@@ -11,12 +11,11 @@ FARPROC p[84] = { 0 };
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 {
 	static HINSTANCE hL;
+	static HINSTANCE payload;
 	if (reason == DLL_PROCESS_ATTACH)
 	{
-		MessageBox(NULL, _T("Hello World"), _T("Hi"), NULL);
 		hL = LoadLibrary(_T("binkw32_orig.dll"));
 		if (!hL) {
-			MessageBox(NULL, _T("not found"), _T("Hi"), NULL);
 			return false;
 		}
 		p[0] = GetProcAddress(hL, "_BinkBufferSetDirectDraw@8");
@@ -103,9 +102,12 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		p[81] = GetProcAddress(hL, "_YUV_blit_UYVY@52");
 		p[82] = GetProcAddress(hL, "_YUV_blit_UYVY_mask@60");
 		p[83] = GetProcAddress(hL, "_YUV_blit_YV12@56");
+		payload = LoadLibrary(_T("S5CppLogic.dll"));
 	}
-	if (reason == DLL_PROCESS_DETACH)
+	if (reason == DLL_PROCESS_DETACH) {
 		FreeLibrary(hL);
+		FreeLibrary(payload);
+	}
 	return TRUE;
 }
 

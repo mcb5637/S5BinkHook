@@ -97,6 +97,10 @@
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>./binkw32.def</ModuleDefinitionFile>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\binkw32.dll"
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\binkw32.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

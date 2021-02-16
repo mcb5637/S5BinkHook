@@ -181,6 +181,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClInclude Include="lua\lauxlib.h" />
     <ClInclude Include="lua\lua.h" />
     <ClInclude Include="lua\lualib.h" />
+    <ClInclude Include="l_api.h" />
     <ClInclude Include="l_mem.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="s5data.h" />
@@ -188,6 +189,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="luaext.cpp" />
+    <ClCompile Include="l_api.cpp" />
     <ClCompile Include="l_mem.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

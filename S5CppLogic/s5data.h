@@ -64,6 +64,19 @@ public:
 	shok_vector<int*> BehaviorList; // 31
 };
 
+struct shok_ECS_CManager : shok_object {
+
+};
+
+struct shok_vtable_ECS_CManager {
+private:
+	int u, u2;
+public:
+	void(__thiscall* ReloadCutscene)(shok_ECS_CManager* th, const char* path);
+};
+
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
 extern void(_stdcall* shok_SetHighPrecFPU)();
+
+extern shok_ECS_CManager*** shok_ECS_CManagerObject;

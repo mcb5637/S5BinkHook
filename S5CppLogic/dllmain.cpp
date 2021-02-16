@@ -5,6 +5,7 @@
 #include "luaext.h"
 #include <string>
 #include "l_mem.h"
+#include "l_api.h"
 
 int __cdecl test(lua_State* L) {
     int id = luaL_checkint(L, 1);
@@ -21,15 +22,20 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_setglobal(L, "hooked");
     lua_pushcfunction(L, &test);
     lua_setglobal(L, "test");
-    lua_newtable(L);
-    lua_newtable(L);
-    lua_pushstring(L, "Memory");
-    lua_pushvalue(L, -2);
-    lua_rawset(L, -4);
-    l_mem_init(L);
-    lua_pop(L, 1);
+
     lua_pushstring(L, "CppLogic");
-    lua_insert(L, -2);
+    lua_newtable(L);
+
+    lua_pushstring(L, "Memory");
+    lua_newtable(L);
+    l_mem_init(L);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "API");
+    lua_newtable(L);
+    l_api_init(L);
+    lua_rawset(L, -3);
+
     lua_rawset(L, LUA_GLOBALSINDEX);
 }
 

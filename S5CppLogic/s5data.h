@@ -22,9 +22,7 @@ struct shok_position {
 	float Y;
 };
 
-struct shok_positionRot {
-	float X;
-	float Y;
+struct shok_positionRot : shok_position {
 	float r;
 };
 
@@ -75,8 +73,51 @@ public:
 	void(__thiscall* ReloadCutscene)(shok_ECS_CManager* th, const char* path);
 };
 
+struct shok_effectCreatorData {
+public:
+	int CreatorType, EffectType;
+private:
+	int Zero1 = 0;
+public:
+	int PlayerID;
+	shok_position StartPos, CurrentPos, TargetPos;
+private:
+	int Zero2 = 0;
+public:
+	int AttackerID, TargetID, Damage;
+	float DamageRadius;
+private:
+	int Zero3 = 0, Zero4 = 0, Zero5 = 0;
+};
+
+struct shok_EGL_CGLEGameLogic : shok_object {
+
+};
+
+struct shok_vtable_EGL_CGLEGameLogic {
+private:
+	int u[23];
+public:
+	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, shok_effectCreatorData* data);
+};
+
+struct shok_EGL_CGLEEffectManager : shok_object {
+
+};
+
+
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
 extern void(_stdcall* shok_SetHighPrecFPU)();
 
 extern shok_ECS_CManager*** shok_ECS_CManagerObject;
+
+extern shok_EGL_CGLEGameLogic** shok_EGL_CGLEGameLogicObject;
+
+extern int shok_effectCreatorData_CreatorType_Projectile;
+
+extern shok_EGL_CGLEEffectManager** shok_EGL_CGLEEffectManagerObject;
+
+extern bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id);
+
+extern void(* shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage);

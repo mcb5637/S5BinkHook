@@ -6,6 +6,8 @@
 #include <string>
 #include "l_mem.h"
 #include "l_api.h"
+#include "l_effect.h"
+#include "l_combat.h"
 
 int __cdecl test(lua_State* L) {
     int id = luaL_checkint(L, 1);
@@ -36,8 +38,20 @@ extern "C" void __cdecl install(lua_State * L) {
     l_api_init(L);
     lua_rawset(L, -3);
 
+    lua_pushstring(L, "Effect");
+    lua_newtable(L);
+    l_effect_init(L);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "Combat");
+    lua_newtable(L);
+    l_combat_init(L);
+    lua_rawset(L, -3);
+
     lua_rawset(L, LUA_GLOBALSINDEX);
 }
+
+// CUtilMemory.GetMemory(tonumber("0898144", 16))
 
 extern "C" lua_State * __lua_open() {
     lua_State* o = lua_open();

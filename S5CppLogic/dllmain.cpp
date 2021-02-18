@@ -8,6 +8,7 @@
 #include "l_api.h"
 #include "l_effect.h"
 #include "l_combat.h"
+#include "l_entity.h"
 
 int __cdecl test(lua_State* L) {
     int id = luaL_checkint(L, 1);
@@ -15,7 +16,7 @@ int __cdecl test(lua_State* L) {
     if (eo == NULL)
         luaL_error(L, "invalid entity id %d", id);
     else
-        lua_pushnumber(L, eo->Position.X);
+        lua_pushnumber(L, eo->EntityId);
     return 1;
 }
 
@@ -48,10 +49,15 @@ extern "C" void __cdecl install(lua_State * L) {
     l_combat_init(L);
     lua_rawset(L, -3);
 
+    lua_pushstring(L, "Entity");
+    lua_newtable(L);
+    l_entity_init(L);
+    lua_rawset(L, -3);
+
     lua_rawset(L, LUA_GLOBALSINDEX);
 }
 
-// CUtilMemory.GetMemory(tonumber("A0C838", 16))
+// CUtilMemory.GetMemory(tonumber("897558", 16))
 
 extern "C" lua_State * __lua_open() {
     lua_State* o = lua_open();

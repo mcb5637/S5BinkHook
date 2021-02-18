@@ -109,6 +109,21 @@ struct shok_BB_CIDManagerEx : shok_object {
 
 };
 
+struct shok_EGL_CGLEEntityManager : shok_object {
+	friend shok_EGL_CGLEEntity * shok_EGL_CGLEEntityManager_GetEntityByNum(shok_EGL_CGLEEntityManager* man, int num);
+public:
+	int EntityCount;
+private:
+	int u[4];
+	struct {
+	private:
+		int u;
+	public:
+		shok_EGL_CGLEEntity* entity;
+	} Entities[1];
+};
+
+shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager_GetEntityByNum(shok_EGL_CGLEEntityManager* man, int num);
 
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
@@ -131,3 +146,5 @@ extern void (*shok_logString)(const char* format, const char* string);
 extern shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj;
 
 extern int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name);
+
+extern shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj;

@@ -8,12 +8,12 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	shok_effectCreatorData data = shok_effectCreatorData();
 	data.CreatorType = shok_effectCreatorData_CreatorType_Projectile;
 	data.EffectType = luaL_checkint(L, 1);
-	data.CurrentPos.X = data.StartPos.X = (float)luaL_checknumber(L, 2);
-	data.CurrentPos.Y = data.StartPos.Y = (float)luaL_checknumber(L, 3);
-	data.TargetPos.X = (float)luaL_checknumber(L, 4);
-	data.TargetPos.Y = (float)luaL_checknumber(L, 5);
+	data.CurrentPos.X = data.StartPos.X = luaL_checkfloat(L, 2);
+	data.CurrentPos.Y = data.StartPos.Y = luaL_checkfloat(L, 3);
+	data.TargetPos.X = luaL_checkfloat(L, 4);
+	data.TargetPos.Y = luaL_checkfloat(L, 5);
 	data.Damage = luaL_optint(L, 6, 0);
-	data.DamageRadius = (float)luaL_optnumber(L, 7, -1);
+	data.DamageRadius = luaL_optfloat(L, 7, -1);
 	data.TargetID = luaL_optint(L, 8, 0);
 	data.AttackerID = luaL_optint(L, 9, 0);
 	data.PlayerID = luaL_optint(L, 10, 0);

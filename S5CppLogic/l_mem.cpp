@@ -20,9 +20,18 @@ int l_mem_reloadCutscene(lua_State* L) {
 	return 0;
 }
 
+int l_mem_getAnimIdFromName(lua_State* L) {
+	const char* data = luaL_checkstring(L, 1);
+	int id = shok_getAnimIdByName(*shok_BB_CIDManagerExObj, data);
+	lua_pushnumber(L, id);
+	return 1;
+}
+
 void l_mem_init(lua_State* L)
 {
 	luaext_registerFunc(L, "SetFPU", &l_mem_setFPU);
 	luaext_registerFunc(L, "ReloadCutscene", &l_mem_reloadCutscene);
+	luaext_registerFunc(L, "GetAnimIdFromName", &l_mem_getAnimIdFromName);
 }
 //CppLogic.Memory.ReloadCutscene
+//CppLogic.Memory.GetAnimIdFromName("CU_Barbarian_LeaderClub1_Walk")

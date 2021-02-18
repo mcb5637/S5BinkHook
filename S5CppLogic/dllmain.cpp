@@ -51,7 +51,7 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_rawset(L, LUA_GLOBALSINDEX);
 }
 
-// CUtilMemory.GetMemory(tonumber("0898144", 16))
+// CUtilMemory.GetMemory(tonumber("A0C838", 16))
 
 extern "C" lua_State * __lua_open() {
     lua_State* o = lua_open();

@@ -105,6 +105,10 @@ struct shok_EGL_CGLEEffectManager : shok_object {
 
 };
 
+struct shok_BB_CIDManagerEx : shok_object {
+
+};
+
 
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
@@ -121,3 +125,9 @@ extern shok_EGL_CGLEEffectManager** shok_EGL_CGLEEffectManagerObject;
 extern bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id);
 
 extern void(* shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage);
+
+extern void (*shok_logString)(const char* format, const char* string);
+
+extern shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj;
+
+extern int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name);

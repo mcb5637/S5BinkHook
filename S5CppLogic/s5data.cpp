@@ -14,6 +14,7 @@ void (*shok_logString)(const char* format, const char* string) = (void (*)(const
 shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name) = (int(__thiscall*)(shok_BB_CIDManagerEx * th, const char* name)) 0x54F19E;
 shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj = (shok_EGL_CGLEEntityManager**)0x897558;
+int(*shok_getEntityIdByScriptName)(const char* str) = (int(*)(const char* str)) 0x576624;
 
 template<class T>
 inline T* shok_vector<T>::Get(int i)
@@ -29,9 +30,9 @@ int shok_vector<T>::Size()
 	return (this->end - this->start) / sizeof(T);
 }
 
-shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager_GetEntityByNum(shok_EGL_CGLEEntityManager* man, int num)
+shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 {
-	if (man->EntityCount <= num)
+	if (EntityCount <= num)
 		return nullptr;
-	return man->Entities[num].entity;
+	return Entities[num].entity;
 }

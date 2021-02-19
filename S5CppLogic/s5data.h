@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+#define DEBUGGER_BREAK _asm int 3
+
 #define SHOK_Import_LUA_OPEN 0x761284
 #define SHOK_SEGMENTSTART 0x401000
 #define SHOK_SEGMENTLENGTH 0x64B000
@@ -43,11 +45,11 @@ public:
 	int ModelOverride;
 	int PlayerId;
 private:
-	int u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14, u15, u16, u17;
+	int u3[15];
 public:
 	shok_positionRot Position; // 22
 private:
-	int u18, u19;
+	int u4[2];
 public:
 	float Scale; // 25
 	byte DefaultBehavourFlag, UserControlFlag, UnattackableFlag;
@@ -60,6 +62,30 @@ private:
 	int u22, u23;
 public:
 	shok_vector<int*> BehaviorList; // 31
+private:
+	int u24;
+public:
+	int CurrentState, EntityStateBehaviors, TaskListId, TaskIndex; // la37
+private:
+	int u25[13]; // la50
+public:
+	int CurrentHealth;
+	char* ScriptName;
+	char* ScriptCommandLine;
+	float Exploration;
+	int TaskListStart;
+private:
+	int u26[3];
+public:
+	int InvulnerabilityAndSuspended; // 57
+	int SuspensionTurn;
+	int ScriptingValue;
+private:
+	int u27[4];
+public:
+	int StateChangeCounter;
+	int TaskListChangeCounter;
+	int NumberOfAuraEffects;
 };
 
 struct shok_ECS_CManager : shok_object {
@@ -110,7 +136,6 @@ struct shok_BB_CIDManagerEx : shok_object {
 };
 
 struct shok_EGL_CGLEEntityManager : shok_object {
-	friend shok_EGL_CGLEEntity * shok_EGL_CGLEEntityManager_GetEntityByNum(shok_EGL_CGLEEntityManager* man, int num);
 public:
 	int EntityCount;
 private:
@@ -121,9 +146,10 @@ private:
 	public:
 		shok_EGL_CGLEEntity* entity;
 	} Entities[1];
-};
 
-shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager_GetEntityByNum(shok_EGL_CGLEEntityManager* man, int num);
+public:
+	shok_EGL_CGLEEntity* GetEntityByNum(int num);
+};
 
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
@@ -148,3 +174,5 @@ extern shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj;
 extern int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name);
 
 extern shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj;
+
+extern int(*shok_getEntityIdByScriptName)(const char* str);

@@ -14,8 +14,8 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.TargetPos.Y = luaL_checkfloat(L, 5);
 	data.Damage = luaL_optint(L, 6, 0);
 	data.DamageRadius = luaL_optfloat(L, 7, -1);
-	data.TargetID = luaL_optint(L, 8, 0);
-	data.AttackerID = luaL_optint(L, 9, 0);
+	data.TargetID = luaext_optEntityId(L, 8);
+	data.AttackerID = luaext_optEntityId(L, 9);
 	data.PlayerID = luaL_optint(L, 10, 0);
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogicObject;
 	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)gl->vtable;

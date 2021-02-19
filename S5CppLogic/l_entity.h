@@ -3,7 +3,7 @@
 #include "luaimport.h"
 #include "s5data.h"
 
-#define l_entity_checkpredicate(L, i) (EntityIteratorPredicateOfType *) luaext_checkudata(L, i)
+#define l_entity_checkpredicate(L, i) (EntityIteratorPredicate *) luaext_checkudata(L, i)
 
 void l_entity_init(lua_State* L);
 

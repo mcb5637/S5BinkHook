@@ -75,7 +75,10 @@ int l_entityPredicateOr(lua_State* L) {
 }
 
 int l_entityIteratorToTable(lua_State* L) {
-	EntityIteratorPredicateOfType* pred = l_entity_checkpredicate(L, 1);
+	if (lua_gettop(L) > 1) { // auto create an and predicate
+		l_entityPredicateAnd(L);
+	}
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
 	int index = 1;
 	lua_newtable(L);
 	EntityIterator it = EntityIterator(pred);
@@ -91,11 +94,38 @@ int l_entityIteratorToTable(lua_State* L) {
 	return 1;
 }
 
+int l_entityIteratorNext(lua_State* L) { // (state, last value) -> next value
+	EntityIterator* it = (EntityIterator*)lua_touserdata(L, 1); // no error checking here, cause that would cost speed
+	shok_EGL_CGLEEntity* e = it->GetNext();
+	if (e == nullptr)
+		lua_pushnil(L);
+	else
+		lua_pushnumber(L, e->EntityId);
+	return 1;
+}
+
+int l_entityIterator(lua_State* L) {
+	if (lua_gettop(L) > 1) { // auto create an and predicate
+		l_entityPredicateAnd(L);
+	}
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
+	lua_pushcfunction(L, &l_entityIteratorNext); // func
+	void* ud = lua_newuserdata(L, sizeof(EntityIterator)); // state (using state instead of c closure, cause i have one less lua api call in next)
+	new(ud) EntityIterator(pred);
+	lua_newtable(L);
+	lua_pushvalue(L, 1);
+	lua_rawseti(L, -2, 1);
+	lua_setmetatable(L, 3); // set predicate as metatable of state, to keep it from getting gced
+	lua_pushnil(L); // initial value
+	return 3;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
 	luaext_registerFunc(L, "Get", &l_entity_get);
 	luaext_registerFunc(L, "EntityIteratorTableize", &l_entityIteratorToTable);
+	luaext_registerFunc(L, "EntityIterator", &l_entityIterator);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -111,6 +141,7 @@ void l_entity_init(lua_State* L)
 // CppLogic.Entity.Get(1)
 // CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.And(CppLogic.Entity.Predicates.OfType(Entities.PB_Headquarters1), CppLogic.Entity.Predicates.OfPlayer(1)))
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.InCircle(x,y, 1000))
+// for id in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.OfType(Entities.PU_Serf), CppLogic.Entity.Predicates.OfPlayer(1)) do LuaDebugger.Log(id) end
 
 EntityIterator::EntityIterator(EntityIteratorPredicate* Predicate)
 {

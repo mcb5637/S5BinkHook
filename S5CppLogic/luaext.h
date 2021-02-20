@@ -13,3 +13,5 @@ shok_EGL_CGLEEntity* luaext_checkEntity(lua_State* L, int ind);
 shok_EGL_CGLEEntity* luaext_optEntity(lua_State* L, int ind);
 int luaext_optEntityId(lua_State* L, int ind);
 int luaext_checkEntityId(lua_State* L, int ind);
+shok_GGL_CSettler* luaext_optSettler(lua_State* L, int ind);
+shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind);

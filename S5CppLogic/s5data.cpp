@@ -15,19 +15,21 @@ shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C83
 int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name) = (int(__thiscall*)(shok_BB_CIDManagerEx * th, const char* name)) 0x54F19E;
 shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj = (shok_EGL_CGLEEntityManager**)0x897558;
 int(*shok_getEntityIdByScriptName)(const char* str) = (int(*)(const char* str)) 0x576624;
+bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4A2B62;
+bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x449432;
 
 template<class T>
 inline T* shok_vector<T>::Get(int i)
 {
 	if (i < 0 || i >= Size())
-		return NULL;
+		return nullptr;
 	return start + i;
 }
 
 template<class T>
 int shok_vector<T>::Size()
 {
-	return (this->end - this->start) / sizeof(T);
+	return end - start;
 }
 
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
@@ -35,4 +37,18 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 	if (EntityCount <= num)
 		return nullptr;
 	return Entities[num].entity;
+}
+
+shok_EGL_CGLEBehavior* EntitySearchBehavior(shok_EGL_CGLEEntity* e, void* vt) {
+	for (int i = 0; i < e->BehaviorList.Size(); i++) {
+		shok_EGL_CGLEBehavior** b = e->BehaviorList.Get(i);
+		if (b != nullptr && (*b) != nullptr && (*b)->vtable == vt)
+			return *b;
+	}
+	return nullptr;
+}
+
+shok_GGL_CSoldierBehavior* EntityGetSoldierBehavior(shok_EGL_CGLEEntity* e)
+{
+	return (shok_GGL_CSoldierBehavior*)EntitySearchBehavior(e, (void*)0x773CC8);
 }

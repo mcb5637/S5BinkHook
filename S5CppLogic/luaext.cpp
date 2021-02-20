@@ -48,3 +48,17 @@ int luaext_checkEntityId(lua_State* L, int ind) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, ind);
 	return e == nullptr ? 0 : e->EntityId;
 }
+
+shok_GGL_CSettler* luaext_optSettler(lua_State* L, int ind) {
+	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
+	if (d != nullptr && shok_EntityIsSettler(d))
+		return (shok_GGL_CSettler*)d;
+	return nullptr;
+}
+
+shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind) {
+	shok_GGL_CSettler* d = luaext_optSettler(L, ind);
+	if (d == nullptr)
+		luaL_error(L, "no settler at argument %d", ind);
+	return d;
+}

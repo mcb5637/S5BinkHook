@@ -11,12 +11,10 @@
 #include "l_entity.h"
 
 int __cdecl test(lua_State* L) {
-    int id = luaL_checkint(L, 1);
-    shok_EGL_CGLEEntity* eo = shok_eid2obj(id);
-    if (eo == NULL)
-        luaL_error(L, "invalid entity id %d", id);
-    else
-        lua_pushnumber(L, eo->EntityId);
+    shok_GGL_CSettler s = shok_GGL_CSettler();
+    int st = (int)&s;
+    int test = (int)&s.BehaviorList;
+    lua_pushnumber(L, (test - st) / 4);
     return 1;
 }
 

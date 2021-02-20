@@ -10,7 +10,7 @@
 typedef uint8_t byte;
 
 template <class T> struct shok_vector {
-private:
+public:
 	T* start;
 	T* end;
 	T* endData;
@@ -33,6 +33,40 @@ public:
 	void* vtable;
 };
 
+struct shok_EGL_CGLEBehavior : shok_object {
+	int BehaviorIndex, EntityId;
+private:
+	int PropPointer; // 3
+};
+
+struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior {
+	float SuccessDistance, FailureDistance;
+	int TimeOutTime, StartTurn;
+	shok_position TargetPosition;
+	byte StartFollowing, StopFollowing;
+private:
+	byte u1[2];
+public:
+	int FollowStatus, LatestHitTurn;
+private:
+	int u2;
+public:
+	int LatestAttackerID, BattleStatus;
+	byte NoMoveNecessary, NormalRangeCheckNecessary;
+private:
+	byte u3[2];
+public:
+	int Command;
+	shok_position AttackMoveTarget;
+private:
+	int u4;
+public:
+	int MilliSecondsToWait, MSToPlayHitAnimation, HitPlayed;
+};
+
+struct shok_GGL_CSoldierBehavior : shok_GGL_CBattleBehavior {
+};
+
 struct shok_EGL_CGLEEntity : shok_object {
 private:
 	int u1;
@@ -48,10 +82,11 @@ private:
 	int u3[15];
 public:
 	shok_positionRot Position; // 22
-private:
-	int u4[2];
 public:
 	float Scale; // 25
+private:
+	int u4;
+public:
 	byte DefaultBehavourFlag, UserControlFlag, UnattackableFlag;
 private:
 	byte u20;
@@ -61,35 +96,125 @@ private:
 	byte u21;
 	int u22, u23;
 public:
-	shok_vector<int*> BehaviorList; // 31
-private:
-	int u24;
-public:
+	shok_vector<shok_EGL_CGLEBehavior*> BehaviorList; // 31
 	int CurrentState, EntityStateBehaviors, TaskListId, TaskIndex; // la37
 private:
-	int u25[13]; // la50
+	int u25[12]; // la49
 public:
 	int CurrentHealth;
 	char* ScriptName;
 	char* ScriptCommandLine;
 	float Exploration;
-	int TaskListStart;
+	int TaskListStart; // 54
 private:
-	int u26[3];
+	int u26[2];
 public:
 	int InvulnerabilityAndSuspended; // 57
 	int SuspensionTurn;
-	int ScriptingValue;
+	int ScriptingValue; // 59
 private:
-	int u27[4];
+	int u27[3];
 public:
-	int StateChangeCounter;
+	int StateChangeCounter; // 63
 	int TaskListChangeCounter;
-	int NumberOfAuraEffects;
+	int NumberOfAuraEffects; // 65
+};
+
+struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
+	shok_position TargetPosition; // la67
+	int TargetRotationValid;
+	float TargetRotation;
+	int MovementState; // 70
+};
+
+struct shok_GGL_CEvadingEntity : shok_EGL_CMovingEntity {};
+
+struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
+private:
+	int u[4];
+public:
+	int TimeToWait, HeadIndex, HeadParams; // la77
+private:
+	int u2[7];
+public:
+	float ExperiencePoints; // 85
+	int ExperienceLevel;
+private:
+	int u3[2];
+public:
+	float MovingSpeed; //89
+private:
+	int u4;
+public:
+	float Damage;
+private:
+	int u5;
+public:
+	float Dodge;
+private:
+	int u6;
+public:
+	float Motivation;
+private:
+	int u7;
+public:
+	float Armor;
+private:
+	int u8;
+public:
+	float CurrentAmountSoldiers;
+private:
+	int u9;
+public:
+	float MaxAmountSoldiers;
+private:
+	int u10;
+public:
+	float DamageBonus;
+private:
+	int u11;
+public:
+	float ExplorationCache;
+private:
+	int u12;
+public:
+	float MaxAttackRange;
+private:
+	int u13;
+public:
+	float AutoAttackRange;
+private:
+	int u14;
+public:
+	float HealingPoints;
+private:
+	int u15;
+public:
+	float MissChance;
+private:
+	int u16;
+public:
+	float Healthbar; // 115
+private:
+	int u17[7];
+public:
+	float SomeIntRegardingTaskLists; // 123
+private:
+	int u18[3];
+public:
+	int LeaderId;
+private:
+	int u19[2];
+public:
+	int OverheadWidget;
+	int ExperienceClass;
+private:
+	int u20[2];
+public:
+	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
 };
 
 struct shok_ECS_CManager : shok_object {
-
 };
 
 struct shok_vtable_ECS_CManager {
@@ -176,3 +301,9 @@ extern int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const cha
 extern shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj;
 
 extern int(*shok_getEntityIdByScriptName)(const char* str);
+
+extern bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e);
+
+extern bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e);
+
+shok_GGL_CSoldierBehavior* EntityGetSoldierBehavior(shok_EGL_CGLEEntity* e);

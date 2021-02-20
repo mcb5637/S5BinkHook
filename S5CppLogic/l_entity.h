@@ -24,7 +24,7 @@ public:
 
 struct EntityIteratorPredicateOfType : EntityIteratorPredicate {
 private:
-	int t;
+	int type;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
 	EntityIteratorPredicateOfType(int etype);
@@ -32,7 +32,7 @@ public:
 
 struct EntityIteratorPredicateOfPlayer : EntityIteratorPredicate {
 private:
-	int t;
+	int player;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
 	EntityIteratorPredicateOfPlayer(int player);
@@ -40,20 +40,20 @@ public:
 
 struct EntityIteratorPredicateAnd : EntityIteratorPredicate {
 private:
-	EntityIteratorPredicate** t;
+	EntityIteratorPredicate** predicates;
 	int numPreds;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
-	EntityIteratorPredicateAnd(EntityIteratorPredicate** t, int numPreds);
+	EntityIteratorPredicateAnd(EntityIteratorPredicate** preds, int numPreds);
 };
 
 struct EntityIteratorPredicateOr : EntityIteratorPredicate {
 private:
-	EntityIteratorPredicate** t;
+	EntityIteratorPredicate** predicates;
 	int numPreds;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
-	EntityIteratorPredicateOr(EntityIteratorPredicate** t, int numPreds);
+	EntityIteratorPredicateOr(EntityIteratorPredicate** preds, int numPreds);
 };
 
 struct EntityIteratorPredicateInCircle : EntityIteratorPredicate {
@@ -62,4 +62,42 @@ private:
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
 	EntityIteratorPredicateInCircle(float x, float y, float r);
+};
+
+struct EntityIteratorPredicateIsSettler : EntityIteratorPredicate {
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+};
+
+struct EntityIteratorPredicateIsBuilding : EntityIteratorPredicate {
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+};
+
+struct EntityIteratorPredicateIsSettlerOrBuilding : EntityIteratorPredicate {
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+};
+
+struct EntityIteratorPredicateAnyPlayer : EntityIteratorPredicate {
+private:
+	int* players;
+	int numPlayers;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+	EntityIteratorPredicateAnyPlayer(int* pl, int numPlayers);
+};
+
+struct EntityIteratorPredicateAnyEntityType : EntityIteratorPredicate {
+private:
+	int* types;
+	int numTypes;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+	EntityIteratorPredicateAnyEntityType(int* ty, int numTy);
+};
+
+struct EntityIteratorPredicateIsNotSoldier : EntityIteratorPredicate {
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
 };

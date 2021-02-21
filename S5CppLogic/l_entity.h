@@ -101,3 +101,19 @@ struct EntityIteratorPredicateIsNotSoldier : EntityIteratorPredicate {
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
 };
+
+struct EntityIteratorPredicateOfEntityCategory : EntityIteratorPredicate {
+private:
+	int category;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+	EntityIteratorPredicateOfEntityCategory(int cat);
+};
+
+struct EntityIteratorPredicateProvidesResource : EntityIteratorPredicate {
+private:
+	int resource;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+	EntityIteratorPredicateProvidesResource(int res);
+};

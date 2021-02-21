@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <vector>
 
 #define DEBUGGER_BREAK _asm int 3
 
@@ -94,9 +95,9 @@ public:
 	byte SelectableFlag, f1, VisibleFlag;
 private:
 	byte u21;
-	int u22, u23;
+	int u22;
 public:
-	shok_vector<shok_EGL_CGLEBehavior*> BehaviorList; // 31
+	std::vector<shok_EGL_CGLEBehavior*> BehaviorList; // 30, first field in 31
 	int CurrentState, EntityStateBehaviors, TaskListId, TaskIndex; // la37
 private:
 	int u25[12]; // la49
@@ -118,6 +119,11 @@ public:
 	int StateChangeCounter; // 63
 	int TaskListChangeCounter;
 	int NumberOfAuraEffects; // 65
+
+private:
+	shok_EGL_CGLEBehavior* SearchBehavior(void* vt);
+public:
+	shok_GGL_CSoldierBehavior* GetSoldierBehavior();
 };
 
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
@@ -214,6 +220,10 @@ public:
 	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
 };
 
+struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
+	int ResourceType, ResourceAmount, ResourceAmountAdd;
+};
+
 struct shok_ECS_CManager : shok_object {
 };
 
@@ -306,4 +316,8 @@ extern bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e);
 
 extern bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e);
 
-shok_GGL_CSoldierBehavior* EntityGetSoldierBehavior(shok_EGL_CGLEEntity* e);
+extern bool(__thiscall* shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat);
+
+extern bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e);
+
+extern int(_cdecl* shok_EntityGetProvidedResourceByID)(int id);

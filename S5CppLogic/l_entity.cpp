@@ -119,6 +119,20 @@ int l_entityPredicateIsNotSoldier(lua_State* L) {
 	return 1;
 }
 
+int l_entityPredicateOfEntityCategory(lua_State* L) {
+	int ty = luaL_checkint(L, 1);
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateOfEntityCategory));
+	new(ud) EntityIteratorPredicateOfEntityCategory(ty);
+	return 1;
+}
+
+int l_entityPredicateProvidesResource(lua_State* L) {
+	int ty = luaL_checkint(L, 1);
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateProvidesResource));
+	new(ud) EntityIteratorPredicateProvidesResource(ty);
+	return 1;
+}
+
 int l_entityIteratorToTable(lua_State* L) {
 	if (lua_gettop(L) > 1) { // auto create an and predicate
 		l_entityPredicateAnd(L);
@@ -165,6 +179,13 @@ int l_entityIterator(lua_State* L) {
 	return 3;
 }
 
+int l_entityCheckPredicate(lua_State* L) {
+	shok_EGL_CGLEEntity* s = luaext_checkEntity(L, 1);
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 2);
+	lua_pushboolean(L, pred->MatchesEntity(s));
+	return 1;
+}
+
 int l_settlerGetLeaderOfSoldier(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	lua_pushnumber(L, s->LeaderId);
@@ -173,7 +194,14 @@ int l_settlerGetLeaderOfSoldier(lua_State* L) {
 
 int l_entityGetNumberOfBehaviors(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	lua_pushnumber(L, e->BehaviorList.Size());
+	lua_pushnumber(L, e->BehaviorList.size());
+	return 1;
+}
+
+int l_entity_test(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	int(_cdecl * func)(int id) = (int(_cdecl*)(int id))  0x4B8489;
+	lua_pushnumber(L, func(e->EntityId));
 	return 1;
 }
 
@@ -184,6 +212,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "EntityIteratorTableize", &l_entityIteratorToTable);
 	luaext_registerFunc(L, "EntityIterator", &l_entityIterator);
 	luaext_registerFunc(L, "GetNumberOfBehaviors", &l_entityGetNumberOfBehaviors);
+	luaext_registerFunc(L, "test", &l_entity_test);
+	luaext_registerFunc(L, "CheckPredicate", &l_entityCheckPredicate);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -198,6 +228,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "OfAnyPlayer", &l_entityPredicateAnyPlayer);
 	luaext_registerFunc(L, "OfAnyEntityType", &l_entityPredicateAnyEntityType);
 	luaext_registerFunc(L, "IsNotSoldier", &l_entityPredicateIsNotSoldier);
+	luaext_registerFunc(L, "OfEntityCategory", &l_entityPredicateOfEntityCategory);
+	luaext_registerFunc(L, "ProvidesResource", &l_entityPredicateProvidesResource);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Settler");
@@ -206,6 +238,8 @@ void l_entity_init(lua_State* L)
 	lua_rawset(L, -3);
 }
 
+// CppLogic.Entity.CheckPredicate(GUI.GetEntityAtPosition(GUI.GetMousePosition()), CppLogic.Entity.Predicates.ProvidesResource(ResourceType.WoodRaw))
+// CppLogic.Entity.test(GUI.GetEntityAtPosition(GUI.GetMousePosition()), EntityCategories.Sword)
 // CppLogic.Entity.GetNumberOfAllocatedEntities()
 // CppLogic.Entity.GetNumberOfBehaviors(GUI.GetEntityAtPosition(GUI.GetMousePosition()))
 // CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.IsSettler(), CppLogic.Entity.Predicates.IsNotSoldier(), CppLogic.Entity.Predicates.OfPlayer(1))
@@ -350,5 +384,25 @@ EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(int* 
 
 bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e)
 {
-	return EntityGetSoldierBehavior(e) == nullptr;
+	return e->GetSoldierBehavior() == nullptr;
+}
+
+bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e)
+{
+	return shok_IsEntityInCategory(e, category);
+}
+
+EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory(int cat)
+{
+	category = cat;
+}
+
+bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity* e)
+{
+	return shok_EntityGetProvidedResourceByID(e->EntityId) == resource;
+}
+
+EntityIteratorPredicateProvidesResource::EntityIteratorPredicateProvidesResource(int res)
+{
+	resource = res;
 }

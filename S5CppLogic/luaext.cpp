@@ -62,3 +62,17 @@ shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind) {
 		luaL_error(L, "no settler at argument %d", ind);
 	return d;
 }
+
+shok_GGL_CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind) {
+	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
+	if (d != nullptr && shok_EntityIsResourceDoodad(d))
+		return (shok_GGL_CResourceDoodad*)d;
+	return nullptr;
+}
+
+shok_GGL_CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind) {
+	shok_GGL_CResourceDoodad* d = luaext_optResourceDoodad(L, ind);
+	if (d == nullptr)
+		luaL_error(L, "no resource entity at argument %d", ind);
+	return d;
+}

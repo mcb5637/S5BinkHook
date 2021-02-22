@@ -11,9 +11,9 @@
 #include "l_entity.h"
 
 int __cdecl test(lua_State* L) {
-    shok_GGL_CSettler s = shok_GGL_CSettler();
+    shok_GGL_CBuilding s = shok_GGL_CBuilding();
     int st = (int)&s;
-    int test = (int)&s.BehaviorList;
+    int test = (int)&s.ConstructionSiteType;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }

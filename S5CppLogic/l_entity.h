@@ -117,3 +117,20 @@ public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
 	EntityIteratorPredicateProvidesResource(int res);
 };
+
+struct EntityIteratorPredicateInRect : EntityIteratorPredicate {
+private:
+	shok_position low;
+	shok_position high;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+	EntityIteratorPredicateInRect(float x1, float y1, float x2, float y2);
+};
+
+struct EntityIteratorPredicateNot : EntityIteratorPredicate {
+private:
+	EntityIteratorPredicate* predicate;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e);
+	EntityIteratorPredicateNot(EntityIteratorPredicate* pred);
+};

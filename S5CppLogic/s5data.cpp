@@ -21,20 +21,6 @@ bool(__thiscall* shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bo
 bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4B82C7;
 int(_cdecl* shok_EntityGetProvidedResourceByID)(int id) = (int(_cdecl*)(int id)) 0x4B8489;
 
-template<class T>
-inline T* shok_vector<T>::Get(int i)
-{
-	if (i < 0 || i >= Size())
-		return nullptr;
-	return start + i;
-}
-
-template<class T>
-int shok_vector<T>::Size()
-{
-	return end - start;
-}
-
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 {
 	if (EntityCount <= num)
@@ -42,16 +28,28 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 	return Entities[num].entity;
 }
 
-shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(void* vt)
+template<class T>
+bool contains(T* data, T search, int num) {
+	for (int i = 0; i < num; i++)
+		if (data[i] == search)
+			return true;
+	return false;
+}
+
+shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(void** vts, int num)
 {
 	for (shok_EGL_CGLEBehavior* b : BehaviorList) {
-		if (b != nullptr && b->vtable == vt)
+		if (b != nullptr && contains(vts, b->vtable, num))
 			return b;
 	}
 	return nullptr;
 }
 
+shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(void* vt) {
+	return SearchBehavior(&vt, 1);
+}
+
 shok_GGL_CSoldierBehavior* shok_EGL_CGLEEntity::GetSoldierBehavior()
 {
-	return (shok_GGL_CSoldierBehavior*)SearchBehavior((void*)0x773CC8);
+	return (shok_GGL_CSoldierBehavior*)SearchBehavior(shok_vtp_GGL_CSoldierBehavior);
 }

@@ -96,6 +96,17 @@ int l_entityPredicateOr(lua_State* L) {
 	return 1;
 }
 
+int l_entityPredicateNot(lua_State* L) {
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, -1);
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateNot));
+	new(ud) EntityIteratorPredicateNot(pred);
+	lua_newtable(L);
+	lua_pushvalue(L, 1);// keep predicate as metatable, so they dont get gced
+	lua_rawseti(L, 2, 1);
+	lua_setmetatable(L, 2);
+	return 1;
+}
+
 int l_entityPredicateIsSettler(lua_State* L) {
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateIsSettler));
 	new(ud) EntityIteratorPredicateIsSettler();
@@ -130,6 +141,16 @@ int l_entityPredicateProvidesResource(lua_State* L) {
 	int ty = luaL_checkint(L, 1);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateProvidesResource));
 	new(ud) EntityIteratorPredicateProvidesResource(ty);
+	return 1;
+}
+
+int l_entityPredicateInRect(lua_State* L) {
+	float x1 = luaL_checkfloat(L, 1);
+	float y1 = luaL_checkfloat(L, 2);
+	float x2 = luaL_checkfloat(L, 3);
+	float y2 = luaL_checkfloat(L, 4);
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateInRect));
+	new(ud) EntityIteratorPredicateInRect(x1, y1, x2, y2);
 	return 1;
 }
 
@@ -219,6 +240,7 @@ void l_entity_init(lua_State* L)
 	lua_newtable(L);
 	luaext_registerFunc(L, "And", &l_entityPredicateAnd);
 	luaext_registerFunc(L, "Or", &l_entityPredicateOr);
+	luaext_registerFunc(L, "Not", &l_entityPredicateNot);
 	luaext_registerFunc(L, "OfType", &l_entityPredicateOfType);
 	luaext_registerFunc(L, "OfPlayer", &l_entityPredicateOfPlayer);
 	luaext_registerFunc(L, "InCircle", &l_entityPredicateInCircle);
@@ -230,6 +252,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "IsNotSoldier", &l_entityPredicateIsNotSoldier);
 	luaext_registerFunc(L, "OfEntityCategory", &l_entityPredicateOfEntityCategory);
 	luaext_registerFunc(L, "ProvidesResource", &l_entityPredicateProvidesResource);
+	luaext_registerFunc(L, "InRect", &l_entityPredicateInRect);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Settler");
@@ -405,4 +428,27 @@ bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity*
 EntityIteratorPredicateProvidesResource::EntityIteratorPredicateProvidesResource(int res)
 {
 	resource = res;
+}
+
+bool EntityIteratorPredicateInRect::MatchesEntity(shok_EGL_CGLEEntity* e)
+{
+	return low.X <= e->Position.X && e->Position.X <= high.X && low.Y <= e->Position.Y && e->Position.Y <= high.Y;
+}
+
+EntityIteratorPredicateInRect::EntityIteratorPredicateInRect(float x1, float y1, float x2, float y2)
+{
+	low.X = min(x1, x2);
+	low.Y = min(y1, y2);
+	high.X = max(x1, x2);
+	high.Y = max(y1, y2);
+}
+
+bool EntityIteratorPredicateNot::MatchesEntity(shok_EGL_CGLEEntity* e)
+{
+	return !predicate->MatchesEntity(e);
+}
+
+EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* pred)
+{
+	predicate = pred;
 }

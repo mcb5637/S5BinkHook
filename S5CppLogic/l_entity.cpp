@@ -412,7 +412,7 @@ bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e)
 
 bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e)
 {
-	return shok_IsEntityInCategory(e, category);
+	return e->IsEntityInCategory(category);
 }
 
 EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory(int cat)

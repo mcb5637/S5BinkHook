@@ -22,7 +22,7 @@ int l_mem_reloadCutscene(lua_State* L) {
 
 int l_mem_getAnimIdFromName(lua_State* L) {
 	const char* data = luaL_checkstring(L, 1);
-	int id = shok_getAnimIdByName(*shok_BB_CIDManagerExObj, data);
+	int id = (*shok_BB_CIDManagerExObj)->GetAnimIdByName(data);
 	lua_pushnumber(L, id);
 	return 1;
 }

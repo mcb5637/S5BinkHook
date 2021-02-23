@@ -26,7 +26,7 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 
 int l_effect_isValid(lua_State* L) {
 	int id = luaL_checkint(L, 1);
-	bool r = shok_EGL_CGLEEffectManager_IsEffectValid(*shok_EGL_CGLEEffectManagerObject, id);
+	bool r = (*shok_EGL_CGLEEffectManagerObject)->IsEffectValid(id);
 	lua_pushboolean(L, r);
 	return 1;
 }

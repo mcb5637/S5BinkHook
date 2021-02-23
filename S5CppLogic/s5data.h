@@ -27,10 +27,433 @@ public:
 	float Gold, GoldRaw, Silver, SilverRaw, Stone, StoneRaw, Iron, IronRaw, Sulfur, SulfurRaw, Clay, ClayRaw, Wood, WoodRaw, WeatherEnergy, Knowledge, Faith;
 };
 
+struct shok_modifyEntityProps {
+	int MysteriousInt;
+	std::vector<int> TechList;
+};
+
 struct shok_object {
 public:
 	void* vtable;
 };
+
+
+// behavior props
+#define shok_vtp_EGL_CGLEBehaviorProps (void*)0x772A2C
+struct shok_EGL_CGLEBehaviorProps : shok_object {
+private:
+	int u;
+public:
+	int BehaviorIndex, BehaviorClass;
+};
+
+#define shok_vtp_EGL_CMovementBehaviorProps (void*)0x784938
+struct shok_EGL_CMovementBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	float MovementSpeed, TurningSpeed;
+	int MoveTaskList, MoveIdleAnim;
+};
+
+#define shok_vtp_GGL_CHeroAbilityProps (void*)0x773774
+struct shok_GGL_CHeroAbilityProps : shok_EGL_CGLEBehaviorProps {
+	int RechargeTimeSeconds;
+};
+
+#define shok_vtp_GGL_CCamouflageBehaviorProps (void*)0x7778D8
+struct shok_GGL_CCamouflageBehaviorProps : shok_GGL_CHeroAbilityProps {
+	int DurationSeconds;
+	float DiscoveryRange;
+};
+
+#define shok_vtp_GGL_CHeroHawkBehaviorProps (void*)0x77672C
+struct shok_GGL_CHeroHawkBehaviorProps : shok_GGL_CHeroAbilityProps {
+	int HawkType;
+	float HawkMaxRange;
+};
+
+#define shok_vtp_GGL_CInflictFearAbilityProps (void*)0x776674
+struct shok_GGL_CInflictFearAbilityProps : shok_GGL_CHeroAbilityProps {
+	int TaskList, Animation, FlightDuration;
+	float Range, FlightRange;
+};
+
+#define shok_vtp_GGL_CCannonBuilderBehaviorProps (void*)0x777510
+struct shok_GGL_CCannonBuilderBehaviorProps : shok_GGL_CHeroAbilityProps {
+	int TaskList;
+};
+
+#define shok_vtp_GGL_CRangedEffectAbilityProps (void*)0x774E9C
+struct shok_GGL_CRangedEffectAbilityProps : shok_GGL_CHeroAbilityProps {
+	byte AffectsOwn, AffectsFriends, AffectsNeutrals, AffectsHostiles, AffectsMilitaryOnly, AffectsLongRangeOnly;
+private:
+	byte u[2];
+public:
+	float Range;
+	int DurationSeconds;
+	float DamageFactor, ArmorFactor, HealthRecoveryFactor;
+	int Effect, HealEffect;
+};
+
+#define shok_vtp_GGL_CCircularAttackProps (void*)0x7774A0
+struct shok_GGL_CCircularAttackProps : shok_GGL_CHeroAbilityProps {
+	int TaskList, Animation, DamageClass, Damage;
+	float Range;
+};
+
+#define shok_vtp_GGL_CSummonBehaviorProps (void*)0x773C50
+struct shok_GGL_CSummonBehaviorProps : shok_GGL_CHeroAbilityProps {
+	int SummonedEntityType, NumberOfSummonedEntities, SummonTaskList;
+};
+
+#define shok_vtp_GGL_CConvertSettlerAbilityProps (void*)0x7772D0
+struct shok_GGL_CConvertSettlerAbilityProps : shok_GGL_CHeroAbilityProps {
+	int ConversionTaskList;
+	float HPToMSFactor, ConversionStartRange, ConversionMaxRange;
+};
+
+#define shok_vtp_GGL_CSniperAbilityProps (void*)0x7745E8
+struct shok_GGL_CSniperAbilityProps : shok_GGL_CHeroAbilityProps {
+	int TaskList, Animation;
+	float Range, DamageFactor;
+};
+
+#define shok_vtp_GGL_CMotivateWorkersAbilityProps (void*)0x775788
+struct shok_GGL_CMotivateWorkersAbilityProps : shok_GGL_CHeroAbilityProps {
+	int TaskList, Animation;
+	float Range;
+	int WorkTimeBonus, Effect;
+};
+
+#define shok_vtp_GGL_CShurikenAbilityProps (void*)0x7746B4
+struct shok_GGL_CShurikenAbilityProps : shok_GGL_CHeroAbilityProps {
+	int TaskList, Animation;
+	float Range, MaxArcDegree;
+	int NumberShuriken, ProjectileType;
+	float ProjectileOffsetHeight, ProjectileOffsetFront, ProjectileOffsetRight;
+	int DamageClass, DamageAmount;
+};
+
+#define shok_vtp_GGL_CSentinelBehaviorProps (void*)0x774BAC
+struct shok_GGL_CSentinelBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	float Range;
+};
+
+#define shok_vtp_GGL_CGLAnimationBehaviorExProps (void*)0x776C48
+struct shok_GGL_CGLAnimationBehaviorExProps : shok_EGL_CGLEBehaviorProps {
+	int SuspensionAnimation, AnimSet;
+};
+
+#define shok_vtp_GGL_CWorkerBehaviorProps (void*)0x772B90
+struct shok_GGL_CWorkerBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int WorkTaskList, WorkIdleTaskList;
+private:
+	int u;
+public:
+	int WorkWaitUntil, EatTaskList, EatIdleTaskList, EatWait, RestTaskList, RestIdleTaskList, RestWait;
+private:
+	int u2;
+public:
+	int LeaveTaskList;
+	float AmountResearched;
+private:
+	int u3;
+public:
+	float WorkTimeChangeFarm, WorkTimeChangeResidence, WorkTimeChangeCamp;
+	int WorkTimeMaxCangeFarm, WorkTimeMaxChangeResidence;
+	float ExhaustedWorkMotivationMalus;
+	int TransportAmount, TransportModel, TransportAnim, ResourceToRefine;
+	float WorkTimeChangeWork;
+};
+
+#define shok_vtp_GGL_CBattleBehaviorProps (void*)0x7731C0
+struct shok_GGL_CBattleBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int BattleTaskList, NormalAttackAnim1, NormalAttackAnim2, CounterAttackAnim, FinishingMoveAnim, MissAttackAnim, BattleIdleAnim, BattleWalkAnim;
+	int HitAnim, DamageClass, DamageAmount, MaxDamageRandomBonus;
+	float DamageRange;
+	int ProjectileEffectID;
+	float ProjectileOffsetFront, ProjectileOffsetRight, ProjectileOffsetHeight;
+	int BattleWaitUntil, MissChance;
+	float MaxRange, MinRange;
+};
+
+#define shok_vtp_GGL_CLeaderBehaviorProps (void*)0x775FA4
+struct shok_GGL_CLeaderBehaviorProps : shok_GGL_CBattleBehaviorProps {
+	int SoldierType, BarrackUpgradeCategory;
+	float HomeRadius;
+	int HealingPoints, HealingSeconds;
+	float AutoAttackRange, UpkeepCosts;
+};
+
+#define shok_vtp_GGL_CSoldierBehaviorProps (void*)0x773D10
+struct shok_GGL_CSoldierBehaviorProps : shok_GGL_CBattleBehaviorProps {
+
+};
+
+#define shok_vtp_GGL_CSerfBattleBehaviorProps (void*)0x774B50
+struct shok_GGL_CSerfBattleBehaviorProps : shok_GGL_CBattleBehaviorProps {
+
+};
+
+#define shok_vtp_GGL_CBattleSerfBehaviorProps (void*)0x77889C
+struct shok_GGL_CBattleSerfBehaviorProps : shok_GGL_CLeaderBehaviorProps {
+
+};
+
+struct shok_serf_extractionInfo {
+	int ResourceEntityType;
+	float Delay;
+	int Amount;
+};
+#define shok_vtp_GGL_CSerfBehaviorProps (void*)0x774A14
+struct shok_GGL_CSerfBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int ResourceSearchRadius, ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList;
+	std::vector<shok_serf_extractionInfo> ExtractionInfo;
+};
+
+struct shok_limitedAttachmentProps {
+private:
+	int u;
+public:
+	char* Type;
+private:
+	int u2[4];
+public:
+	int Limit;
+};
+#define shok_vtp_GGL_CLimitedAttachmentBehaviorProperties (void*)0x775DE4
+struct shok_GGL_CLimitedAttachmentBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	std::vector<shok_limitedAttachmentProps> Attachments;
+};
+
+struct shok_idleAnimProps {
+	int AnimID, Frequency;
+};
+#define shok_vtp_GGL_CFormationBehaviorProperties (void*)0x776DE4
+struct shok_GGL_CFormationBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	std::vector<shok_idleAnimProps> IdleAnims;
+};
+
+#define shok_vtp_GGL_CCamperBehaviorProperties (void*)0x7777D4
+struct shok_GGL_CCamperBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	float Range;
+};
+
+#define shok_vtp_GGL_CGLBehaviorPropsDying (void*)0x778634
+struct shok_GGL_CGLBehaviorPropsDying : shok_EGL_CGLEBehaviorProps {
+	int DyingTaskList;
+};
+
+#define shok_vtp_GGL_CHeroBehaviorProps (void*)0x7767F4
+struct shok_GGL_CHeroBehaviorProps : shok_EGL_CGLEBehaviorProps {
+
+};
+
+#define shok_vtp_GGL_CBombBehaviorProperties (void*)0x7784A0
+struct shok_GGL_CBombBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	float Radius, Delay;
+	int Damage, ExplosionEffectID;
+	std::vector<int> AffectedEntityTypes;
+};
+
+#define shok_vtp_GGL_CKegBehaviorProperties (void*)0x776558
+struct shok_GGL_CKegBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	float Radius;
+	int Damage;
+	float Delay;
+	int DamagePercent, ExplosionEffectID;
+};
+
+#define shok_vtp_GGL_CThiefBehaviorProperties (void*)0x7739E0
+struct shok_GGL_CThiefBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	int SecondsNeededToSteal, MinimumAmountToSteal, MaximumAmountToSteal, CarryingModelID, StealGoodsTaskList, SecureGoodsTaskList;
+};
+
+#define shok_vtp_GGL_CAutoCannonBehaviorProps (void*)0x778CD4
+struct shok_GGL_CAutoCannonBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int NumberOfShots;
+	float RotationSpeed;
+	int CannonBallEffectType;
+private:
+	int u[3];
+public:
+	int ReloadTime;
+	float MaxAttackRange;
+private:
+	int u2;
+public:
+	int DamageClass, DamageAmount;
+	float DamageRange;
+	int BattleTaskList;
+};
+
+#define shok_vtp_GGL_CResourceRefinerBehaviorProperties (void*)0x774C24
+struct shok_GGL_CResourceRefinerBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	int ResourceType;
+	float InitialFactor;
+private:
+	int u[4];
+public:
+	int SupplierCategory;
+};
+
+#define shok_vtp_GGL_CAffectMotivationBehaviorProps (void*)0x7791D4
+struct shok_GGL_CAffectMotivationBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	float MotivationEffect;
+};
+
+#define shok_vtp_GGL_CLimitedLifespanBehaviorProps (void*)0x775DE4
+struct shok_GGL_CLimitedLifespanBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int LifespanSeconds;
+};
+
+#define shok_vtp_GGL_CBarrackBehaviorProperties (void*)0x778B34
+struct shok_GGL_CBarrackBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	int TrainingTaskList1, TrainingTaskList2, TrainingTaskList3;
+private:
+	int MaxTrainingNumber;
+public:
+	int LeaveTaskList;
+	float TrainingTime;
+};
+
+#define shok_vtp_GGL_CBuildingMerchantBehaviorProps (void*)0x7783B8
+struct shok_GGL_CBuildingMerchantBehaviorProps : shok_EGL_CGLEBehaviorProps {
+
+};
+
+#define shok_vtp_GGL_CServiceBuildingBehaviorProperties (void*)0x774830
+struct shok_GGL_CServiceBuildingBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	// initial amount at 4?
+};
+
+
+// entitytype
+
+struct shok_AARect {
+	shok_position low, high;
+};
+#define shok_vtp_EGL_CGLEEntityProps (void*)0x76E47C
+struct shok_EGL_CGLEEntityProps : shok_object {
+	int Class;
+	std::vector<int> Categories;
+	shok_positionRot ApproachPos;
+private:
+	int Race;
+public:
+	byte CanFloat, CanDrown, MapFileDontSave, DividesTwoSectors, ForceNoPlayer, AdjustWalkAnimSpeed, Visible, DoNotExecute;
+	int MaxHealth;
+private:
+	int Models[5];
+public:
+	float Exploration;
+	int ExperiencePoints, AccessCategory, NumBlockedPoints;
+	float SnapTolerance;
+	byte DeleteWhenBuiltOn, NeedsPlayer;
+private:
+	byte u[2];
+	int u2[9];
+public:
+	std::vector<shok_AARect> BlockingArea; // la37
+};
+
+#define shok_vtp_GGL_CEntityProperties (void*)0x776FEC
+struct shok_GGL_CEntityProperties : shok_EGL_CGLEEntityProps {
+	int ResourceEntity, ResourceAmount, SummerEffect, WinterEffect;
+};
+
+struct shok_upgradeInfo {
+	float Time;
+	shok_costInfo Cost;
+	int Type, Category;
+};
+#define shok_vtp_GGL_CGLSettlerProps (void*)0x76E498
+struct shok_GGL_CGLSettlerProps : shok_EGL_CGLEEntityProps {
+private:
+	int HeadSet, Hat;
+public:
+	shok_costInfo Cost;
+	float BuildFactor, RepairFactor;
+	int ArmorClass;
+	int ArmorAmount;
+	int DodgeChance;
+	int IdleTaskList;
+	shok_upgradeInfo Upgrade;
+	byte Convertible, Fearless;
+private:
+	byte u[2];
+public:
+	shok_modifyEntityProps ModifyExploration, ModifyHitpoints, ModifySpeed, ModifyDamage, ModifyArmor, ModifyDodge, ModifyMaxRange, ModifyMinRange, ModifyDamageBonus, ModifyGroupLimit;
+	int AttractionSlots;
+};
+
+#define shok_vtp_GGL_CGLAnimalProps (void*)0x779074
+struct shok_GGL_CGLAnimalProps : shok_EGL_CGLEEntityProps {
+	int DefaultTaskList;
+	float TerritoryRadius, WanderRangeMin, WanderRangeMax, ShyRange, MaxBuildingPollution;
+	int FleeTaskList;
+};
+
+#define shok_vtp_GGL_CBuildBlockProperties (void*)0x76EB38
+struct shok_GGL_CBuildBlockProperties : shok_EGL_CGLEEntityProps {
+	shok_AARect BuildBlockArea; // la 41
+};
+
+#define shok_vtp_GGL_CResourceDoodadProperties (void*)0x76FF68
+struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
+	float Radius;
+	shok_position Center, LineStart, LineEnd;
+	int ExtractTaskList, Model1, Model2;
+};
+
+struct shok_constructionInfo {
+private:
+	int u;
+public:
+	std::vector<shok_positionRot> BuilderSlot;
+	int Time;
+	shok_costInfo Cost;
+	int ConstructionSite;
+};
+#define shok_vtp_GGL_CGLBuildingProps (void*)0x76EC78
+struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
+	int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker;
+	shok_position DoorPos, LeavePos;
+	shok_constructionInfo ConstructionInfo;
+	std::vector<int> BuildOn;
+	byte HideBase, CanBeSold, IsWall;
+private:
+	byte u;
+public:
+	shok_upgradeInfo Upgrade;
+	int UpgradeSite, ArmorClass, ArmorAmount;
+	std::vector<int> WorkTaskList;
+private:
+	int MilitaryInfo[4];
+public:
+	float CollapseTime;
+	byte Convertible;
+private:
+	byte u2[3];
+public:
+	shok_modifyEntityProps ModifyExploration, ModifyArmor;
+	float KegEffectFactor; // 124
+};
+
+#define shok_vtp_GGL_CBridgeProperties (void*)0x778148
+struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
+	shok_AARect BridgeArea;
+	int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
+};
+
+#define shok_vtp_GGlue_CGlueEntityProps (void*)0x788824
+struct shok_GGlue_CGlueEntityProps : shok_object {
+private:
+	int u;
+public:
+	shok_EGL_CGLEEntityProps* LogicProps;
+	void* DisplayProps;
+	std::vector<shok_EGL_CGLEBehaviorProps*> BehaviorProps;
+};
+
 
 
 // behaviors
@@ -470,6 +893,7 @@ private:
 	shok_EGL_CGLEBehavior* SearchBehavior(void** vts, int num);
 public:
 	shok_GGL_CSoldierBehavior* GetSoldierBehavior();
+	bool IsEntityInCategory(int cat);
 };
 
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84
@@ -636,11 +1060,11 @@ private:
 };
 
 struct shok_EGL_CGLEEffectManager : shok_object {
-
+	bool IsEffectValid(int id);
 };
 
 struct shok_BB_CIDManagerEx : shok_object {
-
+	int GetAnimIdByName(const char* name);
 };
 
 
@@ -674,10 +1098,26 @@ public:
 	shok_EGL_CGLEEntity* GetEntityByNum(int num);
 };
 
+// global funcs
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
 extern void(_stdcall* shok_SetHighPrecFPU)();
 
+extern void(* shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage);
+
+extern void (*shok_logString)(const char* format, const char* string);
+
+extern int(*shok_getEntityIdByScriptName)(const char* str);
+
+extern bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e);
+
+extern bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e);
+
+extern bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e);
+
+extern int(_cdecl* shok_EntityGetProvidedResourceByID)(int id);
+
+// global objects
 extern shok_ECS_CManager*** shok_ECS_CManagerObject;
 
 extern shok_EGL_CGLEGameLogic** shok_EGL_CGLEGameLogicObject;
@@ -686,26 +1126,6 @@ extern int shok_effectCreatorData_CreatorType_Projectile;
 
 extern shok_EGL_CGLEEffectManager** shok_EGL_CGLEEffectManagerObject;
 
-extern bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id);
-
-extern void(* shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage);
-
-extern void (*shok_logString)(const char* format, const char* string);
-
 extern shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj;
 
-extern int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name);
-
 extern shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj;
-
-extern int(*shok_getEntityIdByScriptName)(const char* str);
-
-extern bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e);
-
-extern bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e);
-
-extern bool(__thiscall* shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat);
-
-extern bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e);
-
-extern int(_cdecl* shok_EntityGetProvidedResourceByID)(int id);

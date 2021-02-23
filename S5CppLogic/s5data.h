@@ -1031,14 +1031,9 @@ public:
 
 // c manager
 struct shok_ECS_CManager : shok_object {
+	void ReloadCutscene(const char* path);
 };
 
-struct shok_vtable_ECS_CManager {
-private:
-	int u, u2;
-public:
-	void(__thiscall* ReloadCutscene)(shok_ECS_CManager* th, const char* path);
-};
 
 
 // effect manager
@@ -1070,14 +1065,7 @@ struct shok_BB_CIDManagerEx : shok_object {
 
 // game logic
 struct shok_EGL_CGLEGameLogic : shok_object {
-
-};
-
-struct shok_vtable_EGL_CGLEGameLogic {
-private:
-	int u[23];
-public:
-	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, shok_effectCreatorData* data);
+	int CreateEffect(shok_effectCreatorData* data);
 };
 
 

@@ -35,6 +35,29 @@ bool shok_EGL_CGLEEntity::IsEntityInCategory(int cat)
 	return shok_IsEntityInCategory(this, cat);
 }
 
+
+struct shok_vtable_EGL_CGLEGameLogic {
+private:
+	int u[23];
+public:
+	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, shok_effectCreatorData* data);
+};
+int shok_EGL_CGLEGameLogic::CreateEffect(shok_effectCreatorData* data) {
+	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)this->vtable;
+	return vt->CreateEffect(this, data);
+}
+
+struct shok_vtable_ECS_CManager {
+private:
+	int u, u2;
+public:
+	void(__thiscall* ReloadCutscene)(shok_ECS_CManager* th, const char* path);
+};
+void shok_ECS_CManager::ReloadCutscene(const char* path)
+{
+	((shok_vtable_ECS_CManager*)this->vtable)->ReloadCutscene(this, path);
+}
+
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 {
 	if (EntityCount <= num)

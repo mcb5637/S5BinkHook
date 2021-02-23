@@ -18,8 +18,7 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.AttackerID = luaext_optEntityId(L, 9);
 	data.PlayerID = luaL_optint(L, 10, 0);
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogicObject;
-	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)gl->vtable;
-	int id = vt->CreateEffect(gl, &data);
+	int id = gl->CreateEffect(&data);
 	lua_pushnumber(L, id);
 	return 1;
 }

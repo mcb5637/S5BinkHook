@@ -76,3 +76,9 @@ shok_GGL_CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind) {
 		luaL_error(L, "no resource entity at argument %d", ind);
 	return d;
 }
+
+int luaext_assertPointer(lua_State* L, void* p, const char* msg) {
+	if (p == nullptr)
+		luaL_error(L, msg);
+	return 0;
+}

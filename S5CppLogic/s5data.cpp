@@ -90,3 +90,9 @@ shok_GGL_CSoldierBehavior* shok_EGL_CGLEEntity::GetSoldierBehavior()
 {
 	return (shok_GGL_CSoldierBehavior*)SearchBehavior(shok_vtp_GGL_CSoldierBehavior);
 }
+
+shok_GGL_CLeaderBehavior* shok_EGL_CGLEEntity::GetLeaderBehavior()
+{
+	void* data[2] = { shok_vtp_GGL_CLeaderBehavior, shok_vtp_GGL_CBattleSerfBehavior };
+	return (shok_GGL_CLeaderBehavior*)SearchBehavior(data, 2);
+}

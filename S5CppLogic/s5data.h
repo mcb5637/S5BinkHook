@@ -675,7 +675,7 @@ struct shok_GGL_CSoldierBehavior : shok_GGL_CBattleBehavior {
 };
 
 #define shok_vtp_GGL_CBattleSerfBehavior (void*)0x7788C4
-struct shok_GGL_CBattleSerfBehavior : shok_GGL_CBattleBehavior {
+struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
 
 };
 
@@ -893,6 +893,7 @@ private:
 	shok_EGL_CGLEBehavior* SearchBehavior(void** vts, int num);
 public:
 	shok_GGL_CSoldierBehavior* GetSoldierBehavior();
+	shok_GGL_CLeaderBehavior* GetLeaderBehavior();
 	bool IsEntityInCategory(int cat);
 };
 

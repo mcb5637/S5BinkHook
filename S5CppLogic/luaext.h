@@ -17,3 +17,4 @@ shok_GGL_CSettler* luaext_optSettler(lua_State* L, int ind);
 shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind);
 shok_GGL_CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind);
 shok_GGL_CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind);
+int luaext_assertPointer(lua_State* L, void* p, const char* msg);

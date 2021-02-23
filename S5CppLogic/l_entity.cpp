@@ -219,6 +219,38 @@ int l_entityGetNumberOfBehaviors(lua_State* L) {
 	return 1;
 }
 
+int l_leaderGetLeaderXP(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	luaext_assertPointer(L, b, "no leader at 1");
+	lua_pushnumber(L, b->Experience);
+	return 1;
+}
+
+int l_leaderSetLeaderXP(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	luaext_assertPointer(L, b, "no leader at 1");
+	b->Experience = luaL_checkint(L, 2);
+	return 1;
+}
+
+int l_leaderGetLeaderHP(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	luaext_assertPointer(L, b, "no leader at 1");
+	lua_pushnumber(L, b->TroopHealthCurrent);
+	return 1;
+}
+
+int l_leaderSetLeaderHP(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	luaext_assertPointer(L, b, "no leader at 1");
+	b->TroopHealthCurrent = luaL_checkint(L, 2);
+	return 1;
+}
+
 int l_entity_test(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
 	int(_cdecl * func)(int id) = (int(_cdecl*)(int id))  0x4B8489;
@@ -258,6 +290,14 @@ void l_entity_init(lua_State* L)
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);
 	luaext_registerFunc(L, "GetLeaderOfSoldier", &l_settlerGetLeaderOfSoldier);
+	lua_rawset(L, -3);
+
+	lua_pushstring(L, "Leader");
+	lua_newtable(L);
+	luaext_registerFunc(L, "GetExperience", &l_leaderGetLeaderXP);
+	luaext_registerFunc(L, "SetExperience", &l_leaderSetLeaderXP);
+	luaext_registerFunc(L, "GetTroopHealth", &l_leaderGetLeaderHP);
+	luaext_registerFunc(L, "SetTroopHealth", &l_leaderSetLeaderHP);
 	lua_rawset(L, -3);
 }
 

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "l_entity.h"
-#include "pch.h"
 #include "s5data.h"
 #include "luaext.h"
 
@@ -232,7 +231,7 @@ int l_leaderSetLeaderXP(lua_State* L) {
 	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
 	luaext_assertPointer(L, b, "no leader at 1");
 	b->Experience = luaL_checkint(L, 2);
-	return 1;
+	return 0;
 }
 
 int l_leaderGetLeaderHP(lua_State* L) {
@@ -248,6 +247,34 @@ int l_leaderSetLeaderHP(lua_State* L) {
 	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
 	luaext_assertPointer(L, b, "no leader at 1");
 	b->TroopHealthCurrent = luaL_checkint(L, 2);
+	return 0;
+}
+
+int l_settlerGetBaseMovementSpeed(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CBehaviorDefaultMovement* b = s->GetMovementBehavior();
+	luaext_assertPointer(L, b, "no moving entity at 1");
+	lua_pushnumber(L, b->MovementSpeed);
+	lua_pushnumber(L, rad2deg((double)b->TurningSpeed));
+	return 2;
+}
+
+int l_settlerSetBaseMovementSpeed(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CBehaviorDefaultMovement* b = s->GetMovementBehavior();
+	luaext_assertPointer(L, b, "no moving entity at 1");
+	if (lua_isnumber(L, 2))
+		b->MovementSpeed = luaL_checkfloat(L, 2);
+	if (lua_isnumber(L, 3))
+		b->TurningSpeed = (float)deg2rad(lua_tonumber(L, 3));
+	return 0;
+}
+
+int l_buildingGetAutoFillActive(lua_State* L) {
+	shok_GGL_CBuilding* e = luaext_checkBulding(L, 1);
+	shok_GGL_CBarrackBehavior* b = e->GetBarrackBehavior();
+	luaext_assertPointer(L, b, "no barracks at 1");
+	lua_pushboolean(L, b->AutoFillActive);
 	return 1;
 }
 
@@ -290,6 +317,8 @@ void l_entity_init(lua_State* L)
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);
 	luaext_registerFunc(L, "GetLeaderOfSoldier", &l_settlerGetLeaderOfSoldier);
+	luaext_registerFunc(L, "GetBaseMovementSpeed", &l_settlerGetBaseMovementSpeed);
+	luaext_registerFunc(L, "SetBaseMovementSpeed", &l_settlerSetBaseMovementSpeed);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -298,6 +327,11 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetExperience", &l_leaderSetLeaderXP);
 	luaext_registerFunc(L, "GetTroopHealth", &l_leaderGetLeaderHP);
 	luaext_registerFunc(L, "SetTroopHealth", &l_leaderSetLeaderHP);
+	lua_rawset(L, -3);
+
+	lua_pushstring(L, "Building");
+	lua_newtable(L);
+	luaext_registerFunc(L, "GetBarracksAutoFillActive", &l_buildingGetAutoFillActive);
 	lua_rawset(L, -3);
 }
 
@@ -308,7 +342,7 @@ void l_entity_init(lua_State* L)
 // CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.IsSettler(), CppLogic.Entity.Predicates.IsNotSoldier(), CppLogic.Entity.Predicates.OfPlayer(1))
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.InCircle(x,y, 1000))
 // for id in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.OfAnyEntityType(Entities.PU_Serf, Entities.PB_Headquarters1), CppLogic.Entity.Predicates.OfAnyPlayer(2, 3)) do LuaDebugger.Log(id) end
-// CppLogic.Entity.Settler.GetLeaderOfSoldier(GUI.GetEntityAtPosition(GUI.GetMousePosition()))
+// CppLogic.Entity.Settler.GetBaseMovementSpeed(GUI.GetSelectedEntity())
 
 EntityIterator::EntityIterator(EntityIteratorPredicate* Predicate)
 {

@@ -9,11 +9,12 @@
 #include "l_effect.h"
 #include "l_combat.h"
 #include "l_entity.h"
+#include "l_entitytype.h"
 
 int __cdecl test(lua_State* L) {
-    shok_GGL_CBuilding s = shok_GGL_CBuilding();
+    shok_EGL_CGLEEntitiesProps s = shok_EGL_CGLEEntitiesProps();
     int st = (int)&s;
-    int test = (int)&s.ConstructionSiteType;
+    int test = (int)&s.EntityTypes;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }
@@ -50,6 +51,11 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_pushstring(L, "Entity");
     lua_newtable(L);
     l_entity_init(L);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "EntityType");
+    lua_newtable(L);
+    l_entitytype_init(L);
     lua_rawset(L, -3);
 
     lua_rawset(L, LUA_GLOBALSINDEX);

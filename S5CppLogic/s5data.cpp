@@ -17,6 +17,7 @@ bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok
 bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x449432;
 bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4B82C7;
 int(_cdecl* shok_EntityGetProvidedResourceByID)(int id) = (int(_cdecl*)(int id)) 0x4B8489;
+shok_EGL_CGLEEntitiesProps** shok_EGL_CGLEEntitiesPropsObj = (shok_EGL_CGLEEntitiesProps**)0x895DB0;
 
 bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = (bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x4FAABD;
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
@@ -95,4 +96,46 @@ shok_GGL_CLeaderBehavior* shok_EGL_CGLEEntity::GetLeaderBehavior()
 {
 	void* data[2] = { shok_vtp_GGL_CLeaderBehavior, shok_vtp_GGL_CBattleSerfBehavior };
 	return (shok_GGL_CLeaderBehavior*)SearchBehavior(data, 2);
+}
+
+shok_GGL_CBehaviorDefaultMovement* shok_EGL_CGLEEntity::GetMovementBehavior()
+{
+	void* data[4] = { shok_vtp_GGL_CBehaviorDefaultMovement, shok_vtp_GGL_CLeaderMovement, shok_vtp_GGL_CSoldierMovement, shok_vtp_GGL_CSettlerMovement };
+	return (shok_GGL_CBehaviorDefaultMovement*)SearchBehavior(data, 4);
+}
+
+shok_GGL_CBarrackBehavior* shok_EGL_CGLEEntity::GetBarrackBehavior()
+{
+	return (shok_GGL_CBarrackBehavior*)SearchBehavior(shok_vtp_GGL_CBarrackBehavior);
+}
+
+shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
+{
+	if (i <= 0 || i >= (int) EntityTypes.size())
+		return nullptr;
+	return EntityTypes.data() + i;
+}
+
+shok_EGL_CGLEBehaviorProps* shok_GGlue_CGlueEntityProps::SearchBehaviorProp(void** vts, int num)
+{
+	for (shok_EGL_CGLEBehaviorProps* b : BehaviorProps) {
+		if (b != nullptr && contains(vts, b->vtable, num))
+			return b;
+	}
+	return nullptr;
+}
+
+shok_EGL_CGLEBehaviorProps* shok_GGlue_CGlueEntityProps::SearchBehaviorProp(void* vt)
+{
+	return SearchBehaviorProp(&vt, 1);
+}
+
+shok_GGL_CLeaderBehaviorProps* shok_GGlue_CGlueEntityProps::GetLeaderBehaviorProp()
+{
+	return (shok_GGL_CLeaderBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CLeaderBehaviorProps);
+}
+
+shok_GGL_CSoldierBehaviorProps* shok_GGlue_CGlueEntityProps::GetSoldierBehaviorProp()
+{
+	return (shok_GGL_CSoldierBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CSoldierBehaviorProps);
 }

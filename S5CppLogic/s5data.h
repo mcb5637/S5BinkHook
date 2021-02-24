@@ -452,6 +452,25 @@ public:
 	shok_EGL_CGLEEntityProps* LogicProps;
 	void* DisplayProps;
 	std::vector<shok_EGL_CGLEBehaviorProps*> BehaviorProps;
+
+
+private:
+	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(void** vts, int num);
+	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(void* vt);
+
+public:
+	shok_GGL_CLeaderBehaviorProps* GetLeaderBehaviorProp();
+	shok_GGL_CSoldierBehaviorProps* GetSoldierBehaviorProp();
+};
+
+#define shok_vtp_EGL_CGLEEntitiesProps (void*)0x788834
+struct shok_EGL_CGLEEntitiesProps : shok_object {
+private:
+	int u[14];
+public:
+	std::vector<shok_GGlue_CGlueEntityProps> EntityTypes;
+
+	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
 };
 
 
@@ -471,7 +490,7 @@ public:
 	float MovementSpeed, TurningSpeed, SpeedFactor;
 };
 
-#define shok_vtp_GGL_CSettlerMovement (void*)77471C
+#define shok_vtp_GGL_CSettlerMovement (void*)0x77471C
 struct shok_GGL_CSettlerMovement : shok_GGL_CBehaviorDefaultMovement {
 private:
 	int u;
@@ -894,6 +913,8 @@ private:
 public:
 	shok_GGL_CSoldierBehavior* GetSoldierBehavior();
 	shok_GGL_CLeaderBehavior* GetLeaderBehavior();
+	shok_GGL_CBehaviorDefaultMovement* GetMovementBehavior();
+	shok_GGL_CBarrackBehavior* GetBarrackBehavior();
 	bool IsEntityInCategory(int cat);
 };
 
@@ -1118,3 +1139,5 @@ extern shok_EGL_CGLEEffectManager** shok_EGL_CGLEEffectManagerObject;
 extern shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj;
 
 extern shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj;
+
+extern shok_EGL_CGLEEntitiesProps** shok_EGL_CGLEEntitiesPropsObj;

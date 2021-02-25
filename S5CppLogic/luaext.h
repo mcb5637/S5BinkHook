@@ -22,8 +22,12 @@ shok_GGL_CBuilding* luaext_checkBulding(lua_State* L, int ind);
 shok_GGL_CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind);
 shok_GGL_CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind);
 int luaext_assertPointer(lua_State* L, void* p, const char* msg);
+int luaext_assert(lua_State* L, bool b, const char* msg);
 shok_GGlue_CGlueEntityProps* luaext_optEntityType(lua_State* L, int i);
 shok_GGlue_CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i);
+void luaext_pushPos(lua_State* L, shok_position& p);
+void luaext_pushPosRot(lua_State* L, shok_positionRot& p);
+void luaext_checkPos(lua_State* L, shok_position& p, int i);
 
 #define rad2deg(r) ((r) * 180 / M_PI)
 #define deg2rad(d) ((d) * M_PI / 180)

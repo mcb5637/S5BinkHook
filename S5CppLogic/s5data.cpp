@@ -139,3 +139,26 @@ shok_GGL_CSoldierBehaviorProps* shok_GGlue_CGlueEntityProps::GetSoldierBehaviorP
 {
 	return (shok_GGL_CSoldierBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CSoldierBehaviorProps);
 }
+
+shok_GGL_CBattleBehaviorProps* shok_GGlue_CGlueEntityProps::GetBattleBehaviorProp()
+{
+	void* data[5] = { shok_vtp_GGL_CBattleBehaviorProps, shok_vtp_GGL_CLeaderBehaviorProps, shok_vtp_GGL_CSoldierBehaviorProps, shok_vtp_GGL_CSerfBattleBehaviorProps, shok_vtp_GGL_CBattleSerfBehaviorProps };
+	return (shok_GGL_CBattleBehaviorProps*)SearchBehaviorProp(data, 5);
+}
+
+bool shok_GGlue_CGlueEntityProps::IsSettlerType()
+{
+	return LogicProps->vtable == shok_vtp_GGL_CGLSettlerProps;
+}
+
+bool shok_GGlue_CGlueEntityProps::IsBuildingType()
+{
+	void* data[2] = { shok_vtp_GGL_CGLBuildingProps, shok_vtp_GGL_CBridgeProperties };
+	return contains(data, LogicProps->vtable, 2);
+}
+
+bool shok_EGL_CGLEEntity::IsMovingEntity()
+{
+	void* data[4] = { shok_vtp_EGL_CMovingEntity, shok_vtp_GGL_CEvadingEntity, shok_vtp_GGL_CSettler, shok_vtp_GGL_CAnimal };
+	return contains(data, vtable, 4);
+}

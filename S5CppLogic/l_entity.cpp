@@ -278,6 +278,74 @@ int l_buildingGetAutoFillActive(lua_State* L) {
 	return 1;
 }
 
+int l_entityGetScale(lua_State* L) {
+	shok_EGL_CGLEEntity* s = luaext_checkEntity(L, 1);
+	lua_pushnumber(L, s->Scale);
+	return 1;
+}
+
+int l_entitySetScale(lua_State* L) {
+	shok_EGL_CGLEEntity* s = luaext_checkEntity(L, 1);
+	s->Scale = luaL_checkfloat(L, 2);
+	return 0;
+}
+
+int l_buildingGetHeight(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	lua_pushnumber(L, b->BuildingHeight);
+	return 1;
+}
+
+int l_buildingSetHeight(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	b->BuildingHeight = luaL_checkfloat(L, 2);
+	return 0;
+}
+
+int l_settlerGetOvereadWidget(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	lua_pushnumber(L, s->OverheadWidget);
+	return 1;
+}
+
+int l_settlerSetOvereadWidget(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	int ov = luaL_checkint(L, 2);
+	luaext_assert(L, ov >= 0 && ov <= 4, "invalid overhead code");
+	s->OverheadWidget = ov;
+	return 1;
+}
+
+int l_movingEntityGetTargetPos(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	luaext_assert(L, e->IsMovingEntity(), "no moving entity at 1");
+	shok_EGL_CMovingEntity* m = (shok_EGL_CMovingEntity*)e;
+	luaext_pushPos(L, m->TargetPosition);
+	if (m->TargetRotationValid) {
+		lua_pushstring(L, "r");
+		lua_pushnumber(L, rad2deg((double)m->TargetRotation));
+		lua_rawset(L, -3);
+	}
+	return 1;
+}
+
+int l_movingEntitySetTargetPos(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	luaext_assert(L, e->IsMovingEntity(), "no moving entity at 1");
+	shok_EGL_CMovingEntity* m = (shok_EGL_CMovingEntity*)e;
+	luaext_checkPos(L, m->TargetPosition, 2);
+	lua_pushstring(L, "r");
+	lua_gettable(L, 2);
+	if (lua_isnumber(L, -1)) {
+		m->TargetRotation = (float)deg2rad(lua_tonumber(L, -1));
+		m->TargetRotationValid = 1;
+	}
+	else {
+		m->TargetRotationValid = 0;
+	}
+	return 0;
+}
+
 int l_entity_test(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
 	int(_cdecl * func)(int id) = (int(_cdecl*)(int id))  0x4B8489;
@@ -294,6 +362,10 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetNumberOfBehaviors", &l_entityGetNumberOfBehaviors);
 	luaext_registerFunc(L, "test", &l_entity_test);
 	luaext_registerFunc(L, "CheckPredicate", &l_entityCheckPredicate);
+	luaext_registerFunc(L, "GetScale", &l_entityGetScale);
+	luaext_registerFunc(L, "SetScale", &l_entitySetScale);
+	luaext_registerFunc(L, "MovingEntityGetTargetPos", &l_movingEntityGetTargetPos);
+	luaext_registerFunc(L, "MovingEntitySetTargetPos", &l_movingEntitySetTargetPos);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -319,6 +391,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetLeaderOfSoldier", &l_settlerGetLeaderOfSoldier);
 	luaext_registerFunc(L, "GetBaseMovementSpeed", &l_settlerGetBaseMovementSpeed);
 	luaext_registerFunc(L, "SetBaseMovementSpeed", &l_settlerSetBaseMovementSpeed);
+	luaext_registerFunc(L, "GetOverheadWidget", &l_settlerGetOvereadWidget);
+	luaext_registerFunc(L, "SetOverheadWidget", &l_settlerSetOvereadWidget);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -332,6 +406,8 @@ void l_entity_init(lua_State* L)
 	lua_pushstring(L, "Building");
 	lua_newtable(L);
 	luaext_registerFunc(L, "GetBarracksAutoFillActive", &l_buildingGetAutoFillActive);
+	luaext_registerFunc(L, "GetHeight", &l_buildingGetHeight);
+	luaext_registerFunc(L, "SetHeight", &l_buildingSetHeight);
 	lua_rawset(L, -3);
 }
 
@@ -343,6 +419,8 @@ void l_entity_init(lua_State* L)
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.InCircle(x,y, 1000))
 // for id in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.OfAnyEntityType(Entities.PU_Serf, Entities.PB_Headquarters1), CppLogic.Entity.Predicates.OfAnyPlayer(2, 3)) do LuaDebugger.Log(id) end
 // CppLogic.Entity.Settler.GetBaseMovementSpeed(GUI.GetSelectedEntity())
+// CppLogic.Entity.MovingEntityGetTargetPos(GUI.GetSelectedEntity())
+// local x,y = GUI.Debug_GetMapPositionUnderMouse() CppLogic.Entity.MovingEntitySetTargetPos(GUI.GetSelectedEntity(), {X=x,Y=y})
 
 EntityIterator::EntityIterator(EntityIteratorPredicate* Predicate)
 {

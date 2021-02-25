@@ -97,6 +97,12 @@ int luaext_assertPointer(lua_State* L, void* p, const char* msg) {
 	return 0;
 }
 
+int luaext_assert(lua_State* L, bool b, const char* msg) {
+	if (!b)
+		luaL_error(L, msg);
+	return 0;
+}
+
 shok_GGlue_CGlueEntityProps* luaext_optEntityType(lua_State* L, int i) {
 	if (!lua_isnumber(L, i))
 		return nullptr;
@@ -109,4 +115,33 @@ shok_GGlue_CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i) {
 	if (t == nullptr)
 		luaL_error(L, "no entitytype at %d", i);
 	return t;
+}
+
+void luaext_pushPos(lua_State* L, shok_position& p) {
+	lua_newtable(L);
+	lua_pushstring(L, "X");
+	lua_pushnumber(L, p.X);
+	lua_rawset(L, -3);
+	lua_pushstring(L, "Y");
+	lua_pushnumber(L, p.Y);
+	lua_rawset(L, -3);
+}
+
+void luaext_pushPosRot(lua_State* L, shok_positionRot& p) {
+	luaext_pushPos(L, p);
+	lua_pushstring(L, "r");
+	lua_pushnumber(L, p.r);
+	lua_rawset(L, -3);
+}
+
+void luaext_checkPos(lua_State* L, shok_position& p, int i) {
+	lua_pushstring(L, "X");
+	lua_gettable(L, i);
+	float x = luaL_checkfloat(L, -1);
+	lua_pushstring(L, "Y");
+	lua_gettable(L, i);
+	float y = luaL_checkfloat(L, -1);
+	p.X = x;
+	p.Y = y;
+	lua_pop(L, 2);
 }

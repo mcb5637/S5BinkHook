@@ -461,6 +461,10 @@ private:
 public:
 	shok_GGL_CLeaderBehaviorProps* GetLeaderBehaviorProp();
 	shok_GGL_CSoldierBehaviorProps* GetSoldierBehaviorProp();
+	shok_GGL_CBattleBehaviorProps* GetBattleBehaviorProp();
+
+	bool IsSettlerType();
+	bool IsBuildingType();
 };
 
 #define shok_vtp_EGL_CGLEEntitiesProps (void*)0x788834
@@ -916,12 +920,16 @@ public:
 	shok_GGL_CBehaviorDefaultMovement* GetMovementBehavior();
 	shok_GGL_CBarrackBehavior* GetBarrackBehavior();
 	bool IsEntityInCategory(int cat);
+	bool IsMovingEntity();
 };
 
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	shok_position TargetPosition; // la67
-	int TargetRotationValid;
+	byte TargetRotationValid;
+private:
+	byte u[3];
+public:
 	float TargetRotation;
 	int MovementState; // 70
 };
@@ -1013,6 +1021,11 @@ private:
 	int u20[2];
 public:
 	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
+};
+
+#define shok_vtp_GGL_CAnimal (void*)0x778F7C
+struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
+
 };
 
 #define shok_vtp_GGL_CResourceDoodad (void*)0x76FEA4

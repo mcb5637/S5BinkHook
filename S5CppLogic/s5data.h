@@ -333,6 +333,9 @@ struct shok_AARect {
 };
 #define shok_vtp_EGL_CGLEEntityProps (void*)0x76E47C
 struct shok_EGL_CGLEEntityProps : shok_object {
+private:
+	int u3;
+public:
 	int Class;
 	std::vector<int> Categories;
 	shok_positionRot ApproachPos;
@@ -462,6 +465,10 @@ public:
 	shok_GGL_CLeaderBehaviorProps* GetLeaderBehaviorProp();
 	shok_GGL_CSoldierBehaviorProps* GetSoldierBehaviorProp();
 	shok_GGL_CBattleBehaviorProps* GetBattleBehaviorProp();
+	shok_GGL_CLimitedLifespanBehaviorProps* GetLimitedLifespanBehaviorProp();
+	shok_GGL_CAffectMotivationBehaviorProps* GetAffectMotivationBehaviorProp();
+	shok_GGL_CGLAnimationBehaviorExProps* GetAnimationExProp();
+	shok_GGL_CAutoCannonBehaviorProps* GetAutoCannonProp();
 
 	bool IsSettlerType();
 	bool IsBuildingType();
@@ -919,6 +926,10 @@ public:
 	shok_GGL_CLeaderBehavior* GetLeaderBehavior();
 	shok_GGL_CBehaviorDefaultMovement* GetMovementBehavior();
 	shok_GGL_CBarrackBehavior* GetBarrackBehavior();
+	shok_GGL_CCamouflageBehavior* GetCamoAbilityBehavior();
+	shok_GGL_CThiefCamouflageBehavior* GetCamoThiefBehavior();
+	shok_GGL_CHeroBehavior* GetHeroBehavior();
+	shok_GGL_CLimitedLifespanBehavior* GetLimitedLifespanBehavior();
 	bool IsEntityInCategory(int cat);
 	bool IsMovingEntity();
 };

@@ -95,6 +95,7 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="lua\S5Lua5.dll" />
+    <None Include="CppLogic.lua" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua\S5Lua5.lib" />

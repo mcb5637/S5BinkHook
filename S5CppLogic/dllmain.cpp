@@ -12,9 +12,9 @@
 #include "l_entitytype.h"
 
 int __cdecl test(lua_State* L) {
-    shok_EGL_CGLEEntitiesProps s = shok_EGL_CGLEEntitiesProps();
+    shok_EGL_CGLEEntityProps s = shok_EGL_CGLEEntityProps();
     int st = (int)&s;
-    int test = (int)&s.EntityTypes;
+    int test = (int)&s.MaxHealth;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }

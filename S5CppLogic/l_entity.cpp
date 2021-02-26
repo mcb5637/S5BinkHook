@@ -225,7 +225,6 @@ int l_leaderGetLeaderXP(lua_State* L) {
 	lua_pushnumber(L, b->Experience);
 	return 1;
 }
-
 int l_leaderSetLeaderXP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
@@ -241,7 +240,6 @@ int l_leaderGetLeaderHP(lua_State* L) {
 	lua_pushnumber(L, b->TroopHealthCurrent);
 	return 1;
 }
-
 int l_leaderSetLeaderHP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
@@ -258,7 +256,6 @@ int l_settlerGetBaseMovementSpeed(lua_State* L) {
 	lua_pushnumber(L, rad2deg((double)b->TurningSpeed));
 	return 2;
 }
-
 int l_settlerSetBaseMovementSpeed(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CBehaviorDefaultMovement* b = s->GetMovementBehavior();
@@ -283,7 +280,6 @@ int l_entityGetScale(lua_State* L) {
 	lua_pushnumber(L, s->Scale);
 	return 1;
 }
-
 int l_entitySetScale(lua_State* L) {
 	shok_EGL_CGLEEntity* s = luaext_checkEntity(L, 1);
 	s->Scale = luaL_checkfloat(L, 2);
@@ -295,7 +291,6 @@ int l_buildingGetHeight(lua_State* L) {
 	lua_pushnumber(L, b->BuildingHeight);
 	return 1;
 }
-
 int l_buildingSetHeight(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	b->BuildingHeight = luaL_checkfloat(L, 2);
@@ -307,7 +302,6 @@ int l_settlerGetOvereadWidget(lua_State* L) {
 	lua_pushnumber(L, s->OverheadWidget);
 	return 1;
 }
-
 int l_settlerSetOvereadWidget(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	int ov = luaL_checkint(L, 2);
@@ -328,7 +322,6 @@ int l_movingEntityGetTargetPos(lua_State* L) {
 	}
 	return 1;
 }
-
 int l_movingEntitySetTargetPos(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
 	luaext_assert(L, e->IsMovingEntity(), "no moving entity at 1");
@@ -343,6 +336,69 @@ int l_movingEntitySetTargetPos(lua_State* L) {
 	else {
 		m->TargetRotationValid = 0;
 	}
+	return 0;
+}
+
+int l_settlerHeroCamouflageGetDurationLeft(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CCamouflageBehavior* c = s->GetCamoAbilityBehavior();
+	luaext_assertPointer(L, c, "no camo hero at 1");
+	lua_pushnumber(L, c->InvisibilityRemaining);
+	return 1;
+}
+int l_settlerHeroCamouflageSetDurationLeft(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CCamouflageBehavior* c = s->GetCamoAbilityBehavior();
+	luaext_assertPointer(L, c, "no camo hero at 1");
+	luaext_assert(L, c->vtable != shok_vtp_GGL_CThiefCamouflageBehavior, "thief at 1, use ThiefSetCamouflageTimeTo instead");
+	c->InvisibilityRemaining = luaL_checkint(L, 2);
+	return 1;
+}
+
+int l_settlerThiefCamouflageGetTimeTo(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CThiefCamouflageBehavior* c = s->GetCamoThiefBehavior();
+	luaext_assertPointer(L, c, "no thief at 1");
+	lua_pushnumber(L, c->TimeToInvisibility);
+	return 1;
+}
+int l_settlerThiefCamouflageSetTimeTo(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CThiefCamouflageBehavior* c = s->GetCamoThiefBehavior();
+	luaext_assertPointer(L, c, "no thief at 1");
+	int i = luaL_checkint(L, 2);
+	c->TimeToInvisibility = i;
+	c->InvisibilityRemaining = i <= 0 ? 15 : 0;
+	return 0;
+}
+
+int l_settlerHeroGetResurrectionTime(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CHeroBehavior* h = s->GetHeroBehavior();
+	luaext_assertPointer(L, h, "no hero at 1");
+	lua_pushnumber(L, h->ResurrectionTimePassed);
+	return 1;
+}
+int l_settlerHeroSetResurrectionTime(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CHeroBehavior* h = s->GetHeroBehavior();
+	luaext_assertPointer(L, h, "no hero at 1");
+	h->ResurrectionTimePassed = luaL_checkint(L, 2);
+	return 0;
+}
+
+int l_entityGetLimitedLifespanRemaining(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CLimitedLifespanBehavior* l = e->GetLimitedLifespanBehavior();
+	luaext_assertPointer(L, l, "no limited lifespan at 1");
+	lua_pushnumber(L, l->RemainingLifespanSeconds);
+	return 1;
+}
+int l_entitySetLimitedLifespanRemaining(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CLimitedLifespanBehavior* l = e->GetLimitedLifespanBehavior();
+	luaext_assertPointer(L, l, "no limited lifespan at 1");
+	l->RemainingLifespanSeconds = luaL_checkint(L, 2);
 	return 0;
 }
 
@@ -366,6 +422,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetScale", &l_entitySetScale);
 	luaext_registerFunc(L, "MovingEntityGetTargetPos", &l_movingEntityGetTargetPos);
 	luaext_registerFunc(L, "MovingEntitySetTargetPos", &l_movingEntitySetTargetPos);
+	luaext_registerFunc(L, "GetLimitedLifespanRemaining", &l_entityGetLimitedLifespanRemaining);
+	luaext_registerFunc(L, "SetLimitedLifespanRemaining", &l_entitySetLimitedLifespanRemaining);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -393,6 +451,12 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetBaseMovementSpeed", &l_settlerSetBaseMovementSpeed);
 	luaext_registerFunc(L, "GetOverheadWidget", &l_settlerGetOvereadWidget);
 	luaext_registerFunc(L, "SetOverheadWidget", &l_settlerSetOvereadWidget);
+	luaext_registerFunc(L, "HeroGetCamouflageDurationLeft", &l_settlerHeroCamouflageGetDurationLeft);
+	luaext_registerFunc(L, "HeroSetCamouflageDurationLeft", &l_settlerHeroCamouflageSetDurationLeft);
+	luaext_registerFunc(L, "ThiefGetCamouflageTimeTo", &l_settlerThiefCamouflageGetTimeTo);
+	luaext_registerFunc(L, "ThiefSetCamouflageTimeTo", &l_settlerThiefCamouflageSetTimeTo);
+	luaext_registerFunc(L, "HeroGetResurrectionTime", &l_settlerHeroGetResurrectionTime);
+	luaext_registerFunc(L, "HeroSetResurrectionTime", &l_settlerHeroSetResurrectionTime);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

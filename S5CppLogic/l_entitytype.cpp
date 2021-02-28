@@ -172,6 +172,14 @@ int l_entityTySetAutoAttackDamageClass(lua_State* L) {
 	return luaL_error(L, "no battle or autocannon entity type at 1");
 }
 
+int l_entityTypeAddEntityCat(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	int cat = luaL_checkint(L, 2);
+	luaext_assert(L, !t->IsOfCategory(cat), "entitytype is already of this cat");
+	t->LogicProps->Categories.push_back(cat);
+	return 0;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetMaxRange", &l_entityTyGetMaxRange);
@@ -186,6 +194,7 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetSuspendedAnimation", &l_entityTySetSuspendedAnimation);
 	luaext_registerFunc(L, "GetAutoAttackDamageClass", &l_entityTyGetAutoAttackDamageClass);
 	luaext_registerFunc(L, "SetAutoAttackDamageClass", &l_entityTySetAutoAttackDamageClass);
+	luaext_registerFunc(L, "AddEntityCategory", &l_entityTypeAddEntityCat);
 
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);
@@ -205,3 +214,5 @@ void l_entitytype_init(lua_State* L)
 }
 
 // CppLogic.EntityType.Settler.LeaderTypeGetSoldierType(Entities.PU_LeaderSword1)
+// Logic.IsEntityInCategory(GUI.GetSelectedEntity(), 100)
+// CppLogic.EntityType.AddEntityCategory(Entities.PU_LeaderSword1, 100)

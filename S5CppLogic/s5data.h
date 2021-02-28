@@ -10,6 +10,32 @@
 
 typedef uint8_t byte;
 
+// allocator
+extern void* (__cdecl* shok_malloc)(size_t t);
+extern void(__cdecl* shok_free)(void* p);
+
+
+template <class T>
+struct shok_allocator {
+	typedef T value_type;
+	shok_allocator() = default;
+	template <class U> constexpr shok_allocator(const shok_allocator <U>&) noexcept {}
+
+	[[nodiscard]] T* allocate(size_t n) noexcept
+	{
+		return (T*)shok_malloc(n);
+	}
+	void deallocate(T* p, size_t n) noexcept
+	{
+		shok_free(p);
+	}
+};
+template <class T, class U>
+bool operator==(const shok_allocator <T>&, const shok_allocator <U>&) { return true; }
+template <class T, class U>
+bool operator!=(const shok_allocator <T>&, const shok_allocator <U>&) { return false; }
+
+
 // generic structs
 struct shok_position {
 	float X;
@@ -29,7 +55,7 @@ public:
 
 struct shok_modifyEntityProps {
 	int MysteriousInt;
-	std::vector<int> TechList;
+	std::vector<int, shok_allocator<int>> TechList;
 };
 
 struct shok_object {
@@ -206,7 +232,7 @@ struct shok_serf_extractionInfo {
 #define shok_vtp_GGL_CSerfBehaviorProps (void*)0x774A14
 struct shok_GGL_CSerfBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	int ResourceSearchRadius, ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList;
-	std::vector<shok_serf_extractionInfo> ExtractionInfo;
+	std::vector<shok_serf_extractionInfo, shok_allocator<shok_serf_extractionInfo>> ExtractionInfo;
 };
 
 struct shok_limitedAttachmentProps {
@@ -221,7 +247,7 @@ public:
 };
 #define shok_vtp_GGL_CLimitedAttachmentBehaviorProperties (void*)0x775DE4
 struct shok_GGL_CLimitedAttachmentBehaviorProperties : shok_EGL_CGLEBehaviorProps {
-	std::vector<shok_limitedAttachmentProps> Attachments;
+	std::vector<shok_limitedAttachmentProps, shok_allocator<shok_limitedAttachmentProps>> Attachments;
 };
 
 struct shok_idleAnimProps {
@@ -229,7 +255,7 @@ struct shok_idleAnimProps {
 };
 #define shok_vtp_GGL_CFormationBehaviorProperties (void*)0x776DE4
 struct shok_GGL_CFormationBehaviorProperties : shok_EGL_CGLEBehaviorProps {
-	std::vector<shok_idleAnimProps> IdleAnims;
+	std::vector<shok_idleAnimProps, shok_allocator<shok_idleAnimProps>> IdleAnims;
 };
 
 #define shok_vtp_GGL_CCamperBehaviorProperties (void*)0x7777D4
@@ -251,7 +277,7 @@ struct shok_GGL_CHeroBehaviorProps : shok_EGL_CGLEBehaviorProps {
 struct shok_GGL_CBombBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	float Radius, Delay;
 	int Damage, ExplosionEffectID;
-	std::vector<int> AffectedEntityTypes;
+	std::vector<int, shok_allocator<int>> AffectedEntityTypes;
 };
 
 #define shok_vtp_GGL_CKegBehaviorProperties (void*)0x776558
@@ -337,7 +363,7 @@ private:
 	int u3;
 public:
 	int Class;
-	std::vector<int> Categories;
+	std::vector<int, shok_allocator<int>> Categories;
 	shok_positionRot ApproachPos;
 private:
 	int Race;
@@ -355,7 +381,7 @@ private:
 	byte u[2];
 	int u2[9];
 public:
-	std::vector<shok_AARect> BlockingArea; // la37
+	std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
 };
 
 #define shok_vtp_GGL_CEntityProperties (void*)0x776FEC
@@ -411,7 +437,7 @@ struct shok_constructionInfo {
 private:
 	int u;
 public:
-	std::vector<shok_positionRot> BuilderSlot;
+	std::vector<shok_positionRot, shok_allocator<shok_positionRot>> BuilderSlot;
 	int Time;
 	shok_costInfo Cost;
 	int ConstructionSite;
@@ -421,14 +447,14 @@ struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
 	int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker;
 	shok_position DoorPos, LeavePos;
 	shok_constructionInfo ConstructionInfo;
-	std::vector<int> BuildOn;
+	std::vector<int, shok_allocator<int>> BuildOn;
 	byte HideBase, CanBeSold, IsWall;
 private:
 	byte u;
 public:
 	shok_upgradeInfo Upgrade;
 	int UpgradeSite, ArmorClass, ArmorAmount;
-	std::vector<int> WorkTaskList;
+	std::vector<int, shok_allocator<int>> WorkTaskList;
 private:
 	int MilitaryInfo[4];
 public:
@@ -454,7 +480,7 @@ private:
 public:
 	shok_EGL_CGLEEntityProps* LogicProps;
 	void* DisplayProps;
-	std::vector<shok_EGL_CGLEBehaviorProps*> BehaviorProps;
+	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps;
 
 
 private:
@@ -472,6 +498,7 @@ public:
 
 	bool IsSettlerType();
 	bool IsBuildingType();
+	bool IsOfCategory(int cat);
 };
 
 #define shok_vtp_EGL_CGLEEntitiesProps (void*)0x788834
@@ -479,7 +506,7 @@ struct shok_EGL_CGLEEntitiesProps : shok_object {
 private:
 	int u[14];
 public:
-	std::vector<shok_GGlue_CGlueEntityProps> EntityTypes;
+	std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes;
 
 	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
 };
@@ -687,7 +714,7 @@ public:
 	shok_position TerritoryCenter;
 	float TerritoryCenterRange;
 	int Experience;
-	std::vector<shok_position> PatrolPoints;
+	std::vector<shok_position, shok_allocator<shok_position>> PatrolPoints;
 private:
 	int u2;
 public:
@@ -841,7 +868,7 @@ struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u[2];
 public:
-	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*> ListOfOffers;
+	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> ListOfOffers;
 };
 
 #define shok_vtp_GGL_CBuildingMercenaryBehavior (void*)0x7782C0
@@ -895,7 +922,7 @@ private:
 	byte u21;
 	int u22;
 public:
-	std::vector<shok_EGL_CGLEBehavior*> BehaviorList; // 30, first field in 31
+	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> BehaviorList; // 30, first field in 31
 	int CurrentState, EntityStateBehaviors, TaskListId, TaskIndex; // la37
 private:
 	int u25[12]; // la49

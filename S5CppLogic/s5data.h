@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <string>
+#include <functional>
 
 #define DEBUGGER_BREAK _asm int 3
 
@@ -12,8 +14,13 @@ typedef uint8_t byte;
 
 // allocator
 extern void* (__cdecl* shok_malloc)(size_t t);
+extern void* (__cdecl* shok_new)(size_t t);
 extern void(__cdecl* shok_free)(void* p);
+extern void (*shok_logString)(const char* format, const char* string);
 
+struct shok_vector {
+	int vtable, start, end, encCap;
+};
 
 template <class T>
 struct shok_allocator {
@@ -23,10 +30,15 @@ struct shok_allocator {
 
 	[[nodiscard]] T* allocate(size_t n) noexcept
 	{
-		return (T*)shok_malloc(n);
+		//shok_logString("alloc: %s\n", std::to_string(n).c_str());
+		void* p = shok_malloc(n * sizeof(T));
+		//shok_logString("allocpoint: %s\n", std::to_string((int)p).c_str());
+		return (T*)p;
 	}
 	void deallocate(T* p, size_t n) noexcept
 	{
+		//shok_logString("free: %s\n", std::to_string(n).c_str());
+		//shok_logString("freepoint: %s\n", std::to_string((int)p).c_str());
 		shok_free(p);
 	}
 };
@@ -35,6 +47,22 @@ bool operator==(const shok_allocator <T>&, const shok_allocator <U>&) { return t
 template <class T, class U>
 bool operator!=(const shok_allocator <T>&, const shok_allocator <U>&) { return false; }
 
+template<class T>
+inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {
+	std::vector<T, shok_allocator<T>> save = std::vector<T, shok_allocator<T>>();
+	int* vecPoint = (int*)vec;
+	int* savePoint = (int*)&save;
+	int backu[3] = {};
+	for (int i = 1; i < 4; i++) {
+		backu[i - 1] = savePoint[i];
+		savePoint[i] = vecPoint[i];
+	}
+	func(save);
+	for (int i = 1; i < 4; i++) {
+		vecPoint[i] = savePoint[i];
+		savePoint[i] = backu[i - 1];
+	}
+}
 
 // generic structs
 struct shok_position {
@@ -1165,8 +1193,6 @@ extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 extern void(_stdcall* shok_SetHighPrecFPU)();
 
 extern void(* shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage);
-
-extern void (*shok_logString)(const char* format, const char* string);
 
 extern int(*shok_getEntityIdByScriptName)(const char* str);
 

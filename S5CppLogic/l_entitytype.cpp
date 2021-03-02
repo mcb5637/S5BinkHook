@@ -176,8 +176,32 @@ int l_entityTypeAddEntityCat(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
 	int cat = luaL_checkint(L, 2);
 	luaext_assert(L, !t->IsOfCategory(cat), "entitytype is already of this cat");
-	t->LogicProps->Categories.push_back(cat);
+	shok_saveVector<int>(&t->LogicProps->Categories, [cat](std::vector<int, shok_allocator<int>>& v) {
+		v.push_back(cat);
+		});
 	return 0;
+}
+int l_entityTypeRemoveEntityCat(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	int cat = luaL_checkint(L, 2);
+	shok_saveVector<int>(&t->LogicProps->Categories, [cat](std::vector<int, shok_allocator<int>>& v) {
+			auto e = std::remove_if(v.begin(), v.end(), [cat](int c) { return c == cat; });
+			v.erase(e, v.end());
+		});
+	return 0;
+}
+int l_entityTypeDump(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	int s = t->LogicProps->Categories.size();
+	luaL_checkstack(L, s + 5, "");
+	int* d = (int*)&t->LogicProps->Categories;
+	for (int i = 0; i < 4; i++)
+		lua_pushnumber(L, d[i]);
+	lua_pushnumber(L, s);
+	for (int i : t->LogicProps->Categories) {
+		lua_pushnumber(L, i);
+	}
+	return s + 5;
 }
 
 void l_entitytype_init(lua_State* L)
@@ -195,6 +219,8 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "GetAutoAttackDamageClass", &l_entityTyGetAutoAttackDamageClass);
 	luaext_registerFunc(L, "SetAutoAttackDamageClass", &l_entityTySetAutoAttackDamageClass);
 	luaext_registerFunc(L, "AddEntityCategory", &l_entityTypeAddEntityCat);
+	luaext_registerFunc(L, "RemoveEntityCategory", &l_entityTypeRemoveEntityCat);
+	luaext_registerFunc(L, "Dump", &l_entityTypeDump);
 
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);

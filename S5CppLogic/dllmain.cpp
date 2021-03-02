@@ -16,7 +16,22 @@ int __cdecl test(lua_State* L) {
     int st = (int)&s;
     int test = (int)&s.MaxHealth;
     lua_pushnumber(L, (test - st) / 4);
-    return 1;
+    std::vector<int, shok_allocator<int>> v = std::vector<int, shok_allocator<int>>();
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.erase(v.begin() + 1);
+    v.erase(v.begin() + 1);
+    int si = v.size();
+    luaL_checkstack(L, si + 5, "");
+    int* d = (int*)&v;
+    for (int i = 0; i < 4; i++)
+        lua_pushnumber(L, d[i]);
+    lua_pushnumber(L, si);
+    for (int i : v) {
+        lua_pushnumber(L, i);
+    }
+    return 5+si;
 }
 
 extern "C" void __cdecl install(lua_State * L) {

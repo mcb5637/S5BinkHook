@@ -459,3 +459,85 @@ function CppLogic.EntityType.GetModels(ty) end
 -- @param m2 model 2 (optional)
 -- @param m3 model 3 (optional)
 function CppLogic.EntityType.GetModels(ty, m0, m1, m2, m3) end
+
+--- entitytytpe circular attack ability data.
+-- @param ty entitytype
+-- @return damage
+-- @return damage class
+-- @return range
+-- @return recharge time
+function CppLogic.EntityType.Settler.GetAbilityDataCircularAttack(ty) end
+--- entitytytpe circular attack ability data.
+-- @param ty entitytype
+-- @param dmg damage
+-- @param dcl damage class
+-- @param ra range
+-- @param rech recharge time
+function CppLogic.EntityType.Settler.SetAbilityDataCircularAttack(ty, dmg, dcl, ra, rech) end
+
+--- entity task list index.
+-- @param id entity
+-- @return index
+function CppLogic.Entity.GetTaskListIndex(id) end
+--- entity task list index.
+-- @param id entity
+-- @param i index
+function CppLogic.Entity.SetTaskListIndex(id, i) end
+
+--- moving entity speed factor (set via logic).
+-- @param id entity
+-- @return factor
+function CppLogic.Entity.MovingEntityGetSpeedFactor(id) end
+
+--- entitytytpe shuriken ability data.
+-- @param ty entitytype
+-- @return damage
+-- @return damage class
+-- @return number shuriken
+-- @return range
+-- @return max arc degree
+-- @return recharge time
+function CppLogic.EntityType.Settler.GetAbilityDataShuriken(ty) end
+--- entitytytpe shuriken ability data.
+-- @param ty entitytype
+-- @param dmg damage
+-- @param dcl damage class
+-- @param numSh number shuriken
+-- @param ran range
+-- @param mArc max arc degree
+-- @param rech recharge time
+function CppLogic.EntityType.Settler.SetAbilityDataShuriken(ty, dmg, dcl, numSh, ran, mArc, rech) end
+
+--- entitytytpe sniper ability data.
+-- damage is facto * max hp of target.
+-- @param ty entitytype
+-- @return damage factor
+-- @return range
+-- @return recharge time
+function CppLogic.EntityType.Settler.GetAbilityDataSniper(ty) end
+--- entitytytpe sniper ability data.
+-- damage is facto * max hp of target.
+-- @param ty entitytype
+-- @param dfac damage factor
+-- @param ran range
+-- @param rech recharge time
+function CppLogic.EntityType.Settler.GetAbilityDataSniper(ty, dfac, ran, rech) end
+
+--- entitytytpe sniper ability data.
+-- damage is facto * max hp of target.
+-- @param ty entitytype
+-- @return damage factor
+-- @return armor factor
+-- @return health recover factor
+-- @return range
+-- @return recharge time
+function CppLogic.EntityType.Settler.GetAbilityDataRangedEffect(ty) end
+--- entitytytpe sniper ability data.
+-- damage is facto * max hp of target.
+-- @param ty entitytype
+-- @param dmgfac damage factor
+-- @param armfac armor factor
+-- @param hpfac health recover factor
+-- @param ran range
+-- @param rech recharge time
+function CppLogic.EntityType.Settler.SetAbilityDataRangedEffect(ty, dmgfac, armfac, hpfac, ran, rech) end

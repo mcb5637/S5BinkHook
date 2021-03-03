@@ -527,15 +527,19 @@ private:
 	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(void* vt);
 
 public:
-	shok_GGL_CLeaderBehaviorProps* GetLeaderBehaviorProp();
-	shok_GGL_CSoldierBehaviorProps* GetSoldierBehaviorProp();
-	shok_GGL_CBattleBehaviorProps* GetBattleBehaviorProp();
-	shok_GGL_CLimitedLifespanBehaviorProps* GetLimitedLifespanBehaviorProp();
-	shok_GGL_CAffectMotivationBehaviorProps* GetAffectMotivationBehaviorProp();
-	shok_GGL_CGLAnimationBehaviorExProps* GetAnimationExProp();
-	shok_GGL_CAutoCannonBehaviorProps* GetAutoCannonProp();
-	shok_GGL_CThiefBehaviorProperties* GetThiefBehaviorProp();
-	shok_GGL_CCamouflageBehaviorProps* GetCamouflageBehaviorProp();
+	shok_GGL_CLeaderBehaviorProps* GetLeaderBehaviorProps();
+	shok_GGL_CSoldierBehaviorProps* GetSoldierBehaviorProps();
+	shok_GGL_CBattleBehaviorProps* GetBattleBehaviorProps();
+	shok_GGL_CLimitedLifespanBehaviorProps* GetLimitedLifespanBehaviorProps();
+	shok_GGL_CAffectMotivationBehaviorProps* GetAffectMotivationBehaviorProps();
+	shok_GGL_CGLAnimationBehaviorExProps* GetAnimationExProps();
+	shok_GGL_CAutoCannonBehaviorProps* GetAutoCannonProps();
+	shok_GGL_CThiefBehaviorProperties* GetThiefBehaviorProps();
+	shok_GGL_CCamouflageBehaviorProps* GetCamouflageBehaviorProps();
+	shok_GGL_CCircularAttackProps* GetCircularAttackProps();
+	shok_GGL_CShurikenAbilityProps* GetShurikenProps();
+	shok_GGL_CSniperAbilityProps* GetSniperProps();
+	shok_GGL_CRangedEffectAbilityProps* GetRangedEffectProps();
 
 	bool IsSettlerType();
 	bool IsBuildingType();

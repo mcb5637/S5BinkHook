@@ -409,6 +409,25 @@ int l_entity_test(lua_State* L) {
 	return 1;
 }
 
+int l_entityGetTaskListIndex(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	lua_pushnumber(L, e->TaskIndex);
+	return 1;
+}
+int l_entitySetTaskListIndex(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	e->TaskIndex = luaL_checkint(L, 2);
+	return 0;
+}
+
+int l_movingEntityGetSpeedFactor(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CBehaviorDefaultMovement* m = e->GetMovementBehavior();
+	luaext_assertPointer(L, m, "no moving entity at 1");
+	lua_pushnumber(L, m->SpeedFactor);
+	return 1;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -424,6 +443,9 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "MovingEntitySetTargetPos", &l_movingEntitySetTargetPos);
 	luaext_registerFunc(L, "GetLimitedLifespanRemaining", &l_entityGetLimitedLifespanRemaining);
 	luaext_registerFunc(L, "SetLimitedLifespanRemaining", &l_entitySetLimitedLifespanRemaining);
+	luaext_registerFunc(L, "GetTaskListIndex", &l_entityGetTaskListIndex);
+	luaext_registerFunc(L, "SetTaskListIndex", &l_entitySetTaskListIndex);
+	luaext_registerFunc(L, "MovingEntityGetSpeedFactor", &l_movingEntityGetSpeedFactor);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);

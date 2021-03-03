@@ -501,13 +501,24 @@ struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
 };
 
+#define shok_vtp_ED_CDisplayEntityProps (void*)0x788840
+struct shok_ED_CDisplayEntityProps : shok_object {
+	int DisplayClass;
+	int Model[4];
+	byte DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
+private:
+	byte u[2];
+public:
+	std::vector<int, shok_allocator<int>> AnimList;
+};
+
 #define shok_vtp_GGlue_CGlueEntityProps (void*)0x788824
 struct shok_GGlue_CGlueEntityProps : shok_object {
 private:
 	int u;
 public:
 	shok_EGL_CGLEEntityProps* LogicProps;
-	void* DisplayProps;
+	shok_ED_CDisplayEntityProps* DisplayProps;
 	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps;
 
 
@@ -523,6 +534,8 @@ public:
 	shok_GGL_CAffectMotivationBehaviorProps* GetAffectMotivationBehaviorProp();
 	shok_GGL_CGLAnimationBehaviorExProps* GetAnimationExProp();
 	shok_GGL_CAutoCannonBehaviorProps* GetAutoCannonProp();
+	shok_GGL_CThiefBehaviorProperties* GetThiefBehaviorProp();
+	shok_GGL_CCamouflageBehaviorProps* GetCamouflageBehaviorProp();
 
 	bool IsSettlerType();
 	bool IsBuildingType();

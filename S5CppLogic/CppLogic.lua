@@ -241,16 +241,6 @@ function CppLogic.Entity.Building.SetHeight(id, h) end
 function CppLogic.Entity.Building.GetBarracksAutoFillActive(id) end
 
 
---- entity type max range (standard for melee is 250).
--- @param ty entity type
--- @return range
-function CppLogic.EntityType.GetMaxRange(ty) end
---- entity type max range (standard for melee is 250).
--- @param ty entity type
--- @param r range
-function CppLogic.EntityType.SetMaxRange(ty, r) end
-
-
 --- the soldier type of a leader type
 -- @param ty leader type
 -- @return soldier type
@@ -352,11 +342,120 @@ function CppLogic.EntityType.Settler.LeaderTypeGetRegeneration(ty) end
 -- @param t regen seconds (optional)
 function CppLogic.EntityType.Settler.LeaderTypeSetRegeneration(ty, hp, t) end
 
---- damageclass of autoattacks of an entity type.
+--- damage and damageclass of autoattacks of an entity type.
 -- @param ty entitytype
+-- @return damage amount
 -- @return damageclass
-function CppLogic.EntityType.GetAutoAttackDamageClass(ty) end
---- damageclass of autoattacks of an entity type.
+function CppLogic.EntityType.GetAutoAttackDamage(ty) end
+--- damage and damageclass of autoattacks of an entity type.
 -- @param ty entitytype
+-- @param dmg damage amount
 -- @param dc damageclass
-function CppLogic.EntityType.SetAutoAttackDamageClass(ty, dc) end
+function CppLogic.EntityType.SetAutoAttackDamage(ty, dmg, dc) end
+
+--- adds an entity category to an entitytype.
+-- can be tested for with logic/predicate, does not need to be from predefined EntityCategories.
+-- @param ty entitytype
+-- @param ecat entitycategory
+function CppLogic.EntityType.AddEntityCategory(ty, ecat) end
+--- removes an entity category from an entitytype.
+-- can be tested for with logic/predicate, does not need to be from predefined EntityCategories.
+-- @param ty entitytype
+-- @param ecat entitycategory
+function CppLogic.EntityType.RemoveEntityCategory(ty, ecat) end
+
+--- miss chance of autoattacks of an entity type (no autocannon).
+-- @param ty entitytype
+-- @return miss chance
+function CppLogic.EntityType.GetAutoAttackMissChance(ty) end
+--- miss chance of autoattacks of an entity type (no autocannon).
+-- @param ty entitytype
+-- @param mc miss chance
+function CppLogic.EntityType.SetAutoAttackMissChance(ty, mc) end
+
+--- range chance of autoattacks of an entity type.
+-- for autocannons only max range, for anything else max and min range.
+-- @param ty entitytype
+-- @return max range
+-- @return min range (nil for autocannons)
+function CppLogic.EntityType.GetAutoAttackMissChance(ty) end
+--- range chance of autoattacks of an entity type.
+-- for autocannons only max range, for anything else max and min range.
+-- @param ty entitytype
+-- @return max range (optional)
+-- @return min range (ignored for autocannons) (optional)
+function CppLogic.EntityType.SetAutoAttackMissChance(ty, maxrange, minrange) end
+
+--- range in which enemies get attacked by this leader type.
+-- @param ty entitytype
+-- @return range
+function CppLogic.EntityType.Settler.LeaderTypeGetAutoAggressiveRange(ty) end
+--- range in which enemies get attacked by this leader type.
+-- @param ty entitytype
+-- @param r range
+function CppLogic.EntityType.Settler.LeaderTypeSetAutoAggressiveRange(ty, r) end
+
+--- number of settlers this building (villagecenter) supports.
+-- @param ty entitytype
+-- @return slots
+function CppLogic.EntityType.Building.GetVCAttractionSlotsProvided(ty) end
+--- number of settlers this building (villagecenter) supports.
+-- @param ty entitytype
+-- @param s slots
+function CppLogic.EntityType.Building.SetVCAttractionSlotsProvided(ty, s) end
+
+--- stealing time and resource amounts of a thief type.
+-- @param ty entitytype
+-- @return seconds needed
+-- @return max resource
+-- @return min resource
+function CppLogic.EntityType.Settler.ThiefTypeGetStealingInfo(ty) end
+--- stealing time and resource amounts of a thief type.
+-- @param ty entitytype
+-- @param sec seconds needed
+-- @param maxS max resource
+-- @param minS min resource
+function CppLogic.EntityType.Settler.ThiefTypeSetStealingInfo(ty, sec, maxS, minS) end
+
+--- entitytytpe camouflage ability data.
+-- for ari duration is invisibility after activation, for thieves its time to invisibility after discovery.
+-- @param ty entitytype
+-- @return duration
+-- @return discovery range
+-- @return recharge time
+function CppLogic.EntityType.Settler.GetAbilityDataCamouflage(ty) end
+--- entitytytpe camouflage ability data.
+-- for ari duration is invisibility after activation, for thieves its time to invisibility after discovery.
+-- @param ty entitytype
+-- @param dur duration
+-- @param dran discovery range
+-- @param rech recharge time
+function CppLogic.EntityType.Settler.SetAbilityDataCamouflage(ty, dur, dran, rech) end
+
+--- settler or building type armor and armorclass.
+-- @param ty entitytype
+-- @return armor
+-- @return armorclass
+function CppLogic.EntityType.GetArmor(ty) end
+--- settler or building type armor and armorclass.
+-- @param ty entitytype
+-- @param ar armor
+-- @param acl armorclass
+function CppLogic.EntityType.GetArmor(ty, ar, acl) end
+
+--- entity type models.
+-- most entitytypes use only one model, but some use the others as well.
+-- @param ty entitytype
+-- @return model 0
+-- @return model 1
+-- @return model 2
+-- @return model 3
+function CppLogic.EntityType.GetModels(ty) end
+--- entity type models.
+-- most entitytypes use only one model, but some use the others as well.
+-- @param ty entitytype
+-- @param m0 model 0 (optional)
+-- @param m1 model 1 (optional)
+-- @param m2 model 2 (optional)
+-- @param m3 model 3 (optional)
+function CppLogic.EntityType.GetModels(ty, m0, m1, m2, m3) end

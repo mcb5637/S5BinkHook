@@ -1,3 +1,6 @@
+
+assert(false, "do not load this file, this is documentation only!")
+
 --- CppLogic
 CppLogic = {}
 CppLogic.Effect = {}
@@ -69,6 +72,9 @@ function CppLogic.Combat.DealDamage(target, damage, attacker) end
 
 --- iterates over all entities that match a predicate.
 -- perfect to use with for loop.
+-- examples:
+-- - for id in CppLogic.Entity.EntityIterator(...) do Message(id) end  
+-- - for id, rsqu in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.InCircle(...), ...) do Message(id.."   "..r) end  
 -- @param pred predicate userdata
 -- @return nextEntity func
 -- @return iteratorStatus
@@ -108,6 +114,7 @@ function CppLogic.Entity.Predicates.OfType(etyp) end
 function CppLogic.Entity.Predicates.OfPlayer(pl) end
 
 --- creates a predicate that checks for an area.
+-- when used in loop iterator, can also return the range squared for each matched entity as 2nd loop parameter (optional).
 -- @param x x coordinate of center
 -- @param y y coordinate of center
 -- @param r radius of circle
@@ -122,9 +129,9 @@ function CppLogic.Entity.Predicates.IsBuilding() end
 -- @return predicate userdata
 function CppLogic.Entity.Predicates.IsSettler() end
 
---- creates a predicate that checks for settlers or buildings.
+--- creates a predicate that checks for (player!=0 && (IsBuilding || IsSettler)).
 -- @return predicate userdata
-function CppLogic.Entity.Predicates.IsSettlerOrBuilding() end
+function CppLogic.Entity.Predicates.IsCombatRelevant() end
 
 --- creates a predicate that checks for anything that is not a soldier.
 -- @return predicate userdata
@@ -541,3 +548,56 @@ function CppLogic.EntityType.Settler.GetAbilityDataRangedEffect(ty) end
 -- @param ran range
 -- @param rech recharge time
 function CppLogic.EntityType.Settler.SetAbilityDataRangedEffect(ty, dmgfac, armfac, hpfac, ran, rech) end
+
+--- tree data to replace a tree with a resourcetree.
+-- @param ty entitytype
+-- @return resource entitytype
+-- @return resource amount
+function CppLogic.EntityType.ResourceTreeTypeGetData(ty) end
+--- tree data to replace a tree with a resourcetree.
+-- @param ty entitytype
+-- @param rety resource entitytype
+-- @param ram resource amount
+function CppLogic.EntityType.ResourceTreeTypeSetData(ty, rety, ram) end
+
+--- settler current work time.
+-- @param id entity
+-- @return work time
+function CppLogic.Entity.Settler.WorkerGetCurrentWorkTime(id) end
+--- settler current work time.
+-- @param id entity
+-- @param wt work time
+function CppLogic.Entity.Settler.WorkerSetCurrentWorkTime(id, wt) end
+
+--- settler type fearless.
+-- @param ty entitytype
+-- @return fearless
+function CppLogic.EntityType.Settler.GetFearless(ty) end
+--- settler type fearless.
+-- @param ty entitytype
+-- @param fl fearless
+function CppLogic.EntityType.Settler.SetFearless(ty, fl) end
+
+--- market trade data.
+-- progress is buy amount + sell amount
+-- @param id entity
+-- @return buy type
+-- @return sell type
+-- @return buy amount
+-- @return sell amount
+-- @return progress amount
+function CppLogic.Entity.Building.MarketGetCurrentTradeData(id) end
+--- market trade data.
+-- progress is buy amount + sell amount
+-- @param id entity
+-- @param bty buy type (optional)
+-- @param sty sell type (optional)
+-- @param bam buy amount (optional)
+-- @param sam sell amount (optional)
+-- @param pam progress amount (optional)
+function CppLogic.Entity.Building.MarketSetCurrentTradeData(id, bty, sty, bam, sam, pam) end
+
+--- entity check for soldier. (asserts if no entity).
+-- @param id entity
+-- @return is entity of soldier type
+function CppLogic.Entity.IsSoldier(id) end

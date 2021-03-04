@@ -118,9 +118,9 @@ int l_entityPredicateIsBuilding(lua_State* L) {
 	return 1;
 }
 
-int l_entityPredicateIsSettlerOrBuilding(lua_State* L) {
-	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateIsSettlerOrBuilding));
-	new(ud) EntityIteratorPredicateIsSettlerOrBuilding();
+int l_entityPredicateIsRelevant(lua_State* L) {
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateIsRelevant));
+	new(ud) EntityIteratorPredicateIsRelevant();
 	return 1;
 }
 int l_entityPredicateIsNotSoldier(lua_State* L) {
@@ -163,7 +163,7 @@ int l_entityIteratorToTable(lua_State* L) {
 	EntityIterator it = EntityIterator(pred);
 	shok_EGL_CGLEEntity* e = nullptr;
 	while (true) {
-		e = it.GetNext();
+		e = it.GetNext(nullptr);
 		if (e == nullptr)
 			break;
 		lua_pushnumber(L, e->EntityId);
@@ -173,14 +173,43 @@ int l_entityIteratorToTable(lua_State* L) {
 	return 1;
 }
 
+int l_entityIteratorGetNearest(lua_State* L) {
+	if (lua_gettop(L) > 1) { // auto create an and predicate
+		l_entityPredicateAnd(L);
+	}
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
+	EntityIterator it = EntityIterator(pred);
+	shok_EGL_CGLEEntity* e = nullptr;
+	float currentR = -1;
+	float maxR = -1;
+	int maxID = -1;
+	while (true) {
+		e = it.GetNext(&currentR);
+		if (e == nullptr)
+			break;
+		if (maxR <= -1 || currentR < maxR) {
+			maxID = e->EntityId;
+			maxR = currentR;
+		}
+	}
+	lua_pushnumber(L, maxID);
+	lua_pushnumber(L, maxR);
+	return 2;
+}
+
 int l_entityIteratorNext(lua_State* L) { // (state, last value) -> next value
 	EntityIterator* it = (EntityIterator*)lua_touserdata(L, 1); // no error checking here, cause that would cost speed
-	shok_EGL_CGLEEntity* e = it->GetNext();
-	if (e == nullptr)
+	float r = -1;
+	shok_EGL_CGLEEntity* e = it->GetNext(&r);
+	if (e == nullptr) {
 		lua_pushnil(L);
-	else
+		lua_pushnil(L);
+	}
+	else {
 		lua_pushnumber(L, e->EntityId);
-	return 1;
+		lua_pushnumber(L, r);
+	}
+	return 2;
 }
 
 int l_entityIterator(lua_State* L) {
@@ -202,7 +231,7 @@ int l_entityIterator(lua_State* L) {
 int l_entityCheckPredicate(lua_State* L) {
 	shok_EGL_CGLEEntity* s = luaext_checkEntity(L, 1);
 	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 2);
-	lua_pushboolean(L, pred->MatchesEntity(s));
+	lua_pushboolean(L, pred->MatchesEntity(s, nullptr));
 	return 1;
 }
 
@@ -428,12 +457,62 @@ int l_movingEntityGetSpeedFactor(lua_State* L) {
 	return 1;
 }
 
+int l_settlerGetWorkerCurrentWorkTime(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CWorkerBehavior* w = s->GetWorkerBehavior();
+	luaext_assertPointer(L, w, "no worker at 1");
+	lua_pushnumber(L, w->WorkTimeRemaining);
+	return 1;
+}
+int l_settlerSetWorkerCurrentWorkTime(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CWorkerBehavior* w = s->GetWorkerBehavior();
+	luaext_assertPointer(L, w, "no worker at 1");
+	w->WorkTimeRemaining = luaL_checkint(L, 2);
+	return 0;
+}
+
+int l_buildingGetCurrentTradeInfo(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CMarketBehavior* m = b->GetMarketBehavior();
+	luaext_assertPointer(L, m, "no market at 1");
+	lua_pushnumber(L, m->BuyResourceType);
+	lua_pushnumber(L, m->SellResourceType);
+	lua_pushnumber(L, m->BuyAmount);
+	lua_pushnumber(L, m->SellAmount);
+	lua_pushnumber(L, m->ProgressAmount);
+	return 5;
+}
+int l_buildingSetCurrentTradeInfo(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CMarketBehavior* m = b->GetMarketBehavior();
+	luaext_assertPointer(L, m, "no market at 1");
+	if (lua_isnumber(L, 2))
+		m->BuyResourceType = luaL_checkint(L, 2);
+	if (lua_isnumber(L, 3))
+		m->SellResourceType = luaL_checkint(L, 3);
+	if (lua_isnumber(L, 4))
+		m->BuyAmount = luaL_checkfloat(L, 4);
+	if (lua_isnumber(L, 5))
+		m->SellAmount = luaL_checkfloat(L, 5);
+	if (lua_isnumber(L, 6))
+		m->ProgressAmount = luaL_checkfloat(L, 6);
+	return 0;
+}
+
+int l_entityIsSoldier(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	lua_pushboolean(L, e->GetSoldierBehavior() != nullptr);
+	return 1;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
 	luaext_registerFunc(L, "Get", &l_entity_get);
 	luaext_registerFunc(L, "EntityIteratorTableize", &l_entityIteratorToTable);
 	luaext_registerFunc(L, "EntityIterator", &l_entityIterator);
+	luaext_registerFunc(L, "EntityIteratorGetNearest", &l_entityIteratorGetNearest);
 	luaext_registerFunc(L, "GetNumberOfBehaviors", &l_entityGetNumberOfBehaviors);
 	luaext_registerFunc(L, "test", &l_entity_test);
 	luaext_registerFunc(L, "CheckPredicate", &l_entityCheckPredicate);
@@ -446,6 +525,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetTaskListIndex", &l_entityGetTaskListIndex);
 	luaext_registerFunc(L, "SetTaskListIndex", &l_entitySetTaskListIndex);
 	luaext_registerFunc(L, "MovingEntityGetSpeedFactor", &l_movingEntityGetSpeedFactor);
+	luaext_registerFunc(L, "IsSoldier", &l_entityIsSoldier);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -457,7 +537,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "InCircle", &l_entityPredicateInCircle);
 	luaext_registerFunc(L, "IsBuilding", &l_entityPredicateIsBuilding);
 	luaext_registerFunc(L, "IsSettler", &l_entityPredicateIsSettler);
-	luaext_registerFunc(L, "IsSettlerOrBuilding", &l_entityPredicateIsSettlerOrBuilding);
+	luaext_registerFunc(L, "IsCombatRelevant", &l_entityPredicateIsRelevant);
 	luaext_registerFunc(L, "OfAnyPlayer", &l_entityPredicateAnyPlayer);
 	luaext_registerFunc(L, "OfAnyEntityType", &l_entityPredicateAnyEntityType);
 	luaext_registerFunc(L, "IsNotSoldier", &l_entityPredicateIsNotSoldier);
@@ -479,6 +559,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "ThiefSetCamouflageTimeTo", &l_settlerThiefCamouflageSetTimeTo);
 	luaext_registerFunc(L, "HeroGetResurrectionTime", &l_settlerHeroGetResurrectionTime);
 	luaext_registerFunc(L, "HeroSetResurrectionTime", &l_settlerHeroSetResurrectionTime);
+	luaext_registerFunc(L, "WorkerGetCurrentWorkTime", &l_settlerGetWorkerCurrentWorkTime);
+	luaext_registerFunc(L, "WorkerSetCurrentWorkTime", &l_settlerSetWorkerCurrentWorkTime);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -494,6 +576,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetBarracksAutoFillActive", &l_buildingGetAutoFillActive);
 	luaext_registerFunc(L, "GetHeight", &l_buildingGetHeight);
 	luaext_registerFunc(L, "SetHeight", &l_buildingSetHeight);
+	luaext_registerFunc(L, "MarketGetCurrentTradeData", &l_buildingGetCurrentTradeInfo);
+	luaext_registerFunc(L, "MarketSetCurrentTradeData", &l_buildingSetCurrentTradeInfo);
 	lua_rawset(L, -3);
 }
 
@@ -502,8 +586,9 @@ void l_entity_init(lua_State* L)
 // CppLogic.Entity.GetNumberOfAllocatedEntities()
 // CppLogic.Entity.GetNumberOfBehaviors(GUI.GetEntityAtPosition(GUI.GetMousePosition()))
 // CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.IsSettler(), CppLogic.Entity.Predicates.IsNotSoldier(), CppLogic.Entity.Predicates.OfPlayer(1))
-// local x,y = GUI.Debug_GetMapPositionUnderMouse(); CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.InCircle(x,y, 1000))
-// for id in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.OfAnyEntityType(Entities.PU_Serf, Entities.PB_Headquarters1), CppLogic.Entity.Predicates.OfAnyPlayer(2, 3)) do LuaDebugger.Log(id) end
+// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Entity.EntityIteratorTableize(CppLogic.Entity.Predicates.InCircle(x,y, 1000))
+// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Entity.EntityIteratorGetNearest(CppLogic.Entity.Predicates.InCircle(x,y, 1000))
+// local x,y = GUI.Debug_GetMapPositionUnderMouse();  for id,r in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.OfAnyEntityType(Entities.PU_Serf, Entities.PB_Headquarters1), CppLogic.Entity.Predicates.InCircle(x,y, 1000)) do LuaDebugger.Log(id.."   "..r) end
 // CppLogic.Entity.Settler.GetBaseMovementSpeed(GUI.GetSelectedEntity())
 // CppLogic.Entity.MovingEntityGetTargetPos(GUI.GetSelectedEntity())
 // local x,y = GUI.Debug_GetMapPositionUnderMouse() CppLogic.Entity.MovingEntitySetTargetPos(GUI.GetSelectedEntity(), {X=x,Y=y})
@@ -519,7 +604,7 @@ void EntityIterator::Reset()
 	current = 0;
 }
 
-shok_EGL_CGLEEntity* EntityIterator::GetNext()
+shok_EGL_CGLEEntity* EntityIterator::GetNext(float* rangeOut)
 {
 	shok_EGL_CGLEEntityManager* eman = *shok_EGL_CGLEEntityManagerObj;
 	while (true) {
@@ -527,7 +612,7 @@ shok_EGL_CGLEEntity* EntityIterator::GetNext()
 			return nullptr;
 		shok_EGL_CGLEEntity* e = eman->GetEntityByNum(current);
 		current++;
-		if (e != nullptr && Predicate->MatchesEntity(e))
+		if (e != nullptr && Predicate->MatchesEntity(e, rangeOut))
 			return e;
 	}
 	return nullptr;
@@ -538,12 +623,12 @@ EntityIteratorPredicateOfType::EntityIteratorPredicateOfType(int etype)
 	type = etype;
 }
 
-bool EntityIteratorPredicateOfType::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateOfType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return e->EntityType == type;
 }
 
-bool EntityIteratorPredicateOfPlayer::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateOfPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return e->PlayerId == player;
 }
@@ -553,10 +638,10 @@ EntityIteratorPredicateOfPlayer::EntityIteratorPredicateOfPlayer(int player)
 	this->player = player;
 }
 
-bool EntityIteratorPredicateAnd::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateAnd::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	for (int i = 0; i < numPreds; i++) {
-		if (!predicates[i]->MatchesEntity(e))
+		if (!predicates[i]->MatchesEntity(e, rangeOut))
 			return false;
 	}
 	return true;
@@ -568,10 +653,10 @@ EntityIteratorPredicateAnd::EntityIteratorPredicateAnd(EntityIteratorPredicate**
 	this->numPreds = numPreds;
 }
 
-bool EntityIteratorPredicateOr::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateOr::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	for (int i = 0; i < numPreds; i++) {
-		if (predicates[i]->MatchesEntity(e))
+		if (predicates[i]->MatchesEntity(e, rangeOut))
 			return true;
 	}
 	return false;
@@ -583,11 +668,14 @@ EntityIteratorPredicateOr::EntityIteratorPredicateOr(EntityIteratorPredicate** t
 	this->numPreds = numPreds;
 }
 
-bool EntityIteratorPredicateInCircle::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateInCircle::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	float dx = e->Position.X - x;
 	float dy = e->Position.Y - y;
-	return (dx*dx + dy*dy) <= r;
+	float ran = (dx * dx + dy * dy);
+	if (rangeOut != nullptr)
+		*rangeOut = ran;
+	return ran <= r;
 }
 
 EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(float x, float y, float r)
@@ -597,21 +685,22 @@ EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(float x, float 
 	this->r = r * r;
 }
 
-bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return shok_EntityIsSettler(e);
 }
 
-bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return shok_EntityIsBuilding(e);
 }
-bool EntityIteratorPredicateIsSettlerOrBuilding::MatchesEntity(shok_EGL_CGLEEntity* e)
+
+bool EntityIteratorPredicateIsRelevant::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
-	return shok_EntityIsSettler(e) || shok_EntityIsBuilding(e);
+	return e->PlayerId != 0 && (shok_EntityIsSettler(e) || shok_EntityIsBuilding(e));
 }
 
-bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	int pl = e->PlayerId;
 	for (int i = 0; i < numPlayers; i++) {
@@ -627,7 +716,7 @@ EntityIteratorPredicateAnyPlayer::EntityIteratorPredicateAnyPlayer(int* pl, int 
 	this->numPlayers = numPlayers;
 }
 
-bool EntityIteratorPredicateAnyEntityType::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateAnyEntityType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	int pl = e->EntityType;
 	for (int i = 0; i < numTypes; i++) {
@@ -643,12 +732,12 @@ EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(int* 
 	numTypes = numTy;
 }
 
-bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return e->GetSoldierBehavior() == nullptr;
 }
 
-bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return e->IsEntityInCategory(category);
 }
@@ -658,7 +747,7 @@ EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory
 	category = cat;
 }
 
-bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return shok_EntityGetProvidedResourceByID(e->EntityId) == resource;
 }
@@ -668,7 +757,7 @@ EntityIteratorPredicateProvidesResource::EntityIteratorPredicateProvidesResource
 	resource = res;
 }
 
-bool EntityIteratorPredicateInRect::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateInRect::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
 	return low.X <= e->Position.X && e->Position.X <= high.X && low.Y <= e->Position.Y && e->Position.Y <= high.Y;
 }
@@ -681,9 +770,9 @@ EntityIteratorPredicateInRect::EntityIteratorPredicateInRect(float x1, float y1,
 	high.Y = max(y1, y2);
 }
 
-bool EntityIteratorPredicateNot::MatchesEntity(shok_EGL_CGLEEntity* e)
+bool EntityIteratorPredicateNot::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
-	return !predicate->MatchesEntity(e);
+	return !predicate->MatchesEntity(e, rangeOut);
 }
 
 EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* pred)

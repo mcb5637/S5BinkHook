@@ -434,7 +434,7 @@ public:
 	int DodgeChance;
 	int IdleTaskList;
 	shok_upgradeInfo Upgrade;
-	byte Convertible, Fearless;
+	byte Fearless, Convertible;
 private:
 	byte u[2];
 public:
@@ -536,14 +536,16 @@ public:
 	shok_GGL_CAutoCannonBehaviorProps* GetAutoCannonProps();
 	shok_GGL_CThiefBehaviorProperties* GetThiefBehaviorProps();
 	shok_GGL_CCamouflageBehaviorProps* GetCamouflageBehaviorProps();
-	shok_GGL_CCircularAttackProps* GetCircularAttackProps();
-	shok_GGL_CShurikenAbilityProps* GetShurikenProps();
-	shok_GGL_CSniperAbilityProps* GetSniperProps();
-	shok_GGL_CRangedEffectAbilityProps* GetRangedEffectProps();
+	shok_GGL_CCircularAttackProps* GetCircularAttackBehaviorProps();
+	shok_GGL_CShurikenAbilityProps* GetShurikenBehaviorProps();
+	shok_GGL_CSniperAbilityProps* GetSniperBehaviorProps();
+	shok_GGL_CRangedEffectAbilityProps* GetRangedEffectBehaviorProps();
+	shok_GGL_CWorkerBehaviorProps* GetWorkerBehaviorProps();
 
 	bool IsSettlerType();
 	bool IsBuildingType();
 	bool IsOfCategory(int cat);
+	bool IsCEntityProperties();
 };
 
 #define shok_vtp_EGL_CGLEEntitiesProps (void*)0x788834
@@ -1002,8 +1004,12 @@ public:
 	shok_GGL_CThiefCamouflageBehavior* GetCamoThiefBehavior();
 	shok_GGL_CHeroBehavior* GetHeroBehavior();
 	shok_GGL_CLimitedLifespanBehavior* GetLimitedLifespanBehavior();
+	shok_GGL_CWorkerBehavior* GetWorkerBehavior();
+	shok_GGL_CMarketBehavior* GetMarketBehavior();
+
 	bool IsEntityInCategory(int cat);
 	bool IsMovingEntity();
+	shok_GGlue_CGlueEntityProps* GetEntityType();
 };
 
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84

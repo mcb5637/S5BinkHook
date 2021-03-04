@@ -367,7 +367,7 @@ int l_entityTySetModels(lua_State* L) {
 
 int l_settlerTyGetAbilityDataCircularAttack(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CCircularAttackProps* p = t->GetCircularAttackProps();
+	shok_GGL_CCircularAttackProps* p = t->GetCircularAttackBehaviorProps();
 	luaext_assertPointer(L, p, "no circularattack entity at 1");
 	lua_pushnumber(L, p->Damage);
 	lua_pushnumber(L, p->DamageClass);
@@ -377,7 +377,7 @@ int l_settlerTyGetAbilityDataCircularAttack(lua_State* L) {
 }
 int l_settlerTySetAbilityDataCircularAttack(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CCircularAttackProps* p = t->GetCircularAttackProps();
+	shok_GGL_CCircularAttackProps* p = t->GetCircularAttackBehaviorProps();
 	luaext_assertPointer(L, p, "no circularattack entity at 1");
 	if (lua_isnumber(L, 2))
 		p->Damage = luaL_checkint(L, 2);
@@ -392,7 +392,7 @@ int l_settlerTySetAbilityDataCircularAttack(lua_State* L) {
 
 int l_settlerTyGetAbilityDataShuriken(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CShurikenAbilityProps* p = t->GetShurikenProps();
+	shok_GGL_CShurikenAbilityProps* p = t->GetShurikenBehaviorProps();
 	luaext_assertPointer(L, p, "no shuriken entity at 1");
 	lua_pushnumber(L, p->DamageAmount);
 	lua_pushnumber(L, p->DamageClass);
@@ -404,7 +404,7 @@ int l_settlerTyGetAbilityDataShuriken(lua_State* L) {
 }
 int l_settlerTySetAbilityDataShuriken(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CShurikenAbilityProps* p = t->GetShurikenProps();
+	shok_GGL_CShurikenAbilityProps* p = t->GetShurikenBehaviorProps();
 	luaext_assertPointer(L, p, "no shuriken entity at 1");
 	if (lua_isnumber(L, 2))
 		p->DamageAmount = luaL_checkint(L, 2);
@@ -423,7 +423,7 @@ int l_settlerTySetAbilityDataShuriken(lua_State* L) {
 
 int l_settlerTyGetAbilityDataSniper(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CSniperAbilityProps* p = t->GetSniperProps();
+	shok_GGL_CSniperAbilityProps* p = t->GetSniperBehaviorProps();
 	luaext_assertPointer(L, p, "no sniper entity at 1");
 	lua_pushnumber(L, p->DamageFactor);
 	lua_pushnumber(L, p->Range);
@@ -432,7 +432,7 @@ int l_settlerTyGetAbilityDataSniper(lua_State* L) {
 }
 int l_settlerTySetAbilityDataSniper(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CSniperAbilityProps* p = t->GetSniperProps();
+	shok_GGL_CSniperAbilityProps* p = t->GetSniperBehaviorProps();
 	luaext_assertPointer(L, p, "no sniper entity at 1");
 	if (lua_isnumber(L, 2))
 		p->DamageFactor = luaL_checkfloat(L, 2);
@@ -445,7 +445,7 @@ int l_settlerTySetAbilityDataSniper(lua_State* L) {
 
 int l_settlerTyGetAbilityDataRangedEffect(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CRangedEffectAbilityProps* p = t->GetRangedEffectProps();
+	shok_GGL_CRangedEffectAbilityProps* p = t->GetRangedEffectBehaviorProps();
 	luaext_assertPointer(L, p, "no ranged effect entity at 1");
 	lua_pushnumber(L, p->DamageFactor);
 	lua_pushnumber(L, p->ArmorFactor);
@@ -456,7 +456,7 @@ int l_settlerTyGetAbilityDataRangedEffect(lua_State* L) {
 }
 int l_settlerTySetAbilityDataRangedEffect(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok_GGL_CRangedEffectAbilityProps* p = t->GetRangedEffectProps();
+	shok_GGL_CRangedEffectAbilityProps* p = t->GetRangedEffectBehaviorProps();
 	luaext_assertPointer(L, p, "no ranged effect entity at 1");
 	if (lua_isnumber(L, 2))
 		p->DamageFactor = luaL_checkfloat(L, 2);
@@ -468,6 +468,39 @@ int l_settlerTySetAbilityDataRangedEffect(lua_State* L) {
 		p->Range = luaL_checkfloat(L, 5);
 	if (lua_isnumber(L, 6))
 		p->RechargeTimeSeconds = luaL_checkint(L, 6);
+	return 0;
+}
+
+int l_entityTyGetResourceTreeData(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsCEntityProperties(), "no resource tree entity at 1");
+	shok_GGL_CEntityProperties* l = (shok_GGL_CEntityProperties*)t->LogicProps;
+	lua_pushnumber(L, l->ResourceEntity);
+	lua_pushnumber(L, l->ResourceAmount);
+	return 2;
+}
+int l_entityTySetResourceTreeData(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsCEntityProperties(), "no resource tree entity at 1");
+	shok_GGL_CEntityProperties* l = (shok_GGL_CEntityProperties*)t->LogicProps;
+	if (lua_isnumber(L, 2))
+		l->ResourceEntity = luaL_checkint(L, 2);
+	if (lua_isnumber(L, 3))
+		l->ResourceAmount = luaL_checkint(L, 3);
+	return 0;
+}
+
+int l_settlerTyGetFearless(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsSettlerType(), "no settler entity at 1");
+	lua_pushboolean(L, ((shok_GGL_CGLSettlerProps*)t->LogicProps)->Fearless);
+	return 1;
+}
+int l_settlerTySetFearless(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsSettlerType(), "no settler entity at 1");
+	luaL_checkany(L, 2);
+	((shok_GGL_CGLSettlerProps*)t->LogicProps)->Fearless = lua_toboolean(L, 2);
 	return 0;
 }
 
@@ -494,6 +527,8 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetArmor", &l_entityTySetArmor);
 	luaext_registerFunc(L, "GetModels", &l_entityTyGetModels);
 	luaext_registerFunc(L, "SetModels", &l_entityTySetModels);
+	luaext_registerFunc(L, "ResourceTreeTypeGetData", &l_entityTyGetResourceTreeData);
+	luaext_registerFunc(L, "ResourceTreeTypeSetData", &l_entityTySetResourceTreeData);
 
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);
@@ -517,6 +552,8 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetAbilityDataSniper", &l_settlerTySetAbilityDataSniper);
 	luaext_registerFunc(L, "GetAbilityDataRangedEffect", &l_settlerTyGetAbilityDataRangedEffect);
 	luaext_registerFunc(L, "SetAbilityDataRangedEffect", &l_settlerTySetAbilityDataRangedEffect);
+	luaext_registerFunc(L, "GetFearless", &l_settlerTyGetFearless);
+	luaext_registerFunc(L, "SetFearless", &l_settlerTySetFearless);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");

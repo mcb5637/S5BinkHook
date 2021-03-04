@@ -226,22 +226,47 @@ shok_GGL_CCamouflageBehaviorProps* shok_GGlue_CGlueEntityProps::GetCamouflageBeh
 	return (shok_GGL_CCamouflageBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CCamouflageBehaviorProps);
 }
 
-shok_GGL_CCircularAttackProps* shok_GGlue_CGlueEntityProps::GetCircularAttackProps()
+shok_GGL_CCircularAttackProps* shok_GGlue_CGlueEntityProps::GetCircularAttackBehaviorProps()
 {
 	return (shok_GGL_CCircularAttackProps*)SearchBehaviorProp(shok_vtp_GGL_CCircularAttackProps);
 }
 
-shok_GGL_CShurikenAbilityProps* shok_GGlue_CGlueEntityProps::GetShurikenProps()
+shok_GGL_CShurikenAbilityProps* shok_GGlue_CGlueEntityProps::GetShurikenBehaviorProps()
 {
 	return (shok_GGL_CShurikenAbilityProps*)SearchBehaviorProp(shok_vtp_GGL_CShurikenAbilityProps);
 }
 
-shok_GGL_CSniperAbilityProps* shok_GGlue_CGlueEntityProps::GetSniperProps()
+shok_GGL_CSniperAbilityProps* shok_GGlue_CGlueEntityProps::GetSniperBehaviorProps()
 {
 	return (shok_GGL_CSniperAbilityProps*)SearchBehaviorProp(shok_vtp_GGL_CSniperAbilityProps);
 }
 
-shok_GGL_CRangedEffectAbilityProps* shok_GGlue_CGlueEntityProps::GetRangedEffectProps()
+shok_GGL_CRangedEffectAbilityProps* shok_GGlue_CGlueEntityProps::GetRangedEffectBehaviorProps()
 {
 	return (shok_GGL_CRangedEffectAbilityProps*)SearchBehaviorProp(shok_vtp_GGL_CRangedEffectAbilityProps);
+}
+
+bool shok_GGlue_CGlueEntityProps::IsCEntityProperties()
+{
+	return LogicProps->vtable == shok_vtp_GGL_CEntityProperties;
+}
+
+shok_GGL_CWorkerBehaviorProps* shok_GGlue_CGlueEntityProps::GetWorkerBehaviorProps()
+{
+	return (shok_GGL_CWorkerBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CWorkerBehaviorProps);
+}
+
+shok_GGL_CWorkerBehavior* shok_EGL_CGLEEntity::GetWorkerBehavior()
+{
+	return (shok_GGL_CWorkerBehavior*)SearchBehavior(shok_vtp_GGL_CWorkerBehavior);
+}
+
+shok_GGL_CMarketBehavior* shok_EGL_CGLEEntity::GetMarketBehavior()
+{
+	return (shok_GGL_CMarketBehavior*)SearchBehavior(shok_vtp_GGL_CMarketBehavior);
+}
+
+shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntity::GetEntityType()
+{
+	return (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(EntityType);
 }

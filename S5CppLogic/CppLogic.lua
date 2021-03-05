@@ -635,3 +635,9 @@ function CppLogic.EntityType.Building.SetUpradeCost(ty, c, ignoreZeroes) end
 --- resurrect a hero.
 -- @param ty entitytype
 function CppLogic.Entity.Settler.HeroResurrect(id) end
+
+--- set thief stolen resources.
+-- @param ty entitytype
+-- @param ty res type or 0
+-- @param am amount (optional)
+function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end

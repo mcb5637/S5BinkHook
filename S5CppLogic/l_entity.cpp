@@ -433,8 +433,7 @@ int l_entitySetLimitedLifespanRemaining(lua_State* L) {
 
 int l_entity_test(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	int(_cdecl * func)(int id) = (int(_cdecl*)(int id))  0x4B8489;
-	lua_pushnumber(L, func(e->EntityId));
+	lua_pushnumber(L, e->EventGetById(luaL_checkint(L, 2)));
 	return 1;
 }
 
@@ -516,6 +515,25 @@ int l_heroResurrect(lua_State* L) {
 	return 0;
 }
 
+int l_settlerThiefSetStolenResourceInfo(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CThiefBehavior* t = e->GetThiefBehavior();
+	luaext_assertPointer(L, t, "no thief at 1");
+	int ty = luaL_checkint(L, 2);
+	int am;
+	if (ty == 0)
+		am = 0;
+	else
+		am = luaL_checkint(L, 3);
+	t->ResourceType = ty;
+	t->Amount = am;
+	if (ty == 0)
+		t->StolenFromPlayer = 0;
+	else if (lua_isnumber(L, 4))
+		t->StolenFromPlayer = luaL_checkint(L, 4); // todo: check for func that refreshes model
+	return 0;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -572,6 +590,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "WorkerGetCurrentWorkTime", &l_settlerGetWorkerCurrentWorkTime);
 	luaext_registerFunc(L, "WorkerSetCurrentWorkTime", &l_settlerSetWorkerCurrentWorkTime);
 	luaext_registerFunc(L, "HeroResurrect", &l_heroResurrect);
+	luaext_registerFunc(L, "ThiefSetStolenResourceInfo", &l_settlerThiefSetStolenResourceInfo);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

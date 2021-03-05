@@ -1006,10 +1006,16 @@ public:
 	shok_GGL_CLimitedLifespanBehavior* GetLimitedLifespanBehavior();
 	shok_GGL_CWorkerBehavior* GetWorkerBehavior();
 	shok_GGL_CMarketBehavior* GetMarketBehavior();
+	shok_GGL_CThiefBehavior* GetThiefBehavior();
 
 	bool IsEntityInCategory(int cat);
 	bool IsMovingEntity();
 	shok_GGlue_CGlueEntityProps* GetEntityType();
+
+	int EventGetDamage();
+	int EventGetArmor();
+	int EventGetMaxWorktime();
+	int EventGetById(int id);
 };
 
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84

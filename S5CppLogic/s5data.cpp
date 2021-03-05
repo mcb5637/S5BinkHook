@@ -270,3 +270,40 @@ shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntity::GetEntityType()
 {
 	return (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(EntityType);
 }
+
+shok_GGL_CThiefBehavior* shok_EGL_CGLEEntity::GetThiefBehavior()
+{
+	return (shok_GGL_CThiefBehavior*)SearchBehavior(shok_vtp_GGL_CThiefBehavior);
+}
+
+struct shok_event_data {
+	int vtable = 0x766CC4;
+	int id = 0;
+	int result = 0;
+	int u[2] = { 0, 0 };
+};
+struct shok_vtable_EGL_CGLEEntity {
+	int u[16];
+	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
+};
+int shok_EGL_CGLEEntity::EventGetById(int id)
+{
+	shok_event_data d = shok_event_data();
+	d.id = id;
+	shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)vtable;
+	vt->FireEvent(this, &d);
+	return d.result;
+}
+
+int shok_EGL_CGLEEntity::EventGetDamage()
+{
+	return EventGetById(0x1503D);
+}
+int shok_EGL_CGLEEntity::EventGetArmor()
+{
+	return EventGetById(0x1503E);
+}
+int shok_EGL_CGLEEntity::EventGetMaxWorktime()
+{
+	return EventGetById(0x1301A);
+}

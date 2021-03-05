@@ -504,6 +504,54 @@ int l_settlerTySetFearless(lua_State* L) {
 	return 0;
 }
 
+int l_settlerTyGetCost(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsSettlerType(), "no settler entity at 1");
+	luaext_writeCostInfo(L, ((shok_GGL_CGLSettlerProps*)t->LogicProps)->Cost);
+	return 1;
+}
+int l_settlerTySetCost(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsSettlerType(), "no settler entity at 1");
+	bool ig = false;
+	if (lua_isboolean(L, 3))
+		ig = lua_toboolean(L, 3);
+	luaext_readCostInfo(L, 2, ((shok_GGL_CGLSettlerProps*)t->LogicProps)->Cost, ig);
+	return 0;
+}
+
+int l_buildingGetCostConstr(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsBuildingType(), "no building entity at 1");
+	luaext_writeCostInfo(L, ((shok_GGL_CGLBuildingProps*)t->LogicProps)->ConstructionInfo.Cost);
+	return 1;
+}
+int l_buildingSetCostConstr(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsBuildingType(), "no building entity at 1");
+	bool ig = false;
+	if (lua_isboolean(L, 3))
+		ig = lua_toboolean(L, 3);
+	luaext_readCostInfo(L, 2, ((shok_GGL_CGLBuildingProps*)t->LogicProps)->ConstructionInfo.Cost, ig);
+	return 0;
+}
+
+int l_buildingGetCostUpgr(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsBuildingType(), "no building entity at 1");
+	luaext_writeCostInfo(L, ((shok_GGL_CGLBuildingProps*)t->LogicProps)->Upgrade.Cost);
+	return 1;
+}
+int l_buildingSetCostUpgr(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsBuildingType(), "no building entity at 1");
+	bool ig = false;
+	if (lua_isboolean(L, 3))
+		ig = lua_toboolean(L, 3);
+	luaext_readCostInfo(L, 2, ((shok_GGL_CGLBuildingProps*)t->LogicProps)->Upgrade.Cost, ig);
+	return 0;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -554,6 +602,8 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetAbilityDataRangedEffect", &l_settlerTySetAbilityDataRangedEffect);
 	luaext_registerFunc(L, "GetFearless", &l_settlerTyGetFearless);
 	luaext_registerFunc(L, "SetFearless", &l_settlerTySetFearless);
+	luaext_registerFunc(L, "GetCost", &l_settlerTyGetCost);
+	luaext_registerFunc(L, "SetCost", &l_settlerTySetCost);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");
@@ -562,6 +612,10 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetSabotageFactor", &l_buildingTySetSabotageFactor);
 	luaext_registerFunc(L, "GetVCAttractionSlotsProvided", &l_buildingTyGetVCAttractionPlaces);
 	luaext_registerFunc(L, "SetVCAttractionSlotsProvided", &l_buildingTySetVCAttractionPlaces);
+	luaext_registerFunc(L, "GetConstructionCost", &l_buildingGetCostConstr);
+	luaext_registerFunc(L, "SetConstructionCost", &l_buildingSetCostConstr);
+	luaext_registerFunc(L, "GetUpgradeCost", &l_buildingGetCostUpgr);
+	luaext_registerFunc(L, "SetUpgradeCost", &l_buildingSetCostUpgr);
 	lua_rawset(L, -3);
 }
 

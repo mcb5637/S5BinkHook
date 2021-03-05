@@ -601,3 +601,37 @@ function CppLogic.Entity.Building.MarketSetCurrentTradeData(id, bty, sty, bam, s
 -- @param id entity
 -- @return is entity of soldier type
 function CppLogic.Entity.IsSoldier(id) end
+
+--- settler type cost.
+-- @param ty entitytype
+-- @return cost info table
+function CppLogic.EntityType.Settler.GetCost(ty) end
+--- settler type cost.
+-- @param ty entitytype
+-- @param c cost info table
+-- @param ignoreZeroes should zeroes get ignored (optional)
+function CppLogic.EntityType.Settler.SetCost(ty, c, ignoreZeroes) end
+
+--- building type construction cost.
+-- @param ty entitytype
+-- @return cost info table
+function CppLogic.EntityType.Building.GetConstructionCost(ty) end
+--- building type construction cost.
+-- @param ty entitytype
+-- @param c cost info table
+-- @param ignoreZeroes should zeroes get ignored (optional)
+function CppLogic.EntityType.Building.SetConstructionCost(ty, c, ignoreZeroes) end
+
+--- building type upgrade cost.
+-- @param ty entitytype
+-- @return cost info table
+function CppLogic.EntityType.Building.GetUpradeCost(ty) end
+--- building type upgrade cost.
+-- @param ty entitytype
+-- @param c cost info table
+-- @param ignoreZeroes should zeroes get ignored (optional)
+function CppLogic.EntityType.Building.SetUpradeCost(ty, c, ignoreZeroes) end
+
+--- resurrect a hero.
+-- @param ty entitytype
+function CppLogic.Entity.Settler.HeroResurrect(id) end

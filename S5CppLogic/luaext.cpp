@@ -145,3 +145,86 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i) {
 	p.Y = y;
 	lua_pop(L, 2);
 }
+
+constexpr int shok_clay = 11;
+constexpr int shok_gold = 1;
+constexpr int shok_iron = 7;
+constexpr int shok_silver = 3;
+constexpr int shok_stone = 5;
+constexpr int shok_sulfur = 9;
+constexpr int shok_wood = 13;
+constexpr int shok_maxres = 17;
+void luaext_writeCostInfo(lua_State* L, shok_costInfo& c) {
+	lua_newtable(L);
+	for (int i = 1; i <= shok_maxres; i++) {
+		lua_pushnumber(L, 0);
+		lua_rawseti(L, -2, i);
+	}
+	lua_pushnumber(L, c.Clay);
+	lua_rawseti(L, -2, shok_clay);
+	lua_pushnumber(L, c.Gold);
+	lua_rawseti(L, -2, shok_gold);
+	lua_pushnumber(L, c.Iron);
+	lua_rawseti(L, -2, shok_iron);
+	lua_pushnumber(L, c.Silver);
+	lua_rawseti(L, -2, shok_silver);
+	lua_pushnumber(L, c.Stone);
+	lua_rawseti(L, -2, shok_stone);
+	lua_pushnumber(L, c.Sulfur);
+	lua_rawseti(L, -2, shok_sulfur);
+	lua_pushnumber(L, c.Wood);
+	lua_rawseti(L, -2, shok_wood);
+}
+
+void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZeroes) {
+	float i = 0;
+	lua_rawgeti(L, index, shok_clay);
+	if (lua_isnumber(L, -1)) {
+		i = luaL_checkfloat(L, -1);
+		if (i != 0 || !ignoreZeroes)
+			c.Clay = i;
+	}
+	lua_pop(L, 1);
+	lua_rawgeti(L, index, shok_gold);
+	if (lua_isnumber(L, -1)) {
+		i = luaL_checkfloat(L, -1);
+		if (i != 0 || !ignoreZeroes)
+			c.Gold = i;
+	}
+	lua_pop(L, 1);
+	lua_rawgeti(L, index, shok_iron);
+	if (lua_isnumber(L, -1)) {
+		i = luaL_checkfloat(L, -1);
+		if (i != 0 || !ignoreZeroes)
+			c.Iron = i;
+	}
+	lua_pop(L, 1);
+	lua_rawgeti(L, index, shok_silver);
+	if (lua_isnumber(L, -1)) {
+		i = luaL_checkfloat(L, -1);
+		if (i != 0 || !ignoreZeroes)
+			c.Silver = i;
+	}
+	lua_pop(L, 1);
+	lua_rawgeti(L, index, shok_stone);
+	if (lua_isnumber(L, -1)) {
+		i = luaL_checkfloat(L, -1);
+		if (i != 0 || !ignoreZeroes)
+			c.Stone = i;
+	}
+	lua_pop(L, 1);
+	lua_rawgeti(L, index, shok_sulfur);
+	if (lua_isnumber(L, -1)) {
+		i = luaL_checkfloat(L, -1);
+		if (i != 0 || !ignoreZeroes)
+			c.Sulfur = i;
+	}
+	lua_pop(L, 1);
+	lua_rawgeti(L, index, shok_wood);
+	if (lua_isnumber(L, -1)) {
+		i = luaL_checkfloat(L, -1);
+		if (i != 0 || !ignoreZeroes)
+			c.Wood = i;
+	}
+	lua_pop(L, 1);
+}

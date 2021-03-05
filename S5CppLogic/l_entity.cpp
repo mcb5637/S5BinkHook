@@ -506,6 +506,16 @@ int l_entityIsSoldier(lua_State* L) {
 	return 1;
 }
 
+int l_heroResurrect(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CHeroBehavior* h = e->GetHeroBehavior();
+	luaext_assertPointer(L, h, "no hero at 1");
+	h->ResurrectionTimePassed = 20000;
+	h->EnemyNear = 0;
+	h->FriendNear = 1;
+	return 0;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -561,6 +571,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "HeroSetResurrectionTime", &l_settlerHeroSetResurrectionTime);
 	luaext_registerFunc(L, "WorkerGetCurrentWorkTime", &l_settlerGetWorkerCurrentWorkTime);
 	luaext_registerFunc(L, "WorkerSetCurrentWorkTime", &l_settlerSetWorkerCurrentWorkTime);
+	luaext_registerFunc(L, "HeroResurrect", &l_heroResurrect);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

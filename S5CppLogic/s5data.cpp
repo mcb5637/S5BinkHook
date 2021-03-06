@@ -276,16 +276,6 @@ shok_GGL_CThiefBehavior* shok_EGL_CGLEEntity::GetThiefBehavior()
 	return (shok_GGL_CThiefBehavior*)SearchBehavior(shok_vtp_GGL_CThiefBehavior);
 }
 
-struct shok_event_data {
-	int vtable = 0x766CC4;
-	int id = 0;
-	int result = 0;
-	int u[2] = { 0, 0 };
-};
-struct shok_vtable_EGL_CGLEEntity {
-	int u[16];
-	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
-};
 int shok_EGL_CGLEEntity::EventGetById(int id)
 {
 	shok_event_data d = shok_event_data();
@@ -306,4 +296,16 @@ int shok_EGL_CGLEEntity::EventGetArmor()
 int shok_EGL_CGLEEntity::EventGetMaxWorktime()
 {
 	return EventGetById(0x1301A);
+}
+
+shok_GGL_CBattleBehavior* shok_EGL_CGLEEntity::GetBattleBehavior()
+{
+	void* v[5] = { shok_vtp_GGL_CBattleBehavior, shok_vtp_GGL_CLeaderBehavior, shok_vtp_GGL_CSoldierBehavior, shok_vtp_GGL_CSerfBattleBehavior, shok_vtp_GGL_CBattleSerfBehavior };
+	return (shok_GGL_CBattleBehavior*)SearchBehavior(v, 5);
+}
+
+float(__thiscall* battleBehaviorGetMaxRange)(shok_GGL_CBattleBehavior*) = (float(__thiscall*)(shok_GGL_CBattleBehavior * id))0x50AB43;
+float shok_GGL_CBattleBehavior::GetMaxRange()
+{
+	return battleBehaviorGetMaxRange(this);
 }

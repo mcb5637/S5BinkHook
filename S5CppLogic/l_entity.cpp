@@ -431,9 +431,38 @@ int l_entitySetLimitedLifespanRemaining(lua_State* L) {
 	return 0;
 }
 
+
+lua_State* shok_gamestate;
+int ref = 0;
+int id;
+void(__thiscall* FireEventBackup)(shok_EGL_CGLEEntity* th, shok_event_data* d);
+void __fastcall entityFireEventHook(shok_EGL_CGLEEntity* e, int z, shok_event_data* d) {
+	FireEventBackup(e, d);
+	if (e->EntityId != id)
+		return;
+	int t = lua_gettop(shok_gamestate);
+	//lua_rawgeti(shok_gamestate, LUA_REGISTRYINDEX, ref);
+	lua_getglobal(shok_gamestate, "eventdebug");
+	lua_pushnumber(shok_gamestate, d->vtable);
+	lua_pushnumber(shok_gamestate, d->id);
+	lua_pushnumber(shok_gamestate, d->result);
+	float* f = (float*)&d->result;
+	lua_pushnumber(shok_gamestate, *f);
+	lua_pcall(shok_gamestate, 4, 0, 0);
+	lua_settop(shok_gamestate, t);
+}
+
 int l_entity_test(lua_State* L) {
+	luaext_assert(L, ref == 0, "");
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	lua_pushnumber(L, e->EventGetById(luaL_checkint(L, 2)));
+	//id = e->EntityId;
+	//ref = 1;// luaL_ref(L, LUA_REGISTRYINDEX);
+	//shok_gamestate = L;
+	//shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
+	//FireEventBackup = vt->FireEvent;
+	//vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &entityFireEventHook;
+	//lua_pushnumber(L, (int)&((shok_GGL_CSettler*)e)->MaxAttackRange);
+	//lua_pushnumber(L, (int)&e->GetEntityType()->GetBattleBehaviorProps()->MaxRange);
 	return 1;
 }
 
@@ -534,6 +563,14 @@ int l_settlerThiefSetStolenResourceInfo(lua_State* L) {
 	return 0;
 }
 
+int l_entityGetAutoAttackMaxRange(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CBattleBehavior* b = e->GetBattleBehavior();
+	luaext_assertPointer(L, b, "no battle entity at 1");
+	lua_pushnumber(L, b->GetMaxRange());
+	return 1;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -554,6 +591,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetTaskListIndex", &l_entitySetTaskListIndex);
 	luaext_registerFunc(L, "MovingEntityGetSpeedFactor", &l_movingEntityGetSpeedFactor);
 	luaext_registerFunc(L, "IsSoldier", &l_entityIsSoldier);
+	luaext_registerFunc(L, "GetAutoAttackMaxRange", &l_entityGetAutoAttackMaxRange);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);

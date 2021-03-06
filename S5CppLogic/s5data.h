@@ -750,6 +750,8 @@ private:
 	int u4;
 public:
 	int MilliSecondsToWait, MSToPlayHitAnimation, HitPlayed; // la 23
+
+	float GetMaxRange();
 };
 
 #define shok_vtp_GGL_CLeaderBehavior (void*)0x7761E0
@@ -937,7 +939,6 @@ public:
 	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam+sellam
 };
 
-
 // entities
 #define shok_vtp_EGL_CGLEEntity (void*)0x783E74
 struct shok_EGL_CGLEEntity : shok_object {
@@ -1007,6 +1008,7 @@ public:
 	shok_GGL_CWorkerBehavior* GetWorkerBehavior();
 	shok_GGL_CMarketBehavior* GetMarketBehavior();
 	shok_GGL_CThiefBehavior* GetThiefBehavior();
+	shok_GGL_CBattleBehavior* GetBattleBehavior();
 
 	bool IsEntityInCategory(int cat);
 	bool IsMovingEntity();
@@ -1016,6 +1018,17 @@ public:
 	int EventGetArmor();
 	int EventGetMaxWorktime();
 	int EventGetById(int id);
+};
+
+struct shok_event_data {
+	int vtable = 0x766CC4;
+	int id = 0;
+	int result = 0;
+	int u[2] = { 0, 0 };
+};
+struct shok_vtable_EGL_CGLEEntity {
+	int u[16];
+	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
 };
 
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84

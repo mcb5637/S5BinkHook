@@ -633,11 +633,15 @@ function CppLogic.EntityType.Building.GetUpradeCost(ty) end
 function CppLogic.EntityType.Building.SetUpradeCost(ty, c, ignoreZeroes) end
 
 --- resurrect a hero.
--- @param ty entitytype
+-- @param id entity
 function CppLogic.Entity.Settler.HeroResurrect(id) end
 
 --- set thief stolen resources.
--- @param ty entitytype
+-- @param id entity
 -- @param ty res type or 0
 -- @param am amount (optional)
 function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
+
+--- entity max range (including tech boni).
+-- @param id entity
+function CppLogic.Entity.GetAutoAttackMaxRange(id) end

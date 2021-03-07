@@ -4,6 +4,18 @@
 #include <string>
 #include <functional>
 
+#define TOKENPASTE(x, y) x ## y
+#define TOKENPASTE2(x, y) TOKENPASTE(x, y)
+#define PADDING(size) private: char TOKENPASTE2(padding_, __LINE__) [size]; public:
+
+#ifdef _DEBUG
+#define vector_padding public:
+static_assert(sizeof(std::vector<int>) == 16);
+#else
+#define vector_padding PADDING(4) public:
+static_assert(sizeof(std::vector<int>) == 12);
+#endif
+
 #define DEBUGGER_BREAK _asm int 3
 
 #define SHOK_Import_LUA_OPEN 0x761284
@@ -49,6 +61,7 @@ bool operator!=(const shok_allocator <T>&, const shok_allocator <U>&) { return f
 
 template<class T>
 inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {
+#ifdef _DEBUG
 	std::vector<T, shok_allocator<T>> save = std::vector<T, shok_allocator<T>>();
 	int* vecPoint = (int*)vec;
 	int* savePoint = (int*)&save;
@@ -62,6 +75,9 @@ inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::functio
 		vecPoint[i] = savePoint[i];
 		savePoint[i] = backu[i - 1];
 	}
+#else
+	func(*vec);
+#endif
 }
 
 // generic structs
@@ -83,6 +99,7 @@ public:
 
 struct shok_modifyEntityProps {
 	int MysteriousInt;
+	vector_padding
 	std::vector<int, shok_allocator<int>> TechList;
 };
 
@@ -95,9 +112,7 @@ public:
 // behavior props
 #define shok_vtp_EGL_CGLEBehaviorProps (void*)0x772A2C
 struct shok_EGL_CGLEBehaviorProps : shok_object {
-private:
-	int u;
-public:
+	PADDING(4);
 	int BehaviorIndex, BehaviorClass;
 };
 
@@ -260,6 +275,7 @@ struct shok_serf_extractionInfo {
 #define shok_vtp_GGL_CSerfBehaviorProps (void*)0x774A14
 struct shok_GGL_CSerfBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	int ResourceSearchRadius, ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList;
+	vector_padding
 	std::vector<shok_serf_extractionInfo, shok_allocator<shok_serf_extractionInfo>> ExtractionInfo;
 };
 
@@ -275,6 +291,7 @@ public:
 };
 #define shok_vtp_GGL_CLimitedAttachmentBehaviorProperties (void*)0x775DE4
 struct shok_GGL_CLimitedAttachmentBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	vector_padding
 	std::vector<shok_limitedAttachmentProps, shok_allocator<shok_limitedAttachmentProps>> Attachments;
 };
 
@@ -283,6 +300,7 @@ struct shok_idleAnimProps {
 };
 #define shok_vtp_GGL_CFormationBehaviorProperties (void*)0x776DE4
 struct shok_GGL_CFormationBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	vector_padding
 	std::vector<shok_idleAnimProps, shok_allocator<shok_idleAnimProps>> IdleAnims;
 };
 
@@ -305,6 +323,7 @@ struct shok_GGL_CHeroBehaviorProps : shok_EGL_CGLEBehaviorProps {
 struct shok_GGL_CBombBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	float Radius, Delay;
 	int Damage, ExplosionEffectID;
+	vector_padding
 	std::vector<int, shok_allocator<int>> AffectedEntityTypes;
 };
 
@@ -391,6 +410,7 @@ private:
 	int u3;
 public:
 	int Class;
+	vector_padding
 	std::vector<int, shok_allocator<int>> Categories;
 	shok_positionRot ApproachPos;
 private:
@@ -409,6 +429,7 @@ private:
 	byte u[2];
 	int u2[9];
 public:
+	vector_padding
 	std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
 };
 
@@ -465,6 +486,7 @@ struct shok_constructionInfo {
 private:
 	int u;
 public:
+	vector_padding
 	std::vector<shok_positionRot, shok_allocator<shok_positionRot>> BuilderSlot;
 	int Time;
 	shok_costInfo Cost;
@@ -475,6 +497,7 @@ struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
 	int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker;
 	shok_position DoorPos, LeavePos;
 	shok_constructionInfo ConstructionInfo;
+	vector_padding
 	std::vector<int, shok_allocator<int>> BuildOn;
 	byte HideBase, CanBeSold, IsWall;
 private:
@@ -482,6 +505,7 @@ private:
 public:
 	shok_upgradeInfo Upgrade;
 	int UpgradeSite, ArmorClass, ArmorAmount;
+	vector_padding
 	std::vector<int, shok_allocator<int>> WorkTaskList;
 private:
 	int MilitaryInfo[4];
@@ -509,6 +533,7 @@ struct shok_ED_CDisplayEntityProps : shok_object {
 private:
 	byte u[2];
 public:
+	vector_padding
 	std::vector<int, shok_allocator<int>> AnimList;
 };
 
@@ -519,6 +544,7 @@ private:
 public:
 	shok_EGL_CGLEEntityProps* LogicProps;
 	shok_ED_CDisplayEntityProps* DisplayProps;
+	vector_padding
 	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps;
 
 
@@ -553,6 +579,7 @@ struct shok_EGL_CGLEEntitiesProps : shok_object {
 private:
 	int u[14];
 public:
+	vector_padding
 	std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes;
 
 	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
@@ -763,6 +790,7 @@ public:
 	shok_position TerritoryCenter;
 	float TerritoryCenterRange;
 	int Experience;
+	vector_padding
 	std::vector<shok_position, shok_allocator<shok_position>> PatrolPoints;
 private:
 	int u2;
@@ -917,6 +945,7 @@ struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u[2];
 public:
+	vector_padding
 	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> ListOfOffers;
 };
 
@@ -970,6 +999,7 @@ private:
 	byte u21;
 	int u22;
 public:
+	vector_padding
 	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> BehaviorList; // 30, first field in 31
 	int CurrentState, EntityStateBehaviors, TaskListId, TaskIndex; // la37
 private:

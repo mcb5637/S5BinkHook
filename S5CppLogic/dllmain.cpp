@@ -14,7 +14,7 @@
 int __cdecl test(lua_State* L) {
     shok_EGL_CGLEEntityProps s = shok_EGL_CGLEEntityProps();
     int st = (int)&s;
-    int test = (int)&s.MaxHealth;
+    int test = (int)&s.ApproachPos;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }

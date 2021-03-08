@@ -14,6 +14,7 @@ CppLogic.Entity.Leader = {}
 CppLogic.Entity.Building = {}
 CppLogic.EntityType = {}
 CppLogic.EntityType.Settler = {}
+CppLogic.Logic = {}
 
 --- check if an effect is valid
 -- @param id effect id
@@ -43,12 +44,12 @@ function CppLogic.Memory.SetFPU() end
 
 --- reloads cutscenes from the specified path
 -- @param path optional, default "Maps\\ExternalMap"
-function CppLogic.Memory.ReloadCutscene(path) end
+function CppLogic.Logic.ReloadCutscene(path) end
 
 --- gets the animation id from a name.
 -- @param anim the name of the animation
 -- @return animation id
-function CppLogic.Memory.GetAnimIdFromName(anim) end
+function CppLogic.Logic.GetAnimIdFromName(anim) end
 
 
 --- compiles a lua chunk
@@ -644,4 +645,21 @@ function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
 
 --- entity max range (including tech boni).
 -- @param id entity
+-- @return max range
 function CppLogic.Entity.GetAutoAttackMaxRange(id) end
+
+--- entity model, from model override or entitytype model 0.
+-- @param id entity
+-- @return model
+function CppLogic.Entity.GetModel(id) end
+
+--- the damage factor between a damageclass and an armorclass.
+-- @param dmgclass damageclass
+-- @param armorclass armorclass
+-- @return factor
+function CppLogic.Logic.GetDamageFactor(dmgclass, armorclass) end
+--- the damage factor between a damageclass and an armorclass.
+-- @param dmgclass damageclass
+-- @param armorclass armorclass
+-- @param fac factor
+function CppLogic.Logic.SetDamageFactor(dmgclass, armorclass, fac) end

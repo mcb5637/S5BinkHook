@@ -571,6 +571,16 @@ int l_entityGetAutoAttackMaxRange(lua_State* L) {
 	return 1;
 }
 
+int l_entityGetModel(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	int m = e->ModelOverride;
+	if (m == 0) {
+		m = e->GetEntityType()->DisplayProps->Model[0];
+	}
+	lua_pushnumber(L, m);
+	return 1;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -592,6 +602,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "MovingEntityGetSpeedFactor", &l_movingEntityGetSpeedFactor);
 	luaext_registerFunc(L, "IsSoldier", &l_entityIsSoldier);
 	luaext_registerFunc(L, "GetAutoAttackMaxRange", &l_entityGetAutoAttackMaxRange);
+	luaext_registerFunc(L, "GetModel", &l_entityGetModel);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);

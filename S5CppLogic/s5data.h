@@ -7,6 +7,7 @@
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
 #define PADDING(size) private: char TOKENPASTE2(padding_, __LINE__) [size]; public:
+#define PADDINGI(size) PADDING(size*4)
 
 #ifdef _DEBUG
 #define vector_padding public:
@@ -1259,6 +1260,21 @@ public:
 	shok_EGL_CGLEEntity* GetEntityByNum(int num);
 };
 
+#define shok_vtp_GGL_CDamageClassProps (void*)0x788978
+struct shok_GGL_CDamageClassProps : shok_object {
+	float BonusVsArmorClass[7];
+};
+
+struct shok_DamageClassList {
+	shok_GGL_CDamageClassProps* DamageClasses[8]; // there is a damageclass 0, probably not working at all
+};
+
+struct shok_damageClassHolder {
+	PADDINGI(1)
+	vector_padding
+	std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList;
+};
+
 // global funcs
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
@@ -1290,3 +1306,5 @@ extern shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj;
 extern shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj;
 
 extern shok_EGL_CGLEEntitiesProps** shok_EGL_CGLEEntitiesPropsObj;
+
+extern shok_damageClassHolder** shok_DamageClassHolderObj;

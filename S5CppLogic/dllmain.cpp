@@ -10,11 +10,12 @@
 #include "l_combat.h"
 #include "l_entity.h"
 #include "l_entitytype.h"
+#include "l_logic.h"
 
 int __cdecl test(lua_State* L) {
-    shok_EGL_CGLEEntityProps s = shok_EGL_CGLEEntityProps();
+    shok_DamageClassList s = shok_DamageClassList();
     int st = (int)&s;
-    int test = (int)&s.ApproachPos;
+    int test = (int)&s.DamageClasses;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }
@@ -56,6 +57,11 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_pushstring(L, "EntityType");
     lua_newtable(L);
     l_entitytype_init(L);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "Logic");
+    lua_newtable(L);
+    l_logic_init(L);
     lua_rawset(L, -3);
 
     lua_rawset(L, LUA_GLOBALSINDEX);

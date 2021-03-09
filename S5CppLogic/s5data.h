@@ -601,6 +601,12 @@ private:
 	int Counter;
 public:
 	float MovementSpeed, TurningSpeed, SpeedFactor;
+
+	float GetMovementSpeed();
+};
+struct shok_vtable_GGL_CBehaviorDefaultMovement {
+	PADDINGI(9)
+	float(__thiscall* GetSpeed)(shok_GGL_CBehaviorDefaultMovement* m);
 };
 
 #define shok_vtp_GGL_CSettlerMovement (void*)0x77471C
@@ -1049,6 +1055,7 @@ public:
 	int EventGetArmor();
 	int EventGetMaxWorktime();
 	int EventGetById(int id);
+	float GetExploration();
 };
 
 struct shok_event_data {
@@ -1060,6 +1067,8 @@ struct shok_event_data {
 struct shok_vtable_EGL_CGLEEntity {
 	int u[16];
 	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
+	PADDINGI(11)
+	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
 };
 
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84

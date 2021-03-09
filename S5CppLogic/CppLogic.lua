@@ -679,3 +679,13 @@ function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
 -- @param p player
 -- @param t tick
 function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
+
+--- entity exploration.
+-- @param id entity
+-- @return exploration
+function CppLogic.Entity.GetExploration(id) end
+
+--- entity speed.
+-- @param id entity
+-- @return speed
+function CppLogic.Entity.GetSpeed(id) end

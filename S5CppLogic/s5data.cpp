@@ -318,3 +318,15 @@ shok_GGL_CPlayerStatus* shok_GGL_CGLGameLogic::GetPlayer(int i)
 {
 	return players[i * 2 + 1];
 }
+
+float shok_EGL_CGLEEntity::GetExploration()
+{
+	shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)vtable;
+	return vt->GetExploration(this);
+}
+
+float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
+{
+	shok_vtable_GGL_CBehaviorDefaultMovement* vt = (shok_vtable_GGL_CBehaviorDefaultMovement*)vtable;
+	return vt->GetSpeed(this);
+}

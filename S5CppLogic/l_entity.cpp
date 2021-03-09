@@ -469,6 +469,7 @@ int l_entity_test(lua_State* L) {
 	//vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &entityFireEventHook;
 	//lua_pushnumber(L, (int)&((shok_GGL_CSettler*)e)->MaxAttackRange);
 	//lua_pushnumber(L, (int)&e->GetEntityType()->GetBattleBehaviorProps()->MaxRange);
+	lua_pushnumber(L, (int)&((shok_GGL_CSettler*)e)->MovingSpeed);
 	return 1;
 }
 
@@ -587,6 +588,20 @@ int l_entityGetModel(lua_State* L) {
 	return 1;
 }
 
+int l_entityGetExploration(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	lua_pushnumber(L, e->GetExploration());
+	return 1;
+}
+
+int l_entityGetSpeed(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CBehaviorDefaultMovement* m = e->GetMovementBehavior();
+	luaext_assertPointer(L, m, "no moving entity at 1");
+	lua_pushnumber(L, m->GetMovementSpeed() * 10.0);
+	return 1;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -609,6 +624,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "IsSoldier", &l_entityIsSoldier);
 	luaext_registerFunc(L, "GetAutoAttackMaxRange", &l_entityGetAutoAttackMaxRange);
 	luaext_registerFunc(L, "GetModel", &l_entityGetModel);
+	luaext_registerFunc(L, "GetExploration", &l_entityGetExploration);
+	luaext_registerFunc(L, "GetSpeed", &l_entityGetSpeed);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);

@@ -13,9 +13,9 @@
 #include "l_logic.h"
 
 int __cdecl test(lua_State* L) {
-    shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
+    shok_vtable_EGL_CGLEEntity s = shok_vtable_EGL_CGLEEntity();
     int st = (int)&s;
-    int test = (int)&s.PlayerAttractionHandler;
+    int test = (int)&s.GetExploration;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }

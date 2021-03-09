@@ -1265,14 +1265,111 @@ struct shok_GGL_CDamageClassProps : shok_object {
 	float BonusVsArmorClass[7];
 };
 
-struct shok_DamageClassList {
-	shok_GGL_CDamageClassProps* DamageClasses[8]; // there is a damageclass 0, probably not working at all
-};
-
 struct shok_damageClassHolder {
 	PADDINGI(1)
 	vector_padding
-	std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList;
+	std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
+};
+
+
+#define shok_vtp_GGL_CLogicProperties_SBuildingUpgradeCategory (void*)0x76EF10
+struct shok_GGL_CLogicProperties_SBuildingUpgradeCategory : shok_object {
+	int Category, FirstBuilding;
+	PADDINGI(1)
+};
+
+#define shok_vtp_GGL_CLogicProperties_SSettlerUpgradeCategory (void*)0x76EF18
+struct shok_GGL_CLogicProperties_SSettlerUpgradeCategory : shok_object {
+	int Category, FirstSettler;
+};
+
+#define shok_vtp_GGL_CLogicProperties_STaxationLevel (void*)0x76EF20
+struct shok_GGL_CLogicProperties_STaxationLevel : shok_object {
+	int RegularTax;
+	float MotivationChange;
+};
+
+#define shok_vtp_GGL_CLogicProperties_STradeResource (void*)0x76EF28
+struct shok_GGL_CLogicProperties_STradeResource : shok_object {
+	int ResourceType;
+	float BasePrice, MinPrice, MaxPrice, Inflation, Deflation, WorkAmount;
+};
+
+#define shok_vtp_GGL_CLogicProperties_SBlessCategory (void*)0x76EFC4
+struct shok_GGL_CLogicProperties_SBlessCategory : shok_object {
+	int Name;
+	float RequiredFaith;
+	vector_padding
+	std::vector<int, shok_allocator<int>> EntityTypes;
+};
+
+#define shok_vtp_GGL_CLogicProperties (void*)0x76EFCC
+struct shok_GGL_CLogicProperties : shok_object {
+	int CompensationOnBuildingSale;
+	vector_padding
+	std::vector<shok_GGL_CLogicProperties_SBuildingUpgradeCategory, shok_allocator<shok_GGL_CLogicProperties_SBuildingUpgradeCategory>> BuildingUpgrades;
+	vector_padding
+	std::vector<shok_GGL_CLogicProperties_SSettlerUpgradeCategory, shok_allocator<shok_GGL_CLogicProperties_SSettlerUpgradeCategory>> SettlerUpgrades;
+	vector_padding
+	std::vector<shok_GGL_CLogicProperties_STaxationLevel, shok_allocator<shok_GGL_CLogicProperties_STaxationLevel>> TaxationLevels;
+	vector_padding
+	std::vector<shok_GGL_CLogicProperties_STradeResource, shok_allocator<shok_GGL_CLogicProperties_STradeResource>> TradeResources;
+	float BuildingUnderConstructionExplorationFactor, BuildingPlacementSnapDistance, BuildingClosedHealthFactor, WeatherExplorationBuildingSnowFactor, WeatherExplorationSettlerSnowFactor;
+	float WeatherMoveSpeedSnowFactor, WeatherExplorationBuildingRainFactor, WeatherExplorationSettlerRainFactor, WeatherMoveSpeedRainFactor;
+	int WeatherMissChanceChangeRain, WeatherMissChanceChangeSnow;
+	float AttackMoveRange; // 33
+	PADDINGI(22)
+	float BlessingBonus; // 55
+	PADDINGI(4)
+	int ResourceDoodadWarnAmount; // 59
+	PADDINGI(10)
+	float MotivationThresholdHappy; // 69
+	float MotivationThresholdSad, MotivationThresholdAngry, MotivationThresholdLeave, AverageMotivationVillageCenterLockThreshold;
+	int WorkTimeBase, WorkTimeThresholdWork;
+	PADDINGI(5)
+	float MotivationAbsoluteMaxMotivation;
+	PADDINGI(1)
+	int HeroResurrectionTime, HeroResurrectionSlippage;
+	PADDINGI(6)
+	int ExpelEffectID, DefenderMSPerShot;
+	float DefenderMaxRange;
+	PADDINGI(1)
+	int DefenderProjectileDamage;
+	PADDINGI(2)
+	int DefenderMissChance;
+	PADDINGI(4)
+	float EnergyRequiredForWeatherChange;
+	PADDINGI(4)
+	float MaxFaith;
+};
+
+struct shok_GGL_CPlayerAttractionHandler : shok_object {
+	PADDINGI(1)
+	byte PaydayStarted;
+	PADDING(3)
+	int PaydayStartTick;
+};
+
+struct shok_GGL_CPlayerAttractionProps : shok_object {
+	int AttractionFrequency, PaydayFrequency, EntityTypeBanTime, ReAttachWorkerFrequency, PlayerMoneyDispo;
+	float MaximumDistanceWorkerToFarm, MaximumDistanceWorkerToResidence;
+};
+
+struct shok_GGL_CPlayerStatus : shok_object {
+	int PlayerID;
+	PADDINGI(80)
+	int NumberOfSettlersKilled, NumberOfSettlersLost, NumberOfBuildingsKilled, NumberOfBuildingsLost;
+	PADDINGI(111)
+	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler;
+};
+
+struct shok_GGL_CGLGameLogic : shok_object {
+	PADDINGI(9)
+public:
+	shok_GGL_CPlayerStatus** players;
+public:
+
+	shok_GGL_CPlayerStatus* GetPlayer(int i);
 };
 
 // global funcs
@@ -1308,3 +1405,9 @@ extern shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj;
 extern shok_EGL_CGLEEntitiesProps** shok_EGL_CGLEEntitiesPropsObj;
 
 extern shok_damageClassHolder** shok_DamageClassHolderObj;
+
+extern shok_GGL_CLogicProperties** shok_GGL_CLogicPropertiesObj;
+
+extern shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj;
+
+extern shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj;

@@ -153,6 +153,12 @@ int l_entityPredicateInRect(lua_State* L) {
 	return 1;
 }
 
+int l_entityPredicateIsVisible(lua_State* L) {
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateIsVisible));
+	new(ud) EntityIteratorPredicateIsVisible();
+	return 1;
+}
+
 int l_entityIteratorToTable(lua_State* L) {
 	if (lua_gettop(L) > 1) { // auto create an and predicate
 		l_entityPredicateAnd(L);
@@ -621,6 +627,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "OfEntityCategory", &l_entityPredicateOfEntityCategory);
 	luaext_registerFunc(L, "ProvidesResource", &l_entityPredicateProvidesResource);
 	luaext_registerFunc(L, "InRect", &l_entityPredicateInRect);
+	luaext_registerFunc(L, "IsVisible", &l_entityPredicateIsVisible);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Settler");
@@ -857,4 +864,13 @@ bool EntityIteratorPredicateNot::MatchesEntity(shok_EGL_CGLEEntity* e, float* ra
 EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* pred)
 {
 	predicate = pred;
+}
+
+bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+{
+	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
+	if (c != nullptr) {
+		return c->InvisibilityRemaining <= 0;
+	}
+	return true;
 }

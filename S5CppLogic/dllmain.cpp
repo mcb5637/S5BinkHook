@@ -13,9 +13,9 @@
 #include "l_logic.h"
 
 int __cdecl test(lua_State* L) {
-    shok_DamageClassList s = shok_DamageClassList();
+    shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
     int st = (int)&s;
-    int test = (int)&s.DamageClasses;
+    int test = (int)&s.PlayerAttractionHandler;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }

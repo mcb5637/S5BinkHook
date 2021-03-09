@@ -167,6 +167,10 @@ function CppLogic.Entity.Predicates.OfAnyEntityType(...) end
 -- @return predicate userdata
 function CppLogic.Entity.Predicates.InRect(x1, y1, x2, y2) end
 
+--- creates a predicate that checks for ari or thieves invisibility.
+-- @return predicate userdata
+function CppLogic.Entity.Predicates.IsVisible() end
+
 --- entity scale.
 -- @param id entity
 -- @return scale
@@ -663,3 +667,15 @@ function CppLogic.Logic.GetDamageFactor(dmgclass, armorclass) end
 -- @param armorclass armorclass
 -- @param fac factor
 function CppLogic.Logic.SetDamageFactor(dmgclass, armorclass, fac) end
+
+--- the tick where this players payday got startet (-1 if inactive).
+-- (you can get the current tick via Logic.GetCurrentTurn() ).
+-- @param p player
+-- @return tick
+function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
+--- the tick where this players payday got startet (-1 if inactive).
+-- (you can get the current tick via Logic.GetCurrentTurn() ).
+-- if you disable it (via -1) it gets immediately restarted has a worker or leader on the map.
+-- @param p player
+-- @param t tick
+function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end

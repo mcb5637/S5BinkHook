@@ -39,10 +39,37 @@ int l_logicGetAnimIdFromName(lua_State* L) {
 	return 1;
 }
 
+int l_playerGetPaydayStatus(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	if (p->PlayerAttractionHandler->PaydayStarted)
+		lua_pushnumber(L, p->PlayerAttractionHandler->PaydayStartTick);
+	else
+		lua_pushnumber(L, -1);
+	return 1;
+}
+int l_playerSetPaydayStatus(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	int st = luaL_checkint(L, 2);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	if (st < 0) {
+		p->PlayerAttractionHandler->PaydayStarted = 0;
+	}
+	else {
+		p->PlayerAttractionHandler->PaydayStarted = 1;
+		p->PlayerAttractionHandler->PaydayStartTick = st;
+	}
+	return 0;
+}
+
 void l_logic_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetDamageFactor", l_logicGetDamageModifier);
 	luaext_registerFunc(L, "SetDamageFactor", l_logicSetDamageModifier);
 	luaext_registerFunc(L, "ReloadCutscene", &l_logicReloadCutscene);
 	luaext_registerFunc(L, "GetAnimIdFromName", &l_logicGetAnimIdFromName);
+	luaext_registerFunc(L, "PlayerGetPaydayStartetTick", &l_playerGetPaydayStatus);
+	luaext_registerFunc(L, "PlayerSetPaydayStartetTick", &l_playerSetPaydayStatus);
 }

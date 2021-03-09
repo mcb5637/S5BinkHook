@@ -23,6 +23,9 @@ bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e) = (bool(_cdecl
 int(_cdecl* shok_EntityGetProvidedResourceByID)(int id) = (int(_cdecl*)(int id)) 0x4B8489;
 shok_EGL_CGLEEntitiesProps** shok_EGL_CGLEEntitiesPropsObj = (shok_EGL_CGLEEntitiesProps**)0x895DB0;
 shok_damageClassHolder** shok_DamageClassHolderObj = (shok_damageClassHolder**)0x85A3DC;
+shok_GGL_CLogicProperties** shok_GGL_CLogicPropertiesObj = (shok_GGL_CLogicProperties**)0x8758240;
+shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj = (shok_GGL_CPlayerAttractionProps**)0x866A80;
+shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
 
 bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = (bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x4FAABD;
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
@@ -309,4 +312,9 @@ float(__thiscall* battleBehaviorGetMaxRange)(shok_GGL_CBattleBehavior*) = (float
 float shok_GGL_CBattleBehavior::GetMaxRange()
 {
 	return battleBehaviorGetMaxRange(this);
+}
+
+shok_GGL_CPlayerStatus* shok_GGL_CGLGameLogic::GetPlayer(int i)
+{
+	return players[i * 2 + 1];
 }

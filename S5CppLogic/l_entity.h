@@ -134,3 +134,8 @@ public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
 	EntityIteratorPredicateNot(EntityIteratorPredicate* pred);
 };
+
+struct EntityIteratorPredicateIsVisible : EntityIteratorPredicate {
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+};

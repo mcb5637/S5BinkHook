@@ -23,20 +23,25 @@ function CppLogic.Effect.IsValidEffect(id) end
 
 --- create a projectile.
 -- to deal damage on impact use:
--- - AOE: dmg > 0, radius > 0, attid or playerid set to attacker entity or player (deals damage only to entities hostile to attacker).
--- - single target: dmg > 0, tarid to target entity id, attid or playerid set to attacker entity or player.
+-- - single target: dmg > 0.
+--		tarid to target entity id.
+--		attid or playerid? set to attacker entity or player.
+-- - AOE: dmg > 0, radius > 0.
+--		attid or playerid can be set to attacker entity or player (deals damage only to entities hostile to attacker).
+--		dmgclass can be set to the attacks damageclass to include it in the calculation.
 -- @param effecttype GGL_Effects.XXX
 -- @param startx start pos x
 -- @param starty start pos y
 -- @param tarx target pos x
 -- @param tary target pos y
--- @param dmg damage done by projectile, default 0
--- @param radius damage radius for AOE projectiles, default -1
--- @param tarid target entity id, default 0
--- @param attid attacker entity id, default 0
--- @param playerid attacker player id, default 0
+-- @param dmg damage done by projectile (optional, 0/nil if not used)
+-- @param radius damage radius for AOE projectiles (optional, -1/nil if not used)
+-- @param tarid target entity id (optional, 0/nil if not used)
+-- @param attid attacker entity id (optional, 0/nil if not used)
+-- @param playerid attacker player id (optional, 0/nil if not used)
+-- @param dmgclass damageclass (optional, 0/nil if not used)
 -- @return effect id
-function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid) end
+function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass) end
 
 
 --- sets high precision FPU (gets reset on every API call, so call id directly before your calculations)
@@ -689,3 +694,16 @@ function CppLogic.Entity.GetExploration(id) end
 -- @param id entity
 -- @return speed
 function CppLogic.Entity.GetSpeed(id) end
+
+--- deals damage in an area.
+-- if attackerId (or player) are set, damages only targets hostile to them.
+-- if dmgclass not set, it gets ignored in the damage calculation.
+-- damage gets reduced, the furher away from impact the target is.
+-- @param attackerId attacking entity (optional, 0 if not used)
+-- @param x X coorinate of center
+-- @param y Y coorinate of center
+-- @param r range of damage dealt
+-- @param dmg damage
+-- @param player attacking player (optional, 0/nil if not used)
+-- @param dmgclass damageclass (optional, 0/nil if not used)
+function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass) end

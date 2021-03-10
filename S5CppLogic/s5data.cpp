@@ -26,6 +26,7 @@ shok_damageClassHolder** shok_DamageClassHolderObj = (shok_damageClassHolder**)0
 shok_GGL_CLogicProperties** shok_GGL_CLogicPropertiesObj = (shok_GGL_CLogicProperties**)0x8758240;
 shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj = (shok_GGL_CPlayerAttractionProps**)0x866A80;
 shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
+void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int))0x49F82A;
 
 bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = (bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x4FAABD;
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
@@ -329,4 +330,15 @@ float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
 {
 	shok_vtable_GGL_CBehaviorDefaultMovement* vt = (shok_vtable_GGL_CBehaviorDefaultMovement*)vtable;
 	return vt->GetSpeed(this);
+}
+
+bool shok_EGL_CEffect::IsCannonBallEffect()
+{
+	return vtable == shok_vtp_GGL_CCannonBallEffect;
+}
+
+shok_EGL_CEffect* (__thiscall* shok_effid2obj)(shok_EGL_CGLEEffectManager* th, int id) = (shok_EGL_CEffect * (__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x04FAAE3;
+shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
+{
+	return shok_effid2obj(this, id);
 }

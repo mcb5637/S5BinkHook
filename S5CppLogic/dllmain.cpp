@@ -13,9 +13,9 @@
 #include "l_logic.h"
 
 int __cdecl test(lua_State* L) {
-    shok_vtable_EGL_CGLEEntity s = shok_vtable_EGL_CGLEEntity();
+    shok_EGL_CFlyingEffect s = shok_EGL_CFlyingEffect();
     int st = (int)&s;
-    int test = (int)&s.GetExploration;
+    int test = (int)&s.SpawnedTurnAgain;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }

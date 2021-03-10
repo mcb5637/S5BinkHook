@@ -1217,7 +1217,43 @@ struct shok_ECS_CManager : shok_object {
 	void ReloadCutscene(const char* path);
 };
 
+#define shok_vtp_EGL_CEffect (void*)0x784B28
+struct shok_EGL_CEffect : shok_object {
+	PADDINGI(15)
+	shok_position Position; // 16
+	int SpawnedTurn; // 18
+	PADDINGI(1)
+	int EffectType; // 20
+	PADDINGI(2)
+	int EffectID; // 23
 
+	bool IsCannonBallEffect();
+};
+#define shok_vtp_EGL_CFlyingEffect (void*)0x7775E4
+struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
+	PADDINGI(6)
+	int SpawnedTurnAgain; //30
+	float GravityFactor;
+	PADDINGI(2)
+	shok_position StartPosition, TargetPosition, CurrentPosition, NextPosition;
+	PADDINGI(1)
+	float StrangeFloat;
+	PADDINGI(3)
+	int AttackerID; // 47
+};
+#define shok_vtp_GGL_CArrowEffect (void*)0x778E24
+struct shok_GGL_CArrowEffect : shok_EGL_CFlyingEffect {
+	int TargetID;
+	int DamageAmount;
+};
+#define shok_vtp_GGL_CCannonBallEffect (void*)0x777690
+struct shok_GGL_CCannonBallEffect : shok_EGL_CFlyingEffect {
+	int SourcePlayer; // 48
+	void* Props;
+	int DamageAmount; // 50
+	float AoERange;
+	int DamageClass; // 52
+};
 
 // effect manager
 struct shok_effectCreatorData {
@@ -1239,6 +1275,7 @@ private:
 
 struct shok_EGL_CGLEEffectManager : shok_object {
 	bool IsEffectValid(int id);
+	shok_EGL_CEffect* GetEffectById(int id);
 };
 
 struct shok_BB_CIDManagerEx : shok_object {
@@ -1397,6 +1434,8 @@ extern bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e);
 extern bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e);
 
 extern int(_cdecl* shok_EntityGetProvidedResourceByID)(int id);
+
+extern void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass);
 
 // global objects
 extern shok_ECS_CManager*** shok_ECS_CManagerObject;

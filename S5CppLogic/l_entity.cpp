@@ -469,7 +469,7 @@ int l_entity_test(lua_State* L) {
 	//vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &entityFireEventHook;
 	//lua_pushnumber(L, (int)&((shok_GGL_CSettler*)e)->MaxAttackRange);
 	//lua_pushnumber(L, (int)&e->GetEntityType()->GetBattleBehaviorProps()->MaxRange);
-	lua_pushnumber(L, (int)&((shok_GGL_CSettler*)e)->MovingSpeed);
+	lua_pushnumber(L, (int)&e->GetEntityType()->GetLeaderBehaviorProps()->HealingPoints);
 	return 1;
 }
 

@@ -16,10 +16,17 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.DamageRadius = luaL_optfloat(L, 7, -1);
 	data.TargetID = luaext_optEntityId(L, 8);
 	data.AttackerID = luaext_optEntityId(L, 9);
-	data.PlayerID = luaL_optint(L, 10, 0);
+	int player = luaL_optint(L, 10, 0);
+	data.PlayerID = player;
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogicObject;
 	int id = gl->CreateEffect(&data);
 	lua_pushnumber(L, id);
+	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(id);
+	if (ef->IsCannonBallEffect()) {
+		shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
+		cbeff->SourcePlayer = player;
+		cbeff->DamageClass = luaL_optint(L, 11, 0);
+	}
 	return 1;
 }
 
@@ -36,5 +43,5 @@ void l_effect_init(lua_State* L)
 	luaext_registerFunc(L, "IsValidEffect", &l_effect_isValid);
 }
 
-// local x,y = GUI.Debug_GetMapPositionUnderMouse(); effid = CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x, y, x+1000, y, 500, 1000, 0, 0, 2)
+// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x, y, x+1000, y, 500, 1000, 0, 0, 1, 0)
 // CppLogic.Effect.IsValidEffect(effid)

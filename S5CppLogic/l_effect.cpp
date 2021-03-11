@@ -4,7 +4,7 @@
 #include "s5data.h"
 #include "luaext.h"
 
-int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid)
+int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass)
 	shok_effectCreatorData data = shok_effectCreatorData();
 	data.CreatorType = shok_effectCreatorData_CreatorType_Projectile;
 	data.EffectType = luaL_checkint(L, 1);
@@ -43,5 +43,6 @@ void l_effect_init(lua_State* L)
 	luaext_registerFunc(L, "IsValidEffect", &l_effect_isValid);
 }
 
-// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x, y, x+1000, y, 500, 1000, 0, 0, 1, 0)
+// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-1000, y, x, y, 500, 1000, 0, 0, 1, 0)
+// local id = e(); local p = GetPosition(id); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, p.X-1000, p.Y, p.X, p.Y, 100, 1000, 0, 0, 1, 0)
 // CppLogic.Effect.IsValidEffect(effid)

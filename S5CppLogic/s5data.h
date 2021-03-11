@@ -29,7 +29,7 @@ typedef uint8_t byte;
 extern void* (__cdecl* shok_malloc)(size_t t);
 extern void* (__cdecl* shok_new)(size_t t);
 extern void(__cdecl* shok_free)(void* p);
-extern void (*shok_logString)(const char* format, const char* string);
+extern void (*shok_logString)(const char* format, ...);
 
 struct shok_vector {
 	int vtable, start, end, encCap;
@@ -1286,6 +1286,7 @@ struct shok_BB_CIDManagerEx : shok_object {
 // game logic
 struct shok_EGL_CGLEGameLogic : shok_object {
 	int CreateEffect(shok_effectCreatorData* data);
+	void HookCreateEffect();
 };
 
 
@@ -1459,3 +1460,10 @@ extern shok_GGL_CLogicProperties** shok_GGL_CLogicPropertiesObj;
 extern shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj;
 
 extern shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj;
+
+
+
+void logAdress(const char* name, void* adr);
+
+extern void(*CreateEffectHookCallback)(int id, void* ret);
+#define CreatEffectReturnBattleBehaviorAttack (void*)0x50C4B5

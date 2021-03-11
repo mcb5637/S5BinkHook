@@ -13,7 +13,7 @@ shok_EGL_CGLEGameLogic** shok_EGL_CGLEGameLogicObject = (shok_EGL_CGLEGameLogic*
 int shok_effectCreatorData_CreatorType_Projectile = 0x774698;
 shok_EGL_CGLEEffectManager** shok_EGL_CGLEEffectManagerObject = (shok_EGL_CGLEEffectManager**)0x898144;
 void(* shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage) = (void(*)(shok_EGL_CGLEEntity*, shok_EGL_CGLEEntity*, int)) 0x49F358;
-void (*shok_logString)(const char* format, const char* string) = (void (*)(const char* format, const char* string)) 0x548268;
+void (*shok_logString)(const char* format, ...) = (void (*)(const char* format, ...)) 0x548268;
 shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj = (shok_EGL_CGLEEntityManager**)0x897558;
 int(*shok_getEntityIdByScriptName)(const char* str) = (int(*)(const char* str)) 0x576624;
@@ -46,6 +46,8 @@ bool shok_EGL_CGLEEntity::IsEntityInCategory(int cat)
 }
 
 
+int(__thiscall* CreateEffectHookedOrig)(shok_EGL_CGLEGameLogic* th, shok_effectCreatorData* data) = nullptr;
+void(*CreateEffectHookCallback)(int id, void* ret) = nullptr;
 struct shok_vtable_EGL_CGLEGameLogic {
 private:
 	int u[23];
@@ -55,6 +57,25 @@ public:
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_effectCreatorData* data) {
 	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)this->vtable;
 	return vt->CreateEffect(this, data);
+}
+int __fastcall CreateEffectHook(shok_EGL_CGLEGameLogic* th, int _, shok_effectCreatorData* data)
+{
+	void** ebp_var = (void**) 1;
+	_asm {
+		mov ebp_var, ebp
+	}
+	int id = CreateEffectHookedOrig(th, data);
+	if (CreateEffectHookCallback)
+		CreateEffectHookCallback(id, ebp_var[1]);
+	return id;
+}
+void shok_EGL_CGLEGameLogic::HookCreateEffect()
+{
+	if (CreateEffectHookedOrig)
+		return;
+	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)this->vtable;
+	CreateEffectHookedOrig = vt->CreateEffect;
+	vt->CreateEffect = (int(__thiscall *)(shok_EGL_CGLEGameLogic * th, shok_effectCreatorData * data)) &CreateEffectHook;
 }
 
 struct shok_vtable_ECS_CManager {
@@ -341,4 +362,9 @@ shok_EGL_CEffect* (__thiscall* shok_effid2obj)(shok_EGL_CGLEEffectManager* th, i
 shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 {
 	return shok_effid2obj(this, id);
+}
+
+void logAdress(const char* name, void* adr)
+{
+	shok_logString("%s %x\n", name, adr);
 }

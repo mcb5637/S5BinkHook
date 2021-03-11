@@ -707,3 +707,10 @@ function CppLogic.Entity.GetSpeed(id) end
 -- @param player attacking player (optional, 0/nil if not used)
 -- @param dmgclass damageclass (optional, 0/nil if not used)
 function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass) end
+
+--- enables AoE projectile fix.
+-- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
+function CppLogic.Combat.EnableAoEProjectileFix() end
+--- disables AoE projectile fix.
+-- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
+function CppLogic.Combat.DisableAoEProjectileFix() end

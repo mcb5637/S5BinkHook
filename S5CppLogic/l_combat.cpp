@@ -25,13 +25,44 @@ int l_combat_dealAOEDamage(lua_State* L) {
 	return 0;
 }
 
+void l_combatHookCreateEffect(int effectId, void* retAdr) {
+	if (retAdr == CreatEffectReturnBattleBehaviorAttack) {
+		shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(effectId);
+		if (ef->IsCannonBallEffect()) {
+			shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
+			shok_EGL_CGLEEntity* e = shok_eid2obj(cbeff->AttackerID);
+			cbeff->SourcePlayer = e->PlayerId;
+			shok_GGlue_CGlueEntityProps* t = e->GetEntityType();
+			shok_GGL_CBattleBehaviorProps* b = t->GetBattleBehaviorProps();
+			if (b) {
+				cbeff->DamageClass = b->DamageClass;
+				return;
+			}
+			shok_GGL_CAutoCannonBehaviorProps* a = t->GetAutoCannonProps();
+			if (a)
+				cbeff->DamageClass = a->DamageClass;
+		}
+	}
+}
+
+int l_combat_EnableAoEProjectileFix(lua_State* L) {
+	(*shok_EGL_CGLEGameLogicObject)->HookCreateEffect();
+	CreateEffectHookCallback = &l_combatHookCreateEffect;
+	return 0;
+}
+
+int l_combat_DisableAoEProjectileFix(lua_State* L) {
+	CreateEffectHookCallback = nullptr;
+	return 0;
+}
+
 void l_combat_init(lua_State* L)
 {
 	luaext_registerFunc(L, "DealDamage", &l_combat_dealDamage);
 	luaext_registerFunc(L, "DealAoEDamage", &l_combat_dealAOEDamage);
+	luaext_registerFunc(L, "EnableAoEProjectileFix", &l_combat_EnableAoEProjectileFix);
+	luaext_registerFunc(L, "DisableAoEProjectileFix", &l_combat_DisableAoEProjectileFix);
 }
 
 // CppLogic.Combat.DealDamage(GUI.GetEntityAtPosition(GUI.GetMousePosition()), 100)
 // local id = e(); local p = GetPosition(id); CppLogic.Combat.DealAoEDamage(0, p.X, p.Y, 1000, 100, 0, 0)
-
-// suspected deal aoe damage; 0049F82A (attacker obj, targetid, range, *pos?, player, damage)

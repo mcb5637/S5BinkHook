@@ -1467,3 +1467,5 @@ void logAdress(const char* name, void* adr);
 
 extern void(*CreateEffectHookCallback)(int id, void* ret);
 #define CreatEffectReturnBattleBehaviorAttack (void*)0x50C4B5
+#define CreatEffectReturnAutoCannonBehaviorAttack (void*)0x5107a8
+#define CreatEffectReturnCannonBallOnHit (void*)0x4ff55e

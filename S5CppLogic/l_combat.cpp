@@ -26,7 +26,7 @@ int l_combat_dealAOEDamage(lua_State* L) {
 }
 
 void l_combatHookCreateEffect(int effectId, void* retAdr) {
-	if (retAdr == CreatEffectReturnBattleBehaviorAttack) {
+	if (retAdr == CreatEffectReturnBattleBehaviorAttack || retAdr == CreatEffectReturnAutoCannonBehaviorAttack) {
 		shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(effectId);
 		if (ef->IsCannonBallEffect()) {
 			shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
@@ -43,8 +43,12 @@ void l_combatHookCreateEffect(int effectId, void* retAdr) {
 				cbeff->DamageClass = a->DamageClass;
 		}
 	}
+	else if (retAdr != CreatEffectReturnCannonBallOnHit) {
+		logAdress("createeffect", retAdr);
+	}
 }
 
+// tested aoe damage: cannon/autocannon projectile, circularattack, trapcannon 
 int l_combat_EnableAoEProjectileFix(lua_State* L) {
 	(*shok_EGL_CGLEGameLogicObject)->HookCreateEffect();
 	CreateEffectHookCallback = &l_combatHookCreateEffect;

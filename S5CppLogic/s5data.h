@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include "luaimport.h"
 
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
@@ -1228,6 +1229,7 @@ struct shok_EGL_CEffect : shok_object {
 	int EffectID; // 23
 
 	bool IsCannonBallEffect();
+	bool IsArrowEffect();
 };
 #define shok_vtp_EGL_CFlyingEffect (void*)0x7775E4
 struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
@@ -1240,6 +1242,8 @@ struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
 	float StrangeFloat;
 	PADDINGI(3)
 	int AttackerID; // 47
+
+	static void HookOnHit();
 };
 #define shok_vtp_GGL_CArrowEffect (void*)0x778E24
 struct shok_GGL_CArrowEffect : shok_EGL_CFlyingEffect {
@@ -1461,6 +1465,8 @@ extern shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj;
 
 extern shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj;
 
+extern lua_State** shok_luastate_game;
+
 
 
 void logAdress(const char* name, void* adr);
@@ -1469,3 +1475,5 @@ extern void(*CreateEffectHookCallback)(int id, void* ret);
 #define CreatEffectReturnBattleBehaviorAttack (void*)0x50C4B5
 #define CreatEffectReturnAutoCannonBehaviorAttack (void*)0x5107a8
 #define CreatEffectReturnCannonBallOnHit (void*)0x4ff55e
+
+extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);

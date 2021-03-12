@@ -27,6 +27,7 @@ shok_GGL_CLogicProperties** shok_GGL_CLogicPropertiesObj = (shok_GGL_CLogicPrope
 shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj = (shok_GGL_CPlayerAttractionProps**)0x866A80;
 shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
 void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int))0x49F82A;
+lua_State** shok_luastate_game = (lua_State**)0x853A9C;
 
 bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = (bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x4FAABD;
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
@@ -358,6 +359,11 @@ bool shok_EGL_CEffect::IsCannonBallEffect()
 	return vtable == shok_vtp_GGL_CCannonBallEffect;
 }
 
+bool shok_EGL_CEffect::IsArrowEffect()
+{
+	return vtable == shok_vtp_GGL_CArrowEffect;
+}
+
 shok_EGL_CEffect* (__thiscall* shok_effid2obj)(shok_EGL_CGLEEffectManager* th, int id) = (shok_EGL_CEffect * (__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x04FAAE3;
 shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 {
@@ -367,4 +373,35 @@ shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 void logAdress(const char* name, void* adr)
 {
 	shok_logString("%s %x\n", name, adr);
+}
+
+struct shok_vtable_EGL_CFlyingEffect {
+	PADDINGI(9)
+	int(__thiscall* OnHit)(shok_EGL_CFlyingEffect* th);
+};
+
+void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff) = nullptr;
+int(__thiscall* CannonBallOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
+int __fastcall CannonBallOnHitHook(shok_EGL_CFlyingEffect* th) {
+	if (FlyingEffectOnHitCallback)
+		FlyingEffectOnHitCallback(th);
+	return CannonBallOnHit(th);
+}
+int(__thiscall* ArrowOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
+int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th) {
+	if (FlyingEffectOnHitCallback)
+		FlyingEffectOnHitCallback(th);
+	return ArrowOnHit(th);
+}
+void shok_EGL_CFlyingEffect::HookOnHit()
+{
+	if (CannonBallOnHit)
+		return;
+	shok_vtable_EGL_CFlyingEffect* vt = (shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CCannonBallEffect;
+	logAdress("flyingeff", vt->OnHit);
+	CannonBallOnHit = vt->OnHit;
+	vt->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & CannonBallOnHitHook;
+	vt = (shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CArrowEffect;
+	ArrowOnHit = vt->OnHit;
+	vt->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & ArrowOnHitHook;
 }

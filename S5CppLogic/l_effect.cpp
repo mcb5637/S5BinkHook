@@ -4,7 +4,26 @@
 #include "s5data.h"
 #include "luaext.h"
 
-int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass)
+int l_effect_idToCb = 0;
+
+void l_effectFlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff) {
+	int id = eff->EffectID;
+	lua_State* L = *shok_luastate_game;
+	int top = lua_gettop(L);
+	luaL_checkstack(L, 5, "");
+	lua_rawgeti(L, LUA_REGISTRYINDEX, l_effect_idToCb);
+	lua_rawgeti(L, -1, id);
+	if (lua_isfunction(L, -1)) {
+		lua_pushnumber(L, id);
+		lua_pcall(L, 1, 0, 0);
+	}
+	lua_settop(L, top + 1);
+	lua_pushnil(L);
+	lua_rawseti(L, -2, id);
+	lua_settop(L, top);
+}
+
+int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback)
 	shok_effectCreatorData data = shok_effectCreatorData();
 	data.CreatorType = shok_effectCreatorData_CreatorType_Projectile;
 	data.EffectType = luaL_checkint(L, 1);
@@ -20,13 +39,20 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.PlayerID = player;
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogicObject;
 	int id = gl->CreateEffect(&data);
-	lua_pushnumber(L, id);
 	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(id);
 	if (ef->IsCannonBallEffect()) {
 		shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
 		cbeff->SourcePlayer = player;
 		cbeff->DamageClass = luaL_optint(L, 11, 0);
 	}
+	if (lua_isfunction(L, 12)) {
+		shok_EGL_CFlyingEffect::HookOnHit();
+		FlyingEffectOnHitCallback = &l_effectFlyingEffectOnHitCallback;
+		lua_rawgeti(L, LUA_REGISTRYINDEX, l_effect_idToCb);
+		lua_pushvalue(L, 12);
+		lua_rawseti(L, 13, id);
+	}
+	lua_pushnumber(L, id);
 	return 1;
 }
 
@@ -37,12 +63,21 @@ int l_effect_isValid(lua_State* L) {
 	return 1;
 }
 
+int l_effect_getCbs(lua_State* L) {
+	lua_rawgeti(L, LUA_REGISTRYINDEX, l_effect_idToCb);
+	return 1;
+}
+
 void l_effect_init(lua_State* L)
 {
 	luaext_registerFunc(L, "CreateProjectile", &l_effect_createProjectile);
 	luaext_registerFunc(L, "IsValidEffect", &l_effect_isValid);
+	luaext_registerFunc(L, "GetProjectileCallbacks", &l_effect_getCbs);
+
+	lua_newtable(L);
+	l_effect_idToCb = luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
-// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-1000, y, x, y, 500, 1000, 0, 0, 1, 0)
+// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-100000, y, x, y, 500, 1000, 0, 0, 1, 0, LuaDebugger.Log)
 // local id = e(); local p = GetPosition(id); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, p.X-1000, p.Y, p.X, p.Y, 100, 1000, 0, 0, 1, 0)
 // CppLogic.Effect.IsValidEffect(effid)

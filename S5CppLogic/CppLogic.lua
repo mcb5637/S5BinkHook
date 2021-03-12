@@ -40,8 +40,9 @@ function CppLogic.Effect.IsValidEffect(id) end
 -- @param attid attacker entity id (optional, 0/nil if not used)
 -- @param playerid attacker player id (optional, 0/nil if not used)
 -- @param dmgclass damageclass (optional, 0/nil if not used)
+-- @param callback function that gets called on hit (optional, nil if not used)
 -- @return effect id
-function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass) end
+function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback) end
 
 
 --- sets high precision FPU (gets reset on every API call, so call id directly before your calculations)

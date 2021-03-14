@@ -1423,6 +1423,119 @@ public:
 	shok_GGL_CPlayerStatus* GetPlayer(int i);
 };
 
+#define shok_vtp_BB_CEvent (void*)0x762114
+struct shok_BB_CEvent : shok_object {
+	int EventTypeId;
+};
+
+#define shok_vtp_EGL_CNetEvent2Entities (void*)0x76DD60
+struct shok_EGL_CNetEvent2Entities : shok_BB_CEvent {
+	int ActorId, TargetId;
+};
+
+#define shok_vtp_EGL_CNetEventEntityAndPos (void*)0x76DD50
+struct shok_EGL_CNetEventEntityAndPos : shok_BB_CEvent {
+	int EntityId;
+	shok_position Position;
+};
+
+#define shok_vtp_EGL_CNetEventEntityAndPosArray (void*)0x770704
+struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
+	int EntityId;
+	vector_padding
+	std::vector<shok_position, shok_allocator<shok_position>> Positions;
+};
+
+#define shok_vtp_GGL_CNetEventExtractResource (void*)0x77061C
+struct shok_GGL_CNetEventExtractResource : shok_BB_CEvent {
+	int EntityId;
+	int ResourceType;
+	shok_position Position;
+};
+
+#define shok_vtp_GGL_CNetEventTransaction (void*)0x77062C
+struct shok_GGL_CNetEventTransaction : shok_BB_CEvent {
+	int EntityType, SellType, BuyType, BuyAmount;
+};
+
+#define shok_vtp_EGL_CNetEventEntityID (void*)0x766C28
+struct shok_EGL_CNetEventEntityID : shok_BB_CEvent {
+	int EntityId;
+};
+
+#define shok_vtp_GGL_CNetEventCannonCreator (void*)0x7705EC
+struct shok_GGL_CNetEventCannonCreator : shok_EGL_CNetEventEntityID {
+	int BottomType, TopType;
+	shok_position Position;
+};
+
+#define shok_vtp_GGL_CNetEventEntityIDAndUpgradeCategory (void*)0x77060C
+struct shok_GGL_CNetEventEntityIDAndUpgradeCategory : shok_EGL_CNetEventEntityID {
+	int UpgradeCategory;
+};
+
+#define shok_vtp_EGL_CNetEventEntityIDAndInteger (void*)0x766C48
+struct shok_EGL_CNetEventEntityIDAndInteger : shok_EGL_CNetEventEntityID {
+	int Data;
+};
+
+#define shok_vtp_GGL_CNetEventTechnologyAndEntityID (void*)0x7705FC
+struct shok_GGL_CNetEventTechnologyAndEntityID : shok_EGL_CNetEventEntityID {
+	int Technology;
+};
+
+#define shok_vtp_EGL_CNetEventPlayerID (void*)0x766C18
+struct shok_EGL_CNetEventPlayerID : shok_BB_CEvent {
+	int PlayerId;
+};
+
+#define shok_vtp_GGL_CNetEventBuildingCreator (void*)0x770714
+struct shok_GGL_CNetEventBuildingCreator : shok_EGL_CNetEventPlayerID {
+	int UpgradeCategory;
+	shok_position Position;
+	vector_padding
+	std::vector<int, shok_allocator<int>> Serfs;
+};
+
+#define shok_vtp_EGL_CNetEventIntegerAndPlayerID (void*)0x7705BC
+struct shok_EGL_CNetEventIntegerAndPlayerID : shok_EGL_CNetEventPlayerID {
+	int Data;
+};
+
+#define shok_vtp_EGL_CNetEventPlayerIDAndInteger (void*)0x7705CC
+struct shok_EGL_CNetEventPlayerIDAndInteger : shok_EGL_CNetEventPlayerID {
+	int Data;
+};
+
+#define shok_vtp_EGL_CNetEventEntityIDAndPlayerID (void*)0x766C38
+struct shok_EGL_CNetEventEntityIDAndPlayerID : shok_EGL_CNetEventPlayerID {
+	int EntityId;
+};
+
+#define shok_vtp_EGL_CNetEventEntityIDAndPlayerIDAndEntityType (void*)0x77057C
+struct shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType : shok_EGL_CNetEventEntityIDAndPlayerID {
+	int EntityType;
+};
+
+#define shok_vtp_GGL_CNetEventEntityIDPlayerIDAndInteger (void*)0x77064C
+struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityIDAndPlayerID {
+	int Data;
+};
+
+struct shok_BB_IPostEvent : shok_object {
+
+};
+
+#define shok_vtp_GGUI_CManager (void*)0x77B2F8;
+struct shok_GGUI_CManager : shok_object {
+	PADDINGI(9)
+private:
+	shok_BB_IPostEvent* PostEvent;
+
+public:
+	void HackPostEvent();
+};
+
 // global funcs
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);
 
@@ -1441,6 +1554,8 @@ extern bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e);
 extern int(_cdecl* shok_EntityGetProvidedResourceByID)(int id);
 
 extern void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass);
+
+extern shok_GGUI_CManager*(* shok_GetGuiManager)();
 
 // global objects
 extern shok_ECS_CManager*** shok_ECS_CManagerObject;
@@ -1477,3 +1592,4 @@ extern void(*CreateEffectHookCallback)(int id, void* ret);
 #define CreatEffectReturnCannonBallOnHit (void*)0x4ff55e
 
 extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
+extern bool(*PostEventCallback)(shok_BB_CEvent* ev);

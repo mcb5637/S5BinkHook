@@ -28,6 +28,7 @@ shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj = (shok_GGL
 shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
 void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int))0x49F82A;
 lua_State** shok_luastate_game = (lua_State**)0x853A9C;
+shok_GGUI_CManager* (*shok_GetGuiManager)() = (shok_GGUI_CManager * (*)()) 0x525622;
 
 bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = (bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x4FAABD;
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
@@ -404,4 +405,24 @@ void shok_EGL_CFlyingEffect::HookOnHit()
 	vt = (shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CArrowEffect;
 	ArrowOnHit = vt->OnHit;
 	vt->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & ArrowOnHitHook;
+}
+
+struct shok_vtable_BB_IPostEvent {
+	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev);
+};
+void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) = nullptr;
+bool(*PostEventCallback)(shok_BB_CEvent* ev) = nullptr;
+void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
+	if (PostEventCallback)
+		if (PostEventCallback(ev))
+			return;
+	PostEventOrig(th, ev);
+}
+void shok_GGUI_CManager::HackPostEvent()
+{
+	if (PostEventOrig)
+		return;
+	shok_vtable_BB_IPostEvent* vt = (shok_vtable_BB_IPostEvent*)PostEvent->vtable;
+	PostEventOrig = vt->PostEvent;
+	vt->PostEvent = (void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent* ev)) & PostEventHook;
 }

@@ -1455,7 +1455,7 @@ struct shok_GGL_CNetEventExtractResource : shok_BB_CEvent {
 
 #define shok_vtp_GGL_CNetEventTransaction (void*)0x77062C
 struct shok_GGL_CNetEventTransaction : shok_BB_CEvent {
-	int EntityType, SellType, BuyType, BuyAmount;
+	int EntityId, SellType, BuyType, BuyAmount;
 };
 
 #define shok_vtp_EGL_CNetEventEntityID (void*)0x766C28
@@ -1492,7 +1492,7 @@ struct shok_EGL_CNetEventPlayerID : shok_BB_CEvent {
 #define shok_vtp_GGL_CNetEventBuildingCreator (void*)0x770714
 struct shok_GGL_CNetEventBuildingCreator : shok_EGL_CNetEventPlayerID {
 	int UpgradeCategory;
-	shok_position Position;
+	shok_positionRot Position;
 	vector_padding
 	std::vector<int, shok_allocator<int>> Serfs;
 };

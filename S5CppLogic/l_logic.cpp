@@ -65,18 +65,585 @@ int l_playerSetPaydayStatus(lua_State* L) {
 }
 
 
+void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
+	lua_newtable(L);
+	if (ev->vtable == shok_vtp_EGL_CNetEventEntityID) {
+		shok_EGL_CNetEventEntityID* e = (shok_EGL_CNetEventEntityID*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEvent2Entities) {
+		shok_EGL_CNetEvent2Entities* e = (shok_EGL_CNetEvent2Entities*)ev;
+		lua_pushstring(L, "ActorId");
+		lua_pushnumber(L, e->ActorId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "TargetId");
+		lua_pushnumber(L, e->TargetId);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPos) {
+		shok_EGL_CNetEventEntityAndPos* e = (shok_EGL_CNetEventEntityAndPos*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Position");
+		luaext_pushPos(L, e->Position);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPosArray) {
+		shok_EGL_CNetEventEntityAndPosArray* e = (shok_EGL_CNetEventEntityAndPosArray*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Positions");
+		lua_newtable(L);
+		int i = 1;
+		for (shok_position p : e->Positions) {
+			luaext_pushPos(L, p);
+			lua_rawseti(L, -2, i);
+			i++;
+		}
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventExtractResource) {
+		shok_GGL_CNetEventExtractResource* e = (shok_GGL_CNetEventExtractResource*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "ResourceType");
+		lua_pushnumber(L, e->ResourceType);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Position");
+		luaext_pushPos(L, e->Position);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventTransaction) {
+		shok_GGL_CNetEventTransaction* e = (shok_GGL_CNetEventTransaction*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "BuyType");
+		lua_pushnumber(L, e->BuyType);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "BuyAmount");
+		lua_pushnumber(L, e->BuyAmount);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "SellType");
+		lua_pushnumber(L, e->SellType);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventCannonCreator) {
+		shok_GGL_CNetEventCannonCreator* e = (shok_GGL_CNetEventCannonCreator*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "BottomType");
+		lua_pushnumber(L, e->BottomType);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "TopType");
+		lua_pushnumber(L, e->TopType);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Position");
+		luaext_pushPos(L, e->Position);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDAndUpgradeCategory) {
+		shok_GGL_CNetEventEntityIDAndUpgradeCategory* e = (shok_GGL_CNetEventEntityIDAndUpgradeCategory*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "UpgradeCategory");
+		lua_pushnumber(L, e->UpgradeCategory);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndInteger) {
+		shok_EGL_CNetEventEntityIDAndInteger* e = (shok_EGL_CNetEventEntityIDAndInteger*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Data");
+		lua_pushnumber(L, e->Data);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventTechnologyAndEntityID) {
+		shok_GGL_CNetEventTechnologyAndEntityID* e = (shok_GGL_CNetEventTechnologyAndEntityID*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Technology");
+		lua_pushnumber(L, e->Technology);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerID) {
+		shok_EGL_CNetEventPlayerID* e = (shok_EGL_CNetEventPlayerID*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_pushnumber(L, e->PlayerId);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventBuildingCreator) {
+		shok_GGL_CNetEventBuildingCreator* e = (shok_GGL_CNetEventBuildingCreator*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_pushnumber(L, e->PlayerId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "UpgradeCategory");
+		lua_pushnumber(L, e->UpgradeCategory);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Position");
+		luaext_pushPosRot(L, e->Position);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Serfs");
+		lua_newtable(L);
+		int i = 1;
+		for (int s : e->Serfs) {
+			lua_pushnumber(L, s);
+			lua_rawseti(L, -2, i);
+			i++;
+		}
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventIntegerAndPlayerID) {
+		shok_EGL_CNetEventIntegerAndPlayerID* e = (shok_EGL_CNetEventIntegerAndPlayerID*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_pushnumber(L, e->PlayerId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Data");
+		lua_pushnumber(L, e->Data);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerIDAndInteger) {
+		shok_EGL_CNetEventPlayerIDAndInteger* e = (shok_EGL_CNetEventPlayerIDAndInteger*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_pushnumber(L, e->PlayerId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Data");
+		lua_pushnumber(L, e->Data);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerID) {
+		shok_EGL_CNetEventEntityIDAndPlayerID* e = (shok_EGL_CNetEventEntityIDAndPlayerID*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_pushnumber(L, e->PlayerId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerIDAndEntityType) {
+		shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType* e = (shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_pushnumber(L, e->PlayerId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "EntityType");
+		lua_pushnumber(L, e->EntityType);
+		lua_rawset(L, -3);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDPlayerIDAndInteger) {
+		shok_GGL_CNetEventEntityIDPlayerIDAndInteger* e = (shok_GGL_CNetEventEntityIDPlayerIDAndInteger*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_pushnumber(L, e->PlayerId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "EntityId");
+		lua_pushnumber(L, e->EntityId);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Data");
+		lua_pushnumber(L, e->Data);
+		lua_rawset(L, -3);
+	}
+}
+bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
+	bool allRead = true;
+	if (ev->vtable == shok_vtp_EGL_CNetEventEntityID) {
+		shok_EGL_CNetEventEntityID* e = (shok_EGL_CNetEventEntityID*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEvent2Entities) {
+		shok_EGL_CNetEvent2Entities* e = (shok_EGL_CNetEvent2Entities*)ev;
+		lua_pushstring(L, "ActorId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->ActorId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "TargetId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->TargetId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPos) {
+		shok_EGL_CNetEventEntityAndPos* e = (shok_EGL_CNetEventEntityAndPos*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Position");
+		lua_rawget(L, -2);
+		if (lua_istable(L, -1))
+			luaext_checkPos(L, e->Position, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPosArray) {
+		shok_EGL_CNetEventEntityAndPosArray* e = (shok_EGL_CNetEventEntityAndPosArray*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Positions");
+		lua_rawget(L, -2);
+		if (lua_istable(L, -1)) {
+			int i = 1;
+			shok_saveVector<shok_position>(&e->Positions, [L, &i](std::vector<shok_position, shok_allocator<shok_position>>& v) {
+				shok_position p = shok_position();
+				v.clear();
+				while (true) {
+					lua_rawgeti(L, -1, i);
+					if (!lua_istable(L, -1)) {
+						lua_pop(L, 1);
+						break;
+					}
+					luaext_checkPos(L, p, -1);
+					lua_pop(L, 1);
+					v.push_back(p);
+					i++;
+				}
+				});
+		}
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventExtractResource) {
+		shok_GGL_CNetEventExtractResource* e = (shok_GGL_CNetEventExtractResource*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "ResourceType");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->ResourceType = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Position");
+		lua_rawget(L, -2);
+		if (lua_istable(L, -1))
+			luaext_checkPos(L, e->Position, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventTransaction) {
+		shok_GGL_CNetEventTransaction* e = (shok_GGL_CNetEventTransaction*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "BuyType");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->BuyType = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "BuyAmount");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->BuyAmount = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "SellType");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->SellType = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventCannonCreator) {
+		shok_GGL_CNetEventCannonCreator* e = (shok_GGL_CNetEventCannonCreator*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "BottomType");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->BottomType = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "TopType");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->TopType = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Position");
+		lua_rawget(L, -2);
+		if (lua_istable(L, -1))
+			luaext_checkPos(L, e->Position, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDAndUpgradeCategory) {
+		shok_GGL_CNetEventEntityIDAndUpgradeCategory* e = (shok_GGL_CNetEventEntityIDAndUpgradeCategory*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "UpgradeCategory");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->UpgradeCategory = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndInteger) {
+		shok_EGL_CNetEventEntityIDAndInteger* e = (shok_EGL_CNetEventEntityIDAndInteger*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Data");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->Data = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventTechnologyAndEntityID) {
+		shok_GGL_CNetEventTechnologyAndEntityID* e = (shok_GGL_CNetEventTechnologyAndEntityID*)ev;
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Technology");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->Technology = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerID) {
+		shok_EGL_CNetEventPlayerID* e = (shok_EGL_CNetEventPlayerID*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->PlayerId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventBuildingCreator) {
+		shok_GGL_CNetEventBuildingCreator* e = (shok_GGL_CNetEventBuildingCreator*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->PlayerId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "UpgradeCategory");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->UpgradeCategory = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Position");
+		lua_rawget(L, -2);
+		if (lua_istable(L, -1))
+			luaext_checkPos(L, e->Position, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Serfs");
+		lua_rawget(L, -2);
+		if (lua_istable(L, -1)) {
+			int i = 1;
+			shok_saveVector<int>(&e->Serfs, [L, &i](std::vector<int, shok_allocator<int>>& v) {
+				v.clear();
+				while (true) {
+					lua_rawgeti(L, -1, i);
+					if (!lua_isnumber(L, -1)) {
+						lua_pop(L, 1);
+						break;
+					}
+					v.push_back((int)lua_tonumber(L, -1));
+					lua_pop(L, 1);
+					i++;
+				}
+				});
+		}
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventIntegerAndPlayerID) {
+		shok_EGL_CNetEventIntegerAndPlayerID* e = (shok_EGL_CNetEventIntegerAndPlayerID*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->PlayerId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Data");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->Data = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerIDAndInteger) {
+		shok_EGL_CNetEventPlayerIDAndInteger* e = (shok_EGL_CNetEventPlayerIDAndInteger*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->PlayerId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Data");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->Data = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerID) {
+		shok_EGL_CNetEventEntityIDAndPlayerID* e = (shok_EGL_CNetEventEntityIDAndPlayerID*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->PlayerId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerIDAndEntityType) {
+		shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType* e = (shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->PlayerId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "EntityType");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityType = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDPlayerIDAndInteger) {
+		shok_GGL_CNetEventEntityIDPlayerIDAndInteger* e = (shok_GGL_CNetEventEntityIDPlayerIDAndInteger*)ev;
+		lua_pushstring(L, "PlayerId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->PlayerId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "EntityId");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->EntityId = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Data");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1))
+			e->Data = (int)lua_tonumber(L, -1);
+		else
+			allRead = false;
+		lua_pop(L, 1);
+	}
+	return allRead;
+}
+
+
 int l_netEventCbRef = LUA_NOREF;
 bool l_netEventPostCallback(shok_BB_CEvent* ev) {
 	int id = ev->EventTypeId;
 	lua_State* L = *shok_luastate_game;
 	int top = lua_gettop(L);
-	luaL_checkstack(L, 2, "");
+	luaL_checkstack(L, 10, "");
 	lua_rawgeti(L, LUA_REGISTRYINDEX, l_netEventCbRef);
 	bool r = false;
 	if (lua_isfunction(L, -1)) {
 		lua_pushnumber(L, id);
-		lua_pcall(L, 1, 1, 0);
-		r = lua_toboolean(L, -1);
+		l_netPushEvent(L, ev);
+		lua_pcall(L, 2, 1, 0);
+		if (lua_isboolean(L, -1))
+			r = lua_toboolean(L, -1);
+		else if (lua_istable(L, -1))
+			l_netReadEvent(L, ev);
 	}
 	lua_settop(L, top);
 	return r;
@@ -106,8 +673,13 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "GetAnimIdFromName", &l_logicGetAnimIdFromName);
 	luaext_registerFunc(L, "PlayerGetPaydayStartetTick", &l_playerGetPaydayStatus);
 	luaext_registerFunc(L, "PlayerSetPaydayStartetTick", &l_playerSetPaydayStatus);
-	luaext_registerFunc(L, "NetEventSetCallback", &l_netEventSetHook);
-	luaext_registerFunc(L, "NetEventUnSetCallback", &l_netEventUnSetHook);
+
+
+	lua_pushstring(L, "UICommands");
+	lua_newtable(L);
+	luaext_registerFunc(L, "SetCallback", &l_netEventSetHook);
+	luaext_registerFunc(L, "UnSetCallback", &l_netEventUnSetHook);
+	lua_rawset(L, -3);
 }
 
-// CppLogic.Logic.NetEventSetCallback(function(id) LuaDebugger.Log(id) return true end)
+// CppLogic.Logic.UICommands.SetCallback(function(id, ev) LuaDebugger.Log(id) LuaDebugger.Log(ev) return false end)

@@ -411,6 +411,7 @@ struct shok_vtable_BB_IPostEvent {
 	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev);
 };
 void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) = nullptr;
+shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
 bool(*PostEventCallback)(shok_BB_CEvent* ev) = nullptr;
 void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
 	if (PostEventCallback)
@@ -420,9 +421,10 @@ void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
 }
 void shok_GGUI_CManager::HackPostEvent()
 {
-	if (PostEventOrig)
-		return;
-	shok_vtable_BB_IPostEvent* vt = (shok_vtable_BB_IPostEvent*)PostEvent->vtable;
-	PostEventOrig = vt->PostEvent;
-	vt->PostEvent = (void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent* ev)) & PostEventHook;
+	if (PostEventOrig) {
+		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
+	}
+	BB_IPostEvent_vtableHooked = (shok_vtable_BB_IPostEvent*)PostEvent->vtable;
+	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
+	BB_IPostEvent_vtableHooked->PostEvent = (void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent* ev)) & PostEventHook;
 }

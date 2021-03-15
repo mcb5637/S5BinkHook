@@ -135,6 +135,7 @@ void luaext_pushPosRot(lua_State* L, shok_positionRot& p) {
 }
 
 void luaext_checkPos(lua_State* L, shok_position& p, int i) {
+	i = lua_abs_index(L, i);
 	lua_pushstring(L, "X");
 	lua_gettable(L, i);
 	float x = luaL_checkfloat(L, -1);

@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "s5data.h"
+#include <stdexcept>
 
 void* (__cdecl* shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
 void(__cdecl* shok_free)(void* p) = (void(__cdecl*)(void* p)) 0x5C2E2D;
@@ -427,4 +428,14 @@ void shok_GGUI_CManager::HackPostEvent()
 	BB_IPostEvent_vtableHooked = (shok_vtable_BB_IPostEvent*)PostEvent->vtable;
 	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
 	BB_IPostEvent_vtableHooked->PostEvent = (void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent* ev)) & PostEventHook;
+}
+
+shok_technology* shok_GGL_CGLGameLogic::GetTech(int i)
+{
+	try {
+		return TechList->TechList.at(i-1);
+	}
+	catch (std::out_of_range) {
+		return nullptr;
+	}
 }

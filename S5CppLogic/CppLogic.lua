@@ -715,3 +715,50 @@ function CppLogic.Combat.EnableAoEProjectileFix() end
 --- disables AoE projectile fix.
 -- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
 function CppLogic.Combat.DisableAoEProjectileFix() end
+
+--- tech research time and costs.
+-- @param tid tech id
+-- @return research time needed
+-- @return cost info
+function CppLogic.Technology.GetResearchInfo(tid) end
+--- tech research time and costs.
+-- @param tid tech id
+-- @param time research time needed (optional)
+-- @param cost cost info (optional)
+function CppLogic.Technology.SetResearchInfo(tid, time, cost) end
+
+--- tech requirements.
+-- @param tid tech id
+-- @return num required entity cond (0 -> all)
+-- @return entity conditions (table [entitytypeId] = amount)
+-- @return num required tech cond (0 -> all)
+-- @return tech conditions (array of tech ids)
+-- @return num required ucat cond (0 -> all)
+-- @return ucat conditions (table [ucatId] = amount)
+function CppLogic.Technology.GetRequirements(tid) end
+
+--- technology exploration modifier.
+-- @param tid tech id
+-- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
+-- @return value
+function CppLogic.Technology.GetExplorationModifier(tid) end
+--- technology armor modifier.
+-- @param tid tech id
+-- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
+-- @return value
+function CppLogic.Technology.GetArmorModifier(tid) end
+--- technology damage modifier.
+-- @param tid tech id
+-- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
+-- @return value
+function CppLogic.Technology.GetDamageModifier(tid) end
+--- technology range modifier.
+-- @param tid tech id
+-- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
+-- @return value
+function CppLogic.Technology.GetRangeModifier(tid) end
+--- technology speed modifier.
+-- @param tid tech id
+-- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
+-- @return value
+function CppLogic.Technology.GetSpeedModifier(tid) end

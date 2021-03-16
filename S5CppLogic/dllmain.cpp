@@ -11,11 +11,12 @@
 #include "l_entity.h"
 #include "l_entitytype.h"
 #include "l_logic.h"
+#include "l_tech.h"
 
 int __cdecl test(lua_State* L) {
-    shok_GGL_CNetEventBuildingCreator s = shok_GGL_CNetEventBuildingCreator();
+    shok_technologyModifier s = shok_technologyModifier();
     int st = (int)&s;
-    int test = (int)&s.Serfs;
+    int test = (int)&s.Operator;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }
@@ -62,6 +63,11 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_pushstring(L, "Logic");
     lua_newtable(L);
     l_logic_init(L);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "Technology");
+    lua_newtable(L);
+    l_tech_init(L);
     lua_rawset(L, -3);
 
     lua_rawset(L, LUA_GLOBALSINDEX);

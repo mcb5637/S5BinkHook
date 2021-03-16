@@ -4,7 +4,7 @@
 #include "s5data.h"
 #include "luaext.h"
 
-int l_effect_idToCb = 0;
+int l_effect_idToCb = LUA_NOREF;
 
 void l_effectFlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff) {
 	int id = eff->EffectID;

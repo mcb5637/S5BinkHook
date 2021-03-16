@@ -1414,15 +1414,6 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler;
 };
 
-struct shok_GGL_CGLGameLogic : shok_object {
-	PADDINGI(9)
-public:
-	shok_GGL_CPlayerStatus** players;
-public:
-
-	shok_GGL_CPlayerStatus* GetPlayer(int i);
-};
-
 #define shok_vtp_BB_CEvent (void*)0x762114
 struct shok_BB_CEvent : shok_object {
 	int EventTypeId;
@@ -1535,6 +1526,71 @@ private:
 public:
 	void HackPostEvent();
 };
+
+
+
+struct shok_technologyRequirementEType {
+	int EntityType;
+	int Amount;
+};
+struct shok_technologyRequirementTech {
+	int TecType;
+	int TecCategoryType;
+};
+struct shok_technologyRequirementUCat {
+	int UpgradeCategory;
+	int Amount;
+};
+struct shok_technologyModifier {
+	float Value;
+	PADDINGI(1)
+	char Operator;
+	PADDING(3)
+};
+
+struct shok_technology {
+	PADDINGI(1)
+	float TimeToResearch;
+	PADDINGI(1)
+	shok_costInfo ResourceCosts;
+	int RequiredTecConditions;
+	vector_padding
+	std::vector<shok_technologyRequirementTech, shok_allocator<shok_technologyRequirementTech>> TecConditions;
+	int RequiredEntityConditions;
+	vector_padding
+	std::vector<shok_technologyRequirementEType, shok_allocator<shok_technologyRequirementEType>> EntityConditions;
+	PADDINGI(5)
+	int RequiredUpgradeCategoryConditions;
+	vector_padding
+	std::vector<shok_technologyRequirementUCat, shok_allocator<shok_technologyRequirementUCat>> UpgradeCategoryConditions;
+	PADDINGI(7)
+	shok_technologyModifier ExplorationModifier;
+	PADDINGI(5)
+	shok_technologyModifier SpeedModifier;
+	PADDINGI(13)
+	shok_technologyModifier DamageModifier;
+	PADDINGI(13)
+	shok_technologyModifier RangeModifier;
+	PADDINGI(13)
+	shok_technologyModifier ArmorModifier;
+};
+
+struct shok_GGL_CGLGameLogic_TechList {
+	vector_padding
+	std::vector<shok_technology*, shok_allocator<shok_technology*>> TechList;
+};
+
+struct shok_GGL_CGLGameLogic : shok_object {
+	PADDINGI(9)
+	shok_GGL_CPlayerStatus** players;
+	PADDINGI(2)
+	shok_GGL_CGLGameLogic_TechList* TechList;
+public:
+
+	shok_GGL_CPlayerStatus* GetPlayer(int i);
+	shok_technology* GetTech(int i);
+};
+
 
 // global funcs
 extern shok_EGL_CGLEEntity* (_stdcall *shok_eid2obj)(int id);

@@ -44,7 +44,6 @@ function CppLogic.Effect.IsValidEffect(id) end
 -- @return effect id
 function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback) end
 
-
 --- sets high precision FPU (gets reset on every API call, so call id directly before your calculations)
 function CppLogic.Memory.SetFPU() end
 
@@ -57,6 +56,28 @@ function CppLogic.Logic.ReloadCutscene(path) end
 -- @return animation id
 function CppLogic.Logic.GetAnimIdFromName(anim) end
 
+--- the damage factor between a damageclass and an armorclass.
+-- @param dmgclass damageclass
+-- @param armorclass armorclass
+-- @return factor
+function CppLogic.Logic.GetDamageFactor(dmgclass, armorclass) end
+--- the damage factor between a damageclass and an armorclass.
+-- @param dmgclass damageclass
+-- @param armorclass armorclass
+-- @param fac factor
+function CppLogic.Logic.SetDamageFactor(dmgclass, armorclass, fac) end
+
+--- the tick where this players payday got startet (-1 if inactive).
+-- (you can get the current tick via Logic.GetCurrentTurn() ).
+-- @param p player
+-- @return tick
+function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
+--- the tick where this players payday got startet (-1 if inactive).
+-- (you can get the current tick via Logic.GetCurrentTurn() ).
+-- if you disable it (via -1) it gets immediately restarted has a worker or leader on the map.
+-- @param p player
+-- @param t tick
+function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
 
 --- compiles a lua chunk
 -- @param code to compile, sourcecode or binary
@@ -68,7 +89,6 @@ function CppLogic.API.Eval(code) end
 -- @param str the string to log
 function CppLogic.API.Log(str) end
 
-
 --- deals damage to a target.
 -- calls respective hurt entity trigger.
 -- @param target entity to be damaged
@@ -76,6 +96,25 @@ function CppLogic.API.Log(str) end
 -- @param attacker entity dealing the damage (gets xp from kill, statistics...), default 0
 function CppLogic.Combat.DealDamage(target, damage, attacker) end
 
+--- deals damage in an area.
+-- if attackerId (or player) are set, damages only targets hostile to them.
+-- if dmgclass not set, it gets ignored in the damage calculation.
+-- damage gets reduced, the furher away from impact the target is.
+-- @param attackerId attacking entity (optional, 0 if not used)
+-- @param x X coorinate of center
+-- @param y Y coorinate of center
+-- @param r range of damage dealt
+-- @param dmg damage
+-- @param player attacking player (optional, 0/nil if not used)
+-- @param dmgclass damageclass (optional, 0/nil if not used)
+function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass) end
+
+--- enables AoE projectile fix.
+-- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
+function CppLogic.Combat.EnableAoEProjectileFix() end
+--- disables AoE projectile fix.
+-- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
+function CppLogic.Combat.DisableAoEProjectileFix() end
 
 --- iterates over all entities that match a predicate.
 -- perfect to use with for loop.
@@ -98,7 +137,6 @@ function CppLogic.Entity.EntityIteratorTableize(pred) end
 -- @param pred predicate
 -- @return bool
 function CppLogic.Entity.CheckPredicate(id, pred) end
-
 
 --- creates a predicate that performs an and of multiple predicates.
 -- @param ... predicates
@@ -177,6 +215,20 @@ function CppLogic.Entity.Predicates.InRect(x1, y1, x2, y2) end
 -- @return predicate userdata
 function CppLogic.Entity.Predicates.IsVisible() end
 
+--- entity task list index.
+-- @param id entity
+-- @return index
+function CppLogic.Entity.GetTaskListIndex(id) end
+--- entity task list index.
+-- @param id entity
+-- @param i index
+function CppLogic.Entity.SetTaskListIndex(id, i) end
+
+--- moving entity speed factor (set via logic).
+-- @param id entity
+-- @return factor
+function CppLogic.Entity.MovingEntityGetSpeedFactor(id) end
+
 --- entity scale.
 -- @param id entity
 -- @return scale
@@ -185,6 +237,11 @@ function CppLogic.Entity.GetScale(id) end
 -- @param id entity
 -- @param s scale
 function CppLogic.Entity.SetScale(id, s) end
+
+--- entity check for soldier. (asserts if no entity).
+-- @param id entity
+-- @return is entity of soldier type
+function CppLogic.Entity.IsSoldier(id) end
 
 --- moving entity target pos (best to change directly after a move command).
 -- @param id entity
@@ -195,6 +252,34 @@ function CppLogic.Entity.MovingEntityGetTargetPos(id) end
 -- @param p position table, with optional rotation
 function CppLogic.Entity.MovingEntitySetTargetPos(id, p) end
 
+--- entity exploration.
+-- @param id entity
+-- @return exploration
+function CppLogic.Entity.GetExploration(id) end
+
+--- entity speed.
+-- @param id entity
+-- @return speed
+function CppLogic.Entity.GetSpeed(id) end
+
+--- entity max range (including tech boni).
+-- @param id entity
+-- @return max range
+function CppLogic.Entity.GetAutoAttackMaxRange(id) end
+
+--- entity model, from model override or entitytype model 0.
+-- @param id entity
+-- @return model
+function CppLogic.Entity.GetModel(id) end
+
+--- limited lifespan remaining seconds.
+-- @param id entity
+-- @return duration
+function CppLogic.Entity.GetLimitedLifespanRemaining(id) end
+--- limited lifespan remaining seconds.
+-- @param id entity
+-- @param t duration
+function CppLogic.Entity.GetLimitedLifespanRemaining(id, t) end
 
 --- gets the leader of a soldier.
 -- @param id id of the solder
@@ -212,6 +297,15 @@ function CppLogic.Entity.Settler.GetBaseMovementSpeed(id) end
 -- @param rotate optional new rotation speed
 function CppLogic.Entity.Settler.SetBaseMovementSpeed(id, move, rotate) end
 
+--- settler current work time.
+-- @param id entity
+-- @return work time
+function CppLogic.Entity.Settler.WorkerGetCurrentWorkTime(id) end
+--- settler current work time.
+-- @param id entity
+-- @param wt work time
+function CppLogic.Entity.Settler.WorkerSetCurrentWorkTime(id, wt) end
+
 --- settler overhead widget.
 -- 0->only name, 1->name+bar(anything), 2->worker, 3->name+bar(leader), 4->nothing.
 -- @param id settler
@@ -222,51 +316,6 @@ function CppLogic.Entity.Settler.GetOverheadWidget(id) end
 -- @param id settler
 -- @param wid widget code
 function CppLogic.Entity.Settler.SetOverheadWidget(id, wid) end
-
-
---- a leaders experience.
--- @param id leader
--- @return xp
-function CppLogic.Entity.Leader.GetExperience(id) end
---- a leaders experience
--- @param id leader
--- @param xp xp
-function CppLogic.Entity.Leader.SetExperience(id, xp) end
-
---- a leaders troop health (hp of all soldiers summed up).
--- -1 when not yet set (calculate in lua as all soldiers at full hp).
--- @param id leader
--- @return hp
-function CppLogic.Entity.Leader.GetTroopHealth(id) end
---- a leaders troop health (does not kill soldiers when decreasing).
--- @param id leader
--- @param hp hp
-function CppLogic.Entity.Leader.SetTroopHealth(id, hp) end
-
-
---- building height (& construction progress).
--- @param id entity
--- @return height
-function CppLogic.Entity.Building.GetHeight(id) end
---- building height (& construction progress).
--- @param id entity
--- @param h height
-function CppLogic.Entity.Building.SetHeight(id, h) end
-
---- barracks autofill status.
--- @param id barracks entity
--- @return bool active
-function CppLogic.Entity.Building.GetBarracksAutoFillActive(id) end
-
-
---- the soldier type of a leader type
--- @param ty leader type
--- @return soldier type
-function CppLogic.EntityType.Settler.LeaderTypeGetSoldierType(ty) end
---- the soldier type of a leader type
--- @param leaderTy leader type
--- @param soldierTy soldier type
-function CppLogic.EntityType.Settler.LeaderTypeSetSoldierType(leaderTy, soldierTy) end
 
 --- camouflage duration left (ari: seconds, thief: invis ? 15 : 0).
 -- @param id entity
@@ -295,32 +344,67 @@ function CppLogic.Entity.Settler.HeroGetResurrectionTime(id) end
 -- @param t duration
 function CppLogic.Entity.Settler.HeroSetResurrectionTime(id, t) end
 
---- limited lifespan remaining seconds.
+--- resurrect a hero.
 -- @param id entity
--- @return duration
-function CppLogic.Entity.GetLimitedLifespanRemaining(id) end
---- limited lifespan remaining seconds.
+function CppLogic.Entity.Settler.HeroResurrect(id) end
+
+--- set thief stolen resources.
 -- @param id entity
--- @param t duration
-function CppLogic.Entity.GetLimitedLifespanRemaining(id, t) end
+-- @param ty res type or 0
+-- @param am amount (optional)
+function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
 
---- limited lifespan duration seconds.
--- @param ty entitytype
--- @return duration
-function CppLogic.EntityType.GetLimitedLifespanDuration(ty) end
---- limited lifespan duration seconds.
--- @param ty entitytype
--- @param t duration
-function CppLogic.EntityType.SetLimitedLifespanDuration(ty, t) end
+--- a leaders experience.
+-- @param id leader
+-- @return xp
+function CppLogic.Entity.Leader.GetExperience(id) end
+--- a leaders experience
+-- @param id leader
+-- @param xp xp
+function CppLogic.Entity.Leader.SetExperience(id, xp) end
 
---- leader type upkeep per payday.
--- @param ty entitytype
--- @return upkeep
-function CppLogic.EntityType.Settler.LeaderTypeGetUpkeep(ty) end
---- leader type upkeep per payday.
--- @param ty entitytype
--- @param u upkeep
-function CppLogic.EntityType.Settler.LeaderTypeSetUpkeep(ty, u) end
+--- a leaders troop health (hp of all soldiers summed up).
+-- -1 when not yet set (calculate in lua as all soldiers at full hp).
+-- @param id leader
+-- @return hp
+function CppLogic.Entity.Leader.GetTroopHealth(id) end
+--- a leaders troop health (does not kill soldiers when decreasing).
+-- @param id leader
+-- @param hp hp
+function CppLogic.Entity.Leader.SetTroopHealth(id, hp) end
+
+--- building height (& construction progress).
+-- @param id entity
+-- @return height
+function CppLogic.Entity.Building.GetHeight(id) end
+--- building height (& construction progress).
+-- @param id entity
+-- @param h height
+function CppLogic.Entity.Building.SetHeight(id, h) end
+
+--- barracks autofill status.
+-- @param id barracks entity
+-- @return bool active
+function CppLogic.Entity.Building.GetBarracksAutoFillActive(id) end
+
+--- market trade data.
+-- progress is buy amount + sell amount
+-- @param id entity
+-- @return buy type
+-- @return sell type
+-- @return buy amount
+-- @return sell amount
+-- @return progress amount
+function CppLogic.Entity.Building.MarketGetCurrentTradeData(id) end
+--- market trade data.
+-- progress is buy amount + sell amount
+-- @param id entity
+-- @param bty buy type (optional)
+-- @param sty sell type (optional)
+-- @param bam buy amount (optional)
+-- @param sam sell amount (optional)
+-- @param pam progress amount (optional)
+function CppLogic.Entity.Building.MarketSetCurrentTradeData(id, bty, sty, bam, sam, pam) end
 
 --- entity type max health.
 -- @param ty entitytype
@@ -349,16 +433,14 @@ function CppLogic.EntityType.GetSuspendedAnimation(ty) end
 -- @param a anim
 function CppLogic.EntityType.GetSuspendedAnimation(ty, a) end
 
---- leader type regeneration.
+--- limited lifespan duration seconds.
 -- @param ty entitytype
--- @return regen health
--- @return regen seconds
-function CppLogic.EntityType.Settler.LeaderTypeGetRegeneration(ty) end
---- leader type regeneration.
+-- @return duration
+function CppLogic.EntityType.GetLimitedLifespanDuration(ty) end
+--- limited lifespan duration seconds.
 -- @param ty entitytype
--- @param hp regen health (optional)
--- @param t regen seconds (optional)
-function CppLogic.EntityType.Settler.LeaderTypeSetRegeneration(ty, hp, t) end
+-- @param t duration
+function CppLogic.EntityType.SetLimitedLifespanDuration(ty, t) end
 
 --- damage and damageclass of autoattacks of an entity type.
 -- @param ty entitytype
@@ -404,6 +486,74 @@ function CppLogic.EntityType.GetAutoAttackMissChance(ty) end
 -- @return min range (ignored for autocannons) (optional)
 function CppLogic.EntityType.SetAutoAttackMissChance(ty, maxrange, minrange) end
 
+--- settler or building type armor and armorclass.
+-- @param ty entitytype
+-- @return armor
+-- @return armorclass
+function CppLogic.EntityType.GetArmor(ty) end
+--- settler or building type armor and armorclass.
+-- @param ty entitytype
+-- @param ar armor
+-- @param acl armorclass
+function CppLogic.EntityType.GetArmor(ty, ar, acl) end
+
+--- entity type models.
+-- most entitytypes use only one model, but some use the others as well.
+-- @param ty entitytype
+-- @return model 0
+-- @return model 1
+-- @return model 2
+-- @return model 3
+function CppLogic.EntityType.GetModels(ty) end
+--- entity type models.
+-- most entitytypes use only one model, but some use the others as well.
+-- @param ty entitytype
+-- @param m0 model 0 (optional)
+-- @param m1 model 1 (optional)
+-- @param m2 model 2 (optional)
+-- @param m3 model 3 (optional)
+function CppLogic.EntityType.GetModels(ty, m0, m1, m2, m3) end
+
+--- tree data to replace a tree with a resourcetree.
+-- @param ty entitytype
+-- @return resource entitytype
+-- @return resource amount
+function CppLogic.EntityType.ResourceTreeTypeGetData(ty) end
+--- tree data to replace a tree with a resourcetree.
+-- @param ty entitytype
+-- @param rety resource entitytype
+-- @param ram resource amount
+function CppLogic.EntityType.ResourceTreeTypeSetData(ty, rety, ram) end
+
+--- the soldier type of a leader type
+-- @param ty leader type
+-- @return soldier type
+function CppLogic.EntityType.Settler.LeaderTypeGetSoldierType(ty) end
+--- the soldier type of a leader type
+-- @param leaderTy leader type
+-- @param soldierTy soldier type
+function CppLogic.EntityType.Settler.LeaderTypeSetSoldierType(leaderTy, soldierTy) end
+
+--- leader type upkeep per payday.
+-- @param ty entitytype
+-- @return upkeep
+function CppLogic.EntityType.Settler.LeaderTypeGetUpkeep(ty) end
+--- leader type upkeep per payday.
+-- @param ty entitytype
+-- @param u upkeep
+function CppLogic.EntityType.Settler.LeaderTypeSetUpkeep(ty, u) end
+
+--- leader type regeneration.
+-- @param ty entitytype
+-- @return regen health
+-- @return regen seconds
+function CppLogic.EntityType.Settler.LeaderTypeGetRegeneration(ty) end
+--- leader type regeneration.
+-- @param ty entitytype
+-- @param hp regen health (optional)
+-- @param t regen seconds (optional)
+function CppLogic.EntityType.Settler.LeaderTypeSetRegeneration(ty, hp, t) end
+
 --- range in which enemies get attacked by this leader type.
 -- @param ty entitytype
 -- @return range
@@ -412,15 +562,6 @@ function CppLogic.EntityType.Settler.LeaderTypeGetAutoAggressiveRange(ty) end
 -- @param ty entitytype
 -- @param r range
 function CppLogic.EntityType.Settler.LeaderTypeSetAutoAggressiveRange(ty, r) end
-
---- number of settlers this building (villagecenter) supports.
--- @param ty entitytype
--- @return slots
-function CppLogic.EntityType.Building.GetVCAttractionSlotsProvided(ty) end
---- number of settlers this building (villagecenter) supports.
--- @param ty entitytype
--- @param s slots
-function CppLogic.EntityType.Building.SetVCAttractionSlotsProvided(ty, s) end
 
 --- stealing time and resource amounts of a thief type.
 -- @param ty entitytype
@@ -450,34 +591,6 @@ function CppLogic.EntityType.Settler.GetAbilityDataCamouflage(ty) end
 -- @param rech recharge time
 function CppLogic.EntityType.Settler.SetAbilityDataCamouflage(ty, dur, dran, rech) end
 
---- settler or building type armor and armorclass.
--- @param ty entitytype
--- @return armor
--- @return armorclass
-function CppLogic.EntityType.GetArmor(ty) end
---- settler or building type armor and armorclass.
--- @param ty entitytype
--- @param ar armor
--- @param acl armorclass
-function CppLogic.EntityType.GetArmor(ty, ar, acl) end
-
---- entity type models.
--- most entitytypes use only one model, but some use the others as well.
--- @param ty entitytype
--- @return model 0
--- @return model 1
--- @return model 2
--- @return model 3
-function CppLogic.EntityType.GetModels(ty) end
---- entity type models.
--- most entitytypes use only one model, but some use the others as well.
--- @param ty entitytype
--- @param m0 model 0 (optional)
--- @param m1 model 1 (optional)
--- @param m2 model 2 (optional)
--- @param m3 model 3 (optional)
-function CppLogic.EntityType.GetModels(ty, m0, m1, m2, m3) end
-
 --- entitytytpe circular attack ability data.
 -- @param ty entitytype
 -- @return damage
@@ -492,20 +605,6 @@ function CppLogic.EntityType.Settler.GetAbilityDataCircularAttack(ty) end
 -- @param ra range
 -- @param rech recharge time
 function CppLogic.EntityType.Settler.SetAbilityDataCircularAttack(ty, dmg, dcl, ra, rech) end
-
---- entity task list index.
--- @param id entity
--- @return index
-function CppLogic.Entity.GetTaskListIndex(id) end
---- entity task list index.
--- @param id entity
--- @param i index
-function CppLogic.Entity.SetTaskListIndex(id, i) end
-
---- moving entity speed factor (set via logic).
--- @param id entity
--- @return factor
-function CppLogic.Entity.MovingEntityGetSpeedFactor(id) end
 
 --- entitytytpe shuriken ability data.
 -- @param ty entitytype
@@ -560,26 +659,6 @@ function CppLogic.EntityType.Settler.GetAbilityDataRangedEffect(ty) end
 -- @param rech recharge time
 function CppLogic.EntityType.Settler.SetAbilityDataRangedEffect(ty, dmgfac, armfac, hpfac, ran, rech) end
 
---- tree data to replace a tree with a resourcetree.
--- @param ty entitytype
--- @return resource entitytype
--- @return resource amount
-function CppLogic.EntityType.ResourceTreeTypeGetData(ty) end
---- tree data to replace a tree with a resourcetree.
--- @param ty entitytype
--- @param rety resource entitytype
--- @param ram resource amount
-function CppLogic.EntityType.ResourceTreeTypeSetData(ty, rety, ram) end
-
---- settler current work time.
--- @param id entity
--- @return work time
-function CppLogic.Entity.Settler.WorkerGetCurrentWorkTime(id) end
---- settler current work time.
--- @param id entity
--- @param wt work time
-function CppLogic.Entity.Settler.WorkerSetCurrentWorkTime(id, wt) end
-
 --- settler type fearless.
 -- @param ty entitytype
 -- @return fearless
@@ -588,30 +667,6 @@ function CppLogic.EntityType.Settler.GetFearless(ty) end
 -- @param ty entitytype
 -- @param fl fearless
 function CppLogic.EntityType.Settler.SetFearless(ty, fl) end
-
---- market trade data.
--- progress is buy amount + sell amount
--- @param id entity
--- @return buy type
--- @return sell type
--- @return buy amount
--- @return sell amount
--- @return progress amount
-function CppLogic.Entity.Building.MarketGetCurrentTradeData(id) end
---- market trade data.
--- progress is buy amount + sell amount
--- @param id entity
--- @param bty buy type (optional)
--- @param sty sell type (optional)
--- @param bam buy amount (optional)
--- @param sam sell amount (optional)
--- @param pam progress amount (optional)
-function CppLogic.Entity.Building.MarketSetCurrentTradeData(id, bty, sty, bam, sam, pam) end
-
---- entity check for soldier. (asserts if no entity).
--- @param id entity
--- @return is entity of soldier type
-function CppLogic.Entity.IsSoldier(id) end
 
 --- settler type cost.
 -- @param ty entitytype
@@ -622,6 +677,15 @@ function CppLogic.EntityType.Settler.GetCost(ty) end
 -- @param c cost info table
 -- @param ignoreZeroes should zeroes get ignored (optional)
 function CppLogic.EntityType.Settler.SetCost(ty, c, ignoreZeroes) end
+
+--- number of settlers this building (villagecenter) supports.
+-- @param ty entitytype
+-- @return slots
+function CppLogic.EntityType.Building.GetVCAttractionSlotsProvided(ty) end
+--- number of settlers this building (villagecenter) supports.
+-- @param ty entitytype
+-- @param s slots
+function CppLogic.EntityType.Building.SetVCAttractionSlotsProvided(ty, s) end
 
 --- building type construction cost.
 -- @param ty entitytype
@@ -642,79 +706,6 @@ function CppLogic.EntityType.Building.GetUpradeCost(ty) end
 -- @param c cost info table
 -- @param ignoreZeroes should zeroes get ignored (optional)
 function CppLogic.EntityType.Building.SetUpradeCost(ty, c, ignoreZeroes) end
-
---- resurrect a hero.
--- @param id entity
-function CppLogic.Entity.Settler.HeroResurrect(id) end
-
---- set thief stolen resources.
--- @param id entity
--- @param ty res type or 0
--- @param am amount (optional)
-function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
-
---- entity max range (including tech boni).
--- @param id entity
--- @return max range
-function CppLogic.Entity.GetAutoAttackMaxRange(id) end
-
---- entity model, from model override or entitytype model 0.
--- @param id entity
--- @return model
-function CppLogic.Entity.GetModel(id) end
-
---- the damage factor between a damageclass and an armorclass.
--- @param dmgclass damageclass
--- @param armorclass armorclass
--- @return factor
-function CppLogic.Logic.GetDamageFactor(dmgclass, armorclass) end
---- the damage factor between a damageclass and an armorclass.
--- @param dmgclass damageclass
--- @param armorclass armorclass
--- @param fac factor
-function CppLogic.Logic.SetDamageFactor(dmgclass, armorclass, fac) end
-
---- the tick where this players payday got startet (-1 if inactive).
--- (you can get the current tick via Logic.GetCurrentTurn() ).
--- @param p player
--- @return tick
-function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
---- the tick where this players payday got startet (-1 if inactive).
--- (you can get the current tick via Logic.GetCurrentTurn() ).
--- if you disable it (via -1) it gets immediately restarted has a worker or leader on the map.
--- @param p player
--- @param t tick
-function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
-
---- entity exploration.
--- @param id entity
--- @return exploration
-function CppLogic.Entity.GetExploration(id) end
-
---- entity speed.
--- @param id entity
--- @return speed
-function CppLogic.Entity.GetSpeed(id) end
-
---- deals damage in an area.
--- if attackerId (or player) are set, damages only targets hostile to them.
--- if dmgclass not set, it gets ignored in the damage calculation.
--- damage gets reduced, the furher away from impact the target is.
--- @param attackerId attacking entity (optional, 0 if not used)
--- @param x X coorinate of center
--- @param y Y coorinate of center
--- @param r range of damage dealt
--- @param dmg damage
--- @param player attacking player (optional, 0/nil if not used)
--- @param dmgclass damageclass (optional, 0/nil if not used)
-function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass) end
-
---- enables AoE projectile fix.
--- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
-function CppLogic.Combat.EnableAoEProjectileFix() end
---- disables AoE projectile fix.
--- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
-function CppLogic.Combat.DisableAoEProjectileFix() end
 
 --- tech research time and costs.
 -- @param tid tech id

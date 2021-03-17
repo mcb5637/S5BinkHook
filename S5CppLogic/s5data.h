@@ -32,10 +32,6 @@ extern void* (__cdecl* shok_new)(size_t t);
 extern void(__cdecl* shok_free)(void* p);
 extern void (*shok_logString)(const char* format, ...);
 
-struct shok_vector {
-	int vtable, start, end, encCap;
-};
-
 template <class T>
 struct shok_allocator {
 	typedef T value_type;
@@ -1414,6 +1410,7 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler;
 };
 
+// net events
 #define shok_vtp_BB_CEvent (void*)0x762114
 struct shok_BB_CEvent : shok_object {
 	int EventTypeId;
@@ -1528,7 +1525,7 @@ public:
 };
 
 
-
+// techs
 struct shok_technologyRequirementEType {
 	int EntityType;
 	int Amount;
@@ -1580,6 +1577,7 @@ struct shok_GGL_CGLGameLogic_TechList {
 	std::vector<shok_technology*, shok_allocator<shok_technology*>> TechList;
 };
 
+// gamelogic
 struct shok_GGL_CGLGameLogic : shok_object {
 	PADDINGI(9)
 	shok_GGL_CPlayerStatus** players;
@@ -1639,7 +1637,7 @@ extern shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj;
 extern lua_State** shok_luastate_game;
 
 
-
+// own variables/funcs
 void logAdress(const char* name, void* adr);
 
 extern void(*CreateEffectHookCallback)(int id, void* ret);

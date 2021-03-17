@@ -147,6 +147,23 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i) {
 	lua_pop(L, 2);
 }
 
+void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i) {
+	i = lua_abs_index(L, i);
+	lua_pushstring(L, "X");
+	lua_gettable(L, i);
+	float x = luaL_checkfloat(L, -1);
+	lua_pushstring(L, "Y");
+	lua_gettable(L, i);
+	float y = luaL_checkfloat(L, -1);
+	lua_pushstring(L, "r");
+	lua_gettable(L, i);
+	float r = luaL_checkfloat(L, -1);
+	p.X = x;
+	p.Y = y;
+	p.r = r;
+	lua_pop(L, 3);
+}
+
 constexpr int shok_clay = 11;
 constexpr int shok_gold = 1;
 constexpr int shok_iron = 7;

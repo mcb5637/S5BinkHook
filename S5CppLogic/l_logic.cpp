@@ -499,7 +499,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushstring(L, "Position");
 		lua_rawget(L, -2);
 		if (lua_istable(L, -1))
-			luaext_checkPos(L, e->Position, -1);
+			luaext_checkPosRot(L, e->Position, -1);
 		else
 			allRead = false;
 		lua_pop(L, 1);

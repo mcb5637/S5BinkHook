@@ -602,6 +602,15 @@ int l_entityGetSpeed(lua_State* L) {
 	return 1;
 }
 
+int l_settlerIsVisible(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
+	if (c != nullptr) {
+		return c->InvisibilityRemaining <= 0;
+	}
+	return true;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -664,6 +673,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "WorkerSetCurrentWorkTime", &l_settlerSetWorkerCurrentWorkTime);
 	luaext_registerFunc(L, "HeroResurrect", &l_heroResurrect);
 	luaext_registerFunc(L, "ThiefSetStolenResourceInfo", &l_settlerThiefSetStolenResourceInfo);
+	luaext_registerFunc(L, "IsVisible", &l_settlerIsVisible);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

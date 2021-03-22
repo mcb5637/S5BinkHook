@@ -552,6 +552,23 @@ int l_buildingSetCostUpgr(lua_State* L) {
 	return 0;
 }
 
+int l_entityTypeGetBlocking(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	lua_newtable(L);
+	int i = 1;
+	for (shok_AARect r : t->LogicProps->BlockingArea) {
+		lua_newtable(L);
+		luaext_pushPos(L, r.low);
+		lua_rawseti(L, -2, 1);
+		luaext_pushPos(L, r.high);
+		lua_rawseti(L, -2, 2);
+		lua_rawseti(L, -2, i);
+		i++;
+	}
+	lua_pushnumber(L, t->LogicProps->NumBlockedPoints);
+	return 2;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -577,6 +594,7 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetModels", &l_entityTySetModels);
 	luaext_registerFunc(L, "ResourceTreeTypeGetData", &l_entityTyGetResourceTreeData);
 	luaext_registerFunc(L, "ResourceTreeTypeSetData", &l_entityTySetResourceTreeData);
+	luaext_registerFunc(L, "GetBlocking", &l_entityTypeGetBlocking);
 
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);

@@ -125,12 +125,12 @@ function CppLogic.Combat.DisableAoEProjectileFix() end
 -- @return nextEntity func
 -- @return iteratorStatus
 -- @return nil
-function CppLogic.Entity.EntityIterator(pred) end
+function CppLogic.Entity.EntityIterator(...) end
 
 --- gets all entities that match a predicate as a table.
 -- @param pred predicate userdata
 -- @return table of ids
-function CppLogic.Entity.EntityIteratorTableize(pred) end
+function CppLogic.Entity.EntityIteratorTableize(...) end
 
 --- checks an entity agains a predicate.
 -- @param id entity
@@ -354,6 +354,10 @@ function CppLogic.Entity.Settler.HeroResurrect(id) end
 -- @param am amount (optional)
 function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
 
+--- checks visibility of an entity.
+-- @param id entity
+function CppLogic.Entity.Settler.IsVisible(id) end
+
 --- a leaders experience.
 -- @param id leader
 -- @return xp
@@ -524,6 +528,12 @@ function CppLogic.EntityType.ResourceTreeTypeGetData(ty) end
 -- @param rety resource entitytype
 -- @param ram resource amount
 function CppLogic.EntityType.ResourceTreeTypeSetData(ty, rety, ram) end
+
+--- tree data to replace a tree with a resourcetree.
+-- @param ty entitytype
+-- @return blocking table
+-- @return num blocked points
+function CppLogic.EntityType.GetBlocking(ty) end
 
 --- the soldier type of a leader type
 -- @param ty leader type

@@ -12,6 +12,7 @@
 #include "l_entitytype.h"
 #include "l_logic.h"
 #include "l_tech.h"
+#include "l_ua.h"
 
 int __cdecl test(lua_State* L) {
     shok_technologyModifier s = shok_technologyModifier();
@@ -22,8 +23,6 @@ int __cdecl test(lua_State* L) {
 }
 
 extern "C" void __cdecl install(lua_State * L) {
-    lua_pushboolean(L, TRUE);
-    lua_setglobal(L, "hooked");
     lua_pushcfunction(L, &test);
     lua_setglobal(L, "test");
 
@@ -68,6 +67,11 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_pushstring(L, "Technology");
     lua_newtable(L);
     l_tech_init(L);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "UA");
+    lua_newtable(L);
+    l_ua_init(L);
     lua_rawset(L, -3);
 
     lua_rawset(L, LUA_GLOBALSINDEX);

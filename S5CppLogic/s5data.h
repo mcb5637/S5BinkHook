@@ -1611,6 +1611,8 @@ extern void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, sh
 
 extern shok_GGUI_CManager*(* shok_GetGuiManager)();
 
+extern bool(_cdecl* shok_entityIsDead)(int id);
+
 // global objects
 extern shok_ECS_CManager*** shok_ECS_CManagerObject;
 

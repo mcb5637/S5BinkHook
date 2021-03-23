@@ -139,3 +139,11 @@ struct EntityIteratorPredicateIsVisible : EntityIteratorPredicate {
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
 };
+
+struct EntityIteratorPredicateOfUpgradeCategory : EntityIteratorPredicate {
+private:
+	int category;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	EntityIteratorPredicateOfUpgradeCategory(int cat);
+};

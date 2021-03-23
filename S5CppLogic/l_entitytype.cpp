@@ -569,6 +569,102 @@ int l_entityTypeGetBlocking(lua_State* L) {
 	return 2;
 }
 
+int l_entityTyGetArmorModifierTechs(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	if (t->IsSettlerType()) {
+		shok_GGL_CGLSettlerProps* s = (shok_GGL_CGLSettlerProps*)t->LogicProps;
+		lua_newtable(L);
+		int c = 1;
+		for (int i : s->ModifyArmor.TechList) {
+			lua_pushnumber(L, i);
+			lua_rawseti(L, -2, c);
+			c++;
+		}
+		return 1;
+	}
+	if (t->IsBuildingType()) {
+		shok_GGL_CGLBuildingProps* s = (shok_GGL_CGLBuildingProps*)t->LogicProps;
+		lua_newtable(L);
+		int c = 1;
+		for (int i : s->ModifyArmor.TechList) {
+			lua_pushnumber(L, i);
+			lua_rawseti(L, -2, c);
+			c++;
+		}
+		return 1;
+	}
+	return luaL_error(L, "no settler or building entity type at 1");
+}
+
+int l_entityTyGetExploModifierTechs(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	if (t->IsSettlerType()) {
+		shok_GGL_CGLSettlerProps* s = (shok_GGL_CGLSettlerProps*)t->LogicProps;
+		lua_newtable(L);
+		int c = 1;
+		for (int i : s->ModifyExploration.TechList) {
+			lua_pushnumber(L, i);
+			lua_rawseti(L, -2, c);
+			c++;
+		}
+		return 1;
+	}
+	if (t->IsBuildingType()) {
+		shok_GGL_CGLBuildingProps* s = (shok_GGL_CGLBuildingProps*)t->LogicProps;
+		lua_newtable(L);
+		int c = 1;
+		for (int i : s->ModifyExploration.TechList) {
+			lua_pushnumber(L, i);
+			lua_rawseti(L, -2, c);
+			c++;
+		}
+		return 1;
+	}
+	return luaL_error(L, "no settler or building entity type at 1");
+}
+
+int l_entityTyGetDamageModifierTechs(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsSettlerType(), "no settler type at 1");
+	shok_GGL_CGLSettlerProps* s = (shok_GGL_CGLSettlerProps*)t->LogicProps;
+	lua_newtable(L);
+	int c = 1;
+	for (int i : s->ModifyDamage.TechList) {
+		lua_pushnumber(L, i);
+		lua_rawseti(L, -2, c);
+		c++;
+	}
+	return 1;
+}
+
+int l_entityTyGetRangeModifierTechs(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsSettlerType(), "no settler type at 1");
+	shok_GGL_CGLSettlerProps* s = (shok_GGL_CGLSettlerProps*)t->LogicProps;
+	lua_newtable(L);
+	int c = 1;
+	for (int i : s->ModifyMaxRange.TechList) {
+		lua_pushnumber(L, i);
+		lua_rawseti(L, -2, c);
+		c++;
+	}
+	return 1;
+}
+
+int l_entityTyGetSpeedModifierTechs(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsSettlerType(), "no settler type at 1");
+	shok_GGL_CGLSettlerProps* s = (shok_GGL_CGLSettlerProps*)t->LogicProps;
+	lua_newtable(L);
+	int c = 1;
+	for (int i : s->ModifySpeed.TechList) {
+		lua_pushnumber(L, i);
+		lua_rawseti(L, -2, c);
+		c++;
+	}
+	return 1;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -595,6 +691,8 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "ResourceTreeTypeGetData", &l_entityTyGetResourceTreeData);
 	luaext_registerFunc(L, "ResourceTreeTypeSetData", &l_entityTySetResourceTreeData);
 	luaext_registerFunc(L, "GetBlocking", &l_entityTypeGetBlocking);
+	luaext_registerFunc(L, "GetArmorModifierTechs", &l_entityTyGetArmorModifierTechs);
+	luaext_registerFunc(L, "GetExplorationModifierTechs", &l_entityTyGetExploModifierTechs);
 
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);
@@ -622,6 +720,9 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetFearless", &l_settlerTySetFearless);
 	luaext_registerFunc(L, "GetCost", &l_settlerTyGetCost);
 	luaext_registerFunc(L, "SetCost", &l_settlerTySetCost);
+	luaext_registerFunc(L, "GetDamageModifierTechs", &l_entityTyGetDamageModifierTechs);
+	luaext_registerFunc(L, "GetMaxRangeModifierTechs", &l_entityTyGetRangeModifierTechs);
+	luaext_registerFunc(L, "GetSpeedModifierTechs", &l_entityTyGetSpeedModifierTechs);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");

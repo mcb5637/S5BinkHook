@@ -15,6 +15,7 @@ CppLogic.Entity.Building = {}
 CppLogic.EntityType = {}
 CppLogic.EntityType.Settler = {}
 CppLogic.Logic = {}
+CppLogic.Logic.UICommands = {}
 
 --- check if an effect is valid
 -- @param id effect id
@@ -79,6 +80,21 @@ function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
 -- @param t tick
 function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
 
+--- player kill statistics.
+-- @param p player
+-- @return numSettlerKilled
+-- @return numSettlerLost
+-- @return numBuildingKilled
+-- @return numBuildingLost
+function CppLogic.Logic.PlayerGetKillStatistics(p) end
+
+--- ui command callback.
+-- func parameters are (eventId, eventData)
+-- @param f func
+function CppLogic.Logic.UICommands.SetCallback(f) end
+--- ui command callback.
+function CppLogic.Logic.UICommands.UnSetCallback() end
+
 --- compiles a lua chunk
 -- @param code to compile, sourcecode or binary
 -- @return function to execute the compiled code, or error message
@@ -131,6 +147,11 @@ function CppLogic.Entity.EntityIterator(...) end
 -- @param pred predicate userdata
 -- @return table of ids
 function CppLogic.Entity.EntityIteratorTableize(...) end
+
+--- counts all entities that match a predicate as a table.
+-- @param pred predicate userdata
+-- @return c
+function CppLogic.Entity.EntityIteratorCount(...) end
 
 --- checks an entity agains a predicate.
 -- @param id entity
@@ -214,6 +235,11 @@ function CppLogic.Entity.Predicates.InRect(x1, y1, x2, y2) end
 --- creates a predicate that checks for ari or thieves invisibility.
 -- @return predicate userdata
 function CppLogic.Entity.Predicates.IsVisible() end
+
+--- creates a predicate that checks for an upgrade category (settler or building, as defined in txpe xml).
+-- @param ecat UpgradeCategory to check against
+-- @return predicate userdata
+function CppLogic.Entity.Predicates.OfUpgradeCategory(ecat) end
 
 --- entity task list index.
 -- @param id entity
@@ -501,6 +527,11 @@ function CppLogic.EntityType.GetArmor(ty) end
 -- @param acl armorclass
 function CppLogic.EntityType.GetArmor(ty, ar, acl) end
 
+--- settler or building type armor modifier techs.
+-- @param ty entitytype
+-- @return array of techs
+function CppLogic.EntityType.GetArmorModifierTechs(ty) end
+
 --- entity type models.
 -- most entitytypes use only one model, but some use the others as well.
 -- @param ty entitytype
@@ -534,6 +565,11 @@ function CppLogic.EntityType.ResourceTreeTypeSetData(ty, rety, ram) end
 -- @return blocking table
 -- @return num blocked points
 function CppLogic.EntityType.GetBlocking(ty) end
+
+--- settler or building type exploration modifier techs.
+-- @param ty entitytype
+-- @return array of techs
+function CppLogic.EntityType.GetExplorationModifierTechs(ty) end
 
 --- the soldier type of a leader type
 -- @param ty leader type
@@ -687,6 +723,21 @@ function CppLogic.EntityType.Settler.GetCost(ty) end
 -- @param c cost info table
 -- @param ignoreZeroes should zeroes get ignored (optional)
 function CppLogic.EntityType.Settler.SetCost(ty, c, ignoreZeroes) end
+
+--- settler or building type damage modifier techs.
+-- @param ty entitytype
+-- @return array of techs
+function CppLogic.EntityType.Settler.GetDamageModifierTechs(ty) end
+
+--- settler or building type max range modifier techs.
+-- @param ty entitytype
+-- @return array of techs
+function CppLogic.EntityType.Settler.GetMaxRangeModifierTechs(ty) end
+
+--- settler or building type speed modifier techs.
+-- @param ty entitytype
+-- @return array of techs
+function CppLogic.EntityType.Settler.GetSpeedModifierTechs(ty) end
 
 --- number of settlers this building (villagecenter) supports.
 -- @param ty entitytype

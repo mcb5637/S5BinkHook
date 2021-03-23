@@ -665,6 +665,17 @@ int l_netEventUnSetHook(lua_State* L) {
 }
 
 
+int l_playerGetKillStatistics(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	lua_pushnumber(L, p->NumberOfSettlersKilled);
+	lua_pushnumber(L, p->NumberOfSettlersLost);
+	lua_pushnumber(L, p->NumberOfBuildingsKilled);
+	lua_pushnumber(L, p->NumberOfBuildingsLost);
+	return 4;
+}
+
 void l_logic_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetDamageFactor", l_logicGetDamageModifier);
@@ -673,6 +684,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "GetAnimIdFromName", &l_logicGetAnimIdFromName);
 	luaext_registerFunc(L, "PlayerGetPaydayStartetTick", &l_playerGetPaydayStatus);
 	luaext_registerFunc(L, "PlayerSetPaydayStartetTick", &l_playerSetPaydayStatus);
+	luaext_registerFunc(L, "PlayerGetKillStatistics", &l_playerGetKillStatistics);
 
 
 	lua_pushstring(L, "UICommands");

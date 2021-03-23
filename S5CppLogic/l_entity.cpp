@@ -159,6 +159,13 @@ int l_entityPredicateIsVisible(lua_State* L) {
 	return 1;
 }
 
+int l_entityPredicateOfUpgradeCategory(lua_State* L) {
+	int ty = luaL_checkint(L, 1);
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateOfUpgradeCategory));
+	new(ud) EntityIteratorPredicateOfUpgradeCategory(ty);
+	return 1;
+}
+
 int l_entityIteratorToTable(lua_State* L) {
 	if (lua_gettop(L) > 1) { // auto create an and predicate
 		l_entityPredicateAnd(L);
@@ -176,6 +183,24 @@ int l_entityIteratorToTable(lua_State* L) {
 		lua_rawseti(L, 2, index);
 		index++;
 	}
+	return 1;
+}
+
+int l_entityIteratorCount(lua_State* L) {
+	if (lua_gettop(L) > 1) { // auto create an and predicate
+		l_entityPredicateAnd(L);
+	}
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
+	int count = 1;
+	EntityIterator it = EntityIterator(pred);
+	shok_EGL_CGLEEntity* e = nullptr;
+	while (true) {
+		e = it.GetNext(nullptr);
+		if (e == nullptr)
+			break;
+		count++;
+	}
+	lua_pushnumber(L, count);
 	return 1;
 }
 
@@ -618,6 +643,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "EntityIteratorTableize", &l_entityIteratorToTable);
 	luaext_registerFunc(L, "EntityIterator", &l_entityIterator);
 	luaext_registerFunc(L, "EntityIteratorGetNearest", &l_entityIteratorGetNearest);
+	luaext_registerFunc(L, "EntityIteratorCount", &l_entityIteratorCount);
 	luaext_registerFunc(L, "GetNumberOfBehaviors", &l_entityGetNumberOfBehaviors);
 	luaext_registerFunc(L, "test", &l_entity_test);
 	luaext_registerFunc(L, "CheckPredicate", &l_entityCheckPredicate);
@@ -654,6 +680,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "ProvidesResource", &l_entityPredicateProvidesResource);
 	luaext_registerFunc(L, "InRect", &l_entityPredicateInRect);
 	luaext_registerFunc(L, "IsVisible", &l_entityPredicateIsVisible);
+	luaext_registerFunc(L, "OfUpgradeCategory", &l_entityPredicateOfUpgradeCategory);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Settler");
@@ -900,4 +927,23 @@ bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, flo
 		return c->InvisibilityRemaining <= 0;
 	}
 	return true;
+}
+
+bool EntityIteratorPredicateOfUpgradeCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+{
+	shok_GGlue_CGlueEntityProps* t = e->GetEntityType();
+	if (t->IsBuildingType()) {
+		shok_GGL_CGLBuildingProps* p = (shok_GGL_CGLBuildingProps*)t;
+		return p->Upgrade.Category == category;
+	}
+	if (t->IsSettlerType()) {
+		shok_GGL_CGLSettlerProps* p = (shok_GGL_CGLSettlerProps*)t;
+		return p->Upgrade.Category == category;
+	}
+	return false;
+}
+
+EntityIteratorPredicateOfUpgradeCategory::EntityIteratorPredicateOfUpgradeCategory(int cat)
+{
+	category = cat;
 }

@@ -166,6 +166,12 @@ int l_entityPredicateOfUpgradeCategory(lua_State* L) {
 	return 1;
 }
 
+int l_entityPredicateIsAlive(lua_State* L) {
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateIsAlive));
+	new(ud) EntityIteratorPredicateIsAlive();
+	return 1;
+}
+
 int l_entityIteratorToTable(lua_State* L) {
 	if (lua_gettop(L) > 1) { // auto create an and predicate
 		l_entityPredicateAnd(L);
@@ -462,40 +468,24 @@ int l_entitySetLimitedLifespanRemaining(lua_State* L) {
 	return 0;
 }
 
-
-lua_State* shok_gamestate;
-int ref = 0;
-int id;
-void(__thiscall* FireEventBackup)(shok_EGL_CGLEEntity* th, shok_event_data* d);
-void __fastcall entityFireEventHook(shok_EGL_CGLEEntity* e, int z, shok_event_data* d) {
-	FireEventBackup(e, d);
-	if (e->EntityId != id)
-		return;
-	int t = lua_gettop(shok_gamestate);
-	//lua_rawgeti(shok_gamestate, LUA_REGISTRYINDEX, ref);
-	lua_getglobal(shok_gamestate, "eventdebug");
-	lua_pushnumber(shok_gamestate, d->vtable);
-	lua_pushnumber(shok_gamestate, d->id);
-	lua_pushnumber(shok_gamestate, d->result);
-	float* f = (float*)&d->result;
-	lua_pushnumber(shok_gamestate, *f);
-	lua_pcall(shok_gamestate, 4, 0, 0);
-	lua_settop(shok_gamestate, t);
+void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
+void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d) {
+	lua_State* L = *shok_luastate_game;
+	int t = lua_gettop(L);
+	lua_getglobal(L, "event");
+	lua_pushnumber(L, ((int*)d)[1]);
+	lua_pushnumber(L, (int)d);
+	lua_pcall(L, 2, 0, 0);
+	lua_settop(L, t);
+	FireEvent(th, d);
 }
 
 int l_entity_test(lua_State* L) {
-	luaext_assert(L, ref == 0, "");
-	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	//id = e->EntityId;
-	//ref = 1;// luaL_ref(L, LUA_REGISTRYINDEX);
-	//shok_gamestate = L;
-	//shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
-	//FireEventBackup = vt->FireEvent;
-	//vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &entityFireEventHook;
-	//lua_pushnumber(L, (int)&((shok_GGL_CSettler*)e)->MaxAttackRange);
-	//lua_pushnumber(L, (int)&e->GetEntityType()->GetBattleBehaviorProps()->MaxRange);
-	lua_pushnumber(L, (int)&e->GetEntityType()->GetLeaderBehaviorProps()->HealingPoints);
-	return 1;
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
+	FireEvent = vt->FireEvent;
+	vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;
+	return 0;
 }
 
 int l_entityGetTaskListIndex(lua_State* L) {
@@ -636,6 +626,61 @@ int l_settlerIsVisible(lua_State* L) {
 	return true;
 }
 
+int l_settlerSendHawk(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	shok_position p = { 0,0 };
+	luaext_checkPos(L, p, 2);
+	e->HeroAbilitySendHawk(p);
+	//e->HeroAbilityInflictFear();
+	return 0;
+}
+
+int l_settlerInflictFear(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	e->HeroAbilityInflictFear();
+	return 0;
+}
+
+int l_settlerPlaceBomb(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	shok_position p = { 0,0 };
+	luaext_checkPos(L, p, 2);
+	e->HeroAbilityPlaceBomb(p);
+	return 0;
+}
+
+int l_settlerPlaceCannon(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	shok_position p = { 0,0 };
+	luaext_checkPos(L, p, 2);
+	e->HeroAbilityPlaceCannon(p, luaL_checkint(L, 3), luaL_checkint(L, 4));
+	return 0;
+}
+
+int l_settlerRangedEffect(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	e->HeroAbilityRangedEffect();
+	return 0;
+}
+
+int l_settlerCircularAttack(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	e->HeroAbilityCircularAttack();
+	return 0;
+}
+
+int l_settlerSummon(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	e->HeroAbilitySummon();
+	return 0;
+}
+
+int l_settlerConvert(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	e->HeroAbilityConvert(luaext_checkEntityId(L, 2));
+	return 0;
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -681,6 +726,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "InRect", &l_entityPredicateInRect);
 	luaext_registerFunc(L, "IsVisible", &l_entityPredicateIsVisible);
 	luaext_registerFunc(L, "OfUpgradeCategory", &l_entityPredicateOfUpgradeCategory);
+	luaext_registerFunc(L, "IsAlive", &l_entityPredicateIsAlive);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Settler");
@@ -701,6 +747,14 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "HeroResurrect", &l_heroResurrect);
 	luaext_registerFunc(L, "ThiefSetStolenResourceInfo", &l_settlerThiefSetStolenResourceInfo);
 	luaext_registerFunc(L, "IsVisible", &l_settlerIsVisible);
+	luaext_registerFunc(L, "CommandSendHawk", &l_settlerSendHawk);
+	luaext_registerFunc(L, "CommandInflictFear", &l_settlerInflictFear);
+	luaext_registerFunc(L, "CommandPlaceBomb", &l_settlerPlaceBomb);
+	luaext_registerFunc(L, "CommandPlaceCannon", &l_settlerPlaceCannon);
+	luaext_registerFunc(L, "CommandRangedEffect", &l_settlerRangedEffect);
+	luaext_registerFunc(L, "CommandCircularAttack", &l_settlerCircularAttack);
+	luaext_registerFunc(L, "CommandSummon", &l_settlerSummon);
+	luaext_registerFunc(L, "CommandConvert", &l_settlerConvert);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -756,6 +810,23 @@ shok_EGL_CGLEEntity* EntityIterator::GetNext(float* rangeOut)
 			return e;
 	}
 	return nullptr;
+}
+shok_EGL_CGLEEntity* EntityIterator::GetNearest(float* rangeOut)
+{
+	shok_EGL_CGLEEntity* curr, * ret = nullptr;
+	float currR = -1, maxR = -1;
+	Reset();
+	curr = GetNext(&currR);
+	while (curr != nullptr) {
+		if (maxR == -1 || currR < maxR) {
+			ret = curr;
+			maxR = currR;
+		}
+		curr = GetNext(&currR);
+	}
+	if (rangeOut != nullptr)
+		*rangeOut = maxR;
+	return ret;
 }
 
 EntityIteratorPredicateOfType::EntityIteratorPredicateOfType(int etype)
@@ -848,6 +919,18 @@ bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, flo
 			return true;
 	}
 	return false;
+}
+void EntityIteratorPredicateAnyPlayer::FillHostilePlayers(int source, int* players, int& maxP)
+{
+	shok_GGL_CPlayerStatus* pl = (*shok_GGL_CGLGameLogicObj)->GetPlayer(source);
+	int curr = 0;
+	for (int p = 1; p <= maxP; p++) {
+		if (pl->GetDiploStateTo(p) == shok_DIPLOSTATE_HOSTILE) {
+			players[curr] = p;
+			curr++;
+		}
+	}
+	maxP = curr;
 }
 
 EntityIteratorPredicateAnyPlayer::EntityIteratorPredicateAnyPlayer(int* pl, int numPlayers)
@@ -946,4 +1029,9 @@ bool EntityIteratorPredicateOfUpgradeCategory::MatchesEntity(shok_EGL_CGLEEntity
 EntityIteratorPredicateOfUpgradeCategory::EntityIteratorPredicateOfUpgradeCategory(int cat)
 {
 	category = cat;
+}
+
+bool EntityIteratorPredicateIsAlive::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+{
+	return !shok_entityIsDead(e->EntityId); // performance improvement by not doing obj -> id ->obj ?
 }

@@ -18,9 +18,9 @@ void (*shok_logString)(const char* format, ...) = (void (*)(const char* format, 
 shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj = (shok_EGL_CGLEEntityManager**)0x897558;
 int(*shok_getEntityIdByScriptName)(const char* str) = (int(*)(const char* str)) 0x576624;
-bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4A2B62;
-bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x449432;
-bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e) = (bool(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4B82C7;
+int(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4A2B62;
+int(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x449432;
+int(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4B82C7;
 int(_cdecl* shok_EntityGetProvidedResourceByID)(int id) = (int(_cdecl*)(int id)) 0x4B8489;
 shok_EGL_CGLEEntitiesProps** shok_EGL_CGLEEntitiesPropsObj = (shok_EGL_CGLEEntitiesProps**)0x895DB0;
 shok_damageClassHolder** shok_DamageClassHolderObj = (shok_damageClassHolder**)0x85A3DC;
@@ -306,9 +306,9 @@ shok_GGL_CThiefBehavior* shok_EGL_CGLEEntity::GetThiefBehavior()
 	return (shok_GGL_CThiefBehavior*)SearchBehavior(shok_vtp_GGL_CThiefBehavior);
 }
 
-int shok_EGL_CGLEEntity::EventGetById(int id)
+int shok_EGL_CGLEEntity::EventGetIntById(int id)
 {
-	shok_event_data d = shok_event_data();
+	shok_event_data_EGL_CEventGetValue_int_1211121895 d = shok_event_data_EGL_CEventGetValue_int_1211121895();
 	d.id = id;
 	shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)vtable;
 	vt->FireEvent(this, &d);
@@ -317,15 +317,15 @@ int shok_EGL_CGLEEntity::EventGetById(int id)
 
 int shok_EGL_CGLEEntity::EventGetDamage()
 {
-	return EventGetById(0x1503D);
+	return EventGetIntById(0x1503D);
 }
 int shok_EGL_CGLEEntity::EventGetArmor()
 {
-	return EventGetById(0x1503E);
+	return EventGetIntById(0x1503E);
 }
 int shok_EGL_CGLEEntity::EventGetMaxWorktime()
 {
-	return EventGetById(0x1301A);
+	return EventGetIntById(0x1301A);
 }
 
 shok_GGL_CBattleBehavior* shok_EGL_CGLEEntity::GetBattleBehavior()
@@ -340,9 +340,11 @@ float shok_GGL_CBattleBehavior::GetMaxRange()
 	return battleBehaviorGetMaxRange(this);
 }
 
+
+shok_GGL_CPlayerStatus* (__thiscall* shok_GGL_CGLGameLogic_GetPlayer)(shok_GGL_CPlayerStatus** pl, int p) = (shok_GGL_CPlayerStatus* (__thiscall*) (shok_GGL_CPlayerStatus **, int)) 0x4A91BC;
 shok_GGL_CPlayerStatus* shok_GGL_CGLGameLogic::GetPlayer(int i)
 {
-	return players[i * 2 + 1];
+	return shok_GGL_CGLGameLogic_GetPlayer(this->players, i);
 }
 
 float shok_EGL_CGLEEntity::GetExploration()
@@ -440,3 +442,131 @@ shok_technology* shok_GGL_CGLGameLogic::GetTech(int i)
 		return nullptr;
 	}
 }
+
+void shok_EGL_CMovingEntity::AttackMove(shok_position& p)
+{
+	shok_event_data_EGL_CEventPosition ev = shok_event_data_EGL_CEventPosition();
+	ev.id = 0x1502E; // attack move
+	ev.pos.X = p.X;
+	ev.pos.Y = p.Y;
+	ev.r = 0;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	//shok_event_data_EGL_CEventValue_bool_703333479 e2 = shok_event_data_EGL_CEventValue_bool_703333479();
+	//e2.id = 0x1503B; // set target rotation state
+	//e2.b = 0;
+	//((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &e2);
+	TargetRotationValid = 0;
+}
+
+void shok_EGL_CMovingEntity::AttackEntity(int targetId)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x15004;
+	ev.entityId = targetId;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::Move(shok_position& p)
+{
+	shok_event_data_EGL_CEventPosition ev = shok_event_data_EGL_CEventPosition();
+	ev.id = 0x11002; // move
+	ev.pos.X = p.X;
+	ev.pos.Y = p.Y;
+	ev.r = 0;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	TargetRotationValid = 0;
+}
+
+bool IsInRange(shok_position& a, shok_position& b, float r)
+{
+	float dx = a.X - b.X;
+	float dy = a.Y - b.Y;
+	return (dx * dx + dy * dy) <= (r * r);
+}
+
+int(__thiscall* shok_GGL_CPlayerStatus_getDiploState)(int* d, int p) = (int(__thiscall*)(int* d, int p)) 0x4B4D5B;
+int shok_GGL_CPlayerStatus::GetDiploStateTo(int p)
+{
+	return shok_GGL_CPlayerStatus_getDiploState(&DiploData, p);
+}
+
+int shok_EGL_CGLEEntity::EventLeaderGetCurrentCommand()
+{
+	if (GetLeaderBehavior() == nullptr)
+		return -1;
+	return EventGetIntById(0x1502D);
+}
+
+int shok_EGL_CGLEGameLogic::GetTimeMS()
+{
+	return InGameTime[0] * InGameTime[1];
+}
+
+void shok_EGL_CMovingEntity::HeroAbilitySendHawk(shok_position& p)
+{
+	shok_event_data_EGL_CEventPosition ev = shok_event_data_EGL_CEventPosition();
+	ev.id = 0x16002;
+	ev.pos.X = p.X;
+	ev.pos.Y = p.Y;
+	ev.r = 0;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityInflictFear()
+{
+	shok_event_data_BB_CEvent ev = shok_event_data_BB_CEvent();
+	ev.id = 0x16026;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityPlaceBomb(shok_position& p)
+{
+	shok_event_data_EGL_CEventPosition ev = shok_event_data_EGL_CEventPosition();
+	ev.id = 0x15033;
+	ev.pos.X = p.X;
+	ev.pos.Y = p.Y;
+	ev.r = 0;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityPlaceCannon(shok_position& p, int FoundationType, int CannonType)
+{
+	shok_event_data_GGL_CEventPositionAnd2EntityTypes ev = shok_event_data_GGL_CEventPositionAnd2EntityTypes();
+	ev.id = 0x1600A;
+	ev.pos.X = p.X;
+	ev.pos.Y = p.Y;
+	ev.EntityType1 = FoundationType;
+	ev.EntityType2 = CannonType;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityRangedEffect()
+{
+	shok_event_data_BB_CEvent ev = shok_event_data_BB_CEvent();
+	ev.id = 0x1601C;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityCircularAttack()
+{
+	shok_event_data_BB_CEvent ev = shok_event_data_BB_CEvent();
+	ev.id = 0x16022;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilitySummon()
+{
+	shok_event_data_BB_CEvent ev = shok_event_data_BB_CEvent();
+	ev.id = 0x1601A;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityConvert(int target)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x16027;
+	ev.entityId = target;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+// summon 1601A convert 1ent 16027

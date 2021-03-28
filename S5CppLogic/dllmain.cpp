@@ -15,9 +15,9 @@
 #include "l_ua.h"
 
 int __cdecl test(lua_State* L) {
-    shok_technologyModifier s = shok_technologyModifier();
+    shok_EGL_CGLEGameLogic s = shok_EGL_CGLEGameLogic();
     int st = (int)&s;
-    int test = (int)&s.Operator;
+    int test = (int)&s.InGameTime;
     lua_pushnumber(L, (test - st) / 4);
     return 1;
 }

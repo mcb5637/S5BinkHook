@@ -16,6 +16,7 @@ CppLogic.EntityType = {}
 CppLogic.EntityType.Settler = {}
 CppLogic.Logic = {}
 CppLogic.Logic.UICommands = {}
+CppLogic.UA = {}
 
 --- check if an effect is valid
 -- @param id effect id
@@ -153,6 +154,11 @@ function CppLogic.Entity.EntityIteratorTableize(...) end
 -- @return c
 function CppLogic.Entity.EntityIteratorCount(...) end
 
+--- returns the nearest entity. requires InCircle predicate.
+-- @param pred predicate userdata
+-- @return id
+function CppLogic.Entity.EntityIteratorGetNearest(...) end
+
 --- checks an entity agains a predicate.
 -- @param id entity
 -- @param pred predicate
@@ -240,6 +246,10 @@ function CppLogic.Entity.Predicates.IsVisible() end
 -- @param ecat UpgradeCategory to check against
 -- @return predicate userdata
 function CppLogic.Entity.Predicates.OfUpgradeCategory(ecat) end
+
+--- creates a predicate that checks dead entities.
+-- @return predicate userdata
+function CppLogic.Entity.Predicates.IsAlive() end
 
 --- entity task list index.
 -- @param id entity
@@ -383,6 +393,44 @@ function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
 --- checks visibility of an entity.
 -- @param id entity
 function CppLogic.Entity.Settler.IsVisible(id) end
+
+--- command to send darios hawk.
+-- @param id entity
+-- @param p target
+function CppLogic.Entity.Settler.CommandSendHawk(id, p) end
+
+--- command to inflict fear.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandInflictFear(id) end
+
+--- command to place bomb.
+-- @param id entity
+-- @param p target
+function CppLogic.Entity.Settler.CommandPlaceBomb(id) end
+
+--- command to inflict fear.
+-- @param id entity
+-- @param p target
+-- @param bottom foundation type
+-- @param top cannon type
+function CppLogic.Entity.Settler.CommandPlaceCannon(id, p, bottom, top) end
+
+--- command to activate ranged effect.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandRangedEffect(id) end
+
+--- command to perform circular attack.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandCircularAttack(id) end
+
+--- command to summon.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandSummon(id) end
+
+--- command to convert.
+-- @param id entity
+-- @param tid target
+function CppLogic.Entity.Settler.CommandConvert(id, tid) end
 
 --- a leaders experience.
 -- @param id leader
@@ -814,3 +862,37 @@ function CppLogic.Technology.GetRangeModifier(tid) end
 -- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
 -- @return value
 function CppLogic.Technology.GetSpeedModifier(tid) end
+
+--- @class UACore
+local UACore = {}
+function UACore:AddLeader(id) end
+function UACore:GetPos() end
+function UACore:Tick() end
+function UACore:Iterate() end
+function UACore:IterateTransit() end
+function UACore:OnIdChanged(ol, ne) end
+function UACore:GetSize(trans, deadHero) end
+function UACore:RemoveLeader(id) end
+function UACore:IsIdle() end
+function UACore:GetStatus() end
+function UACore:SetArea(a) end
+function UACore:SetTarget(p) end
+function UACore:DumpTable() end
+function UACore:ReadTable(t) end
+function UACore:SetStatus(s) end
+function UACore:SetReMove(b) end
+function UACore:SetCurrentBattleTarget(id) end
+function UACore:GetRangedMelee() end
+
+
+--- creates new ua.
+-- @param pl player
+--- @return UACore ua
+function CppLogic.UA.New(pl, format, commandqueue, spawner, normalize) end
+
+--- gets next enemy in area.
+function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area) end
+
+function CppLogic.UA.AddIdleTaskList(t) end
+
+function CppLogic.UA.CountTargetEntitiesInArea(pl, pos, area) end

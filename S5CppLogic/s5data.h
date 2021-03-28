@@ -1051,11 +1051,25 @@ public:
 	int EventGetDamage();
 	int EventGetArmor();
 	int EventGetMaxWorktime();
-	int EventGetById(int id);
+	int EventLeaderGetCurrentCommand();
 	float GetExploration();
+private:
+	int EventGetIntById(int id);
 };
 
+#define shok_LeaderCommandAttack 0
+#define shok_LeaderCommandDefend 3
+#define shok_LeaderCommandPatrol 4
+#define shok_LeaderCommandAttackMove 5
+#define shok_LeaderCommandGuard 6
+#define shok_LeaderCommandHoldPos 7
+#define shok_LeaderCommandMove 8
+#define shok_LeaderCommandHeroAbility 10
+
 struct shok_event_data {
+
+};
+struct shok_event_data_EGL_CEventGetValue_int_1211121895 : shok_event_data {
 	int vtable = 0x766CC4;
 	int id = 0;
 	int result = 0;
@@ -1068,6 +1082,34 @@ struct shok_vtable_EGL_CGLEEntity {
 	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
 };
 
+struct shok_event_data_EGL_CEventPosition : shok_event_data {
+	int vtable = 0x766C70;
+	int id = 0;
+	shok_position pos = { 0,0 };
+	int r = 0;
+};
+struct shok_event_data_EGL_CEventValue_bool_703333479 : shok_event_data {
+	int vtable = 0x76E220;
+	int id = 0;
+	int b = 0;
+};
+struct shok_event_data_EGL_CEvent1Entity : shok_event_data {
+	int vtable = 0x766C60;
+	int id = 0;
+	int vtable2 = 0x766C58; //EGL::CEvent1Entity ?
+	int entityId = 0;
+};
+struct shok_event_data_BB_CEvent : shok_event_data {
+	int vtable = 0x762114;
+	int id = 0;
+};
+struct shok_event_data_GGL_CEventPositionAnd2EntityTypes : shok_event_data {
+	int vtable = 0x766C70;
+	int id = 0;
+	shok_position pos = { 0,0 };
+	int EntityType1 = 0, EntityType2 = 0;
+};
+
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	shok_position TargetPosition; // la67
@@ -1077,6 +1119,18 @@ private:
 public:
 	float TargetRotation;
 	int MovementState; // 70
+
+	void AttackMove(shok_position& p);
+	void AttackEntity(int targetId);
+	void Move(shok_position& p);
+	void HeroAbilitySendHawk(shok_position& p);
+	void HeroAbilityInflictFear();
+	void HeroAbilityPlaceBomb(shok_position& p);
+	void HeroAbilityPlaceCannon(shok_position& p, int FoundationType, int CannonType);
+	void HeroAbilityRangedEffect();
+	void HeroAbilityCircularAttack();
+	void HeroAbilitySummon();
+	void HeroAbilityConvert(int target);
 };
 
 #define shok_vtp_GGL_CEvadingEntity (void*)0x770A7C
@@ -1285,8 +1339,12 @@ struct shok_BB_CIDManagerEx : shok_object {
 
 // game logic
 struct shok_EGL_CGLEGameLogic : shok_object {
+	PADDINGI(6)
+	int* InGameTime;
+
 	int CreateEffect(shok_effectCreatorData* data);
 	void HookCreateEffect();
+	int GetTimeMS();
 };
 
 
@@ -1404,10 +1462,15 @@ struct shok_GGL_CPlayerAttractionProps : shok_object {
 
 struct shok_GGL_CPlayerStatus : shok_object {
 	int PlayerID;
-	PADDINGI(80)
+	PADDINGI(46)
+private:
+	int DiploData;
+	PADDINGI(33)
 	int NumberOfSettlersKilled, NumberOfSettlersLost, NumberOfBuildingsKilled, NumberOfBuildingsLost;
 	PADDINGI(111)
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler;
+
+	int GetDiploStateTo(int p);
 };
 
 // net events
@@ -1580,14 +1643,18 @@ struct shok_GGL_CGLGameLogic_TechList {
 // gamelogic
 struct shok_GGL_CGLGameLogic : shok_object {
 	PADDINGI(9)
+private:
 	shok_GGL_CPlayerStatus** players;
 	PADDINGI(2)
+private:
 	shok_GGL_CGLGameLogic_TechList* TechList;
 public:
 
 	shok_GGL_CPlayerStatus* GetPlayer(int i);
 	shok_technology* GetTech(int i);
 };
+
+#define shok_DIPLOSTATE_HOSTILE 3
 
 
 // global funcs
@@ -1599,11 +1666,11 @@ extern void(* shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_
 
 extern int(*shok_getEntityIdByScriptName)(const char* str);
 
-extern bool(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e);
+extern int(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e);
 
-extern bool(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e);
+extern int(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e);
 
-extern bool(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e);
+extern int(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e);
 
 extern int(_cdecl* shok_EntityGetProvidedResourceByID)(int id);
 
@@ -1649,3 +1716,4 @@ extern void(*CreateEffectHookCallback)(int id, void* ret);
 
 extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
 extern bool(*PostEventCallback)(shok_BB_CEvent* ev);
+bool IsInRange(shok_position& a, shok_position& b, float r);

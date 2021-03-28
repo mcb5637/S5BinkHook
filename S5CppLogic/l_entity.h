@@ -20,6 +20,7 @@ public:
 	EntityIterator(EntityIteratorPredicate* Predicate);
 	void Reset();
 	shok_EGL_CGLEEntity* GetNext(float* rangeOut);
+	shok_EGL_CGLEEntity* GetNearest(float* rangeOut);
 };
 
 struct EntityIteratorPredicateOfType : EntityIteratorPredicate {
@@ -86,6 +87,7 @@ private:
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
 	EntityIteratorPredicateAnyPlayer(int* pl, int numPlayers);
+	static void FillHostilePlayers(int source, int* players, int& maxP);
 };
 
 struct EntityIteratorPredicateAnyEntityType : EntityIteratorPredicate {
@@ -146,4 +148,9 @@ private:
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
 	EntityIteratorPredicateOfUpgradeCategory(int cat);
+};
+
+struct EntityIteratorPredicateIsAlive : EntityIteratorPredicate {
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
 };

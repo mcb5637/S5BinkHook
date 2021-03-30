@@ -15,10 +15,11 @@
 #include "l_ua.h"
 
 int __cdecl test(lua_State* L) {
-    shok_EGL_CGLEGameLogic s = shok_EGL_CGLEGameLogic();
+    shok_GGL_CHeroHawkBehavior s = shok_GGL_CHeroHawkBehavior();
     int st = (int)&s;
-    int test = (int)&s.InGameTime;
+    int test = (int)&s.AbilitySecondsCharged;
     lua_pushnumber(L, (test - st) / 4);
+    lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->GetTick());
     return 1;
 }
 

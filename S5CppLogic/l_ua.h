@@ -14,25 +14,31 @@ void l_ua_init(lua_State* L);
 
 #define UATargetCat 100
 #define UATargetCatLeader 101
-#define EntityCategoryLongRange 32
-#define EntityCategoryCannon 11
 #define EntityCategoryCustomRanged 102
 #define EntityCategoryNonCombat 103
+
+struct UACannonData {
+	int EntityId, LastUpdated;
+};
 
 class UnlimitedArmy {
 public:
 	int Player;
 	std::vector<int> Leaders;
 	std::vector<int> LeaderInTransit;
+	std::vector<UACannonData> Cannons;
+	std::vector<int> DeadHeroes;
 	shok_position LastPos = { -1,-1 };
 	int PosLastUpdatedTick = -1;
 	int Status = UAStatus_Idle;
 	float Area = 0;
 	int CurrentBattleTarget = 0;
 	shok_position Target = { -1,-1 };
-	bool ReMove = false;
+	bool ReMove = false, IgnoreFleeing = false;
 	lua_State* L = nullptr;
 	int Formation = LUA_NOREF, CommandQueue = LUA_NOREF, Spawner = LUA_NOREF, Normalize = LUA_NOREF;
+	float AutoRotateFormation = -1;
+	float LastRotation = 0;
 
 	static std::vector<int> IdleTaskLists;
 
@@ -48,8 +54,8 @@ public:
 	bool IsRanged(shok_EGL_CGLEEntity* e);
 	bool IsNonCombat(shok_EGL_CGLEEntity* e);
 
-	static shok_EGL_CGLEEntity* GetNextTarget(int player, shok_position& p, float ran);
-	static int GetTargetsInArea(int player, shok_position& p, float ran);
+	static shok_EGL_CGLEEntity* GetNextTarget(int player, shok_position& p, float ran, bool notFleeing);
+	static int GetTargetsInArea(int player, shok_position& p, float ran, bool notFleeing);
 
 private:
 	void CleanDead();

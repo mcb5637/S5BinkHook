@@ -57,6 +57,7 @@ public:
 	EntityIteratorPredicateOr(EntityIteratorPredicate** preds, int numPreds);
 };
 
+// not using sqrt
 struct EntityIteratorPredicateInCircle : EntityIteratorPredicate {
 private:
 	float x, y, r;
@@ -153,4 +154,15 @@ public:
 struct EntityIteratorPredicateIsAlive : EntityIteratorPredicate {
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+};
+
+// not the fastest, cause i have to use sqrt twice, use it last
+struct EntityIteratorPredicateIsNotFleeingFrom : EntityIteratorPredicate {
+private:
+	shok_position Center;
+	float Range;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	EntityIteratorPredicateIsNotFleeingFrom(shok_position& p, float r);
+	static bool IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok_position Center, float Range);
 };

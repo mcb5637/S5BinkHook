@@ -18,7 +18,7 @@ UnlimitedArmy::UnlimitedArmy(int p)
 }
 void UnlimitedArmy::CalculatePos()
 {
-	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTimeMS();
+	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
 	if (tick == PosLastUpdatedTick)
 		return;
 	float x = 0, y = 0;
@@ -43,10 +43,30 @@ void UnlimitedArmy::CalculatePos()
 }
 void UnlimitedArmy::CleanDead()
 {
-	auto e = std::remove_if(Leaders.begin(), Leaders.end(), shok_entityIsDead);
+	auto remo = [this](int id) {
+		if (shok_entityIsDead(id)) {
+			shok_EGL_CGLEEntity* e = shok_eid2obj(id);
+			if (e != nullptr && e->IsEntityInCategory(EntityCategoryHero)) {
+				this->DeadHeroes.push_back(id);
+			}
+			return true;
+		}
+		return false;
+	};
+	auto e = std::remove_if(Leaders.begin(), Leaders.end(), remo);
 	Leaders.erase(e, Leaders.end());
-	e = std::remove_if(LeaderInTransit.begin(), LeaderInTransit.end(), shok_entityIsDead);
+	e = std::remove_if(LeaderInTransit.begin(), LeaderInTransit.end(), remo);
 	LeaderInTransit.erase(e, LeaderInTransit.end());
+	auto e2 = std::remove_if(Cannons.begin(), Cannons.end(), [](UACannonData& d) { return shok_entityIsDead(d.EntityId); });
+	Cannons.erase(e2, Cannons.end());
+	e = std::remove_if(DeadHeroes.begin(), DeadHeroes.end(), [this](int id) {
+		if (!shok_entityIsDead(id)) {
+			this->AddLeader(shok_eid2obj(id));
+			return true;
+		}
+		return shok_eid2obj(id) == nullptr;
+		});
+	DeadHeroes.erase(e, DeadHeroes.end());
 }
 void UnlimitedArmy::Tick()
 {
@@ -59,11 +79,15 @@ void UnlimitedArmy::Tick()
 	PosLastUpdatedTick = -1;
 	CalculatePos();
 	if (!IsTargetValid(CurrentBattleTarget)) {
-		shok_EGL_CGLEEntity* e = GetNextTarget(Player, LastPos, Area);
+		shok_EGL_CGLEEntity* e = GetNextTarget(Player, LastPos, Area, IgnoreFleeing);
 		if (e == nullptr)
 			CurrentBattleTarget = 0;
-		else
+		else {
 			CurrentBattleTarget = e->EntityId;
+			for (UACannonData d : Cannons) {
+				d.LastUpdated = -1;
+			}
+		}
 	}
 	bool preventComands = false;
 	if (!preventComands && Status != UAStatus_MovingNoBattle && CurrentBattleTarget != 0) {
@@ -77,7 +101,16 @@ void UnlimitedArmy::Tick()
 	}
 	if (!preventComands) {
 		CheckStatus(UAStatus_Idle);
-		// autorotate
+		if (AutoRotateFormation >= 0) {
+			shok_EGL_CGLEEntity* e = GetNextTarget(Player, LastPos, AutoRotateFormation, IgnoreFleeing);
+			if (e != nullptr) {
+				float a = GetAngleBetween(LastPos, e->Position);
+				if (std::fabsf(a - LastRotation) > 10) {
+					LastRotation = a;
+					ReMove = true;
+				}
+			}
+		}
 		preventComands = true;
 	}
 	CallCommandQueue();
@@ -103,6 +136,8 @@ void UnlimitedArmy::AddLeader(shok_EGL_CGLEEntity* e)
 			Target = e->Position;
 		}
 		NeedFormat();
+		if (e->IsEntityInCategory(EntityCategoryCannon))
+			Cannons.push_back({ e->EntityId, -1 });
 	}
 	else
 		LeaderInTransit.push_back(e->EntityId);
@@ -117,18 +152,33 @@ void UnlimitedArmy::OnIdChanged(int old, int ne)
 		if (LeaderInTransit[i] == old)
 			LeaderInTransit[i] = ne;
 	}
+	for (int i = 0; i < (int)DeadHeroes.size(); i++) {
+		if (DeadHeroes[i] == old)
+			DeadHeroes[i] = ne;
+	}
+	for (int i = 0; i < (int)Cannons.size(); i++) {
+		if (Cannons[i].EntityId == old)
+			Cannons[i].EntityId = ne;
+	}
 }
 void UnlimitedArmy::CheckTransit()
 {
 	if (Leaders.size() == 0 && LeaderInTransit.size() > 0) {
 		Leaders.push_back(LeaderInTransit[1]);
+		if (shok_eid2obj(LeaderInTransit[1])->IsEntityInCategory(EntityCategoryCannon))
+			Cannons.push_back({ LeaderInTransit[1], -1 });
 		LeaderInTransit.erase(LeaderInTransit.begin());
+		PosLastUpdatedTick = -1;
 		CalculatePos();
+		NeedFormat();
 	}
 	auto e = std::remove_if(LeaderInTransit.begin(), LeaderInTransit.end(), [this](int id) {
 		shok_EGL_CGLEEntity* e = shok_eid2obj(id);
 		if (IsInRange(this->LastPos, e->Position, this->Area)) {
 			this->Leaders.push_back(id);
+			if (e->IsEntityInCategory(EntityCategoryCannon))
+				this->Cannons.push_back({ e->EntityId, -1 });
+			this->NeedFormat();
 			return true;
 		}
 		return false;
@@ -146,9 +196,11 @@ int UnlimitedArmy::GetSize(bool transit, bool hero)
 	int r = Leaders.size();
 	if (transit)
 		r += LeaderInTransit.size();
+	if (hero)
+		r += DeadHeroes.size();
 	return r;
 }
-shok_EGL_CGLEEntity* UnlimitedArmy::GetNextTarget(int player, shok_position& p, float ran)
+shok_EGL_CGLEEntity* UnlimitedArmy::GetNextTarget(int player, shok_position& p, float ran, bool notFleeing)
 {
 	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
 	int buff[8];
@@ -161,10 +213,11 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNextTarget(int player, shok_position& p, 
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-	EntityIteratorPredicate* preds[7] = {
-		&relev, &pl, &cat, &al, &nsol, &vis, &cir
+	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
+	EntityIteratorPredicate* preds[8] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, 7);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
 	EntityIterator iter = EntityIterator(&a);
 	shok_EGL_CGLEEntity* r = iter.GetNearest(nullptr);
 	if (r == nullptr) {
@@ -185,12 +238,11 @@ bool UnlimitedArmy::IsTargetValid(int id)
 	shok_EGL_CGLEEntity* e = shok_eid2obj(id);
 	if (!IsInRange(LastPos, e->Position, Area))
 		return false;
-	// fleeing check
 	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
 	if (c != nullptr) {
 		return c->InvisibilityRemaining <= 0;
 	}
-	return true;
+	return EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(e, LastPos, 500);
 }
 void UnlimitedArmy::CheckStatus(int status)
 {
@@ -235,14 +287,28 @@ void UnlimitedArmy::BattleCommand()
 	shok_position p = shok_eid2obj(CurrentBattleTarget)->Position;
 	if (ReMove)
 		NormalizeSpeed(false, false);
-	for (int id : Leaders) {
+	for (int id : Leaders) { // hero abilities
 		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*) shok_eid2obj(id);
-		if ((ReMove || !LeaderIsInBattle(e) ) && !IsNonCombat(e)) { // cannon command
+		if ((ReMove || !LeaderIsInBattle(e) ) && !IsNonCombat(e) && !e->IsEntityInCategory(EntityCategoryCannon)) {
 			if (IsRanged(e)) {
 				e->AttackEntity(CurrentBattleTarget);
 			}
 			else {
 				e->AttackMove(p);
+			}
+		}
+	}
+	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
+	for (UACannonData cd : Cannons) {
+		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(cd.EntityId);
+		if (ReMove || !LeaderIsInBattle(e) || cd.LastUpdated == -1) {
+			if (cd.LastUpdated < 0 || cd.LastUpdated < tick) {
+				e->AttackEntity(CurrentBattleTarget);
+				cd.LastUpdated = tick + 1;
+			}
+			else {
+				e->AttackMove(p);
+				cd.LastUpdated = -1;
 			}
 		}
 	}
@@ -305,7 +371,7 @@ bool UnlimitedArmy::IsIdle()
 			return false;
 	return true;
 }
-int UnlimitedArmy::GetTargetsInArea(int player, shok_position& p, float ran)
+int UnlimitedArmy::GetTargetsInArea(int player, shok_position& p, float ran, bool notFleeing)
 {
 	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
 	int buff[8];
@@ -318,10 +384,11 @@ int UnlimitedArmy::GetTargetsInArea(int player, shok_position& p, float ran)
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-	EntityIteratorPredicate* preds[7] = {
-		&relev, &pl, &cat, &al, &nsol, &vis, &cir
+	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
+	EntityIteratorPredicate* preds[8] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, 7);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
 	EntityIterator iter = EntityIterator(&a);
 	int count = 0;
 	shok_EGL_CGLEEntity* e = nullptr;
@@ -337,7 +404,8 @@ void UnlimitedArmy::CallFormation()
 {
 	int t = lua_gettop(L);
 	lua_rawgeti(L, LUA_REGISTRYINDEX, Formation);
-	lua_call(L, 0, 0); // errors get propagated to lua tick
+	lua_pushnumber(L, LastRotation);
+	lua_call(L, 1, 0); // errors get propagated to lua tick
 	lua_settop(L, t);
 }
 void UnlimitedArmy::CallCommandQueue()
@@ -480,6 +548,15 @@ int l_uam_DumpTable(lua_State* L) {
 		i++;
 	}
 	lua_rawset(L, -3);
+	lua_pushstring(L, "DeadHeroes");
+	lua_newtable(L);
+	i = 1;
+	for (int l : a->DeadHeroes) {
+		lua_pushnumber(L, l);
+		lua_rawseti(L, -2, i);
+		i++;
+	}
+	lua_rawset(L, -3);
 	lua_pushstring(L, "Player");
 	lua_pushnumber(L, a->Player);
 	lua_rawset(L, -3);
@@ -498,6 +575,12 @@ int l_uam_DumpTable(lua_State* L) {
 	lua_pushstring(L, "ReMove");
 	lua_pushboolean(L, a->ReMove);
 	lua_rawset(L, -3);
+	lua_pushstring(L, "IgnoreFleeing");
+	lua_pushboolean(L, a->IgnoreFleeing);
+	lua_rawset(L, -3);
+	lua_pushstring(L, "AutoRotateFormation");
+	lua_pushnumber(L, a->AutoRotateFormation);
+	lua_rawset(L, -3);
 	return 1;
 }
 
@@ -513,7 +596,10 @@ int l_uam_ReadTable(lua_State* L) {
 			lua_pop(L, 1);
 			break;
 		}
-		a->Leaders.emplace_back(luaL_checkint(L, -1));
+		int id = luaL_checkint(L, -1);
+		a->Leaders.emplace_back(id);
+		if (shok_eid2obj(id)->IsEntityInCategory(EntityCategoryCannon))
+			a->Cannons.push_back({ id, -1 });
 		lua_pop(L, 1);
 		i++;
 	}
@@ -529,6 +615,21 @@ int l_uam_ReadTable(lua_State* L) {
 			break;
 		}
 		a->LeaderInTransit.emplace_back(luaL_checkint(L, -1));
+		lua_pop(L, 1);
+		i++;
+	}
+	lua_pop(L, 1);
+	lua_pushstring(L, "DeadHeroes");
+	lua_rawget(L, 2);
+	i = 1;
+	a->DeadHeroes.clear();
+	while (true) {
+		lua_rawgeti(L, -1, i);
+		if (!lua_isnumber(L, -1)) {
+			lua_pop(L, 1);
+			break;
+		}
+		a->DeadHeroes.emplace_back(luaL_checkint(L, -1));
 		lua_pop(L, 1);
 		i++;
 	}
@@ -556,6 +657,14 @@ int l_uam_ReadTable(lua_State* L) {
 	lua_pushstring(L, "ReMove");
 	lua_rawget(L, 2);
 	a->ReMove = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	lua_pushstring(L, "IgnoreFleeing");
+	lua_rawget(L, 2);
+	a->IgnoreFleeing = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	lua_pushstring(L, "AutoRotateFormation");
+	lua_rawget(L, 2);
+	a->AutoRotateFormation = luaL_checkfloat(L, -1);
 	lua_pop(L, 1);
 	return 0;
 }
@@ -626,6 +735,27 @@ int l_uam_GetRangedMelee(lua_State* L) {
 	return 3;
 }
 
+int l_uam_SetIgnoreFleeing(lua_State* L) {
+	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	a->IgnoreFleeing = lua_toboolean(L, 2);
+	return 0;
+}
+
+int l_uam_SetAutoRotateFormation(lua_State* L) {
+	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	a->AutoRotateFormation = luaL_checkfloat(L, 2);
+	return 0;
+}
+
+int l_uam_GetFirstDeadHero(lua_State* L) {
+	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	if (a->DeadHeroes.size() > 0)
+		lua_pushnumber(L, a->DeadHeroes[0]);
+	else
+		lua_pushnil(L);
+	return 1;
+}
+
 int l_uaNew(lua_State* L) {
 	int pl = luaL_checkint(L, 1);
 	UnlimitedArmy* a = (UnlimitedArmy*)lua_newuserdata(L, sizeof(UnlimitedArmy));
@@ -646,9 +776,10 @@ int l_uaNew(lua_State* L) {
 
 int l_uaNearest(lua_State* L) {
 	int pl = luaL_checkint(L, 1);
-	shok_position p = { luaL_checkfloat(L, 2), luaL_checkfloat(L, 3) };
-	float r = luaL_checkfloat(L, 4);
-	shok_EGL_CGLEEntity* e = UnlimitedArmy::GetNextTarget(pl, p, r);
+	shok_position p;
+	luaext_checkPos(L, p, 2);
+	float r = luaL_checkfloat(L, 3);
+	shok_EGL_CGLEEntity* e = UnlimitedArmy::GetNextTarget(pl, p, r, lua_toboolean(L, 4));
 	if (e == nullptr)
 		lua_pushnumber(L, 0);
 	else
@@ -658,9 +789,10 @@ int l_uaNearest(lua_State* L) {
 
 int l_uaCount(lua_State* L) {
 	int pl = luaL_checkint(L, 1);
-	shok_position p = { luaL_checkfloat(L, 2), luaL_checkfloat(L, 3) };
-	float r = luaL_checkfloat(L, 4);
-	lua_pushnumber(L, UnlimitedArmy::GetTargetsInArea(pl, p, r));
+	shok_position p;
+	luaext_checkPos(L, p, 2);
+	float r = luaL_checkfloat(L, 3);
+	lua_pushnumber(L, UnlimitedArmy::GetTargetsInArea(pl, p, r, lua_toboolean(L, 4)));
 	return 1;
 }
 
@@ -702,6 +834,9 @@ void l_ua_init(lua_State* L)
 	luaext_registerFunc(L, "SetReMove", &l_uam_SetReMove);
 	luaext_registerFunc(L, "SetCurrentBattleTarget", &l_uam_SetCurrentBattleTarget);
 	luaext_registerFunc(L, "GetRangedMelee", &l_uam_GetRangedMelee);
+	luaext_registerFunc(L, "SetIgnoreFleeing", &l_uam_SetIgnoreFleeing);
+	luaext_registerFunc(L, "SetAutoRotateFormation", &l_uam_SetAutoRotateFormation);
+	luaext_registerFunc(L, "GetFirstDeadHero", &l_uam_GetFirstDeadHero);
 	lua_settable(L, -3);
 	lua_pop(L, 1);
 }

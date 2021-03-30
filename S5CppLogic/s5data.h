@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 #include "luaimport.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
@@ -197,6 +199,22 @@ struct shok_GGL_CShurikenAbilityProps : shok_GGL_CHeroAbilityProps {
 	int NumberShuriken, ProjectileType;
 	float ProjectileOffsetHeight, ProjectileOffsetFront, ProjectileOffsetRight;
 	int DamageClass, DamageAmount;
+};
+
+#define shok_vtp_GGL_CKegPlacerBehaviorProperties (void*)0x7763B4
+struct shok_GGL_CKegPlacerBehaviorProperties : shok_GGL_CHeroAbilityProps {
+};
+
+#define shok_vtp_GGL_CAbilityScoutBinocularProps (void*)0x779254
+struct shok_GGL_CAbilityScoutBinocularProps : shok_GGL_CHeroAbilityProps {
+};
+
+#define shok_vtp_GGL_CTorchPlacerBehaviorProperties (void*)0x773790
+struct shok_GGL_CTorchPlacerBehaviorProperties : shok_GGL_CHeroAbilityProps {
+};
+
+#define shok_vtp_GGL_CPointToResourceBehaviorProperties (void*)0x774FEC
+struct shok_GGL_CPointToResourceBehaviorProperties : shok_GGL_CHeroAbilityProps {
 };
 
 #define shok_vtp_GGL_CSentinelBehaviorProps (void*)0x774BAC
@@ -565,6 +583,17 @@ public:
 	shok_GGL_CSniperAbilityProps* GetSniperBehaviorProps();
 	shok_GGL_CRangedEffectAbilityProps* GetRangedEffectBehaviorProps();
 	shok_GGL_CWorkerBehaviorProps* GetWorkerBehaviorProps();
+	shok_GGL_CHeroHawkBehaviorProps* GetHeroHawkBehaviorProps();
+	shok_GGL_CInflictFearAbilityProps* GetInflictFearBehaviorProps();
+	shok_GGL_CHeroAbilityProps* GetBombPlacerBehaviorProps();
+	shok_GGL_CCannonBuilderBehaviorProps* GetCannonBuilderBehaviorProps();
+	shok_GGL_CSummonBehaviorProps* GetSummonBehaviorProps();
+	shok_GGL_CConvertSettlerAbilityProps* GetConvertSettlersBehaviorProps();
+	shok_GGL_CKegPlacerBehaviorProperties* GetKegPlacerBehaviorProps();
+	shok_GGL_CAbilityScoutBinocularProps* GetBinocularBehaviorProps();
+	shok_GGL_CTorchPlacerBehaviorProperties* GetTorchPlacerBehaviorProps();
+	shok_GGL_CPointToResourceBehaviorProperties* GetPointToResBehaviorProps();
+	
 
 	bool IsSettlerType();
 	bool IsBuildingType();
@@ -632,9 +661,7 @@ struct shok_GGL_CSoldierMovement : shok_GGL_CBehaviorDefaultMovement {
 };
 
 struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior {
-private:
-	int u[2];
-public:
+	PADDINGI(1)
 	int AbilitySecondsCharged; // 5
 };
 
@@ -723,6 +750,26 @@ private:
 	int u;
 public:
 	int TargetId;
+};
+
+#define shok_vtp_GGL_CKegPlacerBehavior (void*)0x776368
+struct shok_GGL_CKegPlacerBehavior : shok_GGL_CHeroAbility {
+
+};
+
+#define shok_vtp_GGL_CAbilityScoutBinocular (void*)0x779218
+struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
+
+};
+
+#define shok_vtp_GGL_CTorchPlacerBehavior (void*)0x773738
+struct shok_GGL_CTorchPlacerBehavior : shok_GGL_CHeroAbility {
+
+};
+
+#define shok_vtp_GGL_CPointToResourceBehavior (void*)0x774FB0
+struct shok_GGL_CPointToResourceBehavior : shok_GGL_CHeroAbility {
+
 };
 
 #define shok_vtp_GGL_CSentinelBehavior (void*)0x774B6C
@@ -1043,6 +1090,23 @@ public:
 	shok_GGL_CMarketBehavior* GetMarketBehavior();
 	shok_GGL_CThiefBehavior* GetThiefBehavior();
 	shok_GGL_CBattleBehavior* GetBattleBehavior();
+	shok_GGL_CHeroHawkBehavior* GetHeroHawkBehavior();
+	shok_GGL_CInflictFearAbility* GetInflictFearBehavior();
+	shok_GGL_CBombPlacerBehavior* GetBombPlacerBehavior();
+	shok_GGL_CCannonBuilderBehavior* GetCannonBuilderBehavior();
+	shok_GGL_CRangedEffectAbility* GetRangedEffectBehavior();
+	shok_GGL_CCircularAttack* GetCircularAttackBehavior();
+	shok_GGL_CSummonBehavior* GetSummonBehavior();
+	shok_GGL_CConvertSettlerAbility* GetConvertSettlerBehavior();
+	shok_GGL_CSniperAbility* GetSniperBehavior();
+	shok_GGL_CShurikenAbility* GetShurikenBehavior();
+	shok_GGL_CKegPlacerBehavior* GetKegPlacerBehavior();
+	shok_GGL_CAbilityScoutBinocular* GetBinocularBehavior();
+	shok_GGL_CTorchPlacerBehavior* GetTorchPlacerBehavior();
+	shok_GGL_CPointToResourceBehavior* GetPointToResBehavior();
+	shok_GGL_CKegBehavior* GetKegBehavior();
+	
+	
 
 	bool IsEntityInCategory(int cat);
 	bool IsMovingEntity();
@@ -1073,7 +1137,6 @@ struct shok_event_data_EGL_CEventGetValue_int_1211121895 : shok_event_data {
 	int vtable = 0x766CC4;
 	int id = 0;
 	int result = 0;
-	int u[2] = { 0, 0 };
 };
 struct shok_vtable_EGL_CGLEEntity {
 	int u[16];
@@ -1086,7 +1149,6 @@ struct shok_event_data_EGL_CEventPosition : shok_event_data {
 	int vtable = 0x766C70;
 	int id = 0;
 	shok_position pos = { 0,0 };
-	int r = 0;
 };
 struct shok_event_data_EGL_CEventValue_bool_703333479 : shok_event_data {
 	int vtable = 0x76E220;
@@ -1131,6 +1193,15 @@ public:
 	void HeroAbilityCircularAttack();
 	void HeroAbilitySummon();
 	void HeroAbilityConvert(int target);
+	void HeroAbilitySnipe(int tid);
+	void HeroAbilityShuriken(int tid);
+	void ThiefSabotage(int tid);
+	void ThiefDefuse(int tid);
+	void ThiefStealFrom(int tid);
+	void ThiefSecureGoods(int tid);
+	void ScoutBinoculars(shok_position& p);
+	void ScoutFindResource();
+	void ScoutPlaceTorch(shok_position& p);
 };
 
 #define shok_vtp_GGL_CEvadingEntity (void*)0x770A7C
@@ -1340,11 +1411,12 @@ struct shok_BB_CIDManagerEx : shok_object {
 // game logic
 struct shok_EGL_CGLEGameLogic : shok_object {
 	PADDINGI(6)
-	int* InGameTime;
+	int* InGameTime; // 7
 
 	int CreateEffect(shok_effectCreatorData* data);
 	void HookCreateEffect();
 	int GetTimeMS();
+	int GetTick();
 };
 
 
@@ -1717,3 +1789,14 @@ extern void(*CreateEffectHookCallback)(int id, void* ret);
 extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
 extern bool(*PostEventCallback)(shok_BB_CEvent* ev);
 bool IsInRange(shok_position& a, shok_position& b, float r);
+bool ArePlayersHostile(int p1, int p2);
+float GetAngleBetween(shok_position& p1, shok_position& p2);
+
+#define EntityCategoryHeadquarters 7
+#define EntityCategoryLongRange 32
+#define EntityCategoryCannon 11
+#define EntityCategoryBridge 37
+#define EntityCategoryHero 22
+
+#define rad2deg(r) ((r) * 180 / M_PI)
+#define deg2rad(d) ((d) * M_PI / 180)

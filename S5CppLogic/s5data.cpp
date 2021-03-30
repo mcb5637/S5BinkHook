@@ -449,7 +449,6 @@ void shok_EGL_CMovingEntity::AttackMove(shok_position& p)
 	ev.id = 0x1502E; // attack move
 	ev.pos.X = p.X;
 	ev.pos.Y = p.Y;
-	ev.r = 0;
 	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
 	//shok_event_data_EGL_CEventValue_bool_703333479 e2 = shok_event_data_EGL_CEventValue_bool_703333479();
 	//e2.id = 0x1503B; // set target rotation state
@@ -472,7 +471,6 @@ void shok_EGL_CMovingEntity::Move(shok_position& p)
 	ev.id = 0x11002; // move
 	ev.pos.X = p.X;
 	ev.pos.Y = p.Y;
-	ev.r = 0;
 	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
 	TargetRotationValid = 0;
 }
@@ -508,7 +506,6 @@ void shok_EGL_CMovingEntity::HeroAbilitySendHawk(shok_position& p)
 	ev.id = 0x16002;
 	ev.pos.X = p.X;
 	ev.pos.Y = p.Y;
-	ev.r = 0;
 	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
 }
 
@@ -525,7 +522,6 @@ void shok_EGL_CMovingEntity::HeroAbilityPlaceBomb(shok_position& p)
 	ev.id = 0x15033;
 	ev.pos.X = p.X;
 	ev.pos.Y = p.Y;
-	ev.r = 0;
 	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
 }
 
@@ -569,4 +565,229 @@ void shok_EGL_CMovingEntity::HeroAbilityConvert(int target)
 	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
 }
 
-// summon 1601A convert 1ent 16027
+void shok_EGL_CMovingEntity::HeroAbilitySnipe(int tid)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x1602D;
+	ev.entityId = tid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityShuriken(int tid)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x1602F;
+	ev.entityId = tid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+shok_GGL_CHeroHawkBehavior* shok_EGL_CGLEEntity::GetHeroHawkBehavior()
+{
+	return (shok_GGL_CHeroHawkBehavior*)SearchBehavior(shok_vtp_GGL_CHeroHawkBehavior);
+}
+
+shok_GGL_CHeroHawkBehaviorProps* shok_GGlue_CGlueEntityProps::GetHeroHawkBehaviorProps()
+{
+	return (shok_GGL_CHeroHawkBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CHeroHawkBehaviorProps);
+}
+
+shok_GGL_CInflictFearAbilityProps* shok_GGlue_CGlueEntityProps::GetInflictFearBehaviorProps()
+{
+	return (shok_GGL_CInflictFearAbilityProps*)SearchBehaviorProp(shok_vtp_GGL_CInflictFearAbilityProps);
+}
+
+shok_GGL_CInflictFearAbility* shok_EGL_CGLEEntity::GetInflictFearBehavior()
+{
+	return (shok_GGL_CInflictFearAbility*)SearchBehavior(shok_vtp_GGL_CInflictFearAbility);
+}
+
+shok_GGL_CBombPlacerBehavior* shok_EGL_CGLEEntity::GetBombPlacerBehavior()
+{
+	return (shok_GGL_CBombPlacerBehavior*)SearchBehavior(shok_vtp_GGL_CBombPlacerBehavior);
+}
+
+shok_GGL_CHeroAbilityProps* shok_GGlue_CGlueEntityProps::GetBombPlacerBehaviorProps()
+{
+	return (shok_GGL_CHeroAbilityProps*)SearchBehaviorProp(shok_vtp_GGL_CHeroAbilityProps);
+}
+
+shok_GGL_CCannonBuilderBehaviorProps* shok_GGlue_CGlueEntityProps::GetCannonBuilderBehaviorProps()
+{
+	return (shok_GGL_CCannonBuilderBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CCannonBuilderBehaviorProps);
+}
+
+shok_GGL_CCannonBuilderBehavior* shok_EGL_CGLEEntity::GetCannonBuilderBehavior()
+{
+	return (shok_GGL_CCannonBuilderBehavior*)SearchBehavior(shok_vtp_GGL_CCannonBuilderBehavior);
+}
+
+shok_GGL_CRangedEffectAbility* shok_EGL_CGLEEntity::GetRangedEffectBehavior()
+{
+	return (shok_GGL_CRangedEffectAbility*)SearchBehavior(shok_vtp_GGL_CRangedEffectAbility);
+}
+
+shok_GGL_CCircularAttack* shok_EGL_CGLEEntity::GetCircularAttackBehavior()
+{
+	return (shok_GGL_CCircularAttack*)SearchBehavior(shok_vtp_GGL_CCircularAttack);
+}
+
+shok_GGL_CSummonBehavior* shok_EGL_CGLEEntity::GetSummonBehavior()
+{
+	return (shok_GGL_CSummonBehavior*)SearchBehavior(shok_vtp_GGL_CSummonBehavior);
+}
+
+shok_GGL_CSummonBehaviorProps* shok_GGlue_CGlueEntityProps::GetSummonBehaviorProps()
+{
+	return (shok_GGL_CSummonBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CSummonBehaviorProps);
+}
+
+shok_GGL_CConvertSettlerAbilityProps* shok_GGlue_CGlueEntityProps::GetConvertSettlersBehaviorProps()
+{
+	return (shok_GGL_CConvertSettlerAbilityProps*)SearchBehaviorProp(shok_vtp_GGL_CConvertSettlerAbilityProps);
+}
+
+shok_GGL_CConvertSettlerAbility* shok_EGL_CGLEEntity::GetConvertSettlerBehavior()
+{
+	return (shok_GGL_CConvertSettlerAbility*)SearchBehavior(shok_vtp_GGL_CConvertSettlerAbility);
+}
+
+bool ArePlayersHostile(int p1, int p2)
+{
+	return (*shok_GGL_CGLGameLogicObj)->GetPlayer(p1)->GetDiploStateTo(p2) == shok_DIPLOSTATE_HOSTILE;
+}
+
+shok_GGL_CSniperAbility* shok_EGL_CGLEEntity::GetSniperBehavior()
+{
+	return (shok_GGL_CSniperAbility*)SearchBehavior(shok_vtp_GGL_CSniperAbility);
+}
+
+shok_GGL_CShurikenAbility* shok_EGL_CGLEEntity::GetShurikenBehavior()
+{
+	return (shok_GGL_CShurikenAbility*)SearchBehavior(shok_vtp_GGL_CShurikenAbility);
+}
+
+void shok_EGL_CMovingEntity::ThiefSabotage(int tid)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x10107;
+	ev.entityId = tid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::ThiefDefuse(int tid)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x1010E;
+	ev.entityId = tid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::ThiefStealFrom(int tid)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x10102;
+	ev.entityId = tid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::ThiefSecureGoods(int tid)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x10103;
+	ev.entityId = tid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::ScoutBinoculars(shok_position& p)
+{
+	shok_event_data_EGL_CEventPosition ev = shok_event_data_EGL_CEventPosition();
+	ev.id = 0x11102;
+	ev.pos.X = p.X;
+	ev.pos.Y = p.Y;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::ScoutFindResource()
+{
+	shok_event_data_BB_CEvent ev = shok_event_data_BB_CEvent();
+	ev.id = 0x11104;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::ScoutPlaceTorch(shok_position& p)
+{
+	shok_event_data_EGL_CEventPosition ev = shok_event_data_EGL_CEventPosition();
+	ev.id = 0x11103;
+	ev.pos.X = p.X;
+	ev.pos.Y = p.Y;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+shok_GGL_CKegPlacerBehaviorProperties* shok_GGlue_CGlueEntityProps::GetKegPlacerBehaviorProps()
+{
+	return (shok_GGL_CKegPlacerBehaviorProperties*)SearchBehaviorProp(shok_vtp_GGL_CKegPlacerBehaviorProperties);
+}
+
+shok_GGL_CKegPlacerBehavior* shok_EGL_CGLEEntity::GetKegPlacerBehavior()
+{
+	return (shok_GGL_CKegPlacerBehavior*)SearchBehavior(shok_vtp_GGL_CKegPlacerBehavior);
+}
+
+shok_GGL_CAbilityScoutBinocularProps* shok_GGlue_CGlueEntityProps::GetBinocularBehaviorProps()
+{
+	return (shok_GGL_CAbilityScoutBinocularProps*)SearchBehaviorProp(shok_vtp_GGL_CAbilityScoutBinocularProps);
+}
+
+shok_GGL_CAbilityScoutBinocular* shok_EGL_CGLEEntity::GetBinocularBehavior()
+{
+	return (shok_GGL_CAbilityScoutBinocular*)SearchBehavior(shok_vtp_GGL_CAbilityScoutBinocular);
+}
+
+shok_GGL_CTorchPlacerBehavior* shok_EGL_CGLEEntity::GetTorchPlacerBehavior()
+{
+	return (shok_GGL_CTorchPlacerBehavior*)SearchBehavior(shok_vtp_GGL_CTorchPlacerBehavior);
+}
+
+shok_GGL_CTorchPlacerBehaviorProperties* shok_GGlue_CGlueEntityProps::GetTorchPlacerBehaviorProps()
+{
+	return (shok_GGL_CTorchPlacerBehaviorProperties*)SearchBehaviorProp(shok_vtp_GGL_CTorchPlacerBehaviorProperties);
+}
+
+shok_GGL_CPointToResourceBehaviorProperties* shok_GGlue_CGlueEntityProps::GetPointToResBehaviorProps()
+{
+	return (shok_GGL_CPointToResourceBehaviorProperties*)SearchBehaviorProp(shok_vtp_GGL_CPointToResourceBehaviorProperties);
+}
+
+shok_GGL_CPointToResourceBehavior* shok_EGL_CGLEEntity::GetPointToResBehavior()
+{
+	return (shok_GGL_CPointToResourceBehavior*)SearchBehavior(shok_vtp_GGL_CPointToResourceBehavior);
+}
+
+shok_GGL_CKegBehavior* shok_EGL_CGLEEntity::GetKegBehavior()
+{
+	return (shok_GGL_CKegBehavior*)SearchBehavior(shok_vtp_GGL_CKegBehavior);
+}
+
+int shok_EGL_CGLEGameLogic::GetTick()
+{
+	return InGameTime[0];
+}
+
+float GetAngleBetween(shok_position& p1, shok_position& p2)
+{
+	float dx = p1.X - p2.X;
+	float dy = p1.Y - p2.Y;
+	if (dx == 0 && dy == 0)
+		return 0;
+	float a = std::asinf(std::fabsf(dx) / (std::sqrtf(dx * dx + dy * dy)));
+	a = (float) rad2deg((double)a);
+	if (dx >= 0 && dy > 0)
+		a = 270 - a;
+	else if (dx < 0 && dy > 0)
+		a = 270 + a;
+	else if (dx < 0 && dy <= 0)
+		a = 90 - a;
+	else if (dx >= 0 && dy <= 0)
+		a = 90 + a;
+	return a;
+}

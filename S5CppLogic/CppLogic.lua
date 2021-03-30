@@ -395,20 +395,24 @@ function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
 function CppLogic.Entity.Settler.IsVisible(id) end
 
 --- command to send darios hawk.
+-- decreases hawk range automatically, asserts if ability cannot be used.
 -- @param id entity
 -- @param p target
 function CppLogic.Entity.Settler.CommandSendHawk(id, p) end
 
 --- command to inflict fear.
+-- asserts if ability cannot be used.
 -- @param id entity
 function CppLogic.Entity.Settler.CommandInflictFear(id) end
 
 --- command to place bomb.
+-- asserts if ability cannot be used.
 -- @param id entity
 -- @param p target
 function CppLogic.Entity.Settler.CommandPlaceBomb(id) end
 
 --- command to inflict fear.
+-- asserts if ability cannot be used.
 -- @param id entity
 -- @param p target
 -- @param bottom foundation type
@@ -416,21 +420,78 @@ function CppLogic.Entity.Settler.CommandPlaceBomb(id) end
 function CppLogic.Entity.Settler.CommandPlaceCannon(id, p, bottom, top) end
 
 --- command to activate ranged effect.
+-- asserts if ability cannot be used.
 -- @param id entity
 function CppLogic.Entity.Settler.CommandRangedEffect(id) end
 
 --- command to perform circular attack.
+-- asserts if ability cannot be used.
 -- @param id entity
 function CppLogic.Entity.Settler.CommandCircularAttack(id) end
 
 --- command to summon.
+-- asserts if ability cannot be used.
 -- @param id entity
 function CppLogic.Entity.Settler.CommandSummon(id) end
 
 --- command to convert.
+-- moves into range, asserts if ability cannot be used.
 -- @param id entity
 -- @param tid target
 function CppLogic.Entity.Settler.CommandConvert(id, tid) end
+
+--- command to snipe.
+-- asserts if ability cannot be used, including out of range.
+-- @param id entity
+-- @param tid target
+function CppLogic.Entity.Settler.CommandSnipe(id, tid) end
+
+--- command to use shuriken.
+-- asserts if ability cannot be used, including out of range.
+-- @param id entity
+-- @param tid target
+function CppLogic.Entity.Settler.CommandShuriken(id, tid) end
+
+--- command to use sabotage.
+-- asserts if ability cannot be used. does not check tech requirement.
+-- @param id entity
+-- @param tid target
+function CppLogic.Entity.Settler.CommandSabotage(id, tid) end
+
+--- command to defuse a sabotage.
+-- asserts if ability cannot be used. does not check tech requirement.
+-- @param id entity
+-- @param tid target
+function CppLogic.Entity.Settler.CommandDefuse(id, tid) end
+
+--- command to use binoculars.
+-- asserts if ability cannot be used.
+-- @param id entity
+-- @param p target
+function CppLogic.Entity.Settler.CommandBinocular(id, p) end
+
+--- command to place a torch.
+-- asserts if ability cannot be used. does not check tech requirement.
+-- @param id entity
+-- @param p target
+function CppLogic.Entity.Settler.CommandPlaceTorch(id, p) end
+
+--- command to search resources.
+-- asserts if ability cannot be used. does not check tech requirement.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandPointToRes(id) end
+
+--- command to steal.
+-- asserts if ability cannot be used.
+-- @param id entity
+-- @param tid target
+function CppLogic.Entity.Settler.CommandStealFrom(id, tid) end
+
+--- command to secure stolen goods.
+-- asserts if ability cannot be used.
+-- @param id entity
+-- @param tid target
+function CppLogic.Entity.Settler.CommandSecureGoods(id, tid) end
 
 --- a leaders experience.
 -- @param id leader
@@ -883,6 +944,9 @@ function UACore:SetStatus(s) end
 function UACore:SetReMove(b) end
 function UACore:SetCurrentBattleTarget(id) end
 function UACore:GetRangedMelee() end
+function UACore:SetIgnoreFleeing(fl) end
+function UACore:SetAutoRotateFormation(ar) end
+function UACore:GetFirstDeadHero() end
 
 
 --- creates new ua.
@@ -891,8 +955,8 @@ function UACore:GetRangedMelee() end
 function CppLogic.UA.New(pl, format, commandqueue, spawner, normalize) end
 
 --- gets next enemy in area.
-function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area) end
+function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area, ignoreFleeing) end
 
 function CppLogic.UA.AddIdleTaskList(t) end
 
-function CppLogic.UA.CountTargetEntitiesInArea(pl, pos, area) end
+function CppLogic.UA.CountTargetEntitiesInArea(pl, pos, area, ignoreFleeing) end

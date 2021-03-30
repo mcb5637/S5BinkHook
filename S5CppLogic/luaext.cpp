@@ -246,3 +246,9 @@ void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZ
 	}
 	lua_pop(L, 1);
 }
+
+void luaext_assertEntityAlive(lua_State* L, int id, const char* msg)
+{
+	if (shok_entityIsDead(id))
+		luaL_error(L, msg);
+}

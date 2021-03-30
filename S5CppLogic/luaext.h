@@ -31,6 +31,4 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i);
 void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i);
 void luaext_writeCostInfo(lua_State* L, shok_costInfo& c);
 void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZeroes);
-
-#define rad2deg(r) ((r) * 180 / M_PI)
-#define deg2rad(d) ((d) * M_PI / 180)
+void luaext_assertEntityAlive(lua_State* L, int id, const char* msg);

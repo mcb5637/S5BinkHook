@@ -15,12 +15,23 @@
 #include "l_ua.h"
 
 int __cdecl test(lua_State* L) {
-    shok_GGL_CHeroHawkBehavior s = shok_GGL_CHeroHawkBehavior();
+    /*shok_GGL_CHeroHawkBehavior s = shok_GGL_CHeroHawkBehavior();
     int st = (int)&s;
     int test = (int)&s.AbilitySecondsCharged;
-    lua_pushnumber(L, (test - st) / 4);
-    lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->GetTick());
-    return 1;
+    lua_pushnumber(L, (test - st) / 4);*/
+    byte* d = (byte*)0x4FCD26;
+    int* ad = (int*)0x4FCD27;
+    lua_pushnumber(L, d[0]);
+    lua_pushnumber(L, ad[0]);
+    return 2;
+}
+
+int cleanup(lua_State* L) {
+    l_entity_cleanup(L);
+    l_logic_cleanup(L);
+    l_combat_cleanup(L);
+    l_effect_cleanup(L);
+    return 0;
 }
 
 extern "C" void __cdecl install(lua_State * L) {
@@ -29,6 +40,7 @@ extern "C" void __cdecl install(lua_State * L) {
 
     lua_pushstring(L, "CppLogic");
     lua_newtable(L);
+    luaext_registerFunc(L, "OnLeaveMap", cleanup);
 
     lua_pushstring(L, "Memory");
     lua_newtable(L);

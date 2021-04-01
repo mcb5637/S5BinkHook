@@ -20,6 +20,9 @@ void l_ua_init(lua_State* L);
 struct UACannonData {
 	int EntityId, LastUpdated;
 };
+struct UACannonBuilderAbilityData {
+	int HeroType, BottomType, TopType;
+};
 
 class UnlimitedArmy {
 public:
@@ -41,6 +44,7 @@ public:
 	float LastRotation = 0;
 
 	static std::vector<int> IdleTaskLists;
+	static std::vector<UACannonBuilderAbilityData> CannonBuilderAbilityData;
 
 	UnlimitedArmy(int p);
 	~UnlimitedArmy();
@@ -54,8 +58,11 @@ public:
 	bool IsRanged(shok_EGL_CGLEEntity* e);
 	bool IsNonCombat(shok_EGL_CGLEEntity* e);
 
-	static shok_EGL_CGLEEntity* GetNextTarget(int player, shok_position& p, float ran, bool notFleeing);
-	static int GetTargetsInArea(int player, shok_position& p, float ran, bool notFleeing);
+	static shok_EGL_CGLEEntity* GetNearestTargetInArea(int player, shok_position& p, float ran, bool notFleeing);
+	static shok_EGL_CGLEEntity* GetNearestSettlerInArea(int player, shok_position& p, float ran, bool notFleeing);
+	static shok_EGL_CGLEEntity* GetNearestHeroOrCannonInArea(int player, shok_position& p, float ran, bool notFleeing);
+	static shok_EGL_CGLEEntity* GetFurthestTargetInArea(int player, shok_position& p, float ran, bool notFleeing);
+	static int CountTargetsInArea(int player, shok_position& p, float ran, bool notFleeing);
 
 private:
 	void CleanDead();
@@ -74,4 +81,5 @@ private:
 	void CallCommandQueue();
 	void CallSpawner();
 	void NormalizeSpeed(bool normalize, bool force);
+	bool ExecuteHeroAbility(shok_EGL_CGLEEntity* e, bool nume);
 };

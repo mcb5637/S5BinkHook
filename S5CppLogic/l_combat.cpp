@@ -60,6 +60,10 @@ int l_combat_DisableAoEProjectileFix(lua_State* L) {
 	return 0;
 }
 
+void l_combat_cleanup(lua_State* L) {
+	l_combat_DisableAoEProjectileFix(L);
+}
+
 void l_combat_init(lua_State* L)
 {
 	luaext_registerFunc(L, "DealDamage", &l_combat_dealDamage);

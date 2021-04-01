@@ -78,6 +78,12 @@ void l_effect_init(lua_State* L)
 	l_effect_idToCb = luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
+void l_effect_cleanup(lua_State* L) {
+	luaL_unref(L, LUA_REGISTRYINDEX, l_effect_idToCb);
+	l_effect_idToCb = LUA_NOREF;
+	FlyingEffectOnHitCallback = nullptr;
+}
+
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-100000, y, x, y, 500, 1000, 0, 0, 1, 0, LuaDebugger.Log)
 // local id = e(); local p = GetPosition(id); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, p.X-1000, p.Y, p.X, p.Y, 100, 1000, 0, 0, 1, 0)
 // CppLogic.Effect.IsValidEffect(effid)

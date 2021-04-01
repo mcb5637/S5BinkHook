@@ -2,9 +2,12 @@
 #include "l_ua.h"
 #include "luaext.h"
 #include "l_entity.h"
+#include <random>
 
 
 std::vector<int> UnlimitedArmy::IdleTaskLists = std::vector<int>();
+std::vector<UACannonBuilderAbilityData> UnlimitedArmy::CannonBuilderAbilityData = std::vector<UACannonBuilderAbilityData>();
+
 UnlimitedArmy::~UnlimitedArmy()
 {
 	luaL_unref(L, LUA_REGISTRYINDEX, Formation);
@@ -79,7 +82,7 @@ void UnlimitedArmy::Tick()
 	PosLastUpdatedTick = -1;
 	CalculatePos();
 	if (!IsTargetValid(CurrentBattleTarget)) {
-		shok_EGL_CGLEEntity* e = GetNextTarget(Player, LastPos, Area, IgnoreFleeing);
+		shok_EGL_CGLEEntity* e = GetNearestTargetInArea(Player, LastPos, Area, IgnoreFleeing);
 		if (e == nullptr)
 			CurrentBattleTarget = 0;
 		else {
@@ -94,7 +97,7 @@ void UnlimitedArmy::Tick()
 		CheckStatus(UAStatus_Battle);
 		preventComands = true;
 	}
-	if (!preventComands && !IsInRange(LastPos, Target, 1000)) {
+	if (!preventComands && !LastPos.IsInRange(Target, 1000)) {
 		if (Status != UAStatus_Moving && Status != UAStatus_MovingNoBattle)
 			CheckStatus(UAStatus_Moving);
 		preventComands = true;
@@ -102,9 +105,9 @@ void UnlimitedArmy::Tick()
 	if (!preventComands) {
 		CheckStatus(UAStatus_Idle);
 		if (AutoRotateFormation >= 0) {
-			shok_EGL_CGLEEntity* e = GetNextTarget(Player, LastPos, AutoRotateFormation, IgnoreFleeing);
+			shok_EGL_CGLEEntity* e = GetNearestTargetInArea(Player, LastPos, AutoRotateFormation, IgnoreFleeing);
 			if (e != nullptr) {
-				float a = GetAngleBetween(LastPos, e->Position);
+				float a = LastPos.GetAngleBetween(e->Position);
 				if (std::fabsf(a - LastRotation) > 10) {
 					LastRotation = a;
 					ReMove = true;
@@ -129,7 +132,7 @@ void UnlimitedArmy::NeedFormat()
 void UnlimitedArmy::AddLeader(shok_EGL_CGLEEntity* e)
 {
 	CalculatePos();
-	if (Leaders.size() == 0 || IsInRange(LastPos, e->Position, Area)) {
+	if (Leaders.size() == 0 || LastPos.IsInRange(e->Position, Area)) {
 		Leaders.push_back(e->EntityId);
 		PosLastUpdatedTick = -1;
 		if (Target.X == -1) {
@@ -174,7 +177,7 @@ void UnlimitedArmy::CheckTransit()
 	}
 	auto e = std::remove_if(LeaderInTransit.begin(), LeaderInTransit.end(), [this](int id) {
 		shok_EGL_CGLEEntity* e = shok_eid2obj(id);
-		if (IsInRange(this->LastPos, e->Position, this->Area)) {
+		if (this->LastPos.IsInRange(e->Position, this->Area)) {
 			this->Leaders.push_back(id);
 			if (e->IsEntityInCategory(EntityCategoryCannon))
 				this->Cannons.push_back({ e->EntityId, -1 });
@@ -200,7 +203,7 @@ int UnlimitedArmy::GetSize(bool transit, bool hero)
 		r += DeadHeroes.size();
 	return r;
 }
-shok_EGL_CGLEEntity* UnlimitedArmy::GetNextTarget(int player, shok_position& p, float ran, bool notFleeing)
+shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestTargetInArea(int player, shok_position& p, float ran, bool notFleeing)
 {
 	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
 	int buff[8];
@@ -231,12 +234,89 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNextTarget(int player, shok_position& p, 
 	}
 	return r;
 }
+shok_EGL_CGLEEntity* UnlimitedArmy::GetFurthestTargetInArea(int player, shok_position& p, float ran, bool notFleeing)
+{
+	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
+	int buff[8];
+	int bufflen = 8;
+	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
+	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(UATargetCatLeader);
+	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
+	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
+	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
+	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
+	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
+	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
+	EntityIteratorPredicate* preds[8] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee
+	};
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
+	EntityIterator iter = EntityIterator(&a);
+	shok_EGL_CGLEEntity* r = iter.GetFurthest(nullptr);
+	if (r == nullptr) {
+		preds[2] = &buil;
+		r = iter.GetFurthest(nullptr);
+	}
+	if (r == nullptr) {
+		cat = EntityIteratorPredicateOfEntityCategory(UATargetCat);
+		preds[2] = &cat;
+		r = iter.GetFurthest(nullptr);
+	}
+	return r;
+}
+shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSettlerInArea(int player, shok_position& p, float ran, bool notFleeing)
+{
+	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
+	int buff[8];
+	int bufflen = 8;
+	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
+	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(UATargetCatLeader);
+	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
+	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
+	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
+	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
+	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
+	EntityIteratorPredicate* preds[8] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee
+	};
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
+	EntityIterator iter = EntityIterator(&a);
+	return iter.GetNearest(nullptr);
+}
+shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestHeroOrCannonInArea(int player, shok_position& p, float ran, bool notFleeing)
+{
+	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
+	int buff[8];
+	int bufflen = 8;
+	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
+	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
+
+	EntityIteratorPredicateOfEntityCategory he = EntityIteratorPredicateOfEntityCategory(EntityCategoryHero);
+	EntityIteratorPredicateOfEntityCategory can = EntityIteratorPredicateOfEntityCategory(EntityCategoryCannon);
+	EntityIteratorPredicate* cats[2] = {
+		&he, &can
+	};
+	EntityIteratorPredicateOr cat = EntityIteratorPredicateOr(cats, 2);
+
+	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
+	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
+	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
+	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
+	EntityIteratorPredicate* preds[7] = {
+		&relev, &pl, &cat, &al, &vis, &cir, &nflee
+	};
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 7 : 6);
+	EntityIterator iter = EntityIterator(&a);
+	return iter.GetNearest(nullptr);
+}
 bool UnlimitedArmy::IsTargetValid(int id)
 {
 	if (shok_entityIsDead(id))
 		return false;
 	shok_EGL_CGLEEntity* e = shok_eid2obj(id);
-	if (!IsInRange(LastPos, e->Position, Area))
+	if (!LastPos.IsInRange(e->Position, Area))
 		return false;
 	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
 	if (c != nullptr) {
@@ -289,6 +369,10 @@ void UnlimitedArmy::BattleCommand()
 		NormalizeSpeed(false, false);
 	for (int id : Leaders) { // hero abilities
 		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*) shok_eid2obj(id);
+		if (e->IsEntityInCategory(EntityCategoryHero)) {
+			if (ExecuteHeroAbility(e, 0))
+				continue;
+		}
 		if ((ReMove || !LeaderIsInBattle(e) ) && !IsNonCombat(e) && !e->IsEntityInCategory(EntityCategoryCannon)) {
 			if (IsRanged(e)) {
 				e->AttackEntity(CurrentBattleTarget);
@@ -364,14 +448,14 @@ bool UnlimitedArmy::IsIdle()
 	if (LeaderInTransit.size() > 0)
 		return false;
 	CalculatePos();
-	if (!IsInRange(LastPos, Target, 1000))
+	if (!LastPos.IsInRange(Target, 1000))
 		return false;
 	for (int id : Leaders)
 		if (!LeaderIsIdle(shok_eid2obj(id)))
 			return false;
 	return true;
 }
-int UnlimitedArmy::GetTargetsInArea(int player, shok_position& p, float ran, bool notFleeing)
+int UnlimitedArmy::CountTargetsInArea(int player, shok_position& p, float ran, bool notFleeing)
 {
 	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
 	int buff[8];
@@ -379,16 +463,15 @@ int UnlimitedArmy::GetTargetsInArea(int player, shok_position& p, float ran, boo
 	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
 	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
 	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(UATargetCat);
-	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
 	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-	EntityIteratorPredicate* preds[8] = {
-		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee
+	EntityIteratorPredicate* preds[7] = {
+		&relev, &pl, &cat, &al, &vis, &cir, &nflee
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 7 : 6);
 	EntityIterator iter = EntityIterator(&a);
 	int count = 0;
 	shok_EGL_CGLEEntity* e = nullptr;
@@ -430,6 +513,143 @@ void UnlimitedArmy::NormalizeSpeed(bool normalize, bool force)
 	lua_pushboolean(L, force);
 	lua_call(L, 2, 0); // errors get propagated to lua tick
 	lua_settop(L, t);
+}
+std::random_device                  rand_dev;
+std::mt19937                        generator(rand_dev());
+std::uniform_int_distribution<int>  distr(-10, 10);
+bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e, bool nume)
+{
+	// first instant abilities
+	{
+		shok_GGL_CRangedEffectAbility* a = e->GetRangedEffectBehavior();
+		if (a != nullptr) {
+			shok_GGL_CRangedEffectAbilityProps* p = e->GetEntityType()->GetRangedEffectBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				float r = 1000;
+				if (p->AffectsLongRangeOnly)
+					r = 3000;
+				if (!((shok_GGL_CSettler*)e)->IsMoving() && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 10) {
+					if (p->DamageFactor > 0 || p->ArmorFactor > 0) { // todo heal
+						((shok_GGL_CSettler*)e)->HeroAbilityRangedEffect();
+					}
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CSummonBehavior* a = e->GetSummonBehavior();
+		if (a != nullptr) {
+			shok_GGL_CSummonBehaviorProps* p = e->GetEntityType()->GetSummonBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
+					((shok_GGL_CSettler*)e)->HeroAbilitySummon(); // todo add summons to army
+				}
+			}
+		}
+	}
+
+	// then noninstant
+	{
+		shok_GGL_CCircularAttack* a = e->GetCircularAttackBehavior();
+		if (a != nullptr) {
+			shok_GGL_CCircularAttackProps* p = e->GetEntityType()->GetCircularAttackBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
+					((shok_GGL_CSettler*)e)->HeroAbilityCircularAttack();
+					return true;
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CBombPlacerBehavior* a = e->GetBombPlacerBehavior();
+		if (a != nullptr) {
+			shok_GGL_CHeroAbilityProps* p = e->GetEntityType()->GetBombPlacerBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				if (CountTargetsInArea(Player, e->Position, 500, IgnoreFleeing) >= 10) {
+					((shok_GGL_CSettler*)e)->HeroAbilityPlaceBomb(e->Position);
+					return true;
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CCannonBuilderBehavior* a = e->GetCannonBuilderBehavior();
+		if (a != nullptr) {
+			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetCannonBuilderBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				int ety = e->EntityType;
+				auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
+				if (d != CannonBuilderAbilityData.end() && CountTargetsInArea(Player, e->Position, 2000, IgnoreFleeing) >= 10) {
+					shok_position p = e->Position;
+					p.X += distr(generator)*100;
+					p.Y += distr(generator)*100;
+					p.FloorToBuildingPlacement();
+					if (shok_canPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
+						((shok_GGL_CSettler*)e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
+						return true;
+					}
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CShurikenAbility* a = e->GetShurikenBehavior();
+		if (a != nullptr) {
+			shok_GGL_CShurikenAbilityProps* p = e->GetEntityType()->GetShurikenBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
+					shok_EGL_CGLEEntity* tar = GetNearestSettlerInArea(Player, e->Position, p->Range, IgnoreFleeing);
+					if (tar != nullptr) {
+						((shok_GGL_CSettler*)e)->HeroAbilityShuriken(tar->EntityId);
+						return true;
+					}
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CConvertSettlerAbility* a = e->GetConvertSettlerBehavior();
+		if (a != nullptr) {
+			shok_GGL_CConvertSettlerAbilityProps* p = e->GetEntityType()->GetConvertSettlersBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				if (CountTargetsInArea(Player, e->Position, p->ConversionMaxRange, IgnoreFleeing) >= 10) {
+					shok_EGL_CGLEEntity* tar = GetFurthestTargetInArea(Player, e->Position, p->ConversionStartRange, IgnoreFleeing);
+					if (tar != nullptr) {
+						((shok_GGL_CSettler*)e)->HeroAbilityConvert(tar->EntityId);
+						return true;
+					}
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CSniperAbility* a = e->GetSniperBehavior();
+		if (a != nullptr) {
+			shok_GGL_CSniperAbilityProps* p = e->GetEntityType()->GetSniperBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				shok_EGL_CGLEEntity* tar = GetNearestHeroOrCannonInArea(Player, e->Position, p->Range, IgnoreFleeing);
+				if (tar != nullptr) {
+					((shok_GGL_CSettler*)e)->HeroAbilitySnipe(tar->EntityId);
+					return true;
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CInflictFearAbility* a = e->GetInflictFearBehavior();
+		if (a != nullptr) {
+			shok_GGL_CInflictFearAbilityProps* p = e->GetEntityType()->GetInflictFearBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				if (CountTargetsInArea(Player, e->Position, p->Range/2, IgnoreFleeing) >= 10) { // TODO ignore fleeing as targets?
+					((shok_GGL_CSettler*)e)->HeroAbilityInflictFear();
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 const char* udname = "UnlimitedArmy";
@@ -779,7 +999,7 @@ int l_uaNearest(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 2);
 	float r = luaL_checkfloat(L, 3);
-	shok_EGL_CGLEEntity* e = UnlimitedArmy::GetNextTarget(pl, p, r, lua_toboolean(L, 4));
+	shok_EGL_CGLEEntity* e = UnlimitedArmy::GetNearestTargetInArea(pl, p, r, lua_toboolean(L, 4));
 	if (e == nullptr)
 		lua_pushnumber(L, 0);
 	else
@@ -792,7 +1012,7 @@ int l_uaCount(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 2);
 	float r = luaL_checkfloat(L, 3);
-	lua_pushnumber(L, UnlimitedArmy::GetTargetsInArea(pl, p, r, lua_toboolean(L, 4)));
+	lua_pushnumber(L, UnlimitedArmy::CountTargetsInArea(pl, p, r, lua_toboolean(L, 4)));
 	return 1;
 }
 
@@ -802,12 +1022,19 @@ int l_uaAddIdleTL(lua_State* L) {
 	return 0;
 }
 
+int l_uaAddCannonBuilderData(lua_State* L) {
+	UACannonBuilderAbilityData d = { luaL_checkint(L, 1), luaL_checkint(L, 2), luaL_checkint(L, 3) };
+	UnlimitedArmy::CannonBuilderAbilityData.emplace_back(d);
+	return 0;
+}
+
 void l_ua_init(lua_State* L)
 {
 	luaext_registerFunc(L, "New", &l_uaNew);
 	luaext_registerFunc(L, "GetNearestEnemyInArea", &l_uaNearest);
 	luaext_registerFunc(L, "AddIdleTaskList", &l_uaAddIdleTL);
 	luaext_registerFunc(L, "CountTargetEntitiesInArea", &l_uaCount);
+	luaext_registerFunc(L, "AddCannonBuilderData", &l_uaAddCannonBuilderData);
 
 	luaL_newmetatable(L, udname);
 	lua_pushstring(L, "__gc");

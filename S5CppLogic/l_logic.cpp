@@ -676,6 +676,25 @@ int l_playerGetKillStatistics(lua_State* L) {
 	return 4;
 }
 
+int l_logicCanPLaceBuildingAt(lua_State* L) {
+	int ty = luaL_checkint(L, 1);
+	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(ty);
+	luaext_assertPointer(L, ety, "no entitytype");
+	luaext_assert(L, ety->IsBuildingType(), "not a building");
+	int pl = luaL_checkint(L, 2);
+	shok_position p;
+	luaext_checkPos(L, p, 3);
+	p.FloorToBuildingPlacement();
+	float r = luaL_checkfloat(L, 4);
+	int bon = luaL_checkint(L, 5);
+	lua_pushboolean(L, shok_canPlaceBuilding(ty, pl, &p, r, bon));
+	return 1;
+}
+
+void l_logic_cleanup(lua_State* L) {
+	l_netEventUnSetHook(L);
+}
+
 void l_logic_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetDamageFactor", l_logicGetDamageModifier);
@@ -685,6 +704,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "PlayerGetPaydayStartetTick", &l_playerGetPaydayStatus);
 	luaext_registerFunc(L, "PlayerSetPaydayStartetTick", &l_playerSetPaydayStatus);
 	luaext_registerFunc(L, "PlayerGetKillStatistics", &l_playerGetKillStatistics);
+	luaext_registerFunc(L, "CanPlaceBuildingAt", &l_logicCanPLaceBuildingAt);
 
 
 	lua_pushstring(L, "UICommands");

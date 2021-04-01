@@ -6,6 +6,7 @@
 #define l_entity_checkpredicate(L, i) (EntityIteratorPredicate *) luaext_checkudata(L, i)
 
 void l_entity_init(lua_State* L);
+void l_entity_cleanup(lua_State* L);
 
 class EntityIteratorPredicate {
 public:
@@ -21,6 +22,7 @@ public:
 	void Reset();
 	shok_EGL_CGLEEntity* GetNext(float* rangeOut);
 	shok_EGL_CGLEEntity* GetNearest(float* rangeOut);
+	shok_EGL_CGLEEntity* GetFurthest(float* rangeOut);
 };
 
 struct EntityIteratorPredicateOfType : EntityIteratorPredicate {
@@ -60,10 +62,12 @@ public:
 // not using sqrt
 struct EntityIteratorPredicateInCircle : EntityIteratorPredicate {
 private:
-	float x, y, r;
+	shok_position p;
+	float r;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
 	EntityIteratorPredicateInCircle(float x, float y, float r);
+	EntityIteratorPredicateInCircle(shok_position &p, float r);
 };
 
 struct EntityIteratorPredicateIsSettler : EntityIteratorPredicate {

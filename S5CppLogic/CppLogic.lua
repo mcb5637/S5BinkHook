@@ -18,6 +18,10 @@ CppLogic.Logic = {}
 CppLogic.Logic.UICommands = {}
 CppLogic.UA = {}
 
+--- call this function to cleanup used hooks.
+-- does not reset values in entitytypes.
+function CppLogic.OnLeaveMap() end
+
 --- check if an effect is valid
 -- @param id effect id
 -- @return true/false
@@ -88,6 +92,15 @@ function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
 -- @return numBuildingKilled
 -- @return numBuildingLost
 function CppLogic.Logic.PlayerGetKillStatistics(p) end
+
+--- checks building placement at a specific position.
+-- does not check, if BuildOn type matches.
+-- @param ty entitytype to place
+-- @param pl player
+-- @param pos target position
+-- @param rot rotation
+-- @param bon BuildOn entity id, or 0
+function CppLogic.Logic.CanPlaceBuildingAt(ty, pl, pos, rot, bon) end
 
 --- ui command callback.
 -- func parameters are (eventId, eventData)
@@ -412,7 +425,8 @@ function CppLogic.Entity.Settler.CommandInflictFear(id) end
 function CppLogic.Entity.Settler.CommandPlaceBomb(id) end
 
 --- command to inflict fear.
--- asserts if ability cannot be used.
+-- asserts if ability cannot be used, checks position.
+-- does not check bottom & top entitytype.
 -- @param id entity
 -- @param p target
 -- @param bottom foundation type
@@ -492,6 +506,13 @@ function CppLogic.Entity.Settler.CommandStealFrom(id, tid) end
 -- @param id entity
 -- @param tid target
 function CppLogic.Entity.Settler.CommandSecureGoods(id, tid) end
+
+--- enables conversion hook. gets called twice, before and after conversion.
+-- the first created entity after pre call is the new converted leader.
+-- @param func function(targetId, player, isPost, converterId)
+function CppLogic.Entity.Settler.EnableConversionHook(func) end
+--- disables conversion hook.
+function CppLogic.Entity.Settler.DisableConversionHook() end
 
 --- a leaders experience.
 -- @param id leader
@@ -958,5 +979,7 @@ function CppLogic.UA.New(pl, format, commandqueue, spawner, normalize) end
 function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area, ignoreFleeing) end
 
 function CppLogic.UA.AddIdleTaskList(t) end
+
+function CppLogic.UA.AddCannonBuilderData(heroTy, bottomTy, topTy) end
 
 function CppLogic.UA.CountTargetEntitiesInArea(pl, pos, area, ignoreFleeing) end

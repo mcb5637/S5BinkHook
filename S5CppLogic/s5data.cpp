@@ -31,6 +31,8 @@ void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_posi
 lua_State** shok_luastate_game = (lua_State**)0x853A9C;
 shok_GGUI_CManager* (*shok_GetGuiManager)() = (shok_GGUI_CManager * (*)()) 0x525622;
 bool(_cdecl* shok_entityIsDead)(int id) = (bool(_cdecl*)(int)) 0x44B096;
+bool(_cdecl* shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;
+int(_cdecl* shok_entityChangePlayer)(int entityid, int player) = (int(_cdecl*)(int, int)) 0x49A6A7;
 
 bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = (bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x4FAABD;
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
@@ -475,13 +477,6 @@ void shok_EGL_CMovingEntity::Move(shok_position& p)
 	TargetRotationValid = 0;
 }
 
-bool IsInRange(shok_position& a, shok_position& b, float r)
-{
-	float dx = a.X - b.X;
-	float dy = a.Y - b.Y;
-	return (dx * dx + dy * dy) <= (r * r);
-}
-
 int(__thiscall* shok_GGL_CPlayerStatus_getDiploState)(int* d, int p) = (int(__thiscall*)(int* d, int p)) 0x4B4D5B;
 int shok_GGL_CPlayerStatus::GetDiploStateTo(int p)
 {
@@ -773,14 +768,32 @@ int shok_EGL_CGLEGameLogic::GetTick()
 	return InGameTime[0];
 }
 
-float GetAngleBetween(shok_position& p1, shok_position& p2)
+void shok_position::FloorToBuildingPlacement()
 {
-	float dx = p1.X - p2.X;
-	float dy = p1.Y - p2.Y;
+	X = std::floorf(X / 100) * 100;
+	Y = std::floorf(Y / 100) * 100;
+}
+
+float shok_position::GetDistanceSquaredTo(shok_position& p)
+{
+	float dx = X - p.X;
+	float dy = Y - p.Y;
+	return (dx * dx + dy * dy);
+}
+
+bool shok_position::IsInRange(shok_position& p, float range)
+{
+	return GetDistanceSquaredTo(p) <= (range * range);
+}
+
+float shok_position::GetAngleBetween(shok_position& p)
+{
+	float dx = X - p.X;
+	float dy = Y - p.Y;
 	if (dx == 0 && dy == 0)
 		return 0;
 	float a = std::asinf(std::fabsf(dx) / (std::sqrtf(dx * dx + dy * dy)));
-	a = (float) rad2deg((double)a);
+	a = (float)rad2deg((double)a);
 	if (dx >= 0 && dy > 0)
 		a = 270 - a;
 	else if (dx < 0 && dy > 0)
@@ -790,4 +803,37 @@ float GetAngleBetween(shok_position& p1, shok_position& p2)
 	else if (dx >= 0 && dy <= 0)
 		a = 90 + a;
 	return a;
+}
+
+bool shok_EGL_CGLEEntity::IsSettler()
+{
+	return shok_EntityIsSettler(this);
+}
+
+bool shok_EGL_CMovingEntity::IsMoving()
+{
+	shok_event_data_EGL_CEventValue_bool_703333479 d = shok_event_data_EGL_CEventValue_bool_703333479();
+	d.id = 0x20009;
+	d.b = false;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &d);
+	return d.b;
+}
+
+void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter) = nullptr;
+int _cdecl hero6convertchangeplayer(int id, int pl) {
+	shok_EGL_CGLEEntity* c = (shok_EGL_CGLEEntity*)1;
+	_asm { mov c, esi }
+	if (Hero6ConvertHookCb)
+		Hero6ConvertHookCb(id, pl, false, c->EntityId);
+	int r = shok_entityChangePlayer(id, pl);
+	if (Hero6ConvertHookCb)
+		Hero6ConvertHookCb(id, pl, true, c->EntityId);
+	return r;
+}
+void HookHero6Convert()
+{
+	//byte* d = (byte*)0x4FCD26; // opcode call E8
+	int* ad = (int*)0x4FCD27; // operand relative to next instruction
+	//*d = 0x9a;
+	*ad = ((int) &hero6convertchangeplayer) - 0x4FCD2B;
 }

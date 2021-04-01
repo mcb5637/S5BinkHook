@@ -482,10 +482,11 @@ void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d
 }
 
 int l_entity_test(lua_State* L) {
-	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
-	shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
+	//shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	/*shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
 	FireEvent = vt->FireEvent;
-	vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;
+	vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;*/
+	//lua_pushnumber(L, (int)&e->GetConvertSettlerBehavior()->TimeToConvert);
 	return 0;
 }
 
@@ -673,8 +674,15 @@ int l_settlerPlaceCannon(lua_State* L) {
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
 	shok_position p = { 0,0 };
 	luaext_checkPos(L, p, 2);
-	// check pos buildable
-	e->HeroAbilityPlaceCannon(p, luaL_checkint(L, 3), luaL_checkint(L, 4));
+	p.FloorToBuildingPlacement();
+	int bottom = luaL_checkint(L, 3);
+	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(bottom);
+	luaext_assertPointer(L, ety, "no bottom entitytype");
+	luaext_assert(L, ety->IsBuildingType(), "bottom not a building");
+	int top = luaL_checkint(L, 4);
+	luaext_assertPointer(L, (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(top), "no top entitytype");
+	luaext_assert(L, shok_canPlaceBuilding(bottom, e->PlayerId, &p, 0, 0), "cannot place foundation at that position");
+	e->HeroAbilityPlaceCannon(p, bottom, top);
 	return 0;
 }
 
@@ -735,7 +743,7 @@ int l_settlerSnipe(lua_State* L) {
 	shok_GGL_CSettler* t = luaext_checkSettler(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
 	luaext_assert(L, ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile");
-	luaext_assert(L, IsInRange(e->Position, t->Position, bp->Range), "target not in range");
+	luaext_assert(L, e->Position.IsInRange(t->Position, bp->Range), "target not in range");
 	e->HeroAbilitySnipe(t->EntityId);
 	return 0;
 }
@@ -750,7 +758,7 @@ int l_settlerShuriken(lua_State* L) {
 	shok_GGL_CSettler* t = luaext_checkSettler(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
 	luaext_assert(L, ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile");
-	luaext_assert(L, IsInRange(e->Position, t->Position, bp->Range), "target not in range");
+	luaext_assert(L, e->Position.IsInRange(t->Position, bp->Range), "target not in range");
 	e->HeroAbilityShuriken(t->EntityId);
 	return 0;
 }
@@ -845,6 +853,38 @@ int l_settlerSecureGoods(lua_State* L) {
 	return 0;
 }
 
+int ConversionHookRef = LUA_NOREF;
+int l_settlerEnableConversionHook(lua_State* L) {
+	if (!lua_isfunction(L, 1))
+		luaL_error(L, "no func");
+	lua_pushvalue(L, 1);
+	luaL_unref(L, LUA_REGISTRYINDEX, ConversionHookRef);
+	ConversionHookRef = luaL_ref(L, LUA_REGISTRYINDEX);
+	HookHero6Convert();
+	Hero6ConvertHookCb = [](int id, int pl, bool post, int converter) {
+		lua_State* L = *shok_luastate_game;
+		int t = lua_gettop(L);
+		lua_rawgeti(L, LUA_REGISTRYINDEX, ConversionHookRef);
+		lua_pushnumber(L, id);
+		lua_pushnumber(L, pl);
+		lua_pushboolean(L, post);
+		lua_pushnumber(L, converter);
+		lua_pcall(L, 4, 0, 0);
+		lua_settop(L, t);
+	};
+	return 0;
+}
+int l_settlerDisableConversionHook(lua_State* L) {
+	luaL_unref(L, LUA_REGISTRYINDEX, ConversionHookRef);
+	ConversionHookRef = LUA_NOREF;
+	Hero6ConvertHookCb = nullptr;
+	return 0;
+}
+
+void l_entity_cleanup(lua_State* L) {
+	l_settlerDisableConversionHook(L);
+}
+
 void l_entity_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetNumberOfAllocatedEntities", &l_entity_getNum);
@@ -928,6 +968,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandPointToRes", &l_settlerPointToRes);
 	luaext_registerFunc(L, "CommandStealFrom", &l_settlerStealFrom);
 	luaext_registerFunc(L, "CommandSecureGoods", &l_settlerSecureGoods);
+	luaext_registerFunc(L, "EnableConversionHook", &l_settlerEnableConversionHook);
+	luaext_registerFunc(L, "DisableConversionHook", &l_settlerDisableConversionHook);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -1001,6 +1043,23 @@ shok_EGL_CGLEEntity* EntityIterator::GetNearest(float* rangeOut)
 		*rangeOut = maxR;
 	return ret;
 }
+shok_EGL_CGLEEntity* EntityIterator::GetFurthest(float* rangeOut)
+{
+	shok_EGL_CGLEEntity* curr, * ret = nullptr;
+	float currR = -1, maxR = -1;
+	Reset();
+	curr = GetNext(&currR);
+	while (curr != nullptr) {
+		if (maxR == -1 || currR > maxR) {
+			ret = curr;
+			maxR = currR;
+		}
+		curr = GetNext(&currR);
+	}
+	if (rangeOut != nullptr)
+		*rangeOut = maxR;
+	return ret;
+}
 
 EntityIteratorPredicateOfType::EntityIteratorPredicateOfType(int etype)
 {
@@ -1054,9 +1113,7 @@ EntityIteratorPredicateOr::EntityIteratorPredicateOr(EntityIteratorPredicate** t
 
 bool EntityIteratorPredicateInCircle::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
-	float dx = e->Position.X - x;
-	float dy = e->Position.Y - y;
-	float ran = (dx * dx + dy * dy);
+	float ran = p.GetDistanceSquaredTo(e->Position);
 	if (rangeOut != nullptr)
 		*rangeOut = ran;
 	return ran <= r;
@@ -1064,8 +1121,12 @@ bool EntityIteratorPredicateInCircle::MatchesEntity(shok_EGL_CGLEEntity* e, floa
 
 EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(float x, float y, float r)
 {
-	this->x = x;
-	this->y = y;
+	this->p = { x,y };
+	this->r = r * r;
+}
+EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(shok_position& p, float r)
+{
+	this->p = p;
 	this->r = r * r;
 }
 

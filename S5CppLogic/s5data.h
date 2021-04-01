@@ -84,6 +84,11 @@ inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::functio
 struct shok_position {
 	float X;
 	float Y;
+	void FloorToBuildingPlacement();
+	float GetDistanceSquaredTo(shok_position& p);
+	bool IsInRange(shok_position& p, float range);
+	// returns deg
+	float GetAngleBetween(shok_position& p);
 };
 
 struct shok_positionRot : shok_position {
@@ -1110,6 +1115,7 @@ public:
 
 	bool IsEntityInCategory(int cat);
 	bool IsMovingEntity();
+	bool IsSettler();
 	shok_GGlue_CGlueEntityProps* GetEntityType();
 
 	int EventGetDamage();
@@ -1202,6 +1208,7 @@ public:
 	void ScoutBinoculars(shok_position& p);
 	void ScoutFindResource();
 	void ScoutPlaceTorch(shok_position& p);
+	bool IsMoving();
 };
 
 #define shok_vtp_GGL_CEvadingEntity (void*)0x770A7C
@@ -1752,6 +1759,10 @@ extern shok_GGUI_CManager*(* shok_GetGuiManager)();
 
 extern bool(_cdecl* shok_entityIsDead)(int id);
 
+extern bool(_cdecl* shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId);
+
+extern int(_cdecl* shok_entityChangePlayer)(int entityid, int player);
+
 // global objects
 extern shok_ECS_CManager*** shok_ECS_CManagerObject;
 
@@ -1788,9 +1799,10 @@ extern void(*CreateEffectHookCallback)(int id, void* ret);
 
 extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
 extern bool(*PostEventCallback)(shok_BB_CEvent* ev);
-bool IsInRange(shok_position& a, shok_position& b, float r);
 bool ArePlayersHostile(int p1, int p2);
-float GetAngleBetween(shok_position& p1, shok_position& p2);
+
+extern void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter);
+void HookHero6Convert();
 
 #define EntityCategoryHeadquarters 7
 #define EntityCategoryLongRange 32

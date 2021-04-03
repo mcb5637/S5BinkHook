@@ -13,17 +13,25 @@
 #include "l_logic.h"
 #include "l_tech.h"
 #include "l_ua.h"
+#include <map>
+#include <set>
+
+struct i {
+    int a, b;
+};
+bool operator<(i a, i b) {
+    if (a.a == b.a)
+        return a.b < b.b;
+    return a.a < b.a;
+}
 
 int __cdecl test(lua_State* L) {
     /*shok_GGL_CHeroHawkBehavior s = shok_GGL_CHeroHawkBehavior();
     int st = (int)&s;
     int test = (int)&s.AbilitySecondsCharged;
     lua_pushnumber(L, (test - st) / 4);*/
-    byte* d = (byte*)0x4FCD26;
-    int* ad = (int*)0x4FCD27;
-    lua_pushnumber(L, d[0]);
-    lua_pushnumber(L, ad[0]);
-    return 2;
+    lua_pushnumber(L, sizeof(i));
+    return 1;
 }
 
 int cleanup(lua_State* L) {

@@ -59,6 +59,40 @@ bool operator==(const shok_allocator <T>&, const shok_allocator <U>&) { return t
 template <class T, class U>
 bool operator!=(const shok_allocator <T>&, const shok_allocator <U>&) { return false; }
 
+template <class T>
+struct shok_treeNode {
+	shok_treeNode<T>* left, * parent, * right;
+	T data;
+	bool redblack;
+};
+template <class T>
+struct shok_set {
+	PADDINGI(1)
+	shok_treeNode<T>* root;
+	int size;
+
+private:
+	void ForAllRec(shok_treeNode<T>* d, std::function<void(T*)> lambda) {
+		if (d == root)
+			return;
+		ForAllRec(d->left, lambda);
+		lambda(&d->data);
+		ForAllRec(d->right, lambda);
+	}
+public:
+	void ForAll(std::function<void(T*)> lambda) {
+		ForAllRec(root->parent, lambda);
+	}
+	T* GetFirstMatch(std::function<bool(T*)> lambda) {
+		T* r = nullptr;
+		ForAll([&r, lambda](T* d) {
+			if (r == nullptr && lambda(d))
+				r = d;
+			});
+		return r;
+	}
+};
+
 template<class T>
 inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {
 #ifdef _DEBUG
@@ -165,6 +199,10 @@ public:
 	int DurationSeconds;
 	float DamageFactor, ArmorFactor, HealthRecoveryFactor;
 	int Effect, HealEffect;
+
+	bool IsDefensive();
+	bool IsAggressive();
+	bool IsHeal();
 };
 
 #define shok_vtp_GGL_CCircularAttackProps (void*)0x7774A0
@@ -1024,6 +1062,11 @@ public:
 	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam+sellam
 };
 
+struct Attachment {
+	int AttachmentType, EntityId;
+};
+bool operator<(Attachment a, Attachment b);
+
 // entities
 #define shok_vtp_EGL_CGLEEntity (void*)0x783E74
 struct shok_EGL_CGLEEntity : shok_object {
@@ -1037,8 +1080,12 @@ public:
 	int EntityType;
 	int ModelOverride;
 	int PlayerId;
+	void* attachmentvt;
+	shok_set<Attachment> EntitiesAttachedToMe;
+	PADDINGI(3)
+	shok_set<Attachment> AttachedToEntities;
 private:
-	int u3[15];
+	int u3[5];
 public:
 	shok_positionRot Position; // 22
 public:
@@ -1123,6 +1170,10 @@ public:
 	int EventGetMaxWorktime();
 	int EventLeaderGetCurrentCommand();
 	float GetExploration();
+
+	int GetFirstAttachedToMe(int attachmentId);
+	int GetFirstAttachedEntity(int attachmentId);
+
 private:
 	int EventGetIntById(int id);
 };
@@ -1135,6 +1186,9 @@ private:
 #define shok_LeaderCommandHoldPos 7
 #define shok_LeaderCommandMove 8
 #define shok_LeaderCommandHeroAbility 10
+
+#define AttachmentType_INFLICTOR_TERRORIZED 61
+#define AttachmentType_SUMMONER_SUMMONED 54
 
 struct shok_event_data {
 

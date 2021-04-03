@@ -837,3 +837,35 @@ void HookHero6Convert()
 	//*d = 0x9a;
 	*ad = ((int) &hero6convertchangeplayer) - 0x4FCD2B;
 }
+
+bool shok_GGL_CRangedEffectAbilityProps::IsDefensive()
+{
+	return (AffectsHostiles && DamageFactor > 0 && DamageFactor < 1) || ((AffectsFriends || AffectsOwn) && ArmorFactor > 1);
+}
+bool shok_GGL_CRangedEffectAbilityProps::IsAggressive()
+{
+	return (AffectsHostiles && ArmorFactor > 0 && ArmorFactor < 1) || ((AffectsFriends || AffectsOwn) && DamageFactor > 1);
+}
+
+bool shok_GGL_CRangedEffectAbilityProps::IsHeal()
+{
+	return (AffectsFriends || AffectsOwn) && HealthRecoveryFactor > 0;
+}
+
+bool operator<(Attachment a, Attachment b) {
+	if (a.AttachmentType == b.AttachmentType)
+		return a.EntityId < b.EntityId;
+	return a.AttachmentType < b.AttachmentType;
+}
+
+int shok_EGL_CGLEEntity::GetFirstAttachedToMe(int attachmentId)
+{
+	Attachment* r = EntitiesAttachedToMe.GetFirstMatch([attachmentId](Attachment* a) {return a->AttachmentType == attachmentId; });
+	return r == nullptr ? 0 : r->EntityId;
+}
+
+int shok_EGL_CGLEEntity::GetFirstAttachedEntity(int attachmentId)
+{
+	Attachment* r = AttachedToEntities.GetFirstMatch([attachmentId](Attachment* a) {return a->AttachmentType == attachmentId; });
+	return r == nullptr ? 0 : r->EntityId;
+}

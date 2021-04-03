@@ -321,6 +321,11 @@ function CppLogic.Entity.GetAutoAttackMaxRange(id) end
 -- @return model
 function CppLogic.Entity.GetModel(id) end
 
+--- checks if an entity is feared.
+-- @param id entity
+-- @return false or fearing entity
+function CppLogic.Entity.IsFeared(id) end
+
 --- limited lifespan remaining seconds.
 -- @param id entity
 -- @return duration
@@ -506,6 +511,13 @@ function CppLogic.Entity.Settler.CommandStealFrom(id, tid) end
 -- @param id entity
 -- @param tid target
 function CppLogic.Entity.Settler.CommandSecureGoods(id, tid) end
+
+--- command to move.
+-- asserts if ability cannot be used.
+-- @param id entity
+-- @param pos target
+-- @param r target rotation (optional, nil if not used)
+function CppLogic.Entity.Settler.CommandMove(id, pos, r) end
 
 --- enables conversion hook. gets called twice, before and after conversion.
 -- the first created entity after pre call is the new converted leader.
@@ -968,6 +980,7 @@ function UACore:GetRangedMelee() end
 function UACore:SetIgnoreFleeing(fl) end
 function UACore:SetAutoRotateFormation(ar) end
 function UACore:GetFirstDeadHero() end
+function UACore:SetPrepDefense(p) end
 
 
 --- creates new ua.

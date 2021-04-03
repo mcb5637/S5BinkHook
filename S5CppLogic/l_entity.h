@@ -170,3 +170,11 @@ public:
 	EntityIteratorPredicateIsNotFleeingFrom(shok_position& p, float r);
 	static bool IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok_position Center, float Range);
 };
+
+struct EntityIteratorPredicateFunc : EntityIteratorPredicate {
+private:
+	std::function<bool(shok_EGL_CGLEEntity* e)> func;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	EntityIteratorPredicateFunc(std::function<bool(shok_EGL_CGLEEntity* e)> f);
+};

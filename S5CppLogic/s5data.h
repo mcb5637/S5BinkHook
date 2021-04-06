@@ -28,6 +28,14 @@ static_assert(sizeof(std::vector<int>) == 12);
 
 typedef uint8_t byte;
 
+// list of code changes in exe
+// 0x761284 redirected (lua open dll import)
+// EGL_CGLEGameLogic.CreateEffect vtable redirect
+// GGL_CCannonBallEffect & GGL_CArrowEffect . OnHit vtable redirect
+// GGUI_CManager.PostEvent vtable redirect
+// convert task 0x4FCD27 changed func call
+// 0x005011DF reset camo func override
+
 // allocator
 extern void* (__cdecl* shok_malloc)(size_t t);
 extern void* (__cdecl* shok_new)(size_t t);
@@ -710,6 +718,7 @@ struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior {
 
 #define shok_vtp_GGL_CCamouflageBehavior (void*)0x7738F4
 struct shok_GGL_CCamouflageBehavior : shok_GGL_CHeroAbility {
+	PADDINGI(2)
 	int InvisibilityRemaining;
 };
 
@@ -1062,6 +1071,11 @@ public:
 	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam+sellam
 };
 
+#define shok_vtp_GGL_CFoundryBehavior (void*)0x778A8C
+struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
+
+};
+
 struct Attachment {
 	int AttachmentType, EntityId;
 };
@@ -1157,6 +1171,7 @@ public:
 	shok_GGL_CTorchPlacerBehavior* GetTorchPlacerBehavior();
 	shok_GGL_CPointToResourceBehavior* GetPointToResBehavior();
 	shok_GGL_CKegBehavior* GetKegBehavior();
+	shok_GGL_CFoundryBehavior* GetFoundryBehavior();
 	
 	
 
@@ -1174,6 +1189,8 @@ public:
 	int GetFirstAttachedToMe(int attachmentId);
 	int GetFirstAttachedEntity(int attachmentId);
 
+	void ClearAttackers();
+
 private:
 	int EventGetIntById(int id);
 };
@@ -1187,8 +1204,11 @@ private:
 #define shok_LeaderCommandMove 8
 #define shok_LeaderCommandHeroAbility 10
 
-#define AttachmentType_INFLICTOR_TERRORIZED 61
+#define AttachmentType_ATTACKER_COMMAND_TARGET 35
+#define AttachmentType_FOLLOWER_FOLLOWED 37
+#define AttachmentType_LEADER_TARGET 51
 #define AttachmentType_SUMMONER_SUMMONED 54
+#define AttachmentType_INFLICTOR_TERRORIZED 61
 
 struct shok_event_data {
 
@@ -1231,6 +1251,11 @@ struct shok_event_data_GGL_CEventPositionAnd2EntityTypes : shok_event_data {
 	shok_position pos = { 0,0 };
 	int EntityType1 = 0, EntityType2 = 0;
 };
+struct shok_event_data_EGL_CEventValue_int_27574121 : shok_event_data {
+	int vtable = 0x763130;
+	int id = 0;
+	int i = 0;
+};
 
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
@@ -1244,6 +1269,8 @@ public:
 
 	void AttackMove(shok_position& p);
 	void AttackEntity(int targetId);
+	void HoldPosition();
+	void Defend();
 	void Move(shok_position& p);
 	void HeroAbilitySendHawk(shok_position& p);
 	void HeroAbilityInflictFear();
@@ -1381,6 +1408,8 @@ private:
 	int u3;
 public:
 	int ConstructionSiteType; // 83
+
+	void CommandBuildCannon(int entitytype);
 };
 
 #define shok_vtp_GGL_CBridgeEntity (void*)0x77805C
@@ -1852,17 +1881,22 @@ extern void(*CreateEffectHookCallback)(int id, void* ret);
 #define CreatEffectReturnCannonBallOnHit (void*)0x4ff55e
 
 extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
+extern void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post);
 extern bool(*PostEventCallback)(shok_BB_CEvent* ev);
 bool ArePlayersHostile(int p1, int p2);
 
 extern void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter);
 void HookHero6Convert();
+void HookResetCamo();
+extern int ResetCamoIgnoreIfNotEntity;
+extern void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
+void HookCamoActivate();
 
 #define EntityCategoryHeadquarters 7
-#define EntityCategoryLongRange 32
 #define EntityCategoryCannon 11
-#define EntityCategoryBridge 37
 #define EntityCategoryHero 22
+#define EntityCategoryLongRange 32
+#define EntityCategoryBridge 37
 
 #define rad2deg(r) ((r) * 180 / M_PI)
 #define deg2rad(d) ((d) * M_PI / 180)

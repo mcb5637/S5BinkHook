@@ -44,7 +44,7 @@ void l_combatHookCreateEffect(int effectId, void* retAdr) {
 		}
 	}
 	else if (retAdr != CreatEffectReturnCannonBallOnHit) {
-		logAdress("createeffect", retAdr);
+		//logAdress("createeffect", retAdr);
 	}
 }
 
@@ -60,8 +60,37 @@ int l_combat_DisableAoEProjectileFix(lua_State* L) {
 	return 0;
 }
 
+void l_combat_FlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff, bool post) {
+	if (post)
+		ResetCamoIgnoreIfNotEntity = 0;
+	else
+		ResetCamoIgnoreIfNotEntity = eff->AttackerID;
+}
+void l_combat_ActivateCamo(shok_GGL_CCamouflageBehavior* th) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	if (e)
+		e->ClearAttackers();
+}
+
+int l_combat_EnableCamoFix(lua_State* L) {
+	shok_EGL_CFlyingEffect::HookOnHit();
+	FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
+	HookResetCamo();
+	HookCamoActivate();
+	CamoActivateCb = &l_combat_ActivateCamo;
+	return 0;
+}
+
+int l_combat_DisableCamoFix(lua_State* L) {
+	FlyingEffectOnHitCallback2 = nullptr;
+	CamoActivateCb = nullptr;
+	ResetCamoIgnoreIfNotEntity = 0;
+	return 0;
+}
+
 void l_combat_cleanup(lua_State* L) {
 	l_combat_DisableAoEProjectileFix(L);
+	l_combat_DisableCamoFix(L);
 }
 
 void l_combat_init(lua_State* L)
@@ -70,6 +99,8 @@ void l_combat_init(lua_State* L)
 	luaext_registerFunc(L, "DealAoEDamage", &l_combat_dealAOEDamage);
 	luaext_registerFunc(L, "EnableAoEProjectileFix", &l_combat_EnableAoEProjectileFix);
 	luaext_registerFunc(L, "DisableAoEProjectileFix", &l_combat_DisableAoEProjectileFix);
+	luaext_registerFunc(L, "EnableCamoFix", &l_combat_EnableCamoFix);
+	luaext_registerFunc(L, "DisableCamoFix", &l_combat_DisableCamoFix);
 }
 
 // CppLogic.Combat.DealDamage(GUI.GetEntityAtPosition(GUI.GetMousePosition()), 100)

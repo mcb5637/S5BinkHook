@@ -27,6 +27,14 @@ void UnlimitedArmy::CalculatePos()
 	float x = 0, y = 0;
 	int num = 0;
 	for (int id : Leaders) {
+		bool con = false;
+		for (UAReset& r : PrepDefenseReset)
+			if (r.EntityId == id) {
+				con = true;
+				break;
+			}
+		if (con)
+			continue;
 		shok_EGL_CGLEEntity* e = shok_eid2obj(id);
 		if (e != nullptr) {
 			x += e->Position.X;
@@ -310,6 +318,21 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestBuildingInArea(int player, shok_po
 	EntityIterator iter = EntityIterator(&a);
 	return iter.GetNearest(nullptr);
 }
+shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestBridgeInArea(shok_position& p, float ran) {
+	EntityIteratorPredicateOfPlayer pl = EntityIteratorPredicateOfPlayer(0);
+	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(EntityCategoryBridge);
+	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
+	EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](shok_EGL_CGLEEntity* e) {
+		return this->CheckTargetCache(e->EntityId, 1);
+		});
+	EntityIteratorPredicate* preds[5] = {
+		&pl, &buil, &cat, &cir, &fun
+	};
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, 5);
+	EntityIterator iter = EntityIterator(&a);
+	return iter.GetNearest(nullptr);
+}
 shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSnipeTargetInArea(int player, shok_position& p, float ran, bool notFleeing)
 {
 	EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
@@ -395,12 +418,14 @@ bool UnlimitedArmy::IsNonCombat(shok_EGL_CGLEEntity* e)
 void UnlimitedArmy::BattleCommand()
 {
 	shok_position p = shok_eid2obj(CurrentBattleTarget)->Position;
-	if (ReMove)
+	if (ReMove) {
+		PrepDefenseReset.clear();
 		NormalizeSpeed(false, false);
-	for (int id : Leaders) { // hero abilities
+	}
+	for (int id : Leaders) {
 		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*) shok_eid2obj(id);
 		if (e->IsEntityInCategory(EntityCategoryHero) || IsNonCombat(e)) {
-			if (ExecuteHeroAbility(e, 0))
+			if (ExecuteHeroAbility(e))
 				continue;
 		}
 		if ((ReMove || !LeaderIsInBattle(e) ) && !IsNonCombat(e) && !e->IsEntityInCategory(EntityCategoryCannon)) {
@@ -430,8 +455,10 @@ void UnlimitedArmy::BattleCommand()
 }
 void UnlimitedArmy::MoveCommand()
 {
-	if (ReMove)
+	if (ReMove) {
+		PrepDefenseReset.clear();
 		NormalizeSpeed(true, false);
+	}
 	if (Status == UAStatus_MovingNoBattle) {
 		for (int id : Leaders) {
 			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(id);
@@ -454,9 +481,35 @@ void UnlimitedArmy::FormationCommand()
 {
 	if (ReMove) {
 		NormalizeSpeed(false, false);
+		PrepDefenseReset.clear();
 		CallFormation();
 	}
-	// prep defense
+	else if (PrepDefense && IsIdle()) {
+		for (int id : Leaders) {
+			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(id);
+			if ((e->IsEntityInCategory(EntityCategoryHero) || IsNonCombat(e)) && e->EventLeaderGetCurrentCommand() != shok_LeaderCommandHeroAbility) {
+				if (ExecutePrepDefense(e)) {
+					UAReset r;
+					r.EntityId = id;
+					r.Pos = e->Position;
+					PrepDefenseReset.push_back(r);
+				}
+			}
+		}
+		PrepDefenseReset.erase(std::remove_if(PrepDefenseReset.begin(), PrepDefenseReset.end(), [this](UAReset& r) {
+			if (shok_entityIsDead(r.EntityId))
+				return true;
+			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(r.EntityId);
+			if (e->EventLeaderGetCurrentCommand() != shok_LeaderCommandHeroAbility) {
+				shok_EGL_CMovingEntity* m = (shok_EGL_CMovingEntity*)e;
+				m->Move(r.Pos);
+				m->TargetRotation = r.Pos.r;
+				m->TargetRotationValid = 1;
+				return true;
+			}
+			return false;
+			}), PrepDefenseReset.end());
+	}
 	ReMove = false;
 }
 void UnlimitedArmy::RemoveLeader(shok_EGL_CGLEEntity* e)
@@ -547,7 +600,7 @@ void UnlimitedArmy::NormalizeSpeed(bool normalize, bool force)
 std::random_device                  rand_dev;
 std::mt19937                        generator(rand_dev());
 std::uniform_int_distribution<int>  distr(-10, 10);
-bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e, bool nume)
+bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 {
 	// first instant abilities
 	{
@@ -699,7 +752,50 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e, bool nume)
 		if (a != nullptr) {
 			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetKegPlacerBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
-				shok_EGL_CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, 3000);
+				shok_EGL_CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, 6000);
+				if (tar == nullptr && SabotageBridges)
+					tar = GetNearestBridgeInArea(e->Position, 6000);
+				if (tar != nullptr) {
+					((shok_GGL_CSettler*)e)->ThiefSabotage(tar->EntityId);
+					UpdateTargetCache(tar->EntityId, 500);
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+bool UnlimitedArmy::ExecutePrepDefense(shok_EGL_CGLEEntity* e)
+{
+	{
+		shok_GGL_CCannonBuilderBehavior* a = e->GetCannonBuilderBehavior();
+		if (a != nullptr) {
+			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetCannonBuilderBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				int ety = e->EntityType;
+				auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
+				if (d != CannonBuilderAbilityData.end()) {
+					shok_position p = e->Position;
+					p.X += distr(generator) * 100;
+					p.Y += distr(generator) * 100;
+					p.FloorToBuildingPlacement();
+					if (shok_canPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
+						((shok_GGL_CSettler*)e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
+						return true;
+					}
+				}
+			}
+		}
+	}
+	{
+		shok_GGL_CKegPlacerBehavior* a = e->GetKegPlacerBehavior();
+		if (a != nullptr) {
+			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetKegPlacerBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				shok_EGL_CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, Area);
+				if (tar == nullptr && SabotageBridges)
+					tar = GetNearestBridgeInArea(e->Position, Area);
 				if (tar != nullptr) {
 					((shok_GGL_CSettler*)e)->ThiefSabotage(tar->EntityId);
 					UpdateTargetCache(tar->EntityId, 500);
@@ -1065,6 +1161,12 @@ int l_uam_SetPrepDefense(lua_State* L) {
 	return 0;
 }
 
+int l_uam_SetSabotageBridges(lua_State* L) {
+	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	a->SabotageBridges = lua_toboolean(L, 2);
+	return 0;
+}
+
 int l_uaNew(lua_State* L) {
 	int pl = luaL_checkint(L, 1);
 	UnlimitedArmy* a = (UnlimitedArmy*)lua_newuserdata(L, sizeof(UnlimitedArmy));
@@ -1154,6 +1256,7 @@ void l_ua_init(lua_State* L)
 	luaext_registerFunc(L, "SetAutoRotateFormation", &l_uam_SetAutoRotateFormation);
 	luaext_registerFunc(L, "GetFirstDeadHero", &l_uam_GetFirstDeadHero);
 	luaext_registerFunc(L, "SetPrepDefense", &l_uam_SetPrepDefense);
+	luaext_registerFunc(L, "SetSabotageBridges", &l_uam_SetSabotageBridges);
 	lua_settable(L, -3);
 	lua_pop(L, 1);
 }

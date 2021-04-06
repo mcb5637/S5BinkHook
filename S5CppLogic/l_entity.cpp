@@ -482,13 +482,13 @@ void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d
 }
 
 int l_entity_test(lua_State* L) {
-	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
-	/*shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
+	//shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
 	FireEvent = vt->FireEvent;
-	vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;*/
-	//lua_pushnumber(L, (int)&e->GetConvertSettlerBehavior()->TimeToConvert);
-	//std::multimap<int, int> m = std::multimap < int, int >();
+	vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;
 	//DEBUGGER_BREAK
+	//lua_pushnumber(L, (int) &(e->GetCamoAbilityBehavior()->InvisibilityRemaining));
 	return 0;
 }
 
@@ -905,6 +905,19 @@ int l_settlerMove(lua_State* L) {
 	return 0;
 }
 
+int l_entityClearAttackers(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	e->ClearAttackers();
+	return 0;
+}
+
+int l_buildingFoundryBuildCannon(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assertPointer(L, b->GetFoundryBehavior(), "no foundry at 1");
+	b->CommandBuildCannon(luaL_checkint(L, 2));
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 }
@@ -935,6 +948,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetExploration", &l_entityGetExploration);
 	luaext_registerFunc(L, "GetSpeed", &l_entityGetSpeed);
 	luaext_registerFunc(L, "IsFeared", &l_entityIsFeared);
+	luaext_registerFunc(L, "ClearAttackers", &l_entityClearAttackers);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -1013,6 +1027,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetHeight", &l_buildingSetHeight);
 	luaext_registerFunc(L, "MarketGetCurrentTradeData", &l_buildingGetCurrentTradeInfo);
 	luaext_registerFunc(L, "MarketSetCurrentTradeData", &l_buildingSetCurrentTradeInfo);
+	luaext_registerFunc(L, "CommandFoundryBuildCannon", &l_buildingFoundryBuildCannon);
 	lua_rawset(L, -3);
 }
 

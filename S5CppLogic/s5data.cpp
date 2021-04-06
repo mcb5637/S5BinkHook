@@ -387,25 +387,41 @@ struct shok_vtable_EGL_CFlyingEffect {
 	int(__thiscall* OnHit)(shok_EGL_CFlyingEffect* th);
 };
 
+void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post) = nullptr;
 void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff) = nullptr;
 int(__thiscall* CannonBallOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
+int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th);
 int __fastcall CannonBallOnHitHook(shok_EGL_CFlyingEffect* th) {
 	if (FlyingEffectOnHitCallback)
 		FlyingEffectOnHitCallback(th);
-	return CannonBallOnHit(th);
+	if (FlyingEffectOnHitCallback2)
+		FlyingEffectOnHitCallback2(th, false);
+	int i = CannonBallOnHit(th);
+	if (FlyingEffectOnHitCallback2)
+		FlyingEffectOnHitCallback2(th, true);
+	// TODO remove rewriting vtable after kimichura removes the reset of it
+	((shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CCannonBallEffect)->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & CannonBallOnHitHook;
+	((shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CArrowEffect)->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & ArrowOnHitHook;
+	return i;
 }
 int(__thiscall* ArrowOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
 int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th) {
 	if (FlyingEffectOnHitCallback)
 		FlyingEffectOnHitCallback(th);
-	return ArrowOnHit(th);
+	if (FlyingEffectOnHitCallback2)
+		FlyingEffectOnHitCallback2(th, false);
+	int i = ArrowOnHit(th);
+	if (FlyingEffectOnHitCallback2)
+		FlyingEffectOnHitCallback2(th, true);
+	((shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CCannonBallEffect)->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & CannonBallOnHitHook;
+	((shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CArrowEffect)->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & ArrowOnHitHook;
+	return i;
 }
 void shok_EGL_CFlyingEffect::HookOnHit()
 {
 	if (CannonBallOnHit)
 		return;
 	shok_vtable_EGL_CFlyingEffect* vt = (shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CCannonBallEffect;
-	logAdress("flyingeff", vt->OnHit);
 	CannonBallOnHit = vt->OnHit;
 	vt->OnHit = (int(__thiscall*)(shok_EGL_CFlyingEffect*)) & CannonBallOnHitHook;
 	vt = (shok_vtable_EGL_CFlyingEffect*)shok_vtp_GGL_CArrowEffect;
@@ -819,6 +835,21 @@ bool shok_EGL_CMovingEntity::IsMoving()
 	return d.b;
 }
 
+void RedirectCall(void* call, void* redirect) {
+	byte* opcode = (byte*)call;
+	if (*opcode != 0xE8) { // call
+		DEBUGGER_BREAK
+	}
+	int* adr = (int*)(opcode+1);
+	*adr = ((int)redirect) - ((int)(adr + 1)); // address relative to next instruction
+}
+void WriteJump(void* adr, void* toJump) {
+	byte* opcode = (byte*)adr;
+	*opcode = 0xE9; // jmp
+	int* a = (int*)(opcode + 1);
+	*a = ((int)toJump) - ((int)(a + 1)); // address relative to next instruction
+}
+
 void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter) = nullptr;
 int _cdecl hero6convertchangeplayer(int id, int pl) {
 	shok_EGL_CGLEEntity* c = (shok_EGL_CGLEEntity*)1;
@@ -832,10 +863,7 @@ int _cdecl hero6convertchangeplayer(int id, int pl) {
 }
 void HookHero6Convert()
 {
-	//byte* d = (byte*)0x4FCD26; // opcode call E8
-	int* ad = (int*)0x4FCD27; // operand relative to next instruction
-	//*d = 0x9a;
-	*ad = ((int) &hero6convertchangeplayer) - 0x4FCD2B;
+	RedirectCall((void*)0x4FCD26, &hero6convertchangeplayer);
 }
 
 bool shok_GGL_CRangedEffectAbilityProps::IsDefensive()
@@ -868,4 +896,70 @@ int shok_EGL_CGLEEntity::GetFirstAttachedEntity(int attachmentId)
 {
 	Attachment* r = AttachedToEntities.GetFirstMatch([attachmentId](Attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
+}
+
+int ResetCamoIgnoreIfNotEntity = 0;
+void __fastcall camo_behaviorReset(shok_GGL_CCamouflageBehavior* th, int _, int a) {
+	if (ResetCamoIgnoreIfNotEntity == 0 || th->EntityId == ResetCamoIgnoreIfNotEntity)
+		th->InvisibilityRemaining = 0;
+}
+void HookResetCamo() {
+	WriteJump((void*)0x5011DF, &camo_behaviorReset);
+}
+
+void shok_EGL_CMovingEntity::HoldPosition()
+{
+	shok_event_data_BB_CEvent ev = shok_event_data_BB_CEvent();
+	ev.id = 0x1502F;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CMovingEntity::Defend()
+{
+	shok_event_data_BB_CEvent ev = shok_event_data_BB_CEvent();
+	ev.id = 0x15032;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void shok_EGL_CGLEEntity::ClearAttackers()
+{
+	std::vector<shok_GGL_CSettler*> tomove = std::vector<shok_GGL_CSettler*>();
+	EntitiesAttachedToMe.ForAll([&tomove](Attachment* a) {
+		if (a->AttachmentType == AttachmentType_ATTACKER_COMMAND_TARGET || a->AttachmentType == AttachmentType_LEADER_TARGET || a->AttachmentType == AttachmentType_FOLLOWER_FOLLOWED) {
+			shok_EGL_CGLEEntity* at = shok_eid2obj(a->EntityId);
+			if (shok_EntityIsSettler(at)) {
+				shok_GGL_CSettler* s = (shok_GGL_CSettler*)at;
+				tomove.emplace_back(s);
+			}
+		}
+		});
+	for (shok_GGL_CSettler* s : tomove)
+		s->Defend();
+}
+
+int(__thiscall* activateCamoOrig)(shok_GGL_CCamouflageBehavior* th) = (int(__thiscall*)(shok_GGL_CCamouflageBehavior*)) 0x501561;
+void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
+int __fastcall camoActivateHook(shok_GGL_CCamouflageBehavior* th) {
+	int i = activateCamoOrig(th);
+	if (CamoActivateCb)
+		CamoActivateCb(th);
+	return i;
+}
+void HookCamoActivate()
+{
+	RedirectCall((void*)0x4D51A4, &camoActivateHook);
+	RedirectCall((void*)0x50163A, &camoActivateHook);
+}
+
+void shok_GGL_CBuilding::CommandBuildCannon(int entitytype)
+{
+	shok_event_data_EGL_CEventValue_int_27574121 e = shok_event_data_EGL_CEventValue_int_27574121();
+	e.id = 0x17016;
+	e.i = entitytype;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &e);
+}
+
+shok_GGL_CFoundryBehavior* shok_EGL_CGLEEntity::GetFoundryBehavior()
+{
+	return (shok_GGL_CFoundryBehavior*)SearchBehavior(shok_vtp_GGL_CFoundryBehavior);
 }

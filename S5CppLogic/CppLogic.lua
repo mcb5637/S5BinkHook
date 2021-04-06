@@ -146,6 +146,13 @@ function CppLogic.Combat.EnableAoEProjectileFix() end
 -- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
 function CppLogic.Combat.DisableAoEProjectileFix() end
 
+--- enables camoflage projectile fix.
+-- when enabled, camoflage does not get reset by ranged attacks, also all attackers get cleared on entering camo.
+function CppLogic.Combat.EnableCamoFix() end
+--- disabes camoflage projectile fix.
+-- when enabled, camoflage does not get reset by ranged attacks, also all attackers get cleared on entering camo.
+function CppLogic.Combat.DisableCamoFix() end
+
 --- iterates over all entities that match a predicate.
 -- perfect to use with for loop.
 -- examples:
@@ -325,6 +332,10 @@ function CppLogic.Entity.GetModel(id) end
 -- @param id entity
 -- @return false or fearing entity
 function CppLogic.Entity.IsFeared(id) end
+
+--- clears all attackers of an entity.
+-- @param id entity
+function CppLogic.Entity.ClearAttackers(id) end
 
 --- limited lifespan remaining seconds.
 -- @param id entity
@@ -577,6 +588,12 @@ function CppLogic.Entity.Building.MarketGetCurrentTradeData(id) end
 -- @param sam sell amount (optional)
 -- @param pam progress amount (optional)
 function CppLogic.Entity.Building.MarketSetCurrentTradeData(id, bty, sty, bam, sam, pam) end
+
+--- starts building a cannon.
+-- does not check all parameters, or if foundry is ready.
+-- @param id foundry entity
+-- @param ty cannon type
+function CppLogic.Entity.Building.CommandFoundryBuildCannon(id, ty) end
 
 --- entity type max health.
 -- @param ty entitytype
@@ -981,6 +998,7 @@ function UACore:SetIgnoreFleeing(fl) end
 function UACore:SetAutoRotateFormation(ar) end
 function UACore:GetFirstDeadHero() end
 function UACore:SetPrepDefense(p) end
+function UACore:SetSabotageBridges(s) end
 
 
 --- creates new ua.

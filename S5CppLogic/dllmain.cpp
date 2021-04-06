@@ -16,22 +16,13 @@
 #include <map>
 #include <set>
 
-struct i {
-    int a, b;
-};
-bool operator<(i a, i b) {
-    if (a.a == b.a)
-        return a.b < b.b;
-    return a.a < b.a;
-}
-
+bool b = true;
 int __cdecl test(lua_State* L) {
     /*shok_GGL_CHeroHawkBehavior s = shok_GGL_CHeroHawkBehavior();
     int st = (int)&s;
     int test = (int)&s.AbilitySecondsCharged;
     lua_pushnumber(L, (test - st) / 4);*/
-    lua_pushnumber(L, sizeof(i));
-    return 1;
+    return 0;
 }
 
 int cleanup(lua_State* L) {

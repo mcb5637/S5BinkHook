@@ -60,6 +60,7 @@ void UnlimitedArmy::CleanDead()
 			if (e != nullptr && e->IsEntityInCategory(EntityCategoryHero)) {
 				this->DeadHeroes.push_back(id);
 			}
+			NeedFormat();
 			return true;
 		}
 		return false;
@@ -758,6 +759,18 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 				if (tar != nullptr) {
 					((shok_GGL_CSettler*)e)->ThiefSabotage(tar->EntityId);
 					UpdateTargetCache(tar->EntityId, 500);
+					return true;
+				}
+			}
+		}
+	}
+	if (CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
+		shok_GGL_CCamouflageBehavior* a = e->GetCamoAbilityBehavior();
+		if (a != nullptr && !a->IsThiefCamoBehavior()) {
+			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetCamouflageBehaviorProps();
+			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
+				if (e->CurrentHealth <= e->GetEntityType()->LogicProps->MaxHealth / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
+					((shok_GGL_CSettler*)e)->HeroAbilityActivateCamoflage();
 					return true;
 				}
 			}

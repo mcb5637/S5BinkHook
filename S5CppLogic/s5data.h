@@ -720,6 +720,8 @@ struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior {
 struct shok_GGL_CCamouflageBehavior : shok_GGL_CHeroAbility {
 	PADDINGI(2)
 	int InvisibilityRemaining;
+	
+	bool IsThiefCamoBehavior();
 };
 
 #define shok_vtp_GGL_CThiefCamouflageBehavior (void*)0x773934
@@ -1282,6 +1284,7 @@ public:
 	void HeroAbilityConvert(int target);
 	void HeroAbilitySnipe(int tid);
 	void HeroAbilityShuriken(int tid);
+	void HeroAbilityActivateCamoflage();
 	void ThiefSabotage(int tid);
 	void ThiefDefuse(int tid);
 	void ThiefStealFrom(int tid);

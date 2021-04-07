@@ -963,3 +963,15 @@ shok_GGL_CFoundryBehavior* shok_EGL_CGLEEntity::GetFoundryBehavior()
 {
 	return (shok_GGL_CFoundryBehavior*)SearchBehavior(shok_vtp_GGL_CFoundryBehavior);
 }
+
+bool shok_GGL_CCamouflageBehavior::IsThiefCamoBehavior()
+{
+	return vtable == shok_vtp_GGL_CThiefCamouflageBehavior;
+}
+
+void shok_EGL_CMovingEntity::HeroAbilityActivateCamoflage()
+{
+	shok_event_data_BB_CEvent e = shok_event_data_BB_CEvent();
+	e.id = 0x16015;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &e);
+}

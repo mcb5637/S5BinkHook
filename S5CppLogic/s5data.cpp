@@ -33,6 +33,7 @@ shok_GGUI_CManager* (*shok_GetGuiManager)() = (shok_GGUI_CManager * (*)()) 0x525
 bool(_cdecl* shok_entityIsDead)(int id) = (bool(_cdecl*)(int)) 0x44B096;
 bool(_cdecl* shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;
 int(_cdecl* shok_entityChangePlayer)(int entityid, int player) = (int(_cdecl*)(int, int)) 0x49A6A7;
+int(__stdcall* shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = (int(__stdcall*)(lua_State*, const char*, size_t, const char*)) 0x59BE57;
 
 bool(__thiscall* shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = (bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int))0x4FAABD;
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
@@ -974,4 +975,65 @@ void shok_EGL_CMovingEntity::HeroAbilityActivateCamoflage()
 	shok_event_data_BB_CEvent e = shok_event_data_BB_CEvent();
 	e.id = 0x16015;
 	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &e);
+}
+
+struct shok_BB_CFileStreamEx {
+	int vtable = 0x761C60;
+	int x = 0;
+};
+bool(__thiscall* shok_BB_CFileStreamEx_OpenFile)(shok_BB_CFileStreamEx* th, const char* name, int unk) = (bool(__thiscall*)(shok_BB_CFileStreamEx*, const char*, int)) 0x54924D;
+size_t(__stdcall* shok_BB_CFileStreamEx_GetSize)(shok_BB_CFileStreamEx* th) = (size_t(__stdcall*)(shok_BB_CFileStreamEx*)) 0x549140;
+int(__stdcall* shok_BB_CFileStreamEx_ReadToBuffer)(shok_BB_CFileStreamEx* th, void* buff, size_t buffsiz) = (int(__stdcall*)(shok_BB_CFileStreamEx*, void*, size_t)) 0x5491A8;
+void(__thiscall* shok_BB_CFileStreamEx_Close)(shok_BB_CFileStreamEx* th) = (void(__thiscall*)(shok_BB_CFileStreamEx*))0x54920A;
+int(__thiscall* shok_BB_CFileStreamEx_dtor)(shok_BB_CFileStreamEx* th) = (int(__thiscall*)(shok_BB_CFileStreamEx*))0x549215;
+
+const char* ReadFileToString(const char* name, size_t* size)
+{
+	char* buff = nullptr;
+	try
+	{
+		shok_BB_CFileStreamEx filestr = shok_BB_CFileStreamEx();
+		if (shok_BB_CFileStreamEx_OpenFile(&filestr, name, 0x10113)) {
+			size_t s = shok_BB_CFileStreamEx_GetSize(&filestr);
+			if (size)
+				*size = s;
+			if (s > 0) {
+				buff = new char[s + 1];
+				memset(buff, 0, s + 1);
+				shok_BB_CFileStreamEx_ReadToBuffer(&filestr, buff, s);
+			}
+			shok_BB_CFileStreamEx_Close(&filestr);
+		}
+		shok_BB_CFileStreamEx_dtor(&filestr);
+	}
+	catch (...)
+	{
+		if (buff)
+			delete[] buff;
+		return nullptr;
+	}
+	return buff;
+}
+
+bool DoesFileExist(const char* name)
+{
+
+	bool r = false;
+	try
+	{
+		shok_BB_CFileStreamEx filestr = shok_BB_CFileStreamEx();
+		if (shok_BB_CFileStreamEx_OpenFile(&filestr, name, 0x10113)) {
+			size_t s = shok_BB_CFileStreamEx_GetSize(&filestr);
+			if (s > 0) {
+				r = true;
+			}
+			shok_BB_CFileStreamEx_Close(&filestr);
+		}
+		shok_BB_CFileStreamEx_dtor(&filestr);
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return r;
 }

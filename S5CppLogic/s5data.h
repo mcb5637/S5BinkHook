@@ -1849,6 +1849,8 @@ extern bool(_cdecl* shok_canPlaceBuilding)(int entitytype, int player, shok_posi
 
 extern int(_cdecl* shok_entityChangePlayer)(int entityid, int player);
 
+extern int(__stdcall* shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name);
+
 // global objects
 extern shok_ECS_CManager*** shok_ECS_CManagerObject;
 
@@ -1894,6 +1896,8 @@ void HookResetCamo();
 extern int ResetCamoIgnoreIfNotEntity;
 extern void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
 void HookCamoActivate();
+const char* ReadFileToString(const char* name, size_t* size);
+bool DoesFileExist(const char* name);
 
 #define EntityCategoryHeadquarters 7
 #define EntityCategoryCannon 11

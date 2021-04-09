@@ -109,7 +109,7 @@ function CppLogic.Logic.UICommands.SetCallback(f) end
 --- ui command callback.
 function CppLogic.Logic.UICommands.UnSetCallback() end
 
---- compiles a lua chunk
+--- compiles a lua chunk.
 -- @param code to compile, sourcecode or binary
 -- @return function to execute the compiled code, or error message
 -- @return bool successful
@@ -118,6 +118,22 @@ function CppLogic.API.Eval(code) end
 --- logs a string to the current settlers log.
 -- @param str the string to log
 function CppLogic.API.Log(str) end
+
+--- reads a file into a string.
+-- @param file path to the file
+-- @return file content
+function CppLogic.API.ReadFileAsString(file) end
+
+--- checks if a file exists.
+-- @param file path to the file
+-- @return bool
+function CppLogic.API.DoesFileExist(file) end
+
+--- compiles a lua chunk and executes it. shows the script in the debugger as file with the defined name.
+-- @param code to compile, sourcecode or binary
+-- @param name name to show in debugger
+-- @return return values of the executed code
+function CppLogic.API.LoadString(code, name) end
 
 --- deals damage to a target.
 -- calls respective hurt entity trigger.

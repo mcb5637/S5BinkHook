@@ -2,7 +2,23 @@
 #include "l_api.h"
 #include "luaext.h"
 
+void l_api_checkEvalEnabled(lua_State* L) {
+	int t = lua_gettop(L);
+	lua_getglobal(L, "XNetwork");
+	if (!lua_isnil(L, -1)) {
+		lua_pushstring(L, "EXTENDED_GameInformation_IsLuaDebuggerDisabled");
+		lua_rawget(L, -2);
+		if (!lua_isnil(L, -1)) {
+			lua_pcall(L, 0, 1, 0);
+			if (lua_toboolean(L, -1))
+				luaL_error(L, "LuaDebugger disabled for MP");
+		}
+	}
+	lua_settop(L, t);
+}
+
 int l_api_eval(lua_State* L) {
+	l_api_checkEvalEnabled(L);
 	size_t strlen = 0;
 	const char* s = luaL_checklstring(L, 1, &strlen);
 	int r = luaL_loadbuffer(L, s, strlen, "Eval");
@@ -37,6 +53,7 @@ int l_api_hasfile(lua_State* L) {
 }
 
 int l_api_loadString(lua_State* L) {
+	l_api_checkEvalEnabled(L);
 	size_t strlen = 0;
 	const char* s = luaL_checklstring(L, 1, &strlen);
 	size_t strlen2 = 0;

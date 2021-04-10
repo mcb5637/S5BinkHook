@@ -87,6 +87,8 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_rawset(L, -3);
 
     lua_rawset(L, LUA_GLOBALSINDEX);
+
+    luaopen_debug(L);
 }
 
 // CUtilMemory.GetMemory(tonumber("897558", 16))

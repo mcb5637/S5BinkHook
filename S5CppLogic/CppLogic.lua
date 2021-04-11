@@ -110,6 +110,7 @@ function CppLogic.Logic.UICommands.SetCallback(f) end
 function CppLogic.Logic.UICommands.UnSetCallback() end
 
 --- compiles a lua chunk.
+-- asserts if kimichuras dlls are detected.
 -- @param code to compile, sourcecode or binary
 -- @return function to execute the compiled code, or error message
 -- @return bool successful
@@ -120,6 +121,7 @@ function CppLogic.API.Eval(code) end
 function CppLogic.API.Log(str) end
 
 --- reads a file into a string.
+-- can only read files in data\maps\externalmap\
 -- @param file path to the file
 -- @return file content
 function CppLogic.API.ReadFileAsString(file) end
@@ -130,10 +132,11 @@ function CppLogic.API.ReadFileAsString(file) end
 function CppLogic.API.DoesFileExist(file) end
 
 --- compiles a lua chunk and executes it. shows the script in the debugger as file with the defined name.
+-- asserts if kimichuras dlls are detected.
 -- @param code to compile, sourcecode or binary
 -- @param name name to show in debugger
 -- @return return values of the executed code
-function CppLogic.API.LoadString(code, name) end
+function CppLogic.API.DoString(code, name) end
 
 --- deals damage to a target.
 -- calls respective hurt entity trigger.

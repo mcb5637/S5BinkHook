@@ -1899,6 +1899,9 @@ void HookCamoActivate();
 const char* ReadFileToString(const char* name, size_t* size);
 bool DoesFileExist(const char* name);
 
+void RedirectCall(void* call, void* redirect);
+void WriteJump(void* adr, void* toJump);
+
 #define EntityCategoryHeadquarters 7
 #define EntityCategoryCannon 11
 #define EntityCategoryHero 22

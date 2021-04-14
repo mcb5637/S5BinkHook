@@ -442,6 +442,10 @@ function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
 -- @param id entity
 function CppLogic.Entity.Settler.IsVisible(id) end
 
+--- checks if a settler is idle
+-- @param id entity
+function CppLogic.Entity.Settler.IsIdle(id) end
+
 --- command to send darios hawk.
 -- decreases hawk range automatically, asserts if ability cannot be used.
 -- @param id entity
@@ -549,6 +553,20 @@ function CppLogic.Entity.Settler.CommandSecureGoods(id, tid) end
 -- @param r target rotation (optional, nil if not used)
 function CppLogic.Entity.Settler.CommandMove(id, pos, r) end
 
+--- command to construct a building.
+-- asserts if ability cannot be used.
+-- @param id entity
+-- @param tid target
+-- @return bool if a slot was free
+function CppLogic.Entity.Settler.CommandSerfConstructBuilding(id, tid) end
+
+--- command to construct a building.
+-- asserts if ability cannot be used.
+-- @param id entity
+-- @param tid target
+-- @return bool if a slot was free
+function CppLogic.Entity.Settler.CommandSerfRepairBuilding(id, tid) end
+
 --- enables conversion hook. gets called twice, before and after conversion.
 -- the first created entity after pre call is the new converted leader.
 -- @param func function(targetId, player, isPost, converterId)
@@ -588,6 +606,23 @@ function CppLogic.Entity.Building.SetHeight(id, h) end
 -- @param id barracks entity
 -- @return bool active
 function CppLogic.Entity.Building.GetBarracksAutoFillActive(id) end
+
+--- construction site id.
+-- @param id entity
+-- @return id
+function CppLogic.Entity.Building.GetConstructionSite(id) end
+
+--- nearest construction slot.
+-- @param build building
+-- @param p position to measure from
+-- @return slot index, -1 if nothing free
+function CppLogic.Entity.Building.GetNearestFreeConstructionSlotFor(build, p) end
+
+--- nearest repair slot.
+-- @param build building
+-- @param p position to measure from
+-- @return slot index, -1 if nothing free
+function CppLogic.Entity.Building.GetNearestFreeRepairSlotFor(build, p) end
 
 --- market trade data.
 -- progress is buy amount + sell amount
@@ -1027,8 +1062,6 @@ function CppLogic.UA.New(pl, format, commandqueue, spawner, normalize) end
 
 --- gets next enemy in area.
 function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area, ignoreFleeing) end
-
-function CppLogic.UA.AddIdleTaskList(t) end
 
 function CppLogic.UA.AddCannonBuilderData(heroTy, bottomTy, topTy) end
 

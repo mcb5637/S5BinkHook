@@ -5,7 +5,6 @@
 #include <random>
 
 
-std::vector<int> UnlimitedArmy::IdleTaskLists = std::vector<int>();
 std::vector<UACannonBuilderAbilityData> UnlimitedArmy::CannonBuilderAbilityData = std::vector<UACannonBuilderAbilityData>();
 
 UnlimitedArmy::~UnlimitedArmy()
@@ -388,25 +387,16 @@ void UnlimitedArmy::CheckStatus(int status)
 bool UnlimitedArmy::LeaderIsMoving(shok_EGL_CGLEEntity* e)
 {
 	int comm = e->EventLeaderGetCurrentCommand();
-	return (comm == shok_LeaderCommandMove || comm == shok_LeaderCommandAttackMove || comm == shok_LeaderCommandPatrol) && !LeaderIsIdleTL(e);
+	return (comm == shok_LeaderCommandMove || comm == shok_LeaderCommandAttackMove || comm == shok_LeaderCommandPatrol) && !LeaderIsIdle(e);
 }
 bool UnlimitedArmy::LeaderIsIdle(shok_EGL_CGLEEntity* e)
 {
-	int comm = e->EventLeaderGetCurrentCommand();
-	return comm == shok_LeaderCommandDefend || comm == shok_LeaderCommandHoldPos || LeaderIsIdleTL(e);
+	return ((shok_GGL_CSettler*)e)->IsIdle();
 }
 bool UnlimitedArmy::LeaderIsInBattle(shok_EGL_CGLEEntity* e)
 {
 	int comm = e->EventLeaderGetCurrentCommand();
-	return (comm == shok_LeaderCommandAttack || comm == shok_LeaderCommandAttackMove || comm == shok_LeaderCommandHeroAbility) && !LeaderIsIdleTL(e);
-}
-bool UnlimitedArmy::LeaderIsIdleTL(shok_EGL_CGLEEntity* e)
-{
-	int tl = e->TaskListId;
-	for (int i : UnlimitedArmy::IdleTaskLists)
-		if (i == tl)
-			return true;
-	return false;
+	return (comm == shok_LeaderCommandAttack || comm == shok_LeaderCommandAttackMove || comm == shok_LeaderCommandHeroAbility) && !LeaderIsIdle(e);
 }
 bool UnlimitedArmy::IsRanged(shok_EGL_CGLEEntity* e)
 {
@@ -1220,12 +1210,6 @@ int l_uaCount(lua_State* L) {
 	return 1;
 }
 
-int l_uaAddIdleTL(lua_State* L) {
-	int tl = luaL_checkint(L, 1);
-	UnlimitedArmy::IdleTaskLists.emplace_back(tl);
-	return 0;
-}
-
 int l_uaAddCannonBuilderData(lua_State* L) {
 	UACannonBuilderAbilityData d = { luaL_checkint(L, 1), luaL_checkint(L, 2), luaL_checkint(L, 3) };
 	UnlimitedArmy::CannonBuilderAbilityData.emplace_back(d);
@@ -1236,7 +1220,6 @@ void l_ua_init(lua_State* L)
 {
 	luaext_registerFunc(L, "New", &l_uaNew);
 	luaext_registerFunc(L, "GetNearestEnemyInArea", &l_uaNearest);
-	luaext_registerFunc(L, "AddIdleTaskList", &l_uaAddIdleTL);
 	luaext_registerFunc(L, "CountTargetEntitiesInArea", &l_uaCount);
 	luaext_registerFunc(L, "AddCannonBuilderData", &l_uaAddCannonBuilderData);
 

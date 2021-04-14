@@ -918,6 +918,53 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 	return 0;
 }
 
+int l_settlerIsIdle(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	lua_pushboolean(L, e->IsIdle());
+	return 1;
+}
+
+int l_buildingGetConstructionSite(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	lua_pushnumber(L, b->GetConstructionSite());
+	return 1;
+}
+
+int l_buildingGetNextFreeConstructionSlotFor(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_position p;
+	luaext_checkPos(L, p, 2);
+	lua_pushnumber(L, b->GetNearestFreeConstructionSlotFor(&p));
+	return 1;
+}
+
+int l_settlerSerfConstruct(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 2);
+	luaext_assert(L, !b->IsConstructionFinished(), "no construction site");
+	bool suc = s->SerfConstructBuilding(b);
+	lua_pushboolean(L, suc);
+	return 1;
+}
+
+int l_buildingGetNextFreeRepairSlotFor(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_position p;
+	luaext_checkPos(L, p, 2);
+	lua_pushnumber(L, b->GetNearestFreeRepairSlotFor(&p));
+	return 1;
+}
+
+int l_settlerSerfRepair(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 2);
+	luaext_assert(L, b->IsConstructionFinished(), "construction site");
+	luaext_assert(L, b->CurrentHealth < b->GetEntityType()->LogicProps->MaxHealth, "at full health");
+	bool suc = s->SerfRepairBuilding(b);
+	lua_pushboolean(L, suc);
+	return 1;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 }
@@ -990,6 +1037,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "HeroResurrect", &l_heroResurrect);
 	luaext_registerFunc(L, "ThiefSetStolenResourceInfo", &l_settlerThiefSetStolenResourceInfo);
 	luaext_registerFunc(L, "IsVisible", &l_settlerIsVisible);
+	luaext_registerFunc(L, "IsIdle", &l_settlerIsIdle);
 	luaext_registerFunc(L, "CommandSendHawk", &l_settlerSendHawk);
 	luaext_registerFunc(L, "CommandInflictFear", &l_settlerInflictFear);
 	luaext_registerFunc(L, "CommandPlaceBomb", &l_settlerPlaceBomb);
@@ -1010,6 +1058,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "EnableConversionHook", &l_settlerEnableConversionHook);
 	luaext_registerFunc(L, "DisableConversionHook", &l_settlerDisableConversionHook);
 	luaext_registerFunc(L, "CommandMove", &l_settlerMove);
+	luaext_registerFunc(L, "CommandSerfConstructBuilding", &l_settlerSerfConstruct);
+	luaext_registerFunc(L, "CommandSerfRepairBuilding", &l_settlerSerfRepair);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -1028,6 +1078,9 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "MarketGetCurrentTradeData", &l_buildingGetCurrentTradeInfo);
 	luaext_registerFunc(L, "MarketSetCurrentTradeData", &l_buildingSetCurrentTradeInfo);
 	luaext_registerFunc(L, "CommandFoundryBuildCannon", &l_buildingFoundryBuildCannon);
+	luaext_registerFunc(L, "GetConstructionSite", &l_buildingGetConstructionSite);
+	luaext_registerFunc(L, "GetNearestFreeConstructionSlotFor", &l_buildingGetNextFreeConstructionSlotFor);
+	luaext_registerFunc(L, "GetNearestFreeRepairSlotFor", &l_buildingGetNextFreeRepairSlotFor);
 	lua_rawset(L, -3);
 }
 

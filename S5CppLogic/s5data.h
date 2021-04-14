@@ -1206,6 +1206,7 @@ private:
 #define shok_LeaderCommandMove 8
 #define shok_LeaderCommandHeroAbility 10
 
+#define AttachmentType_ATTACHMENT_CONSTRUCTION_SITE_BUILDING 20
 #define AttachmentType_ATTACKER_COMMAND_TARGET 35
 #define AttachmentType_FOLLOWER_FOLLOWED 37
 #define AttachmentType_LEADER_TARGET 51
@@ -1258,7 +1259,14 @@ struct shok_event_data_EGL_CEventValue_int_27574121 : shok_event_data {
 	int id = 0;
 	int i = 0;
 };
+struct shok_event_data_GGL_CEventEntityIndex : shok_event_data {
+	int vtable = 0x766C90;
+	int id = 0;
+	int entity = 0;
+	int index = 0;
+};
 
+struct shok_GGL_CBuilding;
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	shok_position TargetPosition; // la67
@@ -1292,6 +1300,8 @@ public:
 	void ScoutBinoculars(shok_position& p);
 	void ScoutFindResource();
 	void ScoutPlaceTorch(shok_position& p);
+	bool SerfConstructBuilding(shok_GGL_CBuilding* build);
+	bool SerfRepairBuilding(shok_GGL_CBuilding* build);
 	bool IsMoving();
 };
 
@@ -1382,6 +1392,8 @@ private:
 	int u20[2];
 public:
 	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
+
+	bool IsIdle();
 };
 
 #define shok_vtp_GGL_CAnimal (void*)0x778F7C
@@ -1413,6 +1425,10 @@ public:
 	int ConstructionSiteType; // 83
 
 	void CommandBuildCannon(int entitytype);
+	int GetConstructionSite();
+	int GetNearestFreeConstructionSlotFor(shok_position* p);
+	int GetNearestFreeRepairSlotFor(shok_position* p);
+	bool IsConstructionFinished();
 };
 
 #define shok_vtp_GGL_CBridgeEntity (void*)0x77805C

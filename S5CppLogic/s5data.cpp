@@ -1037,3 +1037,65 @@ bool DoesFileExist(const char* name)
 	}
 	return r;
 }
+
+bool shok_GGL_CSettler::IsIdle()
+{
+	int com = EventLeaderGetCurrentCommand();
+	return com == shok_LeaderCommandDefend || com == shok_LeaderCommandHoldPos || TaskListId == ((shok_GGL_CGLSettlerProps*)GetEntityType())->IdleTaskList;
+}
+
+int shok_GGL_CBuilding::GetConstructionSite()
+{
+	Attachment* a = EntitiesAttachedToMe.GetFirstMatch([](Attachment* a) { return a->AttachmentType == AttachmentType_ATTACHMENT_CONSTRUCTION_SITE_BUILDING; });
+	if (a)
+		return a->EntityId;
+	return 0;
+}
+
+int(__thiscall* shok_build_getnearestfreeslot)(shok_EGL_CGLEEntity* th, shok_position* p) = (int(__thiscall*) (shok_EGL_CGLEEntity*, shok_position*)) 0x4AB02D;
+int shok_GGL_CBuilding::GetNearestFreeConstructionSlotFor(shok_position* p)
+{
+	int cid = GetConstructionSite();
+	if (!cid)
+		return -1;
+	shok_EGL_CGLEEntity* consi = shok_eid2obj(cid);
+	if (!consi)
+		return -1;
+	return shok_build_getnearestfreeslot(consi, p);
+}
+
+int shok_GGL_CBuilding::GetNearestFreeRepairSlotFor(shok_position* p)
+{
+	return shok_build_getnearestfreeslot(this, p);
+}
+
+bool shok_EGL_CMovingEntity::SerfConstructBuilding(shok_GGL_CBuilding* build)
+{
+	int cid = build->GetNearestFreeConstructionSlotFor(&this->Position);
+	if (cid < 0)
+		return false;
+	shok_event_data_GGL_CEventEntityIndex ev = shok_event_data_GGL_CEventEntityIndex();
+	ev.id = 0x14003;
+	ev.entity = build->GetConstructionSite();
+	ev.index = cid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	return true;
+}
+
+bool shok_EGL_CMovingEntity::SerfRepairBuilding(shok_GGL_CBuilding* build)
+{
+	int cid = build->GetNearestFreeRepairSlotFor(&this->Position);
+	if (cid < 0)
+		return false;
+	shok_event_data_GGL_CEventEntityIndex ev = shok_event_data_GGL_CEventEntityIndex();
+	ev.id = 0x14003; // repair and build are the same event, just different target entity
+	ev.entity = build->EntityId;
+	ev.index = cid;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	return true;
+}
+
+bool shok_GGL_CBuilding::IsConstructionFinished()
+{
+	return BuildingHeight >= 1;
+}

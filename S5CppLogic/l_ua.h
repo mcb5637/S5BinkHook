@@ -52,7 +52,6 @@ public:
 	float AutoRotateFormation = -1;
 	float LastRotation = 0;
 
-	static std::vector<int> IdleTaskLists;
 	static std::vector<UACannonBuilderAbilityData> CannonBuilderAbilityData;
 
 	UnlimitedArmy(int p);
@@ -84,7 +83,6 @@ private:
 	bool LeaderIsMoving(shok_EGL_CGLEEntity* e);
 	bool LeaderIsIdle(shok_EGL_CGLEEntity* e);
 	bool LeaderIsInBattle(shok_EGL_CGLEEntity* e);
-	bool LeaderIsIdleTL(shok_EGL_CGLEEntity* e);
 	void BattleCommand();
 	void MoveCommand();
 	void FormationCommand();

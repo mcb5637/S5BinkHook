@@ -613,7 +613,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 					}
 				}
 				else if (p->IsHeal()) {
-					if (e->CurrentHealth <= e->GetEntityType()->LogicProps->MaxHealth/2 && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 2) {
+					if (e->CurrentHealth <= e->GetMaxHealth()/2 && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 2) {
 						((shok_GGL_CSettler*)e)->HeroAbilityRangedEffect();
 					}
 				}
@@ -759,7 +759,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		if (a != nullptr && !a->IsThiefCamoBehavior()) {
 			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetCamouflageBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
-				if (e->CurrentHealth <= e->GetEntityType()->LogicProps->MaxHealth / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
+				if (e->CurrentHealth <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
 					((shok_GGL_CSettler*)e)->HeroAbilityActivateCamoflage();
 					return true;
 				}

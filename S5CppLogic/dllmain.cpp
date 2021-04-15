@@ -16,12 +16,20 @@
 #include <map>
 #include <set>
 
-bool b = true;
+
 int __cdecl test(lua_State* L) {
-    /*shok_GGL_CHeroHawkBehavior s = shok_GGL_CHeroHawkBehavior();
+    /*shok_vtable_EGL_CGLEGameLogic__ s = shok_vtable_EGL_CGLEGameLogic__();
     int st = (int)&s;
-    int test = (int)&s.AbilitySecondsCharged;
+    int test = (int)&s.createent;
     lua_pushnumber(L, (test - st) / 4);*/
+    /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
+    c.EntityType = 274;
+    c.PlayerId = 1;
+    c.Pos = { 34000,42000, deg2rad(0) };
+    c.Scale = 1;
+    c.ResourceAmount = 10;
+    int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
+    lua_pushnumber(L, id);*/
     return 0;
 }
 

@@ -1174,6 +1174,7 @@ public:
 	shok_GGL_CPointToResourceBehavior* GetPointToResBehavior();
 	shok_GGL_CKegBehavior* GetKegBehavior();
 	shok_GGL_CFoundryBehavior* GetFoundryBehavior();
+	shok_GGL_CSerfBehavior* GetSerfBehavior();
 	
 	
 
@@ -1187,6 +1188,9 @@ public:
 	int EventGetMaxWorktime();
 	int EventLeaderGetCurrentCommand();
 	float GetExploration();
+	int GetMaxHealth();
+
+	void Destroy();
 
 	int GetFirstAttachedToMe(int attachmentId);
 	int GetFirstAttachedEntity(int attachmentId);
@@ -1222,7 +1226,9 @@ struct shok_event_data_EGL_CEventGetValue_int_1211121895 : shok_event_data {
 	int result = 0;
 };
 struct shok_vtable_EGL_CGLEEntity {
-	int u[16];
+	PADDINGI(3)
+	void(__thiscall* Destroy)(shok_EGL_CGLEEntity* th, int i);
+	PADDINGI(12)
 	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
 	PADDINGI(11)
 	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
@@ -1302,6 +1308,7 @@ public:
 	void ScoutPlaceTorch(shok_position& p);
 	bool SerfConstructBuilding(shok_GGL_CBuilding* build);
 	bool SerfRepairBuilding(shok_GGL_CBuilding* build);
+	void SerfExtractResource(int id);
 	bool IsMoving();
 };
 
@@ -1516,13 +1523,44 @@ struct shok_BB_CIDManagerEx : shok_object {
 	int GetAnimIdByName(const char* name);
 };
 
-
 // game logic
+struct shok_EGL_CGLEEntityCreator : shok_object {
+	int EntityType = 0;
+	shok_positionRot Pos = { 0,0,0 };
+private:
+	int u = 0;
+public:
+	int PlayerId = 0;
+private:
+	int u2 = 0;
+public:
+	char* ScriptName = nullptr;
+private:
+	int u3[2] = { 0,0 };
+public:
+	float Scale = 0; // 11
+
+	shok_EGL_CGLEEntityCreator();
+	shok_EGL_CGLEEntityCreator(bool _);
+	~shok_EGL_CGLEEntityCreator();
+};
+struct shok_GGL_CGLConstructionSiteCreator : shok_EGL_CGLEEntityCreator {
+
+
+	shok_GGL_CGLConstructionSiteCreator();
+};
+struct shok_GGL_CResourceDoodadCreator : shok_EGL_CGLEEntityCreator {
+	int ResourceAmount = 0;
+
+	shok_GGL_CResourceDoodadCreator();
+};
+
 struct shok_EGL_CGLEGameLogic : shok_object {
 	PADDINGI(6)
 	int* InGameTime; // 7
 
 	int CreateEffect(shok_effectCreatorData* data);
+	int CreateEntity(shok_EGL_CGLEEntityCreator* cr);
 	void HookCreateEffect();
 	int GetTimeMS();
 	int GetTick();
@@ -1905,6 +1943,8 @@ extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
 extern void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post);
 extern bool(*PostEventCallback)(shok_BB_CEvent* ev);
 bool ArePlayersHostile(int p1, int p2);
+
+shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e);
 
 extern void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter);
 void HookHero6Convert();

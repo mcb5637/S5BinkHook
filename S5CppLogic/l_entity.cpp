@@ -941,6 +941,7 @@ int l_buildingGetNextFreeConstructionSlotFor(lua_State* L) {
 int l_settlerSerfConstruct(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 2);
+	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
 	luaext_assert(L, !b->IsConstructionFinished(), "no construction site");
 	bool suc = s->SerfConstructBuilding(b);
 	lua_pushboolean(L, suc);
@@ -958,10 +959,33 @@ int l_buildingGetNextFreeRepairSlotFor(lua_State* L) {
 int l_settlerSerfRepair(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 2);
+	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
 	luaext_assert(L, b->IsConstructionFinished(), "construction site");
-	luaext_assert(L, b->CurrentHealth < b->GetEntityType()->LogicProps->MaxHealth, "at full health");
+	luaext_assert(L, b->CurrentHealth < b->GetMaxHealth(), "at full health");
 	bool suc = s->SerfRepairBuilding(b);
 	lua_pushboolean(L, suc);
+	return 1;
+}
+
+int l_entityReplaceWithResourceEntity(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	e = ReplaceEntityWithResourceEntity(e);
+	if (e)
+		lua_pushnumber(L, e->EntityId);
+	else
+		lua_pushnil(L);
+	return 1;
+}
+
+int l_settlerSerfExtract(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 2);
+	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
+	if (!shok_EntityIsResourceDoodad(b))
+		b = ReplaceEntityWithResourceEntity(b);
+	luaext_assert(L, b && shok_EntityIsResourceDoodad(b), "no resource entity");
+	s->SerfExtractResource(b->EntityId);
+	lua_pushnumber(L, b->EntityId);
 	return 1;
 }
 
@@ -996,6 +1020,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetSpeed", &l_entityGetSpeed);
 	luaext_registerFunc(L, "IsFeared", &l_entityIsFeared);
 	luaext_registerFunc(L, "ClearAttackers", &l_entityClearAttackers);
+	luaext_registerFunc(L, "ReplaceWithResourceEntity", &l_entityReplaceWithResourceEntity);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -1060,6 +1085,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandMove", &l_settlerMove);
 	luaext_registerFunc(L, "CommandSerfConstructBuilding", &l_settlerSerfConstruct);
 	luaext_registerFunc(L, "CommandSerfRepairBuilding", &l_settlerSerfRepair);
+	luaext_registerFunc(L, "CommandSerfExtract", &l_settlerSerfExtract);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

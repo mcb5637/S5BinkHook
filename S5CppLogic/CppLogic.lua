@@ -365,6 +365,11 @@ function CppLogic.Entity.GetLimitedLifespanRemaining(id) end
 -- @param t duration
 function CppLogic.Entity.GetLimitedLifespanRemaining(id, t) end
 
+--- replaces a tree with its ResourceTree equivalent.
+-- @param id entity
+-- @return new id or nil
+function CppLogic.Entity.ReplaceWithResourceEntity(id) end
+
 --- gets the leader of a soldier.
 -- @param id id of the solder
 -- @return id of the leader
@@ -566,6 +571,13 @@ function CppLogic.Entity.Settler.CommandSerfConstructBuilding(id, tid) end
 -- @param tid target
 -- @return bool if a slot was free
 function CppLogic.Entity.Settler.CommandSerfRepairBuilding(id, tid) end
+
+--- command to extract a resource.
+-- automatically tries to convert trees to ResourceTrees, asserts if no resource doodad afterwards.
+-- @param id entity
+-- @param tid target
+-- @return resource entity id (might be different than tid)
+function CppLogic.Entity.Settler.CommandSerfExtract(id, tid) end
 
 --- enables conversion hook. gets called twice, before and after conversion.
 -- the first created entity after pre call is the new converted leader.

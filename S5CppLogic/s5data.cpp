@@ -57,9 +57,10 @@ int(__thiscall* CreateEffectHookedOrig)(shok_EGL_CGLEGameLogic* th, shok_effectC
 void(*CreateEffectHookCallback)(int id, void* ret) = nullptr;
 struct shok_vtable_EGL_CGLEGameLogic {
 private:
-	int u[23];
+	int u[22];
 public:
-	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, shok_effectCreatorData* data);
+	int(__thiscall* CreateEntity)(shok_EGL_CGLEGameLogic* th, shok_EGL_CGLEEntityCreator* data, int i); // 22
+	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, shok_effectCreatorData* data); // 23
 };
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_effectCreatorData* data) {
 	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)this->vtable;
@@ -1098,4 +1099,88 @@ bool shok_EGL_CMovingEntity::SerfRepairBuilding(shok_GGL_CBuilding* build)
 bool shok_GGL_CBuilding::IsConstructionFinished()
 {
 	return BuildingHeight >= 1;
+}
+
+int(__thiscall* entitygetmaxhealth)(shok_EGL_CGLEEntity* th) = (int(__thiscall*)(shok_EGL_CGLEEntity*)) 0x57B798;
+int shok_EGL_CGLEEntity::GetMaxHealth()
+{
+	return entitygetmaxhealth(this);
+}
+
+void shok_EGL_CMovingEntity::SerfExtractResource(int id)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x10009;
+	ev.entityId = id;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+void(__thiscall* shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = (void(__thiscall*)(shok_EGL_CGLEEntityCreator*))0x4493A4;
+shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator(bool _)
+{
+	shok_EGL_CGLEEntityCreator_ctor(this);
+}
+shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator()
+{
+}
+
+shok_GGL_CGLConstructionSiteCreator::shok_GGL_CGLConstructionSiteCreator()
+{
+
+}
+void(__thiscall* shok_GGL_CResourceDoodadCreator_ctor)(shok_GGL_CResourceDoodadCreator* th) = (void(__thiscall*)(shok_GGL_CResourceDoodadCreator*)) 0x4DD7E2;
+shok_GGL_CResourceDoodadCreator::shok_GGL_CResourceDoodadCreator()
+{
+	shok_GGL_CResourceDoodadCreator_ctor(this);
+}
+
+int shok_EGL_CGLEGameLogic::CreateEntity(shok_EGL_CGLEEntityCreator* cr)
+{
+	return ((shok_vtable_EGL_CGLEGameLogic*)vtable)->CreateEntity(this, cr, 1);
+}
+
+void(__thiscall* shok_EGL_CGLEEntityCreator_dtor)(shok_EGL_CGLEEntityCreator* th) = (void(__thiscall*)(shok_EGL_CGLEEntityCreator*))0x449E23;
+shok_EGL_CGLEEntityCreator::~shok_EGL_CGLEEntityCreator()
+{
+	shok_EGL_CGLEEntityCreator_dtor(this);
+}
+
+void shok_EGL_CGLEEntity::Destroy()
+{
+	((shok_vtable_EGL_CGLEEntity*)vtable)->Destroy(this, 0);
+}
+
+shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
+{
+	shok_EGL_CGLEEntityProps* ty = e->GetEntityType()->LogicProps;
+	if (ty->vtable != shok_vtp_GGL_CEntityProperties)
+		return nullptr;
+	shok_GGL_CEntityProperties* t = (shok_GGL_CEntityProperties*)ty;
+	shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
+	c.EntityType = t->ResourceEntity;
+	c.PlayerId = e->PlayerId;
+	c.Pos = e->Position;
+	c.ResourceAmount = t->ResourceAmount;
+	c.Scale = e->Scale;
+	if (e->ScriptName) {
+		size_t len = strlen(e->ScriptName) + 1;
+		c.ScriptName = (char*)shok_malloc(sizeof(char) * len);
+		strcpy_s(c.ScriptName, len, e->ScriptName);
+	}
+	else {
+		c.ScriptName = nullptr;
+	}
+	int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
+	shok_EGL_CGLEEntity* r = shok_eid2obj(id);
+	shok_event_data_EGL_CEventValue_int_27574121 ev = shok_event_data_EGL_CEventValue_int_27574121();
+	ev.id = 0x1000C;
+	ev.i = e->EntityType;
+	((shok_vtable_EGL_CGLEEntity*)r->vtable)->FireEvent(r, &ev);
+	e->Destroy();
+	return r;
+}
+
+shok_GGL_CSerfBehavior* shok_EGL_CGLEEntity::GetSerfBehavior()
+{
+	return (shok_GGL_CSerfBehavior*)SearchBehavior(shok_vtp_GGL_CSerfBehavior);
 }

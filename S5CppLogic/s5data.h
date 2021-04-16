@@ -1075,7 +1075,7 @@ public:
 
 #define shok_vtp_GGL_CFoundryBehavior (void*)0x778A8C
 struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
-
+	int CannonType, CannonProgress;
 };
 
 struct Attachment {
@@ -1197,7 +1197,7 @@ public:
 
 	void ClearAttackers();
 
-private:
+protected:
 	int EventGetIntById(int id);
 };
 
@@ -1211,8 +1211,10 @@ private:
 #define shok_LeaderCommandHeroAbility 10
 
 #define AttachmentType_ATTACHMENT_CONSTRUCTION_SITE_BUILDING 20
+#define AttachmentType_LEADER_SOLDIER 31
 #define AttachmentType_ATTACKER_COMMAND_TARGET 35
 #define AttachmentType_FOLLOWER_FOLLOWED 37
+#define AttachmentType_FIGHTER_BARRACKS 42
 #define AttachmentType_LEADER_TARGET 51
 #define AttachmentType_SUMMONER_SUMMONED 54
 #define AttachmentType_INFLICTOR_TERRORIZED 61
@@ -1271,6 +1273,11 @@ struct shok_event_data_GGL_CEventEntityIndex : shok_event_data {
 	int entity = 0;
 	int index = 0;
 };
+struct shok_event_data_EGL_CEventGetValue_float_1468983543 : shok_event_data {
+	int vtable = 0x76E210;
+	int id = 0;
+	float f = 0.0f;
+};
 
 struct shok_GGL_CBuilding;
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84
@@ -1309,6 +1316,8 @@ public:
 	bool SerfConstructBuilding(shok_GGL_CBuilding* build);
 	bool SerfRepairBuilding(shok_GGL_CBuilding* build);
 	void SerfExtractResource(int id);
+	void LeaderBuySoldierAt();
+	void SettlerExpell();
 	bool IsMoving();
 };
 
@@ -1436,6 +1445,12 @@ public:
 	int GetNearestFreeConstructionSlotFor(shok_position* p);
 	int GetNearestFreeRepairSlotFor(shok_position* p);
 	bool IsConstructionFinished();
+	void StartUpgrade();
+	void CancelUpgrade();
+	bool IsIdle();
+	int GetTechnologyInResearch();
+	int GetCannonProgress();
+	float GetMarketProgress();
 };
 
 #define shok_vtp_GGL_CBridgeEntity (void*)0x77805C

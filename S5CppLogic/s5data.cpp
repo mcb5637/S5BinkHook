@@ -1184,3 +1184,76 @@ shok_GGL_CSerfBehavior* shok_EGL_CGLEEntity::GetSerfBehavior()
 {
 	return (shok_GGL_CSerfBehavior*)SearchBehavior(shok_vtp_GGL_CSerfBehavior);
 }
+
+void(__thiscall* building_startUpgrade)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AF1B5;
+void shok_GGL_CBuilding::StartUpgrade()
+{
+	building_startUpgrade(this);
+}
+
+void(__thiscall* buildingCancelUpgrade)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*))0x4AF228;
+void shok_GGL_CBuilding::CancelUpgrade()
+{
+	buildingCancelUpgrade(this);
+}
+
+bool shok_GGL_CBuilding::IsIdle()
+{
+	if (!IsConstructionFinished())
+		return false;
+	if (IsUpgrading)
+		return false;
+	if (CurrentState == 0x13) // alarm mode
+		return false;
+	if (GetTechnologyInResearch())
+		return false;
+	{
+		shok_GGL_CFoundryBehavior* f = GetFoundryBehavior();
+		if (f && (f->CannonType != 0 || GetCannonProgress() != 100))
+			return false;
+	}
+	if (GetMarketBehavior() && GetMarketProgress() < 1.0f)
+		return false;
+	if (GetBarrackBehavior()) {
+		if (EntitiesAttachedToMe.GetFirstMatch([](Attachment* a) { return a->AttachmentType == AttachmentType_FIGHTER_BARRACKS; }))
+			return false;
+	}
+	return true;
+}
+
+int(__thiscall* building_gettechinres)(shok_GGL_CBuilding* th) = (int(__thiscall*)(shok_GGL_CBuilding*))0x4AAD09;
+int shok_GGL_CBuilding::GetTechnologyInResearch()
+{
+	return building_gettechinres(this);
+}
+
+int shok_GGL_CBuilding::GetCannonProgress()
+{
+	return this->EventGetIntById(0x17014);
+}
+
+float shok_GGL_CBuilding::GetMarketProgress()
+{
+	shok_event_data_EGL_CEventGetValue_float_1468983543 ev = shok_event_data_EGL_CEventGetValue_float_1468983543();
+	ev.id = 0x17009;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	return ev.f;
+}
+
+void(__thiscall* shok_entity_expellSettler)(shok_EGL_CGLEEntity* th, int i) = (void(__thiscall*)(shok_EGL_CGLEEntity*, int))0x4A39BB;
+void shok_EGL_CMovingEntity::SettlerExpell()
+{
+	if (GetLeaderBehavior() && AttachedToEntities.GetFirstMatch([](Attachment* a) { return a->AttachmentType == AttachmentType_LEADER_SOLDIER; })) {
+		shok_event_data_EGL_CEventValue_bool_703333479 ev = shok_event_data_EGL_CEventValue_bool_703333479();
+		ev.id = 0x15046;
+		ev.b = true;
+		((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	}
+	else {
+		//((shok_vtable_EGL_CGLEEntity*)vtable)->Destroy(this, 1);
+		shok_entity_expellSettler(this, 1);
+	}
+}
+
+// expell 15046 eventbool / 15008 event1ent
+// recruit 15009 event1ent

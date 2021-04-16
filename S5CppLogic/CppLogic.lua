@@ -448,6 +448,8 @@ function CppLogic.Entity.Settler.ThiefSetStolenResourceInfo(id, ty, am) end
 function CppLogic.Entity.Settler.IsVisible(id) end
 
 --- checks if a settler is idle
+-- this is in defend or hold position command, or having the type specific idle tasklist.
+-- workers are never idle.
 -- @param id entity
 function CppLogic.Entity.Settler.IsIdle(id) end
 
@@ -490,6 +492,7 @@ function CppLogic.Entity.Settler.CommandCircularAttack(id) end
 --- command to summon.
 -- asserts if ability cannot be used.
 -- @param id entity
+-- @return ids of summoned entities
 function CppLogic.Entity.Settler.CommandSummon(id) end
 
 --- command to convert.
@@ -586,6 +589,10 @@ function CppLogic.Entity.Settler.EnableConversionHook(func) end
 --- disables conversion hook.
 function CppLogic.Entity.Settler.DisableConversionHook() end
 
+--- command to expell a settler.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandExpell(id) end
+
 --- a leaders experience.
 -- @param id leader
 -- @return xp
@@ -660,6 +667,31 @@ function CppLogic.Entity.Building.MarketSetCurrentTradeData(id, bty, sty, bam, s
 -- @param id foundry entity
 -- @param ty cannon type
 function CppLogic.Entity.Building.CommandFoundryBuildCannon(id, ty) end
+
+--- starts upgrading a building. does not cost resources.
+-- @param id foundry entity
+function CppLogic.Entity.Building.StartUpgrade(id) end
+--- cancels an upgrade currently in progress. does not refund resources.
+-- @param id foundry entity
+function CppLogic.Entity.Building.CancelUpgrade(id) end
+
+--- checks if a building is idle.
+-- this is not under constrcution, upgrading, researching, in alarm, recruiting or trading.
+-- @param id entity
+-- @return bool idle status
+function CppLogic.Entity.Building.IsIdle(id) end
+
+--- gets leaders currently getting trainet at a barracks.
+-- @param id entity
+-- @return entities
+function CppLogic.Entity.Building.BarracksGetLeadersTrainingAt(id) end
+
+--- gets the entitytype of the cannon in construction.
+-- 0 if no entitytype, gets reset when cannon spawns.
+-- @param id entity
+-- @return entitytype
+function CppLogic.Entity.Building.FoundryGetCannonTypeInConstruction(id) end
+
 
 --- entity type max health.
 -- @param ty entitytype

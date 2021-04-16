@@ -484,12 +484,14 @@ void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d
 int l_entity_test(lua_State* L) {
 	//shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
-	FireEvent = vt->FireEvent;
-	vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;
+	/*if (!FireEvent) {
+		shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
+		FireEvent = vt->FireEvent;
+		vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;
+	}*/
 	//DEBUGGER_BREAK
-	//lua_pushnumber(L, (int) &(e->GetCamoAbilityBehavior()->InvisibilityRemaining));
-	return 0;
+	lua_pushnumber(L, (int) ((shok_vtable_EGL_CGLEEntity*)e->vtable)->Destroy);
+	return 1;
 }
 
 int l_entityGetTaskListIndex(lua_State* L) {
@@ -718,7 +720,13 @@ int l_settlerSummon(lua_State* L) {
 	shok_GGL_CSummonBehaviorProps* bp = e->GetEntityType()->GetSummonBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
 	e->HeroAbilitySummon();
-	return 0;
+	int summoned = 0;
+	e->AttachedToEntities.ForAll([L, &summoned](Attachment* a) {
+		if (a->AttachmentType == AttachmentType_SUMMONER_SUMMONED)
+			lua_pushnumber(L, a->EntityId);
+			summoned++;
+		});
+	return summoned;
 }
 
 int l_settlerConvert(lua_State* L) {
@@ -914,6 +922,7 @@ int l_entityClearAttackers(lua_State* L) {
 int l_buildingFoundryBuildCannon(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetFoundryBehavior(), "no foundry at 1");
+	luaext_assert(L, b->IsIdle(), "is not idle");
 	b->CommandBuildCannon(luaL_checkint(L, 2));
 	return 0;
 }
@@ -983,10 +992,59 @@ int l_settlerSerfExtract(lua_State* L) {
 	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
 	if (!shok_EntityIsResourceDoodad(b))
 		b = ReplaceEntityWithResourceEntity(b);
-	luaext_assert(L, b && shok_EntityIsResourceDoodad(b), "no resource entity");
+	if (b == nullptr || !shok_EntityIsResourceDoodad(b)) {
+		return luaL_error(L, "no resource entity");
+	}
 	s->SerfExtractResource(b->EntityId);
 	lua_pushnumber(L, b->EntityId);
 	return 1;
+}
+
+int l_buildingStartUpgrade(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, b->IsIdle(), "is not idle");
+	b->StartUpgrade();
+	return 0;
+}
+
+int l_buildingCancelUpgrade(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, b->IsUpgrading, "not upgrading");
+	b->CancelUpgrade();
+	return 0;
+}
+
+int l_buildingIsIdle(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	lua_pushboolean(L, b->IsIdle());
+	return 1;
+}
+
+int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
+	int i = 0;
+	b->EntitiesAttachedToMe.ForAll([L, &i](Attachment* a) {
+		if (a->AttachmentType == AttachmentType_FIGHTER_BARRACKS && !shok_eid2obj(a->EntityId)->GetSoldierBehavior()) {
+			lua_pushnumber(L, a->EntityId);
+			i++;
+		}
+		});
+	return i;
+}
+
+int l_buildingFoundryGetCannonTypeInConstruction(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CFoundryBehavior* f = b->GetFoundryBehavior();
+	luaext_assertPointer(L, f, "no foundry");
+	lua_pushnumber(L, f->CannonType);
+	return 1;
+}
+
+int l_settlerExpell(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	s->SettlerExpell();
+	return 0;
 }
 
 void l_entity_cleanup(lua_State* L) {
@@ -1086,6 +1144,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandSerfConstructBuilding", &l_settlerSerfConstruct);
 	luaext_registerFunc(L, "CommandSerfRepairBuilding", &l_settlerSerfRepair);
 	luaext_registerFunc(L, "CommandSerfExtract", &l_settlerSerfExtract);
+	luaext_registerFunc(L, "CommandExpell", &l_settlerExpell);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -1107,6 +1166,12 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetConstructionSite", &l_buildingGetConstructionSite);
 	luaext_registerFunc(L, "GetNearestFreeConstructionSlotFor", &l_buildingGetNextFreeConstructionSlotFor);
 	luaext_registerFunc(L, "GetNearestFreeRepairSlotFor", &l_buildingGetNextFreeRepairSlotFor);
+	luaext_registerFunc(L, "GetNearestFreeRepairSlotFor", &l_buildingGetNextFreeRepairSlotFor);
+	luaext_registerFunc(L, "StartUpgrade", &l_buildingStartUpgrade);
+	luaext_registerFunc(L, "CancelUpgrade", &l_buildingCancelUpgrade);
+	luaext_registerFunc(L, "IsIdle", &l_buildingIsIdle);
+	luaext_registerFunc(L, "BarracksGetLeadersTrainingAt", &l_buildingBarracksGetLeadersTrainingAt);
+	luaext_registerFunc(L, "FoundryGetCannonTypeInConstruction", &l_buildingFoundryGetCannonTypeInConstruction);
 	lua_rawset(L, -3);
 }
 

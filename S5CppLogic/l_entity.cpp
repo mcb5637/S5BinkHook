@@ -484,14 +484,14 @@ void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d
 int l_entity_test(lua_State* L) {
 	//shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	/*if (!FireEvent) {
+	if (!FireEvent) {
 		shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
 		FireEvent = vt->FireEvent;
 		vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;
-	}*/
+	}
 	//DEBUGGER_BREAK
-	lua_pushnumber(L, (int) ((shok_vtable_EGL_CGLEEntity*)e->vtable)->Destroy);
-	return 1;
+	//lua_pushnumber(L, (int) ((shok_vtable_EGL_CGLEEntity*)e->vtable)->Destroy);
+	return 0;
 }
 
 int l_entityGetTaskListIndex(lua_State* L) {
@@ -923,6 +923,8 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetFoundryBehavior(), "no foundry at 1");
 	luaext_assert(L, b->IsIdle(), "is not idle");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
+	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	b->CommandBuildCannon(luaL_checkint(L, 2));
 	return 0;
 }
@@ -1047,6 +1049,39 @@ int l_settlerExpell(lua_State* L) {
 	return 0;
 }
 
+int l_buildingBuySoldierForLeader(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 2);
+	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading, "barracks is upgrading or under construction");
+	shok_GGL_CLeaderBehavior* l = s->GetLeaderBehavior();
+	luaext_assertPointer(L, l, "no leader");
+	luaext_assert(L, b->PlayerId == s->PlayerId, "different players");
+	if (!lua_toboolean(L, 3)) {
+		int ucat = (*shok_GGL_CGLGameLogicObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(b->EntityType);
+		luaext_assert(L, s->GetEntityType()->GetLeaderBehaviorProps()->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
+	}
+	int max = s->LimitedAttachmentGetMaximum(AttachmentType_LEADER_SOLDIER);
+	int curr = 0;
+	s->AttachedToEntities.ForAll([&curr](Attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) curr++; });
+	luaext_assert(L, curr < max, "no free soldier slot left");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(s->PlayerId);
+	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
+	b->CommandRecruitSoldierForLeader(s->EntityId);
+	return 0;
+}
+
+int l_leaderAttachSoldier(lua_State* L) {
+	shok_GGL_CSettler* l = luaext_checkSettler(L, 1);
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 2);
+	shok_GGL_CLeaderBehavior* lb = l->GetLeaderBehavior();
+	luaext_assertPointer(L, lb, "no leader");
+	luaext_assertPointer(L, s->GetSoldierBehavior(), "no soldier");
+	luaext_assert(L, s->EntityType == l->GetEntityType()->GetLeaderBehaviorProps()->SoldierType, "leader and soldier type doesnt match");
+	l->LeaderAttachSoldier(s->EntityId);
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 }
@@ -1153,6 +1188,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetExperience", &l_leaderSetLeaderXP);
 	luaext_registerFunc(L, "GetTroopHealth", &l_leaderGetLeaderHP);
 	luaext_registerFunc(L, "SetTroopHealth", &l_leaderSetLeaderHP);
+	luaext_registerFunc(L, "AttachSoldier", &l_leaderAttachSoldier);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");
@@ -1172,6 +1208,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "IsIdle", &l_buildingIsIdle);
 	luaext_registerFunc(L, "BarracksGetLeadersTrainingAt", &l_buildingBarracksGetLeadersTrainingAt);
 	luaext_registerFunc(L, "FoundryGetCannonTypeInConstruction", &l_buildingFoundryGetCannonTypeInConstruction);
+	luaext_registerFunc(L, "BarracksBuySoldierForLeader", &l_buildingBuySoldierForLeader);
 	lua_rawset(L, -3);
 }
 

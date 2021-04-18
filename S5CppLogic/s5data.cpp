@@ -1229,7 +1229,7 @@ int shok_GGL_CBuilding::GetTechnologyInResearch()
 
 int shok_GGL_CBuilding::GetCannonProgress()
 {
-	return this->EventGetIntById(0x17014);
+	return EventGetIntById(0x17014);
 }
 
 float shok_GGL_CBuilding::GetMarketProgress()
@@ -1255,5 +1255,54 @@ void shok_EGL_CMovingEntity::SettlerExpell()
 	}
 }
 
-// expell 15046 eventbool / 15008 event1ent
-// recruit 15009 event1ent
+void shok_GGL_CBuilding::CommandRecruitSoldierForLeader(int id)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x15037;
+	ev.entityId = id;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+}
+
+int shok_EGL_CMovingEntity::LeaderGetNearbyBarracks()
+{
+	return EventGetIntById(0x15036);
+}
+
+int(__thiscall* upgrademanager_getucatbybuilding)(shok_GGL_CBuildingUpgradeManager* th, int id) = (int(__thiscall*)(shok_GGL_CBuildingUpgradeManager*, int))0x4B3CA6;
+int shok_GGL_CBuildingUpgradeManager::GetUpgradeCategoryOfBuildingType(int etype)
+{
+	return upgrademanager_getucatbybuilding(this, etype);
+}
+
+int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(int attachType)
+{
+	shok_event_data_GGL_CEventAttachmentTypeGetInteger ev = shok_event_data_GGL_CEventAttachmentTypeGetInteger();
+	ev.id = 0x1A007;
+	ev.AttachmentType = attachType;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	return ev.i;
+}
+
+int(__thiscall* plattracthandlerGetAttLimit)(shok_GGL_CPlayerAttractionHandler* th) = (int(__thiscall*)(shok_GGL_CPlayerAttractionHandler*))0x4C216F;
+int shok_GGL_CPlayerAttractionHandler::GetAttractionLimit()
+{
+	return plattracthandlerGetAttLimit(this);
+}
+
+int(__thiscall* plattracthandlerGetAttUsage)(shok_GGL_CPlayerAttractionHandler* th) = (int(__thiscall*)(shok_GGL_CPlayerAttractionHandler*))0x4C278B;
+int shok_GGL_CPlayerAttractionHandler::GetAttractionUsage()
+{
+	return plattracthandlerGetAttUsage(this);
+}
+
+void shok_EGL_CMovingEntity::LeaderAttachSoldier(int soldierId)
+{
+	shok_event_data_EGL_CEvent1Entity ev = shok_event_data_EGL_CEvent1Entity();
+	ev.id = 0x15009;
+	ev.entityId = soldierId;
+	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x15017;
+	shok_EGL_CGLEEntity* sol = shok_eid2obj(soldierId);
+	((shok_vtable_EGL_CGLEEntity*)sol->vtable)->FireEvent(sol, &e2);
+}

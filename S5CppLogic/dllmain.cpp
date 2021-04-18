@@ -18,10 +18,10 @@
 
 
 int __cdecl test(lua_State* L) {
-    /*shok_vtable_EGL_CGLEGameLogic__ s = shok_vtable_EGL_CGLEGameLogic__();
+    shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
     int st = (int)&s;
-    int test = (int)&s.createent;
-    lua_pushnumber(L, (test - st) / 4);*/
+    int test = (int)&s.PlayerAttractionHandler;
+    lua_pushnumber(L, (test - st) / 4);
     /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
     c.EntityType = 274;
     c.PlayerId = 1;
@@ -30,7 +30,7 @@ int __cdecl test(lua_State* L) {
     c.ResourceAmount = 10;
     int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
     lua_pushnumber(L, id);*/
-    return 0;
+    return 1;
 }
 
 int cleanup(lua_State* L) {

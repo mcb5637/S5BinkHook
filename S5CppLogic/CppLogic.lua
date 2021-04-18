@@ -602,6 +602,11 @@ function CppLogic.Entity.Leader.GetExperience(id) end
 -- @param xp xp
 function CppLogic.Entity.Leader.SetExperience(id, xp) end
 
+--- attaches a soldier to a leader.
+-- @param leader
+-- @param soldier
+function CppLogic.Entity.Leader.AttachSoldier(leader, soldier) end
+
 --- a leaders troop health (hp of all soldiers summed up).
 -- -1 when not yet set (calculate in lua as all soldiers at full hp).
 -- @param id leader
@@ -691,6 +696,14 @@ function CppLogic.Entity.Building.BarracksGetLeadersTrainingAt(id) end
 -- @param id entity
 -- @return entitytype
 function CppLogic.Entity.Building.FoundryGetCannonTypeInConstruction(id) end
+
+--- buys a soldier for a leader at a specific barracks.
+-- uses resources, does not check them.
+-- @param bid barracks
+-- @param lid leader
+-- @param noChecktype (optional, default false) set to true to skip the check for matching barracks type.
+-- @return entitytype
+function CppLogic.Entity.Building.BarracksBuySoldierForLeader(bid, lid, noChecktype) end
 
 
 --- entity type max health.

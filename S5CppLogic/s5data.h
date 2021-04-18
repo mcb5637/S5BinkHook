@@ -1189,6 +1189,7 @@ public:
 	int EventLeaderGetCurrentCommand();
 	float GetExploration();
 	int GetMaxHealth();
+	int LimitedAttachmentGetMaximum(int attachType);
 
 	void Destroy();
 
@@ -1278,6 +1279,12 @@ struct shok_event_data_EGL_CEventGetValue_float_1468983543 : shok_event_data {
 	int id = 0;
 	float f = 0.0f;
 };
+struct shok_event_data_GGL_CEventAttachmentTypeGetInteger : shok_event_data {
+	int vtable = 0x766C80;
+	int id = 0;
+	int AttachmentType = 0;
+	int i;
+};
 
 struct shok_GGL_CBuilding;
 #define shok_vtp_EGL_CMovingEntity (void*)0x783F84
@@ -1316,8 +1323,9 @@ public:
 	bool SerfConstructBuilding(shok_GGL_CBuilding* build);
 	bool SerfRepairBuilding(shok_GGL_CBuilding* build);
 	void SerfExtractResource(int id);
-	void LeaderBuySoldierAt();
 	void SettlerExpell();
+	int LeaderGetNearbyBarracks();
+	void LeaderAttachSoldier(int soldierId);
 	bool IsMoving();
 };
 
@@ -1451,6 +1459,7 @@ public:
 	int GetTechnologyInResearch();
 	int GetCannonProgress();
 	float GetMarketProgress();
+	void CommandRecruitSoldierForLeader(int id);
 };
 
 #define shok_vtp_GGL_CBridgeEntity (void*)0x77805C
@@ -1687,6 +1696,9 @@ struct shok_GGL_CPlayerAttractionHandler : shok_object {
 	byte PaydayStarted;
 	PADDING(3)
 	int PaydayStartTick;
+
+	int GetAttractionLimit();
+	int GetAttractionUsage();
 };
 
 struct shok_GGL_CPlayerAttractionProps : shok_object {
@@ -1694,6 +1706,13 @@ struct shok_GGL_CPlayerAttractionProps : shok_object {
 	float MaximumDistanceWorkerToFarm, MaximumDistanceWorkerToResidence;
 };
 
+#define shok_vtp_GGL_CBuildingUpgradeManager (void*)0x772948
+struct shok_GGL_CBuildingUpgradeManager : shok_object {
+
+	int GetUpgradeCategoryOfBuildingType(int etype);
+};
+
+#define shok_vtp_GGL_CPlayerStatus (void*)0x76FA88
 struct shok_GGL_CPlayerStatus : shok_object {
 	int PlayerID;
 	PADDINGI(46)
@@ -1702,7 +1721,9 @@ private:
 	PADDINGI(33)
 	int NumberOfSettlersKilled, NumberOfSettlersLost, NumberOfBuildingsKilled, NumberOfBuildingsLost;
 	PADDINGI(111)
-	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler;
+	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler; // 197
+public:
+	shok_GGL_CBuildingUpgradeManager* BuildingUpgradeManager;
 
 	int GetDiploStateTo(int p);
 };

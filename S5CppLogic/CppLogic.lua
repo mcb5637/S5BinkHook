@@ -593,6 +593,13 @@ function CppLogic.Entity.Settler.DisableConversionHook() end
 -- @param id entity
 function CppLogic.Entity.Settler.CommandExpell(id) end
 
+--- command to turn a serf to a battleserf.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandTurnSerfToBattleSerf(id) end
+--- command to turn a battleserf back to a serf.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandTurnBattleSerfToSerf(id) end
+
 --- a leaders experience.
 -- @param id leader
 -- @return xp
@@ -698,12 +705,20 @@ function CppLogic.Entity.Building.BarracksGetLeadersTrainingAt(id) end
 function CppLogic.Entity.Building.FoundryGetCannonTypeInConstruction(id) end
 
 --- buys a soldier for a leader at a specific barracks.
--- uses resources, does not check them.
+-- uses resources.
 -- @param bid barracks
 -- @param lid leader
 -- @param noChecktype (optional, default false) set to true to skip the check for matching barracks type.
 -- @return entitytype
 function CppLogic.Entity.Building.BarracksBuySoldierForLeader(bid, lid, noChecktype) end
+
+--- activates overtime.
+-- checks for cooldown.
+-- @param id entity
+function CppLogic.Entity.Building.ActivateOvertime(id) end
+--- deactivates overtime and sets overtime cooldown.
+-- @param id entity
+function CppLogic.Entity.Building.DeactivateOvertime(id) end
 
 
 --- entity type max health.

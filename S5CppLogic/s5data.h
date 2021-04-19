@@ -142,6 +142,11 @@ private:
 	int u;
 public:
 	float Gold, GoldRaw, Silver, SilverRaw, Stone, StoneRaw, Iron, IronRaw, Sulfur, SulfurRaw, Clay, ClayRaw, Wood, WoodRaw, WeatherEnergy, Knowledge, Faith;
+
+	float GetResourceAmountFromType(int ty, bool addRaw);
+	void AddToType(int ty, float toadd);
+	void SubFromType(int ty, float tosub);
+	bool HasResources(shok_costInfo* has);
 };
 
 struct shok_modifyEntityProps {
@@ -1175,6 +1180,7 @@ public:
 	shok_GGL_CKegBehavior* GetKegBehavior();
 	shok_GGL_CFoundryBehavior* GetFoundryBehavior();
 	shok_GGL_CSerfBehavior* GetSerfBehavior();
+	shok_GGL_CBattleSerfBehavior* GetBattleSerfBehavior();
 	
 	
 
@@ -1326,6 +1332,8 @@ public:
 	void SettlerExpell();
 	int LeaderGetNearbyBarracks();
 	void LeaderAttachSoldier(int soldierId);
+	void SerfTurnToBattleSerf();
+	void BattleSerfTurnToSerf();
 	bool IsMoving();
 };
 
@@ -1443,9 +1451,7 @@ private:
 	int u2[2];
 public:
 	int NumberOfRepairingSerfs;
-private:
-	int u3;
-public:
+	int OvertimeCooldown;
 	int ConstructionSiteType; // 83
 
 	void CommandBuildCannon(int entitytype);
@@ -1460,6 +1466,8 @@ public:
 	int GetCannonProgress();
 	float GetMarketProgress();
 	void CommandRecruitSoldierForLeader(int id);
+	void ActivateOvertime();
+	void DeactivateOvertime();
 };
 
 #define shok_vtp_GGL_CBridgeEntity (void*)0x77805C
@@ -1521,7 +1529,7 @@ struct shok_GGL_CCannonBallEffect : shok_EGL_CFlyingEffect {
 };
 
 // effect manager
-struct shok_effectCreatorData {
+struct shok_effectCreatorData { // 16 source player, 13 dmg
 public:
 	int CreatorType, EffectType;
 private:
@@ -1715,14 +1723,15 @@ struct shok_GGL_CBuildingUpgradeManager : shok_object {
 #define shok_vtp_GGL_CPlayerStatus (void*)0x76FA88
 struct shok_GGL_CPlayerStatus : shok_object {
 	int PlayerID;
-	PADDINGI(46)
-private:
-	int DiploData;
+	PADDINGI(21)
+	shok_costInfo CurrentResources; // 23
+	PADDINGI(7)
+public:
+	int DiploData; // 48
 	PADDINGI(33)
 	int NumberOfSettlersKilled, NumberOfSettlersLost, NumberOfBuildingsKilled, NumberOfBuildingsLost;
 	PADDINGI(111)
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler; // 197
-public:
 	shok_GGL_CBuildingUpgradeManager* BuildingUpgradeManager;
 
 	int GetDiploStateTo(int p);

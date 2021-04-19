@@ -1055,11 +1055,14 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
 	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading, "barracks is upgrading or under construction");
 	shok_GGL_CLeaderBehavior* l = s->GetLeaderBehavior();
+	shok_GGL_CLeaderBehaviorProps* lp = s->GetEntityType()->GetLeaderBehaviorProps();
 	luaext_assertPointer(L, l, "no leader");
 	luaext_assert(L, b->PlayerId == s->PlayerId, "different players");
+	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(lp->SoldierType);
+	luaext_assertPointer(L, solty, "no soldier type set");
 	if (!lua_toboolean(L, 3)) {
 		int ucat = (*shok_GGL_CGLGameLogicObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(b->EntityType);
-		luaext_assert(L, s->GetEntityType()->GetLeaderBehaviorProps()->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
+		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
 	}
 	int max = s->LimitedAttachmentGetMaximum(AttachmentType_LEADER_SOLDIER);
 	int curr = 0;
@@ -1067,6 +1070,8 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	luaext_assert(L, curr < max, "no free soldier slot left");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
+
+	luaext_assert(L, p->CurrentResources.HasResources(&((shok_GGL_CGLSettlerProps*)solty->LogicProps)->Cost), "missing res");
 	b->CommandRecruitSoldierForLeader(s->EntityId);
 	return 0;
 }
@@ -1079,6 +1084,37 @@ int l_leaderAttachSoldier(lua_State* L) {
 	luaext_assertPointer(L, s->GetSoldierBehavior(), "no soldier");
 	luaext_assert(L, s->EntityType == l->GetEntityType()->GetLeaderBehaviorProps()->SoldierType, "leader and soldier type doesnt match");
 	l->LeaderAttachSoldier(s->EntityId);
+	return 0;
+}
+
+int l_settlerSerfToBattleSerf(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
+	s->SerfTurnToBattleSerf();
+	return 0;
+}
+
+int l_settlerBattleSerfToSerf(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	luaext_assertPointer(L, s->GetBattleSerfBehavior(), "no battleserf");
+	s->BattleSerfTurnToSerf();
+	return 0;
+}
+
+int l_buildingActivateOvertime(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, !b->IsOvertimeActive, "overtime already active");
+	luaext_assert(L, b->OvertimeCooldown <= 0, "cooldown active");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != 0x13, "building not idle");
+	b->ActivateOvertime();
+	return 0;
+}
+
+int l_buildingDeactivateOvertime(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, b->IsOvertimeActive, "overtime not active");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != 0x13, "building not idle");
+	b->DeactivateOvertime();
 	return 0;
 }
 
@@ -1180,6 +1216,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandSerfRepairBuilding", &l_settlerSerfRepair);
 	luaext_registerFunc(L, "CommandSerfExtract", &l_settlerSerfExtract);
 	luaext_registerFunc(L, "CommandExpell", &l_settlerExpell);
+	luaext_registerFunc(L, "CommandTurnSerfToBattleSerf", &l_settlerSerfToBattleSerf);
+	luaext_registerFunc(L, "CommandTurnBattleSerfToSerf", &l_settlerBattleSerfToSerf);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -1209,6 +1247,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "BarracksGetLeadersTrainingAt", &l_buildingBarracksGetLeadersTrainingAt);
 	luaext_registerFunc(L, "FoundryGetCannonTypeInConstruction", &l_buildingFoundryGetCannonTypeInConstruction);
 	luaext_registerFunc(L, "BarracksBuySoldierForLeader", &l_buildingBuySoldierForLeader);
+	luaext_registerFunc(L, "ActivateOvertime", &l_buildingActivateOvertime);
+	luaext_registerFunc(L, "DeactivateOvertime", &l_buildingDeactivateOvertime);
 	lua_rawset(L, -3);
 }
 

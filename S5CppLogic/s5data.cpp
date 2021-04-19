@@ -1306,3 +1306,57 @@ void shok_EGL_CMovingEntity::LeaderAttachSoldier(int soldierId)
 	shok_EGL_CGLEEntity* sol = shok_eid2obj(soldierId);
 	((shok_vtable_EGL_CGLEEntity*)sol->vtable)->FireEvent(sol, &e2);
 }
+
+float(__thiscall* costinfo_getres)(shok_costInfo* th, int ty, bool addRaw) = (float(__thiscall*)(shok_costInfo*, int, bool))0x4A9606;
+float shok_costInfo::GetResourceAmountFromType(int ty, bool addRaw)
+{
+	return costinfo_getres(this, ty, addRaw);
+}
+
+void(__thiscall* costinfo_add)(shok_costInfo* th, int ty, float a) = (void(__thiscall*)(shok_costInfo*, int, float))0x4A9774;
+void shok_costInfo::AddToType(int ty, float toadd)
+{
+	costinfo_add(this, ty, toadd);
+}
+
+void(__thiscall* costinfo_sub)(shok_costInfo* th, int ty, float a, float b) = (void(__thiscall*)(shok_costInfo*, int, float, float))0x4A963D;
+void shok_costInfo::SubFromType(int ty, float tosub)
+{
+	costinfo_sub(this, ty, tosub, 0.0f);
+}
+
+bool(__thiscall* constinfo_hasres)(shok_costInfo* th, shok_costInfo* has) = (bool(__thiscall*)(shok_costInfo*, shok_costInfo*))0x4A96D3;
+bool shok_costInfo::HasResources(shok_costInfo* has)
+{
+	return constinfo_hasres(this, has);
+}
+
+void shok_EGL_CMovingEntity::SerfTurnToBattleSerf()
+{
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x14005;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
+void shok_EGL_CMovingEntity::BattleSerfTurnToSerf()
+{
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x14006;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
+shok_GGL_CBattleSerfBehavior* shok_EGL_CGLEEntity::GetBattleSerfBehavior()
+{
+	return (shok_GGL_CBattleSerfBehavior*)SearchBehavior(shok_vtp_GGL_CBattleSerfBehavior);
+}
+
+void(__thiscall* shok_buildingActivateOvertime)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AE566;
+void shok_GGL_CBuilding::ActivateOvertime()
+{
+	shok_buildingActivateOvertime(this);
+}
+void(__thiscall* shok_buildingDeactivateOvertime)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AA073;
+void shok_GGL_CBuilding::DeactivateOvertime()
+{
+	shok_buildingDeactivateOvertime(this);
+}

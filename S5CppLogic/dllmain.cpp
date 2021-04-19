@@ -20,7 +20,7 @@
 int __cdecl test(lua_State* L) {
     shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
     int st = (int)&s;
-    int test = (int)&s.PlayerAttractionHandler;
+    int test = (int)&s.DiploData;
     lua_pushnumber(L, (test - st) / 4);
     /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
     c.EntityType = 274;

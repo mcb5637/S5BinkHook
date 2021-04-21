@@ -102,6 +102,18 @@ function CppLogic.Logic.PlayerGetKillStatistics(p) end
 -- @param bon BuildOn entity id, or 0
 function CppLogic.Logic.CanPlaceBuildingAt(ty, pl, pos, rot, bon) end
 
+--- activates alarm mode.
+-- @param pl player
+function CppLogic.Logic.PlayerActivateAlarm(pl) end
+--- deactivates alarm mode.
+-- @param pl player
+function CppLogic.Logic.PlayerDeactivateAlarm(pl) end
+
+--- upgrades a settler category.
+-- @param pl player
+-- @param ucat
+function CppLogic.Logic.PlayerUpgradeSettlerCategory(pl, ucat) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func
@@ -719,6 +731,23 @@ function CppLogic.Entity.Building.ActivateOvertime(id) end
 --- deactivates overtime and sets overtime cooldown.
 -- @param id entity
 function CppLogic.Entity.Building.DeactivateOvertime(id) end
+
+--- sets a barrack to recruit full groups.
+-- @param id entity
+function CppLogic.Entity.Building.BarracksRecruitGroups(id) end
+--- sets a barrack to recruit only leaders.
+-- @param id entity
+function CppLogic.Entity.Building.BarracksRecruitLeaders(id) end
+
+--- buys a serf at a hq.
+-- uses resources.
+-- @param id entity
+function CppLogic.Entity.Building.HQBuySerf(id) end
+
+--- sells a building.
+-- does not give you back resources.
+-- @param id entity
+function CppLogic.Entity.Building.SellBuilding(id) end
 
 
 --- entity type max health.

@@ -691,6 +691,34 @@ int l_logicCanPLaceBuildingAt(lua_State* L) {
 	return 1;
 }
 
+int l_logicPlayerActivateAlarm(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	luaext_assert(L, !p->AlarmActive, "alarm active");
+	luaext_assert(L, p->AlarmRechargeTime <= 0, "alarm cooldown");
+	(*shok_GGL_CGLGameLogicObj)->EnableAlarmForPlayer(i);
+	return 0;
+}
+int l_logicPlayerDeactivateAlarm(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	luaext_assert(L, p->AlarmActive, "alarm not active");
+	(*shok_GGL_CGLGameLogicObj)->DisableAlarmForPlayer(i);
+	return 0;
+}
+
+int l_logicPlayerUpgradeSettlerCategory(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	int ucat = luaL_checkint(L, 2);
+	shok_GGL_CSettlerUpgradeManager_UCatEntry* u = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](shok_GGL_CSettlerUpgradeManager_UCatEntry* u) {return u->UCat == ucat; });
+	luaext_assertPointer(L, u, "invalid ucat");
+	(*shok_GGL_CGLGameLogicObj)->UpgradeSettlerCategory(i, ucat);
+	return 0;
+}
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 }
@@ -705,6 +733,9 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "PlayerSetPaydayStartetTick", &l_playerSetPaydayStatus);
 	luaext_registerFunc(L, "PlayerGetKillStatistics", &l_playerGetKillStatistics);
 	luaext_registerFunc(L, "CanPlaceBuildingAt", &l_logicCanPLaceBuildingAt);
+	luaext_registerFunc(L, "PlayerActivateAlarm", &l_logicPlayerActivateAlarm);
+	luaext_registerFunc(L, "PlayerDeactivateAlarm", &l_logicPlayerDeactivateAlarm);
+	luaext_registerFunc(L, "PlayerUpgradeSettlerCategory", &l_logicPlayerUpgradeSettlerCategory);
 
 
 	lua_pushstring(L, "UICommands");

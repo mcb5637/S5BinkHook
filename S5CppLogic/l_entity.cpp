@@ -483,15 +483,15 @@ void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d
 
 int l_entity_test(lua_State* L) {
 	//shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
-	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	/*shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
 	if (!FireEvent) {
 		shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
 		FireEvent = vt->FireEvent;
 		vt->FireEvent = (void(__thiscall *)(shok_EGL_CGLEEntity * th, shok_event_data * d)) &fireeventhook;
-	}
+	}*/
 	//DEBUGGER_BREAK
 	//lua_pushnumber(L, (int) ((shok_vtable_EGL_CGLEEntity*)e->vtable)->Destroy);
-	return 0;
+	return 1;
 }
 
 int l_entityGetTaskListIndex(lua_State* L) {
@@ -1118,8 +1118,57 @@ int l_buildingDeactivateOvertime(lua_State* L) {
 	return 0;
 }
 
+int l_buildingBarracksRecruitLeaders(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CBarrackBehavior* r = b->GetBarrackBehavior();
+	luaext_assertPointer(L, r, "no barracks");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading, "building not idle");
+	luaext_assert(L, r->AutoFillActive, "already recruiting leaders");
+	b->BarracksRecruitLeaders();
+	return 0;
+}
+int l_buildingBarracksRecruitGroups(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CBarrackBehavior* r = b->GetBarrackBehavior();
+	luaext_assertPointer(L, r, "no barracks");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading, "building not idle");
+	luaext_assert(L, !r->AutoFillActive, "already recruiting groups");
+	b->BarracksRecruitGroups();
+	return 0;
+}
+
+int serfType = -1;
+int l_buildingHQBuySerf(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, b->IsEntityInCategory(EntityCategoryHeadquarters), "no hq");
+	luaext_assert(L, b->IsIdle(), "building not idle");
+	if (serfType < 0) {
+
+		serfType = 0;
+		for (shok_GGlue_CGlueEntityProps& t : (*shok_EGL_CGLEEntitiesPropsObj)->EntityTypes) {
+			if (t.GetSerfBehaviorProps())
+				break;
+			serfType++;
+		}
+	}
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
+	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
+	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(serfType);
+	luaext_assert(L, p->CurrentResources.HasResources(&((shok_GGL_CGLSettlerProps*)solty->LogicProps)->Cost), "missing res");
+	b->HQBuySerf();
+	return 0;
+}
+
+int l_buildingSell(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, ((shok_GGL_CGLBuildingProps*)b->GetEntityType()->LogicProps)->CanBeSold, "cannot be sold");
+	b->SellBuilding();
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
+	serfType = -1;
 }
 
 void l_entity_init(lua_State* L)
@@ -1249,6 +1298,10 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "BarracksBuySoldierForLeader", &l_buildingBuySoldierForLeader);
 	luaext_registerFunc(L, "ActivateOvertime", &l_buildingActivateOvertime);
 	luaext_registerFunc(L, "DeactivateOvertime", &l_buildingDeactivateOvertime);
+	luaext_registerFunc(L, "BarracksRecruitGroups", &l_buildingBarracksRecruitGroups);
+	luaext_registerFunc(L, "BarracksRecruitLeaders", &l_buildingBarracksRecruitLeaders);
+	luaext_registerFunc(L, "HQBuySerf", &l_buildingHQBuySerf);
+	luaext_registerFunc(L, "SellBuilding", &l_buildingSell);
 	lua_rawset(L, -3);
 }
 

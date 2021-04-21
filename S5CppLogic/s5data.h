@@ -611,7 +611,7 @@ public:
 
 #define shok_vtp_GGlue_CGlueEntityProps (void*)0x788824
 struct shok_GGlue_CGlueEntityProps : shok_object {
-private:
+public:
 	int u;
 public:
 	shok_EGL_CGLEEntityProps* LogicProps;
@@ -649,6 +649,7 @@ public:
 	shok_GGL_CAbilityScoutBinocularProps* GetBinocularBehaviorProps();
 	shok_GGL_CTorchPlacerBehaviorProperties* GetTorchPlacerBehaviorProps();
 	shok_GGL_CPointToResourceBehaviorProperties* GetPointToResBehaviorProps();
+	shok_GGL_CSerfBehaviorProps* GetSerfBehaviorProps();
 	
 
 	bool IsSettlerType();
@@ -1468,6 +1469,10 @@ public:
 	void CommandRecruitSoldierForLeader(int id);
 	void ActivateOvertime();
 	void DeactivateOvertime();
+	void BarracksRecruitGroups();
+	void BarracksRecruitLeaders();
+	void HQBuySerf();
+	void SellBuilding();
 };
 
 #define shok_vtp_GGL_CBridgeEntity (void*)0x77805C
@@ -1720,19 +1725,36 @@ struct shok_GGL_CBuildingUpgradeManager : shok_object {
 	int GetUpgradeCategoryOfBuildingType(int etype);
 };
 
+struct shok_GGL_CSettlerUpgradeManager_UCatEntry {
+	int UCat;
+	int NumUpgrades;
+	int FirstEntityType;
+};
+#define shok_vtp_GGL_CSettlerUpgradeManager (void*)0x772904
+struct shok_GGL_CSettlerUpgradeManager : shok_object {
+	PADDINGI(3)
+	shok_set<shok_GGL_CSettlerUpgradeManager_UCatEntry> UpgradeCategories;
+
+	int GetSettlerTypeByUCat(int ucat);
+};
+
 #define shok_vtp_GGL_CPlayerStatus (void*)0x76FA88
 struct shok_GGL_CPlayerStatus : shok_object {
 	int PlayerID;
 	PADDINGI(21)
 	shok_costInfo CurrentResources; // 23
-	PADDINGI(7)
+	PADDINGI(5)
 public:
+	byte AlarmActive;
+	PADDING(3)
+	int AlarmRechargeTime;
 	int DiploData; // 48
 	PADDINGI(33)
 	int NumberOfSettlersKilled, NumberOfSettlersLost, NumberOfBuildingsKilled, NumberOfBuildingsLost;
 	PADDINGI(111)
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler; // 197
 	shok_GGL_CBuildingUpgradeManager* BuildingUpgradeManager;
+	shok_GGL_CSettlerUpgradeManager* SettlerUpgradeManager;
 
 	int GetDiploStateTo(int p);
 };
@@ -1916,6 +1938,9 @@ public:
 
 	shok_GGL_CPlayerStatus* GetPlayer(int i);
 	shok_technology* GetTech(int i);
+	void EnableAlarmForPlayer(int pl);
+	void DisableAlarmForPlayer(int pl);
+	void UpgradeSettlerCategory(int pl, int ucat);
 };
 
 #define shok_DIPLOSTATE_HOSTILE 3

@@ -1360,3 +1360,63 @@ void shok_GGL_CBuilding::DeactivateOvertime()
 {
 	shok_buildingDeactivateOvertime(this);
 }
+
+void shok_GGL_CBuilding::BarracksRecruitGroups()
+{
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x1701E;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
+void shok_GGL_CBuilding::BarracksRecruitLeaders()
+{
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x1701F;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
+void shok_GGL_CBuilding::HQBuySerf()
+{
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x14004;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
+void shok_GGL_CBuilding::SellBuilding()
+{
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x2000A;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
+shok_GGL_CSerfBehaviorProps* shok_GGlue_CGlueEntityProps::GetSerfBehaviorProps()
+{
+	return (shok_GGL_CSerfBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CSerfBehaviorProps);
+}
+
+void(__thiscall* cglgamelogic_enablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*))0x49FA14;
+void shok_GGL_CGLGameLogic::EnableAlarmForPlayer(int pl)
+{
+	shok_EGL_CNetEventPlayerID ev = { shok_vtp_EGL_CNetEventPlayerID, 69680, pl };
+	cglgamelogic_enablealarm(this, &ev);
+}
+
+void(__thiscall* cglgamelogic_disablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*))0x49FAD7;
+void shok_GGL_CGLGameLogic::DisableAlarmForPlayer(int pl)
+{
+	shok_EGL_CNetEventPlayerID ev = { shok_vtp_EGL_CNetEventPlayerID, 69681, pl };
+	cglgamelogic_disablealarm(this, &ev);
+}
+
+void(__thiscall* cglgamelogic_upgradesettlercat)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*))0x4985C5;
+void shok_GGL_CGLGameLogic::UpgradeSettlerCategory(int pl, int ucat)
+{
+	shok_EGL_CNetEventIntegerAndPlayerID ev = { shok_vtp_EGL_CNetEventIntegerAndPlayerID , 69642, pl, ucat };
+	cglgamelogic_upgradesettlercat(this, &ev);
+}
+
+int(__thiscall* settlerupmanager_getstybyucat)(shok_GGL_CSettlerUpgradeManager* th, int ucat) = (int(__thiscall*)(shok_GGL_CSettlerUpgradeManager*, int))0x4B3280;
+int shok_GGL_CSettlerUpgradeManager::GetSettlerTypeByUCat(int ucat)
+{
+	return settlerupmanager_getstybyucat(this, ucat);
+}

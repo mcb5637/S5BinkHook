@@ -18,10 +18,10 @@
 
 
 int __cdecl test(lua_State* L) {
-    shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
+    /*shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
     int st = (int)&s;
     int test = (int)&s.DiploData;
-    lua_pushnumber(L, (test - st) / 4);
+    lua_pushnumber(L, (test - st) / 4);*/
     /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
     c.EntityType = 274;
     c.PlayerId = 1;
@@ -30,7 +30,16 @@ int __cdecl test(lua_State* L) {
     c.ResourceAmount = 10;
     int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
     lua_pushnumber(L, id);*/
-    return 1;
+    shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(1);
+    int i = 0;
+    int cat = luaL_checkint(L, 1);
+    p->SettlerUpgradeManager->UpgradeCategories.ForAll([&i, cat, L](shok_GGL_CSettlerUpgradeManager_UCatEntry* u) {
+        if (u->UCat == cat) {
+            lua_pushnumber(L, u->FirstEntityType);
+            lua_pushnumber(L, u->NumUpgrades);
+            i++;
+        }});
+    return i*2;
 }
 
 int cleanup(lua_State* L) {

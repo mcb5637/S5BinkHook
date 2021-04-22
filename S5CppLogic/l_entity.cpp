@@ -721,7 +721,7 @@ int l_settlerSummon(lua_State* L) {
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
 	e->HeroAbilitySummon();
 	int summoned = 0;
-	e->AttachedToEntities.ForAll([L, &summoned](Attachment* a) {
+	e->AttachedToEntities.ForAll([L, &summoned](shok_attachment* a) {
 		if (a->AttachmentType == AttachmentType_SUMMONER_SUMMONED)
 			lua_pushnumber(L, a->EntityId);
 			summoned++;
@@ -992,9 +992,9 @@ int l_settlerSerfExtract(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 2);
 	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
-	if (!shok_EntityIsResourceDoodad(b))
+	if (!b->IsResourceDoodad())
 		b = ReplaceEntityWithResourceEntity(b);
-	if (b == nullptr || !shok_EntityIsResourceDoodad(b)) {
+	if (b == nullptr || !b->IsResourceDoodad()) {
 		return luaL_error(L, "no resource entity");
 	}
 	s->SerfExtractResource(b->EntityId);
@@ -1026,7 +1026,7 @@ int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
 	int i = 0;
-	b->EntitiesAttachedToMe.ForAll([L, &i](Attachment* a) {
+	b->EntitiesAttachedToMe.ForAll([L, &i](shok_attachment* a) {
 		if (a->AttachmentType == AttachmentType_FIGHTER_BARRACKS && !shok_eid2obj(a->EntityId)->GetSoldierBehavior()) {
 			lua_pushnumber(L, a->EntityId);
 			i++;
@@ -1066,7 +1066,7 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	}
 	int max = s->LimitedAttachmentGetMaximum(AttachmentType_LEADER_SOLDIER);
 	int curr = 0;
-	s->AttachedToEntities.ForAll([&curr](Attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) curr++; });
+	s->AttachedToEntities.ForAll([&curr](shok_attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) curr++; });
 	luaext_assert(L, curr < max, "no free soldier slot left");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
@@ -1447,17 +1447,17 @@ EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(shok_position& 
 
 bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
-	return shok_EntityIsSettler(e);
+	return e->IsSettler();
 }
 
 bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
-	return shok_EntityIsBuilding(e);
+	return e->IsBuilding();
 }
 
 bool EntityIteratorPredicateIsRelevant::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
-	return e->PlayerId != 0 && (shok_EntityIsSettler(e) || shok_EntityIsBuilding(e));
+	return e->PlayerId != 0 && (e->IsSettler() || e->IsBuilding());
 }
 
 bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
@@ -1521,7 +1521,7 @@ EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory
 
 bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
 {
-	return shok_EntityGetProvidedResourceByID(e->EntityId) == resource;
+	return e->GetResourceProvided() == resource;
 }
 
 EntityIteratorPredicateProvidesResource::EntityIteratorPredicateProvidesResource(int res)

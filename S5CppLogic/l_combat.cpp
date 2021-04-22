@@ -26,7 +26,7 @@ int l_combat_dealAOEDamage(lua_State* L) {
 }
 
 void l_combatHookCreateEffect(int effectId, void* retAdr) {
-	if (retAdr == CreatEffectReturnBattleBehaviorAttack || retAdr == CreatEffectReturnAutoCannonBehaviorAttack) {
+	if (retAdr == (void*)CreatEffectReturnBattleBehaviorAttack || retAdr == (void*)CreatEffectReturnAutoCannonBehaviorAttack) {
 		shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(effectId);
 		if (ef->IsCannonBallEffect()) {
 			shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
@@ -43,7 +43,7 @@ void l_combatHookCreateEffect(int effectId, void* retAdr) {
 				cbeff->DamageClass = a->DamageClass;
 		}
 	}
-	else if (retAdr != CreatEffectReturnCannonBallOnHit) {
+	else if (retAdr != (void*)CreatEffectReturnCannonBallOnHit) {
 		//logAdress("createeffect", retAdr);
 	}
 }

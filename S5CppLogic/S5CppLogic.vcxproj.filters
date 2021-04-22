@@ -66,6 +66,36 @@
     <ClInclude Include="l_ua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="s5behaviorProps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5entitytype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5behaviors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5events.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5effects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5globalObjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s5tech.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -105,6 +135,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="l_ua.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5effects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5behaviorProps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5behaviors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5entitytype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5globalObjects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

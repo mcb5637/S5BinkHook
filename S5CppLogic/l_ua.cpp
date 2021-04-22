@@ -627,7 +627,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
 					((shok_GGL_CSettler*)e)->HeroAbilitySummon();
-					e->AttachedToEntities.ForAll([this](Attachment* a) {
+					e->AttachedToEntities.ForAll([this](shok_attachment* a) {
 						if (a->AttachmentType == AttachmentType_SUMMONER_SUMMONED)
 							AddLeader(shok_eid2obj(a->EntityId));
 						});

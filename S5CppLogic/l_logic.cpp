@@ -719,6 +719,43 @@ int l_logicPlayerUpgradeSettlerCategory(lua_State* L) {
 	return 0;
 }
 
+int l_logicPlayerSetTaxLevel(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	int tl = luaL_checkint(L, 2);
+	luaext_assert(L, tl >= 0 && tl < 5, "invalid taxlevel");
+	(*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->TaxLevel = tl;
+	return 0;
+}
+
+int l_logicPlayerActivateWeatherMachine(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	int w = luaL_checkint(L, 2);
+	luaext_assert(L, w > 0 && w < 4, "invalid weathertype");
+	luaext_assert(L, !(*shok_GGL_CGLGameLogicObj)->WeatherHandler->WeatherChangeActive, "weather currently changing");
+	luaext_assert(L, (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->CurrentResources.WeatherEnergy >= (*shok_GGL_CLogicPropertiesObj)->EnergyRequiredForWeatherChange, "not enough weather energy");
+	(*shok_GGL_CGLGameLogicObj)->PlayerActivateWeathermachine(i, w);
+	return 0;
+}
+
+int l_logicPlayerBlessSettlers(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0 && i < 9, "invalid player");
+	int b = luaL_checkint(L, 2);
+	float faithneeded = -1;
+	for (shok_GGL_CLogicProperties_SBlessCategory& bcat : (*shok_GGL_CLogicPropertiesObj)->BlessCategories) {
+		if (bcat.Name == b) {
+			faithneeded = bcat.RequiredFaith;
+			break;
+		}
+	}
+	luaext_assert(L, faithneeded >= 0, "invalid blesscategory");
+	luaext_assert(L, (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->CurrentResources.Faith >= faithneeded, "not enough faith");
+	(*shok_GGL_CGLGameLogicObj)->PlayerBlessSettlers(i, b);
+	return 0;
+}
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 }
@@ -736,6 +773,9 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "PlayerActivateAlarm", &l_logicPlayerActivateAlarm);
 	luaext_registerFunc(L, "PlayerDeactivateAlarm", &l_logicPlayerDeactivateAlarm);
 	luaext_registerFunc(L, "PlayerUpgradeSettlerCategory", &l_logicPlayerUpgradeSettlerCategory);
+	luaext_registerFunc(L, "PlayerSetTaxLevel", &l_logicPlayerSetTaxLevel);
+	luaext_registerFunc(L, "PlayerActivateWeatherMachine", &l_logicPlayerActivateWeatherMachine);
+	luaext_registerFunc(L, "PlayerBlessSettlers", &l_logicPlayerBlessSettlers);
 
 
 	lua_pushstring(L, "UICommands");

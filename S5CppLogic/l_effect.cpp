@@ -23,8 +23,7 @@ void l_effectFlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff) {
 }
 
 int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback)
-	shok_effectCreatorData data = shok_effectCreatorData();
-	data.CreatorType = shok_effectCreatorData_CreatorType_Projectile;
+	shok_CProjectileEffectCreator data = shok_CProjectileEffectCreator();
 	data.EffectType = luaL_checkint(L, 1);
 	data.CurrentPos.X = data.StartPos.X = luaL_checkfloat(L, 2);
 	data.CurrentPos.Y = data.StartPos.Y = luaL_checkfloat(L, 3);

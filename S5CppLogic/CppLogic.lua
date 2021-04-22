@@ -114,6 +114,23 @@ function CppLogic.Logic.PlayerDeactivateAlarm(pl) end
 -- @param ucat
 function CppLogic.Logic.PlayerUpgradeSettlerCategory(pl, ucat) end
 
+--- sets a players tax level.
+-- @param pl player
+-- @param tl
+function CppLogic.Logic.PlayerSetTaxLevel(pl, tl) end
+
+--- activates a players weathermachine/weathertower.
+-- does not check if you are at that weather, or the availability of buildings.
+-- @param pl player
+-- @param wt
+function CppLogic.Logic.PlayerActivateWeatherMachine(pl, wt) end
+
+--- blesses a players settlers.
+-- does not check if you have settlers of that category or a high enough monastery.
+-- @param pl player
+-- @param bc
+function CppLogic.Logic.PlayerBlessSettlers(pl, bc) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func

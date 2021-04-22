@@ -192,7 +192,17 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClInclude Include="l_tech.h" />
     <ClInclude Include="l_ua.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="s5behaviorProps.h" />
+    <ClInclude Include="s5behaviors.h" />
     <ClInclude Include="s5data.h" />
+    <ClInclude Include="s5defines.h" />
+    <ClInclude Include="s5effects.h" />
+    <ClInclude Include="s5entity.h" />
+    <ClInclude Include="s5entitytype.h" />
+    <ClInclude Include="s5events.h" />
+    <ClInclude Include="s5globalObjects.h" />
+    <ClInclude Include="s5player.h" />
+    <ClInclude Include="s5tech.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -212,7 +222,14 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="s5behaviorProps.cpp" />
+    <ClCompile Include="s5behaviors.cpp" />
     <ClCompile Include="s5data.cpp" />
+    <ClCompile Include="s5effects.cpp" />
+    <ClCompile Include="s5entity.cpp" />
+    <ClCompile Include="s5entitytype.cpp" />
+    <ClCompile Include="s5globalObjects.cpp" />
+    <ClCompile Include="s5player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CppLogic.lua">

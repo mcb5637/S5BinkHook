@@ -1166,6 +1166,53 @@ int l_buildingSell(lua_State* L) {
 	return 0;
 }
 
+int l_buildingStartResearch(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, b->IsIdle(), "building not idle");
+	int tech = luaL_checkint(L, 2);
+	shok_technology* techo = (*shok_GGL_CGLGameLogicObj)->GetTech(tech);
+	luaext_assertPointer(L, techo, "no tech at 2");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
+	int techstate = p->GetTechStatus(tech);
+	luaext_assert(L, techstate == TechState_Allowed, "wrong techstate");
+	luaext_assert(L, p->CurrentResources.HasResources(&techo->ResourceCosts), "not enough res");
+	b->StartResearch(tech);
+	return 0;
+}
+
+int l_buildingCancelResearch(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assert(L, b->GetTechnologyInResearch(), "no tech in research");
+	b->CancelResearch();
+	return 0;
+}
+
+bool marketIsRes(int rty) {
+	return rty == shok_clay || rty == shok_gold || rty == shok_iron || rty == shok_stone || rty == shok_sulfur || rty == shok_wood;
+}
+
+int l_buildingMarketStartTrade(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assertPointer(L, b->GetMarketBehavior(), "no market at 1");
+	luaext_assert(L, b->IsIdle(), "building not idle");
+	int sellty = luaL_checkint(L, 2);
+	int buyty = luaL_checkint(L, 3);
+	float am = luaL_checkfloat(L, 4);
+	luaext_assert(L, marketIsRes(sellty), "sell type is invalid");
+	luaext_assert(L, marketIsRes(buyty), "buy type is invalid");
+	luaext_assert(L, am > 0, "amount <= 0");
+	b->MarketStartTrade(sellty, buyty, am);
+	return 0;
+}
+
+int l_buildingMarketCancelTrade(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	luaext_assertPointer(L, b->GetMarketBehavior(), "no market at 1");
+	luaext_assert(L, b->GetMarketProgress() < 1.0f, "no transaction in progress");
+	b->MarketCancelTrade();
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	serfType = -1;
@@ -1302,6 +1349,10 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "BarracksRecruitLeaders", &l_buildingBarracksRecruitLeaders);
 	luaext_registerFunc(L, "HQBuySerf", &l_buildingHQBuySerf);
 	luaext_registerFunc(L, "SellBuilding", &l_buildingSell);
+	luaext_registerFunc(L, "StartResearch", &l_buildingStartResearch);
+	luaext_registerFunc(L, "CancelResearch", &l_buildingCancelResearch);
+	luaext_registerFunc(L, "MarketStartTrade", &l_buildingMarketStartTrade);
+	luaext_registerFunc(L, "MarketCancelTrade", &l_buildingMarketCancelTrade);
 	lua_rawset(L, -3);
 }
 

@@ -32,11 +32,20 @@ struct shok_BB_CIDManagerEx : shok_object {
 };
 static inline shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 
-// game logic
+struct shok_EGL_CGLELandscape : shok_object {
 
+
+	int GetSector(shok_position* p);
+	bool GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut);
+};
+
+// game logic
+#define shok_vtp_EGL_CGLEGameLogic (void*)0x7839CC
 struct shok_EGL_CGLEGameLogic : shok_object {
 	PADDINGI(6)
-		int* InGameTime; // 7
+	int* InGameTime; // 7
+	PADDINGI(1)
+	shok_EGL_CGLELandscape* Landscape; // 9
 
 	int CreateEffect(shok_EGL_CGLEEffectCreator* data);
 	int CreateEntity(shok_EGL_CGLEEntityCreator* cr);

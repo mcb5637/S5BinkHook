@@ -56,6 +56,24 @@ int shok_BB_CIDManagerEx::GetAnimIdByName(const char* name) {
 	return shok_getAnimIdByName(this, name);
 }
 
+static inline int(__thiscall* shokLandscape_getSector)(shok_EGL_CGLELandscape* th, shok_position* p) = (int(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*))0x5778BE;
+int shok_EGL_CGLELandscape::GetSector(shok_position* p)
+{
+	return shokLandscape_getSector(this, p);
+}
+
+static inline void(__thiscall* shoklandscape_getnearestcon)(int* pred, bool* one, int sector, shok_EGL_CGLELandscape* l) = (void(__thiscall*)(int*, bool*, int, shok_EGL_CGLELandscape*))0x57F253;
+static inline bool(__thiscall* shoklandscape_getnearest)(shok_EGL_CGLELandscape* th, shok_position* pIn, float range, int* pred, shok_position* pOut) = (bool(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*, float, int*, shok_position*))0x5775AF;
+bool shok_EGL_CGLELandscape::GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut)
+{
+	int pred[5];
+	bool one = true;
+	shoklandscape_getnearestcon(pred, &one, sector, this);
+	pOut->X = 0.0f;
+	pOut->Y = 0.0f;
+	return shoklandscape_getnearest(this, pIn, range, pred, pOut);
+}
+
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
 	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)this->vtable;
 	return vt->CreateEffect(this, data);

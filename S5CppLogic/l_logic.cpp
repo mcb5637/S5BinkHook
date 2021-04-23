@@ -105,6 +105,9 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 			i++;
 		}
 		lua_rawset(L, -3);
+		lua_pushstring(L, "Rotation");
+		lua_pushnumber(L, e->Rotation==-1.0f ? -1.0 : rad2deg((double)e->Rotation));
+		lua_rawset(L, -3);
 	}
 	else if (ev->vtable == shok_vtp_GGL_CNetEventExtractResource) {
 		shok_GGL_CNetEventExtractResource* e = (shok_GGL_CNetEventExtractResource*)ev;
@@ -328,6 +331,17 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 					i++;
 				}
 				});
+		}
+		else
+			allRead = false;
+		lua_pop(L, 1);
+		lua_pushstring(L, "Rotation");
+		lua_rawget(L, -2);
+		if (lua_isnumber(L, -1)) {
+			e->Rotation = (float)lua_tonumber(L, -1);
+			if (e->Rotation != -1.0f) {
+				e->Rotation = (float)deg2rad((double)e->Rotation);
+			}
 		}
 		else
 			allRead = false;
@@ -756,6 +770,26 @@ int l_logicPlayerBlessSettlers(lua_State* L) {
 	return 0;
 }
 
+int l_logicLandscapeGetSector(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->GetSector(&p));
+	return 1;
+}
+
+int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	int s = luaL_checkint(L, 2);
+	float r = luaL_checkfloat(L, 3);
+	shok_position po;
+	if ((*shok_EGL_CGLEGameLogicObject)->Landscape->GetNearestPositionInSector(&p, r, s, &po))
+		luaext_pushPos(L, po);
+	else
+		lua_pushnil(L);
+	return 1;
+}
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 }
@@ -776,6 +810,8 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "PlayerSetTaxLevel", &l_logicPlayerSetTaxLevel);
 	luaext_registerFunc(L, "PlayerActivateWeatherMachine", &l_logicPlayerActivateWeatherMachine);
 	luaext_registerFunc(L, "PlayerBlessSettlers", &l_logicPlayerBlessSettlers);
+	luaext_registerFunc(L, "LandscapeGetSector", &l_logicLandscapeGetSector);
+	luaext_registerFunc(L, "LandscapeGetNearestUnblockedPosInSector", &l_logicLandscapeGetNearesUnblockedPosInSector);
 
 
 	lua_pushstring(L, "UICommands");

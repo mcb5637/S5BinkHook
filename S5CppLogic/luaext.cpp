@@ -164,14 +164,6 @@ void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i) {
 	lua_pop(L, 3);
 }
 
-constexpr int shok_clay = 11;
-constexpr int shok_gold = 1;
-constexpr int shok_iron = 7;
-constexpr int shok_silver = 3;
-constexpr int shok_stone = 5;
-constexpr int shok_sulfur = 9;
-constexpr int shok_wood = 13;
-constexpr int shok_maxres = 17;
 void luaext_writeCostInfo(lua_State* L, shok_costInfo& c) {
 	lua_newtable(L);
 	for (int i = 1; i <= shok_maxres; i++) {

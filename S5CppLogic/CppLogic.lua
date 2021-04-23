@@ -131,6 +131,19 @@ function CppLogic.Logic.PlayerActivateWeatherMachine(pl, wt) end
 -- @param bc
 function CppLogic.Logic.PlayerBlessSettlers(pl, bc) end
 
+
+--- gets the sector of a position.
+-- @param p
+-- @return sector
+function CppLogic.Logic.LandscapeGetSector(p) end
+
+--- gets the nearest unblocked position in range and in a specific sector.
+-- @param p
+-- @param sector
+-- @param range
+-- @return position or nil
+function CppLogic.Logic.LandscapeGetNearestUnblockedPosInSector(p, sector, range) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func
@@ -765,6 +778,29 @@ function CppLogic.Entity.Building.HQBuySerf(id) end
 -- does not give you back resources.
 -- @param id entity
 function CppLogic.Entity.Building.SellBuilding(id) end
+
+--- starts researching a tech.
+-- does not check, if the tech belongs to that building.
+-- uses resources.
+-- @param id entity
+-- @param tech
+function CppLogic.Entity.Building.StartResearch(id, tech) end
+--- cancels research.
+-- gives back resources.
+-- @param id entity
+function CppLogic.Entity.Building.CancelResearch(id) end
+
+--- starts a market transaction.
+-- uses resources.
+-- @param id entity
+-- @param sellty
+-- @param buyty
+-- @param buyam
+function CppLogic.Entity.Building.MarketStartTrade(id, sellty, buyty, buyam) end
+--- cancels a market transaction.
+-- gives back resources.
+-- @param id entity
+function CppLogic.Entity.Building.MarketCancelTrade(id) end
 
 
 --- entity type max health.

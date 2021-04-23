@@ -25,3 +25,19 @@ constexpr int EntityCategoryCannon = 11;
 constexpr int EntityCategoryHero = 22;
 constexpr int EntityCategoryLongRange = 32;
 constexpr int EntityCategoryBridge = 37;
+
+constexpr int TechState_Forbidden = 0;
+constexpr int TechState_Waiting = 1;
+constexpr int TechState_Allowed = 2;
+constexpr int TechState_InProgress = 3;
+constexpr int TechState_Researched = 4;
+constexpr int TechState_Future = 5;
+
+constexpr int shok_clay = 11;
+constexpr int shok_gold = 1;
+constexpr int shok_iron = 7;
+constexpr int shok_silver = 3;
+constexpr int shok_stone = 5;
+constexpr int shok_sulfur = 9;
+constexpr int shok_wood = 13;
+constexpr int shok_maxres = 17;

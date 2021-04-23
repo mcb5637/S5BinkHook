@@ -306,6 +306,10 @@ public:
 	void BarracksRecruitLeaders();
 	void HQBuySerf();
 	void SellBuilding();
+	void StartResearch(int tech);
+	void CancelResearch();
+	void MarketStartTrade(int ResourceTypeSell, int ResourceTypeBuy, float BuyAmount);
+	void MarketCancelTrade();
 };
 
 #define shok_vtp_GGL_CBridgeEntity (void*)0x77805C

@@ -63,6 +63,12 @@ struct shok_event_data_GGL_CEventAttachmentTypeGetInteger : shok_event_data {
 	int AttachmentType = 0;
 	int i = 0;
 };
+struct shok_event_data_GGL_CEventTransaction : shok_event_data {
+	int vtable = 0x76D93C;
+	int id = 0x1700A;
+	int SellType = 0, BuyType = 0;
+	float BuyAmount = 0.0f;
+};
 
 // net events
 #define shok_vtp_BB_CEvent (void*)0x762114
@@ -86,6 +92,7 @@ struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
 	int EntityId;
 	vector_padding
 		std::vector<shok_position, shok_allocator<shok_position>> Positions;
+	float Rotation;
 };
 
 #define shok_vtp_GGL_CNetEventExtractResource (void*)0x77061C

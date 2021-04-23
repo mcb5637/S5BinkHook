@@ -750,6 +750,34 @@ void shok_GGL_CBuilding::SellBuilding()
 	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
 }
 
+static inline void(__thiscall* building_startresearch)(shok_GGL_CBuilding* th, int tech) = (void(__thiscall*)(shok_GGL_CBuilding*, int))0x4AAC76;
+void shok_GGL_CBuilding::StartResearch(int tech)
+{
+	building_startresearch(this, tech);
+}
+
+static inline void(__thiscall* building_cancelresearch)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*))0x4AACC0;
+void shok_GGL_CBuilding::CancelResearch()
+{
+	building_cancelresearch(this);
+}
+
+void shok_GGL_CBuilding::MarketStartTrade(int ResourceTypeSell, int ResourceTypeBuy, float BuyAmount)
+{
+	shok_event_data_GGL_CEventTransaction e2 = shok_event_data_GGL_CEventTransaction();
+	e2.SellType = ResourceTypeSell;
+	e2.BuyType = ResourceTypeBuy;
+	e2.BuyAmount = BuyAmount;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
+void shok_GGL_CBuilding::MarketCancelTrade()
+{
+	shok_event_data_BB_CEvent e2 = shok_event_data_BB_CEvent();
+	e2.id = 0x1700B;
+	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
+}
+
 
 void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter) = nullptr;
 int _cdecl hero6convertchangeplayer(int id, int pl) {

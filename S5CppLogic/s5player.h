@@ -28,6 +28,16 @@ struct shok_GGL_CSettlerUpgradeManager : shok_object {
 	int GetSettlerTypeByUCat(int ucat);
 };
 
+struct shok_GGL_CPlayerStatus_techData_tech {
+	int TechStatus;
+	int ResearchProgress;
+	int StartTick;
+	int ResearcherId;
+};
+struct shok_GGL_CPlayerStatus_techData : shok_object {
+	vector_padding
+	std::vector<shok_GGL_CPlayerStatus_techData_tech, shok_allocator<shok_GGL_CPlayerStatus_techData_tech>> TechList;
+};
 #define shok_vtp_GGL_CPlayerStatus (void*)0x76FA88
 struct shok_GGL_CPlayerStatus : shok_object {
 	int PlayerID;
@@ -40,7 +50,9 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	PADDING(3)
 	int AlarmRechargeTime;
 	int DiploData; // 48
-	PADDINGI(33)
+	PADDINGI(10)
+	shok_GGL_CPlayerStatus_techData TechData; // 59
+	PADDINGI(18)
 	int NumberOfSettlersKilled, NumberOfSettlersLost, NumberOfBuildingsKilled, NumberOfBuildingsLost;
 	PADDINGI(111)
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler; // 197
@@ -48,6 +60,7 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	shok_GGL_CSettlerUpgradeManager* SettlerUpgradeManager;
 
 	int GetDiploStateTo(int p);
+	int GetTechStatus(int tech);
 };
 
 static inline bool(_cdecl* shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;

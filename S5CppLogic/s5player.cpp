@@ -31,6 +31,12 @@ int shok_GGL_CPlayerStatus::GetDiploStateTo(int p)
 	return shok_GGL_CPlayerStatus_getDiploState(&DiploData, p);
 }
 
+static inline int(__thiscall* playerstatus_gettechstatus)(shok_GGL_CPlayerStatus_techData* th, int tech) = (int(__thiscall*)(shok_GGL_CPlayerStatus_techData*, int))0x4A2A8D;
+int shok_GGL_CPlayerStatus::GetTechStatus(int tech)
+{
+	return playerstatus_gettechstatus(&TechData, tech);
+}
+
 
 bool ArePlayersHostile(int p1, int p2)
 {

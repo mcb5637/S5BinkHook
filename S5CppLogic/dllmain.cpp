@@ -18,9 +18,9 @@
 
 
 int __cdecl test(lua_State* L) {
-    /*shok_GGL_CLogicProperties s = shok_GGL_CLogicProperties();
+    /*shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
     int st = (int)&s;
-    int test = (int)&s.MaxFaith;
+    int test = (int)&s.PlayerAttractionHandler;
     lua_pushnumber(L, (test - st) / 4);*/
     /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
     c.EntityType = 274;
@@ -30,7 +30,17 @@ int __cdecl test(lua_State* L) {
     c.ResourceAmount = 10;
     int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
     lua_pushnumber(L, id);*/
-    return 0;
+    shok_position p1;
+    luaext_checkPos(L, p1, 1);
+    shok_position p2;
+    luaext_checkPos(L, p2, 2);
+    shok_EGL_CGLEGameLogic* gl = (*shok_EGL_CGLEGameLogicObject);
+    int i = gl->Landscape->GetSector(&p1);
+    shok_position p3;
+    lua_pushboolean(L, gl->Landscape->GetNearestPositionInSector(&p2, 100, i, &p3));
+    lua_pushnumber(L, i);
+    luaext_pushPos(L, p3);
+    return 3;
 }
 
 int cleanup(lua_State* L) {

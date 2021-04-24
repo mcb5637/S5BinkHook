@@ -51,6 +51,18 @@ int cleanup(lua_State* L) {
     return 0;
 }
 
+const char* SCELoaderFuncOverrides = R"(
+function CppLogic.Logic.EnableAllHurtEntityTrigger()
+    CEntity.EnableAllHurtTrigger()
+end
+function CppLogic.Logic.HurtEntityGetDamage()
+    return CEntity.TriggerGetDamage()
+end
+function CppLogic.Logic.HurtEntitySetDamage(d)
+    CEntity.TriggerSetDamage(d)
+end
+)";
+
 extern "C" void __cdecl install(lua_State * L) {
     lua_pushcfunction(L, &test);
     lua_setglobal(L, "test");
@@ -107,6 +119,10 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_rawset(L, LUA_GLOBALSINDEX);
 
     luaopen_debug(L);
+
+    if (HasSCELoader()) {
+        lua_dobuffer(L, SCELoaderFuncOverrides, strlen(SCELoaderFuncOverrides), "CppLogic");
+    }
 }
 
 // CUtilMemory.GetMemory(tonumber("897558", 16))

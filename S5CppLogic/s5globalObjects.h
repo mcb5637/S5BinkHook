@@ -216,3 +216,14 @@ public:
 	void PlayerBlessSettlers(int player, int blessCat);
 };
 static inline shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
+
+
+#define shok_vtp_EScr_CScriptTriggerSystem (void*)0x78667C
+struct shok_EScr_CScriptTriggerSystem : shok_object {
+private:
+	shok_BB_IPostEvent PostEvent;
+
+public:
+	void RunTrigger(shok_BB_CEvent* ev);
+};
+static inline shok_EScr_CScriptTriggerSystem** shok_EScr_CScriptTriggerSystemObj = (shok_EScr_CScriptTriggerSystem**)0x895DEC;

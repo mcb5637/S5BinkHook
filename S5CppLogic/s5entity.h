@@ -371,3 +371,6 @@ void HookResetCamo();
 extern int ResetCamoIgnoreIfNotEntity;
 extern void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
 void HookCamoActivate();
+
+extern int* HurtEntityDamagePointer;
+void HookHurtEntity();

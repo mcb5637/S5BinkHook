@@ -2,6 +2,7 @@
 
 #include "s5data.h"
 #include <stdexcept>
+#include <libloaderapi.h>
 
 
 void shok_position::FloorToBuildingPlacement()
@@ -175,4 +176,9 @@ static inline bool(__thiscall* constinfo_hasres)(shok_costInfo* th, shok_costInf
 bool shok_costInfo::HasResources(shok_costInfo* has)
 {
 	return constinfo_hasres(this, has);
+}
+
+bool HasSCELoader()
+{
+	return GetModuleHandle(L"SCELoader.dll");
 }

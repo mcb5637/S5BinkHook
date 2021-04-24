@@ -818,3 +818,52 @@ void HookCamoActivate()
 	RedirectCall((void*)0x50163A, &camoActivateHook);
 }
 
+
+static inline void(__thiscall* event2entitiesctor)(int* e, int id, int at, int de) = (void(__thiscall*)(int*, int, int, int))0x49847F;
+int* HurtEntityDamagePointer = nullptr;
+void __stdcall hurtentityhookc(int* damage, shok_EGL_CGLEEntity** target, shok_EGL_CGLEEntity** attacker) { // argument order is reversed, for asm reasons
+	if (!*target)
+		return;
+	int aid = 0;
+	if (*attacker)
+		aid = (*attacker)->EntityId;
+	int tid = (*target)->EntityId;
+	int ev[6];
+	event2entitiesctor(ev, 0x1C007, aid, tid);
+	HurtEntityDamagePointer = damage;
+	(*shok_EScr_CScriptTriggerSystemObj)->RunTrigger((shok_BB_CEvent*)ev);
+	HurtEntityDamagePointer = nullptr;
+}
+
+void __declspec(naked) hurtentityhook() { // push arguments, call func,do the move i did override, last jump back
+	__asm {
+		mov eax, esp
+		add eax, 0x4
+		push eax
+		add eax, 0x4
+		push eax
+		add eax, 0x4
+		push eax
+		call hurtentityhookc
+
+		mov eax, 0x72d687
+		push 0x49f35d
+		ret
+	}
+}
+
+void HookHurtEntity()
+{
+	if (HasSCELoader())
+		DEBUGGER_BREAK
+	WriteJump((void*)0x49f358, &hurtentityhook); // call my own func, that calls the trigger
+	byte* p = (byte*)0x49F4A6; // remove call to trigger
+	*p = 0x90; // nop
+	p = (byte*)0x49F4A7;
+	*p = 0x90;
+	p = (byte*)0x49F4AC;
+	*p = 0x90;
+	p = (byte*)0x49F4AD;
+	*p = 0x90;
+}
+

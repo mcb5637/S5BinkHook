@@ -4,7 +4,7 @@
 #include <libloaderapi.h>
 
 void l_api_checkEvalEnabled(lua_State* L) {
-	if (GetModuleHandle(L"SCELoader.dll"))
+	if (HasSCELoader())
 		luaL_error(L, "Loading lua code disabled for Kimichura");
 }
 

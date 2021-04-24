@@ -209,3 +209,8 @@ int shok_GGL_CWeatherHandler::GetTicksToNextPeriodicWeatherChange()
 {
 	return weatherdata_gettimetonext(this);
 }
+
+void shok_EScr_CScriptTriggerSystem::RunTrigger(shok_BB_CEvent* ev)
+{
+	((shok_vtable_BB_IPostEvent*)PostEvent.vtable)->PostEvent(&PostEvent, ev);
+}

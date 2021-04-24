@@ -790,6 +790,28 @@ int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
 	return 1;
 }
 
+int l_logicHookHurtEntity(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	HookHurtEntity();
+	return 0;
+}
+
+int l_logicHurtEntityGetDamage(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	luaext_assertPointer(L, HurtEntityDamagePointer, "not in trigger");
+	lua_pushnumber(L, *HurtEntityDamagePointer);
+	return 1;
+}
+int l_logicHurtEntitySetDamage(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	luaext_assertPointer(L, HurtEntityDamagePointer, "not in trigger");
+	*HurtEntityDamagePointer = luaL_checkint(L, 1);
+	return 0;
+}
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 }
@@ -812,6 +834,9 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "PlayerBlessSettlers", &l_logicPlayerBlessSettlers);
 	luaext_registerFunc(L, "LandscapeGetSector", &l_logicLandscapeGetSector);
 	luaext_registerFunc(L, "LandscapeGetNearestUnblockedPosInSector", &l_logicLandscapeGetNearesUnblockedPosInSector);
+	luaext_registerFunc(L, "EnableAllHurtEntityTrigger", &l_logicHookHurtEntity);
+	luaext_registerFunc(L, "HurtEntityGetDamage", &l_logicHurtEntityGetDamage);
+	luaext_registerFunc(L, "HurtEntitySetDamage", &l_logicHurtEntitySetDamage);
 
 
 	lua_pushstring(L, "UICommands");

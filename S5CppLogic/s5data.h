@@ -35,6 +35,7 @@ typedef uint8_t byte;
 // GGUI_CManager.PostEvent vtable redirect
 // convert task 0x4FCD27 changed func call
 // 0x005011DF reset camo func override
+// shok_entityHurtEntity 0x49F358 jmp patched, only without SCELoader
 
 // allocator
 static inline void* (__cdecl* shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
@@ -196,6 +197,8 @@ bool DoesFileExist(const char* name);
 
 void RedirectCall(void* call, void* redirect);
 void WriteJump(void* adr, void* toJump);
+
+bool HasSCELoader();
 
 template<class T>
 constexpr inline T rad2deg(T r) {

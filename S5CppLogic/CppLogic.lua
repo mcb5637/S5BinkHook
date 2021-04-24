@@ -131,7 +131,6 @@ function CppLogic.Logic.PlayerActivateWeatherMachine(pl, wt) end
 -- @param bc
 function CppLogic.Logic.PlayerBlessSettlers(pl, bc) end
 
-
 --- gets the sector of a position.
 -- @param p
 -- @return sector
@@ -143,6 +142,18 @@ function CppLogic.Logic.LandscapeGetSector(p) end
 -- @param range
 -- @return position or nil
 function CppLogic.Logic.LandscapeGetNearestUnblockedPosInSector(p, sector, range) end
+
+--- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
+function CppLogic.Logic.EnableAllHurtEntityTrigger() end
+
+--- gets the damage that is going to be dealt in a Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger.
+-- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
+-- @return dmg
+function CppLogic.Logic.HurtEntityGetDamage() end
+--- sets the damage that is going to be dealt in a Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger.
+-- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
+-- @param dmg
+function CppLogic.Logic.HurtEntitySetDamage(dmg) end
 
 --- ui command callback.
 -- func parameters are (eventId, eventData)

@@ -867,3 +867,47 @@ void HookHurtEntity()
 	*p = 0x90;
 }
 
+int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
+	shok_GGlue_CGlueEntityProps* et = e->GetEntityType();
+	float hp = (float) et->LogicProps->MaxHealth;
+	if (e->IsSettler()) {
+		for (int t : ((shok_GGL_CGLSettlerProps*)et->LogicProps)->ModifyHitpoints.TechList) {
+			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState_Researched)
+				continue;
+			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
+			switch (tech->HitpointModifier.Operator) {
+			case '+':
+				hp += tech->HitpointModifier.Value;
+				break;
+			case '-':
+				hp -= tech->HitpointModifier.Value;
+				break;
+			case '*':
+				hp *= tech->HitpointModifier.Value;
+				break;
+			case '/':
+				hp /= tech->HitpointModifier.Value;
+				break;
+			}
+		}
+	}
+	return (int) hp;
+}
+
+void __declspec(naked) hookgetmaxhpui() {
+	__asm {
+		mov ecx, [ebp+0xC]
+		call hookGetMaxHP
+		push eax
+		fild [esp]
+		pop eax
+		push 0x4BDEE0
+		ret
+	}
+}
+
+void EnableMaxHealthTechBoni()
+{
+	WriteJump((void*)0x57B798, &hookGetMaxHP);
+	WriteJump((void*)0x4BDED8, &hookgetmaxhpui);
+}

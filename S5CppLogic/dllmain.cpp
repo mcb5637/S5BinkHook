@@ -30,17 +30,8 @@ int __cdecl test(lua_State* L) {
     c.ResourceAmount = 10;
     int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
     lua_pushnumber(L, id);*/
-    shok_position p1;
-    luaext_checkPos(L, p1, 1);
-    shok_position p2;
-    luaext_checkPos(L, p2, 2);
-    shok_EGL_CGLEGameLogic* gl = (*shok_EGL_CGLEGameLogicObject);
-    int i = gl->Landscape->GetSector(&p1);
-    shok_position p3;
-    lua_pushboolean(L, gl->Landscape->GetNearestPositionInSector(&p2, 100, i, &p3));
-    lua_pushnumber(L, i);
-    luaext_pushPos(L, p3);
-    return 3;
+    lua_pushnumber(L, (int)&((*shok_GGL_CGLGameLogicObj)->GetPlayer(1)->PlayerAttractionHandler->PaydayStartTick));
+    return 1;
 }
 
 int cleanup(lua_State* L) {

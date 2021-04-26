@@ -65,3 +65,4 @@ void l_api_init(lua_State* L)
 }
 
 // CppLogic.API.Log("string")
+// CppLogic.API.ReadFileAsString("data\\maps\\externalmap\\info.xml")

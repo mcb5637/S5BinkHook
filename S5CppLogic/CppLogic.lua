@@ -143,6 +143,19 @@ function CppLogic.Logic.LandscapeGetSector(p) end
 -- @return position or nil
 function CppLogic.Logic.LandscapeGetNearestUnblockedPosInSector(p, sector, range) end
 
+--- gets the terrain type of a position.
+-- @param p
+-- @return terrain type
+function CppLogic.Logic.LandscapeGetTerrainType(p) end
+--- gets the water type of a position.
+-- @param p
+-- @return water type
+function CppLogic.Logic.LandscapeGetWaterType(p) end
+--- gets the water height of a position.
+-- @param p
+-- @return water height type
+function CppLogic.Logic.LandscapeGetWaterHeight(p) end
+
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
 function CppLogic.Logic.EnableAllHurtEntityTrigger() end
 
@@ -154,6 +167,15 @@ function CppLogic.Logic.HurtEntityGetDamage() end
 -- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
 -- @param dmg
 function CppLogic.Logic.HurtEntitySetDamage(dmg) end
+
+--- gets all loaded archives and folders.
+-- @return string, string...
+function CppLogic.Logic.GetLoadOrder() end
+--- adds a archive on top of your load order.
+-- @param map archive, relative to current dir, so "extra2\\shr\\maps\\user\\map.s5x for a map file
+function CppLogic.Logic.AddArchive(arch) end
+--- removes the top archive. may only remove .s5x map archives.
+function CppLogic.Logic.RemoveTopArchive() end
 
 --- ui command callback.
 -- func parameters are (eventId, eventData)

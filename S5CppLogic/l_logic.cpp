@@ -2,6 +2,7 @@
 #include "l_logic.h"
 #include "luaext.h"
 #include <assert.h>
+#include <filesystem>
 
 int l_logicGetDamageModifier(lua_State* L) {
 	int dmgclass = luaL_checkint(L, 1);
@@ -812,6 +813,86 @@ int l_logicHurtEntitySetDamage(lua_State* L) {
 	return 0;
 }
 
+int l_logicGetLoadOrder(lua_State* L) {
+	int r = 0;
+	for (shok_BB_IFileSystem* a : (*shok_BB_CFileSystemMgrObj)->LoadOrder) {
+		if (a->vtable == shok_vtp_BB_CDirectoryFileSystem) {
+			lua_pushstring(L, ((shok_BB_CDirectoryFileSystem*)a)->Path);
+			r++;
+		}
+		else if (a->vtable == shok_vtp_BB_CBBArchiveFile) {
+			lua_pushstring(L, ((shok_BB_CBBArchiveFile*)a)->Path);
+			r++;
+		}
+	}
+	return r;
+}
+
+int l_logicAddArchive(lua_State* L) {
+	const char* s = luaL_checkstring(L, 1);
+	luaext_assert(L, std::filesystem::exists(s), "file doesnt exist");
+	(*shok_BB_CFileSystemMgrObj)->AddArchive(s);
+	return 0;
+}
+
+int str_ends_with(const char* str, const char* suffix) {
+
+	if (str == NULL || suffix == NULL)
+		return 0;
+
+	size_t str_len = strlen(str);
+	size_t suffix_len = strlen(suffix);
+
+	if (suffix_len > str_len)
+		return 0;
+
+	return 0 == strncmp(str + str_len - suffix_len, suffix, suffix_len);
+}
+
+int l_logicRemoveTop(lua_State* L) {
+	if ((*shok_BB_CFileSystemMgrObj)->LoadOrder.size() <= 0)
+		return 0;
+	shok_BB_IFileSystem* a = (*shok_BB_CFileSystemMgrObj)->LoadOrder[0];
+	luaext_assert(L, a->vtable == shok_vtp_BB_CBBArchiveFile, "may only remove archives");
+	luaext_assert(L, str_ends_with(((shok_BB_CBBArchiveFile*)a)->Path, ".s5x"), "may only remove maps");
+	(*shok_BB_CFileSystemMgrObj)->RemoveTopArchive();
+	return 0;
+}
+
+int l_logicAddFolder(lua_State* L) { // works, but adds to the bottom
+	const char* s = luaL_checkstring(L, 1);
+	(*shok_BB_CFileSystemMgrObj)->AddFolder(s);
+	return 0;
+}
+
+int l_logicEnableMaxHpTechMod(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supportet with SCELoader");
+	EnableMaxHealthTechBoni();
+	return 0;
+}
+
+int l_logicLandscapeGetTerrainType(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetTerrainTypeAt(p));
+	return 1;
+}
+
+int l_logicLandscapeGetWaterType(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetWaterTypeAt(p));
+	return 1;
+}
+
+int l_logicLandscapeGetWaterHeight(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetWaterHeightAt(p));
+	return 1;
+}
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 }
@@ -837,6 +918,14 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "EnableAllHurtEntityTrigger", &l_logicHookHurtEntity);
 	luaext_registerFunc(L, "HurtEntityGetDamage", &l_logicHurtEntityGetDamage);
 	luaext_registerFunc(L, "HurtEntitySetDamage", &l_logicHurtEntitySetDamage);
+	luaext_registerFunc(L, "GetLoadOrder", &l_logicGetLoadOrder);
+	luaext_registerFunc(L, "AddArchive", &l_logicAddArchive);
+	luaext_registerFunc(L, "RemoveTopArchive", &l_logicRemoveTop);
+	//luaext_registerFunc(L, "AddFolder", &l_logicAddFolder);
+	luaext_registerFunc(L, "EnableMaxHPTechMod", &l_logicEnableMaxHpTechMod);
+	luaext_registerFunc(L, "LandscapeGetTerrainType", &l_logicLandscapeGetTerrainType);
+	luaext_registerFunc(L, "LandscapeGetWaterType", &l_logicLandscapeGetWaterType);
+	luaext_registerFunc(L, "LandscapeGetWaterHeight", &l_logicLandscapeGetWaterHeight);
 
 
 	lua_pushstring(L, "UICommands");
@@ -847,3 +936,7 @@ void l_logic_init(lua_State* L)
 }
 
 // CppLogic.Logic.UICommands.SetCallback(function(id, ev) LuaDebugger.Log(id) LuaDebugger.Log(ev) return false end)
+// CppLogic.Logic.AddArchive("extra2\\shr\\maps\\user\\test.s5x")
+// CppLogic.Logic.AddArchive("test.bba")
+// CppLogic.Logic.RemoveTopArchive()
+// CppLogic.Logic.EnableMaxHPTechMod()

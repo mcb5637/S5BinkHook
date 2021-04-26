@@ -33,9 +33,14 @@ typedef uint8_t byte;
 // EGL_CGLEGameLogic.CreateEffect vtable redirect
 // GGL_CCannonBallEffect & GGL_CArrowEffect . OnHit vtable redirect
 // GGUI_CManager.PostEvent vtable redirect
-// convert task 0x4FCD27 changed func call
+// convert task 0x4FCD27 call redirect
 // 0x005011DF reset camo func override
-// shok_entityHurtEntity 0x49F358 jmp patched, only without SCELoader
+// 0x4D51A4 & 0x50163A activate camo call redirect
+// 
+// only without SCELoader
+// shok_entityHurtEntity 0x49F358 jmp patched
+// entity get max hp 0x57B798 jmp
+// 0x4BDED8 ui settler overhead hp bar maxhp jmp
 
 // allocator
 static inline void* (__cdecl* shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;

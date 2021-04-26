@@ -32,8 +32,31 @@ struct shok_BB_CIDManagerEx : shok_object {
 };
 static inline shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 
-struct shok_EGL_CGLELandscape : shok_object {
 
+#define shok_vtp_EGL_CGLETerrainHiRes (void*)0x7837B0
+struct shok_EGL_CGLETerrainHiRes : shok_object {
+
+};
+#define shok_vtp_EGL_CGLETerrainLowRes (void*)0x7837C0
+struct shok_EGL_CGLETerrainLowRes : shok_object {
+	PADDINGI(1)
+	int* Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
+	PADDINGI(6)
+	int MaxSizeX, MaxSizeY; // 9
+	int ArraySizeX, ArraySizeY;// 11
+
+	void ToTerrainCoord(shok_position& p, int* out);
+	void ToQuadsCoord(shok_position& p, int* out);
+	bool IsCoordValid(int* out);
+	int GetTerrainTypeAt(shok_position& p);
+	int GetWaterTypeAt(shok_position& p);
+	int GetWaterHeightAt(shok_position& p);
+};
+#define shok_vtp_EGL_CGLELandscape (void*)0x783C38
+struct shok_EGL_CGLELandscape : shok_object {
+	PADDINGI(6)
+	shok_EGL_CGLETerrainHiRes* HiRes;
+	shok_EGL_CGLETerrainLowRes* LowRes;
 
 	int GetSector(shok_position* p);
 	bool GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut);
@@ -227,3 +250,26 @@ public:
 	void RunTrigger(shok_BB_CEvent* ev);
 };
 static inline shok_EScr_CScriptTriggerSystem** shok_EScr_CScriptTriggerSystemObj = (shok_EScr_CScriptTriggerSystem**)0x895DEC;
+
+struct shok_BB_IFileSystem : shok_object {
+
+};
+#define shok_vtp_BB_CDirectoryFileSystem (void*)0x7803B4
+struct shok_BB_CDirectoryFileSystem : shok_BB_IFileSystem {
+	char* Path;
+};
+#define shok_vtp_BB_CBBArchiveFile (void*)0x77FABC
+struct shok_BB_CBBArchiveFile : shok_BB_IFileSystem {
+	PADDINGI(2) // BB::CFileStream 761C98, then probably file handle
+	char* Path;
+};
+#define shok_vtp_BB_CFileSystemMgr (void*)0x77F794
+struct shok_BB_CFileSystemMgr : shok_object {
+	vector_padding
+	std::vector<shok_BB_IFileSystem*, shok_allocator<shok_BB_IFileSystem*>> LoadOrder;
+
+	void AddFolder(const char* path);
+	void AddArchive(const char* path);
+	void RemoveTopArchive();
+};
+static inline shok_BB_CFileSystemMgr** shok_BB_CFileSystemMgrObj = (shok_BB_CFileSystemMgr**)0x88F088;

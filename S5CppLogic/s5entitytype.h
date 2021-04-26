@@ -22,7 +22,7 @@ private:
 	int Race;
 public:
 	byte CanFloat, CanDrown, MapFileDontSave, DividesTwoSectors, ForceNoPlayer, AdjustWalkAnimSpeed, Visible, DoNotExecute;
-	int MaxHealth;
+	int MaxHealth; // 13
 private:
 	int Models[5];
 public:

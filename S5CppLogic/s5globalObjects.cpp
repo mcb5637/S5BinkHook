@@ -27,6 +27,18 @@ struct shok_vtable_GGL_CWeatherHandler {
 	int(__thiscall* GetCurrentWeather)(shok_GGL_CWeatherHandler* th);
 };
 
+struct shok_vtable_shok_BB_CFileSystemMgr {
+	PADDINGI(6)
+	void(__thiscall* AddArchive)(shok_BB_CFileSystemMgr* th, const char* Path, bool OnTop); // 6
+	PADDINGI(1)
+	void(__thiscall* AddFolder)(shok_BB_CFileSystemMgr* th, const char* path, bool OnTop, int x); // 8
+	PADDINGI(1)
+	void(__thiscall* RemoveTop)(shok_BB_CFileSystemMgr* th); // 10
+	PADDINGI(1)
+	void(__thiscall* MakeAbsolute)(shok_BB_CFileSystemMgr* th, char* relative, char* absolute); // 12
+
+};
+
 shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
 {
 	if (i <= 0 || i >= (int)EntityTypes.size())
@@ -54,6 +66,46 @@ shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 static inline int(__thiscall* shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name) = (int(__thiscall*)(shok_BB_CIDManagerEx * th, const char* name)) 0x54F19E;
 int shok_BB_CIDManagerEx::GetAnimIdByName(const char* name) {
 	return shok_getAnimIdByName(this, name);
+}
+
+void shok_EGL_CGLETerrainLowRes::ToTerrainCoord(shok_position& p, int* out)
+{
+	out[0] = (int)std::lroundf(p.X / 100);
+	out[1] = (int)std::lroundf(p.Y / 100);
+}
+void shok_EGL_CGLETerrainLowRes::ToQuadsCoord(shok_position& p, int* out)
+{
+	ToTerrainCoord(p, out);
+	out[0] /= 4;
+	out[1] /= 4;
+}
+bool shok_EGL_CGLETerrainLowRes::IsCoordValid(int* out)
+{
+	return out[0] >= 0 && out[1] >= 0 && out[0] < MaxSizeX && out[1] < MaxSizeY;
+}
+int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(shok_position& p)
+{
+	int qp[2] = { 0,0 };
+	ToQuadsCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	return Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0xFF;
+}
+int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(shok_position& p)
+{
+	int qp[2] = { 0,0 };
+	ToQuadsCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3F00) >> 8;
+}
+int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(shok_position& p)
+{
+	int qp[2] = { 0,0 };
+	ToQuadsCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3FFFC000) >> 14;
 }
 
 static inline int(__thiscall* shokLandscape_getSector)(shok_EGL_CGLELandscape* th, shok_position* p) = (int(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*))0x5778BE;
@@ -213,4 +265,20 @@ int shok_GGL_CWeatherHandler::GetTicksToNextPeriodicWeatherChange()
 void shok_EScr_CScriptTriggerSystem::RunTrigger(shok_BB_CEvent* ev)
 {
 	((shok_vtable_BB_IPostEvent*)PostEvent.vtable)->PostEvent(&PostEvent, ev);
+}
+
+static inline void(__cdecl* filesystem_addfolder)(const char* p, char* d) = (void(__cdecl*)(const char*, char*))0x546514;
+void shok_BB_CFileSystemMgr::AddFolder(const char* path)
+{
+	filesystem_addfolder(path, nullptr);
+}
+
+void shok_BB_CFileSystemMgr::AddArchive(const char* path)
+{
+	((shok_vtable_shok_BB_CFileSystemMgr*)vtable)->AddArchive(this, path, 1);
+}
+
+void shok_BB_CFileSystemMgr::RemoveTopArchive()
+{
+	((shok_vtable_shok_BB_CFileSystemMgr*)vtable)->RemoveTop(this);
 }

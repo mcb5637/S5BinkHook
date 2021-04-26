@@ -374,3 +374,5 @@ void HookCamoActivate();
 
 extern int* HurtEntityDamagePointer;
 void HookHurtEntity();
+
+void EnableMaxHealthTechBoni();

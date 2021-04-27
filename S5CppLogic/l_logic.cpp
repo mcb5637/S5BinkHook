@@ -878,18 +878,34 @@ int l_logicLandscapeGetTerrainType(lua_State* L) {
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetTerrainTypeAt(p));
 	return 1;
 }
-
 int l_logicLandscapeGetWaterType(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetWaterTypeAt(p));
 	return 1;
 }
-
 int l_logicLandscapeGetWaterHeight(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetWaterHeightAt(p));
+	return 1;
+}
+int l_logicLandscapeGetTerrainHeight(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->HiRes->GetTerrainHeight(p));
+	return 1;
+}
+int l_logicLandscapeGetTerrainVertexColor(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->VertexColors->GetTerrainVertexColor(p));
+	return 1;
+}
+int l_logicLandscapeGetBlocking(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_ED_CGlobalsLogicExObj)->GetBlocking(p));
 	return 1;
 }
 
@@ -926,6 +942,9 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "LandscapeGetTerrainType", &l_logicLandscapeGetTerrainType);
 	luaext_registerFunc(L, "LandscapeGetWaterType", &l_logicLandscapeGetWaterType);
 	luaext_registerFunc(L, "LandscapeGetWaterHeight", &l_logicLandscapeGetWaterHeight);
+	luaext_registerFunc(L, "LandscapeGetTerrainHeight", &l_logicLandscapeGetTerrainHeight);
+	luaext_registerFunc(L, "LandscapeGetTerrainVertexColor", &l_logicLandscapeGetTerrainVertexColor);
+	luaext_registerFunc(L, "LandscapeGetBlocking", &l_logicLandscapeGetBlocking);
 
 
 	lua_pushstring(L, "UICommands");

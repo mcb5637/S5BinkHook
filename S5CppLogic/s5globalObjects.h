@@ -33,30 +33,51 @@ struct shok_BB_CIDManagerEx : shok_object {
 static inline shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 
 
+#define shok_vtp_EGL_CTerrainVertexColors (void*)0x7841F8
+struct shok_EGL_CTerrainVertexColors : shok_object {
+	int ArraySizeX, ArraySizeY;
+	int* VertexColors;
+
+	void ToTerrainCoord(shok_position& p, int* out);
+	bool IsCoordValid(int* out);
+	int GetTerrainVertexColor(shok_position& p);
+	// set 580582 (this, x, y, *col) terraincoord
+};
 #define shok_vtp_EGL_CGLETerrainHiRes (void*)0x7837B0
 struct shok_EGL_CGLETerrainHiRes : shok_object {
+	vector_padding
+	std::vector<int16_t, shok_allocator<int16_t>> TerrainHeights;
+	int MaxSizeX, MaxSizeY; // 5
+	int ArraySizeX, ArraySizeY; // 7
 
+	void ToTerrainCoord(shok_position& p, int* out);
+	bool IsCoordValid(int* out);
+	int GetTerrainHeight(shok_position& p);
+	// set 591B53 (this, *out, int16 h)
 };
 #define shok_vtp_EGL_CGLETerrainLowRes (void*)0x7837C0
 struct shok_EGL_CGLETerrainLowRes : shok_object {
-	PADDINGI(1)
-	int* Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
-	PADDINGI(6)
+	vector_padding
+	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
+	PADDINGI(4) // 1 vectors of int
 	int MaxSizeX, MaxSizeY; // 9
-	int ArraySizeX, ArraySizeY;// 11
+	int ArraySizeX, ArraySizeY; // 11
 
-	void ToTerrainCoord(shok_position& p, int* out);
-	void ToQuadsCoord(shok_position& p, int* out);
+	void ToQuadCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
 	int GetTerrainTypeAt(shok_position& p);
 	int GetWaterTypeAt(shok_position& p);
 	int GetWaterHeightAt(shok_position& p);
+	// set water height 591B82 (this, *out, int)
+	// set water type 591BB9 (this, *out, int)
+	// set terrain type 58BBCE (this, *out, int)
 };
 #define shok_vtp_EGL_CGLELandscape (void*)0x783C38
 struct shok_EGL_CGLELandscape : shok_object {
 	PADDINGI(6)
 	shok_EGL_CGLETerrainHiRes* HiRes;
 	shok_EGL_CGLETerrainLowRes* LowRes;
+	shok_EGL_CTerrainVertexColors* VertexColors;
 
 	int GetSector(shok_position* p);
 	bool GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut);
@@ -83,6 +104,27 @@ constexpr int CreatEffectReturnBattleBehaviorAttack = 0x50C4B5;
 constexpr int CreatEffectReturnAutoCannonBehaviorAttack = 0x5107a8;
 constexpr int CreatEffectReturnCannonBallOnHit = 0x4ff55e;
 
+static inline int** shok_mapsize = (int**)0x898B74;
+
+#define shok_vtp_EGL_CRegionInfo (void*)0x783878
+struct shok_EGL_CRegionInfo : shok_object {
+
+};
+#define shok_vtp_ED_CGlobalsLogicEx (void*)0x769F74
+struct shok_ED_CGlobalsLogicEx : shok_object {
+	PADDINGI(5)
+	struct {
+		int ArraySizeXY;
+		byte* data;
+	}* Blocking; // 6
+	PADDINGI(2)
+	shok_EGL_CRegionInfo* RegionInfo; // 9
+
+	void ToTerrainCoord(shok_position& p, int* out);
+	bool IsCoordValid(int* out);
+	int GetBlocking(shok_position& p);
+};
+static inline shok_ED_CGlobalsLogicEx** shok_ED_CGlobalsLogicExObj = (shok_ED_CGlobalsLogicEx**)0x8581EC;
 
 // entity manager
 struct shok_EGL_CGLEEntityManager : shok_object {

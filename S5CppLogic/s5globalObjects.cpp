@@ -68,16 +68,46 @@ int shok_BB_CIDManagerEx::GetAnimIdByName(const char* name) {
 	return shok_getAnimIdByName(this, name);
 }
 
-void shok_EGL_CGLETerrainLowRes::ToTerrainCoord(shok_position& p, int* out)
+void shok_EGL_CTerrainVertexColors::ToTerrainCoord(shok_position& p, int* out)
 {
 	out[0] = (int)std::lroundf(p.X / 100);
 	out[1] = (int)std::lroundf(p.Y / 100);
 }
-void shok_EGL_CGLETerrainLowRes::ToQuadsCoord(shok_position& p, int* out)
+bool shok_EGL_CTerrainVertexColors::IsCoordValid(int* out)
 {
-	ToTerrainCoord(p, out);
-	out[0] /= 4;
-	out[1] /= 4;
+	return out[0] >= 0 && out[1] >= 0 && (out[0]+1) < ArraySizeX && (out[1]+1) < ArraySizeY;
+}
+int shok_EGL_CTerrainVertexColors::GetTerrainVertexColor(shok_position& p)
+{
+	int qp[2] = { 0,0 };
+	ToTerrainCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	return VertexColors[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
+}
+
+void shok_EGL_CGLETerrainHiRes::ToTerrainCoord(shok_position& p, int* out)
+{
+	out[0] = (int)std::lroundf(p.X / 100);
+	out[1] = (int)std::lroundf(p.Y / 100);
+}
+bool shok_EGL_CGLETerrainHiRes::IsCoordValid(int* out)
+{
+	return out[0] >= 0 && out[1] >= 0 && out[0] < MaxSizeX && out[1] < MaxSizeY;
+}
+int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(shok_position& p)
+{
+	int qp[2] = { 0,0 };
+	ToTerrainCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	return TerrainHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
+}
+
+void shok_EGL_CGLETerrainLowRes::ToQuadCoord(shok_position& p, int* out)
+{
+	out[0] = (int)std::lroundf(p.X / 100) / 4;
+	out[1] = (int)std::lroundf(p.Y / 100) / 4;
 }
 bool shok_EGL_CGLETerrainLowRes::IsCoordValid(int* out)
 {
@@ -86,7 +116,7 @@ bool shok_EGL_CGLETerrainLowRes::IsCoordValid(int* out)
 int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(shok_position& p)
 {
 	int qp[2] = { 0,0 };
-	ToQuadsCoord(p, qp);
+	ToQuadCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0xFF;
@@ -94,7 +124,7 @@ int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(shok_position& p)
 int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(shok_position& p)
 {
 	int qp[2] = { 0,0 };
-	ToQuadsCoord(p, qp);
+	ToQuadCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3F00) >> 8;
@@ -102,7 +132,7 @@ int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(shok_position& p)
 int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(shok_position& p)
 {
 	int qp[2] = { 0,0 };
-	ToQuadsCoord(p, qp);
+	ToQuadCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3FFFC000) >> 14;
@@ -166,6 +196,25 @@ void shok_EGL_CGLEGameLogic::HookCreateEffect()
 	shok_vtable_EGL_CGLEGameLogic* vt = (shok_vtable_EGL_CGLEGameLogic*)this->vtable;
 	CreateEffectHookedOrig = vt->CreateEffect;
 	vt->CreateEffect = (int(__thiscall*)(shok_EGL_CGLEGameLogic * th, shok_EGL_CGLEEffectCreator * data)) & CreateEffectHook;
+}
+
+
+void shok_ED_CGlobalsLogicEx::ToTerrainCoord(shok_position& p, int* out)
+{
+	out[0] = (int)std::lroundf(p.X / 100);
+	out[1] = (int)std::lroundf(p.Y / 100);
+}
+bool shok_ED_CGlobalsLogicEx::IsCoordValid(int* out)
+{
+	return out[0] >= 0 && out[1] >= 0 && out[0] < Blocking->ArraySizeXY && out[1] < Blocking->ArraySizeXY;
+}
+int shok_ED_CGlobalsLogicEx::GetBlocking(shok_position& p)
+{
+	int qp[2] = { 0,0 };
+	ToTerrainCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	return Blocking->data[(qp[1] + 1) * Blocking->ArraySizeXY + (qp[0] + 1)];
 }
 
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)

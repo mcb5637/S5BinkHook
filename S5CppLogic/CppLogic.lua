@@ -144,17 +144,35 @@ function CppLogic.Logic.LandscapeGetSector(p) end
 function CppLogic.Logic.LandscapeGetNearestUnblockedPosInSector(p, sector, range) end
 
 --- gets the terrain type of a position.
+-- quads resolution (pos/100/4), input full pos.
 -- @param p
 -- @return terrain type
 function CppLogic.Logic.LandscapeGetTerrainType(p) end
 --- gets the water type of a position.
+-- quads resolution (pos/100/4), input full pos.
 -- @param p
 -- @return water type
 function CppLogic.Logic.LandscapeGetWaterType(p) end
 --- gets the water height of a position.
+-- quads resolution (pos/100/4), input full pos.
 -- @param p
--- @return water height type
+-- @return water height
 function CppLogic.Logic.LandscapeGetWaterHeight(p) end
+--- gets the terrain height of a position.
+-- height resolution (pos/100), input full pos.
+-- @param p
+-- @return terrain height
+function CppLogic.Logic.LandscapeGetTerrainHeight(p) end
+--- gets the terrain vertex color of a position.
+-- height resolution (pos/100), input full pos.
+-- @param p
+-- @return terrain vertex color
+function CppLogic.Logic.LandscapeGetTerrainVertexColor(p) end
+--- gets the blocking of a position.
+-- height resolution (pos/100), input full pos.
+-- @param p
+-- @return blocking info bitfield
+function CppLogic.Logic.LandscapeGetBlocking(p) end
 
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
 function CppLogic.Logic.EnableAllHurtEntityTrigger() end

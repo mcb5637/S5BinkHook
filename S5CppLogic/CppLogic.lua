@@ -16,6 +16,7 @@ CppLogic.EntityType = {}
 CppLogic.EntityType.Settler = {}
 CppLogic.Logic = {}
 CppLogic.Logic.UICommands = {}
+CppLogic.UI = {}
 CppLogic.UA = {}
 
 --- call this function to cleanup used hooks.
@@ -693,6 +694,11 @@ function CppLogic.Entity.Settler.CommandTurnSerfToBattleSerf(id) end
 -- @param id entity
 function CppLogic.Entity.Settler.CommandTurnBattleSerfToSerf(id) end
 
+--- teleports a settler to a position. does not change id.
+-- @param id entity
+-- @param p target pos
+function CppLogic.Entity.Settler.SetPosition(id, p) end
+
 --- a leaders experience.
 -- @param id leader
 -- @return xp
@@ -1232,6 +1238,35 @@ function CppLogic.Technology.GetRangeModifier(tid) end
 -- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
 -- @return value
 function CppLogic.Technology.GetSpeedModifier(tid) end
+
+--- gets a widgets position and size.
+-- @param wid widget
+-- @return x
+-- @return y
+-- @return w
+-- @return h
+function CppLogic.UI.WidgetGetPositionAndSize(wid) end
+--- sets a widgets position and size as floats (so you can set fractional coordinates).
+-- @param wid widget
+-- @param x (optional, default current)
+-- @param y (optional, default current)
+-- @param w (optional, default current)
+-- @param h (optional, default current)
+function CppLogic.UI.WidgetSetPositionAndSize(wid, x, y, w, h) end
+
+--- gets a widgets updatemanual flag.
+-- @param wid widget
+-- @return bool
+function CppLogic.UI.WidgetGetUpdateManualFlag(wid) end
+--- sets a widgets updatemanual flag.
+-- @param wid widget
+-- @param bool
+function CppLogic.UI.WidgetSetUpdateManualFlag(wid, f) end
+
+--- gets a widgets update func.
+-- @param wid widget
+-- @param func
+function CppLogic.UI.WidgetGetUpdateFunc(wid) end
 
 --- @class UACore
 local UACore = {}

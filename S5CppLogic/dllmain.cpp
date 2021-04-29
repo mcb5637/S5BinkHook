@@ -13,15 +13,17 @@
 #include "l_logic.h"
 #include "l_tech.h"
 #include "l_ua.h"
+#include "l_ui.h"
 #include <map>
 #include <set>
 
 
+
 int __cdecl test(lua_State* L) {
-    /*shok_GGL_CPlayerStatus s = shok_GGL_CPlayerStatus();
+    shok_EGUIX_CStaticTextWidget s = shok_EGUIX_CStaticTextWidget();
     int st = (int)&s;
-    int test = (int)&s.PlayerAttractionHandler;
-    lua_pushnumber(L, (test - st) / 4);*/
+    int test = (int)&s.UpdateFunction;
+    lua_pushnumber(L, (test - st) / 4);
     /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
     c.EntityType = 274;
     c.PlayerId = 1;
@@ -30,7 +32,16 @@ int __cdecl test(lua_State* L) {
     c.ResourceAmount = 10;
     int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
     lua_pushnumber(L, id);*/
-    lua_pushnumber(L, (int)&((*shok_GGL_CGLGameLogicObj)->GetPlayer(1)->PlayerAttractionHandler->PaydayStartTick));
+    /*if (lua_gettop(L) == 0) {
+        lua_pushnumber(L, (int)L);
+        return 1;
+    }
+    if (lua_isnumber(L, 1)) {
+        lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
+
+    }
+    shok_widgetManager* wm = shok_getWidgetManagerObj();
+    lua_pushnumber(L, (int) wm->GetWidgetByID(wm->GetIdByName(luaL_checkstring(L,1))));*/
     return 1;
 }
 
@@ -100,6 +111,11 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_pushstring(L, "Technology");
     lua_newtable(L);
     l_tech_init(L);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "UI");
+    lua_newtable(L);
+    l_ui_init(L);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "UA");

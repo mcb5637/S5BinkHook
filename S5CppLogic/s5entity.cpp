@@ -683,6 +683,13 @@ void shok_EGL_CMovingEntity::BattleSerfTurnToSerf()
 	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
 }
 
+void(__thiscall* movingentity_setpos)(shok_EGL_CMovingEntity* th, shok_position* p) = (void(__thiscall*)(shok_EGL_CMovingEntity*, shok_position*))0x57BC78;
+void shok_EGL_CMovingEntity::SetPosition(shok_position& p)
+{
+	movingentity_setpos(this, &p);
+	Move(p);
+}
+
 static inline void(__thiscall* building_startUpgrade)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AF1B5;
 void shok_GGL_CBuilding::StartUpgrade()
 {

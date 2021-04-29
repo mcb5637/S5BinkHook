@@ -104,7 +104,7 @@ constexpr int CreatEffectReturnBattleBehaviorAttack = 0x50C4B5;
 constexpr int CreatEffectReturnAutoCannonBehaviorAttack = 0x5107a8;
 constexpr int CreatEffectReturnCannonBallOnHit = 0x4ff55e;
 
-static inline int** shok_mapsize = (int**)0x898B74;
+static inline int* shok_mapsize = (int*)0x898B74;
 
 #define shok_vtp_EGL_CRegionInfo (void*)0x783878
 struct shok_EGL_CRegionInfo : shok_object {

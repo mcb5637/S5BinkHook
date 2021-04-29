@@ -1213,6 +1213,15 @@ int l_buildingMarketCancelTrade(lua_State* L) {
 	return 0;
 }
 
+int l_settlerSetPos(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_position p;
+	luaext_checkPos(L, p, 2);
+	luaext_assert(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->GetSector(&p) != 0, "position is blocked");
+	s->SetPosition(p);
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	serfType = -1;
@@ -1314,6 +1323,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandExpell", &l_settlerExpell);
 	luaext_registerFunc(L, "CommandTurnSerfToBattleSerf", &l_settlerSerfToBattleSerf);
 	luaext_registerFunc(L, "CommandTurnBattleSerfToSerf", &l_settlerBattleSerfToSerf);
+	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

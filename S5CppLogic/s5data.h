@@ -187,6 +187,13 @@ bool contains(T* data, T search, int num) {
 #include "s5player.h"
 #include "s5tech.h"
 #include "s5globalObjects.h"
+#include "s5widget.h"
+
+// xml loader vars:
+// v2 type?
+// v3 xml element
+// v4 offset
+// v5 size
 
 
 static inline void(_stdcall* shok_SetHighPrecFPU)() = (void(_stdcall*)()) 0x5C8451;

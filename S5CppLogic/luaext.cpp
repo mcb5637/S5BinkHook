@@ -142,6 +142,8 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i) {
 	lua_pushstring(L, "Y");
 	lua_gettable(L, i);
 	float y = luaL_checkfloat(L, -1);
+	int size = *shok_mapsize * 100;
+	luaext_assert(L, x >= 0 && y >= 0 && x < size && y < size, "position outside of map");
 	p.X = x;
 	p.Y = y;
 	lua_pop(L, 2);
@@ -158,6 +160,8 @@ void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i) {
 	lua_pushstring(L, "r");
 	lua_gettable(L, i);
 	float r = luaL_checkfloat(L, -1);
+	int size = *shok_mapsize * 100;
+	luaext_assert(L, x >= 0 && y >= 0 && x < size && y < size, "position outside of map");
 	p.X = x;
 	p.Y = y;
 	p.r = r;

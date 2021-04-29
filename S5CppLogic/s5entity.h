@@ -166,6 +166,8 @@ public:
 	void SerfTurnToBattleSerf();
 	void BattleSerfTurnToSerf();
 
+	void SetPosition(shok_position& p);
+
 	int LeaderGetNearbyBarracks();
 	bool IsMoving();
 };

@@ -96,6 +96,12 @@
     <ClInclude Include="s5tech.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="s5widget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="l_ui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -156,6 +162,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5widget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="l_ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

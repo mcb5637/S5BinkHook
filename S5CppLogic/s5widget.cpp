@@ -33,6 +33,8 @@ byte* shok_EGUIX_CBaseWidget::GetUpdateManualFlag()
         return &((shok_EGUIX_CGfxButtonWidget*)this)->UpdateManualFlag;
     if (vtable == shok_vtp_EGUIX_CTextButtonWidget)
         return &((shok_EGUIX_CTextButtonWidget*)this)->UpdateManualFlag;
+    if (vtable == shok_vtp_EGUIX_CProgressBarWidget)
+        return &((shok_EGUIX_CProgressBarWidget*)this)->UpdateManualFlag;
     return nullptr;
 }
 shok_EGUIX_CLuaFunctionHelper* shok_EGUIX_CBaseWidget::GetUpdateFunc()
@@ -43,5 +45,25 @@ shok_EGUIX_CLuaFunctionHelper* shok_EGUIX_CBaseWidget::GetUpdateFunc()
         return &((shok_EGUIX_CGfxButtonWidget*)this)->UpdateFunction;
     if (vtable == shok_vtp_EGUIX_CTextButtonWidget)
         return &((shok_EGUIX_CTextButtonWidget*)this)->UpdateFunction;
+    if (vtable == shok_vtp_EGUIX_CProgressBarWidget)
+        return &((shok_EGUIX_CProgressBarWidget*)this)->UpdateFunction;
+    return nullptr;
+}
+
+bool shok_EGUIX_CBaseWidget::IsContainerWidget()
+{
+    return vtable == shok_vtp_EGUIX_CContainerWidget;
+}
+
+shok_EGUIX_CMaterial* shok_EGUIX_CBaseWidget::GetMaterials(int* count)
+{
+    if (vtable == shok_vtp_EGUIX_CStaticWidget || vtable == shok_vtp_EGUIX_CStaticTextWidget || vtable == shok_vtp_EGUIX_CProgressBarWidget) {
+        *count = 1;
+        return &((shok_EGUIX_CStaticWidget*)this)->BackgroundMaterial;
+    }
+    if (vtable == shok_vtp_EGUIX_CGfxButtonWidget || vtable == shok_vtp_EGUIX_CTextButtonWidget) {
+        *count = 5;
+        return ((shok_EGUIX_CButtonWidget*)this)->Materials;
+    }
     return nullptr;
 }

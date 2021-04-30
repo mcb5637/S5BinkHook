@@ -15,9 +15,11 @@
 #ifdef _DEBUG
 #define vector_padding public:
 static_assert(sizeof(std::vector<int>) == 16);
+static_assert(sizeof(std::list<int>) == 12);
 #else
 #define vector_padding PADDING(4) public:
 static_assert(sizeof(std::vector<int>) == 12);
+static_assert(sizeof(std::list<int>) == 8);
 #endif
 
 #define DEBUGGER_BREAK _asm int 3

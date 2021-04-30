@@ -1,12 +1,13 @@
 #pragma once
 #include "s5data.h"
+#include <list>
 
 struct shok_widget_rect { // size 4
 	float X, Y, W, H;
 };
 
 struct shok_widget_color { // size 4
-	float Red, Green, Blue, Alpha; // type float or int?
+	int Red, Green, Blue, Alpha; // >=0 && <=0xFF
 };
 
 struct shok_widget_string { // size 7
@@ -63,10 +64,6 @@ struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
 };
 static_assert(sizeof(shok_EGUIX_CLuaFunctionHelper) == 20 * 4);
 
-struct shok_EGUIX_IMaterialAccess : shok_object { // multiinheritance
-	shok_EGUIX_CMaterial Material; // la 10
-};
-
 struct shok_EGUIX_ITextAccess : shok_object { // multiinheritance
 
 };
@@ -113,12 +110,21 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 	int SetPosAndSize(float x, float y, float w, float h);
 	byte* GetUpdateManualFlag();
 	shok_EGUIX_CLuaFunctionHelper* GetUpdateFunc();
+	bool IsContainerWidget();
+	shok_EGUIX_CMaterial* GetMaterials(int* count);
+};
+
+#define shok_vtp_EGUIX_CWidgetListHandler (void*)0x78098C
+struct shok_EGUIX_CWidgetListHandler : shok_object {
+	vector_padding;
+	std::list<shok_EGUIX_CBaseWidget*> SubWidgets;
 };
 
 #define shok_vtp_EGUIX_CStaticWidget (void*)0x780F84
 struct shok_EGUIX_CStaticWidget : shok_EGUIX_CBaseWidget {
 	void* vtable_EGUIX_IRender; // 14
-	shok_EGUIX_IMaterialAccess MaterialAcces; // la 24
+	void* vtable_shok_EGUIX_IMaterialAccess;
+	shok_EGUIX_CMaterial BackgroundMaterial; // la 24
 };
 
 #define shok_vtp_EGUIX_CStaticTextWidget (void*)0x780EE4
@@ -157,6 +163,25 @@ struct shok_EGUIX_CTextButtonWidget : shok_EGUIX_CButtonWidget {
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction;
 	byte UpdateManualFlag;
 	PADDING(3);
+};
+
+#define shok_vtp_EGUIX_CContainerWidget (void*)0x78114C
+struct shok_EGUIX_CContainerWidget : shok_EGUIX_CBaseWidget {
+	void* vtable_EGUIX_IRender; // 15
+	void* vtable_EGUIX_IWidgetRegistrationCallback;
+	shok_EGUIX_CWidgetListHandler WidgetListHandler;
+};
+
+#define shok_vtp_EGUIX_CPureTooltipWidget (void*)0x780BB0
+struct shok_EGUIX_CPureTooltipWidget : shok_EGUIX_CBaseWidget {
+	shok_EGUIX_CToolTipHelper ToolTipHelper;
+};
+
+#define shok_vtp_EGUIX_CProgressBarWidget (void*)0x780C20
+struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
+	shok_EGUIX_CLuaFunctionHelper UpdateFunction;
+	byte UpdateManualFlag;
+	float ProgressBarValue, ProgressBarLimit;
 };
 
 struct shok_widgetManager { // this thing has no vtable...

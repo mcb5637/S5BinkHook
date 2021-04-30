@@ -16,14 +16,15 @@
 #include "l_ui.h"
 #include <map>
 #include <set>
+#include <list>
 
 
 
 int __cdecl test(lua_State* L) {
-    shok_EGUIX_CStaticTextWidget s = shok_EGUIX_CStaticTextWidget();
+    /*shok_EGUIX_CStaticTextWidget s = shok_EGUIX_CStaticTextWidget();
     int st = (int)&s;
     int test = (int)&s.UpdateFunction;
-    lua_pushnumber(L, (test - st) / 4);
+    lua_pushnumber(L, (test - st) / 4);*/
     /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
     c.EntityType = 274;
     c.PlayerId = 1;
@@ -42,6 +43,7 @@ int __cdecl test(lua_State* L) {
     }
     shok_widgetManager* wm = shok_getWidgetManagerObj();
     lua_pushnumber(L, (int) wm->GetWidgetByID(wm->GetIdByName(luaL_checkstring(L,1))));*/
+    lua_pushnumber(L, sizeof(std::list<int>));
     return 1;
 }
 

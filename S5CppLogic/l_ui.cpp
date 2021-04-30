@@ -82,6 +82,51 @@ int l_uiGetUpdateFunc(lua_State* L) {
 	return 1;
 }
 
+int l_uiGetAllSubWidgets(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	lua_newtable(L);
+	int i = 1;
+	for (shok_EGUIX_CBaseWidget* p : c->WidgetListHandler.SubWidgets) {
+		lua_pushnumber(L, p->WidgetID);
+		lua_rawseti(L, -2, i);
+		i++;
+	}
+	return 1;
+}
+
+int l_uiGetMaterialTexCoord(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	int c = 0;
+	shok_EGUIX_CMaterial* m = wid->GetMaterials(&c);
+	luaext_assertPointer(L, m, "no known materials");
+	int min = luaL_checkint(L, 2);
+	luaext_assert(L, min >= 0 && min < c, "invalid index");
+	lua_pushnumber(L, m[min].TextureCoordinates.X);
+	lua_pushnumber(L, m[min].TextureCoordinates.Y);
+	lua_pushnumber(L, m[min].TextureCoordinates.H);
+	lua_pushnumber(L, m[min].TextureCoordinates.W);
+	return 4;
+}
+int l_uiSetMaterialTexCoord(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	int c = 0;
+	shok_EGUIX_CMaterial* m = wid->GetMaterials(&c);
+	luaext_assertPointer(L, m, "no known materials");
+	int min = luaL_checkint(L, 2);
+	luaext_assert(L, min >= 0 && min < c, "invalid index");
+	if (lua_isnumber(L, 3))
+		m[min].TextureCoordinates.X = luaL_checkfloat(L, 3);
+	if (lua_isnumber(L, 4))
+		m[min].TextureCoordinates.Y = luaL_checkfloat(L, 4);
+	if (lua_isnumber(L, 5))
+		m[min].TextureCoordinates.H = luaL_checkfloat(L, 5);
+	if (lua_isnumber(L, 6))
+		m[min].TextureCoordinates.W = luaL_checkfloat(L, 6);
+	return 0;
+}
+
 void l_ui_init(lua_State* L)
 {
 	luaext_registerFunc(L, "WidgetGetPositionAndSize", &l_uiGetWidPosAndSize);
@@ -90,8 +135,13 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "WidgetGetUpdateManualFlag", &l_uiGetUpdateManualFlag);
 	luaext_registerFunc(L, "WidgetSetUpdateManualFlag", &l_uiSetUpdateManualFlag);
 	luaext_registerFunc(L, "WidgetGetUpdateFunc", &l_uiGetUpdateFunc);
+	luaext_registerFunc(L, "ContainerWidgetGetAllChildren", &l_uiGetAllSubWidgets);
+	luaext_registerFunc(L, "WidgetMaterialGetTextureCoordinates", &l_uiGetMaterialTexCoord);
+	luaext_registerFunc(L, "WidgetMaterialSetTextureCoordinates", &l_uiSetMaterialTexCoord);
 }
 
 // CppLogic.UI.WidgetGetAddress("")
 // StartMenu00_VersionNumber
 // StartMenu00_EndGame
+// StartMenu00
+// GoldTooltipController

@@ -814,18 +814,21 @@ int l_logicHurtEntitySetDamage(lua_State* L) {
 }
 
 int l_logicGetLoadOrder(lua_State* L) {
-	int r = 0;
+	lua_newtable(L);
+	int r = 1;
 	for (shok_BB_IFileSystem* a : (*shok_BB_CFileSystemMgrObj)->LoadOrder) {
 		if (a->vtable == shok_vtp_BB_CDirectoryFileSystem) {
 			lua_pushstring(L, ((shok_BB_CDirectoryFileSystem*)a)->Path);
+			lua_rawseti(L, -2, r);
 			r++;
 		}
 		else if (a->vtable == shok_vtp_BB_CBBArchiveFile) {
 			lua_pushstring(L, ((shok_BB_CBBArchiveFile*)a)->Path);
+			lua_rawseti(L, -2, r);
 			r++;
 		}
 	}
-	return r;
+	return 1;
 }
 
 int l_logicAddArchive(lua_State* L) {

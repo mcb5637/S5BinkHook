@@ -188,7 +188,7 @@ function CppLogic.Logic.HurtEntityGetDamage() end
 function CppLogic.Logic.HurtEntitySetDamage(dmg) end
 
 --- gets all loaded archives and folders.
--- @return string, string...
+-- @return table of strings
 function CppLogic.Logic.GetLoadOrder() end
 --- adds a archive on top of your load order.
 -- @param map archive, relative to current dir, so "extra2\\shr\\maps\\user\\map.s5x for a map file
@@ -1267,6 +1267,28 @@ function CppLogic.UI.WidgetSetUpdateManualFlag(wid, f) end
 -- @param wid widget
 -- @param func
 function CppLogic.UI.WidgetGetUpdateFunc(wid) end
+
+--- returns a table with all child widget ids.
+-- @param wid widget
+-- @param t
+function CppLogic.UI.ContainerWidgetGetAllChildren(wid) end
+
+--- gets a widget material textures position and size
+-- @param wid widget
+-- @param mat material index, [0..5] for buttons, 0 for statics.
+-- @return x
+-- @return y
+-- @return w
+-- @return h
+function CppLogic.UI.WidgetMaterialGetTextureCoordinates(wid, mat) end
+--- sets a widget material textures position and size
+-- @param wid widget
+-- @param mat material index, [0..5] for buttons, 0 for statics.
+-- @param x (optional, default current)
+-- @param y (optional, default current)
+-- @param w (optional, default current)
+-- @param h (optional, default current)
+function CppLogic.UI.WidgetMaterialSetTextureCoordinates(wid, mat) end
 
 --- @class UACore
 local UACore = {}

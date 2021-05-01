@@ -1265,13 +1265,45 @@ function CppLogic.UI.WidgetSetUpdateManualFlag(wid, f) end
 
 --- gets a widgets update func.
 -- @param wid widget
--- @param func
+-- @return command string
+-- @return func or err msg
 function CppLogic.UI.WidgetGetUpdateFunc(wid) end
+--- calls a buttons update func.
+-- @param wid widget
+function CppLogic.UI.WidgetCallUpdateFunc(wid) end
+--- overrides a buttons update func to a lua func that gets called without any arguments.
+-- @param wid widget
+-- @param f func
+function CppLogic.UI.WidgetOverrideUpdateFunc(wid, f) end
+
+--- gets a buttons action func.
+-- @param wid widget
+-- @return command string
+-- @return func or err msg
+function CppLogic.UI.ButtonGetActionFunc(wid) end
+--- calls a buttons action func.
+-- @param wid widget
+function CppLogic.UI.ButtonCallActionFunc(wid) end
+--- overrides a buttons action func to a lua func that gets called without any arguments.
+-- @param wid widget
+-- @param f func
+function CppLogic.UI.ButtonOverrideActionFunc(wid, f) end
 
 --- returns a table with all child widget ids.
 -- @param wid widget
 -- @param t
 function CppLogic.UI.ContainerWidgetGetAllChildren(wid) end
+
+--- craetes a new static widget and registers it as its child.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @return id
+function CppLogic.UI.ContainerWidgetCreateStaticWidgetChild(wid, name) end
+--- craetes a new static text widget and registers it as its child.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @return id
+function CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild(wid, name) end
 
 --- gets a widget material textures position and size
 -- @param wid widget
@@ -1288,7 +1320,7 @@ function CppLogic.UI.WidgetMaterialGetTextureCoordinates(wid, mat) end
 -- @param y (optional, default current)
 -- @param w (optional, default current)
 -- @param h (optional, default current)
-function CppLogic.UI.WidgetMaterialSetTextureCoordinates(wid, mat) end
+function CppLogic.UI.WidgetMaterialSetTextureCoordinates(wid, mat, x, y, w, h) end
 
 --- @class UACore
 local UACore = {}

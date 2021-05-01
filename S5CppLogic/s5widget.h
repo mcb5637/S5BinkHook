@@ -10,12 +10,6 @@ struct shok_widget_color { // size 4
 	int Red, Green, Blue, Alpha; // >=0 && <=0xFF
 };
 
-struct shok_widget_string { // size 7
-	PADDINGI(1)
-	char* string;
-	PADDINGI(5)
-};
-static_assert(sizeof(shok_widget_string) == 7 * 4);
 
 #define shok_vtp_EGUIX_CFontIDHandler (void*)0x780B0C
 struct shok_EGUIX_CFontIDHandler : shok_object { // size 2
@@ -24,7 +18,10 @@ struct shok_EGUIX_CFontIDHandler : shok_object { // size 2
 
 #define shok_vtp_EGUIX_CSingleStringHandler (void*)0x7809A4
 struct shok_EGUIX_CSingleStringHandler : shok_object { // size 15
-	shok_widget_string StringTableKey, RawString;
+	vector_padding;
+	shok_string StringTableKey;
+	vector_padding;
+	shok_string RawString;
 };
 static_assert(sizeof(shok_EGUIX_CSingleStringHandler) == 15 * 4);
 
@@ -48,25 +45,22 @@ static_assert(sizeof(shok_EGUIX_CMaterial) == 10 * 4);
 #define shok_vtp_EScr_CLuaFuncRefCommand (void*)0x786BE0
 struct shoc_EScr_CLuaFuncRefCommand : shok_object {
 	lua_State* L;
-	PADDINGI(1)
+	int NeedsCompile;
 	int Ref;
-	PADDINGI(1)
-	char* LuaCommand;
-	PADDINGI(6)
+	vector_padding;
+	shok_string LuaCommand;
+	PADDINGI(1);
 };
 
 #define shok_vtp_EGUIX_CLuaFunctionHelper (void*)0x780994
 struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
-	PADDINGI(1)
-	char* LuaCommand;
-	PADDINGI(5)
+	vector_padding;
+	shok_string LuaCommand;
 	shoc_EScr_CLuaFuncRefCommand FuncRefCommand;
+
+	void Call(int widgetID);
 };
 static_assert(sizeof(shok_EGUIX_CLuaFunctionHelper) == 20 * 4);
-
-struct shok_EGUIX_ITextAccess : shok_object { // multiinheritance
-
-};
 
 #define shok_vtp_EGUIX_CButtonHelper (void*)0x780818
 struct shok_EGUIX_CButtonHelper : shok_object { // size 38
@@ -112,6 +106,7 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 	shok_EGUIX_CLuaFunctionHelper* GetUpdateFunc();
 	bool IsContainerWidget();
 	shok_EGUIX_CMaterial* GetMaterials(int* count);
+	shok_EGUIX_CButtonHelper* GetButtonHelper();
 };
 
 #define shok_vtp_EGUIX_CWidgetListHandler (void*)0x78098C
@@ -123,18 +118,22 @@ struct shok_EGUIX_CWidgetListHandler : shok_object {
 #define shok_vtp_EGUIX_CStaticWidget (void*)0x780F84
 struct shok_EGUIX_CStaticWidget : shok_EGUIX_CBaseWidget {
 	void* vtable_EGUIX_IRender; // 14
-	void* vtable_shok_EGUIX_IMaterialAccess;
+	void* vtable_EGUIX_IMaterialAccess;
 	shok_EGUIX_CMaterial BackgroundMaterial; // la 24
+
+	static shok_EGUIX_CStaticWidget* Create();
 };
 
 #define shok_vtp_EGUIX_CStaticTextWidget (void*)0x780EE4
 struct shok_EGUIX_CStaticTextWidget : shok_EGUIX_CStaticWidget {
-	shok_EGUIX_ITextAccess ITextAccess;
+	void* vtable_EGUIX_ITextAccess;
 	shok_EGUIX_CWidgetStringHelper StringHelper; // 27
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction; // 50
 	byte UpdateManualFlag;
 	PADDING(3)
 	int FirstLineToPrint, NumberOfLinesToPrint, LineDistanceFactor;
+
+	static shok_EGUIX_CStaticTextWidget* Create();
 };
 
 #define shok_vtp_EGUIX_CButtonWidget (void*)0x780E5C
@@ -170,6 +169,8 @@ struct shok_EGUIX_CContainerWidget : shok_EGUIX_CBaseWidget {
 	void* vtable_EGUIX_IRender; // 15
 	void* vtable_EGUIX_IWidgetRegistrationCallback;
 	shok_EGUIX_CWidgetListHandler WidgetListHandler;
+
+	void AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name);
 };
 
 #define shok_vtp_EGUIX_CPureTooltipWidget (void*)0x780BB0
@@ -185,7 +186,9 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 };
 
 struct shok_widgetManager { // this thing has no vtable...
-
+	int u;
+	vector_padding;
+	std::vector<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>> Widgets;
 
 	int GetIdByName(const char* name);
 	shok_EGUIX_CBaseWidget* GetWidgetByID(int id);

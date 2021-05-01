@@ -15,6 +15,18 @@ shok_EGUIX_CBaseWidget* l_uiCheckWid(lua_State* L, int i) {
 	return r;
 }
 
+void l_uiOverrideFunc(lua_State* L, shok_EGUIX_CLuaFunctionHelper* f, int i) {
+	lua_pushvalue(L, i);
+	if (f->FuncRefCommand.L) {
+		lua_rawseti(L, LUA_REGISTRYINDEX, f->FuncRefCommand.Ref);
+	}
+	else {
+		f->FuncRefCommand.L = L;
+		f->FuncRefCommand.Ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	}
+	f->FuncRefCommand.NeedsCompile = 0;
+}
+
 int l_uiGetWidAdr(lua_State* L) {
 	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
 	lua_pushnumber(L, (int)w);
@@ -76,10 +88,27 @@ int l_uiSetUpdateManualFlag(lua_State* L) {
 int l_uiGetUpdateFunc(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
 	shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc();
-	luaext_assertPointer(L, fh, "widget ha no known update func");
-	luaext_assert(L, fh->FuncRefCommand.L == L, "lua state doesnt match");
-	lua_rawgeti(L, LUA_REGISTRYINDEX, fh->FuncRefCommand.Ref);
-	return 1;
+	luaext_assertPointer(L, fh, "widget has no known update func");
+	lua_pushstring(L, fh->LuaCommand.c_str());
+	if (fh->FuncRefCommand.L == L)
+		lua_rawgeti(L, LUA_REGISTRYINDEX, fh->FuncRefCommand.Ref);
+	else
+		lua_pushstring(L, "no compiled func found");
+	return 2;
+}
+int l_uiCallUpdateFunc(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc();
+	luaext_assertPointer(L, fh, "widget has no known update func");
+	fh->Call(wid->WidgetID);
+	return 0;
+}
+int l_uiOverrideUpdateFunc(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc();
+	luaext_assertPointer(L, fh, "widget has no known update func");
+	l_uiOverrideFunc(L, fh, 2);
+	return 0;
 }
 
 int l_uiGetAllSubWidgets(lua_State* L) {
@@ -127,6 +156,68 @@ int l_uiSetMaterialTexCoord(lua_State* L) {
 	return 0;
 }
 
+int l_uiButtonGetAction(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CButtonHelper* fh = wid->GetButtonHelper();
+	luaext_assertPointer(L, fh, "widget has no known action func");
+	lua_pushstring(L, fh->ActionFunction.LuaCommand.c_str());
+	if (fh->ActionFunction.FuncRefCommand.L == L)
+		lua_rawgeti(L, LUA_REGISTRYINDEX, fh->ActionFunction.FuncRefCommand.Ref);
+	else
+		lua_pushstring(L, "no compiled func found");
+	return 2;
+}
+int l_uiButtonCallAction(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CButtonHelper* fh = wid->GetButtonHelper();
+	luaext_assertPointer(L, fh, "widget has no known action func");
+	fh->ActionFunction.Call(wid->WidgetID);
+	return 0;
+}
+int l_uiButtonOverrideAction(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CButtonHelper* fh = wid->GetButtonHelper();
+	luaext_assertPointer(L, fh, "widget has no known action func");
+	l_uiOverrideFunc(L, &fh->ActionFunction, 2);
+	return 0;
+}
+
+int l_uiCreateStaticWidget(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CStaticWidget* ne = shok_EGUIX_CStaticWidget::Create();
+	c->AddWidget(ne, name);
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
+int l_uiCreateStaticTextWidget(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CStaticTextWidget* ne = shok_EGUIX_CStaticTextWidget::Create();
+	c->AddWidget(ne, name);
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
+
+int l_uiTest(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CStaticWidget* ne = shok_EGUIX_CStaticWidget::Create();
+	c->AddWidget(ne, "test");
+	ne->BackgroundMaterial.Color = { 0xFF, 0xFF, 0xFF ,0xFF };
+	ne->BackgroundMaterial.TextureCoordinates = { 0, 0, 1 ,1 };
+	ne->SetPosAndSize(10, 10, 32, 32);
+	ne->IsShown = 1;
+	return 0;
+}
+
 void l_ui_init(lua_State* L)
 {
 	luaext_registerFunc(L, "WidgetGetPositionAndSize", &l_uiGetWidPosAndSize);
@@ -135,13 +226,25 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "WidgetGetUpdateManualFlag", &l_uiGetUpdateManualFlag);
 	luaext_registerFunc(L, "WidgetSetUpdateManualFlag", &l_uiSetUpdateManualFlag);
 	luaext_registerFunc(L, "WidgetGetUpdateFunc", &l_uiGetUpdateFunc);
+	luaext_registerFunc(L, "WidgetCallUpdateFunc", &l_uiCallUpdateFunc);
+	luaext_registerFunc(L, "WidgetOverrideUpdateFunc", &l_uiOverrideUpdateFunc);
 	luaext_registerFunc(L, "ContainerWidgetGetAllChildren", &l_uiGetAllSubWidgets);
 	luaext_registerFunc(L, "WidgetMaterialGetTextureCoordinates", &l_uiGetMaterialTexCoord);
 	luaext_registerFunc(L, "WidgetMaterialSetTextureCoordinates", &l_uiSetMaterialTexCoord);
+	luaext_registerFunc(L, "ButtonGetActionFunc", &l_uiButtonGetAction);
+	luaext_registerFunc(L, "ButtonCallActionFunc", &l_uiButtonCallAction);
+	luaext_registerFunc(L, "ButtonOverrideActionFunc", &l_uiButtonOverrideAction);
+	luaext_registerFunc(L, "Test", &l_uiTest);
+	luaext_registerFunc(L, "ContainerWidgetCreateStaticWidgetChild", &l_uiCreateStaticWidget);
+	luaext_registerFunc(L, "ContainerWidgetCreateStaticTextWidgetChild", &l_uiCreateStaticTextWidget);
 }
 
-// CppLogic.UI.WidgetGetAddress("")
+// CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")
 // StartMenu00_VersionNumber
 // StartMenu00_EndGame
 // StartMenu00
 // GoldTooltipController
+// CppLogic.UI.ButtonOverrideActionFunc("StartMenu00_EndGame", function() LuaDebugger.Log(XGUIEng.GetCurrentWidgetID()) end)
+// CppLogic.UI.Test("StartMenu00") XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png")
+// CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("StartMenu00", "test"); XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); CppLogic.UI.WidgetMaterialSetTextureCoordinates("test", 0, 0, 0, 1, 1); XGUIEng.SetMaterialColor("test", 0, 255,255,255,255); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetMaterialColor("test", 0, 0,0,0,0);  XGUIEng.SetTextColor("test",255,255,255,255); XGUIEng.SetText("test","tst"); XGUIEng.ShowWidget("test", 1);

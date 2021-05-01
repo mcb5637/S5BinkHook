@@ -5,6 +5,12 @@ struct shok_vtable_EGUIX_CBaseWidget {
     PADDINGI(7);
     int(__thiscall* SetSizeAndPos)(shok_EGUIX_CBaseWidget* th, float x, float y, float w, float h); // 7
 };
+struct shok_vtable_EGUIX_CContainerWidget {
+    PADDINGI(7);
+    int(__thiscall* SetSizeAndPos)(shok_EGUIX_CBaseWidget* th, float x, float y, float w, float h); // 7
+    PADDINGI(4);
+    void(__thiscall* AddChild)(shok_EGUIX_CContainerWidget* th, shok_EGUIX_CBaseWidget* ch); // 12
+};
 
 
 static inline int(__thiscall* widman_getidbyname)(shok_widgetManager* th, const char* n) = (int(__thiscall*)(shok_widgetManager*, const char*))0x5588A0;
@@ -22,6 +28,12 @@ shok_EGUIX_CBaseWidget* shok_widgetManager::GetWidgetByID(int id)
 int shok_EGUIX_CBaseWidget::SetPosAndSize(float x, float y, float w, float h)
 {
     return ((shok_vtable_EGUIX_CBaseWidget*)vtable)->SetSizeAndPos(this, x, y, w, h);
+}
+
+static inline void(__thiscall* funchelper_call)(shok_EGUIX_CLuaFunctionHelper* th, int widgetID) = (void(__thiscall*)(shok_EGUIX_CLuaFunctionHelper*, int))0x55BDDE;
+void shok_EGUIX_CLuaFunctionHelper::Call(int widgetID)
+{
+    funchelper_call(this, widgetID);
 }
 
 
@@ -66,4 +78,54 @@ shok_EGUIX_CMaterial* shok_EGUIX_CBaseWidget::GetMaterials(int* count)
         return ((shok_EGUIX_CButtonWidget*)this)->Materials;
     }
     return nullptr;
+}
+
+shok_EGUIX_CButtonHelper* shok_EGUIX_CBaseWidget::GetButtonHelper()
+{
+    if (vtable == shok_vtp_EGUIX_CGfxButtonWidget || vtable == shok_vtp_EGUIX_CTextButtonWidget || vtable == shok_vtp_EGUIX_CButtonWidget)
+        return &((shok_EGUIX_CButtonWidget*)this)->ButtonHelper;
+    return nullptr;
+}
+
+static inline int(__thiscall* widman_registerName)(shok_widgetManager* th, const char* name) = (int(__thiscall*)(shok_widgetManager*, const char*))0x55884F;
+static inline void(__thiscall* widman_addWidget)(shok_widgetManager* th, shok_EGUIX_CBaseWidget* a, int id) = (void(__thiscall*)(shok_widgetManager*, shok_EGUIX_CBaseWidget*, int))0x558AA2;
+void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name)
+{
+    shok_widgetManager* m = shok_getWidgetManagerObj();
+    int newId = widman_registerName(m, name);
+    if (newId) {
+        toAdd->WidgetID = newId;
+        widman_addWidget(m, toAdd, newId);
+        ((shok_vtable_EGUIX_CContainerWidget*)vtable)->AddChild(this, toAdd);
+    }
+}
+
+shok_EGUIX_CStaticWidget* shok_EGUIX_CStaticWidget::Create()
+{
+    shok_EGUIX_CStaticWidget* r = (shok_EGUIX_CStaticWidget*)shok_malloc(sizeof(shok_EGUIX_CStaticWidget));
+    memset(r, 0, sizeof(shok_EGUIX_CStaticWidget));
+    r->vtable = shok_vtp_EGUIX_CStaticWidget;
+    r->vtable_EGUIX_IOnEvent = (void*)0x780F78;
+    r->vtable_EGUIX_IRender = (void*)0x780F6C;
+    r->vtable_EGUIX_IMaterialAccess = (void*)0x780F58;
+    r->BackgroundMaterial.vtable = shok_vtp_EGUIX_CMaterial;
+    return r;
+}
+
+shok_EGUIX_CStaticTextWidget* shok_EGUIX_CStaticTextWidget::Create()
+{
+    shok_EGUIX_CStaticTextWidget* r = (shok_EGUIX_CStaticTextWidget*)shok_malloc(sizeof(shok_EGUIX_CStaticTextWidget));
+    memset(r, 0, sizeof(shok_EGUIX_CStaticTextWidget));
+    r->vtable = shok_vtp_EGUIX_CStaticTextWidget;
+    r->vtable_EGUIX_IOnEvent = (void*)0x780ED8;
+    r->vtable_EGUIX_IRender = (void*)0x780ECC;
+    r->vtable_EGUIX_IMaterialAccess = (void*)0x780EB8;
+    r->vtable_EGUIX_ITextAccess = (void*)0x780E90;
+    r->BackgroundMaterial.vtable = shok_vtp_EGUIX_CMaterial;
+    r->StringHelper.vtable = shok_vtp_EGUIX_CWidgetStringHelper;
+    r->StringHelper.FontHandler.vtable = shok_vtp_EGUIX_CFontIDHandler;
+    r->StringHelper.SingleStringHandler.vtable = shok_vtp_EGUIX_CSingleStringHandler;
+    r->UpdateManualFlag = true;
+    r->StringHelper.FontHandler.FontID = 1;
+    return r;
 }

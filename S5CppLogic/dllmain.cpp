@@ -19,6 +19,17 @@
 #include <list>
 
 
+const char* SCELoaderFuncOverrides = R"(
+function CppLogic.Logic.EnableAllHurtEntityTrigger()
+    CEntity.EnableAllHurtTrigger()
+end
+function CppLogic.Logic.HurtEntityGetDamage()
+    return CEntity.TriggerGetDamage()
+end
+function CppLogic.Logic.HurtEntitySetDamage(d)
+    CEntity.TriggerSetDamage(d)
+end
+)";
 
 int __cdecl test(lua_State* L) {
     /*shok_EGUIX_CStaticTextWidget s = shok_EGUIX_CStaticTextWidget();
@@ -43,8 +54,7 @@ int __cdecl test(lua_State* L) {
     }
     shok_widgetManager* wm = shok_getWidgetManagerObj();
     lua_pushnumber(L, (int) wm->GetWidgetByID(wm->GetIdByName(luaL_checkstring(L,1))));*/
-    lua_pushnumber(L, sizeof(std::list<int>));
-    return 1;
+    return 0;
 }
 
 int cleanup(lua_State* L) {
@@ -54,18 +64,6 @@ int cleanup(lua_State* L) {
     l_effect_cleanup(L);
     return 0;
 }
-
-const char* SCELoaderFuncOverrides = R"(
-function CppLogic.Logic.EnableAllHurtEntityTrigger()
-    CEntity.EnableAllHurtTrigger()
-end
-function CppLogic.Logic.HurtEntityGetDamage()
-    return CEntity.TriggerGetDamage()
-end
-function CppLogic.Logic.HurtEntitySetDamage(d)
-    CEntity.TriggerSetDamage(d)
-end
-)";
 
 extern "C" void __cdecl install(lua_State * L) {
     lua_pushcfunction(L, &test);

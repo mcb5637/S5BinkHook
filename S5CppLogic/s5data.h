@@ -105,13 +105,19 @@ public:
 	}
 };
 
-typedef std::basic_string<char, std::char_traits<char>, shok_allocator<char>> shok_string;
+struct shok_string {
+private:
+	int u1 = 0;
+	int data;
+	int u[4] = { 0 };
+	int size = 0;
 
-#ifdef _DEBUG
+public:
+	shok_string(const char* s);
+	const char* c_str();
+};
+
 static_assert(sizeof(shok_string) == 7 * 4);
-#elif
-static_assert(sizeof(shok_string) == 6 * 4);
-#endif
 
 template<class T>
 inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {

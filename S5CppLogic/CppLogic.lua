@@ -1294,12 +1294,16 @@ function CppLogic.UI.ButtonOverrideActionFunc(wid, f) end
 -- @param t
 function CppLogic.UI.ContainerWidgetGetAllChildren(wid) end
 
---- craetes a new static widget and registers it as its child.
+--- creetes a new static widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
 -- @param wid widget
 -- @param name widgetname of the child
 -- @return id
 function CppLogic.UI.ContainerWidgetCreateStaticWidgetChild(wid, name) end
---- craetes a new static text widget and registers it as its child.
+--- creetes a new static text widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
 -- @param wid widget
 -- @param name widgetname of the child
 -- @return id

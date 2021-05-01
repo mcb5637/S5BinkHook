@@ -18,9 +18,7 @@ struct shok_EGUIX_CFontIDHandler : shok_object { // size 2
 
 #define shok_vtp_EGUIX_CSingleStringHandler (void*)0x7809A4
 struct shok_EGUIX_CSingleStringHandler : shok_object { // size 15
-	vector_padding;
 	shok_string StringTableKey;
-	vector_padding;
 	shok_string RawString;
 };
 static_assert(sizeof(shok_EGUIX_CSingleStringHandler) == 15 * 4);
@@ -47,14 +45,12 @@ struct shoc_EScr_CLuaFuncRefCommand : shok_object {
 	lua_State* L;
 	int NeedsCompile;
 	int Ref;
-	vector_padding;
 	shok_string LuaCommand;
 	PADDINGI(1);
 };
 
 #define shok_vtp_EGUIX_CLuaFunctionHelper (void*)0x780994
 struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
-	vector_padding;
 	shok_string LuaCommand;
 	shoc_EScr_CLuaFuncRefCommand FuncRefCommand;
 

@@ -100,6 +100,23 @@ void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const
     }
 }
 
+void initMaterial(shok_EGUIX_CMaterial& m) {
+    m.vtable = shok_vtp_EGUIX_CMaterial;
+}
+void initStringHelper(shok_EGUIX_CWidgetStringHelper& h) {
+    h.vtable = shok_vtp_EGUIX_CWidgetStringHelper;
+    h.FontHandler.vtable = shok_vtp_EGUIX_CFontIDHandler;
+    h.SingleStringHandler.vtable = shok_vtp_EGUIX_CSingleStringHandler;
+    h.FontHandler.FontID = 1;
+    h.SingleStringHandler.RawString = shok_string("");
+    h.SingleStringHandler.StringTableKey = shok_string("");
+}
+void initLuaFunc(shok_EGUIX_CLuaFunctionHelper& h) {
+    h.vtable = shok_vtp_EGUIX_CLuaFunctionHelper;
+    h.FuncRefCommand.vtable = shok_vtp_EScr_CLuaFuncRefCommand;
+    h.LuaCommand = shok_string("");
+}
+
 shok_EGUIX_CStaticWidget* shok_EGUIX_CStaticWidget::Create()
 {
     shok_EGUIX_CStaticWidget* r = (shok_EGUIX_CStaticWidget*)shok_malloc(sizeof(shok_EGUIX_CStaticWidget));
@@ -108,10 +125,9 @@ shok_EGUIX_CStaticWidget* shok_EGUIX_CStaticWidget::Create()
     r->vtable_EGUIX_IOnEvent = (void*)0x780F78;
     r->vtable_EGUIX_IRender = (void*)0x780F6C;
     r->vtable_EGUIX_IMaterialAccess = (void*)0x780F58;
-    r->BackgroundMaterial.vtable = shok_vtp_EGUIX_CMaterial;
+    initMaterial(r->BackgroundMaterial);
     return r;
 }
-
 shok_EGUIX_CStaticTextWidget* shok_EGUIX_CStaticTextWidget::Create()
 {
     shok_EGUIX_CStaticTextWidget* r = (shok_EGUIX_CStaticTextWidget*)shok_malloc(sizeof(shok_EGUIX_CStaticTextWidget));
@@ -121,11 +137,9 @@ shok_EGUIX_CStaticTextWidget* shok_EGUIX_CStaticTextWidget::Create()
     r->vtable_EGUIX_IRender = (void*)0x780ECC;
     r->vtable_EGUIX_IMaterialAccess = (void*)0x780EB8;
     r->vtable_EGUIX_ITextAccess = (void*)0x780E90;
-    r->BackgroundMaterial.vtable = shok_vtp_EGUIX_CMaterial;
-    r->StringHelper.vtable = shok_vtp_EGUIX_CWidgetStringHelper;
-    r->StringHelper.FontHandler.vtable = shok_vtp_EGUIX_CFontIDHandler;
-    r->StringHelper.SingleStringHandler.vtable = shok_vtp_EGUIX_CSingleStringHandler;
+    initMaterial(r->BackgroundMaterial);
+    initStringHelper(r->StringHelper);
+    initLuaFunc(r->UpdateFunction);
     r->UpdateManualFlag = true;
-    r->StringHelper.FontHandler.FontID = 1;
     return r;
 }

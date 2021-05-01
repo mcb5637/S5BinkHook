@@ -5,6 +5,19 @@
 #include <libloaderapi.h>
 
 
+static inline void(__thiscall* str_ctor)(shok_string* th, const char* s) = (void(__thiscall*)(shok_string*, const char*))0x4018C6;
+shok_string::shok_string(const char* s)
+{
+	str_ctor(this, s);
+}
+const char* shok_string::c_str()
+{
+	if (size < 16)
+		return (const char*)&data;
+	else
+		return (const char*)data;
+}
+
 void shok_position::FloorToBuildingPlacement()
 {
 	X = std::floorf(X / 100) * 100;

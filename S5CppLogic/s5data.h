@@ -114,7 +114,10 @@ private:
 
 public:
 	shok_string(const char* s);
+	shok_string(const shok_string& c);
+	void assign(const char* s);
 	const char* c_str();
+	~shok_string();
 };
 
 static_assert(sizeof(shok_string) == 7 * 4);

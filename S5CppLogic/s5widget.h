@@ -14,6 +14,8 @@ struct shok_widget_color { // size 4
 #define shok_vtp_EGUIX_CFontIDHandler (void*)0x780B0C
 struct shok_EGUIX_CFontIDHandler : shok_object { // size 2
 	int FontID;
+
+	void LoadFont(const char* name);
 };
 
 #define shok_vtp_EGUIX_CSingleStringHandler (void*)0x7809A4
@@ -103,6 +105,8 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 	bool IsContainerWidget();
 	shok_EGUIX_CMaterial* GetMaterials(int* count);
 	shok_EGUIX_CButtonHelper* GetButtonHelper();
+	shok_EGUIX_CToolTipHelper* GetTooltipHelper();
+	shok_EGUIX_CWidgetStringHelper* GetStringHelper();
 };
 
 #define shok_vtp_EGUIX_CWidgetListHandler (void*)0x78098C
@@ -149,6 +153,8 @@ struct shok_EGUIX_CGfxButtonWidget : shok_EGUIX_CButtonWidget {
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction;
 	byte UpdateManualFlag;
 	PADDING(3);
+
+	static shok_EGUIX_CGfxButtonWidget* Create();
 };
 
 #define shok_vtp_EGUIX_CTextButtonWidget (void*)0x780DB0
@@ -158,6 +164,8 @@ struct shok_EGUIX_CTextButtonWidget : shok_EGUIX_CButtonWidget {
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction;
 	byte UpdateManualFlag;
 	PADDING(3);
+
+	static shok_EGUIX_CTextButtonWidget* Create();
 };
 
 #define shok_vtp_EGUIX_CContainerWidget (void*)0x78114C
@@ -167,11 +175,14 @@ struct shok_EGUIX_CContainerWidget : shok_EGUIX_CBaseWidget {
 	shok_EGUIX_CWidgetListHandler WidgetListHandler;
 
 	void AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name);
+	static shok_EGUIX_CContainerWidget* Create();
 };
 
 #define shok_vtp_EGUIX_CPureTooltipWidget (void*)0x780BB0
 struct shok_EGUIX_CPureTooltipWidget : shok_EGUIX_CBaseWidget {
 	shok_EGUIX_CToolTipHelper ToolTipHelper;
+
+	static shok_EGUIX_CPureTooltipWidget* Create();
 };
 
 #define shok_vtp_EGUIX_CProgressBarWidget (void*)0x780C20
@@ -179,6 +190,8 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction;
 	byte UpdateManualFlag;
 	float ProgressBarValue, ProgressBarLimit;
+
+	static shok_EGUIX_CProgressBarWidget* Create();
 };
 
 struct shok_widgetManager { // this thing has no vtable...
@@ -190,3 +203,15 @@ struct shok_widgetManager { // this thing has no vtable...
 	shok_EGUIX_CBaseWidget* GetWidgetByID(int id);
 };
 static inline shok_widgetManager* (*shok_getWidgetManagerObj)() = (shok_widgetManager * (*)())0x558473;
+
+struct shok_font {
+	PADDINGI(1);
+	float Size, Offset, Spacing;
+};
+
+struct shok_fontManager { // no vtable either
+
+	static void LoadFont(int* outFontID, const char* fontName);
+	shok_font* GetFontObj(int id);
+};
+static inline shok_fontManager* (*shok_getFontMangerObj)() = (shok_fontManager * (*)())0x5593AD;

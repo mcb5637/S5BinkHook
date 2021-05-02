@@ -1289,25 +1289,131 @@ function CppLogic.UI.ButtonCallActionFunc(wid) end
 -- @param f func
 function CppLogic.UI.ButtonOverrideActionFunc(wid, f) end
 
+--- gets a widgets tooltip func.
+-- @param wid widget
+-- @return command string
+-- @return func or err msg
+function CppLogic.UI.WidgetGetTooltipFunc(wid) end
+--- calls a widgets tooltip action func.
+-- @param wid widget
+function CppLogic.UI.WidgetCallTooltipFunc(wid) end
+--- overrides a widgets tooltip action func to a lua func that gets called without any arguments.
+-- @param wid widget
+-- @param f func
+function CppLogic.UI.WidgetOverrideTooltipFunc(wid, f) end
+
+--- gets a widgets tooltip data.
+-- target widget can be the text widget or the container.
+-- @param wid widget
+-- @return target widget id
+-- @return control target widget state flag
+-- @return tooltip enabled flag
+function CppLogic.UI.WidgetGetTooltipData(wid) end
+--- sets a widgets tooltip data.
+-- target widget can be the text widget or the container.
+-- @param wid widget
+-- @param tid target widget id
+-- @param controlFlag control target widget state flag
+-- @param enabledFlag tooltip enabled flag
+function CppLogic.UI.WidgetSetTooltipData(wid, tid, controlFlag, enabledFlag) end
+
+--- gets a widgets tooltip string.
+-- this string gets shown automatically, if the target widget is a text widget.
+-- @param wid widget
+-- @return raw string
+-- @return string table text key
+function CppLogic.UI.WidgetGetTooltipString(wid) end
+--- sets a widgets tooltip string.
+-- this string gets shown automatically, if the target widget is a text widget.
+-- @param wid widget
+-- @param string
+-- @param isSTTKey (optional, default false) if true, sets this as string table text key
+function CppLogic.UI.WidgetSetTooltipString(wid, str, isSTTKey) end
+
 --- returns a table with all child widget ids.
 -- @param wid widget
 -- @param t
 function CppLogic.UI.ContainerWidgetGetAllChildren(wid) end
 
---- creetes a new static widget and registers it as its child.
+--- returns if the tooltip of this widget is shown.
+-- @param wid widget
+-- @param bool
+function CppLogic.UI.WidgetIsTooltipShown(wid) end
+
+--- returns the font config.
+-- @param fontName font
+-- @return size
+-- @return offset
+-- @return spacing
+function CppLogic.UI.FontGetConfig(fontName) end
+--- sets the font config.
+-- @param fontName font
+-- @param size
+-- @param offset
+-- @param spacing
+function CppLogic.UI.FontSetConfig(fontName, size, offset, spacing) end
+
+--- sets the font of a widget.
+-- @param wid widget
+-- @param fontName font
+function CppLogic.UI.WidgetSetFont(wid, fontName) end
+
+--- creates a new static widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
 -- @return id
 function CppLogic.UI.ContainerWidgetCreateStaticWidgetChild(wid, name) end
---- creetes a new static text widget and registers it as its child.
+--- creates a new static text widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
 -- @return id
 function CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild(wid, name) end
+--- creates a new pure tooltip widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @return id
+function CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild(wid, name) end
+--- creates a new gfx button widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @return id
+function CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild(wid, name) end
+--- creates a new text button widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @return id
+function CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild(wid, name) end
+--- creates a new progress bar widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @return id
+function CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild(wid, name) end
+--- creates a new container widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @return id
+function CppLogic.UI.ContainerWidgetCreateContainerWidgetChild(wid, name) end
 
 --- gets a widget material textures position and size
 -- @param wid widget

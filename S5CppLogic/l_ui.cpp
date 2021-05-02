@@ -27,6 +27,18 @@ void l_uiOverrideFunc(lua_State* L, shok_EGUIX_CLuaFunctionHelper* f, int i) {
 	f->FuncRefCommand.NeedsCompile = 0;
 }
 
+void l_uiSetString(lua_State* L, shok_EGUIX_CSingleStringHandler& h, int i) {
+	const char* s = luaL_checkstring(L, i);
+	if (lua_toboolean(L, i + 1)) {
+		h.StringTableKey.assign(s);
+		h.RawString.assign("");
+	}
+	else {
+		h.RawString.assign(s);
+		h.StringTableKey.assign("");
+	}
+}
+
 int l_uiGetWidAdr(lua_State* L) {
 	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
 	lua_pushnumber(L, (int)w);
@@ -156,6 +168,71 @@ int l_uiSetMaterialTexCoord(lua_State* L) {
 	return 0;
 }
 
+int l_uiGetTooltipData(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	lua_pushnumber(L, tt->TargetWidget);
+	lua_pushboolean(L, tt->ControlTargetWidgetDisplayState);
+	lua_pushboolean(L, tt->ToolTipEnabledFlag);
+	return 3;
+}
+int l_uiSetTooltipData(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	if (!lua_isnoneornil(L, 2)) {
+		tt->TargetWidget = l_uiCheckWid(L, 2)->WidgetID;
+	}
+	if (!lua_isnoneornil(L, 3))
+		tt->ControlTargetWidgetDisplayState = lua_toboolean(L, 3);
+	if (!lua_isnoneornil(L, 4))
+		tt->ToolTipEnabledFlag = lua_toboolean(L, 4);
+	return 0;
+}
+
+int l_uiGetTooltipString(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	lua_pushstring(L, tt->ToolTipString.RawString.c_str());
+	lua_pushstring(L, tt->ToolTipString.StringTableKey.c_str());
+	return 2;
+}
+int l_uiSetTooltipString(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	l_uiSetString(L, tt->ToolTipString, 2);
+	return 0;
+}
+
+int l_uiTooltipGetFunc(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	lua_pushstring(L, tt->UpdateFunction.LuaCommand.c_str());
+	if (tt->UpdateFunction.FuncRefCommand.L == L)
+		lua_rawgeti(L, LUA_REGISTRYINDEX, tt->UpdateFunction.FuncRefCommand.Ref);
+	else
+		lua_pushstring(L, "no compiled func found");
+	return 2;
+}
+int l_uiTooltipCallFunc(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	tt->UpdateFunction.Call(wid->WidgetID);
+	return 0;
+}
+int l_uiTooltipOverrideFunc(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	l_uiOverrideFunc(L, &tt->UpdateFunction, 2);
+	return 0;
+}
+
 int l_uiButtonGetAction(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
 	shok_EGUIX_CButtonHelper* fh = wid->GetButtonHelper();
@@ -182,6 +259,24 @@ int l_uiButtonOverrideAction(lua_State* L) {
 	return 0;
 }
 
+int l_uiIsTooltipOfWidgetShown(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	luaext_assertPointer(L, tt, "no known tooltip");
+	lua_pushboolean(L, tt->IsToolTipShown);
+	return 1;
+}
+
+int l_uiSetFont(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CWidgetStringHelper* s = wid->GetStringHelper();
+	luaext_assertPointer(L, s, "no known stringhelper");
+	const char* font = luaL_checkstring(L, 2);
+	luaext_assert(L, DoesFileExist(font), "file doesnt exist");
+	s->FontHandler.LoadFont(font);
+	return 0;
+}
+
 int l_uiCreateStaticWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
@@ -204,18 +299,94 @@ int l_uiCreateStaticTextWidget(lua_State* L) {
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
-
-int l_uiTest(lua_State* L) {
+int l_uiCreatePureTooltipWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
-	shok_EGUIX_CStaticWidget* ne = shok_EGUIX_CStaticWidget::Create();
-	c->AddWidget(ne, "test");
-	ne->BackgroundMaterial.Color = { 0xFF, 0xFF, 0xFF ,0xFF };
-	ne->BackgroundMaterial.TextureCoordinates = { 0, 0, 1 ,1 };
-	ne->SetPosAndSize(10, 10, 32, 32);
-	ne->IsShown = 1;
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CPureTooltipWidget* ne = shok_EGUIX_CPureTooltipWidget::Create();
+	c->AddWidget(ne, name);
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
+int l_uiCreateGFXButtonWidget(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CGfxButtonWidget* ne = shok_EGUIX_CGfxButtonWidget::Create();
+	c->AddWidget(ne, name);
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
+int l_uiCreateTextButtonWidget(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CTextButtonWidget* ne = shok_EGUIX_CTextButtonWidget::Create();
+	c->AddWidget(ne, name);
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
+int l_uiCreateProgessBarWidget(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CProgressBarWidget* ne = shok_EGUIX_CProgressBarWidget::Create();
+	c->AddWidget(ne, name);
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
+int l_uiCreateContainerWidget(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
+	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CContainerWidget* ne = shok_EGUIX_CContainerWidget::Create();
+	c->AddWidget(ne, name);
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
+
+int l_uiGetFontValues(lua_State* L) {
+	const char* font = luaL_checkstring(L, 1);
+	luaext_assert(L, DoesFileExist(font), "file doesnt exist");
+	int id = 0;
+	shok_fontManager::LoadFont(&id, font);
+	shok_font* f = shok_getFontMangerObj()->GetFontObj(id);
+	lua_pushnumber(L, f->Size);
+	lua_pushnumber(L, f->Offset);
+	lua_pushnumber(L, f->Spacing);
+	return 3;
+}
+int l_uiSetFontValues(lua_State* L) {
+	const char* font = luaL_checkstring(L, 1);
+	luaext_assert(L, DoesFileExist(font), "file doesnt exist");
+	int id = 0;
+	shok_fontManager::LoadFont(&id, font);
+	shok_font* f = shok_getFontMangerObj()->GetFontObj(id);
+	if (lua_isnumber(L, 2))
+		f->Size = luaL_checkfloat(L, 2);
+	if (lua_isnumber(L, 3))
+		f->Offset = luaL_checkfloat(L, 3);
+	if (lua_isnumber(L, 4))
+		f->Spacing = luaL_checkfloat(L, 4);
 	return 0;
+}
+
+int l_uiTest(lua_State* L) {
+	const char* s = luaL_checkstring(L, 1);
+	int i = 0;
+	shok_fontManager::LoadFont(&i, s);
+	lua_pushnumber(L, (int)shok_getFontMangerObj()->GetFontObj(i));
+	return 1;
 }
 
 void l_ui_init(lua_State* L)
@@ -234,9 +405,25 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "ButtonGetActionFunc", &l_uiButtonGetAction);
 	luaext_registerFunc(L, "ButtonCallActionFunc", &l_uiButtonCallAction);
 	luaext_registerFunc(L, "ButtonOverrideActionFunc", &l_uiButtonOverrideAction);
+	luaext_registerFunc(L, "WidgetGetTooltipData", &l_uiGetTooltipData);
+	luaext_registerFunc(L, "WidgetSetTooltipData", &l_uiSetTooltipData);
+	luaext_registerFunc(L, "WidgetGetTooltipString", &l_uiGetTooltipString);
+	luaext_registerFunc(L, "WidgetSetTooltipString", &l_uiSetTooltipString);
+	luaext_registerFunc(L, "WidgetGetTooltipFunc", &l_uiTooltipGetFunc);
+	luaext_registerFunc(L, "WidgetCallTooltipFunc", &l_uiTooltipCallFunc);
+	luaext_registerFunc(L, "WidgetOverrideTooltipFunc", &l_uiTooltipOverrideFunc);
+	luaext_registerFunc(L, "WidgetIsTooltipShown", &l_uiIsTooltipOfWidgetShown);
+	luaext_registerFunc(L, "WidgetSetFont", &l_uiSetFont);
+	luaext_registerFunc(L, "FontGetConfig", &l_uiGetFontValues);
+	luaext_registerFunc(L, "FontSetConfig", &l_uiSetFontValues);
 	luaext_registerFunc(L, "Test", &l_uiTest);
 	luaext_registerFunc(L, "ContainerWidgetCreateStaticWidgetChild", &l_uiCreateStaticWidget);
 	luaext_registerFunc(L, "ContainerWidgetCreateStaticTextWidgetChild", &l_uiCreateStaticTextWidget);
+	luaext_registerFunc(L, "ContainerWidgetCreatePureTooltipWidgetChild", &l_uiCreatePureTooltipWidget);
+	luaext_registerFunc(L, "ContainerWidgetCreateGFXButtonWidgetChild", &l_uiCreateGFXButtonWidget);
+	luaext_registerFunc(L, "ContainerWidgetCreateTextButtonWidgetChild", &l_uiCreateTextButtonWidget);
+	luaext_registerFunc(L, "ContainerWidgetCreateProgressBarWidgetChild", &l_uiCreateProgessBarWidget);
+	luaext_registerFunc(L, "ContainerWidgetCreateContainerWidgetChild", &l_uiCreateContainerWidget);
 }
 
 // CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")
@@ -246,5 +433,12 @@ void l_ui_init(lua_State* L)
 // GoldTooltipController
 // CppLogic.UI.ButtonOverrideActionFunc("StartMenu00_EndGame", function() LuaDebugger.Log(XGUIEng.GetCurrentWidgetID()) end)
 // CppLogic.UI.Test("StartMenu00") XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png")
-// CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("StartMenu00", "test"); XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); CppLogic.UI.WidgetMaterialSetTextureCoordinates("test", 0, 0, 0, 1, 1); XGUIEng.SetMaterialColor("test", 0, 255,255,255,255); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetMaterialColor("test", 0, 0,0,0,0);  XGUIEng.SetTextColor("test",255,255,255,255); XGUIEng.SetText("test","tst"); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("test", "test1"); XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png"); CppLogic.UI.WidgetSetPositionAndSize("test", 5, 5, 32, 32); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetMaterialColor("test", 0, 0,0,0,0); XGUIEng.SetTextColor("test",255,255,255,255); XGUIEng.SetText("test","tst"); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); CppLogic.UI.WidgetSetTooltipData("test", "StartMenu_TooltipText", true, true); CppLogic.UI.WidgetSetTooltipString("test", "tst"); CppLogic.UI.WidgetOverrideTooltipFunc("test", function() LuaDebugger.Log(1) end); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetText("test","tst"); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 100, 100); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\medium11bold.met") --"data\\menu\\fonts\\mainmenularge.met"
+// CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\standard10.met")

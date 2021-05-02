@@ -10,12 +10,27 @@ shok_string::shok_string(const char* s)
 {
 	str_ctor(this, s);
 }
+static inline void(__thiscall* str_ctorcopy)(shok_string* th, const shok_string* ot) = (void(__thiscall*)(shok_string*, const shok_string*))0x401808;
+shok_string::shok_string(const shok_string& c)
+{
+	str_ctorcopy(this, &c);
+}
 const char* shok_string::c_str()
 {
 	if (size < 16)
 		return (const char*)&data;
 	else
 		return (const char*)data;
+}
+shok_string::~shok_string()
+{
+	if (size >= 16)
+		shok_free((void*)data);
+}
+static inline void(__thiscall* str_assign)(shok_string* th, const char* c) = (void(__thiscall*)(shok_string*, const char*)) 0x40182E;
+void shok_string::assign(const char* s)
+{
+	str_assign(this, s);
 }
 
 void shok_position::FloorToBuildingPlacement()

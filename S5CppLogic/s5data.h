@@ -142,6 +142,26 @@ inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::functio
 	func(*vec);
 #endif
 }
+template<class T>
+inline void shok_saveList(std::list<T, shok_allocator<T>>* vec, std::function<void(std::list<T, shok_allocator<T>>& s)> func) {
+#ifdef _DEBUG
+	std::list<T, shok_allocator<T>> save = std::list<T, shok_allocator<T>>();
+	int* vecPoint = (int*)vec;
+	int* savePoint = (int*)&save;
+	int backu[2] = {};
+	for (int i = 1; i < 3; i++) {
+		backu[i - 1] = savePoint[i];
+		savePoint[i] = vecPoint[i];
+	}
+	func(save);
+	for (int i = 1; i < 3; i++) {
+		vecPoint[i] = savePoint[i];
+		savePoint[i] = backu[i - 1];
+	}
+#else
+	func(*vec);
+#endif
+}
 
 // generic structs
 struct shok_position {

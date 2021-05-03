@@ -248,3 +248,17 @@ void luaext_assertEntityAlive(lua_State* L, int id, const char* msg)
 	if (shok_entityIsDead(id))
 		luaL_error(L, msg);
 }
+
+int str_ends_with(const char* str, const char* suffix) {
+
+	if (str == NULL || suffix == NULL)
+		return 0;
+
+	size_t str_len = strlen(str);
+	size_t suffix_len = strlen(suffix);
+
+	if (suffix_len > str_len)
+		return 0;
+
+	return 0 == strncmp(str + str_len - suffix_len, suffix, suffix_len);
+}

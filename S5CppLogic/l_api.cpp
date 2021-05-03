@@ -8,6 +8,11 @@ void l_api_checkEvalEnabled(lua_State* L) {
 		luaL_error(L, "Loading lua code disabled for Kimichura");
 }
 
+bool l_apiIsExternalmap(const char* s) {
+	std::string str = std::string(s);
+	return str.rfind("data\\maps\\externalmap\\", 0) != std::string::npos;
+}
+
 int l_api_eval(lua_State* L) {
 	l_api_checkEvalEnabled(L);
 	size_t strlen = 0;
@@ -28,8 +33,7 @@ int l_api_log(lua_State* L) {
 int l_api_getfile(lua_State* L) {
 	size_t strlen = 0;
 	const char* s = luaL_checklstring(L, 1, &strlen);
-	std::string str = std::string(s);
-	if (str.rfind("data\\maps\\externalmap\\", 0) != 0)
+	if (!l_apiIsExternalmap(s))
 		luaL_error(L, "not a map file");
 	const char* data = ReadFileToString(s, &strlen);
 	if (!data)

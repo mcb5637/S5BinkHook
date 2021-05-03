@@ -112,7 +112,7 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 #define shok_vtp_EGUIX_CWidgetListHandler (void*)0x78098C
 struct shok_EGUIX_CWidgetListHandler : shok_object {
 	vector_padding;
-	std::list<shok_EGUIX_CBaseWidget*> SubWidgets;
+	std::list<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>> SubWidgets;
 };
 
 #define shok_vtp_EGUIX_CStaticWidget (void*)0x780F84
@@ -174,7 +174,7 @@ struct shok_EGUIX_CContainerWidget : shok_EGUIX_CBaseWidget {
 	void* vtable_EGUIX_IWidgetRegistrationCallback;
 	shok_EGUIX_CWidgetListHandler WidgetListHandler;
 
-	void AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name);
+	void AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name, const shok_EGUIX_CBaseWidget* before);
 	static shok_EGUIX_CContainerWidget* Create();
 };
 

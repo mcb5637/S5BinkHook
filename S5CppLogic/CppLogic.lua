@@ -1364,56 +1364,63 @@ function CppLogic.UI.WidgetSetFont(wid, fontName) end
 -- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
-function CppLogic.UI.ContainerWidgetCreateStaticWidgetChild(wid, name) end
+function CppLogic.UI.ContainerWidgetCreateStaticWidgetChild(wid, name, before) end
 --- creates a new static text widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
 -- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
-function CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild(wid, name) end
+function CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild(wid, name, before) end
 --- creates a new pure tooltip widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
 -- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
-function CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild(wid, name) end
+function CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild(wid, name, before) end
 --- creates a new gfx button widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
 -- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
-function CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild(wid, name) end
+function CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild(wid, name, before) end
 --- creates a new text button widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
 -- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
-function CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild(wid, name) end
+function CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild(wid, name, before) end
 --- creates a new progress bar widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
 -- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
-function CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild(wid, name) end
+function CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild(wid, name, before) end
 --- creates a new container widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
 -- position and size are 0.
 -- @param wid widget
 -- @param name widgetname of the child
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
-function CppLogic.UI.ContainerWidgetCreateContainerWidgetChild(wid, name) end
+function CppLogic.UI.ContainerWidgetCreateContainerWidgetChild(wid, name, before) end
 
 --- gets a widget material textures position and size
 -- @param wid widget

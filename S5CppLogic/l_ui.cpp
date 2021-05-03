@@ -39,6 +39,17 @@ void l_uiSetString(lua_State* L, shok_EGUIX_CSingleStringHandler& h, int i) {
 	}
 }
 
+const char* l_uiCheckFontString(const char* font) {
+	if (!DoesFileExist(font))
+		return "file doesnt exist";
+	if (!str_ends_with(font, ".met"))
+		return "wrong file extension";
+	std::string str = std::string(font);
+	if ((str.rfind("data\\maps\\externalmap\\", 0) == std::string::npos) && (str.rfind("data\\menu\\fonts\\", 0) == std::string::npos))
+		return "incorrect folder";
+	return nullptr;
+}
+
 int l_uiGetWidAdr(lua_State* L) {
 	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
 	lua_pushnumber(L, (int)w);
@@ -272,7 +283,9 @@ int l_uiSetFont(lua_State* L) {
 	shok_EGUIX_CWidgetStringHelper* s = wid->GetStringHelper();
 	luaext_assertPointer(L, s, "no known stringhelper");
 	const char* font = luaL_checkstring(L, 2);
-	luaext_assert(L, DoesFileExist(font), "file doesnt exist");
+	const char* err = l_uiCheckFontString(font);
+	if (err)
+		luaL_error(L, err);
 	s->FontHandler.LoadFont(font);
 	return 0;
 }
@@ -283,8 +296,11 @@ int l_uiCreateStaticWidget(lua_State* L) {
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	if (!lua_isnoneornil(L, 3))
+		bef = l_uiCheckWid(L, 3);
 	shok_EGUIX_CStaticWidget* ne = shok_EGUIX_CStaticWidget::Create();
-	c->AddWidget(ne, name);
+	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
@@ -294,8 +310,11 @@ int l_uiCreateStaticTextWidget(lua_State* L) {
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	if (!lua_isnoneornil(L, 3))
+		bef = l_uiCheckWid(L, 3);
 	shok_EGUIX_CStaticTextWidget* ne = shok_EGUIX_CStaticTextWidget::Create();
-	c->AddWidget(ne, name);
+	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
@@ -305,8 +324,11 @@ int l_uiCreatePureTooltipWidget(lua_State* L) {
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	if (!lua_isnoneornil(L, 3))
+		bef = l_uiCheckWid(L, 3);
 	shok_EGUIX_CPureTooltipWidget* ne = shok_EGUIX_CPureTooltipWidget::Create();
-	c->AddWidget(ne, name);
+	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
@@ -316,8 +338,11 @@ int l_uiCreateGFXButtonWidget(lua_State* L) {
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	if (!lua_isnoneornil(L, 3))
+		bef = l_uiCheckWid(L, 3);
 	shok_EGUIX_CGfxButtonWidget* ne = shok_EGUIX_CGfxButtonWidget::Create();
-	c->AddWidget(ne, name);
+	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
@@ -327,8 +352,11 @@ int l_uiCreateTextButtonWidget(lua_State* L) {
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	if (!lua_isnoneornil(L, 3))
+		bef = l_uiCheckWid(L, 3);
 	shok_EGUIX_CTextButtonWidget* ne = shok_EGUIX_CTextButtonWidget::Create();
-	c->AddWidget(ne, name);
+	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
@@ -338,8 +366,11 @@ int l_uiCreateProgessBarWidget(lua_State* L) {
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	if (!lua_isnoneornil(L, 3))
+		bef = l_uiCheckWid(L, 3);
 	shok_EGUIX_CProgressBarWidget* ne = shok_EGUIX_CProgressBarWidget::Create();
-	c->AddWidget(ne, name);
+	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
@@ -349,15 +380,20 @@ int l_uiCreateContainerWidget(lua_State* L) {
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	if (!lua_isnoneornil(L, 3))
+		bef = l_uiCheckWid(L, 3);
 	shok_EGUIX_CContainerWidget* ne = shok_EGUIX_CContainerWidget::Create();
-	c->AddWidget(ne, name);
+	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 
 int l_uiGetFontValues(lua_State* L) {
 	const char* font = luaL_checkstring(L, 1);
-	luaext_assert(L, DoesFileExist(font), "file doesnt exist");
+	const char* err = l_uiCheckFontString(font);
+	if (err)
+		luaL_error(L, err);
 	int id = 0;
 	shok_fontManager::LoadFont(&id, font);
 	shok_font* f = shok_getFontMangerObj()->GetFontObj(id);
@@ -368,7 +404,9 @@ int l_uiGetFontValues(lua_State* L) {
 }
 int l_uiSetFontValues(lua_State* L) {
 	const char* font = luaL_checkstring(L, 1);
-	luaext_assert(L, DoesFileExist(font), "file doesnt exist");
+	const char* err = l_uiCheckFontString(font);
+	if (err)
+		luaL_error(L, err);
 	int id = 0;
 	shok_fontManager::LoadFont(&id, font);
 	shok_font* f = shok_getFontMangerObj()->GetFontObj(id);
@@ -432,8 +470,7 @@ void l_ui_init(lua_State* L)
 // StartMenu00
 // GoldTooltipController
 // CppLogic.UI.ButtonOverrideActionFunc("StartMenu00_EndGame", function() LuaDebugger.Log(XGUIEng.GetCurrentWidgetID()) end)
-// CppLogic.UI.Test("StartMenu00") XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png")
-// CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("test", "test1"); XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png"); CppLogic.UI.WidgetSetPositionAndSize("test", 5, 5, 32, 32); XGUIEng.ShowWidget("test", 1);
+// CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("StartMenu00", "test", "StartMenu00_EndGame"); XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png"); CppLogic.UI.WidgetSetPositionAndSize("test", 783, 500, 32, 32); XGUIEng.ShowWidget("test", 1);
 // CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetMaterialColor("test", 0, 0,0,0,0); XGUIEng.SetTextColor("test",255,255,255,255); XGUIEng.SetText("test","tst"); XGUIEng.ShowWidget("test", 1);
 // CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); CppLogic.UI.WidgetSetTooltipData("test", "StartMenu_TooltipText", true, true); CppLogic.UI.WidgetSetTooltipString("test", "tst"); CppLogic.UI.WidgetOverrideTooltipFunc("test", function() LuaDebugger.Log(1) end); XGUIEng.ShowWidget("test", 1);
 // CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
@@ -441,4 +478,4 @@ void l_ui_init(lua_State* L)
 // CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
 // CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 100, 100); XGUIEng.ShowWidget("test", 1);
 // CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\medium11bold.met") --"data\\menu\\fonts\\mainmenularge.met"
-// CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\standard10.met")
+// CppLogic.UI.FontGetConfig("data\\menu\\fonts\\standard10.met")

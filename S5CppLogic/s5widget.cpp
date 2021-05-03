@@ -107,7 +107,7 @@ shok_EGUIX_CWidgetStringHelper* shok_EGUIX_CBaseWidget::GetStringHelper()
 
 static inline int(__thiscall* widman_registerName)(shok_widgetManager* th, const char* name) = (int(__thiscall*)(shok_widgetManager*, const char*))0x55884F;
 static inline void(__thiscall* widman_addWidget)(shok_widgetManager* th, shok_EGUIX_CBaseWidget* a, int id) = (void(__thiscall*)(shok_widgetManager*, shok_EGUIX_CBaseWidget*, int))0x558AA2;
-void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name)
+void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name, const shok_EGUIX_CBaseWidget* before)
 {
     shok_widgetManager* m = shok_getWidgetManagerObj();
     int newId = widman_registerName(m, name);
@@ -115,6 +115,19 @@ void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const
         toAdd->WidgetID = newId;
         widman_addWidget(m, toAdd, newId);
         ((shok_vtable_EGUIX_CContainerWidget*)vtable)->AddChild(this, toAdd);
+        if (before) {
+            shok_saveList<shok_EGUIX_CBaseWidget*>(&WidgetListHandler.SubWidgets, [before](std::list<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>>& l) {
+                std::list<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>>::iterator it = l.begin();
+                while (it != l.end()) {
+                    if (*it == before) {
+                        l.splice(it, l, --l.end());
+                        break;
+                    }
+
+                    it++;
+                }
+                });
+        }
     }
 }
 

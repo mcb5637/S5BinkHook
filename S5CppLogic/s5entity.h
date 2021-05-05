@@ -4,61 +4,43 @@
 
 #define shok_vtp_EGL_CGLEEntity (void*)0x783E74
 struct shok_EGL_CGLEEntity : shok_object {
-private:
-	int u1;
-public:
+	PADDINGI(1);
 	int EntityId;
-private:
-	int u2;
-public:
+	PADDINGI(1);
 	int EntityType;
 	int ModelOverride;
 	int PlayerId;
 	void* attachmentvt;
-	shok_set<shok_attachment> EntitiesAttachedToMe;
-	PADDINGI(3)
-		shok_set<shok_attachment> AttachedToEntities;
-private:
-	int u3[5];
-public:
+	shok_set<shok_attachment> ObserverEntities;
+	shok_set<shok_attachment> ObserverEffects;
+	shok_set<shok_attachment> ObservedEntities;
+	shok_set<shok_attachment> ObservedEffects;
+	byte SendEvent; // 20
+	PADDING(3);
+	int SetNewTaskListDepth;
 	shok_positionRot Position; // 22
-public:
 	float Scale; // 25
-private:
-	int u4;
-public:
-	byte DefaultBehavourFlag, UserControlFlag, UnattackableFlag;
-private:
-	byte u20;
-public:
-	byte SelectableFlag, f1, VisibleFlag;
-private:
-	byte u21;
-	int u22;
-public:
-	vector_padding
-		std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> BehaviorList; // 30, first field in 31
-	int CurrentState, EntityStateBehaviors, TaskListId, TaskIndex; // la37
-private:
-	int u25[12]; // la49
-public:
-	int CurrentHealth;
-	char* ScriptName;
+	PADDINGI(1);
+	byte StandardBehaviorActive, f1, ValidPosition, IsOnWater;
+	byte UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
+	int TaskListToSet; // 29
+	vector_padding;
+	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
+	int CurrentState, EntityState, CurrentTaskListID, CurrentTaskIndex; // 34 la37
+	PADDINGI(12); // la49
+	int Health; // 50
+	char* ScriptName; // "Name" in loader
 	char* ScriptCommandLine;
 	float Exploration;
 	int TaskListStart; // 54
-private:
-	int u26[2];
-public:
-	int InvulnerabilityAndSuspended; // 57
+	PADDINGI(2);
+	byte InvulnerabilityFlag, Suspended; // 57
+	PADDING(2);
 	int SuspensionTurn;
-	int ScriptingValue; // 59
-private:
-	int u27[3];
-public:
+	int ScriptingValue[4]; // 59
 	int StateChangeCounter; // 63
 	int TaskListChangeCounter;
-	int NumberOfAuraEffects; // 65
+	int NumberOfAuras; // 65
 
 private:
 	shok_EGL_CGLEBehavior* SearchBehavior(void* vt);
@@ -129,9 +111,7 @@ struct shok_GGL_CBuilding;
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	shok_position TargetPosition; // la67
 	byte TargetRotationValid;
-private:
-	byte u[3];
-public:
+	PADDING(3);
 	float TargetRotation;
 	int MovementState; // 70
 
@@ -173,13 +153,12 @@ public:
 };
 
 #define shok_vtp_GGL_CEvadingEntity (void*)0x770A7C
-struct shok_GGL_CEvadingEntity : shok_EGL_CMovingEntity {};
+struct shok_GGL_CEvadingEntity : shok_EGL_CMovingEntity {
+	int EvaderWaitObject[4];
+};
 
 #define shok_vtp_GGL_CSettler (void*)0x76E3CC
 struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
-private:
-	int u[4];
-public:
 	int TimeToWait, HeadIndex, HeadParams; // la77
 private:
 	int u2[7];
@@ -265,7 +244,9 @@ public:
 
 #define shok_vtp_GGL_CAnimal (void*)0x778F7C
 struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
-
+	shok_position TerritoryCenter; // 71
+	float TerritoryRadius; // int?
+	shok_position DangerPosition;
 };
 
 #define shok_vtp_GGL_CResourceDoodad (void*)0x76FEA4
@@ -283,7 +264,7 @@ public:
 	int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn;
 	float BuildingHeight, Helathbar, UpgradeProgress; //la78
 private:
-	int u2[2];
+	int u2[2]; // list Slots with NumberOfRepairingSerfs?
 public:
 	int NumberOfRepairingSerfs;
 	int OvertimeCooldown;
@@ -328,17 +309,12 @@ public:
 struct shok_EGL_CGLEEntityCreator : shok_object {
 	int EntityType = 0;
 	shok_positionRot Pos = { 0,0,0 };
-private:
-	int u = 0;
-public:
+	int Flags = 0;
 	int PlayerId = 0;
-private:
-	int u2 = 0;
-public:
+	int Health = 0;
 	char* ScriptName = nullptr;
-private:
-	int u3[2] = { 0,0 };
-public:
+	char* ScriptCommandLine = nullptr;
+	int AmbientSoundType = 0;
 	float Scale = 0; // 11
 	
 	shok_EGL_CGLEEntityCreator();
@@ -367,7 +343,9 @@ static inline int(_cdecl* shok_entityChangePlayer)(int entityid, int player) = (
 
 shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e);
 
-extern void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter);
+void ActivateEntityChangePlayerFix();
+
+extern void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
 void HookHero6Convert();
 void HookResetCamo();
 extern int ResetCamoIgnoreIfNotEntity;

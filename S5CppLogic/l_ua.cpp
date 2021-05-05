@@ -613,7 +613,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 					}
 				}
 				else if (p->IsHeal()) {
-					if (e->CurrentHealth <= e->GetMaxHealth()/2 && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 2) {
+					if (e->Health <= e->GetMaxHealth()/2 && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 2) {
 						((shok_GGL_CSettler*)e)->HeroAbilityRangedEffect();
 					}
 				}
@@ -627,7 +627,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
 					((shok_GGL_CSettler*)e)->HeroAbilitySummon();
-					e->AttachedToEntities.ForAll([this](shok_attachment* a) {
+					e->ObservedEntities.ForAll([this](shok_attachment* a) {
 						if (a->AttachmentType == AttachmentType_SUMMONER_SUMMONED)
 							AddLeader(shok_eid2obj(a->EntityId));
 						});
@@ -759,7 +759,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		if (a != nullptr && !a->IsThiefCamoBehavior()) {
 			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetCamouflageBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
-				if (e->CurrentHealth <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
+				if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
 					((shok_GGL_CSettler*)e)->HeroAbilityActivateCamoflage();
 					return true;
 				}

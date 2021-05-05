@@ -38,6 +38,7 @@ typedef uint8_t byte;
 // convert task 0x4FCD27 call redirect
 // 0x005011DF reset camo func override
 // 0x4D51A4 & 0x50163A activate camo call redirect
+// 0x49A6A7 settlerchangeplayer override func to fix it not returning new id
 // 
 // only without SCELoader
 // shok_entityHurtEntity 0x49F358 jmp patched
@@ -200,7 +201,7 @@ public:
 };
 
 struct shok_attachment {
-	int AttachmentType, EntityId;
+	int AttachmentType, EntityId, EventID; // does event id exist, or is it just in attachmentinfo loader?
 };
 bool operator<(shok_attachment a, shok_attachment b);
 

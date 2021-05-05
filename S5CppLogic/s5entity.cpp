@@ -30,7 +30,7 @@ shok_EGL_CGLEEntityCreator::~shok_EGL_CGLEEntityCreator()
 
 shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(void** vts, int num)
 {
-	for (shok_EGL_CGLEBehavior* b : BehaviorList) {
+	for (shok_EGL_CGLEBehavior* b : Behaviours) {
 		if (b != nullptr && contains(vts, b->vtable, num))
 			return b;
 	}
@@ -288,13 +288,13 @@ int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(int attachType)
 
 int shok_EGL_CGLEEntity::GetFirstAttachedToMe(int attachmentId)
 {
-	shok_attachment* r = EntitiesAttachedToMe.GetFirstMatch([attachmentId](shok_attachment* a) {return a->AttachmentType == attachmentId; });
+	shok_attachment* r = ObserverEntities.GetFirstMatch([attachmentId](shok_attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
 }
 
 int shok_EGL_CGLEEntity::GetFirstAttachedEntity(int attachmentId)
 {
-	shok_attachment* r = AttachedToEntities.GetFirstMatch([attachmentId](shok_attachment* a) {return a->AttachmentType == attachmentId; });
+	shok_attachment* r = ObservedEntities.GetFirstMatch([attachmentId](shok_attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
 }
 
@@ -315,12 +315,12 @@ bool shok_EGL_CMovingEntity::IsMoving()
 bool shok_GGL_CSettler::IsIdle()
 {
 	int com = EventLeaderGetCurrentCommand();
-	return com == shok_LeaderCommandDefend || com == shok_LeaderCommandHoldPos || TaskListId == ((shok_GGL_CGLSettlerProps*)GetEntityType())->IdleTaskList;
+	return com == shok_LeaderCommandDefend || com == shok_LeaderCommandHoldPos || CurrentTaskListID == ((shok_GGL_CGLSettlerProps*)GetEntityType())->IdleTaskList;
 }
 
 int shok_GGL_CBuilding::GetConstructionSite()
 {
-	shok_attachment* a = EntitiesAttachedToMe.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_ATTACHMENT_CONSTRUCTION_SITE_BUILDING; });
+	shok_attachment* a = ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_ATTACHMENT_CONSTRUCTION_SITE_BUILDING; });
 	if (a)
 		return a->EntityId;
 	return 0;
@@ -366,7 +366,7 @@ bool shok_GGL_CBuilding::IsIdle()
 	if (GetMarketBehavior() && GetMarketProgress() < 1.0f)
 		return false;
 	if (GetBarrackBehavior()) {
-		if (EntitiesAttachedToMe.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_FIGHTER_BARRACKS; }))
+		if (ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_FIGHTER_BARRACKS; }))
 			return false;
 	}
 	return true;
@@ -402,7 +402,7 @@ void shok_EGL_CGLEEntity::Destroy()
 void shok_EGL_CGLEEntity::ClearAttackers()
 {
 	std::vector<shok_GGL_CSettler*> tomove = std::vector<shok_GGL_CSettler*>();
-	EntitiesAttachedToMe.ForAll([&tomove](shok_attachment* a) {
+	ObserverEntities.ForAll([&tomove](shok_attachment* a) {
 		if (a->AttachmentType == AttachmentType_ATTACKER_COMMAND_TARGET || a->AttachmentType == AttachmentType_LEADER_TARGET || a->AttachmentType == AttachmentType_FOLLOWER_FOLLOWED) {
 			shok_EGL_CGLEEntity* at = shok_eid2obj(a->EntityId);
 			if (at->IsSettler()) {
@@ -478,7 +478,7 @@ void shok_EGL_CMovingEntity::LeaderAttachSoldier(int soldierId)
 static inline void(__thiscall* shok_entity_expellSettler)(shok_EGL_CGLEEntity* th, int i) = (void(__thiscall*)(shok_EGL_CGLEEntity*, int))0x4A39BB;
 void shok_EGL_CMovingEntity::SettlerExpell()
 {
-	if (GetLeaderBehavior() && AttachedToEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_LEADER_SOLDIER; })) {
+	if (GetLeaderBehavior() && ObservedEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_LEADER_SOLDIER; })) {
 		shok_event_data_EGL_CEventValue_bool_703333479 ev = shok_event_data_EGL_CEventValue_bool_703333479();
 		ev.id = 0x15046;
 		ev.b = true;
@@ -785,20 +785,62 @@ void shok_GGL_CBuilding::MarketCancelTrade()
 	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
 }
 
+int __cdecl fixedChangePlayer(int id, int pl) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(id);
+	if (!e)
+		return 0;
+	if (e->PlayerId == pl)
+		return id;
+	shok_EGL_CGLEEntityCreator c = shok_EGL_CGLEEntityCreator(true);
+	c.EntityType = e->EntityType;
+	c.PlayerId = pl;
+	c.Pos = e->Position;
+	c.Scale = e->Scale;
+	c.Health = e->Health;
+	if (e->ScriptName) {
+		size_t len = strlen(e->ScriptName) + 1;
+		c.ScriptName = (char*)shok_malloc(sizeof(char) * len);
+		strcpy_s(c.ScriptName, len, e->ScriptName);
+	}
+	else {
+		c.ScriptName = nullptr;
+	}
+	int nid = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
+	if (e->IsSettler()) {
+		shok_GGL_CLeaderBehavior* lb = e->GetLeaderBehavior();
+		if (lb) {
+			std::vector<int> sol = std::vector<int>();
+			e->ObservedEntities.ForAll([&sol](shok_attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) sol.push_back(a->EntityId); });
+			shok_GGL_CSettler* settler = (shok_GGL_CSettler*)shok_eid2obj(nid);
+			for (int i : sol) {
+				settler->LeaderAttachSoldier(fixedChangePlayer(i, pl));
+			}
+			shok_GGL_CLeaderBehavior* nlb = settler->GetLeaderBehavior();
+			nlb->Experience = lb->Experience;
+			nlb->TroopHealthCurrent = lb->TroopHealthCurrent;
+			nlb->TroopHealthPerSoldier = lb->TroopHealthPerSoldier;
+		}
+	}
+	e->Destroy();
+	return nid;
+}
+void ActivateEntityChangePlayerFix()
+{
+	WriteJump(shok_entityChangePlayer, &fixedChangePlayer);
+}
 
-void (*Hero6ConvertHookCb)(int id, int pl, bool post, int converter) = nullptr;
+void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter) = nullptr;
 int _cdecl hero6convertchangeplayer(int id, int pl) {
 	shok_EGL_CGLEEntity* c = (shok_EGL_CGLEEntity*)1;
 	_asm { mov c, esi }
-	if (Hero6ConvertHookCb)
-		Hero6ConvertHookCb(id, pl, false, c->EntityId);
 	int r = shok_entityChangePlayer(id, pl);
 	if (Hero6ConvertHookCb)
-		Hero6ConvertHookCb(id, pl, true, c->EntityId);
+		Hero6ConvertHookCb(id, pl, r, c->EntityId);
 	return r;
 }
 void HookHero6Convert()
 {
+	ActivateEntityChangePlayerFix();
 	RedirectCall((void*)0x4FCD26, &hero6convertchangeplayer);
 }
 

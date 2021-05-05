@@ -280,7 +280,7 @@ int l_settlerGetLeaderOfSoldier(lua_State* L) {
 
 int l_entityGetNumberOfBehaviors(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	lua_pushnumber(L, e->BehaviorList.size());
+	lua_pushnumber(L, e->Behaviours.size());
 	return 1;
 }
 
@@ -496,12 +496,12 @@ int l_entity_test(lua_State* L) {
 
 int l_entityGetTaskListIndex(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	lua_pushnumber(L, e->TaskIndex);
+	lua_pushnumber(L, e->CurrentTaskIndex);
 	return 1;
 }
 int l_entitySetTaskListIndex(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	e->TaskIndex = luaL_checkint(L, 2);
+	e->CurrentTaskIndex = luaL_checkint(L, 2);
 	return 0;
 }
 
@@ -721,7 +721,7 @@ int l_settlerSummon(lua_State* L) {
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
 	e->HeroAbilitySummon();
 	int summoned = 0;
-	e->AttachedToEntities.ForAll([L, &summoned](shok_attachment* a) {
+	e->ObservedEntities.ForAll([L, &summoned](shok_attachment* a) {
 		if (a->AttachmentType == AttachmentType_SUMMONER_SUMMONED)
 			lua_pushnumber(L, a->EntityId);
 			summoned++;
@@ -871,13 +871,13 @@ int l_settlerEnableConversionHook(lua_State* L) {
 	luaL_unref(L, LUA_REGISTRYINDEX, ConversionHookRef);
 	ConversionHookRef = luaL_ref(L, LUA_REGISTRYINDEX);
 	HookHero6Convert();
-	Hero6ConvertHookCb = [](int id, int pl, bool post, int converter) {
+	Hero6ConvertHookCb = [](int id, int pl, int nid, int converter) {
 		lua_State* L = *shok_luastate_game;
 		int t = lua_gettop(L);
 		lua_rawgeti(L, LUA_REGISTRYINDEX, ConversionHookRef);
 		lua_pushnumber(L, id);
 		lua_pushnumber(L, pl);
-		lua_pushboolean(L, post);
+		lua_pushnumber(L, nid);
 		lua_pushnumber(L, converter);
 		lua_pcall(L, 4, 0, 0);
 		lua_settop(L, t);
@@ -972,7 +972,7 @@ int l_settlerSerfRepair(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 2);
 	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
 	luaext_assert(L, b->IsConstructionFinished(), "construction site");
-	luaext_assert(L, b->CurrentHealth < b->GetMaxHealth(), "at full health");
+	luaext_assert(L, b->Health < b->GetMaxHealth(), "at full health");
 	bool suc = s->SerfRepairBuilding(b);
 	lua_pushboolean(L, suc);
 	return 1;
@@ -1026,7 +1026,7 @@ int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
 	int i = 0;
-	b->EntitiesAttachedToMe.ForAll([L, &i](shok_attachment* a) {
+	b->ObserverEntities.ForAll([L, &i](shok_attachment* a) {
 		if (a->AttachmentType == AttachmentType_FIGHTER_BARRACKS && !shok_eid2obj(a->EntityId)->GetSoldierBehavior()) {
 			lua_pushnumber(L, a->EntityId);
 			i++;
@@ -1066,7 +1066,7 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	}
 	int max = s->LimitedAttachmentGetMaximum(AttachmentType_LEADER_SOLDIER);
 	int curr = 0;
-	s->AttachedToEntities.ForAll([&curr](shok_attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) curr++; });
+	s->ObservedEntities.ForAll([&curr](shok_attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) curr++; });
 	luaext_assert(L, curr < max, "no free soldier slot left");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");

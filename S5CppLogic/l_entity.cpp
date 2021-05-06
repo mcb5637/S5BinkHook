@@ -1224,6 +1224,7 @@ int l_settlerSetPos(lua_State* L) {
 
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
+	BuildingMaxHpBoni.clear();
 	serfType = -1;
 }
 

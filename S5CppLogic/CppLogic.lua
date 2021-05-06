@@ -178,6 +178,12 @@ function CppLogic.Logic.LandscapeGetBlocking(p) end
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
 function CppLogic.Logic.EnableAllHurtEntityTrigger() end
 
+--- enables entity max hp to be modified by techs.
+-- does not work with SCELoader.
+-- use a techs HitpointModifier to set up the boni.
+-- then use ModifyHitpoints on settlers and CppLogic.EntityType.Building.AddHPTechMod for buildings to add the techs.
+function CppLogic.Logic.EnableMaxHPTechMod() end
+
 --- gets the damage that is going to be dealt in a Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger.
 -- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
 -- @return dmg
@@ -1191,6 +1197,13 @@ function CppLogic.EntityType.Building.GetUpradeCost(ty) end
 -- @param c cost info table
 -- @param ignoreZeroes should zeroes get ignored (optional)
 function CppLogic.EntityType.Building.SetUpradeCost(ty, c, ignoreZeroes) end
+
+--- adds a tech modifier for building hp.
+-- does not work with SCELoader.
+-- has no effect without EnableMaxHPTechMod.
+-- @param ty entitytype
+-- @param tech
+function CppLogic.EntityType.Building.AddHPTechMod(ty, tech) end
 
 --- tech research time and costs.
 -- @param tid tech id

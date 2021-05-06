@@ -665,6 +665,18 @@ int l_entityTyGetSpeedModifierTechs(lua_State* L) {
 	return 1;
 }
 
+int l_buildingTyAddHPTechMod(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supportet with SCELoader");
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsBuildingType(), "no building type at 1");
+	int tech = luaL_checkint(L, 2);
+	shok_technology* techo = (*shok_GGL_CGLGameLogicObj)->GetTech(tech);
+	luaext_assertPointer(L, techo, "no tech at 2");
+	BuildingMaxHpBoni.emplace(luaL_checkint(L, 1), tech);
+	return 0;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -735,6 +747,7 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetConstructionCost", &l_buildingSetCostConstr);
 	luaext_registerFunc(L, "GetUpgradeCost", &l_buildingGetCostUpgr);
 	luaext_registerFunc(L, "SetUpgradeCost", &l_buildingSetCostUpgr);
+	luaext_registerFunc(L, "AddHPTechMod", &l_buildingTyAddHPTechMod);
 	lua_rawset(L, -3);
 }
 
@@ -743,4 +756,5 @@ void l_entitytype_init(lua_State* L)
 // CppLogic.EntityType.AddEntityCategory(Entities.PU_LeaderSword1, 100)
 // CppLogic.EntityType.GetAutoAttackMissChance(Entities.PU_LeaderBow1)
 // CppLogic.EntityType.Settler.GetAbilityDataCamouflage(Entities.PU_Hero5)
-// CppLogic.EntityType.GetArmor(Entities.PU_LeaderSword1)
+// CppLogic.EntityType.GetArmor(Entities.PU_LeaderSword1
+// CppLogic.EntityType.Building.AddHPTechMod(Entities.PB_Farm1, Technologies.T_Fletching)

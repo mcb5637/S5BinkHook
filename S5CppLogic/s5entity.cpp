@@ -916,6 +916,7 @@ void HookHurtEntity()
 	*p = 0x90;
 }
 
+std::multimap<int, int> BuildingMaxHpBoni = std::multimap<int, int>();
 int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 	shok_GGlue_CGlueEntityProps* et = e->GetEntityType();
 	float hp = (float) et->LogicProps->MaxHealth;
@@ -940,9 +941,31 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 			}
 		}
 	}
+	else if (e->IsBuilding()) {
+		std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = BuildingMaxHpBoni.equal_range(e->EntityType);
+		for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
+			int t = i->second;
+			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState_Researched)
+				continue;
+			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
+			switch (tech->HitpointModifier.Operator) {
+			case '+':
+				hp += tech->HitpointModifier.Value;
+				break;
+			case '-':
+				hp -= tech->HitpointModifier.Value;
+				break;
+			case '*':
+				hp *= tech->HitpointModifier.Value;
+				break;
+			case '/':
+				hp /= tech->HitpointModifier.Value;
+				break;
+			}
+		}
+	}
 	return (int) hp;
 }
-
 void __declspec(naked) hookgetmaxhpui() {
 	__asm {
 		mov ecx, [ebp+0xC]
@@ -954,9 +977,38 @@ void __declspec(naked) hookgetmaxhpui() {
 		ret
 	}
 }
-
+void __fastcall createentityfixhp(shok_EGL_CGLEEntity* th, int hpIn) {
+	if (hpIn != -1)
+		return;
+	if (th->IsSettler()) {
+		th->Health = th->GetMaxHealth();
+	}
+	else if (th->IsBuilding()) {
+		th->Health = th->GetMaxHealth();
+		if (!((shok_GGL_CBuilding*)th)->IsConstructionFinished()) {
+			th->Health = (int)(th->Health * 0.25f); // TODO load from xml
+		}
+	}
+}
+void __declspec(naked) hookcreatentityfixhp() {
+	__asm {
+		mov ecx, esi
+		pop edx // creator, param for eax+0x14
+		mov eax, [edx+7*4] // health
+		push eax // push health, then old param
+		push edx
+		mov eax, [ecx]
+		call [eax+0x14] // call
+		mov ecx, esi // get params
+		pop edx
+		call createentityfixhp // hp fix
+		push 0x571B98
+		ret
+	}
+}
 void EnableMaxHealthTechBoni()
 {
 	WriteJump((void*)0x57B798, &hookGetMaxHP);
 	WriteJump((void*)0x4BDED8, &hookgetmaxhpui);
+	WriteJump((void*)0x571B93, &hookcreatentityfixhp);
 }

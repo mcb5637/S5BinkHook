@@ -1,5 +1,6 @@
 #pragma once
 #include "s5data.h"
+#include <map>
 
 
 #define shok_vtp_EGL_CGLEEntity (void*)0x783E74
@@ -309,9 +310,9 @@ public:
 struct shok_EGL_CGLEEntityCreator : shok_object {
 	int EntityType = 0;
 	shok_positionRot Pos = { 0,0,0 };
-	int Flags = 0;
+	int Flags = 0; // 5
 	int PlayerId = 0;
-	int Health = 0;
+	int Health = 0; // 7
 	char* ScriptName = nullptr;
 	char* ScriptCommandLine = nullptr;
 	int AmbientSoundType = 0;
@@ -355,4 +356,5 @@ void HookCamoActivate();
 extern int* HurtEntityDamagePointer;
 void HookHurtEntity();
 
+extern std::multimap<int, int> BuildingMaxHpBoni; // entitytype -> tech id
 void EnableMaxHealthTechBoni();

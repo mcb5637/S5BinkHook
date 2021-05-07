@@ -32,18 +32,10 @@ end
 )";
 
 int __cdecl test(lua_State* L) {
-    /*shok_EGL_CGLEEntity s = shok_EGL_CGLEEntity();
+    /*shok_GGL_CLogicProperties s = shok_GGL_CLogicProperties();
     int st = (int)&s;
-    int test = (int)&s.NumberOfAuras;
+    int test = (int)&s.OvertimeRechargeTimeInMs;
     lua_pushnumber(L, (test - st) / 4);*/
-    /*shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
-    c.EntityType = 274;
-    c.PlayerId = 1;
-    c.Pos = { 34000,42000, deg2rad(0) };
-    c.Scale = 1;
-    c.ResourceAmount = 10;
-    int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
-    lua_pushnumber(L, id);*/
     /*if (lua_gettop(L) == 0) {
         lua_pushnumber(L, (int)L);
         return 1;
@@ -51,11 +43,8 @@ int __cdecl test(lua_State* L) {
     if (lua_isnumber(L, 1)) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
-    }
-    shok_widgetManager* wm = shok_getWidgetManagerObj();
-    lua_pushnumber(L, (int) wm->GetWidgetByID(wm->GetIdByName(luaL_checkstring(L,1))));*/
-    lua_pushnumber(L, (int)(&(luaext_checkEntity(L, 1)->Health)));
-    return 1;
+    }*/
+    return 0;
 }
 
 int cleanup(lua_State* L) {

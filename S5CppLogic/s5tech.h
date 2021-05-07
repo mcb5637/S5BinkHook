@@ -19,10 +19,12 @@ struct shok_technologyRequirementECat {
 };
 struct shok_technologyModifier {
 	float Value;
-	PADDINGI(1)
-		char Operator;
-	PADDING(3)
-	PADDINGI(5) // no idea what this is
+	PADDINGI(1);
+	char Operator;
+	PADDING(3);
+	PADDINGI(5); // no idea what this is
+
+	float ModifyValue(float i);
 };
 struct shok_technology {
 	int TecCategoryType;

@@ -925,20 +925,7 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState_Researched)
 				continue;
 			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
-			switch (tech->HitpointModifier.Operator) {
-			case '+':
-				hp += tech->HitpointModifier.Value;
-				break;
-			case '-':
-				hp -= tech->HitpointModifier.Value;
-				break;
-			case '*':
-				hp *= tech->HitpointModifier.Value;
-				break;
-			case '/':
-				hp /= tech->HitpointModifier.Value;
-				break;
-			}
+			hp = tech->HitpointModifier.ModifyValue(hp);
 		}
 	}
 	else if (e->IsBuilding()) {
@@ -948,20 +935,7 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState_Researched)
 				continue;
 			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
-			switch (tech->HitpointModifier.Operator) {
-			case '+':
-				hp += tech->HitpointModifier.Value;
-				break;
-			case '-':
-				hp -= tech->HitpointModifier.Value;
-				break;
-			case '*':
-				hp *= tech->HitpointModifier.Value;
-				break;
-			case '/':
-				hp /= tech->HitpointModifier.Value;
-				break;
-			}
+			hp = tech->HitpointModifier.ModifyValue(hp);
 		}
 	}
 	return (int) hp;
@@ -986,7 +960,7 @@ void __fastcall createentityfixhp(shok_EGL_CGLEEntity* th, int hpIn) {
 	else if (th->IsBuilding()) {
 		th->Health = th->GetMaxHealth();
 		if (!((shok_GGL_CBuilding*)th)->IsConstructionFinished()) {
-			th->Health = (int)(th->Health * 0.25f); // TODO load from xml
+			th->Health = (int)(th->Health * (*shok_GGL_CLogicPropertiesObj)->ConstructionSiteHealthFactor);
 		}
 	}
 }

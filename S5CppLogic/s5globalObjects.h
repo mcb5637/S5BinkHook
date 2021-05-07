@@ -6,8 +6,8 @@ struct shok_EGL_CGLEEntitiesProps : shok_object {
 private:
 	int u[14];
 public:
-	vector_padding
-		std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes;
+	vector_padding;
+	std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes;
 
 	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
 };
@@ -45,7 +45,7 @@ struct shok_EGL_CTerrainVertexColors : shok_object {
 };
 #define shok_vtp_EGL_CGLETerrainHiRes (void*)0x7837B0
 struct shok_EGL_CGLETerrainHiRes : shok_object {
-	vector_padding
+	vector_padding;
 	std::vector<int16_t, shok_allocator<int16_t>> TerrainHeights;
 	int MaxSizeX, MaxSizeY; // 5
 	int ArraySizeX, ArraySizeY; // 7
@@ -59,7 +59,7 @@ struct shok_EGL_CGLETerrainHiRes : shok_object {
 struct shok_EGL_CGLETerrainLowRes : shok_object {
 	vector_padding
 	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
-	PADDINGI(4) // 1 vectors of int
+	PADDINGI(4); // 1 vectors of int
 	int MaxSizeX, MaxSizeY; // 9
 	int ArraySizeX, ArraySizeY; // 11
 
@@ -74,7 +74,7 @@ struct shok_EGL_CGLETerrainLowRes : shok_object {
 };
 #define shok_vtp_EGL_CGLELandscape (void*)0x783C38
 struct shok_EGL_CGLELandscape : shok_object {
-	PADDINGI(6)
+	PADDINGI(6);
 	shok_EGL_CGLETerrainHiRes* HiRes;
 	shok_EGL_CGLETerrainLowRes* LowRes;
 	shok_EGL_CTerrainVertexColors* VertexColors;
@@ -86,9 +86,9 @@ struct shok_EGL_CGLELandscape : shok_object {
 // game logic
 #define shok_vtp_EGL_CGLEGameLogic (void*)0x7839CC
 struct shok_EGL_CGLEGameLogic : shok_object {
-	PADDINGI(6)
+	PADDINGI(6);
 	int* InGameTime; // 7
-	PADDINGI(1)
+	PADDINGI(1);
 	shok_EGL_CGLELandscape* Landscape; // 9
 
 	int CreateEffect(shok_EGL_CGLEEffectCreator* data);
@@ -112,12 +112,12 @@ struct shok_EGL_CRegionInfo : shok_object {
 };
 #define shok_vtp_ED_CGlobalsLogicEx (void*)0x769F74
 struct shok_ED_CGlobalsLogicEx : shok_object {
-	PADDINGI(5)
+	PADDINGI(5);
 	struct {
 		int ArraySizeXY;
 		byte* data;
 	}* Blocking; // 6
-	PADDINGI(2)
+	PADDINGI(2);
 	shok_EGL_CRegionInfo* RegionInfo; // 9
 
 	void ToTerrainCoord(shok_position& p, int* out);
@@ -149,9 +149,9 @@ struct shok_GGL_CDamageClassProps : shok_object {
 	float BonusVsArmorClass[7];
 };
 struct shok_damageClassHolder {
-	PADDINGI(1)
-		vector_padding
-		std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
+	PADDINGI(1);
+	vector_padding;
+	std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
 };
 static inline shok_damageClassHolder** shok_DamageClassHolderObj = (shok_damageClassHolder**)0x85A3DC;
 
@@ -179,49 +179,78 @@ struct shok_GGL_CLogicProperties_STradeResource : shok_object {
 struct shok_GGL_CLogicProperties_SBlessCategory : shok_object {
 	int Name;
 	float RequiredFaith;
-	vector_padding
-		std::vector<int, shok_allocator<int>> EntityTypes;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> EntityTypes;
 };
 #define shok_vtp_GGL_CLogicProperties (void*)0x76EFCC
 struct shok_GGL_CLogicProperties : shok_object {
 	int CompensationOnBuildingSale;
-	vector_padding
+	vector_padding;
 	std::vector<shok_GGL_CLogicProperties_SBuildingUpgradeCategory, shok_allocator<shok_GGL_CLogicProperties_SBuildingUpgradeCategory>> BuildingUpgrades;
-	vector_padding
+	vector_padding;
 	std::vector<shok_GGL_CLogicProperties_SSettlerUpgradeCategory, shok_allocator<shok_GGL_CLogicProperties_SSettlerUpgradeCategory>> SettlerUpgrades;
-	vector_padding
+	vector_padding;
 	std::vector<shok_GGL_CLogicProperties_STaxationLevel, shok_allocator<shok_GGL_CLogicProperties_STaxationLevel>> TaxationLevels;
-	vector_padding
+	vector_padding;
 	std::vector<shok_GGL_CLogicProperties_STradeResource, shok_allocator<shok_GGL_CLogicProperties_STradeResource>> TradeResources;
-	vector_padding
-	std::vector<shok_GGL_CLogicProperties_SBlessCategory, shok_allocator<shok_GGL_CLogicProperties_SBlessCategory>> BlessCategories;
+	vector_padding;
+	std::vector<shok_GGL_CLogicProperties_SBlessCategory, shok_allocator<shok_GGL_CLogicProperties_SBlessCategory>> BlessCategories; // 18
 	float BuildingUnderConstructionExplorationFactor, BuildingPlacementSnapDistance, BuildingClosedHealthFactor, WeatherExplorationBuildingSnowFactor, WeatherExplorationSettlerSnowFactor;
 	float WeatherMoveSpeedSnowFactor, WeatherExplorationBuildingRainFactor, WeatherExplorationSettlerRainFactor, WeatherMoveSpeedRainFactor;
 	int WeatherMissChanceChangeRain, WeatherMissChanceChangeSnow;
 	float AttackMoveRange; // 33
-	PADDINGI(21)
-		float BlessingBonus; // 55
-	PADDINGI(3)
-		int ResourceDoodadWarnAmount; // 59
-	PADDINGI(9)
-		float MotivationThresholdHappy; // 69
+	int TaxAmount;
+	float TaxPenalty;
+	int InitialTaxLevel; // 36
+	shok_costInfo BlessingCost;
+	float BlessingBonus; // 55
+	PADDINGI(1);
+	int ForceToWorkPenalty;
+	PADDINGI(1);
+	int ResourceDoodadWarnAmount; // 59
+	int FeedbackHandlerUpdateFrequency;
+	int FeedbackHandlerTimeStaysInSystem;
+	float MilitaryLeaderAutoAttackRange;
+	float MilitaryBuildingAutoAttackRangeFactor;
+	float MilitaryCivilianAutoAttackRangeFactor;
+	float MilitaryDefendRange;
+	int MilitaryRecentlyAttackedTime;
+	int MilitaryMaxAttackersPerEntity;
+	float CivilianDefenseRadius;
+	float MotivationThresholdHappy; // 69
 	float MotivationThresholdSad, MotivationThresholdAngry, MotivationThresholdLeave, AverageMotivationVillageCenterLockThreshold;
-	int WorkTimeBase, WorkTimeThresholdWork; // la 75
-	PADDINGI(4)
-		float MotivationAbsoluteMaxMotivation;
-	PADDINGI(1)
-		int HeroResurrectionTime, HeroResurrectionSlippage;
-	PADDINGI(5)
-		int ExpelEffectID, DefenderMSPerShot; // fi 89
+	int WorkTimeBase, WorkTimeThresholdWork, WorkTimeThresholdFarm, WorkTimeThresholdResidence, WorkTimeThresholdCampFire;
+	float MotivationGameStartMaxMotivation;
+	float MotivationAbsoluteMaxMotivation; // 80
+	int MotivationMillisecondsWithoutJob;
+	int HeroResurrectionTime, HeroResurrectionSlippage;
+	float HeroResurrectionRadius, HeroResurrectionHealthFactor, HeroResurrectionActionPointFactor;
+	int HeroComatoseExploration;
+	int BattleSerfMaxSeconds;
+	int ExpelEffectID, DefenderMSPerShot; // fi 89
 	float DefenderMaxRange;
-	PADDINGI(1)
-		int DefenderProjectileDamage;
-	PADDINGI(1)
-		int DefenderMissChance; // 95
-	PADDINGI(3)
-		float EnergyRequiredForWeatherChange; // 99
-	PADDINGI(3)
-		float MaxFaith; // 103
+	int DefenderProjectileEffectType;
+	int DefenderProjectileDamage;
+	int DefenderProjectileDamageClass;
+	int DefenderMissChance; // 95
+	float WorkerFlightDistance;
+	int MaxExperiencePoints;
+	int BuildingRecentlyAttackedDuration;
+	float EnergyRequiredForWeatherChange; // 99
+	int DefaultDurationOfWeatherChange;
+	float EnergyDeductedFromOtherPlayers;
+	float ConstructionSiteHealthFactor;
+	float MaxFaith; // 103
+	float GuardMaxDistanceBuilding;
+	float GuardMoveDistanceBuilding;
+	float GuardMaxDistanceOther;
+	float GuardMoveDistanceOther;
+	float NPCInteractionDistance;
+	int WeatherTowerAnim;
+	int LeaderNudgeCount;
+	float LeaderApproachRange;
+	int AlarmRechargeTime;
+	int OvertimeRechargeTimeInMs; // 113
 };
 static inline shok_GGL_CLogicProperties** shok_GGL_CLogicPropertiesObj = (shok_GGL_CLogicProperties**)0x85A3E0;
 

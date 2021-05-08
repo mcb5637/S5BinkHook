@@ -331,3 +331,23 @@ void shok_BB_CFileSystemMgr::RemoveTopArchive()
 {
 	((shok_vtable_shok_BB_CFileSystemMgr*)vtable)->RemoveTop(this);
 }
+
+int shok_ED_CPlayerColors::GetColorByIndex(int i)
+{
+	// todo 16 player
+	if (i < 0 || i > 16)
+		return 0;
+	return Colors[i];
+}
+void shok_ED_CPlayerColors::SetColorByIndex(int i, int c)
+{
+	if (i < 0 || i > 16)
+		return;
+	Colors[i] = c;
+	(*shok_ED_CGlobalsBaseExObj)->DisplayProps->MiniMapColor.data()[i] = c;
+}
+static inline void(__thiscall* playercolors_refresh)(shok_ED_CPlayerColors* th) = (void(__thiscall*)(shok_ED_CPlayerColors*)) 0x4699B9;
+void shok_ED_CPlayerColors::RefreshPlayerColors()
+{
+	playercolors_refresh(this);
+}

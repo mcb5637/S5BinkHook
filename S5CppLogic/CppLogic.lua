@@ -202,6 +202,21 @@ function CppLogic.Logic.AddArchive(arch) end
 --- removes the top archive. may only remove .s5x map archives.
 function CppLogic.Logic.RemoveTopArchive() end
 
+--- color by color index.
+-- @param index
+-- @return r
+-- @return g
+-- @return b
+-- @return a
+function CppLogic.Logic.GetColorByColorIndex(index) end
+--- color by color index. Refreshes the color of players.
+-- @param index
+-- @param r
+-- @param g
+-- @param b
+-- @param a (optional, default 255)
+function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func

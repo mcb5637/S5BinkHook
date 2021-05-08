@@ -898,6 +898,28 @@ int l_logicLandscapeGetBlocking(lua_State* L) {
 	return 1;
 }
 
+int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
+	int i = luaL_checkint(L, 1);
+	int c = (*shok_ED_CGlobalsBaseExObj)->PlayerColors->GetColorByIndex(i);
+	lua_pushnumber(L, c & 0xFF);
+	lua_pushnumber(L, c >> 8 & 0xFF);
+	lua_pushnumber(L, c >> 16 & 0xFF);
+	lua_pushnumber(L, c >> 24 & 0xFF);
+	return 4;
+}
+int l_logicSetColor(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	int r = luaL_checkint(L, 2), g = luaL_checkint(L, 3), b = luaL_checkint(L, 4);
+	int a = luaL_optint(L, 5, 255);
+	int c = r & 0xFF;
+	c |= (g & 0xFF) << 8;
+	c |= (b & 0xFF) << 16;
+	c |= (a & 0xFF) << 24;
+	(*shok_ED_CGlobalsBaseExObj)->PlayerColors->SetColorByIndex(i, c);
+	(*shok_ED_CGlobalsBaseExObj)->PlayerColors->RefreshPlayerColors();
+	return 0;
+}
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 }
@@ -934,6 +956,8 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "LandscapeGetTerrainHeight", &l_logicLandscapeGetTerrainHeight);
 	luaext_registerFunc(L, "LandscapeGetTerrainVertexColor", &l_logicLandscapeGetTerrainVertexColor);
 	luaext_registerFunc(L, "LandscapeGetBlocking", &l_logicLandscapeGetBlocking);
+	luaext_registerFunc(L, "GetColorByColorIndex", &l_logicGetColor);
+	luaext_registerFunc(L, "SetColorByColorIndex", &l_logicSetColor);
 
 
 	lua_pushstring(L, "UICommands");
@@ -948,3 +972,5 @@ void l_logic_init(lua_State* L)
 // CppLogic.Logic.AddArchive("test.bba")
 // CppLogic.Logic.RemoveTopArchive()
 // CppLogic.Logic.EnableMaxHPTechMod() ResearchTechnology(Technologies.T_Fletching)
+// CppLogic.Logic.GetColorByColorIndex(1)
+// CppLogic.Logic.SetColorByColorIndex(1, 255, 255, 255, 255)

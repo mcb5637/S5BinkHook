@@ -120,6 +120,7 @@ public:
 	void assign(const char* s);
 	const char* c_str();
 	~shok_string();
+	shok_string() = default;
 };
 
 static_assert(sizeof(shok_string) == 7 * 4);

@@ -32,10 +32,10 @@ end
 )";
 
 int __cdecl test(lua_State* L) {
-    /*shok_GGL_CLogicProperties s = shok_GGL_CLogicProperties();
+    shok_ED_CGlobalsBaseEx s = shok_ED_CGlobalsBaseEx();
     int st = (int)&s;
-    int test = (int)&s.OvertimeRechargeTimeInMs;
-    lua_pushnumber(L, (test - st) / 4);*/
+    int test = (int)&s.DisplayProps;
+    lua_pushnumber(L, (test - st) / 4);
     /*if (lua_gettop(L) == 0) {
         lua_pushnumber(L, (int)L);
         return 1;
@@ -44,7 +44,7 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    return 0;
+    return 1;
 }
 
 int cleanup(lua_State* L) {

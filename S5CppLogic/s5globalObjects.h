@@ -336,7 +336,7 @@ struct shok_BB_CBBArchiveFile : shok_BB_IFileSystem {
 };
 #define shok_vtp_BB_CFileSystemMgr (void*)0x77F794
 struct shok_BB_CFileSystemMgr : shok_object {
-	vector_padding
+	vector_padding;
 	std::vector<shok_BB_IFileSystem*, shok_allocator<shok_BB_IFileSystem*>> LoadOrder;
 
 	void AddFolder(const char* path);
@@ -344,3 +344,44 @@ struct shok_BB_CFileSystemMgr : shok_object {
 	void RemoveTopArchive();
 };
 static inline shok_BB_CFileSystemMgr** shok_BB_CFileSystemMgrObj = (shok_BB_CFileSystemMgr**)0x88F088;
+
+#define shok_vtp_ED_CDisplayProps (void*)0x7AE630
+struct shok_ED_CDisplayProps : shok_object {
+	byte ShadowBlur;
+	PADDING(3);
+	int ShadowRasterSize;
+	float ShadowStrength;
+	int InvalidPositionColorModulate;
+	int InvalidPositionColorEmissive;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> PlayerColor;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> MiniMapColor;
+	float SelectionRadiusScaleForModelsWithDecal;
+	int FogOfWarNeverSeenLuminance;
+	int FogOfWarSeenLuminance;
+	float AuraRadius;
+	float AuraHeight;
+	shok_string AuraTexture;
+	int CommandAcknowledgementModel;
+	int CommandAcknowledgementDuration;
+};
+
+#define shok_vtp_ED_CPlayerColors (void*)0x76964C
+struct shok_ED_CPlayerColors : shok_object {
+
+	PADDINGI(63);
+	int Colors[17]; // 8 player
+
+	int GetColorByIndex(int i);
+	void SetColorByIndex(int i, int c);
+	void RefreshPlayerColors();
+};
+#define shok_vtp_ED_CGlobalsBaseEx (void*)0x769478
+struct shok_ED_CGlobalsBaseEx : shok_object {
+	PADDINGI(4);
+	shok_ED_CDisplayProps* DisplayProps;
+	PADDINGI(16);
+	shok_ED_CPlayerColors* PlayerColors;
+};
+static inline shok_ED_CGlobalsBaseEx** shok_ED_CGlobalsBaseExObj = (shok_ED_CGlobalsBaseEx**)0x857E8C;

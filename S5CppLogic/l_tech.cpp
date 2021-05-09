@@ -95,6 +95,20 @@ int l_techGetSpeed(lua_State* L) {
 	return 2;
 }
 
+int l_techAddConstructionSpeedMod(lua_State* L) {
+	EnableConstructionSpeedTechs();
+	int tid = luaL_checkint(L, 1);
+	shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(tid);
+	luaext_assertPointer(L, tech, "no tech at 1");
+	char op = luaL_checkstring(L, 3)[0];
+	ConstructionSpeedModifiers.push_back({ tid, luaL_checkfloat(L,2), op });
+	return 0;
+}
+
+void l_tech_cleanup(lua_State* L) {
+	ConstructionSpeedModifiers.clear();
+}
+
 void l_tech_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetResearchInfo", l_techGetResearchInfo);
@@ -105,4 +119,7 @@ void l_tech_init(lua_State* L)
 	luaext_registerFunc(L, "GetDamageModifier", l_techGetDamage);
 	luaext_registerFunc(L, "GetRangeModifier", l_techGetRange);
 	luaext_registerFunc(L, "GetSpeedModifier", l_techGetSpeed);
+	luaext_registerFunc(L, "TechAddConstructionSpeedModifier", l_techAddConstructionSpeedMod);
 }
+
+// CppLogic.Technology.TechAddConstructionSpeedModifier(Technologies.T_ScoutFindResources, 0.01, "*")

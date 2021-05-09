@@ -57,3 +57,14 @@ struct shok_technology {
 	shok_technologyModifier GroupLimitModifier; // 120
 	byte UseForStatisticsFlag; // 128
 };
+
+struct additionalTechModifier {
+	int TechID;
+	float Value;
+	char Operator;
+
+	float ModifyValue(float i);
+};
+
+extern std::vector<additionalTechModifier> ConstructionSpeedModifiers;
+void EnableConstructionSpeedTechs();

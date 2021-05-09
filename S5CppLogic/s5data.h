@@ -47,10 +47,10 @@ typedef uint8_t byte;
 // 0x4BDED8 ui settler overhead hp bar maxhp jmp
 
 // allocator
-static inline void* (__cdecl* shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
-static inline void* (__cdecl* shok_new)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C04FB;
-static inline void(__cdecl* shok_free)(void* p) = (void(__cdecl*)(void* p)) 0x5C2E2D;
-static inline void (*shok_logString)(const char* format, ...) = (void (*)(const char* format, ...)) 0x548268;
+static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
+static inline void* (__cdecl* const shok_new)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C04FB;
+static inline void(__cdecl* const shok_free)(void* p) = (void(__cdecl*)(void* p)) 0x5C2E2D;
+static inline void (*const shok_logString)(const char* format, ...) = (void (*)(const char* format, ...)) 0x548268;
 
 template <class T>
 struct shok_allocator {
@@ -81,7 +81,7 @@ struct shok_treeNode {
 };
 template <class T>
 struct shok_set {
-	PADDINGI(1)
+	PADDINGI(1);
 	shok_treeNode<T>* root;
 	int size;
 
@@ -120,7 +120,7 @@ public:
 	void assign(const char* s);
 	const char* c_str();
 	~shok_string();
-	shok_string() = default;
+	shok_string();
 };
 
 static_assert(sizeof(shok_string) == 7 * 4);
@@ -238,12 +238,12 @@ bool contains(T* data, T search, int num) {
 // v5 size
 
 
-static inline void(_stdcall* shok_SetHighPrecFPU)() = (void(_stdcall*)()) 0x5C8451;
+static inline void(_stdcall* const shok_SetHighPrecFPU)() = (void(_stdcall*)()) 0x5C8451;
 
-static inline int(__stdcall* shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = (int(__stdcall*)(lua_State*, const char*, size_t, const char*)) 0x59BE57;
+static inline int(__stdcall* const shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = (int(__stdcall*)(lua_State*, const char*, size_t, const char*)) 0x59BE57;
 
 
-static inline lua_State** shok_luastate_game = (lua_State**)0x853A9C;
+static inline lua_State** const shok_luastate_game = (lua_State**)0x853A9C;
 
 
 const char* ReadFileToString(const char* name, size_t* size);
@@ -256,9 +256,9 @@ bool HasSCELoader();
 
 template<class T>
 constexpr inline T rad2deg(T r) {
-	return r * 180 / M_PI;
+	return (T) r * 180 / M_PI;
 }
 template<class T>
 constexpr inline T deg2rad(T d) {
-	return d * M_PI / 180;
+	return (T) d * M_PI / 180;
 }

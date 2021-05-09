@@ -5,12 +5,12 @@
 #include <libloaderapi.h>
 
 
-static inline void(__thiscall* str_ctor)(shok_string* th, const char* s) = (void(__thiscall*)(shok_string*, const char*))0x4018C6;
+static inline void(__thiscall* const str_ctor)(shok_string* th, const char* s) = (void(__thiscall*)(shok_string*, const char*))0x4018C6;
 shok_string::shok_string(const char* s)
 {
 	str_ctor(this, s);
 }
-static inline void(__thiscall* str_ctorcopy)(shok_string* th, const shok_string* ot) = (void(__thiscall*)(shok_string*, const shok_string*))0x401808;
+static inline void(__thiscall* const str_ctorcopy)(shok_string* th, const shok_string* ot) = (void(__thiscall*)(shok_string*, const shok_string*))0x401808;
 shok_string::shok_string(const shok_string& c)
 {
 	str_ctorcopy(this, &c);
@@ -27,10 +27,14 @@ shok_string::~shok_string()
 	if (size >= 16)
 		shok_free((void*)data);
 }
-static inline void(__thiscall* str_assign)(shok_string* th, const char* c) = (void(__thiscall*)(shok_string*, const char*)) 0x40182E;
+static inline void(__thiscall* const str_assign)(shok_string* th, const char* c) = (void(__thiscall*)(shok_string*, const char*)) 0x40182E;
 void shok_string::assign(const char* s)
 {
 	str_assign(this, s);
+}
+shok_string::shok_string() : shok_string("")
+{
+
 }
 
 void shok_position::FloorToBuildingPlacement()
@@ -95,11 +99,11 @@ struct shok_BB_CFileStreamEx {
 	int vtable = 0x761C60;
 	int x = 0;
 };
-static inline bool(__thiscall* shok_BB_CFileStreamEx_OpenFile)(shok_BB_CFileStreamEx* th, const char* name, int unk) = (bool(__thiscall*)(shok_BB_CFileStreamEx*, const char*, int)) 0x54924D;
-static inline size_t(__stdcall* shok_BB_CFileStreamEx_GetSize)(shok_BB_CFileStreamEx* th) = (size_t(__stdcall*)(shok_BB_CFileStreamEx*)) 0x549140;
-static inline int(__stdcall* shok_BB_CFileStreamEx_ReadToBuffer)(shok_BB_CFileStreamEx* th, void* buff, size_t buffsiz) = (int(__stdcall*)(shok_BB_CFileStreamEx*, void*, size_t)) 0x5491A8;
-static inline void(__thiscall* shok_BB_CFileStreamEx_Close)(shok_BB_CFileStreamEx* th) = (void(__thiscall*)(shok_BB_CFileStreamEx*))0x54920A;
-static inline int(__thiscall* shok_BB_CFileStreamEx_dtor)(shok_BB_CFileStreamEx* th) = (int(__thiscall*)(shok_BB_CFileStreamEx*))0x549215;
+static inline bool(__thiscall* const shok_BB_CFileStreamEx_OpenFile)(shok_BB_CFileStreamEx* th, const char* name, int unk) = (bool(__thiscall*)(shok_BB_CFileStreamEx*, const char*, int)) 0x54924D;
+static inline size_t(__stdcall* const shok_BB_CFileStreamEx_GetSize)(shok_BB_CFileStreamEx* th) = (size_t(__stdcall*)(shok_BB_CFileStreamEx*)) 0x549140;
+static inline int(__stdcall* const shok_BB_CFileStreamEx_ReadToBuffer)(shok_BB_CFileStreamEx* th, void* buff, size_t buffsiz) = (int(__stdcall*)(shok_BB_CFileStreamEx*, void*, size_t)) 0x5491A8;
+static inline void(__thiscall* const shok_BB_CFileStreamEx_Close)(shok_BB_CFileStreamEx* th) = (void(__thiscall*)(shok_BB_CFileStreamEx*))0x54920A;
+static inline int(__thiscall* const shok_BB_CFileStreamEx_dtor)(shok_BB_CFileStreamEx* th) = (int(__thiscall*)(shok_BB_CFileStreamEx*))0x549215;
 
 const char* ReadFileToString(const char* name, size_t* size)
 {
@@ -182,25 +186,25 @@ shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
 	return r;
 }
 
-static inline float(__thiscall* costinfo_getres)(shok_costInfo* th, int ty, bool addRaw) = (float(__thiscall*)(shok_costInfo*, int, bool))0x4A9606;
+static inline float(__thiscall* const costinfo_getres)(shok_costInfo* th, int ty, bool addRaw) = (float(__thiscall*)(shok_costInfo*, int, bool))0x4A9606;
 float shok_costInfo::GetResourceAmountFromType(int ty, bool addRaw)
 {
 	return costinfo_getres(this, ty, addRaw);
 }
 
-static inline void(__thiscall* costinfo_add)(shok_costInfo* th, int ty, float a) = (void(__thiscall*)(shok_costInfo*, int, float))0x4A9774;
+static inline void(__thiscall* const costinfo_add)(shok_costInfo* th, int ty, float a) = (void(__thiscall*)(shok_costInfo*, int, float))0x4A9774;
 void shok_costInfo::AddToType(int ty, float toadd)
 {
 	costinfo_add(this, ty, toadd);
 }
 
-static inline void(__thiscall* costinfo_sub)(shok_costInfo* th, int ty, float a, float b) = (void(__thiscall*)(shok_costInfo*, int, float, float))0x4A963D;
+static inline void(__thiscall* const costinfo_sub)(shok_costInfo* th, int ty, float a, float b) = (void(__thiscall*)(shok_costInfo*, int, float, float))0x4A963D;
 void shok_costInfo::SubFromType(int ty, float tosub)
 {
 	costinfo_sub(this, ty, tosub, 0.0f);
 }
 
-static inline bool(__thiscall* constinfo_hasres)(shok_costInfo* th, shok_costInfo* has) = (bool(__thiscall*)(shok_costInfo*, shok_costInfo*))0x4A96D3;
+static inline bool(__thiscall* const constinfo_hasres)(shok_costInfo* th, shok_costInfo* has) = (bool(__thiscall*)(shok_costInfo*, shok_costInfo*))0x4A96D3;
 bool shok_costInfo::HasResources(shok_costInfo* has)
 {
 	return constinfo_hasres(this, has);

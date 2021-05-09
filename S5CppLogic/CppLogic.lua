@@ -14,6 +14,8 @@ CppLogic.Entity.Leader = {}
 CppLogic.Entity.Building = {}
 CppLogic.EntityType = {}
 CppLogic.EntityType.Settler = {}
+CppLogic.EntityType.Building = {}
+CppLogic.Technology = {}
 CppLogic.Logic = {}
 CppLogic.Logic.UICommands = {}
 CppLogic.UI = {}
@@ -1266,6 +1268,13 @@ function CppLogic.Technology.GetRangeModifier(tid) end
 -- @return operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
 -- @return value
 function CppLogic.Technology.GetSpeedModifier(tid) end
+
+--- adds a construction time modifier to a technology.
+-- default modifier is 1.0, smaller modifiers lead to faster construction.
+-- @param tech tech
+-- @param value modification value
+-- @param op string operation to perform, accepted is "+" "-" "*" "/"
+function CppLogic.Technology.TechAddConstructionSpeedModifier(tech, value, op) end
 
 --- gets a widgets position and size.
 -- @param wid widget

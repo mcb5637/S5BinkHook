@@ -202,7 +202,7 @@ struct shok_widgetManager { // this thing has no vtable...
 	int GetIdByName(const char* name);
 	shok_EGUIX_CBaseWidget* GetWidgetByID(int id);
 };
-static inline shok_widgetManager* (*shok_getWidgetManagerObj)() = (shok_widgetManager * (*)())0x558473;
+static inline shok_widgetManager* (*const shok_getWidgetManagerObj)() = (shok_widgetManager * (*)())0x558473;
 
 struct shok_font {
 	PADDINGI(1);
@@ -214,4 +214,4 @@ struct shok_fontManager { // no vtable either
 	static void LoadFont(int* outFontID, const char* fontName);
 	shok_font* GetFontObj(int id);
 };
-static inline shok_fontManager* (*shok_getFontMangerObj)() = (shok_fontManager * (*)())0x5593AD;
+static inline shok_fontManager* (*const shok_getFontMangerObj)() = (shok_fontManager * (*)())0x5593AD;

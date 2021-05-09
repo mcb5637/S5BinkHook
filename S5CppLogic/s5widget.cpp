@@ -13,13 +13,13 @@ struct shok_vtable_EGUIX_CContainerWidget {
 };
 
 
-static inline int(__thiscall* widman_getidbyname)(shok_widgetManager* th, const char* n) = (int(__thiscall*)(shok_widgetManager*, const char*))0x5588A0;
+static inline int(__thiscall* const widman_getidbyname)(shok_widgetManager* th, const char* n) = (int(__thiscall*)(shok_widgetManager*, const char*))0x5588A0;
 int shok_widgetManager::GetIdByName(const char* name)
 {
     return widman_getidbyname(this, name);
 }
 
-static inline shok_EGUIX_CBaseWidget* (__thiscall* widman_getwid)(shok_widgetManager* th, int id) = (shok_EGUIX_CBaseWidget * (__thiscall*)(shok_widgetManager*, int))0x558966;
+static inline shok_EGUIX_CBaseWidget* (__thiscall* const widman_getwid)(shok_widgetManager* th, int id) = (shok_EGUIX_CBaseWidget * (__thiscall*)(shok_widgetManager*, int))0x558966;
 shok_EGUIX_CBaseWidget* shok_widgetManager::GetWidgetByID(int id)
 {
     return widman_getwid(this, id);
@@ -35,7 +35,7 @@ int shok_EGUIX_CBaseWidget::SetPosAndSize(float x, float y, float w, float h)
     return ((shok_vtable_EGUIX_CBaseWidget*)vtable)->SetSizeAndPos(this, x, y, w, h);
 }
 
-static inline void(__thiscall* funchelper_call)(shok_EGUIX_CLuaFunctionHelper* th, int widgetID) = (void(__thiscall*)(shok_EGUIX_CLuaFunctionHelper*, int))0x55BDDE;
+static inline void(__thiscall* const funchelper_call)(shok_EGUIX_CLuaFunctionHelper* th, int widgetID) = (void(__thiscall*)(shok_EGUIX_CLuaFunctionHelper*, int))0x55BDDE;
 void shok_EGUIX_CLuaFunctionHelper::Call(int widgetID)
 {
     funchelper_call(this, widgetID);
@@ -105,8 +105,8 @@ shok_EGUIX_CWidgetStringHelper* shok_EGUIX_CBaseWidget::GetStringHelper()
     return nullptr;
 }
 
-static inline int(__thiscall* widman_registerName)(shok_widgetManager* th, const char* name) = (int(__thiscall*)(shok_widgetManager*, const char*))0x55884F;
-static inline void(__thiscall* widman_addWidget)(shok_widgetManager* th, shok_EGUIX_CBaseWidget* a, int id) = (void(__thiscall*)(shok_widgetManager*, shok_EGUIX_CBaseWidget*, int))0x558AA2;
+static inline int(__thiscall* const widman_registerName)(shok_widgetManager* th, const char* name) = (int(__thiscall*)(shok_widgetManager*, const char*))0x55884F;
+static inline void(__thiscall* const widman_addWidget)(shok_widgetManager* th, shok_EGUIX_CBaseWidget* a, int id) = (void(__thiscall*)(shok_widgetManager*, shok_EGUIX_CBaseWidget*, int))0x558AA2;
 void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name, const shok_EGUIX_CBaseWidget* before)
 {
     shok_widgetManager* m = shok_getWidgetManagerObj();
@@ -164,7 +164,7 @@ void initButtonHelper(shok_EGUIX_CButtonHelper& h) {
     initSingleSting(h.ShortCutString);
     initLuaFunc(h.ActionFunction);
 }
-static inline void(__thiscall* widlisthandler_ctor)(shok_EGUIX_CWidgetListHandler* th) = (void(__thiscall*)(shok_EGUIX_CWidgetListHandler*))0x55BB26;
+static inline void(__thiscall* const widlisthandler_ctor)(shok_EGUIX_CWidgetListHandler* th) = (void(__thiscall*)(shok_EGUIX_CWidgetListHandler*))0x55BB26;
 void initWidgetListHandler(shok_EGUIX_CWidgetListHandler& h) {
     widlisthandler_ctor(&h);
 }
@@ -266,12 +266,12 @@ shok_EGUIX_CContainerWidget* shok_EGUIX_CContainerWidget::Create()
     return r;
 }
 
-static inline void(__stdcall* loadfont)(int* out, const char* name) = (void(__stdcall*)(int*, const char*))0x55D99E;
+static inline void(__stdcall* const loadfont)(int* out, const char* name) = (void(__stdcall*)(int*, const char*))0x55D99E;
 void shok_fontManager::LoadFont(int* outFontID, const char* fontName)
 {
     loadfont(outFontID, fontName);
 }
-static inline shok_font* (__thiscall* fontmng_getfont)(shok_fontManager* th, int id) = (shok_font * (__thiscall*)(shok_fontManager*, int)) 0x5597C7;
+static inline shok_font* (__thiscall* const fontmng_getfont)(shok_fontManager* th, int id) = (shok_font * (__thiscall*)(shok_fontManager*, int)) 0x5597C7;
 shok_font* shok_fontManager::GetFontObj(int id)
 {
     return fontmng_getfont(this, id);

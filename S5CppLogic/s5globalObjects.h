@@ -11,13 +11,13 @@ public:
 
 	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
 };
-static inline shok_EGL_CGLEEntitiesProps** shok_EGL_CGLEEntitiesPropsObj = (shok_EGL_CGLEEntitiesProps**)0x895DB0;
+static inline shok_EGL_CGLEEntitiesProps** const shok_EGL_CGLEEntitiesPropsObj = (shok_EGL_CGLEEntitiesProps**)0x895DB0;
 
 // c manager
 struct shok_ECS_CManager : shok_object {
 	void ReloadCutscene(const char* path);
 };
-static inline shok_ECS_CManager*** shok_ECS_CManagerObject = (shok_ECS_CManager***)0x0A0344C;
+static inline shok_ECS_CManager*** const shok_ECS_CManagerObject = (shok_ECS_CManager***)0x0A0344C;
 
 
 // effect manager
@@ -25,12 +25,12 @@ struct shok_EGL_CGLEEffectManager : shok_object {
 	bool IsEffectValid(int id);
 	shok_EGL_CEffect* GetEffectById(int id);
 };
-static inline shok_EGL_CGLEEffectManager** shok_EGL_CGLEEffectManagerObject = (shok_EGL_CGLEEffectManager**)0x898144;
+static inline shok_EGL_CGLEEffectManager** const shok_EGL_CGLEEffectManagerObject = (shok_EGL_CGLEEffectManager**)0x898144;
 
 struct shok_BB_CIDManagerEx : shok_object {
 	int GetAnimIdByName(const char* name);
 };
-static inline shok_BB_CIDManagerEx** shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
+static inline shok_BB_CIDManagerEx** const shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 
 
 #define shok_vtp_EGL_CTerrainVertexColors (void*)0x7841F8
@@ -98,13 +98,13 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 
 	void HookCreateEffect();
 };
-static inline shok_EGL_CGLEGameLogic** shok_EGL_CGLEGameLogicObject = (shok_EGL_CGLEGameLogic**)0x895DAC;
+static inline shok_EGL_CGLEGameLogic** const shok_EGL_CGLEGameLogicObject = (shok_EGL_CGLEGameLogic**)0x895DAC;
 extern void(*CreateEffectHookCallback)(int id, void* ret);
 constexpr int CreatEffectReturnBattleBehaviorAttack = 0x50C4B5;
 constexpr int CreatEffectReturnAutoCannonBehaviorAttack = 0x5107a8;
 constexpr int CreatEffectReturnCannonBallOnHit = 0x4ff55e;
 
-static inline int* shok_mapsize = (int*)0x898B74;
+static inline int* const shok_mapsize = (int*)0x898B74;
 
 #define shok_vtp_EGL_CRegionInfo (void*)0x783878
 struct shok_EGL_CRegionInfo : shok_object {
@@ -124,7 +124,7 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 	bool IsCoordValid(int* out);
 	int GetBlocking(shok_position& p);
 };
-static inline shok_ED_CGlobalsLogicEx** shok_ED_CGlobalsLogicExObj = (shok_ED_CGlobalsLogicEx**)0x8581EC;
+static inline shok_ED_CGlobalsLogicEx** const shok_ED_CGlobalsLogicExObj = (shok_ED_CGlobalsLogicEx**)0x8581EC;
 
 // entity manager
 struct shok_EGL_CGLEEntityManager : shok_object {
@@ -142,7 +142,7 @@ private:
 public:
 	shok_EGL_CGLEEntity* GetEntityByNum(int num);
 };
-static inline shok_EGL_CGLEEntityManager** shok_EGL_CGLEEntityManagerObj = (shok_EGL_CGLEEntityManager**)0x897558;
+static inline shok_EGL_CGLEEntityManager** const shok_EGL_CGLEEntityManagerObj = (shok_EGL_CGLEEntityManager**)0x897558;
 
 #define shok_vtp_GGL_CDamageClassProps (void*)0x788978
 struct shok_GGL_CDamageClassProps : shok_object {
@@ -153,7 +153,7 @@ struct shok_damageClassHolder {
 	vector_padding;
 	std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
 };
-static inline shok_damageClassHolder** shok_DamageClassHolderObj = (shok_damageClassHolder**)0x85A3DC;
+static inline shok_damageClassHolder** const shok_DamageClassHolderObj = (shok_damageClassHolder**)0x85A3DC;
 
 
 #define shok_vtp_GGL_CLogicProperties_SBuildingUpgradeCategory (void*)0x76EF10
@@ -252,13 +252,13 @@ struct shok_GGL_CLogicProperties : shok_object {
 	int AlarmRechargeTime;
 	int OvertimeRechargeTimeInMs; // 113
 };
-static inline shok_GGL_CLogicProperties** shok_GGL_CLogicPropertiesObj = (shok_GGL_CLogicProperties**)0x85A3E0;
+static inline shok_GGL_CLogicProperties** const shok_GGL_CLogicPropertiesObj = (shok_GGL_CLogicProperties**)0x85A3E0;
 
 struct shok_GGL_CPlayerAttractionProps : shok_object {
 	int AttractionFrequency, PaydayFrequency, EntityTypeBanTime, ReAttachWorkerFrequency, PlayerMoneyDispo;
 	float MaximumDistanceWorkerToFarm, MaximumDistanceWorkerToResidence;
 };
-static inline shok_GGL_CPlayerAttractionProps** shok_GGL_CPlayerAttractionPropsObj = (shok_GGL_CPlayerAttractionProps**)0x866A80;
+static inline shok_GGL_CPlayerAttractionProps** const shok_GGL_CPlayerAttractionPropsObj = (shok_GGL_CPlayerAttractionProps**)0x866A80;
 
 struct shok_BB_IPostEvent : shok_object {
 
@@ -272,7 +272,7 @@ private:
 public:
 	void HackPostEvent();
 };
-static inline shok_GGUI_CManager* (*shok_GetGuiManager)() = (shok_GGUI_CManager * (*)()) 0x525622;
+static inline shok_GGUI_CManager* (__cdecl* const shok_GetGuiManager)() = (shok_GGUI_CManager * (__cdecl*)()) 0x525622;
 extern bool(*PostEventCallback)(shok_BB_CEvent* ev);
 
 struct shok_GGL_CGLGameLogic_TechList {
@@ -309,7 +309,7 @@ public:
 	void PlayerActivateWeathermachine(int player, int weathertype);
 	void PlayerBlessSettlers(int player, int blessCat);
 };
-static inline shok_GGL_CGLGameLogic** shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
+static inline shok_GGL_CGLGameLogic** const shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
 
 
 #define shok_vtp_EScr_CScriptTriggerSystem (void*)0x78667C
@@ -320,7 +320,7 @@ private:
 public:
 	void RunTrigger(shok_BB_CEvent* ev);
 };
-static inline shok_EScr_CScriptTriggerSystem** shok_EScr_CScriptTriggerSystemObj = (shok_EScr_CScriptTriggerSystem**)0x895DEC;
+static inline shok_EScr_CScriptTriggerSystem** const shok_EScr_CScriptTriggerSystemObj = (shok_EScr_CScriptTriggerSystem**)0x895DEC;
 
 struct shok_BB_IFileSystem : shok_object {
 
@@ -343,7 +343,7 @@ struct shok_BB_CFileSystemMgr : shok_object {
 	void AddArchive(const char* path);
 	void RemoveTopArchive();
 };
-static inline shok_BB_CFileSystemMgr** shok_BB_CFileSystemMgrObj = (shok_BB_CFileSystemMgr**)0x88F088;
+static inline shok_BB_CFileSystemMgr** const shok_BB_CFileSystemMgrObj = (shok_BB_CFileSystemMgr**)0x88F088;
 
 #define shok_vtp_ED_CDisplayProps (void*)0x7AE630
 struct shok_ED_CDisplayProps : shok_object {
@@ -384,4 +384,4 @@ struct shok_ED_CGlobalsBaseEx : shok_object {
 	PADDINGI(16);
 	shok_ED_CPlayerColors* PlayerColors;
 };
-static inline shok_ED_CGlobalsBaseEx** shok_ED_CGlobalsBaseExObj = (shok_ED_CGlobalsBaseEx**)0x857E8C;
+static inline shok_ED_CGlobalsBaseEx** const shok_ED_CGlobalsBaseExObj = (shok_ED_CGlobalsBaseEx**)0x857E8C;

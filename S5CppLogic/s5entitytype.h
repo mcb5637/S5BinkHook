@@ -191,3 +191,5 @@ public:
 	bool IsOfCategory(int cat);
 };
 
+int* const shok_entityTypeIDSerf = (int*)0x863830;
+

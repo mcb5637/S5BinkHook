@@ -2,7 +2,7 @@
 #include "s5data.h"
 
 
-static inline void(__thiscall* shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = (void(__thiscall*)(shok_EGL_CGLEEntityCreator*))0x4493A4;
+static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = (void(__thiscall*)(shok_EGL_CGLEEntityCreator*))0x4493A4;
 shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator(bool _)
 {
 	shok_EGL_CGLEEntityCreator_ctor(this);
@@ -16,13 +16,13 @@ shok_GGL_CGLConstructionSiteCreator::shok_GGL_CGLConstructionSiteCreator()
 {
 
 }
-static inline void(__thiscall* shok_GGL_CResourceDoodadCreator_ctor)(shok_GGL_CResourceDoodadCreator* th) = (void(__thiscall*)(shok_GGL_CResourceDoodadCreator*)) 0x4DD7E2;
+static inline void(__thiscall* const shok_GGL_CResourceDoodadCreator_ctor)(shok_GGL_CResourceDoodadCreator* th) = (void(__thiscall*)(shok_GGL_CResourceDoodadCreator*)) 0x4DD7E2;
 shok_GGL_CResourceDoodadCreator::shok_GGL_CResourceDoodadCreator()
 {
 	shok_GGL_CResourceDoodadCreator_ctor(this);
 }
 
-static inline void(__thiscall* shok_EGL_CGLEEntityCreator_dtor)(shok_EGL_CGLEEntityCreator* th) = (void(__thiscall*)(shok_EGL_CGLEEntityCreator*))0x449E23;
+static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_dtor)(shok_EGL_CGLEEntityCreator* th) = (void(__thiscall*)(shok_EGL_CGLEEntityCreator*))0x449E23;
 shok_EGL_CGLEEntityCreator::~shok_EGL_CGLEEntityCreator()
 {
 	shok_EGL_CGLEEntityCreator_dtor(this);
@@ -195,7 +195,7 @@ shok_GGL_CSerfBehavior* shok_EGL_CGLEEntity::GetSerfBehavior()
 	return (shok_GGL_CSerfBehavior*)SearchBehavior(shok_vtp_GGL_CSerfBehavior);
 }
 
-static inline bool(__thiscall* shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, int cat)) 0x57BBEB;
+static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, int cat)) 0x57BBEB;
 bool shok_EGL_CGLEEntity::IsEntityInCategory(int cat)
 {
 	return shok_IsEntityInCategory(this, cat);
@@ -207,19 +207,19 @@ bool shok_EGL_CGLEEntity::IsMovingEntity()
 	return contains(data, vtable, 4);
 }
 
-static inline int(_cdecl* shok_EntityIsSettler)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4A2B62;
+static inline int(_cdecl* const shok_EntityIsSettler)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4A2B62;
 bool shok_EGL_CGLEEntity::IsSettler()
 {
 	return shok_EntityIsSettler(this);
 }
 
-static inline int(_cdecl* shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x449432;
+static inline int(_cdecl* const shok_EntityIsBuilding)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x449432;
 bool shok_EGL_CGLEEntity::IsBuilding()
 {
 	return shok_EntityIsBuilding(this);
 }
 
-static inline int(_cdecl* shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4B82C7;
+static inline int(_cdecl* const shok_EntityIsResourceDoodad)(shok_EGL_CGLEEntity* e) = (int(_cdecl*)(shok_EGL_CGLEEntity * e)) 0x4B82C7;
 bool shok_EGL_CGLEEntity::IsResourceDoodad()
 {
 	return shok_EntityIsResourceDoodad(this);
@@ -270,7 +270,7 @@ float shok_EGL_CGLEEntity::GetExploration()
 	return vt->GetExploration(this);
 }
 
-static inline int(__thiscall* entitygetmaxhealth)(shok_EGL_CGLEEntity* th) = (int(__thiscall*)(shok_EGL_CGLEEntity*)) 0x57B798;
+static inline int(__thiscall* const entitygetmaxhealth)(shok_EGL_CGLEEntity* th) = (int(__thiscall*)(shok_EGL_CGLEEntity*)) 0x57B798;
 int shok_EGL_CGLEEntity::GetMaxHealth()
 {
 	return entitygetmaxhealth(this);
@@ -326,7 +326,7 @@ int shok_GGL_CBuilding::GetConstructionSite()
 	return 0;
 }
 
-static inline int(__thiscall* shok_build_getnearestfreeslot)(shok_EGL_CGLEEntity* th, shok_position* p) = (int(__thiscall*) (shok_EGL_CGLEEntity*, shok_position*)) 0x4AB02D;
+static inline int(__thiscall* const shok_build_getnearestfreeslot)(shok_EGL_CGLEEntity* th, shok_position* p) = (int(__thiscall*) (shok_EGL_CGLEEntity*, shok_position*)) 0x4AB02D;
 int shok_GGL_CBuilding::GetNearestFreeConstructionSlotFor(shok_position* p)
 {
 	int cid = GetConstructionSite();
@@ -475,7 +475,7 @@ void shok_EGL_CMovingEntity::LeaderAttachSoldier(int soldierId)
 	((shok_vtable_EGL_CGLEEntity*)sol->vtable)->FireEvent(sol, &e2);
 }
 
-static inline void(__thiscall* shok_entity_expellSettler)(shok_EGL_CGLEEntity* th, int i) = (void(__thiscall*)(shok_EGL_CGLEEntity*, int))0x4A39BB;
+static inline void(__thiscall* const shok_entity_expellSettler)(shok_EGL_CGLEEntity* th, int i) = (void(__thiscall*)(shok_EGL_CGLEEntity*, int))0x4A39BB;
 void shok_EGL_CMovingEntity::SettlerExpell()
 {
 	if (GetLeaderBehavior() && ObservedEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_LEADER_SOLDIER; })) {
@@ -683,20 +683,20 @@ void shok_EGL_CMovingEntity::BattleSerfTurnToSerf()
 	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
 }
 
-void(__thiscall* movingentity_setpos)(shok_EGL_CMovingEntity* th, shok_position* p) = (void(__thiscall*)(shok_EGL_CMovingEntity*, shok_position*))0x57BC78;
+void(__thiscall* const movingentity_setpos)(shok_EGL_CMovingEntity* th, shok_position* p) = (void(__thiscall*)(shok_EGL_CMovingEntity*, shok_position*))0x57BC78;
 void shok_EGL_CMovingEntity::SetPosition(shok_position& p)
 {
 	movingentity_setpos(this, &p);
 	Move(p);
 }
 
-static inline void(__thiscall* building_startUpgrade)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AF1B5;
+static inline void(__thiscall* const building_startUpgrade)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AF1B5;
 void shok_GGL_CBuilding::StartUpgrade()
 {
 	building_startUpgrade(this);
 }
 
-static inline void(__thiscall* buildingCancelUpgrade)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*))0x4AF228;
+static inline void(__thiscall* const buildingCancelUpgrade)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*))0x4AF228;
 void shok_GGL_CBuilding::CancelUpgrade()
 {
 	buildingCancelUpgrade(this);
@@ -718,12 +718,12 @@ void shok_GGL_CBuilding::CommandRecruitSoldierForLeader(int id)
 	((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &ev);
 }
 
-static inline void(__thiscall* shok_buildingActivateOvertime)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AE566;
+static inline void(__thiscall* const shok_buildingActivateOvertime)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AE566;
 void shok_GGL_CBuilding::ActivateOvertime()
 {
 	shok_buildingActivateOvertime(this);
 }
-static inline void(__thiscall* shok_buildingDeactivateOvertime)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AA073;
+static inline void(__thiscall* const shok_buildingDeactivateOvertime)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*)) 0x4AA073;
 void shok_GGL_CBuilding::DeactivateOvertime()
 {
 	shok_buildingDeactivateOvertime(this);
@@ -757,13 +757,13 @@ void shok_GGL_CBuilding::SellBuilding()
 	((shok_vtable_EGL_CGLEEntity*)this->vtable)->FireEvent(this, &e2);
 }
 
-static inline void(__thiscall* building_startresearch)(shok_GGL_CBuilding* th, int tech) = (void(__thiscall*)(shok_GGL_CBuilding*, int))0x4AAC76;
+static inline void(__thiscall* const building_startresearch)(shok_GGL_CBuilding* th, int tech) = (void(__thiscall*)(shok_GGL_CBuilding*, int))0x4AAC76;
 void shok_GGL_CBuilding::StartResearch(int tech)
 {
 	building_startresearch(this, tech);
 }
 
-static inline void(__thiscall* building_cancelresearch)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*))0x4AACC0;
+static inline void(__thiscall* const building_cancelresearch)(shok_GGL_CBuilding* th) = (void(__thiscall*)(shok_GGL_CBuilding*))0x4AACC0;
 void shok_GGL_CBuilding::CancelResearch()
 {
 	building_cancelresearch(this);
@@ -853,7 +853,7 @@ void HookResetCamo() {
 	WriteJump((void*)0x5011DF, &camo_behaviorReset);
 }
 
-static inline int(__thiscall* activateCamoOrig)(shok_GGL_CCamouflageBehavior* th) = (int(__thiscall*)(shok_GGL_CCamouflageBehavior*)) 0x501561;
+static inline int(__thiscall* const activateCamoOrig)(shok_GGL_CCamouflageBehavior* th) = (int(__thiscall*)(shok_GGL_CCamouflageBehavior*)) 0x501561;
 void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
 int __fastcall camoActivateHook(shok_GGL_CCamouflageBehavior* th) {
 	int i = activateCamoOrig(th);
@@ -868,7 +868,7 @@ void HookCamoActivate()
 }
 
 
-static inline void(__thiscall* event2entitiesctor)(int* e, int id, int at, int de) = (void(__thiscall*)(int*, int, int, int))0x49847F;
+static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = (void(__thiscall*)(int*, int, int, int))0x49847F;
 int* HurtEntityDamagePointer = nullptr;
 void __stdcall hurtentityhookc(int* damage, shok_EGL_CGLEEntity** target, shok_EGL_CGLEEntity** attacker) { // argument order is reversed, for asm reasons
 	if (!*target)

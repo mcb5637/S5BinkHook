@@ -333,14 +333,13 @@ struct shok_GGL_CResourceDoodadCreator : shok_EGL_CGLEEntityCreator {
 	shok_GGL_CResourceDoodadCreator();
 };
 
-static inline shok_EGL_CGLEEntity* (_stdcall* shok_eid2obj)(int id) = (shok_EGL_CGLEEntity * (_stdcall*)(int)) 0x5825B4;
-static inline void(*shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage) = (void(*)(shok_EGL_CGLEEntity*, shok_EGL_CGLEEntity*, int)) 0x49F358;
-static inline void(__cdecl* shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int))0x49F82A;
-static inline int(*shok_getEntityIdByScriptName)(const char* str) = (int(*)(const char* str)) 0x576624;
-static inline int(_cdecl* shok_EntityGetProvidedResourceByID)(int id) = (int(_cdecl*)(int id)) 0x4B8489;
-static inline bool(_cdecl* shok_entityIsDead)(int id) = (bool(_cdecl*)(int)) 0x44B096;
-static inline int(_cdecl* shok_entityChangePlayer)(int entityid, int player) = (int(_cdecl*)(int, int)) 0x49A6A7;
-
+static inline shok_EGL_CGLEEntity* (__stdcall* const shok_eid2obj)(int id) = (shok_EGL_CGLEEntity * (__stdcall*)(int)) 0x5825B4;
+static inline void(__cdecl* const shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_EGL_CGLEEntity*, int)) 0x49F358;
+static inline void(__cdecl* const shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int))0x49F82A;
+static inline int(__cdecl* const shok_getEntityIdByScriptName)(const char* str) = (int(__cdecl*)(const char* str)) 0x576624;
+static inline int(__cdecl* const shok_EntityGetProvidedResourceByID)(int id) = (int(__cdecl*)(int id)) 0x4B8489;
+static inline bool(__cdecl* const shok_entityIsDead)(int id) = (bool(__cdecl*)(int)) 0x44B096;
+static inline int(__cdecl* const shok_entityChangePlayer)(int entityid, int player) = (int(__cdecl*)(int, int)) 0x49A6A7;
 
 shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e);
 

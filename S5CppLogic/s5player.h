@@ -63,7 +63,7 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	int GetTechStatus(int tech);
 };
 
-static inline bool(_cdecl* shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;
+static inline bool(_cdecl* const shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;
 
 
 bool ArePlayersHostile(int p1, int p2);

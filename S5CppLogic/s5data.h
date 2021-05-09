@@ -39,6 +39,7 @@ typedef uint8_t byte;
 // 0x005011DF reset camo func override
 // 0x4D51A4 & 0x50163A activate camo call redirect
 // 0x49A6A7 settlerchangeplayer override func to fix it not returning new id
+// 0x4B8EAD constructionsite_getprogresspertick func override
 // 
 // only without SCELoader
 // shok_entityHurtEntity 0x49F358 jmp patched

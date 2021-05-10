@@ -31,16 +31,6 @@ function CppLogic.Logic.HurtEntitySetDamage(d)
 end
 )";
 
-void __declspec(naked) t() {
-    __asm {
-        mov eax, 0x3f000000
-        push eax
-        fld [esp]
-        pop eax
-        ret
-    }
-}
-
 int __cdecl test(lua_State* L) {
     /*shok_ED_CGlobalsBaseEx s = shok_ED_CGlobalsBaseEx();
     int st = (int)&s;
@@ -54,10 +44,9 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    /*shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-    lua_pushnumber(L, (int)&((shok_GGL_CGLBuildingProps*)t->LogicProps)->ConstructionInfo.Time);*/
-    WriteJump((void*)0x4B8EAD, &t);
-    return 0;
+    shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+    lua_pushnumber(L, (int)t->GetBarrackBehaviorProps());
+    return 1;
 }
 
 int cleanup(lua_State* L) {

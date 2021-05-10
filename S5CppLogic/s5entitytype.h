@@ -183,6 +183,8 @@ public:
 	shok_GGL_CTorchPlacerBehaviorProperties* GetTorchPlacerBehaviorProps();
 	shok_GGL_CPointToResourceBehaviorProperties* GetPointToResBehaviorProps();
 	shok_GGL_CSerfBehaviorProps* GetSerfBehaviorProps();
+	shok_GGL_CResourceRefinerBehaviorProperties* GetResourceRefinerBehaviorProps();
+	shok_GGL_CBarrackBehaviorProperties* GetBarrackBehaviorProps();
 
 
 	bool IsSettlerType();

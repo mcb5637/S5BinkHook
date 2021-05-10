@@ -144,6 +144,16 @@ shok_GGL_CSerfBehaviorProps* shok_GGlue_CGlueEntityProps::GetSerfBehaviorProps()
 	return (shok_GGL_CSerfBehaviorProps*)SearchBehaviorProp(shok_vtp_GGL_CSerfBehaviorProps);
 }
 
+shok_GGL_CResourceRefinerBehaviorProperties* shok_GGlue_CGlueEntityProps::GetResourceRefinerBehaviorProps()
+{
+	return (shok_GGL_CResourceRefinerBehaviorProperties*)SearchBehaviorProp(shok_vtp_GGL_CResourceRefinerBehaviorProperties);
+}
+
+shok_GGL_CBarrackBehaviorProperties* shok_GGlue_CGlueEntityProps::GetBarrackBehaviorProps()
+{
+	return (shok_GGL_CBarrackBehaviorProperties*)SearchBehaviorProp(shok_vtp_GGL_CBarrackBehaviorProperties);
+}
+
 
 
 bool shok_GGlue_CGlueEntityProps::IsSettlerType()

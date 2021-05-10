@@ -269,13 +269,16 @@ public:
 	int BattleTaskList;
 };
 
+struct shok_resourceRefinerEfficencyUpgrade {
+	int Technology;
+	float Factor;
+};
 #define shok_vtp_GGL_CResourceRefinerBehaviorProperties (void*)0x774C24
 struct shok_GGL_CResourceRefinerBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	int ResourceType;
 	float InitialFactor;
-private:
-	int u[4];
-public:
+	vector_padding;
+	std::vector<shok_resourceRefinerEfficencyUpgrade, shok_allocator<shok_resourceRefinerEfficencyUpgrade>> Efficiency;
 	int SupplierCategory;
 };
 
@@ -307,4 +310,9 @@ struct shok_GGL_CBuildingMerchantBehaviorProps : shok_EGL_CGLEBehaviorProps {
 #define shok_vtp_GGL_CServiceBuildingBehaviorProperties (void*)0x774830
 struct shok_GGL_CServiceBuildingBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	// initial amount at 4?
+};
+
+#define shok_vtp_GGL_CMineBehaviorProperties (void*)0x77581C
+struct shok_GGL_CMineBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	int AmountToMine;
 };

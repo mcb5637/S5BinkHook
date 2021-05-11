@@ -1,43 +1,180 @@
 #pragma once
 
-constexpr int shok_LeaderCommandAttack = 0;
-constexpr int shok_LeaderCommandDefend = 3;
-constexpr int shok_LeaderCommandPatrol = 4;
-constexpr int shok_LeaderCommandAttackMove = 5;
-constexpr int shok_LeaderCommandGuard = 6;
-constexpr int shok_LeaderCommandHoldPos = 7;
-constexpr int shok_LeaderCommandMove = 8;
-constexpr int shok_LeaderCommandHeroAbility = 10;
+enum shok_DiploState : int {
+	Friendly = 1,
+	Neutral = 2,
+	Hostile = 3,
+};
 
-constexpr int AttachmentType_ATTACHMENT_CONSTRUCTION_SITE_BUILDING = 20;
-constexpr int AttachmentType_LEADER_SOLDIER = 31;
-constexpr int AttachmentType_ATTACKER_COMMAND_TARGET = 35;
-constexpr int AttachmentType_FOLLOWER_FOLLOWED = 37;
-constexpr int AttachmentType_FIGHTER_BARRACKS = 42;
-constexpr int AttachmentType_LEADER_TARGET = 51;
-constexpr int AttachmentType_SUMMONER_SUMMONED = 54;
-constexpr int AttachmentType_INFLICTOR_TERRORIZED = 61;
+enum shok_LeaderCommand : int {
+	Attack = 0,
+	Defend = 3,
+	Patrol = 4,
+	AttackMove = 5,
+	Guard = 6,
+	HoldPos = 7,
+	Move = 8,
+	HeroAbility = 10,
+};
 
-constexpr int shok_DIPLOSTATE_HOSTILE = 3;
+enum shok_AttachmentType : int {
+	SETTLER_SOURCE_PILE = 2,
+	SETTLER_DESTINATION_PILE = 3,
+	SETTLER_COLLECT_GOOD_RESOURCE = 4,
+	GATHERER_RESOURCE_DOODAD = 5,
+	SETTLER_EMPOLYING_BUILDING = 6,
+	SETTLER_TARGET_FIRE = 7,
+	CROP_FIELD = 8,
+	SETTLER_ENTERED_BUILDING = 9,
+	SETTLER_FIELD = 10,
+	SETTLER_RESOURCE_DOODAD = 11,
+	SETTLER_HARBOR = 12,
+	SETTLER_ENTITY_TO_DESTROY = 13,
+	SETTLER_TARGET_BUILDING = 14,
+	SETTLER_WORKPLACE = 15,
+	HUNTER_PREY = 16,
+	MILITIA_ENEMY = 17,
+	APPROACHING_SERF_CONSTRUCTION_SITE = 18,
+	SERF_CONSTRUCTION_SITE = 19,
+	CONSTRUCTION_SITE_BUILDING = 20,
+	WORKER_FARM = 21,
+	WORKER_RESIDENCE = 22,
+	WORKER_WORKPLACE = 23,
+	MINE_RESOURCE = 24,
+	MINE_LORRY = 25,
+	MINE_LORRY_STORE = 26,
+	CONSUMER_LORRY = 27,
+	MARKET_LORRY_STORE = 28,
+	SERF_MARKET = 29,
+	MARKET_MARKET = 30,
+	LEADER_SOLDIER = 31,
+	ATTACKER_TARGET = 32,
+	ATTACKED_DEAD = 33,
+	CAMP_SETTLER = 34,
+	ATTACKER_COMMAND_TARGET = 35,
+	BUILDING_BASE = 36,
+	FOLLOWER_FOLLOWED = 37,
+	WORKER_VILLAGE_CENTER = 38,
+	PLACEHOLDER_BUILDING_CONSTRUCTION_SITE = 39,
+	SERF_RESOURCE = 40,
+	GUARD_GUARDED = 41,
+	FIGHTER_BARRACKS = 42,
+	BOMBER_BOMB = 43,
+	SERF_BATTLE_SERF = 44,
+	HERO_HAWK = 45,
+	TOP_ENTITY_FOUNDATION = 46,
+	BUILDER_FOUNDATION = 47,
+	DEFENDER_BUILDING = 48,
+	APPROACHING_DEFENDER_BUILDING = 49,
+	//[[ Missing ]]
+	LEADER_TARGET = 51,
+	WORKER_SUPPLIER = 52,
+	SETTLER_BUILDING_TO_LEAVE = 53,
+	SUMMONER_SUMMONED = 54,
+	FOUNDATION_TOP_ENTITY = 55,
+	FOUNDATION_BUILDER = 56,
+	BUILDING_UPGRADE_SITE = 57,
+	HERO_AFFECTED = 58,
+	HERO_NPC = 59,
+	CONVERTER_BUILDING = 60,
+	INFLICTOR_TERRORIZED = 61,
+	CONVERTER_SETTLER = 62,
+	MERCHANT_TRADER = 63,
+	BUILDER_BRIDGE = 64,
+	APPROACHING_BUILDER_BRIDGE = 65,
+	SCOUT_EXPLORATION = 66,
+	THIEF_TARGET_BUILDING = 67,
+	THIEF_SECURE_BUILDING = 68,
+	KEG_TARGET_BUILDING = 69,
+	ARMING_THIEF_KEG = 70,
+	DISARMING_THIEF_KEG = 71,
+	THIEF_KEG_TARGET = 72,
+	FIRE_BURNING_ENTITY = 73,
+};
 
-constexpr int EntityCategoryHeadquarters = 7;
-constexpr int EntityCategoryCannon = 11;
-constexpr int EntityCategoryHero = 22;
-constexpr int EntityCategoryLongRange = 32;
-constexpr int EntityCategoryBridge = 37;
+enum shok_EntityCategory : int {
+	CavalryHeavy = 1,
+	CavalryLight = 2,
+	Spear = 3,
+	Bow = 4,
+	Sword = 5,
+	VillageCenter = 6,
+	Headquarters = 7,
+	Scout = 8,
+	Thief = 9,
+	Rifle = 10,
+	Cannon = 11,
+	Worker = 12,
+	Serf = 13,
+	Hero8 = 14,
+	Hero7 = 15,
+	Hero6 = 16,
+	Hero5 = 17,
+	Hero4 = 18,
+	Hero3 = 19,
+	Hero2 = 20,
+	Hero1 = 21,
+	Hero = 22,
+	Military = 23,
+	ResourcePit = 24,
+	Coiner = 25,
+	Hero11 = 26,
+	Hero10 = 27,
+	Soldier = 28,
+	Leader = 29,
+	SplashDamage = 30,
+	EvilLeader = 31,
+	LongRange = 32,
+	Melee = 33,
+	ThiefRefuge = 34,
+	NeutralBridge = 35,
+	SerfConversionBuilding = 36,
+	Bridge = 37,
+	Wall = 38,
+	SulfurSupplier = 39,
+	IronSupplier = 40,
+	ClaySupplier = 41,
+	WoodSupplier = 42,
+	StoneSupplier = 43,
+	GoldSupplier = 44,
+	DefendableBuilding = 45,
+	Barracks = 46,
+	MilitaryBuilding = 47,
+	Workplace = 48,
+	Farm = 49,
+	Residence = 50,
+	TargetFilter_CustomRanged = 102,
+	TargetFilter_NonCombat = 103,
+	TargetFilter_TargetType = 100,
+	TargetFilter_TargetTypeLeader = 101,
+};
 
-constexpr int TechState_Forbidden = 0;
-constexpr int TechState_Waiting = 1;
-constexpr int TechState_Allowed = 2;
-constexpr int TechState_InProgress = 3;
-constexpr int TechState_Researched = 4;
-constexpr int TechState_Future = 5;
+enum TechState : int {
+	Forbidden = 0,
+	Waiting = 1,
+	Allowed = 2,
+	InProgress = 3,
+	Researched = 4,
+	Future = 5,
+};
 
-constexpr int shok_clay = 11;
-constexpr int shok_gold = 1;
-constexpr int shok_iron = 7;
-constexpr int shok_silver = 3;
-constexpr int shok_stone = 5;
-constexpr int shok_sulfur = 9;
-constexpr int shok_wood = 13;
-constexpr int shok_maxres = 17;
+enum shok_ResourceType : int {
+	Gold = 1,
+	GoldRaw = 2,
+	Silver = 3,
+	SilverRaw = 4,
+	Stone = 5,
+	StoneRaw = 6,
+	Iron = 7,
+	IronRaw = 8,
+	Sulfur = 9,
+	SulfurRaw = 10,
+	Clay = 11,
+	ClayRaw = 12,
+	Wood = 13,
+	WoodRaw = 14,
+	WeatherEnergy = 15,
+	Knowledge = 16,
+	Faith = 17,
+};
+constexpr int shok_ResourceType_MaxValue = 17;

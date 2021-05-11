@@ -5,17 +5,14 @@
 
 void l_ua_init(lua_State* L);
 
-#define UAStatus_Idle 1
-#define UAStatus_Moving 2
-#define UAStatus_Battle 3
-#define UAStatus_Destroyed 4
-#define UAStatus_IdleUnformated 5
-#define UAStatus_MovingNoBattle 6
-
-#define UATargetCat 100
-#define UATargetCatLeader 101
-#define EntityCategoryCustomRanged 102
-#define EntityCategoryNonCombat 103
+enum UAStatus : int {
+	Idle = 1,
+	Moving = 2,
+	Battle = 3,
+	Destroyed = 4,
+	IdleUnformated = 5,
+	MovingNoBattle = 6,
+};
 
 struct UACannonData {
 	int EntityId, LastUpdated;
@@ -42,7 +39,7 @@ public:
 	std::vector<UAReset> PrepDefenseReset;
 	shok_position LastPos = { -1,-1 };
 	int PosLastUpdatedTick = -1;
-	int Status = UAStatus_Idle;
+	UAStatus Status = UAStatus::Idle;
 	float Area = 0;
 	int CurrentBattleTarget = 0;
 	shok_position Target = { -1,-1 };
@@ -79,7 +76,7 @@ private:
 	inline void NeedFormat();
 	void CheckTransit();
 	bool IsTargetValid(int id);
-	void CheckStatus(int status);
+	void CheckStatus(UAStatus status);
 	bool LeaderIsMoving(shok_EGL_CGLEEntity* e);
 	bool LeaderIsIdle(shok_EGL_CGLEEntity* e);
 	bool LeaderIsInBattle(shok_EGL_CGLEEntity* e);

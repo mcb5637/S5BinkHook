@@ -3,7 +3,6 @@
 #include <map>
 
 
-#define shok_vtp_EGL_CGLEEntity (void*)0x783E74
 struct shok_EGL_CGLEEntity : shok_object {
 	PADDINGI(1);
 	int EntityId;
@@ -43,9 +42,11 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int TaskListChangeCounter;
 	int NumberOfAuras; // 65
 
+	static inline constexpr int vtp = 0x783E74;
+
 private:
-	shok_EGL_CGLEBehavior* SearchBehavior(void* vt);
-	shok_EGL_CGLEBehavior* SearchBehavior(void** vts, int num);
+	shok_EGL_CGLEBehavior* SearchBehavior(int vt);
+	shok_EGL_CGLEBehavior* SearchBehavior(int* vts, int num);
 public:
 	shok_GGL_CSoldierBehavior* GetSoldierBehavior();
 	shok_GGL_CLeaderBehavior* GetLeaderBehavior();
@@ -108,13 +109,14 @@ protected:
 };
 
 struct shok_GGL_CBuilding;
-#define shok_vtp_EGL_CMovingEntity (void*)0x783F84
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	shok_position TargetPosition; // la67
 	byte TargetRotationValid;
 	PADDING(3);
 	float TargetRotation;
 	int MovementState; // 70
+
+	static inline constexpr int vtp = 0x783F84;
 
 	void AttackMove(shok_position& p);
 	void AttackEntity(int targetId);
@@ -153,12 +155,12 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	bool IsMoving();
 };
 
-#define shok_vtp_GGL_CEvadingEntity (void*)0x770A7C
 struct shok_GGL_CEvadingEntity : shok_EGL_CMovingEntity {
 	int EvaderWaitObject[4];
+
+	static inline constexpr int vtp = 0x770A7C;
 };
 
-#define shok_vtp_GGL_CSettler (void*)0x76E3CC
 struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
 	int TimeToWait, HeadIndex, HeadParams; // la77
 private:
@@ -240,22 +242,25 @@ private:
 public:
 	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
 
+	static inline constexpr int vtp = 0x76E3CC;
+
 	bool IsIdle();
 };
 
-#define shok_vtp_GGL_CAnimal (void*)0x778F7C
 struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
 	shok_position TerritoryCenter; // 71
 	float TerritoryRadius; // int?
 	shok_position DangerPosition;
+
+	static inline constexpr int vtp = 0x778F7C;
 };
 
-#define shok_vtp_GGL_CResourceDoodad (void*)0x76FEA4
 struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
 	int ResourceType, ResourceAmount, ResourceAmountAdd;
+
+	static inline constexpr int vtp = 0x76FEA4;
 };
 
-#define shok_vtp_GGL_CBuilding (void*)0x76EB94
 struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	shok_position ApproachPosition, LeavePosition; // fi 66
 	byte IsActive, IsRegistered, IsUpgrading, IsOvertimeActive, HQAlarmActive;
@@ -270,6 +275,8 @@ public:
 	int NumberOfRepairingSerfs;
 	int OvertimeCooldown;
 	int ConstructionSiteType; // 83
+
+	static inline constexpr int vtp = 0x76EB94;
 
 	int GetConstructionSite();
 	int GetNearestFreeConstructionSlotFor(shok_position* p);
@@ -296,15 +303,17 @@ public:
 	void MarketCancelTrade();
 };
 
-#define shok_vtp_GGL_CBridgeEntity (void*)0x77805C
-struct shok_GGL_CBridgeEntity : shok_GGL_CBuilding {};
+struct shok_GGL_CBridgeEntity : shok_GGL_CBuilding {
+	static inline constexpr int vtp = 0x77805C;
+};
 
-#define shok_vtp_EGL_CAmbientSoundEntity (void*)0x78568C
 struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
 private:
 	int u;
 public:
 	int AmbientSoundType;
+
+	static inline constexpr int vtp = 0x78568C;
 };
 
 struct shok_EGL_CGLEEntityCreator : shok_object {

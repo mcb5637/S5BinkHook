@@ -159,7 +159,7 @@ bool DoesFileExist(const char* name)
 shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
 {
 	shok_EGL_CGLEEntityProps* ty = e->GetEntityType()->LogicProps;
-	if (ty->vtable != shok_vtp_GGL_CEntityProperties)
+	if (ty->vtable != shok_GGL_CEntityProperties::vtp)
 		return nullptr;
 	shok_GGL_CEntityProperties* t = (shok_GGL_CEntityProperties*)ty;
 	shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();

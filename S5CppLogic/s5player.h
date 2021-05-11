@@ -2,16 +2,17 @@
 #include "s5data.h"
 
 struct shok_GGL_CPlayerAttractionHandler : shok_object {
-	PADDINGI(1)
-		byte PaydayStarted;
-	PADDING(3)
-		int PaydayStartTick;
+	PADDINGI(1);
+	byte PaydayStarted;
+	PADDING(3);
+	int PaydayStartTick;
 
 	int GetAttractionLimit();
 	int GetAttractionUsage();
 };
-#define shok_vtp_GGL_CBuildingUpgradeManager (void*)0x772948
 struct shok_GGL_CBuildingUpgradeManager : shok_object {
+
+	static inline constexpr int vtp = 0x772948;
 
 	int GetUpgradeCategoryOfBuildingType(int etype);
 };
@@ -20,10 +21,11 @@ struct shok_GGL_CSettlerUpgradeManager_UCatEntry {
 	int NumUpgrades;
 	int FirstEntityType;
 };
-#define shok_vtp_GGL_CSettlerUpgradeManager (void*)0x772904
 struct shok_GGL_CSettlerUpgradeManager : shok_object {
-	PADDINGI(3)
-		shok_set<shok_GGL_CSettlerUpgradeManager_UCatEntry> UpgradeCategories;
+	PADDINGI(3);
+	shok_set<shok_GGL_CSettlerUpgradeManager_UCatEntry> UpgradeCategories;
+
+	static inline constexpr int vtp = 0x772904;
 
 	int GetSettlerTypeByUCat(int ucat);
 };
@@ -38,7 +40,6 @@ struct shok_GGL_CPlayerStatus_techData : shok_object {
 	vector_padding
 	std::vector<shok_GGL_CPlayerStatus_techData_tech, shok_allocator<shok_GGL_CPlayerStatus_techData_tech>> TechList;
 };
-#define shok_vtp_GGL_CPlayerStatus (void*)0x76FA88
 struct shok_GGL_CPlayerStatus : shok_object {
 	int PlayerID;
 	PADDINGI(21)
@@ -58,6 +59,8 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler; // 197
 	shok_GGL_CBuildingUpgradeManager* BuildingUpgradeManager;
 	shok_GGL_CSettlerUpgradeManager* SettlerUpgradeManager;
+
+	static inline constexpr int vtp = 0x76FA88;
 
 	int GetDiploStateTo(int p);
 	int GetTechStatus(int tech);

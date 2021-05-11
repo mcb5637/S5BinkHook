@@ -71,102 +71,120 @@ struct shok_event_data_GGL_CEventTransaction : shok_event_data {
 };
 
 // net events
-#define shok_vtp_BB_CEvent (void*)0x762114
 struct shok_BB_CEvent : shok_object {
 	int EventTypeId;
+
+	static inline constexpr int vtp = 0x762114;
 };
 
-#define shok_vtp_EGL_CNetEvent2Entities (void*)0x76DD60
 struct shok_EGL_CNetEvent2Entities : shok_BB_CEvent {
 	int ActorId, TargetId;
+
+	static inline constexpr int vtp = 0x76DD60;
 };
 
-#define shok_vtp_EGL_CNetEventEntityAndPos (void*)0x76DD50
 struct shok_EGL_CNetEventEntityAndPos : shok_BB_CEvent {
 	int EntityId;
 	shok_position Position;
+
+	static inline constexpr int vtp = 0x76DD50;
 };
 
-#define shok_vtp_EGL_CNetEventEntityAndPosArray (void*)0x770704
 struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
 	int EntityId;
-	vector_padding
-		std::vector<shok_position, shok_allocator<shok_position>> Positions;
+	vector_padding;
+	std::vector<shok_position, shok_allocator<shok_position>> Positions;
 	float Rotation;
+
+	static inline constexpr int vtp = 0x770704;
 };
 
-#define shok_vtp_GGL_CNetEventExtractResource (void*)0x77061C
 struct shok_GGL_CNetEventExtractResource : shok_BB_CEvent {
 	int EntityId;
 	int ResourceType;
 	shok_position Position;
+
+	static inline constexpr int vtp = 0x77061C;
 };
 
-#define shok_vtp_GGL_CNetEventTransaction (void*)0x77062C
 struct shok_GGL_CNetEventTransaction : shok_BB_CEvent {
 	int EntityId, SellType, BuyType, BuyAmount;
+
+	static inline constexpr int vtp = 0x77062C;
 };
 
-#define shok_vtp_EGL_CNetEventEntityID (void*)0x766C28
 struct shok_EGL_CNetEventEntityID : shok_BB_CEvent {
 	int EntityId;
+
+	static inline constexpr int vtp = 0x766C28;
 };
 
-#define shok_vtp_GGL_CNetEventCannonCreator (void*)0x7705EC
 struct shok_GGL_CNetEventCannonCreator : shok_EGL_CNetEventEntityID {
 	int BottomType, TopType;
 	shok_position Position;
+
+	static inline constexpr int vtp = 0x7705EC;
 };
 
-#define shok_vtp_GGL_CNetEventEntityIDAndUpgradeCategory (void*)0x77060C
 struct shok_GGL_CNetEventEntityIDAndUpgradeCategory : shok_EGL_CNetEventEntityID {
 	int UpgradeCategory;
+
+	static inline constexpr int vtp = 0x77060C;
 };
 
-#define shok_vtp_EGL_CNetEventEntityIDAndInteger (void*)0x766C48
 struct shok_EGL_CNetEventEntityIDAndInteger : shok_EGL_CNetEventEntityID {
 	int Data;
+
+	static inline constexpr int vtp = 0x766C48;
 };
 
-#define shok_vtp_GGL_CNetEventTechnologyAndEntityID (void*)0x7705FC
 struct shok_GGL_CNetEventTechnologyAndEntityID : shok_EGL_CNetEventEntityID {
 	int Technology;
+
+	static inline constexpr int vtp = 0x7705FC;
 };
 
-#define shok_vtp_EGL_CNetEventPlayerID (void*)0x766C18
 struct shok_EGL_CNetEventPlayerID : shok_BB_CEvent {
 	int PlayerId;
+
+	static inline constexpr int vtp = 0x766C18;
 };
 
-#define shok_vtp_GGL_CNetEventBuildingCreator (void*)0x770714
 struct shok_GGL_CNetEventBuildingCreator : shok_EGL_CNetEventPlayerID {
 	int UpgradeCategory;
 	shok_positionRot Position;
-	vector_padding
-		std::vector<int, shok_allocator<int>> Serfs;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> Serfs;
+
+	static inline constexpr int vtp = 0x770714;
 };
 
-#define shok_vtp_EGL_CNetEventIntegerAndPlayerID (void*)0x7705BC
 struct shok_EGL_CNetEventIntegerAndPlayerID : shok_EGL_CNetEventPlayerID {
 	int Data;
+
+	static inline constexpr int vtp = 0x7705BC;
 };
 
-#define shok_vtp_EGL_CNetEventPlayerIDAndInteger (void*)0x7705CC
 struct shok_EGL_CNetEventPlayerIDAndInteger : shok_EGL_CNetEventPlayerID {
 	int Data;
+
+	static inline constexpr int vtp = 0x7705CC;
 };
 
-#define shok_vtp_EGL_CNetEventEntityIDAndPlayerID (void*)0x766C38
 struct shok_EGL_CNetEventEntityIDAndPlayerID : shok_EGL_CNetEventPlayerID {
 	int EntityId;
+
+	static inline constexpr int vtp = 0x766C38;
 };
 
-#define shok_vtp_EGL_CNetEventEntityIDAndPlayerIDAndEntityType (void*)0x77057C
 struct shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType : shok_EGL_CNetEventEntityIDAndPlayerID {
 	int EntityType;
+
+	static inline constexpr int vtp = 0x77057C;
 };
 
-#define shok_vtp_GGL_CNetEventEntityIDPlayerIDAndInteger (void*)0x77064C
 struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityIDAndPlayerID {
 	int Data;
+
+	static inline constexpr int vtp = 0x77064C;
 };

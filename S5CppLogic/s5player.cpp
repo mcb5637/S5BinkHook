@@ -40,6 +40,6 @@ int shok_GGL_CPlayerStatus::GetTechStatus(int tech)
 
 bool ArePlayersHostile(int p1, int p2)
 {
-	return (*shok_GGL_CGLGameLogicObj)->GetPlayer(p1)->GetDiploStateTo(p2) == shok_DIPLOSTATE_HOSTILE;
+	return (*shok_GGL_CGLGameLogicObj)->GetPlayer(p1)->GetDiploStateTo(p2) == shok_DiploState::Hostile;
 }
 

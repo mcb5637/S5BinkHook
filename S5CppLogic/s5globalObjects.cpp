@@ -262,35 +262,35 @@ shok_technology* shok_GGL_CGLGameLogic::GetTech(int i)
 static inline void(__thiscall* const cglgamelogic_enablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*))0x49FA14;
 void shok_GGL_CGLGameLogic::EnableAlarmForPlayer(int pl)
 {
-	shok_EGL_CNetEventPlayerID ev = { shok_vtp_EGL_CNetEventPlayerID, 69680, pl };
+	shok_EGL_CNetEventPlayerID ev = { shok_EGL_CNetEventPlayerID::vtp, 69680, pl };
 	cglgamelogic_enablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_disablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*))0x49FAD7;
 void shok_GGL_CGLGameLogic::DisableAlarmForPlayer(int pl)
 {
-	shok_EGL_CNetEventPlayerID ev = { shok_vtp_EGL_CNetEventPlayerID, 69681, pl };
+	shok_EGL_CNetEventPlayerID ev = { shok_EGL_CNetEventPlayerID::vtp, 69681, pl };
 	cglgamelogic_disablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_upgradesettlercat)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*))0x4985C5;
 void shok_GGL_CGLGameLogic::UpgradeSettlerCategory(int pl, int ucat)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev = { shok_vtp_EGL_CNetEventIntegerAndPlayerID , 69642, pl, ucat };
+	shok_EGL_CNetEventIntegerAndPlayerID ev = { shok_EGL_CNetEventIntegerAndPlayerID::vtp , 69642, pl, ucat };
 	cglgamelogic_upgradesettlercat(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_activateweatherm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*))0x49BF7A;
 void shok_GGL_CGLGameLogic::PlayerActivateWeathermachine(int player, int weathertype)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev = { shok_vtp_EGL_CNetEventIntegerAndPlayerID , 69686, player, weathertype };
+	shok_EGL_CNetEventIntegerAndPlayerID ev = { shok_EGL_CNetEventIntegerAndPlayerID::vtp , 69686, player, weathertype };
 	cglgamelogic_activateweatherm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_blesssettlers)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = (void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*))0x49B7E6;
 void shok_GGL_CGLGameLogic::PlayerBlessSettlers(int player, int blessCat)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev = { shok_vtp_EGL_CNetEventIntegerAndPlayerID , 69686, player, blessCat };
+	shok_EGL_CNetEventIntegerAndPlayerID ev = { shok_EGL_CNetEventIntegerAndPlayerID::vtp , 69686, player, blessCat };
 	cglgamelogic_blesssettlers(this, &ev);
 }
 

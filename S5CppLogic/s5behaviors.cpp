@@ -13,7 +13,7 @@ float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
 
 bool shok_GGL_CCamouflageBehavior::IsThiefCamoBehavior()
 {
-	return vtable == shok_vtp_GGL_CThiefCamouflageBehavior;
+	return vtable == shok_GGL_CThiefCamouflageBehavior::vtp;
 }
 
 static inline float(__thiscall* const battleBehaviorGetMaxRange)(shok_GGL_CBattleBehavior*) = (float(__thiscall*)(shok_GGL_CBattleBehavior * id))0x50AB43;

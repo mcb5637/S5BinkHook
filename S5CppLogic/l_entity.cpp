@@ -416,7 +416,7 @@ int l_settlerHeroCamouflageSetDurationLeft(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CCamouflageBehavior* c = s->GetCamoAbilityBehavior();
 	luaext_assertPointer(L, c, "no camo hero at 1");
-	luaext_assert(L, c->vtable != shok_vtp_GGL_CThiefCamouflageBehavior, "thief at 1, use ThiefSetCamouflageTimeTo instead");
+	luaext_assert(L, c->vtable != shok_GGL_CThiefCamouflageBehavior::vtp, "thief at 1, use ThiefSetCamouflageTimeTo instead");
 	c->InvisibilityRemaining = luaL_checkint(L, 2);
 	return 1;
 }
@@ -722,7 +722,7 @@ int l_settlerSummon(lua_State* L) {
 	e->HeroAbilitySummon();
 	int summoned = 0;
 	e->ObservedEntities.ForAll([L, &summoned](shok_attachment* a) {
-		if (a->AttachmentType == AttachmentType_SUMMONER_SUMMONED)
+		if (a->AttachmentType == shok_AttachmentType::SUMMONER_SUMMONED)
 			lua_pushnumber(L, a->EntityId);
 			summoned++;
 		});
@@ -783,7 +783,7 @@ int l_settlerSabotage(lua_State* L) {
 	luaext_assert(L, e->GetThiefBehavior()->ResourceType == 0, "is carrying resources");
 	shok_GGL_CBuilding* t = luaext_checkBulding(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
-	luaext_assert(L, t->IsEntityInCategory(EntityCategoryBridge) || ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile or bridge");
+	luaext_assert(L, t->IsEntityInCategory(shok_EntityCategory::Bridge) || ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile or bridge");
 	e->ThiefSabotage(t->EntityId);
 	return 0;
 }
@@ -858,7 +858,7 @@ int l_settlerSecureGoods(lua_State* L) {
 	shok_GGL_CBuilding* t = luaext_checkBulding(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
 	luaext_assert(L, e->PlayerId == t->PlayerId, "entities are not of same player");
-	luaext_assert(L, t->IsEntityInCategory(EntityCategoryHeadquarters), "target not hq");
+	luaext_assert(L, t->IsEntityInCategory(shok_EntityCategory::Headquarters), "target not hq");
 	e->ThiefSecureGoods(t->EntityId);
 	return 0;
 }
@@ -893,7 +893,7 @@ int l_settlerDisableConversionHook(lua_State* L) {
 
 int l_entityIsFeared(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	int id = e->GetFirstAttachedToMe(AttachmentType_INFLICTOR_TERRORIZED);
+	int id = e->GetFirstAttachedToMe(shok_AttachmentType::INFLICTOR_TERRORIZED);
 	if (id == 0)
 		lua_pushboolean(L, false);
 	else
@@ -1027,7 +1027,7 @@ int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
 	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
 	int i = 0;
 	b->ObserverEntities.ForAll([L, &i](shok_attachment* a) {
-		if (a->AttachmentType == AttachmentType_FIGHTER_BARRACKS && !shok_eid2obj(a->EntityId)->GetSoldierBehavior()) {
+		if (a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS && !shok_eid2obj(a->EntityId)->GetSoldierBehavior()) {
 			lua_pushnumber(L, a->EntityId);
 			i++;
 		}
@@ -1064,9 +1064,9 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 		int ucat = (*shok_GGL_CGLGameLogicObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(b->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
 	}
-	int max = s->LimitedAttachmentGetMaximum(AttachmentType_LEADER_SOLDIER);
+	int max = s->LimitedAttachmentGetMaximum(shok_AttachmentType::LEADER_SOLDIER);
 	int curr = 0;
-	s->ObservedEntities.ForAll([&curr](shok_attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) curr++; });
+	s->ObservedEntities.ForAll([&curr](shok_attachment* a) { if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER) curr++; });
 	luaext_assert(L, curr < max, "no free soldier slot left");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
@@ -1140,7 +1140,7 @@ int l_buildingBarracksRecruitGroups(lua_State* L) {
 int serfType = -1;
 int l_buildingHQBuySerf(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	luaext_assert(L, b->IsEntityInCategory(EntityCategoryHeadquarters), "no hq");
+	luaext_assert(L, b->IsEntityInCategory(shok_EntityCategory::Headquarters), "no hq");
 	luaext_assert(L, b->IsIdle(), "building not idle");
 	if (serfType < 0) {
 
@@ -1174,7 +1174,7 @@ int l_buildingStartResearch(lua_State* L) {
 	luaext_assertPointer(L, techo, "no tech at 2");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
 	int techstate = p->GetTechStatus(tech);
-	luaext_assert(L, techstate == TechState_Allowed, "wrong techstate");
+	luaext_assert(L, techstate == TechState::Allowed, "wrong techstate");
 	luaext_assert(L, p->CurrentResources.HasResources(&techo->ResourceCosts), "not enough res");
 	b->StartResearch(tech);
 	return 0;
@@ -1188,7 +1188,7 @@ int l_buildingCancelResearch(lua_State* L) {
 }
 
 bool marketIsRes(int rty) {
-	return rty == shok_clay || rty == shok_gold || rty == shok_iron || rty == shok_stone || rty == shok_sulfur || rty == shok_wood;
+	return rty == shok_ResourceType::Clay || rty == shok_ResourceType::Gold || rty == shok_ResourceType::Iron || rty == shok_ResourceType::Stone || rty == shok_ResourceType::Sulfur || rty == shok_ResourceType::Wood;
 }
 
 int l_buildingMarketStartTrade(lua_State* L) {
@@ -1536,7 +1536,7 @@ void EntityIteratorPredicateAnyPlayer::FillHostilePlayers(int source, int* playe
 	shok_GGL_CPlayerStatus* pl = (*shok_GGL_CGLGameLogicObj)->GetPlayer(source);
 	int curr = 0;
 	for (int p = 1; p <= maxP; p++) {
-		if (pl->GetDiploStateTo(p) == shok_DIPLOSTATE_HOSTILE) {
+		if (pl->GetDiploStateTo(p) == shok_DiploState::Hostile) {
 			players[curr] = p;
 			curr++;
 		}
@@ -1656,7 +1656,7 @@ bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(shok_EGL_CGLEEnti
 {
 	if (!e->IsMovingEntity())
 		return true;
-	if (e->GetFirstAttachedToMe(AttachmentType_INFLICTOR_TERRORIZED) != 0)
+	if (e->GetFirstAttachedToMe(shok_AttachmentType::INFLICTOR_TERRORIZED) != 0)
 		return false;
 	shok_EGL_CMovingEntity* me = (shok_EGL_CMovingEntity*)e;
 	float dx1 = Center.X - e->Position.X;

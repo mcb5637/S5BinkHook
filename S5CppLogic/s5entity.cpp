@@ -28,7 +28,7 @@ shok_EGL_CGLEEntityCreator::~shok_EGL_CGLEEntityCreator()
 	shok_EGL_CGLEEntityCreator_dtor(this);
 }
 
-shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(void** vts, int num)
+shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(int* vts, int num)
 {
 	for (shok_EGL_CGLEBehavior* b : Behaviours) {
 		if (b != nullptr && contains(vts, b->vtable, num))
@@ -37,162 +37,162 @@ shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(void** vts, int num)
 	return nullptr;
 }
 
-shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(void* vt) {
+shok_EGL_CGLEBehavior* shok_EGL_CGLEEntity::SearchBehavior(int vt) {
 	return SearchBehavior(&vt, 1);
 }
 
 shok_GGL_CSoldierBehavior* shok_EGL_CGLEEntity::GetSoldierBehavior()
 {
-	return (shok_GGL_CSoldierBehavior*)SearchBehavior(shok_vtp_GGL_CSoldierBehavior);
+	return (shok_GGL_CSoldierBehavior*)SearchBehavior(shok_GGL_CSoldierBehavior::vtp);
 }
 
 shok_GGL_CLeaderBehavior* shok_EGL_CGLEEntity::GetLeaderBehavior()
 {
-	void* data[2] = { shok_vtp_GGL_CLeaderBehavior, shok_vtp_GGL_CBattleSerfBehavior };
+	int data[2] = { shok_GGL_CLeaderBehavior::vtp, shok_GGL_CSoldierBehavior::vtp };
 	return (shok_GGL_CLeaderBehavior*)SearchBehavior(data, 2);
 }
 
 shok_GGL_CBehaviorDefaultMovement* shok_EGL_CGLEEntity::GetMovementBehavior()
 {
-	void* data[4] = { shok_vtp_GGL_CBehaviorDefaultMovement, shok_vtp_GGL_CLeaderMovement, shok_vtp_GGL_CSoldierMovement, shok_vtp_GGL_CSettlerMovement };
+	int data[4] = { shok_GGL_CBehaviorDefaultMovement::vtp, shok_GGL_CLeaderMovement::vtp, shok_GGL_CSoldierMovement::vtp, shok_GGL_CSettlerMovement::vtp };
 	return (shok_GGL_CBehaviorDefaultMovement*)SearchBehavior(data, 4);
 }
 
 shok_GGL_CBarrackBehavior* shok_EGL_CGLEEntity::GetBarrackBehavior()
 {
-	return (shok_GGL_CBarrackBehavior*)SearchBehavior(shok_vtp_GGL_CBarrackBehavior);
+	return (shok_GGL_CBarrackBehavior*)SearchBehavior(shok_GGL_CBarrackBehavior::vtp);
 }
 
 shok_GGL_CCamouflageBehavior* shok_EGL_CGLEEntity::GetCamoAbilityBehavior()
 {
-	void* data[2] = { shok_vtp_GGL_CCamouflageBehavior, shok_vtp_GGL_CThiefCamouflageBehavior };
+	int data[2] = { shok_GGL_CCamouflageBehavior::vtp, shok_GGL_CThiefCamouflageBehavior::vtp };
 	return (shok_GGL_CCamouflageBehavior*)SearchBehavior(data, 2);
 }
 
 shok_GGL_CThiefCamouflageBehavior* shok_EGL_CGLEEntity::GetCamoThiefBehavior()
 {
-	return (shok_GGL_CThiefCamouflageBehavior*)SearchBehavior(shok_vtp_GGL_CThiefCamouflageBehavior);
+	return (shok_GGL_CThiefCamouflageBehavior*)SearchBehavior(shok_GGL_CThiefCamouflageBehavior::vtp);
 }
 
 shok_GGL_CHeroBehavior* shok_EGL_CGLEEntity::GetHeroBehavior()
 {
-	return (shok_GGL_CHeroBehavior*)SearchBehavior(shok_vtp_GGL_CHeroBehavior);
+	return (shok_GGL_CHeroBehavior*)SearchBehavior(shok_GGL_CHeroBehavior::vtp);
 }
 
 shok_GGL_CLimitedLifespanBehavior* shok_EGL_CGLEEntity::GetLimitedLifespanBehavior()
 {
-	return (shok_GGL_CLimitedLifespanBehavior*)SearchBehavior(shok_vtp_GGL_CLimitedLifespanBehavior);
+	return (shok_GGL_CLimitedLifespanBehavior*)SearchBehavior(shok_GGL_CLimitedLifespanBehavior::vtp);
 }
 
 shok_GGL_CWorkerBehavior* shok_EGL_CGLEEntity::GetWorkerBehavior()
 {
-	return (shok_GGL_CWorkerBehavior*)SearchBehavior(shok_vtp_GGL_CWorkerBehavior);
+	return (shok_GGL_CWorkerBehavior*)SearchBehavior(shok_GGL_CWorkerBehavior::vtp);
 }
 
 shok_GGL_CMarketBehavior* shok_EGL_CGLEEntity::GetMarketBehavior()
 {
-	return (shok_GGL_CMarketBehavior*)SearchBehavior(shok_vtp_GGL_CMarketBehavior);
+	return (shok_GGL_CMarketBehavior*)SearchBehavior(shok_GGL_CMarketBehavior::vtp);
 }
 
 shok_GGL_CThiefBehavior* shok_EGL_CGLEEntity::GetThiefBehavior()
 {
-	return (shok_GGL_CThiefBehavior*)SearchBehavior(shok_vtp_GGL_CThiefBehavior);
+	return (shok_GGL_CThiefBehavior*)SearchBehavior(shok_GGL_CThiefBehavior::vtp);
 }
 
 shok_GGL_CBattleBehavior* shok_EGL_CGLEEntity::GetBattleBehavior()
 {
-	void* v[5] = { shok_vtp_GGL_CBattleBehavior, shok_vtp_GGL_CLeaderBehavior, shok_vtp_GGL_CSoldierBehavior, shok_vtp_GGL_CSerfBattleBehavior, shok_vtp_GGL_CBattleSerfBehavior };
+	int v[5] = { shok_GGL_CBattleBehavior::vtp, shok_GGL_CLeaderBehavior::vtp, shok_GGL_CSoldierBehavior::vtp, shok_GGL_CSerfBattleBehavior::vtp, shok_GGL_CBattleSerfBehavior::vtp };
 	return (shok_GGL_CBattleBehavior*)SearchBehavior(v, 5);
 }
 
 shok_GGL_CHeroHawkBehavior* shok_EGL_CGLEEntity::GetHeroHawkBehavior()
 {
-	return (shok_GGL_CHeroHawkBehavior*)SearchBehavior(shok_vtp_GGL_CHeroHawkBehavior);
+	return (shok_GGL_CHeroHawkBehavior*)SearchBehavior(shok_GGL_CHeroHawkBehavior::vtp);
 }
 
 shok_GGL_CInflictFearAbility* shok_EGL_CGLEEntity::GetInflictFearBehavior()
 {
-	return (shok_GGL_CInflictFearAbility*)SearchBehavior(shok_vtp_GGL_CInflictFearAbility);
+	return (shok_GGL_CInflictFearAbility*)SearchBehavior(shok_GGL_CInflictFearAbility::vtp);
 }
 
 shok_GGL_CBombPlacerBehavior* shok_EGL_CGLEEntity::GetBombPlacerBehavior()
 {
-	return (shok_GGL_CBombPlacerBehavior*)SearchBehavior(shok_vtp_GGL_CBombPlacerBehavior);
+	return (shok_GGL_CBombPlacerBehavior*)SearchBehavior(shok_GGL_CBombPlacerBehavior::vtp);
 }
 
 shok_GGL_CCannonBuilderBehavior* shok_EGL_CGLEEntity::GetCannonBuilderBehavior()
 {
-	return (shok_GGL_CCannonBuilderBehavior*)SearchBehavior(shok_vtp_GGL_CCannonBuilderBehavior);
+	return (shok_GGL_CCannonBuilderBehavior*)SearchBehavior(shok_GGL_CCannonBuilderBehavior::vtp);
 }
 
 shok_GGL_CRangedEffectAbility* shok_EGL_CGLEEntity::GetRangedEffectBehavior()
 {
-	return (shok_GGL_CRangedEffectAbility*)SearchBehavior(shok_vtp_GGL_CRangedEffectAbility);
+	return (shok_GGL_CRangedEffectAbility*)SearchBehavior(shok_GGL_CRangedEffectAbility::vtp);
 }
 
 shok_GGL_CCircularAttack* shok_EGL_CGLEEntity::GetCircularAttackBehavior()
 {
-	return (shok_GGL_CCircularAttack*)SearchBehavior(shok_vtp_GGL_CCircularAttack);
+	return (shok_GGL_CCircularAttack*)SearchBehavior(shok_GGL_CCircularAttack::vtp);
 }
 
 shok_GGL_CSummonBehavior* shok_EGL_CGLEEntity::GetSummonBehavior()
 {
-	return (shok_GGL_CSummonBehavior*)SearchBehavior(shok_vtp_GGL_CSummonBehavior);
+	return (shok_GGL_CSummonBehavior*)SearchBehavior(shok_GGL_CSummonBehavior::vtp);
 }
 
 shok_GGL_CConvertSettlerAbility* shok_EGL_CGLEEntity::GetConvertSettlerBehavior()
 {
-	return (shok_GGL_CConvertSettlerAbility*)SearchBehavior(shok_vtp_GGL_CConvertSettlerAbility);
+	return (shok_GGL_CConvertSettlerAbility*)SearchBehavior(shok_GGL_CConvertSettlerAbility::vtp);
 }
 
 shok_GGL_CSniperAbility* shok_EGL_CGLEEntity::GetSniperBehavior()
 {
-	return (shok_GGL_CSniperAbility*)SearchBehavior(shok_vtp_GGL_CSniperAbility);
+	return (shok_GGL_CSniperAbility*)SearchBehavior(shok_GGL_CSniperAbility::vtp);
 }
 
 shok_GGL_CShurikenAbility* shok_EGL_CGLEEntity::GetShurikenBehavior()
 {
-	return (shok_GGL_CShurikenAbility*)SearchBehavior(shok_vtp_GGL_CShurikenAbility);
+	return (shok_GGL_CShurikenAbility*)SearchBehavior(shok_GGL_CShurikenAbility::vtp);
 }
 
 shok_GGL_CKegPlacerBehavior* shok_EGL_CGLEEntity::GetKegPlacerBehavior()
 {
-	return (shok_GGL_CKegPlacerBehavior*)SearchBehavior(shok_vtp_GGL_CKegPlacerBehavior);
+	return (shok_GGL_CKegPlacerBehavior*)SearchBehavior(shok_GGL_CKegPlacerBehavior::vtp);
 }
 
 shok_GGL_CAbilityScoutBinocular* shok_EGL_CGLEEntity::GetBinocularBehavior()
 {
-	return (shok_GGL_CAbilityScoutBinocular*)SearchBehavior(shok_vtp_GGL_CAbilityScoutBinocular);
+	return (shok_GGL_CAbilityScoutBinocular*)SearchBehavior(shok_GGL_CAbilityScoutBinocular::vtp);
 }
 
 shok_GGL_CTorchPlacerBehavior* shok_EGL_CGLEEntity::GetTorchPlacerBehavior()
 {
-	return (shok_GGL_CTorchPlacerBehavior*)SearchBehavior(shok_vtp_GGL_CTorchPlacerBehavior);
+	return (shok_GGL_CTorchPlacerBehavior*)SearchBehavior(shok_GGL_CTorchPlacerBehavior::vtp);
 }
 
 shok_GGL_CPointToResourceBehavior* shok_EGL_CGLEEntity::GetPointToResBehavior()
 {
-	return (shok_GGL_CPointToResourceBehavior*)SearchBehavior(shok_vtp_GGL_CPointToResourceBehavior);
+	return (shok_GGL_CPointToResourceBehavior*)SearchBehavior(shok_GGL_CPointToResourceBehavior::vtp);
 }
 
 shok_GGL_CKegBehavior* shok_EGL_CGLEEntity::GetKegBehavior()
 {
-	return (shok_GGL_CKegBehavior*)SearchBehavior(shok_vtp_GGL_CKegBehavior);
+	return (shok_GGL_CKegBehavior*)SearchBehavior(shok_GGL_CKegBehavior::vtp);
 }
 
 shok_GGL_CFoundryBehavior* shok_EGL_CGLEEntity::GetFoundryBehavior()
 {
-	return (shok_GGL_CFoundryBehavior*)SearchBehavior(shok_vtp_GGL_CFoundryBehavior);
+	return (shok_GGL_CFoundryBehavior*)SearchBehavior(shok_GGL_CFoundryBehavior::vtp);
 }
 
 shok_GGL_CBattleSerfBehavior* shok_EGL_CGLEEntity::GetBattleSerfBehavior()
 {
-	return (shok_GGL_CBattleSerfBehavior*)SearchBehavior(shok_vtp_GGL_CBattleSerfBehavior);
+	return (shok_GGL_CBattleSerfBehavior*)SearchBehavior(shok_GGL_CBattleSerfBehavior::vtp);
 }
 
 shok_GGL_CSerfBehavior* shok_EGL_CGLEEntity::GetSerfBehavior()
 {
-	return (shok_GGL_CSerfBehavior*)SearchBehavior(shok_vtp_GGL_CSerfBehavior);
+	return (shok_GGL_CSerfBehavior*)SearchBehavior(shok_GGL_CSerfBehavior::vtp);
 }
 
 static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, int cat)) 0x57BBEB;
@@ -203,7 +203,7 @@ bool shok_EGL_CGLEEntity::IsEntityInCategory(int cat)
 
 bool shok_EGL_CGLEEntity::IsMovingEntity()
 {
-	void* data[4] = { shok_vtp_EGL_CMovingEntity, shok_vtp_GGL_CEvadingEntity, shok_vtp_GGL_CSettler, shok_vtp_GGL_CAnimal };
+	int data[4] = { shok_EGL_CMovingEntity::vtp, shok_GGL_CEvadingEntity::vtp, shok_GGL_CSettler::vtp, shok_GGL_CAnimal::vtp };
 	return contains(data, vtable, 4);
 }
 
@@ -315,12 +315,12 @@ bool shok_EGL_CMovingEntity::IsMoving()
 bool shok_GGL_CSettler::IsIdle()
 {
 	int com = EventLeaderGetCurrentCommand();
-	return com == shok_LeaderCommandDefend || com == shok_LeaderCommandHoldPos || CurrentTaskListID == ((shok_GGL_CGLSettlerProps*)GetEntityType())->IdleTaskList;
+	return com == shok_LeaderCommand::Defend || com == shok_LeaderCommand::HoldPos || CurrentTaskListID == ((shok_GGL_CGLSettlerProps*)GetEntityType())->IdleTaskList;
 }
 
 int shok_GGL_CBuilding::GetConstructionSite()
 {
-	shok_attachment* a = ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_ATTACHMENT_CONSTRUCTION_SITE_BUILDING; });
+	shok_attachment* a = ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == shok_AttachmentType::CONSTRUCTION_SITE_BUILDING; });
 	if (a)
 		return a->EntityId;
 	return 0;
@@ -366,7 +366,7 @@ bool shok_GGL_CBuilding::IsIdle()
 	if (GetMarketBehavior() && GetMarketProgress() < 1.0f)
 		return false;
 	if (GetBarrackBehavior()) {
-		if (ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_FIGHTER_BARRACKS; }))
+		if (ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS; }))
 			return false;
 	}
 	return true;
@@ -403,7 +403,7 @@ void shok_EGL_CGLEEntity::ClearAttackers()
 {
 	std::vector<shok_GGL_CSettler*> tomove = std::vector<shok_GGL_CSettler*>();
 	ObserverEntities.ForAll([&tomove](shok_attachment* a) {
-		if (a->AttachmentType == AttachmentType_ATTACKER_COMMAND_TARGET || a->AttachmentType == AttachmentType_LEADER_TARGET || a->AttachmentType == AttachmentType_FOLLOWER_FOLLOWED) {
+		if (a->AttachmentType == shok_AttachmentType::ATTACKER_COMMAND_TARGET || a->AttachmentType == shok_AttachmentType::LEADER_TARGET || a->AttachmentType == shok_AttachmentType::FOLLOWER_FOLLOWED) {
 			shok_EGL_CGLEEntity* at = shok_eid2obj(a->EntityId);
 			if (at->IsSettler()) {
 				shok_GGL_CSettler* s = (shok_GGL_CSettler*)at;
@@ -478,7 +478,7 @@ void shok_EGL_CMovingEntity::LeaderAttachSoldier(int soldierId)
 static inline void(__thiscall* const shok_entity_expellSettler)(shok_EGL_CGLEEntity* th, int i) = (void(__thiscall*)(shok_EGL_CGLEEntity*, int))0x4A39BB;
 void shok_EGL_CMovingEntity::SettlerExpell()
 {
-	if (GetLeaderBehavior() && ObservedEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == AttachmentType_LEADER_SOLDIER; })) {
+	if (GetLeaderBehavior() && ObservedEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER; })) {
 		shok_event_data_EGL_CEventValue_bool_703333479 ev = shok_event_data_EGL_CEventValue_bool_703333479();
 		ev.id = 0x15046;
 		ev.b = true;
@@ -810,7 +810,7 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 		shok_GGL_CLeaderBehavior* lb = e->GetLeaderBehavior();
 		if (lb) {
 			std::vector<int> sol = std::vector<int>();
-			e->ObservedEntities.ForAll([&sol](shok_attachment* a) { if (a->AttachmentType == AttachmentType_LEADER_SOLDIER) sol.push_back(a->EntityId); });
+			e->ObservedEntities.ForAll([&sol](shok_attachment* a) { if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER) sol.push_back(a->EntityId); });
 			shok_GGL_CSettler* settler = (shok_GGL_CSettler*)shok_eid2obj(nid);
 			for (int i : sol) {
 				settler->LeaderAttachSoldier(fixedChangePlayer(i, pl));
@@ -922,7 +922,7 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 	float hp = (float) et->LogicProps->MaxHealth;
 	if (e->IsSettler()) {
 		for (int t : ((shok_GGL_CGLSettlerProps*)et->LogicProps)->ModifyHitpoints.TechList) {
-			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState_Researched)
+			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
 				continue;
 			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
 			hp = tech->HitpointModifier.ModifyValue(hp);
@@ -932,7 +932,7 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 		std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = BuildingMaxHpBoni.equal_range(e->EntityType);
 		for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
 			int t = i->second;
-			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState_Researched)
+			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
 				continue;
 			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
 			hp = tech->HitpointModifier.ModifyValue(hp);

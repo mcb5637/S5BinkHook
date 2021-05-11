@@ -68,13 +68,13 @@ int l_playerSetPaydayStatus(lua_State* L) {
 
 void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 	lua_newtable(L);
-	if (ev->vtable == shok_vtp_EGL_CNetEventEntityID) {
+	if (ev->vtable == shok_EGL_CNetEventEntityID::vtp) {
 		shok_EGL_CNetEventEntityID* e = (shok_EGL_CNetEventEntityID*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEvent2Entities) {
+	else if (ev->vtable == shok_EGL_CNetEvent2Entities::vtp) {
 		shok_EGL_CNetEvent2Entities* e = (shok_EGL_CNetEvent2Entities*)ev;
 		lua_pushstring(L, "ActorId");
 		lua_pushnumber(L, e->ActorId);
@@ -83,7 +83,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->TargetId);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPos) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityAndPos::vtp) {
 		shok_EGL_CNetEventEntityAndPos* e = (shok_EGL_CNetEventEntityAndPos*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -92,7 +92,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		luaext_pushPos(L, e->Position);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPosArray) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityAndPosArray::vtp) {
 		shok_EGL_CNetEventEntityAndPosArray* e = (shok_EGL_CNetEventEntityAndPosArray*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -110,7 +110,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->Rotation==-1.0f ? -1.0 : rad2deg((double)e->Rotation));
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventExtractResource) {
+	else if (ev->vtable == shok_GGL_CNetEventExtractResource::vtp) {
 		shok_GGL_CNetEventExtractResource* e = (shok_GGL_CNetEventExtractResource*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -122,7 +122,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		luaext_pushPos(L, e->Position);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventTransaction) {
+	else if (ev->vtable == shok_GGL_CNetEventTransaction::vtp) {
 		shok_GGL_CNetEventTransaction* e = (shok_GGL_CNetEventTransaction*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -137,7 +137,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->SellType);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventCannonCreator) {
+	else if (ev->vtable == shok_GGL_CNetEventCannonCreator::vtp) {
 		shok_GGL_CNetEventCannonCreator* e = (shok_GGL_CNetEventCannonCreator*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -152,7 +152,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		luaext_pushPos(L, e->Position);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDAndUpgradeCategory) {
+	else if (ev->vtable == shok_GGL_CNetEventEntityIDAndUpgradeCategory::vtp) {
 		shok_GGL_CNetEventEntityIDAndUpgradeCategory* e = (shok_GGL_CNetEventEntityIDAndUpgradeCategory*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -161,7 +161,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->UpgradeCategory);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndInteger) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityIDAndInteger::vtp) {
 		shok_EGL_CNetEventEntityIDAndInteger* e = (shok_EGL_CNetEventEntityIDAndInteger*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -170,7 +170,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->Data);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventTechnologyAndEntityID) {
+	else if (ev->vtable == shok_GGL_CNetEventTechnologyAndEntityID::vtp) {
 		shok_GGL_CNetEventTechnologyAndEntityID* e = (shok_GGL_CNetEventTechnologyAndEntityID*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
@@ -179,13 +179,13 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->Technology);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerID) {
+	else if (ev->vtable == shok_EGL_CNetEventPlayerID::vtp) {
 		shok_EGL_CNetEventPlayerID* e = (shok_EGL_CNetEventPlayerID*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventBuildingCreator) {
+	else if (ev->vtable == shok_GGL_CNetEventBuildingCreator::vtp) {
 		shok_GGL_CNetEventBuildingCreator* e = (shok_GGL_CNetEventBuildingCreator*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
@@ -206,7 +206,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		}
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventIntegerAndPlayerID) {
+	else if (ev->vtable == shok_EGL_CNetEventIntegerAndPlayerID::vtp) {
 		shok_EGL_CNetEventIntegerAndPlayerID* e = (shok_EGL_CNetEventIntegerAndPlayerID*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
@@ -215,7 +215,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->Data);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerIDAndInteger) {
+	else if (ev->vtable == shok_EGL_CNetEventPlayerIDAndInteger::vtp) {
 		shok_EGL_CNetEventPlayerIDAndInteger* e = (shok_EGL_CNetEventPlayerIDAndInteger*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
@@ -224,7 +224,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->Data);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerID) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityIDAndPlayerID::vtp) {
 		shok_EGL_CNetEventEntityIDAndPlayerID* e = (shok_EGL_CNetEventEntityIDAndPlayerID*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
@@ -233,7 +233,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->EntityId);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerIDAndEntityType) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType::vtp) {
 		shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType* e = (shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
@@ -245,7 +245,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->EntityType);
 		lua_rawset(L, -3);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDPlayerIDAndInteger) {
+	else if (ev->vtable == shok_GGL_CNetEventEntityIDPlayerIDAndInteger::vtp) {
 		shok_GGL_CNetEventEntityIDPlayerIDAndInteger* e = (shok_GGL_CNetEventEntityIDPlayerIDAndInteger*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
@@ -260,7 +260,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 }
 bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 	bool allRead = true;
-	if (ev->vtable == shok_vtp_EGL_CNetEventEntityID) {
+	if (ev->vtable == shok_EGL_CNetEventEntityID::vtp) {
 		shok_EGL_CNetEventEntityID* e = (shok_EGL_CNetEventEntityID*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -270,7 +270,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEvent2Entities) {
+	else if (ev->vtable == shok_EGL_CNetEvent2Entities::vtp) {
 		shok_EGL_CNetEvent2Entities* e = (shok_EGL_CNetEvent2Entities*)ev;
 		lua_pushstring(L, "ActorId");
 		lua_rawget(L, -2);
@@ -287,7 +287,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPos) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityAndPos::vtp) {
 		shok_EGL_CNetEventEntityAndPos* e = (shok_EGL_CNetEventEntityAndPos*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -304,7 +304,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityAndPosArray) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityAndPosArray::vtp) {
 		shok_EGL_CNetEventEntityAndPosArray* e = (shok_EGL_CNetEventEntityAndPosArray*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -348,7 +348,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventExtractResource) {
+	else if (ev->vtable == shok_GGL_CNetEventExtractResource::vtp) {
 		shok_GGL_CNetEventExtractResource* e = (shok_GGL_CNetEventExtractResource*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -372,7 +372,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventTransaction) {
+	else if (ev->vtable == shok_GGL_CNetEventTransaction::vtp) {
 		shok_GGL_CNetEventTransaction* e = (shok_GGL_CNetEventTransaction*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -403,7 +403,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventCannonCreator) {
+	else if (ev->vtable == shok_GGL_CNetEventCannonCreator::vtp) {
 		shok_GGL_CNetEventCannonCreator* e = (shok_GGL_CNetEventCannonCreator*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -434,7 +434,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDAndUpgradeCategory) {
+	else if (ev->vtable == shok_GGL_CNetEventEntityIDAndUpgradeCategory::vtp) {
 		shok_GGL_CNetEventEntityIDAndUpgradeCategory* e = (shok_GGL_CNetEventEntityIDAndUpgradeCategory*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -451,7 +451,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndInteger) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityIDAndInteger::vtp) {
 		shok_EGL_CNetEventEntityIDAndInteger* e = (shok_EGL_CNetEventEntityIDAndInteger*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -468,7 +468,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventTechnologyAndEntityID) {
+	else if (ev->vtable == shok_GGL_CNetEventTechnologyAndEntityID::vtp) {
 		shok_GGL_CNetEventTechnologyAndEntityID* e = (shok_GGL_CNetEventTechnologyAndEntityID*)ev;
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
@@ -485,7 +485,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerID) {
+	else if (ev->vtable == shok_EGL_CNetEventPlayerID::vtp) {
 		shok_EGL_CNetEventPlayerID* e = (shok_EGL_CNetEventPlayerID*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
@@ -495,7 +495,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventBuildingCreator) {
+	else if (ev->vtable == shok_GGL_CNetEventBuildingCreator::vtp) {
 		shok_GGL_CNetEventBuildingCreator* e = (shok_GGL_CNetEventBuildingCreator*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
@@ -540,7 +540,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventIntegerAndPlayerID) {
+	else if (ev->vtable == shok_EGL_CNetEventIntegerAndPlayerID::vtp) {
 		shok_EGL_CNetEventIntegerAndPlayerID* e = (shok_EGL_CNetEventIntegerAndPlayerID*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
@@ -557,7 +557,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventPlayerIDAndInteger) {
+	else if (ev->vtable == shok_EGL_CNetEventPlayerIDAndInteger::vtp) {
 		shok_EGL_CNetEventPlayerIDAndInteger* e = (shok_EGL_CNetEventPlayerIDAndInteger*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
@@ -574,7 +574,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerID) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityIDAndPlayerID::vtp) {
 		shok_EGL_CNetEventEntityIDAndPlayerID* e = (shok_EGL_CNetEventEntityIDAndPlayerID*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
@@ -591,7 +591,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_EGL_CNetEventEntityIDAndPlayerIDAndEntityType) {
+	else if (ev->vtable == shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType::vtp) {
 		shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType* e = (shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
@@ -615,7 +615,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (ev->vtable == shok_vtp_GGL_CNetEventEntityIDPlayerIDAndInteger) {
+	else if (ev->vtable == shok_GGL_CNetEventEntityIDPlayerIDAndInteger::vtp) {
 		shok_GGL_CNetEventEntityIDPlayerIDAndInteger* e = (shok_GGL_CNetEventEntityIDPlayerIDAndInteger*)ev;
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
@@ -817,12 +817,12 @@ int l_logicGetLoadOrder(lua_State* L) {
 	lua_newtable(L);
 	int r = 1;
 	for (shok_BB_IFileSystem* a : (*shok_BB_CFileSystemMgrObj)->LoadOrder) {
-		if (a->vtable == shok_vtp_BB_CDirectoryFileSystem) {
+		if (a->vtable == shok_BB_CDirectoryFileSystem::vtp) {
 			lua_pushstring(L, ((shok_BB_CDirectoryFileSystem*)a)->Path);
 			lua_rawseti(L, -2, r);
 			r++;
 		}
-		else if (a->vtable == shok_vtp_BB_CBBArchiveFile) {
+		else if (a->vtable == shok_BB_CBBArchiveFile::vtp) {
 			lua_pushstring(L, ((shok_BB_CBBArchiveFile*)a)->Path);
 			lua_rawseti(L, -2, r);
 			r++;
@@ -842,7 +842,7 @@ int l_logicRemoveTop(lua_State* L) {
 	if ((*shok_BB_CFileSystemMgrObj)->LoadOrder.size() <= 0)
 		return 0;
 	shok_BB_IFileSystem* a = (*shok_BB_CFileSystemMgrObj)->LoadOrder[0];
-	luaext_assert(L, a->vtable == shok_vtp_BB_CBBArchiveFile, "may only remove archives");
+	luaext_assert(L, a->vtable == shok_BB_CBBArchiveFile::vtp, "may only remove archives");
 	luaext_assert(L, str_ends_with(((shok_BB_CBBArchiveFile*)a)->Path, ".s5x"), "may only remove maps");
 	(*shok_BB_CFileSystemMgrObj)->RemoveTopArchive();
 	return 0;

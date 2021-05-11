@@ -200,7 +200,7 @@ public:
 
 struct shok_object {
 public:
-	void* vtable;
+	int vtable;
 };
 
 struct shok_attachment {

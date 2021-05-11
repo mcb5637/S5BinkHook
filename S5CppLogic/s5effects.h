@@ -1,48 +1,52 @@
 #pragma once
 #include "s5data.h"
 
-#define shok_vtp_EGL_CEffect (void*)0x784B28
 struct shok_EGL_CEffect : shok_object {
-	PADDINGI(15)
-		shok_position Position; // 16
+	PADDINGI(15);
+	shok_position Position; // 16
 	int SpawnedTurn; // 18
-	PADDINGI(1)
-		int EffectType; // 20
-	PADDINGI(2)
-		int EffectID; // 23
+	PADDINGI(1);
+	int EffectType; // 20
+	PADDINGI(2);
+	int EffectID; // 23
+
+	static inline constexpr int vtp = 0x784B28;
 
 	bool IsCannonBallEffect();
 	bool IsArrowEffect();
 };
-#define shok_vtp_EGL_CFlyingEffect (void*)0x7775E4
 struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
-	PADDINGI(6)
-		int SpawnedTurnAgain; //30
+	PADDINGI(6);
+	int SpawnedTurnAgain; //30
 	float GravityFactor;
-	PADDINGI(2)
-		shok_position StartPosition, TargetPosition, CurrentPosition, NextPosition;
-	PADDINGI(1)
-		float StrangeFloat;
-	PADDINGI(3)
-		int AttackerID; // 47
+	PADDINGI(2);
+	shok_position StartPosition, TargetPosition, CurrentPosition, NextPosition;
+	PADDINGI(1);
+	float StrangeFloat;
+	PADDINGI(3);
+	int AttackerID; // 47
+
+	static inline constexpr int vtp = 0x7775E4;
 
 	static void HookOnHit();
 };
 extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
 extern void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post);
 
-#define shok_vtp_GGL_CArrowEffect (void*)0x778E24
 struct shok_GGL_CArrowEffect : shok_EGL_CFlyingEffect {
 	int TargetID;
 	int DamageAmount;
+
+	static inline constexpr int vtp = 0x778E24;
 };
-#define shok_vtp_GGL_CCannonBallEffect (void*)0x777690
 struct shok_GGL_CCannonBallEffect : shok_EGL_CFlyingEffect {
 	int SourcePlayer; // 48
 	void* Props;
 	int DamageAmount; // 50
 	float AoERange;
 	int DamageClass; // 52
+
+	static inline constexpr int vtp = 0x777690;
 };
 
 struct shok_EGL_CGLEEffectCreator { // 16 source player, 13 dmg

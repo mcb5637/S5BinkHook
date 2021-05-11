@@ -4,19 +4,18 @@
 
 struct shok_modifyEntityProps {
 	int MysteriousInt;
-	vector_padding
-		std::vector<int, shok_allocator<int>> TechList;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> TechList;
 };
 
 
-#define shok_vtp_EGL_CGLEEntityProps (void*)0x76E47C
 struct shok_EGL_CGLEEntityProps : shok_object {
 private:
 	int u3;
 public:
 	int Class;
-	vector_padding
-		std::vector<int, shok_allocator<int>> Categories;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> Categories;
 	shok_positionRot ApproachPos;
 private:
 	int Race;
@@ -34,13 +33,16 @@ private:
 	byte u[2];
 	int u2[9];
 public:
-	vector_padding
-		std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
+	vector_padding;
+	std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
+
+	static inline constexpr int vtp = 0x76E47C;
 };
 
-#define shok_vtp_GGL_CEntityProperties (void*)0x776FEC
 struct shok_GGL_CEntityProperties : shok_EGL_CGLEEntityProps {
 	int ResourceEntity, ResourceAmount, SummerEffect, WinterEffect;
+
+	static inline constexpr int vtp = 0x776FEC;
 };
 
 struct shok_upgradeInfo {
@@ -48,7 +50,6 @@ struct shok_upgradeInfo {
 	shok_costInfo Cost;
 	int Type, Category;
 };
-#define shok_vtp_GGL_CGLSettlerProps (void*)0x76E498
 struct shok_GGL_CGLSettlerProps : shok_EGL_CGLEEntityProps {
 private:
 	int HeadSet, Hat;
@@ -66,52 +67,56 @@ private:
 public:
 	shok_modifyEntityProps ModifyExploration, ModifyHitpoints, ModifySpeed, ModifyDamage, ModifyArmor, ModifyDodge, ModifyMaxRange, ModifyMinRange, ModifyDamageBonus, ModifyGroupLimit;
 	int AttractionSlots;
+
+	static inline constexpr int vtp = 0x76E498;
 };
 
-#define shok_vtp_GGL_CGLAnimalProps (void*)0x779074
 struct shok_GGL_CGLAnimalProps : shok_EGL_CGLEEntityProps {
 	int DefaultTaskList;
 	float TerritoryRadius, WanderRangeMin, WanderRangeMax, ShyRange, MaxBuildingPollution;
 	int FleeTaskList;
+
+	static inline constexpr int vtp = 0x779074;
 };
 
-#define shok_vtp_GGL_CBuildBlockProperties (void*)0x76EB38
 struct shok_GGL_CBuildBlockProperties : shok_EGL_CGLEEntityProps {
 	shok_AARect BuildBlockArea; // la 41
+
+	static inline constexpr int vtp = 0x76EB38;
 };
 
-#define shok_vtp_GGL_CResourceDoodadProperties (void*)0x76FF68
 struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
 	float Radius;
 	shok_position Center, LineStart, LineEnd;
 	int ExtractTaskList, Model1, Model2;
+
+	static inline constexpr int vtp = 0x76FF68;
 };
 
 struct shok_constructionInfo {
 private:
 	int u;
 public:
-	vector_padding
-		std::vector<shok_positionRot, shok_allocator<shok_positionRot>> BuilderSlot;
+	vector_padding;
+	std::vector<shok_positionRot, shok_allocator<shok_positionRot>> BuilderSlot;
 	int Time;
 	shok_costInfo Cost;
 	int ConstructionSite;
 };
-#define shok_vtp_GGL_CGLBuildingProps (void*)0x76EC78
 struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
 	int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker;
 	shok_position DoorPos, LeavePos;
 	shok_constructionInfo ConstructionInfo;
-	vector_padding
-		std::vector<int, shok_allocator<int>> BuildOn;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> BuildOn;
 	byte HideBase, CanBeSold, IsWall;
 private:
 	byte u;
 public:
 	shok_upgradeInfo Upgrade;
 	int UpgradeSite, ArmorClass, ArmorAmount;
-	vector_padding
-		std::vector<int, shok_allocator<int>> WorkTaskList;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> WorkTaskList;
 private:
 	int MilitaryInfo[4];
 public:
@@ -122,15 +127,17 @@ private:
 public:
 	shok_modifyEntityProps ModifyExploration, ModifyArmor;
 	float KegEffectFactor; // 124
+
+	static inline constexpr int vtp = 0x76EC78;
 };
 
-#define shok_vtp_GGL_CBridgeProperties (void*)0x778148
 struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	shok_AARect BridgeArea;
 	int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
+
+	static inline constexpr int vtp = 0x778148;
 };
 
-#define shok_vtp_ED_CDisplayEntityProps (void*)0x788840
 struct shok_ED_CDisplayEntityProps : shok_object {
 	int DisplayClass;
 	int Model[4];
@@ -138,24 +145,27 @@ struct shok_ED_CDisplayEntityProps : shok_object {
 private:
 	byte u[2];
 public:
-	vector_padding
-		std::vector<int, shok_allocator<int>> AnimList;
+	vector_padding;
+	std::vector<int, shok_allocator<int>> AnimList;
+
+	static inline constexpr int vtp = 0x788840;
 };
 
-#define shok_vtp_GGlue_CGlueEntityProps (void*)0x788824
 struct shok_GGlue_CGlueEntityProps : shok_object {
 public:
 	int u;
 public:
 	shok_EGL_CGLEEntityProps* LogicProps;
 	shok_ED_CDisplayEntityProps* DisplayProps;
-	vector_padding
-		std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps;
+	vector_padding;
+	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps;
+
+	static inline constexpr int vtp = 0x788824;
 
 
 private:
-	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(void** vts, int num);
-	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(void* vt);
+	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(int* vts, int num);
+	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(int vt);
 
 public:
 	shok_GGL_CLeaderBehaviorProps* GetLeaderBehaviorProps();

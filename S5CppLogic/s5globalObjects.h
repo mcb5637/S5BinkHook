@@ -1,13 +1,14 @@
 #pragma once
 #include "s5data.h"
 
-#define shok_vtp_EGL_CGLEEntitiesProps (void*)0x788834
 struct shok_EGL_CGLEEntitiesProps : shok_object {
 private:
 	int u[14];
 public:
 	vector_padding;
 	std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes;
+
+	static inline constexpr int vtp = 0x788834;
 
 	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
 };
@@ -33,35 +34,38 @@ struct shok_BB_CIDManagerEx : shok_object {
 static inline shok_BB_CIDManagerEx** const shok_BB_CIDManagerExObj = (shok_BB_CIDManagerEx**)0xA0C838;
 
 
-#define shok_vtp_EGL_CTerrainVertexColors (void*)0x7841F8
 struct shok_EGL_CTerrainVertexColors : shok_object {
 	int ArraySizeX, ArraySizeY;
 	int* VertexColors;
+
+	static inline constexpr int vtp = 0x7841F8;
 
 	void ToTerrainCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
 	int GetTerrainVertexColor(shok_position& p);
 	// set 580582 (this, x, y, *col) terraincoord
 };
-#define shok_vtp_EGL_CGLETerrainHiRes (void*)0x7837B0
 struct shok_EGL_CGLETerrainHiRes : shok_object {
 	vector_padding;
 	std::vector<int16_t, shok_allocator<int16_t>> TerrainHeights;
 	int MaxSizeX, MaxSizeY; // 5
 	int ArraySizeX, ArraySizeY; // 7
 
+	static inline constexpr int vtp = 0x7837B0;
+
 	void ToTerrainCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
 	int GetTerrainHeight(shok_position& p);
 	// set 591B53 (this, *out, int16 h)
 };
-#define shok_vtp_EGL_CGLETerrainLowRes (void*)0x7837C0
 struct shok_EGL_CGLETerrainLowRes : shok_object {
 	vector_padding
 	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
 	PADDINGI(4); // 1 vectors of int
 	int MaxSizeX, MaxSizeY; // 9
 	int ArraySizeX, ArraySizeY; // 11
+
+	static inline constexpr int vtp = 0x7837C0;
 
 	void ToQuadCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
@@ -72,24 +76,26 @@ struct shok_EGL_CGLETerrainLowRes : shok_object {
 	// set water type 591BB9 (this, *out, int)
 	// set terrain type 58BBCE (this, *out, int)
 };
-#define shok_vtp_EGL_CGLELandscape (void*)0x783C38
 struct shok_EGL_CGLELandscape : shok_object {
 	PADDINGI(6);
 	shok_EGL_CGLETerrainHiRes* HiRes;
 	shok_EGL_CGLETerrainLowRes* LowRes;
 	shok_EGL_CTerrainVertexColors* VertexColors;
 
+	static inline constexpr int vtp = 0x783C38;
+
 	int GetSector(shok_position* p);
 	bool GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut);
 };
 
 // game logic
-#define shok_vtp_EGL_CGLEGameLogic (void*)0x7839CC
 struct shok_EGL_CGLEGameLogic : shok_object {
 	PADDINGI(6);
 	int* InGameTime; // 7
 	PADDINGI(1);
 	shok_EGL_CGLELandscape* Landscape; // 9
+
+	static inline constexpr int vtp = 0x7839CC;
 
 	int CreateEffect(shok_EGL_CGLEEffectCreator* data);
 	int CreateEntity(shok_EGL_CGLEEntityCreator* cr);
@@ -106,11 +112,9 @@ constexpr int CreatEffectReturnCannonBallOnHit = 0x4ff55e;
 
 static inline int* const shok_mapsize = (int*)0x898B74;
 
-#define shok_vtp_EGL_CRegionInfo (void*)0x783878
 struct shok_EGL_CRegionInfo : shok_object {
-
+	static inline constexpr int vtp = 0x783878;
 };
-#define shok_vtp_ED_CGlobalsLogicEx (void*)0x769F74
 struct shok_ED_CGlobalsLogicEx : shok_object {
 	PADDINGI(5);
 	struct {
@@ -119,6 +123,8 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 	}* Blocking; // 6
 	PADDINGI(2);
 	shok_EGL_CRegionInfo* RegionInfo; // 9
+
+	static inline constexpr int vtp = 0x769F74;
 
 	void ToTerrainCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
@@ -144,9 +150,10 @@ public:
 };
 static inline shok_EGL_CGLEEntityManager** const shok_EGL_CGLEEntityManagerObj = (shok_EGL_CGLEEntityManager**)0x897558;
 
-#define shok_vtp_GGL_CDamageClassProps (void*)0x788978
 struct shok_GGL_CDamageClassProps : shok_object {
 	float BonusVsArmorClass[7];
+
+	static inline constexpr int vtp = 0x788978;
 };
 struct shok_damageClassHolder {
 	PADDINGI(1);
@@ -156,33 +163,37 @@ struct shok_damageClassHolder {
 static inline shok_damageClassHolder** const shok_DamageClassHolderObj = (shok_damageClassHolder**)0x85A3DC;
 
 
-#define shok_vtp_GGL_CLogicProperties_SBuildingUpgradeCategory (void*)0x76EF10
 struct shok_GGL_CLogicProperties_SBuildingUpgradeCategory : shok_object {
 	int Category, FirstBuilding;
-	PADDINGI(1)
+	PADDINGI(1);
+
+	static inline constexpr int vtp = 0x76EF10;
 };
-#define shok_vtp_GGL_CLogicProperties_SSettlerUpgradeCategory (void*)0x76EF18
 struct shok_GGL_CLogicProperties_SSettlerUpgradeCategory : shok_object {
 	int Category, FirstSettler;
+
+	static inline constexpr int vtp = 0x76EF18;
 };
-#define shok_vtp_GGL_CLogicProperties_STaxationLevel (void*)0x76EF20
 struct shok_GGL_CLogicProperties_STaxationLevel : shok_object {
 	int RegularTax;
 	float MotivationChange;
+
+	static inline constexpr int vtp = 0x76EF20;
 };
-#define shok_vtp_GGL_CLogicProperties_STradeResource (void*)0x76EF28
 struct shok_GGL_CLogicProperties_STradeResource : shok_object {
 	int ResourceType;
 	float BasePrice, MinPrice, MaxPrice, Inflation, Deflation, WorkAmount;
+
+	static inline constexpr int vtp = 0x76EF28;
 };
-#define shok_vtp_GGL_CLogicProperties_SBlessCategory (void*)0x76EFC4
 struct shok_GGL_CLogicProperties_SBlessCategory : shok_object {
 	int Name;
 	float RequiredFaith;
 	vector_padding;
 	std::vector<int, shok_allocator<int>> EntityTypes;
+
+	static inline constexpr int vtp = 0x76EFC4;
 };
-#define shok_vtp_GGL_CLogicProperties (void*)0x76EFCC
 struct shok_GGL_CLogicProperties : shok_object {
 	int CompensationOnBuildingSale;
 	vector_padding;
@@ -251,6 +262,8 @@ struct shok_GGL_CLogicProperties : shok_object {
 	float LeaderApproachRange;
 	int AlarmRechargeTime;
 	int OvertimeRechargeTimeInMs; // 113
+
+	static inline constexpr int vtp = 0x76EFCC;
 };
 static inline shok_GGL_CLogicProperties** const shok_GGL_CLogicPropertiesObj = (shok_GGL_CLogicProperties**)0x85A3E0;
 
@@ -263,13 +276,14 @@ static inline shok_GGL_CPlayerAttractionProps** const shok_GGL_CPlayerAttraction
 struct shok_BB_IPostEvent : shok_object {
 
 };
-#define shok_vtp_GGUI_CManager (void*)0x77B2F8
 struct shok_GGUI_CManager : shok_object {
-	PADDINGI(9)
+	PADDINGI(9);
 private:
 	shok_BB_IPostEvent* PostEvent;
 
 public:
+	static inline constexpr int vtp = 0x77B2F8;
+
 	void HackPostEvent();
 };
 static inline shok_GGUI_CManager* (__cdecl* const shok_GetGuiManager)() = (shok_GGUI_CManager * (__cdecl*)()) 0x525622;
@@ -290,7 +304,6 @@ struct shok_GGL_CWeatherHandler : shok_object {
 };
 
 // gamelogic
-#define shok_vtp_GGL_CGLGameLogic (void*)0x76E018
 struct shok_GGL_CGLGameLogic : shok_object {
 	PADDINGI(9)
 public:
@@ -300,6 +313,8 @@ public:
 private:
 	shok_GGL_CGLGameLogic_TechList* TechList;
 public:
+
+	static inline constexpr int vtp = 0x76E018;
 
 	shok_GGL_CPlayerStatus* GetPlayer(int i);
 	shok_technology* GetTech(int i);
@@ -312,12 +327,13 @@ public:
 static inline shok_GGL_CGLGameLogic** const shok_GGL_CGLGameLogicObj = (shok_GGL_CGLGameLogic**)0x85A3A0;
 
 
-#define shok_vtp_EScr_CScriptTriggerSystem (void*)0x78667C
 struct shok_EScr_CScriptTriggerSystem : shok_object {
 private:
 	shok_BB_IPostEvent PostEvent;
 
 public:
+	static inline constexpr int vtp = 0x78667C;
+
 	void RunTrigger(shok_BB_CEvent* ev);
 };
 static inline shok_EScr_CScriptTriggerSystem** const shok_EScr_CScriptTriggerSystemObj = (shok_EScr_CScriptTriggerSystem**)0x895DEC;
@@ -325,19 +341,22 @@ static inline shok_EScr_CScriptTriggerSystem** const shok_EScr_CScriptTriggerSys
 struct shok_BB_IFileSystem : shok_object {
 
 };
-#define shok_vtp_BB_CDirectoryFileSystem (void*)0x7803B4
 struct shok_BB_CDirectoryFileSystem : shok_BB_IFileSystem {
 	char* Path;
+
+	static inline constexpr int vtp = 0x7803B4;
 };
-#define shok_vtp_BB_CBBArchiveFile (void*)0x77FABC
 struct shok_BB_CBBArchiveFile : shok_BB_IFileSystem {
 	PADDINGI(2) // BB::CFileStream 761C98, then probably file handle
 	char* Path;
+
+	static inline constexpr int vtp = 0x77FABC;
 };
-#define shok_vtp_BB_CFileSystemMgr (void*)0x77F794
 struct shok_BB_CFileSystemMgr : shok_object {
 	vector_padding;
 	std::vector<shok_BB_IFileSystem*, shok_allocator<shok_BB_IFileSystem*>> LoadOrder;
+
+	static inline constexpr int vtp = 0x77F794;
 
 	void AddFolder(const char* path);
 	void AddArchive(const char* path);
@@ -345,7 +364,6 @@ struct shok_BB_CFileSystemMgr : shok_object {
 };
 static inline shok_BB_CFileSystemMgr** const shok_BB_CFileSystemMgrObj = (shok_BB_CFileSystemMgr**)0x88F088;
 
-#define shok_vtp_ED_CDisplayProps (void*)0x7AE630
 struct shok_ED_CDisplayProps : shok_object {
 	byte ShadowBlur;
 	PADDING(3);
@@ -365,23 +383,27 @@ struct shok_ED_CDisplayProps : shok_object {
 	shok_string AuraTexture;
 	int CommandAcknowledgementModel;
 	int CommandAcknowledgementDuration;
+
+	static inline constexpr int vtp = 0x7AE630;
 };
 
-#define shok_vtp_ED_CPlayerColors (void*)0x76964C
 struct shok_ED_CPlayerColors : shok_object {
 
 	PADDINGI(63);
 	int Colors[17]; // 8 player
 
+	static inline constexpr int vtp = 0x76964C;
+
 	int GetColorByIndex(int i);
 	void SetColorByIndex(int i, int c);
 	void RefreshPlayerColors();
 };
-#define shok_vtp_ED_CGlobalsBaseEx (void*)0x769478
 struct shok_ED_CGlobalsBaseEx : shok_object {
 	PADDINGI(4);
 	shok_ED_CDisplayProps* DisplayProps;
 	PADDINGI(16);
 	shok_ED_CPlayerColors* PlayerColors;
+
+	static inline constexpr int vtp = 0x769478;
 };
 static inline shok_ED_CGlobalsBaseEx** const shok_ED_CGlobalsBaseExObj = (shok_ED_CGlobalsBaseEx**)0x857E8C;

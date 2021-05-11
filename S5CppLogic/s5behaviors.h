@@ -7,78 +7,77 @@ private:
 	int PropPointer; // 3
 };
 
-#define shok_vtp_GGL_CBehaviorDefaultMovement (void*)0x7786AC
 struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior {
 private:
 	int Counter;
 public:
 	float MovementSpeed, TurningSpeed, SpeedFactor;
 
+	static inline constexpr int vtp = 0x7786AC;
+
 	float GetMovementSpeed();
 };
 
-#define shok_vtp_GGL_CSettlerMovement (void*)0x77471C
 struct shok_GGL_CSettlerMovement : shok_GGL_CBehaviorDefaultMovement {
 private:
 	int u;
 public:
 	shok_positionRot PositionHiRes, Position;
 	byte BlockingFlag;
-private:
-	byte u2[3];
+	PADDING(3);
+
+	static inline constexpr int vtp = 0x77471C;
 };
 
-#define shok_vtp_GGL_CLeaderMovement (void*)0x775ED4
 struct shok_GGL_CLeaderMovement : shok_GGL_CBehaviorDefaultMovement {
 	int MoveTaskList;
 	shok_positionRot NextWayPoint, LastTurnPos;
 	byte IsPathingUsed, IsMoveFinished;
-private:
-	byte u[2];
+	PADDING(2);
+
+	static inline constexpr int vtp = 0x775ED4;
 };
 
-#define shok_vtp_GGL_CSoldierMovement (void*)0x77438C
 struct shok_GGL_CSoldierMovement : shok_GGL_CBehaviorDefaultMovement {
-
+	static inline constexpr int vtp = 0x77438C;
 };
 
 struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior {
-	PADDINGI(1)
-		int AbilitySecondsCharged; // 5
+	PADDINGI(1);
+	int AbilitySecondsCharged; // 5
 };
 
-#define shok_vtp_GGL_CCamouflageBehavior (void*)0x7738F4
 struct shok_GGL_CCamouflageBehavior : shok_GGL_CHeroAbility {
-	PADDINGI(2)
-		int InvisibilityRemaining;
+	PADDINGI(2);
+	int InvisibilityRemaining;
+
+	static inline constexpr int vtp = 0x7738F4;
 
 	bool IsThiefCamoBehavior();
 };
 
-#define shok_vtp_GGL_CThiefCamouflageBehavior (void*)0x773934
 struct shok_GGL_CThiefCamouflageBehavior : shok_GGL_CCamouflageBehavior {
 	int TimeToInvisibility;
+
+	static inline constexpr int vtp = 0x773934;
 };
 
-#define shok_vtp_GGL_CHeroHawkBehavior (void*)0x7766F0
 struct shok_GGL_CHeroHawkBehavior : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x7766F0;
 };
 
-#define shok_vtp_GGL_CInflictFearAbility (void*)0x776638
 struct shok_GGL_CInflictFearAbility : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x776638;
 };
 
-#define shok_vtp_GGL_CBombPlacerBehavior (void*)0x7783D8
 struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
 	shok_position StartPosition, TargetPosition;
 	byte PlacedBomb;
-private:
-	byte u[3];
+	PADDING(3);
+
+	static inline constexpr int vtp = 0x7783D8;
 };
 
-#define shok_vtp_GGL_CCannonBuilderBehavior (void*)0x7774D4
 struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
 private:
 	int u;
@@ -86,83 +85,79 @@ public:
 	shok_position StartPosition;
 	int CannonType, FoundationType;
 	byte PlacedCannon;
-private:
-	byte u2[3];
+	PADDINGI(3);
+
+	static inline constexpr int vtp = 0x7774D4;
 };
 
-#define shok_vtp_GGL_CRangedEffectAbility (void*)0x774E54
 struct shok_GGL_CRangedEffectAbility : shok_GGL_CHeroAbility {
 private:
 	int u;
 public:
 	int SecondsRemaining;
+
+	static inline constexpr int vtp = 0x7774D4;
 };
 
-#define shok_vtp_GGL_CCircularAttack (void*)0x777464
 struct shok_GGL_CCircularAttack : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x777464;
 };
 
-#define shok_vtp_GGL_CSummonBehavior (void*)0x773C10
 struct shok_GGL_CSummonBehavior : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x773C10;
 };
 
-#define shok_vtp_GGL_CConvertSettlerAbility (void*)0x777294
 struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
 private:
 	int u;
 public:
 	int TimeToConvert;
+
+	static inline constexpr int vtp = 0x777294;
 };
 
-#define shok_vtp_GGL_CSniperAbility (void*)0x7745AC
 struct shok_GGL_CSniperAbility : shok_GGL_CHeroAbility {
 private:
 	int u;
 public:
 	int TargetId;
+
+	static inline constexpr int vtp = 0x7745AC;
 };
 
-#define shok_vtp_GGL_CMotivateWorkersAbility (void*)0x77574C
 struct shok_GGL_CMotivateWorkersAbility : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x77574C;
 };
 
-#define shok_vtp_GGL_CShurikenAbility (void*)0x774658
 struct shok_GGL_CShurikenAbility : shok_GGL_CHeroAbility {
 private:
 	int u;
 public:
 	int TargetId;
+
+	static inline constexpr int vtp = 0x774658;
 };
 
-#define shok_vtp_GGL_CKegPlacerBehavior (void*)0x776368
 struct shok_GGL_CKegPlacerBehavior : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x776368;
 };
 
-#define shok_vtp_GGL_CAbilityScoutBinocular (void*)0x779218
 struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x779218;
 };
 
-#define shok_vtp_GGL_CTorchPlacerBehavior (void*)0x773738
 struct shok_GGL_CTorchPlacerBehavior : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x773738;
 };
 
-#define shok_vtp_GGL_CPointToResourceBehavior (void*)0x774FB0
 struct shok_GGL_CPointToResourceBehavior : shok_GGL_CHeroAbility {
-
+	static inline constexpr int vtp = 0x774FB0;
 };
 
-#define shok_vtp_GGL_CSentinelBehavior (void*)0x774B6C
 struct shok_GGL_CSentinelBehavior : shok_EGL_CGLEBehavior {
-
+	static inline constexpr int vtp = 0x774B6C;
 };
 
-#define shok_vtp_GGL_CGLBehaviorAnimationEx (void*)0x776B64
 struct shok_GGL_CGLBehaviorAnimationEx : shok_EGL_CGLEBehavior {
 	int Animation, AnimCategory, SuspendedAnimation, StartTurn, Duration;
 	byte PlayBackwards;
@@ -171,14 +166,16 @@ private:
 public:
 	int TurnToWaitFor;
 	float Speed;
+
+	static inline constexpr int vtp = 0x776B64;
 };
 
-#define shok_vtp_GGL_CBehaviorWalkCommand (void*)0x7736A4
 struct shok_GGL_CBehaviorWalkCommand : shok_EGL_CGLEBehavior {
 	shok_position TargetPosition;
+
+	static inline constexpr int vtp = 0x7736A4;
 };
 
-#define shok_vtp_GGL_CWorkerBehavior (void*)0x772B30
 struct shok_GGL_CWorkerBehavior : shok_EGL_CGLEBehavior {
 	int WorkTimeRemaining, TargetWorkTime;
 	float Motivation;
@@ -187,9 +184,10 @@ private:
 public:
 	int CycleIndex, TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn, CouldConsumeResource, IsLeaving;
 	float TransportAmount;
+
+	static inline constexpr int vtp = 0x772B30;
 };
 
-#define shok_vtp_GGL_CBattleBehavior (void*)0x77313C
 struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior {
 	float SuccessDistance, FailureDistance;
 	int TimeOutTime, StartTurn;
@@ -214,10 +212,11 @@ private:
 public:
 	int MilliSecondsToWait, MSToPlayHitAnimation, HitPlayed; // la 23
 
+	static inline constexpr int vtp = 0x77313C;
+
 	float GetMaxRange();
 };
 
-#define shok_vtp_GGL_CLeaderBehavior (void*)0x7761E0
 struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 private:
 	int u[3];
@@ -238,110 +237,111 @@ private:
 public:
 	int SecondsSinceHPRefresh, NudgeCount, FormationType;
 	shok_position StartBattlePosition;
+
+	static inline constexpr int vtp = 0x7761E0;
 };
 
-#define shok_vtp_GGL_CSoldierBehavior (void*)0x773CC8
 struct shok_GGL_CSoldierBehavior : shok_GGL_CBattleBehavior {
+	static inline constexpr int vtp = 0x773CC8;
 };
 
-#define shok_vtp_GGL_CBattleSerfBehavior (void*)0x7788C4
 struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
-
+	static inline constexpr int vtp = 0x7788C4;
 };
 
-#define shok_vtp_GGL_CSerfBattleBehavior (void*)0x774A98
 struct shok_GGL_CSerfBattleBehavior : shok_GGL_CBattleBehavior {
-
+	static inline constexpr int vtp = 0x774A98;
 };
 
-#define shok_vtp_GGL_CSerfBehavior (void*)0x774874
 struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
-
+	static inline constexpr int vtp = 0x774874;
 };
 
-#define shok_vtp_GGL_CLimitedAttachmentBehavior (void*)0x775E84
 struct shok_GGL_CLimitedAttachmentBehavior : shok_EGL_CGLEBehavior {
 	// Attachment1 at 6, 0
+
+	static inline constexpr int vtp = 0x775E84;
 };
 
-#define shok_vtp_GGL_CFormationBehavior (void*)0x776D60
 struct shok_GGL_CFormationBehavior : shok_EGL_CGLEBehavior {
 	int AnimStartTurn, AnimDuration;
+
+	static inline constexpr int vtp = 0x776D60;
 };
 
-#define shok_vtp_GGL_CCamperBehavior (void*)0x77777C
 struct shok_GGL_CCamperBehavior : shok_EGL_CGLEBehavior {
-
+	static inline constexpr int vtp = 0x77777C;
 };
 
-#define shok_vtp_GGL_CGLBehaviorDying (void*)0x7785E4
 struct shok_GGL_CGLBehaviorDying : shok_EGL_CGLEBehavior {
-
+	static inline constexpr int vtp = 0x7785E4;
 };
 
-#define shok_vtp_GGL_CHeroBehavior (void*)0x77677C
 struct shok_GGL_CHeroBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u;
 public:
 	int ResurrectionTimePassed, SpawnTurn;
 	byte FriendNear, EnemyNear;
-private:
-	byte u2[2];
+	PADDING(2);
+
+	static inline constexpr int vtp = 0x77677C;
 };
 
-#define shok_vtp_GGL_CBombBehavior (void*)0x778468
 struct shok_GGL_CBombBehavior : shok_EGL_CGLEBehavior {
 	int TimeToExplode;
+
+	static inline constexpr int vtp = 0x778468;
 };
 
-#define shok_vtp_GGL_CKegBehavior (void*)0x7764D8
 struct shok_GGL_CKegBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u;
 public:
 	int TimeToExplode;
+
+	static inline constexpr int vtp = 0x7764D8;
 };
 
-#define shok_vtp_GGL_CThiefBehavior (void*)0x7739B0
 struct shok_GGL_CThiefBehavior : shok_EGL_CGLEBehavior {
 	int Amount, ResourceType, StolenFromPlayer, TimeToSteal;
+
+	static inline constexpr int vtp = 0x7739B0;
 };
 
-#define shok_vtp_GGL_CAutoCannonBehavior (void*)0x778CF0
 struct shok_GGL_CAutoCannonBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u[6];
 public:
 	int ShotsLeft;
+
+	static inline constexpr int vtp = 0x778CF0;
 };
 
-#define shok_vtp_GGL_CResourceRefinerBehavior (void*)0x774BCC
 struct shok_GGL_CResourceRefinerBehavior : shok_EGL_CGLEBehavior {
-
+	static inline constexpr int vtp = 0x774BCC;
 };
 
-#define shok_vtp_GGL_CAffectMotivationBehavior (void*)0x77918C
 struct shok_GGL_CAffectMotivationBehavior : shok_EGL_CGLEBehavior {
-
+	static inline constexpr int vtp = 0x77918C;
 };
 
-#define shok_vtp_GGL_CLimitedLifespanBehavior (void*)0x775D9C
 struct shok_GGL_CLimitedLifespanBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u;
 public:
 	int RemainingLifespanSeconds;
+
+	static inline constexpr int vtp = 0x775D9C;
 };
 
-#define shok_vtp_GGL_CBarrackBehavior (void*)0x778A68
 struct shok_GGL_CBarrackBehavior : shok_EGL_CGLEBehavior {
 	byte AutoFillActive;
-private:
-	byte u[3];
+	PADDING(3);
+
+	static inline constexpr int vtp = 0x778A68;
 };
 
-#define shok_vtp_EGL_GLEBehaviorMultiSubAnims (void*)0x785EEC
 struct shok_EGL_GLEBehaviorMultiSubAnims : shok_EGL_CGLEBehavior {
 private:
 	int u;
@@ -358,54 +358,60 @@ public:
 	public:
 		float Speed;
 	} AnimSlot[4];
+
+	static inline constexpr int vtp = 0x785EEC;
 };
 
-#define shok_vtp_GGL_CBuildingMerchantBehavior_COffer (void*)0x7781B4
 struct shok_GGL_CBuildingMerchantBehavior_COffer : shok_object {
 	shok_costInfo ResourceCosts;
 	int OffersRemaining;
+
+	static inline constexpr int vtp = 0x7781B4;
 };
 
-#define shok_vtp_GGL_CBuildingTechTraderBehavior_CTechOffer (void*)0x7781C4
 struct shok_GGL_CBuildingTechTraderBehavior_CTechOffer : shok_GGL_CBuildingMerchantBehavior_COffer {
 	int OfferedTechnologyType;
+
+	static inline constexpr int vtp = 0x7781C4;
 };
 
-#define shok_vtp_GGL_CBuildingMercenaryBehavior_CMercenaryOffer (void*)0x778284
 struct shok_GGL_CBuildingMercenaryBehavior_CMercenaryOffer : shok_GGL_CBuildingMerchantBehavior_COffer {
 	int OfferedEntityType;
+
+	static inline constexpr int vtp = 0x778284;
 };
 
-#define shok_vtp_GGL_CBuildingMerchantBehavior (void*)0x778208
 struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u[2];
 public:
-	vector_padding
-		std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> ListOfOffers;
+	vector_padding;
+	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> ListOfOffers;
+
+	static inline constexpr int vtp = 0x778208;
 };
 
-#define shok_vtp_GGL_CBuildingMercenaryBehavior (void*)0x7782C0
 struct shok_GGL_CBuildingMercenaryBehavior : shok_GGL_CBuildingMerchantBehavior {
-
+	static inline constexpr int vtp = 0x7782C0;
 };
 
-#define shok_vtp_GGL_CBuildingTechTraderBehavior (void*)0x77822C
 struct shok_GGL_CBuildingTechTraderBehavior : shok_GGL_CBuildingMerchantBehavior {
-
+	static inline constexpr int vtp = 0x77822C;
 };
 
-#define shok_vtp_GGL_CMarketBehavior (void*)0x775CCC
 struct shok_GGL_CMarketBehavior : shok_EGL_CGLEBehavior {
 private:
 	int u;
 public:
 	int SellResourceType, BuyResourceType;
 	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam+sellam
+
+	static inline constexpr int vtp = 0x775CCC;
 };
 
-#define shok_vtp_GGL_CFoundryBehavior (void*)0x778A8C
 struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
 	int CannonType, CannonProgress;
+
+	static inline constexpr int vtp = 0x778A8C;
 };
 

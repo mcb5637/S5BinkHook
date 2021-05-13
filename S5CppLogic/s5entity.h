@@ -10,7 +10,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int EntityType;
 	int ModelOverride;
 	int PlayerId;
-	void* attachmentvt;
+	int attachmentvt;
 	shok_set<shok_attachment> ObserverEntities;
 	shok_set<shok_attachment> ObserverEffects;
 	shok_set<shok_attachment> ObservedEntities;
@@ -78,6 +78,7 @@ public:
 	shok_GGL_CFoundryBehavior* GetFoundryBehavior();
 	shok_GGL_CSerfBehavior* GetSerfBehavior();
 	shok_GGL_CBattleSerfBehavior* GetBattleSerfBehavior();
+	shok_GGL_CLimitedAttachmentBehavior* GetLimitedAttachmentBehavior();
 
 
 

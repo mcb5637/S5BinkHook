@@ -257,8 +257,13 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 	static inline constexpr int vtp = 0x774874;
 };
 
+struct GGL_SSlotArgsLimitedAttachment {
+	int AttachmentType, Limit;
+	int Event; // ?
+};
 struct shok_GGL_CLimitedAttachmentBehavior : shok_EGL_CGLEBehavior {
-	// Attachment1 at 6, 0
+	int vtable_EGL_TSlot_GGL_SSlotArgsLimitedAttachment_331624813;
+	shok_set<GGL_SSlotArgsLimitedAttachment> AttachmentLimits;
 
 	static inline constexpr int vtp = 0x775E84;
 };

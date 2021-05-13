@@ -186,7 +186,7 @@ struct shok_AARect {
 	shok_position low, high;
 };
 
-struct shok_costInfo {
+struct shok_costInfo { // size 18
 private:
 	int u;
 public:
@@ -197,6 +197,7 @@ public:
 	void SubFromType(int ty, float tosub);
 	bool HasResources(shok_costInfo* has);
 };
+static_assert(sizeof(shok_costInfo) == 18 * 4);
 
 struct shok_object {
 public:

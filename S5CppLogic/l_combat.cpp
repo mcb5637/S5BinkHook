@@ -63,8 +63,10 @@ int l_combat_DisableAoEProjectileFix(lua_State* L) {
 void l_combat_FlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff, bool post) {
 	if (post)
 		ResetCamoIgnoreIfNotEntity = 0;
-	else
-		ResetCamoIgnoreIfNotEntity = eff->AttackerID;
+	else if (eff->IsArrowEffect())
+		ResetCamoIgnoreIfNotEntity = ((shok_GGL_CArrowEffect*)eff)->AttackerID;
+	else if (eff->IsCannonBallEffect())
+		ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
 }
 void l_combat_ActivateCamo(shok_GGL_CCamouflageBehavior* th) {
 	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);

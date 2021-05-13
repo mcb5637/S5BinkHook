@@ -1222,6 +1222,18 @@ int l_settlerSetPos(lua_State* L) {
 	return 0;
 }
 
+int l_leaderSetSoldierLimit(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CLimitedAttachmentBehavior* l = s->GetLimitedAttachmentBehavior();
+	luaext_assertPointer(L, l, "no limited attachment");
+	int limit = luaL_checkint(L, 2);
+	luaext_assert(L, limit >= 0, "limit < 0");
+	auto a = l->AttachmentLimits.GetFirstMatch([](auto a) { return a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER; });
+	luaext_assertPointer(L, a, "no matching limited attachment");
+	a->Limit = limit;
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	BuildingMaxHpBoni.clear();
@@ -1334,6 +1346,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "GetTroopHealth", &l_leaderGetLeaderHP);
 	luaext_registerFunc(L, "SetTroopHealth", &l_leaderSetLeaderHP);
 	luaext_registerFunc(L, "AttachSoldier", &l_leaderAttachSoldier);
+	luaext_registerFunc(L, "SetSoldierLimit", &l_leaderSetSoldierLimit);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");

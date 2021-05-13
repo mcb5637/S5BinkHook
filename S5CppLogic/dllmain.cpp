@@ -44,8 +44,7 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-    lua_pushnumber(L, (int)t->GetBarrackBehaviorProps());
+    lua_pushnumber(L, (int)luaext_checkEntity(L, 1)->GetLimitedAttachmentBehavior()->AttachmentLimits.GetFirstMatch([](auto a) { return a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER; })->Limit);
     return 1;
 }
 

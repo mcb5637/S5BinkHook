@@ -195,6 +195,11 @@ shok_GGL_CSerfBehavior* shok_EGL_CGLEEntity::GetSerfBehavior()
 	return (shok_GGL_CSerfBehavior*)SearchBehavior(shok_GGL_CSerfBehavior::vtp);
 }
 
+shok_GGL_CLimitedAttachmentBehavior* shok_EGL_CGLEEntity::GetLimitedAttachmentBehavior()
+{
+	return (shok_GGL_CLimitedAttachmentBehavior*)SearchBehavior(shok_GGL_CLimitedAttachmentBehavior::vtp);
+}
+
 static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, int cat)) 0x57BBEB;
 bool shok_EGL_CGLEEntity::IsEntityInCategory(int cat)
 {

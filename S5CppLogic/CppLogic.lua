@@ -746,6 +746,11 @@ function CppLogic.Entity.Leader.GetTroopHealth(id) end
 -- @param hp hp
 function CppLogic.Entity.Leader.SetTroopHealth(id, hp) end
 
+--- a leaders troop limit-
+-- @param id leader
+-- @param limit limit
+function CppLogic.Entity.Leader.SetSoldierLimit(id, limit) end
+
 --- building height (& construction progress).
 -- @param id entity
 -- @return height

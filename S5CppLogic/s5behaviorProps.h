@@ -208,14 +208,10 @@ struct shok_GGL_CSerfBehaviorProps : shok_EGL_CGLEBehaviorProps {
 };
 
 struct shok_limitedAttachmentProps {
-private:
-	int u;
-public:
-	char* Type;
-private:
-	int u2[4];
-public:
+	shok_string Type;
 	int Limit;
+	bool IsActive;
+	PADDING(3);
 };
 struct shok_GGL_CLimitedAttachmentBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	vector_padding;

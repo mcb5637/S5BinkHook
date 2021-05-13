@@ -44,8 +44,8 @@ int l_playerGetPaydayStatus(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
-	if (p->PlayerAttractionHandler->PaydayStarted)
-		lua_pushnumber(L, p->PlayerAttractionHandler->PaydayStartTick);
+	if (p->PlayerAttractionHandler->PaydayActive)
+		lua_pushnumber(L, p->PlayerAttractionHandler->PaydayFirstOccuraceGameTurn);
 	else
 		lua_pushnumber(L, -1);
 	return 1;
@@ -56,11 +56,11 @@ int l_playerSetPaydayStatus(lua_State* L) {
 	int st = luaL_checkint(L, 2);
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
 	if (st < 0) {
-		p->PlayerAttractionHandler->PaydayStarted = 0;
+		p->PlayerAttractionHandler->PaydayActive = 0;
 	}
 	else {
-		p->PlayerAttractionHandler->PaydayStarted = 1;
-		p->PlayerAttractionHandler->PaydayStartTick = st;
+		p->PlayerAttractionHandler->PaydayActive = 1;
+		p->PlayerAttractionHandler->PaydayFirstOccuraceGameTurn = st;
 	}
 	return 0;
 }
@@ -684,10 +684,10 @@ int l_playerGetKillStatistics(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
-	lua_pushnumber(L, p->NumberOfSettlersKilled);
-	lua_pushnumber(L, p->NumberOfSettlersLost);
-	lua_pushnumber(L, p->NumberOfBuildingsKilled);
-	lua_pushnumber(L, p->NumberOfBuildingsLost);
+	lua_pushnumber(L, p->Statistics.NumberOfUnitsKilled);
+	lua_pushnumber(L, p->Statistics.NumberOfUnitsDied);
+	lua_pushnumber(L, p->Statistics.NumberOfBuildingsDestroyed);
+	lua_pushnumber(L, p->Statistics.NumberOfBuildingsLost);
 	return 4;
 }
 
@@ -710,7 +710,7 @@ int l_logicPlayerActivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
-	luaext_assert(L, !p->AlarmActive, "alarm active");
+	luaext_assert(L, !p->WorkerAlarmMode, "alarm active");
 	luaext_assert(L, p->AlarmRechargeTime <= 0, "alarm cooldown");
 	(*shok_GGL_CGLGameLogicObj)->EnableAlarmForPlayer(i);
 	return 0;
@@ -719,7 +719,7 @@ int l_logicPlayerDeactivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
-	luaext_assert(L, p->AlarmActive, "alarm not active");
+	luaext_assert(L, p->WorkerAlarmMode, "alarm not active");
 	(*shok_GGL_CGLGameLogicObj)->DisableAlarmForPlayer(i);
 	return 0;
 }
@@ -728,7 +728,7 @@ int l_logicPlayerUpgradeSettlerCategory(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int ucat = luaL_checkint(L, 2);
-	shok_GGL_CSettlerUpgradeManager_UCatEntry* u = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](shok_GGL_CSettlerUpgradeManager_UCatEntry* u) {return u->UCat == ucat; });
+	shok_GGL_CUpgradeManager_UCatEntry* u = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](shok_GGL_CUpgradeManager_UCatEntry* u) {return u->UCat == ucat; });
 	luaext_assertPointer(L, u, "invalid ucat");
 	(*shok_GGL_CGLGameLogicObj)->UpgradeSettlerCategory(i, ucat);
 	return 0;

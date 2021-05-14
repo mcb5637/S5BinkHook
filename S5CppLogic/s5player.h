@@ -65,6 +65,9 @@ struct shok_GGL_CPlayerAttractionHandler : shok_object {
 
 	// checkpayday 4C25FB thiscall
 };
+extern void (*shok_GGL_CPlayerAttractionHandler_OnCheckPayDay)(shok_GGL_CPlayerAttractionHandler* th);
+void shok_GGL_CPlayerAttractionHandler_HookCheckPayday();
+
 struct shok_GGL_CUpgradeManager_jobdata {
 	int Category;
 	shok_set<int[3]> UpgradeJobData; // UpgradeProgress, Category, UpgradeManager

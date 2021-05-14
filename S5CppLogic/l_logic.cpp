@@ -643,38 +643,36 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 }
 
 
-int l_netEventCbRef = LUA_NOREF;
-bool l_netEventPostCallback(shok_BB_CEvent* ev) {
-	int id = ev->EventTypeId;
-	lua_State* L = *shok_luastate_game;
-	int top = lua_gettop(L);
-	luaL_checkstack(L, 10, "");
-	lua_rawgeti(L, LUA_REGISTRYINDEX, l_netEventCbRef);
-	bool r = false;
-	if (lua_isfunction(L, -1)) {
-		lua_pushnumber(L, id);
-		l_netPushEvent(L, ev);
-		lua_pcall(L, 2, 1, 0);
-		if (lua_isboolean(L, -1))
-			r = lua_toboolean(L, -1);
-		else if (lua_istable(L, -1))
-			l_netReadEvent(L, ev);
-	}
-	lua_settop(L, top);
-	return r;
-}
-
 int l_netEventSetHook(lua_State* L) {
 	if (!lua_isfunction(L, 1))
 		luaL_error(L, "no func");
-	luaL_unref(L, LUA_REGISTRYINDEX, l_netEventCbRef);
-	l_netEventCbRef = luaL_ref(L, LUA_REGISTRYINDEX);
-	PostEventCallback = &l_netEventPostCallback;
+	lua_pushlightuserdata(L, &l_netEventSetHook);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+	PostEventCallback = [](shok_BB_CEvent* ev) {
+		int id = ev->EventTypeId;
+		lua_State* L = *shok_luastate_game;
+		int top = lua_gettop(L);
+		luaL_checkstack(L, 10, "");
+		lua_pushlightuserdata(L, &l_netEventSetHook);
+		lua_rawget(L, LUA_REGISTRYINDEX);
+		bool r = false;
+		if (lua_isfunction(L, -1)) {
+			lua_pushnumber(L, id);
+			l_netPushEvent(L, ev);
+			lua_pcall(L, 2, 1, 0);
+			if (lua_isboolean(L, -1))
+				r = lua_toboolean(L, -1);
+			else if (lua_istable(L, -1))
+				l_netReadEvent(L, ev);
+		}
+		lua_settop(L, top);
+		return r;
+	};
 	shok_GetGuiManager()->HackPostEvent();
 	return 0;
 }
 int l_netEventUnSetHook(lua_State* L) {
-	luaL_unref(L, LUA_REGISTRYINDEX, l_netEventCbRef);
 	PostEventCallback = nullptr;
 	return 0;
 }
@@ -920,8 +918,31 @@ int l_logicSetColor(lua_State* L) {
 	return 0;
 }
 
+int l_logicEnablePlayerPaydayCallback(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use global GameCallback_PaydayPayed instead");
+	if (!lua_isfunction(L, 1))
+		luaL_error(L, "no func");
+	shok_GGL_CPlayerAttractionHandler_HookCheckPayday();
+	lua_pushlightuserdata(L, &l_logicEnablePlayerPaydayCallback);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = [](shok_GGL_CPlayerAttractionHandler* th) {
+		lua_State* L2 = *shok_luastate_game;
+		int t = lua_gettop(L2);
+		lua_pushlightuserdata(L2, &l_logicEnablePlayerPaydayCallback);
+		lua_rawget(L2, LUA_REGISTRYINDEX);
+		lua_pushnumber(L2, th->PlayerID);
+		lua_pushnumber(L2, th->GetWorkerPaydayIncome());
+		lua_pcall(L2, 2, 0, 0);
+		lua_settop(L2, t);
+	};
+	return 0;
+}
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
+	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = nullptr;
 }
 
 void l_logic_init(lua_State* L)
@@ -958,6 +979,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "LandscapeGetBlocking", &l_logicLandscapeGetBlocking);
 	luaext_registerFunc(L, "GetColorByColorIndex", &l_logicGetColor);
 	luaext_registerFunc(L, "SetColorByColorIndex", &l_logicSetColor);
+	luaext_registerFunc(L, "SetPaydayCallback", &l_logicEnablePlayerPaydayCallback);
 
 
 	lua_pushstring(L, "UICommands");
@@ -974,3 +996,4 @@ void l_logic_init(lua_State* L)
 // CppLogic.Logic.EnableMaxHPTechMod() ResearchTechnology(Technologies.T_Fletching)
 // CppLogic.Logic.GetColorByColorIndex(1)
 // CppLogic.Logic.SetColorByColorIndex(1, 255, 255, 255, 255)
+// CppLogic.Logic.SetPaydayCallback(GameCallback_PaydayPayed)

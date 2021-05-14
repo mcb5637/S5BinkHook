@@ -46,6 +46,7 @@ typedef uint8_t byte;
 // entity get max hp 0x57B798 jmp
 // create entity 0x571B93 jmp to fix max hp
 // 0x4BDED8 ui settler overhead hp bar maxhp jmp
+// shok_playerattractionhandler_checkpayday 0x4C25FB jmp at 0x4C2754
 
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;

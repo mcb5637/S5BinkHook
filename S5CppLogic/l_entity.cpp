@@ -863,18 +863,18 @@ int l_settlerSecureGoods(lua_State* L) {
 	return 0;
 }
 
-int ConversionHookRef = LUA_NOREF;
 int l_settlerEnableConversionHook(lua_State* L) {
 	if (!lua_isfunction(L, 1))
 		luaL_error(L, "no func");
+	lua_pushlightuserdata(L, &l_settlerEnableConversionHook);
 	lua_pushvalue(L, 1);
-	luaL_unref(L, LUA_REGISTRYINDEX, ConversionHookRef);
-	ConversionHookRef = luaL_ref(L, LUA_REGISTRYINDEX);
+	lua_rawset(L, LUA_REGISTRYINDEX);
 	HookHero6Convert();
 	Hero6ConvertHookCb = [](int id, int pl, int nid, int converter) {
 		lua_State* L = *shok_luastate_game;
 		int t = lua_gettop(L);
-		lua_rawgeti(L, LUA_REGISTRYINDEX, ConversionHookRef);
+		lua_pushlightuserdata(L, &l_settlerEnableConversionHook);
+		lua_rawget(L, LUA_REGISTRYINDEX);
 		lua_pushnumber(L, id);
 		lua_pushnumber(L, pl);
 		lua_pushnumber(L, nid);
@@ -885,8 +885,6 @@ int l_settlerEnableConversionHook(lua_State* L) {
 	return 0;
 }
 int l_settlerDisableConversionHook(lua_State* L) {
-	luaL_unref(L, LUA_REGISTRYINDEX, ConversionHookRef);
-	ConversionHookRef = LUA_NOREF;
 	Hero6ConvertHookCb = nullptr;
 	return 0;
 }

@@ -305,11 +305,11 @@ struct shok_GGL_CWeatherHandler : shok_object {
 
 // gamelogic
 struct shok_GGL_CGLGameLogic : shok_object {
-	PADDINGI(9)
+	PADDINGI(9);
 public:
 	shok_GGL_CPlayerStatus** players; // 10
 	shok_GGL_CWeatherHandler* WeatherHandler;
-	PADDINGI(1)
+	PADDINGI(1);
 private:
 	shok_GGL_CGLGameLogic_TechList* TechList;
 public:
@@ -347,7 +347,7 @@ struct shok_BB_CDirectoryFileSystem : shok_BB_IFileSystem {
 	static inline constexpr int vtp = 0x7803B4;
 };
 struct shok_BB_CBBArchiveFile : shok_BB_IFileSystem {
-	PADDINGI(2) // BB::CFileStream 761C98, then probably file handle
+	PADDINGI(2); // BB::CFileStream 761C98, then probably file handle
 	char* Path;
 
 	static inline constexpr int vtp = 0x77FABC;

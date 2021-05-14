@@ -33,6 +33,29 @@ int shok_GGL_CPlayerAttractionHandler::GetNumberOfLeaders()
 	return shok_playerattractionhandler_getnumleaders(this);
 }
 
+void (*shok_GGL_CPlayerAttractionHandler_OnCheckPayDay)(shok_GGL_CPlayerAttractionHandler* th) = nullptr;
+void __fastcall hookedcheckpayday_call(shok_GGL_CPlayerAttractionHandler* th) {
+	if (shok_GGL_CPlayerAttractionHandler_OnCheckPayDay)
+		shok_GGL_CPlayerAttractionHandler_OnCheckPayDay(th);
+}
+void __declspec(naked) hookedcheckpayday() {
+	__asm {
+		mov ecx, esi
+		call hookedcheckpayday_call
+
+		mov esi, [esi + 4]
+		mov[ebp + 0x18], 0x1300E
+		push 0x4C275E
+		ret
+	}
+}
+void shok_GGL_CPlayerAttractionHandler_HookCheckPayday()
+{
+	if (HasSCELoader())
+		DEBUGGER_BREAK;
+	WriteJump((void*)0x4C2754, &hookedcheckpayday);
+}
+
 static inline int(__thiscall* const upgrademanager_getucatbybuilding)(shok_GGL_CBuildingUpgradeManager* th, int id) = (int(__thiscall*)(shok_GGL_CBuildingUpgradeManager*, int))0x4B3CA6;
 int shok_GGL_CBuildingUpgradeManager::GetUpgradeCategoryOfBuildingType(int etype)
 {

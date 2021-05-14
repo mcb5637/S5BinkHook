@@ -987,6 +987,8 @@ void __declspec(naked) hookcreatentityfixhp() {
 }
 void EnableMaxHealthTechBoni()
 {
+	if (HasSCELoader())
+		DEBUGGER_BREAK
 	WriteJump((void*)0x57B798, &hookGetMaxHP);
 	WriteJump((void*)0x4BDED8, &hookgetmaxhpui);
 	WriteJump((void*)0x571B93, &hookcreatentityfixhp);

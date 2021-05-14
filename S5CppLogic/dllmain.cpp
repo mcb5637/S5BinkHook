@@ -29,6 +29,9 @@ end
 function CppLogic.Logic.HurtEntitySetDamage(d)
     CEntity.TriggerSetDamage(d)
 end
+function CppLogic.Logic.SetPaydayCallback(func)
+    GameCallback_PaydayPayed = func
+end
 )";
 
 int __cdecl test(lua_State* L) {

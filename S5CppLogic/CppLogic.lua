@@ -219,6 +219,10 @@ function CppLogic.Logic.GetColorByColorIndex(index) end
 -- @param a (optional, default 255)
 function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
 
+--- sets a function to be called after payday was done.
+-- @param func to be called (playerId, taxes)
+function CppLogic.Logic.SetPaydayCallback(func) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func

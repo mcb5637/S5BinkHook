@@ -3,6 +3,11 @@
 #include <map>
 
 
+struct entityAddonData {
+	int EntityId = 0;
+	int HealthOverride = -1;
+};
+
 struct shok_EGL_CGLEEntity : shok_object {
 	PADDINGI(1);
 	int EntityId;
@@ -79,6 +84,8 @@ public:
 	shok_GGL_CSerfBehavior* GetSerfBehavior();
 	shok_GGL_CBattleSerfBehavior* GetBattleSerfBehavior();
 	shok_GGL_CLimitedAttachmentBehavior* GetLimitedAttachmentBehavior();
+	shok_GGL_CBuildingMerchantBehavior* GetBuildingMerchantBehavior();
+	shok_GGL_CBuildingMercenaryBehavior* GetMercenaryBehavior();
 
 
 
@@ -104,6 +111,9 @@ public:
 	int GetFirstAttachedEntity(int attachmentId);
 
 	void ClearAttackers();
+
+	entityAddonData* GetAdditionalData(bool create);
+	void CloneAdditionalDataFrom(entityAddonData* other);
 
 protected:
 	int EventGetIntById(int id);
@@ -367,3 +377,6 @@ void HookHurtEntity();
 
 extern std::multimap<int, int> BuildingMaxHpBoni; // entitytype -> tech id
 void EnableMaxHealthTechBoni();
+
+extern entityAddonData LastRemovedEntityAddonData;
+void HookDestroyEntity();

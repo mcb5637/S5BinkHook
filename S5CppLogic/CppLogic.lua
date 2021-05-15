@@ -491,6 +491,16 @@ function CppLogic.Entity.GetLimitedLifespanRemaining(id, t) end
 -- @return new id or nil
 function CppLogic.Entity.ReplaceWithResourceEntity(id) end
 
+--- overrides an entities max hp.
+-- @param id entity
+-- @param hp
+function CppLogic.Entity.SetMaxHP(id, hp) end
+
+--- clones all overrides.
+-- @param from entity (can be id of last destroyed entits)
+-- @param to entity 
+function CppLogic.Entity.CloneOverrideData(from, to) end
+
 --- gets the leader of a soldier.
 -- @param id id of the solder
 -- @return id of the leader
@@ -890,6 +900,17 @@ function CppLogic.Entity.Building.MarketStartTrade(id, sellty, buyty, buyam) end
 -- gives back resources.
 -- @param id entity
 function CppLogic.Entity.Building.MarketCancelTrade(id) end
+
+--- removes the last offer in a mercenary or techtrader tent.
+-- @param id entity
+function CppLogic.Entity.Building.MercenaryRemoveLastOffer(id) end
+--- sets the remaining units and cost in a mercenary or techtrader tent.
+-- @param id entity
+-- @param ind index
+-- @param remain offers remaining (optional, default no change)
+-- @param cost cost table (optional, default no change)
+-- @param ignoreZeroes ignore anything that is zero (optional, default false)
+function CppLogic.Entity.Building.MercenarySetOfferData(id, ind, remain, cost, ignoreZeroes) end
 
 
 --- entity type max health.

@@ -1232,6 +1232,55 @@ int l_leaderSetSoldierLimit(lua_State* L) {
 	return 0;
 }
 
+int l_buildingRemoveLastMerchantOffer(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CBuildingMerchantBehavior* m = b->GetBuildingMerchantBehavior();
+	luaext_assertPointer(L, m, "no merchant");
+	luaext_assert(L, m->Offer.size() > 0, "is empty");
+	shok_saveVector<shok_GGL_CBuildingMerchantBehavior_COffer*>(&m->Offer, [](std::vector< shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator< shok_GGL_CBuildingMerchantBehavior_COffer*>> &a) {
+		a.pop_back();
+		});
+	return 0;
+}
+int l_buildingMerchantOfferSetData(lua_State* L) {
+	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
+	shok_GGL_CBuildingMerchantBehavior* m = b->GetBuildingMerchantBehavior();
+	int i = luaL_checkint(L, 2);
+	luaext_assertPointer(L, m, "no merchant");
+	luaext_assert(L, i >= 0 && i < (int)m->Offer.size(), "invalid index");
+	if (lua_isnumber(L, 3)) {
+		m->Offer[i]->OffersRemaining = luaL_checkint(L, 3);
+	}
+	if (lua_istable(L, 4)) {
+		bool ig = false;
+		if (lua_isboolean(L, 5))
+			ig = lua_toboolean(L, 5);
+		luaext_readCostInfo(L, 4, m->Offer[i]->ResourceCosts, ig);
+	}
+	return 0;
+}
+
+int l_entitySetMaxHP(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	int mhp = luaL_checkint(L, 2);
+	luaext_assert(L, mhp > 0, "invalid hp");
+	HookDestroyEntity();
+	EnableMaxHealthTechBoni();
+	b->GetAdditionalData(true)->HealthOverride = mhp;
+	return 0;
+};
+int l_entityCloneAddData(lua_State* L) {
+	shok_EGL_CGLEEntity* fro = luaext_optEntity(L, 1);
+	shok_EGL_CGLEEntity* to = luaext_checkEntity(L, 2);
+	if (fro)
+		to->CloneAdditionalDataFrom(fro->GetAdditionalData(false));
+	else if (LastRemovedEntityAddonData.EntityId == luaL_checkint(L, 1))
+		to->CloneAdditionalDataFrom(&LastRemovedEntityAddonData);
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	BuildingMaxHpBoni.clear();
@@ -1266,6 +1315,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "IsFeared", &l_entityIsFeared);
 	luaext_registerFunc(L, "ClearAttackers", &l_entityClearAttackers);
 	luaext_registerFunc(L, "ReplaceWithResourceEntity", &l_entityReplaceWithResourceEntity);
+	luaext_registerFunc(L, "SetMaxHP", &l_entitySetMaxHP);
+	luaext_registerFunc(L, "CloneOverrideData", &l_entityCloneAddData);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -1335,6 +1386,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandTurnSerfToBattleSerf", &l_settlerSerfToBattleSerf);
 	luaext_registerFunc(L, "CommandTurnBattleSerfToSerf", &l_settlerBattleSerfToSerf);
 	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
+	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -1374,7 +1426,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "StartResearch", &l_buildingStartResearch);
 	luaext_registerFunc(L, "CancelResearch", &l_buildingCancelResearch);
 	luaext_registerFunc(L, "MarketStartTrade", &l_buildingMarketStartTrade);
-	luaext_registerFunc(L, "MarketCancelTrade", &l_buildingMarketCancelTrade);
+	luaext_registerFunc(L, "MercenaryRemoveLastOffer", &l_buildingRemoveLastMerchantOffer);
+	luaext_registerFunc(L, "MercenarySetOfferData", &l_buildingMerchantOfferSetData);
 	lua_rawset(L, -3);
 }
 

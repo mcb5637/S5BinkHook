@@ -387,11 +387,10 @@ struct shok_GGL_CBuildingMercenaryBehavior_CMercenaryOffer : shok_GGL_CBuildingM
 };
 
 struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
-private:
-	int u[2];
-public:
+	int CurrentPlayer;
+	int TraderEntityID;
 	vector_padding;
-	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> ListOfOffers;
+	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> Offer;
 
 	static inline constexpr int vtp = 0x778208;
 };

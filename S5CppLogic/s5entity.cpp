@@ -200,6 +200,17 @@ shok_GGL_CLimitedAttachmentBehavior* shok_EGL_CGLEEntity::GetLimitedAttachmentBe
 	return (shok_GGL_CLimitedAttachmentBehavior*)SearchBehavior(shok_GGL_CLimitedAttachmentBehavior::vtp);
 }
 
+shok_GGL_CBuildingMerchantBehavior* shok_EGL_CGLEEntity::GetBuildingMerchantBehavior()
+{
+	int vts[3] = { shok_GGL_CBuildingMercenaryBehavior::vtp, shok_GGL_CBuildingTechTraderBehavior::vtp, shok_GGL_CBuildingMerchantBehavior::vtp };
+	return (shok_GGL_CBuildingMerchantBehavior*)SearchBehavior(vts, 3);
+}
+
+shok_GGL_CBuildingMercenaryBehavior* shok_EGL_CGLEEntity::GetMercenaryBehavior()
+{
+	return (shok_GGL_CBuildingMercenaryBehavior*)SearchBehavior(shok_GGL_CBuildingMercenaryBehavior::vtp);
+}
+
 static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, int cat)) 0x57BBEB;
 bool shok_EGL_CGLEEntity::IsEntityInCategory(int cat)
 {
@@ -923,6 +934,9 @@ void HookHurtEntity()
 
 std::multimap<int, int> BuildingMaxHpBoni = std::multimap<int, int>();
 int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
+	entityAddonData* d = e->GetAdditionalData(false);
+	if (d && d->HealthOverride > 0)
+		return d->HealthOverride;
 	shok_GGlue_CGlueEntityProps* et = e->GetEntityType();
 	float hp = (float) et->LogicProps->MaxHealth;
 	if (e->IsSettler()) {
@@ -992,4 +1006,59 @@ void EnableMaxHealthTechBoni()
 	WriteJump((void*)0x57B798, &hookGetMaxHP);
 	WriteJump((void*)0x4BDED8, &hookgetmaxhpui);
 	WriteJump((void*)0x571B93, &hookcreatentityfixhp);
+}
+
+std::map<int, entityAddonData> AddonDataMap = std::map<int, entityAddonData>();
+entityAddonData LastRemovedEntityAddonData = entityAddonData();
+void __fastcall destroyentity_gemoveadd(shok_EGL_CGLEEntity* e) {
+	auto a = AddonDataMap.find(e->EntityId);
+	if (a != AddonDataMap.end()) {
+		LastRemovedEntityAddonData = a->second;
+		AddonDataMap.erase(a);
+	}
+}
+void __declspec(naked) destroyentityhook() {
+	__asm {
+		push ecx
+		call destroyentity_gemoveadd
+		pop ecx
+
+		push esi
+		mov esi, ecx
+		cmp byte ptr [esi+0x6D], 0
+		jnz jump
+		push 0x57C957
+		ret
+	jump:
+		push 0x57C9DE
+		ret
+	}
+
+}
+void HookDestroyEntity()
+{
+	WriteJump((void*)0x57C94A, &destroyentityhook);
+}
+entityAddonData* shok_EGL_CGLEEntity::GetAdditionalData(bool create)
+{
+	auto a = AddonDataMap.find(EntityId);
+	if (a != AddonDataMap.end()) {
+		return &a->second;
+	}
+	if (!create) {
+		return nullptr;
+	}
+	else {
+		AddonDataMap[EntityId] = entityAddonData();
+		entityAddonData* r = &AddonDataMap[EntityId];
+		r->EntityId = EntityId;
+		return r;
+	}
+}
+void shok_EGL_CGLEEntity::CloneAdditionalDataFrom(entityAddonData* other)
+{
+	if (other) {
+		entityAddonData* t = GetAdditionalData(true);
+		t->HealthOverride = other->HealthOverride;
+	}
 }

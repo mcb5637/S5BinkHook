@@ -39,7 +39,7 @@ struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
 	PADDINGI(4);
 	shok_EGL_CFlyingEffectSlot FlyingEffectSlot; // 28
 	shok_position TargetPosition; // 44 la 45
-	PADDINGI(2);
+	PADDINGI(1);
 
 	static inline constexpr int vtp = 0x7775E4;
 

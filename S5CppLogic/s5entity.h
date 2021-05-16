@@ -6,6 +6,8 @@
 struct entityAddonData {
 	int EntityId = 0;
 	int HealthOverride = -1;
+	bool HealthUseBoni = true;
+	int DamageOverride = -1;
 };
 
 struct shok_EGL_CGLEEntity : shok_object {
@@ -380,3 +382,5 @@ void EnableMaxHealthTechBoni();
 
 extern entityAddonData LastRemovedEntityAddonData;
 void HookDestroyEntity();
+
+void EnableEntityDamageMod();

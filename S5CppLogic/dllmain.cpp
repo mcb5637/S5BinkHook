@@ -38,10 +38,10 @@ end
 )";
 
 int __cdecl test(lua_State* L) {
-    /*shok_ED_CGlobalsBaseEx s = shok_ED_CGlobalsBaseEx();
+    shok_GGL_CCannonBallEffect s = shok_GGL_CCannonBallEffect();
     int st = (int)&s;
-    int test = (int)&s.DisplayProps;
-    lua_pushnumber(L, (test - st) / 4);*/
+    int test = (int)&s.AttackerID;
+    lua_pushnumber(L, (test - st) / 4);
     /*if (lua_gettop(L) == 0) {
         lua_pushnumber(L, (int)L);
         return 1;
@@ -50,7 +50,7 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, (int)luaext_checkEntity(L, 1)->GetMercenaryBehavior());
+    /*lua_pushnumber(L, (int)luaext_checkEntity(L, 1)->GetMercenaryBehavior());*/
     return 1;
 }
 

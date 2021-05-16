@@ -493,8 +493,15 @@ function CppLogic.Entity.ReplaceWithResourceEntity(id) end
 
 --- overrides an entities max hp.
 -- @param id entity
--- @param hp
-function CppLogic.Entity.SetMaxHP(id, hp) end
+-- @param hp (optional, <0 to disable)
+-- @param useBoni (optional)
+function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
+
+--- overrides an entities damage.
+-- requires CppLogic.Combat.EnableAoEProjectileFix to work for cannons/autocannons.
+-- @param id entity
+-- @param dmg, (<0 disable)
+function CppLogic.Entity.SetDamage(id, dmg) end
 
 --- clones all overrides.
 -- @param from entity (can be id of last destroyed entits)

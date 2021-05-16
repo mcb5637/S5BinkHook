@@ -1264,11 +1264,16 @@ int l_entitySetMaxHP(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
-	int mhp = luaL_checkint(L, 2);
-	luaext_assert(L, mhp > 0, "invalid hp");
 	HookDestroyEntity();
 	EnableMaxHealthTechBoni();
-	b->GetAdditionalData(true)->HealthOverride = mhp;
+	entityAddonData* d = b->GetAdditionalData(true);
+	if (lua_isnumber(L, 2)) {
+		int mhp = luaL_checkint(L, 2);
+		d->HealthOverride = mhp;
+	}
+	if (lua_isboolean(L, 3)) {
+		d->HealthUseBoni = lua_toboolean(L, 3);
+	}
 	return 0;
 };
 int l_entityCloneAddData(lua_State* L) {
@@ -1278,6 +1283,15 @@ int l_entityCloneAddData(lua_State* L) {
 		to->CloneAdditionalDataFrom(fro->GetAdditionalData(false));
 	else if (LastRemovedEntityAddonData.EntityId == luaL_checkint(L, 1))
 		to->CloneAdditionalDataFrom(&LastRemovedEntityAddonData);
+	return 0;
+}
+int l_entity_SetDamage(lua_State* L) { // todo autocannon
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	EnableEntityDamageMod();
+	entityAddonData* d = b->GetAdditionalData(true);
+	d->DamageOverride = luaL_checkint(L, 2);
 	return 0;
 }
 
@@ -1317,6 +1331,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "ReplaceWithResourceEntity", &l_entityReplaceWithResourceEntity);
 	luaext_registerFunc(L, "SetMaxHP", &l_entitySetMaxHP);
 	luaext_registerFunc(L, "CloneOverrideData", &l_entityCloneAddData);
+	luaext_registerFunc(L, "SetDamage", &l_entity_SetDamage);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);

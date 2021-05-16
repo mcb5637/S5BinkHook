@@ -25,7 +25,7 @@ int l_combat_dealAOEDamage(lua_State* L) {
 	return 0;
 }
 
-void l_combatHookCreateEffect(int effectId, void* retAdr) {
+void l_combatHookCreateEffect(int effectId, void* retAdr) { // todo hook correct func instead of overriding createeffect
 	if (retAdr == (void*)CreatEffectReturnBattleBehaviorAttack || retAdr == (void*)CreatEffectReturnAutoCannonBehaviorAttack) {
 		shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(effectId);
 		if (ef->IsCannonBallEffect()) {
@@ -34,6 +34,7 @@ void l_combatHookCreateEffect(int effectId, void* retAdr) {
 			cbeff->SourcePlayer = e->PlayerId;
 			shok_GGlue_CGlueEntityProps* t = e->GetEntityType();
 			shok_GGL_CBattleBehaviorProps* b = t->GetBattleBehaviorProps();
+			cbeff->DamageAmount = e->EventGetDamage();
 			if (b) {
 				cbeff->DamageClass = b->DamageClass;
 				return;

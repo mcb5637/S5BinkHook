@@ -934,11 +934,17 @@ void HookHurtEntity()
 
 std::multimap<int, int> BuildingMaxHpBoni = std::multimap<int, int>();
 int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
+	float hp;
 	entityAddonData* d = e->GetAdditionalData(false);
-	if (d && d->HealthOverride > 0)
-		return d->HealthOverride;
 	shok_GGlue_CGlueEntityProps* et = e->GetEntityType();
-	float hp = (float) et->LogicProps->MaxHealth;
+	if (d && d->HealthOverride > 0) {
+		hp = (float) d->HealthOverride;
+	}
+	else {
+		hp = (float) et->LogicProps->MaxHealth;
+	}
+	if (d && !d->HealthUseBoni)
+		return (int)hp;
 	if (e->IsSettler()) {
 		for (int t : ((shok_GGL_CGLSettlerProps*)et->LogicProps)->ModifyHitpoints.TechList) {
 			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
@@ -1060,5 +1066,48 @@ void shok_EGL_CGLEEntity::CloneAdditionalDataFrom(entityAddonData* other)
 	if (other) {
 		entityAddonData* t = GetAdditionalData(true);
 		t->HealthOverride = other->HealthOverride;
+		t->HealthUseBoni = other->HealthUseBoni;
 	}
+}
+
+float __fastcall entitygetdamagemod(shok_GGL_CBattleBehavior* b) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(b->EntityId);
+	entityAddonData* d = e->GetAdditionalData(false);
+	if (d && d->DamageOverride >= 0)
+		return (float)d->DamageOverride;
+	else
+		return (float)e->GetEntityType()->GetBattleBehaviorProps()->DamageAmount;
+}
+void __declspec(naked) entitydamagemodasm() {
+	__asm {
+		sub esp, 0x24
+		push ebx
+		push esi
+		mov esi, ecx
+
+		call entitygetdamagemod
+		//mov eax, [esi+0x30]
+		// flid [eax+0x38]
+
+		push esi
+		push 0x50C793
+		ret
+	}
+}
+void __declspec(naked) entitydamagemodasm2() {
+	__asm {
+		pushad
+
+		mov ecx, esi
+		call entitygetdamagemod
+
+		popad
+
+		push 0x50C23B
+		ret
+	}
+}
+void EnableEntityDamageMod() {
+	WriteJump((void*)0x50C785, &entitydamagemodasm);
+	WriteJump((void*)0x50C235, &entitydamagemodasm2);
 }

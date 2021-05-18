@@ -57,7 +57,7 @@ public:
 	shok_costInfo Cost;
 	float BuildFactor, RepairFactor;
 	int ArmorClass;
-	int ArmorAmount;
+	int ArmorAmount; // 61
 	int DodgeChance;
 	int IdleTaskList;
 	shok_upgradeInfo Upgrade;

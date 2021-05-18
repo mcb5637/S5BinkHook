@@ -8,6 +8,9 @@ struct entityAddonData {
 	int HealthOverride = -1;
 	bool HealthUseBoni = true;
 	int DamageOverride = -1;
+	int ArmorOverride = -1;
+	float ExplorationOverride = -1.0f;
+	int RegenHPOverride = -1;
 };
 
 struct shok_EGL_CGLEEntity : shok_object {
@@ -106,6 +109,8 @@ public:
 	float GetExploration();
 	int GetMaxHealth();
 	int LimitedAttachmentGetMaximum(int attachType);
+
+	void SetHealth(int h);
 
 	void Destroy();
 
@@ -258,6 +263,8 @@ public:
 	static inline constexpr int vtp = 0x76E3CC;
 
 	bool IsIdle();
+
+	int LeaderGetRegenHealth();
 };
 
 struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
@@ -384,3 +391,7 @@ extern entityAddonData LastRemovedEntityAddonData;
 void HookDestroyEntity();
 
 void EnableEntityDamageMod();
+void EnableEntityArmorMod();
+void EnableEntityExplorationMod();
+extern bool LeaderRegenRegenerateSoldiers;
+void HookLeaderRegen();

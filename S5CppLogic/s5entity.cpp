@@ -407,8 +407,11 @@ float shok_GGL_CBuilding::GetMarketProgress()
 	return ev.f;
 }
 
-
-
+static inline void(__thiscall* const entitysethealth)(shok_EGL_CGLEEntity* th, int h) = (void(__thiscall* const)(shok_EGL_CGLEEntity *, int)) 0x57A6D9;
+void shok_EGL_CGLEEntity::SetHealth(int h)
+{
+	entitysethealth(this, h);
+}
 
 void shok_EGL_CGLEEntity::Destroy()
 {
@@ -1067,6 +1070,9 @@ void shok_EGL_CGLEEntity::CloneAdditionalDataFrom(entityAddonData* other)
 		entityAddonData* t = GetAdditionalData(true);
 		t->HealthOverride = other->HealthOverride;
 		t->HealthUseBoni = other->HealthUseBoni;
+		t->DamageOverride = other->DamageOverride;
+		t->ArmorOverride = other->ArmorOverride;
+		t->ExplorationOverride = other->ExplorationOverride;
 	}
 }
 
@@ -1078,7 +1084,7 @@ float __fastcall entitygetdamagemod(shok_GGL_CBattleBehavior* b) {
 	else
 		return (float)e->GetEntityType()->GetBattleBehaviorProps()->DamageAmount;
 }
-void __declspec(naked) entitydamagemodasm() {
+void __declspec(naked) entitydamagemodeventbattleasm() {
 	__asm {
 		sub esp, 0x24
 		push ebx
@@ -1094,7 +1100,7 @@ void __declspec(naked) entitydamagemodasm() {
 		ret
 	}
 }
-void __declspec(naked) entitydamagemodasm2() {
+void __declspec(naked) entitydamagemodbattlemelleonhitasm() {
 	__asm {
 		pushad
 
@@ -1107,7 +1113,142 @@ void __declspec(naked) entitydamagemodasm2() {
 		ret
 	}
 }
+shok_event_data_EGL_CEventGetValue_int_1211121895* __fastcall entitydamagemodeventautocannonasm(shok_GGL_CAutoCannonBehavior* th, int, shok_event_data_EGL_CEventGetValue_int_1211121895* ev) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	entityAddonData* d = e->GetAdditionalData(false);
+	if (d && d->DamageOverride >= 0)
+		ev->result = d->DamageOverride;
+	else
+		ev->result = e->GetEntityType()->GetAutoCannonProps()->DamageAmount;
+	return ev;
+}
 void EnableEntityDamageMod() {
-	WriteJump((void*)0x50C785, &entitydamagemodasm);
-	WriteJump((void*)0x50C235, &entitydamagemodasm2);
+	WriteJump((void*)0x50C785, &entitydamagemodeventbattleasm);
+	WriteJump((void*)0x50C235, &entitydamagemodbattlemelleonhitasm);
+	WriteJump((void*)0x50F5ED, &entitydamagemodeventautocannonasm);
+}
+
+int __fastcall entityarmormod(shok_EGL_CGLEEntity* e) {
+	entityAddonData* d = e->GetAdditionalData(false);
+	if (d && d->ArmorOverride >= 0)
+		return d->ArmorOverride;
+	shok_GGlue_CGlueEntityProps* p = e->GetEntityType();
+	if (p->IsSettlerType())
+		return ((shok_GGL_CGLSettlerProps*)p->LogicProps)->ArmorAmount;
+	else if (p->IsBuildingType())
+		return ((shok_GGL_CGLBuildingProps*)p->LogicProps)->ArmorAmount;
+	return 0;
+}
+void __declspec(naked) entityarmormodsettlerasm() {
+	__asm {
+		mov esi, ecx
+		push [esi+0x10]
+
+		call entityarmormod
+
+		push 0x4A6B25
+		ret
+	}
+}
+void __declspec(naked) entityarmormodbuildingrasm() {
+	__asm {
+		mov esi, ecx
+		push[esi + 0x10]
+
+		call entityarmormod
+		push eax
+		fild [esp]
+		pop eax
+
+		mov eax, 0x4AAB98
+		call eax
+
+		push 0x04AB170
+		ret
+	}
+}
+void EnableEntityArmorMod()
+{
+	WriteJump((void*)0x4A6B15, &entityarmormodsettlerasm);
+	WriteJump((void*)0x4AB160, &entityarmormodbuildingrasm);
+}
+
+float __fastcall entityexplmod(shok_EGL_CGLEEntity* e) {
+	entityAddonData* d = e->GetAdditionalData(false);
+	if (d && d->ExplorationOverride >= 0.0f)
+		return d->ExplorationOverride;
+	return e->GetEntityType()->LogicProps->Exploration;
+}
+void __declspec(naked) entityexplmodsettasm() {
+	__asm {
+		push esi
+		push [esi+0x10]
+
+		call entityexplmod
+
+		push 0x4A4AD4
+		ret
+	}
+}
+void __declspec(naked) entityexplmodbuildasm() {
+	__asm {
+		push esi
+		push [esi + 0x10]
+		mov eax, 0x4AAB98
+		call eax
+
+		push eax
+		mov ecx, esi
+		call entityexplmod
+		pop eax
+
+		push 0x4AB1A4
+		ret
+	}
+}
+void EnableEntityExplorationMod()
+{
+	WriteJump((void*)0x4A4AC3, &entityexplmodsettasm);
+	WriteJump((void*)0x4AB199, &entityexplmodbuildasm);
+}
+
+int shok_GGL_CSettler::LeaderGetRegenHealth()
+{
+	entityAddonData* d = GetAdditionalData(false);
+	if (d && d->RegenHPOverride >= 0)
+		return d->RegenHPOverride;
+	else
+		return GetEntityType()->GetLeaderBehaviorProps()->HealingPoints;
+}
+
+bool LeaderRegenRegenerateSoldiers = false;
+void __fastcall leaderregen(shok_GGL_CLeaderBehavior* th) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	th->SecondsSinceHPRefresh = 0;
+	int hp = e->Health, mhp = e->GetMaxHealth();
+	if (hp <= 0)
+		return;
+	int r = ((shok_GGL_CSettler*)e)->LeaderGetRegenHealth();
+	if (hp < mhp) {
+		hp += r;
+		if (hp > mhp)
+			hp = mhp;
+		e->SetHealth(hp);
+		return;
+	}
+	if (LeaderRegenRegenerateSoldiers) {
+		int shp = th->GetTroopHealth(), smp = th->GetTroopHealthPerSoldier();
+		int numsol = 0;
+		e->ObservedEntities.ForAll([&numsol](shok_attachment* a) { if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER) numsol++; });
+		smp *= numsol;
+		shp += r;
+		if (shp > smp)
+			shp = smp;
+		th->TroopHealthCurrent = shp;
+		return;
+	}
+}
+void HookLeaderRegen()
+{
+	WriteJump((void*)0x4EAE92, &leaderregen);
 }

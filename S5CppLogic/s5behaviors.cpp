@@ -21,3 +21,14 @@ float shok_GGL_CBattleBehavior::GetMaxRange()
 {
 	return battleBehaviorGetMaxRange(this);
 }
+
+static inline int(__thiscall* const leaderbehgettroophealth)(shok_GGL_CBattleBehavior*) = (int(__thiscall*)(shok_GGL_CBattleBehavior * id))0x4EE1D6;
+int shok_GGL_CLeaderBehavior::GetTroopHealth()
+{
+	return leaderbehgettroophealth(this);
+}
+static inline int(__thiscall* const leaderbehgettroophealthpersol)(shok_GGL_CBattleBehavior*) = (int(__thiscall*)(shok_GGL_CBattleBehavior * id))0x4ECE77;
+int shok_GGL_CLeaderBehavior::GetTroopHealthPerSoldier()
+{
+	return leaderbehgettroophealthpersol(this);
+}

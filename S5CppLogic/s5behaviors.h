@@ -221,12 +221,12 @@ struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 private:
 	int u[3];
 public:
-	int TroopHealthCurrent, TroopHealthPerSoldier;
+	int TroopHealthCurrent, TroopHealthPerSoldier; // 27
 	shok_position TerritoryCenter;
 	float TerritoryCenterRange;
 	int Experience;
-	vector_padding
-		std::vector<shok_position, shok_allocator<shok_position>> PatrolPoints;
+	vector_padding;
+	std::vector<shok_position, shok_allocator<shok_position>> PatrolPoints;
 private:
 	int u2;
 public:
@@ -239,6 +239,9 @@ public:
 	shok_position StartBattlePosition;
 
 	static inline constexpr int vtp = 0x7761E0;
+
+	int GetTroopHealth();
+	int GetTroopHealthPerSoldier();
 };
 
 struct shok_GGL_CSoldierBehavior : shok_GGL_CBattleBehavior {

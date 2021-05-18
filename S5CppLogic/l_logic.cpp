@@ -940,9 +940,19 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 	return 0;
 }
 
+int l_logicSetRegenerateSoldiers(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "nos supported with SCELoader");
+	HookLeaderRegen();
+	LeaderRegenRegenerateSoldiers = lua_toboolean(L, 1);
+	return 0;
+}
+
+
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = nullptr;
+	LeaderRegenRegenerateSoldiers = false;
 }
 
 void l_logic_init(lua_State* L)
@@ -980,6 +990,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "GetColorByColorIndex", &l_logicGetColor);
 	luaext_registerFunc(L, "SetColorByColorIndex", &l_logicSetColor);
 	luaext_registerFunc(L, "SetPaydayCallback", &l_logicEnablePlayerPaydayCallback);
+	luaext_registerFunc(L, "SetLeadersRegenerateTroopHealth", &l_logicSetRegenerateSoldiers);
 
 
 	lua_pushstring(L, "UICommands");

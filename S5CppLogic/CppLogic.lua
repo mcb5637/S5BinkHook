@@ -223,6 +223,11 @@ function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
 -- @param func to be called (playerId, taxes)
 function CppLogic.Logic.SetPaydayCallback(func) end
 
+--- sets if leader regenration regenerates troop hp.
+-- does not work with SCELoader.
+-- @param b bool
+function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func
@@ -503,8 +508,19 @@ function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
 -- @param dmg, (<0 disable)
 function CppLogic.Entity.SetDamage(id, dmg) end
 
+--- overrides an entities armor.
+-- @param id entity
+-- @param armor, (<0 disable)
+function CppLogic.Entity.SetArmor(id, armor) end
+
+--- overrides a settlers/buildings exploration.
+-- use Logic for scriptentities.
+-- @param id entity
+-- @param ex, (<0 disable)
+function CppLogic.Entity.SetExploration(id, ex) end
+
 --- clones all overrides.
--- @param from entity (can be id of last destroyed entits)
+-- @param from entity (can be id of last destroyed entity)
 -- @param to entity 
 function CppLogic.Entity.CloneOverrideData(from, to) end
 
@@ -767,10 +783,15 @@ function CppLogic.Entity.Leader.GetTroopHealth(id) end
 -- @param hp hp
 function CppLogic.Entity.Leader.SetTroopHealth(id, hp) end
 
---- a leaders troop limit-
+--- a leaders troop limit.
 -- @param id leader
 -- @param limit limit
 function CppLogic.Entity.Leader.SetSoldierLimit(id, limit) end
+
+--- a leaders regeneration.
+-- @param id leader
+-- @param hp regenerated
+function CppLogic.Entity.Leader.SetRegeneration(id, hp) end
 
 --- building height (& construction progress).
 -- @param id entity

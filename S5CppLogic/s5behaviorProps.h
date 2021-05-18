@@ -176,7 +176,7 @@ struct shok_GGL_CBattleBehaviorProps : shok_EGL_CGLEBehaviorProps {
 struct shok_GGL_CLeaderBehaviorProps : shok_GGL_CBattleBehaviorProps {
 	int SoldierType, BarrackUpgradeCategory;
 	float HomeRadius;
-	int HealingPoints, HealingSeconds;
+	int HealingPoints, HealingSeconds; // 28
 	float AutoAttackRange, UpkeepCosts;
 
 	static inline constexpr int vtp = 0x775FA4;

@@ -43,10 +43,14 @@ typedef uint8_t byte;
 // 
 // only without SCELoader
 // shok_entityHurtEntity 0x49F358 jmp patched
-// entity get max hp 0x57B798 jmp
+// entity get max hp 0x57B798 jmp, settler overhead hp bar 0x4BDED8 jmp, createentity 0x571B93 jmp set hp
 // create entity 0x571B93 jmp to fix max hp
 // 0x4BDED8 ui settler overhead hp bar maxhp jmp
 // shok_playerattractionhandler_checkpayday 0x4C25FB jmp at 0x4C2754
+// entity get damage battle event 0x50C785 jmp, autocannon event 0x50F5ED jmp, melee onhit 0x50C235 jmp
+// entity get armor event settler 0x4A6B15 jmp, building 0x4AB160 jmp
+// entity get exploration settler 0x4A4AC3 jmp, building 0x4AB199 jmp
+// leader behavior regen 0x4EAE92 jmp
 
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;

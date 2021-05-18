@@ -303,8 +303,9 @@ int l_leaderGetLeaderHP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
 	luaext_assertPointer(L, b, "no leader at 1");
-	lua_pushnumber(L, b->TroopHealthCurrent);
-	return 1;
+	lua_pushnumber(L, b->GetTroopHealth());
+	lua_pushnumber(L, b->GetTroopHealthPerSoldier());
+	return 2;
 }
 int l_leaderSetLeaderHP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
@@ -1285,13 +1286,44 @@ int l_entityCloneAddData(lua_State* L) {
 		to->CloneAdditionalDataFrom(&LastRemovedEntityAddonData);
 	return 0;
 }
-int l_entity_SetDamage(lua_State* L) { // todo autocannon
+int l_entity_SetDamage(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
 	EnableEntityDamageMod();
+	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->DamageOverride = luaL_checkint(L, 2);
+	return 0;
+}
+int l_entity_SetArmor(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	EnableEntityArmorMod();
+	HookDestroyEntity();
+	entityAddonData* d = b->GetAdditionalData(true);
+	d->ArmorOverride = luaL_checkint(L, 2);
+	return 0;
+}
+int l_entity_SetExploration(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	EnableEntityExplorationMod();
+	HookDestroyEntity();
+	entityAddonData* d = b->GetAdditionalData(true);
+	d->ExplorationOverride = luaL_checkfloat(L, 2);
+	return 0;
+}
+int l_leader_SetRegen(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	HookLeaderRegen();
+	HookDestroyEntity();
+	entityAddonData* d = b->GetAdditionalData(true);
+	d->RegenHPOverride = luaL_checkint(L, 2);
 	return 0;
 }
 
@@ -1332,6 +1364,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetMaxHP", &l_entitySetMaxHP);
 	luaext_registerFunc(L, "CloneOverrideData", &l_entityCloneAddData);
 	luaext_registerFunc(L, "SetDamage", &l_entity_SetDamage);
+	luaext_registerFunc(L, "SetArmor", &l_entity_SetArmor);
+	luaext_registerFunc(L, "SetExploration", &l_entity_SetExploration);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -1412,6 +1446,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetTroopHealth", &l_leaderSetLeaderHP);
 	luaext_registerFunc(L, "AttachSoldier", &l_leaderAttachSoldier);
 	luaext_registerFunc(L, "SetSoldierLimit", &l_leaderSetSoldierLimit);
+	luaext_registerFunc(L, "SetRegeneration", &l_leader_SetRegen);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");

@@ -46,6 +46,12 @@ shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
 	return EntityTypes.data() + i;
 }
 
+const char* (__stdcall* const getentitydisplayname)(int i) = (const char* (__stdcall* const)(int i)) 0x52EFCF;
+const char* shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(int i)
+{
+	return getentitydisplayname(i);
+}
+
 void shok_ECS_CManager::ReloadCutscene(const char* path)
 {
 	((shok_vtable_ECS_CManager*)this->vtable)->ReloadCutscene(this, path);

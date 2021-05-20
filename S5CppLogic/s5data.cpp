@@ -214,3 +214,32 @@ bool HasSCELoader()
 {
 	return GetModuleHandle(L"SCELoader.dll");
 }
+
+const char* (*GetStringTableTextOverride)(const char* s) = nullptr;
+const char* __stdcall hookstt(const char* s) {
+	if (!GetStringTableTextOverride)
+		return nullptr;
+	return GetStringTableTextOverride(s);
+}
+void __declspec(naked) hooksttasm() {
+	__asm {
+		//int 3
+		push [esp+4]
+		call hookstt
+		test eax,eax
+		jz notfound
+		ret
+
+		notfound:
+		mov eax, 0x894508
+		mov eax, [eax]
+		push 0x556D33
+		ret
+	}
+}
+void HookGetStringTableText()
+{
+	if (HasSCELoader())
+		DEBUGGER_BREAK;
+	WriteJump(shok_GetStringTableText, &hooksttasm);
+}

@@ -32,3 +32,9 @@ int shok_GGL_CLeaderBehavior::GetTroopHealthPerSoldier()
 {
 	return leaderbehgettroophealthpersol(this);
 }
+
+static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(shok_GGL_CAutoCannonBehavior*) = (float(__thiscall*)(shok_GGL_CAutoCannonBehavior * id))0x50F508;
+float shok_GGL_CAutoCannonBehavior::GetMaxRange()
+{
+	return autocannonBehaviorGetMaxRange(this);
+}

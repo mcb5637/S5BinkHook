@@ -11,6 +11,9 @@ struct entityAddonData {
 	int ArmorOverride = -1;
 	float ExplorationOverride = -1.0f;
 	int RegenHPOverride = -1;
+	int RegenSecondsOverride = -1;
+	float MaxRangeOverride = -1.0f;
+	std::string NameOverride = "";
 };
 
 struct shok_EGL_CGLEEntity : shok_object {
@@ -53,6 +56,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int NumberOfAuras; // 65
 
 	static inline constexpr int vtp = 0x783E74;
+	static inline constexpr int vtp_IEntityDisplay = 0x783E58;
 
 private:
 	shok_EGL_CGLEBehavior* SearchBehavior(int vt);
@@ -91,6 +95,7 @@ public:
 	shok_GGL_CLimitedAttachmentBehavior* GetLimitedAttachmentBehavior();
 	shok_GGL_CBuildingMerchantBehavior* GetBuildingMerchantBehavior();
 	shok_GGL_CBuildingMercenaryBehavior* GetMercenaryBehavior();
+	shok_GGL_CAutoCannonBehavior* GetAutoCannonBehavior();
 
 
 
@@ -261,10 +266,12 @@ public:
 	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
 
 	static inline constexpr int vtp = 0x76E3CC;
+	static inline constexpr int vtp_IEntityDisplay = 0x76E3B0;
 
 	bool IsIdle();
 
 	int LeaderGetRegenHealth();
+	int LeaderGetRegenHealthSeconds();
 };
 
 struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
@@ -279,6 +286,7 @@ struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
 	int ResourceType, ResourceAmount, ResourceAmountAdd;
 
 	static inline constexpr int vtp = 0x76FEA4;
+	static inline constexpr int vtp_IEntityDisplay = 0x76FE88;
 };
 
 struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
@@ -297,6 +305,7 @@ public:
 	int ConstructionSiteType; // 83
 
 	static inline constexpr int vtp = 0x76EB94;
+	static inline constexpr int vtp_IEntityDisplay = 0x76EB78;
 
 	int GetConstructionSite();
 	int GetNearestFreeConstructionSlotFor(shok_position* p);
@@ -325,6 +334,7 @@ public:
 
 struct shok_GGL_CBridgeEntity : shok_GGL_CBuilding {
 	static inline constexpr int vtp = 0x77805C;
+	static inline constexpr int vtp_IEntityDisplay = 0x778040;
 };
 
 struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
@@ -387,6 +397,7 @@ void HookHurtEntity();
 extern std::multimap<int, int> BuildingMaxHpBoni; // entitytype -> tech id
 void EnableMaxHealthTechBoni();
 
+extern std::map<int, entityAddonData> AddonDataMap;
 extern entityAddonData LastRemovedEntityAddonData;
 void HookDestroyEntity();
 
@@ -395,3 +406,5 @@ void EnableEntityArmorMod();
 void EnableEntityExplorationMod();
 extern bool LeaderRegenRegenerateSoldiers;
 void HookLeaderRegen();
+void HookEntityMaxRange();
+void HookEntityDisplayName();

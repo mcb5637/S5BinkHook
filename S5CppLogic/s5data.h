@@ -50,7 +50,10 @@ typedef uint8_t byte;
 // entity get damage battle event 0x50C785 jmp, autocannon event 0x50F5ED jmp, melee onhit 0x50C235 jmp
 // entity get armor event settler 0x4A6B15 jmp, building 0x4AB160 jmp
 // entity get exploration settler 0x4A4AC3 jmp, building 0x4AB199 jmp
-// leader behavior regen 0x4EAE92 jmp
+// leader behavior regen 0x4EAE92 jmp, leader behavior ontick? 0x4EFC29 jmp
+// battle behavior get max range 0x50AB48 jmp, autocannon behavior get max range 0x50F50D jmp
+// GetStringTableText 0x556D2E jmp
+// display entity name overhead 0x53F911 jmp
 
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
@@ -226,6 +229,8 @@ bool contains(T* data, T search, int num) {
 	return false;
 }
 
+const char* (__cdecl* const shok_GetStringTableText)(const char* key) = (const char* (__cdecl* const)(const char*))0x556D2E;
+
 #include "s5behaviorProps.h"
 #include "s5entitytype.h"
 #include "s5behaviors.h"
@@ -260,6 +265,9 @@ void RedirectCall(void* call, void* redirect);
 void WriteJump(void* adr, void* toJump);
 
 bool HasSCELoader();
+
+extern const char* (*GetStringTableTextOverride)(const char* s);
+void HookGetStringTableText();
 
 template<class T>
 constexpr inline T rad2deg(T r) {

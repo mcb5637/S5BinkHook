@@ -48,7 +48,7 @@ shok_GGL_CSoldierBehavior* shok_EGL_CGLEEntity::GetSoldierBehavior()
 
 shok_GGL_CLeaderBehavior* shok_EGL_CGLEEntity::GetLeaderBehavior()
 {
-	int data[2] = { shok_GGL_CLeaderBehavior::vtp, shok_GGL_CSoldierBehavior::vtp };
+	int data[2] = { shok_GGL_CLeaderBehavior::vtp, shok_GGL_CBattleSerfBehavior::vtp };
 	return (shok_GGL_CLeaderBehavior*)SearchBehavior(data, 2);
 }
 
@@ -209,6 +209,11 @@ shok_GGL_CBuildingMerchantBehavior* shok_EGL_CGLEEntity::GetBuildingMerchantBeha
 shok_GGL_CBuildingMercenaryBehavior* shok_EGL_CGLEEntity::GetMercenaryBehavior()
 {
 	return (shok_GGL_CBuildingMercenaryBehavior*)SearchBehavior(shok_GGL_CBuildingMercenaryBehavior::vtp);
+}
+
+shok_GGL_CAutoCannonBehavior* shok_EGL_CGLEEntity::GetAutoCannonBehavior()
+{
+	return (shok_GGL_CAutoCannonBehavior*)SearchBehavior(shok_GGL_CAutoCannonBehavior::vtp);
 }
 
 static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, int cat)) 0x57BBEB;
@@ -1073,6 +1078,9 @@ void shok_EGL_CGLEEntity::CloneAdditionalDataFrom(entityAddonData* other)
 		t->DamageOverride = other->DamageOverride;
 		t->ArmorOverride = other->ArmorOverride;
 		t->ExplorationOverride = other->ExplorationOverride;
+		t->RegenHPOverride = other->RegenHPOverride;
+		t->RegenSecondsOverride = other->RegenSecondsOverride;
+		t->MaxRangeOverride = other->MaxRangeOverride;
 	}
 }
 
@@ -1220,6 +1228,14 @@ int shok_GGL_CSettler::LeaderGetRegenHealth()
 	else
 		return GetEntityType()->GetLeaderBehaviorProps()->HealingPoints;
 }
+int shok_GGL_CSettler::LeaderGetRegenHealthSeconds()
+{
+	entityAddonData* d = GetAdditionalData(false);
+	if (d && d->RegenSecondsOverride >= 0)
+		return d->RegenSecondsOverride;
+	else
+		return GetEntityType()->GetLeaderBehaviorProps()->HealingSeconds;
+}
 
 bool LeaderRegenRegenerateSoldiers = false;
 void __fastcall leaderregen(shok_GGL_CLeaderBehavior* th) {
@@ -1248,7 +1264,113 @@ void __fastcall leaderregen(shok_GGL_CLeaderBehavior* th) {
 		return;
 	}
 }
+void __fastcall leaderregenseconds(shok_GGL_CLeaderBehavior* th) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	int max = ((shok_GGL_CSettler*)e)->LeaderGetRegenHealthSeconds();
+	th->SecondsSinceHPRefresh++;
+	if (th->SecondsSinceHPRefresh >= max)
+		leaderregen(th);
+}
+void __declspec(naked) leaderregensecondsasm() {
+	__asm {
+		mov ecx, esi
+		call leaderregenseconds
+		push 0x4EFC42
+		ret
+	}
+}
 void HookLeaderRegen()
 {
 	WriteJump((void*)0x4EAE92, &leaderregen);
+	WriteJump((void*)0x4EFC29, &leaderregensecondsasm);
+}
+
+float __fastcall leadermaxrange(shok_GGL_CBattleBehavior* th) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	entityAddonData* d = e->GetAdditionalData(false);
+	if (d && d->MaxRangeOverride >= 0)
+		return d->MaxRangeOverride;
+	else
+		return e->GetEntityType()->GetLeaderBehaviorProps()->MaxRange;
+}
+void __declspec(naked) leadermaxrangeasm() {
+	__asm {
+		mov esi, ecx
+
+		pushad
+		call leadermaxrange
+		popad
+
+		mov eax, [esi+0x30]
+		push 0x50AB50
+		ret
+	}
+}
+float __fastcall autocannonmaxrange(shok_GGL_CAutoCannonBehavior* th) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	entityAddonData* d = e->GetAdditionalData(false);
+	if (d && d->MaxRangeOverride >= 0)
+		return d->MaxRangeOverride;
+	else
+		return e->GetEntityType()->GetAutoCannonProps()->MaxAttackRange;
+}
+void __declspec(naked) autocannonmaxrangeasm() {
+	__asm {
+		mov esi, ecx
+
+		pushad
+		call autocannonmaxrange
+		popad
+
+		mov eax, [esi + 0x14]
+		push 0x50F515
+		ret
+	}
+}
+void HookEntityMaxRange()
+{
+	WriteJump((void*)0x50AB48, &leadermaxrangeasm);
+	WriteJump((void*)0x50F50D, &autocannonmaxrangeasm);
+}
+
+const char* __stdcall entitydisplayname(int* e, int type) {
+	// lots of hacks to recover that entity pointer in a safe way
+	// there are 2 branches that can end up calling this, with 2 different pointers in eax
+	int d[5] = { shok_EGL_CGLEEntity::vtp_IEntityDisplay, shok_GGL_CSettler::vtp_IEntityDisplay, shok_GGL_CBuilding::vtp_IEntityDisplay,
+		shok_GGL_CResourceDoodad::vtp_IEntityDisplay, shok_GGL_CBridgeEntity::vtp_IEntityDisplay
+	};
+	shok_EGL_CGLEEntity* ent = nullptr;
+	if (contains(d, *e, 5)) {
+		e--;
+		ent = (shok_EGL_CGLEEntity*)e;
+	}
+	else {
+		int d2[5] = { shok_EGL_CGLEEntity::vtp, shok_GGL_CSettler::vtp, shok_GGL_CBuilding::vtp,
+			shok_GGL_CResourceDoodad::vtp, shok_GGL_CBridgeEntity::vtp
+		};
+		if (contains(d2, *e, 5)) {
+			ent = (shok_EGL_CGLEEntity*)e;
+		}
+	}
+	if (ent) {
+		entityAddonData* d = ent->GetAdditionalData(false);
+		if (d && d->NameOverride.size() > 0) {
+			return d->NameOverride.c_str();
+		}
+	}
+
+	return shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(type);
+}
+void __declspec(naked) entitydisplaynameasm() {
+	__asm {
+		push eax
+		call entitydisplayname
+
+		push 0x53F91D
+		ret
+	}
+}
+void HookEntityDisplayName()
+{
+	WriteJump((void*)0x53F911, &entitydisplaynameasm);
 }

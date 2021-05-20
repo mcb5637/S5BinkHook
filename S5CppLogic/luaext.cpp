@@ -262,3 +262,12 @@ int str_ends_with(const char* str, const char* suffix) {
 
 	return 0 == strncmp(str + str_len - suffix_len, suffix, suffix_len);
 }
+
+void luaext_tolower(lua_State* L) {
+	lua_getglobal(L, "string");
+	lua_pushstring(L, "lower");
+	lua_rawget(L, -2);
+	lua_remove(L, -2);
+	lua_insert(L, -2);
+	lua_pcall(L, 1, 1, 0);
+}

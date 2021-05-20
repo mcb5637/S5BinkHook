@@ -33,3 +33,4 @@ void luaext_writeCostInfo(lua_State* L, shok_costInfo& c);
 void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZeroes);
 void luaext_assertEntityAlive(lua_State* L, int id, const char* msg);
 int str_ends_with(const char* str, const char* suffix);
+void luaext_tolower(lua_State* L);

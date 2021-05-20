@@ -934,7 +934,14 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 		lua_rawget(L2, LUA_REGISTRYINDEX);
 		lua_pushnumber(L2, th->PlayerID);
 		lua_pushnumber(L2, th->GetWorkerPaydayIncome());
-		lua_pcall(L2, 2, 0, 0);
+		lua_pcall(L2, 2, 1, 0);
+		if (lua_isnumber(L2, -1)) {
+			float add = luaL_checkfloat(L2, -1);
+			if (add > 0)
+				(*shok_GGL_CGLGameLogicObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok_ResourceType::GoldRaw, add);
+			else if (add < 0)
+				(*shok_GGL_CGLGameLogicObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok_ResourceType::Gold, -add);
+		}
 		lua_settop(L2, t);
 	};
 	return 0;
@@ -942,9 +949,56 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 
 int l_logicSetRegenerateSoldiers(lua_State* L) {
 	if (HasSCELoader())
-		luaL_error(L, "nos supported with SCELoader");
+		luaL_error(L, "not supported with SCELoader");
 	HookLeaderRegen();
 	LeaderRegenRegenerateSoldiers = lua_toboolean(L, 1);
+	return 0;
+}
+
+void breakasm() {
+	DEBUGGER_BREAK;
+}
+
+int l_logicOverrideStringTableText(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (L != *shok_luastate_game)
+		luaL_error(L, "does only work ingame");
+	if (!GetStringTableTextOverride) {
+		HookGetStringTableText();
+		lua_pushlightuserdata(L, &l_logicOverrideStringTableText);
+		lua_newtable(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		GetStringTableTextOverride = [](const char* s) {
+			if (!s)
+				return s;
+			const char* r = nullptr;
+			int t = lua_gettop(*shok_luastate_game);
+
+			lua_pushlightuserdata(*shok_luastate_game, &l_logicOverrideStringTableText);
+			lua_rawget(*shok_luastate_game, LUA_REGISTRYINDEX);
+			lua_pushstring(*shok_luastate_game, s);
+			luaext_tolower(*shok_luastate_game);
+			lua_rawget(*shok_luastate_game, -2);
+			if (lua_isstring(*shok_luastate_game, -1)) {
+				r = lua_tostring(*shok_luastate_game, -1); // stored in registry, so its ok to return it
+				breakasm();
+			}
+
+			lua_settop(*shok_luastate_game, t);
+			return r;
+		};
+	}
+
+	luaext_assert(L, lua_isstring(L, 1), "key not string");
+	luaext_assert(L, lua_isstring(L, 2) || lua_isnil(L, 2), "replacement not string or nil");
+
+	lua_pushlightuserdata(L, &l_logicOverrideStringTableText);
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	lua_pushvalue(L, 1);
+	luaext_tolower(L);
+	lua_pushvalue(L, 2);
+	lua_rawset(L, -3);
 	return 0;
 }
 
@@ -953,6 +1007,7 @@ void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = nullptr;
 	LeaderRegenRegenerateSoldiers = false;
+	GetStringTableTextOverride = nullptr;
 }
 
 void l_logic_init(lua_State* L)
@@ -991,6 +1046,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "SetColorByColorIndex", &l_logicSetColor);
 	luaext_registerFunc(L, "SetPaydayCallback", &l_logicEnablePlayerPaydayCallback);
 	luaext_registerFunc(L, "SetLeadersRegenerateTroopHealth", &l_logicSetRegenerateSoldiers);
+	luaext_registerFunc(L, "SetStringTableText", &l_logicOverrideStringTableText);
 
 
 	lua_pushstring(L, "UICommands");
@@ -1008,3 +1064,5 @@ void l_logic_init(lua_State* L)
 // CppLogic.Logic.GetColorByColorIndex(1)
 // CppLogic.Logic.SetColorByColorIndex(1, 255, 255, 255, 255)
 // CppLogic.Logic.SetPaydayCallback(GameCallback_PaydayPayed)
+// CppLogic.Logic.SetStringTableText("MainMenu/StartExtras", "test")
+// CppLogic.Logic.SetStringTableText("names/pu_hero1a", "test")

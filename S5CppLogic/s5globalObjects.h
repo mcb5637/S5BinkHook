@@ -11,6 +11,8 @@ public:
 	static inline constexpr int vtp = 0x788834;
 
 	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
+
+	static const char* GetEntityTypeDisplayName(int i);
 };
 static inline shok_EGL_CGLEEntitiesProps** const shok_EGL_CGLEEntitiesPropsObj = (shok_EGL_CGLEEntitiesProps**)0x895DB0;
 

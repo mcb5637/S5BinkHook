@@ -595,9 +595,16 @@ int l_settlerThiefSetStolenResourceInfo(lua_State* L) {
 int l_entityGetAutoAttackMaxRange(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
 	shok_GGL_CBattleBehavior* b = e->GetBattleBehavior();
-	luaext_assertPointer(L, b, "no battle entity at 1");
-	lua_pushnumber(L, b->GetMaxRange());
-	return 1;
+	if (b) {
+		lua_pushnumber(L, b->GetMaxRange());
+		return 1;
+	}
+	shok_GGL_CAutoCannonBehavior* a = e->GetAutoCannonBehavior();
+	if (a) {
+		lua_pushnumber(L, a->GetMaxRange());
+		return 1;
+	}
+	return luaL_error(L, "no battle entity or autocannon at 1");
 }
 
 int l_entityGetModel(lua_State* L) {
@@ -1136,23 +1143,13 @@ int l_buildingBarracksRecruitGroups(lua_State* L) {
 	return 0;
 }
 
-int serfType = -1;
 int l_buildingHQBuySerf(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsEntityInCategory(shok_EntityCategory::Headquarters), "no hq");
 	luaext_assert(L, b->IsIdle(), "building not idle");
-	if (serfType < 0) {
-
-		serfType = 0;
-		for (shok_GGlue_CGlueEntityProps& t : (*shok_EGL_CGLEEntitiesPropsObj)->EntityTypes) {
-			if (t.GetSerfBehaviorProps())
-				break;
-			serfType++;
-		}
-	}
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(serfType);
+	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(*shok_entityTypeIDSerf);
 	luaext_assert(L, p->CurrentResources.HasResources(&((shok_GGL_CGLSettlerProps*)solty->LogicProps)->Cost), "missing res");
 	b->HQBuySerf();
 	return 0;
@@ -1319,18 +1316,53 @@ int l_entity_SetExploration(lua_State* L) {
 int l_leader_SetRegen(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
-	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	shok_GGL_CSettler* b = luaext_checkSettler(L, 1);
+	luaext_assertPointer(L, b->GetLeaderBehavior(), "no leader");
 	HookLeaderRegen();
 	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
-	d->RegenHPOverride = luaL_checkint(L, 2);
+	if (lua_isnumber(L, 2))
+		d->RegenHPOverride = luaL_checkint(L, 2);
+	if (lua_isnumber(L, 3))
+		d->RegenSecondsOverride = luaL_checkint(L, 3);
 	return 0;
+}
+int l_entity_SetAutoAttackMaxRange(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	HookEntityMaxRange();
+	HookDestroyEntity();
+	entityAddonData* d = b->GetAdditionalData(true);
+	d->MaxRangeOverride = luaL_checkfloat(L, 2);
+	return 0;
+}
+int l_entity_SetDisplayName(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	HookEntityDisplayName();
+	HookDestroyEntity();
+	entityAddonData* d = b->GetAdditionalData(true);
+	d->NameOverride = luaL_checkstring(L, 2);
+	return 0;
+}
+
+int l_leader_GetRegen(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_GGL_CSettler* b = luaext_checkSettler(L, 1);
+	luaext_assertPointer(L, b->GetLeaderBehavior(), "no leader");
+	lua_pushnumber(L, b->LeaderGetRegenHealth());
+	lua_pushnumber(L, b->LeaderGetRegenHealthSeconds());
+	return 2;
 }
 
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	BuildingMaxHpBoni.clear();
-	serfType = -1;
+	AddonDataMap.clear();
+	LastRemovedEntityAddonData.EntityId = 0;
 }
 
 void l_entity_init(lua_State* L)
@@ -1366,6 +1398,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetDamage", &l_entity_SetDamage);
 	luaext_registerFunc(L, "SetArmor", &l_entity_SetArmor);
 	luaext_registerFunc(L, "SetExploration", &l_entity_SetExploration);
+	luaext_registerFunc(L, "SetAutoAttackMaxRange", &l_entity_SetAutoAttackMaxRange);
+	luaext_registerFunc(L, "SetDisplayName", &l_entity_SetDisplayName);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -1447,6 +1481,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "AttachSoldier", &l_leaderAttachSoldier);
 	luaext_registerFunc(L, "SetSoldierLimit", &l_leaderSetSoldierLimit);
 	luaext_registerFunc(L, "SetRegeneration", &l_leader_SetRegen);
+	luaext_registerFunc(L, "GetRegeneration", &l_leader_GetRegen);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");

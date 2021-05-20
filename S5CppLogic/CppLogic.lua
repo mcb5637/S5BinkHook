@@ -220,13 +220,19 @@ function CppLogic.Logic.GetColorByColorIndex(index) end
 function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
 
 --- sets a function to be called after payday was done.
--- @param func to be called (playerId, taxes)
+-- @param func to be called (playerId, taxes)->GoldToAdd
 function CppLogic.Logic.SetPaydayCallback(func) end
 
 --- sets if leader regenration regenerates troop hp.
 -- does not work with SCELoader.
 -- @param b bool
 function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
+
+--- sets a stringtabletexts accosiated text. automatically resets on leaving the game.
+-- (stored in lua registry).
+-- @param key key to replace
+-- @param text replacement string or nil to restore default
+function CppLogic.Logic.SetStringTableText(key, text) end
 
 --- ui command callback.
 -- func parameters are (eventId, eventData)
@@ -519,6 +525,16 @@ function CppLogic.Entity.SetArmor(id, armor) end
 -- @param ex, (<0 disable)
 function CppLogic.Entity.SetExploration(id, ex) end
 
+--- overrides a settlers/autocannons max attack range.
+-- @param id entity
+-- @param ran, (<0 disable)
+function CppLogic.Entity.SetAutoAttackMaxRange(id, ran) end
+
+--- overrides a n entities display name.
+-- @param id entity
+-- @param n, ("" disable)
+function CppLogic.Entity.SetDisplayName(id, n) end
+
 --- clones all overrides.
 -- @param from entity (can be id of last destroyed entity)
 -- @param to entity 
@@ -789,9 +805,16 @@ function CppLogic.Entity.Leader.SetTroopHealth(id, hp) end
 function CppLogic.Entity.Leader.SetSoldierLimit(id, limit) end
 
 --- a leaders regeneration.
+-- does not work with SCELoader.
+-- @param id leader
+-- @return hp regenerated
+-- @return seconds between refreshes
+function CppLogic.Entity.Leader.GetRegeneration(id) end
+--- a leaders regeneration.
 -- @param id leader
 -- @param hp regenerated
-function CppLogic.Entity.Leader.SetRegeneration(id, hp) end
+-- @param seconds between refreshes
+function CppLogic.Entity.Leader.SetRegeneration(id, hp, seconds) end
 
 --- building height (& construction progress).
 -- @param id entity
@@ -1013,13 +1036,13 @@ function CppLogic.EntityType.SetAutoAttackMissChance(ty, mc) end
 -- @param ty entitytype
 -- @return max range
 -- @return min range (nil for autocannons)
-function CppLogic.EntityType.GetAutoAttackMissChance(ty) end
+function CppLogic.EntityType.GetAutoAttackRange(ty) end
 --- range chance of autoattacks of an entity type.
 -- for autocannons only max range, for anything else max and min range.
 -- @param ty entitytype
 -- @return max range (optional)
 -- @return min range (ignored for autocannons) (optional)
-function CppLogic.EntityType.SetAutoAttackMissChance(ty, maxrange, minrange) end
+function CppLogic.EntityType.SetAutoAttackRange(ty, maxrange, minrange) end
 
 --- settler or building type armor and armorclass.
 -- @param ty entitytype

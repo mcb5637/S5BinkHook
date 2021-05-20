@@ -323,6 +323,8 @@ private:
 public:
 	int ShotsLeft;
 
+	float GetMaxRange();
+
 	static inline constexpr int vtp = 0x778CF0;
 };
 

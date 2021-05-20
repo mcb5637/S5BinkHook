@@ -47,6 +47,23 @@ end
 function CppLogic.Entity.SetExploration(id, ex)
     CEntity.SetExploration(GetID(id), ex)
 end
+function CppLogic.Entity.Leader.SetRegeneration(id, hp, seconds)
+    if hp then
+        CEntity.SetHealingPoints(GetID(id), hp)
+    end
+    if seconds then
+        CEntity.SetHealingSeconds(GetID(id), seconds)
+    end
+end
+function CppLogic.Entity.SetAutoAttackMaxRange(id, ran)
+    CEntity.SetAttackRange(GetID(id), ran)
+end
+function CppLogic.Logic.SetStringTableText(key, text)
+    CUtil.SetStringTableText(key, text)
+end
+function CppLogic.Entity.SetDisplayName(id, n)
+    CUtil.SetEntityDisplayName(GetID(id), n)
+end
 )";
 
 int __cdecl test(lua_State* L) {
@@ -62,7 +79,8 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->GetLeaderBehavior()->TroopHealthCurrent);
+    //lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->GetEntityType()->GetAutoCannonProps()->MaxAttackRange);
+    lua_pushstring(L, shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(luaL_checkint(L, 1)));
     return 1;
 }
 

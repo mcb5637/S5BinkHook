@@ -227,3 +227,6 @@ static inline bool(_cdecl* const shok_canPlaceBuilding)(int entitytype, int play
 
 
 bool ArePlayersHostile(int p1, int p2);
+
+extern bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId);
+void HookCanPlaceBuilding();

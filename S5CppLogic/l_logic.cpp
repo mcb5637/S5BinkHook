@@ -1002,12 +1002,47 @@ int l_logicOverrideStringTableText(lua_State* L) {
 	return 0;
 }
 
+int l_logic_SetPlaceBuildingCb(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_logic_SetPlaceBuildingCb);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+
+	if (!CanPlaceBuildingCallback) {
+		CanPlaceBuildingCallback = [](int entitytype, int player, shok_position* pos, float rotation, int buildOnId) {
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+			bool r = true;
+
+			lua_pushlightuserdata(L, &l_logic_SetPlaceBuildingCb);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, entitytype);
+			lua_pushnumber(L, player);
+			luaext_pushPos(L, *pos);
+			lua_pushnumber(L, rotation);
+			lua_pushnumber(L, buildOnId);
+			lua_pcall(L, 5, 1, 0);
+			if (lua_isboolean(L, -1))
+				r = lua_toboolean(L, -1);
+
+			lua_settop(L, t);
+			return r;
+		};
+		HookCanPlaceBuilding();
+	}
+	return 0;
+}
+
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = nullptr;
 	LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
+	CanPlaceBuildingCallback = nullptr;
 }
 
 void l_logic_init(lua_State* L)
@@ -1047,6 +1082,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "SetPaydayCallback", &l_logicEnablePlayerPaydayCallback);
 	luaext_registerFunc(L, "SetLeadersRegenerateTroopHealth", &l_logicSetRegenerateSoldiers);
 	luaext_registerFunc(L, "SetStringTableText", &l_logicOverrideStringTableText);
+	luaext_registerFunc(L, "SetPlaceBuildingAdditionalCheck", &l_logic_SetPlaceBuildingCb);
 
 
 	lua_pushstring(L, "UICommands");
@@ -1066,3 +1102,4 @@ void l_logic_init(lua_State* L)
 // CppLogic.Logic.SetPaydayCallback(GameCallback_PaydayPayed)
 // CppLogic.Logic.SetStringTableText("MainMenu/StartExtras", "test")
 // CppLogic.Logic.SetStringTableText("names/pu_hero1a", "test")
+// CppLogic.Logic.SetPlaceBuildingAdditionalCheck(function(...) LuaDebugger.Log(arg) return true end)

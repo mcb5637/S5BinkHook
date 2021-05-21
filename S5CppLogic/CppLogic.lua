@@ -223,6 +223,12 @@ function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
 -- @param func to be called (playerId, taxes)->GoldToAdd
 function CppLogic.Logic.SetPaydayCallback(func) end
 
+--- sets a function to be called for building placement checks.
+-- only gets called if all usual conditions for placement are satisfied.
+-- (with SCELoader player is always -1, and buildOnID is a bool instead of an id).
+-- @param func to be called (entitytype, playerId, pos, rotation, buildOnID)->canBuild
+function CppLogic.Logic.SetPlaceBuildingAdditionalCheck(func) end
+
 --- sets if leader regenration regenerates troop hp.
 -- does not work with SCELoader.
 -- @param b bool

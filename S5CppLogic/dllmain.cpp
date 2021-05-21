@@ -64,6 +64,14 @@ end
 function CppLogic.Entity.SetDisplayName(id, n)
     CUtil.SetEntityDisplayName(GetID(id), n)
 end
+function CppLogic.Logic.SetPlaceBuildingCB(func)
+    GameCallback_PlaceBuildingAdditionalCheck = function(ety, x, y, r, isbuildon)
+        if not func then
+            return true
+        end
+        return func(ety, -1, {X=x,Y=y}, r, isbuildon)
+    end
+end
 )";
 
 int __cdecl test(lua_State* L) {

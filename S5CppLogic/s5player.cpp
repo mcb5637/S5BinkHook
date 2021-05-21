@@ -86,3 +86,37 @@ bool ArePlayersHostile(int p1, int p2)
 	return (*shok_GGL_CGLGameLogicObj)->GetPlayer(p1)->GetDiploStateTo(p2) == shok_DiploState::Hostile;
 }
 
+bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = nullptr;
+int __stdcall canplacebuilding(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) {
+	if (CanPlaceBuildingCallback)
+		return CanPlaceBuildingCallback(entitytype, player, pos, rotation, buildOnId);
+	return true;
+}
+void __declspec(naked) canplacebuildingasm() {
+	__asm {
+
+		test bl, bl
+		jz retu
+
+		push[ebp + 0x18]
+		push[ebp + 0x14]
+		push[ebp + 0x10]
+		push[ebp + 0xC]
+		push[ebp + 0x8]
+		call canplacebuilding
+		jmp modif
+
+	retu:
+		mov al, bl
+
+	modif:
+		mov ecx, [ebp+0xC]
+		pop ebx
+		push 0x4B45BF
+		ret
+	}
+}
+void HookCanPlaceBuilding()
+{
+	WriteJump((void*)0x4B45B9, &canplacebuildingasm);
+}

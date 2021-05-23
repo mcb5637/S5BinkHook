@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5data.h"
+#include <cmath>
 
 static inline int(__thiscall* const plattracthandlerGetAttLimit)(shok_GGL_CPlayerAttractionHandler* th) = (int(__thiscall*)(shok_GGL_CPlayerAttractionHandler*))0x4C216F;
 int shok_GGL_CPlayerAttractionHandler::GetAttractionLimit()
@@ -119,4 +120,53 @@ void __declspec(naked) canplacebuildingasm() {
 void HookCanPlaceBuilding()
 {
 	WriteJump((void*)0x4B45B9, &canplacebuildingasm);
+}
+
+float ConstructBuildingRotation = 0.0f;
+void __declspec(naked) constructcommandbuildingnetevent() {
+	__asm {
+		fld [ConstructBuildingRotation]
+		mov eax, [eax+0x3C]
+		lea ecx, [ebp-0x30]
+
+		push 0x538FFC
+		ret
+	}
+}
+void __declspec(naked) constructcommandplacementpreviewcheck() {
+	__asm {
+		sub esp, 0xC
+		fld [ConstructBuildingRotation]
+		mov ecx, esi
+
+		push 0x538A02
+		ret
+	}
+}
+void __fastcall constructcommandsetbuildingmodel_setrot(float***** p) { // TODO most of this are objects, further research needed
+	if (p[1]) {
+		p[1][5][2][1][4] = std::cos(ConstructBuildingRotation);
+		p[1][5][2][1][5] = std::sin(ConstructBuildingRotation);
+		p[1][5][2][1][8] = -std::sin(ConstructBuildingRotation);
+		p[1][5][2][1][9] = std::cos(ConstructBuildingRotation);
+	}
+}
+int __declspec(naked) constructcommandsetbuildingmodel() {
+	__asm{
+		push ecx
+		call constructcommandsetbuildingmodel_setrot
+		pop ecx
+		
+		mov eax, 0x5269FE
+		call eax
+
+		push 0x538C92
+		ret
+	}
+}
+void HookConstructCommandRotation()
+{
+	WriteJump((void*)0x538FF4, &constructcommandbuildingnetevent);
+	WriteJump((void*)0x5389FB, &constructcommandplacementpreviewcheck);
+	WriteJump((void*)0x538C8D, &constructcommandsetbuildingmodel);
 }

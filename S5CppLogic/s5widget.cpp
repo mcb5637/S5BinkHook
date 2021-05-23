@@ -276,3 +276,31 @@ shok_font* shok_fontManager::GetFontObj(int id)
 {
     return fontmng_getfont(this, id);
 }
+
+void (*UIInput_Char_Callback)(int c) = nullptr;
+int(__stdcall* const uiinput_char_orig)(void* ev, int id, int w, int h) = (int(__stdcall* const)(void*, int, int, int))0x54E649;
+int __stdcall uiinput_char(void* ev, int id, int w, int l) {
+    if (UIInput_Char_Callback)
+        UIInput_Char_Callback(w);
+    return uiinput_char_orig(ev, id, w, l);
+}
+void (*UIInput_Key_Callback)(int c, int ev) = nullptr;
+int(__stdcall* const uiinput_key_orig)(void* ev, int id, int w, int h) = (int(__stdcall* const)(void*, int, int, int))0x54E82F;
+int __stdcall uiinput_key(void* ev, int id, int w, int l) {
+    if (UIInput_Key_Callback)
+        UIInput_Key_Callback(w, id);
+    return uiinput_key_orig(ev, id, w, l);
+}
+void (*UIInput_Mouse_Callback)(int id, int w, int l) = nullptr;
+int(__stdcall* const uiinput_mouse_orig)(void* ev, int hwind, int id, int w, int h) = (int(__stdcall* const)(void*, int, int, int, int))0x54E6BD;
+int __stdcall uiinput_mouse(void* ev, int hwind, int id, int w, int l) {
+    if (id >= win_mouseEvents::MouseMove && id <= win_mouseEvents::XButtonDBl && UIInput_Mouse_Callback)
+        UIInput_Mouse_Callback(id, w, l);
+    return uiinput_mouse_orig(ev, hwind, id, w, l);
+}
+void HookUIInput()
+{
+    RedirectCall((void*)0x40754C, &uiinput_char);
+    RedirectCall((void*)0x40757D, &uiinput_key);
+    RedirectCall((void*)0x40747E, &uiinput_mouse);
+}

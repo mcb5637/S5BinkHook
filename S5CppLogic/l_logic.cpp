@@ -194,7 +194,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushnumber(L, e->UpgradeCategory);
 		lua_rawset(L, -3);
 		lua_pushstring(L, "Position");
-		luaext_pushPosRot(L, e->Position);
+		luaext_pushPosRot(L, e->Position, true);
 		lua_rawset(L, -3);
 		lua_pushstring(L, "Serfs");
 		lua_newtable(L);
@@ -514,7 +514,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushstring(L, "Position");
 		lua_rawget(L, -2);
 		if (lua_istable(L, -1))
-			luaext_checkPosRot(L, e->Position, -1);
+			luaext_checkPosRot(L, e->Position, -1, true);
 		else
 			allRead = false;
 		lua_pop(L, 1);
@@ -1005,6 +1005,14 @@ int l_logicOverrideStringTableText(lua_State* L) {
 int l_logic_SetPlaceBuildingCb(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		CanPlaceBuildingCallback = nullptr;
+		lua_pushlightuserdata(L, &l_logic_SetPlaceBuildingCb);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
 	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
 	lua_pushlightuserdata(L, &l_logic_SetPlaceBuildingCb);
 	lua_pushvalue(L, 1);
@@ -1022,7 +1030,7 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 			lua_pushnumber(L, entitytype);
 			lua_pushnumber(L, player);
 			luaext_pushPos(L, *pos);
-			lua_pushnumber(L, rotation);
+			lua_pushnumber(L, rad2deg(rotation));
 			lua_pushnumber(L, buildOnId);
 			lua_pcall(L, 5, 1, 0);
 			if (lua_isboolean(L, -1))
@@ -1036,6 +1044,140 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 	return 0;
 }
 
+int l_logic_SetPlaceBuildingRotation(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	HookConstructCommandRotation();
+	ConstructBuildingRotation = deg2rad(luaL_checkfloat(L, 1));
+	return 0;
+}
+int l_logic_GetPlaceBuildingRotation(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	lua_pushnumber(L, rad2deg(ConstructBuildingRotation));
+	return 1;
+}
+
+int l_logic_SetCharTrigger(lua_State* L) { // are they allowed in SCELoader mode?
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		UIInput_Char_Callback = nullptr;
+		lua_pushlightuserdata(L, &l_logic_SetCharTrigger);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_logic_SetCharTrigger);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+	if (!UIInput_Char_Callback) {
+		HookUIInput();
+		UIInput_Char_Callback = [](int c) {
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_logic_SetCharTrigger);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, c);
+			lua_pcall(L, 1, 0, 0);
+
+			lua_settop(L, t);
+		};
+	}
+	return 0;
+}
+int l_logic_SetKeyTrigger(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		UIInput_Key_Callback = nullptr;
+		lua_pushlightuserdata(L, &l_logic_SetKeyTrigger);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_logic_SetKeyTrigger);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+	if (!UIInput_Key_Callback) {
+		HookUIInput();
+		UIInput_Key_Callback = [](int c, int id) {
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_logic_SetKeyTrigger);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, c);
+			lua_pushboolean(L, id == 0x101 || id == 0x105); // is up (100,104 down)
+			lua_pcall(L, 2, 0, 0);
+
+			lua_settop(L, t);
+		};
+	}
+	return 0;
+}
+int l_logic_SetMouseTrigger(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		UIInput_Mouse_Callback = nullptr;
+		lua_pushlightuserdata(L, &l_logic_SetMouseTrigger);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_logic_SetMouseTrigger);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+	if (!UIInput_Mouse_Callback) {
+		HookUIInput();
+		UIInput_Mouse_Callback = [](int id, int w, int l) {
+			if (id == win_mouseEvents::MouseMove)
+				return;
+
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_logic_SetMouseTrigger);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+
+			if (id >= win_mouseEvents::LButtonDown && id <= win_mouseEvents::MButtonDBl) {
+				lua_pushnumber(L, id);
+				lua_pushnumber(L, l & 0xFFFF);
+				lua_pushnumber(L, (l >> 16) & 0xFFFF);
+				lua_pcall(L, 3, 0, 0);
+			}
+			else if (id == win_mouseEvents::MouseWheel) {
+				lua_pushnumber(L, id);
+				lua_pushboolean(L, w > 0);
+				lua_pushnumber(L, l & 0xFFFF);
+				lua_pushnumber(L, (l >> 16) & 0xFFFF);
+				lua_pcall(L, 4, 0, 0);
+			}
+			else if (id >= win_mouseEvents::XButtonDown && id <= win_mouseEvents::XButtonDBl) {
+				lua_pushnumber(L, id);
+				lua_pushboolean(L, ((w >> 16) & 0xFFFF) -1);
+				lua_pushnumber(L, l & 0xFFFF);
+				lua_pushnumber(L, (l >> 16) & 0xFFFF);
+				lua_pcall(L, 4, 0, 0);
+			}
+
+			lua_settop(L, t);
+		};
+	}
+	return 0;
+}
+
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
@@ -1043,6 +1185,10 @@ void l_logic_cleanup(lua_State* L) {
 	LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
 	CanPlaceBuildingCallback = nullptr;
+	ConstructBuildingRotation = 0.0f;
+	UIInput_Char_Callback = nullptr;
+	UIInput_Key_Callback = nullptr;
+	UIInput_Mouse_Callback = nullptr;
 }
 
 void l_logic_init(lua_State* L)
@@ -1083,6 +1229,11 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "SetLeadersRegenerateTroopHealth", &l_logicSetRegenerateSoldiers);
 	luaext_registerFunc(L, "SetStringTableText", &l_logicOverrideStringTableText);
 	luaext_registerFunc(L, "SetPlaceBuildingAdditionalCheck", &l_logic_SetPlaceBuildingCb);
+	luaext_registerFunc(L, "SetPlaceBuildingRotation", &l_logic_SetPlaceBuildingRotation);
+	luaext_registerFunc(L, "GetPlaceBuildingRotation", &l_logic_GetPlaceBuildingRotation);
+	luaext_registerFunc(L, "SetCharTrigger", &l_logic_SetCharTrigger);
+	luaext_registerFunc(L, "SetKeyTrigger", &l_logic_SetKeyTrigger);
+	luaext_registerFunc(L, "SetMouseTrigger", &l_logic_SetMouseTrigger);
 
 
 	lua_pushstring(L, "UICommands");
@@ -1103,3 +1254,7 @@ void l_logic_init(lua_State* L)
 // CppLogic.Logic.SetStringTableText("MainMenu/StartExtras", "test")
 // CppLogic.Logic.SetStringTableText("names/pu_hero1a", "test")
 // CppLogic.Logic.SetPlaceBuildingAdditionalCheck(function(...) LuaDebugger.Log(arg) return true end)
+// CppLogic.Logic.SetPlaceBuildingRotation(90)
+// CppLogic.Logic.SetCharTrigger(function(a) LuaDebugger.Log(string.char(a)) end)
+// CppLogic.Logic.SetKeyTrigger(function(a,up) LuaDebugger.Log(a) LuaDebugger.Log(up) end)
+// CppLogic.Logic.SetMouseTrigger(function(...) LuaDebugger.Log(arg) end)

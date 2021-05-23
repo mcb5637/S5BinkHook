@@ -72,6 +72,12 @@ function CppLogic.Logic.SetPlaceBuildingCB(func)
         return func(ety, -1, {X=x,Y=y}, r, isbuildon)
     end
 end
+function CppLogic.Logic.GetPlaceBuildingRotation()
+    return CPlaceBuilding.GetRotation()
+end
+function CppLogic.Logic.SetPlaceBuildingRotation(r)
+    return CPlaceBuilding.SetRotation(r)
+end
 )";
 
 int __cdecl test(lua_State* L) {

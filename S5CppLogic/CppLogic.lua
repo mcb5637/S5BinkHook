@@ -225,6 +225,7 @@ function CppLogic.Logic.SetPaydayCallback(func) end
 
 --- sets a function to be called for building placement checks.
 -- only gets called if all usual conditions for placement are satisfied.
+-- set to nil to remove.
 -- (with SCELoader player is always -1, and buildOnID is a bool instead of an id).
 -- @param func to be called (entitytype, playerId, pos, rotation, buildOnID)->canBuild
 function CppLogic.Logic.SetPlaceBuildingAdditionalCheck(func) end
@@ -239,6 +240,40 @@ function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
 -- @param key key to replace
 -- @param text replacement string or nil to restore default
 function CppLogic.Logic.SetStringTableText(key, text) end
+
+--- serf ui place building rotaton.
+-- @return rotation
+function CppLogic.Logic.GetPlaceBuildingRotation() end
+--- serf ui place building rotaton.
+-- @param r rotation
+function CppLogic.Logic.SetPlaceBuildingRotation(r) end
+
+--- char entered callback. use string.char to get the character.
+-- does not work with SCELoader.
+-- gets called when a key (or key kombination) is pressed that can be converted to a char.
+-- set to nil to remove.
+-- @param f func to be called (char)->nil
+function CppLogic.Logic.SetCharTrigger(f) end
+--- key pressed callback.
+-- does not work with SCELoader.
+-- use global Keys to check what was pessed.
+-- gets called at least twice, when the key gets pressed down, then when the key gets released (only time up is true).
+-- if the key keepd pressed, after a short delay the trigger is called in fast succession.
+-- set to nil to remove.
+-- @param f func to be called (key, up)->nil
+function CppLogic.Logic.SetKeyTrigger(f) end
+--- mouse event callback.
+-- does not work with SCELoader.
+-- use global MouseEvents to check what was pessed (from CommunityLib).
+-- MouseMove does not get forwarded to lua (cause it is spammed),
+-- Double clicks are not generated, you get 2 normal klicks instead.
+-- parameters for MouseWheel are (id, forward, x, y).
+-- parameters for XButtons are (id, isxb2, x, y).
+-- parameters for all others are (id, x, y).
+-- x and y cooridates are screen coordinates not processed by SHoK and are equals to what GUI.GetMousePosition returns you (not scaled to widget coordinates).
+-- set to nil to remove.
+-- @param f func to be called
+function CppLogic.Logic.SetMouseTrigger(f) end
 
 --- ui command callback.
 -- func parameters are (eventId, eventData)

@@ -127,10 +127,13 @@ void luaext_pushPos(lua_State* L, shok_position& p) {
 	lua_rawset(L, -3);
 }
 
-void luaext_pushPosRot(lua_State* L, shok_positionRot& p) {
+void luaext_pushPosRot(lua_State* L, shok_positionRot& p, bool rad) {
 	luaext_pushPos(L, p);
 	lua_pushstring(L, "r");
-	lua_pushnumber(L, p.r);
+	if (rad)
+		lua_pushnumber(L, rad2deg(p.r));
+	else
+		lua_pushnumber(L, p.r);
 	lua_rawset(L, -3);
 }
 
@@ -149,7 +152,7 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i) {
 	lua_pop(L, 2);
 }
 
-void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i) {
+void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i, bool rad) {
 	i = lua_abs_index(L, i);
 	lua_pushstring(L, "X");
 	lua_gettable(L, i);
@@ -160,6 +163,8 @@ void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i) {
 	lua_pushstring(L, "r");
 	lua_gettable(L, i);
 	float r = luaL_checkfloat(L, -1);
+	if (rad)
+		r = deg2rad(r);
 	int size = *shok_mapsize * 100;
 	luaext_assert(L, x >= 0 && y >= 0 && x < size && y < size, "position outside of map");
 	p.X = x;

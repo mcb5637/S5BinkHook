@@ -54,6 +54,13 @@ typedef uint8_t byte;
 // battle behavior get max range 0x50AB48 jmp, autocannon behavior get max range 0x50F50D jmp
 // GetStringTableText 0x556D2E jmp
 // display entity name overhead 0x53F911 jmp
+// check building placement 0x4B45B9 jmp
+// place building create net event 0x538FF4 jmp
+// place building preview pos check 0x5389FB jmp
+// place building set model 0x538C8D jmp
+// win main char event 0x40754C call redirect
+// win main key event 0x40757D call redirect
+// win main mouse event check 0x40747E call redirect
 
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
@@ -231,6 +238,25 @@ bool contains(T* data, T search, int num) {
 
 const char* (__cdecl* const shok_GetStringTableText)(const char* key) = (const char* (__cdecl* const)(const char*))0x556D2E;
 
+
+enum win_mouseEvents : int {
+	MouseMove = 0x200,
+	LButtonDown = 0x201,
+	LButtonUp = 0x202,
+	LButtonDBl = 0x203,
+	RButtonDown = 0x204,
+	RButtonUp = 0x205,
+	RButtonDBl = 0x206,
+	MButtonDown = 0x207,
+	MButtonUp = 0x208,
+	MButtonDBl = 0x209,
+	MouseWheel = 0x20A,
+	XButtonDown = 0x20B,
+	XButtonUp = 0x20C,
+	XButtonDBl = 0x20D,
+};
+
+
 #include "s5behaviorProps.h"
 #include "s5entitytype.h"
 #include "s5behaviors.h"
@@ -271,9 +297,9 @@ void HookGetStringTableText();
 
 template<class T>
 constexpr inline T rad2deg(T r) {
-	return (T) r * 180 / M_PI;
+	return static_cast<T>(static_cast<double>(r) * 180.0 / M_PI);
 }
 template<class T>
 constexpr inline T deg2rad(T d) {
-	return (T) d * M_PI / 180;
+	return static_cast<T>(d * M_PI / 180);
 }

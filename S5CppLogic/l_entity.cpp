@@ -96,13 +96,25 @@ int l_entityPredicateOr(lua_State* L) {
 }
 
 int l_entityPredicateNot(lua_State* L) {
-	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, -1);
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateNot));
 	new(ud) EntityIteratorPredicateNot(pred);
 	lua_newtable(L);
 	lua_pushvalue(L, 1);// keep predicate as metatable, so they dont get gced
-	lua_rawseti(L, 2, 1);
-	lua_setmetatable(L, 2);
+	lua_rawseti(L, -2, 1);
+	lua_setmetatable(L, -2);
+	return 1;
+}
+
+int l_entityPredicatePriority(lua_State* L) {
+	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
+	int p = luaL_checkint(L, 2);
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicatePriority));
+	new(ud) EntityIteratorPredicatePriority(p, pred);
+	lua_newtable(L);
+	lua_pushvalue(L, 1);// keep predicate as metatable, so they dont get gced
+	lua_rawseti(L, -2, 1);
+	lua_setmetatable(L, -2);
 	return 1;
 }
 
@@ -182,7 +194,7 @@ int l_entityIteratorToTable(lua_State* L) {
 	EntityIterator it = EntityIterator(pred);
 	shok_EGL_CGLEEntity* e = nullptr;
 	while (true) {
-		e = it.GetNext(nullptr);
+		e = it.GetNext(nullptr, nullptr);
 		if (e == nullptr)
 			break;
 		lua_pushnumber(L, e->EntityId);
@@ -201,7 +213,7 @@ int l_entityIteratorCount(lua_State* L) {
 	EntityIterator it = EntityIterator(pred);
 	shok_EGL_CGLEEntity* e = nullptr;
 	while (true) {
-		e = it.GetNext(nullptr);
+		e = it.GetNext(nullptr, nullptr);
 		if (e == nullptr)
 			break;
 		count++;
@@ -216,20 +228,9 @@ int l_entityIteratorGetNearest(lua_State* L) {
 	}
 	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
 	EntityIterator it = EntityIterator(pred);
-	shok_EGL_CGLEEntity* e = nullptr;
-	float currentR = -1;
 	float maxR = -1;
-	int maxID = -1;
-	while (true) {
-		e = it.GetNext(&currentR);
-		if (e == nullptr)
-			break;
-		if (maxR <= -1 || currentR < maxR) {
-			maxID = e->EntityId;
-			maxR = currentR;
-		}
-	}
-	lua_pushnumber(L, maxID);
+	shok_EGL_CGLEEntity* e = it.GetNearest(&maxR);
+	lua_pushnumber(L, e == nullptr ? 0 : e->EntityId);
 	lua_pushnumber(L, maxR);
 	return 2;
 }
@@ -237,16 +238,19 @@ int l_entityIteratorGetNearest(lua_State* L) {
 int l_entityIteratorNext(lua_State* L) { // (state, last value) -> next value
 	EntityIterator* it = (EntityIterator*)lua_touserdata(L, 1); // no error checking here, cause that would cost speed
 	float r = -1;
-	shok_EGL_CGLEEntity* e = it->GetNext(&r);
+	int p = -1;
+	shok_EGL_CGLEEntity* e = it->GetNext(&r, &p);
 	if (e == nullptr) {
+		lua_pushnil(L);
 		lua_pushnil(L);
 		lua_pushnil(L);
 	}
 	else {
 		lua_pushnumber(L, e->EntityId);
 		lua_pushnumber(L, r);
+		lua_pushnumber(L, p);
 	}
-	return 2;
+	return 3;
 }
 
 int l_entityIterator(lua_State* L) {
@@ -268,7 +272,7 @@ int l_entityIterator(lua_State* L) {
 int l_entityCheckPredicate(lua_State* L) {
 	shok_EGL_CGLEEntity* s = luaext_checkEntity(L, 1);
 	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 2);
-	lua_pushboolean(L, pred->MatchesEntity(s, nullptr));
+	lua_pushboolean(L, pred->MatchesEntity(s, nullptr, nullptr));
 	return 1;
 }
 
@@ -1406,6 +1410,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "And", &l_entityPredicateAnd);
 	luaext_registerFunc(L, "Or", &l_entityPredicateOr);
 	luaext_registerFunc(L, "Not", &l_entityPredicateNot);
+	luaext_registerFunc(L, "SetPriority", &l_entityPredicatePriority);
 	luaext_registerFunc(L, "OfType", &l_entityPredicateOfType);
 	luaext_registerFunc(L, "OfPlayer", &l_entityPredicateOfPlayer);
 	luaext_registerFunc(L, "InCircle", &l_entityPredicateInCircle);
@@ -1539,7 +1544,7 @@ void EntityIterator::Reset()
 	current = 0;
 }
 
-shok_EGL_CGLEEntity* EntityIterator::GetNext(float* rangeOut)
+shok_EGL_CGLEEntity* EntityIterator::GetNext(float* rangeOut, int* prio)
 {
 	shok_EGL_CGLEEntityManager* eman = *shok_EGL_CGLEEntityManagerObj;
 	while (true) {
@@ -1547,7 +1552,7 @@ shok_EGL_CGLEEntity* EntityIterator::GetNext(float* rangeOut)
 			return nullptr;
 		shok_EGL_CGLEEntity* e = eman->GetEntityByNum(current);
 		current++;
-		if (e != nullptr && Predicate->MatchesEntity(e, rangeOut))
+		if (e != nullptr && Predicate->MatchesEntity(e, rangeOut, prio))
 			return e;
 	}
 	return nullptr;
@@ -1556,14 +1561,18 @@ shok_EGL_CGLEEntity* EntityIterator::GetNearest(float* rangeOut)
 {
 	shok_EGL_CGLEEntity* curr, * ret = nullptr;
 	float currR = -1, maxR = -1;
+	int currPrio = -1, maxPrio = -1;
 	Reset();
-	curr = GetNext(&currR);
+	curr = GetNext(&currR, &currPrio);
 	while (curr != nullptr) {
-		if (maxR == -1 || currR < maxR) {
+		if (currPrio > maxPrio || maxR == -1 || (currR < maxR && currPrio==maxPrio)) {
 			ret = curr;
 			maxR = currR;
+			maxPrio = currPrio;
 		}
-		curr = GetNext(&currR);
+		currPrio = -1;
+		currR = -1;
+		curr = GetNext(&currR, &currPrio);
 	}
 	if (rangeOut != nullptr)
 		*rangeOut = maxR;
@@ -1573,14 +1582,18 @@ shok_EGL_CGLEEntity* EntityIterator::GetFurthest(float* rangeOut)
 {
 	shok_EGL_CGLEEntity* curr, * ret = nullptr;
 	float currR = -1, maxR = -1;
+	int currPrio = -1, maxPrio = -1;
 	Reset();
-	curr = GetNext(&currR);
+	curr = GetNext(&currR, &currPrio);
 	while (curr != nullptr) {
-		if (maxR == -1 || currR > maxR) {
+		if (currPrio > maxPrio || maxR == -1 || (currR > maxR && currPrio == maxPrio)) {
 			ret = curr;
 			maxR = currR;
+			maxPrio = currPrio;
 		}
-		curr = GetNext(&currR);
+		currPrio = -1;
+		currR = -1;
+		curr = GetNext(&currR, &currPrio);
 	}
 	if (rangeOut != nullptr)
 		*rangeOut = maxR;
@@ -1592,12 +1605,12 @@ EntityIteratorPredicateOfType::EntityIteratorPredicateOfType(int etype)
 	type = etype;
 }
 
-bool EntityIteratorPredicateOfType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateOfType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->EntityType == type;
 }
 
-bool EntityIteratorPredicateOfPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateOfPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->PlayerId == player;
 }
@@ -1607,10 +1620,10 @@ EntityIteratorPredicateOfPlayer::EntityIteratorPredicateOfPlayer(int player)
 	this->player = player;
 }
 
-bool EntityIteratorPredicateAnd::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateAnd::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	for (int i = 0; i < numPreds; i++) {
-		if (!predicates[i]->MatchesEntity(e, rangeOut))
+		if (!predicates[i]->MatchesEntity(e, rangeOut, prio))
 			return false;
 	}
 	return true;
@@ -1622,10 +1635,10 @@ EntityIteratorPredicateAnd::EntityIteratorPredicateAnd(EntityIteratorPredicate**
 	this->numPreds = numPreds;
 }
 
-bool EntityIteratorPredicateOr::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateOr::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	for (int i = 0; i < numPreds; i++) {
-		if (predicates[i]->MatchesEntity(e, rangeOut))
+		if (predicates[i]->MatchesEntity(e, rangeOut, prio))
 			return true;
 	}
 	return false;
@@ -1637,7 +1650,7 @@ EntityIteratorPredicateOr::EntityIteratorPredicateOr(EntityIteratorPredicate** t
 	this->numPreds = numPreds;
 }
 
-bool EntityIteratorPredicateInCircle::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateInCircle::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	float ran = p.GetDistanceSquaredTo(e->Position);
 	if (rangeOut != nullptr)
@@ -1656,22 +1669,22 @@ EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(shok_position& 
 	this->r = r * r;
 }
 
-bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->IsSettler();
 }
 
-bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->IsBuilding();
 }
 
-bool EntityIteratorPredicateIsRelevant::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateIsRelevant::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->PlayerId != 0 && (e->IsSettler() || e->IsBuilding());
 }
 
-bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	int pl = e->PlayerId;
 	for (int i = 0; i < numPlayers; i++) {
@@ -1699,7 +1712,7 @@ EntityIteratorPredicateAnyPlayer::EntityIteratorPredicateAnyPlayer(int* pl, int 
 	this->numPlayers = numPlayers;
 }
 
-bool EntityIteratorPredicateAnyEntityType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateAnyEntityType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	int pl = e->EntityType;
 	for (int i = 0; i < numTypes; i++) {
@@ -1715,12 +1728,12 @@ EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(int* 
 	numTypes = numTy;
 }
 
-bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->GetSoldierBehavior() == nullptr;
 }
 
-bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->IsEntityInCategory(category);
 }
@@ -1730,7 +1743,7 @@ EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory
 	category = cat;
 }
 
-bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return e->GetResourceProvided() == resource;
 }
@@ -1740,7 +1753,7 @@ EntityIteratorPredicateProvidesResource::EntityIteratorPredicateProvidesResource
 	resource = res;
 }
 
-bool EntityIteratorPredicateInRect::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateInRect::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return low.X <= e->Position.X && e->Position.X <= high.X && low.Y <= e->Position.Y && e->Position.Y <= high.Y;
 }
@@ -1753,9 +1766,9 @@ EntityIteratorPredicateInRect::EntityIteratorPredicateInRect(float x1, float y1,
 	high.Y = max(y1, y2);
 }
 
-bool EntityIteratorPredicateNot::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateNot::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	return !predicate->MatchesEntity(e, rangeOut);
+	return !predicate->MatchesEntity(e, rangeOut, prio);
 }
 
 EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* pred)
@@ -1763,7 +1776,7 @@ EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* 
 	predicate = pred;
 }
 
-bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
 	if (c != nullptr) {
@@ -1772,7 +1785,7 @@ bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, flo
 	return true;
 }
 
-bool EntityIteratorPredicateOfUpgradeCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateOfUpgradeCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	shok_GGlue_CGlueEntityProps* t = e->GetEntityType();
 	if (t->IsBuildingType()) {
@@ -1791,12 +1804,12 @@ EntityIteratorPredicateOfUpgradeCategory::EntityIteratorPredicateOfUpgradeCatego
 	category = cat;
 }
 
-bool EntityIteratorPredicateIsAlive::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateIsAlive::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return !shok_entityIsDead(e->EntityId); // performance improvement by not doing obj -> id ->obj ?
 }
 
-bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return IsNotFleeingFrom(e, Center, Range);
 }
@@ -1821,11 +1834,23 @@ EntityIteratorPredicateIsNotFleeingFrom::EntityIteratorPredicateIsNotFleeingFrom
 	Range = r;
 }
 
-bool EntityIteratorPredicateFunc::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut)
+bool EntityIteratorPredicateFunc::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
 	return func(e);
 }
 EntityIteratorPredicateFunc::EntityIteratorPredicateFunc(std::function<bool(shok_EGL_CGLEEntity* e)> f)
 {
 	func = f;
+}
+
+bool EntityIteratorPredicatePriority::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
+{
+	if (prio && Pred->MatchesEntity(e, rangeOut, nullptr))
+		*prio = Prio;
+	return true;
+}
+EntityIteratorPredicatePriority::EntityIteratorPredicatePriority(int prio, EntityIteratorPredicate* pred)
+{
+	Prio = prio;
+	Pred = pred;
 }

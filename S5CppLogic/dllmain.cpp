@@ -104,6 +104,7 @@ int cleanup(lua_State* L) {
     l_combat_cleanup(L);
     l_effect_cleanup(L);
     l_tech_cleanup(L);
+    l_ui_cleanup(L);
     return 0;
 }
 

@@ -5,7 +5,7 @@
 
 void l_ua_init(lua_State* L);
 
-enum UAStatus : int {
+enum class UAStatus : int {
 	Idle = 1,
 	Moving = 2,
 	Battle = 3,

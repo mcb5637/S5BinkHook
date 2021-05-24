@@ -248,33 +248,6 @@ function CppLogic.Logic.GetPlaceBuildingRotation() end
 -- @param r rotation
 function CppLogic.Logic.SetPlaceBuildingRotation(r) end
 
---- char entered callback. use string.char to get the character.
--- does not work with SCELoader.
--- gets called when a key (or key kombination) is pressed that can be converted to a char.
--- set to nil to remove.
--- @param f func to be called (char)->nil
-function CppLogic.Logic.SetCharTrigger(f) end
---- key pressed callback.
--- does not work with SCELoader.
--- use global Keys to check what was pessed.
--- gets called at least twice, when the key gets pressed down, then when the key gets released (only time up is true).
--- if the key keepd pressed, after a short delay the trigger is called in fast succession.
--- set to nil to remove.
--- @param f func to be called (key, up)->nil
-function CppLogic.Logic.SetKeyTrigger(f) end
---- mouse event callback.
--- does not work with SCELoader.
--- use global MouseEvents to check what was pessed (from CommunityLib).
--- MouseMove does not get forwarded to lua (cause it is spammed),
--- Double clicks are not generated, you get 2 normal klicks instead.
--- parameters for MouseWheel are (id, forward, x, y).
--- parameters for XButtons are (id, isxb2, x, y).
--- parameters for all others are (id, x, y).
--- x and y cooridates are screen coordinates not processed by SHoK and are equals to what GUI.GetMousePosition returns you (not scaled to widget coordinates).
--- set to nil to remove.
--- @param f func to be called
-function CppLogic.Logic.SetMouseTrigger(f) end
-
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func
@@ -349,7 +322,7 @@ function CppLogic.Combat.DisableCamoFix() end
 -- perfect to use with for loop.
 -- examples:
 -- - for id in CppLogic.Entity.EntityIterator(...) do Message(id) end  
--- - for id, rsqu in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.InCircle(...), ...) do Message(id.."   "..r) end  
+-- - for id, rsqu, prio in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.InCircle(...), ...) do Message(id.."   "..r) end  
 -- @param pred predicate userdata
 -- @return nextEntity func
 -- @return iteratorStatus
@@ -386,6 +359,17 @@ function CppLogic.Entity.Predicates.And(...) end
 -- @param ... predicates
 -- @return predicate userdata
 function CppLogic.Entity.Predicates.Or(...) end
+
+--- creates a predicate that performs an not of anoher predicate.
+-- @param p predicate
+-- @return predicate userdata
+function CppLogic.Entity.Predicates.Not(p) end
+
+--- creates a predicate that always matches, but sets the priority to prio if p matches it.
+-- @param p predicate
+-- @param prio priority
+-- @return predicate userdata
+function CppLogic.Entity.Predicates.SetPriority(p, prio) end
 
 --- creates a predicate that checks for one entitytype.
 -- @param etyp entitytype to check against
@@ -1597,6 +1581,33 @@ function CppLogic.UI.WidgetMaterialGetTextureCoordinates(wid, mat) end
 -- @param w (optional, default current)
 -- @param h (optional, default current)
 function CppLogic.UI.WidgetMaterialSetTextureCoordinates(wid, mat, x, y, w, h) end
+
+--- char entered callback. use string.char to get the character.
+-- does not work with SCELoader.
+-- gets called when a key (or key kombination) is pressed that can be converted to a char.
+-- set to nil to remove.
+-- @param f func to be called (char)->nil
+function CppLogic.UI.SetCharTrigger(f) end
+--- key pressed callback.
+-- does not work with SCELoader.
+-- use global Keys to check what was pessed.
+-- gets called at least twice, when the key gets pressed down, then when the key gets released (only time up is true).
+-- if the key keepd pressed, after a short delay the trigger is called in fast succession.
+-- set to nil to remove.
+-- @param f func to be called (key, up)->nil
+function CppLogic.UI.SetKeyTrigger(f) end
+--- mouse event callback.
+-- does not work with SCELoader.
+-- use global MouseEvents to check what was pessed (from CommunityLib).
+-- MouseMove does not get forwarded to lua (cause it is spammed),
+-- Double clicks are not generated, you get 2 normal klicks instead.
+-- parameters for MouseWheel are (id, x, y, forward).
+-- parameters for XButtons are (id, x, y, isxb2).
+-- parameters for all others are (id, x, y).
+-- x and y cooridates are screen coordinates not processed by SHoK and are equals to what GUI.GetMousePosition returns you (not scaled to widget coordinates).
+-- set to nil to remove.
+-- @param f func to be called
+function CppLogic.UI.SetMouseTrigger(f) end
 
 --- @class UACore
 local UACore = {}

@@ -20,7 +20,8 @@ shok_EGL_CGLEBehaviorProps* shok_GGlue_CGlueEntityProps::SearchBehaviorProp(int 
 
 shok_GGL_CLeaderBehaviorProps* shok_GGlue_CGlueEntityProps::GetLeaderBehaviorProps()
 {
-	return (shok_GGL_CLeaderBehaviorProps*)SearchBehaviorProp(shok_GGL_CLeaderBehaviorProps::vtp);
+	int data[2] = { shok_GGL_CLeaderBehaviorProps::vtp, shok_GGL_CBattleSerfBehaviorProps::vtp };
+	return (shok_GGL_CLeaderBehaviorProps*)SearchBehaviorProp(data, 2);
 }
 
 shok_GGL_CSoldierBehaviorProps* shok_GGlue_CGlueEntityProps::GetSoldierBehaviorProps()

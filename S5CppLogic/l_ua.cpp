@@ -220,28 +220,22 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestTargetInArea(int player, shok_posi
 	int bufflen = 8;
 	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
 	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetTypeLeader);
+	EntityIteratorPredicateOfEntityCategory catLeader = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetTypeLeader);
 	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
 	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-	EntityIteratorPredicate* preds[8] = {
-		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetType);
+	EntityIteratorPredicatePriority prio1 = EntityIteratorPredicatePriority(2, &catLeader);
+	EntityIteratorPredicatePriority prio2 = EntityIteratorPredicatePriority(1, &buil);
+	EntityIteratorPredicate* preds[10] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee, &prio1, &prio2
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 10 : 9);
 	EntityIterator iter = EntityIterator(&a);
 	shok_EGL_CGLEEntity* r = iter.GetNearest(nullptr);
-	if (r == nullptr) {
-		preds[2] = &buil;
-		r = iter.GetNearest(nullptr);
-	}
-	if (r == nullptr) {
-		cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetType);
-		preds[2] = &cat;
-		r = iter.GetNearest(nullptr);
-	}
 	return r;
 }
 shok_EGL_CGLEEntity* UnlimitedArmy::GetFurthestConversionTargetInArea(int player, shok_position& p, float ran, bool notFleeing)
@@ -255,7 +249,6 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetFurthestConversionTargetInArea(int player
 	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
 	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
 	EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](shok_EGL_CGLEEntity* e) {
@@ -267,15 +260,6 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetFurthestConversionTargetInArea(int player
 	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 9 : 8);
 	EntityIterator iter = EntityIterator(&a);
 	shok_EGL_CGLEEntity* r = iter.GetFurthest(nullptr);
-	if (r == nullptr) {
-		preds[2] = &buil;
-		r = iter.GetFurthest(nullptr);
-	}
-	if (r == nullptr) {
-		cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetType);
-		preds[2] = &cat;
-		r = iter.GetFurthest(nullptr);
-	}
 	return r;
 }
 shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSettlerInArea(int player, shok_position& p, float ran, bool notFleeing)
@@ -550,7 +534,7 @@ int UnlimitedArmy::CountTargetsInArea(int player, shok_position& p, float ran, b
 	int count = 0;
 	shok_EGL_CGLEEntity* e = nullptr;
 	while (true) {
-		e = iter.GetNext(nullptr);
+		e = iter.GetNext(nullptr, nullptr);
 		if (e == nullptr)
 			break;
 		count++;
@@ -743,7 +727,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		if (a != nullptr) {
 			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetKegPlacerBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
-				shok_EGL_CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, 6000);
+				shok_EGL_CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, Area);
 				if (tar == nullptr && SabotageBridges)
 					tar = GetNearestBridgeInArea(e->Position, 6000);
 				if (tar != nullptr) {
@@ -913,7 +897,7 @@ int l_uam_IsIdle(lua_State* L) {
 
 int l_uam_GetStatus(lua_State* L) {
 	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
-	lua_pushnumber(L, a->Status);
+	lua_pushnumber(L, (int) a->Status);
 	return 1;
 }
 
@@ -963,7 +947,7 @@ int l_uam_DumpTable(lua_State* L) {
 	lua_pushnumber(L, a->Player);
 	lua_rawset(L, -3);
 	lua_pushstring(L, "Status");
-	lua_pushnumber(L, a->Status);
+	lua_pushnumber(L, (int) a->Status);
 	lua_rawset(L, -3);
 	lua_pushstring(L, "Area");
 	lua_pushnumber(L, a->Area);

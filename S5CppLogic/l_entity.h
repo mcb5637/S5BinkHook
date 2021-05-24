@@ -10,7 +10,7 @@ void l_entity_cleanup(lua_State* L);
 
 class EntityIteratorPredicate {
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut) = 0;
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) = 0;
 };
 
 class EntityIterator {
@@ -20,7 +20,7 @@ public:
 	EntityIteratorPredicate* Predicate;
 	EntityIterator(EntityIteratorPredicate* Predicate);
 	void Reset();
-	shok_EGL_CGLEEntity* GetNext(float* rangeOut);
+	shok_EGL_CGLEEntity* GetNext(float* rangeOut, int* prio);
 	shok_EGL_CGLEEntity* GetNearest(float* rangeOut);
 	shok_EGL_CGLEEntity* GetFurthest(float* rangeOut);
 };
@@ -29,7 +29,7 @@ struct EntityIteratorPredicateOfType : EntityIteratorPredicate {
 private:
 	int type;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateOfType(int etype);
 };
 
@@ -37,7 +37,7 @@ struct EntityIteratorPredicateOfPlayer : EntityIteratorPredicate {
 private:
 	int player;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateOfPlayer(int player);
 };
 
@@ -46,7 +46,7 @@ private:
 	EntityIteratorPredicate** predicates;
 	int numPreds;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateAnd(EntityIteratorPredicate** preds, int numPreds);
 };
 
@@ -55,7 +55,7 @@ private:
 	EntityIteratorPredicate** predicates;
 	int numPreds;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateOr(EntityIteratorPredicate** preds, int numPreds);
 };
 
@@ -65,24 +65,24 @@ private:
 	shok_position p;
 	float r;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateInCircle(float x, float y, float r);
 	EntityIteratorPredicateInCircle(shok_position &p, float r);
 };
 
 struct EntityIteratorPredicateIsSettler : EntityIteratorPredicate {
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 };
 
 struct EntityIteratorPredicateIsBuilding : EntityIteratorPredicate {
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 };
 
 struct EntityIteratorPredicateIsRelevant : EntityIteratorPredicate {
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 };
 
 struct EntityIteratorPredicateAnyPlayer : EntityIteratorPredicate {
@@ -90,7 +90,7 @@ private:
 	int* players;
 	int numPlayers;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateAnyPlayer(int* pl, int numPlayers);
 	static void FillHostilePlayers(int source, int* players, int& maxP);
 };
@@ -100,20 +100,20 @@ private:
 	int* types;
 	int numTypes;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateAnyEntityType(int* ty, int numTy);
 };
 
 struct EntityIteratorPredicateIsNotSoldier : EntityIteratorPredicate {
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 };
 
 struct EntityIteratorPredicateOfEntityCategory : EntityIteratorPredicate {
 private:
 	int category;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateOfEntityCategory(int cat);
 };
 
@@ -121,7 +121,7 @@ struct EntityIteratorPredicateProvidesResource : EntityIteratorPredicate {
 private:
 	int resource;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateProvidesResource(int res);
 };
 
@@ -130,7 +130,7 @@ private:
 	shok_position low;
 	shok_position high;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateInRect(float x1, float y1, float x2, float y2);
 };
 
@@ -138,26 +138,26 @@ struct EntityIteratorPredicateNot : EntityIteratorPredicate {
 private:
 	EntityIteratorPredicate* predicate;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateNot(EntityIteratorPredicate* pred);
 };
 
 struct EntityIteratorPredicateIsVisible : EntityIteratorPredicate {
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 };
 
 struct EntityIteratorPredicateOfUpgradeCategory : EntityIteratorPredicate {
 private:
 	int category;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateOfUpgradeCategory(int cat);
 };
 
 struct EntityIteratorPredicateIsAlive : EntityIteratorPredicate {
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 };
 
 // not the fastest, cause i have to use sqrt twice, use it last
@@ -166,7 +166,7 @@ private:
 	shok_position Center;
 	float Range;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateIsNotFleeingFrom(shok_position& p, float r);
 	static bool IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok_position Center, float Range);
 };
@@ -175,6 +175,15 @@ struct EntityIteratorPredicateFunc : EntityIteratorPredicate {
 private:
 	std::function<bool(shok_EGL_CGLEEntity* e)> func;
 public:
-	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut);
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicateFunc(std::function<bool(shok_EGL_CGLEEntity* e)> f);
+};
+
+struct EntityIteratorPredicatePriority : EntityIteratorPredicate {
+private:
+	int Prio;
+	EntityIteratorPredicate* Pred;
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
+	EntityIteratorPredicatePriority(int prio, EntityIteratorPredicate* pred);
 };

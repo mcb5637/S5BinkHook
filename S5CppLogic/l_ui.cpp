@@ -427,6 +427,126 @@ int l_uiTest(lua_State* L) {
 	return 1;
 }
 
+int l_ui_SetCharTrigger(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		UIInput_Char_Callback = nullptr;
+		lua_pushlightuserdata(L, &l_ui_SetCharTrigger);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_ui_SetCharTrigger);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+	if (!UIInput_Char_Callback) {
+		HookUIInput();
+		UIInput_Char_Callback = [](int c) {
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_ui_SetCharTrigger);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, c);
+			lua_pcall(L, 1, 0, 0);
+
+			lua_settop(L, t);
+		};
+	}
+	return 0;
+}
+int l_ui_SetKeyTrigger(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		UIInput_Key_Callback = nullptr;
+		lua_pushlightuserdata(L, &l_ui_SetKeyTrigger);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_ui_SetKeyTrigger);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+	if (!UIInput_Key_Callback) {
+		HookUIInput();
+		UIInput_Key_Callback = [](int c, int id) {
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_ui_SetKeyTrigger);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, c);
+			lua_pushboolean(L, id == 0x101 || id == 0x105); // is up (100,104 down)
+			lua_pcall(L, 2, 0, 0);
+
+			lua_settop(L, t);
+		};
+	}
+	return 0;
+}
+int l_ui_SetMouseTrigger(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		UIInput_Mouse_Callback = nullptr;
+		lua_pushlightuserdata(L, &l_ui_SetMouseTrigger);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_ui_SetMouseTrigger);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+	if (!UIInput_Mouse_Callback) {
+		HookUIInput();
+		UIInput_Mouse_Callback = [](int id, int w, int l) {
+			if (id == win_mouseEvents::MouseMove)
+				return;
+
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_ui_SetMouseTrigger);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, id);
+			lua_pushnumber(L, l & 0xFFFF);
+			lua_pushnumber(L, (l >> 16) & 0xFFFF);
+
+			if (id >= win_mouseEvents::LButtonDown && id <= win_mouseEvents::MButtonDBl) {
+				lua_pcall(L, 3, 0, 0);
+			}
+			else if (id == win_mouseEvents::MouseWheel) {
+				lua_pushboolean(L, w > 0);
+				lua_pcall(L, 4, 0, 0);
+			}
+			else if (id >= win_mouseEvents::XButtonDown && id <= win_mouseEvents::XButtonDBl) {
+				lua_pushboolean(L, ((w >> 16) & 0xFFFF) - 1);
+				lua_pcall(L, 4, 0, 0);
+			}
+
+			lua_settop(L, t);
+		};
+	}
+	return 0;
+}
+
+void l_ui_cleanup(lua_State* L) {
+	UIInput_Char_Callback = nullptr;
+	UIInput_Key_Callback = nullptr;
+	UIInput_Mouse_Callback = nullptr;
+}
+
 void l_ui_init(lua_State* L)
 {
 	luaext_registerFunc(L, "WidgetGetPositionAndSize", &l_uiGetWidPosAndSize);
@@ -462,6 +582,9 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "ContainerWidgetCreateTextButtonWidgetChild", &l_uiCreateTextButtonWidget);
 	luaext_registerFunc(L, "ContainerWidgetCreateProgressBarWidgetChild", &l_uiCreateProgessBarWidget);
 	luaext_registerFunc(L, "ContainerWidgetCreateContainerWidgetChild", &l_uiCreateContainerWidget);
+	luaext_registerFunc(L, "SetCharTrigger", &l_ui_SetCharTrigger);
+	luaext_registerFunc(L, "SetKeyTrigger", &l_ui_SetKeyTrigger);
+	luaext_registerFunc(L, "SetMouseTrigger", &l_ui_SetMouseTrigger);
 }
 
 // CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")

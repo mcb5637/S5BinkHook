@@ -284,6 +284,13 @@ function CppLogic.API.DoesFileExist(file) end
 -- @return return values of the executed code
 function CppLogic.API.DoString(code, name) end
 
+--- checks if a file exists.
+-- @param mapname filename of the map
+-- @param typ type code
+-- @param campname campagn name
+-- @return path
+function CppLogic.API.MapGetDataPath(mapname, typ, campname) end
+
 --- deals damage to a target.
 -- calls respective hurt entity trigger.
 -- @param target entity to be damaged

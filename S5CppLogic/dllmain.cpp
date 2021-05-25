@@ -94,7 +94,9 @@ int __cdecl test(lua_State* L) {
 
     }*/
     //lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->GetEntityType()->GetAutoCannonProps()->MaxAttackRange);
-    lua_pushstring(L, shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(luaL_checkint(L, 1)));
+    shok_framework_mapinfo* i = (*shok_Framework_CMainObj)->GetCampagnInfo(3, nullptr)->GetMapInfoByName("test");
+    //DEBUGGER_BREAK
+    lua_pushnumber(L, (int)&i->MiniMapTextureName);
     return 1;
 }
 

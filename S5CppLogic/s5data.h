@@ -268,6 +268,7 @@ enum win_mouseEvents : int {
 #include "s5tech.h"
 #include "s5globalObjects.h"
 #include "s5widget.h"
+#include "s5framework.h"
 
 // xml loader vars:
 // v2 type?

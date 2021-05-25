@@ -59,6 +59,18 @@ int l_api_doString(lua_State* L) {
 	return shok_loadBuffer(L, s, strlen, na)-2;
 }
 
+int l_api_mapGetDataPath(lua_State* L) {
+	int ty = luaL_checkint(L, 2);
+	const char* cn = lua_tostring(L, 3); // optional
+	const char* n = luaL_checkstring(L, 1);
+	shok_framework_campagnInfo* ci = (*shok_Framework_CMainObj)->GetCampagnInfo(ty, cn);
+	luaext_assertPointer(L, ci, "invalid map type/campagn");
+	shok_framework_mapinfo* i = ci->GetMapInfoByName(n);
+	luaext_assertPointer(L, i, "invalid map");
+	lua_pushstring(L, i->MapFilePath.c_str());
+	return 1;
+}
+
 void l_api_init(lua_State* L)
 {
 	luaext_registerFunc(L, "Eval", &l_api_eval);
@@ -66,6 +78,7 @@ void l_api_init(lua_State* L)
 	luaext_registerFunc(L, "ReadFileAsString", &l_api_getfile);
 	luaext_registerFunc(L, "DoesFileExist", &l_api_hasfile);
 	luaext_registerFunc(L, "DoString", &l_api_doString);
+	luaext_registerFunc(L, "MapGetDataPath", &l_api_mapGetDataPath);
 }
 
 // CppLogic.API.Log("string")

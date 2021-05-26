@@ -71,6 +71,17 @@ int l_api_mapGetDataPath(lua_State* L) {
 	return 1;
 }
 
+int l_api_saveGetMap(lua_State* L) {
+	const char* save = luaL_checkstring(L, 1);
+	shok_framework_saveData* sdata = shok_getframework_saveDataObj();
+	luaext_assert(L, sdata->LoadSaveData(save), "save doesnt exist");
+	lua_pushstring(L, sdata->CurrentSave->MapData.MapName.c_str());
+	lua_pushnumber(L, sdata->CurrentSave->MapData.MapType);
+	lua_pushstring(L, sdata->CurrentSave->MapData.MapCampagnName.c_str());
+	lua_pushstring(L, sdata->CurrentSave->MapData.MapGUID.c_str());
+	return 4;
+}
+
 void l_api_init(lua_State* L)
 {
 	luaext_registerFunc(L, "Eval", &l_api_eval);
@@ -79,6 +90,7 @@ void l_api_init(lua_State* L)
 	luaext_registerFunc(L, "DoesFileExist", &l_api_hasfile);
 	luaext_registerFunc(L, "DoString", &l_api_doString);
 	luaext_registerFunc(L, "MapGetDataPath", &l_api_mapGetDataPath);
+	luaext_registerFunc(L, "SaveGetMapInfo", &l_api_saveGetMap);
 }
 
 // CppLogic.API.Log("string")

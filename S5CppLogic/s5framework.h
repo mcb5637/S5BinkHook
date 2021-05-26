@@ -27,12 +27,30 @@ struct shok_framework_campagnInfo {
 	shok_framework_mapinfo* GetMapInfoByName(const char* n);
 };
 
+struct shok_GS3DTools_CMapData : shok_object {
+	shok_string MapName;
+	int MapType;
+	shok_string MapCampagnName, MapGUID;
+
+	static inline constexpr int vtp = 0x761D34;
+};
+
+struct shok_framework_saveData {
+	struct {
+		shok_string SavePath;
+		shok_GS3DTools_CMapData MapData;
+	}* CurrentSave;
+	char* SaveDir;
+	char* DebugSaveDir;
+
+	bool LoadSaveData(const char* name);
+};
+static inline shok_framework_saveData* (* const shok_getframework_saveDataObj)() = (shok_framework_saveData * (* const)()) 0x403158;
+
 struct shok_Framework_CMain : shok_object {
 	int vtable_Framework_IGameCallBacks, vtable_ESnd_IAmbientSoundInfo;
-	PADDINGI(2); // 2, GS3DTools::CMapData::vtable 761D34
-	shok_string CurrentMapName;
-	int CurrentMapType; // 12
-	shok_string CurrentMapCampagnName, CurrentMapGUID;
+	PADDINGI(1); // 2
+	shok_GS3DTools_CMapData CurrentMap;
 	//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent
 	// GS3DTools::CMapData::vtable???
 
@@ -40,6 +58,7 @@ struct shok_Framework_CMain : shok_object {
 	static inline constexpr int vtp = 0x76293C;
 
 	shok_framework_campagnInfo* GetCampagnInfo(int i, const char* n);
+	shok_framework_campagnInfo* GetCampagnInfo(shok_GS3DTools_CMapData* d);
 };
 
 static inline shok_Framework_CMain** const shok_Framework_CMainObj = (shok_Framework_CMain**)0x84EF60;

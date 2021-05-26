@@ -62,6 +62,8 @@ typedef uint8_t byte;
 // win main key event 0x40757D call redirect
 // win main mouse event check 0x40747E call redirect
 
+// string @center render 0x00557E58 to 0x00557DAA needs filtering out all the @ for center calculation
+
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
 static inline void* (__cdecl* const shok_new)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C04FB;

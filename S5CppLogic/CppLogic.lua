@@ -284,12 +284,21 @@ function CppLogic.API.DoesFileExist(file) end
 -- @return return values of the executed code
 function CppLogic.API.DoString(code, name) end
 
---- checks if a file exists.
+--- gets the path to a map. internal data or s5x file.
 -- @param mapname filename of the map
 -- @param typ type code
 -- @param campname campagn name
 -- @return path
 function CppLogic.API.MapGetDataPath(mapname, typ, campname) end
+
+--- returns the map a save is accociated with.
+-- does not check, if the save is still valid, just if it exists.
+-- @param save
+-- @return mapname
+-- @return typ
+-- @return campname
+-- @return GUID
+function CppLogic.API.SaveGetMapInfo(save) end
 
 --- deals damage to a target.
 -- calls respective hurt entity trigger.

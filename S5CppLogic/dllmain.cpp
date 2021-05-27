@@ -81,10 +81,10 @@ end
 )";
 
 int __cdecl test(lua_State* L) {
-    shok_GS3DTools_CMapData s = shok_GS3DTools_CMapData();
+    /*shok_GS3DTools_CMapData s = shok_GS3DTools_CMapData();
     int st = (int)&s;
     int test = (int)&s.MapType;
-    lua_pushnumber(L, (test - st) / 4);
+    lua_pushnumber(L, (test - st) / 4);*/
     /*if (lua_gettop(L) == 0) {
         lua_pushnumber(L, (int)L);
         return 1;
@@ -97,7 +97,7 @@ int __cdecl test(lua_State* L) {
     //shok_framework_mapinfo* i = (*shok_Framework_CMainObj)->GetCampagnInfo(3, nullptr)->GetMapInfoByName("test");
     //DEBUGGER_BREAK
     //lua_pushnumber(L, (int)&i->MiniMapTextureName);
-    return 1;
+    return 0;
 }
 
 int cleanup(lua_State* L) {
@@ -171,6 +171,8 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_rawset(L, LUA_GLOBALSINDEX);
 
     luaopen_debug(L);
+
+    HookTextPrinting();
 
     if (HasSCELoader()) {
         lua_dobuffer(L, SCELoaderFuncOverrides, strlen(SCELoaderFuncOverrides), "CppLogic");

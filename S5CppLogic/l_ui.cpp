@@ -602,3 +602,4 @@ void l_ui_init(lua_State* L)
 // CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 100, 100); XGUIEng.ShowWidget("test", 1);
 // CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\medium11bold.met") --"data\\menu\\fonts\\mainmenularge.met"
 // CppLogic.UI.FontGetConfig("data\\menu\\fonts\\standard10.met")
+// XGUIEng.SetText("StartMenu00_EndGame", "@center @color:0,255,0 test")

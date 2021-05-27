@@ -40,6 +40,7 @@ typedef uint8_t byte;
 // 0x4D51A4 & 0x50163A activate camo call redirect
 // 0x49A6A7 settlerchangeplayer override func to fix it not returning new id
 // 0x4B8EAD constructionsite_getprogresspertick func override
+// string render 0x557E58 to 0x557DAA jmp, string render getlen 0x708F60 jmp
 // 
 // only without SCELoader
 // shok_entityHurtEntity 0x49F358 jmp patched
@@ -61,8 +62,6 @@ typedef uint8_t byte;
 // win main char event 0x40754C call redirect
 // win main key event 0x40757D call redirect
 // win main mouse event check 0x40747E call redirect
-
-// string @center render 0x00557E58 to 0x00557DAA needs filtering out all the @ for center calculation
 
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
@@ -297,6 +296,8 @@ bool HasSCELoader();
 
 extern const char* (*GetStringTableTextOverride)(const char* s);
 void HookGetStringTableText();
+
+void HookTextPrinting();
 
 template<class T>
 constexpr inline T rad2deg(T r) {

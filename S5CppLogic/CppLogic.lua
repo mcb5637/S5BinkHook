@@ -550,7 +550,7 @@ function CppLogic.Entity.ReplaceWithResourceEntity(id) end
 function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
 
 --- overrides an entities damage.
--- requires CppLogic.Combat.EnableAoEProjectileFix to work for cannons/autocannons.
+-- does not work for trapcannon.
 -- @param id entity
 -- @param dmg, (<0 disable)
 function CppLogic.Entity.SetDamage(id, dmg) end
@@ -580,6 +580,12 @@ function CppLogic.Entity.SetDisplayName(id, n) end
 -- @param from entity (can be id of last destroyed entity)
 -- @param to entity 
 function CppLogic.Entity.CloneOverrideData(from, to) end
+
+--- heals an entity. for leaders its own hp is healed, then troop hp if enabled.
+-- @param id entity
+-- @param heal
+-- @param healTroopHp (optional, default false)
+function CppLogic.Entity.PerformHeal(id, heal, healTroopHp) end
 
 --- gets the leader of a soldier.
 -- @param id id of the solder
@@ -815,6 +821,11 @@ function CppLogic.Entity.Settler.CommandTurnBattleSerfToSerf(id) end
 -- @param id entity
 -- @param p target pos
 function CppLogic.Entity.Settler.SetPosition(id, p) end
+
+--- enables ranged effect advanced healing. heal gets transfered from solder to leader, first healing the leader, and if something is left, the troop hp pool.
+-- does not work with SCELoader.
+-- @param enabl bool
+function CppLogic.Entity.Settler.EnableRangedEffectSoldierHeal(enabl) end
 
 --- a leaders experience.
 -- @param id leader

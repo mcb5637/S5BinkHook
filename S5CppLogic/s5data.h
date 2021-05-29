@@ -62,6 +62,7 @@ typedef uint8_t byte;
 // win main char event 0x40754C call redirect
 // win main key event 0x40757D call redirect
 // win main mouse event check 0x40747E call redirect
+// activate ranged effect ability heal 0x4E3C78 call redirect
 
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;

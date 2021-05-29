@@ -23,11 +23,11 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int EntityType;
 	int ModelOverride;
 	int PlayerId;
-	int attachmentvt;
-	shok_set<shok_attachment> ObserverEntities;
-	shok_set<shok_attachment> ObserverEffects;
-	shok_set<shok_attachment> ObservedEntities;
-	shok_set<shok_attachment> ObservedEffects;
+	int attachmentvt; // 7 // possible attach func 4A61B3(attachmentthis, type, id, ?, ?), possible detach 4A2E5D(attachmentthis?, type, id, ?)
+	shok_set<shok_attachment> ObserverEntities; // 8
+	shok_set<shok_attachment> ObserverEffects; // 11
+	shok_set<shok_attachment> ObservedEntities; // 14
+	shok_set<shok_attachment> ObservedEffects; // 17
 	byte SendEvent; // 20
 	PADDING(3);
 	int SetNewTaskListDepth;
@@ -117,6 +117,8 @@ public:
 
 	void SetHealth(int h);
 
+	void PerformHeal(int hp, bool healSoldiers);
+
 	void Destroy();
 
 	int GetFirstAttachedToMe(int attachmentId);
@@ -126,6 +128,15 @@ public:
 
 	entityAddonData* GetAdditionalData(bool create);
 	void CloneAdditionalDataFrom(entityAddonData* other);
+
+	static void HookDamageMod();
+	static void HookArmorMod();
+	static void HookExplorationMod();
+	static bool LeaderRegenRegenerateSoldiers;
+	static void HookLeaderRegen();
+	static void HookMaxRange();
+	static void HookDisplayName();
+	static void HookRangedEffectActivateHeal(bool hookActive);
 
 protected:
 	int EventGetIntById(int id);
@@ -400,11 +411,3 @@ void EnableMaxHealthTechBoni();
 extern std::map<int, entityAddonData> AddonDataMap;
 extern entityAddonData LastRemovedEntityAddonData;
 void HookDestroyEntity();
-
-void EnableEntityDamageMod();
-void EnableEntityArmorMod();
-void EnableEntityExplorationMod();
-extern bool LeaderRegenRegenerateSoldiers;
-void HookLeaderRegen();
-void HookEntityMaxRange();
-void HookEntityDisplayName();

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5data.h"
+#include <math.h>
 
 
 static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = (void(__thiscall*)(shok_EGL_CGLEEntityCreator*))0x4493A4;
@@ -1108,7 +1109,7 @@ void __declspec(naked) entitydamagemodeventbattleasm() {
 		ret
 	}
 }
-void __declspec(naked) entitydamagemodbattlemelleonhitasm() {
+void __declspec(naked) entitydamagemodbattlemeleeonhitasm() {
 	__asm {
 		pushad
 
@@ -1130,10 +1131,65 @@ shok_event_data_EGL_CEventGetValue_int_1211121895* __fastcall entitydamagemodeve
 		ev->result = e->GetEntityType()->GetAutoCannonProps()->DamageAmount;
 	return ev;
 }
-void EnableEntityDamageMod() {
+void __declspec(naked) entitydamagemodbattleprojectilearrowasm() {
+	__asm {
+		pushad
+
+		mov ecx, esi
+		call entitygetdamagemod
+
+		popad
+
+		push 0x50C23B
+		ret
+	}
+}
+void __declspec(naked) entitydamagemodbattleprojectile() {
+	__asm {
+		test al, al;
+		jz arrow;
+
+		mov ecx, [ebp - 0x10]; // attacker obj
+		mov eax, [ecx + 6 * 4]; // player
+		mov[ebp - 0x28], eax; // source player
+
+		call shok_EGL_CGLEEntity::EventGetDamage;
+		push 0x50C3F7;
+		ret;
+
+	arrow:
+		push esi;
+		mov ecx, edi;
+		mov eax, 0x50C1CD;
+		call eax;
+		push 0x50C3F7;
+		ret;
+	}
+}
+void __declspec(naked) entitydamagemodautocannonprojectileasm() {
+	__asm {
+		push ecx;
+
+		mov ecx, edi;
+		mov eax, [ecx + 6 * 4]; // player
+		mov[ebp - 0x38], eax; // source player
+		call shok_EGL_CGLEEntity::EventGetDamage;
+		mov[ebp - 0x44], eax; // damage
+
+		pop ecx;
+
+		push 0x510776;
+		ret;
+	}
+}
+void shok_EGL_CGLEEntity::HookDamageMod()
+{
 	WriteJump((void*)0x50C785, &entitydamagemodeventbattleasm);
-	WriteJump((void*)0x50C235, &entitydamagemodbattlemelleonhitasm);
+	WriteJump((void*)0x50C235, &entitydamagemodbattlemeleeonhitasm);
 	WriteJump((void*)0x50F5ED, &entitydamagemodeventautocannonasm);
+	WriteJump((void*)0x50C3E7, &entitydamagemodbattleprojectile);
+	WriteJump((void*)0x50C235, &entitydamagemodbattleprojectilearrowasm);
+	WriteJump((void*)0x51076C, &entitydamagemodautocannonprojectileasm);
 }
 
 int __fastcall entityarmormod(shok_EGL_CGLEEntity* e) {
@@ -1175,7 +1231,7 @@ void __declspec(naked) entityarmormodbuildingrasm() {
 		ret
 	}
 }
-void EnableEntityArmorMod()
+void shok_EGL_CGLEEntity::HookArmorMod()
 {
 	WriteJump((void*)0x4A6B15, &entityarmormodsettlerasm);
 	WriteJump((void*)0x4AB160, &entityarmormodbuildingrasm);
@@ -1214,7 +1270,7 @@ void __declspec(naked) entityexplmodbuildasm() {
 		ret
 	}
 }
-void EnableEntityExplorationMod()
+void shok_EGL_CGLEEntity::HookExplorationMod()
 {
 	WriteJump((void*)0x4A4AC3, &entityexplmodsettasm);
 	WriteJump((void*)0x4AB199, &entityexplmodbuildasm);
@@ -1237,7 +1293,34 @@ int shok_GGL_CSettler::LeaderGetRegenHealthSeconds()
 		return GetEntityType()->GetLeaderBehaviorProps()->HealingSeconds;
 }
 
-bool LeaderRegenRegenerateSoldiers = false;
+void shok_EGL_CGLEEntity::PerformHeal(int r, bool healSoldiers)
+{
+	int hp = Health, mhp = GetMaxHealth();
+	if (hp <= 0)
+		return;
+	if (hp < mhp) {
+		int healsel = min(r, mhp - hp);
+		hp += healsel;
+		r -= healsel;
+		SetHealth(hp);
+	}
+	if (r <= 0)
+		return;
+	shok_GGL_CLeaderBehavior* lb = GetLeaderBehavior();
+	if (lb && healSoldiers) {
+		int shp = lb->GetTroopHealth(), smp = lb->GetTroopHealthPerSoldier();
+		int numsol = 0;
+		ObservedEntities.ForAll([&numsol](shok_attachment* a) { if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER) numsol++; });
+		smp *= numsol;
+		shp += r;
+		if (shp > smp)
+			shp = smp;
+		lb->TroopHealthCurrent = shp;
+		return;
+	}
+}
+
+bool shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 void __fastcall leaderregen(shok_GGL_CLeaderBehavior* th) {
 	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
 	th->SecondsSinceHPRefresh = 0;
@@ -1245,24 +1328,7 @@ void __fastcall leaderregen(shok_GGL_CLeaderBehavior* th) {
 	if (hp <= 0)
 		return;
 	int r = ((shok_GGL_CSettler*)e)->LeaderGetRegenHealth();
-	if (hp < mhp) {
-		hp += r;
-		if (hp > mhp)
-			hp = mhp;
-		e->SetHealth(hp);
-		return;
-	}
-	if (LeaderRegenRegenerateSoldiers) {
-		int shp = th->GetTroopHealth(), smp = th->GetTroopHealthPerSoldier();
-		int numsol = 0;
-		e->ObservedEntities.ForAll([&numsol](shok_attachment* a) { if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER) numsol++; });
-		smp *= numsol;
-		shp += r;
-		if (shp > smp)
-			shp = smp;
-		th->TroopHealthCurrent = shp;
-		return;
-	}
+	e->PerformHeal(r, shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers);
 }
 void __fastcall leaderregenseconds(shok_GGL_CLeaderBehavior* th) {
 	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
@@ -1279,7 +1345,7 @@ void __declspec(naked) leaderregensecondsasm() {
 		ret
 	}
 }
-void HookLeaderRegen()
+void shok_EGL_CGLEEntity::HookLeaderRegen()
 {
 	WriteJump((void*)0x4EAE92, &leaderregen);
 	WriteJump((void*)0x4EFC29, &leaderregensecondsasm);
@@ -1327,7 +1393,7 @@ void __declspec(naked) autocannonmaxrangeasm() {
 		ret
 	}
 }
-void HookEntityMaxRange()
+void shok_EGL_CGLEEntity::HookMaxRange()
 {
 	WriteJump((void*)0x50AB48, &leadermaxrangeasm);
 	WriteJump((void*)0x50F50D, &autocannonmaxrangeasm);
@@ -1370,7 +1436,44 @@ void __declspec(naked) entitydisplaynameasm() {
 		ret
 	}
 }
-void HookEntityDisplayName()
+void shok_EGL_CGLEEntity::HookDisplayName()
 {
 	WriteJump((void*)0x53F911, &entitydisplaynameasm);
+}
+
+void __fastcall rangedeffecthealhook(shok_GGL_CRangedEffectAbility* th) {
+	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	shok_GGL_CRangedEffectAbilityProps* pr = e->GetEntityType()->GetRangedEffectBehaviorProps();
+	float hpfact = pr->HealthRecoveryFactor;
+	if (hpfact <= 0)
+		return;
+	shok_EGL_CGLEEffectCreator ecr = shok_EGL_CGLEEffectCreator();
+	ecr.PlayerID = e->PlayerId;
+	ecr.EffectType = pr->HealEffect;
+	e->ObservedEntities.ForAll([hpfact, &ecr](shok_attachment* a) {
+		if (a->AttachmentType == shok_AttachmentType::HERO_AFFECTED) {
+			shok_EGL_CGLEEntity* toheal = shok_eid2obj(a->EntityId);
+			if (!toheal)
+				return;
+			float heal = toheal->GetMaxHealth() * hpfact;
+			if (ecr.EffectType) {
+				ecr.StartPos.X = toheal->Position.X;
+				ecr.StartPos.Y = toheal->Position.Y;
+				(*shok_EGL_CGLEGameLogicObject)->CreateEffect(&ecr);
+			}
+			if (toheal->GetSoldierBehavior()) {
+				toheal = shok_eid2obj(((shok_GGL_CSettler*)toheal)->LeaderId);
+			}
+			if (!toheal)
+				return;
+			toheal->PerformHeal(static_cast<int>(heal), true);
+		}
+	});
+}
+void shok_EGL_CGLEEntity::HookRangedEffectActivateHeal(bool hookActive)
+{
+	if (hookActive)
+		RedirectCall((void*)0x4E3C78, &rangedeffecthealhook);
+	else
+		RedirectCall((void*)0x4E3C78, (void*)0x4E39B4);
 }

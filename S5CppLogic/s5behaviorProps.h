@@ -54,7 +54,7 @@ private:
 	byte u[2];
 public:
 	float Range;
-	int DurationSeconds;
+	int DurationSeconds; // 9
 	float DamageFactor, ArmorFactor, HealthRecoveryFactor;
 	int Effect, HealEffect;
 
@@ -163,7 +163,7 @@ public:
 
 struct shok_GGL_CBattleBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	int BattleTaskList, NormalAttackAnim1, NormalAttackAnim2, CounterAttackAnim, FinishingMoveAnim, MissAttackAnim, BattleIdleAnim, BattleWalkAnim;
-	int HitAnim, DamageClass, DamageAmount, MaxDamageRandomBonus;
+	int HitAnim, DamageClass, DamageAmount, MaxDamageRandomBonus; // 12
 	float DamageRange;
 	int ProjectileEffectID;
 	float ProjectileOffsetFront, ProjectileOffsetRight, ProjectileOffsetHeight;
@@ -273,18 +273,15 @@ struct shok_GGL_CThiefBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 struct shok_GGL_CAutoCannonBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	int NumberOfShots;
 	float RotationSpeed;
-	int CannonBallEffectType;
-private:
-	int u[3];
-public:
+	int CannonBallEffectType; // 6
+	float ProjectileOffsetFront, ProjectileOffsetRight;
+	int ImpactEffectType; // 9
 	int ReloadTime;
-	float MaxAttackRange;
-private:
-	int u2;
-public:
+	float MaxAttackRange, MinRange;
 	int DamageClass, DamageAmount;
 	float DamageRange;
-	int BattleTaskList;
+	int BattleTaskList, SelfDestructTaskList; // 16
+
 
 	static inline constexpr int vtp = 0x778CD4;
 };

@@ -950,8 +950,8 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 int l_logicSetRegenerateSoldiers(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
-	HookLeaderRegen();
-	LeaderRegenRegenerateSoldiers = lua_toboolean(L, 1);
+	shok_EGL_CGLEEntity::HookLeaderRegen();
+	shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = lua_toboolean(L, 1);
 	return 0;
 }
 
@@ -1062,7 +1062,7 @@ int l_logic_GetPlaceBuildingRotation(lua_State* L) {
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = nullptr;
-	LeaderRegenRegenerateSoldiers = false;
+	shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
 	CanPlaceBuildingCallback = nullptr;
 	ConstructBuildingRotation = 0.0f;

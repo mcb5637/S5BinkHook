@@ -51,8 +51,11 @@ void l_combatHookCreateEffect(int effectId, void* retAdr) { // todo hook correct
 
 // tested aoe damage: cannon/autocannon projectile, circularattack, trapcannon 
 int l_combat_EnableAoEProjectileFix(lua_State* L) {
-	(*shok_EGL_CGLEGameLogicObject)->HookCreateEffect();
-	CreateEffectHookCallback = &l_combatHookCreateEffect;
+	/*(*shok_EGL_CGLEGameLogicObject)->HookCreateEffect();
+	CreateEffectHookCallback = &l_combatHookCreateEffect;*/
+	shok_GGL_CCannonBallEffect::HookFromCreator();
+	shok_GGL_CCannonBallEffect::FixDamageClass = true;
+	shok_EGL_CGLEEntity::HookDamageMod();
 	return 0;
 }
 

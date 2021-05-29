@@ -52,7 +52,7 @@ struct shok_GGL_CArrowEffect : shok_EGL_CFlyingEffect {
 	int AttackerID; // 47
 	int TargetID;
 	int DamageAmount;
-	byte Misses;
+	byte Misses; // 50
 	PADDING(3);
 
 	static inline constexpr int vtp = 0x778E24;
@@ -65,10 +65,13 @@ struct shok_GGL_CCannonBallEffect : shok_EGL_CFlyingEffect {
 	float AoERange;
 	int DamageClass; // 52
 
+	static bool FixDamageClass;
+	static void HookFromCreator();
+
 	static inline constexpr int vtp = 0x777690;
 };
 
-struct shok_EGL_CGLEEffectCreator { // 16 source player, 13 dmg
+struct shok_EGL_CGLEEffectCreator {
 protected:
 	int vtable;
 public:
@@ -79,12 +82,15 @@ public:
 	int PlayerID = 0;
 	shok_position StartPos = { 0,0 }, CurrentPos = { 0,0 }, TargetPos = { 0,0 };
 private:
-	int Zero2 = 0;
+	int Zero2 = 0; // height offset unused
 public:
-	int AttackerID = 0, TargetID = 0, Damage = 0;
+	int AttackerID = 0, TargetID = 0, Damage = 0; // la 13
 	float DamageRadius = 0;
+	int DamageClass = 0; // unused
+	int SourcePlayer = 0; // 16
+	bool Misses = false; // 17
 private:
-	int Zero3 = 0, Zero4 = 0, Zero5 = 0;
+	bool Zero5[3] = { false, false, false };
 
 public:
 	shok_EGL_CGLEEffectCreator();

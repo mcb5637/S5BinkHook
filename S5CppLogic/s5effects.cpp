@@ -32,6 +32,32 @@ bool shok_EGL_CEffect::IsArrowEffect()
 	return vtable == shok_GGL_CArrowEffect::vtp;
 }
 
+bool shok_GGL_CCannonBallEffect::FixDamageClass = false;
+void __fastcall hookcannonfromcreator(shok_GGL_CCannonBallEffect* th, shok_CProjectileEffectCreator* cr) {
+	if (shok_GGL_CCannonBallEffect::FixDamageClass) {
+		th->DamageClass = cr->DamageClass;
+		shok_logString("%i\n", th->SourcePlayer);
+	}
+}
+void __declspec(naked) hookcannonfromcreatorasm() {
+	__asm {
+		mov[esi + 0x0C8], eax;
+		mov eax, [edi + 0x38];
+		mov[esi + 0x0CC], eax;
+
+		mov ecx, esi;
+		mov edx, edi;
+		call hookcannonfromcreator;
+
+		push 0x4FF951;
+		ret;
+	}
+}
+void shok_GGL_CCannonBallEffect::HookFromCreator()
+{
+	WriteJump((void*)0x4FF942, &hookcannonfromcreatorasm);
+}
+
 void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post) = nullptr;
 void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff) = nullptr;
 int(__thiscall* CannonBallOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;

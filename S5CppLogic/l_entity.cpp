@@ -1291,7 +1291,7 @@ int l_entity_SetDamage(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
-	EnableEntityDamageMod();
+	shok_EGL_CGLEEntity::HookDamageMod();
 	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->DamageOverride = luaL_checkint(L, 2);
@@ -1301,7 +1301,7 @@ int l_entity_SetArmor(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
-	EnableEntityArmorMod();
+	shok_EGL_CGLEEntity::HookArmorMod();
 	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->ArmorOverride = luaL_checkint(L, 2);
@@ -1311,7 +1311,7 @@ int l_entity_SetExploration(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
-	EnableEntityExplorationMod();
+	shok_EGL_CGLEEntity::HookExplorationMod();
 	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->ExplorationOverride = luaL_checkfloat(L, 2);
@@ -1322,7 +1322,7 @@ int l_leader_SetRegen(lua_State* L) {
 		luaL_error(L, "use CEntity instead");
 	shok_GGL_CSettler* b = luaext_checkSettler(L, 1);
 	luaext_assertPointer(L, b->GetLeaderBehavior(), "no leader");
-	HookLeaderRegen();
+	shok_EGL_CGLEEntity::HookLeaderRegen();
 	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	if (lua_isnumber(L, 2))
@@ -1335,7 +1335,7 @@ int l_entity_SetAutoAttackMaxRange(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
-	HookEntityMaxRange();
+	shok_EGL_CGLEEntity::HookMaxRange();
 	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->MaxRangeOverride = luaL_checkfloat(L, 2);
@@ -1345,7 +1345,7 @@ int l_entity_SetDisplayName(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
-	HookEntityDisplayName();
+	shok_EGL_CGLEEntity::HookDisplayName();
 	HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->NameOverride = luaL_checkstring(L, 2);
@@ -1362,11 +1362,27 @@ int l_leader_GetRegen(lua_State* L) {
 	return 2;
 }
 
+int l_settler_EnableRangedEffectSoldierHeal(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "use CEntity instead");
+	shok_EGL_CGLEEntity::HookRangedEffectActivateHeal(lua_toboolean(L, 1));
+	return 0;
+}
+
+int l_entity_PerformHeal(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	int h = luaL_checkint(L, 2);
+	luaext_assert(L, h > 0, "heal is <=0");
+	e->PerformHeal(h, lua_toboolean(L, 3));
+	return 0;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	BuildingMaxHpBoni.clear();
 	AddonDataMap.clear();
 	LastRemovedEntityAddonData.EntityId = 0;
+	shok_EGL_CGLEEntity::HookRangedEffectActivateHeal(false);
 }
 
 void l_entity_init(lua_State* L)
@@ -1404,6 +1420,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetExploration", &l_entity_SetExploration);
 	luaext_registerFunc(L, "SetAutoAttackMaxRange", &l_entity_SetAutoAttackMaxRange);
 	luaext_registerFunc(L, "SetDisplayName", &l_entity_SetDisplayName);
+	luaext_registerFunc(L, "PerformHeal", &l_entity_PerformHeal);
 
 	lua_pushstring(L, "Predicates");
 	lua_newtable(L);
@@ -1475,6 +1492,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandTurnBattleSerfToSerf", &l_settlerBattleSerfToSerf);
 	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
 	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
+	luaext_registerFunc(L, "EnableRangedEffectSoldierHeal", &l_settler_EnableRangedEffectSoldierHeal);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

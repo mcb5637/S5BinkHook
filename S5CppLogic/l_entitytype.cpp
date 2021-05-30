@@ -673,7 +673,7 @@ int l_buildingTyAddHPTechMod(lua_State* L) {
 	int tech = luaL_checkint(L, 2);
 	shok_technology* techo = (*shok_GGL_CGLGameLogicObj)->GetTech(tech);
 	luaext_assertPointer(L, techo, "no tech at 2");
-	BuildingMaxHpBoni.emplace(luaL_checkint(L, 1), tech);
+	shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.emplace(luaL_checkint(L, 1), tech);
 	return 0;
 }
 

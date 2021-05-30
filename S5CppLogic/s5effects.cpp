@@ -36,7 +36,6 @@ bool shok_GGL_CCannonBallEffect::FixDamageClass = false;
 void __fastcall hookcannonfromcreator(shok_GGL_CCannonBallEffect* th, shok_CProjectileEffectCreator* cr) {
 	if (shok_GGL_CCannonBallEffect::FixDamageClass) {
 		th->DamageClass = cr->DamageClass;
-		shok_logString("%i\n", th->SourcePlayer);
 	}
 }
 void __declspec(naked) hookcannonfromcreatorasm() {

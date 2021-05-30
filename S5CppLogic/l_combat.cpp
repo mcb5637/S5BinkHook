@@ -66,11 +66,11 @@ int l_combat_DisableAoEProjectileFix(lua_State* L) {
 
 void l_combat_FlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff, bool post) {
 	if (post)
-		ResetCamoIgnoreIfNotEntity = 0;
+		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 	else if (eff->IsArrowEffect())
-		ResetCamoIgnoreIfNotEntity = ((shok_GGL_CArrowEffect*)eff)->AttackerID;
+		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CArrowEffect*)eff)->AttackerID;
 	else if (eff->IsCannonBallEffect())
-		ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
+		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
 }
 void l_combat_ActivateCamo(shok_GGL_CCamouflageBehavior* th) {
 	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
@@ -81,16 +81,16 @@ void l_combat_ActivateCamo(shok_GGL_CCamouflageBehavior* th) {
 int l_combat_EnableCamoFix(lua_State* L) {
 	shok_EGL_CFlyingEffect::HookOnHit();
 	FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
-	HookResetCamo();
-	HookCamoActivate();
-	CamoActivateCb = &l_combat_ActivateCamo;
+	shok_EGL_CGLEEntity::HookResetCamo();
+	shok_EGL_CGLEEntity::HookCamoActivate();
+	shok_EGL_CGLEEntity::CamoActivateCb = &l_combat_ActivateCamo;
 	return 0;
 }
 
 int l_combat_DisableCamoFix(lua_State* L) {
 	FlyingEffectOnHitCallback2 = nullptr;
-	CamoActivateCb = nullptr;
-	ResetCamoIgnoreIfNotEntity = 0;
+	shok_EGL_CGLEEntity::CamoActivateCb = nullptr;
+	shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 	return 0;
 }
 

@@ -849,44 +849,45 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 	e->Destroy();
 	return nid;
 }
-void ActivateEntityChangePlayerFix()
+void shok_EGL_CGLEEntity::ActivateEntityChangePlayerFix()
 {
 	WriteJump(shok_entityChangePlayer, &fixedChangePlayer);
 }
 
-void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter) = nullptr;
+void (*shok_EGL_CGLEEntity::Hero6ConvertHookCb)(int id, int pl, int nid, int converter) = nullptr;
 int _cdecl hero6convertchangeplayer(int id, int pl) {
 	shok_EGL_CGLEEntity* c = (shok_EGL_CGLEEntity*)1;
 	_asm { mov c, esi }
 	int r = shok_entityChangePlayer(id, pl);
-	if (Hero6ConvertHookCb)
-		Hero6ConvertHookCb(id, pl, r, c->EntityId);
+	if (shok_EGL_CGLEEntity::Hero6ConvertHookCb)
+		shok_EGL_CGLEEntity::Hero6ConvertHookCb(id, pl, r, c->EntityId);
 	return r;
 }
-void HookHero6Convert()
+void shok_EGL_CGLEEntity::HookHero6Convert()
 {
-	ActivateEntityChangePlayerFix();
+	shok_EGL_CGLEEntity::ActivateEntityChangePlayerFix();
 	RedirectCall((void*)0x4FCD26, &hero6convertchangeplayer);
 }
 
-int ResetCamoIgnoreIfNotEntity = 0;
+int shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 void __fastcall camo_behaviorReset(shok_GGL_CCamouflageBehavior* th, int _, int a) {
-	if (ResetCamoIgnoreIfNotEntity == 0 || th->EntityId == ResetCamoIgnoreIfNotEntity)
+	if (shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity == 0 || th->EntityId == shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity)
 		th->InvisibilityRemaining = 0;
 }
-void HookResetCamo() {
+void shok_EGL_CGLEEntity::HookResetCamo()
+{
 	WriteJump((void*)0x5011DF, &camo_behaviorReset);
 }
 
 static inline int(__thiscall* const activateCamoOrig)(shok_GGL_CCamouflageBehavior* th) = (int(__thiscall*)(shok_GGL_CCamouflageBehavior*)) 0x501561;
-void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
+void (*shok_EGL_CGLEEntity::CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
 int __fastcall camoActivateHook(shok_GGL_CCamouflageBehavior* th) {
 	int i = activateCamoOrig(th);
-	if (CamoActivateCb)
-		CamoActivateCb(th);
+	if (shok_EGL_CGLEEntity::CamoActivateCb)
+		shok_EGL_CGLEEntity::CamoActivateCb(th);
 	return i;
 }
-void HookCamoActivate()
+void shok_EGL_CGLEEntity::HookCamoActivate()
 {
 	RedirectCall((void*)0x4D51A4, &camoActivateHook);
 	RedirectCall((void*)0x50163A, &camoActivateHook);
@@ -894,7 +895,7 @@ void HookCamoActivate()
 
 
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = (void(__thiscall*)(int*, int, int, int))0x49847F;
-int* HurtEntityDamagePointer = nullptr;
+int* shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
 void __stdcall hurtentityhookc(int* damage, shok_EGL_CGLEEntity** target, shok_EGL_CGLEEntity** attacker) { // argument order is reversed, for asm reasons
 	if (!*target)
 		return;
@@ -904,9 +905,9 @@ void __stdcall hurtentityhookc(int* damage, shok_EGL_CGLEEntity** target, shok_E
 	int tid = (*target)->EntityId;
 	int ev[6];
 	event2entitiesctor(ev, 0x1C007, aid, tid);
-	HurtEntityDamagePointer = damage;
+	shok_EGL_CGLEEntity::HurtEntityDamagePointer = damage;
 	(*shok_EScr_CScriptTriggerSystemObj)->RunTrigger((shok_BB_CEvent*)ev);
-	HurtEntityDamagePointer = nullptr;
+	shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
 }
 
 void __declspec(naked) hurtentityhook() { // push arguments, call func,do the move i did override, last jump back
@@ -925,8 +926,7 @@ void __declspec(naked) hurtentityhook() { // push arguments, call func,do the mo
 		ret
 	}
 }
-
-void HookHurtEntity()
+void shok_EGL_CGLEEntity::HookHurtEntity()
 {
 	if (HasSCELoader())
 		DEBUGGER_BREAK
@@ -941,7 +941,8 @@ void HookHurtEntity()
 	*p = 0x90;
 }
 
-std::multimap<int, int> BuildingMaxHpBoni = std::multimap<int, int>();
+std::multimap<int, int> shok_EGL_CGLEEntity::BuildingMaxHpTechBoni = std::multimap<int, int>();
+bool shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
 int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 	float hp;
 	entityAddonData* d = e->GetAdditionalData(false);
@@ -954,22 +955,25 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 	}
 	if (d && !d->HealthUseBoni)
 		return (int)hp;
-	if (e->IsSettler()) {
-		for (int t : ((shok_GGL_CGLSettlerProps*)et->LogicProps)->ModifyHitpoints.TechList) {
-			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
-				continue;
-			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
-			hp = tech->HitpointModifier.ModifyValue(hp);
+	if (shok_EGL_CGLEEntity::UseMaxHPTechBoni)
+	{
+		if (e->IsSettler()) {
+			for (int t : ((shok_GGL_CGLSettlerProps*)et->LogicProps)->ModifyHitpoints.TechList) {
+				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
+					continue;
+				shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
+				hp = tech->HitpointModifier.ModifyValue(hp);
+			}
 		}
-	}
-	else if (e->IsBuilding()) {
-		std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = BuildingMaxHpBoni.equal_range(e->EntityType);
-		for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
-			int t = i->second;
-			if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
-				continue;
-			shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
-			hp = tech->HitpointModifier.ModifyValue(hp);
+		else if (e->IsBuilding()) {
+			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.equal_range(e->EntityType);
+			for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
+				int t = i->second;
+				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
+					continue;
+				shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
+				hp = tech->HitpointModifier.ModifyValue(hp);
+			}
 		}
 	}
 	return (int) hp;
@@ -1014,7 +1018,7 @@ void __declspec(naked) hookcreatentityfixhp() {
 		ret
 	}
 }
-void EnableMaxHealthTechBoni()
+void shok_EGL_CGLEEntity::HookMaxHP()
 {
 	if (HasSCELoader())
 		DEBUGGER_BREAK
@@ -1023,13 +1027,13 @@ void EnableMaxHealthTechBoni()
 	WriteJump((void*)0x571B93, &hookcreatentityfixhp);
 }
 
-std::map<int, entityAddonData> AddonDataMap = std::map<int, entityAddonData>();
-entityAddonData LastRemovedEntityAddonData = entityAddonData();
+std::map<int, entityAddonData> shok_EGL_CGLEEntity::AddonDataMap = std::map<int, entityAddonData>();
+entityAddonData shok_EGL_CGLEEntity::LastRemovedEntityAddonData = entityAddonData();
 void __fastcall destroyentity_gemoveadd(shok_EGL_CGLEEntity* e) {
-	auto a = AddonDataMap.find(e->EntityId);
-	if (a != AddonDataMap.end()) {
-		LastRemovedEntityAddonData = a->second;
-		AddonDataMap.erase(a);
+	auto a = shok_EGL_CGLEEntity::AddonDataMap.find(e->EntityId);
+	if (a != shok_EGL_CGLEEntity::AddonDataMap.end()) {
+		shok_EGL_CGLEEntity::LastRemovedEntityAddonData = a->second;
+		shok_EGL_CGLEEntity::AddonDataMap.erase(a);
 	}
 }
 void __declspec(naked) destroyentityhook() {
@@ -1050,22 +1054,22 @@ void __declspec(naked) destroyentityhook() {
 	}
 
 }
-void HookDestroyEntity()
+void shok_EGL_CGLEEntity::HookDestroyEntity()
 {
 	WriteJump((void*)0x57C94A, &destroyentityhook);
 }
 entityAddonData* shok_EGL_CGLEEntity::GetAdditionalData(bool create)
 {
-	auto a = AddonDataMap.find(EntityId);
-	if (a != AddonDataMap.end()) {
+	auto a = shok_EGL_CGLEEntity::AddonDataMap.find(EntityId);
+	if (a != shok_EGL_CGLEEntity::AddonDataMap.end()) {
 		return &a->second;
 	}
 	if (!create) {
 		return nullptr;
 	}
 	else {
-		AddonDataMap[EntityId] = entityAddonData();
-		entityAddonData* r = &AddonDataMap[EntityId];
+		shok_EGL_CGLEEntity::AddonDataMap[EntityId] = entityAddonData();
+		entityAddonData* r = &shok_EGL_CGLEEntity::AddonDataMap[EntityId];
 		r->EntityId = EntityId;
 		return r;
 	}

@@ -738,7 +738,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			}
 		}
 	}
-	if (CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
+	if (shok_EGL_CGLEEntity::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
 		shok_GGL_CCamouflageBehavior* a = e->GetCamoAbilityBehavior();
 		if (a != nullptr && !a->IsThiefCamoBehavior()) {
 			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetCamouflageBehaviorProps();

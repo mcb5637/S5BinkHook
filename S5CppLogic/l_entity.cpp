@@ -881,8 +881,8 @@ int l_settlerEnableConversionHook(lua_State* L) {
 	lua_pushlightuserdata(L, &l_settlerEnableConversionHook);
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
-	HookHero6Convert();
-	Hero6ConvertHookCb = [](int id, int pl, int nid, int converter) {
+	shok_EGL_CGLEEntity::HookHero6Convert();
+	shok_EGL_CGLEEntity::Hero6ConvertHookCb = [](int id, int pl, int nid, int converter) {
 		lua_State* L = *shok_luastate_game;
 		int t = lua_gettop(L);
 		lua_pushlightuserdata(L, &l_settlerEnableConversionHook);
@@ -897,7 +897,7 @@ int l_settlerEnableConversionHook(lua_State* L) {
 	return 0;
 }
 int l_settlerDisableConversionHook(lua_State* L) {
-	Hero6ConvertHookCb = nullptr;
+	shok_EGL_CGLEEntity::Hero6ConvertHookCb = nullptr;
 	return 0;
 }
 
@@ -1266,8 +1266,8 @@ int l_entitySetMaxHP(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
-	HookDestroyEntity();
-	EnableMaxHealthTechBoni();
+	shok_EGL_CGLEEntity::HookDestroyEntity();
+	shok_EGL_CGLEEntity::HookMaxHP();
 	entityAddonData* d = b->GetAdditionalData(true);
 	if (lua_isnumber(L, 2)) {
 		int mhp = luaL_checkint(L, 2);
@@ -1283,8 +1283,8 @@ int l_entityCloneAddData(lua_State* L) {
 	shok_EGL_CGLEEntity* to = luaext_checkEntity(L, 2);
 	if (fro)
 		to->CloneAdditionalDataFrom(fro->GetAdditionalData(false));
-	else if (LastRemovedEntityAddonData.EntityId == luaL_checkint(L, 1))
-		to->CloneAdditionalDataFrom(&LastRemovedEntityAddonData);
+	else if (shok_EGL_CGLEEntity::LastRemovedEntityAddonData.EntityId == luaL_checkint(L, 1))
+		to->CloneAdditionalDataFrom(&shok_EGL_CGLEEntity::LastRemovedEntityAddonData);
 	return 0;
 }
 int l_entity_SetDamage(lua_State* L) {
@@ -1292,7 +1292,7 @@ int l_entity_SetDamage(lua_State* L) {
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
 	shok_EGL_CGLEEntity::HookDamageMod();
-	HookDestroyEntity();
+	shok_EGL_CGLEEntity::HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->DamageOverride = luaL_checkint(L, 2);
 	return 0;
@@ -1302,7 +1302,7 @@ int l_entity_SetArmor(lua_State* L) {
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
 	shok_EGL_CGLEEntity::HookArmorMod();
-	HookDestroyEntity();
+	shok_EGL_CGLEEntity::HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->ArmorOverride = luaL_checkint(L, 2);
 	return 0;
@@ -1312,7 +1312,7 @@ int l_entity_SetExploration(lua_State* L) {
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
 	shok_EGL_CGLEEntity::HookExplorationMod();
-	HookDestroyEntity();
+	shok_EGL_CGLEEntity::HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->ExplorationOverride = luaL_checkfloat(L, 2);
 	return 0;
@@ -1323,7 +1323,7 @@ int l_leader_SetRegen(lua_State* L) {
 	shok_GGL_CSettler* b = luaext_checkSettler(L, 1);
 	luaext_assertPointer(L, b->GetLeaderBehavior(), "no leader");
 	shok_EGL_CGLEEntity::HookLeaderRegen();
-	HookDestroyEntity();
+	shok_EGL_CGLEEntity::HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	if (lua_isnumber(L, 2))
 		d->RegenHPOverride = luaL_checkint(L, 2);
@@ -1336,7 +1336,7 @@ int l_entity_SetAutoAttackMaxRange(lua_State* L) {
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
 	shok_EGL_CGLEEntity::HookMaxRange();
-	HookDestroyEntity();
+	shok_EGL_CGLEEntity::HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->MaxRangeOverride = luaL_checkfloat(L, 2);
 	return 0;
@@ -1346,7 +1346,7 @@ int l_entity_SetDisplayName(lua_State* L) {
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
 	shok_EGL_CGLEEntity::HookDisplayName();
-	HookDestroyEntity();
+	shok_EGL_CGLEEntity::HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
 	d->NameOverride = luaL_checkstring(L, 2);
 	return 0;
@@ -1379,9 +1379,9 @@ int l_entity_PerformHeal(lua_State* L) {
 
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
-	BuildingMaxHpBoni.clear();
-	AddonDataMap.clear();
-	LastRemovedEntityAddonData.EntityId = 0;
+	shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.clear();
+	shok_EGL_CGLEEntity::AddonDataMap.clear();
+	shok_EGL_CGLEEntity::LastRemovedEntityAddonData.EntityId = 0;
 	shok_EGL_CGLEEntity::HookRangedEffectActivateHeal(false);
 }
 

@@ -792,22 +792,22 @@ int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
 int l_logicHookHurtEntity(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
-	HookHurtEntity();
+	shok_EGL_CGLEEntity::HookHurtEntity();
 	return 0;
 }
 
 int l_logicHurtEntityGetDamage(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
-	luaext_assertPointer(L, HurtEntityDamagePointer, "not in trigger");
-	lua_pushnumber(L, *HurtEntityDamagePointer);
+	luaext_assertPointer(L, shok_EGL_CGLEEntity::HurtEntityDamagePointer, "not in trigger");
+	lua_pushnumber(L, *shok_EGL_CGLEEntity::HurtEntityDamagePointer);
 	return 1;
 }
 int l_logicHurtEntitySetDamage(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
-	luaext_assertPointer(L, HurtEntityDamagePointer, "not in trigger");
-	*HurtEntityDamagePointer = luaL_checkint(L, 1);
+	luaext_assertPointer(L, shok_EGL_CGLEEntity::HurtEntityDamagePointer, "not in trigger");
+	*shok_EGL_CGLEEntity::HurtEntityDamagePointer = luaL_checkint(L, 1);
 	return 0;
 }
 
@@ -855,7 +855,8 @@ int l_logicAddFolder(lua_State* L) { // works, but adds to the bottom
 int l_logicEnableMaxHpTechMod(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supportet with SCELoader");
-	EnableMaxHealthTechBoni();
+	shok_EGL_CGLEEntity::HookMaxHP();
+	shok_EGL_CGLEEntity::UseMaxHPTechBoni = true;
 	return 0;
 }
 
@@ -1066,6 +1067,7 @@ void l_logic_cleanup(lua_State* L) {
 	GetStringTableTextOverride = nullptr;
 	CanPlaceBuildingCallback = nullptr;
 	ConstructBuildingRotation = 0.0f;
+	shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
 }
 
 void l_logic_init(lua_State* L)

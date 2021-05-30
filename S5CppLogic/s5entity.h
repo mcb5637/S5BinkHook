@@ -137,6 +137,22 @@ public:
 	static void HookMaxRange();
 	static void HookDisplayName();
 	static void HookRangedEffectActivateHeal(bool hookActive);
+	static std::multimap<int, int> BuildingMaxHpTechBoni; // ety->techid
+	static bool UseMaxHPTechBoni;
+	static void HookMaxHP();
+
+	static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
+	static void HookHero6Convert();
+	static void ActivateEntityChangePlayerFix();
+	static int ResetCamoIgnoreIfNotEntity;
+	static void HookResetCamo();
+	static void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
+	static void HookCamoActivate();
+	static void HookHurtEntity();
+	static int* HurtEntityDamagePointer;
+	static void HookDestroyEntity();
+	static std::map<int, entityAddonData> AddonDataMap;
+	static entityAddonData LastRemovedEntityAddonData;
 
 protected:
 	int EventGetIntById(int id);
@@ -392,22 +408,3 @@ static inline bool(__cdecl* const shok_entityIsDead)(int id) = (bool(__cdecl*)(i
 static inline int(__cdecl* const shok_entityChangePlayer)(int entityid, int player) = (int(__cdecl*)(int, int)) 0x49A6A7;
 
 shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e);
-
-void ActivateEntityChangePlayerFix();
-
-extern void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
-void HookHero6Convert();
-void HookResetCamo();
-extern int ResetCamoIgnoreIfNotEntity;
-extern void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
-void HookCamoActivate();
-
-extern int* HurtEntityDamagePointer;
-void HookHurtEntity();
-
-extern std::multimap<int, int> BuildingMaxHpBoni; // entitytype -> tech id
-void EnableMaxHealthTechBoni();
-
-extern std::map<int, entityAddonData> AddonDataMap;
-extern entityAddonData LastRemovedEntityAddonData;
-void HookDestroyEntity();

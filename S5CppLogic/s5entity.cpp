@@ -419,6 +419,22 @@ void shok_EGL_CGLEEntity::SetHealth(int h)
 	entitysethealth(this, h);
 }
 
+static inline void(__thiscall* const shok_entity_settasklistbyid)(shok_EGL_CGLEEntity* th, int tl, int t) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, int, int)>(0x57B3B6);
+void shok_EGL_CGLEEntity::SetTaskList(int tl)
+{
+	shok_entity_settasklistbyid(this, tl, 1);
+}
+static inline void(__thiscall* const shok_entity_settasklist)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskList* tl, int t) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, shok_EGL_CGLETaskList*, int)>(0x57B208);
+void shok_EGL_CGLEEntity::SetTaskList(shok_EGL_CGLETaskList* tl)
+{
+	shok_entity_settasklist(this, tl, 1);
+}
+static inline shok_EGL_CGLETaskList*(__thiscall* const shok_entity_GetCurrentTaskList)(shok_EGL_CGLEEntity* th) = reinterpret_cast<shok_EGL_CGLETaskList*(__thiscall* const)(shok_EGL_CGLEEntity*)>(0x57A892);
+shok_EGL_CGLETaskList* shok_EGL_CGLEEntity::GetCurrentTaskList()
+{
+	return shok_entity_GetCurrentTaskList(this);
+}
+
 void shok_EGL_CGLEEntity::Destroy()
 {
 	((shok_vtable_EGL_CGLEEntity*)vtable)->Destroy(this, 0);

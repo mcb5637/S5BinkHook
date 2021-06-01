@@ -204,6 +204,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClInclude Include="s5framework.h" />
     <ClInclude Include="s5globalObjects.h" />
     <ClInclude Include="s5player.h" />
+    <ClInclude Include="s5tasklist.h" />
     <ClInclude Include="s5tech.h" />
     <ClInclude Include="s5widget.h" />
   </ItemGroup>
@@ -235,6 +236,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClCompile Include="s5framework.cpp" />
     <ClCompile Include="s5globalObjects.cpp" />
     <ClCompile Include="s5player.cpp" />
+    <ClCompile Include="s5tasklist.cpp" />
     <ClCompile Include="s5tech.cpp" />
     <ClCompile Include="s5widget.cpp" />
   </ItemGroup>

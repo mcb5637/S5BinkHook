@@ -16,6 +16,8 @@ struct entityAddonData {
 	std::string NameOverride = "";
 };
 
+struct shok_EGL_CGLETaskList;
+
 struct shok_EGL_CGLEEntity : shok_object {
 	PADDINGI(1);
 	int EntityId;
@@ -34,13 +36,13 @@ struct shok_EGL_CGLEEntity : shok_object {
 	shok_positionRot Position; // 22
 	float Scale; // 25
 	PADDINGI(1);
-	byte StandardBehaviorActive, f1, ValidPosition, IsOnWater;
+	byte StandardBehaviorActive, f1, ValidPosition, IsOnWater; // f1 taslist related, if true tasklist execute returns 1
 	byte UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
 	int TaskListToSet; // 29
 	vector_padding;
 	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
 	int CurrentState, EntityState, CurrentTaskListID, CurrentTaskIndex; // 34 la37
-	PADDINGI(12); // la49
+	PADDINGI(12); // la49 41 map of taskhandlers EGL::IGLEHandler<EGL::CGLETaskArgs,int> {vt,obj, func}
 	int Health; // 50
 	char* ScriptName; // "Name" in loader
 	char* ScriptCommandLine;
@@ -116,6 +118,9 @@ public:
 	int LimitedAttachmentGetMaximum(int attachType);
 
 	void SetHealth(int h);
+	void SetTaskList(int tl);
+	void SetTaskList(shok_EGL_CGLETaskList* tl);
+	shok_EGL_CGLETaskList* GetCurrentTaskList();
 
 	void PerformHeal(int hp, bool healSoldiers);
 
@@ -128,6 +133,8 @@ public:
 
 	entityAddonData* GetAdditionalData(bool create);
 	void CloneAdditionalDataFrom(entityAddonData* other);
+
+	// execute task 0x57BF33 vt entry 15
 
 	static void HookDamageMod();
 	static void HookArmorMod();

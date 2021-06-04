@@ -44,7 +44,7 @@ const char* l_uiCheckFontString(const char* font) {
 		return "file doesnt exist";
 	if (!str_ends_with(font, ".met"))
 		return "wrong file extension";
-	std::string str = std::string(font);
+	std::string_view str{ font };
 	if ((str.rfind("data\\maps\\externalmap\\", 0) == std::string::npos) && (str.rfind("data\\menu\\fonts\\", 0) == std::string::npos))
 		return "incorrect folder";
 	return nullptr;
@@ -290,6 +290,81 @@ int l_uiSetFont(lua_State* L) {
 	return 0;
 }
 
+int l_uiGetBaseWidgetData(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	lua_pushnumber(L, wid->ZPriority);
+	lua_pushboolean(L, wid->ForceToHandleMouseEventsFlag);
+	lua_pushboolean(L, wid->ForceToNeverBeFoundFlag);
+	return 3;
+}
+int l_uiSetBaseWidgetData(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	if (lua_isnumber(L, 2))
+		wid->ZPriority = luaL_checkfloat(L, 2);
+	if (lua_isboolean(L, 3))
+		wid->ForceToHandleMouseEventsFlag = lua_toboolean(L, 3);
+	if (lua_isboolean(L, 4))
+		wid->ForceToNeverBeFoundFlag = lua_toboolean(L, 4);
+	return 0;
+}
+
+int l_uiGetWidgetStringFrameDistance(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CWidgetStringHelper* s = wid->GetStringHelper();
+	luaext_assertPointer(L, s, "no string helper");
+	lua_pushnumber(L, s->StringFrameDistance);
+	return 1;
+}
+int l_uiSetWidgetStringFrameDistance(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CWidgetStringHelper* s = wid->GetStringHelper();
+	luaext_assertPointer(L, s, "no string helper");
+	s->StringFrameDistance = luaL_checkfloat(L, 2);
+	return 0;
+}
+
+int l_uiGetStaticTextWidgetLineDistanceFactor(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsStaticTextWidget(), "no static text widget");
+	shok_EGUIX_CStaticTextWidget* tw = static_cast<shok_EGUIX_CStaticTextWidget*>(wid);
+	lua_pushnumber(L, tw->LineDistanceFactor);
+	return 1;
+}
+int l_uiSetStaticTextWidgetLineDistanceFactor(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	luaext_assert(L, wid->IsStaticTextWidget(), "no static text widget");
+	shok_EGUIX_CStaticTextWidget* tw = static_cast<shok_EGUIX_CStaticTextWidget*>(wid);
+	tw->LineDistanceFactor = luaL_checkfloat(L, 2);
+	return 0;
+}
+
+int l_uiGetButtonShortCut(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CButtonHelper* b = wid->GetButtonHelper();
+	luaext_assertPointer(L, b, "no button");
+	lua_pushstring(L, b->ShortCutString.RawString.c_str());
+	lua_pushstring(L, b->ShortCutString.StringTableKey.c_str());
+	return 2;
+}
+int l_uiSetButtonShortCut(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CButtonHelper* b = wid->GetButtonHelper();
+	luaext_assertPointer(L, b, "no button");
+	l_uiSetString(L, b->ShortCutString, 2);
+	return 0;
+}
+
+int l_uiSetWidgetGroup(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	const char* s = luaL_checkstring(L, 2);
+	shok_EGUIX_CWidgetGroupManager* wgm = shok_EGUIX_CWidgetGroupManager::GlobalObj();
+	int g = wgm->GetGroupId(s);
+	if (!g)
+		g = wgm->CreateGroup(s);
+	wid->Group = g;
+	return 0;
+}
+
 int l_uiCreateStaticWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
@@ -421,9 +496,10 @@ int l_uiSetFontValues(lua_State* L) {
 
 int l_uiTest(lua_State* L) {
 	const char* s = luaL_checkstring(L, 1);
-	int i = 0;
-	shok_fontManager::LoadFont(&i, s);
-	lua_pushnumber(L, (int)shok_getFontMangerObj()->GetFontObj(i));
+	int g = shok_EGUIX_CWidgetGroupManager::GlobalObj()->GetGroupId(s);
+	if (!g)
+		g = shok_EGUIX_CWidgetGroupManager::GlobalObj()->CreateGroup(s);
+	lua_pushnumber(L, g);
 	return 1;
 }
 
@@ -572,6 +648,15 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "WidgetOverrideTooltipFunc", &l_uiTooltipOverrideFunc);
 	luaext_registerFunc(L, "WidgetIsTooltipShown", &l_uiIsTooltipOfWidgetShown);
 	luaext_registerFunc(L, "WidgetSetFont", &l_uiSetFont);
+	luaext_registerFunc(L, "WidgetGetBaseData", &l_uiGetBaseWidgetData);
+	luaext_registerFunc(L, "WidgetSetBaseData", &l_uiSetBaseWidgetData);
+	luaext_registerFunc(L, "WidgetGetStringFrameDistance", &l_uiGetWidgetStringFrameDistance);
+	luaext_registerFunc(L, "WidgetSetStringFrameDistance", &l_uiSetWidgetStringFrameDistance);
+	luaext_registerFunc(L, "StaticTextWidgetGetLineDistanceFactor", &l_uiGetStaticTextWidgetLineDistanceFactor);
+	luaext_registerFunc(L, "StaticTextWidgetSetLineDistanceFactor", &l_uiSetStaticTextWidgetLineDistanceFactor);
+	luaext_registerFunc(L, "ButtonGetShortcutString", &l_uiGetButtonShortCut);
+	luaext_registerFunc(L, "ButtonSetShortcutString", &l_uiSetButtonShortCut);
+	luaext_registerFunc(L, "WidgetSetGroup", &l_uiSetWidgetGroup);
 	luaext_registerFunc(L, "FontGetConfig", &l_uiGetFontValues);
 	luaext_registerFunc(L, "FontSetConfig", &l_uiSetFontValues);
 	luaext_registerFunc(L, "Test", &l_uiTest);

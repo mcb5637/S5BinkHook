@@ -30,7 +30,7 @@ static_assert(sizeof(shok_EGUIX_CSingleStringHandler) == 15 * 4);
 struct shok_EGUIX_CWidgetStringHelper : shok_object { // size 23
 	shok_EGUIX_CFontIDHandler FontHandler;
 	shok_EGUIX_CSingleStringHandler SingleStringHandler;
-	int StringFrameDistance; //float?
+	float StringFrameDistance;
 	shok_widget_color Color;
 
 	static inline constexpr int vtp = 0x781518;
@@ -95,7 +95,7 @@ static_assert(sizeof(shok_EGUIX_CToolTipHelper) == 41 * 4);
 
 struct shok_EGUIX_CBaseWidget : shok_object {
 	void* vtable_EGUIX_IOnEvent;
-	PADDINGI(2)
+	int UserVariable[2];
 	int WidgetID;
 	shok_widget_rect PosAndSize;
 	byte IsShown;
@@ -112,6 +112,7 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 	byte* GetUpdateManualFlag();
 	shok_EGUIX_CLuaFunctionHelper* GetUpdateFunc();
 	bool IsContainerWidget();
+	bool IsStaticTextWidget();
 	shok_EGUIX_CMaterial* GetMaterials(int* count);
 	shok_EGUIX_CButtonHelper* GetButtonHelper();
 	shok_EGUIX_CToolTipHelper* GetTooltipHelper();
@@ -140,8 +141,9 @@ struct shok_EGUIX_CStaticTextWidget : shok_EGUIX_CStaticWidget {
 	shok_EGUIX_CWidgetStringHelper StringHelper; // 27
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction; // 50
 	byte UpdateManualFlag;
-	PADDING(3)
-	int FirstLineToPrint, NumberOfLinesToPrint, LineDistanceFactor;
+	PADDING(3);
+	int FirstLineToPrint, NumberOfLinesToPrint;
+	float LineDistanceFactor;
 
 	static inline constexpr int vtp = 0x780EE4;
 
@@ -221,6 +223,16 @@ struct shok_widgetManager { // this thing has no vtable...
 	shok_EGUIX_CBaseWidget* GetWidgetByID(int id);
 };
 static inline shok_widgetManager* (*const shok_getWidgetManagerObj)() = (shok_widgetManager * (*)())0x558473;
+
+struct shok_EGUIX_CWidgetGroupManager : shok_object {
+
+	int GetGroupId(const char* s);
+	int CreateGroup(const char* s);
+
+	static inline constexpr int vtp = 0x780978;
+
+	static inline shok_EGUIX_CWidgetGroupManager* (__stdcall* const GlobalObj)() = reinterpret_cast<shok_EGUIX_CWidgetGroupManager * (__stdcall*)()>(0x55B688);
+};
 
 struct shok_font {
 	PADDINGI(1);

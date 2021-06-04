@@ -25,6 +25,17 @@ shok_EGUIX_CBaseWidget* shok_widgetManager::GetWidgetByID(int id)
     return widman_getwid(this, id);
 }
 
+static inline int(__thiscall* const widgroupman_getgroupid)(shok_EGUIX_CWidgetGroupManager* th, const char* s) = reinterpret_cast<int(__thiscall*)(shok_EGUIX_CWidgetGroupManager*, const char*)>(0x583214);
+int shok_EGUIX_CWidgetGroupManager::GetGroupId(const char* s)
+{
+    return widgroupman_getgroupid(this, s);
+}
+static inline int(__thiscall* const widgroupman_creategroup)(int man, const char* s, int z) = reinterpret_cast<int(__thiscall*)(int, const char*, int)>(0x54F656);
+int shok_EGUIX_CWidgetGroupManager::CreateGroup(const char* s)
+{
+    return widgroupman_creategroup(*reinterpret_cast<int*>(0x894EA4), s, 0);
+}
+
 void shok_EGUIX_CFontIDHandler::LoadFont(const char* name)
 {
     shok_fontManager::LoadFont(&FontID, name);
@@ -69,6 +80,10 @@ shok_EGUIX_CLuaFunctionHelper* shok_EGUIX_CBaseWidget::GetUpdateFunc()
 bool shok_EGUIX_CBaseWidget::IsContainerWidget()
 {
     return vtable == shok_EGUIX_CContainerWidget::vtp;
+}
+bool shok_EGUIX_CBaseWidget::IsStaticTextWidget()
+{
+    return vtable == shok_EGUIX_CStaticTextWidget::vtp;
 }
 shok_EGUIX_CMaterial* shok_EGUIX_CBaseWidget::GetMaterials(int* count)
 {

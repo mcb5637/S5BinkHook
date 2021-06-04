@@ -1528,6 +1528,71 @@ function CppLogic.UI.FontSetConfig(fontName, size, offset, spacing) end
 -- @param fontName font
 function CppLogic.UI.WidgetSetFont(wid, fontName) end
 
+--- basic widget data.
+-- @param wid widget
+-- @return zpriority
+-- @return forceToHandleMouseEvent
+-- @return forceToNeverBeFound
+function CppLogic.UI.WidgetGetBaseData(wid) end
+--- basic widget data.
+-- @param wid widget
+-- @param zpriority (optional, default current value)
+-- @param forceToHandleMouseEvent (optional, default current value)
+-- @param forceToNeverBeFound (optional, default current value)
+function CppLogic.UI.WidgetSetBaseData(wid, zpriority, forceToHandleMouseEvent, forceToNeverBeFound) end
+
+--- string frame distance of a text display. (distance from top of widget to string rendering).
+-- @param wid widget
+-- @return frame distance
+function CppLogic.UI.WidgetGetStringFrameDistance(wid) end
+--- string frame distance of a text display. (distance from top of widget to string rendering).
+-- @param wid widget
+-- @param fdis frame distance
+function CppLogic.UI.WidgetSetStringFrameDistance(wid, fdis) end
+
+--- line distance factor (space between lines).
+-- @param wid widget
+-- @return distance factor
+function CppLogic.UI.StaticTextWidgetGetLineDistanceFactor(wid) end
+--- line distance factor (space between lines).
+-- @param wid widget
+-- @param df distance factor
+function CppLogic.UI.StaticTextWidgetSetLineDistanceFactor(wid, df) end
+
+--- gets a widget material textures position and size
+-- @param wid widget
+-- @param mat material index, [0..4] for buttons, 0 for statics.
+-- @return x
+-- @return y
+-- @return w
+-- @return h
+function CppLogic.UI.WidgetMaterialGetTextureCoordinates(wid, mat) end
+--- sets a widget material textures position and size
+-- @param wid widget
+-- @param mat material index, [0..4] for buttons, 0 for statics.
+-- @param x (optional, default current)
+-- @param y (optional, default current)
+-- @param w (optional, default current)
+-- @param h (optional, default current)
+function CppLogic.UI.WidgetMaterialSetTextureCoordinates(wid, mat, x, y, w, h) end
+
+--- a buttons shortcut string.
+-- @param wid widget
+-- @return raw string
+-- @return string table text key
+function CppLogic.UI.ButtonGetShortcutString(wid) end
+--- a buttons shortcut string.
+-- @param wid widget
+-- @param string
+-- @param isSTTKey (optional, default false) if true, sets this as string table text key
+function CppLogic.UI.ButtonSetShortcutString(wid, str, isSTTKey) end
+
+--- sets a widgets group.
+-- @param wid widget
+-- @param group group name
+function CppLogic.UI.WidgetSetGroup(wid, group) end
+
+
 --- creates a new static widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.
 -- all attached functions are empty, and the UpdateManualFlag is set.
@@ -1591,23 +1656,6 @@ function CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild(wid, name, befo
 -- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
 function CppLogic.UI.ContainerWidgetCreateContainerWidgetChild(wid, name, before) end
-
---- gets a widget material textures position and size
--- @param wid widget
--- @param mat material index, [0..5] for buttons, 0 for statics.
--- @return x
--- @return y
--- @return w
--- @return h
-function CppLogic.UI.WidgetMaterialGetTextureCoordinates(wid, mat) end
---- sets a widget material textures position and size
--- @param wid widget
--- @param mat material index, [0..5] for buttons, 0 for statics.
--- @param x (optional, default current)
--- @param y (optional, default current)
--- @param w (optional, default current)
--- @param h (optional, default current)
-function CppLogic.UI.WidgetMaterialSetTextureCoordinates(wid, mat, x, y, w, h) end
 
 --- char entered callback. use string.char to get the character.
 -- does not work with SCELoader.

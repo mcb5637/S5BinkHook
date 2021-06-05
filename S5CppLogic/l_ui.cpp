@@ -586,7 +586,7 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 
 	if (!UIInput_Mouse_Callback) {
 		HookUIInput();
-		UIInput_Mouse_Callback = [](int id, int w, int l) {
+		UIInput_Mouse_Callback = [](win_mouseEvents id, int w, int l) {
 			if (id == win_mouseEvents::MouseMove)
 				return;
 
@@ -595,7 +595,7 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 
 			lua_pushlightuserdata(L, &l_ui_SetMouseTrigger);
 			lua_rawget(L, LUA_REGISTRYINDEX);
-			lua_pushnumber(L, id);
+			lua_pushnumber(L, static_cast<int>(id));
 			lua_pushnumber(L, l & 0xFFFF);
 			lua_pushnumber(L, (l >> 16) & 0xFFFF);
 

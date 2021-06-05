@@ -69,14 +69,14 @@ int shok_GGL_CSettlerUpgradeManager::GetSettlerTypeByUCat(int ucat)
 	return settlerupmanager_getstybyucat(this, ucat);
 }
 
-static inline int(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(int* d, int p) = (int(__thiscall*)(int* d, int p)) 0x4B4D5B;
-int shok_GGL_CPlayerStatus::GetDiploStateTo(int p)
+static inline shok_DiploState(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(int* d, int p) = (shok_DiploState(__thiscall*)(int* d, int p)) 0x4B4D5B;
+shok_DiploState shok_GGL_CPlayerStatus::GetDiploStateTo(int p)
 {
 	return shok_GGL_CPlayerStatus_getDiploState(DiplomacyData, p);
 }
 
-static inline int(__thiscall* const playerstatus_gettechstatus)(shok_GGL_CPlayerStatus_techData* th, int tech) = (int(__thiscall*)(shok_GGL_CPlayerStatus_techData*, int))0x4A2A8D;
-int shok_GGL_CPlayerStatus::GetTechStatus(int tech)
+static inline shok_TechState(__thiscall* const playerstatus_gettechstatus)(shok_GGL_CPlayerStatus_techData* th, int tech) = (shok_TechState(__thiscall*)(shok_GGL_CPlayerStatus_techData*, int))0x4A2A8D;
+shok_TechState shok_GGL_CPlayerStatus::GetTechStatus(int tech)
 {
 	return playerstatus_gettechstatus(&TechnologyStates, tech);
 }

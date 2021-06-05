@@ -248,5 +248,5 @@ static inline shok_fontManager* (*const shok_getFontMangerObj)() = (shok_fontMan
 
 extern void (*UIInput_Char_Callback)(int c);
 extern void (*UIInput_Key_Callback)(int c, int ev);
-extern void (*UIInput_Mouse_Callback)(int id, int w, int l);
+extern void (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l);
 void HookUIInput();

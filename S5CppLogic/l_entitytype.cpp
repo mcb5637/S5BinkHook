@@ -163,34 +163,21 @@ int l_entityTySetAutoAttackDamage(lua_State* L) {
 
 int l_entityTypeAddEntityCat(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	int cat = luaL_checkint(L, 2);
+	shok_EntityCategory cat = static_cast<shok_EntityCategory>(luaL_checkint(L, 2));
 	luaext_assert(L, !t->IsOfCategory(cat), "entitytype is already of this cat");
-	shok_saveVector<int>(&t->LogicProps->Categories, [cat](auto& v) {
+	shok_saveVector<shok_EntityCategory>(&t->LogicProps->Categories, [cat](auto& v) {
 		v.push_back(cat);
 		});
 	return 0;
 }
 int l_entityTypeRemoveEntityCat(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	int cat = luaL_checkint(L, 2);
-	shok_saveVector<int>(&t->LogicProps->Categories, [cat](auto& v) {
-			auto e = std::remove_if(v.begin(), v.end(), [cat](int c) { return c == cat; });
+	shok_EntityCategory cat = static_cast<shok_EntityCategory>(luaL_checkint(L, 2));
+	shok_saveVector<shok_EntityCategory>(&t->LogicProps->Categories, [cat](auto& v) {
+			auto e = std::remove_if(v.begin(), v.end(), [cat](shok_EntityCategory c) { return c == cat; });
 			v.erase(e, v.end());
 		});
 	return 0;
-}
-int l_entityTypeDump(lua_State* L) {
-	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	int s = t->LogicProps->Categories.size();
-	luaL_checkstack(L, s + 5, "");
-	int* d = (int*)&t->LogicProps->Categories;
-	for (int i = 0; i < 4; i++)
-		lua_pushnumber(L, d[i]);
-	lua_pushnumber(L, s);
-	for (int i : t->LogicProps->Categories) {
-		lua_pushnumber(L, i);
-	}
-	return s + 5;
 }
 
 int l_entityTyGetAutoAttackMissChance(lua_State* L) {
@@ -691,7 +678,6 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetAutoAttackDamage", &l_entityTySetAutoAttackDamage);
 	luaext_registerFunc(L, "AddEntityCategory", &l_entityTypeAddEntityCat);
 	luaext_registerFunc(L, "RemoveEntityCategory", &l_entityTypeRemoveEntityCat);
-	luaext_registerFunc(L, "DumpCategories", &l_entityTypeDump);
 	luaext_registerFunc(L, "GetAutoAttackMissChance", &l_entityTyGetAutoAttackMissChance);
 	luaext_registerFunc(L, "SetAutoAttackMissChance", &l_entityTySetAutoAttackMissChance);
 	luaext_registerFunc(L, "GetAutoAttackRange", &l_entityTyGetRange);

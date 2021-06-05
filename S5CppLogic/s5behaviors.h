@@ -261,7 +261,8 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct GGL_SSlotArgsLimitedAttachment {
-	int AttachmentType, Limit;
+	shok_AttachmentType AttachmentType;
+	int Limit;
 	int Event; // ?
 };
 struct shok_GGL_CLimitedAttachmentBehavior : shok_EGL_CGLEBehavior {

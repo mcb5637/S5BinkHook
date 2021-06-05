@@ -101,7 +101,7 @@ public:
 
 
 
-	bool IsEntityInCategory(int cat);
+	bool IsEntityInCategory(shok_EntityCategory cat);
 	bool IsMovingEntity();
 	bool IsSettler();
 	bool IsBuilding();
@@ -112,10 +112,10 @@ public:
 	int EventGetDamage();
 	int EventGetArmor();
 	int EventGetMaxWorktime();
-	int EventLeaderGetCurrentCommand();
+	shok_LeaderCommand EventLeaderGetCurrentCommand();
 	float GetExploration();
 	int GetMaxHealth();
-	int LimitedAttachmentGetMaximum(int attachType);
+	int LimitedAttachmentGetMaximum(shok_AttachmentType attachType);
 
 	void SetHealth(int h);
 	void SetTaskList(int tl);
@@ -126,8 +126,8 @@ public:
 
 	void Destroy();
 
-	int GetFirstAttachedToMe(int attachmentId);
-	int GetFirstAttachedEntity(int attachmentId);
+	int GetFirstAttachedToMe(shok_AttachmentType attachmentId);
+	int GetFirstAttachedEntity(shok_AttachmentType attachmentId);
 
 	void ClearAttackers();
 
@@ -362,7 +362,7 @@ public:
 	void SellBuilding();
 	void StartResearch(int tech);
 	void CancelResearch();
-	void MarketStartTrade(int ResourceTypeSell, int ResourceTypeBuy, float BuyAmount);
+	void MarketStartTrade(shok_ResourceType ResourceTypeSell, shok_ResourceType ResourceTypeBuy, float BuyAmount);
 	void MarketCancelTrade();
 };
 

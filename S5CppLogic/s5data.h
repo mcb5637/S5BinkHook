@@ -203,15 +203,16 @@ struct shok_AARect {
 	shok_position low, high;
 };
 
+enum class shok_ResourceType;
 struct shok_costInfo { // size 18
 private:
 	int u;
 public:
 	float Gold, GoldRaw, Silver, SilverRaw, Stone, StoneRaw, Iron, IronRaw, Sulfur, SulfurRaw, Clay, ClayRaw, Wood, WoodRaw, WeatherEnergy, Knowledge, Faith;
 
-	float GetResourceAmountFromType(int ty, bool addRaw);
-	void AddToType(int ty, float toadd);
-	void SubFromType(int ty, float tosub);
+	float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw);
+	void AddToType(shok_ResourceType ty, float toadd);
+	void SubFromType(shok_ResourceType ty, float tosub);
 	bool HasResources(shok_costInfo* has);
 };
 static_assert(sizeof(shok_costInfo) == 18 * 4);
@@ -221,8 +222,10 @@ public:
 	int vtable;
 };
 
+enum class shok_AttachmentType;
 struct shok_attachment {
-	int AttachmentType, EntityId, EventID; // does event id exist, or is it just in attachmentinfo loader?
+	shok_AttachmentType AttachmentType;
+	int EntityId, EventID; // does event id exist, or is it just in attachmentinfo loader?
 };
 bool operator<(shok_attachment a, shok_attachment b);
 
@@ -241,7 +244,7 @@ bool contains(T* data, T search, int num) {
 const char* (__cdecl* const shok_GetStringTableText)(const char* key) = (const char* (__cdecl* const)(const char*))0x556D2E;
 
 
-enum win_mouseEvents : int {
+enum class win_mouseEvents : int {
 	MouseMove = 0x200,
 	LButtonDown = 0x201,
 	LButtonUp = 0x202,
@@ -259,11 +262,11 @@ enum win_mouseEvents : int {
 };
 
 
+#include "s5defines.h"
 #include "s5behaviorProps.h"
 #include "s5entitytype.h"
 #include "s5behaviors.h"
 #include "s5entity.h"
-#include "s5defines.h"
 #include "s5events.h"
 #include "s5effects.h"
 #include "s5player.h"

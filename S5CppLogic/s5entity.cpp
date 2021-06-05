@@ -217,8 +217,8 @@ shok_GGL_CAutoCannonBehavior* shok_EGL_CGLEEntity::GetAutoCannonBehavior()
 	return (shok_GGL_CAutoCannonBehavior*)SearchBehavior(shok_GGL_CAutoCannonBehavior::vtp);
 }
 
-static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, int cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, int cat)) 0x57BBEB;
-bool shok_EGL_CGLEEntity::IsEntityInCategory(int cat)
+static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, shok_EntityCategory cat) = (bool(__thiscall*)(shok_EGL_CGLEEntity * e, shok_EntityCategory cat)) 0x57BBEB;
+bool shok_EGL_CGLEEntity::IsEntityInCategory(shok_EntityCategory cat)
 {
 	return shok_IsEntityInCategory(this, cat);
 }
@@ -279,11 +279,11 @@ int shok_EGL_CGLEEntity::EventGetMaxWorktime()
 	return EventGetIntById(0x1301A);
 }
 
-int shok_EGL_CGLEEntity::EventLeaderGetCurrentCommand()
+shok_LeaderCommand shok_EGL_CGLEEntity::EventLeaderGetCurrentCommand()
 {
 	if (GetLeaderBehavior() == nullptr)
-		return -1;
-	return EventGetIntById(0x1502D);
+		return shok_LeaderCommand::Unknown;
+	return static_cast<shok_LeaderCommand>(EventGetIntById(0x1502D));
 }
 
 float shok_EGL_CGLEEntity::GetExploration()
@@ -298,7 +298,7 @@ int shok_EGL_CGLEEntity::GetMaxHealth()
 	return entitygetmaxhealth(this);
 }
 
-int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(int attachType)
+int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(shok_AttachmentType attachType)
 {
 	shok_event_data_GGL_CEventAttachmentTypeGetInteger ev = shok_event_data_GGL_CEventAttachmentTypeGetInteger();
 	ev.id = 0x1A007;
@@ -308,13 +308,13 @@ int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(int attachType)
 }
 
 
-int shok_EGL_CGLEEntity::GetFirstAttachedToMe(int attachmentId)
+int shok_EGL_CGLEEntity::GetFirstAttachedToMe(shok_AttachmentType attachmentId)
 {
 	shok_attachment* r = ObserverEntities.GetFirstMatch([attachmentId](shok_attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
 }
 
-int shok_EGL_CGLEEntity::GetFirstAttachedEntity(int attachmentId)
+int shok_EGL_CGLEEntity::GetFirstAttachedEntity(shok_AttachmentType attachmentId)
 {
 	shok_attachment* r = ObservedEntities.GetFirstMatch([attachmentId](shok_attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
@@ -336,7 +336,7 @@ bool shok_EGL_CMovingEntity::IsMoving()
 
 bool shok_GGL_CSettler::IsIdle()
 {
-	int com = EventLeaderGetCurrentCommand();
+	shok_LeaderCommand com = EventLeaderGetCurrentCommand();
 	return com == shok_LeaderCommand::Defend || com == shok_LeaderCommand::HoldPos || CurrentTaskListID == ((shok_GGL_CGLSettlerProps*)GetEntityType())->IdleTaskList;
 }
 
@@ -810,7 +810,7 @@ void shok_GGL_CBuilding::CancelResearch()
 	building_cancelresearch(this);
 }
 
-void shok_GGL_CBuilding::MarketStartTrade(int ResourceTypeSell, int ResourceTypeBuy, float BuyAmount)
+void shok_GGL_CBuilding::MarketStartTrade(shok_ResourceType ResourceTypeSell, shok_ResourceType ResourceTypeBuy, float BuyAmount)
 {
 	shok_event_data_GGL_CEventTransaction e2 = shok_event_data_GGL_CEventTransaction();
 	e2.SellType = ResourceTypeSell;
@@ -975,7 +975,7 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 	{
 		if (e->IsSettler()) {
 			for (int t : ((shok_GGL_CGLSettlerProps*)et->LogicProps)->ModifyHitpoints.TechList) {
-				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
+				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok_TechState::Researched)
 					continue;
 				shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
@@ -985,7 +985,7 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.equal_range(e->EntityType);
 			for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
 				int t = i->second;
-				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != TechState::Researched)
+				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok_TechState::Researched)
 					continue;
 				shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);

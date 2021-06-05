@@ -35,13 +35,15 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.AttackerID = luaext_optEntityId(L, 9);
 	int player = luaL_optint(L, 10, 0);
 	data.PlayerID = player;
+	data.SourcePlayer = player;
+	int dmgclass = luaL_optint(L, 11, 0);
+	data.DamageClass = dmgclass;
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogicObject;
 	int id = gl->CreateEffect(&data);
 	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(id);
-	if (ef->IsCannonBallEffect()) {
+	if (!shok_GGL_CCannonBallEffect::FixDamageClass && ef->IsCannonBallEffect()) {
 		shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
-		cbeff->SourcePlayer = player;
-		cbeff->DamageClass = luaL_optint(L, 11, 0);
+		cbeff->DamageClass = dmgclass;
 	}
 	if (lua_isfunction(L, 12)) {
 		shok_EGL_CFlyingEffect::HookOnHit();

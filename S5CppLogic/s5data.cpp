@@ -186,20 +186,20 @@ shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
 	return r;
 }
 
-static inline float(__thiscall* const costinfo_getres)(shok_costInfo* th, int ty, bool addRaw) = (float(__thiscall*)(shok_costInfo*, int, bool))0x4A9606;
-float shok_costInfo::GetResourceAmountFromType(int ty, bool addRaw)
+static inline float(__thiscall* const costinfo_getres)(shok_costInfo* th, shok_ResourceType ty, bool addRaw) = (float(__thiscall*)(shok_costInfo*, shok_ResourceType, bool))0x4A9606;
+float shok_costInfo::GetResourceAmountFromType(shok_ResourceType ty, bool addRaw)
 {
 	return costinfo_getres(this, ty, addRaw);
 }
 
-static inline void(__thiscall* const costinfo_add)(shok_costInfo* th, int ty, float a) = (void(__thiscall*)(shok_costInfo*, int, float))0x4A9774;
-void shok_costInfo::AddToType(int ty, float toadd)
+static inline void(__thiscall* const costinfo_add)(shok_costInfo* th, shok_ResourceType ty, float a) = (void(__thiscall*)(shok_costInfo*, shok_ResourceType, float))0x4A9774;
+void shok_costInfo::AddToType(shok_ResourceType ty, float toadd)
 {
 	costinfo_add(this, ty, toadd);
 }
 
-static inline void(__thiscall* const costinfo_sub)(shok_costInfo* th, int ty, float a, float b) = (void(__thiscall*)(shok_costInfo*, int, float, float))0x4A963D;
-void shok_costInfo::SubFromType(int ty, float tosub)
+static inline void(__thiscall* const costinfo_sub)(shok_costInfo* th, shok_ResourceType ty, float a, float b) = (void(__thiscall*)(shok_costInfo*, shok_ResourceType, float, float))0x4A963D;
+void shok_costInfo::SubFromType(shok_ResourceType ty, float tosub)
 {
 	costinfo_sub(this, ty, tosub, 0.0f);
 }

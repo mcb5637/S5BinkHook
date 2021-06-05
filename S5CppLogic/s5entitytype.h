@@ -15,7 +15,7 @@ private:
 public:
 	int Class;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> Categories;
+	std::vector<shok_EntityCategory, shok_allocator<shok_EntityCategory>> Categories;
 	shok_positionRot ApproachPos;
 private:
 	int Race;
@@ -200,7 +200,7 @@ public:
 	bool IsSettlerType();
 	bool IsBuildingType();
 	bool IsCEntityProperties();
-	bool IsOfCategory(int cat);
+	bool IsOfCategory(shok_EntityCategory cat);
 };
 
 int* const shok_entityTypeIDSerf = (int*)0x863830;

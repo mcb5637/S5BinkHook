@@ -370,7 +370,7 @@ void UnlimitedArmy::CheckStatus(UAStatus status)
 }
 bool UnlimitedArmy::LeaderIsMoving(shok_EGL_CGLEEntity* e)
 {
-	int comm = e->EventLeaderGetCurrentCommand();
+	shok_LeaderCommand comm = e->EventLeaderGetCurrentCommand();
 	return (comm == shok_LeaderCommand::Move || comm == shok_LeaderCommand::AttackMove || comm == shok_LeaderCommand::Patrol) && !LeaderIsIdle(e);
 }
 bool UnlimitedArmy::LeaderIsIdle(shok_EGL_CGLEEntity* e)
@@ -379,7 +379,7 @@ bool UnlimitedArmy::LeaderIsIdle(shok_EGL_CGLEEntity* e)
 }
 bool UnlimitedArmy::LeaderIsInBattle(shok_EGL_CGLEEntity* e)
 {
-	int comm = e->EventLeaderGetCurrentCommand();
+	shok_LeaderCommand comm = e->EventLeaderGetCurrentCommand();
 	return (comm == shok_LeaderCommand::Attack || comm == shok_LeaderCommand::AttackMove || comm == shok_LeaderCommand::HeroAbility) && !LeaderIsIdle(e);
 }
 bool UnlimitedArmy::IsRanged(shok_EGL_CGLEEntity* e)

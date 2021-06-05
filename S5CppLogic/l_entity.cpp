@@ -144,7 +144,7 @@ int l_entityPredicateIsNotSoldier(lua_State* L) {
 int l_entityPredicateOfEntityCategory(lua_State* L) {
 	int ty = luaL_checkint(L, 1);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateOfEntityCategory));
-	new(ud) EntityIteratorPredicateOfEntityCategory(ty);
+	new(ud) EntityIteratorPredicateOfEntityCategory(static_cast<shok_EntityCategory>(ty));
 	return 1;
 }
 
@@ -1176,8 +1176,8 @@ int l_buildingStartResearch(lua_State* L) {
 	shok_technology* techo = (*shok_GGL_CGLGameLogicObj)->GetTech(tech);
 	luaext_assertPointer(L, techo, "no tech at 2");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
-	int techstate = p->GetTechStatus(tech);
-	luaext_assert(L, techstate == TechState::Allowed, "wrong techstate");
+	shok_TechState techstate = p->GetTechStatus(tech);
+	luaext_assert(L, techstate == shok_TechState::Allowed, "wrong techstate");
 	luaext_assert(L, p->CurrentResources.HasResources(&techo->ResourceCosts), "not enough res");
 	b->StartResearch(tech);
 	return 0;
@@ -1190,7 +1190,7 @@ int l_buildingCancelResearch(lua_State* L) {
 	return 0;
 }
 
-bool marketIsRes(int rty) {
+bool marketIsRes(shok_ResourceType rty) {
 	return rty == shok_ResourceType::Clay || rty == shok_ResourceType::Gold || rty == shok_ResourceType::Iron || rty == shok_ResourceType::Stone || rty == shok_ResourceType::Sulfur || rty == shok_ResourceType::Wood;
 }
 
@@ -1198,8 +1198,8 @@ int l_buildingMarketStartTrade(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetMarketBehavior(), "no market at 1");
 	luaext_assert(L, b->IsIdle(), "building not idle");
-	int sellty = luaL_checkint(L, 2);
-	int buyty = luaL_checkint(L, 3);
+	shok_ResourceType sellty = static_cast<shok_ResourceType>(luaL_checkint(L, 2));
+	shok_ResourceType buyty = static_cast<shok_ResourceType>(luaL_checkint(L, 3));
 	float am = luaL_checkfloat(L, 4);
 	luaext_assert(L, marketIsRes(sellty), "sell type is invalid");
 	luaext_assert(L, marketIsRes(buyty), "buy type is invalid");
@@ -1759,7 +1759,7 @@ bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity*
 	return e->IsEntityInCategory(category);
 }
 
-EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory(int cat)
+EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory(shok_EntityCategory cat)
 {
 	category = cat;
 }

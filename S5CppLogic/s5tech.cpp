@@ -45,7 +45,7 @@ float __fastcall constructionsite_getprogresspertick_hook(shok_GGL_CBuilding* th
 	shok_GGL_CGLBuildingProps* bty = (shok_GGL_CGLBuildingProps*)(*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(th->ConstructionSiteType)->LogicProps;
 	float constructionfactor = serf->BuildFactor;
 	for (additionalTechModifier& tmod : ConstructionSpeedModifiers) {
-		if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(th->PlayerId)->GetTechStatus(tmod.TechID) != TechState::Researched)
+		if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(th->PlayerId)->GetTechStatus(tmod.TechID) != shok_TechState::Researched)
 			continue;
 		constructionfactor = tmod.ModifyValue(constructionfactor);
 	}

@@ -173,9 +173,9 @@ bool shok_GGlue_CGlueEntityProps::IsCEntityProperties()
 	return LogicProps->vtable == shok_GGL_CEntityProperties::vtp;
 }
 
-bool shok_GGlue_CGlueEntityProps::IsOfCategory(int cat)
+bool shok_GGlue_CGlueEntityProps::IsOfCategory(shok_EntityCategory cat)
 {
-	for (int i : LogicProps->Categories)
+	for (shok_EntityCategory i : LogicProps->Categories)
 		if (i == cat)
 			return true;
 	return false;

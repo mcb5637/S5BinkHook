@@ -219,8 +219,8 @@ struct shok_GGL_CPlayerStatus : shok_object {
 
 	static inline constexpr int vtp = 0x76FA88;
 
-	int GetDiploStateTo(int p);
-	int GetTechStatus(int tech);
+	shok_DiploState GetDiploStateTo(int p);
+	shok_TechState GetTechStatus(int tech);
 };
 
 static inline bool(_cdecl* const shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;

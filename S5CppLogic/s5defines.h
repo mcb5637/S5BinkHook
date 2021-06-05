@@ -1,12 +1,13 @@
 #pragma once
 
-enum shok_DiploState : int {
+enum class shok_DiploState : int {
 	Friendly = 1,
 	Neutral = 2,
 	Hostile = 3,
 };
 
-enum shok_LeaderCommand : int {
+enum class shok_LeaderCommand : int {
+	Unknown = -1,
 	Attack = 0,
 	Defend = 3,
 	Patrol = 4,
@@ -17,7 +18,7 @@ enum shok_LeaderCommand : int {
 	HeroAbility = 10,
 };
 
-enum shok_AttachmentType : int {
+enum class shok_AttachmentType : int {
 	SETTLER_SOURCE_PILE = 2,
 	SETTLER_DESTINATION_PILE = 3,
 	SETTLER_COLLECT_GOOD_RESOURCE = 4,
@@ -92,7 +93,7 @@ enum shok_AttachmentType : int {
 	FIRE_BURNING_ENTITY = 73,
 };
 
-enum shok_EntityCategory : int {
+enum class shok_EntityCategory : int {
 	CavalryHeavy = 1,
 	CavalryLight = 2,
 	Spear = 3,
@@ -149,7 +150,7 @@ enum shok_EntityCategory : int {
 	TargetFilter_TargetTypeLeader = 101,
 };
 
-enum TechState : int {
+enum class shok_TechState : int {
 	Forbidden = 0,
 	Waiting = 1,
 	Allowed = 2,
@@ -158,7 +159,7 @@ enum TechState : int {
 	Future = 5,
 };
 
-enum shok_ResourceType : int {
+enum class shok_ResourceType : int {
 	Gold = 1,
 	GoldRaw = 2,
 	Silver = 3,

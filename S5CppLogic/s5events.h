@@ -60,13 +60,13 @@ struct shok_event_data_EGL_CEventGetValue_float_1468983543 : shok_event_data {
 struct shok_event_data_GGL_CEventAttachmentTypeGetInteger : shok_event_data {
 	int vtable = 0x766C80;
 	int id = 0;
-	int AttachmentType = 0;
+	shok_AttachmentType AttachmentType = static_cast<shok_AttachmentType>(0);
 	int i = 0;
 };
 struct shok_event_data_GGL_CEventTransaction : shok_event_data {
 	int vtable = 0x76D93C;
 	int id = 0x1700A;
-	int SellType = 0, BuyType = 0;
+	shok_ResourceType SellType = static_cast<shok_ResourceType>(0), BuyType = static_cast<shok_ResourceType>(0);
 	float BuyAmount = 0.0f;
 };
 

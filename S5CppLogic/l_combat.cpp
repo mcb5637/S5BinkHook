@@ -8,7 +8,7 @@ int l_combat_dealDamage(lua_State* L) {
 	shok_EGL_CGLEEntity* targ = luaext_checkEntity(L, 1);
 	int dmg = luaL_checkint(L, 2);
 	shok_EGL_CGLEEntity* att = luaext_optEntity(L, 3);
-	shok_entityHurtEntity(att, targ, dmg);
+	shok_EGL_CGLEEntity::EntityHurtEntity(att, targ, dmg);
 	return 0;
 }
 
@@ -21,7 +21,7 @@ int l_combat_dealAOEDamage(lua_State* L) {
 	int dmg = luaL_checkint(L, 5);
 	int player = luaL_optint(L, 6, 0);
 	int dmgclass = luaL_optint(L, 7, 0);
-	shok_entityDealAOEDamage(source, &pos, range, dmg, player, dmgclass);
+	shok_EGL_CGLEEntity::EntityDealAoEDamage(source, &pos, range, dmg, player, dmgclass);
 	return 0;
 }
 
@@ -30,7 +30,7 @@ void l_combatHookCreateEffect(int effectId, void* retAdr) { // todo hook correct
 		shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(effectId);
 		if (ef->IsCannonBallEffect()) {
 			shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
-			shok_EGL_CGLEEntity* e = shok_eid2obj(cbeff->AttackerID);
+			shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(cbeff->AttackerID);
 			cbeff->SourcePlayer = e->PlayerId;
 			shok_GGlue_CGlueEntityProps* t = e->GetEntityType();
 			shok_GGL_CBattleBehaviorProps* b = t->GetBattleBehaviorProps();
@@ -73,7 +73,7 @@ void l_combat_FlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff, bool post) 
 		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
 }
 void l_combat_ActivateCamo(shok_GGL_CCamouflageBehavior* th) {
-	shok_EGL_CGLEEntity* e = shok_eid2obj(th->EntityId);
+	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
 	if (e)
 		e->ClearAttackers();
 }

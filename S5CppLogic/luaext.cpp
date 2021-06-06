@@ -29,14 +29,14 @@ shok_EGL_CGLEEntity* luaext_optEntity(lua_State* L, int ind)
 {
 	int id = 0;
 	if (lua_type(L, ind) == LUA_TSTRING) {
-		id = shok_getEntityIdByScriptName(lua_tostring(L, ind));
+		id = shok_EGL_CGLEEntity::GetEntityIDByScriptName(lua_tostring(L, ind));
 	}
 	else if (lua_type(L, ind) == LUA_TNUMBER) {
 		id = (int)lua_tonumber(L, ind);
 	}
 	if (id == 0)
 		return nullptr;
-	return shok_eid2obj(id);
+	return shok_EGL_CGLEEntity::GetEntityByID(id);
 }
 
 int luaext_optEntityId(lua_State* L, int ind) {
@@ -250,7 +250,7 @@ void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZ
 
 void luaext_assertEntityAlive(lua_State* L, int id, const char* msg)
 {
-	if (shok_entityIsDead(id))
+	if (shok_EGL_CGLEEntity::EntityIDIsDead(id))
 		luaL_error(L, msg);
 }
 

@@ -993,7 +993,7 @@ int l_settlerSerfRepair(lua_State* L) {
 
 int l_entityReplaceWithResourceEntity(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	e = ReplaceEntityWithResourceEntity(e);
+	e = shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(e);
 	if (e)
 		lua_pushnumber(L, e->EntityId);
 	else
@@ -1006,7 +1006,7 @@ int l_settlerSerfExtract(lua_State* L) {
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 2);
 	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
 	if (!b->IsResourceDoodad())
-		b = ReplaceEntityWithResourceEntity(b);
+		b = shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(b);
 	if (b == nullptr || !b->IsResourceDoodad()) {
 		return luaL_error(L, "no resource entity");
 	}
@@ -1040,7 +1040,7 @@ int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
 	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
 	int i = 0;
 	b->ObserverEntities.ForAll([L, &i](shok_attachment* a) {
-		if (a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS && !shok_eid2obj(a->EntityId)->GetSoldierBehavior()) {
+		if (a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS && !shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->GetSoldierBehavior()) {
 			lua_pushnumber(L, a->EntityId);
 			i++;
 		}
@@ -1827,7 +1827,7 @@ EntityIteratorPredicateOfUpgradeCategory::EntityIteratorPredicateOfUpgradeCatego
 
 bool EntityIteratorPredicateIsAlive::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	return !shok_entityIsDead(e->EntityId); // performance improvement by not doing obj -> id ->obj ?
+	return !shok_EGL_CGLEEntity::EntityIDIsDead(e->EntityId); // performance improvement by not doing obj -> id ->obj ?
 }
 
 bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)

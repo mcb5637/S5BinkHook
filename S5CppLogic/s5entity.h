@@ -161,6 +161,16 @@ public:
 	static std::map<int, entityAddonData> AddonDataMap;
 	static entityAddonData LastRemovedEntityAddonData;
 
+	static inline shok_EGL_CGLEEntity* (__stdcall* const GetEntityByID)(int id) = reinterpret_cast<shok_EGL_CGLEEntity * (__stdcall*)(int)>(0x5825B4);
+	static inline void(__cdecl* const EntityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage) = reinterpret_cast<void(__cdecl*)(shok_EGL_CGLEEntity*, shok_EGL_CGLEEntity*, int)>(0x49F358);
+	static inline void(__cdecl* const EntityDealAoEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = reinterpret_cast<void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int)>(0x49F82A);
+	static inline int(__cdecl* const GetEntityIDByScriptName)(const char* str) = reinterpret_cast<int(__cdecl*)(const char* str)>(0x576624);
+	static inline int(__cdecl* const EntityIDGetProvidedResource)(int id) = reinterpret_cast<int(__cdecl*)(int id)>(0x4B8489);
+	static inline bool(__cdecl* const EntityIDIsDead)(int id) = reinterpret_cast<bool(__cdecl*)(int)>(0x44B096);
+	static inline int(__cdecl* const EntityIDChangePlayer)(int entityid, int player) = reinterpret_cast<int(__cdecl*)(int, int)>(0x49A6A7);
+
+	static shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e);
+
 protected:
 	int EventGetIntById(int id);
 };
@@ -213,90 +223,52 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 };
 
 struct shok_GGL_CEvadingEntity : shok_EGL_CMovingEntity {
-	int EvaderWaitObject[4];
+	PADDINGI(4);
 
 	static inline constexpr int vtp = 0x770A7C;
 };
 
 struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
 	int TimeToWait, HeadIndex, HeadParams; // la77
-private:
-	int u2[7];
-public:
+	PADDINGI(7);
 	float ExperiencePoints; // 85
 	int ExperienceLevel;
-private:
-	int u3[2];
-public:
+	PADDINGI(2);
 	float MovingSpeed; //89
-private:
-	int u4;
-public:
+	PADDINGI(1);
 	float Damage;
-private:
-	int u5;
-public:
+	PADDINGI(1);
 	float Dodge;
-private:
-	int u6;
-public:
+	PADDINGI(1);
 	float Motivation;
-private:
-	int u7;
-public:
+	PADDINGI(1);
 	float Armor;
-private:
-	int u8;
-public:
+	PADDINGI(1);
 	float CurrentAmountSoldiers;
-private:
-	int u9;
-public:
+	PADDINGI(1);
 	float MaxAmountSoldiers;
-private:
-	int u10;
-public:
+	PADDINGI(1);
 	float DamageBonus;
-private:
-	int u11;
-public:
+	PADDINGI(1);
 	float ExplorationCache;
-private:
-	int u12;
-public:
+	PADDINGI(1);
 	float MaxAttackRange;
-private:
-	int u13;
-public:
+	PADDINGI(1);
 	float AutoAttackRange;
-private:
-	int u14;
-public:
+	PADDINGI(1);
 	float HealingPoints;
-private:
-	int u15;
-public:
+	PADDINGI(1);
 	float MissChance;
-private:
-	int u16;
-public:
+	PADDINGI(1);
 	float Healthbar; // 115
-private:
-	int u17[7];
-public:
+	PADDINGI(7);
 	float SomeIntRegardingTaskLists; // 123
-private:
-	int u18[3];
-public:
+	PADDINGI(3);
 	int LeaderId;
-private:
-	int u19[2];
-public:
+	PADDINGI(2);
 	int OverheadWidget;
 	int ExperienceClass;
-private:
-	int u20[2];
-public:
+	PADDINGI(2);
 	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
 
 	static inline constexpr int vtp = 0x76E3CC;
@@ -326,14 +298,10 @@ struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
 struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	shok_position ApproachPosition, LeavePosition; // fi 66
 	byte IsActive, IsRegistered, IsUpgrading, IsOvertimeActive, HQAlarmActive;
-private:
-	byte u[3];
-public:
+	PADDING(3);
 	int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn;
 	float BuildingHeight, Helathbar, UpgradeProgress; //la78
-private:
-	int u2[2]; // list Slots with NumberOfRepairingSerfs?
-public:
+	PADDINGI(2);// list Slots with NumberOfRepairingSerfs?
 	int NumberOfRepairingSerfs;
 	int OvertimeCooldown;
 	int ConstructionSiteType; // 83
@@ -372,9 +340,7 @@ struct shok_GGL_CBridgeEntity : shok_GGL_CBuilding {
 };
 
 struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int AmbientSoundType;
 
 	static inline constexpr int vtp = 0x78568C;
@@ -386,32 +352,29 @@ struct shok_EGL_CGLEEntityCreator : shok_object {
 	int Flags = 0; // 5
 	int PlayerId = 0;
 	int Health = 0; // 7
-	char* ScriptName = nullptr;
-	char* ScriptCommandLine = nullptr;
+	char* ScriptName = nullptr; // use shok_malloc, gets freed by destructor
+	char* ScriptCommandLine = nullptr; // use shok_malloc, gets freed by destructor
 	int AmbientSoundType = 0;
 	float Scale = 0; // 11
+
+	static inline constexpr int vtp = 0x766B50;
 	
 	shok_EGL_CGLEEntityCreator();
-	shok_EGL_CGLEEntityCreator(bool _);
 	~shok_EGL_CGLEEntityCreator();
+protected:
+	shok_EGL_CGLEEntityCreator(int _);
 };
 struct shok_GGL_CGLConstructionSiteCreator : shok_EGL_CGLEEntityCreator {
+	int BuildingType = 0; // set EntityType to construction site type (from building props) and BuildingType to the building youactually want to construct
 
+	static inline constexpr int vtp = 0x770114;
 
 	shok_GGL_CGLConstructionSiteCreator();
 };
 struct shok_GGL_CResourceDoodadCreator : shok_EGL_CGLEEntityCreator {
 	int ResourceAmount = 0;
 
+	static inline constexpr int vtp = 0x774898;
+
 	shok_GGL_CResourceDoodadCreator();
 };
-
-static inline shok_EGL_CGLEEntity* (__stdcall* const shok_eid2obj)(int id) = (shok_EGL_CGLEEntity * (__stdcall*)(int)) 0x5825B4;
-static inline void(__cdecl* const shok_entityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_EGL_CGLEEntity*, int)) 0x49F358;
-static inline void(__cdecl* const shok_entityDealAOEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = (void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int))0x49F82A;
-static inline int(__cdecl* const shok_getEntityIdByScriptName)(const char* str) = (int(__cdecl*)(const char* str)) 0x576624;
-static inline int(__cdecl* const shok_EntityGetProvidedResourceByID)(int id) = (int(__cdecl*)(int id)) 0x4B8489;
-static inline bool(__cdecl* const shok_entityIsDead)(int id) = (bool(__cdecl*)(int)) 0x44B096;
-static inline int(__cdecl* const shok_entityChangePlayer)(int entityid, int player) = (int(__cdecl*)(int, int)) 0x49A6A7;
-
-shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e);

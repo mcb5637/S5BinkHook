@@ -156,36 +156,6 @@ bool DoesFileExist(const char* name)
 	return r;
 }
 
-shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
-{
-	shok_EGL_CGLEEntityProps* ty = e->GetEntityType()->LogicProps;
-	if (ty->vtable != shok_GGL_CEntityProperties::vtp)
-		return nullptr;
-	shok_GGL_CEntityProperties* t = (shok_GGL_CEntityProperties*)ty;
-	shok_GGL_CResourceDoodadCreator c = shok_GGL_CResourceDoodadCreator();
-	c.EntityType = t->ResourceEntity;
-	c.PlayerId = e->PlayerId;
-	c.Pos = e->Position;
-	c.ResourceAmount = t->ResourceAmount;
-	c.Scale = e->Scale;
-	if (e->ScriptName) {
-		size_t len = strlen(e->ScriptName) + 1;
-		c.ScriptName = (char*)shok_malloc(sizeof(char) * len);
-		strcpy_s(c.ScriptName, len, e->ScriptName);
-	}
-	else {
-		c.ScriptName = nullptr;
-	}
-	int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
-	shok_EGL_CGLEEntity* r = shok_eid2obj(id);
-	shok_event_data_EGL_CEventValue_int_27574121 ev = shok_event_data_EGL_CEventValue_int_27574121();
-	ev.id = 0x1000C;
-	ev.i = e->EntityType;
-	((shok_vtable_EGL_CGLEEntity*)r->vtable)->FireEvent(r, &ev);
-	e->Destroy();
-	return r;
-}
-
 static inline float(__thiscall* const costinfo_getres)(shok_costInfo* th, shok_ResourceType ty, bool addRaw) = (float(__thiscall*)(shok_costInfo*, shok_ResourceType, bool))0x4A9606;
 float shok_costInfo::GetResourceAmountFromType(shok_ResourceType ty, bool addRaw)
 {

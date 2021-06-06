@@ -43,7 +43,7 @@ typedef uint8_t byte;
 // string render 0x557E58 to 0x557DAA jmp, string render getlen 0x708F60 jmp
 // 
 // only without SCELoader
-// shok_entityHurtEntity 0x49F358 jmp patched
+// shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched
 // entity get max hp 0x57B798 jmp, settler overhead hp bar 0x4BDED8 jmp, createentity 0x571B93 jmp set hp
 // create entity 0x571B93 jmp to fix max hp
 // 0x4BDED8 ui settler overhead hp bar maxhp jmp

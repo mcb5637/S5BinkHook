@@ -34,7 +34,7 @@ void UnlimitedArmy::CalculatePos()
 			}
 		if (con)
 			continue;
-		shok_EGL_CGLEEntity* e = shok_eid2obj(id);
+		shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
 		if (e != nullptr) {
 			x += e->Position.X;
 			y += e->Position.Y;
@@ -54,8 +54,8 @@ void UnlimitedArmy::CalculatePos()
 void UnlimitedArmy::CleanDead()
 {
 	auto remo = [this](int id) {
-		if (shok_entityIsDead(id)) {
-			shok_EGL_CGLEEntity* e = shok_eid2obj(id);
+		if (shok_EGL_CGLEEntity::EntityIDIsDead(id)) {
+			shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
 			if (e != nullptr && e->IsEntityInCategory(shok_EntityCategory::Hero)) {
 				this->DeadHeroes.push_back(id);
 			}
@@ -68,14 +68,14 @@ void UnlimitedArmy::CleanDead()
 	Leaders.erase(e, Leaders.end());
 	e = std::remove_if(LeaderInTransit.begin(), LeaderInTransit.end(), remo);
 	LeaderInTransit.erase(e, LeaderInTransit.end());
-	auto e2 = std::remove_if(Cannons.begin(), Cannons.end(), [](UACannonData& d) { return shok_entityIsDead(d.EntityId); });
+	auto e2 = std::remove_if(Cannons.begin(), Cannons.end(), [](UACannonData& d) { return shok_EGL_CGLEEntity::EntityIDIsDead(d.EntityId); });
 	Cannons.erase(e2, Cannons.end());
 	e = std::remove_if(DeadHeroes.begin(), DeadHeroes.end(), [this](int id) {
-		if (!shok_entityIsDead(id)) {
-			this->AddLeader(shok_eid2obj(id));
+		if (!shok_EGL_CGLEEntity::EntityIDIsDead(id)) {
+			this->AddLeader(shok_EGL_CGLEEntity::GetEntityByID(id));
 			return true;
 		}
-		return shok_eid2obj(id) == nullptr;
+		return shok_EGL_CGLEEntity::GetEntityByID(id) == nullptr;
 		});
 	DeadHeroes.erase(e, DeadHeroes.end());
 	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
@@ -178,7 +178,7 @@ void UnlimitedArmy::CheckTransit()
 {
 	if (Leaders.size() == 0 && LeaderInTransit.size() > 0) {
 		Leaders.push_back(LeaderInTransit[1]);
-		if (shok_eid2obj(LeaderInTransit[1])->IsEntityInCategory(shok_EntityCategory::Cannon))
+		if (shok_EGL_CGLEEntity::GetEntityByID(LeaderInTransit[1])->IsEntityInCategory(shok_EntityCategory::Cannon))
 			Cannons.push_back({ LeaderInTransit[1], -1 });
 		LeaderInTransit.erase(LeaderInTransit.begin());
 		PosLastUpdatedTick = -1;
@@ -186,7 +186,7 @@ void UnlimitedArmy::CheckTransit()
 		NeedFormat();
 	}
 	auto e = std::remove_if(LeaderInTransit.begin(), LeaderInTransit.end(), [this](int id) {
-		shok_EGL_CGLEEntity* e = shok_eid2obj(id);
+		shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
 		if (this->LastPos.IsInRange(e->Position, this->Area)) {
 			this->Leaders.push_back(id);
 			if (e->IsEntityInCategory(shok_EntityCategory::Cannon))
@@ -198,7 +198,7 @@ void UnlimitedArmy::CheckTransit()
 	});
 	LeaderInTransit.erase(e, LeaderInTransit.end());
 	for (int id : LeaderInTransit) {
-		shok_EGL_CMovingEntity* e = ((shok_EGL_CMovingEntity*)shok_eid2obj(id));
+		shok_EGL_CMovingEntity* e = ((shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(id));
 		if (!LeaderIsMoving(e)) {
 			e->Move(LastPos);
 		}
@@ -348,9 +348,9 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSnipeTargetInArea(int player, shok
 }
 bool UnlimitedArmy::IsTargetValid(int id)
 {
-	if (shok_entityIsDead(id))
+	if (shok_EGL_CGLEEntity::EntityIDIsDead(id))
 		return false;
-	shok_EGL_CGLEEntity* e = shok_eid2obj(id);
+	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
 	if (!LastPos.IsInRange(e->Position, Area))
 		return false;
 	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
@@ -392,13 +392,13 @@ bool UnlimitedArmy::IsNonCombat(shok_EGL_CGLEEntity* e)
 }
 void UnlimitedArmy::BattleCommand()
 {
-	shok_position p = shok_eid2obj(CurrentBattleTarget)->Position;
+	shok_position p = shok_EGL_CGLEEntity::GetEntityByID(CurrentBattleTarget)->Position;
 	if (ReMove) {
 		PrepDefenseReset.clear();
 		NormalizeSpeed(false, false);
 	}
 	for (int id : Leaders) {
-		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*) shok_eid2obj(id);
+		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*) shok_EGL_CGLEEntity::GetEntityByID(id);
 		if (e->IsEntityInCategory(shok_EntityCategory::Hero) || IsNonCombat(e)) {
 			if (ExecuteHeroAbility(e))
 				continue;
@@ -414,7 +414,7 @@ void UnlimitedArmy::BattleCommand()
 	}
 	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
 	for (UACannonData cd : Cannons) {
-		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(cd.EntityId);
+		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(cd.EntityId);
 		if (ReMove || !LeaderIsInBattle(e) || cd.LastUpdated == -1) {
 			if (cd.LastUpdated < 0 || cd.LastUpdated < tick) {
 				e->AttackEntity(CurrentBattleTarget);
@@ -436,7 +436,7 @@ void UnlimitedArmy::MoveCommand()
 	}
 	if (Status == UAStatus::MovingNoBattle) {
 		for (int id : Leaders) {
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(id);
+			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(id);
 			if (ReMove || !LeaderIsMoving(e)) {
 				e->Move(Target);
 			}
@@ -444,7 +444,7 @@ void UnlimitedArmy::MoveCommand()
 	}
 	else {
 		for (int id : Leaders) {
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(id);
+			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(id);
 			if (ReMove || LeaderIsIdle(e)) {
 				e->AttackMove(Target);
 			}
@@ -461,7 +461,7 @@ void UnlimitedArmy::FormationCommand()
 	}
 	else if (PrepDefense && IsIdle()) {
 		for (int id : Leaders) {
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(id);
+			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(id);
 			if ((e->IsEntityInCategory(shok_EntityCategory::Hero) || IsNonCombat(e)) && e->EventLeaderGetCurrentCommand() != shok_LeaderCommand::HeroAbility) {
 				if (ExecutePrepDefense(e)) {
 					UAReset r;
@@ -472,9 +472,9 @@ void UnlimitedArmy::FormationCommand()
 			}
 		}
 		PrepDefenseReset.erase(std::remove_if(PrepDefenseReset.begin(), PrepDefenseReset.end(), [this](UAReset& r) {
-			if (shok_entityIsDead(r.EntityId))
+			if (shok_EGL_CGLEEntity::EntityIDIsDead(r.EntityId))
 				return true;
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_eid2obj(r.EntityId);
+			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(r.EntityId);
 			if (e->EventLeaderGetCurrentCommand() != shok_LeaderCommand::HeroAbility) {
 				shok_EGL_CMovingEntity* m = (shok_EGL_CMovingEntity*)e;
 				m->Move(r.Pos);
@@ -509,7 +509,7 @@ bool UnlimitedArmy::IsIdle()
 	if (!LastPos.IsInRange(Target, 1000))
 		return false;
 	for (int id : Leaders)
-		if (!LeaderIsIdle(shok_eid2obj(id)))
+		if (!LeaderIsIdle(shok_EGL_CGLEEntity::GetEntityByID(id)))
 			return false;
 	return true;
 }
@@ -613,7 +613,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 					((shok_GGL_CSettler*)e)->HeroAbilitySummon();
 					e->ObservedEntities.ForAll([this](shok_attachment* a) {
 						if (a->AttachmentType == shok_AttachmentType::SUMMONER_SUMMONED)
-							AddLeader(shok_eid2obj(a->EntityId));
+							AddLeader(shok_EGL_CGLEEntity::GetEntityByID(a->EntityId));
 						});
 				}
 			}
@@ -984,7 +984,7 @@ int l_uam_ReadTable(lua_State* L) {
 		}
 		int id = luaL_checkint(L, -1);
 		a->Leaders.emplace_back(id);
-		if (shok_eid2obj(id)->IsEntityInCategory(shok_EntityCategory::Cannon))
+		if (shok_EGL_CGLEEntity::GetEntityByID(id)->IsEntityInCategory(shok_EntityCategory::Cannon))
 			a->Cannons.push_back({ id, -1 });
 		lua_pop(L, 1);
 		i++;
@@ -1104,7 +1104,7 @@ int l_uam_GetRangedMelee(lua_State* L) {
 	int ran = 1, mel = 1, nc = 1;
 	for (int id : a->Leaders) {
 		lua_pushnumber(L, id);
-		shok_EGL_CGLEEntity* e = shok_eid2obj(id);
+		shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
 		if (a->IsRanged(e)) {
 			lua_rawseti(L, -4, ran);
 			ran++;

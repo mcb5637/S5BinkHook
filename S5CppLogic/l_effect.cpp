@@ -38,16 +38,16 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.SourcePlayer = player;
 	int dmgclass = luaL_optint(L, 11, 0);
 	data.DamageClass = dmgclass;
-	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogicObject;
+	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogic::GlobalObj;
 	int id = gl->CreateEffect(&data);
-	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(id);
+	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManager::GlobalObj)->GetEffectById(id);
 	if (!shok_GGL_CCannonBallEffect::FixDamageClass && ef->IsCannonBallEffect()) {
 		shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
 		cbeff->DamageClass = dmgclass;
 	}
 	if (lua_isfunction(L, 12)) {
 		shok_EGL_CFlyingEffect::HookOnHit();
-		FlyingEffectOnHitCallback = &l_effectFlyingEffectOnHitCallback;
+		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback = &l_effectFlyingEffectOnHitCallback;
 		lua_pushlightuserdata(L, &l_effect_init);
 		lua_rawget(L, LUA_REGISTRYINDEX);
 		lua_pushvalue(L, 12);
@@ -59,7 +59,7 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 
 int l_effect_isValid(lua_State* L) {
 	int id = luaL_checkint(L, 1);
-	bool r = (*shok_EGL_CGLEEffectManagerObject)->IsEffectValid(id);
+	bool r = (*shok_EGL_CGLEEffectManager::GlobalObj)->IsEffectValid(id);
 	lua_pushboolean(L, r);
 	return 1;
 }
@@ -82,7 +82,7 @@ void l_effect_init(lua_State* L)
 }
 
 void l_effect_cleanup(lua_State* L) {
-	FlyingEffectOnHitCallback = nullptr;
+	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback = nullptr;
 }
 
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-10000, y, x, y, 500, 1000, 0, 0, 1, 0, LuaDebugger.Log)

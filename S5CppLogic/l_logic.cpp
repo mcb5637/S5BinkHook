@@ -6,36 +6,36 @@
 
 int l_logicGetDamageModifier(lua_State* L) {
 	int dmgclass = luaL_checkint(L, 1);
-	int size = (int)(*shok_DamageClassHolderObj)->DamageClassList.size();
+	int size = (int)(*shok_damageClassHolder::GlobalObj)->DamageClassList.size();
 	luaext_assert(L, dmgclass > 0 && dmgclass < size, "invalid damagecass");
 	int amclass = luaL_checkint(L, 2);
 	amclass--;
 	luaext_assert(L, amclass >= 0 && amclass < 7, "invalid armorclass");
 	assert(amclass >= 0 && amclass < 7);
-	lua_pushnumber(L, (*shok_DamageClassHolderObj)->DamageClassList[dmgclass]->BonusVsArmorClass[amclass]);
+	lua_pushnumber(L, (*shok_damageClassHolder::GlobalObj)->DamageClassList[dmgclass]->BonusVsArmorClass[amclass]);
 	return 1;
 }
 int l_logicSetDamageModifier(lua_State* L) {
 	int dmgclass = luaL_checkint(L, 1);
-	int size = (int)(*shok_DamageClassHolderObj)->DamageClassList.size();
+	int size = (int)(*shok_damageClassHolder::GlobalObj)->DamageClassList.size();
 	luaext_assert(L, dmgclass > 0 && dmgclass < size, "invalid damagecass");
 	int amclass = luaL_checkint(L, 2);
 	amclass--;
 	luaext_assert(L, amclass >= 0 && amclass < 7, "invalid armorclass");
 	assert(amclass >= 0 && amclass < 7);
-	(*shok_DamageClassHolderObj)->DamageClassList[dmgclass]->BonusVsArmorClass[amclass] = luaL_checkfloat(L, 2);
+	(*shok_damageClassHolder::GlobalObj)->DamageClassList[dmgclass]->BonusVsArmorClass[amclass] = luaL_checkfloat(L, 2);
 	return 0;
 }
 
 int l_logicReloadCutscene(lua_State* L) {
 	const char* data = luaL_optlstring(L, 1, "Maps\\ExternalMap", nullptr);
-	(**shok_ECS_CManagerObject)->ReloadCutscene(data);
+	(**shok_ECS_CManager::GlobalObj)->ReloadCutscene(data);
 	return 0;
 }
 
 int l_logicGetAnimIdFromName(lua_State* L) {
 	const char* data = luaL_checkstring(L, 1);
-	int id = (*shok_BB_CIDManagerExObj)->GetAnimIdByName(data);
+	int id = (*shok_BB_CIDManagerEx::AnimManager)->GetAnimIdByName(data);
 	lua_pushnumber(L, id);
 	return 1;
 }
@@ -43,7 +43,7 @@ int l_logicGetAnimIdFromName(lua_State* L) {
 int l_playerGetPaydayStatus(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	if (p->PlayerAttractionHandler->PaydayActive)
 		lua_pushnumber(L, p->PlayerAttractionHandler->PaydayFirstOccuraceGameTurn);
 	else
@@ -54,7 +54,7 @@ int l_playerSetPaydayStatus(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int st = luaL_checkint(L, 2);
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	if (st < 0) {
 		p->PlayerAttractionHandler->PaydayActive = 0;
 	}
@@ -649,7 +649,7 @@ int l_netEventSetHook(lua_State* L) {
 	lua_pushlightuserdata(L, &l_netEventSetHook);
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
-	PostEventCallback = [](shok_BB_CEvent* ev) {
+	shok_GGUI_CManager::PostEventCallback = [](shok_BB_CEvent* ev) {
 		int id = ev->EventTypeId;
 		lua_State* L = *shok_luastate_game;
 		int top = lua_gettop(L);
@@ -669,11 +669,11 @@ int l_netEventSetHook(lua_State* L) {
 		lua_settop(L, top);
 		return r;
 	};
-	shok_GetGuiManager()->HackPostEvent();
+	shok_GGUI_CManager::GlobalObj()->HackPostEvent();
 	return 0;
 }
 int l_netEventUnSetHook(lua_State* L) {
-	PostEventCallback = nullptr;
+	shok_GGUI_CManager::PostEventCallback = nullptr;
 	return 0;
 }
 
@@ -681,7 +681,7 @@ int l_netEventUnSetHook(lua_State* L) {
 int l_playerGetKillStatistics(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	lua_pushnumber(L, p->Statistics.NumberOfUnitsKilled);
 	lua_pushnumber(L, p->Statistics.NumberOfUnitsDied);
 	lua_pushnumber(L, p->Statistics.NumberOfBuildingsDestroyed);
@@ -691,7 +691,7 @@ int l_playerGetKillStatistics(lua_State* L) {
 
 int l_logicCanPLaceBuildingAt(lua_State* L) {
 	int ty = luaL_checkint(L, 1);
-	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(ty);
+	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ty);
 	luaext_assertPointer(L, ety, "no entitytype");
 	luaext_assert(L, ety->IsBuildingType(), "not a building");
 	int pl = luaL_checkint(L, 2);
@@ -707,18 +707,18 @@ int l_logicCanPLaceBuildingAt(lua_State* L) {
 int l_logicPlayerActivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	luaext_assert(L, !p->WorkerAlarmMode, "alarm active");
 	luaext_assert(L, p->AlarmRechargeTime <= 0, "alarm cooldown");
-	(*shok_GGL_CGLGameLogicObj)->EnableAlarmForPlayer(i);
+	(*shok_GGL_CGLGameLogic::GlobalObj)->EnableAlarmForPlayer(i);
 	return 0;
 }
 int l_logicPlayerDeactivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	luaext_assert(L, p->WorkerAlarmMode, "alarm not active");
-	(*shok_GGL_CGLGameLogicObj)->DisableAlarmForPlayer(i);
+	(*shok_GGL_CGLGameLogic::GlobalObj)->DisableAlarmForPlayer(i);
 	return 0;
 }
 
@@ -726,9 +726,9 @@ int l_logicPlayerUpgradeSettlerCategory(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int ucat = luaL_checkint(L, 2);
-	shok_GGL_CUpgradeManager_UCatEntry* u = (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](shok_GGL_CUpgradeManager_UCatEntry* u) {return u->UCat == ucat; });
+	shok_GGL_CUpgradeManager_UCatEntry* u = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](shok_GGL_CUpgradeManager_UCatEntry* u) {return u->UCat == ucat; });
 	luaext_assertPointer(L, u, "invalid ucat");
-	(*shok_GGL_CGLGameLogicObj)->UpgradeSettlerCategory(i, ucat);
+	(*shok_GGL_CGLGameLogic::GlobalObj)->UpgradeSettlerCategory(i, ucat);
 	return 0;
 }
 
@@ -737,7 +737,7 @@ int l_logicPlayerSetTaxLevel(lua_State* L) {
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int tl = luaL_checkint(L, 2);
 	luaext_assert(L, tl >= 0 && tl < 5, "invalid taxlevel");
-	(*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->TaxLevel = tl;
+	(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->TaxLevel = tl;
 	return 0;
 }
 
@@ -746,9 +746,9 @@ int l_logicPlayerActivateWeatherMachine(lua_State* L) {
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int w = luaL_checkint(L, 2);
 	luaext_assert(L, w > 0 && w < 4, "invalid weathertype");
-	luaext_assert(L, !(*shok_GGL_CGLGameLogicObj)->WeatherHandler->WeatherChangeActive, "weather currently changing");
-	luaext_assert(L, (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->CurrentResources.WeatherEnergy >= (*shok_GGL_CLogicPropertiesObj)->EnergyRequiredForWeatherChange, "not enough weather energy");
-	(*shok_GGL_CGLGameLogicObj)->PlayerActivateWeathermachine(i, w);
+	luaext_assert(L, !(*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChangeActive, "weather currently changing");
+	luaext_assert(L, (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.WeatherEnergy >= (*shok_GGL_CLogicProperties::GlobalObj)->EnergyRequiredForWeatherChange, "not enough weather energy");
+	(*shok_GGL_CGLGameLogic::GlobalObj)->PlayerActivateWeathermachine(i, w);
 	return 0;
 }
 
@@ -757,22 +757,22 @@ int l_logicPlayerBlessSettlers(lua_State* L) {
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int b = luaL_checkint(L, 2);
 	float faithneeded = -1;
-	for (shok_GGL_CLogicProperties_SBlessCategory& bcat : (*shok_GGL_CLogicPropertiesObj)->BlessCategories) {
+	for (shok_GGL_CLogicProperties_SBlessCategory& bcat : (*shok_GGL_CLogicProperties::GlobalObj)->BlessCategories) {
 		if (bcat.Name == b) {
 			faithneeded = bcat.RequiredFaith;
 			break;
 		}
 	}
 	luaext_assert(L, faithneeded >= 0, "invalid blesscategory");
-	luaext_assert(L, (*shok_GGL_CGLGameLogicObj)->GetPlayer(i)->CurrentResources.Faith >= faithneeded, "not enough faith");
-	(*shok_GGL_CGLGameLogicObj)->PlayerBlessSettlers(i, b);
+	luaext_assert(L, (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.Faith >= faithneeded, "not enough faith");
+	(*shok_GGL_CGLGameLogic::GlobalObj)->PlayerBlessSettlers(i, b);
 	return 0;
 }
 
 int l_logicLandscapeGetSector(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->GetSector(&p));
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p));
 	return 1;
 }
 
@@ -782,7 +782,7 @@ int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
 	int s = luaL_checkint(L, 2);
 	float r = luaL_checkfloat(L, 3);
 	shok_position po;
-	if ((*shok_EGL_CGLEGameLogicObject)->Landscape->GetNearestPositionInSector(&p, r, s, &po))
+	if ((*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetNearestPositionInSector(&p, r, s, &po))
 		luaext_pushPos(L, po);
 	else
 		lua_pushnil(L);
@@ -814,7 +814,7 @@ int l_logicHurtEntitySetDamage(lua_State* L) {
 int l_logicGetLoadOrder(lua_State* L) {
 	lua_newtable(L);
 	int r = 1;
-	for (shok_BB_IFileSystem* a : (*shok_BB_CFileSystemMgrObj)->LoadOrder) {
+	for (shok_BB_IFileSystem* a : (*shok_BB_CFileSystemMgr::GlobalObj)->LoadOrder) {
 		if (a->vtable == shok_BB_CDirectoryFileSystem::vtp) {
 			lua_pushstring(L, ((shok_BB_CDirectoryFileSystem*)a)->Path);
 			lua_rawseti(L, -2, r);
@@ -832,23 +832,23 @@ int l_logicGetLoadOrder(lua_State* L) {
 int l_logicAddArchive(lua_State* L) {
 	const char* s = luaL_checkstring(L, 1);
 	luaext_assert(L, std::filesystem::exists(s), "file doesnt exist");
-	(*shok_BB_CFileSystemMgrObj)->AddArchive(s);
+	(*shok_BB_CFileSystemMgr::GlobalObj)->AddArchive(s);
 	return 0;
 }
 
 int l_logicRemoveTop(lua_State* L) {
-	if ((*shok_BB_CFileSystemMgrObj)->LoadOrder.size() <= 0)
+	if ((*shok_BB_CFileSystemMgr::GlobalObj)->LoadOrder.size() <= 0)
 		return 0;
-	shok_BB_IFileSystem* a = (*shok_BB_CFileSystemMgrObj)->LoadOrder[0];
+	shok_BB_IFileSystem* a = (*shok_BB_CFileSystemMgr::GlobalObj)->LoadOrder[0];
 	luaext_assert(L, a->vtable == shok_BB_CBBArchiveFile::vtp, "may only remove archives");
 	luaext_assert(L, str_ends_with(((shok_BB_CBBArchiveFile*)a)->Path, ".s5x"), "may only remove maps");
-	(*shok_BB_CFileSystemMgrObj)->RemoveTopArchive();
+	(*shok_BB_CFileSystemMgr::GlobalObj)->RemoveTopArchive();
 	return 0;
 }
 
 int l_logicAddFolder(lua_State* L) { // works, but adds to the bottom
 	const char* s = luaL_checkstring(L, 1);
-	(*shok_BB_CFileSystemMgrObj)->AddFolder(s);
+	(*shok_BB_CFileSystemMgr::GlobalObj)->AddFolder(s);
 	return 0;
 }
 
@@ -863,43 +863,43 @@ int l_logicEnableMaxHpTechMod(lua_State* L) {
 int l_logicLandscapeGetTerrainType(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetTerrainTypeAt(p));
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetTerrainTypeAt(p));
 	return 1;
 }
 int l_logicLandscapeGetWaterType(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetWaterTypeAt(p));
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterTypeAt(p));
 	return 1;
 }
 int l_logicLandscapeGetWaterHeight(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->LowRes->GetWaterHeightAt(p));
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterHeightAt(p));
 	return 1;
 }
 int l_logicLandscapeGetTerrainHeight(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->HiRes->GetTerrainHeight(p));
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(p));
 	return 1;
 }
 int l_logicLandscapeGetTerrainVertexColor(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->VertexColors->GetTerrainVertexColor(p));
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->VertexColors->GetTerrainVertexColor(p));
 	return 1;
 }
 int l_logicLandscapeGetBlocking(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_ED_CGlobalsLogicExObj)->GetBlocking(p));
+	lua_pushnumber(L, (*shok_ED_CGlobalsLogicEx::GlobalObj)->GetBlocking(p));
 	return 1;
 }
 
 int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
 	int i = luaL_checkint(L, 1);
-	int c = (*shok_ED_CGlobalsBaseExObj)->PlayerColors->GetColorByIndex(i);
+	int c = (*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->GetColorByIndex(i);
 	lua_pushnumber(L, c & 0xFF);
 	lua_pushnumber(L, c >> 8 & 0xFF);
 	lua_pushnumber(L, c >> 16 & 0xFF);
@@ -914,8 +914,8 @@ int l_logicSetColor(lua_State* L) {
 	c |= (g & 0xFF) << 8;
 	c |= (b & 0xFF) << 16;
 	c |= (a & 0xFF) << 24;
-	(*shok_ED_CGlobalsBaseExObj)->PlayerColors->SetColorByIndex(i, c);
-	(*shok_ED_CGlobalsBaseExObj)->PlayerColors->RefreshPlayerColors();
+	(*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->SetColorByIndex(i, c);
+	(*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->RefreshPlayerColors();
 	return 0;
 }
 
@@ -924,11 +924,11 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 		luaL_error(L, "use global GameCallback_PaydayPayed instead");
 	if (!lua_isfunction(L, 1))
 		luaL_error(L, "no func");
-	shok_GGL_CPlayerAttractionHandler_HookCheckPayday();
+	shok_GGL_CPlayerAttractionHandler::HookCheckPayday();
 	lua_pushlightuserdata(L, &l_logicEnablePlayerPaydayCallback);
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
-	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = [](shok_GGL_CPlayerAttractionHandler* th) {
+	shok_GGL_CPlayerAttractionHandler::OnCheckPayDayCallback = [](shok_GGL_CPlayerAttractionHandler* th) {
 		lua_State* L2 = *shok_luastate_game;
 		int t = lua_gettop(L2);
 		lua_pushlightuserdata(L2, &l_logicEnablePlayerPaydayCallback);
@@ -939,9 +939,9 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 		if (lua_isnumber(L2, -1)) {
 			float add = luaL_checkfloat(L2, -1);
 			if (add > 0)
-				(*shok_GGL_CGLGameLogicObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok_ResourceType::GoldRaw, add);
+				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok_ResourceType::GoldRaw, add);
 			else if (add < 0)
-				(*shok_GGL_CGLGameLogicObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok_ResourceType::Gold, -add);
+				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok_ResourceType::Gold, -add);
 		}
 		lua_settop(L2, t);
 	};
@@ -1062,7 +1062,7 @@ int l_logic_GetPlaceBuildingRotation(lua_State* L) {
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
-	shok_GGL_CPlayerAttractionHandler_OnCheckPayDay = nullptr;
+	shok_GGL_CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
 	shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
 	CanPlaceBuildingCallback = nullptr;

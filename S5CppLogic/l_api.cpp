@@ -63,7 +63,7 @@ int l_api_mapGetDataPath(lua_State* L) {
 	int ty = luaL_checkint(L, 2);
 	const char* cn = lua_tostring(L, 3); // optional
 	const char* n = luaL_checkstring(L, 1);
-	shok_framework_campagnInfo* ci = (*shok_Framework_CMainObj)->GetCampagnInfo(ty, cn);
+	shok_framework_campagnInfo* ci = (*shok_Framework_CMain::GlobalObj)->GetCampagnInfo(ty, cn);
 	luaext_assertPointer(L, ci, "invalid map type/campagn");
 	shok_framework_mapinfo* i = ci->GetMapInfoByName(n);
 	luaext_assertPointer(L, i, "invalid map");
@@ -73,7 +73,7 @@ int l_api_mapGetDataPath(lua_State* L) {
 
 int l_api_saveGetMap(lua_State* L) {
 	const char* save = luaL_checkstring(L, 1);
-	shok_framework_saveData* sdata = shok_getframework_saveDataObj();
+	shok_framework_saveData* sdata = shok_framework_saveData::GlobalObj();
 	luaext_assert(L, sdata->LoadSaveData(save), "save doesnt exist");
 	lua_pushstring(L, sdata->CurrentSave->MapData.MapName.c_str());
 	lua_pushnumber(L, sdata->CurrentSave->MapData.MapType);

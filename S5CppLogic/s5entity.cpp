@@ -255,7 +255,7 @@ int shok_EGL_CGLEEntity::GetResourceProvided()
 
 shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntity::GetEntityType()
 {
-	return (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(EntityType);
+	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
 }
 
 int shok_EGL_CGLEEntity::EventGetIntById(int id)
@@ -845,7 +845,7 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 	else {
 		c.ScriptName = nullptr;
 	}
-	int nid = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
+	int nid = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	if (e->IsSettler()) {
 		shok_GGL_CLeaderBehavior* lb = e->GetLeaderBehavior();
 		if (lb) {
@@ -921,7 +921,7 @@ void __stdcall hurtentityhookc(int* damage, shok_EGL_CGLEEntity** target, shok_E
 	int ev[6];
 	event2entitiesctor(ev, 0x1C007, aid, tid);
 	shok_EGL_CGLEEntity::HurtEntityDamagePointer = damage;
-	(*shok_EScr_CScriptTriggerSystemObj)->RunTrigger((shok_BB_CEvent*)ev);
+	(*shok_EScr_CScriptTriggerSystem::GlobalObj)->RunTrigger((shok_BB_CEvent*)ev);
 	shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
 }
 
@@ -974,9 +974,9 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 	{
 		if (e->IsSettler()) {
 			for (int t : static_cast<shok_GGL_CGLSettlerProps*>(et->LogicProps)->ModifyHitpoints.TechList) {
-				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok_TechState::Researched)
+				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok_TechState::Researched)
 					continue;
-				shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
+				shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
@@ -984,9 +984,9 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.equal_range(e->EntityType);
 			for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
 				int t = i->second;
-				if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok_TechState::Researched)
+				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok_TechState::Researched)
 					continue;
-				shok_technology* tech = (*shok_GGL_CGLGameLogicObj)->GetTech(t);
+				shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
@@ -1013,7 +1013,7 @@ void __fastcall createentityfixhp(shok_EGL_CGLEEntity* th, int hpIn) {
 	else if (th->IsBuilding()) {
 		th->Health = th->GetMaxHealth();
 		if (!static_cast<shok_GGL_CBuilding*>(th)->IsConstructionFinished()) {
-			th->Health = static_cast<int>(th->Health * (*shok_GGL_CLogicPropertiesObj)->ConstructionSiteHealthFactor);
+			th->Health = static_cast<int>(th->Health * (*shok_GGL_CLogicProperties::GlobalObj)->ConstructionSiteHealthFactor);
 		}
 	}
 }
@@ -1063,7 +1063,7 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_E
 	else {
 		c.ScriptName = nullptr;
 	}
-	int id = (*shok_EGL_CGLEGameLogicObject)->CreateEntity(&c);
+	int id = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	shok_EGL_CGLEEntity* r = shok_EGL_CGLEEntity::GetEntityByID(id);
 	shok_event_data_EGL_CEventValue_int_27574121 ev{};
 	ev.id = 0x1000C;
@@ -1508,7 +1508,7 @@ void __fastcall rangedeffecthealhook(shok_GGL_CRangedEffectAbility* th) {
 			if (ecr.EffectType) {
 				ecr.StartPos.X = toheal->Position.X;
 				ecr.StartPos.Y = toheal->Position.Y;
-				(*shok_EGL_CGLEGameLogicObject)->CreateEffect(&ecr);
+				(*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
 			}
 			if (toheal->GetSoldierBehavior()) {
 				toheal = shok_EGL_CGLEEntity::GetEntityByID(static_cast<shok_GGL_CSettler*>(toheal)->LeaderId);

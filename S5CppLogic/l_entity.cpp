@@ -4,13 +4,13 @@
 #include "luaext.h"
 
 int l_entity_getNum(lua_State* L) {
-	lua_pushnumber(L, (*shok_EGL_CGLEEntityManagerObj)->EntityCount);
+	lua_pushnumber(L, (*shok_EGL_CGLEEntityManager::GlobalObj)->EntityCount);
 	return 1;
 }
 
 int l_entity_get(lua_State* L) {
 	int i = luaL_checkint(L, 1);
-	shok_EGL_CGLEEntity* p = (*shok_EGL_CGLEEntityManagerObj)->GetEntityByNum(i);
+	shok_EGL_CGLEEntity* p = (*shok_EGL_CGLEEntityManager::GlobalObj)->GetEntityByNum(i);
 	if (p == nullptr)
 		lua_pushnumber(L, 0);
 	else
@@ -695,11 +695,11 @@ int l_settlerPlaceCannon(lua_State* L) {
 	luaext_checkPos(L, p, 2);
 	p.FloorToBuildingPlacement();
 	int bottom = luaL_checkint(L, 3);
-	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(bottom);
+	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
 	luaext_assertPointer(L, ety, "no bottom entitytype");
 	luaext_assert(L, ety->IsBuildingType(), "bottom not a building");
 	int top = luaL_checkint(L, 4);
-	luaext_assertPointer(L, (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(top), "no top entitytype");
+	luaext_assertPointer(L, (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(top), "no top entitytype");
 	luaext_assert(L, shok_canPlaceBuilding(bottom, e->PlayerId, &p, 0, 0), "cannot place foundation at that position");
 	e->HeroAbilityPlaceCannon(p, bottom, top);
 	return 0;
@@ -936,7 +936,7 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetFoundryBehavior(), "no foundry at 1");
 	luaext_assert(L, b->IsIdle(), "is not idle");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	b->CommandBuildCannon(luaL_checkint(L, 2));
 	return 0;
@@ -1071,17 +1071,17 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	shok_GGL_CLeaderBehaviorProps* lp = s->GetEntityType()->GetLeaderBehaviorProps();
 	luaext_assertPointer(L, l, "no leader");
 	luaext_assert(L, b->PlayerId == s->PlayerId, "different players");
-	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(lp->SoldierType);
+	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
 	luaext_assertPointer(L, solty, "no soldier type set");
 	if (!lua_toboolean(L, 3)) {
-		int ucat = (*shok_GGL_CGLGameLogicObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(b->EntityType);
+		int ucat = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(b->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
 	}
 	int max = s->LimitedAttachmentGetMaximum(shok_AttachmentType::LEADER_SOLDIER);
 	int curr = 0;
 	s->ObservedEntities.ForAll([&curr](shok_attachment* a) { if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER) curr++; });
 	luaext_assert(L, curr < max, "no free soldier slot left");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(s->PlayerId);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 
 	luaext_assert(L, p->CurrentResources.HasResources(&((shok_GGL_CGLSettlerProps*)solty->LogicProps)->Cost), "missing res");
@@ -1154,9 +1154,9 @@ int l_buildingHQBuySerf(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsEntityInCategory(shok_EntityCategory::Headquarters), "no hq");
 	luaext_assert(L, b->IsIdle(), "building not idle");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(*shok_entityTypeIDSerf);
+	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(*shok_entityTypeIDSerf);
 	luaext_assert(L, p->CurrentResources.HasResources(&((shok_GGL_CGLSettlerProps*)solty->LogicProps)->Cost), "missing res");
 	b->HQBuySerf();
 	return 0;
@@ -1173,9 +1173,9 @@ int l_buildingStartResearch(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsIdle(), "building not idle");
 	int tech = luaL_checkint(L, 2);
-	shok_technology* techo = (*shok_GGL_CGLGameLogicObj)->GetTech(tech);
+	shok_technology* techo = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tech);
 	luaext_assertPointer(L, techo, "no tech at 2");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogicObj)->GetPlayer(b->PlayerId);
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	shok_TechState techstate = p->GetTechStatus(tech);
 	luaext_assert(L, techstate == shok_TechState::Allowed, "wrong techstate");
 	luaext_assert(L, p->CurrentResources.HasResources(&techo->ResourceCosts), "not enough res");
@@ -1220,7 +1220,7 @@ int l_settlerSetPos(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_position p;
 	luaext_checkPos(L, p, 2);
-	luaext_assert(L, (*shok_EGL_CGLEGameLogicObject)->Landscape->GetSector(&p) != 0, "position is blocked");
+	luaext_assert(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p) != 0, "position is blocked");
 	s->SetPosition(p);
 	return 0;
 }
@@ -1567,7 +1567,7 @@ void EntityIterator::Reset()
 
 shok_EGL_CGLEEntity* EntityIterator::GetNext(float* rangeOut, int* prio)
 {
-	shok_EGL_CGLEEntityManager* eman = *shok_EGL_CGLEEntityManagerObj;
+	shok_EGL_CGLEEntityManager* eman = *shok_EGL_CGLEEntityManager::GlobalObj;
 	while (true) {
 		if (current > eman->EntityCount)
 			return nullptr;
@@ -1716,7 +1716,7 @@ bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, flo
 }
 void EntityIteratorPredicateAnyPlayer::FillHostilePlayers(int source, int* players, int& maxP)
 {
-	shok_GGL_CPlayerStatus* pl = (*shok_GGL_CGLGameLogicObj)->GetPlayer(source);
+	shok_GGL_CPlayerStatus* pl = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(source);
 	int curr = 0;
 	for (int p = 1; p <= maxP; p++) {
 		if (pl->GetDiploStateTo(p) == shok_DiploState::Hostile) {

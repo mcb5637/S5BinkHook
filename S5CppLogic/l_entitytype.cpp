@@ -658,7 +658,7 @@ int l_buildingTyAddHPTechMod(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
 	luaext_assert(L, t->IsBuildingType(), "no building type at 1");
 	int tech = luaL_checkint(L, 2);
-	shok_technology* techo = (*shok_GGL_CGLGameLogicObj)->GetTech(tech);
+	shok_technology* techo = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tech);
 	luaext_assertPointer(L, techo, "no tech at 2");
 	shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.emplace(luaL_checkint(L, 1), tech);
 	return 0;

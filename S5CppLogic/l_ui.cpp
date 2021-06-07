@@ -3,7 +3,7 @@
 
 shok_EGUIX_CBaseWidget* l_uiCheckWid(lua_State* L, int i) {
 	int id;
-	shok_widgetManager* wm = shok_getWidgetManagerObj();
+	shok_widgetManager* wm = shok_widgetManager::GlobalObj();
 	if (lua_isnumber(L, i)) {
 		id = luaL_checkint(L, i);
 	}
@@ -370,7 +370,7 @@ int l_uiCreateStaticWidget(lua_State* L) {
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
@@ -384,7 +384,7 @@ int l_uiCreateStaticTextWidget(lua_State* L) {
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
@@ -398,7 +398,7 @@ int l_uiCreatePureTooltipWidget(lua_State* L) {
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
@@ -412,7 +412,7 @@ int l_uiCreateGFXButtonWidget(lua_State* L) {
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
@@ -426,7 +426,7 @@ int l_uiCreateTextButtonWidget(lua_State* L) {
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
@@ -440,7 +440,7 @@ int l_uiCreateProgessBarWidget(lua_State* L) {
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
@@ -454,7 +454,7 @@ int l_uiCreateContainerWidget(lua_State* L) {
 	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
 	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_getWidgetManagerObj()->GetIdByName(name) == 0, "name already in use");
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
@@ -471,7 +471,7 @@ int l_uiGetFontValues(lua_State* L) {
 		luaL_error(L, err);
 	int id = 0;
 	shok_fontManager::LoadFont(&id, font);
-	shok_font* f = shok_getFontMangerObj()->GetFontObj(id);
+	shok_font* f = shok_fontManager::GlobalObj()->GetFontObj(id);
 	lua_pushnumber(L, f->Size);
 	lua_pushnumber(L, f->Offset);
 	lua_pushnumber(L, f->Spacing);
@@ -484,7 +484,7 @@ int l_uiSetFontValues(lua_State* L) {
 		luaL_error(L, err);
 	int id = 0;
 	shok_fontManager::LoadFont(&id, font);
-	shok_font* f = shok_getFontMangerObj()->GetFontObj(id);
+	shok_font* f = shok_fontManager::GlobalObj()->GetFontObj(id);
 	if (lua_isnumber(L, 2))
 		f->Size = luaL_checkfloat(L, 2);
 	if (lua_isnumber(L, 3))

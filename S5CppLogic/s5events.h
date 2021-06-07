@@ -7,12 +7,12 @@ struct shok_event_data_EGL_CEventGetValue_int_1211121895 : shok_event_data {
 	int result = 0;
 };
 struct shok_vtable_EGL_CGLEEntity {
-	PADDINGI(3)
-		void(__thiscall* Destroy)(shok_EGL_CGLEEntity* th, int i);
-	PADDINGI(12)
-		void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
-	PADDINGI(11)
-		float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
+	PADDINGI(3);
+	void(__thiscall* Destroy)(shok_EGL_CGLEEntity* th, int i);
+	PADDINGI(12);
+	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
+	PADDINGI(11);
+	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
 };
 
 struct shok_event_data_EGL_CEventPosition : shok_event_data {
@@ -71,7 +71,7 @@ struct shok_event_data_GGL_CEventTransaction : shok_event_data {
 };
 
 // net events
-struct shok_BB_CEvent : shok_object {
+struct shok_BB_CEvent : shok_object { // todo
 	int EventTypeId;
 
 	static inline constexpr int vtp = 0x762114;

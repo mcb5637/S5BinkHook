@@ -25,34 +25,8 @@ int l_combat_dealAOEDamage(lua_State* L) {
 	return 0;
 }
 
-void l_combatHookCreateEffect(int effectId, void* retAdr) { // todo hook correct func instead of overriding createeffect
-	if (retAdr == (void*)CreatEffectReturnBattleBehaviorAttack || retAdr == (void*)CreatEffectReturnAutoCannonBehaviorAttack) {
-		shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManagerObject)->GetEffectById(effectId);
-		if (ef->IsCannonBallEffect()) {
-			shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
-			shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(cbeff->AttackerID);
-			cbeff->SourcePlayer = e->PlayerId;
-			shok_GGlue_CGlueEntityProps* t = e->GetEntityType();
-			shok_GGL_CBattleBehaviorProps* b = t->GetBattleBehaviorProps();
-			cbeff->DamageAmount = e->EventGetDamage();
-			if (b) {
-				cbeff->DamageClass = b->DamageClass;
-				return;
-			}
-			shok_GGL_CAutoCannonBehaviorProps* a = t->GetAutoCannonProps();
-			if (a)
-				cbeff->DamageClass = a->DamageClass;
-		}
-	}
-	else if (retAdr != (void*)CreatEffectReturnCannonBallOnHit) {
-		//logAdress("createeffect", retAdr);
-	}
-}
-
 // tested aoe damage: cannon/autocannon projectile, circularattack, trapcannon 
 int l_combat_EnableAoEProjectileFix(lua_State* L) {
-	/*(*shok_EGL_CGLEGameLogicObject)->HookCreateEffect();
-	CreateEffectHookCallback = &l_combatHookCreateEffect;*/
 	shok_GGL_CCannonBallEffect::HookFromCreator();
 	shok_GGL_CCannonBallEffect::FixDamageClass = true;
 	shok_EGL_CGLEEntity::HookDamageMod();
@@ -60,7 +34,7 @@ int l_combat_EnableAoEProjectileFix(lua_State* L) {
 }
 
 int l_combat_DisableAoEProjectileFix(lua_State* L) {
-	CreateEffectHookCallback = nullptr;
+	shok_GGL_CCannonBallEffect::FixDamageClass = false;
 	return 0;
 }
 
@@ -80,7 +54,7 @@ void l_combat_ActivateCamo(shok_GGL_CCamouflageBehavior* th) {
 
 int l_combat_EnableCamoFix(lua_State* L) {
 	shok_EGL_CFlyingEffect::HookOnHit();
-	FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
+	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
 	shok_EGL_CGLEEntity::HookResetCamo();
 	shok_EGL_CGLEEntity::HookCamoActivate();
 	shok_EGL_CGLEEntity::CamoActivateCb = &l_combat_ActivateCamo;
@@ -88,7 +62,7 @@ int l_combat_EnableCamoFix(lua_State* L) {
 }
 
 int l_combat_DisableCamoFix(lua_State* L) {
-	FlyingEffectOnHitCallback2 = nullptr;
+	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
 	shok_EGL_CGLEEntity::CamoActivateCb = nullptr;
 	shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 	return 0;

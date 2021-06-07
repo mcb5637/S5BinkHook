@@ -10,9 +10,7 @@ struct shok_modifyEntityProps {
 
 
 struct shok_EGL_CGLEEntityProps : shok_object {
-private:
-	int u3;
-public:
+	PADDINGI(1);
 	int Class;
 	vector_padding;
 	std::vector<shok_EntityCategory, shok_allocator<shok_EntityCategory>> Categories;
@@ -29,10 +27,8 @@ public:
 	int ExperiencePoints, AccessCategory, NumBlockedPoints;
 	float SnapTolerance;
 	byte DeleteWhenBuiltOn, NeedsPlayer;
-private:
-	byte u[2];
-	int u2[9];
-public:
+	PADDING(2);
+	PADDINGI(9);
 	vector_padding;
 	std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
 
@@ -62,9 +58,7 @@ public:
 	int IdleTaskList;
 	shok_upgradeInfo Upgrade;
 	byte Fearless, Convertible;
-private:
-	byte u[2];
-public:
+	PADDING(2);
 	shok_modifyEntityProps ModifyExploration, ModifyHitpoints, ModifySpeed, ModifyDamage, ModifyArmor, ModifyDodge, ModifyMaxRange, ModifyMinRange, ModifyDamageBonus, ModifyGroupLimit;
 	int AttractionSlots;
 
@@ -94,9 +88,7 @@ struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
 };
 
 struct shok_constructionInfo {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	vector_padding;
 	std::vector<shok_positionRot, shok_allocator<shok_positionRot>> BuilderSlot;
 	int Time;
@@ -110,9 +102,7 @@ struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
 	vector_padding;
 	std::vector<int, shok_allocator<int>> BuildOn;
 	byte HideBase, CanBeSold, IsWall;
-private:
-	byte u;
-public:
+	PADDING(1);
 	shok_upgradeInfo Upgrade;
 	int UpgradeSite, ArmorClass, ArmorAmount;
 	vector_padding;
@@ -122,9 +112,7 @@ private:
 public:
 	float CollapseTime;
 	byte Convertible;
-private:
-	byte u2[3];
-public:
+	PADDING(3);
 	shok_modifyEntityProps ModifyExploration, ModifyArmor;
 	float KegEffectFactor; // 124
 
@@ -142,9 +130,7 @@ struct shok_ED_CDisplayEntityProps : shok_object {
 	int DisplayClass;
 	int Model[4];
 	byte DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
-private:
-	byte u[2];
-public:
+	PADDING(2);
 	vector_padding;
 	std::vector<int, shok_allocator<int>> AnimList;
 
@@ -152,9 +138,7 @@ public:
 };
 
 struct shok_GGlue_CGlueEntityProps : shok_object {
-public:
-	int u;
-public:
+	PADDINGI(1);
 	shok_EGL_CGLEEntityProps* LogicProps;
 	shok_ED_CDisplayEntityProps* DisplayProps;
 	vector_padding;
@@ -203,5 +187,5 @@ public:
 	bool IsOfCategory(shok_EntityCategory cat);
 };
 
-int* const shok_entityTypeIDSerf = (int*)0x863830;
+int* const shok_entityTypeIDSerf = reinterpret_cast<int*>(0x863830);
 

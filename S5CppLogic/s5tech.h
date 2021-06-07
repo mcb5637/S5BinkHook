@@ -22,7 +22,7 @@ struct shok_technologyModifier {
 	PADDINGI(1);
 	char Operator;
 	PADDING(3);
-	PADDINGI(5); // no idea what this is
+	PADDINGI(5); // most likely a shok_string
 
 	float ModifyValue(float i);
 };
@@ -30,21 +30,21 @@ struct shok_technology {
 	int TecCategoryType;
 	float TimeToResearch;
 	byte AutomaticResearch;
-	PADDING(3)
+	PADDING(3);
 	shok_costInfo ResourceCosts;
 	int RequiredTecConditions;
-	vector_padding
+	vector_padding;
 	std::vector<shok_technologyRequirementTech, shok_allocator<shok_technologyRequirementTech>> TecConditions;
 	int RequiredEntityConditions;
-	vector_padding
+	vector_padding;
 	std::vector<shok_technologyRequirementEType, shok_allocator<shok_technologyRequirementEType>> EntityConditions;
 	int RequiredEntityCategoryConditions;
-	vector_padding
+	vector_padding;
 	std::vector<shok_technologyRequirementUCat, shok_allocator<shok_technologyRequirementUCat>> EntityCategoryConditions;
 	int RequiredUpgradeCategoryConditions;
-	vector_padding
+	vector_padding;
 	std::vector<shok_technologyRequirementUCat, shok_allocator<shok_technologyRequirementUCat>> UpgradeCategoryConditions; // 38
-	PADDINGI(7) // 41 Effect -> Script, size 7
+	PADDINGI(7); // 41 Effect -> Script, size 7
 	shok_technologyModifier ExplorationModifier; // 48
 	shok_technologyModifier SpeedModifier; // 56
 	shok_technologyModifier HitpointModifier; // 64

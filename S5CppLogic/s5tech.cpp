@@ -41,11 +41,11 @@ float additionalTechModifier::ModifyValue(float i)
 
 std::vector<additionalTechModifier> ConstructionSpeedModifiers = std::vector<additionalTechModifier>();
 float __fastcall constructionsite_getprogresspertick_hook(shok_GGL_CBuilding* th) { // param is constructionsite, just not done yet ;)
-	shok_GGL_CGLSettlerProps* serf = (shok_GGL_CGLSettlerProps*)(*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(*shok_entityTypeIDSerf)->LogicProps;
-	shok_GGL_CGLBuildingProps* bty = (shok_GGL_CGLBuildingProps*)(*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(th->ConstructionSiteType)->LogicProps;
+	shok_GGL_CGLSettlerProps* serf = (shok_GGL_CGLSettlerProps*)(*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(*shok_entityTypeIDSerf)->LogicProps;
+	shok_GGL_CGLBuildingProps* bty = (shok_GGL_CGLBuildingProps*)(*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(th->ConstructionSiteType)->LogicProps;
 	float constructionfactor = serf->BuildFactor;
 	for (additionalTechModifier& tmod : ConstructionSpeedModifiers) {
-		if ((*shok_GGL_CGLGameLogicObj)->GetPlayer(th->PlayerId)->GetTechStatus(tmod.TechID) != shok_TechState::Researched)
+		if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerId)->GetTechStatus(tmod.TechID) != shok_TechState::Researched)
 			continue;
 		constructionfactor = tmod.ModifyValue(constructionfactor);
 	}

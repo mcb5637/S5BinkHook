@@ -44,8 +44,9 @@ struct shok_framework_saveData {
 	char* DebugSaveDir;
 
 	bool LoadSaveData(const char* name);
+
+	static inline shok_framework_saveData* (* const GlobalObj)() = reinterpret_cast<shok_framework_saveData * (* const)()>(0x403158);
 };
-static inline shok_framework_saveData* (* const shok_getframework_saveDataObj)() = (shok_framework_saveData * (* const)()) 0x403158;
 
 struct shok_Framework_CMain : shok_object {
 	int vtable_Framework_IGameCallBacks, vtable_ESnd_IAmbientSoundInfo;
@@ -59,6 +60,6 @@ struct shok_Framework_CMain : shok_object {
 
 	shok_framework_campagnInfo* GetCampagnInfo(int i, const char* n);
 	shok_framework_campagnInfo* GetCampagnInfo(shok_GS3DTools_CMapData* d);
-};
 
-static inline shok_Framework_CMain** const shok_Framework_CMainObj = (shok_Framework_CMain**)0x84EF60;
+	static inline shok_Framework_CMain** const GlobalObj = reinterpret_cast<shok_Framework_CMain**>(0x84EF60);
+};

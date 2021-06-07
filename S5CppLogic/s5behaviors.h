@@ -19,9 +19,7 @@ public:
 };
 
 struct shok_GGL_CSettlerMovement : shok_GGL_CBehaviorDefaultMovement {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	shok_positionRot PositionHiRes, Position;
 	byte BlockingFlag;
 	PADDING(3);
@@ -79,9 +77,7 @@ struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
 };
 
 struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	shok_position StartPosition;
 	int CannonType, FoundationType;
 	byte PlacedCannon;
@@ -91,9 +87,7 @@ public:
 };
 
 struct shok_GGL_CRangedEffectAbility : shok_GGL_CHeroAbility {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int SecondsRemaining;
 
 	static inline constexpr int vtp = 0x7774D4;
@@ -108,18 +102,14 @@ struct shok_GGL_CSummonBehavior : shok_GGL_CHeroAbility {
 };
 
 struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int TimeToConvert;
 
 	static inline constexpr int vtp = 0x777294;
 };
 
 struct shok_GGL_CSniperAbility : shok_GGL_CHeroAbility {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int TargetId;
 
 	static inline constexpr int vtp = 0x7745AC;
@@ -130,9 +120,7 @@ struct shok_GGL_CMotivateWorkersAbility : shok_GGL_CHeroAbility {
 };
 
 struct shok_GGL_CShurikenAbility : shok_GGL_CHeroAbility {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int TargetId;
 
 	static inline constexpr int vtp = 0x774658;
@@ -161,9 +149,7 @@ struct shok_GGL_CSentinelBehavior : shok_EGL_CGLEBehavior {
 struct shok_GGL_CGLBehaviorAnimationEx : shok_EGL_CGLEBehavior {
 	int Animation, AnimCategory, SuspendedAnimation, StartTurn, Duration;
 	byte PlayBackwards;
-private:
-	byte u[3];
-public:
+	PADDING(3);
 	int TurnToWaitFor;
 	float Speed;
 
@@ -193,23 +179,15 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior {
 	int TimeOutTime, StartTurn;
 	shok_position TargetPosition;
 	byte StartFollowing, StopFollowing;
-private:
-	byte u1[2];
-public:
+	PADDING(2);
 	int FollowStatus, LatestHitTurn;
-private:
-	int u2;
-public:
+	PADDINGI(1);
 	int LatestAttackerID, BattleStatus;
 	byte NoMoveNecessary, NormalRangeCheckNecessary;
-private:
-	byte u3[2];
-public:
+	PADDING(2);
 	int Command;
 	shok_position AttackMoveTarget;
-private:
-	int u4;
-public:
+	PADDINGI(1);
 	int MilliSecondsToWait, MSToPlayHitAnimation, HitPlayed; // la 23
 
 	static inline constexpr int vtp = 0x77313C;
@@ -218,23 +196,17 @@ public:
 };
 
 struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
-private:
-	int u[3];
-public:
+	PADDINGI(3);
 	int TroopHealthCurrent, TroopHealthPerSoldier; // 27
 	shok_position TerritoryCenter;
 	float TerritoryCenterRange;
 	int Experience;
 	vector_padding;
 	std::vector<shok_position, shok_allocator<shok_position>> PatrolPoints;
-private:
-	int u2;
-public:
+	PADDINGI(1);
 	float DefendOrientation;
 	int TrainingStartTurn;
-private:
-	int u3;
-public:
+	PADDINGI(1);
 	int SecondsSinceHPRefresh, NudgeCount, FormationType;
 	shok_position StartBattlePosition;
 
@@ -287,9 +259,7 @@ struct shok_GGL_CGLBehaviorDying : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CHeroBehavior : shok_EGL_CGLEBehavior {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int ResurrectionTimePassed, SpawnTurn;
 	byte FriendNear, EnemyNear;
 	PADDING(2);
@@ -304,9 +274,7 @@ struct shok_GGL_CBombBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CKegBehavior : shok_EGL_CGLEBehavior {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int TimeToExplode;
 
 	static inline constexpr int vtp = 0x7764D8;
@@ -319,9 +287,7 @@ struct shok_GGL_CThiefBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CAutoCannonBehavior : shok_EGL_CGLEBehavior {
-private:
-	int u[6];
-public:
+	PADDINGI(6);
 	int ShotsLeft;
 
 	float GetMaxRange();
@@ -338,9 +304,7 @@ struct shok_GGL_CAffectMotivationBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CLimitedLifespanBehavior : shok_EGL_CGLEBehavior {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int RemainingLifespanSeconds;
 
 	static inline constexpr int vtp = 0x775D9C;
@@ -354,19 +318,13 @@ struct shok_GGL_CBarrackBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_EGL_GLEBehaviorMultiSubAnims : shok_EGL_CGLEBehavior {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int LastUpdateTurn;
 	struct {
 		byte Active, PlayBackwards, IsLooped;
-	private:
-		byte u;
-	public:
+		PADDING(1);
 		int AnimID, StartTurn, Duration;
-	private:
-		int u2;
-	public:
+		PADDINGI(1);
 		float Speed;
 	} AnimSlot[4];
 
@@ -410,9 +368,7 @@ struct shok_GGL_CBuildingTechTraderBehavior : shok_GGL_CBuildingMerchantBehavior
 };
 
 struct shok_GGL_CMarketBehavior : shok_EGL_CGLEBehavior {
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int SellResourceType, BuyResourceType;
 	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam+sellam
 

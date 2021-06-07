@@ -107,7 +107,7 @@ shok_GGlue_CGlueEntityProps* luaext_optEntityType(lua_State* L, int i) {
 	if (!lua_isnumber(L, i))
 		return nullptr;
 	int t = luaL_checkint(L, i);
-	return (*shok_EGL_CGLEEntitiesPropsObj)->GetEntityType(t);
+	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(t);
 }
 
 shok_GGlue_CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i) {
@@ -145,7 +145,7 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i) {
 	lua_pushstring(L, "Y");
 	lua_gettable(L, i);
 	float y = luaL_checkfloat(L, -1);
-	int size = *shok_mapsize * 100;
+	int size = *shok_EGL_CGLEGameLogic::MapSize * 100;
 	luaext_assert(L, x >= 0 && y >= 0 && x < size && y < size, "position outside of map");
 	p.X = x;
 	p.Y = y;
@@ -165,7 +165,7 @@ void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i, bool rad) {
 	float r = luaL_checkfloat(L, -1);
 	if (rad)
 		r = deg2rad(r);
-	int size = *shok_mapsize * 100;
+	int size = *shok_EGL_CGLEGameLogic::MapSize * 100;
 	luaext_assert(L, x >= 0 && y >= 0 && x < size && y < size, "position outside of map");
 	p.X = x;
 	p.Y = y;

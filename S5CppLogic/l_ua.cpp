@@ -20,7 +20,7 @@ UnlimitedArmy::UnlimitedArmy(int p)
 }
 void UnlimitedArmy::CalculatePos()
 {
-	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
+	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
 	if (tick == PosLastUpdatedTick)
 		return;
 	float x = 0, y = 0;
@@ -78,7 +78,7 @@ void UnlimitedArmy::CleanDead()
 		return shok_EGL_CGLEEntity::GetEntityByID(id) == nullptr;
 		});
 	DeadHeroes.erase(e, DeadHeroes.end());
-	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
+	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
 	TargetCache.erase(std::remove_if(TargetCache.begin(), TargetCache.end(), [tick](UATargetCache& c) { return c.Tick < tick; }), TargetCache.end());
 }
 void UnlimitedArmy::Tick()
@@ -412,7 +412,7 @@ void UnlimitedArmy::BattleCommand()
 			}
 		}
 	}
-	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
+	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
 	for (UACannonData cd : Cannons) {
 		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(cd.EntityId);
 		if (ReMove || !LeaderIsInBattle(e) || cd.LastUpdated == -1) {
@@ -807,7 +807,7 @@ bool UnlimitedArmy::CheckTargetCache(int id, int count) {
 	return true;
 }
 void UnlimitedArmy::UpdateTargetCache(int id, int time) {
-	int tick = (*shok_EGL_CGLEGameLogicObject)->GetTick();
+	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
 	for (UATargetCache& t : TargetCache) {
 		if (t.EntityId == id) {
 			t.Num++;

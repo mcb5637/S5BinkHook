@@ -44,9 +44,9 @@ struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
 	static inline constexpr int vtp = 0x7775E4;
 
 	static void HookOnHit();
+	static void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
+	static void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post);
 };
-extern void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
-extern void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post);
 
 struct shok_GGL_CArrowEffect : shok_EGL_CFlyingEffect {
 	int AttackerID; // 47

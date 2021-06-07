@@ -78,7 +78,7 @@ struct shok_EGUIX_CButtonHelper : shok_object { // size 38
 static_assert(sizeof(shok_EGUIX_CButtonHelper) == 38 * 4);
 
 struct shok_EGUIX_CToolTipHelper : shok_object { // size 41
-	void* vtable_EGUIX_IWidgetRegistrationCallback;
+	int vtable_EGUIX_IWidgetRegistrationCallback;
 	byte ToolTipEnabledFlag;
 	PADDING(3);
 	shok_EGUIX_CSingleStringHandler ToolTipString;
@@ -94,12 +94,12 @@ struct shok_EGUIX_CToolTipHelper : shok_object { // size 41
 static_assert(sizeof(shok_EGUIX_CToolTipHelper) == 41 * 4);
 
 struct shok_EGUIX_CBaseWidget : shok_object {
-	void* vtable_EGUIX_IOnEvent;
+	int vtable_EGUIX_IOnEvent;
 	int UserVariable[2];
 	int WidgetID;
 	shok_widget_rect PosAndSize;
 	byte IsShown;
-	PADDING(3)
+	PADDING(3);
 	float ZPriority;
 	int MotherWidgetID;
 	int Group; // 12
@@ -127,8 +127,8 @@ struct shok_EGUIX_CWidgetListHandler : shok_object {
 };
 
 struct shok_EGUIX_CStaticWidget : shok_EGUIX_CBaseWidget {
-	void* vtable_EGUIX_IRender; // 14
-	void* vtable_EGUIX_IMaterialAccess;
+	int vtable_EGUIX_IRender; // 14
+	int vtable_EGUIX_IMaterialAccess;
 	shok_EGUIX_CMaterial BackgroundMaterial; // la 24
 
 	static inline constexpr int vtp = 0x780F84;
@@ -137,7 +137,7 @@ struct shok_EGUIX_CStaticWidget : shok_EGUIX_CBaseWidget {
 };
 
 struct shok_EGUIX_CStaticTextWidget : shok_EGUIX_CStaticWidget {
-	void* vtable_EGUIX_ITextAccess;
+	int vtable_EGUIX_ITextAccess;
 	shok_EGUIX_CWidgetStringHelper StringHelper; // 27
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction; // 50
 	byte UpdateManualFlag;
@@ -151,8 +151,8 @@ struct shok_EGUIX_CStaticTextWidget : shok_EGUIX_CStaticWidget {
 };
 
 struct shok_EGUIX_CButtonWidget : shok_EGUIX_CBaseWidget {
-	void* vtable_EGUIX_IRender; // 14
-	void* vtable_EGUIX_IMaterialAccess; // 15
+	int vtable_EGUIX_IRender; // 14
+	int vtable_EGUIX_IMaterialAccess; // 15
 	shok_EGUIX_CButtonHelper ButtonHelper; // la 54
 	shok_EGUIX_CMaterial Materials[5];
 	int NumMaterials; // ? why after materials
@@ -174,7 +174,7 @@ struct shok_EGUIX_CGfxButtonWidget : shok_EGUIX_CButtonWidget {
 };
 
 struct shok_EGUIX_CTextButtonWidget : shok_EGUIX_CButtonWidget {
-	void* vtable_EGUIX_ITextAccess; // 147
+	int vtable_EGUIX_ITextAccess; // 147
 	shok_EGUIX_CWidgetStringHelper StringHelper; // la 170
 	shok_EGUIX_CLuaFunctionHelper UpdateFunction;
 	byte UpdateManualFlag;
@@ -186,8 +186,8 @@ struct shok_EGUIX_CTextButtonWidget : shok_EGUIX_CButtonWidget {
 };
 
 struct shok_EGUIX_CContainerWidget : shok_EGUIX_CBaseWidget {
-	void* vtable_EGUIX_IRender; // 15
-	void* vtable_EGUIX_IWidgetRegistrationCallback;
+	int vtable_EGUIX_IRender; // 15
+	int vtable_EGUIX_IWidgetRegistrationCallback;
 	shok_EGUIX_CWidgetListHandler WidgetListHandler;
 
 	static inline constexpr int vtp = 0x78114C;
@@ -215,14 +215,15 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 };
 
 struct shok_widgetManager { // this thing has no vtable...
-	int u;
+	PADDINGI(1);
 	vector_padding;
 	std::vector<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>> Widgets;
 
 	int GetIdByName(const char* name);
 	shok_EGUIX_CBaseWidget* GetWidgetByID(int id);
+
+	static inline shok_widgetManager* (* const GlobalObj)() = reinterpret_cast<shok_widgetManager * (*)()>(0x558473);
 };
-static inline shok_widgetManager* (*const shok_getWidgetManagerObj)() = (shok_widgetManager * (*)())0x558473;
 
 struct shok_EGUIX_CWidgetGroupManager : shok_object {
 
@@ -243,8 +244,9 @@ struct shok_fontManager { // no vtable either
 
 	static void LoadFont(int* outFontID, const char* fontName);
 	shok_font* GetFontObj(int id);
+
+	static inline shok_fontManager* (* const GlobalObj)() = reinterpret_cast<shok_fontManager * (*)()>(0x5593AD);
 };
-static inline shok_fontManager* (*const shok_getFontMangerObj)() = (shok_fontManager * (*)())0x5593AD;
 
 extern void (*UIInput_Char_Callback)(int c);
 extern void (*UIInput_Key_Callback)(int c, int ev);

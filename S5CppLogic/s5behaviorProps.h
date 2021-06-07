@@ -50,9 +50,7 @@ struct shok_GGL_CCannonBuilderBehaviorProps : shok_GGL_CHeroAbilityProps {
 
 struct shok_GGL_CRangedEffectAbilityProps : shok_GGL_CHeroAbilityProps {
 	byte AffectsOwn, AffectsFriends, AffectsNeutrals, AffectsHostiles, AffectsMilitaryOnly, AffectsLongRangeOnly;
-private:
-	byte u[2];
-public:
+	PADDING(2);
 	float Range;
 	int DurationSeconds; // 9
 	float DamageFactor, ArmorFactor, HealthRecoveryFactor;
@@ -140,18 +138,12 @@ struct shok_GGL_CGLAnimationBehaviorExProps : shok_EGL_CGLEBehaviorProps {
 
 struct shok_GGL_CWorkerBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	int WorkTaskList, WorkIdleTaskList;
-private:
-	int u;
-public:
+	PADDINGI(1);
 	int WorkWaitUntil, EatTaskList, EatIdleTaskList, EatWait, RestTaskList, RestIdleTaskList, RestWait;
-private:
-	int u2;
-public:
+	PADDINGI(1);
 	int LeaveTaskList;
 	float AmountResearched;
-private:
-	int u3;
-public:
+	PADDINGI(1);
 	float WorkTimeChangeFarm, WorkTimeChangeResidence, WorkTimeChangeCamp;
 	int WorkTimeMaxCangeFarm, WorkTimeMaxChangeResidence;
 	float ExhaustedWorkMotivationMalus;

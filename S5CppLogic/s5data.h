@@ -65,10 +65,10 @@ typedef uint8_t byte;
 // activate ranged effect ability heal 0x4E3C78 call redirect
 
 // allocator
-static inline void* (__cdecl* const shok_malloc)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C4181;
-static inline void* (__cdecl* const shok_new)(size_t t) = (void* (__cdecl*)(size_t)) 0x5C04FB;
-static inline void(__cdecl* const shok_free)(void* p) = (void(__cdecl*)(void* p)) 0x5C2E2D;
-static inline void (*const shok_logString)(const char* format, ...) = (void (*)(const char* format, ...)) 0x548268;
+static inline void* (__cdecl* const shok_malloc)(size_t t) = reinterpret_cast<void* (__cdecl*)(size_t)>(0x5C4181);
+static inline void* (__cdecl* const shok_new)(size_t t) = reinterpret_cast<void* (__cdecl*)(size_t)>(0x5C04FB);
+static inline void(__cdecl* const shok_free)(void* p) = reinterpret_cast<void(__cdecl*)(void* p)>(0x5C2E2D);
+static inline void (*const shok_logString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
 
 template <class T>
 struct shok_allocator {
@@ -98,7 +98,7 @@ struct shok_treeNode {
 	bool redblack;
 };
 template <class T>
-struct shok_set {
+struct shok_set { // todo iterators
 	PADDINGI(1);
 	shok_treeNode<T>* root;
 	int size;
@@ -146,9 +146,9 @@ static_assert(sizeof(shok_string) == 7 * 4);
 template<class T>
 inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {
 #ifdef _DEBUG
-	std::vector<T, shok_allocator<T>> save = std::vector<T, shok_allocator<T>>();
-	int* vecPoint = (int*)vec;
-	int* savePoint = (int*)&save;
+	std::vector<T, shok_allocator<T>> save{};
+	int* vecPoint = reinterpret_cast<int*>(vec);
+	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[3] = {};
 	for (int i = 1; i < 4; i++) {
 		backu[i - 1] = savePoint[i];
@@ -166,9 +166,9 @@ inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::functio
 template<class T>
 inline void shok_saveList(std::list<T, shok_allocator<T>>* vec, std::function<void(std::list<T, shok_allocator<T>>& s)> func) {
 #ifdef _DEBUG
-	std::list<T, shok_allocator<T>> save = std::list<T, shok_allocator<T>>();
-	int* vecPoint = (int*)vec;
-	int* savePoint = (int*)&save;
+	std::list<T, shok_allocator<T>> save{};
+	int* vecPoint = reinterpret_cast<int*>(vec);
+	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[2] = {};
 	for (int i = 1; i < 3; i++) {
 		backu[i - 1] = savePoint[i];
@@ -188,6 +188,7 @@ inline void shok_saveList(std::list<T, shok_allocator<T>>* vec, std::function<vo
 struct shok_position {
 	float X;
 	float Y;
+
 	void FloorToBuildingPlacement();
 	float GetDistanceSquaredTo(shok_position& p);
 	bool IsInRange(shok_position& p, float range);
@@ -205,9 +206,7 @@ struct shok_AARect {
 
 enum class shok_ResourceType;
 struct shok_costInfo { // size 18
-private:
-	int u;
-public:
+	PADDINGI(1);
 	float Gold, GoldRaw, Silver, SilverRaw, Stone, StoneRaw, Iron, IronRaw, Sulfur, SulfurRaw, Clay, ClayRaw, Wood, WoodRaw, WeatherEnergy, Knowledge, Faith;
 
 	float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw);
@@ -218,7 +217,6 @@ public:
 static_assert(sizeof(shok_costInfo) == 18 * 4);
 
 struct shok_object {
-public:
 	int vtable;
 };
 
@@ -241,7 +239,7 @@ bool contains(T* data, T search, int num) {
 	return false;
 }
 
-const char* (__cdecl* const shok_GetStringTableText)(const char* key) = (const char* (__cdecl* const)(const char*))0x556D2E;
+const char* (__cdecl* const shok_GetStringTableText)(const char* key) = reinterpret_cast<const char* (__cdecl* const)(const char*)>(0x556D2E);
 
 
 enum class win_mouseEvents : int {
@@ -283,12 +281,12 @@ enum class win_mouseEvents : int {
 // v5 size
 
 
-static inline void(_stdcall* const shok_SetHighPrecFPU)() = (void(_stdcall*)()) 0x5C8451;
+static inline void(_stdcall* const shok_SetHighPrecFPU)() = reinterpret_cast<void(_stdcall*)()>(0x5C8451);
 
-static inline int(__stdcall* const shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = (int(__stdcall*)(lua_State*, const char*, size_t, const char*)) 0x59BE57;
+static inline int(__stdcall* const shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = reinterpret_cast<int(__stdcall*)(lua_State*, const char*, size_t, const char*)>(0x59BE57);
 
 
-static inline lua_State** const shok_luastate_game = (lua_State**)0x853A9C;
+static inline lua_State** const shok_luastate_game = reinterpret_cast<lua_State**>(0x853A9C);
 
 
 const char* ReadFileToString(const char* name, size_t* size);

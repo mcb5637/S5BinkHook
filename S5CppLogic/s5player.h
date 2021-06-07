@@ -64,9 +64,9 @@ struct shok_GGL_CPlayerAttractionHandler : shok_object {
 	int GetNumberOfLeaders();
 
 	// checkpayday 4C25FB thiscall
+	static void HookCheckPayday();
+	static void (*OnCheckPayDayCallback)(shok_GGL_CPlayerAttractionHandler* th);
 };
-extern void (*shok_GGL_CPlayerAttractionHandler_OnCheckPayDay)(shok_GGL_CPlayerAttractionHandler* th);
-void shok_GGL_CPlayerAttractionHandler_HookCheckPayday();
 
 struct shok_GGL_CUpgradeManager_jobdata {
 	int Category;
@@ -182,6 +182,7 @@ struct shok_GGL_CGameStatistics : shok_object {
 		WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine;
 	vector_padding;
 	std::vector<shok_statisticsTechResearched, shok_allocator<shok_statisticsTechResearched>> ResearchedTechnologies;
+	vector_padding;
 	std::vector<shok_statisticsBuildingUpgraded, shok_allocator<shok_statisticsBuildingUpgraded>> UpgradedBuildings;
 
 	static inline constexpr int vtp = 0x76E0E0;

@@ -97,7 +97,9 @@ int __cdecl test(lua_State* L) {
     //shok_framework_mapinfo* i = (*shok_Framework_CMain::GlobalObj)->GetCampagnInfo(3, nullptr)->GetMapInfoByName("test");
     //DEBUGGER_BREAK
     //lua_pushnumber(L, (int)&i->MiniMapTextureName);
-    return 0;
+    shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+    lua_pushnumber(L, e->GetBehavior<shok_GGL_CBattleBehavior>()->vtable);
+    return 1;
 }
 
 int cleanup(lua_State* L) {
@@ -192,13 +194,13 @@ BOOL APIENTRY DllMain( HMODULE hModule,
                        LPVOID lpReserved
                      )
 {
-    int *data = (int*) SHOK_Import_LUA_OPEN;
+    int *data = reinterpret_cast<int*>(SHOK_Import_LUA_OPEN);
     DWORD vp = 0;
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        VirtualProtect((LPVOID)SHOK_SEGMENTSTART, SHOK_SEGMENTLENGTH, PAGE_EXECUTE_READWRITE, &vp);
-        *data = (int)&__lua_open;
+        VirtualProtect(reinterpret_cast<LPVOID>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH, PAGE_EXECUTE_READWRITE, &vp);
+        *data = reinterpret_cast<int>(&__lua_open);
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:

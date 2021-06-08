@@ -10,11 +10,6 @@ float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
 	return reinterpret_cast<shok_vtable_GGL_CBehaviorDefaultMovement*>(vtable)->GetSpeed(this);
 }
 
-bool shok_GGL_CCamouflageBehavior::IsThiefCamoBehavior()
-{
-	return vtable == shok_GGL_CThiefCamouflageBehavior::vtp;
-}
-
 static inline float(__thiscall* const battleBehaviorGetMaxRange)(shok_GGL_CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(shok_GGL_CBattleBehavior *)>(0x50AB43);
 float shok_GGL_CBattleBehavior::GetMaxRange()
 {

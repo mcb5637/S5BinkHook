@@ -51,9 +51,9 @@ int luaext_checkEntityId(lua_State* L, int ind) {
 
 shok_GGL_CSettler* luaext_optSettler(lua_State* L, int ind) {
 	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
-	if (d != nullptr && d->IsSettler())
-		return (shok_GGL_CSettler*)d;
-	return nullptr;
+	if (d == nullptr)
+		return nullptr;
+	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(d);
 }
 
 shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind) {
@@ -65,9 +65,9 @@ shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind) {
 
 shok_GGL_CBuilding* luaext_optBuilding(lua_State* L, int ind) {
 	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
-	if (d != nullptr && d->IsBuilding())
-		return (shok_GGL_CBuilding*)d;
-	return nullptr;
+	if (d == nullptr)
+		return nullptr;
+	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(d);
 }
 
 shok_GGL_CBuilding* luaext_checkBulding(lua_State* L, int ind) {
@@ -79,9 +79,9 @@ shok_GGL_CBuilding* luaext_checkBulding(lua_State* L, int ind) {
 
 shok_GGL_CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind) {
 	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
-	if (d != nullptr && d->IsResourceDoodad())
-		return (shok_GGL_CResourceDoodad*)d;
-	return nullptr;
+	if (d == nullptr)
+		return nullptr;
+	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CResourceDoodad>(d);
 }
 
 shok_GGL_CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind) {

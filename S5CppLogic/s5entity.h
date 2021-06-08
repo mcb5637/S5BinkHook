@@ -58,54 +58,22 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int NumberOfAuras; // 65
 
 	static inline constexpr int vtp = 0x783E74;
+	static inline constexpr int TypeDesc = 0x8077CC;
 	static inline constexpr int vtp_IEntityDisplay = 0x783E58;
 
-private:
-	shok_EGL_CGLEBehavior* SearchBehavior(int vt);
-	shok_EGL_CGLEBehavior* SearchBehavior(int* vts, int num);
-public:
-	shok_GGL_CSoldierBehavior* GetSoldierBehavior();
-	shok_GGL_CLeaderBehavior* GetLeaderBehavior();
-	shok_GGL_CBehaviorDefaultMovement* GetMovementBehavior();
-	shok_GGL_CBarrackBehavior* GetBarrackBehavior();
-	shok_GGL_CCamouflageBehavior* GetCamoAbilityBehavior();
-	shok_GGL_CThiefCamouflageBehavior* GetCamoThiefBehavior();
-	shok_GGL_CHeroBehavior* GetHeroBehavior();
-	shok_GGL_CLimitedLifespanBehavior* GetLimitedLifespanBehavior();
-	shok_GGL_CWorkerBehavior* GetWorkerBehavior();
-	shok_GGL_CMarketBehavior* GetMarketBehavior();
-	shok_GGL_CThiefBehavior* GetThiefBehavior();
-	shok_GGL_CBattleBehavior* GetBattleBehavior();
-	shok_GGL_CHeroHawkBehavior* GetHeroHawkBehavior();
-	shok_GGL_CInflictFearAbility* GetInflictFearBehavior();
-	shok_GGL_CBombPlacerBehavior* GetBombPlacerBehavior();
-	shok_GGL_CCannonBuilderBehavior* GetCannonBuilderBehavior();
-	shok_GGL_CRangedEffectAbility* GetRangedEffectBehavior();
-	shok_GGL_CCircularAttack* GetCircularAttackBehavior();
-	shok_GGL_CSummonBehavior* GetSummonBehavior();
-	shok_GGL_CConvertSettlerAbility* GetConvertSettlerBehavior();
-	shok_GGL_CSniperAbility* GetSniperBehavior();
-	shok_GGL_CShurikenAbility* GetShurikenBehavior();
-	shok_GGL_CKegPlacerBehavior* GetKegPlacerBehavior();
-	shok_GGL_CAbilityScoutBinocular* GetBinocularBehavior();
-	shok_GGL_CTorchPlacerBehavior* GetTorchPlacerBehavior();
-	shok_GGL_CPointToResourceBehavior* GetPointToResBehavior();
-	shok_GGL_CKegBehavior* GetKegBehavior();
-	shok_GGL_CFoundryBehavior* GetFoundryBehavior();
-	shok_GGL_CSerfBehavior* GetSerfBehavior();
-	shok_GGL_CBattleSerfBehavior* GetBattleSerfBehavior();
-	shok_GGL_CLimitedAttachmentBehavior* GetLimitedAttachmentBehavior();
-	shok_GGL_CBuildingMerchantBehavior* GetBuildingMerchantBehavior();
-	shok_GGL_CBuildingMercenaryBehavior* GetMercenaryBehavior();
-	shok_GGL_CAutoCannonBehavior* GetAutoCannonBehavior();
-
-
+	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehavior, T>::value>::type* = nullptr>
+	T* GetBehavior() {
+		for (shok_EGL_CGLEBehavior* b : Behaviours) {
+			if (b) {
+				T* r = shok_DynamicCast<shok_EGL_CGLEBehavior, T>(b);
+				if (r)
+					return r;
+			}
+		}
+		return nullptr;
+	}
 
 	bool IsEntityInCategory(shok_EntityCategory cat);
-	bool IsMovingEntity();
-	bool IsSettler();
-	bool IsBuilding();
-	bool IsResourceDoodad();
 	int GetResourceProvided();
 	shok_GGlue_CGlueEntityProps* GetEntityType();
 
@@ -184,6 +152,7 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	int MovementState; // 70
 
 	static inline constexpr int vtp = 0x783F84;
+	static inline constexpr int TypeDesc = 0x8077EC;
 
 	void AttackMove(shok_position& p);
 	void AttackEntity(int targetId);
@@ -226,6 +195,7 @@ struct shok_GGL_CEvadingEntity : shok_EGL_CMovingEntity {
 	PADDINGI(4);
 
 	static inline constexpr int vtp = 0x770A7C;
+	static inline constexpr int TypeDesc = 0x810C34;
 };
 
 struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
@@ -272,6 +242,7 @@ struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
 	int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
 
 	static inline constexpr int vtp = 0x76E3CC;
+	static inline constexpr int TypeDesc = 0x807858;
 	static inline constexpr int vtp_IEntityDisplay = 0x76E3B0;
 
 	bool IsIdle();
@@ -286,12 +257,14 @@ struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
 	shok_position DangerPosition;
 
 	static inline constexpr int vtp = 0x778F7C;
+	static inline constexpr int TypeDesc = 0x812038;
 };
 
 struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
 	int ResourceType, ResourceAmount, ResourceAmountAdd;
 
 	static inline constexpr int vtp = 0x76FEA4;
+	static inline constexpr int TypeDesc = 0x8118AC;
 	static inline constexpr int vtp_IEntityDisplay = 0x76FE88;
 };
 
@@ -307,6 +280,7 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	int ConstructionSiteType; // 83
 
 	static inline constexpr int vtp = 0x76EB94;
+	static inline constexpr int TypeDesc = 0x807898;
 	static inline constexpr int vtp_IEntityDisplay = 0x76EB78;
 
 	int GetConstructionSite();
@@ -336,6 +310,7 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 
 struct shok_GGL_CBridgeEntity : shok_GGL_CBuilding {
 	static inline constexpr int vtp = 0x77805C;
+	static inline constexpr int TypeDesc = 0x812054;
 	static inline constexpr int vtp_IEntityDisplay = 0x778040;
 };
 
@@ -344,6 +319,7 @@ struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
 	int AmbientSoundType;
 
 	static inline constexpr int vtp = 0x78568C;
+	static inline constexpr int TypeDesc = 0x839FF0;
 };
 
 struct shok_EGL_CGLEEntityCreator : shok_object {
@@ -358,6 +334,7 @@ struct shok_EGL_CGLEEntityCreator : shok_object {
 	float Scale = 0; // 11
 
 	static inline constexpr int vtp = 0x766B50;
+	static inline constexpr int TypeDesc = 0x807874;
 	
 	shok_EGL_CGLEEntityCreator();
 	~shok_EGL_CGLEEntityCreator();
@@ -368,6 +345,7 @@ struct shok_GGL_CGLConstructionSiteCreator : shok_EGL_CGLEEntityCreator {
 	int BuildingType = 0; // set EntityType to construction site type (from building props) and BuildingType to the building youactually want to construct
 
 	static inline constexpr int vtp = 0x770114;
+	static inline constexpr int TypeDesc = 0x811A80;
 
 	shok_GGL_CGLConstructionSiteCreator();
 };
@@ -375,6 +353,7 @@ struct shok_GGL_CResourceDoodadCreator : shok_EGL_CGLEEntityCreator {
 	int ResourceAmount = 0;
 
 	static inline constexpr int vtp = 0x774898;
+	static inline constexpr int TypeDesc = 0x811974;
 
 	shok_GGL_CResourceDoodadCreator();
 };

@@ -24,9 +24,9 @@ static_assert(sizeof(std::list<int>) == 8);
 
 #define DEBUGGER_BREAK _asm int 3
 
-#define SHOK_Import_LUA_OPEN 0x761284
-#define SHOK_SEGMENTSTART 0x401000
-#define SHOK_SEGMENTLENGTH 0x64B000
+constexpr int SHOK_Import_LUA_OPEN = 0x761284;
+constexpr int SHOK_SEGMENTSTART = 0x401000;
+constexpr int SHOK_SEGMENTLENGTH = 0x64B000;
 
 typedef uint8_t byte;
 
@@ -70,41 +70,41 @@ static inline void* (__cdecl* const shok_new)(size_t t) = reinterpret_cast<void*
 static inline void(__cdecl* const shok_free)(void* p) = reinterpret_cast<void(__cdecl*)(void* p)>(0x5C2E2D);
 static inline void (*const shok_logString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
 
-template <class T>
+template <class CastFrom>
 struct shok_allocator {
-	typedef T value_type;
+	typedef CastFrom value_type;
 	shok_allocator() = default;
 	template <class U> constexpr shok_allocator(const shok_allocator <U>&) noexcept {}
 
-	[[nodiscard]] T* allocate(size_t n) noexcept
+	[[nodiscard]] CastFrom* allocate(size_t n) noexcept
 	{
-		void* p = shok_malloc(n * sizeof(T));
-		return (T*)p;
+		void* p = shok_malloc(n * sizeof(CastFrom));
+		return (CastFrom*)p;
 	}
-	void deallocate(T* p, size_t n) noexcept
+	void deallocate(CastFrom* p, size_t n) noexcept
 	{
 		shok_free(p);
 	}
 };
-template <class T, class U>
-bool operator==(const shok_allocator <T>&, const shok_allocator <U>&) { return true; }
-template <class T, class U>
-bool operator!=(const shok_allocator <T>&, const shok_allocator <U>&) { return false; }
+template <class CastFrom, class U>
+bool operator==(const shok_allocator <CastFrom>&, const shok_allocator <U>&) { return true; }
+template <class CastFrom, class U>
+bool operator!=(const shok_allocator <CastFrom>&, const shok_allocator <U>&) { return false; }
 
-template <class T>
+template <class CastFrom>
 struct shok_treeNode {
-	shok_treeNode<T>* left, * parent, * right;
-	T data;
+	shok_treeNode<CastFrom>* left, * parent, * right;
+	CastFrom data;
 	bool redblack;
 };
-template <class T>
+template <class CastFrom>
 struct shok_set { // todo iterators
 	PADDINGI(1);
-	shok_treeNode<T>* root;
+	shok_treeNode<CastFrom>* root;
 	int size;
 
 private:
-	void ForAllRec(shok_treeNode<T>* d, std::function<void(T*)> lambda) {
+	void ForAllRec(shok_treeNode<CastFrom>* d, std::function<void(CastFrom*)> lambda) {
 		if (d == root)
 			return;
 		ForAllRec(d->left, lambda);
@@ -112,12 +112,12 @@ private:
 		ForAllRec(d->right, lambda);
 	}
 public:
-	void ForAll(std::function<void(T*)> lambda) {
+	void ForAll(std::function<void(CastFrom*)> lambda) {
 		ForAllRec(root->parent, lambda);
 	}
-	T* GetFirstMatch(std::function<bool(T*)> lambda) {
-		T* r = nullptr;
-		ForAll([&r, lambda](T* d) {
+	CastFrom* GetFirstMatch(std::function<bool(CastFrom*)> lambda) {
+		CastFrom* r = nullptr;
+		ForAll([&r, lambda](CastFrom* d) {
 			if (r == nullptr && lambda(d))
 				r = d;
 			});
@@ -143,10 +143,10 @@ public:
 
 static_assert(sizeof(shok_string) == 7 * 4);
 
-template<class T>
-inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {
+template<class CastFrom>
+inline void shok_saveVector(std::vector<CastFrom, shok_allocator<CastFrom>>* vec, std::function<void(std::vector<CastFrom, shok_allocator<CastFrom>> &s)> func) {
 #ifdef _DEBUG
-	std::vector<T, shok_allocator<T>> save{};
+	std::vector<CastFrom, shok_allocator<CastFrom>> save{};
 	int* vecPoint = reinterpret_cast<int*>(vec);
 	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[3] = {};
@@ -163,10 +163,10 @@ inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::functio
 	func(*vec);
 #endif
 }
-template<class T>
-inline void shok_saveList(std::list<T, shok_allocator<T>>* vec, std::function<void(std::list<T, shok_allocator<T>>& s)> func) {
+template<class CastFrom>
+inline void shok_saveList(std::list<CastFrom, shok_allocator<CastFrom>>* vec, std::function<void(std::list<CastFrom, shok_allocator<CastFrom>>& s)> func) {
 #ifdef _DEBUG
-	std::list<T, shok_allocator<T>> save{};
+	std::list<CastFrom, shok_allocator<CastFrom>> save{};
 	int* vecPoint = reinterpret_cast<int*>(vec);
 	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[2] = {};
@@ -182,6 +182,12 @@ inline void shok_saveList(std::list<T, shok_allocator<T>>* vec, std::function<vo
 #else
 	func(*vec);
 #endif
+}
+
+template<class CastFrom, class CastTo>
+inline CastTo* shok_DynamicCast(CastFrom* i) {
+	void* (__cdecl* const shok_dyncastFunc)(void* i, int off, int TypeDescSource, int TypeDescOut, bool isref) = reinterpret_cast<void* (__cdecl* const)(void*, int, int, int, bool)>(0x5C36EE);
+	return static_cast<CastTo*>(shok_dyncastFunc(i, 0, CastFrom::TypeDesc, CastTo::TypeDesc, false));
 }
 
 // generic structs
@@ -231,8 +237,8 @@ struct shok_event_data {
 
 };
 
-template<class T>
-bool contains(T* data, T search, int num) {
+template<class CastFrom>
+bool contains(CastFrom* data, CastFrom search, int num) {
 	for (int i = 0; i < num; i++)
 		if (data[i] == search)
 			return true;
@@ -308,5 +314,5 @@ constexpr inline T rad2deg(T r) {
 }
 template<class T>
 constexpr inline T deg2rad(T d) {
-	return static_cast<T>(d * M_PI / 180);
+	return static_cast<T>(static_cast<double>(d) * M_PI / 180);
 }

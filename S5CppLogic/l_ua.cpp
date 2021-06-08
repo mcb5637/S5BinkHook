@@ -353,7 +353,7 @@ bool UnlimitedArmy::IsTargetValid(int id)
 	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
 	if (!LastPos.IsInRange(e->Position, Area))
 		return false;
-	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
+	shok_GGL_CCamouflageBehavior* c = e->GetBehavior<shok_GGL_CCamouflageBehavior>();
 	if (c != nullptr) {
 		return c->InvisibilityRemaining <= 0;
 	}
@@ -579,7 +579,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 {
 	// first instant abilities
 	{
-		shok_GGL_CRangedEffectAbility* a = e->GetRangedEffectBehavior();
+		shok_GGL_CRangedEffectAbility* a = e->GetBehavior<shok_GGL_CRangedEffectAbility>();
 		if (a != nullptr) {
 			shok_GGL_CRangedEffectAbilityProps* p = e->GetEntityType()->GetRangedEffectBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -605,7 +605,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CSummonBehavior* a = e->GetSummonBehavior();
+		shok_GGL_CSummonBehavior* a = e->GetBehavior<shok_GGL_CSummonBehavior>();
 		if (a != nullptr) {
 			shok_GGL_CSummonBehaviorProps* p = e->GetEntityType()->GetSummonBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -622,7 +622,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 
 	// then noninstant
 	{
-		shok_GGL_CCircularAttack* a = e->GetCircularAttackBehavior();
+		shok_GGL_CCircularAttack* a = e->GetBehavior<shok_GGL_CCircularAttack>();
 		if (a != nullptr) {
 			shok_GGL_CCircularAttackProps* p = e->GetEntityType()->GetCircularAttackBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -634,7 +634,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CBombPlacerBehavior* a = e->GetBombPlacerBehavior();
+		shok_GGL_CBombPlacerBehavior* a = e->GetBehavior<shok_GGL_CBombPlacerBehavior>();
 		if (a != nullptr) {
 			shok_GGL_CHeroAbilityProps* p = e->GetEntityType()->GetBombPlacerBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -646,7 +646,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CCannonBuilderBehavior* a = e->GetCannonBuilderBehavior();
+		shok_GGL_CCannonBuilderBehavior* a = e->GetBehavior<shok_GGL_CCannonBuilderBehavior>();
 		if (a != nullptr) {
 			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetCannonBuilderBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -666,7 +666,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CShurikenAbility* a = e->GetShurikenBehavior();
+		shok_GGL_CShurikenAbility* a = e->GetBehavior<shok_GGL_CShurikenAbility>();
 		if (a != nullptr) {
 			shok_GGL_CShurikenAbilityProps* p = e->GetEntityType()->GetShurikenBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -681,7 +681,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CConvertSettlerAbility* a = e->GetConvertSettlerBehavior();
+		shok_GGL_CConvertSettlerAbility* a = e->GetBehavior<shok_GGL_CConvertSettlerAbility>();
 		if (a != nullptr) {
 			shok_GGL_CConvertSettlerAbilityProps* p = e->GetEntityType()->GetConvertSettlersBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -697,7 +697,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CSniperAbility* a = e->GetSniperBehavior();
+		shok_GGL_CSniperAbility* a = e->GetBehavior<shok_GGL_CSniperAbility>();
 		if (a != nullptr) {
 			shok_GGL_CSniperAbilityProps* p = e->GetEntityType()->GetSniperBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -711,7 +711,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CInflictFearAbility* a = e->GetInflictFearBehavior();
+		shok_GGL_CInflictFearAbility* a = e->GetBehavior<shok_GGL_CInflictFearAbility>();
 		if (a != nullptr) {
 			shok_GGL_CInflictFearAbilityProps* p = e->GetEntityType()->GetInflictFearBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -723,7 +723,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CKegPlacerBehavior* a = e->GetKegPlacerBehavior();
+		shok_GGL_CKegPlacerBehavior* a = e->GetBehavior<shok_GGL_CKegPlacerBehavior>();
 		if (a != nullptr) {
 			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetKegPlacerBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -739,8 +739,8 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 		}
 	}
 	if (shok_EGL_CGLEEntity::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
-		shok_GGL_CCamouflageBehavior* a = e->GetCamoAbilityBehavior();
-		if (a != nullptr && !a->IsThiefCamoBehavior()) {
+		shok_GGL_CCamouflageBehavior* a = e->GetBehavior<shok_GGL_CCamouflageBehavior>();
+		if (a != nullptr && !shok_DynamicCast<shok_GGL_CCamouflageBehavior, shok_GGL_CThiefCamouflageBehavior>(a)) {
 			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetCamouflageBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
@@ -756,7 +756,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 bool UnlimitedArmy::ExecutePrepDefense(shok_EGL_CGLEEntity* e)
 {
 	{
-		shok_GGL_CCannonBuilderBehavior* a = e->GetCannonBuilderBehavior();
+		shok_GGL_CCannonBuilderBehavior* a = e->GetBehavior<shok_GGL_CCannonBuilderBehavior>();
 		if (a != nullptr) {
 			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetCannonBuilderBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
@@ -776,7 +776,7 @@ bool UnlimitedArmy::ExecutePrepDefense(shok_EGL_CGLEEntity* e)
 		}
 	}
 	{
-		shok_GGL_CKegPlacerBehavior* a = e->GetKegPlacerBehavior();
+		shok_GGL_CKegPlacerBehavior* a = e->GetBehavior<shok_GGL_CKegPlacerBehavior>();
 		if (a != nullptr) {
 			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetKegPlacerBehaviorProps();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {

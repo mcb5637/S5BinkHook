@@ -33,12 +33,14 @@ public:
 	std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
 
 	static inline constexpr int vtp = 0x76E47C;
+	static inline constexpr int TypeDesc = 0x810B0C;
 };
 
 struct shok_GGL_CEntityProperties : shok_EGL_CGLEEntityProps {
 	int ResourceEntity, ResourceAmount, SummerEffect, WinterEffect;
 
 	static inline constexpr int vtp = 0x776FEC;
+	static inline constexpr int TypeDesc = 0x81192C;
 };
 
 struct shok_upgradeInfo {
@@ -63,6 +65,7 @@ public:
 	int AttractionSlots;
 
 	static inline constexpr int vtp = 0x76E498;
+	static inline constexpr int TypeDesc = 0x810B30;
 };
 
 struct shok_GGL_CGLAnimalProps : shok_EGL_CGLEEntityProps {
@@ -71,12 +74,14 @@ struct shok_GGL_CGLAnimalProps : shok_EGL_CGLEEntityProps {
 	int FleeTaskList;
 
 	static inline constexpr int vtp = 0x779074;
+	static inline constexpr int TypeDesc = 0x828DD0;
 };
 
 struct shok_GGL_CBuildBlockProperties : shok_EGL_CGLEEntityProps {
 	shok_AARect BuildBlockArea; // la 41
 
 	static inline constexpr int vtp = 0x76EB38;
+	static inline constexpr int TypeDesc = 0x811284;
 };
 
 struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
@@ -85,6 +90,7 @@ struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
 	int ExtractTaskList, Model1, Model2;
 
 	static inline constexpr int vtp = 0x76FF68;
+	static inline constexpr int TypeDesc = 0x811900;
 };
 
 struct shok_constructionInfo {
@@ -117,6 +123,7 @@ public:
 	float KegEffectFactor; // 124
 
 	static inline constexpr int vtp = 0x76EC78;
+	static inline constexpr int TypeDesc = 0x811210;
 };
 
 struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
@@ -124,6 +131,7 @@ struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
 
 	static inline constexpr int vtp = 0x778148;
+	static inline constexpr int TypeDesc = 0x824A84;
 };
 
 struct shok_ED_CDisplayEntityProps : shok_object {
@@ -135,6 +143,7 @@ struct shok_ED_CDisplayEntityProps : shok_object {
 	std::vector<int, shok_allocator<int>> AnimList;
 
 	static inline constexpr int vtp = 0x788840;
+	static inline constexpr int TypeDesc = 0x83C918;
 };
 
 struct shok_GGlue_CGlueEntityProps : shok_object {
@@ -145,6 +154,7 @@ struct shok_GGlue_CGlueEntityProps : shok_object {
 	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps;
 
 	static inline constexpr int vtp = 0x788824;
+	static inline constexpr int TypeDesc = 0x83C8CC;
 
 
 private:

@@ -3,6 +3,10 @@
 #include "s5data.h"
 #include "luaext.h"
 
+EntityIteratorPredicate* l_entity_checkpredicate(lua_State* L, int i) {
+	return reinterpret_cast<EntityIteratorPredicate*>(luaext_checkudata(L, i));
+};
+
 int l_entity_getNum(lua_State* L) {
 	lua_pushnumber(L, (*shok_EGL_CGLEEntityManager::GlobalObj)->EntityCount);
 	return 1;
@@ -44,7 +48,7 @@ int l_entityPredicateInCircle(lua_State* L) {
 int l_entityPredicateAnyPlayer(lua_State* L) {
 	int num = lua_gettop(L);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateAnyPlayer) + sizeof(int) * num);
-	int* pred = (int*)&((EntityIteratorPredicateAnyPlayer*)ud)[1]; // get start address of array
+	int* pred = reinterpret_cast<int*>(&reinterpret_cast<EntityIteratorPredicateAnyPlayer*>(ud)[1]); // get start address of array
 	for (int i = 0; i < num; i++) {
 		pred[i] = luaL_checkint(L, i+1);
 	}
@@ -55,7 +59,7 @@ int l_entityPredicateAnyPlayer(lua_State* L) {
 int l_entityPredicateAnyEntityType(lua_State* L) {
 	int num = lua_gettop(L);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateAnyEntityType) + sizeof(int) * num);
-	int* pred = (int*)&((EntityIteratorPredicateAnyEntityType*)ud)[1]; // get start address of array
+	int* pred = reinterpret_cast<int*>(&reinterpret_cast<EntityIteratorPredicateAnyEntityType*>(ud)[1]); // get start address of array
 	for (int i = 0; i < num; i++) {
 		pred[i] = luaL_checkint(L, i+1);
 	}
@@ -67,7 +71,7 @@ int l_entityPredicateAnd(lua_State* L) {
 	int num = lua_gettop(L);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateAnd) + sizeof(EntityIteratorPredicate*) * num);
 	lua_insert(L, 1);
-	EntityIteratorPredicate** pred = (EntityIteratorPredicate**)&((EntityIteratorPredicateAnd*)ud)[1]; // get start address of predicate array
+	EntityIteratorPredicate** pred = reinterpret_cast<EntityIteratorPredicate**>(&reinterpret_cast<EntityIteratorPredicateAnd*>(ud)[1]); // get start address of predicate array
 	new(ud) EntityIteratorPredicateAnd(pred, num);
 	lua_newtable(L);
 	lua_insert(L, 2);
@@ -83,7 +87,7 @@ int l_entityPredicateOr(lua_State* L) {
 	int num = lua_gettop(L);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateOr) + sizeof(EntityIteratorPredicate*) * num);
 	lua_insert(L, 1);
-	EntityIteratorPredicate** pred = (EntityIteratorPredicate**)&((EntityIteratorPredicateOr*)ud)[1]; // get start address of predicate array
+	EntityIteratorPredicate** pred = reinterpret_cast<EntityIteratorPredicate**>(&reinterpret_cast<EntityIteratorPredicateOr*>(ud)[1]); // get start address of predicate array
 	new(ud) EntityIteratorPredicateOr(pred, num);
 	lua_newtable(L);
 	lua_insert(L, 2);
@@ -191,7 +195,7 @@ int l_entityIteratorToTable(lua_State* L) {
 	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
 	int index = 1;
 	lua_newtable(L);
-	EntityIterator it = EntityIterator(pred);
+	EntityIterator it{ pred };
 	shok_EGL_CGLEEntity* e = nullptr;
 	while (true) {
 		e = it.GetNext(nullptr, nullptr);
@@ -210,7 +214,7 @@ int l_entityIteratorCount(lua_State* L) {
 	}
 	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
 	int count = 1;
-	EntityIterator it = EntityIterator(pred);
+	EntityIterator it{ pred };
 	shok_EGL_CGLEEntity* e = nullptr;
 	while (true) {
 		e = it.GetNext(nullptr, nullptr);
@@ -227,7 +231,7 @@ int l_entityIteratorGetNearest(lua_State* L) {
 		l_entityPredicateAnd(L);
 	}
 	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
-	EntityIterator it = EntityIterator(pred);
+	EntityIterator it{ pred };
 	float maxR = -1;
 	shok_EGL_CGLEEntity* e = it.GetNearest(&maxR);
 	lua_pushnumber(L, e == nullptr ? 0 : e->EntityId);
@@ -236,7 +240,7 @@ int l_entityIteratorGetNearest(lua_State* L) {
 }
 
 int l_entityIteratorNext(lua_State* L) { // (state, last value) -> next value
-	EntityIterator* it = (EntityIterator*)lua_touserdata(L, 1); // no error checking here, cause that would cost speed
+	EntityIterator* it = reinterpret_cast<EntityIterator*>(lua_touserdata(L, 1)); // no error checking here, cause that would cost speed
 	float r = -1;
 	int p = -1;
 	shok_EGL_CGLEEntity* e = it->GetNext(&r, &p);
@@ -290,14 +294,14 @@ int l_entityGetNumberOfBehaviors(lua_State* L) {
 
 int l_leaderGetLeaderXP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	shok_GGL_CLeaderBehavior* b = s->GetBehavior<shok_GGL_CLeaderBehavior>();
 	luaext_assertPointer(L, b, "no leader at 1");
 	lua_pushnumber(L, b->Experience);
 	return 1;
 }
 int l_leaderSetLeaderXP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	shok_GGL_CLeaderBehavior* b = s->GetBehavior<shok_GGL_CLeaderBehavior>();
 	luaext_assertPointer(L, b, "no leader at 1");
 	b->Experience = luaL_checkint(L, 2);
 	return 0;
@@ -305,7 +309,7 @@ int l_leaderSetLeaderXP(lua_State* L) {
 
 int l_leaderGetLeaderHP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	shok_GGL_CLeaderBehavior* b = s->GetBehavior<shok_GGL_CLeaderBehavior>();
 	luaext_assertPointer(L, b, "no leader at 1");
 	lua_pushnumber(L, b->GetTroopHealth());
 	lua_pushnumber(L, b->GetTroopHealthPerSoldier());
@@ -313,7 +317,7 @@ int l_leaderGetLeaderHP(lua_State* L) {
 }
 int l_leaderSetLeaderHP(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CLeaderBehavior* b = s->GetLeaderBehavior();
+	shok_GGL_CLeaderBehavior* b = s->GetBehavior<shok_GGL_CLeaderBehavior>();
 	luaext_assertPointer(L, b, "no leader at 1");
 	b->TroopHealthCurrent = luaL_checkint(L, 2);
 	return 0;
@@ -321,26 +325,26 @@ int l_leaderSetLeaderHP(lua_State* L) {
 
 int l_settlerGetBaseMovementSpeed(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CBehaviorDefaultMovement* b = s->GetMovementBehavior();
+	shok_GGL_CBehaviorDefaultMovement* b = s->GetBehavior<shok_GGL_CBehaviorDefaultMovement>();
 	luaext_assertPointer(L, b, "no moving entity at 1");
 	lua_pushnumber(L, b->MovementSpeed);
-	lua_pushnumber(L, rad2deg((double)b->TurningSpeed));
+	lua_pushnumber(L, rad2deg(b->TurningSpeed));
 	return 2;
 }
 int l_settlerSetBaseMovementSpeed(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CBehaviorDefaultMovement* b = s->GetMovementBehavior();
+	shok_GGL_CBehaviorDefaultMovement* b = s->GetBehavior<shok_GGL_CBehaviorDefaultMovement>();
 	luaext_assertPointer(L, b, "no moving entity at 1");
 	if (lua_isnumber(L, 2))
 		b->MovementSpeed = luaL_checkfloat(L, 2);
 	if (lua_isnumber(L, 3))
-		b->TurningSpeed = (float)deg2rad(lua_tonumber(L, 3));
+		b->TurningSpeed = static_cast<float>(deg2rad(lua_tonumber(L, 3)));
 	return 0;
 }
 
 int l_buildingGetAutoFillActive(lua_State* L) {
 	shok_GGL_CBuilding* e = luaext_checkBulding(L, 1);
-	shok_GGL_CBarrackBehavior* b = e->GetBarrackBehavior();
+	shok_GGL_CBarrackBehavior* b = e->GetBehavior<shok_GGL_CBarrackBehavior>();
 	luaext_assertPointer(L, b, "no barracks at 1");
 	lua_pushboolean(L, b->AutoFillActive);
 	return 1;
@@ -383,25 +387,25 @@ int l_settlerSetOvereadWidget(lua_State* L) {
 
 int l_movingEntityGetTargetPos(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	luaext_assert(L, e->IsMovingEntity(), "no moving entity at 1");
-	shok_EGL_CMovingEntity* m = (shok_EGL_CMovingEntity*)e;
+	shok_EGL_CMovingEntity* m = shok_DynamicCast<shok_EGL_CGLEEntity, shok_EGL_CMovingEntity>(e);
+	luaext_assertPointer(L, m, "no moving entity at 1");
 	luaext_pushPos(L, m->TargetPosition);
 	if (m->TargetRotationValid) {
 		lua_pushstring(L, "r");
-		lua_pushnumber(L, rad2deg((double)m->TargetRotation));
+		lua_pushnumber(L, rad2deg(m->TargetRotation));
 		lua_rawset(L, -3);
 	}
 	return 1;
 }
 int l_movingEntitySetTargetPos(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	luaext_assert(L, e->IsMovingEntity(), "no moving entity at 1");
-	shok_EGL_CMovingEntity* m = (shok_EGL_CMovingEntity*)e;
+	shok_EGL_CMovingEntity* m = shok_DynamicCast<shok_EGL_CGLEEntity, shok_EGL_CMovingEntity>(e);
+	luaext_assertPointer(L, m, "no moving entity at 1");
 	luaext_checkPos(L, m->TargetPosition, 2);
 	lua_pushstring(L, "r");
 	lua_gettable(L, 2);
 	if (lua_isnumber(L, -1)) {
-		m->TargetRotation = (float)deg2rad(lua_tonumber(L, -1));
+		m->TargetRotation = static_cast<float>(deg2rad(lua_tonumber(L, -1)));
 		m->TargetRotationValid = 1;
 	}
 	else {
@@ -412,30 +416,30 @@ int l_movingEntitySetTargetPos(lua_State* L) {
 
 int l_settlerHeroCamouflageGetDurationLeft(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CCamouflageBehavior* c = s->GetCamoAbilityBehavior();
+	shok_GGL_CCamouflageBehavior* c = s->GetBehavior<shok_GGL_CCamouflageBehavior>();
 	luaext_assertPointer(L, c, "no camo hero at 1");
 	lua_pushnumber(L, c->InvisibilityRemaining);
 	return 1;
 }
 int l_settlerHeroCamouflageSetDurationLeft(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CCamouflageBehavior* c = s->GetCamoAbilityBehavior();
+	shok_GGL_CCamouflageBehavior* c = s->GetBehavior<shok_GGL_CCamouflageBehavior>();
 	luaext_assertPointer(L, c, "no camo hero at 1");
-	luaext_assert(L, c->vtable != shok_GGL_CThiefCamouflageBehavior::vtp, "thief at 1, use ThiefSetCamouflageTimeTo instead");
+	luaext_assert(L, !shok_DynamicCast<shok_GGL_CCamouflageBehavior, shok_GGL_CThiefCamouflageBehavior>(c), "thief at 1, use ThiefSetCamouflageTimeTo instead");
 	c->InvisibilityRemaining = luaL_checkint(L, 2);
 	return 1;
 }
 
 int l_settlerThiefCamouflageGetTimeTo(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CThiefCamouflageBehavior* c = s->GetCamoThiefBehavior();
+	shok_GGL_CThiefCamouflageBehavior* c = s->GetBehavior<shok_GGL_CThiefCamouflageBehavior>();
 	luaext_assertPointer(L, c, "no thief at 1");
 	lua_pushnumber(L, c->TimeToInvisibility);
 	return 1;
 }
 int l_settlerThiefCamouflageSetTimeTo(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CThiefCamouflageBehavior* c = s->GetCamoThiefBehavior();
+	shok_GGL_CThiefCamouflageBehavior* c = s->GetBehavior<shok_GGL_CThiefCamouflageBehavior>();
 	luaext_assertPointer(L, c, "no thief at 1");
 	int i = luaL_checkint(L, 2);
 	c->TimeToInvisibility = i;
@@ -445,14 +449,14 @@ int l_settlerThiefCamouflageSetTimeTo(lua_State* L) {
 
 int l_settlerHeroGetResurrectionTime(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CHeroBehavior* h = s->GetHeroBehavior();
+	shok_GGL_CHeroBehavior* h = s->GetBehavior<shok_GGL_CHeroBehavior>();
 	luaext_assertPointer(L, h, "no hero at 1");
 	lua_pushnumber(L, h->ResurrectionTimePassed);
 	return 1;
 }
 int l_settlerHeroSetResurrectionTime(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CHeroBehavior* h = s->GetHeroBehavior();
+	shok_GGL_CHeroBehavior* h = s->GetBehavior<shok_GGL_CHeroBehavior>();
 	luaext_assertPointer(L, h, "no hero at 1");
 	h->ResurrectionTimePassed = luaL_checkint(L, 2);
 	return 0;
@@ -460,14 +464,14 @@ int l_settlerHeroSetResurrectionTime(lua_State* L) {
 
 int l_entityGetLimitedLifespanRemaining(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CLimitedLifespanBehavior* l = e->GetLimitedLifespanBehavior();
+	shok_GGL_CLimitedLifespanBehavior* l = e->GetBehavior<shok_GGL_CLimitedLifespanBehavior>();
 	luaext_assertPointer(L, l, "no limited lifespan at 1");
 	lua_pushnumber(L, l->RemainingLifespanSeconds);
 	return 1;
 }
 int l_entitySetLimitedLifespanRemaining(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CLimitedLifespanBehavior* l = e->GetLimitedLifespanBehavior();
+	shok_GGL_CLimitedLifespanBehavior* l = e->GetBehavior<shok_GGL_CLimitedLifespanBehavior>();
 	luaext_assertPointer(L, l, "no limited lifespan at 1");
 	l->RemainingLifespanSeconds = luaL_checkint(L, 2);
 	return 0;
@@ -515,7 +519,7 @@ int l_entitySetTaskListIndex(lua_State* L) {
 
 int l_movingEntityGetSpeedFactor(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CBehaviorDefaultMovement* m = e->GetMovementBehavior();
+	shok_GGL_CBehaviorDefaultMovement* m = e->GetBehavior<shok_GGL_CBehaviorDefaultMovement>();
 	luaext_assertPointer(L, m, "no moving entity at 1");
 	lua_pushnumber(L, m->SpeedFactor);
 	return 1;
@@ -523,14 +527,14 @@ int l_movingEntityGetSpeedFactor(lua_State* L) {
 
 int l_settlerGetWorkerCurrentWorkTime(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CWorkerBehavior* w = s->GetWorkerBehavior();
+	shok_GGL_CWorkerBehavior* w = s->GetBehavior<shok_GGL_CWorkerBehavior>();
 	luaext_assertPointer(L, w, "no worker at 1");
 	lua_pushnumber(L, w->WorkTimeRemaining);
 	return 1;
 }
 int l_settlerSetWorkerCurrentWorkTime(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CWorkerBehavior* w = s->GetWorkerBehavior();
+	shok_GGL_CWorkerBehavior* w = s->GetBehavior<shok_GGL_CWorkerBehavior>();
 	luaext_assertPointer(L, w, "no worker at 1");
 	w->WorkTimeRemaining = luaL_checkint(L, 2);
 	return 0;
@@ -538,7 +542,7 @@ int l_settlerSetWorkerCurrentWorkTime(lua_State* L) {
 
 int l_buildingGetCurrentTradeInfo(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	shok_GGL_CMarketBehavior* m = b->GetMarketBehavior();
+	shok_GGL_CMarketBehavior* m = b->GetBehavior<shok_GGL_CMarketBehavior>();
 	luaext_assertPointer(L, m, "no market at 1");
 	lua_pushnumber(L, m->BuyResourceType);
 	lua_pushnumber(L, m->SellResourceType);
@@ -549,7 +553,7 @@ int l_buildingGetCurrentTradeInfo(lua_State* L) {
 }
 int l_buildingSetCurrentTradeInfo(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	shok_GGL_CMarketBehavior* m = b->GetMarketBehavior();
+	shok_GGL_CMarketBehavior* m = b->GetBehavior<shok_GGL_CMarketBehavior>();
 	luaext_assertPointer(L, m, "no market at 1");
 	if (lua_isnumber(L, 2))
 		m->BuyResourceType = luaL_checkint(L, 2);
@@ -566,13 +570,13 @@ int l_buildingSetCurrentTradeInfo(lua_State* L) {
 
 int l_entityIsSoldier(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	lua_pushboolean(L, e->GetSoldierBehavior() != nullptr);
+	lua_pushboolean(L, e->GetBehavior<shok_GGL_CSoldierBehavior>() != nullptr);
 	return 1;
 }
 
 int l_heroResurrect(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CHeroBehavior* h = e->GetHeroBehavior();
+	shok_GGL_CHeroBehavior* h = e->GetBehavior<shok_GGL_CHeroBehavior>();
 	luaext_assertPointer(L, h, "no hero at 1");
 	h->ResurrectionTimePassed = 20000;
 	h->EnemyNear = 0;
@@ -582,7 +586,7 @@ int l_heroResurrect(lua_State* L) {
 
 int l_settlerThiefSetStolenResourceInfo(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CThiefBehavior* t = e->GetThiefBehavior();
+	shok_GGL_CThiefBehavior* t = e->GetBehavior<shok_GGL_CThiefBehavior>();
 	luaext_assertPointer(L, t, "no thief at 1");
 	int ty = luaL_checkint(L, 2);
 	int am;
@@ -601,12 +605,12 @@ int l_settlerThiefSetStolenResourceInfo(lua_State* L) {
 
 int l_entityGetAutoAttackMaxRange(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CBattleBehavior* b = e->GetBattleBehavior();
+	shok_GGL_CBattleBehavior* b = e->GetBehavior<shok_GGL_CBattleBehavior>();
 	if (b) {
 		lua_pushnumber(L, b->GetMaxRange());
 		return 1;
 	}
-	shok_GGL_CAutoCannonBehavior* a = e->GetAutoCannonBehavior();
+	shok_GGL_CAutoCannonBehavior* a = e->GetBehavior<shok_GGL_CAutoCannonBehavior>();
 	if (a) {
 		lua_pushnumber(L, a->GetMaxRange());
 		return 1;
@@ -632,7 +636,7 @@ int l_entityGetExploration(lua_State* L) {
 
 int l_entityGetSpeed(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CBehaviorDefaultMovement* m = e->GetMovementBehavior();
+	shok_GGL_CBehaviorDefaultMovement* m = e->GetBehavior<shok_GGL_CBehaviorDefaultMovement>();
 	luaext_assertPointer(L, m, "no moving entity at 1");
 	lua_pushnumber(L, m->GetMovementSpeed() * 10.0);
 	return 1;
@@ -640,7 +644,7 @@ int l_entityGetSpeed(lua_State* L) {
 
 int l_settlerIsVisible(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
+	shok_GGL_CCamouflageBehavior* c = e->GetBehavior<shok_GGL_CCamouflageBehavior>();
 	if (c != nullptr) {
 		return c->InvisibilityRemaining <= 0;
 	}
@@ -650,7 +654,7 @@ int l_settlerIsVisible(lua_State* L) {
 int l_settlerSendHawk(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CHeroHawkBehavior* b = e->GetHeroHawkBehavior();
+	shok_GGL_CHeroHawkBehavior* b = e->GetBehavior<shok_GGL_CHeroHawkBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CHeroHawkBehaviorProps* bp = e->GetEntityType()->GetHeroHawkBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -663,7 +667,7 @@ int l_settlerSendHawk(lua_State* L) {
 int l_settlerInflictFear(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CInflictFearAbility* b = e->GetInflictFearBehavior();
+	shok_GGL_CInflictFearAbility* b = e->GetBehavior<shok_GGL_CInflictFearAbility>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CInflictFearAbilityProps* bp = e->GetEntityType()->GetInflictFearBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -674,7 +678,7 @@ int l_settlerInflictFear(lua_State* L) {
 int l_settlerPlaceBomb(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CBombPlacerBehavior* b = e->GetBombPlacerBehavior();
+	shok_GGL_CBombPlacerBehavior* b = e->GetBehavior<shok_GGL_CBombPlacerBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CHeroAbilityProps* bp = e->GetEntityType()->GetBombPlacerBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -687,7 +691,7 @@ int l_settlerPlaceBomb(lua_State* L) {
 int l_settlerPlaceCannon(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CCannonBuilderBehavior* b = e->GetCannonBuilderBehavior();
+	shok_GGL_CCannonBuilderBehavior* b = e->GetBehavior<shok_GGL_CCannonBuilderBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CCannonBuilderBehaviorProps* bp = e->GetEntityType()->GetCannonBuilderBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -708,7 +712,7 @@ int l_settlerPlaceCannon(lua_State* L) {
 int l_settlerRangedEffect(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CRangedEffectAbility* b = e->GetRangedEffectBehavior();
+	shok_GGL_CRangedEffectAbility* b = e->GetBehavior<shok_GGL_CRangedEffectAbility>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CRangedEffectAbilityProps* bp = e->GetEntityType()->GetRangedEffectBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -719,7 +723,7 @@ int l_settlerRangedEffect(lua_State* L) {
 int l_settlerCircularAttack(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CCircularAttack* b = e->GetCircularAttackBehavior();
+	shok_GGL_CCircularAttack* b = e->GetBehavior<shok_GGL_CCircularAttack>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CCircularAttackProps* bp = e->GetEntityType()->GetCircularAttackBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -730,7 +734,7 @@ int l_settlerCircularAttack(lua_State* L) {
 int l_settlerSummon(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CSummonBehavior* b = e->GetSummonBehavior();
+	shok_GGL_CSummonBehavior* b = e->GetBehavior<shok_GGL_CSummonBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CSummonBehaviorProps* bp = e->GetEntityType()->GetSummonBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -747,7 +751,7 @@ int l_settlerSummon(lua_State* L) {
 int l_settlerConvert(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CConvertSettlerAbility* b = e->GetConvertSettlerBehavior();
+	shok_GGL_CConvertSettlerAbility* b = e->GetBehavior<shok_GGL_CConvertSettlerAbility>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CConvertSettlerAbilityProps* bp = e->GetEntityType()->GetConvertSettlersBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -761,7 +765,7 @@ int l_settlerConvert(lua_State* L) {
 int l_settlerSnipe(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CSniperAbility* b = e->GetSniperBehavior();
+	shok_GGL_CSniperAbility* b = e->GetBehavior<shok_GGL_CSniperAbility>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CSniperAbilityProps* bp = e->GetEntityType()->GetSniperBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -776,7 +780,7 @@ int l_settlerSnipe(lua_State* L) {
 int l_settlerShuriken(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CShurikenAbility* b = e->GetShurikenBehavior();
+	shok_GGL_CShurikenAbility* b = e->GetBehavior<shok_GGL_CShurikenAbility>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CShurikenAbilityProps* bp = e->GetEntityType()->GetShurikenBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -791,11 +795,11 @@ int l_settlerShuriken(lua_State* L) {
 int l_settlerSabotage(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CKegPlacerBehavior* b = e->GetKegPlacerBehavior();
+	shok_GGL_CKegPlacerBehavior* b = e->GetBehavior<shok_GGL_CKegPlacerBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CKegPlacerBehaviorProperties* bp = e->GetEntityType()->GetKegPlacerBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
-	luaext_assert(L, e->GetThiefBehavior()->ResourceType == 0, "is carrying resources");
+	luaext_assert(L, e->GetBehavior<shok_GGL_CThiefBehavior>()->ResourceType == 0, "is carrying resources");
 	shok_GGL_CBuilding* t = luaext_checkBulding(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
 	luaext_assert(L, t->IsEntityInCategory(shok_EntityCategory::Bridge) || ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile or bridge");
@@ -806,11 +810,11 @@ int l_settlerSabotage(lua_State* L) {
 int l_settlerDefuse(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CKegPlacerBehavior* b = e->GetKegPlacerBehavior();
+	shok_GGL_CKegPlacerBehavior* b = e->GetBehavior<shok_GGL_CKegPlacerBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
-	luaext_assert(L, e->GetThiefBehavior()->ResourceType == 0, "is carrying resources");
+	luaext_assert(L, e->GetBehavior<shok_GGL_CThiefBehavior>()->ResourceType == 0, "is carrying resources");
 	shok_EGL_CGLEEntity* t = luaext_checkEntity(L, 2);
-	luaext_assertPointer(L, t->GetKegBehavior(), "no keg at 2");
+	luaext_assertPointer(L, t->GetBehavior<shok_GGL_CKegBehavior>(), "no keg at 2");
 	e->ThiefDefuse(t->EntityId);
 	return 0;
 }
@@ -818,7 +822,7 @@ int l_settlerDefuse(lua_State* L) {
 int l_settlerBinoculars(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CAbilityScoutBinocular* b = e->GetBinocularBehavior();
+	shok_GGL_CAbilityScoutBinocular* b = e->GetBehavior<shok_GGL_CAbilityScoutBinocular>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CAbilityScoutBinocularProps* bp = e->GetEntityType()->GetBinocularBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -831,7 +835,7 @@ int l_settlerBinoculars(lua_State* L) {
 int l_settlerPlaceTorch(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CTorchPlacerBehavior* b = e->GetTorchPlacerBehavior();
+	shok_GGL_CTorchPlacerBehavior* b = e->GetBehavior<shok_GGL_CTorchPlacerBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CTorchPlacerBehaviorProperties* bp = e->GetEntityType()->GetTorchPlacerBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -844,7 +848,7 @@ int l_settlerPlaceTorch(lua_State* L) {
 int l_settlerPointToRes(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CPointToResourceBehavior* b = e->GetPointToResBehavior();
+	shok_GGL_CPointToResourceBehavior* b = e->GetBehavior<shok_GGL_CPointToResourceBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CPointToResourceBehaviorProperties* bp = e->GetEntityType()->GetPointToResBehaviorProps();
 	luaext_assert(L, b->AbilitySecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
@@ -855,7 +859,7 @@ int l_settlerPointToRes(lua_State* L) {
 int l_settlerStealFrom(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CThiefBehavior* b = e->GetThiefBehavior();
+	shok_GGL_CThiefBehavior* b = e->GetBehavior<shok_GGL_CThiefBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	shok_GGL_CBuilding* t = luaext_checkBulding(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
@@ -867,7 +871,7 @@ int l_settlerStealFrom(lua_State* L) {
 int l_settlerSecureGoods(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
-	shok_GGL_CThiefBehavior* b = e->GetThiefBehavior();
+	shok_GGL_CThiefBehavior* b = e->GetBehavior<shok_GGL_CThiefBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
 	luaext_assert(L, b->ResourceType != 0, "no resources carried");
 	shok_GGL_CBuilding* t = luaext_checkBulding(L, 2);
@@ -920,7 +924,7 @@ int l_settlerMove(lua_State* L) {
 	luaext_checkPos(L, p, 2);
 	e->Move(p);
 	if (lua_isnumber(L, 3)) {
-		e->TargetRotation = (float)deg2rad((double)lua_tonumber(L, 3));
+		e->TargetRotation = static_cast<float>(deg2rad(lua_tonumber(L, 3)));
 		e->TargetRotationValid = 1;
 	}
 	return 0;
@@ -934,7 +938,7 @@ int l_entityClearAttackers(lua_State* L) {
 
 int l_buildingFoundryBuildCannon(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	luaext_assertPointer(L, b->GetFoundryBehavior(), "no foundry at 1");
+	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CFoundryBehavior>(), "no foundry at 1");
 	luaext_assert(L, b->IsIdle(), "is not idle");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
@@ -965,7 +969,7 @@ int l_buildingGetNextFreeConstructionSlotFor(lua_State* L) {
 int l_settlerSerfConstruct(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 2);
-	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
+	luaext_assertPointer(L, s->GetBehavior<shok_GGL_CSerfBehavior>(), "no serf");
 	luaext_assert(L, !b->IsConstructionFinished(), "no construction site");
 	bool suc = s->SerfConstructBuilding(b);
 	lua_pushboolean(L, suc);
@@ -983,7 +987,7 @@ int l_buildingGetNextFreeRepairSlotFor(lua_State* L) {
 int l_settlerSerfRepair(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 2);
-	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
+	luaext_assertPointer(L, s->GetBehavior<shok_GGL_CSerfBehavior>(), "no serf");
 	luaext_assert(L, b->IsConstructionFinished(), "construction site");
 	luaext_assert(L, b->Health < b->GetMaxHealth(), "at full health");
 	bool suc = s->SerfRepairBuilding(b);
@@ -1004,10 +1008,10 @@ int l_entityReplaceWithResourceEntity(lua_State* L) {
 int l_settlerSerfExtract(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
 	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 2);
-	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
-	if (!b->IsResourceDoodad())
+	luaext_assertPointer(L, s->GetBehavior<shok_GGL_CSerfBehavior>(), "no serf");
+	if (!shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CResourceDoodad>(b))
 		b = shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(b);
-	if (b == nullptr || !b->IsResourceDoodad()) {
+	if (b == nullptr || !shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CResourceDoodad>(b)) {
 		return luaL_error(L, "no resource entity");
 	}
 	s->SerfExtractResource(b->EntityId);
@@ -1037,10 +1041,10 @@ int l_buildingIsIdle(lua_State* L) {
 
 int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
+	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CBarrackBehavior>(), "no barracks");
 	int i = 0;
 	b->ObserverEntities.ForAll([L, &i](shok_attachment* a) {
-		if (a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS && !shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->GetSoldierBehavior()) {
+		if (a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS && !shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->GetBehavior<shok_GGL_CSoldierBehavior>()) {
 			lua_pushnumber(L, a->EntityId);
 			i++;
 		}
@@ -1050,7 +1054,7 @@ int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
 
 int l_buildingFoundryGetCannonTypeInConstruction(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	shok_GGL_CFoundryBehavior* f = b->GetFoundryBehavior();
+	shok_GGL_CFoundryBehavior* f = b->GetBehavior<shok_GGL_CFoundryBehavior>();
 	luaext_assertPointer(L, f, "no foundry");
 	lua_pushnumber(L, f->CannonType);
 	return 1;
@@ -1065,9 +1069,9 @@ int l_settlerExpell(lua_State* L) {
 int l_buildingBuySoldierForLeader(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 2);
-	luaext_assertPointer(L, b->GetBarrackBehavior(), "no barracks");
+	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CBarrackBehavior>(), "no barracks");
 	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading, "barracks is upgrading or under construction");
-	shok_GGL_CLeaderBehavior* l = s->GetLeaderBehavior();
+	shok_GGL_CLeaderBehavior* l = s->GetBehavior<shok_GGL_CLeaderBehavior>();
 	shok_GGL_CLeaderBehaviorProps* lp = s->GetEntityType()->GetLeaderBehaviorProps();
 	luaext_assertPointer(L, l, "no leader");
 	luaext_assert(L, b->PlayerId == s->PlayerId, "different players");
@@ -1083,8 +1087,9 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	luaext_assert(L, curr < max, "no free soldier slot left");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-
-	luaext_assert(L, p->CurrentResources.HasResources(&((shok_GGL_CGLSettlerProps*)solty->LogicProps)->Cost), "missing res");
+	shok_GGL_CGLSettlerProps* sprop = shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(solty->LogicProps);
+	luaext_assertPointer(L, sprop, "error: soldier no settler type");
+	luaext_assert(L, p->CurrentResources.HasResources(&sprop->Cost), "missing res");
 	b->CommandRecruitSoldierForLeader(s->EntityId);
 	return 0;
 }
@@ -1092,9 +1097,9 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 int l_leaderAttachSoldier(lua_State* L) {
 	shok_GGL_CSettler* l = luaext_checkSettler(L, 1);
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 2);
-	shok_GGL_CLeaderBehavior* lb = l->GetLeaderBehavior();
+	shok_GGL_CLeaderBehavior* lb = l->GetBehavior<shok_GGL_CLeaderBehavior>();
 	luaext_assertPointer(L, lb, "no leader");
-	luaext_assertPointer(L, s->GetSoldierBehavior(), "no soldier");
+	luaext_assertPointer(L, s->GetBehavior<shok_GGL_CSoldierBehavior>(), "no soldier");
 	luaext_assert(L, s->EntityType == l->GetEntityType()->GetLeaderBehaviorProps()->SoldierType, "leader and soldier type doesnt match");
 	l->LeaderAttachSoldier(s->EntityId);
 	return 0;
@@ -1102,14 +1107,14 @@ int l_leaderAttachSoldier(lua_State* L) {
 
 int l_settlerSerfToBattleSerf(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	luaext_assertPointer(L, s->GetSerfBehavior(), "no serf");
+	luaext_assertPointer(L, s->GetBehavior<shok_GGL_CSerfBehavior>(), "no serf");
 	s->SerfTurnToBattleSerf();
 	return 0;
 }
 
 int l_settlerBattleSerfToSerf(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	luaext_assertPointer(L, s->GetBattleSerfBehavior(), "no battleserf");
+	luaext_assertPointer(L, s->GetBehavior<shok_GGL_CBattleSerfBehavior>(), "no battleserf");
 	s->BattleSerfTurnToSerf();
 	return 0;
 }
@@ -1133,7 +1138,7 @@ int l_buildingDeactivateOvertime(lua_State* L) {
 
 int l_buildingBarracksRecruitLeaders(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	shok_GGL_CBarrackBehavior* r = b->GetBarrackBehavior();
+	shok_GGL_CBarrackBehavior* r = b->GetBehavior<shok_GGL_CBarrackBehavior>();
 	luaext_assertPointer(L, r, "no barracks");
 	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading, "building not idle");
 	luaext_assert(L, r->AutoFillActive, "already recruiting leaders");
@@ -1142,7 +1147,7 @@ int l_buildingBarracksRecruitLeaders(lua_State* L) {
 }
 int l_buildingBarracksRecruitGroups(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	shok_GGL_CBarrackBehavior* r = b->GetBarrackBehavior();
+	shok_GGL_CBarrackBehavior* r = b->GetBehavior<shok_GGL_CBarrackBehavior>();
 	luaext_assertPointer(L, r, "no barracks");
 	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading, "building not idle");
 	luaext_assert(L, !r->AutoFillActive, "already recruiting groups");
@@ -1157,7 +1162,7 @@ int l_buildingHQBuySerf(lua_State* L) {
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(*shok_entityTypeIDSerf);
-	luaext_assert(L, p->CurrentResources.HasResources(&((shok_GGL_CGLSettlerProps*)solty->LogicProps)->Cost), "missing res");
+	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(solty->LogicProps)->Cost), "missing res");
 	b->HQBuySerf();
 	return 0;
 }
@@ -1196,7 +1201,7 @@ bool marketIsRes(shok_ResourceType rty) {
 
 int l_buildingMarketStartTrade(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	luaext_assertPointer(L, b->GetMarketBehavior(), "no market at 1");
+	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CMarketBehavior>(), "no market at 1");
 	luaext_assert(L, b->IsIdle(), "building not idle");
 	shok_ResourceType sellty = static_cast<shok_ResourceType>(luaL_checkint(L, 2));
 	shok_ResourceType buyty = static_cast<shok_ResourceType>(luaL_checkint(L, 3));
@@ -1210,7 +1215,7 @@ int l_buildingMarketStartTrade(lua_State* L) {
 
 int l_buildingMarketCancelTrade(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	luaext_assertPointer(L, b->GetMarketBehavior(), "no market at 1");
+	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CMarketBehavior>(), "no market at 1");
 	luaext_assert(L, b->GetMarketProgress() < 1.0f, "no transaction in progress");
 	b->MarketCancelTrade();
 	return 0;
@@ -1227,7 +1232,7 @@ int l_settlerSetPos(lua_State* L) {
 
 int l_leaderSetSoldierLimit(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	shok_GGL_CLimitedAttachmentBehavior* l = s->GetLimitedAttachmentBehavior();
+	shok_GGL_CLimitedAttachmentBehavior* l = s->GetBehavior<shok_GGL_CLimitedAttachmentBehavior>();
 	luaext_assertPointer(L, l, "no limited attachment");
 	int limit = luaL_checkint(L, 2);
 	luaext_assert(L, limit >= 0, "limit < 0");
@@ -1239,17 +1244,17 @@ int l_leaderSetSoldierLimit(lua_State* L) {
 
 int l_buildingRemoveLastMerchantOffer(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	shok_GGL_CBuildingMerchantBehavior* m = b->GetBuildingMerchantBehavior();
+	shok_GGL_CBuildingMerchantBehavior* m = b->GetBehavior<shok_GGL_CBuildingMerchantBehavior>();
 	luaext_assertPointer(L, m, "no merchant");
 	luaext_assert(L, m->Offer.size() > 0, "is empty");
-	shok_saveVector<shok_GGL_CBuildingMerchantBehavior_COffer*>(&m->Offer, [](std::vector< shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator< shok_GGL_CBuildingMerchantBehavior_COffer*>> &a) {
+	shok_saveVector<shok_GGL_CBuildingMerchantBehavior_COffer*>(&m->Offer, [](std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> &a) {
 		a.pop_back();
 		});
 	return 0;
 }
 int l_buildingMerchantOfferSetData(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	shok_GGL_CBuildingMerchantBehavior* m = b->GetBuildingMerchantBehavior();
+	shok_GGL_CBuildingMerchantBehavior* m = b->GetBehavior<shok_GGL_CBuildingMerchantBehavior>();
 	int i = luaL_checkint(L, 2);
 	luaext_assertPointer(L, m, "no merchant");
 	luaext_assert(L, i >= 0 && i < (int)m->Offer.size(), "invalid index");
@@ -1324,7 +1329,7 @@ int l_leader_SetRegen(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_GGL_CSettler* b = luaext_checkSettler(L, 1);
-	luaext_assertPointer(L, b->GetLeaderBehavior(), "no leader");
+	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CLeaderBehavior>(), "no leader");
 	shok_EGL_CGLEEntity::HookLeaderRegen();
 	shok_EGL_CGLEEntity::HookDestroyEntity();
 	entityAddonData* d = b->GetAdditionalData(true);
@@ -1359,7 +1364,7 @@ int l_leader_GetRegen(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_GGL_CSettler* b = luaext_checkSettler(L, 1);
-	luaext_assertPointer(L, b->GetLeaderBehavior(), "no leader");
+	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CLeaderBehavior>(), "no leader");
 	lua_pushnumber(L, b->LeaderGetRegenHealth());
 	lua_pushnumber(L, b->LeaderGetRegenHealthSeconds());
 	return 2;
@@ -1692,17 +1697,17 @@ EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(shok_position& 
 
 bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	return e->IsSettler();
+	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e);
 }
 
 bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	return e->IsBuilding();
+	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e);
 }
 
 bool EntityIteratorPredicateIsRelevant::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	return e->PlayerId != 0 && (e->IsSettler() || e->IsBuilding());
+	return e->PlayerId != 0 && (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e) || shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e));
 }
 
 bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
@@ -1751,7 +1756,7 @@ EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(int* 
 
 bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	return e->GetSoldierBehavior() == nullptr;
+	return e->GetBehavior<shok_GGL_CSoldierBehavior>() == nullptr;
 }
 
 bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
@@ -1799,7 +1804,7 @@ EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* 
 
 bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	shok_GGL_CCamouflageBehavior* c = e->GetCamoAbilityBehavior();
+	shok_GGL_CCamouflageBehavior* c = e->GetBehavior<shok_GGL_CCamouflageBehavior>();
 	if (c != nullptr) {
 		return c->InvisibilityRemaining <= 0;
 	}
@@ -1837,7 +1842,7 @@ bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(shok_EGL_CGLEEntity*
 
 bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok_position Center, float Range)
 {
-	if (!e->IsMovingEntity())
+	if (!shok_DynamicCast<shok_EGL_CGLEEntity, shok_EGL_CMovingEntity>(e))
 		return true;
 	if (e->GetFirstAttachedToMe(shok_AttachmentType::INFLICTOR_TERRORIZED) != 0)
 		return false;

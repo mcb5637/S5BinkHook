@@ -41,10 +41,9 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogic::GlobalObj;
 	int id = gl->CreateEffect(&data);
 	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManager::GlobalObj)->GetEffectById(id);
-	if (!shok_GGL_CCannonBallEffect::FixDamageClass && ef->IsCannonBallEffect()) {
-		shok_GGL_CCannonBallEffect* cbeff = (shok_GGL_CCannonBallEffect*)ef;
-		cbeff->DamageClass = dmgclass;
-	}
+	if (!shok_GGL_CCannonBallEffect::FixDamageClass)
+		if (shok_GGL_CCannonBallEffect* cbeff = shok_DynamicCast<shok_EGL_CEffect, shok_GGL_CCannonBallEffect>(ef))
+			cbeff->DamageClass = dmgclass;
 	if (lua_isfunction(L, 12)) {
 		shok_EGL_CFlyingEffect::HookOnHit();
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback = &l_effectFlyingEffectOnHitCallback;

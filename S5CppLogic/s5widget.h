@@ -15,6 +15,7 @@ struct shok_EGUIX_CFontIDHandler : shok_object { // size 2
 	int FontID;
 
 	static inline constexpr int vtp = 0x780B0C;
+	static inline constexpr int TypeDesc = 0x833B40;
 
 	void LoadFont(const char* name);
 };
@@ -24,6 +25,7 @@ struct shok_EGUIX_CSingleStringHandler : shok_object { // size 15
 	shok_string RawString;
 
 	static inline constexpr int vtp = 0x7809A4;
+	static inline constexpr int TypeDesc = 0x833530;
 };
 static_assert(sizeof(shok_EGUIX_CSingleStringHandler) == 15 * 4);
 
@@ -34,6 +36,7 @@ struct shok_EGUIX_CWidgetStringHelper : shok_object { // size 23
 	shok_widget_color Color;
 
 	static inline constexpr int vtp = 0x781518;
+	static inline constexpr int TypeDesc = 0x834FDC;
 };
 static_assert(sizeof(shok_EGUIX_CWidgetStringHelper) == 23 * 4);
 
@@ -43,6 +46,7 @@ struct shok_EGUIX_CMaterial : shok_object {
 	shok_widget_color Color; // la 10
 
 	static inline constexpr int vtp = 0x780890;
+	static inline constexpr int TypeDesc = 0x832A90;
 };
 static_assert(sizeof(shok_EGUIX_CMaterial) == 10 * 4);
 
@@ -54,6 +58,7 @@ struct shoc_EScr_CLuaFuncRefCommand : shok_object {
 	PADDINGI(1);
 
 	static inline constexpr int vtp = 0x786BE0;
+	static inline constexpr int TypeDesc = 0x83B83C;
 };
 
 struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
@@ -61,6 +66,7 @@ struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
 	shoc_EScr_CLuaFuncRefCommand FuncRefCommand;
 
 	static inline constexpr int vtp = 0x780994;
+	static inline constexpr int TypeDesc = 0x8333B8;
 
 	void Call(int widgetID);
 };
@@ -74,6 +80,7 @@ struct shok_EGUIX_CButtonHelper : shok_object { // size 38
 	shok_EGUIX_CSingleStringHandler ShortCutString;
 
 	static inline constexpr int vtp = 0x780818;
+	static inline constexpr int TypeDesc = 0x832918;
 };
 static_assert(sizeof(shok_EGUIX_CButtonHelper) == 38 * 4);
 
@@ -90,6 +97,7 @@ struct shok_EGUIX_CToolTipHelper : shok_object { // size 41
 	PADDING(3);
 
 	static inline constexpr int vtp = 0x780B30;
+	static inline constexpr int TypeDesc = 0x833CB8;
 };
 static_assert(sizeof(shok_EGUIX_CToolTipHelper) == 41 * 4);
 
@@ -107,12 +115,11 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 	PADDING(2); // 13
 
 	static inline constexpr int vtp = 0x780768;
+	static inline constexpr int TypeDesc = 0x82D93C;
 
 	int SetPosAndSize(float x, float y, float w, float h);
 	byte* GetUpdateManualFlag();
 	shok_EGUIX_CLuaFunctionHelper* GetUpdateFunc();
-	bool IsContainerWidget();
-	bool IsStaticTextWidget();
 	shok_EGUIX_CMaterial* GetMaterials(int* count);
 	shok_EGUIX_CButtonHelper* GetButtonHelper();
 	shok_EGUIX_CToolTipHelper* GetTooltipHelper();
@@ -124,6 +131,7 @@ struct shok_EGUIX_CWidgetListHandler : shok_object {
 	std::list<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>> SubWidgets;
 
 	static inline constexpr int vtp = 0x78098C;
+	static inline constexpr int TypeDesc = 0x833240;
 };
 
 struct shok_EGUIX_CStaticWidget : shok_EGUIX_CBaseWidget {
@@ -132,6 +140,7 @@ struct shok_EGUIX_CStaticWidget : shok_EGUIX_CBaseWidget {
 	shok_EGUIX_CMaterial BackgroundMaterial; // la 24
 
 	static inline constexpr int vtp = 0x780F84;
+	static inline constexpr int TypeDesc = 0x82DF64;
 
 	static shok_EGUIX_CStaticWidget* Create();
 };
@@ -146,6 +155,7 @@ struct shok_EGUIX_CStaticTextWidget : shok_EGUIX_CStaticWidget {
 	float LineDistanceFactor;
 
 	static inline constexpr int vtp = 0x780EE4;
+	static inline constexpr int TypeDesc = 0x82D95C;
 
 	static shok_EGUIX_CStaticTextWidget* Create();
 };
@@ -159,6 +169,7 @@ struct shok_EGUIX_CButtonWidget : shok_EGUIX_CBaseWidget {
 	shok_EGUIX_CToolTipHelper ToolTipHelper; // 105 la 146
 
 	static inline constexpr int vtp = 0x780E5C;
+	static inline constexpr int TypeDesc = 0x834148;
 };
 static_assert(sizeof(shok_EGUIX_CButtonWidget) == 146 * 4);
 
@@ -169,6 +180,7 @@ struct shok_EGUIX_CGfxButtonWidget : shok_EGUIX_CButtonWidget {
 	PADDING(3);
 
 	static inline constexpr int vtp = 0x780CD0;
+	static inline constexpr int TypeDesc = 0x82DB14;
 
 	static shok_EGUIX_CGfxButtonWidget* Create();
 };
@@ -181,6 +193,7 @@ struct shok_EGUIX_CTextButtonWidget : shok_EGUIX_CButtonWidget {
 	PADDING(3);
 
 	static inline constexpr int vtp = 0x780DB0;
+	static inline constexpr int TypeDesc = 0x82DF3C;
 
 	static shok_EGUIX_CTextButtonWidget* Create();
 };
@@ -191,6 +204,7 @@ struct shok_EGUIX_CContainerWidget : shok_EGUIX_CBaseWidget {
 	shok_EGUIX_CWidgetListHandler WidgetListHandler;
 
 	static inline constexpr int vtp = 0x78114C;
+	static inline constexpr int TypeDesc = 0x8321D8;
 
 	void AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name, const shok_EGUIX_CBaseWidget* before);
 	static shok_EGUIX_CContainerWidget* Create();
@@ -200,6 +214,7 @@ struct shok_EGUIX_CPureTooltipWidget : shok_EGUIX_CBaseWidget {
 	shok_EGUIX_CToolTipHelper ToolTipHelper;
 
 	static inline constexpr int vtp = 0x780BB0;
+	static inline constexpr int TypeDesc = 0x833E30;
 
 	static shok_EGUIX_CPureTooltipWidget* Create();
 };
@@ -210,6 +225,7 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 	float ProgressBarValue, ProgressBarLimit;
 
 	static inline constexpr int vtp = 0x780C20;
+	static inline constexpr int TypeDesc = 0x833FCC;
 
 	static shok_EGUIX_CProgressBarWidget* Create();
 };
@@ -231,6 +247,7 @@ struct shok_EGUIX_CWidgetGroupManager : shok_object {
 	int CreateGroup(const char* s);
 
 	static inline constexpr int vtp = 0x780978;
+	static inline constexpr int TypeDesc = 0x832F70;
 
 	static inline shok_EGUIX_CWidgetGroupManager* (__stdcall* const GlobalObj)() = reinterpret_cast<shok_EGUIX_CWidgetGroupManager * (__stdcall*)()>(0x55B688);
 };

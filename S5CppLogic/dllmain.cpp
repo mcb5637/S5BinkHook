@@ -98,7 +98,7 @@ int __cdecl test(lua_State* L) {
     //DEBUGGER_BREAK
     //lua_pushnumber(L, (int)&i->MiniMapTextureName);
     shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-    lua_pushnumber(L, e->GetBehavior<shok_GGL_CBattleBehavior>()->vtable);
+    lua_pushnumber(L, e->GetEntityType()->GetBehaviorProps<shok_GGL_CBattleBehaviorProps>()->vtable);
     return 1;
 }
 

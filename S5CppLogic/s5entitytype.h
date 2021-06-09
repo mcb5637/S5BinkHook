@@ -157,39 +157,17 @@ struct shok_GGlue_CGlueEntityProps : shok_object {
 	static inline constexpr int TypeDesc = 0x83C8CC;
 
 
-private:
-	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(int* vts, int num);
-	shok_EGL_CGLEBehaviorProps* SearchBehaviorProp(int vt);
-
-public:
-	shok_GGL_CLeaderBehaviorProps* GetLeaderBehaviorProps();
-	shok_GGL_CSoldierBehaviorProps* GetSoldierBehaviorProps();
-	shok_GGL_CBattleBehaviorProps* GetBattleBehaviorProps();
-	shok_GGL_CLimitedLifespanBehaviorProps* GetLimitedLifespanBehaviorProps();
-	shok_GGL_CAffectMotivationBehaviorProps* GetAffectMotivationBehaviorProps();
-	shok_GGL_CGLAnimationBehaviorExProps* GetAnimationExProps();
-	shok_GGL_CAutoCannonBehaviorProps* GetAutoCannonProps();
-	shok_GGL_CThiefBehaviorProperties* GetThiefBehaviorProps();
-	shok_GGL_CCamouflageBehaviorProps* GetCamouflageBehaviorProps();
-	shok_GGL_CCircularAttackProps* GetCircularAttackBehaviorProps();
-	shok_GGL_CShurikenAbilityProps* GetShurikenBehaviorProps();
-	shok_GGL_CSniperAbilityProps* GetSniperBehaviorProps();
-	shok_GGL_CRangedEffectAbilityProps* GetRangedEffectBehaviorProps();
-	shok_GGL_CWorkerBehaviorProps* GetWorkerBehaviorProps();
-	shok_GGL_CHeroHawkBehaviorProps* GetHeroHawkBehaviorProps();
-	shok_GGL_CInflictFearAbilityProps* GetInflictFearBehaviorProps();
-	shok_GGL_CHeroAbilityProps* GetBombPlacerBehaviorProps();
-	shok_GGL_CCannonBuilderBehaviorProps* GetCannonBuilderBehaviorProps();
-	shok_GGL_CSummonBehaviorProps* GetSummonBehaviorProps();
-	shok_GGL_CConvertSettlerAbilityProps* GetConvertSettlersBehaviorProps();
-	shok_GGL_CKegPlacerBehaviorProperties* GetKegPlacerBehaviorProps();
-	shok_GGL_CAbilityScoutBinocularProps* GetBinocularBehaviorProps();
-	shok_GGL_CTorchPlacerBehaviorProperties* GetTorchPlacerBehaviorProps();
-	shok_GGL_CPointToResourceBehaviorProperties* GetPointToResBehaviorProps();
-	shok_GGL_CSerfBehaviorProps* GetSerfBehaviorProps();
-	shok_GGL_CResourceRefinerBehaviorProperties* GetResourceRefinerBehaviorProps();
-	shok_GGL_CBarrackBehaviorProperties* GetBarrackBehaviorProps();
-
+	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehaviorProps, T>::value>::type* = nullptr>
+	T* GetBehaviorProps() {
+		for (shok_EGL_CGLEBehaviorProps* b : BehaviorProps) {
+			if (b) {
+				T* r = shok_DynamicCast<shok_EGL_CGLEBehaviorProps, T>(b);
+				if (r)
+					return r;
+			}
+		}
+		return nullptr;
+	}
 
 	bool IsSettlerType();
 	bool IsBuildingType();

@@ -184,6 +184,12 @@ inline void shok_saveList(std::list<CastFrom, shok_allocator<CastFrom>>* vec, st
 #endif
 }
 
+// casts shok objects with runtime type chek. you can only cast objects that have a vtable (does not have to be known) and a known RTTI TypeDesc set in the class.
+// works almost the same way as dynamic_cast, just you can only cast pointers and you have to specify both current type and target type (without pointer).
+// example:
+// shok_EGL_CGLEEntity* e = ...;
+// shok_GGL_CSettler* sett = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e);
+// if (sett) { ...
 template<class CastFrom, class CastTo>
 inline CastTo* shok_DynamicCast(CastFrom* i) {
 	void* (__cdecl* const shok_dyncastFunc)(void* i, int off, int TypeDescSource, int TypeDescOut, bool isref) = reinterpret_cast<void* (__cdecl* const)(void*, int, int, int, bool)>(0x5C36EE);

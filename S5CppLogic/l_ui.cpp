@@ -52,7 +52,7 @@ const char* l_uiCheckFontString(const char* font) {
 
 int l_uiGetWidAdr(lua_State* L) {
 	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
-	lua_pushnumber(L, (int)w);
+	lua_pushnumber(L, reinterpret_cast<int>(w));
 	return 1;
 }
 
@@ -136,8 +136,8 @@ int l_uiOverrideUpdateFunc(lua_State* L) {
 
 int l_uiGetAllSubWidgets(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	lua_newtable(L);
 	int i = 1;
 	for (shok_EGUIX_CBaseWidget* p : c->WidgetListHandler.SubWidgets) {
@@ -325,15 +325,15 @@ int l_uiSetWidgetStringFrameDistance(lua_State* L) {
 
 int l_uiGetStaticTextWidgetLineDistanceFactor(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsStaticTextWidget(), "no static text widget");
-	shok_EGUIX_CStaticTextWidget* tw = static_cast<shok_EGUIX_CStaticTextWidget*>(wid);
+	shok_EGUIX_CStaticTextWidget* tw = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticTextWidget>(wid);
+	luaext_assertPointer(L, tw, "no static text widget");
 	lua_pushnumber(L, tw->LineDistanceFactor);
 	return 1;
 }
 int l_uiSetStaticTextWidgetLineDistanceFactor(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsStaticTextWidget(), "no static text widget");
-	shok_EGUIX_CStaticTextWidget* tw = static_cast<shok_EGUIX_CStaticTextWidget*>(wid);
+	shok_EGUIX_CStaticTextWidget* tw = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticTextWidget>(wid);
+	luaext_assertPointer(L, tw, "no static text widget");
 	tw->LineDistanceFactor = luaL_checkfloat(L, 2);
 	return 0;
 }
@@ -367,8 +367,8 @@ int l_uiSetWidgetGroup(lua_State* L) {
 
 int l_uiCreateStaticWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
@@ -381,8 +381,8 @@ int l_uiCreateStaticWidget(lua_State* L) {
 }
 int l_uiCreateStaticTextWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
@@ -395,8 +395,8 @@ int l_uiCreateStaticTextWidget(lua_State* L) {
 }
 int l_uiCreatePureTooltipWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
@@ -409,8 +409,8 @@ int l_uiCreatePureTooltipWidget(lua_State* L) {
 }
 int l_uiCreateGFXButtonWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
@@ -423,8 +423,8 @@ int l_uiCreateGFXButtonWidget(lua_State* L) {
 }
 int l_uiCreateTextButtonWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
@@ -437,8 +437,8 @@ int l_uiCreateTextButtonWidget(lua_State* L) {
 }
 int l_uiCreateProgessBarWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;
@@ -451,8 +451,8 @@ int l_uiCreateProgessBarWidget(lua_State* L) {
 }
 int l_uiCreateContainerWidget(lua_State* L) {
 	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	luaext_assert(L, wid->IsContainerWidget(), "no container widget");
-	shok_EGUIX_CContainerWidget* c = (shok_EGUIX_CContainerWidget*)wid;
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
 	shok_EGUIX_CBaseWidget* bef = nullptr;

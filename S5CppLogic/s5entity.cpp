@@ -930,7 +930,7 @@ float __fastcall entitygetdamagemod(shok_GGL_CBattleBehavior* b) {
 	if (d && d->DamageOverride >= 0)
 		return static_cast<float>(d->DamageOverride);
 	else
-		return static_cast<float>(e->GetEntityType()->GetBattleBehaviorProps()->DamageAmount);
+		return static_cast<float>(e->GetEntityType()->GetBehaviorProps<shok_GGL_CBattleBehaviorProps>()->DamageAmount);
 }
 void __declspec(naked) entitydamagemodeventbattleasm() {
 	__asm {
@@ -965,7 +965,7 @@ shok_event_data_EGL_CEventGetValue_int_1211121895* __fastcall entitydamagemodeve
 	if (d && d->DamageOverride >= 0)
 		ev->result = d->DamageOverride;
 	else
-		ev->result = e->GetEntityType()->GetAutoCannonProps()->DamageAmount;
+		ev->result = e->GetEntityType()->GetBehaviorProps<shok_GGL_CAutoCannonBehaviorProps>()->DamageAmount;
 	return ev;
 }
 void __declspec(naked) entitydamagemodbattleprojectilearrowasm() {
@@ -1119,7 +1119,7 @@ int shok_GGL_CSettler::LeaderGetRegenHealth()
 	if (d && d->RegenHPOverride >= 0)
 		return d->RegenHPOverride;
 	else
-		return GetEntityType()->GetLeaderBehaviorProps()->HealingPoints;
+		return GetEntityType()->GetBehaviorProps<shok_GGL_CLeaderBehaviorProps>()->HealingPoints;
 }
 int shok_GGL_CSettler::LeaderGetRegenHealthSeconds()
 {
@@ -1127,7 +1127,7 @@ int shok_GGL_CSettler::LeaderGetRegenHealthSeconds()
 	if (d && d->RegenSecondsOverride >= 0)
 		return d->RegenSecondsOverride;
 	else
-		return GetEntityType()->GetLeaderBehaviorProps()->HealingSeconds;
+		return GetEntityType()->GetBehaviorProps<shok_GGL_CLeaderBehaviorProps>()->HealingSeconds;
 }
 
 void shok_EGL_CGLEEntity::PerformHeal(int r, bool healSoldiers)
@@ -1194,7 +1194,7 @@ float __fastcall leadermaxrange(shok_GGL_CBattleBehavior* th) {
 	if (d && d->MaxRangeOverride >= 0)
 		return d->MaxRangeOverride;
 	else
-		return e->GetEntityType()->GetLeaderBehaviorProps()->MaxRange;
+		return e->GetEntityType()->GetBehaviorProps<shok_GGL_CLeaderBehaviorProps>()->MaxRange;
 }
 void __declspec(naked) leadermaxrangeasm() {
 	__asm {
@@ -1215,7 +1215,7 @@ float __fastcall autocannonmaxrange(shok_GGL_CAutoCannonBehavior* th) {
 	if (d && d->MaxRangeOverride >= 0)
 		return d->MaxRangeOverride;
 	else
-		return e->GetEntityType()->GetAutoCannonProps()->MaxAttackRange;
+		return e->GetEntityType()->GetBehaviorProps<shok_GGL_CAutoCannonBehaviorProps>()->MaxAttackRange;
 }
 void __declspec(naked) autocannonmaxrangeasm() {
 	__asm {
@@ -1279,7 +1279,7 @@ void shok_EGL_CGLEEntity::HookDisplayName()
 
 void __fastcall rangedeffecthealhook(shok_GGL_CRangedEffectAbility* th) {
 	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
-	shok_GGL_CRangedEffectAbilityProps* pr = e->GetEntityType()->GetRangedEffectBehaviorProps();
+	shok_GGL_CRangedEffectAbilityProps* pr = e->GetEntityType()->GetBehaviorProps<shok_GGL_CRangedEffectAbilityProps>();
 	float hpfact = pr->HealthRecoveryFactor;
 	if (hpfact <= 0)
 		return;

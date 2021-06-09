@@ -581,7 +581,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CRangedEffectAbility* a = e->GetBehavior<shok_GGL_CRangedEffectAbility>();
 		if (a != nullptr) {
-			shok_GGL_CRangedEffectAbilityProps* p = e->GetEntityType()->GetRangedEffectBehaviorProps();
+			shok_GGL_CRangedEffectAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CRangedEffectAbilityProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				float r = 1000;
 				if (p->AffectsLongRangeOnly)
@@ -607,7 +607,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CSummonBehavior* a = e->GetBehavior<shok_GGL_CSummonBehavior>();
 		if (a != nullptr) {
-			shok_GGL_CSummonBehaviorProps* p = e->GetEntityType()->GetSummonBehaviorProps();
+			shok_GGL_CSummonBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CSummonBehaviorProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
 					((shok_GGL_CSettler*)e)->HeroAbilitySummon();
@@ -624,7 +624,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CCircularAttack* a = e->GetBehavior<shok_GGL_CCircularAttack>();
 		if (a != nullptr) {
-			shok_GGL_CCircularAttackProps* p = e->GetEntityType()->GetCircularAttackBehaviorProps();
+			shok_GGL_CCircularAttackProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CCircularAttackProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
 					((shok_GGL_CSettler*)e)->HeroAbilityCircularAttack();
@@ -636,7 +636,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CBombPlacerBehavior* a = e->GetBehavior<shok_GGL_CBombPlacerBehavior>();
 		if (a != nullptr) {
-			shok_GGL_CHeroAbilityProps* p = e->GetEntityType()->GetBombPlacerBehaviorProps();
+			shok_GGL_CHeroAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CHeroAbilityProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, 500, IgnoreFleeing) >= 10) {
 					((shok_GGL_CSettler*)e)->HeroAbilityPlaceBomb(e->Position);
@@ -648,7 +648,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CCannonBuilderBehavior* a = e->GetBehavior<shok_GGL_CCannonBuilderBehavior>();
 		if (a != nullptr) {
-			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetCannonBuilderBehaviorProps();
+			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CCannonBuilderBehaviorProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				int ety = e->EntityType;
 				auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
@@ -668,7 +668,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CShurikenAbility* a = e->GetBehavior<shok_GGL_CShurikenAbility>();
 		if (a != nullptr) {
-			shok_GGL_CShurikenAbilityProps* p = e->GetEntityType()->GetShurikenBehaviorProps();
+			shok_GGL_CShurikenAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CShurikenAbilityProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
 					shok_EGL_CGLEEntity* tar = GetNearestSettlerInArea(Player, e->Position, p->Range, IgnoreFleeing);
@@ -683,7 +683,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CConvertSettlerAbility* a = e->GetBehavior<shok_GGL_CConvertSettlerAbility>();
 		if (a != nullptr) {
-			shok_GGL_CConvertSettlerAbilityProps* p = e->GetEntityType()->GetConvertSettlersBehaviorProps();
+			shok_GGL_CConvertSettlerAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CConvertSettlerAbilityProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, p->ConversionMaxRange, IgnoreFleeing) >= 10) {
 					shok_EGL_CGLEEntity* tar = GetFurthestConversionTargetInArea(Player, e->Position, p->ConversionStartRange, IgnoreFleeing);
@@ -699,7 +699,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CSniperAbility* a = e->GetBehavior<shok_GGL_CSniperAbility>();
 		if (a != nullptr) {
-			shok_GGL_CSniperAbilityProps* p = e->GetEntityType()->GetSniperBehaviorProps();
+			shok_GGL_CSniperAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CSniperAbilityProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				shok_EGL_CGLEEntity* tar = GetNearestSnipeTargetInArea(Player, e->Position, p->Range, IgnoreFleeing);
 				if (tar != nullptr) {
@@ -713,7 +713,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CInflictFearAbility* a = e->GetBehavior<shok_GGL_CInflictFearAbility>();
 		if (a != nullptr) {
-			shok_GGL_CInflictFearAbilityProps* p = e->GetEntityType()->GetInflictFearBehaviorProps();
+			shok_GGL_CInflictFearAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CInflictFearAbilityProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, p->Range/2, IgnoreFleeing) >= 10) {
 					((shok_GGL_CSettler*)e)->HeroAbilityInflictFear();
@@ -725,7 +725,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CKegPlacerBehavior* a = e->GetBehavior<shok_GGL_CKegPlacerBehavior>();
 		if (a != nullptr) {
-			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetKegPlacerBehaviorProps();
+			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CKegPlacerBehaviorProperties>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				shok_EGL_CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, Area);
 				if (tar == nullptr && SabotageBridges)
@@ -741,7 +741,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 	if (shok_EGL_CGLEEntity::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
 		shok_GGL_CCamouflageBehavior* a = e->GetBehavior<shok_GGL_CCamouflageBehavior>();
 		if (a != nullptr && !shok_DynamicCast<shok_GGL_CCamouflageBehavior, shok_GGL_CThiefCamouflageBehavior>(a)) {
-			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetCamouflageBehaviorProps();
+			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CCamouflageBehaviorProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
 					((shok_GGL_CSettler*)e)->HeroAbilityActivateCamoflage();
@@ -758,7 +758,7 @@ bool UnlimitedArmy::ExecutePrepDefense(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CCannonBuilderBehavior* a = e->GetBehavior<shok_GGL_CCannonBuilderBehavior>();
 		if (a != nullptr) {
-			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetCannonBuilderBehaviorProps();
+			shok_GGL_CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CCannonBuilderBehaviorProps>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				int ety = e->EntityType;
 				auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
@@ -778,7 +778,7 @@ bool UnlimitedArmy::ExecutePrepDefense(shok_EGL_CGLEEntity* e)
 	{
 		shok_GGL_CKegPlacerBehavior* a = e->GetBehavior<shok_GGL_CKegPlacerBehavior>();
 		if (a != nullptr) {
-			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetKegPlacerBehaviorProps();
+			shok_GGL_CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CKegPlacerBehaviorProperties>();
 			if (a->AbilitySecondsCharged >= p->RechargeTimeSeconds) {
 				shok_EGL_CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, Area);
 				if (tar == nullptr && SabotageBridges)

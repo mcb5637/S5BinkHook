@@ -55,68 +55,60 @@ void shok_EGUIX_CLuaFunctionHelper::Call(int widgetID)
 
 byte* shok_EGUIX_CBaseWidget::GetUpdateManualFlag()
 {
-    if (vtable == shok_EGUIX_CStaticTextWidget::vtp)
-        return &static_cast<shok_EGUIX_CStaticTextWidget*>(this)->UpdateManualFlag;
-    if (vtable == shok_EGUIX_CGfxButtonWidget::vtp)
-        return &static_cast<shok_EGUIX_CGfxButtonWidget*>(this)->UpdateManualFlag;
-    if (vtable == shok_EGUIX_CTextButtonWidget::vtp)
-        return &static_cast<shok_EGUIX_CTextButtonWidget*>(this)->UpdateManualFlag;
-    if (vtable == shok_EGUIX_CProgressBarWidget::vtp)
-        return &static_cast<shok_EGUIX_CProgressBarWidget*>(this)->UpdateManualFlag;
+    if (shok_EGUIX_CStaticTextWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticTextWidget>(this))
+        return &w->UpdateManualFlag;
+    if (shok_EGUIX_CGfxButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CGfxButtonWidget>(this))
+        return &w->UpdateManualFlag;
+    if (shok_EGUIX_CTextButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CTextButtonWidget>(this))
+        return &w->UpdateManualFlag;
+    if (shok_EGUIX_CProgressBarWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CProgressBarWidget>(this))
+        return &w->UpdateManualFlag;
     return nullptr;
 }
 shok_EGUIX_CLuaFunctionHelper* shok_EGUIX_CBaseWidget::GetUpdateFunc()
 {
-    if (vtable == shok_EGUIX_CStaticTextWidget::vtp)
-        return &static_cast<shok_EGUIX_CStaticTextWidget*>(this)->UpdateFunction;
-    if (vtable == shok_EGUIX_CGfxButtonWidget::vtp)
-        return &static_cast<shok_EGUIX_CGfxButtonWidget*>(this)->UpdateFunction;
-    if (vtable == shok_EGUIX_CTextButtonWidget::vtp)
-        return &static_cast<shok_EGUIX_CTextButtonWidget*>(this)->UpdateFunction;
-    if (vtable == shok_EGUIX_CProgressBarWidget::vtp)
-        return &static_cast<shok_EGUIX_CProgressBarWidget*>(this)->UpdateFunction;
+    if (shok_EGUIX_CStaticTextWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticTextWidget>(this))
+        return &w->UpdateFunction;
+    if (shok_EGUIX_CGfxButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CGfxButtonWidget>(this))
+        return &w->UpdateFunction;
+    if (shok_EGUIX_CTextButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CTextButtonWidget>(this))
+        return &w->UpdateFunction;
+    if (shok_EGUIX_CProgressBarWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CProgressBarWidget>(this))
+        return &w->UpdateFunction;
     return nullptr;
-}
-bool shok_EGUIX_CBaseWidget::IsContainerWidget()
-{
-    return vtable == shok_EGUIX_CContainerWidget::vtp;
-}
-bool shok_EGUIX_CBaseWidget::IsStaticTextWidget()
-{
-    return vtable == shok_EGUIX_CStaticTextWidget::vtp;
 }
 shok_EGUIX_CMaterial* shok_EGUIX_CBaseWidget::GetMaterials(int* count)
 {
-    if (vtable == shok_EGUIX_CStaticWidget::vtp || vtable == shok_EGUIX_CStaticTextWidget::vtp || vtable == shok_EGUIX_CProgressBarWidget::vtp) {
+    if (shok_EGUIX_CStaticWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticWidget>(this)) {
         *count = 1;
-        return &static_cast<shok_EGUIX_CStaticWidget*>(this)->BackgroundMaterial;
+        return &w->BackgroundMaterial;
     }
-    if (vtable == shok_EGUIX_CGfxButtonWidget::vtp || vtable == shok_EGUIX_CTextButtonWidget::vtp) {
+    if (shok_EGUIX_CButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CButtonWidget>(this)) {
         *count = 5;
-        return static_cast<shok_EGUIX_CButtonWidget*> (this)->Materials;
+        return w->Materials;
     }
     return nullptr;
 }
 shok_EGUIX_CButtonHelper* shok_EGUIX_CBaseWidget::GetButtonHelper()
 {
-    if (vtable == shok_EGUIX_CGfxButtonWidget::vtp || vtable == shok_EGUIX_CTextButtonWidget::vtp || vtable == shok_EGUIX_CButtonWidget::vtp)
-        return &static_cast<shok_EGUIX_CButtonWidget*>(this)->ButtonHelper;
+    if (shok_EGUIX_CButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CButtonWidget>(this))
+        return &w->ButtonHelper;
     return nullptr;
 }
 shok_EGUIX_CToolTipHelper* shok_EGUIX_CBaseWidget::GetTooltipHelper()
 {
-    if (vtable == shok_EGUIX_CGfxButtonWidget::vtp || vtable == shok_EGUIX_CTextButtonWidget::vtp || vtable == shok_EGUIX_CButtonWidget::vtp)
-        return &static_cast<shok_EGUIX_CButtonWidget*>(this)->ToolTipHelper;
-    if (vtable == shok_EGUIX_CPureTooltipWidget::vtp)
-        return &static_cast<shok_EGUIX_CPureTooltipWidget*>(this)->ToolTipHelper;
+    if (shok_EGUIX_CButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CButtonWidget>(this))
+        return &w->ToolTipHelper;
+    if (shok_EGUIX_CPureTooltipWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CPureTooltipWidget>(this))
+        return &w->ToolTipHelper;
     return nullptr;
 }
 shok_EGUIX_CWidgetStringHelper* shok_EGUIX_CBaseWidget::GetStringHelper()
 {
-    if (vtable == shok_EGUIX_CStaticTextWidget::vtp)
-        return &static_cast<shok_EGUIX_CStaticTextWidget*>(this)->StringHelper;
-    if (vtable == shok_EGUIX_CTextButtonWidget::vtp)
-        return &static_cast<shok_EGUIX_CTextButtonWidget*>(this)->StringHelper;
+    if (shok_EGUIX_CStaticTextWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticTextWidget>(this))
+        return &w->StringHelper;
+    if (shok_EGUIX_CTextButtonWidget* w = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CTextButtonWidget>(this))
+        return &w->StringHelper;
     return nullptr;
 }
 

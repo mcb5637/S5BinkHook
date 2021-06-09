@@ -9,27 +9,27 @@ struct shok_vtable_EGL_CFlyingEffect {
 
 shok_EGL_CGLEEffectCreator::shok_EGL_CGLEEffectCreator()
 {
-	vtable = 0x76E140;
+	vtable = shok_EGL_CGLEEffectCreator::vtp;
 }
 
 shok_EGL_CFlyingEffectCreator::shok_EGL_CFlyingEffectCreator()
 {
-	vtable = 0x774688;
+	vtable = shok_EGL_CFlyingEffectCreator::vtp;
 }
 
 shok_CProjectileEffectCreator::shok_CProjectileEffectCreator()
 {
-	vtable = 0x774698;
+	vtable = shok_CProjectileEffectCreator::vtp;
 }
 
 bool shok_EGL_CEffect::IsCannonBallEffect()
 {
-	return vtable == shok_GGL_CCannonBallEffect::vtp;
+	return shok_DynamicCast<shok_EGL_CEffect, shok_GGL_CCannonBallEffect>(this);
 }
 
 bool shok_EGL_CEffect::IsArrowEffect()
 {
-	return vtable == shok_GGL_CArrowEffect::vtp;
+	return shok_DynamicCast<shok_EGL_CEffect, shok_GGL_CArrowEffect>(this);
 }
 
 bool shok_GGL_CCannonBallEffect::FixDamageClass = false;

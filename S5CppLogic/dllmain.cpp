@@ -112,13 +112,20 @@ int cleanup(lua_State* L) {
     return 0;
 }
 
+constexpr double Version = 1.0;
+
 extern "C" void __cdecl install(lua_State * L) {
+#ifdef _DEBUG
     lua_pushcfunction(L, &test);
     lua_setglobal(L, "test");
+#endif
 
     lua_pushstring(L, "CppLogic");
     lua_newtable(L);
     luaext_registerFunc(L, "OnLeaveMap", cleanup);
+    lua_pushstring(L, "Version");
+    lua_pushnumber(L, Version);
+    lua_rawset(L, -3);
 
     lua_pushstring(L, "Memory");
     lua_newtable(L);
@@ -179,6 +186,14 @@ extern "C" void __cdecl install(lua_State * L) {
     if (HasSCELoader()) {
         lua_dobuffer(L, SCELoaderFuncOverrides, strlen(SCELoaderFuncOverrides), "CppLogic");
     }
+
+    shok_logString("loaded CppLogic %f %s into %X with SCELoader status %i\n", Version,
+#ifdef _DEBUG
+        "debug",
+#else
+        "release",
+#endif
+        reinterpret_cast<int>(L), static_cast<int>(HasSCELoader()));
 }
 
 // CUtilMemory.GetMemory(tonumber("897558", 16))

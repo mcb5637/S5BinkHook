@@ -193,6 +193,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClInclude Include="l_ua.h" />
     <ClInclude Include="l_ui.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="s5behaviorProps.h" />
     <ClInclude Include="s5behaviors.h" />
     <ClInclude Include="s5data.h" />
@@ -249,6 +250,9 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua\S5Lua5.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

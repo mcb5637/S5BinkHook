@@ -80,6 +80,11 @@ function CppLogic.Logic.SetPlaceBuildingRotation(r)
 end
 )";
 
+struct x {
+    const char* name;
+    int i, id;
+};
+
 int __cdecl test(lua_State* L) {
     /*shok_GS3DTools_CMapData s = shok_GS3DTools_CMapData();
     int st = (int)&s;
@@ -97,8 +102,12 @@ int __cdecl test(lua_State* L) {
     //shok_framework_mapinfo* i = (*shok_Framework_CMain::GlobalObj)->GetCampagnInfo(3, nullptr)->GetMapInfoByName("test");
     //DEBUGGER_BREAK
     //lua_pushnumber(L, (int)&i->MiniMapTextureName);
-    shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-    lua_pushnumber(L, e->GetEntityType()->GetBehaviorProps<shok_GGL_CBattleBehaviorProps>()->vtable);
+    lua_newtable(L);
+    for (auto& r : **shok_taskData::GlobalVector) {
+        lua_pushstring(L, r.TaskName);
+        lua_pushnumber(L, r.ID);
+        lua_rawset(L, -3);
+    }
     return 1;
 }
 

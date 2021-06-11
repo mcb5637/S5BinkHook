@@ -192,3 +192,10 @@ struct shok_taskData {
 	static inline std::vector<shok_taskData, shok_allocator<shok_taskData>>** GlobalVector = reinterpret_cast<std::vector<shok_taskData, shok_allocator<shok_taskData>>**>(0x898238);
 };
 
+struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int : shok_object {
+	shok_EGL_CGLEBehavior* Object;
+	int(__thiscall* Func)(shok_EGL_CGLEBehavior* th, shok_EGL_CGLETaskArgs* args);
+
+	int ExecuteTask(shok_EGL_CGLETaskArgs* args);
+};
+

@@ -17,6 +17,11 @@ struct entityAddonData {
 };
 
 struct shok_EGL_CGLETaskList;
+struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int;
+struct shok_entity_TaskIdAndTaskHandler {
+	int TaskID;
+	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* TaskHandler;
+};
 
 struct shok_EGL_CGLEEntity : shok_object {
 	PADDINGI(1);
@@ -36,13 +41,15 @@ struct shok_EGL_CGLEEntity : shok_object {
 	shok_positionRot Position; // 22
 	float Scale; // 25
 	PADDINGI(1);
-	byte StandardBehaviorActive, f1, ValidPosition, IsOnWater; // f1 taslist related, if true tasklist execute returns 1
+	byte StandardBehaviorActive, TaskAdvanceNextTurnNextTask, ValidPosition, IsOnWater;
 	byte UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
 	int TaskListToSet; // 29
 	vector_padding;
 	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
 	int CurrentState, EntityState, CurrentTaskListID, CurrentTaskIndex; // 34 la37
-	PADDINGI(12); // la49 41 map of taskhandlers EGL::IGLEHandler<EGL::CGLETaskArgs,int> {vt,obj, func}
+	PADDINGI(3);
+	shok_set<shok_entity_TaskIdAndTaskHandler> TaskHandlers; // 41
+	PADDINGI(6); // la49 41 map of taskhandlers EGL::IGLEHandler<EGL::CGLETaskArgs,int> {vt,obj, func}
 	int Health; // 50
 	char* ScriptName; // "Name" in loader
 	char* ScriptCommandLine;
@@ -56,7 +63,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int StateChangeCounter; // 63
 	int TaskListChangeCounter;
 	int NumberOfAuras; // 65
-
+	
 	static inline constexpr int vtp = 0x783E74;
 	static inline constexpr int TypeDesc = 0x8077CC;
 	static inline constexpr int vtp_IEntityDisplay = 0x783E58;
@@ -89,6 +96,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	void SetTaskList(int tl);
 	void SetTaskList(shok_EGL_CGLETaskList* tl);
 	shok_EGL_CGLETaskList* GetCurrentTaskList();
+	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* GetTaskHandler(shok_Task task);
 
 	void PerformHeal(int hp, bool healSoldiers);
 
@@ -142,7 +150,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 protected:
 	int EventGetIntById(int id);
 };
-
+//constexpr int i = offsetof(shok_EGL_CGLEEntity, TaskHandlers) / 4;
 struct shok_GGL_CBuilding;
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	shok_position TargetPosition; // la67

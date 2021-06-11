@@ -3,6 +3,20 @@
 #include <math.h>
 
 
+struct shok_vtable_EGL_CGLEEntity {
+	PADDINGI(3);
+	void(__thiscall* Destroy)(shok_EGL_CGLEEntity* th, int i); // 3
+	PADDINGI(11);
+	void(__thiscall* ExecuteTask)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
+	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d); // 16
+	PADDINGI(2);
+	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, int taskhandler); // 19
+	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, int eventid, int eventhandler); // 20
+	void(__thiscall* AddStateHandler)(shok_EGL_CGLEEntity* th, int eventid, int eventhandler); // 21
+	PADDINGI(6);
+	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
+};
+
 static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLEEntityCreator*)>(0x4493A4);
 shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator()
 {
@@ -220,6 +234,11 @@ static inline shok_EGL_CGLETaskList*(__thiscall* const shok_entity_GetCurrentTas
 shok_EGL_CGLETaskList* shok_EGL_CGLEEntity::GetCurrentTaskList()
 {
 	return shok_entity_GetCurrentTaskList(this);
+}
+static inline shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok_set<shok_entity_TaskIdAndTaskHandler>* th, shok_Task id) = reinterpret_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int * (__thiscall* const)(shok_set<shok_entity_TaskIdAndTaskHandler>*, shok_Task)>(0x57BDD3);
+shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* shok_EGL_CGLEEntity::GetTaskHandler(shok_Task task)
+{
+	return shok_entitytaskhandler_gettaskhandler(&TaskHandlers, task);
 }
 
 void shok_EGL_CGLEEntity::Destroy()

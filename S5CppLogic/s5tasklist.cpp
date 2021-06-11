@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "s5data.h"
 
+struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
+    int(__thiscall* ExecuteTask)(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, shok_EGL_CGLETaskArgs* args);
+};
+
 int shok_EGL_CGLETaskList::GetNumberOfTasks()
 {
     return this->Task.size();
@@ -21,4 +25,9 @@ static inline const char* (__thiscall* const shok_CGLETaskListMgr_gettasklistnam
 const char* shok_EGL_CGLETaskListMgr::GetTaskListNameByID(int i)
 {
     return shok_CGLETaskListMgr_gettasklistnamebyid(this, i);
+}
+
+int shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int::ExecuteTask(shok_EGL_CGLETaskArgs* args)
+{
+    return reinterpret_cast<shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(vtable)->ExecuteTask(this, args);
 }

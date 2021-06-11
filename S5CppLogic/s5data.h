@@ -91,20 +91,20 @@ bool operator==(const shok_allocator <CastFrom>&, const shok_allocator <U>&) { r
 template <class CastFrom, class U>
 bool operator!=(const shok_allocator <CastFrom>&, const shok_allocator <U>&) { return false; }
 
-template <class CastFrom>
+template <class T>
 struct shok_treeNode {
-	shok_treeNode<CastFrom>* left, * parent, * right;
-	CastFrom data;
+	shok_treeNode<T>* left, * parent, * right;
+	T data;
 	bool redblack;
 };
-template <class CastFrom>
+template <class T>
 struct shok_set { // todo iterators
 	PADDINGI(1);
-	shok_treeNode<CastFrom>* root;
+	shok_treeNode<T>* root;
 	int size;
 
 private:
-	void ForAllRec(shok_treeNode<CastFrom>* d, std::function<void(CastFrom*)> lambda) {
+	void ForAllRec(shok_treeNode<T>* d, std::function<void(T*)> lambda) {
 		if (d == root)
 			return;
 		ForAllRec(d->left, lambda);
@@ -112,12 +112,12 @@ private:
 		ForAllRec(d->right, lambda);
 	}
 public:
-	void ForAll(std::function<void(CastFrom*)> lambda) {
+	void ForAll(std::function<void(T*)> lambda) {
 		ForAllRec(root->parent, lambda);
 	}
-	CastFrom* GetFirstMatch(std::function<bool(CastFrom*)> lambda) {
-		CastFrom* r = nullptr;
-		ForAll([&r, lambda](CastFrom* d) {
+	T* GetFirstMatch(std::function<bool(T*)> lambda) {
+		T* r = nullptr;
+		ForAll([&r, lambda](T* d) {
 			if (r == nullptr && lambda(d))
 				r = d;
 			});

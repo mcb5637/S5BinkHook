@@ -98,16 +98,12 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    //lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->GetEntityType()->GetAutoCannonProps()->MaxAttackRange);
-    //shok_framework_mapinfo* i = (*shok_Framework_CMain::GlobalObj)->GetCampagnInfo(3, nullptr)->GetMapInfoByName("test");
+    shok_EGL_CGLETaskArgs args{};
+    args.vtable = shok_EGL_CGLETaskArgs::vtp;
+    args.TaskType = shok_Task::TASK_SUMMON_ENTITIES;
+    lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->StateChangeCounter);
     //DEBUGGER_BREAK
     //lua_pushnumber(L, (int)&i->MiniMapTextureName);
-    lua_newtable(L);
-    for (auto& r : **shok_taskData::GlobalVector) {
-        lua_pushstring(L, r.TaskName);
-        lua_pushnumber(L, r.ID);
-        lua_rawset(L, -3);
-    }
     return 1;
 }
 

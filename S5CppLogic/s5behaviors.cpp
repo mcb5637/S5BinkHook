@@ -2,9 +2,14 @@
 #include "s5data.h"
 
 struct shok_vtable_GGL_CBehaviorDefaultMovement {
-	PADDINGI(9);
+	PADDINGI(3);
+	int(__thiscall* AddHandlers)(shok_EGL_CGLEBehavior*, int); // behavior, just didnt make a extra vtable for it...
+	PADDINGI(5);
 	float(__thiscall* GetSpeed)(shok_GGL_CBehaviorDefaultMovement* m);
 };
+
+// vtable heroability 8 is ability(this, abilityid)
+
 float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
 {
 	return reinterpret_cast<shok_vtable_GGL_CBehaviorDefaultMovement*>(vtable)->GetSpeed(this);

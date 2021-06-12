@@ -180,3 +180,46 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 
 	static inline constexpr int vtp = 0x77064C;
 };
+
+enum class shok_EventIDs : int {
+	AttackEntity = 0x15004,
+
+	BombPlacer_CommandPlaceBomb = 0x15033, //BB::CEvent,EGL::CEventPosition
+
+	HeroHawk_SendHawk = 0x16002, //BB::CEvent,EGL::CEventPosition
+
+	HeroAbility_IsAbilitySupported = 0x16008, //GGL::CEventHeroAbilityInteger
+	HeroAbility_StandUpOrInit = 0x16009, //BB::CEvent
+	CannonBuilder_BuildCannonCommand = 0x1600A, //GGL::CEventPositionAnd2EntityTypes
+	HeroAbility_Cancel = 0x1600D, //BB::CEvent
+	// 1500E convert cancel?
+	HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
+	HeroAbility_GetChargeMax = 0x16011, //GGL::CEventHeroAbilityInteger
+	HeroAbility_SetChargeCurrent = 0x16012, //GGL::CEventHeroAbilityInteger
+
+	Camouflage_IsInvisible = 0x16013, //EGL::CEventGetValue<bool,1709081367>, 1504A same
+	Camouflage_Activate = 0x16015, //BB::CEvent
+	Camouflage_GetDurationMax = 0x16016, //EGL::CEventGetValue<int,1211121895>
+	Camouflage_GetDurationCurrent = 0x16017, //EGL::CEventGetValue<int,1211121895>
+
+	Summon_ActivateCommand = 0x1601A, //BB::CEvent
+
+	RangedEffect_Activate = 0x1601C, //BB::CEvent
+	RangedEffect_GetDamageFactor = 0x1601D, //EGL::CEventGetValue<float,1468983543>
+	RangedEffect_GetArmorFactor = 0x1601E, //EGL::CEventGetValue<float,1468983543>
+	RangedEffect_GetDurationMax = 0x1601F, //EGL::CEventGetValue<int,1211121895>
+	RangedEffect_GetDurationCurrent = 0x16020, //EGL::CEventGetValue<int,1211121895>
+
+	CircularAttack_ActivateCommand = 0x16022, //BB::CEvent
+
+	ComvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
+	// 16028 convert cancel?
+
+	InflictFear_Activate = 0x16026, //BB::CEvent
+
+	Behavior_Tick = 0x20005, //BB::CEvent
+	HeroAbility_Reset = 0x2000A, //GGL::CHeroAbility
+
+	// 1100D, 1100E, 11017 something default movement
+	// 12002 stop?
+};

@@ -18,14 +18,14 @@ struct shok_EGL_CMovementBehaviorProps : shok_EGL_CGLEBehaviorProps {
 };
 
 struct shok_GGL_CHeroAbilityProps : shok_EGL_CGLEBehaviorProps {
-	int RechargeTimeSeconds;
+	int RechargeTimeSeconds; // 4
 
 	static inline constexpr int vtp = 0x773774;
 	static inline constexpr int TypeDesc = 0x816EA8;
 };
 
 struct shok_GGL_CCamouflageBehaviorProps : shok_GGL_CHeroAbilityProps {
-	int DurationSeconds;
+	int DurationSeconds; // 5
 	float DiscoveryRange;
 
 	static inline constexpr int vtp = 0x7778D8;
@@ -59,7 +59,7 @@ struct shok_GGL_CRangedEffectAbilityProps : shok_GGL_CHeroAbilityProps {
 	byte AffectsOwn, AffectsFriends, AffectsNeutrals, AffectsHostiles, AffectsMilitaryOnly, AffectsLongRangeOnly;
 	PADDING(2);
 	float Range;
-	int DurationSeconds; // 9
+	int DurationSeconds; // 8
 	float DamageFactor, ArmorFactor, HealthRecoveryFactor;
 	int Effect, HealEffect;
 

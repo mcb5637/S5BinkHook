@@ -19,6 +19,9 @@ public:
 	static inline constexpr int vtp = 0x7786AC;
 	static inline constexpr int TypeDesc = 0x818DF0;
 
+	// defined states: 12
+	// defined events: 1100D, 1100E, 11017
+
 	float GetMovementSpeed();
 };
 
@@ -51,12 +54,16 @@ struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior { // no vtable
 	PADDINGI(1);
 	int AbilitySecondsCharged; // 5
 
+	// defined events: HeroAbility_XXX, Behavior_Tick
+
 	static inline constexpr int TypeDesc = 0x816E2C;
 };
 
 struct shok_GGL_CCamouflageBehavior : shok_GGL_CHeroAbility {
 	PADDINGI(2);
-	int InvisibilityRemaining;
+	int InvisibilityRemaining; // 8
+
+	// defined events: Behavior_Tick, Camouflage_XXX, 1504A and 16013 return isinvisible, AttackEntity 1500E camo reset
 
 	static inline constexpr int vtp = 0x7738F4;
 	static inline constexpr int TypeDesc = 0x8172E8;
@@ -65,24 +72,37 @@ struct shok_GGL_CCamouflageBehavior : shok_GGL_CHeroAbility {
 struct shok_GGL_CThiefCamouflageBehavior : shok_GGL_CCamouflageBehavior {
 	int TimeToInvisibility;
 
+	// defined events: 16014 reset camo
+
 	static inline constexpr int vtp = 0x773934;
 	static inline constexpr int TypeDesc = 0x817310;
 };
 
 struct shok_GGL_CHeroHawkBehavior : shok_GGL_CHeroAbility {
+	// defined events: HeroHawk_XXX, HeroAbility_Reset, HeroAbility_StandUpOrInit
+
 	static inline constexpr int vtp = 0x7766F0;
 	static inline constexpr int TypeDesc = 0x81FE84;
 };
 
 struct shok_GGL_CInflictFearAbility : shok_GGL_CHeroAbility {
+	PADDINGI(1);
+	int SecondsFearRemaining; // 7
+
+	// defined events: InflictFear_XXX, Behavior_Tick, HeroAbility_Reset
+	// defined tasks: TASK_SET_SPECIAL_ATTACK_ANIM, TASK_PERFORM_SPECIAL_ATTACK
+
 	static inline constexpr int vtp = 0x776638;
 	static inline constexpr int TypeDesc = 0x81FBD8;
 };
 
 struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
 	shok_position StartPosition, TargetPosition;
-	byte PlacedBomb;
+	byte PlacedBomb; // 10
 	PADDING(3);
+
+	// defined events: BombPlacer_XXX, HeroAbility_Cancel
+	// defined tasks: TASK_PLACE_BOMB, TASK_GO_TO_BOMB_TARGET, TASK_RETREAT_FROM_BOMB_TARGET
 
 	static inline constexpr int vtp = 0x7783D8;
 	static inline constexpr int TypeDesc = 0x8255D0;
@@ -92,8 +112,11 @@ struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
 	PADDINGI(1);
 	shok_position StartPosition;
 	int CannonType, FoundationType;
-	byte PlacedCannon;
-	PADDINGI(3);
+	byte PlacedCannon; // 11
+	PADDING(3);
+
+	// defined events: CannonBuilder_XXX, HeroAbility_Cancel, HeroAbility_Reset, 1600B some form of stop?->12002
+	// defined tasks: TASK_GO_TO_CANNON_POSITION, TASK_BUILD_CANNON
 
 	static inline constexpr int vtp = 0x7774D4;
 	static inline constexpr int TypeDesc = 0x823254;
@@ -101,18 +124,28 @@ struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
 
 struct shok_GGL_CRangedEffectAbility : shok_GGL_CHeroAbility {
 	PADDINGI(1);
-	int SecondsRemaining;
+	int SecondsRemaining; // 7
+
+	// defined events: HeroAbility_Reset, Behavior_Tick, RangedEffect_XXX
 
 	static inline constexpr int vtp = 0x774E54;
 	static inline constexpr int TypeDesc = 0x81B7AC;
 };
 
 struct shok_GGL_CCircularAttack : shok_GGL_CHeroAbility {
+
+	// defined events: CircularAttack_ActivateCommand
+	// defined tasks: TASK_SET_SPECIAL_ATTACK_ANIM, TASK_PERFORM_SPECIAL_ATTACK
+
 	static inline constexpr int vtp = 0x777464;
 	static inline constexpr int TypeDesc = 0x823038;
 };
 
 struct shok_GGL_CSummonBehavior : shok_GGL_CHeroAbility {
+
+	// defined events: HeroAbility_Reset, Summon_ActivateCommand
+	// defined tasks: TASK_SUMMON_ENTITIES
+
 	static inline constexpr int vtp = 0x773C10;
 	static inline constexpr int TypeDesc = 0x817E0C;
 };
@@ -120,6 +153,10 @@ struct shok_GGL_CSummonBehavior : shok_GGL_CHeroAbility {
 struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
 	PADDINGI(1);
 	int TimeToConvert;
+
+	// defined states: ComvertSettler
+	// defined tasks: TASK_MOVE_TO_SETTLER_TO_CONVERT, TASK_CONVERT_SETTLER
+	// defined events: ComvertSettler_ActivateCommand, 1500E, 16028, HeroAbility_Cancel
 
 	static inline constexpr int vtp = 0x777294;
 	static inline constexpr int TypeDesc = 0x8227D8;

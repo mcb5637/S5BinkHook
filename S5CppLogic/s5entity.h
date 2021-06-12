@@ -47,7 +47,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	vector_padding;
 	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
 	int CurrentState, EntityState, CurrentTaskListID, CurrentTaskIndex; // 34 la37
-	PADDINGI(3);
+	PADDINGI(3); // set of state handlers
 	shok_set<shok_entity_TaskIdAndTaskHandler> TaskHandlers; // 41
 	PADDINGI(6); // la49 41 map of taskhandlers EGL::IGLEHandler<EGL::CGLETaskArgs,int> {vt,obj, func}
 	int Health; // 50

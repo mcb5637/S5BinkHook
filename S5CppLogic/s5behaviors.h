@@ -2,7 +2,7 @@
 #include "s5data.h"
 
 struct shok_EGL_CGLEBehavior : shok_object { // no vtable
-	int BehaviorIndex, EntityId;
+	int SlotIndex, EntityId;
 private:
 	int PropPointer; // 3
 
@@ -52,7 +52,7 @@ struct shok_GGL_CSoldierMovement : shok_GGL_CBehaviorDefaultMovement {
 
 struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior { // no vtable
 	PADDINGI(1);
-	int AbilitySecondsCharged; // 5
+	int SecondsCharged; // 5
 
 	// defined events: HeroAbility_XXX, Behavior_Tick
 
@@ -72,7 +72,7 @@ struct shok_GGL_CCamouflageBehavior : shok_GGL_CHeroAbility {
 struct shok_GGL_CThiefCamouflageBehavior : shok_GGL_CCamouflageBehavior {
 	int TimeToInvisibility;
 
-	// defined events: 16014 reset camo
+	// defined events: ThiefCamouflage_Reset
 
 	static inline constexpr int vtp = 0x773934;
 	static inline constexpr int TypeDesc = 0x817310;
@@ -164,13 +164,20 @@ struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
 
 struct shok_GGL_CSniperAbility : shok_GGL_CHeroAbility {
 	PADDINGI(1);
-	int TargetId;
+	int TargetId; // 7
+
+	// defined tasks: TASK_SET_SNIPE_ANIM, TASK_SNIPE, TASK_TURN_TO_SNIPER_TARGET
+	// defined events: Sniper_XXX
 
 	static inline constexpr int vtp = 0x7745AC;
 	static inline constexpr int TypeDesc = 0x819044;
 };
 
 struct shok_GGL_CMotivateWorkersAbility : shok_GGL_CHeroAbility {
+
+	// defined tasks: TASK_SET_MOTIVATE_ANIM, TASK_PERFORM_MOTIVATION
+	// defined events: MotivateVorkers_ActivateCommand
+
 	static inline constexpr int vtp = 0x77574C;
 	static inline constexpr int TypeDesc = 0x81C408;
 };
@@ -179,61 +186,132 @@ struct shok_GGL_CShurikenAbility : shok_GGL_CHeroAbility {
 	PADDINGI(1);
 	int TargetId;
 
+	// defined tasks: TASK_SET_THROW_SHURIKEN_ANIM, TASK_THROW_SHURIKEN, TASK_TURN_TO_SHURIKEN_TARGET
+	// defined events: Shuriken_XXX
+
 	static inline constexpr int vtp = 0x774658;
 	static inline constexpr int TypeDesc = 0x819310;
 };
 
 struct shok_GGL_CKegPlacerBehavior : shok_GGL_CHeroAbility {
+	shok_position StartPosition, TargetPosition;
+	byte PlacedKeg; // 10
+	PADDING(3);
+	int TurnsUntilArmed, TurnsUntilDisarmed; // 11
+
+	// defined states: ThiefSabotage, ThiefDisarm
+	// defined tasks: TASK_PLACE_KEG, TASK_GO_TO_KEG_TARGET, TASK_GO_TO_KEG, TASK_CHECK_GO_TO_KEG_TARGET_SUCCESS, TASK_RETREAT_FROM_KEG_TARGET, TASK_DISARM_KEG
+	// defined events: KegPlacer_XXX, HeroAbility_Cancel
+
 	static inline constexpr int vtp = 0x776368;
 	static inline constexpr int TypeDesc = 0x81F084;
 };
 
 struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
+	PADDINGI(1);
+	byte Active; // 7
+	PADDING(3);
+	shok_position ExlorationPosition;
+
+	// defined tasks: TASK_EXPLORE, TASK_TURN_TO_EXPLORE_POSITION
+	// defined events: Binocular_XXX, 11002 1500E cancel
+
 	static inline constexpr int vtp = 0x779218;
 	static inline constexpr int TypeDesc = 0x829248;
 };
 
 struct shok_GGL_CTorchPlacerBehavior : shok_GGL_CHeroAbility {
+	shok_position StartPosition, TargetPosition; // 5
+	byte PlacedTorch;
+	PADDING(3);
+
+	// defined tasks: TASK_GO_TO_TORCH_DESTINATION, TASK_PLACE_TORCH
+	// defined events: HeroAbility_Cancel, TorchPlacer_PlaceTorch
+
 	static inline constexpr int vtp = 0x773738;
 	static inline constexpr int TypeDesc = 0x816E4C;
 };
 
 struct shok_GGL_CPointToResourceBehavior : shok_GGL_CHeroAbility {
+
+	// defined states: ScoutPointToRes (maybe unused)
+	// defined tasks: TASK_POINT_TO_RESOURCE
+	// defined events: HeroAbility_Cancel (null), PointToResources_Activate
+
 	static inline constexpr int vtp = 0x774FB0;
 	static inline constexpr int TypeDesc = 0x81BB84;
 };
 
 struct shok_GGL_CSentinelBehavior : shok_EGL_CGLEBehavior {
+	PADDINGI(1);
+	int Urgency; // 5 ???
+
+	// defined events: Behavior_Tick, Sentinel_GetUrgency
+
 	static inline constexpr int vtp = 0x774B6C;
 	static inline constexpr int TypeDesc = 0x81ABC0;
 };
 
 struct shok_GGL_CGLBehaviorAnimationEx : shok_EGL_CGLEBehavior {
-	int Animation, AnimCategory, SuspendedAnimation, StartTurn, Duration;
+	int Animation, AnimCategory, SuspendedAnimation, StartTurn, Duration; // 4
 	byte PlayBackwards;
 	PADDING(3);
 	int TurnToWaitFor;
-	float Speed;
+	float SpeedModifier; // 11
+	PADDINGI(1); // 12 p to EGL::CBehaviorAnimation::CSlotAnimation
+	PADDINGI(1); // p to props
+	struct {
+		PADDINGI(1);
+		int TaskType; // 15
+		int AnimID;
+		int Category;
+		byte PlayBackwards;
+		PADDING(3);
+	} AnimToRestore;
+	int AnimSet; // 19
+
+	// defined states: WaitForAnim
+	// defined tasks: TASK_SET_ANIM (x2), TASK_WAIT_FOR_ANIM, TASK_RANDOM_WAIT_FOR_ANIM
+	// defined events: Animation_XXX
 
 	static inline constexpr int vtp = 0x776B64;
 	static inline constexpr int TypeDesc = 0x820BE8;
 };
 
 struct shok_GGL_CBehaviorWalkCommand : shok_EGL_CGLEBehavior {
-	shok_position TargetPosition;
+	shok_position WalkTarget;
+
+	// defined tasks: TASK_WALK -> goes to ev 20003
+	// defined events: MoveCommand_Move
 
 	static inline constexpr int vtp = 0x7736A4;
 	static inline constexpr int TypeDesc = 0x816A78;
 };
 
 struct shok_GGL_CWorkerBehavior : shok_EGL_CGLEBehavior {
-	int WorkTimeRemaining, TargetWorkTime;
+	int WorkTimeRemaining, TargetWorkTime; // 4
 	float Motivation;
 private:
-	int BehaviorProps2;
+	int BehaviorProps2; //7
 public:
-	int CycleIndex, TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn, CouldConsumeResource, IsLeaving;
-	float TransportAmount;
+	int CycleIndex, TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn;
+	byte CouldConsumeResource, IsLeaving; // 15
+	PADDING(2);
+	PADDINGI(1);
+	float CarriedResourceAmount; // 17
+
+	// defined states: unknown 13,21
+	// defined tasks: TASK_LEAVE_SETTLEMENT, TASK_GO_TO_POS, TASK_ADVANCE_IN_CYCLE, TASK_INCREASE_PLAYER_XXX,
+	// 	   TASK_CHANGE_WORK_TIME_ABSOLUTE, TASK_CHANGE_WORK_TIME_RELATIVE, TASK_CHANGE_WORK_TIME_XXX, TASK_GO_TO_WORK_BUILDING,
+	// 	   TASK_GO_TO_EAT_BUILDING, TASK_GO_TO_REST_BUILDING, TASK_GO_TO_LEAVE_BUILDING,
+	// 	   TASK_CHECK_GO_TO_WORK_BUILDING_SUCCESS, TASK_CHECK_GO_TO_EAT_BUILDING_SUCCESS, TASK_CHECK_GO_TO_REST_BUILDING_SUCCESS, TASK_CHECK_GO_TO_VILLAGE_CENTER_SUCCESS,
+	// 	   TASK_WORK_WAIT_UNTIL, TASK_EAT_WAIT, TASK_REST_WAIT, TASK_SET_ANIM_AT_WORKPLACE, TASK_SET_ANIM_AT_FARM, TASK_SET_ANIM_AT_RESIDENCE, TASK_SET_ANIM_AT_VILLAGE_CENTER,
+	// 	   TASK_MINED_RESOURCE TASK_REFINE_RESOURCE TASK_DO_TRADE_STEP TASK_DO_RESEARCH_STEP (all the same),
+	// 	   TASK_RETURN_TO_CYCLE, TASK_CHECK_FEAR, TASK_CREATE_CANNON, TASK_SET_CANNON_PROGRESS, TASK_DO_WORK_AT_FOUNDRY
+	// 	   TASK_GO_TO_SUPPLIER, TASK_TAKE_FROM_STOCK, TASK_SET_CARRIER_MODEL, TASK_CHECK_GO_TO_SUPPLIER_SUCCESS, TASK_ACTIVATE_UVANIM,
+	// 	   TASK_START_WORK_IF_AT_WORKPLACE, TASK_ACTIVATE_PARTICLE_EFFECT, TASK_DEACTIVATE_PARTICLE_EFFECT,TASK_GO_TO_NEAREST_NEUTRAL_BRIDGE, TASK_CHECK_GO_TO_BRIDGE_SUCCESS,
+	// 	   TASK_INCREASE_BRIDGE_PROGRESS
+	// defined events: Worker_XXX
 
 	static inline constexpr int vtp = 0x772B30;
 	static inline constexpr int TypeDesc = 0x813B1C;

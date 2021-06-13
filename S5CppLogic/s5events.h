@@ -182,8 +182,50 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 };
 
 enum class shok_EventIDs : int {
-	AttackEntity = 0x15004,
+	MoveCommand_Move = 0x11002, //EGL::CEventPosition
+	// 1100D, 1100E, 11017 something default movement
+	// 11002 bino cancel
+	// 12002 stop?
+	Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
 
+	KegPlacer_Sabotage = 0x10107, //EGL::CEvent1Entity
+	// 65804 -> 12002
+	KegPpacer_Defuse = 0x1010E, //EGL::CEvent1Entity
+	// 1010F -> 12002
+	KegPlacer_GetSabotageProgress = 0x10112, //EGL::CEventGetValue<float,1468983543>
+	KegPlacer_GetDisarmProgress = 0x10113, //EGL::CEventGetValue<float,1468983543>
+
+	Binocular_ExploreCommand = 0x11102, //EGL::CEventPosition
+	TorchPlacer_PlaceTorch = 0x11103, //EGL::CEventPosition
+	PointToResources_Activate = 0x11104, //BB::CEvent
+
+	// 13002, 13003, 13004 EGL::CEvent1Entity worker & some entity
+	Worker_GetMotivation = 0x13007, //EGL::CEventGetValue<float,1468983543>
+	Worker_GetWorkWaitUntil = 0x13008, //EGL::CEventGetValue<int,1211121895>
+	Worker_GetWorkTaskList = 0x13009, //EGL::CEventGetValue<int,1211121895> checks building, then props
+	Worker_LevyTaxes = 0x1300A, //BB::CEvent
+	Worker_ForceToWork = 0x1300B, //BB::CEvent
+	// 1300C most likely worker leave
+	// worker 13013 get int something cycleindex
+	// worker 13014 empty EGL::CEventValue<int,-27574121>
+	Worker_Bless = 0x13015, //BB::CEvent
+	Worker_AdvanceInCycles = 0x13016, //BB::CEvent
+	// worker 13017 CycleIndex=5
+	Worker_ChangeMoti = 0x13019, //GGL::CEventChangeMotivation
+	Worker_GetMaxWorkTime = 0x1301A, //EGL::CEventGetValue<int, 1211121895>
+	Worker_GetWorkTimeRemaining = 0x1301B, //EGL::CEventGetValue<int, 1211121895>
+	// 1301D worker something entity
+	Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
+	// 13018 worker leave? EGL::CEvent1Entity
+	// 13020 worker get some bool
+	Worker_IsLeaving = 0x13021, //EGL::CEventGetValue<bool,1709081367>
+	Worker_GetTransportModel = 0x13022, //EGL::CEventGetValue<int, 1211121895>
+	// 13025 worker emtpty EGL::CEvent1Entity
+	Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
+	// 18003 get bool true
+
+	AttackEntity = 0x15004,
+	// 1500E bino cancel
 	BombPlacer_CommandPlaceBomb = 0x15033, //BB::CEvent,EGL::CEventPosition
 
 	HeroHawk_SendHawk = 0x16002, //BB::CEvent,EGL::CEventPosition
@@ -196,11 +238,15 @@ enum class shok_EventIDs : int {
 	HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
 	HeroAbility_GetChargeMax = 0x16011, //GGL::CEventHeroAbilityInteger
 	HeroAbility_SetChargeCurrent = 0x16012, //GGL::CEventHeroAbilityInteger
+	// 16013 ? fire projectile event???
 
 	Camouflage_IsInvisible = 0x16013, //EGL::CEventGetValue<bool,1709081367>, 1504A same
+	ThiefCamouflage_Reset = 0x16014, //BB::CEvent
 	Camouflage_Activate = 0x16015, //BB::CEvent
 	Camouflage_GetDurationMax = 0x16016, //EGL::CEventGetValue<int,1211121895>
 	Camouflage_GetDurationCurrent = 0x16017, //EGL::CEventGetValue<int,1211121895>
+
+	Sentinel_GetUrgency = 0x16019, //EGL::CEventGetValue<int,1211121895>
 
 	Summon_ActivateCommand = 0x1601A, //BB::CEvent
 
@@ -215,11 +261,27 @@ enum class shok_EventIDs : int {
 	ComvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
 	// 16028 convert cancel?
 
+	MotivateVorkers_ActivateCommand = 0x1602C, //BB::CEvent
+	Sniper_SnipeCommand = 0x1602D, //EGL::CEvent1Entity
+	Sniper_GetRange = 0x1602E, //EGL::CEventGetValue<float,1468983543>
+	Shuriken_ActivateCommand = 0x1602F, //EGL::CEvent1Entity
+	Shuriken_GetRange = 0x16030, //EGL::CEventGetValue<float,1468983543>
+
 	InflictFear_Activate = 0x16026, //BB::CEvent
+
+	Worker_ResetTaskList = 17012, //BB::CEvent
+
+	// 20002 set walk target?
+	// 20003 set walk target?
 
 	Behavior_Tick = 0x20005, //BB::CEvent
 	HeroAbility_Reset = 0x2000A, //GGL::CHeroAbility
 
-	// 1100D, 1100E, 11017 something default movement
-	// 12002 stop?
+	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
+	Animation_UnSuspend = 0x20014, //BB::CEvent may be swapped, check
+	Animation_Suspend = 0x20015, //EGL::CEventValue<int,-27574121> argument seems to be tick
+	Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
+	Animation_ResetTaskType = 0x2001E, //BB::CEvent
+	// worker 20024 get some int
+	// 20027 BB::CEvent also suspend?
 };

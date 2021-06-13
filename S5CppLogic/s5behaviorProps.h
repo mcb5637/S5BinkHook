@@ -96,7 +96,7 @@ struct shok_GGL_CConvertSettlerAbilityProps : shok_GGL_CHeroAbilityProps {
 
 struct shok_GGL_CSniperAbilityProps : shok_GGL_CHeroAbilityProps {
 	int TaskList, Animation;
-	float Range, DamageFactor;
+	float Range, DamageFactor; // 7
 
 	static inline constexpr int vtp = 0x7745E8;
 	static inline constexpr int TypeDesc = 0x81901C;
@@ -104,7 +104,7 @@ struct shok_GGL_CSniperAbilityProps : shok_GGL_CHeroAbilityProps {
 
 struct shok_GGL_CMotivateWorkersAbilityProps : shok_GGL_CHeroAbilityProps {
 	int TaskList, Animation;
-	float Range;
+	float Range; // 7
 	int WorkTimeBonus, Effect;
 
 	static inline constexpr int vtp = 0x775788;
@@ -113,7 +113,7 @@ struct shok_GGL_CMotivateWorkersAbilityProps : shok_GGL_CHeroAbilityProps {
 
 struct shok_GGL_CShurikenAbilityProps : shok_GGL_CHeroAbilityProps {
 	int TaskList, Animation;
-	float Range, MaxArcDegree;
+	float Range, MaxArcDegree; // 7
 	int NumberShuriken, ProjectileType;
 	float ProjectileOffsetHeight, ProjectileOffsetFront, ProjectileOffsetRight;
 	int DamageClass, DamageAmount;
@@ -123,21 +123,36 @@ struct shok_GGL_CShurikenAbilityProps : shok_GGL_CHeroAbilityProps {
 };
 
 struct shok_GGL_CKegPlacerBehaviorProperties : shok_GGL_CHeroAbilityProps {
+	int SecondsNeededToArm; // 5
+	int SecondsNeededToDisarm;
+	int PlaceKegTaskList, DisarmKegTaskList, KegEntityType;
+
 	static inline constexpr int vtp = 0x7763B4;
 	static inline constexpr int TypeDesc = 0x81F0AC;
 };
 
 struct shok_GGL_CAbilityScoutBinocularProps : shok_GGL_CHeroAbilityProps {
+	int NumberOfExplorationEntities; // 5
+	float SpacingOfExplorationEntities; // int/float?
+	int ExplorationRangeOfExplorationEntities; // int/float?
+	int ExplorationEntityType, ExplorationTaskList;
+
 	static inline constexpr int vtp = 0x779254;
 	static inline constexpr int TypeDesc = 0x829218;
 };
 
 struct shok_GGL_CTorchPlacerBehaviorProperties : shok_GGL_CHeroAbilityProps {
+	int TorchEntity; // 5
+	int TaskList;
+
 	static inline constexpr int vtp = 0x773790;
 	static inline constexpr int TypeDesc = 0x816E74;
 };
 
 struct shok_GGL_CPointToResourceBehaviorProperties : shok_GGL_CHeroAbilityProps {
+	int TaskList; // 5
+	float SearchRadius;
+
 	static inline constexpr int vtp = 0x774FEC;
 	static inline constexpr int TypeDesc = 0x81BBB0;
 };
@@ -149,26 +164,27 @@ struct shok_GGL_CSentinelBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	static inline constexpr int TypeDesc = 0x81AB94;
 };
 
-struct shok_GGL_CGLAnimationBehaviorExProps : shok_EGL_CGLEBehaviorProps {
-	int SuspensionAnimation, AnimSet;
+struct shok_GGL_CGLAnimationBehaviorExProps : shok_EGL_CGLEBehaviorProps { // there is EGL::CAnimationBehaviorProps, but its not used anywhere else vt 776BB4
+	int SuspensionAnimation, AnimSet; // 4
+	// list/set of {int Model, AnimSet; } ExtraSet
 
 	static inline constexpr int vtp = 0x776C48;
 	static inline constexpr int TypeDesc = 0x820B90;
 };
 
 struct shok_GGL_CWorkerBehaviorProps : shok_EGL_CGLEBehaviorProps {
-	int WorkTaskList, WorkIdleTaskList;
-	PADDINGI(1);
+	int WorkTaskList, WorkIdleTaskList; // 4
+	int WorkLeaveTaskList;
 	int WorkWaitUntil, EatTaskList, EatIdleTaskList, EatWait, RestTaskList, RestIdleTaskList, RestWait;
-	PADDINGI(1);
-	int LeaveTaskList;
+	int IdleTaskList;
+	int LeaveTaskList; // 15
 	float AmountResearched;
-	PADDINGI(1);
-	float WorkTimeChangeFarm, WorkTimeChangeResidence, WorkTimeChangeCamp;
+	float WorkTimeChangeWork;
+	float WorkTimeChangeFarm, WorkTimeChangeResidence, WorkTimeChangeCamp; // la20
 	int WorkTimeMaxCangeFarm, WorkTimeMaxChangeResidence;
 	float ExhaustedWorkMotivationMalus;
 	int TransportAmount, TransportModel, TransportAnim, ResourceToRefine;
-	float WorkTimeChangeWork;
+	float BridgeProgress, MaximumDistanceToBridge; // la 29
 
 	static inline constexpr int vtp = 0x772B90;
 	static inline constexpr int TypeDesc = 0x813B40;

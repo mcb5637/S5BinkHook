@@ -282,8 +282,8 @@ enum class shok_Task : int {
     TASK_INCREASE_PLAYER_KNOWLEDGE = 78,
     TASK_INCREASE_PLAYER_FAITH = 79,
     TASK_CONSUME_RESOURCE = 80,
-    TASK_GO_TO_WORK_BUILDING = 82,
     TASK_MINED_RESOURCE = 81,
+    TASK_GO_TO_WORK_BUILDING = 82,
     TASK_GO_TO_EAT_BUILDING = 83,
     TASK_GO_TO_REST_BUILDING = 84,
     TASK_GO_TO_LEAVE_BUILDING = 85,
@@ -341,11 +341,11 @@ enum class shok_Task : int {
     TASK_GO_TO_RESOURCE_SLOT = 136,
     TASK_CHANGE_DEFENDABLE_BUILDING_ATTACHMENT = 137,
     TASK_MOVE_TO_DEFENDABLE_BUILDING = 138,
-    TASK_CHECK_FEAR = 143,
     TASK_DEFEND = 139,
     TASK_GO_TO_CONSTRUCTION_SITE_SLOT = 140,
     TASK_FLEE = 141,
     TASK_RETURN_TO_CYCLE = 142,
+    TASK_CHECK_FEAR = 143,
     TASK_CHANGE_WORK_TIME_WORK = 144,
     TASK_CHANGE_WORK_TIME_FARM = 145,
     TASK_CHANGE_WORK_TIME_RESIDENCE = 146,
@@ -361,8 +361,8 @@ enum class shok_Task : int {
     TASK_CHECK_GO_TO_EAT_BUILDING_SUCCESS = 155,
     TASK_CHECK_GO_TO_WORK_BUILDING_SUCCESS = 156,
     TASK_CHECK_GO_TO_VILLAGE_CENTER_SUCCESS = 157,
-    TASK_TAKE_FROM_STOCK = 159,
     TASK_CHECK_GO_TO_DEFENDABLE_BUILDING_SUCCESS = 158,
+    TASK_TAKE_FROM_STOCK = 159,
     TASK_SET_CARRIER_MODEL = 160,
     TASK_CHECK_GO_TO_SUPPLIER_SUCCESS = 161,
     TASK_LEFT_BUILDING = 162,
@@ -418,9 +418,14 @@ enum class shok_Task : int {
 };
 
 enum class shok_TaskState : int {
-    Idle = 2,
+    WaitForAnim = 2,
     Move = 3,
     Rotate = 6,
     // 12 something movement behavior
+    // 13 something worker
+    // 21 something worker
     ComvertSettler = 28,
+    ThiefSabotage = 31,
+    ThiefDisarm = 32,
+    ScoutPointToRes = 33, // maybe unused?
 };

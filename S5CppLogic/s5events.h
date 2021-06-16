@@ -182,24 +182,41 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 };
 
 enum class shok_EventIDs : int {
-	MoveCommand_Move = 0x11002, //EGL::CEventPosition
-	// 1100D, 1100E, 11017 something default movement
-	// 11002 bino cancel
-	// 12002 stop?
-	Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
+	Follow_GetFollowStatus = 0x10008, //EGL::CEventGetValue<int,1211121895>
+	BattleSerf_SerJobMemoryResourceID = 0x10009, //EGL::CEvent1Entity
 
 	KegPlacer_Sabotage = 0x10107, //EGL::CEvent1Entity
-	// 65804 -> 12002
+	// 1010C -> 12002
 	KegPpacer_Defuse = 0x1010E, //EGL::CEvent1Entity
 	// 1010F -> 12002
 	KegPlacer_GetSabotageProgress = 0x10112, //EGL::CEventGetValue<float,1468983543>
 	KegPlacer_GetDisarmProgress = 0x10113, //EGL::CEventGetValue<float,1468983543>
 
+	MoveCommand_Move = 0x11002, //EGL::CEventPosition
+	Leader_SetTerritory = 0x11003, //EGL::CEventPosition
+	Leader_SetTerritoryRange = 0x11004, //EGL::CEventValue<float,1278362727>
+
+	Follow_TargetDestroyed = 0x11009, //EGL::CEvent1Entity
+	Follow_StartFollowing = 0x1100A, //GGL::CEventFollowInfo
+	Follow_CheckTargetStillAlive = 0x1100B, //BB::CEvent
+	Follow_GetFollowBehavior = 0x1100C, //EGL::CEventGetValue<GGL::CBehaviorFollow *,-1301899769>
+	Leader_ApproachPos = 0x1101A, //EGL::CEventPosition
+	// 1101B follow semms to return -1, lots of calls
+	Battle_SetBattleWalkAnim = 0x1101C, //BB::CEvent
+
+	// 1100D, 1100E, 11017 something default movement
+	// 11002 bino cancel
+	// 12002 stop?
+	Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
+	// 12008 leader hurt?
+
 	Binocular_ExploreCommand = 0x11102, //EGL::CEventPosition
 	TorchPlacer_PlaceTorch = 0x11103, //EGL::CEventPosition
 	PointToResources_Activate = 0x11104, //BB::CEvent
 
-	// 13002, 13003, 13004 EGL::CEvent1Entity worker & some entity
+	Worker_WorkPlaceBuildingDestroyed = 0x13002, //EGL::CEvent1Entity
+	Worker_FarmBuildingDestroyed = 0x13003, //EGL::CEvent1Entity
+	Worker_ResidencePlaceBuildingDestroyed = 0x13004, //EGL::CEvent1Entity
 	Worker_GetMotivation = 0x13007, //EGL::CEventGetValue<float,1468983543>
 	Worker_GetWorkWaitUntil = 0x13008, //EGL::CEventGetValue<int,1211121895>
 	Worker_GetWorkTaskList = 0x13009, //EGL::CEventGetValue<int,1211121895> checks building, then props
@@ -217,16 +234,71 @@ enum class shok_EventIDs : int {
 	// 1301D worker something entity
 	Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
 	// 13018 worker leave? EGL::CEvent1Entity
-	// 13020 worker get some bool
+	// 13020 worker get some bool condidtionally forwards to 18007
 	Worker_IsLeaving = 0x13021, //EGL::CEventGetValue<bool,1709081367>
 	Worker_GetTransportModel = 0x13022, //EGL::CEventGetValue<int, 1211121895>
 	// 13025 worker emtpty EGL::CEvent1Entity
 	Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
+
+	// 14005 battleserf stop if toserf tl
+	BattleSerf_CommandTurnToSerf = 0x14006, //BB::CEvent
+	BattleSerf_GetTimeToChangeBack = 0x14008, //EGL::CEventGetValue<int, 1211121895>
+
 	// 18003 get bool true
 
-	AttackEntity = 0x15004,
-	// 1500E bino cancel
-	BombPlacer_CommandPlaceBomb = 0x15033, //BB::CEvent,EGL::CEventPosition
+	Leader_AttackEntity = 0x15004,
+	// 15005 leader
+	// 15007 soldier empty
+	// 15008 leader empty
+	// 15009 leader
+	Leader_GetHealthPlusTroopHealth = 0x1500A, //EGL::CEventGetValue<int, 1211121895>
+	Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
+	// 1500C battle set target?
+	// 1500D leader
+	// 1500E bino cancel, battle cancel?
+	Battle_GetBattleStatus = 0x15011, //EGL::CEventGetValue<int, 1211121895>
+	Battle_SetBattleStatus = 0x15012, //EGL::CEventValue<int,-27574121>
+	Battle_GetDamageClass = 0x15013, //EGL::CEventGetValue<int, 1211121895>
+	Leader_GetCurrentNumSoldier = 0x15016, //EGL::CEventGetValue<int, 1211121895>
+	Leader_SetNudgeCount = 0x15018, //EGL::CEventValue<int,-27574121>
+	Leader_GetNudgeCount = 0x15019, //EGL::CEventGetValue<int, 1211121895>
+	// 1501C soldier some other entity
+	// 1501D battle barracks attachment, set battle tl?, soldier simmilar
+	// 1501E leader get some unknown int +100, soldier something other entity???
+	Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
+	Leader_GetAttackTarget = 0x15021, //EGL::CEventGetValue<int, 1211121895> soldier forwards to leader
+	Leader_Hurt = 0x15023, //EGL::CEventValue<int,-27574121>
+	Battle_GetLatestAttackerID = 0x15024, //EGL::CEventGetValue<int, 1211121895>
+	Battle_GetLatestHitTurn = 0x15025, //EGL::CEventGetValue<int, 1211121895>
+	Battle_GetBattleBehavior = 0x15026, //EGL::CEventGetValue<GGL::CBattleBehavior *,-646837913>
+	Leader_GetLeaderBehavior = 0x15027, //EGL::CEventGetValue<GGL::CLeaderBehavior *,-1190255961>
+	Soldier_GetSoldierBehavior = 0x15028, //EGL::CEventGetValue<GGL::CSoldierBehavior *,-806903129>
+	SoldierGetLeaderID = 0x15029, //EGL::CEventGetValue<int, 1211121895>
+	Leader_GetXP = 0x1502A, //EGL::CEventGetValue<int, 1211121895>
+	Leader_SetXP = 0x1502B, //EGL::CEventValue<int,-27574121>
+	// 1502C leader empty
+	Leader_GetCommand = 0x1502D, //EGL::CEventGetValue<int, 1211121895>
+	Leader_AttackMove = 0x1502E, //EGL::CEventPosition
+	Leader_HoldPosition = 0x1502F, //BB::CEvent
+	// 15030 leader disable territory?
+	Leader_RunAwayFromFearEffect = 0x15031, //EGL::CEvent1Entity TODO validate
+	Leader_Defend = 0x15032, //BB::CEvent
+	BombPlacer_CommandPlaceBomb = 0x15033, //EGL::CEventPosition
+	// 15034 also something with fear
+	// 15036 leader some area check get
+	// 15037 buy soldier?
+	// 15038 leader? goes to defend after something else
+	// 15039 leader something attack target?
+	// 1503A leader
+	Leader_IsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
+	// 15042 leader set training tl?
+	// 15044 leader to 12002
+	Leader_ExpellSoldier = 0x15046, //EGL::CEventValue<bool,703333479> bool seems to be use effect
+	Battle_IsInBattleTL = 0x15049, //EGL::CEventGetValue<bool,1709081367>
+	Leader_GetUpkeepCost = 0x1504C, //EGL::CEventGetValue<float, 1468983543>
+
+	GetDamage = 0x1503D, //EGL::CEventGetValue<int, 1211121895>
+	// 15045 battle maybe cancel?
 
 	HeroHawk_SendHawk = 0x16002, //BB::CEvent,EGL::CEventPosition
 
@@ -271,10 +343,19 @@ enum class shok_EventIDs : int {
 
 	Worker_ResetTaskList = 17012, //BB::CEvent
 
+	// 17020 rax is autofill?
+
+	// 18004 leader ret true
+	// 18005 soldier ret true
+	// 18007 battle ret true
+
+	LimitedAttachment_GetMax = 0x1A007, //GGL::CEventAttachmentTypeGetInteger
+
 	// 20002 set walk target?
 	// 20003 set walk target?
+	// 20004 set building sub anim?
 
-	Behavior_Tick = 0x20005, //BB::CEvent
+	Behavior_Tick = 0x20005, //BB::CEvent ticks every second
 	HeroAbility_Reset = 0x2000A, //GGL::CHeroAbility
 
 	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
@@ -282,6 +363,7 @@ enum class shok_EventIDs : int {
 	Animation_Suspend = 0x20015, //EGL::CEventValue<int,-27574121> argument seems to be tick
 	Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 	Animation_ResetTaskType = 0x2001E, //BB::CEvent
-	// worker 20024 get some int
+	// worker 20024 get some int, leader get something barracks related, soldier simmilar
+	// 20026 set uv anim?
 	// 20027 BB::CEvent also suspend?
 };

@@ -491,8 +491,8 @@ void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d
 }
 
 int l_entity_test(lua_State* L) {
-	//shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
-	shok_GGL_CBuilding* e = luaext_checkBulding(L, 1);
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	//shok_GGL_CBuilding* e = luaext_checkBulding(L, 1);
 	/*shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
 	if (!FireEvent) {
 		shok_vtable_EGL_CGLEEntity* vt = (shok_vtable_EGL_CGLEEntity*)e->vtable;
@@ -501,9 +501,8 @@ int l_entity_test(lua_State* L) {
 	}*/
 	//DEBUGGER_BREAK
 	//lua_pushnumber(L, (int) &(e->GetEntityType()->LogicProps->MaxHealth));
-	luaext_pushPos(L, e->LeavePosition);
-	luaext_pushPos(L, e->ApproachPosition);
-	return 2;
+	lua_pushnumber(L, (int)&e->CurrentState);
+	return 1;
 }
 
 int l_entityGetTaskListIndex(lua_State* L) {

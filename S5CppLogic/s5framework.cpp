@@ -21,6 +21,32 @@ bool shok_framework_saveData::LoadSaveData(const char* name)
     return savedata_load(this, name);
 }
 
+bool(__thiscall* const gdb_iskeyvalid)(shok_GDB_CList* th, const char* k) = reinterpret_cast<bool(__thiscall* const)(shok_GDB_CList*, const char*)>(0x40E038);
+bool shok_GDB_CList::IsKeyValid(const char* key)
+{
+    return gdb_iskeyvalid(this, key);
+}
+const char* (__thiscall* const gdb_getstring)(shok_GDB_CList* th, const char* k) = reinterpret_cast<const char* (__thiscall* const)(shok_GDB_CList*, const char*)>(0x40E01C);
+const char* shok_GDB_CList::GetString(const char* key)
+{
+    return gdb_getstring(this, key);
+}
+void(__thiscall* const gdb_setstring)(shok_GDB_CList* th, const char* k, const char* v) = reinterpret_cast<void(__thiscall* const)(shok_GDB_CList*, const char*, const char*)>(0x40E1AD);
+void shok_GDB_CList::SetString(const char* key, const char* value)
+{
+    return gdb_setstring(this, key, value);
+}
+float(__thiscall* const gdb_getval)(shok_GDB_CList* th, const char* k) = reinterpret_cast<float(__thiscall* const)(shok_GDB_CList*, const char*)>(0x40E000);
+float shok_GDB_CList::GetValue(const char* key)
+{
+    return gdb_getval(this, key);
+}
+void(__thiscall* const gdb_setval)(shok_GDB_CList* th, const char* k, float v) = reinterpret_cast<void(__thiscall* const)(shok_GDB_CList*, const char*, float)>(0x40E18A);
+void shok_GDB_CList::SetValue(const char* key, float value)
+{
+    gdb_setval(this, key, value);
+}
+
 shok_framework_campagnInfo* shok_Framework_CMain::GetCampagnInfo(int i, const char* n)
 {
     shok_framework_campagnInfo* r = nullptr;
@@ -40,4 +66,10 @@ shok_framework_campagnInfo*(__thiscall* const framew_getcinfo)(shok_Framework_CM
 shok_framework_campagnInfo* shok_Framework_CMain::GetCampagnInfo(shok_GS3DTools_CMapData* d)
 {
     return framew_getcinfo(this, d);
+}
+
+void(__thiscall* const framew_savegdb)(shok_Framework_CMain* th) = reinterpret_cast<void(__thiscall* const)(shok_Framework_CMain*)>(0x40AED0);
+void shok_Framework_CMain::SaveGDB()
+{
+    framew_savegdb(this);
 }

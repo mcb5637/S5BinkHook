@@ -294,7 +294,8 @@ struct shok_GGL_CWorkerBehavior : shok_EGL_CGLEBehavior {
 private:
 	int BehaviorProps2; //7
 public:
-	int CycleIndex, TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn;
+	int CycleIndex; // seems to be 0->working, 1->eating, 2->resting, 5->joining settlement
+	int TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn;
 	byte CouldConsumeResource, IsLeaving; // 15
 	PADDING(2);
 	PADDINGI(1);
@@ -317,21 +318,31 @@ public:
 	static inline constexpr int TypeDesc = 0x813B1C;
 };
 
-struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior {
-	float SuccessDistance, FailureDistance;
+struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollow in between, 776E40
+	float SuccessDistance, FailureDistance; // 4
 	int TimeOutTime, StartTurn;
 	shok_position TargetPosition;
-	byte StartFollowing, StopFollowing;
+	byte StartFollowing, StopFollowing; // 10
 	PADDING(2);
-	int FollowStatus, LatestHitTurn;
-	PADDINGI(1);
-	int LatestAttackerID, BattleStatus;
+	int FollowStatus;
+	PADDINGI(1); // 12 p to behprops
+	int LatestHitTurn;
+	int LatestAttackerID, BattleStatus; // la15
 	byte NoMoveNecessary, NormalRangeCheckNecessary;
 	PADDING(2);
 	int Command;
 	shok_position AttackMoveTarget;
-	PADDINGI(1);
-	int MilliSecondsToWait, MSToPlayHitAnimation, HitPlayed; // la 23
+	byte Helping;
+	PADDING(3);
+	int MilliSecondsToWait, MSToPlayHitAnimation;
+	byte HitPlayed; // 23
+	PADDING(3);
+	int LatestAttackTurn;
+
+	// defined sates: Follow, MoveToTarget, BattleWait
+	// defined events: Follow_XXX, Animation_UnSuspend (x2) (updates startturn), Battle_XXX
+	// defined tasks: TASK_MOVE_TO_TARGET, TASK_SET_ORIENTATION_TO_TARGET, TASK_SET_ATTACK_ANIM, TASK_HURT, TASK_CHECK_RANGE, TASK_FIRE_PROJECTILE, TASK_SET_BATTLE_IDLE_ANIM,
+	//		TASK_BATTLE_WAIT_UNTIL, TASK_SET_LATEST_ATTACK_TURN, TASK_WAIT_FOR_LATEST_ATTACK, TASK_RESOLVE_BATTLE_COLLISION
 
 	static inline constexpr int vtp = 0x77313C;
 	static inline constexpr int TypeDesc = 0x815EEC;
@@ -340,19 +351,26 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
-	PADDINGI(3);
+	PADDINGI(2);
 	int TroopHealthCurrent, TroopHealthPerSoldier; // 27
 	shok_position TerritoryCenter;
 	float TerritoryCenterRange;
-	int Experience;
+	int Experience; // 32
 	vector_padding;
 	std::vector<shok_position, shok_allocator<shok_position>> PatrolPoints;
-	PADDINGI(1);
+	int NextPatrolPointIndex; // 37
 	float DefendOrientation;
 	int TrainingStartTurn;
-	PADDINGI(1);
+	byte PatrolIndexCountingDown, UsingTargetOrientation, UsingTerritory; // 40
+	PADDING(1);
 	int SecondsSinceHPRefresh, NudgeCount, FormationType;
 	shok_position StartBattlePosition;
+	int IndexOfFirstChaoticPosition; //46
+
+	// defined states: Train, LeaderGetCloseTotarget
+	// defined events: Leader_XXX, MoveCommand_Move, Behavior_Tick (regen), HeroAbility_Reset
+	// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE, TASK_GO_TO_POS, TASK_ACTIVATE_UVANIM, TASK_LEAVE_BARRACKS, TASK_SET_ANIM_AT_BARRACKS, TASK_TRAIN,
+	//		TASK_GET_CLOSE_TO_TARGET, TASK_ATTACK, TASK_CHECK_MIN_RADIUS
 
 	static inline constexpr int vtp = 0x7761E0;
 	static inline constexpr int TypeDesc = 0x81EF80;
@@ -362,11 +380,22 @@ struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 };
 
 struct shok_GGL_CSoldierBehavior : shok_GGL_CBattleBehavior {
+
+	// defined states: 1, 24
+	// defined events: Leader_Hurt, Leader_GetAttackTarget (forwards to leader), HeroAbility_Reset, Soldier_XXX
+	// defined tasks: TASK_GO_TO_POS, TASK_LEAVE_BARRACKS
+
 	static inline constexpr int vtp = 0x773CC8;
 	static inline constexpr int TypeDesc = 0x817FC4;
 };
 
 struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
+	PADDINGI(1); // 47 p to props
+	int JobMemoryResourceID, TimeBeforeChangeback;
+
+	// defined events: BattleSerf_XXX, Behavior_Tick (ticks down time if >0, reverts back if 0)
+	// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_TURN_INTO_SERF
+
 	static inline constexpr int vtp = 0x7788C4;
 	static inline constexpr int TypeDesc = 0x826BB4;
 };

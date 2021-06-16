@@ -191,7 +191,7 @@ struct shok_GGL_CWorkerBehaviorProps : shok_EGL_CGLEBehaviorProps {
 };
 
 struct shok_GGL_CBattleBehaviorProps : shok_EGL_CGLEBehaviorProps {
-	int BattleTaskList, NormalAttackAnim1, NormalAttackAnim2, CounterAttackAnim, FinishingMoveAnim, MissAttackAnim, BattleIdleAnim, BattleWalkAnim;
+	int BattleTaskList, NormalAttackAnim1, NormalAttackAnim2, CounterAttackAnim, FinishingMoveAnim, MissAttackAnim, BattleIdleAnim, BattleWalkAnim; // 4
 	int HitAnim, DamageClass, DamageAmount, MaxDamageRandomBonus; // 12
 	float DamageRange;
 	int ProjectileEffectID;
@@ -224,6 +224,8 @@ struct shok_GGL_CSerfBattleBehaviorProps : shok_GGL_CBattleBehaviorProps {
 };
 
 struct shok_GGL_CBattleSerfBehaviorProps : shok_GGL_CLeaderBehaviorProps {
+	int TurnIntoSerfTaskList; //32
+
 	static inline constexpr int vtp = 0x77889C;
 	static inline constexpr int TypeDesc = 0x8268F0;
 };

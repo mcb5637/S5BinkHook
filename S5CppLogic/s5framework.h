@@ -48,6 +48,38 @@ struct shok_framework_saveData {
 	static inline shok_framework_saveData* (* const GlobalObj)() = reinterpret_cast<shok_framework_saveData * (* const)()>(0x403158);
 };
 
+
+
+struct shok_GDB_CValue : shok_object {
+	float Data;
+
+	static inline constexpr int vtp = 0x76300C;
+};
+
+struct shok_GDB_CString : shok_object {
+	shok_string Data;
+
+	static inline constexpr int vtp = 0x76302C;
+};
+
+struct shok_GDBEntry {
+	shok_string Key;
+	shok_object* Data;
+};
+
+struct shok_GDB_CList : shok_object {
+	shok_set<shok_GDBEntry> Entries;
+
+	bool IsKeyValid(const char* key);
+	const char* GetString(const char* key);
+	void SetString(const char* key, const char* value);
+	float GetValue(const char* key);
+	void SetValue(const char* key, float value);
+
+	static inline constexpr int vtp = 0x76289C;
+	static inline constexpr int TypeDesc = 0x80040C;
+};
+
 struct shok_Framework_CMain : shok_object {
 	int vtable_Framework_IGameCallBacks, vtable_ESnd_IAmbientSoundInfo;
 	PADDINGI(1); // 2
@@ -55,11 +87,15 @@ struct shok_Framework_CMain : shok_object {
 	//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent
 	// GS3DTools::CMapData::vtable???
 
+	PADDINGI(200);
+	shok_GDB_CList GDB; // 227
 
 	static inline constexpr int vtp = 0x76293C;
 
 	shok_framework_campagnInfo* GetCampagnInfo(int i, const char* n);
 	shok_framework_campagnInfo* GetCampagnInfo(shok_GS3DTools_CMapData* d);
+	void SaveGDB();
 
 	static inline shok_Framework_CMain** const GlobalObj = reinterpret_cast<shok_Framework_CMain**>(0x84EF60);
 };
+//constexpr int i = offsetof(shok_Framework_CMain, GDB) / 4;

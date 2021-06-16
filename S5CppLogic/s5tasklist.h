@@ -418,12 +418,19 @@ enum class shok_Task : int {
 };
 
 enum class shok_TaskState : int {
+    // 1 something leader related, also soldier related
     WaitForAnim = 2,
     Move = 3,
+    Follow = 4,
     Rotate = 6,
     // 12 something movement behavior
     // 13 something worker
+    Train = 17,
+    BattleWait = 20,
     // 21 something worker
+    LeaderGetCloseTotarget = 22,
+    MoveToTarget = 23,
+    // 24 soldier formation?
     ComvertSettler = 28,
     ThiefSabotage = 31,
     ThiefDisarm = 32,

@@ -101,7 +101,8 @@ int __cdecl test(lua_State* L) {
     shok_EGL_CGLETaskArgs args{};
     args.vtable = shok_EGL_CGLETaskArgs::vtp;
     args.TaskType = shok_Task::TASK_SUMMON_ENTITIES;
-    lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->CurrentTaskIndex);
+    //lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->GetBehavior<shok_GGL_CBattleSerfBehavior>()->TimeBeforeChangeback);
+    lua_pushnumber(L, (int)&(*shok_Framework_CMain::GlobalObj)->GDB);
     //DEBUGGER_BREAK
     //lua_pushnumber(L, (int)&i->MiniMapTextureName);
     return 1;

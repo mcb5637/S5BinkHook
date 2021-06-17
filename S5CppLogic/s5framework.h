@@ -64,7 +64,7 @@ struct shok_GDB_CString : shok_object {
 
 struct shok_GDBEntry {
 	shok_string Key;
-	shok_object* Data;
+	shok_object* Data; // shok_GDB_CValue, shok_GDB_CString, or shok_GDB_CList
 };
 
 struct shok_GDB_CList : shok_object {

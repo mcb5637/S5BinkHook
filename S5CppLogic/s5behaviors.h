@@ -401,11 +401,21 @@ struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
 };
 
 struct shok_GGL_CSerfBattleBehavior : shok_GGL_CBattleBehavior {
+	// padding 2, shok_pos territory?
+
+	// defined events: MoveCommand_Move, Leader_AttackEntity, Leader_GetAttackTarget, Behavior_Tick
+	// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE
+
 	static inline constexpr int vtp = 0x774A98;
 	static inline constexpr int TypeDesc = 0x81A4FC;
 };
 
 struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
+	int ConstructionSiteSlotIndex; //4
+	int ExtractionDelayCounter; //float?
+	int LastResourceType, JobMemoryResourceID;
+	int ResourceSlot;
+
 	static inline constexpr int vtp = 0x774874;
 	static inline constexpr int TypeDesc = 0x819AFC;
 };

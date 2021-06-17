@@ -82,6 +82,27 @@ int l_api_saveGetMap(lua_State* L) {
 	return 4;
 }
 
+int l_api_getGDB(lua_State* L) {
+	lua_newtable(L);
+	std::function<void(shok_GDBEntry*)> a = [L,&a](shok_GDBEntry* e) {
+		lua_pushstring(L, e->Key.c_str());
+		if (e->Data->vtable == shok_GDB_CString::vtp)
+			lua_pushstring(L, static_cast<shok_GDB_CString*>(e->Data)->Data.c_str());
+		else if (e->Data->vtable == shok_GDB_CValue::vtp)
+			lua_pushnumber(L, static_cast<shok_GDB_CValue*>(e->Data)->Data);
+		else if (e->Data->vtable == shok_GDB_CList::vtp) {
+			luaL_checkstack(L, 4, "stackoverflow");
+			lua_newtable(L);
+			static_cast<shok_GDB_CList*>(e->Data)->Entries.ForAll(a);
+		}
+		else
+			lua_pushboolean(L, true);
+		lua_rawset(L, -3);
+	};
+	(*shok_Framework_CMain::GlobalObj)->GDB.Entries.ForAll(a);
+	return 1;
+}
+
 void l_api_init(lua_State* L)
 {
 	luaext_registerFunc(L, "Eval", &l_api_eval);
@@ -91,6 +112,7 @@ void l_api_init(lua_State* L)
 	luaext_registerFunc(L, "DoString", &l_api_doString);
 	luaext_registerFunc(L, "MapGetDataPath", &l_api_mapGetDataPath);
 	luaext_registerFunc(L, "SaveGetMapInfo", &l_api_saveGetMap);
+	luaext_registerFunc(L, "GetGDB", &l_api_getGDB);
 }
 
 // CppLogic.API.Log("string")

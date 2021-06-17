@@ -300,6 +300,11 @@ function CppLogic.API.MapGetDataPath(mapname, typ, campname) end
 -- @return GUID
 function CppLogic.API.SaveGetMapInfo(save) end
 
+--- returns the complete GDB as multilayered table.
+-- keys are split at every \, and put into a layered map.
+-- @return table
+function CppLogic.API.GetGDB() end
+
 --- deals damage to a target.
 -- calls respective hurt entity trigger.
 -- @param target entity to be damaged

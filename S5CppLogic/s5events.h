@@ -183,7 +183,7 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 
 enum class shok_EventIDs : int {
 	Follow_GetFollowStatus = 0x10008, //EGL::CEventGetValue<int,1211121895>
-	BattleSerf_SerJobMemoryResourceID = 0x10009, //EGL::CEvent1Entity
+	BattleSerf_SerJobMemoryResourceID = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
 
 	KegPlacer_Sabotage = 0x10107, //EGL::CEvent1Entity
 	// 1010C -> 12002
@@ -206,6 +206,7 @@ enum class shok_EventIDs : int {
 
 	// 1100D, 1100E, 11017 something default movement
 	// 11002 bino cancel
+	// 11003 serfbattle, set territory?
 	// 12002 stop?
 	Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
 	// 12008 leader hurt?
@@ -240,6 +241,7 @@ enum class shok_EventIDs : int {
 	// 13025 worker emtpty EGL::CEvent1Entity
 	Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
 
+	// 14003 serfbattle
 	// 14005 battleserf stop if toserf tl
 	BattleSerf_CommandTurnToSerf = 0x14006, //BB::CEvent
 	BattleSerf_GetTimeToChangeBack = 0x14008, //EGL::CEventGetValue<int, 1211121895>
@@ -247,15 +249,15 @@ enum class shok_EventIDs : int {
 	// 18003 get bool true
 
 	Leader_AttackEntity = 0x15004,
-	// 15005 leader
+	// 15005 leader, serfbattle
 	// 15007 soldier empty
 	// 15008 leader empty
 	// 15009 leader
 	Leader_GetHealthPlusTroopHealth = 0x1500A, //EGL::CEventGetValue<int, 1211121895>
 	Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
 	// 1500C battle set target?
-	// 1500D leader
-	// 1500E bino cancel, battle cancel?
+	// 1500D leader, serfbattle
+	// 1500E bino cancel, battle cancel?, serfbattle
 	Battle_GetBattleStatus = 0x15011, //EGL::CEventGetValue<int, 1211121895>
 	Battle_SetBattleStatus = 0x15012, //EGL::CEventValue<int,-27574121>
 	Battle_GetDamageClass = 0x15013, //EGL::CEventGetValue<int, 1211121895>
@@ -291,6 +293,7 @@ enum class shok_EventIDs : int {
 	// 15039 leader something attack target?
 	// 1503A leader
 	Leader_IsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
+	// 1503C serf some kind of stop?
 	// 15042 leader set training tl?
 	// 15044 leader to 12002
 	Leader_ExpellSoldier = 0x15046, //EGL::CEventValue<bool,703333479> bool seems to be use effect

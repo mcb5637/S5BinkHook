@@ -293,9 +293,9 @@ enum class shok_Task : int {
     TASK_EAT_WAIT = 89,
     TASK_REST_WAIT = 90,
     TASK_GO_TO_CONSTRUCTION_SITE = 91,
+    TASK_TURN_TO_CONSTRUCTION_SITE = 92,
     TASK_CHANGE_ATTACHMENT_TO_CONSTRUCTION_SITE = 93,
     TASK_HURT = 94,
-    TASK_TURN_TO_CONSTRUCTION_SITE = 92,
     TASK_MOVE_TO_TARGET = 95,
     TASK_SET_ORIENTATION_TO_TARGET = 96,
     TASK_SET_ATTACK_ANIM = 97,
@@ -418,13 +418,16 @@ enum class shok_Task : int {
 };
 
 enum class shok_TaskState : int {
-    // 1 something leader related, also soldier related
+    // 1 something leader related (detach attack target, then defend?), also soldier related, also serf (to stop event)
     WaitForAnim = 2,
     Move = 3,
     Follow = 4,
     Rotate = 6,
     // 12 something movement behavior
     // 13 something worker
+    IdleInFormation = 14,
+    AssumePositionInFormation = 15,
+    SerfSearchResource = 16,
     Train = 17,
     BattleWait = 20,
     // 21 something worker

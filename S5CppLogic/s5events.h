@@ -182,8 +182,10 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 };
 
 enum class shok_EventIDs : int {
+	Serf_TargetResDestroyed = 0x10003, //EGL::CEvent1Entity, also bserf
 	Follow_GetFollowStatus = 0x10008, //EGL::CEventGetValue<int,1211121895>
-	BattleSerf_SerJobMemoryResourceID = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
+	Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
+	// 1000A serf something extract res get bool
 
 	KegPlacer_Sabotage = 0x10107, //EGL::CEvent1Entity
 	// 1010C -> 12002
@@ -191,6 +193,7 @@ enum class shok_EventIDs : int {
 	// 1010F -> 12002
 	KegPlacer_GetSabotageProgress = 0x10112, //EGL::CEventGetValue<float,1468983543>
 	KegPlacer_GetDisarmProgress = 0x10113, //EGL::CEventGetValue<float,1468983543>
+
 
 	MoveCommand_Move = 0x11002, //EGL::CEventPosition
 	Leader_SetTerritory = 0x11003, //EGL::CEventPosition
@@ -203,6 +206,7 @@ enum class shok_EventIDs : int {
 	Leader_ApproachPos = 0x1101A, //EGL::CEventPosition
 	// 1101B follow semms to return -1, lots of calls
 	Battle_SetBattleWalkAnim = 0x1101C, //BB::CEvent
+	// 1101E formation get pos in formation?
 
 	// 1100D, 1100E, 11017 something default movement
 	// 11002 bino cancel
@@ -215,7 +219,7 @@ enum class shok_EventIDs : int {
 	TorchPlacer_PlaceTorch = 0x11103, //EGL::CEventPosition
 	PointToResources_Activate = 0x11104, //BB::CEvent
 
-	Worker_WorkPlaceBuildingDestroyed = 0x13002, //EGL::CEvent1Entity
+	Worker_WorkPlaceBuildingDestroyed = 0x13002, //EGL::CEvent1Entity serf probably construction/repair destr
 	Worker_FarmBuildingDestroyed = 0x13003, //EGL::CEvent1Entity
 	Worker_ResidencePlaceBuildingDestroyed = 0x13004, //EGL::CEvent1Entity
 	Worker_GetMotivation = 0x13007, //EGL::CEventGetValue<float,1468983543>
@@ -241,9 +245,10 @@ enum class shok_EventIDs : int {
 	// 13025 worker emtpty EGL::CEvent1Entity
 	Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
 
-	// 14003 serfbattle
-	// 14005 battleserf stop if toserf tl
-	BattleSerf_CommandTurnToSerf = 0x14006, //BB::CEvent
+	Serf_Construct = 0x14003, // GGL::CEventEntityIndex serfbattle?
+	Serf_CommandTurnToBattleSerf = 0x14005, //BB::CEvent battleserf stop if toserf tl
+	BattleSerf_CommandTurnToSerf = 0x14006, //BB::CEvent serf stop if toserf tl
+	// 14007 serf get unknown float 9
 	BattleSerf_GetTimeToChangeBack = 0x14008, //EGL::CEventGetValue<int, 1211121895>
 
 	// 18003 get bool true
@@ -262,6 +267,7 @@ enum class shok_EventIDs : int {
 	Battle_SetBattleStatus = 0x15012, //EGL::CEventValue<int,-27574121>
 	Battle_GetDamageClass = 0x15013, //EGL::CEventGetValue<int, 1211121895>
 	Leader_GetCurrentNumSoldier = 0x15016, //EGL::CEventGetValue<int, 1211121895>
+	Formation_AssumePosition = 0x15017, //BB::CEvent
 	Leader_SetNudgeCount = 0x15018, //EGL::CEventValue<int,-27574121>
 	Leader_GetNudgeCount = 0x15019, //EGL::CEventGetValue<int, 1211121895>
 	// 1501C soldier some other entity
@@ -348,11 +354,20 @@ enum class shok_EventIDs : int {
 
 	// 17020 rax is autofill?
 
+	// 18002 serf ret true
 	// 18004 leader ret true
 	// 18005 soldier ret true
 	// 18007 battle ret true
 
+	// 1A002 limitedattachment on attach?
+	// 1A003 limitedattachment on detach?
+	// 1A004 limitedattach maybe get is full?
+	// 1A005 limitedattach get bool?
+	// 1A006 limitedattach maybe get curr?
 	LimitedAttachment_GetMax = 0x1A007, //GGL::CEventAttachmentTypeGetInteger
+	// 1A008 limitedattachment maybe get left?
+	// 1A009 limitedattach ?
+	// 1A00A limitedattach ?
 
 	// 20002 set walk target?
 	// 20003 set walk target?
@@ -366,7 +381,7 @@ enum class shok_EventIDs : int {
 	Animation_Suspend = 0x20015, //EGL::CEventValue<int,-27574121> argument seems to be tick
 	Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 	Animation_ResetTaskType = 0x2001E, //BB::CEvent
-	// worker 20024 get some int, leader get something barracks related, soldier simmilar
+	// worker 20024 get some int, leader get something barracks related, soldier simmilar, serf get terrainH < waterHeight
 	// 20026 set uv anim?
 	// 20027 BB::CEvent also suspend?
 };

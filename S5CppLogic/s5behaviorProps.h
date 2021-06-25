@@ -236,7 +236,7 @@ struct shok_serf_extractionInfo {
 	int Amount;
 };
 struct shok_GGL_CSerfBehaviorProps : shok_EGL_CGLEBehaviorProps {
-	int ResourceSearchRadius, ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList;
+	int ResourceSearchRadius, ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList; //4
 	vector_padding;
 	std::vector<shok_serf_extractionInfo, shok_allocator<shok_serf_extractionInfo>> ExtractionInfo;
 

@@ -393,7 +393,8 @@ struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
 	PADDINGI(1); // 47 p to props
 	int JobMemoryResourceID, TimeBeforeChangeback;
 
-	// defined events: BattleSerf_XXX, Behavior_Tick (ticks down time if >0, reverts back if 0)
+	// defined events: BattleSerf_XXX, Behavior_Tick (ticks down time if >0, reverts back if 0), Serf_CommandTurnToBattleSerf,
+	//		Serf_Construct?, Serf_ExtractResource?, Serf_TargetResDestroyed?
 	// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_TURN_INTO_SERF
 
 	static inline constexpr int vtp = 0x7788C4;
@@ -415,6 +416,13 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 	int ExtractionDelayCounter; //float?
 	int LastResourceType, JobMemoryResourceID;
 	int ResourceSlot;
+	// float ? 9, probably -1
+
+	// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_GO_TO_CONSTRUCTION_SITE, TASK_TURN_TO_CONSTRUCTION_SITE, TASK_CHANGE_ATTACHMENT_TO_CONSTRUCTION_SITE,
+	//		TASK_GO_TO_CONSTRUCTION_SITE_SLOT, TASK_LEAVE_SETTLEMENT, TASK_ABANDON_CURRENT_JOB, TASK_GO_TO_RESOURCE, TASK_TURN_TO_RESOURCE, TASK_WAIT_EXTRACTION_DELAY
+	//		TASK_EXTRACT_RESOURCE, TASK_GO_TO_RESOURCE_SLOT, TASK_TURN_INTO_BATTLE_SERF
+	// defined events: Worker_WorkPlaceBuildingDestroyed, Serf_XXX, BattleSerf_CommandTurnToSerf, Leader_AttackEntity
+	// defined states: SerfSearchResource, 1
 
 	static inline constexpr int vtp = 0x774874;
 	static inline constexpr int TypeDesc = 0x819AFC;
@@ -422,12 +430,15 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 
 struct GGL_SSlotArgsLimitedAttachment {
 	shok_AttachmentType AttachmentType;
-	int Limit;
-	int Event; // ?
+	int Limit; // these 2 are a struct called AttachmentInfo
+	byte IsActive;
+	PADDING(3);
 };
 struct shok_GGL_CLimitedAttachmentBehavior : shok_EGL_CGLEBehavior {
 	int vtable_EGL_TSlot_GGL_SSlotArgsLimitedAttachment_331624813;
 	shok_set<GGL_SSlotArgsLimitedAttachment> AttachmentLimits;
+
+	// defined evets: LimitedAttachment_XXX
 
 	static inline constexpr int vtp = 0x775E84;
 	static inline constexpr int TypeDesc = 0x81D6DC;
@@ -435,6 +446,10 @@ struct shok_GGL_CLimitedAttachmentBehavior : shok_EGL_CGLEBehavior {
 
 struct shok_GGL_CFormationBehavior : shok_EGL_CGLEBehavior {
 	int AnimStartTurn, AnimDuration;
+
+	// defined tasks: TASK_ASSUME_POSITION_IN_FORMATION, TASK_IDLE_IN_FORMATION
+	// defined states: IdleInFormation, AssumePositionInFormation
+	// defined events: Formation_AssumePosition
 
 	static inline constexpr int vtp = 0x776D60;
 	static inline constexpr int TypeDesc = 0x8212A4;

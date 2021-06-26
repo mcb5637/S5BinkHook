@@ -299,7 +299,7 @@ struct shok_GGL_CBombBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 };
 
 struct shok_GGL_CKegBehaviorProperties : shok_EGL_CGLEBehaviorProps {
-	float Radius;
+	float Radius; //4
 	int Damage;
 	float Delay;
 	int DamagePercent, ExplosionEffectID;

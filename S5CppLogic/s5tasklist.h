@@ -418,6 +418,7 @@ enum class shok_Task : int {
 };
 
 enum class shok_TaskState : int {
+    Default = 0,
     // 1 something leader related (detach attack target, then defend?), also soldier related, also serf (to stop event)
     WaitForAnim = 2,
     Move = 3,
@@ -429,12 +430,15 @@ enum class shok_TaskState : int {
     AssumePositionInFormation = 15,
     SerfSearchResource = 16,
     Train = 17,
+    HeroComatose = 18,
     BattleWait = 20,
     // 21 something worker
     LeaderGetCloseTotarget = 22,
     MoveToTarget = 23,
     // 24 soldier formation?
+    HeroGoToNPC = 25,
     ComvertSettler = 28,
+    ThiefStealGoods = 30,
     ThiefSabotage = 31,
     ThiefDisarm = 32,
     ScoutPointToRes = 33, // maybe unused?

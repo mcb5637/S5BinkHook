@@ -187,12 +187,26 @@ enum class shok_EventIDs : int {
 	Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
 	// 1000A serf something extract res get bool
 
-	KegPlacer_Sabotage = 0x10107, //EGL::CEvent1Entity
-	// 1010C -> 12002
-	KegPpacer_Defuse = 0x1010E, //EGL::CEvent1Entity
-	// 1010F -> 12002
+	Thief_StealFromCommand = 0x10102, //EGL::CEvent1Entity
+	Thief_SecureGoodsCommand = 0x10103, //EGL::CEvent1Entity
+	Thief_OnStealTargetDetach = 0x10104, //EGL::CEvent1Entity
+	Thief_OnSecureTargetDetach = 0x10105, //EGL::CEvent1Entity
+	Thief_IsCarryingSomething = 0x10106, //EGL::CEventGetValue<bool,1709081367>
+	KegPlacer_SabotageCommand = 0x10107, //EGL::CEvent1Entity
+	Keg_Setup = 0x10108, //GGL::CEventKegInfo {vt,evid,targetid}
+	Keg_OnThiefDetach = 0x10109, //EGL::CEvent1Entity
+	Keg_Arm = 0x1010A, //BB::CEvent
+	Keg_Disarm = 0x1010B, //BB::CEvent
+	KegPlacer_OnTargetDetach = 0x1010C, //EGL::CEvent1Entity
+	Keg_CanBeDisarmed = 0x1010D, //EGL::CEventGetValue<bool,1709081367>
+	KegPlacer_DefuseCommand = 0x1010E, //EGL::CEvent1Entity
+	KegPlacer_OnDisarmDetach = 0x1010F, //EGL::CEvent1Entity
+	Keg_GetTimeToExplode = 0x10110, //EGL::CEventGetValue<int,1211121895>
+	Thief_GetStealProgress = 0x10111, //EGL::CEventGetValue<float,1468983543>
 	KegPlacer_GetSabotageProgress = 0x10112, //EGL::CEventGetValue<float,1468983543>
 	KegPlacer_GetDisarmProgress = 0x10113, //EGL::CEventGetValue<float,1468983543>
+	Thief_GetAmountOfStolenResource = 0x10114, //EGL::CEventGetValue<int,1211121895>
+	Thief_GetStolenResourceType = 0x10115, //EGL::CEventGetValue<int,1211121895>
 
 
 	MoveCommand_Move = 0x11002, //EGL::CEventPosition
@@ -228,6 +242,8 @@ enum class shok_EventIDs : int {
 	Worker_LevyTaxes = 0x1300A, //BB::CEvent
 	Worker_ForceToWork = 0x1300B, //BB::CEvent
 	// 1300C most likely worker leave
+	// 13011 camper beh
+	// 13012 camper beh forward to 12003 on camp
 	// worker 13013 get int something cycleindex
 	// worker 13014 empty EGL::CEventValue<int,-27574121>
 	Worker_Bless = 0x13015, //BB::CEvent
@@ -327,6 +343,8 @@ enum class shok_EventIDs : int {
 	Camouflage_GetDurationMax = 0x16016, //EGL::CEventGetValue<int,1211121895>
 	Camouflage_GetDurationCurrent = 0x16017, //EGL::CEventGetValue<int,1211121895>
 
+	HeroBehavior_GetResurrectionTimePassed = 0x16018, //EGL::CEventGetValue<int,1211121895>
+
 	Sentinel_GetUrgency = 0x16019, //EGL::CEventGetValue<int,1211121895>
 
 	Summon_ActivateCommand = 0x1601A, //BB::CEvent
@@ -337,10 +355,13 @@ enum class shok_EventIDs : int {
 	RangedEffect_GetDurationMax = 0x1601F, //EGL::CEventGetValue<int,1211121895>
 	RangedEffect_GetDurationCurrent = 0x16020, //EGL::CEventGetValue<int,1211121895>
 
+	HeroBehavior_CommandNPCInteraction = 0x16021, //EGL::CEvent1Entity
+
 	CircularAttack_ActivateCommand = 0x16022, //BB::CEvent
 
 	ComvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
 	// 16028 convert cancel?
+	HeroBehavior_GetSpawnTurn = 0x1602B, //EGL::CEventGetValue<int,1211121895>
 
 	MotivateVorkers_ActivateCommand = 0x1602C, //BB::CEvent
 	Sniper_SnipeCommand = 0x1602D, //EGL::CEvent1Entity
@@ -358,6 +379,8 @@ enum class shok_EventIDs : int {
 	// 18004 leader ret true
 	// 18005 soldier ret true
 	// 18007 battle ret true
+	// 18006 herobeh ret true
+	// 1800D thefbeh ret true
 
 	// 1A002 limitedattachment on attach?
 	// 1A003 limitedattachment on detach?
@@ -374,7 +397,7 @@ enum class shok_EventIDs : int {
 	// 20004 set building sub anim?
 
 	Behavior_Tick = 0x20005, //BB::CEvent ticks every second
-	HeroAbility_Reset = 0x2000A, //GGL::CHeroAbility
+	Die = 0x2000A, ///BB::CEvent
 
 	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
 	Animation_UnSuspend = 0x20014, //BB::CEvent may be swapped, check

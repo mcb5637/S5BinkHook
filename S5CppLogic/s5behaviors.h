@@ -54,7 +54,7 @@ struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior { // no vtable
 	PADDINGI(1);
 	int SecondsCharged; // 5
 
-	// defined events: HeroAbility_XXX, Behavior_Tick
+	// defined events: HeroAbility_XXX, Behavior_Tick, Die
 
 	static inline constexpr int TypeDesc = 0x816E2C;
 };
@@ -79,7 +79,7 @@ struct shok_GGL_CThiefCamouflageBehavior : shok_GGL_CCamouflageBehavior {
 };
 
 struct shok_GGL_CHeroHawkBehavior : shok_GGL_CHeroAbility {
-	// defined events: HeroHawk_XXX, HeroAbility_Reset, HeroAbility_StandUpOrInit
+	// defined events: HeroHawk_XXX, Die, HeroAbility_StandUpOrInit
 
 	static inline constexpr int vtp = 0x7766F0;
 	static inline constexpr int TypeDesc = 0x81FE84;
@@ -89,7 +89,7 @@ struct shok_GGL_CInflictFearAbility : shok_GGL_CHeroAbility {
 	PADDINGI(1);
 	int SecondsFearRemaining; // 7
 
-	// defined events: InflictFear_XXX, Behavior_Tick, HeroAbility_Reset
+	// defined events: InflictFear_XXX, Behavior_Tick, Die
 	// defined tasks: TASK_SET_SPECIAL_ATTACK_ANIM, TASK_PERFORM_SPECIAL_ATTACK
 
 	static inline constexpr int vtp = 0x776638;
@@ -115,7 +115,7 @@ struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
 	byte PlacedCannon; // 11
 	PADDING(3);
 
-	// defined events: CannonBuilder_XXX, HeroAbility_Cancel, HeroAbility_Reset, 1600B some form of stop?->12002
+	// defined events: CannonBuilder_XXX, HeroAbility_Cancel, Die, 1600B some form of stop?->12002
 	// defined tasks: TASK_GO_TO_CANNON_POSITION, TASK_BUILD_CANNON
 
 	static inline constexpr int vtp = 0x7774D4;
@@ -456,42 +456,63 @@ struct shok_GGL_CFormationBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CCamperBehavior : shok_EGL_CGLEBehavior {
+
+	// defined tasks: TASK_GO_TO_CAMP, TASK_LEAVE_CAMP
+
 	static inline constexpr int vtp = 0x77777C;
 	static inline constexpr int TypeDesc = 0x823720;
 };
 
 struct shok_GGL_CGLBehaviorDying : shok_EGL_CGLEBehavior {
+
+	// defined tasks: TASK_DELETE_SELF, TASK_CREATE_ENTITY, TASK_SPAWN_PLAYER_EFFECT
+
 	static inline constexpr int vtp = 0x7785E4;
 	static inline constexpr int TypeDesc = 0x825F14;
 };
 
 struct shok_GGL_CHeroBehavior : shok_EGL_CGLEBehavior {
 	PADDINGI(1);
-	int ResurrectionTimePassed, SpawnTurn;
+	int ResurrectionTimePassed, SpawnTurn; // 5
 	byte FriendNear, EnemyNear;
 	PADDING(2);
+
+	// defined events: Die, HeroBehavior_XXX
+	// defined tasks: TASK_BECOME_COMATOSE, TASK_GO_TO_NPC, TASK_INTERACT_WITH_NPC
+	// defined tasks: HeroGoToNPC, HeroComatose
 
 	static inline constexpr int vtp = 0x77677C;
 	static inline constexpr int TypeDesc = 0x820070;
 };
 
 struct shok_GGL_CBombBehavior : shok_EGL_CGLEBehavior {
-	int TimeToExplode;
+	int TimeToExplode; //4
+
+	// defined states: Default
 
 	static inline constexpr int vtp = 0x778468;
 	static inline constexpr int TypeDesc = 0x8258A8;
 };
 
 struct shok_GGL_CKegBehavior : shok_EGL_CGLEBehavior {
-	PADDINGI(1);
-	int TimeToExplode;
+	byte IsArmed;
+	PADDING(3);
+	int TimeToExplode; //5
+
+	// defined events: Keg_XXX
+	// defined states: Default
 
 	static inline constexpr int vtp = 0x7764D8;
 	static inline constexpr int TypeDesc = 0x81F6BC;
 };
 
 struct shok_GGL_CThiefBehavior : shok_EGL_CGLEBehavior {
-	int Amount, ResourceType, StolenFromPlayer, TimeToSteal;
+	int Amount, ResourceType, StolenFromPlayer, TimeToSteal; //4
+
+	// defined tasks: TASK_GO_TO_TARGET_BUILDING, TASK_CHECK_GO_TO_TARGET_BUILDING_SUCCESS, TASK_GO_TO_SECURE_BUILDING, TASK_CHECK_GO_TO_SECURE_BUILDING_SUCCESS,
+	//		TASK_STEAL_GOODS, TASK_SECURE_STOLEN_GOODS, TASK_SET_THIEF_MODEL, TASK_THIEF_IDLE
+	// defined events: Thief_XXX, HeroAbility_Cancel
+	// defined states: ThiefStealGoods
 
 	static inline constexpr int vtp = 0x7739B0;
 	static inline constexpr int TypeDesc = 0x8173DC;

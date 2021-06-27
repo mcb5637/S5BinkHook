@@ -30,7 +30,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int EntityType;
 	int ModelOverride;
 	int PlayerId;
-	int attachmentvt; // 7 // possible attach func 4A61B3(attachmentthis, type, id, ?, ?), possible detach 4A2E5D(attachmentthis?, type, id, ?)
+	int attachmentvt; // 7
 	shok_set<shok_attachment> ObserverEntities; // 8
 	shok_set<shok_attachment> ObserverEffects; // 11
 	shok_set<shok_attachment> ObservedEntities; // 14
@@ -104,6 +104,11 @@ struct shok_EGL_CGLEEntity : shok_object {
 
 	int GetFirstAttachedToMe(shok_AttachmentType attachmentId);
 	int GetFirstAttachedEntity(shok_AttachmentType attachmentId);
+	/**
+	fires event eventIdOnThisDetach on otherId, if this gets detached/destroyed, fires eventIdOnOtherDetach on this, if otherId gets detached/destroyed
+	**/
+	void AttachEntity(shok_AttachmentType attachtype, int otherId, int eventIdOnThisDetach, int eventIdOnOtherDetach);
+	void DetachObservedEntity(shok_AttachmentType attachtype, int otherId, bool fireEvent);
 
 	void ClearAttackers();
 

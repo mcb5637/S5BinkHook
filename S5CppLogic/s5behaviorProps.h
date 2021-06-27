@@ -316,7 +316,7 @@ struct shok_GGL_CThiefBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 };
 
 struct shok_GGL_CAutoCannonBehaviorProps : shok_EGL_CGLEBehaviorProps {
-	int NumberOfShots;
+	int NumberOfShots; //4
 	float RotationSpeed;
 	int CannonBallEffectType; // 6
 	float ProjectileOffsetFront, ProjectileOffsetRight;

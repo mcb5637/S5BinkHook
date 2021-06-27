@@ -423,6 +423,7 @@ enum class shok_TaskState : int {
     WaitForAnim = 2,
     Move = 3,
     Follow = 4,
+    BattleWaitUntilAutoCannon = 5,
     Rotate = 6,
     // 12 something movement behavior
     // 13 something worker

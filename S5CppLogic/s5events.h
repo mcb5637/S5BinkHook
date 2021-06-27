@@ -269,16 +269,16 @@ enum class shok_EventIDs : int {
 
 	// 18003 get bool true
 
-	Leader_AttackEntity = 0x15004,
+	Leader_AttackEntity = 0x15004, //EGL::CEvent1Entity
 	// 15005 leader, serfbattle
 	// 15007 soldier empty
 	// 15008 leader empty
 	// 15009 leader
 	Leader_GetHealthPlusTroopHealth = 0x1500A, //EGL::CEventGetValue<int, 1211121895>
 	Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
-	// 1500C battle set target?
-	// 1500D leader, serfbattle
-	// 1500E bino cancel, battle cancel?, serfbattle
+	// 1500C battle set target?, autocannon too?
+	Leader_OnAttackTargetDetached = 0x1500D, //EGL::CEvent1Entity
+	// 1500E bino cancel, battle cancel?, serfbattle, autocannon something foundation?
 	Battle_GetBattleStatus = 0x15011, //EGL::CEventGetValue<int, 1211121895>
 	Battle_SetBattleStatus = 0x15012, //EGL::CEventValue<int,-27574121>
 	Battle_GetDamageClass = 0x15013, //EGL::CEventGetValue<int, 1211121895>
@@ -287,7 +287,7 @@ enum class shok_EventIDs : int {
 	Leader_SetNudgeCount = 0x15018, //EGL::CEventValue<int,-27574121>
 	Leader_GetNudgeCount = 0x15019, //EGL::CEventGetValue<int, 1211121895>
 	// 1501C soldier some other entity
-	// 1501D battle barracks attachment, set battle tl?, soldier simmilar
+	// 1501D battle barracks attachment, set battle tl?, soldier simmilar, autocannon set battle tl
 	// 1501E leader get some unknown int +100, soldier something other entity???
 	Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
 	Leader_GetAttackTarget = 0x15021, //EGL::CEventGetValue<int, 1211121895> soldier forwards to leader
@@ -330,6 +330,7 @@ enum class shok_EventIDs : int {
 	HeroAbility_IsAbilitySupported = 0x16008, //GGL::CEventHeroAbilityInteger
 	HeroAbility_StandUpOrInit = 0x16009, //BB::CEvent
 	CannonBuilder_BuildCannonCommand = 0x1600A, //GGL::CEventPositionAnd2EntityTypes
+	// 1600B autocannon on foundation detach?
 	HeroAbility_Cancel = 0x1600D, //BB::CEvent
 	// 1500E convert cancel?
 	HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
@@ -378,7 +379,7 @@ enum class shok_EventIDs : int {
 	// 18002 serf ret true
 	// 18004 leader ret true
 	// 18005 soldier ret true
-	// 18007 battle ret true
+	// 18007 battle, autocannon ret true
 	// 18006 herobeh ret true
 	// 1800D thefbeh ret true
 
@@ -400,7 +401,7 @@ enum class shok_EventIDs : int {
 	Die = 0x2000A, ///BB::CEvent
 
 	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
-	Animation_UnSuspend = 0x20014, //BB::CEvent may be swapped, check
+	Animation_UnSuspend = 0x20014, //BB::CEvent may be swapped, check, autocannon EGL::CEventValue<int,-27574121>?
 	Animation_Suspend = 0x20015, //EGL::CEventValue<int,-27574121> argument seems to be tick
 	Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 	Animation_ResetTaskType = 0x2001E, //BB::CEvent

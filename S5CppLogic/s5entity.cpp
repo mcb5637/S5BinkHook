@@ -120,6 +120,16 @@ int shok_EGL_CGLEEntity::GetFirstAttachedEntity(shok_AttachmentType attachmentId
 	shok_attachment* r = ObservedEntities.GetFirstMatch([attachmentId](shok_attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
 }
+static inline void(__thiscall* entattach_attach)(int* th, shok_AttachmentType at, int id, int evth, int evot) = reinterpret_cast<void(__thiscall*)(int*, shok_AttachmentType, int, int, int)>(0x4A61B3);
+void shok_EGL_CGLEEntity::AttachEntity(shok_AttachmentType attachtype, int otherId, int eventIdOnThisDetach, int eventIdOnOtherDetach)
+{
+	entattach_attach(&attachmentvt, attachtype, otherId, eventIdOnThisDetach, eventIdOnOtherDetach);
+}
+static inline void(__thiscall* entattach_detach)(int* th, shok_AttachmentType at, int id, byte ev) = reinterpret_cast<void(__thiscall*)(int*, shok_AttachmentType, int, byte)>(0x4A2E5D);
+void shok_EGL_CGLEEntity::DetachObservedEntity(shok_AttachmentType attachtype, int otherId, bool fireEvent)
+{
+	entattach_detach(&attachmentvt, attachtype, otherId, fireEvent);
+}
 
 int shok_EGL_CMovingEntity::LeaderGetNearbyBarracks()
 {

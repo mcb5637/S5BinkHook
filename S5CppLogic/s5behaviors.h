@@ -162,6 +162,7 @@ struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
 	static inline constexpr int TypeDesc = 0x8227D8;
 };
 
+struct shok_EGL_CGLEEntity;
 struct shok_GGL_CSniperAbility : shok_GGL_CHeroAbility {
 	PADDINGI(1);
 	int TargetId; // 7
@@ -171,6 +172,9 @@ struct shok_GGL_CSniperAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x7745AC;
 	static inline constexpr int TypeDesc = 0x819044;
+
+	static void OverrideSnipeTask();
+	static int (*SnipeDamageOverride)(shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg);
 };
 
 struct shok_GGL_CMotivateWorkersAbility : shok_GGL_CHeroAbility {
@@ -536,11 +540,21 @@ struct shok_GGL_CAutoCannonBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CResourceRefinerBehavior : shok_EGL_CGLEBehavior {
+
+	// defined evetns: ResourceRefiner_XXX, Worker_GetResourceToRefine
+
 	static inline constexpr int vtp = 0x774BCC;
 	static inline constexpr int TypeDesc = 0x81AD80;
 };
 
 struct shok_GGL_CAffectMotivationBehavior : shok_EGL_CGLEBehavior {
+	PADDINGI(1); //p to props
+	int PlayerID; //5
+	byte MotivationAffected;
+	PADDING(3);
+
+	// defined events: AffectMotivation_XXX
+
 	static inline constexpr int vtp = 0x77918C;
 	static inline constexpr int TypeDesc = 0x829024;
 };
@@ -549,13 +563,17 @@ struct shok_GGL_CLimitedLifespanBehavior : shok_EGL_CGLEBehavior {
 	PADDINGI(1);
 	int RemainingLifespanSeconds;
 
+	// defined events: Behavior_Tick, LimitedLifespan_XXX
+
 	static inline constexpr int vtp = 0x775D9C;
 	static inline constexpr int TypeDesc = 0x81D0B0;
 };
 
 struct shok_GGL_CBarrackBehavior : shok_EGL_CGLEBehavior {
-	byte AutoFillActive;
+	byte AutoFillActive; //4
 	PADDING(3);
+
+	// defined events: Barracks_XXX
 
 	static inline constexpr int vtp = 0x778A68;
 	static inline constexpr int TypeDesc = 0x8278DC;
@@ -568,9 +586,11 @@ struct shok_EGL_GLEBehaviorMultiSubAnims : shok_EGL_CGLEBehavior {
 		byte Active, PlayBackwards, IsLooped;
 		PADDING(1);
 		int AnimID, StartTurn, Duration;
-		PADDINGI(1);
 		float Speed;
 	} AnimSlot[4];
+
+	// defined tasks: TASK_SET_SUB_ANIM
+	// defined events: MultiSubAnim_SetSubAnim
 
 	static inline constexpr int vtp = 0x785EEC;
 	static inline constexpr int TypeDesc = 0x83AE4C;
@@ -599,36 +619,48 @@ struct shok_GGL_CBuildingMercenaryBehavior_CMercenaryOffer : shok_GGL_CBuildingM
 };
 
 struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
-	int CurrentPlayer;
+	int CurrentPlayer; //4
 	int TraderEntityID;
 	vector_padding;
 	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> Offer;
+
+	// defined events: Behavior_Tick, BuildingMerchant_XXX
 
 	static inline constexpr int vtp = 0x778208;
 	static inline constexpr int TypeDesc = 0x824DFC;
 };
 
 struct shok_GGL_CBuildingMercenaryBehavior : shok_GGL_CBuildingMerchantBehavior {
+
+	// defined events: BuildingMercenary_XXX
+
 	static inline constexpr int vtp = 0x7782C0;
 	static inline constexpr int TypeDesc = 0x8250E4;
 };
 
 struct shok_GGL_CBuildingTechTraderBehavior : shok_GGL_CBuildingMerchantBehavior {
+
+	// defined events: BuildingTechTrader_XXX, BuildingMercenary_BuyOffer
+
 	static inline constexpr int vtp = 0x77822C;
 	static inline constexpr int TypeDesc = 0x824E28;
 };
 
 struct shok_GGL_CMarketBehavior : shok_EGL_CGLEBehavior {
-	PADDINGI(1);
+	PADDINGI(1); //4
 	int SellResourceType, BuyResourceType;
 	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam+sellam
+
+	// defined events: Market_XXX
 
 	static inline constexpr int vtp = 0x775CCC;
 	static inline constexpr int TypeDesc = 0x81CE24;
 };
 
 struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
-	int CannonType, CannonProgress;
+	int CannonType, CannonProgress; //4
+
+	// defined events: Foundry_XXX
 
 	static inline constexpr int vtp = 0x778A8C;
 	static inline constexpr int TypeDesc = 0x827900;

@@ -186,6 +186,7 @@ enum class shok_EventIDs : int {
 	Follow_GetFollowStatus = 0x10008, //EGL::CEventGetValue<int,1211121895>
 	Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
 	// 1000A serf something extract res get bool
+	ResourceRefiner_Refine = 0x1000B, //BB::CEvent // todo check if this is generic work
 
 	Thief_StealFromCommand = 0x10102, //EGL::CEvent1Entity
 	Thief_SecureGoodsCommand = 0x10103, //EGL::CEvent1Entity
@@ -252,6 +253,7 @@ enum class shok_EventIDs : int {
 	Worker_ChangeMoti = 0x13019, //GGL::CEventChangeMotivation
 	Worker_GetMaxWorkTime = 0x1301A, //EGL::CEventGetValue<int, 1211121895>
 	Worker_GetWorkTimeRemaining = 0x1301B, //EGL::CEventGetValue<int, 1211121895>
+	// 0x1301C foundry something progress?
 	// 1301D worker something entity
 	Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
 	// 13018 worker leave? EGL::CEvent1Entity
@@ -309,14 +311,19 @@ enum class shok_EventIDs : int {
 	Leader_Defend = 0x15032, //BB::CEvent
 	BombPlacer_CommandPlaceBomb = 0x15033, //EGL::CEventPosition
 	// 15034 also something with fear
+	// 0x15035 rax buy leader?
 	// 15036 leader some area check get
-	// 15037 buy soldier?
+	Barracks_BuySoldierForLeader = 0x15037, //EGL::CEvent1Entity
 	// 15038 leader? goes to defend after something else
 	// 15039 leader something attack target?
 	// 1503A leader
 	Leader_IsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
 	// 1503C serf some kind of stop?
+	Barracks_GetTrainingTaskList = 0x1503F, //EGL::CEventGetValue<int, 1211121895>
+	Barracks_GetTrainingTime = 0x15040, //EGL::CEventGetValue<float, 1468983543>
+	// 0x15041 rax is training allowed?
 	// 15042 leader set training tl?
+	Barracks_GetLeaveTaskList = 0x15043, //EGL::CEventGetValue<int, 1211121895>
 	// 15044 leader to 12002
 	Leader_ExpellSoldier = 0x15046, //EGL::CEventValue<bool,703333479> bool seems to be use effect
 	Battle_IsInBattleTL = 0x15049, //EGL::CEventGetValue<bool,1709081367>
@@ -362,6 +369,8 @@ enum class shok_EventIDs : int {
 
 	ComvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
 	// 16028 convert cancel?
+	LimitedLifespan_GetTimeRemaining = 0x16029, //EGL::CEventGetValue<int,1211121895>
+	LimitedLifespan_GetTimeMax = 0x1602A, //EGL::CEventGetValue<int,1211121895>
 	HeroBehavior_GetSpawnTurn = 0x1602B, //EGL::CEventGetValue<int,1211121895>
 
 	MotivateVorkers_ActivateCommand = 0x1602C, //BB::CEvent
@@ -372,15 +381,43 @@ enum class shok_EventIDs : int {
 
 	InflictFear_Activate = 0x16026, //BB::CEvent
 
-	Worker_ResetTaskList = 17012, //BB::CEvent
+	// 0x17005 affectmoti affect moti
+	Market_WorkStep = 0x17007, //BB::CEvent
+	Market_GetProgress = 0x17009, //EGL::CEventGetValue<float,1468983543>
+	AffectMotivation_GetEffect = 0x17010, //EGL::CEventGetValue<float,1468983543>
+	Market_GetProgress = 0x1700A, //EGL::CEventGetValue<float,1468983543>
+	Market_CancelTrade = 0x1700B, //BB::CEvent
+	// 0x17011 resourcerefiner get supplier?/can work?
+	Worker_ResetTaskList = 0x17012, //BB::CEvent
+	Foundry_GetProgress = 0x17014, //EGL::CEventGetValue<int,1211121895>
+	Foundry_SetProgress = 0x17015, //EGL::CEventValue<int,-27574121>
+	Foundry_BuildCannonCommand = 0x17016, //EGL::CEventValue<int,-27574121>
+	Foundry_WorkStep = 0x17018, //BB::CEvent
+	// 0x17019 affectmoti affect moti
 
-	// 17020 rax is autofill?
+	Barracks_ActivateAutoFill = 0x1701E, //BB::CEvent
+	Barracks_DeActivateAutoFill = 0x1701F, //BB::CEvent
+	Barracks_IsAutoFillActive = 0x17020, //EGL::CEventGetValue<bool,1709081367>
+	BuildingMerchant_IsBlocked = 0x17021, //EGL::CEventPlayerGetBool
+	BuildingMerchant_GetBlockingPlayer = 0x17022, //EGL::CEventGetValue<int,1211121895>
+	BuildingMerchant_GetBuildingMerchantProps = 0x17023, //EGL::CEventGetValue<GGL::CBuildingMerchantBehaviorProps const *,-1872076829>
+	BuildingMerchant_IsNotEmpty = 0x17024, //EGL::CEventGetValue<bool,1709081367>
+	BuildingMercenary_AddOffer = 0x17025, //GGL::CEventMercenaryOffer
+	BuildingMercenary_GetOffer = 0x17026, //GGL::CEventGetMercenaryOffer
+	BuildingMercenary_BuyOffer = 0x17027, //GGL::CEventPlayerIDInteger
+	// 0x17028 buildmerc ret true
+	BuildingMerchant_GetNumberOfOffers = 0x17029, //EGL::CEventGetValue<int,1211121895>
+	// 0x1702A buildingmerch ret true
+	BuildingTechTrader_AddOffer = 0x1702B, //GGL::CEventTechOffer
+	BuildingTechTrader_GetOffer = 0x1702C, //GGL::CEventGetTechOffer
+	// 0x1702D builtechtrad ret true
 
 	// 18002 serf ret true
 	// 18004 leader ret true
 	// 18005 soldier ret true
 	// 18007 battle, autocannon ret true
 	// 18006 herobeh ret true
+	// 1800C resourcerefiner ret true
 	// 1800D thefbeh ret true
 
 	// 1A002 limitedattachment on attach?
@@ -397,6 +434,7 @@ enum class shok_EventIDs : int {
 	// 20003 set walk target?
 	// 20004 set building sub anim?
 
+	MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim
 	Behavior_Tick = 0x20005, //BB::CEvent ticks every second
 	Die = 0x2000A, ///BB::CEvent
 

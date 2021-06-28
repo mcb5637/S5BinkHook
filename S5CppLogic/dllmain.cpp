@@ -98,33 +98,8 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-    shok_AttachmentType ty = static_cast<shok_AttachmentType>(1000);
-    e->AttachEntity(ty, luaext_checkEntity(L, 2)->EntityId, 0x15004, 0);
-    e->DetachObservedEntity(ty, luaext_checkEntity(L, 2)->EntityId, false);
-    auto* a = e->ObservedEntities.GetFirstMatch([ty](auto* a) {
-        return a->AttachmentType == ty;
-        });
-    if (a) {
-        lua_pushnumber(L, a->EntityId);
-        lua_pushnumber(L, a->EventID);
-    }
-    else {
-        lua_pushnil(L);
-        lua_pushnil(L);
-    }
-    a = luaext_checkEntity(L, 2)->ObserverEntities.GetFirstMatch([ty](auto* a) {
-        return a->AttachmentType == ty;
-        });
-    if (a) {
-        lua_pushnumber(L, a->EntityId);
-        lua_pushnumber(L, a->EventID);
-    }
-    else {
-        lua_pushnil(L);
-        lua_pushnil(L);
-    }
-    return 4;
+    lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->GetEntityType()->GetBehaviorProps<shok_GGL_CBattleBehaviorProps>()->ProjectileEffectID);
+    return 1;
 }
 
 int cleanup(lua_State* L) {
@@ -144,7 +119,7 @@ extern "C" void __cdecl install(lua_State * L) {
     lua_pushcfunction(L, &test);
     lua_setglobal(L, "test");
 #endif
-
+    
     lua_pushstring(L, "CppLogic");
     lua_newtable(L);
     luaext_registerFunc(L, "OnLeaveMap", cleanup);

@@ -337,7 +337,7 @@ struct shok_resourceRefinerEfficencyUpgrade {
 	float Factor;
 };
 struct shok_GGL_CResourceRefinerBehaviorProperties : shok_EGL_CGLEBehaviorProps {
-	int ResourceType;
+	int ResourceType; // 4
 	float InitialFactor;
 	vector_padding;
 	std::vector<shok_resourceRefinerEfficencyUpgrade, shok_allocator<shok_resourceRefinerEfficencyUpgrade>> Efficiency;
@@ -348,7 +348,7 @@ struct shok_GGL_CResourceRefinerBehaviorProperties : shok_EGL_CGLEBehaviorProps 
 };
 
 struct shok_GGL_CAffectMotivationBehaviorProps : shok_EGL_CGLEBehaviorProps {
-	float MotivationEffect;
+	float MotivationEffect; //4
 
 	static inline constexpr int vtp = 0x7791D4;
 	static inline constexpr int TypeDesc = 0x828FF0;
@@ -362,12 +362,12 @@ struct shok_GGL_CLimitedLifespanBehaviorProps : shok_EGL_CGLEBehaviorProps {
 };
 
 struct shok_GGL_CBarrackBehaviorProperties : shok_EGL_CGLEBehaviorProps {
-	int TrainingTaskList1, TrainingTaskList2, TrainingTaskList3;
+	int TrainingTaskList1, TrainingTaskList2, TrainingTaskList3; //4
 private:
 	int MaxTrainingNumber;
 public:
 	int LeaveTaskList;
-	float TrainingTime;
+	float TrainingTime; //9
 
 	static inline constexpr int vtp = 0x778B34;
 	static inline constexpr int TypeDesc = 0x827F48;

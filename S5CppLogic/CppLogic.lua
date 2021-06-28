@@ -248,6 +248,10 @@ function CppLogic.Logic.GetPlaceBuildingRotation() end
 -- @param r rotation
 function CppLogic.Logic.SetPlaceBuildingRotation(r) end
 
+--- fixes snipe task, now it actually shoots a projectile which does damage.
+-- @param override func (optional, default nil) (sniper, target, dmg)->dmgOverride called before the projectile gets fired, can change the damage)
+function CppLogic.Logic.FixSnipeDamage(override) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func

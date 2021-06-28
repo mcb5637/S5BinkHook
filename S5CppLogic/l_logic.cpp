@@ -1059,6 +1059,41 @@ int l_logic_GetPlaceBuildingRotation(lua_State* L) {
 	return 1;
 }
 
+int l_logic_FixSnipeDamage(lua_State* L) {
+	shok_GGL_CSniperAbility::OverrideSnipeTask();
+	if (lua_isnil(L, 1)) {
+		shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_logic_FixSnipeDamage);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+
+	if (!shok_GGL_CSniperAbility::SnipeDamageOverride) {
+		shok_GGL_CSniperAbility::SnipeDamageOverride = [](shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg) {
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_logic_FixSnipeDamage);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, sniper->EntityId);
+			lua_pushnumber(L, tar->EntityId);
+			lua_pushnumber(L, dmg);
+			lua_pcall(L, 3, 1, 0);
+			if (lua_isnumber(L, -1))
+				dmg = luaL_checkint(L, -1);
+
+			lua_settop(L, t);
+			return dmg;
+		};
+	}
+	
+	return 0;
+}
+
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
@@ -1068,6 +1103,7 @@ void l_logic_cleanup(lua_State* L) {
 	CanPlaceBuildingCallback = nullptr;
 	ConstructBuildingRotation = 0.0f;
 	shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
+	shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
 }
 
 void l_logic_init(lua_State* L)
@@ -1110,6 +1146,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "SetPlaceBuildingAdditionalCheck", &l_logic_SetPlaceBuildingCb);
 	luaext_registerFunc(L, "SetPlaceBuildingRotation", &l_logic_SetPlaceBuildingRotation);
 	luaext_registerFunc(L, "GetPlaceBuildingRotation", &l_logic_GetPlaceBuildingRotation);
+	luaext_registerFunc(L, "FixSnipeDamage", &l_logic_FixSnipeDamage);
 
 
 	lua_pushstring(L, "UICommands");

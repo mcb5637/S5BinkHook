@@ -10,7 +10,7 @@ public:
 	static inline constexpr int TypeDesc = 0x813778;
 };
 
-struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior {
+struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMovementBehavior in between
 private:
 	int Counter;
 public:
@@ -50,6 +50,11 @@ struct shok_GGL_CSoldierMovement : shok_GGL_CBehaviorDefaultMovement {
 	static inline constexpr int TypeDesc = 0x818E1C;
 };
 
+struct shok_GGL_CBehaviorAnimalMovement : shok_GGL_CBehaviorDefaultMovement {
+	static inline constexpr int vtp = 0x77880C;
+	static inline constexpr int TypeDesc = 0x826844;
+};
+
 struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior { // no vtable
 	PADDINGI(1);
 	int SecondsCharged; // 5
@@ -84,6 +89,19 @@ struct shok_GGL_CHeroHawkBehavior : shok_GGL_CHeroAbility {
 	static inline constexpr int vtp = 0x7766F0;
 	static inline constexpr int TypeDesc = 0x81FE84;
 };
+
+struct shok_GGL_CHawkBehavior : shok_EGL_CGLEBehavior {
+	PADDINGI(1);
+	shok_position ExplorePosition;
+	int CreationTurn;
+
+	// defined tasks: TASK_GO_TO_POS, TASK_MOVE_TO_EXPLORATION_POINT, TASK_CHECK_HERO_POSITION
+	// defined events: HeroHawk_SendHawk
+
+	static inline constexpr int vtp = 0x776A24;
+	static inline constexpr int TypeDesc = 0x8207C4;
+};
+
 
 struct shok_GGL_CInflictFearAbility : shok_GGL_CHeroAbility {
 	PADDINGI(1);
@@ -148,6 +166,13 @@ struct shok_GGL_CSummonBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x773C10;
 	static inline constexpr int TypeDesc = 0x817E0C;
+};
+
+struct shok_GGL_CSummonedBehavior : shok_EGL_CGLEBehavior {
+	// defined events: Summoned_OnSummonerDetach
+
+	static inline constexpr int vtp = 0x773BB8;
+	static inline constexpr int TypeDesc = 0x817CD4;
 };
 
 struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
@@ -218,7 +243,7 @@ struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
 	shok_position ExlorationPosition;
 
 	// defined tasks: TASK_EXPLORE, TASK_TURN_TO_EXPLORE_POSITION
-	// defined events: Binocular_XXX, 11002 1500E cancel
+	// defined events: Binocular_XXX, OnAttackedBy, 11002
 
 	static inline constexpr int vtp = 0x779218;
 	static inline constexpr int TypeDesc = 0x829248;
@@ -234,6 +259,15 @@ struct shok_GGL_CTorchPlacerBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x773738;
 	static inline constexpr int TypeDesc = 0x816E4C;
+};
+
+struct shok_GGL_CTorchBehavior : shok_EGL_CGLEBehavior {
+	int RemainingTurns, TotalTurns, InitialExplorationRange; //4
+
+	// defined states: Default
+
+	static inline constexpr int vtp = 0x773848;
+	static inline constexpr int TypeDesc = 0x817174;
 };
 
 struct shok_GGL_CPointToResourceBehavior : shok_GGL_CHeroAbility {
@@ -344,7 +378,7 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollo
 	int LatestAttackTurn;
 
 	// defined sates: Follow, MoveToTarget, BattleWait
-	// defined events: Follow_XXX, Animation_UnSuspend (x2) (updates startturn), Battle_XXX
+	// defined events: Follow_XXX, Animation_UnSuspend (x2) (updates startturn), Battle_XXX, OnAttackedBy
 	// defined tasks: TASK_MOVE_TO_TARGET, TASK_SET_ORIENTATION_TO_TARGET, TASK_SET_ATTACK_ANIM, TASK_HURT, TASK_CHECK_RANGE, TASK_FIRE_PROJECTILE, TASK_SET_BATTLE_IDLE_ANIM,
 	//		TASK_BATTLE_WAIT_UNTIL, TASK_SET_LATEST_ATTACK_TURN, TASK_WAIT_FOR_LATEST_ATTACK, TASK_RESOLVE_BATTLE_COLLISION
 
@@ -398,7 +432,7 @@ struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
 	int JobMemoryResourceID, TimeBeforeChangeback;
 
 	// defined events: BattleSerf_XXX, Behavior_Tick (ticks down time if >0, reverts back if 0), Serf_CommandTurnToBattleSerf,
-	//		Serf_Construct?, Serf_ExtractResource?, Serf_TargetResDestroyed?
+	//		Serf_Construct?, Serf_ExtractResource?, OnResourceDoodadDetach?
 	// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_TURN_INTO_SERF
 
 	static inline constexpr int vtp = 0x7788C4;
@@ -408,12 +442,13 @@ struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
 struct shok_GGL_CSerfBattleBehavior : shok_GGL_CBattleBehavior {
 	// padding 2, shok_pos territory?
 
-	// defined events: MoveCommand_Move, Leader_AttackEntity, Leader_GetAttackTarget, Behavior_Tick
+	// defined events: MoveCommand_Move, Leader_AttackEntity, Leader_GetAttackTarget, Behavior_Tick, OnAttackedBy
 	// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE
 
 	static inline constexpr int vtp = 0x774A98;
 	static inline constexpr int TypeDesc = 0x81A4FC;
 };
+// GGL::CWorkerBattleBehavior unused
 
 struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 	int ConstructionSiteSlotIndex; //4
@@ -425,7 +460,7 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 	// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_GO_TO_CONSTRUCTION_SITE, TASK_TURN_TO_CONSTRUCTION_SITE, TASK_CHANGE_ATTACHMENT_TO_CONSTRUCTION_SITE,
 	//		TASK_GO_TO_CONSTRUCTION_SITE_SLOT, TASK_LEAVE_SETTLEMENT, TASK_ABANDON_CURRENT_JOB, TASK_GO_TO_RESOURCE, TASK_TURN_TO_RESOURCE, TASK_WAIT_EXTRACTION_DELAY
 	//		TASK_EXTRACT_RESOURCE, TASK_GO_TO_RESOURCE_SLOT, TASK_TURN_INTO_BATTLE_SERF
-	// defined events: Worker_WorkPlaceBuildingDestroyed, Serf_XXX, BattleSerf_CommandTurnToSerf, Leader_AttackEntity
+	// defined events: Worker_WorkPlaceBuildingDestroyed, Serf_XXX, BattleSerf_CommandTurnToSerf, Leader_AttackEntity, OnResourceDoodadDetach
 	// defined states: SerfSearchResource, 1
 
 	static inline constexpr int vtp = 0x774874;
@@ -531,7 +566,7 @@ struct shok_GGL_CAutoCannonBehavior : shok_EGL_CGLEBehavior {
 
 	// defined tasks: TASK_SET_ORIENTATION_TO_TARGET, TASK_CHECK_RANGE, TASK_FIRE_PROJECTILE, TASK_BATTLE_WAIT_UNTIL, TASK_SET_LATEST_ATTACK_TURN, TASK_WAIT_FOR_LATEST_ATTACK
 	// defined states: Rotate, BattleWaitUntilAutoCannon, BattleWait (TASK_WAIT_FOR_LATEST_ATTACK), Default
-	// defined events: Leader_AttackEntity, Leader_OnAttackTargetDetached, Battle_GetDamageClass, Battle_GetLatestAttackerID, Battle_GetLatestHitTurn, GetDamage
+	// defined events: Leader_AttackEntity, Leader_OnAttackTargetDetached, Battle_GetDamageClass, Battle_GetLatestAttackerID, Battle_GetLatestHitTurn, GetDamage, OnAttackedBy
 
 	float GetMaxRange();
 
@@ -646,6 +681,16 @@ struct shok_GGL_CBuildingTechTraderBehavior : shok_GGL_CBuildingMerchantBehavior
 	static inline constexpr int TypeDesc = 0x824E28;
 };
 
+struct shok_GGL_CSettlerMerchantBehavior : shok_EGL_CGLEBehavior {
+
+	// defined tasks: TASK_GO_TO_POS, TASK_TRADER_OFFER_POS_REACHED
+	// defined states: Merchant_WaitForHero
+	// defined events: SettlerMerchant_XXX
+
+	static inline constexpr int vtp = 0x77477C;
+	static inline constexpr int TypeDesc = 0x819710;
+};
+
 struct shok_GGL_CMarketBehavior : shok_EGL_CGLEBehavior {
 	PADDINGI(1); //4
 	int SellResourceType, BuyResourceType;
@@ -666,3 +711,101 @@ struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
 	static inline constexpr int TypeDesc = 0x827900;
 };
 
+struct shok_GGL_CWorkerFleeBehavior : shok_EGL_CGLEBehavior {
+	shok_position FlightPosition; //4
+	// 6 p to props
+
+	// defined tasks: TASK_FLEE
+	// defined events: WorkerFlee_XXX, OnAttackedBy
+
+	static inline constexpr int vtp = 0x7729FC;
+	static inline constexpr int TypeDesc = 0x813798;
+};
+
+struct shok_GGL_CWorkerAlarmModeBehavior : shok_EGL_CGLEBehavior {
+
+	// defined tasks: TASK_CHANGE_DEFENDABLE_BUILDING_ATTACHMENT, TASK_MOVE_TO_DEFENDABLE_BUILDING, TASK_DEFEND, TASK_CHECK_GO_TO_DEFENDABLE_BUILDING_SUCCESS
+	// defined events: WorkerAlarmMode_XXX
+
+	static inline constexpr int vtp = 0x7734DC;
+	static inline constexpr int TypeDesc = 0x8164E4;
+};
+
+struct shok_GGL_CUniversityBehavior : shok_EGL_CGLEBehavior {
+
+	// defined events: University_XXX
+
+	static inline constexpr int vtp = 0x7736F4;
+	static inline constexpr int TypeDesc = 0x816C74;
+};
+
+struct shok_GGL_CResourceDoodadBehavior : shok_EGL_CGLEBehavior {
+	int OriginalEntityType; //4
+	shok_positionRot Position;
+
+	// defined events: ResourceDoodad_RemoveOneRes
+
+	static inline constexpr int vtp = 0x774CCC;
+	static inline constexpr int TypeDesc = 0x81B1A4;
+};
+
+struct shok_GGL_CTreeBehavior : shok_EGL_CGLEBehavior {
+	// 4 some value
+
+	// defined events: Tree_XXX
+
+	static inline constexpr int vtp = 0x774CF0;
+	static inline constexpr int TypeDesc = 0x81B1D0;
+};
+
+struct shok_GGL_CResourceDependentBuildingBehavior : shok_EGL_CGLEBehavior {
+
+	// defined states: Default
+
+	static inline constexpr int vtp = 0x774D94;
+	static inline constexpr int TypeDesc = 0x81B478;
+};
+
+struct shok_GGL_CReplaceableEntityBehavior : shok_EGL_CGLEBehavior {
+	byte IsReplacementActive; // 4
+	PADDING(3);
+
+	// defined events: ReplaceableEntity_Disable
+
+	static inline constexpr int vtp = 0x774DEC;
+	static inline constexpr int TypeDesc = 0x081B61C;
+};
+
+struct shok_GGL_CMineBehavior : shok_EGL_CGLEBehavior {
+
+	// defined events: Mine_XXX, OnResourceDoodadDetach
+
+	static inline constexpr int vtp = 0x7757CC;
+	static inline constexpr int TypeDesc = 0x81C5EC;
+};
+
+struct shok_GGL_CKeepBehavior : shok_EGL_CGLEBehavior {
+
+	// defined events: Keep_BuySerfCommand
+
+	static inline constexpr int vtp = 0x7765C8;
+	static inline constexpr int TypeDesc = 0x81FA60;
+};
+
+// GGL::CEvadeBehaviorBase
+//GGL::CFoundationBehavior
+//GGL::CFarmBehavior
+//GGL::CEvadeExecutionBehavior
+//GGL::CDefendableBuildingBehavior
+//GGL::CConvertBuildingAbility
+//GGL::CConstructionSiteBehavior
+//GGL::CCampBehavior
+//GGL::CBuildingBehavior
+//GGL::CBehaviorFieldDoodad
+//GGL::CBarrierBehavior
+//GGL::CStaticCamouflageSlot
+//GGL::CAlphaBlendingBehavior
+//GGL::CNeutralBridgeBehavior
+//EGL::CUVAnimBehavior
+//EGL::CParticleEffectSwitchBehavior
+//EGL::CParticleEffectAttachmentBehavior

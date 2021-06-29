@@ -40,6 +40,14 @@ struct shok_GGL_CHeroHawkBehaviorProps : shok_GGL_CHeroAbilityProps {
 	static inline constexpr int TypeDesc = 0x81FE58;
 };
 
+struct shok_GGL_CHawkBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int ExploreTaskList; //4
+	float MaxCirclingDistance;
+
+	static inline constexpr int vtp = 0x776A7C;
+	static inline constexpr int TypeDesc = 0x82079C;
+};
+
 struct shok_GGL_CInflictFearAbilityProps : shok_GGL_CHeroAbilityProps {
 	int TaskList, Animation, FlightDuration;
 	float Range, FlightRange;
@@ -84,6 +92,12 @@ struct shok_GGL_CSummonBehaviorProps : shok_GGL_CHeroAbilityProps {
 
 	static inline constexpr int vtp = 0x773C50;
 	static inline constexpr int TypeDesc = 0x817DE4;
+};
+
+struct shok_GGL_CSummonedBehaviorProps : shok_EGL_CGLEBehaviorProps {
+
+	static inline constexpr int vtp = 0x773BF0;
+	static inline constexpr int TypeDesc = 0x817D58;
 };
 
 struct shok_GGL_CConvertSettlerAbilityProps : shok_GGL_CHeroAbilityProps {
@@ -147,6 +161,12 @@ struct shok_GGL_CTorchPlacerBehaviorProperties : shok_GGL_CHeroAbilityProps {
 
 	static inline constexpr int vtp = 0x773790;
 	static inline constexpr int TypeDesc = 0x816E74;
+};
+
+struct shok_GGL_CTorchBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+
+	static inline constexpr int vtp = 0x773880;
+	static inline constexpr int TypeDesc = 0x817148;
 };
 
 struct shok_GGL_CPointToResourceBehaviorProperties : shok_GGL_CHeroAbilityProps {
@@ -378,8 +398,22 @@ struct shok_GGL_CBuildingMerchantBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	static inline constexpr int TypeDesc = 0x8251B4;
 };
 
+struct shok_GGL_CSettlerMerchantBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int InitTaskList, MoveOutTaskList, MoveInTaskList; //4
+
+	static inline constexpr int vtp = 0x7747DC;
+	static inline constexpr int TypeDesc = 0x8196E0;
+};
+
+struct shok_GGL_CServiceBuildingBehaviorProperties_WorkModifier {
+	int Technology;
+	float WorkAmount;
+};
 struct shok_GGL_CServiceBuildingBehaviorProperties : shok_EGL_CGLEBehaviorProps {
-	// initial amount at 4?
+	float InitialWorkAmount; // int?
+	vector_padding;
+	std::vector<shok_GGL_CServiceBuildingBehaviorProperties_WorkModifier> Work;
+
 	static inline constexpr int vtp = 0x774830;
 	static inline constexpr int TypeDesc = 0x816C3C;
 };
@@ -389,4 +423,61 @@ struct shok_GGL_CMineBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 
 	static inline constexpr int vtp = 0x77581C;
 	static inline constexpr int TypeDesc = 0x81C77C;
+};
+
+struct shok_GGL_CWorkerFleeBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int FlightTaskList; //4
+
+	static inline constexpr int vtp = 0x772A60;
+	static inline constexpr int TypeDesc = 0x81374C;
+};
+
+struct shok_GGL_CWorkerAlarmModeBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int GoToDefendableBuildingTaskList; //4
+
+	static inline constexpr int vtp = 0x773544;
+	static inline constexpr int TypeDesc = 0x8164B4;
+};
+
+struct shok_GGL_CGLResourceDoodadBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	struct {
+		PADDINGI(1); // vtable?
+		int Amount; //float?
+		shok_ResourceType Good;
+	} Resource; // if im unlucky this is a list or set or something similar stupid
+
+	static inline constexpr int vtp = 0x774D40;
+	static inline constexpr int TypeDesc = 0x81B170;
+};
+
+struct shok_GGL_CResourceDependentBuildingBehaviorProperties_data {
+	int Resource, Type;
+};
+struct shok_GGL_CResourceDependentBuildingBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	vector_padding;
+	std::vector<shok_GGL_CResourceDependentBuildingBehaviorProperties_data> Building;
+
+	static inline constexpr int vtp = 0x774DCC;
+	static inline constexpr int TypeDesc = 0x81B4FC;
+};
+
+struct shok_GGL_CReplaceableEntityBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	int EntityType;
+
+	static inline constexpr int vtp = 0x774E24;
+	static inline constexpr int TypeDesc = 0x81B6A8;
+};
+
+struct shok_GGL_CMineBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	int AmountToMine;
+
+	static inline constexpr int vtp = 0x77581C;
+	static inline constexpr int TypeDesc = 0x81C77C;
+};
+
+struct shok_GGL_CKeepBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	int NumSerfs; // used anywhere?
+
+	static inline constexpr int vtp = 0x776600;
+	static inline constexpr int TypeDesc = 0x81FA34;
 };

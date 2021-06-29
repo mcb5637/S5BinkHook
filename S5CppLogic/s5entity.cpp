@@ -677,6 +677,9 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 			nlb->TroopHealthPerSoldier = lb->TroopHealthPerSoldier;
 		}
 	}
+	if (shok_GGL_CReplaceableEntityBehavior* rep = e->GetBehavior<shok_GGL_CReplaceableEntityBehavior>()) {
+		rep->IsReplacementActive = false;
+	}
 	e->Destroy();
 	return nid;
 }

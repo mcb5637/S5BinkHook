@@ -439,6 +439,7 @@ enum class shok_TaskState : int {
     // 24 soldier formation?
     HeroGoToNPC = 25,
     ComvertSettler = 28,
+    Merchant_WaitForHero = 29,
     ThiefStealGoods = 30,
     ThiefSabotage = 31,
     ThiefDisarm = 32,

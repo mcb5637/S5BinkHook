@@ -274,7 +274,9 @@ struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
 };
 
 struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
-	int ResourceType, ResourceAmount, ResourceAmountAdd;
+	int ResourceType, ResourceAmount, ResourceAmountAdd; //66
+
+	// set current res amount 4B864B thiscall (th, int)
 
 	static inline constexpr int vtp = 0x76FEA4;
 	static inline constexpr int TypeDesc = 0x8118AC;

@@ -182,11 +182,17 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 };
 
 enum class shok_EventIDs : int {
-	Serf_TargetResDestroyed = 0x10003, //EGL::CEvent1Entity, also bserf
+	ResourceDoodad_RemoveOneRes = 0x10002, //BB::CEvent
+	OnResourceDoodadDetach = 0x10003, //EGL::CEvent1Entity, also bserf
+	Mine_DoWorkStep = 0x10004, //BB::CEvent
 	Follow_GetFollowStatus = 0x10008, //EGL::CEventGetValue<int,1211121895>
+	Mine_GetResourcesRemaining = 0x10007, //EGL::CEventGetValue<int,1211121895>
 	Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
 	// 1000A serf something extract res get bool
 	ResourceRefiner_Refine = 0x1000B, //BB::CEvent // todo check if this is generic work
+	// 0x1000C res tree int?
+	Tree_UpdateModel = 0x1000D, //BB::CEvent
+	// 0x1000E res tree get bool
 
 	Thief_StealFromCommand = 0x10102, //EGL::CEvent1Entity
 	Thief_SecureGoodsCommand = 0x10103, //EGL::CEvent1Entity
@@ -256,14 +262,19 @@ enum class shok_EventIDs : int {
 	// 0x1301C foundry something progress?
 	// 1301D worker something entity
 	Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
+	WorkerFlee_IsFleeing = 0x1301F, //EGL::CEventGetValue<bool,1709081367>
 	// 13018 worker leave? EGL::CEvent1Entity
 	// 13020 worker get some bool condidtionally forwards to 18007
 	Worker_IsLeaving = 0x13021, //EGL::CEventGetValue<bool,1709081367>
 	Worker_GetTransportModel = 0x13022, //EGL::CEventGetValue<int, 1211121895>
+	SettlerMerchant_MoveInCommand = 0x13023, //BB::CEvent
+	SettlerMerchant_MoveOutCommand = 0x13024, //BB::CEvent
 	// 13025 worker emtpty EGL::CEvent1Entity
 	Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
+	SettlerMerchant_GetBuildingId = 0x1302A, //EGL::CEventGetValue<int, 1211121895>
 
 	Serf_Construct = 0x14003, // GGL::CEventEntityIndex serfbattle?
+	Keep_BuySerfCommand = 0x14004, //BB::CEvent
 	Serf_CommandTurnToBattleSerf = 0x14005, //BB::CEvent battleserf stop if toserf tl
 	BattleSerf_CommandTurnToSerf = 0x14006, //BB::CEvent serf stop if toserf tl
 	// 14007 serf get unknown float 9
@@ -280,7 +291,7 @@ enum class shok_EventIDs : int {
 	Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
 	// 1500C battle set target?, autocannon too?
 	Leader_OnAttackTargetDetached = 0x1500D, //EGL::CEvent1Entity
-	// 1500E bino cancel, battle cancel?, serfbattle, autocannon something foundation?
+	OnAttackedBy = 0x1500E, //EGL::CEvent1Entity
 	Battle_GetBattleStatus = 0x15011, //EGL::CEventGetValue<int, 1211121895>
 	Battle_SetBattleStatus = 0x15012, //EGL::CEventValue<int,-27574121>
 	Battle_GetDamageClass = 0x15013, //EGL::CEventGetValue<int, 1211121895>
@@ -326,13 +337,15 @@ enum class shok_EventIDs : int {
 	Barracks_GetLeaveTaskList = 0x15043, //EGL::CEventGetValue<int, 1211121895>
 	// 15044 leader to 12002
 	Leader_ExpellSoldier = 0x15046, //EGL::CEventValue<bool,703333479> bool seems to be use effect
+	WorkerAlarmMode_Enable = 0x15047, //BB::CEvent
+	WorkerAlarmMode_Disable = 0x15048, //BB::CEvent
 	Battle_IsInBattleTL = 0x15049, //EGL::CEventGetValue<bool,1709081367>
 	Leader_GetUpkeepCost = 0x1504C, //EGL::CEventGetValue<float, 1468983543>
 
 	GetDamage = 0x1503D, //EGL::CEventGetValue<int, 1211121895>
 	// 15045 battle maybe cancel?
 
-	HeroHawk_SendHawk = 0x16002, //BB::CEvent,EGL::CEventPosition
+	HeroHawk_SendHawk = 0x16002, //EGL::CEventPosition
 
 	HeroAbility_IsAbilitySupported = 0x16008, //GGL::CEventHeroAbilityInteger
 	HeroAbility_StandUpOrInit = 0x16009, //BB::CEvent
@@ -340,6 +353,7 @@ enum class shok_EventIDs : int {
 	// 1600B autocannon on foundation detach?
 	HeroAbility_Cancel = 0x1600D, //BB::CEvent
 	// 1500E convert cancel?
+	// 0x1600F hawk destroy?
 	HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
 	HeroAbility_GetChargeMax = 0x16011, //GGL::CEventHeroAbilityInteger
 	HeroAbility_SetChargeCurrent = 0x16012, //GGL::CEventHeroAbilityInteger
@@ -356,7 +370,7 @@ enum class shok_EventIDs : int {
 	Sentinel_GetUrgency = 0x16019, //EGL::CEventGetValue<int,1211121895>
 
 	Summon_ActivateCommand = 0x1601A, //BB::CEvent
-
+	Summoned_OnSummonerDetach = 0x1601B, //BB::CEvent
 	RangedEffect_Activate = 0x1601C, //BB::CEvent
 	RangedEffect_GetDamageFactor = 0x1601D, //EGL::CEventGetValue<float,1468983543>
 	RangedEffect_GetArmorFactor = 0x1601E, //EGL::CEventGetValue<float,1468983543>
@@ -383,10 +397,13 @@ enum class shok_EventIDs : int {
 
 	// 0x17005 affectmoti affect moti
 	Market_WorkStep = 0x17007, //BB::CEvent
+	University_ResearchStep = 0x17008, //BB::CEvent
 	Market_GetProgress = 0x17009, //EGL::CEventGetValue<float,1468983543>
 	AffectMotivation_GetEffect = 0x17010, //EGL::CEventGetValue<float,1468983543>
-	Market_GetProgress = 0x1700A, //EGL::CEventGetValue<float,1468983543>
+	Market_StartTrade = 0x1700A, //EGL::CEventGetValue<float,1468983543>
 	Market_CancelTrade = 0x1700B, //BB::CEvent
+	// 0x1700C university get tech progress?
+	WorkerAlarmMode_OnBuildingDetach = 0x1700F, //EGL::CEvent1Entity
 	// 0x17011 resourcerefiner get supplier?/can work?
 	Worker_ResetTaskList = 0x17012, //BB::CEvent
 	Foundry_GetProgress = 0x17014, //EGL::CEventGetValue<int,1211121895>
@@ -394,6 +411,7 @@ enum class shok_EventIDs : int {
 	Foundry_BuildCannonCommand = 0x17016, //EGL::CEventValue<int,-27574121>
 	Foundry_WorkStep = 0x17018, //BB::CEvent
 	// 0x17019 affectmoti affect moti
+	// 0x1701B mine detach res
 
 	Barracks_ActivateAutoFill = 0x1701E, //BB::CEvent
 	Barracks_DeActivateAutoFill = 0x1701F, //BB::CEvent
@@ -444,6 +462,7 @@ enum class shok_EventIDs : int {
 	Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 	Animation_ResetTaskType = 0x2001E, //BB::CEvent
 	// worker 20024 get some int, leader get something barracks related, soldier simmilar, serf get terrainH < waterHeight
+	ReplaceableEntity_Disable = 0x20025, //BB::CEvent
 	// 20026 set uv anim?
 	// 20027 BB::CEvent also suspend?
 };

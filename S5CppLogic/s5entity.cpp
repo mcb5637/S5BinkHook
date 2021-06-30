@@ -411,6 +411,14 @@ void shok_EGL_CMovingEntity::HeroAbilityConvert(int target)
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
+void shok_EGL_CMovingEntity::HeroAbilityConvertBuilding(int target)
+{
+	shok_event_data_EGL_CEvent1Entity ev{};
+	ev.id = 0x16023;
+	ev.entityId = target;
+	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+}
+
 void shok_EGL_CMovingEntity::HeroAbilitySnipe(int tid)
 {
 	shok_event_data_EGL_CEvent1Entity ev{};

@@ -233,6 +233,7 @@ enum class shok_EventIDs : int {
 	// 11002 bino cancel
 	// 11003 serfbattle, set territory?
 	// 12002 stop?
+	// 0x12003 camp detach worker?
 	Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
 	// 12008 leader hurt?
 
@@ -249,7 +250,11 @@ enum class shok_EventIDs : int {
 	Worker_LevyTaxes = 0x1300A, //BB::CEvent
 	Worker_ForceToWork = 0x1300B, //BB::CEvent
 	// 1300C most likely worker leave
-	// 13011 camper beh
+	// 0x1300D camp get num slots?
+	// 0x1300E camp get pos from slot?
+	// 0x1300F camp attach worker?
+	// 0x13010 camp has free slot?
+	// 0x13011 worker on camp detach?
 	// 13012 camper beh forward to 12003 on camp
 	// worker 13013 get int something cycleindex
 	// worker 13014 empty EGL::CEventValue<int,-27574121>
@@ -270,9 +275,13 @@ enum class shok_EventIDs : int {
 	SettlerMerchant_MoveInCommand = 0x13023, //BB::CEvent
 	SettlerMerchant_MoveOutCommand = 0x13024, //BB::CEvent
 	// 13025 worker emtpty EGL::CEvent1Entity
+	// 0x13026 neutralbridge progress?
+	NeutralBridge_GetNeutralBridgeBehavior = 0x13027, //EGL::CEventGetValue<GGL::CNeutralBridgeBehavior *,1150290935>
+	// 0x13028 neutralbridge get progress?
 	Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
 	SettlerMerchant_GetBuildingId = 0x1302A, //EGL::CEventGetValue<int, 1211121895>
 
+	// 0x14002 buildingbeh 1 ent
 	Serf_Construct = 0x14003, // GGL::CEventEntityIndex serfbattle?
 	Keep_BuySerfCommand = 0x14004, //BB::CEvent
 	Serf_CommandTurnToBattleSerf = 0x14005, //BB::CEvent battleserf stop if toserf tl
@@ -350,8 +359,10 @@ enum class shok_EventIDs : int {
 	HeroAbility_IsAbilitySupported = 0x16008, //GGL::CEventHeroAbilityInteger
 	HeroAbility_StandUpOrInit = 0x16009, //BB::CEvent
 	CannonBuilder_BuildCannonCommand = 0x1600A, //GGL::CEventPositionAnd2EntityTypes
-	// 1600B autocannon on foundation detach?
+	AutoCannon_OnFoundationDetach = 0x1600B, //EGL::CEvent1Entity
+	Foundation_OnAutoCannonDetach = 0x1600C, //EGL::CEvent1Entity
 	HeroAbility_Cancel = 0x1600D, //BB::CEvent
+	// 0x1600E foundation detach builder & top then die, neutralbridge detach architects
 	// 1500E convert cancel?
 	// 0x1600F hawk destroy?
 	HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
@@ -380,9 +391,10 @@ enum class shok_EventIDs : int {
 	HeroBehavior_CommandNPCInteraction = 0x16021, //EGL::CEvent1Entity
 
 	CircularAttack_ActivateCommand = 0x16022, //BB::CEvent
-
+	ConvertBuilding_ActivateCommand = 0x16023, //EGL::CEvent1Entity
+	ConvertBuilding_OnTargetDetach = 0x16024, //EGL::CEvent1Entity
 	ComvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
-	// 16028 convert cancel?
+	ComvertSettler_OnTargetDetach = 0x16028, //EGL::CEvent1Entity
 	LimitedLifespan_GetTimeRemaining = 0x16029, //EGL::CEventGetValue<int,1211121895>
 	LimitedLifespan_GetTimeMax = 0x1602A, //EGL::CEventGetValue<int,1211121895>
 	HeroBehavior_GetSpawnTurn = 0x1602B, //EGL::CEventGetValue<int,1211121895>
@@ -395,7 +407,10 @@ enum class shok_EventIDs : int {
 
 	InflictFear_Activate = 0x16026, //BB::CEvent
 
-	// 0x17005 affectmoti affect moti
+	WorkPlace_OnWorkerAttach = 0x17003, //EGL::CEvent1Entity
+	WorkPlace_OnWorkerDetach = 0x17004, //EGL::CEvent1Entity
+	// 0x17005 affectmoti affect moti, foundation init, defendablebuil activate defendmode construction complete
+	// 0x17006 buildingbeh worward to 0x17004
 	Market_WorkStep = 0x17007, //BB::CEvent
 	University_ResearchStep = 0x17008, //BB::CEvent
 	Market_GetProgress = 0x17009, //EGL::CEventGetValue<float,1468983543>
@@ -403,6 +418,7 @@ enum class shok_EventIDs : int {
 	Market_StartTrade = 0x1700A, //EGL::CEventGetValue<float,1468983543>
 	Market_CancelTrade = 0x1700B, //BB::CEvent
 	// 0x1700C university get tech progress?
+	// 0x1700D constructionsite complete
 	WorkerAlarmMode_OnBuildingDetach = 0x1700F, //EGL::CEvent1Entity
 	// 0x17011 resourcerefiner get supplier?/can work?
 	Worker_ResetTaskList = 0x17012, //BB::CEvent
@@ -410,8 +426,10 @@ enum class shok_EventIDs : int {
 	Foundry_SetProgress = 0x17015, //EGL::CEventValue<int,-27574121>
 	Foundry_BuildCannonCommand = 0x17016, //EGL::CEventValue<int,-27574121>
 	Foundry_WorkStep = 0x17018, //BB::CEvent
-	// 0x17019 affectmoti affect moti
+	// 0x17019 affectmoti affect moti, foundation init
+	// 0x1701A foundation cleanup?
 	// 0x1701B mine detach res
+	// 0x1701C foundation init, save load?
 
 	Barracks_ActivateAutoFill = 0x1701E, //BB::CEvent
 	Barracks_DeActivateAutoFill = 0x1701F, //BB::CEvent
@@ -435,18 +453,19 @@ enum class shok_EventIDs : int {
 	// 18005 soldier ret true
 	// 18007 battle, autocannon ret true
 	// 18006 herobeh ret true
+	DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
 	// 1800C resourcerefiner ret true
 	// 1800D thefbeh ret true
 
 	// 1A002 limitedattachment on attach?
 	// 1A003 limitedattachment on detach?
-	// 1A004 limitedattach maybe get is full?
-	// 1A005 limitedattach get bool?
+	// 1A004 limitedattach maybe get is full? maybe get is limited?
+	LimitedAttachment_IsActive = 0x1A005, //GGL::CEventAttachmentTypeGetBool
 	// 1A006 limitedattach maybe get curr?
 	LimitedAttachment_GetMax = 0x1A007, //GGL::CEventAttachmentTypeGetInteger
 	// 1A008 limitedattachment maybe get left?
-	// 1A009 limitedattach ?
-	// 1A00A limitedattach ?
+	LimitedAttachment_Activate = 0x1A009, //GGL::CEventAttachmentType
+	LimitedAttachment_DeActivate = 0x1A00A, //GGL::CEventAttachmentType
 
 	// 20002 set walk target?
 	// 20003 set walk target?
@@ -457,8 +476,8 @@ enum class shok_EventIDs : int {
 	Die = 0x2000A, ///BB::CEvent
 
 	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
-	Animation_UnSuspend = 0x20014, //BB::CEvent may be swapped, check, autocannon EGL::CEventValue<int,-27574121>?
-	Animation_Suspend = 0x20015, //EGL::CEventValue<int,-27574121> argument seems to be tick
+	Animation_UnSuspend = 0x20014, //EGL::CEventValue<int,-27574121> argument is ticks spent suspended
+	Animation_Suspend = 0x20015, //EGL::CEventValue<int,-27574121> argument is current tick
 	Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 	Animation_ResetTaskType = 0x2001E, //BB::CEvent
 	// worker 20024 get some int, leader get something barracks related, soldier simmilar, serf get terrainH < waterHeight

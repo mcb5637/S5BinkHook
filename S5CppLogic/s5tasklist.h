@@ -425,6 +425,7 @@ enum class shok_TaskState : int {
     Follow = 4,
     BattleWaitUntilAutoCannon = 5,
     Rotate = 6,
+    // 9 & 10 building behavior
     // 12 something movement behavior
     // 13 something worker
     IdleInFormation = 14,
@@ -432,12 +433,14 @@ enum class shok_TaskState : int {
     SerfSearchResource = 16,
     Train = 17,
     HeroComatose = 18,
+    BuildingAlarmDefend = 19,
     BattleWait = 20,
     // 21 something worker
     LeaderGetCloseTotarget = 22,
     MoveToTarget = 23,
     // 24 soldier formation?
     HeroGoToNPC = 25,
+    ConvertBuilding = 26,
     ComvertSettler = 28,
     Merchant_WaitForHero = 29,
     ThiefStealGoods = 30,

@@ -98,8 +98,8 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->GetEntityType()->GetBehaviorProps<shok_GGL_CBattleBehaviorProps>()->ProjectileEffectID);
-    return 1;
+    luaext_checkSettler(L, 1)->HeroAbilityConvertBuilding(luaext_checkBulding(L, 2)->EntityId);
+    return 0;
 }
 
 int cleanup(lua_State* L) {

@@ -108,6 +108,14 @@ struct shok_GGL_CConvertSettlerAbilityProps : shok_GGL_CHeroAbilityProps {
 	static inline constexpr int TypeDesc = 0x8227A8;
 };
 
+struct shok_GGL_CConvertBuildingAbilityProps : shok_GGL_CHeroAbilityProps {
+	int ConversionTaskList;
+	float HPToMSFactor;
+
+	static inline constexpr int vtp = 0x7773D8;
+	static inline constexpr int TypeDesc = 0x822B68;
+};
+
 struct shok_GGL_CSniperAbilityProps : shok_GGL_CHeroAbilityProps {
 	int TaskList, Animation;
 	float Range, DamageFactor; // 7
@@ -296,6 +304,15 @@ struct shok_GGL_CCamperBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	static inline constexpr int TypeDesc = 0x8237CC;
 };
 
+struct shok_GGL_CCampBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	vector_padding;
+	std::vector<shok_position> Slot;
+	int RemoveDelay;
+
+	static inline constexpr int vtp = 0x777854;
+	static inline constexpr int TypeDesc = 0x823770;
+};
+
 struct shok_GGL_CGLBehaviorPropsDying : shok_EGL_CGLEBehaviorProps {
 	int DyingTaskList;
 
@@ -350,6 +367,14 @@ struct shok_GGL_CAutoCannonBehaviorProps : shok_EGL_CGLEBehaviorProps {
 
 	static inline constexpr int vtp = 0x778CD4;
 	static inline constexpr int TypeDesc = 0x828088;
+};
+
+struct shok_GGL_CFoundationBehaviorProps : shok_EGL_CGLEBehaviorProps {
+	int TopEntityType; //4
+	float XOffset, YOffset; //int?
+
+	static inline constexpr int vtp = 0x776D08;
+	static inline constexpr int TypeDesc = 0x820F18;
 };
 
 struct shok_resourceRefinerEfficencyUpgrade {
@@ -418,13 +443,6 @@ struct shok_GGL_CServiceBuildingBehaviorProperties : shok_EGL_CGLEBehaviorProps 
 	static inline constexpr int TypeDesc = 0x816C3C;
 };
 
-struct shok_GGL_CMineBehaviorProperties : shok_EGL_CGLEBehaviorProps {
-	int AmountToMine;
-
-	static inline constexpr int vtp = 0x77581C;
-	static inline constexpr int TypeDesc = 0x81C77C;
-};
-
 struct shok_GGL_CWorkerFleeBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	int FlightTaskList; //4
 
@@ -437,6 +455,12 @@ struct shok_GGL_CWorkerAlarmModeBehaviorProps : shok_EGL_CGLEBehaviorProps {
 
 	static inline constexpr int vtp = 0x773544;
 	static inline constexpr int TypeDesc = 0x8164B4;
+};
+
+struct shok_GGL_CDefendableBuildingBehaviorProps : shok_EGL_CGLEBehaviorProps {
+
+	static inline constexpr int vtp = 0x777234;
+	static inline constexpr int TypeDesc = 0x8223F4;
 };
 
 struct shok_GGL_CGLResourceDoodadBehaviorProps : shok_EGL_CGLEBehaviorProps {
@@ -480,4 +504,11 @@ struct shok_GGL_CKeepBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 
 	static inline constexpr int vtp = 0x776600;
 	static inline constexpr int TypeDesc = 0x81FA34;
+};
+
+struct shok_GGL_CNeutralBridgeBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	//shok_constructionInfo ConstructionInfo;
+
+	static inline constexpr int vtp = 0x779B9C;
+	static inline constexpr int TypeDesc = 0x8298A4;
 };

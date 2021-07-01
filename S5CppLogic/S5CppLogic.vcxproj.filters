@@ -188,6 +188,9 @@
     <ClCompile Include="s5tasklist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="s5events.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">

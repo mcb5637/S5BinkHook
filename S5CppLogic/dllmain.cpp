@@ -98,6 +98,7 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
+    shok_GGL_CEventEntityIndex e{ shok_EventIDs::AffectMotivation_GetEffect, 0,0 };
     luaext_checkSettler(L, 1)->HeroAbilityConvertBuilding(luaext_checkBulding(L, 2)->EntityId);
     return 0;
 }

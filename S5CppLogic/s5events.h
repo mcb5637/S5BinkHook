@@ -1,6 +1,157 @@
 #pragma once
 #include "s5data.h"
 
+enum class shok_EventIDs : int;
+enum class shok_NetEventIds : int;
+
+struct shok_BB_CEvent : shok_object {
+	int EventTypeId;
+
+	shok_BB_CEvent(int eventid);
+	shok_BB_CEvent(shok_EventIDs eventid);
+	shok_BB_CEvent(shok_NetEventIds eventid);
+	shok_BB_CEvent(shok_BB_CEvent&&) = default;
+	shok_BB_CEvent(const shok_BB_CEvent&) = default;
+	shok_BB_CEvent& operator=(shok_BB_CEvent&&) = default;
+	shok_BB_CEvent& operator=(const shok_BB_CEvent&) = default;
+
+	static inline constexpr int vtp = 0x762114;
+	static inline constexpr int TypeDesc = 0x7FFE24;
+};
+
+// input events
+
+struct shok_EGL_CEventValue_int : shok_BB_CEvent { // EGL::CEventValue<int,-27574121>
+	int Data;
+
+	shok_EGL_CEventValue_int(shok_EventIDs e, int d);
+	shok_EGL_CEventValue_int(shok_EGL_CEventValue_int&&) = default;
+	shok_EGL_CEventValue_int(const shok_EGL_CEventValue_int&) = default;
+	shok_EGL_CEventValue_int& operator=(shok_EGL_CEventValue_int&&) = default;
+	shok_EGL_CEventValue_int& operator=(const shok_EGL_CEventValue_int&) = default;
+
+	static inline constexpr int vtp = 0x763130;
+	static inline constexpr int TypeDesc = 0x801270;
+};
+
+struct shok_EGL_CEventGetValue_bool : shok_BB_CEvent { // EGL::CEventGetValue<bool,1709081367>
+	bool Data = false;
+
+	shok_EGL_CEventGetValue_bool(shok_EventIDs e);
+	shok_EGL_CEventGetValue_bool(shok_EGL_CEventGetValue_bool&&) = default;
+	shok_EGL_CEventGetValue_bool(const shok_EGL_CEventGetValue_bool&) = default;
+	shok_EGL_CEventGetValue_bool& operator=(shok_EGL_CEventGetValue_bool&&) = default;
+	shok_EGL_CEventGetValue_bool& operator=(const shok_EGL_CEventGetValue_bool&) = default;
+
+	static inline constexpr int vtp = 0x766CB4;
+	static inline constexpr int TypeDesc = 0x807A70;
+};
+struct shok_EGL_CEventGetValue_int : shok_BB_CEvent { // EGL::CEventGetValue<int,1211121895>
+	int Data = 0;
+
+	shok_EGL_CEventGetValue_int(shok_EventIDs e);
+	shok_EGL_CEventGetValue_int(shok_EGL_CEventGetValue_int&&) = default;
+	shok_EGL_CEventGetValue_int(const shok_EGL_CEventGetValue_int&) = default;
+	shok_EGL_CEventGetValue_int& operator=(shok_EGL_CEventGetValue_int&&) = default;
+	shok_EGL_CEventGetValue_int& operator=(const shok_EGL_CEventGetValue_int&) = default;
+
+	static inline constexpr int vtp = 0x766CC4;
+	static inline constexpr int TypeDesc = 0x807AA4;
+};
+
+
+struct shok_EGL_CEvent1Entity : shok_BB_CEvent {
+private:
+	int vtable_EGL_IEventEntityID = 0x766C58;
+public:
+	int EntityID;
+
+	shok_EGL_CEvent1Entity(shok_EventIDs e, int ent);
+	shok_EGL_CEvent1Entity(shok_EGL_CEvent1Entity&&) = default;
+	shok_EGL_CEvent1Entity(const shok_EGL_CEvent1Entity&) = default;
+	shok_EGL_CEvent1Entity& operator=(shok_EGL_CEvent1Entity&&) = default;
+	shok_EGL_CEvent1Entity& operator=(const shok_EGL_CEvent1Entity&) = default;
+
+	static inline constexpr int vtp = 0x766C60;
+	static inline constexpr int TypeDesc = 0x8079A8;
+};
+
+struct shok_EGL_CEventPosition : shok_BB_CEvent {
+	shok_position Position;
+
+	shok_EGL_CEventPosition(shok_EventIDs e, const shok_position& p);
+	shok_EGL_CEventPosition(shok_EGL_CEventPosition&&) = default;
+	shok_EGL_CEventPosition(const shok_EGL_CEventPosition&) = default;
+	shok_EGL_CEventPosition& operator=(shok_EGL_CEventPosition&&) = default;
+	shok_EGL_CEventPosition& operator=(const shok_EGL_CEventPosition&) = default;
+
+	static inline constexpr int vtp = 0x766C70;
+	static inline constexpr int TypeDesc = 0x8079C8;
+};
+
+struct shok_GGL_CEventAttachmentTypeGetInteger : shok_BB_CEvent {
+	shok_AttachmentType AttachmentType;
+	int Data = 0;
+
+	shok_GGL_CEventAttachmentTypeGetInteger(shok_EventIDs e, shok_AttachmentType t);
+	shok_GGL_CEventAttachmentTypeGetInteger(shok_GGL_CEventAttachmentTypeGetInteger&&) = default;
+	shok_GGL_CEventAttachmentTypeGetInteger(const shok_GGL_CEventAttachmentTypeGetInteger&) = default;
+	shok_GGL_CEventAttachmentTypeGetInteger& operator=(shok_GGL_CEventAttachmentTypeGetInteger&&) = default;
+	shok_GGL_CEventAttachmentTypeGetInteger& operator=(const shok_GGL_CEventAttachmentTypeGetInteger&) = default;
+
+	static inline constexpr int vtp = 0x766C80;
+	static inline constexpr int TypeDesc = 0x8079EC;
+};
+
+struct shok_GGL_CEventEntityIndex : shok_BB_CEvent {
+	int EntityId;
+	int Index;
+
+	shok_GGL_CEventEntityIndex(shok_EventIDs e, int eid, int ind);
+	shok_GGL_CEventEntityIndex(shok_GGL_CEventEntityIndex&&) = default;
+	shok_GGL_CEventEntityIndex(const shok_GGL_CEventEntityIndex&) = default;
+	shok_GGL_CEventEntityIndex& operator=(shok_GGL_CEventEntityIndex&&) = default;
+	shok_GGL_CEventEntityIndex& operator=(const shok_GGL_CEventEntityIndex&) = default;
+
+	static inline constexpr int vtp = 0x766C90;
+	static inline constexpr int TypeDesc = 0x807A20;
+};
+
+// ENetworkX::CEventBase probably never used, since servers are down
+
+// EGL::CEventSoundPositionAndID
+
+struct shok_EGL_CEventPlayerID : shok_BB_CEvent {
+private:
+	int vtable_EGL_IEventPlayerID = 0x76D8F8;
+public:
+	int PlayerID;
+
+	shok_EGL_CEventPlayerID(shok_EventIDs e, int p);
+	shok_EGL_CEventPlayerID(shok_EGL_CEventPlayerID&&) = default;
+	shok_EGL_CEventPlayerID(const shok_EGL_CEventPlayerID&) = default;
+	shok_EGL_CEventPlayerID& operator=(shok_EGL_CEventPlayerID&&) = default;
+	shok_EGL_CEventPlayerID& operator=(const shok_EGL_CEventPlayerID&) = default;
+
+	static inline constexpr int vtp = 0x76D900;
+	static inline constexpr int TypeDesc = 0x80E078;
+};
+
+struct shok_EGL_CEventSubAnim : shok_BB_CEvent {
+	int AnimId, SubAnimIndex;
+	bool PlayBackwards, IsLooped;
+
+	shok_EGL_CEventSubAnim(shok_EventIDs e, int an, int subind, bool back, bool loop);
+	shok_EGL_CEventSubAnim(shok_EGL_CEventSubAnim&&) = default;
+	shok_EGL_CEventSubAnim(const shok_EGL_CEventSubAnim&) = default;
+	shok_EGL_CEventSubAnim& operator=(shok_EGL_CEventSubAnim&&) = default;
+	shok_EGL_CEventSubAnim& operator=(const shok_EGL_CEventSubAnim&) = default;
+
+	static inline constexpr int vtp = 0x76D910;
+	static inline constexpr int TypeDesc = 0x80E09C;
+};
+
+
 struct shok_event_data_EGL_CEventGetValue_int_1211121895 : shok_event_data {
 	int vtable = 0x766CC4;
 	int id = 0;
@@ -63,23 +214,31 @@ struct shok_event_data_GGL_CEventTransaction : shok_event_data {
 };
 
 // net events
-struct shok_BB_CEvent : shok_object { // todo
-	int EventTypeId;
-
-	static inline constexpr int vtp = 0x762114;
-};
-
 struct shok_EGL_CNetEvent2Entities : shok_BB_CEvent {
 	int ActorId, TargetId;
 
+	shok_EGL_CNetEvent2Entities(shok_NetEventIds id, int actor, int tar);
+	shok_EGL_CNetEvent2Entities(shok_EGL_CNetEvent2Entities&&) = default;
+	shok_EGL_CNetEvent2Entities(const shok_EGL_CNetEvent2Entities&) = default;
+	shok_EGL_CNetEvent2Entities& operator=(shok_EGL_CNetEvent2Entities&&) = default;
+	shok_EGL_CNetEvent2Entities& operator=(const shok_EGL_CNetEvent2Entities&) = default;
+
 	static inline constexpr int vtp = 0x76DD60;
+	static inline constexpr int TypeDesc = 0x80FF1C;
 };
 
 struct shok_EGL_CNetEventEntityAndPos : shok_BB_CEvent {
 	int EntityId;
 	shok_position Position;
 
+	shok_EGL_CNetEventEntityAndPos(shok_NetEventIds id, int ent, const shok_position& pos);
+	shok_EGL_CNetEventEntityAndPos(shok_EGL_CNetEventEntityAndPos&&) = default;
+	shok_EGL_CNetEventEntityAndPos(const shok_EGL_CNetEventEntityAndPos&) = default;
+	shok_EGL_CNetEventEntityAndPos& operator=(shok_EGL_CNetEventEntityAndPos&&) = default;
+	shok_EGL_CNetEventEntityAndPos& operator=(const shok_EGL_CNetEventEntityAndPos&) = default;
+
 	static inline constexpr int vtp = 0x76DD50;
+	static inline constexpr int TypeDesc = 0x80FEF4;
 };
 
 struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
@@ -88,97 +247,215 @@ struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
 	std::vector<shok_position, shok_allocator<shok_position>> Positions;
 	float Rotation;
 
+	shok_EGL_CNetEventEntityAndPosArray(shok_NetEventIds id, int ent, float r);
+	shok_EGL_CNetEventEntityAndPosArray(const shok_EGL_CNetEventEntityAndPosArray&) = default;
+	shok_EGL_CNetEventEntityAndPosArray& operator=(const shok_EGL_CNetEventEntityAndPosArray&) = default;
+
 	static inline constexpr int vtp = 0x770704;
+	static inline constexpr int TypeDesc = 0x8125EC;
 };
 
 struct shok_GGL_CNetEventExtractResource : shok_BB_CEvent {
 	int EntityId;
-	int ResourceType;
+	shok_ResourceType ResourceType;
 	shok_position Position;
 
+	shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok_ResourceType resty, const shok_position& pos);
+	shok_GGL_CNetEventExtractResource(shok_GGL_CNetEventExtractResource&&) = default;
+	shok_GGL_CNetEventExtractResource(const shok_GGL_CNetEventExtractResource&) = default;
+	shok_GGL_CNetEventExtractResource& operator=(shok_GGL_CNetEventExtractResource&&) = default;
+	shok_GGL_CNetEventExtractResource& operator=(const shok_GGL_CNetEventExtractResource&) = default;
+
 	static inline constexpr int vtp = 0x77061C;
+	static inline constexpr int TypeDesc = 0x81252C;
 };
 
 struct shok_GGL_CNetEventTransaction : shok_BB_CEvent {
-	int EntityId, SellType, BuyType, BuyAmount;
+	int EntityId;
+	shok_ResourceType SellType, BuyType;
+	int BuyAmount;
+
+	shok_GGL_CNetEventTransaction(shok_NetEventIds shok_NetEventIds, int ent, shok_ResourceType sell, shok_ResourceType buy, int buyam);
+	shok_GGL_CNetEventTransaction(shok_GGL_CNetEventTransaction&&) = default;
+	shok_GGL_CNetEventTransaction(const shok_GGL_CNetEventTransaction&) = default;
+	shok_GGL_CNetEventTransaction& operator=(shok_GGL_CNetEventTransaction&&) = default;
+	shok_GGL_CNetEventTransaction& operator=(const shok_GGL_CNetEventTransaction&) = default;
 
 	static inline constexpr int vtp = 0x77062C;
+	static inline constexpr int TypeDesc = 0x812558;
 };
 
 struct shok_EGL_CNetEventEntityID : shok_BB_CEvent {
 	int EntityId;
 
+	shok_EGL_CNetEventEntityID(shok_NetEventIds shok_NetEventIds, int ent);
+	shok_EGL_CNetEventEntityID(shok_EGL_CNetEventEntityID&&) = default;
+	shok_EGL_CNetEventEntityID(const shok_EGL_CNetEventEntityID&) = default;
+	shok_EGL_CNetEventEntityID& operator=(shok_EGL_CNetEventEntityID&&) = default;
+	shok_EGL_CNetEventEntityID& operator=(const shok_EGL_CNetEventEntityID&) = default;
+
 	static inline constexpr int vtp = 0x766C28;
+	static inline constexpr int TypeDesc = 0x807924;
 };
 
 struct shok_GGL_CNetEventCannonCreator : shok_EGL_CNetEventEntityID {
 	int BottomType, TopType;
 	shok_position Position;
 
+	shok_GGL_CNetEventCannonCreator(shok_NetEventIds id, int ent, int bty, int tty, const shok_position& pos);
+	shok_GGL_CNetEventCannonCreator(shok_GGL_CNetEventCannonCreator&&) = default;
+	shok_GGL_CNetEventCannonCreator(const shok_GGL_CNetEventCannonCreator&) = default;
+	shok_GGL_CNetEventCannonCreator& operator=(shok_GGL_CNetEventCannonCreator&&) = default;
+	shok_GGL_CNetEventCannonCreator& operator=(const shok_GGL_CNetEventCannonCreator&) = default;
+
+	static inline constexpr int TypeDesc = 0x812494;
 	static inline constexpr int vtp = 0x7705EC;
 };
 
 struct shok_GGL_CNetEventEntityIDAndUpgradeCategory : shok_EGL_CNetEventEntityID {
 	int UpgradeCategory;
 
+	shok_GGL_CNetEventEntityIDAndUpgradeCategory(shok_NetEventIds id, int ent, int ucat);
+	shok_GGL_CNetEventEntityIDAndUpgradeCategory(shok_GGL_CNetEventEntityIDAndUpgradeCategory&&) = default;
+	shok_GGL_CNetEventEntityIDAndUpgradeCategory(const shok_GGL_CNetEventEntityIDAndUpgradeCategory&) = default;
+	shok_GGL_CNetEventEntityIDAndUpgradeCategory& operator=(shok_GGL_CNetEventEntityIDAndUpgradeCategory&&) = default;
+	shok_GGL_CNetEventEntityIDAndUpgradeCategory& operator=(const shok_GGL_CNetEventEntityIDAndUpgradeCategory&) = default;
+
+	static inline constexpr int TypeDesc = 0x8124F4;
 	static inline constexpr int vtp = 0x77060C;
 };
 
 struct shok_EGL_CNetEventEntityIDAndInteger : shok_EGL_CNetEventEntityID {
 	int Data;
 
+	shok_EGL_CNetEventEntityIDAndInteger(shok_NetEventIds id, int ent, int d);
+	shok_EGL_CNetEventEntityIDAndInteger(shok_EGL_CNetEventEntityIDAndInteger&&) = default;
+	shok_EGL_CNetEventEntityIDAndInteger(const shok_EGL_CNetEventEntityIDAndInteger&) = default;
+	shok_EGL_CNetEventEntityIDAndInteger& operator=(shok_EGL_CNetEventEntityIDAndInteger&&) = default;
+	shok_EGL_CNetEventEntityIDAndInteger& operator=(const shok_EGL_CNetEventEntityIDAndInteger&) = default;
+
+	static inline constexpr int TypeDesc = 0x807978;
 	static inline constexpr int vtp = 0x766C48;
 };
 
 struct shok_GGL_CNetEventTechnologyAndEntityID : shok_EGL_CNetEventEntityID {
 	int Technology;
 
+	shok_GGL_CNetEventTechnologyAndEntityID(shok_NetEventIds id, int ent, int tech);
+	shok_GGL_CNetEventTechnologyAndEntityID(shok_GGL_CNetEventTechnologyAndEntityID&&) = default;
+	shok_GGL_CNetEventTechnologyAndEntityID(const shok_GGL_CNetEventTechnologyAndEntityID&) = default;
+	shok_GGL_CNetEventTechnologyAndEntityID& operator=(shok_GGL_CNetEventTechnologyAndEntityID&&) = default;
+	shok_GGL_CNetEventTechnologyAndEntityID& operator=(const shok_GGL_CNetEventTechnologyAndEntityID&) = default;
+
+	static inline constexpr int TypeDesc = 0x8124C0;
 	static inline constexpr int vtp = 0x7705FC;
 };
 
 struct shok_EGL_CNetEventPlayerID : shok_BB_CEvent {
 	int PlayerId;
 
+	shok_EGL_CNetEventPlayerID(shok_NetEventIds id, int pl);
+	shok_EGL_CNetEventPlayerID(shok_EGL_CNetEventPlayerID&&) = default;
+	shok_EGL_CNetEventPlayerID(const shok_EGL_CNetEventPlayerID&) = default;
+	shok_EGL_CNetEventPlayerID& operator=(shok_EGL_CNetEventPlayerID&&) = default;
+	shok_EGL_CNetEventPlayerID& operator=(const shok_EGL_CNetEventPlayerID&) = default;
+
+	static inline constexpr int TypeDesc = 0x807900;
 	static inline constexpr int vtp = 0x766C18;
 };
 
-struct shok_GGL_CNetEventBuildingCreator : shok_EGL_CNetEventPlayerID {
+struct shok_GGL_CNetEventBuildingCreator : shok_EGL_CNetEventPlayerID { // add at least one serf, or it crashes
 	int UpgradeCategory;
 	shok_positionRot Position;
 	vector_padding;
 	std::vector<int, shok_allocator<int>> Serfs;
 
+	shok_GGL_CNetEventBuildingCreator(shok_NetEventIds id, int pl, int ucat, const shok_positionRot& p);
+	shok_GGL_CNetEventBuildingCreator(shok_GGL_CNetEventBuildingCreator&&) = default;
+	shok_GGL_CNetEventBuildingCreator(const shok_GGL_CNetEventBuildingCreator&) = default;
+	shok_GGL_CNetEventBuildingCreator& operator=(shok_GGL_CNetEventBuildingCreator&&) = default;
+	shok_GGL_CNetEventBuildingCreator& operator=(const shok_GGL_CNetEventBuildingCreator&) = default;
+
+	static inline constexpr int TypeDesc = 0x81261C;
 	static inline constexpr int vtp = 0x770714;
 };
 
 struct shok_EGL_CNetEventIntegerAndPlayerID : shok_EGL_CNetEventPlayerID {
 	int Data;
 
+	shok_EGL_CNetEventIntegerAndPlayerID(shok_NetEventIds id, int pl, int d);
+	shok_EGL_CNetEventIntegerAndPlayerID(shok_EGL_CNetEventIntegerAndPlayerID&&) = default;
+	shok_EGL_CNetEventIntegerAndPlayerID(const shok_EGL_CNetEventIntegerAndPlayerID&) = default;
+	shok_EGL_CNetEventIntegerAndPlayerID& operator=(shok_EGL_CNetEventIntegerAndPlayerID&&) = default;
+	shok_EGL_CNetEventIntegerAndPlayerID& operator=(const shok_EGL_CNetEventIntegerAndPlayerID&) = default;
+
+	static inline constexpr int TypeDesc = 0x812404;
 	static inline constexpr int vtp = 0x7705BC;
 };
 
 struct shok_EGL_CNetEventPlayerIDAndInteger : shok_EGL_CNetEventPlayerID {
 	int Data;
 
+	shok_EGL_CNetEventPlayerIDAndInteger(shok_NetEventIds id, int pl, int d);
+	shok_EGL_CNetEventPlayerIDAndInteger(shok_EGL_CNetEventPlayerIDAndInteger&&) = default;
+	shok_EGL_CNetEventPlayerIDAndInteger(const shok_EGL_CNetEventPlayerIDAndInteger&) = default;
+	shok_EGL_CNetEventPlayerIDAndInteger& operator=(shok_EGL_CNetEventPlayerIDAndInteger&&) = default;
+	shok_EGL_CNetEventPlayerIDAndInteger& operator=(const shok_EGL_CNetEventPlayerIDAndInteger&) = default;
+
+	static inline constexpr int TypeDesc = 0x812434;
 	static inline constexpr int vtp = 0x7705CC;
 };
 
 struct shok_EGL_CNetEventEntityIDAndPlayerID : shok_EGL_CNetEventPlayerID {
 	int EntityId;
 
+	shok_EGL_CNetEventEntityIDAndPlayerID(shok_NetEventIds id, int pl, int e);
+	shok_EGL_CNetEventEntityIDAndPlayerID(shok_EGL_CNetEventEntityIDAndPlayerID&&) = default;
+	shok_EGL_CNetEventEntityIDAndPlayerID(const shok_EGL_CNetEventEntityIDAndPlayerID&) = default;
+	shok_EGL_CNetEventEntityIDAndPlayerID& operator=(shok_EGL_CNetEventEntityIDAndPlayerID&&) = default;
+	shok_EGL_CNetEventEntityIDAndPlayerID& operator=(const shok_EGL_CNetEventEntityIDAndPlayerID&) = default;
+
+	static inline constexpr int TypeDesc = 0x807948;
 	static inline constexpr int vtp = 0x766C38;
 };
 
 struct shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType : shok_EGL_CNetEventEntityIDAndPlayerID {
 	int EntityType;
 
+	shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType(shok_NetEventIds id, int pl, int e, int ety);
+	shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType(shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType&&) = default;
+	shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType(const shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType&) = default;
+	shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType& operator=(shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType&&) = default;
+	shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType& operator=(const shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType&) = default;
+
+	static inline constexpr int TypeDesc = 0x812340;
 	static inline constexpr int vtp = 0x77057C;
 };
 
 struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityIDAndPlayerID {
 	int Data;
 
+	shok_GGL_CNetEventEntityIDPlayerIDAndInteger(shok_NetEventIds id, int pl, int e, int d);
+	shok_GGL_CNetEventEntityIDPlayerIDAndInteger(shok_GGL_CNetEventEntityIDPlayerIDAndInteger&&) = default;
+	shok_GGL_CNetEventEntityIDPlayerIDAndInteger(const shok_GGL_CNetEventEntityIDPlayerIDAndInteger&) = default;
+	shok_GGL_CNetEventEntityIDPlayerIDAndInteger& operator=(shok_GGL_CNetEventEntityIDPlayerIDAndInteger&&) = default;
+	shok_GGL_CNetEventEntityIDPlayerIDAndInteger& operator=(const shok_GGL_CNetEventEntityIDPlayerIDAndInteger&) = default;
+
+	static inline constexpr int TypeDesc = 0x8125B4;
 	static inline constexpr int vtp = 0x77064C;
+};
+
+struct shok_Framework_CEventGameSpeed : shok_BB_CEvent {
+	double SpeedFactor;
+
+	shok_Framework_CEventGameSpeed(shok_NetEventIds id, double speed);
+	shok_Framework_CEventGameSpeed(shok_Framework_CEventGameSpeed&&) = default;
+	shok_Framework_CEventGameSpeed(const shok_Framework_CEventGameSpeed&) = default;
+	shok_Framework_CEventGameSpeed& operator=(shok_Framework_CEventGameSpeed&&) = default;
+	shok_Framework_CEventGameSpeed& operator=(const shok_Framework_CEventGameSpeed&) = default;
+
+	static inline constexpr int TypeDesc = 0x800078;
+	static inline constexpr int vtp = 0x762474;
 };
 
 enum class shok_EventIDs : int {
@@ -484,4 +761,64 @@ enum class shok_EventIDs : int {
 	ReplaceableEntity_Disable = 0x20025, //BB::CEvent
 	// 20026 set uv anim?
 	// 20027 BB::CEvent also suspend?
+};
+
+enum class shok_NetEventIds : int {
+	CommandEntityAttackEntity = 69650,
+	CommandSerfConstructBuilding = 69655,
+	CommandSerfRepairBuilding = 69656,
+	CommandEntityGuardEntity = 69664,
+	CommandHeroConvertSettler = 69695,
+	CommandThiefStealFrom = 69699,
+	CommandThiefCarryStolenStuffToHQ = 69700,
+	CommandThiefSabotageBuilding = 69701,
+	CommandThiefDefuseKeg = 69702,
+	CommandHeroSnipeSettler = 69705,
+	CommandHeroThrowShurikenAt = 69708,
+	CommandHeroPlaceCannonAt = 69679,
+	CommandHeroPlaceBombAt = 69668,
+	CommandEntityAttackPos = 69663,
+	CommandHeroSendHawkToPos = 69676,
+	CommandScoutUseBinocularsAt = 69704,
+	CommandScoutPlaceTorchAtPos = 69706,
+	CommandEntityMove = 69634,
+	CommandEntityPatrol = 69669,
+	CommandBuildingStartUpgrade = 69640,
+	CommandLeaderBuySoldier = 69644,
+	CommandSettlerExpell = 69647,
+	CommandBuildingCancelResearch = 69659,
+	CommandMarketCancelTrade = 69661,
+	CommandBuildingCancelUpgrade = 69662,
+	CommandLeaderHoldPosition = 69665,
+	CommandLeaderDefend = 69667,
+	CommandBattleSerfTurnToSerf = 69677,
+	CommandSerfTurnToBattleSerf = 69678,
+	CommandHeroActivateCamouflage = 69682,
+	CommandHeroActivateSummon = 69685,
+	CommandBuildingToggleOvertime = 69683,
+	CommandHeroAffectEntities = 69689,
+	CommandHeroCircularAttack = 69690,
+	CommandHeroInflictFear = 69694,
+	CommandBarracksRecruitGroups = 69696,
+	CommandBarracksRecruitLeaderOnly = 69697,
+	CommandHeroMotivateWorkers = 69703,
+	CommandScoutFindResources = 69707,
+	CommandPlaceBuilding = 69635,
+	CommandHQBuySerf = 69636,
+	CommandBuildingSell = 69638,
+	CommandPlayerActivateAlarm = 69680,
+	CommandPlayerDeactivateAlarm = 69681,
+	PlayerUpgradeSettlerCategory = 69642,
+	CommandPlayerSetTaxes = 69646,
+	CommandWeathermachineChangeWeather = 69686,
+	CommandMonasteryBlessSettlerGroup = 69687,
+	CommandPlayerPayTribute = 69670,
+	CommandBarracksBuyLeader = 69643,
+	CommandLeaderSetFormation = 69653,
+	CommandBuildingSetCurrentMaxWorkers = 69672,
+	CommandFoundryBuildCannon = 69684,
+	CommandSerfExtractResource = 69657,
+	CommandBuildingStartResearch = 69658,
+	CommandMarketStartTrade = 69660,
+	SetGameSpeed = 0x50001,
 };

@@ -31,6 +31,7 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i);
 void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i, bool rad = false);
 void luaext_writeCostInfo(lua_State* L, shok_costInfo& c);
 void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZeroes);
+shok_ResourceType luaext_getresourcetype(lua_State* L, int i);
 void luaext_assertEntityAlive(lua_State* L, int id, const char* msg);
 int str_ends_with(const char* str, const char* suffix);
 void luaext_tolower(lua_State* L);

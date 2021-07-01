@@ -242,6 +242,7 @@ bool operator<(shok_attachment a, shok_attachment b);
 struct shok_event_data {
 
 };
+struct shok_BB_CEvent;
 
 template<class CastFrom>
 bool contains(CastFrom* data, CastFrom search, int num) {

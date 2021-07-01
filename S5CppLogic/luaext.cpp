@@ -248,6 +248,12 @@ void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZ
 	lua_pop(L, 1);
 }
 
+shok_ResourceType luaext_getresourcetype(lua_State* L, int i) {
+	int r = luaL_checkint(L, i);
+	luaext_assert(L, r > 0 && r <= shok_ResourceType_MaxValue, "no resource type");
+	return static_cast<shok_ResourceType>(r);
+}
+
 void luaext_assertEntityAlive(lua_State* L, int id, const char* msg)
 {
 	if (shok_EGL_CGLEEntity::EntityIDIsDead(id))

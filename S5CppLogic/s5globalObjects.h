@@ -300,12 +300,14 @@ public:
 };
 
 struct shok_GGL_CGLGameLogic_TechList {
-	vector_padding
+	vector_padding;
 	std::vector<shok_technology*, shok_allocator<shok_technology*>> TechList;
 };
 
 struct shok_GGL_CWeatherHandler : shok_object {
-	PADDINGI(12)
+	PADDINGI(9);
+	int CurrentWeatherGFXState;
+	PADDINGI(2);
 	int WeatherChangeActive;
 
 	int GetNextWeatherState();

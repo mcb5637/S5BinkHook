@@ -418,7 +418,7 @@ struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 	int IndexOfFirstChaoticPosition; //46
 
 	// defined states: Train, LeaderGetCloseTotarget
-	// defined events: Leader_XXX, MoveCommand_Move, Behavior_Tick (regen), HeroAbility_Reset
+	// defined events: Leader_XXX, MoveCommand_Move, Behavior_Tick (regen), HeroAbility_Reset, IsLeader
 	// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE, TASK_GO_TO_POS, TASK_ACTIVATE_UVANIM, TASK_LEAVE_BARRACKS, TASK_SET_ANIM_AT_BARRACKS, TASK_TRAIN,
 	//		TASK_GET_CLOSE_TO_TARGET, TASK_ATTACK, TASK_CHECK_MIN_RADIUS
 
@@ -432,7 +432,7 @@ struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 struct shok_GGL_CSoldierBehavior : shok_GGL_CBattleBehavior {
 
 	// defined states: 1, 24
-	// defined events: Leader_Hurt, Leader_GetAttackTarget (forwards to leader), HeroAbility_Reset, Soldier_XXX
+	// defined events: Leader_Hurt, Leader_GetAttackTarget (forwards to leader), HeroAbility_Reset, Soldier_XXX, IsSoldier
 	// defined tasks: TASK_GO_TO_POS, TASK_LEAVE_BARRACKS
 
 	static inline constexpr int vtp = 0x773CC8;
@@ -454,7 +454,7 @@ struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
 struct shok_GGL_CSerfBattleBehavior : shok_GGL_CBattleBehavior {
 	// padding 2, shok_pos territory?
 
-	// defined events: MoveCommand_Move, Leader_AttackEntity, Leader_GetAttackTarget, Behavior_Tick, OnAttackedBy
+	// defined events: MoveCommand_Move, Leader_AttackEntity, Leader_GetAttackTarget, Behavior_Tick, OnAttackedBy, Leader_OnAttackCommandTargetDetach
 	// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE
 
 	static inline constexpr int vtp = 0x774A98;
@@ -472,7 +472,7 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 	// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_GO_TO_CONSTRUCTION_SITE, TASK_TURN_TO_CONSTRUCTION_SITE, TASK_CHANGE_ATTACHMENT_TO_CONSTRUCTION_SITE,
 	//		TASK_GO_TO_CONSTRUCTION_SITE_SLOT, TASK_LEAVE_SETTLEMENT, TASK_ABANDON_CURRENT_JOB, TASK_GO_TO_RESOURCE, TASK_TURN_TO_RESOURCE, TASK_WAIT_EXTRACTION_DELAY
 	//		TASK_EXTRACT_RESOURCE, TASK_GO_TO_RESOURCE_SLOT, TASK_TURN_INTO_BATTLE_SERF
-	// defined events: Worker_WorkPlaceBuildingDestroyed, Serf_XXX, BattleSerf_CommandTurnToSerf, Leader_AttackEntity, OnResourceDoodadDetach
+	// defined events: Worker_WorkPlaceBuildingDestroyed, Serf_XXX, BattleSerf_CommandTurnToSerf, Leader_AttackEntity, OnResourceDoodadDetach, IsSerf
 	// defined states: SerfSearchResource, 1
 
 	static inline constexpr int vtp = 0x774874;

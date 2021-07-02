@@ -946,6 +946,12 @@ int l_logic_FixSnipeDamage(lua_State* L) {
 	return 0;
 }
 
+int l_logic_GetCurrentWeatherGFXState(lua_State* L) {
+	int state = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->CurrentWeatherGFXState;
+	lua_pushnumber(L, state);
+	return 1;
+}
+
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
@@ -999,6 +1005,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "SetPlaceBuildingRotation", &l_logic_SetPlaceBuildingRotation);
 	luaext_registerFunc(L, "GetPlaceBuildingRotation", &l_logic_GetPlaceBuildingRotation);
 	luaext_registerFunc(L, "FixSnipeDamage", &l_logic_FixSnipeDamage);
+	luaext_registerFunc(L, "GetCurrentWeatherGFXState", &l_logic_GetCurrentWeatherGFXState);
 
 
 	lua_pushstring(L, "UICommands");

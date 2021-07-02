@@ -477,8 +477,8 @@ int l_entitySetLimitedLifespanRemaining(lua_State* L) {
 	return 0;
 }
 
-void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d);
-void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_event_data* d) {
+void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_BB_CEvent* d);
+void __fastcall fireeventhook(shok_EGL_CGLEEntity* th, int _, shok_BB_CEvent* d) {
 	lua_State* L = *shok_luastate_game;
 	int t = lua_gettop(L);
 	lua_getglobal(L, "event");

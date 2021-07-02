@@ -239,10 +239,10 @@ struct shok_attachment {
 };
 bool operator<(shok_attachment a, shok_attachment b);
 
-struct shok_event_data {
-
-};
 struct shok_BB_CEvent;
+enum class shok_EventIDs : int;
+enum class shok_NetEventIds : int;
+
 
 template<class CastFrom>
 bool contains(CastFrom* data, CastFrom search, int num) {

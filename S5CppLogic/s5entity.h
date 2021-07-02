@@ -153,7 +153,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static shok_EGL_CGLEEntity* ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e);
 
 protected:
-	int EventGetIntById(int id);
+	int EventGetIntById(shok_EventIDs id);
 };
 //constexpr int i = offsetof(shok_EGL_CGLEEntity, TaskHandlers) / 4;
 struct shok_GGL_CBuilding;

@@ -252,6 +252,10 @@ function CppLogic.Logic.SetPlaceBuildingRotation(r) end
 -- @param override func (optional, default nil) (sniper, target, dmg)->dmgOverride called before the projectile gets fired, can change the damage)
 function CppLogic.Logic.FixSnipeDamage(override) end
 
+--- gets the current weather GFX state (4th param of Logic.AddWeatherElement).
+-- @return weatherGFX
+function CppLogic.Logic.GetCurrentWeatherGFXState() end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData)
 -- @param f func
@@ -1149,7 +1153,7 @@ function CppLogic.EntityType.ResourceTreeTypeGetData(ty) end
 -- @param ram resource amount
 function CppLogic.EntityType.ResourceTreeTypeSetData(ty, rety, ram) end
 
---- tree data to replace a tree with a resourcetree.
+--- blocking data of an entitytype.
 -- @param ty entitytype
 -- @return blocking table
 -- @return num blocked points

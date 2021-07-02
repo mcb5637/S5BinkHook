@@ -1,9 +1,6 @@
 #pragma once
 #include "s5data.h"
 
-enum class shok_EventIDs : int;
-enum class shok_NetEventIds : int;
-
 struct shok_BB_CEvent : shok_object {
 	int EventTypeId;
 
@@ -33,6 +30,30 @@ struct shok_EGL_CEventValue_int : shok_BB_CEvent { // EGL::CEventValue<int,-2757
 	static inline constexpr int vtp = 0x763130;
 	static inline constexpr int TypeDesc = 0x801270;
 };
+struct shok_EGL_CEventValue_bool : shok_BB_CEvent { // EGL::CEventValue<bool,703333479>
+	bool Data;
+
+	shok_EGL_CEventValue_bool(shok_EventIDs e, bool d);
+	shok_EGL_CEventValue_bool(shok_EGL_CEventValue_bool&&) = default;
+	shok_EGL_CEventValue_bool(const shok_EGL_CEventValue_bool&) = default;
+	shok_EGL_CEventValue_bool& operator=(shok_EGL_CEventValue_bool&&) = default;
+	shok_EGL_CEventValue_bool& operator=(const shok_EGL_CEventValue_bool&) = default;
+
+	static inline constexpr int vtp = 0x76E220;
+	static inline constexpr int TypeDesc = 0x810ADC;
+};
+struct shok_EGL_CEventValue_float : shok_BB_CEvent { // EGL::CEventValue<float,1278362727>
+	float Data;
+
+	shok_EGL_CEventValue_float(shok_EventIDs e, float d);
+	shok_EGL_CEventValue_float(shok_EGL_CEventValue_float&&) = default;
+	shok_EGL_CEventValue_float(const shok_EGL_CEventValue_float&) = default;
+	shok_EGL_CEventValue_float& operator=(shok_EGL_CEventValue_float&&) = default;
+	shok_EGL_CEventValue_float& operator=(const shok_EGL_CEventValue_float&) = default;
+
+	static inline constexpr int vtp = 0x76F8F4;
+	static inline constexpr int TypeDesc = 0x8117B0;
+};
 
 struct shok_EGL_CEventGetValue_bool : shok_BB_CEvent { // EGL::CEventGetValue<bool,1709081367>
 	bool Data = false;
@@ -58,6 +79,28 @@ struct shok_EGL_CEventGetValue_int : shok_BB_CEvent { // EGL::CEventGetValue<int
 	static inline constexpr int vtp = 0x766CC4;
 	static inline constexpr int TypeDesc = 0x807AA4;
 };
+struct shok_EGL_CEventGetValue_float : shok_BB_CEvent { // EGL::CEventGetValue<float,1468983543>
+	float Data;
+
+	shok_EGL_CEventGetValue_float(shok_EventIDs e);
+	shok_EGL_CEventGetValue_float(shok_EGL_CEventGetValue_float&&) = default;
+	shok_EGL_CEventGetValue_float(const shok_EGL_CEventGetValue_float&) = default;
+	shok_EGL_CEventGetValue_float& operator=(shok_EGL_CEventGetValue_float&&) = default;
+	shok_EGL_CEventGetValue_float& operator=(const shok_EGL_CEventGetValue_float&) = default;
+
+	static inline constexpr int vtp = 0x76E210;
+	static inline constexpr int TypeDesc = 0x810AAC;
+};
+// EGL::CEventGetValue<GGL::CBuildingMerchantBehaviorProps const *,-1872076829> 7704A4
+// EGL::CEventGetValue<GGL::CNeutralBridgeBehavior *,1150290935>
+// EGL::CEventGetValue<GGL::CBattleBehavior *,-646837913>
+// EGL::CEventGetValue<GGL::CSoldierBehavior *,-806903129>
+// EGL::CEventGetValue<GGL::CLeaderBehavior *,-1190255961>
+// EGL::CEventGetValue<GGL::CBehaviorFollow *,-1301899769>
+// EGL::CEventGetValue<EGL::CMovementBehavior *,212523703>
+
+// GGL::CEventHeroAbilityInteger -> valueint
+// GGL::CEventHeroAbilityGetInteger -> getvalueint
 
 
 struct shok_EGL_CEvent1Entity : shok_BB_CEvent {
@@ -151,67 +194,84 @@ struct shok_EGL_CEventSubAnim : shok_BB_CEvent {
 	static inline constexpr int TypeDesc = 0x80E09C;
 };
 
+struct shok_EGL_CEvent2Entities : shok_BB_CEvent {
+private:
+	int vtable_EGL_IEvent2Entities = 0x76D920;
+public:
+	int ActorId, TargetId;
 
-struct shok_event_data_EGL_CEventGetValue_int_1211121895 : shok_event_data {
-	int vtable = 0x766CC4;
-	int id = 0;
-	int result = 0;
+	shok_EGL_CEvent2Entities(shok_EventIDs e, int aid, int tid);
+	shok_EGL_CEvent2Entities(shok_EGL_CEvent2Entities&&) = default;
+	shok_EGL_CEvent2Entities(const shok_EGL_CEvent2Entities&) = default;
+	shok_EGL_CEvent2Entities& operator=(shok_EGL_CEvent2Entities&&) = default;
+	shok_EGL_CEvent2Entities& operator=(const shok_EGL_CEvent2Entities&) = default;
+
+	static inline constexpr int vtp = 0x76D92C;
+	static inline constexpr int TypeDesc = 0x80E0BC;
 };
 
-struct shok_event_data_EGL_CEventPosition : shok_event_data {
-	int vtable = 0x766C70;
-	int id = 0;
-	shok_position pos = { 0,0 };
+struct shok_GGL_CEventTransaction : shok_BB_CEvent {
+	shok_ResourceType SellType, BuyType;
+	float BuyAmount;
+
+	shok_GGL_CEventTransaction(shok_EventIDs e, shok_ResourceType sell, shok_ResourceType buy, float buyAm);
+	shok_GGL_CEventTransaction(shok_GGL_CEventTransaction&&) = default;
+	shok_GGL_CEventTransaction(const shok_GGL_CEventTransaction&) = default;
+	shok_GGL_CEventTransaction& operator=(shok_GGL_CEventTransaction&&) = default;
+	shok_GGL_CEventTransaction& operator=(const shok_GGL_CEventTransaction&) = default;
+
+	static inline constexpr int vtp = 0x76D93C;
+	static inline constexpr int TypeDesc = 0x80E0E0;
 };
-struct shok_event_data_EGL_CEventValue_bool_703333479 : shok_event_data {
-	int vtable = 0x76E220;
-	int id = 0;
-	int b = 0;
+
+struct shok_GGL_CEventPositionAnd2EntityTypes : shok_EGL_CEventPosition {
+	int Type1, Type2;
+
+	shok_GGL_CEventPositionAnd2EntityTypes(shok_EventIDs e, const shok_position& p, int t1, int t2);
+	shok_GGL_CEventPositionAnd2EntityTypes(shok_GGL_CEventPositionAnd2EntityTypes&&) = default;
+	shok_GGL_CEventPositionAnd2EntityTypes(const shok_GGL_CEventPositionAnd2EntityTypes&) = default;
+	shok_GGL_CEventPositionAnd2EntityTypes& operator=(shok_GGL_CEventPositionAnd2EntityTypes&&) = default;
+	shok_GGL_CEventPositionAnd2EntityTypes& operator=(const shok_GGL_CEventPositionAnd2EntityTypes&) = default;
+
+	static inline constexpr int vtp = 0x76D94C;
+	static inline constexpr int TypeDesc = 0x80E104;
 };
-struct shok_event_data_EGL_CEvent1Entity : shok_event_data {
-	int vtable = 0x766C60;
-	int id = 0;
-	int vtable2 = 0x766C58; //EGL::CEvent1Entity ?
-	int entityId = 0;
-};
-struct shok_event_data_BB_CEvent : shok_event_data {
-	int vtable = 0x762114;
-	int id = 0;
-};
-struct shok_event_data_GGL_CEventPositionAnd2EntityTypes : shok_event_data {
-	int vtable = 0x766C70;
-	int id = 0;
-	shok_position pos = { 0,0 };
-	int EntityType1 = 0, EntityType2 = 0;
-};
-struct shok_event_data_EGL_CEventValue_int_27574121 : shok_event_data {
-	int vtable = 0x763130;
-	int id = 0;
-	int i = 0;
-};
-struct shok_event_data_GGL_CEventEntityIndex : shok_event_data {
-	int vtable = 0x766C90;
-	int id = 0;
-	int entity = 0;
-	int index = 0;
-};
-struct shok_event_data_EGL_CEventGetValue_float_1468983543 : shok_event_data {
-	int vtable = 0x76E210;
-	int id = 0;
-	float f = 0.0f;
-};
-struct shok_event_data_GGL_CEventAttachmentTypeGetInteger : shok_event_data {
-	int vtable = 0x766C80;
-	int id = 0;
-	shok_AttachmentType AttachmentType = static_cast<shok_AttachmentType>(0);
-	int i = 0;
-};
-struct shok_event_data_GGL_CEventTransaction : shok_event_data {
-	int vtable = 0x76D93C;
-	int id = 0x1700A;
-	shok_ResourceType SellType = static_cast<shok_ResourceType>(0), BuyType = static_cast<shok_ResourceType>(0);
-	float BuyAmount = 0.0f;
-};
+
+// GGL::CEventPlayerIDInteger -> EGL::CEventPlayerID 76D964
+// EGL::CEventPositionAndEntity 76E150
+// GGL::CEventSourceTargetPlayerID 76F8BC
+// GGL::CEventDiplomacyChanged -> GGL::CEventSourceTargetPlayerID 76F8E4
+// GGL::CEventChangeMotivation -> EGL::CEventValue<float,1278362727> 76F904
+// GGL::CEventWeatherStateChanged 770130
+// GGL::CEventBridgeProgress -> EGL::CEventPlayerID 770494
+// EGL::CEventEntityGetBool
+// EGL::CEventPlayerGetBool
+// GGL::CEventTributePaid
+// GGL::CEventStartAlphaBlending
+// GGL::CEventOfferBase
+// GGL::CEventMercenaryOffer GGL::CEventGetMercenaryOffer
+// GGL::CEventTechOffer GGL::CEventGetTechOffer
+// EGL::CEventRowColumn GGL::CEventGetRowColumn
+// ECore::CECoreEventInteger
+// EGUIX::CEventUpdateTime
+// EGUIX::CGroupEvent
+// EGL::CEvent1Effect
+// EGL::CEventIndexAndEffectType
+
+// GGL::CEventEntityAttachment
+// GGL::CEventAttachmentType
+// GGL::CEventAttachmentTypeGetBool
+// EGL::CEventUVAnim
+// EGL::CEventGetPosition
+// GGL::CEventGoodsTraded -> GGL::CEventTransaction
+// EGL::CEventThousandthsGetInteger
+// EGL::CEventPositionAndTaskState
+// GGL::CEventFollowInfo
+// GGL::CEventKegInfo
+// GGL::CEventGetPositionFromID
+// GGL::CEventIndex
+// EGL::CEventAnimation
+// EGL::CEventEntityInRangeOfEntity
 
 // net events
 struct shok_EGL_CNetEvent2Entities : shok_BB_CEvent {
@@ -467,7 +527,7 @@ enum class shok_EventIDs : int {
 	Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
 	// 1000A serf something extract res get bool
 	ResourceRefiner_Refine = 0x1000B, //BB::CEvent // todo check if this is generic work
-	// 0x1000C res tree int?
+	ResourceTree_Init = 0x1000C, //EGL::CEventGetValue<int,1211121895>
 	Tree_UpdateModel = 0x1000D, //BB::CEvent
 	// 0x1000E res tree get bool
 
@@ -569,10 +629,10 @@ enum class shok_EventIDs : int {
 	// 18003 get bool true
 
 	Leader_AttackEntity = 0x15004, //EGL::CEvent1Entity
-	// 15005 leader, serfbattle
-	// 15007 soldier empty
-	// 15008 leader empty
-	// 15009 leader
+	Leader_OnAttackCommandTargetDetach = 0x15005, //EGL::CEvent1Entity
+	Soldier_OnLeaderDetach = 0x15007, //EGL::CEvent1Entity
+	Leader_OnSoldierDetach = 0x15008, //EGL::CEvent1Entity
+	Leader_AttachSoldier = 0x15009, //EGL::CEvent1Entity
 	Leader_GetHealthPlusTroopHealth = 0x1500A, //EGL::CEventGetValue<int, 1211121895>
 	Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
 	// 1500C battle set target?, autocannon too?
@@ -608,20 +668,21 @@ enum class shok_EventIDs : int {
 	Leader_Defend = 0x15032, //BB::CEvent
 	BombPlacer_CommandPlaceBomb = 0x15033, //EGL::CEventPosition
 	// 15034 also something with fear
-	// 0x15035 rax buy leader?
-	// 15036 leader some area check get
+	Barracks_BuyLeader = 0x15035, //EGL::CEventValue<int,-27574121> ucat
+	Leader_GetNearbyBarracks = 0x15036, //EGL::CEventGetValue<int, 1211121895>
 	Barracks_BuySoldierForLeader = 0x15037, //EGL::CEvent1Entity
 	// 15038 leader? goes to defend after something else
-	// 15039 leader something attack target?
+	// 15039 leader something attack target? on attacked
 	// 1503A leader
 	Leader_IsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
 	// 1503C serf some kind of stop?
+	GetArmor = 0x1503E, //EGL::CEventGetValue<int, 1211121895>
 	Barracks_GetTrainingTaskList = 0x1503F, //EGL::CEventGetValue<int, 1211121895>
 	Barracks_GetTrainingTime = 0x15040, //EGL::CEventGetValue<float, 1468983543>
 	// 0x15041 rax is training allowed?
-	// 15042 leader set training tl?
+	Leader_SetTrainingTL = 0x15042, //EGL::CEventValue<int,-27574121>
 	Barracks_GetLeaveTaskList = 0x15043, //EGL::CEventGetValue<int, 1211121895>
-	// 15044 leader to 12002
+	Leader_OnBarracksDetach = 0x15044, //EGL::CEvent1Entity
 	Leader_ExpellSoldier = 0x15046, //EGL::CEventValue<bool,703333479> bool seems to be use effect
 	WorkerAlarmMode_Enable = 0x15047, //BB::CEvent
 	WorkerAlarmMode_Disable = 0x15048, //BB::CEvent
@@ -670,8 +731,8 @@ enum class shok_EventIDs : int {
 	CircularAttack_ActivateCommand = 0x16022, //BB::CEvent
 	ConvertBuilding_ActivateCommand = 0x16023, //EGL::CEvent1Entity
 	ConvertBuilding_OnTargetDetach = 0x16024, //EGL::CEvent1Entity
-	ComvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
-	ComvertSettler_OnTargetDetach = 0x16028, //EGL::CEvent1Entity
+	ConvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
+	ConvertSettler_OnTargetDetach = 0x16028, //EGL::CEvent1Entity
 	LimitedLifespan_GetTimeRemaining = 0x16029, //EGL::CEventGetValue<int,1211121895>
 	LimitedLifespan_GetTimeMax = 0x1602A, //EGL::CEventGetValue<int,1211121895>
 	HeroBehavior_GetSpawnTurn = 0x1602B, //EGL::CEventGetValue<int,1211121895>
@@ -725,9 +786,9 @@ enum class shok_EventIDs : int {
 	BuildingTechTrader_GetOffer = 0x1702C, //GGL::CEventGetTechOffer
 	// 0x1702D builtechtrad ret true
 
-	// 18002 serf ret true
-	// 18004 leader ret true
-	// 18005 soldier ret true
+	IsSerf = 0x18002, //EGL::CEventGetValue<bool, 1709081367>
+	IsLeader = 0x18004, //EGL::CEventGetValue<bool, 1709081367>
+	IsSoldier = 0x18005, //EGL::CEventGetValue<bool, 1709081367>
 	// 18007 battle, autocannon ret true
 	// 18006 herobeh ret true
 	DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
@@ -750,6 +811,7 @@ enum class shok_EventIDs : int {
 
 	MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim
 	Behavior_Tick = 0x20005, //BB::CEvent ticks every second
+	Movement_IsMoving = 0x20009, //EGL::CEventGetValue<bool,1709081367>
 	Die = 0x2000A, ///BB::CEvent
 
 	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>

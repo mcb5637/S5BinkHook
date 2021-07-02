@@ -8,7 +8,7 @@ struct shok_vtable_EGL_CGLEEntity {
 	void(__thiscall* Destroy)(shok_EGL_CGLEEntity* th, int i); // 3
 	PADDINGI(11);
 	void(__thiscall* ExecuteTask)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
-	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_event_data* d); // 16
+	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_BB_CEvent* d); // 16
 	PADDINGI(2);
 	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, int taskhandler); // 19
 	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, int eventid, int eventhandler); // 20
@@ -60,32 +60,31 @@ shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntity::GetEntityType()
 	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
 }
 
-int shok_EGL_CGLEEntity::EventGetIntById(int id)
+int shok_EGL_CGLEEntity::EventGetIntById(shok_EventIDs id)
 {
-	shok_event_data_EGL_CEventGetValue_int_1211121895 d{};
-	d.id = id;
+	shok_EGL_CEventGetValue_int d {id};
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &d);
-	return d.result;
+	return d.Data;
 }
 
 int shok_EGL_CGLEEntity::EventGetDamage()
 {
-	return EventGetIntById(0x1503D);
+	return EventGetIntById(shok_EventIDs::GetDamage);
 }
 int shok_EGL_CGLEEntity::EventGetArmor()
 {
-	return EventGetIntById(0x1503E);
+	return EventGetIntById(shok_EventIDs::GetArmor);
 }
 int shok_EGL_CGLEEntity::EventGetMaxWorktime()
 {
-	return EventGetIntById(0x1301A);
+	return EventGetIntById(shok_EventIDs::Worker_GetMaxWorkTime);
 }
 
 shok_LeaderCommand shok_EGL_CGLEEntity::EventLeaderGetCurrentCommand()
 {
 	if (GetBehavior<shok_GGL_CLeaderBehavior>() == nullptr)
 		return shok_LeaderCommand::Unknown;
-	return static_cast<shok_LeaderCommand>(EventGetIntById(0x1502D));
+	return static_cast<shok_LeaderCommand>(EventGetIntById(shok_EventIDs::Leader_GetCommand));
 }
 
 float shok_EGL_CGLEEntity::GetExploration()
@@ -101,11 +100,9 @@ int shok_EGL_CGLEEntity::GetMaxHealth()
 
 int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(shok_AttachmentType attachType)
 {
-	shok_event_data_GGL_CEventAttachmentTypeGetInteger ev{};
-	ev.id = 0x1A007;
-	ev.AttachmentType = attachType;
+	shok_GGL_CEventAttachmentTypeGetInteger ev{ shok_EventIDs::LimitedAttachment_GetMax, attachType };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
-	return ev.i;
+	return ev.Data;
 }
 
 
@@ -133,16 +130,14 @@ void shok_EGL_CGLEEntity::DetachObservedEntity(shok_AttachmentType attachtype, i
 
 int shok_EGL_CMovingEntity::LeaderGetNearbyBarracks()
 {
-	return EventGetIntById(0x15036);
+	return EventGetIntById(shok_EventIDs::Leader_GetNearbyBarracks);
 }
 
 bool shok_EGL_CMovingEntity::IsMoving()
 {
-	shok_event_data_EGL_CEventValue_bool_703333479 d{};
-	d.id = 0x20009;
-	d.b = false;
+	shok_EGL_CEventGetValue_bool d{ shok_EventIDs::Movement_IsMoving };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &d);
-	return d.b;
+	return d.Data;
 }
 
 bool shok_GGL_CSettler::IsIdle()
@@ -213,15 +208,14 @@ int shok_GGL_CBuilding::GetTechnologyInResearch()
 
 int shok_GGL_CBuilding::GetCannonProgress()
 {
-	return EventGetIntById(0x17014);
+	return EventGetIntById(shok_EventIDs::Foundry_GetProgress);
 }
 
 float shok_GGL_CBuilding::GetMarketProgress()
 {
-	shok_event_data_EGL_CEventGetValue_float_1468983543 ev{};
-	ev.id = 0x17009;
+	shok_EGL_CEventGetValue_float ev{ shok_EventIDs::Market_GetProgress };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
-	return ev.f;
+	return ev.Data;
 }
 
 static inline void(__thiscall* const entitysethealth)(shok_EGL_CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity *, int)>(0x57A6D9);
@@ -275,58 +269,41 @@ void shok_EGL_CGLEEntity::ClearAttackers()
 
 void shok_EGL_CMovingEntity::AttackMove(shok_position& p)
 {
-	shok_event_data_EGL_CEventPosition ev{};
-	ev.id = 0x1502E; // attack move
-	ev.pos.X = p.X;
-	ev.pos.Y = p.Y;
+	shok_EGL_CEventPosition ev{ shok_EventIDs::Leader_AttackMove, p};
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
-	//shok_event_data_EGL_CEventValue_bool_703333479 e2 = shok_event_data_EGL_CEventValue_bool_703333479();
-	//e2.id = 0x1503B; // set target rotation state
-	//e2.b = 0;
-	//((shok_vtable_EGL_CGLEEntity*)vtable)->FireEvent(this, &e2);
 	TargetRotationValid = 0;
 }
 
 void shok_EGL_CMovingEntity::AttackEntity(int targetId)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x15004;
-	ev.entityId = targetId;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_AttackEntity, targetId };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::Move(shok_position& p)
 {
-	shok_event_data_EGL_CEventPosition ev{};
-	ev.id = 0x11002; // move
-	ev.pos.X = p.X;
-	ev.pos.Y = p.Y;
+	shok_EGL_CEventPosition ev{ shok_EventIDs::MoveCommand_Move, p };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 	TargetRotationValid = 0;
 }
 
 void shok_EGL_CMovingEntity::HoldPosition()
 {
-	shok_event_data_BB_CEvent ev{};
-	ev.id = 0x1502F;
+	shok_BB_CEvent ev{ shok_EventIDs::Leader_HoldPosition };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::Defend()
 {
-	shok_event_data_BB_CEvent ev{};
-	ev.id = 0x15032;
+	shok_BB_CEvent ev{ shok_EventIDs::Leader_Defend };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::LeaderAttachSoldier(int soldierId)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x15009;
-	ev.entityId = soldierId;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_AttachSoldier, soldierId };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x15017;
+	shok_BB_CEvent e2{ shok_EventIDs::Formation_AssumePosition };
 	shok_EGL_CGLEEntity* sol = shok_EGL_CGLEEntity::GetEntityByID(soldierId);
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(sol, &e2);
 }
@@ -335,167 +312,125 @@ static inline void(__thiscall* const shok_entity_expellSettler)(shok_EGL_CGLEEnt
 void shok_EGL_CMovingEntity::SettlerExpell()
 {
 	if (GetBehavior<shok_GGL_CLeaderBehavior>() && ObservedEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER; })) {
-		shok_event_data_EGL_CEventValue_bool_703333479 ev{};
-		ev.id = 0x15046;
-		ev.b = true;
+		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_ExpellSoldier, true };
 		reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 	}
 	else {
-		//((shok_vtable_EGL_CGLEEntity*)vtable)->Destroy(this, 1);
 		shok_entity_expellSettler(this, 1);
 	}
 }
 
 void shok_EGL_CMovingEntity::HeroAbilitySendHawk(shok_position& p)
 {
-	shok_event_data_EGL_CEventPosition ev{};
-	ev.id = 0x16002;
-	ev.pos.X = p.X;
-	ev.pos.Y = p.Y;
+	shok_EGL_CEventPosition ev{ shok_EventIDs::HeroHawk_SendHawk, p};
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityInflictFear()
 {
-	shok_event_data_BB_CEvent ev{};
-	ev.id = 0x16026;
+	shok_BB_CEvent ev{ shok_EventIDs::InflictFear_Activate };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityPlaceBomb(shok_position& p)
 {
-	shok_event_data_EGL_CEventPosition ev{};
-	ev.id = 0x15033;
-	ev.pos.X = p.X;
-	ev.pos.Y = p.Y;
+	shok_EGL_CEventPosition ev{ shok_EventIDs::BombPlacer_CommandPlaceBomb, p };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityPlaceCannon(shok_position& p, int FoundationType, int CannonType)
 {
-	shok_event_data_GGL_CEventPositionAnd2EntityTypes ev{};
-	ev.id = 0x1600A;
-	ev.pos.X = p.X;
-	ev.pos.Y = p.Y;
-	ev.EntityType1 = FoundationType;
-	ev.EntityType2 = CannonType;
+	shok_GGL_CEventPositionAnd2EntityTypes ev{ shok_EventIDs::CannonBuilder_BuildCannonCommand, p, FoundationType, CannonType };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityRangedEffect()
 {
-	shok_event_data_BB_CEvent ev{};
-	ev.id = 0x1601C;
+	shok_BB_CEvent ev{ shok_EventIDs::RangedEffect_Activate };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityCircularAttack()
 {
-	shok_event_data_BB_CEvent ev{};
-	ev.id = 0x16022;
+	shok_BB_CEvent ev{ shok_EventIDs::CircularAttack_ActivateCommand };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilitySummon()
 {
-	shok_event_data_BB_CEvent ev{};
-	ev.id = 0x1601A;
+	shok_BB_CEvent ev{ shok_EventIDs::Summon_ActivateCommand };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityConvert(int target)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x16027;
-	ev.entityId = target;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::ConvertSettler_ActivateCommand, target };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityConvertBuilding(int target)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x16023;
-	ev.entityId = target;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::ConvertBuilding_ActivateCommand, target };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilitySnipe(int tid)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x1602D;
-	ev.entityId = tid;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Sniper_SnipeCommand, tid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityShuriken(int tid)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x1602F;
-	ev.entityId = tid;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Shuriken_ActivateCommand, tid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::HeroAbilityActivateCamoflage()
 {
-	shok_event_data_BB_CEvent e{};
-	e.id = 0x16015;
+	shok_BB_CEvent e{ shok_EventIDs::Camouflage_Activate };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e);
 }
 
 void shok_EGL_CMovingEntity::ThiefSabotage(int tid)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x10107;
-	ev.entityId = tid;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::KegPlacer_SabotageCommand, tid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::ThiefDefuse(int tid)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x1010E;
-	ev.entityId = tid;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::KegPlacer_DefuseCommand, tid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::ThiefStealFrom(int tid)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x10102;
-	ev.entityId = tid;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Thief_StealFromCommand, tid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::ThiefSecureGoods(int tid)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x10103;
-	ev.entityId = tid;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Thief_SecureGoodsCommand, tid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::ScoutBinoculars(shok_position& p)
 {
-	shok_event_data_EGL_CEventPosition ev{};
-	ev.id = 0x11102;
-	ev.pos.X = p.X;
-	ev.pos.Y = p.Y;
+	shok_EGL_CEventPosition ev{ shok_EventIDs::Binocular_ExploreCommand, p };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::ScoutFindResource()
 {
-	shok_event_data_BB_CEvent ev{};
-	ev.id = 0x11104;
+	shok_BB_CEvent ev{ shok_EventIDs::PointToResources_Activate };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::ScoutPlaceTorch(shok_position& p)
 {
-	shok_event_data_EGL_CEventPosition ev{};
-	ev.id = 0x11103;
-	ev.pos.X = p.X;
-	ev.pos.Y = p.Y;
+	shok_EGL_CEventPosition ev{ shok_EventIDs::TorchPlacer_PlaceTorch, p };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
@@ -504,10 +439,7 @@ bool shok_EGL_CMovingEntity::SerfConstructBuilding(shok_GGL_CBuilding* build)
 	int cid = build->GetNearestFreeConstructionSlotFor(&this->Position);
 	if (cid < 0)
 		return false;
-	shok_event_data_GGL_CEventEntityIndex ev{};
-	ev.id = 0x14003;
-	ev.entity = build->GetConstructionSite();
-	ev.index = cid;
+	shok_GGL_CEventEntityIndex ev{ shok_EventIDs::Serf_Construct, build->GetConstructionSite(), cid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 	return true;
 }
@@ -517,33 +449,26 @@ bool shok_EGL_CMovingEntity::SerfRepairBuilding(shok_GGL_CBuilding* build)
 	int cid = build->GetNearestFreeRepairSlotFor(&this->Position);
 	if (cid < 0)
 		return false;
-	shok_event_data_GGL_CEventEntityIndex ev{};
-	ev.id = 0x14003; // repair and build are the same event, just different target entity
-	ev.entity = build->EntityId;
-	ev.index = cid;
+	shok_GGL_CEventEntityIndex ev{ shok_EventIDs::Serf_Construct, build->EntityId, cid };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 	return true;
 }
 
 void shok_EGL_CMovingEntity::SerfExtractResource(int id)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x10009;
-	ev.entityId = id;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Serf_ExtractResource, id };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
 void shok_EGL_CMovingEntity::SerfTurnToBattleSerf()
 {
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x14005;
+	shok_BB_CEvent e2{ shok_EventIDs::Serf_CommandTurnToBattleSerf };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
 void shok_EGL_CMovingEntity::BattleSerfTurnToSerf()
 {
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x14006;
+	shok_BB_CEvent e2{ shok_EventIDs::BattleSerf_CommandTurnToSerf };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
@@ -568,17 +493,13 @@ void shok_GGL_CBuilding::CancelUpgrade()
 
 void shok_GGL_CBuilding::CommandBuildCannon(int entitytype)
 {
-	shok_event_data_EGL_CEventValue_int_27574121 e{};
-	e.id = 0x17016;
-	e.i = entitytype;
+	shok_EGL_CEventValue_int e{ shok_EventIDs::Foundry_BuildCannonCommand, entitytype };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e);
 }
 
 void shok_GGL_CBuilding::CommandRecruitSoldierForLeader(int id)
 {
-	shok_event_data_EGL_CEvent1Entity ev{};
-	ev.id = 0x15037;
-	ev.entityId = id;
+	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Barracks_BuySoldierForLeader, id };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
@@ -595,29 +516,25 @@ void shok_GGL_CBuilding::DeactivateOvertime()
 
 void shok_GGL_CBuilding::BarracksRecruitGroups()
 {
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x1701E;
+	shok_BB_CEvent e2{ shok_EventIDs::Barracks_ActivateAutoFill };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
 void shok_GGL_CBuilding::BarracksRecruitLeaders()
 {
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x1701F;
+	shok_BB_CEvent e2{ shok_EventIDs::Barracks_DeActivateAutoFill };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
 void shok_GGL_CBuilding::HQBuySerf()
 {
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x14004;
+	shok_BB_CEvent e2{ shok_EventIDs::Keep_BuySerfCommand };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
 void shok_GGL_CBuilding::SellBuilding()
 {
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x2000A;
+	shok_BB_CEvent e2{ shok_EventIDs::Die };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
@@ -635,17 +552,13 @@ void shok_GGL_CBuilding::CancelResearch()
 
 void shok_GGL_CBuilding::MarketStartTrade(shok_ResourceType ResourceTypeSell, shok_ResourceType ResourceTypeBuy, float BuyAmount)
 {
-	shok_event_data_GGL_CEventTransaction e2{};
-	e2.SellType = ResourceTypeSell;
-	e2.BuyType = ResourceTypeBuy;
-	e2.BuyAmount = BuyAmount;
+	shok_GGL_CEventTransaction e2{ shok_EventIDs::Market_StartTrade, ResourceTypeSell, ResourceTypeBuy, BuyAmount };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
 void shok_GGL_CBuilding::MarketCancelTrade()
 {
-	shok_event_data_BB_CEvent e2{};
-	e2.id = 0x1700B;
+	shok_BB_CEvent e2{ shok_EventIDs::Market_CancelTrade };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
 }
 
@@ -892,9 +805,7 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_E
 	}
 	int id = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	shok_EGL_CGLEEntity* r = shok_EGL_CGLEEntity::GetEntityByID(id);
-	shok_event_data_EGL_CEventValue_int_27574121 ev{};
-	ev.id = 0x1000C;
-	ev.i = e->EntityType;
+	shok_EGL_CEventValue_int ev{ shok_EventIDs::ResourceTree_Init, e->EntityType };
 	((shok_vtable_EGL_CGLEEntity*)r->vtable)->FireEvent(r, &ev);
 	e->Destroy();
 	return r;
@@ -999,13 +910,13 @@ void __declspec(naked) entitydamagemodbattlemeleeonhitasm() {
 		ret;
 	}
 }
-shok_event_data_EGL_CEventGetValue_int_1211121895* __fastcall entitydamagemodeventautocannonasm(shok_GGL_CAutoCannonBehavior* th, int, shok_event_data_EGL_CEventGetValue_int_1211121895* ev) {
+shok_EGL_CEventGetValue_int* __fastcall entitydamagemodeventautocannonasm(shok_GGL_CAutoCannonBehavior* th, int, shok_EGL_CEventGetValue_int* ev) {
 	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
 	entityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->DamageOverride >= 0)
-		ev->result = d->DamageOverride;
+		ev->Data = d->DamageOverride;
 	else
-		ev->result = e->GetEntityType()->GetBehaviorProps<shok_GGL_CAutoCannonBehaviorProps>()->DamageAmount;
+		ev->Data = e->GetEntityType()->GetBehaviorProps<shok_GGL_CAutoCannonBehaviorProps>()->DamageAmount;
 	return ev;
 }
 void __declspec(naked) entitydamagemodbattleprojectilearrowasm() {

@@ -18,6 +18,16 @@ shok_EGL_CEventValue_int::shok_EGL_CEventValue_int(shok_EventIDs e, int d) : sho
 	vtable = shok_EGL_CEventValue_int::vtp;
 	Data = d;
 }
+shok_EGL_CEventValue_bool::shok_EGL_CEventValue_bool(shok_EventIDs e, bool d) : shok_BB_CEvent(e)
+{
+	vtable = shok_EGL_CEventValue_bool::vtp;
+	Data = d;
+}
+shok_EGL_CEventValue_float::shok_EGL_CEventValue_float(shok_EventIDs e, float d) : shok_BB_CEvent(e)
+{
+	vtable = shok_EGL_CEventValue_float::vtp;
+	Data = d;
+}
 
 shok_EGL_CEventGetValue_bool::shok_EGL_CEventGetValue_bool(shok_EventIDs e) : shok_BB_CEvent(e)
 {
@@ -26,6 +36,10 @@ shok_EGL_CEventGetValue_bool::shok_EGL_CEventGetValue_bool(shok_EventIDs e) : sh
 shok_EGL_CEventGetValue_int::shok_EGL_CEventGetValue_int(shok_EventIDs e) : shok_BB_CEvent(e)
 {
 	vtable = shok_EGL_CEventGetValue_int::vtp;
+}
+shok_EGL_CEventGetValue_float::shok_EGL_CEventGetValue_float(shok_EventIDs e) : shok_BB_CEvent(e)
+{
+	vtable = shok_EGL_CEventGetValue_float::vtp;
 }
 
 shok_EGL_CEvent1Entity::shok_EGL_CEvent1Entity(shok_EventIDs e, int ent) : shok_BB_CEvent(e)
@@ -66,6 +80,28 @@ shok_EGL_CEventSubAnim::shok_EGL_CEventSubAnim(shok_EventIDs e, int an, int subi
 	SubAnimIndex = subind;
 	PlayBackwards = back;
 	IsLooped = loop;
+}
+
+shok_EGL_CEvent2Entities::shok_EGL_CEvent2Entities(shok_EventIDs e, int aid, int tid) : shok_BB_CEvent(e)
+{
+	vtable = shok_EGL_CEvent2Entities::vtp;
+	ActorId = aid;
+	TargetId = tid;
+}
+
+shok_GGL_CEventTransaction::shok_GGL_CEventTransaction(shok_EventIDs e, shok_ResourceType sell, shok_ResourceType buy, float buyAm) : shok_BB_CEvent(e)
+{
+	vtable = shok_GGL_CEventTransaction::vtp;
+	SellType = sell;
+	BuyType = buy;
+	BuyAmount = buyAm;
+}
+
+shok_GGL_CEventPositionAnd2EntityTypes::shok_GGL_CEventPositionAnd2EntityTypes(shok_EventIDs e, const shok_position& p, int t1, int t2) : shok_EGL_CEventPosition(e, p)
+{
+	vtable = shok_GGL_CEventPositionAnd2EntityTypes::vtp;
+	Type1 = t1;
+	Type2 = t2;
 }
 
 shok_EGL_CNetEvent2Entities::shok_EGL_CNetEvent2Entities(shok_NetEventIds id, int actor, int tar) : shok_BB_CEvent(id)

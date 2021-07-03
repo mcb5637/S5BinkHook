@@ -67,6 +67,11 @@ int shok_EGL_CGLEEntity::EventGetIntById(shok_EventIDs id)
 	return d.Data;
 }
 
+void shok_EGL_CGLEEntity::FireEvent(shok_BB_CEvent* ev)
+{
+	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, ev);
+}
+
 int shok_EGL_CGLEEntity::EventGetDamage()
 {
 	return EventGetIntById(shok_EventIDs::GetDamage);

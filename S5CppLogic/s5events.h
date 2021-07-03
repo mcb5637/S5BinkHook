@@ -80,7 +80,7 @@ struct shok_EGL_CEventGetValue_int : shok_BB_CEvent { // EGL::CEventGetValue<int
 	static inline constexpr int TypeDesc = 0x807AA4;
 };
 struct shok_EGL_CEventGetValue_float : shok_BB_CEvent { // EGL::CEventGetValue<float,1468983543>
-	float Data;
+	float Data = 0.0f;
 
 	shok_EGL_CEventGetValue_float(shok_EventIDs e);
 	shok_EGL_CEventGetValue_float(shok_EGL_CEventGetValue_float&&) = default;
@@ -144,6 +144,19 @@ struct shok_GGL_CEventAttachmentTypeGetInteger : shok_BB_CEvent {
 
 	static inline constexpr int vtp = 0x766C80;
 	static inline constexpr int TypeDesc = 0x8079EC;
+};
+struct shok_GGL_CEventAttachmentTypeInteger : shok_BB_CEvent {
+	shok_AttachmentType AttachmentType;
+	int Data = 0;
+
+	shok_GGL_CEventAttachmentTypeInteger(shok_EventIDs e, shok_AttachmentType t, int d);
+	shok_GGL_CEventAttachmentTypeInteger(shok_GGL_CEventAttachmentTypeInteger&&) = default;
+	shok_GGL_CEventAttachmentTypeInteger(const shok_GGL_CEventAttachmentTypeInteger&) = default;
+	shok_GGL_CEventAttachmentTypeInteger& operator=(shok_GGL_CEventAttachmentTypeInteger&&) = default;
+	shok_GGL_CEventAttachmentTypeInteger& operator=(const shok_GGL_CEventAttachmentTypeInteger&) = default;
+
+	static inline constexpr int vtp = 0x775E28;
+	static inline constexpr int TypeDesc = 0x81D3A8;
 };
 
 struct shok_GGL_CEventEntityIndex : shok_BB_CEvent {
@@ -235,6 +248,21 @@ struct shok_GGL_CEventPositionAnd2EntityTypes : shok_EGL_CEventPosition {
 
 	static inline constexpr int vtp = 0x76D94C;
 	static inline constexpr int TypeDesc = 0x80E104;
+};
+
+struct shok_GGL_CEventEntityAttachment : shok_BB_CEvent {
+	shok_AttachmentType Type;
+	int EntityId;
+	shok_EventIDs DetachEvent;
+
+	shok_GGL_CEventEntityAttachment(shok_EventIDs e, shok_AttachmentType ty, int eid, shok_EventIDs detach);
+	shok_GGL_CEventEntityAttachment(shok_GGL_CEventEntityAttachment&&) = default;
+	shok_GGL_CEventEntityAttachment(const shok_GGL_CEventEntityAttachment&) = default;
+	shok_GGL_CEventEntityAttachment& operator=(shok_GGL_CEventEntityAttachment&&) = default;
+	shok_GGL_CEventEntityAttachment& operator=(const shok_GGL_CEventEntityAttachment&) = default;
+
+	static inline constexpr int vtp = 0x770844;
+	static inline constexpr int TypeDesc = 0x8129E0;
 };
 
 // GGL::CEventPlayerIDInteger -> EGL::CEventPlayerID 76D964
@@ -519,14 +547,16 @@ struct shok_Framework_CEventGameSpeed : shok_BB_CEvent {
 };
 
 enum class shok_EventIDs : int {
-	ResourceDoodad_RemoveOneRes = 0x10002, //BB::CEvent
+	NoDetachEvent = 0, // only use for attachmen detach event
+
+	ResourceDoodad_RemoveOneRes = 0x10002, //BB::CEvent unused
 	OnResourceDoodadDetach = 0x10003, //EGL::CEvent1Entity, also bserf
 	Mine_DoWorkStep = 0x10004, //BB::CEvent
 	Follow_GetFollowStatus = 0x10008, //EGL::CEventGetValue<int,1211121895>
 	Mine_GetResourcesRemaining = 0x10007, //EGL::CEventGetValue<int,1211121895>
 	Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
 	// 1000A serf something extract res get bool
-	ResourceRefiner_Refine = 0x1000B, //BB::CEvent // todo check if this is generic work
+	ResourceRefiner_Refine = 0x1000B, //BB::CEvent
 	ResourceTree_Init = 0x1000C, //EGL::CEventGetValue<int,1211121895>
 	Tree_UpdateModel = 0x1000D, //BB::CEvent
 	// 0x1000E res tree get bool
@@ -795,13 +825,13 @@ enum class shok_EventIDs : int {
 	// 1800C resourcerefiner ret true
 	// 1800D thefbeh ret true
 
-	// 1A002 limitedattachment on attach?
-	// 1A003 limitedattachment on detach?
-	// 1A004 limitedattach maybe get is full? maybe get is limited?
+	LimitedAttachment_Attach = 0x1A002, //GGL::CEventEntityAttachment
+	LimitedAttachment_Dettach = 0x1A003, //GGL::CEventEntityAttachment
+	// 1A004 limitedattach maybe get is full? maybe get is limited?, is unused
 	LimitedAttachment_IsActive = 0x1A005, //GGL::CEventAttachmentTypeGetBool
-	// 1A006 limitedattach maybe get curr?
+	LimitedAttachment_SetLimit = 0x1A006, //GGL::CEventAttachmentTypeInteger
 	LimitedAttachment_GetMax = 0x1A007, //GGL::CEventAttachmentTypeGetInteger
-	// 1A008 limitedattachment maybe get left?
+	LimitedAttachment_GetFree = 0x1A008, //GGL::CEventAttachmentTypeGetInteger
 	LimitedAttachment_Activate = 0x1A009, //GGL::CEventAttachmentType
 	LimitedAttachment_DeActivate = 0x1A00A, //GGL::CEventAttachmentType
 

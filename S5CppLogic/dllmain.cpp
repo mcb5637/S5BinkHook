@@ -98,8 +98,16 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    shok_GGL_CEventEntityIndex e{ shok_EventIDs::AffectMotivation_GetEffect, 0,0 };
-    luaext_checkSettler(L, 1)->HeroAbilityConvertBuilding(luaext_checkBulding(L, 2)->EntityId);
+    int id = luaext_checkEntityId(L, 1);
+    __asm {
+        int 3;
+        mov ecx, [0x882F54]; // GGUI::C3DOnScreenInformationCustomWidget obj
+        mov ecx, [ecx];
+        push 500;
+        push id;
+        mov eax, 0x536361;
+        call eax;
+    };
     return 0;
 }
 

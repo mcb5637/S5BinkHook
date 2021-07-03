@@ -84,6 +84,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int GetResourceProvided();
 	shok_GGlue_CGlueEntityProps* GetEntityType();
 
+	void FireEvent(shok_BB_CEvent* ev);
 	int EventGetDamage();
 	int EventGetArmor();
 	int EventGetMaxWorktime();

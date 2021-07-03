@@ -59,6 +59,12 @@ shok_GGL_CEventAttachmentTypeGetInteger::shok_GGL_CEventAttachmentTypeGetInteger
 	vtable = shok_GGL_CEventAttachmentTypeGetInteger::vtp;
 	AttachmentType = t;
 }
+shok_GGL_CEventAttachmentTypeInteger::shok_GGL_CEventAttachmentTypeInteger(shok_EventIDs e, shok_AttachmentType t, int d) : shok_BB_CEvent(e)
+{
+	vtable = shok_GGL_CEventAttachmentTypeInteger::vtp;
+	AttachmentType = t;
+	Data = d;
+}
 
 shok_GGL_CEventEntityIndex::shok_GGL_CEventEntityIndex(shok_EventIDs e, int eid, int ind) : shok_BB_CEvent(e)
 {
@@ -102,6 +108,14 @@ shok_GGL_CEventPositionAnd2EntityTypes::shok_GGL_CEventPositionAnd2EntityTypes(s
 	vtable = shok_GGL_CEventPositionAnd2EntityTypes::vtp;
 	Type1 = t1;
 	Type2 = t2;
+}
+
+shok_GGL_CEventEntityAttachment::shok_GGL_CEventEntityAttachment(shok_EventIDs e, shok_AttachmentType ty, int eid, shok_EventIDs detach) : shok_BB_CEvent(e)
+{
+	vtable = shok_GGL_CEventEntityAttachment::vtp;
+	Type = ty;
+	EntityId = eid;
+	DetachEvent = detach;
 }
 
 shok_EGL_CNetEvent2Entities::shok_EGL_CNetEvent2Entities(shok_NetEventIds id, int actor, int tar) : shok_BB_CEvent(id)

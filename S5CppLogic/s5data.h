@@ -244,8 +244,8 @@ enum class shok_EventIDs : int;
 enum class shok_NetEventIds : int;
 
 
-template<class CastFrom>
-bool contains(CastFrom* data, CastFrom search, int num) {
+template<class T>
+bool contains(T* data, T search, int num) {
 	for (int i = 0; i < num; i++)
 		if (data[i] == search)
 			return true;

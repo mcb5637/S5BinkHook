@@ -273,6 +273,17 @@ shok_EGUIX_CContainerWidget* shok_EGUIX_CContainerWidget::Create()
     return r;
 }
 
+static inline void(__thiscall* const showresfloatie)(shok_GGUI_C3DOnScreenInformationCustomWidget* th, int eid, int am) = reinterpret_cast<void(__thiscall*)(shok_GGUI_C3DOnScreenInformationCustomWidget*, int, int)>(0x536361);
+void shok_GGUI_C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(int eid, int amount)
+{
+    showresfloatie(this, eid, amount);
+}
+
+void shok_GGUI_C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool showwood)
+{
+    *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok_ResourceType::WoodRaw);
+}
+
 static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);
 void shok_fontManager::LoadFont(int* outFontID, const char* fontName)
 {

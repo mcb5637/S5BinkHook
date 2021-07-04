@@ -230,6 +230,19 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 	static shok_EGUIX_CProgressBarWidget* Create();
 };
 
+struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_object {
+	int vtable_EGUIX_ICustomWidget;
+
+	static inline constexpr int vtp = 0x77D490;
+	static inline constexpr int TypeDesc = 0x82E1E8;
+
+	void ShowResourceFloatieOnEntity(int eid, int amount);
+
+	static void HookResourceFloatieShowWood(bool showwood); // unfortunately there is something else that prevents this...
+
+	static inline shok_GGUI_C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<shok_GGUI_C3DOnScreenInformationCustomWidget**>(0x882F54);
+};
+
 struct shok_widgetManager { // this thing has no vtable...
 	PADDINGI(1);
 	vector_padding;

@@ -1670,6 +1670,13 @@ function CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild(wid, name, befo
 -- @return id
 function CppLogic.UI.ContainerWidgetCreateContainerWidgetChild(wid, name, before) end
 
+--- shows a resources gained floating number at a specific entity.
+-- entity has to be visible, but settlers or rocks work fine.
+-- if the entity moves, the floatie does move with it.
+-- @param entity entity defines screen position
+-- @param amount number to show (abs of this int gets shown)
+function CppLogic.UI.ShowResourceFloatieOnEntity(entity, amount) end
+
 --- char entered callback. use string.char to get the character.
 -- does not work with SCELoader.
 -- gets called when a key (or key kombination) is pressed that can be converted to a char.

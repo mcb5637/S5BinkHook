@@ -617,6 +617,11 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 	return 0;
 }
 
+int l_ui_ShowResFloatie(lua_State* L) {
+	(*shok_GGUI_C3DOnScreenInformationCustomWidget::GlobalObj)->ShowResourceFloatieOnEntity(luaext_checkEntityId(L, 1), luaL_checkint(L, 2));
+	return 0;
+}
+
 void l_ui_cleanup(lua_State* L) {
 	UIInput_Char_Callback = nullptr;
 	UIInput_Key_Callback = nullptr;
@@ -670,6 +675,7 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "SetCharTrigger", &l_ui_SetCharTrigger);
 	luaext_registerFunc(L, "SetKeyTrigger", &l_ui_SetKeyTrigger);
 	luaext_registerFunc(L, "SetMouseTrigger", &l_ui_SetMouseTrigger);
+	luaext_registerFunc(L, "ShowResourceFloatieOnEntity", &l_ui_ShowResFloatie);
 }
 
 // CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")

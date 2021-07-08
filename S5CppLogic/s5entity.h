@@ -186,6 +186,7 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	void HeroAbilityConvertBuilding(int target);
 	void HeroAbilitySnipe(int tid);
 	void HeroAbilityShuriken(int tid);
+	void HeroAbilityMotivateWorkers();
 	void HeroAbilityActivateCamoflage();
 	void ThiefSabotage(int tid);
 	void ThiefDefuse(int tid);

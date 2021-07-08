@@ -698,7 +698,7 @@ function CppLogic.Entity.Settler.CommandInflictFear(id) end
 -- asserts if ability cannot be used.
 -- @param id entity
 -- @param p target
-function CppLogic.Entity.Settler.CommandPlaceBomb(id) end
+function CppLogic.Entity.Settler.CommandPlaceBomb(id, p) end
 
 --- command to inflict fear.
 -- asserts if ability cannot be used, checks position.
@@ -725,6 +725,11 @@ function CppLogic.Entity.Settler.CommandCircularAttack(id) end
 -- @return ids of summoned entities
 function CppLogic.Entity.Settler.CommandSummon(id) end
 
+--- command to activate camoflage.
+-- asserts if ability cannot be used.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandActivateCamoflage(id) end
+
 --- command to convert.
 -- moves into range, asserts if ability cannot be used.
 -- @param id entity
@@ -742,6 +747,11 @@ function CppLogic.Entity.Settler.CommandSnipe(id, tid) end
 -- @param id entity
 -- @param tid target
 function CppLogic.Entity.Settler.CommandShuriken(id, tid) end
+
+--- command to motivate workers.
+-- asserts if ability cannot be used, including out of range.
+-- @param id entity
+function CppLogic.Entity.Settler.CommandMotivateWorkers(id) end
 
 --- command to use sabotage.
 -- asserts if ability cannot be used. does not check tech requirement.
@@ -1027,6 +1037,15 @@ function CppLogic.Entity.Building.MercenaryRemoveLastOffer(id) end
 -- @param cost cost table (optional, default no change)
 -- @param ignoreZeroes ignore anything that is zero (optional, default false)
 function CppLogic.Entity.Building.MercenarySetOfferData(id, ind, remain, cost, ignoreZeroes) end
+
+--- gets the BuildOn entity this building is constructed on (mine/VC/bridge).
+-- @param id entity
+-- @return id or 0
+function CppLogic.Entity.Building.GetBuildOnEntity(id) end
+--- gets the building constructed on a BuildOn entity (mine/VC/bridge).
+-- @param id entity
+-- @return id or 0
+function CppLogic.Entity.Building.BuildOnEntityGetBuilding(id) end
 
 
 --- entity type max health.

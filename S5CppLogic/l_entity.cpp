@@ -747,6 +747,18 @@ int l_settlerSummon(lua_State* L) {
 	return summoned;
 }
 
+int l_settlerActivateCamo(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
+	shok_GGL_CCamouflageBehavior* b = e->GetBehavior<shok_GGL_CCamouflageBehavior>();
+	luaext_assertPointer(L, b, "no matching ability at 1");
+	luaext_assert(L, !shok_DynamicCast<shok_GGL_CCamouflageBehavior, shok_GGL_CThiefCamouflageBehavior>(b), "thief camo cannot be manually activated");
+	shok_GGL_CCamouflageBehaviorProps* bp = e->GetEntityType()->GetBehaviorProps<shok_GGL_CCamouflageBehaviorProps>();
+	luaext_assert(L, b->SecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
+	e->HeroAbilityActivateCamoflage();
+	return 0;
+}
+
 int l_settlerConvert(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
@@ -788,6 +800,17 @@ int l_settlerShuriken(lua_State* L) {
 	luaext_assert(L, ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile");
 	luaext_assert(L, e->Position.IsInRange(t->Position, bp->Range), "target not in range");
 	e->HeroAbilityShuriken(t->EntityId);
+	return 0;
+}
+
+int l_settlerMotivateWorkers(lua_State* L) {
+	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
+	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
+	shok_GGL_CMotivateWorkersAbility* b = e->GetBehavior<shok_GGL_CMotivateWorkersAbility>();
+	luaext_assertPointer(L, b, "no matching ability at 1");
+	shok_GGL_CMotivateWorkersAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<shok_GGL_CMotivateWorkersAbilityProps>();
+	luaext_assert(L, b->SecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
+	e->HeroAbilityMotivateWorkers();
 	return 0;
 }
 
@@ -1384,6 +1407,17 @@ int l_entity_PerformHeal(lua_State* L) {
 	return 0;
 }
 
+int l_building_GetBuildOn(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkBulding(L, 1);
+	lua_pushnumber(L, e->GetFirstAttachedEntity(shok_AttachmentType::BUILDING_BASE));
+	return 1;
+}
+int l_building_GetBuildOnReverse(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	lua_pushnumber(L, e->GetFirstAttachedToMe(shok_AttachmentType::BUILDING_BASE));
+	return 1;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.clear();
@@ -1478,9 +1512,11 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandRangedEffect", &l_settlerRangedEffect);
 	luaext_registerFunc(L, "CommandCircularAttack", &l_settlerCircularAttack);
 	luaext_registerFunc(L, "CommandSummon", &l_settlerSummon);
+	luaext_registerFunc(L, "CommandActivateCamoflage", &l_settlerActivateCamo);
 	luaext_registerFunc(L, "CommandConvert", &l_settlerConvert);
 	luaext_registerFunc(L, "CommandSnipe", &l_settlerSnipe);
 	luaext_registerFunc(L, "CommandShuriken", &l_settlerShuriken);
+	luaext_registerFunc(L, "CommandMotivateWorkers", &l_settlerMotivateWorkers);
 	luaext_registerFunc(L, "CommandSabotage", &l_settlerSabotage);
 	luaext_registerFunc(L, "CommandDefuse", &l_settlerDefuse);
 	luaext_registerFunc(L, "CommandBinocular", &l_settlerBinoculars);
@@ -1543,6 +1579,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "MarketStartTrade", &l_buildingMarketStartTrade);
 	luaext_registerFunc(L, "MercenaryRemoveLastOffer", &l_buildingRemoveLastMerchantOffer);
 	luaext_registerFunc(L, "MercenarySetOfferData", &l_buildingMerchantOfferSetData);
+	luaext_registerFunc(L, "GetBuildOnEntity", &l_building_GetBuildOn);
+	luaext_registerFunc(L, "BuildOnEntityGetBuilding", &l_building_GetBuildOnReverse);
 	lua_rawset(L, -3);
 }
 

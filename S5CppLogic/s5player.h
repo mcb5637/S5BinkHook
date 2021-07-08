@@ -67,6 +67,7 @@ struct shok_GGL_CPlayerAttractionHandler : shok_object {
 	static void HookCheckPayday();
 	static void (*OnCheckPayDayCallback)(shok_GGL_CPlayerAttractionHandler* th);
 };
+//constexpr int i = offsetof(shok_GGL_CPlayerAttractionHandler, WorkBuildingsArray) / 4;
 
 struct shok_GGL_CUpgradeManager_jobdata {
 	int Category;

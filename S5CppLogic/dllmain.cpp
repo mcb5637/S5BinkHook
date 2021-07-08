@@ -98,8 +98,8 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    shok_GGUI_C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(lua_toboolean(L, 1));
-    return 0;
+    lua_pushnumber(L, (int)&(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->PlayerAttractionHandler->WorkBuildingsArray);
+    return 1;
 }
 
 int cleanup(lua_State* L) {

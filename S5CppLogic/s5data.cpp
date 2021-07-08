@@ -274,6 +274,7 @@ void __declspec(naked) textprinting_getstringlen() {
 }
 void HookTextPrinting()
 {
-	WriteJump(reinterpret_cast<void*>(0x557E58), reinterpret_cast<void*>(0x557DAA)); // continue checking @ after center,... (redirecting an existing jmp)
+	WriteJump(reinterpret_cast<void*>(0x557E47), reinterpret_cast<void*>(0x557DAA)); // continue checking @ after center,... (redirecting an existing jmp, and removing a push for a previous parameter)
+
 	WriteJump(reinterpret_cast<void*>(0x708F60), &textprinting_getstringlen);
 }

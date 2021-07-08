@@ -391,6 +391,12 @@ void shok_EGL_CMovingEntity::HeroAbilityShuriken(int tid)
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
+void shok_EGL_CMovingEntity::HeroAbilityMotivateWorkers()
+{
+	shok_BB_CEvent ev{ shok_EventIDs::MotivateVorkers_ActivateCommand };
+	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+}
+
 void shok_EGL_CMovingEntity::HeroAbilityActivateCamoflage()
 {
 	shok_BB_CEvent e{ shok_EventIDs::Camouflage_Activate };

@@ -670,6 +670,19 @@ int l_buildingTyAddHPTechMod(lua_State* L) {
 	return 0;
 }
 
+int l_buildingTy_GetBuildOnTypes(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaext_assert(L, t->IsBuildingType(), "no building type at 1");
+	lua_newtable(L);
+	int i = 1;
+	for (int ty : shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLBuildingProps>(t->LogicProps)->BuildOn) {
+		lua_pushnumber(L, ty);
+		lua_rawseti(L, -2, i);
+		i++;
+	}
+	return 1;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -740,6 +753,7 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "GetUpgradeCost", &l_buildingGetCostUpgr);
 	luaext_registerFunc(L, "SetUpgradeCost", &l_buildingSetCostUpgr);
 	luaext_registerFunc(L, "AddHPTechMod", &l_buildingTyAddHPTechMod);
+	luaext_registerFunc(L, "GetBuildOnTypes", &l_buildingTy_GetBuildOnTypes);
 	lua_rawset(L, -3);
 }
 

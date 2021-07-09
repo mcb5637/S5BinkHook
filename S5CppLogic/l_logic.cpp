@@ -494,6 +494,11 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 	return allRead;
 }
 
+int l_netEventReadBack(lua_State* L) {
+	shok_BB_CEvent* ev = static_cast<shok_BB_CEvent*>(lua_touserdata(L, lua_upvalueindex(1)));
+	lua_pushboolean(L, l_netReadEvent(L, ev));
+	return 1;
+}
 
 int l_netEventSetHook(lua_State* L) {
 	if (!lua_isfunction(L, 1))
@@ -512,11 +517,11 @@ int l_netEventSetHook(lua_State* L) {
 		if (lua_isfunction(L, -1)) {
 			lua_pushnumber(L, id);
 			l_netPushEvent(L, ev);
-			lua_pcall(L, 2, 1, 0);
+			lua_pushlightuserdata(L, ev);
+			lua_pushcclosure(L, &l_netEventReadBack, 1);
+			lua_pcall(L, 3, 1, 0);
 			if (lua_isboolean(L, -1))
 				r = lua_toboolean(L, -1);
-			else if (lua_istable(L, -1))
-				l_netReadEvent(L, ev);
 		}
 		lua_settop(L, top);
 		return r;

@@ -157,8 +157,8 @@ int l_uiGetMaterialTexCoord(lua_State* L) {
 	luaext_assert(L, min >= 0 && min < c, "invalid index");
 	lua_pushnumber(L, m[min].TextureCoordinates.X);
 	lua_pushnumber(L, m[min].TextureCoordinates.Y);
-	lua_pushnumber(L, m[min].TextureCoordinates.H);
 	lua_pushnumber(L, m[min].TextureCoordinates.W);
+	lua_pushnumber(L, m[min].TextureCoordinates.H);
 	return 4;
 }
 int l_uiSetMaterialTexCoord(lua_State* L) {
@@ -173,9 +173,9 @@ int l_uiSetMaterialTexCoord(lua_State* L) {
 	if (lua_isnumber(L, 4))
 		m[min].TextureCoordinates.Y = luaL_checkfloat(L, 4);
 	if (lua_isnumber(L, 5))
-		m[min].TextureCoordinates.H = luaL_checkfloat(L, 5);
+		m[min].TextureCoordinates.W = luaL_checkfloat(L, 5);
 	if (lua_isnumber(L, 6))
-		m[min].TextureCoordinates.W = luaL_checkfloat(L, 6);
+		m[min].TextureCoordinates.H = luaL_checkfloat(L, 6);
 	return 0;
 }
 

@@ -1418,6 +1418,17 @@ int l_building_GetBuildOnReverse(lua_State* L) {
 	return 1;
 }
 
+int l_building_GetConstructionSite(lua_State* L) {
+	shok_GGL_CBuilding* e = luaext_checkBulding(L, 1);
+	lua_pushnumber(L, e->GetConstructionSite());
+	return 1;
+}
+int l_building_ConSiteGetBuilding(lua_State* L) {
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	lua_pushnumber(L, e->GetFirstAttachedEntity(shok_AttachmentType::CONSTRUCTION_SITE_BUILDING));
+	return 1;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.clear();
@@ -1581,6 +1592,8 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "MercenarySetOfferData", &l_buildingMerchantOfferSetData);
 	luaext_registerFunc(L, "GetBuildOnEntity", &l_building_GetBuildOn);
 	luaext_registerFunc(L, "BuildOnEntityGetBuilding", &l_building_GetBuildOnReverse);
+	luaext_registerFunc(L, "GetConstructionSite", &l_building_GetConstructionSite);
+	luaext_registerFunc(L, "ConstructionSiteGetBuilding", &l_building_ConSiteGetBuilding);
 	lua_rawset(L, -3);
 }
 
@@ -1739,7 +1752,7 @@ bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e, flo
 
 bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
 {
-	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e);
+	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(e);
 }
 
 bool EntityIteratorPredicateIsRelevant::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)

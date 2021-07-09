@@ -257,7 +257,10 @@ function CppLogic.Logic.FixSnipeDamage(override) end
 function CppLogic.Logic.GetCurrentWeatherGFXState() end
 
 --- ui command callback.
--- func parameters are (eventId, eventData)
+-- func parameters are (eventId, eventData, writeback).
+-- function can return true to skip further event execution.
+-- call writeback(eventData) with a modified eventData to change event values.
+-- writeback has the event as a upvalue, do not save it and call it later, you will override a random c stack position!
 -- @param f func
 function CppLogic.Logic.UICommands.SetCallback(f) end
 --- ui command callback.
@@ -1047,6 +1050,15 @@ function CppLogic.Entity.Building.GetBuildOnEntity(id) end
 -- @return id or 0
 function CppLogic.Entity.Building.BuildOnEntityGetBuilding(id) end
 
+--- gets the constructonsite of a building.
+-- @param id entity
+-- @return id or 0
+function CppLogic.Entity.Building.GetConstructionSite(id) end
+--- gets building of a constructionsite.
+-- @param id entity
+-- @return id or 0
+function CppLogic.Entity.Building.ConstructionSiteGetBuilding(id) end
+
 
 --- entity type max health.
 -- @param ty entitytype
@@ -1386,6 +1398,11 @@ function CppLogic.EntityType.Building.SetUpradeCost(ty, c, ignoreZeroes) end
 -- @param ty entitytype
 -- @param tech
 function CppLogic.EntityType.Building.AddHPTechMod(ty, tech) end
+
+--- gets the BuildOnTypes of a building type.
+-- @param ty entitytype
+-- @return array of types (may be empty table)
+function CppLogic.EntityType.Building.GetBuildOnTypes(ty) end
 
 --- tech research time and costs.
 -- @param tid tech id

@@ -153,10 +153,7 @@ bool shok_GGL_CSettler::IsIdle()
 
 int shok_GGL_CBuilding::GetConstructionSite()
 {
-	shok_attachment* a = ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == shok_AttachmentType::CONSTRUCTION_SITE_BUILDING; });
-	if (a)
-		return a->EntityId;
-	return 0;
+	return GetFirstAttachedToMe(shok_AttachmentType::CONSTRUCTION_SITE_BUILDING);
 }
 
 static inline int(__thiscall* const shok_build_getnearestfreeslot)(shok_EGL_CGLEEntity* th, shok_position* p) = reinterpret_cast<int(__thiscall*) (shok_EGL_CGLEEntity*, shok_position*)>(0x4AB02D);

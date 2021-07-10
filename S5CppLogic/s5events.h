@@ -599,8 +599,14 @@ enum class shok_EventIDs : int {
 	// 1100D, 1100E, 11017 something default movement
 	// 11002 bino cancel
 	// 11003 serfbattle, set territory?
-	// 12002 stop?
+	
+	// 0x11013 evadingent
+	// 0x11014 evadingent to 0x11011 cevent
+	// 0x11015 evadingent
+
+	// 0x12002 stop?
 	// 0x12003 camp detach worker?
+	// 0x12004 settler wait? state 5 EGL::CEventValue<int,-27574121>
 	Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
 	// 12008 leader hurt?
 
@@ -679,6 +685,7 @@ enum class shok_EventIDs : int {
 	// 1501D battle barracks attachment, set battle tl?, soldier simmilar, autocannon set battle tl
 	// 1501E leader get some unknown int +100, soldier something other entity???
 	Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
+	GetArmorClass = 0x15020, //EGL::CEventGetValue<int,1211121895>
 	Leader_GetAttackTarget = 0x15021, //EGL::CEventGetValue<int, 1211121895> soldier forwards to leader
 	Leader_Hurt = 0x15023, //EGL::CEventValue<int,-27574121>
 	Battle_GetLatestAttackerID = 0x15024, //EGL::CEventGetValue<int, 1211121895>
@@ -761,6 +768,7 @@ enum class shok_EventIDs : int {
 	CircularAttack_ActivateCommand = 0x16022, //BB::CEvent
 	ConvertBuilding_ActivateCommand = 0x16023, //EGL::CEvent1Entity
 	ConvertBuilding_OnTargetDetach = 0x16024, //EGL::CEvent1Entity
+	Settler_IsFearless = 0x16025, //EGL::CEventGetValue<bool,1709081367>
 	ConvertSettler_ActivateCommand = 0x16027, //EGL::CEvent1Entity
 	ConvertSettler_OnTargetDetach = 0x16028, //EGL::CEvent1Entity
 	LimitedLifespan_GetTimeRemaining = 0x16029, //EGL::CEventGetValue<int,1211121895>
@@ -787,6 +795,7 @@ enum class shok_EventIDs : int {
 	Market_CancelTrade = 0x1700B, //BB::CEvent
 	// 0x1700C university get tech progress?
 	// 0x1700D constructionsite complete
+	// 0x1700E settler 1 entity ? building 0x20003
 	WorkerAlarmMode_OnBuildingDetach = 0x1700F, //EGL::CEvent1Entity
 	// 0x17011 resourcerefiner get supplier?/can work?
 	Worker_ResetTaskList = 0x17012, //BB::CEvent
@@ -798,6 +807,7 @@ enum class shok_EventIDs : int {
 	// 0x1701A foundation cleanup?
 	// 0x1701B mine detach res
 	// 0x1701C foundation init, save load?
+	IsConvertible = 0x1701D, //EGL::CEventGetValue<bool,1709081367>
 
 	Barracks_ActivateAutoFill = 0x1701E, //BB::CEvent
 	Barracks_DeActivateAutoFill = 0x1701F, //BB::CEvent
@@ -820,8 +830,10 @@ enum class shok_EventIDs : int {
 	IsLeader = 0x18004, //EGL::CEventGetValue<bool, 1709081367>
 	IsSoldier = 0x18005, //EGL::CEventGetValue<bool, 1709081367>
 	// 18007 battle, autocannon ret true
+	//IsSettler = 0x18008, //EGL::CEventGetValue<bool, 1709081367> building too? 0x18008
 	// 18006 herobeh ret true
 	DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
+	// 0x1800B building get bool?
 	// 1800C resourcerefiner ret true
 	// 1800D thefbeh ret true
 

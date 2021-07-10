@@ -114,6 +114,8 @@ int cleanup(lua_State* L) {
 
 constexpr double Version = 1.0;
 
+const char* TaskLuaFunc = "TASK_LUA_FUNC";
+
 extern "C" void __cdecl install(lua_State * L) {
 #ifdef _DEBUG
     lua_pushcfunction(L, &test);
@@ -182,6 +184,20 @@ extern "C" void __cdecl install(lua_State * L) {
     luaopen_debug(L);
 
     HookTextPrinting();
+    {
+        bool found = false;
+        for (shok_taskData& td : **shok_taskData::GlobalVector) {
+            if (td.TaskName == TaskLuaFunc) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            shok_saveVector<shok_taskData>(*shok_taskData::GlobalVector, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
+                v.push_back(shok_taskData{ TaskLuaFunc, 0xB3F8356D, shok_Task::TASK_LUA_FUNC });
+            });
+        }
+    }
 
     if (HasSCELoader()) {
         lua_dobuffer(L, SCELoaderFuncOverrides, strlen(SCELoaderFuncOverrides), "CppLogic");
@@ -214,7 +230,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        VirtualProtect(reinterpret_cast<LPVOID>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH, PAGE_EXECUTE_READWRITE, &vp);
+        VirtualProtect(reinterpret_cast<LPVOID>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH, PAGE_EXECUTE_READWRITE, &vp); // TODO reverse, and do the same on every code change
         *data = reinterpret_cast<int>(&__lua_open);
         break;
     case DLL_THREAD_ATTACH:

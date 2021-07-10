@@ -130,6 +130,9 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static bool UseMaxHPTechBoni;
 	static void HookMaxHP();
 
+	static int (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, shok_EGL_CGLETaskArgs* args);
+	static void HookLuaTaskList();
+
 	static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
 	static void HookHero6Convert();
 	static void ActivateEntityChangePlayerFix();
@@ -155,6 +158,9 @@ struct shok_EGL_CGLEEntity : shok_object {
 
 protected:
 	int EventGetIntById(shok_EventIDs id);
+
+	// defined tasks: TASK_RESET_TASK_LIST_TIMER, TASK_SET_MODEL, TASK_PLAY_SOUND, TASK_STOP_SOUND
+	// defined states: SetNextTaskList
 };
 //constexpr int i = offsetof(shok_EGL_CGLEEntity, TaskHandlers) / 4;
 struct shok_GGL_CBuilding;
@@ -265,6 +271,11 @@ struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
 
 	int LeaderGetRegenHealth();
 	int LeaderGetRegenHealthSeconds();
+
+	// defined tasks: TASK_VANISH, TASK_APPEAR, TASK_ENTER_BUILDING, TASK_LEAVE_BUILDING, TASK_LIST_DONE, TASK_SET_TASK_LIST, TASK_WAIT, TASK_LEFT_BUILDING, TASK_WAIT_UNTIL
+	//		TASK_RESOLVE_COLLISION, TASK_GO_TO_FREE_POSITION, TASK_SET_POS (set relative to workplace)
+	// defined events: GetArmorClass, GetArmor, Settler_XXX, Worker_Bless (set BlessBuff to 10), IsConvertible
+	// defined states: BattleWaitUntilAutoCannon, Default (set tl to default)
 };
 
 struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
@@ -324,6 +335,8 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	void CancelResearch();
 	void MarketStartTrade(shok_ResourceType ResourceTypeSell, shok_ResourceType ResourceTypeBuy, float BuyAmount);
 	void MarketCancelTrade();
+
+	// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 };
 
 struct shok_GGL_CBridgeEntity : shok_GGL_CBuilding {

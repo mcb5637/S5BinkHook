@@ -957,6 +957,41 @@ int l_logic_GetCurrentWeatherGFXState(lua_State* L) {
 	return 1;
 }
 
+int l_logic_setluataskfunc(lua_State* L) {
+	shok_EGL_CGLEEntity::HookLuaTaskList();
+	if (lua_isnil(L, 1)) {
+		shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_logic_setluataskfunc);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+
+	if (!shok_EGL_CGLEEntity::LuaTaskListCallback) {
+		shok_EGL_CGLEEntity::LuaTaskListCallback = [](shok_EGL_CGLEEntity* e, shok_EGL_CGLETaskArgs* args) {
+			lua_State* L = *shok_luastate_game;
+			int t = lua_gettop(L);
+
+			int r = 0;
+			lua_pushlightuserdata(L, &l_logic_setluataskfunc);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, e->EntityId);
+			lua_pushnumber(L, static_cast<shok_EGL_CTaskArgsInteger*>(args)->Value);
+			lua_pcall(L, 2, 1, 0);
+			if (lua_isnumber(L, -1))
+				r = luaL_checkint(L, -1);
+
+			lua_settop(L, t);
+			return r;
+		};
+	}
+
+	return 0;
+}
+
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
@@ -967,6 +1002,7 @@ void l_logic_cleanup(lua_State* L) {
 	ConstructBuildingRotation = 0.0f;
 	shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
 	shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
+	shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
 }
 
 void l_logic_init(lua_State* L)
@@ -1011,6 +1047,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "GetPlaceBuildingRotation", &l_logic_GetPlaceBuildingRotation);
 	luaext_registerFunc(L, "FixSnipeDamage", &l_logic_FixSnipeDamage);
 	luaext_registerFunc(L, "GetCurrentWeatherGFXState", &l_logic_GetCurrentWeatherGFXState);
+	luaext_registerFunc(L, "SetLuaTaskListFunc", &l_logic_setluataskfunc);
 
 
 	lua_pushstring(L, "UICommands");
@@ -1032,3 +1069,4 @@ void l_logic_init(lua_State* L)
 // CppLogic.Logic.SetStringTableText("names/pu_hero1a", "test")
 // CppLogic.Logic.SetPlaceBuildingAdditionalCheck(function(...) LuaDebugger.Log(arg) return true end)
 // CppLogic.Logic.SetPlaceBuildingRotation(90)
+// CppLogic.Logic.SetLuaTaskListFunc(function(id, i) LuaDebugger.Log(id) LuaDebugger.Log(i) end)

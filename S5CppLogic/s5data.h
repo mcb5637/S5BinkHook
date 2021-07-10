@@ -242,6 +242,7 @@ bool operator<(shok_attachment a, shok_attachment b);
 struct shok_BB_CEvent;
 enum class shok_EventIDs : int;
 enum class shok_NetEventIds : int;
+struct shok_EGL_CGLETaskArgs;
 
 
 template<class T>

@@ -186,14 +186,14 @@ struct shok_EGL_CGLETaskListMgr : shok_object {
 
 struct shok_taskData {
 	const char* TaskName;
-	PADDINGI(1); // no idea what this is, big hex values like 23F8242D, but no pointer/float
-	int ID;
+    unsigned int TaskArgsClassID;
+	shok_Task ID;
 
 	static inline std::vector<shok_taskData, shok_allocator<shok_taskData>>** GlobalVector = reinterpret_cast<std::vector<shok_taskData, shok_allocator<shok_taskData>>**>(0x898238);
 };
 
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int : shok_object {
-	shok_EGL_CGLEBehavior* Object;
+	void* Object;
 	int(__thiscall* Func)(shok_EGL_CGLEBehavior* th, shok_EGL_CGLETaskArgs* args);
 
 	int ExecuteTask(shok_EGL_CGLETaskArgs* args);
@@ -415,6 +415,8 @@ enum class shok_Task : int {
     TASK_THROW_SHURIKEN = 208,
     TASK_TURN_TO_SNIPER_TARGET = 209,
     TASK_TURN_TO_SHURIKEN_TARGET = 210,
+
+    TASK_LUA_FUNC = 500,
 };
 
 enum class shok_TaskState : int {
@@ -425,6 +427,7 @@ enum class shok_TaskState : int {
     Follow = 4,
     BattleWaitUntilAutoCannon = 5,
     Rotate = 6,
+    SetNextTaskList = 7,
     // 9 & 10 building behavior
     // 12 something movement behavior
     // 13 something worker
@@ -441,6 +444,7 @@ enum class shok_TaskState : int {
     // 24 soldier formation?
     HeroGoToNPC = 25,
     ConvertBuilding = 26,
+    // 27 settler entered building?
     ComvertSettler = 28,
     Merchant_WaitForHero = 29,
     ThiefStealGoods = 30,

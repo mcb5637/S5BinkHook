@@ -59,7 +59,7 @@ public:
 	int DodgeChance;
 	int IdleTaskList;
 	shok_upgradeInfo Upgrade;
-	byte Fearless, Convertible;
+	byte Fearless, Convertible; //85
 	PADDING(2);
 	shok_modifyEntityProps ModifyExploration, ModifyHitpoints, ModifySpeed, ModifyDamage, ModifyArmor, ModifyDodge, ModifyMaxRange, ModifyMinRange, ModifyDamageBonus, ModifyGroupLimit;
 	int AttractionSlots;
@@ -67,6 +67,7 @@ public:
 	static inline constexpr int vtp = 0x76E498;
 	static inline constexpr int TypeDesc = 0x810B30;
 };
+//constexpr int i = offsetof(shok_GGL_CGLSettlerProps, Fearless) / 4;
 
 struct shok_GGL_CGLAnimalProps : shok_EGL_CGLEEntityProps {
 	int DefaultTaskList;
@@ -117,7 +118,7 @@ private:
 	int MilitaryInfo[4];
 public:
 	float CollapseTime;
-	byte Convertible;
+	byte Convertible; //113
 	PADDING(3);
 	shok_modifyEntityProps ModifyExploration, ModifyArmor;
 	float KegEffectFactor; // 124
@@ -125,6 +126,7 @@ public:
 	static inline constexpr int vtp = 0x76EC78;
 	static inline constexpr int TypeDesc = 0x811210;
 };
+//constexpr int i = offsetof(shok_GGL_CGLBuildingProps, Convertible) / 4;
 
 struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	shok_AARect BridgeArea;

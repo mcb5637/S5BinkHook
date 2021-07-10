@@ -790,6 +790,29 @@ void shok_EGL_CGLEEntity::HookMaxHP()
 	WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp);
 }
 
+int (*shok_EGL_CGLEEntity::LuaTaskListCallback)(shok_EGL_CGLEEntity* e, shok_EGL_CGLETaskArgs* args) = nullptr;
+int __fastcall FakeTaskHandler_Execute(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, int _, shok_EGL_CGLETaskArgs* args) {
+	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
+		return shok_EGL_CGLEEntity::LuaTaskListCallback(reinterpret_cast<shok_EGL_CGLEEntity*>(th->Object), args);
+	return 0;
+}
+struct FakeTaskHandler_VtableTy{ 
+	int(__fastcall* Execute)(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, int _, shok_EGL_CGLETaskArgs* args);
+};
+FakeTaskHandler_VtableTy FakeTaskHandler_Vtable{ &FakeTaskHandler_Execute };
+shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int FakeTaskHandler{ reinterpret_cast<int>(&FakeTaskHandler_Vtable), nullptr, nullptr };
+shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* const __fastcall entity_gettaskhandlerhook(shok_set<shok_entity_TaskIdAndTaskHandler>* thandler, int _, shok_Task tid) {
+	if (tid == shok_Task::TASK_LUA_FUNC) {
+		FakeTaskHandler.Object = reinterpret_cast<void*>(reinterpret_cast<int>(thandler) - offsetof(shok_EGL_CGLEEntity, TaskHandlers));
+		return &FakeTaskHandler;
+	}
+	return shok_entitytaskhandler_gettaskhandler(thandler, tid);
+}
+void shok_EGL_CGLEEntity::HookLuaTaskList()
+{
+	RedirectCall(reinterpret_cast<void*>(0x57BF7A), &entity_gettaskhandlerhook);
+}
+
 
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
 {

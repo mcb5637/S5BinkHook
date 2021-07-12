@@ -281,6 +281,7 @@ void shok_GGUI_C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(i
 
 void shok_GGUI_C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool showwood)
 {
+    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
     *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok_ResourceType::WoodRaw);
 }
 
@@ -316,8 +317,13 @@ int __stdcall uiinput_mouse(void* ev, int hwind, win_mouseEvents id, int w, int 
         UIInput_Mouse_Callback(id, w, l);
     return uiinput_mouse_orig(ev, hwind, id, w, l);
 }
+bool HookUIInput_Hooked = false;
 void HookUIInput()
 {
+    if (HookUIInput_Hooked)
+        return;
+    HookUIInput_Hooked = true;
+    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x40747E), 0x40754C - 0x40747E + 10 };
     RedirectCall(reinterpret_cast<void*>(0x40754C), &uiinput_char);
     RedirectCall(reinterpret_cast<void*>(0x40757D), &uiinput_key);
     RedirectCall(reinterpret_cast<void*>(0x40747E), &uiinput_mouse);

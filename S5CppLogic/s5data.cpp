@@ -36,6 +36,21 @@ shok_string::shok_string() : shok_string("")
 {
 }
 
+shok_saveVirtualProtect::shok_saveVirtualProtect() : shok_saveVirtualProtect(reinterpret_cast<void*>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH)
+{
+}
+shok_saveVirtualProtect::shok_saveVirtualProtect(void* adr, size_t size)
+{
+	Adr = adr;
+	Size = size;
+	Prev = PAGE_EXECUTE_READWRITE;
+	VirtualProtect(adr, size, PAGE_EXECUTE_READWRITE, &Prev);
+}
+shok_saveVirtualProtect::~shok_saveVirtualProtect()
+{
+	VirtualProtect(Adr, Size, Prev, &Prev);
+}
+
 void shok_position::FloorToBuildingPlacement()
 {
 	X = std::floorf(X / 100) * 100;
@@ -205,10 +220,15 @@ void __declspec(naked) hooksttasm() {
 		ret;
 	}
 }
+bool HookGetStringTableText_Hooked = false;
 void HookGetStringTableText()
 {
+	if (HookGetStringTableText_Hooked)
+		return;
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
+	HookGetStringTableText_Hooked = true;
+	shok_saveVirtualProtect vp{ shok_GetStringTableText , 10 };
 	WriteJump(shok_GetStringTableText, &hooksttasm);
 }
 
@@ -272,9 +292,14 @@ void __declspec(naked) textprinting_getstringlen() {
 		ret;
 	}
 }
+bool HookTextPrinting_Hooked = false;
 void HookTextPrinting()
 {
+	if (HookTextPrinting_Hooked)
+		return;
+	HookTextPrinting_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x557E47), 10 };
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x708F60), 10 };
 	WriteJump(reinterpret_cast<void*>(0x557E47), reinterpret_cast<void*>(0x557DAA)); // continue checking @ after center,... (redirecting an existing jmp, and removing a push for a previous parameter)
-
 	WriteJump(reinterpret_cast<void*>(0x708F60), &textprinting_getstringlen);
 }

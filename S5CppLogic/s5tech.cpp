@@ -55,7 +55,12 @@ float __fastcall constructionsite_getprogresspertick_hook(shok_GGL_CBuilding* th
 	else
 		return 1.0f / constructionfactor;
 }
+bool EnableConstructionSpeedTechs_Hooked = false;
 void EnableConstructionSpeedTechs()
 {
-	WriteJump((void*)0x4B8EAD, &constructionsite_getprogresspertick_hook);
+	if (EnableConstructionSpeedTechs_Hooked)
+		return;
+	EnableConstructionSpeedTechs_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 10 };
+	WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook);
 }

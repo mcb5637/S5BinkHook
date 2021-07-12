@@ -50,10 +50,15 @@ void __declspec(naked) hookedcheckpayday() {
 		ret;
 	}
 }
+bool HookCheckPayday_Hooked = false;
 void shok_GGL_CPlayerAttractionHandler::HookCheckPayday()
 {
+	if (HookCheckPayday_Hooked)
+		return;
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
+	HookCheckPayday_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday);
 }
 
@@ -117,8 +122,13 @@ void __declspec(naked) canplacebuildingasm() {
 		ret;
 	}
 }
+bool HookCanPlaceBuilding_Hooked = false;
 void HookCanPlaceBuilding()
 {
+	if (HookCanPlaceBuilding_Hooked)
+		return;
+	HookCanPlaceBuilding_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4B45B9), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4B45B9), &canplacebuildingasm);
 }
 
@@ -164,8 +174,13 @@ int __declspec(naked) constructcommandsetbuildingmodel() {
 		ret;
 	}
 }
+bool HookConstructCommandRotation_Hooked = false;
 void HookConstructCommandRotation()
 {
+	if (HookConstructCommandRotation_Hooked)
+		return;
+	HookConstructCommandRotation_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x5389FB), 0x538FF4 - 0x5389FB + 10 };
 	WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommandbuildingnetevent);
 	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommandplacementpreviewcheck);
 	WriteJump(reinterpret_cast<void*>(0x538C8D), &constructcommandsetbuildingmodel);

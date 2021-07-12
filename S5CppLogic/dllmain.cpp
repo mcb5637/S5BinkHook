@@ -98,7 +98,7 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, (int)&(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->PlayerAttractionHandler->WorkBuildingsArray);
+    lua_pushnumber(L, (int)&luaext_checkEntity(L,1)->StateChangeCounter);
     return 1;
 }
 
@@ -230,8 +230,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        VirtualProtect(reinterpret_cast<LPVOID>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH, PAGE_EXECUTE_READWRITE, &vp); // TODO reverse, and do the same on every code change
-        *data = reinterpret_cast<int>(&__lua_open);
+        //VirtualProtect(reinterpret_cast<LPVOID>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH, PAGE_EXECUTE_READWRITE, &vp); // TODO reverse, and do the same on every code change
+        {
+            shok_saveVirtualProtect vp{ data, 4 };
+            *data = reinterpret_cast<int>(&__lua_open);
+        }
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:

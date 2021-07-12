@@ -52,8 +52,13 @@ void __declspec(naked) hookcannonfromcreatorasm() {
 		ret;
 	}
 }
+bool HookFromCreator_Hooked = false;
 void shok_GGL_CCannonBallEffect::HookFromCreator()
 {
+	if (HookFromCreator_Hooked)
+		return;
+	HookFromCreator_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm);
 }
 
@@ -61,6 +66,7 @@ void (*shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffec
 void (*shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff) = nullptr;
 int(__thiscall* CannonBallOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
 int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th);
+void WriteProjectlileOnHits();
 int __fastcall CannonBallOnHitHook(shok_EGL_CFlyingEffect* th) {
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback)
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback(th);
@@ -70,8 +76,7 @@ int __fastcall CannonBallOnHitHook(shok_EGL_CFlyingEffect* th) {
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2(th, true);
 	// TODO remove rewriting vtable after kimichura removes the reset of it
-	reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CCannonBallEffect::vtp)->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&CannonBallOnHitHook);
-	reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CArrowEffect::vtp)->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&ArrowOnHitHook);
+	WriteProjectlileOnHits();
 	return i;
 }
 int(__thiscall* ArrowOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
@@ -83,9 +88,16 @@ int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th) {
 	int i = ArrowOnHit(th);
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2(th, true);
-	reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CCannonBallEffect::vtp)->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&CannonBallOnHitHook);
-	reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CArrowEffect::vtp)->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&ArrowOnHitHook);
+	WriteProjectlileOnHits();
 	return i;
+}
+void WriteProjectlileOnHits() {
+	shok_vtable_EGL_CFlyingEffect* vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CCannonBallEffect::vtp);
+	shok_saveVirtualProtect vp{ vt, 12 * 4 };
+	vt->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&CannonBallOnHitHook);
+	vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CArrowEffect::vtp);
+	shok_saveVirtualProtect vp2{ vt, 12 * 4 };
+	vt->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&ArrowOnHitHook);
 }
 void shok_EGL_CFlyingEffect::HookOnHit()
 {
@@ -93,8 +105,7 @@ void shok_EGL_CFlyingEffect::HookOnHit()
 		return;
 	shok_vtable_EGL_CFlyingEffect* vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CCannonBallEffect::vtp);
 	CannonBallOnHit = vt->OnHit;
-	vt->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(& CannonBallOnHitHook);
 	vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CArrowEffect::vtp);
 	ArrowOnHit = vt->OnHit;
-	vt->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(& ArrowOnHitHook);
+	WriteProjectlileOnHits();
 }

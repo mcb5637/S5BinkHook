@@ -194,6 +194,7 @@ void shok_EGL_CGLEGameLogic::HookCreateEffect()
 	if (CreateEffectHookedOrig)
 		return;
 	shok_vtable_EGL_CGLEGameLogic* vt = reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable);
+	shok_saveVirtualProtect vp{ vt, 25*4 };
 	CreateEffectHookedOrig = vt->CreateEffect;
 	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLEGameLogic * th, shok_EGL_CGLEEffectCreator * data)>(&CreateEffectHook);
 }
@@ -236,9 +237,11 @@ void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
 void shok_GGUI_CManager::HackPostEvent()
 {
 	if (PostEventOrig) {
+		shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3*4 };
 		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
 	}
 	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent->vtable);
+	shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
 	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent * ev)>(&PostEventHook);
 }
@@ -320,6 +323,12 @@ static inline void(__cdecl* const filesystem_addfolder)(const char* p, char* d) 
 void shok_BB_CFileSystemMgr::AddFolder(const char* path)
 {
 	filesystem_addfolder(path, nullptr);
+	size_t l = LoadOrder.size();
+	shok_BB_IFileSystem* last = LoadOrder[l - 1];
+	for (int i = l - 1; i > 0; i--) {
+		LoadOrder[i] = LoadOrder[i - 1];
+	}
+	LoadOrder[0] = last;
 }
 
 void shok_BB_CFileSystemMgr::AddArchive(const char* path)

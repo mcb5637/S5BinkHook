@@ -43,8 +43,13 @@ int __fastcall sniperability_tasksnipeoverride(shok_GGL_CSniperAbility* thi, int
 	(*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
 	return 0;
 }
+bool OverrideSnipeTask_Hooked = false;
 void shok_GGL_CSniperAbility::OverrideSnipeTask()
 {
+	if (OverrideSnipeTask_Hooked)
+		return;
+	OverrideSnipeTask_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
 }
 

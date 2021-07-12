@@ -612,8 +612,13 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 	e->Destroy();
 	return nid;
 }
+bool ActivateEntityChangePlayerFix_Hooked = false;
 void shok_EGL_CGLEEntity::ActivateEntityChangePlayerFix()
 {
+	if (ActivateEntityChangePlayerFix_Hooked)
+		return;
+	ActivateEntityChangePlayerFix_Hooked = true;
+	shok_saveVirtualProtect vp{ shok_EGL_CGLEEntity::EntityIDChangePlayer, 10 };
 	WriteJump(shok_EGL_CGLEEntity::EntityIDChangePlayer, &fixedChangePlayer);
 }
 
@@ -626,9 +631,14 @@ int _cdecl hero6convertchangeplayer(int id, int pl) {
 		shok_EGL_CGLEEntity::Hero6ConvertHookCb(id, pl, r, c->EntityId);
 	return r;
 }
+bool HookHero6Convert_Hooked = false;
 void shok_EGL_CGLEEntity::HookHero6Convert()
 {
+	if (HookHero6Convert_Hooked)
+		return;
+	HookHero6Convert_Hooked = true;
 	shok_EGL_CGLEEntity::ActivateEntityChangePlayerFix();
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4FCD26), 10 };
 	RedirectCall(reinterpret_cast<void*>(0x4FCD26), &hero6convertchangeplayer);
 }
 
@@ -637,8 +647,13 @@ void __fastcall camo_behaviorReset(shok_GGL_CCamouflageBehavior* th, int _, int 
 	if (shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity == 0 || th->EntityId == shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity)
 		th->InvisibilityRemaining = 0;
 }
+bool HookResetCamo_Hooked = false;
 void shok_EGL_CGLEEntity::HookResetCamo()
 {
+	if (HookResetCamo_Hooked)
+		return;
+	HookResetCamo_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x5011DF), 10 };
 	WriteJump(reinterpret_cast<void*>(0x5011DF), &camo_behaviorReset);
 }
 
@@ -650,8 +665,14 @@ int __fastcall camoActivateHook(shok_GGL_CCamouflageBehavior* th) {
 		shok_EGL_CGLEEntity::CamoActivateCb(th);
 	return i;
 }
+bool HookCamoActivate_Hooked = false;
 void shok_EGL_CGLEEntity::HookCamoActivate()
 {
+	if (HookCamoActivate_Hooked)
+		return;
+	HookCamoActivate_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4D51A4), 10 };
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x50163A), 10 };
 	RedirectCall(reinterpret_cast<void*>(0x4D51A4), &camoActivateHook);
 	RedirectCall(reinterpret_cast<void*>(0x50163A), &camoActivateHook);
 }
@@ -689,10 +710,15 @@ void __declspec(naked) hurtentityhook() { // push arguments, call func, do the m
 		ret;
 	}
 }
+bool HookHurtEntity_Hooked = false;
 void shok_EGL_CGLEEntity::HookHurtEntity()
 {
+	if (HookHurtEntity_Hooked)
+		return;
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
+	HookHurtEntity_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x49f358), 0x49F4AD - 0x49f358 + 10 };
 	WriteJump(reinterpret_cast<void*>(0x49f358), &hurtentityhook); // call my own func, that calls the trigger
 	byte* p = reinterpret_cast<byte*>(0x49F4A6); // remove call to trigger
 	*p = 0x90; // nop
@@ -781,10 +807,17 @@ void __declspec(naked) hookcreatentityfixhp() {
 		ret;
 	}
 }
+bool HookMaxHP_Hooked = false;
 void shok_EGL_CGLEEntity::HookMaxHP()
 {
+	if (HookMaxHP_Hooked)
+		return;
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
+	HookMaxHP_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x57B798), 10 };
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x4BDED8), 10 };
+	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x571B93), 10 };
 	WriteJump(reinterpret_cast<void*>(0x57B798), &hookGetMaxHP);
 	WriteJump(reinterpret_cast<void*>(0x4BDED8), &hookgetmaxhpui);
 	WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp);
@@ -792,9 +825,16 @@ void shok_EGL_CGLEEntity::HookMaxHP()
 
 int (*shok_EGL_CGLEEntity::LuaTaskListCallback)(shok_EGL_CGLEEntity* e, shok_EGL_CGLETaskArgs* args) = nullptr;
 int __fastcall FakeTaskHandler_Execute(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, int _, shok_EGL_CGLETaskArgs* args) {
+	int i = 0;
+	shok_EGL_CGLEEntity* e = reinterpret_cast<shok_EGL_CGLEEntity*>(th->Object);
+	//e->CurrentState = 7;
 	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
-		return shok_EGL_CGLEEntity::LuaTaskListCallback(reinterpret_cast<shok_EGL_CGLEEntity*>(th->Object), args);
-	return 0;
+		i = shok_EGL_CGLEEntity::LuaTaskListCallback(e, args);
+	if (i == 2)
+		e->TaskListChangeCounter++;
+	else if (i == 1)
+		e->StateChangeCounter++;
+	return 0; // TODO repeat task
 }
 struct FakeTaskHandler_VtableTy{ 
 	int(__fastcall* Execute)(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, int _, shok_EGL_CGLETaskArgs* args);
@@ -808,8 +848,13 @@ shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* const __fastcall entity_gettaskhandle
 	}
 	return shok_entitytaskhandler_gettaskhandler(thandler, tid);
 }
+bool HookLuaTaskList_Hooked = false;
 void shok_EGL_CGLEEntity::HookLuaTaskList()
 {
+	if (HookLuaTaskList_Hooked)
+		return;
+	HookLuaTaskList_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x57BF7A), 10 };
 	RedirectCall(reinterpret_cast<void*>(0x57BF7A), &entity_gettaskhandlerhook);
 }
 
@@ -870,8 +915,13 @@ void __declspec(naked) destroyentityhook() {
 	}
 
 }
+bool HookDestroyEntity_Hooked = false;
 void shok_EGL_CGLEEntity::HookDestroyEntity()
 {
+	if (HookDestroyEntity_Hooked)
+		return;
+	HookDestroyEntity_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x57C94A), 10 };
 	WriteJump(reinterpret_cast<void*>(0x57C94A), &destroyentityhook);
 }
 entityAddonData* shok_EGL_CGLEEntity::GetAdditionalData(bool create)
@@ -928,7 +978,7 @@ void __declspec(naked) entitydamagemodeventbattleasm() {
 		ret;
 	}
 }
-void __declspec(naked) entitydamagemodbattlemeleeonhitasm() {
+void __declspec(naked) entitydamagemodbattlecalcsingletargetdmgasm() {
 	__asm {
 		pushad;
 
@@ -949,19 +999,6 @@ shok_EGL_CEventGetValue_int* __fastcall entitydamagemodeventautocannonasm(shok_G
 	else
 		ev->Data = e->GetEntityType()->GetBehaviorProps<shok_GGL_CAutoCannonBehaviorProps>()->DamageAmount;
 	return ev;
-}
-void __declspec(naked) entitydamagemodbattleprojectilearrowasm() {
-	__asm {
-		pushad;
-
-		mov ecx, esi;
-		call entitygetdamagemod;
-
-		popad;
-
-		push 0x50C23B;
-		ret;
-	}
 }
 void __declspec(naked) entitydamagemodbattleprojectile() {
 	__asm {
@@ -1001,13 +1038,17 @@ void __declspec(naked) entitydamagemodautocannonprojectileasm() {
 		ret;
 	}
 }
+bool HookDamageMod_Hooked = false;
 void shok_EGL_CGLEEntity::HookDamageMod()
 {
+	if (HookDamageMod_Hooked)
+		return;
+	HookDamageMod_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x50C235), 0x51076C - 0x50C235 + 10 };
 	WriteJump(reinterpret_cast<void*>(0x50C785), &entitydamagemodeventbattleasm);
-	WriteJump(reinterpret_cast<void*>(0x50C235), &entitydamagemodbattlemeleeonhitasm);
+	WriteJump(reinterpret_cast<void*>(0x50C235), &entitydamagemodbattlecalcsingletargetdmgasm);
 	WriteJump(reinterpret_cast<void*>(0x50F5ED), &entitydamagemodeventautocannonasm);
 	WriteJump(reinterpret_cast<void*>(0x50C3E7), &entitydamagemodbattleprojectile);
-	WriteJump(reinterpret_cast<void*>(0x50C235), &entitydamagemodbattleprojectilearrowasm);
 	WriteJump(reinterpret_cast<void*>(0x51076C), &entitydamagemodautocannonprojectileasm);
 }
 
@@ -1050,8 +1091,14 @@ void __declspec(naked) entityarmormodbuildingrasm() {
 		ret;
 	}
 }
+bool HookArmorMod_Hooked = false;
 void shok_EGL_CGLEEntity::HookArmorMod()
 {
+	if (HookArmorMod_Hooked)
+		return;
+	HookArmorMod_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4A6B15), 10};
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x4AB160), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4A6B15), &entityarmormodsettlerasm);
 	WriteJump(reinterpret_cast<void*>(0x4AB160), &entityarmormodbuildingrasm);
 }
@@ -1089,8 +1136,14 @@ void __declspec(naked) entityexplmodbuildasm() {
 		ret;
 	}
 }
+bool HookExplorationMod_Hooked = false;
 void shok_EGL_CGLEEntity::HookExplorationMod()
 {
+	if (HookExplorationMod_Hooked)
+		return;
+	HookExplorationMod_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4A4AC3), 10 };
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x4AB199), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4A4AC3), &entityexplmodsettasm);
 	WriteJump(reinterpret_cast<void*>(0x4AB199), &entityexplmodbuildasm);
 }
@@ -1164,8 +1217,14 @@ void __declspec(naked) leaderregensecondsasm() {
 		ret;
 	}
 }
+bool HookLeaderRegen_Hooked = false;
 void shok_EGL_CGLEEntity::HookLeaderRegen()
 {
+	if (HookLeaderRegen_Hooked)
+		return;
+	HookLeaderRegen_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4EAE92), 10 };
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x4EFC29), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4EAE92), &leaderregen);
 	WriteJump(reinterpret_cast<void*>(0x4EFC29), &leaderregensecondsasm);
 }
@@ -1212,8 +1271,14 @@ void __declspec(naked) autocannonmaxrangeasm() {
 		ret;
 	}
 }
+bool HookMaxRange_Hooked = false;
 void shok_EGL_CGLEEntity::HookMaxRange()
 {
+	if (HookMaxRange_Hooked)
+		return;
+	HookMaxRange_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x50AB48), 10 };
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x50F50D), 10 };
 	WriteJump(reinterpret_cast<void*>(0x50AB48), &leadermaxrangeasm);
 	WriteJump(reinterpret_cast<void*>(0x50F50D), &autocannonmaxrangeasm);
 }
@@ -1254,8 +1319,13 @@ void __declspec(naked) entitydisplaynameasm() {
 		ret;
 	}
 }
+bool HookDisplayName_Hooked = false;
 void shok_EGL_CGLEEntity::HookDisplayName()
 {
+	if (HookDisplayName_Hooked)
+		return;
+	HookDisplayName_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x53F911), 10 };
 	WriteJump(reinterpret_cast<void*>(0x53F911), &entitydisplaynameasm);
 }
 
@@ -1290,6 +1360,7 @@ void __fastcall rangedeffecthealhook(shok_GGL_CRangedEffectAbility* th) {
 }
 void shok_EGL_CGLEEntity::HookRangedEffectActivateHeal(bool hookActive)
 {
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4E3C78), 10 };
 	if (hookActive)
 		RedirectCall(reinterpret_cast<void*>(0x4E3C78), &rangedeffecthealhook);
 	else

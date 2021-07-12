@@ -34,21 +34,26 @@ typedef uint8_t byte;
 // 0x761284 redirected (lua open dll import)
 // EGL_CGLEGameLogic.CreateEffect vtable redirect
 // GGL_CCannonBallEffect & GGL_CArrowEffect . OnHit vtable redirect
+// cannonball effect from creator 0x4FF942 jmp
 // GGUI_CManager.PostEvent vtable redirect
-// convert task 0x4FCD27 call redirect
-// 0x005011DF reset camo func override
+// convert task 0x4FCD26 call redirect
+// 0x5011DF reset camo func override
 // 0x4D51A4 & 0x50163A activate camo call redirect
 // 0x49A6A7 settlerchangeplayer override func to fix it not returning new id
 // 0x4B8EAD constructionsite_getprogresspertick func override
-// string render 0x557E58 to 0x557DAA jmp, string render getlen 0x708F60 jmp
+// string render 0x557E47 to 0x557DAA jmp, string render getlen 0x708F60 jmp
+// entity execute task get task handler 0x57BF7A call redirect
+// destroy entity 0x57C94A jmp
+// snipe task 0x4DB5B8 jmp (func override)
+// 0x529067 feedback event handler res mined show floatie
 // 
 // only without SCELoader
-// shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched
+// shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, afew instructions noped
 // entity get max hp 0x57B798 jmp, settler overhead hp bar 0x4BDED8 jmp, createentity 0x571B93 jmp set hp
 // create entity 0x571B93 jmp to fix max hp
 // 0x4BDED8 ui settler overhead hp bar maxhp jmp
 // shok_playerattractionhandler_checkpayday 0x4C25FB jmp at 0x4C2754
-// entity get damage battle event 0x50C785 jmp, autocannon event 0x50F5ED jmp, melee onhit 0x50C235 jmp
+// entity get damage battle event 0x50C785 jmp, autocannon event 0x50F5ED jmp, battle singletargetcalcdmg 0x50C235 jmp, battle proj 0x50C3E7 jmp, autocannon proj 0x51076C jmp
 // entity get armor event settler 0x4A6B15 jmp, building 0x4AB160 jmp
 // entity get exploration settler 0x4A4AC3 jmp, building 0x4AB199 jmp
 // leader behavior regen 0x4EAE92 jmp, leader behavior ontick? 0x4EFC29 jmp
@@ -70,26 +75,26 @@ static inline void* (__cdecl* const shok_new)(size_t t) = reinterpret_cast<void*
 static inline void(__cdecl* const shok_free)(void* p) = reinterpret_cast<void(__cdecl*)(void* p)>(0x5C2E2D);
 static inline void (*const shok_logString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
 
-template <class CastFrom>
+template <class T>
 struct shok_allocator {
-	typedef CastFrom value_type;
+	typedef T value_type;
 	shok_allocator() = default;
 	template <class U> constexpr shok_allocator(const shok_allocator <U>&) noexcept {}
 
-	[[nodiscard]] CastFrom* allocate(size_t n) noexcept
+	[[nodiscard]] T* allocate(size_t n) noexcept
 	{
-		void* p = shok_malloc(n * sizeof(CastFrom));
-		return (CastFrom*)p;
+		void* p = shok_malloc(n * sizeof(T));
+		return (T*)p;
 	}
-	void deallocate(CastFrom* p, size_t n) noexcept
+	void deallocate(T* p, size_t n) noexcept
 	{
 		shok_free(p);
 	}
 };
-template <class CastFrom, class U>
-bool operator==(const shok_allocator <CastFrom>&, const shok_allocator <U>&) { return true; }
-template <class CastFrom, class U>
-bool operator!=(const shok_allocator <CastFrom>&, const shok_allocator <U>&) { return false; }
+template <class T, class U>
+bool operator==(const shok_allocator <T>&, const shok_allocator <U>&) { return true; }
+template <class T, class U>
+bool operator!=(const shok_allocator <T>&, const shok_allocator <U>&) { return false; }
 
 template <class T>
 struct shok_treeNode {
@@ -143,10 +148,10 @@ public:
 
 static_assert(sizeof(shok_string) == 7 * 4);
 
-template<class CastFrom>
-inline void shok_saveVector(std::vector<CastFrom, shok_allocator<CastFrom>>* vec, std::function<void(std::vector<CastFrom, shok_allocator<CastFrom>> &s)> func) {
+template<class T>
+inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {
 #ifdef _DEBUG
-	std::vector<CastFrom, shok_allocator<CastFrom>> save{};
+	std::vector<T, shok_allocator<T>> save{};
 	int* vecPoint = reinterpret_cast<int*>(vec);
 	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[3] = {};
@@ -163,10 +168,10 @@ inline void shok_saveVector(std::vector<CastFrom, shok_allocator<CastFrom>>* vec
 	func(*vec);
 #endif
 }
-template<class CastFrom>
-inline void shok_saveList(std::list<CastFrom, shok_allocator<CastFrom>>* vec, std::function<void(std::list<CastFrom, shok_allocator<CastFrom>>& s)> func) {
+template<class T>
+inline void shok_saveList(std::list<T, shok_allocator<T>>* vec, std::function<void(std::list<T, shok_allocator<T>>& s)> func) {
 #ifdef _DEBUG
-	std::list<CastFrom, shok_allocator<CastFrom>> save{};
+	std::list<T, shok_allocator<T>> save{};
 	int* vecPoint = reinterpret_cast<int*>(vec);
 	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[2] = {};
@@ -183,6 +188,19 @@ inline void shok_saveList(std::list<CastFrom, shok_allocator<CastFrom>>* vec, st
 	func(*vec);
 #endif
 }
+
+// allows read/write/execute of the memory location pointed to until it goes out of scope.
+// using more than one at the same time works as expected, cause the destructors are called in reverse order.
+// use always as stack variable!
+struct shok_saveVirtualProtect {
+	shok_saveVirtualProtect();
+	shok_saveVirtualProtect(void* adr, size_t size);
+	~shok_saveVirtualProtect();
+private:
+	void* Adr;
+	size_t Size;
+	unsigned long Prev;
+};
 
 // casts shok objects with runtime type chek. you can only cast objects that have a vtable (does not have to be known) and a known RTTI TypeDesc set in the class.
 // works almost the same way as dynamic_cast, just you can only cast pointers and you have to specify both current type and target type (without pointer).

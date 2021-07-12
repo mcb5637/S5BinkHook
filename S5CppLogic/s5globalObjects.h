@@ -112,7 +112,7 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 	int GetTimeMS();
 	int GetTick();
 
-	void HookCreateEffect();
+	void HookCreateEffect(); // currently unused
 	static void(*CreateEffectHookCallback)(int id, void* ret);
 
 	static inline shok_EGL_CGLEGameLogic** const GlobalObj = reinterpret_cast<shok_EGL_CGLEGameLogic**>(0x895DAC);

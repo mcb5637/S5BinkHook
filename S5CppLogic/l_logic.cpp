@@ -703,7 +703,7 @@ int l_logicRemoveTop(lua_State* L) {
 	return 0;
 }
 
-int l_logicAddFolder(lua_State* L) { // works, but adds to the bottom
+int l_logicAddFolder(lua_State* L) {
 	const char* s = luaL_checkstring(L, 1);
 	(*shok_BB_CFileSystemMgr::GlobalObj)->AddFolder(s);
 	return 0;
@@ -1029,7 +1029,9 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "GetLoadOrder", &l_logicGetLoadOrder);
 	luaext_registerFunc(L, "AddArchive", &l_logicAddArchive);
 	luaext_registerFunc(L, "RemoveTopArchive", &l_logicRemoveTop);
-	//luaext_registerFunc(L, "AddFolder", &l_logicAddFolder);
+#ifdef _DEBUG
+	luaext_registerFunc(L, "AddFolder", &l_logicAddFolder);
+#endif
 	luaext_registerFunc(L, "EnableMaxHPTechMod", &l_logicEnableMaxHpTechMod);
 	luaext_registerFunc(L, "LandscapeGetTerrainType", &l_logicLandscapeGetTerrainType);
 	luaext_registerFunc(L, "LandscapeGetWaterType", &l_logicLandscapeGetWaterType);
@@ -1060,6 +1062,8 @@ void l_logic_init(lua_State* L)
 // CppLogic.Logic.UICommands.SetCallback(function(id, ev) LuaDebugger.Log(id) LuaDebugger.Log(ev) return false end)
 // CppLogic.Logic.AddArchive("extra2\\shr\\maps\\user\\test.s5x")
 // CppLogic.Logic.AddArchive("test.bba")
+// CppLogic.Logic.AddFolder("test")
+// CppLogic.Logic.GetLoadOrder()
 // CppLogic.Logic.RemoveTopArchive()
 // CppLogic.Logic.EnableMaxHPTechMod() ResearchTechnology(Technologies.T_Fletching)
 // CppLogic.Logic.GetColorByColorIndex(1)

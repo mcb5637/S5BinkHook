@@ -190,13 +190,19 @@ struct shok_taskData {
 	shok_Task ID;
 
 	static inline std::vector<shok_taskData, shok_allocator<shok_taskData>>** GlobalVector = reinterpret_cast<std::vector<shok_taskData, shok_allocator<shok_taskData>>**>(0x898238);
+
+    static void OnGameInit();
 };
 
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int : shok_object {
 	void* Object;
-	int(__thiscall* Func)(shok_EGL_CGLEBehavior* th, shok_EGL_CGLETaskArgs* args);
+	int(__thiscall* Func)(void* th, shok_EGL_CGLETaskArgs* args);
 
 	int ExecuteTask(shok_EGL_CGLETaskArgs* args);
+};
+struct shok_EGL_IGLEStateHandler : shok_object {
+    void* Object;
+    int(__thiscall* Func)(void* th, int args);
 };
 
 
@@ -451,4 +457,7 @@ enum class shok_TaskState : int {
     ThiefSabotage = 31,
     ThiefDisarm = 32,
     ScoutPointToRes = 33, // maybe unused?
+
+
+    LuaFunc = 500,
 };

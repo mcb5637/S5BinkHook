@@ -98,7 +98,7 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, (int)&luaext_checkEntity(L,1)->StateChangeCounter);
+    lua_pushnumber(L, 1);
     return 1;
 }
 
@@ -112,9 +112,12 @@ int cleanup(lua_State* L) {
     return 0;
 }
 
-constexpr double Version = 1.0;
+void initGame() {
+    HookTextPrinting();
+    shok_taskData::OnGameInit();
+}
 
-const char* TaskLuaFunc = "TASK_LUA_FUNC";
+constexpr double Version = 1.0;
 
 extern "C" void __cdecl install(lua_State * L) {
 #ifdef _DEBUG
@@ -124,7 +127,7 @@ extern "C" void __cdecl install(lua_State * L) {
     
     lua_pushstring(L, "CppLogic");
     lua_newtable(L);
-    luaext_registerFunc(L, "OnLeaveMap", cleanup);
+    luaext_registerFunc(L, "OnLeaveMap", &cleanup);
     lua_pushstring(L, "Version");
     lua_pushnumber(L, Version);
     lua_rawset(L, -3);
@@ -183,22 +186,11 @@ extern "C" void __cdecl install(lua_State * L) {
 
     luaopen_debug(L);
 
-    HookTextPrinting();
-    {
-        bool found = false;
-        for (shok_taskData& td : **shok_taskData::GlobalVector) {
-            if (td.TaskName == TaskLuaFunc) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            shok_saveVector<shok_taskData>(*shok_taskData::GlobalVector, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
-                v.push_back(shok_taskData{ TaskLuaFunc, 0xB3F8356D, shok_Task::TASK_LUA_FUNC });
-            });
-        }
+    if (!mainmenu_state) {
+        mainmenu_state = L;
+        initGame();
     }
-
+    
     if (HasSCELoader()) {
         lua_dobuffer(L, SCELoaderFuncOverrides, strlen(SCELoaderFuncOverrides), "CppLogic");
     }
@@ -219,21 +211,27 @@ extern "C" lua_State * __lua_open() {
     install(o);
     return o;
 }
+void __lua_close(lua_State* L) {
+    cleanup(L);
+    lua_close(L);
+}
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
                      )
 {
-    int *data = reinterpret_cast<int*>(SHOK_Import_LUA_OPEN);
     DWORD vp = 0;
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        //VirtualProtect(reinterpret_cast<LPVOID>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH, PAGE_EXECUTE_READWRITE, &vp); // TODO reverse, and do the same on every code change
         {
+            int *data = reinterpret_cast<int*>(SHOK_Import_LUA_OPEN);
             shok_saveVirtualProtect vp{ data, 4 };
             *data = reinterpret_cast<int>(&__lua_open);
+            data = reinterpret_cast<int*>(SHOK_Import_LUA_CLOSE);
+            shok_saveVirtualProtect vp2{ data, 4 };
+            *data = reinterpret_cast<int>(&__lua_close);
         }
         break;
     case DLL_THREAD_ATTACH:

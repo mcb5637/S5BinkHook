@@ -27,6 +27,14 @@ const char* shok_EGL_CGLETaskListMgr::GetTaskListNameByID(int i)
     return shok_CGLETaskListMgr_gettasklistnamebyid(this, i);
 }
 
+const char* TaskLuaFunc = "TASK_LUA_FUNC";
+void shok_taskData::OnGameInit()
+{
+    shok_saveVector<shok_taskData>(*shok_taskData::GlobalVector, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
+        v.push_back(shok_taskData{ TaskLuaFunc, 0xB3F8356D, shok_Task::TASK_LUA_FUNC });
+        });
+}
+
 int shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int::ExecuteTask(shok_EGL_CGLETaskArgs* args)
 {
     return reinterpret_cast<shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(vtable)->ExecuteTask(this, args);

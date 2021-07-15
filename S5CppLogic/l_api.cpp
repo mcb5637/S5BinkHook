@@ -2,6 +2,7 @@
 #include "l_api.h"
 #include "luaext.h"
 #include <libloaderapi.h>
+#include <sstream>
 
 void l_api_checkEvalEnabled(lua_State* L) {
 	if (HasSCELoader())
@@ -28,6 +29,24 @@ int l_api_log(lua_State* L) {
 	// use errorfb to get stack trace?
 	shok_logString("%s\n", s);
 	return 0;
+}
+
+int l_api_stacktrace(lua_State* L) {
+	int lvl = 0;
+	lua_Debug ar;
+	std::ostringstream trace{};
+	while (lua_getstack(L, lvl, &ar)) {
+		if (lua_getinfo(L, "nSl", &ar)) {
+			trace << ar.what << " ";
+			trace << ar.namewhat << " ";
+			trace << (ar.name ? ar.name : "null") << " (defined in:";
+			trace << ar.short_src << ":";
+			trace << ar.currentline << ")\r\n";
+		}
+		lvl++;
+	}
+	lua_pushstring(L, trace.str().c_str());
+	return 1;
 }
 
 int l_api_getfile(lua_State* L) {
@@ -107,6 +126,7 @@ void l_api_init(lua_State* L)
 {
 	luaext_registerFunc(L, "Eval", &l_api_eval);
 	luaext_registerFunc(L, "Log", &l_api_log);
+	luaext_registerFunc(L, "StackTrace", &l_api_stacktrace);
 	luaext_registerFunc(L, "ReadFileAsString", &l_api_getfile);
 	luaext_registerFunc(L, "DoesFileExist", &l_api_hasfile);
 	luaext_registerFunc(L, "DoString", &l_api_doString);

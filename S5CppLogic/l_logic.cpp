@@ -971,7 +971,7 @@ int l_logic_setluataskfunc(lua_State* L) {
 
 
 	if (!shok_EGL_CGLEEntity::LuaTaskListCallback) {
-		shok_EGL_CGLEEntity::LuaTaskListCallback = [](shok_EGL_CGLEEntity* e, shok_EGL_CGLETaskArgs* args) {
+		shok_EGL_CGLEEntity::LuaTaskListCallback = [](shok_EGL_CGLEEntity* e, int val) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 
@@ -979,7 +979,7 @@ int l_logic_setluataskfunc(lua_State* L) {
 			lua_pushlightuserdata(L, &l_logic_setluataskfunc);
 			lua_rawget(L, LUA_REGISTRYINDEX);
 			lua_pushnumber(L, e->EntityId);
-			lua_pushnumber(L, static_cast<shok_EGL_CTaskArgsInteger*>(args)->Value);
+			lua_pushnumber(L, val);
 			lua_pcall(L, 2, 1, 0);
 			if (lua_isnumber(L, -1))
 				r = luaL_checkint(L, -1);

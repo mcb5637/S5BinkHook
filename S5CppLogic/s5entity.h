@@ -18,9 +18,14 @@ struct entityAddonData {
 
 struct shok_EGL_CGLETaskList;
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int;
+struct shok_EGL_IGLEStateHandler;
 struct shok_entity_TaskIdAndTaskHandler {
-	int TaskID;
+	shok_Task TaskID;
 	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* TaskHandler;
+};
+struct shok_entity_StateIdAndStateHandler {
+	shok_TaskState StateID;
+	shok_EGL_IGLEStateHandler* StateHandler;
 };
 
 struct shok_EGL_CGLEEntity : shok_object {
@@ -47,9 +52,9 @@ struct shok_EGL_CGLEEntity : shok_object {
 	vector_padding;
 	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
 	int CurrentState, EntityState, CurrentTaskListID, CurrentTaskIndex; // 34 la37
-	PADDINGI(3); // set of state handlers
+	shok_set<shok_entity_StateIdAndStateHandler> StateHandlers; // 38
 	shok_set<shok_entity_TaskIdAndTaskHandler> TaskHandlers; // 41
-	PADDINGI(6); // la49 41 map of taskhandlers EGL::IGLEHandler<EGL::CGLETaskArgs,int> {vt,obj, func}
+	PADDINGI(6); // la49
 	int Health; // 50
 	char* ScriptName; // "Name" in loader
 	char* ScriptCommandLine;
@@ -130,7 +135,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static bool UseMaxHPTechBoni;
 	static void HookMaxHP();
 
-	static int (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, shok_EGL_CGLETaskArgs* args);
+	static int (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val);
 	static void HookLuaTaskList();
 
 	static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);

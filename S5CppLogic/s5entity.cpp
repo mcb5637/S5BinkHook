@@ -10,9 +10,9 @@ struct shok_vtable_EGL_CGLEEntity {
 	void(__thiscall* ExecuteTask)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_BB_CEvent* d); // 16
 	PADDINGI(2);
-	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, int taskhandler); // 19
-	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, int eventid, int eventhandler); // 20
-	void(__thiscall* AddStateHandler)(shok_EGL_CGLEEntity* th, int eventid, int eventhandler); // 21
+	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
+	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, shok_EventIDs eventid, int eventhandler); // 20
+	void(__thiscall* AddStateHandler)(shok_EGL_CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
 	PADDINGI(6);
 	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
 };
@@ -823,24 +823,55 @@ void shok_EGL_CGLEEntity::HookMaxHP()
 	WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp);
 }
 
-int (*shok_EGL_CGLEEntity::LuaTaskListCallback)(shok_EGL_CGLEEntity* e, shok_EGL_CGLETaskArgs* args) = nullptr;
+int (*shok_EGL_CGLEEntity::LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val) = nullptr;
+void CheckAndAddStateHandler(shok_EGL_CGLEEntity* e, int val);
 int __fastcall FakeTaskHandler_Execute(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, int _, shok_EGL_CGLETaskArgs* args) {
 	int i = 0;
+	int val = static_cast<shok_EGL_CTaskArgsInteger*>(args)->Value;
 	shok_EGL_CGLEEntity* e = reinterpret_cast<shok_EGL_CGLEEntity*>(th->Object);
 	//e->CurrentState = 7;
 	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
-		i = shok_EGL_CGLEEntity::LuaTaskListCallback(e, args);
-	if (i == 2)
+		i = shok_EGL_CGLEEntity::LuaTaskListCallback(e, val);
+	if (i) {
 		e->TaskListChangeCounter++;
-	else if (i == 1)
-		e->StateChangeCounter++;
+		CheckAndAddStateHandler(e, val);
+	}
 	return 0; // TODO repeat task
 }
-struct FakeTaskHandler_VtableTy{ 
+struct FakeTaskHandler_VtableTy { 
 	int(__fastcall* Execute)(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, int _, shok_EGL_CGLETaskArgs* args);
 };
 FakeTaskHandler_VtableTy FakeTaskHandler_Vtable{ &FakeTaskHandler_Execute };
 shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int FakeTaskHandler{ reinterpret_cast<int>(&FakeTaskHandler_Vtable), nullptr, nullptr };
+int __fastcall FakeStateHandler_Execute(shok_EGL_IGLEStateHandler* th, int _, int onek) {
+	int i = -2;
+	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
+		if (shok_EGL_CGLEEntity::LuaTaskListCallback(static_cast<shok_EGL_CGLEEntity*>(th->Object), reinterpret_cast<int>(th->Func)) != 0)
+			i = -1;
+	return i;
+}
+struct FakeStateHandlerVtableType {
+	int(__fastcall* Execute)(shok_EGL_IGLEStateHandler* th, int _, int onek);
+};
+FakeStateHandlerVtableType FakeStateHandler_Vtable = { &FakeStateHandler_Execute };
+void CheckAndAddStateHandler(shok_EGL_CGLEEntity* e, int val) {
+	shok_EGL_IGLEStateHandler* sh;
+	shok_entity_StateIdAndStateHandler* h = e->StateHandlers.GetFirstMatch([](shok_entity_StateIdAndStateHandler* h) {
+		return h->StateID == shok_TaskState::LuaFunc;
+		});
+	if (!h) {
+		sh = static_cast<shok_EGL_IGLEStateHandler*>(shok_malloc(sizeof(shok_EGL_IGLEStateHandler)));
+		sh->vtable = reinterpret_cast<int>(&FakeStateHandler_Vtable);
+		sh->Object = e;
+		sh->Func = nullptr;
+		reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(e->vtable)->AddStateHandler(e, shok_TaskState::LuaFunc, sh);
+	}
+	else {
+		sh = h->StateHandler;
+	}
+	e->CurrentState = static_cast<int>(shok_TaskState::LuaFunc);
+	sh->Func = reinterpret_cast<int(__thiscall *)(void* th, int args)>(val);
+}
 shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* const __fastcall entity_gettaskhandlerhook(shok_set<shok_entity_TaskIdAndTaskHandler>* thandler, int _, shok_Task tid) {
 	if (tid == shok_Task::TASK_LUA_FUNC) {
 		FakeTaskHandler.Object = reinterpret_cast<void*>(reinterpret_cast<int>(thandler) - offsetof(shok_EGL_CGLEEntity, TaskHandlers));

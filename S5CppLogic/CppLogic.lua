@@ -281,6 +281,10 @@ function CppLogic.API.Eval(code) end
 -- @param str the string to log
 function CppLogic.API.Log(str) end
 
+--- creates a stack trace of the current executing lua functions.
+-- @return string trace
+function CppLogic.API.StackTrace() end
+
 --- reads a file into a string.
 -- can only read files in data\maps\externalmap\
 -- @param file path to the file

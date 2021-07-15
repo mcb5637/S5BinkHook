@@ -25,6 +25,7 @@ static_assert(sizeof(std::list<int>) == 8);
 #define DEBUGGER_BREAK _asm int 3
 
 constexpr int SHOK_Import_LUA_OPEN = 0x761284;
+constexpr int SHOK_Import_LUA_CLOSE = 0x76126C;
 constexpr int SHOK_SEGMENTSTART = 0x401000;
 constexpr int SHOK_SEGMENTLENGTH = 0x64B000;
 
@@ -319,6 +320,7 @@ static inline int(__stdcall* const shok_loadBuffer)(lua_State* L, const char* bu
 
 
 static inline lua_State** const shok_luastate_game = reinterpret_cast<lua_State**>(0x853A9C);
+extern lua_State* mainmenu_state;
 
 
 const char* ReadFileToString(const char* name, size_t* size);

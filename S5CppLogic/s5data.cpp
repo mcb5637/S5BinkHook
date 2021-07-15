@@ -109,6 +109,8 @@ bool operator<(shok_attachment a, shok_attachment b) {
 	return a.AttachmentType < b.AttachmentType;
 }
 
+lua_State* mainmenu_state = nullptr;
+
 struct shok_BB_CFileStreamEx {
 	int vtable = 0x761C60;
 	int x = 0;

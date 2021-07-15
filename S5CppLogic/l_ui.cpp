@@ -15,15 +15,18 @@ shok_EGUIX_CBaseWidget* l_uiCheckWid(lua_State* L, int i) {
 	return r;
 }
 
+void l_uiClearFunc(lua_State* L, shok_EGUIX_CLuaFunctionHelper* f) {
+	if (f->FuncRefCommand.L) {
+		luaL_unref(f->FuncRefCommand.L, LUA_REGISTRYINDEX, f->FuncRefCommand.Ref);
+		f->FuncRefCommand.L = nullptr;
+		f->FuncRefCommand.Ref = LUA_NOREF;
+	}
+}
 void l_uiOverrideFunc(lua_State* L, shok_EGUIX_CLuaFunctionHelper* f, int i) {
 	lua_pushvalue(L, i);
-	if (f->FuncRefCommand.L) {
-		lua_rawseti(L, LUA_REGISTRYINDEX, f->FuncRefCommand.Ref);
-	}
-	else {
-		f->FuncRefCommand.L = L;
-		f->FuncRefCommand.Ref = luaL_ref(L, LUA_REGISTRYINDEX);
-	}
+	l_uiClearFunc(L, f);
+	f->FuncRefCommand.L = L;
+	f->FuncRefCommand.Ref = luaL_ref(L, LUA_REGISTRYINDEX);
 	f->FuncRefCommand.NeedsCompile = 0;
 }
 
@@ -53,6 +56,11 @@ const char* l_uiCheckFontString(const char* font) {
 int l_uiGetWidAdr(lua_State* L) {
 	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
 	lua_pushnumber(L, reinterpret_cast<int>(w));
+	shok_EGUIX_CLuaFunctionHelper* bh = w->GetUpdateFunc();
+	if (bh) {
+		lua_pushnumber(L, (int)bh);
+		return 2;
+	}
 	return 1;
 }
 
@@ -626,6 +634,19 @@ void l_ui_cleanup(lua_State* L) {
 	UIInput_Char_Callback = nullptr;
 	UIInput_Key_Callback = nullptr;
 	UIInput_Mouse_Callback = nullptr;
+	if (shok_widgetManager* wm = shok_widgetManager::GlobalObj()) {
+		for (shok_EGUIX_CBaseWidget* wid : wm->Widgets) {
+			if (shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper()) {
+				l_uiClearFunc(L, &tt->UpdateFunction);
+			}
+			if (shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc()) {
+				l_uiClearFunc(L, fh);
+			}
+			if (shok_EGUIX_CButtonHelper* bh = wid->GetButtonHelper()) {
+				l_uiClearFunc(L, &bh->ActionFunction);
+			}
+		}
+	}
 }
 
 void l_ui_init(lua_State* L)
@@ -679,6 +700,7 @@ void l_ui_init(lua_State* L)
 }
 
 // CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")
+// CppLogic.UI.WidgetGetAddress("AutoAddSerfJobs")
 // StartMenu00_VersionNumber
 // StartMenu00_EndGame
 // StartMenu00

@@ -155,10 +155,14 @@ void initStringHelper(shok_EGUIX_CWidgetStringHelper& h) {
     h.Color = { 0, 0, 0, 0xFF };
     initSingleSting(h.SingleStringHandler);
 }
+void(__thiscall* const shok_EGUIX_CLuaFunctionHelper_ctor)(shok_EGUIX_CLuaFunctionHelper* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CLuaFunctionHelper * th)>(0x55BEA2);
 void initLuaFunc(shok_EGUIX_CLuaFunctionHelper& h) {
-    h.vtable = shok_EGUIX_CLuaFunctionHelper::vtp;
+    /*h.vtable = shok_EGUIX_CLuaFunctionHelper::vtp;
     h.FuncRefCommand.vtable = shoc_EScr_CLuaFuncRefCommand::vtp;
     h.LuaCommand = shok_string("");
+    h.FuncRefCommand.LuaCommand = shok_string("");
+    h.FuncRefCommand.NeedsCompile = 1;*/
+    shok_EGUIX_CLuaFunctionHelper_ctor(&h);
 }
 void initTooltipHelper(shok_EGUIX_CToolTipHelper& h) {
     h.vtable = shok_EGUIX_CToolTipHelper::vtp;

@@ -14,6 +14,7 @@ struct entityAddonData {
 	int RegenSecondsOverride = -1;
 	float MaxRangeOverride = -1.0f;
 	std::string NameOverride = "";
+	int FakeTaskValue = 0;
 };
 
 struct shok_EGL_CGLETaskList;
@@ -135,7 +136,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static bool UseMaxHPTechBoni;
 	static void HookMaxHP();
 
-	static int (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val);
+	static bool (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val);
 	static void HookLuaTaskList();
 
 	static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);

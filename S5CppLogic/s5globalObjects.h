@@ -53,7 +53,7 @@ struct shok_EGL_CTerrainVertexColors : shok_object {
 	void ToTerrainCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
 	int GetTerrainVertexColor(shok_position& p);
-	// set 580582 (this, x, y, *col) terraincoord
+	void SetTerrainVertexColor(shok_position& p, int col); // a,r,g,b each int8
 };
 struct shok_EGL_CGLETerrainHiRes : shok_object {
 	vector_padding;
@@ -66,7 +66,7 @@ struct shok_EGL_CGLETerrainHiRes : shok_object {
 	void ToTerrainCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
 	int GetTerrainHeight(shok_position& p);
-	// set 591B53 (this, *out, int16 h)
+	void SetTerrainHeight(shok_position& p, int h); // int16
 };
 struct shok_EGL_CGLETerrainLowRes : shok_object {
 	vector_padding
@@ -80,11 +80,11 @@ struct shok_EGL_CGLETerrainLowRes : shok_object {
 	void ToQuadCoord(shok_position& p, int* out);
 	bool IsCoordValid(int* out);
 	int GetTerrainTypeAt(shok_position& p);
+	void SetTerrainTypeAt(shok_position& p, int tty); // byte (int8)
 	int GetWaterTypeAt(shok_position& p);
+	void SetWaterTypeAt(shok_position& p, int wty); // int6
 	int GetWaterHeightAt(shok_position& p);
-	// set water height 591B82 (this, *out, int)
-	// set water type 591BB9 (this, *out, int)
-	// set terrain type 58BBCE (this, *out, int)
+	void SetWaterHeightAt(shok_position& p, int wh); // int16
 };
 struct shok_EGL_CGLELandscape : shok_object {
 	PADDINGI(6);

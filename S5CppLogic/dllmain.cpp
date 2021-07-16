@@ -98,8 +98,11 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, 1);
-    return 1;
+    shok_position p;
+    luaext_checkPos(L, p, 1);
+    (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->SetWaterTypeAt(p, 5);
+    (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->SetWaterHeightAt(p, 2200);
+    return 0;
 }
 
 int cleanup(lua_State* L) {
@@ -115,6 +118,7 @@ int cleanup(lua_State* L) {
 void initGame() {
     HookTextPrinting();
     shok_taskData::OnGameInit();
+    shok_EGL_CGLEEntity::HookLuaTaskList();
 }
 
 constexpr double Version = 1.0;
@@ -211,7 +215,7 @@ extern "C" lua_State * __lua_open() {
     install(o);
     return o;
 }
-void __lua_close(lua_State* L) {
+void __lua_close(lua_State* L) { // TODO do something better than this when i come around writing a modloader...
     cleanup(L);
     lua_close(L);
 }

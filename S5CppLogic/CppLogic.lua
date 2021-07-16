@@ -257,7 +257,7 @@ function CppLogic.Logic.FixSnipeDamage(override) end
 function CppLogic.Logic.GetCurrentWeatherGFXState() end
 
 --- sets a func to be called, if a tasklist contains TASK_LUA_FUNC.
--- @param func(entityid, value)->tlret
+-- @param func(entityid, value)->repeat
 function CppLogic.Logic.SetLuaTaskListFunc(func) end
 
 --- ui command callback.

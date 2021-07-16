@@ -197,12 +197,14 @@ struct shok_taskData {
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int : shok_object {
 	void* Object;
 	int(__thiscall* Func)(void* th, shok_EGL_CGLETaskArgs* args);
+    int Zero;
 
 	int ExecuteTask(shok_EGL_CGLETaskArgs* args);
 };
 struct shok_EGL_IGLEStateHandler : shok_object {
     void* Object;
     int(__thiscall* Func)(void* th, int args);
+    int Zero;
 };
 
 

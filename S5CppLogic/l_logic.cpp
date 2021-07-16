@@ -958,7 +958,6 @@ int l_logic_GetCurrentWeatherGFXState(lua_State* L) {
 }
 
 int l_logic_setluataskfunc(lua_State* L) {
-	shok_EGL_CGLEEntity::HookLuaTaskList();
 	if (lua_isnil(L, 1)) {
 		shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
 		return 0;
@@ -975,14 +974,14 @@ int l_logic_setluataskfunc(lua_State* L) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 
-			int r = 0;
+			bool r = false;
 			lua_pushlightuserdata(L, &l_logic_setluataskfunc);
 			lua_rawget(L, LUA_REGISTRYINDEX);
 			lua_pushnumber(L, e->EntityId);
 			lua_pushnumber(L, val);
 			lua_pcall(L, 2, 1, 0);
-			if (lua_isnumber(L, -1))
-				r = luaL_checkint(L, -1);
+			if (lua_toboolean(L, -1))
+				r = true;
 
 			lua_settop(L, t);
 			return r;

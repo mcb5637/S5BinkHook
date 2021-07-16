@@ -86,6 +86,15 @@ int shok_EGL_CTerrainVertexColors::GetTerrainVertexColor(shok_position& p)
 		DEBUGGER_BREAK;
 	return VertexColors[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
 }
+void(__thiscall* const terrvertexcol_setvcol)(shok_EGL_CTerrainVertexColors* th, int x, int y, int* col) = reinterpret_cast<void(__thiscall*)(shok_EGL_CTerrainVertexColors*, int, int, int*)>(0x580582);
+void shok_EGL_CTerrainVertexColors::SetTerrainVertexColor(shok_position& p, int col)
+{
+	int qp[2] = { 0,0 };
+	ToTerrainCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	terrvertexcol_setvcol(this, qp[0], qp[1], &col);
+}
 
 void shok_EGL_CGLETerrainHiRes::ToTerrainCoord(shok_position& p, int* out)
 {
@@ -103,6 +112,15 @@ int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(shok_position& p)
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return TerrainHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
+}
+void(__thiscall* const terrhires_setheight)(shok_EGL_CGLETerrainHiRes* th, int* qp, int16_t h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainHiRes*, int*, int16_t)>(0x591B53);
+void shok_EGL_CGLETerrainHiRes::SetTerrainHeight(shok_position& p, int h)
+{
+	int qp[2] = { 0,0 };
+	ToTerrainCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	terrhires_setheight(this, qp, h);
 }
 
 void shok_EGL_CGLETerrainLowRes::ToQuadCoord(shok_position& p, int* out)
@@ -122,6 +140,15 @@ int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(shok_position& p)
 		DEBUGGER_BREAK;
 	return Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0xFF;
 }
+void(__thiscall* const terrlores_settty)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x58BBCE);
+void shok_EGL_CGLETerrainLowRes::SetTerrainTypeAt(shok_position& p, int tty)
+{
+	int qp[2] = { 0,0 };
+	ToQuadCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	terrlores_settty(this, qp, tty);
+}
 int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(shok_position& p)
 {
 	int qp[2] = { 0,0 };
@@ -130,6 +157,15 @@ int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(shok_position& p)
 		DEBUGGER_BREAK;
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3F00) >> 8;
 }
+void(__thiscall* const terrlores_setwty)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x591BB9);
+void shok_EGL_CGLETerrainLowRes::SetWaterTypeAt(shok_position& p, int wty)
+{
+	int qp[2] = { 0,0 };
+	ToQuadCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	terrlores_setwty(this, qp, wty);
+}
 int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(shok_position& p)
 {
 	int qp[2] = { 0,0 };
@@ -137,6 +173,15 @@ int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(shok_position& p)
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3FFFC000) >> 14;
+}
+void(__thiscall* const terrlores_setwh)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x591B82);
+void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(shok_position& p, int wh)
+{
+	int qp[2] = { 0,0 };
+	ToQuadCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	terrlores_setwh(this, qp, wh);
 }
 
 static inline int(__thiscall* const shokLandscape_getSector)(shok_EGL_CGLELandscape* th, shok_position* p) = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*)>(0x5778BE);

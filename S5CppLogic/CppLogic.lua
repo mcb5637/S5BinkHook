@@ -260,6 +260,16 @@ function CppLogic.Logic.GetCurrentWeatherGFXState() end
 -- @param func(entityid, value)->repeat
 function CppLogic.Logic.SetLuaTaskListFunc(func) end
 
+--- changes all occurences of TASK_WAIT_FOR_ANIM to TASK_WAIT_FOR_ANIM_NON_CANCELABLE in the give tasklist.
+-- this prevents new commands canceling the task.
+-- @param tl tasklist
+-- @param tind task index (optional, default -1) id <0 full tasklist gets searched
+function CppLogic.Logic.TaskListMakeWaitForAnimsUnCancelable(tl, tind) end
+--- changes all occurences of TASK_WAIT_FOR_ANIM_NON_CANCELABLE to TASK_WAIT_FOR_ANIM in the give tasklist.
+-- @param tl tasklist
+-- @param tind task index (optional, default -1) id <0 full tasklist gets searched
+function CppLogic.Logic.TaskListMakeWaitForAnimsCancelable(tl, tind) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData, writeback).
 -- function can return true to skip further event execution.
@@ -1157,7 +1167,7 @@ function CppLogic.EntityType.GetArmor(ty) end
 -- @param ty entitytype
 -- @param ar armor
 -- @param acl armorclass
-function CppLogic.EntityType.GetArmor(ty, ar, acl) end
+function CppLogic.EntityType.SetArmor(ty, ar, acl) end
 
 --- settler or building type armor modifier techs.
 -- @param ty entitytype
@@ -1179,7 +1189,7 @@ function CppLogic.EntityType.GetModels(ty) end
 -- @param m1 model 1 (optional)
 -- @param m2 model 2 (optional)
 -- @param m3 model 3 (optional)
-function CppLogic.EntityType.GetModels(ty, m0, m1, m2, m3) end
+function CppLogic.EntityType.SetModels(ty, m0, m1, m2, m3) end
 
 --- tree data to replace a tree with a resourcetree.
 -- @param ty entitytype

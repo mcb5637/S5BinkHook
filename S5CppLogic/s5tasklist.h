@@ -425,6 +425,7 @@ enum class shok_Task : int {
     TASK_TURN_TO_SHURIKEN_TARGET = 210,
 
     TASK_LUA_FUNC = 500,
+    TASK_WAIT_FOR_ANIM_NON_CANCELABLE = 501,
 };
 
 enum class shok_TaskState : int {
@@ -462,4 +463,5 @@ enum class shok_TaskState : int {
 
 
     LuaFunc = 500,
+    WaitForAnimNonCancelable = 501,
 };

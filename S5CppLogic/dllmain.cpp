@@ -98,11 +98,8 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    shok_position p;
-    luaext_checkPos(L, p, 1);
-    (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->SetWaterTypeAt(p, 5);
-    (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->SetWaterHeightAt(p, 2200);
-    return 0;
+    lua_pushnumber(L, (int)&luaext_checkEntity(L, 1)->Health);
+    return 1;
 }
 
 int cleanup(lua_State* L) {
@@ -119,6 +116,7 @@ void initGame() {
     HookTextPrinting();
     shok_taskData::OnGameInit();
     shok_EGL_CGLEEntity::HookLuaTaskList();
+    shok_EGL_CGLEEntity::HookNonCancelableAnim();
 }
 
 constexpr double Version = 1.0;

@@ -991,6 +991,43 @@ int l_logic_setluataskfunc(lua_State* L) {
 	return 0;
 }
 
+int l_logic_makeTaskListWaitForAnimUncancelable(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	shok_EGL_CGLETaskList* tl = (*shok_EGL_CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+	luaext_assertPointer(L, tl, "invalid tasklist");
+	i = luaL_optint(L, 2, -1);
+	if (i < 0) {
+		for (shok_EGL_CGLETaskArgs* p : tl->Task) {
+			if (p->TaskType == shok_Task::TASK_WAIT_FOR_ANIM)
+				p->TaskType = shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE;
+		}
+	}
+	else {
+		luaext_assert(L, i < static_cast<int>(tl->Task.size()), "invalid task");
+		luaext_assert(L, tl->Task[i]->TaskType == shok_Task::TASK_WAIT_FOR_ANIM, "task not waitforanim");
+		tl->Task[i]->TaskType = shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE;
+	}
+	return 0;
+}
+int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	shok_EGL_CGLETaskList* tl = (*shok_EGL_CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+	luaext_assertPointer(L, tl, "invalid tasklist");
+	i = luaL_optint(L, 2, -1);
+	if (i < 0) {
+		for (shok_EGL_CGLETaskArgs* p : tl->Task) {
+			if (p->TaskType == shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE)
+				p->TaskType = shok_Task::TASK_WAIT_FOR_ANIM;
+		}
+	}
+	else {
+		luaext_assert(L, i < static_cast<int>(tl->Task.size()), "invalid task");
+		luaext_assert(L, tl->Task[i]->TaskType == shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, "task not waitforanim_nocancel");
+		tl->Task[i]->TaskType = shok_Task::TASK_WAIT_FOR_ANIM;
+	}
+	return 0;
+}
+
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
@@ -1049,6 +1086,8 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "FixSnipeDamage", &l_logic_FixSnipeDamage);
 	luaext_registerFunc(L, "GetCurrentWeatherGFXState", &l_logic_GetCurrentWeatherGFXState);
 	luaext_registerFunc(L, "SetLuaTaskListFunc", &l_logic_setluataskfunc);
+	luaext_registerFunc(L, "TaskListMakeWaitForAnimsUnCancelable", &l_logic_makeTaskListWaitForAnimUncancelable);
+	luaext_registerFunc(L, "TaskListMakeWaitForAnimsCancelable", &l_logic_makeTaskListWaitForAnimCancelable);
 
 
 	lua_pushstring(L, "UICommands");

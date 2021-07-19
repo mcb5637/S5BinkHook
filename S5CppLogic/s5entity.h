@@ -55,7 +55,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int CurrentState, EntityState, CurrentTaskListID, CurrentTaskIndex; // 34 la37
 	shok_set<shok_entity_StateIdAndStateHandler> StateHandlers; // 38
 	shok_set<shok_entity_TaskIdAndTaskHandler> TaskHandlers; // 41
-	PADDINGI(6); // la49
+	PADDINGI(6); // la49 49 p to array EGL::ISlot of behaviors
 	int Health; // 50
 	char* ScriptName; // "Name" in loader
 	char* ScriptCommandLine;
@@ -138,6 +138,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 
 	static bool (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val);
 	static void HookLuaTaskList();
+	static void HookNonCancelableAnim();
 
 	static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
 	static void HookHero6Convert();

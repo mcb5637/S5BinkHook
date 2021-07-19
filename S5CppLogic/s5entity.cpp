@@ -13,9 +13,14 @@ struct shok_vtable_EGL_CGLEEntity {
 	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
 	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, shok_EventIDs eventid, int eventhandler); // 20
 	void(__thiscall* AddStateHandler)(shok_EGL_CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
-	PADDINGI(6);
+	PADDINGI(2);
+	void(__thiscall* SetTaskState)(shok_EGL_CGLEEntity* th, shok_TaskState state); // 24
+	PADDINGI(3);
 	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
+	PADDINGI(5);
+	bool(__thiscall* CanCancelCurrentState)(shok_EGL_CGLEEntity* e); // 34
 };
+//constexpr int i = offsetof(shok_vtable_EGL_CGLEEntity, CanCancelCurrentState) / 4;
 
 static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLEEntityCreator*)>(0x4493A4);
 shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator()
@@ -831,10 +836,10 @@ int __fastcall entity_executeluatask(shok_EGL_CGLEEntity* th, int _, shok_EGL_CG
 		i = shok_EGL_CGLEEntity::LuaTaskListCallback(th, val);
 	if (i) {
 		th->GetAdditionalData(true)->FakeTaskValue = val;
-		th->StateChangeCounter++;
-		th->CurrentState = static_cast<int>(shok_TaskState::LuaFunc);
+		shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
+		vt->SetTaskState(th, shok_TaskState::LuaFunc);
 	}
-	return 0;
+	return i;
 }
 int __fastcall entity_executeluataskstate(shok_EGL_CGLEEntity* th, int _, int onek) {
 	int i = -2;
@@ -868,6 +873,55 @@ void shok_EGL_CGLEEntity::HookLuaTaskList()
 	HookLuaTaskList_Hooked = true;
 	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x57D6CA), 10 };
 	RedirectCall(reinterpret_cast<void*>(0x57D6CA), &entity_addluatlhandlershook);
+}
+
+int __fastcall entity_hooknoncancelanim_task(shok_GGL_CGLBehaviorAnimationEx* th, int _, shok_EGL_CGLETaskArgs* args) {
+	int wait = static_cast<shok_EGL_CGLETaskArgsThousandths*>(args)->Thousandths;
+	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
+	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(e->vtable);
+	th->TurnToWaitFor = th->StartTurn + th->Duration * wait / 1000;
+	vt->SetTaskState(e, shok_TaskState::WaitForAnimNonCancelable);
+	return 1;
+}
+void __stdcall entity_hooknoncancelanim(shok_EGL_CGLEEntity* th, shok_GGL_CGLBehaviorAnimationEx* beh) {
+	if (beh->vtable != shok_GGL_CGLBehaviorAnimationEx::vtp)
+		DEBUGGER_BREAK;
+	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
+	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok_malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
+	thand->vtable = 0x784A4C; // EGL::THandler<5,EGL::CGLETaskArgs,EGL::CGLETaskArgsThousandths,EGL::CBehaviorAnimation,int>
+	thand->Object = beh;
+	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(entity_hooknoncancelanim_task);
+	thand->Zero = 0;
+	vt->AddTaskHandler(th, shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, thand);
+	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok_malloc(sizeof(shok_EGL_IGLEStateHandler)));
+	shand->vtable = 0x784A7C; // EGL::TStateHandler<EGL::CBehaviorAnimation>
+	shand->Object = beh;
+	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(0x587E20);
+	shand->Zero = 0;
+	vt->AddStateHandler(th, shok_TaskState::WaitForAnimNonCancelable, shand);
+}
+void __declspec(naked) entity_hooknoncancelanim_asm() {
+	__asm {
+		mov ecx, esi;
+		call[eax + 0x48];
+
+		push edi;
+		push esi;
+		call entity_hooknoncancelanim;
+
+		mov ecx, [ebp + 0xC];
+		push 0x588410;
+		ret;
+	};
+}
+bool HookNonCancelableAnim_Hooked = false;
+void shok_EGL_CGLEEntity::HookNonCancelableAnim()
+{
+	if (HookNonCancelableAnim_Hooked)
+		return;
+	HookNonCancelableAnim_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x588408), 10 };
+	WriteJump(reinterpret_cast<void*>(0x588408), &entity_hooknoncancelanim_asm);
 }
 
 

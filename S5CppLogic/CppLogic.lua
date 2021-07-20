@@ -1659,6 +1659,10 @@ function CppLogic.UI.ButtonSetShortcutString(wid, str, isSTTKey) end
 -- @param group group name
 function CppLogic.UI.WidgetSetGroup(wid, group) end
 
+--- removes a widget.
+-- @param wid widget
+function CppLogic.UI.RemoveWidget(wid) end
+
 
 --- creates a new static widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.

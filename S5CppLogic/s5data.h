@@ -249,6 +249,14 @@ static_assert(sizeof(shok_costInfo) == 18 * 4);
 
 struct shok_object {
 	int vtable;
+
+	void Destructor(bool free); // not everything should be destroyed with this destructor, make sure there is not somenting extra for your type in question
+};
+
+struct shok_vtable_BB_IObject {
+	void(__thiscall* dtor)(shok_object* th, bool free);
+	unsigned int(__thiscall* GetClassIdentifier)(shok_object* th);
+	PADDINGI(1); // unknown, thiscall (th, x,x)
 };
 
 enum class shok_AttachmentType;

@@ -106,7 +106,7 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 	int UserVariable[2];
 	int WidgetID;
 	shok_widget_rect PosAndSize;
-	byte IsShown;
+	byte IsShown; //9
 	PADDING(3);
 	float ZPriority;
 	int MotherWidgetID;
@@ -116,6 +116,7 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 
 	static inline constexpr int vtp = 0x780768;
 	static inline constexpr int TypeDesc = 0x82D93C;
+	// 5598E3 ctor
 
 	int SetPosAndSize(float x, float y, float w, float h);
 	byte* GetUpdateManualFlag();
@@ -170,6 +171,7 @@ struct shok_EGUIX_CButtonWidget : shok_EGUIX_CBaseWidget {
 
 	static inline constexpr int vtp = 0x780E5C;
 	static inline constexpr int TypeDesc = 0x834148;
+	// 55F782 ctor
 };
 static_assert(sizeof(shok_EGUIX_CButtonWidget) == 146 * 4);
 
@@ -250,6 +252,7 @@ struct shok_widgetManager { // this thing has no vtable...
 
 	int GetIdByName(const char* name);
 	shok_EGUIX_CBaseWidget* GetWidgetByID(int id);
+	void RemoveWidget(shok_EGUIX_CBaseWidget* w);
 
 	static inline shok_widgetManager* (* const GlobalObj)() = reinterpret_cast<shok_widgetManager * (*)()>(0x558473);
 };

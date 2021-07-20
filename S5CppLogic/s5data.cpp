@@ -195,6 +195,11 @@ bool shok_costInfo::HasResources(shok_costInfo* has)
 	return constinfo_hasres(this, has);
 }
 
+void shok_object::Destructor(bool free)
+{
+	reinterpret_cast<shok_vtable_BB_IObject*>(vtable)->dtor(this, free);
+}
+
 bool HasSCELoader()
 {
 	return GetModuleHandle(L"SCELoader.dll");

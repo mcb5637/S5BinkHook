@@ -1,16 +1,15 @@
 #include "pch.h"
 #include "s5data.h"
 
-struct shok_vtable_EGUIX_CBaseWidget {
-    PADDINGI(7);
-    int(__thiscall* SetSizeAndPos)(shok_EGUIX_CBaseWidget* th, float x, float y, float w, float h); // 7
-};
-struct shok_vtable_EGUIX_CContainerWidget {
-    PADDINGI(7);
+struct shok_vtable_EGUIX_CBaseWidget : shok_vtable_BB_IObject {
+    PADDINGI(4);
     int(__thiscall* SetSizeAndPos)(shok_EGUIX_CBaseWidget* th, float x, float y, float w, float h); // 7
     PADDINGI(4);
+};
+struct shok_vtable_EGUIX_CContainerWidget : shok_vtable_EGUIX_CBaseWidget {
     void(__thiscall* AddChild)(shok_EGUIX_CContainerWidget* th, shok_EGUIX_CBaseWidget* ch); // 12
 };
+//constexpr int i = offsetof(shok_vtable_EGUIX_CContainerWidget, AddChild) / 4;
 
 
 static inline int(__thiscall* const widman_getidbyname)(shok_widgetManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(shok_widgetManager*, const char*)>(0x5588A0);
@@ -23,6 +22,11 @@ static inline shok_EGUIX_CBaseWidget* (__thiscall* const widman_getwid)(shok_wid
 shok_EGUIX_CBaseWidget* shok_widgetManager::GetWidgetByID(int id)
 {
     return widman_getwid(this, id);
+}
+static inline void(__thiscall* const widman_removewid)(shok_widgetManager* th, shok_EGUIX_CBaseWidget* w, int id) = reinterpret_cast<void(__thiscall*)(shok_widgetManager*, shok_EGUIX_CBaseWidget * w, int)>(0x558915);
+void shok_widgetManager::RemoveWidget(shok_EGUIX_CBaseWidget* w)
+{
+    widman_removewid(this, w, w->WidgetID);
 }
 
 static inline int(__thiscall* const widgroupman_getgroupid)(shok_EGUIX_CWidgetGroupManager* th, const char* s) = reinterpret_cast<int(__thiscall*)(shok_EGUIX_CWidgetGroupManager*, const char*)>(0x583214);
@@ -138,142 +142,70 @@ void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const
     }
 }
 
-void initMaterial(shok_EGUIX_CMaterial& m) {
-    m.vtable = shok_EGUIX_CMaterial::vtp;
-    m.TextureCoordinates = { 0, 0, 1, 1 };
-    m.Color = { 0xFF, 0xFF, 0xFF, 0xFF };
-}
-void initSingleSting(shok_EGUIX_CSingleStringHandler& h) {
-    h.RawString = shok_string("");
-    h.StringTableKey = shok_string("");
-}
-void initStringHelper(shok_EGUIX_CWidgetStringHelper& h) {
-    h.vtable = shok_EGUIX_CWidgetStringHelper::vtp;
-    h.FontHandler.vtable = shok_EGUIX_CFontIDHandler::vtp;
-    h.SingleStringHandler.vtable = shok_EGUIX_CSingleStringHandler::vtp;
-    h.FontHandler.FontID = 1;
-    h.Color = { 0, 0, 0, 0xFF };
-    initSingleSting(h.SingleStringHandler);
-}
 void(__thiscall* const shok_EGUIX_CLuaFunctionHelper_ctor)(shok_EGUIX_CLuaFunctionHelper* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CLuaFunctionHelper * th)>(0x55BEA2);
-void initLuaFunc(shok_EGUIX_CLuaFunctionHelper& h) {
-    /*h.vtable = shok_EGUIX_CLuaFunctionHelper::vtp;
-    h.FuncRefCommand.vtable = shoc_EScr_CLuaFuncRefCommand::vtp;
-    h.LuaCommand = shok_string("");
-    h.FuncRefCommand.LuaCommand = shok_string("");
-    h.FuncRefCommand.NeedsCompile = 1;*/
-    shok_EGUIX_CLuaFunctionHelper_ctor(&h);
-}
-void initTooltipHelper(shok_EGUIX_CToolTipHelper& h) {
-    h.vtable = shok_EGUIX_CToolTipHelper::vtp;
-    h.vtable_EGUIX_IWidgetRegistrationCallback = 0x780B28;
-    initSingleSting(h.ToolTipString);
-    initLuaFunc(h.UpdateFunction);
-}
-void initButtonHelper(shok_EGUIX_CButtonHelper& h) {
-    h.vtable = shok_EGUIX_CButtonHelper::vtp;
-    initSingleSting(h.ShortCutString);
-    initLuaFunc(h.ActionFunction);
-}
 static inline void(__thiscall* const widlisthandler_ctor)(shok_EGUIX_CWidgetListHandler* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CWidgetListHandler*)>(0x55BB26);
-void initWidgetListHandler(shok_EGUIX_CWidgetListHandler& h) {
-    widlisthandler_ctor(&h);
-}
 
+static inline void(__thiscall* const statwid_ctor)(shok_EGUIX_CStaticWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CStaticWidget*)>(0x5603F1);
 shok_EGUIX_CStaticWidget* shok_EGUIX_CStaticWidget::Create()
 {
     shok_EGUIX_CStaticWidget* r = reinterpret_cast<shok_EGUIX_CStaticWidget*>(shok_malloc(sizeof(shok_EGUIX_CStaticWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CStaticWidget));
-    r->vtable = shok_EGUIX_CStaticWidget::vtp;
-    r->vtable_EGUIX_IOnEvent = 0x780F78;
-    r->vtable_EGUIX_IRender = 0x780F6C;
-    r->vtable_EGUIX_IMaterialAccess = 0x780F58;
-    initMaterial(r->BackgroundMaterial);
+    statwid_ctor(r);
+    r->IsShown = false;
     return r;
 }
+static inline void(__thiscall* const stattextwid_ctor)(shok_EGUIX_CStaticTextWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CStaticTextWidget*)>(0x55FBB1);
 shok_EGUIX_CStaticTextWidget* shok_EGUIX_CStaticTextWidget::Create()
 {
     shok_EGUIX_CStaticTextWidget* r = reinterpret_cast<shok_EGUIX_CStaticTextWidget*>(shok_malloc(sizeof(shok_EGUIX_CStaticTextWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CStaticTextWidget));
-    r->vtable = shok_EGUIX_CStaticTextWidget::vtp;
-    r->vtable_EGUIX_IOnEvent = 0x780ED8;
-    r->vtable_EGUIX_IRender = 0x780ECC;
-    r->vtable_EGUIX_IMaterialAccess = 0x780EB8;
-    r->vtable_EGUIX_ITextAccess = 0x780E90;
-    initMaterial(r->BackgroundMaterial);
-    initStringHelper(r->StringHelper);
-    initLuaFunc(r->UpdateFunction);
-    r->UpdateManualFlag = true;
+    stattextwid_ctor(r);
+    r->IsShown = false;
     return r;
 }
+static inline void(__thiscall* const purettwid_ctor)(shok_EGUIX_CPureTooltipWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CPureTooltipWidget*)>(0x55DF3E);
 shok_EGUIX_CPureTooltipWidget* shok_EGUIX_CPureTooltipWidget::Create()
 {
     shok_EGUIX_CPureTooltipWidget* r = reinterpret_cast<shok_EGUIX_CPureTooltipWidget*>(shok_malloc(sizeof(shok_EGUIX_CPureTooltipWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CPureTooltipWidget));
-    r->vtable = shok_EGUIX_CPureTooltipWidget::vtp;
-    r->vtable_EGUIX_IOnEvent = 0x780BA4;
-    initTooltipHelper(r->ToolTipHelper);
+    purettwid_ctor(r);
+    r->IsShown = false;
     return r;
 }
+static inline void(__thiscall* const gfxbutwid_ctor)(shok_EGUIX_CGfxButtonWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CGfxButtonWidget*)>(0x55E917);
 shok_EGUIX_CGfxButtonWidget* shok_EGUIX_CGfxButtonWidget::Create()
 {
     shok_EGUIX_CGfxButtonWidget* r = reinterpret_cast<shok_EGUIX_CGfxButtonWidget*>(shok_malloc(sizeof(shok_EGUIX_CGfxButtonWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CGfxButtonWidget));
-    r->vtable = shok_EGUIX_CGfxButtonWidget::vtp;
-    r->vtable_EGUIX_IOnEvent = 0x780CC4;
-    r->vtable_EGUIX_IRender = 0x780CB8;
-    r->vtable_EGUIX_IMaterialAccess = 0x780CA4;
-    initButtonHelper(r->ButtonHelper);
-    for (int i = 0; i < 5; i++)
-        initMaterial(r->Materials[i]);
-    r->NumMaterials = 5;
-    initTooltipHelper(r->ToolTipHelper);
-    initMaterial(r->IconMaterial);
-    r->IconMaterial.Color.Alpha = 0;
-    initLuaFunc(r->UpdateFunction);
+    gfxbutwid_ctor(r);
+    r->IsShown = false;
     return r;
 }
+static inline void(__thiscall* const txtbutwid_ctor)(shok_EGUIX_CTextButtonWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CTextButtonWidget*)>(0x55EFA3);
 shok_EGUIX_CTextButtonWidget* shok_EGUIX_CTextButtonWidget::Create()
 {
     shok_EGUIX_CTextButtonWidget* r = reinterpret_cast<shok_EGUIX_CTextButtonWidget*>(shok_malloc(sizeof(shok_EGUIX_CTextButtonWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CTextButtonWidget));
-    r->vtable = shok_EGUIX_CTextButtonWidget::vtp;
-    r->vtable_EGUIX_IOnEvent = 0x780DA4;
-    r->vtable_EGUIX_IRender = 0x780D98;
-    r->vtable_EGUIX_IMaterialAccess = 0x780D84;
-    r->vtable_EGUIX_ITextAccess = 0x780D5C;
-    initButtonHelper(r->ButtonHelper);
-    for (int i = 0; i < 5; i++)
-        initMaterial(r->Materials[i]);
-    r->NumMaterials = 5;
-    initTooltipHelper(r->ToolTipHelper);
-    initStringHelper(r->StringHelper);
-    initLuaFunc(r->UpdateFunction);
+    txtbutwid_ctor(r);
+    r->IsShown = false;
     return r;
 }
+static inline void(__thiscall* const progbarwid_ctor)(shok_EGUIX_CProgressBarWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CProgressBarWidget*)>(0x55E300);
 shok_EGUIX_CProgressBarWidget* shok_EGUIX_CProgressBarWidget::Create()
 {
     shok_EGUIX_CProgressBarWidget* r = reinterpret_cast<shok_EGUIX_CProgressBarWidget*>(shok_malloc(sizeof(shok_EGUIX_CProgressBarWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CProgressBarWidget));
-    r->vtable = shok_EGUIX_CProgressBarWidget::vtp;
-    r->vtable_EGUIX_IOnEvent = 0x780C14;
-    r->vtable_EGUIX_IRender = 0x780C08;
-    r->vtable_EGUIX_IMaterialAccess = 0x780BF4;
-    initMaterial(r->BackgroundMaterial);
-    initLuaFunc(r->UpdateFunction);
-    r->ProgressBarLimit = 1.0f;
-    r->ProgressBarValue = 1.0f;
+    progbarwid_ctor(r);
+    r->IsShown = false;
     return r;
 }
+static inline void(__thiscall* const contwid_ctor)(shok_EGUIX_CContainerWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CContainerWidget*)>(0x560DAD);
 shok_EGUIX_CContainerWidget* shok_EGUIX_CContainerWidget::Create()
 {
     shok_EGUIX_CContainerWidget* r = reinterpret_cast<shok_EGUIX_CContainerWidget*>(shok_malloc(sizeof(shok_EGUIX_CContainerWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CContainerWidget));
-    r->vtable = shok_EGUIX_CContainerWidget::vtp;
-    r->vtable_EGUIX_IOnEvent = 0x781140;
-    r->vtable_EGUIX_IRender = 0x781134;
-    r->vtable_EGUIX_IWidgetRegistrationCallback = 0x78112C;
-    initWidgetListHandler(r->WidgetListHandler);
+    contwid_ctor(r);
+    r->IsShown = false;
     return r;
 }
 

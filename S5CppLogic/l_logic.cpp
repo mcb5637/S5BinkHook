@@ -957,6 +957,34 @@ int l_logic_GetCurrentWeatherGFXState(lua_State* L) {
 	return 1;
 }
 
+struct l_logic_setluataskfunc_info {
+	shok_EGL_CGLEEntity* e;
+	bool HasSetTl, HasMoved, Ret;
+};
+int l_logic_setluataskfunc_move(lua_State* L) {
+	l_logic_setluataskfunc_info* d = static_cast<l_logic_setluataskfunc_info*>(lua_touserdata(L, lua_upvalueindex(1)));
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	shok_EGL_CEventPosition e{ shok_EventIDs::Movement_TaskMoveToPos, p };
+	d->e->FireEvent(&e);
+	d->HasMoved = true;
+	bool usepathing = true;
+	if (lua_toboolean(L, 2))
+		usepathing = false;
+	d->e->GetBehavior<shok_GGL_CBehaviorDefaultMovement>()->IsPathingUsed = usepathing;
+	if (lua_toboolean(L, 3) && d->e->CurrentState == shok_TaskState::Move)
+		d->e->CurrentState = shok_TaskState::Move_NonCancelable;
+	return 0;
+}
+int l_logic_setluataskfunc_settl(lua_State* L) {
+	l_logic_setluataskfunc_info* d = static_cast<l_logic_setluataskfunc_info*>(lua_touserdata(L, lua_upvalueindex(1)));
+	int tid = luaL_checkint(L, 1);
+	shok_EGL_CGLETaskList* tl = (*shok_EGL_CGLETaskListMgr::GlobalObj)->GetTaskListByID(tid);
+	luaext_assertPointer(L, tl, "no tasklist");
+	d->e->SetTaskList(tl);
+	d->HasSetTl = true;
+	return 0;
+}
 int l_logic_setluataskfunc(lua_State* L) {
 	if (lua_isnil(L, 1)) {
 		shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
@@ -974,17 +1002,28 @@ int l_logic_setluataskfunc(lua_State* L) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 
-			bool r = false;
+			l_logic_setluataskfunc_info d{ e, false, false, false };
 			lua_pushlightuserdata(L, &l_logic_setluataskfunc);
 			lua_rawget(L, LUA_REGISTRYINDEX);
 			lua_pushnumber(L, e->EntityId);
 			lua_pushnumber(L, val);
-			lua_pcall(L, 2, 1, 0);
+			lua_pushlightuserdata(L, &d);
+			lua_pushcclosure(L, &l_logic_setluataskfunc_move, 1);
+			lua_pushlightuserdata(L, &d);
+			lua_pushcclosure(L, &l_logic_setluataskfunc_settl, 1);
+			lua_pcall(L, 4, 1, 0);
 			if (lua_toboolean(L, -1))
-				r = true;
+				d.Ret = true;
 
 			lua_settop(L, t);
-			return r;
+			if (d.HasMoved)
+				return 1;
+			else if (d.HasSetTl)
+				return 2;
+			else if (d.Ret)
+				return 3;
+			else
+				return 0;
 		};
 	}
 

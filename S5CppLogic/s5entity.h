@@ -52,7 +52,8 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int TaskListToSet; // 29
 	vector_padding;
 	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
-	int CurrentState, EntityState, CurrentTaskListID, CurrentTaskIndex; // 34 la37
+	shok_TaskState CurrentState; // 34
+	int EntityState, CurrentTaskListID, CurrentTaskIndex; // la37
 	shok_set<shok_entity_StateIdAndStateHandler> StateHandlers; // 38
 	shok_set<shok_entity_TaskIdAndTaskHandler> TaskHandlers; // 41
 	PADDINGI(6); // la49 49 p to array EGL::ISlot of behaviors
@@ -136,7 +137,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static bool UseMaxHPTechBoni;
 	static void HookMaxHP();
 
-	static bool (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val);
+	static int (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
 	static void HookLuaTaskList();
 	static void HookNonCancelableAnim();
 

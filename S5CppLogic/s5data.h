@@ -47,6 +47,8 @@ typedef uint8_t byte;
 // destroy entity 0x57C94A jmp
 // snipe task 0x4DB5B8 jmp (func override)
 // 0x529067 feedback event handler res mined show floatie
+// 0x57D6CA entity ctor jmp to add TASK_LUA_FUNC handlers
+// 0x588408 behavioranim_addhandlers jmp to add TASK_WAIT_FOR_ANIM_NON_CANCELABLE handlers
 // 
 // only without SCELoader
 // shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, afew instructions noped

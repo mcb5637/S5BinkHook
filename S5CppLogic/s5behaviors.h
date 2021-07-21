@@ -10,36 +10,36 @@ public:
 	static inline constexpr int TypeDesc = 0x813778;
 };
 
-struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMovementBehavior in between
-private:
-	int Counter;
-public:
-	float MovementSpeed, TurningSpeed, SpeedFactor;
+struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMovementBehavior 7848DC in between
+	int CurrentTurn;
+	float MovementSpeed, TurningSpeed, SpeedFactor; // la7
+	PADDINGI(1);
+	shok_positionRot NextWayPoint, LastTurnPos;
+	bool IsPathingUsed, IsMoveFinished; // 15
+	PADDING(2);
+	PADDINGI(1);
+	int ResumeModelID; // 17
+	bool PauseMode, WasMoving, IsObstructed;
+	PADDING(1);
 
 	static inline constexpr int vtp = 0x7786AC;
 	static inline constexpr int TypeDesc = 0x818DF0;
 
-	// defined states: 12
-	// defined events: 1100D, 1100E, 11017
+	// defined states: Move, Move_NonCancelable, Rotate
+	// defined events: Movement_XXX, 1100D, 1100E, 11017
+	// defined tasks: TASK_TURN_TO_TARGET_ORIENTATION, TASK_SET_TARGET_ORIENTATION_RELATIVE
 
 	float GetMovementSpeed();
 };
 
 struct shok_GGL_CSettlerMovement : shok_GGL_CBehaviorDefaultMovement {
-	PADDINGI(1);
-	shok_positionRot PositionHiRes, Position;
-	byte BlockingFlag;
-	PADDING(3);
+	// FinePath, CoarsePath ???
 
 	static inline constexpr int vtp = 0x77471C;
 	static inline constexpr int TypeDesc = 0x81961C;
 };
 
 struct shok_GGL_CLeaderMovement : shok_GGL_CBehaviorDefaultMovement {
-	int MoveTaskList;
-	shok_positionRot NextWayPoint, LastTurnPos;
-	byte IsPathingUsed, IsMoveFinished;
-	PADDING(2);
 
 	static inline constexpr int vtp = 0x775ED4;
 	static inline constexpr int TypeDesc = 0x81D7E4;

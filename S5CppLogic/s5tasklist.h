@@ -213,7 +213,7 @@ enum class shok_Task : int {
     TASK_GO_TO_POS = 2,
     TASK_SET_ANIM = 3,
     TASK_SET_SUB_ANIM = 4,
-    TASK_WAIT_FOR_ANIM = 5,
+    TASK_WAIT_FOR_ANIM = 5, // wait to % of anims duration, always timed from start of animation.
     TASK_RANDOM_WAIT_FOR_ANIM = 6,
     TASK_WAIT = 7,
     TASK_DELETE_SELF = 8,
@@ -438,7 +438,7 @@ enum class shok_TaskState : int {
     Rotate = 6,
     SetNextTaskList = 7,
     // 9 & 10 building behavior
-    // 12 something movement behavior
+    Move_NonCancelable = 12,
     // 13 something worker
     IdleInFormation = 14,
     AssumePositionInFormation = 15,

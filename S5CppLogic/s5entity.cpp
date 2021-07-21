@@ -189,7 +189,7 @@ bool shok_GGL_CBuilding::IsIdle()
 		return false;
 	if (IsUpgrading)
 		return false;
-	if (CurrentState == 0x13) // alarm mode
+	if (CurrentState == shok_TaskState::BuildingAlarmDefend) // alarm mode
 		return false;
 	if (GetTechnologyInResearch())
 		return false;
@@ -828,23 +828,24 @@ void shok_EGL_CGLEEntity::HookMaxHP()
 	WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp);
 }
 
-bool (*shok_EGL_CGLEEntity::LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val) = nullptr;
+int (*shok_EGL_CGLEEntity::LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val) = nullptr;
 int __fastcall entity_executeluatask(shok_EGL_CGLEEntity* th, int _, shok_EGL_CGLETaskArgs* args) {
-	bool i = false;
+	int i = 0;
 	int val = static_cast<shok_EGL_CTaskArgsInteger*>(args)->Value;
 	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
 		i = shok_EGL_CGLEEntity::LuaTaskListCallback(th, val);
-	if (i) {
+	if (i == 3) {
 		th->GetAdditionalData(true)->FakeTaskValue = val;
 		shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
 		vt->SetTaskState(th, shok_TaskState::LuaFunc);
+		i = 1;
 	}
 	return i;
 }
 int __fastcall entity_executeluataskstate(shok_EGL_CGLEEntity* th, int _, int onek) {
 	int i = -2;
 	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
-		if (shok_EGL_CGLEEntity::LuaTaskListCallback(th, th->GetAdditionalData(true)->FakeTaskValue))
+		if (shok_EGL_CGLEEntity::LuaTaskListCallback(th, th->GetAdditionalData(true)->FakeTaskValue) == 3)
 			i = -1;
 	return i;
 }

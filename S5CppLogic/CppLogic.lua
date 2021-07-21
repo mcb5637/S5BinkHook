@@ -257,7 +257,14 @@ function CppLogic.Logic.FixSnipeDamage(override) end
 function CppLogic.Logic.GetCurrentWeatherGFXState() end
 
 --- sets a func to be called, if a tasklist contains TASK_LUA_FUNC.
--- @param func(entityid, value)->repeat
+-- define the task as <Task classname="EGL::CTaskArgsInteger" classid="0xb3f8356d"><TaskType>TASK_LUA_FUNC</TaskType> in the tasklist to use it.
+-- <Value> gets passed to your func, to identify what action should be executed.
+-- use the parameter funcs moveto(pos, ignorepathing, noncancelable) and settl(tl) to move the entity or set the task list.
+-- if you use moveto with ignorepathing, make sure the tasklist cannot be cancelled and that the target pos is actually not blocked.
+-- return true, to call the function again next tick (not available if you have used moveto or settl).
+-- do not save&use moveto and settl later, will cause crashes!
+-- do not use moveto if you are repeating the call via return true.
+-- @param func (entityid, value, moveto(p,i,n), settl(tl))->repeat
 function CppLogic.Logic.SetLuaTaskListFunc(func) end
 
 --- changes all occurences of TASK_WAIT_FOR_ANIM to TASK_WAIT_FOR_ANIM_NON_CANCELABLE in the give tasklist.

@@ -1145,7 +1145,7 @@ int l_buildingActivateOvertime(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, !b->IsOvertimeActive, "overtime already active");
 	luaext_assert(L, b->OvertimeCooldown <= 0, "cooldown active");
-	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != 0x13, "building not idle");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != shok_TaskState::BuildingAlarmDefend, "building not idle");
 	b->ActivateOvertime();
 	return 0;
 }
@@ -1153,7 +1153,7 @@ int l_buildingActivateOvertime(lua_State* L) {
 int l_buildingDeactivateOvertime(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsOvertimeActive, "overtime not active");
-	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != 0x13, "building not idle");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != shok_TaskState::BuildingAlarmDefend, "building not idle");
 	b->DeactivateOvertime();
 	return 0;
 }
@@ -1544,7 +1544,6 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandExpell", &l_settlerExpell);
 	luaext_registerFunc(L, "CommandTurnSerfToBattleSerf", &l_settlerSerfToBattleSerf);
 	luaext_registerFunc(L, "CommandTurnBattleSerfToSerf", &l_settlerBattleSerfToSerf);
-	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
 	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
 	luaext_registerFunc(L, "EnableRangedEffectSoldierHeal", &l_settler_EnableRangedEffectSoldierHeal);
 	lua_rawset(L, -3);

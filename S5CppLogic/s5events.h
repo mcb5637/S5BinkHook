@@ -847,8 +847,9 @@ enum class shok_EventIDs : int {
 	LimitedAttachment_Activate = 0x1A009, //GGL::CEventAttachmentType
 	LimitedAttachment_DeActivate = 0x1A00A, //GGL::CEventAttachmentType
 
-	// 20002 set walk target?
-	// 20003 set walk target?
+	// 20001 move to entity?
+	Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity
+	Movement_TaskMoveToPos = 0x20003, //EGL::CEventPosition
 	// 20004 set building sub anim?
 
 	MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim

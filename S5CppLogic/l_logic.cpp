@@ -35,7 +35,7 @@ int l_logicReloadCutscene(lua_State* L) {
 
 int l_logicGetAnimIdFromName(lua_State* L) {
 	const char* data = luaL_checkstring(L, 1);
-	int id = (*shok_BB_CIDManagerEx::AnimManager)->GetAnimIdByName(data);
+	int id = (*shok_BB_CIDManagerEx::AnimManager)->GetIdByName(data);
 	lua_pushnumber(L, id);
 	return 1;
 }
@@ -1067,6 +1067,13 @@ int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
 	return 0;
 }
 
+int l_logic_FixBuildOnMovement(lua_State* L) {
+	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = lua_toboolean(L, 1);
+	if (shok_EGL_CGLEEntity::BuildOnSetPosFixMovement)
+		shok_EGL_CGLEEntity::HookBuildOnSetPos();
+	return 0;
+}
+
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
@@ -1078,6 +1085,7 @@ void l_logic_cleanup(lua_State* L) {
 	shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
 	shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
 	shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
+	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = false;
 }
 
 void l_logic_init(lua_State* L)
@@ -1127,6 +1135,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "SetLuaTaskListFunc", &l_logic_setluataskfunc);
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsUnCancelable", &l_logic_makeTaskListWaitForAnimUncancelable);
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsCancelable", &l_logic_makeTaskListWaitForAnimCancelable);
+	luaext_registerFunc(L, "EnableBuildOnMovementFix", &l_logic_FixBuildOnMovement);
 
 
 	lua_pushstring(L, "UICommands");

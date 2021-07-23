@@ -98,17 +98,8 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    shok_widgetManager* m = shok_widgetManager::GlobalObj();
-    shok_EGUIX_CBaseWidget* w = m->GetWidgetByID(m->GetIdByName(luaL_checkstring(L, 1)));
-    int id = w->WidgetID;
-    __asm {
-        push id;
-        push w;
-        mov ecx, m;
-        mov eax, 0x558915;
-        call eax;
-    };
-    return 0;
+    lua_pushnumber(L, (int)luaext_checkEntity(L, 1)->GetBehavior<shok_GGL_CBehaviorDefaultMovement>());
+    return 1;
 }
 
 int cleanup(lua_State* L) {

@@ -32,7 +32,7 @@ struct shok_entity_StateIdAndStateHandler {
 struct shok_EGL_CGLEEntity : shok_object {
 	PADDINGI(1);
 	int EntityId;
-	PADDINGI(1);
+	PADDINGI(1); // some type of flags
 	int EntityType;
 	int ModelOverride;
 	int PlayerId;
@@ -140,6 +140,8 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static int (*LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
 	static void HookLuaTaskList();
 	static void HookNonCancelableAnim();
+	static bool BuildOnSetPosFixMovement;
+	static void HookBuildOnSetPos();
 
 	static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
 	static void HookHero6Convert();
@@ -307,9 +309,10 @@ struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
 
 struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	shok_position ApproachPosition, LeavePosition; // fi 66
-	byte IsActive, IsRegistered, IsUpgrading, IsOvertimeActive, HQAlarmActive;
+	byte IsActive, IsRegistered, IsUpgrading, IsOvertimeActive;
+	byte HQAlarmActive;
 	PADDING(3);
-	int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn;
+	int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn; // 72
 	float BuildingHeight, Helathbar, UpgradeProgress; //la78
 	PADDINGI(2);// list Slots with NumberOfRepairingSerfs?
 	int NumberOfRepairingSerfs;

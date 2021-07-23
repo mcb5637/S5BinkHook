@@ -850,8 +850,6 @@ enum class shok_EventIDs : int {
 	// 20001 move to entity?
 	Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity
 	Movement_TaskMoveToPos = 0x20003, //EGL::CEventPosition
-	// 20004 set building sub anim?
-
 	MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim
 	Behavior_Tick = 0x20005, //BB::CEvent ticks every second
 	Movement_IsMoving = 0x20009, //EGL::CEventGetValue<bool,1709081367>

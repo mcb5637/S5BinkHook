@@ -3,13 +3,20 @@
 #include <math.h>
 
 
-struct shok_vtable_EGL_CGLEEntity {
-	PADDINGI(3);
+struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
 	void(__thiscall* Destroy)(shok_EGL_CGLEEntity* th, int i); // 3
-	PADDINGI(11);
+	PADDINGI(1);
+	void(__thiscall* CopyDataFromCreator)(shok_EGL_CGLEEntity* th, shok_EGL_CGLEEntityCreator* cr); // 5
+	PADDINGI(1);
+	void(__thiscall* InitializeEntity)(shok_EGL_CGLEEntity* th); // dont use outside of createentity
+	PADDINGI(1);
+	void(__thiscall* FireOnCreatedTriggers)(shok_EGL_CGLEEntity* th); // 9, script trigger + scriptcommandline
+	void(__thiscall* SetPosition)(shok_EGL_CGLEEntity* th, shok_position* p); // 10 works for settlers, check if it does for other stuff to
+	PADDINGI(4);
 	void(__thiscall* ExecuteTask)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_BB_CEvent* d); // 16
-	PADDINGI(2);
+	void(__thiscall* AddBehavior)(shok_EGL_CGLEEntity* th, shok_EGL_CGLEBehavior* bh); // 17 probably not usable outside of createentity
+	PADDINGI(1); // add behavior slot
 	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
 	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, shok_EventIDs eventid, int eventhandler); // 20
 	void(__thiscall* AddStateHandler)(shok_EGL_CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
@@ -923,6 +930,44 @@ void shok_EGL_CGLEEntity::HookNonCancelableAnim()
 	HookNonCancelableAnim_Hooked = true;
 	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x588408), 10 };
 	WriteJump(reinterpret_cast<void*>(0x588408), &entity_hooknoncancelanim_asm);
+}
+
+void(__thiscall* movementbeh_setmovetarget)(shok_GGL_CBehaviorDefaultMovement* m, shok_position* p) = reinterpret_cast<void(__thiscall*)(shok_GGL_CBehaviorDefaultMovement*, shok_position*)>(0x586894);
+void __fastcall entity_buildonsetpos(shok_EGL_CMovingEntity* e) {
+	if (e->MovementState && shok_EGL_CGLEEntity::BuildOnSetPosFixMovement) {
+		shok_GGL_CBehaviorDefaultMovement* mov = e->GetBehavior<shok_GGL_CBehaviorDefaultMovement>();
+		if (mov) {
+			movementbeh_setmovetarget(mov, &e->TargetPosition);
+		}
+	}
+	else {
+		shok_BB_CEvent ev{ 0x2000D };
+		e->FireEvent(&ev);
+		if (e->MovementState == 0) {
+			ev.EventTypeId = 0x11017;
+			e->FireEvent(&ev);
+			e->MovementState = 0; // ?? original code
+		}
+	}
+}
+void __declspec(naked) entity_buildonsetpos_asm() {
+	__asm {
+		mov ecx, edi;
+		call entity_buildonsetpos;
+
+		push 0x4ADB76;
+		ret;
+	};
+}
+bool shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = false;
+bool HookBuildOnSetPos_Hooked = false;
+void shok_EGL_CGLEEntity::HookBuildOnSetPos()
+{
+	if (HookBuildOnSetPos_Hooked)
+		return;
+	HookBuildOnSetPos_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4ADB16), 10 };
+	WriteJump(reinterpret_cast<void*>(0x4ADB16), &entity_buildonsetpos_asm);
 }
 
 

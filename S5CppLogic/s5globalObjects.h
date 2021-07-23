@@ -1,10 +1,38 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_EGL_CGLEEntitiesProps : shok_object {
-	PADDINGI(14);
+struct shok_BB_CIDManagerEx_data {
+	const char* Name;
+	PADDINGI(1);
+};
+struct shok_BB_CIDManagerEx : shok_object {
+	static inline constexpr int vtp = 0x77F8C4;
+	PADDINGI(1);
 	vector_padding;
-	std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes;
+	std::vector<shok_BB_CIDManagerEx_data, shok_allocator<shok_BB_CIDManagerEx_data>> TypeNames;
+	// maybe 2 more ints
+
+	int GetIdByName(const char* name);
+	const char* GetNameByID(int id);
+
+	static inline shok_BB_CIDManagerEx** const AnimManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C838);
+	static inline shok_BB_CIDManagerEx** const EntityTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x895DC0);
+	static inline shok_BB_CIDManagerEx** const UpgradeCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C84C);
+};
+
+struct shok_EGL_CGLEEntitiesProps : shok_object {
+	PADDINGI(1); // float 240
+	shok_BB_CIDManagerEx* EntityTypeManager;
+	shok_BB_CIDManagerEx* EntityCategoryManager;
+	shok_BB_CIDManagerEx* UpgradeCategoryManager;
+	shok_BB_CIDManagerEx* TechCategoryManager;
+	vector_padding;
+	std::vector<shok_EGL_CGLEEntityProps*, shok_allocator<shok_EGL_CGLEEntityProps*>> EntityTypesLogicProps; // 6
+	shok_BB_CIDManagerEx* EntityTypeManagerAgain;
+	vector_padding;
+	std::vector<shok_ED_CDisplayEntityProps*, shok_allocator<shok_ED_CDisplayEntityProps*>> EntityTypesDisplayProps; // 11
+	vector_padding;
+	std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes; // 15
 
 	static inline constexpr int vtp = 0x788834;
 
@@ -14,6 +42,7 @@ struct shok_EGL_CGLEEntitiesProps : shok_object {
 
 	static const char* GetEntityTypeDisplayName(int i);
 };
+//constexpr int i = offsetof(shok_EGL_CGLEEntitiesProps, EntityTypesDisplayProps) / 4;
 
 // c manager
 struct shok_ECS_CManager : shok_object { // ECS::ICutsceneManager
@@ -33,14 +62,6 @@ struct shok_EGL_CGLEEffectManager : shok_object {
 	shok_EGL_CEffect* GetEffectById(int id);
 
 	static inline shok_EGL_CGLEEffectManager** const GlobalObj = reinterpret_cast<shok_EGL_CGLEEffectManager**>(0x898144);
-};
-
-struct shok_BB_CIDManagerEx : shok_object {
-	static inline constexpr int vtp = 0x77F8C4;
-
-	int GetAnimIdByName(const char* name);
-
-	static inline shok_BB_CIDManagerEx** const AnimManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C838);
 };
 
 
@@ -146,7 +167,7 @@ struct shok_EGL_CGLEEntityManager : shok_object {
 	PADDINGI(4);
 private:
 	struct {
-		PADDINGI(1);
+		PADDINGI(1); // some type of flags
 		shok_EGL_CGLEEntity* entity;
 	} Entities[1];
 

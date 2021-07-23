@@ -18,23 +18,28 @@ struct shok_EGL_CGLEEntityProps : shok_object {
 private:
 	int Race;
 public:
-	byte CanFloat, CanDrown, MapFileDontSave, DividesTwoSectors, ForceNoPlayer, AdjustWalkAnimSpeed, Visible, DoNotExecute;
+	byte CanFloat, CanDrown, MapFileDontSave, DividesTwoSectors; // 11
+	byte ForceNoPlayer, AdjustWalkAnimSpeed, Visible, DoNotExecute; // 12
 	int MaxHealth; // 13
 private:
 	int Models[5];
 public:
 	float Exploration;
-	int ExperiencePoints, AccessCategory, NumBlockedPoints;
-	float SnapTolerance;
+	int ExperiencePoints, AccessCategory, NumBlockedPoints; //20
+	float SnapTolerance; //23
 	byte DeleteWhenBuiltOn, NeedsPlayer;
 	PADDING(2);
-	PADDINGI(9);
+	vector_padding;
+	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps; // 25
+	int NumberOfBehaviors; //29
+	PADDINGI(4);
 	vector_padding;
 	std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
 
 	static inline constexpr int vtp = 0x76E47C;
 	static inline constexpr int TypeDesc = 0x810B0C;
 };
+//constexpr int i = offsetof(shok_EGL_CGLEEntityProps, ExperiencePoints) / 4;
 
 struct shok_GGL_CEntityProperties : shok_EGL_CGLEEntityProps {
 	int ResourceEntity, ResourceAmount, SummerEffect, WinterEffect;
@@ -79,11 +84,12 @@ struct shok_GGL_CGLAnimalProps : shok_EGL_CGLEEntityProps {
 };
 
 struct shok_GGL_CBuildBlockProperties : shok_EGL_CGLEEntityProps {
-	shok_AARect BuildBlockArea; // la 41
+	shok_AARect BuildBlockArea; // 38 la 41
 
 	static inline constexpr int vtp = 0x76EB38;
 	static inline constexpr int TypeDesc = 0x811284;
 };
+//constexpr int i = offsetof(shok_GGL_CBuildBlockProperties, BuildBlockArea) / 4;
 
 struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
 	float Radius;
@@ -103,17 +109,17 @@ struct shok_constructionInfo {
 	int ConstructionSite;
 };
 struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
-	int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker;
+	int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker; // 42
 	shok_position DoorPos, LeavePos;
 	shok_constructionInfo ConstructionInfo;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> BuildOn;
-	byte HideBase, CanBeSold, IsWall;
+	std::vector<int, shok_allocator<int>> BuildOn; // 75
+	byte HideBase, CanBeSold, IsWall; // 79
 	PADDING(1);
 	shok_upgradeInfo Upgrade;
 	int UpgradeSite, ArmorClass, ArmorAmount;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> WorkTaskList;
+	std::vector<int, shok_allocator<int>> WorkTaskList; // 104
 private:
 	int MilitaryInfo[4];
 public:
@@ -126,7 +132,7 @@ public:
 	static inline constexpr int vtp = 0x76EC78;
 	static inline constexpr int TypeDesc = 0x811210;
 };
-//constexpr int i = offsetof(shok_GGL_CGLBuildingProps, Convertible) / 4;
+//constexpr int i = offsetof(shok_GGL_CGLBuildingProps, BuildOn) / 4;
 
 struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	shok_AARect BridgeArea;

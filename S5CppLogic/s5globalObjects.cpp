@@ -65,8 +65,14 @@ shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 }
 
 static inline int(__thiscall* const shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name) = reinterpret_cast<int(__thiscall*)(shok_BB_CIDManagerEx * th, const char* name)>(0x54F19E);
-int shok_BB_CIDManagerEx::GetAnimIdByName(const char* name) {
+int shok_BB_CIDManagerEx::GetIdByName(const char* name) {
 	return shok_getAnimIdByName(this, name);
+}
+const char* shok_BB_CIDManagerEx::GetNameByID(int id)
+{
+	if (id > 0 && id < static_cast<int>(TypeNames.size()))
+		return TypeNames[id].Name;
+	return nullptr;
 }
 
 void shok_EGL_CTerrainVertexColors::ToTerrainCoord(shok_position& p, int* out)

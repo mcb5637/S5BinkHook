@@ -277,6 +277,11 @@ function CppLogic.Logic.TaskListMakeWaitForAnimsUnCancelable(tl, tind) end
 -- @param tind task index (optional, default -1) id <0 full tasklist gets searched
 function CppLogic.Logic.TaskListMakeWaitForAnimsCancelable(tl, tind) end
 
+--- enables/disables fixing movement tasks when a building is placed on top of a moving entity.
+-- with the fix active, issues a new move task to the same position, instead of potentially skipping the move.
+-- @param f enabled
+function CppLogic.Logic.EnableBuildOnMovementFix(f) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData, writeback).
 -- function can return true to skip further event execution.

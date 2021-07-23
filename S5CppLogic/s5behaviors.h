@@ -10,6 +10,19 @@ public:
 	static inline constexpr int TypeDesc = 0x813778;
 };
 
+struct shok_EGL_CCoarsePath {
+	int vtable;
+	struct {
+		int Goal;
+		int GoalDistance;
+		int WaypointsCount;
+		int CacheCount;
+		int CacheTail;
+		int CacheItem[33];
+		bool GoalCached;
+		PADDING(3);
+	} WayPoints;
+};
 struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMovementBehavior 7848DC in between
 	int CurrentTurn;
 	float MovementSpeed, TurningSpeed, SpeedFactor; // la7
@@ -17,10 +30,14 @@ struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMove
 	shok_positionRot NextWayPoint, LastTurnPos;
 	bool IsPathingUsed, IsMoveFinished; // 15
 	PADDING(2);
-	PADDINGI(1);
+	PADDINGI(1); // p to EGL::CMovementBehavior::CSlotMovingEntity
 	int ResumeModelID; // 17
 	bool PauseMode, WasMoving, IsObstructed;
-	PADDING(1);
+	PADDING(1); // end of EGL::CMovementBehavior
+	int FinePath; // 19 p to GGL::CPath/GGL::CLeaderPath
+	shok_EGL_CCoarsePath CoarsePath;
+	int FineWayPointIndex; // 60
+	int MovedFineWaypoints;
 
 	static inline constexpr int vtp = 0x7786AC;
 	static inline constexpr int TypeDesc = 0x818DF0;
@@ -33,9 +50,8 @@ struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMove
 };
 
 struct shok_GGL_CSettlerMovement : shok_GGL_CBehaviorDefaultMovement {
-	// FinePath, CoarsePath ???
 
-	static inline constexpr int vtp = 0x77471C;
+	static inline constexpr int vtp = 0x77471C; //786A407
 	static inline constexpr int TypeDesc = 0x81961C;
 };
 

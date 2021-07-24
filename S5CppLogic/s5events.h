@@ -847,11 +847,19 @@ enum class shok_EventIDs : int {
 	LimitedAttachment_Activate = 0x1A009, //GGL::CEventAttachmentType
 	LimitedAttachment_DeActivate = 0x1A00A, //GGL::CEventAttachmentType
 
+	LogicEvent_DiplomacyChanged = 0x1C002,
+	LogicEvent_TributePaid = 0x1C003,
+	LogicEvent_ResearchDone = 0x1C004,
+	LogicEvent_TradeCompleted = 0x1C005,
+	LogicEvent_WeatherChanged = 0x1C006,
+	LogicEvent_HurtEntity = 0x1C007,
+
 	// 20001 move to entity?
 	Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity
 	Movement_TaskMoveToPos = 0x20003, //EGL::CEventPosition
 	MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim
-	Behavior_Tick = 0x20005, //BB::CEvent ticks every second
+	Behavior_Tick = 0x20005, //BB::CEvent ticks every second, also LogicEvent_Second
+	LogicEvent_OnTick = 0x20006, // 10 per sec
 	Movement_IsMoving = 0x20009, //EGL::CEventGetValue<bool,1709081367>
 	Die = 0x2000A, ///BB::CEvent
 	// 0x2000D tasklist reset?
@@ -859,6 +867,10 @@ enum class shok_EventIDs : int {
 	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
 	Animation_UnSuspend = 0x20014, //EGL::CEventValue<int,-27574121> argument is ticks spent suspended
 	Animation_Suspend = 0x20015, //EGL::CEventValue<int,-27574121> argument is current tick
+	LogicEvent_EntityCreated = 0x20016,
+	LogicEvent_EntityDestroyed = 0x20017,
+	LogicEvent_PlayerDied = 0x20018,
+	LogicEvent_InRange = 0x20019,
 	Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 	Animation_ResetTaskType = 0x2001E, //BB::CEvent
 	// worker 20024 get some int, leader get something barracks related, soldier simmilar, serf get terrainH < waterHeight

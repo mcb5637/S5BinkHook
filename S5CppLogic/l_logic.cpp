@@ -650,6 +650,10 @@ int l_logicHookHurtEntity(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	shok_EGL_CGLEEntity::HookHurtEntity();
+	if (lua_isboolean(L, 1))
+		shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = lua_toboolean(L, 1);
+	else
+		shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = true;
 	return 0;
 }
 
@@ -813,10 +817,6 @@ int l_logicSetRegenerateSoldiers(lua_State* L) {
 	return 0;
 }
 
-void breakasm() {
-	DEBUGGER_BREAK;
-}
-
 int l_logicOverrideStringTableText(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
@@ -840,7 +840,6 @@ int l_logicOverrideStringTableText(lua_State* L) {
 			lua_rawget(*shok_luastate_game, -2);
 			if (lua_isstring(*shok_luastate_game, -1)) {
 				r = lua_tostring(*shok_luastate_game, -1); // stored in registry, so its ok to return it
-				breakasm();
 			}
 
 			lua_settop(*shok_luastate_game, t);
@@ -1086,6 +1085,7 @@ void l_logic_cleanup(lua_State* L) {
 	shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
 	shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
 	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = false;
+	shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;
 }
 
 void l_logic_init(lua_State* L)

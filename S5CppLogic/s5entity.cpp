@@ -692,20 +692,21 @@ void shok_EGL_CGLEEntity::HookCamoActivate()
 
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
 int* shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
+bool shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;
 void __stdcall hurtentityhookc(int* damage, shok_EGL_CGLEEntity** target, shok_EGL_CGLEEntity** attacker) { // argument order is reversed, for asm reasons
 	if (!*target)
 		return;
 	int aid = 0;
 	if (*attacker)
 		aid = (*attacker)->EntityId;
+	else if (!shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker)
+		return;
 	int tid = (*target)->EntityId;
-	int ev[6];
-	event2entitiesctor(ev, 0x1C007, aid, tid);
+	shok_EGL_CEvent2Entities ev{ shok_EventIDs::LogicEvent_HurtEntity, aid, tid };
 	shok_EGL_CGLEEntity::HurtEntityDamagePointer = damage;
-	(*shok_EScr_CScriptTriggerSystem::GlobalObj)->RunTrigger((shok_BB_CEvent*)ev);
+	(*shok_EScr_CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 	shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
 }
-
 void __declspec(naked) hurtentityhook() { // push arguments, call func, do the move i did override, last jump back
 	__asm {
 		mov eax, esp;

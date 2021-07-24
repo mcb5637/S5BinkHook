@@ -122,6 +122,71 @@ int l_api_getGDB(lua_State* L) {
 	return 1;
 }
 
+void l_api_getruntimesore() {
+	lua_State* mm = mainmenu_state;
+	lua_pushlightuserdata(mm, &l_api_getruntimesore);
+	lua_rawget(mm, LUA_REGISTRYINDEX);
+	if (lua_isnil(mm, -1)) {
+		lua_newtable(mm);
+		lua_pushlightuserdata(mm, &l_api_getruntimesore);
+		lua_pushvalue(mm, -2);
+		lua_rawset(mm, LUA_REGISTRYINDEX);
+	}
+}
+int l_api_runtimestore_set(lua_State* L) {
+	lua_State* mm = mainmenu_state;
+	int t = lua_gettop(mm);
+
+	const char* s = luaL_checkstring(L, 1);
+	const char* ds = nullptr;
+	lua_Number di = 0;
+	int ty = lua_type(L, 2);
+	luaext_assert(L, ty == LUA_TNUMBER || ty == LUA_TSTRING || ty == LUA_TNIL, "not saveable");
+	if (ty == LUA_TNUMBER)
+		di = lua_tonumber(L, 2);
+	else if (ty == LUA_TSTRING)
+		ds = lua_tostring(L, 2);
+	l_api_getruntimesore();
+	lua_pushstring(mm, s);
+	if (ty == LUA_TNUMBER)
+		lua_pushnumber(mm, di);
+	else if (ty == LUA_TSTRING)
+		lua_pushstring(mm, ds);
+	else
+		lua_pushnil(mm);
+	lua_rawset(mm, -3);
+
+	lua_settop(mm, t);
+	return 0;
+}
+int l_api_runtimestore_get(lua_State* L) {
+	lua_State* mm = mainmenu_state;
+	int t = lua_gettop(mm);
+
+	const char* s = luaL_checkstring(L, 1);
+	l_api_getruntimesore();
+	lua_pushstring(mm, s);
+	lua_rawget(mm, -2);
+	int ty = lua_type(mm, -1);
+	const char* ds = nullptr;
+	lua_Number di = 0;
+	if (ty == LUA_TNUMBER)
+		di = lua_tonumber(mm, -1);
+	else if (ty == LUA_TSTRING)
+		ds = lua_tostring(mm, -1);
+
+	lua_settop(mm, t);
+
+	if (ty == LUA_TNUMBER)
+		lua_pushnumber(L, di);
+	else if (ty == LUA_TSTRING)
+		lua_pushstring(L, ds);
+	else
+		lua_pushnil(L);
+
+	return 1;
+}
+
 void l_api_init(lua_State* L)
 {
 	luaext_registerFunc(L, "Eval", &l_api_eval);
@@ -133,6 +198,8 @@ void l_api_init(lua_State* L)
 	luaext_registerFunc(L, "MapGetDataPath", &l_api_mapGetDataPath);
 	luaext_registerFunc(L, "SaveGetMapInfo", &l_api_saveGetMap);
 	luaext_registerFunc(L, "GetGDB", &l_api_getGDB);
+	luaext_registerFunc(L, "RuntimeStoreSet", &l_api_runtimestore_set);
+	luaext_registerFunc(L, "RuntimeStoreGet", &l_api_runtimestore_get);
 }
 
 // CppLogic.API.Log("string")

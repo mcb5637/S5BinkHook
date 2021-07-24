@@ -80,11 +80,6 @@ function CppLogic.Logic.SetPlaceBuildingRotation(r)
 end
 )";
 
-struct x {
-    const char* name;
-    int i, id;
-};
-
 int __cdecl test(lua_State* L) {
     /*shok_GS3DTools_CMapData s = shok_GS3DTools_CMapData();
     int st = (int)&s;

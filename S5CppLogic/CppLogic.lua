@@ -178,7 +178,8 @@ function CppLogic.Logic.LandscapeGetTerrainVertexColor(p) end
 function CppLogic.Logic.LandscapeGetBlocking(p) end
 
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
-function CppLogic.Logic.EnableAllHurtEntityTrigger() end
+-- @param b enable (optional, default true)
+function CppLogic.Logic.EnableAllHurtEntityTrigger(b) end
 
 --- enables entity max hp to be modified by techs.
 -- does not work with SCELoader.
@@ -345,6 +346,15 @@ function CppLogic.API.SaveGetMapInfo(save) end
 -- keys are split at every \, and put into a layered map.
 -- @return table
 function CppLogic.API.GetGDB() end
+
+--- saves a value in the mainmenu lua state (gets only removed on game restart, not on map load/start).
+-- @param name string key
+-- @param value data to store, only string/number/nil allowed
+function CppLogic.API.RuntimeStoreSet(name, value) end
+--- loads a value from the mainmenu lua state (gets only removed on game restart, not on map load/start).
+-- @param name string key
+-- @return value data
+function CppLogic.API.RuntimeStoreGet(name) end
 
 --- deals damage to a target.
 -- calls respective hurt entity trigger.

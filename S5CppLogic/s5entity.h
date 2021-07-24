@@ -152,6 +152,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static void HookCamoActivate();
 	static void HookHurtEntity();
 	static int* HurtEntityDamagePointer;
+	static bool HurtEntityCallWithNoAttacker;
 	static void HookDestroyEntity();
 	static std::map<int, entityAddonData> AddonDataMap;
 	static entityAddonData LastRemovedEntityAddonData;

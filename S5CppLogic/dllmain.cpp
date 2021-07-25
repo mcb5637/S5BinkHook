@@ -114,7 +114,7 @@ void initGame() {
     shok_EGL_CGLEEntity::HookNonCancelableAnim();
 }
 
-constexpr double Version = 1.0;
+constexpr double Version = 1.1;
 
 extern "C" void __cdecl install(lua_State * L) {
 #ifdef _DEBUG

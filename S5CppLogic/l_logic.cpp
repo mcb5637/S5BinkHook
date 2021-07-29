@@ -1073,6 +1073,18 @@ int l_logic_FixBuildOnMovement(lua_State* L) {
 	return 0;
 }
 
+int l_logic_loadtasks(lua_State* L)
+{
+	shok_taskData::AddExtraTasks();
+	shok_EGL_CGLEEntity::HookLuaTaskList();
+	shok_EGL_CGLEEntity::HookNonCancelableAnim();
+	return 0;
+}
+
+void l_logic_onload()
+{
+	l_logic_loadtasks(nullptr);
+}
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
@@ -1136,7 +1148,6 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsUnCancelable", &l_logic_makeTaskListWaitForAnimUncancelable);
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsCancelable", &l_logic_makeTaskListWaitForAnimCancelable);
 	luaext_registerFunc(L, "EnableBuildOnMovementFix", &l_logic_FixBuildOnMovement);
-
 
 	lua_pushstring(L, "UICommands");
 	lua_newtable(L);

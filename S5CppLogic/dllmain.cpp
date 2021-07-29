@@ -109,14 +109,25 @@ int cleanup(lua_State* L) {
 
 void initGame() {
     HookTextPrinting();
-    shok_taskData::OnGameInit();
-    shok_EGL_CGLEEntity::HookLuaTaskList();
-    shok_EGL_CGLEEntity::HookNonCancelableAnim();
+    l_logic_onload();
 }
 
 constexpr double Version = 1.1;
 
-extern "C" void __cdecl install(lua_State * L) {
+int resetCppLogic(lua_State* L) {
+    lua_pushstring(L, "CppLogic");
+    lua_pushlightuserdata(L, &resetCppLogic);
+    lua_rawget(L, LUA_REGISTRYINDEX);
+    lua_rawset(L, LUA_GLOBALSINDEX);
+    return 0;
+}
+
+ void install(lua_State * L) {
+     if (!mainmenu_state) {
+         mainmenu_state = L;
+         initGame();
+     }
+
 #ifdef _DEBUG
     lua_pushcfunction(L, &test);
     lua_setglobal(L, "test");
@@ -124,6 +135,11 @@ extern "C" void __cdecl install(lua_State * L) {
     
     lua_pushstring(L, "CppLogic");
     lua_newtable(L);
+
+    lua_pushlightuserdata(L, &resetCppLogic);
+    lua_pushvalue(L, -2);
+    lua_rawset(L, LUA_REGISTRYINDEX);
+
     luaext_registerFunc(L, "OnLeaveMap", &cleanup);
     lua_pushstring(L, "Version");
     lua_pushnumber(L, Version);
@@ -181,13 +197,10 @@ extern "C" void __cdecl install(lua_State * L) {
 
     lua_rawset(L, LUA_GLOBALSINDEX);
 
+    lua_register(L, "CppLogic_ResetGlobal", &resetCppLogic);
+
     luaopen_debug(L);
 
-    if (!mainmenu_state) {
-        mainmenu_state = L;
-        initGame();
-    }
-    
     if (HasSCELoader()) {
         lua_dobuffer(L, SCELoaderFuncOverrides, strlen(SCELoaderFuncOverrides), "CppLogic");
     }

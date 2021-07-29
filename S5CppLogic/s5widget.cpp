@@ -179,6 +179,7 @@ shok_EGUIX_CGfxButtonWidget* shok_EGUIX_CGfxButtonWidget::Create()
     memset(r, 0, sizeof(shok_EGUIX_CGfxButtonWidget));
     gfxbutwid_ctor(r);
     r->IsShown = false;
+    r->IconMaterial.Color.Alpha = 0;
     return r;
 }
 static inline void(__thiscall* const txtbutwid_ctor)(shok_EGUIX_CTextButtonWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CTextButtonWidget*)>(0x55EFA3);

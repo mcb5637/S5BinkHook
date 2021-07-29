@@ -29,11 +29,19 @@ const char* shok_EGL_CGLETaskListMgr::GetTaskListNameByID(int i)
 
 const char* TaskLuaFunc = "TASK_LUA_FUNC";
 const char* TaskWaitForAnimNonCancel = "TASK_WAIT_FOR_ANIM_NON_CANCELABLE";
-void shok_taskData::OnGameInit()
+void shok_taskData::AddExtraTasks()
 {
-    shok_saveVector<shok_taskData>(*shok_taskData::GlobalVector, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
+    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
         v.push_back(shok_taskData{ TaskLuaFunc, 0xB3F8356D, shok_Task::TASK_LUA_FUNC });
         v.push_back(shok_taskData{ TaskWaitForAnimNonCancel, 0x230862d8, shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE });
+        });
+}
+void shok_taskData::RemoveExtraTasks()
+{
+    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
+        v.erase(std::remove_if(v.begin(), v.end(), [](shok_taskData& a) {
+            return a.TaskName == TaskLuaFunc || a.TaskName == TaskWaitForAnimNonCancel;
+            }), v.end());
         });
 }
 

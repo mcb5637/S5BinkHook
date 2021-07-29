@@ -1784,6 +1784,10 @@ function CppLogic.UI.SetKeyTrigger(f) end
 -- @param f func to be called
 function CppLogic.UI.SetMouseTrigger(f) end
 
+--- resets the global CppLogic.
+-- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.
+function CppLogic_ResetGlobal() end
+
 --- @class UACore
 local UACore = {}
 function UACore:AddLeader(id) end

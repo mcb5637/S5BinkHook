@@ -184,14 +184,20 @@ struct shok_EGL_CGLETaskListMgr : shok_object {
 	static inline shok_EGL_CGLETaskListMgr** const GlobalObj = reinterpret_cast<shok_EGL_CGLETaskListMgr**>(0x895DD8);
 };
 
+struct shok_taskData_vect;
 struct shok_taskData {
 	const char* TaskName;
     unsigned int TaskArgsClassID;
 	shok_Task ID;
 
-	static inline std::vector<shok_taskData, shok_allocator<shok_taskData>>** GlobalVector = reinterpret_cast<std::vector<shok_taskData, shok_allocator<shok_taskData>>**>(0x898238);
+	static inline shok_taskData_vect** GlobalVector = reinterpret_cast<shok_taskData_vect**>(0x898238);
 
-    static void OnGameInit();
+    static void AddExtraTasks();
+    static void RemoveExtraTasks();
+};
+struct shok_taskData_vect {
+    vector_padding;
+    std::vector<shok_taskData, shok_allocator<shok_taskData>> TaskData;
 };
 
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int : shok_object {
@@ -424,8 +430,8 @@ enum class shok_Task : int {
     TASK_TURN_TO_SNIPER_TARGET = 209,
     TASK_TURN_TO_SHURIKEN_TARGET = 210,
 
-    TASK_LUA_FUNC = 500,
-    TASK_WAIT_FOR_ANIM_NON_CANCELABLE = 501,
+    TASK_LUA_FUNC = 1500,
+    TASK_WAIT_FOR_ANIM_NON_CANCELABLE = 1501,
 };
 
 enum class shok_TaskState : int {

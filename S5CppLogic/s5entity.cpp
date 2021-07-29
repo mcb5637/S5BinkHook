@@ -893,8 +893,6 @@ int __fastcall entity_hooknoncancelanim_task(shok_GGL_CGLBehaviorAnimationEx* th
 	return 1;
 }
 void __stdcall entity_hooknoncancelanim(shok_EGL_CGLEEntity* th, shok_GGL_CGLBehaviorAnimationEx* beh) {
-	if (beh->vtable != shok_GGL_CGLBehaviorAnimationEx::vtp)
-		DEBUGGER_BREAK;
 	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
 	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok_malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
 	thand->vtable = 0x784A4C; // EGL::THandler<5,EGL::CGLETaskArgs,EGL::CGLETaskArgsThousandths,EGL::CBehaviorAnimation,int>

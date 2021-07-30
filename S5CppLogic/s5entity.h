@@ -329,6 +329,7 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	int GetNearestFreeRepairSlotFor(shok_position* p);
 	bool IsConstructionFinished();
 	bool IsIdle();
+	bool IsIdle(bool forRecruitemnt);
 	int GetTechnologyInResearch();
 	int GetCannonProgress();
 	float GetMarketProgress();
@@ -347,6 +348,7 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	void CancelResearch();
 	void MarketStartTrade(shok_ResourceType ResourceTypeSell, shok_ResourceType ResourceTypeBuy, float BuyAmount);
 	void MarketCancelTrade();
+	int BuyLeaderByType(int ety);
 
 	// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 };

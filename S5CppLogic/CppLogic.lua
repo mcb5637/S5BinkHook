@@ -985,7 +985,7 @@ function CppLogic.Entity.Building.MarketGetCurrentTradeData(id) end
 function CppLogic.Entity.Building.MarketSetCurrentTradeData(id, bty, sty, bam, sam, pam) end
 
 --- starts building a cannon.
--- does not check all parameters, or if foundry is ready.
+-- uses resources, asserts if it cannot build.
 -- @param id foundry entity
 -- @param ty cannon type
 function CppLogic.Entity.Building.CommandFoundryBuildCannon(id, ty) end
@@ -1098,6 +1098,14 @@ function CppLogic.Entity.Building.GetConstructionSite(id) end
 -- @param id entity
 -- @return id or 0
 function CppLogic.Entity.Building.ConstructionSiteGetBuilding(id) end
+
+--- buys a leader in a barracks by entitytype.
+-- uses resources, asserts if not possible.
+-- @param id barracks
+-- @param ety leader type
+-- @param checkType check if leader type can be recruited at this barracks upgradecategory (optional, default false)
+-- @return id
+function CppLogic.Entity.Building.BarracksBuyLeaderByType(id, ety, checkType) end
 
 
 --- entity type max health.

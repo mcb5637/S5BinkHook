@@ -93,7 +93,7 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, (int)luaext_checkEntity(L, 1)->GetBehavior<shok_GGL_CBehaviorDefaultMovement>());
+    lua_pushnumber(L, (int)luaext_checkEntityType(L,1)->GetBehaviorProps<shok_GGL_CFoundryBehaviorProperties>());
     return 1;
 }
 

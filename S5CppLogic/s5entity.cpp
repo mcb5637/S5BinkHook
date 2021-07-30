@@ -192,6 +192,11 @@ bool shok_GGL_CBuilding::IsConstructionFinished()
 
 bool shok_GGL_CBuilding::IsIdle()
 {
+	return IsIdle(false);
+}
+
+bool shok_GGL_CBuilding::IsIdle(bool forRecruitemnt)
+{
 	if (!IsConstructionFinished())
 		return false;
 	if (IsUpgrading)
@@ -208,8 +213,21 @@ bool shok_GGL_CBuilding::IsIdle()
 	if (GetBehavior<shok_GGL_CMarketBehavior>() && GetMarketProgress() < 1.0f)
 		return false;
 	if (GetBehavior<shok_GGL_CBarrackBehavior>()) {
-		if (ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS; }))
-			return false;
+		
+		if (forRecruitemnt) {
+			int c = 0;
+			ObserverEntities.ForAll([&c](shok_attachment* a) {
+				if (a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS && !shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->GetBehavior<shok_GGL_CSoldierBehavior>())
+					c++;
+				});
+			if (c >= 3)
+				return false;
+		}
+		else {
+			if (ObserverEntities.GetFirstMatch([](shok_attachment* a) { return a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS; }))
+				return false;
+		}
+
 	}
 	return true;
 }
@@ -580,6 +598,19 @@ void shok_GGL_CBuilding::MarketCancelTrade()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::Market_CancelTrade };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+}
+
+static inline int(__thiscall* const raxbeh_createentityandattach)(shok_GGL_CBarrackBehavior* th, int ety) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBarrackBehavior*, int)>(0x50EA18);
+static inline int(__thiscall* const raxbeh_gettrainingtl)(shok_GGL_CBarrackBehavior* th) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBarrackBehavior*)>(0x50EBCE);
+int shok_GGL_CBuilding::BuyLeaderByType(int ety)
+{
+	shok_GGL_CBarrackBehavior* rax = GetBehavior<shok_GGL_CBarrackBehavior>();
+	int id = raxbeh_createentityandattach(rax, ety);
+	if (id) {
+		shok_EGL_CEventValue_int ev = { shok_EventIDs::Leader_SetTrainingTL, raxbeh_gettrainingtl(rax) };
+		shok_EGL_CGLEEntity::GetEntityByID(id)->FireEvent(&ev);
+	}
+	return id;
 }
 
 int __cdecl fixedChangePlayer(int id, int pl) {

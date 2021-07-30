@@ -418,6 +418,18 @@ public:
 	static inline constexpr int TypeDesc = 0x827F48;
 };
 
+struct shok_GGL_CFoundryBehaviorProperties_CannonInfo {
+	int Cannon;
+	int TaskList;
+};
+struct shok_GGL_CFoundryBehaviorProperties : shok_EGL_CGLEBehaviorProps {
+	vector_padding;
+	std::vector<shok_GGL_CFoundryBehaviorProperties_CannonInfo, shok_allocator<shok_GGL_CFoundryBehaviorProperties_CannonInfo>> CannonInfo;
+
+	static inline constexpr int vtp = 0x778B80;
+	static inline constexpr int TypeDesc = 0x827F78;
+};
+
 struct shok_GGL_CBuildingMerchantBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	static inline constexpr int vtp = 0x7783B8;
 	static inline constexpr int TypeDesc = 0x8251B4;

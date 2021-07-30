@@ -962,9 +962,18 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CFoundryBehavior>(), "no foundry at 1");
 	luaext_assert(L, b->IsIdle(), "is not idle");
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 2);
+	int ety = luaL_checkint(L, 2);
+	bool found = false;
+	for (shok_GGL_CFoundryBehaviorProperties_CannonInfo& i : b->GetEntityType()->GetBehaviorProps<shok_GGL_CFoundryBehaviorProperties>()->CannonInfo) {
+		if (i.Cannon == ety)
+			found = true;
+	}
+	luaext_assert(L, found, "foundry cannot build entitytype");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
+	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(t->LogicProps)->Cost), "missing res");
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	b->CommandBuildCannon(luaL_checkint(L, 2));
+	b->CommandBuildCannon(ety);
 	return 0;
 }
 
@@ -1429,6 +1438,25 @@ int l_building_ConSiteGetBuilding(lua_State* L) {
 	return 1;
 }
 
+int l_building_BarracksBuyLeaderByType(lua_State* L) {
+	shok_GGL_CBuilding* e = luaext_checkBulding(L, 1);
+	luaext_assertPointer(L, e->GetBehavior<shok_GGL_CBarrackBehavior>(), "no barracks");
+	shok_GGlue_CGlueEntityProps* ety = luaext_checkEntityType(L, 2);
+	shok_GGL_CLeaderBehaviorProps* lp = ety->GetBehaviorProps<shok_GGL_CLeaderBehaviorProps>();
+	luaext_assertPointer(L, lp, "no leader type");
+	luaext_assert(L, e->IsIdle(true), "building not idle");
+	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
+	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
+	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(ety->LogicProps)->Cost), "missing res");
+	if (!lua_toboolean(L, 3)) {
+		int ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(e->EntityType);
+		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
+	}
+	int id = e->BuyLeaderByType(luaL_checkint(L, 2));
+	lua_pushnumber(L, id);
+	return 1;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.clear();
@@ -1593,6 +1621,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "BuildOnEntityGetBuilding", &l_building_GetBuildOnReverse);
 	luaext_registerFunc(L, "GetConstructionSite", &l_building_GetConstructionSite);
 	luaext_registerFunc(L, "ConstructionSiteGetBuilding", &l_building_ConSiteGetBuilding);
+	luaext_registerFunc(L, "BarracksBuyLeaderByType", &l_building_BarracksBuyLeaderByType);
 	lua_rawset(L, -3);
 }
 

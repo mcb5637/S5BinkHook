@@ -332,6 +332,7 @@ static inline int(__stdcall* const shok_loadBuffer)(lua_State* L, const char* bu
 
 static inline lua_State** const shok_luastate_game = reinterpret_cast<lua_State**>(0x853A9C);
 extern lua_State* mainmenu_state;
+static inline HWND* shok_mainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
 
 
 const char* ReadFileToString(const char* name, size_t* size);

@@ -356,6 +356,12 @@ function CppLogic.API.RuntimeStoreSet(name, value) end
 -- @return value data
 function CppLogic.API.RuntimeStoreGet(name) end
 
+--- gets the main windows client size.
+-- == GUI.GetScreenSize(), but available in main menu.
+-- @return right
+-- @return bottom
+function CppLogic.API.GetClientSize() end
+
 --- deals damage to a target.
 -- calls respective hurt entity trigger.
 -- @param target entity to be damaged

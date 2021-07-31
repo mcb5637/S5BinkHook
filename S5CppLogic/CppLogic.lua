@@ -356,12 +356,6 @@ function CppLogic.API.RuntimeStoreSet(name, value) end
 -- @return value data
 function CppLogic.API.RuntimeStoreGet(name) end
 
---- gets the main windows client size.
--- == GUI.GetScreenSize(), but available in main menu.
--- @return right
--- @return bottom
-function CppLogic.API.GetClientSize() end
-
 --- deals damage to a target.
 -- calls respective hurt entity trigger.
 -- @param target entity to be damaged
@@ -1797,6 +1791,17 @@ function CppLogic.UI.SetKeyTrigger(f) end
 -- set to nil to remove.
 -- @param f func to be called
 function CppLogic.UI.SetMouseTrigger(f) end
+
+--- gets the main windows client size.
+-- == GUI.GetScreenSize(), but available in main menu.
+-- @return right
+-- @return bottom
+function CppLogic.UI.GetClientSize() end
+
+--- checks if a widget is a container widget.
+-- @param wid
+-- @return true/false
+function CppLogic.UI.IsContainerWidget(wid) end
 
 --- resets the global CppLogic.
 -- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

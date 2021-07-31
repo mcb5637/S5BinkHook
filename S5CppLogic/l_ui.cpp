@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "l_ui.h"
+#include <WinUser.h>
 
 shok_EGUIX_CBaseWidget* l_uiCheckWid(lua_State* L, int i) {
 	int id;
@@ -153,6 +154,15 @@ int l_uiGetAllSubWidgets(lua_State* L) {
 		lua_rawseti(L, -2, i);
 		i++;
 	}
+	return 1;
+}
+
+int l_ui_IsContainerWid(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	if (shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
 	return 1;
 }
 
@@ -640,6 +650,16 @@ int l_ui_ShowResFloatie(lua_State* L) {
 	return 0;
 }
 
+int l_ui_GetClientSize(lua_State* L) {
+	RECT r;
+	if (GetClientRect(*shok_mainWindowHandle, &r)) {
+		lua_pushnumber(L, r.right);
+		lua_pushnumber(L, r.bottom);
+		return 2;
+	}
+	return 0;
+}
+
 void l_ui_cleanup(lua_State* L) {
 	UIInput_Char_Callback = nullptr;
 	UIInput_Key_Callback = nullptr;
@@ -708,6 +728,8 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "SetKeyTrigger", &l_ui_SetKeyTrigger);
 	luaext_registerFunc(L, "SetMouseTrigger", &l_ui_SetMouseTrigger);
 	luaext_registerFunc(L, "ShowResourceFloatieOnEntity", &l_ui_ShowResFloatie);
+	luaext_registerFunc(L, "GetClientSize", &l_ui_GetClientSize);
+	luaext_registerFunc(L, "IsContainerWidget", &l_ui_IsContainerWid);
 }
 
 // CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")

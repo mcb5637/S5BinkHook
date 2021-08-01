@@ -87,6 +87,9 @@ function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
 -- @param p player
 -- @param t tick
 function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
+--- sets the time between paydays. (get via Logic).
+-- @param freq frequency in seconds
+function CppLogic.Logic.SetPaydayFrequency(freq) end
 
 --- player kill statistics.
 -- @param p player

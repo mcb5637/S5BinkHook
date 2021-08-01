@@ -64,6 +64,12 @@ int l_playerSetPaydayStatus(lua_State* L) {
 	}
 	return 0;
 }
+int l_logic_setpaydayfrequency(lua_State* L) {
+	int i = luaL_checkint(L, 1);
+	luaext_assert(L, i > 0, "freq has to be > 0");
+	(*shok_GGL_CPlayerAttractionProps::GlobalObj)->PaydayFrequency = i;
+	return 0;
+}
 
 
 void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
@@ -1108,6 +1114,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "GetAnimIdFromName", &l_logicGetAnimIdFromName);
 	luaext_registerFunc(L, "PlayerGetPaydayStartetTick", &l_playerGetPaydayStatus);
 	luaext_registerFunc(L, "PlayerSetPaydayStartetTick", &l_playerSetPaydayStatus);
+	luaext_registerFunc(L, "SetPaydayFrequency", &l_logic_setpaydayfrequency);
 	luaext_registerFunc(L, "PlayerGetKillStatistics", &l_playerGetKillStatistics);
 	luaext_registerFunc(L, "CanPlaceBuildingAt", &l_logicCanPLaceBuildingAt);
 	luaext_registerFunc(L, "PlayerActivateAlarm", &l_logicPlayerActivateAlarm);

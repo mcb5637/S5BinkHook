@@ -1457,6 +1457,14 @@ int l_building_BarracksBuyLeaderByType(lua_State* L) {
 	return 1;
 }
 
+int l_settler_GetShurikenTarget(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CShurikenAbility* beh = s->GetBehavior<shok_GGL_CShurikenAbility>();
+	luaext_assertPointer(L, beh, "no shuriken ability");
+	lua_pushnumber(L, beh->TargetId);
+	return 1;
+}
+
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
 	shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.clear();
@@ -1574,6 +1582,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "CommandTurnBattleSerfToSerf", &l_settlerBattleSerfToSerf);
 	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
 	luaext_registerFunc(L, "EnableRangedEffectSoldierHeal", &l_settler_EnableRangedEffectSoldierHeal);
+	luaext_registerFunc(L, "ShurikenGetTarget", &l_settler_GetShurikenTarget);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

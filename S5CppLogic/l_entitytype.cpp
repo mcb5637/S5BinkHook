@@ -389,7 +389,8 @@ int l_settlerTyGetAbilityDataShuriken(lua_State* L) {
 	lua_pushnumber(L, p->Range);
 	lua_pushnumber(L, p->MaxArcDegree);
 	lua_pushnumber(L, p->RechargeTimeSeconds);
-	return 6;
+	lua_pushnumber(L, p->ProjectileType);
+	return 7;
 }
 int l_settlerTySetAbilityDataShuriken(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);

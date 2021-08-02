@@ -896,6 +896,11 @@ function CppLogic.Entity.Settler.SetPosition(id, p) end
 -- @param enabl bool
 function CppLogic.Entity.Settler.EnableRangedEffectSoldierHeal(enabl) end
 
+--- gets the target of a heros shuriken ability.
+-- @param id
+-- @return tid
+function CppLogic.Entity.Settler.ShurikenGetTarget(id) end
+
 --- a leaders experience.
 -- @param id leader
 -- @return xp
@@ -1335,6 +1340,7 @@ function CppLogic.EntityType.Settler.SetAbilityDataCircularAttack(ty, dmg, dcl, 
 -- @return range
 -- @return max arc degree
 -- @return recharge time
+-- @return effectTypeID
 function CppLogic.EntityType.Settler.GetAbilityDataShuriken(ty) end
 --- entitytytpe shuriken ability data.
 -- @param ty entitytype

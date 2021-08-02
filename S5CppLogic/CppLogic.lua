@@ -1800,6 +1800,8 @@ function CppLogic.UI.SetKeyTrigger(f) end
 -- set to nil to remove.
 -- @param f func to be called
 function CppLogic.UI.SetMouseTrigger(f) end
+--- same as CppLogic.UI.SetMouseTrigger, just designed for mainmenu
+function CppLogic.UI.SetMouseTriggerMainMenu(f) end
 
 --- gets the main windows client size.
 -- == GUI.GetScreenSize(), but available in main menu.

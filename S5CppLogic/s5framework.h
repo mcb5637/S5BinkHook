@@ -82,8 +82,8 @@ struct shok_GDB_CList : shok_object {
 
 struct shok_Framework_CMain : shok_object {
 	int vtable_Framework_IGameCallBacks, vtable_ESnd_IAmbientSoundInfo;
-	PADDINGI(1); // 2
-	shok_GS3DTools_CMapData CurrentMap;
+	int CurrentMode; // 1 mainmenu, 2 ingame (sp?)
+	shok_GS3DTools_CMapData CurrentMap; // 4
 	//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent
 	// GS3DTools::CMapData::vtable???
 
@@ -98,4 +98,4 @@ struct shok_Framework_CMain : shok_object {
 
 	static inline shok_Framework_CMain** const GlobalObj = reinterpret_cast<shok_Framework_CMain**>(0x84EF60);
 };
-//constexpr int i = offsetof(shok_Framework_CMain, GDB) / 4;
+//constexpr int i = offsetof(shok_Framework_CMain, CurrentMap.MapName.size) / 4;

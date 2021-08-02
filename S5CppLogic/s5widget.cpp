@@ -248,10 +248,15 @@ int __stdcall uiinput_key(void* ev, int id, int w, int l) {
     return uiinput_key_orig(ev, id, w, l);
 }
 void (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l) = nullptr;
+void (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l) = nullptr;
 int(__stdcall* const uiinput_mouse_orig)(void* ev, int hwind, win_mouseEvents id, int w, int h) = reinterpret_cast<int(__stdcall* const)(void*, int, win_mouseEvents, int, int)>(0x54E6BD);
 int __stdcall uiinput_mouse(void* ev, int hwind, win_mouseEvents id, int w, int l) {
-    if (id >= win_mouseEvents::MouseMove && id <= win_mouseEvents::XButtonDBl && UIInput_Mouse_Callback)
-        UIInput_Mouse_Callback(id, w, l);
+    if (id >= win_mouseEvents::MouseMove && id <= win_mouseEvents::XButtonDBl) {
+        if (UIInput_Mouse_Callback)
+            UIInput_Mouse_Callback(id, w, l);
+        if (UIInput_Mouse_CallbackMainMenu)
+            UIInput_Mouse_CallbackMainMenu(id, w, l);
+    }
     return uiinput_mouse_orig(ev, hwind, id, w, l);
 }
 bool HookUIInput_Hooked = false;

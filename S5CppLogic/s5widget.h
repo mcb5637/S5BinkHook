@@ -284,4 +284,5 @@ struct shok_fontManager { // no vtable either
 extern void (*UIInput_Char_Callback)(int c);
 extern void (*UIInput_Key_Callback)(int c, int ev);
 extern void (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l);
+extern void (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l);
 void HookUIInput();

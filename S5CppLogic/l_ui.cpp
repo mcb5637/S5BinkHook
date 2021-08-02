@@ -644,6 +644,57 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 	}
 	return 0;
 }
+int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
+	if (lua_isnil(L, 1)) {
+		UIInput_Mouse_CallbackMainMenu = nullptr;
+		lua_pushlightuserdata(L, &l_ui_SetMouseTriggerMainMenu);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+		return 0;
+	}
+
+	luaext_assert(L, lua_isfunction(L, 1), "no func at 1");
+	lua_pushlightuserdata(L, &l_ui_SetMouseTriggerMainMenu);
+	lua_pushvalue(L, 1);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+
+	if (!UIInput_Mouse_CallbackMainMenu) {
+		HookUIInput();
+		UIInput_Mouse_CallbackMainMenu = [](win_mouseEvents id, int w, int l) {
+			if (id == win_mouseEvents::MouseMove)
+				return;
+
+			if ((*shok_Framework_CMain::GlobalObj)->CurrentMode != 1)
+				return;
+
+			lua_State* L = mainmenu_state;
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_ui_SetMouseTriggerMainMenu);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, static_cast<int>(id));
+			lua_pushnumber(L, l & 0xFFFF);
+			lua_pushnumber(L, (l >> 16) & 0xFFFF);
+
+			if (id >= win_mouseEvents::LButtonDown && id <= win_mouseEvents::MButtonDBl) {
+				lua_pcall(L, 3, 0, 0);
+			}
+			else if (id == win_mouseEvents::MouseWheel) {
+				lua_pushboolean(L, w > 0);
+				lua_pcall(L, 4, 0, 0);
+			}
+			else if (id >= win_mouseEvents::XButtonDown && id <= win_mouseEvents::XButtonDBl) {
+				lua_pushboolean(L, ((w >> 16) & 0xFFFF) - 1);
+				lua_pcall(L, 4, 0, 0);
+			}
+
+			lua_settop(L, t);
+		};
+	}
+	return 0;
+}
 
 int l_ui_ShowResFloatie(lua_State* L) {
 	(*shok_GGUI_C3DOnScreenInformationCustomWidget::GlobalObj)->ShowResourceFloatieOnEntity(luaext_checkEntityId(L, 1), luaL_checkint(L, 2));
@@ -730,6 +781,9 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "ShowResourceFloatieOnEntity", &l_ui_ShowResFloatie);
 	luaext_registerFunc(L, "GetClientSize", &l_ui_GetClientSize);
 	luaext_registerFunc(L, "IsContainerWidget", &l_ui_IsContainerWid);
+
+	if (L == mainmenu_state)
+		luaext_registerFunc(L, "SetMouseTriggerMainMenu", &l_ui_SetMouseTriggerMainMenu);
 }
 
 // CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")

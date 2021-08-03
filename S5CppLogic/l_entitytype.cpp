@@ -442,7 +442,7 @@ int l_settlerTyGetAbilityDataRangedEffect(lua_State* L) {
 	lua_pushnumber(L, p->HealthRecoveryFactor);
 	lua_pushnumber(L, p->Range);
 	lua_pushnumber(L, p->RechargeTimeSeconds);
-	return 4;
+	return 5;
 }
 int l_settlerTySetAbilityDataRangedEffect(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
@@ -461,6 +461,12 @@ int l_settlerTySetAbilityDataRangedEffect(lua_State* L) {
 	return 0;
 }
 
+int l_entityTyHasResourceTreeData(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	shok_GGL_CEntityProperties* l = shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CEntityProperties>(t->LogicProps);
+	lua_pushboolean(L, l != nullptr);
+	return 1;
+}
 int l_entityTyGetResourceTreeData(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
 	shok_GGL_CEntityProperties* l = shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CEntityProperties>(t->LogicProps);
@@ -714,6 +720,7 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "SetArmor", &l_entityTySetArmor);
 	luaext_registerFunc(L, "GetModels", &l_entityTyGetModels);
 	luaext_registerFunc(L, "SetModels", &l_entityTySetModels);
+	luaext_registerFunc(L, "ResourceTreeTypeHasData", &l_entityTyHasResourceTreeData);
 	luaext_registerFunc(L, "ResourceTreeTypeGetData", &l_entityTyGetResourceTreeData);
 	luaext_registerFunc(L, "ResourceTreeTypeSetData", &l_entityTySetResourceTreeData);
 	luaext_registerFunc(L, "GetBlocking", &l_entityTypeGetBlocking);

@@ -1229,6 +1229,10 @@ function CppLogic.EntityType.GetModels(ty) end
 -- @param m3 model 3 (optional)
 function CppLogic.EntityType.SetModels(ty, m0, m1, m2, m3) end
 
+--- checks it a entitytype can be replaced with a resourcetree.
+-- @param ty entitytype
+-- @return bool
+function CppLogic.EntityType.ResourceTreeTypeHasData(ty) end
 --- tree data to replace a tree with a resourcetree.
 -- @param ty entitytype
 -- @return resource entitytype

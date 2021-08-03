@@ -213,7 +213,7 @@ int l_entityIteratorCount(lua_State* L) {
 		l_entityPredicateAnd(L);
 	}
 	EntityIteratorPredicate* pred = l_entity_checkpredicate(L, 1);
-	int count = 1;
+	int count = 0;
 	EntityIterator it{ pred };
 	shok_EGL_CGLEEntity* e = nullptr;
 	while (true) {

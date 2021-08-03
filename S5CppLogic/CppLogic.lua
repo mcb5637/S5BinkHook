@@ -1242,8 +1242,9 @@ function CppLogic.EntityType.ResourceTreeTypeSetData(ty, rety, ram) end
 
 --- blocking data of an entitytype.
 -- @param ty entitytype
--- @return blocking table
--- @return num blocked points
+-- @return blocking table (array of {pos,pos})
+-- @return num blocked points (number)
+-- @return buildblock ({pos,pos} or nil)
 function CppLogic.EntityType.GetBlocking(ty) end
 
 --- settler or building type exploration modifier techs.

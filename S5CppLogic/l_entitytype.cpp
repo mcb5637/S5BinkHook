@@ -564,6 +564,14 @@ int l_entityTypeGetBlocking(lua_State* L) {
 		i++;
 	}
 	lua_pushnumber(L, t->LogicProps->NumBlockedPoints);
+	if (shok_GGL_CBuildBlockProperties* bb = shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CBuildBlockProperties>(t->LogicProps)) {
+		lua_newtable(L);
+		luaext_pushPos(L, bb->BuildBlockArea.low);
+		lua_rawseti(L, -2, 1);
+		luaext_pushPos(L, bb->BuildBlockArea.high);
+		lua_rawseti(L, -2, 2);
+		return 3;
+	}
 	return 2;
 }
 

@@ -266,7 +266,7 @@ int shok_ED_CGlobalsLogicEx::GetBlocking(shok_position& p)
 	ToTerrainCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
-	return Blocking->data[(qp[1] + 1) * Blocking->ArraySizeXY + (qp[0] + 1)];
+	return Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]];
 }
 
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)

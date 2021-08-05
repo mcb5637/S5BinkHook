@@ -77,6 +77,7 @@ typedef uint8_t byte;
 static inline void* (__cdecl* const shok_malloc)(size_t t) = reinterpret_cast<void* (__cdecl*)(size_t)>(0x5C4181);
 static inline void* (__cdecl* const shok_new)(size_t t) = reinterpret_cast<void* (__cdecl*)(size_t)>(0x5C04FB);
 static inline void(__cdecl* const shok_free)(void* p) = reinterpret_cast<void(__cdecl*)(void* p)>(0x5C2E2D);
+// format i int, f float, x hex int, c char, s const char*
 static inline void (*const shok_logString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
 
 template <class T>

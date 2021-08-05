@@ -1390,6 +1390,15 @@ int l_entity_SetDisplayName(lua_State* L) {
 	d->NameOverride = luaL_checkstring(L, 2);
 	return 0;
 }
+int l_entity_GetDisplayName(lua_State* L) {
+	shok_EGL_CGLEEntity* b = luaext_checkEntity(L, 1);
+	entityAddonData* d = b->GetAdditionalData(false);
+	if (d && !d->NameOverride.empty())
+		lua_pushstring(L, d->NameOverride.c_str());
+	else
+		lua_pushstring(L, shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(b->EntityType));
+	return 1;
+}
 
 int l_leader_GetRegen(lua_State* L) {
 	if (HasSCELoader())
@@ -1508,6 +1517,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetExploration", &l_entity_SetExploration);
 	luaext_registerFunc(L, "SetAutoAttackMaxRange", &l_entity_SetAutoAttackMaxRange);
 	luaext_registerFunc(L, "SetDisplayName", &l_entity_SetDisplayName);
+	luaext_registerFunc(L, "GetDisplayName", &l_entity_GetDisplayName);
 	luaext_registerFunc(L, "PerformHeal", &l_entity_PerformHeal);
 
 	lua_pushstring(L, "Predicates");

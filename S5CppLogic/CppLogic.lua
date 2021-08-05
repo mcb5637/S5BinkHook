@@ -630,10 +630,14 @@ function CppLogic.Entity.SetExploration(id, ex) end
 -- @param ran, (<0 disable)
 function CppLogic.Entity.SetAutoAttackMaxRange(id, ran) end
 
---- overrides a n entities display name.
+--- overrides an entities display name.
 -- @param id entity
 -- @param n, ("" disable)
 function CppLogic.Entity.SetDisplayName(id, n) end
+--- gets the display name of an entity.
+-- @param id entity
+-- @return name
+function CppLogic.Entity.GetDisplayName(id) end
 
 --- clones all overrides.
 -- @param from entity (can be id of last destroyed entity)

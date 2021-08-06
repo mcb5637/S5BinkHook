@@ -246,7 +246,7 @@ struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_object {
 };
 
 struct shok_widgetManager { // this thing has no vtable...
-	PADDINGI(1);
+	shok_BB_CIDManagerEx* WidgetNameManager;
 	vector_padding;
 	std::vector<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>> Widgets;
 

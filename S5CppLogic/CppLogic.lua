@@ -1711,6 +1711,11 @@ function CppLogic.UI.WidgetSetGroup(wid, group) end
 -- @param wid widget
 function CppLogic.UI.RemoveWidget(wid) end
 
+--- gets a widgets name.
+-- @param wid widget
+-- @return name
+function CppLogic.UI.GetWidgetName(wid) end
+
 
 --- creates a new static widget and registers it as its child.
 -- the widget is initially hidden and all variables at a default value.

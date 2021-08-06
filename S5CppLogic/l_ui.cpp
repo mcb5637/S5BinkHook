@@ -711,6 +711,12 @@ int l_ui_GetClientSize(lua_State* L) {
 	return 0;
 }
 
+int l_ui_GetWidgetName(lua_State* L) {
+	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
+	lua_pushstring(L, shok_widgetManager::GlobalObj()->WidgetNameManager->GetNameByID(w->WidgetID));
+	return 1;
+}
+
 void l_ui_cleanup(lua_State* L) {
 	UIInput_Char_Callback = nullptr;
 	UIInput_Key_Callback = nullptr;
@@ -781,6 +787,7 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "ShowResourceFloatieOnEntity", &l_ui_ShowResFloatie);
 	luaext_registerFunc(L, "GetClientSize", &l_ui_GetClientSize);
 	luaext_registerFunc(L, "IsContainerWidget", &l_ui_IsContainerWid);
+	luaext_registerFunc(L, "GetWidgetName", &l_ui_GetWidgetName);
 
 	if (L == mainmenu_state)
 		luaext_registerFunc(L, "SetMouseTriggerMainMenu", &l_ui_SetMouseTriggerMainMenu);

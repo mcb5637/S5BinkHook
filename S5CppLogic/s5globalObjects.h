@@ -18,6 +18,14 @@ struct shok_BB_CIDManagerEx : shok_object {
 	static inline shok_BB_CIDManagerEx** const AnimManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C838);
 	static inline shok_BB_CIDManagerEx** const EntityTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x895DC0);
 	static inline shok_BB_CIDManagerEx** const UpgradeCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C84C);
+	static inline shok_BB_CIDManagerEx** const EntityCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C4);
+	static inline shok_BB_CIDManagerEx** const DamageClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B8);
+	static inline shok_BB_CIDManagerEx** const TechnologiesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3BC);
+	static inline shok_BB_CIDManagerEx** const TechnologyCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C0);
+	static inline shok_BB_CIDManagerEx** const AbilityManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3CC);
+	static inline shok_BB_CIDManagerEx** const GoodsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B4); // i dont think they are actually used somewhere...
+	static inline shok_BB_CIDManagerEx** const ArmorClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C8); // you probably cannot add anything here, cause fixed array
+	static inline shok_BB_CIDManagerEx** const AttachmentTypesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3D0); // 85A3D4 too
 };
 
 struct shok_EGL_CGLEEntitiesProps : shok_object {
@@ -25,7 +33,7 @@ struct shok_EGL_CGLEEntitiesProps : shok_object {
 	shok_BB_CIDManagerEx* EntityTypeManager;
 	shok_BB_CIDManagerEx* EntityCategoryManager;
 	shok_BB_CIDManagerEx* UpgradeCategoryManager;
-	shok_BB_CIDManagerEx* TechCategoryManager;
+	shok_BB_CIDManagerEx* BlessCategoryManager;
 	vector_padding;
 	std::vector<shok_EGL_CGLEEntityProps*, shok_allocator<shok_EGL_CGLEEntityProps*>> EntityTypesLogicProps; // 6
 	shok_BB_CIDManagerEx* EntityTypeManagerAgain;
@@ -136,7 +144,7 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 	void HookCreateEffect(); // currently unused
 	static void(*CreateEffectHookCallback)(int id, void* ret);
 
-	static inline shok_EGL_CGLEGameLogic** const GlobalObj = reinterpret_cast<shok_EGL_CGLEGameLogic**>(0x895DAC);
+	static inline shok_EGL_CGLEGameLogic** const GlobalObj = reinterpret_cast<shok_EGL_CGLEGameLogic**>(0x895DAC); // also 85A3A4
 	static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 };
 
@@ -183,7 +191,7 @@ struct shok_GGL_CDamageClassProps : shok_object {
 	static inline constexpr int vtp = 0x788978;
 };
 struct shok_damageClassHolder {
-	PADDINGI(1);
+	shok_BB_CIDManagerEx* DamageClassManager;
 	vector_padding;
 	std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
 

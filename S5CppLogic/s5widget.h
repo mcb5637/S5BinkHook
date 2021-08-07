@@ -116,6 +116,7 @@ struct shok_EGUIX_CBaseWidget : shok_object {
 
 	static inline constexpr int vtp = 0x780768;
 	static inline constexpr int TypeDesc = 0x82D93C;
+	static inline constexpr unsigned int Identifier = 0x18736A06;
 	// 5598E3 ctor
 
 	int SetPosAndSize(float x, float y, float w, float h);
@@ -142,6 +143,7 @@ struct shok_EGUIX_CStaticWidget : shok_EGUIX_CBaseWidget {
 
 	static inline constexpr int vtp = 0x780F84;
 	static inline constexpr int TypeDesc = 0x82DF64;
+	static inline constexpr unsigned int Identifier = 0x213A8776;
 
 	static shok_EGUIX_CStaticWidget* Create();
 };
@@ -157,6 +159,7 @@ struct shok_EGUIX_CStaticTextWidget : shok_EGUIX_CStaticWidget {
 
 	static inline constexpr int vtp = 0x780EE4;
 	static inline constexpr int TypeDesc = 0x82D95C;
+	static inline constexpr unsigned int Identifier = 0x86E3BC06;
 
 	static shok_EGUIX_CStaticTextWidget* Create();
 };
@@ -171,6 +174,7 @@ struct shok_EGUIX_CButtonWidget : shok_EGUIX_CBaseWidget {
 
 	static inline constexpr int vtp = 0x780E5C;
 	static inline constexpr int TypeDesc = 0x834148;
+	static inline constexpr unsigned int Identifier = 0x0FE028496;
 	// 55F782 ctor
 };
 static_assert(sizeof(shok_EGUIX_CButtonWidget) == 146 * 4);
@@ -183,6 +187,7 @@ struct shok_EGUIX_CGfxButtonWidget : shok_EGUIX_CButtonWidget {
 
 	static inline constexpr int vtp = 0x780CD0;
 	static inline constexpr int TypeDesc = 0x82DB14;
+	static inline constexpr unsigned int Identifier = 0x56DDA656;
 
 	static shok_EGUIX_CGfxButtonWidget* Create();
 };
@@ -196,6 +201,7 @@ struct shok_EGUIX_CTextButtonWidget : shok_EGUIX_CButtonWidget {
 
 	static inline constexpr int vtp = 0x780DB0;
 	static inline constexpr int TypeDesc = 0x82DF3C;
+	static inline constexpr unsigned int Identifier = 0x5DD085A6;
 
 	static shok_EGUIX_CTextButtonWidget* Create();
 };
@@ -207,6 +213,7 @@ struct shok_EGUIX_CContainerWidget : shok_EGUIX_CBaseWidget {
 
 	static inline constexpr int vtp = 0x78114C;
 	static inline constexpr int TypeDesc = 0x8321D8;
+	static inline constexpr unsigned int Identifier = 0x55F9D1F6;
 
 	void AddWidget(shok_EGUIX_CBaseWidget* toAdd, const char* name, const shok_EGUIX_CBaseWidget* before);
 	static shok_EGUIX_CContainerWidget* Create();
@@ -217,6 +224,7 @@ struct shok_EGUIX_CPureTooltipWidget : shok_EGUIX_CBaseWidget {
 
 	static inline constexpr int vtp = 0x780BB0;
 	static inline constexpr int TypeDesc = 0x833E30;
+	static inline constexpr unsigned int Identifier = 0x82CC8876;
 
 	static shok_EGUIX_CPureTooltipWidget* Create();
 };
@@ -228,6 +236,7 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 
 	static inline constexpr int vtp = 0x780C20;
 	static inline constexpr int TypeDesc = 0x833FCC;
+	static inline constexpr unsigned int Identifier = 0x72633416;
 
 	static shok_EGUIX_CProgressBarWidget* Create();
 };

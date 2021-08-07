@@ -196,6 +196,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClInclude Include="resource.h" />
     <ClInclude Include="s5behaviorProps.h" />
     <ClInclude Include="s5behaviors.h" />
+    <ClInclude Include="s5classfactory.h" />
     <ClInclude Include="s5data.h" />
     <ClInclude Include="s5defines.h" />
     <ClInclude Include="s5effects.h" />
@@ -230,6 +231,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     </ClCompile>
     <ClCompile Include="s5behaviorProps.cpp" />
     <ClCompile Include="s5behaviors.cpp" />
+    <ClCompile Include="s5classfactory.cpp" />
     <ClCompile Include="s5data.cpp" />
     <ClCompile Include="s5effects.cpp" />
     <ClCompile Include="s5entity.cpp" />

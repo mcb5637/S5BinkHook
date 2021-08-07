@@ -93,7 +93,11 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    lua_pushnumber(L, (int)luaext_checkEntityType(L,1)->GetBehaviorProps<shok_GGL_CFoundryBehaviorProperties>());
+    int a = 0;
+    shok_EGUIX_CStaticWidget* o = (*shok_BB_CClassFactory::GlobalObj)->LoadObject<shok_EGUIX_CStaticWidget>("data\\test.txt");
+    shok_widgetManager* wm = shok_widgetManager::GlobalObj();
+    static_cast<shok_EGUIX_CContainerWidget*>(wm->GetWidgetByID(wm->GetIdByName("StartMenu00")))->AddWidget(o, "testwid", nullptr);
+    lua_pushnumber(L, (int)o);
     return 1;
 }
 

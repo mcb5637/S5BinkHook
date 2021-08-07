@@ -256,6 +256,11 @@ struct shok_object {
 
 	void Destructor(bool free); // not everything should be destroyed with this destructor, make sure there is not somenting extra for your type in question
 };
+template<class CastTo>
+inline CastTo* shok_DynamicCastFromObject(shok_object* i) {
+	void* (__cdecl* const shok_dyncastFunc)(void* i, int off, int TypeDescSource, int TypeDescOut, bool isref) = reinterpret_cast<void* (__cdecl* const)(void*, int, int, int, bool)>(0x5C36EE);
+	return static_cast<CastTo*>(shok_dyncastFunc(i, 0, 0x7FFE08, CastTo::TypeDesc, false));
+}
 
 struct shok_vtable_BB_IObject {
 	void(__thiscall* dtor)(shok_object* th, bool free);
@@ -318,6 +323,7 @@ enum class win_mouseEvents : int {
 #include "s5widget.h"
 #include "s5framework.h"
 #include "s5tasklist.h"
+#include "s5classfactory.h"
 
 // xml loader vars:
 // v2 type?
@@ -335,7 +341,21 @@ static inline lua_State** const shok_luastate_game = reinterpret_cast<lua_State*
 extern lua_State* mainmenu_state;
 static inline HWND* shok_mainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
 
+struct shok_BB_CFileStreamEx : shok_object {
+private:
+	int x = 0;
 
+public:
+	static constexpr int vtp = 0x761C60;
+
+
+	shok_BB_CFileStreamEx();
+	~shok_BB_CFileStreamEx();
+	bool OpenFile(const char* filename, int u);
+	size_t GetSize();
+	int ReadToBuffer(void* buff, size_t s);
+	void Close();
+};
 const char* ReadFileToString(const char* name, size_t* size);
 bool DoesFileExist(const char* name);
 

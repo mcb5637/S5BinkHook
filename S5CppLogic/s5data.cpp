@@ -111,15 +111,36 @@ bool operator<(shok_attachment a, shok_attachment b) {
 
 lua_State* mainmenu_state = nullptr;
 
-struct shok_BB_CFileStreamEx {
-	int vtable = 0x761C60;
-	int x = 0;
-};
+
 static inline bool(__thiscall* const shok_BB_CFileStreamEx_OpenFile)(shok_BB_CFileStreamEx* th, const char* name, int unk) = reinterpret_cast<bool(__thiscall*)(shok_BB_CFileStreamEx*, const char*, int)>(0x54924D);
 static inline size_t(__stdcall* const shok_BB_CFileStreamEx_GetSize)(shok_BB_CFileStreamEx* th) = reinterpret_cast<size_t(__stdcall*)(shok_BB_CFileStreamEx*)>(0x549140);
 static inline int(__stdcall* const shok_BB_CFileStreamEx_ReadToBuffer)(shok_BB_CFileStreamEx* th, void* buff, size_t buffsiz) = reinterpret_cast<int(__stdcall*)(shok_BB_CFileStreamEx*, void*, size_t)>(0x5491A8);
 static inline void(__thiscall* const shok_BB_CFileStreamEx_Close)(shok_BB_CFileStreamEx* th) = reinterpret_cast<void(__thiscall*)(shok_BB_CFileStreamEx*)>(0x54920A);
 static inline int(__thiscall* const shok_BB_CFileStreamEx_dtor)(shok_BB_CFileStreamEx* th) = reinterpret_cast<int(__thiscall*)(shok_BB_CFileStreamEx*)>(0x549215);
+shok_BB_CFileStreamEx::shok_BB_CFileStreamEx()
+{
+	vtable = shok_BB_CFileStreamEx::vtp;
+}
+shok_BB_CFileStreamEx::~shok_BB_CFileStreamEx()
+{
+	shok_BB_CFileStreamEx_dtor(this);
+}
+bool shok_BB_CFileStreamEx::OpenFile(const char* filename, int u)
+{
+	return shok_BB_CFileStreamEx_OpenFile(this, filename, u);
+}
+size_t shok_BB_CFileStreamEx::GetSize()
+{
+	return shok_BB_CFileStreamEx_GetSize(this);
+}
+int shok_BB_CFileStreamEx::ReadToBuffer(void* buff, size_t s)
+{
+	return shok_BB_CFileStreamEx_ReadToBuffer(this, buff, s);
+}
+void shok_BB_CFileStreamEx::Close()
+{
+	shok_BB_CFileStreamEx_Close(this);
+}
 
 const char* ReadFileToString(const char* name, size_t* size)
 {
@@ -127,18 +148,17 @@ const char* ReadFileToString(const char* name, size_t* size)
 	try
 	{
 		shok_BB_CFileStreamEx filestr{};
-		if (shok_BB_CFileStreamEx_OpenFile(&filestr, name, 0x10113)) {
-			size_t s = shok_BB_CFileStreamEx_GetSize(&filestr);
+		if (filestr.OpenFile(name, 0x10113)) {
+			size_t s = filestr.GetSize();
 			if (size)
 				*size = s;
 			if (s > 0) {
 				buff = new char[s + 1];
 				memset(buff, 0, s + 1);
-				shok_BB_CFileStreamEx_ReadToBuffer(&filestr, buff, s);
+				filestr.ReadToBuffer(buff, s);
 			}
-			shok_BB_CFileStreamEx_Close(&filestr);
+			filestr.Close();
 		}
-		shok_BB_CFileStreamEx_dtor(&filestr);
 	}
 	catch (...)
 	{
@@ -155,14 +175,13 @@ bool DoesFileExist(const char* name)
 	try
 	{
 		shok_BB_CFileStreamEx filestr{};
-		if (shok_BB_CFileStreamEx_OpenFile(&filestr, name, 0x10113)) {
-			size_t s = shok_BB_CFileStreamEx_GetSize(&filestr);
+		if (filestr.OpenFile(name, 0x10113)) {
+			size_t s = filestr.GetSize();
 			if (s > 0) {
 				r = true;
 			}
-			shok_BB_CFileStreamEx_Close(&filestr);
+			filestr.Close();
 		}
-		shok_BB_CFileStreamEx_dtor(&filestr);
 	}
 	catch (...)
 	{

@@ -80,6 +80,58 @@ function CppLogic.Logic.SetPlaceBuildingRotation(r)
 end
 )";
 
+void dumpClassSerialization(lua_State* L, shok_BB_CClassFactory_serializationData* d) {
+    if (!d) {
+        lua_pushstring(L, "unknown serialization data");
+        return;
+    }
+    lua_newtable(L);
+    while (d->Type) {
+        lua_pushnumber(L, d->Position);
+        lua_newtable(L);
+
+        if (d->SerializationName) {
+            lua_pushstring(L, "name");
+            lua_pushstring(L, d->SerializationName);
+            lua_rawset(L, -3);
+        }
+        lua_pushstring(L, "size");
+        lua_pushnumber(L, d->Size);
+        lua_rawset(L, -3);
+
+        if (d->Type == 2) {
+            lua_pushstring(L, "DataType");
+            if (d->DataConverter == shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeInt)
+                lua_pushstring(L, "Int");
+            else if (d->DataConverter == shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeFloat)
+                lua_pushstring(L, "Float");
+            else if (d->DataConverter == shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeBool)
+                lua_pushstring(L, "Bool");
+            else
+                lua_pushnumber(L, reinterpret_cast<int>(d->DataConverter));
+            lua_rawset(L, -3);
+        }
+        else if (d->Type == 3) {
+            lua_pushstring(L, "SubElement");
+            dumpClassSerialization(L, d->SubElementData);
+            lua_rawset(L, -3);
+        }
+
+        if (d->ListOptions) {
+            lua_pushstring(L, "ListOpions");
+            lua_pushnumber(L, d->ListOptions);
+            lua_rawset(L, -3);
+        }
+
+        lua_rawset(L, -3);
+        d++;
+    }
+}
+void dumpClassSerialization(lua_State* L, unsigned int id) {
+    shok_BB_CClassFactory_serializationData* d = (*shok_BB_CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+    dumpClassSerialization(L, d);
+}
+
 int __cdecl test(lua_State* L) {
     /*shok_GS3DTools_CMapData s = shok_GS3DTools_CMapData();
     int st = (int)&s;
@@ -93,11 +145,8 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    int a = 0;
-    shok_EGUIX_CStaticWidget* o = (*shok_BB_CClassFactory::GlobalObj)->LoadObject<shok_EGUIX_CStaticWidget>("data\\test.txt");
-    shok_widgetManager* wm = shok_widgetManager::GlobalObj();
-    static_cast<shok_EGUIX_CContainerWidget*>(wm->GetWidgetByID(wm->GetIdByName("StartMenu00")))->AddWidget(o, "testwid", nullptr);
-    lua_pushnumber(L, (int)o);
+    dumpClassSerialization(L, shok_GGL_CBridgeEntity::Identifier);
+    //lua_pushstring(L, (*shok_BB_CClassFactory::GlobalObj)->GetClassDemangledName(shok_GGL_CBridgeEntity::Identifier));
     return 1;
 }
 

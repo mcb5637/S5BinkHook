@@ -18,6 +18,33 @@ private:
 	shok_BB_CXmlSerializer()=default;
 };
 
+struct shok_BB_CClassFactory_serializationData_FieldSerilaizer {
+	int(__stdcall* DeserializeFromString)(void* data, const char* buff);
+	int(__stdcall* SerializeToString)(char* buff, size_t s, void* data);
+	// probably the same for binary
+	// bool
+	// another func
+
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeInt = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C98);
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeFloat = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C78);
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeBool = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C58);
+
+};
+struct shok_BB_CClassFactory_serializationData { // use a 0-terminated array (default constructed is 0)
+	int Type = 0; // 2 direct val, 3 embedded
+	const char* SerializationName = nullptr;
+	int Position = 0;
+	int Size = 0;
+	shok_BB_CClassFactory_serializationData_FieldSerilaizer* DataConverter = 0;
+	shok_BB_CClassFactory_serializationData* SubElementData = nullptr; //5
+	int Unknown2 = 0;
+	int ListOptions = 0;
+	int Unknown3 = 0;
+
+
+};
+static_assert(sizeof(shok_BB_CClassFactory_serializationData) == 4 * 9);
+
 struct shok_BB_CClassFactory : shok_object {
 
 	static inline constexpr int vtp = 0x77F74C;
@@ -29,15 +56,54 @@ struct shok_BB_CClassFactory : shok_object {
 	{
 		return shok_DynamicCastFromObject<T>(CreateObject(T::Identifier));
 	}
+	void LoadObject(shok_object* ob, const char* filename);
 	template<class T> T* LoadObject(const char* filename)
 	{
 		T* ob = CreateObject<T>();
-		shok_BB_CXmlSerializer* s = shok_BB_CXmlSerializer::Create();
-		s->Deserialize(filename, ob);
-		s->Destroy();
+		LoadObject(ob, filename);
 		return ob;
 	}
+	shok_BB_CClassFactory_serializationData* GetSerializationDataForClass(unsigned int identifier); // returns a 0-terminated array
+	template<class T> shok_BB_CClassFactory_serializationData* GetSerializationDataForClass()
+	{
+		return GetSerializationDataForClass(T::Identifier);
+	}
+	const char* GetClassDemangledName(unsigned int identifier);
 
 
 	static inline shok_BB_CClassFactory** const GlobalObj = reinterpret_cast<shok_BB_CClassFactory**>(0x88F044);
 };
+
+// to create a dynamic_cast able type, provide a RTTI typedesc and a vtable for it.
+// remember to set vtable[-1] to &RTTI_CompleteObjectLocator
+// and set up all base classes as RTTI_BaseClassDescriptor
+// look at existing classes for what values you do need to put into the RTTI fields
+// look at factorytest_s in s5classfactory.cpp for an easy example
+struct RTTI_TypeDescriptor {
+	int vtable;
+	const char* MangledTypeName;
+};
+struct RTTI_BaseClassDescriptor {
+	RTTI_TypeDescriptor* TypeDesc;
+	int NumOfSubElementsInBaseClassArray;
+	int MemberDisplacement = 0;
+	int vtableDisplacement = 0;
+	int DisplacementWithinVtable = 0;
+	int BaseClassAttributes = 0;
+};
+struct RTTI_ClassHierarchyDescriptor {
+	unsigned int Signature = 0;
+	int Attributes;
+	int NumberOfBaseClassEntries;
+	RTTI_BaseClassDescriptor** BaseClassArray;
+};
+struct RTTI_CompleteObjectLocator {
+	unsigned int Signature = 0;
+	unsigned int Offset = 0;
+	unsigned int ConstructorDisplaycementOffset = 0;
+	RTTI_TypeDescriptor* TypeDesc;
+	RTTI_ClassHierarchyDescriptor* ClassHierarchyDesc;
+};
+
+
+void factorytest();

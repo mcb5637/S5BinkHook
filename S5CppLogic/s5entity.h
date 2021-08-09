@@ -74,6 +74,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static inline constexpr int vtp = 0x783E74;
 	static inline constexpr int TypeDesc = 0x8077CC;
 	static inline constexpr int vtp_IEntityDisplay = 0x783E58;
+	static inline constexpr unsigned int Identifier = 0x3F2913E0;
 
 	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehavior, T>::value>::type* = nullptr>
 	T* GetBehavior() {
@@ -184,6 +185,7 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 
 	static inline constexpr int vtp = 0x783F84;
 	static inline constexpr int TypeDesc = 0x8077EC;
+	static inline constexpr unsigned int Identifier = 0x77D4E427;
 
 	void AttackMove(shok_position& p);
 	void AttackEntity(int targetId);
@@ -229,6 +231,7 @@ struct shok_GGL_CEvadingEntity : shok_EGL_CMovingEntity {
 
 	static inline constexpr int vtp = 0x770A7C;
 	static inline constexpr int TypeDesc = 0x810C34;
+	static inline constexpr unsigned int Identifier = 0x42D23A53;
 };
 
 struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
@@ -277,6 +280,7 @@ struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
 	static inline constexpr int vtp = 0x76E3CC;
 	static inline constexpr int TypeDesc = 0x807858;
 	static inline constexpr int vtp_IEntityDisplay = 0x76E3B0;
+	static inline constexpr unsigned int Identifier = 0x0EDC11EA8;
 
 	bool IsIdle();
 
@@ -296,6 +300,7 @@ struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
 
 	static inline constexpr int vtp = 0x778F7C;
 	static inline constexpr int TypeDesc = 0x812038;
+	static inline constexpr unsigned int Identifier = 0x5D6B737;
 };
 
 struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
@@ -306,6 +311,7 @@ struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
 	static inline constexpr int vtp = 0x76FEA4;
 	static inline constexpr int TypeDesc = 0x8118AC;
 	static inline constexpr int vtp_IEntityDisplay = 0x76FE88;
+	static inline constexpr unsigned int Identifier = 0xB0778F47;
 };
 
 struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
@@ -323,6 +329,7 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	static inline constexpr int vtp = 0x76EB94;
 	static inline constexpr int TypeDesc = 0x807898;
 	static inline constexpr int vtp_IEntityDisplay = 0x76EB78;
+	static inline constexpr unsigned int Identifier = 0x15EBDB60;
 
 	int GetConstructionSite();
 	int GetNearestFreeConstructionSlotFor(shok_position* p);
@@ -357,6 +364,7 @@ struct shok_GGL_CBridgeEntity : shok_GGL_CBuilding {
 	static inline constexpr int vtp = 0x77805C;
 	static inline constexpr int TypeDesc = 0x812054;
 	static inline constexpr int vtp_IEntityDisplay = 0x778040;
+	static inline constexpr unsigned int Identifier = 0x3736FF8E;
 };
 
 struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
@@ -365,6 +373,7 @@ struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
 
 	static inline constexpr int vtp = 0x78568C;
 	static inline constexpr int TypeDesc = 0x839FF0;
+	static inline constexpr unsigned int Identifier = 0xE12A3723;
 };
 
 struct shok_EGL_CGLEEntityCreator : shok_object {

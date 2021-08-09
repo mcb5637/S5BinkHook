@@ -52,8 +52,10 @@ int l_api_stacktrace(lua_State* L) {
 int l_api_getfile(lua_State* L) {
 	size_t strlen = 0;
 	const char* s = luaL_checklstring(L, 1, &strlen);
+#ifndef _DEBUG
 	if (!l_apiIsExternalmap(s))
 		luaL_error(L, "not a map file");
+#endif
 	const char* data = ReadFileToString(s, &strlen);
 	if (!data)
 		return 0;

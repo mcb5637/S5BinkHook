@@ -3,7 +3,12 @@
 
 struct shok_vtable_BB_CXmlSerializer {
     void(__stdcall* Destroy)(shok_BB_CXmlSerializer* th);
-    void(__stdcall* Deserialize)(shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_object* ob);
+    void(__stdcall* Deserialize)(shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_object* ob); // open file in mode 0x113
+    PADDINGI(1);
+    void(__stdcall* Serialize)(shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_object* ob); // open file in mode 0x121
+    PADDINGI(1); // dtor, use destroy
+    void(__stdcall* DeserializeByData)(shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_object* ob, shok_BB_CClassFactory_serializationData* d);
+    // serialize by data, (shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_object* ob, shok_BB_CClassFactory_serializationData* d, char* buff)?
 };
 
 struct shok_vtable_BB_CClassFactory {
@@ -35,7 +40,7 @@ void shok_BB_CXmlSerializer::Deserialize(const char* filename, shok_object* ob)
     shok_BB_CFileStreamEx filestr{};
     if (filestr.OpenFile(filename, 0x113)) {
         Deserialize(&filestr, ob);
-        //filestr.Close();
+        filestr.Close();
     }
 }
 

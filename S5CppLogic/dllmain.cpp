@@ -145,9 +145,9 @@ int __cdecl test(lua_State* L) {
         lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
 
     }*/
-    dumpClassSerialization(L, shok_GGL_CBridgeEntity::Identifier);
+    //dumpClassSerialization(L, shok_GGL_CBridgeEntity::Identifier);
     //lua_pushstring(L, (*shok_BB_CClassFactory::GlobalObj)->GetClassDemangledName(shok_GGL_CBridgeEntity::Identifier));
-    return 1;
+    return 0;
 }
 
 int cleanup(lua_State* L) {

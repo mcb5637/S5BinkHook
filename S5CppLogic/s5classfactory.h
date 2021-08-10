@@ -60,6 +60,8 @@ struct shok_BB_CClassFactory : shok_object {
 	template<class T> T* LoadObject(const char* filename)
 	{
 		T* ob = CreateObject<T>();
+		if (!ob)
+			return nullptr;
 		LoadObject(ob, filename);
 		return ob;
 	}
@@ -69,6 +71,7 @@ struct shok_BB_CClassFactory : shok_object {
 		return GetSerializationDataForClass(T::Identifier);
 	}
 	const char* GetClassDemangledName(unsigned int identifier);
+	void AddClassToFactory(unsigned int identifier, const char* name, shok_object* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData);
 
 
 	static inline shok_BB_CClassFactory** const GlobalObj = reinterpret_cast<shok_BB_CClassFactory**>(0x88F044);
@@ -80,8 +83,9 @@ struct shok_BB_CClassFactory : shok_object {
 // look at existing classes for what values you do need to put into the RTTI fields
 // look at factorytest_s in s5classfactory.cpp for an easy example
 struct RTTI_TypeDescriptor {
-	int vtable;
-	const char* MangledTypeName;
+	int typedesc_vtable = 0x0788E9C;
+	int runtime_reference = 0;
+	char MangledTypeName[25] = ".?AVFakeClass@CppLogic@@";
 };
 struct RTTI_BaseClassDescriptor {
 	RTTI_TypeDescriptor* TypeDesc;

@@ -64,6 +64,12 @@ const char* shok_BB_CClassFactory::GetClassDemangledName(unsigned int identifier
 {
     return reinterpret_cast<shok_vtable_BB_CClassFactory*>(vtable)->GetClassDemangledName(this, identifier);
 }
+void shok_BB_CClassFactory::AddClassToFactory(unsigned int identifier, const char* name, shok_object* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData)
+{
+    reinterpret_cast<shok_vtable_BB_CClassFactory*>(vtable)->AddClassData(this, identifier, name, createObj, serializationData);
+}
+
+
 
 shok_BB_CClassFactory_serializationData seridata[] = {
     {
@@ -80,7 +86,7 @@ struct factorytest_s : shok_object {
     static const int TypeDesc;
 };
 int factorytestvt[];
-RTTI_TypeDescriptor factorytypedesc{ reinterpret_cast<int>(&(factorytestvt[1])), "class GGL::FactoryTest" };
+RTTI_TypeDescriptor factorytypedesc{ };
 RTTI_BaseClassDescriptor factorybaseclass1{ &factorytypedesc, 1, 0, -1, 0, 0 };
 RTTI_BaseClassDescriptor factorybaseclass2{ reinterpret_cast<RTTI_TypeDescriptor*>(0x7FFE08), 0, 0, -1, 0, 0 };
 RTTI_BaseClassDescriptor* factorybaseclasses[] = { &factorybaseclass1 , &factorybaseclass2 };
@@ -105,7 +111,7 @@ shok_object* __stdcall newfactorytest_s() {
 void factorytest()
 {
     shok_BB_CClassFactory* f = *shok_BB_CClassFactory::GlobalObj;
-    reinterpret_cast<shok_vtable_BB_CClassFactory*>(f->vtable)->AddClassData(f, 0x500, "class GGL::FactoryTest", &newfactorytest_s, seridata);
+    f->AddClassToFactory(0x500, "class GGL::FactoryTest", &newfactorytest_s, seridata);
     factorytest_s* o = shok_DynamicCastFromObject<factorytest_s>((*shok_BB_CClassFactory::GlobalObj)->CreateObject(0x500));
     (*shok_BB_CClassFactory::GlobalObj)->LoadObject(o, "data\\test.xml");
     DEBUGGER_BREAK;

@@ -41,6 +41,7 @@ struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMove
 
 	static inline constexpr int vtp = 0x7786AC;
 	static inline constexpr int TypeDesc = 0x818DF0;
+	static inline constexpr unsigned int Identifier = 0x3B4EFD17;
 
 	// defined states: Move, Move_NonCancelable, Rotate
 	// defined events: Movement_XXX, 1100D, 1100E, 11017
@@ -53,22 +54,26 @@ struct shok_GGL_CSettlerMovement : shok_GGL_CBehaviorDefaultMovement {
 
 	static inline constexpr int vtp = 0x77471C; //786A407
 	static inline constexpr int TypeDesc = 0x81961C;
+	static inline constexpr unsigned int Identifier = 0x786A407;
 };
 
 struct shok_GGL_CLeaderMovement : shok_GGL_CBehaviorDefaultMovement {
 
 	static inline constexpr int vtp = 0x775ED4;
 	static inline constexpr int TypeDesc = 0x81D7E4;
+	static inline constexpr unsigned int Identifier = 0x0E66510C3;
 };
 
 struct shok_GGL_CSoldierMovement : shok_GGL_CBehaviorDefaultMovement {
 	static inline constexpr int vtp = 0x77438C;
 	static inline constexpr int TypeDesc = 0x818E1C;
+	static inline constexpr unsigned int Identifier = 0x19BC8A93;
 };
 
 struct shok_GGL_CBehaviorAnimalMovement : shok_GGL_CBehaviorDefaultMovement {
 	static inline constexpr int vtp = 0x77880C;
 	static inline constexpr int TypeDesc = 0x826844;
+	static inline constexpr unsigned int Identifier = 0x29093B37;
 };
 
 struct shok_GGL_CHeroAbility : shok_EGL_CGLEBehavior { // no vtable
@@ -88,6 +93,7 @@ struct shok_GGL_CCamouflageBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x7738F4;
 	static inline constexpr int TypeDesc = 0x8172E8;
+	static inline constexpr unsigned int Identifier = 0x0E2D7A5DD;
 };
 
 struct shok_GGL_CThiefCamouflageBehavior : shok_GGL_CCamouflageBehavior {
@@ -97,6 +103,7 @@ struct shok_GGL_CThiefCamouflageBehavior : shok_GGL_CCamouflageBehavior {
 
 	static inline constexpr int vtp = 0x773934;
 	static inline constexpr int TypeDesc = 0x817310;
+	static inline constexpr unsigned int Identifier = 0x51D6A267;
 };
 
 struct shok_GGL_CHeroHawkBehavior : shok_GGL_CHeroAbility {
@@ -104,6 +111,7 @@ struct shok_GGL_CHeroHawkBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x7766F0;
 	static inline constexpr int TypeDesc = 0x81FE84;
+	static inline constexpr unsigned int Identifier = 0x0FE5FCD9D;
 };
 
 struct shok_GGL_CHawkBehavior : shok_EGL_CGLEBehavior {
@@ -116,6 +124,7 @@ struct shok_GGL_CHawkBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x776A24;
 	static inline constexpr int TypeDesc = 0x8207C4;
+	static inline constexpr unsigned int Identifier = 0x0CB26FC4D;
 };
 
 
@@ -128,6 +137,7 @@ struct shok_GGL_CInflictFearAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x776638;
 	static inline constexpr int TypeDesc = 0x81FBD8;
+	static inline constexpr unsigned int Identifier = 0x400E6C6D;
 };
 
 struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
@@ -140,6 +150,7 @@ struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x7783D8;
 	static inline constexpr int TypeDesc = 0x8255D0;
+	static inline constexpr unsigned int Identifier = 0x29AF8F97;
 };
 
 struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
@@ -154,6 +165,7 @@ struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x7774D4;
 	static inline constexpr int TypeDesc = 0x823254;
+	static inline constexpr unsigned int Identifier = 0x259E7B1D;
 };
 
 struct shok_GGL_CRangedEffectAbility : shok_GGL_CHeroAbility {
@@ -164,6 +176,7 @@ struct shok_GGL_CRangedEffectAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x774E54;
 	static inline constexpr int TypeDesc = 0x81B7AC;
+	static inline constexpr unsigned int Identifier = 0x0F622BC1D;
 };
 
 struct shok_GGL_CCircularAttack : shok_GGL_CHeroAbility {
@@ -173,6 +186,7 @@ struct shok_GGL_CCircularAttack : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x777464;
 	static inline constexpr int TypeDesc = 0x823038;
+	static inline constexpr unsigned int Identifier = 0x522330D;
 };
 
 struct shok_GGL_CSummonBehavior : shok_GGL_CHeroAbility {
@@ -182,6 +196,7 @@ struct shok_GGL_CSummonBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x773C10;
 	static inline constexpr int TypeDesc = 0x817E0C;
+	static inline constexpr unsigned int Identifier = 0x2BA19F1D;
 };
 
 struct shok_GGL_CSummonedBehavior : shok_EGL_CGLEBehavior {
@@ -189,6 +204,7 @@ struct shok_GGL_CSummonedBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x773BB8;
 	static inline constexpr int TypeDesc = 0x817CD4;
+	static inline constexpr unsigned int Identifier = 0x83CAFB3D;
 };
 
 struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
@@ -201,6 +217,7 @@ struct shok_GGL_CConvertSettlerAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x777294;
 	static inline constexpr int TypeDesc = 0x8227D8;
+	static inline constexpr unsigned int Identifier = 0x0E8276B7D;
 };
 
 struct shok_GGL_CConvertBuildingAbility : shok_GGL_CHeroAbility {
@@ -213,6 +230,7 @@ struct shok_GGL_CConvertBuildingAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x77739C;
 	static inline constexpr int TypeDesc = 0x822B98;
+	static inline constexpr unsigned int Identifier = 0x0FF68C96D;
 };
 
 struct shok_EGL_CGLEEntity;
@@ -225,6 +243,7 @@ struct shok_GGL_CSniperAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x7745AC;
 	static inline constexpr int TypeDesc = 0x819044;
+	static inline constexpr unsigned int Identifier = 0x0D167211D;
 
 	static void OverrideSnipeTask();
 	static int (*SnipeDamageOverride)(shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg);
@@ -237,6 +256,7 @@ struct shok_GGL_CMotivateWorkersAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x77574C;
 	static inline constexpr int TypeDesc = 0x81C408;
+	static inline constexpr unsigned int Identifier = 0x33A2FBFD;
 };
 
 struct shok_GGL_CShurikenAbility : shok_GGL_CHeroAbility {
@@ -248,6 +268,7 @@ struct shok_GGL_CShurikenAbility : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x774658;
 	static inline constexpr int TypeDesc = 0x819310;
+	static inline constexpr unsigned int Identifier = 0x3A0D7DAD;
 };
 
 struct shok_GGL_CKegPlacerBehavior : shok_GGL_CHeroAbility {
@@ -262,6 +283,7 @@ struct shok_GGL_CKegPlacerBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x776368;
 	static inline constexpr int TypeDesc = 0x81F084;
+	static inline constexpr unsigned int Identifier = 0x0BF115057;
 };
 
 struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
@@ -275,6 +297,7 @@ struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x779218;
 	static inline constexpr int TypeDesc = 0x829248;
+	static inline constexpr unsigned int Identifier = 0x0E7661C1D;
 };
 
 struct shok_GGL_CTorchPlacerBehavior : shok_GGL_CHeroAbility {
@@ -287,6 +310,7 @@ struct shok_GGL_CTorchPlacerBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x773738;
 	static inline constexpr int TypeDesc = 0x816E4C;
+	static inline constexpr unsigned int Identifier = 0x0A5AB3F17;
 };
 
 struct shok_GGL_CTorchBehavior : shok_EGL_CGLEBehavior {
@@ -296,6 +320,7 @@ struct shok_GGL_CTorchBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x773848;
 	static inline constexpr int TypeDesc = 0x817174;
+	static inline constexpr unsigned int Identifier = 0x0A27E4FF7;
 };
 
 struct shok_GGL_CPointToResourceBehavior : shok_GGL_CHeroAbility {
@@ -306,6 +331,7 @@ struct shok_GGL_CPointToResourceBehavior : shok_GGL_CHeroAbility {
 
 	static inline constexpr int vtp = 0x774FB0;
 	static inline constexpr int TypeDesc = 0x81BB84;
+	static inline constexpr unsigned int Identifier = 0x0EC055D7;
 };
 
 struct shok_GGL_CSentinelBehavior : shok_EGL_CGLEBehavior {
@@ -316,6 +342,7 @@ struct shok_GGL_CSentinelBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x774B6C;
 	static inline constexpr int TypeDesc = 0x81ABC0;
+	static inline constexpr unsigned int Identifier = 0x5F1FFAD;
 };
 
 struct shok_GGL_CGLBehaviorAnimationEx : shok_EGL_CGLEBehavior {
@@ -342,6 +369,7 @@ struct shok_GGL_CGLBehaviorAnimationEx : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x776B64;
 	static inline constexpr int TypeDesc = 0x820BE8;
+	static inline constexpr unsigned int Identifier = 0x0A4947238;
 };
 
 struct shok_GGL_CBehaviorWalkCommand : shok_EGL_CGLEBehavior {
@@ -352,6 +380,7 @@ struct shok_GGL_CBehaviorWalkCommand : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7736A4;
 	static inline constexpr int TypeDesc = 0x816A78;
+	static inline constexpr unsigned int Identifier = 0x0E23732C7;
 };
 
 struct shok_GGL_CWorkerBehavior : shok_EGL_CGLEBehavior {
@@ -382,6 +411,7 @@ public:
 
 	static inline constexpr int vtp = 0x772B30;
 	static inline constexpr int TypeDesc = 0x813B1C;
+	static inline constexpr unsigned int Identifier = 0x0DCDBAB9D;
 };
 
 struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollow in between, 776E40
@@ -412,6 +442,7 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollo
 
 	static inline constexpr int vtp = 0x77313C;
 	static inline constexpr int TypeDesc = 0x815EEC;
+	static inline constexpr unsigned int Identifier = 0x0C4F1C42D;
 
 	float GetMaxRange();
 };
@@ -440,6 +471,7 @@ struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 
 	static inline constexpr int vtp = 0x7761E0;
 	static inline constexpr int TypeDesc = 0x81EF80;
+	static inline constexpr unsigned int Identifier = 0x6DACD5ED;
 
 	int GetTroopHealth();
 	int GetTroopHealthPerSoldier();
@@ -453,6 +485,7 @@ struct shok_GGL_CSoldierBehavior : shok_GGL_CBattleBehavior {
 
 	static inline constexpr int vtp = 0x773CC8;
 	static inline constexpr int TypeDesc = 0x817FC4;
+	static inline constexpr unsigned int Identifier = 0x0B1DACA7D;
 };
 
 struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
@@ -465,6 +498,7 @@ struct shok_GGL_CBattleSerfBehavior : shok_GGL_CLeaderBehavior {
 
 	static inline constexpr int vtp = 0x7788C4;
 	static inline constexpr int TypeDesc = 0x826BB4;
+	static inline constexpr unsigned int Identifier = 0x738D051D;
 };
 
 struct shok_GGL_CSerfBattleBehavior : shok_GGL_CBattleBehavior {
@@ -475,6 +509,7 @@ struct shok_GGL_CSerfBattleBehavior : shok_GGL_CBattleBehavior {
 
 	static inline constexpr int vtp = 0x774A98;
 	static inline constexpr int TypeDesc = 0x81A4FC;
+	static inline constexpr unsigned int Identifier = 0x0AAB009AD;
 };
 // GGL::CWorkerBattleBehavior unused
 
@@ -493,6 +528,7 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x774874;
 	static inline constexpr int TypeDesc = 0x819AFC;
+	static inline constexpr unsigned int Identifier = 0x1A1A688D;
 };
 
 struct GGL_SSlotArgsLimitedAttachment {
@@ -509,6 +545,7 @@ struct shok_GGL_CLimitedAttachmentBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x775E84;
 	static inline constexpr int TypeDesc = 0x81D6DC;
+	static inline constexpr unsigned int Identifier = 0x2776847;
 };
 
 struct shok_GGL_CFormationBehavior : shok_EGL_CGLEBehavior {
@@ -520,6 +557,7 @@ struct shok_GGL_CFormationBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x776D60;
 	static inline constexpr int TypeDesc = 0x8212A4;
+	static inline constexpr unsigned int Identifier = 0x0C9C36977;
 };
 
 struct shok_GGL_CCamperBehavior : shok_EGL_CGLEBehavior {
@@ -528,6 +566,7 @@ struct shok_GGL_CCamperBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x77777C;
 	static inline constexpr int TypeDesc = 0x823720;
+	static inline constexpr unsigned int Identifier = 0x1ADA8097;
 };
 
 struct shok_GGL_CCampBehavior : shok_EGL_CGLEBehavior {
@@ -540,6 +579,7 @@ struct shok_GGL_CCampBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x777864;
 	static inline constexpr int TypeDesc = 0x823C48;
+	static inline constexpr unsigned int Identifier = 0x671CDCE7;
 };
 
 struct shok_GGL_CGLBehaviorDying : shok_EGL_CGLEBehavior {
@@ -548,6 +588,7 @@ struct shok_GGL_CGLBehaviorDying : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7785E4;
 	static inline constexpr int TypeDesc = 0x825F14;
+	static inline constexpr unsigned int Identifier = 0x0C035C4ED;
 };
 
 struct shok_GGL_CHeroBehavior : shok_EGL_CGLEBehavior {
@@ -562,6 +603,7 @@ struct shok_GGL_CHeroBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x77677C;
 	static inline constexpr int TypeDesc = 0x820070;
+	static inline constexpr unsigned int Identifier = 0x0FCB04BAD;
 };
 
 struct shok_GGL_CBombBehavior : shok_EGL_CGLEBehavior {
@@ -571,6 +613,7 @@ struct shok_GGL_CBombBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x778468;
 	static inline constexpr int TypeDesc = 0x8258A8;
+	static inline constexpr unsigned int Identifier = 0x76AE8807;
 };
 
 struct shok_GGL_CKegBehavior : shok_EGL_CGLEBehavior {
@@ -583,6 +626,7 @@ struct shok_GGL_CKegBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7764D8;
 	static inline constexpr int TypeDesc = 0x81F6BC;
+	static inline constexpr unsigned int Identifier = 0x14A85A47;
 };
 
 struct shok_GGL_CThiefBehavior : shok_EGL_CGLEBehavior {
@@ -595,6 +639,7 @@ struct shok_GGL_CThiefBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7739B0;
 	static inline constexpr int TypeDesc = 0x8173DC;
+	static inline constexpr unsigned int Identifier = 0x7AE64E17;
 };
 
 struct shok_GGL_CAutoCannonBehavior : shok_EGL_CGLEBehavior {
@@ -613,6 +658,7 @@ struct shok_GGL_CAutoCannonBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x778CF0;
 	static inline constexpr int TypeDesc = 0x8288A0;
+	static inline constexpr unsigned int Identifier = 0x143C5EFD;
 };
 
 struct shok_GGL_CFoundationBehavior : shok_EGL_CGLEBehavior {
@@ -621,6 +667,7 @@ struct shok_GGL_CFoundationBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x776CA0;
 	static inline constexpr int TypeDesc = 0x820F44;
+	static inline constexpr unsigned int Identifier = 0x0B68167D;
 };
 
 struct shok_GGL_CResourceRefinerBehavior : shok_EGL_CGLEBehavior {
@@ -629,6 +676,7 @@ struct shok_GGL_CResourceRefinerBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x774BCC;
 	static inline constexpr int TypeDesc = 0x81AD80;
+	static inline constexpr unsigned int Identifier = 0x340C4B57;
 };
 
 struct shok_GGL_CAffectMotivationBehavior : shok_EGL_CGLEBehavior {
@@ -641,6 +689,7 @@ struct shok_GGL_CAffectMotivationBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x77918C;
 	static inline constexpr int TypeDesc = 0x829024;
+	static inline constexpr unsigned int Identifier = 0x6280C00D;
 };
 
 struct shok_GGL_CLimitedLifespanBehavior : shok_EGL_CGLEBehavior {
@@ -651,6 +700,7 @@ struct shok_GGL_CLimitedLifespanBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x775D9C;
 	static inline constexpr int TypeDesc = 0x81D0B0;
+	static inline constexpr unsigned int Identifier = 0x66243B3D;
 };
 
 struct shok_GGL_CBarrackBehavior : shok_EGL_CGLEBehavior {
@@ -661,6 +711,7 @@ struct shok_GGL_CBarrackBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x778A68;
 	static inline constexpr int TypeDesc = 0x8278DC;
+	static inline constexpr unsigned int Identifier = 0x0FE724607;
 };
 
 struct shok_EGL_GLEBehaviorMultiSubAnims : shok_EGL_CGLEBehavior {
@@ -678,6 +729,7 @@ struct shok_EGL_GLEBehaviorMultiSubAnims : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x785EEC;
 	static inline constexpr int TypeDesc = 0x83AE4C;
+	static inline constexpr unsigned int Identifier = 0x0FCFC0D;
 };
 
 struct shok_GGL_CBuildingMerchantBehavior_COffer : shok_object {
@@ -686,6 +738,7 @@ struct shok_GGL_CBuildingMerchantBehavior_COffer : shok_object {
 
 	static inline constexpr int vtp = 0x7781B4;
 	static inline constexpr int TypeDesc = 0x824BC8;
+	static inline constexpr unsigned int Identifier = 0x1079FB13;
 };
 
 struct shok_GGL_CBuildingTechTraderBehavior_CTechOffer : shok_GGL_CBuildingMerchantBehavior_COffer {
@@ -693,6 +746,7 @@ struct shok_GGL_CBuildingTechTraderBehavior_CTechOffer : shok_GGL_CBuildingMerch
 
 	static inline constexpr int vtp = 0x7781C4;
 	static inline constexpr int TypeDesc = 0x824BFC;
+	static inline constexpr unsigned int Identifier = 0x0D9705E63;
 };
 
 struct shok_GGL_CBuildingMercenaryBehavior_CMercenaryOffer : shok_GGL_CBuildingMerchantBehavior_COffer {
@@ -700,6 +754,7 @@ struct shok_GGL_CBuildingMercenaryBehavior_CMercenaryOffer : shok_GGL_CBuildingM
 
 	static inline constexpr int vtp = 0x778284;
 	static inline constexpr int TypeDesc = 0x824ED8;
+	static inline constexpr unsigned int Identifier = 0x339B693;
 };
 
 struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
@@ -712,6 +767,7 @@ struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x778208;
 	static inline constexpr int TypeDesc = 0x824DFC;
+	static inline constexpr unsigned int Identifier = 0x8D87CCB3;
 };
 
 struct shok_GGL_CBuildingMercenaryBehavior : shok_GGL_CBuildingMerchantBehavior {
@@ -720,6 +776,7 @@ struct shok_GGL_CBuildingMercenaryBehavior : shok_GGL_CBuildingMerchantBehavior 
 
 	static inline constexpr int vtp = 0x7782C0;
 	static inline constexpr int TypeDesc = 0x8250E4;
+	static inline constexpr unsigned int Identifier = 0x2B61C163;
 };
 
 struct shok_GGL_CBuildingTechTraderBehavior : shok_GGL_CBuildingMerchantBehavior {
@@ -728,6 +785,7 @@ struct shok_GGL_CBuildingTechTraderBehavior : shok_GGL_CBuildingMerchantBehavior
 
 	static inline constexpr int vtp = 0x77822C;
 	static inline constexpr int TypeDesc = 0x824E28;
+	static inline constexpr unsigned int Identifier = 0x41EEB893;
 };
 
 struct shok_GGL_CSettlerMerchantBehavior : shok_EGL_CGLEBehavior {
@@ -738,6 +796,7 @@ struct shok_GGL_CSettlerMerchantBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x77477C;
 	static inline constexpr int TypeDesc = 0x819710;
+	static inline constexpr unsigned int Identifier = 0x0AB50F013;
 };
 
 struct shok_GGL_CMarketBehavior : shok_EGL_CGLEBehavior {
@@ -749,6 +808,7 @@ struct shok_GGL_CMarketBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x775CCC;
 	static inline constexpr int TypeDesc = 0x81CE24;
+	static inline constexpr unsigned int Identifier = 0x90A53E97;
 };
 
 struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
@@ -758,6 +818,7 @@ struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x778A8C;
 	static inline constexpr int TypeDesc = 0x827900;
+	static inline constexpr unsigned int Identifier = 0x8EB5DC97;
 };
 
 struct shok_GGL_CWorkerFleeBehavior : shok_EGL_CGLEBehavior {
@@ -769,6 +830,7 @@ struct shok_GGL_CWorkerFleeBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7729FC;
 	static inline constexpr int TypeDesc = 0x813798;
+	static inline constexpr unsigned int Identifier = 0x83A6BCAD;
 };
 
 struct shok_GGL_CWorkerAlarmModeBehavior : shok_EGL_CGLEBehavior {
@@ -778,6 +840,7 @@ struct shok_GGL_CWorkerAlarmModeBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7734DC;
 	static inline constexpr int TypeDesc = 0x8164E4;
+	static inline constexpr unsigned int Identifier = 0x8076034D;
 };
 
 struct shok_CDefendableBuildingBehavior : shok_EGL_CGLEBehavior {
@@ -789,6 +852,7 @@ struct shok_CDefendableBuildingBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7771DC;
 	static inline constexpr int TypeDesc = 0x822428;
+	static inline constexpr unsigned int Identifier = 0x0B663EA8D;
 };
 
 struct shok_GGL_CUniversityBehavior : shok_EGL_CGLEBehavior {
@@ -797,6 +861,7 @@ struct shok_GGL_CUniversityBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7736F4;
 	static inline constexpr int TypeDesc = 0x816C74;
+	static inline constexpr unsigned int Identifier = 0x5F780A67;
 };
 
 struct shok_GGL_CResourceDoodadBehavior : shok_EGL_CGLEBehavior {
@@ -807,6 +872,7 @@ struct shok_GGL_CResourceDoodadBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x774CCC;
 	static inline constexpr int TypeDesc = 0x81B1A4;
+	static inline constexpr unsigned int Identifier = 0x707CD967;
 };
 
 struct shok_GGL_CTreeBehavior : shok_EGL_CGLEBehavior {
@@ -816,6 +882,7 @@ struct shok_GGL_CTreeBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x774CF0;
 	static inline constexpr int TypeDesc = 0x81B1D0;
+	static inline constexpr unsigned int Identifier = 0x74CA1CA7;
 };
 
 struct shok_GGL_CResourceDependentBuildingBehavior : shok_EGL_CGLEBehavior {
@@ -824,6 +891,7 @@ struct shok_GGL_CResourceDependentBuildingBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x774D94;
 	static inline constexpr int TypeDesc = 0x81B478;
+	static inline constexpr unsigned int Identifier = 0x4267D337;
 };
 
 struct shok_GGL_CReplaceableEntityBehavior : shok_EGL_CGLEBehavior {
@@ -834,6 +902,7 @@ struct shok_GGL_CReplaceableEntityBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x774DEC;
 	static inline constexpr int TypeDesc = 0x081B61C;
+	static inline constexpr unsigned int Identifier = 0x981BE357;
 };
 
 struct shok_GGL_CMineBehavior : shok_EGL_CGLEBehavior {
@@ -842,6 +911,7 @@ struct shok_GGL_CMineBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7757CC;
 	static inline constexpr int TypeDesc = 0x81C5EC;
+	static inline constexpr unsigned int Identifier = 0x0DE005127;
 };
 
 struct shok_GGL_CKeepBehavior : shok_EGL_CGLEBehavior {
@@ -850,6 +920,7 @@ struct shok_GGL_CKeepBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x7765C8;
 	static inline constexpr int TypeDesc = 0x81FA60;
+	static inline constexpr unsigned int Identifier = 0x995E7AF7;
 };
 
 struct shok_GGL_CFarmBehavior : shok_EGL_CGLEBehavior {
@@ -858,6 +929,7 @@ struct shok_GGL_CFarmBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x776EBC;
 	static inline constexpr int TypeDesc = 0x821970;
+	static inline constexpr unsigned int Identifier = 0x6EF4A627;
 };
 
 struct shok_GGL_CConstructionSiteBehavior : shok_EGL_CGLEBehavior {
@@ -866,6 +938,7 @@ struct shok_GGL_CConstructionSiteBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x777424;
 	static inline constexpr int TypeDesc = 0x822EC4;
+	static inline constexpr unsigned int Identifier = 0x0E69FE40;
 };
 
 struct shok_GGL_CBuildingBehavior : shok_EGL_CGLEBehavior {
@@ -876,6 +949,7 @@ struct shok_GGL_CBuildingBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x777FBC;
 	static inline constexpr int TypeDesc = 0x8247AC;
+	static inline constexpr unsigned int Identifier = 0x0F3538D37;
 };
 
 struct shok_GGL_CBarrierBehavior : shok_EGL_CGLEBehavior {
@@ -884,6 +958,7 @@ struct shok_GGL_CBarrierBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x778A10;
 	static inline constexpr int TypeDesc = 0x8277DC;
+	static inline constexpr unsigned int Identifier = 0x310288C7;
 };
 
 struct shok_GGL_CNeutralBridgeBehavior : shok_EGL_CGLEBehavior {
@@ -893,6 +968,7 @@ struct shok_GGL_CNeutralBridgeBehavior : shok_EGL_CGLEBehavior {
 
 	static inline constexpr int vtp = 0x779BC4;
 	static inline constexpr int TypeDesc = 0x829AA8;
+	static inline constexpr unsigned int Identifier = 0x0D26CD737;
 };
 
 // GGL::CEvadeBehaviorBase

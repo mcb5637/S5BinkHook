@@ -28,6 +28,7 @@ struct shok_BB_CClassFactory_serializationData_FieldSerilaizer {
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeInt = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C98);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeFloat = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C78);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeBool = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C58);
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeClassIdentifier = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x813978);
 
 };
 struct shok_BB_CClassFactory_serializationData { // use a 0-terminated array (default constructed is 0)
@@ -71,6 +72,7 @@ struct shok_BB_CClassFactory : shok_object {
 		return GetSerializationDataForClass(T::Identifier);
 	}
 	const char* GetClassDemangledName(unsigned int identifier);
+	unsigned int GetIdentifierByName(const char* name);
 	void AddClassToFactory(unsigned int identifier, const char* name, shok_object* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData);
 
 

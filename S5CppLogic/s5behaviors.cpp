@@ -1,12 +1,18 @@
 #include "pch.h"
 #include "s5data.h"
 
-struct shok_vtable_GGL_CBehaviorDefaultMovement {
-	PADDINGI(3);
-	int(__thiscall* AddHandlers)(shok_EGL_CGLEBehavior*, int); // behavior, just didnt make a extra vtable for it...
-	PADDINGI(5);
-	float(__thiscall* GetSpeed)(shok_GGL_CBehaviorDefaultMovement* m);
+struct shok_vtable_EGL_CGLEBehavior : shok_vtable_BB_IObject {
+	int(__thiscall* AddHandlers)(shok_EGL_CGLEBehavior*, int);
+	int(__thiscall* OnEntityCreate)(shok_EGL_CGLEBehavior* th, shok_EGL_CGLEBehaviorProps* p);
+	int(__thiscall* OnEntityLoad)(shok_EGL_CGLEBehavior* th, shok_EGL_CGLEBehaviorProps* p);
+	PADDINGI(2); // nullsubs 0x52B509
 };
+
+struct shok_vtable_GGL_CBehaviorDefaultMovement : shok_vtable_EGL_CGLEBehavior {
+	PADDINGI(1);
+	float(__thiscall* GetSpeed)(shok_GGL_CBehaviorDefaultMovement* m); // 9
+};
+//constexpr int i = offsetof(shok_vtable_GGL_CBehaviorDefaultMovement, GetSpeed) / 4;
 
 // vtable heroability 8 is ability(this, abilityid)
 

@@ -14,7 +14,7 @@ struct shok_vtable_BB_CXmlSerializer {
 struct shok_vtable_BB_CClassFactory {
     PADDINGI(4);
     shok_object* (__stdcall* Create)(shok_BB_CClassFactory* th, unsigned int id);
-    PADDINGI(1);
+    unsigned int(__stdcall* GetIdentifierByName)(shok_BB_CClassFactory* th, const char*);
     const char*(__stdcall* GetClassDemangledName)(shok_BB_CClassFactory* th, unsigned int id);
     shok_BB_CClassFactory_serializationData* (__stdcall* GetClassSerializationData)(shok_BB_CClassFactory* th, unsigned int id);
     PADDINGI(1);
@@ -63,6 +63,10 @@ shok_BB_CClassFactory_serializationData* shok_BB_CClassFactory::GetSerialization
 const char* shok_BB_CClassFactory::GetClassDemangledName(unsigned int identifier)
 {
     return reinterpret_cast<shok_vtable_BB_CClassFactory*>(vtable)->GetClassDemangledName(this, identifier);
+}
+unsigned int shok_BB_CClassFactory::GetIdentifierByName(const char* name)
+{
+    return reinterpret_cast<shok_vtable_BB_CClassFactory*>(vtable)->GetIdentifierByName(this, name);
 }
 void shok_BB_CClassFactory::AddClassToFactory(unsigned int identifier, const char* name, shok_object* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData)
 {

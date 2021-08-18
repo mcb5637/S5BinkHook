@@ -546,6 +546,11 @@ struct shok_Framework_CEventGameSpeed : shok_BB_CEvent {
 	static inline constexpr int vtp = 0x762474;
 };
 
+struct shok_EGL_IGLEHandler_BB_CEvent_void : shok_object {
+	void* Object;
+	int(__thiscall* Func)(void* th, shok_BB_CEvent* ev);
+};
+
 enum class shok_EventIDs : int {
 	NoDetachEvent = 0, // only use for attachmen detach event
 
@@ -599,7 +604,7 @@ enum class shok_EventIDs : int {
 	// 1100D, 1100E, 11017 something default movement
 	// 11002 bino cancel
 	// 11003 serfbattle, set territory?
-	
+
 	// 0x11013 evadingent
 	// 0x11014 evadingent to 0x11011 cevent
 	// 0x11015 evadingent
@@ -659,7 +664,7 @@ enum class shok_EventIDs : int {
 	Keep_BuySerfCommand = 0x14004, //BB::CEvent
 	Serf_CommandTurnToBattleSerf = 0x14005, //BB::CEvent battleserf stop if toserf tl
 	BattleSerf_CommandTurnToSerf = 0x14006, //BB::CEvent serf stop if toserf tl
-	// 14007 serf get unknown float 9
+	Serf_GetResourceAttachmentOffset = 0x14007, //EGL::CEventGetValue<float,1468983543> used for resouce finder
 	BattleSerf_GetTimeToChangeBack = 0x14008, //EGL::CEventGetValue<int, 1211121895>
 
 	// 18003 get bool true

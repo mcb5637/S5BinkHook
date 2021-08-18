@@ -15,7 +15,7 @@ struct shok_BB_CXmlSerializer : shok_object {
 	void Deserialize(const char* filename, shok_object* ob);
 
 private:
-	shok_BB_CXmlSerializer()=default;
+	shok_BB_CXmlSerializer() = default;
 };
 
 struct shok_BB_CClassFactory_serializationData_FieldSerilaizer {
@@ -29,6 +29,7 @@ struct shok_BB_CClassFactory_serializationData_FieldSerilaizer {
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeFloat = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C78);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeBool = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C58);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeClassIdentifier = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x813978);
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeTaskList = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x85D4AC);
 
 };
 struct shok_BB_CClassFactory_serializationData { // use a 0-terminated array (default constructed is 0)

@@ -99,7 +99,7 @@ struct shok_EGL_CGLETerrainHiRes : shok_object {
 };
 struct shok_EGL_CGLETerrainLowRes : shok_object {
 	vector_padding
-	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
+		std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
 	PADDINGI(4); // 1 vectors of int
 	int MaxSizeX, MaxSizeY; // 9
 	int ArraySizeX, ArraySizeY; // 11
@@ -125,6 +125,9 @@ struct shok_EGL_CGLELandscape : shok_object {
 
 	int GetSector(shok_position* p);
 	bool GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut);
+	shok_position GetNearestFreePos(shok_position* p, float range);
+	bool IsValidPos(shok_position* p);
+	shok_position GetMapSize();
 };
 
 // game logic
@@ -156,7 +159,7 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 	struct {
 		int ArraySizeXY;
 		byte* data;
-	}* Blocking; // 6
+	}*Blocking; // 6
 	PADDINGI(2);
 	shok_EGL_CRegionInfo* RegionInfo; // 9
 

@@ -14,6 +14,12 @@ struct shok_vtable_GGL_CBehaviorDefaultMovement : shok_vtable_EGL_CGLEBehavior {
 };
 //constexpr int i = offsetof(shok_vtable_GGL_CBehaviorDefaultMovement, GetSpeed) / 4;
 
+struct shok_vtable_shok_GGL_CPositionAtResourceFinder {
+	void(__thiscall* Destructor)(shok_GGL_CPositionAtResourceFinder* th, bool free);
+	float(__thiscall* SearchForPosition)(shok_GGL_CPositionAtResourceFinder* th, shok_EGL_CGLEEntity* e);
+	void(__thiscall* GetPositionOffset)(shok_GGL_CPositionAtResourceFinder* th, shok_position* p, float f);
+};
+
 // vtable heroability 8 is ability(this, abilityid)
 
 float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
@@ -59,25 +65,47 @@ void shok_GGL_CSniperAbility::OverrideSnipeTask()
 	WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
 }
 
-static inline float(__thiscall* const battleBehaviorGetMaxRange)(shok_GGL_CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(shok_GGL_CBattleBehavior *)>(0x50AB43);
+static inline float(__thiscall* const battleBehaviorGetMaxRange)(shok_GGL_CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(shok_GGL_CBattleBehavior*)>(0x50AB43);
 float shok_GGL_CBattleBehavior::GetMaxRange()
 {
 	return battleBehaviorGetMaxRange(this);
 }
 
-static inline int(__thiscall* const leaderbehgettroophealth)(shok_GGL_CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBattleBehavior *)>(0x4EE1D6);
+static inline int(__thiscall* const leaderbehgettroophealth)(shok_GGL_CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBattleBehavior*)>(0x4EE1D6);
 int shok_GGL_CLeaderBehavior::GetTroopHealth()
 {
 	return leaderbehgettroophealth(this);
 }
-static inline int(__thiscall* const leaderbehgettroophealthpersol)(shok_GGL_CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBattleBehavior *)>(0x4ECE77);
+static inline int(__thiscall* const leaderbehgettroophealthpersol)(shok_GGL_CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBattleBehavior*)>(0x4ECE77);
 int shok_GGL_CLeaderBehavior::GetTroopHealthPerSoldier()
 {
 	return leaderbehgettroophealthpersol(this);
 }
 
-static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(shok_GGL_CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(shok_GGL_CAutoCannonBehavior *)>(0x50F508);
+static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(shok_GGL_CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(shok_GGL_CAutoCannonBehavior*)>(0x50F508);
 float shok_GGL_CAutoCannonBehavior::GetMaxRange()
 {
 	return autocannonBehaviorGetMaxRange(this);
+}
+
+static inline shok_GGL_CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<shok_GGL_CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);
+shok_GGL_CPositionAtResourceFinder* shok_GGL_CPositionAtResourceFinder::CreateByEntity(int entityid)
+{
+	return shok_GGL_CPositionAtResourceFinder_greatebyent(entityid);
+}
+void shok_GGL_CPositionAtResourceFinder::Destroy()
+{
+	reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->Destructor(this, true);
+}
+float shok_GGL_CPositionAtResourceFinder::SearchForPosition(shok_EGL_CGLEEntity* e)
+{
+	return reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->SearchForPosition(this, e);
+}
+static inline void(__thiscall* const shok_GGL_CPositionAtResourceFinder_getposbyfloat)(shok_GGL_CPositionAtResourceFinder* th, shok_position* p, float f) = reinterpret_cast<void(__thiscall*)(shok_GGL_CPositionAtResourceFinder*, shok_position*, float)>(0x4CA89E);
+shok_position shok_GGL_CPositionAtResourceFinder::CalcPositionFromFloat(float f)
+{
+	shok_position p;
+	//reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->GetPosition(this, &p, f);
+	shok_GGL_CPositionAtResourceFinder_getposbyfloat(this, &p, f);
+	return p;
 }

@@ -82,7 +82,7 @@ void shok_EGL_CTerrainVertexColors::ToTerrainCoord(shok_position& p, int* out)
 }
 bool shok_EGL_CTerrainVertexColors::IsCoordValid(int* out)
 {
-	return out[0] >= 0 && out[1] >= 0 && (out[0]+1) < ArraySizeX && (out[1]+1) < ArraySizeY;
+	return out[0] >= 0 && out[1] >= 0 && (out[0] + 1) < ArraySizeX && (out[1] + 1) < ArraySizeY;
 }
 int shok_EGL_CTerrainVertexColors::GetTerrainVertexColor(shok_position& p)
 {
@@ -207,6 +207,26 @@ bool shok_EGL_CGLELandscape::GetNearestPositionInSector(shok_position* pIn, floa
 	pOut->Y = 0.0f;
 	return shoklandscape_getnearest(this, pIn, range, pred, pOut);
 }
+static inline void(__thiscall* const shoklandscape_getnearestfreepos)(shok_EGL_CGLELandscape* ls, shok_position* ou, shok_position* in, float r, int* d) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*, shok_position*, float, int*)>(0x577661);
+shok_position shok_EGL_CGLELandscape::GetNearestFreePos(shok_position* p, float range)
+{
+	shok_position r;
+	int i = 1;
+	shoklandscape_getnearestfreepos(this, &r, p, range, &i);
+	return r;
+}
+static inline bool(__thiscall* const shok_EGL_CGLELandscape_isvalidpos)(shok_EGL_CGLELandscape* ls, shok_position* p) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*)>(0x5785BC);
+bool shok_EGL_CGLELandscape::IsValidPos(shok_position* p)
+{
+	return shok_EGL_CGLELandscape_isvalidpos(this, p);
+}
+static inline void(__thiscall* const shok_EGL_CGLELandscape_getsize)(shok_EGL_CGLELandscape* ls, shok_position* p) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*)>(0x578589);
+shok_position shok_EGL_CGLELandscape::GetMapSize()
+{
+	shok_position r;
+	shok_EGL_CGLELandscape_getsize(this, &r);
+	return r;
+}
 
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
 	return reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable)->CreateEffect(this, data);
@@ -245,7 +265,7 @@ void shok_EGL_CGLEGameLogic::HookCreateEffect()
 	if (CreateEffectHookedOrig)
 		return;
 	shok_vtable_EGL_CGLEGameLogic* vt = reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable);
-	shok_saveVirtualProtect vp{ vt, 25*4 };
+	shok_saveVirtualProtect vp{ vt, 25 * 4 };
 	CreateEffectHookedOrig = vt->CreateEffect;
 	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLEGameLogic * th, shok_EGL_CGLEEffectCreator * data)>(&CreateEffectHook);
 }
@@ -288,7 +308,7 @@ void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
 void shok_GGUI_CManager::HackPostEvent()
 {
 	if (PostEventOrig) {
-		shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3*4 };
+		shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
 	}
 	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent->vtable);
@@ -316,35 +336,35 @@ shok_technology* shok_GGL_CGLGameLogic::GetTech(int i)
 static inline void(__thiscall* const cglgamelogic_enablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*)>(0x49FA14);
 void shok_GGL_CGLGameLogic::EnableAlarmForPlayer(int pl)
 {
-	shok_EGL_CNetEventPlayerID ev { shok_NetEventIds::CommandPlayerActivateAlarm, pl };
+	shok_EGL_CNetEventPlayerID ev{ shok_NetEventIds::CommandPlayerActivateAlarm, pl };
 	cglgamelogic_enablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_disablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*)>(0x49FAD7);
 void shok_GGL_CGLGameLogic::DisableAlarmForPlayer(int pl)
 {
-	shok_EGL_CNetEventPlayerID ev { shok_NetEventIds::CommandPlayerDeactivateAlarm, pl };
+	shok_EGL_CNetEventPlayerID ev{ shok_NetEventIds::CommandPlayerDeactivateAlarm, pl };
 	cglgamelogic_disablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_upgradesettlercat)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*)>(0x4985C5);
 void shok_GGL_CGLGameLogic::UpgradeSettlerCategory(int pl, int ucat)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev { shok_NetEventIds::PlayerUpgradeSettlerCategory, pl, ucat };
+	shok_EGL_CNetEventIntegerAndPlayerID ev{ shok_NetEventIds::PlayerUpgradeSettlerCategory, pl, ucat };
 	cglgamelogic_upgradesettlercat(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_activateweatherm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*)>(0x49BF7A);
 void shok_GGL_CGLGameLogic::PlayerActivateWeathermachine(int player, int weathertype)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev { shok_NetEventIds::CommandWeathermachineChangeWeather, player, weathertype };
+	shok_EGL_CNetEventIntegerAndPlayerID ev{ shok_NetEventIds::CommandWeathermachineChangeWeather, player, weathertype };
 	cglgamelogic_activateweatherm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_blesssettlers)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*)>(0x49B7E6);
 void shok_GGL_CGLGameLogic::PlayerBlessSettlers(int player, int blessCat)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev { shok_NetEventIds::CommandMonasteryBlessSettlerGroup, player, blessCat };
+	shok_EGL_CNetEventIntegerAndPlayerID ev{ shok_NetEventIds::CommandMonasteryBlessSettlerGroup, player, blessCat };
 	cglgamelogic_blesssettlers(this, &ev);
 }
 

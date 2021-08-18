@@ -2,7 +2,7 @@
 #include "s5data.h"
 
 struct shok_EGL_CGLEBehaviorProps : shok_object {
-	PADDING(4);
+	int vtable_ICheckData;
 	int BehaviorIndex, BehaviorClass;
 
 	static inline constexpr int vtp = 0x772A2C;

@@ -70,7 +70,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int StateChangeCounter; // 63
 	int TaskListChangeCounter;
 	int NumberOfAuras; // 65
-	
+
 	static inline constexpr int vtp = 0x783E74;
 	static inline constexpr int TypeDesc = 0x8077CC;
 	static inline constexpr int vtp_IEntityDisplay = 0x783E58;
@@ -116,13 +116,17 @@ struct shok_EGL_CGLEEntity : shok_object {
 	/**
 	fires event eventIdOnThisDetach on otherId, if this gets detached/destroyed, fires eventIdOnOtherDetach on this, if otherId gets detached/destroyed
 	**/
-	void AttachEntity(shok_AttachmentType attachtype, int otherId, int eventIdOnThisDetach, int eventIdOnOtherDetach);
+	void AttachEntity(shok_AttachmentType attachtype, int otherId, shok_EventIDs eventIdOnThisDetach, shok_EventIDs eventIdOnOtherDetach);
 	void DetachObservedEntity(shok_AttachmentType attachtype, int otherId, bool fireEvent);
 
 	void ClearAttackers();
 
 	entityAddonData* GetAdditionalData(bool create);
 	void CloneAdditionalDataFrom(entityAddonData* other);
+
+	void AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs)); // _ is undefined
+	void AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek)); // _ is undefined
+	void AddEventHandler(shok_EventIDs ev, void* ob, int(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev)); // _ is undefined
 
 	// execute task 0x57BF33 vt entry 15
 
@@ -304,9 +308,11 @@ struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
 };
 
 struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
-	int ResourceType, ResourceAmount, ResourceAmountAdd; //66
+	shok_ResourceType ResourceType;
+	int ResourceAmount, ResourceAmountAdd; //66
 
 	// set current res amount 4B864B thiscall (th, int)
+	void SetCurrentResourceAmount(int am);
 
 	static inline constexpr int vtp = 0x76FEA4;
 	static inline constexpr int TypeDesc = 0x8118AC;
@@ -389,7 +395,7 @@ struct shok_EGL_CGLEEntityCreator : shok_object {
 
 	static inline constexpr int vtp = 0x766B50;
 	static inline constexpr int TypeDesc = 0x807874;
-	
+
 	shok_EGL_CGLEEntityCreator();
 	~shok_EGL_CGLEEntityCreator();
 protected:

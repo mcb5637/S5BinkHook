@@ -518,7 +518,7 @@ struct shok_GGL_CSerfBehavior : shok_EGL_CGLEBehavior {
 	int ExtractionDelayCounter; //float?
 	int LastResourceType, JobMemoryResourceID;
 	int ResourceSlot;
-	// float ? 9, probably -1
+	float ResourceAttachmentOffset; //9
 
 	// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_GO_TO_CONSTRUCTION_SITE, TASK_TURN_TO_CONSTRUCTION_SITE, TASK_CHANGE_ATTACHMENT_TO_CONSTRUCTION_SITE,
 	//		TASK_GO_TO_CONSTRUCTION_SITE_SLOT, TASK_LEAVE_SETTLEMENT, TASK_ABANDON_CURRENT_JOB, TASK_GO_TO_RESOURCE, TASK_TURN_TO_RESOURCE, TASK_WAIT_EXTRACTION_DELAY
@@ -979,3 +979,25 @@ struct shok_GGL_CNeutralBridgeBehavior : shok_EGL_CGLEBehavior {
 //EGL::CUVAnimBehavior
 //EGL::CParticleEffectSwitchBehavior
 //EGL::CParticleEffectAttachmentBehavior
+
+// these belong to serf behavior
+struct shok_GGL_CPositionAtResourceFinder : shok_object {
+
+	static shok_GGL_CPositionAtResourceFinder* CreateByEntity(int entityid);
+	void Destroy();
+	float SearchForPosition(shok_EGL_CGLEEntity* e);
+	shok_position CalcPositionFromFloat(float f);
+
+	static inline constexpr int vtp = 0x7729AC;
+	static inline constexpr int TypeDesc = 0x8135B4;
+};
+struct shok_GGL_CPositionAtCircularResourceFinder : shok_GGL_CPositionAtResourceFinder {
+
+	static inline constexpr int vtp = 0x7729BC;
+	static inline constexpr int TypeDesc = 0x8135E0;
+};
+struct shok_CPositionAtLinearResourceFinder : shok_GGL_CPositionAtResourceFinder {
+
+	static inline constexpr int vtp = 0x7729CC;
+	static inline constexpr int TypeDesc = 0x813614;
+};

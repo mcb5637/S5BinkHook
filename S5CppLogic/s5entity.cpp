@@ -12,7 +12,9 @@ struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
 	PADDINGI(1);
 	void(__thiscall* FireOnCreatedTriggers)(shok_EGL_CGLEEntity* th); // 9, script trigger + scriptcommandline
 	void(__thiscall* SetPosition)(shok_EGL_CGLEEntity* th, shok_position* p); // 10 works for settlers, check if it does for other stuff to
-	PADDINGI(4);
+	PADDINGI(1);
+	int(__thiscall* GetSector)(shok_EGL_CGLEEntity* th); // 12
+	PADDINGI(2);
 	void(__thiscall* ExecuteTask)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_BB_CEvent* d); // 16
 	void(__thiscall* AddBehavior)(shok_EGL_CGLEEntity* th, shok_EGL_CGLEBehavior* bh); // 17 probably not usable outside of createentity
@@ -120,6 +122,19 @@ int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(shok_AttachmentType attachT
 	shok_GGL_CEventAttachmentTypeGetInteger ev{ shok_EventIDs::LimitedAttachment_GetMax, attachType };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 	return ev.Data;
+}
+int shok_EGL_CGLEEntity::GetSector()
+{
+	return reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->GetSector(this);
+}
+int shok_EGL_CGLEEntity::ResourceTreeGetNearestSector()
+{
+	shok_position p = Position;
+	shok_position p2 = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetNearestFreePos(&p, 600);
+	if (!(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsValidPos(&p2)) {
+		return 0;
+	}
+	return (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p2);
 }
 
 

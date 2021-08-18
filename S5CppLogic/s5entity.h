@@ -100,6 +100,8 @@ struct shok_EGL_CGLEEntity : shok_object {
 	float GetExploration();
 	int GetMaxHealth();
 	int LimitedAttachmentGetMaximum(shok_AttachmentType attachType);
+	int GetSector();
+	int ResourceTreeGetNearestSector();
 
 	void SetHealth(int h);
 	void SetTaskList(int tl);

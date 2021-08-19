@@ -50,7 +50,7 @@ int l_entityPredicateAnyPlayer(lua_State* L) {
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateAnyPlayer) + sizeof(int) * num);
 	int* pred = reinterpret_cast<int*>(&reinterpret_cast<EntityIteratorPredicateAnyPlayer*>(ud)[1]); // get start address of array
 	for (int i = 0; i < num; i++) {
-		pred[i] = luaL_checkint(L, i+1);
+		pred[i] = luaL_checkint(L, i + 1);
 	}
 	new(ud) EntityIteratorPredicateAnyPlayer(pred, num);
 	return 1;
@@ -61,7 +61,7 @@ int l_entityPredicateAnyEntityType(lua_State* L) {
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateAnyEntityType) + sizeof(int) * num);
 	int* pred = reinterpret_cast<int*>(&reinterpret_cast<EntityIteratorPredicateAnyEntityType*>(ud)[1]); // get start address of array
 	for (int i = 0; i < num; i++) {
-		pred[i] = luaL_checkint(L, i+1);
+		pred[i] = luaL_checkint(L, i + 1);
 	}
 	new(ud) EntityIteratorPredicateAnyEntityType(pred, num);
 	return 1;
@@ -75,7 +75,7 @@ int l_entityPredicateAnd(lua_State* L) {
 	new(ud) EntityIteratorPredicateAnd(pred, num);
 	lua_newtable(L);
 	lua_insert(L, 2);
-	for (int i = num-1; i >= 0; i--) { // keep predicates as metatable, so they dont get gced
+	for (int i = num - 1; i >= 0; i--) { // keep predicates as metatable, so they dont get gced
 		pred[i] = l_entity_checkpredicate(L, -1);
 		lua_rawseti(L, 2, i);
 	}
@@ -742,7 +742,7 @@ int l_settlerSummon(lua_State* L) {
 	e->ObservedEntities.ForAll([L, &summoned](shok_attachment* a) {
 		if (a->AttachmentType == shok_AttachmentType::SUMMONER_SUMMONED)
 			lua_pushnumber(L, a->EntityId);
-			summoned++;
+		summoned++;
 		});
 	return summoned;
 }
@@ -1278,7 +1278,7 @@ int l_buildingRemoveLastMerchantOffer(lua_State* L) {
 	shok_GGL_CBuildingMerchantBehavior* m = b->GetBehavior<shok_GGL_CBuildingMerchantBehavior>();
 	luaext_assertPointer(L, m, "no merchant");
 	luaext_assert(L, m->Offer.size() > 0, "is empty");
-	shok_saveVector<shok_GGL_CBuildingMerchantBehavior_COffer*>(&m->Offer, [](std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> &a) {
+	shok_saveVector<shok_GGL_CBuildingMerchantBehavior_COffer*>(&m->Offer, [](std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>>& a) {
 		a.pop_back();
 		});
 	return 0;
@@ -1473,6 +1473,14 @@ int l_settler_GetShurikenTarget(lua_State* L) {
 	lua_pushnumber(L, beh->TargetId);
 	return 1;
 }
+int l_settler_GetSnipeTarget(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	shok_GGL_CSniperAbility* beh = s->GetBehavior<shok_GGL_CSniperAbility>();
+	luaext_assertPointer(L, beh, "no snipe ability");
+	lua_pushnumber(L, beh->TargetId);
+	return 1;
+}
+
 
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
@@ -1593,6 +1601,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "SetPosition", &l_settlerSetPos);
 	luaext_registerFunc(L, "EnableRangedEffectSoldierHeal", &l_settler_EnableRangedEffectSoldierHeal);
 	luaext_registerFunc(L, "ShurikenGetTarget", &l_settler_GetShurikenTarget);
+	luaext_registerFunc(L, "SniperGetTarget", &l_settler_GetSnipeTarget);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");
@@ -1688,7 +1697,7 @@ shok_EGL_CGLEEntity* EntityIterator::GetNearest(float* rangeOut)
 	Reset();
 	curr = GetNext(&currR, &currPrio);
 	while (curr != nullptr) {
-		if (currPrio > maxPrio || maxR == -1 || (currR < maxR && currPrio==maxPrio)) {
+		if (currPrio > maxPrio || maxR == -1 || (currR < maxR && currPrio == maxPrio)) {
 			ret = curr;
 			maxR = currR;
 			maxPrio = currPrio;

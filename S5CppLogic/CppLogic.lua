@@ -905,6 +905,11 @@ function CppLogic.Entity.Settler.EnableRangedEffectSoldierHeal(enabl) end
 -- @return tid
 function CppLogic.Entity.Settler.ShurikenGetTarget(id) end
 
+--- gets the target of a heros sniper ability.
+-- @param id
+-- @return tid
+function CppLogic.Entity.Settler.SniperGetTarget(id) end
+
 --- a leaders experience.
 -- @param id leader
 -- @return xp
@@ -1374,7 +1379,7 @@ function CppLogic.EntityType.Settler.GetAbilityDataSniper(ty) end
 -- @param dfac damage factor
 -- @param ran range
 -- @param rech recharge time
-function CppLogic.EntityType.Settler.GetAbilityDataSniper(ty, dfac, ran, rech) end
+function CppLogic.EntityType.Settler.SetAbilityDataSniper(ty, dfac, ran, rech) end
 
 --- entitytytpe sniper ability data.
 -- damage is facto * max hp of target.

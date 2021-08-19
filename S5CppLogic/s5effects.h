@@ -49,6 +49,7 @@ struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
 	static void HookOnHit();
 	static void (*FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff);
 	static void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post);
+	static shok_EGL_CFlyingEffect* CurrentHittingEffect;
 };
 
 struct shok_GGL_CArrowEffect : shok_EGL_CFlyingEffect {

@@ -295,3 +295,10 @@ extern void (*UIInput_Key_Callback)(int c, int ev);
 extern void (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l);
 extern void (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l);
 void HookUIInput();
+
+struct shok_feedbackEventHandler { // another no vtable
+
+	void FireEvent(shok_BB_CEvent* ev);
+
+	static inline shok_feedbackEventHandler* (* const GlobalObj)() = reinterpret_cast<shok_feedbackEventHandler * (*)()>(0x582EE1);
+};

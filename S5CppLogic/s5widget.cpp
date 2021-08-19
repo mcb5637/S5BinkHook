@@ -270,3 +270,9 @@ void HookUIInput()
     RedirectCall(reinterpret_cast<void*>(0x40757D), &uiinput_key);
     RedirectCall(reinterpret_cast<void*>(0x40747E), &uiinput_mouse);
 }
+
+void(__thiscall* const shok_feedbackEventHandler_fireevent)(shok_feedbackEventHandler* th, shok_BB_CEvent* e) = reinterpret_cast<void(__thiscall*)(shok_feedbackEventHandler*, shok_BB_CEvent*)>(0x582EB2);
+void shok_feedbackEventHandler::FireEvent(shok_BB_CEvent* ev)
+{
+    shok_feedbackEventHandler_fireevent(this, ev);
+}

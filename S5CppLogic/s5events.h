@@ -622,6 +622,7 @@ enum class shok_EventIDs : int {
 	Worker_WorkPlaceBuildingDestroyed = 0x13002, //EGL::CEvent1Entity serf probably construction/repair destr
 	Worker_FarmBuildingDestroyed = 0x13003, //EGL::CEvent1Entity
 	Worker_ResidencePlaceBuildingDestroyed = 0x13004, //EGL::CEvent1Entity
+	FeedbackEvent_BattleOnDamageDealt = 0x13005, //GGL::CFeedbackEventBattling
 	Worker_GetMotivation = 0x13007, //EGL::CEventGetValue<float,1468983543>
 	Worker_GetWorkWaitUntil = 0x13008, //EGL::CEventGetValue<int,1211121895>
 	Worker_GetWorkTaskList = 0x13009, //EGL::CEventGetValue<int,1211121895> checks building, then props
@@ -714,7 +715,7 @@ enum class shok_EventIDs : int {
 	Leader_GetNearbyBarracks = 0x15036, //EGL::CEventGetValue<int, 1211121895>
 	Barracks_BuySoldierForLeader = 0x15037, //EGL::CEvent1Entity
 	// 15038 leader? goes to defend after something else
-	// 15039 leader something attack target? on attacked
+	Leader_OnGuardedAttackedBy = 15039, //EGL::CEvent1Entity
 	// 1503A leader
 	Leader_IsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
 	// 1503C serf some kind of stop?
@@ -832,11 +833,13 @@ enum class shok_EventIDs : int {
 	// 0x1702D builtechtrad ret true
 
 	IsSerf = 0x18002, //EGL::CEventGetValue<bool, 1709081367>
+	IsWorker = 0x18003, //EGL::CEventGetValue<bool, 1709081367>
 	IsLeader = 0x18004, //EGL::CEventGetValue<bool, 1709081367>
 	IsSoldier = 0x18005, //EGL::CEventGetValue<bool, 1709081367>
 	// 18007 battle, autocannon ret true
 	//IsSettler = 0x18008, //EGL::CEventGetValue<bool, 1709081367> building too? 0x18008
 	// 18006 herobeh ret true
+	// 0x18009 serfbattle or workerbattle ret true
 	DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
 	// 0x1800B building get bool?
 	// 1800C resourcerefiner ret true
@@ -942,4 +945,39 @@ enum class shok_NetEventIds : int {
 	CommandBuildingStartResearch = 69658,
 	CommandMarketStartTrade = 69660,
 	SetGameSpeed = 0x50001,
+};
+
+enum class shok_FeedbackEventIds : int {
+	FEEDBACK_EVENT_RESOURCE_MINED = 0x13001,
+	FEEDBACK_EVENT_RESOURCE_RUNNING_OUT = 0x13002,
+	FEEDBACK_EVENT_MINE_RESOURCE_GONE = 0x13003,
+	FEEDBACK_EVENT_ENTITIES_EXCHANGED = 0x13004,
+	FEEDBACK_EVENT_BATTLING = 0x13005, // GGL::CFeedbackEventBattling attackerplayer, attackerid, targetplayer, attackerx, attackery
+	FEEDBACK_EVENT_SETTLER_WALK = 0x13006,
+	FEEDBACK_EVENT_TECHNOLOGY_RESEARCHED = 0x13007,
+	FEEDBACK_EVENT_SETTLER_GRIEVANCE = 0x13008,
+	FEEDBACK_EVENT_SETTLER_LEFT_SETTLEMENT = 0x13009,
+	FEEDBACK_EVENT_SETTLER_JOINED_SETTLEMENT = 0x1300A,
+	FEEDBACK_EVENT_QUEST_CHANGED = 0x1300B,
+	FEEDBACK_EVENT_MARKET_TRANSACTION_COMPLETE = 0x1300C,
+	FEEDBACK_EVENT_NO_MONEY = 0x1300D,
+	FEEDBACK_EVENT_PAYDAY = 0x1300E,
+	FEEDBACK_EVENT_NOT_ENOUGH_RESOURCES = 0x13010,
+	FEEDBACK_EVENT_LEADER_COMMAND = 0x13012,
+	FEEDBACK_EVENT_HERO_ABILITY = 0x13013,
+	FEEDBACK_EVENT_SEND_RESOURCES = 0x13014,
+	FEEDBACK_EVENT_GOT_RESOURCES = 0x13015,
+	FEEDBACK_EVENT_WEATHER_CHANGED = 0x13016,
+	FEEDBACK_EVENT_POPULATION_LIMIT_REACHED = 0x13017,
+
+	FEEDBACK_EVENT_SIMPLE = 0x23003,
+	FEEDBACK_EVENT_ENTITY_HURT = 0x23004, // EGL::CNetEventEntityIDAndInteger entity, damage
+
+	FEEDBACK_EVENT_FARM_LIMIT_REACHED = 0x25001,
+	FEEDBACK_EVENT_RESIDENCE_LIMIT_REACHED = 0x25002,
+	FEEDBACK_EVENT_HQ_2_POSSIBLE = 0x25003,
+	FEEDBACK_EVENT_HQ_3_POSSIBLE = 0x25004,
+	FEEDBACK_EVENT_BUILDING_UPGRADE_FINISHED = 0x25005,
+	FEEDBACK_EVENT_LEADER_CHANGE_FORMATION = 0x25006,
+	FEEDBACK_EVENT_WEATHER_FORECAST = 0x25007,
 };

@@ -10,7 +10,6 @@ struct shok_BB_CIDManagerEx : shok_object {
 	PADDINGI(1);
 	vector_padding;
 	std::vector<shok_BB_CIDManagerEx_data, shok_allocator<shok_BB_CIDManagerEx_data>> TypeNames;
-	// maybe 2 more ints
 
 	int GetIdByName(const char* name);
 	const char* GetNameByID(int id);
@@ -26,7 +25,9 @@ struct shok_BB_CIDManagerEx : shok_object {
 	static inline shok_BB_CIDManagerEx** const GoodsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B4); // i dont think they are actually used somewhere...
 	static inline shok_BB_CIDManagerEx** const ArmorClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C8); // you probably cannot add anything here, cause fixed array
 	static inline shok_BB_CIDManagerEx** const AttachmentTypesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3D0); // 85A3D4 too
+	static inline shok_BB_CIDManagerEx** const FeedBackEventManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x880BA0); // ids are not correct here
 };
+static_assert(sizeof(shok_BB_CIDManagerEx) == 6 * 4);
 
 struct shok_EGL_CGLEEntitiesProps : shok_object {
 	PADDINGI(1); // float 240
@@ -348,7 +349,7 @@ struct shok_GGL_CWeatherHandler : shok_object {
 };
 
 // gamelogic
-struct shok_GGL_CGLGameLogic : shok_object {
+struct shok_GGL_CGLGameLogic : shok_object { // 15 (3c) bool globalinv?
 	PADDINGI(9);
 public:
 	shok_GGL_CPlayerStatus** players; // 10

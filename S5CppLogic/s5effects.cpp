@@ -62,12 +62,14 @@ void shok_GGL_CCannonBallEffect::HookFromCreator()
 	WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm);
 }
 
+shok_EGL_CFlyingEffect* shok_EGL_CFlyingEffect::CurrentHittingEffect = nullptr;
 void (*shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post) = nullptr;
 void (*shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback)(shok_EGL_CFlyingEffect* eff) = nullptr;
 int(__thiscall* CannonBallOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
 int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th);
 void WriteProjectlileOnHits();
 int __fastcall CannonBallOnHitHook(shok_EGL_CFlyingEffect* th) {
+	shok_EGL_CFlyingEffect::CurrentHittingEffect = th;
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback)
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback(th);
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)
@@ -75,12 +77,14 @@ int __fastcall CannonBallOnHitHook(shok_EGL_CFlyingEffect* th) {
 	int i = CannonBallOnHit(th);
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2(th, true);
+	shok_EGL_CFlyingEffect::CurrentHittingEffect = nullptr;
 	// TODO remove rewriting vtable after kimichura removes the reset of it
 	WriteProjectlileOnHits();
 	return i;
 }
 int(__thiscall* ArrowOnHit)(shok_EGL_CFlyingEffect* th) = nullptr;
 int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th) {
+	shok_EGL_CFlyingEffect::CurrentHittingEffect = th;
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback)
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback(th);
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)
@@ -88,6 +92,7 @@ int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th) {
 	int i = ArrowOnHit(th);
 	if (shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2)
 		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2(th, true);
+	shok_EGL_CFlyingEffect::CurrentHittingEffect = nullptr;
 	WriteProjectlileOnHits();
 	return i;
 }

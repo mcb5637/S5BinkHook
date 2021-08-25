@@ -22,7 +22,7 @@ void l_effectFlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff) {
 	lua_settop(L, top);
 }
 
-int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback)
+int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source)
 	shok_CProjectileEffectCreator data = shok_CProjectileEffectCreator();
 	data.EffectType = luaL_checkint(L, 1);
 	data.CurrentPos.X = data.StartPos.X = luaL_checkfloat(L, 2);
@@ -38,6 +38,7 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.SourcePlayer = player;
 	int dmgclass = luaL_optint(L, 11, 0);
 	data.DamageClass = dmgclass;
+	data.AdvancedDamageSourceOverride = luaL_optint(L, 13, static_cast<int>(AdvancedDealDamageSource::Script));
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogic::GlobalObj;
 	int id = gl->CreateEffect(&data);
 	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManager::GlobalObj)->GetEffectById(id);

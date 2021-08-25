@@ -50,8 +50,9 @@ function CppLogic.Effect.IsValidEffect(id) end
 -- @param playerid attacker player id (optional, 0/nil if not used)
 -- @param dmgclass damageclass (optional, 0/nil if not used)
 -- @param callback function that gets called on hit (optional, nil if not used)
+-- @param source what deals damage, used for triggers (default AdvancedDealDamageSource.Script) max size 8 bit instead of 32
 -- @return effect id
-function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback) end
+function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source) end
 
 --- sets high precision FPU (gets reset on every API call, so call id directly before your calculations)
 function CppLogic.Memory.SetFPU() end
@@ -195,9 +196,8 @@ function CppLogic.Logic.EnableMaxHPTechMod() end
 --- gets the damage that is going to be dealt in a Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger.
 -- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
 -- with SCELoader, returns only the damage.
--- damageSource needs different code changes for every damageSource:
--- - CppLogic.Logic.EnableAllHurtEntityTrigger for Melee, Arrow, Cannonball, AbilityCircularAttack, AbilityBomb, AbilitySabotageXXX, Script.
--- - CppLogic.Logic.FixSnipeDamage for AbilitySnipe.
+-- - CppLogic.Logic.FixSnipeDamage is required for damage source AbilitySnipe.
+-- - cannonball damage source override requires CppLogic.Combat.EnableAoEProjectileFix().
 -- - salims trap shows up as unknown (todo?)
 -- @return dmg
 -- @return damageSource
@@ -372,8 +372,13 @@ function CppLogic.API.RuntimeStoreGet(name) end
 -- calls respective hurt entity trigger.
 -- @param target entity to be damaged
 -- @param damage damage to deal
--- @param attacker entity dealing the damage (gets xp from kill, statistics...), default 0
-function CppLogic.Combat.DealDamage(target, damage, attacker) end
+-- @param attacker entity dealing the damage (gets xp from kill, statistics...), (default 0)
+-- @param attackerPlayerFallback player fallback for statistics, if attacker not set (default 0)
+-- @param uiFeedback send battle feedback (default true)
+-- @param xp give attacker xp for kills (default true)
+-- @param addStat add kills to statistics (default true)
+-- @param source what deals damage, used for triggers (default AdvancedDealDamageSource.Script)
+function CppLogic.Combat.DealDamage(target, damage, attacker, attackerPlayerFallback, uiFeedback, xp, addStat, source) end
 
 --- deals damage in an area.
 -- if attackerId (or player) are set, damages only targets hostile to them.
@@ -386,7 +391,11 @@ function CppLogic.Combat.DealDamage(target, damage, attacker) end
 -- @param dmg damage
 -- @param player attacking player (optional, 0/nil if not used)
 -- @param dmgclass damageclass (optional, 0/nil if not used)
-function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass) end
+-- @param uiFeedback send battle feedback (default true)
+-- @param xp give attacker xp for kills (default true)
+-- @param addStat add kills to statistics (default true)
+-- @param source what deals damage, used for triggers (default AdvancedDealDamageSource.Script)
+function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass, uiFeedback, xp, addStat, source) end
 
 --- enables AoE projectile fix.
 -- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.

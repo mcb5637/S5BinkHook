@@ -180,6 +180,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static bool HurtEntityCallWithNoAttacker;
 	static AdvancedDealDamageSource HurtEntityDamageSource;
 	static int HurtEntityAttackerPlayer;
+	static void (*HurtEntityOnKillCb)(shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc);
 	static void HookDestroyEntity();
 	static std::map<int, entityAddonData> AddonDataMap;
 	static entityAddonData LastRemovedEntityAddonData;

@@ -660,6 +660,33 @@ int l_logicHookHurtEntity(lua_State* L) {
 		shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = lua_toboolean(L, 1);
 	else
 		shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = true;
+	if (lua_isfunction(L, 2)) {
+		lua_pushlightuserdata(L, &l_logicHookHurtEntity);
+		lua_pushvalue(L, 2);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+
+		shok_EGL_CGLEEntity::HurtEntityOnKillCb = [](shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) {
+			lua_State* L = *shok_luastate_game;
+
+			int t = lua_gettop(L);
+
+			lua_pushlightuserdata(L, &l_logicHookHurtEntity);
+			lua_rawget(L, LUA_REGISTRYINDEX);
+			lua_pushnumber(L, att ? att->EntityId : 0);
+			lua_pushnumber(L, kill->EntityId);
+			lua_pushnumber(L, attpl);
+			lua_pushnumber(L, static_cast<int>(sourc));
+			lua_pcall(L, 4, 0, 0);
+
+			lua_settop(L, t);
+		};
+	}
+	else {
+		shok_EGL_CGLEEntity::HurtEntityOnKillCb = nullptr;
+		lua_pushlightuserdata(L, &l_logicHookHurtEntity);
+		lua_pushnil(L);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+	}
 	return 0;
 }
 

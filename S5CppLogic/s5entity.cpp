@@ -753,6 +753,7 @@ int* shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
 bool shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;
 AdvancedDealDamageSource shok_EGL_CGLEEntity::HurtEntityDamageSource = AdvancedDealDamageSource::Unknown;
 int  shok_EGL_CGLEEntity::HurtEntityAttackerPlayer = 0;
+void (*shok_EGL_CGLEEntity::HurtEntityOnKillCb)(shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) = nullptr;
 bool HookHurtEntity_Hooked = false;
 void __cdecl hurtentity_override(shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* tar, int dmg) {
 	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, AdvancedDealDamageSource::Unknown);
@@ -1018,6 +1019,8 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 					currentsol--;
 					idskilled.push_back(firsttodie->EntityId);
 					xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
+					if (shok_EGL_CGLEEntity::HurtEntityOnKillCb)
+						shok_EGL_CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
 					firsttodie->Hurt(firsttodie->Health);
 
 					int id = attackedleader->GetFirstAttachedEntity(shok_AttachmentType::LEADER_SOLDIER);
@@ -1040,6 +1043,8 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		if (damage >= firsttodie->Health) {
 			idskilled.push_back(firsttodie->EntityId);
 			xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
+			if (shok_EGL_CGLEEntity::HurtEntityOnKillCb)
+				shok_EGL_CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
 			firsttodie->Hurt(firsttodie->Health);
 		}
 		else {

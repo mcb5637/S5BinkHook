@@ -116,8 +116,13 @@ struct shok_EGL_CGLETerrainLowRes : shok_object {
 	int GetWaterHeightAt(shok_position& p);
 	void SetWaterHeightAt(shok_position& p, int wh); // int16
 };
+struct shok_EGL_CGLELandscape_blockingData {
+	int ArraySizeXY;
+	byte* data;
+};
 struct shok_EGL_CGLELandscape : shok_object {
-	PADDINGI(6);
+	shok_EGL_CGLELandscape_blockingData* BlockingData;
+	PADDINGI(5); // p 0, p EGL::CTiling, set/list of BB::TSlotEx1<EGL::CGLEGameLogic,EGL::C2DVector const &>
 	shok_EGL_CGLETerrainHiRes* HiRes;
 	shok_EGL_CGLETerrainLowRes* LowRes;
 	shok_EGL_CTerrainVertexColors* VertexColors;
@@ -129,6 +134,7 @@ struct shok_EGL_CGLELandscape : shok_object {
 	shok_position GetNearestFreePos(shok_position* p, float range);
 	bool IsValidPos(shok_position* p);
 	shok_position GetMapSize();
+	bool IsPosBlockedInMode(const shok_position* p, int mode);
 };
 
 // game logic
@@ -157,10 +163,7 @@ struct shok_EGL_CRegionInfo : shok_object {
 };
 struct shok_ED_CGlobalsLogicEx : shok_object {
 	PADDINGI(5);
-	struct {
-		int ArraySizeXY;
-		byte* data;
-	}*Blocking; // 6
+	shok_EGL_CGLELandscape_blockingData *Blocking; // 6
 	PADDINGI(2);
 	shok_EGL_CRegionInfo* RegionInfo; // 9
 
@@ -349,7 +352,7 @@ struct shok_GGL_CWeatherHandler : shok_object {
 };
 
 // gamelogic
-struct shok_GGL_CGLGameLogic : shok_object { // 15 (3c) bool globalinv?
+struct shok_GGL_CGLGameLogic : shok_object {
 	PADDINGI(9);
 public:
 	shok_GGL_CPlayerStatus** players; // 10
@@ -358,6 +361,9 @@ public:
 private:
 	shok_GGL_CGLGameLogic_TechList* TechList;
 public:
+	PADDINGI(1);
+	bool GlobalInvulnerability;
+	PADDING(3);
 
 	static inline constexpr int vtp = 0x76E018;
 
@@ -371,6 +377,7 @@ public:
 
 	static inline shok_GGL_CGLGameLogic** const GlobalObj = reinterpret_cast<shok_GGL_CGLGameLogic**>(0x85A3A0);
 };
+//constexpr int i = offsetof(shok_GGL_CGLGameLogic, GlobalInvulnerability);
 
 
 struct shok_EScr_CScriptTriggerSystem : shok_object {

@@ -3,6 +3,7 @@
 #include "luaext.h"
 #include "l_entity.h"
 #include <random>
+#include "entityiterator.h"
 
 
 std::vector<UACannonBuilderAbilityData> UnlimitedArmy::CannonBuilderAbilityData = std::vector<UACannonBuilderAbilityData>();

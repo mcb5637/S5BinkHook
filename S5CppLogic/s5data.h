@@ -52,7 +52,18 @@ typedef uint8_t byte;
 // 0x4ADB16 on building init blocking check jmp to fix move tasks (seems not to conflict with CUtil.ActivateTaskIncrementBugfix)
 // 
 // only without SCELoader
-// shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, afew instructions noped
+// shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, func override
+// EntityDealAoEDamage 0x49F82A func override
+// 0x5113C2 arrow onhit jmp
+// 0x4DBA20 projectile creator ctor more zeroing out
+// 0x511634 projectile from creator copy more data
+// 0x50CA59 melee hit jmp
+// 0x4FE722 circular attack jmp
+// 0x4FF4EB cannonball onhit jmp
+// 0x506B28 bomb explode jmp
+// 0x4F1E77 keg explode damage jmp
+// 0x4DC6D9 throw shuriken projecile jmp
+// 0x5062C6 place bomb jmp
 // entity get max hp 0x57B798 jmp, settler overhead hp bar 0x4BDED8 jmp, createentity 0x571B93 jmp set hp
 // create entity 0x571B93 jmp to fix max hp
 // 0x4BDED8 ui settler overhead hp bar maxhp jmp
@@ -225,8 +236,8 @@ struct shok_position {
 	float Y;
 
 	void FloorToBuildingPlacement();
-	float GetDistanceSquaredTo(shok_position& p);
-	bool IsInRange(shok_position& p, float range);
+	float GetDistanceSquaredTo(const shok_position& p);
+	bool IsInRange(const shok_position& p, float range);
 	// returns deg
 	float GetAngleBetween(shok_position& p);
 };
@@ -278,6 +289,7 @@ bool operator<(shok_attachment a, shok_attachment b);
 struct shok_BB_CEvent;
 enum class shok_EventIDs : int;
 enum class shok_NetEventIds : int;
+enum class shok_FeedbackEventIds : int;
 struct shok_EGL_CGLETaskArgs;
 
 

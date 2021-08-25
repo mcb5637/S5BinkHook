@@ -668,7 +668,9 @@ int l_logicHurtEntityGetDamage(lua_State* L) {
 		luaL_error(L, "use CEntity instead");
 	luaext_assertPointer(L, shok_EGL_CGLEEntity::HurtEntityDamagePointer, "not in trigger");
 	lua_pushnumber(L, *shok_EGL_CGLEEntity::HurtEntityDamagePointer);
-	return 1;
+	lua_pushnumber(L, static_cast<int>(shok_EGL_CGLEEntity::HurtEntityDamageSource));
+	lua_pushnumber(L, shok_EGL_CGLEEntity::HurtEntityAttackerPlayer);
+	return 3;
 }
 int l_logicHurtEntitySetDamage(lua_State* L) {
 	if (HasSCELoader())

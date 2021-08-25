@@ -181,6 +181,7 @@ function CppLogic.Logic.LandscapeGetTerrainVertexColor(p) end
 function CppLogic.Logic.LandscapeGetBlocking(p) end
 
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
+-- also sets the hero as attacker on bomb explode.
 -- @param b enable (optional, default true)
 function CppLogic.Logic.EnableAllHurtEntityTrigger(b) end
 
@@ -192,7 +193,14 @@ function CppLogic.Logic.EnableMaxHPTechMod() end
 
 --- gets the damage that is going to be dealt in a Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger.
 -- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
+-- with SCELoader, returns only the damage.
+-- damageSource needs different code changes for every damageSource:
+-- - CppLogic.Logic.EnableAllHurtEntityTrigger for Melee, Arrow, Cannonball, AbilityCircularAttack, AbilityBomb, AbilitySabotageXXX, Script.
+-- - CppLogic.Logic.FixSnipeDamage for AbilitySnipe.
+-- - salims trap shows up as unknown (todo?)
 -- @return dmg
+-- @return damageSource
+-- @return attackerPlayer
 function CppLogic.Logic.HurtEntityGetDamage() end
 --- sets the damage that is going to be dealt in a Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger.
 -- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.

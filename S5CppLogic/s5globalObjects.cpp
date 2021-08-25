@@ -227,6 +227,11 @@ shok_position shok_EGL_CGLELandscape::GetMapSize()
 	shok_EGL_CGLELandscape_getsize(this, &r);
 	return r;
 }
+static inline bool(__thiscall* const shok_EGL_CGLELandscape_isposblockedinmode)(shok_EGL_CGLELandscape* ls, const shok_position* p, int* mode) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, int*)>(0x57772E);
+bool shok_EGL_CGLELandscape::IsPosBlockedInMode(const shok_position* p, int mode)
+{
+	return shok_EGL_CGLELandscape_isposblockedinmode(this, p, &mode);
+}
 
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
 	return reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable)->CreateEffect(this, data);

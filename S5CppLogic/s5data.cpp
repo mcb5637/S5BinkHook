@@ -57,14 +57,14 @@ void shok_position::FloorToBuildingPlacement()
 	Y = std::floorf(Y / 100) * 100;
 }
 
-float shok_position::GetDistanceSquaredTo(shok_position& p)
+float shok_position::GetDistanceSquaredTo(const shok_position& p)
 {
 	float dx = X - p.X;
 	float dy = Y - p.Y;
 	return (dx * dx + dy * dy);
 }
 
-bool shok_position::IsInRange(shok_position& p, float range)
+bool shok_position::IsInRange(const shok_position& p, float range)
 {
 	return GetDistanceSquaredTo(p) <= (range * range);
 }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "s5data.h"
 #include <math.h>
+#include "entityiterator.h"
 
 
 struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
@@ -275,6 +276,11 @@ static inline void(__thiscall* const entitysethealth)(shok_EGL_CGLEEntity* th, i
 void shok_EGL_CGLEEntity::SetHealth(int h)
 {
 	entitysethealth(this, h);
+}
+static inline void(__thiscall* const entityhurt)(shok_EGL_CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, int)>(0x57AD47);
+void shok_EGL_CGLEEntity::Hurt(int dmg)
+{
+	entityhurt(this, dmg);
 }
 
 static inline void(__thiscall* const shok_entity_settasklistbyid)(shok_EGL_CGLEEntity* th, int tl, int t) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, int, int)>(0x57B3B6);
@@ -745,37 +751,149 @@ void shok_EGL_CGLEEntity::HookCamoActivate()
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
 int* shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
 bool shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;
-void __stdcall hurtentityhookc(int* damage, shok_EGL_CGLEEntity** target, shok_EGL_CGLEEntity** attacker) { // argument order is reversed, for asm reasons
-	if (!*target)
-		return;
-	int aid = 0;
-	if (*attacker)
-		aid = (*attacker)->EntityId;
-	else if (!shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker)
-		return;
-	int tid = (*target)->EntityId;
-	shok_EGL_CEvent2Entities ev{ shok_EventIDs::LogicEvent_HurtEntity, aid, tid };
-	shok_EGL_CGLEEntity::HurtEntityDamagePointer = damage;
-	(*shok_EScr_CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
-	shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
-}
-void __declspec(naked) hurtentityhook() { // push arguments, call func, do the move i did override, last jump back
-	__asm {
-		mov eax, esp;
-		add eax, 0x4;
-		push eax;
-		add eax, 0x4;
-		push eax;
-		add eax, 0x4;
-		push eax;
-		call hurtentityhookc;
-
-		mov eax, 0x72d687;
-		push 0x49f35d;
-		ret;
-	}
-}
+AdvancedDealDamageSource shok_EGL_CGLEEntity::HurtEntityDamageSource = AdvancedDealDamageSource::Unknown;
+int  shok_EGL_CGLEEntity::HurtEntityAttackerPlayer = 0;
 bool HookHurtEntity_Hooked = false;
+void __cdecl hurtentity_override(shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* tar, int dmg) {
+	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, AdvancedDealDamageSource::Unknown);
+}
+void __cdecl hurtaoe_override(shok_EGL_CGLEEntity* att, shok_position* p, float r, int dmg, int pl, int dmgcl) {
+	shok_EGL_CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, AdvancedDealDamageSource::Unknown);
+}
+void __declspec(naked) arrowonhit_damage() {
+	__asm {
+		mov ebx, 0;
+		mov bl, [esi + 50*4 + 3]; // AdvancedDamageSourceOverride
+		cmp ebx, 0;
+		jne pu;
+		mov ebx, 2; // arrow
+
+	pu:
+		push ebx;
+		push 1;
+		push 1;
+		push 1;
+
+		push[esi + 22 * 4]; // effect player
+
+		push ecx;
+		push eax;
+
+		mov ecx, [ebp - 0x10];
+		call shok_EGL_CGLEEntity::AdvancedHurtEntityBy;
+
+		push 0x5113CF;
+		ret;
+	};
+}
+void __declspec(naked) meleeonhit_damage() {
+	__asm {
+		push 1;
+		push 1;
+		push 1;
+		push 1;
+		push 0;
+		push[ebp - 0x10];
+
+		push[edi + 8];
+		call shok_EGL_CGLEEntity::GetEntityByID;
+		push eax;
+
+		mov ecx, esi;
+		call shok_EGL_CGLEEntity::AdvancedHurtEntityBy;
+
+		push 0x50CA6D;
+		ret;
+	};
+}
+void __declspec(naked) circularatt_damage() {
+	__asm {
+		push 11;
+		push 1;
+		push 1;
+		push 1;
+		push 0;
+		push eax;
+		push esi;
+		mov ecx, [ebp - 0x10];
+		call shok_EGL_CGLEEntity::AdvancedHurtEntityBy;
+
+		push 0x4FE72F;
+		ret;
+	};
+}
+void __declspec(naked) cannonballhit_damage() {
+	__asm {
+		mov eax, [esi + 52 * 4];
+		shr eax, 24;
+		cmp eax, 0;
+		jne pu;
+
+		mov eax, 3;
+	pu:
+		push eax;
+
+		push 1;
+		push 1;
+		push 1;
+		mov eax, [esi + 52 * 4];
+		and eax, 0xFFFFFF;
+		push eax;
+		push[esi + 48 * 4];
+		push edx;
+		push edx;
+		fstp[esp];
+
+		lea eax, [esi + 16 * 4]; // pos
+		push eax;
+		push ebx;
+		call shok_EGL_CGLEEntity::AdvancedDealAoEDamage;
+
+		mov eax, [esi + 0xC4];
+		push 0x4FF51B;
+		ret;
+	};
+}
+void __declspec(naked) bombexplode_damage() {
+	__asm {
+		push 12;
+		push 1;
+		push 1;
+		push 1;
+		push 0;
+		push edi;
+		push ebx;
+
+		push ebx;
+		fstp[esp];
+
+		lea eax, [eax + 22 * 4];
+		push eax;
+		push[ebp - 0x10];
+		call shok_EGL_CGLEEntity::AdvancedDealAoEDamage;
+
+		push 0x506B3F;
+		ret;
+	};
+}
+void __fastcall kegdealdmgproxy(shok_GGL_CKegBehavior* th) {
+	th->AdvancedDealDamage();
+}
+void __declspec(naked) shurikenthrow() {
+	__asm {
+		lea edx, [ebp - 0x5C];
+
+		mov byte ptr [edx + 17 * 4 + 3], 15;
+
+		mov[ebp - 0x20], eax;
+		mov eax, [ecx];
+		push edx;
+
+
+		push 0x4DC6E2;
+		ret;
+	};
+}
 void shok_EGL_CGLEEntity::HookHurtEntity()
 {
 	if (HookHurtEntity_Hooked)
@@ -783,16 +901,240 @@ void shok_EGL_CGLEEntity::HookHurtEntity()
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
 	HookHurtEntity_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x49f358), 0x49F4AD - 0x49f358 + 10 };
-	WriteJump(reinterpret_cast<void*>(0x49f358), &hurtentityhook); // call my own func, that calls the trigger
-	byte* p = reinterpret_cast<byte*>(0x49F4A6); // remove call to trigger
-	*p = 0x90; // nop
-	p = reinterpret_cast<byte*>(0x49F4A7);
-	*p = 0x90;
-	p = reinterpret_cast<byte*>(0x49F4AC);
-	*p = 0x90;
-	p = reinterpret_cast<byte*>(0x49F4AD);
-	*p = 0x90;
+	shok_saveVirtualProtect vp{ shok_EGL_CGLEEntity::EntityHurtEntity, 10 };
+	WriteJump(shok_EGL_CGLEEntity::EntityHurtEntity, &hurtentity_override);
+	shok_saveVirtualProtect vp2{ shok_EGL_CGLEEntity::EntityDealAoEDamage, 10 };
+	WriteJump(shok_EGL_CGLEEntity::EntityDealAoEDamage, &hurtaoe_override);
+	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x5113C2), 10 };
+	WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage);
+	shok_saveVirtualProtect vp4{ reinterpret_cast<void*>(0x4DBA20), 10 }; // projectile creator bigger zero for AdvancedDamageSourceOverride
+	*reinterpret_cast<byte*>(0x4DBA20) = 0x89;
+	shok_saveVirtualProtect vp5{ reinterpret_cast<void*>(0x511634), 20 }; // arrow projcetile AdvancedDamageSourceOverride
+	*reinterpret_cast<byte*>(0x511634) = 0x8B;
+	*reinterpret_cast<byte*>(0x511637) = 0x89;
+	shok_saveVirtualProtect vp6{ reinterpret_cast<void*>(0x50CA59), 10 };
+	WriteJump(reinterpret_cast<void*>(0x50CA59), &meleeonhit_damage);
+	shok_saveVirtualProtect vp7{ reinterpret_cast<void*>(0x4FE722), 10 };
+	WriteJump(reinterpret_cast<void*>(0x4FE722), &circularatt_damage);
+	shok_saveVirtualProtect vp8{ reinterpret_cast<void*>(0x4FF4EB), 10 };
+	WriteJump(reinterpret_cast<void*>(0x4FF4EB), &cannonballhit_damage);
+	shok_saveVirtualProtect vp9{ reinterpret_cast<void*>(0x506B28), 10 };
+	WriteJump(reinterpret_cast<void*>(0x506B28), &bombexplode_damage);
+	shok_saveVirtualProtect vp10{ reinterpret_cast<void*>(0x4F1E77), 10 };
+	RedirectCall(reinterpret_cast<void*>(0x4F1E77), &kegdealdmgproxy);
+	shok_saveVirtualProtect vp11{ reinterpret_cast<void*>(0x4DC6D9), 10 };
+	WriteJump(reinterpret_cast<void*>(0x4DC6D9), &shurikenthrow);
+
+	HookDamageMod(); // set projectile player field in creator
+	shok_GGL_CBombPlacerBehavior::FixBombAttachment();
+	shok_GGL_CCannonBallEffect::AddDamageSourceOverride = true;
+}
+void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
+{
+	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
+		return;
+	if (Health <= 0)
+		return;
+	shok_EGL_CEventGetValue_bool getbool{ shok_EventIDs::IsSettlerOrBuilding };
+	FireEvent(&getbool);
+	if (!getbool.Data)
+		return;
+	if (GetFirstAttachedEntity(shok_AttachmentType::SETTLER_ENTERED_BUILDING) || GetFirstAttachedEntity(shok_AttachmentType::SETTLER_BUILDING_TO_LEAVE))
+		return;
+	int attackerplayer = attacker ? attacker->PlayerId : attackerFallback;
+	if (attacker || shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker) {
+		shok_EGL_CEvent2Entities ev{ shok_EventIDs::LogicEvent_HurtEntity, attacker ? attacker->EntityId : 0, EntityId };
+		shok_EGL_CGLEEntity::HurtEntityDamagePointer = &damage;
+		shok_EGL_CGLEEntity::HurtEntityDamageSource = sourceInfo;
+		shok_EGL_CGLEEntity::HurtEntityAttackerPlayer = attackerplayer;
+		(*shok_EScr_CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
+	}
+	if (damage <= 0)
+		return;
+	getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsWorker };
+	FireEvent(&getbool);
+	if (attacker) {
+		if (!getbool.Data || !(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, 1)) {
+			if (!ArePlayersFriendly(PlayerId, attacker->PlayerId)) {
+				shok_EGL_CEvent1Entity ev{ shok_EventIDs::OnAttackedBy, attacker->EntityId };
+				FireEvent(&ev);
+			}
+		}
+	}
+	if (uiFeedback) {
+		if (attackerplayer) {
+			shok_GGL_CFeedbackEventBattling ev{ shok_FeedbackEventIds::FEEDBACK_EVENT_BATTLING, EntityId, PlayerId, attacker ? attacker->Position : Position, attackerplayer };
+			shok_feedbackEventHandler::GlobalObj()->FireEvent(&ev);
+		}
+		shok_EGL_CNetEventEntityIDAndInteger ev{ shok_FeedbackEventIds::FEEDBACK_EVENT_ENTITY_HURT, EntityId, damage };
+		shok_feedbackEventHandler::GlobalObj()->FireEvent(&ev);
+	}
+	if (attacker) {
+		ObserverEntities.ForAll([attacker](shok_attachment* a) {
+			if (a->AttachmentType == shok_AttachmentType::GUARD_GUARDED) {
+				shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_OnGuardedAttackedBy, attacker->EntityId };
+				shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->FireEvent(&ev);
+			}
+			});
+	}
+
+	getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsBattleOrAutocannon };
+	FireEvent(&getbool);
+	shok_EGL_CEventGetValue_bool getbool2{ shok_EventIDs::IsSerfOrWorker };
+	FireEvent(&getbool2);
+	std::vector<int> idskilled{};
+	int xptoadd = 0;
+	shok_EGL_CGLEEntity* firsttodie = this;
+	if (getbool.Data && !getbool2.Data) { // has potentially soldiers
+		getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsSoldier };
+		FireEvent(&getbool);
+		shok_EGL_CGLEEntity* attackedleader = this;
+		if (getbool.Data) {
+			int id = this->GetFirstAttachedToMe(shok_AttachmentType::LEADER_SOLDIER);
+			if (id)
+				attackedleader = shok_EGL_CGLEEntity::GetEntityByID(id);
+		}
+		shok_GGL_CLeaderBehavior* lbeh = attackedleader->GetBehavior<shok_GGL_CLeaderBehavior>();
+		if (lbeh && firsttodie == attackedleader) {
+			int id = attackedleader->GetFirstAttachedEntity(shok_AttachmentType::LEADER_SOLDIER);
+			if (id)
+				firsttodie = shok_EGL_CGLEEntity::GetEntityByID(id);
+		}
+		if (lbeh) {
+			int troophp = lbeh->GetTroopHealth();
+			int hppersol = lbeh->GetTroopHealthPerSoldier();
+			int currentsol = 0;
+			attackedleader->ObservedEntities.ForAll([&currentsol](shok_attachment* a) {
+				if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER)
+					currentsol++;
+				});
+			while (troophp > 0 && damage > 0) {
+				int thissolhp = troophp - ((currentsol - 1) * hppersol);
+				if (damage >= thissolhp) {
+					damage -= thissolhp;
+					troophp -= thissolhp;
+					attackedleader->DetachObservedEntity(shok_AttachmentType::LEADER_SOLDIER, firsttodie->EntityId, false);
+					currentsol--;
+					idskilled.push_back(firsttodie->EntityId);
+					xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
+					firsttodie->Hurt(firsttodie->Health);
+
+					int id = attackedleader->GetFirstAttachedEntity(shok_AttachmentType::LEADER_SOLDIER);
+					if (id)
+						firsttodie = shok_EGL_CGLEEntity::GetEntityByID(id);
+					else
+						firsttodie = attackedleader;
+				}
+				else {
+					troophp -= damage;
+					damage = 0;
+					break;
+				}
+			}
+			lbeh->TroopHealthCurrent = troophp;
+			firsttodie = attackedleader;
+		}
+	}
+	if (damage > 0) {
+		if (damage >= firsttodie->Health) {
+			idskilled.push_back(firsttodie->EntityId);
+			xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
+			firsttodie->Hurt(firsttodie->Health);
+		}
+		else {
+			firsttodie->Hurt(damage);
+		}
+	}
+	if (xp && attacker && xptoadd) {
+		shok_GGL_CLeaderBehavior* al = attacker->GetBehavior<shok_GGL_CLeaderBehavior>();
+		if (al) {
+			al->Experience += xptoadd;
+		}
+	}
+	if (idskilled.size() == 0)
+		return;
+
+	const char* callback;
+	if (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(this)) {
+		if (addStat) {
+			if (attackerplayer)
+				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfBuildingsDestroyed += idskilled.size();
+			(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId)->Statistics.NumberOfBuildingsLost += idskilled.size();
+		}
+		callback = "GameCallback_BuildingDestroyed";
+	}
+	else {
+		if (addStat) {
+			if (attackerplayer)
+				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfUnitsKilled += idskilled.size();
+			(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId)->Statistics.NumberOfUnitsDied += idskilled.size();
+		}
+		callback = "GameCallback_SettlerKilled";
+	}
+	if (attackerplayer || shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker) {
+
+		lua_State* L = *shok_luastate_game;
+		int t = lua_gettop(L);
+		lua_pushstring(L, callback);
+		lua_rawget(L, LUA_GLOBALSINDEX);
+		lua_pushnumber(L, attackerplayer);
+		lua_pushnumber(L, this->PlayerId);
+		lua_pushnumber(L, attacker ? attacker->EntityId : 0);
+		lua_checkstack(L, idskilled.size());
+		for (int i : idskilled) {
+			lua_pushnumber(L, i);
+		}
+		lua_pcall(L, 3 + idskilled.size(), 0, 0);
+		lua_settop(L, t);
+	}
+}
+void __stdcall shok_EGL_CGLEEntity::AdvancedDealAoEDamage(shok_EGL_CGLEEntity* attacker, const shok_position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
+{
+	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
+		return;
+	if (range <= 0)
+		return;
+	int pl = attacker ? attacker->PlayerId : player;
+	EntityIteratorPredicateIsRelevant irel{};
+	EntityIteratorPredicateInCircle icircl{ center, range };
+	EntityIteratorPredicateIsAlive iali{};
+	int buff[8];
+	int bufflen = 8;
+	if (pl)
+		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(pl, buff, bufflen);
+	EntityIteratorPredicateAnyPlayer ipl{buff, bufflen};
+	EntityIteratorPredicate* iandd[4] = { &irel, &icircl, &iali, &ipl };
+	EntityIteratorPredicateAnd iand{ iandd, pl ? 4 : 3 };
+	EntityIterator it{ &iand };
+	float cr = 0;
+	shok_EGL_CGLEEntity* curr = it.GetNext(&cr, nullptr);
+	while (curr) {
+		cr = std::sqrtf(cr) / range;
+		if (cr < 0 || cr > 1)
+			cr = 0;
+		else
+			cr = 1 - cr * cr;
+		
+		if (cr != 0) {
+			shok_EGL_CEventGetValue_int getac{ shok_EventIDs::GetArmorClass };
+			curr->FireEvent(&getac);
+			shok_EGL_CEventGetValue_int geta{ shok_EventIDs::GetArmor };
+			curr->FireEvent(&geta);
+
+			float dmg = damage * cr;
+			if (damageclass > 0 && damageclass < static_cast<int>((*shok_damageClassHolder::GlobalObj)->DamageClassList.size()))
+				dmg *= (*shok_damageClassHolder::GlobalObj)->DamageClassList[damageclass]->BonusVsArmorClass[getac.Data];
+			dmg -= geta.Data;
+
+			if (dmg < 1)
+				dmg = 1;
+
+			curr->AdvancedHurtEntityBy(attacker, static_cast<int>(dmg), pl, uiFeedback, xp, addStat, sourceInfo);
+		}
+
+		curr = it.GetNext(&cr, nullptr);
+	}
 }
 
 std::multimap<int, int> shok_EGL_CGLEEntity::BuildingMaxHpTechBoni = std::multimap<int, int>();
@@ -1198,13 +1540,20 @@ void __declspec(naked) entitydamagemodbattleprojectile() {
 
 		mov ecx, [ebp - 0x10]; // attacker obj
 		mov eax, [ecx + 6 * 4]; // player
-		mov[ebp - 0x28], eax; // source player
+		mov[ebp - 0x28], eax; // creator source player
+		mov[ebp - 0x5C], eax; // creator player
 
 		call shok_EGL_CGLEEntity::EventGetDamage;
 		push 0x50C3F7;
 		ret;
 
 	arrow:
+
+		mov ecx, [ebp - 0x10]; // attacker obj
+		mov eax, [ecx + 6 * 4]; // player
+		mov[ebp - 0x5C], eax; // creator player
+
+		
 		push esi;
 		mov ecx, edi;
 		mov eax, 0x50C1CD;

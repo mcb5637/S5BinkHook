@@ -176,6 +176,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="entityiterator.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="luaext.h" />
     <ClInclude Include="luaimport.h" />
@@ -212,6 +213,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="entityiterator.cpp" />
     <ClCompile Include="luaext.cpp" />
     <ClCompile Include="l_api.cpp" />
     <ClCompile Include="l_combat.cpp" />

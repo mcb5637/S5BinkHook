@@ -35,3 +35,4 @@ shok_ResourceType luaext_getresourcetype(lua_State* L, int i);
 void luaext_assertEntityAlive(lua_State* L, int id, const char* msg);
 int str_ends_with(const char* str, const char* suffix);
 void luaext_tolower(lua_State* L);
+bool luaext_optbool(lua_State* L, int i, bool b);

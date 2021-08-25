@@ -282,3 +282,9 @@ void luaext_tolower(lua_State* L) {
 	lua_insert(L, -2);
 	lua_pcall(L, 1, 1, 0);
 }
+
+bool luaext_optbool(lua_State* L, int i, bool b) {
+	if (lua_isnoneornil(L, i))
+		return b;
+	return lua_toboolean(L, i);
+}

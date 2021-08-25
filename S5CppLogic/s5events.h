@@ -7,6 +7,7 @@ struct shok_BB_CEvent : shok_object {
 	shok_BB_CEvent(int eventid);
 	shok_BB_CEvent(shok_EventIDs eventid);
 	shok_BB_CEvent(shok_NetEventIds eventid);
+	shok_BB_CEvent(shok_FeedbackEventIds eventid);
 	shok_BB_CEvent(shok_BB_CEvent&&) = default;
 	shok_BB_CEvent(const shok_BB_CEvent&) = default;
 	shok_BB_CEvent& operator=(shok_BB_CEvent&&) = default;
@@ -377,6 +378,7 @@ struct shok_EGL_CNetEventEntityID : shok_BB_CEvent {
 	int EntityId;
 
 	shok_EGL_CNetEventEntityID(shok_NetEventIds shok_NetEventIds, int ent);
+	shok_EGL_CNetEventEntityID(shok_FeedbackEventIds shok_NetEventIds, int ent);
 	shok_EGL_CNetEventEntityID(shok_EGL_CNetEventEntityID&&) = default;
 	shok_EGL_CNetEventEntityID(const shok_EGL_CNetEventEntityID&) = default;
 	shok_EGL_CNetEventEntityID& operator=(shok_EGL_CNetEventEntityID&&) = default;
@@ -417,6 +419,7 @@ struct shok_EGL_CNetEventEntityIDAndInteger : shok_EGL_CNetEventEntityID {
 	int Data;
 
 	shok_EGL_CNetEventEntityIDAndInteger(shok_NetEventIds id, int ent, int d);
+	shok_EGL_CNetEventEntityIDAndInteger(shok_FeedbackEventIds id, int ent, int d);
 	shok_EGL_CNetEventEntityIDAndInteger(shok_EGL_CNetEventEntityIDAndInteger&&) = default;
 	shok_EGL_CNetEventEntityIDAndInteger(const shok_EGL_CNetEventEntityIDAndInteger&) = default;
 	shok_EGL_CNetEventEntityIDAndInteger& operator=(shok_EGL_CNetEventEntityIDAndInteger&&) = default;
@@ -443,6 +446,7 @@ struct shok_EGL_CNetEventPlayerID : shok_BB_CEvent {
 	int PlayerId;
 
 	shok_EGL_CNetEventPlayerID(shok_NetEventIds id, int pl);
+	shok_EGL_CNetEventPlayerID(shok_FeedbackEventIds id, int pl);
 	shok_EGL_CNetEventPlayerID(shok_EGL_CNetEventPlayerID&&) = default;
 	shok_EGL_CNetEventPlayerID(const shok_EGL_CNetEventPlayerID&) = default;
 	shok_EGL_CNetEventPlayerID& operator=(shok_EGL_CNetEventPlayerID&&) = default;
@@ -498,6 +502,7 @@ struct shok_EGL_CNetEventEntityIDAndPlayerID : shok_EGL_CNetEventPlayerID {
 	int EntityId;
 
 	shok_EGL_CNetEventEntityIDAndPlayerID(shok_NetEventIds id, int pl, int e);
+	shok_EGL_CNetEventEntityIDAndPlayerID(shok_FeedbackEventIds id, int pl, int e);
 	shok_EGL_CNetEventEntityIDAndPlayerID(shok_EGL_CNetEventEntityIDAndPlayerID&&) = default;
 	shok_EGL_CNetEventEntityIDAndPlayerID(const shok_EGL_CNetEventEntityIDAndPlayerID&) = default;
 	shok_EGL_CNetEventEntityIDAndPlayerID& operator=(shok_EGL_CNetEventEntityIDAndPlayerID&&) = default;
@@ -531,6 +536,20 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 
 	static inline constexpr int TypeDesc = 0x8125B4;
 	static inline constexpr int vtp = 0x77064C;
+};
+
+struct shok_GGL_CFeedbackEventBattling : shok_EGL_CNetEventEntityIDAndPlayerID {
+	shok_position Pos;
+	int TargetPlayer;
+
+	shok_GGL_CFeedbackEventBattling(shok_FeedbackEventIds id, int eid, int p, const shok_position& pos, int tp);
+	shok_GGL_CFeedbackEventBattling(shok_GGL_CFeedbackEventBattling&&) = default;
+	shok_GGL_CFeedbackEventBattling(const shok_GGL_CFeedbackEventBattling&) = default;
+	shok_GGL_CFeedbackEventBattling& operator=(shok_GGL_CFeedbackEventBattling&&) = default;
+	shok_GGL_CFeedbackEventBattling& operator=(const shok_GGL_CFeedbackEventBattling&) = default;
+
+	static inline constexpr int TypeDesc = 0x80FFE4;
+	static inline constexpr int vtp = 0x76DDA0;
 };
 
 struct shok_Framework_CEventGameSpeed : shok_BB_CEvent {
@@ -836,10 +855,10 @@ enum class shok_EventIDs : int {
 	IsWorker = 0x18003, //EGL::CEventGetValue<bool, 1709081367>
 	IsLeader = 0x18004, //EGL::CEventGetValue<bool, 1709081367>
 	IsSoldier = 0x18005, //EGL::CEventGetValue<bool, 1709081367>
-	// 18007 battle, autocannon ret true
-	//IsSettler = 0x18008, //EGL::CEventGetValue<bool, 1709081367> building too? 0x18008
+	IsBattleOrAutocannon = 0x18007, //EGL::CEventGetValue<bool, 1709081367>
+	IsSettlerOrBuilding = 0x18008, //EGL::CEventGetValue<bool, 1709081367>
 	// 18006 herobeh ret true
-	// 0x18009 serfbattle or workerbattle ret true
+	IsSerfOrWorker = 0x18009, //EGL::CEventGetValue<bool, 1709081367>
 	DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
 	// 0x1800B building get bool?
 	// 1800C resourcerefiner ret true

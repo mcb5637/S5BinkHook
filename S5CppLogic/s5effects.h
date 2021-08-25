@@ -51,13 +51,15 @@ struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
 	static void (*FlyingEffectOnHitCallback2)(shok_EGL_CFlyingEffect* eff, bool post);
 	static shok_EGL_CFlyingEffect* CurrentHittingEffect;
 };
+//constexpr int i = offsetof(shok_EGL_CFlyingEffect, PlayerID);
 
 struct shok_GGL_CArrowEffect : shok_EGL_CFlyingEffect {
 	int AttackerID; // 47
 	int TargetID;
 	int DamageAmount;
 	byte Misses; // 50
-	PADDING(3);
+	PADDING(2);
+	byte AdvancedDamageSourceOverride;
 
 	static inline constexpr int vtp = 0x778E24;
 	static inline constexpr int TypeDesc = 0x8289CC;
@@ -71,6 +73,7 @@ struct shok_GGL_CCannonBallEffect : shok_EGL_CFlyingEffect {
 	int DamageClass; // 52
 
 	static bool FixDamageClass;
+	static bool AddDamageSourceOverride;
 	static void HookFromCreator();
 
 	static inline constexpr int vtp = 0x777690;
@@ -96,7 +99,9 @@ public:
 	int SourcePlayer = 0; // 16
 	bool Misses = false; // 17
 private:
-	bool Zero5[3] = { false, false, false };
+	bool Zero5[2] = { false, false };
+public:
+	byte AdvancedDamageSourceOverride = 0;
 
 
 public:

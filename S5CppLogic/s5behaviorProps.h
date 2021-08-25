@@ -334,6 +334,7 @@ struct shok_GGL_CBombBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	static inline constexpr int vtp = 0x7784A0;
 	static inline constexpr int TypeDesc = 0x82587C;
 };
+//constexpr int i = offsetof(shok_GGL_CBombBehaviorProperties, Damage)/4;
 
 struct shok_GGL_CKegBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	float Radius; //4

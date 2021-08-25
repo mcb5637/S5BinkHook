@@ -3,8 +3,7 @@
 
 struct shok_EGL_CGLEBehavior : shok_object { // no vtable
 	int SlotIndex, EntityId;
-private:
-	int PropPointer; // 3
+	shok_EGL_CGLEBehaviorProps* PropPointer; // 3, warning this may not be set
 
 public:
 	static inline constexpr int TypeDesc = 0x813778;
@@ -151,6 +150,8 @@ struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
 	static inline constexpr int vtp = 0x7783D8;
 	static inline constexpr int TypeDesc = 0x8255D0;
 	static inline constexpr unsigned int Identifier = 0x29AF8F97;
+
+	static void FixBombAttachment();
 };
 
 struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
@@ -627,6 +628,8 @@ struct shok_GGL_CKegBehavior : shok_EGL_CGLEBehavior {
 	static inline constexpr int vtp = 0x7764D8;
 	static inline constexpr int TypeDesc = 0x81F6BC;
 	static inline constexpr unsigned int Identifier = 0x14A85A47;
+
+	void AdvancedDealDamage();
 };
 
 struct shok_GGL_CThiefBehavior : shok_EGL_CGLEBehavior {

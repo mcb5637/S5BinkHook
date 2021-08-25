@@ -8,7 +8,7 @@ int l_combat_dealDamage(lua_State* L) {
 	shok_EGL_CGLEEntity* targ = luaext_checkEntity(L, 1);
 	int dmg = luaL_checkint(L, 2);
 	shok_EGL_CGLEEntity* att = luaext_optEntity(L, 3);
-	shok_EGL_CGLEEntity::EntityHurtEntity(att, targ, dmg);
+	targ->AdvancedHurtEntityBy(att, dmg, luaL_optint(L, 4, 0), luaext_optbool(L, 5, true), luaext_optbool(L, 6, true), luaext_optbool(L, 7, true), AdvancedDealDamageSource::Script);
 	return 0;
 }
 
@@ -21,7 +21,7 @@ int l_combat_dealAOEDamage(lua_State* L) {
 	int dmg = luaL_checkint(L, 5);
 	int player = luaL_optint(L, 6, 0);
 	int dmgclass = luaL_optint(L, 7, 0);
-	shok_EGL_CGLEEntity::EntityDealAoEDamage(source, &pos, range, dmg, player, dmgclass);
+	shok_EGL_CGLEEntity::AdvancedDealAoEDamage(source, pos, range, dmg, player, dmgclass, luaext_optbool(L, 8, true), luaext_optbool(L, 9, true), luaext_optbool(L, 10, true), AdvancedDealDamageSource::Script);
 	return 0;
 }
 

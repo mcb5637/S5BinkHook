@@ -33,9 +33,12 @@ bool shok_EGL_CEffect::IsArrowEffect()
 }
 
 bool shok_GGL_CCannonBallEffect::FixDamageClass = false;
+bool shok_GGL_CCannonBallEffect::AddDamageSourceOverride = false;
 void __fastcall hookcannonfromcreator(shok_GGL_CCannonBallEffect* th, shok_CProjectileEffectCreator* cr) {
 	if (shok_GGL_CCannonBallEffect::FixDamageClass) {
 		th->DamageClass = cr->DamageClass;
+		if (shok_GGL_CCannonBallEffect::AddDamageSourceOverride)
+			th->DamageClass |= static_cast<int>(cr->AdvancedDamageSourceOverride) << 24;
 	}
 }
 void __declspec(naked) hookcannonfromcreatorasm() {

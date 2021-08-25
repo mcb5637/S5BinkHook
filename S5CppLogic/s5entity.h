@@ -29,6 +29,22 @@ struct shok_entity_StateIdAndStateHandler {
 	shok_EGL_IGLEStateHandler* StateHandler;
 };
 
+enum class AdvancedDealDamageSource : int {
+	Unknown = 0,
+	Melee = 1,
+	Arrow = 2,
+	Cannonball = 3,
+
+	AbilitySnipe = 10,
+	AbilityCircularAttack = 11,
+	AbilityBomb = 12,
+	AbilitySabotageSingleTarget = 13,
+	AbilitySabotageBlast = 14,
+	AbilityShuriken = 15,
+
+	Script = 25,
+};
+
 struct shok_EGL_CGLEEntity : shok_object {
 	PADDINGI(1);
 	int EntityId;
@@ -104,6 +120,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	int ResourceTreeGetNearestSector();
 
 	void SetHealth(int h);
+	void Hurt(int dmg);
 	void SetTaskList(int tl);
 	void SetTaskList(shok_EGL_CGLETaskList* tl);
 	shok_EGL_CGLETaskList* GetCurrentTaskList();
@@ -130,7 +147,8 @@ struct shok_EGL_CGLEEntity : shok_object {
 	void AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek)); // _ is undefined
 	void AddEventHandler(shok_EventIDs ev, void* ob, int(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev)); // _ is undefined
 
-	// execute task 0x57BF33 vt entry 15
+	void AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo);
+	static void __stdcall AdvancedDealAoEDamage(shok_EGL_CGLEEntity* attacker, const shok_position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo);
 
 	static void HookDamageMod();
 	static void HookArmorMod();
@@ -160,6 +178,8 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static void HookHurtEntity();
 	static int* HurtEntityDamagePointer;
 	static bool HurtEntityCallWithNoAttacker;
+	static AdvancedDealDamageSource HurtEntityDamageSource;
+	static int HurtEntityAttackerPlayer;
 	static void HookDestroyEntity();
 	static std::map<int, entityAddonData> AddonDataMap;
 	static entityAddonData LastRemovedEntityAddonData;

@@ -26,7 +26,7 @@ private:
 public:
 	float Exploration;
 	int ExperiencePoints, AccessCategory, NumBlockedPoints; //20
-	float SnapTolerance; //23
+	float SnapTolerance; //23 seems to be a max change in every coordinate on entity placement
 	byte DeleteWhenBuiltOn, NeedsPlayer;
 	PADDING(2);
 	vector_padding;

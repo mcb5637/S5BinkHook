@@ -193,7 +193,7 @@ public:
 };
 
 struct shok_GGL_CDamageClassProps : shok_object {
-	float BonusVsArmorClass[7];
+	float BonusVsArmorClass[7]; // remember to access with ArmorClass - 1
 
 	static inline constexpr int vtp = 0x788978;
 };

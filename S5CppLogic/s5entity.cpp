@@ -1129,7 +1129,7 @@ void __stdcall shok_EGL_CGLEEntity::AdvancedDealAoEDamage(shok_EGL_CGLEEntity* a
 
 			float dmg = damage * cr;
 			if (damageclass > 0 && damageclass < static_cast<int>((*shok_damageClassHolder::GlobalObj)->DamageClassList.size()))
-				dmg *= (*shok_damageClassHolder::GlobalObj)->DamageClassList[damageclass]->BonusVsArmorClass[getac.Data];
+				dmg *= (*shok_damageClassHolder::GlobalObj)->DamageClassList[damageclass]->BonusVsArmorClass[getac.Data - 1];
 			dmg -= geta.Data;
 
 			if (dmg < 1)

@@ -167,6 +167,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	static void HookNonCancelableAnim();
 	static bool BuildOnSetPosFixMovement;
 	static void HookBuildOnSetPos();
+	static void HookSetTaskListNonCancelable(bool active);
 
 	static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
 	static void HookHero6Convert();

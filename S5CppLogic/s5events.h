@@ -707,7 +707,7 @@ enum class shok_EventIDs : int {
 	Leader_SetNudgeCount = 0x15018, //EGL::CEventValue<int,-27574121>
 	Leader_GetNudgeCount = 0x15019, //EGL::CEventGetValue<int, 1211121895>
 	// 1501C soldier some other entity
-	// 1501D battle barracks attachment, set battle tl?, soldier simmilar, autocannon set battle tl
+	Battle_OnTargetDetached = 0x1501D, //EGL::CEvent1Entity
 	// 1501E leader get some unknown int +100, soldier something other entity???
 	Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
 	GetArmorClass = 0x15020, //EGL::CEventGetValue<int,1211121895>

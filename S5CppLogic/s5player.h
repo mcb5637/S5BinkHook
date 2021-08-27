@@ -177,10 +177,10 @@ struct shok_statisticsBuildingUpgraded {
 struct shok_GGL_CGameStatistics : shok_object {
 	int PlayerID;
 	int NumberOfUnitsKilled, NumberOfUnitsDied, NumberOfBuildingsDestroyed, NumberOfBuildingsLost;
-	shok_GGL_CResourceStatistics ResourceStatistics;
-	shok_statisticsTimeline UnitsKilledTimeLine, UnitsDiedTimeLine, BuildingsDestroyedTimeLine, BuildingsLostTimeLine,
+	shok_GGL_CResourceStatistics ResourceStatistics; //6
+	shok_statisticsTimeline UnitsKilledTimeLine, UnitsDiedTimeLine, BuildingsDestroyedTimeLine, BuildingsLostTimeLine, // 12, 18
 		SerfTimeLine, WorkerTimeLine, LeaderTimeLine, HeroTimeLine, SoldierTimeLine, FarmTimeLine, ResidenceTimeLine,
-		WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine;
+		WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine; // la 102, 96, 90
 	vector_padding;
 	std::vector<shok_statisticsTechResearched, shok_allocator<shok_statisticsTechResearched>> ResearchedTechnologies;
 	vector_padding;
@@ -189,6 +189,7 @@ struct shok_GGL_CGameStatistics : shok_object {
 	static inline constexpr int vtp = 0x76E0E0;
 };
 static_assert(sizeof(shok_GGL_CGameStatistics) == 116 * 4);
+//constexpr int i = offsetof(shok_GGL_CGameStatistics, VillageCenterTimeLine) / 4;
 struct shok_GGL_CPlayerStatus : shok_object {
 	int PlayerGameState;
 	byte PlayerHasLeftGameFlag;
@@ -212,7 +213,7 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	shok_GGL_CPlayerStatus_techData TechnologyStates; // 59
 	shok_GGL_CPlayerStatus_tributeData Tributes; // 71
 	shok_GGL_CPlayerStatus_questData Quests; // 76
-	shok_GGL_CGameStatistics Statistics;
+	shok_GGL_CGameStatistics Statistics; // 80
 	shok_GGL_CSerfManager* SerfManager;
 	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler; // 197
 	shok_GGL_CBuildingUpgradeManager* BuildingUpgradeManager;
@@ -224,6 +225,7 @@ struct shok_GGL_CPlayerStatus : shok_object {
 	shok_DiploState GetDiploStateTo(int p);
 	shok_TechState GetTechStatus(int tech);
 };
+//constexpr int i = offsetof(shok_GGL_CPlayerStatus, Statistics) / 4;
 
 static inline bool(_cdecl* const shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;
 

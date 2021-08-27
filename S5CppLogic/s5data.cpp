@@ -96,11 +96,13 @@ void RedirectCall(void* call, void* redirect) {
 	int* adr = reinterpret_cast<int*>(opcode + 1);
 	*adr = reinterpret_cast<int>(redirect) - reinterpret_cast<int>(adr + 1); // address relative to next instruction
 }
-void WriteJump(void* adr, void* toJump) {
+long long WriteJump(void* adr, void* toJump) {
+	long long r = *reinterpret_cast<long long*>(adr);
 	byte* opcode = reinterpret_cast<byte*>(adr);
 	*opcode = 0xE9; // jmp
 	int* a = reinterpret_cast<int*>(opcode + 1);
 	*a = reinterpret_cast<int>(toJump) - reinterpret_cast<int>(a + 1); // address relative to next instruction
+	return r;
 }
 
 bool operator<(shok_attachment a, shok_attachment b) {

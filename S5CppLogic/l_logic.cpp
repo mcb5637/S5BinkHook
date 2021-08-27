@@ -1100,6 +1100,10 @@ int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
 	}
 	return 0;
 }
+int l_logic_setTaskListSetCheckUncancelable(lua_State* L) {
+	shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(luaext_optbool(L, 1, false));
+	return 0;
+}
 
 int l_logic_FixBuildOnMovement(lua_State* L) {
 	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = lua_toboolean(L, 1);
@@ -1133,6 +1137,7 @@ void l_logic_cleanup(lua_State* L) {
 	shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
 	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = false;
 	shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;
+	shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(false);
 }
 
 void l_logic_init(lua_State* L)
@@ -1183,6 +1188,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "SetLuaTaskListFunc", &l_logic_setluataskfunc);
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsUnCancelable", &l_logic_makeTaskListWaitForAnimUncancelable);
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsCancelable", &l_logic_makeTaskListWaitForAnimCancelable);
+	luaext_registerFunc(L, "TaskListSetChangeTaskListCheckUncancelable", &l_logic_setTaskListSetCheckUncancelable);
 	luaext_registerFunc(L, "EnableBuildOnMovementFix", &l_logic_FixBuildOnMovement);
 
 	lua_pushstring(L, "UICommands");

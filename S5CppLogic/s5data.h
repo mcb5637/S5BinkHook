@@ -372,7 +372,8 @@ const char* ReadFileToString(const char* name, size_t* size);
 bool DoesFileExist(const char* name);
 
 void RedirectCall(void* call, void* redirect);
-void WriteJump(void* adr, void* toJump);
+long long WriteJump(void* adr, void* toJump);
+static_assert(sizeof(long long) == 8);
 
 bool HasSCELoader();
 

@@ -147,6 +147,7 @@ int __cdecl test(lua_State* L) {
     }*/
     //dumpClassSerialization(L, shok_GGL_CBridgeEntity::Identifier);
     //lua_pushstring(L, (*shok_BB_CClassFactory::GlobalObj)->GetClassDemangledName(shok_GGL_CBridgeEntity::Identifier));
+    //lua_pushnumber(L, (int)&(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->Statistics.BuildingTimeLine.LastGatherTurn);
     return 0;
 }
 

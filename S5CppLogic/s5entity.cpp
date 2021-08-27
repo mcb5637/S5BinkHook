@@ -1368,6 +1368,41 @@ void shok_EGL_CGLEEntity::HookBuildOnSetPos()
 	WriteJump(reinterpret_cast<void*>(0x4ADB16), &entity_buildonsetpos_asm);
 }
 
+void __declspec(naked) HookSetTaskListNonCancelable_asm() {
+	__asm {
+		cmp dword ptr[ecx + 34 * 4], 501;
+		je ca;
+
+
+		mov eax, [esi + 0x8c];
+		push 0x57B229;
+		ret;
+
+	ca:
+		mov eax, [ebp + 8];
+		mov eax, [eax + 20];
+		mov[esi + 36 * 4], eax;
+		mov[esi + 37 * 4], 0;
+
+		push 0x57B3A6;
+		ret;
+	};
+}
+long long HookSetTaskListNonCancelable_backup = 0;
+void shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(bool active)
+{
+	shok_saveVirtualProtect vp{ (void*)0x57B223, 10 };
+	if (active) {
+		if (!HookSetTaskListNonCancelable_backup)
+			HookSetTaskListNonCancelable_backup = WriteJump(reinterpret_cast<void*>(0x57B223), &HookSetTaskListNonCancelable_asm);
+	}
+	else {
+		if (HookSetTaskListNonCancelable_backup)
+			*reinterpret_cast<long long*>(0x57B223) = HookSetTaskListNonCancelable_backup;
+		HookSetTaskListNonCancelable_backup = 0;
+	}
+}
+
 
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
 {

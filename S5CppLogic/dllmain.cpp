@@ -148,7 +148,8 @@ int __cdecl test(lua_State* L) {
     //dumpClassSerialization(L, shok_GGL_CBridgeEntity::Identifier);
     //lua_pushstring(L, (*shok_BB_CClassFactory::GlobalObj)->GetClassDemangledName(shok_GGL_CBridgeEntity::Identifier));
     //lua_pushnumber(L, (int)&(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->Statistics.BuildingTimeLine.LastGatherTurn);
-    return 0;
+    lua_pushstring(L, shok_BB_CFileSystemMgr::PathGetExtension(luaL_checkstring(L, 1)));
+    return 1;
 }
 
 int cleanup(lua_State* L) {
@@ -164,6 +165,7 @@ int cleanup(lua_State* L) {
 void initGame() {
     HookTextPrinting();
     l_logic_onload();
+    shok_ESnd_CSoEMusic::HookStartMusicFilesystem();
 }
 
 constexpr double Version = 1.1;

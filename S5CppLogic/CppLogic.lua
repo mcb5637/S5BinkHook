@@ -2,6 +2,9 @@
 assert(false, "do not load this file, this is documentation only!")
 
 --- CppLogic
+-- these changes are always active:
+-- - text rendering: @color does now work after @center.
+-- - music can now be played from bba/s5x archives (make sure the s5x is loaded if you want to use music from it).
 CppLogic = {}
 CppLogic.Effect = {}
 CppLogic.Memory = {}

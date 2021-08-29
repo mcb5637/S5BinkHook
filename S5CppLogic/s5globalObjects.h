@@ -415,8 +415,14 @@ struct shok_BB_CFileSystemMgr : shok_object {
 	void AddFolder(const char* path);
 	void AddArchive(const char* path);
 	void RemoveTopArchive();
+	// handle + size get set, use shok_BB_CFileSystemMgr::CloseHandle to close the file after you dont need it any more.
+	// to read/write a file more easily, use shok_BB_CFileStreamEx.
+	// remove data/ before usage, this func does not do that by itself.
+	bool OpenFileAsHandle(const char* path, int& handle, size_t& size);
+	static bool CloseHandle(int handle);
 
 	static inline shok_BB_CFileSystemMgr** const GlobalObj = reinterpret_cast<shok_BB_CFileSystemMgr**>(0x88F088);
+	static inline const char* (__cdecl* const PathGetExtension)(const char* path) = reinterpret_cast<const char* (__cdecl*)(const char*)>(0x40BAB3);
 };
 
 struct shok_ED_CDisplayProps : shok_object {

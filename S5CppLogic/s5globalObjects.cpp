@@ -24,15 +24,18 @@ struct shok_vtable_GGL_CWeatherHandler {
 };
 
 struct shok_vtable_shok_BB_CFileSystemMgr {
-	PADDINGI(6);
+	PADDINGI(4);
+	void* (__thiscall* OpenFileAsStream)(shok_BB_CFileSystemMgr* th, const char* path, int mode); // use via shok_BB_CFileStreamEx
+	bool(__thiscall* OpenAsFileHandle)(shok_BB_CFileSystemMgr* th, const char* path, int* pHandle, size_t* pSize);
 	void(__thiscall* AddArchive)(shok_BB_CFileSystemMgr* th, const char* Path, bool OnTop); // 6
 	PADDINGI(1);
-	void(__thiscall* AddFolder)(shok_BB_CFileSystemMgr* th, const char* path, bool OnTop, int x); // 8
+	void(__thiscall* AddFolder)(shok_BB_CFileSystemMgr* th, const char* path, bool OnTop, int unknown); // 8
 	PADDINGI(1);
 	void(__thiscall* RemoveTop)(shok_BB_CFileSystemMgr* th); // 10
 	PADDINGI(1);
-	void(__thiscall* MakeAbsolute)(shok_BB_CFileSystemMgr* th, char* relative, char* absolute); // 12
+	void(__thiscall* MakeAbsolute)(shok_BB_CFileSystemMgr* th, char* absol, char* relati); // 12
 };
+//constexpr int i = offsetof(shok_vtable_shok_BB_CFileSystemMgr, OpenAsFileHandle);
 
 shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
 {
@@ -415,6 +418,16 @@ void shok_BB_CFileSystemMgr::AddArchive(const char* path)
 void shok_BB_CFileSystemMgr::RemoveTopArchive()
 {
 	reinterpret_cast<shok_vtable_shok_BB_CFileSystemMgr*>(vtable)->RemoveTop(this);
+}
+
+bool shok_BB_CFileSystemMgr::OpenFileAsHandle(const char* path, int& handle, size_t& size)
+{
+	return reinterpret_cast<shok_vtable_shok_BB_CFileSystemMgr*>(vtable)->OpenAsFileHandle(this, path, &handle, &size);
+}
+static inline bool(__cdecl* const file_closehandle)(int h) = reinterpret_cast<bool(__cdecl*)(int)>(0x54E9EC);
+bool shok_BB_CFileSystemMgr::CloseHandle(int handle)
+{
+	return file_closehandle(handle);
 }
 
 int shok_ED_CPlayerColors::GetColorByIndex(int i)

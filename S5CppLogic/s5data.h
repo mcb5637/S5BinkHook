@@ -336,6 +336,7 @@ enum class win_mouseEvents : int {
 #include "s5framework.h"
 #include "s5tasklist.h"
 #include "s5classfactory.h"
+#include "s5sound.h"
 
 // xml loader vars:
 // v2 type?

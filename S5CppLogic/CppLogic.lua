@@ -24,6 +24,9 @@ CppLogic.Logic.UICommands = {}
 CppLogic.UI = {}
 CppLogic.UA = {}
 
+--- CppLogic version number.
+CppLogic.Version = 1.1
+
 --- call this function to cleanup used hooks.
 -- does not reset values in entitytypes.
 function CppLogic.OnLeaveMap() end

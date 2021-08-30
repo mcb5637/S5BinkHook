@@ -88,8 +88,10 @@ void UnlimitedArmy::Tick()
 	CalculatePos();
 	CheckTransit();
 	CallSpawner();
-	if (Leaders.size() == 0)
+	if (Leaders.size() == 0) {
+		CallCommandQueue();
 		return;
+	}
 	PosLastUpdatedTick = -1;
 	CalculatePos();
 	if (!IsTargetValid(CurrentBattleTarget)) {

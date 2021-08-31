@@ -562,8 +562,10 @@ int l_logicCanPLaceBuildingAt(lua_State* L) {
 	luaext_checkPos(L, p, 3);
 	p.FloorToBuildingPlacement();
 	float r = luaL_checkfloat(L, 4);
-	int bon = luaL_checkint(L, 5);
-	lua_pushboolean(L, shok_canPlaceBuilding(ty, pl, &p, r, bon));
+	if (lua_isnumber(L, 5))
+		lua_pushboolean(L, shok_canPlaceBuilding(ty, pl, &p, r, luaL_checkint(L, 5)));
+	else
+		lua_pushboolean(L, shok_canPlaceBuildingAtPos(ty, pl, &p, r));
 	return 1;
 }
 

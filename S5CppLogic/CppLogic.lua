@@ -108,11 +108,12 @@ function CppLogic.Logic.PlayerGetKillStatistics(p) end
 
 --- checks building placement at a specific position.
 -- does not check, if BuildOn type matches.
+-- if bon is nil, searches for a buildon entity at the specified position (if the building is buildon).
 -- @param ty entitytype to place
 -- @param pl player
 -- @param pos target position
 -- @param rot rotation
--- @param bon BuildOn entity id, or 0
+-- @param bon BuildOn entity id, or 0, or nil
 function CppLogic.Logic.CanPlaceBuildingAt(ty, pl, pos, rot, bon) end
 
 --- activates alarm mode.

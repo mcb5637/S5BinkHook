@@ -227,7 +227,8 @@ struct shok_GGL_CPlayerStatus : shok_object {
 };
 //constexpr int i = offsetof(shok_GGL_CPlayerStatus, Statistics) / 4;
 
-static inline bool(_cdecl* const shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = (bool(_cdecl*)(int entitytype, int player, shok_position * pos, float rotation, int buildOnId)) 0x4B442C;
+static inline bool(_cdecl* const shok_canPlaceBuilding)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = reinterpret_cast<bool(_cdecl*)(int, int, shok_position*, float, int)>(0x4B442C);
+static inline bool(_cdecl* const shok_canPlaceBuildingAtPos)(int entitytype, int player, shok_position* pos, float rotation) = reinterpret_cast<bool(_cdecl*)(int, int, shok_position *, float)>(0x4B45C8);
 
 
 bool ArePlayersHostile(int p1, int p2);

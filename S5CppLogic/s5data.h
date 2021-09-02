@@ -9,7 +9,7 @@
 
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
-#define PADDING(size) private: char TOKENPASTE2(padding_, __LINE__) [size]; public:
+#define PADDING(size) private: char TOKENPASTE2(padding_, __LINE__) [size]={}; public:
 #define PADDINGI(size) PADDING(size*4)
 
 #ifdef _DEBUG

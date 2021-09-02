@@ -393,6 +393,66 @@ int shok_GGL_CWeatherHandler::GetTicksToNextPeriodicWeatherChange()
 	return weatherdata_gettimetonext(this);
 }
 
+static inline void(__thiscall* const weatherdata_addelement)(shok_GGL_CWeatherHandler* th, int state, int dur, bool peri, int fore, int gfx, int trans) = reinterpret_cast<void(__thiscall*)(shok_GGL_CWeatherHandler*, int, int, bool, int, int, int)>(0x4B95A8);
+void shok_GGL_CWeatherHandler::AddWeatherElement(int state, int dur, bool peri, int forerun, int gfx, int transition)
+{
+	weatherdata_addelement(this, state, dur, peri, forerun, gfx, transition);
+}
+
+static inline void(__thiscall* const weatherdata_elements_remove)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>*, int*)>(0x513D32);
+static inline void(__thiscall* const weatherdata_elements_add)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>* th, shok_GGL_CWeatherHandler_weatherElement* e) = reinterpret_cast<void(__thiscall*)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>*, shok_GGL_CWeatherHandler_weatherElement*)>(0x513CB6);
+void shok_GGL_CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, int transition)
+{
+	// save data
+	shok_GGL_CWeatherHandler_weatherElement *current;
+	shok_GGL_CWeatherHandler_weatherElement *changeto;
+	std::vector<int> win_toremove{};
+	Elements.ForAll([this, &win_toremove, &current, &changeto](shok_GGL_CWeatherHandler_KeyAndWeatherElement* kae) {
+		if (this->CurrentWeatherIndex == kae->WeatherIndex)
+			current = &kae->WeatherElement;
+		else if (this->WeatherChange.WIndexToChangeTo == kae->WeatherIndex)
+			changeto = &kae->WeatherElement;
+		else
+			win_toremove.push_back(kae->WeatherIndex);
+		});
+	// remove all elements
+	for (int i : win_toremove) {
+		int a = i;
+		weatherdata_elements_remove(&Elements, &a);
+	}
+	// initalize first element
+	NextPeriodicWeatherStartTimeOffset = 0;
+	shok_GGL_CWeatherHandler_weatherElement initial{};
+	initial.State = state;
+	initial.Length = dur;
+	initial.Forerun = forerun;
+	initial.GfxSet = gfx;
+	initial.Transition = transition;
+	initial.IsPeriodic = true;
+	initial.StartTimeOffset = 0;
+	initial.WeatherIndex = NextWeatherIndex;
+	NextWeatherIndex++;
+	weatherdata_elements_add(&Elements, &initial);
+	// add transition nonperiodics
+	if (WeatherChange.State == 1) { // weatherchange in progress
+		current->IsPeriodic = false; // always delete
+		if (changeto->IsPeriodic) { // remove asap
+			changeto->IsPeriodic = false;
+			changeto->Length = changeto->Transition;
+			changeto->StartTimeOffset = 1;
+		}
+		// keep changeto nonperiodic
+	}
+	else {
+		if (current->IsPeriodic) {
+			current->IsPeriodic = false;
+			current->Length = current->Transition;
+			current->StartTimeOffset = 1;
+		}
+		// keep nonperiodic as is
+	}
+}
+
 void shok_EScr_CScriptTriggerSystem::RunTrigger(shok_BB_CEvent* ev)
 {
 	reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent.vtable)->PostEvent(&PostEvent, ev);

@@ -340,16 +340,54 @@ struct shok_GGL_CGLGameLogic_TechList {
 	std::vector<shok_technology*, shok_allocator<shok_technology*>> TechList;
 };
 
+struct shok_GGL_CWeatherHandler_weatherElement {
+	int StartTimeOffset = 0; // ticks, sec*10
+	int Length = 0; // ticks, sec*10
+	int State = 0;
+	PADDINGI(1); // nonperiodic index?
+	bool IsPeriodic = false;
+	PADDING(3);
+	int WeatherIndex = 0; //5
+	int Forerun = 0;
+	int GfxSet = 0;
+	int Transition = 0;
+};
+struct shok_GGL_CWeatherHandler_KeyAndWeatherElement {
+	int WeatherIndex;
+	shok_GGL_CWeatherHandler_weatherElement WeatherElement;
+};
 struct shok_GGL_CWeatherHandler : shok_object {
-	PADDINGI(9);
-	int CurrentWeatherGFXState;
-	PADDINGI(2);
-	int WeatherChangeActive;
+	int CurrentWeatherState;
+	int CurrentWeatherIndex;
+	PADDINGI(1);// 3 next nonperiodic weather?
+	int NextWeatherIndex;
+	int CurrentWeatherOffset; // 5
+	shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement> Elements;
+	int NextPeriodicWeatherStartTimeOffset;
+	struct { // 10
+		int CurrentWeatherGFXState; //0
+		int FromGFXState;
+		int StartedTimeOffset;
+		int ToGFXState; //3 0 if no chnage
+		int TransitionLength;
+		int StateToChangeFrom;
+		int StateToChangeTo;
+		int WeatherStateChangeTimeOffset; //7
+		int WIndexToChangeTo;
+		int State; // 1 changing, 2 fix
+	} WeatherChange;
+
+
+	static inline constexpr int vtp = 0x770140;
+	static inline constexpr int TypeDesc = 0x811DE8;
 
 	int GetNextWeatherState();
 	int GetCurrentWeatherState();
 	int GetTicksToNextPeriodicWeatherChange();
+	void AddWeatherElement(int state, int dur, bool peri, int forerun, int gfx, int transition); // all times in ticks
+	void ClearQueue(int state, int dur, int forerun, int gfx, int transition);
 };
+//constexpr int i = offsetof(shok_GGL_CWeatherHandler, CurrentWeatherGFXState) / 4;
 
 // gamelogic
 struct shok_GGL_CGLGameLogic : shok_object {
@@ -377,7 +415,7 @@ public:
 
 	static inline shok_GGL_CGLGameLogic** const GlobalObj = reinterpret_cast<shok_GGL_CGLGameLogic**>(0x85A3A0);
 };
-//constexpr int i = offsetof(shok_GGL_CGLGameLogic, GlobalInvulnerability);
+//constexpr int i = offsetof(shok_GGL_CGLGameLogic, WeatherHandler);
 
 
 struct shok_EScr_CScriptTriggerSystem : shok_object {

@@ -276,6 +276,20 @@ function CppLogic.Logic.FixSnipeDamage(override) end
 -- @return weatherGFX
 function CppLogic.Logic.GetCurrentWeatherGFXState() end
 
+--- gets the current weather queue.
+-- @return weatherQueue table [startOffset]={State,GFX,IsPeriodic,Length,Forerun}
+-- @return currentOffset
+-- @return nextPeriodicOffset (sum of all periodic element length+forerun == weather loop length)
+function CppLogic.Logic.GetWeatherQueue() end
+
+--- clears the weather queue and adds an initial first element.
+-- @param state weatherstate
+-- @param duration duration in sec > 5
+-- @param forerun forerun in sec >0 <=10
+-- @param gfx gfxindex >0
+-- @param transition transition in sec >forerun <=200
+function CppLogic.Logic.ClearWeatherQueueAndAddInitial(state, duration, forerun, gfx, transition) end
+
 --- sets a func to be called, if a tasklist contains TASK_LUA_FUNC.
 -- define the task as <Task classname="EGL::CTaskArgsInteger" classid="0xb3f8356d"><TaskType>TASK_LUA_FUNC</TaskType> in the tasklist to use it.
 -- <Value> gets passed to your func, to identify what action should be executed.

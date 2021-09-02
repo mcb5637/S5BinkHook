@@ -611,7 +611,7 @@ int l_logicPlayerActivateWeatherMachine(lua_State* L) {
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int w = luaL_checkint(L, 2);
 	luaext_assert(L, w > 0 && w < 4, "invalid weathertype");
-	luaext_assert(L, !(*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChangeActive, "weather currently changing");
+	luaext_assert(L, !(*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.StateToChangeTo, "weather currently changing");
 	luaext_assert(L, (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.WeatherEnergy >= (*shok_GGL_CLogicProperties::GlobalObj)->EnergyRequiredForWeatherChange, "not enough weather energy");
 	(*shok_GGL_CGLGameLogic::GlobalObj)->PlayerActivateWeathermachine(i, w);
 	return 0;
@@ -988,9 +988,56 @@ int l_logic_FixSnipeDamage(lua_State* L) {
 }
 
 int l_logic_GetCurrentWeatherGFXState(lua_State* L) {
-	int state = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->CurrentWeatherGFXState;
+	int state = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.CurrentWeatherGFXState;
 	lua_pushnumber(L, state);
 	return 1;
+}
+int l_logic_GetWeatherQueue(lua_State* L) {
+	shok_GGL_CWeatherHandler* wh = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler;
+	lua_newtable(L);
+	wh->Elements.ForAll([L](shok_GGL_CWeatherHandler_KeyAndWeatherElement* kae) {
+		lua_newtable(L);
+		lua_pushstring(L, "State");
+		lua_pushnumber(L, kae->WeatherElement.State);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "GFX");
+		lua_pushnumber(L, kae->WeatherElement.GfxSet);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "IsPeriodic");
+		lua_pushboolean(L, kae->WeatherElement.IsPeriodic);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Length");
+		lua_pushnumber(L, kae->WeatherElement.Length);
+		lua_rawset(L, -3);
+		lua_pushstring(L, "Forerun");
+		lua_pushnumber(L, kae->WeatherElement.Forerun);
+		lua_rawset(L, -3);
+
+		lua_rawseti(L, -2, kae->WeatherElement.StartTimeOffset);
+		});
+	lua_pushnumber(L, wh->CurrentWeatherOffset);
+	lua_pushnumber(L, wh->NextPeriodicWeatherStartTimeOffset);
+	return 3;
+}
+int l_logic_ClearWeatherAndAddInitial(lua_State* L) {
+	shok_GGL_CWeatherHandler* wh = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler;
+	int state = luaL_checkint(L, 1);
+	luaext_assert(L, state >= 1 && state <= 3, "no weather state");
+	int dur = luaL_checkint(L, 2) * 10;
+	luaext_assert(L, dur > 50, "duration too short");
+	int fore = luaL_checkint(L, 3) * 10;
+	luaext_assert(L, fore > 0 && fore <= 100, "forerun to small or too big");
+	int gfx = luaL_checkint(L, 4);
+	luaext_assert(L, gfx > 0, "gfx <=0");
+	int trans = luaL_checkint(L, 5) * 10;
+	luaext_assert(L, trans > fore && trans <= 200, "transition too small or too big");
+	if (wh->Elements.size == 0) {
+		wh->AddWeatherElement(state, dur, true, fore, gfx, trans);
+	}
+	else {
+		wh->ClearQueue(state, dur, fore, gfx, trans);
+	}
+	return 0;
 }
 
 struct l_logic_setluataskfunc_info {
@@ -1187,6 +1234,8 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "GetPlaceBuildingRotation", &l_logic_GetPlaceBuildingRotation);
 	luaext_registerFunc(L, "FixSnipeDamage", &l_logic_FixSnipeDamage);
 	luaext_registerFunc(L, "GetCurrentWeatherGFXState", &l_logic_GetCurrentWeatherGFXState);
+	luaext_registerFunc(L, "GetWeatherQueue", &l_logic_GetWeatherQueue);
+	luaext_registerFunc(L, "ClearWeatherQueueAndAddInitial", &l_logic_ClearWeatherAndAddInitial);
 	luaext_registerFunc(L, "SetLuaTaskListFunc", &l_logic_setluataskfunc);
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsUnCancelable", &l_logic_makeTaskListWaitForAnimUncancelable);
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsCancelable", &l_logic_makeTaskListWaitForAnimCancelable);

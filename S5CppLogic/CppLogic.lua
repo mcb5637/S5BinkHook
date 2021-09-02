@@ -282,7 +282,7 @@ function CppLogic.Logic.GetCurrentWeatherGFXState() end
 -- @return nextPeriodicOffset (sum of all periodic element length+forerun == weather loop length)
 function CppLogic.Logic.GetWeatherQueue() end
 
---- clears the weather queue and adds an initial first element.
+--- clears the weather queue and adds an initial (periodic) first element.
 -- @param state weatherstate
 -- @param duration duration in sec > 5
 -- @param forerun forerun in sec >0 <=10

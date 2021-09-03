@@ -18,68 +18,6 @@
 #include <set>
 #include <list>
 
-
-const char* SCELoaderFuncOverrides = R"(
-function CppLogic.Logic.EnableAllHurtEntityTrigger()
-    CEntity.EnableAllHurtTrigger()
-end
-function CppLogic.Logic.HurtEntityGetDamage()
-    return CEntity.TriggerGetDamage()
-end
-function CppLogic.Logic.HurtEntitySetDamage(d)
-    CEntity.TriggerSetDamage(d)
-end
-function CppLogic.Logic.SetPaydayCallback(func)
-    GameCallback_PaydayPayed = func
-end
-function CppLogic.Entity.SetMaxHP(id, hp)
-    CEntity.SetMaxHP(GetID(id), hp)
-end
-function CppLogic.Entity.SetDamage(id, dmg)
-    CEntity.SetDamage(GetID(id), dmg)
-end
-function CppLogic.Entity.SetArmor(id, armor)
-    CEntity.SetArmor(GetID(id), armor)
-end
-function CppLogic.Entity.SetArmor(id, armor)
-    CEntity.SetArmor(GetID(id), armor)
-end
-function CppLogic.Entity.SetExploration(id, ex)
-    CEntity.SetExploration(GetID(id), ex)
-end
-function CppLogic.Entity.Leader.SetRegeneration(id, hp, seconds)
-    if hp then
-        CEntity.SetHealingPoints(GetID(id), hp)
-    end
-    if seconds then
-        CEntity.SetHealingSeconds(GetID(id), seconds)
-    end
-end
-function CppLogic.Entity.SetAutoAttackMaxRange(id, ran)
-    CEntity.SetAttackRange(GetID(id), ran)
-end
-function CppLogic.Logic.SetStringTableText(key, text)
-    CUtil.SetStringTableText(key, text)
-end
-function CppLogic.Entity.SetDisplayName(id, n)
-    CUtil.SetEntityDisplayName(GetID(id), n)
-end
-function CppLogic.Logic.SetPlaceBuildingCB(func)
-    GameCallback_PlaceBuildingAdditionalCheck = function(ety, x, y, r, isbuildon)
-        if not func then
-            return true
-        end
-        return func(ety, -1, {X=x,Y=y}, r, isbuildon)
-    end
-end
-function CppLogic.Logic.GetPlaceBuildingRotation()
-    return CPlaceBuilding.GetRotation()
-end
-function CppLogic.Logic.SetPlaceBuildingRotation(r)
-    return CPlaceBuilding.SetRotation(r)
-end
-)";
-
 void dumpClassSerialization(lua_State* L, shok_BB_CClassFactory_serializationData* d) {
     if (!d) {
         lua_pushstring(L, "unknown serialization data");
@@ -168,7 +106,7 @@ void initGame() {
     shok_ESnd_CSoEMusic::HookStartMusicFilesystem();
 }
 
-constexpr double Version = 1.1;
+constexpr double Version = 1.2;
 
 int resetCppLogic(lua_State* L) {
     lua_pushstring(L, "CppLogic");
@@ -256,10 +194,6 @@ int resetCppLogic(lua_State* L) {
     lua_register(L, "CppLogic_ResetGlobal", &resetCppLogic);
 
     luaopen_debug(L);
-
-    if (HasSCELoader()) {
-        lua_dobuffer(L, SCELoaderFuncOverrides, strlen(SCELoaderFuncOverrides), "CppLogic");
-    }
 
     shok_logString("loaded CppLogic %f %s into %X with SCELoader status %i\n", Version,
 #ifdef _DEBUG

@@ -25,7 +25,7 @@ CppLogic.UI = {}
 CppLogic.UA = {}
 
 --- CppLogic version number.
-CppLogic.Version = 1.1
+CppLogic.Version = 1.2
 
 --- call this function to cleanup used hooks.
 -- does not reset values in entitytypes.
@@ -190,6 +190,7 @@ function CppLogic.Logic.LandscapeGetBlocking(p) end
 
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
 -- also sets the hero as attacker on bomb explode.
+-- does not work with SCELoader.
 -- @param b enable (optional, default true)
 -- @param killfunc func(attackerid, killid, attackerplayer, source), (optional, default nil)
 function CppLogic.Logic.EnableAllHurtEntityTrigger(b, killfunc) end
@@ -206,12 +207,14 @@ function CppLogic.Logic.EnableMaxHPTechMod() end
 -- - CppLogic.Logic.FixSnipeDamage is required for damage source AbilitySnipe.
 -- - cannonball damage source override requires CppLogic.Combat.EnableAoEProjectileFix().
 -- - salims trap shows up as unknown (todo?)
+-- does not work with SCELoader.
 -- @return dmg
 -- @return damageSource
 -- @return attackerPlayer
 function CppLogic.Logic.HurtEntityGetDamage() end
 --- sets the damage that is going to be dealt in a Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger.
 -- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
+-- does not work with SCELoader.
 -- @param dmg
 function CppLogic.Logic.HurtEntitySetDamage(dmg) end
 
@@ -241,6 +244,7 @@ function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
 
 --- sets a function to be called after payday was done.
 -- @param func to be called (playerId, taxes)->GoldToAdd
+-- does not work with SCELoader.
 function CppLogic.Logic.SetPaydayCallback(func) end
 
 --- sets a function to be called for building placement checks.
@@ -257,14 +261,17 @@ function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
 
 --- sets a stringtabletexts accosiated text. automatically resets on leaving the game.
 -- (stored in lua registry).
+-- does not work with SCELoader.
 -- @param key key to replace
 -- @param text replacement string or nil to restore default
 function CppLogic.Logic.SetStringTableText(key, text) end
 
 --- serf ui place building rotaton.
+-- does not work with SCELoader.
 -- @return rotation
 function CppLogic.Logic.GetPlaceBuildingRotation() end
 --- serf ui place building rotaton.
+-- does not work with SCELoader.
 -- @param r rotation
 function CppLogic.Logic.SetPlaceBuildingRotation(r) end
 
@@ -646,6 +653,7 @@ function CppLogic.Entity.GetLimitedLifespanRemaining(id, t) end
 function CppLogic.Entity.ReplaceWithResourceEntity(id) end
 
 --- overrides an entities max hp.
+-- does not work with SCELoader.
 -- @param id entity
 -- @param hp (optional, <0 to disable)
 -- @param useBoni (optional)
@@ -653,27 +661,32 @@ function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
 
 --- overrides an entities damage.
 -- does not work for trapcannon.
+-- does not work with SCELoader.
 -- @param id entity
 -- @param dmg, (<0 disable)
 function CppLogic.Entity.SetDamage(id, dmg) end
 
 --- overrides an entities armor.
+-- does not work with SCELoader.
 -- @param id entity
 -- @param armor, (<0 disable)
 function CppLogic.Entity.SetArmor(id, armor) end
 
 --- overrides a settlers/buildings exploration.
 -- use Logic for scriptentities.
+-- does not work with SCELoader.
 -- @param id entity
 -- @param ex, (<0 disable)
 function CppLogic.Entity.SetExploration(id, ex) end
 
 --- overrides a settlers/autocannons max attack range.
+-- does not work with SCELoader.
 -- @param id entity
 -- @param ran, (<0 disable)
 function CppLogic.Entity.SetAutoAttackMaxRange(id, ran) end
 
 --- overrides an entities display name.
+-- does not work with SCELoader.
 -- @param id entity
 -- @param n, ("" disable)
 function CppLogic.Entity.SetDisplayName(id, n) end
@@ -989,6 +1002,7 @@ function CppLogic.Entity.Leader.SetSoldierLimit(id, limit) end
 -- @return seconds between refreshes
 function CppLogic.Entity.Leader.GetRegeneration(id) end
 --- a leaders regeneration.
+-- does not work with SCELoader.
 -- @param id leader
 -- @param hp regenerated
 -- @param seconds between refreshes

@@ -180,9 +180,9 @@ void UnlimitedArmy::OnIdChanged(int old, int ne)
 void UnlimitedArmy::CheckTransit()
 {
 	if (Leaders.size() == 0 && LeaderInTransit.size() > 0) {
-		Leaders.push_back(LeaderInTransit[1]);
-		if (shok_EGL_CGLEEntity::GetEntityByID(LeaderInTransit[1])->IsEntityInCategory(shok_EntityCategory::Cannon))
-			Cannons.push_back({ LeaderInTransit[1], -1 });
+		Leaders.push_back(LeaderInTransit[0]);
+		if (shok_EGL_CGLEEntity::GetEntityByID(LeaderInTransit[0])->IsEntityInCategory(shok_EntityCategory::Cannon))
+			Cannons.push_back({ LeaderInTransit[0], -1 });
 		LeaderInTransit.erase(LeaderInTransit.begin());
 		PosLastUpdatedTick = -1;
 		CalculatePos();

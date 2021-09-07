@@ -1491,6 +1491,11 @@ function CppLogic.EntityType.Settler.GetMaxRangeModifierTechs(ty) end
 -- @return array of techs
 function CppLogic.EntityType.Settler.GetSpeedModifierTechs(ty) end
 
+--- leader type initial max number of soldiers.
+-- @param ty entitytype
+-- @return numSol
+function CppLogic.EntityType.Settler.LeaderTypeGetMaxNumberOfSoldiers(ty) end
+
 --- number of settlers this building (villagecenter) supports.
 -- @param ty entitytype
 -- @return slots

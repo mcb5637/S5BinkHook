@@ -698,6 +698,23 @@ int l_buildingTy_GetBuildOnTypes(lua_State* L) {
 	return 1;
 }
 
+int l_leaderTy_GetMaxNumOfSoldiers(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	shok_GGL_CLimitedAttachmentBehaviorProperties* pr = t->GetBehaviorProps<shok_GGL_CLimitedAttachmentBehaviorProperties>();
+	luaext_assertPointer(L, pr, "no limited attachment");
+	int limit = -1;
+	std::string_view v = "ATTACHMENT_LEADER_SOLDIER";
+	for (auto& l : pr->Attachments) {
+		if (v.compare(l.Type.c_str()) == 0) {
+			limit = l.Limit;
+			break;
+		}
+	}
+	luaext_assert(L, limit >= 0, "no attachment limit ATTACHMENT_LEADER_SOLDIER");
+	lua_pushnumber(L, limit);
+	return 1;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -756,6 +773,7 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "GetDamageModifierTechs", &l_entityTyGetDamageModifierTechs);
 	luaext_registerFunc(L, "GetMaxRangeModifierTechs", &l_entityTyGetRangeModifierTechs);
 	luaext_registerFunc(L, "GetSpeedModifierTechs", &l_entityTyGetSpeedModifierTechs);
+	luaext_registerFunc(L, "LeaderTypeGetMaxNumberOfSoldiers", &l_leaderTy_GetMaxNumOfSoldiers);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");

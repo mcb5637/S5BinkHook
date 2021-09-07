@@ -282,8 +282,8 @@ struct shok_GGL_CLimitedAttachmentBehaviorProperties : shok_EGL_CGLEBehaviorProp
 	vector_padding;
 	std::vector<shok_limitedAttachmentProps, shok_allocator<shok_limitedAttachmentProps>> Attachments;
 
-	static inline constexpr int vtp = 0x775DE4;
-	static inline constexpr int TypeDesc = 0x81D080;
+	static inline constexpr int vtp = 0x775EB4;
+	static inline constexpr int TypeDesc = 0x81D70C;
 };
 
 struct shok_idleAnimProps {

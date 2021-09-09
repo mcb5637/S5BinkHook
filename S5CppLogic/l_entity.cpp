@@ -1110,7 +1110,7 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
 	luaext_assertPointer(L, solty, "no soldier type set");
 	if (!lua_toboolean(L, 3)) {
-		int ucat = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(b->EntityType);
+		int ucat = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(b->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
 	}
 	int max = s->LimitedAttachmentGetMaximum(shok_AttachmentType::LEADER_SOLDIER);
@@ -1459,7 +1459,7 @@ int l_building_BarracksBuyLeaderByType(lua_State* L) {
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(ety->LogicProps)->Cost), "missing res");
 	if (!lua_toboolean(L, 3)) {
-		int ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfBuildingType(e->EntityType);
+		int ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(e->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
 	}
 	int id = e->BuyLeaderByType(luaL_checkint(L, 2));

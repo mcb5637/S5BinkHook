@@ -1496,6 +1496,11 @@ function CppLogic.EntityType.Settler.GetSpeedModifierTechs(ty) end
 -- @return numSol
 function CppLogic.EntityType.Settler.LeaderTypeGetMaxNumberOfSoldiers(ty) end
 
+--- gets the first upgradecategory a settler type is in.
+-- @param ty entitytype
+-- @return ucat
+function CppLogic.EntityType.Settler.GetUpgradeCategory(ty) end
+
 --- number of settlers this building (villagecenter) supports.
 -- @param ty entitytype
 -- @return slots

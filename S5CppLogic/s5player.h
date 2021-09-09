@@ -84,12 +84,13 @@ struct shok_GGL_CUpgradeManager : shok_object {
 	int PlayerID;
 
 	static inline constexpr int vtp = 0x7728CC;
+
+	int GetUpgradeCategoryOfEntityType(int etype);
 };
 struct shok_GGL_CBuildingUpgradeManager : shok_GGL_CUpgradeManager {
 	shok_set<int[3]> ScholarInfoElement; // Category, ScholarInfo { ?, CurrentAmount } ?
-	static inline constexpr int vtp = 0x772948;
 
-	int GetUpgradeCategoryOfBuildingType(int etype);
+	static inline constexpr int vtp = 0x772948;
 };
 struct shok_GGL_CSettlerUpgradeManager : shok_GGL_CUpgradeManager {
 	

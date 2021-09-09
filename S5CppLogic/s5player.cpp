@@ -62,8 +62,8 @@ void shok_GGL_CPlayerAttractionHandler::HookCheckPayday()
 	WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday);
 }
 
-static inline int(__thiscall* const upgrademanager_getucatbybuilding)(shok_GGL_CBuildingUpgradeManager* th, int id) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBuildingUpgradeManager*, int)>(0x4B3CA6);
-int shok_GGL_CBuildingUpgradeManager::GetUpgradeCategoryOfBuildingType(int etype)
+static inline int(__thiscall* const upgrademanager_getucatbybuilding)(shok_GGL_CUpgradeManager* th, int id) = reinterpret_cast<int(__thiscall*)(shok_GGL_CUpgradeManager*, int)>(0x4B3CA6);
+int shok_GGL_CUpgradeManager::GetUpgradeCategoryOfEntityType(int etype)
 {
 	return upgrademanager_getucatbybuilding(this, etype);
 }

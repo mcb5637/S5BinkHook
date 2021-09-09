@@ -715,6 +715,13 @@ int l_leaderTy_GetMaxNumOfSoldiers(lua_State* L) {
 	return 1;
 }
 
+int l_settlerTy_GetUpgradeCategory(lua_State* L) {
+	luaext_checkEntityType(L, 1);
+	int ucat = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->SettlerUpgradeManager->GetUpgradeCategoryOfEntityType(luaL_checkint(L, 1));
+	lua_pushnumber(L, ucat);
+	return 1;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -774,6 +781,7 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "GetMaxRangeModifierTechs", &l_entityTyGetRangeModifierTechs);
 	luaext_registerFunc(L, "GetSpeedModifierTechs", &l_entityTyGetSpeedModifierTechs);
 	luaext_registerFunc(L, "LeaderTypeGetMaxNumberOfSoldiers", &l_leaderTy_GetMaxNumOfSoldiers);
+	luaext_registerFunc(L, "GetUpgradeCategory", &l_settlerTy_GetUpgradeCategory);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Building");

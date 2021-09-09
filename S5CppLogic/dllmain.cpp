@@ -86,7 +86,17 @@ int __cdecl test(lua_State* L) {
     //dumpClassSerialization(L, shok_GGL_CBridgeEntity::Identifier);
     //lua_pushstring(L, (*shok_BB_CClassFactory::GlobalObj)->GetClassDemangledName(shok_GGL_CBridgeEntity::Identifier));
     //lua_pushnumber(L, (int)&(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->Statistics.BuildingTimeLine.LastGatherTurn);
-    lua_pushstring(L, shok_BB_CFileSystemMgr::PathGetExtension(luaL_checkstring(L, 1)));
+    auto* um =(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->SettlerUpgradeManager;
+    int vret = 0;
+    int vin = luaL_checkint(L, 1);
+    __asm {
+        mov ecx, um;
+        push vin;
+        mov eax, 0x4B3CA6;
+        call eax;
+        mov vret, eax;
+    }
+    lua_pushnumber(L, vret);
     return 1;
 }
 

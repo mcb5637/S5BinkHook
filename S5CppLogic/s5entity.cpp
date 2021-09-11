@@ -326,7 +326,7 @@ void shok_EGL_CGLEEntity::ClearAttackers()
 
 
 
-void shok_EGL_CMovingEntity::AttackMove(shok_position& p)
+void shok_EGL_CMovingEntity::AttackMove(const shok_position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::Leader_AttackMove, p };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
@@ -339,7 +339,7 @@ void shok_EGL_CMovingEntity::AttackEntity(int targetId)
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
 }
 
-void shok_EGL_CMovingEntity::Move(shok_position& p)
+void shok_EGL_CMovingEntity::Move(const shok_position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::MoveCommand_Move, p };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
@@ -535,6 +535,12 @@ void shok_EGL_CMovingEntity::BattleSerfTurnToSerf()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::BattleSerf_CommandTurnToSerf };
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+}
+
+void(__thiscall* const movingentity_settarrot)(shok_EGL_CMovingEntity* th, float r) = reinterpret_cast<void(__thiscall*)(shok_EGL_CMovingEntity*, float)>(0x57DBC8);
+void shok_EGL_CMovingEntity::SetTargetRotation(float f)
+{
+	movingentity_settarrot(this, f);
 }
 
 void(__thiscall* const movingentity_setpos)(shok_EGL_CMovingEntity* th, shok_position* p) = reinterpret_cast<void(__thiscall*)(shok_EGL_CMovingEntity*, shok_position*)>(0x57BC78);

@@ -215,11 +215,11 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	static inline constexpr int TypeDesc = 0x8077EC;
 	static inline constexpr unsigned int Identifier = 0x77D4E427;
 
-	void AttackMove(shok_position& p);
+	void AttackMove(const shok_position& p);
 	void AttackEntity(int targetId);
 	void HoldPosition();
 	void Defend();
-	void Move(shok_position& p);
+	void Move(const shok_position& p);
 	void LeaderAttachSoldier(int soldierId);
 	void SettlerExpell();
 	void HeroAbilitySendHawk(shok_position& p);
@@ -247,6 +247,7 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	void SerfExtractResource(int id);
 	void SerfTurnToBattleSerf();
 	void BattleSerfTurnToSerf();
+	void SetTargetRotation(float f);
 
 	void SetPosition(shok_position& p);
 

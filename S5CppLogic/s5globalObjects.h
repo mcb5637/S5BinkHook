@@ -129,9 +129,9 @@ struct shok_EGL_CGLELandscape : shok_object {
 
 	static inline constexpr int vtp = 0x783C38;
 
-	int GetSector(shok_position* p);
-	bool GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut);
-	shok_position GetNearestFreePos(shok_position* p, float range);
+	int GetSector(const shok_position* p);
+	bool GetNearestPositionInSector(const shok_position* pIn, float range, int sector, shok_position* pOut);
+	shok_position GetNearestFreePos(const shok_position* p, float range);
 	bool IsValidPos(shok_position* p);
 	shok_position GetMapSize();
 	bool IsPosBlockedInMode(const shok_position* p, int mode);

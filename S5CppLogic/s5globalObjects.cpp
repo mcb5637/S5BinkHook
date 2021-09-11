@@ -193,15 +193,15 @@ void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(shok_position& p, int wh)
 	terrlores_setwh(this, qp, wh);
 }
 
-static inline int(__thiscall* const shokLandscape_getSector)(shok_EGL_CGLELandscape* th, shok_position* p) = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*)>(0x5778BE);
-int shok_EGL_CGLELandscape::GetSector(shok_position* p)
+static inline int(__thiscall* const shokLandscape_getSector)(shok_EGL_CGLELandscape* th, const shok_position* p) = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*)>(0x5778BE);
+int shok_EGL_CGLELandscape::GetSector(const shok_position* p)
 {
 	return shokLandscape_getSector(this, p);
 }
 
 static inline void(__thiscall* const shoklandscape_getnearestcon)(int* pred, bool* one, int sector, shok_EGL_CGLELandscape* l) = reinterpret_cast<void(__thiscall*)(int*, bool*, int, shok_EGL_CGLELandscape*)>(0x57F253);
-static inline bool(__thiscall* const shoklandscape_getnearest)(shok_EGL_CGLELandscape* th, shok_position* pIn, float range, int* pred, shok_position* pOut) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*, float, int*, shok_position*)>(0x5775AF);
-bool shok_EGL_CGLELandscape::GetNearestPositionInSector(shok_position* pIn, float range, int sector, shok_position* pOut)
+static inline bool(__thiscall* const shoklandscape_getnearest)(shok_EGL_CGLELandscape* th, const shok_position* pIn, float range, int* pred, shok_position* pOut) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, float, int*, shok_position*)>(0x5775AF);
+bool shok_EGL_CGLELandscape::GetNearestPositionInSector(const shok_position* pIn, float range, int sector, shok_position* pOut)
 {
 	int pred[5];
 	bool one = true;
@@ -210,8 +210,8 @@ bool shok_EGL_CGLELandscape::GetNearestPositionInSector(shok_position* pIn, floa
 	pOut->Y = 0.0f;
 	return shoklandscape_getnearest(this, pIn, range, pred, pOut);
 }
-static inline void(__thiscall* const shoklandscape_getnearestfreepos)(shok_EGL_CGLELandscape* ls, shok_position* ou, shok_position* in, float r, int* d) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*, shok_position*, float, int*)>(0x577661);
-shok_position shok_EGL_CGLELandscape::GetNearestFreePos(shok_position* p, float range)
+static inline void(__thiscall* const shoklandscape_getnearestfreepos)(shok_EGL_CGLELandscape* ls, shok_position* ou, const shok_position* in, float r, int* d) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*, const shok_position*, float, int*)>(0x577661);
+shok_position shok_EGL_CGLELandscape::GetNearestFreePos(const shok_position* p, float range)
 {
 	shok_position r;
 	int i = 1;

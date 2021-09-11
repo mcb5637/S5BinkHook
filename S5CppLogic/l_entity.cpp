@@ -406,11 +406,14 @@ int l_movingEntitySetTargetPos(lua_State* L) {
 	lua_pushstring(L, "r");
 	lua_gettable(L, 2);
 	if (lua_isnumber(L, -1)) {
-		m->TargetRotation = static_cast<float>(deg2rad(lua_tonumber(L, -1)));
-		m->TargetRotationValid = 1;
+		m->SetTargetRotation(static_cast<float>(deg2rad(lua_tonumber(L, -1))));
+		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, true };
+		m->FireEvent(&ev);
 	}
 	else {
 		m->TargetRotationValid = 0;
+		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, false };
+		m->FireEvent(&ev);
 	}
 	return 0;
 }
@@ -945,10 +948,22 @@ int l_settlerMove(lua_State* L) {
 	shok_GGL_CSettler* e = luaext_checkSettler(L, 1);
 	shok_position p;
 	luaext_checkPos(L, p, 2);
+	shok_EGL_CGLELandscape* ls = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape;
+	if (ls->GetSector(&p) == 0) {
+		shok_position pou;
+		if (ls->GetNearestPositionInSector(&p, 1000, e->GetSector(), &pou))
+			p = pou;
+	}
 	e->Move(p);
 	if (lua_isnumber(L, 3)) {
-		e->TargetRotation = static_cast<float>(deg2rad(lua_tonumber(L, 3)));
-		e->TargetRotationValid = 1;
+		e->SetTargetRotation(static_cast<float>(deg2rad( lua_tonumber(L, 3))));
+		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, true };
+		e->FireEvent(&ev);
+	}
+	else {
+		e->TargetRotationValid = false;
+		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, false };
+		e->FireEvent(&ev);
 	}
 	return 0;
 }

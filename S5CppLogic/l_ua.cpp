@@ -110,7 +110,7 @@ void UnlimitedArmy::Tick()
 		CheckStatus(UAStatus::Battle);
 		preventComands = true;
 	}
-	if (!preventComands && !LastPos.IsInRange(Target, 1000)) {
+	if (!preventComands && !LastPos.IsInRange(Target, 1500)) {
 		if (Status != UAStatus::Moving && Status != UAStatus::MovingNoBattle)
 			CheckStatus(UAStatus::Moving);
 		preventComands = true;
@@ -160,19 +160,19 @@ void UnlimitedArmy::AddLeader(shok_EGL_CGLEEntity* e)
 }
 void UnlimitedArmy::OnIdChanged(int old, int ne)
 {
-	for (int i = 0; i < (int)Leaders.size(); i++) {
+	for (int i = 0; i < static_cast<int>(Leaders.size()); i++) {
 		if (Leaders[i] == old)
 			Leaders[i] = ne;
 	}
-	for (int i = 0; i < (int)LeaderInTransit.size(); i++) {
+	for (int i = 0; i < static_cast<int>(LeaderInTransit.size()); i++) {
 		if (LeaderInTransit[i] == old)
 			LeaderInTransit[i] = ne;
 	}
-	for (int i = 0; i < (int)DeadHeroes.size(); i++) {
+	for (int i = 0; i < static_cast<int>(DeadHeroes.size()); i++) {
 		if (DeadHeroes[i] == old)
 			DeadHeroes[i] = ne;
 	}
-	for (int i = 0; i < (int)Cannons.size(); i++) {
+	for (int i = 0; i < static_cast<int>(Cannons.size()); i++) {
 		if (Cannons[i].EntityId == old)
 			Cannons[i].EntityId = ne;
 	}
@@ -378,7 +378,7 @@ bool UnlimitedArmy::LeaderIsMoving(shok_EGL_CGLEEntity* e)
 }
 bool UnlimitedArmy::LeaderIsIdle(shok_EGL_CGLEEntity* e)
 {
-	return ((shok_GGL_CSettler*)e)->IsIdle();
+	return static_cast<shok_GGL_CSettler*>(e)->IsIdle();
 }
 bool UnlimitedArmy::LeaderIsInBattle(shok_EGL_CGLEEntity* e)
 {
@@ -396,12 +396,18 @@ bool UnlimitedArmy::IsNonCombat(shok_EGL_CGLEEntity* e)
 void UnlimitedArmy::BattleCommand()
 {
 	shok_position p = shok_EGL_CGLEEntity::GetEntityByID(CurrentBattleTarget)->Position;
+	shok_EGL_CGLELandscape* ls = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape;
+	if (ls->GetSector(&p) == 0) {
+		shok_position pou;
+		if (ls->GetNearestPositionInSector(&p, 1000, shok_EGL_CGLEEntity::GetEntityByID(Leaders[0])->GetSector(), &pou))
+			p = pou;
+	}
 	if (ReMove) {
 		PrepDefenseReset.clear();
 		NormalizeSpeed(false, false);
 	}
 	for (int id : Leaders) {
-		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*) shok_EGL_CGLEEntity::GetEntityByID(id);
+		shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(id));
 		if (e->IsEntityInCategory(shok_EntityCategory::Hero) || IsNonCombat(e)) {
 			if (ExecuteHeroAbility(e))
 				continue;
@@ -417,7 +423,7 @@ void UnlimitedArmy::BattleCommand()
 	}
 	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
 	for (UACannonData cd : Cannons) {
-		shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(cd.EntityId);
+		shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(cd.EntityId));
 		if (ReMove || !LeaderIsInBattle(e) || cd.LastUpdated == -1) {
 			if (cd.LastUpdated < 0 || cd.LastUpdated < tick) {
 				e->AttackEntity(CurrentBattleTarget);
@@ -437,19 +443,26 @@ void UnlimitedArmy::MoveCommand()
 		PrepDefenseReset.clear();
 		NormalizeSpeed(true, false);
 	}
+	shok_position p = Target;
+	shok_EGL_CGLELandscape* ls = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape;
+	if (ls->GetSector(&p) == 0) {
+		shok_position pou;
+		if (ls->GetNearestPositionInSector(&p, 1000, shok_EGL_CGLEEntity::GetEntityByID(Leaders[0])->GetSector(), &pou))
+			p = pou;
+	}
 	if (Status == UAStatus::MovingNoBattle) {
 		for (int id : Leaders) {
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(id);
+			shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(id));
 			if (ReMove || !LeaderIsMoving(e)) {
-				e->Move(Target);
+				e->Move(p);
 			}
 		}
 	}
 	else {
 		for (int id : Leaders) {
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(id);
+			shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(id));
 			if (ReMove || LeaderIsIdle(e)) {
-				e->AttackMove(Target);
+				e->AttackMove(p);
 			}
 		}
 	}
@@ -464,7 +477,7 @@ void UnlimitedArmy::FormationCommand()
 	}
 	else if (PrepDefense && IsIdle()) {
 		for (int id : Leaders) {
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(id);
+			shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(id));
 			if ((e->IsEntityInCategory(shok_EntityCategory::Hero) || IsNonCombat(e)) && e->EventLeaderGetCurrentCommand() != shok_LeaderCommand::HeroAbility) {
 				if (ExecutePrepDefense(e)) {
 					UAReset r;
@@ -477,12 +490,13 @@ void UnlimitedArmy::FormationCommand()
 		PrepDefenseReset.erase(std::remove_if(PrepDefenseReset.begin(), PrepDefenseReset.end(), [this](UAReset& r) {
 			if (shok_EGL_CGLEEntity::EntityIDIsDead(r.EntityId))
 				return true;
-			shok_EGL_CMovingEntity* e = (shok_EGL_CMovingEntity*)shok_EGL_CGLEEntity::GetEntityByID(r.EntityId);
+			shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(r.EntityId));
 			if (e->EventLeaderGetCurrentCommand() != shok_LeaderCommand::HeroAbility) {
-				shok_EGL_CMovingEntity* m = (shok_EGL_CMovingEntity*)e;
+				shok_EGL_CMovingEntity* m = static_cast<shok_EGL_CMovingEntity*>(e);
 				m->Move(r.Pos);
-				m->TargetRotation = r.Pos.r;
-				m->TargetRotationValid = 1;
+				m->SetTargetRotation(r.Pos.r);
+				shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, true };
+				m->FireEvent(&ev);
 				return true;
 			}
 			return false;
@@ -590,18 +604,18 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 				if (p->AffectsLongRangeOnly)
 					r = 3000;
 				if (p->IsAggressive()) {
-					if (!((shok_GGL_CSettler*)e)->IsMoving() && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 10) {
-						((shok_GGL_CSettler*)e)->HeroAbilityRangedEffect();
+					if (!static_cast<shok_GGL_CSettler*>(e)->IsMoving() && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 10) {
+						static_cast<shok_GGL_CSettler*>(e)->HeroAbilityRangedEffect();
 					}
 				}
 				else if (p->IsDefensive()) {
 					if (CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 10) {
-						((shok_GGL_CSettler*)e)->HeroAbilityRangedEffect();
+						static_cast<shok_GGL_CSettler*>(e)->HeroAbilityRangedEffect();
 					}
 				}
 				else if (p->IsHeal()) {
 					if (e->Health <= e->GetMaxHealth()/2 && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 2) {
-						((shok_GGL_CSettler*)e)->HeroAbilityRangedEffect();
+						static_cast<shok_GGL_CSettler*>(e)->HeroAbilityRangedEffect();
 					}
 				}
 			}
@@ -613,7 +627,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			shok_GGL_CSummonBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CSummonBehaviorProps>();
 			if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
-					((shok_GGL_CSettler*)e)->HeroAbilitySummon();
+					static_cast<shok_GGL_CSettler*>(e)->HeroAbilitySummon();
 					e->ObservedEntities.ForAll([this](shok_attachment* a) {
 						if (a->AttachmentType == shok_AttachmentType::SUMMONER_SUMMONED)
 							AddLeader(shok_EGL_CGLEEntity::GetEntityByID(a->EntityId));
@@ -630,7 +644,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			shok_GGL_CCircularAttackProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CCircularAttackProps>();
 			if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
-					((shok_GGL_CSettler*)e)->HeroAbilityCircularAttack();
+					static_cast<shok_GGL_CSettler*>(e)->HeroAbilityCircularAttack();
 					return true;
 				}
 			}
@@ -642,7 +656,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			shok_GGL_CHeroAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CHeroAbilityProps>();
 			if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, 500, IgnoreFleeing) >= 10) {
-					((shok_GGL_CSettler*)e)->HeroAbilityPlaceBomb(e->Position);
+					static_cast<shok_GGL_CSettler*>(e)->HeroAbilityPlaceBomb(e->Position);
 					return true;
 				}
 			}
@@ -661,7 +675,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 					p.Y += distr(generator)*100;
 					p.FloorToBuildingPlacement();
 					if (shok_canPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
-						((shok_GGL_CSettler*)e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
+						static_cast<shok_GGL_CSettler*>(e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
 						return true;
 					}
 				}
@@ -676,7 +690,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 				if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
 					shok_EGL_CGLEEntity* tar = GetNearestSettlerInArea(Player, e->Position, p->Range, IgnoreFleeing);
 					if (tar != nullptr) {
-						((shok_GGL_CSettler*)e)->HeroAbilityShuriken(tar->EntityId);
+						static_cast<shok_GGL_CSettler*>(e)->HeroAbilityShuriken(tar->EntityId);
 						return true;
 					}
 				}
@@ -691,7 +705,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 				if (CountTargetsInArea(Player, e->Position, p->ConversionMaxRange, IgnoreFleeing) >= 10) {
 					shok_EGL_CGLEEntity* tar = GetFurthestConversionTargetInArea(Player, e->Position, p->ConversionStartRange, IgnoreFleeing);
 					if (tar != nullptr) {
-						((shok_GGL_CSettler*)e)->HeroAbilityConvert(tar->EntityId);
+						static_cast<shok_GGL_CSettler*>(e)->HeroAbilityConvert(tar->EntityId);
 						UpdateTargetCache(tar->EntityId, 600);
 						return true;
 					}
@@ -706,7 +720,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 				shok_EGL_CGLEEntity* tar = GetNearestSnipeTargetInArea(Player, e->Position, p->Range, IgnoreFleeing);
 				if (tar != nullptr) {
-					((shok_GGL_CSettler*)e)->HeroAbilitySnipe(tar->EntityId);
+					static_cast<shok_GGL_CSettler*>(e)->HeroAbilitySnipe(tar->EntityId);
 					UpdateTargetCache(tar->EntityId, 600);
 					return true;
 				}
@@ -719,7 +733,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			shok_GGL_CInflictFearAbilityProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CInflictFearAbilityProps>();
 			if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 				if (CountTargetsInArea(Player, e->Position, p->Range/2, IgnoreFleeing) >= 10) {
-					((shok_GGL_CSettler*)e)->HeroAbilityInflictFear();
+					static_cast<shok_GGL_CSettler*>(e)->HeroAbilityInflictFear();
 					return true;
 				}
 			}
@@ -734,7 +748,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 				if (tar == nullptr && SabotageBridges)
 					tar = GetNearestBridgeInArea(e->Position, 6000);
 				if (tar != nullptr) {
-					((shok_GGL_CSettler*)e)->ThiefSabotage(tar->EntityId);
+					static_cast<shok_GGL_CSettler*>(e)->ThiefSabotage(tar->EntityId);
 					UpdateTargetCache(tar->EntityId, 500);
 					return true;
 				}
@@ -747,7 +761,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 			shok_GGL_CCamouflageBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<shok_GGL_CCamouflageBehaviorProps>();
 			if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 				if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
-					((shok_GGL_CSettler*)e)->HeroAbilityActivateCamoflage();
+					static_cast<shok_GGL_CSettler*>(e)->HeroAbilityActivateCamoflage();
 					return true;
 				}
 			}
@@ -771,7 +785,7 @@ bool UnlimitedArmy::ExecutePrepDefense(shok_EGL_CGLEEntity* e)
 					p.Y += distr(generator) * 100;
 					p.FloorToBuildingPlacement();
 					if (shok_canPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
-						((shok_GGL_CSettler*)e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
+						static_cast<shok_GGL_CSettler*>(e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
 						return true;
 					}
 				}
@@ -787,7 +801,7 @@ bool UnlimitedArmy::ExecutePrepDefense(shok_EGL_CGLEEntity* e)
 				if (tar == nullptr && SabotageBridges)
 					tar = GetNearestBridgeInArea(e->Position, Area);
 				if (tar != nullptr) {
-					((shok_GGL_CSettler*)e)->ThiefSabotage(tar->EntityId);
+					static_cast<shok_GGL_CSettler*>(e)->ThiefSabotage(tar->EntityId);
 					UpdateTargetCache(tar->EntityId, 500);
 					return true;
 				}
@@ -824,22 +838,22 @@ void UnlimitedArmy::UpdateTargetCache(int id, int time) {
 const char* udname = "UnlimitedArmy";
 
 int l_uam_gc(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->~UnlimitedArmy();
 	return 0;
 }
 
 int l_uam_AddEntity(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->AddLeader(luaext_checkSettler(L, 2));
 	return 0;
 }
 
 int l_ual_IterateNext(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	int i = luaL_checkint(L, 2);
 	i++;
-	if (i >= (int)a->Leaders.size()) {
+	if (i >= static_cast<int>(a->Leaders.size())) {
 		lua_pushnil(L);
 		lua_pushnil(L);
 	}
@@ -851,7 +865,7 @@ int l_ual_IterateNext(lua_State* L) {
 }
 
 int l_uam_Iterate(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	lua_pushcfunction(L, &l_ual_IterateNext);
 	lua_pushvalue(L, 1);
 	lua_pushnumber(L, -1);
@@ -859,20 +873,20 @@ int l_uam_Iterate(lua_State* L) {
 }
 
 int l_uam_GetPos(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->CalculatePos();
 	luaext_pushPos(L, a->LastPos);
 	return 1;
 }
 
 int l_uam_Tick(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->Tick();
 	return 0;
 }
 
 int l_uam_IdChanged(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	int old = luaL_checkint(L, 2);
 	int ne = luaL_checkint(L, 3);
 	a->OnIdChanged(old, ne);
@@ -880,44 +894,44 @@ int l_uam_IdChanged(lua_State* L) {
 }
 
 int l_uam_GetSize(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	int i = a->GetSize(lua_toboolean(L, 2), lua_toboolean(L, 3));
 	lua_pushnumber(L, i);
 	return 1;
 }
 
 int l_uam_RemoveLeader(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->RemoveLeader(luaext_checkEntity(L, 2));
 	return 0;
 }
 
 int l_uam_IsIdle(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	lua_pushboolean(L, a->IsIdle());
 	return 1;
 }
 
 int l_uam_GetStatus(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	lua_pushnumber(L, (int) a->Status);
 	return 1;
 }
 
 int l_uam_SetArea(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->Area = luaL_checkfloat(L, 2);
 	return 0;
 }
 
 int l_uam_SetTarget(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	luaext_checkPos(L, a->Target, 2);
 	return 0;
 }
 
 int l_uam_DumpTable(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	lua_newtable(L);
 	lua_pushstring(L, "Leaders");
 	lua_newtable(L);
@@ -950,7 +964,7 @@ int l_uam_DumpTable(lua_State* L) {
 	lua_pushnumber(L, a->Player);
 	lua_rawset(L, -3);
 	lua_pushstring(L, "Status");
-	lua_pushnumber(L, (int) a->Status);
+	lua_pushnumber(L, static_cast<int>(a->Status));
 	lua_rawset(L, -3);
 	lua_pushstring(L, "Area");
 	lua_pushnumber(L, a->Area);
@@ -974,7 +988,7 @@ int l_uam_DumpTable(lua_State* L) {
 }
 
 int l_uam_ReadTable(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	lua_pushstring(L, "Leaders");
 	lua_rawget(L, 2);
 	int i = 1;
@@ -1029,7 +1043,7 @@ int l_uam_ReadTable(lua_State* L) {
 	lua_pop(L, 1);
 	lua_pushstring(L, "Status");
 	lua_rawget(L, 2);
-	a->Status = (UAStatus) luaL_checkint(L, -1);
+	a->Status = static_cast<UAStatus>(luaL_checkint(L, -1));
 	lua_pop(L, 1);
 	lua_pushstring(L, "Area");
 	lua_rawget(L, 2);
@@ -1059,7 +1073,7 @@ int l_uam_ReadTable(lua_State* L) {
 }
 
 int l_ual_IterateTransitNext(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	int i = luaL_checkint(L, 2);
 	i++;
 	if (i >= (int)a->LeaderInTransit.size()) {
@@ -1073,7 +1087,7 @@ int l_ual_IterateTransitNext(lua_State* L) {
 	return 2;
 }
 int l_uam_IterateTransit(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	lua_pushcfunction(L, &l_ual_IterateTransitNext);
 	lua_pushvalue(L, 1);
 	lua_pushnumber(L, -1);
@@ -1082,25 +1096,25 @@ int l_uam_IterateTransit(lua_State* L) {
 
 
 int l_uam_SetStatus(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->Status = (UAStatus) luaL_checkint(L, 2);
 	return 0;
 }
 
 int l_uam_SetReMove(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->ReMove = lua_toboolean(L, 2);
 	return 0;
 }
 
 int l_uam_SetCurrentBattleTarget(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->CurrentBattleTarget = luaext_checkEntityId(L, 2);
 	return 0;
 }
 
 int l_uam_GetRangedMelee(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	lua_newtable(L);
 	lua_newtable(L);
 	lua_newtable(L);
@@ -1125,19 +1139,19 @@ int l_uam_GetRangedMelee(lua_State* L) {
 }
 
 int l_uam_SetIgnoreFleeing(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->IgnoreFleeing = lua_toboolean(L, 2);
 	return 0;
 }
 
 int l_uam_SetAutoRotateFormation(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->AutoRotateFormation = luaL_checkfloat(L, 2);
 	return 0;
 }
 
 int l_uam_GetFirstDeadHero(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	if (a->DeadHeroes.size() > 0)
 		lua_pushnumber(L, a->DeadHeroes[0]);
 	else
@@ -1146,20 +1160,20 @@ int l_uam_GetFirstDeadHero(lua_State* L) {
 }
 
 int l_uam_SetPrepDefense(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->PrepDefense = lua_toboolean(L, 2);
 	return 0;
 }
 
 int l_uam_SetSabotageBridges(lua_State* L) {
-	UnlimitedArmy* a = (UnlimitedArmy*)luaL_checkudata(L, 1, udname);
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
 	a->SabotageBridges = lua_toboolean(L, 2);
 	return 0;
 }
 
 int l_uaNew(lua_State* L) {
 	int pl = luaL_checkint(L, 1);
-	UnlimitedArmy* a = (UnlimitedArmy*)lua_newuserdata(L, sizeof(UnlimitedArmy));
+	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(lua_newuserdata(L, sizeof(UnlimitedArmy)));
 	new (a) UnlimitedArmy(pl);
 	luaL_getmetatable(L, udname);
 	lua_setmetatable(L, -2);

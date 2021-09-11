@@ -736,7 +736,7 @@ enum class shok_EventIDs : int {
 	// 15038 leader? goes to defend after something else
 	Leader_OnGuardedAttackedBy = 15039, //EGL::CEvent1Entity
 	// 1503A leader
-	Leader_IsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
+	Leader_SetIsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
 	// 1503C serf some kind of stop?
 	GetArmor = 0x1503E, //EGL::CEventGetValue<int, 1211121895>
 	Barracks_GetTrainingTaskList = 0x1503F, //EGL::CEventGetValue<int, 1211121895>

@@ -233,10 +233,11 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestTargetInArea(int player, shok_posi
 	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetType);
 	EntityIteratorPredicatePriority prio1 = EntityIteratorPredicatePriority(2, &catLeader);
 	EntityIteratorPredicatePriority prio2 = EntityIteratorPredicatePriority(1, &buil);
-	EntityIteratorPredicate* preds[10] = {
-		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee, &prio1, &prio2
+	EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
+	EntityIteratorPredicate* preds[11] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &notinbuild, &cir, &prio1, &prio2, &nflee
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 10 : 9);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 11 : 10);
 	EntityIterator iter = EntityIterator(&a);
 	shok_EGL_CGLEEntity* r = iter.GetNearest(nullptr);
 	return r;
@@ -254,13 +255,14 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetFurthestConversionTargetInArea(int player
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
 	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
+	EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
 	EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](shok_EGL_CGLEEntity* e) {
 		return this->CheckTargetCache(e->EntityId, 1);
 		});
-	EntityIteratorPredicate* preds[9] = {
-		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &fun, &nflee
+	EntityIteratorPredicate* preds[10] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &notinbuild, &cir, &fun, &nflee
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 9 : 8);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 10 : 9);
 	EntityIterator iter = EntityIterator(&a);
 	shok_EGL_CGLEEntity* r = iter.GetFurthest(nullptr);
 	return r;
@@ -278,10 +280,11 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSettlerInArea(int player, shok_pos
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
 	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-	EntityIteratorPredicate* preds[8] = {
-		&relev, &pl, &cat, &al, &nsol, &vis, &cir, &nflee
+	EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
+	EntityIteratorPredicate* preds[9] = {
+		&relev, &pl, &cat, &al, &nsol, &vis, &notinbuild, &cir, &nflee
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 9 : 8);
 	EntityIterator iter = EntityIterator(&a);
 	return iter.GetNearest(nullptr);
 }
@@ -338,14 +341,15 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSnipeTargetInArea(int player, shok
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
+	EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
 	EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](shok_EGL_CGLEEntity* e) {
 		return this->CheckTargetCache(e->EntityId, 1);
 		});
 	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-	EntityIteratorPredicate* preds[8] = {
-		&relev, &pl, &cat, &al, &vis, &cir, &fun, &nflee
+	EntityIteratorPredicate* preds[9] = {
+		&relev, &pl, &cat, &al, &vis, &notinbuild, &cir, &fun, &nflee
 	};
-	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 8 : 7);
+	EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 9 : 8);
 	EntityIterator iter = EntityIterator(&a);
 	return iter.GetNearest(nullptr);
 }

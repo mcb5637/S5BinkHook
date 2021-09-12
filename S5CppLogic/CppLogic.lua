@@ -572,6 +572,11 @@ function CppLogic.Entity.Predicates.OfUpgradeCategory(ecat) end
 -- @return predicate userdata
 function CppLogic.Entity.Predicates.IsAlive() end
 
+--- creates a predicate that checks settlers not inside a building. (includes entering and leaving).
+-- includes all sorts of buildings, workplaces/farms/residences/barracks...
+-- @return predicate userdata
+function CppLogic.Entity.Predicates.IsNotInBuilding() end
+
 --- entity task list index.
 -- @param id entity
 -- @return index

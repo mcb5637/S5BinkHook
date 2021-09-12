@@ -189,6 +189,12 @@ int l_entityPredicateIsAlive(lua_State* L) {
 	return 1;
 }
 
+int l_entityPredicateIsNotInBuilding(lua_State* L) {
+	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateNotInBuilding));
+	new(ud) EntityIteratorPredicateNotInBuilding();
+	return 1;
+}
+
 int l_entityIteratorToTable(lua_State* L) {
 	if (lua_gettop(L) > 1) { // auto create an and predicate
 		l_entityPredicateAnd(L);
@@ -1565,6 +1571,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "IsVisible", &l_entityPredicateIsVisible);
 	luaext_registerFunc(L, "OfUpgradeCategory", &l_entityPredicateOfUpgradeCategory);
 	luaext_registerFunc(L, "IsAlive", &l_entityPredicateIsAlive);
+	luaext_registerFunc(L, "IsNotInBuilding", &l_entityPredicateIsNotInBuilding);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Settler");

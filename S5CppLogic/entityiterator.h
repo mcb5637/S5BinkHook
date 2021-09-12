@@ -181,3 +181,8 @@ public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
 	EntityIteratorPredicatePriority(int prio, EntityIteratorPredicate* pred);
 };
+
+struct EntityIteratorPredicateNotInBuilding : EntityIteratorPredicate {
+public:
+	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio);
+};

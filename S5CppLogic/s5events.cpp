@@ -15,6 +15,9 @@ shok_BB_CEvent::shok_BB_CEvent(shok_NetEventIds eventid) : shok_BB_CEvent(static
 shok_BB_CEvent::shok_BB_CEvent(shok_FeedbackEventIds eventid) : shok_BB_CEvent(static_cast<int>(eventid))
 {
 }
+shok_BB_CEvent::shok_BB_CEvent(shok_InputEventIds eventid) : shok_BB_CEvent(static_cast<int>(eventid))
+{
+}
 
 shok_EGL_CEventValue_int::shok_EGL_CEventValue_int(shok_EventIDs e, int d) : shok_BB_CEvent(e)
 {
@@ -265,4 +268,20 @@ shok_Framework_CEventGameSpeed::shok_Framework_CEventGameSpeed(shok_NetEventIds 
 {
 	vtable = shok_Framework_CEventGameSpeed::vtp;
 	SpeedFactor = speed;
+}
+
+shok_BB_CInputEvent::shok_BB_CInputEvent(shok_InputEventIds id) : shok_BB_CEvent(id)
+{
+	vtable = shok_BB_CInputEvent::vtp;
+	EventHandeled = false;
+}
+
+shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, int keydata, int clicks, int x, int y, int delta) : shok_BB_CInputEvent(id)
+{
+	vtable = shok_BB_CMouseEvent::vtp;
+	KeyData = keydata;
+	Clicks = clicks;
+	X = x;
+	Y = y;
+	Delta = delta;
 }

@@ -71,32 +71,7 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    /*shok_GS3DTools_CMapData s = shok_GS3DTools_CMapData();
-    int st = (int)&s;
-    int test = (int)&s.MapType;
-    lua_pushnumber(L, (test - st) / 4);*/
-    /*if (lua_gettop(L) == 0) {
-        lua_pushnumber(L, (int)L);
-        return 1;
-    }
-    if (lua_isnumber(L, 1)) {
-        lua_rawgeti(L, LUA_REGISTRYINDEX, luaL_checkint(L, 1));
-
-    }*/
-    //dumpClassSerialization(L, shok_GGL_CBridgeEntity::Identifier);
-    //lua_pushstring(L, (*shok_BB_CClassFactory::GlobalObj)->GetClassDemangledName(shok_GGL_CBridgeEntity::Identifier));
-    //lua_pushnumber(L, (int)&(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->Statistics.BuildingTimeLine.LastGatherTurn);
-    auto* um =(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->SettlerUpgradeManager;
-    int vret = 0;
-    int vin = luaL_checkint(L, 1);
-    __asm {
-        mov ecx, um;
-        push vin;
-        mov eax, 0x4B3CA6;
-        call eax;
-        mov vret, eax;
-    }
-    lua_pushnumber(L, vret);
+    dumpClassSerialization(L, reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x894310));
     return 1;
 }
 

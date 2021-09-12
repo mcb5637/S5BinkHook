@@ -323,3 +323,8 @@ EntityIteratorPredicatePriority::EntityIteratorPredicatePriority(int prio, Entit
 	Prio = prio;
 	Pred = pred;
 }
+
+bool EntityIteratorPredicateNotInBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio)
+{
+	return !e->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_ENTERED_BUILDING) && !e->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_BUILDING_TO_LEAVE);
+}

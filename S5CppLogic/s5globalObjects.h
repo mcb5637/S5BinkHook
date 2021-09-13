@@ -318,22 +318,6 @@ struct shok_GGL_CPlayerAttractionProps : shok_object {
 	static inline shok_GGL_CPlayerAttractionProps** const GlobalObj = reinterpret_cast<shok_GGL_CPlayerAttractionProps**>(0x866A80);
 };
 
-struct shok_BB_IPostEvent : shok_object {
-
-};
-struct shok_GGUI_CManager : shok_object {
-	PADDINGI(9);
-private:
-	shok_BB_IPostEvent* PostEvent;
-
-public:
-	static inline constexpr int vtp = 0x77B2F8;
-
-	void HackPostEvent();
-
-	static inline shok_GGUI_CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<shok_GGUI_CManager * (__cdecl*)()>(0x525622);
-	static bool(*PostEventCallback)(shok_BB_CEvent* ev);
-};
 
 struct shok_GGL_CGLGameLogic_TechList {
 	vector_padding;

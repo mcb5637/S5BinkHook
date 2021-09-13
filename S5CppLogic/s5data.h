@@ -294,6 +294,10 @@ enum class shok_InputEventIds : int;
 struct shok_EGL_CGLETaskArgs;
 
 
+struct shok_BB_IPostEvent : shok_object {
+
+};
+
 template<class T>
 bool contains(T* data, T search, int num) {
 	for (int i = 0; i < num; i++)
@@ -333,6 +337,7 @@ enum class win_mouseEvents : int {
 #include "s5player.h"
 #include "s5tech.h"
 #include "s5globalObjects.h"
+#include "s5ui.h"
 #include "s5widget.h"
 #include "s5framework.h"
 #include "s5tasklist.h"

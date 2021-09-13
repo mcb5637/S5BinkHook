@@ -304,27 +304,6 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 	return Entities[num].entity;
 }
 
-void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) = nullptr;
-shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
-bool(*shok_GGUI_CManager::PostEventCallback)(shok_BB_CEvent* ev) = nullptr;
-void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
-	if (shok_GGUI_CManager::PostEventCallback)
-		if (shok_GGUI_CManager::PostEventCallback(ev))
-			return;
-	PostEventOrig(th, ev);
-}
-void shok_GGUI_CManager::HackPostEvent()
-{
-	if (PostEventOrig) {
-		shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
-		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
-	}
-	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent->vtable);
-	shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
-	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
-	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent * ev)>(&PostEventHook);
-}
-
 static inline shok_GGL_CPlayerStatus* (__thiscall* const shok_GGL_CGLGameLogic_GetPlayer)(shok_GGL_CPlayerStatus** pl, int p) = reinterpret_cast<shok_GGL_CPlayerStatus * (__thiscall*) (shok_GGL_CPlayerStatus**, int)>(0x4A91BC);
 shok_GGL_CPlayerStatus* shok_GGL_CGLGameLogic::GetPlayer(int i)
 {

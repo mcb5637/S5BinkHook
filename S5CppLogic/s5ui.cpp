@@ -23,6 +23,12 @@ struct shok_vtable_BB_IPostEvent {
 	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev);
 };
 
+static inline void(__thiscall*const c3dviewhandler_setguistate)(shok_GGUI_C3DViewHandler* th, unsigned int id, shok_GGUI_SStateParameters* p) = reinterpret_cast<void(__thiscall*)(shok_GGUI_C3DViewHandler*, unsigned int, shok_GGUI_SStateParameters*)>(0x52820C);
+void shok_GGUI_C3DViewHandler::SetGUIStateByIdentifier(unsigned int identifier)
+{
+	c3dviewhandler_setguistate(this, identifier, nullptr);
+}
+
 void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) = nullptr;
 shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
 bool(*shok_GGUI_CManager::PostEventCallback)(shok_BB_CEvent* ev) = nullptr;

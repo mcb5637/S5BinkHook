@@ -18,9 +18,9 @@ struct shok_vtable_BB_CClassFactory {
     const char*(__stdcall* GetClassDemangledName)(shok_BB_CClassFactory* th, unsigned int id);
     shok_BB_CClassFactory_serializationData* (__stdcall* GetClassSerializationData)(shok_BB_CClassFactory* th, unsigned int id);
     PADDINGI(1);
-    int(__stdcall* AddClassData)(shok_BB_CClassFactory* th, unsigned int id, const char* name, shok_object* (__stdcall* NewObj)(), shok_BB_CClassFactory_serializationData* data); // 9
+    int(__stdcall* AddClassData)(shok_BB_CClassFactory* th, unsigned int id, const char* name, shok_object* (__stdcall* NewObj)(), shok_BB_CClassFactory_serializationData* data); // 9, data can be nullptr
 };
-//constexpr int i = offsetof(shok_vtable_BB_CClassFactory, GetClassSerializationData) / 4;
+//constexpr int i = offsetof(shok_vtable_BB_CClassFactory, AddClassData) / 4;
 
 static inline shok_BB_CXmlSerializer*(__stdcall* const xmlserializer_new)(int d) = reinterpret_cast<shok_BB_CXmlSerializer*(__stdcall* const)(int)>(0x550731);
 shok_BB_CXmlSerializer* shok_BB_CXmlSerializer::Create()

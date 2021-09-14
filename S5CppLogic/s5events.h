@@ -590,7 +590,7 @@ struct shok_BB_CMouseEvent : shok_BB_CInputEvent {
 	shok_BB_CMouseEvent& operator=(shok_BB_CMouseEvent&&) = default;
 	shok_BB_CMouseEvent& operator=(const shok_BB_CMouseEvent&) = default;
 
-	static inline constexpr int TypeDesc = 0x07FFE98;
+	static inline constexpr int TypeDesc = 0x7FFE98;
 	static inline constexpr int vtp = 0x762154;
 };
 //constexpr int i = offsetof(shok_BB_CMouseEvent, KeyData) / 4;

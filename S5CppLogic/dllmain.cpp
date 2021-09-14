@@ -71,7 +71,7 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    dumpClassSerialization(L, reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x894310));
+    dumpClassSerialization(L, shok_GGUI_CPlaceBuildingState::Identifier);
     return 1;
 }
 

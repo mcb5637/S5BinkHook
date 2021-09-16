@@ -9,15 +9,18 @@ struct shok_GGUI_SStateParameters : shok_object {
 
 struct shok_GGUI_CState : shok_object { // no vtable
 	shok_GGUI_C3DViewHandler* C3DViewHandler;
+
+	static inline constexpr int TypeDesc = 0x82CC10;
 };
 struct shok_GGUI_CBasicState : shok_GGUI_CState { // no vtable
-
+	static inline constexpr int TypeDesc = 0x82CC2C;
 };
 struct shok_GGUI_CCommandState : shok_GGUI_CBasicState { // no vtable
-
+	static inline constexpr int TypeDesc = 0x82CC88;
 };
 
 struct shok_GGUI_CPositionCommandState : shok_GGUI_CCommandState { // no vtable
+	static inline constexpr int TypeDesc = 0x82CDFC;
 };
 struct shok_GGUI_CWalkCommandState : shok_GGUI_CPositionCommandState {
 	static inline constexpr int vtp = 0x77B300;
@@ -57,6 +60,7 @@ struct shok_GGUI_CSendHawkCommandState : shok_GGUI_CPositionCommandState {
 
 
 struct shok_GGUI_CEntityCommandState : shok_GGUI_CCommandState { // no vtable
+	static inline constexpr int TypeDesc = 0x82CCAC;
 };
 struct shok_GGUI_CStealGoodsState : shok_GGUI_CEntityCommandState {
 	static inline constexpr int vtp = 0x77B00C;
@@ -198,7 +202,7 @@ struct shok_stateidandcommandstate {
 };
 struct shok_GGUI_C3DViewHandler : shok_object {
 	shok_GGUI_CState* CurrentState;
-	int* StateIdManager; // BB::CIDManager
+	shok_BB_CIDManager* StateIdManager;
 	int* IPicker; // ERwTools::IPicker
 	int* IPlacer; // ERwTools::IPlacer
 	int* ClumpRenerable; // ERwTools::CRpClumpRenderable, maybe ERwTools::IRenderable
@@ -207,6 +211,11 @@ struct shok_GGUI_C3DViewHandler : shok_object {
 	template<class T>
 	void SetGUIState() {
 		SetGUIStateByIdentifier(T::Identifier);
+	}
+	void SetGUIStateByIdentfierOnNextUpdate(unsigned int identifier);
+	template<class T>
+	void SetGUIStateByIdentfierOnNextUpdate() {
+		SetGUIStateByIdentfierOnNextUpdate(T::Identifier);
 	}
 
 	static inline constexpr int vtp = 0x77B8E0;
@@ -243,7 +252,7 @@ public:
 	vector_padding;
 	std::vector<shok_stateidandcommandstate*, shok_allocator<shok_stateidandcommandstate*>> CommandStates;
 	shok_GGUI_CMouseEffect* MouseEffect;
-	PADDINGI(1); // p to unknown
+	lua_State* GameState;
 	shok_CMouseCursorManager* MouseCursorManager;
 
 
@@ -257,5 +266,5 @@ public:
 	static inline shok_GGUI_CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<shok_GGUI_CManager * (__cdecl*)()>(0x525622);
 	static bool(*PostEventCallback)(shok_BB_CEvent* ev);
 };
-//constexpr int i = offsetof(shok_GGUI_CManager, SelectedEntities) / 4;
+//constexpr int i = offsetof(shok_GGUI_CManager, GameState) / 4;
 //constexpr int i = sizeof(shok_GGUI_CManager) / 4;

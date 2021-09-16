@@ -3,7 +3,7 @@
 
 struct shok_BB_CIDManagerEx_data {
 	const char* Name;
-	PADDINGI(1);
+	PADDINGI(1); // maybe some sort of hash
 };
 struct shok_BB_CIDManagerEx : shok_object {
 	static inline constexpr int vtp = 0x77F8C4;
@@ -28,6 +28,16 @@ struct shok_BB_CIDManagerEx : shok_object {
 	static inline shok_BB_CIDManagerEx** const FeedBackEventManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x880BA0); // ids are not correct here
 };
 static_assert(sizeof(shok_BB_CIDManagerEx) == 6 * 4);
+struct shok_BB_CIDManager : shok_object {
+	PADDINGI(1);
+	vector_padding;
+	std::vector<shok_BB_CIDManagerEx_data, shok_allocator<shok_BB_CIDManagerEx_data>> TypeNames; // seems to be the same struct
+
+	static inline constexpr int vtp = 0x76C028;
+
+	int GetIDByName(const char* name); // throws if id invalid
+	int GetIDByName(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
+};
 
 struct shok_EGL_CGLEEntitiesProps : shok_object {
 	PADDINGI(1); // float 240

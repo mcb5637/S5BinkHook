@@ -78,6 +78,16 @@ const char* shok_BB_CIDManagerEx::GetNameByID(int id)
 	return nullptr;
 }
 
+static inline int(__thiscall* const shok_BB_CIDManager_getidbyname)(shok_BB_CIDManager* th, const char* name, int nid) = reinterpret_cast<int(__thiscall*)(shok_BB_CIDManager*, const char*, int)>(0x54F656);
+int shok_BB_CIDManager::GetIDByName(const char* name, int newid)
+{
+	return shok_BB_CIDManager_getidbyname(this, name, newid);
+}
+int shok_BB_CIDManager::GetIDByName(const char* name)
+{
+	return GetIDByName(name, 0);
+}
+
 void shok_EGL_CTerrainVertexColors::ToTerrainCoord(shok_position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));

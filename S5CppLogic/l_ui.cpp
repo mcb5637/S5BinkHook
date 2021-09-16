@@ -717,6 +717,107 @@ int l_ui_GetWidgetName(lua_State* L) {
 	return 1;
 }
 
+int l_ui_SetGUIState_LuaSelection(lua_State* L) {
+	luaext_assert(L, lua_isfunction(L, 1), "no confirm func");
+	auto* vh = shok_GGUI_CManager::GlobalObj()->C3DViewHandler;
+	vh->SetGUIState<CppL_GUIState_LuaSelection>();
+	lua_pushvalue(L, 1);
+	shok_DynamicCast<shok_GGUI_CState, CppL_GUIState_LuaSelection>(vh->CurrentState)->RefOnKlick = luaL_ref(L, LUA_REGISTRYINDEX);
+	return 0;
+}
+
+
+
+shok_object* __stdcall CppL_GUIState_LuaSelection_ctor() {
+	return new (shok_malloc(sizeof(CppL_GUIState_LuaSelection))) CppL_GUIState_LuaSelection();
+}
+void CppL_GUIState_LuaSelection::Initialize()
+{
+	(*shok_BB_CClassFactory::GlobalObj)->AddClassToFactory(CppL_GUIState_LuaSelection::Identifier, "class CppLogic::GuiState_LuaSelection", &CppL_GUIState_LuaSelection_ctor, nullptr);
+}
+CppL_GUIState_LuaSelection::CppL_GUIState_LuaSelection()
+{
+	vtable = CppL_GUIState_LuaSelection::vtp;
+	shok_GGUI_CManager::GlobalObj()->C3DViewHandler->StateIdManager->GetIDByName("LuaSelectionState", 27); // make sure the state id exists
+}
+CppL_GUIState_LuaSelection::~CppL_GUIState_LuaSelection()
+{
+	if (RefOnKlick > 0)
+		luaL_unref(*shok_luastate_game, LUA_REGISTRYINDEX, RefOnKlick);
+}
+bool CppL_GUIState_LuaSelection::OnMouseEvent(shok_BB_CEvent* ev)
+{
+	shok_BB_CMouseEvent* mev = shok_DynamicCast<shok_BB_CEvent, shok_BB_CMouseEvent>(ev);
+	if (mev && mev->EventTypeId==static_cast<int>(shok_InputEventIds::MouseButtonDown)) {
+		if ((mev->KeyData & 0xFFFF) == 1) { // lmb
+			bool r = true;
+			if (RefOnKlick > 0) {
+				lua_State* L = *shok_luastate_game;
+				int i = lua_gettop(L);
+				lua_rawgeti(L, LUA_REGISTRYINDEX, RefOnKlick);
+				lua_pushnumber(L, mev->X);
+				lua_pushnumber(L, mev->Y);
+				lua_pcall(L, 2, 1, 0);
+				if (lua_isboolean(L, -1))
+					r = lua_toboolean(L, -1);
+				lua_settop(L, i);
+			}
+			if (r)
+				Cancel();
+			return r;
+		}
+		else if ((mev->KeyData & 0xFFFF) == 2) { // rmb
+			Cancel();
+			return true;
+		}
+	}
+	return false;
+}
+void CppL_GUIState_LuaSelection::Cancel()
+{
+	C3DViewHandler->SetGUIStateByIdentfierOnNextUpdate<shok_GGUI_CSelectionState>();
+}
+
+void __fastcall CppL_GUIState_LuaSelection_dtor(CppL_GUIState_LuaSelection* th, int _, bool free) {
+	th->~CppL_GUIState_LuaSelection();
+	if (free)
+		shok_free(th);
+}
+unsigned int __stdcall CppL_GUIState_LuaSelection_GetClassID(shok_object* th) {
+	return CppL_GUIState_LuaSelection::Identifier;
+}
+bool __fastcall CppL_GUIState_LuaSelection_OnMouseEvent(CppL_GUIState_LuaSelection* th, int _, shok_BB_CEvent* ev) {
+	return th->OnMouseEvent(ev);
+}
+int __fastcall CppL_GUIState_LuaSelection_Cancel(CppL_GUIState_LuaSelection* th) {
+	th->Cancel();
+	return 1;
+}
+const char* __fastcall CppL_GUIState_LuaSelection_GetName(shok_GGUI_CState* th) {
+	return "LuaSelectionState";
+}
+RTTI_TypeDescriptor CppL_GUIState_LuaSelection_TypeDesc {};
+const int CppL_GUIState_LuaSelection::TypeDesc = reinterpret_cast<int>(&CppL_GUIState_LuaSelection_TypeDesc);
+RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass1{ &CppL_GUIState_LuaSelection_TypeDesc, 2, 0, -1, 0, 0 };
+RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass2{ reinterpret_cast<RTTI_TypeDescriptor*>(shok_GGUI_CState::TypeDesc), 1, 0, -1, 0, 0 };
+RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass3{ reinterpret_cast<RTTI_TypeDescriptor*>(0x7FFE08), 0, 0, -1, 0, 0 };
+RTTI_BaseClassDescriptor* CppL_GUIState_LuaSelection_BaseClasses[] = { &CppL_GUIState_LuaSelection_BaseClass1, &CppL_GUIState_LuaSelection_BaseClass2, &CppL_GUIState_LuaSelection_BaseClass3 };
+RTTI_ClassHierarchyDescriptor CppL_GUIState_LuaSelection_ClassHierarchy{ 0, 0, 3, CppL_GUIState_LuaSelection_BaseClasses };
+RTTI_CompleteObjectLocator CppL_GUIState_LuaSelection_ObjectLocator{ 0, 0, 0, &CppL_GUIState_LuaSelection_TypeDesc, &CppL_GUIState_LuaSelection_ClassHierarchy };
+struct vtable_CppL_GUIState_LuaSelection {
+	RTTI_CompleteObjectLocator* ObLoc = &CppL_GUIState_LuaSelection_ObjectLocator;
+	void(__fastcall* dtor)(CppL_GUIState_LuaSelection* th, int _, bool free) = &CppL_GUIState_LuaSelection_dtor;
+	unsigned int(__stdcall* GetClassIdentifier)(shok_object* th) = &CppL_GUIState_LuaSelection_GetClassID;
+	int retzero = 0x55336A;
+	bool(__fastcall* OnMouseEvent)(CppL_GUIState_LuaSelection* th, int _, shok_BB_CEvent* ev) = &CppL_GUIState_LuaSelection_OnMouseEvent;
+	int SetStateParameters = 0x52B509;
+	int(__fastcall* Cancel)(CppL_GUIState_LuaSelection* th) = &CppL_GUIState_LuaSelection_Cancel;
+	const char* (__fastcall* GetName)(shok_GGUI_CState* th) = &CppL_GUIState_LuaSelection_GetName;
+	int OnSelectionChanged = 0x526A15;
+};
+vtable_CppL_GUIState_LuaSelection CppL_GUIState_LuaSelectionVtable{};
+const int CppL_GUIState_LuaSelection::vtp = reinterpret_cast<int>(&CppL_GUIState_LuaSelectionVtable.dtor);
+
 void l_ui_cleanup(lua_State* L) {
 	UIInput_Char_Callback = nullptr;
 	UIInput_Key_Callback = nullptr;
@@ -788,9 +889,12 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "GetClientSize", &l_ui_GetClientSize);
 	luaext_registerFunc(L, "IsContainerWidget", &l_ui_IsContainerWid);
 	luaext_registerFunc(L, "GetWidgetName", &l_ui_GetWidgetName);
+	luaext_registerFunc(L, "SetGUIStateLuaSelection", &l_ui_SetGUIState_LuaSelection);
 
-	if (L == mainmenu_state)
+	if (L == mainmenu_state) {
 		luaext_registerFunc(L, "SetMouseTriggerMainMenu", &l_ui_SetMouseTriggerMainMenu);
+		CppL_GUIState_LuaSelection::Initialize();
+	}
 }
 
 // CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")
@@ -811,3 +915,4 @@ void l_ui_init(lua_State* L)
 // CppLogic.UI.FontGetConfig("data\\menu\\fonts\\standard10.met")
 // XGUIEng.SetText("StartMenu00_EndGame", "@center @color:0,255,0 test")
 // CppLogic.UI.RemoveWidget("StartMenu00_VersionNumber")
+// CppLogic.UI.SetGUIStateLuaSelection(function(x, y) LuaDebugger.Log(x.."/"..y) end)

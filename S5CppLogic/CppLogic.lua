@@ -1894,6 +1894,13 @@ function CppLogic.UI.SetMouseTrigger(f) end
 --- same as CppLogic.UI.SetMouseTrigger, just designed for mainmenu
 function CppLogic.UI.SetMouseTriggerMainMenu(f) end
 
+--- sets a GUI State which reroutes clicks to lua functions.
+-- onclick gets called on left click and gets x and y coordinates of the mouse cursor and can return a bool to override ending the state (default true).
+-- oncancel gets called on right click (or gets canceled any other way).
+-- @param onclick func(x,y)->endstate
+-- @param oncancel func()
+function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
+
 --- gets the main windows client size.
 -- == GUI.GetScreenSize(), but available in main menu.
 -- @return right

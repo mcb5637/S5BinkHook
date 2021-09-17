@@ -176,6 +176,7 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 	shok_EGL_CGLELandscape_blockingData *Blocking; // 6
 	PADDINGI(2);
 	shok_EGL_CRegionInfo* RegionInfo; // 9
+	// 11 p ED::CLandscapeFogOfWar
 
 	static inline constexpr int vtp = 0x769F74;
 

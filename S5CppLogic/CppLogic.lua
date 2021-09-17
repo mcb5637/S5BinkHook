@@ -1897,6 +1897,7 @@ function CppLogic.UI.SetMouseTriggerMainMenu(f) end
 --- sets a GUI State which reroutes clicks to lua functions.
 -- onclick gets called on left click and gets x and y coordinates of the mouse cursor and can return a bool to override ending the state (default true).
 -- oncancel gets called on right click (or gets canceled any other way).
+-- make sure you set the mouse cursor after the call or modify GameCallback_GUI_StateChanged to set it.
 -- @param onclick func(x,y)->endstate
 -- @param oncancel func()
 function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end

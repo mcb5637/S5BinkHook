@@ -179,10 +179,15 @@ struct shok_GGUI_CPlaceCannonState : shok_GGUI_CCommandState {
 	static inline constexpr unsigned int Identifier = 0x8BF90FCD;
 };
 struct shok_GGUI_CPlaceBuildingState : shok_GGUI_CBasicState {
+	int UpgradeCategory;
+	shok_position PosToBuild;
+	int MouseX, MouseY; // screenpos
+
 	static inline constexpr int vtp = 0x77DCA8;
 	static inline constexpr int TypeDesc = 0x82ECC0;
 	static inline constexpr unsigned int Identifier = 0x956CDD97;
 };
+static_assert(sizeof(shok_GGUI_CPlaceBuildingState) / 4 == 7);
 
 struct shok_GGUI_CSelectionState : shok_GGUI_CState {
 	static inline constexpr int vtp = 0x77B90C;
@@ -206,6 +211,8 @@ struct shok_GGUI_C3DViewHandler : shok_object {
 	int* IPicker; // ERwTools::IPicker
 	int* IPlacer; // ERwTools::IPlacer
 	int* ClumpRenerable; // ERwTools::CRpClumpRenderable, maybe ERwTools::IRenderable
+	PADDINGI(2);
+	int MouseX, MouseY;
 
 	void SetGUIStateByIdentifier(unsigned int identifier);
 	template<class T>
@@ -220,6 +227,7 @@ struct shok_GGUI_C3DViewHandler : shok_object {
 
 	static inline constexpr int vtp = 0x77B8E0;
 };
+//constexpr int i = offsetof(shok_GGUI_C3DViewHandler, MouseX) / 4;
 struct shok_EGL_CGLEGUIInterface : shok_object {
 
 	static inline constexpr int vtp = 0x783840;

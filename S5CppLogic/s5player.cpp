@@ -137,7 +137,7 @@ void HookCanPlaceBuilding()
 }
 
 float ConstructBuildingRotation = 0.0f;
-void __declspec(naked) constructcommandbuildingnetevent() {
+void __declspec(naked) constructcommand_placebuilding() {
 	__asm {
 		fld[ConstructBuildingRotation];
 		mov eax, [eax + 0x3C];
@@ -147,7 +147,7 @@ void __declspec(naked) constructcommandbuildingnetevent() {
 		ret;
 	}
 }
-void __declspec(naked) constructcommandplacementpreviewcheck() {
+void __declspec(naked) constructcommand_checkposition() {
 	__asm {
 		sub esp, 0xC;
 		fld[ConstructBuildingRotation];
@@ -185,7 +185,7 @@ void HookConstructCommandRotation()
 		return;
 	HookConstructCommandRotation_Hooked = true;
 	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x5389FB), 0x538FF4 - 0x5389FB + 10 };
-	WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommandbuildingnetevent);
-	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommandplacementpreviewcheck);
+	WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding);
+	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
 	WriteJump(reinterpret_cast<void*>(0x538C8D), &constructcommandsetbuildingmodel);
 }

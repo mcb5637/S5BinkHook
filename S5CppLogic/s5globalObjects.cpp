@@ -37,6 +37,12 @@ struct shok_vtable_shok_BB_CFileSystemMgr {
 };
 //constexpr int i = offsetof(shok_vtable_shok_BB_CFileSystemMgr, OpenAsFileHandle);
 
+struct shok_vtable_ED_CLandscape {
+	PADDINGI(5);
+	bool(__thiscall* GetLandscapePosFromMousePos)(shok_ED_CLandscape* th, void* cam, float* mousepos, shok_positionRot* outpos, int flag);
+};
+//constexpr int i = offsetof(shok_vtable_ED_CLandscape, GetLandscapePosFromMousePos) / 4;
+
 shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
 {
 	if (i <= 0 || i >= (int)EntityTypes.size())
@@ -305,6 +311,11 @@ int shok_ED_CGlobalsLogicEx::GetBlocking(shok_position& p)
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]];
+}
+bool shok_ED_CLandscape::GetTerrainPosAtScreenCoords(shok_positionRot& outpos, int x, int y)
+{
+	float mp[] = { static_cast<float>(x), static_cast<float>(y) };
+	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetLandscapePosFromMousePos(this, (*shok_ED_CGlobalsBaseEx::GlobalObj)->Camera->SomeCameraData, mp, &outpos, 3);
 }
 
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)

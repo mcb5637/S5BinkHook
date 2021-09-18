@@ -228,6 +228,7 @@ function CppLogic.Logic.AddArchive(arch) end
 function CppLogic.Logic.RemoveTopArchive() end
 
 --- color by color index.
+-- does not work with SCELoader.
 -- @param index
 -- @return r
 -- @return g
@@ -235,6 +236,7 @@ function CppLogic.Logic.RemoveTopArchive() end
 -- @return a
 function CppLogic.Logic.GetColorByColorIndex(index) end
 --- color by color index. Refreshes the color of players.
+-- does not work with SCELoader.
 -- @param index
 -- @param r
 -- @param g
@@ -1901,6 +1903,13 @@ function CppLogic.UI.SetMouseTriggerMainMenu(f) end
 -- @param onclick func(x,y)->endstate
 -- @param oncancel func()
 function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
+
+--- gets the map position under a given screen position.
+-- @param x
+-- @param y1
+-- @return pos
+-- @return terrainHeigt
+function CppLogic.UI.GetLandscapePosAtScreenPos(x, y) end
 
 --- gets the main windows client size.
 -- == GUI.GetScreenSize(), but available in main menu.

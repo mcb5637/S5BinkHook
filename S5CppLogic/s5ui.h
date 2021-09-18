@@ -211,7 +211,7 @@ struct shok_GGUI_C3DViewHandler : shok_object {
 	int* IPicker; // ERwTools::IPicker
 	int* IPlacer; // ERwTools::IPlacer
 	int* ClumpRenerable; // ERwTools::CRpClumpRenderable, maybe ERwTools::IRenderable
-	PADDINGI(2);
+	PADDINGI(2); // probably pos mouseover
 	int MouseX, MouseY;
 
 	void SetGUIStateByIdentifier(unsigned int identifier);

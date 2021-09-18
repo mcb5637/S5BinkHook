@@ -123,6 +123,9 @@
     <ClInclude Include="s5ui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="s5RWEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

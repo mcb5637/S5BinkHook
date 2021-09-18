@@ -336,6 +336,7 @@ enum class win_mouseEvents : int {
 #include "s5effects.h"
 #include "s5player.h"
 #include "s5tech.h"
+#include "s5RWEngine.h"
 #include "s5globalObjects.h"
 #include "s5ui.h"
 #include "s5widget.h"

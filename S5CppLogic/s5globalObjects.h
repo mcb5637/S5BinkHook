@@ -168,6 +168,10 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 	static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 };
 
+struct shok_ED_CLandscape : shok_object {
+	bool GetTerrainPosAtScreenCoords(shok_positionRot& outpos, int x, int y); // r in this case is the terrain height at the position
+};
+
 struct shok_EGL_CRegionInfo : shok_object {
 	static inline constexpr int vtp = 0x783878;
 };
@@ -176,7 +180,8 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 	shok_EGL_CGLELandscape_blockingData *Blocking; // 6
 	PADDINGI(2);
 	shok_EGL_CRegionInfo* RegionInfo; // 9
-	// 11 p ED::CLandscapeFogOfWar
+	PADDINGI(1);
+	shok_ED_CLandscape* Landscape;
 
 	static inline constexpr int vtp = 0x769F74;
 
@@ -481,6 +486,19 @@ struct shok_ED_CDisplayProps : shok_object {
 	static inline constexpr int vtp = 0x7AE630;
 };
 
+struct shok_ED_CModelsProps : shok_object {
+
+
+	static inline constexpr int vtp = 0x7AE60C;
+};
+
+struct shok_ED_CCameraEx : shok_object {
+	PADDINGI(1); //1
+	void* SomeCameraData;
+
+	static inline constexpr int vtp = 0x769E64;
+};
+
 struct shok_ED_CPlayerColors : shok_object {
 
 	PADDINGI(63);
@@ -493,12 +511,31 @@ struct shok_ED_CPlayerColors : shok_object {
 	void RefreshPlayerColors();
 };
 struct shok_ED_CGlobalsBaseEx : shok_object {
-	PADDINGI(4);
-	shok_ED_CDisplayProps* DisplayProps;
-	PADDINGI(16);
-	shok_ED_CPlayerColors* PlayerColors;
+	shok_BB_CIDManagerEx* AnimManager;
+	shok_BB_CIDManagerEx* ModelManager;
+	shok_BB_CIDManagerEx* SpecialEffectManager; // lightning and snow textures?
+	PADDINGI(1); // empty shok_BB_CIDManagerEx
+	shok_ED_CDisplayProps* DisplayProps; // 5
+	shok_BB_CIDManagerEx** EffectManager; // probably an object without vtable
+	shok_BB_CIDManagerEx** EntityTypeManager; // probably an object without vtable
+	shok_ED_CModelsProps* ModelProps;
+	PADDINGI(1); // p to something terrain related?
+	PADDINGI(1); // p to something water related? // 10
+	shok_BBRw_CEngine* RWEngine; // p to BBRw::CEngine
+	PADDINGI(1); // p to ED::CAuras
+	shok_ED_CCameraEx* Camera;
+	PADDINGI(1); // p to ED::CCommandAcknowledgements
+	PADDINGI(1); // p to ED::CEntitiesTypeFlags
+	PADDINGI(1); // p to ED::CGUIScene
+	PADDINGI(1); // unknown
+	PADDINGI(1); // p to ED::CLight
+	PADDINGI(1); // unknown
+	PADDINGI(1); // p to ED::COcclusionEffect
+	PADDINGI(1); // p to ED::COrnamentalItems
+	shok_ED_CPlayerColors* PlayerColors; // 22
 
 	static inline constexpr int vtp = 0x769478;
 
 	static inline shok_ED_CGlobalsBaseEx** const GlobalObj = reinterpret_cast<shok_ED_CGlobalsBaseEx**>(0x857E8C);
 };
+//constexpr int i = offsetof(shok_ED_CGlobalsBaseEx, RWEngine) / 4;

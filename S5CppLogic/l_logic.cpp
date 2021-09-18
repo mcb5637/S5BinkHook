@@ -796,6 +796,8 @@ int l_logicLandscapeGetBlocking(lua_State* L) {
 }
 
 int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
 	int i = luaL_checkint(L, 1);
 	int c = (*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->GetColorByIndex(i);
 	lua_pushnumber(L, c & 0xFF);
@@ -805,6 +807,8 @@ int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
 	return 4;
 }
 int l_logicSetColor(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "not supported with SCELoader");
 	int i = luaL_checkint(L, 1);
 	int r = luaL_checkint(L, 2), g = luaL_checkint(L, 3), b = luaL_checkint(L, 4);
 	int a = luaL_optint(L, 5, 255);

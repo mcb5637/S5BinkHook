@@ -91,7 +91,7 @@ void initGame() {
     shok_ESnd_CSoEMusic::HookStartMusicFilesystem();
 }
 
-constexpr double Version = 1.2;
+constexpr double Version = 1.2003;
 
 int resetCppLogic(lua_State* L) {
     lua_pushstring(L, "CppLogic");

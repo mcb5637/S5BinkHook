@@ -43,6 +43,11 @@ struct shok_vtable_ED_CLandscape {
 };
 //constexpr int i = offsetof(shok_vtable_ED_CLandscape, GetLandscapePosFromMousePos) / 4;
 
+struct shok_vtable_ED_CCommandAcknowledgements {
+	PADDINGI(3);
+	void(__thiscall* ShowAck)(shok_ED_CCommandAcknowledgements* th, float x, float y);
+};
+
 shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
 {
 	if (i <= 0 || i >= (int)EntityTypes.size())
@@ -508,4 +513,9 @@ static inline void(__thiscall* const playercolors_refresh)(shok_ED_CPlayerColors
 void shok_ED_CPlayerColors::RefreshPlayerColors()
 {
 	playercolors_refresh(this);
+}
+
+void shok_ED_CCommandAcknowledgements::ShowAck(const shok_position& pos)
+{
+	reinterpret_cast<shok_vtable_ED_CCommandAcknowledgements*>(vtable)->ShowAck(this, pos.X, pos.Y);
 }

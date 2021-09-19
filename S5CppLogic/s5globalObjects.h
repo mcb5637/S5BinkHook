@@ -510,6 +510,10 @@ struct shok_ED_CPlayerColors : shok_object {
 	void SetColorByIndex(int i, int c);
 	void RefreshPlayerColors();
 };
+struct shok_ED_CCommandAcknowledgements : shok_object {
+
+	void ShowAck(const shok_position& pos);
+};
 struct shok_ED_CGlobalsBaseEx : shok_object {
 	shok_BB_CIDManagerEx* AnimManager;
 	shok_BB_CIDManagerEx* ModelManager;
@@ -524,8 +528,8 @@ struct shok_ED_CGlobalsBaseEx : shok_object {
 	shok_BBRw_CEngine* RWEngine; // p to BBRw::CEngine
 	PADDINGI(1); // p to ED::CAuras
 	shok_ED_CCameraEx* Camera;
-	PADDINGI(1); // p to ED::CCommandAcknowledgements
-	PADDINGI(1); // p to ED::CEntitiesTypeFlags
+	shok_ED_CCommandAcknowledgements* CommandAcks;
+	PADDINGI(1); // p to ED::CEntitiesTypeFlags // 15
 	PADDINGI(1); // p to ED::CGUIScene
 	PADDINGI(1); // unknown
 	PADDINGI(1); // p to ED::CLight

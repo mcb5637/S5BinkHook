@@ -729,6 +729,13 @@ int l_ui_GetLandscapePosAtScreenPos(lua_State* L) {
 	return 0;
 }
 
+int l_ui_ShowCommandAckAtPos(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	(*shok_ED_CGlobalsBaseEx::GlobalObj)->CommandAcks->ShowAck(p);
+	return 0;
+}
+
 int l_ui_SetGUIState_LuaSelection(lua_State* L) {
 	luaext_assert(L, lua_isfunction(L, 1), "no confirm func");
 	auto* vh = shok_GGUI_CManager::GlobalObj()->C3DViewHandler;
@@ -931,6 +938,7 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "GetWidgetName", &l_ui_GetWidgetName);
 	luaext_registerFunc(L, "SetGUIStateLuaSelection", &l_ui_SetGUIState_LuaSelection);
 	luaext_registerFunc(L, "GetLandscapePosAtScreenPos", &l_ui_GetLandscapePosAtScreenPos);
+	luaext_registerFunc(L, "ShowCommandAcknowledgementAtPosition", &l_ui_ShowCommandAckAtPos);
 
 	if (L == mainmenu_state) {
 		luaext_registerFunc(L, "SetMouseTriggerMainMenu", &l_ui_SetMouseTriggerMainMenu);

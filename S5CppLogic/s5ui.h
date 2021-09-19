@@ -248,7 +248,7 @@ struct shok_GGUI_CManager : shok_object { // size 26*4
 	PADDINGI(5);
 	shok_GGUI_C3DViewHandler* C3DViewHandler; // 6
 	shok_EGL_CGLEGUIInterface* EGUIInterface;
-	shok_GGL_CGLGUIInterface* GUIInterface;
+	shok_GGL_CGLGUIInterface* GUIInterface; // 8
 	shok_EGL_CGLETerrainHiRes* TerrainHiRes;
 private:
 	shok_BB_IPostEvent* PostEvent;
@@ -262,9 +262,6 @@ public:
 	shok_GGUI_CMouseEffect* MouseEffect;
 	lua_State* GameState;
 	shok_CMouseCursorManager* MouseCursorManager;
-
-
-	// last p to CMouseCursorManager (no namespace?), before, p to unknown, p to GGUI::CMouseEffect, vector of p to ?
 
 public:
 	static inline constexpr int vtp = 0x77B2F8;

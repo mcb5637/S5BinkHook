@@ -71,7 +71,7 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    dumpClassSerialization(L, shok_GGUI_CPlaceBuildingState::Identifier);
+    lua_pushnumber(L, (int) &(*shok_ED_CGlobalsBaseEx::GlobalObj)->DisplayProps->CommandAcknowledgementModel);
     return 1;
 }
 

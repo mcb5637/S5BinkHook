@@ -1911,6 +1911,10 @@ function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
 -- @return terrainHeigt
 function CppLogic.UI.GetLandscapePosAtScreenPos(x, y) end
 
+--- shows a command acknowledgement at a given position. (usually shown on move commands).
+-- @param p
+function CppLogic.UI.ShowCommandAcknowledgementAtPosition(p) end
+
 --- gets the main windows client size.
 -- == GUI.GetScreenSize(), but available in main menu.
 -- @return right

@@ -803,9 +803,9 @@ struct shok_GGL_CSettlerMerchantBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CMarketBehavior : shok_EGL_CGLEBehavior {
-	PADDINGI(1); //4
+	PADDINGI(1); //4 probably player
 	int SellResourceType, BuyResourceType;
-	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam+sellam
+	float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam * workamount + sellam * workamount
 
 	// defined events: Market_XXX
 

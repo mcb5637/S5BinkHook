@@ -1859,6 +1859,28 @@ function CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild(wid, name, befo
 -- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
 -- @return id
 function CppLogic.UI.ContainerWidgetCreateContainerWidgetChild(wid, name, before) end
+--- creates a new container widget and registers it as its child.
+-- the widget is initially hidden and all variables at a default value.
+-- all attached functions are empty, and the UpdateManualFlag is set.
+-- position and size are 0.
+-- not all customwidget types were tested by me, use at your own risk. known customwidget types:
+-- - EGUIX::CVideoPlaybackCustomWidget
+--		on first video start clamps the video to the widget size.
+--		if you change size afterwards, it scales the video from the previously clamped size.
+-- @param wid widget
+-- @param name widgetname of the child
+-- @param customclass name of the custom class. may not work properly, if not actually a customwidget.
+-- @param before (optional) if set, the new widget gets moved before this widget in the mothers list (rendering on top of it)
+-- @param icv0 intergerCustomVariable 0 (optional, default 0)
+-- @param icv1 intergerCustomVariable 1 (optional, default 0)
+-- @param icv2 intergerCustomVariable 2 (optional, default 0)
+-- @param icv3 intergerCustomVariable 3 (optional, default 0)
+-- @param icv4 intergerCustomVariable 4 (optional, default 0)
+-- @param icv5 intergerCustomVariable 5 (optional, default 0)
+-- @param scv0 stringCustomVariable 0 (optional, default "")
+-- @param scv1 stringCustomVariable 1 (optional, default "")
+-- @return id
+function CppLogic.UI.ContainerWidgetCreateCustomWidgetChild(wid, name, customclass, before, icv0, icv1, icv2, icv3, icv4, icv5, scv0, scv1) end
 
 --- shows a resources gained floating number at a specific entity.
 -- entity has to be visible, but settlers or rocks work fine.

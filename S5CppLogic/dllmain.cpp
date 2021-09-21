@@ -71,7 +71,7 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    lua_pushnumber(L, (int) &(*shok_ED_CGlobalsBaseEx::GlobalObj)->DisplayProps->CommandAcknowledgementModel);
+    lua_pushnumber(L, (int) luaext_checkEntity(L,1)->GetBehavior<shok_GGL_CMarketBehavior>());
     return 1;
 }
 

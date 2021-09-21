@@ -210,6 +210,12 @@ shok_EGUIX_CContainerWidget* shok_EGUIX_CContainerWidget::Create()
     return r;
 }
 
+static inline void(__thiscall* const customwid_initwid)(shok_EGUIX_CCustomWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CCustomWidget*)>(0x560BA3);
+void shok_EGUIX_CCustomWidget::InitializeCustomWidget()
+{
+    customwid_initwid(this);
+}
+
 static inline void(__thiscall* const showresfloatie)(shok_GGUI_C3DOnScreenInformationCustomWidget* th, int eid, int am) = reinterpret_cast<void(__thiscall*)(shok_GGUI_C3DOnScreenInformationCustomWidget*, int, int)>(0x536361);
 void shok_GGUI_C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(int eid, int amount)
 {

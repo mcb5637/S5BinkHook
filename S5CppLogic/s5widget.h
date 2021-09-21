@@ -73,7 +73,7 @@ struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
 static_assert(sizeof(shok_EGUIX_CLuaFunctionHelper) == 20 * 4);
 
 struct shok_EGUIX_CButtonHelper : shok_object { // size 38
-	PADDINGI(1);
+	PADDINGI(1); // probably current model
 	byte DisabledFlag, HighLightedFlag;
 	PADDING(2);
 	shok_EGUIX_CLuaFunctionHelper ActionFunction;
@@ -101,7 +101,7 @@ struct shok_EGUIX_CToolTipHelper : shok_object { // size 41
 };
 static_assert(sizeof(shok_EGUIX_CToolTipHelper) == 41 * 4);
 
-struct shok_EGUIX_CBaseWidget : shok_object {
+struct shok_EGUIX_CBaseWidget : shok_object { // size 14
 	int vtable_EGUIX_IOnEvent;
 	int UserVariable[2];
 	int WidgetID;
@@ -240,6 +240,23 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 
 	static shok_EGUIX_CProgressBarWidget* Create();
 };
+
+struct shok_EGUIX_CCustomWidget : shok_EGUIX_CBaseWidget {
+	int vtable_EGUIX_IRender;
+	shok_string CustomClassName; // 15
+	void* CustomWidget; // 22 p to EGUIX::ICustomWidget
+	int IntegerUserVariable0DefaultValue, IntegerUserVariable1DefaultValue, IntegerUserVariable2DefaultValue, IntegerUserVariable3DefaultValue,
+		IntegerUserVariable4DefaultValue, IntegerUserVariable5DefaultValue;
+	shok_string StringUserVariable0DefaultValue, StringUserVariable1DefaultValue; //29
+
+	void InitializeCustomWidget();
+
+	static inline constexpr int vtp = 0x7810F8;
+	static inline constexpr int TypeDesc = 0x834820;
+	static inline constexpr unsigned int Identifier = 0x7656DB56;
+};
+constexpr int i = offsetof(shok_EGUIX_CCustomWidget, StringUserVariable0DefaultValue) / 4;
+static_assert(sizeof(shok_EGUIX_CCustomWidget) == 43 * 4);
 
 struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_object {
 	int vtable_EGUIX_ICustomWidget;

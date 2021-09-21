@@ -481,6 +481,31 @@ int l_uiCreateContainerWidget(lua_State* L) {
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
+int l_ui_CreateCustomWidget(lua_State* L) {
+	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	luaext_assertPointer(L, c, "no container widget");
+	const char* name = luaL_checkstring(L, 2);
+	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	shok_EGUIX_CBaseWidget* bef = nullptr;
+	const char* customname = luaL_check_string(L, 3);
+	if (!lua_isnoneornil(L, 4))
+		bef = l_uiCheckWid(L, 4);
+	shok_EGUIX_CCustomWidget* ne = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<shok_EGUIX_CCustomWidget>();
+	c->AddWidget(ne, name, bef);
+	ne->CustomClassName.assign(customname);
+	ne->IntegerUserVariable0DefaultValue = luaL_optint(L, 5, 0);
+	ne->IntegerUserVariable1DefaultValue = luaL_optint(L, 6, 0);
+	ne->IntegerUserVariable2DefaultValue = luaL_optint(L, 7, 0);
+	ne->IntegerUserVariable3DefaultValue = luaL_optint(L, 8, 0);
+	ne->IntegerUserVariable4DefaultValue = luaL_optint(L, 9, 0);
+	ne->IntegerUserVariable5DefaultValue = luaL_optint(L, 10, 0);
+	ne->StringUserVariable0DefaultValue.assign(luaL_optstring(L, 11, ""));
+	ne->StringUserVariable1DefaultValue.assign(luaL_optstring(L, 12, ""));
+	ne->InitializeCustomWidget();
+	lua_pushnumber(L, c->WidgetID);
+	return 1;
+}
 
 int l_uiGetFontValues(lua_State* L) {
 	const char* font = luaL_checkstring(L, 1);
@@ -929,6 +954,7 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "ContainerWidgetCreateTextButtonWidgetChild", &l_uiCreateTextButtonWidget);
 	luaext_registerFunc(L, "ContainerWidgetCreateProgressBarWidgetChild", &l_uiCreateProgessBarWidget);
 	luaext_registerFunc(L, "ContainerWidgetCreateContainerWidgetChild", &l_uiCreateContainerWidget);
+	luaext_registerFunc(L, "ContainerWidgetCreateCustomWidgetChild", &l_ui_CreateCustomWidget);
 	luaext_registerFunc(L, "SetCharTrigger", &l_ui_SetCharTrigger);
 	luaext_registerFunc(L, "SetKeyTrigger", &l_ui_SetKeyTrigger);
 	luaext_registerFunc(L, "SetMouseTrigger", &l_ui_SetMouseTrigger);
@@ -965,3 +991,4 @@ void l_ui_init(lua_State* L)
 // XGUIEng.SetText("StartMenu00_EndGame", "@center @color:0,255,0 test")
 // CppLogic.UI.RemoveWidget("StartMenu00_VersionNumber")
 // CppLogic.UI.SetGUIStateLuaSelection(function(x, y) LuaDebugger.Log(x.."/"..y) end)
+// CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test", "EGUIX::CVideoPlaybackCustomWidget"); XGUIEng.ShowWidget("test", 1); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 250, 250); XGUIEng.StartVideoPlayback("test", "data\\graphics\\videos\\pu_farmer.bik", 1);

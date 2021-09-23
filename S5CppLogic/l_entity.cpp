@@ -1503,6 +1503,81 @@ int l_settler_GetSnipeTarget(lua_State* L) {
 	return 1;
 }
 
+const char* AnimTaskList = "TL_SCRIPT_ANIMATION";
+void l_settler_createAnimTaskList(lua_State* L) {
+	shok_EGL_CGLETaskListMgr* tmng = *shok_EGL_CGLETaskListMgr::GlobalObj;
+	int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
+	if (!tid) {
+		tid = tmng->TaskListManager->GetIDByNameOrCreate(AnimTaskList);
+		shok_EGL_CGLETaskList* tl = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<shok_EGL_CGLETaskList>();
+		tl->TaskListID = tid;
+
+		shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>>& v) {
+			shok_BB_CClassFactory* fact = *shok_BB_CClassFactory::GlobalObj;
+			{
+				shok_EGL_CGLETaskArgsThousandths* t = fact->CreateObject<shok_EGL_CGLETaskArgsThousandths>();
+				t->TaskType = shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE;
+				t->Thousandths = 1000;
+				v.push_back(t);
+			}
+			{
+				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
+				t->TaskType = shok_Task::TASK_SET_BATTLE_IDLE_ANIM;
+				v.push_back(t);
+			}
+			{
+				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
+				t->TaskType = shok_Task::TASK_BATTLE_WAIT_UNTIL;
+				v.push_back(t);
+			}
+			{
+				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
+				t->TaskType = shok_Task::TASK_SET_DEFAULT_REACTION_TYPE;
+				v.push_back(t);
+			}
+			{
+				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
+				t->TaskType = shok_Task::TASK_LIST_DONE;
+				v.push_back(t);
+			}
+			});
+
+		luaext_assert(L, static_cast<int>(tmng->TaskLists.size()) == tid, "ids dont match???");
+		shok_saveVector<shok_EGL_CGLETaskList*>(&tmng->TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>>& v) {
+			v.push_back(tl);
+			});
+		int top = lua_gettop(L);
+		lua_getglobal(L, "TaskLists");
+		lua_pushstring(L, AnimTaskList);
+		lua_pushnumber(L, tid);
+		lua_rawset(L, -3);
+		lua_settop(L, top);
+	}
+}
+int l_settler_playScriptAnim(lua_State* L) {
+	if (HasSCELoader())
+		luaL_error(L, "does not work with SCELoader");
+	l_settler_createAnimTaskList(L);
+	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
+	shok_EGL_CGLETaskArgsAnimation setanim{};
+	setanim.TaskType = shok_Task::TASK_SET_ANIM;
+	setanim.AnimID = (*shok_BB_CIDManagerEx::AnimManager)->GetIdByName(luaL_checkstring(L, 2));
+	luaext_assert(L, setanim.AnimID, "not an animation");
+	setanim.PlayBackwards = luaext_optbool(L, 3, false);
+	shok_EGL_CGLETaskArgs reset{};
+	reset.TaskType = shok_Task::TASK_RESET_TASK_LIST_TIMER;
+	e->ExecuteTask(reset);
+	e->ExecuteTask(setanim);
+	shok_GGL_CGLBehaviorAnimationEx* animbeh = e->GetBehavior<shok_GGL_CGLBehaviorAnimationEx>();
+	animbeh->SpeedModifier = luaL_optfloat(L, 4, 1);
+	animbeh->Duration = static_cast<int>(animbeh->Duration / animbeh->SpeedModifier);
+	shok_GGL_CBattleBehavior* batt = e->GetBehavior<shok_GGL_CBattleBehavior>();
+	if (batt)
+		batt->SetCurrentCommand(shok_LeaderCommand::HeroAbility);
+	e->SetTaskList((*shok_EGL_CGLETaskListMgr::GlobalObj)->TaskListManager->GetIdByName(AnimTaskList));
+	return 0;
+}
+
 
 void l_entity_cleanup(lua_State* L) {
 	l_settlerDisableConversionHook(L);
@@ -1625,6 +1700,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "EnableRangedEffectSoldierHeal", &l_settler_EnableRangedEffectSoldierHeal);
 	luaext_registerFunc(L, "ShurikenGetTarget", &l_settler_GetShurikenTarget);
 	luaext_registerFunc(L, "SniperGetTarget", &l_settler_GetSnipeTarget);
+	luaext_registerFunc(L, "PlayScriptAnimation", &l_settler_playScriptAnim);
 	lua_rawset(L, -3);
 
 	lua_pushstring(L, "Leader");

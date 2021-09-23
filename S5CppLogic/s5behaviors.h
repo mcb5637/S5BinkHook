@@ -427,7 +427,7 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollo
 	int LatestAttackerID, BattleStatus; // la15
 	byte NoMoveNecessary, NormalRangeCheckNecessary;
 	PADDING(2);
-	int Command;
+	shok_LeaderCommand Command;
 	shok_position AttackMoveTarget;
 	byte Helping;
 	PADDING(3);
@@ -446,6 +446,7 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollo
 	static inline constexpr unsigned int Identifier = 0x0C4F1C42D;
 
 	float GetMaxRange();
+	void SetCurrentCommand(shok_LeaderCommand cmd); // only sets the command int, not the tasklist
 };
 
 struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {

@@ -125,6 +125,7 @@ struct shok_EGL_CGLEEntity : shok_object {
 	void SetTaskList(shok_EGL_CGLETaskList* tl);
 	shok_EGL_CGLETaskList* GetCurrentTaskList();
 	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* GetTaskHandler(shok_Task task);
+	void ExecuteTask(shok_EGL_CGLETaskArgs& targ);
 
 	void PerformHeal(int hp, bool healSoldiers);
 

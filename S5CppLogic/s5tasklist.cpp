@@ -5,6 +5,15 @@ struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
     int(__thiscall* ExecuteTask)(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, shok_EGL_CGLETaskArgs* args);
 };
 
+shok_EGL_CGLETaskArgs::shok_EGL_CGLETaskArgs()
+{
+    vtable = shok_EGL_CGLETaskArgs::vtp;
+}
+shok_EGL_CGLETaskArgsAnimation::shok_EGL_CGLETaskArgsAnimation()
+{
+    vtable = shok_EGL_CGLETaskArgsAnimation::vtp;
+}
+
 int shok_EGL_CGLETaskList::GetNumberOfTasks()
 {
     return this->Task.size();

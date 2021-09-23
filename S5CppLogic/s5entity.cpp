@@ -304,6 +304,11 @@ shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* shok_EGL_CGLEEntity::GetTaskHandler(s
 	return shok_entitytaskhandler_gettaskhandler(&TaskHandlers, task);
 }
 
+void shok_EGL_CGLEEntity::ExecuteTask(shok_EGL_CGLETaskArgs& targ)
+{
+	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->ExecuteTask(this, &targ);
+}
+
 void shok_EGL_CGLEEntity::Destroy()
 {
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->Destroy(this, 0);

@@ -267,6 +267,10 @@ struct shok_GGL_CEventEntityAttachment : shok_BB_CEvent {
 	static inline constexpr int TypeDesc = 0x8129E0;
 };
 
+struct shok_EGL_CEventAnimation : shok_BB_CEvent {
+
+};
+
 // GGL::CEventPlayerIDInteger -> EGL::CEventPlayerID 76D964
 // EGL::CEventPositionAndEntity 76E150
 // GGL::CEventSourceTargetPlayerID 76F8BC

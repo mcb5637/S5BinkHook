@@ -12,7 +12,11 @@ struct shok_vtable_GGL_CBehaviorDefaultMovement : shok_vtable_EGL_CGLEBehavior {
 	PADDINGI(1);
 	float(__thiscall* GetSpeed)(shok_GGL_CBehaviorDefaultMovement* m); // 9
 };
-//constexpr int i = offsetof(shok_vtable_GGL_CBehaviorDefaultMovement, GetSpeed) / 4;
+
+struct shok_vtable_GGL_CBattleBehavior : shok_vtable_EGL_CGLEBehavior { // behaviorfollow in between
+	void(__thiscall* SetCommandInt)(shok_GGL_CBattleBehavior* th, shok_LeaderCommand cmd);
+};
+//constexpr int i = offsetof(shok_vtable_GGL_CBattleBehavior, SetCommandInt) / 4;
 
 struct shok_vtable_shok_GGL_CPositionAtResourceFinder {
 	void(__thiscall* Destructor)(shok_GGL_CPositionAtResourceFinder* th, bool free);
@@ -100,6 +104,10 @@ static inline float(__thiscall* const battleBehaviorGetMaxRange)(shok_GGL_CBattl
 float shok_GGL_CBattleBehavior::GetMaxRange()
 {
 	return battleBehaviorGetMaxRange(this);
+}
+void shok_GGL_CBattleBehavior::SetCurrentCommand(shok_LeaderCommand cmd)
+{
+	reinterpret_cast<shok_vtable_GGL_CBattleBehavior*>(vtable)->SetCommandInt(this, cmd);
 }
 
 static inline int(__thiscall* const leaderbehgettroophealth)(shok_GGL_CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBattleBehavior*)>(0x4EE1D6);

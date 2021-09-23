@@ -973,6 +973,16 @@ function CppLogic.Entity.Settler.ShurikenGetTarget(id) end
 -- @return tid
 function CppLogic.Entity.Settler.SniperGetTarget(id) end
 
+--- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
+-- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).
+-- the tasklist TL_SCRIPT_ANIMATION gets created at first use, it may not be there before you call this func.
+-- does not work with SCELoader.
+-- @param id
+-- @param animname string name of the animation (can be copied from entity xml) does not check if the anim matches the model!
+-- @param backwards bool play animation backwards, (optional, default false)
+-- @param speed number speed factor
+function CppLogic.Entity.Settler.PlayScriptAnimation(id, animname, backwards, speed) end
+
 --- a leaders experience.
 -- @param id leader
 -- @return xp

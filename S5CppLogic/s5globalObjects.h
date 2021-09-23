@@ -13,6 +13,8 @@ struct shok_BB_CIDManagerEx : shok_object {
 
 	int GetIdByName(const char* name);
 	const char* GetNameByID(int id);
+	int GetIDByNameOrCreate(const char* name); // throws if id invalid
+	int GetIDByNameOrCreate(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
 
 	static inline shok_BB_CIDManagerEx** const AnimManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C838);
 	static inline shok_BB_CIDManagerEx** const EntityTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x895DC0);

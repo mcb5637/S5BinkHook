@@ -2,10 +2,13 @@
 #include "s5data.h"
 
 struct shok_EGL_CGLETaskArgs : shok_object {
-	shok_Task TaskType;
+    shok_Task TaskType = static_cast<shok_Task>(0);
+
+    shok_EGL_CGLETaskArgs();
 
 	static inline constexpr int vtp = 0x76E10C;
 	static inline constexpr int TypeDesc = 0x8101E8;
+    static inline constexpr unsigned int Identifier = 0x7CE66308;
 };
 
 struct shok_EGL_CGLETaskArgsThousandths : shok_EGL_CGLETaskArgs {
@@ -13,6 +16,7 @@ struct shok_EGL_CGLETaskArgsThousandths : shok_EGL_CGLETaskArgs {
 
 	static inline constexpr int vtp = 0x76E120;
 	static inline constexpr int TypeDesc = 0x810208;
+    static inline constexpr unsigned int Identifier = 0x230862D8;
 };
 
 struct shok_EGL_CGLETaskArgsPosition : shok_EGL_CGLETaskArgs {
@@ -44,13 +48,16 @@ struct shok_GGL_CGLTaskArgsTargetType : shok_EGL_CGLETaskArgs {
 };
 
 struct shok_EGL_CGLETaskArgsAnimation : shok_EGL_CGLETaskArgs {
-	int AnimID;
-	byte PlayBackwards;
+	int AnimID = 0;
+	bool PlayBackwards = false;
 	PADDING(3);
-	int Category;
+	int Category = 0;
+
+    shok_EGL_CGLETaskArgsAnimation();
 
 	static inline constexpr int vtp = 0x772AE8;
 	static inline constexpr int TypeDesc = 0x813A88;
+    static inline constexpr unsigned int Identifier = 0x4D90ECB8;
 };
 
 struct shok_EGL_CGLETaskArgsSubAnim : shok_EGL_CGLETaskArgsAnimation {
@@ -159,7 +166,7 @@ struct shok_GGL_CGLTaskArgsGoodType : shok_EGL_CGLETaskArgs { // unsed
 
 struct shok_EGL_CGLETaskList : shok_object {
 	vector_padding;
-	std::vector<shok_EGL_CGLETaskArgs*> Task;
+	std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>> Task;
 	int TaskListID;
 	int PrincipalTask;
 	char* Script;
@@ -169,12 +176,16 @@ struct shok_EGL_CGLETaskList : shok_object {
 
 	static inline constexpr int vtp = 0x7845FC;
 	static inline constexpr int TypeDesc = 0x836FA8;
+    static inline constexpr unsigned int Identifier = 0xA7170A28;
 };
+static_assert(sizeof(shok_EGL_CGLETaskList) == 8 * 4);
 
 struct shok_EGL_CGLETaskListMgr : shok_object {
-	PADDINGI(3); // pointer to 3 different BB::CIDManagerEx?
+    shok_BB_CIDManagerEx* TaskListManager;
+    shok_BB_CIDManagerEx* TaskManager;
+    shok_BB_CIDManagerEx* WorkCycleManager;
 	vector_padding;
-	std::vector<shok_EGL_CGLETaskList*> TaskLists;
+	std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>> TaskLists;
 
 	shok_EGL_CGLETaskList* GetTaskListByID(int id);
 	const char* GetTaskListNameByID(int i);

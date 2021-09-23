@@ -79,6 +79,7 @@ shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 }
 
 static inline int(__thiscall* const shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name) = reinterpret_cast<int(__thiscall*)(shok_BB_CIDManagerEx * th, const char* name)>(0x54F19E);
+static inline int(__thiscall* const shok_BB_CIDManager_getidbyname)(void* th, const char* name, int nid) = reinterpret_cast<int(__thiscall*)(void*, const char*, int)>(0x54F656);
 int shok_BB_CIDManagerEx::GetIdByName(const char* name) {
 	return shok_getAnimIdByName(this, name);
 }
@@ -88,8 +89,15 @@ const char* shok_BB_CIDManagerEx::GetNameByID(int id)
 		return TypeNames[id].Name;
 	return nullptr;
 }
+int shok_BB_CIDManagerEx::GetIDByNameOrCreate(const char* name, int newid)
+{
+	return shok_BB_CIDManager_getidbyname(this, name, newid);
+}
+int shok_BB_CIDManagerEx::GetIDByNameOrCreate(const char* name)
+{
+	return GetIDByNameOrCreate(name, 0);
+}
 
-static inline int(__thiscall* const shok_BB_CIDManager_getidbyname)(shok_BB_CIDManager* th, const char* name, int nid) = reinterpret_cast<int(__thiscall*)(shok_BB_CIDManager*, const char*, int)>(0x54F656);
 int shok_BB_CIDManager::GetIDByName(const char* name, int newid)
 {
 	return shok_BB_CIDManager_getidbyname(this, name, newid);

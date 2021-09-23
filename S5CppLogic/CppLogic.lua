@@ -980,7 +980,7 @@ function CppLogic.Entity.Settler.SniperGetTarget(id) end
 -- @param id
 -- @param animname string name of the animation (can be copied from entity xml) does not check if the anim matches the model!
 -- @param backwards bool play animation backwards, (optional, default false)
--- @param speed number speed factor
+-- @param speed number speed factor (optional, default 1)
 function CppLogic.Entity.Settler.PlayScriptAnimation(id, animname, backwards, speed) end
 
 --- a leaders experience.

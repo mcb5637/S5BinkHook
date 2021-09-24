@@ -36,6 +36,38 @@ const char* shok_EGL_CGLETaskListMgr::GetTaskListNameByID(int i)
     return shok_CGLETaskListMgr_gettasklistnamebyid(this, i);
 }
 
+int shok_EGL_CGLETaskListMgr::RegisterTaskList(shok_EGL_CGLETaskList* tl, const char* name)
+{
+    int tid = TaskListManager->GetIDByNameOrCreate(name);
+    if (static_cast<int>(TaskLists.size()) != tid)
+        throw std::exception("ids dont match!");
+    tl->TaskListID = tid;
+    shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>>& v) {
+        v.push_back(tl);
+        });
+    return tid;
+}
+void shok_EGL_CGLETaskListMgr::RemoveTaskList(int tid)
+{
+    if (tid) {
+        if (static_cast<int>(TaskLists.size()) != tid + 1)
+            throw std::exception("ids dont match!");
+        shok_EGL_CGLETaskList* tl = GetTaskListByID(tid);
+        shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>>& v) {
+            for (shok_EGL_CGLETaskArgs* p : v) {
+                p->Destructor(true);
+            }
+            v.clear();
+            });
+        tl->Destructor(true);
+        shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>>& v) {
+            v.pop_back();
+            });
+        TaskListManager->RemoveID(tid);
+    }
+}
+
+
 const char* TaskLuaFunc = "TASK_LUA_FUNC";
 const char* TaskWaitForAnimNonCancel = "TASK_WAIT_FOR_ANIM_NON_CANCELABLE";
 void shok_taskData::AddExtraTasks()

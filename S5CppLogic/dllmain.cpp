@@ -71,8 +71,7 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    lua_pushnumber(L, (int) luaext_checkEntity(L,1)->GetBehavior<shok_GGL_CMarketBehavior>());
-    return 1;
+    return 0;
 }
 
 int cleanup(lua_State* L) {

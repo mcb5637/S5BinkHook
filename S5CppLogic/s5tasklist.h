@@ -189,6 +189,8 @@ struct shok_EGL_CGLETaskListMgr : shok_object {
 
 	shok_EGL_CGLETaskList* GetTaskListByID(int id);
 	const char* GetTaskListNameByID(int i);
+    int RegisterTaskList(shok_EGL_CGLETaskList* tl, const char* name);
+    void RemoveTaskList(int tid); // has to be the last tasklist. do not use if anything still uses that tasklist (only intendef for cleanup)
 
 	static inline constexpr int vtp = 0x7845EC;
 	static inline constexpr int TypeDesc = 0x836F84;

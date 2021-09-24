@@ -98,6 +98,22 @@ int shok_BB_CIDManagerEx::GetIDByNameOrCreate(const char* name)
 	return GetIDByNameOrCreate(name, 0);
 }
 
+void shok_BB_CIDManagerEx::RemoveID(int id)
+{
+	shok_saveVector<shok_BB_CIDManagerEx_data>(&TypeNames, [id](std::vector<shok_BB_CIDManagerEx_data, shok_allocator<shok_BB_CIDManagerEx_data>>& v) {
+		shok_free(v.at(id).Name);
+		v[id].Name = nullptr;
+		v[id].Hash = 0;
+		if (id == static_cast<int>(v.size()-1))
+			v.pop_back();
+		});
+}
+static inline void(__stdcall* const idmanager_writemngtoglobal)(lua_State* L, const char* global, shok_BB_CIDManagerEx* mng) = reinterpret_cast<void(__stdcall*)(lua_State*, const char*, shok_BB_CIDManagerEx*)>(0x59C128);
+void shok_BB_CIDManagerEx::DumpManagerToLuaGlobal(lua_State* L, const char* global)
+{
+	idmanager_writemngtoglobal(L, global, this);
+}
+
 int shok_BB_CIDManager::GetIDByName(const char* name, int newid)
 {
 	return shok_BB_CIDManager_getidbyname(this, name, newid);

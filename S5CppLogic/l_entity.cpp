@@ -1508,9 +1508,7 @@ void l_settler_createAnimTaskList(lua_State* L) {
 	shok_EGL_CGLETaskListMgr* tmng = *shok_EGL_CGLETaskListMgr::GlobalObj;
 	int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
 	if (!tid) {
-		tid = tmng->TaskListManager->GetIDByNameOrCreate(AnimTaskList);
 		shok_EGL_CGLETaskList* tl = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<shok_EGL_CGLETaskList>();
-		tl->TaskListID = tid;
 
 		shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>>& v) {
 			shok_BB_CClassFactory* fact = *shok_BB_CClassFactory::GlobalObj;
@@ -1541,17 +1539,23 @@ void l_settler_createAnimTaskList(lua_State* L) {
 				v.push_back(t);
 			}
 			});
-
-		luaext_assert(L, static_cast<int>(tmng->TaskLists.size()) == tid, "ids dont match???");
-		shok_saveVector<shok_EGL_CGLETaskList*>(&tmng->TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>>& v) {
-			v.push_back(tl);
-			});
+		tid = tmng->RegisterTaskList(tl, AnimTaskList);
+		
 		int top = lua_gettop(L);
 		lua_getglobal(L, "TaskLists");
 		lua_pushstring(L, AnimTaskList);
 		lua_pushnumber(L, tid);
 		lua_rawset(L, -3);
 		lua_settop(L, top);
+	}
+}
+void l_settler_cleanupAnimTask(lua_State* L) {
+	shok_EGL_CGLETaskListMgr* tmng = *shok_EGL_CGLETaskListMgr::GlobalObj;
+	if (!tmng)
+		return;
+	int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
+	if (tid) {
+		tmng->RemoveTaskList(tid);
 	}
 }
 int l_settler_playScriptAnim(lua_State* L) {
@@ -1585,6 +1589,7 @@ void l_entity_cleanup(lua_State* L) {
 	shok_EGL_CGLEEntity::AddonDataMap.clear();
 	shok_EGL_CGLEEntity::LastRemovedEntityAddonData.EntityId = 0;
 	shok_EGL_CGLEEntity::HookRangedEffectActivateHeal(false);
+	l_settler_cleanupAnimTask(L);
 }
 
 void l_entity_init(lua_State* L)

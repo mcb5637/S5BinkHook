@@ -240,6 +240,9 @@ struct shok_position {
 	bool IsInRange(const shok_position& p, float range);
 	// returns deg
 	float GetAngleBetween(shok_position& p);
+
+	shok_position operator+(const shok_position& other) const;
+	shok_position operator-(const shok_position& other) const;
 };
 
 struct shok_positionRot : shok_position {
@@ -332,6 +335,7 @@ enum class win_mouseEvents : int {
 #include "s5entitytype.h"
 #include "s5behaviors.h"
 #include "s5entity.h"
+#include "s5entitydisplay.h"
 #include "s5events.h"
 #include "s5effects.h"
 #include "s5player.h"

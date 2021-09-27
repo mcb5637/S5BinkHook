@@ -185,8 +185,16 @@ function CppLogic.Logic.LandscapeGetTerrainVertexColor(p) end
 --- gets the blocking of a position.
 -- height resolution (pos/100), input full pos.
 -- @param p
--- @return blocking info bitfield
+-- @return blocking info bitfield (Blocking -> 1, BridgeArea -> 2, BuildBlock -> 4, TerrainSlope -> 8)
 function CppLogic.Logic.LandscapeGetBlocking(p) end
+--- gets the bridge height of a position.
+-- quads resolution (pos/100/4), input full pos.
+-- is 0 if not set by a bridge that was there at some point.
+-- bridges set the height in a rect +500, the dont seem to remove the heigth.
+-- to check if bridge height is active, use CppLogic.Logic.LandscapeGetBlocking.
+-- @param p
+-- @return bridge height
+function CppLogic.Logic.LandscapeGetBridgeHeight(p) end
 
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
 -- also sets the hero as attacker on bomb explode.

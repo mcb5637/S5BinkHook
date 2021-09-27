@@ -135,7 +135,8 @@ public:
 //constexpr int i = offsetof(shok_GGL_CGLBuildingProps, BuildOn) / 4;
 
 struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
-	shok_AARect BridgeArea;
+	vector_padding;
+	std::vector<shok_AARect, shok_allocator<shok_AARect>> BridgeArea;
 	int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
 
 	static inline constexpr int vtp = 0x778148;

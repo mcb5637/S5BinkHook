@@ -10,12 +10,13 @@ struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
 	void(__thiscall* CopyDataFromCreator)(shok_EGL_CGLEEntity* th, shok_EGL_CGLEEntityCreator* cr); // 5
 	PADDINGI(1);
 	void(__thiscall* InitializeEntity)(shok_EGL_CGLEEntity* th); // dont use outside of createentity
-	PADDINGI(1);
+	void(__thiscall* InitializeAfterSaveLoad)(shok_EGL_CGLEEntity* th); // dont use outside of save load
 	void(__thiscall* FireOnCreatedTriggers)(shok_EGL_CGLEEntity* th); // 9, script trigger + scriptcommandline
-	void(__thiscall* SetPosition)(shok_EGL_CGLEEntity* th, shok_position* p); // 10 works for settlers, check if it does for other stuff to
-	PADDINGI(1);
+	void(__thiscall* SetPosition)(shok_EGL_CGLEEntity* th, shok_position* p); // 10 works for settlers, check if it does for other stuff to, called every tick
+	void(__thiscall* SetRotation)(shok_EGL_CGLEEntity* th, float r);
 	int(__thiscall* GetSector)(shok_EGL_CGLEEntity* th); // 12
-	PADDINGI(2);
+	bool(__thiscall* IsInSector)(shok_EGL_CGLEEntity* th, int sector);
+	PADDINGI(1); // maybe execute task?/ontick?, settler update auras
 	void(__thiscall* ExecuteTask)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_BB_CEvent* d); // 16
 	void(__thiscall* AddBehavior)(shok_EGL_CGLEEntity* th, shok_EGL_CGLEBehavior* bh); // 17 probably not usable outside of createentity
@@ -23,11 +24,12 @@ struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
 	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
 	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, shok_EventIDs eventid, shok_EGL_IGLEHandler_BB_CEvent_void* eventhandler); // 20
 	void(__thiscall* AddStateHandler)(shok_EGL_CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
-	PADDINGI(2);
+	void(__thiscall* GetApproachPos)(shok_EGL_CGLEEntity* th, shok_position* outpos);
+	float(__thiscall* GetApproachRot)(shok_EGL_CGLEEntity* th);
 	void(__thiscall* SetTaskState)(shok_EGL_CGLEEntity* th, shok_TaskState state); // 24
 	PADDINGI(3);
 	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
-	PADDINGI(5);
+	PADDINGI(5); // get flags as float, then jmp to 33
 	bool(__thiscall* CanCancelCurrentState)(shok_EGL_CGLEEntity* e); // 34
 };
 //constexpr int i = offsetof(shok_vtable_EGL_CGLEEntity, CanCancelCurrentState) / 4;
@@ -967,7 +969,7 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 	getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsWorker };
 	FireEvent(&getbool);
 	if (attacker) {
-		if (!getbool.Data || !(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, 1)) {
+		if (!getbool.Data || !(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, shok_EGL_CGLELandscape::BlockingMode::Blocked)) {
 			if (!ArePlayersFriendly(PlayerId, attacker->PlayerId)) {
 				shok_EGL_CEvent1Entity ev{ shok_EventIDs::OnAttackedBy, attacker->EntityId };
 				FireEvent(&ev);

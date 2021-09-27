@@ -177,16 +177,16 @@ void shok_EGL_CGLETerrainHiRes::SetTerrainHeight(shok_position& p, int h)
 	terrhires_setheight(this, qp, h);
 }
 
-void shok_EGL_CGLETerrainLowRes::ToQuadCoord(shok_position& p, int* out)
+void shok_EGL_CGLETerrainLowRes::ToQuadCoord(const shok_position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100) / 4);
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100) / 4);
 }
-bool shok_EGL_CGLETerrainLowRes::IsCoordValid(int* out)
+bool shok_EGL_CGLETerrainLowRes::IsCoordValid(const int* out)
 {
 	return out[0] >= 0 && out[1] >= 0 && out[0] < MaxSizeX && out[1] < MaxSizeY;
 }
-int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(shok_position& p)
+int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(const shok_position& p)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -195,7 +195,7 @@ int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(shok_position& p)
 	return Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0xFF;
 }
 void(__thiscall* const terrlores_settty)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x58BBCE);
-void shok_EGL_CGLETerrainLowRes::SetTerrainTypeAt(shok_position& p, int tty)
+void shok_EGL_CGLETerrainLowRes::SetTerrainTypeAt(const shok_position& p, int tty)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -203,7 +203,7 @@ void shok_EGL_CGLETerrainLowRes::SetTerrainTypeAt(shok_position& p, int tty)
 		DEBUGGER_BREAK;
 	terrlores_settty(this, qp, tty);
 }
-int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(shok_position& p)
+int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(const shok_position& p)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -212,7 +212,7 @@ int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(shok_position& p)
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3F00) >> 8;
 }
 void(__thiscall* const terrlores_setwty)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x591BB9);
-void shok_EGL_CGLETerrainLowRes::SetWaterTypeAt(shok_position& p, int wty)
+void shok_EGL_CGLETerrainLowRes::SetWaterTypeAt(const shok_position& p, int wty)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -220,7 +220,7 @@ void shok_EGL_CGLETerrainLowRes::SetWaterTypeAt(shok_position& p, int wty)
 		DEBUGGER_BREAK;
 	terrlores_setwty(this, qp, wty);
 }
-int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(shok_position& p)
+int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(const shok_position& p)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -229,13 +229,33 @@ int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(shok_position& p)
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3FFFC000) >> 14;
 }
 void(__thiscall* const terrlores_setwh)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x591B82);
-void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(shok_position& p, int wh)
+void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(const shok_position& p, int wh)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	terrlores_setwh(this, qp, wh);
+}
+int shok_EGL_CGLETerrainLowRes::GetBridgeHeight(const shok_position& p)
+{
+	int qp[2] = { 0,0 };
+	ToQuadCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	return BridgeHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
+}
+void shok_EGL_CGLETerrainLowRes::SetBridgeHeight(const shok_position& p, int bh)
+{
+	int qp[2] = { 0,0 };
+	ToQuadCoord(p, qp);
+	if (!IsCoordValid(qp))
+		DEBUGGER_BREAK;
+	BridgeHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] = bh;
+}
+inline int* shok_EGL_CGLETerrainLowRes::GetBridgeHeightP(const int* qp)
+{
+	return &BridgeHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
 }
 
 static inline int(__thiscall* const shokLandscape_getSector)(shok_EGL_CGLELandscape* th, const shok_position* p) = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*)>(0x5778BE);
@@ -275,10 +295,63 @@ shok_position shok_EGL_CGLELandscape::GetMapSize()
 	shok_EGL_CGLELandscape_getsize(this, &r);
 	return r;
 }
-static inline bool(__thiscall* const shok_EGL_CGLELandscape_isposblockedinmode)(shok_EGL_CGLELandscape* ls, const shok_position* p, int* mode) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, int*)>(0x57772E);
-bool shok_EGL_CGLELandscape::IsPosBlockedInMode(const shok_position* p, int mode)
+static inline bool(__thiscall* const shok_EGL_CGLELandscape_isposblockedinmode)(shok_EGL_CGLELandscape* ls, const shok_position* p, shok_EGL_CGLELandscape::BlockingMode* mode) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, shok_EGL_CGLELandscape::BlockingMode*)>(0x57772E);
+bool shok_EGL_CGLELandscape::IsPosBlockedInMode(const shok_position* p, BlockingMode mode)
 {
 	return shok_EGL_CGLELandscape_isposblockedinmode(this, p, &mode);
+}
+static inline void(__thiscall* const shok_EGL_CGLELandscape_flattenpos)(shok_EGL_CGLELandscape* th, const shok_position* p, const shok_position* a, const shok_position* b, float r) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, const shok_position*, const shok_position*, float)>(0x579AFA);
+void shok_EGL_CGLELandscape::FlattenPosForBuilding(const shok_position& p, const shok_AARect& area, float rot)
+{
+	shok_EGL_CGLELandscape_flattenpos(this, &p, &area.low, &area.high, rot);
+}
+static inline void(__thiscall* const shok_EGL_CGLELandscape_applyblocking)(shok_EGL_CGLELandscape* th, const shok_position* p, const shok_position* a, const shok_position* b, float r, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, const shok_position*, const shok_position*, float, shok_EGL_CGLELandscape::BlockingMode*)>(0x577A82);
+void shok_EGL_CGLELandscape::ApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+{
+	shok_EGL_CGLELandscape_applyblocking(this, &p, &area.low, &area.high, rot, &blockingmode);
+}
+static inline void(__thiscall* const shok_EGL_CGLELandscape_remblocking)(shok_EGL_CGLELandscape* th, const shok_position* p, const shok_position* a, const shok_position* b, float r, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, const shok_position*, const shok_position*, float, shok_EGL_CGLELandscape::BlockingMode*)>(0x577B41);
+void shok_EGL_CGLELandscape::RemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+{
+	shok_EGL_CGLELandscape_remblocking(this, &p, &area.low, &area.high, rot, &blockingmode);
+}
+void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height)
+{
+	shok_position pl = area.low;
+	shok_position ph = area.high;
+	// todo rotate positions
+	if (pl.X > ph.X)
+		std::swap(pl.X, ph.X);
+	if (pl.Y > ph.Y)
+		std::swap(pl.Y, ph.Y);
+	pl = p - pl;
+	ph = p + ph;
+
+	int low[2] = { 0,0 };
+	int high[2] = { 0,0 };
+	LowRes->ToQuadCoord(pl, low);
+	LowRes->ToQuadCoord(ph, high);
+
+	int curr[2];
+	for (curr[1] = low[1] - 4; curr[1] < high[1] + 4; curr[1]++) {
+		for (curr[0] = low[0] - 4; curr[0] < high[0] + 4; curr[0]++) {
+			if (!LowRes->IsCoordValid(curr))
+				continue;
+			shok_position bch = { static_cast<float>(curr[1] * 100 * 4), static_cast<float>(curr[0] * 100 * 4) };
+			bool before = IsPosBlockedInMode(&bch, BlockingMode::BridgeArea);
+			bool toadd = !(curr[1] < low[1] || curr[1] > high[1] || curr[0] < low[0] || curr[0] > high[0]);
+			int* h = LowRes->GetBridgeHeightP(curr);
+			if (!before) {
+				*h = height;
+			}
+			else if (toadd) {
+				*h = max(*h, height);
+			}
+		}
+	}
+
+	ApplyBlocking(p, area, 0, BlockingMode::BridgeArea); // set r after implememting rotation
+	RemoveBlocking(p, area, 0, BlockingMode::Blocked);
 }
 
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
@@ -324,7 +397,7 @@ void shok_EGL_CGLEGameLogic::HookCreateEffect()
 }
 
 
-void shok_ED_CGlobalsLogicEx::ToTerrainCoord(shok_position& p, int* out)
+void shok_ED_CGlobalsLogicEx::ToTerrainCoord(const shok_position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
@@ -333,13 +406,13 @@ bool shok_ED_CGlobalsLogicEx::IsCoordValid(int* out)
 {
 	return out[0] >= 0 && out[1] >= 0 && out[0] < Blocking->ArraySizeXY && out[1] < Blocking->ArraySizeXY;
 }
-int shok_ED_CGlobalsLogicEx::GetBlocking(shok_position& p)
+shok_EGL_CGLELandscape::BlockingMode shok_ED_CGlobalsLogicEx::GetBlocking(const shok_position& p)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
-	return Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]];
+	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]]);
 }
 bool shok_ED_CLandscape::GetTerrainPosAtScreenCoords(shok_positionRot& outpos, int x, int y)
 {

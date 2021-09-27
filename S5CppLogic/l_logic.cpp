@@ -791,7 +791,13 @@ int l_logicLandscapeGetTerrainVertexColor(lua_State* L) {
 int l_logicLandscapeGetBlocking(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_ED_CGlobalsLogicEx::GlobalObj)->GetBlocking(p));
+	lua_pushnumber(L, static_cast<int>((*shok_ED_CGlobalsLogicEx::GlobalObj)->GetBlocking(p)));
+	return 1;
+}
+int l_logicLandscapeGetBridgeHeight(lua_State* L) {
+	shok_position p;
+	luaext_checkPos(L, p, 1);
+	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetBridgeHeight(p));
 	return 1;
 }
 
@@ -1228,6 +1234,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "LandscapeGetTerrainHeight", &l_logicLandscapeGetTerrainHeight);
 	luaext_registerFunc(L, "LandscapeGetTerrainVertexColor", &l_logicLandscapeGetTerrainVertexColor);
 	luaext_registerFunc(L, "LandscapeGetBlocking", &l_logicLandscapeGetBlocking);
+	luaext_registerFunc(L, "LandscapeGetBridgeHeight", &l_logicLandscapeGetBridgeHeight);
 	luaext_registerFunc(L, "GetColorByColorIndex", &l_logicGetColor);
 	luaext_registerFunc(L, "SetColorByColorIndex", &l_logicSetColor);
 	luaext_registerFunc(L, "SetPaydayCallback", &l_logicEnablePlayerPaydayCallback);

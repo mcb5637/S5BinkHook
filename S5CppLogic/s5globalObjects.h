@@ -113,28 +113,40 @@ struct shok_EGL_CGLETerrainHiRes : shok_object {
 	void SetTerrainHeight(shok_position& p, int h); // int16
 };
 struct shok_EGL_CGLETerrainLowRes : shok_object {
-	vector_padding
-		std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
-	PADDINGI(4); // 1 vectors of int
+	friend struct shok_EGL_CGLELandscape;
+	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
+	vector_padding;
+	std::vector<int, shok_allocator<int>> BridgeHeights;
 	int MaxSizeX, MaxSizeY; // 9
 	int ArraySizeX, ArraySizeY; // 11
 
 	static inline constexpr int vtp = 0x7837C0;
 
-	void ToQuadCoord(shok_position& p, int* out);
-	bool IsCoordValid(int* out);
-	int GetTerrainTypeAt(shok_position& p);
-	void SetTerrainTypeAt(shok_position& p, int tty); // byte (int8)
-	int GetWaterTypeAt(shok_position& p);
-	void SetWaterTypeAt(shok_position& p, int wty); // int6
-	int GetWaterHeightAt(shok_position& p);
-	void SetWaterHeightAt(shok_position& p, int wh); // int16
+	void ToQuadCoord(const shok_position& p, int* out);
+	bool IsCoordValid(const int* out);
+	int GetTerrainTypeAt(const shok_position& p);
+	void SetTerrainTypeAt(const shok_position& p, int tty); // byte (int8)
+	int GetWaterTypeAt(const shok_position& p);
+	void SetWaterTypeAt(const shok_position& p, int wty); // int6
+	int GetWaterHeightAt(const shok_position& p);
+	void SetWaterHeightAt(const shok_position& p, int wh); // int16
+	int GetBridgeHeight(const shok_position& p);
+	void SetBridgeHeight(const shok_position& p, int bh);
+private:
+	inline int* GetBridgeHeightP(const int* c);
 };
 struct shok_EGL_CGLELandscape_blockingData {
 	int ArraySizeXY;
 	byte* data;
 };
 struct shok_EGL_CGLELandscape : shok_object {
+	enum class BlockingMode : byte {
+		Blocked = 0x1,
+		BridgeArea = 0x2,
+		BuildBlock = 0x4,
+		TerrainSlope = 0x8,
+	};
+
 	shok_EGL_CGLELandscape_blockingData* BlockingData;
 	PADDINGI(5); // p 0, p EGL::CTiling, set/list of BB::TSlotEx1<EGL::CGLEGameLogic,EGL::C2DVector const &>
 	shok_EGL_CGLETerrainHiRes* HiRes;
@@ -148,8 +160,14 @@ struct shok_EGL_CGLELandscape : shok_object {
 	shok_position GetNearestFreePos(const shok_position* p, float range);
 	bool IsValidPos(shok_position* p);
 	shok_position GetMapSize();
-	bool IsPosBlockedInMode(const shok_position* p, int mode);
+	bool IsPosBlockedInMode(const shok_position* p, BlockingMode mode);
+	void FlattenPosForBuilding(const shok_position& p, const shok_AARect& area, float rot);
+	// block for vector of aarect: thiscall 577B07 (this, pos*, vector<aarect>*, float, byte*)
+	void ApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
+	void RemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
+	void AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height);
 };
+//constexpr int i = sizeof(byte*);
 
 // game logic
 struct shok_EGL_CGLEGameLogic : shok_object {
@@ -180,18 +198,20 @@ struct shok_EGL_CRegionInfo : shok_object {
 	static inline constexpr int vtp = 0x783878;
 };
 struct shok_ED_CGlobalsLogicEx : shok_object {
-	PADDINGI(5);
+	shok_EGL_CGLEGameLogic* GameLogic;
+	PADDINGI(5); // p EGL::CGLEGameLogic, p EGL::CGLEEntitiesDisplay, p EGL::CGLEEffectsDisplay, p EGL::CGLETerrainHiRes, p EGL::CGLETerrainLowRes
 	shok_EGL_CGLELandscape_blockingData *Blocking; // 6
-	PADDINGI(2);
+	PADDINGI(2); // p EGL::CGLELandscape, p EGL::CTerrainVertexColors
 	shok_EGL_CRegionInfo* RegionInfo; // 9
-	PADDINGI(1);
+	PADDINGI(1); // p EGL::CPlayerExplorationHandler
 	shok_ED_CLandscape* Landscape;
+	// p ED::CLandscapeFogOfWar, 
 
 	static inline constexpr int vtp = 0x769F74;
 
-	void ToTerrainCoord(shok_position& p, int* out);
+	void ToTerrainCoord(const shok_position& p, int* out);
 	bool IsCoordValid(int* out);
-	int GetBlocking(shok_position& p);
+	shok_EGL_CGLELandscape::BlockingMode GetBlocking(const shok_position& p);
 
 	static inline shok_ED_CGlobalsLogicEx** const GlobalObj = reinterpret_cast<shok_ED_CGlobalsLogicEx**>(0x8581EC);
 };
@@ -541,6 +561,7 @@ struct shok_ED_CGlobalsBaseEx : shok_object {
 	PADDINGI(1); // p to ED::COcclusionEffect
 	PADDINGI(1); // p to ED::COrnamentalItems
 	shok_ED_CPlayerColors* PlayerColors; // 22
+	// 26 p ED::CResourceManager
 
 	static inline constexpr int vtp = 0x769478;
 

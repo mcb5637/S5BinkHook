@@ -76,7 +76,7 @@ float shok_position::GetAngleBetween(shok_position& p)
 	if (dx == 0 && dy == 0)
 		return 0;
 	float a = std::asinf(std::fabsf(dx) / (std::sqrtf(dx * dx + dy * dy)));
-	a = (float)rad2deg((double)a);
+	a = rad2deg<float>(a);
 	if (dx >= 0 && dy > 0)
 		a = 270 - a;
 	else if (dx < 0 && dy > 0)
@@ -86,6 +86,15 @@ float shok_position::GetAngleBetween(shok_position& p)
 	else if (dx >= 0 && dy <= 0)
 		a = 90 + a;
 	return a;
+}
+
+shok_position shok_position::operator+(const shok_position& other) const
+{
+	return { this->X + other.X, this->Y + other.Y };
+}
+shok_position shok_position::operator-(const shok_position& other) const
+{
+	return { this->X - other.X, this->Y - other.Y };
 }
 
 void RedirectCall(void* call, void* redirect) {

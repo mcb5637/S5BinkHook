@@ -23,6 +23,27 @@ struct shok_vtable_BB_IPostEvent {
 	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev);
 };
 
+struct shok_vtable_ERwTools_CRpClumpRenderable {
+	void(__thiscall* SetBuildingColoredRed)(shok_ERwTools_CRpClumpRenderable* th, int flag);
+	PADDINGI(3);
+	void(__thiscall* SetPosition)(shok_ERwTools_CRpClumpRenderable* th, float x, float y, float z);
+	PADDINGI(1);
+	void(__thiscall* SetModelData)(shok_ERwTools_CRpClumpRenderable* th, const shok_modeldata* model, float rot);
+};
+
+void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeldata, float rotation)
+{
+	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata, rotation);
+}
+void shok_ERwTools_CRpClumpRenderable::SetPosition(const shok_position& p, float z)
+{
+	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetPosition(this, p.X, p.Y, z);
+}
+void shok_ERwTools_CRpClumpRenderable::SetBuildingRedColor(bool r)
+{
+	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetBuildingColoredRed(this, r);
+}
+
 static inline void(__thiscall*const c3dviewhandler_setguistate)(shok_GGUI_C3DViewHandler* th, unsigned int id, shok_GGUI_SStateParameters* p) = reinterpret_cast<void(__thiscall*)(shok_GGUI_C3DViewHandler*, unsigned int, shok_GGUI_SStateParameters*)>(0x52820C);
 void shok_GGUI_C3DViewHandler::SetGUIStateByIdentifier(unsigned int identifier)
 {

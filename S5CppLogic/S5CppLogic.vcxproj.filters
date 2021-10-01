@@ -221,6 +221,9 @@
     <ClCompile Include="s5ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="s5entitydisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">

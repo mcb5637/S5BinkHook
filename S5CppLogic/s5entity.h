@@ -45,7 +45,11 @@ enum class AdvancedDealDamageSource : int {
 	Script = 25,
 };
 
-struct shok_EGL_CGLEEntity : shok_object {
+struct shok_IEntityDisplay { // warning: you have to dymamic cast this! , entity offsets dont match
+	static inline constexpr int TypeDesc = 0x810C10;
+};
+
+struct shok_EGL_CGLEEntity : shok_object, shok_IEntityDisplay {
 	PADDINGI(1);
 	int EntityId;
 	PADDINGI(1); // some type of flags
@@ -203,7 +207,7 @@ protected:
 	// defined tasks: TASK_RESET_TASK_LIST_TIMER, TASK_SET_MODEL, TASK_PLAY_SOUND, TASK_STOP_SOUND
 	// defined states: SetNextTaskList
 };
-//constexpr int i = offsetof(shok_EGL_CGLEEntity, TaskHandlers) / 4;
+//constexpr int i = sizeof(shok_EGL_CGLEEntity) / 4;
 struct shok_GGL_CBuilding;
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	shok_position TargetPosition; // la67

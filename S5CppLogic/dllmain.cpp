@@ -71,17 +71,29 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    shok_position p;
-    shok_AARect r = { 500,500,-500, -500 };
-    luaext_checkPos(L, p, 1);
-    p.FloorToBuildingPlacement();
+    if (lua_isnumber(L, 1)) {
+        shok_modelinstance* m =(shok_modelinstance *) luaL_checkint(L, 1);
+        m->Destroy();
+        return 0;
+    }
+
     auto* ls = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape;
-    shok_EGL_CGLELandscape::BlockingMode bl = (shok_EGL_CGLELandscape::BlockingMode)luaL_checkint(L, 2);
+    shok_position p;
+    luaext_checkPos(L, p, 1);
+    /*shok_AARect r = { 500,500,-500, -500 };
+    p.FloorToBuildingPlacement();
+    shok_EGL_CGLELandscape::BlockingMode bl = (shok_EGL_CGLELandscape::BlockingMode)luaL_checkint(L, 2);*/
     int h = luaL_checkint(L, 2) + ls->HiRes->GetTerrainHeight(p);
     /*void(__thiscall * func)(void* d, shok_position * p, shok_position* a, shok_position* b, float r, shok_EGL_CGLELandscape::BlockingMode * bl) = (void(__thiscall*)(void*, shok_position*, shok_position*, shok_position*, float, shok_EGL_CGLELandscape::BlockingMode*))0x577B41;
     func(ls, & p, &r.low, &r.high, 0, &bl);*/
-    ls->AdvancedApplyBridgeHeight(p, r, 0, h);
-    return 0;
+    //ls->AdvancedApplyBridgeHeight(p, r, 0, h);
+    shok_modelinstance* m = (*shok_ED_CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(luaL_checkint(L, 3))->Instanciate();
+    m->SetRotation(0);
+    m->SetScale(1);
+    m->SetPosition(p, h);
+    m->Register();
+    lua_pushnumber(L, (int)m);
+    return 1;
 }
 
 int cleanup(lua_State* L) {

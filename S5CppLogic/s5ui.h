@@ -201,6 +201,15 @@ struct shok_GGUI_CCutsceneState : shok_GGUI_CState {
 	static inline constexpr unsigned int Identifier = 0xD33F4188;
 };
 
+struct shok_ERwTools_CRpClumpRenderable : shok_object {
+
+	static inline constexpr int vtp = 0x7AEBF8;
+
+	void SetModelData(const shok_modeldata* modeldata, float rotation);
+	void SetPosition(const shok_position& p, float z);
+	void SetBuildingRedColor(bool r);
+};
+
 struct shok_stateidandcommandstate {
 	int Id;
 	shok_GGUI_CState* State;
@@ -210,7 +219,7 @@ struct shok_GGUI_C3DViewHandler : shok_object {
 	shok_BB_CIDManager* StateIdManager;
 	int* IPicker; // ERwTools::IPicker
 	int* IPlacer; // ERwTools::IPlacer
-	int* ClumpRenerable; // ERwTools::CRpClumpRenderable, maybe ERwTools::IRenderable
+	shok_ERwTools_CRpClumpRenderable* ClumpRenerable;
 	PADDINGI(2); // probably pos mouseover
 	int MouseX, MouseY;
 

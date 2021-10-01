@@ -191,8 +191,18 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 };
 
 struct shok_ED_CLandscape : shok_object {
+	shok_EGL_CGLETerrainHiRes* TerrainHiRes;
+	shok_EGL_CGLETerrainLowRes* TerrainLowRes;
+	shok_EGL_CGLELandscape_blockingData* Blocking;
+	int SizeDiv32X, SizeDiv32Y;
+	int HiResSizeX, HiResSizeY;
+	float WorldSizeX, WorldSizeY;
+
+	static inline constexpr int vtp = 0x76A404;
+
 	bool GetTerrainPosAtScreenCoords(shok_positionRot& outpos, int x, int y); // r in this case is the terrain height at the position
 };
+static_assert(sizeof(shok_ED_CLandscape) == 10 * 4);
 
 struct shok_EGL_CRegionInfo : shok_object {
 	static inline constexpr int vtp = 0x783878;
@@ -206,6 +216,8 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 	PADDINGI(1); // p EGL::CPlayerExplorationHandler
 	shok_ED_CLandscape* Landscape;
 	// p ED::CLandscapeFogOfWar, 
+	PADDINGI(6);
+	shok_ED_CVisibleEntityManager* VisibleEntityManager; // 19
 
 	static inline constexpr int vtp = 0x769F74;
 
@@ -215,6 +227,7 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 
 	static inline shok_ED_CGlobalsLogicEx** const GlobalObj = reinterpret_cast<shok_ED_CGlobalsLogicEx**>(0x8581EC);
 };
+//constexpr int i = offsetof(shok_ED_CGlobalsLogicEx, VisibleEntityManager) / 4;
 
 // entity manager
 struct shok_EGL_CGLEEntityManager : shok_object {
@@ -538,6 +551,33 @@ struct shok_ED_CCommandAcknowledgements : shok_object {
 
 	void ShowAck(const shok_position& pos);
 };
+struct shok_modelinstance {
+	PADDINGI(1);
+	void* Loc;
+
+	void Register();
+	void Destroy();
+	void SetRotation(float r);
+	void SetScale(float* s); // 3 coordinates (order?)
+	void SetScale(float s);
+	void SetPosition(const shok_position& p, float height);
+};
+struct shok_modeldata {
+
+	shok_modelinstance* Instanciate() const;
+};
+struct shok_ED_CResourceManager : shok_object {
+	PADDINGI(1); // conat char**?
+	void* ModelData; // most likely a vector
+	PADDINGI(3);
+
+	const shok_modeldata* GetModelData(int modelid);
+};
+struct shok_ED_CWorld : shok_object {
+	void* SomeRenderObj;
+
+	static inline constexpr int vtp = 0x769E94;
+};
 struct shok_ED_CGlobalsBaseEx : shok_object {
 	shok_BB_CIDManagerEx* AnimManager;
 	shok_BB_CIDManagerEx* ModelManager;
@@ -561,10 +601,13 @@ struct shok_ED_CGlobalsBaseEx : shok_object {
 	PADDINGI(1); // p to ED::COcclusionEffect
 	PADDINGI(1); // p to ED::COrnamentalItems
 	shok_ED_CPlayerColors* PlayerColors; // 22
-	// 26 p ED::CResourceManager
+	PADDINGI(3);
+	shok_ED_CResourceManager* ResManager; // 26
+	PADDINGI(7);
+	shok_ED_CWorld* DisplayWorld;
 
 	static inline constexpr int vtp = 0x769478;
 
 	static inline shok_ED_CGlobalsBaseEx** const GlobalObj = reinterpret_cast<shok_ED_CGlobalsBaseEx**>(0x857E8C);
 };
-//constexpr int i = offsetof(shok_ED_CGlobalsBaseEx, RWEngine) / 4;
+//constexpr int i = offsetof(shok_ED_CGlobalsBaseEx, DisplayWorld) / 4;

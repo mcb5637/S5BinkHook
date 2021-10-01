@@ -38,8 +38,13 @@ struct shok_vtable_shok_BB_CFileSystemMgr {
 //constexpr int i = offsetof(shok_vtable_shok_BB_CFileSystemMgr, OpenAsFileHandle);
 
 struct shok_vtable_ED_CLandscape {
-	PADDINGI(5);
+	void(__thiscall* Destroy)(shok_ED_CLandscape* th, bool free);
+	PADDINGI(1); // concurrency ref counter destroy?
+	float(__thiscall* GetTerrainHeightAtPos)(shok_ED_CLandscape* th, float x, float y);
+	float(__thiscall* GetWaterHeightAtPos)(shok_ED_CLandscape* th, float x, float y);
+	float(__thiscall* GetHigherTerrainOrWaterHeightAtPos)(shok_ED_CLandscape* th, float x, float y);
 	bool(__thiscall* GetLandscapePosFromMousePos)(shok_ED_CLandscape* th, void* cam, float* mousepos, shok_positionRot* outpos, int flag);
+	PADDINGI(1); // ret 0.0f, thiscall 3 args
 };
 //constexpr int i = offsetof(shok_vtable_ED_CLandscape, GetLandscapePosFromMousePos) / 4;
 
@@ -47,6 +52,13 @@ struct shok_vtable_ED_CCommandAcknowledgements {
 	PADDINGI(3);
 	void(__thiscall* ShowAck)(shok_ED_CCommandAcknowledgements* th, float x, float y);
 };
+
+struct shok_vtable_ED_CResourceManager {
+	PADDINGI(6);
+	shok_modeldata* (__thiscall* GetModelDataByEntityType)(shok_ED_CResourceManager* th, int ety); // 6
+	shok_modeldata* (__thiscall* GetModelDataByModelID)(shok_ED_CResourceManager* th, int mid);
+};
+//constexpr int i = offsetof(shok_vtable_ED_CResourceManager, GetModelDataByModelType) / 4;
 
 shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
 {
@@ -615,4 +627,53 @@ void shok_ED_CPlayerColors::RefreshPlayerColors()
 void shok_ED_CCommandAcknowledgements::ShowAck(const shok_position& pos)
 {
 	reinterpret_cast<shok_vtable_ED_CCommandAcknowledgements*>(vtable)->ShowAck(this, pos.X, pos.Y);
+}
+
+static inline void(__cdecl* const registermodelinst)(void* robj, shok_modelinstance* i) = reinterpret_cast<void(__cdecl*)(void*, shok_modelinstance*)>(0x627130);
+void shok_modelinstance::Register()
+{
+	registermodelinst((*shok_ED_CGlobalsBaseEx::GlobalObj)->DisplayWorld->SomeRenderObj, this);
+}
+static inline void*(__cdecl* const modelinst_getsomethingdtor)(shok_modelinstance* i) = reinterpret_cast<void*(__cdecl*)(shok_modelinstance*)>(0x626E00);
+static inline void(__cdecl* const modelinst_deregister)(void* d, shok_modelinstance* i) = reinterpret_cast<void(__cdecl*)(void*, shok_modelinstance*)>(0x6271C0);
+static inline void(__cdecl* const modelinst_dest)(shok_modelinstance* i) = reinterpret_cast<void(__cdecl*)(shok_modelinstance*)>(0x6294A0);
+void shok_modelinstance::Destroy()
+{
+	void* d = modelinst_getsomethingdtor(this);
+	if (d) {
+		modelinst_deregister(d, this);
+		modelinst_dest(this);
+	}
+}
+static inline void(__cdecl* const modelinst_setrot)(void* l, float* f, float r, int i) = reinterpret_cast<void(__cdecl*)(void*, float*, float, int)>(0x4141D0);
+void shok_modelinstance::SetRotation(float r)
+{
+	float f[] = { 0,0,1 };
+	modelinst_setrot(Loc, f, r, 0);
+}
+static inline void(__cdecl* const modelinst_setscale)(void* l, float* f, int i) = reinterpret_cast<void(__cdecl*)(void*, float*, int)>(0x414170);
+void shok_modelinstance::SetScale(float* s)
+{
+	modelinst_setscale(Loc, s, 2);
+}
+void shok_modelinstance::SetScale(float s)
+{
+	float f[] = { s,s,s };
+	SetScale(f);
+}
+static inline void(__cdecl* const modelinst_setpos)(void* l, float* f, int i) = reinterpret_cast<void(__cdecl*)(void*, float*, int)>(0x414140);
+void shok_modelinstance::SetPosition(const shok_position& p, float height)
+{
+	float f[] = { p.X, p.Y, height };
+	modelinst_setpos(Loc, f, 2);
+}
+
+static inline shok_modelinstance* (__thiscall* const modeldata_instanciate)(const shok_modeldata* d) = reinterpret_cast<shok_modelinstance*(__thiscall*)(const shok_modeldata*)> (0x472742);
+shok_modelinstance* shok_modeldata::Instanciate() const
+{
+	return modeldata_instanciate(this);
+}
+const shok_modeldata* shok_ED_CResourceManager::GetModelData(int modelid)
+{
+	return reinterpret_cast<shok_vtable_ED_CResourceManager*>(vtable)->GetModelDataByModelID(this, modelid);
 }

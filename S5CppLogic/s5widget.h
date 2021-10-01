@@ -255,7 +255,7 @@ struct shok_EGUIX_CCustomWidget : shok_EGUIX_CBaseWidget {
 	static inline constexpr int TypeDesc = 0x834820;
 	static inline constexpr unsigned int Identifier = 0x7656DB56;
 };
-constexpr int i = offsetof(shok_EGUIX_CCustomWidget, StringUserVariable0DefaultValue) / 4;
+//constexpr int i = offsetof(shok_EGUIX_CCustomWidget, StringUserVariable0DefaultValue) / 4;
 static_assert(sizeof(shok_EGUIX_CCustomWidget) == 43 * 4);
 
 struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_object {

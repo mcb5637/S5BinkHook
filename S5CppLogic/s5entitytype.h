@@ -143,17 +143,21 @@ struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	static inline constexpr int TypeDesc = 0x824A84;
 };
 
+struct shok_ED_CBehaviorProps;
 struct shok_ED_CDisplayEntityProps : shok_object {
 	int DisplayClass;
 	int Model[4];
-	byte DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
+	bool DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
 	PADDING(2);
 	vector_padding;
 	std::vector<int, shok_allocator<int>> AnimList;
+	vector_padding;
+	std::vector<shok_ED_CBehaviorProps*, shok_allocator<shok_ED_CBehaviorProps*>> DisplaBehaviorProps;
 
 	static inline constexpr int vtp = 0x788840;
 	static inline constexpr int TypeDesc = 0x83C918;
 };
+static_assert(sizeof(shok_ED_CDisplayEntityProps) == 16 * 4);
 
 struct shok_GGlue_CGlueEntityProps : shok_object {
 	PADDINGI(1);

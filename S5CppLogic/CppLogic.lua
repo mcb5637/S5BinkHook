@@ -348,7 +348,7 @@ function CppLogic.Logic.UICommands.SetCallback(f) end
 function CppLogic.Logic.UICommands.UnSetCallback() end
 
 --- renders only a model without any entity or effect. (animations currently not supported).
--- automatically gets cleared when the object is gc'd / lua state gets closed (you have to recreate them after save load).
+-- automatically gets cleared when the userdata is gc'd / lua state gets closed (you have to recreate them after save load).
 -- rendering happens regardless of local player FoW and camera pos, use it only when needed.
 -- Transform options: Set=0 (removes any other), Multiply=1 (default), ReverseMultiply=2 (as if called with Multiply in opposite order)
 -- usual order for transforms is: translate, scale, rotate.

@@ -1,15 +1,104 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_ED_IBehavior : shok_object {
+struct shok_ED_CBehaviorProps : shok_object {
 
+	static inline constexpr int vtp = 0x76AB0C;
+	static inline constexpr int TypeDesc = 0x80AC10;
+	static inline constexpr unsigned int Identifier = 0x1F78996D;
 };
 
+struct shok_ED_IBehavior : shok_object {
+
+
+	static inline constexpr int vtp = 0x76A9E4;
+	static inline constexpr int TypeDesc = 0x80AA54;
+};
+
+struct shok_GD_CAlphaBlendingBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x76AA0C;
+	static inline constexpr int TypeDesc = 0x80AA70;
+};
+
+struct shok_GD_CLimitedAttachmentBannerBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x76AB2C;
+	static inline constexpr int TypeDesc = 0x80AC68;
+};
+
+struct shok_GD_CCamouflageBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x76AEB0;
+	static inline constexpr int TypeDesc = 0x80B0B8;
+};
+
+struct shok_GD_CBuildingBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x76AF54;
+	static inline constexpr int TypeDesc = 0x80B1E8;
+};
+
+struct shok_ED_CUVAnimBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AE8EC;
+	static inline constexpr int TypeDesc = 0x84CF0C;
+};
+
+struct shok_ED_CPermanentUVAnimBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AE914;
+	static inline constexpr int TypeDesc = 0x84CFD0;
+};
+
+struct shok_ED_CParticleEffectAttachmentBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AE93C;
+	static inline constexpr int TypeDesc = 0x84D01C;
+};
+
+struct shok_ED_CParticleEffectSwitchBehavior : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AE964;
+	static inline constexpr int TypeDesc = 0x84D050;
+};
+
+struct shok_ED_CDisplayBehaviorWaterfallAnimation : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AEA44;
+	static inline constexpr int TypeDesc = 0x84D354;
+};
+
+struct shok_ED_CDisplayBehaviorMovement : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AEAA4;
+	static inline constexpr int TypeDesc = 0x84D3E8;
+};
+
+struct shok_ED_CDisplayBehaviorBuildingAnimation : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AEAD4;
+	static inline constexpr int TypeDesc = 0x84D4CC;
+};
+
+struct shok_ED_CDisplayBehaviorAnimationNoBlending : shok_ED_IBehavior {
+
+	static inline constexpr int vtp = 0x7AEB08;
+	static inline constexpr int TypeDesc = 0x84D5B4;
+};
+
+struct shok_ED_CDisplayBehaviorAnimation : shok_ED_CDisplayBehaviorAnimationNoBlending {
+
+	static inline constexpr int vtp = 0x7AEB40;
+	static inline constexpr int TypeDesc = 0x84D6A4;
+};
+
+struct shok_modelinstance;
 struct shok_ED_CEntity : shok_object {
 	shok_IEntityDisplay* Entity;
 	int EntityID;
 	int ModelOverrideID;
-	PADDINGI(1); // unk p might be model data, some sort of initilaized model data
+	shok_modelinstance* Model;
 	PADDINGI(1); // some kind of flags? // 5
 	PADDINGI(1); // some counter
 	vector_padding; // 7
@@ -33,6 +122,8 @@ struct shok_ED_CDisplayStaticEntity : shok_ED_CEntity {
 static_assert(sizeof(shok_ED_CDisplayStaticEntity) == 4 * 17);
 
 
+// creates shok_ED_CEntity objects as the corresponding entity appears on screen, and deletes them when they go off screen.
+// (a entity hidden by FoW counts as offscreen in this case).
 struct shok_ED_CVisibleEntityManager : shok_object {
 	PADDINGI(1); // p EGL::CGLEEntitiesDisplay
 	PADDINGI(1); // p to ?

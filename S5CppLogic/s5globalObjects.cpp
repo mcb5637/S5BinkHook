@@ -431,6 +431,14 @@ bool shok_ED_CLandscape::GetTerrainPosAtScreenCoords(shok_positionRot& outpos, i
 	float mp[] = { static_cast<float>(x), static_cast<float>(y) };
 	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetLandscapePosFromMousePos(this, (*shok_ED_CGlobalsBaseEx::GlobalObj)->Camera->SomeCameraData, mp, &outpos, 3);
 }
+float shok_ED_CLandscape::GetTerrainHeightAtPos(const shok_position& p)
+{
+	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetTerrainHeightAtPos(this, p.X, p.Y);
+}
+float shok_ED_CLandscape::GetWaterHeightAtPos(const shok_position& p)
+{
+	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetWaterHeightAtPos(this, p.X, p.Y);
+}
 
 shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 {
@@ -645,27 +653,31 @@ void shok_modelinstance::Destroy()
 		modelinst_dest(this);
 	}
 }
-static inline void(__cdecl* const modelinst_setrot)(void* l, float* f, float r, int i) = reinterpret_cast<void(__cdecl*)(void*, float*, float, int)>(0x4141D0);
-void shok_modelinstance::SetRotation(float r)
+static inline void(__cdecl* const modelinst_setrot)(void* l, float* f, float r, shok_modelinstance::TransformOperation i) = reinterpret_cast<void(__cdecl*)(void*, float*, float, shok_modelinstance::TransformOperation)>(0x4141D0);
+void shok_modelinstance::Rotate(float r, float* axis, TransformOperation op)
+{
+	modelinst_setrot(Transform, axis, r, op);
+}
+void shok_modelinstance::Rotate(float r, TransformOperation op)
 {
 	float f[] = { 0,0,1 };
-	modelinst_setrot(Loc, f, r, 0);
+	Rotate(r, f, op);
 }
-static inline void(__cdecl* const modelinst_setscale)(void* l, float* f, int i) = reinterpret_cast<void(__cdecl*)(void*, float*, int)>(0x414170);
-void shok_modelinstance::SetScale(float* s)
+static inline void(__cdecl* const modelinst_setscale)(void* l, float* f, shok_modelinstance::TransformOperation i) = reinterpret_cast<void(__cdecl*)(void*, float*, shok_modelinstance::TransformOperation)>(0x414170);
+void shok_modelinstance::Scale(float* s, TransformOperation op)
 {
-	modelinst_setscale(Loc, s, 2);
+	modelinst_setscale(Transform, s, op);
 }
-void shok_modelinstance::SetScale(float s)
+void shok_modelinstance::Scale(float s, TransformOperation op)
 {
 	float f[] = { s,s,s };
-	SetScale(f);
+	Scale(f, op);
 }
-static inline void(__cdecl* const modelinst_setpos)(void* l, float* f, int i) = reinterpret_cast<void(__cdecl*)(void*, float*, int)>(0x414140);
-void shok_modelinstance::SetPosition(const shok_position& p, float height)
+static inline void(__cdecl* const modelinst_setpos)(void* l, float* f, shok_modelinstance::TransformOperation i) = reinterpret_cast<void(__cdecl*)(void*, float*, shok_modelinstance::TransformOperation)>(0x414140);
+void shok_modelinstance::Translate(const shok_position& p, float height, TransformOperation op)
 {
 	float f[] = { p.X, p.Y, height };
-	modelinst_setpos(Loc, f, 2);
+	modelinst_setpos(Transform, f, op);
 }
 
 static inline shok_modelinstance* (__thiscall* const modeldata_instanciate)(const shok_modeldata* d) = reinterpret_cast<shok_modelinstance*(__thiscall*)(const shok_modeldata*)> (0x472742);

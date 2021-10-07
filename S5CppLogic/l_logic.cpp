@@ -1171,6 +1171,94 @@ int l_logic_FixBuildOnMovement(lua_State* L) {
 	return 0;
 }
 
+struct l_logicModel {
+	shok_modelinstance* Model = nullptr;
+	
+	static constexpr const char* MetaName = "CppLogic_Model";
+};
+int l_logicModel_Clear(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	if (m->Model) {
+		m->Model->Destroy();
+		m->Model = nullptr;
+	}
+	return 0;
+}
+int l_logicModel_SetModel(lua_State* L) {
+	l_logicModel_Clear(L);
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	int mid = luaL_checkint(L, 2);
+	luaext_assert(L, (*shok_ED_CGlobalsBaseEx::GlobalObj)->ModelManager->GetNameByID(mid), "invalid model");
+	m->Model = (*shok_ED_CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
+	m->Model->Register();
+	return 0;
+}
+shok_modelinstance::TransformOperation l_logicModel_checkTO(lua_State* L, int idx) {
+	int i = luaL_optint(L, idx, static_cast<int>(shok_modelinstance::TransformOperation::Multiply));
+	luaext_assert(L, i >= 0 && i < 3, "invalid transform operation");
+	return static_cast<shok_modelinstance::TransformOperation>(i);
+}
+int l_logicModel_Translate(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	shok_position p;
+	luaext_checkPos(L, p, 2);
+	float h = luaL_optfloat(L, 3, 0);
+	if (luaext_optbool(L, 5, true)) {
+		float t = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
+		if (luaext_optbool(L, 6, false)) {
+			float w = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
+			h += max(t, w);
+		}
+		else {
+			h += t;
+		}
+	}
+	m->Model->Translate(p, h, l_logicModel_checkTO(L, 4));
+	return 0;
+}
+int l_logicModel_Rotate(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	float r = luaL_checkfloat(L, 2);
+	m->Model->Rotate(r, l_logicModel_checkTO(L, 3));
+	return 0;
+}
+int l_logicModel_Scale(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	float s = luaL_checkfloat(L, 2);
+	m->Model->Scale(s, l_logicModel_checkTO(L, 3));
+	return 0;
+}
+int l_logicModel_ResetTransform(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	m->Model->Rotate(0, shok_modelinstance::TransformOperation::Set);
+	return 0;
+}
+void l_logicModel_CreateModelUDType(lua_State* L) {
+	luaL_newmetatable(L, l_logicModel::MetaName);
+	lua_pushstring(L, "__index");
+	lua_newtable(L);
+	luaext_registerFunc(L, "Clear", l_logicModel_Clear);
+	luaext_registerFunc(L, "SetModel", l_logicModel_SetModel);
+	luaext_registerFunc(L, "Translate", l_logicModel_Translate);
+	luaext_registerFunc(L, "Rotate", l_logicModel_Rotate);
+	luaext_registerFunc(L, "Scale", l_logicModel_Scale);
+	luaext_registerFunc(L, "ResetTransform", l_logicModel_ResetTransform);
+	
+	lua_rawset(L, -3);
+	luaext_registerFunc(L, "__gc", l_logicModel_Clear);
+	lua_pop(L, 1);
+}
+int l_logicModel_create(lua_State* L) {
+	l_logicModel* m = new (lua_newuserdata(L, sizeof(l_logicModel))) l_logicModel();
+	luaL_getmetatable(L, l_logicModel::MetaName);
+	lua_setmetatable(L, -2);
+	return 1;
+}
+
 int l_logic_loadtasks(lua_State* L)
 {
 	shok_taskData::AddExtraTasks();
@@ -1252,12 +1340,17 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "TaskListMakeWaitForAnimsCancelable", &l_logic_makeTaskListWaitForAnimCancelable);
 	luaext_registerFunc(L, "TaskListSetChangeTaskListCheckUncancelable", &l_logic_setTaskListSetCheckUncancelable);
 	luaext_registerFunc(L, "EnableBuildOnMovementFix", &l_logic_FixBuildOnMovement);
+	luaext_registerFunc(L, "CreateFreeModel", &l_logicModel_create);
 
 	lua_pushstring(L, "UICommands");
 	lua_newtable(L);
 	luaext_registerFunc(L, "SetCallback", &l_netEventSetHook);
 	luaext_registerFunc(L, "UnSetCallback", &l_netEventUnSetHook);
 	lua_rawset(L, -3);
+
+	if (L != mainmenu_state) {
+		l_logicModel_CreateModelUDType(L);
+	}
 }
 
 // CppLogic.Logic.UICommands.SetCallback(function(id, ev) LuaDebugger.Log(id) LuaDebugger.Log(ev) return false end)

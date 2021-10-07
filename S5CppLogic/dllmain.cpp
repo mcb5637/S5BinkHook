@@ -88,12 +88,17 @@ int __cdecl test(lua_State* L) {
     func(ls, & p, &r.low, &r.high, 0, &bl);*/
     //ls->AdvancedApplyBridgeHeight(p, r, 0, h);
     shok_modelinstance* m = (*shok_ED_CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(luaL_checkint(L, 3))->Instanciate();
-    m->SetRotation(0);
-    m->SetScale(1);
-    m->SetPosition(p, h);
+    m->Translate(p, h, shok_modelinstance::TransformOperation::Set);
+    m->Rotate(90, shok_modelinstance::TransformOperation::Multiply);
+    m->Scale(2, shok_modelinstance::TransformOperation::Multiply);
     m->Register();
     lua_pushnumber(L, (int)m);
-    return 1;
+    lua_newtable(L);
+    for (int i = 0; i < 4 * 4; i++) {
+        lua_pushnumber(L, m->Transform->Matrix[i]);
+        lua_rawseti(L, -2, i);
+    }
+    return 2;
 }
 
 int cleanup(lua_State* L) {

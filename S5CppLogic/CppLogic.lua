@@ -347,6 +347,43 @@ function CppLogic.Logic.UICommands.SetCallback(f) end
 --- ui command callback.
 function CppLogic.Logic.UICommands.UnSetCallback() end
 
+--- renders only a model without any entity or effect. (animations currently not supported).
+-- automatically gets cleared when the object is gc'd / lua state gets closed (you have to recreate them after save load).
+-- rendering happens regardless of local player FoW and camera pos, use it only when needed.
+-- Transform options: Set=0 (removes any other), Multiply=1 (default), ReverseMultiply=2 (as if called with Multiply in opposite order)
+-- usual order for transforms is: translate, scale, rotate.
+-- remember to set the model before using transforms.
+-- should not affect mp in any way (even if not synced), as for gamelogic is concerned, there is nothing there (not tested).
+local LogicModel = {}
+--- clears the model and all its data, removes the object from rendering.
+function LogicModel:Clear() end
+--- sets the model to display. resets transform to identity (position 0/0, no rotation and scale).
+-- @param mid model to display
+function LogicModel:SetModel(mid) end
+--- translates (moves) the model (if it was not moved, it is at 0/0).
+-- @param pos position for the center of the model to be
+-- @param height (optional, default 0) height for the model
+-- @param tro (optional, default Multiply) Transform Operation, see LogicModel
+-- @param addTerraiHeight (optional, default true) if the terrain height at p should be added to height
+-- @param floats (optional, default false) if true uses max of terrain and water height for addTerraiHeight
+function LogicModel:Translate(pos, height, tro, addTerraiHeight, floats) end
+--- scales the model.
+-- scaling all 3 axis differently is currently not supported, but should be easy to implement. ask me if needed.
+-- @param s scale
+-- @param tro (optional, default Multiply) Transform Operation, see LogicModel
+function LogicModel:Scale(s, tro) end
+--- rotates the model.
+-- curretly rotates in the usual way, so the feet stay always on the ground. other rotations should be possible, ask me if needed.
+-- @param r rotation (in degrees)
+-- @param tro (optional, default Multiply) Transform Operation, see LogicModel
+function LogicModel:Rotate(r, tro) end
+--- resets the transform of the model to identity (position 0/0, no rotation and scale).
+function LogicModel:ResetTransform() end
+
+--- creates a new LogicModel.
+-- @return LogicModel
+function CppLogic.Logic.CreateFreeModel(f) end
+
 --- compiles a lua chunk.
 -- asserts if kimichuras dlls are detected.
 -- @param code to compile, sourcecode or binary

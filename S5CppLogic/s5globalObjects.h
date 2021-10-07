@@ -201,6 +201,8 @@ struct shok_ED_CLandscape : shok_object {
 	static inline constexpr int vtp = 0x76A404;
 
 	bool GetTerrainPosAtScreenCoords(shok_positionRot& outpos, int x, int y); // r in this case is the terrain height at the position
+	float GetTerrainHeightAtPos(const shok_position& p);
+	float GetWaterHeightAtPos(const shok_position& p);
 };
 static_assert(sizeof(shok_ED_CLandscape) == 10 * 4);
 
@@ -209,14 +211,14 @@ struct shok_EGL_CRegionInfo : shok_object {
 };
 struct shok_ED_CGlobalsLogicEx : shok_object {
 	shok_EGL_CGLEGameLogic* GameLogic;
-	PADDINGI(5); // p EGL::CGLEGameLogic, p EGL::CGLEEntitiesDisplay, p EGL::CGLEEffectsDisplay, p EGL::CGLETerrainHiRes, p EGL::CGLETerrainLowRes
+	PADDINGI(4); // p EGL::CGLEEntitiesDisplay, p EGL::CGLEEffectsDisplay, p EGL::CGLETerrainHiRes, p EGL::CGLETerrainLowRes
 	shok_EGL_CGLELandscape_blockingData *Blocking; // 6
 	PADDINGI(2); // p EGL::CGLELandscape, p EGL::CTerrainVertexColors
 	shok_EGL_CRegionInfo* RegionInfo; // 9
 	PADDINGI(1); // p EGL::CPlayerExplorationHandler
 	shok_ED_CLandscape* Landscape;
 	// p ED::CLandscapeFogOfWar, 
-	PADDINGI(6);
+	PADDINGI(7);
 	shok_ED_CVisibleEntityManager* VisibleEntityManager; // 19
 
 	static inline constexpr int vtp = 0x769F74;
@@ -552,15 +554,26 @@ struct shok_ED_CCommandAcknowledgements : shok_object {
 	void ShowAck(const shok_position& pos);
 };
 struct shok_modelinstance {
+	enum class TransformOperation : int {
+		Set = 0, // sets to identity, then performs the operation
+		Multiply = 1, // the new matrix is performed last
+		ReverseMultiply = 2, // the new matrix is performed first
+	};
+
+
 	PADDINGI(1);
-	void* Loc;
+	struct {
+		PADDINGI(4);
+		float Matrix[4 * 4];
+	}*Transform;
 
 	void Register();
 	void Destroy();
-	void SetRotation(float r);
-	void SetScale(float* s); // 3 coordinates (order?)
-	void SetScale(float s);
-	void SetPosition(const shok_position& p, float height);
+	void Rotate(float r, TransformOperation op);
+	void Rotate(float r, float* axis, TransformOperation op);
+	void Scale(float* s, TransformOperation op); // 3 coordinates (order?)
+	void Scale(float s, TransformOperation op);
+	void Translate(const shok_position& p, float height, TransformOperation op);
 };
 struct shok_modeldata {
 

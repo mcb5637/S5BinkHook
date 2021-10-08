@@ -267,19 +267,21 @@ static_assert(sizeof(shok_costInfo) == 18 * 4);
 
 struct shok_object {
 	int vtable;
+};
+struct shok_BB_IObject : shok_object {
 
 	void Destructor(bool free); // not everything should be destroyed with this destructor, make sure there is not somenting extra for your type in question
+	unsigned int GetIdentifier() const;
+
+	static constexpr int TypeDesc = 0x7FFE08;
+	static constexpr int vtp = 0x7620F0;
+	// no identifier
 };
-template<class CastTo>
-inline CastTo* shok_DynamicCastFromObject(shok_object* i) {
-	void* (__cdecl* const shok_dyncastFunc)(void* i, int off, int TypeDescSource, int TypeDescOut, bool isref) = reinterpret_cast<void* (__cdecl* const)(void*, int, int, int, bool)>(0x5C36EE);
-	return static_cast<CastTo*>(shok_dyncastFunc(i, 0, 0x7FFE08, CastTo::TypeDesc, false));
-}
 
 struct shok_vtable_BB_IObject {
-	void(__thiscall* dtor)(shok_object* th, bool free);
-	unsigned int(__thiscall* GetClassIdentifier)(shok_object* th);
-	PADDINGI(1); // unknown, thiscall (th, x,x)
+	void(__thiscall* dtor)(shok_BB_IObject* th, bool free);
+	unsigned int(__thiscall* GetClassIdentifier)(const shok_BB_IObject* th);
+	PADDINGI(1); // unknown, thiscall (th, x,x), cast to identifier?
 };
 
 enum class shok_AttachmentType;

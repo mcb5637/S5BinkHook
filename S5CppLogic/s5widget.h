@@ -11,7 +11,7 @@ struct shok_widget_color { // size 4
 };
 
 
-struct shok_EGUIX_CFontIDHandler : shok_object { // size 2
+struct shok_EGUIX_CFontIDHandler : shok_BB_IObject { // size 2
 	int FontID;
 
 	static inline constexpr int vtp = 0x780B0C;
@@ -20,7 +20,7 @@ struct shok_EGUIX_CFontIDHandler : shok_object { // size 2
 	void LoadFont(const char* name);
 };
 
-struct shok_EGUIX_CSingleStringHandler : shok_object { // size 15
+struct shok_EGUIX_CSingleStringHandler : shok_BB_IObject { // size 15
 	shok_string StringTableKey;
 	shok_string RawString;
 
@@ -29,7 +29,7 @@ struct shok_EGUIX_CSingleStringHandler : shok_object { // size 15
 };
 static_assert(sizeof(shok_EGUIX_CSingleStringHandler) == 15 * 4);
 
-struct shok_EGUIX_CWidgetStringHelper : shok_object { // size 23
+struct shok_EGUIX_CWidgetStringHelper : shok_BB_IObject { // size 23
 	shok_EGUIX_CFontIDHandler FontHandler;
 	shok_EGUIX_CSingleStringHandler SingleStringHandler;
 	float StringFrameDistance;
@@ -40,7 +40,7 @@ struct shok_EGUIX_CWidgetStringHelper : shok_object { // size 23
 };
 static_assert(sizeof(shok_EGUIX_CWidgetStringHelper) == 23 * 4);
 
-struct shok_EGUIX_CMaterial : shok_object {
+struct shok_EGUIX_CMaterial : shok_BB_IObject {
 	int Texture; // type? // 1
 	shok_widget_rect TextureCoordinates; // la 5
 	shok_widget_color Color; // la 10
@@ -61,7 +61,7 @@ struct shoc_EScr_CLuaFuncRefCommand : shok_object {
 	static inline constexpr int TypeDesc = 0x83B83C;
 };
 
-struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
+struct shok_EGUIX_CLuaFunctionHelper : shok_BB_IObject { // size 20
 	shok_string LuaCommand;
 	shoc_EScr_CLuaFuncRefCommand FuncRefCommand;
 
@@ -72,7 +72,7 @@ struct shok_EGUIX_CLuaFunctionHelper : shok_object { // size 20
 };
 static_assert(sizeof(shok_EGUIX_CLuaFunctionHelper) == 20 * 4);
 
-struct shok_EGUIX_CButtonHelper : shok_object { // size 38
+struct shok_EGUIX_CButtonHelper : shok_BB_IObject { // size 38
 	PADDINGI(1); // probably current model
 	byte DisabledFlag, HighLightedFlag;
 	PADDING(2);
@@ -84,7 +84,7 @@ struct shok_EGUIX_CButtonHelper : shok_object { // size 38
 };
 static_assert(sizeof(shok_EGUIX_CButtonHelper) == 38 * 4);
 
-struct shok_EGUIX_CToolTipHelper : shok_object { // size 41
+struct shok_EGUIX_CToolTipHelper : shok_BB_IObject { // size 41
 	int vtable_EGUIX_IWidgetRegistrationCallback;
 	byte ToolTipEnabledFlag;
 	PADDING(3);
@@ -101,7 +101,7 @@ struct shok_EGUIX_CToolTipHelper : shok_object { // size 41
 };
 static_assert(sizeof(shok_EGUIX_CToolTipHelper) == 41 * 4);
 
-struct shok_EGUIX_CBaseWidget : shok_object { // size 14
+struct shok_EGUIX_CBaseWidget : shok_BB_IObject { // size 14
 	int vtable_EGUIX_IOnEvent;
 	int UserVariable[2];
 	int WidgetID;
@@ -258,7 +258,7 @@ struct shok_EGUIX_CCustomWidget : shok_EGUIX_CBaseWidget {
 //constexpr int i = offsetof(shok_EGUIX_CCustomWidget, StringUserVariable0DefaultValue) / 4;
 static_assert(sizeof(shok_EGUIX_CCustomWidget) == 43 * 4);
 
-struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_object {
+struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_BB_IObject {
 	int vtable_EGUIX_ICustomWidget;
 
 	static inline constexpr int vtp = 0x77D490;

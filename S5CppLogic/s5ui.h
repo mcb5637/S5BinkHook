@@ -7,7 +7,7 @@ struct shok_GGUI_SStateParameters : shok_object {
 
 };
 
-struct shok_GGUI_CState : shok_object { // no vtable
+struct shok_GGUI_CState : shok_BB_IObject { // no vtable
 	shok_GGUI_C3DViewHandler* C3DViewHandler;
 
 	static inline constexpr int TypeDesc = 0x82CC10;
@@ -214,7 +214,7 @@ struct shok_stateidandcommandstate {
 	int Id;
 	shok_GGUI_CState* State;
 };
-struct shok_GGUI_C3DViewHandler : shok_object {
+struct shok_GGUI_C3DViewHandler : shok_BB_IObject {
 	shok_GGUI_CState* CurrentState;
 	shok_BB_CIDManager* StateIdManager;
 	int* IPicker; // ERwTools::IPicker

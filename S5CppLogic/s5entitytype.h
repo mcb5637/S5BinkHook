@@ -9,7 +9,7 @@ struct shok_modifyEntityProps {
 };
 
 
-struct shok_EGL_CGLEEntityProps : shok_object {
+struct shok_EGL_CGLEEntityProps : shok_BB_IObject {
 	PADDINGI(1);
 	int Class;
 	vector_padding;
@@ -144,7 +144,7 @@ struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 };
 
 struct shok_ED_CBehaviorProps;
-struct shok_ED_CDisplayEntityProps : shok_object {
+struct shok_ED_CDisplayEntityProps : shok_BB_IObject {
 	int DisplayClass;
 	int Model[4];
 	bool DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
@@ -159,7 +159,7 @@ struct shok_ED_CDisplayEntityProps : shok_object {
 };
 static_assert(sizeof(shok_ED_CDisplayEntityProps) == 16 * 4);
 
-struct shok_GGlue_CGlueEntityProps : shok_object {
+struct shok_GGlue_CGlueEntityProps : shok_BB_IObject {
 	PADDINGI(1);
 	shok_EGL_CGLEEntityProps* LogicProps;
 	shok_ED_CDisplayEntityProps* DisplayProps;

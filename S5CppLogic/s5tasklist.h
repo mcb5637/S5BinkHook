@@ -1,7 +1,7 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_EGL_CGLETaskArgs : shok_object {
+struct shok_EGL_CGLETaskArgs : shok_BB_IObject {
     shok_Task TaskType = static_cast<shok_Task>(0);
 
     shok_EGL_CGLETaskArgs();
@@ -164,7 +164,7 @@ struct shok_GGL_CGLTaskArgsGoodType : shok_EGL_CGLETaskArgs { // unsed
 	static inline constexpr int TypeDesc = 0x812DCC;
 };
 
-struct shok_EGL_CGLETaskList : shok_object {
+struct shok_EGL_CGLETaskList : shok_BB_IObject {
 	vector_padding;
 	std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>> Task;
 	int TaskListID;
@@ -180,7 +180,7 @@ struct shok_EGL_CGLETaskList : shok_object {
 };
 static_assert(sizeof(shok_EGL_CGLETaskList) == 8 * 4);
 
-struct shok_EGL_CGLETaskListMgr : shok_object {
+struct shok_EGL_CGLETaskListMgr : shok_BB_IObject {
     shok_BB_CIDManagerEx* TaskListManager;
     shok_BB_CIDManagerEx* TaskManager;
     shok_BB_CIDManagerEx* WorkCycleManager;

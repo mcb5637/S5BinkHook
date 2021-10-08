@@ -779,7 +779,7 @@ int l_ui_SetGUIState_LuaSelection(lua_State* L) {
 
 
 // creator func, used by class factory
-shok_object* __stdcall CppL_GUIState_LuaSelection_ctor() {
+shok_BB_IObject* __stdcall CppL_GUIState_LuaSelection_ctor() {
 	// allocate an object and then call the constructor for it manually
 	return new (shok_malloc(sizeof(CppL_GUIState_LuaSelection))) CppL_GUIState_LuaSelection();
 }
@@ -848,7 +848,7 @@ void __fastcall CppL_GUIState_LuaSelection_dtor(CppL_GUIState_LuaSelection* th, 
 	if (free)
 		shok_free(th);
 }
-unsigned int __stdcall CppL_GUIState_LuaSelection_GetClassID(shok_object* th) {
+unsigned int __stdcall CppL_GUIState_LuaSelection_GetClassID(const shok_BB_IObject* th) {
 	return CppL_GUIState_LuaSelection::Identifier;
 }
 bool __fastcall CppL_GUIState_LuaSelection_OnMouseEvent(CppL_GUIState_LuaSelection* th, int _, shok_BB_CEvent* ev) {
@@ -858,7 +858,7 @@ int __fastcall CppL_GUIState_LuaSelection_Cancel(CppL_GUIState_LuaSelection* th)
 	th->Cancel(true);
 	return 1;
 }
-const char* __fastcall CppL_GUIState_LuaSelection_GetName(shok_GGUI_CState* th) {
+const char* __fastcall CppL_GUIState_LuaSelection_GetName(const shok_GGUI_CState* th) {
 	return "LuaSelectionState";
 }
 // generate a typedesc for it (you need to write a custom one if you want type_info::name to return something useful
@@ -866,8 +866,8 @@ RTTI_TypeDescriptor CppL_GUIState_LuaSelection_TypeDesc {};
 const int CppL_GUIState_LuaSelection::TypeDesc = reinterpret_cast<int>(&CppL_GUIState_LuaSelection_TypeDesc);
 // generate base class array (have a look at array of other classes with the same ihneritance)
 RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass1{ &CppL_GUIState_LuaSelection_TypeDesc, 2, 0, -1, 0, 0 };
-RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass2{ reinterpret_cast<RTTI_TypeDescriptor*>(shok_GGUI_CState::TypeDesc), 1, 0, -1, 0, 0 };
-RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass3{ reinterpret_cast<RTTI_TypeDescriptor*>(0x7FFE08), 0, 0, -1, 0, 0 };
+RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass2{ RTTI_TypeDescriptor::TypeID<shok_GGUI_CState>(), 1, 0, -1, 0, 0 };
+RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass3{ RTTI_TypeDescriptor::TypeID<shok_BB_IObject>(), 0, 0, -1, 0, 0 };
 RTTI_BaseClassDescriptor* CppL_GUIState_LuaSelection_BaseClasses[] = { &CppL_GUIState_LuaSelection_BaseClass1, &CppL_GUIState_LuaSelection_BaseClass2, &CppL_GUIState_LuaSelection_BaseClass3 };
 // generate class hierarchy (remember to set the length of the array)
 RTTI_ClassHierarchyDescriptor CppL_GUIState_LuaSelection_ClassHierarchy{ 0, 0, 3, CppL_GUIState_LuaSelection_BaseClasses };
@@ -878,12 +878,12 @@ RTTI_CompleteObjectLocator CppL_GUIState_LuaSelection_ObjectLocator{ 0, 0, 0, &C
 struct vtable_CppL_GUIState_LuaSelection {
 	RTTI_CompleteObjectLocator* ObLoc = &CppL_GUIState_LuaSelection_ObjectLocator;
 	void(__fastcall* dtor)(CppL_GUIState_LuaSelection* th, int _, bool free) = &CppL_GUIState_LuaSelection_dtor;
-	unsigned int(__stdcall* GetClassIdentifier)(shok_object* th) = &CppL_GUIState_LuaSelection_GetClassID;
+	unsigned int(__stdcall* GetClassIdentifier)(const shok_BB_IObject* th) = &CppL_GUIState_LuaSelection_GetClassID;
 	int retzero = 0x55336A;
 	bool(__fastcall* OnMouseEvent)(CppL_GUIState_LuaSelection* th, int _, shok_BB_CEvent* ev) = &CppL_GUIState_LuaSelection_OnMouseEvent;
 	int SetStateParameters = 0x52B509;
 	int(__fastcall* Cancel)(CppL_GUIState_LuaSelection* th) = &CppL_GUIState_LuaSelection_Cancel;
-	const char* (__fastcall* GetName)(shok_GGUI_CState* th) = &CppL_GUIState_LuaSelection_GetName;
+	const char* (__fastcall* GetName)(const shok_GGUI_CState* th) = &CppL_GUIState_LuaSelection_GetName;
 	int OnSelectionChanged = 0x526A15;
 };
 vtable_CppL_GUIState_LuaSelection CppL_GUIState_LuaSelectionVtable{};

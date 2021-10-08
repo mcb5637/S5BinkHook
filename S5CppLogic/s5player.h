@@ -1,7 +1,7 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_GGL_CSerfManager : shok_object {
+struct shok_GGL_CSerfManager : shok_BB_IObject {
 	// seems to be just playerid and 2 unknown values
 
 	static inline constexpr int vtp = 0x76EA2C;
@@ -15,7 +15,7 @@ struct shok_GGL_CPlayerAttractionHandler_typethatleft {
 struct shok_GGL_CPlayerAttractionHandler_typecount {
 	int EntityType, Count;
 };
-struct shok_GGL_CPlayerAttractionHandler : shok_object {
+struct shok_GGL_CPlayerAttractionHandler : shok_BB_IObject {
 	int PlayerID;
 	byte PaydayActive;
 	PADDING(3);
@@ -78,7 +78,7 @@ struct shok_GGL_CUpgradeManager_UCatEntry {
 	int NumUpgrades;
 	int FirstEntityType;
 };
-struct shok_GGL_CUpgradeManager : shok_object {
+struct shok_GGL_CUpgradeManager : shok_BB_IObject {
 	shok_set<shok_GGL_CUpgradeManager_jobdata> JobData; // empty
 	shok_set<shok_GGL_CUpgradeManager_UCatEntry> UpgradeCategories;
 	int PlayerID;
@@ -104,7 +104,7 @@ struct shok_GGL_CTradeManager_data {
 	float CurrentPrice, CurrentInflation, CurrentDeflation;
 	byte CanBeSold, CanBeBought;
 };
-struct shok_GGL_CTradeManager : shok_object {
+struct shok_GGL_CTradeManager : shok_BB_IObject {
 	int PlayerID;
 	vector_padding;
 	std::vector<shok_GGL_CTradeManager_data, shok_allocator<shok_GGL_CTradeManager_data>> TradeData;
@@ -191,7 +191,7 @@ struct shok_GGL_CGameStatistics : shok_object {
 };
 static_assert(sizeof(shok_GGL_CGameStatistics) == 116 * 4);
 //constexpr int i = offsetof(shok_GGL_CGameStatistics, VillageCenterTimeLine) / 4;
-struct shok_GGL_CPlayerStatus : shok_object {
+struct shok_GGL_CPlayerStatus : shok_BB_IObject {
 	int PlayerGameState;
 	byte PlayerHasLeftGameFlag;
 	PADDING(3);

@@ -1,7 +1,7 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_EGL_CGLEBehaviorProps : shok_object {
+struct shok_EGL_CGLEBehaviorProps : shok_BB_IObject {
 	int vtable_ICheckData;
 	int BehaviorIndex, BehaviorClass;
 

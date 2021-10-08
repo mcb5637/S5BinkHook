@@ -1,7 +1,7 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_EGL_CEffect : shok_object {
+struct shok_EGL_CEffect : shok_BB_IObject {
 	int vtable_EGL_IEffectDisplay;
 	int attachmentvt;
 	shok_set<shok_attachment> ObserverEntities;
@@ -24,7 +24,7 @@ struct shok_EGL_CEffect : shok_object {
 	bool IsCannonBallEffect();
 	bool IsArrowEffect();
 };
-struct shok_EGL_CFlyingEffectSlot : shok_object {
+struct shok_EGL_CFlyingEffectSlot : shok_object { // technically bbiobj, but we have to dynamiccast it
 	int vtable_bbobject;
 	int StartTurn;
 	float a; // gravity factor

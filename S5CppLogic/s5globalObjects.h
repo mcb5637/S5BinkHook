@@ -99,7 +99,7 @@ struct shok_EGL_CTerrainVertexColors : shok_object {
 	int GetTerrainVertexColor(shok_position& p);
 	void SetTerrainVertexColor(shok_position& p, int col); // a,r,g,b each int8
 };
-struct shok_EGL_CGLETerrainHiRes : shok_object {
+struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 	vector_padding;
 	std::vector<int16_t, shok_allocator<int16_t>> TerrainHeights;
 	int MaxSizeX, MaxSizeY; // 5
@@ -112,7 +112,7 @@ struct shok_EGL_CGLETerrainHiRes : shok_object {
 	int GetTerrainHeight(shok_position& p);
 	void SetTerrainHeight(shok_position& p, int h); // int16
 };
-struct shok_EGL_CGLETerrainLowRes : shok_object {
+struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	friend struct shok_EGL_CGLELandscape;
 	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
 	vector_padding;
@@ -244,10 +244,12 @@ private:
 public:
 	shok_EGL_CGLEEntity* GetEntityByNum(int num);
 
+	static inline constexpr int vtp = 0x783B70;
+
 	static inline shok_EGL_CGLEEntityManager** const GlobalObj = reinterpret_cast<shok_EGL_CGLEEntityManager**>(0x897558);
 };
 
-struct shok_GGL_CDamageClassProps : shok_object {
+struct shok_GGL_CDamageClassProps : shok_BB_IObject {
 	float BonusVsArmorClass[7]; // remember to access with ArmorClass - 1
 
 	static inline constexpr int vtp = 0x788978;
@@ -292,7 +294,7 @@ struct shok_GGL_CLogicProperties_SBlessCategory : shok_object {
 
 	static inline constexpr int vtp = 0x76EFC4;
 };
-struct shok_GGL_CLogicProperties : shok_object {
+struct shok_GGL_CLogicProperties : shok_BB_IObject {
 	int CompensationOnBuildingSale;
 	vector_padding;
 	std::vector<shok_GGL_CLogicProperties_SBuildingUpgradeCategory, shok_allocator<shok_GGL_CLogicProperties_SBuildingUpgradeCategory>> BuildingUpgrades;
@@ -366,9 +368,11 @@ struct shok_GGL_CLogicProperties : shok_object {
 	static inline shok_GGL_CLogicProperties** const GlobalObj = reinterpret_cast<shok_GGL_CLogicProperties**>(0x85A3E0);
 };
 
-struct shok_GGL_CPlayerAttractionProps : shok_object {
+struct shok_GGL_CPlayerAttractionProps : shok_BB_IObject {
 	int AttractionFrequency, PaydayFrequency, EntityTypeBanTime, ReAttachWorkerFrequency, PlayerMoneyDispo;
 	float MaximumDistanceWorkerToFarm, MaximumDistanceWorkerToResidence;
+
+	static inline constexpr int vtp = 0x770834;
 
 	static inline shok_GGL_CPlayerAttractionProps** const GlobalObj = reinterpret_cast<shok_GGL_CPlayerAttractionProps**>(0x866A80);
 };
@@ -457,7 +461,7 @@ public:
 //constexpr int i = offsetof(shok_GGL_CGLGameLogic, WeatherHandler);
 
 
-struct shok_EScr_CScriptTriggerSystem : shok_object {
+struct shok_EScr_CScriptTriggerSystem : shok_BB_IObject {
 private:
 	shok_BB_IPostEvent PostEvent;
 
@@ -551,6 +555,8 @@ struct shok_ED_CPlayerColors : shok_object {
 };
 struct shok_ED_CCommandAcknowledgements : shok_object {
 
+	static inline constexpr int vtp = 0x7695C0;
+
 	void ShowAck(const shok_position& pos);
 };
 struct shok_modelinstance {
@@ -583,6 +589,8 @@ struct shok_ED_CResourceManager : shok_object {
 	PADDINGI(1); // conat char**?
 	void* ModelData; // most likely a vector
 	PADDINGI(3);
+
+	static inline constexpr int vtp = 0x769824;
 
 	const shok_modeldata* GetModelData(int modelid);
 };

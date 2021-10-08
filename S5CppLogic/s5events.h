@@ -1,7 +1,7 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_BB_CEvent : shok_object {
+struct shok_BB_CEvent : shok_BB_IObject {
 	int EventTypeId;
 
 	shok_BB_CEvent(int eventid);

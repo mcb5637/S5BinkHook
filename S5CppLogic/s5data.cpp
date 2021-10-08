@@ -225,9 +225,13 @@ bool shok_costInfo::HasResources(shok_costInfo* has)
 	return constinfo_hasres(this, has);
 }
 
-void shok_object::Destructor(bool free)
+void shok_BB_IObject::Destructor(bool free)
 {
 	reinterpret_cast<shok_vtable_BB_IObject*>(vtable)->dtor(this, free);
+}
+unsigned int shok_BB_IObject::GetIdentifier() const
+{
+	return reinterpret_cast<shok_vtable_BB_IObject*>(vtable)->GetClassIdentifier(this);
 }
 
 bool HasSCELoader()

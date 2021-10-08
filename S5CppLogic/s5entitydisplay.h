@@ -1,14 +1,14 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_ED_CBehaviorProps : shok_object {
+struct shok_ED_CBehaviorProps : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x76AB0C;
 	static inline constexpr int TypeDesc = 0x80AC10;
 	static inline constexpr unsigned int Identifier = 0x1F78996D;
 };
 
-struct shok_ED_IBehavior : shok_object {
+struct shok_ED_IBehavior : shok_BB_IObject {
 
 
 	static inline constexpr int vtp = 0x76A9E4;
@@ -94,7 +94,7 @@ struct shok_ED_CDisplayBehaviorAnimation : shok_ED_CDisplayBehaviorAnimationNoBl
 };
 
 struct shok_modelinstance;
-struct shok_ED_CEntity : shok_object {
+struct shok_ED_CEntity : shok_BB_IObject {
 	shok_IEntityDisplay* Entity;
 	int EntityID;
 	int ModelOverrideID;
@@ -103,7 +103,7 @@ struct shok_ED_CEntity : shok_object {
 	PADDINGI(1); // some counter
 	vector_padding; // 7
 	std::vector<shok_ED_IBehavior*, shok_allocator<shok_ED_IBehavior*>> DisplayBehaviors;
-	PADDINGI(1); // unk p // 1
+	PADDINGI(1); // unk p // 11
 	PADDINGI(1); // 0
 	PADDINGI(1); // unk p
 	PADDINGI(1); // -1, color? // 14

@@ -11,8 +11,8 @@ struct shok_BB_CXmlSerializer : shok_object {
 
 	void Destroy();
 	static shok_BB_CXmlSerializer* Create();
-	void Deserialize(shok_BB_CFileStreamEx* f, shok_object* ob);
-	void Deserialize(const char* filename, shok_object* ob);
+	void Deserialize(shok_BB_CFileStreamEx* f, shok_BB_IObject* ob);
+	void Deserialize(const char* filename, shok_BB_IObject* ob);
 
 private:
 	shok_BB_CXmlSerializer() = default;
@@ -53,12 +53,12 @@ struct shok_BB_CClassFactory : shok_object {
 	static inline constexpr int TypeDesc = 0x830C80;
 
 
-	shok_object* CreateObject(unsigned int identifier);
+	shok_BB_IObject* CreateObject(unsigned int identifier);
 	template<class T> T* CreateObject()
 	{
-		return shok_DynamicCastFromObject<T>(CreateObject(T::Identifier));
+		return shok_DynamicCast<shok_BB_IObject, T>(CreateObject(T::Identifier));
 	}
-	void LoadObject(shok_object* ob, const char* filename);
+	void LoadObject(shok_BB_IObject* ob, const char* filename);
 	template<class T> T* LoadObject(const char* filename)
 	{
 		T* ob = CreateObject<T>();
@@ -74,7 +74,7 @@ struct shok_BB_CClassFactory : shok_object {
 	}
 	const char* GetClassDemangledName(unsigned int identifier);
 	unsigned int GetIdentifierByName(const char* name);
-	void AddClassToFactory(unsigned int identifier, const char* name, shok_object* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData);
+	void AddClassToFactory(unsigned int identifier, const char* name, shok_BB_IObject* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData);
 
 
 	static inline shok_BB_CClassFactory** const GlobalObj = reinterpret_cast<shok_BB_CClassFactory**>(0x88F044);
@@ -89,9 +89,16 @@ struct RTTI_TypeDescriptor {
 	int typedesc_vtable = 0x0788E9C;
 	int runtime_reference = 0;
 	char MangledTypeName[25] = ".?AVFakeClass@CppLogic@@";
+
+	const char* name() const;
+	static inline const RTTI_TypeDescriptor* (__cdecl* const __RTTypeid)(const void* ob) = reinterpret_cast<const RTTI_TypeDescriptor* (__cdecl*)(const void*)>(0x5C339A);
+	template<class T>
+	static const RTTI_TypeDescriptor* TypeID() {
+		return reinterpret_cast<RTTI_TypeDescriptor*>(T::TypeDesc);
+	}
 };
 struct RTTI_BaseClassDescriptor {
-	RTTI_TypeDescriptor* TypeDesc;
+	const RTTI_TypeDescriptor* TypeDesc;
 	int NumOfSubElementsInBaseClassArray;
 	int MemberDisplacement = 0;
 	int vtableDisplacement = 0;

@@ -50,13 +50,13 @@ struct shok_framework_saveData {
 
 
 
-struct shok_GDB_CValue : shok_object {
+struct shok_GDB_CValue : shok_BB_IObject {
 	float Data;
 
 	static inline constexpr int vtp = 0x76300C;
 };
 
-struct shok_GDB_CString : shok_object {
+struct shok_GDB_CString : shok_BB_IObject {
 	shok_string Data;
 
 	static inline constexpr int vtp = 0x76302C;
@@ -64,10 +64,10 @@ struct shok_GDB_CString : shok_object {
 
 struct shok_GDBEntry {
 	shok_string Key;
-	shok_object* Data; // shok_GDB_CValue, shok_GDB_CString, or shok_GDB_CList
+	shok_BB_IObject* Data; // shok_GDB_CValue, shok_GDB_CString, or shok_GDB_CList
 };
 
-struct shok_GDB_CList : shok_object {
+struct shok_GDB_CList : shok_BB_IObject {
 	shok_set<shok_GDBEntry> Entries;
 
 	bool IsKeyValid(const char* key);

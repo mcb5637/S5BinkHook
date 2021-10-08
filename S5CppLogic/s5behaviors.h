@@ -1,7 +1,7 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_EGL_CGLEBehavior : shok_object { // no vtable
+struct shok_EGL_CGLEBehavior : shok_BB_IObject { // no vtable
 	int SlotIndex, EntityId;
 	shok_EGL_CGLEBehaviorProps* PropPointer; // 3, warning this may not be set
 
@@ -736,7 +736,7 @@ struct shok_EGL_GLEBehaviorMultiSubAnims : shok_EGL_CGLEBehavior {
 	static inline constexpr unsigned int Identifier = 0x0FCFC0D;
 };
 
-struct shok_GGL_CBuildingMerchantBehavior_COffer : shok_object {
+struct shok_GGL_CBuildingMerchantBehavior_COffer : shok_BB_IObject {
 	shok_costInfo ResourceCosts;
 	int OffersRemaining;
 

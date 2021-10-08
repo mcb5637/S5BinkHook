@@ -49,7 +49,7 @@ struct shok_IEntityDisplay { // warning: you have to dymamic cast this! , entity
 	static inline constexpr int TypeDesc = 0x810C10;
 };
 
-struct shok_EGL_CGLEEntity : shok_object, shok_IEntityDisplay {
+struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_IEntityDisplay {
 	PADDINGI(1);
 	int EntityId;
 	PADDINGI(1); // some type of flags
@@ -412,7 +412,7 @@ struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
 	static inline constexpr unsigned int Identifier = 0xE12A3723;
 };
 
-struct shok_EGL_CGLEEntityCreator : shok_object {
+struct shok_EGL_CGLEEntityCreator : shok_BB_IObject {
 	int EntityType = 0;
 	shok_positionRot Pos = { 0,0,0 };
 	int Flags = 0; // 5

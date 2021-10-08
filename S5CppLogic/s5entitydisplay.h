@@ -2,14 +2,47 @@
 #include "s5data.h"
 
 struct shok_ED_CBehaviorProps : shok_BB_IObject {
+	int Class;
+	int Index;
+	PADDINGI(1); // 100?? 4
 
 	static inline constexpr int vtp = 0x76AB0C;
 	static inline constexpr int TypeDesc = 0x80AC10;
 	static inline constexpr unsigned int Identifier = 0x1F78996D;
 };
 
-struct shok_ED_IBehavior : shok_BB_IObject {
+struct shok_GD_CLimitedAttachmentBannerBehaviorProps : shok_ED_CBehaviorProps {
 
+	static inline constexpr int vtp = 0x76AB1C;
+	static inline constexpr int TypeDesc = 0x80AC30;
+	static inline constexpr unsigned int Identifier = 0x156D5E5D;
+};
+
+struct shok_GD_CCamouflageBehaviorProps : shok_ED_CBehaviorProps {
+
+	static inline constexpr int vtp = 0x76AEA0;
+	static inline constexpr int TypeDesc = 0x80B048;
+	static inline constexpr unsigned int Identifier = 0x15CB25AD;
+};
+
+struct shok_GD_CBuildingBehaviorProps : shok_ED_CBehaviorProps {
+
+	static inline constexpr int vtp = 0x76AF1C;
+	static inline constexpr int TypeDesc = 0x80B1C0;
+	static inline constexpr unsigned int Identifier = 0x2A2142BD;
+};
+
+struct shok_GD_CWaterfallAnimationBehaviorProps : shok_ED_CBehaviorProps {
+
+	static inline constexpr int vtp = 0x7AEA34;
+	static inline constexpr int TypeDesc = 0x84D320;
+	static inline constexpr unsigned int Identifier = 0x38F70CA3;
+};
+
+struct shok_ED_CEntity;
+struct shok_ED_IBehavior : shok_BB_IObject {
+	shok_ED_CEntity* EntityDisplay;
+	shok_ED_CBehaviorProps* Props;
 
 	static inline constexpr int vtp = 0x76A9E4;
 	static inline constexpr int TypeDesc = 0x80AA54;
@@ -28,10 +61,15 @@ struct shok_GD_CLimitedAttachmentBannerBehavior : shok_ED_IBehavior {
 };
 
 struct shok_GD_CCamouflageBehavior : shok_ED_IBehavior {
+	void* Slot; // EGL::TSlot<GGL::SSlotArgsCamouflage,983570077>
+	bool Active; // check if true, returned by slot
+	PADDING(3);
 
 	static inline constexpr int vtp = 0x76AEB0;
 	static inline constexpr int TypeDesc = 0x80B0B8;
+	static inline constexpr unsigned int Identifier = 0x26C048ED;
 };
+static_assert(sizeof(shok_GD_CCamouflageBehavior) == 5 * 4);
 
 struct shok_GD_CBuildingBehavior : shok_ED_IBehavior {
 
@@ -108,6 +146,17 @@ struct shok_ED_CEntity : shok_BB_IObject {
 	PADDINGI(1); // unk p
 	PADDINGI(1); // -1, color? // 14
 
+	template<typename T, typename std::enable_if<std::is_base_of<shok_ED_IBehavior, T>::value>::type* = nullptr>
+	T* GetDisplayBehavior() {
+		for (shok_ED_IBehavior* b : DisplayBehaviors) {
+			if (b) {
+				T* r = shok_DynamicCast<shok_ED_IBehavior, T>(b);
+				if (r)
+					return r;
+			}
+		}
+		return nullptr;
+	}
 
 	static inline constexpr int vtp = 0x76A494;
 };

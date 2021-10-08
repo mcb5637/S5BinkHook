@@ -38,6 +38,18 @@ public:
 
 	static inline constexpr int vtp = 0x76E47C;
 	static inline constexpr int TypeDesc = 0x810B0C;
+
+	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehaviorProps, T>::value>::type* = nullptr>
+	T* GetBehaviorProps() {
+		for (shok_EGL_CGLEBehaviorProps* b : BehaviorProps) {
+			if (b) {
+				T* r = shok_DynamicCast<shok_EGL_CGLEBehaviorProps, T>(b);
+				if (r)
+					return r;
+			}
+		}
+		return nullptr;
+	}
 };
 //constexpr int i = offsetof(shok_EGL_CGLEEntityProps, ExperiencePoints) / 4;
 
@@ -152,34 +164,47 @@ struct shok_ED_CDisplayEntityProps : shok_BB_IObject {
 	vector_padding;
 	std::vector<int, shok_allocator<int>> AnimList;
 	vector_padding;
-	std::vector<shok_ED_CBehaviorProps*, shok_allocator<shok_ED_CBehaviorProps*>> DisplaBehaviorProps;
+	std::vector<shok_ED_CBehaviorProps*, shok_allocator<shok_ED_CBehaviorProps*>> DisplayBehaviorProps;
+
+	template<typename T, typename std::enable_if<std::is_base_of<shok_ED_CBehaviorProps, T>::value>::type* = nullptr>
+	T* GetDisplayBehaviorProps() {
+		for (shok_ED_CBehaviorProps* b : DisplayBehaviorProps) {
+			if (b) {
+				T* r = shok_DynamicCast<shok_ED_CBehaviorProps, T>(b);
+				if (r)
+					return r;
+			}
+		}
+		return nullptr;
+	}
 
 	static inline constexpr int vtp = 0x788840;
 	static inline constexpr int TypeDesc = 0x83C918;
 };
 static_assert(sizeof(shok_ED_CDisplayEntityProps) == 16 * 4);
 
+struct shok_GGlue_CGlueEntityProps_behavior {
+	shok_EGL_CGLEBehaviorProps* Logic;
+	shok_ED_CBehaviorProps* Display;
+};
 struct shok_GGlue_CGlueEntityProps : shok_BB_IObject {
 	PADDINGI(1);
 	shok_EGL_CGLEEntityProps* LogicProps;
 	shok_ED_CDisplayEntityProps* DisplayProps;
 	vector_padding;
-	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps;
+	std::vector<shok_GGlue_CGlueEntityProps_behavior, shok_allocator<shok_GGlue_CGlueEntityProps_behavior>> BehaviorProps;
 
 	static inline constexpr int vtp = 0x788824;
 	static inline constexpr int TypeDesc = 0x83C8CC;
 
 
-	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehaviorProps, T>::value>::type* = nullptr>
+	template<typename T>
 	T* GetBehaviorProps() {
-		for (shok_EGL_CGLEBehaviorProps* b : BehaviorProps) {
-			if (b) {
-				T* r = shok_DynamicCast<shok_EGL_CGLEBehaviorProps, T>(b);
-				if (r)
-					return r;
-			}
-		}
-		return nullptr;
+		return LogicProps->GetBehaviorProps<T>();
+	}
+	template<typename T>
+	T* GetDisplayBehaviorProps() {
+		return DisplayProps->GetDisplayBehaviorProps<T>();
 	}
 
 	bool IsSettlerType();

@@ -2,7 +2,8 @@
 #include "s5data.h"
 
 struct shok_vtable_ED_CBehaviorProps : shok_vtable_BB_IObject {
-    PADDINGI(2);
+    void(__stdcall* OnAdd)(shok_ED_IBehavior* th, shok_ED_CEntity* edisplay, shok_ED_CBehaviorProps* props, int _2); // called before shok_ED_CEntity init
+    void(__stdcall* Initialize)(shok_ED_IBehavior* th, shok_ED_CEntity* edisplay, shok_ED_CBehaviorProps* props); // called after shok_ED_CEntity init
     void(__stdcall* UpdateRenderNoTick)(shok_ED_IBehavior* th, int count, float uk);
     void(__stdcall* UpdateRenderOneTick)(shok_ED_IBehavior* th, int count, float uk);
     void(__stdcall* UpdateRenderManyTick)(shok_ED_IBehavior* th, int count, float uk);

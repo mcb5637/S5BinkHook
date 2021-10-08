@@ -71,8 +71,28 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    lua_pushstring(L, RTTI_TypeDescriptor::__RTTypeid( luaext_checkEntity(L, 1))->name());
-    return 1;
+    shok_GGlue_CGlueEntityProps* t = luaext_checkEntity(L, 1)->GetEntityType();
+    lua_newtable(L);
+    int i = 1;
+    for (shok_GGlue_CGlueEntityProps_behavior& p : t->BehaviorProps) {
+        if (p.Logic) {
+            lua_pushstring(L, RTTI_TypeDescriptor::__RTTypeid(p.Logic)->name());
+            lua_rawseti(L, -2, i);
+        }
+
+        i++;
+    }
+    lua_newtable(L);
+    i = 1;
+    for (shok_GGlue_CGlueEntityProps_behavior& p : t->BehaviorProps) {
+        if (p.Display) {
+            lua_pushstring(L, RTTI_TypeDescriptor::__RTTypeid(p.Display)->name());
+            lua_rawseti(L, -2, i);
+        }
+
+        i++;
+    }
+    return 2;
 }
 
 int cleanup(lua_State* L) {

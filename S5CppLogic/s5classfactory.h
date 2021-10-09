@@ -32,6 +32,58 @@ struct shok_BB_CClassFactory_serializationData_FieldSerilaizer {
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeTaskList = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x85D4AC);
 
 };
+struct shok_BB_CClassFactory_serializationData_ListOptions {
+	struct iter {
+		void* List;
+		unsigned int data; // usually a pointer
+		bool first = true;
+	};
+
+	void* (__stdcall* AddToList)(void* List) = nullptr; // gets list, allocates, then returns p to new object
+	int z = 0;
+	iter* (__stdcall* AllocIter)(void* List) = nullptr;
+	bool(__stdcall* IterNext)(iter* i) = nullptr;
+	void* (__stdcall* IterCurrent)(iter* i) = nullptr;
+	void(__stdcall* FreeIter)(iter* i) = nullptr;
+	int nullsub = 0x52B509;
+	size_t(__stdcall* GetSize)(void* List) = nullptr;
+};
+template<class T>
+struct shok_BB_CClassFactory_serializationData_ListOptions_ForVector : shok_BB_CClassFactory_serializationData_ListOptions { // do not use with shok_allocator vector!
+
+	shok_BB_CClassFactory_serializationData_ListOptions_ForVector() {
+		AddToList = [](void* l) {
+			std::vector<T>* v = static_cast<std::vector<T>*>(l);
+			v->push_back(T{});
+			return static_cast<void*>(v->data() + (v->size() - 1));
+		};
+		AllocIter = [](void* l) {
+			return new iter{ l, 0, true };
+		};
+		IterNext = [](iter* i) {
+			std::vector<T>* v = static_cast<std::vector<T>*>(i->List);
+			if (i->first) {
+				i->first = false;
+				i->data = 0;
+			}
+			else {
+				i->data++;
+			}
+			return i->data < v->size();
+		};
+		IterCurrent = [](iter* i) {
+			std::vector<T>* v = static_cast<std::vector<T>*>(i->List);
+			return static_cast<void*>(v->data() + i->data);
+		};
+		FreeIter = [](iter* i) {
+			delete i;
+		};
+		GetSize = [](void* l) {
+			std::vector<T>* v = static_cast<std::vector<T>*>(l);;
+			return v->size();
+		};
+	}
+};
 struct shok_BB_CClassFactory_serializationData { // use a 0-terminated array (default constructed is 0)
 	int Type = 0; // 2 direct val, 3 embedded
 	const char* SerializationName = nullptr;
@@ -40,7 +92,7 @@ struct shok_BB_CClassFactory_serializationData { // use a 0-terminated array (de
 	shok_BB_CClassFactory_serializationData_FieldSerilaizer* DataConverter = 0;
 	shok_BB_CClassFactory_serializationData* SubElementData = nullptr; //5
 	int Unknown2 = 0;
-	int ListOptions = 0;
+	shok_BB_CClassFactory_serializationData_ListOptions* ListOptions = nullptr;
 	int Unknown3 = 0;
 
 

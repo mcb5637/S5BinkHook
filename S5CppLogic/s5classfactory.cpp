@@ -79,21 +79,21 @@ const char* RTTI_TypeDescriptor::name() const
     return typedesc_name(this);
 }
 
+struct factorytest_s : shok_BB_IObject {
+    std::vector<int> data;
 
+    static inline constexpr int Identifier = 0x500;
+    static const int TypeDesc;
+};
+shok_BB_CClassFactory_serializationData_ListOptions_ForVector<int> intvect{};
 shok_BB_CClassFactory_serializationData seridata[] = {
     {
-        2, "Data", 4, 4, shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeInt, nullptr, 0,0,0
+        2, "Data", offsetof(factorytest_s, data), sizeof(factorytest_s::data), shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeInt, nullptr, 0, &intvect,0
     },
     {}
 };
 
 
-struct factorytest_s : shok_BB_IObject {
-    int data;
-
-    static inline constexpr int Identifier = 0x500;
-    static const int TypeDesc;
-};
 int factorytestvt[];
 RTTI_TypeDescriptor factorytypedesc{ };
 RTTI_BaseClassDescriptor factorybaseclass1{ &factorytypedesc, 1, 0, -1, 0, 0 };

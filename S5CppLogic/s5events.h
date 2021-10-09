@@ -844,7 +844,7 @@ enum class shok_EventIDs : int {
 
 	WorkPlace_OnWorkerAttach = 0x17003, //EGL::CEvent1Entity
 	WorkPlace_OnWorkerDetach = 0x17004, //EGL::CEvent1Entity
-	// 0x17005 affectmoti affect moti, foundation init, defendablebuil activate defendmode construction complete
+	Building_OnConstructionComplete = 0x17005, //BB::CEvent affectmoti affect moti, foundation init, defendablebuil activate defendmode construction complete
 	// 0x17006 buildingbeh worward to 0x17004
 	Market_WorkStep = 0x17007, //BB::CEvent
 	University_ResearchStep = 0x17008, //BB::CEvent

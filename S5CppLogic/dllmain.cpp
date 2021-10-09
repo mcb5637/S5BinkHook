@@ -57,7 +57,7 @@ void dumpClassSerialization(lua_State* L, shok_BB_CClassFactory_serializationDat
 
         if (d->ListOptions) {
             lua_pushstring(L, "ListOpions");
-            lua_pushnumber(L, d->ListOptions);
+            lua_pushnumber(L, reinterpret_cast<int>(d->ListOptions));
             lua_rawset(L, -3);
         }
 

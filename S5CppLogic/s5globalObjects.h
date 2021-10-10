@@ -107,10 +107,10 @@ struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x7837B0;
 
-	void ToTerrainCoord(shok_position& p, int* out);
+	void ToTerrainCoord(const shok_position& p, int* out);
 	bool IsCoordValid(int* out);
-	int GetTerrainHeight(shok_position& p);
-	void SetTerrainHeight(shok_position& p, int h); // int16
+	int GetTerrainHeight(const shok_position& p);
+	void SetTerrainHeight(const shok_position& p, int h); // int16
 };
 struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	friend struct shok_EGL_CGLELandscape;

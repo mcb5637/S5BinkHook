@@ -601,7 +601,7 @@ struct shok_BB_CMouseEvent : shok_BB_CInputEvent {
 
 struct shok_EGL_IGLEHandler_BB_CEvent_void : shok_object {
 	void* Object;
-	int(__thiscall* Func)(void* th, shok_BB_CEvent* ev);
+	void(__thiscall* Func)(void* th, shok_BB_CEvent* ev);
 };
 
 enum class shok_EventIDs : int {
@@ -938,6 +938,8 @@ enum class shok_EventIDs : int {
 	ReplaceableEntity_Disable = 0x20025, //BB::CEvent
 	// 20026 set uv anim?
 	// 20027 BB::CEvent also suspend?
+
+	CppL_OnEntityDestroy = 0x50000,
 };
 
 enum class shok_NetEventIds : int {

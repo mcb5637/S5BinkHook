@@ -1449,6 +1449,8 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_E
 std::map<int, entityAddonData> shok_EGL_CGLEEntity::AddonDataMap = std::map<int, entityAddonData>();
 entityAddonData shok_EGL_CGLEEntity::LastRemovedEntityAddonData = entityAddonData();
 void __fastcall destroyentity_gemoveadd(shok_EGL_CGLEEntity* e) {
+	shok_BB_CEvent ev{ shok_EventIDs::CppL_OnEntityDestroy };
+	e->FireEvent(&ev);
 	auto a = shok_EGL_CGLEEntity::AddonDataMap.find(e->EntityId);
 	if (a != shok_EGL_CGLEEntity::AddonDataMap.end()) {
 		shok_EGL_CGLEEntity::LastRemovedEntityAddonData = a->second;
@@ -1533,12 +1535,12 @@ void shok_EGL_CGLEEntity::AddTaskStateHandler(shok_TaskState state, void* obj, i
 	shand->Zero = 0;
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->AddStateHandler(this, state, shand);
 }
-void shok_EGL_CGLEEntity::AddEventHandler(shok_EventIDs ev, void* ob, int(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev))
+void shok_EGL_CGLEEntity::AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev))
 {
 	shok_EGL_IGLEHandler_BB_CEvent_void* ehand = static_cast<shok_EGL_IGLEHandler_BB_CEvent_void*>(shok_malloc(sizeof(shok_EGL_IGLEHandler_BB_CEvent_void)));
 	ehand->vtable = 0x774948; // EGL::THandler<81926, class BB::CEvent, class BB::CEvent, class GGL::CSerfBehavior, void>
 	ehand->Object = ob;
-	ehand->Func = reinterpret_cast<int(__thiscall*)(void*, shok_BB_CEvent*)>(Handler);
+	ehand->Func = reinterpret_cast<void(__thiscall*)(void*, shok_BB_CEvent*)>(Handler);
 	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->AddEventHandler(this, ev, ehand);
 }
 

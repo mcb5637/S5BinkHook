@@ -150,7 +150,7 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_IEntityDisplay {
 
 	void AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs)); // _ is undefined
 	void AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek)); // _ is undefined
-	void AddEventHandler(shok_EventIDs ev, void* ob, int(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev)); // _ is undefined
+	void AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev)); // _ is undefined
 
 	void AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo);
 	static void __stdcall AdvancedDealAoEDamage(shok_EGL_CGLEEntity* attacker, const shok_position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo);

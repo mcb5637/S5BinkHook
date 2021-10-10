@@ -162,7 +162,7 @@ void shok_EGL_CTerrainVertexColors::SetTerrainVertexColor(shok_position& p, int 
 	terrvertexcol_setvcol(this, qp[0], qp[1], &col);
 }
 
-void shok_EGL_CGLETerrainHiRes::ToTerrainCoord(shok_position& p, int* out)
+void shok_EGL_CGLETerrainHiRes::ToTerrainCoord(const shok_position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
@@ -171,7 +171,7 @@ bool shok_EGL_CGLETerrainHiRes::IsCoordValid(int* out)
 {
 	return out[0] >= 0 && out[1] >= 0 && out[0] < MaxSizeX && out[1] < MaxSizeY;
 }
-int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(shok_position& p)
+int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(const shok_position& p)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
@@ -180,7 +180,7 @@ int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(shok_position& p)
 	return TerrainHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
 }
 void(__thiscall* const terrhires_setheight)(shok_EGL_CGLETerrainHiRes* th, int* qp, int16_t h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainHiRes*, int*, int16_t)>(0x591B53);
-void shok_EGL_CGLETerrainHiRes::SetTerrainHeight(shok_position& p, int h)
+void shok_EGL_CGLETerrainHiRes::SetTerrainHeight(const shok_position& p, int h)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);

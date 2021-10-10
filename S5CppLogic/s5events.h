@@ -939,7 +939,8 @@ enum class shok_EventIDs : int {
 	// 20026 set uv anim?
 	// 20027 BB::CEvent also suspend?
 
-	CppL_OnEntityDestroy = 0x50000,
+	CppL_OnEntityDestroy = 0x50000, // BB::CEvent
+	CppL_OnEntityKilled = 0x50001, // GGL::CEventEntityIndex index is attacker player
 };
 
 enum class shok_NetEventIds : int {

@@ -1032,6 +1032,8 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 					currentsol--;
 					idskilled.push_back(firsttodie->EntityId);
 					xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
+					shok_GGL_CEventEntityIndex kev{ shok_EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
+					firsttodie->FireEvent(&kev);
 					if (shok_EGL_CGLEEntity::HurtEntityOnKillCb)
 						shok_EGL_CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
 					firsttodie->Hurt(firsttodie->Health);
@@ -1056,6 +1058,8 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		if (damage >= firsttodie->Health) {
 			idskilled.push_back(firsttodie->EntityId);
 			xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
+			shok_GGL_CEventEntityIndex kev{ shok_EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
+			firsttodie->FireEvent(&kev);
 			if (shok_EGL_CGLEEntity::HurtEntityOnKillCb)
 				shok_EGL_CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
 			firsttodie->Hurt(firsttodie->Health);

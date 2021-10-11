@@ -951,7 +951,7 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		return;
 	shok_EGL_CEventGetValue_bool getbool{ shok_EventIDs::IsSettlerOrBuilding };
 	FireEvent(&getbool);
-	if (!getbool.Data)
+	if (!getbool.Data && !shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBridgeEntity>(this))
 		return;
 	if (GetFirstAttachedEntity(shok_AttachmentType::SETTLER_ENTERED_BUILDING) || GetFirstAttachedEntity(shok_AttachmentType::SETTLER_BUILDING_TO_LEAVE))
 		return;
@@ -1082,7 +1082,8 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		if (addStat) {
 			if (attackerplayer)
 				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfBuildingsDestroyed += idskilled.size();
-			(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId)->Statistics.NumberOfBuildingsLost += idskilled.size();
+			if (shok_GGL_CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
+				ps->Statistics.NumberOfBuildingsLost += idskilled.size();
 		}
 		callback = "GameCallback_BuildingDestroyed";
 	}
@@ -1090,7 +1091,8 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		if (addStat) {
 			if (attackerplayer)
 				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfUnitsKilled += idskilled.size();
-			(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId)->Statistics.NumberOfUnitsDied += idskilled.size();
+			if (shok_GGL_CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
+				ps->Statistics.NumberOfUnitsDied += idskilled.size();
 		}
 		callback = "GameCallback_SettlerKilled";
 	}
@@ -1762,6 +1764,11 @@ int shok_GGL_CSettler::LeaderGetRegenHealthSeconds()
 		return d->RegenSecondsOverride;
 	else
 		return GetEntityType()->GetBehaviorProps<shok_GGL_CLeaderBehaviorProps>()->HealingSeconds;
+}
+static inline void(__thiscall* const settler_killbyenviro)(shok_GGL_CSettler* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CSettler*)>(0x4A5049);
+void shok_GGL_CSettler::KillSettlerByEnvironment()
+{
+	settler_killbyenviro(this);
 }
 
 void shok_EGL_CGLEEntity::PerformHeal(int r, bool healSoldiers)

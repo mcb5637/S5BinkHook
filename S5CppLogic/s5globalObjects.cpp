@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "s5data.h"
 #include <stdexcept>
+#include "entityiterator.h"
 
 
 struct shok_vtable_ECS_CManager {
@@ -364,6 +365,40 @@ void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, c
 
 	ApplyBlocking(p, area, 0, BlockingMode::BridgeArea); // set r after implememting rotation
 	RemoveBlocking(p, area, 0, BlockingMode::Blocked);
+}
+static inline void(__thiscall* const landscape_updateblocking)(shok_EGL_CGLELandscape* th, int* low, int* high) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, int*, int*)>(0x5796A2);
+void shok_EGL_CGLELandscape::UpdateBlocking(const shok_AARect& area)
+{
+	shok_position p{ min(area.low.X, area.high.X), min(area.low.Y, area.high.Y) };
+	int low[2] = { 0,0 };
+	int high[2] = { 0,0 };
+	HiRes->ToTerrainCoord(p, low);
+	p = { max(area.low.X, area.high.X), max(area.low.Y, area.high.Y) };
+	HiRes->ToTerrainCoord(p, high);
+	if (!HiRes->IsCoordValid(low))
+		DEBUGGER_BREAK;
+	if (!HiRes->IsCoordValid(high))
+		DEBUGGER_BREAK;
+	landscape_updateblocking(this, low, high);
+}
+void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot)
+{
+	EntityIteratorPredicateInRect rec{ p.X + area.low.X, p.Y + area.low.Y, p.X + area.high.X, p.Y + area.high.Y };
+	EntityIterator it{ &rec };
+	shok_EGL_CGLEEntity* ent = it.GetNext(nullptr, nullptr);
+	while (ent) {
+		if (shok_GGL_CSettler* s = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(ent)) {
+			s->KillSettlerByEnvironment();
+		}
+		else if (shok_GGL_CAnimal* a = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CAnimal>(ent)) {
+			if (!a->GetFirstAttachedToMe(shok_AttachmentType::HERO_HAWK))
+				a->Destroy();
+		}
+
+		ent = it.GetNext(nullptr, nullptr);
+	}
+	RemoveBlocking(p, area, 0, BlockingMode::BridgeArea);
+	ApplyBlocking(p, area, 0, BlockingMode::Blocked); // set r after implememting rotation
 }
 
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {

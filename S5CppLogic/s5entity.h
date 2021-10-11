@@ -320,6 +320,7 @@ struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
 
 	int LeaderGetRegenHealth();
 	int LeaderGetRegenHealthSeconds();
+	void KillSettlerByEnvironment();
 
 	// defined tasks: TASK_VANISH, TASK_APPEAR, TASK_ENTER_BUILDING, TASK_LEAVE_BUILDING, TASK_LIST_DONE, TASK_SET_TASK_LIST, TASK_WAIT, TASK_LEFT_BUILDING, TASK_WAIT_UNTIL
 	//		TASK_RESOLVE_COLLISION, TASK_GO_TO_FREE_POSITION, TASK_SET_POS (set relative to workplace)

@@ -71,28 +71,14 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    shok_GGlue_CGlueEntityProps* t = luaext_checkEntity(L, 1)->GetEntityType();
-    lua_newtable(L);
-    int i = 1;
-    for (shok_GGlue_CGlueEntityProps_behavior& p : t->BehaviorProps) {
-        if (p.Logic) {
-            lua_pushstring(L, RTTI_TypeDescriptor::__RTTypeid(p.Logic)->name());
-            lua_rawseti(L, -2, i);
-        }
-
-        i++;
-    }
-    lua_newtable(L);
-    i = 1;
-    for (shok_GGlue_CGlueEntityProps_behavior& p : t->BehaviorProps) {
-        if (p.Display) {
-            lua_pushstring(L, RTTI_TypeDescriptor::__RTTypeid(p.Display)->name());
-            lua_rawseti(L, -2, i);
-        }
-
-        i++;
-    }
-    return 2;
+    shok_AARect a{ -500,-500,500,500 };
+    shok_position p;
+    luaext_checkPos(L, p, 1);
+    if (lua_toboolean(L, 2))
+        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedApplyBridgeHeight(p, a, 0, 2500);
+    else
+        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedRemoveBridgeHeight(p, a, 0);
+    return 0;
 }
 
 int cleanup(lua_State* L) {

@@ -107,7 +107,7 @@ struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x7837B0;
 
-	void ToTerrainCoord(const shok_position& p, int* out);
+	static void ToTerrainCoord(const shok_position& p, int* out);
 	bool IsCoordValid(int* out);
 	int GetTerrainHeight(const shok_position& p);
 	void SetTerrainHeight(const shok_position& p, int h); // int16
@@ -122,7 +122,7 @@ struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x7837C0;
 
-	void ToQuadCoord(const shok_position& p, int* out);
+	static void ToQuadCoord(const shok_position& p, int* out);
 	bool IsCoordValid(const int* out);
 	int GetTerrainTypeAt(const shok_position& p);
 	void SetTerrainTypeAt(const shok_position& p, int tty); // byte (int8)
@@ -166,6 +166,8 @@ struct shok_EGL_CGLELandscape : shok_object {
 	void ApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	void RemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	void AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height);
+	void UpdateBlocking(const shok_AARect& area);
+	void AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot);
 };
 //constexpr int i = sizeof(byte*);
 

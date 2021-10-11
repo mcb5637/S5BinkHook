@@ -89,11 +89,17 @@ shok_TechState shok_GGL_CPlayerStatus::GetTechStatus(int tech)
 
 bool ArePlayersHostile(int p1, int p2)
 {
-	return (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(p1)->GetDiploStateTo(p2) == shok_DiploState::Hostile;
+	shok_GGL_CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(p1);
+	if (!ps)
+		return false;
+	return ps->GetDiploStateTo(p2) == shok_DiploState::Hostile;
 }
 bool ArePlayersFriendly(int p1, int p2)
 {
-	return (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(p1)->GetDiploStateTo(p2) == shok_DiploState::Friendly;
+	shok_GGL_CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(p1);
+	if (!ps)
+		return false;
+	return ps->GetDiploStateTo(p2) == shok_DiploState::Friendly;
 }
 
 bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = nullptr;

@@ -9,6 +9,16 @@ struct shok_vtable_ECS_CManager {
 	void(__thiscall* ReloadCutscene)(shok_ECS_CManager* th, const char* path);
 };
 
+struct shok_vtable_EGL_CTiling {
+	PADDINGI(5);
+	void(__thiscall* OnPreBlockingAddedAt)(shok_EGL_CTiling* th, int x, int y); // 5
+	void(__thiscall* OnPreBlockingMode1Removed)(shok_EGL_CTiling* th, int x, int y);
+	void(__thiscall* OnPostBlockingMode2Removed)(shok_EGL_CTiling* th, int x, int y);
+	PADDINGI(6);
+	bool(__thiscall* GetSomeGlobal)(shok_EGL_CTiling* th); // 14
+};
+//constexpr int i = offsetof(shok_vtable_EGL_CTiling, GetSomeGlobal) / 4;
+
 struct shok_vtable_EGL_CGLEGameLogic {
 	PADDINGI(22);
 	int(__thiscall* CreateEntity)(shok_EGL_CGLEGameLogic* th, shok_EGL_CGLEEntityCreator* data, int i); // 22
@@ -117,7 +127,7 @@ void shok_BB_CIDManagerEx::RemoveID(int id)
 		shok_free(v.at(id).Name);
 		v[id].Name = nullptr;
 		v[id].Hash = 0;
-		if (id == static_cast<int>(v.size()-1))
+		if (id == static_cast<int>(v.size() - 1))
 			v.pop_back();
 		});
 }
@@ -363,8 +373,8 @@ void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, c
 		}
 	}
 
-	ApplyBlocking(p, area, 0, BlockingMode::BridgeArea); // set r after implememting rotation
-	RemoveBlocking(p, area, 0, BlockingMode::Blocked);
+	AdvancedApplyBlocking(p, area, 0, BlockingMode::BridgeArea); // set r after implememting rotation
+	AdvancedRemoveBlocking(p, area, 0, BlockingMode::Blocked);
 }
 static inline void(__thiscall* const landscape_updateblocking)(shok_EGL_CGLELandscape* th, int* low, int* high) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, int*, int*)>(0x5796A2);
 void shok_EGL_CGLELandscape::UpdateBlocking(const shok_AARect& area)
@@ -397,8 +407,53 @@ void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok_position& p, 
 
 		ent = it.GetNext(nullptr, nullptr);
 	}
-	RemoveBlocking(p, area, 0, BlockingMode::BridgeArea);
-	ApplyBlocking(p, area, 0, BlockingMode::Blocked); // set r after implememting rotation
+	AdvancedRemoveBlocking(p, area, 0, BlockingMode::BridgeArea);
+	AdvancedApplyBlocking(p, area, 0, BlockingMode::Blocked); // set r after implememting rotation
+}
+static inline void(__thiscall* const landscape_setsingleblockingpoint)(shok_EGL_CGLELandscape* th, int x, int y, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, int, int, shok_EGL_CGLELandscape::BlockingMode*)>(0x57738A);
+void shok_EGL_CGLELandscape::AdvancedApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+{
+	shok_position p2{ min(area.low.X, area.high.X) + p.X, min(area.low.Y, area.high.Y) + p.Y };
+	int low[2] = { 0,0 };
+	int high[2] = { 0,0 };
+	HiRes->ToTerrainCoord(p2, low);
+	p2 = { max(area.low.X, area.high.X) + p.X, max(area.low.Y, area.high.Y) + p.Y };
+	HiRes->ToTerrainCoord(p2, high);
+	int curr[2];
+	for (curr[1] = low[1]; curr[1] < high[1]; curr[1]++) {
+		for (curr[0] = low[0]; curr[0] < high[0]; curr[0]++) {
+			if (!HiRes->IsCoordValid(curr))
+				continue;
+			landscape_setsingleblockingpoint(this, curr[0], curr[1], &blockingmode);
+		}
+	}
+}
+static inline void(__thiscall* const lsblocking_remvoveblockingpoint)(shok_EGL_CGLELandscape_blockingData* th, int x, int y, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape_blockingData*, int, int, shok_EGL_CGLELandscape::BlockingMode*)>(0x57EEE1);
+void shok_EGL_CGLELandscape::AdvancedRemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+{
+	shok_position p2{ min(area.low.X, area.high.X) + p.X, min(area.low.Y, area.high.Y) + p.Y };
+	int low[2] = { 0,0 };
+	int high[2] = { 0,0 };
+	HiRes->ToTerrainCoord(p2, low);
+	p2 = { max(area.low.X, area.high.X) + p.X, max(area.low.Y, area.high.Y) + p.Y };
+	HiRes->ToTerrainCoord(p2, high);
+	int curr[2];
+	for (curr[1] = low[1]; curr[1] < high[1]; curr[1]++) {
+		for (curr[0] = low[0]; curr[0] < high[0]; curr[0]++) {
+			if (!HiRes->IsCoordValid(curr))
+				continue;
+			RemoveSingleBlockingPoint(curr[0], curr[1], blockingmode);
+		}
+	}
+}
+void shok_EGL_CGLELandscape::RemoveSingleBlockingPoint(int x, int y, BlockingMode mode)
+{
+	shok_vtable_EGL_CTiling* vt = reinterpret_cast<shok_vtable_EGL_CTiling*>(Tiling->vtable);
+	if (static_cast<int>(mode) & static_cast<int>(BlockingMode::Blocked) && vt->GetSomeGlobal(Tiling))
+		vt->OnPreBlockingMode1Removed(Tiling, x, y);
+	lsblocking_remvoveblockingpoint(BlockingData, x, y, &mode);
+	if (static_cast<int>(mode) & static_cast<int>(BlockingMode::BridgeArea) && vt->GetSomeGlobal(Tiling))
+		vt->OnPostBlockingMode2Removed(Tiling, x, y);
 }
 
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
@@ -561,8 +616,8 @@ static inline void(__thiscall* const weatherdata_elements_add)(shok_set<shok_GGL
 void shok_GGL_CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, int transition)
 {
 	// save data
-	shok_GGL_CWeatherHandler_weatherElement *current;
-	shok_GGL_CWeatherHandler_weatherElement *changeto;
+	shok_GGL_CWeatherHandler_weatherElement* current;
+	shok_GGL_CWeatherHandler_weatherElement* changeto;
 	std::vector<int> win_toremove{};
 	Elements.ForAll([this, &win_toremove, &current, &changeto](shok_GGL_CWeatherHandler_KeyAndWeatherElement* kae) {
 		if (this->CurrentWeatherIndex == kae->WeatherIndex)
@@ -677,7 +732,7 @@ void shok_modelinstance::Register()
 {
 	registermodelinst((*shok_ED_CGlobalsBaseEx::GlobalObj)->DisplayWorld->SomeRenderObj, this);
 }
-static inline void*(__cdecl* const modelinst_getsomethingdtor)(shok_modelinstance* i) = reinterpret_cast<void*(__cdecl*)(shok_modelinstance*)>(0x626E00);
+static inline void* (__cdecl* const modelinst_getsomethingdtor)(shok_modelinstance* i) = reinterpret_cast<void* (__cdecl*)(shok_modelinstance*)>(0x626E00);
 static inline void(__cdecl* const modelinst_deregister)(void* d, shok_modelinstance* i) = reinterpret_cast<void(__cdecl*)(void*, shok_modelinstance*)>(0x6271C0);
 static inline void(__cdecl* const modelinst_dest)(shok_modelinstance* i) = reinterpret_cast<void(__cdecl*)(shok_modelinstance*)>(0x6294A0);
 void shok_modelinstance::Destroy()
@@ -715,7 +770,7 @@ void shok_modelinstance::Translate(const shok_position& p, float height, Transfo
 	modelinst_setpos(Transform, f, op);
 }
 
-static inline shok_modelinstance* (__thiscall* const modeldata_instanciate)(const shok_modeldata* d) = reinterpret_cast<shok_modelinstance*(__thiscall*)(const shok_modeldata*)> (0x472742);
+static inline shok_modelinstance* (__thiscall* const modeldata_instanciate)(const shok_modeldata* d) = reinterpret_cast<shok_modelinstance * (__thiscall*)(const shok_modeldata*)> (0x472742);
 shok_modelinstance* shok_modeldata::Instanciate() const
 {
 	return modeldata_instanciate(this);

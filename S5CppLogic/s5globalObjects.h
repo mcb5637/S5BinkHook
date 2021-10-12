@@ -139,6 +139,10 @@ struct shok_EGL_CGLELandscape_blockingData {
 	int ArraySizeXY;
 	byte* data;
 };
+struct shok_EGL_CTiling : shok_object {
+
+	static inline constexpr int vtp = 0x783BAC;
+};
 struct shok_EGL_CGLELandscape : shok_object {
 	enum class BlockingMode : byte {
 		Blocked = 0x1,
@@ -148,7 +152,9 @@ struct shok_EGL_CGLELandscape : shok_object {
 	};
 
 	shok_EGL_CGLELandscape_blockingData* BlockingData;
-	PADDINGI(5); // p 0, p EGL::CTiling, set/list of BB::TSlotEx1<EGL::CGLEGameLogic,EGL::C2DVector const &>
+	PADDINGI(1); //  0 array?
+	shok_EGL_CTiling* Tiling;
+	PADDINGI(3); // set/list of BB::TSlotEx1<EGL::CGLEGameLogic,EGL::C2DVector const &>
 	shok_EGL_CGLETerrainHiRes* HiRes;
 	shok_EGL_CGLETerrainLowRes* LowRes;
 	shok_EGL_CTerrainVertexColors* VertexColors;
@@ -163,11 +169,16 @@ struct shok_EGL_CGLELandscape : shok_object {
 	bool IsPosBlockedInMode(const shok_position* p, BlockingMode mode);
 	void FlattenPosForBuilding(const shok_position& p, const shok_AARect& area, float rot);
 	// block for vector of aarect: thiscall 577B07 (this, pos*, vector<aarect>*, float, byte*)
+	// unblock for vector of aarect: thiscall 577C12 (this, pos*, vector<aarect>*, float, byte*)
 	void ApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	void RemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	void AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height);
 	void UpdateBlocking(const shok_AARect& area);
 	void AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot);
+	void AdvancedApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
+	void AdvancedRemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
+private:
+	void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 };
 //constexpr int i = sizeof(byte*);
 
@@ -214,7 +225,7 @@ struct shok_EGL_CRegionInfo : shok_object {
 struct shok_ED_CGlobalsLogicEx : shok_object {
 	shok_EGL_CGLEGameLogic* GameLogic;
 	PADDINGI(4); // p EGL::CGLEEntitiesDisplay, p EGL::CGLEEffectsDisplay, p EGL::CGLETerrainHiRes, p EGL::CGLETerrainLowRes
-	shok_EGL_CGLELandscape_blockingData *Blocking; // 6
+	shok_EGL_CGLELandscape_blockingData* Blocking; // 6
 	PADDINGI(2); // p EGL::CGLELandscape, p EGL::CTerrainVertexColors
 	shok_EGL_CRegionInfo* RegionInfo; // 9
 	PADDINGI(1); // p EGL::CPlayerExplorationHandler

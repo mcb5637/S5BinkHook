@@ -1,6 +1,14 @@
 #pragma once
 #include "s5data.h"
 
+struct shok_guistate_targetingdata { // size 8
+	int TargetID;
+	shok_position TargetPos;
+	shok_positionRot TargetPosWithZ;
+	PADDINGI(2);
+};
+static_assert(sizeof(shok_guistate_targetingdata) == 8 * 4);
+
 struct shok_GGUI_C3DViewHandler;
 
 struct shok_GGUI_SStateParameters : shok_object {
@@ -242,6 +250,8 @@ struct shok_EGL_CGLEGUIInterface : shok_object {
 	static inline constexpr int vtp = 0x783840;
 };
 struct shok_GGL_CGLGUIInterface : shok_object {
+
+	bool GetNearestFreePosForBuildingPlacement(int ety, const shok_position& inp, shok_position& outp);
 
 	static inline constexpr int vtp = 0x76D9A4;
 };

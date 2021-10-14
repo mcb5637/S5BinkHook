@@ -31,6 +31,12 @@ struct shok_vtable_ERwTools_CRpClumpRenderable {
 	void(__thiscall* SetModelData)(shok_ERwTools_CRpClumpRenderable* th, const shok_modeldata* model, float rot);
 };
 
+struct shok_vtable_GGL_CGLGUIInterface {
+	void(__thiscall* dtor)(shok_GGL_CGLGUIInterface* th, bool free);
+	PADDINGI(3);
+	bool(__thiscall* GetNearestFreeBuildingPos)(shok_GGL_CGLGUIInterface* th, int ety, float inx, float iny, float* outx, float* outy, float range);
+};
+
 void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeldata, float rotation)
 {
 	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata, rotation);
@@ -53,6 +59,11 @@ static inline void(__thiscall* const c3dviewhandler_setguistateonupdate)(shok_GG
 void shok_GGUI_C3DViewHandler::SetGUIStateByIdentfierOnNextUpdate(unsigned int identifier)
 {
 	c3dviewhandler_setguistateonupdate(this, identifier);
+}
+
+bool shok_GGL_CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const shok_position& inp, shok_position& outp)
+{
+	return reinterpret_cast<shok_vtable_GGL_CGLGUIInterface*>(vtable)->GetNearestFreeBuildingPos(this, ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);
 }
 
 void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) = nullptr;

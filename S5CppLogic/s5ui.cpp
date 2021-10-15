@@ -39,7 +39,7 @@ struct shok_vtable_GGL_CGLGUIInterface {
 
 void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeldata, float rotation)
 {
-	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, *reinterpret_cast<void**>(const_cast<shok_modeldata*>(modeldata)), rotation);
+	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata ? *reinterpret_cast<void**>(const_cast<shok_modeldata*>(modeldata)) : nullptr, rotation);
 }
 void shok_ERwTools_CRpClumpRenderable::SetPosition(const shok_position& p, float z)
 {

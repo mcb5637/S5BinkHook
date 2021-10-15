@@ -28,7 +28,7 @@ struct shok_vtable_ERwTools_CRpClumpRenderable {
 	PADDINGI(3);
 	void(__thiscall* SetPosition)(shok_ERwTools_CRpClumpRenderable* th, float x, float y, float z);
 	PADDINGI(1);
-	void(__thiscall* SetModelData)(shok_ERwTools_CRpClumpRenderable* th, const shok_modeldata* model, float rot);
+	void(__thiscall* SetModelData)(shok_ERwTools_CRpClumpRenderable* th, void* model, float rot);
 };
 
 struct shok_vtable_GGL_CGLGUIInterface {
@@ -39,7 +39,7 @@ struct shok_vtable_GGL_CGLGUIInterface {
 
 void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeldata, float rotation)
 {
-	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata, rotation);
+	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, *reinterpret_cast<void**>(const_cast<shok_modeldata*>(modeldata)), rotation);
 }
 void shok_ERwTools_CRpClumpRenderable::SetPosition(const shok_position& p, float z)
 {
@@ -47,7 +47,7 @@ void shok_ERwTools_CRpClumpRenderable::SetPosition(const shok_position& p, float
 }
 void shok_ERwTools_CRpClumpRenderable::SetBuildingRedColor(bool r)
 {
-	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetBuildingColoredRed(this, r);
+	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetBuildingColoredRed(this, r ? 2 : 1);
 }
 
 static inline void(__thiscall*const c3dviewhandler_setguistate)(shok_GGUI_C3DViewHandler* th, unsigned int id, shok_GGUI_SStateParameters* p) = reinterpret_cast<void(__thiscall*)(shok_GGUI_C3DViewHandler*, unsigned int, shok_GGUI_SStateParameters*)>(0x52820C);

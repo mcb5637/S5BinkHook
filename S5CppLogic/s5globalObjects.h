@@ -182,12 +182,26 @@ private:
 };
 //constexpr int i = sizeof(byte*);
 
+struct shok_EGL_CPlayerExplorationHandler : shok_BB_IObject {
+	PADDINGI(2);
+	int SizeX, SizeY; // 3
+
+	bool IsPositionExplored(const shok_position& p);
+};
+
+struct shok_somegamelogicstuff {
+
+	shok_EGL_CPlayerExplorationHandler* GetExplorationHandlerByPlayer(int pl);
+};
+
 // game logic
 struct shok_EGL_CGLEGameLogic : shok_object {
 	PADDINGI(6);
 	int* InGameTime; // 7
 	PADDINGI(1);
 	shok_EGL_CGLELandscape* Landscape; // 9
+	PADDINGI(9);
+	shok_somegamelogicstuff* SomeStuff;
 
 	static inline constexpr int vtp = 0x7839CC;
 
@@ -202,6 +216,7 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 	static inline shok_EGL_CGLEGameLogic** const GlobalObj = reinterpret_cast<shok_EGL_CGLEGameLogic**>(0x895DAC); // also 85A3A4
 	static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 };
+//constexpr int i = offsetof(shok_EGL_CGLEGameLogic, SomeStuff) / 4;
 
 struct shok_ED_CLandscape : shok_object {
 	shok_EGL_CGLETerrainHiRes* TerrainHiRes;

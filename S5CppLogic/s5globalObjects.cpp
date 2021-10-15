@@ -456,6 +456,25 @@ void shok_EGL_CGLELandscape::RemoveSingleBlockingPoint(int x, int y, BlockingMod
 		vt->OnPostBlockingMode2Removed(Tiling, x, y);
 }
 
+static inline bool(__thiscall* explohandler_isexplored)(shok_EGL_CPlayerExplorationHandler* th, int x, int y) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CPlayerExplorationHandler*, int , int)>(0x4BD183);
+bool shok_EGL_CPlayerExplorationHandler::IsPositionExplored(const shok_position& p)
+{
+	int i[2] = {};
+	shok_EGL_CGLETerrainHiRes::ToTerrainCoord(p, i);
+	return explohandler_isexplored(this, i[0], i[1]);
+}
+
+static inline int(__thiscall* somegamelogicstuff_getexplomin)(shok_somegamelogicstuff* th) = reinterpret_cast<int(__thiscall*)(shok_somegamelogicstuff*)>(0x5758FB);
+static inline int(__thiscall* somegamelogicstuff_getexplomax)(shok_somegamelogicstuff* th) = reinterpret_cast<int(__thiscall*)(shok_somegamelogicstuff*)>(0x575904);
+static inline shok_EGL_CPlayerExplorationHandler* (__thiscall* somegamelogicstuff_getexplo)(shok_somegamelogicstuff* th, int pl) = reinterpret_cast<shok_EGL_CPlayerExplorationHandler * (__thiscall*)(shok_somegamelogicstuff*, int)>(0x575895);
+shok_EGL_CPlayerExplorationHandler* shok_somegamelogicstuff::GetExplorationHandlerByPlayer(int pl)
+{
+	if (pl >= somegamelogicstuff_getexplomin(this) && pl >= somegamelogicstuff_getexplomax(this)) {
+		return somegamelogicstuff_getexplo(this, pl);
+	}
+	return nullptr;
+}
+
 int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
 	return reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable)->CreateEffect(this, data);
 }

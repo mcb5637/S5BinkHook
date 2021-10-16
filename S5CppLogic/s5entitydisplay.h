@@ -2,16 +2,17 @@
 #include "s5data.h"
 
 struct shok_ED_CBehaviorProps : shok_BB_IObject {
-	int Class;
-	int Index;
-	PADDINGI(1); // 100?? 4
+	int Class = 0;
+	int Index = 0;
+	PADDINGI(1); // 100?? 3
 
 	static inline constexpr int vtp = 0x76AB0C;
 	static inline constexpr int TypeDesc = 0x80AC10;
 	static inline constexpr unsigned int Identifier = 0x1F78996D;
 };
 
-struct shok_GD_CLimitedAttachmentBannerBehaviorProps : shok_ED_CBehaviorProps {
+struct shok_GD_CLimitedAttachmentBannerBehaviorProps : shok_ED_CBehaviorProps { // residence
+	int Banner, Node;
 
 	static inline constexpr int vtp = 0x76AB1C;
 	static inline constexpr int TypeDesc = 0x80AC30;
@@ -19,6 +20,8 @@ struct shok_GD_CLimitedAttachmentBannerBehaviorProps : shok_ED_CBehaviorProps {
 };
 
 struct shok_GD_CCamouflageBehaviorProps : shok_ED_CBehaviorProps {
+	int CamouflageModelID; //4
+	int CamouflageAlpha;
 
 	static inline constexpr int vtp = 0x76AEA0;
 	static inline constexpr int TypeDesc = 0x80B048;
@@ -26,13 +29,15 @@ struct shok_GD_CCamouflageBehaviorProps : shok_ED_CBehaviorProps {
 };
 
 struct shok_GD_CBuildingBehaviorProps : shok_ED_CBehaviorProps {
+	int Banner, NumDamageEffects, NumDestroyEffects;
 
 	static inline constexpr int vtp = 0x76AF1C;
 	static inline constexpr int TypeDesc = 0x80B1C0;
 	static inline constexpr unsigned int Identifier = 0x2A2142BD;
 };
 
-struct shok_GD_CWaterfallAnimationBehaviorProps : shok_ED_CBehaviorProps {
+struct shok_GD_CWaterfallAnimationBehaviorProps : shok_ED_CBehaviorProps { // seems to be unused
+	int Layer01Speed, Layer02Speed, Layer03Speed;
 
 	static inline constexpr int vtp = 0x7AEA34;
 	static inline constexpr int TypeDesc = 0x84D320;
@@ -41,8 +46,8 @@ struct shok_GD_CWaterfallAnimationBehaviorProps : shok_ED_CBehaviorProps {
 
 struct shok_ED_CEntity;
 struct shok_ED_IBehavior : shok_BB_IObject {
-	shok_ED_CEntity* EntityDisplay;
-	shok_ED_CBehaviorProps* Props;
+	shok_ED_CEntity* EntityDisplay = nullptr;
+	shok_ED_CBehaviorProps* Props = nullptr;
 
 	static inline constexpr int vtp = 0x76A9E4;
 	static inline constexpr int TypeDesc = 0x80AA54;
@@ -62,7 +67,7 @@ struct shok_GD_CLimitedAttachmentBannerBehavior : shok_ED_IBehavior {
 
 struct shok_GD_CCamouflageBehavior : shok_ED_IBehavior {
 	void* Slot; // EGL::TSlot<GGL::SSlotArgsCamouflage,983570077>
-	bool Active; // check if true, returned by slot
+	bool UseAltModel;
 	PADDING(3);
 
 	static inline constexpr int vtp = 0x76AEB0;

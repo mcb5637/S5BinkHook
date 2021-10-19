@@ -4,7 +4,7 @@
 struct shok_ED_CBehaviorProps : shok_BB_IObject {
 	int Class = 0;
 	int Index = 0;
-	PADDINGI(1); // 100?? 3
+	int Unknown = 100; // 100?? 3
 
 	static inline constexpr int vtp = 0x76AB0C;
 	static inline constexpr int TypeDesc = 0x80AC10;

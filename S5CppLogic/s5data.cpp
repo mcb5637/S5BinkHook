@@ -57,19 +57,19 @@ void shok_position::FloorToBuildingPlacement()
 	Y = std::floorf(Y / 100) * 100;
 }
 
-float shok_position::GetDistanceSquaredTo(const shok_position& p)
+float shok_position::GetDistanceSquaredTo(const shok_position& p) const
 {
 	float dx = X - p.X;
 	float dy = Y - p.Y;
 	return (dx * dx + dy * dy);
 }
 
-bool shok_position::IsInRange(const shok_position& p, float range)
+bool shok_position::IsInRange(const shok_position& p, float range) const
 {
 	return GetDistanceSquaredTo(p) <= (range * range);
 }
 
-float shok_position::GetAngleBetween(shok_position& p)
+float shok_position::GetAngleBetween(const shok_position& p) const
 {
 	float dx = X - p.X;
 	float dy = Y - p.Y;
@@ -86,6 +86,18 @@ float shok_position::GetAngleBetween(shok_position& p)
 	else if (dx >= 0 && dy <= 0)
 		a = 90 + a;
 	return a;
+}
+shok_position shok_position::Rotate(float r) const
+{
+	float s = std::sinf(r);
+	float c = std::cosf(r);
+	return { X * c + Y * s, X * s + Y * c };
+}
+shok_position shok_position::RotateAround(float r, const shok_position& center) const
+{
+	shok_position p = *this - center;
+	p = p.Rotate(r);
+	return p + center;
 }
 
 shok_position shok_position::operator+(const shok_position& other) const

@@ -236,10 +236,12 @@ struct shok_position {
 	float Y;
 
 	void FloorToBuildingPlacement();
-	float GetDistanceSquaredTo(const shok_position& p);
-	bool IsInRange(const shok_position& p, float range);
-	// returns deg
-	float GetAngleBetween(shok_position& p);
+	float GetDistanceSquaredTo(const shok_position& p) const;
+	bool IsInRange(const shok_position& p, float range) const;
+	// returns deg, this is a hok specific angle, useful for a look at by settlers
+	float GetAngleBetween(const shok_position& p) const;
+	shok_position Rotate(float r) const; // requires rad
+	shok_position RotateAround(float r, const shok_position& center) const; // requires rad
 
 	shok_position operator+(const shok_position& other) const;
 	shok_position operator-(const shok_position& other) const;

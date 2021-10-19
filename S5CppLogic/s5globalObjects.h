@@ -109,6 +109,7 @@ struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 
 	static void ToTerrainCoord(const shok_position& p, int* out);
 	bool IsCoordValid(int* out);
+	bool IsCoordValid(int x, int y);
 	int GetTerrainHeight(const shok_position& p);
 	void SetTerrainHeight(const shok_position& p, int h); // int16
 };
@@ -124,6 +125,7 @@ struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 
 	static void ToQuadCoord(const shok_position& p, int* out);
 	bool IsCoordValid(const int* out);
+	bool IsCoordValid(int x, int y);
 	int GetTerrainTypeAt(const shok_position& p);
 	void SetTerrainTypeAt(const shok_position& p, int tty); // byte (int8)
 	int GetWaterTypeAt(const shok_position& p);
@@ -133,18 +135,16 @@ struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	int GetBridgeHeight(const shok_position& p);
 	void SetBridgeHeight(const shok_position& p, int bh);
 private:
-	inline int* GetBridgeHeightP(const int* c);
-};
-struct shok_EGL_CGLELandscape_blockingData {
-	int ArraySizeXY;
-	byte* data;
+	inline int* GetBridgeHeightP(int x, int y);
 };
 struct shok_EGL_CTiling : shok_object {
 
 	static inline constexpr int vtp = 0x783BAC;
 };
+struct shok_EGL_CGLELandscape_blockingData;
 struct shok_EGL_CGLELandscape : shok_object {
 	enum class BlockingMode : byte {
+		None = 0x0,
 		Blocked = 0x1,
 		BridgeArea = 0x2,
 		BuildBlock = 0x4,
@@ -161,12 +161,38 @@ struct shok_EGL_CGLELandscape : shok_object {
 
 	static inline constexpr int vtp = 0x783C38;
 
+	struct AdvancedAARectIterator {
+		struct Coord {
+			int x = 0, y = 0;
+		};
+		Coord Low, High;
+
+		struct Iter {
+			const AdvancedAARectIterator* I;
+			Coord Curr;
+
+			const Coord& operator*() const;
+			bool operator==(const Iter& o) const;
+			bool operator!=(const Iter& o) const;
+			Iter& operator++();
+			Iter operator++(int);
+			Iter(const AdvancedAARectIterator& i, const Coord& c);
+		};
+
+		AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes);
+		bool HasNext(const Coord& Curr) const;
+		void ToNext(Coord& Curr) const;
+		Iter begin() const;
+		Iter end() const;
+	};
+
 	int GetSector(const shok_position* p);
 	bool GetNearestPositionInSector(const shok_position* pIn, float range, int sector, shok_position* pOut);
 	shok_position GetNearestFreePos(const shok_position* p, float range);
 	bool IsValidPos(shok_position* p);
 	shok_position GetMapSize();
 	bool IsPosBlockedInMode(const shok_position* p, BlockingMode mode);
+	BlockingMode GetBlocking(const shok_position& p);
 	void FlattenPosForBuilding(const shok_position& p, const shok_AARect& area, float rot);
 	// block for vector of aarect: thiscall 577B07 (this, pos*, vector<aarect>*, float, byte*)
 	// unblock for vector of aarect: thiscall 577C12 (this, pos*, vector<aarect>*, float, byte*)
@@ -177,10 +203,20 @@ struct shok_EGL_CGLELandscape : shok_object {
 	void AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot);
 	void AdvancedApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	void AdvancedRemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
+	bool IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode);
 private:
 	void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 };
-//constexpr int i = sizeof(byte*);
+constexpr shok_EGL_CGLELandscape::BlockingMode operator&(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b);
+constexpr shok_EGL_CGLELandscape::BlockingMode operator|(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b);
+constexpr shok_EGL_CGLELandscape::BlockingMode operator^(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b);
+struct shok_EGL_CGLELandscape_blockingData {
+	friend struct shok_EGL_CGLELandscape;
+	int ArraySizeXY;
+	byte* data;
+private:
+	inline shok_EGL_CGLELandscape::BlockingMode GetBlockingData(int x, int y);
+};
 
 struct shok_EGL_CPlayerExplorationHandler : shok_BB_IObject {
 	PADDINGI(2);

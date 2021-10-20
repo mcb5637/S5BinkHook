@@ -203,6 +203,9 @@ void shok_EGL_CGLETerrainHiRes::SetTerrainHeight(const shok_position& p, int h)
 		DEBUGGER_BREAK;
 	terrhires_setheight(this, qp, h);
 }
+int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(int x, int y) {
+	return TerrainHeights[(y + 1) * ArraySizeY + (x + 1)];
+}
 
 void shok_EGL_CGLETerrainLowRes::ToQuadCoord(const shok_position& p, int* out)
 {
@@ -288,6 +291,10 @@ inline int* shok_EGL_CGLETerrainLowRes::GetBridgeHeightP(int x, int y)
 {
 	return &BridgeHeights[(y + 1) * ArraySizeY + (x + 1)];
 }
+int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(int x, int y)
+{
+	return (Data[(y + 1) * ArraySizeY + (x + 1)] & 0x3FFFC000) >> 14;
+}
 
 shok_EGL_CGLELandscape::BlockingMode shok_EGL_CGLELandscape_blockingData::GetBlockingData(int x, int y)
 {
@@ -362,12 +369,15 @@ void shok_EGL_CGLELandscape::RemoveBlocking(const shok_position& p, const shok_A
 void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height)
 {
 	AdvancedAARectIterator it{ p, area, rot, true };
+	it.Low.x -= 2;
+	it.Low.y -= 2;
+	it.High.x += 2;
+	it.High.y += 2;
 	for (auto& c : it) {
 		if (!LowRes->IsCoordValid(c.x, c.y))
 			continue;
-		shok_position bch = { static_cast<float>(c.x * 100 * 4), static_cast<float>(c.y * 100 * 4) };
-		bool before = IsPosBlockedInMode(&bch, BlockingMode::BridgeArea);
-		bool toadd = true;// !(curr[1] < low[1] || curr[1] > high[1] || curr[0] < low[0] || curr[0] > high[0]);
+		bool before = (BlockingData->GetBlockingData(c.x*4, c.y*4) & BlockingMode::BridgeArea) != BlockingMode::None;
+		bool toadd = !(c.y < it.Low.y+2 || c.y >= it.High.y-2 || c.x < it.Low.x+2 || c.x >= it.High.x-2);
 		int* h = LowRes->GetBridgeHeightP(c.x, c.y);
 		if (!before) {
 			*h = height;
@@ -399,8 +409,7 @@ void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok_position& p, 
 {
 	EntityIteratorPredicateInRect rec{ p.X + area.low.X, p.Y + area.low.Y, p.X + area.high.X, p.Y + area.high.Y };
 	EntityIterator it{ &rec };
-	shok_EGL_CGLEEntity* ent = it.GetNext(nullptr, nullptr);
-	while (ent) {
+	for (auto* ent : it) {
 		if (shok_GGL_CSettler* s = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(ent)) {
 			s->KillSettlerByEnvironment();
 		}
@@ -408,8 +417,6 @@ void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok_position& p, 
 			if (!a->GetFirstAttachedToMe(shok_AttachmentType::HERO_HAWK))
 				a->Destroy();
 		}
-
-		ent = it.GetNext(nullptr, nullptr);
 	}
 	AdvancedRemoveBlocking(p, area, rot, BlockingMode::BridgeArea);
 	AdvancedApplyBlocking(p, area, rot, BlockingMode::Blocked);
@@ -454,6 +461,17 @@ bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok_position& p, const
 	}
 	return true;
 }
+bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot)
+{
+	AdvancedAARectIterator iter{ p, area, rot, false };
+	for (auto& curr : iter) {
+		if (!HiRes->IsCoordValid(curr.x, curr.y))
+			return false;
+		if (HiRes->GetTerrainHeight(curr.x, curr.y) < LowRes->GetWaterHeightAt(curr.x / 4, curr.y / 4))
+			return false;
+	}
+	return true;
+}
 constexpr shok_EGL_CGLELandscape::BlockingMode operator&(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b) {
 	using under = std::underlying_type<shok_EGL_CGLELandscape::BlockingMode>::type;
 	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(static_cast<under>(a) & static_cast<under>(b));
@@ -470,14 +488,17 @@ constexpr shok_EGL_CGLELandscape::BlockingMode operator^(shok_EGL_CGLELandscape:
 shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes)
 {
 	// TODO implement rotation
-	shok_position p2{ min(area.low.X, area.high.X) + p.X, min(area.low.Y, area.high.Y) + p.Y };
+	shok_AARect rotated = area;
+	rotated.low = area.low.Rotate(rot);
+	rotated.high = area.high.Rotate(rot);
+	shok_position p2{ min(rotated.low.X, rotated.high.X) + p.X, min(rotated.low.Y, rotated.high.Y) + p.Y };
 	int low[2] = { 0,0 };
 	int high[2] = { 0,0 };
 	if (LowRes)
 		shok_EGL_CGLETerrainLowRes::ToQuadCoord(p2, low);
 	else
 		shok_EGL_CGLETerrainHiRes::ToTerrainCoord(p2, low);
-	p2 = { max(area.low.X, area.high.X) + p.X, max(area.low.Y, area.high.Y) + p.Y };
+	p2 = { max(rotated.low.X, rotated.high.X) + p.X, max(rotated.low.Y, rotated.high.Y) + p.Y };
 	if (LowRes)
 		shok_EGL_CGLETerrainLowRes::ToQuadCoord(p2, high);
 	else
@@ -498,6 +519,8 @@ void shok_EGL_CGLELandscape::AdvancedAARectIterator::ToNext(Coord& Curr) const
 	}
 }
 shok_EGL_CGLELandscape::AdvancedAARectIterator::Iter shok_EGL_CGLELandscape::AdvancedAARectIterator::begin() const {
+	if (High.x == Low.x || High.y == Low.y)
+		return end();
 	return shok_EGL_CGLELandscape::AdvancedAARectIterator::Iter( *this, Low );
 }
 shok_EGL_CGLELandscape::AdvancedAARectIterator::Iter shok_EGL_CGLELandscape::AdvancedAARectIterator::end() const

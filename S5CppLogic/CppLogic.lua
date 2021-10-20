@@ -1321,8 +1321,8 @@ function CppLogic.EntityType.GetAutoAttackRange(ty) end
 --- range chance of autoattacks of an entity type.
 -- for autocannons only max range, for anything else max and min range.
 -- @param ty entitytype
--- @return max range (optional)
--- @return min range (ignored for autocannons) (optional)
+-- @param maxrange range (optional)
+-- @param minrange range (ignored for autocannons) (optional)
 function CppLogic.EntityType.SetAutoAttackRange(ty, maxrange, minrange) end
 
 --- settler or building type armor and armorclass.

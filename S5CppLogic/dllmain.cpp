@@ -71,14 +71,16 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    shok_AARect a{ -500,-500,500,500 };
+    shok_AARect a{ 0,0,500,0 };
     shok_position p;
     luaext_checkPos(L, p, 1);
-    if (lua_toboolean(L, 2))
-        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedApplyBridgeHeight(p, a, 0, 2500);
+    if (lua_isnumber(L, 2))
+        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedApplyBridgeHeight(p, a, deg2rad(luaL_checkfloat(L,3)), luaL_checkint(L,2));
     else
         (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedRemoveBridgeHeight(p, a, 0);
-    return 0;
+    p = a.high.Rotate(deg2rad(luaL_checkfloat(L, 3)));
+    luaext_pushPos(L, p);
+    return 1;
 }
 
 int cleanup(lua_State* L) {

@@ -56,6 +56,11 @@ void shok_position::FloorToBuildingPlacement()
 	X = std::floorf(X / 100) * 100;
 	Y = std::floorf(Y / 100) * 100;
 }
+void shok_position::RoundToBuildingPlacement()
+{
+	X = std::roundf(X / 100) * 100;
+	Y = std::roundf(Y / 100) * 100;
+}
 
 float shok_position::GetDistanceSquaredTo(const shok_position& p) const
 {

@@ -100,6 +100,7 @@ struct shok_EGL_CTerrainVertexColors : shok_object {
 	void SetTerrainVertexColor(shok_position& p, int col); // a,r,g,b each int8
 };
 struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
+	friend struct shok_EGL_CGLELandscape;
 	vector_padding;
 	std::vector<int16_t, shok_allocator<int16_t>> TerrainHeights;
 	int MaxSizeX, MaxSizeY; // 5
@@ -112,6 +113,8 @@ struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 	bool IsCoordValid(int x, int y);
 	int GetTerrainHeight(const shok_position& p);
 	void SetTerrainHeight(const shok_position& p, int h); // int16
+private:
+	int GetTerrainHeight(int x, int y);
 };
 struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	friend struct shok_EGL_CGLELandscape;
@@ -136,6 +139,7 @@ struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	void SetBridgeHeight(const shok_position& p, int bh);
 private:
 	inline int* GetBridgeHeightP(int x, int y);
+	int GetWaterHeightAt(int x, int y);
 };
 struct shok_EGL_CTiling : shok_object {
 
@@ -161,6 +165,7 @@ struct shok_EGL_CGLELandscape : shok_object {
 
 	static inline constexpr int vtp = 0x783C38;
 
+	// only works with 90° rotation steps, cause behind the scenes its still an AA rect. maybe fix if needed.
 	struct AdvancedAARectIterator {
 		struct Coord {
 			int x = 0, y = 0;
@@ -168,9 +173,10 @@ struct shok_EGL_CGLELandscape : shok_object {
 		Coord Low, High;
 
 		struct Iter {
+		private:
 			const AdvancedAARectIterator* I;
 			Coord Curr;
-
+		public:
 			const Coord& operator*() const;
 			bool operator==(const Iter& o) const;
 			bool operator!=(const Iter& o) const;
@@ -204,6 +210,7 @@ struct shok_EGL_CGLELandscape : shok_object {
 	void AdvancedApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	void AdvancedRemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	bool IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode);
+	bool IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot);
 private:
 	void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 };

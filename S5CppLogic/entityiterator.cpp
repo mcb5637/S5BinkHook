@@ -32,7 +32,7 @@ shok_EGL_CGLEEntity* EntityIterator::GetNext(int& icurr, float* rangeOut, int* p
 }
 
 shok_EGL_CGLEEntity* EntityIterator::Iter::operator*() const {
-	return (*shok_EGL_CGLEEntityManager::GlobalObj)->GetEntityByNum(curr);
+	return e;
 }
 bool EntityIterator::Iter::operator==(const Iter& o) const {
 	return curr == o.curr;
@@ -42,6 +42,7 @@ bool EntityIterator::Iter::operator!=(const Iter& o) const {
 }
 EntityIterator::Iter& EntityIterator::Iter::operator++() {
 	shok_EGL_CGLEEntity* e = I->GetNext(curr, nullptr, nullptr);
+	this->e = e;
 	if (!e)
 		curr = 0;
 	return *this;
@@ -51,10 +52,11 @@ EntityIterator::Iter EntityIterator::Iter::operator++(int) {
 	++(*this);
 	return r;
 }
-EntityIterator::Iter::Iter(const EntityIterator& i, int c)
+EntityIterator::Iter::Iter(const EntityIterator& i, int c, shok_EGL_CGLEEntity* e)
 {
 	I = &i;
 	curr = c;
+	this->e = e;
 }
 EntityIterator::Iter EntityIterator::begin() const
 {
@@ -64,7 +66,7 @@ EntityIterator::Iter EntityIterator::begin() const
 }
 EntityIterator::Iter EntityIterator::end() const
 {
-	return { *this, 0 }; // 0 is guranteed to not be an entity
+	return { *this, 0, nullptr }; // 0 is guranteed to not be an entity
 }
 
 shok_EGL_CGLEEntity* EntityIterator::GetNearest(float* rangeOut)

@@ -472,18 +472,6 @@ bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok_position& p, const s
 	}
 	return true;
 }
-constexpr shok_EGL_CGLELandscape::BlockingMode operator&(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b) {
-	using under = std::underlying_type<shok_EGL_CGLELandscape::BlockingMode>::type;
-	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(static_cast<under>(a) & static_cast<under>(b));
-}
-constexpr shok_EGL_CGLELandscape::BlockingMode operator|(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b) {
-	using under = std::underlying_type<shok_EGL_CGLELandscape::BlockingMode>::type;
-	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(static_cast<under>(a) | static_cast<under>(b));
-}
-constexpr shok_EGL_CGLELandscape::BlockingMode operator^(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b) {
-	using under = std::underlying_type<shok_EGL_CGLELandscape::BlockingMode>::type;
-	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(static_cast<under>(a) ^ static_cast<under>(b));
-}
 
 shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes)
 {

@@ -214,9 +214,18 @@ struct shok_EGL_CGLELandscape : shok_object {
 private:
 	void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 };
-constexpr shok_EGL_CGLELandscape::BlockingMode operator&(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b);
-constexpr shok_EGL_CGLELandscape::BlockingMode operator|(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b);
-constexpr shok_EGL_CGLELandscape::BlockingMode operator^(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b);
+constexpr shok_EGL_CGLELandscape::BlockingMode operator&(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b) {
+	using under = std::underlying_type<shok_EGL_CGLELandscape::BlockingMode>::type;
+	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(static_cast<under>(a) & static_cast<under>(b));
+}
+constexpr shok_EGL_CGLELandscape::BlockingMode operator|(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b) {
+	using under = std::underlying_type<shok_EGL_CGLELandscape::BlockingMode>::type;
+	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(static_cast<under>(a) | static_cast<under>(b));
+}
+constexpr shok_EGL_CGLELandscape::BlockingMode operator^(shok_EGL_CGLELandscape::BlockingMode a, shok_EGL_CGLELandscape::BlockingMode b) {
+	using under = std::underlying_type<shok_EGL_CGLELandscape::BlockingMode>::type;
+	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(static_cast<under>(a) ^ static_cast<under>(b));
+}
 struct shok_EGL_CGLELandscape_blockingData {
 	friend struct shok_EGL_CGLELandscape;
 	int ArraySizeXY;

@@ -23,6 +23,7 @@ public:
 	struct Iter {
 	private:
 		int curr;
+		shok_EGL_CGLEEntity* e;
 		const EntityIterator* I;
 
 	public:
@@ -31,7 +32,7 @@ public:
 		bool operator!=(const Iter& o) const;
 		Iter& operator++();
 		Iter operator++(int);
-		Iter(const EntityIterator& i, int c);
+		Iter(const EntityIterator& i, int c, shok_EGL_CGLEEntity* e);
 	};
 	// maybe implement an iterator that gives access to range+prio too...
 	Iter begin() const;

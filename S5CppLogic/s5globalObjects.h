@@ -185,6 +185,7 @@ struct shok_EGL_CGLELandscape : shok_object {
 			Iter(const AdvancedAARectIterator& i, const Coord& c);
 		};
 
+		AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes, bool AddOne);
 		AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes);
 		bool HasNext(const Coord& Curr) const;
 		void ToNext(Coord& Curr) const;
@@ -209,8 +210,8 @@ struct shok_EGL_CGLELandscape : shok_object {
 	void AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot);
 	void AdvancedApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
 	void AdvancedRemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
-	bool IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode);
-	bool IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot);
+	bool IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode, bool AddOne);
+	bool IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot, bool AddOne);
 private:
 	void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 };

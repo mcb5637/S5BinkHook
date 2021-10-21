@@ -450,9 +450,9 @@ void shok_EGL_CGLELandscape::RemoveSingleBlockingPoint(int x, int y, BlockingMod
 	if (static_cast<int>(mode) & static_cast<int>(BlockingMode::BridgeArea) && vt->GetSomeGlobal(Tiling))
 		vt->OnPostBlockingMode2Removed(Tiling, x, y);
 }
-bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode)
+bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode, bool AddOne)
 {
-	AdvancedAARectIterator iter{ p, area, rot, false };
+	AdvancedAARectIterator iter{ p, area, rot, false, AddOne };
 	for (auto& curr : iter) {
 		if (!HiRes->IsCoordValid(curr.x, curr.y))
 			return false;
@@ -461,9 +461,9 @@ bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok_position& p, const
 	}
 	return true;
 }
-bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot)
+bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot, bool AddOne)
 {
-	AdvancedAARectIterator iter{ p, area, rot, false };
+	AdvancedAARectIterator iter{ p, area, rot, false, AddOne };
 	for (auto& curr : iter) {
 		if (!HiRes->IsCoordValid(curr.x, curr.y))
 			return false;
@@ -473,7 +473,10 @@ bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok_position& p, const s
 	return true;
 }
 
-shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes)
+shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes) : AdvancedAARectIterator(p, area, rot, LowRes, false)
+{
+}
+shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes, bool AddOne)
 {
 	// TODO implement rotation
 	shok_AARect rotated = area;
@@ -493,6 +496,10 @@ shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const sho
 		shok_EGL_CGLETerrainHiRes::ToTerrainCoord(p2, high);
 	Low = { low[0], low[1] };
 	High = { high[0], high[1] };
+	if (AddOne) {
+		High.x++;
+		High.y++;
+	}
 }
 bool shok_EGL_CGLELandscape::AdvancedAARectIterator::HasNext(const Coord& Curr) const
 {

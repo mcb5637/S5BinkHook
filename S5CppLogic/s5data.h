@@ -248,6 +248,7 @@ struct shok_position {
 
 	shok_position operator+(const shok_position& other) const;
 	shok_position operator-(const shok_position& other) const;
+	auto operator<=>(const shok_position& o) const = default;
 };
 
 struct shok_positionRot : shok_position {
@@ -256,6 +257,7 @@ struct shok_positionRot : shok_position {
 
 struct shok_AARect {
 	shok_position low, high;
+	auto operator<=>(const shok_AARect& o) const = default;
 };
 
 enum class shok_ResourceType;

@@ -31,6 +31,9 @@ float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
 	return reinterpret_cast<shok_vtable_GGL_CBehaviorDefaultMovement*>(vtable)->GetSpeed(this);
 }
 
+
+shok_BB_CClassFactory_serializationData* shok_EGL_CGLEBehavior::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x86A828);
+
 void __declspec(naked) bombattachment_fix() {
 	__asm {
 		push 0;

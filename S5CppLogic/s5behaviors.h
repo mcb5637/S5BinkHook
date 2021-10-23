@@ -7,6 +7,7 @@ struct shok_EGL_CGLEBehavior : shok_BB_IObject { // no vtable
 
 public:
 	static inline constexpr int TypeDesc = 0x813778;
+	static shok_BB_CClassFactory_serializationData* SerializationData;
 };
 
 struct shok_EGL_CCoarsePath {

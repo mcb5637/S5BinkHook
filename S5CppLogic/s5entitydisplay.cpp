@@ -10,6 +10,9 @@ struct shok_vtable_ED_CBehaviorProps : shok_vtable_BB_IObject {
     PADDINGI(1); // 1 param, ret 100
 };
 
+
+shok_BB_CClassFactory_serializationData* shok_ED_CBehaviorProps::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x8586E8);
+
 static inline shok_ED_CEntity* (__thiscall* const shok_ED_CVisibleEntityManager_create)(shok_ED_CVisibleEntityManager* th, shok_IEntityDisplay* e) = reinterpret_cast<shok_ED_CEntity * (__thiscall*)(shok_ED_CVisibleEntityManager*, shok_IEntityDisplay*)>(0x4762EA);
 shok_ED_CEntity* shok_ED_CVisibleEntityManager::CreateDisplayForEntity(shok_IEntityDisplay* e)
 {

@@ -7,6 +7,8 @@ struct shok_EGL_CGLEBehaviorProps : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x772A2C;
 	static inline constexpr int TypeDesc = 0x813728;
+
+	static shok_BB_CClassFactory_serializationData* SerializationData;
 };
 
 struct shok_EGL_CMovementBehaviorProps : shok_EGL_CGLEBehaviorProps {

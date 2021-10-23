@@ -9,6 +9,8 @@ struct shok_ED_CBehaviorProps : shok_BB_IObject {
 	static inline constexpr int vtp = 0x76AB0C;
 	static inline constexpr int TypeDesc = 0x80AC10;
 	static inline constexpr unsigned int Identifier = 0x1F78996D;
+
+	static shok_BB_CClassFactory_serializationData* SerializationData;
 };
 
 struct shok_GD_CLimitedAttachmentBannerBehaviorProps : shok_ED_CBehaviorProps { // residence

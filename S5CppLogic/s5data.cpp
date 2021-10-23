@@ -109,10 +109,45 @@ shok_position shok_position::operator+(const shok_position& other) const
 {
 	return { this->X + other.X, this->Y + other.Y };
 }
+shok_position& shok_position::operator+=(const shok_position& other)
+{
+	this->X += other.X;
+	this->Y += other.Y;
+	return *this;
+}
 shok_position shok_position::operator-(const shok_position& other) const
 {
 	return { this->X - other.X, this->Y - other.Y };
 }
+shok_position& shok_position::operator-=(const shok_position& other)
+{
+	this->X -= other.X;
+	this->Y -= other.Y;
+	return *this;
+}
+shok_BB_CClassFactory_serializationData* shok_position::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D9B0);
+
+shok_AARect shok_AARect::operator+(const shok_AARect& other) const
+{
+	return { this->low + other.low, this->high + other.high };
+}
+shok_AARect& shok_AARect::operator+=(const shok_AARect& other)
+{
+	this->low += other.low;
+	this->high += other.high;
+	return *this;
+}
+shok_AARect shok_AARect::operator-(const shok_AARect& other) const
+{
+	return { this->low - other.low, this->high - other.high };
+}
+shok_AARect& shok_AARect::operator-=(const shok_AARect& other)
+{
+	this->low -= other.low;
+	this->high -= other.high;
+	return *this;
+}
+shok_BB_CClassFactory_serializationData* shok_AARect::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85DA90);
 
 void RedirectCall(void* call, void* redirect) {
 	byte* opcode = reinterpret_cast<byte*>(call);

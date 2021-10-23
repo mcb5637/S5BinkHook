@@ -230,6 +230,7 @@ inline CastTo* shok_DynamicCast(CastFrom* i) {
 	return static_cast<CastTo*>(shok_dyncastFunc(i, 0, CastFrom::TypeDesc, CastTo::TypeDesc, false));
 }
 
+struct shok_BB_CClassFactory_serializationData;
 // generic structs
 struct shok_position {
 	float X;
@@ -247,8 +248,12 @@ struct shok_position {
 	shok_position RotateAround(float r, const shok_position& center) const;
 
 	shok_position operator+(const shok_position& other) const;
+	shok_position& operator+=(const shok_position& other);
 	shok_position operator-(const shok_position& other) const;
+	shok_position& operator -=(const shok_position& other);
 	auto operator<=>(const shok_position& o) const = default;
+
+	static shok_BB_CClassFactory_serializationData* SerializationData;
 };
 
 struct shok_positionRot : shok_position {
@@ -258,6 +263,13 @@ struct shok_positionRot : shok_position {
 struct shok_AARect {
 	shok_position low, high;
 	auto operator<=>(const shok_AARect& o) const = default;
+	shok_AARect operator+(const shok_AARect & other) const;
+	shok_AARect& operator+=(const shok_AARect& other);
+	shok_AARect operator-(const shok_AARect& other) const;
+	shok_AARect& operator-=(const shok_AARect& other);
+
+	// uses Blocked1 and Blocked2 for the 2 members
+	static shok_BB_CClassFactory_serializationData* SerializationData;
 };
 
 enum class shok_ResourceType;

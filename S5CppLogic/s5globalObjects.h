@@ -118,6 +118,7 @@ private:
 };
 struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	friend struct shok_EGL_CGLELandscape;
+	vector_padding;
 	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
 	vector_padding;
 	std::vector<int, shok_allocator<int>> BridgeHeights;

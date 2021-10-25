@@ -662,6 +662,7 @@ struct shok_modelinstance {
 	void Scale(float* s, TransformOperation op); // 3 coordinates (order?)
 	void Scale(float s, TransformOperation op);
 	void Translate(const shok_position& p, float height, TransformOperation op);
+	void SetColorByPlayerID(int pl);
 };
 struct shok_modeldata {
 

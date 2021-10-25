@@ -883,6 +883,12 @@ void shok_modelinstance::Translate(const shok_position& p, float height, Transfo
 	float f[] = { p.X, p.Y, height };
 	modelinst_setpos(Transform, f, op);
 }
+static inline void(__cdecl* const modelinst_iteratefuncoversomething)(shok_modelinstance* m, int(__cdecl* op)(void* m, void* data), void* data) = reinterpret_cast<void(__cdecl*)(shok_modelinstance*, int(__cdecl*)(void*, void*), void*)>(0x628E30);
+static inline int(__cdecl* const modelinst_iter_setcolorbyplayer)(void* m, void* data) = reinterpret_cast<int(__cdecl*)(void*, void*)>(0x48F361);
+void shok_modelinstance::SetColorByPlayerID(int pl)
+{
+	modelinst_iteratefuncoversomething(this, modelinst_iter_setcolorbyplayer, &pl);
+}
 
 static inline shok_modelinstance* (__thiscall* const modeldata_instanciate)(const shok_modeldata* d) = reinterpret_cast<shok_modelinstance * (__thiscall*)(const shok_modeldata*)> (0x472742);
 shok_modelinstance* shok_modeldata::Instanciate() const

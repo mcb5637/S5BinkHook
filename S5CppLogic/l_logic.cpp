@@ -1237,6 +1237,14 @@ int l_logicModel_ResetTransform(lua_State* L) {
 	m->Model->Rotate(0, shok_modelinstance::TransformOperation::Set);
 	return 0;
 }
+int l_logicModel_SetColorByPlayer(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	int p = luaL_checkint(L, 2);
+	luaext_assert(L, p >= 0 && p <= 9, "invalid player");
+	m->Model->SetColorByPlayerID(p);
+	return 0;
+}
 void l_logicModel_CreateModelUDType(lua_State* L) {
 	luaL_newmetatable(L, l_logicModel::MetaName);
 	lua_pushstring(L, "__index");
@@ -1247,6 +1255,7 @@ void l_logicModel_CreateModelUDType(lua_State* L) {
 	luaext_registerFunc(L, "Rotate", l_logicModel_Rotate);
 	luaext_registerFunc(L, "Scale", l_logicModel_Scale);
 	luaext_registerFunc(L, "ResetTransform", l_logicModel_ResetTransform);
+	luaext_registerFunc(L, "SetColorByPlayer", l_logicModel_SetColorByPlayer);
 	
 	lua_rawset(L, -3);
 	luaext_registerFunc(L, "__gc", l_logicModel_Clear);

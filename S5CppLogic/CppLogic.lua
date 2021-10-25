@@ -354,6 +354,7 @@ function CppLogic.Logic.UICommands.UnSetCallback() end
 -- usual order for transforms is: translate, scale, rotate.
 -- remember to set the model before using transforms.
 -- should not affect mp in any way (even if not synced), as for gamelogic is concerned, there is nothing there (not tested).
+--- @class LogicModel
 local LogicModel = {}
 --- clears the model and all its data, removes the object from rendering.
 function LogicModel:Clear() end
@@ -379,9 +380,12 @@ function LogicModel:Scale(s, tro) end
 function LogicModel:Rotate(r, tro) end
 --- resets the transform of the model to identity (position 0/0, no rotation and scale).
 function LogicModel:ResetTransform() end
+--- sets the player color for this model.
+-- @param pl player id
+function LogicModel:SetColorByPlayer(pl) end
 
 --- creates a new LogicModel.
--- @return LogicModel
+--- @return LogicModel
 function CppLogic.Logic.CreateFreeModel(f) end
 
 --- compiles a lua chunk.

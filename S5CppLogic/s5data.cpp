@@ -107,7 +107,9 @@ shok_position shok_position::RotateAround(float r, const shok_position& center) 
 
 shok_position shok_position::operator+(const shok_position& other) const
 {
-	return { this->X + other.X, this->Y + other.Y };
+	shok_position r = *this;
+	r += other;
+	return r;
 }
 shok_position& shok_position::operator+=(const shok_position& other)
 {
@@ -117,13 +119,31 @@ shok_position& shok_position::operator+=(const shok_position& other)
 }
 shok_position shok_position::operator-(const shok_position& other) const
 {
-	return { this->X - other.X, this->Y - other.Y };
+	shok_position r = *this;
+	r -= other;
+	return r;
 }
 shok_position& shok_position::operator-=(const shok_position& other)
 {
 	this->X -= other.X;
 	this->Y -= other.Y;
 	return *this;
+}
+shok_position shok_position::operator*(float f) const
+{
+	shok_position r = *this;
+	r *= f;
+	return r;
+}
+shok_position& shok_position::operator*=(float f)
+{
+	this->X *= f;
+	this->Y *= f;
+	return *this;
+}
+float shok_position::Dot(const shok_position& o) const
+{
+	return this->X * o.X + this->Y * o.Y;
 }
 shok_BB_CClassFactory_serializationData* shok_position::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D9B0);
 

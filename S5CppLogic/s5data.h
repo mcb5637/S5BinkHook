@@ -250,7 +250,10 @@ struct shok_position {
 	shok_position operator+(const shok_position& other) const;
 	shok_position& operator+=(const shok_position& other);
 	shok_position operator-(const shok_position& other) const;
-	shok_position& operator -=(const shok_position& other);
+	shok_position& operator-=(const shok_position& other);
+	shok_position operator*(float f) const;
+	shok_position& operator*=(float f);
+	float Dot(const shok_position& o) const;
 	auto operator<=>(const shok_position& o) const = default;
 
 	static shok_BB_CClassFactory_serializationData* SerializationData;

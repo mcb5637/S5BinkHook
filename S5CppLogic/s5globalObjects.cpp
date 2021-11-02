@@ -405,9 +405,15 @@ void shok_EGL_CGLETerrainLowRes::CheckBridgeHeightSize()
 		}
 	}
 	int** vec = reinterpret_cast<int**>(&BridgeHeights);
+#ifdef _DEBUG
 	shok_free(vec[1]);
 	for (int i = 0; i < 4; i++)
 		vec[i] = nullptr;
+#else
+	shok_free(vec[0]);
+	for (int i = -1; i < 3; i++)
+		vec[i] = nullptr;
+#endif
 }
 void shok_EGL_CGLETerrainLowRes::ClearBridgeArea()
 {

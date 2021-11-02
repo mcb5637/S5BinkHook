@@ -89,7 +89,6 @@ int cleanup(lua_State* L) {
     l_effect_cleanup(L);
     l_tech_cleanup(L);
     l_ui_cleanup(L);
-    shok_EGL_CGLETerrainLowRes::ClearBridgeArea();
     return 0;
 }
 
@@ -207,6 +206,7 @@ extern "C" lua_State * __lua_open() {
 void __lua_close(lua_State* L) { // TODO do something better than this when i come around writing a modloader...
     cleanup(L);
     lua_close(L);
+    shok_EGL_CGLETerrainLowRes::ClearBridgeArea();
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,

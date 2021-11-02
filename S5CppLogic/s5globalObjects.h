@@ -130,6 +130,7 @@ struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	static void ToQuadCoord(const shok_position& p, int* out);
 	bool IsCoordValid(const int* out);
 	bool IsCoordValid(int x, int y);
+	bool IsBridgeHeightCoordValid(int x, int y);
 	int GetTerrainTypeAt(const shok_position& p);
 	void SetTerrainTypeAt(const shok_position& p, int tty); // byte (int8)
 	int GetWaterTypeAt(const shok_position& p);
@@ -138,9 +139,18 @@ struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	void SetWaterHeightAt(const shok_position& p, int wh); // int16
 	int GetBridgeHeight(const shok_position& p);
 	void SetBridgeHeight(const shok_position& p, int bh);
-private:
+	// hires coords if HiResBridgeHeightEnabled
 	inline int* GetBridgeHeightP(int x, int y);
+
+
+	static bool HiResBridgeHeightEnabled;
+	static void EnableHiResBridgeHeight();
+	static void ClearBridgeArea();
+	static int* Dbg_bh;
+private:
 	int GetWaterHeightAt(int x, int y);
+	void CheckBridgeHeightSize();
+	float GetBridgeHeightFloat(float x, float y);
 };
 struct shok_EGL_CTiling : shok_object {
 

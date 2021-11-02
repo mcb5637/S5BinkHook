@@ -220,6 +220,13 @@ bool shok_EGL_CGLETerrainLowRes::IsCoordValid(const int* out)
 {
 	return IsCoordValid(out[0], out[1]);
 }
+bool shok_EGL_CGLETerrainLowRes::IsBridgeHeightCoordValid(int x, int y)
+{
+	if (HiResBridgeHeightEnabled) {
+		return x >= 0 && y >= 0 && x < (MaxSizeX * 4) && y < (MaxSizeY * 4);
+	}
+	return x >= 0 && y >= 0 && x < MaxSizeX&& y < MaxSizeY;
+}
 int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(const shok_position& p)
 {
 	int qp[2] = { 0,0 };
@@ -274,6 +281,13 @@ void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(const shok_position& p, int wh
 int shok_EGL_CGLETerrainLowRes::GetBridgeHeight(const shok_position& p)
 {
 	int qp[2] = { 0,0 };
+	if (HiResBridgeHeightEnabled) {
+		CheckBridgeHeightSize();
+		shok_EGL_CGLETerrainHiRes::ToTerrainCoord(p, qp);
+		if (!IsBridgeHeightCoordValid(qp[0], qp[1]))
+			DEBUGGER_BREAK;
+		return *GetBridgeHeightP(qp[0], qp[1]);
+	}
 	ToQuadCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
@@ -282,6 +296,14 @@ int shok_EGL_CGLETerrainLowRes::GetBridgeHeight(const shok_position& p)
 void shok_EGL_CGLETerrainLowRes::SetBridgeHeight(const shok_position& p, int bh)
 {
 	int qp[2] = { 0,0 };
+	if (HiResBridgeHeightEnabled) {
+		CheckBridgeHeightSize();
+		shok_EGL_CGLETerrainHiRes::ToTerrainCoord(p, qp);
+		if (!IsBridgeHeightCoordValid(qp[0], qp[1]))
+			DEBUGGER_BREAK;
+		*GetBridgeHeightP(qp[0], qp[1]) = bh;
+		return;
+	}
 	ToQuadCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
@@ -289,12 +311,112 @@ void shok_EGL_CGLETerrainLowRes::SetBridgeHeight(const shok_position& p, int bh)
 }
 inline int* shok_EGL_CGLETerrainLowRes::GetBridgeHeightP(int x, int y)
 {
+	if (HiResBridgeHeightEnabled) {
+		CheckBridgeHeightSize();
+		if (!IsBridgeHeightCoordValid(x, y))
+			DEBUGGER_BREAK;
+		return &Dbg_bh[(y + 1) * (MaxSizeY * 4 + 2) + (x + 1)];
+	}
+	if (!IsCoordValid(x, y))
+		DEBUGGER_BREAK;
 	return &BridgeHeights[(y + 1) * ArraySizeY + (x + 1)];
 }
 int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(int x, int y)
 {
 	return (Data[(y + 1) * ArraySizeY + (x + 1)] & 0x3FFFC000) >> 14;
 }
+float shok_EGL_CGLETerrainLowRes::GetBridgeHeightFloat(float x, float y)
+{
+	shok_position p{ x,y };
+	return static_cast<float>(GetBridgeHeight(p));
+}
+
+float __fastcall shok_ED_CLandscape_overridegetwaterheightatpos(shok_ED_CLandscape* th, int _, float x, float y) { // this func breaks its arguments, so i have to rewrite it instead of patching a few instructions
+	shok_position p{ min(max(0, x), th->WorldSizeX),min(max(0, y), th->WorldSizeY) };
+	if ((*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&p, shok_EGL_CGLELandscape::BlockingMode::BridgeArea)) {
+		return static_cast<float>(th->TerrainLowRes->GetBridgeHeight(p));
+	}
+	else {
+		return static_cast<float>(th->TerrainLowRes->GetWaterHeightAt(p));
+	}
+}
+void __declspec(naked) hiresbridgearea_somewaterregionfunc() {
+	__asm {
+		push[ebp - 0x4]; // y
+		push[ebp + 0x8]; // x
+		mov ecx, [ebp - 0xC];
+		call shok_EGL_CGLETerrainLowRes::GetBridgeHeightP;
+		fild[eax];
+
+		push 0x47D318; // should be 47D30A, but thats just a unconditional jmp
+		ret;
+	};
+}
+void __fastcall shok_bridge_applyheight(shok_GGL_CBridgeEntity* th) {
+	shok_GGL_CBridgeProperties* p = static_cast<shok_GGL_CBridgeProperties*>(th->GetEntityType()->LogicProps);
+	auto* lr = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes;
+	int h = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(th->Position) + p->Height;
+	for (const shok_AARect& area : p->BridgeArea) {
+		shok_EGL_CGLELandscape::AdvancedAARectIterator it{ th->Position, area, th->Position.r, !shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled, true };
+		for (const auto& c : it) {
+			if (!lr->IsBridgeHeightCoordValid(c.x, c.y))
+				continue;
+			*lr->GetBridgeHeightP(c.x, c.y) = h;
+		}
+	}
+}
+
+bool shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled = false;
+int* shok_EGL_CGLETerrainLowRes::Dbg_bh = nullptr;
+void shok_EGL_CGLETerrainLowRes::EnableHiResBridgeHeight()
+{
+	if (shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled)
+		return;
+	shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
+	*reinterpret_cast<float(__fastcall**)(shok_ED_CLandscape*, int, float, float)>(0x76A410) = &shok_ED_CLandscape_overridegetwaterheightatpos;
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
+	WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc);
+	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
+	WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight);
+}
+
+void shok_EGL_CGLETerrainLowRes::CheckBridgeHeightSize()
+{
+	if (!HiResBridgeHeightEnabled)
+		return;
+	if (Dbg_bh)
+		return;
+	int ary = (MaxSizeY * 4 + 2);
+	int arx = (MaxSizeX * 4 + 2);
+	int size = arx * ary;
+	Dbg_bh = new int[size];
+	memset(Dbg_bh, 0, size * sizeof(int));
+	for (int y = 0; y < MaxSizeY; y++) {
+		for (int x = 0; x < MaxSizeX; x++) {
+			int h = BridgeHeights[(y + 1) * ArraySizeY + (x + 1)];
+			int x2 = x * 4 + 1;
+			int y2 = y * 4 + 1;
+			for (int dy = 0; dy < 4; dy++) {
+				for (int dx = 0; dx < 4; dx++) {
+					Dbg_bh[(y2 + dy) * ary + (x2 + dx)] = h;
+				}
+			}
+		}
+	}
+	int** vec = reinterpret_cast<int**>(&BridgeHeights);
+	shok_free(vec[1]);
+	for (int i = 0; i < 4; i++)
+		vec[i] = nullptr;
+}
+void shok_EGL_CGLETerrainLowRes::ClearBridgeArea()
+{
+	if (Dbg_bh) {
+		delete[] Dbg_bh;
+		Dbg_bh = nullptr;
+	}
+}
+
 
 shok_EGL_CGLELandscape::BlockingMode shok_EGL_CGLELandscape_blockingData::GetBlockingData(int x, int y)
 {
@@ -368,23 +490,12 @@ void shok_EGL_CGLELandscape::RemoveBlocking(const shok_position& p, const shok_A
 }
 void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height)
 {
-	AdvancedAARectIterator it{ p, area, rot, true };
-	it.Low.x -= 2;
-	it.Low.y -= 2;
-	it.High.x += 2;
-	it.High.y += 2;
+	AdvancedAARectIterator it{ p, area, rot, !shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled, false };
 	for (auto& c : it) {
-		if (!LowRes->IsCoordValid(c.x, c.y))
+		if (!LowRes->IsBridgeHeightCoordValid(c.x, c.y))
 			continue;
-		bool before = (BlockingData->GetBlockingData(c.x*4, c.y*4) & BlockingMode::BridgeArea) != BlockingMode::None;
-		bool toadd = !(c.y < it.Low.y+2 || c.y >= it.High.y-2 || c.x < it.Low.x+2 || c.x >= it.High.x-2);
 		int* h = LowRes->GetBridgeHeightP(c.x, c.y);
-		if (!before) {
-			*h = height;
-		}
-		else if (toadd) {
-			*h = max(*h, height);
-		}
+		*h = height;
 	}
 
 	AdvancedApplyBlocking(p, area, rot, BlockingMode::BridgeArea);

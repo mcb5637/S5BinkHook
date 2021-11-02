@@ -71,16 +71,15 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    shok_AARect a{ 0,0,500,0 };
+    shok_EGL_CGLETerrainLowRes::EnableHiResBridgeHeight();
+    shok_AARect a{ 0,0,200,200 };
     shok_position p;
     luaext_checkPos(L, p, 1);
     if (lua_isnumber(L, 2))
-        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedApplyBridgeHeight(p, a, deg2rad(luaL_checkfloat(L,3)), luaL_checkint(L,2));
+        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedApplyBridgeHeight(p, a, 0, luaL_checkint(L,2));
     else
         (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedRemoveBridgeHeight(p, a, 0);
-    p = a.high.Rotate(deg2rad(luaL_checkfloat(L, 3)));
-    luaext_pushPos(L, p);
-    return 1;
+    return 0;
 }
 
 int cleanup(lua_State* L) {
@@ -90,6 +89,7 @@ int cleanup(lua_State* L) {
     l_effect_cleanup(L);
     l_tech_cleanup(L);
     l_ui_cleanup(L);
+    shok_EGL_CGLETerrainLowRes::ClearBridgeArea();
     return 0;
 }
 

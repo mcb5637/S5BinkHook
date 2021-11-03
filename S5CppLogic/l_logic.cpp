@@ -805,11 +805,11 @@ int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	int i = luaL_checkint(L, 1);
-	int c = (*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->GetColorByIndex(i);
-	lua_pushnumber(L, c & 0xFF);
-	lua_pushnumber(L, c >> 8 & 0xFF);
-	lua_pushnumber(L, c >> 16 & 0xFF);
-	lua_pushnumber(L, c >> 24 & 0xFF);
+	shok_color c = (*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->GetColorByIndex(i);
+	lua_pushnumber(L, c.R);
+	lua_pushnumber(L, c.G);
+	lua_pushnumber(L, c.B);
+	lua_pushnumber(L, c.A);
 	return 4;
 }
 int l_logicSetColor(lua_State* L) {
@@ -818,11 +818,7 @@ int l_logicSetColor(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	int r = luaL_checkint(L, 2), g = luaL_checkint(L, 3), b = luaL_checkint(L, 4);
 	int a = luaL_optint(L, 5, 255);
-	int c = r & 0xFF;
-	c |= (g & 0xFF) << 8;
-	c |= (b & 0xFF) << 16;
-	c |= (a & 0xFF) << 24;
-	(*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->SetColorByIndex(i, c);
+	(*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->SetColorByIndex(i, shok_color(r, g, b, a));
 	(*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->RefreshPlayerColors();
 	return 0;
 }

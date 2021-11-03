@@ -933,14 +933,22 @@ bool shok_BB_CFileSystemMgr::CloseHandle(int handle)
 	return file_closehandle(handle);
 }
 
-int shok_ED_CPlayerColors::GetColorByIndex(int i)
+shok_color::shok_color(int r, int g, int b, int a)
+{
+	R = r & 0xFF;
+	G = g & 0xFF;
+	B = b & 0xFF;
+	A = a & 0xFF;
+}
+
+shok_color shok_ED_CPlayerColors::GetColorByIndex(int i)
 {
 	// todo 16 player
 	if (i < 0 || i > 16)
-		return 0;
+		return { 0,0,0,0 };
 	return Colors[i];
 }
-void shok_ED_CPlayerColors::SetColorByIndex(int i, int c)
+void shok_ED_CPlayerColors::SetColorByIndex(int i, shok_color c)
 {
 	if (i < 0 || i > 16)
 		return;
@@ -1022,7 +1030,7 @@ void shok_modelinstance::DisableTerrainDecal()
 	modelinst_iteratefuncoversomething(this, modelinst_iter_disableterraindecal, nullptr);
 }
 static inline int(__cdecl* const modelinst_iter_setcolormodulate)(void* m, void* data) = reinterpret_cast<int(__cdecl*)(void*, void*)>(0x47B6E3);
-void shok_modelinstance::SetColorModulate(unsigned int argb)
+void shok_modelinstance::SetColorModulate(shok_color argb)
 {
 	modelinst_iteratefuncoversomething(this, modelinst_iter_setcolormodulate, &argb);
 }
@@ -1032,7 +1040,7 @@ void shok_modelinstance::SetColorModulate(int a, int r, int g, int b)
 	r &= 0xFF;
 	g &= 0xFF;
 	b &= 0xFF;
-	SetColorModulate(r | (g << 8) | (b << 16) | (a << 24));
+	SetColorModulate({ r, g, b, a });
 }
 
 static inline shok_modelinstance* (__thiscall* const modeldata_instanciate)(const shok_modeldata* d) = reinterpret_cast<shok_modelinstance * (__thiscall*)(const shok_modeldata*)> (0x472742);

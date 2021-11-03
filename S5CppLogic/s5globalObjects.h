@@ -598,17 +598,24 @@ struct shok_BB_CFileSystemMgr : shok_object {
 	static inline const char* (__cdecl* const PathGetExtension)(const char* path) = reinterpret_cast<const char* (__cdecl*)(const char*)>(0x40BAB3);
 };
 
+struct shok_color {
+	byte R = 255, G = 255, B = 255, A = 255;
+
+	shok_color(int r, int g, int b, int a);
+};
+static_assert(sizeof(shok_color) == 1 * 4);
+
 struct shok_ED_CDisplayProps : shok_object {
 	byte ShadowBlur;
 	PADDING(3);
 	int ShadowRasterSize;
 	float ShadowStrength;
-	int InvalidPositionColorModulate;
-	int InvalidPositionColorEmissive;
+	shok_color InvalidPositionColorModulate;
+	shok_color InvalidPositionColorEmissive;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> PlayerColor;
+	std::vector<shok_color, shok_allocator<shok_color>> PlayerColor;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> MiniMapColor;
+	std::vector<shok_color, shok_allocator<shok_color>> MiniMapColor;
 	float SelectionRadiusScaleForModelsWithDecal;
 	int FogOfWarNeverSeenLuminance;
 	int FogOfWarSeenLuminance;
@@ -637,12 +644,12 @@ struct shok_ED_CCameraEx : shok_object {
 struct shok_ED_CPlayerColors : shok_object {
 
 	PADDINGI(63);
-	int Colors[17]; // 8 player
+	shok_color Colors[17]; // 8 player
 
 	static inline constexpr int vtp = 0x76964C;
 
-	int GetColorByIndex(int i);
-	void SetColorByIndex(int i, int c);
+	shok_color GetColorByIndex(int i);
+	void SetColorByIndex(int i, shok_color c);
 	void RefreshPlayerColors();
 };
 struct shok_ED_CCommandAcknowledgements : shok_object {
@@ -677,7 +684,7 @@ struct shok_modelinstance {
 	void DisableParticleEffects();
 	void DisableTerrainDecal();
 	//argb =  r | (g << 8) | (b << 16) | (a << 24)
-	void SetColorModulate(unsigned int argb);
+	void SetColorModulate(shok_color argb);
 	void SetColorModulate(int a, int r, int g, int b);
 };
 struct shok_modeldata {

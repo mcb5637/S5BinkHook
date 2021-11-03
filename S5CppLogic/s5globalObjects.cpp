@@ -1006,6 +1006,34 @@ void shok_modelinstance::SetColorByPlayerID(int pl)
 {
 	modelinst_iteratefuncoversomething(this, modelinst_iter_setcolorbyplayer, &pl);
 }
+static inline int(__cdecl* const modelinst_iter_disableshadow)(void* m, void* data) = reinterpret_cast<int(__cdecl*)(void*, void*)>(0x721FD8);
+void shok_modelinstance::DisableShadow()
+{
+	modelinst_iteratefuncoversomething(this, modelinst_iter_disableshadow, nullptr);
+}
+static inline int(__cdecl* const modelinst_iter_disableparticleeffects)(void* m, void* data) = reinterpret_cast<int(__cdecl*)(void*, void*)>(0x721F87);
+void shok_modelinstance::DisableParticleEffects()
+{
+	modelinst_iteratefuncoversomething(this, modelinst_iter_disableparticleeffects, nullptr);
+}
+static inline int(__cdecl* const modelinst_iter_disableterraindecal)(void* m, void* data) = reinterpret_cast<int(__cdecl*)(void*, void*)>(0x721FB2);
+void shok_modelinstance::DisableTerrainDecal()
+{
+	modelinst_iteratefuncoversomething(this, modelinst_iter_disableterraindecal, nullptr);
+}
+static inline int(__cdecl* const modelinst_iter_setcolormodulate)(void* m, void* data) = reinterpret_cast<int(__cdecl*)(void*, void*)>(0x47B6E3);
+void shok_modelinstance::SetColorModulate(unsigned int argb)
+{
+	modelinst_iteratefuncoversomething(this, modelinst_iter_setcolormodulate, &argb);
+}
+void shok_modelinstance::SetColorModulate(int a, int r, int g, int b)
+{
+	a &= 0xFF;
+	r &= 0xFF;
+	g &= 0xFF;
+	b &= 0xFF;
+	SetColorModulate(r | (g << 8) | (b << 16) | (a << 24));
+}
 
 static inline shok_modelinstance* (__thiscall* const modeldata_instanciate)(const shok_modeldata* d) = reinterpret_cast<shok_modelinstance * (__thiscall*)(const shok_modeldata*)> (0x472742);
 shok_modelinstance* shok_modeldata::Instanciate() const

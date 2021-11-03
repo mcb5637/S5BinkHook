@@ -673,6 +673,12 @@ struct shok_modelinstance {
 	void Scale(float s, TransformOperation op);
 	void Translate(const shok_position& p, float height, TransformOperation op);
 	void SetColorByPlayerID(int pl);
+	void DisableShadow();
+	void DisableParticleEffects();
+	void DisableTerrainDecal();
+	//argb =  r | (g << 8) | (b << 16) | (a << 24)
+	void SetColorModulate(unsigned int argb);
+	void SetColorModulate(int a, int r, int g, int b);
 };
 struct shok_modeldata {
 

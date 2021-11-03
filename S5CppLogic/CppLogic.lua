@@ -383,6 +383,18 @@ function LogicModel:ResetTransform() end
 --- sets the player color for this model.
 -- @param pl player id
 function LogicModel:SetColorByPlayer(pl) end
+--- disables the shadow of a model. reset the model to reenable.
+function LogicModel:DisableShadow() end
+--- disables all particle effects (smoke...). reset the model to reenable.
+function LogicModel:DisableParticleEffects() end
+--- disables the terraindecal of a model. reset the model to reenable.
+function LogicModel:DisableTerrainDecal() end
+--- sets a color to modulate (multiply with texture).
+-- @param r red, [0-255]
+-- @param g green, [0-255]
+-- @param b blue, [0-255]
+-- @param a alpha, [0-255] (optional, default 255) (does not work with all models)
+function LogicModel:SetColorModulate(r, g, b, a) end
 
 --- creates a new LogicModel.
 --- @return LogicModel

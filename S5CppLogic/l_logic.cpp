@@ -1245,6 +1245,34 @@ int l_logicModel_SetColorByPlayer(lua_State* L) {
 	m->Model->SetColorByPlayerID(p);
 	return 0;
 }
+int l_logicModel_DisableShadow(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	m->Model->DisableShadow();
+	return 0;
+}
+int l_logicModel_DisableParticleEffects(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	m->Model->DisableParticleEffects();
+	return 0;
+}
+int l_logicModel_DisableTerrainDecal(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	m->Model->DisableTerrainDecal();
+	return 0;
+}
+int l_logicModel_SetColorModulate(lua_State* L) {
+	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
+	luaext_assertPointer(L, m->Model, "set a model first");
+	int r = luaL_checkint(L, 2);
+	int g = luaL_checkint(L, 3);
+	int b = luaL_checkint(L, 4);
+	int a = luaL_optint(L, 5, 255);
+	m->Model->SetColorModulate(a, r, g, b);
+	return 0;
+}
 void l_logicModel_CreateModelUDType(lua_State* L) {
 	luaL_newmetatable(L, l_logicModel::MetaName);
 	lua_pushstring(L, "__index");
@@ -1256,6 +1284,10 @@ void l_logicModel_CreateModelUDType(lua_State* L) {
 	luaext_registerFunc(L, "Scale", l_logicModel_Scale);
 	luaext_registerFunc(L, "ResetTransform", l_logicModel_ResetTransform);
 	luaext_registerFunc(L, "SetColorByPlayer", l_logicModel_SetColorByPlayer);
+	luaext_registerFunc(L, "DisableShadow", l_logicModel_DisableShadow);
+	luaext_registerFunc(L, "DisableParticleEffects", l_logicModel_DisableParticleEffects);
+	luaext_registerFunc(L, "DisableTerrainDecal", l_logicModel_DisableTerrainDecal);
+	luaext_registerFunc(L, "SetColorModulate", l_logicModel_SetColorModulate);
 	
 	lua_rawset(L, -3);
 	luaext_registerFunc(L, "__gc", l_logicModel_Clear);

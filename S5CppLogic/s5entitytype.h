@@ -50,6 +50,17 @@ public:
 		}
 		return nullptr;
 	}
+	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehaviorProps, T>::value>::type* = nullptr>
+	const T* GetBehaviorProps() const {
+		for (const shok_EGL_CGLEBehaviorProps* b : BehaviorProps) {
+			if (b) {
+				const T* r = shok_DynamicCast<const shok_EGL_CGLEBehaviorProps, const T>(b);
+				if (r)
+					return r;
+			}
+		}
+		return nullptr;
+	}
 };
 //constexpr int i = offsetof(shok_EGL_CGLEEntityProps, ExperiencePoints) / 4;
 
@@ -177,6 +188,17 @@ struct shok_ED_CDisplayEntityProps : shok_BB_IObject {
 		}
 		return nullptr;
 	}
+	template<typename T, typename std::enable_if<std::is_base_of<shok_ED_CBehaviorProps, T>::value>::type* = nullptr>
+	const T* GetDisplayBehaviorProps() const {
+		for (const shok_ED_CBehaviorProps* b : DisplayBehaviorProps) {
+			if (b) {
+				const T* r = shok_DynamicCast<const shok_ED_CBehaviorProps, const T>(b);
+				if (r)
+					return r;
+			}
+		}
+		return nullptr;
+	}
 
 	static inline constexpr int vtp = 0x788840;
 	static inline constexpr int TypeDesc = 0x83C918;
@@ -207,10 +229,10 @@ struct shok_GGlue_CGlueEntityProps : shok_BB_IObject {
 		return DisplayProps->GetDisplayBehaviorProps<T>();
 	}
 
-	bool IsSettlerType();
-	bool IsBuildingType();
-	bool IsCEntityProperties();
-	bool IsOfCategory(shok_EntityCategory cat);
+	bool IsSettlerType() const;
+	bool IsBuildingType() const;
+	bool IsCEntityProperties() const;
+	bool IsOfCategory(shok_EntityCategory cat) const;
 };
 
 int* const shok_entityTypeIDSerf = reinterpret_cast<int*>(0x863830);

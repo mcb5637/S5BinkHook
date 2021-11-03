@@ -280,10 +280,10 @@ struct shok_costInfo { // size 18
 	PADDINGI(1);
 	float Gold, GoldRaw, Silver, SilverRaw, Stone, StoneRaw, Iron, IronRaw, Sulfur, SulfurRaw, Clay, ClayRaw, Wood, WoodRaw, WeatherEnergy, Knowledge, Faith;
 
-	float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw);
+	float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const;
 	void AddToType(shok_ResourceType ty, float toadd);
 	void SubFromType(shok_ResourceType ty, float tosub);
-	bool HasResources(shok_costInfo* has);
+	bool HasResources(const shok_costInfo* has) const;
 };
 static_assert(sizeof(shok_costInfo) == 18 * 4);
 
@@ -326,7 +326,7 @@ struct shok_BB_IPostEvent : shok_object {
 };
 
 template<class T>
-bool contains(T* data, T search, int num) {
+bool contains(const T* data, const T search, int num) {
 	for (int i = 0; i < num; i++)
 		if (data[i] == search)
 			return true;

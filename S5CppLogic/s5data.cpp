@@ -273,8 +273,8 @@ bool DoesFileExist(const char* name)
 	return r;
 }
 
-static inline float(__thiscall* const costinfo_getres)(shok_costInfo* th, shok_ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(shok_costInfo*, shok_ResourceType, bool)>(0x4A9606);
-float shok_costInfo::GetResourceAmountFromType(shok_ResourceType ty, bool addRaw)
+static inline float(__thiscall* const costinfo_getres)(const shok_costInfo* th, shok_ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(const shok_costInfo*, shok_ResourceType, bool)>(0x4A9606);
+float shok_costInfo::GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const
 {
 	return costinfo_getres(this, ty, addRaw);
 }
@@ -291,8 +291,8 @@ void shok_costInfo::SubFromType(shok_ResourceType ty, float tosub)
 	costinfo_sub(this, ty, tosub, 0.0f);
 }
 
-static inline bool(__thiscall* const constinfo_hasres)(shok_costInfo* th, shok_costInfo* has) = reinterpret_cast<bool(__thiscall*)(shok_costInfo*, shok_costInfo*)>(0x4A96D3);
-bool shok_costInfo::HasResources(shok_costInfo* has)
+static inline bool(__thiscall* const constinfo_hasres)(const shok_costInfo* th, const shok_costInfo* has) = reinterpret_cast<bool(__thiscall*)(const shok_costInfo*, const shok_costInfo*)>(0x4A96D3);
+bool shok_costInfo::HasResources(const shok_costInfo* has) const
 {
 	return constinfo_hasres(this, has);
 }

@@ -76,9 +76,9 @@ struct shok_GGL_CRangedEffectAbilityProps : shok_GGL_CHeroAbilityProps {
 	static inline constexpr int vtp = 0x774E9C;
 	static inline constexpr int TypeDesc = 0x81B780;
 
-	bool IsDefensive();
-	bool IsAggressive();
-	bool IsHeal();
+	bool IsDefensive() const;
+	bool IsAggressive() const;
+	bool IsHeal() const;
 };
 
 struct shok_GGL_CCircularAttackProps : shok_GGL_CHeroAbilityProps {

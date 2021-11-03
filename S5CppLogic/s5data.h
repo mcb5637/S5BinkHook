@@ -50,6 +50,9 @@ typedef uint8_t byte;
 // 0x57D6CA entity ctor jmp to add TASK_LUA_FUNC handlers
 // 0x588408 behavioranim_addhandlers jmp to add TASK_WAIT_FOR_ANIM_NON_CANCELABLE handlers
 // 0x4ADB16 on building init blocking check jmp to fix move tasks (seems not to conflict with CUtil.ActivateTaskIncrementBugfix)
+// 0x496677 start music jmp
+// AIL_closestream 0x7614A4 dllimport redirect
+// 0x57B223 entity settasklist jmp
 // 
 // only without SCELoader
 // shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, func override
@@ -83,6 +86,10 @@ typedef uint8_t byte;
 // win main key event 0x40757D call redirect
 // win main mouse event check 0x40747E call redirect
 // activate ranged effect ability heal 0x4E3C78 call redirect
+// ED_CLandscape vtable 0x76A410 get water height func override (hires bridge area)
+// waterregion unknown func 0x47D301 jmp (hires bridge area)
+// bridgeentity apply bridgeheight 0x503C50 jmp redefined (hires bridge area)
+// shok_EGL_CGLETerrainLowRes::BridgeHeights vector modified (hires bridge area)
 
 // allocator
 static inline void* (__cdecl* const shok_malloc)(size_t t) = reinterpret_cast<void* (__cdecl*)(size_t)>(0x5C4181);

@@ -947,14 +947,14 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 int l_logic_SetPlaceBuildingRotation(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
-	HookConstructCommandRotation();
-	ConstructBuildingRotation = deg2rad(luaL_checkfloat(L, 1));
+	shok_GGUI_CPlaceBuildingState::HookPlacementRotation();
+	shok_GGUI_CPlaceBuildingState::PlacementRotation = deg2rad(luaL_checkfloat(L, 1));
 	return 0;
 }
 int l_logic_GetPlaceBuildingRotation(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
-	lua_pushnumber(L, rad2deg(ConstructBuildingRotation));
+	lua_pushnumber(L, rad2deg(shok_GGUI_CPlaceBuildingState::PlacementRotation));
 	return 1;
 }
 
@@ -1315,7 +1315,7 @@ void l_logic_cleanup(lua_State* L) {
 	shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
 	CanPlaceBuildingCallback = nullptr;
-	ConstructBuildingRotation = 0.0f;
+	shok_GGUI_CPlaceBuildingState::PlacementRotation = 0.0f;
 	shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
 	shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
 	shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;

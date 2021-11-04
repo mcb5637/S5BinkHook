@@ -237,6 +237,3 @@ bool ArePlayersFriendly(int p1, int p2);
 
 extern bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId);
 void HookCanPlaceBuilding();
-
-extern float ConstructBuildingRotation;
-void HookConstructCommandRotation();

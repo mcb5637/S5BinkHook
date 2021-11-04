@@ -191,9 +191,15 @@ struct shok_GGUI_CPlaceBuildingState : shok_GGUI_CBasicState {
 	shok_position PosToBuild;
 	int MouseX, MouseY; // screenpos
 
+	void UpdateModel();
+
 	static inline constexpr int vtp = 0x77DCA8;
 	static inline constexpr int TypeDesc = 0x82ECC0;
 	static inline constexpr unsigned int Identifier = 0x956CDD97;
+
+	// maybe increase the objects size and make this not global?
+	static float PlacementRotation;
+	static void HookPlacementRotation();
 };
 static_assert(sizeof(shok_GGUI_CPlaceBuildingState) / 4 == 7);
 

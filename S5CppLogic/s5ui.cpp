@@ -37,6 +37,62 @@ struct shok_vtable_GGL_CGLGUIInterface {
 	bool(__thiscall* GetNearestFreeBuildingPos)(shok_GGL_CGLGUIInterface* th, int ety, float inx, float iny, float* outx, float* outy, float range);
 };
 
+void(__stdcall* const placebuildingstate_updatemodel)(shok_GGUI_CPlaceBuildingState* th) = reinterpret_cast<void(__stdcall*)(shok_GGUI_CPlaceBuildingState*)>(0x538C46);
+void shok_GGUI_CPlaceBuildingState::UpdateModel()
+{
+	placebuildingstate_updatemodel(this);
+}
+
+float shok_GGUI_CPlaceBuildingState::PlacementRotation = 0;
+void __declspec(naked) constructcommand_placebuilding() {
+	__asm {
+		fld[shok_GGUI_CPlaceBuildingState::PlacementRotation];
+		mov eax, [eax + 0x3C];
+		lea ecx, [ebp - 0x30];
+
+		push 0x538FFC;
+		ret;
+	}
+}
+void __declspec(naked) constructcommand_checkposition() {
+	__asm {
+		sub esp, 0xC;
+		fld[shok_GGUI_CPlaceBuildingState::PlacementRotation];
+		mov ecx, esi;
+
+		push 0x538A02;
+		ret;
+	}
+}
+float __stdcall constructcommand_getrotindeg() {
+	return rad2deg(shok_GGUI_CPlaceBuildingState::PlacementRotation);
+}
+void __declspec(naked) constructcommand_setmodelrot() {
+	__asm {
+		push ecx; // gets replaced with float
+		push eax;
+		call constructcommand_getrotindeg; // for some reason i cant call rad2deg<float> directly here...
+		fstp[esp+4]; // replacing
+		mov ecx, edi;
+
+		push 0x538B0A;
+		ret;
+	};
+}
+bool HookConstructCommandRotation_Hooked = false;
+void shok_GGUI_CPlaceBuildingState::HookPlacementRotation()
+{
+	if (HookConstructCommandRotation_Hooked)
+		return;
+	HookConstructCommandRotation_Hooked = true;
+	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x538FF4), 10 };
+	WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding);
+	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x5389FB), 10 };
+	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
+	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
+	WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
+}
+
 void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeldata, float rotation)
 {
 	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata ? *reinterpret_cast<void**>(const_cast<shok_modeldata*>(modeldata)) : nullptr, rotation);

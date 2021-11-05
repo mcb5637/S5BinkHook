@@ -111,11 +111,11 @@ public:
 
 struct EntityIteratorPredicateAnyEntityType : EntityIteratorPredicate {
 private:
-	int* types;
-	int numTypes;
+	const int* types;
+	size_t numTypes;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const;
-	EntityIteratorPredicateAnyEntityType(int* ty, int numTy);
+	EntityIteratorPredicateAnyEntityType(const int* ty, size_t numTy);
 };
 
 struct EntityIteratorPredicateIsNotSoldier : EntityIteratorPredicate {

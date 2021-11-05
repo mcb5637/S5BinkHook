@@ -227,14 +227,14 @@ EntityIteratorPredicateAnyPlayer::EntityIteratorPredicateAnyPlayer(int* pl, int 
 bool EntityIteratorPredicateAnyEntityType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	int pl = e->EntityType;
-	for (int i = 0; i < numTypes; i++) {
+	for (size_t i = 0; i < numTypes; i++) {
 		if (pl == types[i])
 			return true;
 	}
 	return false;
 }
 
-EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(int* ty, int numTy)
+EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(const int* ty, size_t numTy)
 {
 	types = ty;
 	numTypes = numTy;

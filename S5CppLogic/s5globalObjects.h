@@ -242,7 +242,9 @@ struct shok_EGL_CGLELandscape_blockingData {
 	friend struct shok_EGL_CGLELandscape;
 	int ArraySizeXY;
 	byte* data;
-private:
+
+	bool IsCoordValid(int x, int y);
+	shok_position GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok_positionRot& pos, float range);
 	inline shok_EGL_CGLELandscape::BlockingMode GetBlockingData(int x, int y);
 };
 

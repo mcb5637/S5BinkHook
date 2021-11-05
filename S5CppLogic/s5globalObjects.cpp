@@ -423,7 +423,34 @@ void shok_EGL_CGLETerrainLowRes::ClearBridgeArea()
 	}
 }
 
+bool shok_EGL_CGLELandscape_blockingData::IsCoordValid(int x, int y)
+{
+	return x >= 0 && x < ArraySizeXY&& y >= 0 && y < ArraySizeXY;
+}
+void(__thiscall* const buildblock_gethigh)(const shok_GGL_CGLBuildingProps* t, shok_position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok_position*, float)>(0x4C7B8B);
+void(__thiscall* const buildblock_getlow)(const shok_GGL_CGLBuildingProps* t, shok_position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok_position*, float)>(0x4C7B1E);
+struct shok_GGL_CFreeBuildingPosPredicate {
+	PADDINGI(20);
+};
+void(__thiscall* const freebuildpred_ctor)(shok_GGL_CFreeBuildingPosPredicate* p, shok_position* lo, shok_position* hi, int uk, float r) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*, shok_position*, shok_position*, int, float)>(0x4C7E84);
+void(__thiscall* const freebuildpred_calc)(shok_EGL_CGLELandscape_blockingData* bl, int x, int y, int* xo, int* yo, int ra, shok_GGL_CFreeBuildingPosPredicate* pred) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape_blockingData*, int, int, int*, int*, int, shok_GGL_CFreeBuildingPosPredicate*)>(0x57F726);
+void(__thiscall* const freebuildpred_dtor)(shok_GGL_CFreeBuildingPosPredicate* p) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*)>(0x4C7E07);
+shok_position shok_EGL_CGLELandscape_blockingData::GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok_positionRot& pos, float range)
+{
+	int x = 0, y = 0;
+	shok_position hi, lo;
+	buildblock_gethigh(bprops, &hi, pos.r);
+	buildblock_getlow(bprops, &lo, pos.r);
+	shok_GGL_CFreeBuildingPosPredicate pred;
+	freebuildpred_ctor(&pred, &lo, &hi, reinterpret_cast<int>(bprops) + 136, pos.r); // blocing area vector*
+	freebuildpred_calc((*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->BlockingData, static_cast<int>(std::roundf(pos.X / 100)), static_cast<int>(std::roundf(pos.Y / 100)), &x, &y, static_cast<int>(std::roundf(range / 100)), &pred);
+	freebuildpred_dtor(&pred);
 
+	if (IsCoordValid(x, y))
+		return { static_cast<float>(x) * 100, static_cast<float>(y) * 100 };
+
+	return { -1,-1 };
+}
 shok_EGL_CGLELandscape::BlockingMode shok_EGL_CGLELandscape_blockingData::GetBlockingData(int x, int y)
 {
 	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(data[x + y * *shok_EGL_CGLEGameLogic::MapSize]);

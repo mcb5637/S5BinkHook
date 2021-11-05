@@ -200,6 +200,10 @@ struct shok_GGUI_CPlaceBuildingState : shok_GGUI_CBasicState {
 	// maybe increase the objects size and make this not global?
 	static float PlacementRotation;
 	static void HookPlacementRotation();
+
+	static shok_positionRot GetNearestPlacementPosBuildOn(int ety, const shok_position& p, float range);
+	static shok_positionRot GetNearestPlacementPosFree(int ety, const shok_positionRot& p, float range);
+	static shok_positionRot GetNearestPlacementPos(int ety, const shok_positionRot& p, float range);
 };
 static_assert(sizeof(shok_GGUI_CPlaceBuildingState) / 4 == 7);
 

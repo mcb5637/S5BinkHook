@@ -337,6 +337,17 @@ function CppLogic.Logic.TaskListSetChangeTaskListCheckUncancelable(b) end
 -- @param f enabled
 function CppLogic.Logic.EnableBuildOnMovementFix(f) end
 
+--- returns the next position where a building can be build accoring to blocking.
+-- position can still be blocked by hostile settlers.
+-- for buildon entitiy types, ignores p.r and returns the position+rotation of the nearest free base entity.
+-- for non buildon entity types, checks for placement with p.r and returns rotation unchanged.
+-- if no valid position can be found, returns {-1,-1,0}.
+-- @param ety entitytype
+-- @param p position with rotation
+-- @param range area (optional, default logic.xml/BuildingPlacementSnapDistance)
+-- @return position with rotation
+function CppLogic.Logic.GetNearestFreePosForBuilding(ety, p, range) end
+
 --- ui command callback.
 -- func parameters are (eventId, eventData, writeback).
 -- function can return true to skip further event execution.

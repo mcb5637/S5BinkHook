@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5data.h"
+#include "entityiterator.h"
 
 struct shok_vtable_GGUI_CState : shok_vtable_BB_IObject {
 	bool(__thiscall* OnMouseEvent)(shok_GGUI_CState* th, shok_BB_CEvent* ev);
@@ -91,6 +92,43 @@ void shok_GGUI_CPlaceBuildingState::HookPlacementRotation()
 	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
 	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
 	WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
+}
+
+shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(int ety, const shok_position& p, float range)
+{
+	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
+
+	EntityIteratorPredicateOfPlayer predpl{ 0 };
+	EntityIteratorPredicateAnyEntityType predety{ bp->BuildOn.data(), bp->BuildOn.size() };
+	EntityIteratorPredicateInCircle predcir{ p, range };
+	EntityIteratorPredicateFunc predfunc{ [](shok_EGL_CGLEEntity* e) {
+			return e->GetFirstAttachedToMe(shok_AttachmentType::BUILDING_BASE) == 0;
+	} };
+	EntityIteratorPredicate* preds[] = { &predpl, &predety, &predcir, &predfunc };
+	EntityIteratorPredicateAnd predand{ preds, 4 };
+	EntityIterator it{ &predand };
+	auto* ent = it.GetNearest(nullptr);
+	if (!ent)
+		return { -1,-1,0 };
+	return ent->Position;
+}
+shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosFree(int ety, const shok_positionRot& p, float range)
+{
+	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
+
+	shok_position r = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
+	return { r.X, r.Y, p.r };
+}
+shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(int ety, const shok_positionRot& p, float range)
+{
+	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
+	if (bp->BuildOn.size() == 0)
+		return GetNearestPlacementPosFree(ety, p, range);
+	else
+		return GetNearestPlacementPosBuildOn(ety, p, range);
 }
 
 void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeldata, float rotation)

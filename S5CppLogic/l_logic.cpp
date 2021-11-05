@@ -561,7 +561,7 @@ int l_logicCanPLaceBuildingAt(lua_State* L) {
 	shok_position p;
 	luaext_checkPos(L, p, 3);
 	p.FloorToBuildingPlacement();
-	float r = luaL_checkfloat(L, 4);
+	float r = deg2rad(luaL_checkfloat(L, 4));
 	if (lua_isnumber(L, 5))
 		lua_pushboolean(L, shok_canPlaceBuilding(ty, pl, &p, r, luaL_checkint(L, 5)));
 	else
@@ -1167,6 +1167,19 @@ int l_logic_FixBuildOnMovement(lua_State* L) {
 	return 0;
 }
 
+int l_logic_GetNearestFreePosForBuilding(lua_State* L) {
+	luaext_assert(L, luaext_checkEntityType(L, 1)->IsBuildingType(), "no building type");
+	int ty = luaL_checkint(L, 1);
+	shok_positionRot pin;
+	luaext_checkPosRot(L, pin, 2);
+	float range = luaL_optfloat(L, 3, 0);
+	if (range <= 0)
+		range = (*shok_GGL_CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance;
+	shok_positionRot pout = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
+	luaext_pushPosRot(L, pout);
+	return 1;
+}
+
 struct l_logicModel {
 	shok_modelinstance* Model = nullptr;
 	
@@ -1378,6 +1391,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "TaskListSetChangeTaskListCheckUncancelable", &l_logic_setTaskListSetCheckUncancelable);
 	luaext_registerFunc(L, "EnableBuildOnMovementFix", &l_logic_FixBuildOnMovement);
 	luaext_registerFunc(L, "CreateFreeModel", &l_logicModel_create);
+	luaext_registerFunc(L, "GetNearestFreePosForBuilding", &l_logic_GetNearestFreePosForBuilding);
 
 	lua_pushstring(L, "UICommands");
 	lua_newtable(L);

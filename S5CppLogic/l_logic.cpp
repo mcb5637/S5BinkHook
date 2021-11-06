@@ -949,6 +949,9 @@ int l_logic_SetPlaceBuildingRotation(lua_State* L) {
 		luaL_error(L, "not supported with SCELoader");
 	shok_GGUI_CPlaceBuildingState::HookPlacementRotation();
 	shok_GGUI_CPlaceBuildingState::PlacementRotation = deg2rad(luaL_checkfloat(L, 1));
+	shok_GGUI_CPlaceBuildingState* s = shok_DynamicCast<shok_GGUI_CState, shok_GGUI_CPlaceBuildingState>(shok_GGUI_CManager::GlobalObj()->C3DViewHandler->CurrentState);
+	if (s)
+		s->UpdateModel();
 	return 0;
 }
 int l_logic_GetPlaceBuildingRotation(lua_State* L) {

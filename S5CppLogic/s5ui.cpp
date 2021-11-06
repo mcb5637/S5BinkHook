@@ -80,6 +80,36 @@ void __declspec(naked) constructcommand_setmodelrot() {
 		ret;
 	};
 }
+bool __stdcall constructcommand_getnearestpos(int ety, float x, float y, float* xo, float* yo) {
+	shok_positionRot p = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ety, { x, y, shok_GGUI_CPlaceBuildingState::PlacementRotation }, (*shok_GGL_CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
+	if (p.X >= 0) {
+		*xo = p.X;
+		*yo = p.Y;
+		shok_GGUI_CPlaceBuildingState::PlacementRotation = p.r;
+		return true;
+	}
+	return false;
+}
+void __declspec(naked) constructcommand_checkpos() {
+	__asm {
+		lea eax, [ebp - 0x8];
+		push eax;
+		lea eax, [ebp - 0x4];
+		push eax;
+		push[ebp - 0x20];
+		push[ebp - 0x24];
+		push ebx;
+		call constructcommand_getnearestpos;
+
+		push 0x538C0E;
+		ret;
+	};
+}
+void(__thiscall* const constructcommand_updatemodelsetpos)(shok_GGUI_CPlaceBuildingState* th, int* p, int r) = reinterpret_cast<void(__thiscall*)(shok_GGUI_CPlaceBuildingState*, int*, int)>(0x5269FE);
+void __fastcall constructcommand_updatemodelsetpos_over(shok_GGUI_CPlaceBuildingState* th, int _, int* p, int r) {
+	th->C3DViewHandler->ClumpRenerable->Model->Rotate(rad2deg(shok_GGUI_CPlaceBuildingState::PlacementRotation), shok_modelinstance::TransformOperation::Set);
+	constructcommand_updatemodelsetpos(th, p, r);
+}
 bool HookConstructCommandRotation_Hooked = false;
 void shok_GGUI_CPlaceBuildingState::HookPlacementRotation()
 {
@@ -92,6 +122,10 @@ void shok_GGUI_CPlaceBuildingState::HookPlacementRotation()
 	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
 	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
 	WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
+	shok_saveVirtualProtect vp4{ reinterpret_cast<void*>(0x538BDB), 10 };
+	WriteJump(reinterpret_cast<void*>(0x538BDB), &constructcommand_checkpos);
+	shok_saveVirtualProtect vp5{ reinterpret_cast<void*>(0x538C8D), 10 };
+	RedirectCall(reinterpret_cast<void*>(0x538C8D), &constructcommand_updatemodelsetpos_over);
 }
 
 shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(int ety, const shok_position& p, float range)

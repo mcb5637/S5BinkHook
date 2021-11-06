@@ -19,6 +19,23 @@ shok_BB_CEvent::shok_BB_CEvent(shok_InputEventIds eventid) : shok_BB_CEvent(stat
 {
 }
 
+bool shok_BB_CEvent::IsEvent(shok_EventIDs id)
+{
+	return EventTypeId == static_cast<int>(id);
+}
+bool shok_BB_CEvent::IsEvent(shok_NetEventIds id)
+{
+	return EventTypeId == static_cast<int>(id);
+}
+bool shok_BB_CEvent::IsEvent(shok_FeedbackEventIds id)
+{
+	return EventTypeId == static_cast<int>(id);
+}
+bool shok_BB_CEvent::IsEvent(shok_InputEventIds id)
+{
+	return EventTypeId == static_cast<int>(id);
+}
+
 shok_EGL_CEventValue_int::shok_EGL_CEventValue_int(shok_EventIDs e, int d) : shok_BB_CEvent(e)
 {
 	vtable = shok_EGL_CEventValue_int::vtp;
@@ -276,7 +293,7 @@ shok_BB_CInputEvent::shok_BB_CInputEvent(shok_InputEventIds id) : shok_BB_CEvent
 	EventHandeled = false;
 }
 
-shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, int keydata, int clicks, int x, int y, int delta) : shok_BB_CInputEvent(id)
+shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, shok_Keys keydata, int clicks, int x, int y, int delta) : shok_BB_CInputEvent(id)
 {
 	vtable = shok_BB_CMouseEvent::vtp;
 	KeyData = keydata;
@@ -284,4 +301,12 @@ shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, int keydata, int
 	X = x;
 	Y = y;
 	Delta = delta;
+}
+bool shok_BB_CMouseEvent::IsKey(shok_Keys key)
+{
+	return (KeyData & shok_Keys::MaskCode) == key;
+}
+bool shok_BB_CMouseEvent::IsModifier(shok_Keys mod)
+{
+	return (KeyData & shok_Keys::MaskModifiers) == mod;
 }

@@ -80,8 +80,10 @@ typedef uint8_t byte;
 // display entity name overhead 0x53F911 jmp
 // check building placement 0x4B45B9 jmp
 // place building create net event 0x538FF4 jmp
-// place building preview pos check 0x5389FB jmp
-// place building set model 0x538C8D jmp
+// place building pos check 0x5389FB jmp
+// place building set model 0x538B01 jmp
+// place building calc preview pos 0x538BDB jmp
+// place building update model 0x538C8D call redirct
 // win main char event 0x40754C call redirect
 // win main key event 0x40757D call redirect
 // win main mouse event check 0x40747E call redirect

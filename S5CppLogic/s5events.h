@@ -804,7 +804,7 @@ enum class shok_EventIDs : int {
 	AutoCannon_OnFoundationDetach = 0x1600B, //EGL::CEvent1Entity
 	Foundation_OnAutoCannonDetach = 0x1600C, //EGL::CEvent1Entity
 	HeroAbility_Cancel = 0x1600D, //BB::CEvent
-	// 0x1600E foundation detach builder & top then die, neutralbridge detach architects
+	OnBuilderDetaches = 0x1600E, //EGL::CEvent1Entity foundation detach builder & top then die, neutralbridge detach architects
 	// 1500E convert cancel?
 	// 0x1600F hawk destroy?
 	HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
@@ -870,10 +870,10 @@ enum class shok_EventIDs : int {
 	Foundry_SetProgress = 0x17015, //EGL::CEventValue<int,-27574121>
 	Foundry_BuildCannonCommand = 0x17016, //EGL::CEventValue<int,-27574121>
 	Foundry_WorkStep = 0x17018, //BB::CEvent
-	// 0x17019 affectmoti affect moti, foundation init
-	// 0x1701A foundation cleanup?
+	// 0x17019 affectmoti affect moti, foundation init, not called?
+	Building_OnUpgradeStart = 0x1701A, //BB::CEvent
 	// 0x1701B mine detach res
-	// 0x1701C foundation init, save load?
+	Building_OnUpgradeCancel = 0x1701C, //BB::CEvent
 	IsConvertible = 0x1701D, //EGL::CEventGetValue<bool,1709081367>
 
 	Barracks_ActivateAutoFill = 0x1701E, //BB::CEvent

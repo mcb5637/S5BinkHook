@@ -668,7 +668,7 @@ struct shok_GGL_CAutoCannonBehavior : shok_EGL_CGLEBehavior {
 
 struct shok_GGL_CFoundationBehavior : shok_EGL_CGLEBehavior {
 
-	// defined events: Leader_AttackEntity, Foundation_XXX
+	// defined events: Leader_AttackEntity, Foundation_XXX, Building_OnUpgradeStart, Building_OnUpgradeCancel, OnBuilderDetaches
 
 	static inline constexpr int vtp = 0x776CA0;
 	static inline constexpr int TypeDesc = 0x820F44;

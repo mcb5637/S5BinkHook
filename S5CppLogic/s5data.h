@@ -293,6 +293,8 @@ struct shok_costInfo { // size 18
 	void AddToType(shok_ResourceType ty, float toadd);
 	void SubFromType(shok_ResourceType ty, float tosub);
 	bool HasResources(const shok_costInfo* has) const;
+
+	static inline shok_BB_CClassFactory_serializationData* SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D668);
 };
 static_assert(sizeof(shok_costInfo) == 18 * 4);
 

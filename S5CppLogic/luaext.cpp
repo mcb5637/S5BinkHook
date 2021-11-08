@@ -173,7 +173,7 @@ void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i, bool rad) {
 	lua_pop(L, 3);
 }
 
-void luaext_writeCostInfo(lua_State* L, shok_costInfo& c) {
+void luaext_writeCostInfo(lua_State* L, const shok_costInfo& c) {
 	lua_newtable(L);
 	for (int i = 1; i <= shok_ResourceType_MaxValue; i++) {
 		lua_pushnumber(L, 0);

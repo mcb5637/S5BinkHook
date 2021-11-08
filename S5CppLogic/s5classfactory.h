@@ -30,6 +30,9 @@ struct shok_BB_CClassFactory_serializationData_FieldSerilaizer {
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeBool = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C58);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeClassIdentifier = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x813978);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeTaskList = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x85D4AC);
+	// does not add ids
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeEntityType = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x85D4D0);
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeModel = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x8585C0);
 
 };
 struct shok_BB_CClassFactory_serializationData_ListOptions {

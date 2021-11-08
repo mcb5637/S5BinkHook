@@ -287,7 +287,14 @@ struct shok_AARect {
 enum class shok_ResourceType;
 struct shok_costInfo { // size 18
 	PADDINGI(1);
-	float Gold, GoldRaw, Silver, SilverRaw, Stone, StoneRaw, Iron, IronRaw, Sulfur, SulfurRaw, Clay, ClayRaw, Wood, WoodRaw, WeatherEnergy, Knowledge, Faith;
+	float Gold = 0, GoldRaw = 0;
+	float Silver = 0, SilverRaw = 0;
+	float Stone = 0, StoneRaw = 0;
+	float Iron = 0, IronRaw = 0;
+	float Sulfur = 0, SulfurRaw = 0;
+	float Clay = 0, ClayRaw = 0;
+	float Wood = 0, WoodRaw = 0;
+	float WeatherEnergy = 0, Knowledge = 0, Faith = 0;
 
 	float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const;
 	void AddToType(shok_ResourceType ty, float toadd);

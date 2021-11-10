@@ -189,6 +189,14 @@ int l_api_runtimestore_get(lua_State* L) {
 	return 1;
 }
 
+int l_api_dumpExtraTables(lua_State* L) {
+	(*shok_BB_CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L, "Animations");
+	(*shok_BB_CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L, "TerrainTypes");
+	(*shok_BB_CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L, "WaterTypes");
+	(*shok_BB_CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L, "ArmorClasses");
+	return 0;
+}
+
 void l_api_init(lua_State* L)
 {
 	luaext_registerFunc(L, "Eval", &l_api_eval);
@@ -202,6 +210,7 @@ void l_api_init(lua_State* L)
 	luaext_registerFunc(L, "GetGDB", &l_api_getGDB);
 	luaext_registerFunc(L, "RuntimeStoreSet", &l_api_runtimestore_set);
 	luaext_registerFunc(L, "RuntimeStoreGet", &l_api_runtimestore_get);
+	luaext_registerFunc(L, "CreateExtraDataTables", &l_api_dumpExtraTables);
 }
 
 // CppLogic.API.Log("string")

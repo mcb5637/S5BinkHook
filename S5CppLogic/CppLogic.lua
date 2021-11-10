@@ -474,6 +474,10 @@ function CppLogic.API.RuntimeStoreSet(name, value) end
 -- @return value data
 function CppLogic.API.RuntimeStoreGet(name) end
 
+--- creates the global tables Animations, TerrainTypes, WaterTypes, ArmorClasses.
+-- data gets read directly from the game, so anything you can use is in there.
+function CppLogic.API.CreateExtraDataTables() end
+
 --- deals damage to a target.
 -- calls respective hurt entity trigger.
 -- @param target entity to be damaged

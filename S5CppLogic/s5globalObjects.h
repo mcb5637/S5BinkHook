@@ -19,17 +19,33 @@ struct shok_BB_CIDManagerEx : shok_object {
 	void DumpManagerToLuaGlobal(lua_State* L, const char* global);
 
 	static inline shok_BB_CIDManagerEx** const AnimManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C838);
-	static inline shok_BB_CIDManagerEx** const EntityTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x895DC0);
+	static inline shok_BB_CIDManagerEx** const EntityTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x895DC0); // A0C834 same
 	static inline shok_BB_CIDManagerEx** const UpgradeCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C84C);
-	static inline shok_BB_CIDManagerEx** const EntityCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C4);
-	static inline shok_BB_CIDManagerEx** const DamageClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B8);
-	static inline shok_BB_CIDManagerEx** const TechnologiesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3BC);
-	static inline shok_BB_CIDManagerEx** const TechnologyCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C0);
+	static inline shok_BB_CIDManagerEx** const EntityCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C4); // 867838 same
+	static inline shok_BB_CIDManagerEx** const DamageClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B8); // A0D034 same
+	static inline shok_BB_CIDManagerEx** const TechnologiesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3BC); // 8640EC same
+	static inline shok_BB_CIDManagerEx** const TechnologyCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C0); // 864854 same
 	static inline shok_BB_CIDManagerEx** const AbilityManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3CC);
 	static inline shok_BB_CIDManagerEx** const GoodsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B4); // i dont think they are actually used somewhere...
-	static inline shok_BB_CIDManagerEx** const ArmorClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C8); // you probably cannot add anything here, cause fixed array
+	static inline shok_BB_CIDManagerEx** const ArmorClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C8); // you probably cannot add anything here, cause fixed array, A0C850 same
 	static inline shok_BB_CIDManagerEx** const AttachmentTypesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3D0); // 85A3D4 too
 	static inline shok_BB_CIDManagerEx** const FeedBackEventManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x880BA0); // ids are not correct here
+	static inline shok_BB_CIDManagerEx** const SoundsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x859F14); // 8979C8 same
+	static inline shok_BB_CIDManagerEx** const AmbientSoundsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x8979CC);
+	static inline shok_BB_CIDManagerEx** const ResourceTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x885EE5C);
+	static inline shok_BB_CIDManagerEx** const FeedbackStateManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x880C10);
+	static inline shok_BB_CIDManagerEx** const TaskManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x898208);
+	static inline shok_BB_CIDManagerEx** const PrincipalTaskManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x89820C);
+	static inline shok_BB_CIDManagerEx** const AnimCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C82C);
+	static inline shok_BB_CIDManagerEx** const AnimSetManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C830);
+	static inline shok_BB_CIDManagerEx** const EffectTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0CC7C); // A0C83C ?
+	static inline shok_BB_CIDManagerEx** const TaskListManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C848);
+	static inline shok_BB_CIDManagerEx** const BlessCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C858);
+	static inline shok_BB_CIDManagerEx** const WeatherEffectTextureManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0CC80); // lightning and snow
+	static inline shok_BB_CIDManagerEx** const TerrainTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0D5CC);
+	static inline shok_BB_CIDManagerEx** const TerrainTextureManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0D5D0);
+	static inline shok_BB_CIDManagerEx** const WaterTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0D9C8);
+	static inline shok_BB_CIDManagerEx** const ShorewaveTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA19F34);
 };
 static_assert(sizeof(shok_BB_CIDManagerEx) == 6 * 4);
 struct shok_BB_CIDManager : shok_object {

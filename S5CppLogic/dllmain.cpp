@@ -17,6 +17,31 @@
 #include <map>
 #include <set>
 #include <list>
+#include <iostream>
+#include <fstream>
+
+struct CppLogicOptions {
+    bool DoNotLoad = false;
+    bool DoNotUseCenterFix = false;
+
+    void LoadFromFile(const char* name) {
+        std::ifstream f{ name, std::ios::in };
+        if (f.is_open()) {
+            std::string line;
+            while (std::getline(f >> std::ws, line, '=')) {
+                if (line == "DoNotLoad") {
+                    f >> DoNotLoad;
+                }
+                else if (line == "DoNotUseCenterFix") {
+                    f >> DoNotUseCenterFix;
+                }
+                f.ignore();
+            }
+            f.close();
+        }
+    }
+};
+CppLogicOptions Options{};
 
 void dumpClassSerialization(lua_State* L, shok_BB_CClassFactory_serializationData* d) {
     if (!d) {
@@ -93,7 +118,8 @@ int cleanup(lua_State* L) {
 }
 
 void initGame() {
-    HookTextPrinting();
+    if (!Options.DoNotUseCenterFix)
+        HookTextPrinting();
     l_logic_onload();
     shok_ESnd_CSoEMusic::HookStartMusicFilesystem();
 }
@@ -219,6 +245,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     {
     case DLL_PROCESS_ATTACH:
         {
+            Options.LoadFromFile("./CppLogicOptions.txt");
+            if (Options.DoNotLoad)
+                return false;
+        }
+    
+        {
             int *data = reinterpret_cast<int*>(SHOK_Import_LUA_OPEN);
             shok_saveVirtualProtect vp{ data, 4 };
             *data = reinterpret_cast<int>(&__lua_open);
@@ -233,5 +265,5 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_PROCESS_DETACH:
         break;
     }
-    return TRUE;
+    return true;
 }

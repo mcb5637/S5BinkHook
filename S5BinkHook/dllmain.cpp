@@ -105,10 +105,12 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		payload = LoadLibrary(_T("S5CppLogic.dll"));
 	}
 	if (reason == DLL_PROCESS_DETACH) {
-		FreeLibrary(hL);
-		FreeLibrary(payload);
+		if (hL)
+			FreeLibrary(hL);
+		if (payload)
+			FreeLibrary(payload);
 	}
-	return TRUE;
+	return true;
 }
 
 extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferSetDirectDraw()

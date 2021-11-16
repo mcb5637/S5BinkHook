@@ -1503,6 +1503,13 @@ int l_settler_GetSnipeTarget(lua_State* L) {
 	return 1;
 }
 
+int l_settler_GetEnteredBuilding(lua_State* L) {
+	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
+	lua_pushnumber(L, s->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_ENTERED_BUILDING));
+	lua_pushnumber(L, s->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_BUILDING_TO_LEAVE));
+	return 2;
+}
+
 const char* AnimTaskList = "TL_SCRIPT_ANIMATION";
 void l_settler_createAnimTaskList(lua_State* L) {
 	shok_EGL_CGLETaskListMgr* tmng = *shok_EGL_CGLETaskListMgr::GlobalObj;
@@ -1705,6 +1712,7 @@ void l_entity_init(lua_State* L)
 	luaext_registerFunc(L, "EnableRangedEffectSoldierHeal", &l_settler_EnableRangedEffectSoldierHeal);
 	luaext_registerFunc(L, "ShurikenGetTarget", &l_settler_GetShurikenTarget);
 	luaext_registerFunc(L, "SniperGetTarget", &l_settler_GetSnipeTarget);
+	luaext_registerFunc(L, "GetEnteredBuilding", &l_settler_GetEnteredBuilding);
 	luaext_registerFunc(L, "PlayScriptAnimation", &l_settler_playScriptAnim);
 	lua_rawset(L, -3);
 

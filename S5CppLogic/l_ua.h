@@ -71,6 +71,8 @@ public:
 	shok_EGL_CGLEEntity* GetFurthestConversionTargetInArea(int player, shok_position& p, float ran, bool notFleeing);
 	static int CountTargetsInArea(int player, shok_position& p, float ran, bool notFleeing);
 
+
+
 private:
 	void CleanDead();
 	inline void NeedFormat();
@@ -91,4 +93,56 @@ private:
 	bool ExecutePrepDefense(shok_EGL_CGLEEntity* e);
 	bool CheckTargetCache(int id, int count);
 	void UpdateTargetCache(int id, int time);
+
+	static int AddLeader(lua_State* L);
+	static int GetPos(lua_State* L);
+	static int Tick(lua_State* L);
+	static int Iterate(lua_State* L);
+	static int IterateTransit(lua_State* L);
+	static int OnIdChanged(lua_State* L);
+	static int GetSize(lua_State* L);
+	static int RemoveLeader(lua_State* L);
+	static int IsIdle(lua_State* L);
+	static int GetStatus(lua_State* L);
+	static int SetArea(lua_State* L);
+	static int SetTarget(lua_State* L);
+	static int DumpTable(lua_State* L);
+	static int ReadTable(lua_State* L);
+	static int SetStatus(lua_State* L);
+	static int SetReMove(lua_State* L);
+	static int SetCurrentBattleTarget(lua_State* L);
+	static int GetRangedMelee(lua_State* L);
+	static int SetIgnoreFleeing(lua_State* L);
+	static int SetAutoRotateFormation(lua_State* L);
+	static int GetFirstDeadHero(lua_State* L);
+	static int SetPrepDefense(lua_State* L);
+	static int SetSabotageBridges(lua_State* L);
+
+public:
+	static constexpr const luaL_reg LuaMethods[] = {
+		{"AddLeader", &AddLeader},
+		{"GetPos", &GetPos},
+		{"Tick", &Tick},
+		{"Iterate", &Iterate},
+		{"IterateTransit", &IterateTransit},
+		{"OnIdChanged", &OnIdChanged},
+		{"GetSize", &GetSize},
+		{"RemoveLeader", &RemoveLeader},
+		{"IsIdle", &IsIdle},
+		{"GetStatus", &GetStatus},
+		{"SetArea", &SetArea},
+		{"SetTarget", &SetTarget},
+		{"DumpTable", &DumpTable},
+		{"ReadTable", &ReadTable},
+		{"SetStatus", &SetStatus},
+		{"SetReMove", &SetReMove},
+		{"SetCurrentBattleTarget", &SetCurrentBattleTarget},
+		{"GetRangedMelee", &GetRangedMelee},
+		{"SetIgnoreFleeing", &SetIgnoreFleeing},
+		{"SetAutoRotateFormation", &SetAutoRotateFormation},
+		{"GetFirstDeadHero", &GetFirstDeadHero},
+		{"SetPrepDefense", &SetPrepDefense},
+		{"SetSabotageBridges", &SetSabotageBridges},
+		{nullptr, nullptr},
+	};
 };

@@ -839,103 +839,123 @@ void UnlimitedArmy::UpdateTargetCache(int id, int time) {
 	TargetCache.push_back({ id, tick + time, 1 });
 }
 
-const char* udname = "UnlimitedArmy";
-
-int l_uam_gc(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	a->~UnlimitedArmy();
-	return 0;
-}
-
-int l_uam_AddEntity(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::AddLeader(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->AddLeader(luaext_checkSettler(L, 2));
 	return 0;
 }
 
-int l_ual_IterateNext(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	int i = luaL_checkint(L, 2);
-	i++;
-	if (i >= static_cast<int>(a->Leaders.size())) {
-		lua_pushnil(L);
-		lua_pushnil(L);
-	}
-	else {
-		lua_pushnumber(L, i);
-		lua_pushnumber(L, a->Leaders[i]);
-	}
-	return 2;
+int UnlimitedArmy::GetPos(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+	a->CalculatePos();
+	luaext_pushPos(L, a->LastPos);
+	return 1;
+}
+int UnlimitedArmy::Tick(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+	a->Tick();
+	return 0;
 }
 
-int l_uam_Iterate(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	lua_pushcfunction(L, &l_ual_IterateNext);
+int UnlimitedArmy::Iterate(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+	lua_pushcfunction(L, [](lua_State* L) {
+		UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+		int i = luaL_checkint(L, 2);
+		i++;
+		if (i >= static_cast<int>(a->Leaders.size())) {
+			lua_pushnil(L);
+			lua_pushnil(L);
+		}
+		else {
+			lua_pushnumber(L, i);
+			lua_pushnumber(L, a->Leaders[i]);
+		}
+		return 2;
+		} );
+	lua_pushvalue(L, 1);
+	lua_pushnumber(L, -1);
+	return 3;
+}
+int UnlimitedArmy::IterateTransit(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+	lua_pushcfunction(L, [](lua_State* L) {
+		UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+		int i = luaL_checkint(L, 2);
+		i++;
+		if (i >= (int)a->LeaderInTransit.size()) {
+			lua_pushnil(L);
+			lua_pushnil(L);
+		}
+		else {
+			lua_pushnumber(L, i);
+			lua_pushnumber(L, a->LeaderInTransit[i]);
+		}
+		return 2;
+		});
 	lua_pushvalue(L, 1);
 	lua_pushnumber(L, -1);
 	return 3;
 }
 
-int l_uam_GetPos(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	a->CalculatePos();
-	luaext_pushPos(L, a->LastPos);
-	return 1;
-}
-
-int l_uam_Tick(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	a->Tick();
-	return 0;
-}
-
-int l_uam_IdChanged(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::OnIdChanged(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	int old = luaL_checkint(L, 2);
 	int ne = luaL_checkint(L, 3);
 	a->OnIdChanged(old, ne);
 	return 0;
 }
 
-int l_uam_GetSize(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::GetSize(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	int i = a->GetSize(lua_toboolean(L, 2), lua_toboolean(L, 3));
 	lua_pushnumber(L, i);
 	return 1;
 }
 
-int l_uam_RemoveLeader(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::RemoveLeader(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->RemoveLeader(luaext_checkEntity(L, 2));
 	return 0;
 }
 
-int l_uam_IsIdle(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::IsIdle(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	lua_pushboolean(L, a->IsIdle());
 	return 1;
 }
-
-int l_uam_GetStatus(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	lua_pushnumber(L, (int) a->Status);
+int UnlimitedArmy::GetStatus(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+	lua_pushnumber(L, static_cast<int>(a->Status));
 	return 1;
 }
 
-int l_uam_SetArea(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetArea(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->Area = luaL_checkfloat(L, 2);
 	return 0;
 }
-
-int l_uam_SetTarget(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetTarget(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	luaext_checkPos(L, a->Target, 2);
 	return 0;
 }
 
-int l_uam_DumpTable(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::DumpTable(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	lua_newtable(L);
 	lua_pushstring(L, "Leaders");
 	lua_newtable(L);
@@ -990,9 +1010,9 @@ int l_uam_DumpTable(lua_State* L) {
 	lua_rawset(L, -3);
 	return 1;
 }
-
-int l_uam_ReadTable(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::ReadTable(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	lua_pushstring(L, "Leaders");
 	lua_rawget(L, 2);
 	int i = 1;
@@ -1076,49 +1096,28 @@ int l_uam_ReadTable(lua_State* L) {
 	return 0;
 }
 
-int l_ual_IterateTransitNext(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	int i = luaL_checkint(L, 2);
-	i++;
-	if (i >= (int)a->LeaderInTransit.size()) {
-		lua_pushnil(L);
-		lua_pushnil(L);
-	}
-	else {
-		lua_pushnumber(L, i);
-		lua_pushnumber(L, a->LeaderInTransit[i]);
-	}
-	return 2;
-}
-int l_uam_IterateTransit(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	lua_pushcfunction(L, &l_ual_IterateTransitNext);
-	lua_pushvalue(L, 1);
-	lua_pushnumber(L, -1);
-	return 3;
-}
-
-
-int l_uam_SetStatus(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
-	a->Status = (UAStatus) luaL_checkint(L, 2);
+int UnlimitedArmy::SetStatus(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
+	a->Status = static_cast<UAStatus>(luaL_checkint(L, 2));
 	return 0;
 }
-
-int l_uam_SetReMove(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetReMove(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->ReMove = lua_toboolean(L, 2);
 	return 0;
 }
-
-int l_uam_SetCurrentBattleTarget(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetCurrentBattleTarget(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->CurrentBattleTarget = luaext_checkEntityId(L, 2);
 	return 0;
 }
 
-int l_uam_GetRangedMelee(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::GetRangedMelee(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	lua_newtable(L);
 	lua_newtable(L);
 	lua_newtable(L);
@@ -1142,20 +1141,22 @@ int l_uam_GetRangedMelee(lua_State* L) {
 	return 3;
 }
 
-int l_uam_SetIgnoreFleeing(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetIgnoreFleeing(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->IgnoreFleeing = lua_toboolean(L, 2);
 	return 0;
 }
-
-int l_uam_SetAutoRotateFormation(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetAutoRotateFormation(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->AutoRotateFormation = luaL_checkfloat(L, 2);
 	return 0;
 }
 
-int l_uam_GetFirstDeadHero(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::GetFirstDeadHero(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	if (a->DeadHeroes.size() > 0)
 		lua_pushnumber(L, a->DeadHeroes[0]);
 	else
@@ -1163,24 +1164,22 @@ int l_uam_GetFirstDeadHero(lua_State* L) {
 	return 1;
 }
 
-int l_uam_SetPrepDefense(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetPrepDefense(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->PrepDefense = lua_toboolean(L, 2);
 	return 0;
 }
-
-int l_uam_SetSabotageBridges(lua_State* L) {
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(luaL_checkudata(L, 1, udname));
+int UnlimitedArmy::SetSabotageBridges(lua_State* L)
+{
+	UnlimitedArmy* a = luaext_GetUserData<UnlimitedArmy>(L, 1);
 	a->SabotageBridges = lua_toboolean(L, 2);
 	return 0;
 }
 
 int l_uaNew(lua_State* L) {
 	int pl = luaL_checkint(L, 1);
-	UnlimitedArmy* a = static_cast<UnlimitedArmy*>(lua_newuserdata(L, sizeof(UnlimitedArmy)));
-	new (a) UnlimitedArmy(pl);
-	luaL_getmetatable(L, udname);
-	lua_setmetatable(L, -2);
+	UnlimitedArmy* a = luaext_newUserData<UnlimitedArmy>(L, pl);
 	a->L = L;
 	lua_pushvalue(L, 2);
 	a->Formation = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -1228,38 +1227,7 @@ void l_ua_init(lua_State* L)
 	luaext_registerFunc(L, "CountTargetEntitiesInArea", &l_uaCount);
 	luaext_registerFunc(L, "AddCannonBuilderData", &l_uaAddCannonBuilderData);
 
-	luaL_newmetatable(L, udname);
-	lua_pushstring(L, "__gc");
-	lua_pushcfunction(L, &l_uam_gc);
-	lua_settable(L, -3);
-
-	lua_pushstring(L, "__index");
-	lua_newtable(L);
-	luaext_registerFunc(L, "AddLeader", &l_uam_AddEntity);
-	luaext_registerFunc(L, "GetPos", &l_uam_GetPos);
-	luaext_registerFunc(L, "Tick", &l_uam_Tick);
-	luaext_registerFunc(L, "Iterate", &l_uam_Iterate);
-	luaext_registerFunc(L, "IterateTransit", &l_uam_IterateTransit);
-	luaext_registerFunc(L, "OnIdChanged", &l_uam_IdChanged);
-	luaext_registerFunc(L, "GetSize", &l_uam_GetSize);
-	luaext_registerFunc(L, "RemoveLeader", &l_uam_RemoveLeader);
-	luaext_registerFunc(L, "IsIdle", &l_uam_IsIdle);
-	luaext_registerFunc(L, "GetStatus", &l_uam_GetStatus);
-	luaext_registerFunc(L, "SetArea", &l_uam_SetArea);
-	luaext_registerFunc(L, "SetTarget", &l_uam_SetTarget);
-	luaext_registerFunc(L, "DumpTable", &l_uam_DumpTable);
-	luaext_registerFunc(L, "ReadTable", &l_uam_ReadTable);
-	luaext_registerFunc(L, "SetStatus", &l_uam_SetStatus);
-	luaext_registerFunc(L, "SetReMove", &l_uam_SetReMove);
-	luaext_registerFunc(L, "SetCurrentBattleTarget", &l_uam_SetCurrentBattleTarget);
-	luaext_registerFunc(L, "GetRangedMelee", &l_uam_GetRangedMelee);
-	luaext_registerFunc(L, "SetIgnoreFleeing", &l_uam_SetIgnoreFleeing);
-	luaext_registerFunc(L, "SetAutoRotateFormation", &l_uam_SetAutoRotateFormation);
-	luaext_registerFunc(L, "GetFirstDeadHero", &l_uam_GetFirstDeadHero);
-	luaext_registerFunc(L, "SetPrepDefense", &l_uam_SetPrepDefense);
-	luaext_registerFunc(L, "SetSabotageBridges", &l_uam_SetSabotageBridges);
-	lua_settable(L, -3);
-	lua_pop(L, 1);
+	luaext_prepareUserDataType<UnlimitedArmy>(L);
 }
 
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.UA.GetNearestEnemyInArea(1, x,y, 1000)

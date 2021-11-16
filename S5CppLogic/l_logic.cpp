@@ -1183,132 +1183,130 @@ int l_logic_GetNearestFreePosForBuilding(lua_State* L) {
 	return 1;
 }
 
-struct l_logicModel {
-	shok_modelinstance* Model = nullptr;
-	
-	static constexpr const char* MetaName = "CppLogic_Model";
-};
-int l_logicModel_Clear(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	if (m->Model) {
-		m->Model->Destroy();
-		m->Model = nullptr;
-	}
-	return 0;
-}
-int l_logicModel_SetModel(lua_State* L) {
-	l_logicModel_Clear(L);
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	int mid = luaL_checkint(L, 2);
-	luaext_assert(L, (*shok_ED_CGlobalsBaseEx::GlobalObj)->ModelManager->GetNameByID(mid), "invalid model");
-	m->Model = (*shok_ED_CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
-	m->Model->Register();
-	return 0;
-}
 shok_modelinstance::TransformOperation l_logicModel_checkTO(lua_State* L, int idx) {
 	int i = luaL_optint(L, idx, static_cast<int>(shok_modelinstance::TransformOperation::Multiply));
 	luaext_assert(L, i >= 0 && i < 3, "invalid transform operation");
 	return static_cast<shok_modelinstance::TransformOperation>(i);
 }
-int l_logicModel_Translate(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	shok_position p;
-	luaext_checkPos(L, p, 2);
-	float h = luaL_optfloat(L, 3, 0);
-	if (luaext_optbool(L, 5, true)) {
-		float t = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
-		if (luaext_optbool(L, 6, false)) {
-			float w = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
-			h += max(t, w);
+struct l_logicModel {
+	shok_modelinstance* Model = nullptr;
+
+	static int Clear(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		if (m->Model) {
+			m->Model->Destroy();
+			m->Model = nullptr;
 		}
-		else {
-			h += t;
-		}
+		return 0;
 	}
-	m->Model->Translate(p, h, l_logicModel_checkTO(L, 4));
-	return 0;
-}
-int l_logicModel_Rotate(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	float r = luaL_checkfloat(L, 2);
-	m->Model->Rotate(r, l_logicModel_checkTO(L, 3));
-	return 0;
-}
-int l_logicModel_Scale(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	float s = luaL_checkfloat(L, 2);
-	m->Model->Scale(s, l_logicModel_checkTO(L, 3));
-	return 0;
-}
-int l_logicModel_ResetTransform(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	m->Model->Rotate(0, shok_modelinstance::TransformOperation::Set);
-	return 0;
-}
-int l_logicModel_SetColorByPlayer(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	int p = luaL_checkint(L, 2);
-	luaext_assert(L, p >= 0 && p <= 9, "invalid player");
-	m->Model->SetColorByPlayerID(p);
-	return 0;
-}
-int l_logicModel_DisableShadow(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	m->Model->DisableShadow();
-	return 0;
-}
-int l_logicModel_DisableParticleEffects(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	m->Model->DisableParticleEffects();
-	return 0;
-}
-int l_logicModel_DisableTerrainDecal(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	m->Model->DisableTerrainDecal();
-	return 0;
-}
-int l_logicModel_SetColorModulate(lua_State* L) {
-	l_logicModel* m = static_cast<l_logicModel*>(luaL_checkudata(L, 1, l_logicModel::MetaName));
-	luaext_assertPointer(L, m->Model, "set a model first");
-	int r = luaL_checkint(L, 2);
-	int g = luaL_checkint(L, 3);
-	int b = luaL_checkint(L, 4);
-	int a = luaL_optint(L, 5, 255);
-	m->Model->SetColorModulate(a, r, g, b);
-	return 0;
-}
-void l_logicModel_CreateModelUDType(lua_State* L) {
-	luaL_newmetatable(L, l_logicModel::MetaName);
-	lua_pushstring(L, "__index");
-	lua_newtable(L);
-	luaext_registerFunc(L, "Clear", l_logicModel_Clear);
-	luaext_registerFunc(L, "SetModel", l_logicModel_SetModel);
-	luaext_registerFunc(L, "Translate", l_logicModel_Translate);
-	luaext_registerFunc(L, "Rotate", l_logicModel_Rotate);
-	luaext_registerFunc(L, "Scale", l_logicModel_Scale);
-	luaext_registerFunc(L, "ResetTransform", l_logicModel_ResetTransform);
-	luaext_registerFunc(L, "SetColorByPlayer", l_logicModel_SetColorByPlayer);
-	luaext_registerFunc(L, "DisableShadow", l_logicModel_DisableShadow);
-	luaext_registerFunc(L, "DisableParticleEffects", l_logicModel_DisableParticleEffects);
-	luaext_registerFunc(L, "DisableTerrainDecal", l_logicModel_DisableTerrainDecal);
-	luaext_registerFunc(L, "SetColorModulate", l_logicModel_SetColorModulate);
+	static int SetModel(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		int mid = luaL_checkint(L, 2);
+		luaext_assert(L, (*shok_ED_CGlobalsBaseEx::GlobalObj)->ModelManager->GetNameByID(mid), "invalid model");
+		m->Model = (*shok_ED_CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
+		m->Model->Register();
+		return 0;
+	}
+	static int Translate(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		shok_position p;
+		luaext_checkPos(L, p, 2);
+		float h = luaL_optfloat(L, 3, 0);
+		if (luaext_optbool(L, 5, true)) {
+			float t = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
+			if (luaext_optbool(L, 6, false)) {
+				float w = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
+				h += max(t, w);
+			}
+			else {
+				h += t;
+			}
+		}
+		m->Model->Translate(p, h, l_logicModel_checkTO(L, 4));
+		return 0;
+	}
+	static int Rotate(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		float r = luaL_checkfloat(L, 2);
+		m->Model->Rotate(r, l_logicModel_checkTO(L, 3));
+		return 0;
+	}
+	static int Scale(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		float s = luaL_checkfloat(L, 2);
+		m->Model->Scale(s, l_logicModel_checkTO(L, 3));
+		return 0;
+	}
+	static int ResetTransform(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		m->Model->Rotate(0, shok_modelinstance::TransformOperation::Set);
+		return 0;
+	}
+	static int SetColorByPlayer(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		int p = luaL_checkint(L, 2);
+		luaext_assert(L, p >= 0 && p <= 9, "invalid player");
+		m->Model->SetColorByPlayerID(p);
+		return 0;
+	}
+	static int DisableShadow(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		m->Model->DisableShadow();
+		return 0;
+	}
+	static int DisableParticleEffects(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		m->Model->DisableParticleEffects();
+		return 0;
+	}
+	static int DisableTerrainDecal(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		m->Model->DisableTerrainDecal();
+		return 0;
+	}
+	static int SetColorModulate(lua_State* L) {
+		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
+		luaext_assertPointer(L, m->Model, "set a model first");
+		int r = luaL_checkint(L, 2);
+		int g = luaL_checkint(L, 3);
+		int b = luaL_checkint(L, 4);
+		int a = luaL_optint(L, 5, 255);
+		m->Model->SetColorModulate(a, r, g, b);
+		return 0;
+	}
 	
-	lua_rawset(L, -3);
-	luaext_registerFunc(L, "__gc", l_logicModel_Clear);
-	lua_pop(L, 1);
-}
+	static constexpr const luaL_reg LuaMethods[] = {
+		{"Clear", &Clear},
+		{"SetModel", &SetModel},
+		{"Translate", &Translate},
+		{"Rotate", &Rotate},
+		{"Scale", &Scale},
+		{"ResetTransform", &ResetTransform},
+		{"SetColorByPlayer", &SetColorByPlayer},
+		{"DisableShadow", &DisableShadow},
+		{"DisableParticleEffects", &DisableParticleEffects},
+		{"DisableTerrainDecal", &DisableTerrainDecal},
+		{"SetColorModulate", &SetColorModulate},
+		{nullptr, nullptr},
+	};
+
+	~l_logicModel() {
+		if (Model) {
+			Model->Destroy();
+			Model = nullptr;
+		}
+	};
+};
 int l_logicModel_create(lua_State* L) {
-	l_logicModel* m = new (lua_newuserdata(L, sizeof(l_logicModel))) l_logicModel();
-	luaL_getmetatable(L, l_logicModel::MetaName);
-	lua_setmetatable(L, -2);
+	luaext_newUserData<l_logicModel>(L);
 	return 1;
 }
 
@@ -1403,7 +1401,7 @@ void l_logic_init(lua_State* L)
 	lua_rawset(L, -3);
 
 	if (L != mainmenu_state) {
-		l_logicModel_CreateModelUDType(L);
+		luaext_prepareUserDataType<l_logicModel>(L);
 	}
 }
 

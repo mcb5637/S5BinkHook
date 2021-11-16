@@ -36,3 +36,42 @@ void luaext_assertEntityAlive(lua_State* L, int id, const char* msg);
 int str_ends_with(const char* str, const char* suffix);
 void luaext_tolower(lua_State* L);
 bool luaext_optbool(lua_State* L, int i, bool b);
+
+template<class T>
+T* luaext_GetUserData(lua_State* L, int i) {
+	T* t = static_cast<T*>(luaL_checkudata(L, i, typeid(T).name()));
+	if (t == nullptr)
+		luaL_error(L, "no %s at argument %d", typeid(T).name(), i);
+	return t;
+}
+template<class T>
+void luaext_getUserDataMetatable(lua_State* L) {
+	if (luaL_newmetatable(L, typeid(T).name())) {
+		lua_pushstring(L, "__index");
+		lua_newtable(L);
+
+		const luaL_reg* f = T::LuaMethods;
+		while (f->func && f->name) {
+			luaext_registerFunc(L, f->name, f->func);
+			f++;
+		}
+
+		lua_rawset(L, -3);
+		luaext_registerFunc(L, "__gc", [](lua_State* L) {
+			luaext_GetUserData<T>(L, 1)->~T();
+			return 0;
+			});
+	}
+}
+template<class T>
+void luaext_prepareUserDataType(lua_State* L) {
+	luaext_getUserDataMetatable<T>(L);
+	lua_pop(L, 1);
+}
+template<class T, class ... Args>
+T* luaext_newUserData(lua_State* L, Args&& ... args) {
+	T* t = new (lua_newuserdata(L, sizeof(T))) T(std::forward<Args>(args)...);
+	luaext_getUserDataMetatable<T>(L);
+	lua_setmetatable(L, -2);
+	return t;
+}

@@ -117,7 +117,7 @@ shok_GGlue_CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i) {
 	return t;
 }
 
-void luaext_pushPos(lua_State* L, shok_position& p) {
+void luaext_pushPos(lua_State* L, const shok_position& p) {
 	lua_newtable(L);
 	lua_pushstring(L, "X");
 	lua_pushnumber(L, p.X);
@@ -127,7 +127,7 @@ void luaext_pushPos(lua_State* L, shok_position& p) {
 	lua_rawset(L, -3);
 }
 
-void luaext_pushPosRot(lua_State* L, shok_positionRot& p, bool rad) {
+void luaext_pushPosRot(lua_State* L, const shok_positionRot& p, bool rad) {
 	luaext_pushPos(L, p);
 	lua_pushstring(L, "r");
 	if (rad)

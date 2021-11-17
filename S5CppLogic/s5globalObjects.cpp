@@ -551,7 +551,9 @@ void shok_EGL_CGLELandscape::UpdateBlocking(const shok_AARect& area)
 }
 void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot)
 {
-	EntityIteratorPredicateInRect rec{ p.X + area.low.X, p.Y + area.low.Y, p.X + area.high.X, p.Y + area.high.Y };
+	shok_position lo = area.low.Rotate(rot);
+	shok_position hi = area.high.Rotate(rot);
+	EntityIteratorPredicateInRect rec{ p.X + lo.X, p.Y + lo.Y, p.X + hi.X, p.Y + hi.Y };
 	EntityIterator it{ &rec };
 	for (auto* ent : it) {
 		if (shok_GGL_CSettler* s = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(ent)) {

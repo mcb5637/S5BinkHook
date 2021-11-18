@@ -307,10 +307,10 @@ struct shok_fontManager { // no vtable either
 	static inline shok_fontManager* (* const GlobalObj)() = reinterpret_cast<shok_fontManager * (*)()>(0x5593AD);
 };
 
-extern void (*UIInput_Char_Callback)(int c);
-extern void (*UIInput_Key_Callback)(int c, int ev);
-extern void (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l);
-extern void (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l);
+extern bool (*UIInput_Char_Callback)(int c);
+extern bool (*UIInput_Key_Callback)(int c, win_mouseEvents ev);
+extern bool (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l);
+extern bool (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l);
 void HookUIInput();
 
 struct shok_feedbackEventHandler { // another no vtable

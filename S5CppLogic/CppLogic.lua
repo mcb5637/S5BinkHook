@@ -1985,26 +1985,29 @@ function CppLogic.UI.ShowResourceFloatieOnEntity(entity, amount) end
 --- char entered callback. use string.char to get the character.
 -- does not work with SCELoader.
 -- gets called when a key (or key kombination) is pressed that can be converted to a char.
+-- you can return true to skip all additional message handling.
 -- set to nil to remove.
--- @param f func to be called (char)->nil
+-- @param f func to be called (char)->handeled
 function CppLogic.UI.SetCharTrigger(f) end
 --- key pressed callback.
 -- does not work with SCELoader.
 -- use global Keys to check what was pessed.
 -- gets called at least twice, when the key gets pressed down, then when the key gets released (only time up is true).
 -- if the key keepd pressed, after a short delay the trigger is called in fast succession.
+-- you can return true to skip all additional message handling.
 -- set to nil to remove.
--- @param f func to be called (key, up)->nil
+-- @param f func to be called (key, up)->handeled
 function CppLogic.UI.SetKeyTrigger(f) end
 --- mouse event callback.
 -- does not work with SCELoader.
 -- use global MouseEvents to check what was pessed (from CommunityLib).
 -- MouseMove does not get forwarded to lua (cause it is spammed),
 -- Double clicks are not generated, you get 2 normal klicks instead.
--- parameters for MouseWheel are (id, x, y, forward).
--- parameters for XButtons are (id, x, y, isxb2).
--- parameters for all others are (id, x, y).
+-- parameters for MouseWheel are (id, x, y, forward)->handeled.
+-- parameters for XButtons are (id, x, y, isxb2)->handeled.
+-- parameters for all others are (id, x, y)->handeled.
 -- x and y cooridates are screen coordinates not processed by SHoK and are equals to what GUI.GetMousePosition returns you (not scaled to widget coordinates).
+-- you can return true to skip all additional message handling.
 -- set to nil to remove.
 -- @param f func to be called
 function CppLogic.UI.SetMouseTrigger(f) end

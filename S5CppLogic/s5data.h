@@ -84,9 +84,7 @@ typedef uint8_t byte;
 // place building set model 0x538B01 jmp
 // place building calc preview pos 0x538BDB jmp
 // place building update model 0x538C8D call redirct
-// win main char event 0x40754C call redirect
-// win main key event 0x40757D call redirect
-// win main mouse event check 0x40747E call redirect
+// window message handler 0x40744B jmp
 // activate ranged effect ability heal 0x4E3C78 call redirect
 // ED_CLandscape vtable 0x76A410 get water height func override (hires bridge area)
 // waterregion unknown func 0x47D301 jmp (hires bridge area)
@@ -355,6 +353,11 @@ const char* (__cdecl* const shok_GetStringTableText)(const char* key) = reinterp
 
 
 enum class win_mouseEvents : int {
+	KeyDown = 0x100,
+	KeyUp = 0x101,
+	Char = 0x102,
+	SysKeyDown = 0x104,
+	SysKeyUp = 0x105,
 	MouseMove = 0x200,
 	LButtonDown = 0x201,
 	LButtonUp = 0x202,

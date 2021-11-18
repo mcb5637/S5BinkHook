@@ -577,13 +577,18 @@ int l_ui_SetCharTrigger(lua_State* L) {
 		UIInput_Char_Callback = [](int c) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
+			bool r = false;
 
 			lua_pushlightuserdata(L, &l_ui_SetCharTrigger);
 			lua_rawget(L, LUA_REGISTRYINDEX);
 			lua_pushnumber(L, c);
-			lua_pcall(L, 1, 0, 0);
+			if (!lua_pcall(L, 1, 1, 0)) {
+				r = luaext_optbool(L, -1, false);
+			}
+
 
 			lua_settop(L, t);
+			return r;
 		};
 	}
 	return 0;
@@ -606,17 +611,21 @@ int l_ui_SetKeyTrigger(lua_State* L) {
 
 	if (!UIInput_Key_Callback) {
 		HookUIInput();
-		UIInput_Key_Callback = [](int c, int id) {
+		UIInput_Key_Callback = [](int c, win_mouseEvents id) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
+			bool r = false;
 
 			lua_pushlightuserdata(L, &l_ui_SetKeyTrigger);
 			lua_rawget(L, LUA_REGISTRYINDEX);
 			lua_pushnumber(L, c);
-			lua_pushboolean(L, id == 0x101 || id == 0x105); // is up (100,104 down)
-			lua_pcall(L, 2, 0, 0);
+			lua_pushboolean(L, id == win_mouseEvents::KeyUp || id == win_mouseEvents::SysKeyUp);
+			if (!lua_pcall(L, 2, 1, 0)) {
+				r = luaext_optbool(L, -1, false);
+			}
 
 			lua_settop(L, t);
+			return r;
 		};
 	}
 	return 0;
@@ -641,30 +650,36 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 		HookUIInput();
 		UIInput_Mouse_Callback = [](win_mouseEvents id, int w, int l) {
 			if (id == win_mouseEvents::MouseMove)
-				return;
+				return false;
 
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
+			bool r = false;
 
 			lua_pushlightuserdata(L, &l_ui_SetMouseTrigger);
 			lua_rawget(L, LUA_REGISTRYINDEX);
 			lua_pushnumber(L, static_cast<int>(id));
 			lua_pushnumber(L, l & 0xFFFF);
 			lua_pushnumber(L, (l >> 16) & 0xFFFF);
+			int res = 1;
 
 			if (id >= win_mouseEvents::LButtonDown && id <= win_mouseEvents::MButtonDBl) {
-				lua_pcall(L, 3, 0, 0);
+				res = lua_pcall(L, 3, 1, 0);
 			}
 			else if (id == win_mouseEvents::MouseWheel) {
 				lua_pushboolean(L, w > 0);
-				lua_pcall(L, 4, 0, 0);
+				res = lua_pcall(L, 4, 1, 0);
 			}
 			else if (id >= win_mouseEvents::XButtonDown && id <= win_mouseEvents::XButtonDBl) {
 				lua_pushboolean(L, ((w >> 16) & 0xFFFF) - 1);
-				lua_pcall(L, 4, 0, 0);
+				res = lua_pcall(L, 4, 1, 0);
+			}
+			if (!res) {
+				r = luaext_optbool(L, -1, false);
 			}
 
 			lua_settop(L, t);
+			return r;
 		};
 	}
 	return 0;
@@ -689,33 +704,39 @@ int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
 		HookUIInput();
 		UIInput_Mouse_CallbackMainMenu = [](win_mouseEvents id, int w, int l) {
 			if (id == win_mouseEvents::MouseMove)
-				return;
+				return false;
 
 			if ((*shok_Framework_CMain::GlobalObj)->CurrentMode != 1)
-				return;
+				return false;
 
 			lua_State* L = mainmenu_state;
 			int t = lua_gettop(L);
+			bool r = false;
 
 			lua_pushlightuserdata(L, &l_ui_SetMouseTriggerMainMenu);
 			lua_rawget(L, LUA_REGISTRYINDEX);
 			lua_pushnumber(L, static_cast<int>(id));
 			lua_pushnumber(L, l & 0xFFFF);
 			lua_pushnumber(L, (l >> 16) & 0xFFFF);
+			int res = 1;
 
 			if (id >= win_mouseEvents::LButtonDown && id <= win_mouseEvents::MButtonDBl) {
-				lua_pcall(L, 3, 0, 0);
+				res = lua_pcall(L, 3, 1, 0);
 			}
 			else if (id == win_mouseEvents::MouseWheel) {
 				lua_pushboolean(L, w > 0);
-				lua_pcall(L, 4, 0, 0);
+				res = lua_pcall(L, 4, 1, 0);
 			}
 			else if (id >= win_mouseEvents::XButtonDown && id <= win_mouseEvents::XButtonDBl) {
 				lua_pushboolean(L, ((w >> 16) & 0xFFFF) - 1);
-				lua_pcall(L, 4, 0, 0);
+				res = lua_pcall(L, 4, 1, 0);
+			}
+			if (!res) {
+				r = luaext_optbool(L, -1, false);
 			}
 
 			lua_settop(L, t);
+			return r;
 		};
 	}
 	return 0;

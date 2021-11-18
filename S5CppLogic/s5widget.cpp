@@ -239,31 +239,56 @@ shok_font* shok_fontManager::GetFontObj(int id)
     return fontmng_getfont(this, id);
 }
 
-void (*UIInput_Char_Callback)(int c) = nullptr;
-int(__stdcall* const uiinput_char_orig)(void* ev, int id, int w, int h) = reinterpret_cast<int(__stdcall* const)(void*, int, int, int)>(0x54E649);
-int __stdcall uiinput_char(void* ev, int id, int w, int l) {
-    if (UIInput_Char_Callback)
-        UIInput_Char_Callback(w);
-    return uiinput_char_orig(ev, id, w, l);
-}
-void (*UIInput_Key_Callback)(int c, int ev) = nullptr;
-int(__stdcall* const uiinput_key_orig)(void* ev, int id, int w, int h) = reinterpret_cast<int(__stdcall* const)(void*, int, int, int)>(0x54E82F);
-int __stdcall uiinput_key(void* ev, int id, int w, int l) {
-    if (UIInput_Key_Callback)
-        UIInput_Key_Callback(w, id);
-    return uiinput_key_orig(ev, id, w, l);
-}
-void (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l) = nullptr;
-void (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l) = nullptr;
-int(__stdcall* const uiinput_mouse_orig)(void* ev, int hwind, win_mouseEvents id, int w, int h) = reinterpret_cast<int(__stdcall* const)(void*, int, win_mouseEvents, int, int)>(0x54E6BD);
-int __stdcall uiinput_mouse(void* ev, int hwind, win_mouseEvents id, int w, int l) {
-    if (id >= win_mouseEvents::MouseMove && id <= win_mouseEvents::XButtonDBl) {
-        if (UIInput_Mouse_Callback)
-            UIInput_Mouse_Callback(id, w, l);
-        if (UIInput_Mouse_CallbackMainMenu)
-            UIInput_Mouse_CallbackMainMenu(id, w, l);
+bool (*UIInput_Char_Callback)(int c) = nullptr;
+bool (*UIInput_Key_Callback)(int c, win_mouseEvents ev) = nullptr;
+bool (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l) = nullptr;
+bool (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l) = nullptr;
+int __stdcall uiinput_firecbs(win_mouseEvents ev, int w, int l) {
+    int r = 0;
+    if (ev == win_mouseEvents::Char) {
+        if (UIInput_Char_Callback)
+            if (UIInput_Char_Callback(w))
+                r = 1;
     }
-    return uiinput_mouse_orig(ev, hwind, id, w, l);
+    else if (ev == win_mouseEvents::KeyDown || ev == win_mouseEvents::KeyUp || ev == win_mouseEvents::SysKeyDown || ev == win_mouseEvents::SysKeyUp) {
+        if (UIInput_Key_Callback)
+            if (UIInput_Key_Callback(w, ev))
+                r = 1;
+    }
+    else if (ev > win_mouseEvents::MouseMove && ev <= win_mouseEvents::XButtonDBl) {
+        if (UIInput_Mouse_Callback)
+            if (UIInput_Mouse_Callback(ev, w, l))
+                r = 1;
+        if (UIInput_Mouse_CallbackMainMenu)
+            if (UIInput_Mouse_CallbackMainMenu(ev, w, l))
+                r = 1;
+    }
+    return r;
+}
+void __declspec(naked) uiinput_asm() {
+    __asm {
+        sub esp, 0x24;
+        push ebx;
+        push esi;
+        push edi;
+
+        push[ebp + 0x14];
+        push[ebp + 0x10];
+        push[ebp + 0xC];
+        call uiinput_firecbs;
+        cmp eax, 0;
+        je cont;
+
+        push 0x40751B;
+        ret;
+
+    cont:
+        push - 21;
+        push[ebp + 8];
+
+        push 0x407456;
+        ret;
+    };
 }
 bool HookUIInput_Hooked = false;
 void HookUIInput()
@@ -271,10 +296,8 @@ void HookUIInput()
     if (HookUIInput_Hooked)
         return;
     HookUIInput_Hooked = true;
-    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x40747E), 0x40754C - 0x40747E + 10 };
-    RedirectCall(reinterpret_cast<void*>(0x40754C), &uiinput_char);
-    RedirectCall(reinterpret_cast<void*>(0x40757D), &uiinput_key);
-    RedirectCall(reinterpret_cast<void*>(0x40747E), &uiinput_mouse);
+    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 0x40744B + 10 };
+    WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
 }
 
 void(__thiscall* const shok_feedbackEventHandler_fireevent)(shok_feedbackEventHandler* th, shok_BB_CEvent* e) = reinterpret_cast<void(__thiscall*)(shok_feedbackEventHandler*, shok_BB_CEvent*)>(0x582EB2);

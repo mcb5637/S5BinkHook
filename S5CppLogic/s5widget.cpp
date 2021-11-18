@@ -296,7 +296,7 @@ void HookUIInput()
     if (HookUIInput_Hooked)
         return;
     HookUIInput_Hooked = true;
-    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 0x40744B + 10 };
+    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
     WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
 }
 

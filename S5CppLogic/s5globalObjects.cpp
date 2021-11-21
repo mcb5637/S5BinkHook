@@ -521,19 +521,6 @@ void shok_EGL_CGLELandscape::RemoveBlocking(const shok_position& p, const shok_A
 {
 	shok_EGL_CGLELandscape_remblocking(this, &p, &area.low, &area.high, rot, &blockingmode);
 }
-void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height)
-{
-	AdvancedAARectIterator it{ p, area, rot, !shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled, false };
-	for (auto& c : it) {
-		if (!LowRes->IsBridgeHeightCoordValid(c.x, c.y))
-			continue;
-		int* h = LowRes->GetBridgeHeightP(c.x, c.y);
-		*h = height;
-	}
-
-	AdvancedApplyBlocking(p, area, rot, BlockingMode::BridgeArea);
-	AdvancedRemoveBlocking(p, area, rot, BlockingMode::Blocked);
-}
 static inline void(__thiscall* const landscape_updateblocking)(shok_EGL_CGLELandscape* th, int* low, int* high) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, int*, int*)>(0x5796A2);
 void shok_EGL_CGLELandscape::UpdateBlocking(const shok_AARect& area)
 {
@@ -595,6 +582,32 @@ void shok_EGL_CGLELandscape::RemoveSingleBlockingPoint(int x, int y, BlockingMod
 	lsblocking_remvoveblockingpoint(BlockingData, x, y, &mode);
 	if (static_cast<int>(mode) & static_cast<int>(BlockingMode::BridgeArea) && vt->GetSomeGlobal(Tiling))
 		vt->OnPostBlockingMode2Removed(Tiling, x, y);
+}
+void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height)
+{
+	AdvancedAARectIterator it{ p, area, rot, !shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled, false };
+	for (auto& c : it) {
+		if (!LowRes->IsBridgeHeightCoordValid(c.x, c.y))
+			continue;
+		int* h = LowRes->GetBridgeHeightP(c.x, c.y);
+		*h = height;
+	}
+
+	AdvancedAARectIterator iter{ p, area, rot, false };
+	BlockingMode m = BlockingMode::BridgeArea;
+	BlockingMode m2 = BlockingMode::Blocked;
+	for (auto& curr : iter) {
+		if (!HiRes->IsCoordValid(curr.x, curr.y))
+			continue;
+		if (HiRes->GetTerrainHeight(curr.x, curr.y) < height) {
+			landscape_setsingleblockingpoint(this, curr.x, curr.y, &m);
+			RemoveSingleBlockingPoint(curr.x, curr.y, BlockingMode::Blocked);
+		}
+		else {
+			landscape_setsingleblockingpoint(this, curr.x, curr.y, &m2);
+			RemoveSingleBlockingPoint(curr.x, curr.y, BlockingMode::BridgeArea);
+		}
+	}
 }
 bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode, bool AddOne)
 {

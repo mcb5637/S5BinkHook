@@ -605,6 +605,31 @@ struct shok_BB_CMouseEvent : shok_BB_CInputEvent {
 	static inline constexpr int TypeDesc = 0x7FFE98;
 	static inline constexpr int vtp = 0x762154;
 };
+struct shok_BB_CKeyEvent : shok_BB_CInputEvent {
+	shok_Keys KeyData;
+
+	shok_BB_CKeyEvent(shok_InputEventIds id, shok_Keys keydata);
+	shok_BB_CKeyEvent(shok_BB_CKeyEvent&&) = default;
+	shok_BB_CKeyEvent(const shok_BB_CKeyEvent&) = default;
+	shok_BB_CKeyEvent& operator=(shok_BB_CKeyEvent&&) = default;
+	shok_BB_CKeyEvent& operator=(const shok_BB_CKeyEvent&) = default;
+
+	static inline constexpr int TypeDesc = 0x7FFE5C;
+	static inline constexpr int vtp = 0x762134;
+};
+struct shok_BB_CKeyPressEvent : shok_BB_CInputEvent {
+	int KeyChar; // as char
+	shok_Keys KeyModifier;
+
+	shok_BB_CKeyPressEvent(shok_InputEventIds id, int keychar, shok_Keys keymodif);
+	shok_BB_CKeyPressEvent(shok_BB_CKeyPressEvent&&) = default;
+	shok_BB_CKeyPressEvent(const shok_BB_CKeyPressEvent&) = default;
+	shok_BB_CKeyPressEvent& operator=(shok_BB_CKeyPressEvent&&) = default;
+	shok_BB_CKeyPressEvent& operator=(const shok_BB_CKeyPressEvent&) = default;
+
+	static inline constexpr int TypeDesc = 0x7FFE78;
+	static inline constexpr int vtp = 0x762144;
+};
 //constexpr int i = offsetof(shok_BB_CMouseEvent, KeyData) / 4;
 
 struct shok_EGL_IGLEHandler_BB_CEvent_void : shok_object {
@@ -1047,8 +1072,16 @@ enum class shok_FeedbackEventIds : int {
 };
 
 enum class shok_InputEventIds : int {
+	KeyDown = 0x1001,
+	KeyUp = 0x1002,
+	KeyPressed = 0x1003,
 	MouseMove = 0x1004,
 	MouseButtonDown = 0x1005,
 	MouseButtonUp = 0x1006,
 	MouseWheel = 0x1007,
+
+	MouseEnter = 0x50001,
+	MouseLeave = 0x50002,
+	AutoUpdate = 0x50003,
+	ManualUpdate = 0x50004,
 };

@@ -73,7 +73,7 @@ struct shok_EGUIX_CLuaFunctionHelper : shok_BB_IObject { // size 20
 static_assert(sizeof(shok_EGUIX_CLuaFunctionHelper) == 20 * 4);
 
 struct shok_EGUIX_CButtonHelper : shok_BB_IObject { // size 38
-	PADDINGI(1); // probably current model
+	PADDINGI(1); // probably current model disabled 3, highlighted 4, klicked 2, mouseover 1, normal 0
 	byte DisabledFlag, HighLightedFlag;
 	PADDING(2);
 	shok_EGUIX_CLuaFunctionHelper ActionFunction;
@@ -127,6 +127,7 @@ struct shok_EGUIX_CBaseWidget : shok_BB_IObject { // size 14
 	shok_EGUIX_CToolTipHelper* GetTooltipHelper();
 	shok_EGUIX_CWidgetStringHelper* GetStringHelper();
 };
+//constexpr int i = offsetof(shok_EGUIX_CBaseWidget, WidgetID) / 4;
 
 struct shok_EGUIX_CWidgetListHandler : shok_object {
 	vector_padding;
@@ -191,6 +192,7 @@ struct shok_EGUIX_CGfxButtonWidget : shok_EGUIX_CButtonWidget {
 
 	static shok_EGUIX_CGfxButtonWidget* Create();
 };
+//constexpr int i = offsetof(shok_EGUIX_CGfxButtonWidget, ToolTipHelper)/4;
 
 struct shok_EGUIX_CTextButtonWidget : shok_EGUIX_CButtonWidget {
 	int vtable_EGUIX_ITextAccess; // 147

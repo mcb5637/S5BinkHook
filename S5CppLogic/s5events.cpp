@@ -310,3 +310,16 @@ bool shok_BB_CMouseEvent::IsModifier(shok_Keys mod)
 {
 	return (KeyData & shok_Keys::MaskModifiers) == mod;
 }
+
+shok_BB_CKeyEvent::shok_BB_CKeyEvent(shok_InputEventIds id, shok_Keys keydata) : shok_BB_CInputEvent(id)
+{
+	vtable = shok_BB_CKeyEvent::vtp;
+	KeyData = keydata;
+}
+
+shok_BB_CKeyPressEvent::shok_BB_CKeyPressEvent(shok_InputEventIds id, int keychar, shok_Keys keymodif) : shok_BB_CInputEvent(id)
+{
+	vtable = shok_BB_CKeyPressEvent::vtp;
+	KeyChar = keychar;
+	KeyModifier = keymodif;
+}

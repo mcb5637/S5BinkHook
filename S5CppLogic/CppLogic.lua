@@ -1864,11 +1864,15 @@ function CppLogic.UI.WidgetMaterialGetTextureCoordinates(wid, mat) end
 function CppLogic.UI.WidgetMaterialSetTextureCoordinates(wid, mat, x, y, w, h) end
 
 --- a buttons shortcut string.
+-- this is not directly a string, its the key code encoded in one char.
+-- you may use KeyOf(string.byte(txt, 1), Keys) to decode the return values.
 -- @param wid widget
 -- @return raw string
 -- @return string table text key
 function CppLogic.UI.ButtonGetShortcutString(wid) end
 --- a buttons shortcut string.
+-- this is not directly a string, its the key code encoded in one char.
+-- you may use string.char(Keys[c.Key]) to get the correct code.
 -- @param wid widget
 -- @param string
 -- @param isSTTKey (optional, default false) if true, sets this as string table text key

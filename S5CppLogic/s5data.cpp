@@ -167,6 +167,19 @@ shok_AARect& shok_AARect::operator-=(const shok_AARect& other)
 	this->high -= other.high;
 	return *this;
 }
+shok_AARect shok_AARect::Rotate(float r) const
+{
+	return { low.Rotate(r), high.Rotate(r) };
+}
+shok_AARect shok_AARect::Sort() const
+{
+	shok_AARect r = *this;
+	if (r.high.X < r.low.X)
+		std::swap(r.high.X, r.low.X);
+	if (r.high.Y < r.low.Y)
+		std::swap(r.high.Y, r.low.Y);
+	return r;
+}
 shok_BB_CClassFactory_serializationData* shok_AARect::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85DA90);
 
 void RedirectCall(void* call, void* redirect) {

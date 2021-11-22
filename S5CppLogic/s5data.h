@@ -278,6 +278,10 @@ struct shok_AARect {
 	shok_AARect operator-(const shok_AARect& other) const;
 	shok_AARect& operator-=(const shok_AARect& other);
 
+	// requires rad
+	shok_AARect Rotate(float r) const;
+	shok_AARect Sort() const;
+
 	// uses Blocked1 and Blocked2 for the 2 members
 	static shok_BB_CClassFactory_serializationData* SerializationData;
 };

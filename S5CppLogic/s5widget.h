@@ -79,6 +79,8 @@ struct shok_EGUIX_CButtonHelper : shok_BB_IObject { // size 38
 	shok_EGUIX_CLuaFunctionHelper ActionFunction;
 	shok_EGUIX_CSingleStringHandler ShortCutString;
 
+	static void HookShortcutSignExtend();
+
 	static inline constexpr int vtp = 0x780818;
 	static inline constexpr int TypeDesc = 0x832918;
 };

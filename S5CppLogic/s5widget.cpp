@@ -56,6 +56,15 @@ void shok_EGUIX_CLuaFunctionHelper::Call(int widgetID)
     funchelper_call(this, widgetID);
 }
 
+bool shortcutsignextend_hooked = false;
+void shok_EGUIX_CButtonHelper::HookShortcutSignExtend()
+{
+    if (shortcutsignextend_hooked)
+        return;
+    shortcutsignextend_hooked = true;
+    shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x55A62B), 10 };
+    *reinterpret_cast<byte*>(0x55A62B) = 0xB6; // movsx to movzx (sign-extend to zero-extend) (middle part of 3 byte opcode)
+}
 
 byte* shok_EGUIX_CBaseWidget::GetUpdateManualFlag()
 {

@@ -10,11 +10,33 @@ struct shok_vtable_ED_CBehaviorProps : shok_vtable_BB_IObject {
     PADDINGI(1); // 1 param, ret 100
 };
 
+struct shok_vtable_ED_CEntity : shok_vtable_BB_IObject {
+    void(__thiscall* Initialize)(shok_ED_CEntity* th, int* m); // m might be p to model id?
+    void(__stdcall* OnRenderUpdate)(shok_ED_CEntity* th, int tick, float seconds); // tick seems to be logic ticks, seconds in gametime (ticks/10)
+    PADDINGI(1); // maybe update something
+    PADDINGI(1); // get some data to pointer, return bool?
+    PADDINGI(2); // empty funcs
+    PADDINGI(1); // stdcall? set some float?
+    PADDINGI(1); // empty func, ret 0
+    void(__stdcall* SetPositionData)(shok_ED_CEntity* th, shok_EGL_IEntityDisplay::posdata* data);
+    PADDINGI(1); // return some float
+};
 
 shok_BB_CClassFactory_serializationData* shok_ED_CBehaviorProps::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x8586E8);
 
-static inline shok_ED_CEntity* (__thiscall* const shok_ED_CVisibleEntityManager_create)(shok_ED_CVisibleEntityManager* th, shok_IEntityDisplay* e) = reinterpret_cast<shok_ED_CEntity * (__thiscall*)(shok_ED_CVisibleEntityManager*, shok_IEntityDisplay*)>(0x4762EA);
-shok_ED_CEntity* shok_ED_CVisibleEntityManager::CreateDisplayForEntity(shok_IEntityDisplay* e)
+
+void shok_ED_CEntity::SetPositionData(shok_EGL_IEntityDisplay::posdata* d)
+{
+    reinterpret_cast<shok_vtable_ED_CEntity*>(vtable)->SetPositionData(this, d);
+}
+void shok_ED_CEntity::ResetPositionData()
+{
+    shok_EGL_IEntityDisplay::posdata d = Entity->GetPosData();
+    SetPositionData(&d);
+}
+
+static inline shok_ED_CEntity* (__thiscall* const shok_ED_CVisibleEntityManager_create)(shok_ED_CVisibleEntityManager* th, shok_EGL_IEntityDisplay* e) = reinterpret_cast<shok_ED_CEntity * (__thiscall*)(shok_ED_CVisibleEntityManager*, shok_EGL_IEntityDisplay*)>(0x4762EA);
+shok_ED_CEntity* shok_ED_CVisibleEntityManager::CreateDisplayForEntity(shok_EGL_IEntityDisplay* e)
 {
     return shok_ED_CVisibleEntityManager_create(this, e);
 }

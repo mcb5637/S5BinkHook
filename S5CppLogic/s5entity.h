@@ -45,11 +45,33 @@ enum class AdvancedDealDamageSource : int {
 	Script = 25,
 };
 
-struct shok_IEntityDisplay { // warning: you have to dymamic cast this! , entity offsets dont match
+struct shok_EGL_IEntityDisplay { // warning: you have to dymamic cast this! , entity offsets dont match
 	static inline constexpr int TypeDesc = 0x810C10;
+
+	struct modeldata {
+		int EntityID;
+		int EntityType;
+		int ModelOverride;
+		shok_position Pos;
+	};
+	struct playermodeldata {
+		int EntityType;
+		int EntityID;
+		int Player;
+		int ModelOverride;
+	};
+	struct posdata {
+		shok_positionRot Pos;
+		float Scale;
+		int NumAuras;
+	};
+
+	modeldata GetModelData() const;
+	playermodeldata GetPlayerModelData() const;
+	posdata GetPosData() const;
 };
 
-struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_IEntityDisplay {
+struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	PADDINGI(1);
 	int EntityId;
 	PADDINGI(1); // some type of flags

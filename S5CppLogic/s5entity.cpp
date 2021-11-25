@@ -34,6 +34,35 @@ struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
 };
 //constexpr int i = offsetof(shok_vtable_EGL_CGLEEntity, CanCancelCurrentState) / 4;
 
+
+struct shok_vtable_EGL_IEntityDisplay {
+	void(__thiscall* dtor)(shok_EGL_IEntityDisplay* th);
+	void* (__thiscall* GetSlotByIndex)(shok_EGL_IEntityDisplay* th, int i);
+	void(__thiscall* GetModelData)(const shok_EGL_IEntityDisplay* th, shok_EGL_IEntityDisplay::modeldata* d);
+	void(__thiscall* GetPlayerModelData)(const shok_EGL_IEntityDisplay* th, shok_EGL_IEntityDisplay::playermodeldata* d);
+	void(__thiscall* GetPosData)(const shok_EGL_IEntityDisplay* th, shok_EGL_IEntityDisplay::posdata* d);
+	PADDINGI(1); // ret zero, 1 arg
+};
+
+shok_EGL_IEntityDisplay::modeldata shok_EGL_IEntityDisplay::GetModelData() const
+{
+	modeldata r;
+	(*reinterpret_cast<shok_vtable_EGL_IEntityDisplay* const*>(this))->GetModelData(this, &r);
+	return r;
+}
+shok_EGL_IEntityDisplay::playermodeldata shok_EGL_IEntityDisplay::GetPlayerModelData() const
+{
+	playermodeldata r;
+	(*reinterpret_cast<shok_vtable_EGL_IEntityDisplay* const*>(this))->GetPlayerModelData(this, &r);
+	return r;
+}
+shok_EGL_IEntityDisplay::posdata shok_EGL_IEntityDisplay::GetPosData() const
+{
+	posdata r;
+	(*reinterpret_cast<shok_vtable_EGL_IEntityDisplay* const*>(this))->GetPosData(this, &r);
+	return r;
+}
+
 static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLEEntityCreator*)>(0x4493A4);
 shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator()
 {

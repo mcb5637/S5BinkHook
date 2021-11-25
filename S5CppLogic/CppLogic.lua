@@ -1422,6 +1422,15 @@ function CppLogic.EntityType.GetBlocking(ty) end
 -- @return array of techs
 function CppLogic.EntityType.GetExplorationModifierTechs(ty) end
 
+--- DeleteWhenBuiltOn flag of an entitytype.
+-- @param ty entitytype
+-- @return flag
+function CppLogic.EntityType.GetDeleteWhenBuildOn(ty) end
+--- DeleteWhenBuiltOn flag of an entitytype.
+-- @param ty entitytype
+-- @param del flag
+function CppLogic.EntityType.SetDeleteWhenBuildOn(ty, del) end
+
 --- the soldier type of a leader type
 -- @param ty leader type
 -- @return soldier type

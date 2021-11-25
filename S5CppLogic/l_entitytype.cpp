@@ -560,7 +560,7 @@ int l_entityTypeGetBlocking(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
 	lua_newtable(L);
 	int i = 1;
-	for (shok_AARect r : t->LogicProps->BlockingArea) {
+	for (const shok_AARect& r : t->LogicProps->BlockingArea) {
 		lua_newtable(L);
 		luaext_pushPos(L, r.low);
 		lua_rawseti(L, -2, 1);
@@ -722,6 +722,18 @@ int l_settlerTy_GetUpgradeCategory(lua_State* L) {
 	return 1;
 }
 
+int l_entityTy_GetDeleteWhenBuildOn(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	lua_pushboolean(L, t->LogicProps->DeleteWhenBuiltOn);
+	return 1;
+}
+int l_entityTy_SetDeleteWhenBuildOn(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	luaL_checktype(L, 2, LUA_TBOOLEAN);
+	t->LogicProps->DeleteWhenBuiltOn = lua_toboolean(L, 2);
+	return 0;
+}
+
 void l_entitytype_init(lua_State* L)
 {
 	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
@@ -750,6 +762,8 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "GetBlocking", &l_entityTypeGetBlocking);
 	luaext_registerFunc(L, "GetArmorModifierTechs", &l_entityTyGetArmorModifierTechs);
 	luaext_registerFunc(L, "GetExplorationModifierTechs", &l_entityTyGetExploModifierTechs);
+	luaext_registerFunc(L, "GetDeleteWhenBuildOn", &l_entityTy_GetDeleteWhenBuildOn);
+	luaext_registerFunc(L, "SetDeleteWhenBuildOn", &l_entityTy_SetDeleteWhenBuildOn);
 
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);

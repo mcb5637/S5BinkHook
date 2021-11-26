@@ -231,6 +231,35 @@ int l_entityTySetRange(lua_State* L) {
 	return luaL_error(L, "no battle or autocannon entity type at 1");
 }
 
+int l_entityTyGetBattleWaitUntil(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	shok_GGL_CBattleBehaviorProps* b = t->GetBehaviorProps<shok_GGL_CBattleBehaviorProps>();
+	if (b != nullptr) {
+		lua_pushnumber(L, b->BattleWaitUntil);
+		return 1;
+	}
+	shok_GGL_CAutoCannonBehaviorProps* a = t->GetBehaviorProps<shok_GGL_CAutoCannonBehaviorProps>();
+	if (a != nullptr) {
+		lua_pushnumber(L, a->ReloadTime);
+		return 1;
+	}
+	return luaL_error(L, "no battle or autocannon entity type at 1");
+}
+int l_entityTySetBattleWaitUntil(lua_State* L) {
+	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
+	shok_GGL_CBattleBehaviorProps* b = t->GetBehaviorProps<shok_GGL_CBattleBehaviorProps>();
+	if (b != nullptr) {
+		b->BattleWaitUntil = luaL_checkint(L, 2);
+		return 0;
+	}
+	shok_GGL_CAutoCannonBehaviorProps* a = t->GetBehaviorProps<shok_GGL_CAutoCannonBehaviorProps>();
+	if (a != nullptr) {
+		a->ReloadTime = luaL_checkint(L, 2);
+		return 0;
+	}
+	return luaL_error(L, "no battle or autocannon entity type at 1");
+}
+
 int l_leaderTyGetAutoAggressiveRange(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
 	shok_GGL_CLeaderBehaviorProps* b = t->GetBehaviorProps<shok_GGL_CLeaderBehaviorProps>();
@@ -764,6 +793,8 @@ void l_entitytype_init(lua_State* L)
 	luaext_registerFunc(L, "GetExplorationModifierTechs", &l_entityTyGetExploModifierTechs);
 	luaext_registerFunc(L, "GetDeleteWhenBuildOn", &l_entityTy_GetDeleteWhenBuildOn);
 	luaext_registerFunc(L, "SetDeleteWhenBuildOn", &l_entityTy_SetDeleteWhenBuildOn);
+	luaext_registerFunc(L, "GetBattleWaitUntil", &l_entityTyGetBattleWaitUntil);
+	luaext_registerFunc(L, "SetBattleWaitUntil", &l_entityTySetBattleWaitUntil);
 
 	lua_pushstring(L, "Settler");
 	lua_newtable(L);

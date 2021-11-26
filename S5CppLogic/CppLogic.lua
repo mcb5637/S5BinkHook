@@ -1431,6 +1431,15 @@ function CppLogic.EntityType.GetDeleteWhenBuildOn(ty) end
 -- @param del flag
 function CppLogic.EntityType.SetDeleteWhenBuildOn(ty, del) end
 
+--- battlewaituntil (battle behavior) or reloadtime (autocannon behavior) of an entitytype.
+-- @param ty entitytype
+-- @return bwu
+function CppLogic.EntityType.GetBattleWaitUntil(ty) end
+--- battlewaituntil (battle behavior) or reloadtime (autocannon behavior) of an entitytype.
+-- @param ty entitytype
+-- @param bwu battlewaituntil
+function CppLogic.EntityType.SetBattleWaitUntil(ty, bwu) end
+
 --- the soldier type of a leader type
 -- @param ty leader type
 -- @return soldier type

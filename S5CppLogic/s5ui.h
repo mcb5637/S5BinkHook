@@ -302,6 +302,9 @@ public:
 
 	static inline shok_GGUI_CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<shok_GGUI_CManager * (__cdecl*)()>(0x525622);
 	static bool(*PostEventCallback)(shok_BB_CEvent* ev);
+
+
+	static bool IsModifierPressed(shok_Keys modif);
 };
 //constexpr int i = offsetof(shok_GGUI_CManager, GameState) / 4;
 //constexpr int i = sizeof(shok_GGUI_CManager) / 4;

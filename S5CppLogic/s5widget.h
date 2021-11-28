@@ -24,6 +24,8 @@ struct shok_EGUIX_CSingleStringHandler : shok_BB_IObject { // size 15
 	shok_string StringTableKey;
 	shok_string RawString;
 
+	const char* GetString();
+
 	static inline constexpr int vtp = 0x7809A4;
 	static inline constexpr int TypeDesc = 0x833530;
 };
@@ -73,13 +75,16 @@ struct shok_EGUIX_CLuaFunctionHelper : shok_BB_IObject { // size 20
 static_assert(sizeof(shok_EGUIX_CLuaFunctionHelper) == 20 * 4);
 
 struct shok_EGUIX_CButtonHelper : shok_BB_IObject { // size 38
-	PADDINGI(1); // probably current model disabled 3, highlighted 4, klicked 2, mouseover 1, normal 0
+	int CurrentState; // probably current model disabled 3, highlighted 4, klicked 2, mouseover 1, normal 0
 	byte DisabledFlag, HighLightedFlag;
 	PADDING(2);
 	shok_EGUIX_CLuaFunctionHelper ActionFunction;
 	shok_EGUIX_CSingleStringHandler ShortCutString;
 
+	void PressButton(int widgetID);
+
 	static void HookShortcutSignExtend();
+	static void HookShortcutComparison();
 
 	static inline constexpr int vtp = 0x780818;
 	static inline constexpr int TypeDesc = 0x832918;

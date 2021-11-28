@@ -215,3 +215,9 @@ void shok_GGUI_CManager::HackPostEvent()
 	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent * ev)>(&PostEventHook);
 }
 
+static inline int* (* const modifpressed_getobj)() = reinterpret_cast<int* (*)()>(0x558C16);
+static inline bool(__thiscall* const modifpressed_ispressed)(int* ob7, shok_Keys m) = reinterpret_cast<bool(__thiscall*)(int*, shok_Keys)>(0x558C1C);
+bool shok_GGUI_CManager::IsModifierPressed(shok_Keys modif)
+{
+	return modifpressed_ispressed(modifpressed_getobj() + 7, modif);
+}

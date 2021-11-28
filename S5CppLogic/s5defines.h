@@ -184,6 +184,7 @@ enum class shok_Task; // tasklist
 enum class shok_TaskState; // tasklist
 
 enum class shok_Keys : int {
+	None = 0,
 	A = 65,
 	Add = 107,
 	B = 66,
@@ -303,4 +304,9 @@ constexpr shok_Keys operator|(shok_Keys a, shok_Keys b) {
 constexpr shok_Keys operator^(shok_Keys a, shok_Keys b) {
 	using under = std::underlying_type<shok_Keys>::type;
 	return static_cast<shok_Keys>(static_cast<under>(a) ^ static_cast<under>(b));
+}
+constexpr shok_Keys operator~(shok_Keys a) {
+	using under = std::underlying_type<shok_Keys>::type;
+	return static_cast<shok_Keys>(~static_cast<under>(a));
+
 }

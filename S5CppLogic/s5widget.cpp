@@ -45,6 +45,12 @@ void shok_EGUIX_CFontIDHandler::LoadFont(const char* name)
     shok_fontManager::LoadFont(&FontID, name);
 }
 
+static inline const char* (__thiscall* const sinstringhand_getstr)(shok_EGUIX_CSingleStringHandler* th) = reinterpret_cast<const char* (__thiscall*)(shok_EGUIX_CSingleStringHandler*)>(0x55BFBC);
+const char* shok_EGUIX_CSingleStringHandler::GetString()
+{
+    return sinstringhand_getstr(this);
+}
+
 int shok_EGUIX_CBaseWidget::SetPosAndSize(float x, float y, float w, float h)
 {
     return reinterpret_cast<shok_vtable_EGUIX_CBaseWidget*>(vtable)->SetSizeAndPos(this, x, y, w, h);
@@ -56,6 +62,12 @@ void shok_EGUIX_CLuaFunctionHelper::Call(int widgetID)
     funchelper_call(this, widgetID);
 }
 
+static inline void(__thiscall* const butthelp_callaction)(shok_EGUIX_CButtonHelper* th, int wid) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CButtonHelper*, int)>(0x55A3F1);
+void shok_EGUIX_CButtonHelper::PressButton(int widgetID)
+{
+    butthelp_callaction(this, widgetID);
+}
+
 bool shortcutsignextend_hooked = false;
 void shok_EGUIX_CButtonHelper::HookShortcutSignExtend()
 {
@@ -64,6 +76,75 @@ void shok_EGUIX_CButtonHelper::HookShortcutSignExtend()
     shortcutsignextend_hooked = true;
     shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x55A62B), 10 };
     *reinterpret_cast<byte*>(0x55A62B) = 0xB6; // movsx to movzx (sign-extend to zero-extend) (middle part of 3 byte opcode)
+}
+
+shok_Keys extractKey(char c) {
+    return static_cast<shok_Keys>(static_cast<unsigned int>(static_cast<unsigned char>(c)));
+}
+shok_Keys extractModifiers(char c) {
+    return static_cast<shok_Keys>(static_cast<unsigned int>(static_cast<unsigned char>(c)) << 16) & (shok_Keys::ModifierAlt | shok_Keys::ModifierControl | shok_Keys::ModifierShift);
+}
+bool __stdcall buttohelp_shortcutcomparison(shok_EGUIX_CButtonHelper* th, shok_BB_CEvent* ev, shok_EGUIX_CBaseWidget* wid) {
+    if (th->CurrentState == 3 || th->CurrentState == 2)
+        return false;
+    const char* keystr = th->ShortCutString.GetString();
+    if (!keystr)
+        return false;
+
+    shok_Keys key = shok_Keys::None;
+    shok_Keys modif = shok_Keys::None;
+    shok_Keys ignoremodif = shok_Keys::None;
+    bool mayscin4 = false;
+
+    size_t len = strnlen(keystr, 10);
+    if (len == 1) {
+        key = extractKey(keystr[0]);
+    }
+    else if (len == 4) {
+        key = extractKey(keystr[0]);
+        modif = extractModifiers(keystr[1]);
+        ignoremodif = extractModifiers(keystr[2]);
+        mayscin4 = keystr[3] > 2;
+    }
+    else {
+        return false;
+    }
+    if (th->CurrentState == 4 && !mayscin4)
+        return true;
+
+    shok_BB_CKeyEvent* kev = shok_DynamicCast<shok_BB_CEvent, shok_BB_CKeyEvent>(ev);
+    if (!kev)
+        return false;
+
+    if ((kev->KeyData & (~ignoremodif)) == (key | modif)) {
+        th->PressButton(wid->WidgetID);
+        return true;
+    }
+    
+    return false;
+}
+void __declspec(naked) buttohelp_shortcutcomparisonasm() {
+    __asm {
+
+        push[ebp + 0x10];
+        push[ebp + 0xC]; // for some reason, the same event is in 2 arguments...
+        push esi;
+        call buttohelp_shortcutcomparison;
+
+
+        push 0x55A64A;
+        ret;
+    };
+}
+
+bool shortcutcmo_hooked = false;
+void shok_EGUIX_CButtonHelper::HookShortcutComparison()
+{
+    if (shortcutcmo_hooked)
+        return;
+    shortcutcmo_hooked = true;
+    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 10 };
+    WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm);
 }
 
 byte* shok_EGUIX_CBaseWidget::GetUpdateManualFlag()

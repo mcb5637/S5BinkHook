@@ -1203,6 +1203,10 @@ struct l_logicModel {
 		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
 		int mid = luaL_checkint(L, 2);
 		luaext_assert(L, (*shok_ED_CGlobalsBaseEx::GlobalObj)->ModelManager->GetNameByID(mid), "invalid model");
+		if (m->Model) {
+			m->Model->Destroy();
+			m->Model = nullptr;
+		}
 		m->Model = (*shok_ED_CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
 		m->Model->Register();
 		return 0;

@@ -110,7 +110,7 @@ bool __stdcall buttohelp_shortcutcomparison(shok_EGUIX_CButtonHelper* th, shok_B
         return false;
     }
     if (th->CurrentState == 4 && !mayscin4)
-        return true;
+        return false;
 
     shok_BB_CKeyEvent* kev = shok_DynamicCast<shok_BB_CEvent, shok_BB_CKeyEvent>(ev);
     if (!kev)

@@ -53,7 +53,8 @@ typedef uint8_t byte;
 // 0x496677 start music jmp
 // AIL_closestream 0x7614A4 dllimport redirect
 // 0x57B223 entity settasklist jmp
-// 0x55A62A button check shortcut sign extension opcode fixed
+// 0x55A62A button check shortcut sign extension opcode fixed OR
+// 0x55A597 jmp button check shortcut logic override
 // 
 // only without SCELoader
 // shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, func override

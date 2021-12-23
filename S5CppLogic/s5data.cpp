@@ -184,11 +184,20 @@ shok_BB_CClassFactory_serializationData* shok_AARect::SerializationData = reinte
 
 void RedirectCall(void* call, void* redirect) {
 	byte* opcode = reinterpret_cast<byte*>(call);
+	if (*opcode==0xFF && opcode[1]==0x15) { // call by address
+		*opcode = 0xE8; // call
+		opcode[5] = 0x90; // nop
+	}
 	if (*opcode != 0xE8) { // call
 		DEBUGGER_BREAK;
 	}
 	int* adr = reinterpret_cast<int*>(opcode + 1);
 	*adr = reinterpret_cast<int>(redirect) - reinterpret_cast<int>(adr + 1); // address relative to next instruction
+}
+void RedirectCallVP(void* call, void* redirect)
+{
+	shok_saveVirtualProtect vp{ call, 10 };
+	RedirectCall(call, redirect);
 }
 long long WriteJump(void* adr, void* toJump) {
 	long long r = *reinterpret_cast<long long*>(adr);

@@ -4,17 +4,22 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
+#include "binkw_orig.h"
 #pragma pack(1)
 
 FARPROC p[84] = { 0 };
 
+extern "C" {
+	double __cdecl GetCppLogicVersion();
+}
+
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 {
-	static HINSTANCE hL;
-	static HINSTANCE payload;
+	/*static HINSTANCE hL;
+	static HINSTANCE payload;*/
 	if (reason == DLL_PROCESS_ATTACH)
 	{
-		hL = LoadLibrary(_T("binkw32_orig.dll"));
+		/*hL = LoadLibrary(_T("binkw32_orig.dll"));
 		if (!hL) {
 			return false;
 		}
@@ -101,688 +106,437 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		p[80] = GetProcAddress(hL, "_YUV_blit_24rbpp_mask@60");
 		p[81] = GetProcAddress(hL, "_YUV_blit_UYVY@52");
 		p[82] = GetProcAddress(hL, "_YUV_blit_UYVY_mask@60");
-		p[83] = GetProcAddress(hL, "_YUV_blit_YV12@56");
-		payload = LoadLibrary(_T("S5CppLogic.dll"));
+		p[83] = GetProcAddress(hL, "_YUV_blit_YV12@56");*/
+		//payload = LoadLibrary(_T("S5CppLogic.dll"));
+		GetCppLogicVersion();
 	}
 	if (reason == DLL_PROCESS_DETACH) {
-		if (hL)
-			FreeLibrary(hL);
-		if (payload)
-			FreeLibrary(payload);
+		/*if (hL)
+			FreeLibrary(hL);*/
+		/*if (payload)
+			FreeLibrary(payload);*/
 	}
 	return true;
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferSetDirectDraw()
+extern "C" int _stdcall Proxy_BinkBufferSetDirectDraw(int a, int b)
 {
-	__asm
-	{
-		jmp p[0 * 4];
-	}
+	return _BinkBufferSetDirectDraw(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkIsSoftwareCursor()
+extern "C" int _stdcall Proxy_BinkIsSoftwareCursor(int a, int b)
 {
-	__asm
-	{
-		jmp p[1 * 4];
-	}
+	return _BinkIsSoftwareCursor(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkCheckCursor()
+extern "C" int _stdcall Proxy_BinkCheckCursor(int hWnd, int a2, int a3, int a4, int a5)
 {
-	__asm
-	{
-		jmp p[2 * 4];
-	}
+	return _BinkCheckCursor(hWnd, a2, a3, a4, a5);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkRestoreCursor()
+extern "C" int _stdcall Proxy_BinkRestoreCursor(int a)
 {
-	__asm
-	{
-		jmp p[3 * 4];
-	}
+	return _BinkRestoreCursor(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferSetResolution()
+extern "C" int _stdcall Proxy_BinkBufferSetResolution(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[4 * 4];
-	}
+	return _BinkBufferSetResolution(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferCheckWinPos()
+extern "C" void _stdcall Proxy_BinkBufferCheckWinPos(int* a, int* b, int* c)
 {
-	__asm
-	{
-		jmp p[5 * 4];
-	}
+	return _BinkBufferCheckWinPos(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferSetOffset()
+extern "C" int _stdcall Proxy_BinkBufferSetOffset(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[6 * 4];
-	}
+	return _BinkBufferSetOffset(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferOpen()
+extern "C" int _stdcall Proxy_BinkBufferOpen(int a, int b, int c, int d)
 {
-	__asm
-	{
-		jmp p[7 * 4];
-	}
+	return _BinkBufferOpen(a, b, c, d);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferClose()
+extern "C" void _stdcall Proxy_BinkBufferClose(int* a)
 {
-	__asm
-	{
-		jmp p[8 * 4];
-	}
+	return _BinkBufferClose(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferLock()
+extern "C" int _stdcall Proxy_BinkBufferLock(int a)
 {
-	__asm
-	{
-		jmp p[9 * 4];
-	}
+	return _BinkBufferLock(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferUnlock()
+extern "C" int _stdcall Proxy_BinkBufferUnlock(int* a)
 {
-	__asm
-	{
-		jmp p[10 * 4];
-	}
+	return _BinkBufferUnlock(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferBlit()
+extern "C" int _stdcall Proxy_BinkBufferBlit(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[11 * 4];
-	}
+	return _BinkBufferBlit(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferSetScale()
+extern "C" int _stdcall Proxy_BinkBufferSetScale(int* a, int b, int c)
 {
-	__asm
-	{
-		jmp p[12 * 4];
-	}
+	return _BinkBufferSetScale(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferSetHWND()
+extern "C" int _stdcall Proxy_BinkBufferSetHWND(int a, int b)
 {
-	__asm
-	{
-		jmp p[13 * 4];
-	}
+	return _BinkBufferSetHWND(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferGetDescription()
+extern "C" auto _stdcall Proxy_BinkBufferGetDescription(int a)
 {
-	__asm
-	{
-		jmp p[14 * 4];
-	}
+	return _BinkBufferGetDescription(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferGetError()
+extern "C" auto _stdcall Proxy_BinkBufferGetError()
 {
-	__asm
-	{
-		jmp p[15 * 4];
-	}
+	return _BinkBufferGetError();
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkBufferClear()
+extern "C" int _stdcall Proxy_BinkBufferClear(int* a, int b)
 {
-	__asm
-	{
-		jmp p[16 * 4];
-	}
+	return _BinkBufferClear(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkDDSurfaceType()
+extern "C" int _stdcall Proxy_BinkDDSurfaceType(int* a)
 {
-	__asm
-	{
-		jmp p[17 * 4];
-	}
+	return _BinkDDSurfaceType(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkDX8SurfaceType()
+extern "C" int _stdcall Proxy_BinkDX8SurfaceType(int* a)
 {
-	__asm
-	{
-		jmp p[18 * 4];
-	}
+	return _BinkDX8SurfaceType(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkDX9SurfaceType()
+extern "C" int _stdcall Proxy_BinkDX9SurfaceType(int* a)
 {
-	__asm
-	{
-		jmp p[19 * 4];
-	}
+	return _BinkDX9SurfaceType(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetError()
+extern "C" auto _stdcall Proxy_BinkSetError(char* a)
 {
-	__asm
-	{
-		jmp p[20 * 4];
-	}
+	return _BinkSetError(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetError()
+extern "C" auto _stdcall Proxy_BinkGetError()
 {
-	__asm
-	{
-		jmp p[21 * 4];
-	}
+	return _BinkGetError();
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetSoundSystem()
+extern "C" int _stdcall Proxy_BinkSetSoundSystem(int a, int b)
 {
-	__asm
-	{
-		jmp p[22 * 4];
-	}
+	return _BinkSetSoundSystem(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetFrameRate()
+extern "C" int _stdcall Proxy_BinkSetFrameRate(int a, int b)
 {
-	__asm
-	{
-		jmp p[23 * 4];
-	}
+	return _BinkSetFrameRate(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetIOSize()
+extern "C" int _stdcall Proxy_BinkSetIOSize(int a)
 {
-	__asm
-	{
-		jmp p[24 * 4];
-	}
+	return _BinkSetIOSize(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetIO()
+extern "C" int _stdcall Proxy_BinkSetIO(int a)
 {
-	__asm
-	{
-		jmp p[25 * 4];
-	}
+	return _BinkSetIO(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetSimulate()
+extern "C" int _stdcall Proxy_BinkSetSimulate(int a)
 {
-	__asm
-	{
-		jmp p[26 * 4];
-	}
+	return _BinkSetSimulate(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetSoundTrack()
+extern "C" int _stdcall Proxy_BinkSetSoundTrack(unsigned int a, int b)
 {
-	__asm
-	{
-		jmp p[27 * 4];
-	}
+	return _BinkSetSoundTrack(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkOpen()
+extern "C" int* _stdcall Proxy_BinkOpen(int a, int b)
 {
-	__asm
-	{
-		jmp p[28 * 4];
-	}
+	return _BinkOpen(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkCopyToBuffer()
+extern "C" auto _stdcall Proxy_BinkCopyToBuffer(int* a1, int a2, int a3, int a4, int a5, int a6, int a7)
 {
-	__asm
-	{
-		jmp p[29 * 4];
-	}
+	return _BinkCopyToBuffer(a1, a2, a3, a4, a5, a6, a7);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkCopyToBufferRect()
+extern "C" auto _stdcall Proxy_BinkCopyToBufferRect(unsigned int* a1, int a2, int a3, int a4, int a5, int a6, unsigned int a7, unsigned int a8, unsigned int a9, unsigned int a10, int a11)
 {
-	__asm
-	{
-		jmp p[30 * 4];
-	}
+	return _BinkCopyToBufferRect(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkDoFrame()
+extern "C" int _stdcall Proxy_BinkDoFrame(int a)
 {
-	__asm
-	{
-		jmp p[31 * 4];
-	}
+	return _BinkDoFrame(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkNextFrame()
+extern "C" void _stdcall Proxy_BinkNextFrame(int a)
 {
-	__asm
-	{
-		jmp p[32 * 4];
-	}
+	return _BinkNextFrame(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetKeyFrame()
+extern "C" int _stdcall Proxy_BinkGetKeyFrame(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[33 * 4];
-	}
+	return _BinkGetKeyFrame(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGoto()
+extern "C" int _stdcall Proxy_BinkGoto(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[34 * 4];
-	}
+	return _BinkGoto(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkClose()
+extern "C" void _stdcall Proxy_BinkClose(int a)
 {
-	__asm
-	{
-		jmp p[35 * 4];
-	}
+	return _BinkClose(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkWait()
+extern "C" int _stdcall Proxy_BinkWait(int a)
 {
-	__asm
-	{
-		jmp p[36 * 4];
-	}
+	return _BinkWait(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkPause()
+extern "C" int _stdcall Proxy_BinkPause(int* a, int b)
 {
-	__asm
-	{
-		jmp p[37 * 4];
-	}
+	return _BinkPause(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetSummary()
+extern "C" void _stdcall Proxy_BinkGetSummary(int a, int b)
 {
-	__asm
-	{
-		jmp p[38 * 4];
-	}
+	return _BinkGetSummary(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetRealtime()
+extern "C" int _stdcall Proxy_BinkGetRealtime(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[39 * 4];
-	}
+	return _BinkGetRealtime(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetRects()
+extern "C" int _stdcall Proxy_BinkGetRects(int a, int b)
 {
-	__asm
-	{
-		jmp p[40 * 4];
-	}
+	return _BinkGetRects(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkService()
+extern "C" int _stdcall Proxy_BinkService(int a)
 {
-	__asm
-	{
-		jmp p[41 * 4];
-	}
+	return _BinkService(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetVolume()
+extern "C" void _stdcall Proxy_BinkSetVolume(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[42 * 4];
-	}
+	return _BinkSetVolume(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetMixBins()
+extern "C" void _stdcall Proxy_BinkSetMixBins(int a, int b, int c, int d)
 {
-	__asm
-	{
-		jmp p[43 * 4];
-	}
+	return _BinkSetMixBins(a, b, c, d);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetMixBinVolumes()
+extern "C" void _stdcall Proxy_BinkSetMixBinVolumes(int a, int b, int c, int d, int e)
 {
-	__asm
-	{
-		jmp p[44 * 4];
-	}
+	return _BinkSetMixBinVolumes(a, b, c, d, e);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetPan()
+extern "C" void _stdcall Proxy_BinkSetPan(int a, int b, int c)
 {
-	__asm
-	{
-		jmp p[45 * 4];
-	}
+	return _BinkSetPan(a, b, c);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkLogoAddress()
+extern "C" void* _stdcall Proxy_BinkLogoAddress()
 {
-	__asm
-	{
-		jmp p[46 * 4];
-	}
+	return _BinkLogoAddress();
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetTrackType()
+extern "C" int _stdcall Proxy_BinkGetTrackType(int a, int b)
 {
-	__asm
-	{
-		jmp p[47 * 4];
-	}
+	return _BinkGetTrackType(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetTrackMaxSize()
+extern "C" int _stdcall Proxy_BinkGetTrackMaxSize(int a, int b)
 {
-	__asm
-	{
-		jmp p[48 * 4];
-	}
+	return _BinkGetTrackMaxSize(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetTrackID()
+extern "C" int _stdcall Proxy_BinkGetTrackID(int a, int b)
 {
-	__asm
-	{
-		jmp p[49 * 4];
-	}
+	return _BinkGetTrackID(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkOpenTrack()
+extern "C" int _stdcall Proxy_BinkOpenTrack(int a, int b)
 {
-	__asm
-	{
-		jmp p[50 * 4];
-	}
+	return _BinkOpenTrack(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkCloseTrack()
+extern "C" void _stdcall Proxy_BinkCloseTrack(int a)
 {
-	__asm
-	{
-		jmp p[51 * 4];
-	}
+	return _BinkCloseTrack(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkGetTrackData()
+extern "C" int _stdcall Proxy_BinkGetTrackData(int a, int b)
 {
-	__asm
-	{
-		jmp p[52 * 4];
-	}
+	return _BinkGetTrackData(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetVideoOnOff()
+extern "C" int _stdcall Proxy_BinkSetVideoOnOff(int a, int b)
 {
-	__asm
-	{
-		jmp p[53 * 4];
-	}
+	return _BinkSetVideoOnOff(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetSoundOnOff()
+extern "C" int _stdcall Proxy_BinkSetSoundOnOff(int a, int b)
 {
-	__asm
-	{
-		jmp p[54 * 4];
-	}
+	return _BinkSetSoundOnOff(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkSetMemory()
+extern "C" int _stdcall Proxy_BinkSetMemory(int a, int b)
 {
-	__asm
-	{
-		jmp p[55 * 4];
-	}
+	return _BinkSetMemory(a, b);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkOpenWaveOut()
+extern "C" int _stdcall Proxy_BinkOpenWaveOut(int a)
 {
-	__asm
-	{
-		jmp p[56 * 4];
-	}
+	return _BinkOpenWaveOut(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkOpenDirectSound()
+extern "C" int _stdcall Proxy_BinkOpenDirectSound(int a)
 {
-	__asm
-	{
-		jmp p[57 * 4];
-	}
+	return _BinkOpenDirectSound(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_BinkOpenMiles()
+extern "C" int _stdcall Proxy_BinkOpenMiles(int a)
 {
-	__asm
-	{
-		jmp p[58 * 4];
-	}
+	return _BinkOpenMiles(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_RADTimerRead()
+extern "C" int _stdcall Proxy_RADTimerRead()
 {
-	__asm
-	{
-		jmp p[59 * 4];
-	}
+	return _RADTimerRead();
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_init()
+extern "C" int _stdcall Proxy_YUV_init(int a)
 {
-	__asm
-	{
-		jmp p[60 * 4];
-	}
+	return _YUV_init(a);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_16bpp()
+extern "C" int _stdcall Proxy_YUV_blit_16bpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[61 * 4];
-	}
+	return _YUV_blit_16bpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_16bpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_16bpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[62 * 4];
-	}
+	return _YUV_blit_16bpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_16a4bpp()
+extern "C" int _stdcall Proxy_YUV_blit_16a4bpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[63 * 4];
-	}
+	return _YUV_blit_16a4bpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_16a4bpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_16a4bpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[64 * 4];
-	}
+	return _YUV_blit_16a4bpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_16a1bpp()
+extern "C" int _stdcall Proxy_YUV_blit_16a1bpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[65 * 4];
-	}
+	return _YUV_blit_16a1bpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_16a1bpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_16a1bpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[66 * 4];
-	}
+	return _YUV_blit_16a1bpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32bpp()
+extern "C" int _stdcall Proxy_YUV_blit_32bpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[67 * 4];
-	}
+	return _YUV_blit_32bpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32bpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_32bpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[68 * 4];
-	}
+	return _YUV_blit_32bpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32abpp()
+extern "C" int _stdcall Proxy_YUV_blit_32abpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[69 * 4];
-	}
+	return _YUV_blit_32abpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32abpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_32abpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[70 * 4];
-	}
+	return _YUV_blit_32abpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_YUY2()
+extern "C" int _stdcall Proxy_YUV_blit_YUY2(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[71 * 4];
-	}
+	return _YUV_blit_YUY2(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_YUY2_mask()
+extern "C" int _stdcall Proxy_YUV_blit_YUY2_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[72 * 4];
-	}
+	return _YUV_blit_YUY2_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32rbpp()
+extern "C" int _stdcall Proxy_YUV_blit_32rbpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[73 * 4];
-	}
+	return _YUV_blit_32rbpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32rbpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_32rbpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[74 * 4];
-	}
+	return _YUV_blit_32rbpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32rabpp()
+extern "C" int _stdcall Proxy_YUV_blit_32rabpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[75 * 4];
-	}
+	return _YUV_blit_32rabpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_32rabpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_32rabpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[76 * 4];
-	}
+	return _YUV_blit_32rabpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_24bpp()
+extern "C" int _stdcall Proxy_YUV_blit_24bpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[77 * 4];
-	}
+	return _YUV_blit_24bpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_24bpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_24bpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[78 * 4];
-	}
+	return _YUV_blit_24bpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_24rbpp()
+extern "C" int _stdcall Proxy_YUV_blit_24rbpp(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[79 * 4];
-	}
+	return _YUV_blit_24rbpp(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_24rbpp_mask()
+extern "C" int _stdcall Proxy_YUV_blit_24rbpp_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[80 * 4];
-	}
+	return _YUV_blit_24rbpp_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_UYVY()
+extern "C" int _stdcall Proxy_YUV_blit_UYVY(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13)
 {
-	__asm
-	{
-		jmp p[81 * 4];
-	}
+	return _YUV_blit_UYVY(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_UYVY_mask()
+extern "C" int _stdcall Proxy_YUV_blit_UYVY_mask(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14, int a15)
 {
-	__asm
-	{
-		jmp p[82 * 4];
-	}
+	return _YUV_blit_UYVY_mask(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15);
 }
 
-extern "C" __declspec(naked) void _stdcall Proxy_YUV_blit_YV12()
+extern "C" int _stdcall Proxy_YUV_blit_YV12(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int a13, int a14)
 {
-	__asm
-	{
-		jmp p[83 * 4];
-	}
+	return _YUV_blit_YV12(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
 }
 
 

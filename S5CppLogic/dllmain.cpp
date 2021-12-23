@@ -267,3 +267,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     }
     return true;
 }
+
+extern "C" double __cdecl GetCppLogicVersion() {
+    return Version;
+}

@@ -435,6 +435,7 @@ const char* ReadFileToString(const char* name, size_t* size);
 bool DoesFileExist(const char* name);
 
 void RedirectCall(void* call, void* redirect);
+void RedirectCallVP(void* call, void* redirect);
 long long WriteJump(void* adr, void* toJump);
 static_assert(sizeof(long long) == 8);
 

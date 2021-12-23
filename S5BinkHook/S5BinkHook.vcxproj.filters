@@ -21,6 +21,9 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="binkw_orig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -34,5 +37,9 @@
     <None Include="binkw32.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="orig\binkw32_orig.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="orig\binkw32_orig.lib" />
   </ItemGroup>
 </Project>

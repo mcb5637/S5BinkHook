@@ -49,6 +49,33 @@ int l_api_stacktrace(lua_State* L) {
 	return 1;
 }
 
+int l_api_getfuncdebug(lua_State* L) {
+	luaext_assert(L, lua_isfunction(L, 1), "no func");
+	lua_Debug ar;
+	lua_pushvalue(L, 1);
+	lua_getinfo(L, ">Snlu", &ar);
+	lua_newtable(L);
+	lua_pushstring(L, "name");
+	lua_pushstring(L, ar.name);
+	lua_rawset(L, -3);
+	lua_pushstring(L, "namewhat");
+	lua_pushstring(L, ar.namewhat);
+	lua_rawset(L, -3);
+	lua_pushstring(L, "nups");
+	lua_pushnumber(L, ar.nups);
+	lua_rawset(L, -3);
+	lua_pushstring(L, "short_src");
+	lua_pushstring(L, ar.short_src);
+	lua_rawset(L, -3);
+	lua_pushstring(L, "linedefined");
+	lua_pushnumber(L, ar.linedefined);
+	lua_rawset(L, -3);
+	lua_pushstring(L, "what");
+	lua_pushstring(L, ar.what);
+	lua_rawset(L, -3);
+	return 1;
+}
+
 int l_api_getfile(lua_State* L) {
 	size_t strlen = 0;
 	const char* s = luaL_checklstring(L, 1, &strlen);
@@ -211,6 +238,7 @@ void l_api_init(lua_State* L)
 	luaext_registerFunc(L, "RuntimeStoreSet", &l_api_runtimestore_set);
 	luaext_registerFunc(L, "RuntimeStoreGet", &l_api_runtimestore_get);
 	luaext_registerFunc(L, "CreateExtraDataTables", &l_api_dumpExtraTables);
+	luaext_registerFunc(L, "GetFuncDebug", &l_api_getfuncdebug);
 }
 
 // CppLogic.API.Log("string")

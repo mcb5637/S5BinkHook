@@ -25,7 +25,7 @@ CppLogic.UI = {}
 CppLogic.UA = {}
 
 --- CppLogic version number.
-CppLogic.Version = 1.2
+CppLogic.Version = 1.3002
 
 --- call this function to cleanup used hooks.
 -- does not reset values in entitytypes.
@@ -477,6 +477,11 @@ function CppLogic.API.RuntimeStoreGet(name) end
 --- creates the global tables Animations, TerrainTypes, WaterTypes, ArmorClasses.
 -- data gets read directly from the game, so anything you can use is in there.
 function CppLogic.API.CreateExtraDataTables() end
+
+--- returnd debug information about a function.
+-- @param f function func to check
+-- @return table funcdata {name, namewhat, nups, short_src, linedefined, what}, see lua_getinfo for what actually gets returned
+function CppLogic.API.GetFuncDebug(f) end
 
 --- deals damage to a target.
 -- calls respective hurt entity trigger.

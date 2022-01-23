@@ -330,7 +330,7 @@ unsigned int shok_BB_IObject::GetIdentifier() const
 
 bool HasSCELoader()
 {
-	return GetModuleHandle(L"SCELoader.dll");
+	return GetModuleHandle("SCELoader.dll");
 }
 
 const char* (*GetStringTableTextOverride)(const char* s) = nullptr;

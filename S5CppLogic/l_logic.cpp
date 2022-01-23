@@ -1078,6 +1078,8 @@ int l_logic_setluataskfunc_settl(lua_State* L) {
 	return 0;
 }
 int l_logic_setluataskfunc(lua_State* L) {
+	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
+
 	if (lua_isnil(L, 1)) {
 		shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
 		return 0;
@@ -1123,6 +1125,8 @@ int l_logic_setluataskfunc(lua_State* L) {
 }
 
 int l_logic_makeTaskListWaitForAnimUncancelable(lua_State* L) {
+	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
+
 	int i = luaL_checkint(L, 1);
 	shok_EGL_CGLETaskList* tl = (*shok_EGL_CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
 	luaext_assertPointer(L, tl, "invalid tasklist");
@@ -1141,6 +1145,8 @@ int l_logic_makeTaskListWaitForAnimUncancelable(lua_State* L) {
 	return 0;
 }
 int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
+	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
+
 	int i = luaL_checkint(L, 1);
 	shok_EGL_CGLETaskList* tl = (*shok_EGL_CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
 	luaext_assertPointer(L, tl, "invalid tasklist");
@@ -1159,6 +1165,7 @@ int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
 	return 0;
 }
 int l_logic_setTaskListSetCheckUncancelable(lua_State* L) {
+	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
 	shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(luaext_optbool(L, 1, false));
 	return 0;
 }
@@ -1324,7 +1331,8 @@ int l_logic_loadtasks(lua_State* L)
 
 void l_logic_onload()
 {
-	l_logic_loadtasks(nullptr);
+	if (!HasSCELoader())
+		l_logic_loadtasks(nullptr);
 }
 
 void l_logic_cleanup(lua_State* L) {

@@ -315,20 +315,24 @@ function CppLogic.Logic.ClearWeatherQueueAndAddInitial(state, duration, forerun,
 -- return true, to call the function again next tick (not available if you have used moveto or settl).
 -- do not save&use moveto and settl later, will cause crashes!
 -- do not use moveto if you are repeating the call via return true.
+-- does not work with SCELoader.
 -- @param func (entityid, value, moveto(p,i,n), settl(tl))->repeat
 function CppLogic.Logic.SetLuaTaskListFunc(func) end
 
 --- changes all occurences of TASK_WAIT_FOR_ANIM to TASK_WAIT_FOR_ANIM_NON_CANCELABLE in the give tasklist.
 -- this prevents new commands canceling the task.
+-- does not work with SCELoader.
 -- @param tl tasklist
 -- @param tind task index (optional, default -1) id <0 full tasklist gets searched
 function CppLogic.Logic.TaskListMakeWaitForAnimsUnCancelable(tl, tind) end
 --- changes all occurences of TASK_WAIT_FOR_ANIM_NON_CANCELABLE to TASK_WAIT_FOR_ANIM in the give tasklist.
+-- does not work with SCELoader.
 -- @param tl tasklist
 -- @param tind task index (optional, default -1) id <0 full tasklist gets searched
 function CppLogic.Logic.TaskListMakeWaitForAnimsCancelable(tl, tind) end
 
 --- prevents changes in tasklists to cancel TASK_WAIT_FOR_ANIM_NON_CANCELABLE. other states may still be cancelled.
+-- does not work with SCELoader.
 -- @param b bool (default false)
 function CppLogic.Logic.TaskListSetChangeTaskListCheckUncancelable(b) end
 

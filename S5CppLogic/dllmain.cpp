@@ -307,6 +307,16 @@ extern "C" {
     }
 }
 
+bool __declspec(dllexport) __stdcall HasRealDebugger() {
+    if (dbg.debugger)
+        return true;
+    return false;
+}
+
+double __declspec(dllexport) __stdcall GetCppLogicVersion() {
+    return Version;
+}
+
 
 
 
@@ -341,8 +351,4 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         break;
     }
     return true;
-}
-
-extern "C" double __cdecl GetCppLogicVersion() {
-    return Version;
 }

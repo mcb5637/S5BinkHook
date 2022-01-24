@@ -9,9 +9,7 @@
 
 FARPROC p[84] = { 0 };
 
-extern "C" {
-	double __cdecl GetCppLogicVersion();
-}
+double __declspec(dllimport) __stdcall GetCppLogicVersion();
 
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 {

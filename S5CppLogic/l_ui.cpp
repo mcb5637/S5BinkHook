@@ -12,7 +12,8 @@ shok_EGUIX_CBaseWidget* l_uiCheckWid(lua_State* L, int i) {
 		id = wm->GetIdByName(luaL_checkstring(L, i));
 	}
 	shok_EGUIX_CBaseWidget* r = wm->GetWidgetByID(id);
-	luaext_assertPointer(L, r, "no widget");
+	if (!r)
+		luaL_error(L, "no widget at %i", i);
 	return r;
 }
 

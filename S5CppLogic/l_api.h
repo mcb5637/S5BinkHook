@@ -2,4 +2,9 @@
 
 #include "luaimport.h"
 
-void l_api_init(lua_State* L);
+namespace CppLogic::API {
+
+	void Init(lua::State L);
+
+}
+

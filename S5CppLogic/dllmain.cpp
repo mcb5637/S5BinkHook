@@ -135,6 +135,7 @@ int resetCppLogic(lua_State* L) {
 }
 
  void install(lua_State * L) {
+     lua::State L2 = lua::State{ L };
      if (!mainmenu_state) {
          mainmenu_state = L;
          initGame();
@@ -145,69 +146,69 @@ int resetCppLogic(lua_State* L) {
     lua_setglobal(L, "test");
 #endif
     
-    lua_pushstring(L, "CppLogic");
-    lua_newtable(L);
+    L2.Push("CppLogic");
+    L2.NewTable();
 
-    lua_pushlightuserdata(L, &resetCppLogic);
-    lua_pushvalue(L, -2);
-    lua_rawset(L, LUA_REGISTRYINDEX);
+    L2.PushLightUserdata(&resetCppLogic);
+    L2.PushValue(-2);
+    L2.SetTableRaw(L2.REGISTRYINDEX);
 
     luaext_registerFunc(L, "OnLeaveMap", &cleanup);
-    lua_pushstring(L, "Version");
-    lua_pushnumber(L, Version);
-    lua_rawset(L, -3);
+    L2.Push("Version");
+    L2.Push(Version);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "Memory");
-    lua_newtable(L);
-    l_mem_init(L);
-    lua_rawset(L, -3);
+    L2.Push("Memory");
+    L2.NewTable();
+    CppLogic::Mem::Init(L2);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "API");
-    lua_newtable(L);
-    l_api_init(L);
-    lua_rawset(L, -3);
+    L2.Push("API");
+    L2.NewTable();
+    CppLogic::API::Init(L2);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "Effect");
-    lua_newtable(L);
+    L2.Push("Effect");
+    L2.NewTable();
     l_effect_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "Combat");
-    lua_newtable(L);
+    L2.Push("Combat");
+    L2.NewTable();
     l_combat_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "Entity");
-    lua_newtable(L);
+    L2.Push("Entity");
+    L2.NewTable();
     l_entity_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "EntityType");
-    lua_newtable(L);
+    L2.Push("EntityType");
+    L2.NewTable();
     l_entitytype_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "Logic");
-    lua_newtable(L);
+    L2.Push("Logic");
+    L2.NewTable();
     l_logic_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "Technology");
-    lua_newtable(L);
+    L2.Push("Technology");
+    L2.NewTable();
     l_tech_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "UI");
-    lua_newtable(L);
+    L2.Push("UI");
+    L2.NewTable();
     l_ui_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_pushstring(L, "UA");
-    lua_newtable(L);
+    L2.Push("UA");
+    L2.NewTable();
     l_ua_init(L);
-    lua_rawset(L, -3);
+    L2.SetTableRaw(-3);
 
-    lua_rawset(L, LUA_GLOBALSINDEX);
+    L2.SetTableRaw(L2.GLOBALSINDEX);
 
     lua_register(L, "CppLogic_ResetGlobal", &resetCppLogic);
 

@@ -140,7 +140,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,7 +163,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -183,9 +183,11 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClInclude Include="framework.h" />
     <ClInclude Include="luaext.h" />
     <ClInclude Include="luaimport.h" />
-    <ClInclude Include="lua\lauxlib.h" />
-    <ClInclude Include="lua\lua.h" />
-    <ClInclude Include="lua\lualib.h" />
+    <ClInclude Include="Luapp\constexprTypename.h" />
+    <ClInclude Include="Luapp\luapp50.h" />
+    <ClInclude Include="lua50\lauxlib.h" />
+    <ClInclude Include="lua50\lua.h" />
+    <ClInclude Include="lua50\lualib.h" />
     <ClInclude Include="l_api.h" />
     <ClInclude Include="l_combat.h" />
     <ClInclude Include="l_effect.h" />
@@ -222,6 +224,12 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="entityiterator.cpp" />
     <ClCompile Include="luaext.cpp" />
+    <ClCompile Include="Luapp\luapp50.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="l_api.cpp" />
     <ClCompile Include="l_combat.cpp" />
     <ClCompile Include="l_effect.cpp" />
@@ -260,11 +268,10 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
     <None Include="CppLogic.lua">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="lua\S5Lua5.dll" />
     <None Include="Source.def" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lua\S5Lua5.lib" />
+    <Library Include="lua50\S5Lua5.lib" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

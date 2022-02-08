@@ -1,0 +1,3 @@
+[submodule "S5CppLogic/Luapp"]
+	path = S5CppLogic/Luapp
+	url = https://github.com/mcb5637/Luapp.git

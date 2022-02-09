@@ -167,18 +167,16 @@ int l_entityTypeAddEntityCat(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
 	shok_EntityCategory cat = static_cast<shok_EntityCategory>(luaL_checkint(L, 2));
 	luaext_assert(L, !t->IsOfCategory(cat), "entitytype is already of this cat");
-	shok_saveVector<shok_EntityCategory>(&t->LogicProps->Categories, [cat](auto& v) {
-		v.push_back(cat);
-		});
+	auto v = t->LogicProps->Categories.SaveVector();
+	v.Vector.push_back(cat);
 	return 0;
 }
 int l_entityTypeRemoveEntityCat(lua_State* L) {
 	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 1);
 	shok_EntityCategory cat = static_cast<shok_EntityCategory>(luaL_checkint(L, 2));
-	shok_saveVector<shok_EntityCategory>(&t->LogicProps->Categories, [cat](auto& v) {
-			auto e = std::remove_if(v.begin(), v.end(), [cat](shok_EntityCategory c) { return c == cat; });
-			v.erase(e, v.end());
-		});
+	auto v = t->LogicProps->Categories.SaveVector();
+	auto e = std::remove_if(v.Vector.begin(), v.Vector.end(), [cat](shok_EntityCategory c) { return c == cat; });
+	v.Vector.erase(e, v.Vector.end());
 	return 0;
 }
 

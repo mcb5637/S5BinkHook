@@ -803,7 +803,7 @@ int l_ui_SetGUIState_LuaSelection(lua_State* L) {
 // creator func, used by class factory
 shok_BB_IObject* __stdcall CppL_GUIState_LuaSelection_ctor() {
 	// allocate an object and then call the constructor for it manually
-	return new (shok_malloc(sizeof(CppL_GUIState_LuaSelection))) CppL_GUIState_LuaSelection();
+	return new (shok::Malloc(sizeof(CppL_GUIState_LuaSelection))) CppL_GUIState_LuaSelection();
 }
 void CppL_GUIState_LuaSelection::Initialize()
 {
@@ -868,7 +868,7 @@ void CppL_GUIState_LuaSelection::Cancel(bool calllua)
 void __fastcall CppL_GUIState_LuaSelection_dtor(CppL_GUIState_LuaSelection* th, int _, bool free) {
 	th->~CppL_GUIState_LuaSelection();
 	if (free)
-		shok_free(th);
+		shok::Free(th);
 }
 unsigned int __stdcall CppL_GUIState_LuaSelection_GetClassID(const shok_BB_IObject* th) {
 	return CppL_GUIState_LuaSelection::Identifier;

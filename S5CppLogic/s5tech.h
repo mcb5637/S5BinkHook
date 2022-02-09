@@ -22,7 +22,7 @@ struct shok_technologyModifier {
 	PADDINGI(1);
 	char Operator;
 	PADDING(3);
-	PADDINGI(5); // most likely a shok_string
+	PADDINGI(5); // most likely a shok::String
 
 	float ModifyValue(float i);
 };
@@ -34,16 +34,16 @@ struct shok_technology {
 	shok_costInfo ResourceCosts;
 	int RequiredTecConditions;
 	vector_padding;
-	std::vector<shok_technologyRequirementTech, shok_allocator<shok_technologyRequirementTech>> TecConditions;
+	std::vector<shok_technologyRequirementTech, shok::Allocator<shok_technologyRequirementTech>> TecConditions;
 	int RequiredEntityConditions;
 	vector_padding;
-	std::vector<shok_technologyRequirementEType, shok_allocator<shok_technologyRequirementEType>> EntityConditions;
+	std::vector<shok_technologyRequirementEType, shok::Allocator<shok_technologyRequirementEType>> EntityConditions;
 	int RequiredEntityCategoryConditions;
 	vector_padding;
-	std::vector<shok_technologyRequirementUCat, shok_allocator<shok_technologyRequirementUCat>> EntityCategoryConditions;
+	std::vector<shok_technologyRequirementUCat, shok::Allocator<shok_technologyRequirementUCat>> EntityCategoryConditions;
 	int RequiredUpgradeCategoryConditions;
 	vector_padding;
-	std::vector<shok_technologyRequirementUCat, shok_allocator<shok_technologyRequirementUCat>> UpgradeCategoryConditions; // 38
+	std::vector<shok_technologyRequirementUCat, shok::Allocator<shok_technologyRequirementUCat>> UpgradeCategoryConditions; // 38
 	PADDINGI(7); // 41 Effect -> Script, size 7
 	shok_technologyModifier ExplorationModifier; // 48
 	shok_technologyModifier SpeedModifier; // 56

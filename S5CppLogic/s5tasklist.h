@@ -166,7 +166,7 @@ struct shok_GGL_CGLTaskArgsGoodType : shok_EGL_CGLETaskArgs { // unsed
 
 struct shok_EGL_CGLETaskList : shok_BB_IObject {
 	vector_padding;
-	std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>> Task;
+	std::vector<shok_EGL_CGLETaskArgs*, shok::Allocator<shok_EGL_CGLETaskArgs*>> Task;
 	int TaskListID;
 	int PrincipalTask;
 	char* Script;
@@ -185,7 +185,7 @@ struct shok_EGL_CGLETaskListMgr : shok_BB_IObject {
     shok_BB_CIDManagerEx* TaskManager;
     shok_BB_CIDManagerEx* WorkCycleManager;
 	vector_padding;
-	std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>> TaskLists;
+	std::vector<shok_EGL_CGLETaskList*, shok::Allocator<shok_EGL_CGLETaskList*>> TaskLists;
 
 	shok_EGL_CGLETaskList* GetTaskListByID(int id);
 	const char* GetTaskListNameByID(int i);
@@ -210,7 +210,7 @@ struct shok_taskData {
 };
 struct shok_taskData_vect {
     vector_padding;
-    std::vector<shok_taskData, shok_allocator<shok_taskData>> TaskData;
+    std::vector<shok_taskData, shok::Allocator<shok_taskData>> TaskData;
 };
 
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int : shok_object {

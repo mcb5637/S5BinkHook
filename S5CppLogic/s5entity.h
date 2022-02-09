@@ -79,10 +79,10 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	int ModelOverride;
 	int PlayerId;
 	int attachmentvt; // 7
-	shok_set<shok_attachment> ObserverEntities; // 8
-	shok_set<shok_attachment> ObserverEffects; // 11
-	shok_set<shok_attachment> ObservedEntities; // 14
-	shok_set<shok_attachment> ObservedEffects; // 17
+	shok::Set<shok_attachment> ObserverEntities; // 8
+	shok::Set<shok_attachment> ObserverEffects; // 11
+	shok::Set<shok_attachment> ObservedEntities; // 14
+	shok::Set<shok_attachment> ObservedEffects; // 17
 	byte SendEvent; // 20
 	PADDING(3);
 	int SetNewTaskListDepth;
@@ -93,11 +93,11 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	byte UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
 	int TaskListToSet; // 29
 	vector_padding;
-	std::vector<shok_EGL_CGLEBehavior*, shok_allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
+	std::vector<shok_EGL_CGLEBehavior*, shok::Allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
 	shok_TaskState CurrentState; // 34
 	int EntityState, CurrentTaskListID, CurrentTaskIndex; // la37
-	shok_set<shok_entity_StateIdAndStateHandler> StateHandlers; // 38
-	shok_set<shok_entity_TaskIdAndTaskHandler> TaskHandlers; // 41
+	shok::Set<shok_entity_StateIdAndStateHandler> StateHandlers; // 38
+	shok::Set<shok_entity_TaskIdAndTaskHandler> TaskHandlers; // 41
 	PADDINGI(6); // la49 49 p to array EGL::ISlot of behaviors
 	int Health; // 50
 	char* ScriptName; // "Name" in loader
@@ -441,8 +441,8 @@ struct shok_EGL_CGLEEntityCreator : shok_BB_IObject {
 	int Flags = 0; // 5
 	int PlayerId = 0;
 	int Health = 0; // 7
-	char* ScriptName = nullptr; // use shok_malloc, gets freed by destructor
-	char* ScriptCommandLine = nullptr; // use shok_malloc, gets freed by destructor
+	char* ScriptName = nullptr; // use shok::Malloc, gets freed by destructor
+	char* ScriptCommandLine = nullptr; // use shok::Malloc, gets freed by destructor
 	int AmbientSoundType = 0;
 	float Scale = 0; // 11
 

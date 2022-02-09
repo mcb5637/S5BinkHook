@@ -321,7 +321,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_rawget(L, -2);
 		if (lua_istable(L, -1)) {
 			int i = 1;
-			shok_saveVector<shok_position>(&e->Positions, [L, &i](std::vector<shok_position, shok_allocator<shok_position>>& v) {
+			shok_saveVector<shok_position>(&e->Positions, [L, &i](std::vector<shok_position, shok::Allocator<shok_position>>& v) {
 				shok_position p = shok_position();
 				v.clear();
 				while (true) {
@@ -432,7 +432,7 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 			lua_rawget(L, -2);
 			if (lua_istable(L, -1)) {
 				int i = 1;
-				shok_saveVector<int>(&e->Serfs, [L, &i](std::vector<int, shok_allocator<int>>& v) {
+				shok_saveVector<int>(&e->Serfs, [L, &i](std::vector<int, shok::Allocator<int>>& v) {
 					v.clear();
 					while (true) {
 						lua_rawgeti(L, -1, i);

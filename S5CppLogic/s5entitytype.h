@@ -5,15 +5,14 @@
 struct shok_modifyEntityProps {
 	int MysteriousInt;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> TechList;
+	std::vector<int, shok::Allocator<int>> TechList;
 };
 
 
 struct shok_EGL_CGLEEntityProps : shok_BB_IObject {
 	PADDINGI(1);
 	int Class;
-	vector_padding;
-	std::vector<shok_EntityCategory, shok_allocator<shok_EntityCategory>> Categories;
+	shok::Vector<shok_EntityCategory> Categories;
 	shok_positionRot ApproachPos;
 private:
 	int Race;
@@ -30,11 +29,11 @@ public:
 	byte DeleteWhenBuiltOn, NeedsPlayer;
 	PADDING(2);
 	vector_padding;
-	std::vector<shok_EGL_CGLEBehaviorProps*, shok_allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps; // 25
+	std::vector<shok_EGL_CGLEBehaviorProps*, shok::Allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps; // 25
 	int NumberOfBehaviors; //29
 	PADDINGI(4);
 	vector_padding;
-	std::vector<shok_AARect, shok_allocator<shok_AARect>> BlockingArea; // la37
+	std::vector<shok_AARect, shok::Allocator<shok_AARect>> BlockingArea; // la37
 
 	static inline constexpr int vtp = 0x76E47C;
 	static inline constexpr int TypeDesc = 0x810B0C;
@@ -62,7 +61,7 @@ public:
 		return nullptr;
 	}
 };
-//constexpr int i = offsetof(shok_EGL_CGLEEntityProps, ExperiencePoints) / 4;
+constexpr int i = offsetof(shok_EGL_CGLEEntityProps, ApproachPos) / 4;
 
 struct shok_GGL_CEntityProperties : shok_EGL_CGLEEntityProps {
 	int ResourceEntity, ResourceAmount, SummerEffect, WinterEffect;
@@ -126,7 +125,7 @@ struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
 struct shok_constructionInfo {
 	PADDINGI(1);
 	vector_padding;
-	std::vector<shok_positionRot, shok_allocator<shok_positionRot>> BuilderSlot;
+	std::vector<shok_positionRot, shok::Allocator<shok_positionRot>> BuilderSlot;
 	int Time;
 	shok_costInfo Cost;
 	int ConstructionSite;
@@ -136,13 +135,13 @@ struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
 	shok_position DoorPos, LeavePos;
 	shok_constructionInfo ConstructionInfo;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> BuildOn; // 75
+	std::vector<int, shok::Allocator<int>> BuildOn; // 75
 	byte HideBase, CanBeSold, IsWall; // 79
 	PADDING(1);
 	shok_upgradeInfo Upgrade;
 	int UpgradeSite, ArmorClass, ArmorAmount;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> WorkTaskList; // 104
+	std::vector<int, shok::Allocator<int>> WorkTaskList; // 104
 private:
 	int MilitaryInfo[4];
 public:
@@ -159,7 +158,7 @@ public:
 
 struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	vector_padding;
-	std::vector<shok_AARect, shok_allocator<shok_AARect>> BridgeArea;
+	std::vector<shok_AARect, shok::Allocator<shok_AARect>> BridgeArea;
 	int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
 
 	static inline constexpr int vtp = 0x778148;
@@ -173,9 +172,9 @@ struct shok_ED_CDisplayEntityProps : shok_BB_IObject {
 	bool DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
 	PADDING(2);
 	vector_padding;
-	std::vector<int, shok_allocator<int>> AnimList;
+	std::vector<int, shok::Allocator<int>> AnimList;
 	vector_padding;
-	std::vector<shok_ED_CBehaviorProps*, shok_allocator<shok_ED_CBehaviorProps*>> DisplayBehaviorProps;
+	std::vector<shok_ED_CBehaviorProps*, shok::Allocator<shok_ED_CBehaviorProps*>> DisplayBehaviorProps;
 
 	template<typename T, typename std::enable_if<std::is_base_of<shok_ED_CBehaviorProps, T>::value>::type* = nullptr>
 	T* GetDisplayBehaviorProps() {
@@ -214,7 +213,7 @@ struct shok_GGlue_CGlueEntityProps : shok_BB_IObject {
 	shok_EGL_CGLEEntityProps* LogicProps;
 	shok_ED_CDisplayEntityProps* DisplayProps;
 	vector_padding;
-	std::vector<shok_GGlue_CGlueEntityProps_behavior, shok_allocator<shok_GGlue_CGlueEntityProps_behavior>> BehaviorProps;
+	std::vector<shok_GGlue_CGlueEntityProps_behavior, shok::Allocator<shok_GGlue_CGlueEntityProps_behavior>> BehaviorProps;
 
 	static inline constexpr int vtp = 0x788824;
 	static inline constexpr int TypeDesc = 0x83C8CC;

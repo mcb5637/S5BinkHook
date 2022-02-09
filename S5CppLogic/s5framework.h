@@ -2,42 +2,42 @@
 #include "s5data.h"
 
 struct shok_framework_mapinfo {
-	shok_string NameKey, DescKey, Name, Desc;
+	shok::String NameKey, DescKey, Name, Desc;
 	int SizeX, SizeY;
 	byte MPFlag;
 	PADDING(3);
 	int MPPlayerCount;
 	int MPGameOptionFlagSet;
-	shok_string MiniMapTextureName;
+	shok::String MiniMapTextureName;
 	PADDINGI(1); // 1?
 	vector_padding;
-	std::vector<int, shok_allocator<int>> Keys;
+	std::vector<int, shok::Allocator<int>> Keys;
 	struct {
-		shok_string Data;
+		shok::String Data;
 	} GUID;
-	shok_string MapFileName, MapFilePath;
+	shok::String MapFileName, MapFilePath;
 };
 static_assert(sizeof(shok_framework_mapinfo) == 66 * 4);
 
 struct shok_framework_campagnInfo {
 	vector_padding;
-	std::vector<shok_framework_mapinfo, shok_allocator<shok_framework_mapinfo>> Maps;
+	std::vector<shok_framework_mapinfo, shok::Allocator<shok_framework_mapinfo>> Maps;
 
 	int GetMapIndexByName(const char* s);
 	shok_framework_mapinfo* GetMapInfoByName(const char* n);
 };
 
 struct shok_GS3DTools_CMapData : shok_object {
-	shok_string MapName;
+	shok::String MapName;
 	int MapType;
-	shok_string MapCampagnName, MapGUID;
+	shok::String MapCampagnName, MapGUID;
 
 	static inline constexpr int vtp = 0x761D34;
 };
 
 struct shok_framework_saveData {
 	struct {
-		shok_string SavePath;
+		shok::String SavePath;
 		shok_GS3DTools_CMapData MapData;
 	}* CurrentSave;
 	char* SaveDir;
@@ -57,18 +57,18 @@ struct shok_GDB_CValue : shok_BB_IObject {
 };
 
 struct shok_GDB_CString : shok_BB_IObject {
-	shok_string Data;
+	shok::String Data;
 
 	static inline constexpr int vtp = 0x76302C;
 };
 
 struct shok_GDBEntry {
-	shok_string Key;
+	shok::String Key;
 	shok_BB_IObject* Data; // shok_GDB_CValue, shok_GDB_CString, or shok_GDB_CList
 };
 
 struct shok_GDB_CList : shok_BB_IObject {
-	shok_set<shok_GDBEntry> Entries;
+	shok::Set<shok_GDBEntry> Entries;
 
 	bool IsKeyValid(const char* key);
 	const char* GetString(const char* key);

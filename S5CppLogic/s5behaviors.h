@@ -457,7 +457,7 @@ struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 	float TerritoryCenterRange;
 	int Experience; // 32
 	vector_padding;
-	std::vector<shok_position, shok_allocator<shok_position>> PatrolPoints;
+	std::vector<shok_position, shok::Allocator<shok_position>> PatrolPoints;
 	int NextPatrolPointIndex; // 37
 	float DefendOrientation;
 	int TrainingStartTurn;
@@ -542,7 +542,7 @@ struct GGL_SSlotArgsLimitedAttachment {
 };
 struct shok_GGL_CLimitedAttachmentBehavior : shok_EGL_CGLEBehavior {
 	int vtable_EGL_TSlot_GGL_SSlotArgsLimitedAttachment_331624813;
-	shok_set<GGL_SSlotArgsLimitedAttachment> AttachmentLimits;
+	shok::Set<GGL_SSlotArgsLimitedAttachment> AttachmentLimits;
 
 	// defined evets: LimitedAttachment_XXX
 
@@ -766,7 +766,7 @@ struct shok_GGL_CBuildingMerchantBehavior : shok_EGL_CGLEBehavior {
 	int CurrentPlayer; //4
 	int TraderEntityID;
 	vector_padding;
-	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> Offer;
+	std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok::Allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>> Offer;
 
 	// defined events: Behavior_Tick, BuildingMerchant_XXX
 

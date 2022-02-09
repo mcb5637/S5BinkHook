@@ -147,7 +147,7 @@ struct shok_ED_CEntity : shok_BB_IObject {
 	PADDINGI(1); // some kind of flags? // 5
 	PADDINGI(1); // some counter
 	vector_padding; // 7
-	std::vector<shok_ED_IBehavior*, shok_allocator<shok_ED_IBehavior*>> DisplayBehaviors;
+	std::vector<shok_ED_IBehavior*, shok::Allocator<shok_ED_IBehavior*>> DisplayBehaviors;
 	PADDINGI(1); // unk p // 11
 	PADDINGI(1); // 0
 	PADDINGI(1); // unk p

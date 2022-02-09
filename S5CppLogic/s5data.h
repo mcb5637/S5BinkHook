@@ -94,89 +94,15 @@ typedef uint8_t byte;
 // shok_EGL_CGLETerrainLowRes::BridgeHeights vector modified (hires bridge area)
 
 // allocator
-static inline void* (__cdecl* const shok_malloc)(size_t t) = reinterpret_cast<void* (__cdecl*)(size_t)>(0x5C4181);
-static inline void* (__cdecl* const shok_new)(size_t t) = reinterpret_cast<void* (__cdecl*)(size_t)>(0x5C04FB);
-static inline void(__cdecl* const shok_free)(void* p) = reinterpret_cast<void(__cdecl*)(void* p)>(0x5C2E2D);
+#include "s5_mem.h"
+#include "s5_datastructures.h"
 // format i int, f float, x hex int, c char, s const char*
 static inline void (*const shok_logString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
 
-template <class T>
-struct shok_allocator {
-	typedef T value_type;
-	shok_allocator() = default;
-	template <class U> constexpr shok_allocator(const shok_allocator <U>&) noexcept {}
-
-	[[nodiscard]] T* allocate(size_t n) noexcept
-	{
-		void* p = shok_malloc(n * sizeof(T));
-		return (T*)p;
-	}
-	void deallocate(T* p, size_t n) noexcept
-	{
-		shok_free(p);
-	}
-};
-template <class T, class U>
-bool operator==(const shok_allocator <T>&, const shok_allocator <U>&) { return true; }
-template <class T, class U>
-bool operator!=(const shok_allocator <T>&, const shok_allocator <U>&) { return false; }
-
-template <class T>
-struct shok_treeNode {
-	shok_treeNode<T>* left, * parent, * right;
-	T data;
-	bool redblack;
-};
-template <class T>
-struct shok_set { // todo iterators
-	PADDINGI(1);
-	shok_treeNode<T>* root;
-	int size;
-
-private:
-	void ForAllRec(shok_treeNode<T>* d, std::function<void(T*)> lambda) {
-		if (d == root)
-			return;
-		ForAllRec(d->left, lambda);
-		lambda(&d->data);
-		ForAllRec(d->right, lambda);
-	}
-public:
-	void ForAll(std::function<void(T*)> lambda) {
-		ForAllRec(root->parent, lambda);
-	}
-	T* GetFirstMatch(std::function<bool(T*)> lambda) {
-		T* r = nullptr;
-		ForAll([&r, lambda](T* d) {
-			if (r == nullptr && lambda(d))
-				r = d;
-			});
-		return r;
-	}
-};
-
-struct shok_string {
-private:
-	int u1 = 0;
-	int data;
-	int u[4] = { 0 };
-	int size = 0;
-
-public:
-	shok_string(const char* s);
-	shok_string(const shok_string& c);
-	void assign(const char* s);
-	const char* c_str();
-	~shok_string();
-	shok_string();
-};
-
-static_assert(sizeof(shok_string) == 7 * 4);
-
 template<class T>
-inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::function<void(std::vector<T, shok_allocator<T>> &s)> func) {
+inline void shok_saveVector(std::vector<T, shok::Allocator<T>>* vec, std::function<void(std::vector<T, shok::Allocator<T>> &s)> func) {
 #ifdef _DEBUG
-	std::vector<T, shok_allocator<T>> save{};
+	std::vector<T, shok::Allocator<T>> save{};
 	int* vecPoint = reinterpret_cast<int*>(vec);
 	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[3] = {};
@@ -194,9 +120,9 @@ inline void shok_saveVector(std::vector<T, shok_allocator<T>>* vec, std::functio
 #endif
 }
 template<class T>
-inline void shok_saveList(std::list<T, shok_allocator<T>>* vec, std::function<void(std::list<T, shok_allocator<T>>& s)> func) {
+inline void shok_saveList(std::list<T, shok::Allocator<T>>* vec, std::function<void(std::list<T, shok::Allocator<T>>& s)> func) {
 #ifdef _DEBUG
-	std::list<T, shok_allocator<T>> save{};
+	std::list<T, shok::Allocator<T>> save{};
 	int* vecPoint = reinterpret_cast<int*>(vec);
 	int* savePoint = reinterpret_cast<int*>(&save);
 	int backu[2] = {};

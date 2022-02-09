@@ -101,8 +101,8 @@
       <AdditionalDependencies>binkw32_orig.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\binkw32.dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\binkw32.dll"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

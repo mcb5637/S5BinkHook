@@ -286,11 +286,11 @@ private:
 	shok_BB_IPostEvent* PostEvent;
 public:
 	vector_padding;
-	std::vector<int, shok_allocator<int>> SelectedEntities; //11
+	std::vector<int, shok::Allocator<int>> SelectedEntities; //11
 	int ControlledPlayer; // 15
 	PADDINGI(3);
 	vector_padding;
-	std::vector<shok_stateidandcommandstate*, shok_allocator<shok_stateidandcommandstate*>> CommandStates;
+	std::vector<shok_stateidandcommandstate*, shok::Allocator<shok_stateidandcommandstate*>> CommandStates;
 	shok_GGUI_CMouseEffect* MouseEffect;
 	lua_State* GameState;
 	shok_CMouseCursorManager* MouseCursorManager;

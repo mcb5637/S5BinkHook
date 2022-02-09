@@ -4,10 +4,10 @@
 struct shok_EGL_CEffect : shok_BB_IObject {
 	int vtable_EGL_IEffectDisplay;
 	int attachmentvt;
-	shok_set<shok_attachment> ObserverEntities;
-	shok_set<shok_attachment> ObserverEffects;
-	shok_set<shok_attachment> ObservedEntities;
-	shok_set<shok_attachment> ObservedEffects;
+	shok::Set<shok_attachment> ObserverEntities;
+	shok::Set<shok_attachment> ObserverEffects;
+	shok::Set<shok_attachment> ObservedEntities;
+	shok::Set<shok_attachment> ObservedEffects;
 	byte SendEvent; // 20
 	PADDING(3);
 	shok_position Position; // 16

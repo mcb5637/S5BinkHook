@@ -9,7 +9,7 @@ struct shok_BB_CIDManagerEx : shok_object {
 	static inline constexpr int vtp = 0x77F8C4;
 	PADDINGI(1);
 	vector_padding;
-	std::vector<shok_BB_CIDManagerEx_data, shok_allocator<shok_BB_CIDManagerEx_data>> TypeNames;
+	std::vector<shok_BB_CIDManagerEx_data, shok::Allocator<shok_BB_CIDManagerEx_data>> TypeNames;
 
 	int GetIdByName(const char* name);
 	const char* GetNameByID(int id);
@@ -51,7 +51,7 @@ static_assert(sizeof(shok_BB_CIDManagerEx) == 6 * 4);
 struct shok_BB_CIDManager : shok_object {
 	PADDINGI(1);
 	vector_padding;
-	std::vector<shok_BB_CIDManagerEx_data, shok_allocator<shok_BB_CIDManagerEx_data>> TypeNames; // seems to be the same struct
+	std::vector<shok_BB_CIDManagerEx_data, shok::Allocator<shok_BB_CIDManagerEx_data>> TypeNames; // seems to be the same struct
 
 	static inline constexpr int vtp = 0x76C028;
 
@@ -66,12 +66,12 @@ struct shok_EGL_CGLEEntitiesProps : shok_object {
 	shok_BB_CIDManagerEx* UpgradeCategoryManager;
 	shok_BB_CIDManagerEx* BlessCategoryManager;
 	vector_padding;
-	std::vector<shok_EGL_CGLEEntityProps*, shok_allocator<shok_EGL_CGLEEntityProps*>> EntityTypesLogicProps; // 6
+	std::vector<shok_EGL_CGLEEntityProps*, shok::Allocator<shok_EGL_CGLEEntityProps*>> EntityTypesLogicProps; // 6
 	shok_BB_CIDManagerEx* EntityTypeManagerAgain;
 	vector_padding;
-	std::vector<shok_ED_CDisplayEntityProps*, shok_allocator<shok_ED_CDisplayEntityProps*>> EntityTypesDisplayProps; // 11
+	std::vector<shok_ED_CDisplayEntityProps*, shok::Allocator<shok_ED_CDisplayEntityProps*>> EntityTypesDisplayProps; // 11
 	vector_padding;
-	std::vector<shok_GGlue_CGlueEntityProps, shok_allocator<shok_GGlue_CGlueEntityProps>> EntityTypes; // 15
+	std::vector<shok_GGlue_CGlueEntityProps, shok::Allocator<shok_GGlue_CGlueEntityProps>> EntityTypes; // 15
 
 	static inline constexpr int vtp = 0x788834;
 
@@ -118,7 +118,7 @@ struct shok_EGL_CTerrainVertexColors : shok_object {
 struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 	friend struct shok_EGL_CGLELandscape;
 	vector_padding;
-	std::vector<int16_t, shok_allocator<int16_t>> TerrainHeights;
+	std::vector<int16_t, shok::Allocator<int16_t>> TerrainHeights;
 	int MaxSizeX, MaxSizeY; // 5
 	int ArraySizeX, ArraySizeY; // 7
 
@@ -135,9 +135,9 @@ private:
 struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 	friend struct shok_EGL_CGLELandscape;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
+	std::vector<int, shok::Allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
 	vector_padding;
-	std::vector<int, shok_allocator<int>> BridgeHeights;
+	std::vector<int, shok::Allocator<int>> BridgeHeights;
 	int MaxSizeX, MaxSizeY; // 9
 	int ArraySizeX, ArraySizeY; // 11
 
@@ -367,7 +367,7 @@ struct shok_GGL_CDamageClassProps : shok_BB_IObject {
 struct shok_damageClassHolder {
 	shok_BB_CIDManagerEx* DamageClassManager;
 	vector_padding;
-	std::vector<shok_GGL_CDamageClassProps*, shok_allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
+	std::vector<shok_GGL_CDamageClassProps*, shok::Allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
 
 	static inline shok_damageClassHolder** const GlobalObj = reinterpret_cast<shok_damageClassHolder**>(0x85A3DC);
 };
@@ -400,22 +400,22 @@ struct shok_GGL_CLogicProperties_SBlessCategory : shok_object {
 	int Name;
 	float RequiredFaith;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> EntityTypes;
+	std::vector<int, shok::Allocator<int>> EntityTypes;
 
 	static inline constexpr int vtp = 0x76EFC4;
 };
 struct shok_GGL_CLogicProperties : shok_BB_IObject {
 	int CompensationOnBuildingSale;
 	vector_padding;
-	std::vector<shok_GGL_CLogicProperties_SBuildingUpgradeCategory, shok_allocator<shok_GGL_CLogicProperties_SBuildingUpgradeCategory>> BuildingUpgrades;
+	std::vector<shok_GGL_CLogicProperties_SBuildingUpgradeCategory, shok::Allocator<shok_GGL_CLogicProperties_SBuildingUpgradeCategory>> BuildingUpgrades;
 	vector_padding;
-	std::vector<shok_GGL_CLogicProperties_SSettlerUpgradeCategory, shok_allocator<shok_GGL_CLogicProperties_SSettlerUpgradeCategory>> SettlerUpgrades;
+	std::vector<shok_GGL_CLogicProperties_SSettlerUpgradeCategory, shok::Allocator<shok_GGL_CLogicProperties_SSettlerUpgradeCategory>> SettlerUpgrades;
 	vector_padding;
-	std::vector<shok_GGL_CLogicProperties_STaxationLevel, shok_allocator<shok_GGL_CLogicProperties_STaxationLevel>> TaxationLevels;
+	std::vector<shok_GGL_CLogicProperties_STaxationLevel, shok::Allocator<shok_GGL_CLogicProperties_STaxationLevel>> TaxationLevels;
 	vector_padding;
-	std::vector<shok_GGL_CLogicProperties_STradeResource, shok_allocator<shok_GGL_CLogicProperties_STradeResource>> TradeResources;
+	std::vector<shok_GGL_CLogicProperties_STradeResource, shok::Allocator<shok_GGL_CLogicProperties_STradeResource>> TradeResources;
 	vector_padding;
-	std::vector<shok_GGL_CLogicProperties_SBlessCategory, shok_allocator<shok_GGL_CLogicProperties_SBlessCategory>> BlessCategories; // 18
+	std::vector<shok_GGL_CLogicProperties_SBlessCategory, shok::Allocator<shok_GGL_CLogicProperties_SBlessCategory>> BlessCategories; // 18
 	float BuildingUnderConstructionExplorationFactor, BuildingPlacementSnapDistance, BuildingClosedHealthFactor, WeatherExplorationBuildingSnowFactor, WeatherExplorationSettlerSnowFactor;
 	float WeatherMoveSpeedSnowFactor, WeatherExplorationBuildingRainFactor, WeatherExplorationSettlerRainFactor, WeatherMoveSpeedRainFactor;
 	int WeatherMissChanceChangeRain, WeatherMissChanceChangeSnow;
@@ -490,7 +490,7 @@ struct shok_GGL_CPlayerAttractionProps : shok_BB_IObject {
 
 struct shok_GGL_CGLGameLogic_TechList {
 	vector_padding;
-	std::vector<shok_technology*, shok_allocator<shok_technology*>> TechList;
+	std::vector<shok_technology*, shok::Allocator<shok_technology*>> TechList;
 };
 
 struct shok_GGL_CWeatherHandler_weatherElement {
@@ -515,7 +515,7 @@ struct shok_GGL_CWeatherHandler : shok_object {
 	PADDINGI(1);// 3 next nonperiodic weather?
 	int NextWeatherIndex;
 	int CurrentWeatherOffset; // 5
-	shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement> Elements;
+	shok::Set<shok_GGL_CWeatherHandler_KeyAndWeatherElement> Elements;
 	int NextPeriodicWeatherStartTimeOffset;
 	struct { // 10
 		int CurrentWeatherGFXState; //0
@@ -599,7 +599,7 @@ struct shok_BB_CBBArchiveFile : shok_BB_IFileSystem {
 };
 struct shok_BB_CFileSystemMgr : shok_object {
 	vector_padding;
-	std::vector<shok_BB_IFileSystem*, shok_allocator<shok_BB_IFileSystem*>> LoadOrder;
+	std::vector<shok_BB_IFileSystem*, shok::Allocator<shok_BB_IFileSystem*>> LoadOrder;
 
 	static inline constexpr int vtp = 0x77F794;
 
@@ -631,15 +631,15 @@ struct shok_ED_CDisplayProps : shok_object {
 	shok_color InvalidPositionColorModulate;
 	shok_color InvalidPositionColorEmissive;
 	vector_padding;
-	std::vector<shok_color, shok_allocator<shok_color>> PlayerColor;
+	std::vector<shok_color, shok::Allocator<shok_color>> PlayerColor;
 	vector_padding;
-	std::vector<shok_color, shok_allocator<shok_color>> MiniMapColor;
+	std::vector<shok_color, shok::Allocator<shok_color>> MiniMapColor;
 	float SelectionRadiusScaleForModelsWithDecal;
 	int FogOfWarNeverSeenLuminance;
 	int FogOfWarSeenLuminance;
 	float AuraRadius;
 	float AuraHeight;
-	shok_string AuraTexture;
+	shok::String AuraTexture;
 	int CommandAcknowledgementModel;
 	int CommandAcknowledgementDuration;
 

@@ -52,7 +52,7 @@ struct shok_BB_CClassFactory_serializationData_ListOptions {
 	size_t(__stdcall* GetSize)(void* List) = nullptr;
 };
 template<class T>
-struct shok_BB_CClassFactory_serializationData_ListOptions_ForVector : shok_BB_CClassFactory_serializationData_ListOptions { // do not use with shok_allocator vector!
+struct shok_BB_CClassFactory_serializationData_ListOptions_ForVector : shok_BB_CClassFactory_serializationData_ListOptions { // do not use with shok::Allocator vector!
 
 	shok_BB_CClassFactory_serializationData_ListOptions_ForVector() {
 		AddToList = [](void* l) {

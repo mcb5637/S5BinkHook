@@ -343,7 +343,7 @@ struct shok_EGL_CNetEventEntityAndPos : shok_BB_CEvent {
 struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
 	int EntityId;
 	vector_padding;
-	std::vector<shok_position, shok_allocator<shok_position>> Positions;
+	std::vector<shok_position, shok::Allocator<shok_position>> Positions;
 	float Rotation;
 
 	shok_EGL_CNetEventEntityAndPosArray(shok_NetEventIds id, int ent, float r);
@@ -470,7 +470,7 @@ struct shok_GGL_CNetEventBuildingCreator : shok_EGL_CNetEventPlayerID { // add a
 	int UpgradeCategory;
 	shok_positionRot Position;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> Serfs;
+	std::vector<int, shok::Allocator<int>> Serfs;
 
 	shok_GGL_CNetEventBuildingCreator(shok_NetEventIds id, int pl, int ucat, const shok_positionRot& p);
 	shok_GGL_CNetEventBuildingCreator(shok_GGL_CNetEventBuildingCreator&&) = default;

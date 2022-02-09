@@ -1300,7 +1300,7 @@ int l_buildingRemoveLastMerchantOffer(lua_State* L) {
 	shok_GGL_CBuildingMerchantBehavior* m = b->GetBehavior<shok_GGL_CBuildingMerchantBehavior>();
 	luaext_assertPointer(L, m, "no merchant");
 	luaext_assert(L, m->Offer.size() > 0, "is empty");
-	shok_saveVector<shok_GGL_CBuildingMerchantBehavior_COffer*>(&m->Offer, [](std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok_allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>>& a) {
+	shok_saveVector<shok_GGL_CBuildingMerchantBehavior_COffer*>(&m->Offer, [](std::vector<shok_GGL_CBuildingMerchantBehavior_COffer*, shok::Allocator<shok_GGL_CBuildingMerchantBehavior_COffer*>>& a) {
 		a.pop_back();
 		});
 	return 0;
@@ -1517,7 +1517,7 @@ void l_settler_createAnimTaskList(lua_State* L) {
 	if (!tid) {
 		shok_EGL_CGLETaskList* tl = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<shok_EGL_CGLETaskList>();
 
-		shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>>& v) {
+		shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok::Allocator<shok_EGL_CGLETaskArgs*>>& v) {
 			shok_BB_CClassFactory* fact = *shok_BB_CClassFactory::GlobalObj;
 			{
 				shok_EGL_CGLETaskArgsThousandths* t = fact->CreateObject<shok_EGL_CGLETaskArgsThousandths>();

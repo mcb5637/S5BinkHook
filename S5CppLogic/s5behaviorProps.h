@@ -268,21 +268,21 @@ struct shok_serf_extractionInfo {
 struct shok_GGL_CSerfBehaviorProps : shok_EGL_CGLEBehaviorProps {
 	int ResourceSearchRadius, ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList; //4
 	vector_padding;
-	std::vector<shok_serf_extractionInfo, shok_allocator<shok_serf_extractionInfo>> ExtractionInfo;
+	std::vector<shok_serf_extractionInfo, shok::Allocator<shok_serf_extractionInfo>> ExtractionInfo;
 
 	static inline constexpr int vtp = 0x774A14;
 	static inline constexpr int TypeDesc = 0x819B1C;
 };
 
 struct shok_limitedAttachmentProps {
-	shok_string Type;
+	shok::String Type;
 	int Limit;
 	bool IsActive;
 	PADDING(3);
 };
 struct shok_GGL_CLimitedAttachmentBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	vector_padding;
-	std::vector<shok_limitedAttachmentProps, shok_allocator<shok_limitedAttachmentProps>> Attachments;
+	std::vector<shok_limitedAttachmentProps, shok::Allocator<shok_limitedAttachmentProps>> Attachments;
 
 	static inline constexpr int vtp = 0x775EB4;
 	static inline constexpr int TypeDesc = 0x81D70C;
@@ -293,7 +293,7 @@ struct shok_idleAnimProps {
 };
 struct shok_GGL_CFormationBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	vector_padding;
-	std::vector<shok_idleAnimProps, shok_allocator<shok_idleAnimProps>> IdleAnims;
+	std::vector<shok_idleAnimProps, shok::Allocator<shok_idleAnimProps>> IdleAnims;
 
 	static inline constexpr int vtp = 0x776DE4;
 	static inline constexpr int TypeDesc = 0x8212CC;
@@ -331,7 +331,7 @@ struct shok_GGL_CBombBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	float Radius, Delay;
 	int Damage, ExplosionEffectID;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> AffectedEntityTypes;
+	std::vector<int, shok::Allocator<int>> AffectedEntityTypes;
 
 	static inline constexpr int vtp = 0x7784A0;
 	static inline constexpr int TypeDesc = 0x82587C;
@@ -388,7 +388,7 @@ struct shok_GGL_CResourceRefinerBehaviorProperties : shok_EGL_CGLEBehaviorProps 
 	int ResourceType; // 4
 	float InitialFactor;
 	vector_padding;
-	std::vector<shok_resourceRefinerEfficencyUpgrade, shok_allocator<shok_resourceRefinerEfficencyUpgrade>> Efficiency;
+	std::vector<shok_resourceRefinerEfficencyUpgrade, shok::Allocator<shok_resourceRefinerEfficencyUpgrade>> Efficiency;
 	int SupplierCategory;
 
 	static inline constexpr int vtp = 0x774C24;
@@ -427,7 +427,7 @@ struct shok_GGL_CFoundryBehaviorProperties_CannonInfo {
 };
 struct shok_GGL_CFoundryBehaviorProperties : shok_EGL_CGLEBehaviorProps {
 	vector_padding;
-	std::vector<shok_GGL_CFoundryBehaviorProperties_CannonInfo, shok_allocator<shok_GGL_CFoundryBehaviorProperties_CannonInfo>> CannonInfo;
+	std::vector<shok_GGL_CFoundryBehaviorProperties_CannonInfo, shok::Allocator<shok_GGL_CFoundryBehaviorProperties_CannonInfo>> CannonInfo;
 
 	static inline constexpr int vtp = 0x778B80;
 	static inline constexpr int TypeDesc = 0x827F78;

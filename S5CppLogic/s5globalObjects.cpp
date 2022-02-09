@@ -123,8 +123,8 @@ int shok_BB_CIDManagerEx::GetIDByNameOrCreate(const char* name)
 
 void shok_BB_CIDManagerEx::RemoveID(int id)
 {
-	shok_saveVector<shok_BB_CIDManagerEx_data>(&TypeNames, [id](std::vector<shok_BB_CIDManagerEx_data, shok_allocator<shok_BB_CIDManagerEx_data>>& v) {
-		shok_free(v.at(id).Name);
+	shok_saveVector<shok_BB_CIDManagerEx_data>(&TypeNames, [id](std::vector<shok_BB_CIDManagerEx_data, shok::Allocator<shok_BB_CIDManagerEx_data>>& v) {
+		shok::Free(v.at(id).Name);
 		v[id].Name = nullptr;
 		v[id].Hash = 0;
 		if (id == static_cast<int>(v.size() - 1))
@@ -406,11 +406,11 @@ void shok_EGL_CGLETerrainLowRes::CheckBridgeHeightSize()
 	}
 	int** vec = reinterpret_cast<int**>(&BridgeHeights);
 #ifdef _DEBUG
-	shok_free(vec[1]);
+	shok::Free(vec[1]);
 	for (int i = 0; i < 4; i++)
 		vec[i] = nullptr;
 #else
-	shok_free(vec[0]);
+	shok::Free(vec[0]);
 	for (int i = -1; i < 3; i++)
 		vec[i] = nullptr;
 #endif
@@ -885,8 +885,8 @@ void shok_GGL_CWeatherHandler::AddWeatherElement(int state, int dur, bool peri, 
 	weatherdata_addelement(this, state, dur, peri, forerun, gfx, transition);
 }
 
-static inline void(__thiscall* const weatherdata_elements_remove)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>*, int*)>(0x513D32);
-static inline void(__thiscall* const weatherdata_elements_add)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>* th, shok_GGL_CWeatherHandler_weatherElement* e) = reinterpret_cast<void(__thiscall*)(shok_set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>*, shok_GGL_CWeatherHandler_weatherElement*)>(0x513CB6);
+static inline void(__thiscall* const weatherdata_elements_remove)(shok::Set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok::Set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>*, int*)>(0x513D32);
+static inline void(__thiscall* const weatherdata_elements_add)(shok::Set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>* th, shok_GGL_CWeatherHandler_weatherElement* e) = reinterpret_cast<void(__thiscall*)(shok::Set<shok_GGL_CWeatherHandler_KeyAndWeatherElement>*, shok_GGL_CWeatherHandler_weatherElement*)>(0x513CB6);
 void shok_GGL_CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, int transition)
 {
 	// save data

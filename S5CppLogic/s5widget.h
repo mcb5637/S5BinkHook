@@ -21,8 +21,8 @@ struct shok_EGUIX_CFontIDHandler : shok_BB_IObject { // size 2
 };
 
 struct shok_EGUIX_CSingleStringHandler : shok_BB_IObject { // size 15
-	shok_string StringTableKey;
-	shok_string RawString;
+	shok::String StringTableKey;
+	shok::String RawString;
 
 	const char* GetString();
 
@@ -56,7 +56,7 @@ struct shoc_EScr_CLuaFuncRefCommand : shok_object {
 	lua_State* L;
 	int NeedsCompile;
 	int Ref;
-	shok_string LuaCommand;
+	shok::String LuaCommand;
 	PADDINGI(1);
 
 	static inline constexpr int vtp = 0x786BE0;
@@ -64,7 +64,7 @@ struct shoc_EScr_CLuaFuncRefCommand : shok_object {
 };
 
 struct shok_EGUIX_CLuaFunctionHelper : shok_BB_IObject { // size 20
-	shok_string LuaCommand;
+	shok::String LuaCommand;
 	shoc_EScr_CLuaFuncRefCommand FuncRefCommand;
 
 	static inline constexpr int vtp = 0x780994;
@@ -138,7 +138,7 @@ struct shok_EGUIX_CBaseWidget : shok_BB_IObject { // size 14
 
 struct shok_EGUIX_CWidgetListHandler : shok_object {
 	vector_padding;
-	std::list<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>> SubWidgets;
+	std::list<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>> SubWidgets;
 
 	static inline constexpr int vtp = 0x78098C;
 	static inline constexpr int TypeDesc = 0x833240;
@@ -252,11 +252,11 @@ struct shok_EGUIX_CProgressBarWidget : shok_EGUIX_CStaticWidget {
 
 struct shok_EGUIX_CCustomWidget : shok_EGUIX_CBaseWidget {
 	int vtable_EGUIX_IRender;
-	shok_string CustomClassName; // 15
+	shok::String CustomClassName; // 15
 	void* CustomWidget; // 22 p to EGUIX::ICustomWidget
 	int IntegerUserVariable0DefaultValue, IntegerUserVariable1DefaultValue, IntegerUserVariable2DefaultValue, IntegerUserVariable3DefaultValue,
 		IntegerUserVariable4DefaultValue, IntegerUserVariable5DefaultValue;
-	shok_string StringUserVariable0DefaultValue, StringUserVariable1DefaultValue; //29
+	shok::String StringUserVariable0DefaultValue, StringUserVariable1DefaultValue; //29
 
 	void InitializeCustomWidget();
 
@@ -283,7 +283,7 @@ struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_BB_IObject {
 struct shok_widgetManager { // this thing has no vtable...
 	shok_BB_CIDManagerEx* WidgetNameManager;
 	vector_padding;
-	std::vector<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>> Widgets;
+	std::vector<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>> Widgets;
 
 	int GetIdByName(const char* name);
 	shok_EGUIX_CBaseWidget* GetWidgetByID(int id);

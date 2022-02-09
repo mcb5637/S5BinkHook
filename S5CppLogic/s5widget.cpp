@@ -217,8 +217,8 @@ void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const
         widman_addWidget(m, toAdd, newId);
         reinterpret_cast<shok_vtable_EGUIX_CContainerWidget*>(vtable)->AddChild(this, toAdd);
         if (before) {
-            shok_saveList<shok_EGUIX_CBaseWidget*>(&WidgetListHandler.SubWidgets, [before](std::list<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>>& l) {
-                std::list<shok_EGUIX_CBaseWidget*, shok_allocator<shok_EGUIX_CBaseWidget*>>::iterator it = l.begin();
+            shok_saveList<shok_EGUIX_CBaseWidget*>(&WidgetListHandler.SubWidgets, [before](std::list<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>>& l) {
+                std::list<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>>::iterator it = l.begin();
                 while (it != l.end()) {
                     if (*it == before) {
                         l.splice(it, l, --l.end());
@@ -238,7 +238,7 @@ static inline void(__thiscall* const widlisthandler_ctor)(shok_EGUIX_CWidgetList
 static inline void(__thiscall* const statwid_ctor)(shok_EGUIX_CStaticWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CStaticWidget*)>(0x5603F1);
 shok_EGUIX_CStaticWidget* shok_EGUIX_CStaticWidget::Create()
 {
-    shok_EGUIX_CStaticWidget* r = reinterpret_cast<shok_EGUIX_CStaticWidget*>(shok_malloc(sizeof(shok_EGUIX_CStaticWidget)));
+    shok_EGUIX_CStaticWidget* r = reinterpret_cast<shok_EGUIX_CStaticWidget*>(shok::Malloc(sizeof(shok_EGUIX_CStaticWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CStaticWidget));
     statwid_ctor(r);
     r->IsShown = false;
@@ -247,7 +247,7 @@ shok_EGUIX_CStaticWidget* shok_EGUIX_CStaticWidget::Create()
 static inline void(__thiscall* const stattextwid_ctor)(shok_EGUIX_CStaticTextWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CStaticTextWidget*)>(0x55FBB1);
 shok_EGUIX_CStaticTextWidget* shok_EGUIX_CStaticTextWidget::Create()
 {
-    shok_EGUIX_CStaticTextWidget* r = reinterpret_cast<shok_EGUIX_CStaticTextWidget*>(shok_malloc(sizeof(shok_EGUIX_CStaticTextWidget)));
+    shok_EGUIX_CStaticTextWidget* r = reinterpret_cast<shok_EGUIX_CStaticTextWidget*>(shok::Malloc(sizeof(shok_EGUIX_CStaticTextWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CStaticTextWidget));
     stattextwid_ctor(r);
     r->IsShown = false;
@@ -256,7 +256,7 @@ shok_EGUIX_CStaticTextWidget* shok_EGUIX_CStaticTextWidget::Create()
 static inline void(__thiscall* const purettwid_ctor)(shok_EGUIX_CPureTooltipWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CPureTooltipWidget*)>(0x55DF3E);
 shok_EGUIX_CPureTooltipWidget* shok_EGUIX_CPureTooltipWidget::Create()
 {
-    shok_EGUIX_CPureTooltipWidget* r = reinterpret_cast<shok_EGUIX_CPureTooltipWidget*>(shok_malloc(sizeof(shok_EGUIX_CPureTooltipWidget)));
+    shok_EGUIX_CPureTooltipWidget* r = reinterpret_cast<shok_EGUIX_CPureTooltipWidget*>(shok::Malloc(sizeof(shok_EGUIX_CPureTooltipWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CPureTooltipWidget));
     purettwid_ctor(r);
     r->IsShown = false;
@@ -265,7 +265,7 @@ shok_EGUIX_CPureTooltipWidget* shok_EGUIX_CPureTooltipWidget::Create()
 static inline void(__thiscall* const gfxbutwid_ctor)(shok_EGUIX_CGfxButtonWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CGfxButtonWidget*)>(0x55E917);
 shok_EGUIX_CGfxButtonWidget* shok_EGUIX_CGfxButtonWidget::Create()
 {
-    shok_EGUIX_CGfxButtonWidget* r = reinterpret_cast<shok_EGUIX_CGfxButtonWidget*>(shok_malloc(sizeof(shok_EGUIX_CGfxButtonWidget)));
+    shok_EGUIX_CGfxButtonWidget* r = reinterpret_cast<shok_EGUIX_CGfxButtonWidget*>(shok::Malloc(sizeof(shok_EGUIX_CGfxButtonWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CGfxButtonWidget));
     gfxbutwid_ctor(r);
     r->IsShown = false;
@@ -275,7 +275,7 @@ shok_EGUIX_CGfxButtonWidget* shok_EGUIX_CGfxButtonWidget::Create()
 static inline void(__thiscall* const txtbutwid_ctor)(shok_EGUIX_CTextButtonWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CTextButtonWidget*)>(0x55EFA3);
 shok_EGUIX_CTextButtonWidget* shok_EGUIX_CTextButtonWidget::Create()
 {
-    shok_EGUIX_CTextButtonWidget* r = reinterpret_cast<shok_EGUIX_CTextButtonWidget*>(shok_malloc(sizeof(shok_EGUIX_CTextButtonWidget)));
+    shok_EGUIX_CTextButtonWidget* r = reinterpret_cast<shok_EGUIX_CTextButtonWidget*>(shok::Malloc(sizeof(shok_EGUIX_CTextButtonWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CTextButtonWidget));
     txtbutwid_ctor(r);
     r->IsShown = false;
@@ -284,7 +284,7 @@ shok_EGUIX_CTextButtonWidget* shok_EGUIX_CTextButtonWidget::Create()
 static inline void(__thiscall* const progbarwid_ctor)(shok_EGUIX_CProgressBarWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CProgressBarWidget*)>(0x55E300);
 shok_EGUIX_CProgressBarWidget* shok_EGUIX_CProgressBarWidget::Create()
 {
-    shok_EGUIX_CProgressBarWidget* r = reinterpret_cast<shok_EGUIX_CProgressBarWidget*>(shok_malloc(sizeof(shok_EGUIX_CProgressBarWidget)));
+    shok_EGUIX_CProgressBarWidget* r = reinterpret_cast<shok_EGUIX_CProgressBarWidget*>(shok::Malloc(sizeof(shok_EGUIX_CProgressBarWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CProgressBarWidget));
     progbarwid_ctor(r);
     r->IsShown = false;
@@ -293,7 +293,7 @@ shok_EGUIX_CProgressBarWidget* shok_EGUIX_CProgressBarWidget::Create()
 static inline void(__thiscall* const contwid_ctor)(shok_EGUIX_CContainerWidget* th) = reinterpret_cast<void(__thiscall*)(shok_EGUIX_CContainerWidget*)>(0x560DAD);
 shok_EGUIX_CContainerWidget* shok_EGUIX_CContainerWidget::Create()
 {
-    shok_EGUIX_CContainerWidget* r = reinterpret_cast<shok_EGUIX_CContainerWidget*>(shok_malloc(sizeof(shok_EGUIX_CContainerWidget)));
+    shok_EGUIX_CContainerWidget* r = reinterpret_cast<shok_EGUIX_CContainerWidget*>(shok::Malloc(sizeof(shok_EGUIX_CContainerWidget)));
     memset(r, 0, sizeof(shok_EGUIX_CContainerWidget));
     contwid_ctor(r);
     r->IsShown = false;

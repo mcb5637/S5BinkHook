@@ -24,35 +24,35 @@ struct shok_GGL_CPlayerAttractionHandler : shok_BB_IObject {
 	PADDING(2);
 	PADDINGI(2); // maybe char pointer? GUI_WorkersWithoutSleepPlace m_GUI_WorkersWithoutEatPlace
 	vector_padding;
-	std::vector<shok_GGL_CPlayerAttractionHandler_entityinsystem, shok_allocator<shok_GGL_CPlayerAttractionHandler_entityinsystem>> EntityInSystem;
+	std::vector<shok_GGL_CPlayerAttractionHandler_entityinsystem, shok::Allocator<shok_GGL_CPlayerAttractionHandler_entityinsystem>> EntityInSystem;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> HeadquarterArray;
+	std::vector<int, shok::Allocator<int>> HeadquarterArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> VillageCenterArray;
+	std::vector<int, shok::Allocator<int>> VillageCenterArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> WorkBuildingsArray;
+	std::vector<int, shok::Allocator<int>> WorkBuildingsArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> ResidenceBuildingArray;
+	std::vector<int, shok::Allocator<int>> ResidenceBuildingArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> FarmBuildingArray;
+	std::vector<int, shok::Allocator<int>> FarmBuildingArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> BarrackBuildingArray;
+	std::vector<int, shok::Allocator<int>> BarrackBuildingArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> FreeWorkerArray;
+	std::vector<int, shok::Allocator<int>> FreeWorkerArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> EmployedWorkerArray;
+	std::vector<int, shok::Allocator<int>> EmployedWorkerArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> SoldierArray;
+	std::vector<int, shok::Allocator<int>> SoldierArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> LeaderArray;
+	std::vector<int, shok::Allocator<int>> LeaderArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> HeroArray;
+	std::vector<int, shok::Allocator<int>> HeroArray;
 	vector_padding;
-	std::vector<int, shok_allocator<int>> SerfArray;
+	std::vector<int, shok::Allocator<int>> SerfArray;
 	vector_padding;
-	std::vector<shok_GGL_CPlayerAttractionHandler_typethatleft, shok_allocator<shok_GGL_CPlayerAttractionHandler_typethatleft>> EntityTypeThatLeft;
+	std::vector<shok_GGL_CPlayerAttractionHandler_typethatleft, shok::Allocator<shok_GGL_CPlayerAttractionHandler_typethatleft>> EntityTypeThatLeft;
 	vector_padding;
-	std::vector<shok_GGL_CPlayerAttractionHandler_typecount, shok_allocator<shok_GGL_CPlayerAttractionHandler_typecount>> EntityTypeCountMap;
+	std::vector<shok_GGL_CPlayerAttractionHandler_typecount, shok::Allocator<shok_GGL_CPlayerAttractionHandler_typecount>> EntityTypeCountMap;
 
 	static inline constexpr int vtp = 0x770868;
 
@@ -71,7 +71,7 @@ struct shok_GGL_CPlayerAttractionHandler : shok_BB_IObject {
 
 struct shok_GGL_CUpgradeManager_jobdata {
 	int Category;
-	shok_set<int[3]> UpgradeJobData; // UpgradeProgress, Category, UpgradeManager
+	shok::Set<int[3]> UpgradeJobData; // UpgradeProgress, Category, UpgradeManager
 };
 struct shok_GGL_CUpgradeManager_UCatEntry {
 	int UCat;
@@ -79,8 +79,8 @@ struct shok_GGL_CUpgradeManager_UCatEntry {
 	int FirstEntityType;
 };
 struct shok_GGL_CUpgradeManager : shok_BB_IObject {
-	shok_set<shok_GGL_CUpgradeManager_jobdata> JobData; // empty
-	shok_set<shok_GGL_CUpgradeManager_UCatEntry> UpgradeCategories;
+	shok::Set<shok_GGL_CUpgradeManager_jobdata> JobData; // empty
+	shok::Set<shok_GGL_CUpgradeManager_UCatEntry> UpgradeCategories;
 	int PlayerID;
 
 	static inline constexpr int vtp = 0x7728CC;
@@ -88,7 +88,7 @@ struct shok_GGL_CUpgradeManager : shok_BB_IObject {
 	int GetUpgradeCategoryOfEntityType(int etype);
 };
 struct shok_GGL_CBuildingUpgradeManager : shok_GGL_CUpgradeManager {
-	shok_set<int[3]> ScholarInfoElement; // Category, ScholarInfo { ?, CurrentAmount } ?
+	shok::Set<int[3]> ScholarInfoElement; // Category, ScholarInfo { ?, CurrentAmount } ?
 
 	static inline constexpr int vtp = 0x772948;
 };
@@ -107,7 +107,7 @@ struct shok_GGL_CTradeManager_data {
 struct shok_GGL_CTradeManager : shok_BB_IObject {
 	int PlayerID;
 	vector_padding;
-	std::vector<shok_GGL_CTradeManager_data, shok_allocator<shok_GGL_CTradeManager_data>> TradeData;
+	std::vector<shok_GGL_CTradeManager_data, shok::Allocator<shok_GGL_CTradeManager_data>> TradeData;
 
 	static inline constexpr int vtp = 0x772860;
 };
@@ -121,7 +121,7 @@ struct shok_GGL_CPlayerStatus_techData_tech {
 struct shok_GGL_CPlayerStatus_techData { // size 12
 	int PlayerID;
 	vector_padding;
-	std::vector<shok_GGL_CPlayerStatus_techData_tech, shok_allocator<shok_GGL_CPlayerStatus_techData_tech>> TechnologyState;
+	std::vector<shok_GGL_CPlayerStatus_techData_tech, shok::Allocator<shok_GGL_CPlayerStatus_techData_tech>> TechnologyState;
 	PADDINGI(4); // vector<?> TechnologyInProcess
 	PADDINGI(3);
 };
@@ -131,28 +131,28 @@ struct shok_GGL_CPlayerStatus_tributeData_tribute {
 	shok_costInfo Costs;
 	int OwnerEntityID;
 	int OfferingPlayerID;
-	shok_string OfferStringTableKey;
+	shok::String OfferStringTableKey;
 };
 struct shok_GGL_CPlayerStatus_tributeData {
 	int PlayerID;
 	vector_padding;
-	std::vector<shok_GGL_CPlayerStatus_tributeData, shok_allocator<shok_GGL_CPlayerStatus_tributeData>> Tributes;
+	std::vector<shok_GGL_CPlayerStatus_tributeData, shok::Allocator<shok_GGL_CPlayerStatus_tributeData>> Tributes;
 };
 static_assert(sizeof(shok_GGL_CPlayerStatus_tributeData) == 5 * 4);
 struct shok_GGL_CPlayerStatus_questData_quest {
 	int UniqueQuestID;
 	int QuestType;
-	shok_string QuestNameStringTableKey, QuestDescriptionStringTableKey;
+	shok::String QuestNameStringTableKey, QuestDescriptionStringTableKey;
 	int SubQuestDoneFlagArray[6]; // type?
 };
 struct shok_GGL_CPlayerStatus_questData {
 	int PlayerID;
 	vector_padding;
-	std::list< shok_GGL_CPlayerStatus_questData_quest, shok_allocator< shok_GGL_CPlayerStatus_questData_quest>> Quests;
+	std::list< shok_GGL_CPlayerStatus_questData_quest, shok::Allocator< shok_GGL_CPlayerStatus_questData_quest>> Quests;
 };
 struct shok_statisticsTimeline {
 	vector_padding;
-	std::vector<int, shok_allocator<int>> Amounts;
+	std::vector<int, shok::Allocator<int>> Amounts;
 	int PlayerID;
 	int LastGatherTurn;
 };
@@ -164,7 +164,7 @@ struct shok_GGL_CResourceStatistics_data {
 };
 struct shok_GGL_CResourceStatistics : shok_object {
 	vector_padding;
-	std::vector<shok_GGL_CResourceStatistics_data, shok_allocator<shok_GGL_CResourceStatistics_data>> Data;
+	std::vector<shok_GGL_CResourceStatistics_data, shok::Allocator<shok_GGL_CResourceStatistics_data>> Data;
 	PADDINGI(1);
 
 	static inline constexpr int vtp = 0x76E0D8;
@@ -183,9 +183,9 @@ struct shok_GGL_CGameStatistics : shok_object {
 		SerfTimeLine, WorkerTimeLine, LeaderTimeLine, HeroTimeLine, SoldierTimeLine, FarmTimeLine, ResidenceTimeLine,
 		WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine; // la 102, 96, 90
 	vector_padding;
-	std::vector<shok_statisticsTechResearched, shok_allocator<shok_statisticsTechResearched>> ResearchedTechnologies;
+	std::vector<shok_statisticsTechResearched, shok::Allocator<shok_statisticsTechResearched>> ResearchedTechnologies;
 	vector_padding;
-	std::vector<shok_statisticsBuildingUpgraded, shok_allocator<shok_statisticsBuildingUpgraded>> UpgradedBuildings;
+	std::vector<shok_statisticsBuildingUpgraded, shok::Allocator<shok_statisticsBuildingUpgraded>> UpgradedBuildings;
 
 	static inline constexpr int vtp = 0x76E0E0;
 };
@@ -200,7 +200,7 @@ struct shok_GGL_CPlayerStatus : shok_BB_IObject {
 	PADDING(3);
 	int PlayerColorR, PlayerColorG, PlayerColorB;
 	int PlayerID;
-	shok_string PlayerNameStringTableKey, PlayerNameStringRaw;
+	shok::String PlayerNameStringTableKey, PlayerNameStringRaw;
 	shok_costInfo CurrentResources; // 23
 	float TaxAmountFactor;
 	int TaxLevel; // 42

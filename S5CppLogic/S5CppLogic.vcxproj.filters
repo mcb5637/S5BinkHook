@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="shok">
+      <UniqueIdentifier>{7ad01b2a-adbd-4258-bc71-1270c3a75ae3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -135,6 +138,12 @@
     <ClInclude Include="lua50\lualib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="s5_mem.h">
+      <Filter>shok</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_datastructures.h">
+      <Filter>shok</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -231,6 +240,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Luapp\luapp50.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_datastructures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

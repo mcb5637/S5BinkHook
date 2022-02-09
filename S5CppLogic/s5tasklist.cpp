@@ -42,7 +42,7 @@ int shok_EGL_CGLETaskListMgr::RegisterTaskList(shok_EGL_CGLETaskList* tl, const 
     if (static_cast<int>(TaskLists.size()) != tid)
         throw std::exception("ids dont match!");
     tl->TaskListID = tid;
-    shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>>& v) {
+    shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok::Allocator<shok_EGL_CGLETaskList*>>& v) {
         v.push_back(tl);
         });
     return tid;
@@ -53,14 +53,14 @@ void shok_EGL_CGLETaskListMgr::RemoveTaskList(int tid)
         if (static_cast<int>(TaskLists.size()) != tid + 1)
             throw std::exception("ids dont match!");
         shok_EGL_CGLETaskList* tl = GetTaskListByID(tid);
-        shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok_allocator<shok_EGL_CGLETaskArgs*>>& v) {
+        shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok::Allocator<shok_EGL_CGLETaskArgs*>>& v) {
             for (shok_EGL_CGLETaskArgs* p : v) {
                 p->Destructor(true);
             }
             v.clear();
             });
         tl->Destructor(true);
-        shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok_allocator<shok_EGL_CGLETaskList*>>& v) {
+        shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok::Allocator<shok_EGL_CGLETaskList*>>& v) {
             v.pop_back();
             });
         TaskListManager->RemoveID(tid);
@@ -72,14 +72,14 @@ const char* TaskLuaFunc = "TASK_LUA_FUNC";
 const char* TaskWaitForAnimNonCancel = "TASK_WAIT_FOR_ANIM_NON_CANCELABLE";
 void shok_taskData::AddExtraTasks()
 {
-    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
+    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok::Allocator<shok_taskData>>& v) {
         v.push_back(shok_taskData{ TaskLuaFunc, 0xB3F8356D, shok_Task::TASK_LUA_FUNC });
         v.push_back(shok_taskData{ TaskWaitForAnimNonCancel, 0x230862d8, shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE });
         });
 }
 void shok_taskData::RemoveExtraTasks()
 {
-    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok_allocator<shok_taskData>>& v) {
+    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok::Allocator<shok_taskData>>& v) {
         v.erase(std::remove_if(v.begin(), v.end(), [](shok_taskData& a) {
             return a.TaskName == TaskLuaFunc || a.TaskName == TaskWaitForAnimNonCancel;
             }), v.end());

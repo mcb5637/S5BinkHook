@@ -5,37 +5,6 @@
 #include <libloaderapi.h>
 
 
-static inline void(__thiscall* const str_ctor)(shok_string* th, const char* s) = reinterpret_cast<void(__thiscall*)(shok_string*, const char*)>(0x4018C6);
-shok_string::shok_string(const char* s)
-{
-	str_ctor(this, s);
-}
-static inline void(__thiscall* const str_ctorcopy)(shok_string* th, const shok_string* ot) = reinterpret_cast<void(__thiscall*)(shok_string*, const shok_string*)>(0x401808);
-shok_string::shok_string(const shok_string& c)
-{
-	str_ctorcopy(this, &c);
-}
-const char* shok_string::c_str()
-{
-	if (size < 16)
-		return reinterpret_cast<const char*>(&data);
-	else
-		return reinterpret_cast<const char*>(data);
-}
-shok_string::~shok_string()
-{
-	if (size >= 16)
-		shok_free(reinterpret_cast<void*>(data));
-}
-static inline void(__thiscall* const str_assign)(shok_string* th, const char* c) = reinterpret_cast<void(__thiscall*)(shok_string*, const char*)>(0x40182E);
-void shok_string::assign(const char* s)
-{
-	str_assign(this, s);
-}
-shok_string::shok_string() : shok_string("")
-{
-}
-
 shok_saveVirtualProtect::shok_saveVirtualProtect() : shok_saveVirtualProtect(reinterpret_cast<void*>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH)
 {
 }

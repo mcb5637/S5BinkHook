@@ -329,7 +329,7 @@ shok_EGL_CGLETaskList* shok_EGL_CGLEEntity::GetCurrentTaskList()
 {
 	return shok_entity_GetCurrentTaskList(this);
 }
-static inline shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok_set<shok_entity_TaskIdAndTaskHandler>* th, shok_Task id) = reinterpret_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int * (__thiscall* const)(shok_set<shok_entity_TaskIdAndTaskHandler>*, shok_Task)>(0x57BDD3);
+static inline shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Set<shok_entity_TaskIdAndTaskHandler>* th, shok_Task id) = reinterpret_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int * (__thiscall* const)(shok::Set<shok_entity_TaskIdAndTaskHandler>*, shok_Task)>(0x57BDD3);
 shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* shok_EGL_CGLEEntity::GetTaskHandler(shok_Task task)
 {
 	return shok_entitytaskhandler_gettaskhandler(&TaskHandlers, task);
@@ -696,7 +696,7 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 	c.Health = e->Health;
 	if (e->ScriptName) {
 		size_t len = strlen(e->ScriptName) + 1;
-		c.ScriptName = (char*)shok_malloc(sizeof(char) * len);
+		c.ScriptName = (char*)shok::Malloc(sizeof(char) * len);
 		strcpy_s(c.ScriptName, len, e->ScriptName);
 	}
 	else {
@@ -1308,13 +1308,13 @@ void(__thiscall* const entityaddluatlhandlers)(shok_EGL_CGLEEntity* th) = reinte
 void __fastcall entity_addluatlhandlershook(shok_EGL_CGLEEntity* th) {
 	entityaddluatlhandlers(th);
 	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
-	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok_malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
+	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
 	thand->vtable = 0x783D7C; // this is EGL::THandler<12,EGL::CGLETaskArgs,EGL::CGLETaskArgs,EGL::CGLEEntity,int>, but the func is always the same anyway...
 	thand->Object = th;
 	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(&entity_executeluatask);
 	thand->Zero = 0;
 	vt->AddTaskHandler(th, shok_Task::TASK_LUA_FUNC, thand);
-	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok_malloc(sizeof(shok_EGL_IGLEStateHandler)));
+	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
 	shand->vtable = 0x783D9C; // EGL::TStateHandler<EGL::CGLEEntity>
 	shand->Object = th;
 	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(&entity_executeluataskstate);
@@ -1341,13 +1341,13 @@ int __fastcall entity_hooknoncancelanim_task(shok_GGL_CGLBehaviorAnimationEx* th
 }
 void __stdcall entity_hooknoncancelanim(shok_EGL_CGLEEntity* th, shok_GGL_CGLBehaviorAnimationEx* beh) {
 	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
-	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok_malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
+	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
 	thand->vtable = 0x784A4C; // EGL::THandler<5,EGL::CGLETaskArgs,EGL::CGLETaskArgsThousandths,EGL::CBehaviorAnimation,int>
 	thand->Object = beh;
 	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(entity_hooknoncancelanim_task);
 	thand->Zero = 0;
 	vt->AddTaskHandler(th, shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, thand);
-	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok_malloc(sizeof(shok_EGL_IGLEStateHandler)));
+	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
 	shand->vtable = 0x784A7C; // EGL::TStateHandler<EGL::CBehaviorAnimation>
 	shand->Object = beh;
 	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(0x587E20);
@@ -1466,7 +1466,7 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_E
 	c.Scale = e->Scale;
 	if (e->ScriptName) {
 		size_t len = strlen(e->ScriptName) + 1;
-		c.ScriptName = (char*)shok_malloc(sizeof(char) * len);
+		c.ScriptName = (char*)shok::Malloc(sizeof(char) * len);
 		strcpy_s(c.ScriptName, len, e->ScriptName);
 	}
 	else {
@@ -1554,7 +1554,7 @@ void shok_EGL_CGLEEntity::CloneAdditionalDataFrom(entityAddonData* other)
 
 void shok_EGL_CGLEEntity::AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs))
 {
-	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok_malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
+	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
 	thand->vtable = 0x783D7C; // this is EGL::THandler<12,EGL::CGLETaskArgs,EGL::CGLETaskArgs,EGL::CGLEEntity,int>, but the func is always the same anyway...
 	thand->Object = obj;
 	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(Handler);
@@ -1563,7 +1563,7 @@ void shok_EGL_CGLEEntity::AddTaskHandler(shok_Task task, void* obj, int(__fastca
 }
 void shok_EGL_CGLEEntity::AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek))
 {
-	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok_malloc(sizeof(shok_EGL_IGLEStateHandler)));
+	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
 	shand->vtable = 0x783D9C; // EGL::TStateHandler<EGL::CGLEEntity>
 	shand->Object = obj;
 	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(Handler);
@@ -1572,7 +1572,7 @@ void shok_EGL_CGLEEntity::AddTaskStateHandler(shok_TaskState state, void* obj, i
 }
 void shok_EGL_CGLEEntity::AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev))
 {
-	shok_EGL_IGLEHandler_BB_CEvent_void* ehand = static_cast<shok_EGL_IGLEHandler_BB_CEvent_void*>(shok_malloc(sizeof(shok_EGL_IGLEHandler_BB_CEvent_void)));
+	shok_EGL_IGLEHandler_BB_CEvent_void* ehand = static_cast<shok_EGL_IGLEHandler_BB_CEvent_void*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_BB_CEvent_void)));
 	ehand->vtable = 0x774948; // EGL::THandler<81926, class BB::CEvent, class BB::CEvent, class GGL::CSerfBehavior, void>
 	ehand->Object = ob;
 	ehand->Func = reinterpret_cast<void(__thiscall*)(void*, shok_BB_CEvent*)>(Handler);

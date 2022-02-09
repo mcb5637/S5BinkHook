@@ -4,7 +4,7 @@
 
 #include <libloaderapi.h>
 #include <sstream>
-#include <string_view>>
+#include <string_view>
 #include <array>
 
 #include "luaext.h"

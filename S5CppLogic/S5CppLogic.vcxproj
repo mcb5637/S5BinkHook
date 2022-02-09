@@ -30,7 +30,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -43,14 +43,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -100,9 +100,9 @@
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\$(TargetName).dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName).dll"
-copy /Y "$(ProjectDir)CppLogic.lua" "$(ProjectDir)..\..\devLua\s5LuaReference\Cpp\CppLogic.lua"</Command>
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\LuaDebugger.dll"
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,8 +149,9 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\$(TargetName).dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName).dll"</Command>
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\LuaDebugger.dll"
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -174,8 +175,9 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName)
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\$(TargetName).dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\$(TargetName).dll"</Command>
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\LuaDebugger.dll"
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

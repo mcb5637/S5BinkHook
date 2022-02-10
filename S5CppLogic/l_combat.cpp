@@ -15,7 +15,7 @@ int l_combat_dealDamage(lua_State* L) {
 
 int l_combat_dealAOEDamage(lua_State* L) {
 	shok_EGL_CGLEEntity* source = luaext_optEntity(L, 1);
-	shok_position pos = shok_position();
+	shok::Position pos = shok::Position();
 	pos.X = luaL_checkfloat(L, 2);
 	pos.Y = luaL_checkfloat(L, 3);
 	float range = luaL_checkfloat(L, 4);

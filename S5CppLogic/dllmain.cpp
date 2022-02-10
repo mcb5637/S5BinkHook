@@ -96,15 +96,11 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    shok_EGL_CGLETerrainLowRes::EnableHiResBridgeHeight();
-    shok_AARect a{ 0,0,200,200 };
-    shok_position p;
-    luaext_checkPos(L, p, 1);
-    if (lua_isnumber(L, 2))
-        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedApplyBridgeHeight(p, a, 0, luaL_checkint(L,2));
-    else
-        (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->AdvancedRemoveBridgeHeight(p, a, 0);
-    return 0;
+    BB::IObject* o = reinterpret_cast<BB::IObject * >(luaext_checkEntity(L, 1));
+    DEBUGGER_BREAK;
+    unsigned int id = o->GetClassIdentifier();
+    lua_pushnumber(L, id);
+    return 1;
 }
 
 int cleanup(lua_State* L) {
@@ -214,7 +210,7 @@ int resetCppLogic(lua_State* L) {
 
     luaopen_debug(L);
 
-    shok_logString("loaded CppLogic %f %s into %X with SCELoader status %i\n", Version,
+    shok::LogString("loaded CppLogic %f %s into %X with SCELoader status %i\n", Version,
 #ifdef _DEBUG
         "debug",
 #else
@@ -338,10 +334,10 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     
         {
             int *data = reinterpret_cast<int*>(SHOK_Import_LUA_OPEN);
-            shok_saveVirtualProtect vp{ data, 4 };
+            shok::SaveVirtualProtect vp{ data, 4 };
             *data = reinterpret_cast<int>(&__lua_open);
             data = reinterpret_cast<int*>(SHOK_Import_LUA_CLOSE);
-            shok_saveVirtualProtect vp2{ data, 4 };
+            shok::SaveVirtualProtect vp2{ data, 4 };
             *data = reinterpret_cast<int>(&__lua_close);
         }*/
         break;

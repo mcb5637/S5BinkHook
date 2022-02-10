@@ -127,9 +127,9 @@ public:
 };
 
 struct shok_EGL_CEventPosition : shok_BB_CEvent {
-	shok_position Position;
+	shok::Position Position;
 
-	shok_EGL_CEventPosition(shok_EventIDs e, const shok_position& p);
+	shok_EGL_CEventPosition(shok_EventIDs e, const shok::Position& p);
 	shok_EGL_CEventPosition(shok_EGL_CEventPosition&&) = default;
 	shok_EGL_CEventPosition(const shok_EGL_CEventPosition&) = default;
 	shok_EGL_CEventPosition& operator=(shok_EGL_CEventPosition&&) = default;
@@ -247,7 +247,7 @@ struct shok_GGL_CEventTransaction : shok_BB_CEvent {
 struct shok_GGL_CEventPositionAnd2EntityTypes : shok_EGL_CEventPosition {
 	int Type1, Type2;
 
-	shok_GGL_CEventPositionAnd2EntityTypes(shok_EventIDs e, const shok_position& p, int t1, int t2);
+	shok_GGL_CEventPositionAnd2EntityTypes(shok_EventIDs e, const shok::Position& p, int t1, int t2);
 	shok_GGL_CEventPositionAnd2EntityTypes(shok_GGL_CEventPositionAnd2EntityTypes&&) = default;
 	shok_GGL_CEventPositionAnd2EntityTypes(const shok_GGL_CEventPositionAnd2EntityTypes&) = default;
 	shok_GGL_CEventPositionAnd2EntityTypes& operator=(shok_GGL_CEventPositionAnd2EntityTypes&&) = default;
@@ -328,9 +328,9 @@ struct shok_EGL_CNetEvent2Entities : shok_BB_CEvent {
 
 struct shok_EGL_CNetEventEntityAndPos : shok_BB_CEvent {
 	int EntityId;
-	shok_position Position;
+	shok::Position Position;
 
-	shok_EGL_CNetEventEntityAndPos(shok_NetEventIds id, int ent, const shok_position& pos);
+	shok_EGL_CNetEventEntityAndPos(shok_NetEventIds id, int ent, const shok::Position& pos);
 	shok_EGL_CNetEventEntityAndPos(shok_EGL_CNetEventEntityAndPos&&) = default;
 	shok_EGL_CNetEventEntityAndPos(const shok_EGL_CNetEventEntityAndPos&) = default;
 	shok_EGL_CNetEventEntityAndPos& operator=(shok_EGL_CNetEventEntityAndPos&&) = default;
@@ -343,7 +343,7 @@ struct shok_EGL_CNetEventEntityAndPos : shok_BB_CEvent {
 struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
 	int EntityId;
 	vector_padding;
-	std::vector<shok_position, shok::Allocator<shok_position>> Positions;
+	std::vector<shok::Position, shok::Allocator<shok::Position>> Positions;
 	float Rotation;
 
 	shok_EGL_CNetEventEntityAndPosArray(shok_NetEventIds id, int ent, float r);
@@ -357,9 +357,9 @@ struct shok_EGL_CNetEventEntityAndPosArray : shok_BB_CEvent {
 struct shok_GGL_CNetEventExtractResource : shok_BB_CEvent {
 	int EntityId;
 	shok_ResourceType ResourceType;
-	shok_position Position;
+	shok::Position Position;
 
-	shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok_ResourceType resty, const shok_position& pos);
+	shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok_ResourceType resty, const shok::Position& pos);
 	shok_GGL_CNetEventExtractResource(shok_GGL_CNetEventExtractResource&&) = default;
 	shok_GGL_CNetEventExtractResource(const shok_GGL_CNetEventExtractResource&) = default;
 	shok_GGL_CNetEventExtractResource& operator=(shok_GGL_CNetEventExtractResource&&) = default;
@@ -400,9 +400,9 @@ struct shok_EGL_CNetEventEntityID : shok_BB_CEvent {
 
 struct shok_GGL_CNetEventCannonCreator : shok_EGL_CNetEventEntityID {
 	int BottomType, TopType;
-	shok_position Position;
+	shok::Position Position;
 
-	shok_GGL_CNetEventCannonCreator(shok_NetEventIds id, int ent, int bty, int tty, const shok_position& pos);
+	shok_GGL_CNetEventCannonCreator(shok_NetEventIds id, int ent, int bty, int tty, const shok::Position& pos);
 	shok_GGL_CNetEventCannonCreator(shok_GGL_CNetEventCannonCreator&&) = default;
 	shok_GGL_CNetEventCannonCreator(const shok_GGL_CNetEventCannonCreator&) = default;
 	shok_GGL_CNetEventCannonCreator& operator=(shok_GGL_CNetEventCannonCreator&&) = default;
@@ -468,11 +468,11 @@ struct shok_EGL_CNetEventPlayerID : shok_BB_CEvent {
 
 struct shok_GGL_CNetEventBuildingCreator : shok_EGL_CNetEventPlayerID { // add at least one serf, or it crashes
 	int UpgradeCategory;
-	shok_positionRot Position;
+	shok::PositionRot Position;
 	vector_padding;
 	std::vector<int, shok::Allocator<int>> Serfs;
 
-	shok_GGL_CNetEventBuildingCreator(shok_NetEventIds id, int pl, int ucat, const shok_positionRot& p);
+	shok_GGL_CNetEventBuildingCreator(shok_NetEventIds id, int pl, int ucat, const shok::PositionRot& p);
 	shok_GGL_CNetEventBuildingCreator(shok_GGL_CNetEventBuildingCreator&&) = default;
 	shok_GGL_CNetEventBuildingCreator(const shok_GGL_CNetEventBuildingCreator&) = default;
 	shok_GGL_CNetEventBuildingCreator& operator=(shok_GGL_CNetEventBuildingCreator&&) = default;
@@ -549,10 +549,10 @@ struct shok_GGL_CNetEventEntityIDPlayerIDAndInteger : shok_EGL_CNetEventEntityID
 };
 
 struct shok_GGL_CFeedbackEventBattling : shok_EGL_CNetEventEntityIDAndPlayerID {
-	shok_position Pos;
+	shok::Position Pos;
 	int TargetPlayer;
 
-	shok_GGL_CFeedbackEventBattling(shok_FeedbackEventIds id, int eid, int p, const shok_position& pos, int tp);
+	shok_GGL_CFeedbackEventBattling(shok_FeedbackEventIds id, int eid, int p, const shok::Position& pos, int tp);
 	shok_GGL_CFeedbackEventBattling(shok_GGL_CFeedbackEventBattling&&) = default;
 	shok_GGL_CFeedbackEventBattling(const shok_GGL_CFeedbackEventBattling&) = default;
 	shok_GGL_CFeedbackEventBattling& operator=(shok_GGL_CFeedbackEventBattling&&) = default;

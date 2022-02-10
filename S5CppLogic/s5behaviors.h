@@ -3,7 +3,7 @@
 
 struct shok_EGL_CGLEBehavior : shok_BB_IObject { // no vtable
 	int SlotIndex, EntityId;
-	shok_EGL_CGLEBehaviorProps* PropPointer; // 3, warning this may not be set
+	EGL::CGLEBehaviorProps* PropPointer; // 3, warning this may not be set
 
 public:
 	static inline constexpr int TypeDesc = 0x813778;
@@ -27,7 +27,7 @@ struct shok_GGL_CBehaviorDefaultMovement : shok_EGL_CGLEBehavior { // EGL::CMove
 	int CurrentTurn;
 	float MovementSpeed, TurningSpeed, SpeedFactor; // la7
 	PADDINGI(1);
-	shok_positionRot NextWayPoint, LastTurnPos;
+	shok::PositionRot NextWayPoint, LastTurnPos;
 	bool IsPathingUsed, IsMoveFinished; // 15
 	PADDING(2);
 	PADDINGI(1); // p to EGL::CMovementBehavior::CSlotMovingEntity
@@ -116,7 +116,7 @@ struct shok_GGL_CHeroHawkBehavior : shok_GGL_CHeroAbility {
 
 struct shok_GGL_CHawkBehavior : shok_EGL_CGLEBehavior {
 	PADDINGI(1);
-	shok_position ExplorePosition;
+	shok::Position ExplorePosition;
 	int CreationTurn;
 
 	// defined tasks: TASK_GO_TO_POS, TASK_MOVE_TO_EXPLORATION_POINT, TASK_CHECK_HERO_POSITION
@@ -141,7 +141,7 @@ struct shok_GGL_CInflictFearAbility : shok_GGL_CHeroAbility {
 };
 
 struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
-	shok_position StartPosition, TargetPosition;
+	shok::Position StartPosition, TargetPosition;
 	byte PlacedBomb; // 10
 	PADDING(3);
 
@@ -157,7 +157,7 @@ struct shok_GGL_CBombPlacerBehavior : shok_GGL_CHeroAbility {
 
 struct shok_GGL_CCannonBuilderBehavior : shok_GGL_CHeroAbility {
 	PADDINGI(1);
-	shok_position StartPosition;
+	shok::Position StartPosition;
 	int CannonType, FoundationType;
 	byte PlacedCannon; // 11
 	PADDING(3);
@@ -274,7 +274,7 @@ struct shok_GGL_CShurikenAbility : shok_GGL_CHeroAbility {
 };
 
 struct shok_GGL_CKegPlacerBehavior : shok_GGL_CHeroAbility {
-	shok_position StartPosition, TargetPosition;
+	shok::Position StartPosition, TargetPosition;
 	byte PlacedKeg; // 10
 	PADDING(3);
 	int TurnsUntilArmed, TurnsUntilDisarmed; // 11
@@ -292,7 +292,7 @@ struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
 	PADDINGI(1);
 	byte Active; // 7
 	PADDING(3);
-	shok_position ExlorationPosition;
+	shok::Position ExlorationPosition;
 
 	// defined tasks: TASK_EXPLORE, TASK_TURN_TO_EXPLORE_POSITION
 	// defined events: Binocular_XXX, OnAttackedBy, 11002
@@ -303,7 +303,7 @@ struct shok_GGL_CAbilityScoutBinocular : shok_GGL_CHeroAbility {
 };
 
 struct shok_GGL_CTorchPlacerBehavior : shok_GGL_CHeroAbility {
-	shok_position StartPosition, TargetPosition; // 5
+	shok::Position StartPosition, TargetPosition; // 5
 	byte PlacedTorch;
 	PADDING(3);
 
@@ -375,7 +375,7 @@ struct shok_GGL_CGLBehaviorAnimationEx : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CBehaviorWalkCommand : shok_EGL_CGLEBehavior {
-	shok_position WalkTarget;
+	shok::Position WalkTarget;
 
 	// defined tasks: TASK_WALK -> goes to ev 20003
 	// defined events: MoveCommand_Move
@@ -419,7 +419,7 @@ public:
 struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollow in between, 776E40
 	float SuccessDistance, FailureDistance; // 4
 	int TimeOutTime, StartTurn;
-	shok_position TargetPosition;
+	shok::Position TargetPosition;
 	byte StartFollowing, StopFollowing; // 10
 	PADDING(2);
 	int FollowStatus;
@@ -429,7 +429,7 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollo
 	byte NoMoveNecessary, NormalRangeCheckNecessary;
 	PADDING(2);
 	shok_LeaderCommand Command;
-	shok_position AttackMoveTarget;
+	shok::Position AttackMoveTarget;
 	byte Helping;
 	PADDING(3);
 	int MilliSecondsToWait, MSToPlayHitAnimation;
@@ -453,18 +453,18 @@ struct shok_GGL_CBattleBehavior : shok_EGL_CGLEBehavior { // GGL::CBehaviorFollo
 struct shok_GGL_CLeaderBehavior : shok_GGL_CBattleBehavior {
 	PADDINGI(2);
 	int TroopHealthCurrent, TroopHealthPerSoldier; // 27
-	shok_position TerritoryCenter;
+	shok::Position TerritoryCenter;
 	float TerritoryCenterRange;
 	int Experience; // 32
 	vector_padding;
-	std::vector<shok_position, shok::Allocator<shok_position>> PatrolPoints;
+	std::vector<shok::Position, shok::Allocator<shok::Position>> PatrolPoints;
 	int NextPatrolPointIndex; // 37
 	float DefendOrientation;
 	int TrainingStartTurn;
 	byte PatrolIndexCountingDown, UsingTargetOrientation, UsingTerritory; // 40
 	PADDING(1);
 	int SecondsSinceHPRefresh, NudgeCount, FormationType;
-	shok_position StartBattlePosition;
+	shok::Position StartBattlePosition;
 	int IndexOfFirstChaoticPosition; //46
 
 	// defined states: Train, LeaderGetCloseTotarget
@@ -575,7 +575,7 @@ struct shok_GGL_CCamperBehavior : shok_EGL_CGLEBehavior {
 struct shok_GGL_CCampBehavior : shok_EGL_CGLEBehavior {
 	PADDINGI(1);
 	vector_padding;
-	std::vector<shok_position> Slot; // not sure if it is positions in here
+	std::vector<shok::Position> Slot; // not sure if it is positions in here
 	int NumTurnsToDeletion;
 
 	// defined states: Default
@@ -738,7 +738,7 @@ struct shok_EGL_GLEBehaviorMultiSubAnims : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CBuildingMerchantBehavior_COffer : shok_BB_IObject {
-	shok_costInfo ResourceCosts;
+	shok::CostInfo ResourceCosts;
 	int OffersRemaining;
 
 	static inline constexpr int vtp = 0x7781B4;
@@ -827,7 +827,7 @@ struct shok_GGL_CFoundryBehavior : shok_EGL_CGLEBehavior {
 };
 
 struct shok_GGL_CWorkerFleeBehavior : shok_EGL_CGLEBehavior {
-	shok_position FlightPosition; //4
+	shok::Position FlightPosition; //4
 	// 6 p to props
 
 	// defined tasks: TASK_FLEE
@@ -871,7 +871,7 @@ struct shok_GGL_CUniversityBehavior : shok_EGL_CGLEBehavior {
 
 struct shok_GGL_CResourceDoodadBehavior : shok_EGL_CGLEBehavior {
 	int OriginalEntityType; //4
-	shok_positionRot Position;
+	shok::PositionRot Position;
 
 	// defined events: ResourceDoodad_RemoveOneRes
 
@@ -991,7 +991,7 @@ struct shok_GGL_CPositionAtResourceFinder : shok_object {
 	static shok_GGL_CPositionAtResourceFinder* CreateByEntity(int entityid);
 	void Destroy();
 	float SearchForPosition(shok_EGL_CGLEEntity* e);
-	shok_position CalcPositionFromFloat(float f);
+	shok::Position CalcPositionFromFloat(float f);
 
 	static inline constexpr int vtp = 0x7729AC;
 	static inline constexpr int TypeDesc = 0x8135B4;

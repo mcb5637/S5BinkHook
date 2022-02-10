@@ -76,12 +76,12 @@ public:
 // not using sqrt
 struct EntityIteratorPredicateInCircle : EntityIteratorPredicate {
 private:
-	shok_position p;
+	shok::Position p;
 	float r;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const;
 	EntityIteratorPredicateInCircle(float x, float y, float r);
-	EntityIteratorPredicateInCircle(const shok_position& p, float r);
+	EntityIteratorPredicateInCircle(const shok::Position& p, float r);
 };
 
 struct EntityIteratorPredicateIsSettler : EntityIteratorPredicate {
@@ -141,12 +141,12 @@ public:
 
 struct EntityIteratorPredicateInRect : EntityIteratorPredicate {
 private:
-	shok_position low;
-	shok_position high;
+	shok::Position low;
+	shok::Position high;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const;
 	EntityIteratorPredicateInRect(float x1, float y1, float x2, float y2);
-	EntityIteratorPredicateInRect(const shok_AARect& area);
+	EntityIteratorPredicateInRect(const shok::AARect& area);
 };
 
 struct EntityIteratorPredicateNot : EntityIteratorPredicate {
@@ -178,12 +178,12 @@ public:
 // not the fastest, cause i have to use sqrt twice, use it last
 struct EntityIteratorPredicateIsNotFleeingFrom : EntityIteratorPredicate {
 private:
-	shok_position Center;
+	shok::Position Center;
 	float Range;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const;
-	EntityIteratorPredicateIsNotFleeingFrom(shok_position& p, float r);
-	static bool IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok_position Center, float Range);
+	EntityIteratorPredicateIsNotFleeingFrom(shok::Position& p, float r);
+	static bool IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok::Position Center, float Range);
 };
 
 struct EntityIteratorPredicateFunc : EntityIteratorPredicate {

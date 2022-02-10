@@ -128,7 +128,7 @@ void l_netPushEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_pushstring(L, "Positions");
 		lua_newtable(L);
 		int i = 1;
-		for (shok_position p : e->Positions) {
+		for (shok::Position p : e->Positions) {
 			luaext_pushPos(L, p);
 			lua_rawseti(L, -2, i);
 			i++;
@@ -321,8 +321,8 @@ bool l_netReadEvent(lua_State* L, shok_BB_CEvent* ev) {
 		lua_rawget(L, -2);
 		if (lua_istable(L, -1)) {
 			int i = 1;
-			shok_saveVector<shok_position>(&e->Positions, [L, &i](std::vector<shok_position, shok::Allocator<shok_position>>& v) {
-				shok_position p = shok_position();
+			shok_saveVector<shok::Position>(&e->Positions, [L, &i](std::vector<shok::Position, shok::Allocator<shok::Position>>& v) {
+				shok::Position p = shok::Position();
 				v.clear();
 				while (true) {
 					lua_rawgeti(L, -1, i);
@@ -558,7 +558,7 @@ int l_logicCanPLaceBuildingAt(lua_State* L) {
 	luaext_assertPointer(L, ety, "no entitytype");
 	luaext_assert(L, ety->IsBuildingType(), "not a building");
 	int pl = luaL_checkint(L, 2);
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 3);
 	p.FloorToBuildingPlacement();
 	float r = deg2rad(luaL_checkfloat(L, 4));
@@ -635,18 +635,18 @@ int l_logicPlayerBlessSettlers(lua_State* L) {
 }
 
 int l_logicLandscapeGetSector(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p));
 	return 1;
 }
 
 int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	int s = luaL_checkint(L, 2);
 	float r = luaL_checkfloat(L, 3);
-	shok_position po;
+	shok::Position po;
 	if ((*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetNearestPositionInSector(&p, r, s, &po))
 		luaext_pushPos(L, po);
 	else
@@ -759,43 +759,43 @@ int l_logicEnableMaxHpTechMod(lua_State* L) {
 }
 
 int l_logicLandscapeGetTerrainType(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetTerrainTypeAt(p));
 	return 1;
 }
 int l_logicLandscapeGetWaterType(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterTypeAt(p));
 	return 1;
 }
 int l_logicLandscapeGetWaterHeight(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterHeightAt(p));
 	return 1;
 }
 int l_logicLandscapeGetTerrainHeight(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(p));
 	return 1;
 }
 int l_logicLandscapeGetTerrainVertexColor(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->VertexColors->GetTerrainVertexColor(p));
 	return 1;
 }
 int l_logicLandscapeGetBlocking(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, static_cast<int>((*shok_ED_CGlobalsLogicEx::GlobalObj)->GetBlocking(p)));
 	return 1;
 }
 int l_logicLandscapeGetBridgeHeight(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetBridgeHeight(p));
 	return 1;
@@ -920,7 +920,7 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 
 
 	if (!CanPlaceBuildingCallback) {
-		CanPlaceBuildingCallback = [](int entitytype, int player, shok_position* pos, float rotation, int buildOnId) {
+		CanPlaceBuildingCallback = [](int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 			bool r = true;
@@ -1055,7 +1055,7 @@ struct l_logic_setluataskfunc_info {
 };
 int l_logic_setluataskfunc_move(lua_State* L) {
 	l_logic_setluataskfunc_info* d = static_cast<l_logic_setluataskfunc_info*>(lua_touserdata(L, lua_upvalueindex(1)));
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	shok_EGL_CEventPosition e{ shok_EventIDs::Movement_TaskMoveToPos, p };
 	d->e->FireEvent(&e);
@@ -1180,12 +1180,12 @@ int l_logic_FixBuildOnMovement(lua_State* L) {
 int l_logic_GetNearestFreePosForBuilding(lua_State* L) {
 	luaext_assert(L, luaext_checkEntityType(L, 1)->IsBuildingType(), "no building type");
 	int ty = luaL_checkint(L, 1);
-	shok_positionRot pin;
+	shok::PositionRot pin;
 	luaext_checkPosRot(L, pin, 2);
 	float range = luaL_optfloat(L, 3, 0);
 	if (range <= 0)
 		range = (*shok_GGL_CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance;
-	shok_positionRot pout = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
+	shok::PositionRot pout = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
 	luaext_pushPosRot(L, pout);
 	return 1;
 }
@@ -1221,7 +1221,7 @@ struct l_logicModel {
 	static int Translate(lua_State* L) {
 		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
 		luaext_assertPointer(L, m->Model, "set a model first");
-		shok_position p;
+		shok::Position p;
 		luaext_checkPos(L, p, 2);
 		float h = luaL_optfloat(L, 3, 0);
 		if (luaext_optbool(L, 5, true)) {

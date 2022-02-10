@@ -58,7 +58,7 @@ void shok_GGL_CPlayerAttractionHandler::HookCheckPayday()
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
 	HookCheckPayday_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday);
 }
 
@@ -102,8 +102,8 @@ bool ArePlayersFriendly(int p1, int p2)
 	return ps->GetDiploStateTo(p2) == shok_DiploState::Friendly;
 }
 
-bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) = nullptr;
-int __stdcall canplacebuilding(int entitytype, int player, shok_position* pos, float rotation, int buildOnId) {
+bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) = nullptr;
+int __stdcall canplacebuilding(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
 	if (CanPlaceBuildingCallback)
 		return CanPlaceBuildingCallback(entitytype, player, pos, rotation, buildOnId);
 	return true;
@@ -138,6 +138,6 @@ void HookCanPlaceBuilding()
 	if (HookCanPlaceBuilding_Hooked)
 		return;
 	HookCanPlaceBuilding_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4B45B9), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B45B9), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4B45B9), &canplacebuildingasm);
 }

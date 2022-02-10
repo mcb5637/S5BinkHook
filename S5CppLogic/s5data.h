@@ -93,11 +93,120 @@ typedef uint8_t byte;
 // bridgeentity apply bridgeheight 0x503C50 jmp redefined (hires bridge area)
 // shok_EGL_CGLETerrainLowRes::BridgeHeights vector modified (hires bridge area)
 
-// allocator
+#include "s5_forwardDecls.h"
 #include "s5_mem.h"
 #include "s5_datastructures.h"
-// format i int, f float, x hex int, c char, s const char*
-static inline void (*const shok_logString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
+
+namespace shok {
+
+	// format i int, f float, x hex int, c char, s const char*
+	static inline void (*const LogString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
+
+
+
+
+	// generic structs
+	struct Position {
+		float X;
+		float Y;
+
+		void FloorToBuildingPlacement();
+		void RoundToBuildingPlacement();
+		float GetDistanceSquaredTo(const Position& p) const;
+		bool IsInRange(const Position& p, float range) const;
+		// returns deg, this is a hok specific angle, useful for a look at by settlers
+		float GetAngleBetween(const Position& p) const;
+		// requires rad
+		Position Rotate(float r) const;
+		// requires rad
+		Position RotateAround(float r, const Position& center) const;
+
+		Position operator+(const Position& other) const;
+		Position& operator+=(const Position& other);
+		Position operator-(const Position& other) const;
+		Position& operator-=(const Position& other);
+		Position operator*(float f) const;
+		Position& operator*=(float f);
+		float Dot(const Position& o) const;
+		auto operator<=>(const Position& o) const = default;
+
+		static shok_BB_CClassFactory_serializationData* SerializationData;
+	};
+	struct PositionRot : Position {
+		float r;
+	};
+
+
+	struct AARect {
+		shok::Position low, high;
+		auto operator<=>(const AARect& o) const = default;
+		AARect operator+(const AARect& other) const;
+		AARect& operator+=(const AARect& other);
+		AARect operator-(const AARect& other) const;
+		AARect& operator-=(const AARect& other);
+
+		// requires rad
+		AARect Rotate(float r) const;
+		AARect Sort() const;
+
+		// uses Blocked1 and Blocked2 for the 2 members
+		static shok_BB_CClassFactory_serializationData* SerializationData;
+	};
+
+	struct CostInfo { // size 18
+		PADDINGI(1);
+		float Gold = 0, GoldRaw = 0;
+		float Silver = 0, SilverRaw = 0;
+		float Stone = 0, StoneRaw = 0;
+		float Iron = 0, IronRaw = 0;
+		float Sulfur = 0, SulfurRaw = 0;
+		float Clay = 0, ClayRaw = 0;
+		float Wood = 0, WoodRaw = 0;
+		float WeatherEnergy = 0, Knowledge = 0, Faith = 0;
+
+		float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const;
+		void AddToType(shok_ResourceType ty, float toadd);
+		void SubFromType(shok_ResourceType ty, float tosub);
+		bool HasResources(const CostInfo* has) const;
+
+		static inline shok_BB_CClassFactory_serializationData* SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D668);
+	};
+	static_assert(sizeof(CostInfo) == 18 * 4);
+
+
+	struct Attachment {
+		shok_AttachmentType AttachmentType;
+		int EntityId, EventID; // does event id exist, or is it just in attachmentinfo loader?
+
+		auto operator<=>(const Attachment& o) const = default;
+	};
+}
+
+namespace BB {
+	class IObject {
+	public:
+		virtual ~IObject() = default;
+		virtual unsigned int __stdcall GetClassIdentifier() const = 0;
+		virtual void* __stdcall CastToIdentifier(unsigned int id) = 0;
+
+		static constexpr int TypeDesc = 0x7FFE08;
+		static constexpr int vtp = 0x7620F0;
+	};
+
+	class IPostEvent {
+	private:
+		virtual void unknownFunc1() = 0;
+	};
+}
+
+namespace ECore {
+	class ICheckData {
+	public:
+		virtual ~ICheckData() = default;
+	private:
+		virtual void unknownFunc1() = 0;
+	};
+}
 
 template<class T>
 inline void shok_saveVector(std::vector<T, shok::Allocator<T>>* vec, std::function<void(std::vector<T, shok::Allocator<T>> &s)> func) {
@@ -140,19 +249,6 @@ inline void shok_saveList(std::list<T, shok::Allocator<T>>* vec, std::function<v
 #endif
 }
 
-// allows read/write/execute of the memory location pointed to until it goes out of scope.
-// using more than one at the same time works as expected, cause the destructors are called in reverse order.
-// use always as stack variable!
-struct shok_saveVirtualProtect {
-	shok_saveVirtualProtect();
-	shok_saveVirtualProtect(void* adr, size_t size);
-	~shok_saveVirtualProtect();
-private:
-	void* Adr;
-	size_t Size;
-	unsigned long Prev;
-};
-
 // casts shok objects with runtime type chek. you can only cast objects that have a vtable (does not have to be known) and a known RTTI TypeDesc set in the class.
 // works almost the same way as dynamic_cast, just you can only cast pointers and you have to specify both current type and target type (without pointer).
 // example:
@@ -164,76 +260,6 @@ inline CastTo* shok_DynamicCast(CastFrom* i) {
 	void* (__cdecl* const shok_dyncastFunc)(void* i, int off, int TypeDescSource, int TypeDescOut, bool isref) = reinterpret_cast<void* (__cdecl* const)(void*, int, int, int, bool)>(0x5C36EE);
 	return static_cast<CastTo*>(shok_dyncastFunc(i, 0, CastFrom::TypeDesc, CastTo::TypeDesc, false));
 }
-
-struct shok_BB_CClassFactory_serializationData;
-// generic structs
-struct shok_position {
-	float X;
-	float Y;
-
-	void FloorToBuildingPlacement();
-	void RoundToBuildingPlacement();
-	float GetDistanceSquaredTo(const shok_position& p) const;
-	bool IsInRange(const shok_position& p, float range) const;
-	// returns deg, this is a hok specific angle, useful for a look at by settlers
-	float GetAngleBetween(const shok_position& p) const;
-	// requires rad
-	shok_position Rotate(float r) const;
-	// requires rad
-	shok_position RotateAround(float r, const shok_position& center) const;
-
-	shok_position operator+(const shok_position& other) const;
-	shok_position& operator+=(const shok_position& other);
-	shok_position operator-(const shok_position& other) const;
-	shok_position& operator-=(const shok_position& other);
-	shok_position operator*(float f) const;
-	shok_position& operator*=(float f);
-	float Dot(const shok_position& o) const;
-	auto operator<=>(const shok_position& o) const = default;
-
-	static shok_BB_CClassFactory_serializationData* SerializationData;
-};
-
-struct shok_positionRot : shok_position {
-	float r;
-};
-
-struct shok_AARect {
-	shok_position low, high;
-	auto operator<=>(const shok_AARect& o) const = default;
-	shok_AARect operator+(const shok_AARect & other) const;
-	shok_AARect& operator+=(const shok_AARect& other);
-	shok_AARect operator-(const shok_AARect& other) const;
-	shok_AARect& operator-=(const shok_AARect& other);
-
-	// requires rad
-	shok_AARect Rotate(float r) const;
-	shok_AARect Sort() const;
-
-	// uses Blocked1 and Blocked2 for the 2 members
-	static shok_BB_CClassFactory_serializationData* SerializationData;
-};
-
-enum class shok_ResourceType;
-struct shok_costInfo { // size 18
-	PADDINGI(1);
-	float Gold = 0, GoldRaw = 0;
-	float Silver = 0, SilverRaw = 0;
-	float Stone = 0, StoneRaw = 0;
-	float Iron = 0, IronRaw = 0;
-	float Sulfur = 0, SulfurRaw = 0;
-	float Clay = 0, ClayRaw = 0;
-	float Wood = 0, WoodRaw = 0;
-	float WeatherEnergy = 0, Knowledge = 0, Faith = 0;
-
-	float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const;
-	void AddToType(shok_ResourceType ty, float toadd);
-	void SubFromType(shok_ResourceType ty, float tosub);
-	bool HasResources(const shok_costInfo* has) const;
-
-	static inline shok_BB_CClassFactory_serializationData* SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D668);
-};
-static_assert(sizeof(shok_costInfo) == 18 * 4);
 
 struct shok_object {
 	int vtable;
@@ -253,21 +279,6 @@ struct shok_vtable_BB_IObject {
 	unsigned int(__thiscall* GetClassIdentifier)(const shok_BB_IObject* th);
 	PADDINGI(1); // unknown, thiscall (th, x,x), cast to identifier?
 };
-
-enum class shok_AttachmentType;
-struct shok_attachment {
-	shok_AttachmentType AttachmentType;
-	int EntityId, EventID; // does event id exist, or is it just in attachmentinfo loader?
-};
-bool operator<(shok_attachment a, shok_attachment b);
-
-struct shok_BB_CEvent;
-enum class shok_EventIDs : int;
-enum class shok_NetEventIds : int;
-enum class shok_FeedbackEventIds : int;
-enum class shok_InputEventIds : int;
-struct shok_EGL_CGLETaskArgs;
-
 
 struct shok_BB_IPostEvent : shok_object {
 
@@ -325,13 +336,6 @@ enum class win_mouseEvents : int {
 #include "s5tasklist.h"
 #include "s5classfactory.h"
 #include "s5sound.h"
-
-// xml loader vars:
-// v2 type?
-// v3 xml element
-// v4 offset
-// v5 size
-
 
 static inline void(_stdcall* const shok_SetHighPrecFPU)() = reinterpret_cast<void(_stdcall*)()>(0x5C8451);
 

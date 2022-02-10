@@ -75,10 +75,10 @@ void __declspec(naked) startmusic_patchasm() {
 
 void shok_ESnd_CSoEMusic::HookStartMusicFilesystem()
 {
-	shok_saveVirtualProtect vp{ AIL_closestream ,4 };
+	shok::SaveVirtualProtect vp{ AIL_closestream ,4 };
 	AIL_closestreamBackup = *AIL_closestream;
 	*AIL_closestream = &ail_closestream_override;
 
-	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x496677) ,10 };
+	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x496677) ,10 };
 	WriteJump(reinterpret_cast<void*>(0x496677), &startmusic_patchasm);
 }

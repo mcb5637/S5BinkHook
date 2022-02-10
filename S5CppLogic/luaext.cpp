@@ -117,7 +117,7 @@ shok_GGlue_CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i) {
 	return t;
 }
 
-void luaext_pushPos(lua_State* L, const shok_position& p) {
+void luaext_pushPos(lua_State* L, const shok::Position& p) {
 	lua_newtable(L);
 	lua_pushstring(L, "X");
 	lua_pushnumber(L, p.X);
@@ -127,7 +127,7 @@ void luaext_pushPos(lua_State* L, const shok_position& p) {
 	lua_rawset(L, -3);
 }
 
-void luaext_pushPosRot(lua_State* L, const shok_positionRot& p, bool rad) {
+void luaext_pushPosRot(lua_State* L, const shok::PositionRot& p, bool rad) {
 	luaext_pushPos(L, p);
 	lua_pushstring(L, "r");
 	if (rad)
@@ -137,7 +137,7 @@ void luaext_pushPosRot(lua_State* L, const shok_positionRot& p, bool rad) {
 	lua_rawset(L, -3);
 }
 
-void luaext_checkPos(lua_State* L, shok_position& p, int i) {
+void luaext_checkPos(lua_State* L, shok::Position& p, int i) {
 	i = lua_abs_index(L, i);
 	lua_pushstring(L, "X");
 	lua_gettable(L, i);
@@ -152,7 +152,7 @@ void luaext_checkPos(lua_State* L, shok_position& p, int i) {
 	lua_pop(L, 2);
 }
 
-void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i, bool rad) {
+void luaext_checkPosRot(lua_State* L, shok::PositionRot& p, int i, bool rad) {
 	i = lua_abs_index(L, i);
 	lua_pushstring(L, "X");
 	lua_gettable(L, i);
@@ -173,7 +173,7 @@ void luaext_checkPosRot(lua_State* L, shok_positionRot& p, int i, bool rad) {
 	lua_pop(L, 3);
 }
 
-void luaext_writeCostInfo(lua_State* L, const shok_costInfo& c) {
+void luaext_writeCostInfo(lua_State* L, const shok::CostInfo& c) {
 	lua_newtable(L);
 	for (int i = 1; i <= shok_ResourceType_MaxValue; i++) {
 		lua_pushnumber(L, 0);
@@ -195,7 +195,7 @@ void luaext_writeCostInfo(lua_State* L, const shok_costInfo& c) {
 	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Wood));
 }
 
-void luaext_readCostInfo(lua_State* L, int index, shok_costInfo& c, bool ignoreZeroes) {
+void luaext_readCostInfo(lua_State* L, int index, shok::CostInfo& c, bool ignoreZeroes) {
 	float i = 0;
 	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Clay));
 	if (lua_isnumber(L, -1)) {

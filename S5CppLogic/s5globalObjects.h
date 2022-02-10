@@ -110,10 +110,10 @@ struct shok_EGL_CTerrainVertexColors : shok_object {
 
 	static inline constexpr int vtp = 0x7841F8;
 
-	void ToTerrainCoord(shok_position& p, int* out);
+	void ToTerrainCoord(shok::Position& p, int* out);
 	bool IsCoordValid(int* out);
-	int GetTerrainVertexColor(shok_position& p);
-	void SetTerrainVertexColor(shok_position& p, int col); // a,r,g,b each int8
+	int GetTerrainVertexColor(shok::Position& p);
+	void SetTerrainVertexColor(shok::Position& p, int col); // a,r,g,b each int8
 };
 struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 	friend struct shok_EGL_CGLELandscape;
@@ -124,11 +124,11 @@ struct shok_EGL_CGLETerrainHiRes : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x7837B0;
 
-	static void ToTerrainCoord(const shok_position& p, int* out);
+	static void ToTerrainCoord(const shok::Position& p, int* out);
 	bool IsCoordValid(int* out);
 	bool IsCoordValid(int x, int y);
-	int GetTerrainHeight(const shok_position& p);
-	void SetTerrainHeight(const shok_position& p, int h); // int16
+	int GetTerrainHeight(const shok::Position& p);
+	void SetTerrainHeight(const shok::Position& p, int h); // int16
 private:
 	int GetTerrainHeight(int x, int y);
 };
@@ -143,18 +143,18 @@ struct shok_EGL_CGLETerrainLowRes : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x7837C0;
 
-	static void ToQuadCoord(const shok_position& p, int* out);
+	static void ToQuadCoord(const shok::Position& p, int* out);
 	bool IsCoordValid(const int* out);
 	bool IsCoordValid(int x, int y);
 	bool IsBridgeHeightCoordValid(int x, int y);
-	int GetTerrainTypeAt(const shok_position& p);
-	void SetTerrainTypeAt(const shok_position& p, int tty); // byte (int8)
-	int GetWaterTypeAt(const shok_position& p);
-	void SetWaterTypeAt(const shok_position& p, int wty); // int6
-	int GetWaterHeightAt(const shok_position& p);
-	void SetWaterHeightAt(const shok_position& p, int wh); // int16
-	int GetBridgeHeight(const shok_position& p);
-	void SetBridgeHeight(const shok_position& p, int bh);
+	int GetTerrainTypeAt(const shok::Position& p);
+	void SetTerrainTypeAt(const shok::Position& p, int tty); // byte (int8)
+	int GetWaterTypeAt(const shok::Position& p);
+	void SetWaterTypeAt(const shok::Position& p, int wty); // int6
+	int GetWaterHeightAt(const shok::Position& p);
+	void SetWaterHeightAt(const shok::Position& p, int wh); // int16
+	int GetBridgeHeight(const shok::Position& p);
+	void SetBridgeHeight(const shok::Position& p, int bh);
 	// hires coords if HiResBridgeHeightEnabled
 	inline int* GetBridgeHeightP(int x, int y);
 
@@ -212,33 +212,33 @@ struct shok_EGL_CGLELandscape : shok_object {
 			Iter(const AdvancedAARectIterator& i, const Coord& c);
 		};
 
-		AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes, bool AddOne);
-		AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes);
+		AdvancedAARectIterator(const shok::Position& p, const shok::AARect& area, float rot, bool LowRes, bool AddOne);
+		AdvancedAARectIterator(const shok::Position& p, const shok::AARect& area, float rot, bool LowRes);
 		bool HasNext(const Coord& Curr) const;
 		void ToNext(Coord& Curr) const;
 		Iter begin() const;
 		Iter end() const;
 	};
 
-	int GetSector(const shok_position* p);
-	bool GetNearestPositionInSector(const shok_position* pIn, float range, int sector, shok_position* pOut);
-	shok_position GetNearestFreePos(const shok_position* p, float range);
-	bool IsValidPos(shok_position* p);
-	shok_position GetMapSize();
-	bool IsPosBlockedInMode(const shok_position* p, BlockingMode mode);
-	BlockingMode GetBlocking(const shok_position& p);
-	void FlattenPosForBuilding(const shok_position& p, const shok_AARect& area, float rot);
+	int GetSector(const shok::Position* p);
+	bool GetNearestPositionInSector(const shok::Position* pIn, float range, int sector, shok::Position* pOut);
+	shok::Position GetNearestFreePos(const shok::Position* p, float range);
+	bool IsValidPos(shok::Position* p);
+	shok::Position GetMapSize();
+	bool IsPosBlockedInMode(const shok::Position* p, BlockingMode mode);
+	BlockingMode GetBlocking(const shok::Position& p);
+	void FlattenPosForBuilding(const shok::Position& p, const shok::AARect& area, float rot);
 	// block for vector of aarect: thiscall 577B07 (this, pos*, vector<aarect>*, float, byte*)
 	// unblock for vector of aarect: thiscall 577C12 (this, pos*, vector<aarect>*, float, byte*)
-	void ApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
-	void RemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
-	void AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height);
-	void UpdateBlocking(const shok_AARect& area);
-	void AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot);
-	void AdvancedApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
-	void AdvancedRemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode);
-	bool IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode, bool AddOne);
-	bool IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot, bool AddOne);
+	void ApplyBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
+	void RemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
+	void AdvancedApplyBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot, int height);
+	void UpdateBlocking(const shok::AARect& area);
+	void AdvancedRemoveBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot);
+	void AdvancedApplyBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
+	void AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
+	bool IsAreaUnblockedInMode(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode mode, bool AddOne);
+	bool IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne);
 private:
 	void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 };
@@ -260,7 +260,7 @@ struct shok_EGL_CGLELandscape_blockingData {
 	byte* data;
 
 	bool IsCoordValid(int x, int y);
-	shok_position GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok_positionRot& pos, float range);
+	shok::Position GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok::PositionRot& pos, float range);
 	inline shok_EGL_CGLELandscape::BlockingMode GetBlockingData(int x, int y);
 };
 
@@ -268,7 +268,7 @@ struct shok_EGL_CPlayerExplorationHandler : shok_BB_IObject {
 	PADDINGI(2);
 	int SizeX, SizeY; // 3
 
-	bool IsPositionExplored(const shok_position& p);
+	bool IsPositionExplored(const shok::Position& p);
 };
 
 struct shok_somegamelogicstuff {
@@ -310,9 +310,9 @@ struct shok_ED_CLandscape : shok_object {
 
 	static inline constexpr int vtp = 0x76A404;
 
-	bool GetTerrainPosAtScreenCoords(shok_positionRot& outpos, int x, int y); // r in this case is the terrain height at the position
-	float GetTerrainHeightAtPos(const shok_position& p);
-	float GetWaterHeightAtPos(const shok_position& p);
+	bool GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y); // r in this case is the terrain height at the position
+	float GetTerrainHeightAtPos(const shok::Position& p);
+	float GetWaterHeightAtPos(const shok::Position& p);
 };
 static_assert(sizeof(shok_ED_CLandscape) == 10 * 4);
 
@@ -333,9 +333,9 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 
 	static inline constexpr int vtp = 0x769F74;
 
-	void ToTerrainCoord(const shok_position& p, int* out);
+	void ToTerrainCoord(const shok::Position& p, int* out);
 	bool IsCoordValid(int* out);
-	shok_EGL_CGLELandscape::BlockingMode GetBlocking(const shok_position& p);
+	shok_EGL_CGLELandscape::BlockingMode GetBlocking(const shok::Position& p);
 
 	static inline shok_ED_CGlobalsLogicEx** const GlobalObj = reinterpret_cast<shok_ED_CGlobalsLogicEx**>(0x8581EC);
 };
@@ -423,7 +423,7 @@ struct shok_GGL_CLogicProperties : shok_BB_IObject {
 	int TaxAmount;
 	float TaxPenalty;
 	int InitialTaxLevel; // 36
-	shok_costInfo BlessingCost;
+	shok::CostInfo BlessingCost;
 	float BlessingBonus; // 55
 	PADDINGI(1);
 	int ForceToWorkPenalty;
@@ -674,7 +674,7 @@ struct shok_ED_CCommandAcknowledgements : shok_object {
 
 	static inline constexpr int vtp = 0x7695C0;
 
-	void ShowAck(const shok_position& pos);
+	void ShowAck(const shok::Position& pos);
 };
 struct shok_modelinstance {
 	enum class TransformOperation : int {
@@ -696,7 +696,7 @@ struct shok_modelinstance {
 	void Rotate(float r, float* axis, TransformOperation op);
 	void Scale(float* s, TransformOperation op); // 3 coordinates (order?)
 	void Scale(float s, TransformOperation op);
-	void Translate(const shok_position& p, float height, TransformOperation op);
+	void Translate(const shok::Position& p, float height, TransformOperation op);
 	void SetColorByPlayerID(int pl);
 	void DisableShadow();
 	void DisableParticleEffects();

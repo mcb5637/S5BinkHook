@@ -3,8 +3,8 @@
 
 struct shok_guistate_targetingdata { // size 8
 	int TargetID;
-	shok_position TargetPos;
-	shok_positionRot TargetPosWithZ;
+	shok::Position TargetPos;
+	shok::PositionRot TargetPosWithZ;
 	PADDINGI(2);
 };
 static_assert(sizeof(shok_guistate_targetingdata) == 8 * 4);
@@ -188,7 +188,7 @@ struct shok_GGUI_CPlaceCannonState : shok_GGUI_CCommandState {
 };
 struct shok_GGUI_CPlaceBuildingState : shok_GGUI_CBasicState {
 	int UpgradeCategory;
-	shok_position PosToBuild;
+	shok::Position PosToBuild;
 	int MouseX, MouseY; // screenpos
 
 	void UpdateModel();
@@ -201,9 +201,9 @@ struct shok_GGUI_CPlaceBuildingState : shok_GGUI_CBasicState {
 	static float PlacementRotation;
 	static void HookPlacementRotation();
 
-	static shok_positionRot GetNearestPlacementPosBuildOn(int ety, const shok_position& p, float range);
-	static shok_positionRot GetNearestPlacementPosFree(int ety, const shok_positionRot& p, float range);
-	static shok_positionRot GetNearestPlacementPos(int ety, const shok_positionRot& p, float range);
+	static shok::PositionRot GetNearestPlacementPosBuildOn(int ety, const shok::Position& p, float range);
+	static shok::PositionRot GetNearestPlacementPosFree(int ety, const shok::PositionRot& p, float range);
+	static shok::PositionRot GetNearestPlacementPos(int ety, const shok::PositionRot& p, float range);
 };
 static_assert(sizeof(shok_GGUI_CPlaceBuildingState) / 4 == 7);
 
@@ -227,7 +227,7 @@ struct shok_ERwTools_CRpClumpRenderable : shok_object {
 	static inline constexpr int vtp = 0x7AEBF8;
 
 	void SetModelData(const shok_modeldata* modeldata, float rotation);
-	void SetPosition(const shok_position& p, float z);
+	void SetPosition(const shok::Position& p, float z);
 	void SetBuildingRedColor(bool r);
 };
 
@@ -264,7 +264,7 @@ struct shok_EGL_CGLEGUIInterface : shok_object {
 };
 struct shok_GGL_CGLGUIInterface : shok_object {
 
-	bool GetNearestFreePosForBuildingPlacement(int ety, const shok_position& inp, shok_position& outp);
+	bool GetNearestFreePosForBuildingPlacement(int ety, const shok::Position& inp, shok::Position& outp);
 
 	static inline constexpr int vtp = 0x76D9A4;
 };

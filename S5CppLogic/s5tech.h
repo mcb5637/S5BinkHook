@@ -31,7 +31,7 @@ struct shok_technology {
 	float TimeToResearch;
 	byte AutomaticResearch;
 	PADDING(3);
-	shok_costInfo ResourceCosts;
+	shok::CostInfo ResourceCosts;
 	int RequiredTecConditions;
 	vector_padding;
 	std::vector<shok_technologyRequirementTech, shok::Allocator<shok_technologyRequirementTech>> TecConditions;

@@ -61,7 +61,7 @@ void shok_GGL_CCannonBallEffect::HookFromCreator()
 	if (HookFromCreator_Hooked)
 		return;
 	HookFromCreator_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm);
 }
 
@@ -101,10 +101,10 @@ int __fastcall ArrowOnHitHook(shok_EGL_CFlyingEffect* th) {
 }
 void WriteProjectlileOnHits() {
 	shok_vtable_EGL_CFlyingEffect* vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CCannonBallEffect::vtp);
-	shok_saveVirtualProtect vp{ vt, 12 * 4 };
+	shok::SaveVirtualProtect vp{ vt, 12 * 4 };
 	vt->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&CannonBallOnHitHook);
 	vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(shok_GGL_CArrowEffect::vtp);
-	shok_saveVirtualProtect vp2{ vt, 12 * 4 };
+	shok::SaveVirtualProtect vp2{ vt, 12 * 4 };
 	vt->OnHit = reinterpret_cast<int(__thiscall*)(shok_EGL_CFlyingEffect*)>(&ArrowOnHitHook);
 }
 void shok_EGL_CFlyingEffect::HookOnHit()

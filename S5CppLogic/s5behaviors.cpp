@@ -3,8 +3,8 @@
 
 struct shok_vtable_EGL_CGLEBehavior : shok_vtable_BB_IObject {
 	int(__thiscall* AddHandlers)(shok_EGL_CGLEBehavior*, int);
-	int(__thiscall* OnEntityCreate)(shok_EGL_CGLEBehavior* th, shok_EGL_CGLEBehaviorProps* p);
-	int(__thiscall* OnEntityLoad)(shok_EGL_CGLEBehavior* th, shok_EGL_CGLEBehaviorProps* p);
+	int(__thiscall* OnEntityCreate)(shok_EGL_CGLEBehavior* th, EGL::CGLEBehaviorProps* p);
+	int(__thiscall* OnEntityLoad)(shok_EGL_CGLEBehavior* th, EGL::CGLEBehaviorProps* p);
 	PADDINGI(2); // nullsubs 0x52B509
 };
 
@@ -21,7 +21,7 @@ struct shok_vtable_GGL_CBattleBehavior : shok_vtable_EGL_CGLEBehavior { // behav
 struct shok_vtable_shok_GGL_CPositionAtResourceFinder {
 	void(__thiscall* Destructor)(shok_GGL_CPositionAtResourceFinder* th, bool free);
 	float(__thiscall* SearchForPosition)(shok_GGL_CPositionAtResourceFinder* th, shok_EGL_CGLEEntity* e);
-	void(__thiscall* GetPositionOffset)(shok_GGL_CPositionAtResourceFinder* th, shok_position* p, float f);
+	void(__thiscall* GetPositionOffset)(shok_GGL_CPositionAtResourceFinder* th, shok::Position* p, float f);
 };
 
 // vtable heroability 8 is ability(this, abilityid)
@@ -60,7 +60,7 @@ void shok_GGL_CBombPlacerBehavior::FixBombAttachment()
 	if (FixBombAttachment_Hooked)
 		return;
 	FixBombAttachment_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x5062C6), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5062C6), 10 };
 	WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
 }
 
@@ -70,13 +70,13 @@ int __fastcall sniperability_tasksnipeoverride(shok_GGL_CSniperAbility* thi, int
 	shok_EGL_CGLEEntity* tar = shok_EGL_CGLEEntity::GetEntityByID(thi->TargetId);
 	if (!tar || tar->Health <= 0)
 		return 0;
-	shok_GGL_CSniperAbilityProps* pr = thent->GetEntityType()->GetBehaviorProps<shok_GGL_CSniperAbilityProps>();
+	GGL::CSniperAbilityProps* pr = thent->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
 	if (thent->Position.GetDistanceSquaredTo(tar->Position) >= pr->Range * pr->Range)
 		return 0;
 	int dmg = static_cast<int>(tar->GetMaxHealth() * pr->DamageFactor);
 	if (shok_GGL_CSniperAbility::SnipeDamageOverride)
 		dmg = shok_GGL_CSniperAbility::SnipeDamageOverride(thent, tar, dmg);
-	shok_GGL_CBattleBehaviorProps* bpr = thent->GetEntityType()->GetBehaviorProps< shok_GGL_CBattleBehaviorProps>();
+	GGL::CBattleBehaviorProps* bpr = thent->GetEntityType()->GetBehaviorProps< GGL::CBattleBehaviorProps>();
 	shok_CProjectileEffectCreator cr{};
 	cr.EffectType = bpr->ProjectileEffectID;
 	cr.PlayerID = thent->PlayerId;
@@ -99,7 +99,7 @@ void shok_GGL_CSniperAbility::OverrideSnipeTask()
 	if (OverrideSnipeTask_Hooked)
 		return;
 	OverrideSnipeTask_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
 }
 
@@ -137,7 +137,7 @@ void shok_GGL_CKegBehavior::AdvancedDealDamage()
 					}
 					else {
 						float kegeff = static_cast<shok_GGL_CGLBuildingProps*>(b->GetEntityType()->LogicProps)->KegEffectFactor;
-						int dmgperc = static_cast<shok_GGL_CKegBehaviorProperties*>(PropPointer)->DamagePercent;
+						int dmgperc = static_cast<GGL::CKegBehaviorProperties*>(PropPointer)->DamagePercent;
 						int mhp = b->GetMaxHealth();
 						dmg = static_cast<int>(kegeff * dmgperc * mhp / 100);
 					}
@@ -156,7 +156,7 @@ void shok_GGL_CKegBehavior::AdvancedDealDamage()
 		}
 	}
 	{
-		shok_GGL_CKegBehaviorProperties* pr = static_cast<shok_GGL_CKegBehaviorProperties*>(PropPointer);
+		GGL::CKegBehaviorProperties* pr = static_cast<GGL::CKegBehaviorProperties*>(PropPointer);
 		shok_EGL_CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, 0, true, false, true, AdvancedDealDamageSource::AbilitySabotageBlast);
 	}
 }
@@ -180,10 +180,10 @@ float shok_GGL_CPositionAtResourceFinder::SearchForPosition(shok_EGL_CGLEEntity*
 {
 	return reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->SearchForPosition(this, e);
 }
-static inline void(__thiscall* const shok_GGL_CPositionAtResourceFinder_getposbyfloat)(shok_GGL_CPositionAtResourceFinder* th, shok_position* p, float f) = reinterpret_cast<void(__thiscall*)(shok_GGL_CPositionAtResourceFinder*, shok_position*, float)>(0x4CA89E);
-shok_position shok_GGL_CPositionAtResourceFinder::CalcPositionFromFloat(float f)
+static inline void(__thiscall* const shok_GGL_CPositionAtResourceFinder_getposbyfloat)(shok_GGL_CPositionAtResourceFinder* th, shok::Position* p, float f) = reinterpret_cast<void(__thiscall*)(shok_GGL_CPositionAtResourceFinder*, shok::Position*, float)>(0x4CA89E);
+shok::Position shok_GGL_CPositionAtResourceFinder::CalcPositionFromFloat(float f)
 {
-	shok_position p;
+	shok::Position p;
 	//reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->GetPosition(this, &p, f);
 	shok_GGL_CPositionAtResourceFinder_getposbyfloat(this, &p, f);
 	return p;

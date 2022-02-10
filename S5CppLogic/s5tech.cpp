@@ -61,6 +61,6 @@ void EnableConstructionSpeedTechs()
 	if (EnableConstructionSpeedTechs_Hooked)
 		return;
 	EnableConstructionSpeedTechs_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 10 };
 	WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook);
 }

@@ -5,45 +5,30 @@
 #include <libloaderapi.h>
 
 
-shok_saveVirtualProtect::shok_saveVirtualProtect() : shok_saveVirtualProtect(reinterpret_cast<void*>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH)
-{
-}
-shok_saveVirtualProtect::shok_saveVirtualProtect(void* adr, size_t size)
-{
-	Adr = adr;
-	Size = size;
-	Prev = PAGE_EXECUTE_READWRITE;
-	VirtualProtect(adr, size, PAGE_EXECUTE_READWRITE, &Prev);
-}
-shok_saveVirtualProtect::~shok_saveVirtualProtect()
-{
-	VirtualProtect(Adr, Size, Prev, &Prev);
-}
-
-void shok_position::FloorToBuildingPlacement()
+void shok::Position::FloorToBuildingPlacement()
 {
 	X = std::floorf(X / 100) * 100;
 	Y = std::floorf(Y / 100) * 100;
 }
-void shok_position::RoundToBuildingPlacement()
+void shok::Position::RoundToBuildingPlacement()
 {
 	X = std::roundf(X / 100) * 100;
 	Y = std::roundf(Y / 100) * 100;
 }
 
-float shok_position::GetDistanceSquaredTo(const shok_position& p) const
+float shok::Position::GetDistanceSquaredTo(const shok::Position& p) const
 {
 	float dx = X - p.X;
 	float dy = Y - p.Y;
 	return (dx * dx + dy * dy);
 }
 
-bool shok_position::IsInRange(const shok_position& p, float range) const
+bool shok::Position::IsInRange(const shok::Position& p, float range) const
 {
 	return GetDistanceSquaredTo(p) <= (range * range);
 }
 
-float shok_position::GetAngleBetween(const shok_position& p) const
+float shok::Position::GetAngleBetween(const shok::Position& p) const
 {
 	float dx = X - p.X;
 	float dy = Y - p.Y;
@@ -61,95 +46,95 @@ float shok_position::GetAngleBetween(const shok_position& p) const
 		a = 90 + a;
 	return a;
 }
-shok_position shok_position::Rotate(float r) const
+shok::Position shok::Position::Rotate(float r) const
 {
 	float s = std::sinf(r);
 	float c = std::cosf(r);
 	return { X * c + Y * s, X * s + Y * c };
 }
-shok_position shok_position::RotateAround(float r, const shok_position& center) const
+shok::Position shok::Position::RotateAround(float r, const shok::Position& center) const
 {
-	shok_position p = *this - center;
+	shok::Position p = *this - center;
 	p = p.Rotate(r);
 	return p + center;
 }
 
-shok_position shok_position::operator+(const shok_position& other) const
+shok::Position shok::Position::operator+(const shok::Position& other) const
 {
-	shok_position r = *this;
+	shok::Position r = *this;
 	r += other;
 	return r;
 }
-shok_position& shok_position::operator+=(const shok_position& other)
+shok::Position& shok::Position::operator+=(const shok::Position& other)
 {
 	this->X += other.X;
 	this->Y += other.Y;
 	return *this;
 }
-shok_position shok_position::operator-(const shok_position& other) const
+shok::Position shok::Position::operator-(const shok::Position& other) const
 {
-	shok_position r = *this;
+	shok::Position r = *this;
 	r -= other;
 	return r;
 }
-shok_position& shok_position::operator-=(const shok_position& other)
+shok::Position& shok::Position::operator-=(const shok::Position& other)
 {
 	this->X -= other.X;
 	this->Y -= other.Y;
 	return *this;
 }
-shok_position shok_position::operator*(float f) const
+shok::Position shok::Position::operator*(float f) const
 {
-	shok_position r = *this;
+	shok::Position r = *this;
 	r *= f;
 	return r;
 }
-shok_position& shok_position::operator*=(float f)
+shok::Position& shok::Position::operator*=(float f)
 {
 	this->X *= f;
 	this->Y *= f;
 	return *this;
 }
-float shok_position::Dot(const shok_position& o) const
+float shok::Position::Dot(const shok::Position& o) const
 {
 	return this->X * o.X + this->Y * o.Y;
 }
-shok_BB_CClassFactory_serializationData* shok_position::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D9B0);
+shok_BB_CClassFactory_serializationData* shok::Position::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D9B0);
 
-shok_AARect shok_AARect::operator+(const shok_AARect& other) const
+shok::AARect shok::AARect::operator+(const shok::AARect& other) const
 {
 	return { this->low + other.low, this->high + other.high };
 }
-shok_AARect& shok_AARect::operator+=(const shok_AARect& other)
+shok::AARect& shok::AARect::operator+=(const shok::AARect& other)
 {
 	this->low += other.low;
 	this->high += other.high;
 	return *this;
 }
-shok_AARect shok_AARect::operator-(const shok_AARect& other) const
+shok::AARect shok::AARect::operator-(const shok::AARect& other) const
 {
 	return { this->low - other.low, this->high - other.high };
 }
-shok_AARect& shok_AARect::operator-=(const shok_AARect& other)
+shok::AARect& shok::AARect::operator-=(const shok::AARect& other)
 {
 	this->low -= other.low;
 	this->high -= other.high;
 	return *this;
 }
-shok_AARect shok_AARect::Rotate(float r) const
+shok::AARect shok::AARect::Rotate(float r) const
 {
 	return { low.Rotate(r), high.Rotate(r) };
 }
-shok_AARect shok_AARect::Sort() const
+shok::AARect shok::AARect::Sort() const
 {
-	shok_AARect r = *this;
+	shok::AARect r = *this;
 	if (r.high.X < r.low.X)
 		std::swap(r.high.X, r.low.X);
 	if (r.high.Y < r.low.Y)
 		std::swap(r.high.Y, r.low.Y);
 	return r;
 }
-shok_BB_CClassFactory_serializationData* shok_AARect::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85DA90);
+shok_BB_CClassFactory_serializationData* shok::AARect::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85DA90);
 
 void RedirectCall(void* call, void* redirect) {
 	byte* opcode = reinterpret_cast<byte*>(call);
@@ -165,7 +150,7 @@ void RedirectCall(void* call, void* redirect) {
 }
 void RedirectCallVP(void* call, void* redirect)
 {
-	shok_saveVirtualProtect vp{ call, 10 };
+	shok::SaveVirtualProtect vp{ call, 10 };
 	RedirectCall(call, redirect);
 }
 long long WriteJump(void* adr, void* toJump) {
@@ -175,12 +160,6 @@ long long WriteJump(void* adr, void* toJump) {
 	int* a = reinterpret_cast<int*>(opcode + 1);
 	*a = reinterpret_cast<int>(toJump) - reinterpret_cast<int>(a + 1); // address relative to next instruction
 	return r;
-}
-
-bool operator<(shok_attachment a, shok_attachment b) {
-	if (a.AttachmentType == b.AttachmentType)
-		return a.EntityId < b.EntityId;
-	return a.AttachmentType < b.AttachmentType;
 }
 
 lua_State* mainmenu_state = nullptr;
@@ -264,26 +243,26 @@ bool DoesFileExist(const char* name)
 	return r;
 }
 
-static inline float(__thiscall* const costinfo_getres)(const shok_costInfo* th, shok_ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(const shok_costInfo*, shok_ResourceType, bool)>(0x4A9606);
-float shok_costInfo::GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const
+static inline float(__thiscall* const costinfo_getres)(const shok::CostInfo* th, shok_ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(const shok::CostInfo*, shok_ResourceType, bool)>(0x4A9606);
+float shok::CostInfo::GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const
 {
 	return costinfo_getres(this, ty, addRaw);
 }
 
-static inline void(__thiscall* const costinfo_add)(shok_costInfo* th, shok_ResourceType ty, float a) = reinterpret_cast<void(__thiscall*)(shok_costInfo*, shok_ResourceType, float)>(0x4A9774);
-void shok_costInfo::AddToType(shok_ResourceType ty, float toadd)
+static inline void(__thiscall* const costinfo_add)(shok::CostInfo* th, shok_ResourceType ty, float a) = reinterpret_cast<void(__thiscall*)(shok::CostInfo*, shok_ResourceType, float)>(0x4A9774);
+void shok::CostInfo::AddToType(shok_ResourceType ty, float toadd)
 {
 	costinfo_add(this, ty, toadd);
 }
 
-static inline void(__thiscall* const costinfo_sub)(shok_costInfo* th, shok_ResourceType ty, float a, float b) = reinterpret_cast<void(__thiscall*)(shok_costInfo*, shok_ResourceType, float, float)>(0x4A963D);
-void shok_costInfo::SubFromType(shok_ResourceType ty, float tosub)
+static inline void(__thiscall* const costinfo_sub)(shok::CostInfo* th, shok_ResourceType ty, float a, float b) = reinterpret_cast<void(__thiscall*)(shok::CostInfo*, shok_ResourceType, float, float)>(0x4A963D);
+void shok::CostInfo::SubFromType(shok_ResourceType ty, float tosub)
 {
 	costinfo_sub(this, ty, tosub, 0.0f);
 }
 
-static inline bool(__thiscall* const constinfo_hasres)(const shok_costInfo* th, const shok_costInfo* has) = reinterpret_cast<bool(__thiscall*)(const shok_costInfo*, const shok_costInfo*)>(0x4A96D3);
-bool shok_costInfo::HasResources(const shok_costInfo* has) const
+static inline bool(__thiscall* const constinfo_hasres)(const shok::CostInfo* th, const shok::CostInfo* has) = reinterpret_cast<bool(__thiscall*)(const shok::CostInfo*, const shok::CostInfo*)>(0x4A96D3);
+bool shok::CostInfo::HasResources(const shok::CostInfo* has) const
 {
 	return constinfo_hasres(this, has);
 }
@@ -332,7 +311,7 @@ void HookGetStringTableText()
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
 	HookGetStringTableText_Hooked = true;
-	shok_saveVirtualProtect vp{ shok_GetStringTableText , 10 };
+	shok::SaveVirtualProtect vp{ shok_GetStringTableText , 10 };
 	WriteJump(shok_GetStringTableText, &hooksttasm);
 }
 
@@ -402,8 +381,8 @@ void HookTextPrinting()
 	if (HookTextPrinting_Hooked)
 		return;
 	HookTextPrinting_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x557E47), 10 };
-	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x708F60), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x557E47), 10 };
+	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x708F60), 10 };
 	WriteJump(reinterpret_cast<void*>(0x557E47), reinterpret_cast<void*>(0x557DAA)); // continue checking @ after center,... (redirecting an existing jmp, and removing a push for a previous parameter)
 	WriteJump(reinterpret_cast<void*>(0x708F60), &textprinting_getstringlen);
 }

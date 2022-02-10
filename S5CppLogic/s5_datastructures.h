@@ -2,6 +2,7 @@
 #include "s5data.h"
 
 #include <vector>
+#include <list>
 
 namespace shok {
 
@@ -97,6 +98,9 @@ namespace shok {
 		const auto operator[](size_t p) const {
 			return Internal[p];
 		}
+		size_t size() const noexcept {
+			return Internal.size();
+		}
 
 		struct SaveVector_Data {
 #ifdef _DEBUG
@@ -127,9 +131,86 @@ namespace shok {
 #endif
 		};
 
+		// use this to make anythink more complicated than iterating over the vector.
+		// use always as stack variable!
 		SaveVector_Data SaveVector() {
 			return SaveVector_Data{ Internal };
 		}
 	};
 	static_assert(sizeof(Vector<int>) == 4 * 4);
+
+	template<class T>
+	class List {
+#ifndef _DEBUG
+		PADDINGI(1);
+#endif
+	private:
+		std::list<T, shok::Allocator<T>> Internal{};
+
+	public:
+		auto begin() noexcept {
+			return Internal.begin();
+		}
+		const auto begin() const noexcept {
+			return Internal.begin();
+		}
+		auto end() noexcept {
+			return Internal.end();
+		}
+		const auto end() const noexcept {
+			return Internal.end();
+		}
+		// these get used by vs for some reason over the official begin/end in for loops
+		auto _Unchecked_begin() noexcept {
+			return Internal._Unchecked_begin();
+		}
+		auto _Unchecked_begin() const noexcept {
+			return Internal._Unchecked_begin();
+		}
+		auto _Unchecked_end() noexcept {
+			return Internal._Unchecked_end();
+		}
+		auto _Unchecked_end() const noexcept {
+			return Internal._Unchecked_end();
+		}
+		size_t size() const noexcept {
+			return Internal.size();
+		}
+
+		struct SaveList_Data {
+#ifdef _DEBUG
+			std::list<T, Allocator<T>> List{};
+		private:
+			int backu[2] = {};
+			std::list<T, Allocator<T>>& real;
+
+		public:
+			SaveList_Data(std::list<T, Allocator<T>>& v) : real(v) {
+				int* vecPoint = reinterpret_cast<int*>(&real);
+				int* savePoint = reinterpret_cast<int*>(&List);
+				for (int i = 1; i < 3; i++) {
+					backu[i - 1] = savePoint[i];
+					savePoint[i] = vecPoint[i];
+				}
+			}
+			~SaveList_Data() {
+				int* vecPoint = reinterpret_cast<int*>(&real);
+				int* savePoint = reinterpret_cast<int*>(&List);
+				for (int i = 1; i < 3; i++) {
+					vecPoint[i] = savePoint[i];
+					savePoint[i] = backu[i - 1];
+				}
+			}
+#else
+			std::list<T, shok::Allocator<T>>& List;
+#endif
+		};
+
+		// use this to make anythink more complicated than iterating over the list.
+		// use always as stack variable!
+		SaveList_Data SaveList() {
+			return SaveList_Data{ Internal };
+		}
+	};
+	static_assert(sizeof(List<int>) == 3 * 4);
 }

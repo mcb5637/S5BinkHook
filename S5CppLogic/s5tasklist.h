@@ -20,7 +20,7 @@ struct shok_EGL_CGLETaskArgsThousandths : shok_EGL_CGLETaskArgs {
 };
 
 struct shok_EGL_CGLETaskArgsPosition : shok_EGL_CGLETaskArgs {
-	shok_position Position;
+	shok::Position Position;
 
 	static inline constexpr int vtp = 0x7713F4;
 	static inline constexpr int TypeDesc = 0x812DA4;

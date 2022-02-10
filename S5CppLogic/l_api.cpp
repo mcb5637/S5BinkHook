@@ -32,7 +32,7 @@ namespace CppLogic::API {
 
 	int Log(lua::State L) {
 		const char* s = L.CheckString(1);
-		shok_logString("%s\n", s);
+		shok::LogString("%s\n", s);
 		return 0;
 	}
 

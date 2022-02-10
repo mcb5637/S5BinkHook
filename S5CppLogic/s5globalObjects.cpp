@@ -54,7 +54,7 @@ struct shok_vtable_ED_CLandscape {
 	float(__thiscall* GetTerrainHeightAtPos)(shok_ED_CLandscape* th, float x, float y);
 	float(__thiscall* GetWaterHeightAtPos)(shok_ED_CLandscape* th, float x, float y);
 	float(__thiscall* GetHigherTerrainOrWaterHeightAtPos)(shok_ED_CLandscape* th, float x, float y);
-	bool(__thiscall* GetLandscapePosFromMousePos)(shok_ED_CLandscape* th, void* cam, float* mousepos, shok_positionRot* outpos, int flag);
+	bool(__thiscall* GetLandscapePosFromMousePos)(shok_ED_CLandscape* th, void* cam, float* mousepos, shok::PositionRot* outpos, int flag);
 	PADDINGI(1); // ret 0.0f, thiscall 3 args
 };
 //constexpr int i = offsetof(shok_vtable_ED_CLandscape, GetLandscapePosFromMousePos) / 4;
@@ -146,7 +146,7 @@ int shok_BB_CIDManager::GetIDByName(const char* name)
 	return GetIDByName(name, 0);
 }
 
-void shok_EGL_CTerrainVertexColors::ToTerrainCoord(shok_position& p, int* out)
+void shok_EGL_CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
@@ -155,7 +155,7 @@ bool shok_EGL_CTerrainVertexColors::IsCoordValid(int* out)
 {
 	return out[0] >= 0 && out[1] >= 0 && (out[0] + 1) < ArraySizeX && (out[1] + 1) < ArraySizeY;
 }
-int shok_EGL_CTerrainVertexColors::GetTerrainVertexColor(shok_position& p)
+int shok_EGL_CTerrainVertexColors::GetTerrainVertexColor(shok::Position& p)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
@@ -164,7 +164,7 @@ int shok_EGL_CTerrainVertexColors::GetTerrainVertexColor(shok_position& p)
 	return VertexColors[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
 }
 void(__thiscall* const terrvertexcol_setvcol)(shok_EGL_CTerrainVertexColors* th, int x, int y, int* col) = reinterpret_cast<void(__thiscall*)(shok_EGL_CTerrainVertexColors*, int, int, int*)>(0x580582);
-void shok_EGL_CTerrainVertexColors::SetTerrainVertexColor(shok_position& p, int col)
+void shok_EGL_CTerrainVertexColors::SetTerrainVertexColor(shok::Position& p, int col)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
@@ -173,7 +173,7 @@ void shok_EGL_CTerrainVertexColors::SetTerrainVertexColor(shok_position& p, int 
 	terrvertexcol_setvcol(this, qp[0], qp[1], &col);
 }
 
-void shok_EGL_CGLETerrainHiRes::ToTerrainCoord(const shok_position& p, int* out)
+void shok_EGL_CGLETerrainHiRes::ToTerrainCoord(const shok::Position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
@@ -186,7 +186,7 @@ bool shok_EGL_CGLETerrainHiRes::IsCoordValid(int* out)
 {
 	return IsCoordValid(out[0], out[1]);
 }
-int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(const shok_position& p)
+int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(const shok::Position& p)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
@@ -195,7 +195,7 @@ int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(const shok_position& p)
 	return TerrainHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
 }
 void(__thiscall* const terrhires_setheight)(shok_EGL_CGLETerrainHiRes* th, int* qp, int16_t h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainHiRes*, int*, int16_t)>(0x591B53);
-void shok_EGL_CGLETerrainHiRes::SetTerrainHeight(const shok_position& p, int h)
+void shok_EGL_CGLETerrainHiRes::SetTerrainHeight(const shok::Position& p, int h)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
@@ -207,7 +207,7 @@ int shok_EGL_CGLETerrainHiRes::GetTerrainHeight(int x, int y) {
 	return TerrainHeights[(y + 1) * ArraySizeY + (x + 1)];
 }
 
-void shok_EGL_CGLETerrainLowRes::ToQuadCoord(const shok_position& p, int* out)
+void shok_EGL_CGLETerrainLowRes::ToQuadCoord(const shok::Position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100) / 4);
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100) / 4);
@@ -227,7 +227,7 @@ bool shok_EGL_CGLETerrainLowRes::IsBridgeHeightCoordValid(int x, int y)
 	}
 	return x >= 0 && y >= 0 && x < MaxSizeX&& y < MaxSizeY;
 }
-int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(const shok_position& p)
+int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(const shok::Position& p)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -236,7 +236,7 @@ int shok_EGL_CGLETerrainLowRes::GetTerrainTypeAt(const shok_position& p)
 	return Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0xFF;
 }
 void(__thiscall* const terrlores_settty)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x58BBCE);
-void shok_EGL_CGLETerrainLowRes::SetTerrainTypeAt(const shok_position& p, int tty)
+void shok_EGL_CGLETerrainLowRes::SetTerrainTypeAt(const shok::Position& p, int tty)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -244,7 +244,7 @@ void shok_EGL_CGLETerrainLowRes::SetTerrainTypeAt(const shok_position& p, int tt
 		DEBUGGER_BREAK;
 	terrlores_settty(this, qp, tty);
 }
-int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(const shok_position& p)
+int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(const shok::Position& p)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -253,7 +253,7 @@ int shok_EGL_CGLETerrainLowRes::GetWaterTypeAt(const shok_position& p)
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3F00) >> 8;
 }
 void(__thiscall* const terrlores_setwty)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x591BB9);
-void shok_EGL_CGLETerrainLowRes::SetWaterTypeAt(const shok_position& p, int wty)
+void shok_EGL_CGLETerrainLowRes::SetWaterTypeAt(const shok::Position& p, int wty)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -261,7 +261,7 @@ void shok_EGL_CGLETerrainLowRes::SetWaterTypeAt(const shok_position& p, int wty)
 		DEBUGGER_BREAK;
 	terrlores_setwty(this, qp, wty);
 }
-int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(const shok_position& p)
+int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(const shok::Position& p)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -270,7 +270,7 @@ int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(const shok_position& p)
 	return (Data[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)] & 0x3FFFC000) >> 14;
 }
 void(__thiscall* const terrlores_setwh)(shok_EGL_CGLETerrainLowRes* th, int* qp, int h) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLETerrainLowRes*, int*, int)>(0x591B82);
-void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(const shok_position& p, int wh)
+void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(const shok::Position& p, int wh)
 {
 	int qp[2] = { 0,0 };
 	ToQuadCoord(p, qp);
@@ -278,7 +278,7 @@ void shok_EGL_CGLETerrainLowRes::SetWaterHeightAt(const shok_position& p, int wh
 		DEBUGGER_BREAK;
 	terrlores_setwh(this, qp, wh);
 }
-int shok_EGL_CGLETerrainLowRes::GetBridgeHeight(const shok_position& p)
+int shok_EGL_CGLETerrainLowRes::GetBridgeHeight(const shok::Position& p)
 {
 	int qp[2] = { 0,0 };
 	if (HiResBridgeHeightEnabled) {
@@ -293,7 +293,7 @@ int shok_EGL_CGLETerrainLowRes::GetBridgeHeight(const shok_position& p)
 		DEBUGGER_BREAK;
 	return BridgeHeights[(qp[1] + 1) * ArraySizeY + (qp[0] + 1)];
 }
-void shok_EGL_CGLETerrainLowRes::SetBridgeHeight(const shok_position& p, int bh)
+void shok_EGL_CGLETerrainLowRes::SetBridgeHeight(const shok::Position& p, int bh)
 {
 	int qp[2] = { 0,0 };
 	if (HiResBridgeHeightEnabled) {
@@ -327,12 +327,12 @@ int shok_EGL_CGLETerrainLowRes::GetWaterHeightAt(int x, int y)
 }
 float shok_EGL_CGLETerrainLowRes::GetBridgeHeightFloat(float x, float y)
 {
-	shok_position p{ x,y };
+	shok::Position p{ x,y };
 	return static_cast<float>(GetBridgeHeight(p));
 }
 
 float __fastcall shok_ED_CLandscape_overridegetwaterheightatpos(shok_ED_CLandscape* th, int _, float x, float y) { // this func breaks its arguments, so i have to rewrite it instead of patching a few instructions
-	shok_position p{ min(max(0, x), th->WorldSizeX),min(max(0, y), th->WorldSizeY) };
+	shok::Position p{ min(max(0, x), th->WorldSizeX),min(max(0, y), th->WorldSizeY) };
 	if ((*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&p, shok_EGL_CGLELandscape::BlockingMode::BridgeArea)) {
 		return static_cast<float>(th->TerrainLowRes->GetBridgeHeight(p));
 	}
@@ -356,7 +356,7 @@ void __fastcall shok_bridge_applyheight(shok_GGL_CBridgeEntity* th) {
 	shok_GGL_CBridgeProperties* p = static_cast<shok_GGL_CBridgeProperties*>(th->GetEntityType()->LogicProps);
 	auto* lr = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes;
 	int h = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(th->Position) + p->Height;
-	for (const shok_AARect& area : p->BridgeArea) {
+	for (const shok::AARect& area : p->BridgeArea) {
 		shok_EGL_CGLELandscape::AdvancedAARectIterator it{ th->Position, area, th->Position.r, !shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled, true };
 		for (const auto& c : it) {
 			if (!lr->IsBridgeHeightCoordValid(c.x, c.y))
@@ -373,11 +373,11 @@ void shok_EGL_CGLETerrainLowRes::EnableHiResBridgeHeight()
 	if (shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled)
 		return;
 	shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
 	*reinterpret_cast<float(__fastcall**)(shok_ED_CLandscape*, int, float, float)>(0x76A410) = &shok_ED_CLandscape_overridegetwaterheightatpos;
-	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
+	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
 	WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc);
-	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
+	shok::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
 	WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight);
 }
 
@@ -427,18 +427,18 @@ bool shok_EGL_CGLELandscape_blockingData::IsCoordValid(int x, int y)
 {
 	return x >= 0 && x < ArraySizeXY&& y >= 0 && y < ArraySizeXY;
 }
-void(__thiscall* const buildblock_gethigh)(const shok_GGL_CGLBuildingProps* t, shok_position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok_position*, float)>(0x4C7B8B);
-void(__thiscall* const buildblock_getlow)(const shok_GGL_CGLBuildingProps* t, shok_position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok_position*, float)>(0x4C7B1E);
+void(__thiscall* const buildblock_gethigh)(const shok_GGL_CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok::Position*, float)>(0x4C7B8B);
+void(__thiscall* const buildblock_getlow)(const shok_GGL_CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok::Position*, float)>(0x4C7B1E);
 struct shok_GGL_CFreeBuildingPosPredicate {
 	PADDINGI(20);
 };
-void(__thiscall* const freebuildpred_ctor)(shok_GGL_CFreeBuildingPosPredicate* p, shok_position* lo, shok_position* hi, int uk, float r) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*, shok_position*, shok_position*, int, float)>(0x4C7E84);
+void(__thiscall* const freebuildpred_ctor)(shok_GGL_CFreeBuildingPosPredicate* p, shok::Position* lo, shok::Position* hi, int uk, float r) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*, shok::Position*, shok::Position*, int, float)>(0x4C7E84);
 void(__thiscall* const freebuildpred_calc)(shok_EGL_CGLELandscape_blockingData* bl, int x, int y, int* xo, int* yo, int ra, shok_GGL_CFreeBuildingPosPredicate* pred) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape_blockingData*, int, int, int*, int*, int, shok_GGL_CFreeBuildingPosPredicate*)>(0x57F726);
 void(__thiscall* const freebuildpred_dtor)(shok_GGL_CFreeBuildingPosPredicate* p) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*)>(0x4C7E07);
-shok_position shok_EGL_CGLELandscape_blockingData::GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok_positionRot& pos, float range)
+shok::Position shok_EGL_CGLELandscape_blockingData::GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok::PositionRot& pos, float range)
 {
 	int x = 0, y = 0;
-	shok_position hi, lo;
+	shok::Position hi, lo;
 	buildblock_gethigh(bprops, &hi, pos.r);
 	buildblock_getlow(bprops, &lo, pos.r);
 	shok_GGL_CFreeBuildingPosPredicate pred;
@@ -456,15 +456,15 @@ shok_EGL_CGLELandscape::BlockingMode shok_EGL_CGLELandscape_blockingData::GetBlo
 	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(data[x + y * *shok_EGL_CGLEGameLogic::MapSize]);
 }
 
-static inline int(__thiscall* const shokLandscape_getSector)(shok_EGL_CGLELandscape* th, const shok_position* p) = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*)>(0x5778BE);
-int shok_EGL_CGLELandscape::GetSector(const shok_position* p)
+static inline int(__thiscall* const shokLandscape_getSector)(shok_EGL_CGLELandscape* th, const shok::Position* p) = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLELandscape*, const shok::Position*)>(0x5778BE);
+int shok_EGL_CGLELandscape::GetSector(const shok::Position* p)
 {
 	return shokLandscape_getSector(this, p);
 }
 
 static inline void(__thiscall* const shoklandscape_getnearestcon)(int* pred, bool* one, int sector, shok_EGL_CGLELandscape* l) = reinterpret_cast<void(__thiscall*)(int*, bool*, int, shok_EGL_CGLELandscape*)>(0x57F253);
-static inline bool(__thiscall* const shoklandscape_getnearest)(shok_EGL_CGLELandscape* th, const shok_position* pIn, float range, int* pred, shok_position* pOut) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, float, int*, shok_position*)>(0x5775AF);
-bool shok_EGL_CGLELandscape::GetNearestPositionInSector(const shok_position* pIn, float range, int sector, shok_position* pOut)
+static inline bool(__thiscall* const shoklandscape_getnearest)(shok_EGL_CGLELandscape* th, const shok::Position* pIn, float range, int* pred, shok::Position* pOut) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok::Position*, float, int*, shok::Position*)>(0x5775AF);
+bool shok_EGL_CGLELandscape::GetNearestPositionInSector(const shok::Position* pIn, float range, int sector, shok::Position* pOut)
 {
 	int pred[5];
 	bool one = true;
@@ -473,32 +473,32 @@ bool shok_EGL_CGLELandscape::GetNearestPositionInSector(const shok_position* pIn
 	pOut->Y = 0.0f;
 	return shoklandscape_getnearest(this, pIn, range, pred, pOut);
 }
-static inline void(__thiscall* const shoklandscape_getnearestfreepos)(shok_EGL_CGLELandscape* ls, shok_position* ou, const shok_position* in, float r, int* d) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*, const shok_position*, float, int*)>(0x577661);
-shok_position shok_EGL_CGLELandscape::GetNearestFreePos(const shok_position* p, float range)
+static inline void(__thiscall* const shoklandscape_getnearestfreepos)(shok_EGL_CGLELandscape* ls, shok::Position* ou, const shok::Position* in, float r, int* d) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok::Position*, const shok::Position*, float, int*)>(0x577661);
+shok::Position shok_EGL_CGLELandscape::GetNearestFreePos(const shok::Position* p, float range)
 {
-	shok_position r;
+	shok::Position r;
 	int i = 1;
 	shoklandscape_getnearestfreepos(this, &r, p, range, &i);
 	return r;
 }
-static inline bool(__thiscall* const shok_EGL_CGLELandscape_isvalidpos)(shok_EGL_CGLELandscape* ls, shok_position* p) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*)>(0x5785BC);
-bool shok_EGL_CGLELandscape::IsValidPos(shok_position* p)
+static inline bool(__thiscall* const shok_EGL_CGLELandscape_isvalidpos)(shok_EGL_CGLELandscape* ls, shok::Position* p) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, shok::Position*)>(0x5785BC);
+bool shok_EGL_CGLELandscape::IsValidPos(shok::Position* p)
 {
 	return shok_EGL_CGLELandscape_isvalidpos(this, p);
 }
-static inline void(__thiscall* const shok_EGL_CGLELandscape_getsize)(shok_EGL_CGLELandscape* ls, shok_position* p) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok_position*)>(0x578589);
-shok_position shok_EGL_CGLELandscape::GetMapSize()
+static inline void(__thiscall* const shok_EGL_CGLELandscape_getsize)(shok_EGL_CGLELandscape* ls, shok::Position* p) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, shok::Position*)>(0x578589);
+shok::Position shok_EGL_CGLELandscape::GetMapSize()
 {
-	shok_position r;
+	shok::Position r;
 	shok_EGL_CGLELandscape_getsize(this, &r);
 	return r;
 }
-static inline bool(__thiscall* const shok_EGL_CGLELandscape_isposblockedinmode)(shok_EGL_CGLELandscape* ls, const shok_position* p, shok_EGL_CGLELandscape::BlockingMode* mode) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, shok_EGL_CGLELandscape::BlockingMode*)>(0x57772E);
-bool shok_EGL_CGLELandscape::IsPosBlockedInMode(const shok_position* p, BlockingMode mode)
+static inline bool(__thiscall* const shok_EGL_CGLELandscape_isposblockedinmode)(shok_EGL_CGLELandscape* ls, const shok::Position* p, shok_EGL_CGLELandscape::BlockingMode* mode) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLELandscape*, const shok::Position*, shok_EGL_CGLELandscape::BlockingMode*)>(0x57772E);
+bool shok_EGL_CGLELandscape::IsPosBlockedInMode(const shok::Position* p, BlockingMode mode)
 {
 	return shok_EGL_CGLELandscape_isposblockedinmode(this, p, &mode);
 }
-shok_EGL_CGLELandscape::BlockingMode shok_EGL_CGLELandscape::GetBlocking(const shok_position& p)
+shok_EGL_CGLELandscape::BlockingMode shok_EGL_CGLELandscape::GetBlocking(const shok::Position& p)
 {
 	int i[] = { 0,0 };
 	HiRes->ToTerrainCoord(p, i);
@@ -506,25 +506,25 @@ shok_EGL_CGLELandscape::BlockingMode shok_EGL_CGLELandscape::GetBlocking(const s
 		DEBUGGER_BREAK;
 	return BlockingData->GetBlockingData(i[0], i[1]);
 }
-static inline void(__thiscall* const shok_EGL_CGLELandscape_flattenpos)(shok_EGL_CGLELandscape* th, const shok_position* p, const shok_position* a, const shok_position* b, float r) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, const shok_position*, const shok_position*, float)>(0x579AFA);
-void shok_EGL_CGLELandscape::FlattenPosForBuilding(const shok_position& p, const shok_AARect& area, float rot)
+static inline void(__thiscall* const shok_EGL_CGLELandscape_flattenpos)(shok_EGL_CGLELandscape* th, const shok::Position* p, const shok::Position* a, const shok::Position* b, float r) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok::Position*, const shok::Position*, const shok::Position*, float)>(0x579AFA);
+void shok_EGL_CGLELandscape::FlattenPosForBuilding(const shok::Position& p, const shok::AARect& area, float rot)
 {
 	shok_EGL_CGLELandscape_flattenpos(this, &p, &area.low, &area.high, rot);
 }
-static inline void(__thiscall* const shok_EGL_CGLELandscape_applyblocking)(shok_EGL_CGLELandscape* th, const shok_position* p, const shok_position* a, const shok_position* b, float r, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, const shok_position*, const shok_position*, float, shok_EGL_CGLELandscape::BlockingMode*)>(0x577A82);
-void shok_EGL_CGLELandscape::ApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+static inline void(__thiscall* const shok_EGL_CGLELandscape_applyblocking)(shok_EGL_CGLELandscape* th, const shok::Position* p, const shok::Position* a, const shok::Position* b, float r, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok::Position*, const shok::Position*, const shok::Position*, float, shok_EGL_CGLELandscape::BlockingMode*)>(0x577A82);
+void shok_EGL_CGLELandscape::ApplyBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode)
 {
 	shok_EGL_CGLELandscape_applyblocking(this, &p, &area.low, &area.high, rot, &blockingmode);
 }
-static inline void(__thiscall* const shok_EGL_CGLELandscape_remblocking)(shok_EGL_CGLELandscape* th, const shok_position* p, const shok_position* a, const shok_position* b, float r, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok_position*, const shok_position*, const shok_position*, float, shok_EGL_CGLELandscape::BlockingMode*)>(0x577B41);
-void shok_EGL_CGLELandscape::RemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+static inline void(__thiscall* const shok_EGL_CGLELandscape_remblocking)(shok_EGL_CGLELandscape* th, const shok::Position* p, const shok::Position* a, const shok::Position* b, float r, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, const shok::Position*, const shok::Position*, const shok::Position*, float, shok_EGL_CGLELandscape::BlockingMode*)>(0x577B41);
+void shok_EGL_CGLELandscape::RemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode)
 {
 	shok_EGL_CGLELandscape_remblocking(this, &p, &area.low, &area.high, rot, &blockingmode);
 }
 static inline void(__thiscall* const landscape_updateblocking)(shok_EGL_CGLELandscape* th, int* low, int* high) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, int*, int*)>(0x5796A2);
-void shok_EGL_CGLELandscape::UpdateBlocking(const shok_AARect& area)
+void shok_EGL_CGLELandscape::UpdateBlocking(const shok::AARect& area)
 {
-	shok_position p{ min(area.low.X, area.high.X), min(area.low.Y, area.high.Y) };
+	shok::Position p{ min(area.low.X, area.high.X), min(area.low.Y, area.high.Y) };
 	int low[2] = { 0,0 };
 	int high[2] = { 0,0 };
 	HiRes->ToTerrainCoord(p, low);
@@ -536,9 +536,9 @@ void shok_EGL_CGLELandscape::UpdateBlocking(const shok_AARect& area)
 		DEBUGGER_BREAK;
 	landscape_updateblocking(this, low, high);
 }
-void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok_position& p, const shok_AARect& area, float rot)
+void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot)
 {
-	shok_AARect ar = area.Rotate(rot).Sort();
+	shok::AARect ar = area.Rotate(rot).Sort();
 	EntityIteratorPredicateInRect rec{ p.X + ar.low.X, p.Y + ar.low.Y, p.X + ar.high.X - 100, p.Y + ar.high.Y - 100 };
 	EntityIterator it{ &rec };
 	for (auto* ent : it) {
@@ -554,7 +554,7 @@ void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok_position& p, 
 	AdvancedApplyBlocking(p, area, rot, BlockingMode::Blocked);
 }
 static inline void(__thiscall* const landscape_setsingleblockingpoint)(shok_EGL_CGLELandscape* th, int x, int y, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape*, int, int, shok_EGL_CGLELandscape::BlockingMode*)>(0x57738A);
-void shok_EGL_CGLELandscape::AdvancedApplyBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+void shok_EGL_CGLELandscape::AdvancedApplyBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode)
 {
 	AdvancedAARectIterator iter{ p, area, rot, false };
 	for (auto& curr : iter) {
@@ -564,7 +564,7 @@ void shok_EGL_CGLELandscape::AdvancedApplyBlocking(const shok_position& p, const
 	}
 }
 static inline void(__thiscall* const lsblocking_remvoveblockingpoint)(shok_EGL_CGLELandscape_blockingData* th, int x, int y, shok_EGL_CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape_blockingData*, int, int, shok_EGL_CGLELandscape::BlockingMode*)>(0x57EEE1);
-void shok_EGL_CGLELandscape::AdvancedRemoveBlocking(const shok_position& p, const shok_AARect& area, float rot, BlockingMode blockingmode)
+void shok_EGL_CGLELandscape::AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode)
 {
 	AdvancedAARectIterator iter{ p, area, rot, false };
 	for (auto& curr : iter) {
@@ -582,7 +582,7 @@ void shok_EGL_CGLELandscape::RemoveSingleBlockingPoint(int x, int y, BlockingMod
 	if (static_cast<int>(mode) & static_cast<int>(BlockingMode::BridgeArea) && vt->GetSomeGlobal(Tiling))
 		vt->OnPostBlockingMode2Removed(Tiling, x, y);
 }
-void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, const shok_AARect& area, float rot, int height)
+void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot, int height)
 {
 	AdvancedAARectIterator it{ p, area, rot, !shok_EGL_CGLETerrainLowRes::HiResBridgeHeightEnabled, false };
 	for (auto& c : it) {
@@ -610,7 +610,7 @@ void shok_EGL_CGLELandscape::AdvancedApplyBridgeHeight(const shok_position& p, c
 		}
 	}
 }
-bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok_position& p, const shok_AARect& area, float rot, BlockingMode mode, bool AddOne)
+bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode mode, bool AddOne)
 {
 	AdvancedAARectIterator iter{ p, area, rot, false, AddOne };
 	for (auto& curr : iter) {
@@ -621,7 +621,7 @@ bool shok_EGL_CGLELandscape::IsAreaUnblockedInMode(const shok_position& p, const
 	}
 	return true;
 }
-bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok_position& p, const shok_AARect& area, float rot, bool AddOne)
+bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne)
 {
 	AdvancedAARectIterator iter{ p, area, rot, false, AddOne };
 	for (auto& curr : iter) {
@@ -633,16 +633,16 @@ bool shok_EGL_CGLELandscape::IsAreaNotUnderWater(const shok_position& p, const s
 	return true;
 }
 
-shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes) : AdvancedAARectIterator(p, area, rot, LowRes, false)
+shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok::Position& p, const shok::AARect& area, float rot, bool LowRes) : AdvancedAARectIterator(p, area, rot, LowRes, false)
 {
 }
-shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok_position& p, const shok_AARect& area, float rot, bool LowRes, bool AddOne)
+shok_EGL_CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok::Position& p, const shok::AARect& area, float rot, bool LowRes, bool AddOne)
 {
 	// TODO implement rotation
-	shok_AARect rotated = area;
+	shok::AARect rotated = area;
 	rotated.low = area.low.Rotate(rot);
 	rotated.high = area.high.Rotate(rot);
-	shok_position p2{ min(rotated.low.X, rotated.high.X) + p.X, min(rotated.low.Y, rotated.high.Y) + p.Y };
+	shok::Position p2{ min(rotated.low.X, rotated.high.X) + p.X, min(rotated.low.Y, rotated.high.Y) + p.Y };
 	int low[2] = { 0,0 };
 	int high[2] = { 0,0 };
 	if (LowRes)
@@ -712,7 +712,7 @@ shok_EGL_CGLELandscape::AdvancedAARectIterator::Iter::Iter(const AdvancedAARectI
 }
 
 static inline bool(__thiscall* explohandler_isexplored)(shok_EGL_CPlayerExplorationHandler* th, int x, int y) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CPlayerExplorationHandler*, int , int)>(0x4BD183);
-bool shok_EGL_CPlayerExplorationHandler::IsPositionExplored(const shok_position& p)
+bool shok_EGL_CPlayerExplorationHandler::IsPositionExplored(const shok::Position& p)
 {
 	int i[2] = {};
 	shok_EGL_CGLETerrainHiRes::ToTerrainCoord(p, i);
@@ -767,13 +767,13 @@ void shok_EGL_CGLEGameLogic::HookCreateEffect()
 	if (CreateEffectHookedOrig)
 		return;
 	shok_vtable_EGL_CGLEGameLogic* vt = reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable);
-	shok_saveVirtualProtect vp{ vt, 25 * 4 };
+	shok::SaveVirtualProtect vp{ vt, 25 * 4 };
 	CreateEffectHookedOrig = vt->CreateEffect;
 	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLEGameLogic * th, shok_EGL_CGLEEffectCreator * data)>(&CreateEffectHook);
 }
 
 
-void shok_ED_CGlobalsLogicEx::ToTerrainCoord(const shok_position& p, int* out)
+void shok_ED_CGlobalsLogicEx::ToTerrainCoord(const shok::Position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
@@ -782,7 +782,7 @@ bool shok_ED_CGlobalsLogicEx::IsCoordValid(int* out)
 {
 	return out[0] >= 0 && out[1] >= 0 && out[0] < Blocking->ArraySizeXY && out[1] < Blocking->ArraySizeXY;
 }
-shok_EGL_CGLELandscape::BlockingMode shok_ED_CGlobalsLogicEx::GetBlocking(const shok_position& p)
+shok_EGL_CGLELandscape::BlockingMode shok_ED_CGlobalsLogicEx::GetBlocking(const shok::Position& p)
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
@@ -790,16 +790,16 @@ shok_EGL_CGLELandscape::BlockingMode shok_ED_CGlobalsLogicEx::GetBlocking(const 
 		DEBUGGER_BREAK;
 	return static_cast<shok_EGL_CGLELandscape::BlockingMode>(Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]]);
 }
-bool shok_ED_CLandscape::GetTerrainPosAtScreenCoords(shok_positionRot& outpos, int x, int y)
+bool shok_ED_CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)
 {
 	float mp[] = { static_cast<float>(x), static_cast<float>(y) };
 	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetLandscapePosFromMousePos(this, (*shok_ED_CGlobalsBaseEx::GlobalObj)->Camera->SomeCameraData, mp, &outpos, 3);
 }
-float shok_ED_CLandscape::GetTerrainHeightAtPos(const shok_position& p)
+float shok_ED_CLandscape::GetTerrainHeightAtPos(const shok::Position& p)
 {
 	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetTerrainHeightAtPos(this, p.X, p.Y);
 }
-float shok_ED_CLandscape::GetWaterHeightAtPos(const shok_position& p)
+float shok_ED_CLandscape::GetWaterHeightAtPos(const shok::Position& p)
 {
 	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetWaterHeightAtPos(this, p.X, p.Y);
 }
@@ -1004,7 +1004,7 @@ void shok_ED_CPlayerColors::RefreshPlayerColors()
 	playercolors_refresh(this);
 }
 
-void shok_ED_CCommandAcknowledgements::ShowAck(const shok_position& pos)
+void shok_ED_CCommandAcknowledgements::ShowAck(const shok::Position& pos)
 {
 	reinterpret_cast<shok_vtable_ED_CCommandAcknowledgements*>(vtable)->ShowAck(this, pos.X, pos.Y);
 }
@@ -1046,7 +1046,7 @@ void shok_modelinstance::Scale(float s, TransformOperation op)
 	Scale(f, op);
 }
 static inline void(__cdecl* const modelinst_setpos)(void* l, float* f, shok_modelinstance::TransformOperation i) = reinterpret_cast<void(__cdecl*)(void*, float*, shok_modelinstance::TransformOperation)>(0x414140);
-void shok_modelinstance::Translate(const shok_position& p, float height, TransformOperation op)
+void shok_modelinstance::Translate(const shok::Position& p, float height, TransformOperation op)
 {
 	float f[] = { p.X, p.Y, height };
 	modelinst_setpos(Transform, f, op);

@@ -175,7 +175,7 @@ EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(float x, float 
 	this->p = { x,y };
 	this->r = r * r;
 }
-EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(const shok_position& p, float r)
+EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(const shok::Position& p, float r)
 {
 	this->p = p;
 	this->r = r * r;
@@ -278,7 +278,7 @@ EntityIteratorPredicateInRect::EntityIteratorPredicateInRect(float x1, float y1,
 	high.Y = max(y1, y2);
 }
 
-EntityIteratorPredicateInRect::EntityIteratorPredicateInRect(const shok_AARect& area) : EntityIteratorPredicateInRect(area.low.X, area.low.Y, area.high.X, area.high.Y)
+EntityIteratorPredicateInRect::EntityIteratorPredicateInRect(const shok::AARect& area) : EntityIteratorPredicateInRect(area.low.X, area.low.Y, area.high.X, area.high.Y)
 {
 }
 
@@ -330,7 +330,7 @@ bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(shok_EGL_CGLEEntity*
 	return IsNotFleeingFrom(e, Center, Range);
 }
 
-bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok_position Center, float Range)
+bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok::Position Center, float Range)
 {
 	if (!shok_DynamicCast<shok_EGL_CGLEEntity, shok_EGL_CMovingEntity>(e))
 		return true;
@@ -344,7 +344,7 @@ bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(shok_EGL_CGLEEnti
 	return std::sqrtf(dx1 * dx1 + dy1 * dy1) + Range >= std::sqrtf(dx2 * dx2 + dy2 * dy2);
 }
 
-EntityIteratorPredicateIsNotFleeingFrom::EntityIteratorPredicateIsNotFleeingFrom(shok_position& p, float r)
+EntityIteratorPredicateIsNotFleeingFrom::EntityIteratorPredicateIsNotFleeingFrom(shok::Position& p, float r)
 {
 	Center = p;
 	Range = r;

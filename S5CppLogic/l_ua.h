@@ -25,7 +25,7 @@ struct UATargetCache {
 };
 struct UAReset {
 	int EntityId;
-	shok_positionRot Pos;
+	shok::PositionRot Pos;
 };
 
 class UnlimitedArmy {
@@ -37,12 +37,12 @@ public:
 	std::vector<int> DeadHeroes;
 	std::vector<UATargetCache> TargetCache;
 	std::vector<UAReset> PrepDefenseReset;
-	shok_position LastPos = { -1,-1 };
+	shok::Position LastPos = { -1,-1 };
 	int PosLastUpdatedTick = -1;
 	UAStatus Status = UAStatus::Idle;
 	float Area = 0;
 	int CurrentBattleTarget = 0;
-	shok_position Target = { -1,-1 };
+	shok::Position Target = { -1,-1 };
 	bool ReMove = false, IgnoreFleeing = false, PrepDefense = false, SabotageBridges = false;
 	lua_State* L = nullptr;
 	int Formation = LUA_NOREF, CommandQueue = LUA_NOREF, Spawner = LUA_NOREF, Normalize = LUA_NOREF;
@@ -63,13 +63,13 @@ public:
 	bool IsRanged(shok_EGL_CGLEEntity* e);
 	bool IsNonCombat(shok_EGL_CGLEEntity* e);
 
-	static shok_EGL_CGLEEntity* GetNearestTargetInArea(int player, shok_position& p, float ran, bool notFleeing);
-	static shok_EGL_CGLEEntity* GetNearestSettlerInArea(int player, shok_position& p, float ran, bool notFleeing);
-	shok_EGL_CGLEEntity* GetNearestBuildingInArea(int player, shok_position& p, float ran);
-	shok_EGL_CGLEEntity* GetNearestBridgeInArea(shok_position& p, float r);
-	shok_EGL_CGLEEntity* GetNearestSnipeTargetInArea(int player, shok_position& p, float ran, bool notFleeing);
-	shok_EGL_CGLEEntity* GetFurthestConversionTargetInArea(int player, shok_position& p, float ran, bool notFleeing);
-	static int CountTargetsInArea(int player, shok_position& p, float ran, bool notFleeing);
+	static shok_EGL_CGLEEntity* GetNearestTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	static shok_EGL_CGLEEntity* GetNearestSettlerInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	shok_EGL_CGLEEntity* GetNearestBuildingInArea(int player, shok::Position& p, float ran);
+	shok_EGL_CGLEEntity* GetNearestBridgeInArea(shok::Position& p, float r);
+	shok_EGL_CGLEEntity* GetNearestSnipeTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	shok_EGL_CGLEEntity* GetFurthestConversionTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	static int CountTargetsInArea(int player, shok::Position& p, float ran, bool notFleeing);
 
 
 

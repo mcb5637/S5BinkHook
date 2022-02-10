@@ -137,8 +137,7 @@ struct shok_EGUIX_CBaseWidget : shok_BB_IObject { // size 14
 //constexpr int i = offsetof(shok_EGUIX_CBaseWidget, WidgetID) / 4;
 
 struct shok_EGUIX_CWidgetListHandler : shok_object {
-	vector_padding;
-	std::list<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>> SubWidgets;
+	shok::List<shok_EGUIX_CBaseWidget*> SubWidgets;
 
 	static inline constexpr int vtp = 0x78098C;
 	static inline constexpr int TypeDesc = 0x833240;

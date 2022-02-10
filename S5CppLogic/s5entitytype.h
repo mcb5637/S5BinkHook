@@ -13,7 +13,7 @@ struct shok_EGL_CGLEEntityProps : shok_BB_IObject {
 	PADDINGI(1);
 	int Class;
 	shok::Vector<shok_EntityCategory> Categories;
-	shok_positionRot ApproachPos;
+	shok::PositionRot ApproachPos;
 private:
 	int Race;
 public:
@@ -29,31 +29,31 @@ public:
 	byte DeleteWhenBuiltOn, NeedsPlayer;
 	PADDING(2);
 	vector_padding;
-	std::vector<shok_EGL_CGLEBehaviorProps*, shok::Allocator<shok_EGL_CGLEBehaviorProps*>> BehaviorProps; // 25
+	std::vector<EGL::CGLEBehaviorProps*, shok::Allocator<EGL::CGLEBehaviorProps*>> BehaviorProps; // 25
 	int NumberOfBehaviors; //29
 	PADDINGI(4);
 	vector_padding;
-	std::vector<shok_AARect, shok::Allocator<shok_AARect>> BlockingArea; // la37
+	std::vector<shok::AARect, shok::Allocator<shok::AARect>> BlockingArea; // la37
 
 	static inline constexpr int vtp = 0x76E47C;
 	static inline constexpr int TypeDesc = 0x810B0C;
 
-	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehaviorProps, T>::value>::type* = nullptr>
+	template<typename T, typename std::enable_if<std::is_base_of<EGL::CGLEBehaviorProps, T>::value>::type* = nullptr>
 	T* GetBehaviorProps() {
-		for (shok_EGL_CGLEBehaviorProps* b : BehaviorProps) {
+		for (EGL::CGLEBehaviorProps* b : BehaviorProps) {
 			if (b) {
-				T* r = shok_DynamicCast<shok_EGL_CGLEBehaviorProps, T>(b);
+				T* r = shok_DynamicCast<EGL::CGLEBehaviorProps, T>(b);
 				if (r)
 					return r;
 			}
 		}
 		return nullptr;
 	}
-	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehaviorProps, T>::value>::type* = nullptr>
+	template<typename T, typename std::enable_if<std::is_base_of<EGL::CGLEBehaviorProps, T>::value>::type* = nullptr>
 	const T* GetBehaviorProps() const {
-		for (const shok_EGL_CGLEBehaviorProps* b : BehaviorProps) {
+		for (const EGL::CGLEBehaviorProps* b : BehaviorProps) {
 			if (b) {
-				const T* r = shok_DynamicCast<const shok_EGL_CGLEBehaviorProps, const T>(b);
+				const T* r = shok_DynamicCast<const EGL::CGLEBehaviorProps, const T>(b);
 				if (r)
 					return r;
 			}
@@ -72,14 +72,14 @@ struct shok_GGL_CEntityProperties : shok_EGL_CGLEEntityProps {
 
 struct shok_upgradeInfo {
 	float Time;
-	shok_costInfo Cost;
+	shok::CostInfo Cost;
 	int Type, Category;
 };
 struct shok_GGL_CGLSettlerProps : shok_EGL_CGLEEntityProps {
 private:
 	int HeadSet, Hat;
 public:
-	shok_costInfo Cost;
+	shok::CostInfo Cost;
 	float BuildFactor, RepairFactor;
 	int ArmorClass;
 	int ArmorAmount; // 61
@@ -106,7 +106,7 @@ struct shok_GGL_CGLAnimalProps : shok_EGL_CGLEEntityProps {
 };
 
 struct shok_GGL_CBuildBlockProperties : shok_EGL_CGLEEntityProps {
-	shok_AARect BuildBlockArea; // 38 la 41
+	shok::AARect BuildBlockArea; // 38 la 41
 
 	static inline constexpr int vtp = 0x76EB38;
 	static inline constexpr int TypeDesc = 0x811284;
@@ -115,7 +115,7 @@ struct shok_GGL_CBuildBlockProperties : shok_EGL_CGLEEntityProps {
 
 struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
 	float Radius;
-	shok_position Center, LineStart, LineEnd;
+	shok::Position Center, LineStart, LineEnd;
 	int ExtractTaskList, Model1, Model2;
 
 	static inline constexpr int vtp = 0x76FF68;
@@ -125,14 +125,14 @@ struct shok_GGL_CResourceDoodadProperties : shok_GGL_CBuildBlockProperties {
 struct shok_constructionInfo {
 	PADDINGI(1);
 	vector_padding;
-	std::vector<shok_positionRot, shok::Allocator<shok_positionRot>> BuilderSlot;
+	std::vector<shok::PositionRot, shok::Allocator<shok::PositionRot>> BuilderSlot;
 	int Time;
-	shok_costInfo Cost;
+	shok::CostInfo Cost;
 	int ConstructionSite;
 };
 struct shok_GGL_CGLBuildingProps : shok_GGL_CBuildBlockProperties {
 	int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker; // 42
-	shok_position DoorPos, LeavePos;
+	shok::Position DoorPos, LeavePos;
 	shok_constructionInfo ConstructionInfo;
 	vector_padding;
 	std::vector<int, shok::Allocator<int>> BuildOn; // 75
@@ -158,7 +158,7 @@ public:
 
 struct shok_GGL_CBridgeProperties : shok_GGL_CGLBuildingProps {
 	vector_padding;
-	std::vector<shok_AARect, shok::Allocator<shok_AARect>> BridgeArea;
+	std::vector<shok::AARect, shok::Allocator<shok::AARect>> BridgeArea;
 	int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
 
 	static inline constexpr int vtp = 0x778148;
@@ -205,7 +205,7 @@ struct shok_ED_CDisplayEntityProps : shok_BB_IObject {
 static_assert(sizeof(shok_ED_CDisplayEntityProps) == 16 * 4);
 
 struct shok_GGlue_CGlueEntityProps_behavior {
-	shok_EGL_CGLEBehaviorProps* Logic;
+	EGL::CGLEBehaviorProps* Logic;
 	shok_ED_CBehaviorProps* Display;
 };
 struct shok_GGlue_CGlueEntityProps : shok_BB_IObject {

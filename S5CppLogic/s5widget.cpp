@@ -74,7 +74,7 @@ void shok_EGUIX_CButtonHelper::HookShortcutSignExtend()
     if (shortcutsignextend_hooked)
         return;
     shortcutsignextend_hooked = true;
-    shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x55A62B), 10 };
+    shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x55A62B), 10 };
     *reinterpret_cast<byte*>(0x55A62B) = 0xB6; // movsx to movzx (sign-extend to zero-extend) (middle part of 3 byte opcode)
 }
 
@@ -143,7 +143,7 @@ void shok_EGUIX_CButtonHelper::HookShortcutComparison()
     if (shortcutcmo_hooked)
         return;
     shortcutcmo_hooked = true;
-    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 10 };
+    shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 10 };
     WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm);
 }
 
@@ -217,17 +217,16 @@ void shok_EGUIX_CContainerWidget::AddWidget(shok_EGUIX_CBaseWidget* toAdd, const
         widman_addWidget(m, toAdd, newId);
         reinterpret_cast<shok_vtable_EGUIX_CContainerWidget*>(vtable)->AddChild(this, toAdd);
         if (before) {
-            shok_saveList<shok_EGUIX_CBaseWidget*>(&WidgetListHandler.SubWidgets, [before](std::list<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>>& l) {
-                std::list<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>>::iterator it = l.begin();
-                while (it != l.end()) {
-                    if (*it == before) {
-                        l.splice(it, l, --l.end());
-                        break;
-                    }
-
-                    it++;
+            auto l = WidgetListHandler.SubWidgets.SaveList();
+            std::list<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>>::iterator it = l.List.begin();
+            while (it != l.List.end()) {
+                if (*it == before) {
+                    l.List.splice(it, l.List, --l.List.end());
+                    break;
                 }
-                });
+
+                it++;
+            }
         }
     }
 }
@@ -314,7 +313,7 @@ void shok_GGUI_C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(i
 
 void shok_GGUI_C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool showwood)
 {
-    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
+    shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
     *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok_ResourceType::WoodRaw);
 }
 
@@ -386,7 +385,7 @@ void HookUIInput()
     if (HookUIInput_Hooked)
         return;
     HookUIInput_Hooked = true;
-    shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
+    shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
     WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
 }
 

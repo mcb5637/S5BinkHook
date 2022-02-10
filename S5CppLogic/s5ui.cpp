@@ -81,7 +81,7 @@ void __declspec(naked) constructcommand_setmodelrot() {
 	};
 }
 bool __stdcall constructcommand_getnearestpos(int ety, float x, float y, float* xo, float* yo) {
-	shok_positionRot p = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ety, { x, y, shok_GGUI_CPlaceBuildingState::PlacementRotation }, (*shok_GGL_CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
+	shok::PositionRot p = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ety, { x, y, shok_GGUI_CPlaceBuildingState::PlacementRotation }, (*shok_GGL_CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
 	if (p.X >= 0) {
 		*xo = p.X;
 		*yo = p.Y;
@@ -116,19 +116,19 @@ void shok_GGUI_CPlaceBuildingState::HookPlacementRotation()
 	if (HookConstructCommandRotation_Hooked)
 		return;
 	HookConstructCommandRotation_Hooked = true;
-	shok_saveVirtualProtect vp{ reinterpret_cast<void*>(0x538FF4), 10 };
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x538FF4), 10 };
 	WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding);
-	shok_saveVirtualProtect vp2{ reinterpret_cast<void*>(0x5389FB), 10 };
+	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x5389FB), 10 };
 	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
-	shok_saveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
+	shok::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
 	WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
-	shok_saveVirtualProtect vp4{ reinterpret_cast<void*>(0x538BDB), 10 };
+	shok::SaveVirtualProtect vp4{ reinterpret_cast<void*>(0x538BDB), 10 };
 	WriteJump(reinterpret_cast<void*>(0x538BDB), &constructcommand_checkpos);
-	shok_saveVirtualProtect vp5{ reinterpret_cast<void*>(0x538C8D), 10 };
+	shok::SaveVirtualProtect vp5{ reinterpret_cast<void*>(0x538C8D), 10 };
 	RedirectCall(reinterpret_cast<void*>(0x538C8D), &constructcommand_updatemodelsetpos_over);
 }
 
-shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(int ety, const shok_position& p, float range)
+shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(int ety, const shok::Position& p, float range)
 {
 	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
@@ -147,15 +147,15 @@ shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(in
 		return { -1,-1,0 };
 	return ent->Position;
 }
-shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosFree(int ety, const shok_positionRot& p, float range)
+shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosFree(int ety, const shok::PositionRot& p, float range)
 {
 	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
 
-	shok_position r = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
+	shok::Position r = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
 	return { r.X, r.Y, p.r };
 }
-shok_positionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(int ety, const shok_positionRot& p, float range)
+shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(int ety, const shok::PositionRot& p, float range)
 {
 	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
@@ -169,7 +169,7 @@ void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeld
 {
 	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata ? *reinterpret_cast<void**>(const_cast<shok_modeldata*>(modeldata)) : nullptr, rotation);
 }
-void shok_ERwTools_CRpClumpRenderable::SetPosition(const shok_position& p, float z)
+void shok_ERwTools_CRpClumpRenderable::SetPosition(const shok::Position& p, float z)
 {
 	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetPosition(this, p.X, p.Y, z);
 }
@@ -189,7 +189,7 @@ void shok_GGUI_C3DViewHandler::SetGUIStateByIdentfierOnNextUpdate(unsigned int i
 	c3dviewhandler_setguistateonupdate(this, identifier);
 }
 
-bool shok_GGL_CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const shok_position& inp, shok_position& outp)
+bool shok_GGL_CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const shok::Position& inp, shok::Position& outp)
 {
 	return reinterpret_cast<shok_vtable_GGL_CGLGUIInterface*>(vtable)->GetNearestFreeBuildingPos(this, ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);
 }
@@ -206,11 +206,11 @@ void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
 void shok_GGUI_CManager::HackPostEvent()
 {
 	if (PostEventOrig) {
-		shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
+		shok::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
 	}
 	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent->vtable);
-	shok_saveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
+	shok::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
 	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent * ev)>(&PostEventHook);
 }

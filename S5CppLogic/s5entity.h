@@ -52,7 +52,7 @@ struct shok_EGL_IEntityDisplay { // warning: you have to dymamic cast this! , en
 		int EntityID;
 		int EntityType;
 		int ModelOverride;
-		shok_position Pos;
+		shok::Position Pos;
 	};
 	struct playermodeldata {
 		int EntityType;
@@ -61,7 +61,7 @@ struct shok_EGL_IEntityDisplay { // warning: you have to dymamic cast this! , en
 		int ModelOverride;
 	};
 	struct posdata {
-		shok_positionRot Pos;
+		shok::PositionRot Pos;
 		float Scale;
 		int NumAuras;
 	};
@@ -79,14 +79,14 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	int ModelOverride;
 	int PlayerId;
 	int attachmentvt; // 7
-	shok::Set<shok_attachment> ObserverEntities; // 8
-	shok::Set<shok_attachment> ObserverEffects; // 11
-	shok::Set<shok_attachment> ObservedEntities; // 14
-	shok::Set<shok_attachment> ObservedEffects; // 17
+	shok::Set<shok::Attachment> ObserverEntities; // 8
+	shok::Set<shok::Attachment> ObserverEffects; // 11
+	shok::Set<shok::Attachment> ObservedEntities; // 14
+	shok::Set<shok::Attachment> ObservedEffects; // 17
 	byte SendEvent; // 20
 	PADDING(3);
 	int SetNewTaskListDepth;
-	shok_positionRot Position; // 22
+	shok::PositionRot Position; // 22
 	float Scale; // 25
 	PADDINGI(1);
 	byte StandardBehaviorActive, TaskAdvanceNextTurnNextTask, ValidPosition, IsOnWater;
@@ -175,7 +175,7 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	void AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev)); // _ is undefined
 
 	void AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo);
-	static void __stdcall AdvancedDealAoEDamage(shok_EGL_CGLEEntity* attacker, const shok_position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo);
+	static void __stdcall AdvancedDealAoEDamage(shok_EGL_CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo);
 
 	static void HookDamageMod();
 	static void HookArmorMod();
@@ -215,7 +215,7 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 
 	static inline shok_EGL_CGLEEntity* (__stdcall* const GetEntityByID)(int id) = reinterpret_cast<shok_EGL_CGLEEntity * (__stdcall*)(int)>(0x5825B4);
 	static inline void(__cdecl* const EntityHurtEntity)(shok_EGL_CGLEEntity* attackerObj, shok_EGL_CGLEEntity* targetObj, int damage) = reinterpret_cast<void(__cdecl*)(shok_EGL_CGLEEntity*, shok_EGL_CGLEEntity*, int)>(0x49F358);
-	static inline void(__cdecl* const EntityDealAoEDamage)(shok_EGL_CGLEEntity* attacker, shok_position* center, float range, int damage, int player, int damageclass) = reinterpret_cast<void(__cdecl*)(shok_EGL_CGLEEntity*, shok_position*, float, int, int, int)>(0x49F82A);
+	static inline void(__cdecl* const EntityDealAoEDamage)(shok_EGL_CGLEEntity* attacker, shok::Position* center, float range, int damage, int player, int damageclass) = reinterpret_cast<void(__cdecl*)(shok_EGL_CGLEEntity*, shok::Position*, float, int, int, int)>(0x49F82A);
 	static inline int(__cdecl* const GetEntityIDByScriptName)(const char* str) = reinterpret_cast<int(__cdecl*)(const char* str)>(0x576624);
 	static inline int(__cdecl* const EntityIDGetProvidedResource)(int id) = reinterpret_cast<int(__cdecl*)(int id)>(0x4B8489);
 	static inline bool(__cdecl* const EntityIDIsDead)(int id) = reinterpret_cast<bool(__cdecl*)(int)>(0x44B096);
@@ -232,7 +232,7 @@ protected:
 //constexpr int i = sizeof(shok_EGL_CGLEEntity) / 4;
 struct shok_GGL_CBuilding;
 struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
-	shok_position TargetPosition; // la67
+	shok::Position TargetPosition; // la67
 	byte TargetRotationValid;
 	PADDING(3);
 	float TargetRotation;
@@ -242,17 +242,17 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	static inline constexpr int TypeDesc = 0x8077EC;
 	static inline constexpr unsigned int Identifier = 0x77D4E427;
 
-	void AttackMove(const shok_position& p);
+	void AttackMove(const shok::Position& p);
 	void AttackEntity(int targetId);
 	void HoldPosition();
 	void Defend();
-	void Move(const shok_position& p);
+	void Move(const shok::Position& p);
 	void LeaderAttachSoldier(int soldierId);
 	void SettlerExpell();
-	void HeroAbilitySendHawk(shok_position& p);
+	void HeroAbilitySendHawk(shok::Position& p);
 	void HeroAbilityInflictFear();
-	void HeroAbilityPlaceBomb(shok_position& p);
-	void HeroAbilityPlaceCannon(shok_position& p, int FoundationType, int CannonType);
+	void HeroAbilityPlaceBomb(shok::Position& p);
+	void HeroAbilityPlaceCannon(shok::Position& p, int FoundationType, int CannonType);
 	void HeroAbilityRangedEffect();
 	void HeroAbilityCircularAttack();
 	void HeroAbilitySummon();
@@ -266,9 +266,9 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	void ThiefDefuse(int tid);
 	void ThiefStealFrom(int tid);
 	void ThiefSecureGoods(int tid);
-	void ScoutBinoculars(shok_position& p);
+	void ScoutBinoculars(shok::Position& p);
 	void ScoutFindResource();
-	void ScoutPlaceTorch(shok_position& p);
+	void ScoutPlaceTorch(shok::Position& p);
 	bool SerfConstructBuilding(shok_GGL_CBuilding* build);
 	bool SerfRepairBuilding(shok_GGL_CBuilding* build);
 	void SerfExtractResource(int id);
@@ -276,7 +276,7 @@ struct shok_EGL_CMovingEntity : shok_EGL_CGLEEntity {
 	void BattleSerfTurnToSerf();
 	void SetTargetRotation(float f);
 
-	void SetPosition(shok_position& p);
+	void SetPosition(shok::Position& p);
 
 	int LeaderGetNearbyBarracks();
 	bool IsMoving();
@@ -351,9 +351,9 @@ struct shok_GGL_CSettler : shok_GGL_CEvadingEntity {
 };
 
 struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
-	shok_position TerritoryCenter; // 71
+	shok::Position TerritoryCenter; // 71
 	float TerritoryRadius; // int?
-	shok_position DangerPosition;
+	shok::Position DangerPosition;
 
 	static inline constexpr int vtp = 0x778F7C;
 	static inline constexpr int TypeDesc = 0x812038;
@@ -374,7 +374,7 @@ struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
 };
 
 struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
-	shok_position ApproachPosition, LeavePosition; // fi 66
+	shok::Position ApproachPosition, LeavePosition; // fi 66
 	byte IsActive, IsRegistered, IsUpgrading, IsOvertimeActive;
 	byte HQAlarmActive;
 	PADDING(3);
@@ -391,8 +391,8 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	static inline constexpr unsigned int Identifier = 0x15EBDB60;
 
 	int GetConstructionSite();
-	int GetNearestFreeConstructionSlotFor(shok_position* p);
-	int GetNearestFreeRepairSlotFor(shok_position* p);
+	int GetNearestFreeConstructionSlotFor(shok::Position* p);
+	int GetNearestFreeRepairSlotFor(shok::Position* p);
 	bool IsConstructionFinished();
 	bool IsIdle();
 	bool IsIdle(bool forRecruitemnt);
@@ -437,7 +437,7 @@ struct shok_EGL_CAmbientSoundEntity : shok_EGL_CGLEEntity {
 
 struct shok_EGL_CGLEEntityCreator : shok_BB_IObject {
 	int EntityType = 0;
-	shok_positionRot Pos = { 0,0,0 };
+	shok::PositionRot Pos = { 0,0,0 };
 	int Flags = 0; // 5
 	int PlayerId = 0;
 	int Health = 0; // 7

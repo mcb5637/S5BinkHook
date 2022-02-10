@@ -71,7 +71,7 @@ shok_EGL_CEvent1Entity::shok_EGL_CEvent1Entity(shok_EventIDs e, int ent) : shok_
 	EntityID = ent;
 }
 
-shok_EGL_CEventPosition::shok_EGL_CEventPosition(shok_EventIDs e, const shok_position& p) : shok_BB_CEvent(e)
+shok_EGL_CEventPosition::shok_EGL_CEventPosition(shok_EventIDs e, const shok::Position& p) : shok_BB_CEvent(e)
 {
 	vtable = shok_EGL_CEventPosition::vtp;
 	Position = p;
@@ -126,7 +126,7 @@ shok_GGL_CEventTransaction::shok_GGL_CEventTransaction(shok_EventIDs e, shok_Res
 	BuyAmount = buyAm;
 }
 
-shok_GGL_CEventPositionAnd2EntityTypes::shok_GGL_CEventPositionAnd2EntityTypes(shok_EventIDs e, const shok_position& p, int t1, int t2) : shok_EGL_CEventPosition(e, p)
+shok_GGL_CEventPositionAnd2EntityTypes::shok_GGL_CEventPositionAnd2EntityTypes(shok_EventIDs e, const shok::Position& p, int t1, int t2) : shok_EGL_CEventPosition(e, p)
 {
 	vtable = shok_GGL_CEventPositionAnd2EntityTypes::vtp;
 	Type1 = t1;
@@ -148,7 +148,7 @@ shok_EGL_CNetEvent2Entities::shok_EGL_CNetEvent2Entities(shok_NetEventIds id, in
 	TargetId = tar;
 }
 
-shok_EGL_CNetEventEntityAndPos::shok_EGL_CNetEventEntityAndPos(shok_NetEventIds id, int ent, const shok_position& pos) : shok_BB_CEvent(id)
+shok_EGL_CNetEventEntityAndPos::shok_EGL_CNetEventEntityAndPos(shok_NetEventIds id, int ent, const shok::Position& pos) : shok_BB_CEvent(id)
 {
 	vtable = shok_EGL_CNetEventEntityAndPos::vtp;
 	EntityId = ent;
@@ -162,7 +162,7 @@ shok_EGL_CNetEventEntityAndPosArray::shok_EGL_CNetEventEntityAndPosArray(shok_Ne
 	Rotation = r;
 }
 
-shok_GGL_CNetEventExtractResource::shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok_ResourceType resty, const shok_position& pos) : shok_BB_CEvent(id)
+shok_GGL_CNetEventExtractResource::shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok_ResourceType resty, const shok::Position& pos) : shok_BB_CEvent(id)
 {
 	vtable = shok_GGL_CNetEventExtractResource::vtp;
 	EntityId = ent;
@@ -190,7 +190,7 @@ shok_EGL_CNetEventEntityID::shok_EGL_CNetEventEntityID(shok_FeedbackEventIds id,
 	EntityId = ent;
 }
 
-shok_GGL_CNetEventCannonCreator::shok_GGL_CNetEventCannonCreator(shok_NetEventIds id, int ent, int bty, int tty, const shok_position& pos) : shok_EGL_CNetEventEntityID(id, ent)
+shok_GGL_CNetEventCannonCreator::shok_GGL_CNetEventCannonCreator(shok_NetEventIds id, int ent, int bty, int tty, const shok::Position& pos) : shok_EGL_CNetEventEntityID(id, ent)
 {
 	vtable = shok_GGL_CNetEventCannonCreator::vtp;
 	BottomType = bty;
@@ -232,7 +232,7 @@ shok_EGL_CNetEventPlayerID::shok_EGL_CNetEventPlayerID(shok_FeedbackEventIds id,
 	PlayerId = pl;
 }
 
-shok_GGL_CNetEventBuildingCreator::shok_GGL_CNetEventBuildingCreator(shok_NetEventIds id, int pl, int ucat, const shok_positionRot& p) : shok_EGL_CNetEventPlayerID(id, pl)
+shok_GGL_CNetEventBuildingCreator::shok_GGL_CNetEventBuildingCreator(shok_NetEventIds id, int pl, int ucat, const shok::PositionRot& p) : shok_EGL_CNetEventPlayerID(id, pl)
 {
 	vtable = shok_GGL_CNetEventBuildingCreator::vtp;
 	UpgradeCategory = ucat;
@@ -274,7 +274,7 @@ shok_GGL_CNetEventEntityIDPlayerIDAndInteger::shok_GGL_CNetEventEntityIDPlayerID
 	Data = d;
 }
 
-shok_GGL_CFeedbackEventBattling::shok_GGL_CFeedbackEventBattling(shok_FeedbackEventIds id, int eid, int p, const shok_position& pos, int tp) : shok_EGL_CNetEventEntityIDAndPlayerID(id, p, eid)
+shok_GGL_CFeedbackEventBattling::shok_GGL_CFeedbackEventBattling(shok_FeedbackEventIds id, int eid, int p, const shok::Position& pos, int tp) : shok_EGL_CNetEventEntityIDAndPlayerID(id, p, eid)
 {
 	vtable = shok_GGL_CFeedbackEventBattling::vtp;
 	Pos = pos;

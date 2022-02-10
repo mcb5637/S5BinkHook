@@ -4,13 +4,13 @@
 struct shok_EGL_CEffect : shok_BB_IObject {
 	int vtable_EGL_IEffectDisplay;
 	int attachmentvt;
-	shok::Set<shok_attachment> ObserverEntities;
-	shok::Set<shok_attachment> ObserverEffects;
-	shok::Set<shok_attachment> ObservedEntities;
-	shok::Set<shok_attachment> ObservedEffects;
+	shok::Set<shok::Attachment> ObserverEntities;
+	shok::Set<shok::Attachment> ObserverEffects;
+	shok::Set<shok::Attachment> ObservedEntities;
+	shok::Set<shok::Attachment> ObservedEffects;
 	byte SendEvent; // 20
 	PADDING(3);
-	shok_position Position; // 16
+	shok::Position Position; // 16
 	int StartTurn; // 18
 	int Duration;
 	int EffectType; // 20
@@ -30,7 +30,7 @@ struct shok_EGL_CFlyingEffectSlot : shok_object { // technically bbiobj, but we 
 	float a; // gravity factor
 	float b;
 	float c;
-	shok_position StartPosition, TargetPosition, Position, LastPosition;
+	shok::Position StartPosition, TargetPosition, Position, LastPosition;
 	float x; // 6.28 ?
 	float Speed;
 
@@ -40,7 +40,7 @@ struct shok_EGL_CFlyingEffectSlot : shok_object { // technically bbiobj, but we 
 struct shok_EGL_CFlyingEffect : shok_EGL_CEffect {
 	PADDINGI(4);
 	shok_EGL_CFlyingEffectSlot FlyingEffectSlot; // 28
-	shok_position TargetPosition; // 44 la 45
+	shok::Position TargetPosition; // 44 la 45
 	PADDINGI(1);
 
 	static inline constexpr int vtp = 0x7775E4;
@@ -89,7 +89,7 @@ private:
 	int Zero1 = 0;
 public:
 	int PlayerID = 0;
-	shok_position StartPos = { 0,0 }, CurrentPos = { 0,0 }, TargetPos = { 0,0 };
+	shok::Position StartPos = { 0,0 }, CurrentPos = { 0,0 }, TargetPos = { 0,0 };
 private:
 	int Zero2 = 0; // height offset unused
 public:

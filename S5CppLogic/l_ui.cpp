@@ -767,7 +767,7 @@ int l_ui_GetWidgetName(lua_State* L) {
 int l_ui_GetLandscapePosAtScreenPos(lua_State* L) {
 	int x = luaL_checkint(L, 1);
 	int y = luaL_checkint(L, 2);
-	shok_positionRot p;
+	shok::PositionRot p;
 	if ((*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainPosAtScreenCoords(p, x, y)) {
 		luaext_pushPos(L, p);
 		lua_pushnumber(L, p.r);
@@ -777,7 +777,7 @@ int l_ui_GetLandscapePosAtScreenPos(lua_State* L) {
 }
 
 int l_ui_ShowCommandAckAtPos(lua_State* L) {
-	shok_position p;
+	shok::Position p;
 	luaext_checkPos(L, p, 1);
 	(*shok_ED_CGlobalsBaseEx::GlobalObj)->CommandAcks->ShowAck(p);
 	return 0;

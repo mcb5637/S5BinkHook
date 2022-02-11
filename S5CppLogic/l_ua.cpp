@@ -57,7 +57,7 @@ void UnlimitedArmy::CleanDead()
 	auto remo = [this](int id) {
 		if (shok_EGL_CGLEEntity::EntityIDIsDead(id)) {
 			shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
-			if (e != nullptr && e->IsEntityInCategory(shok_EntityCategory::Hero)) {
+			if (e != nullptr && e->IsEntityInCategory(shok::EntityCategory::Hero)) {
 				this->DeadHeroes.push_back(id);
 			}
 			NeedFormat();
@@ -152,7 +152,7 @@ void UnlimitedArmy::AddLeader(shok_EGL_CGLEEntity* e)
 			Target = e->Position;
 		}
 		NeedFormat();
-		if (e->IsEntityInCategory(shok_EntityCategory::Cannon))
+		if (e->IsEntityInCategory(shok::EntityCategory::Cannon))
 			Cannons.push_back({ e->EntityId, -1 });
 	}
 	else
@@ -181,7 +181,7 @@ void UnlimitedArmy::CheckTransit()
 {
 	if (Leaders.size() == 0 && LeaderInTransit.size() > 0) {
 		Leaders.push_back(LeaderInTransit[0]);
-		if (shok_EGL_CGLEEntity::GetEntityByID(LeaderInTransit[0])->IsEntityInCategory(shok_EntityCategory::Cannon))
+		if (shok_EGL_CGLEEntity::GetEntityByID(LeaderInTransit[0])->IsEntityInCategory(shok::EntityCategory::Cannon))
 			Cannons.push_back({ LeaderInTransit[0], -1 });
 		LeaderInTransit.erase(LeaderInTransit.begin());
 		PosLastUpdatedTick = -1;
@@ -192,7 +192,7 @@ void UnlimitedArmy::CheckTransit()
 		shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
 		if (this->LastPos.IsInRange(e->Position, this->Area)) {
 			this->Leaders.push_back(id);
-			if (e->IsEntityInCategory(shok_EntityCategory::Cannon))
+			if (e->IsEntityInCategory(shok::EntityCategory::Cannon))
 				this->Cannons.push_back({ e->EntityId, -1 });
 			this->NeedFormat();
 			return true;
@@ -223,14 +223,14 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestTargetInArea(int player, shok::Pos
 	int bufflen = 8;
 	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
 	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-	EntityIteratorPredicateOfEntityCategory catLeader = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetTypeLeader);
+	EntityIteratorPredicateOfEntityCategory catLeader = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetTypeLeader);
 	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
 	EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
 	EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetType);
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetType);
 	EntityIteratorPredicatePriority prio1 = EntityIteratorPredicatePriority(2, &catLeader);
 	EntityIteratorPredicatePriority prio2 = EntityIteratorPredicatePriority(1, &buil);
 	EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
@@ -249,7 +249,7 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetFurthestConversionTargetInArea(int player
 	int bufflen = 8;
 	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
 	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetTypeLeader);
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetTypeLeader);
 	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
@@ -274,7 +274,7 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSettlerInArea(int player, shok::Po
 	int bufflen = 8;
 	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
 	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetTypeLeader);
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetTypeLeader);
 	EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
@@ -311,7 +311,7 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestBuildingInArea(int player, shok::P
 shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestBridgeInArea(shok::Position& p, float ran) {
 	EntityIteratorPredicateOfPlayer pl = EntityIteratorPredicateOfPlayer(0);
 	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
-	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::Bridge);
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::Bridge);
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](shok_EGL_CGLEEntity* e) {
 		return this->CheckTargetCache(e->EntityId, 1);
@@ -331,8 +331,8 @@ shok_EGL_CGLEEntity* UnlimitedArmy::GetNearestSnipeTargetInArea(int player, shok
 	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
 	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
 
-	EntityIteratorPredicateOfEntityCategory he = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::Hero);
-	EntityIteratorPredicateOfEntityCategory can = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::Cannon);
+	EntityIteratorPredicateOfEntityCategory he = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::Hero);
+	EntityIteratorPredicateOfEntityCategory can = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::Cannon);
 	EntityIteratorPredicate* cats[2] = {
 		&he, &can
 	};
@@ -377,8 +377,8 @@ void UnlimitedArmy::CheckStatus(UAStatus status)
 }
 bool UnlimitedArmy::LeaderIsMoving(shok_EGL_CGLEEntity* e)
 {
-	shok_LeaderCommand comm = e->EventLeaderGetCurrentCommand();
-	return (comm == shok_LeaderCommand::Move || comm == shok_LeaderCommand::AttackMove || comm == shok_LeaderCommand::Patrol) && !LeaderIsIdle(e);
+	shok::LeaderCommand comm = e->EventLeaderGetCurrentCommand();
+	return (comm == shok::LeaderCommand::Move || comm == shok::LeaderCommand::AttackMove || comm == shok::LeaderCommand::Patrol) && !LeaderIsIdle(e);
 }
 bool UnlimitedArmy::LeaderIsIdle(shok_EGL_CGLEEntity* e)
 {
@@ -386,16 +386,16 @@ bool UnlimitedArmy::LeaderIsIdle(shok_EGL_CGLEEntity* e)
 }
 bool UnlimitedArmy::LeaderIsInBattle(shok_EGL_CGLEEntity* e)
 {
-	shok_LeaderCommand comm = e->EventLeaderGetCurrentCommand();
-	return (comm == shok_LeaderCommand::Attack || comm == shok_LeaderCommand::AttackMove || comm == shok_LeaderCommand::HeroAbility) && !LeaderIsIdle(e);
+	shok::LeaderCommand comm = e->EventLeaderGetCurrentCommand();
+	return (comm == shok::LeaderCommand::Attack || comm == shok::LeaderCommand::AttackMove || comm == shok::LeaderCommand::HeroAbility) && !LeaderIsIdle(e);
 }
 bool UnlimitedArmy::IsRanged(shok_EGL_CGLEEntity* e)
 {
-	return e->IsEntityInCategory(shok_EntityCategory::LongRange) || e->IsEntityInCategory(shok_EntityCategory::Cannon) || e->IsEntityInCategory(shok_EntityCategory::TargetFilter_CustomRanged);
+	return e->IsEntityInCategory(shok::EntityCategory::LongRange) || e->IsEntityInCategory(shok::EntityCategory::Cannon) || e->IsEntityInCategory(shok::EntityCategory::TargetFilter_CustomRanged);
 }
 bool UnlimitedArmy::IsNonCombat(shok_EGL_CGLEEntity* e)
 {
-	return e->IsEntityInCategory(shok_EntityCategory::TargetFilter_NonCombat);
+	return e->IsEntityInCategory(shok::EntityCategory::TargetFilter_NonCombat);
 }
 void UnlimitedArmy::BattleCommand()
 {
@@ -412,11 +412,11 @@ void UnlimitedArmy::BattleCommand()
 	}
 	for (int id : Leaders) {
 		shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(id));
-		if (e->IsEntityInCategory(shok_EntityCategory::Hero) || IsNonCombat(e)) {
+		if (e->IsEntityInCategory(shok::EntityCategory::Hero) || IsNonCombat(e)) {
 			if (ExecuteHeroAbility(e))
 				continue;
 		}
-		if ((ReMove || !LeaderIsInBattle(e) ) && !IsNonCombat(e) && !e->IsEntityInCategory(shok_EntityCategory::Cannon)) {
+		if ((ReMove || !LeaderIsInBattle(e) ) && !IsNonCombat(e) && !e->IsEntityInCategory(shok::EntityCategory::Cannon)) {
 			if (IsRanged(e)) {
 				e->AttackEntity(CurrentBattleTarget);
 			}
@@ -482,7 +482,7 @@ void UnlimitedArmy::FormationCommand()
 	else if (PrepDefense && IsIdle()) {
 		for (int id : Leaders) {
 			shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(id));
-			if ((e->IsEntityInCategory(shok_EntityCategory::Hero) || IsNonCombat(e)) && e->EventLeaderGetCurrentCommand() != shok_LeaderCommand::HeroAbility) {
+			if ((e->IsEntityInCategory(shok::EntityCategory::Hero) || IsNonCombat(e)) && e->EventLeaderGetCurrentCommand() != shok::LeaderCommand::HeroAbility) {
 				if (ExecutePrepDefense(e)) {
 					UAReset r;
 					r.EntityId = id;
@@ -495,7 +495,7 @@ void UnlimitedArmy::FormationCommand()
 			if (shok_EGL_CGLEEntity::EntityIDIsDead(r.EntityId))
 				return true;
 			shok_EGL_CMovingEntity* e = static_cast<shok_EGL_CMovingEntity*>(shok_EGL_CGLEEntity::GetEntityByID(r.EntityId));
-			if (e->EventLeaderGetCurrentCommand() != shok_LeaderCommand::HeroAbility) {
+			if (e->EventLeaderGetCurrentCommand() != shok::LeaderCommand::HeroAbility) {
 				shok_EGL_CMovingEntity* m = static_cast<shok_EGL_CMovingEntity*>(e);
 				m->Move(r.Pos);
 				m->SetTargetRotation(r.Pos.r);
@@ -541,7 +541,7 @@ int UnlimitedArmy::CountTargetsInArea(int player, shok::Position& p, float ran, 
 	int bufflen = 8;
 	EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
 	EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok_EntityCategory::TargetFilter_TargetType);
+	EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetType);
 	EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
 	EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
 	EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
@@ -633,7 +633,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(shok_EGL_CGLEEntity* e)
 				if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
 					static_cast<shok_GGL_CSettler*>(e)->HeroAbilitySummon();
 					e->ObservedEntities.ForAll([this](shok::Attachment* a) {
-						if (a->AttachmentType == shok_AttachmentType::SUMMONER_SUMMONED)
+						if (a->AttachmentType == shok::AttachmentType::SUMMONER_SUMMONED)
 							AddLeader(shok_EGL_CGLEEntity::GetEntityByID(a->EntityId));
 						});
 				}
@@ -1025,7 +1025,7 @@ int UnlimitedArmy::ReadTable(lua_State* L)
 		}
 		int id = luaL_checkint(L, -1);
 		a->Leaders.emplace_back(id);
-		if (shok_EGL_CGLEEntity::GetEntityByID(id)->IsEntityInCategory(shok_EntityCategory::Cannon))
+		if (shok_EGL_CGLEEntity::GetEntityByID(id)->IsEntityInCategory(shok::EntityCategory::Cannon))
 			a->Cannons.push_back({ id, -1 });
 		lua_pop(L, 1);
 		i++;

@@ -130,18 +130,18 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 		return nullptr;
 	}
 
-	bool IsEntityInCategory(shok_EntityCategory cat);
+	bool IsEntityInCategory(shok::EntityCategory cat);
 	int GetResourceProvided();
-	shok_GGlue_CGlueEntityProps* GetEntityType();
+	GGlue::CGlueEntityProps* GetEntityType();
 
 	void FireEvent(shok_BB_CEvent* ev);
 	int EventGetDamage();
 	int EventGetArmor();
 	int EventGetMaxWorktime();
-	shok_LeaderCommand EventLeaderGetCurrentCommand();
+	shok::LeaderCommand EventLeaderGetCurrentCommand();
 	float GetExploration();
 	int GetMaxHealth();
-	int LimitedAttachmentGetMaximum(shok_AttachmentType attachType);
+	int LimitedAttachmentGetMaximum(shok::AttachmentType attachType);
 	int GetSector();
 	int ResourceTreeGetNearestSector();
 
@@ -157,13 +157,13 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 
 	void Destroy();
 
-	int GetFirstAttachedToMe(shok_AttachmentType attachmentId);
-	int GetFirstAttachedEntity(shok_AttachmentType attachmentId);
+	int GetFirstAttachedToMe(shok::AttachmentType attachmentId);
+	int GetFirstAttachedEntity(shok::AttachmentType attachmentId);
 	/**
 	fires event eventIdOnThisDetach on otherId, if this gets detached/destroyed, fires eventIdOnOtherDetach on this, if otherId gets detached/destroyed
 	**/
-	void AttachEntity(shok_AttachmentType attachtype, int otherId, shok_EventIDs eventIdOnThisDetach, shok_EventIDs eventIdOnOtherDetach);
-	void DetachObservedEntity(shok_AttachmentType attachtype, int otherId, bool fireEvent);
+	void AttachEntity(shok::AttachmentType attachtype, int otherId, shok_EventIDs eventIdOnThisDetach, shok_EventIDs eventIdOnOtherDetach);
+	void DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent);
 
 	void ClearAttackers();
 
@@ -361,7 +361,7 @@ struct shok_GGL_CAnimal : shok_EGL_CMovingEntity {
 };
 
 struct shok_GGL_CResourceDoodad : shok_EGL_CGLEEntity {
-	shok_ResourceType ResourceType;
+	shok::ResourceType ResourceType;
 	int ResourceAmount, ResourceAmountAdd; //66
 
 	// set current res amount 4B864B thiscall (th, int)
@@ -412,7 +412,7 @@ struct shok_GGL_CBuilding : shok_EGL_CGLEEntity {
 	void SellBuilding();
 	void StartResearch(int tech);
 	void CancelResearch();
-	void MarketStartTrade(shok_ResourceType ResourceTypeSell, shok_ResourceType ResourceTypeBuy, float BuyAmount);
+	void MarketStartTrade(shok::ResourceType ResourceTypeSell, shok::ResourceType ResourceTypeBuy, float BuyAmount);
 	void MarketCancelTrade();
 	int BuyLeaderByType(int ety);
 

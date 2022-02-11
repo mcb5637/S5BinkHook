@@ -130,14 +130,14 @@ void shok_GGUI_CPlaceBuildingState::HookPlacementRotation()
 
 shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(int ety, const shok::Position& p, float range)
 {
-	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
-	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
+	const GGlue::CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 
 	EntityIteratorPredicateOfPlayer predpl{ 0 };
 	EntityIteratorPredicateAnyEntityType predety{ bp->BuildOn.data(), bp->BuildOn.size() };
 	EntityIteratorPredicateInCircle predcir{ p, range };
 	EntityIteratorPredicateFunc predfunc{ [](shok_EGL_CGLEEntity* e) {
-			return e->GetFirstAttachedToMe(shok_AttachmentType::BUILDING_BASE) == 0;
+			return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == 0;
 	} };
 	EntityIteratorPredicate* preds[] = { &predpl, &predety, &predcir, &predfunc };
 	EntityIteratorPredicateAnd predand{ preds, 4 };
@@ -149,16 +149,16 @@ shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(i
 }
 shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosFree(int ety, const shok::PositionRot& p, float range)
 {
-	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
-	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
+	const GGlue::CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 
 	shok::Position r = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
 	return { r.X, r.Y, p.r };
 }
 shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(int ety, const shok::PositionRot& p, float range)
 {
-	const shok_GGlue_CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
-	const shok_GGL_CGLBuildingProps* bp = static_cast<shok_GGL_CGLBuildingProps*>(e->LogicProps);
+	const GGlue::CGlueEntityProps* e = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 	if (bp->BuildOn.size() == 0)
 		return GetNearestPlacementPosFree(ety, p, range);
 	else
@@ -216,8 +216,8 @@ void shok_GGUI_CManager::HackPostEvent()
 }
 
 static inline int* (* const modifpressed_getobj)() = reinterpret_cast<int* (*)()>(0x558C16);
-static inline bool(__thiscall* const modifpressed_ispressed)(int* ob7, shok_Keys m) = reinterpret_cast<bool(__thiscall*)(int*, shok_Keys)>(0x558C1C);
-bool shok_GGUI_CManager::IsModifierPressed(shok_Keys modif)
+static inline bool(__thiscall* const modifpressed_ispressed)(int* ob7, shok::Keys m) = reinterpret_cast<bool(__thiscall*)(int*, shok::Keys)>(0x558C1C);
+bool shok_GGUI_CManager::IsModifierPressed(shok::Keys modif)
 {
 	return modifpressed_ispressed(modifpressed_getobj() + 7, modif);
 }

@@ -77,12 +77,12 @@ shok_EGL_CEventPosition::shok_EGL_CEventPosition(shok_EventIDs e, const shok::Po
 	Position = p;
 }
 
-shok_GGL_CEventAttachmentTypeGetInteger::shok_GGL_CEventAttachmentTypeGetInteger(shok_EventIDs e, shok_AttachmentType t) : shok_BB_CEvent(e)
+shok_GGL_CEventAttachmentTypeGetInteger::shok_GGL_CEventAttachmentTypeGetInteger(shok_EventIDs e, shok::AttachmentType t) : shok_BB_CEvent(e)
 {
 	vtable = shok_GGL_CEventAttachmentTypeGetInteger::vtp;
 	AttachmentType = t;
 }
-shok_GGL_CEventAttachmentTypeInteger::shok_GGL_CEventAttachmentTypeInteger(shok_EventIDs e, shok_AttachmentType t, int d) : shok_BB_CEvent(e)
+shok_GGL_CEventAttachmentTypeInteger::shok_GGL_CEventAttachmentTypeInteger(shok_EventIDs e, shok::AttachmentType t, int d) : shok_BB_CEvent(e)
 {
 	vtable = shok_GGL_CEventAttachmentTypeInteger::vtp;
 	AttachmentType = t;
@@ -118,7 +118,7 @@ shok_EGL_CEvent2Entities::shok_EGL_CEvent2Entities(shok_EventIDs e, int aid, int
 	TargetId = tid;
 }
 
-shok_GGL_CEventTransaction::shok_GGL_CEventTransaction(shok_EventIDs e, shok_ResourceType sell, shok_ResourceType buy, float buyAm) : shok_BB_CEvent(e)
+shok_GGL_CEventTransaction::shok_GGL_CEventTransaction(shok_EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm) : shok_BB_CEvent(e)
 {
 	vtable = shok_GGL_CEventTransaction::vtp;
 	SellType = sell;
@@ -133,7 +133,7 @@ shok_GGL_CEventPositionAnd2EntityTypes::shok_GGL_CEventPositionAnd2EntityTypes(s
 	Type2 = t2;
 }
 
-shok_GGL_CEventEntityAttachment::shok_GGL_CEventEntityAttachment(shok_EventIDs e, shok_AttachmentType ty, int eid, shok_EventIDs detach) : shok_BB_CEvent(e)
+shok_GGL_CEventEntityAttachment::shok_GGL_CEventEntityAttachment(shok_EventIDs e, shok::AttachmentType ty, int eid, shok_EventIDs detach) : shok_BB_CEvent(e)
 {
 	vtable = shok_GGL_CEventEntityAttachment::vtp;
 	Type = ty;
@@ -162,7 +162,7 @@ shok_EGL_CNetEventEntityAndPosArray::shok_EGL_CNetEventEntityAndPosArray(shok_Ne
 	Rotation = r;
 }
 
-shok_GGL_CNetEventExtractResource::shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok_ResourceType resty, const shok::Position& pos) : shok_BB_CEvent(id)
+shok_GGL_CNetEventExtractResource::shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok::ResourceType resty, const shok::Position& pos) : shok_BB_CEvent(id)
 {
 	vtable = shok_GGL_CNetEventExtractResource::vtp;
 	EntityId = ent;
@@ -170,7 +170,7 @@ shok_GGL_CNetEventExtractResource::shok_GGL_CNetEventExtractResource(shok_NetEve
 	Position = pos;
 }
 
-shok_GGL_CNetEventTransaction::shok_GGL_CNetEventTransaction(shok_NetEventIds id, int ent, shok_ResourceType sell, shok_ResourceType buy, int buyam) : shok_BB_CEvent(id)
+shok_GGL_CNetEventTransaction::shok_GGL_CNetEventTransaction(shok_NetEventIds id, int ent, shok::ResourceType sell, shok::ResourceType buy, int buyam) : shok_BB_CEvent(id)
 {
 	vtable = shok_GGL_CNetEventTransaction::vtp;
 	EntityId = ent;
@@ -293,7 +293,7 @@ shok_BB_CInputEvent::shok_BB_CInputEvent(shok_InputEventIds id) : shok_BB_CEvent
 	EventHandeled = false;
 }
 
-shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, shok_Keys keydata, int clicks, int x, int y, int delta) : shok_BB_CInputEvent(id)
+shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, shok::Keys keydata, int clicks, int x, int y, int delta) : shok_BB_CInputEvent(id)
 {
 	vtable = shok_BB_CMouseEvent::vtp;
 	KeyData = keydata;
@@ -302,22 +302,22 @@ shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, shok_Keys keydat
 	Y = y;
 	Delta = delta;
 }
-bool shok_BB_CMouseEvent::IsKey(shok_Keys key)
+bool shok_BB_CMouseEvent::IsKey(shok::Keys key)
 {
-	return (KeyData & shok_Keys::MaskCode) == key;
+	return (KeyData & shok::Keys::MaskCode) == key;
 }
-bool shok_BB_CMouseEvent::IsModifier(shok_Keys mod)
+bool shok_BB_CMouseEvent::IsModifier(shok::Keys mod)
 {
-	return (KeyData & shok_Keys::MaskModifiers) == mod;
+	return (KeyData & shok::Keys::MaskModifiers) == mod;
 }
 
-shok_BB_CKeyEvent::shok_BB_CKeyEvent(shok_InputEventIds id, shok_Keys keydata) : shok_BB_CInputEvent(id)
+shok_BB_CKeyEvent::shok_BB_CKeyEvent(shok_InputEventIds id, shok::Keys keydata) : shok_BB_CInputEvent(id)
 {
 	vtable = shok_BB_CKeyEvent::vtp;
 	KeyData = keydata;
 }
 
-shok_BB_CKeyPressEvent::shok_BB_CKeyPressEvent(shok_InputEventIds id, int keychar, shok_Keys keymodif) : shok_BB_CInputEvent(id)
+shok_BB_CKeyPressEvent::shok_BB_CKeyPressEvent(shok_InputEventIds id, int keychar, shok::Keys keymodif) : shok_BB_CInputEvent(id)
 {
 	vtable = shok_BB_CKeyPressEvent::vtp;
 	KeyChar = keychar;

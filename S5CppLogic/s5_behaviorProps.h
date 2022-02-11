@@ -547,7 +547,7 @@ namespace GGL {
 		struct {
 			PADDINGI(1); // vtable?
 			int Amount; //float?
-			shok_ResourceType Good;
+			shok::ResourceType Good;
 		} Resource; // if im unlucky this is a list or set or something similar stupid
 
 		static inline constexpr int vtp = 0x774D40;

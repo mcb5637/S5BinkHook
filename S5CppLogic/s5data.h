@@ -164,9 +164,9 @@ namespace shok {
 		float Wood = 0, WoodRaw = 0;
 		float WeatherEnergy = 0, Knowledge = 0, Faith = 0;
 
-		float GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const;
-		void AddToType(shok_ResourceType ty, float toadd);
-		void SubFromType(shok_ResourceType ty, float tosub);
+		float GetResourceAmountFromType(shok::ResourceType ty, bool addRaw) const;
+		void AddToType(shok::ResourceType ty, float toadd);
+		void SubFromType(shok::ResourceType ty, float tosub);
 		bool HasResources(const CostInfo* has) const;
 
 		static inline shok_BB_CClassFactory_serializationData* SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D668);
@@ -175,7 +175,7 @@ namespace shok {
 
 
 	struct Attachment {
-		shok_AttachmentType AttachmentType;
+		shok::AttachmentType AttachmentType;
 		int EntityId, EventID; // does event id exist, or is it just in attachmentinfo loader?
 
 		auto operator<=>(const Attachment& o) const = default;
@@ -318,9 +318,9 @@ enum class win_mouseEvents : int {
 };
 
 
-#include "s5defines.h"
-#include "s5behaviorProps.h"
-#include "s5entitytype.h"
+#include "s5_defines.h"
+#include "s5_behaviorProps.h"
+#include "s5_entitytype.h"
 #include "s5behaviors.h"
 #include "s5entity.h"
 #include "s5entitydisplay.h"

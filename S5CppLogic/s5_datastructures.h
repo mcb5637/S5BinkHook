@@ -101,6 +101,9 @@ namespace shok {
 		size_t size() const noexcept {
 			return Internal.size();
 		}
+		const T* data() const noexcept {
+			return Internal.data();
+		}
 
 		struct SaveVector_Data {
 #ifdef _DEBUG

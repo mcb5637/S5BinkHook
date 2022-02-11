@@ -66,16 +66,16 @@ struct shok_EGL_CGLEEntitiesProps : shok_object {
 	shok_BB_CIDManagerEx* UpgradeCategoryManager;
 	shok_BB_CIDManagerEx* BlessCategoryManager;
 	vector_padding;
-	std::vector<shok_EGL_CGLEEntityProps*, shok::Allocator<shok_EGL_CGLEEntityProps*>> EntityTypesLogicProps; // 6
+	std::vector<EGL::CGLEEntityProps*, shok::Allocator<EGL::CGLEEntityProps*>> EntityTypesLogicProps; // 6
 	shok_BB_CIDManagerEx* EntityTypeManagerAgain;
 	vector_padding;
-	std::vector<shok_ED_CDisplayEntityProps*, shok::Allocator<shok_ED_CDisplayEntityProps*>> EntityTypesDisplayProps; // 11
+	std::vector<ED::CDisplayEntityProps*, shok::Allocator<ED::CDisplayEntityProps*>> EntityTypesDisplayProps; // 11
 	vector_padding;
-	std::vector<shok_GGlue_CGlueEntityProps, shok::Allocator<shok_GGlue_CGlueEntityProps>> EntityTypes; // 15
+	std::vector<GGlue::CGlueEntityProps, shok::Allocator<GGlue::CGlueEntityProps>> EntityTypes; // 15
 
 	static inline constexpr int vtp = 0x788834;
 
-	shok_GGlue_CGlueEntityProps* GetEntityType(int i);
+	GGlue::CGlueEntityProps* GetEntityType(int i);
 
 	static inline shok_EGL_CGLEEntitiesProps** const GlobalObj = reinterpret_cast<shok_EGL_CGLEEntitiesProps**>(0x895DB0);
 
@@ -260,7 +260,7 @@ struct shok_EGL_CGLELandscape_blockingData {
 	byte* data;
 
 	bool IsCoordValid(int x, int y);
-	shok::Position GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok::PositionRot& pos, float range);
+	shok::Position GetFreeBuildingPlacementPos(const GGL::CGLBuildingProps* bprops, const shok::PositionRot& pos, float range);
 	inline shok_EGL_CGLELandscape::BlockingMode GetBlockingData(int x, int y);
 };
 

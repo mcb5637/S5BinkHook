@@ -103,15 +103,15 @@ int luaext_assert(lua_State* L, bool b, const char* msg) {
 	return 0;
 }
 
-shok_GGlue_CGlueEntityProps* luaext_optEntityType(lua_State* L, int i) {
+GGlue::CGlueEntityProps* luaext_optEntityType(lua_State* L, int i) {
 	if (!lua_isnumber(L, i))
 		return nullptr;
 	int t = luaL_checkint(L, i);
 	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(t);
 }
 
-shok_GGlue_CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i) {
-	shok_GGlue_CGlueEntityProps* t = luaext_optEntityType(L, i);
+GGlue::CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i) {
+	GGlue::CGlueEntityProps* t = luaext_optEntityType(L, i);
 	if (t == nullptr)
 		luaL_error(L, "no entitytype at %d", i);
 	return t;
@@ -175,71 +175,71 @@ void luaext_checkPosRot(lua_State* L, shok::PositionRot& p, int i, bool rad) {
 
 void luaext_writeCostInfo(lua_State* L, const shok::CostInfo& c) {
 	lua_newtable(L);
-	for (int i = 1; i <= shok_ResourceType_MaxValue; i++) {
+	for (int i = 1; i <= shok::ResourceType_MaxValue; i++) {
 		lua_pushnumber(L, 0);
 		lua_rawseti(L, -2, i);
 	}
 	lua_pushnumber(L, c.Clay);
-	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Clay));
+	lua_rawseti(L, -2, static_cast<int>(shok::ResourceType::Clay));
 	lua_pushnumber(L, c.Gold);
-	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Gold));
+	lua_rawseti(L, -2, static_cast<int>(shok::ResourceType::Gold));
 	lua_pushnumber(L, c.Iron);
-	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Iron));
+	lua_rawseti(L, -2, static_cast<int>(shok::ResourceType::Iron));
 	lua_pushnumber(L, c.Silver);
-	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Silver));
+	lua_rawseti(L, -2, static_cast<int>(shok::ResourceType::Silver));
 	lua_pushnumber(L, c.Stone);
-	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Stone));
+	lua_rawseti(L, -2, static_cast<int>(shok::ResourceType::Stone));
 	lua_pushnumber(L, c.Sulfur);
-	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Sulfur));
+	lua_rawseti(L, -2, static_cast<int>(shok::ResourceType::Sulfur));
 	lua_pushnumber(L, c.Wood);
-	lua_rawseti(L, -2, static_cast<int>(shok_ResourceType::Wood));
+	lua_rawseti(L, -2, static_cast<int>(shok::ResourceType::Wood));
 }
 
 void luaext_readCostInfo(lua_State* L, int index, shok::CostInfo& c, bool ignoreZeroes) {
 	float i = 0;
-	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Clay));
+	lua_rawgeti(L, index, static_cast<int>(shok::ResourceType::Clay));
 	if (lua_isnumber(L, -1)) {
 		i = luaL_checkfloat(L, -1);
 		if (i != 0 || !ignoreZeroes)
 			c.Clay = i;
 	}
 	lua_pop(L, 1);
-	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Gold));
+	lua_rawgeti(L, index, static_cast<int>(shok::ResourceType::Gold));
 	if (lua_isnumber(L, -1)) {
 		i = luaL_checkfloat(L, -1);
 		if (i != 0 || !ignoreZeroes)
 			c.Gold = i;
 	}
 	lua_pop(L, 1);
-	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Iron));
+	lua_rawgeti(L, index, static_cast<int>(shok::ResourceType::Iron));
 	if (lua_isnumber(L, -1)) {
 		i = luaL_checkfloat(L, -1);
 		if (i != 0 || !ignoreZeroes)
 			c.Iron = i;
 	}
 	lua_pop(L, 1);
-	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Silver));
+	lua_rawgeti(L, index, static_cast<int>(shok::ResourceType::Silver));
 	if (lua_isnumber(L, -1)) {
 		i = luaL_checkfloat(L, -1);
 		if (i != 0 || !ignoreZeroes)
 			c.Silver = i;
 	}
 	lua_pop(L, 1);
-	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Stone));
+	lua_rawgeti(L, index, static_cast<int>(shok::ResourceType::Stone));
 	if (lua_isnumber(L, -1)) {
 		i = luaL_checkfloat(L, -1);
 		if (i != 0 || !ignoreZeroes)
 			c.Stone = i;
 	}
 	lua_pop(L, 1);
-	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Sulfur));
+	lua_rawgeti(L, index, static_cast<int>(shok::ResourceType::Sulfur));
 	if (lua_isnumber(L, -1)) {
 		i = luaL_checkfloat(L, -1);
 		if (i != 0 || !ignoreZeroes)
 			c.Sulfur = i;
 	}
 	lua_pop(L, 1);
-	lua_rawgeti(L, index, static_cast<int>(shok_ResourceType::Wood));
+	lua_rawgeti(L, index, static_cast<int>(shok::ResourceType::Wood));
 	if (lua_isnumber(L, -1)) {
 		i = luaL_checkfloat(L, -1);
 		if (i != 0 || !ignoreZeroes)
@@ -248,10 +248,10 @@ void luaext_readCostInfo(lua_State* L, int index, shok::CostInfo& c, bool ignore
 	lua_pop(L, 1);
 }
 
-shok_ResourceType luaext_getresourcetype(lua_State* L, int i) {
+shok::ResourceType luaext_getresourcetype(lua_State* L, int i) {
 	int r = luaL_checkint(L, i);
-	luaext_assert(L, r > 0 && r <= shok_ResourceType_MaxValue, "no resource type");
-	return static_cast<shok_ResourceType>(r);
+	luaext_assert(L, r > 0 && r <= shok::ResourceType_MaxValue, "no resource type");
+	return static_cast<shok::ResourceType>(r);
 }
 
 void luaext_assertEntityAlive(lua_State* L, int id, const char* msg)

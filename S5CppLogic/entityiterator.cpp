@@ -210,7 +210,7 @@ void EntityIteratorPredicateAnyPlayer::FillHostilePlayers(int source, int* playe
 	shok_GGL_CPlayerStatus* pl = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(source);
 	int curr = 0;
 	for (int p = 1; p <= maxP; p++) {
-		if (pl->GetDiploStateTo(p) == shok_DiploState::Hostile) {
+		if (pl->GetDiploStateTo(p) == shok::DiploState::Hostile) {
 			players[curr] = p;
 			curr++;
 		}
@@ -250,7 +250,7 @@ bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity*
 	return e->IsEntityInCategory(category);
 }
 
-EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory(shok_EntityCategory cat)
+EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory(shok::EntityCategory cat)
 {
 	category = cat;
 }
@@ -303,13 +303,13 @@ bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, flo
 
 bool EntityIteratorPredicateOfUpgradeCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	shok_GGlue_CGlueEntityProps* t = e->GetEntityType();
+	GGlue::CGlueEntityProps* t = e->GetEntityType();
 	if (t->IsBuildingType()) {
-		shok_GGL_CGLBuildingProps* p = (shok_GGL_CGLBuildingProps*)t;
+		GGL::CGLBuildingProps* p = (GGL::CGLBuildingProps*)t;
 		return p->Upgrade.Category == category;
 	}
 	if (t->IsSettlerType()) {
-		shok_GGL_CGLSettlerProps* p = (shok_GGL_CGLSettlerProps*)t;
+		GGL::CGLSettlerProps* p = (GGL::CGLSettlerProps*)t;
 		return p->Upgrade.Category == category;
 	}
 	return false;
@@ -334,7 +334,7 @@ bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(shok_EGL_CGLEEnti
 {
 	if (!shok_DynamicCast<shok_EGL_CGLEEntity, shok_EGL_CMovingEntity>(e))
 		return true;
-	if (e->GetFirstAttachedToMe(shok_AttachmentType::INFLICTOR_TERRORIZED) != 0)
+	if (e->GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED) != 0)
 		return false;
 	shok_EGL_CMovingEntity* me = (shok_EGL_CMovingEntity*)e;
 	float dx1 = Center.X - e->Position.X;
@@ -373,5 +373,5 @@ EntityIteratorPredicatePriority::EntityIteratorPredicatePriority(int prio, Entit
 
 bool EntityIteratorPredicateNotInBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return !e->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_ENTERED_BUILDING) && !e->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_BUILDING_TO_LEAVE);
+	return !e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) && !e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE);
 }

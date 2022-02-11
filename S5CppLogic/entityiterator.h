@@ -125,10 +125,10 @@ public:
 
 struct EntityIteratorPredicateOfEntityCategory : EntityIteratorPredicate {
 private:
-	shok_EntityCategory category;
+	shok::EntityCategory category;
 public:
 	virtual bool MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const;
-	EntityIteratorPredicateOfEntityCategory(shok_EntityCategory cat);
+	EntityIteratorPredicateOfEntityCategory(shok::EntityCategory cat);
 };
 
 struct EntityIteratorPredicateProvidesResource : EntityIteratorPredicate {

@@ -34,14 +34,14 @@ struct shok_EGL_CGLETaskArgsPosAndOrientation : shok_EGL_CGLETaskArgsPosition {
 };
 
 struct shok_GGL_CGLTaskArgsPositionAndTarget : shok_EGL_CGLETaskArgsPosition {
-	//shok_AttachmentType TargetType; probably, unused
+	//shok::AttachmentType TargetType; probably, unused
 
 	static inline constexpr int vtp = 0x771430;
 	static inline constexpr int TypeDesc = 0x812E1C;
 };
 
 struct shok_GGL_CGLTaskArgsTargetType : shok_EGL_CGLETaskArgs {
-	shok_AttachmentType TargetType;
+	shok::AttachmentType TargetType;
 
 	static inline constexpr int vtp = 0x77141C;
 	static inline constexpr int TypeDesc = 0x812DF4;

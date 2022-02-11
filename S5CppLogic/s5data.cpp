@@ -243,20 +243,20 @@ bool DoesFileExist(const char* name)
 	return r;
 }
 
-static inline float(__thiscall* const costinfo_getres)(const shok::CostInfo* th, shok_ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(const shok::CostInfo*, shok_ResourceType, bool)>(0x4A9606);
-float shok::CostInfo::GetResourceAmountFromType(shok_ResourceType ty, bool addRaw) const
+static inline float(__thiscall* const costinfo_getres)(const shok::CostInfo* th, shok::ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(const shok::CostInfo*, shok::ResourceType, bool)>(0x4A9606);
+float shok::CostInfo::GetResourceAmountFromType(shok::ResourceType ty, bool addRaw) const
 {
 	return costinfo_getres(this, ty, addRaw);
 }
 
-static inline void(__thiscall* const costinfo_add)(shok::CostInfo* th, shok_ResourceType ty, float a) = reinterpret_cast<void(__thiscall*)(shok::CostInfo*, shok_ResourceType, float)>(0x4A9774);
-void shok::CostInfo::AddToType(shok_ResourceType ty, float toadd)
+static inline void(__thiscall* const costinfo_add)(shok::CostInfo* th, shok::ResourceType ty, float a) = reinterpret_cast<void(__thiscall*)(shok::CostInfo*, shok::ResourceType, float)>(0x4A9774);
+void shok::CostInfo::AddToType(shok::ResourceType ty, float toadd)
 {
 	costinfo_add(this, ty, toadd);
 }
 
-static inline void(__thiscall* const costinfo_sub)(shok::CostInfo* th, shok_ResourceType ty, float a, float b) = reinterpret_cast<void(__thiscall*)(shok::CostInfo*, shok_ResourceType, float, float)>(0x4A963D);
-void shok::CostInfo::SubFromType(shok_ResourceType ty, float tosub)
+static inline void(__thiscall* const costinfo_sub)(shok::CostInfo* th, shok::ResourceType ty, float a, float b) = reinterpret_cast<void(__thiscall*)(shok::CostInfo*, shok::ResourceType, float, float)>(0x4A963D);
+void shok::CostInfo::SubFromType(shok::ResourceType ty, float tosub)
 {
 	costinfo_sub(this, ty, tosub, 0.0f);
 }

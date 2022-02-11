@@ -149,7 +149,7 @@ int l_entityPredicateIsNotSoldier(lua_State* L) {
 int l_entityPredicateOfEntityCategory(lua_State* L) {
 	int ty = luaL_checkint(L, 1);
 	void* ud = lua_newuserdata(L, sizeof(EntityIteratorPredicateOfEntityCategory));
-	new(ud) EntityIteratorPredicateOfEntityCategory(static_cast<shok_EntityCategory>(ty));
+	new(ud) EntityIteratorPredicateOfEntityCategory(static_cast<shok::EntityCategory>(ty));
 	return 1;
 }
 
@@ -708,7 +708,7 @@ int l_settlerPlaceCannon(lua_State* L) {
 	luaext_checkPos(L, p, 2);
 	p.FloorToBuildingPlacement();
 	int bottom = luaL_checkint(L, 3);
-	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
+	GGlue::CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
 	luaext_assertPointer(L, ety, "no bottom entitytype");
 	luaext_assert(L, ety->IsBuildingType(), "bottom not a building");
 	int top = luaL_checkint(L, 4);
@@ -750,7 +750,7 @@ int l_settlerSummon(lua_State* L) {
 	e->HeroAbilitySummon();
 	int summoned = 0;
 	e->ObservedEntities.ForAll([L, &summoned](shok::Attachment* a) {
-		if (a->AttachmentType == shok_AttachmentType::SUMMONER_SUMMONED)
+		if (a->AttachmentType == shok::AttachmentType::SUMMONER_SUMMONED)
 			lua_pushnumber(L, a->EntityId);
 		summoned++;
 		});
@@ -834,7 +834,7 @@ int l_settlerSabotage(lua_State* L) {
 	luaext_assert(L, e->GetBehavior<shok_GGL_CThiefBehavior>()->ResourceType == 0, "is carrying resources");
 	shok_GGL_CBuilding* t = luaext_checkBulding(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
-	luaext_assert(L, t->IsEntityInCategory(shok_EntityCategory::Bridge) || ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile or bridge");
+	luaext_assert(L, t->IsEntityInCategory(shok::EntityCategory::Bridge) || ArePlayersHostile(e->PlayerId, t->PlayerId), "entities are not hostile or bridge");
 	e->ThiefSabotage(t->EntityId);
 	return 0;
 }
@@ -909,7 +909,7 @@ int l_settlerSecureGoods(lua_State* L) {
 	shok_GGL_CBuilding* t = luaext_checkBulding(L, 2);
 	luaext_assertEntityAlive(L, t->EntityId, "entity dead at 2");
 	luaext_assert(L, e->PlayerId == t->PlayerId, "entities are not of same player");
-	luaext_assert(L, t->IsEntityInCategory(shok_EntityCategory::Headquarters), "target not hq");
+	luaext_assert(L, t->IsEntityInCategory(shok::EntityCategory::Headquarters), "target not hq");
 	e->ThiefSecureGoods(t->EntityId);
 	return 0;
 }
@@ -942,7 +942,7 @@ int l_settlerDisableConversionHook(lua_State* L) {
 
 int l_entityIsFeared(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	int id = e->GetFirstAttachedToMe(shok_AttachmentType::INFLICTOR_TERRORIZED);
+	int id = e->GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED);
 	if (id == 0)
 		lua_pushboolean(L, false);
 	else
@@ -984,7 +984,7 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CFoundryBehavior>(), "no foundry at 1");
 	luaext_assert(L, b->IsIdle(), "is not idle");
-	shok_GGlue_CGlueEntityProps* t = luaext_checkEntityType(L, 2);
+	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 2);
 	int ety = luaL_checkint(L, 2);
 	bool found = false;
 	for (GGL::CFoundryBehaviorProperties::CannonInfoData& i : b->GetEntityType()->GetBehaviorProps<GGL::CFoundryBehaviorProperties>()->CannonInfo) {
@@ -993,7 +993,7 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 	}
 	luaext_assert(L, found, "foundry cannot build entitytype");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
-	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(t->LogicProps)->Cost), "missing res");
+	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(t->LogicProps)->Cost), "missing res");
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	b->CommandBuildCannon(ety);
 	return 0;
@@ -1097,7 +1097,7 @@ int l_buildingBarracksGetLeadersTrainingAt(lua_State* L) {
 	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CBarrackBehavior>(), "no barracks");
 	int i = 0;
 	b->ObserverEntities.ForAll([L, &i](shok::Attachment* a) {
-		if (a->AttachmentType == shok_AttachmentType::FIGHTER_BARRACKS && !shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->GetBehavior<shok_GGL_CSoldierBehavior>()) {
+		if (a->AttachmentType == shok::AttachmentType::FIGHTER_BARRACKS && !shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->GetBehavior<shok_GGL_CSoldierBehavior>()) {
 			lua_pushnumber(L, a->EntityId);
 			i++;
 		}
@@ -1128,19 +1128,19 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	GGL::CLeaderBehaviorProps* lp = s->GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
 	luaext_assertPointer(L, l, "no leader");
 	luaext_assert(L, b->PlayerId == s->PlayerId, "different players");
-	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
+	GGlue::CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
 	luaext_assertPointer(L, solty, "no soldier type set");
 	if (!lua_toboolean(L, 3)) {
 		int ucat = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(b->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
 	}
-	int max = s->LimitedAttachmentGetMaximum(shok_AttachmentType::LEADER_SOLDIER);
+	int max = s->LimitedAttachmentGetMaximum(shok::AttachmentType::LEADER_SOLDIER);
 	int curr = 0;
-	s->ObservedEntities.ForAll([&curr](shok::Attachment* a) { if (a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER) curr++; });
+	s->ObservedEntities.ForAll([&curr](shok::Attachment* a) { if (a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER) curr++; });
 	luaext_assert(L, curr < max, "no free soldier slot left");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	shok_GGL_CGLSettlerProps* sprop = shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(solty->LogicProps);
+	GGL::CGLSettlerProps* sprop = shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(solty->LogicProps);
 	luaext_assertPointer(L, sprop, "error: soldier no settler type");
 	luaext_assert(L, p->CurrentResources.HasResources(&sprop->Cost), "missing res");
 	b->CommandRecruitSoldierForLeader(s->EntityId);
@@ -1210,19 +1210,19 @@ int l_buildingBarracksRecruitGroups(lua_State* L) {
 
 int l_buildingHQBuySerf(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	luaext_assert(L, b->IsEntityInCategory(shok_EntityCategory::Headquarters), "no hq");
+	luaext_assert(L, b->IsEntityInCategory(shok::EntityCategory::Headquarters), "no hq");
 	luaext_assert(L, b->IsIdle(), "building not idle");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	shok_GGlue_CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(*shok_entityTypeIDSerf);
-	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(solty->LogicProps)->Cost), "missing res");
+	GGlue::CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
+	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(solty->LogicProps)->Cost), "missing res");
 	b->HQBuySerf();
 	return 0;
 }
 
 int l_buildingSell(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
-	luaext_assert(L, ((shok_GGL_CGLBuildingProps*)b->GetEntityType()->LogicProps)->CanBeSold, "cannot be sold");
+	luaext_assert(L, ((GGL::CGLBuildingProps*)b->GetEntityType()->LogicProps)->CanBeSold, "cannot be sold");
 	b->SellBuilding();
 	return 0;
 }
@@ -1234,8 +1234,8 @@ int l_buildingStartResearch(lua_State* L) {
 	shok_technology* techo = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tech);
 	luaext_assertPointer(L, techo, "no tech at 2");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
-	shok_TechState techstate = p->GetTechStatus(tech);
-	luaext_assert(L, techstate == shok_TechState::Allowed, "wrong techstate");
+	shok::TechState techstate = p->GetTechStatus(tech);
+	luaext_assert(L, techstate == shok::TechState::Allowed, "wrong techstate");
 	luaext_assert(L, p->CurrentResources.HasResources(&techo->ResourceCosts), "not enough res");
 	b->StartResearch(tech);
 	return 0;
@@ -1248,16 +1248,16 @@ int l_buildingCancelResearch(lua_State* L) {
 	return 0;
 }
 
-bool marketIsRes(shok_ResourceType rty) {
-	return rty == shok_ResourceType::Clay || rty == shok_ResourceType::Gold || rty == shok_ResourceType::Iron || rty == shok_ResourceType::Stone || rty == shok_ResourceType::Sulfur || rty == shok_ResourceType::Wood;
+bool marketIsRes(shok::ResourceType rty) {
+	return rty == shok::ResourceType::Clay || rty == shok::ResourceType::Gold || rty == shok::ResourceType::Iron || rty == shok::ResourceType::Stone || rty == shok::ResourceType::Sulfur || rty == shok::ResourceType::Wood;
 }
 
 int l_buildingMarketStartTrade(lua_State* L) {
 	shok_GGL_CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, b->GetBehavior<shok_GGL_CMarketBehavior>(), "no market at 1");
 	luaext_assert(L, b->IsIdle(), "building not idle");
-	shok_ResourceType sellty = static_cast<shok_ResourceType>(luaL_checkint(L, 2));
-	shok_ResourceType buyty = static_cast<shok_ResourceType>(luaL_checkint(L, 3));
+	shok::ResourceType sellty = static_cast<shok::ResourceType>(luaL_checkint(L, 2));
+	shok::ResourceType buyty = static_cast<shok::ResourceType>(luaL_checkint(L, 3));
 	float am = luaL_checkfloat(L, 4);
 	luaext_assert(L, marketIsRes(sellty), "sell type is invalid");
 	luaext_assert(L, marketIsRes(buyty), "buy type is invalid");
@@ -1289,7 +1289,7 @@ int l_leaderSetSoldierLimit(lua_State* L) {
 	luaext_assertPointer(L, l, "no limited attachment");
 	int limit = luaL_checkint(L, 2);
 	luaext_assert(L, limit >= 0, "limit < 0");
-	auto a = l->AttachmentLimits.GetFirstMatch([](auto a) { return a->AttachmentType == shok_AttachmentType::LEADER_SOLDIER; });
+	auto a = l->AttachmentLimits.GetFirstMatch([](auto a) { return a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER; });
 	luaext_assertPointer(L, a, "no matching limited attachment");
 	a->Limit = limit;
 	return 0;
@@ -1449,12 +1449,12 @@ int l_entity_PerformHeal(lua_State* L) {
 
 int l_building_GetBuildOn(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkBulding(L, 1);
-	lua_pushnumber(L, e->GetFirstAttachedEntity(shok_AttachmentType::BUILDING_BASE));
+	lua_pushnumber(L, e->GetFirstAttachedEntity(shok::AttachmentType::BUILDING_BASE));
 	return 1;
 }
 int l_building_GetBuildOnReverse(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	lua_pushnumber(L, e->GetFirstAttachedToMe(shok_AttachmentType::BUILDING_BASE));
+	lua_pushnumber(L, e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE));
 	return 1;
 }
 
@@ -1465,20 +1465,20 @@ int l_building_GetConstructionSite(lua_State* L) {
 }
 int l_building_ConSiteGetBuilding(lua_State* L) {
 	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, 1);
-	lua_pushnumber(L, e->GetFirstAttachedEntity(shok_AttachmentType::CONSTRUCTION_SITE_BUILDING));
+	lua_pushnumber(L, e->GetFirstAttachedEntity(shok::AttachmentType::CONSTRUCTION_SITE_BUILDING));
 	return 1;
 }
 
 int l_building_BarracksBuyLeaderByType(lua_State* L) {
 	shok_GGL_CBuilding* e = luaext_checkBulding(L, 1);
 	luaext_assertPointer(L, e->GetBehavior<shok_GGL_CBarrackBehavior>(), "no barracks");
-	shok_GGlue_CGlueEntityProps* ety = luaext_checkEntityType(L, 2);
+	GGlue::CGlueEntityProps* ety = luaext_checkEntityType(L, 2);
 	GGL::CLeaderBehaviorProps* lp = ety->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
 	luaext_assertPointer(L, lp, "no leader type");
 	luaext_assert(L, e->IsIdle(true), "building not idle");
 	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<shok_EGL_CGLEEntityProps, shok_GGL_CGLSettlerProps>(ety->LogicProps)->Cost), "missing res");
+	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(ety->LogicProps)->Cost), "missing res");
 	if (!lua_toboolean(L, 3)) {
 		int ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(e->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
@@ -1505,8 +1505,8 @@ int l_settler_GetSnipeTarget(lua_State* L) {
 
 int l_settler_GetEnteredBuilding(lua_State* L) {
 	shok_GGL_CSettler* s = luaext_checkSettler(L, 1);
-	lua_pushnumber(L, s->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_ENTERED_BUILDING));
-	lua_pushnumber(L, s->GetFirstAttachedEntity(shok_AttachmentType::SETTLER_BUILDING_TO_LEAVE));
+	lua_pushnumber(L, s->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING));
+	lua_pushnumber(L, s->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE));
 	return 2;
 }
 
@@ -1584,7 +1584,7 @@ int l_settler_playScriptAnim(lua_State* L) {
 	animbeh->Duration = static_cast<int>(animbeh->Duration / animbeh->SpeedModifier);
 	shok_GGL_CBattleBehavior* batt = e->GetBehavior<shok_GGL_CBattleBehavior>();
 	if (batt)
-		batt->SetCurrentCommand(shok_LeaderCommand::HeroAbility);
+		batt->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
 	e->SetTaskList((*shok_EGL_CGLETaskListMgr::GlobalObj)->TaskListManager->GetIdByName(AnimTaskList));
 	return 0;
 }

@@ -63,16 +63,10 @@
     <ClInclude Include="l_ua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s5entitytype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="s5behaviors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="s5defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5events.h">
@@ -147,7 +141,13 @@
     <ClInclude Include="s5_forwardDecls.h">
       <Filter>shok</Filter>
     </ClInclude>
-    <ClInclude Include="s5behaviorProps.h">
+    <ClInclude Include="s5_behaviorProps.h">
+      <Filter>shok\entitytype</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_defines.h">
+      <Filter>shok</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_entitytype.h">
       <Filter>shok\entitytype</Filter>
     </ClInclude>
   </ItemGroup>
@@ -200,9 +200,6 @@
     <ClCompile Include="s5entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="s5entitytype.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="s5globalObjects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -251,7 +248,10 @@
     <ClCompile Include="s5_mem.cpp">
       <Filter>shok</Filter>
     </ClCompile>
-    <ClCompile Include="s5behaviorProps.cpp">
+    <ClCompile Include="s5_behaviorProps.cpp">
+      <Filter>shok\entitytype</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_entitytype.cpp">
       <Filter>shok\entitytype</Filter>
     </ClCompile>
   </ItemGroup>

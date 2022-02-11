@@ -827,7 +827,7 @@ bool CppL_GUIState_LuaSelection::OnMouseEvent(shok_BB_CEvent* ev)
 {
 	shok_BB_CMouseEvent* mev = shok_DynamicCast<shok_BB_CEvent, shok_BB_CMouseEvent>(ev);
 	if (mev && mev->IsEvent(shok_InputEventIds::MouseButtonDown)) {
-		if (mev->IsKey(shok_Keys::MouseLButton)) {
+		if (mev->IsKey(shok::Keys::MouseLButton)) {
 			bool r = true;
 			if (RefOnKlick != LUA_NOREF) {
 				lua_State* L = *shok_luastate_game;
@@ -844,7 +844,7 @@ bool CppL_GUIState_LuaSelection::OnMouseEvent(shok_BB_CEvent* ev)
 				Cancel(false);
 			return r;
 		}
-		else if (mev->IsKey(shok_Keys::MouseRButton)) { // rmb
+		else if (mev->IsKey(shok::Keys::MouseRButton)) { // rmb
 			Cancel(true);
 			return true;
 		}

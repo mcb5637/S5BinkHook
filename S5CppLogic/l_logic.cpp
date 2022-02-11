@@ -554,7 +554,7 @@ int l_playerGetKillStatistics(lua_State* L) {
 
 int l_logicCanPLaceBuildingAt(lua_State* L) {
 	int ty = luaL_checkint(L, 1);
-	shok_GGlue_CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ty);
+	GGlue::CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ty);
 	luaext_assertPointer(L, ety, "no entitytype");
 	luaext_assert(L, ety->IsBuildingType(), "not a building");
 	int pl = luaL_checkint(L, 2);
@@ -843,9 +843,9 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 		if (lua_isnumber(L2, -1)) {
 			float add = luaL_checkfloat(L2, -1);
 			if (add > 0)
-				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok_ResourceType::GoldRaw, add);
+				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok::ResourceType::GoldRaw, add);
 			else if (add < 0)
-				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok_ResourceType::Gold, -add);
+				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok::ResourceType::Gold, -add);
 		}
 		lua_settop(L2, t);
 	};

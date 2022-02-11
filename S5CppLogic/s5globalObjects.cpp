@@ -71,7 +71,7 @@ struct shok_vtable_ED_CResourceManager {
 };
 //constexpr int i = offsetof(shok_vtable_ED_CResourceManager, GetModelDataByModelType) / 4;
 
-shok_GGlue_CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
+GGlue::CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
 {
 	if (i <= 0 || i >= (int)EntityTypes.size())
 		return nullptr;
@@ -353,7 +353,7 @@ void __declspec(naked) hiresbridgearea_somewaterregionfunc() {
 	};
 }
 void __fastcall shok_bridge_applyheight(shok_GGL_CBridgeEntity* th) {
-	shok_GGL_CBridgeProperties* p = static_cast<shok_GGL_CBridgeProperties*>(th->GetEntityType()->LogicProps);
+	GGL::CBridgeProperties* p = static_cast<GGL::CBridgeProperties*>(th->GetEntityType()->LogicProps);
 	auto* lr = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes;
 	int h = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(th->Position) + p->Height;
 	for (const shok::AARect& area : p->BridgeArea) {
@@ -427,15 +427,15 @@ bool shok_EGL_CGLELandscape_blockingData::IsCoordValid(int x, int y)
 {
 	return x >= 0 && x < ArraySizeXY&& y >= 0 && y < ArraySizeXY;
 }
-void(__thiscall* const buildblock_gethigh)(const shok_GGL_CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok::Position*, float)>(0x4C7B8B);
-void(__thiscall* const buildblock_getlow)(const shok_GGL_CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const shok_GGL_CGLBuildingProps * t, shok::Position*, float)>(0x4C7B1E);
+void(__thiscall* const buildblock_gethigh)(const GGL::CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const GGL::CGLBuildingProps * t, shok::Position*, float)>(0x4C7B8B);
+void(__thiscall* const buildblock_getlow)(const GGL::CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const GGL::CGLBuildingProps * t, shok::Position*, float)>(0x4C7B1E);
 struct shok_GGL_CFreeBuildingPosPredicate {
 	PADDINGI(20);
 };
 void(__thiscall* const freebuildpred_ctor)(shok_GGL_CFreeBuildingPosPredicate* p, shok::Position* lo, shok::Position* hi, int uk, float r) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*, shok::Position*, shok::Position*, int, float)>(0x4C7E84);
 void(__thiscall* const freebuildpred_calc)(shok_EGL_CGLELandscape_blockingData* bl, int x, int y, int* xo, int* yo, int ra, shok_GGL_CFreeBuildingPosPredicate* pred) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLELandscape_blockingData*, int, int, int*, int*, int, shok_GGL_CFreeBuildingPosPredicate*)>(0x57F726);
 void(__thiscall* const freebuildpred_dtor)(shok_GGL_CFreeBuildingPosPredicate* p) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*)>(0x4C7E07);
-shok::Position shok_EGL_CGLELandscape_blockingData::GetFreeBuildingPlacementPos(const shok_GGL_CGLBuildingProps* bprops, const shok::PositionRot& pos, float range)
+shok::Position shok_EGL_CGLELandscape_blockingData::GetFreeBuildingPlacementPos(const GGL::CGLBuildingProps* bprops, const shok::PositionRot& pos, float range)
 {
 	int x = 0, y = 0;
 	shok::Position hi, lo;
@@ -546,7 +546,7 @@ void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p,
 			s->KillSettlerByEnvironment();
 		}
 		else if (shok_GGL_CAnimal* a = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CAnimal>(ent)) {
-			if (!a->GetFirstAttachedToMe(shok_AttachmentType::HERO_HAWK))
+			if (!a->GetFirstAttachedToMe(shok::AttachmentType::HERO_HAWK))
 				a->Destroy();
 		}
 	}

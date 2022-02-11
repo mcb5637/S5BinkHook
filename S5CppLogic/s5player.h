@@ -223,8 +223,8 @@ struct shok_GGL_CPlayerStatus : shok_BB_IObject {
 
 	static inline constexpr int vtp = 0x76FA88;
 
-	shok_DiploState GetDiploStateTo(int p);
-	shok_TechState GetTechStatus(int tech);
+	shok::DiploState GetDiploStateTo(int p);
+	shok::TechState GetTechStatus(int tech);
 };
 //constexpr int i = offsetof(shok_GGL_CPlayerStatus, Statistics) / 4;
 

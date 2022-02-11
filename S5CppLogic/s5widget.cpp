@@ -78,11 +78,11 @@ void shok_EGUIX_CButtonHelper::HookShortcutSignExtend()
     *reinterpret_cast<byte*>(0x55A62B) = 0xB6; // movsx to movzx (sign-extend to zero-extend) (middle part of 3 byte opcode)
 }
 
-shok_Keys extractKey(char c) {
-    return static_cast<shok_Keys>(static_cast<unsigned int>(static_cast<unsigned char>(c)));
+shok::Keys extractKey(char c) {
+    return static_cast<shok::Keys>(static_cast<unsigned int>(static_cast<unsigned char>(c)));
 }
-shok_Keys extractModifiers(char c) {
-    return static_cast<shok_Keys>(static_cast<unsigned int>(static_cast<unsigned char>(c)) << 16) & (shok_Keys::ModifierAlt | shok_Keys::ModifierControl | shok_Keys::ModifierShift);
+shok::Keys extractModifiers(char c) {
+    return static_cast<shok::Keys>(static_cast<unsigned int>(static_cast<unsigned char>(c)) << 16) & (shok::Keys::ModifierAlt | shok::Keys::ModifierControl | shok::Keys::ModifierShift);
 }
 bool __stdcall buttohelp_shortcutcomparison(shok_EGUIX_CButtonHelper* th, shok_BB_CEvent* ev, shok_EGUIX_CBaseWidget* wid) {
     if (th->CurrentState == 3 || th->CurrentState == 2)
@@ -91,9 +91,9 @@ bool __stdcall buttohelp_shortcutcomparison(shok_EGUIX_CButtonHelper* th, shok_B
     if (!keystr)
         return false;
 
-    shok_Keys key = shok_Keys::None;
-    shok_Keys modif = shok_Keys::None;
-    shok_Keys ignoremodif = shok_Keys::None;
+    shok::Keys key = shok::Keys::None;
+    shok::Keys modif = shok::Keys::None;
+    shok::Keys ignoremodif = shok::Keys::None;
     bool mayscin4 = false;
 
     size_t len = strnlen(keystr, 10);
@@ -314,7 +314,7 @@ void shok_GGUI_C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(i
 void shok_GGUI_C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool showwood)
 {
     shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
-    *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok_ResourceType::WoodRaw);
+    *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok::ResourceType::WoodRaw);
 }
 
 static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);

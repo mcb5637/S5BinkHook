@@ -14,7 +14,7 @@ struct shok_vtable_GGL_CBehaviorDefaultMovement : shok_vtable_EGL_CGLEBehavior {
 };
 
 struct shok_vtable_GGL_CBattleBehavior : shok_vtable_EGL_CGLEBehavior { // behaviorfollow in between
-	void(__thiscall* SetCommandInt)(shok_GGL_CBattleBehavior* th, shok_LeaderCommand cmd);
+	void(__thiscall* SetCommandInt)(shok_GGL_CBattleBehavior* th, shok::LeaderCommand cmd);
 };
 //constexpr int i = offsetof(shok_vtable_GGL_CBattleBehavior, SetCommandInt) / 4;
 
@@ -108,7 +108,7 @@ float shok_GGL_CBattleBehavior::GetMaxRange()
 {
 	return battleBehaviorGetMaxRange(this);
 }
-void shok_GGL_CBattleBehavior::SetCurrentCommand(shok_LeaderCommand cmd)
+void shok_GGL_CBattleBehavior::SetCurrentCommand(shok::LeaderCommand cmd)
 {
 	reinterpret_cast<shok_vtable_GGL_CBattleBehavior*>(vtable)->SetCommandInt(this, cmd);
 }
@@ -128,7 +128,7 @@ void shok_GGL_CKegBehavior::AdvancedDealDamage()
 {
 	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(EntityId);
 	{
-		if (int id = e->GetFirstAttachedEntity(shok_AttachmentType::KEG_TARGET_BUILDING)) {
+		if (int id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING)) {
 			if (shok_EGL_CGLEEntity* t = shok_EGL_CGLEEntity::GetEntityByID(id)) {
 				if (shok_GGL_CBuilding* b = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(t)) {
 					int dmg;
@@ -136,7 +136,7 @@ void shok_GGL_CKegBehavior::AdvancedDealDamage()
 						dmg = b->Health;
 					}
 					else {
-						float kegeff = static_cast<shok_GGL_CGLBuildingProps*>(b->GetEntityType()->LogicProps)->KegEffectFactor;
+						float kegeff = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps)->KegEffectFactor;
 						int dmgperc = static_cast<GGL::CKegBehaviorProperties*>(PropPointer)->DamagePercent;
 						int mhp = b->GetMaxHealth();
 						dmg = static_cast<int>(kegeff * dmgperc * mhp / 100);
@@ -147,7 +147,7 @@ void shok_GGL_CKegBehavior::AdvancedDealDamage()
 		}
 	}
 	{
-		if (int id = e->GetFirstAttachedToMe(shok_AttachmentType::DISARMING_THIEF_KEG)) {
+		if (int id = e->GetFirstAttachedToMe(shok::AttachmentType::DISARMING_THIEF_KEG)) {
 			if (shok_EGL_CGLEEntity* t = shok_EGL_CGLEEntity::GetEntityByID(id)) {
 				if (t->Position.IsInRange(e->Position, 3)) {
 					t->AdvancedHurtEntityBy(e, t->Health, 0, true, false, true, AdvancedDealDamageSource::AbilitySabotageSingleTarget);

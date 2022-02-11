@@ -304,7 +304,7 @@ public:
 	static bool(*PostEventCallback)(shok_BB_CEvent* ev);
 
 
-	static bool IsModifierPressed(shok_Keys modif);
+	static bool IsModifierPressed(shok::Keys modif);
 };
 //constexpr int i = offsetof(shok_GGUI_CManager, GameState) / 4;
 //constexpr int i = sizeof(shok_GGUI_CManager) / 4;

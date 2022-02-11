@@ -96,10 +96,8 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    BB::IObject* o = reinterpret_cast<BB::IObject * >(luaext_checkEntity(L, 1));
-    DEBUGGER_BREAK;
-    unsigned int id = o->GetClassIdentifier();
-    lua_pushnumber(L, id);
+    GGlue::CGlueEntityProps* ty = luaext_checkEntity(L, 1)->GetEntityType();
+    lua_pushnumber(L, reinterpret_cast<int>(ty->LogicProps->GetBehaviorProps<GGL::CShurikenAbilityProps>()));
     return 1;
 }
 

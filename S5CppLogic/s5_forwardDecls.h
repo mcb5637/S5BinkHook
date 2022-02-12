@@ -18,3 +18,4 @@ enum class shok_Task;
 enum class shok_TaskState;
 
 struct shok_ED_CBehaviorProps;
+struct shok_EGL_CGLEEntity;

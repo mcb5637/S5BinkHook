@@ -242,7 +242,7 @@ EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(const
 
 bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return e->GetBehavior<shok_GGL_CSoldierBehavior>() == nullptr;
+	return e->GetBehavior<GGL::CSoldierBehavior>() == nullptr;
 }
 
 bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
@@ -294,7 +294,7 @@ EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* 
 
 bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	shok_GGL_CCamouflageBehavior* c = e->GetBehavior<shok_GGL_CCamouflageBehavior>();
+	GGL::CCamouflageBehavior* c = e->GetBehavior<GGL::CCamouflageBehavior>();
 	if (c != nullptr) {
 		return c->InvisibilityRemaining <= 0;
 	}

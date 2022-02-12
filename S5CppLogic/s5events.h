@@ -955,8 +955,10 @@ enum class shok_EventIDs : int {
 	Behavior_Tick = 0x20005, //BB::CEvent ticks every second, also LogicEvent_Second
 	LogicEvent_OnTick = 0x20006, // 10 per sec
 	Movement_IsMoving = 0x20009, //EGL::CEventGetValue<bool,1709081367>
-	Die = 0x2000A, ///BB::CEvent
+	Die = 0x2000A, // BB::CEvent
 	// 0x2000D tasklist reset?
+
+	Movement_GetMovementBehavior = 0x20012, //EGL::CEventGetValue<EGL::CMovementBehavior *,212523703>
 
 	Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
 	Animation_UnSuspend = 0x20014, //EGL::CEventValue<int,-27574121> argument is ticks spent suspended

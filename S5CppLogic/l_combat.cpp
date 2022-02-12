@@ -48,7 +48,7 @@ void l_combat_FlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff, bool post) 
 	else if (eff->IsCannonBallEffect())
 		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
 }
-void l_combat_ActivateCamo(shok_GGL_CCamouflageBehavior* th) {
+void l_combat_ActivateCamo(GGL::CCamouflageBehavior* th) {
 	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
 	if (e)
 		e->ClearAttackers();

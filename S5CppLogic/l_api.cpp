@@ -105,7 +105,8 @@ namespace CppLogic::API {
 		shok_framework_campagnInfo* ci = (*shok_Framework_CMain::GlobalObj)->GetCampagnInfo(ty, cn);
 		L.Assert(ci, "invalid map type/campagn");
 		shok_framework_mapinfo* i = ci->GetMapInfoByName(n);
-		L.Assert(i, "invalid map");
+		if (!i)
+			throw lua::LuaException("invalid map");
 		L.Push(i->MapFilePath.c_str());
 		return 1;
 	}

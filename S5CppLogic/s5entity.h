@@ -93,7 +93,7 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	byte UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
 	int TaskListToSet; // 29
 	vector_padding;
-	std::vector<shok_EGL_CGLEBehavior*, shok::Allocator<shok_EGL_CGLEBehavior*>> Behaviours; // 30, first field in 31
+	std::vector<EGL::CGLEBehavior*, shok::Allocator<EGL::CGLEBehavior*>> Behaviours; // 30, first field in 31
 	shok_TaskState CurrentState; // 34
 	int EntityState, CurrentTaskListID, CurrentTaskIndex; // la37
 	shok::Set<shok_entity_StateIdAndStateHandler> StateHandlers; // 38
@@ -118,11 +118,11 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	static inline constexpr int vtp_IEntityDisplay = 0x783E58;
 	static inline constexpr unsigned int Identifier = 0x3F2913E0;
 
-	template<typename T, typename std::enable_if<std::is_base_of<shok_EGL_CGLEBehavior, T>::value>::type* = nullptr>
+	template<typename T, typename std::enable_if<std::is_base_of<EGL::CGLEBehavior, T>::value>::type* = nullptr>
 	T* GetBehavior() {
-		for (shok_EGL_CGLEBehavior* b : Behaviours) {
+		for (EGL::CGLEBehavior* b : Behaviours) {
 			if (b) {
-				T* r = shok_DynamicCast<shok_EGL_CGLEBehavior, T>(b);
+				T* r = shok_DynamicCast<EGL::CGLEBehavior, T>(b);
 				if (r)
 					return r;
 			}
@@ -201,7 +201,7 @@ struct shok_EGL_CGLEEntity : shok_BB_IObject, shok_EGL_IEntityDisplay {
 	static void ActivateEntityChangePlayerFix();
 	static int ResetCamoIgnoreIfNotEntity;
 	static void HookResetCamo();
-	static void (*CamoActivateCb)(shok_GGL_CCamouflageBehavior* th);
+	static void (*CamoActivateCb)(GGL::CCamouflageBehavior* th);
 	static void HookCamoActivate();
 	static void HookHurtEntity();
 	static int* HurtEntityDamagePointer;

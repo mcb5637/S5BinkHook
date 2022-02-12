@@ -962,9 +962,9 @@ int l_logic_GetPlaceBuildingRotation(lua_State* L) {
 }
 
 int l_logic_FixSnipeDamage(lua_State* L) {
-	shok_GGL_CSniperAbility::OverrideSnipeTask();
+	GGL::CSniperAbility::OverrideSnipeTask();
 	if (lua_isnil(L, 1)) {
-		shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
+		GGL::CSniperAbility::SnipeDamageOverride = nullptr;
 		return 0;
 	}
 
@@ -974,8 +974,8 @@ int l_logic_FixSnipeDamage(lua_State* L) {
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
 
-	if (!shok_GGL_CSniperAbility::SnipeDamageOverride) {
-		shok_GGL_CSniperAbility::SnipeDamageOverride = [](shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg) {
+	if (!GGL::CSniperAbility::SnipeDamageOverride) {
+		GGL::CSniperAbility::SnipeDamageOverride = [](shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 
@@ -1063,7 +1063,7 @@ int l_logic_setluataskfunc_move(lua_State* L) {
 	bool usepathing = true;
 	if (lua_toboolean(L, 2))
 		usepathing = false;
-	d->e->GetBehavior<shok_GGL_CBehaviorDefaultMovement>()->IsPathingUsed = usepathing;
+	d->e->GetBehavior<GGL::CBehaviorDefaultMovement>()->IsPathingUsed = usepathing;
 	if (lua_toboolean(L, 3) && d->e->CurrentState == shok_TaskState::Move)
 		d->e->CurrentState = shok_TaskState::Move_NonCancelable;
 	return 0;
@@ -1343,7 +1343,7 @@ void l_logic_cleanup(lua_State* L) {
 	CanPlaceBuildingCallback = nullptr;
 	shok_GGUI_CPlaceBuildingState::PlacementRotation = 0.0f;
 	shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
-	shok_GGL_CSniperAbility::SnipeDamageOverride = nullptr;
+	GGL::CSniperAbility::SnipeDamageOverride = nullptr;
 	shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
 	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = false;
 	shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;

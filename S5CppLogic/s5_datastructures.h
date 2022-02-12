@@ -7,19 +7,20 @@
 namespace shok {
 
 	template<class T>
-	struct TreeNode {
-		TreeNode<T>* left, * parent, * right;
-		T data;
-		bool redblack;
-	};
-	template<class T>
-	struct Set { // todo iterators
+	class Set { // todo iterators
+	private:
+		struct TreeNode {
+			TreeNode* left, * parent, * right;
+			T data;
+			bool redblack;
+		};
 		PADDINGI(1);
-		TreeNode<T>* root;
+		TreeNode* root;
+	public:
 		int size;
 
 	private:
-		void ForAllRec(TreeNode<T>* d, std::function<void(T*)> lambda) {
+		void ForAllRec(TreeNode* d, std::function<void(T*)> lambda) {
 			if (d == root)
 				return;
 			ForAllRec(d->left, lambda);
@@ -38,6 +39,65 @@ namespace shok {
 				});
 			return r;
 		}
+
+		class Iter {
+			friend class Set;
+			TreeNode* node;
+			const Set<T>* set;
+			Iter(TreeNode* n, const Set<T>* s) {
+				node = n;
+				set = s;
+			}
+
+			void FollowDownLeft() {
+				if (!node)
+					return;
+				while (node->left != set->root) {
+					node = node->left;
+				}
+			}
+
+		public:
+			T& operator*() const {
+				return node->data;
+			}
+			bool operator==(const Iter& o) const {
+				return this->node == o.node;
+			}
+			Iter& operator++() {
+				if (node->right != set->root) { // first check right, then go down left as far as possible
+					node = node->right;
+					FollowDownLeft();
+				}
+				else { // go back up until we hit root or did get there by going left
+					TreeNode* p = node->parent;
+					while (p != set->root && node == p->right) {
+						node = p;
+						p = p->parent;
+					}
+					if (p == set->root)
+						node = nullptr;
+					else
+						node = p;
+				}
+				return *this;
+			}
+			Iter operator++(int) {
+				Iter r = *this;
+				++(*this);
+				return r;
+			}
+		};
+
+		Iter begin() const {
+			Iter i { root->parent, this };
+			i.FollowDownLeft();
+			return i;
+		}
+		Iter end() const {
+			return { nullptr, this };
+		}
+
 	};
 
 

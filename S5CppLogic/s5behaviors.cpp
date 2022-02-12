@@ -1,38 +1,7 @@
 #include "pch.h"
 #include "s5data.h"
 
-struct shok_vtable_EGL_CGLEBehavior : shok_vtable_BB_IObject {
-	int(__thiscall* AddHandlers)(shok_EGL_CGLEBehavior*, int);
-	int(__thiscall* OnEntityCreate)(shok_EGL_CGLEBehavior* th, EGL::CGLEBehaviorProps* p);
-	int(__thiscall* OnEntityLoad)(shok_EGL_CGLEBehavior* th, EGL::CGLEBehaviorProps* p);
-	PADDINGI(2); // nullsubs 0x52B509
-};
-
-struct shok_vtable_GGL_CBehaviorDefaultMovement : shok_vtable_EGL_CGLEBehavior {
-	PADDINGI(1);
-	float(__thiscall* GetSpeed)(shok_GGL_CBehaviorDefaultMovement* m); // 9
-};
-
-struct shok_vtable_GGL_CBattleBehavior : shok_vtable_EGL_CGLEBehavior { // behaviorfollow in between
-	void(__thiscall* SetCommandInt)(shok_GGL_CBattleBehavior* th, shok::LeaderCommand cmd);
-};
-//constexpr int i = offsetof(shok_vtable_GGL_CBattleBehavior, SetCommandInt) / 4;
-
-struct shok_vtable_shok_GGL_CPositionAtResourceFinder {
-	void(__thiscall* Destructor)(shok_GGL_CPositionAtResourceFinder* th, bool free);
-	float(__thiscall* SearchForPosition)(shok_GGL_CPositionAtResourceFinder* th, shok_EGL_CGLEEntity* e);
-	void(__thiscall* GetPositionOffset)(shok_GGL_CPositionAtResourceFinder* th, shok::Position* p, float f);
-};
-
-// vtable heroability 8 is ability(this, abilityid)
-
-float shok_GGL_CBehaviorDefaultMovement::GetMovementSpeed()
-{
-	return reinterpret_cast<shok_vtable_GGL_CBehaviorDefaultMovement*>(vtable)->GetSpeed(this);
-}
-
-
-shok_BB_CClassFactory_serializationData* shok_EGL_CGLEBehavior::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x86A828);
+shok_BB_CClassFactory_serializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x86A828);
 
 void __declspec(naked) bombattachment_fix() {
 	__asm {
@@ -54,7 +23,7 @@ void __declspec(naked) bombattachment_fix() {
 	};
 }
 bool FixBombAttachment_Hooked = false;
-void shok_GGL_CBombPlacerBehavior::FixBombAttachment()
+void GGL::CBombPlacerBehavior::FixBombAttachment()
 {
 
 	if (FixBombAttachment_Hooked)
@@ -64,8 +33,8 @@ void shok_GGL_CBombPlacerBehavior::FixBombAttachment()
 	WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
 }
 
-int (*shok_GGL_CSniperAbility::SnipeDamageOverride)(shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg) = nullptr;
-int __fastcall sniperability_tasksnipeoverride(shok_GGL_CSniperAbility* thi, int _, int taskargs) {
+int (*GGL::CSniperAbility::SnipeDamageOverride)(shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg) = nullptr;
+int __fastcall sniperability_tasksnipeoverride(GGL::CSniperAbility* thi, int _, int taskargs) {
 	shok_EGL_CGLEEntity* thent = shok_EGL_CGLEEntity::GetEntityByID(thi->EntityId);
 	shok_EGL_CGLEEntity* tar = shok_EGL_CGLEEntity::GetEntityByID(thi->TargetId);
 	if (!tar || tar->Health <= 0)
@@ -74,8 +43,8 @@ int __fastcall sniperability_tasksnipeoverride(shok_GGL_CSniperAbility* thi, int
 	if (thent->Position.GetDistanceSquaredTo(tar->Position) >= pr->Range * pr->Range)
 		return 0;
 	int dmg = static_cast<int>(tar->GetMaxHealth() * pr->DamageFactor);
-	if (shok_GGL_CSniperAbility::SnipeDamageOverride)
-		dmg = shok_GGL_CSniperAbility::SnipeDamageOverride(thent, tar, dmg);
+	if (GGL::CSniperAbility::SnipeDamageOverride)
+		dmg = GGL::CSniperAbility::SnipeDamageOverride(thent, tar, dmg);
 	GGL::CBattleBehaviorProps* bpr = thent->GetEntityType()->GetBehaviorProps< GGL::CBattleBehaviorProps>();
 	shok_CProjectileEffectCreator cr{};
 	cr.EffectType = bpr->ProjectileEffectID;
@@ -94,7 +63,7 @@ int __fastcall sniperability_tasksnipeoverride(shok_GGL_CSniperAbility* thi, int
 	return 0;
 }
 bool OverrideSnipeTask_Hooked = false;
-void shok_GGL_CSniperAbility::OverrideSnipeTask()
+void GGL::CSniperAbility::OverrideSnipeTask()
 {
 	if (OverrideSnipeTask_Hooked)
 		return;
@@ -103,28 +72,24 @@ void shok_GGL_CSniperAbility::OverrideSnipeTask()
 	WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
 }
 
-static inline float(__thiscall* const battleBehaviorGetMaxRange)(shok_GGL_CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(shok_GGL_CBattleBehavior*)>(0x50AB43);
-float shok_GGL_CBattleBehavior::GetMaxRange()
+static inline float(__thiscall* const battleBehaviorGetMaxRange)(GGL::CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(GGL::CBattleBehavior*)>(0x50AB43);
+float GGL::CBattleBehavior::GetMaxRange()
 {
 	return battleBehaviorGetMaxRange(this);
 }
-void shok_GGL_CBattleBehavior::SetCurrentCommand(shok::LeaderCommand cmd)
-{
-	reinterpret_cast<shok_vtable_GGL_CBattleBehavior*>(vtable)->SetCommandInt(this, cmd);
-}
 
-static inline int(__thiscall* const leaderbehgettroophealth)(shok_GGL_CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBattleBehavior*)>(0x4EE1D6);
-int shok_GGL_CLeaderBehavior::GetTroopHealth()
+static inline int(__thiscall* const leaderbehgettroophealth)(GGL::CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(GGL::CBattleBehavior*)>(0x4EE1D6);
+int GGL::CLeaderBehavior::GetTroopHealth()
 {
 	return leaderbehgettroophealth(this);
 }
-static inline int(__thiscall* const leaderbehgettroophealthpersol)(shok_GGL_CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBattleBehavior*)>(0x4ECE77);
-int shok_GGL_CLeaderBehavior::GetTroopHealthPerSoldier()
+static inline int(__thiscall* const leaderbehgettroophealthpersol)(GGL::CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(GGL::CBattleBehavior*)>(0x4ECE77);
+int GGL::CLeaderBehavior::GetTroopHealthPerSoldier()
 {
 	return leaderbehgettroophealthpersol(this);
 }
 
-void shok_GGL_CKegBehavior::AdvancedDealDamage()
+void GGL::CKegBehavior::AdvancedDealDamage()
 {
 	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(EntityId);
 	{
@@ -161,27 +126,19 @@ void shok_GGL_CKegBehavior::AdvancedDealDamage()
 	}
 }
 
-static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(shok_GGL_CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(shok_GGL_CAutoCannonBehavior*)>(0x50F508);
-float shok_GGL_CAutoCannonBehavior::GetMaxRange()
+static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(GGL::CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(GGL::CAutoCannonBehavior*)>(0x50F508);
+float GGL::CAutoCannonBehavior::GetMaxRange()
 {
 	return autocannonBehaviorGetMaxRange(this);
 }
 
-static inline shok_GGL_CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<shok_GGL_CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);
-shok_GGL_CPositionAtResourceFinder* shok_GGL_CPositionAtResourceFinder::CreateByEntity(int entityid)
+static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);
+GGL::CPositionAtResourceFinder* GGL::CPositionAtResourceFinder::CreateByEntity(int entityid)
 {
 	return shok_GGL_CPositionAtResourceFinder_greatebyent(entityid);
 }
-void shok_GGL_CPositionAtResourceFinder::Destroy()
-{
-	reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->Destructor(this, true);
-}
-float shok_GGL_CPositionAtResourceFinder::SearchForPosition(shok_EGL_CGLEEntity* e)
-{
-	return reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->SearchForPosition(this, e);
-}
-static inline void(__thiscall* const shok_GGL_CPositionAtResourceFinder_getposbyfloat)(shok_GGL_CPositionAtResourceFinder* th, shok::Position* p, float f) = reinterpret_cast<void(__thiscall*)(shok_GGL_CPositionAtResourceFinder*, shok::Position*, float)>(0x4CA89E);
-shok::Position shok_GGL_CPositionAtResourceFinder::CalcPositionFromFloat(float f)
+static inline void(__thiscall* const shok_GGL_CPositionAtResourceFinder_getposbyfloat)(GGL::CPositionAtResourceFinder* th, shok::Position* p, float f) = reinterpret_cast<void(__thiscall*)(GGL::CPositionAtResourceFinder*, shok::Position*, float)>(0x4CA89E);
+shok::Position GGL::CPositionAtResourceFinder::CalcPositionFromFloat(float f)
 {
 	shok::Position p;
 	//reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->GetPosition(this, &p, f);

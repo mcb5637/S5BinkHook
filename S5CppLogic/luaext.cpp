@@ -17,75 +17,75 @@ void* luaext_checkudata(lua_State* L, int ind)
 	return lua_touserdata(L, ind);
 }
 
-shok_EGL_CGLEEntity* luaext_checkEntity(lua_State* L, int ind)
+EGL::CGLEEntity* luaext_checkEntity(lua_State* L, int ind)
 {
-	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
+	EGL::CGLEEntity* d = luaext_optEntity(L, ind);
 	if (d == nullptr)
 		luaL_error(L, "no entity at argument %d", ind);
 	return d;
 }
 
-shok_EGL_CGLEEntity* luaext_optEntity(lua_State* L, int ind)
+EGL::CGLEEntity* luaext_optEntity(lua_State* L, int ind)
 {
 	int id = 0;
 	if (lua_type(L, ind) == LUA_TSTRING) {
-		id = shok_EGL_CGLEEntity::GetEntityIDByScriptName(lua_tostring(L, ind));
+		id = EGL::CGLEEntity::GetEntityIDByScriptName(lua_tostring(L, ind));
 	}
 	else if (lua_type(L, ind) == LUA_TNUMBER) {
 		id = (int)lua_tonumber(L, ind);
 	}
 	if (id == 0)
 		return nullptr;
-	return shok_EGL_CGLEEntity::GetEntityByID(id);
+	return EGL::CGLEEntity::GetEntityByID(id);
 }
 
 int luaext_optEntityId(lua_State* L, int ind) {
-	shok_EGL_CGLEEntity* e = luaext_optEntity(L, ind);
+	EGL::CGLEEntity* e = luaext_optEntity(L, ind);
 	return e == nullptr ? 0 : e->EntityId;
 }
 
 int luaext_checkEntityId(lua_State* L, int ind) {
-	shok_EGL_CGLEEntity* e = luaext_checkEntity(L, ind);
+	EGL::CGLEEntity* e = luaext_checkEntity(L, ind);
 	return e == nullptr ? 0 : e->EntityId;
 }
 
-shok_GGL_CSettler* luaext_optSettler(lua_State* L, int ind) {
-	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
+GGL::CSettler* luaext_optSettler(lua_State* L, int ind) {
+	EGL::CGLEEntity* d = luaext_optEntity(L, ind);
 	if (d == nullptr)
 		return nullptr;
-	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(d);
+	return shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(d);
 }
 
-shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind) {
-	shok_GGL_CSettler* d = luaext_optSettler(L, ind);
+GGL::CSettler* luaext_checkSettler(lua_State* L, int ind) {
+	GGL::CSettler* d = luaext_optSettler(L, ind);
 	if (d == nullptr)
 		luaL_error(L, "no settler at argument %d", ind);
 	return d;
 }
 
-shok_GGL_CBuilding* luaext_optBuilding(lua_State* L, int ind) {
-	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
+GGL::CBuilding* luaext_optBuilding(lua_State* L, int ind) {
+	EGL::CGLEEntity* d = luaext_optEntity(L, ind);
 	if (d == nullptr)
 		return nullptr;
-	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(d);
+	return shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(d);
 }
 
-shok_GGL_CBuilding* luaext_checkBulding(lua_State* L, int ind) {
-	shok_GGL_CBuilding* d = luaext_optBuilding(L, ind);
+GGL::CBuilding* luaext_checkBulding(lua_State* L, int ind) {
+	GGL::CBuilding* d = luaext_optBuilding(L, ind);
 	if (d == nullptr)
 		luaL_error(L, "no building at argument %d", ind);
 	return d;
 }
 
-shok_GGL_CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind) {
-	shok_EGL_CGLEEntity* d = luaext_optEntity(L, ind);
+GGL::CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind) {
+	EGL::CGLEEntity* d = luaext_optEntity(L, ind);
 	if (d == nullptr)
 		return nullptr;
-	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CResourceDoodad>(d);
+	return shok_DynamicCast<EGL::CGLEEntity, GGL::CResourceDoodad>(d);
 }
 
-shok_GGL_CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind) {
-	shok_GGL_CResourceDoodad* d = luaext_optResourceDoodad(L, ind);
+GGL::CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind) {
+	GGL::CResourceDoodad* d = luaext_optResourceDoodad(L, ind);
 	if (d == nullptr)
 		luaL_error(L, "no resource entity at argument %d", ind);
 	return d;
@@ -256,7 +256,7 @@ shok::ResourceType luaext_getresourcetype(lua_State* L, int i) {
 
 void luaext_assertEntityAlive(lua_State* L, int id, const char* msg)
 {
-	if (shok_EGL_CGLEEntity::EntityIDIsDead(id))
+	if (EGL::CGLEEntity::EntityIDIsDead(id))
 		luaL_error(L, msg);
 }
 

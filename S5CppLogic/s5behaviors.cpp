@@ -10,9 +10,9 @@ void __declspec(naked) bombattachment_fix() {
 		push eax;
 		push 43;
 		push[esi + 8];
-		call shok_EGL_CGLEEntity::GetEntityByID;
+		call EGL::CGLEEntity::GetEntityByID;
 		mov ecx, eax;
-		call shok_EGL_CGLEEntity::AttachEntity;
+		call EGL::CGLEEntity::AttachEntity;
 
 
 		or [ebp - 4], 0x0FFFFFFFF;
@@ -33,10 +33,10 @@ void GGL::CBombPlacerBehavior::FixBombAttachment()
 	WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
 }
 
-int (*GGL::CSniperAbility::SnipeDamageOverride)(shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg) = nullptr;
+int (*GGL::CSniperAbility::SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) = nullptr;
 int __fastcall sniperability_tasksnipeoverride(GGL::CSniperAbility* thi, int _, int taskargs) {
-	shok_EGL_CGLEEntity* thent = shok_EGL_CGLEEntity::GetEntityByID(thi->EntityId);
-	shok_EGL_CGLEEntity* tar = shok_EGL_CGLEEntity::GetEntityByID(thi->TargetId);
+	EGL::CGLEEntity* thent = EGL::CGLEEntity::GetEntityByID(thi->EntityId);
+	EGL::CGLEEntity* tar = EGL::CGLEEntity::GetEntityByID(thi->TargetId);
 	if (!tar || tar->Health <= 0)
 		return 0;
 	GGL::CSniperAbilityProps* pr = thent->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
@@ -91,13 +91,13 @@ int GGL::CLeaderBehavior::GetTroopHealthPerSoldier()
 
 void GGL::CKegBehavior::AdvancedDealDamage()
 {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(EntityId);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	{
 		if (int id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING)) {
-			if (shok_EGL_CGLEEntity* t = shok_EGL_CGLEEntity::GetEntityByID(id)) {
-				if (shok_GGL_CBuilding* b = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(t)) {
+			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
+				if (GGL::CBuilding* b = shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(t)) {
 					int dmg;
-					if (shok_DynamicCast<shok_GGL_CBuilding, shok_GGL_CBridgeEntity>(b)) {
+					if (shok_DynamicCast<GGL::CBuilding, GGL::CBridgeEntity>(b)) {
 						dmg = b->Health;
 					}
 					else {
@@ -113,7 +113,7 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 	}
 	{
 		if (int id = e->GetFirstAttachedToMe(shok::AttachmentType::DISARMING_THIEF_KEG)) {
-			if (shok_EGL_CGLEEntity* t = shok_EGL_CGLEEntity::GetEntityByID(id)) {
+			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
 				if (t->Position.IsInRange(e->Position, 3)) {
 					t->AdvancedHurtEntityBy(e, t->Health, 0, true, false, true, AdvancedDealDamageSource::AbilitySabotageSingleTarget);
 				}
@@ -122,7 +122,7 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 	}
 	{
 		GGL::CKegBehaviorProperties* pr = static_cast<GGL::CKegBehaviorProperties*>(PropPointer);
-		shok_EGL_CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, 0, true, false, true, AdvancedDealDamageSource::AbilitySabotageBlast);
+		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, 0, true, false, true, AdvancedDealDamageSource::AbilitySabotageBlast);
 	}
 }
 

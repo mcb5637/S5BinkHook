@@ -57,7 +57,7 @@ typedef uint8_t byte;
 // 0x55A597 jmp button check shortcut logic override
 // 
 // only without SCELoader
-// shok_EGL_CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, func override
+// EGL::CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, func override
 // EntityDealAoEDamage 0x49F82A func override
 // 0x5113C2 arrow onhit jmp
 // 0x4DBA20 projectile creator ctor more zeroing out
@@ -208,6 +208,30 @@ namespace ECore {
 	};
 }
 
+namespace EGL {
+	class CGLEAttachableBase {
+	public:
+		virtual ~CGLEAttachableBase() = default;
+		// 8 more funcs
+
+		shok::Set<shok::Attachment> ObserverEntities; // 8
+		shok::Set<shok::Attachment> ObserverEffects; // 11
+		shok::Set<shok::Attachment> ObservedEntities; // 14
+		shok::Set<shok::Attachment> ObservedEffects; // 17
+		byte SendEvent; // 20
+		PADDING(3);
+
+		static constexpr int vtp = 0x783D18;
+		static constexpr int TypeDesc = 0x810B98;
+	};
+	class CEntityAttachmentProxy {
+	};
+	template<class T, class V>
+	class TGLEAttachable : public CGLEAttachableBase {
+
+	};
+}
+
 template<class T>
 inline void shok_saveVector(std::vector<T, shok::Allocator<T>>* vec, std::function<void(std::vector<T, shok::Allocator<T>> &s)> func) {
 #ifdef _DEBUG
@@ -252,8 +276,8 @@ inline void shok_saveList(std::list<T, shok::Allocator<T>>* vec, std::function<v
 // casts shok objects with runtime type chek. you can only cast objects that have a vtable (does not have to be known) and a known RTTI TypeDesc set in the class.
 // works almost the same way as dynamic_cast, just you can only cast pointers and you have to specify both current type and target type (without pointer).
 // example:
-// shok_EGL_CGLEEntity* e = ...;
-// shok_GGL_CSettler* sett = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e);
+// EGL::CGLEEntity* e = ...;
+// GGL::CSettler* sett = shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e);
 // if (sett) { ...
 template<class CastFrom, class CastTo>
 inline CastTo* shok_DynamicCast(CastFrom* i) {

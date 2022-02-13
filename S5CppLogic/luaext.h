@@ -11,16 +11,16 @@
 void luaext_registerFunc(lua_State* L, const char* name, lua_CFunction func);
 void* luaext_checkudata(lua_State* L, int ind);
 
-shok_EGL_CGLEEntity* luaext_checkEntity(lua_State* L, int ind);
-shok_EGL_CGLEEntity* luaext_optEntity(lua_State* L, int ind);
+EGL::CGLEEntity* luaext_checkEntity(lua_State* L, int ind);
+EGL::CGLEEntity* luaext_optEntity(lua_State* L, int ind);
 int luaext_optEntityId(lua_State* L, int ind);
 int luaext_checkEntityId(lua_State* L, int ind);
-shok_GGL_CSettler* luaext_optSettler(lua_State* L, int ind);
-shok_GGL_CSettler* luaext_checkSettler(lua_State* L, int ind);
-shok_GGL_CBuilding* luaext_optBuilding(lua_State* L, int ind);
-shok_GGL_CBuilding* luaext_checkBulding(lua_State* L, int ind);
-shok_GGL_CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind);
-shok_GGL_CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind);
+GGL::CSettler* luaext_optSettler(lua_State* L, int ind);
+GGL::CSettler* luaext_checkSettler(lua_State* L, int ind);
+GGL::CBuilding* luaext_optBuilding(lua_State* L, int ind);
+GGL::CBuilding* luaext_checkBulding(lua_State* L, int ind);
+GGL::CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind);
+GGL::CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind);
 int luaext_assertPointer(lua_State* L, void* p, const char* msg);
 int luaext_assert(lua_State* L, bool b, const char* msg);
 GGlue::CGlueEntityProps* luaext_optEntityType(lua_State* L, int i);

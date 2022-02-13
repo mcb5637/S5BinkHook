@@ -657,17 +657,17 @@ int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
 int l_logicHookHurtEntity(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
-	shok_EGL_CGLEEntity::HookHurtEntity();
+	EGL::CGLEEntity::HookHurtEntity();
 	if (lua_isboolean(L, 1))
-		shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = lua_toboolean(L, 1);
+		EGL::CGLEEntity::HurtEntityCallWithNoAttacker = lua_toboolean(L, 1);
 	else
-		shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = true;
+		EGL::CGLEEntity::HurtEntityCallWithNoAttacker = true;
 	if (lua_isfunction(L, 2)) {
 		lua_pushlightuserdata(L, &l_logicHookHurtEntity);
 		lua_pushvalue(L, 2);
 		lua_rawset(L, LUA_REGISTRYINDEX);
 
-		shok_EGL_CGLEEntity::HurtEntityOnKillCb = [](shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) {
+		EGL::CGLEEntity::HurtEntityOnKillCb = [](EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) {
 			lua_State* L = *shok_luastate_game;
 
 			int t = lua_gettop(L);
@@ -684,7 +684,7 @@ int l_logicHookHurtEntity(lua_State* L) {
 		};
 	}
 	else {
-		shok_EGL_CGLEEntity::HurtEntityOnKillCb = nullptr;
+		EGL::CGLEEntity::HurtEntityOnKillCb = nullptr;
 		lua_pushlightuserdata(L, &l_logicHookHurtEntity);
 		lua_pushnil(L);
 		lua_rawset(L, LUA_REGISTRYINDEX);
@@ -695,17 +695,17 @@ int l_logicHookHurtEntity(lua_State* L) {
 int l_logicHurtEntityGetDamage(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
-	luaext_assertPointer(L, shok_EGL_CGLEEntity::HurtEntityDamagePointer, "not in trigger");
-	lua_pushnumber(L, *shok_EGL_CGLEEntity::HurtEntityDamagePointer);
-	lua_pushnumber(L, static_cast<int>(shok_EGL_CGLEEntity::HurtEntityDamageSource));
-	lua_pushnumber(L, shok_EGL_CGLEEntity::HurtEntityAttackerPlayer);
+	luaext_assertPointer(L, EGL::CGLEEntity::HurtEntityDamagePointer, "not in trigger");
+	lua_pushnumber(L, *EGL::CGLEEntity::HurtEntityDamagePointer);
+	lua_pushnumber(L, static_cast<int>(EGL::CGLEEntity::HurtEntityDamageSource));
+	lua_pushnumber(L, EGL::CGLEEntity::HurtEntityAttackerPlayer);
 	return 3;
 }
 int l_logicHurtEntitySetDamage(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "use CEntity instead");
-	luaext_assertPointer(L, shok_EGL_CGLEEntity::HurtEntityDamagePointer, "not in trigger");
-	*shok_EGL_CGLEEntity::HurtEntityDamagePointer = luaL_checkint(L, 1);
+	luaext_assertPointer(L, EGL::CGLEEntity::HurtEntityDamagePointer, "not in trigger");
+	*EGL::CGLEEntity::HurtEntityDamagePointer = luaL_checkint(L, 1);
 	return 0;
 }
 
@@ -753,8 +753,8 @@ int l_logicAddFolder(lua_State* L) {
 int l_logicEnableMaxHpTechMod(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supportet with SCELoader");
-	shok_EGL_CGLEEntity::HookMaxHP();
-	shok_EGL_CGLEEntity::UseMaxHPTechBoni = true;
+	EGL::CGLEEntity::HookMaxHP();
+	EGL::CGLEEntity::UseMaxHPTechBoni = true;
 	return 0;
 }
 
@@ -855,8 +855,8 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 int l_logicSetRegenerateSoldiers(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
-	shok_EGL_CGLEEntity::HookLeaderRegen();
-	shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = lua_toboolean(L, 1);
+	EGL::CGLEEntity::HookLeaderRegen();
+	EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = lua_toboolean(L, 1);
 	return 0;
 }
 
@@ -975,7 +975,7 @@ int l_logic_FixSnipeDamage(lua_State* L) {
 
 
 	if (!GGL::CSniperAbility::SnipeDamageOverride) {
-		GGL::CSniperAbility::SnipeDamageOverride = [](shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg) {
+		GGL::CSniperAbility::SnipeDamageOverride = [](EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 
@@ -1050,7 +1050,7 @@ int l_logic_ClearWeatherAndAddInitial(lua_State* L) {
 }
 
 struct l_logic_setluataskfunc_info {
-	shok_EGL_CGLEEntity* e;
+	EGL::CGLEEntity* e;
 	bool HasSetTl, HasMoved, Ret;
 };
 int l_logic_setluataskfunc_move(lua_State* L) {
@@ -1081,7 +1081,7 @@ int l_logic_setluataskfunc(lua_State* L) {
 	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
 
 	if (lua_isnil(L, 1)) {
-		shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
+		EGL::CGLEEntity::LuaTaskListCallback = nullptr;
 		return 0;
 	}
 
@@ -1091,8 +1091,8 @@ int l_logic_setluataskfunc(lua_State* L) {
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
 
-	if (!shok_EGL_CGLEEntity::LuaTaskListCallback) {
-		shok_EGL_CGLEEntity::LuaTaskListCallback = [](shok_EGL_CGLEEntity* e, int val) {
+	if (!EGL::CGLEEntity::LuaTaskListCallback) {
+		EGL::CGLEEntity::LuaTaskListCallback = [](EGL::CGLEEntity* e, int val) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 
@@ -1166,14 +1166,14 @@ int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
 }
 int l_logic_setTaskListSetCheckUncancelable(lua_State* L) {
 	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
-	shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(luaext_optbool(L, 1, false));
+	EGL::CGLEEntity::HookSetTaskListNonCancelable(luaext_optbool(L, 1, false));
 	return 0;
 }
 
 int l_logic_FixBuildOnMovement(lua_State* L) {
-	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = lua_toboolean(L, 1);
-	if (shok_EGL_CGLEEntity::BuildOnSetPosFixMovement)
-		shok_EGL_CGLEEntity::HookBuildOnSetPos();
+	EGL::CGLEEntity::BuildOnSetPosFixMovement = lua_toboolean(L, 1);
+	if (EGL::CGLEEntity::BuildOnSetPosFixMovement)
+		EGL::CGLEEntity::HookBuildOnSetPos();
 	return 0;
 }
 
@@ -1324,8 +1324,8 @@ int l_logicModel_create(lua_State* L) {
 int l_logic_loadtasks(lua_State* L)
 {
 	shok_taskData::AddExtraTasks();
-	shok_EGL_CGLEEntity::HookLuaTaskList();
-	shok_EGL_CGLEEntity::HookNonCancelableAnim();
+	EGL::CGLEEntity::HookLuaTaskList();
+	EGL::CGLEEntity::HookNonCancelableAnim();
 	return 0;
 }
 
@@ -1338,16 +1338,16 @@ void l_logic_onload()
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 	shok_GGL_CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
-	shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = false;
+	EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
 	CanPlaceBuildingCallback = nullptr;
 	shok_GGUI_CPlaceBuildingState::PlacementRotation = 0.0f;
-	shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
+	EGL::CGLEEntity::UseMaxHPTechBoni = false;
 	GGL::CSniperAbility::SnipeDamageOverride = nullptr;
-	shok_EGL_CGLEEntity::LuaTaskListCallback = nullptr;
-	shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = false;
-	shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;
-	shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(false);
+	EGL::CGLEEntity::LuaTaskListCallback = nullptr;
+	EGL::CGLEEntity::BuildOnSetPosFixMovement = false;
+	EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
+	EGL::CGLEEntity::HookSetTaskListNonCancelable(false);
 }
 
 void l_logic_init(lua_State* L)

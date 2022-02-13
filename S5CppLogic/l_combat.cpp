@@ -5,16 +5,16 @@
 #include "l_entity.h"
 
 int l_combat_dealDamage(lua_State* L) {
-	shok_EGL_CGLEEntity* targ = luaext_checkEntity(L, 1);
+	EGL::CGLEEntity* targ = luaext_checkEntity(L, 1);
 	int dmg = luaL_checkint(L, 2);
-	shok_EGL_CGLEEntity* att = luaext_optEntity(L, 3);
+	EGL::CGLEEntity* att = luaext_optEntity(L, 3);
 	AdvancedDealDamageSource sou = static_cast<AdvancedDealDamageSource>(luaL_optint(L, 8, static_cast<int>(AdvancedDealDamageSource::Script)));
 	targ->AdvancedHurtEntityBy(att, dmg, luaL_optint(L, 4, 0), luaext_optbool(L, 5, true), luaext_optbool(L, 6, true), luaext_optbool(L, 7, true), sou);
 	return 0;
 }
 
 int l_combat_dealAOEDamage(lua_State* L) {
-	shok_EGL_CGLEEntity* source = luaext_optEntity(L, 1);
+	EGL::CGLEEntity* source = luaext_optEntity(L, 1);
 	shok::Position pos = shok::Position();
 	pos.X = luaL_checkfloat(L, 2);
 	pos.Y = luaL_checkfloat(L, 3);
@@ -23,7 +23,7 @@ int l_combat_dealAOEDamage(lua_State* L) {
 	int player = luaL_optint(L, 6, 0);
 	int dmgclass = luaL_optint(L, 7, 0);
 	AdvancedDealDamageSource sou = static_cast<AdvancedDealDamageSource>(luaL_optint(L, 11, static_cast<int>(AdvancedDealDamageSource::Script)));
-	shok_EGL_CGLEEntity::AdvancedDealAoEDamage(source, pos, range, dmg, player, dmgclass, luaext_optbool(L, 8, true), luaext_optbool(L, 9, true), luaext_optbool(L, 10, true), sou);
+	EGL::CGLEEntity::AdvancedDealAoEDamage(source, pos, range, dmg, player, dmgclass, luaext_optbool(L, 8, true), luaext_optbool(L, 9, true), luaext_optbool(L, 10, true), sou);
 	return 0;
 }
 
@@ -31,7 +31,7 @@ int l_combat_dealAOEDamage(lua_State* L) {
 int l_combat_EnableAoEProjectileFix(lua_State* L) {
 	shok_GGL_CCannonBallEffect::HookFromCreator();
 	shok_GGL_CCannonBallEffect::FixDamageClass = true;
-	shok_EGL_CGLEEntity::HookDamageMod();
+	EGL::CGLEEntity::HookDamageMod();
 	return 0;
 }
 
@@ -42,14 +42,14 @@ int l_combat_DisableAoEProjectileFix(lua_State* L) {
 
 void l_combat_FlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff, bool post) {
 	if (post)
-		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
+		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 	else if (eff->IsArrowEffect())
-		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CArrowEffect*)eff)->AttackerID;
+		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CArrowEffect*)eff)->AttackerID;
 	else if (eff->IsCannonBallEffect())
-		shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
+		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
 }
 void l_combat_ActivateCamo(GGL::CCamouflageBehavior* th) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 	if (e)
 		e->ClearAttackers();
 }
@@ -57,16 +57,16 @@ void l_combat_ActivateCamo(GGL::CCamouflageBehavior* th) {
 int l_combat_EnableCamoFix(lua_State* L) {
 	shok_EGL_CFlyingEffect::HookOnHit();
 	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
-	shok_EGL_CGLEEntity::HookResetCamo();
-	shok_EGL_CGLEEntity::HookCamoActivate();
-	shok_EGL_CGLEEntity::CamoActivateCb = &l_combat_ActivateCamo;
+	EGL::CGLEEntity::HookResetCamo();
+	EGL::CGLEEntity::HookCamoActivate();
+	EGL::CGLEEntity::CamoActivateCb = &l_combat_ActivateCamo;
 	return 0;
 }
 
 int l_combat_DisableCamoFix(lua_State* L) {
 	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
-	shok_EGL_CGLEEntity::CamoActivateCb = nullptr;
-	shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
+	EGL::CGLEEntity::CamoActivateCb = nullptr;
+	EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 	return 0;
 }
 

@@ -97,25 +97,7 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 
 int __cdecl test(lua_State* L) {
     auto* e = luaext_checkEntity(L, 1);
-    lua_newtable(L);
-    lua_pushstring(L, "forall");
-    lua_newtable(L);
-    int i = 1;
-    e->ObservedEntities.ForAll([L, &i](shok::Attachment* a) {
-        lua_pushfstring(L, "type %d ent %d", static_cast<int>(a->AttachmentType), a->EntityId);
-        lua_rawseti(L, -2, i);
-        i++;
-        });
-    lua_rawset(L, -3);
-    lua_pushstring(L, "iter");
-    lua_newtable(L);
-    i = 1;
-    for (const auto& a : e->ObservedEntities) {
-        lua_pushfstring(L, "type %d ent %d", static_cast<int>(a.AttachmentType), a.EntityId);
-        lua_rawseti(L, -2, i);
-        i++;
-    }
-    lua_rawset(L, -3);
+    lua_pushnumber(L, (int)(&e->TaskHandlers));
     return 1;
 }
 

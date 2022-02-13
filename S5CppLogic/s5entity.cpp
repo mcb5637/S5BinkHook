@@ -5,161 +5,154 @@
 
 
 struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
-	void(__thiscall* Destroy)(shok_EGL_CGLEEntity* th, int i); // 3
+	void(__thiscall* Destroy)(EGL::CGLEEntity* th, int i); // 3
 	PADDINGI(1);
-	void(__thiscall* CopyDataFromCreator)(shok_EGL_CGLEEntity* th, shok_EGL_CGLEEntityCreator* cr); // 5
+	void(__thiscall* CopyDataFromCreator)(EGL::CGLEEntity* th, EGL::CGLEEntityCreator* cr); // 5
 	PADDINGI(1);
-	void(__thiscall* InitializeEntity)(shok_EGL_CGLEEntity* th); // dont use outside of createentity
-	void(__thiscall* InitializeAfterSaveLoad)(shok_EGL_CGLEEntity* th); // dont use outside of save load
-	void(__thiscall* FireOnCreatedTriggers)(shok_EGL_CGLEEntity* th); // 9, script trigger + scriptcommandline
-	void(__thiscall* SetPosition)(shok_EGL_CGLEEntity* th, shok::Position* p); // 10 works for settlers, check if it does for other stuff to, called every tick
-	void(__thiscall* SetRotation)(shok_EGL_CGLEEntity* th, float r);
-	int(__thiscall* GetSector)(shok_EGL_CGLEEntity* th); // 12
-	bool(__thiscall* IsInSector)(shok_EGL_CGLEEntity* th, int sector);
+	void(__thiscall* InitializeEntity)(EGL::CGLEEntity* th); // dont use outside of createentity
+	void(__thiscall* InitializeAfterSaveLoad)(EGL::CGLEEntity* th); // dont use outside of save load
+	void(__thiscall* FireOnCreatedTriggers)(EGL::CGLEEntity* th); // 9, script trigger + scriptcommandline
+	void(__thiscall* SetPosition)(EGL::CGLEEntity* th, shok::Position* p); // 10 works for settlers, check if it does for other stuff to, called every tick
+	void(__thiscall* SetRotation)(EGL::CGLEEntity* th, float r);
+	int(__thiscall* GetSector)(EGL::CGLEEntity* th); // 12
+	bool(__thiscall* IsInSector)(EGL::CGLEEntity* th, int sector);
 	PADDINGI(1); // maybe execute task?/ontick?, settler update auras
-	void(__thiscall* ExecuteTask)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
-	void(__thiscall* FireEvent)(shok_EGL_CGLEEntity* th, shok_BB_CEvent* d); // 16
-	void(__thiscall* AddBehavior)(shok_EGL_CGLEEntity* th, EGL::CGLEBehavior* bh); // 17 probably not usable outside of createentity
+	void(__thiscall* ExecuteTask)(EGL::CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
+	void(__thiscall* FireEvent)(EGL::CGLEEntity* th, shok_BB_CEvent* d); // 16
+	void(__thiscall* AddBehavior)(EGL::CGLEEntity* th, EGL::CGLEBehavior* bh); // 17 probably not usable outside of createentity
 	PADDINGI(1); // add behavior slot
-	void(__thiscall* AddTaskHandler)(shok_EGL_CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
-	void(__thiscall* AddEventHandler)(shok_EGL_CGLEEntity* th, shok_EventIDs eventid, shok_EGL_IGLEHandler_BB_CEvent_void* eventhandler); // 20
-	void(__thiscall* AddStateHandler)(shok_EGL_CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
-	void(__thiscall* GetApproachPos)(shok_EGL_CGLEEntity* th, shok::Position* outpos);
-	float(__thiscall* GetApproachRot)(shok_EGL_CGLEEntity* th);
-	void(__thiscall* SetTaskState)(shok_EGL_CGLEEntity* th, shok_TaskState state); // 24
+	void(__thiscall* AddTaskHandler)(EGL::CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
+	void(__thiscall* AddEventHandler)(EGL::CGLEEntity* th, shok_EventIDs eventid, shok_EGL_IGLEHandler_BB_CEvent_void* eventhandler); // 20
+	void(__thiscall* AddStateHandler)(EGL::CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
+	void(__thiscall* GetApproachPos)(EGL::CGLEEntity* th, shok::Position* outpos);
+	float(__thiscall* GetApproachRot)(EGL::CGLEEntity* th);
+	void(__thiscall* SetTaskState)(EGL::CGLEEntity* th, shok_TaskState state); // 24
 	PADDINGI(3);
-	float(__thiscall* GetExploration)(shok_EGL_CGLEEntity* e); // 28
+	float(__thiscall* GetExploration)(EGL::CGLEEntity* e); // 28
 	PADDINGI(5); // get flags as float, then jmp to 33
-	bool(__thiscall* CanCancelCurrentState)(shok_EGL_CGLEEntity* e); // 34
+	bool(__thiscall* CanCancelCurrentState)(EGL::CGLEEntity* e); // 34
 };
 //constexpr int i = offsetof(shok_vtable_EGL_CGLEEntity, CanCancelCurrentState) / 4;
 
 
 struct shok_vtable_EGL_IEntityDisplay {
-	void(__thiscall* dtor)(shok_EGL_IEntityDisplay* th);
-	void* (__thiscall* GetSlotByIndex)(shok_EGL_IEntityDisplay* th, int i);
-	void(__thiscall* GetModelData)(const shok_EGL_IEntityDisplay* th, shok_EGL_IEntityDisplay::modeldata* d);
-	void(__thiscall* GetPlayerModelData)(const shok_EGL_IEntityDisplay* th, shok_EGL_IEntityDisplay::playermodeldata* d);
-	void(__thiscall* GetPosData)(const shok_EGL_IEntityDisplay* th, shok_EGL_IEntityDisplay::posdata* d);
+	void(__thiscall* dtor)(EGL::IEntityDisplay* th);
+	void* (__thiscall* GetSlotByIndex)(EGL::IEntityDisplay* th, int i);
+	void(__thiscall* GetModelData)(const EGL::IEntityDisplay* th, EGL::IEntityDisplay::modeldata* d);
+	void(__thiscall* GetPlayerModelData)(const EGL::IEntityDisplay* th, EGL::IEntityDisplay::playermodeldata* d);
+	void(__thiscall* GetPosData)(const EGL::IEntityDisplay* th, EGL::IEntityDisplay::posdata* d);
 	PADDINGI(1); // ret zero, 1 arg
 };
 
-shok_EGL_IEntityDisplay::modeldata shok_EGL_IEntityDisplay::GetModelData() const
+EGL::IEntityDisplay::modeldata EGL::IEntityDisplay::GetModelData() const
 {
 	modeldata r;
-	(*reinterpret_cast<shok_vtable_EGL_IEntityDisplay* const*>(this))->GetModelData(this, &r);
+	GetModelData(&r);
 	return r;
 }
-shok_EGL_IEntityDisplay::playermodeldata shok_EGL_IEntityDisplay::GetPlayerModelData() const
+EGL::IEntityDisplay::playermodeldata EGL::IEntityDisplay::GetPlayerModelData() const
 {
 	playermodeldata r;
-	(*reinterpret_cast<shok_vtable_EGL_IEntityDisplay* const*>(this))->GetPlayerModelData(this, &r);
+	GetPlayerModelData(&r);
 	return r;
 }
-shok_EGL_IEntityDisplay::posdata shok_EGL_IEntityDisplay::GetPosData() const
+EGL::IEntityDisplay::posdata EGL::IEntityDisplay::GetPosData() const
 {
 	posdata r;
-	(*reinterpret_cast<shok_vtable_EGL_IEntityDisplay* const*>(this))->GetPosData(this, &r);
+	GetPosData(&r);
 	return r;
 }
 
-static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(shok_EGL_CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLEEntityCreator*)>(0x4493A4);
-shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator()
+static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(EGL::CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntityCreator*)>(0x4493A4);
+EGL::CGLEEntityCreator::CGLEEntityCreator()
 {
+	DEBUGGER_BREAK;
 	shok_EGL_CGLEEntityCreator_ctor(this);
 }
-shok_EGL_CGLEEntityCreator::shok_EGL_CGLEEntityCreator(int _)
+EGL::CGLEEntityCreator::CGLEEntityCreator(int _)
 {
-	shok_EGL_CGLEEntityCreator_ctor(this);
 }
 
-static inline void(__thiscall* const shok_GGL_CGLConstructionSiteCreator_ctor)(shok_GGL_CGLConstructionSiteCreator* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLConstructionSiteCreator*)>(0x4B8E8F);
-shok_GGL_CGLConstructionSiteCreator::shok_GGL_CGLConstructionSiteCreator() : shok_EGL_CGLEEntityCreator(1)
+static inline void(__thiscall* const shok_GGL_CGLConstructionSiteCreator_ctor)(GGL::CGLConstructionSiteCreator* th) = reinterpret_cast<void(__thiscall*)(GGL::CGLConstructionSiteCreator*)>(0x4B8E8F);
+GGL::CGLConstructionSiteCreator::CGLConstructionSiteCreator() : EGL::CGLEEntityCreator(1)
 {
 	shok_GGL_CGLConstructionSiteCreator_ctor(this);
 }
-static inline void(__thiscall* const shok_GGL_CResourceDoodadCreator_ctor)(shok_GGL_CResourceDoodadCreator* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CResourceDoodadCreator*)>(0x4DD7E2);
-shok_GGL_CResourceDoodadCreator::shok_GGL_CResourceDoodadCreator() : shok_EGL_CGLEEntityCreator(1)
+static inline void(__thiscall* const shok_GGL_CResourceDoodadCreator_ctor)(GGL::CResourceDoodadCreator* th) = reinterpret_cast<void(__thiscall*)(GGL::CResourceDoodadCreator*)>(0x4DD7E2);
+GGL::CResourceDoodadCreator::CResourceDoodadCreator() : EGL::CGLEEntityCreator(1)
 {
 	shok_GGL_CResourceDoodadCreator_ctor(this);
 }
 
-static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_dtor)(shok_EGL_CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLEEntityCreator*)>(0x449E23);
-shok_EGL_CGLEEntityCreator::~shok_EGL_CGLEEntityCreator()
+static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_dtor)(EGL::CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntityCreator*)>(0x449E23);
+EGL::CGLEEntityCreator::~CGLEEntityCreator()
 {
 	shok_EGL_CGLEEntityCreator_dtor(this);
 }
 
-static inline bool(__thiscall* const shok_IsEntityInCategory)(shok_EGL_CGLEEntity* e, shok::EntityCategory cat) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLEEntity * e, shok::EntityCategory)>(0x57BBEB);
-bool shok_EGL_CGLEEntity::IsEntityInCategory(shok::EntityCategory cat)
+unsigned int __stdcall EGL::CGLEEntityCreator::GetClassIdentifier() const {
+	return 0;
+}
+void* __stdcall EGL::CGLEEntityCreator::CastToIdentifier(unsigned int id) {
+	return nullptr;
+}
+
+static inline bool(__thiscall* const shok_IsEntityInCategory)(EGL::CGLEEntity* e, shok::EntityCategory cat) = reinterpret_cast<bool(__thiscall*)(EGL::CGLEEntity * e, shok::EntityCategory)>(0x57BBEB);
+bool EGL::CGLEEntity::IsEntityInCategory(shok::EntityCategory cat)
 {
 	return shok_IsEntityInCategory(this, cat);
 }
 
-int shok_EGL_CGLEEntity::GetResourceProvided()
+int EGL::CGLEEntity::GetResourceProvided()
 {
-	return shok_EGL_CGLEEntity::EntityIDGetProvidedResource(this->EntityId);
+	return EGL::CGLEEntity::EntityIDGetProvidedResource(this->EntityId);
 }
 
-GGlue::CGlueEntityProps* shok_EGL_CGLEEntity::GetEntityType()
+GGlue::CGlueEntityProps* EGL::CGLEEntity::GetEntityType()
 {
 	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
 }
 
-int shok_EGL_CGLEEntity::EventGetIntById(shok_EventIDs id)
+int EGL::CGLEEntity::EventGetIntById(shok_EventIDs id)
 {
 	shok_EGL_CEventGetValue_int d{ id };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &d);
+	FireEvent(&d);
 	return d.Data;
 }
 
-void shok_EGL_CGLEEntity::FireEvent(shok_BB_CEvent* ev)
-{
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, ev);
-}
-
-int shok_EGL_CGLEEntity::EventGetDamage()
+int EGL::CGLEEntity::EventGetDamage()
 {
 	return EventGetIntById(shok_EventIDs::GetDamage);
 }
-int shok_EGL_CGLEEntity::EventGetArmor()
+int EGL::CGLEEntity::EventGetArmor()
 {
 	return EventGetIntById(shok_EventIDs::GetArmor);
 }
-int shok_EGL_CGLEEntity::EventGetMaxWorktime()
+int EGL::CGLEEntity::EventGetMaxWorktime()
 {
 	return EventGetIntById(shok_EventIDs::Worker_GetMaxWorkTime);
 }
 
-shok::LeaderCommand shok_EGL_CGLEEntity::EventLeaderGetCurrentCommand()
+shok::LeaderCommand EGL::CGLEEntity::EventLeaderGetCurrentCommand()
 {
 	if (GetBehavior<GGL::CLeaderBehavior>() == nullptr)
 		return shok::LeaderCommand::Unknown;
 	return static_cast<shok::LeaderCommand>(EventGetIntById(shok_EventIDs::Leader_GetCommand));
 }
 
-float shok_EGL_CGLEEntity::GetExploration()
-{
-	return reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->GetExploration(this);
-}
-
-static inline int(__thiscall* const entitygetmaxhealth)(shok_EGL_CGLEEntity* th) = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLEEntity*)>(0x57B798);
-int shok_EGL_CGLEEntity::GetMaxHealth()
+static inline int(__thiscall* const entitygetmaxhealth)(EGL::CGLEEntity* th) = reinterpret_cast<int(__thiscall*)(EGL::CGLEEntity*)>(0x57B798);
+int EGL::CGLEEntity::GetMaxHealth()
 {
 	return entitygetmaxhealth(this);
 }
 
-int shok_EGL_CGLEEntity::LimitedAttachmentGetMaximum(shok::AttachmentType attachType)
+int EGL::CGLEEntity::LimitedAttachmentGetMaximum(shok::AttachmentType attachType)
 {
 	shok_GGL_CEventAttachmentTypeGetInteger ev{ shok_EventIDs::LimitedAttachment_GetMax, attachType };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 	return ev.Data;
 }
-int shok_EGL_CGLEEntity::GetSector()
-{
-	return reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->GetSector(this);
-}
-int shok_EGL_CGLEEntity::ResourceTreeGetNearestSector()
+int EGL::CGLEEntity::ResourceTreeGetNearestSector()
 {
 	shok::Position p = Position;
 	shok::Position p2 = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetNearestFreePos(&p, 600);
@@ -170,85 +163,85 @@ int shok_EGL_CGLEEntity::ResourceTreeGetNearestSector()
 }
 
 
-int shok_EGL_CGLEEntity::GetFirstAttachedToMe(shok::AttachmentType attachmentId)
+int EGL::CGLEEntity::GetFirstAttachedToMe(shok::AttachmentType attachmentId)
 {
 	shok::Attachment* r = ObserverEntities.GetFirstMatch([attachmentId](shok::Attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
 }
 
-int shok_EGL_CGLEEntity::GetFirstAttachedEntity(shok::AttachmentType attachmentId)
+int EGL::CGLEEntity::GetFirstAttachedEntity(shok::AttachmentType attachmentId)
 {
 	shok::Attachment* r = ObservedEntities.GetFirstMatch([attachmentId](shok::Attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
 }
-static inline void(__thiscall* entattach_attach)(int* th, shok::AttachmentType at, int id, shok_EventIDs evth, shok_EventIDs evot) = reinterpret_cast<void(__thiscall*)(int*, shok::AttachmentType, int, shok_EventIDs, shok_EventIDs)>(0x4A61B3);
-void shok_EGL_CGLEEntity::AttachEntity(shok::AttachmentType attachtype, int otherId, shok_EventIDs eventIdOnThisDetach, shok_EventIDs eventIdOnOtherDetach)
+static inline void(__thiscall* entattach_attach)(EGL::CGLEAttachableBase* th, shok::AttachmentType at, int id, shok_EventIDs evth, shok_EventIDs evot) = reinterpret_cast<void(__thiscall*)(EGL::CGLEAttachableBase*, shok::AttachmentType, int, shok_EventIDs, shok_EventIDs)>(0x4A61B3);
+void EGL::CGLEEntity::AttachEntity(shok::AttachmentType attachtype, int otherId, shok_EventIDs eventIdOnThisDetach, shok_EventIDs eventIdOnOtherDetach)
 {
-	entattach_attach(&attachmentvt, attachtype, otherId, eventIdOnThisDetach, eventIdOnOtherDetach);
+	entattach_attach(static_cast<EGL::CGLEAttachableBase*>(this), attachtype, otherId, eventIdOnThisDetach, eventIdOnOtherDetach);
 }
-static inline void(__thiscall* entattach_detach)(int* th, shok::AttachmentType at, int id, byte ev) = reinterpret_cast<void(__thiscall*)(int*, shok::AttachmentType, int, byte)>(0x4A2E5D);
-void shok_EGL_CGLEEntity::DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent)
+static inline void(__thiscall* entattach_detach)(EGL::CGLEAttachableBase* th, shok::AttachmentType at, int id, byte ev) = reinterpret_cast<void(__thiscall*)(EGL::CGLEAttachableBase*, shok::AttachmentType, int, byte)>(0x4A2E5D);
+void EGL::CGLEEntity::DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent)
 {
-	entattach_detach(&attachmentvt, attachtype, otherId, fireEvent);
+	entattach_detach(static_cast<EGL::CGLEAttachableBase*>(this), attachtype, otherId, fireEvent);
 }
 
-int shok_EGL_CMovingEntity::LeaderGetNearbyBarracks()
+int EGL::CMovingEntity::LeaderGetNearbyBarracks()
 {
 	return EventGetIntById(shok_EventIDs::Leader_GetNearbyBarracks);
 }
 
-bool shok_EGL_CMovingEntity::IsMoving()
+bool EGL::CMovingEntity::IsMoving()
 {
 	shok_EGL_CEventGetValue_bool d{ shok_EventIDs::Movement_IsMoving };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &d);
+	FireEvent(&d);
 	return d.Data;
 }
 
-bool shok_GGL_CSettler::IsIdle()
+bool GGL::CSettler::IsIdle()
 {
 	shok::LeaderCommand com = EventLeaderGetCurrentCommand();
 	return com == shok::LeaderCommand::Defend || com == shok::LeaderCommand::HoldPos || CurrentTaskListID == static_cast<GGL::CGLSettlerProps*>(GetEntityType()->LogicProps)->IdleTaskList;
 }
 
-static inline void(__thiscall* const shok_GGL_CResourceDoodad_setresam)(shok_GGL_CResourceDoodad* th, int am) = reinterpret_cast<void(__thiscall* const)(shok_GGL_CResourceDoodad*, int)>(0x4B864B);
-void shok_GGL_CResourceDoodad::SetCurrentResourceAmount(int am)
+static inline void(__thiscall* const shok_GGL_CResourceDoodad_setresam)(GGL::CResourceDoodad* th, int am) = reinterpret_cast<void(__thiscall* const)(GGL::CResourceDoodad*, int)>(0x4B864B);
+void GGL::CResourceDoodad::SetCurrentResourceAmount(int am)
 {
 	shok_GGL_CResourceDoodad_setresam(this, am);
 }
 
-int shok_GGL_CBuilding::GetConstructionSite()
+int GGL::CBuilding::GetConstructionSite()
 {
 	return GetFirstAttachedToMe(shok::AttachmentType::CONSTRUCTION_SITE_BUILDING);
 }
 
-static inline int(__thiscall* const shok_build_getnearestfreeslot)(shok_EGL_CGLEEntity* th, shok::Position* p) = reinterpret_cast<int(__thiscall*) (shok_EGL_CGLEEntity*, shok::Position*)>(0x4AB02D);
-int shok_GGL_CBuilding::GetNearestFreeConstructionSlotFor(shok::Position* p)
+static inline int(__thiscall* const shok_build_getnearestfreeslot)(EGL::CGLEEntity* th, shok::Position* p) = reinterpret_cast<int(__thiscall*) (EGL::CGLEEntity*, shok::Position*)>(0x4AB02D);
+int GGL::CBuilding::GetNearestFreeConstructionSlotFor(shok::Position* p)
 {
 	int cid = GetConstructionSite();
 	if (!cid)
 		return -1;
-	shok_EGL_CGLEEntity* consi = shok_EGL_CGLEEntity::GetEntityByID(cid);
+	EGL::CGLEEntity* consi = EGL::CGLEEntity::GetEntityByID(cid);
 	if (!consi)
 		return -1;
 	return shok_build_getnearestfreeslot(consi, p);
 }
 
-int shok_GGL_CBuilding::GetNearestFreeRepairSlotFor(shok::Position* p)
+int GGL::CBuilding::GetNearestFreeRepairSlotFor(shok::Position* p)
 {
 	return shok_build_getnearestfreeslot(this, p);
 }
 
-bool shok_GGL_CBuilding::IsConstructionFinished()
+bool GGL::CBuilding::IsConstructionFinished()
 {
 	return BuildingHeight >= 1;
 }
 
-bool shok_GGL_CBuilding::IsIdle()
+bool GGL::CBuilding::IsIdle()
 {
 	return IsIdle(false);
 }
 
-bool shok_GGL_CBuilding::IsIdle(bool forRecruitemnt)
+bool GGL::CBuilding::IsIdle(bool forRecruitemnt)
 {
 	if (!IsConstructionFinished())
 		return false;
@@ -270,7 +263,7 @@ bool shok_GGL_CBuilding::IsIdle(bool forRecruitemnt)
 		if (forRecruitemnt) {
 			int c = 0;
 			ObserverEntities.ForAll([&c](shok::Attachment* a) {
-				if (a->AttachmentType == shok::AttachmentType::FIGHTER_BARRACKS && !shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->GetBehavior<GGL::CSoldierBehavior>())
+				if (a->AttachmentType == shok::AttachmentType::FIGHTER_BARRACKS && !EGL::CGLEEntity::GetEntityByID(a->EntityId)->GetBehavior<GGL::CSoldierBehavior>())
 					c++;
 				});
 			if (c >= 3)
@@ -285,410 +278,410 @@ bool shok_GGL_CBuilding::IsIdle(bool forRecruitemnt)
 	return true;
 }
 
-static inline int(__thiscall* building_gettechinres)(shok_GGL_CBuilding* th) = reinterpret_cast<int(__thiscall*)(shok_GGL_CBuilding*)>(0x4AAD09);
-int shok_GGL_CBuilding::GetTechnologyInResearch()
+static inline int(__thiscall* building_gettechinres)(GGL::CBuilding* th) = reinterpret_cast<int(__thiscall*)(GGL::CBuilding*)>(0x4AAD09);
+int GGL::CBuilding::GetTechnologyInResearch()
 {
 	return building_gettechinres(this);
 }
 
-int shok_GGL_CBuilding::GetCannonProgress()
+int GGL::CBuilding::GetCannonProgress()
 {
 	return EventGetIntById(shok_EventIDs::Foundry_GetProgress);
 }
 
-float shok_GGL_CBuilding::GetMarketProgress()
+float GGL::CBuilding::GetMarketProgress()
 {
 	shok_EGL_CEventGetValue_float ev{ shok_EventIDs::Market_GetProgress };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 	return ev.Data;
 }
 
-static inline void(__thiscall* const entitysethealth)(shok_EGL_CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, int)>(0x57A6D9);
-void shok_EGL_CGLEEntity::SetHealth(int h)
+static inline void(__thiscall* const entitysethealth)(EGL::CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, int)>(0x57A6D9);
+void EGL::CGLEEntity::SetHealth(int h)
 {
 	entitysethealth(this, h);
 }
-static inline void(__thiscall* const entityhurt)(shok_EGL_CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, int)>(0x57AD47);
-void shok_EGL_CGLEEntity::Hurt(int dmg)
+static inline void(__thiscall* const entityhurt)(EGL::CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, int)>(0x57AD47);
+void EGL::CGLEEntity::Hurt(int dmg)
 {
 	entityhurt(this, dmg);
 }
 
-static inline void(__thiscall* const shok_entity_settasklistbyid)(shok_EGL_CGLEEntity* th, int tl, int t) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, int, int)>(0x57B3B6);
-void shok_EGL_CGLEEntity::SetTaskList(int tl)
+static inline void(__thiscall* const shok_entity_settasklistbyid)(EGL::CGLEEntity* th, int tl, int t) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, int, int)>(0x57B3B6);
+void EGL::CGLEEntity::SetTaskList(int tl)
 {
 	shok_entity_settasklistbyid(this, tl, 1);
 }
-static inline void(__thiscall* const shok_entity_settasklist)(shok_EGL_CGLEEntity* th, shok_EGL_CGLETaskList* tl, int t) = reinterpret_cast<void(__thiscall* const)(shok_EGL_CGLEEntity*, shok_EGL_CGLETaskList*, int)>(0x57B208);
-void shok_EGL_CGLEEntity::SetTaskList(shok_EGL_CGLETaskList* tl)
+static inline void(__thiscall* const shok_entity_settasklist)(EGL::CGLEEntity* th, shok_EGL_CGLETaskList* tl, int t) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, shok_EGL_CGLETaskList*, int)>(0x57B208);
+void EGL::CGLEEntity::SetTaskList(shok_EGL_CGLETaskList* tl)
 {
 	shok_entity_settasklist(this, tl, 1);
 }
-static inline shok_EGL_CGLETaskList* (__thiscall* const shok_entity_GetCurrentTaskList)(shok_EGL_CGLEEntity* th) = reinterpret_cast<shok_EGL_CGLETaskList * (__thiscall* const)(shok_EGL_CGLEEntity*)>(0x57A892);
-shok_EGL_CGLETaskList* shok_EGL_CGLEEntity::GetCurrentTaskList()
+static inline shok_EGL_CGLETaskList* (__thiscall* const shok_entity_GetCurrentTaskList)(EGL::CGLEEntity* th) = reinterpret_cast<shok_EGL_CGLETaskList * (__thiscall* const)(EGL::CGLEEntity*)>(0x57A892);
+shok_EGL_CGLETaskList* EGL::CGLEEntity::GetCurrentTaskList()
 {
 	return shok_entity_GetCurrentTaskList(this);
 }
-static inline shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Set<shok_entity_TaskIdAndTaskHandler>* th, shok_Task id) = reinterpret_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int * (__thiscall* const)(shok::Set<shok_entity_TaskIdAndTaskHandler>*, shok_Task)>(0x57BDD3);
-shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* shok_EGL_CGLEEntity::GetTaskHandler(shok_Task task)
+static inline shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>* th, shok_Task id) = reinterpret_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int * (__thiscall* const)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>*, shok_Task)>(0x57BDD3);
+shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* EGL::CGLEEntity::GetTaskHandler(shok_Task task)
 {
 	return shok_entitytaskhandler_gettaskhandler(&TaskHandlers, task);
 }
 
-void shok_EGL_CGLEEntity::ExecuteTask(shok_EGL_CGLETaskArgs& targ)
+void EGL::CGLEEntity::ExecuteTask(shok_EGL_CGLETaskArgs& targ)
 {
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->ExecuteTask(this, &targ);
+	ExecuteTask(&targ);
 }
 
-void shok_EGL_CGLEEntity::Destroy()
+void EGL::CGLEEntity::Destroy()
 {
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->Destroy(this, 0);
+	Destroy(0);
 }
 
-void shok_EGL_CGLEEntity::ClearAttackers()
+void EGL::CGLEEntity::ClearAttackers()
 {
-	std::vector<shok_GGL_CSettler*> tomove = std::vector<shok_GGL_CSettler*>();
+	std::vector<GGL::CSettler*> tomove = std::vector<GGL::CSettler*>();
 	ObserverEntities.ForAll([&tomove](shok::Attachment* a) {
 		if (a->AttachmentType == shok::AttachmentType::ATTACKER_COMMAND_TARGET || a->AttachmentType == shok::AttachmentType::LEADER_TARGET || a->AttachmentType == shok::AttachmentType::FOLLOWER_FOLLOWED) {
-			shok_EGL_CGLEEntity* at = shok_EGL_CGLEEntity::GetEntityByID(a->EntityId);
-			if (shok_GGL_CSettler* s = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(at)) {
+			EGL::CGLEEntity* at = EGL::CGLEEntity::GetEntityByID(a->EntityId);
+			if (GGL::CSettler* s = shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(at)) {
 				tomove.emplace_back(s);
 			}
 		}
 		});
-	for (shok_GGL_CSettler* s : tomove)
+	for (GGL::CSettler* s : tomove)
 		s->Defend();
 }
 
 
 
-void shok_EGL_CMovingEntity::AttackMove(const shok::Position& p)
+void EGL::CMovingEntity::AttackMove(const shok::Position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::Leader_AttackMove, p };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 	TargetRotationValid = 0;
 }
 
-void shok_EGL_CMovingEntity::AttackEntity(int targetId)
+void EGL::CMovingEntity::AttackEntity(int targetId)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_AttackEntity, targetId };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::Move(const shok::Position& p)
+void EGL::CMovingEntity::Move(const shok::Position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::MoveCommand_Move, p };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 	TargetRotationValid = 0;
 }
 
-void shok_EGL_CMovingEntity::HoldPosition()
+void EGL::CMovingEntity::HoldPosition()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::Leader_HoldPosition };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::Defend()
+void EGL::CMovingEntity::Defend()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::Leader_Defend };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::LeaderAttachSoldier(int soldierId)
+void EGL::CMovingEntity::LeaderAttachSoldier(int soldierId)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_AttachSoldier, soldierId };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 	shok_BB_CEvent e2{ shok_EventIDs::Formation_AssumePosition };
-	shok_EGL_CGLEEntity* sol = shok_EGL_CGLEEntity::GetEntityByID(soldierId);
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(sol, &e2);
+	EGL::CGLEEntity* sol = EGL::CGLEEntity::GetEntityByID(soldierId);
+	sol->FireEvent(&e2);
 }
 
-static inline void(__thiscall* const shok_entity_expellSettler)(shok_EGL_CGLEEntity* th, int i) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLEEntity*, int)>(0x4A39BB);
-void shok_EGL_CMovingEntity::SettlerExpell()
+static inline void(__thiscall* const shok_entity_expellSettler)(EGL::CGLEEntity* th, int i) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*, int)>(0x4A39BB);
+void EGL::CMovingEntity::SettlerExpell()
 {
 	if (GetBehavior<GGL::CLeaderBehavior>() && ObservedEntities.GetFirstMatch([](shok::Attachment* a) { return a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER; })) {
 		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_ExpellSoldier, true };
-		reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+		FireEvent(&ev);
 	}
 	else {
 		shok_entity_expellSettler(this, 1);
 	}
 }
 
-void shok_EGL_CMovingEntity::HeroAbilitySendHawk(shok::Position& p)
+void EGL::CMovingEntity::HeroAbilitySendHawk(shok::Position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::HeroHawk_SendHawk, p };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityInflictFear()
+void EGL::CMovingEntity::HeroAbilityInflictFear()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::InflictFear_Activate };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityPlaceBomb(shok::Position& p)
+void EGL::CMovingEntity::HeroAbilityPlaceBomb(shok::Position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::BombPlacer_CommandPlaceBomb, p };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityPlaceCannon(shok::Position& p, int FoundationType, int CannonType)
+void EGL::CMovingEntity::HeroAbilityPlaceCannon(shok::Position& p, int FoundationType, int CannonType)
 {
 	shok_GGL_CEventPositionAnd2EntityTypes ev{ shok_EventIDs::CannonBuilder_BuildCannonCommand, p, FoundationType, CannonType };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityRangedEffect()
+void EGL::CMovingEntity::HeroAbilityRangedEffect()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::RangedEffect_Activate };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityCircularAttack()
+void EGL::CMovingEntity::HeroAbilityCircularAttack()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::CircularAttack_ActivateCommand };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilitySummon()
+void EGL::CMovingEntity::HeroAbilitySummon()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::Summon_ActivateCommand };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityConvert(int target)
+void EGL::CMovingEntity::HeroAbilityConvert(int target)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::ConvertSettler_ActivateCommand, target };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityConvertBuilding(int target)
+void EGL::CMovingEntity::HeroAbilityConvertBuilding(int target)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::ConvertBuilding_ActivateCommand, target };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilitySnipe(int tid)
+void EGL::CMovingEntity::HeroAbilitySnipe(int tid)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Sniper_SnipeCommand, tid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityShuriken(int tid)
+void EGL::CMovingEntity::HeroAbilityShuriken(int tid)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Shuriken_ActivateCommand, tid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityMotivateWorkers()
+void EGL::CMovingEntity::HeroAbilityMotivateWorkers()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::MotivateVorkers_ActivateCommand };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::HeroAbilityActivateCamoflage()
+void EGL::CMovingEntity::HeroAbilityActivateCamoflage()
 {
 	shok_BB_CEvent e{ shok_EventIDs::Camouflage_Activate };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e);
+	FireEvent(&e);
 }
 
-void shok_EGL_CMovingEntity::ThiefSabotage(int tid)
+void EGL::CMovingEntity::ThiefSabotage(int tid)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::KegPlacer_SabotageCommand, tid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::ThiefDefuse(int tid)
+void EGL::CMovingEntity::ThiefDefuse(int tid)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::KegPlacer_DefuseCommand, tid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::ThiefStealFrom(int tid)
+void EGL::CMovingEntity::ThiefStealFrom(int tid)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Thief_StealFromCommand, tid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::ThiefSecureGoods(int tid)
+void EGL::CMovingEntity::ThiefSecureGoods(int tid)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Thief_SecureGoodsCommand, tid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::ScoutBinoculars(shok::Position& p)
+void EGL::CMovingEntity::ScoutBinoculars(shok::Position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::Binocular_ExploreCommand, p };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::ScoutFindResource()
+void EGL::CMovingEntity::ScoutFindResource()
 {
 	shok_BB_CEvent ev{ shok_EventIDs::PointToResources_Activate };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::ScoutPlaceTorch(shok::Position& p)
+void EGL::CMovingEntity::ScoutPlaceTorch(shok::Position& p)
 {
 	shok_EGL_CEventPosition ev{ shok_EventIDs::TorchPlacer_PlaceTorch, p };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-bool shok_EGL_CMovingEntity::SerfConstructBuilding(shok_GGL_CBuilding* build)
+bool EGL::CMovingEntity::SerfConstructBuilding(GGL::CBuilding* build)
 {
 	int cid = build->GetNearestFreeConstructionSlotFor(&this->Position);
 	if (cid < 0)
 		return false;
 	shok_GGL_CEventEntityIndex ev{ shok_EventIDs::Serf_Construct, build->GetConstructionSite(), cid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 	return true;
 }
 
-bool shok_EGL_CMovingEntity::SerfRepairBuilding(shok_GGL_CBuilding* build)
+bool EGL::CMovingEntity::SerfRepairBuilding(GGL::CBuilding* build)
 {
 	int cid = build->GetNearestFreeRepairSlotFor(&this->Position);
 	if (cid < 0)
 		return false;
 	shok_GGL_CEventEntityIndex ev{ shok_EventIDs::Serf_Construct, build->EntityId, cid };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 	return true;
 }
 
-void shok_EGL_CMovingEntity::SerfExtractResource(int id)
+void EGL::CMovingEntity::SerfExtractResource(int id)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Serf_ExtractResource, id };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-void shok_EGL_CMovingEntity::SerfTurnToBattleSerf()
+void EGL::CMovingEntity::SerfTurnToBattleSerf()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::Serf_CommandTurnToBattleSerf };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
-void shok_EGL_CMovingEntity::BattleSerfTurnToSerf()
+void EGL::CMovingEntity::BattleSerfTurnToSerf()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::BattleSerf_CommandTurnToSerf };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
-void(__thiscall* const movingentity_settarrot)(shok_EGL_CMovingEntity* th, float r) = reinterpret_cast<void(__thiscall*)(shok_EGL_CMovingEntity*, float)>(0x57DBC8);
-void shok_EGL_CMovingEntity::SetTargetRotation(float f)
+void(__thiscall* const movingentity_settarrot)(EGL::CMovingEntity* th, float r) = reinterpret_cast<void(__thiscall*)(EGL::CMovingEntity*, float)>(0x57DBC8);
+void EGL::CMovingEntity::SetTargetRotation(float f)
 {
 	movingentity_settarrot(this, f);
 }
 
-void(__thiscall* const movingentity_setpos)(shok_EGL_CMovingEntity* th, shok::Position* p) = reinterpret_cast<void(__thiscall*)(shok_EGL_CMovingEntity*, shok::Position*)>(0x57BC78);
-void shok_EGL_CMovingEntity::SetPosition(shok::Position& p)
+void(__thiscall* const movingentity_setpos)(EGL::CMovingEntity* th, shok::Position* p) = reinterpret_cast<void(__thiscall*)(EGL::CMovingEntity*, shok::Position*)>(0x57BC78);
+void EGL::CMovingEntity::SetPosition(shok::Position& p)
 {
 	movingentity_setpos(this, &p);
 	Move(p);
 }
 
-static inline void(__thiscall* const building_startUpgrade)(shok_GGL_CBuilding* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CBuilding*)>(0x4AF1B5);
-void shok_GGL_CBuilding::StartUpgrade()
+static inline void(__thiscall* const building_startUpgrade)(GGL::CBuilding* th) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*)>(0x4AF1B5);
+void GGL::CBuilding::StartUpgrade()
 {
 	building_startUpgrade(this);
 }
 
-static inline void(__thiscall* const buildingCancelUpgrade)(shok_GGL_CBuilding* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CBuilding*)>(0x4AF228);
-void shok_GGL_CBuilding::CancelUpgrade()
+static inline void(__thiscall* const buildingCancelUpgrade)(GGL::CBuilding* th) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*)>(0x4AF228);
+void GGL::CBuilding::CancelUpgrade()
 {
 	buildingCancelUpgrade(this);
 }
 
-void shok_GGL_CBuilding::CommandBuildCannon(int entitytype)
+void GGL::CBuilding::CommandBuildCannon(int entitytype)
 {
 	shok_EGL_CEventValue_int e{ shok_EventIDs::Foundry_BuildCannonCommand, entitytype };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e);
+	FireEvent(&e);
 }
 
-void shok_GGL_CBuilding::CommandRecruitSoldierForLeader(int id)
+void GGL::CBuilding::CommandRecruitSoldierForLeader(int id)
 {
 	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Barracks_BuySoldierForLeader, id };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &ev);
+	FireEvent(&ev);
 }
 
-static inline void(__thiscall* const shok_buildingActivateOvertime)(shok_GGL_CBuilding* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CBuilding*)>(0x4AE566);
-void shok_GGL_CBuilding::ActivateOvertime()
+static inline void(__thiscall* const shok_buildingActivateOvertime)(GGL::CBuilding* th) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*)>(0x4AE566);
+void GGL::CBuilding::ActivateOvertime()
 {
 	shok_buildingActivateOvertime(this);
 }
-static inline void(__thiscall* const shok_buildingDeactivateOvertime)(shok_GGL_CBuilding* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CBuilding*)>(0x4AA073);
-void shok_GGL_CBuilding::DeactivateOvertime()
+static inline void(__thiscall* const shok_buildingDeactivateOvertime)(GGL::CBuilding* th) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*)>(0x4AA073);
+void GGL::CBuilding::DeactivateOvertime()
 {
 	shok_buildingDeactivateOvertime(this);
 }
 
-void shok_GGL_CBuilding::BarracksRecruitGroups()
+void GGL::CBuilding::BarracksRecruitGroups()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::Barracks_ActivateAutoFill };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
-void shok_GGL_CBuilding::BarracksRecruitLeaders()
+void GGL::CBuilding::BarracksRecruitLeaders()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::Barracks_DeActivateAutoFill };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
-void shok_GGL_CBuilding::HQBuySerf()
+void GGL::CBuilding::HQBuySerf()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::Keep_BuySerfCommand };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
-void shok_GGL_CBuilding::SellBuilding()
+void GGL::CBuilding::SellBuilding()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::Die };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
-static inline void(__thiscall* const building_startresearch)(shok_GGL_CBuilding* th, int tech) = reinterpret_cast<void(__thiscall*)(shok_GGL_CBuilding*, int)>(0x4AAC76);
-void shok_GGL_CBuilding::StartResearch(int tech)
+static inline void(__thiscall* const building_startresearch)(GGL::CBuilding* th, int tech) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*, int)>(0x4AAC76);
+void GGL::CBuilding::StartResearch(int tech)
 {
 	building_startresearch(this, tech);
 }
 
-static inline void(__thiscall* const building_cancelresearch)(shok_GGL_CBuilding* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CBuilding*)>(0x4AACC0);
-void shok_GGL_CBuilding::CancelResearch()
+static inline void(__thiscall* const building_cancelresearch)(GGL::CBuilding* th) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*)>(0x4AACC0);
+void GGL::CBuilding::CancelResearch()
 {
 	building_cancelresearch(this);
 }
 
-void shok_GGL_CBuilding::MarketStartTrade(shok::ResourceType ResourceTypeSell, shok::ResourceType ResourceTypeBuy, float BuyAmount)
+void GGL::CBuilding::MarketStartTrade(shok::ResourceType ResourceTypeSell, shok::ResourceType ResourceTypeBuy, float BuyAmount)
 {
 	shok_GGL_CEventTransaction e2{ shok_EventIDs::Market_StartTrade, ResourceTypeSell, ResourceTypeBuy, BuyAmount };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
-void shok_GGL_CBuilding::MarketCancelTrade()
+void GGL::CBuilding::MarketCancelTrade()
 {
 	shok_BB_CEvent e2{ shok_EventIDs::Market_CancelTrade };
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->FireEvent(this, &e2);
+	FireEvent(&e2);
 }
 
 static inline int(__thiscall* const raxbeh_createentityandattach)(GGL::CBarrackBehavior* th, int ety) = reinterpret_cast<int(__thiscall*)(GGL::CBarrackBehavior*, int)>(0x50EA18);
 static inline int(__thiscall* const raxbeh_gettrainingtl)(GGL::CBarrackBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CBarrackBehavior*)>(0x50EBCE);
-int shok_GGL_CBuilding::BuyLeaderByType(int ety)
+int GGL::CBuilding::BuyLeaderByType(int ety)
 {
 	GGL::CBarrackBehavior* rax = GetBehavior<GGL::CBarrackBehavior>();
 	int id = raxbeh_createentityandattach(rax, ety);
 	if (id) {
 		shok_EGL_CEventValue_int ev = { shok_EventIDs::Leader_SetTrainingTL, raxbeh_gettrainingtl(rax) };
-		shok_EGL_CGLEEntity::GetEntityByID(id)->FireEvent(&ev);
+		EGL::CGLEEntity::GetEntityByID(id)->FireEvent(&ev);
 	}
 	return id;
 }
 
 int __cdecl fixedChangePlayer(int id, int pl) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(id);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
 	if (!e)
 		return 0;
 	if (e->PlayerId == pl)
 		return id;
-	shok_EGL_CGLEEntityCreator c{};
+	EGL::CGLEEntityCreator c{};
 	c.EntityType = e->EntityType;
 	c.PlayerId = pl;
 	c.Pos = e->Position;
@@ -703,12 +696,12 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 		c.ScriptName = nullptr;
 	}
 	int nid = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
-	if (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e)) {
+	if (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e)) {
 		GGL::CLeaderBehavior* lb = e->GetBehavior<GGL::CLeaderBehavior>();
 		if (lb) {
 			std::vector<int> sol = std::vector<int>();
 			e->ObservedEntities.ForAll([&sol](shok::Attachment* a) { if (a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER) sol.push_back(a->EntityId); });
-			shok_GGL_CSettler* settler = static_cast<shok_GGL_CSettler*>(shok_EGL_CGLEEntity::GetEntityByID(nid));
+			GGL::CSettler* settler = static_cast<GGL::CSettler*>(EGL::CGLEEntity::GetEntityByID(nid));
 			for (int i : sol) {
 				settler->LeaderAttachSoldier(fixedChangePlayer(i, pl));
 			}
@@ -725,42 +718,42 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 	return nid;
 }
 bool ActivateEntityChangePlayerFix_Hooked = false;
-void shok_EGL_CGLEEntity::ActivateEntityChangePlayerFix()
+void EGL::CGLEEntity::ActivateEntityChangePlayerFix()
 {
 	if (ActivateEntityChangePlayerFix_Hooked)
 		return;
 	ActivateEntityChangePlayerFix_Hooked = true;
-	shok::SaveVirtualProtect vp{ shok_EGL_CGLEEntity::EntityIDChangePlayer, 10 };
-	WriteJump(shok_EGL_CGLEEntity::EntityIDChangePlayer, &fixedChangePlayer);
+	shok::SaveVirtualProtect vp{ EGL::CGLEEntity::EntityIDChangePlayer, 10 };
+	WriteJump(EGL::CGLEEntity::EntityIDChangePlayer, &fixedChangePlayer);
 }
 
-void (*shok_EGL_CGLEEntity::Hero6ConvertHookCb)(int id, int pl, int nid, int converter) = nullptr;
+void (*EGL::CGLEEntity::Hero6ConvertHookCb)(int id, int pl, int nid, int converter) = nullptr;
 int _cdecl hero6convertchangeplayer(int id, int pl) {
-	shok_EGL_CGLEEntity* c = (shok_EGL_CGLEEntity*)1;
+	EGL::CGLEEntity* c = (EGL::CGLEEntity*)1;
 	_asm { mov c, esi }
-	int r = shok_EGL_CGLEEntity::EntityIDChangePlayer(id, pl);
-	if (shok_EGL_CGLEEntity::Hero6ConvertHookCb)
-		shok_EGL_CGLEEntity::Hero6ConvertHookCb(id, pl, r, c->EntityId);
+	int r = EGL::CGLEEntity::EntityIDChangePlayer(id, pl);
+	if (EGL::CGLEEntity::Hero6ConvertHookCb)
+		EGL::CGLEEntity::Hero6ConvertHookCb(id, pl, r, c->EntityId);
 	return r;
 }
 bool HookHero6Convert_Hooked = false;
-void shok_EGL_CGLEEntity::HookHero6Convert()
+void EGL::CGLEEntity::HookHero6Convert()
 {
 	if (HookHero6Convert_Hooked)
 		return;
 	HookHero6Convert_Hooked = true;
-	shok_EGL_CGLEEntity::ActivateEntityChangePlayerFix();
+	EGL::CGLEEntity::ActivateEntityChangePlayerFix();
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FCD26), 10 };
 	RedirectCall(reinterpret_cast<void*>(0x4FCD26), &hero6convertchangeplayer);
 }
 
-int shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
+int EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 void __fastcall camo_behaviorReset(GGL::CCamouflageBehavior* th, int _, int a) {
-	if (shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity == 0 || th->EntityId == shok_EGL_CGLEEntity::ResetCamoIgnoreIfNotEntity)
+	if (EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity == 0 || th->EntityId == EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity)
 		th->InvisibilityRemaining = 0;
 }
 bool HookResetCamo_Hooked = false;
-void shok_EGL_CGLEEntity::HookResetCamo()
+void EGL::CGLEEntity::HookResetCamo()
 {
 	if (HookResetCamo_Hooked)
 		return;
@@ -770,15 +763,15 @@ void shok_EGL_CGLEEntity::HookResetCamo()
 }
 
 static inline int(__thiscall* const activateCamoOrig)(GGL::CCamouflageBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CCamouflageBehavior*)>(0x501561);
-void (*shok_EGL_CGLEEntity::CamoActivateCb)(GGL::CCamouflageBehavior* th);
+void (*EGL::CGLEEntity::CamoActivateCb)(GGL::CCamouflageBehavior* th);
 int __fastcall camoActivateHook(GGL::CCamouflageBehavior* th) {
 	int i = activateCamoOrig(th);
-	if (shok_EGL_CGLEEntity::CamoActivateCb)
-		shok_EGL_CGLEEntity::CamoActivateCb(th);
+	if (EGL::CGLEEntity::CamoActivateCb)
+		EGL::CGLEEntity::CamoActivateCb(th);
 	return i;
 }
 bool HookCamoActivate_Hooked = false;
-void shok_EGL_CGLEEntity::HookCamoActivate()
+void EGL::CGLEEntity::HookCamoActivate()
 {
 	if (HookCamoActivate_Hooked)
 		return;
@@ -791,17 +784,17 @@ void shok_EGL_CGLEEntity::HookCamoActivate()
 
 
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
-int* shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
-bool shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker = false;
-AdvancedDealDamageSource shok_EGL_CGLEEntity::HurtEntityDamageSource = AdvancedDealDamageSource::Unknown;
-int  shok_EGL_CGLEEntity::HurtEntityAttackerPlayer = 0;
-void (*shok_EGL_CGLEEntity::HurtEntityOnKillCb)(shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) = nullptr;
+int* EGL::CGLEEntity::HurtEntityDamagePointer = nullptr;
+bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
+AdvancedDealDamageSource EGL::CGLEEntity::HurtEntityDamageSource = AdvancedDealDamageSource::Unknown;
+int  EGL::CGLEEntity::HurtEntityAttackerPlayer = 0;
+void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) = nullptr;
 bool HookHurtEntity_Hooked = false;
-void __cdecl hurtentity_override(shok_EGL_CGLEEntity* att, shok_EGL_CGLEEntity* tar, int dmg) {
+void __cdecl hurtentity_override(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg) {
 	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, AdvancedDealDamageSource::Unknown);
 }
-void __cdecl hurtaoe_override(shok_EGL_CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl) {
-	shok_EGL_CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, AdvancedDealDamageSource::Unknown);
+void __cdecl hurtaoe_override(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl) {
+	EGL::CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, AdvancedDealDamageSource::Unknown);
 }
 void __declspec(naked) arrowonhit_damage() {
 	__asm {
@@ -823,7 +816,7 @@ void __declspec(naked) arrowonhit_damage() {
 		push eax;
 
 		mov ecx, [ebp - 0x10];
-		call shok_EGL_CGLEEntity::AdvancedHurtEntityBy;
+		call EGL::CGLEEntity::AdvancedHurtEntityBy;
 
 		push 0x5113CF;
 		ret;
@@ -839,11 +832,11 @@ void __declspec(naked) meleeonhit_damage() {
 		push[ebp - 0x10];
 
 		push[edi + 8];
-		call shok_EGL_CGLEEntity::GetEntityByID;
+		call EGL::CGLEEntity::GetEntityByID;
 		push eax;
 
 		mov ecx, esi;
-		call shok_EGL_CGLEEntity::AdvancedHurtEntityBy;
+		call EGL::CGLEEntity::AdvancedHurtEntityBy;
 
 		push 0x50CA6D;
 		ret;
@@ -859,7 +852,7 @@ void __declspec(naked) circularatt_damage() {
 		push eax;
 		push esi;
 		mov ecx, [ebp - 0x10];
-		call shok_EGL_CGLEEntity::AdvancedHurtEntityBy;
+		call EGL::CGLEEntity::AdvancedHurtEntityBy;
 
 		push 0x4FE72F;
 		ret;
@@ -890,7 +883,7 @@ void __declspec(naked) cannonballhit_damage() {
 		lea eax, [esi + 16 * 4]; // pos
 		push eax;
 		push ebx;
-		call shok_EGL_CGLEEntity::AdvancedDealAoEDamage;
+		call EGL::CGLEEntity::AdvancedDealAoEDamage;
 
 		mov eax, [esi + 0xC4];
 		push 0x4FF51B;
@@ -913,7 +906,7 @@ void __declspec(naked) bombexplode_damage() {
 		lea eax, [eax + 22 * 4];
 		push eax;
 		push[ebp - 0x10];
-		call shok_EGL_CGLEEntity::AdvancedDealAoEDamage;
+		call EGL::CGLEEntity::AdvancedDealAoEDamage;
 
 		push 0x506B3F;
 		ret;
@@ -937,17 +930,17 @@ void __declspec(naked) shurikenthrow() {
 		ret;
 	};
 }
-void shok_EGL_CGLEEntity::HookHurtEntity()
+void EGL::CGLEEntity::HookHurtEntity()
 {
 	if (HookHurtEntity_Hooked)
 		return;
 	if (HasSCELoader())
 		DEBUGGER_BREAK;
 	HookHurtEntity_Hooked = true;
-	shok::SaveVirtualProtect vp{ shok_EGL_CGLEEntity::EntityHurtEntity, 10 };
-	WriteJump(shok_EGL_CGLEEntity::EntityHurtEntity, &hurtentity_override);
-	shok::SaveVirtualProtect vp2{ shok_EGL_CGLEEntity::EntityDealAoEDamage, 10 };
-	WriteJump(shok_EGL_CGLEEntity::EntityDealAoEDamage, &hurtaoe_override);
+	shok::SaveVirtualProtect vp{ EGL::CGLEEntity::EntityHurtEntity, 10 };
+	WriteJump(EGL::CGLEEntity::EntityHurtEntity, &hurtentity_override);
+	shok::SaveVirtualProtect vp2{ EGL::CGLEEntity::EntityDealAoEDamage, 10 };
+	WriteJump(EGL::CGLEEntity::EntityDealAoEDamage, &hurtaoe_override);
 	shok::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x5113C2), 10 };
 	WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage);
 	shok::SaveVirtualProtect vp4{ reinterpret_cast<void*>(0x4DBA20), 10 }; // projectile creator bigger zero for AdvancedDamageSourceOverride
@@ -972,7 +965,7 @@ void shok_EGL_CGLEEntity::HookHurtEntity()
 	GGL::CBombPlacerBehavior::FixBombAttachment();
 	shok_GGL_CCannonBallEffect::AddDamageSourceOverride = true;
 }
-void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
+void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
 {
 	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
@@ -980,18 +973,18 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		return;
 	shok_EGL_CEventGetValue_bool getbool{ shok_EventIDs::IsSettlerOrBuilding };
 	FireEvent(&getbool);
-	if (!getbool.Data && !shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBridgeEntity>(this))
+	if (!getbool.Data && !shok_DynamicCast<EGL::CGLEEntity, GGL::CBridgeEntity>(this))
 		return;
 	if (GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) || GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE))
 		return;
 	int attackerplayer = attacker ? attacker->PlayerId : attackerFallback;
-	if (attacker || shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker) {
+	if (attacker || EGL::CGLEEntity::HurtEntityCallWithNoAttacker) {
 		shok_EGL_CEvent2Entities ev{ shok_EventIDs::LogicEvent_HurtEntity, attacker ? attacker->EntityId : 0, EntityId };
-		shok_EGL_CGLEEntity::HurtEntityDamagePointer = &damage;
-		shok_EGL_CGLEEntity::HurtEntityDamageSource = sourceInfo;
-		shok_EGL_CGLEEntity::HurtEntityAttackerPlayer = attackerplayer;
+		EGL::CGLEEntity::HurtEntityDamagePointer = &damage;
+		EGL::CGLEEntity::HurtEntityDamageSource = sourceInfo;
+		EGL::CGLEEntity::HurtEntityAttackerPlayer = attackerplayer;
 		(*shok_EScr_CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
-		shok_EGL_CGLEEntity::HurtEntityDamagePointer = nullptr;
+		EGL::CGLEEntity::HurtEntityDamagePointer = nullptr;
 	}
 	if (damage <= 0)
 		return;
@@ -1017,7 +1010,7 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		ObserverEntities.ForAll([attacker](shok::Attachment* a) {
 			if (a->AttachmentType == shok::AttachmentType::GUARD_GUARDED) {
 				shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_OnGuardedAttackedBy, attacker->EntityId };
-				shok_EGL_CGLEEntity::GetEntityByID(a->EntityId)->FireEvent(&ev);
+				EGL::CGLEEntity::GetEntityByID(a->EntityId)->FireEvent(&ev);
 			}
 			});
 	}
@@ -1028,21 +1021,21 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 	FireEvent(&getbool2);
 	std::vector<int> idskilled{};
 	int xptoadd = 0;
-	shok_EGL_CGLEEntity* firsttodie = this;
+	EGL::CGLEEntity* firsttodie = this;
 	if (getbool.Data && !getbool2.Data) { // has potentially soldiers
 		getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsSoldier };
 		FireEvent(&getbool);
-		shok_EGL_CGLEEntity* attackedleader = this;
+		EGL::CGLEEntity* attackedleader = this;
 		if (getbool.Data) {
 			int id = this->GetFirstAttachedToMe(shok::AttachmentType::LEADER_SOLDIER);
 			if (id)
-				attackedleader = shok_EGL_CGLEEntity::GetEntityByID(id);
+				attackedleader = EGL::CGLEEntity::GetEntityByID(id);
 		}
 		GGL::CLeaderBehavior* lbeh = attackedleader->GetBehavior<GGL::CLeaderBehavior>();
 		if (lbeh && firsttodie == attackedleader) {
 			int id = attackedleader->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
 			if (id)
-				firsttodie = shok_EGL_CGLEEntity::GetEntityByID(id);
+				firsttodie = EGL::CGLEEntity::GetEntityByID(id);
 		}
 		if (lbeh) {
 			int troophp = lbeh->GetTroopHealth();
@@ -1063,13 +1056,13 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 					xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
 					shok_GGL_CEventEntityIndex kev{ shok_EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
 					firsttodie->FireEvent(&kev);
-					if (shok_EGL_CGLEEntity::HurtEntityOnKillCb)
-						shok_EGL_CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
+					if (EGL::CGLEEntity::HurtEntityOnKillCb)
+						EGL::CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
 					firsttodie->Hurt(firsttodie->Health);
 
 					int id = attackedleader->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
 					if (id)
-						firsttodie = shok_EGL_CGLEEntity::GetEntityByID(id);
+						firsttodie = EGL::CGLEEntity::GetEntityByID(id);
 					else
 						firsttodie = attackedleader;
 				}
@@ -1089,8 +1082,8 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 			xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
 			shok_GGL_CEventEntityIndex kev{ shok_EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
 			firsttodie->FireEvent(&kev);
-			if (shok_EGL_CGLEEntity::HurtEntityOnKillCb)
-				shok_EGL_CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
+			if (EGL::CGLEEntity::HurtEntityOnKillCb)
+				EGL::CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
 			firsttodie->Hurt(firsttodie->Health);
 		}
 		else {
@@ -1107,7 +1100,7 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		return;
 
 	const char* callback;
-	if (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(this)) {
+	if (shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(this)) {
 		if (addStat) {
 			if (attackerplayer)
 				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfBuildingsDestroyed += idskilled.size();
@@ -1125,7 +1118,7 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		}
 		callback = "GameCallback_SettlerKilled";
 	}
-	if (attackerplayer || shok_EGL_CGLEEntity::HurtEntityCallWithNoAttacker) {
+	if (attackerplayer || EGL::CGLEEntity::HurtEntityCallWithNoAttacker) {
 
 		lua_State* L = *shok_luastate_game;
 		int t = lua_gettop(L);
@@ -1142,7 +1135,7 @@ void shok_EGL_CGLEEntity::AdvancedHurtEntityBy(shok_EGL_CGLEEntity* attacker, in
 		lua_settop(L, t);
 	}
 }
-void __stdcall shok_EGL_CGLEEntity::AdvancedDealAoEDamage(shok_EGL_CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
+void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
 {
 	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
@@ -1161,7 +1154,7 @@ void __stdcall shok_EGL_CGLEEntity::AdvancedDealAoEDamage(shok_EGL_CGLEEntity* a
 	EntityIteratorPredicateAnd iand{ iandd, pl ? 4 : 3 };
 	EntityIterator it{ &iand };
 	float cr = 0;
-	shok_EGL_CGLEEntity* curr = it.GetNext(&cr, nullptr);
+	EGL::CGLEEntity* curr = it.GetNext(&cr, nullptr);
 	while (curr) {
 		cr = std::sqrtf(cr) / range;
 		if (cr < 0 || cr > 1)
@@ -1190,11 +1183,11 @@ void __stdcall shok_EGL_CGLEEntity::AdvancedDealAoEDamage(shok_EGL_CGLEEntity* a
 	}
 }
 
-std::multimap<int, int> shok_EGL_CGLEEntity::BuildingMaxHpTechBoni = std::multimap<int, int>();
-bool shok_EGL_CGLEEntity::UseMaxHPTechBoni = false;
-int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
+std::multimap<int, int> EGL::CGLEEntity::BuildingMaxHpTechBoni = std::multimap<int, int>();
+bool EGL::CGLEEntity::UseMaxHPTechBoni = false;
+int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
 	float hp;
-	entityAddonData* d = e->GetAdditionalData(false);
+	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	GGlue::CGlueEntityProps* et = e->GetEntityType();
 	if (d && d->HealthOverride > 0) {
 		hp = static_cast<float>(d->HealthOverride);
@@ -1204,9 +1197,9 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 	}
 	if (d && !d->HealthUseBoni)
 		return static_cast<int>(hp);
-	if (shok_EGL_CGLEEntity::UseMaxHPTechBoni)
+	if (EGL::CGLEEntity::UseMaxHPTechBoni)
 	{
-		if (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e)) {
+		if (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e)) {
 			for (int t : static_cast<GGL::CGLSettlerProps*>(et->LogicProps)->ModifyHitpoints.TechList) {
 				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
@@ -1214,8 +1207,8 @@ int __fastcall hookGetMaxHP(shok_EGL_CGLEEntity* e) {
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
-		else if (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e)) {
-			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = shok_EGL_CGLEEntity::BuildingMaxHpTechBoni.equal_range(e->EntityType);
+		else if (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e)) {
+			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = EGL::CGLEEntity::BuildingMaxHpTechBoni.equal_range(e->EntityType);
 			for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
 				int t = i->second;
 				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
@@ -1238,13 +1231,13 @@ void __declspec(naked) hookgetmaxhpui() {
 		ret;
 	}
 }
-void __fastcall createentityfixhp(shok_EGL_CGLEEntity* th, int hpIn) {
+void __fastcall createentityfixhp(EGL::CGLEEntity* th, int hpIn) {
 	if (hpIn != -1)
 		return;
-	if (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(th)) {
+	if (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(th)) {
 		th->Health = th->GetMaxHealth();
 	}
-	else if (shok_GGL_CBuilding* b = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(th)) {
+	else if (GGL::CBuilding* b = shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(th)) {
 		th->Health = th->GetMaxHealth();
 		if (!b->IsConstructionFinished()) {
 			th->Health = static_cast<int>(th->Health * (*shok_GGL_CLogicProperties::GlobalObj)->ConstructionSiteHealthFactor);
@@ -1268,7 +1261,7 @@ void __declspec(naked) hookcreatentityfixhp() {
 	}
 }
 bool HookMaxHP_Hooked = false;
-void shok_EGL_CGLEEntity::HookMaxHP()
+void EGL::CGLEEntity::HookMaxHP()
 {
 	if (HookMaxHP_Hooked)
 		return;
@@ -1283,46 +1276,44 @@ void shok_EGL_CGLEEntity::HookMaxHP()
 	WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp);
 }
 
-int (*shok_EGL_CGLEEntity::LuaTaskListCallback)(shok_EGL_CGLEEntity* e, int val) = nullptr;
-int __fastcall entity_executeluatask(shok_EGL_CGLEEntity* th, int _, shok_EGL_CGLETaskArgs* args) {
+int (*EGL::CGLEEntity::LuaTaskListCallback)(EGL::CGLEEntity* e, int val) = nullptr;
+int __fastcall entity_executeluatask(EGL::CGLEEntity* th, int _, shok_EGL_CGLETaskArgs* args) {
 	int i = 0;
 	int val = static_cast<shok_EGL_CTaskArgsInteger*>(args)->Value;
-	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
-		i = shok_EGL_CGLEEntity::LuaTaskListCallback(th, val);
+	if (EGL::CGLEEntity::LuaTaskListCallback)
+		i = EGL::CGLEEntity::LuaTaskListCallback(th, val);
 	if (i == 3) {
 		th->GetAdditionalData(true)->FakeTaskValue = val;
-		shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
-		vt->SetTaskState(th, shok_TaskState::LuaFunc);
+		th->SetTaskState(shok_TaskState::LuaFunc);
 		i = 1;
 	}
 	return i;
 }
-int __fastcall entity_executeluataskstate(shok_EGL_CGLEEntity* th, int _, int onek) {
+int __fastcall entity_executeluataskstate(EGL::CGLEEntity* th, int _, int onek) {
 	int i = -2;
-	if (shok_EGL_CGLEEntity::LuaTaskListCallback)
-		if (shok_EGL_CGLEEntity::LuaTaskListCallback(th, th->GetAdditionalData(true)->FakeTaskValue) == 3)
+	if (EGL::CGLEEntity::LuaTaskListCallback)
+		if (EGL::CGLEEntity::LuaTaskListCallback(th, th->GetAdditionalData(true)->FakeTaskValue) == 3)
 			i = -1;
 	return i;
 }
-void(__thiscall* const entityaddluatlhandlers)(shok_EGL_CGLEEntity* th) = reinterpret_cast<void(__thiscall*)(shok_EGL_CGLEEntity*)>(0x57BA34);
-void __fastcall entity_addluatlhandlershook(shok_EGL_CGLEEntity* th) {
+void(__thiscall* const entityaddluatlhandlers)(EGL::CGLEEntity* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*)>(0x57BA34);
+void __fastcall entity_addluatlhandlershook(EGL::CGLEEntity* th) {
 	entityaddluatlhandlers(th);
-	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
 	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
 	thand->vtable = 0x783D7C; // this is EGL::THandler<12,EGL::CGLETaskArgs,EGL::CGLETaskArgs,EGL::CGLEEntity,int>, but the func is always the same anyway...
 	thand->Object = th;
 	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(&entity_executeluatask);
 	thand->Zero = 0;
-	vt->AddTaskHandler(th, shok_Task::TASK_LUA_FUNC, thand);
+	th->AddTaskHandler(shok_Task::TASK_LUA_FUNC, thand);
 	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
 	shand->vtable = 0x783D9C; // EGL::TStateHandler<EGL::CGLEEntity>
 	shand->Object = th;
 	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(&entity_executeluataskstate);
 	shand->Zero = 0;
-	vt->AddStateHandler(th, shok_TaskState::LuaFunc, shand);
+	th->AddStateHandler(shok_TaskState::LuaFunc, shand);
 }
 bool HookLuaTaskList_Hooked = false;
-void shok_EGL_CGLEEntity::HookLuaTaskList()
+void EGL::CGLEEntity::HookLuaTaskList()
 {
 	if (HookLuaTaskList_Hooked)
 		return;
@@ -1333,26 +1324,24 @@ void shok_EGL_CGLEEntity::HookLuaTaskList()
 
 int __fastcall entity_hooknoncancelanim_task(GGL::CGLBehaviorAnimationEx* th, int _, shok_EGL_CGLETaskArgs* args) {
 	int wait = static_cast<shok_EGL_CGLETaskArgsThousandths*>(args)->Thousandths;
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
-	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(e->vtable);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 	th->TurnToWaitFor = th->StartTurn + th->Duration * wait / 1000;
-	vt->SetTaskState(e, shok_TaskState::WaitForAnimNonCancelable);
+	e->SetTaskState(shok_TaskState::WaitForAnimNonCancelable);
 	return 1;
 }
-void __stdcall entity_hooknoncancelanim(shok_EGL_CGLEEntity* th, GGL::CGLBehaviorAnimationEx* beh) {
-	shok_vtable_EGL_CGLEEntity* vt = reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(th->vtable);
+void __stdcall entity_hooknoncancelanim(EGL::CGLEEntity* th, GGL::CGLBehaviorAnimationEx* beh) {
 	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
 	thand->vtable = 0x784A4C; // EGL::THandler<5,EGL::CGLETaskArgs,EGL::CGLETaskArgsThousandths,EGL::CBehaviorAnimation,int>
 	thand->Object = beh;
 	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(entity_hooknoncancelanim_task);
 	thand->Zero = 0;
-	vt->AddTaskHandler(th, shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, thand);
+	th->AddTaskHandler(shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, thand);
 	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
 	shand->vtable = 0x784A7C; // EGL::TStateHandler<EGL::CBehaviorAnimation>
 	shand->Object = beh;
 	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(0x587E20);
 	shand->Zero = 0;
-	vt->AddStateHandler(th, shok_TaskState::WaitForAnimNonCancelable, shand);
+	th->AddStateHandler(shok_TaskState::WaitForAnimNonCancelable, shand);
 }
 void __declspec(naked) entity_hooknoncancelanim_asm() {
 	__asm {
@@ -1369,7 +1358,7 @@ void __declspec(naked) entity_hooknoncancelanim_asm() {
 	};
 }
 bool HookNonCancelableAnim_Hooked = false;
-void shok_EGL_CGLEEntity::HookNonCancelableAnim()
+void EGL::CGLEEntity::HookNonCancelableAnim()
 {
 	if (HookNonCancelableAnim_Hooked)
 		return;
@@ -1379,8 +1368,8 @@ void shok_EGL_CGLEEntity::HookNonCancelableAnim()
 }
 
 void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBehaviorDefaultMovement*, shok::Position*)>(0x586894);
-void __fastcall entity_buildonsetpos(shok_EGL_CMovingEntity* e) {
-	if (e->MovementState && shok_EGL_CGLEEntity::BuildOnSetPosFixMovement) {
+void __fastcall entity_buildonsetpos(EGL::CMovingEntity* e) {
+	if (e->MovementState && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
 		GGL::CBehaviorDefaultMovement* mov = e->GetBehavior<GGL::CBehaviorDefaultMovement>();
 		if (mov) {
 			movementbeh_setmovetarget(mov, &e->TargetPosition);
@@ -1405,9 +1394,9 @@ void __declspec(naked) entity_buildonsetpos_asm() {
 		ret;
 	};
 }
-bool shok_EGL_CGLEEntity::BuildOnSetPosFixMovement = false;
+bool EGL::CGLEEntity::BuildOnSetPosFixMovement = false;
 bool HookBuildOnSetPos_Hooked = false;
-void shok_EGL_CGLEEntity::HookBuildOnSetPos()
+void EGL::CGLEEntity::HookBuildOnSetPos()
 {
 	if (HookBuildOnSetPos_Hooked)
 		return;
@@ -1437,7 +1426,7 @@ void __declspec(naked) HookSetTaskListNonCancelable_asm() {
 	};
 }
 long long HookSetTaskListNonCancelable_backup = 0;
-void shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(bool active)
+void EGL::CGLEEntity::HookSetTaskListNonCancelable(bool active)
 {
 	shok::SaveVirtualProtect vp{ (void*)0x57B223, 10 };
 	if (active) {
@@ -1452,13 +1441,13 @@ void shok_EGL_CGLEEntity::HookSetTaskListNonCancelable(bool active)
 }
 
 
-shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_EGL_CGLEEntity* e)
+EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntity* e)
 {
 	EGL::CGLEEntityProps* ty = e->GetEntityType()->LogicProps;
 	if (typeid(*ty) != typeid(GGL::CEntityProperties))
 		return nullptr;
 	GGL::CEntityProperties* t = static_cast<GGL::CEntityProperties*>(ty);
-	shok_GGL_CResourceDoodadCreator c{};
+	GGL::CResourceDoodadCreator c{};
 	c.EntityType = t->ResourceEntity;
 	c.PlayerId = e->PlayerId;
 	c.Pos = e->Position;
@@ -1473,23 +1462,23 @@ shok_EGL_CGLEEntity* shok_EGL_CGLEEntity::ReplaceEntityWithResourceEntity(shok_E
 		c.ScriptName = nullptr;
 	}
 	int id = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
-	shok_EGL_CGLEEntity* r = shok_EGL_CGLEEntity::GetEntityByID(id);
+	EGL::CGLEEntity* r = EGL::CGLEEntity::GetEntityByID(id);
 	shok_EGL_CEventValue_int ev{ shok_EventIDs::ResourceTree_Init, e->EntityType };
-	((shok_vtable_EGL_CGLEEntity*)r->vtable)->FireEvent(r, &ev);
+	r->FireEvent(&ev);
 	e->Destroy();
 	return r;
 }
 
 
-std::map<int, entityAddonData> shok_EGL_CGLEEntity::AddonDataMap = std::map<int, entityAddonData>();
-entityAddonData shok_EGL_CGLEEntity::LastRemovedEntityAddonData = entityAddonData();
-void __fastcall destroyentity_gemoveadd(shok_EGL_CGLEEntity* e) {
+std::map<int, EGL::CGLEEntity::EntityAddonData> EGL::CGLEEntity::AddonDataMap = std::map<int, EGL::CGLEEntity::EntityAddonData>();
+EGL::CGLEEntity::EntityAddonData EGL::CGLEEntity::LastRemovedEntityAddonData = EGL::CGLEEntity::EntityAddonData();
+void __fastcall destroyentity_gemoveadd(EGL::CGLEEntity* e) {
 	shok_BB_CEvent ev{ shok_EventIDs::CppL_OnEntityDestroy };
 	e->FireEvent(&ev);
-	auto a = shok_EGL_CGLEEntity::AddonDataMap.find(e->EntityId);
-	if (a != shok_EGL_CGLEEntity::AddonDataMap.end()) {
-		shok_EGL_CGLEEntity::LastRemovedEntityAddonData = a->second;
-		shok_EGL_CGLEEntity::AddonDataMap.erase(a);
+	auto a = EGL::CGLEEntity::AddonDataMap.find(e->EntityId);
+	if (a != EGL::CGLEEntity::AddonDataMap.end()) {
+		EGL::CGLEEntity::LastRemovedEntityAddonData = a->second;
+		EGL::CGLEEntity::AddonDataMap.erase(a);
 	}
 }
 void __declspec(naked) destroyentityhook() {
@@ -1511,7 +1500,7 @@ void __declspec(naked) destroyentityhook() {
 
 }
 bool HookDestroyEntity_Hooked = false;
-void shok_EGL_CGLEEntity::HookDestroyEntity()
+void EGL::CGLEEntity::HookDestroyEntity()
 {
 	if (HookDestroyEntity_Hooked)
 		return;
@@ -1519,26 +1508,26 @@ void shok_EGL_CGLEEntity::HookDestroyEntity()
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57C94A), 10 };
 	WriteJump(reinterpret_cast<void*>(0x57C94A), &destroyentityhook);
 }
-entityAddonData* shok_EGL_CGLEEntity::GetAdditionalData(bool create)
+EGL::CGLEEntity::EntityAddonData* EGL::CGLEEntity::GetAdditionalData(bool create)
 {
-	auto a = shok_EGL_CGLEEntity::AddonDataMap.find(EntityId);
-	if (a != shok_EGL_CGLEEntity::AddonDataMap.end()) {
+	auto a = EGL::CGLEEntity::AddonDataMap.find(EntityId);
+	if (a != EGL::CGLEEntity::AddonDataMap.end()) {
 		return &a->second;
 	}
 	if (!create) {
 		return nullptr;
 	}
 	else {
-		shok_EGL_CGLEEntity::AddonDataMap[EntityId] = entityAddonData();
-		entityAddonData* r = &shok_EGL_CGLEEntity::AddonDataMap[EntityId];
+		EGL::CGLEEntity::AddonDataMap[EntityId] = EGL::CGLEEntity::EntityAddonData();
+		EGL::CGLEEntity::EntityAddonData* r = &EGL::CGLEEntity::AddonDataMap[EntityId];
 		r->EntityId = EntityId;
 		return r;
 	}
 }
-void shok_EGL_CGLEEntity::CloneAdditionalDataFrom(entityAddonData* other)
+void EGL::CGLEEntity::CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* other)
 {
 	if (other) {
-		entityAddonData* t = GetAdditionalData(true);
+		EGL::CGLEEntity::EntityAddonData* t = GetAdditionalData(true);
 		t->HealthOverride = other->HealthOverride;
 		t->HealthUseBoni = other->HealthUseBoni;
 		t->DamageOverride = other->DamageOverride;
@@ -1552,36 +1541,36 @@ void shok_EGL_CGLEEntity::CloneAdditionalDataFrom(entityAddonData* other)
 	}
 }
 
-void shok_EGL_CGLEEntity::AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs))
+void EGL::CGLEEntity::AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs))
 {
 	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
 	thand->vtable = 0x783D7C; // this is EGL::THandler<12,EGL::CGLETaskArgs,EGL::CGLETaskArgs,EGL::CGLEEntity,int>, but the func is always the same anyway...
 	thand->Object = obj;
 	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(Handler);
 	thand->Zero = 0;
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->AddTaskHandler(this, task, thand);
+	AddTaskHandler(task, thand);
 }
-void shok_EGL_CGLEEntity::AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek))
+void EGL::CGLEEntity::AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek))
 {
 	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
 	shand->vtable = 0x783D9C; // EGL::TStateHandler<EGL::CGLEEntity>
 	shand->Object = obj;
 	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(Handler);
 	shand->Zero = 0;
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->AddStateHandler(this, state, shand);
+	AddStateHandler(state, shand);
 }
-void shok_EGL_CGLEEntity::AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev))
+void EGL::CGLEEntity::AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev))
 {
 	shok_EGL_IGLEHandler_BB_CEvent_void* ehand = static_cast<shok_EGL_IGLEHandler_BB_CEvent_void*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_BB_CEvent_void)));
 	ehand->vtable = 0x774948; // EGL::THandler<81926, class BB::CEvent, class BB::CEvent, class GGL::CSerfBehavior, void>
 	ehand->Object = ob;
 	ehand->Func = reinterpret_cast<void(__thiscall*)(void*, shok_BB_CEvent*)>(Handler);
-	reinterpret_cast<shok_vtable_EGL_CGLEEntity*>(vtable)->AddEventHandler(this, ev, ehand);
+	AddEventHandler(ev, ehand);
 }
 
 float __fastcall entitygetdamagemod(GGL::CBattleBehavior* b) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(b->EntityId);
-	entityAddonData* d = e->GetAdditionalData(false);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(b->EntityId);
+	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->DamageOverride >= 0)
 		return static_cast<float>(d->DamageOverride);
 	else
@@ -1615,8 +1604,8 @@ void __declspec(naked) entitydamagemodbattlecalcsingletargetdmgasm() {
 	}
 }
 shok_EGL_CEventGetValue_int* __fastcall entitydamagemodeventautocannonasm(GGL::CAutoCannonBehavior* th, int, shok_EGL_CEventGetValue_int* ev) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
-	entityAddonData* d = e->GetAdditionalData(false);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
+	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->DamageOverride >= 0)
 		ev->Data = d->DamageOverride;
 	else
@@ -1633,7 +1622,7 @@ void __declspec(naked) entitydamagemodbattleprojectile() {
 		mov[ebp - 0x28], eax; // creator source player
 		mov[ebp - 0x5C], eax; // creator player
 
-		call shok_EGL_CGLEEntity::EventGetDamage;
+		call EGL::CGLEEntity::EventGetDamage;
 		push 0x50C3F7;
 		ret;
 
@@ -1659,7 +1648,7 @@ void __declspec(naked) entitydamagemodautocannonprojectileasm() {
 		mov ecx, edi;
 		mov eax, [ecx + 6 * 4]; // player
 		mov[ebp - 0x38], eax; // source player
-		call shok_EGL_CGLEEntity::EventGetDamage;
+		call EGL::CGLEEntity::EventGetDamage;
 		mov[ebp - 0x44], eax; // damage
 
 		pop ecx;
@@ -1669,7 +1658,7 @@ void __declspec(naked) entitydamagemodautocannonprojectileasm() {
 	}
 }
 bool HookDamageMod_Hooked = false;
-void shok_EGL_CGLEEntity::HookDamageMod()
+void EGL::CGLEEntity::HookDamageMod()
 {
 	if (HookDamageMod_Hooked)
 		return;
@@ -1682,8 +1671,8 @@ void shok_EGL_CGLEEntity::HookDamageMod()
 	WriteJump(reinterpret_cast<void*>(0x51076C), &entitydamagemodautocannonprojectileasm);
 }
 
-int __fastcall entityarmormod(shok_EGL_CGLEEntity* e) {
-	entityAddonData* d = e->GetAdditionalData(false);
+int __fastcall entityarmormod(EGL::CGLEEntity* e) {
+	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->ArmorOverride >= 0)
 		return d->ArmorOverride;
 	GGlue::CGlueEntityProps* p = e->GetEntityType();
@@ -1722,7 +1711,7 @@ void __declspec(naked) entityarmormodbuildingrasm() {
 	}
 }
 bool HookArmorMod_Hooked = false;
-void shok_EGL_CGLEEntity::HookArmorMod()
+void EGL::CGLEEntity::HookArmorMod()
 {
 	if (HookArmorMod_Hooked)
 		return;
@@ -1733,8 +1722,8 @@ void shok_EGL_CGLEEntity::HookArmorMod()
 	WriteJump(reinterpret_cast<void*>(0x4AB160), &entityarmormodbuildingrasm);
 }
 
-float __fastcall entityexplmod(shok_EGL_CGLEEntity* e) {
-	entityAddonData* d = e->GetAdditionalData(false);
+float __fastcall entityexplmod(EGL::CGLEEntity* e) {
+	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->ExplorationOverride >= 0.0f)
 		return d->ExplorationOverride;
 	return e->GetEntityType()->LogicProps->Exploration;
@@ -1767,7 +1756,7 @@ void __declspec(naked) entityexplmodbuildasm() {
 	}
 }
 bool HookExplorationMod_Hooked = false;
-void shok_EGL_CGLEEntity::HookExplorationMod()
+void EGL::CGLEEntity::HookExplorationMod()
 {
 	if (HookExplorationMod_Hooked)
 		return;
@@ -1778,29 +1767,29 @@ void shok_EGL_CGLEEntity::HookExplorationMod()
 	WriteJump(reinterpret_cast<void*>(0x4AB199), &entityexplmodbuildasm);
 }
 
-int shok_GGL_CSettler::LeaderGetRegenHealth()
+int GGL::CSettler::LeaderGetRegenHealth()
 {
-	entityAddonData* d = GetAdditionalData(false);
+	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
 	if (d && d->RegenHPOverride >= 0)
 		return d->RegenHPOverride;
 	else
 		return GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->HealingPoints;
 }
-int shok_GGL_CSettler::LeaderGetRegenHealthSeconds()
+int GGL::CSettler::LeaderGetRegenHealthSeconds()
 {
-	entityAddonData* d = GetAdditionalData(false);
+	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
 	if (d && d->RegenSecondsOverride >= 0)
 		return d->RegenSecondsOverride;
 	else
 		return GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->HealingSeconds;
 }
-static inline void(__thiscall* const settler_killbyenviro)(shok_GGL_CSettler* th) = reinterpret_cast<void(__thiscall*)(shok_GGL_CSettler*)>(0x4A5049);
-void shok_GGL_CSettler::KillSettlerByEnvironment()
+static inline void(__thiscall* const settler_killbyenviro)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x4A5049);
+void GGL::CSettler::KillSettlerByEnvironment()
 {
 	settler_killbyenviro(this);
 }
 
-void shok_EGL_CGLEEntity::PerformHeal(int r, bool healSoldiers)
+void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)
 {
 	int hp = Health, mhp = GetMaxHealth();
 	if (hp <= 0)
@@ -1827,19 +1816,19 @@ void shok_EGL_CGLEEntity::PerformHeal(int r, bool healSoldiers)
 	}
 }
 
-bool shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers = false;
+bool EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 void __fastcall leaderregen(GGL::CLeaderBehavior* th) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 	th->SecondsSinceHPRefresh = 0;
 	int hp = e->Health, mhp = e->GetMaxHealth();
 	if (hp <= 0)
 		return;
-	int r = static_cast<shok_GGL_CSettler*>(e)->LeaderGetRegenHealth();
-	e->PerformHeal(r, shok_EGL_CGLEEntity::LeaderRegenRegenerateSoldiers);
+	int r = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealth();
+	e->PerformHeal(r, EGL::CGLEEntity::LeaderRegenRegenerateSoldiers);
 }
 void __fastcall leaderregenseconds(GGL::CLeaderBehavior* th) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
-	int max = static_cast<shok_GGL_CSettler*>(e)->LeaderGetRegenHealthSeconds();
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
+	int max = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealthSeconds();
 	th->SecondsSinceHPRefresh++;
 	if (th->SecondsSinceHPRefresh >= max)
 		leaderregen(th);
@@ -1853,7 +1842,7 @@ void __declspec(naked) leaderregensecondsasm() {
 	}
 }
 bool HookLeaderRegen_Hooked = false;
-void shok_EGL_CGLEEntity::HookLeaderRegen()
+void EGL::CGLEEntity::HookLeaderRegen()
 {
 	if (HookLeaderRegen_Hooked)
 		return;
@@ -1865,8 +1854,8 @@ void shok_EGL_CGLEEntity::HookLeaderRegen()
 }
 
 float __fastcall leadermaxrange(GGL::CBattleBehavior* th) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
-	entityAddonData* d = e->GetAdditionalData(false);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
+	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->MaxRangeOverride >= 0)
 		return d->MaxRangeOverride;
 	else
@@ -1886,8 +1875,8 @@ void __declspec(naked) leadermaxrangeasm() {
 	}
 }
 float __fastcall autocannonmaxrange(GGL::CAutoCannonBehavior* th) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
-	entityAddonData* d = e->GetAdditionalData(false);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
+	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->MaxRangeOverride >= 0)
 		return d->MaxRangeOverride;
 	else
@@ -1907,7 +1896,7 @@ void __declspec(naked) autocannonmaxrangeasm() {
 	}
 }
 bool HookMaxRange_Hooked = false;
-void shok_EGL_CGLEEntity::HookMaxRange()
+void EGL::CGLEEntity::HookMaxRange()
 {
 	if (HookMaxRange_Hooked)
 		return;
@@ -1921,23 +1910,23 @@ void shok_EGL_CGLEEntity::HookMaxRange()
 const char* __stdcall entitydisplayname(int* e, int type) {
 	// lots of hacks to recover that entity pointer in a safe way
 	// there are 2 branches that can end up calling this, with 2 different pointers in eax
-	int d[5] = { shok_EGL_CGLEEntity::vtp_IEntityDisplay, shok_GGL_CSettler::vtp_IEntityDisplay, shok_GGL_CBuilding::vtp_IEntityDisplay,
-		shok_GGL_CResourceDoodad::vtp_IEntityDisplay, shok_GGL_CBridgeEntity::vtp_IEntityDisplay
+	int d[5] = { EGL::CGLEEntity::vtp_IEntityDisplay, GGL::CSettler::vtp_IEntityDisplay, GGL::CBuilding::vtp_IEntityDisplay,
+		GGL::CResourceDoodad::vtp_IEntityDisplay, GGL::CBridgeEntity::vtp_IEntityDisplay
 	};
-	shok_EGL_CGLEEntity* ent = nullptr;
+	EGL::CGLEEntity* ent = nullptr;
 	if (contains(d, *e, 5)) {
-		ent = reinterpret_cast<shok_EGL_CGLEEntity*>(e - 1);
+		ent = reinterpret_cast<EGL::CGLEEntity*>(e - 1);
 	}
 	else {
-		int d2[5] = { shok_EGL_CGLEEntity::vtp, shok_GGL_CSettler::vtp, shok_GGL_CBuilding::vtp,
-			shok_GGL_CResourceDoodad::vtp, shok_GGL_CBridgeEntity::vtp
+		int d2[5] = { EGL::CGLEEntity::vtp, GGL::CSettler::vtp, GGL::CBuilding::vtp,
+			GGL::CResourceDoodad::vtp, GGL::CBridgeEntity::vtp
 		};
 		if (contains(d2, *e, 5)) {
-			ent = reinterpret_cast<shok_EGL_CGLEEntity*>(e);
+			ent = reinterpret_cast<EGL::CGLEEntity*>(e);
 		}
 	}
 	if (ent) {
-		entityAddonData* d = ent->GetAdditionalData(false);
+		EGL::CGLEEntity::EntityAddonData* d = ent->GetAdditionalData(false);
 		if (d && d->NameOverride.size() > 0) {
 			return d->NameOverride.c_str();
 		}
@@ -1955,7 +1944,7 @@ void __declspec(naked) entitydisplaynameasm() {
 	}
 }
 bool HookDisplayName_Hooked = false;
-void shok_EGL_CGLEEntity::HookDisplayName()
+void EGL::CGLEEntity::HookDisplayName()
 {
 	if (HookDisplayName_Hooked)
 		return;
@@ -1965,7 +1954,7 @@ void shok_EGL_CGLEEntity::HookDisplayName()
 }
 
 void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
-	shok_EGL_CGLEEntity* e = shok_EGL_CGLEEntity::GetEntityByID(th->EntityId);
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 	GGL::CRangedEffectAbilityProps* pr = e->GetEntityType()->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
 	float hpfact = pr->HealthRecoveryFactor;
 	if (hpfact <= 0)
@@ -1975,7 +1964,7 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 	ecr.EffectType = pr->HealEffect;
 	e->ObservedEntities.ForAll([hpfact, &ecr](shok::Attachment* a) {
 		if (a->AttachmentType == shok::AttachmentType::HERO_AFFECTED) {
-			shok_EGL_CGLEEntity* toheal = shok_EGL_CGLEEntity::GetEntityByID(a->EntityId);
+			EGL::CGLEEntity* toheal = EGL::CGLEEntity::GetEntityByID(a->EntityId);
 			if (!toheal)
 				return;
 			float heal = toheal->GetMaxHealth() * hpfact;
@@ -1985,7 +1974,7 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 				(*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
 			}
 			if (toheal->GetBehavior<GGL::CSoldierBehavior>()) {
-				toheal = shok_EGL_CGLEEntity::GetEntityByID(static_cast<shok_GGL_CSettler*>(toheal)->LeaderId);
+				toheal = EGL::CGLEEntity::GetEntityByID(static_cast<GGL::CSettler*>(toheal)->LeaderId);
 			}
 			if (!toheal)
 				return;
@@ -1993,7 +1982,7 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 		}
 		});
 }
-void shok_EGL_CGLEEntity::HookRangedEffectActivateHeal(bool hookActive)
+void EGL::CGLEEntity::HookRangedEffectActivateHeal(bool hookActive)
 {
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4E3C78), 10 };
 	if (hookActive)

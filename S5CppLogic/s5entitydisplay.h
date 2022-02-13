@@ -140,7 +140,7 @@ struct shok_ED_CDisplayBehaviorAnimation : shok_ED_CDisplayBehaviorAnimationNoBl
 
 struct shok_modelinstance;
 struct shok_ED_CEntity : shok_BB_IObject {
-	shok_EGL_IEntityDisplay* Entity;
+	EGL::IEntityDisplay* Entity;
 	int EntityID;
 	int ModelOverrideID;
 	shok_modelinstance* Model;
@@ -165,7 +165,7 @@ struct shok_ED_CEntity : shok_BB_IObject {
 		return nullptr;
 	}
 
-	void SetPositionData(shok_EGL_IEntityDisplay::posdata* d);
+	void SetPositionData(EGL::IEntityDisplay::posdata* d);
 	void ResetPositionData();
 
 	static inline constexpr int vtp = 0x76A494;
@@ -191,7 +191,7 @@ struct shok_ED_CVisibleEntityManager : shok_object {
 
 	static inline constexpr int vtp = 0x76A1A4;
 
-	shok_ED_CEntity* CreateDisplayForEntity(shok_EGL_IEntityDisplay* e);
+	shok_ED_CEntity* CreateDisplayForEntity(EGL::IEntityDisplay* e);
 	shok_ED_CEntity* GetDisplayForEntity(int eid);
 	void DestroyDisplayForEntity(int eid);
 };

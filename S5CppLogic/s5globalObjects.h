@@ -288,7 +288,7 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 	static inline constexpr int vtp = 0x7839CC;
 
 	int CreateEffect(shok_EGL_CGLEEffectCreator* data);
-	int CreateEntity(shok_EGL_CGLEEntityCreator* cr);
+	int CreateEntity(EGL::CGLEEntityCreator* cr);
 	int GetTimeMS();
 	int GetTick();
 
@@ -348,11 +348,11 @@ struct shok_EGL_CGLEEntityManager : shok_object {
 private:
 	struct {
 		PADDINGI(1); // some type of flags
-		shok_EGL_CGLEEntity* entity;
+		EGL::CGLEEntity* entity;
 	} Entities[1];
 
 public:
-	shok_EGL_CGLEEntity* GetEntityByNum(int num);
+	EGL::CGLEEntity* GetEntityByNum(int num);
 
 	static inline constexpr int vtp = 0x783B70;
 

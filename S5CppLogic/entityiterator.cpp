@@ -13,17 +13,17 @@ void EntityIterator::Reset()
 	current = 0;
 }
 
-shok_EGL_CGLEEntity* EntityIterator::GetNext(float* rangeOut, int* prio)
+EGL::CGLEEntity* EntityIterator::GetNext(float* rangeOut, int* prio)
 {
 	return GetNext(current, rangeOut, prio);
 }
-shok_EGL_CGLEEntity* EntityIterator::GetNext(int& icurr, float* rangeOut, int* prio) const
+EGL::CGLEEntity* EntityIterator::GetNext(int& icurr, float* rangeOut, int* prio) const
 {
 	shok_EGL_CGLEEntityManager* eman = *shok_EGL_CGLEEntityManager::GlobalObj;
 	while (true) {
 		if (icurr > eman->EntityCount)
 			return nullptr;
-		shok_EGL_CGLEEntity* e = eman->GetEntityByNum(icurr);
+		EGL::CGLEEntity* e = eman->GetEntityByNum(icurr);
 		icurr++;
 		if (e != nullptr && Predicate->MatchesEntity(e, rangeOut, prio))
 			return e;
@@ -31,7 +31,7 @@ shok_EGL_CGLEEntity* EntityIterator::GetNext(int& icurr, float* rangeOut, int* p
 	return nullptr;
 }
 
-shok_EGL_CGLEEntity* EntityIterator::Iter::operator*() const {
+EGL::CGLEEntity* EntityIterator::Iter::operator*() const {
 	return e;
 }
 bool EntityIterator::Iter::operator==(const Iter& o) const {
@@ -41,7 +41,7 @@ bool EntityIterator::Iter::operator!=(const Iter& o) const {
 	return !(*this == o);
 }
 EntityIterator::Iter& EntityIterator::Iter::operator++() {
-	shok_EGL_CGLEEntity* e = I->GetNext(curr, nullptr, nullptr);
+	EGL::CGLEEntity* e = I->GetNext(curr, nullptr, nullptr);
 	this->e = e;
 	if (!e)
 		curr = 0;
@@ -52,7 +52,7 @@ EntityIterator::Iter EntityIterator::Iter::operator++(int) {
 	++(*this);
 	return r;
 }
-EntityIterator::Iter::Iter(const EntityIterator& i, int c, shok_EGL_CGLEEntity* e)
+EntityIterator::Iter::Iter(const EntityIterator& i, int c, EGL::CGLEEntity* e)
 {
 	I = &i;
 	curr = c;
@@ -69,9 +69,9 @@ EntityIterator::Iter EntityIterator::end() const
 	return { *this, 0, nullptr }; // 0 is guranteed to not be an entity
 }
 
-shok_EGL_CGLEEntity* EntityIterator::GetNearest(float* rangeOut)
+EGL::CGLEEntity* EntityIterator::GetNearest(float* rangeOut)
 {
-	shok_EGL_CGLEEntity* curr, * ret = nullptr;
+	EGL::CGLEEntity* curr, * ret = nullptr;
 	float currR = -1, maxR = -1;
 	int currPrio = -1, maxPrio = -1;
 	Reset();
@@ -90,9 +90,9 @@ shok_EGL_CGLEEntity* EntityIterator::GetNearest(float* rangeOut)
 		*rangeOut = maxR;
 	return ret;
 }
-shok_EGL_CGLEEntity* EntityIterator::GetFurthest(float* rangeOut)
+EGL::CGLEEntity* EntityIterator::GetFurthest(float* rangeOut)
 {
-	shok_EGL_CGLEEntity* curr, * ret = nullptr;
+	EGL::CGLEEntity* curr, * ret = nullptr;
 	float currR = -1, maxR = -1;
 	int currPrio = -1, maxPrio = -1;
 	Reset();
@@ -117,12 +117,12 @@ EntityIteratorPredicateOfType::EntityIteratorPredicateOfType(int etype)
 	type = etype;
 }
 
-bool EntityIteratorPredicateOfType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateOfType::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return e->EntityType == type;
 }
 
-bool EntityIteratorPredicateOfPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateOfPlayer::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return e->PlayerId == player;
 }
@@ -132,7 +132,7 @@ EntityIteratorPredicateOfPlayer::EntityIteratorPredicateOfPlayer(int player)
 	this->player = player;
 }
 
-bool EntityIteratorPredicateAnd::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateAnd::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	for (int i = 0; i < numPreds; i++) {
 		if (!predicates[i]->MatchesEntity(e, rangeOut, prio))
@@ -147,7 +147,7 @@ EntityIteratorPredicateAnd::EntityIteratorPredicateAnd(EntityIteratorPredicate**
 	this->numPreds = numPreds;
 }
 
-bool EntityIteratorPredicateOr::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateOr::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	for (int i = 0; i < numPreds; i++) {
 		if (predicates[i]->MatchesEntity(e, rangeOut, prio))
@@ -162,7 +162,7 @@ EntityIteratorPredicateOr::EntityIteratorPredicateOr(EntityIteratorPredicate** t
 	this->numPreds = numPreds;
 }
 
-bool EntityIteratorPredicateInCircle::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateInCircle::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	float ran = p.GetDistanceSquaredTo(e->Position);
 	if (rangeOut != nullptr)
@@ -181,22 +181,22 @@ EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(const shok::Pos
 	this->r = r * r;
 }
 
-bool EntityIteratorPredicateIsSettler::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateIsSettler::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e);
+	return shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e);
 }
 
-bool EntityIteratorPredicateIsBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateIsBuilding::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(e);
+	return shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(e);
 }
 
-bool EntityIteratorPredicateIsRelevant::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateIsRelevant::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return e->PlayerId != 0 && (shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(e) || shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CBuilding>(e));
+	return e->PlayerId != 0 && (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e) || shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(e));
 }
 
-bool EntityIteratorPredicateAnyPlayer::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateAnyPlayer::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	int pl = e->PlayerId;
 	for (int i = 0; i < numPlayers; i++) {
@@ -224,7 +224,7 @@ EntityIteratorPredicateAnyPlayer::EntityIteratorPredicateAnyPlayer(int* pl, int 
 	this->numPlayers = numPlayers;
 }
 
-bool EntityIteratorPredicateAnyEntityType::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateAnyEntityType::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	int pl = e->EntityType;
 	for (size_t i = 0; i < numTypes; i++) {
@@ -240,12 +240,12 @@ EntityIteratorPredicateAnyEntityType::EntityIteratorPredicateAnyEntityType(const
 	numTypes = numTy;
 }
 
-bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateIsNotSoldier::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return e->GetBehavior<GGL::CSoldierBehavior>() == nullptr;
 }
 
-bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateOfEntityCategory::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return e->IsEntityInCategory(category);
 }
@@ -255,7 +255,7 @@ EntityIteratorPredicateOfEntityCategory::EntityIteratorPredicateOfEntityCategory
 	category = cat;
 }
 
-bool EntityIteratorPredicateProvidesResource::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateProvidesResource::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return e->GetResourceProvided() == resource;
 }
@@ -265,7 +265,7 @@ EntityIteratorPredicateProvidesResource::EntityIteratorPredicateProvidesResource
 	resource = res;
 }
 
-bool EntityIteratorPredicateInRect::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateInRect::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return low.X <= e->Position.X && e->Position.X <= high.X && low.Y <= e->Position.Y && e->Position.Y <= high.Y;
 }
@@ -282,7 +282,7 @@ EntityIteratorPredicateInRect::EntityIteratorPredicateInRect(const shok::AARect&
 {
 }
 
-bool EntityIteratorPredicateNot::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateNot::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return !predicate->MatchesEntity(e, rangeOut, prio);
 }
@@ -292,7 +292,7 @@ EntityIteratorPredicateNot::EntityIteratorPredicateNot(EntityIteratorPredicate* 
 	predicate = pred;
 }
 
-bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateIsVisible::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	GGL::CCamouflageBehavior* c = e->GetBehavior<GGL::CCamouflageBehavior>();
 	if (c != nullptr) {
@@ -301,7 +301,7 @@ bool EntityIteratorPredicateIsVisible::MatchesEntity(shok_EGL_CGLEEntity* e, flo
 	return true;
 }
 
-bool EntityIteratorPredicateOfUpgradeCategory::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateOfUpgradeCategory::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	GGlue::CGlueEntityProps* t = e->GetEntityType();
 	if (t->IsBuildingType()) {
@@ -320,23 +320,23 @@ EntityIteratorPredicateOfUpgradeCategory::EntityIteratorPredicateOfUpgradeCatego
 	category = cat;
 }
 
-bool EntityIteratorPredicateIsAlive::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateIsAlive::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return !shok_EGL_CGLEEntity::EntityIDIsDead(e->EntityId); // performance improvement by not doing obj -> id ->obj ?
+	return !EGL::CGLEEntity::EntityIDIsDead(e->EntityId); // performance improvement by not doing obj -> id ->obj ?
 }
 
-bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return IsNotFleeingFrom(e, Center, Range);
 }
 
-bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(shok_EGL_CGLEEntity* e, shok::Position Center, float Range)
+bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(EGL::CGLEEntity* e, shok::Position Center, float Range)
 {
-	if (!shok_DynamicCast<shok_EGL_CGLEEntity, shok_EGL_CMovingEntity>(e))
+	if (!shok_DynamicCast<EGL::CGLEEntity, EGL::CMovingEntity>(e))
 		return true;
 	if (e->GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED) != 0)
 		return false;
-	shok_EGL_CMovingEntity* me = (shok_EGL_CMovingEntity*)e;
+	EGL::CMovingEntity* me = (EGL::CMovingEntity*)e;
 	float dx1 = Center.X - e->Position.X;
 	float dy1 = Center.Y - e->Position.Y;
 	float dx2 = Center.X - me->TargetPosition.X;
@@ -350,16 +350,16 @@ EntityIteratorPredicateIsNotFleeingFrom::EntityIteratorPredicateIsNotFleeingFrom
 	Range = r;
 }
 
-bool EntityIteratorPredicateFunc::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateFunc::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return func(e);
 }
-EntityIteratorPredicateFunc::EntityIteratorPredicateFunc(std::function<bool(shok_EGL_CGLEEntity* e)> f)
+EntityIteratorPredicateFunc::EntityIteratorPredicateFunc(std::function<bool(EGL::CGLEEntity* e)> f)
 {
 	func = f;
 }
 
-bool EntityIteratorPredicatePriority::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicatePriority::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	if (prio && Pred->MatchesEntity(e, rangeOut, nullptr))
 		*prio = Prio;
@@ -371,7 +371,7 @@ EntityIteratorPredicatePriority::EntityIteratorPredicatePriority(int prio, Entit
 	Pred = pred;
 }
 
-bool EntityIteratorPredicateNotInBuilding::MatchesEntity(shok_EGL_CGLEEntity* e, float* rangeOut, int* prio) const
+bool EntityIteratorPredicateNotInBuilding::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return !e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) && !e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE);
 }

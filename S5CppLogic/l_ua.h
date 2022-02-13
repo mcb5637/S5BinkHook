@@ -55,20 +55,20 @@ public:
 	~UnlimitedArmy();
 	void CalculatePos();
 	void Tick();
-	void AddLeader(shok_EGL_CGLEEntity* e);
+	void AddLeader(EGL::CGLEEntity* e);
 	void OnIdChanged(int ol, int ne);
 	int GetSize(bool transit, bool hero);
-	void RemoveLeader(shok_EGL_CGLEEntity* e);
+	void RemoveLeader(EGL::CGLEEntity* e);
 	bool IsIdle();
-	bool IsRanged(shok_EGL_CGLEEntity* e);
-	bool IsNonCombat(shok_EGL_CGLEEntity* e);
+	bool IsRanged(EGL::CGLEEntity* e);
+	bool IsNonCombat(EGL::CGLEEntity* e);
 
-	static shok_EGL_CGLEEntity* GetNearestTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
-	static shok_EGL_CGLEEntity* GetNearestSettlerInArea(int player, shok::Position& p, float ran, bool notFleeing);
-	shok_EGL_CGLEEntity* GetNearestBuildingInArea(int player, shok::Position& p, float ran);
-	shok_EGL_CGLEEntity* GetNearestBridgeInArea(shok::Position& p, float r);
-	shok_EGL_CGLEEntity* GetNearestSnipeTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
-	shok_EGL_CGLEEntity* GetFurthestConversionTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	static EGL::CGLEEntity* GetNearestTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	static EGL::CGLEEntity* GetNearestSettlerInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	EGL::CGLEEntity* GetNearestBuildingInArea(int player, shok::Position& p, float ran);
+	EGL::CGLEEntity* GetNearestBridgeInArea(shok::Position& p, float r);
+	EGL::CGLEEntity* GetNearestSnipeTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
+	EGL::CGLEEntity* GetFurthestConversionTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
 	static int CountTargetsInArea(int player, shok::Position& p, float ran, bool notFleeing);
 
 
@@ -79,9 +79,9 @@ private:
 	void CheckTransit();
 	bool IsTargetValid(int id);
 	void CheckStatus(UAStatus status);
-	bool LeaderIsMoving(shok_EGL_CGLEEntity* e);
-	bool LeaderIsIdle(shok_EGL_CGLEEntity* e);
-	bool LeaderIsInBattle(shok_EGL_CGLEEntity* e);
+	bool LeaderIsMoving(EGL::CGLEEntity* e);
+	bool LeaderIsIdle(EGL::CGLEEntity* e);
+	bool LeaderIsInBattle(EGL::CGLEEntity* e);
 	void BattleCommand();
 	void MoveCommand();
 	void FormationCommand();
@@ -89,8 +89,8 @@ private:
 	void CallCommandQueue();
 	void CallSpawner();
 	void NormalizeSpeed(bool normalize, bool force);
-	bool ExecuteHeroAbility(shok_EGL_CGLEEntity* e);
-	bool ExecutePrepDefense(shok_EGL_CGLEEntity* e);
+	bool ExecuteHeroAbility(EGL::CGLEEntity* e);
+	bool ExecutePrepDefense(EGL::CGLEEntity* e);
 	bool CheckTargetCache(int id, int count);
 	void UpdateTargetCache(int id, int time);
 

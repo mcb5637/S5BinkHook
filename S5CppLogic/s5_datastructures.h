@@ -7,7 +7,7 @@
 namespace shok {
 
 	template<class T>
-	class Set { // todo iterators
+	class Set {
 	private:
 		struct TreeNode {
 			TreeNode* left, * parent, * right;
@@ -99,6 +99,7 @@ namespace shok {
 		}
 
 	};
+	static_assert(sizeof(Set<int>) == 3 * 4);
 
 
 	struct String {

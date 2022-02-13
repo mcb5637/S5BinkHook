@@ -22,7 +22,7 @@ namespace EGL {
 		virtual int OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
 		virtual int OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
 	private:
-		virtual void unknownFuncBeh1(shok_EGL_CGLEEntity* e) = 0; // on movement seems to copy a lot of data, maybe change behavior?
+		virtual void unknownFuncBeh1(EGL::CGLEEntity* e) = 0; // on movement seems to copy a lot of data, maybe change behavior?
 		virtual void unknownFuncBeh2(int uk) = 0;
 
 	public:
@@ -336,7 +336,7 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x0D167211D;
 
 		static void OverrideSnipeTask();
-		static int (*SnipeDamageOverride)(shok_EGL_CGLEEntity* sniper, shok_EGL_CGLEEntity* tar, int dmg);
+		static int (*SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg);
 	};
 
 	class CMotivateWorkersAbility : public GGL::CHeroAbility {
@@ -1101,7 +1101,7 @@ namespace GGL {
 		shok::Position CalcPositionFromFloat(float f);
 
 		virtual ~CPositionAtResourceFinder() = default;
-		virtual float SearchForPosition(shok_EGL_CGLEEntity* e) = 0;
+		virtual float SearchForPosition(EGL::CGLEEntity* e) = 0;
 	private:
 		virtual void GetPositionOffset(shok::Position* out, float f) = 0;
 	public:

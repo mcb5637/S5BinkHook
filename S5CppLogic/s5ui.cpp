@@ -136,7 +136,7 @@ shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosBuildOn(i
 	EntityIteratorPredicateOfPlayer predpl{ 0 };
 	EntityIteratorPredicateAnyEntityType predety{ bp->BuildOn.data(), bp->BuildOn.size() };
 	EntityIteratorPredicateInCircle predcir{ p, range };
-	EntityIteratorPredicateFunc predfunc{ [](shok_EGL_CGLEEntity* e) {
+	EntityIteratorPredicateFunc predfunc{ [](EGL::CGLEEntity* e) {
 			return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == 0;
 	} };
 	EntityIteratorPredicate* preds[] = { &predpl, &predety, &predcir, &predfunc };

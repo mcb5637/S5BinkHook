@@ -40,7 +40,7 @@ float additionalTechModifier::ModifyValue(float i)
 }
 
 std::vector<additionalTechModifier> ConstructionSpeedModifiers = std::vector<additionalTechModifier>();
-float __fastcall constructionsite_getprogresspertick_hook(shok_GGL_CBuilding* th) { // param is constructionsite, just not done yet ;)
+float __fastcall constructionsite_getprogresspertick_hook(GGL::CBuilding* th) { // param is constructionsite, just not done yet ;)
 	GGL::CGLSettlerProps* serf = (GGL::CGLSettlerProps*)(*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf)->LogicProps;
 	GGL::CGLBuildingProps* bty = (GGL::CGLBuildingProps*)(*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(th->ConstructionSiteType)->LogicProps;
 	float constructionfactor = serf->BuildFactor;

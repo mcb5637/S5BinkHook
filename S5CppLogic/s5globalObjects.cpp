@@ -21,7 +21,7 @@ struct shok_vtable_EGL_CTiling {
 
 struct shok_vtable_EGL_CGLEGameLogic {
 	PADDINGI(22);
-	int(__thiscall* CreateEntity)(shok_EGL_CGLEGameLogic* th, shok_EGL_CGLEEntityCreator* data, int i); // 22
+	int(__thiscall* CreateEntity)(shok_EGL_CGLEGameLogic* th, EGL::CGLEEntityCreator* data, int i); // 22
 	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, shok_EGL_CGLEEffectCreator* data); // 23
 };
 
@@ -352,7 +352,7 @@ void __declspec(naked) hiresbridgearea_somewaterregionfunc() {
 		ret;
 	};
 }
-void __fastcall shok_bridge_applyheight(shok_GGL_CBridgeEntity* th) {
+void __fastcall shok_bridge_applyheight(GGL::CBridgeEntity* th) {
 	GGL::CBridgeProperties* p = static_cast<GGL::CBridgeProperties*>(th->GetEntityType()->LogicProps);
 	auto* lr = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes;
 	int h = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(th->Position) + p->Height;
@@ -542,10 +542,10 @@ void shok_EGL_CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p,
 	EntityIteratorPredicateInRect rec{ p.X + ar.low.X, p.Y + ar.low.Y, p.X + ar.high.X - 100, p.Y + ar.high.Y - 100 };
 	EntityIterator it{ &rec };
 	for (auto* ent : it) {
-		if (shok_GGL_CSettler* s = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CSettler>(ent)) {
+		if (GGL::CSettler* s = shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(ent)) {
 			s->KillSettlerByEnvironment();
 		}
-		else if (shok_GGL_CAnimal* a = shok_DynamicCast<shok_EGL_CGLEEntity, shok_GGL_CAnimal>(ent)) {
+		else if (GGL::CAnimal* a = shok_DynamicCast<EGL::CGLEEntity, GGL::CAnimal>(ent)) {
 			if (!a->GetFirstAttachedToMe(shok::AttachmentType::HERO_HAWK))
 				a->Destroy();
 		}
@@ -734,7 +734,7 @@ int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
 	return reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable)->CreateEffect(this, data);
 }
 
-int shok_EGL_CGLEGameLogic::CreateEntity(shok_EGL_CGLEEntityCreator* cr)
+int shok_EGL_CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
 {
 	return reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable)->CreateEntity(this, cr, 1);
 }
@@ -804,7 +804,7 @@ float shok_ED_CLandscape::GetWaterHeightAtPos(const shok::Position& p)
 	return reinterpret_cast<shok_vtable_ED_CLandscape*>(vtable)->GetWaterHeightAtPos(this, p.X, p.Y);
 }
 
-shok_EGL_CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
+EGL::CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 {
 	if (EntityCount <= num)
 		return nullptr;

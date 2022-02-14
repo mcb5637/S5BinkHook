@@ -111,9 +111,6 @@
     <ClInclude Include="s5RWEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s5entitydisplay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Luapp\constexprTypename.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -147,10 +144,13 @@
     <ClInclude Include="s5_entitytype.h">
       <Filter>shok\entitytype</Filter>
     </ClInclude>
-    <ClInclude Include="s5behaviors.h">
+    <ClInclude Include="s5_behaviors.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
-    <ClInclude Include="s5entity.h">
+    <ClInclude Include="s5_entity.h">
+      <Filter>shok\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="s5entitydisplay.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
   </ItemGroup>
@@ -233,9 +233,6 @@
     <ClCompile Include="s5ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="s5entitydisplay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Luapp\luapp50.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -251,10 +248,13 @@
     <ClCompile Include="s5_entitytype.cpp">
       <Filter>shok\entitytype</Filter>
     </ClCompile>
-    <ClCompile Include="s5behaviors.cpp">
+    <ClCompile Include="s5_behaviors.cpp">
       <Filter>shok\entity</Filter>
     </ClCompile>
-    <ClCompile Include="s5entity.cpp">
+    <ClCompile Include="s5_entity.cpp">
+      <Filter>shok\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="s5entitydisplay.cpp">
       <Filter>shok\entity</Filter>
     </ClCompile>
   </ItemGroup>

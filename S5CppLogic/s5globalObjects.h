@@ -746,7 +746,7 @@ struct shok_ED_CGlobalsBaseEx : shok_object {
 	PADDINGI(1); // p to ED::COcclusionEffect
 	PADDINGI(1); // p to ED::COrnamentalItems
 	shok_ED_CPlayerColors* PlayerColors; // 22
-	PADDINGI(3);
+	PADDINGI(3); // 25 p ED::CRenderSettingsEx
 	shok_ED_CResourceManager* ResManager; // 26
 	PADDINGI(7);
 	shok_ED_CWorld* DisplayWorld;

@@ -667,7 +667,7 @@ int l_logicHookHurtEntity(lua_State* L) {
 		lua_pushvalue(L, 2);
 		lua_rawset(L, LUA_REGISTRYINDEX);
 
-		EGL::CGLEEntity::HurtEntityOnKillCb = [](EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) {
+		EGL::CGLEEntity::HurtEntityOnKillCb = [](EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, CppLogic::AdvancedDealDamageSource sourc) {
 			lua_State* L = *shok_luastate_game;
 
 			int t = lua_gettop(L);

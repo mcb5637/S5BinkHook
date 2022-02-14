@@ -786,15 +786,15 @@ void EGL::CGLEEntity::HookCamoActivate()
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
 int* EGL::CGLEEntity::HurtEntityDamagePointer = nullptr;
 bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
-AdvancedDealDamageSource EGL::CGLEEntity::HurtEntityDamageSource = AdvancedDealDamageSource::Unknown;
+CppLogic::AdvancedDealDamageSource EGL::CGLEEntity::HurtEntityDamageSource = CppLogic::AdvancedDealDamageSource::Unknown;
 int  EGL::CGLEEntity::HurtEntityAttackerPlayer = 0;
-void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, AdvancedDealDamageSource sourc) = nullptr;
+void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, CppLogic::AdvancedDealDamageSource sourc) = nullptr;
 bool HookHurtEntity_Hooked = false;
 void __cdecl hurtentity_override(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg) {
-	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, AdvancedDealDamageSource::Unknown);
+	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, CppLogic::AdvancedDealDamageSource::Unknown);
 }
 void __cdecl hurtaoe_override(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl) {
-	EGL::CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, AdvancedDealDamageSource::Unknown);
+	EGL::CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, CppLogic::AdvancedDealDamageSource::Unknown);
 }
 void __declspec(naked) arrowonhit_damage() {
 	__asm {
@@ -965,7 +965,7 @@ void EGL::CGLEEntity::HookHurtEntity()
 	GGL::CBombPlacerBehavior::FixBombAttachment();
 	shok_GGL_CCannonBallEffect::AddDamageSourceOverride = true;
 }
-void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
+void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo)
 {
 	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
@@ -1135,7 +1135,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		lua_settop(L, t);
 	}
 }
-void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, AdvancedDealDamageSource sourceInfo)
+void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo)
 {
 	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;

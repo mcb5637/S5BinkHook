@@ -11,6 +11,10 @@ namespace EGL {
 namespace GGL {
 	class CBuilding;
 }
+namespace ED {
+	class CBehaviorProps;
+	class CEntity;
+}
 
 struct shok_BB_CClassFactory_serializationData;
 
@@ -24,9 +28,9 @@ struct shok_EGL_CGLETaskArgs;
 enum class shok_Task;
 enum class shok_TaskState;
 
-struct shok_ED_CBehaviorProps;
-
 struct shok_EGL_CGLETaskList;
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int;
 struct shok_EGL_IGLEStateHandler;
 struct shok_EGL_IGLEHandler_BB_CEvent_void;
+
+struct shok_modelinstance;

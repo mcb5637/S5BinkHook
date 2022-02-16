@@ -329,7 +329,7 @@ struct shok_ED_CGlobalsLogicEx : shok_object {
 	shok_ED_CLandscape* Landscape;
 	// p ED::CLandscapeFogOfWar, 
 	PADDINGI(7);
-	shok_ED_CVisibleEntityManager* VisibleEntityManager; // 19
+	ED::CVisibleEntityManager* VisibleEntityManager; // 19
 
 	static inline constexpr int vtp = 0x769F74;
 

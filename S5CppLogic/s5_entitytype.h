@@ -181,12 +181,12 @@ namespace ED {
 		int Model[4];
 		bool DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
 		shok::Vector<int> AnimList;
-		shok::Vector<shok_ED_CBehaviorProps*> DisplayBehaviorProps;
+		shok::Vector<ED::CBehaviorProps*> DisplayBehaviorProps;
 
 		template<class T>
-		requires std::derived_from<T, shok_ED_CBehaviorProps>
+		requires std::derived_from<T, ED::CBehaviorProps>
 		T* GetDisplayBehaviorProps() {
-			for (shok_ED_CBehaviorProps* b : DisplayBehaviorProps) {
+			for (ED::CBehaviorProps* b : DisplayBehaviorProps) {
 				if (b) {
 					T* r = dynamic_cast<T*>(b);
 					if (r)
@@ -196,9 +196,9 @@ namespace ED {
 			return nullptr;
 		}
 		template<class T>
-		requires std::derived_from<T, shok_ED_CBehaviorProps>
+		requires std::derived_from<T, ED::CBehaviorProps>
 		const T* GetDisplayBehaviorProps() const {
-			for (const shok_ED_CBehaviorProps* b : DisplayBehaviorProps) {
+			for (const ED::CBehaviorProps* b : DisplayBehaviorProps) {
 				if (b) {
 					const T* r = dynamic_cast<const T*>(b);
 					if (r)
@@ -219,7 +219,7 @@ namespace GGlue {
 	public:
 		struct BehaviorData {
 			EGL::CGLEBehaviorProps* Logic;
-			shok_ED_CBehaviorProps* Display;
+			ED::CBehaviorProps* Display;
 		};
 		PADDINGI(1);
 		EGL::CGLEEntityProps* LogicProps;

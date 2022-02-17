@@ -67,7 +67,6 @@ EGL::IEntityDisplay::posdata EGL::IEntityDisplay::GetPosData() const
 static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(EGL::CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntityCreator*)>(0x4493A4);
 EGL::CGLEEntityCreator::CGLEEntityCreator()
 {
-	DEBUGGER_BREAK;
 	shok_EGL_CGLEEntityCreator_ctor(this);
 }
 EGL::CGLEEntityCreator::CGLEEntityCreator(int _)

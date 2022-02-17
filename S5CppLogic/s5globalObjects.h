@@ -578,7 +578,7 @@ private:
 public:
 	static inline constexpr int vtp = 0x78667C;
 
-	void RunTrigger(shok_BB_CEvent* ev);
+	void RunTrigger(BB::CEvent* ev);
 
 	static inline shok_EScr_CScriptTriggerSystem** const GlobalObj = reinterpret_cast<shok_EScr_CScriptTriggerSystem**>(0x895DEC);
 };

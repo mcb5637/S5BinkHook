@@ -84,7 +84,7 @@ shok::Keys extractKey(char c) {
 shok::Keys extractModifiers(char c) {
     return static_cast<shok::Keys>(static_cast<unsigned int>(static_cast<unsigned char>(c)) << 16) & (shok::Keys::ModifierAlt | shok::Keys::ModifierControl | shok::Keys::ModifierShift);
 }
-bool __stdcall buttohelp_shortcutcomparison(shok_EGUIX_CButtonHelper* th, shok_BB_CEvent* ev, shok_EGUIX_CBaseWidget* wid) {
+bool __stdcall buttohelp_shortcutcomparison(shok_EGUIX_CButtonHelper* th, BB::CEvent* ev, shok_EGUIX_CBaseWidget* wid) {
     if (th->CurrentState == 3 || th->CurrentState == 2)
         return false;
     const char* keystr = th->ShortCutString.GetString();
@@ -112,7 +112,7 @@ bool __stdcall buttohelp_shortcutcomparison(shok_EGUIX_CButtonHelper* th, shok_B
     if (th->CurrentState == 4 && !mayscin4)
         return false;
 
-    shok_BB_CKeyEvent* kev = shok_DynamicCast<shok_BB_CEvent, shok_BB_CKeyEvent>(ev);
+    BB::CKeyEvent* kev = shok_DynamicCast<BB::CEvent, BB::CKeyEvent>(ev);
     if (!kev)
         return false;
 
@@ -389,8 +389,8 @@ void HookUIInput()
     WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
 }
 
-void(__thiscall* const shok_feedbackEventHandler_fireevent)(shok_feedbackEventHandler* th, shok_BB_CEvent* e) = reinterpret_cast<void(__thiscall*)(shok_feedbackEventHandler*, shok_BB_CEvent*)>(0x582EB2);
-void shok_feedbackEventHandler::FireEvent(shok_BB_CEvent* ev)
+void(__thiscall* const shok_feedbackEventHandler_fireevent)(shok_feedbackEventHandler* th, BB::CEvent* e) = reinterpret_cast<void(__thiscall*)(shok_feedbackEventHandler*, BB::CEvent*)>(0x582EB2);
+void shok_feedbackEventHandler::FireEvent(BB::CEvent* ev)
 {
     shok_feedbackEventHandler_fireevent(this, ev);
 }

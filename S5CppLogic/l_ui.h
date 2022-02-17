@@ -13,7 +13,7 @@ struct CppL_GUIState_LuaSelection : shok_GGUI_CState {
 	static void Initialize();
 	CppL_GUIState_LuaSelection();
 	~CppL_GUIState_LuaSelection();
-	bool OnMouseEvent(shok_BB_CEvent* ev);
+	bool OnMouseEvent(BB::CEvent* ev);
 	void Cancel(bool calllua);
 
 	// the usual vtable, typedec and identifier

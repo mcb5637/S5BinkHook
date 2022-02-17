@@ -19,6 +19,7 @@
 #include <list>
 #include <iostream>
 #include <fstream>
+#include <string_view>
 
 struct CppLogicOptions {
     bool DoNotLoad = false;
@@ -96,9 +97,12 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    auto* e = luaext_checkEntity(L, 1);
-    lua_pushnumber(L, (int)(&e->TaskHandlers));
-    return 1;
+    RTTI_TypeDescriptor* t = reinterpret_cast<RTTI_TypeDescriptor*>(0x81A200);
+    std::string_view n{ t->MangledTypeName};
+    const char* ne = typeid(EGL::THandler<81926, BB::CEvent, BB::CEvent, GGL::CSerfBehavior, void>).raw_name();
+    lua_pushnumber(L, n.compare(ne));
+    lua_pushboolean(L, typeid(EGL::THandler<81926, BB::CEvent, BB::CEvent, GGL::CSerfBehavior, void>) == *reinterpret_cast<type_info*>(0x81A200));
+    return 2;
 }
 
 int cleanup(lua_State* L) {

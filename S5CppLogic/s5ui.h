@@ -301,7 +301,7 @@ public:
 	void HackPostEvent();
 
 	static inline shok_GGUI_CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<shok_GGUI_CManager * (__cdecl*)()>(0x525622);
-	static bool(*PostEventCallback)(shok_BB_CEvent* ev);
+	static bool(*PostEventCallback)(BB::CEvent* ev);
 
 
 	static bool IsModifierPressed(shok::Keys modif);

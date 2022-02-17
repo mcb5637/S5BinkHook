@@ -413,12 +413,12 @@ int l_movingEntitySetTargetPos(lua_State* L) {
 	lua_gettable(L, 2);
 	if (lua_isnumber(L, -1)) {
 		m->SetTargetRotation(static_cast<float>(deg2rad(lua_tonumber(L, -1))));
-		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, true };
+		EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
 		m->FireEvent(&ev);
 	}
 	else {
 		m->TargetRotationValid = 0;
-		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, false };
+		EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, false };
 		m->FireEvent(&ev);
 	}
 	return 0;
@@ -487,8 +487,8 @@ int l_entitySetLimitedLifespanRemaining(lua_State* L) {
 	return 0;
 }
 
-void(__thiscall* FireEvent)(EGL::CGLEEntity* th, shok_BB_CEvent* d);
-void __fastcall fireeventhook(EGL::CGLEEntity* th, int _, shok_BB_CEvent* d) {
+void(__thiscall* FireEvent)(EGL::CGLEEntity* th, BB::CEvent* d);
+void __fastcall fireeventhook(EGL::CGLEEntity* th, int _, BB::CEvent* d) {
 	lua_State* L = *shok_luastate_game;
 	int t = lua_gettop(L);
 	lua_getglobal(L, "event");
@@ -963,12 +963,12 @@ int l_settlerMove(lua_State* L) {
 	e->Move(p);
 	if (lua_isnumber(L, 3)) {
 		e->SetTargetRotation(static_cast<float>(deg2rad( lua_tonumber(L, 3))));
-		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, true };
+		EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
 		e->FireEvent(&ev);
 	}
 	else {
 		e->TargetRotationValid = false;
-		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, false };
+		EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, false };
 		e->FireEvent(&ev);
 	}
 	return 0;

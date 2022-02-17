@@ -823,10 +823,10 @@ CppL_GUIState_LuaSelection::~CppL_GUIState_LuaSelection()
 	if (RefOnCancel != LUA_NOREF)
 		luaL_unref(*shok_luastate_game, LUA_REGISTRYINDEX, RefOnCancel);
 }
-bool CppL_GUIState_LuaSelection::OnMouseEvent(shok_BB_CEvent* ev)
+bool CppL_GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev)
 {
-	shok_BB_CMouseEvent* mev = shok_DynamicCast<shok_BB_CEvent, shok_BB_CMouseEvent>(ev);
-	if (mev && mev->IsEvent(shok_InputEventIds::MouseButtonDown)) {
+	BB::CMouseEvent* mev = shok_DynamicCast<BB::CEvent, BB::CMouseEvent>(ev);
+	if (mev && mev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
 		if (mev->IsKey(shok::Keys::MouseLButton)) {
 			bool r = true;
 			if (RefOnKlick != LUA_NOREF) {
@@ -873,7 +873,7 @@ void __fastcall CppL_GUIState_LuaSelection_dtor(CppL_GUIState_LuaSelection* th, 
 unsigned int __stdcall CppL_GUIState_LuaSelection_GetClassID(const shok_BB_IObject* th) {
 	return CppL_GUIState_LuaSelection::Identifier;
 }
-bool __fastcall CppL_GUIState_LuaSelection_OnMouseEvent(CppL_GUIState_LuaSelection* th, int _, shok_BB_CEvent* ev) {
+bool __fastcall CppL_GUIState_LuaSelection_OnMouseEvent(CppL_GUIState_LuaSelection* th, int _, BB::CEvent* ev) {
 	return th->OnMouseEvent(ev);
 }
 int __fastcall CppL_GUIState_LuaSelection_Cancel(CppL_GUIState_LuaSelection* th) {
@@ -902,7 +902,7 @@ struct vtable_CppL_GUIState_LuaSelection {
 	void(__fastcall* dtor)(CppL_GUIState_LuaSelection* th, int _, bool free) = &CppL_GUIState_LuaSelection_dtor;
 	unsigned int(__stdcall* GetClassIdentifier)(const shok_BB_IObject* th) = &CppL_GUIState_LuaSelection_GetClassID;
 	int retzero = 0x55336A;
-	bool(__fastcall* OnMouseEvent)(CppL_GUIState_LuaSelection* th, int _, shok_BB_CEvent* ev) = &CppL_GUIState_LuaSelection_OnMouseEvent;
+	bool(__fastcall* OnMouseEvent)(CppL_GUIState_LuaSelection* th, int _, BB::CEvent* ev) = &CppL_GUIState_LuaSelection_OnMouseEvent;
 	int SetStateParameters = 0x52B509;
 	int(__fastcall* Cancel)(CppL_GUIState_LuaSelection* th) = &CppL_GUIState_LuaSelection_Cancel;
 	const char* (__fastcall* GetName)(const shok_GGUI_CState* th) = &CppL_GUIState_LuaSelection_GetName;

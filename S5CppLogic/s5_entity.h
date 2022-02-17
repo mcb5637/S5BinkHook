@@ -78,8 +78,8 @@ namespace EGL {
 			shok_EGL_IGLEStateHandler* StateHandler;
 		};
 		struct EventIdAndEventHandler {
-			shok_EventIDs EventID;
-			shok_EGL_IGLEHandler_BB_CEvent_void* EventHandler;
+			shok::EventIDs EventID;
+			EGL::EventHandler* EventHandler;
 		};
 		struct EntityAddonData {
 			int EntityId = 0;
@@ -148,11 +148,11 @@ namespace EGL {
 		virtual void UnknownEntityFunc1() = 0;
 	public:
 		virtual void ExecuteTask(shok_EGL_CGLETaskArgs* t) = 0;// 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
-		virtual void FireEvent(shok_BB_CEvent* ev) = 0;
+		virtual void FireEvent(BB::CEvent* ev) = 0;
 		virtual void AddBehavior(EGL::CGLEBehavior* b) = 0; // 17 probably not usable outside of createentity
 		virtual void AddSlot(EGL::ISlot* slot, int i) = 0;
 		virtual void AddTaskHandler(shok_Task t, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* handl) = 0; //19
-		virtual void AddEventHandler(shok_EventIDs ev, shok_EGL_IGLEHandler_BB_CEvent_void* handl) = 0; //20
+		virtual void AddEventHandler(shok::EventIDs ev, EGL::EventHandler* handl) = 0; //20
 		virtual void AddStateHandler(shok_TaskState st, shok_EGL_IGLEStateHandler* handl) = 0;
 		virtual void GetApproachPos(shok::Position* p) = 0;
 		virtual float GetApproachRot() = 0;
@@ -220,7 +220,7 @@ namespace EGL {
 		/**
 		fires event eventIdOnThisDetach on otherId, if this gets detached/destroyed, fires eventIdOnOtherDetach on this, if otherId gets detached/destroyed
 		**/
-		void AttachEntity(shok::AttachmentType attachtype, int otherId, shok_EventIDs eventIdOnThisDetach, shok_EventIDs eventIdOnOtherDetach);
+		void AttachEntity(shok::AttachmentType attachtype, int otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach);
 		void DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent);
 
 		void ClearAttackers();
@@ -228,9 +228,10 @@ namespace EGL {
 		EGL::CGLEEntity::EntityAddonData* GetAdditionalData(bool create);
 		void CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* other);
 
+		// todo make proper handler teplates for this stuff
 		void AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs)); // _ is undefined
 		void AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek)); // _ is undefined
-		void AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev)); // _ is undefined
+		void AddEventHandler(shok::EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, BB::CEvent* ev)); // _ is undefined
 
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo);
@@ -282,7 +283,7 @@ namespace EGL {
 		static EGL::CGLEEntity* ReplaceEntityWithResourceEntity(EGL::CGLEEntity* e);
 
 	protected:
-		int EventGetIntById(shok_EventIDs id);
+		int EventGetIntById(shok::EventIDs id);
 
 		// defined tasks: TASK_RESET_TASK_LIST_TIMER, TASK_SET_MODEL, TASK_PLAY_SOUND, TASK_STOP_SOUND
 		// defined states: SetNextTaskList

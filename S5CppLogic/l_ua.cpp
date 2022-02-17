@@ -499,7 +499,7 @@ void UnlimitedArmy::FormationCommand()
 				EGL::CMovingEntity* m = static_cast<EGL::CMovingEntity*>(e);
 				m->Move(r.Pos);
 				m->SetTargetRotation(r.Pos.r);
-				shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_SetIsUsingTargetOrientation, true };
+				EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
 				m->FireEvent(&ev);
 				return true;
 			}

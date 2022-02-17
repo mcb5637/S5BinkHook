@@ -323,7 +323,7 @@ void HookUIInput();
 
 struct shok_feedbackEventHandler { // another no vtable
 
-	void FireEvent(shok_BB_CEvent* ev);
+	void FireEvent(BB::CEvent* ev);
 
 	static inline shok_feedbackEventHandler* (* const GlobalObj)() = reinterpret_cast<shok_feedbackEventHandler * (*)()>(0x582EE1);
 };

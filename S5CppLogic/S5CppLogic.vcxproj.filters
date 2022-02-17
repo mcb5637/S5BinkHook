@@ -22,6 +22,9 @@
     <Filter Include="shok\entity">
       <UniqueIdentifier>{bbf8e01b-4712-43f3-99a2-0b28acd49d2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shok\events">
+      <UniqueIdentifier>{772cebac-6898-460f-aa0d-bfff4d515106}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -64,9 +67,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="l_ua.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="s5events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5effects.h">
@@ -153,6 +153,12 @@
     <ClInclude Include="s5entitydisplay.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
+    <ClInclude Include="s5events.h">
+      <Filter>shok\events</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_netevents.h">
+      <Filter>shok\events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -218,9 +224,6 @@
     <ClCompile Include="s5tasklist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="s5events.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="s5classfactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -256,6 +259,12 @@
     </ClCompile>
     <ClCompile Include="s5entitydisplay.cpp">
       <Filter>shok\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="s5events.cpp">
+      <Filter>shok\events</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_netevents.cpp">
+      <Filter>shok\events</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

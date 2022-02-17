@@ -1,325 +1,182 @@
 #include "pch.h"
 #include "s5events.h"
 
-shok_BB_CEvent::shok_BB_CEvent(int eventid)
+BB::CEvent::CEvent(int eventid)
 {
-	vtable = shok_BB_CEvent::vtp;
+	SetVT(BB::CEvent::vtp);
 	EventTypeId = eventid;
 }
-shok_BB_CEvent::shok_BB_CEvent(shok_EventIDs eventid) : shok_BB_CEvent(static_cast<int>(eventid))
+BB::CEvent::CEvent(shok::EventIDs eventid) : BB::CEvent(static_cast<int>(eventid))
 {
 }
-shok_BB_CEvent::shok_BB_CEvent(shok_NetEventIds eventid) : shok_BB_CEvent(static_cast<int>(eventid))
+BB::CEvent::CEvent(shok::NetEventIds eventid) : BB::CEvent(static_cast<int>(eventid))
 {
 }
-shok_BB_CEvent::shok_BB_CEvent(shok_FeedbackEventIds eventid) : shok_BB_CEvent(static_cast<int>(eventid))
+BB::CEvent::CEvent(shok::FeedbackEventIds eventid) : BB::CEvent(static_cast<int>(eventid))
 {
 }
-shok_BB_CEvent::shok_BB_CEvent(shok_InputEventIds eventid) : shok_BB_CEvent(static_cast<int>(eventid))
+BB::CEvent::CEvent(shok::InputEventIds eventid) : BB::CEvent(static_cast<int>(eventid))
 {
 }
 
-bool shok_BB_CEvent::IsEvent(shok_EventIDs id)
+bool BB::CEvent::IsEvent(shok::EventIDs id)
 {
 	return EventTypeId == static_cast<int>(id);
 }
-bool shok_BB_CEvent::IsEvent(shok_NetEventIds id)
+bool BB::CEvent::IsEvent(shok::NetEventIds id)
 {
 	return EventTypeId == static_cast<int>(id);
 }
-bool shok_BB_CEvent::IsEvent(shok_FeedbackEventIds id)
+bool BB::CEvent::IsEvent(shok::FeedbackEventIds id)
 {
 	return EventTypeId == static_cast<int>(id);
 }
-bool shok_BB_CEvent::IsEvent(shok_InputEventIds id)
+bool BB::CEvent::IsEvent(shok::InputEventIds id)
 {
 	return EventTypeId == static_cast<int>(id);
 }
 
-shok_EGL_CEventValue_int::shok_EGL_CEventValue_int(shok_EventIDs e, int d) : shok_BB_CEvent(e)
+void BB::CEvent::SetVT(int vt)
 {
-	vtable = shok_EGL_CEventValue_int::vtp;
-	Data = d;
+	*reinterpret_cast<int*>(this) = vt;
 }
-shok_EGL_CEventValue_bool::shok_EGL_CEventValue_bool(shok_EventIDs e, bool d) : shok_BB_CEvent(e)
+unsigned int __stdcall BB::CEvent::GetClassIdentifier() const
 {
-	vtable = shok_EGL_CEventValue_bool::vtp;
-	Data = d;
+	return 0;
 }
-shok_EGL_CEventValue_float::shok_EGL_CEventValue_float(shok_EventIDs e, float d) : shok_BB_CEvent(e)
+void* __stdcall BB::CEvent::CastToIdentifier(unsigned int id)
 {
-	vtable = shok_EGL_CEventValue_float::vtp;
-	Data = d;
+	return nullptr;
 }
 
-shok_EGL_CEventGetValue_bool::shok_EGL_CEventGetValue_bool(shok_EventIDs e) : shok_BB_CEvent(e)
+int EGL::CEvent1Entity::GetEntityID() const
 {
-	vtable = shok_EGL_CEventGetValue_bool::vtp;
-}
-shok_EGL_CEventGetValue_int::shok_EGL_CEventGetValue_int(shok_EventIDs e) : shok_BB_CEvent(e)
-{
-	vtable = shok_EGL_CEventGetValue_int::vtp;
-}
-shok_EGL_CEventGetValue_float::shok_EGL_CEventGetValue_float(shok_EventIDs e) : shok_BB_CEvent(e)
-{
-	vtable = shok_EGL_CEventGetValue_float::vtp;
+	return EntityID;
 }
 
-shok_EGL_CEvent1Entity::shok_EGL_CEvent1Entity(shok_EventIDs e, int ent) : shok_BB_CEvent(e)
+EGL::CEvent1Entity::CEvent1Entity(shok::EventIDs e, int ent) : BB::CEvent(e)
 {
-	vtable = shok_EGL_CEvent1Entity::vtp;
+	SetVT(EGL::CEvent1Entity::vtp);
 	EntityID = ent;
+	*reinterpret_cast<int*>(static_cast<EGL::IEventEntityID*>(this)) = EGL::CEvent1Entity::vtp_IEventEntityID;
 }
 
-shok_EGL_CEventPosition::shok_EGL_CEventPosition(shok_EventIDs e, const shok::Position& p) : shok_BB_CEvent(e)
+EGL::CEventPosition::CEventPosition(shok::EventIDs e, const shok::Position& p) : BB::CEvent(e)
 {
-	vtable = shok_EGL_CEventPosition::vtp;
+	SetVT(EGL::CEventPosition::vtp);
 	Position = p;
 }
 
-shok_GGL_CEventAttachmentTypeGetInteger::shok_GGL_CEventAttachmentTypeGetInteger(shok_EventIDs e, shok::AttachmentType t) : shok_BB_CEvent(e)
-{
-	vtable = shok_GGL_CEventAttachmentTypeGetInteger::vtp;
-	AttachmentType = t;
+int EGL::CEventPlayerID::GetPlayerID() const {
+	return PlayerID;
 }
-shok_GGL_CEventAttachmentTypeInteger::shok_GGL_CEventAttachmentTypeInteger(shok_EventIDs e, shok::AttachmentType t, int d) : shok_BB_CEvent(e)
+EGL::CEventPlayerID::CEventPlayerID(shok::EventIDs e, int p) : BB::CEvent(e)
 {
-	vtable = shok_GGL_CEventAttachmentTypeInteger::vtp;
-	AttachmentType = t;
-	Data = d;
-}
-
-shok_GGL_CEventEntityIndex::shok_GGL_CEventEntityIndex(shok_EventIDs e, int eid, int ind) : shok_BB_CEvent(e)
-{
-	vtable = shok_GGL_CEventEntityIndex::vtp;
-	EntityId = eid;
-	Index = ind;
-}
-
-shok_EGL_CEventPlayerID::shok_EGL_CEventPlayerID(shok_EventIDs e, int p) : shok_BB_CEvent(e)
-{
-	vtable = shok_EGL_CEventPlayerID::vtp;
+	SetVT(EGL::CEventPlayerID::vtp);
 	PlayerID = p;
+	*reinterpret_cast<int*>(static_cast<EGL::IEventPlayerID*>(this)) = EGL::CEventPlayerID::vtp_IEventPlayerID;
 }
 
-shok_EGL_CEventSubAnim::shok_EGL_CEventSubAnim(shok_EventIDs e, int an, int subind, bool back, bool loop) : shok_BB_CEvent(e)
+EGL::CEventSubAnim::CEventSubAnim(shok::EventIDs e, int an, int subind, bool back, bool loop) : BB::CEvent(e)
 {
-	vtable = shok_EGL_CEventSubAnim::vtp;
+	SetVT(EGL::CEventSubAnim::vtp);
 	AnimId = an;
 	SubAnimIndex = subind;
 	PlayBackwards = back;
 	IsLooped = loop;
 }
 
-shok_EGL_CEvent2Entities::shok_EGL_CEvent2Entities(shok_EventIDs e, int aid, int tid) : shok_BB_CEvent(e)
+EGL::CEvent2Entities::CEvent2Entities(shok::EventIDs e, int aid, int tid) : BB::CEvent(e)
 {
-	vtable = shok_EGL_CEvent2Entities::vtp;
+	SetVT(EGL::CEventSubAnim::vtp);
 	ActorId = aid;
 	TargetId = tid;
+	*reinterpret_cast<int*>(static_cast<EGL::IEvent2Entities*>(this)) = EGL::CEvent2Entities::vtp_IEvent2Entities;
+}
+int EGL::CEvent2Entities::GetActorID() const
+{
+	return ActorId;
+}
+int EGL::CEvent2Entities::GetTargetID() const
+{
+	return TargetId;
 }
 
-shok_GGL_CEventTransaction::shok_GGL_CEventTransaction(shok_EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm) : shok_BB_CEvent(e)
+GGL::CEventAttachmentTypeGetInteger::CEventAttachmentTypeGetInteger(shok::EventIDs e, shok::AttachmentType t) : BB::CEvent(e)
 {
-	vtable = shok_GGL_CEventTransaction::vtp;
+	SetVT(GGL::CEventAttachmentTypeGetInteger::vtp);
+	AttachmentType = t;
+}
+GGL::CEventAttachmentTypeInteger::CEventAttachmentTypeInteger(shok::EventIDs e, shok::AttachmentType t, int d) : BB::CEvent(e)
+{
+	SetVT(GGL::CEventAttachmentTypeInteger::vtp);
+	AttachmentType = t;
+	Data = d;
+}
+
+GGL::CEventEntityIndex::CEventEntityIndex(shok::EventIDs e, int eid, int ind) : BB::CEvent(e)
+{
+	SetVT(GGL::CEventEntityIndex::vtp);
+	EntityId = eid;
+	Index = ind;
+}
+
+GGL::CEventTransaction::CEventTransaction(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm) : BB::CEvent(e)
+{
+	SetVT(GGL::CEventTransaction::vtp);
 	SellType = sell;
 	BuyType = buy;
 	BuyAmount = buyAm;
 }
 
-shok_GGL_CEventPositionAnd2EntityTypes::shok_GGL_CEventPositionAnd2EntityTypes(shok_EventIDs e, const shok::Position& p, int t1, int t2) : shok_EGL_CEventPosition(e, p)
+GGL::CEventPositionAnd2EntityTypes::CEventPositionAnd2EntityTypes(shok::EventIDs e, const shok::Position& p, int t1, int t2) : EGL::CEventPosition(e, p)
 {
-	vtable = shok_GGL_CEventPositionAnd2EntityTypes::vtp;
+	SetVT(GGL::CEventPositionAnd2EntityTypes::vtp);
 	Type1 = t1;
 	Type2 = t2;
 }
 
-shok_GGL_CEventEntityAttachment::shok_GGL_CEventEntityAttachment(shok_EventIDs e, shok::AttachmentType ty, int eid, shok_EventIDs detach) : shok_BB_CEvent(e)
+GGL::CEventEntityAttachment::CEventEntityAttachment(shok::EventIDs e, shok::AttachmentType ty, int eid, shok::EventIDs detach) : BB::CEvent(e)
 {
-	vtable = shok_GGL_CEventEntityAttachment::vtp;
+	SetVT(GGL::CEventEntityAttachment::vtp);
 	Type = ty;
 	EntityId = eid;
 	DetachEvent = detach;
 }
 
-shok_EGL_CNetEvent2Entities::shok_EGL_CNetEvent2Entities(shok_NetEventIds id, int actor, int tar) : shok_BB_CEvent(id)
+BB::CInputEvent::CInputEvent(shok::InputEventIds id) : BB::CEvent(id)
 {
-	vtable = shok_EGL_CNetEvent2Entities::vtp;
-	ActorId = actor;
-	TargetId = tar;
-}
-
-shok_EGL_CNetEventEntityAndPos::shok_EGL_CNetEventEntityAndPos(shok_NetEventIds id, int ent, const shok::Position& pos) : shok_BB_CEvent(id)
-{
-	vtable = shok_EGL_CNetEventEntityAndPos::vtp;
-	EntityId = ent;
-	Position = pos;
-}
-
-shok_EGL_CNetEventEntityAndPosArray::shok_EGL_CNetEventEntityAndPosArray(shok_NetEventIds id, int ent, float r) : shok_BB_CEvent(id)
-{
-	vtable = shok_EGL_CNetEventEntityAndPosArray::vtp;
-	EntityId = ent;
-	Rotation = r;
-}
-
-shok_GGL_CNetEventExtractResource::shok_GGL_CNetEventExtractResource(shok_NetEventIds id, int ent, shok::ResourceType resty, const shok::Position& pos) : shok_BB_CEvent(id)
-{
-	vtable = shok_GGL_CNetEventExtractResource::vtp;
-	EntityId = ent;
-	ResourceType = resty;
-	Position = pos;
-}
-
-shok_GGL_CNetEventTransaction::shok_GGL_CNetEventTransaction(shok_NetEventIds id, int ent, shok::ResourceType sell, shok::ResourceType buy, int buyam) : shok_BB_CEvent(id)
-{
-	vtable = shok_GGL_CNetEventTransaction::vtp;
-	EntityId = ent;
-	SellType = sell;
-	BuyType = buy;
-	BuyAmount = buyam;
-}
-
-shok_EGL_CNetEventEntityID::shok_EGL_CNetEventEntityID(shok_NetEventIds id, int ent) : shok_BB_CEvent(id)
-{
-	vtable = shok_EGL_CNetEventEntityID::vtp;
-	EntityId = ent;
-}
-shok_EGL_CNetEventEntityID::shok_EGL_CNetEventEntityID(shok_FeedbackEventIds id, int ent) : shok_BB_CEvent(id)
-{
-	vtable = shok_EGL_CNetEventEntityID::vtp;
-	EntityId = ent;
-}
-
-shok_GGL_CNetEventCannonCreator::shok_GGL_CNetEventCannonCreator(shok_NetEventIds id, int ent, int bty, int tty, const shok::Position& pos) : shok_EGL_CNetEventEntityID(id, ent)
-{
-	vtable = shok_GGL_CNetEventCannonCreator::vtp;
-	BottomType = bty;
-	TopType = tty;
-	Position = pos;
-}
-
-shok_GGL_CNetEventEntityIDAndUpgradeCategory::shok_GGL_CNetEventEntityIDAndUpgradeCategory(shok_NetEventIds id, int ent, int ucat) : shok_EGL_CNetEventEntityID(id, ent)
-{
-	vtable = shok_GGL_CNetEventEntityIDAndUpgradeCategory::vtp;
-	UpgradeCategory = ucat;
-}
-
-shok_EGL_CNetEventEntityIDAndInteger::shok_EGL_CNetEventEntityIDAndInteger(shok_NetEventIds id, int ent, int d) : shok_EGL_CNetEventEntityID(id, ent)
-{
-	vtable = shok_EGL_CNetEventEntityIDAndInteger::vtp;
-	Data = d;
-}
-shok_EGL_CNetEventEntityIDAndInteger::shok_EGL_CNetEventEntityIDAndInteger(shok_FeedbackEventIds id, int ent, int d) : shok_EGL_CNetEventEntityID(id, ent)
-{
-	vtable = shok_EGL_CNetEventEntityIDAndInteger::vtp;
-	Data = d;
-}
-
-shok_GGL_CNetEventTechnologyAndEntityID::shok_GGL_CNetEventTechnologyAndEntityID(shok_NetEventIds id, int ent, int tech) : shok_EGL_CNetEventEntityID(id, ent)
-{
-	vtable = shok_GGL_CNetEventTechnologyAndEntityID::vtp;
-	Technology = tech;
-}
-
-shok_EGL_CNetEventPlayerID::shok_EGL_CNetEventPlayerID(shok_NetEventIds id, int pl) : shok_BB_CEvent(id)
-{
-	vtable = shok_EGL_CNetEventPlayerID::vtp;
-	PlayerId = pl;
-}
-shok_EGL_CNetEventPlayerID::shok_EGL_CNetEventPlayerID(shok_FeedbackEventIds id, int pl) : shok_BB_CEvent(id)
-{
-	vtable = shok_EGL_CNetEventPlayerID::vtp;
-	PlayerId = pl;
-}
-
-shok_GGL_CNetEventBuildingCreator::shok_GGL_CNetEventBuildingCreator(shok_NetEventIds id, int pl, int ucat, const shok::PositionRot& p) : shok_EGL_CNetEventPlayerID(id, pl)
-{
-	vtable = shok_GGL_CNetEventBuildingCreator::vtp;
-	UpgradeCategory = ucat;
-	Position = p;
-}
-
-shok_EGL_CNetEventIntegerAndPlayerID::shok_EGL_CNetEventIntegerAndPlayerID(shok_NetEventIds id, int pl, int d) : shok_EGL_CNetEventPlayerID(id, pl)
-{
-	vtable = shok_EGL_CNetEventIntegerAndPlayerID::vtp;
-	Data = d;
-}
-
-shok_EGL_CNetEventPlayerIDAndInteger::shok_EGL_CNetEventPlayerIDAndInteger(shok_NetEventIds id, int pl, int d) : shok_EGL_CNetEventPlayerID(id, pl)
-{
-	vtable = shok_EGL_CNetEventPlayerIDAndInteger::vtp;
-	Data = d;
-}
-
-shok_EGL_CNetEventEntityIDAndPlayerID::shok_EGL_CNetEventEntityIDAndPlayerID(shok_NetEventIds id, int pl, int e) : shok_EGL_CNetEventPlayerID(id, pl)
-{
-	vtable = shok_EGL_CNetEventEntityIDAndPlayerID::vtp;
-	EntityId = e;
-}
-shok_EGL_CNetEventEntityIDAndPlayerID::shok_EGL_CNetEventEntityIDAndPlayerID(shok_FeedbackEventIds id, int pl, int e) : shok_EGL_CNetEventPlayerID(id, pl)
-{
-	vtable = shok_EGL_CNetEventEntityIDAndPlayerID::vtp;
-	EntityId = e;
-}
-
-shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType::shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType(shok_NetEventIds id, int pl, int e, int ety) : shok_EGL_CNetEventEntityIDAndPlayerID(id, pl, e)
-{
-	vtable = shok_EGL_CNetEventEntityIDAndPlayerIDAndEntityType::vtp;
-	EntityType = ety;
-}
-
-shok_GGL_CNetEventEntityIDPlayerIDAndInteger::shok_GGL_CNetEventEntityIDPlayerIDAndInteger(shok_NetEventIds id, int pl, int e, int d) : shok_EGL_CNetEventEntityIDAndPlayerID(id, pl, e)
-{
-	vtable = shok_GGL_CNetEventEntityIDPlayerIDAndInteger::vtp;
-	Data = d;
-}
-
-shok_GGL_CFeedbackEventBattling::shok_GGL_CFeedbackEventBattling(shok_FeedbackEventIds id, int eid, int p, const shok::Position& pos, int tp) : shok_EGL_CNetEventEntityIDAndPlayerID(id, p, eid)
-{
-	vtable = shok_GGL_CFeedbackEventBattling::vtp;
-	Pos = pos;
-	TargetPlayer = tp;
-}
-
-shok_Framework_CEventGameSpeed::shok_Framework_CEventGameSpeed(shok_NetEventIds id, double speed) : shok_BB_CEvent(id)
-{
-	vtable = shok_Framework_CEventGameSpeed::vtp;
-	SpeedFactor = speed;
-}
-
-shok_BB_CInputEvent::shok_BB_CInputEvent(shok_InputEventIds id) : shok_BB_CEvent(id)
-{
-	vtable = shok_BB_CInputEvent::vtp;
+	SetVT(BB::CInputEvent::vtp);
 	EventHandeled = false;
 }
 
-shok_BB_CMouseEvent::shok_BB_CMouseEvent(shok_InputEventIds id, shok::Keys keydata, int clicks, int x, int y, int delta) : shok_BB_CInputEvent(id)
+BB::CMouseEvent::CMouseEvent(shok::InputEventIds id, shok::Keys keydata, int clicks, int x, int y, int delta) : BB::CInputEvent(id)
 {
-	vtable = shok_BB_CMouseEvent::vtp;
+	SetVT(BB::CMouseEvent::vtp);
 	KeyData = keydata;
 	Clicks = clicks;
 	X = x;
 	Y = y;
 	Delta = delta;
 }
-bool shok_BB_CMouseEvent::IsKey(shok::Keys key)
+bool BB::CMouseEvent::IsKey(shok::Keys key)
 {
 	return (KeyData & shok::Keys::MaskCode) == key;
 }
-bool shok_BB_CMouseEvent::IsModifier(shok::Keys mod)
+bool BB::CMouseEvent::IsModifier(shok::Keys mod)
 {
 	return (KeyData & shok::Keys::MaskModifiers) == mod;
 }
 
-shok_BB_CKeyEvent::shok_BB_CKeyEvent(shok_InputEventIds id, shok::Keys keydata) : shok_BB_CInputEvent(id)
+BB::CKeyEvent::CKeyEvent(shok::InputEventIds id, shok::Keys keydata) : BB::CInputEvent(id)
 {
-	vtable = shok_BB_CKeyEvent::vtp;
+	SetVT(BB::CKeyEvent::vtp);
 	KeyData = keydata;
 }
 
-shok_BB_CKeyPressEvent::shok_BB_CKeyPressEvent(shok_InputEventIds id, int keychar, shok::Keys keymodif) : shok_BB_CInputEvent(id)
+BB::CKeyPressEvent::CKeyPressEvent(shok::InputEventIds id, int keychar, shok::Keys keymodif) : BB::CInputEvent(id)
 {
-	vtable = shok_BB_CKeyPressEvent::vtp;
+	SetVT(BB::CKeyPressEvent::vtp);
 	KeyChar = keychar;
 	KeyModifier = keymodif;
 }

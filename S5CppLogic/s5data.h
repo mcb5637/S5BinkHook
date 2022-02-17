@@ -230,6 +230,27 @@ namespace EGL {
 	class TGLEAttachable : public CGLEAttachableBase {
 
 	};
+
+
+	template<class T, class V>
+	class IGLEHandler {
+	public:
+		virtual void Handle(T* t) = 0;
+	};
+	template<int HandlerID, class EventBase, class HandlerEvent, class T, class V>
+	class THandler : public IGLEHandler<EventBase, V> {
+	public:
+		typedef void (T::*HandlerType)(HandlerEvent* ev);
+
+		T* Object;
+		HandlerType HandlerFunc;
+
+		virtual void Handle(EventBase* ev) override {
+			std::invoke(HandlerFunc, Object, static_cast<HandlerEvent*>(ev));
+		}
+	};
+
+	using EventHandler = EGL::IGLEHandler<BB::CEvent, void>;
 }
 
 template<class T>
@@ -349,6 +370,7 @@ enum class win_mouseEvents : int {
 #include "s5_entity.h"
 #include "s5entitydisplay.h"
 #include "s5events.h"
+//#include "s5_netevents.h"
 #include "s5effects.h"
 #include "s5player.h"
 #include "s5tech.h"

@@ -3,7 +3,7 @@
 #include "entityiterator.h"
 
 struct shok_vtable_GGUI_CState : shok_vtable_BB_IObject {
-	bool(__thiscall* OnMouseEvent)(shok_GGUI_CState* th, shok_BB_CEvent* ev);
+	bool(__thiscall* OnMouseEvent)(shok_GGUI_CState* th, BB::CEvent* ev);
 	void(__thiscall* SetStateParameters)(shok_GGUI_CState* th, shok_GGUI_SStateParameters* p);
 	int(__thiscall* Cancel)(shok_GGUI_CState* th);
 	const char* (__thiscall* GetName)(shok_GGUI_CState* th);
@@ -21,7 +21,7 @@ struct shok_vtable_GGUI_CPositionCommandState : shok_vtable_GGUI_CBasicState {
 };
 
 struct shok_vtable_BB_IPostEvent {
-	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev);
+	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, BB::CEvent* ev);
 };
 
 struct shok_vtable_ERwTools_CRpClumpRenderable {
@@ -194,10 +194,10 @@ bool shok_GGL_CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, co
 	return reinterpret_cast<shok_vtable_GGL_CGLGUIInterface*>(vtable)->GetNearestFreeBuildingPos(this, ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);
 }
 
-void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) = nullptr;
+void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, BB::CEvent* ev) = nullptr;
 shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
-bool(*shok_GGUI_CManager::PostEventCallback)(shok_BB_CEvent* ev) = nullptr;
-void __stdcall PostEventHook(shok_BB_IPostEvent* th, shok_BB_CEvent* ev) {
+bool(*shok_GGUI_CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;
+void __stdcall PostEventHook(shok_BB_IPostEvent* th, BB::CEvent* ev) {
 	if (shok_GGUI_CManager::PostEventCallback)
 		if (shok_GGUI_CManager::PostEventCallback(ev))
 			return;
@@ -212,7 +212,7 @@ void shok_GGUI_CManager::HackPostEvent()
 	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent->vtable);
 	shok::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
-	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(shok_BB_IPostEvent * th, shok_BB_CEvent * ev)>(&PostEventHook);
+	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(shok_BB_IPostEvent * th, BB::CEvent * ev)>(&PostEventHook);
 }
 
 static inline int* (* const modifpressed_getobj)() = reinterpret_cast<int* (*)()>(0x558C16);

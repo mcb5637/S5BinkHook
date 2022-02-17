@@ -2,6 +2,7 @@
 #include "s5data.h"
 #include <stdexcept>
 #include "entityiterator.h"
+#include "s5_netevents.h"
 
 
 struct shok_vtable_ECS_CManager {
@@ -26,7 +27,7 @@ struct shok_vtable_EGL_CGLEGameLogic {
 };
 
 struct shok_vtable_BB_IPostEvent {
-	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, shok_BB_CEvent* ev);
+	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, BB::CEvent* ev);
 };
 
 struct shok_vtable_GGL_CWeatherHandler {
@@ -827,38 +828,38 @@ shok_technology* shok_GGL_CGLGameLogic::GetTech(int i)
 	}
 }
 
-static inline void(__thiscall* const cglgamelogic_enablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*)>(0x49FA14);
+static inline void(__thiscall* const cglgamelogic_enablealarm)(shok_GGL_CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FA14);
 void shok_GGL_CGLGameLogic::EnableAlarmForPlayer(int pl)
 {
-	shok_EGL_CNetEventPlayerID ev{ shok_NetEventIds::CommandPlayerActivateAlarm, pl };
+	EGL::CNetEventPlayerID ev{ shok::NetEventIds::CommandPlayerActivateAlarm, pl };
 	cglgamelogic_enablealarm(this, &ev);
 }
 
-static inline void(__thiscall* const cglgamelogic_disablealarm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventPlayerID*)>(0x49FAD7);
+static inline void(__thiscall* const cglgamelogic_disablealarm)(shok_GGL_CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FAD7);
 void shok_GGL_CGLGameLogic::DisableAlarmForPlayer(int pl)
 {
-	shok_EGL_CNetEventPlayerID ev{ shok_NetEventIds::CommandPlayerDeactivateAlarm, pl };
+	EGL::CNetEventPlayerID ev{ shok::NetEventIds::CommandPlayerDeactivateAlarm, pl };
 	cglgamelogic_disablealarm(this, &ev);
 }
 
-static inline void(__thiscall* const cglgamelogic_upgradesettlercat)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*)>(0x4985C5);
+static inline void(__thiscall* const cglgamelogic_upgradesettlercat)(shok_GGL_CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x4985C5);
 void shok_GGL_CGLGameLogic::UpgradeSettlerCategory(int pl, int ucat)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev{ shok_NetEventIds::PlayerUpgradeSettlerCategory, pl, ucat };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::PlayerUpgradeSettlerCategory, pl, ucat };
 	cglgamelogic_upgradesettlercat(this, &ev);
 }
 
-static inline void(__thiscall* const cglgamelogic_activateweatherm)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*)>(0x49BF7A);
+static inline void(__thiscall* const cglgamelogic_activateweatherm)(shok_GGL_CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x49BF7A);
 void shok_GGL_CGLGameLogic::PlayerActivateWeathermachine(int player, int weathertype)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev{ shok_NetEventIds::CommandWeathermachineChangeWeather, player, weathertype };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandWeathermachineChangeWeather, player, weathertype };
 	cglgamelogic_activateweatherm(this, &ev);
 }
 
-static inline void(__thiscall* const cglgamelogic_blesssettlers)(shok_GGL_CGLGameLogic* th, shok_EGL_CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, shok_EGL_CNetEventIntegerAndPlayerID*)>(0x49B7E6);
+static inline void(__thiscall* const cglgamelogic_blesssettlers)(shok_GGL_CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(shok_GGL_CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x49B7E6);
 void shok_GGL_CGLGameLogic::PlayerBlessSettlers(int player, int blessCat)
 {
-	shok_EGL_CNetEventIntegerAndPlayerID ev{ shok_NetEventIds::CommandMonasteryBlessSettlerGroup, player, blessCat };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandMonasteryBlessSettlerGroup, player, blessCat };
 	cglgamelogic_blesssettlers(this, &ev);
 }
 
@@ -939,7 +940,7 @@ void shok_GGL_CWeatherHandler::ClearQueue(int state, int dur, int forerun, int g
 	}
 }
 
-void shok_EScr_CScriptTriggerSystem::RunTrigger(shok_BB_CEvent* ev)
+void shok_EScr_CScriptTriggerSystem::RunTrigger(BB::CEvent* ev)
 {
 	reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent.vtable)->PostEvent(&PostEvent, ev);
 }

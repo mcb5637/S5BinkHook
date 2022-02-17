@@ -2,6 +2,7 @@
 #include "s5data.h"
 #include <math.h>
 #include "entityiterator.h"
+#include "s5_netevents.h"
 
 
 struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
@@ -18,11 +19,11 @@ struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
 	bool(__thiscall* IsInSector)(EGL::CGLEEntity* th, int sector);
 	PADDINGI(1); // maybe execute task?/ontick?, settler update auras
 	void(__thiscall* ExecuteTask)(EGL::CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
-	void(__thiscall* FireEvent)(EGL::CGLEEntity* th, shok_BB_CEvent* d); // 16
+	void(__thiscall* FireEvent)(EGL::CGLEEntity* th, BB::CEvent* d); // 16
 	void(__thiscall* AddBehavior)(EGL::CGLEEntity* th, EGL::CGLEBehavior* bh); // 17 probably not usable outside of createentity
 	PADDINGI(1); // add behavior slot
 	void(__thiscall* AddTaskHandler)(EGL::CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
-	void(__thiscall* AddEventHandler)(EGL::CGLEEntity* th, shok_EventIDs eventid, shok_EGL_IGLEHandler_BB_CEvent_void* eventhandler); // 20
+	void(__thiscall* AddEventHandler)(EGL::CGLEEntity* th, shok::EventIDs eventid, EGL::EventHandler* eventhandler); // 20
 	void(__thiscall* AddStateHandler)(EGL::CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
 	void(__thiscall* GetApproachPos)(EGL::CGLEEntity* th, shok::Position* outpos);
 	float(__thiscall* GetApproachRot)(EGL::CGLEEntity* th);
@@ -113,31 +114,31 @@ GGlue::CGlueEntityProps* EGL::CGLEEntity::GetEntityType()
 	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
 }
 
-int EGL::CGLEEntity::EventGetIntById(shok_EventIDs id)
+int EGL::CGLEEntity::EventGetIntById(shok::EventIDs id)
 {
-	shok_EGL_CEventGetValue_int d{ id };
+	EGL::CEventGetValue_Int d{ id };
 	FireEvent(&d);
 	return d.Data;
 }
 
 int EGL::CGLEEntity::EventGetDamage()
 {
-	return EventGetIntById(shok_EventIDs::GetDamage);
+	return EventGetIntById(shok::EventIDs::GetDamage);
 }
 int EGL::CGLEEntity::EventGetArmor()
 {
-	return EventGetIntById(shok_EventIDs::GetArmor);
+	return EventGetIntById(shok::EventIDs::GetArmor);
 }
 int EGL::CGLEEntity::EventGetMaxWorktime()
 {
-	return EventGetIntById(shok_EventIDs::Worker_GetMaxWorkTime);
+	return EventGetIntById(shok::EventIDs::Worker_GetMaxWorkTime);
 }
 
 shok::LeaderCommand EGL::CGLEEntity::EventLeaderGetCurrentCommand()
 {
 	if (GetBehavior<GGL::CLeaderBehavior>() == nullptr)
 		return shok::LeaderCommand::Unknown;
-	return static_cast<shok::LeaderCommand>(EventGetIntById(shok_EventIDs::Leader_GetCommand));
+	return static_cast<shok::LeaderCommand>(EventGetIntById(shok::EventIDs::Leader_GetCommand));
 }
 
 static inline int(__thiscall* const entitygetmaxhealth)(EGL::CGLEEntity* th) = reinterpret_cast<int(__thiscall*)(EGL::CGLEEntity*)>(0x57B798);
@@ -148,7 +149,7 @@ int EGL::CGLEEntity::GetMaxHealth()
 
 int EGL::CGLEEntity::LimitedAttachmentGetMaximum(shok::AttachmentType attachType)
 {
-	shok_GGL_CEventAttachmentTypeGetInteger ev{ shok_EventIDs::LimitedAttachment_GetMax, attachType };
+	GGL::CEventAttachmentTypeGetInteger ev{ shok::EventIDs::LimitedAttachment_GetMax, attachType };
 	FireEvent(&ev);
 	return ev.Data;
 }
@@ -174,8 +175,8 @@ int EGL::CGLEEntity::GetFirstAttachedEntity(shok::AttachmentType attachmentId)
 	shok::Attachment* r = ObservedEntities.GetFirstMatch([attachmentId](shok::Attachment* a) {return a->AttachmentType == attachmentId; });
 	return r == nullptr ? 0 : r->EntityId;
 }
-static inline void(__thiscall* entattach_attach)(EGL::CGLEAttachableBase* th, shok::AttachmentType at, int id, shok_EventIDs evth, shok_EventIDs evot) = reinterpret_cast<void(__thiscall*)(EGL::CGLEAttachableBase*, shok::AttachmentType, int, shok_EventIDs, shok_EventIDs)>(0x4A61B3);
-void EGL::CGLEEntity::AttachEntity(shok::AttachmentType attachtype, int otherId, shok_EventIDs eventIdOnThisDetach, shok_EventIDs eventIdOnOtherDetach)
+static inline void(__thiscall* entattach_attach)(EGL::CGLEAttachableBase* th, shok::AttachmentType at, int id, shok::EventIDs evth, shok::EventIDs evot) = reinterpret_cast<void(__thiscall*)(EGL::CGLEAttachableBase*, shok::AttachmentType, int, shok::EventIDs, shok::EventIDs)>(0x4A61B3);
+void EGL::CGLEEntity::AttachEntity(shok::AttachmentType attachtype, int otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach)
 {
 	entattach_attach(static_cast<EGL::CGLEAttachableBase*>(this), attachtype, otherId, eventIdOnThisDetach, eventIdOnOtherDetach);
 }
@@ -187,12 +188,12 @@ void EGL::CGLEEntity::DetachObservedEntity(shok::AttachmentType attachtype, int 
 
 int EGL::CMovingEntity::LeaderGetNearbyBarracks()
 {
-	return EventGetIntById(shok_EventIDs::Leader_GetNearbyBarracks);
+	return EventGetIntById(shok::EventIDs::Leader_GetNearbyBarracks);
 }
 
 bool EGL::CMovingEntity::IsMoving()
 {
-	shok_EGL_CEventGetValue_bool d{ shok_EventIDs::Movement_IsMoving };
+	EGL::CEventGetValue_Bool d{ shok::EventIDs::Movement_IsMoving };
 	FireEvent(&d);
 	return d.Data;
 }
@@ -286,12 +287,12 @@ int GGL::CBuilding::GetTechnologyInResearch()
 
 int GGL::CBuilding::GetCannonProgress()
 {
-	return EventGetIntById(shok_EventIDs::Foundry_GetProgress);
+	return EventGetIntById(shok::EventIDs::Foundry_GetProgress);
 }
 
 float GGL::CBuilding::GetMarketProgress()
 {
-	shok_EGL_CEventGetValue_float ev{ shok_EventIDs::Market_GetProgress };
+	EGL::CEventGetValue_Float ev{ shok::EventIDs::Market_GetProgress };
 	FireEvent(&ev);
 	return ev.Data;
 }
@@ -357,41 +358,41 @@ void EGL::CGLEEntity::ClearAttackers()
 
 void EGL::CMovingEntity::AttackMove(const shok::Position& p)
 {
-	shok_EGL_CEventPosition ev{ shok_EventIDs::Leader_AttackMove, p };
+	EGL::CEventPosition ev{ shok::EventIDs::Leader_AttackMove, p };
 	FireEvent(&ev);
 	TargetRotationValid = 0;
 }
 
 void EGL::CMovingEntity::AttackEntity(int targetId)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_AttackEntity, targetId };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Leader_AttackEntity, targetId };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::Move(const shok::Position& p)
 {
-	shok_EGL_CEventPosition ev{ shok_EventIDs::MoveCommand_Move, p };
+	EGL::CEventPosition ev{ shok::EventIDs::MoveCommand_Move, p };
 	FireEvent(&ev);
 	TargetRotationValid = 0;
 }
 
 void EGL::CMovingEntity::HoldPosition()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::Leader_HoldPosition };
+	BB::CEvent ev{ shok::EventIDs::Leader_HoldPosition };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::Defend()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::Leader_Defend };
+	BB::CEvent ev{ shok::EventIDs::Leader_Defend };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::LeaderAttachSoldier(int soldierId)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_AttachSoldier, soldierId };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Leader_AttachSoldier, soldierId };
 	FireEvent(&ev);
-	shok_BB_CEvent e2{ shok_EventIDs::Formation_AssumePosition };
+	BB::CEvent e2{ shok::EventIDs::Formation_AssumePosition };
 	EGL::CGLEEntity* sol = EGL::CGLEEntity::GetEntityByID(soldierId);
 	sol->FireEvent(&e2);
 }
@@ -400,7 +401,7 @@ static inline void(__thiscall* const shok_entity_expellSettler)(EGL::CGLEEntity*
 void EGL::CMovingEntity::SettlerExpell()
 {
 	if (GetBehavior<GGL::CLeaderBehavior>() && ObservedEntities.GetFirstMatch([](shok::Attachment* a) { return a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER; })) {
-		shok_EGL_CEventValue_bool ev{ shok_EventIDs::Leader_ExpellSoldier, true };
+		EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_ExpellSoldier, true };
 		FireEvent(&ev);
 	}
 	else {
@@ -410,121 +411,121 @@ void EGL::CMovingEntity::SettlerExpell()
 
 void EGL::CMovingEntity::HeroAbilitySendHawk(shok::Position& p)
 {
-	shok_EGL_CEventPosition ev{ shok_EventIDs::HeroHawk_SendHawk, p };
+	EGL::CEventPosition ev{ shok::EventIDs::HeroHawk_SendHawk, p };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityInflictFear()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::InflictFear_Activate };
+	BB::CEvent ev{ shok::EventIDs::InflictFear_Activate };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityPlaceBomb(shok::Position& p)
 {
-	shok_EGL_CEventPosition ev{ shok_EventIDs::BombPlacer_CommandPlaceBomb, p };
+	EGL::CEventPosition ev{ shok::EventIDs::BombPlacer_CommandPlaceBomb, p };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityPlaceCannon(shok::Position& p, int FoundationType, int CannonType)
 {
-	shok_GGL_CEventPositionAnd2EntityTypes ev{ shok_EventIDs::CannonBuilder_BuildCannonCommand, p, FoundationType, CannonType };
+	GGL::CEventPositionAnd2EntityTypes ev{ shok::EventIDs::CannonBuilder_BuildCannonCommand, p, FoundationType, CannonType };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityRangedEffect()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::RangedEffect_Activate };
+	BB::CEvent ev{ shok::EventIDs::RangedEffect_Activate };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityCircularAttack()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::CircularAttack_ActivateCommand };
+	BB::CEvent ev{ shok::EventIDs::CircularAttack_ActivateCommand };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilitySummon()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::Summon_ActivateCommand };
+	BB::CEvent ev{ shok::EventIDs::Summon_ActivateCommand };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityConvert(int target)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::ConvertSettler_ActivateCommand, target };
+	EGL::CEvent1Entity ev{ shok::EventIDs::ConvertSettler_ActivateCommand, target };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityConvertBuilding(int target)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::ConvertBuilding_ActivateCommand, target };
+	EGL::CEvent1Entity ev{ shok::EventIDs::ConvertBuilding_ActivateCommand, target };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilitySnipe(int tid)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Sniper_SnipeCommand, tid };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Sniper_SnipeCommand, tid };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityShuriken(int tid)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Shuriken_ActivateCommand, tid };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Shuriken_ActivateCommand, tid };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityMotivateWorkers()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::MotivateVorkers_ActivateCommand };
+	BB::CEvent ev{ shok::EventIDs::MotivateVorkers_ActivateCommand };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::HeroAbilityActivateCamoflage()
 {
-	shok_BB_CEvent e{ shok_EventIDs::Camouflage_Activate };
+	BB::CEvent e{ shok::EventIDs::Camouflage_Activate };
 	FireEvent(&e);
 }
 
 void EGL::CMovingEntity::ThiefSabotage(int tid)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::KegPlacer_SabotageCommand, tid };
+	EGL::CEvent1Entity ev{ shok::EventIDs::KegPlacer_SabotageCommand, tid };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::ThiefDefuse(int tid)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::KegPlacer_DefuseCommand, tid };
+	EGL::CEvent1Entity ev{ shok::EventIDs::KegPlacer_DefuseCommand, tid };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::ThiefStealFrom(int tid)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Thief_StealFromCommand, tid };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Thief_StealFromCommand, tid };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::ThiefSecureGoods(int tid)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Thief_SecureGoodsCommand, tid };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Thief_SecureGoodsCommand, tid };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::ScoutBinoculars(shok::Position& p)
 {
-	shok_EGL_CEventPosition ev{ shok_EventIDs::Binocular_ExploreCommand, p };
+	EGL::CEventPosition ev{ shok::EventIDs::Binocular_ExploreCommand, p };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::ScoutFindResource()
 {
-	shok_BB_CEvent ev{ shok_EventIDs::PointToResources_Activate };
+	BB::CEvent ev{ shok::EventIDs::PointToResources_Activate };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::ScoutPlaceTorch(shok::Position& p)
 {
-	shok_EGL_CEventPosition ev{ shok_EventIDs::TorchPlacer_PlaceTorch, p };
+	EGL::CEventPosition ev{ shok::EventIDs::TorchPlacer_PlaceTorch, p };
 	FireEvent(&ev);
 }
 
@@ -533,7 +534,7 @@ bool EGL::CMovingEntity::SerfConstructBuilding(GGL::CBuilding* build)
 	int cid = build->GetNearestFreeConstructionSlotFor(&this->Position);
 	if (cid < 0)
 		return false;
-	shok_GGL_CEventEntityIndex ev{ shok_EventIDs::Serf_Construct, build->GetConstructionSite(), cid };
+	GGL::CEventEntityIndex ev{ shok::EventIDs::Serf_Construct, build->GetConstructionSite(), cid };
 	FireEvent(&ev);
 	return true;
 }
@@ -543,26 +544,26 @@ bool EGL::CMovingEntity::SerfRepairBuilding(GGL::CBuilding* build)
 	int cid = build->GetNearestFreeRepairSlotFor(&this->Position);
 	if (cid < 0)
 		return false;
-	shok_GGL_CEventEntityIndex ev{ shok_EventIDs::Serf_Construct, build->EntityId, cid };
+	GGL::CEventEntityIndex ev{ shok::EventIDs::Serf_Construct, build->EntityId, cid };
 	FireEvent(&ev);
 	return true;
 }
 
 void EGL::CMovingEntity::SerfExtractResource(int id)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Serf_ExtractResource, id };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Serf_ExtractResource, id };
 	FireEvent(&ev);
 }
 
 void EGL::CMovingEntity::SerfTurnToBattleSerf()
 {
-	shok_BB_CEvent e2{ shok_EventIDs::Serf_CommandTurnToBattleSerf };
+	BB::CEvent e2{ shok::EventIDs::Serf_CommandTurnToBattleSerf };
 	FireEvent(&e2);
 }
 
 void EGL::CMovingEntity::BattleSerfTurnToSerf()
 {
-	shok_BB_CEvent e2{ shok_EventIDs::BattleSerf_CommandTurnToSerf };
+	BB::CEvent e2{ shok::EventIDs::BattleSerf_CommandTurnToSerf };
 	FireEvent(&e2);
 }
 
@@ -593,13 +594,13 @@ void GGL::CBuilding::CancelUpgrade()
 
 void GGL::CBuilding::CommandBuildCannon(int entitytype)
 {
-	shok_EGL_CEventValue_int e{ shok_EventIDs::Foundry_BuildCannonCommand, entitytype };
+	EGL::CEventValue_Int e{ shok::EventIDs::Foundry_BuildCannonCommand, entitytype };
 	FireEvent(&e);
 }
 
 void GGL::CBuilding::CommandRecruitSoldierForLeader(int id)
 {
-	shok_EGL_CEvent1Entity ev{ shok_EventIDs::Barracks_BuySoldierForLeader, id };
+	EGL::CEvent1Entity ev{ shok::EventIDs::Barracks_BuySoldierForLeader, id };
 	FireEvent(&ev);
 }
 
@@ -616,25 +617,25 @@ void GGL::CBuilding::DeactivateOvertime()
 
 void GGL::CBuilding::BarracksRecruitGroups()
 {
-	shok_BB_CEvent e2{ shok_EventIDs::Barracks_ActivateAutoFill };
+	BB::CEvent e2{ shok::EventIDs::Barracks_ActivateAutoFill };
 	FireEvent(&e2);
 }
 
 void GGL::CBuilding::BarracksRecruitLeaders()
 {
-	shok_BB_CEvent e2{ shok_EventIDs::Barracks_DeActivateAutoFill };
+	BB::CEvent e2{ shok::EventIDs::Barracks_DeActivateAutoFill };
 	FireEvent(&e2);
 }
 
 void GGL::CBuilding::HQBuySerf()
 {
-	shok_BB_CEvent e2{ shok_EventIDs::Keep_BuySerfCommand };
+	BB::CEvent e2{ shok::EventIDs::Keep_BuySerfCommand };
 	FireEvent(&e2);
 }
 
 void GGL::CBuilding::SellBuilding()
 {
-	shok_BB_CEvent e2{ shok_EventIDs::Die };
+	BB::CEvent e2{ shok::EventIDs::Die };
 	FireEvent(&e2);
 }
 
@@ -652,13 +653,13 @@ void GGL::CBuilding::CancelResearch()
 
 void GGL::CBuilding::MarketStartTrade(shok::ResourceType ResourceTypeSell, shok::ResourceType ResourceTypeBuy, float BuyAmount)
 {
-	shok_GGL_CEventTransaction e2{ shok_EventIDs::Market_StartTrade, ResourceTypeSell, ResourceTypeBuy, BuyAmount };
+	GGL::CEventTransaction e2{ shok::EventIDs::Market_StartTrade, ResourceTypeSell, ResourceTypeBuy, BuyAmount };
 	FireEvent(&e2);
 }
 
 void GGL::CBuilding::MarketCancelTrade()
 {
-	shok_BB_CEvent e2{ shok_EventIDs::Market_CancelTrade };
+	BB::CEvent e2{ shok::EventIDs::Market_CancelTrade };
 	FireEvent(&e2);
 }
 
@@ -669,7 +670,7 @@ int GGL::CBuilding::BuyLeaderByType(int ety)
 	GGL::CBarrackBehavior* rax = GetBehavior<GGL::CBarrackBehavior>();
 	int id = raxbeh_createentityandattach(rax, ety);
 	if (id) {
-		shok_EGL_CEventValue_int ev = { shok_EventIDs::Leader_SetTrainingTL, raxbeh_gettrainingtl(rax) };
+		EGL::CEventValue_Int ev = { shok::EventIDs::Leader_SetTrainingTL, raxbeh_gettrainingtl(rax) };
 		EGL::CGLEEntity::GetEntityByID(id)->FireEvent(&ev);
 	}
 	return id;
@@ -971,7 +972,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		return;
 	if (Health <= 0)
 		return;
-	shok_EGL_CEventGetValue_bool getbool{ shok_EventIDs::IsSettlerOrBuilding };
+	EGL::CEventGetValue_Bool getbool{ shok::EventIDs::IsSettlerOrBuilding };
 	FireEvent(&getbool);
 	if (!getbool.Data && !shok_DynamicCast<EGL::CGLEEntity, GGL::CBridgeEntity>(this))
 		return;
@@ -979,7 +980,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		return;
 	int attackerplayer = attacker ? attacker->PlayerId : attackerFallback;
 	if (attacker || EGL::CGLEEntity::HurtEntityCallWithNoAttacker) {
-		shok_EGL_CEvent2Entities ev{ shok_EventIDs::LogicEvent_HurtEntity, attacker ? attacker->EntityId : 0, EntityId };
+		EGL::CEvent2Entities ev{ shok::EventIDs::LogicEvent_HurtEntity, attacker ? attacker->EntityId : 0, EntityId };
 		EGL::CGLEEntity::HurtEntityDamagePointer = &damage;
 		EGL::CGLEEntity::HurtEntityDamageSource = sourceInfo;
 		EGL::CGLEEntity::HurtEntityAttackerPlayer = attackerplayer;
@@ -988,42 +989,42 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	}
 	if (damage <= 0)
 		return;
-	getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsWorker };
+	getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsWorker };
 	FireEvent(&getbool);
 	if (attacker) {
 		if (!getbool.Data || !(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, shok_EGL_CGLELandscape::BlockingMode::Blocked)) {
 			if (!ArePlayersFriendly(PlayerId, attacker->PlayerId)) {
-				shok_EGL_CEvent1Entity ev{ shok_EventIDs::OnAttackedBy, attacker->EntityId };
+				EGL::CEvent1Entity ev{ shok::EventIDs::OnAttackedBy, attacker->EntityId };
 				FireEvent(&ev);
 			}
 		}
 	}
 	if (uiFeedback) {
 		if (attackerplayer) {
-			shok_GGL_CFeedbackEventBattling ev{ shok_FeedbackEventIds::FEEDBACK_EVENT_BATTLING, EntityId, PlayerId, attacker ? attacker->Position : Position, attackerplayer };
+			GGL::CFeedbackEventBattling ev{ shok::FeedbackEventIds::FEEDBACK_EVENT_BATTLING, EntityId, PlayerId, attacker ? attacker->Position : Position, attackerplayer };
 			shok_feedbackEventHandler::GlobalObj()->FireEvent(&ev);
 		}
-		shok_EGL_CNetEventEntityIDAndInteger ev{ shok_FeedbackEventIds::FEEDBACK_EVENT_ENTITY_HURT, EntityId, damage };
+		EGL::CNetEventEntityIDAndInteger ev{ shok::FeedbackEventIds::FEEDBACK_EVENT_ENTITY_HURT, EntityId, damage };
 		shok_feedbackEventHandler::GlobalObj()->FireEvent(&ev);
 	}
 	if (attacker) {
 		ObserverEntities.ForAll([attacker](shok::Attachment* a) {
 			if (a->AttachmentType == shok::AttachmentType::GUARD_GUARDED) {
-				shok_EGL_CEvent1Entity ev{ shok_EventIDs::Leader_OnGuardedAttackedBy, attacker->EntityId };
+				EGL::CEvent1Entity ev{ shok::EventIDs::Leader_OnGuardedAttackedBy, attacker->EntityId };
 				EGL::CGLEEntity::GetEntityByID(a->EntityId)->FireEvent(&ev);
 			}
 			});
 	}
 
-	getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsBattleOrAutocannon };
+	getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsBattleOrAutocannon };
 	FireEvent(&getbool);
-	shok_EGL_CEventGetValue_bool getbool2{ shok_EventIDs::IsSerfOrWorker };
+	EGL::CEventGetValue_Bool getbool2{ shok::EventIDs::IsSerfOrWorker };
 	FireEvent(&getbool2);
 	std::vector<int> idskilled{};
 	int xptoadd = 0;
 	EGL::CGLEEntity* firsttodie = this;
 	if (getbool.Data && !getbool2.Data) { // has potentially soldiers
-		getbool = shok_EGL_CEventGetValue_bool{ shok_EventIDs::IsSoldier };
+		getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsSoldier };
 		FireEvent(&getbool);
 		EGL::CGLEEntity* attackedleader = this;
 		if (getbool.Data) {
@@ -1054,7 +1055,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 					currentsol--;
 					idskilled.push_back(firsttodie->EntityId);
 					xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
-					shok_GGL_CEventEntityIndex kev{ shok_EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
+					GGL::CEventEntityIndex kev{ shok::EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
 					firsttodie->FireEvent(&kev);
 					if (EGL::CGLEEntity::HurtEntityOnKillCb)
 						EGL::CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
@@ -1080,7 +1081,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		if (damage >= firsttodie->Health) {
 			idskilled.push_back(firsttodie->EntityId);
 			xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
-			shok_GGL_CEventEntityIndex kev{ shok_EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
+			GGL::CEventEntityIndex kev{ shok::EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
 			firsttodie->FireEvent(&kev);
 			if (EGL::CGLEEntity::HurtEntityOnKillCb)
 				EGL::CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
@@ -1163,9 +1164,9 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 			cr = 1 - cr * cr;
 		
 		if (cr != 0) {
-			shok_EGL_CEventGetValue_int getac{ shok_EventIDs::GetArmorClass };
+			EGL::CEventGetValue_Int getac{ shok::EventIDs::GetArmorClass };
 			curr->FireEvent(&getac);
-			shok_EGL_CEventGetValue_int geta{ shok_EventIDs::GetArmor };
+			EGL::CEventGetValue_Int geta{ shok::EventIDs::GetArmor };
 			curr->FireEvent(&geta);
 
 			float dmg = damage * cr;
@@ -1376,7 +1377,7 @@ void __fastcall entity_buildonsetpos(EGL::CMovingEntity* e) {
 		}
 	}
 	else {
-		shok_BB_CEvent ev{ 0x2000D };
+		BB::CEvent ev{ 0x2000D };
 		e->FireEvent(&ev);
 		if (e->MovementState == 0) {
 			ev.EventTypeId = 0x11017;
@@ -1463,7 +1464,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntit
 	}
 	int id = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	EGL::CGLEEntity* r = EGL::CGLEEntity::GetEntityByID(id);
-	shok_EGL_CEventValue_int ev{ shok_EventIDs::ResourceTree_Init, e->EntityType };
+	EGL::CEventValue_Int ev{ shok::EventIDs::ResourceTree_Init, e->EntityType };
 	r->FireEvent(&ev);
 	e->Destroy();
 	return r;
@@ -1473,7 +1474,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntit
 std::map<int, EGL::CGLEEntity::EntityAddonData> EGL::CGLEEntity::AddonDataMap = std::map<int, EGL::CGLEEntity::EntityAddonData>();
 EGL::CGLEEntity::EntityAddonData EGL::CGLEEntity::LastRemovedEntityAddonData = EGL::CGLEEntity::EntityAddonData();
 void __fastcall destroyentity_gemoveadd(EGL::CGLEEntity* e) {
-	shok_BB_CEvent ev{ shok_EventIDs::CppL_OnEntityDestroy };
+	BB::CEvent ev{ shok::EventIDs::CppL_OnEntityDestroy };
 	e->FireEvent(&ev);
 	auto a = EGL::CGLEEntity::AddonDataMap.find(e->EntityId);
 	if (a != EGL::CGLEEntity::AddonDataMap.end()) {
@@ -1559,12 +1560,20 @@ void EGL::CGLEEntity::AddTaskStateHandler(shok_TaskState state, void* obj, int(_
 	shand->Zero = 0;
 	AddStateHandler(state, shand);
 }
-void EGL::CGLEEntity::AddEventHandler(shok_EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, shok_BB_CEvent* ev))
+class EntEventHandler : public EGL::IGLEHandler<BB::CEvent, void> {
+public:
+	void* Object;
+	void(__thiscall* Func)(void*, BB::CEvent*);
+
+	virtual void Handle(BB::CEvent* t) override {
+		Func(Object, t);
+	}
+};
+void EGL::CGLEEntity::AddEventHandler(shok::EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, BB::CEvent* ev))
 {
-	shok_EGL_IGLEHandler_BB_CEvent_void* ehand = static_cast<shok_EGL_IGLEHandler_BB_CEvent_void*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_BB_CEvent_void)));
-	ehand->vtable = 0x774948; // EGL::THandler<81926, class BB::CEvent, class BB::CEvent, class GGL::CSerfBehavior, void>
+	EntEventHandler* ehand = new (shok::Malloc(sizeof(EntEventHandler))) EntEventHandler();
 	ehand->Object = ob;
-	ehand->Func = reinterpret_cast<void(__thiscall*)(void*, shok_BB_CEvent*)>(Handler);
+	ehand->Func = reinterpret_cast<void(__thiscall*)(void*, BB::CEvent*)>(Handler);
 	AddEventHandler(ev, ehand);
 }
 
@@ -1603,7 +1612,7 @@ void __declspec(naked) entitydamagemodbattlecalcsingletargetdmgasm() {
 		ret;
 	}
 }
-shok_EGL_CEventGetValue_int* __fastcall entitydamagemodeventautocannonasm(GGL::CAutoCannonBehavior* th, int, shok_EGL_CEventGetValue_int* ev) {
+EGL::CEventGetValue_Int* __fastcall entitydamagemodeventautocannonasm(GGL::CAutoCannonBehavior* th, int, EGL::CEventGetValue_Int* ev) {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
 	if (d && d->DamageOverride >= 0)

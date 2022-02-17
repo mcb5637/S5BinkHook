@@ -1,6 +1,6 @@
 #pragma once
 #include "s5_forwardDecls.h"
-#include "s5events.h"
+#include "s5_events.h"
 
 namespace EGL {
 	class CNetEvent2Entities : public BB::CEvent {

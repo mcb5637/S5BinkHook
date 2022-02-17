@@ -150,10 +150,10 @@
     <ClInclude Include="s5_entity.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
-    <ClInclude Include="s5entitydisplay.h">
+    <ClInclude Include="s5_entitydisplay.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
-    <ClInclude Include="s5events.h">
+    <ClInclude Include="s5_events.h">
       <Filter>shok\events</Filter>
     </ClInclude>
     <ClInclude Include="s5_netevents.h">
@@ -257,10 +257,10 @@
     <ClCompile Include="s5_entity.cpp">
       <Filter>shok\entity</Filter>
     </ClCompile>
-    <ClCompile Include="s5entitydisplay.cpp">
+    <ClCompile Include="s5_entitydisplay.cpp">
       <Filter>shok\entity</Filter>
     </ClCompile>
-    <ClCompile Include="s5events.cpp">
+    <ClCompile Include="s5_events.cpp">
       <Filter>shok\events</Filter>
     </ClCompile>
     <ClCompile Include="s5_netevents.cpp">

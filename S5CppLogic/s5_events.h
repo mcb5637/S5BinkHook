@@ -35,6 +35,7 @@ namespace BB {
 namespace EGL {
 	// input events
 	template<class T, unsigned int id>
+	requires (std::same_as<T, int> && id == 0xFE5B4097) || (std::same_as<T, bool> && id == 0x29EC0467) || (std::same_as<T, float> && id == 0x4C324467)
 	class CEventValue : public BB::CEvent {
 	public:
 		T Data = {};
@@ -46,11 +47,11 @@ namespace EGL {
 			else if constexpr (std::same_as<T, bool> && id == 0x29EC0467) {
 				return 0x76E220;
 			}
-			else if constexpr (std::same_as<float, bool> && id == 0x4C324467) {
+			else if constexpr (std::same_as<T, float> && id == 0x4C324467) {
 				return 0x76F8F4;
 			}
 			else {
-				static_assert(false, "template initialization faled for CEventValue");
+				//static_assert(false, "template initialization faled for CEventValue");
 			}
 		}
 		static constexpr int TypeDesc() {
@@ -60,11 +61,11 @@ namespace EGL {
 			else if constexpr (std::same_as<T, bool> && id == 0x29EC0467) {
 				return 0x810ADC;
 			}
-			else if constexpr (std::same_as<float, bool> && id == 0x4C324467) {
+			else if constexpr (std::same_as<T, float> && id == 0x4C324467) {
 				return 0x8117B0;
 			}
 			else {
-				static_assert(false, "template initialization faled for CEventValue");
+				//static_assert(false, "template initialization faled for CEventValue");
 			}
 		}
 
@@ -83,6 +84,7 @@ namespace EGL {
 
 
 	template<class T, unsigned int id>
+	requires (std::same_as<T, bool> && id == 0x65DE8317) || (std::same_as<T, int> && id == 0x483040E7) || (std::same_as<T, float> && id == 0x578EE8F7)
 	class CEventGetValue : public BB::CEvent {
 	public:
 		T Data = {};
@@ -98,7 +100,7 @@ namespace EGL {
 				return 0x76E210;
 			}
 			else {
-				static_assert(false, "template initialization faled for CEventGetValue");
+				//static_assert(false, "template initialization faled for CEventGetValue");
 			}
 		}
 		static constexpr int TypeDesc() {
@@ -112,7 +114,7 @@ namespace EGL {
 				return 0x810AAC;
 			}
 			else {
-				static_assert(false, "template initialization faled for CEventGetValue");
+				//static_assert(false, "template initialization faled for CEventGetValue");
 			}
 		}
 

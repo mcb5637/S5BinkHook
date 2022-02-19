@@ -98,7 +98,7 @@ struct shok_EGL_CGLEEffectManager : shok_object {
 	static inline constexpr int vtp = 0x784528;
 
 	bool IsEffectValid(int id);
-	shok_EGL_CEffect* GetEffectById(int id);
+	EGL::CEffect* GetEffectById(int id);
 
 	static inline shok_EGL_CGLEEffectManager** const GlobalObj = reinterpret_cast<shok_EGL_CGLEEffectManager**>(0x898144);
 };
@@ -287,7 +287,7 @@ struct shok_EGL_CGLEGameLogic : shok_object {
 
 	static inline constexpr int vtp = 0x7839CC;
 
-	int CreateEffect(shok_EGL_CGLEEffectCreator* data);
+	int CreateEffect(EGL::CGLEEffectCreator* data);
 	int CreateEntity(EGL::CGLEEntityCreator* cr);
 	int GetTimeMS();
 	int GetTick();
@@ -546,7 +546,7 @@ struct shok_GGL_CWeatherHandler : shok_object {
 struct shok_GGL_CGLGameLogic : shok_object {
 	PADDINGI(9);
 public:
-	shok_GGL_CPlayerStatus** players; // 10
+	GGL::CPlayerStatus** players; // 10
 	shok_GGL_CWeatherHandler* WeatherHandler;
 	PADDINGI(1);
 private:
@@ -558,7 +558,7 @@ public:
 
 	static inline constexpr int vtp = 0x76E018;
 
-	shok_GGL_CPlayerStatus* GetPlayer(int i);
+	GGL::CPlayerStatus* GetPlayer(int i);
 	shok_technology* GetTech(int i);
 	void EnableAlarmForPlayer(int pl);
 	void DisableAlarmForPlayer(int pl);

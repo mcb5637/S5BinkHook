@@ -2,16 +2,6 @@
 #include "s5data.h"
 
 namespace EGL {
-	class ISlot {
-	public:
-		static inline constexpr int vtp = 0x7738CC;
-		virtual ~ISlot();
-	};
-	template<class T, unsigned int id>
-	class TSlot : public ISlot {
-
-	};
-
 	class CGLEBehavior : public BB::IObject { // no vtable
 	public:
 		int SlotIndex, EntityId;

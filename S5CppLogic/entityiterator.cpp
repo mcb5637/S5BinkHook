@@ -207,7 +207,7 @@ bool EntityIteratorPredicateAnyPlayer::MatchesEntity(EGL::CGLEEntity* e, float* 
 }
 void EntityIteratorPredicateAnyPlayer::FillHostilePlayers(int source, int* players, int& maxP)
 {
-	shok_GGL_CPlayerStatus* pl = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(source);
+	GGL::CPlayerStatus* pl = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(source);
 	int curr = 0;
 	for (int p = 1; p <= maxP; p++) {
 		if (pl->GetDiploStateTo(p) == shok::DiploState::Hostile) {

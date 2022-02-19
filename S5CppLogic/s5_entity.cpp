@@ -963,7 +963,7 @@ void EGL::CGLEEntity::HookHurtEntity()
 
 	HookDamageMod(); // set projectile player field in creator
 	GGL::CBombPlacerBehavior::FixBombAttachment();
-	shok_GGL_CCannonBallEffect::AddDamageSourceOverride = true;
+	GGL::CCannonBallEffect::AddDamageSourceOverride = true;
 }
 void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo)
 {
@@ -992,7 +992,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	FireEvent(&getbool);
 	if (attacker) {
 		if (!getbool.Data || !(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, shok_EGL_CGLELandscape::BlockingMode::Blocked)) {
-			if (!ArePlayersFriendly(PlayerId, attacker->PlayerId)) {
+			if (!GGL::CPlayerStatus::ArePlayersFriendly(PlayerId, attacker->PlayerId)) {
 				EGL::CEvent1Entity ev{ shok::EventIDs::OnAttackedBy, attacker->EntityId };
 				FireEvent(&ev);
 			}
@@ -1104,7 +1104,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		if (addStat) {
 			if (attackerplayer)
 				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfBuildingsDestroyed += idskilled.size();
-			if (shok_GGL_CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
+			if (GGL::CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
 				ps->Statistics.NumberOfBuildingsLost += idskilled.size();
 		}
 		callback = "GameCallback_BuildingDestroyed";
@@ -1113,7 +1113,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		if (addStat) {
 			if (attackerplayer)
 				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfUnitsKilled += idskilled.size();
-			if (shok_GGL_CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
+			if (GGL::CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
 				ps->Statistics.NumberOfUnitsDied += idskilled.size();
 		}
 		callback = "GameCallback_SettlerKilled";
@@ -1967,7 +1967,7 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 	float hpfact = pr->HealthRecoveryFactor;
 	if (hpfact <= 0)
 		return;
-	shok_EGL_CGLEEffectCreator ecr{};
+	EGL::CGLEEffectCreator ecr{};
 	ecr.PlayerID = e->PlayerId;
 	ecr.EffectType = pr->HealEffect;
 	e->ObservedEntities.ForAll([hpfact, &ecr](shok::Attachment* a) {

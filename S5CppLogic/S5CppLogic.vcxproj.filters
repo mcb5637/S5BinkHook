@@ -25,6 +25,12 @@
     <Filter Include="shok\events">
       <UniqueIdentifier>{772cebac-6898-460f-aa0d-bfff4d515106}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shok\effect">
+      <UniqueIdentifier>{67a56991-4893-4063-b849-dab4a302cb31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shok\player">
+      <UniqueIdentifier>{8dac7673-600f-4fbf-a555-ee8af0e0d717}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -69,13 +75,7 @@
     <ClInclude Include="l_ua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s5effects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="s5globalObjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="s5player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5tech.h">
@@ -159,6 +159,12 @@
     <ClInclude Include="s5_netevents.h">
       <Filter>shok\events</Filter>
     </ClInclude>
+    <ClInclude Include="s5effects.h">
+      <Filter>shok\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="s5player.h">
+      <Filter>shok\player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -200,13 +206,7 @@
     <ClCompile Include="l_ua.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="s5effects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="s5globalObjects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="s5player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5widget.cpp">
@@ -265,6 +265,12 @@
     </ClCompile>
     <ClCompile Include="s5_netevents.cpp">
       <Filter>shok\events</Filter>
+    </ClCompile>
+    <ClCompile Include="s5effects.cpp">
+      <Filter>shok\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="s5player.cpp">
+      <Filter>shok\player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

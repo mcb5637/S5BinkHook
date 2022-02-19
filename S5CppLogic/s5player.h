@@ -1,239 +1,246 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_GGL_CSerfManager : shok_BB_IObject {
-	// seems to be just playerid and 2 unknown values
+namespace GGL {
+	class CSerfManager : public BB::IObject {
+	public:
+		// seems to be just playerid and 2 unknown values
+		static inline constexpr int vtp = 0x76EA2C;
+	};
 
-	static inline constexpr int vtp = 0x76EA2C;
-};
-struct shok_GGL_CPlayerAttractionHandler_entityinsystem {
-	int EntityID, GameTurn;
-};
-struct shok_GGL_CPlayerAttractionHandler_typethatleft {
-	int EntityType, GameTurn;
-};
-struct shok_GGL_CPlayerAttractionHandler_typecount {
-	int EntityType, Count;
-};
-struct shok_GGL_CPlayerAttractionHandler : shok_BB_IObject {
-	int PlayerID;
-	byte PaydayActive;
-	PADDING(3);
-	int PaydayFirstOccuraceGameTurn;
-	byte AIPlayerFlag, PayLeaderFlag;
-	PADDING(2);
-	PADDINGI(2); // maybe char pointer? GUI_WorkersWithoutSleepPlace m_GUI_WorkersWithoutEatPlace
-	vector_padding;
-	std::vector<shok_GGL_CPlayerAttractionHandler_entityinsystem, shok::Allocator<shok_GGL_CPlayerAttractionHandler_entityinsystem>> EntityInSystem;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> HeadquarterArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> VillageCenterArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> WorkBuildingsArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> ResidenceBuildingArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> FarmBuildingArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> BarrackBuildingArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> FreeWorkerArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> EmployedWorkerArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> SoldierArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> LeaderArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> HeroArray;
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> SerfArray;
-	vector_padding;
-	std::vector<shok_GGL_CPlayerAttractionHandler_typethatleft, shok::Allocator<shok_GGL_CPlayerAttractionHandler_typethatleft>> EntityTypeThatLeft;
-	vector_padding;
-	std::vector<shok_GGL_CPlayerAttractionHandler_typecount, shok::Allocator<shok_GGL_CPlayerAttractionHandler_typecount>> EntityTypeCountMap;
+	class CPlayerAttractionHandler : public BB::IObject {
+	public:
+		struct EntityInSystemData {
+			int EntityID, GameTurn;
+		};
+		struct TypeThatLeftData {
+			int EntityType, GameTurn;
+		};
+		struct TypeCountMapData {
+			int EntityType, Count;
+		};
 
-	static inline constexpr int vtp = 0x770868;
+		int PlayerID;
+		byte PaydayActive;
+		PADDING(3);
+		int PaydayFirstOccuraceGameTurn;
+		byte AIPlayerFlag, PayLeaderFlag;
+		PADDING(2);
+		PADDINGI(2); // maybe char pointer? GUI_WorkersWithoutSleepPlace m_GUI_WorkersWithoutEatPlace
+		shok::Vector<EntityInSystemData> EntityInSystem;
+		shok::Vector<int> HeadquarterArray;
+		shok::Vector<int> VillageCenterArray;
+		shok::Vector<int> WorkBuildingsArray;
+		shok::Vector<int> ResidenceBuildingArray;
+		shok::Vector<int> FarmBuildingArray;
+		shok::Vector<int> BarrackBuildingArray;
+		shok::Vector<int> FreeWorkerArray;
+		shok::Vector<int> EmployedWorkerArray;
+		shok::Vector<int> SoldierArray;
+		shok::Vector<int> LeaderArray;
+		shok::Vector<int> HeroArray;
+		shok::Vector<int> SerfArray;
+		shok::Vector<TypeThatLeftData> EntityTypeThatLeft;
+		shok::Vector<TypeCountMapData> EntityTypeCountMap;
 
-	int GetAttractionLimit();
-	int GetAttractionUsage();
-	int GetWorkerPaydayIncome();
-	int GetNumberOfAttractedWorkers();
-	float GetLeaderPaydayCost();
-	int GetNumberOfLeaders();
+		static inline constexpr int vtp = 0x770868;
 
-	// checkpayday 4C25FB thiscall
-	static void HookCheckPayday();
-	static void (*OnCheckPayDayCallback)(shok_GGL_CPlayerAttractionHandler* th);
-};
-//constexpr int i = offsetof(shok_GGL_CPlayerAttractionHandler, WorkBuildingsArray) / 4;
+		int GetAttractionLimit();
+		int GetAttractionUsage();
+		int GetWorkerPaydayIncome();
+		int GetNumberOfAttractedWorkers();
+		float GetLeaderPaydayCost();
+		int GetNumberOfLeaders();
 
-struct shok_GGL_CUpgradeManager_jobdata {
-	int Category;
-	shok::Set<int[3]> UpgradeJobData; // UpgradeProgress, Category, UpgradeManager
-};
-struct shok_GGL_CUpgradeManager_UCatEntry {
-	int UCat;
-	int NumUpgrades;
-	int FirstEntityType;
-};
-struct shok_GGL_CUpgradeManager : shok_BB_IObject {
-	shok::Set<shok_GGL_CUpgradeManager_jobdata> JobData; // empty
-	shok::Set<shok_GGL_CUpgradeManager_UCatEntry> UpgradeCategories;
-	int PlayerID;
+		// checkpayday 4C25FB thiscall
+		static void HookCheckPayday();
+		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);
+	};
 
-	static inline constexpr int vtp = 0x7728CC;
-
-	int GetUpgradeCategoryOfEntityType(int etype);
-};
-struct shok_GGL_CBuildingUpgradeManager : shok_GGL_CUpgradeManager {
-	shok::Set<int[3]> ScholarInfoElement; // Category, ScholarInfo { ?, CurrentAmount } ?
-
-	static inline constexpr int vtp = 0x772948;
-};
-struct shok_GGL_CSettlerUpgradeManager : shok_GGL_CUpgradeManager {
-	
-
-	static inline constexpr int vtp = 0x772904;
-
-	int GetSettlerTypeByUCat(int ucat);
-};
-struct shok_GGL_CTradeManager_data {
-	int ResourceType;
-	float CurrentPrice, CurrentInflation, CurrentDeflation;
-	byte CanBeSold, CanBeBought;
-};
-struct shok_GGL_CTradeManager : shok_BB_IObject {
-	int PlayerID;
-	vector_padding;
-	std::vector<shok_GGL_CTradeManager_data, shok::Allocator<shok_GGL_CTradeManager_data>> TradeData;
-
-	static inline constexpr int vtp = 0x772860;
-};
-
-struct shok_GGL_CPlayerStatus_techData_tech {
-	int TechStatus;
-	int ResearchProgress;
-	int StartTick;
-	int ResearcherId;
-};
-struct shok_GGL_CPlayerStatus_techData { // size 12
-	int PlayerID;
-	vector_padding;
-	std::vector<shok_GGL_CPlayerStatus_techData_tech, shok::Allocator<shok_GGL_CPlayerStatus_techData_tech>> TechnologyState;
-	PADDINGI(4); // vector<?> TechnologyInProcess
-	PADDINGI(3);
-};
-static_assert(sizeof(shok_GGL_CPlayerStatus_techData) == 12 * 4);
-struct shok_GGL_CPlayerStatus_tributeData_tribute {
-	int UniqueTributeID;
-	shok::CostInfo Costs;
-	int OwnerEntityID;
-	int OfferingPlayerID;
-	shok::String OfferStringTableKey;
-};
-struct shok_GGL_CPlayerStatus_tributeData {
-	int PlayerID;
-	vector_padding;
-	std::vector<shok_GGL_CPlayerStatus_tributeData, shok::Allocator<shok_GGL_CPlayerStatus_tributeData>> Tributes;
-};
-static_assert(sizeof(shok_GGL_CPlayerStatus_tributeData) == 5 * 4);
-struct shok_GGL_CPlayerStatus_questData_quest {
-	int UniqueQuestID;
-	int QuestType;
-	shok::String QuestNameStringTableKey, QuestDescriptionStringTableKey;
-	int SubQuestDoneFlagArray[6]; // type?
-};
-struct shok_GGL_CPlayerStatus_questData {
-	int PlayerID;
-	vector_padding;
-	std::list< shok_GGL_CPlayerStatus_questData_quest, shok::Allocator< shok_GGL_CPlayerStatus_questData_quest>> Quests;
-};
-struct shok_statisticsTimeline {
-	vector_padding;
-	std::vector<int, shok::Allocator<int>> Amounts;
-	int PlayerID;
-	int LastGatherTurn;
-};
-struct shok_GGL_CResourceStatistics_data {
-	int ResourceType;
-	int AmountMined;
-	int AmountRefined;
-	shok_statisticsTimeline TimeLine;
-};
-struct shok_GGL_CResourceStatistics : shok_object {
-	vector_padding;
-	std::vector<shok_GGL_CResourceStatistics_data, shok::Allocator<shok_GGL_CResourceStatistics_data>> Data;
-	PADDINGI(1);
-
-	static inline constexpr int vtp = 0x76E0D8;
-};
-struct shok_statisticsTechResearched {
-	int TechnologyType, Time;
-};
-struct shok_statisticsBuildingUpgraded {
-	int BuildingType, Time;
-};
-struct shok_GGL_CGameStatistics : shok_object {
-	int PlayerID;
-	int NumberOfUnitsKilled, NumberOfUnitsDied, NumberOfBuildingsDestroyed, NumberOfBuildingsLost;
-	shok_GGL_CResourceStatistics ResourceStatistics; //6
-	shok_statisticsTimeline UnitsKilledTimeLine, UnitsDiedTimeLine, BuildingsDestroyedTimeLine, BuildingsLostTimeLine, // 12, 18
-		SerfTimeLine, WorkerTimeLine, LeaderTimeLine, HeroTimeLine, SoldierTimeLine, FarmTimeLine, ResidenceTimeLine,
-		WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine; // la 102, 96, 90
-	vector_padding;
-	std::vector<shok_statisticsTechResearched, shok::Allocator<shok_statisticsTechResearched>> ResearchedTechnologies;
-	vector_padding;
-	std::vector<shok_statisticsBuildingUpgraded, shok::Allocator<shok_statisticsBuildingUpgraded>> UpgradedBuildings;
-
-	static inline constexpr int vtp = 0x76E0E0;
-};
-static_assert(sizeof(shok_GGL_CGameStatistics) == 116 * 4);
-//constexpr int i = offsetof(shok_GGL_CGameStatistics, VillageCenterTimeLine) / 4;
-struct shok_GGL_CPlayerStatus : shok_BB_IObject {
-	int PlayerGameState;
-	byte PlayerHasLeftGameFlag;
-	PADDING(3);
-	int PlayerGameStateChangeGameTurn;
-	byte PlayerIsHumanFlag;
-	PADDING(3);
-	int PlayerColorR, PlayerColorG, PlayerColorB;
-	int PlayerID;
-	shok::String PlayerNameStringTableKey, PlayerNameStringRaw;
-	shok::CostInfo CurrentResources; // 23
-	float TaxAmountFactor;
-	int TaxLevel; // 42
-	float CurrentMaxMotivation;
-	int DurationOfWeatherChange; // seems to be always 0
-	int NumberOfBuyableHeros;
-	byte WorkerAlarmMode;
-	PADDING(3);
-	int AlarmRechargeTime;
-	int DiplomacyData[11]; // 48
-	shok_GGL_CPlayerStatus_techData TechnologyStates; // 59
-	shok_GGL_CPlayerStatus_tributeData Tributes; // 71
-	shok_GGL_CPlayerStatus_questData Quests; // 76
-	shok_GGL_CGameStatistics Statistics; // 80
-	shok_GGL_CSerfManager* SerfManager;
-	shok_GGL_CPlayerAttractionHandler* PlayerAttractionHandler; // 197
-	shok_GGL_CBuildingUpgradeManager* BuildingUpgradeManager;
-	shok_GGL_CSettlerUpgradeManager* SettlerUpgradeManager;
-	shok_GGL_CTradeManager* TradeManager;
-
-	static inline constexpr int vtp = 0x76FA88;
-
-	shok::DiploState GetDiploStateTo(int p);
-	shok::TechState GetTechStatus(int tech);
-};
-//constexpr int i = offsetof(shok_GGL_CPlayerStatus, Statistics) / 4;
-
-static inline bool(_cdecl* const shok_canPlaceBuilding)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) = reinterpret_cast<bool(_cdecl*)(int, int, shok::Position*, float, int)>(0x4B442C);
-static inline bool(_cdecl* const shok_canPlaceBuildingAtPos)(int entitytype, int player, shok::Position* pos, float rotation) = reinterpret_cast<bool(_cdecl*)(int, int, shok::Position *, float)>(0x4B45C8);
+	class CUpgradeManager : public BB::IObject {
+	public:
+		struct Job {
+			int Category;
+			shok::Set<int[3]> UpgradeJobData; // UpgradeProgress, Category, UpgradeManager
+		};
+		struct UCatEntry {
+			int UCat;
+			int NumUpgrades;
+			int FirstEntityType;
+		};
 
 
-bool ArePlayersHostile(int p1, int p2);
-bool ArePlayersFriendly(int p1, int p2);
+		shok::Set<Job> JobData; // empty
+		shok::Set<UCatEntry> UpgradeCategories;
+		int PlayerID;
 
-extern bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId);
-void HookCanPlaceBuilding();
+		static inline constexpr int vtp = 0x7728CC;
+
+		int GetUpgradeCategoryOfEntityType(int etype);
+	};
+	class CBuildingUpgradeManager : public GGL::CUpgradeManager {
+	public:
+		shok::Set<int[3]> ScholarInfoElement; // Category, ScholarInfo { ?, CurrentAmount } ?
+
+		static inline constexpr int vtp = 0x772948;
+	};
+	class CSettlerUpgradeManager : public GGL::CUpgradeManager {
+	public:
+
+		static inline constexpr int vtp = 0x772904;
+
+		int GetSettlerTypeByUCat(int ucat);
+	};
+
+	class CTradeManager : public BB::IObject {
+	public:
+		struct ResData {
+			int ResourceType;
+			float CurrentPrice, CurrentInflation, CurrentDeflation;
+			bool CanBeSold, CanBeBought;
+		};
+
+
+		int PlayerID;
+		shok::Vector<ResData> TradeData;
+
+		static inline constexpr int vtp = 0x772860;
+	};
+
+	struct PlayerTechManager { // size 12
+		struct Tech {
+			int TechStatus;
+			int ResearchProgress;
+			int StartTick;
+			int ResearcherId;
+		};
+
+
+		int PlayerID;
+		shok::Vector<Tech> TechnologyState;
+		PADDINGI(4); // vector<?> TechnologyInProcess
+		PADDINGI(3);
+	};
+	static_assert(sizeof(PlayerTechManager) == 12 * 4);
+
+	struct PlayerTributesManager {
+		struct Tribute {
+			int UniqueTributeID;
+			shok::CostInfo Costs;
+			int OwnerEntityID;
+			int OfferingPlayerID;
+			shok::String OfferStringTableKey;
+		};
+
+		int PlayerID;
+		shok::Vector<Tribute> Tributes;
+	};
+	static_assert(sizeof(PlayerTributesManager) == 5 * 4);
+
+	struct PlayerQuestManager {
+		struct Quest {
+			int UniqueQuestID;
+			int QuestType;
+			shok::String QuestNameStringTableKey, QuestDescriptionStringTableKey;
+			int SubQuestDoneFlagArray[6]; // type?
+		};
+
+
+		int PlayerID;
+		shok::List<Quest> Quests;
+	};
+
+	struct GameStatisticsTimeline {
+		shok::Vector<int> Amounts;
+		int PlayerID;
+		int LastGatherTurn;
+	};
+	class CResourceStatistics {
+	public:
+		struct ResData {
+			int ResourceType;
+			int AmountMined;
+			int AmountRefined;
+			GGL::GameStatisticsTimeline TimeLine;
+		};
+
+		shok::Vector<ResData> Data;
+		PADDINGI(1);
+
+		virtual unsigned int __stdcall GetClassIdentifier() const;
+
+		static inline constexpr int vtp = 0x76E0D8;
+	};
+	class CGameStatistics {
+	public:
+		struct TechResearchData {
+			int TechnologyType, Time;
+		};
+		struct BuildingUpgradedData {
+			int BuildingType, Time;
+		};
+
+		int PlayerID;
+		int NumberOfUnitsKilled, NumberOfUnitsDied, NumberOfBuildingsDestroyed, NumberOfBuildingsLost;
+		GGL::CResourceStatistics ResourceStatistics; //6
+		GGL::GameStatisticsTimeline UnitsKilledTimeLine, UnitsDiedTimeLine, BuildingsDestroyedTimeLine, BuildingsLostTimeLine, // 12, 18
+			SerfTimeLine, WorkerTimeLine, LeaderTimeLine, HeroTimeLine, SoldierTimeLine, FarmTimeLine, ResidenceTimeLine,
+			WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine; // la 102, 96, 90
+		shok::Vector<TechResearchData> ResearchedTechnologies;
+		shok::Vector<BuildingUpgradedData> UpgradedBuildings;
+
+		virtual unsigned int __stdcall GetClassIdentifier() const;
+
+		static inline constexpr int vtp = 0x76E0E0;
+	};
+	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
+
+	class CPlayerStatus : public BB::IObject {
+	public:
+		int PlayerGameState;
+		byte PlayerHasLeftGameFlag;
+		PADDING(3);
+		int PlayerGameStateChangeGameTurn;
+		byte PlayerIsHumanFlag;
+		PADDING(3);
+		int PlayerColorR, PlayerColorG, PlayerColorB;
+		int PlayerID;
+		shok::String PlayerNameStringTableKey, PlayerNameStringRaw;
+		shok::CostInfo CurrentResources; // 23
+		float TaxAmountFactor;
+		int TaxLevel; // 42
+		float CurrentMaxMotivation;
+		int DurationOfWeatherChange; // seems to be always 0
+		int NumberOfBuyableHeros;
+		byte WorkerAlarmMode;
+		PADDING(3);
+		int AlarmRechargeTime;
+		int DiplomacyData[11]; // 48
+		GGL::PlayerTechManager TechnologyStates; // 59
+		GGL::PlayerTributesManager Tributes; // 71
+		GGL::PlayerQuestManager Quests; // 76
+		GGL::CGameStatistics Statistics; // 80
+		GGL::CSerfManager* SerfManager;
+		GGL::CPlayerAttractionHandler* PlayerAttractionHandler; // 197
+		GGL::CBuildingUpgradeManager* BuildingUpgradeManager;
+		GGL::CSettlerUpgradeManager* SettlerUpgradeManager;
+		GGL::CTradeManager* TradeManager;
+
+		static inline constexpr int vtp = 0x76FA88;
+
+		shok::DiploState GetDiploStateTo(int p);
+		shok::TechState GetTechStatus(int tech);
+
+
+		static bool ArePlayersHostile(int p1, int p2);
+		static bool ArePlayersFriendly(int p1, int p2);
+
+		static inline bool(_cdecl* const CanPlaceBuilding)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) = reinterpret_cast<bool(_cdecl*)(int, int, shok::Position*, float, int)>(0x4B442C);
+		static inline bool(_cdecl* const CanPlaceBuildingAtPos)(int entitytype, int player, shok::Position* pos, float rotation) = reinterpret_cast<bool(_cdecl*)(int, int, shok::Position*, float)>(0x4B45C8);
+
+		static bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId);
+		static void HookCanPlaceBuilding();
+
+	};
+
+}

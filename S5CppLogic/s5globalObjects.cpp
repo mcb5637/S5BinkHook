@@ -23,7 +23,7 @@ struct shok_vtable_EGL_CTiling {
 struct shok_vtable_EGL_CGLEGameLogic {
 	PADDINGI(22);
 	int(__thiscall* CreateEntity)(shok_EGL_CGLEGameLogic* th, EGL::CGLEEntityCreator* data, int i); // 22
-	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, shok_EGL_CGLEEffectCreator* data); // 23
+	int(__thiscall* CreateEffect)(shok_EGL_CGLEGameLogic* th, EGL::CGLEEffectCreator* data); // 23
 };
 
 struct shok_vtable_BB_IPostEvent {
@@ -96,8 +96,8 @@ bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
 	return shok_EGL_CGLEEffectManager_IsEffectValid(this, id);
 }
 
-static inline shok_EGL_CEffect* (__thiscall* const shok_effid2obj)(shok_EGL_CGLEEffectManager* th, int id) = reinterpret_cast<shok_EGL_CEffect * (__thiscall*)(shok_EGL_CGLEEffectManager*, int)>(0x4FAAE3);
-shok_EGL_CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
+static inline EGL::CEffect* (__thiscall* const shok_effid2obj)(shok_EGL_CGLEEffectManager* th, int id) = reinterpret_cast<EGL::CEffect * (__thiscall*)(shok_EGL_CGLEEffectManager*, int)>(0x4FAAE3);
+EGL::CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 {
 	return shok_effid2obj(this, id);
 }
@@ -731,7 +731,7 @@ shok_EGL_CPlayerExplorationHandler* shok_somegamelogicstuff::GetExplorationHandl
 	return nullptr;
 }
 
-int shok_EGL_CGLEGameLogic::CreateEffect(shok_EGL_CGLEEffectCreator* data) {
+int shok_EGL_CGLEGameLogic::CreateEffect(EGL::CGLEEffectCreator* data) {
 	return reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable)->CreateEffect(this, data);
 }
 
@@ -750,9 +750,9 @@ int shok_EGL_CGLEGameLogic::GetTick()
 	return InGameTime[0];
 }
 
-int(__thiscall* CreateEffectHookedOrig)(shok_EGL_CGLEGameLogic* th, shok_EGL_CGLEEffectCreator* data) = nullptr;
+int(__thiscall* CreateEffectHookedOrig)(shok_EGL_CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = nullptr;
 void(*shok_EGL_CGLEGameLogic::CreateEffectHookCallback)(int id, void* ret) = nullptr;
-int __fastcall CreateEffectHook(shok_EGL_CGLEGameLogic* th, int _, shok_EGL_CGLEEffectCreator* data)
+int __fastcall CreateEffectHook(shok_EGL_CGLEGameLogic* th, int _, EGL::CGLEEffectCreator* data)
 {
 	void** ebp_var = (void**)1;
 	_asm {
@@ -770,7 +770,7 @@ void shok_EGL_CGLEGameLogic::HookCreateEffect()
 	shok_vtable_EGL_CGLEGameLogic* vt = reinterpret_cast<shok_vtable_EGL_CGLEGameLogic*>(vtable);
 	shok::SaveVirtualProtect vp{ vt, 25 * 4 };
 	CreateEffectHookedOrig = vt->CreateEffect;
-	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLEGameLogic * th, shok_EGL_CGLEEffectCreator * data)>(&CreateEffectHook);
+	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(shok_EGL_CGLEGameLogic * th, EGL::CGLEEffectCreator * data)>(&CreateEffectHook);
 }
 
 
@@ -812,8 +812,8 @@ EGL::CGLEEntity* shok_EGL_CGLEEntityManager::GetEntityByNum(int num)
 	return Entities[num].entity;
 }
 
-static inline shok_GGL_CPlayerStatus* (__thiscall* const shok_GGL_CGLGameLogic_GetPlayer)(shok_GGL_CPlayerStatus** pl, int p) = reinterpret_cast<shok_GGL_CPlayerStatus * (__thiscall*) (shok_GGL_CPlayerStatus**, int)>(0x4A91BC);
-shok_GGL_CPlayerStatus* shok_GGL_CGLGameLogic::GetPlayer(int i)
+static inline GGL::CPlayerStatus* (__thiscall* const shok_GGL_CGLGameLogic_GetPlayer)(GGL::CPlayerStatus** pl, int p) = reinterpret_cast<GGL::CPlayerStatus * (__thiscall*) (GGL::CPlayerStatus**, int)>(0x4A91BC);
+GGL::CPlayerStatus* shok_GGL_CGLGameLogic::GetPlayer(int i)
 {
 	return shok_GGL_CGLGameLogic_GetPlayer(this->players, i);
 }

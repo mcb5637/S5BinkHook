@@ -29,24 +29,24 @@ int l_combat_dealAOEDamage(lua_State* L) {
 
 // tested aoe damage: cannon/autocannon projectile, circularattack, trapcannon 
 int l_combat_EnableAoEProjectileFix(lua_State* L) {
-	shok_GGL_CCannonBallEffect::HookFromCreator();
-	shok_GGL_CCannonBallEffect::FixDamageClass = true;
+	GGL::CCannonBallEffect::HookFromCreator();
+	GGL::CCannonBallEffect::FixDamageClass = true;
 	EGL::CGLEEntity::HookDamageMod();
 	return 0;
 }
 
 int l_combat_DisableAoEProjectileFix(lua_State* L) {
-	shok_GGL_CCannonBallEffect::FixDamageClass = false;
+	GGL::CCannonBallEffect::FixDamageClass = false;
 	return 0;
 }
 
-void l_combat_FlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff, bool post) {
+void l_combat_FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff, bool post) {
 	if (post)
 		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 	else if (eff->IsArrowEffect())
-		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CArrowEffect*)eff)->AttackerID;
+		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((GGL::CArrowEffect*)eff)->AttackerID;
 	else if (eff->IsCannonBallEffect())
-		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((shok_GGL_CCannonBallEffect*)eff)->AttackerID;
+		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((GGL::CCannonBallEffect*)eff)->AttackerID;
 }
 void l_combat_ActivateCamo(GGL::CCamouflageBehavior* th) {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
@@ -55,8 +55,8 @@ void l_combat_ActivateCamo(GGL::CCamouflageBehavior* th) {
 }
 
 int l_combat_EnableCamoFix(lua_State* L) {
-	shok_EGL_CFlyingEffect::HookOnHit();
-	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
+	EGL::CFlyingEffect::HookOnHit();
+	EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
 	EGL::CGLEEntity::HookResetCamo();
 	EGL::CGLEEntity::HookCamoActivate();
 	EGL::CGLEEntity::CamoActivateCb = &l_combat_ActivateCamo;
@@ -64,7 +64,7 @@ int l_combat_EnableCamoFix(lua_State* L) {
 }
 
 int l_combat_DisableCamoFix(lua_State* L) {
-	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
+	EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
 	EGL::CGLEEntity::CamoActivateCb = nullptr;
 	EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
 	return 0;

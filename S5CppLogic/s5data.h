@@ -226,6 +226,8 @@ namespace EGL {
 	};
 	class CEntityAttachmentProxy {
 	};
+	class CEffectAttachmentProxy {
+	};
 	template<class T, class V>
 	class TGLEAttachable : public CGLEAttachableBase {
 
@@ -251,6 +253,17 @@ namespace EGL {
 	};
 
 	using EventHandler = EGL::IGLEHandler<BB::CEvent, void>;
+
+
+	class ISlot {
+	public:
+		static inline constexpr int vtp = 0x7738CC;
+		virtual ~ISlot() = default;
+	};
+	template<class T, unsigned int id>
+	class TSlot : public ISlot {
+
+	};
 }
 
 template<class T>

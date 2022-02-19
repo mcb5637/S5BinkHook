@@ -46,7 +46,7 @@ int __fastcall sniperability_tasksnipeoverride(GGL::CSniperAbility* thi, int _, 
 	if (GGL::CSniperAbility::SnipeDamageOverride)
 		dmg = GGL::CSniperAbility::SnipeDamageOverride(thent, tar, dmg);
 	GGL::CBattleBehaviorProps* bpr = thent->GetEntityType()->GetBehaviorProps< GGL::CBattleBehaviorProps>();
-	shok_CProjectileEffectCreator cr{};
+	CProjectileEffectCreator cr{};
 	cr.EffectType = bpr->ProjectileEffectID;
 	cr.PlayerID = thent->PlayerId;
 	cr.StartPos = thent->Position;

@@ -44,7 +44,7 @@ int l_logicGetAnimIdFromName(lua_State* L) {
 int l_playerGetPaydayStatus(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	if (p->PlayerAttractionHandler->PaydayActive)
 		lua_pushnumber(L, p->PlayerAttractionHandler->PaydayFirstOccuraceGameTurn);
 	else
@@ -55,7 +55,7 @@ int l_playerSetPaydayStatus(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int st = luaL_checkint(L, 2);
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	if (st < 0) {
 		p->PlayerAttractionHandler->PaydayActive = 0;
 	}
@@ -543,7 +543,7 @@ int l_netEventUnSetHook(lua_State* L) {
 int l_playerGetKillStatistics(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	lua_pushnumber(L, p->Statistics.NumberOfUnitsKilled);
 	lua_pushnumber(L, p->Statistics.NumberOfUnitsDied);
 	lua_pushnumber(L, p->Statistics.NumberOfBuildingsDestroyed);
@@ -562,16 +562,16 @@ int l_logicCanPLaceBuildingAt(lua_State* L) {
 	p.FloorToBuildingPlacement();
 	float r = deg2rad(luaL_checkfloat(L, 4));
 	if (lua_isnumber(L, 5))
-		lua_pushboolean(L, shok_canPlaceBuilding(ty, pl, &p, r, luaL_checkint(L, 5)));
+		lua_pushboolean(L, GGL::CPlayerStatus::CanPlaceBuilding(ty, pl, &p, r, luaL_checkint(L, 5)));
 	else
-		lua_pushboolean(L, shok_canPlaceBuildingAtPos(ty, pl, &p, r));
+		lua_pushboolean(L, GGL::CPlayerStatus::CanPlaceBuildingAtPos(ty, pl, &p, r));
 	return 1;
 }
 
 int l_logicPlayerActivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	luaext_assert(L, !p->WorkerAlarmMode, "alarm active");
 	luaext_assert(L, p->AlarmRechargeTime <= 0, "alarm cooldown");
 	(*shok_GGL_CGLGameLogic::GlobalObj)->EnableAlarmForPlayer(i);
@@ -580,7 +580,7 @@ int l_logicPlayerActivateAlarm(lua_State* L) {
 int l_logicPlayerDeactivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	shok_GGL_CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
 	luaext_assert(L, p->WorkerAlarmMode, "alarm not active");
 	(*shok_GGL_CGLGameLogic::GlobalObj)->DisableAlarmForPlayer(i);
 	return 0;
@@ -590,7 +590,7 @@ int l_logicPlayerUpgradeSettlerCategory(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int ucat = luaL_checkint(L, 2);
-	shok_GGL_CUpgradeManager_UCatEntry* u = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](shok_GGL_CUpgradeManager_UCatEntry* u) {return u->UCat == ucat; });
+	auto* u = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](GGL::CSettlerUpgradeManager::UCatEntry* u) {return u->UCat == ucat; });
 	luaext_assertPointer(L, u, "invalid ucat");
 	(*shok_GGL_CGLGameLogic::GlobalObj)->UpgradeSettlerCategory(i, ucat);
 	return 0;
@@ -827,11 +827,11 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 		luaL_error(L, "use global GameCallback_PaydayPayed instead");
 	if (!lua_isfunction(L, 1))
 		luaL_error(L, "no func");
-	shok_GGL_CPlayerAttractionHandler::HookCheckPayday();
+	GGL::CPlayerAttractionHandler::HookCheckPayday();
 	lua_pushlightuserdata(L, &l_logicEnablePlayerPaydayCallback);
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
-	shok_GGL_CPlayerAttractionHandler::OnCheckPayDayCallback = [](shok_GGL_CPlayerAttractionHandler* th) {
+	GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = [](GGL::CPlayerAttractionHandler* th) {
 		lua_State* L2 = *shok_luastate_game;
 		int t = lua_gettop(L2);
 		lua_pushlightuserdata(L2, &l_logicEnablePlayerPaydayCallback);
@@ -905,7 +905,7 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
-		CanPlaceBuildingCallback = nullptr;
+		GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
 		lua_pushlightuserdata(L, &l_logic_SetPlaceBuildingCb);
 		lua_pushnil(L);
 		lua_rawset(L, LUA_REGISTRYINDEX);
@@ -918,8 +918,8 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
 
-	if (!CanPlaceBuildingCallback) {
-		CanPlaceBuildingCallback = [](int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
+	if (!GGL::CPlayerStatus::CanPlaceBuildingCallback) {
+		GGL::CPlayerStatus::CanPlaceBuildingCallback = [](int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
 			lua_State* L = *shok_luastate_game;
 			int t = lua_gettop(L);
 			bool r = true;
@@ -938,7 +938,7 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 			lua_settop(L, t);
 			return r;
 		};
-		HookCanPlaceBuilding();
+		GGL::CPlayerStatus::HookCanPlaceBuilding();
 	}
 	return 0;
 }
@@ -1336,10 +1336,10 @@ void l_logic_onload()
 
 void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
-	shok_GGL_CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
+	GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
 	EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
-	CanPlaceBuildingCallback = nullptr;
+	GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
 	shok_GGUI_CPlaceBuildingState::PlacementRotation = 0.0f;
 	EGL::CGLEEntity::UseMaxHPTechBoni = false;
 	GGL::CSniperAbility::SnipeDamageOverride = nullptr;

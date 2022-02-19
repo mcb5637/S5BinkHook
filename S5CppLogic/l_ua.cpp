@@ -678,7 +678,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(EGL::CGLEEntity* e)
 					p.X += distr(generator)*100;
 					p.Y += distr(generator)*100;
 					p.FloorToBuildingPlacement();
-					if (shok_canPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
+					if (GGL::CPlayerStatus::CanPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
 						static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
 						return true;
 					}
@@ -788,7 +788,7 @@ bool UnlimitedArmy::ExecutePrepDefense(EGL::CGLEEntity* e)
 					p.X += distr(generator) * 100;
 					p.Y += distr(generator) * 100;
 					p.FloorToBuildingPlacement();
-					if (shok_canPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
+					if (GGL::CPlayerStatus::CanPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
 						static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
 						return true;
 					}

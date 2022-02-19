@@ -4,7 +4,7 @@
 #include "s5data.h"
 #include "luaext.h"
 
-void l_effectFlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff) {
+void l_effectFlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
 	int id = eff->EffectID;
 	lua_State* L = *shok_luastate_game;
 	int top = lua_gettop(L);
@@ -23,7 +23,7 @@ void l_effectFlyingEffectOnHitCallback(shok_EGL_CFlyingEffect* eff) {
 }
 
 int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source)
-	shok_CProjectileEffectCreator data = shok_CProjectileEffectCreator();
+	CProjectileEffectCreator data = CProjectileEffectCreator();
 	data.EffectType = luaL_checkint(L, 1);
 	data.CurrentPos.X = data.StartPos.X = luaL_checkfloat(L, 2);
 	data.CurrentPos.Y = data.StartPos.Y = luaL_checkfloat(L, 3);
@@ -41,13 +41,13 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.AdvancedDamageSourceOverride = luaL_optint(L, 13, static_cast<int>(CppLogic::AdvancedDealDamageSource::Script));
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogic::GlobalObj;
 	int id = gl->CreateEffect(&data);
-	shok_EGL_CEffect* ef = (*shok_EGL_CGLEEffectManager::GlobalObj)->GetEffectById(id);
-	if (!shok_GGL_CCannonBallEffect::FixDamageClass)
-		if (shok_GGL_CCannonBallEffect* cbeff = shok_DynamicCast<shok_EGL_CEffect, shok_GGL_CCannonBallEffect>(ef))
+	EGL::CEffect* ef = (*shok_EGL_CGLEEffectManager::GlobalObj)->GetEffectById(id);
+	if (!GGL::CCannonBallEffect::FixDamageClass)
+		if (GGL::CCannonBallEffect* cbeff = shok_DynamicCast<EGL::CEffect, GGL::CCannonBallEffect>(ef))
 			cbeff->DamageClass = dmgclass;
 	if (lua_isfunction(L, 12)) {
-		shok_EGL_CFlyingEffect::HookOnHit();
-		shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback = &l_effectFlyingEffectOnHitCallback;
+		EGL::CFlyingEffect::HookOnHit();
+		EGL::CFlyingEffect::FlyingEffectOnHitCallback = &l_effectFlyingEffectOnHitCallback;
 		lua_pushlightuserdata(L, &l_effect_init);
 		lua_rawget(L, LUA_REGISTRYINDEX);
 		lua_pushvalue(L, 12);
@@ -82,7 +82,7 @@ void l_effect_init(lua_State* L)
 }
 
 void l_effect_cleanup(lua_State* L) {
-	shok_EGL_CFlyingEffect::FlyingEffectOnHitCallback = nullptr;
+	EGL::CFlyingEffect::FlyingEffectOnHitCallback = nullptr;
 }
 
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-10000, y, x, y, 500, 1000, 0, 0, 1, 0, LuaDebugger.Log)

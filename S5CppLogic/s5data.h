@@ -204,7 +204,7 @@ namespace ECore {
 	public:
 		virtual ~ICheckData() = default;
 	private:
-		virtual void unknownFunc1() = 0;
+		virtual bool unknownFunc1(int) = 0;
 	};
 }
 
@@ -377,6 +377,8 @@ enum class win_mouseEvents : int {
 
 
 #include "s5_defines.h"
+#include "s5_exception.h"
+#include "s5tech.h"
 #include "s5_behaviorProps.h"
 #include "s5_entitytype.h"
 #include "s5_behaviors.h"
@@ -386,8 +388,9 @@ enum class win_mouseEvents : int {
 //#include "s5_netevents.h"
 #include "s5effects.h"
 #include "s5player.h"
-#include "s5tech.h"
 #include "s5RWEngine.h"
+#include "s5_idmanager.h"
+#include "s5_cutscene.h"
 #include "s5globalObjects.h"
 #include "s5ui.h"
 #include "s5widget.h"

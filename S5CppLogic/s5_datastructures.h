@@ -106,14 +106,16 @@ namespace shok {
 	private:
 		int u1 = 0;
 		int data;
-		int u[4] = { 0 };
-		int size = 0;
+		int u[3] = { 0 };
+		size_t size_v = 0;
+		size_t allocated = 0;
 
 	public:
 		String(const char* s);
 		String(const String& c);
 		void assign(const char* s);
-		const char* c_str();
+		const char* c_str() const;
+		size_t size() const;
 		~String();
 		String();
 	};
@@ -163,6 +165,9 @@ namespace shok {
 			return Internal.size();
 		}
 		const T* data() const noexcept {
+			return Internal.data();
+		}
+		T* data() noexcept {
 			return Internal.data();
 		}
 

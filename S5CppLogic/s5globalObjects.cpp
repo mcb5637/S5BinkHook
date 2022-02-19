@@ -5,11 +5,6 @@
 #include "s5_netevents.h"
 
 
-struct shok_vtable_ECS_CManager {
-	PADDINGI(2);
-	void(__thiscall* ReloadCutscene)(shok_ECS_CManager* th, const char* path);
-};
-
 struct shok_vtable_EGL_CTiling {
 	PADDINGI(5);
 	void(__thiscall* OnPreBlockingAddedAt)(shok_EGL_CTiling* th, int x, int y); // 5
@@ -72,24 +67,6 @@ struct shok_vtable_ED_CResourceManager {
 };
 //constexpr int i = offsetof(shok_vtable_ED_CResourceManager, GetModelDataByModelType) / 4;
 
-GGlue::CGlueEntityProps* shok_EGL_CGLEEntitiesProps::GetEntityType(int i)
-{
-	if (i <= 0 || i >= (int)EntityTypes.size())
-		return nullptr;
-	return EntityTypes.data() + i;
-}
-
-const char* (__stdcall* const getentitydisplayname)(int i) = reinterpret_cast<const char* (__stdcall* const)(int i)>(0x52EFCF);
-const char* shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(int i)
-{
-	return getentitydisplayname(i);
-}
-
-void shok_ECS_CManager::ReloadCutscene(const char* path)
-{
-	reinterpret_cast<shok_vtable_ECS_CManager*>(vtable)->ReloadCutscene(this, path);
-}
-
 static inline bool(__thiscall* const shok_EGL_CGLEEffectManager_IsEffectValid)(shok_EGL_CGLEEffectManager* th, int id) = reinterpret_cast<bool(__thiscall*)(shok_EGL_CGLEEffectManager*, int)>(0x4FAABD);
 bool shok_EGL_CGLEEffectManager::IsEffectValid(int id)
 {
@@ -100,51 +77,6 @@ static inline EGL::CEffect* (__thiscall* const shok_effid2obj)(shok_EGL_CGLEEffe
 EGL::CEffect* shok_EGL_CGLEEffectManager::GetEffectById(int id)
 {
 	return shok_effid2obj(this, id);
-}
-
-static inline int(__thiscall* const shok_getAnimIdByName)(shok_BB_CIDManagerEx* th, const char* name) = reinterpret_cast<int(__thiscall*)(shok_BB_CIDManagerEx * th, const char* name)>(0x54F19E);
-static inline int(__thiscall* const shok_BB_CIDManager_getidbyname)(void* th, const char* name, int nid) = reinterpret_cast<int(__thiscall*)(void*, const char*, int)>(0x54F656);
-int shok_BB_CIDManagerEx::GetIdByName(const char* name) {
-	return shok_getAnimIdByName(this, name);
-}
-const char* shok_BB_CIDManagerEx::GetNameByID(int id)
-{
-	if (id > 0 && id < static_cast<int>(TypeNames.size()))
-		return TypeNames[id].Name;
-	return nullptr;
-}
-int shok_BB_CIDManagerEx::GetIDByNameOrCreate(const char* name, int newid)
-{
-	return shok_BB_CIDManager_getidbyname(this, name, newid);
-}
-int shok_BB_CIDManagerEx::GetIDByNameOrCreate(const char* name)
-{
-	return GetIDByNameOrCreate(name, 0);
-}
-
-void shok_BB_CIDManagerEx::RemoveID(int id)
-{
-	shok_saveVector<shok_BB_CIDManagerEx_data>(&TypeNames, [id](std::vector<shok_BB_CIDManagerEx_data, shok::Allocator<shok_BB_CIDManagerEx_data>>& v) {
-		shok::Free(v.at(id).Name);
-		v[id].Name = nullptr;
-		v[id].Hash = 0;
-		if (id == static_cast<int>(v.size() - 1))
-			v.pop_back();
-		});
-}
-static inline void(__stdcall* const idmanager_writemngtoglobal)(lua_State* L, const char* global, shok_BB_CIDManagerEx* mng) = reinterpret_cast<void(__stdcall*)(lua_State*, const char*, shok_BB_CIDManagerEx*)>(0x59C128);
-void shok_BB_CIDManagerEx::DumpManagerToLuaGlobal(lua_State* L, const char* global)
-{
-	idmanager_writemngtoglobal(L, global, this);
-}
-
-int shok_BB_CIDManager::GetIDByName(const char* name, int newid)
-{
-	return shok_BB_CIDManager_getidbyname(this, name, newid);
-}
-int shok_BB_CIDManager::GetIDByName(const char* name)
-{
-	return GetIDByName(name, 0);
 }
 
 void shok_EGL_CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)
@@ -818,7 +750,7 @@ GGL::CPlayerStatus* shok_GGL_CGLGameLogic::GetPlayer(int i)
 	return shok_GGL_CGLGameLogic_GetPlayer(this->players, i);
 }
 
-shok_technology* shok_GGL_CGLGameLogic::GetTech(int i)
+shok::Technology* shok_GGL_CGLGameLogic::GetTech(int i)
 {
 	try {
 		return TechList->TechList.at(i - 1);

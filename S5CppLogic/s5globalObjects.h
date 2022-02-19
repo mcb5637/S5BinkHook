@@ -1,96 +1,7 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_BB_CIDManagerEx_data {
-	char* Name;
-	unsigned int Hash;
-};
-struct shok_BB_CIDManagerEx : shok_object {
-	static inline constexpr int vtp = 0x77F8C4;
-	PADDINGI(1);
-	vector_padding;
-	std::vector<shok_BB_CIDManagerEx_data, shok::Allocator<shok_BB_CIDManagerEx_data>> TypeNames;
 
-	int GetIdByName(const char* name);
-	const char* GetNameByID(int id);
-	int GetIDByNameOrCreate(const char* name); // throws if id invalid
-	int GetIDByNameOrCreate(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
-	void RemoveID(int id); // remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
-	void DumpManagerToLuaGlobal(lua_State* L, const char* global);
-
-	static inline shok_BB_CIDManagerEx** const AnimManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C838);
-	static inline shok_BB_CIDManagerEx** const EntityTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x895DC0); // A0C834 same
-	static inline shok_BB_CIDManagerEx** const UpgradeCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C84C);
-	static inline shok_BB_CIDManagerEx** const EntityCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C4); // 867838 same
-	static inline shok_BB_CIDManagerEx** const DamageClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B8); // A0D034 same
-	static inline shok_BB_CIDManagerEx** const TechnologiesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3BC); // 8640EC same
-	static inline shok_BB_CIDManagerEx** const TechnologyCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C0); // 864854 same
-	static inline shok_BB_CIDManagerEx** const AbilityManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3CC);
-	static inline shok_BB_CIDManagerEx** const GoodsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3B4); // i dont think they are actually used somewhere...
-	static inline shok_BB_CIDManagerEx** const ArmorClassManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3C8); // you probably cannot add anything here, cause fixed array, A0C850 same
-	static inline shok_BB_CIDManagerEx** const AttachmentTypesManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x85A3D0); // 85A3D4 too
-	static inline shok_BB_CIDManagerEx** const FeedBackEventManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x880BA0); // ids are not correct here
-	static inline shok_BB_CIDManagerEx** const SoundsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x859F14); // 8979C8 same
-	static inline shok_BB_CIDManagerEx** const AmbientSoundsManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x8979CC);
-	static inline shok_BB_CIDManagerEx** const ResourceTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x885EE5C);
-	static inline shok_BB_CIDManagerEx** const FeedbackStateManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x880C10);
-	static inline shok_BB_CIDManagerEx** const TaskManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x898208);
-	static inline shok_BB_CIDManagerEx** const PrincipalTaskManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0x89820C);
-	static inline shok_BB_CIDManagerEx** const AnimCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C82C);
-	static inline shok_BB_CIDManagerEx** const AnimSetManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C830);
-	static inline shok_BB_CIDManagerEx** const EffectTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0CC7C); // A0C83C ?
-	static inline shok_BB_CIDManagerEx** const TaskListManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C848);
-	static inline shok_BB_CIDManagerEx** const BlessCategoryManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0C858);
-	static inline shok_BB_CIDManagerEx** const WeatherEffectTextureManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0CC80); // lightning and snow
-	static inline shok_BB_CIDManagerEx** const TerrainTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0D5CC);
-	static inline shok_BB_CIDManagerEx** const TerrainTextureManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0D5D0);
-	static inline shok_BB_CIDManagerEx** const WaterTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA0D9C8);
-	static inline shok_BB_CIDManagerEx** const ShorewaveTypeManager = reinterpret_cast<shok_BB_CIDManagerEx**>(0xA19F34);
-};
-static_assert(sizeof(shok_BB_CIDManagerEx) == 6 * 4);
-struct shok_BB_CIDManager : shok_object {
-	PADDINGI(1);
-	vector_padding;
-	std::vector<shok_BB_CIDManagerEx_data, shok::Allocator<shok_BB_CIDManagerEx_data>> TypeNames; // seems to be the same struct
-
-	static inline constexpr int vtp = 0x76C028;
-
-	int GetIDByName(const char* name); // throws if id invalid
-	int GetIDByName(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
-};
-
-struct shok_EGL_CGLEEntitiesProps : shok_object {
-	PADDINGI(1); // float 240
-	shok_BB_CIDManagerEx* EntityTypeManager;
-	shok_BB_CIDManagerEx* EntityCategoryManager;
-	shok_BB_CIDManagerEx* UpgradeCategoryManager;
-	shok_BB_CIDManagerEx* BlessCategoryManager;
-	vector_padding;
-	std::vector<EGL::CGLEEntityProps*, shok::Allocator<EGL::CGLEEntityProps*>> EntityTypesLogicProps; // 6
-	shok_BB_CIDManagerEx* EntityTypeManagerAgain;
-	vector_padding;
-	std::vector<ED::CDisplayEntityProps*, shok::Allocator<ED::CDisplayEntityProps*>> EntityTypesDisplayProps; // 11
-	vector_padding;
-	std::vector<GGlue::CGlueEntityProps, shok::Allocator<GGlue::CGlueEntityProps>> EntityTypes; // 15
-
-	static inline constexpr int vtp = 0x788834;
-
-	GGlue::CGlueEntityProps* GetEntityType(int i);
-
-	static inline shok_EGL_CGLEEntitiesProps** const GlobalObj = reinterpret_cast<shok_EGL_CGLEEntitiesProps**>(0x895DB0);
-
-	static const char* GetEntityTypeDisplayName(int i);
-};
-//constexpr int i = offsetof(shok_EGL_CGLEEntitiesProps, EntityTypesDisplayProps) / 4;
-
-// c manager
-struct shok_ECS_CManager : shok_object { // ECS::ICutsceneManager
-	static inline constexpr int vtp = 0x7860B4;
-
-	void ReloadCutscene(const char* path);
-
-	static inline shok_ECS_CManager*** const GlobalObj = reinterpret_cast<shok_ECS_CManager***>(0x0A0344C);
-};
 
 
 // effect manager
@@ -365,7 +276,7 @@ struct shok_GGL_CDamageClassProps : shok_BB_IObject {
 	static inline constexpr int vtp = 0x788978;
 };
 struct shok_damageClassHolder {
-	shok_BB_CIDManagerEx* DamageClassManager;
+	BB::CIDManagerEx* DamageClassManager;
 	vector_padding;
 	std::vector<shok_GGL_CDamageClassProps*, shok::Allocator<shok_GGL_CDamageClassProps*>> DamageClassList; // there is a damageclass 0, probably not working at all
 
@@ -490,7 +401,7 @@ struct shok_GGL_CPlayerAttractionProps : shok_BB_IObject {
 
 struct shok_GGL_CGLGameLogic_TechList {
 	vector_padding;
-	std::vector<shok_technology*, shok::Allocator<shok_technology*>> TechList;
+	std::vector<shok::Technology*, shok::Allocator<shok::Technology*>> TechList;
 };
 
 struct shok_GGL_CWeatherHandler_weatherElement {
@@ -559,7 +470,7 @@ public:
 	static inline constexpr int vtp = 0x76E018;
 
 	GGL::CPlayerStatus* GetPlayer(int i);
-	shok_technology* GetTech(int i);
+	shok::Technology* GetTech(int i);
 	void EnableAlarmForPlayer(int pl);
 	void DisableAlarmForPlayer(int pl);
 	void UpgradeSettlerCategory(int pl, int ucat);
@@ -724,17 +635,17 @@ struct shok_ED_CWorld : shok_object {
 	static inline constexpr int vtp = 0x769E94;
 };
 struct shok_ED_CGlobalsBaseEx : shok_object {
-	shok_BB_CIDManagerEx* AnimManager;
-	shok_BB_CIDManagerEx* ModelManager;
-	shok_BB_CIDManagerEx* SpecialEffectManager; // lightning and snow textures?
-	PADDINGI(1); // empty shok_BB_CIDManagerEx
+	BB::CIDManagerEx* AnimManager;
+	BB::CIDManagerEx* ModelManager;
+	BB::CIDManagerEx* SpecialEffectManager; // lightning and snow textures?
+	PADDINGI(1); // empty BB::CIDManagerEx
 	shok_ED_CDisplayProps* DisplayProps; // 5
-	shok_BB_CIDManagerEx** EffectManager; // probably an object without vtable
-	shok_BB_CIDManagerEx** EntityTypeManager; // probably an object without vtable
+	BB::CIDManagerEx** EffectManager; // probably an object without vtable
+	BB::CIDManagerEx** EntityTypeManager; // probably an object without vtable
 	shok_ED_CModelsProps* ModelProps;
 	PADDINGI(1); // p to something terrain related?
 	PADDINGI(1); // p to something water related? // 10
-	shok_BBRw_CEngine* RWEngine; // p to BBRw::CEngine
+	BBRw::CEngine* RWEngine; // p to BBRw::CEngine
 	PADDINGI(1); // p to ED::CAuras
 	shok_ED_CCameraEx* Camera;
 	shok_ED_CCommandAcknowledgements* CommandAcks;

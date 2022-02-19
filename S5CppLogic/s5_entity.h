@@ -2,7 +2,7 @@
 #include "s5data.h"
 #include <map>
 
-namespace CppLogic {
+namespace shok {
 	enum class AdvancedDealDamageSource : int {
 		Unknown = 0,
 		Melee = 1,
@@ -233,8 +233,8 @@ namespace EGL {
 		void AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek)); // _ is undefined
 		void AddEventHandler(shok::EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, BB::CEvent* ev)); // _ is undefined
 
-		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo);
-		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo);
+		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
+		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 
 		static void HookDamageMod();
 		static void HookArmorMod();
@@ -265,9 +265,9 @@ namespace EGL {
 		static void HookHurtEntity();
 		static int* HurtEntityDamagePointer;
 		static bool HurtEntityCallWithNoAttacker;
-		static CppLogic::AdvancedDealDamageSource HurtEntityDamageSource;
+		static shok::AdvancedDealDamageSource HurtEntityDamageSource;
 		static int HurtEntityAttackerPlayer;
-		static void (*HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, CppLogic::AdvancedDealDamageSource sourc);
+		static void (*HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc);
 		static void HookDestroyEntity();
 		static std::map<int, EGL::CGLEEntity::EntityAddonData> AddonDataMap;
 		static EGL::CGLEEntity::EntityAddonData LastRemovedEntityAddonData;
@@ -519,6 +519,10 @@ namespace GGL {
 		int BuyLeaderByType(int ety);
 
 		// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
+
+
+		static std::vector<shok::AdditionalTechModifier> ConstructionSpeedModifiers;
+		static void EnableConstructionSpeedTechs();
 	};
 
 	class CBridgeEntity : public GGL::CBuilding {

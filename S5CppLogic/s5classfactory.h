@@ -28,6 +28,7 @@ struct shok_BB_CClassFactory_serializationData_FieldSerilaizer {
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeInt = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C98);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeFloat = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C78);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeBool = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x810C58);
+	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeString = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x8640F0);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeClassIdentifier = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x813978);
 	static inline shok_BB_CClassFactory_serializationData_FieldSerilaizer* const TypeTaskList = reinterpret_cast<shok_BB_CClassFactory_serializationData_FieldSerilaizer*>(0x85D4AC);
 	// does not add ids

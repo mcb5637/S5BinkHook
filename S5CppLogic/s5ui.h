@@ -237,7 +237,7 @@ struct shok_stateidandcommandstate {
 };
 struct shok_GGUI_C3DViewHandler : shok_BB_IObject {
 	shok_GGUI_CState* CurrentState;
-	shok_BB_CIDManager* StateIdManager;
+	BB::CIDManager* StateIdManager;
 	int* IPicker; // ERwTools::IPicker
 	int* IPlacer; // ERwTools::IPlacer
 	shok_ERwTools_CRpClumpRenderable* ClumpRenerable;

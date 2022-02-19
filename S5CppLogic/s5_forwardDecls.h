@@ -21,6 +21,7 @@ namespace ED {
 }
 namespace BB {
 	class CEvent;
+	class CIDManagerEx;
 }
 
 struct shok_BB_CClassFactory_serializationData;

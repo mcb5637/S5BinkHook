@@ -38,7 +38,7 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	data.SourcePlayer = player;
 	int dmgclass = luaL_optint(L, 11, 0);
 	data.DamageClass = dmgclass;
-	data.AdvancedDamageSourceOverride = luaL_optint(L, 13, static_cast<int>(CppLogic::AdvancedDealDamageSource::Script));
+	data.AdvancedDamageSourceOverride = luaL_optint(L, 13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
 	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogic::GlobalObj;
 	int id = gl->CreateEffect(&data);
 	EGL::CEffect* ef = (*shok_EGL_CGLEEffectManager::GlobalObj)->GetEffectById(id);

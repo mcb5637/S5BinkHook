@@ -58,7 +58,7 @@ int __fastcall sniperability_tasksnipeoverride(GGL::CSniperAbility* thi, int _, 
 	cr.DamageRadius = -1;
 	cr.DamageClass = 0;
 	cr.SourcePlayer = thent->PlayerId;
-	cr.AdvancedDamageSourceOverride = static_cast<byte>(CppLogic::AdvancedDealDamageSource::AbilitySnipe);
+	cr.AdvancedDamageSourceOverride = static_cast<byte>(shok::AdvancedDealDamageSource::AbilitySnipe);
 	(*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
 	return 0;
 }
@@ -106,7 +106,7 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 						int mhp = b->GetMaxHealth();
 						dmg = static_cast<int>(kegeff * dmgperc * mhp / 100);
 					}
-					b->AdvancedHurtEntityBy(e, dmg, 0, false, false, true, CppLogic::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
+					b->AdvancedHurtEntityBy(e, dmg, 0, false, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
 				}
 			}
 		}
@@ -115,14 +115,14 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 		if (int id = e->GetFirstAttachedToMe(shok::AttachmentType::DISARMING_THIEF_KEG)) {
 			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
 				if (t->Position.IsInRange(e->Position, 3)) {
-					t->AdvancedHurtEntityBy(e, t->Health, 0, true, false, true, CppLogic::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
+					t->AdvancedHurtEntityBy(e, t->Health, 0, true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
 				}
 			}
 		}
 	}
 	{
 		GGL::CKegBehaviorProperties* pr = static_cast<GGL::CKegBehaviorProperties*>(PropPointer);
-		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, 0, true, false, true, CppLogic::AdvancedDealDamageSource::AbilitySabotageBlast);
+		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, 0, true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageBlast);
 	}
 }
 

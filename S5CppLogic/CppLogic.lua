@@ -56,7 +56,7 @@ function CppLogic.Effect.IsValidEffect(id) end
 -- @param playerid attacker player id (optional, 0/nil if not used)
 -- @param dmgclass damageclass (optional, 0/nil if not used)
 -- @param callback function that gets called on hit (optional, nil if not used)
--- @param source what deals damage, used for triggers (default CppLogic::AdvancedDealDamageSource.Script) max size 8 bit instead of 32
+-- @param source what deals damage, used for triggers (default shok::AdvancedDealDamageSource.Script) max size 8 bit instead of 32
 -- @return effect id
 function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source) end
 
@@ -496,7 +496,7 @@ function CppLogic.API.GetFuncDebug(f) end
 -- @param uiFeedback send battle feedback (default true)
 -- @param xp give attacker xp for kills (default true)
 -- @param addStat add kills to statistics (default true)
--- @param source what deals damage, used for triggers (default CppLogic::AdvancedDealDamageSource.Script)
+-- @param source what deals damage, used for triggers (default shok::AdvancedDealDamageSource.Script)
 function CppLogic.Combat.DealDamage(target, damage, attacker, attackerPlayerFallback, uiFeedback, xp, addStat, source) end
 
 --- deals damage in an area.
@@ -513,7 +513,7 @@ function CppLogic.Combat.DealDamage(target, damage, attacker, attackerPlayerFall
 -- @param uiFeedback send battle feedback (default true)
 -- @param xp give attacker xp for kills (default true)
 -- @param addStat add kills to statistics (default true)
--- @param source what deals damage, used for triggers (default CppLogic::AdvancedDealDamageSource.Script)
+-- @param source what deals damage, used for triggers (default shok::AdvancedDealDamageSource.Script)
 function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass, uiFeedback, xp, addStat, source) end
 
 --- enables AoE projectile fix.

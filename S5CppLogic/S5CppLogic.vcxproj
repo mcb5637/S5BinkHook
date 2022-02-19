@@ -206,6 +206,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5_behaviors.h" />
     <ClInclude Include="s5classfactory.h" />
     <ClInclude Include="s5data.h" />
+    <ClInclude Include="s5_cutscene.h" />
     <ClInclude Include="s5_defines.h" />
     <ClInclude Include="s5effects.h" />
     <ClInclude Include="s5_entity.h" />
@@ -222,7 +223,9 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5widget.h" />
     <ClInclude Include="s5_entitydisplay.h" />
     <ClInclude Include="s5_datastructures.h" />
+    <ClInclude Include="s5_exception.h" />
     <ClInclude Include="s5_forwardDecls.h" />
+    <ClInclude Include="s5_idmanager.h" />
     <ClInclude Include="s5_mem.h" />
     <ClInclude Include="s5_netevents.h" />
   </ItemGroup>
@@ -270,6 +273,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClCompile Include="s5ui.cpp" />
     <ClCompile Include="s5widget.cpp" />
     <ClCompile Include="s5_datastructures.cpp" />
+    <ClCompile Include="s5_idmanager.cpp" />
     <ClCompile Include="s5_mem.cpp" />
     <ClCompile Include="s5_netevents.cpp" />
   </ItemGroup>

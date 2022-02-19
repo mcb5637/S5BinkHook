@@ -209,10 +209,10 @@ namespace CppLogic::API {
 	}
 
 	int CreateExtraDataTables(lua_State* L) {
-		(*shok_BB_CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L, "Animations");
-		(*shok_BB_CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L, "TerrainTypes");
-		(*shok_BB_CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L, "WaterTypes");
-		(*shok_BB_CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L, "ArmorClasses");
+		(*BB::CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L, "Animations");
+		(*BB::CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L, "TerrainTypes");
+		(*BB::CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L, "WaterTypes");
+		(*BB::CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L, "ArmorClasses");
 		return 0;
 	}
 

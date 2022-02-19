@@ -5,7 +5,7 @@
 
 int l_techGetResearchInfo(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	lua_pushnumber(L, tech->TimeToResearch);
 	luaext_writeCostInfo(L, tech->ResourceCosts);
@@ -13,7 +13,7 @@ int l_techGetResearchInfo(lua_State* L) {
 }
 int l_techSetResearchInfo(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	if (lua_isnumber(L, 2))
 		tech->TimeToResearch = luaL_checkfloat(L, 2);
@@ -27,11 +27,11 @@ int l_techSetResearchInfo(lua_State* L) {
 
 int l_techGetRequirements(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	lua_pushnumber(L, tech->RequiredEntityConditions);
 	lua_newtable(L);
-	for (shok_technologyRequirementEType ec : tech->EntityConditions) {
+	for (shok::Technology::ETypeReq ec : tech->EntityConditions) {
 		lua_pushnumber(L, ec.EntityType);
 		lua_pushnumber(L, ec.Amount);
 		lua_settable(L, -3);
@@ -39,14 +39,14 @@ int l_techGetRequirements(lua_State* L) {
 	lua_pushnumber(L, tech->RequiredTecConditions);
 	lua_newtable(L);
 	int i = 1;
-	for (shok_technologyRequirementTech ec : tech->TecConditions) {
+	for (shok::Technology::TechReq ec : tech->TecConditions) {
 		lua_pushnumber(L, ec.TecType);
 		lua_rawseti(L, -2, i);
 		i++;
 	}
 	lua_pushnumber(L, tech->RequiredUpgradeCategoryConditions);
 	lua_newtable(L);
-	for (shok_technologyRequirementUCat ec : tech->UpgradeCategoryConditions) {
+	for (shok::Technology::UCatReq ec : tech->UpgradeCategoryConditions) {
 		lua_pushnumber(L, ec.UpgradeCategory);
 		lua_pushnumber(L, ec.Amount);
 		lua_settable(L, -3);
@@ -54,59 +54,59 @@ int l_techGetRequirements(lua_State* L) {
 	return 6;
 }
 
-void inline l_techPushMod(lua_State* L, shok_technologyModifier& mod) {
-	lua_pushnumber(L, mod.Operator);
+void inline l_techPushMod(lua_State* L, shok::Technology::Modifier& mod) {
+	lua_pushnumber(L, mod.Operator.c_str()[0]);
 	lua_pushnumber(L, mod.Value);
 }
 
 int l_techGetExpl(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	l_techPushMod(L, tech->ExplorationModifier);
 	return 2;
 }
 int l_techGetArmor(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	l_techPushMod(L, tech->ArmorModifier);
 	return 2;
 }
 int l_techGetDamage(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	l_techPushMod(L, tech->DamageModifier);
 	return 2;
 }
 int l_techGetRange(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	l_techPushMod(L, tech->RangeModifier);
 	return 2;
 }
 int l_techGetSpeed(lua_State* L) {
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	l_techPushMod(L, tech->SpeedModifier);
 	return 2;
 }
 
 int l_techAddConstructionSpeedMod(lua_State* L) {
-	EnableConstructionSpeedTechs();
+	GGL::CBuilding::EnableConstructionSpeedTechs();
 	int tid = luaL_checkint(L, 1);
-	shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tid);
 	luaext_assertPointer(L, tech, "no tech at 1");
 	char op = luaL_checkstring(L, 3)[0];
-	ConstructionSpeedModifiers.push_back({ tid, luaL_checkfloat(L,2), op });
+	GGL::CBuilding::ConstructionSpeedModifiers.push_back({ tid, luaL_checkfloat(L,2), op });
 	return 0;
 }
 
 void l_tech_cleanup(lua_State* L) {
-	ConstructionSpeedModifiers.clear();
+	GGL::CBuilding::ConstructionSpeedModifiers.clear();
 }
 
 void l_tech_init(lua_State* L)

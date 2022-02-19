@@ -248,3 +248,26 @@ namespace GGlue {
 		static inline int* const EntityTypeIDSerf = reinterpret_cast<int*>(0x863830);
 	};
 }
+
+namespace EGL {
+	class CGLEEntitiesProps : public ECore::ICheckData {
+	public:
+		PADDINGI(1); // float 240
+		BB::CIDManagerEx* EntityTypeManager;
+		BB::CIDManagerEx* EntityCategoryManager;
+		BB::CIDManagerEx* UpgradeCategoryManager;
+		BB::CIDManagerEx* BlessCategoryManager;
+		shok::Vector<EGL::CGLEEntityProps*> EntityTypesLogicProps; // 6
+		BB::CIDManagerEx* EntityTypeManagerAgain;
+		shok::Vector<ED::CDisplayEntityProps*> EntityTypesDisplayProps; // 11
+		shok::Vector<GGlue::CGlueEntityProps> EntityTypes; // 15
+
+		static inline constexpr int vtp = 0x788834;
+
+		GGlue::CGlueEntityProps* GetEntityType(int i);
+
+		static inline EGL::CGLEEntitiesProps** const GlobalObj = reinterpret_cast<EGL::CGLEEntitiesProps**>(0x895DB0);
+
+		static const char* GetEntityTypeDisplayName(int i);
+	};
+}

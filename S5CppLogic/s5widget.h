@@ -280,7 +280,7 @@ struct shok_GGUI_C3DOnScreenInformationCustomWidget : shok_BB_IObject {
 };
 
 struct shok_widgetManager { // this thing has no vtable...
-	shok_BB_CIDManagerEx* WidgetNameManager;
+	BB::CIDManagerEx* WidgetNameManager;
 	vector_padding;
 	std::vector<shok_EGUIX_CBaseWidget*, shok::Allocator<shok_EGUIX_CBaseWidget*>> Widgets;
 

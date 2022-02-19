@@ -181,9 +181,9 @@ struct shok_EGL_CGLETaskList : shok_BB_IObject {
 static_assert(sizeof(shok_EGL_CGLETaskList) == 8 * 4);
 
 struct shok_EGL_CGLETaskListMgr : shok_BB_IObject {
-    shok_BB_CIDManagerEx* TaskListManager;
-    shok_BB_CIDManagerEx* TaskManager;
-    shok_BB_CIDManagerEx* WorkCycleManager;
+    BB::CIDManagerEx* TaskListManager;
+    BB::CIDManagerEx* TaskManager;
+    BB::CIDManagerEx* WorkCycleManager;
 	vector_padding;
 	std::vector<shok_EGL_CGLETaskList*, shok::Allocator<shok_EGL_CGLETaskList*>> TaskLists;
 

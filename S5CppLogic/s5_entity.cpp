@@ -110,7 +110,7 @@ int EGL::CGLEEntity::GetResourceProvided()
 
 GGlue::CGlueEntityProps* EGL::CGLEEntity::GetEntityType()
 {
-	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
+	return (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
 }
 
 int EGL::CGLEEntity::EventGetIntById(shok::EventIDs id)
@@ -675,6 +675,35 @@ int GGL::CBuilding::BuyLeaderByType(int ety)
 	return id;
 }
 
+
+std::vector<shok::AdditionalTechModifier> GGL::CBuilding::ConstructionSpeedModifiers{};
+float __fastcall constructionsite_getprogresspertick_hook(GGL::CBuilding* th) { // param is constructionsite, just not done yet ;)
+	GGL::CGLSettlerProps* serf = static_cast<GGL::CGLSettlerProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf)->LogicProps);
+	GGL::CGLBuildingProps* bty = static_cast<GGL::CGLBuildingProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(th->ConstructionSiteType)->LogicProps);
+	float constructionfactor = serf->BuildFactor;
+	GGL::CPlayerStatus* pl = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerId);
+	for (const shok::AdditionalTechModifier& tmod : GGL::CBuilding::ConstructionSpeedModifiers) {
+		if (pl->GetTechStatus(tmod.TechID) != shok::TechState::Researched)
+			continue;
+		constructionfactor = tmod.ModifyValue(constructionfactor);
+	}
+	constructionfactor = constructionfactor * bty->ConstructionInfo.Time * 10;
+	if (constructionfactor <= 0.0f)
+		return 0.0f;
+	else
+		return 1.0f / constructionfactor;
+}
+bool EnableConstructionSpeedTechs_Hooked = false;
+void GGL::CBuilding::EnableConstructionSpeedTechs()
+{
+	if (EnableConstructionSpeedTechs_Hooked)
+		return;
+	EnableConstructionSpeedTechs_Hooked = true;
+	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 10 };
+	WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook);
+}
+
+
 int __cdecl fixedChangePlayer(int id, int pl) {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
 	if (!e)
@@ -786,15 +815,15 @@ void EGL::CGLEEntity::HookCamoActivate()
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
 int* EGL::CGLEEntity::HurtEntityDamagePointer = nullptr;
 bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
-CppLogic::AdvancedDealDamageSource EGL::CGLEEntity::HurtEntityDamageSource = CppLogic::AdvancedDealDamageSource::Unknown;
+shok::AdvancedDealDamageSource EGL::CGLEEntity::HurtEntityDamageSource = shok::AdvancedDealDamageSource::Unknown;
 int  EGL::CGLEEntity::HurtEntityAttackerPlayer = 0;
-void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, CppLogic::AdvancedDealDamageSource sourc) = nullptr;
+void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc) = nullptr;
 bool HookHurtEntity_Hooked = false;
 void __cdecl hurtentity_override(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg) {
-	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, CppLogic::AdvancedDealDamageSource::Unknown);
+	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, shok::AdvancedDealDamageSource::Unknown);
 }
 void __cdecl hurtaoe_override(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl) {
-	EGL::CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, CppLogic::AdvancedDealDamageSource::Unknown);
+	EGL::CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, shok::AdvancedDealDamageSource::Unknown);
 }
 void __declspec(naked) arrowonhit_damage() {
 	__asm {
@@ -965,7 +994,7 @@ void EGL::CGLEEntity::HookHurtEntity()
 	GGL::CBombPlacerBehavior::FixBombAttachment();
 	GGL::CCannonBallEffect::AddDamageSourceOverride = true;
 }
-void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo)
+void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
 {
 	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
@@ -1135,7 +1164,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		lua_settop(L, t);
 	}
 }
-void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, CppLogic::AdvancedDealDamageSource sourceInfo)
+void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
 {
 	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
@@ -1203,7 +1232,7 @@ int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
 			for (int t : static_cast<GGL::CGLSettlerProps*>(et->LogicProps)->ModifyHitpoints.TechList) {
 				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
-				shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
+				shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
@@ -1213,7 +1242,7 @@ int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
 				int t = i->second;
 				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
-				shok_technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
+				shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
@@ -1940,7 +1969,7 @@ const char* __stdcall entitydisplayname(int* e, int type) {
 		}
 	}
 
-	return shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(type);
+	return EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(type);
 }
 void __declspec(naked) entitydisplaynameasm() {
 	__asm {

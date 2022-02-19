@@ -30,13 +30,13 @@ int l_logicSetDamageModifier(lua_State* L) {
 
 int l_logicReloadCutscene(lua_State* L) {
 	const char* data = luaL_optlstring(L, 1, "Maps\\ExternalMap", nullptr);
-	(**shok_ECS_CManager::GlobalObj)->ReloadCutscene(data);
+	(**ECS::CManager::GlobalObj)->ReloadCutscene(data);
 	return 0;
 }
 
 int l_logicGetAnimIdFromName(lua_State* L) {
 	const char* data = luaL_checkstring(L, 1);
-	int id = (*shok_BB_CIDManagerEx::AnimManager)->GetIdByName(data);
+	int id = (*BB::CIDManagerEx::AnimManager)->GetIdByName(data);
 	lua_pushnumber(L, id);
 	return 1;
 }
@@ -553,7 +553,7 @@ int l_playerGetKillStatistics(lua_State* L) {
 
 int l_logicCanPLaceBuildingAt(lua_State* L) {
 	int ty = luaL_checkint(L, 1);
-	GGlue::CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(ty);
+	GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ty);
 	luaext_assertPointer(L, ety, "no entitytype");
 	luaext_assert(L, ety->IsBuildingType(), "not a building");
 	int pl = luaL_checkint(L, 2);
@@ -666,7 +666,7 @@ int l_logicHookHurtEntity(lua_State* L) {
 		lua_pushvalue(L, 2);
 		lua_rawset(L, LUA_REGISTRYINDEX);
 
-		EGL::CGLEEntity::HurtEntityOnKillCb = [](EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, CppLogic::AdvancedDealDamageSource sourc) {
+		EGL::CGLEEntity::HurtEntityOnKillCb = [](EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc) {
 			lua_State* L = *shok_luastate_game;
 
 			int t = lua_gettop(L);

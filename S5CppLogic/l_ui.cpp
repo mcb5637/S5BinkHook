@@ -786,7 +786,7 @@ int l_ui_ShowCommandAckAtPos(lua_State* L) {
 int l_ui_SetGUIState_LuaSelection(lua_State* L) {
 	luaext_assert(L, lua_isfunction(L, 1), "no confirm func");
 	auto* vh = shok_GGUI_CManager::GlobalObj()->C3DViewHandler;
-	vh->StateIdManager->GetIDByName("LuaSelectionState", 27); // make sure the state id exists
+	vh->StateIdManager->GetIDByNameOrCreate("LuaSelectionState", 27); // make sure the state id exists
 	vh->SetGUIState<CppL_GUIState_LuaSelection>();
 	CppL_GUIState_LuaSelection* s = shok_DynamicCast<shok_GGUI_CState, CppL_GUIState_LuaSelection>(vh->CurrentState);
 	lua_pushvalue(L, 1);

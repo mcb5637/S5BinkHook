@@ -107,7 +107,7 @@ GGlue::CGlueEntityProps* luaext_optEntityType(lua_State* L, int i) {
 	if (!lua_isnumber(L, i))
 		return nullptr;
 	int t = luaL_checkint(L, i);
-	return (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(t);
+	return (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(t);
 }
 
 GGlue::CGlueEntityProps* luaext_checkEntityType(lua_State* L, int i) {

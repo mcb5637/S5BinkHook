@@ -31,6 +31,12 @@
     <Filter Include="shok\player">
       <UniqueIdentifier>{8dac7673-600f-4fbf-a555-ee8af0e0d717}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shok\tech">
+      <UniqueIdentifier>{ccdb944a-e078-451e-a49c-439db6e7321c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shok\globals">
+      <UniqueIdentifier>{3e1b7796-d47e-4431-aefd-6c86ea6bfe8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -76,9 +82,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5globalObjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="s5tech.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5widget.h">
@@ -165,6 +168,18 @@
     <ClInclude Include="s5player.h">
       <Filter>shok\player</Filter>
     </ClInclude>
+    <ClInclude Include="s5tech.h">
+      <Filter>shok\tech</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_idmanager.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_exception.h">
+      <Filter>shok</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_cutscene.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -213,9 +228,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="l_ui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="s5tech.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5framework.cpp">
@@ -271,6 +283,12 @@
     </ClCompile>
     <ClCompile Include="s5player.cpp">
       <Filter>shok\player</Filter>
+    </ClCompile>
+    <ClCompile Include="s5tech.cpp">
+      <Filter>shok\tech</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_idmanager.cpp">
+      <Filter>shok\globals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

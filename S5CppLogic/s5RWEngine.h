@@ -1,7 +1,14 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_BBRw_CEngine : shok_object {
+namespace BBRw {
+	class IEngine {
+	public:
+		virtual ~IEngine() = default;
+	};
 
-	static inline constexpr int vtp = 0x76B534;
-};
+	class CEngine : public IEngine {
+	public:
+		static inline constexpr int vtp = 0x76B534;
+	};
+}

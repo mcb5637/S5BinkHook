@@ -23,3 +23,17 @@ bool GGlue::CGlueEntityProps::IsOfCategory(shok::EntityCategory cat) const
 			return true;
 	return false;
 }
+
+GGlue::CGlueEntityProps* EGL::CGLEEntitiesProps::GetEntityType(int i)
+{
+	if (i <= 0 || i >= static_cast<int>(EntityTypes.size()))
+		return nullptr;
+	return EntityTypes.data() + i;
+}
+
+const char* (__stdcall* const getentitydisplayname)(int i) = reinterpret_cast<const char* (__stdcall* const)(int i)>(0x52EFCF);
+const char* EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(int i)
+{
+	return getentitydisplayname(i);
+}
+

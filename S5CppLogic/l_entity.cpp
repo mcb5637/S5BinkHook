@@ -708,11 +708,11 @@ int l_settlerPlaceCannon(lua_State* L) {
 	luaext_checkPos(L, p, 2);
 	p.FloorToBuildingPlacement();
 	int bottom = luaL_checkint(L, 3);
-	GGlue::CGlueEntityProps* ety = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
+	GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
 	luaext_assertPointer(L, ety, "no bottom entitytype");
 	luaext_assert(L, ety->IsBuildingType(), "bottom not a building");
 	int top = luaL_checkint(L, 4);
-	luaext_assertPointer(L, (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(top), "no top entitytype");
+	luaext_assertPointer(L, (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(top), "no top entitytype");
 	luaext_assert(L, GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &p, 0, 0), "cannot place foundation at that position");
 	e->HeroAbilityPlaceCannon(p, bottom, top);
 	return 0;
@@ -1128,7 +1128,7 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	GGL::CLeaderBehaviorProps* lp = s->GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
 	luaext_assertPointer(L, l, "no leader");
 	luaext_assert(L, b->PlayerId == s->PlayerId, "different players");
-	GGlue::CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
+	GGlue::CGlueEntityProps* solty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
 	luaext_assertPointer(L, solty, "no soldier type set");
 	if (!lua_toboolean(L, 3)) {
 		int ucat = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(b->EntityType);
@@ -1214,7 +1214,7 @@ int l_buildingHQBuySerf(lua_State* L) {
 	luaext_assert(L, b->IsIdle(), "building not idle");
 	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	GGlue::CGlueEntityProps* solty = (*shok_EGL_CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
+	GGlue::CGlueEntityProps* solty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
 	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(solty->LogicProps)->Cost), "missing res");
 	b->HQBuySerf();
 	return 0;
@@ -1231,7 +1231,7 @@ int l_buildingStartResearch(lua_State* L) {
 	GGL::CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsIdle(), "building not idle");
 	int tech = luaL_checkint(L, 2);
-	shok_technology* techo = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tech);
+	shok::Technology* techo = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tech);
 	luaext_assertPointer(L, techo, "no tech at 2");
 	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	shok::TechState techstate = p->GetTechStatus(tech);
@@ -1418,7 +1418,7 @@ int l_entity_GetDisplayName(lua_State* L) {
 	if (d && !d->NameOverride.empty())
 		lua_pushstring(L, d->NameOverride.c_str());
 	else
-		lua_pushstring(L, shok_EGL_CGLEEntitiesProps::GetEntityTypeDisplayName(b->EntityType));
+		lua_pushstring(L, EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(b->EntityType));
 	return 1;
 }
 
@@ -1572,7 +1572,7 @@ int l_settler_playScriptAnim(lua_State* L) {
 	EGL::CGLEEntity* e = luaext_checkEntity(L, 1);
 	shok_EGL_CGLETaskArgsAnimation setanim{};
 	setanim.TaskType = shok_Task::TASK_SET_ANIM;
-	setanim.AnimID = (*shok_BB_CIDManagerEx::AnimManager)->GetIdByName(luaL_checkstring(L, 2));
+	setanim.AnimID = (*BB::CIDManagerEx::AnimManager)->GetIdByName(luaL_checkstring(L, 2));
 	luaext_assert(L, setanim.AnimID, "not an animation");
 	setanim.PlayBackwards = luaext_optbool(L, 3, false);
 	shok_EGL_CGLETaskArgs reset{};

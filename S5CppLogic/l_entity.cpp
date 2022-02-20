@@ -9,13 +9,13 @@ EntityIteratorPredicate* l_entity_checkpredicate(lua_State* L, int i) {
 };
 
 int l_entity_getNum(lua_State* L) {
-	lua_pushnumber(L, (*shok_EGL_CGLEEntityManager::GlobalObj)->EntityCount);
+	lua_pushnumber(L, (*EGL::CGLEEntityManager::GlobalObj)->Count);
 	return 1;
 }
 
 int l_entity_get(lua_State* L) {
 	int i = luaL_checkint(L, 1);
-	EGL::CGLEEntity* p = (*shok_EGL_CGLEEntityManager::GlobalObj)->GetEntityByNum(i);
+	EGL::CGLEEntity* p = (*EGL::CGLEEntityManager::GlobalObj)->GetInSlot(i);
 	if (p == nullptr)
 		lua_pushnumber(L, 0);
 	else
@@ -954,7 +954,7 @@ int l_settlerMove(lua_State* L) {
 	GGL::CSettler* e = luaext_checkSettler(L, 1);
 	shok::Position p;
 	luaext_checkPos(L, p, 2);
-	shok_EGL_CGLELandscape* ls = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape;
+	EGL::CGLELandscape* ls = (*EGL::CGLEGameLogic::GlobalObj)->Landscape;
 	if (ls->GetSector(&p) == 0) {
 		shok::Position pou;
 		if (ls->GetNearestPositionInSector(&p, 1000, e->GetSector(), &pou))
@@ -992,7 +992,7 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 			found = true;
 	}
 	luaext_assert(L, found, "foundry cannot build entitytype");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(t->LogicProps)->Cost), "missing res");
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	b->CommandBuildCannon(ety);
@@ -1131,14 +1131,14 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	GGlue::CGlueEntityProps* solty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
 	luaext_assertPointer(L, solty, "no soldier type set");
 	if (!lua_toboolean(L, 3)) {
-		int ucat = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(b->EntityType);
+		int ucat = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(b->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
 	}
 	int max = s->LimitedAttachmentGetMaximum(shok::AttachmentType::LEADER_SOLDIER);
 	int curr = 0;
 	s->ObservedEntities.ForAll([&curr](shok::Attachment* a) { if (a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER) curr++; });
 	luaext_assert(L, curr < max, "no free soldier slot left");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	GGL::CGLSettlerProps* sprop = shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(solty->LogicProps);
 	luaext_assertPointer(L, sprop, "error: soldier no settler type");
@@ -1212,7 +1212,7 @@ int l_buildingHQBuySerf(lua_State* L) {
 	GGL::CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsEntityInCategory(shok::EntityCategory::Headquarters), "no hq");
 	luaext_assert(L, b->IsIdle(), "building not idle");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	GGlue::CGlueEntityProps* solty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
 	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(solty->LogicProps)->Cost), "missing res");
@@ -1231,9 +1231,9 @@ int l_buildingStartResearch(lua_State* L) {
 	GGL::CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsIdle(), "building not idle");
 	int tech = luaL_checkint(L, 2);
-	shok::Technology* techo = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(tech);
+	shok::Technology* techo = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tech);
 	luaext_assertPointer(L, techo, "no tech at 2");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	shok::TechState techstate = p->GetTechStatus(tech);
 	luaext_assert(L, techstate == shok::TechState::Allowed, "wrong techstate");
 	luaext_assert(L, p->CurrentResources.HasResources(&techo->ResourceCosts), "not enough res");
@@ -1278,7 +1278,7 @@ int l_settlerSetPos(lua_State* L) {
 	GGL::CSettler* s = luaext_checkSettler(L, 1);
 	shok::Position p;
 	luaext_checkPos(L, p, 2);
-	luaext_assert(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p) != 0, "position is blocked");
+	luaext_assert(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p) != 0, "position is blocked");
 	s->SetPosition(p);
 	return 0;
 }
@@ -1476,7 +1476,7 @@ int l_building_BarracksBuyLeaderByType(lua_State* L) {
 	GGL::CLeaderBehaviorProps* lp = ety->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
 	luaext_assertPointer(L, lp, "no leader type");
 	luaext_assert(L, e->IsIdle(true), "building not idle");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(ety->LogicProps)->Cost), "missing res");
 	if (!lua_toboolean(L, 3)) {

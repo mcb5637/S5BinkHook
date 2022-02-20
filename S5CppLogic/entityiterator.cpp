@@ -19,11 +19,11 @@ EGL::CGLEEntity* EntityIterator::GetNext(float* rangeOut, int* prio)
 }
 EGL::CGLEEntity* EntityIterator::GetNext(int& icurr, float* rangeOut, int* prio) const
 {
-	shok_EGL_CGLEEntityManager* eman = *shok_EGL_CGLEEntityManager::GlobalObj;
+	EGL::CGLEEntityManager* eman = *EGL::CGLEEntityManager::GlobalObj;
 	while (true) {
-		if (icurr > eman->EntityCount)
+		if (icurr > eman->Count)
 			return nullptr;
-		EGL::CGLEEntity* e = eman->GetEntityByNum(icurr);
+		EGL::CGLEEntity* e = eman->GetInSlot(icurr);
 		icurr++;
 		if (e != nullptr && Predicate->MatchesEntity(e, rangeOut, prio))
 			return e;
@@ -207,7 +207,7 @@ bool EntityIteratorPredicateAnyPlayer::MatchesEntity(EGL::CGLEEntity* e, float* 
 }
 void EntityIteratorPredicateAnyPlayer::FillHostilePlayers(int source, int* players, int& maxP)
 {
-	GGL::CPlayerStatus* pl = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(source);
+	GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(source);
 	int curr = 0;
 	for (int p = 1; p <= maxP; p++) {
 		if (pl->GetDiploStateTo(p) == shok::DiploState::Hostile) {

@@ -180,6 +180,18 @@
     <ClInclude Include="s5_cutscene.h">
       <Filter>shok\globals</Filter>
     </ClInclude>
+    <ClInclude Include="s5_entityandeffectmanager.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_maplogic.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_mapdisplay.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_config.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -288,6 +300,15 @@
       <Filter>shok\tech</Filter>
     </ClCompile>
     <ClCompile Include="s5_idmanager.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_maplogic.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_mapdisplay.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_config.cpp">
       <Filter>shok\globals</Filter>
     </ClCompile>
   </ItemGroup>

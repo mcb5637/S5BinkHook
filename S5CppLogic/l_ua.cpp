@@ -21,7 +21,7 @@ UnlimitedArmy::UnlimitedArmy(int p)
 }
 void UnlimitedArmy::CalculatePos()
 {
-	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
+	int tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
 	if (tick == PosLastUpdatedTick)
 		return;
 	float x = 0, y = 0;
@@ -79,7 +79,7 @@ void UnlimitedArmy::CleanDead()
 		return EGL::CGLEEntity::GetEntityByID(id) == nullptr;
 		});
 	DeadHeroes.erase(e, DeadHeroes.end());
-	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
+	int tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
 	TargetCache.erase(std::remove_if(TargetCache.begin(), TargetCache.end(), [tick](UATargetCache& c) { return c.Tick < tick; }), TargetCache.end());
 }
 void UnlimitedArmy::Tick()
@@ -400,7 +400,7 @@ bool UnlimitedArmy::IsNonCombat(EGL::CGLEEntity* e)
 void UnlimitedArmy::BattleCommand()
 {
 	shok::Position p = EGL::CGLEEntity::GetEntityByID(CurrentBattleTarget)->Position;
-	shok_EGL_CGLELandscape* ls = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape;
+	EGL::CGLELandscape* ls = (*EGL::CGLEGameLogic::GlobalObj)->Landscape;
 	if (ls->GetSector(&p) == 0) {
 		shok::Position pou;
 		if (ls->GetNearestPositionInSector(&p, 1000, EGL::CGLEEntity::GetEntityByID(Leaders[0])->GetSector(), &pou))
@@ -425,7 +425,7 @@ void UnlimitedArmy::BattleCommand()
 			}
 		}
 	}
-	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
+	int tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
 	for (UACannonData cd : Cannons) {
 		EGL::CMovingEntity* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(cd.EntityId));
 		if (ReMove || !LeaderIsInBattle(e) || cd.LastUpdated == -1) {
@@ -448,7 +448,7 @@ void UnlimitedArmy::MoveCommand()
 		NormalizeSpeed(true, false);
 	}
 	shok::Position p = Target;
-	shok_EGL_CGLELandscape* ls = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape;
+	EGL::CGLELandscape* ls = (*EGL::CGLEGameLogic::GlobalObj)->Landscape;
 	if (ls->GetSector(&p) == 0) {
 		shok::Position pou;
 		if (ls->GetNearestPositionInSector(&p, 1000, EGL::CGLEEntity::GetEntityByID(Leaders[0])->GetSector(), &pou))
@@ -828,7 +828,7 @@ bool UnlimitedArmy::CheckTargetCache(int id, int count) {
 	return true;
 }
 void UnlimitedArmy::UpdateTargetCache(int id, int time) {
-	int tick = (*shok_EGL_CGLEGameLogic::GlobalObj)->GetTick();
+	int tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
 	for (UATargetCache& t : TargetCache) {
 		if (t.EntityId == id) {
 			t.Num++;

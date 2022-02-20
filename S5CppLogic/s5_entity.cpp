@@ -155,11 +155,11 @@ int EGL::CGLEEntity::LimitedAttachmentGetMaximum(shok::AttachmentType attachType
 int EGL::CGLEEntity::ResourceTreeGetNearestSector()
 {
 	shok::Position p = Position;
-	shok::Position p2 = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetNearestFreePos(&p, 600);
-	if (!(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsValidPos(&p2)) {
+	shok::Position p2 = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetNearestFreePos(&p, 600);
+	if (!(*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsValidPos(&p2)) {
 		return 0;
 	}
-	return (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p2);
+	return (*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p2);
 }
 
 
@@ -681,7 +681,7 @@ float __fastcall constructionsite_getprogresspertick_hook(GGL::CBuilding* th) { 
 	GGL::CGLSettlerProps* serf = static_cast<GGL::CGLSettlerProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf)->LogicProps);
 	GGL::CGLBuildingProps* bty = static_cast<GGL::CGLBuildingProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(th->ConstructionSiteType)->LogicProps);
 	float constructionfactor = serf->BuildFactor;
-	GGL::CPlayerStatus* pl = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerId);
+	GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerId);
 	for (const shok::AdditionalTechModifier& tmod : GGL::CBuilding::ConstructionSpeedModifiers) {
 		if (pl->GetTechStatus(tmod.TechID) != shok::TechState::Researched)
 			continue;
@@ -724,7 +724,7 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 	else {
 		c.ScriptName = nullptr;
 	}
-	int nid = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
+	int nid = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	if (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e)) {
 		GGL::CLeaderBehavior* lb = e->GetBehavior<GGL::CLeaderBehavior>();
 		if (lb) {
@@ -996,7 +996,7 @@ void EGL::CGLEEntity::HookHurtEntity()
 }
 void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
 {
-	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
+	if ((*GGL::CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
 	if (Health <= 0)
 		return;
@@ -1020,7 +1020,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsWorker };
 	FireEvent(&getbool);
 	if (attacker) {
-		if (!getbool.Data || !(*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, shok_EGL_CGLELandscape::BlockingMode::Blocked)) {
+		if (!getbool.Data || !(*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, EGL::CGLELandscape::BlockingMode::Blocked)) {
 			if (!GGL::CPlayerStatus::ArePlayersFriendly(PlayerId, attacker->PlayerId)) {
 				EGL::CEvent1Entity ev{ shok::EventIDs::OnAttackedBy, attacker->EntityId };
 				FireEvent(&ev);
@@ -1132,8 +1132,8 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	if (shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(this)) {
 		if (addStat) {
 			if (attackerplayer)
-				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfBuildingsDestroyed += idskilled.size();
-			if (GGL::CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
+				(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfBuildingsDestroyed += idskilled.size();
+			if (GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
 				ps->Statistics.NumberOfBuildingsLost += idskilled.size();
 		}
 		callback = "GameCallback_BuildingDestroyed";
@@ -1141,8 +1141,8 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	else {
 		if (addStat) {
 			if (attackerplayer)
-				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfUnitsKilled += idskilled.size();
-			if (GGL::CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
+				(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(attackerplayer)->Statistics.NumberOfUnitsKilled += idskilled.size();
+			if (GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(this->PlayerId))
 				ps->Statistics.NumberOfUnitsDied += idskilled.size();
 		}
 		callback = "GameCallback_SettlerKilled";
@@ -1166,7 +1166,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 }
 void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
 {
-	if ((*shok_GGL_CGLGameLogic::GlobalObj)->GlobalInvulnerability)
+	if ((*GGL::CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
 	if (range <= 0)
 		return;
@@ -1198,8 +1198,8 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 			curr->FireEvent(&geta);
 
 			float dmg = damage * cr;
-			if (damageclass > 0 && damageclass < static_cast<int>((*shok_damageClassHolder::GlobalObj)->DamageClassList.size()))
-				dmg *= (*shok_damageClassHolder::GlobalObj)->DamageClassList[damageclass]->BonusVsArmorClass[getac.Data - 1];
+			if (damageclass > 0 && damageclass < static_cast<int>((*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size()))
+				dmg *= (*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[damageclass]->GetBonusVsArmorClass(getac.Data);
 			dmg -= geta.Data;
 
 			if (dmg < 1)
@@ -1230,9 +1230,9 @@ int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
 	{
 		if (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e)) {
 			for (int t : static_cast<GGL::CGLSettlerProps*>(et->LogicProps)->ModifyHitpoints.TechList) {
-				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
+				if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
-				shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
+				shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
@@ -1240,9 +1240,9 @@ int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
 			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = EGL::CGLEEntity::BuildingMaxHpTechBoni.equal_range(e->EntityType);
 			for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
 				int t = i->second;
-				if ((*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
+				if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
-				shok::Technology* tech = (*shok_GGL_CGLGameLogic::GlobalObj)->GetTech(t);
+				shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
@@ -1269,7 +1269,7 @@ void __fastcall createentityfixhp(EGL::CGLEEntity* th, int hpIn) {
 	else if (GGL::CBuilding* b = shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(th)) {
 		th->Health = th->GetMaxHealth();
 		if (!b->IsConstructionFinished()) {
-			th->Health = static_cast<int>(th->Health * (*shok_GGL_CLogicProperties::GlobalObj)->ConstructionSiteHealthFactor);
+			th->Health = static_cast<int>(th->Health * (*GGL::CLogicProperties::GlobalObj)->ConstructionSiteHealthFactor);
 		}
 	}
 }
@@ -1490,7 +1490,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntit
 	else {
 		c.ScriptName = nullptr;
 	}
-	int id = (*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEntity(&c);
+	int id = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	EGL::CGLEEntity* r = EGL::CGLEEntity::GetEntityByID(id);
 	EGL::CEventValue_Int ev{ shok::EventIDs::ResourceTree_Init, e->EntityType };
 	r->FireEvent(&ev);
@@ -2008,7 +2008,7 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 			if (ecr.EffectType) {
 				ecr.StartPos.X = toheal->Position.X;
 				ecr.StartPos.Y = toheal->Position.Y;
-				(*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
+				(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
 			}
 			if (toheal->GetBehavior<GGL::CSoldierBehavior>()) {
 				toheal = EGL::CGLEEntity::GetEntityByID(static_cast<GGL::CSettler*>(toheal)->LeaderId);

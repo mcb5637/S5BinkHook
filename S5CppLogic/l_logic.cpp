@@ -7,24 +7,20 @@
 
 int l_logicGetDamageModifier(lua_State* L) {
 	int dmgclass = luaL_checkint(L, 1);
-	int size = (int)(*shok_damageClassHolder::GlobalObj)->DamageClassList.size();
+	int size = (int)(*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size();
 	luaext_assert(L, dmgclass > 0 && dmgclass < size, "invalid damagecass");
 	int amclass = luaL_checkint(L, 2);
-	amclass--;
-	luaext_assert(L, amclass >= 0 && amclass < 7, "invalid armorclass");
-	assert(amclass >= 0 && amclass < 7);
-	lua_pushnumber(L, (*shok_damageClassHolder::GlobalObj)->DamageClassList[dmgclass]->BonusVsArmorClass[amclass]);
+	luaext_assert(L, amclass >= 1 && amclass < 8, "invalid armorclass");
+	lua_pushnumber(L, (*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[dmgclass]->GetBonusVsArmorClass(amclass));
 	return 1;
 }
 int l_logicSetDamageModifier(lua_State* L) {
 	int dmgclass = luaL_checkint(L, 1);
-	int size = (int)(*shok_damageClassHolder::GlobalObj)->DamageClassList.size();
+	int size = (int)(*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size();
 	luaext_assert(L, dmgclass > 0 && dmgclass < size, "invalid damagecass");
 	int amclass = luaL_checkint(L, 2);
-	amclass--;
-	luaext_assert(L, amclass >= 0 && amclass < 7, "invalid armorclass");
-	assert(amclass >= 0 && amclass < 7);
-	(*shok_damageClassHolder::GlobalObj)->DamageClassList[dmgclass]->BonusVsArmorClass[amclass] = luaL_checkfloat(L, 2);
+	luaext_assert(L, amclass >= 1 && amclass < 8, "invalid armorclass");
+	(*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[dmgclass]->GetBonusVsArmorClass(amclass) = luaL_checkfloat(L, 2);
 	return 0;
 }
 
@@ -44,7 +40,7 @@ int l_logicGetAnimIdFromName(lua_State* L) {
 int l_playerGetPaydayStatus(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 	if (p->PlayerAttractionHandler->PaydayActive)
 		lua_pushnumber(L, p->PlayerAttractionHandler->PaydayFirstOccuraceGameTurn);
 	else
@@ -55,7 +51,7 @@ int l_playerSetPaydayStatus(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int st = luaL_checkint(L, 2);
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 	if (st < 0) {
 		p->PlayerAttractionHandler->PaydayActive = 0;
 	}
@@ -68,7 +64,7 @@ int l_playerSetPaydayStatus(lua_State* L) {
 int l_logic_setpaydayfrequency(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0, "freq has to be > 0");
-	(*shok_GGL_CPlayerAttractionProps::GlobalObj)->PaydayFrequency = i;
+	(*GGL::CPlayerAttractionProps::GlobalObj)->PaydayFrequency = i;
 	return 0;
 }
 
@@ -543,7 +539,7 @@ int l_netEventUnSetHook(lua_State* L) {
 int l_playerGetKillStatistics(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 	lua_pushnumber(L, p->Statistics.NumberOfUnitsKilled);
 	lua_pushnumber(L, p->Statistics.NumberOfUnitsDied);
 	lua_pushnumber(L, p->Statistics.NumberOfBuildingsDestroyed);
@@ -571,18 +567,18 @@ int l_logicCanPLaceBuildingAt(lua_State* L) {
 int l_logicPlayerActivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 	luaext_assert(L, !p->WorkerAlarmMode, "alarm active");
 	luaext_assert(L, p->AlarmRechargeTime <= 0, "alarm cooldown");
-	(*shok_GGL_CGLGameLogic::GlobalObj)->EnableAlarmForPlayer(i);
+	(*GGL::CGLGameLogic::GlobalObj)->EnableAlarmForPlayer(i);
 	return 0;
 }
 int l_logicPlayerDeactivateAlarm(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
-	GGL::CPlayerStatus* p = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i);
+	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 	luaext_assert(L, p->WorkerAlarmMode, "alarm not active");
-	(*shok_GGL_CGLGameLogic::GlobalObj)->DisableAlarmForPlayer(i);
+	(*GGL::CGLGameLogic::GlobalObj)->DisableAlarmForPlayer(i);
 	return 0;
 }
 
@@ -590,9 +586,9 @@ int l_logicPlayerUpgradeSettlerCategory(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int ucat = luaL_checkint(L, 2);
-	auto* u = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](GGL::CSettlerUpgradeManager::UCatEntry* u) {return u->UCat == ucat; });
+	auto* u = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](GGL::CSettlerUpgradeManager::UCatEntry* u) {return u->UCat == ucat; });
 	luaext_assertPointer(L, u, "invalid ucat");
-	(*shok_GGL_CGLGameLogic::GlobalObj)->UpgradeSettlerCategory(i, ucat);
+	(*GGL::CGLGameLogic::GlobalObj)->UpgradeSettlerCategory(i, ucat);
 	return 0;
 }
 
@@ -601,7 +597,7 @@ int l_logicPlayerSetTaxLevel(lua_State* L) {
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int tl = luaL_checkint(L, 2);
 	luaext_assert(L, tl >= 0 && tl < 5, "invalid taxlevel");
-	(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->TaxLevel = tl;
+	(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->TaxLevel = tl;
 	return 0;
 }
 
@@ -610,9 +606,9 @@ int l_logicPlayerActivateWeatherMachine(lua_State* L) {
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int w = luaL_checkint(L, 2);
 	luaext_assert(L, w > 0 && w < 4, "invalid weathertype");
-	luaext_assert(L, !(*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.StateToChangeTo, "weather currently changing");
-	luaext_assert(L, (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.WeatherEnergy >= (*shok_GGL_CLogicProperties::GlobalObj)->EnergyRequiredForWeatherChange, "not enough weather energy");
-	(*shok_GGL_CGLGameLogic::GlobalObj)->PlayerActivateWeathermachine(i, w);
+	luaext_assert(L, !(*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.StateToChangeTo, "weather currently changing");
+	luaext_assert(L, (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.WeatherEnergy >= (*GGL::CLogicProperties::GlobalObj)->EnergyRequiredForWeatherChange, "not enough weather energy");
+	(*GGL::CGLGameLogic::GlobalObj)->PlayerActivateWeathermachine(i, w);
 	return 0;
 }
 
@@ -621,22 +617,22 @@ int l_logicPlayerBlessSettlers(lua_State* L) {
 	luaext_assert(L, i > 0 && i < 9, "invalid player");
 	int b = luaL_checkint(L, 2);
 	float faithneeded = -1;
-	for (shok_GGL_CLogicProperties_SBlessCategory& bcat : (*shok_GGL_CLogicProperties::GlobalObj)->BlessCategories) {
+	for (GGL::CLogicProperties::SBlessCategory& bcat : (*GGL::CLogicProperties::GlobalObj)->BlessCategories) {
 		if (bcat.Name == b) {
 			faithneeded = bcat.RequiredFaith;
 			break;
 		}
 	}
 	luaext_assert(L, faithneeded >= 0, "invalid blesscategory");
-	luaext_assert(L, (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.Faith >= faithneeded, "not enough faith");
-	(*shok_GGL_CGLGameLogic::GlobalObj)->PlayerBlessSettlers(i, b);
+	luaext_assert(L, (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.Faith >= faithneeded, "not enough faith");
+	(*GGL::CGLGameLogic::GlobalObj)->PlayerBlessSettlers(i, b);
 	return 0;
 }
 
 int l_logicLandscapeGetSector(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p));
+	lua_pushnumber(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p));
 	return 1;
 }
 
@@ -646,7 +642,7 @@ int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
 	int s = luaL_checkint(L, 2);
 	float r = luaL_checkfloat(L, 3);
 	shok::Position po;
-	if ((*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->GetNearestPositionInSector(&p, r, s, &po))
+	if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetNearestPositionInSector(&p, r, s, &po))
 		luaext_pushPos(L, po);
 	else
 		lua_pushnil(L);
@@ -760,43 +756,43 @@ int l_logicEnableMaxHpTechMod(lua_State* L) {
 int l_logicLandscapeGetTerrainType(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetTerrainTypeAt(p));
+	lua_pushnumber(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetTerrainTypeAt(p));
 	return 1;
 }
 int l_logicLandscapeGetWaterType(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterTypeAt(p));
+	lua_pushnumber(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterTypeAt(p));
 	return 1;
 }
 int l_logicLandscapeGetWaterHeight(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterHeightAt(p));
+	lua_pushnumber(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterHeightAt(p));
 	return 1;
 }
 int l_logicLandscapeGetTerrainHeight(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(p));
+	lua_pushnumber(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(p));
 	return 1;
 }
 int l_logicLandscapeGetTerrainVertexColor(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->VertexColors->GetTerrainVertexColor(p));
+	lua_pushnumber(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->VertexColors->GetTerrainVertexColor(p));
 	return 1;
 }
 int l_logicLandscapeGetBlocking(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, static_cast<int>((*shok_ED_CGlobalsLogicEx::GlobalObj)->GetBlocking(p)));
+	lua_pushnumber(L, static_cast<int>((*ED::CGlobalsLogicEx::GlobalObj)->GetBlocking(p)));
 	return 1;
 }
 int l_logicLandscapeGetBridgeHeight(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	lua_pushnumber(L, (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetBridgeHeight(p));
+	lua_pushnumber(L, (*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetBridgeHeight(p));
 	return 1;
 }
 
@@ -842,9 +838,9 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 		if (lua_isnumber(L2, -1)) {
 			float add = luaL_checkfloat(L2, -1);
 			if (add > 0)
-				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok::ResourceType::GoldRaw, add);
+				(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok::ResourceType::GoldRaw, add);
 			else if (add < 0)
-				(*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok::ResourceType::Gold, -add);
+				(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok::ResourceType::Gold, -add);
 		}
 		lua_settop(L2, t);
 	};
@@ -996,39 +992,39 @@ int l_logic_FixSnipeDamage(lua_State* L) {
 }
 
 int l_logic_GetCurrentWeatherGFXState(lua_State* L) {
-	int state = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.CurrentWeatherGFXState;
+	int state = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.CurrentWeatherGFXState;
 	lua_pushnumber(L, state);
 	return 1;
 }
 int l_logic_GetWeatherQueue(lua_State* L) {
-	shok_GGL_CWeatherHandler* wh = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler;
+	GGL::CWeatherHandler* wh = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler;
 	lua_newtable(L);
-	wh->Elements.ForAll([L](shok_GGL_CWeatherHandler_KeyAndWeatherElement* kae) {
+	for (const auto& kae : wh->Elements) {
 		lua_newtable(L);
 		lua_pushstring(L, "State");
-		lua_pushnumber(L, kae->WeatherElement.State);
+		lua_pushnumber(L, kae.WeatherElement.State);
 		lua_rawset(L, -3);
 		lua_pushstring(L, "GFX");
-		lua_pushnumber(L, kae->WeatherElement.GfxSet);
+		lua_pushnumber(L, kae.WeatherElement.GfxSet);
 		lua_rawset(L, -3);
 		lua_pushstring(L, "IsPeriodic");
-		lua_pushboolean(L, kae->WeatherElement.IsPeriodic);
+		lua_pushboolean(L, kae.WeatherElement.IsPeriodic);
 		lua_rawset(L, -3);
 		lua_pushstring(L, "Length");
-		lua_pushnumber(L, kae->WeatherElement.Length);
+		lua_pushnumber(L, kae.WeatherElement.Length);
 		lua_rawset(L, -3);
 		lua_pushstring(L, "Forerun");
-		lua_pushnumber(L, kae->WeatherElement.Forerun);
+		lua_pushnumber(L, kae.WeatherElement.Forerun);
 		lua_rawset(L, -3);
 
-		lua_rawseti(L, -2, kae->WeatherElement.StartTimeOffset);
-		});
+		lua_rawseti(L, -2, kae.WeatherElement.StartTimeOffset);
+	}
 	lua_pushnumber(L, wh->CurrentWeatherOffset);
 	lua_pushnumber(L, wh->NextPeriodicWeatherStartTimeOffset);
 	return 3;
 }
 int l_logic_ClearWeatherAndAddInitial(lua_State* L) {
-	shok_GGL_CWeatherHandler* wh = (*shok_GGL_CGLGameLogic::GlobalObj)->WeatherHandler;
+	GGL::CWeatherHandler* wh = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler;
 	int state = luaL_checkint(L, 1);
 	luaext_assert(L, state >= 1 && state <= 3, "no weather state");
 	int dur = luaL_checkint(L, 2) * 10;
@@ -1183,7 +1179,7 @@ int l_logic_GetNearestFreePosForBuilding(lua_State* L) {
 	luaext_checkPosRot(L, pin, 2);
 	float range = luaL_optfloat(L, 3, 0);
 	if (range <= 0)
-		range = (*shok_GGL_CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance;
+		range = (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance;
 	shok::PositionRot pout = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
 	luaext_pushPosRot(L, pout);
 	return 1;
@@ -1224,9 +1220,9 @@ struct l_logicModel {
 		luaext_checkPos(L, p, 2);
 		float h = luaL_optfloat(L, 3, 0);
 		if (luaext_optbool(L, 5, true)) {
-			float t = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
+			float t = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
 			if (luaext_optbool(L, 6, false)) {
-				float w = (*shok_ED_CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
+				float w = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
 				h += max(t, w);
 			}
 			else {

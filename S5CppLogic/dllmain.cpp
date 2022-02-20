@@ -97,12 +97,7 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
 }
 
 int __cdecl test(lua_State* L) {
-    RTTI_TypeDescriptor* t = reinterpret_cast<RTTI_TypeDescriptor*>(0x81A200);
-    std::string_view n{ t->MangledTypeName};
-    const char* ne = typeid(EGL::THandler<81926, BB::CEvent, BB::CEvent, GGL::CSerfBehavior, void>).raw_name();
-    lua_pushnumber(L, n.compare(ne));
-    lua_pushboolean(L, typeid(EGL::THandler<81926, BB::CEvent, BB::CEvent, GGL::CSerfBehavior, void>) == *reinterpret_cast<type_info*>(0x81A200));
-    return 2;
+    return 0;
 }
 
 int cleanup(lua_State* L) {
@@ -231,7 +226,7 @@ extern "C" lua_State * __lua_open() {
 void __lua_close(lua_State* L) { // TODO do something better than this when i come around writing a modloader...
     cleanup(L);
     lua_close(L);
-    shok_EGL_CGLETerrainLowRes::ClearBridgeArea();
+    EGL::CGLETerrainLowRes::ClearBridgeArea();
 }
 
 struct DebuggerOrig {
@@ -275,7 +270,7 @@ extern "C" {
 
     void __declspec(dllexport) __stdcall RemoveLuaState(lua_State* L) {
         cleanup(L);
-        shok_EGL_CGLETerrainLowRes::ClearBridgeArea();
+        EGL::CGLETerrainLowRes::ClearBridgeArea();
         if (dbg.RemoveLuaState)
             dbg.RemoveLuaState(L);
     }

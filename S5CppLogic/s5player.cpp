@@ -99,14 +99,14 @@ shok::TechState GGL::CPlayerStatus::GetTechStatus(int tech)
 
 bool GGL::CPlayerStatus::ArePlayersHostile(int p1, int p2)
 {
-	GGL::CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(p1);
+	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p1);
 	if (!ps)
 		return false;
 	return ps->GetDiploStateTo(p2) == shok::DiploState::Hostile;
 }
 bool GGL::CPlayerStatus::ArePlayersFriendly(int p1, int p2)
 {
-	GGL::CPlayerStatus* ps = (*shok_GGL_CGLGameLogic::GlobalObj)->GetPlayer(p1);
+	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p1);
 	if (!ps)
 		return false;
 	return ps->GetDiploStateTo(p2) == shok::DiploState::Friendly;

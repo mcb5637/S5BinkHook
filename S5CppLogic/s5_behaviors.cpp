@@ -59,7 +59,7 @@ int __fastcall sniperability_tasksnipeoverride(GGL::CSniperAbility* thi, int _, 
 	cr.DamageClass = 0;
 	cr.SourcePlayer = thent->PlayerId;
 	cr.AdvancedDamageSourceOverride = static_cast<byte>(shok::AdvancedDealDamageSource::AbilitySnipe);
-	(*shok_EGL_CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
+	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
 	return 0;
 }
 bool OverrideSnipeTask_Hooked = false;

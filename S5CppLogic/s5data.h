@@ -91,7 +91,7 @@ typedef uint8_t byte;
 // ED_CLandscape vtable 0x76A410 get water height func override (hires bridge area)
 // waterregion unknown func 0x47D301 jmp (hires bridge area)
 // bridgeentity apply bridgeheight 0x503C50 jmp redefined (hires bridge area)
-// shok_EGL_CGLETerrainLowRes::BridgeHeights vector modified (hires bridge area)
+// EGL::CGLETerrainLowRes::BridgeHeights vector modified (hires bridge area)
 
 #include "s5_forwardDecls.h"
 #include "s5_mem.h"
@@ -194,8 +194,8 @@ namespace BB {
 	};
 
 	class IPostEvent {
-	private:
-		virtual void unknownFunc1() = 0;
+	public:
+		virtual void __stdcall PostEvent(BB::CEvent* ev) = 0;
 	};
 }
 
@@ -391,6 +391,10 @@ enum class win_mouseEvents : int {
 #include "s5RWEngine.h"
 #include "s5_idmanager.h"
 #include "s5_cutscene.h"
+#include "s5_entityandeffectmanager.h"
+#include "s5_maplogic.h"
+#include "s5_mapdisplay.h"
+#include "s5_config.h"
 #include "s5globalObjects.h"
 #include "s5ui.h"
 #include "s5widget.h"

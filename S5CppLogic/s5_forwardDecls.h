@@ -11,6 +11,8 @@ namespace shok {
 namespace EGL {
 	class CGLEEntity;
 	class CGLEEntityCreator;
+	class LandscapeBlockingData;
+	class CGLELandscape;
 }
 namespace GGL {
 	class CBuilding;

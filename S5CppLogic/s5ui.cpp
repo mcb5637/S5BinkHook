@@ -81,7 +81,7 @@ void __declspec(naked) constructcommand_setmodelrot() {
 	};
 }
 bool __stdcall constructcommand_getnearestpos(int ety, float x, float y, float* xo, float* yo) {
-	shok::PositionRot p = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ety, { x, y, shok_GGUI_CPlaceBuildingState::PlacementRotation }, (*shok_GGL_CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
+	shok::PositionRot p = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ety, { x, y, shok_GGUI_CPlaceBuildingState::PlacementRotation }, (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
 	if (p.X >= 0) {
 		*xo = p.X;
 		*yo = p.Y;
@@ -152,7 +152,7 @@ shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPosFree(int 
 	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 
-	shok::Position r = (*shok_EGL_CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
+	shok::Position r = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
 	return { r.X, r.Y, p.r };
 }
 shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(int ety, const shok::PositionRot& p, float range)

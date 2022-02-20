@@ -145,7 +145,7 @@ void luaext_checkPos(lua_State* L, shok::Position& p, int i) {
 	lua_pushstring(L, "Y");
 	lua_gettable(L, i);
 	float y = luaL_checkfloat(L, -1);
-	int size = *shok_EGL_CGLEGameLogic::MapSize * 100;
+	int size = *EGL::CGLEGameLogic::MapSize * 100;
 	luaext_assert(L, x >= 0 && y >= 0 && x < size && y < size, "position outside of map");
 	p.X = x;
 	p.Y = y;
@@ -165,7 +165,7 @@ void luaext_checkPosRot(lua_State* L, shok::PositionRot& p, int i, bool rad) {
 	float r = luaL_checkfloat(L, -1);
 	if (rad)
 		r = deg2rad(r);
-	int size = *shok_EGL_CGLEGameLogic::MapSize * 100;
+	int size = *EGL::CGLEGameLogic::MapSize * 100;
 	luaext_assert(L, x >= 0 && y >= 0 && x < size && y < size, "position outside of map");
 	p.X = x;
 	p.Y = y;

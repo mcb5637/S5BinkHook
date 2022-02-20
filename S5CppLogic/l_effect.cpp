@@ -39,9 +39,9 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 	int dmgclass = luaL_optint(L, 11, 0);
 	data.DamageClass = dmgclass;
 	data.AdvancedDamageSourceOverride = luaL_optint(L, 13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
-	shok_EGL_CGLEGameLogic* gl = *shok_EGL_CGLEGameLogic::GlobalObj;
+	EGL::CGLEGameLogic* gl = *EGL::CGLEGameLogic::GlobalObj;
 	int id = gl->CreateEffect(&data);
-	EGL::CEffect* ef = (*shok_EGL_CGLEEffectManager::GlobalObj)->GetEffectById(id);
+	EGL::CEffect* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
 	if (!GGL::CCannonBallEffect::FixDamageClass)
 		if (GGL::CCannonBallEffect* cbeff = shok_DynamicCast<EGL::CEffect, GGL::CCannonBallEffect>(ef))
 			cbeff->DamageClass = dmgclass;
@@ -59,7 +59,7 @@ int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, ta
 
 int l_effect_isValid(lua_State* L) {
 	int id = luaL_checkint(L, 1);
-	bool r = (*shok_EGL_CGLEEffectManager::GlobalObj)->IsEffectValid(id);
+	bool r = (*EGL::CGLEEffectManager::GlobalObj)->IsIdValid(id);
 	lua_pushboolean(L, r);
 	return 1;
 }

@@ -281,7 +281,7 @@ struct shok_GGUI_CManager : shok_object { // size 26*4
 	shok_GGUI_C3DViewHandler* C3DViewHandler; // 6
 	shok_EGL_CGLEGUIInterface* EGUIInterface;
 	shok_GGL_CGLGUIInterface* GUIInterface; // 8
-	shok_EGL_CGLETerrainHiRes* TerrainHiRes;
+	EGL::CGLETerrainHiRes* TerrainHiRes;
 private:
 	shok_BB_IPostEvent* PostEvent;
 public:

@@ -37,6 +37,9 @@
     <Filter Include="shok\globals">
       <UniqueIdentifier>{3e1b7796-d47e-4431-aefd-6c86ea6bfe8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lua">
+      <UniqueIdentifier>{97436b4a-06e4-4301-824e-0a1fa9d62bb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -81,9 +84,6 @@
     <ClInclude Include="l_ua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s5globalObjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="s5widget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -115,18 +115,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Luapp\constexprTypename.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Luapp\luapp50.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lua50\lauxlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lua50\lua.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lua50\lualib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5_mem.h">
@@ -192,6 +180,24 @@
     <ClInclude Include="s5_config.h">
       <Filter>shok\globals</Filter>
     </ClInclude>
+    <ClInclude Include="lua50\lauxlib.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua50\lua.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua50\lualib.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Luapp\luapp50.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_scriptsystem.h">
+      <Filter>shok</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_filesystem.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -233,9 +239,6 @@
     <ClCompile Include="l_ua.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="s5globalObjects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="s5widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -258,9 +261,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5ui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Luapp\luapp50.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5_datastructures.cpp">
@@ -309,6 +309,15 @@
       <Filter>shok\globals</Filter>
     </ClCompile>
     <ClCompile Include="s5_config.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="Luapp\luapp50.cpp">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_scriptsystem.cpp">
+      <Filter>shok</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_filesystem.cpp">
       <Filter>shok\globals</Filter>
     </ClCompile>
   </ItemGroup>

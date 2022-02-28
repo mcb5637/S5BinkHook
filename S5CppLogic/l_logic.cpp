@@ -509,7 +509,7 @@ int l_netEventSetHook(lua_State* L) {
 	lua_rawset(L, LUA_REGISTRYINDEX);
 	shok_GGUI_CManager::PostEventCallback = [](BB::CEvent* ev) {
 		int id = ev->EventTypeId;
-		lua_State* L = *shok_luastate_game;
+		lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 		int top = lua_gettop(L);
 		luaL_checkstack(L, 10, "");
 		lua_pushlightuserdata(L, &l_netEventSetHook);
@@ -663,7 +663,7 @@ int l_logicHookHurtEntity(lua_State* L) {
 		lua_rawset(L, LUA_REGISTRYINDEX);
 
 		EGL::CGLEEntity::HurtEntityOnKillCb = [](EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc) {
-			lua_State* L = *shok_luastate_game;
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 
 			int t = lua_gettop(L);
 
@@ -707,14 +707,19 @@ int l_logicHurtEntitySetDamage(lua_State* L) {
 int l_logicGetLoadOrder(lua_State* L) {
 	lua_newtable(L);
 	int r = 1;
-	for (shok_BB_IFileSystem* a : (*shok_BB_CFileSystemMgr::GlobalObj)->LoadOrder) {
-		if (a->vtable == shok_BB_CDirectoryFileSystem::vtp) {
-			lua_pushstring(L, ((shok_BB_CDirectoryFileSystem*)a)->Path);
+	for (BB::IFileSystem* a : (*BB::CFileSystemMgr::GlobalObj)->LoadOrder) {
+		if (BB::CDirectoryFileSystem* a2 = dynamic_cast<BB::CDirectoryFileSystem*>(a)) {
+			lua_pushstring(L,a2->Path);
 			lua_rawseti(L, -2, r);
 			r++;
 		}
-		else if (a->vtable == shok_BB_CBBArchiveFile::vtp) {
-			lua_pushstring(L, ((shok_BB_CBBArchiveFile*)a)->Path);
+		else if (BB::CBBArchiveFile* a2 = dynamic_cast<BB::CBBArchiveFile*>(a)) {
+			lua_pushstring(L, a2->Path);
+			lua_rawseti(L, -2, r);
+			r++;
+		}
+		else {
+			lua_pushstring(L, typeid(*a).name());
 			lua_rawseti(L, -2, r);
 			r++;
 		}
@@ -725,23 +730,31 @@ int l_logicGetLoadOrder(lua_State* L) {
 int l_logicAddArchive(lua_State* L) {
 	const char* s = luaL_checkstring(L, 1);
 	luaext_assert(L, std::filesystem::exists(s), "file doesnt exist");
-	(*shok_BB_CFileSystemMgr::GlobalObj)->AddArchive(s);
+	try {
+		(*BB::CFileSystemMgr::GlobalObj)->AddArchive(s);
+	}
+	catch (const BB::CFileException& e) {
+		char buff[201]{};
+		e.CopyMessage(buff, 200);
+		lua_pushstring(L, buff);
+		lua_error(L);
+	}
 	return 0;
 }
 
 int l_logicRemoveTop(lua_State* L) {
-	if ((*shok_BB_CFileSystemMgr::GlobalObj)->LoadOrder.size() <= 0)
+	if ((*BB::CFileSystemMgr::GlobalObj)->LoadOrder.size() <= 0)
 		return 0;
-	shok_BB_IFileSystem* a = (*shok_BB_CFileSystemMgr::GlobalObj)->LoadOrder[0];
-	luaext_assert(L, a->vtable == shok_BB_CBBArchiveFile::vtp, "may only remove archives");
-	luaext_assert(L, str_ends_with(((shok_BB_CBBArchiveFile*)a)->Path, ".s5x"), "may only remove maps");
-	(*shok_BB_CFileSystemMgr::GlobalObj)->RemoveTopArchive();
+	BB::CBBArchiveFile* a = dynamic_cast<BB::CBBArchiveFile*>((*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0]);
+	luaext_assert(L, a, "may only remove archives");
+	luaext_assert(L, str_ends_with(a->Path, ".s5x"), "may only remove maps");
+	(*BB::CFileSystemMgr::GlobalObj)->RemoveTopArchive();
 	return 0;
 }
 
 int l_logicAddFolder(lua_State* L) {
 	const char* s = luaL_checkstring(L, 1);
-	(*shok_BB_CFileSystemMgr::GlobalObj)->AddFolder(s);
+	(*BB::CFileSystemMgr::GlobalObj)->AddFolder(s);
 	return 0;
 }
 
@@ -800,7 +813,7 @@ int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	int i = luaL_checkint(L, 1);
-	shok_color c = (*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->GetColorByIndex(i);
+	shok::Color c = (*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors->GetColorByIndex(i);
 	lua_pushnumber(L, c.R);
 	lua_pushnumber(L, c.G);
 	lua_pushnumber(L, c.B);
@@ -813,8 +826,8 @@ int l_logicSetColor(lua_State* L) {
 	int i = luaL_checkint(L, 1);
 	int r = luaL_checkint(L, 2), g = luaL_checkint(L, 3), b = luaL_checkint(L, 4);
 	int a = luaL_optint(L, 5, 255);
-	(*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->SetColorByIndex(i, shok_color(r, g, b, a));
-	(*shok_ED_CGlobalsBaseEx::GlobalObj)->PlayerColors->RefreshPlayerColors();
+	(*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors->SetColorByIndex(i, shok::Color(r, g, b, a));
+	(*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors->RefreshPlayerColors();
 	return 0;
 }
 
@@ -828,7 +841,7 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
 	GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = [](GGL::CPlayerAttractionHandler* th) {
-		lua_State* L2 = *shok_luastate_game;
+		lua_State* L2 = *EScr::CScriptTriggerSystem::GameState;
 		int t = lua_gettop(L2);
 		lua_pushlightuserdata(L2, &l_logicEnablePlayerPaydayCallback);
 		lua_rawget(L2, LUA_REGISTRYINDEX);
@@ -858,7 +871,7 @@ int l_logicSetRegenerateSoldiers(lua_State* L) {
 int l_logicOverrideStringTableText(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
-	if (L != *shok_luastate_game)
+	if (L != *EScr::CScriptTriggerSystem::GameState)
 		luaL_error(L, "does only work ingame");
 	if (!GetStringTableTextOverride) {
 		HookGetStringTableText();
@@ -869,18 +882,18 @@ int l_logicOverrideStringTableText(lua_State* L) {
 			if (!s)
 				return s;
 			const char* r = nullptr;
-			int t = lua_gettop(*shok_luastate_game);
+			int t = lua_gettop(*EScr::CScriptTriggerSystem::GameState);
 
-			lua_pushlightuserdata(*shok_luastate_game, &l_logicOverrideStringTableText);
-			lua_rawget(*shok_luastate_game, LUA_REGISTRYINDEX);
-			lua_pushstring(*shok_luastate_game, s);
-			luaext_tolower(*shok_luastate_game);
-			lua_rawget(*shok_luastate_game, -2);
-			if (lua_isstring(*shok_luastate_game, -1)) {
-				r = lua_tostring(*shok_luastate_game, -1); // stored in registry, so its ok to return it
+			lua_pushlightuserdata(*EScr::CScriptTriggerSystem::GameState, &l_logicOverrideStringTableText);
+			lua_rawget(*EScr::CScriptTriggerSystem::GameState, LUA_REGISTRYINDEX);
+			lua_pushstring(*EScr::CScriptTriggerSystem::GameState, s);
+			luaext_tolower(*EScr::CScriptTriggerSystem::GameState);
+			lua_rawget(*EScr::CScriptTriggerSystem::GameState, -2);
+			if (lua_isstring(*EScr::CScriptTriggerSystem::GameState, -1)) {
+				r = lua_tostring(*EScr::CScriptTriggerSystem::GameState, -1); // stored in registry, so its ok to return it
 			}
 
-			lua_settop(*shok_luastate_game, t);
+			lua_settop(*EScr::CScriptTriggerSystem::GameState, t);
 			return r;
 		};
 	}
@@ -916,7 +929,7 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 
 	if (!GGL::CPlayerStatus::CanPlaceBuildingCallback) {
 		GGL::CPlayerStatus::CanPlaceBuildingCallback = [](int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
-			lua_State* L = *shok_luastate_game;
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 			bool r = true;
 
@@ -971,7 +984,7 @@ int l_logic_FixSnipeDamage(lua_State* L) {
 
 	if (!GGL::CSniperAbility::SnipeDamageOverride) {
 		GGL::CSniperAbility::SnipeDamageOverride = [](EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) {
-			lua_State* L = *shok_luastate_game;
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 
 			lua_pushlightuserdata(L, &l_logic_FixSnipeDamage);
@@ -1088,7 +1101,7 @@ int l_logic_setluataskfunc(lua_State* L) {
 
 	if (!EGL::CGLEEntity::LuaTaskListCallback) {
 		EGL::CGLEEntity::LuaTaskListCallback = [](EGL::CGLEEntity* e, int val) {
-			lua_State* L = *shok_luastate_game;
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 
 			l_logic_setluataskfunc_info d{ e, false, false, false };
@@ -1185,13 +1198,13 @@ int l_logic_GetNearestFreePosForBuilding(lua_State* L) {
 	return 1;
 }
 
-shok_modelinstance::TransformOperation l_logicModel_checkTO(lua_State* L, int idx) {
-	int i = luaL_optint(L, idx, static_cast<int>(shok_modelinstance::TransformOperation::Multiply));
+ED::ModelInstance::TransformOperation l_logicModel_checkTO(lua_State* L, int idx) {
+	int i = luaL_optint(L, idx, static_cast<int>(ED::ModelInstance::TransformOperation::Multiply));
 	luaext_assert(L, i >= 0 && i < 3, "invalid transform operation");
-	return static_cast<shok_modelinstance::TransformOperation>(i);
+	return static_cast<ED::ModelInstance::TransformOperation>(i);
 }
 struct l_logicModel {
-	shok_modelinstance* Model = nullptr;
+	ED::ModelInstance* Model = nullptr;
 
 	static int Clear(lua_State* L) {
 		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
@@ -1204,12 +1217,12 @@ struct l_logicModel {
 	static int SetModel(lua_State* L) {
 		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
 		int mid = luaL_checkint(L, 2);
-		luaext_assert(L, (*shok_ED_CGlobalsBaseEx::GlobalObj)->ModelManager->GetNameByID(mid), "invalid model");
+		luaext_assert(L, (*ED::CGlobalsBaseEx::GlobalObj)->ModelManager->GetNameByID(mid), "invalid model");
 		if (m->Model) {
 			m->Model->Destroy();
 			m->Model = nullptr;
 		}
-		m->Model = (*shok_ED_CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
+		m->Model = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
 		m->Model->Register();
 		return 0;
 	}
@@ -1249,7 +1262,7 @@ struct l_logicModel {
 	static int ResetTransform(lua_State* L) {
 		l_logicModel* m = luaext_GetUserData<l_logicModel>(L, 1);
 		luaext_assertPointer(L, m->Model, "set a model first");
-		m->Model->Rotate(0, shok_modelinstance::TransformOperation::Set);
+		m->Model->Rotate(0, ED::ModelInstance::TransformOperation::Set);
 		return 0;
 	}
 	static int SetColorByPlayer(lua_State* L) {

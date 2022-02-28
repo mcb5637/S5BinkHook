@@ -439,7 +439,7 @@ function CppLogic.API.ReadFileAsString(file) end
 --- checks if a file exists.
 -- @param file path to the file
 -- @return bool
-function CppLogic.API.DoesFileExist(file) end
+function CppLogic.API.BB::CFileSystemMgr::DoesFileExist(file) end
 
 --- compiles a lua chunk and executes it. shows the script in the debugger as file with the defined name.
 -- asserts if kimichuras dlls are detected.

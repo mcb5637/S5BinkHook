@@ -110,7 +110,7 @@ namespace ED {
 		EGL::IEntityDisplay* Entity;
 		int EntityID;
 		int ModelOverrideID;
-		shok_modelinstance* Model;
+		ED::ModelInstance* Model;
 		PADDINGI(1); // some kind of flags? // 5
 		PADDINGI(1); // some counter
 		shok::Vector<ED::IBehavior*> DisplayBehaviors; // 7

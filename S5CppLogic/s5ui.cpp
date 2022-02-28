@@ -107,7 +107,7 @@ void __declspec(naked) constructcommand_checkpos() {
 }
 void(__thiscall* const constructcommand_updatemodelsetpos)(shok_GGUI_CPlaceBuildingState* th, int* p, int r) = reinterpret_cast<void(__thiscall*)(shok_GGUI_CPlaceBuildingState*, int*, int)>(0x5269FE);
 void __fastcall constructcommand_updatemodelsetpos_over(shok_GGUI_CPlaceBuildingState* th, int _, int* p, int r) {
-	th->C3DViewHandler->ClumpRenerable->Model->Rotate(rad2deg(shok_GGUI_CPlaceBuildingState::PlacementRotation), shok_modelinstance::TransformOperation::Set);
+	th->C3DViewHandler->ClumpRenerable->Model->Rotate(rad2deg(shok_GGUI_CPlaceBuildingState::PlacementRotation), ED::ModelInstance::TransformOperation::Set);
 	constructcommand_updatemodelsetpos(th, p, r);
 }
 bool HookConstructCommandRotation_Hooked = false;
@@ -165,9 +165,9 @@ shok::PositionRot shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(int ety,
 		return GetNearestPlacementPosBuildOn(ety, p, range);
 }
 
-void shok_ERwTools_CRpClumpRenderable::SetModelData(const shok_modeldata* modeldata, float rotation)
+void shok_ERwTools_CRpClumpRenderable::SetModelData(const ED::ModelData* modeldata, float rotation)
 {
-	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata ? *reinterpret_cast<void**>(const_cast<shok_modeldata*>(modeldata)) : nullptr, rotation);
+	reinterpret_cast<shok_vtable_ERwTools_CRpClumpRenderable*>(vtable)->SetModelData(this, modeldata ? *reinterpret_cast<void**>(const_cast<ED::ModelData*>(modeldata)) : nullptr, rotation);
 }
 void shok_ERwTools_CRpClumpRenderable::SetPosition(const shok::Position& p, float z)
 {

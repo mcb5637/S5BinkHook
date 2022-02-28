@@ -215,7 +215,6 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5_entitytype.h" />
     <ClInclude Include="s5_events.h" />
     <ClInclude Include="s5framework.h" />
-    <ClInclude Include="s5globalObjects.h" />
     <ClInclude Include="s5player.h" />
     <ClInclude Include="s5RWEngine.h" />
     <ClInclude Include="s5sound.h" />
@@ -226,12 +225,14 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5_entitydisplay.h" />
     <ClInclude Include="s5_datastructures.h" />
     <ClInclude Include="s5_exception.h" />
+    <ClInclude Include="s5_filesystem.h" />
     <ClInclude Include="s5_forwardDecls.h" />
     <ClInclude Include="s5_idmanager.h" />
     <ClInclude Include="s5_mapdisplay.h" />
     <ClInclude Include="s5_maplogic.h" />
     <ClInclude Include="s5_mem.h" />
     <ClInclude Include="s5_netevents.h" />
+    <ClInclude Include="s5_scriptsystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -270,7 +271,6 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClCompile Include="s5_entitytype.cpp" />
     <ClCompile Include="s5_events.cpp" />
     <ClCompile Include="s5framework.cpp" />
-    <ClCompile Include="s5globalObjects.cpp" />
     <ClCompile Include="s5player.cpp" />
     <ClCompile Include="s5sound.cpp" />
     <ClCompile Include="s5tasklist.cpp" />
@@ -278,11 +278,13 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClCompile Include="s5ui.cpp" />
     <ClCompile Include="s5widget.cpp" />
     <ClCompile Include="s5_datastructures.cpp" />
+    <ClCompile Include="s5_filesystem.cpp" />
     <ClCompile Include="s5_idmanager.cpp" />
     <ClCompile Include="s5_mapdisplay.cpp" />
     <ClCompile Include="s5_maplogic.cpp" />
     <ClCompile Include="s5_mem.cpp" />
     <ClCompile Include="s5_netevents.cpp" />
+    <ClCompile Include="s5_scriptsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CppLogic.lua">

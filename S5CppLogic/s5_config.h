@@ -132,5 +132,30 @@ namespace GGL {
 
 		static inline GGL::CPlayerAttractionProps** const GlobalObj = reinterpret_cast<GGL::CPlayerAttractionProps**>(0x866A80);
 	};
+}
 
+namespace ED {
+	class CDisplayProps {
+	public:
+		virtual ~CDisplayProps() = default;
+
+		byte ShadowBlur;
+		PADDING(3);
+		int ShadowRasterSize;
+		float ShadowStrength;
+		shok::Color InvalidPositionColorModulate;
+		shok::Color InvalidPositionColorEmissive;
+		shok::Vector<shok::Color> PlayerColor;
+		shok::Vector<shok::Color> MiniMapColor;
+		float SelectionRadiusScaleForModelsWithDecal;
+		int FogOfWarNeverSeenLuminance;
+		int FogOfWarSeenLuminance;
+		float AuraRadius;
+		float AuraHeight;
+		shok::String AuraTexture;
+		int CommandAcknowledgementModel;
+		int CommandAcknowledgementDuration;
+
+		static inline constexpr int vtp = 0x7AE630;
+	};
 }

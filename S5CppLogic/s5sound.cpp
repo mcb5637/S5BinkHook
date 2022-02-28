@@ -32,7 +32,7 @@ void(__stdcall* AIL_closestreamBackup)(int streamh) = nullptr;
 void __stdcall ail_closestream_override(int streamh) {
 	int h = (*AIL_getstreamuserdata)(streamh, 2); // check handle and close it
 	if (h) {
-		shok_BB_CFileSystemMgr::CloseHandle(h);
+		BB::CFileSystemMgr::CloseHandle(h);
 	}
 	AIL_closestreamBackup(streamh);
 }
@@ -45,15 +45,15 @@ int __stdcall startmusic_patch(const char* path, int th) {
 		if (path[0] == '/' || path[0] == '\\')
 			path++;
 	}
-	if (!(*shok_BB_CFileSystemMgr::GlobalObj)->OpenFileAsHandle(path, handle, s)) {
+	if (!(*BB::CFileSystemMgr::GlobalObj)->OpenFileAsHandle(path, handle, s)) {
 		return 0;
 	}
 	char tmp[255] = {};
 	// this string tells openstream the handle and filesize
-	snprintf(tmp, 254, "\\\\\\\\%i,%i%s", handle, s, shok_BB_CFileSystemMgr::PathGetExtension(path));
+	snprintf(tmp, 254, "\\\\\\\\%i,%i%s", handle, s, BB::CFileSystemMgr::PathGetExtension(path));
 	int h = (*AIL_openstream)(th, tmp, 0); // first param is some string, maybe output format?
 	if (!h) {
-		shok_BB_CFileSystemMgr::CloseHandle(handle);
+		BB::CFileSystemMgr::CloseHandle(handle);
 		return 0;
 	}
 	(*AIL_setsreamuserdata)(h, 2, handle); // remember handle, so we can close it later

@@ -3,12 +3,12 @@
 
 struct shok_vtable_BB_CXmlSerializer {
     void(__stdcall* Destroy)(shok_BB_CXmlSerializer* th);
-    void(__stdcall* Deserialize)(shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_BB_IObject* ob); // open file in mode 0x113
+    void(__stdcall* Deserialize)(shok_BB_CXmlSerializer* th, BB::CFileStreamEx* f, shok_BB_IObject* ob); // open file in mode 0x113
     PADDINGI(1);
-    void(__stdcall* Serialize)(shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_BB_IObject* ob); // open file in mode 0x121
+    void(__stdcall* Serialize)(shok_BB_CXmlSerializer* th, BB::CFileStreamEx* f, shok_BB_IObject* ob); // open file in mode 0x121
     PADDINGI(1); // dtor, use destroy
-    void(__stdcall* DeserializeByData)(shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_BB_IObject* ob, shok_BB_CClassFactory_serializationData* d);
-    // serialize by data, (shok_BB_CXmlSerializer* th, shok_BB_CFileStreamEx* f, shok_object* ob, shok_BB_CClassFactory_serializationData* d, char* buff)?
+    void(__stdcall* DeserializeByData)(shok_BB_CXmlSerializer* th, BB::CFileStreamEx* f, shok_BB_IObject* ob, shok_BB_CClassFactory_serializationData* d);
+    // serialize by data, (shok_BB_CXmlSerializer* th, BB::CFileStreamEx* f, shok_object* ob, shok_BB_CClassFactory_serializationData* d, char* buff)?
 };
 
 struct shok_vtable_BB_CClassFactory {
@@ -31,13 +31,13 @@ void shok_BB_CXmlSerializer::Destroy()
 {
     reinterpret_cast<shok_vtable_BB_CXmlSerializer*>(vtable)->Destroy(this);
 }
-void shok_BB_CXmlSerializer::Deserialize(shok_BB_CFileStreamEx* f, shok_BB_IObject* ob)
+void shok_BB_CXmlSerializer::Deserialize(BB::CFileStreamEx* f, shok_BB_IObject* ob)
 {
     reinterpret_cast<shok_vtable_BB_CXmlSerializer*>(vtable)->Deserialize(this, f, ob);
 }
 void shok_BB_CXmlSerializer::Deserialize(const char* filename, shok_BB_IObject* ob)
 {
-    shok_BB_CFileStreamEx filestr{};
+    BB::CFileStreamEx filestr{};
     if (filestr.OpenFile(filename, 0x113)) {
         Deserialize(&filestr, ob);
         filestr.Close();

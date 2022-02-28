@@ -96,8 +96,20 @@ void dumpClassSerialization(lua_State* L, unsigned int id) {
     dumpClassSerialization(L, d);
 }
 
-int __cdecl test(lua_State* L) {
-    return 0;
+int testfunc(lua::State L) {
+    L.Push(42);
+    return 1;
+}
+
+int test(lua::State L) {
+    char abs[300]{};
+    BB::IFileSystem::FileInfo i;
+    (*BB::CFileSystemMgr::GlobalObj)->GetFileInfo(&i, L.CheckString(1), 0, abs);
+    L.Push(abs);
+    L.Push(i.Size);
+    L.Push(i.Found);
+    L.Push(i.IsDirectory);
+    return 4;
 }
 
 int cleanup(lua_State* L) {
@@ -135,8 +147,9 @@ int resetCppLogic(lua_State* L) {
      }
 
 #ifdef _DEBUG
-    lua_pushcfunction(L, &test);
-    lua_setglobal(L, "test");
+    /*lua_pushcfunction(L, &test);
+    lua_setglobal(L, "test");*/
+    L2.RegisterFunc<test>("test");
 #endif
     
     L2.Push("CppLogic");

@@ -45,7 +45,7 @@ void l_uiSetString(lua_State* L, shok_EGUIX_CSingleStringHandler& h, int i) {
 }
 
 const char* l_uiCheckFontString(const char* font) {
-	if (!DoesFileExist(font))
+	if (!BB::CFileSystemMgr::DoesFileExist(font))
 		return "file doesnt exist";
 	if (!str_ends_with(font, ".met"))
 		return "wrong file extension";
@@ -576,7 +576,7 @@ int l_ui_SetCharTrigger(lua_State* L) {
 	if (!UIInput_Char_Callback) {
 		HookUIInput();
 		UIInput_Char_Callback = [](int c) {
-			lua_State* L = *shok_luastate_game;
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 			bool r = false;
 
@@ -613,7 +613,7 @@ int l_ui_SetKeyTrigger(lua_State* L) {
 	if (!UIInput_Key_Callback) {
 		HookUIInput();
 		UIInput_Key_Callback = [](int c, win_mouseEvents id) {
-			lua_State* L = *shok_luastate_game;
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 			bool r = false;
 
@@ -653,7 +653,7 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 			if (id == win_mouseEvents::MouseMove)
 				return false;
 
-			lua_State* L = *shok_luastate_game;
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 			bool r = false;
 
@@ -779,7 +779,7 @@ int l_ui_GetLandscapePosAtScreenPos(lua_State* L) {
 int l_ui_ShowCommandAckAtPos(lua_State* L) {
 	shok::Position p;
 	luaext_checkPos(L, p, 1);
-	(*shok_ED_CGlobalsBaseEx::GlobalObj)->CommandAcks->ShowAck(p);
+	(*ED::CGlobalsBaseEx::GlobalObj)->CommandAcks->ShowAck(p);
 	return 0;
 }
 
@@ -819,9 +819,9 @@ CppL_GUIState_LuaSelection::CppL_GUIState_LuaSelection()
 CppL_GUIState_LuaSelection::~CppL_GUIState_LuaSelection()
 {
 	if (RefOnKlick != LUA_NOREF)
-		luaL_unref(*shok_luastate_game, LUA_REGISTRYINDEX, RefOnKlick);
+		luaL_unref(*EScr::CScriptTriggerSystem::GameState, LUA_REGISTRYINDEX, RefOnKlick);
 	if (RefOnCancel != LUA_NOREF)
-		luaL_unref(*shok_luastate_game, LUA_REGISTRYINDEX, RefOnCancel);
+		luaL_unref(*EScr::CScriptTriggerSystem::GameState, LUA_REGISTRYINDEX, RefOnCancel);
 }
 bool CppL_GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev)
 {
@@ -830,7 +830,7 @@ bool CppL_GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev)
 		if (mev->IsKey(shok::Keys::MouseLButton)) {
 			bool r = true;
 			if (RefOnKlick != LUA_NOREF) {
-				lua_State* L = *shok_luastate_game;
+				lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 				int i = lua_gettop(L);
 				lua_rawgeti(L, LUA_REGISTRYINDEX, RefOnKlick);
 				lua_pushnumber(L, mev->X);
@@ -854,7 +854,7 @@ bool CppL_GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev)
 void CppL_GUIState_LuaSelection::Cancel(bool calllua)
 {
 	if (calllua && RefOnCancel != LUA_NOREF) {
-		lua_State* L = *shok_luastate_game;
+		lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 		int i = lua_gettop(L);
 		lua_rawgeti(L, LUA_REGISTRYINDEX, RefOnCancel);
 		lua_pcall(L, 0, 0, 0);

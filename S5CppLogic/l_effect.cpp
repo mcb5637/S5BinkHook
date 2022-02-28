@@ -6,7 +6,7 @@
 
 void l_effectFlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
 	int id = eff->EffectID;
-	lua_State* L = *shok_luastate_game;
+	lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 	int top = lua_gettop(L);
 	luaL_checkstack(L, 5, "");
 	lua_pushlightuserdata(L, &l_effect_init);

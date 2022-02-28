@@ -1,7 +1,6 @@
 #pragma once
 #include "s5data.h"
 
-struct shok_BB_CFileStreamEx;
 struct shok_BB_CXmlSerializer : shok_object {
 	PADDINGI(45); // 43 + a bit of extra space
 
@@ -11,7 +10,7 @@ struct shok_BB_CXmlSerializer : shok_object {
 
 	void Destroy();
 	static shok_BB_CXmlSerializer* Create();
-	void Deserialize(shok_BB_CFileStreamEx* f, shok_BB_IObject* ob);
+	void Deserialize(BB::CFileStreamEx* f, shok_BB_IObject* ob);
 	void Deserialize(const char* filename, shok_BB_IObject* ob);
 
 private:

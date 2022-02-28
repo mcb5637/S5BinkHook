@@ -489,7 +489,7 @@ int l_entitySetLimitedLifespanRemaining(lua_State* L) {
 
 void(__thiscall* FireEvent)(EGL::CGLEEntity* th, BB::CEvent* d);
 void __fastcall fireeventhook(EGL::CGLEEntity* th, int _, BB::CEvent* d) {
-	lua_State* L = *shok_luastate_game;
+	lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 	int t = lua_gettop(L);
 	lua_getglobal(L, "event");
 	lua_pushnumber(L, ((int*)d)[1]);
@@ -922,7 +922,7 @@ int l_settlerEnableConversionHook(lua_State* L) {
 	lua_rawset(L, LUA_REGISTRYINDEX);
 	EGL::CGLEEntity::HookHero6Convert();
 	EGL::CGLEEntity::Hero6ConvertHookCb = [](int id, int pl, int nid, int converter) {
-		lua_State* L = *shok_luastate_game;
+		lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 		int t = lua_gettop(L);
 		lua_pushlightuserdata(L, &l_settlerEnableConversionHook);
 		lua_rawget(L, LUA_REGISTRYINDEX);

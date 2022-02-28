@@ -20,10 +20,13 @@ namespace GGL {
 namespace ED {
 	class CBehaviorProps;
 	class CEntity;
+	struct ModelInstance;
+	class CDisplayProps;
 }
 namespace BB {
 	class CEvent;
 	class CIDManagerEx;
+	class CFileStreamEx;
 }
 
 struct shok_BB_CClassFactory_serializationData;
@@ -36,5 +39,3 @@ enum class shok_TaskState;
 struct shok_EGL_CGLETaskList;
 struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int;
 struct shok_EGL_IGLEStateHandler;
-
-struct shok_modelinstance;

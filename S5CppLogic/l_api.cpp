@@ -75,7 +75,7 @@ namespace CppLogic::API {
 		if (!IsExternalmap(s))
 			L.Error("not a map file");
 #endif
-		const char* data = ReadFileToString(s, &strlen);
+		const char* data = BB::CFileSystemMgr::ReadFileToString(s, &strlen);
 		if (!data)
 			return 0;
 		L.Push(data, strlen);
@@ -85,7 +85,7 @@ namespace CppLogic::API {
 
 	int LDoesFileExist(lua::State L) {
 		const char* s = L.CheckString(1);
-		L.Push(DoesFileExist(s));
+		L.Push(BB::CFileSystemMgr::DoesFileExist(s));
 		return 1;
 	}
 

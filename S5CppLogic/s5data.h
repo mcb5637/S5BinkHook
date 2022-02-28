@@ -180,6 +180,14 @@ namespace shok {
 
 		auto operator<=>(const Attachment& o) const = default;
 	};
+
+	struct Color {
+		byte R = 255, G = 255, B = 255, A = 255;
+
+		Color(int r, int g, int b, int a);
+		Color() = default;
+	};
+	static_assert(sizeof(shok::Color) == 1 * 4);
 }
 
 namespace BB {
@@ -395,7 +403,8 @@ enum class win_mouseEvents : int {
 #include "s5_maplogic.h"
 #include "s5_mapdisplay.h"
 #include "s5_config.h"
-#include "s5globalObjects.h"
+#include "s5_scriptsystem.h"
+#include "s5_filesystem.h"
 #include "s5ui.h"
 #include "s5widget.h"
 #include "s5framework.h"
@@ -408,27 +417,8 @@ static inline void(_stdcall* const shok_SetHighPrecFPU)() = reinterpret_cast<voi
 static inline int(__stdcall* const shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = reinterpret_cast<int(__stdcall*)(lua_State*, const char*, size_t, const char*)>(0x59BE57);
 
 
-static inline lua_State** const shok_luastate_game = reinterpret_cast<lua_State**>(0x853A9C);
 extern lua_State* mainmenu_state;
 static inline HWND* shok_mainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
-
-struct shok_BB_CFileStreamEx : shok_object {
-private:
-	int x = 0;
-
-public:
-	static constexpr int vtp = 0x761C60;
-
-
-	shok_BB_CFileStreamEx();
-	~shok_BB_CFileStreamEx();
-	bool OpenFile(const char* filename, int u);
-	size_t GetSize();
-	int ReadToBuffer(void* buff, size_t s);
-	void Close();
-};
-const char* ReadFileToString(const char* name, size_t* size);
-bool DoesFileExist(const char* name);
 
 void RedirectCall(void* call, void* redirect);
 void RedirectCallVP(void* call, void* redirect);

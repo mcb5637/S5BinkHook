@@ -221,12 +221,12 @@ struct shok_GGUI_CCutsceneState : shok_GGUI_CState {
 
 struct shok_ERwTools_CRpClumpRenderable : shok_object {
 	int RenderMode; // red color?
-	shok_modelinstance* Model;
-	void* RenderObj; // from shok_ED_CWorld
+	ED::ModelInstance* Model;
+	void* RenderObj; // from ED::CWorld
 
 	static inline constexpr int vtp = 0x7AEBF8;
 
-	void SetModelData(const shok_modeldata* modeldata, float rotation);
+	void SetModelData(const ED::ModelData* modeldata, float rotation);
 	void SetPosition(const shok::Position& p, float z);
 	void SetBuildingRedColor(bool r);
 };

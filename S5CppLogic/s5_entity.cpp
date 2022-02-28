@@ -1012,7 +1012,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		EGL::CGLEEntity::HurtEntityDamagePointer = &damage;
 		EGL::CGLEEntity::HurtEntityDamageSource = sourceInfo;
 		EGL::CGLEEntity::HurtEntityAttackerPlayer = attackerplayer;
-		(*shok_EScr_CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 		EGL::CGLEEntity::HurtEntityDamagePointer = nullptr;
 	}
 	if (damage <= 0)
@@ -1149,7 +1149,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	}
 	if (attackerplayer || EGL::CGLEEntity::HurtEntityCallWithNoAttacker) {
 
-		lua_State* L = *shok_luastate_game;
+		lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 		int t = lua_gettop(L);
 		lua_pushstring(L, callback);
 		lua_rawget(L, LUA_GLOBALSINDEX);

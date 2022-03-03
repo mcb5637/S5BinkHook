@@ -785,10 +785,10 @@ int l_ui_ShowCommandAckAtPos(lua_State* L) {
 
 int l_ui_SetGUIState_LuaSelection(lua_State* L) {
 	luaext_assert(L, lua_isfunction(L, 1), "no confirm func");
-	auto* vh = shok_GGUI_CManager::GlobalObj()->C3DViewHandler;
+	auto* vh = GGUI::CManager::GlobalObj()->C3DViewHandler;
 	vh->StateIdManager->GetIDByNameOrCreate("LuaSelectionState", 27); // make sure the state id exists
-	vh->SetGUIState<CppL_GUIState_LuaSelection>();
-	CppL_GUIState_LuaSelection* s = shok_DynamicCast<shok_GGUI_CState, CppL_GUIState_LuaSelection>(vh->CurrentState);
+	vh->SetGUIState<CppLogic::UI::GUIState_LuaSelection>();
+	CppLogic::UI::GUIState_LuaSelection* s = dynamic_cast<CppLogic::UI::GUIState_LuaSelection*>(vh->CurrentState);
 	lua_pushvalue(L, 1);
 	s->RefOnKlick = luaL_ref(L, LUA_REGISTRYINDEX);
 	if (!lua_isnoneornil(L, 2)) {
@@ -800,117 +800,107 @@ int l_ui_SetGUIState_LuaSelection(lua_State* L) {
 }
 
 
-// creator func, used by class factory
-shok_BB_IObject* __stdcall CppL_GUIState_LuaSelection_ctor() {
-	// allocate an object and then call the constructor for it manually
-	return new (shok::Malloc(sizeof(CppL_GUIState_LuaSelection))) CppL_GUIState_LuaSelection();
-}
-void CppL_GUIState_LuaSelection::Initialize()
-{
-	// add class to factory, best called on mainmenu lua state initialization (will be called before anything serious gets loaded)
-	// map lua state initialization will be to late, as most stuff is already loaded there
-	(*shok_BB_CClassFactory::GlobalObj)->AddClassToFactory(CppL_GUIState_LuaSelection::Identifier, "class CppLogic::GuiState_LuaSelection", &CppL_GUIState_LuaSelection_ctor, nullptr);
-}
-CppL_GUIState_LuaSelection::CppL_GUIState_LuaSelection()
-{
-	// make sure to initialize all vtables of the object manually
-	vtable = CppL_GUIState_LuaSelection::vtp;
-}
-CppL_GUIState_LuaSelection::~CppL_GUIState_LuaSelection()
-{
-	if (RefOnKlick != LUA_NOREF)
-		luaL_unref(*EScr::CScriptTriggerSystem::GameState, LUA_REGISTRYINDEX, RefOnKlick);
-	if (RefOnCancel != LUA_NOREF)
-		luaL_unref(*EScr::CScriptTriggerSystem::GameState, LUA_REGISTRYINDEX, RefOnCancel);
-}
-bool CppL_GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev)
-{
-	BB::CMouseEvent* mev = shok_DynamicCast<BB::CEvent, BB::CMouseEvent>(ev);
-	if (mev && mev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
-		if (mev->IsKey(shok::Keys::MouseLButton)) {
-			bool r = true;
-			if (RefOnKlick != LUA_NOREF) {
-				lua_State* L = *EScr::CScriptTriggerSystem::GameState;
-				int i = lua_gettop(L);
-				lua_rawgeti(L, LUA_REGISTRYINDEX, RefOnKlick);
-				lua_pushnumber(L, mev->X);
-				lua_pushnumber(L, mev->Y);
-				lua_pcall(L, 2, 1, 0);
-				if (lua_isboolean(L, -1))
-					r = lua_toboolean(L, -1);
-				lua_settop(L, i);
+namespace CppLogic::UI {
+	void* GUIState_LuaSelection::operator new(size_t s)
+	{
+		return shok::Malloc(s);
+	}
+	void GUIState_LuaSelection::operator delete(void* p) {
+		shok::Free(p);
+	}
+	BB::IObject* __stdcall GUIState_LuaSelection::Create() {
+		return new GUIState_LuaSelection();
+	}
+
+	GUIState_LuaSelection::~GUIState_LuaSelection() {
+		if (RefOnKlick != LUA_NOREF)
+			luaL_unref(*EScr::CScriptTriggerSystem::GameState, LUA_REGISTRYINDEX, RefOnKlick);
+		if (RefOnCancel != LUA_NOREF)
+			luaL_unref(*EScr::CScriptTriggerSystem::GameState, LUA_REGISTRYINDEX, RefOnCancel);
+	}
+
+	unsigned int __stdcall GUIState_LuaSelection::GetClassIdentifier() const
+	{
+		return GUIState_LuaSelection::Identifier;
+	}
+
+	void* __stdcall GUIState_LuaSelection::CastToIdentifier(unsigned int id)
+	{
+		return nullptr;
+	}
+
+	bool GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev) {
+		BB::CMouseEvent* mev = dynamic_cast<BB::CMouseEvent*>(ev);
+		if (mev && mev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
+			if (mev->IsKey(shok::Keys::MouseLButton)) {
+				bool r = true;
+				if (RefOnKlick != LUA_NOREF) {
+					lua_State* L = *EScr::CScriptTriggerSystem::GameState;
+					int i = lua_gettop(L);
+					lua_rawgeti(L, LUA_REGISTRYINDEX, RefOnKlick);
+					lua_pushnumber(L, mev->X);
+					lua_pushnumber(L, mev->Y);
+					lua_pcall(L, 2, 1, 0);
+					if (lua_isboolean(L, -1))
+						r = lua_toboolean(L, -1);
+					lua_settop(L, i);
+				}
+				if (r)
+					Cancel(false);
+				return r;
 			}
-			if (r)
-				Cancel(false);
-			return r;
+			else if (mev->IsKey(shok::Keys::MouseRButton)) { // rmb
+				Cancel(true);
+				return true;
+			}
 		}
-		else if (mev->IsKey(shok::Keys::MouseRButton)) { // rmb
-			Cancel(true);
-			return true;
+		return false;
+	}
+
+	void GUIState_LuaSelection::SetStateParameters(GGUI::SStateParameters* p)
+	{
+
+	}
+
+	bool GUIState_LuaSelection::Cancel()
+	{
+		Cancel(true);
+		return true;
+	}
+
+	const char* GUIState_LuaSelection::GetName()
+	{
+		return "LuaSelectionState";
+	}
+
+	int GUIState_LuaSelection::OnSelectionChanged(int z)
+	{
+		if (!z)
+			Cancel();
+		return 1;
+	}
+
+
+	void GUIState_LuaSelection::Initialize()
+	{
+		// add class to factory, best called on mainmenu lua state initialization (will be called before anything serious gets loaded)
+		// map lua state initialization will be to late, as most stuff is already loaded there
+		(*shok_BB_CClassFactory::GlobalObj)->AddClassToFactory(GUIState_LuaSelection::Identifier, "class CppLogic::GuiState_LuaSelection", &GUIState_LuaSelection::Create, nullptr);
+	}
+	
+	void GUIState_LuaSelection::Cancel(bool calllua)
+	{
+		if (calllua && RefOnCancel != LUA_NOREF) {
+			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
+			int i = lua_gettop(L);
+			lua_rawgeti(L, LUA_REGISTRYINDEX, RefOnCancel);
+			lua_pcall(L, 0, 0, 0);
+			lua_settop(L, i);
 		}
+		C3DViewHandler->SetGUIStateByIdentfierOnNextUpdate<GGUI::CSelectionState>();
 	}
-	return false;
-}
-void CppL_GUIState_LuaSelection::Cancel(bool calllua)
-{
-	if (calllua && RefOnCancel != LUA_NOREF) {
-		lua_State* L = *EScr::CScriptTriggerSystem::GameState;
-		int i = lua_gettop(L);
-		lua_rawgeti(L, LUA_REGISTRYINDEX, RefOnCancel);
-		lua_pcall(L, 0, 0, 0);
-		lua_settop(L, i);
-	}
-	C3DViewHandler->SetGUIStateByIdentfierOnNextUpdate<shok_GGUI_CSelectionState>();
 }
 
-// funcs that will be placed in the vtable (fastcall with an ignored 2nd parameter to emulate thiscall)
-// "fake" destructor, call the real destructor, then deallocate if needed
-void __fastcall CppL_GUIState_LuaSelection_dtor(CppL_GUIState_LuaSelection* th, int _, bool free) {
-	th->~CppL_GUIState_LuaSelection();
-	if (free)
-		shok::Free(th);
-}
-unsigned int __stdcall CppL_GUIState_LuaSelection_GetClassID(const shok_BB_IObject* th) {
-	return CppL_GUIState_LuaSelection::Identifier;
-}
-bool __fastcall CppL_GUIState_LuaSelection_OnMouseEvent(CppL_GUIState_LuaSelection* th, int _, BB::CEvent* ev) {
-	return th->OnMouseEvent(ev);
-}
-int __fastcall CppL_GUIState_LuaSelection_Cancel(CppL_GUIState_LuaSelection* th) {
-	th->Cancel(true);
-	return 1;
-}
-const char* __fastcall CppL_GUIState_LuaSelection_GetName(const shok_GGUI_CState* th) {
-	return "LuaSelectionState";
-}
-// generate a typedesc for it (you need to write a custom one if you want type_info::name to return something useful
-RTTI_TypeDescriptor CppL_GUIState_LuaSelection_TypeDesc {};
-const int CppL_GUIState_LuaSelection::TypeDesc = reinterpret_cast<int>(&CppL_GUIState_LuaSelection_TypeDesc);
-// generate base class array (have a look at array of other classes with the same ihneritance)
-RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass1{ &CppL_GUIState_LuaSelection_TypeDesc, 2, 0, -1, 0, 0 };
-RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass2{ RTTI_TypeDescriptor::TypeID<shok_GGUI_CState>(), 1, 0, -1, 0, 0 };
-RTTI_BaseClassDescriptor CppL_GUIState_LuaSelection_BaseClass3{ RTTI_TypeDescriptor::TypeID<shok_BB_IObject>(), 0, 0, -1, 0, 0 };
-RTTI_BaseClassDescriptor* CppL_GUIState_LuaSelection_BaseClasses[] = { &CppL_GUIState_LuaSelection_BaseClass1, &CppL_GUIState_LuaSelection_BaseClass2, &CppL_GUIState_LuaSelection_BaseClass3 };
-// generate class hierarchy (remember to set the length of the array)
-RTTI_ClassHierarchyDescriptor CppL_GUIState_LuaSelection_ClassHierarchy{ 0, 0, 3, CppL_GUIState_LuaSelection_BaseClasses };
-// finally the object locator
-RTTI_CompleteObjectLocator CppL_GUIState_LuaSelection_ObjectLocator{ 0, 0, 0, &CppL_GUIState_LuaSelection_TypeDesc, &CppL_GUIState_LuaSelection_ClassHierarchy };
-// manually generate the vtable, important: add the objectlocator to -1 (like here, at 0 in the struct and then use the dtor as the vtable)
-// you can reuse shok funcs, as it is done here
-struct vtable_CppL_GUIState_LuaSelection {
-	RTTI_CompleteObjectLocator* ObLoc = &CppL_GUIState_LuaSelection_ObjectLocator;
-	void(__fastcall* dtor)(CppL_GUIState_LuaSelection* th, int _, bool free) = &CppL_GUIState_LuaSelection_dtor;
-	unsigned int(__stdcall* GetClassIdentifier)(const shok_BB_IObject* th) = &CppL_GUIState_LuaSelection_GetClassID;
-	int retzero = 0x55336A;
-	bool(__fastcall* OnMouseEvent)(CppL_GUIState_LuaSelection* th, int _, BB::CEvent* ev) = &CppL_GUIState_LuaSelection_OnMouseEvent;
-	int SetStateParameters = 0x52B509;
-	int(__fastcall* Cancel)(CppL_GUIState_LuaSelection* th) = &CppL_GUIState_LuaSelection_Cancel;
-	const char* (__fastcall* GetName)(const shok_GGUI_CState* th) = &CppL_GUIState_LuaSelection_GetName;
-	int OnSelectionChanged = 0x526A15;
-};
-vtable_CppL_GUIState_LuaSelection CppL_GUIState_LuaSelectionVtable{};
-// the vtp that will be set into the object, as discussed earlier this is & of element 1 in the struct
-const int CppL_GUIState_LuaSelection::vtp = reinterpret_cast<int>(&CppL_GUIState_LuaSelectionVtable.dtor);
 
 void l_ui_cleanup(lua_State* L) {
 	UIInput_Char_Callback = nullptr;
@@ -990,7 +980,7 @@ void l_ui_init(lua_State* L)
 
 	if (L == mainmenu_state) {
 		luaext_registerFunc(L, "SetMouseTriggerMainMenu", &l_ui_SetMouseTriggerMainMenu);
-		CppL_GUIState_LuaSelection::Initialize();
+		CppLogic::UI::GUIState_LuaSelection::Initialize();
 	}
 }
 

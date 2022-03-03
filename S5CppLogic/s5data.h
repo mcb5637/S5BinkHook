@@ -405,6 +405,7 @@ enum class win_mouseEvents : int {
 #include "s5_config.h"
 #include "s5_scriptsystem.h"
 #include "s5_filesystem.h"
+#include "s5_guistates.h"
 #include "s5ui.h"
 #include "s5widget.h"
 #include "s5framework.h"

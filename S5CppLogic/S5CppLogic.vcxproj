@@ -227,6 +227,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5_exception.h" />
     <ClInclude Include="s5_filesystem.h" />
     <ClInclude Include="s5_forwardDecls.h" />
+    <ClInclude Include="s5_guistates.h" />
     <ClInclude Include="s5_idmanager.h" />
     <ClInclude Include="s5_mapdisplay.h" />
     <ClInclude Include="s5_maplogic.h" />
@@ -279,6 +280,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClCompile Include="s5widget.cpp" />
     <ClCompile Include="s5_datastructures.cpp" />
     <ClCompile Include="s5_filesystem.cpp" />
+    <ClCompile Include="s5_guistates.cpp" />
     <ClCompile Include="s5_idmanager.cpp" />
     <ClCompile Include="s5_mapdisplay.cpp" />
     <ClCompile Include="s5_maplogic.cpp" />

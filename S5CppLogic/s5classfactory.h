@@ -129,7 +129,7 @@ struct shok_BB_CClassFactory : shok_object {
 	}
 	const char* GetClassDemangledName(unsigned int identifier);
 	unsigned int GetIdentifierByName(const char* name);
-	void AddClassToFactory(unsigned int identifier, const char* name, shok_BB_IObject* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData);
+	void AddClassToFactory(unsigned int identifier, const char* name, BB::IObject* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData);
 
 
 	static inline shok_BB_CClassFactory** const GlobalObj = reinterpret_cast<shok_BB_CClassFactory**>(0x88F044);
@@ -173,6 +173,3 @@ struct RTTI_CompleteObjectLocator {
 	RTTI_TypeDescriptor* TypeDesc;
 	RTTI_ClassHierarchyDescriptor* ClassHierarchyDesc;
 };
-
-
-void factorytest();

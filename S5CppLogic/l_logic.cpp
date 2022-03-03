@@ -507,7 +507,7 @@ int l_netEventSetHook(lua_State* L) {
 	lua_pushlightuserdata(L, &l_netEventSetHook);
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
-	shok_GGUI_CManager::PostEventCallback = [](BB::CEvent* ev) {
+	GGUI::CManager::PostEventCallback = [](BB::CEvent* ev) {
 		int id = ev->EventTypeId;
 		lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 		int top = lua_gettop(L);
@@ -527,11 +527,11 @@ int l_netEventSetHook(lua_State* L) {
 		lua_settop(L, top);
 		return r;
 	};
-	shok_GGUI_CManager::GlobalObj()->HackPostEvent();
+	GGUI::CManager::GlobalObj()->HackPostEvent();
 	return 0;
 }
 int l_netEventUnSetHook(lua_State* L) {
-	shok_GGUI_CManager::PostEventCallback = nullptr;
+	GGUI::CManager::PostEventCallback = nullptr;
 	return 0;
 }
 
@@ -955,9 +955,9 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 int l_logic_SetPlaceBuildingRotation(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
-	shok_GGUI_CPlaceBuildingState::HookPlacementRotation();
-	shok_GGUI_CPlaceBuildingState::PlacementRotation = deg2rad(luaL_checkfloat(L, 1));
-	shok_GGUI_CPlaceBuildingState* s = shok_DynamicCast<shok_GGUI_CState, shok_GGUI_CPlaceBuildingState>(shok_GGUI_CManager::GlobalObj()->C3DViewHandler->CurrentState);
+	GGUI::CPlaceBuildingState::HookPlacementRotation();
+	GGUI::CPlaceBuildingState::PlacementRotation = deg2rad(luaL_checkfloat(L, 1));
+	GGUI::CPlaceBuildingState* s = shok_DynamicCast<GGUI::CState, GGUI::CPlaceBuildingState>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
 	if (s)
 		s->UpdateModel();
 	return 0;
@@ -965,7 +965,7 @@ int l_logic_SetPlaceBuildingRotation(lua_State* L) {
 int l_logic_GetPlaceBuildingRotation(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
-	lua_pushnumber(L, rad2deg(shok_GGUI_CPlaceBuildingState::PlacementRotation));
+	lua_pushnumber(L, rad2deg(GGUI::CPlaceBuildingState::PlacementRotation));
 	return 1;
 }
 
@@ -1193,7 +1193,7 @@ int l_logic_GetNearestFreePosForBuilding(lua_State* L) {
 	float range = luaL_optfloat(L, 3, 0);
 	if (range <= 0)
 		range = (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance;
-	shok::PositionRot pout = shok_GGUI_CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
+	shok::PositionRot pout = GGUI::CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
 	luaext_pushPosRot(L, pout);
 	return 1;
 }
@@ -1349,7 +1349,7 @@ void l_logic_cleanup(lua_State* L) {
 	EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
 	GetStringTableTextOverride = nullptr;
 	GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
-	shok_GGUI_CPlaceBuildingState::PlacementRotation = 0.0f;
+	GGUI::CPlaceBuildingState::PlacementRotation = 0.0f;
 	EGL::CGLEEntity::UseMaxHPTechBoni = false;
 	GGL::CSniperAbility::SnipeDamageOverride = nullptr;
 	EGL::CGLEEntity::LuaTaskListCallback = nullptr;

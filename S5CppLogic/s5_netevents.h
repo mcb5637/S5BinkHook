@@ -187,7 +187,7 @@ namespace GGL {
 	class CNetEventCannonCreator : public EGL::CNetEventEntityID {
 	public:
 		int BottomType, TopType;
-		shok::Position Position;
+		shok::Position Position; // maybe also rot?
 
 		CNetEventCannonCreator(shok::NetEventIds id, int ent, int bty, int tty, const shok::Position& pos);
 		CNetEventCannonCreator(CNetEventCannonCreator&&) = default;

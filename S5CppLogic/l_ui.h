@@ -5,20 +5,31 @@
 void l_ui_init(lua_State* L);
 void l_ui_cleanup(lua_State* L);
 
-struct CppL_GUIState_LuaSelection : shok_GGUI_CState {
-	PADDINGI(2); // not sure how big the base object is;
-	int RefOnKlick = LUA_NOREF;
-	int RefOnCancel = LUA_NOREF;
+namespace CppLogic::UI {
+	class GUIState_LuaSelection : public GGUI::CState {
+	public:
+		PADDINGI(2); // not sure how big the base object is;
+		int RefOnKlick = LUA_NOREF;
+		int RefOnCancel = LUA_NOREF;
 
-	static void Initialize();
-	CppL_GUIState_LuaSelection();
-	~CppL_GUIState_LuaSelection();
-	bool OnMouseEvent(BB::CEvent* ev);
-	void Cancel(bool calllua);
+		virtual ~GUIState_LuaSelection() override;
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
+		virtual bool OnMouseEvent(BB::CEvent* ev) override;
+		virtual void SetStateParameters(GGUI::SStateParameters* p) override;
+		virtual bool Cancel() override;
+		virtual const char* GetName() override;
+		virtual int OnSelectionChanged(int z) override;
 
-	// the usual vtable, typedec and identifier
-	// vtable is used for manual class identification, typedesc for dynamic_cast and identifier for classfactory
-	static const int vtp;
-	static const int TypeDesc;
-	static constexpr unsigned int Identifier = 0x1000;
-};
+		static void Initialize();
+		void Cancel(bool calllua);
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+		static BB::IObject* __stdcall Create(); // todo: template when done with classfactory
+
+		static constexpr unsigned int Identifier = 0x1000;
+	};
+}
+
+

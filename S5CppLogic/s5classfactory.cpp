@@ -18,7 +18,7 @@ struct shok_vtable_BB_CClassFactory {
     const char*(__stdcall* GetClassDemangledName)(shok_BB_CClassFactory* th, unsigned int id);
     shok_BB_CClassFactory_serializationData* (__stdcall* GetClassSerializationData)(shok_BB_CClassFactory* th, unsigned int id);
     PADDINGI(1);
-    int(__stdcall* AddClassData)(shok_BB_CClassFactory* th, unsigned int id, const char* name, shok_BB_IObject* (__stdcall* NewObj)(), shok_BB_CClassFactory_serializationData* data); // 9, data can be nullptr
+    int(__stdcall* AddClassData)(shok_BB_CClassFactory* th, unsigned int id, const char* name, BB::IObject* (__stdcall* NewObj)(), shok_BB_CClassFactory_serializationData* data); // 9, data can be nullptr
 };
 //constexpr int i = offsetof(shok_vtable_BB_CClassFactory, AddClassData) / 4;
 
@@ -68,7 +68,7 @@ unsigned int shok_BB_CClassFactory::GetIdentifierByName(const char* name)
 {
     return reinterpret_cast<shok_vtable_BB_CClassFactory*>(vtable)->GetIdentifierByName(this, name);
 }
-void shok_BB_CClassFactory::AddClassToFactory(unsigned int identifier, const char* name, shok_BB_IObject* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData)
+void shok_BB_CClassFactory::AddClassToFactory(unsigned int identifier, const char* name, BB::IObject* (__stdcall* createObj)(), shok_BB_CClassFactory_serializationData* serializationData)
 {
     reinterpret_cast<shok_vtable_BB_CClassFactory*>(vtable)->AddClassData(this, identifier, name, createObj, serializationData);
 }
@@ -93,35 +93,3 @@ shok_BB_CClassFactory_serializationData seridata[] = {
     {}
 };
 
-
-int factorytestvt[];
-RTTI_TypeDescriptor factorytypedesc{ };
-RTTI_BaseClassDescriptor factorybaseclass1{ &factorytypedesc, 1, 0, -1, 0, 0 };
-RTTI_BaseClassDescriptor factorybaseclass2{ RTTI_TypeDescriptor::TypeID<shok_BB_IObject>(), 0, 0, -1, 0, 0 };
-RTTI_BaseClassDescriptor* factorybaseclasses[] = { &factorybaseclass1 , &factorybaseclass2 };
-RTTI_ClassHierarchyDescriptor factoryclasshiera{ 0, 0, 2, factorybaseclasses };
-RTTI_CompleteObjectLocator  factoryobjectloc{ 0,0,0, &factorytypedesc , &factoryclasshiera };
-
-const int factorytest_s::TypeDesc = reinterpret_cast<int>(&factorytypedesc);
-
-int __stdcall getfactoryid(int _) {
-    return 0x500;
-}
-int factorytestvt[] = {
-    reinterpret_cast<int>(&factoryobjectloc), 0, reinterpret_cast<int>(&getfactoryid), 0x55336A
-};
-
-shok_BB_IObject* __stdcall newfactorytest_s() {
-    factorytest_s* r = new factorytest_s();
-    r->vtable = reinterpret_cast<int>(&(factorytestvt[1]));
-    return r;
-}
-
-void factorytest()
-{
-    shok_BB_CClassFactory* f = *shok_BB_CClassFactory::GlobalObj;
-    f->AddClassToFactory(0x500, "class GGL::FactoryTest", &newfactorytest_s, seridata);
-    factorytest_s* o = shok_DynamicCast<shok_BB_IObject, factorytest_s>((*shok_BB_CClassFactory::GlobalObj)->CreateObject(0x500));
-    (*shok_BB_CClassFactory::GlobalObj)->LoadObject(o, "data\\test.xml");
-    DEBUGGER_BREAK;
-}

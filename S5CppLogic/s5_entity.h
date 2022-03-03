@@ -179,7 +179,7 @@ namespace EGL {
 
 	public:
 		template<typename T>
-			requires std::derived_from<T, EGL::CGLEBehavior>
+		requires std::derived_from<T, EGL::CGLEBehavior>
 		T* GetBehavior() {
 			for (EGL::CGLEBehavior* b : Behaviours) {
 				if (b) {

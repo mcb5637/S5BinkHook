@@ -161,6 +161,7 @@ namespace shok {
 	};
 
 	enum class ResourceType : int {
+		None = 0,
 		Gold = 1,
 		GoldRaw = 2,
 		Silver = 3,

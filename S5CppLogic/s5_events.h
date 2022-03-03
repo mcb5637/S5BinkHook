@@ -739,7 +739,7 @@ namespace shok {
 		IsSoldier = 0x18005, //EGL::CEventGetValue<bool, 1709081367>
 		IsBattleOrAutocannon = 0x18007, //EGL::CEventGetValue<bool, 1709081367>
 		IsSettlerOrBuilding = 0x18008, //EGL::CEventGetValue<bool, 1709081367>
-		// 18006 herobeh ret true
+		IsHero = 0x18006, //EGL::CEventGetValue<bool, 1709081367>
 		IsSerfOrWorker = 0x18009, //EGL::CEventGetValue<bool, 1709081367>
 		DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
 		// 0x1800B building get bool?

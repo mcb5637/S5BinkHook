@@ -136,6 +136,19 @@ shok::AARect shok::AARect::Sort() const
 }
 shok_BB_CClassFactory_serializationData* shok::AARect::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85DA90);
 
+shok::Color::Color(int r, int g, int b, int a)
+{
+	R = r & 0xFF;
+	G = g & 0xFF;
+	B = b & 0xFF;
+	A = a & 0xFF;
+}
+
+void* __stdcall BB::IObject::CastToIdentifier(unsigned int id)
+{
+	return nullptr;
+}
+
 void RedirectCall(void* call, void* redirect) {
 	byte* opcode = reinterpret_cast<byte*>(call);
 	if (*opcode==0xFF && opcode[1]==0x15) { // call by address

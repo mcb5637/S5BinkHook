@@ -14,7 +14,6 @@ namespace CppLogic::UI {
 
 		virtual ~GUIState_LuaSelection() override;
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
-		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
 		virtual bool OnMouseEvent(BB::CEvent* ev) override;
 		virtual void SetStateParameters(GGUI::SStateParameters* p) override;
 		virtual bool Cancel() override;

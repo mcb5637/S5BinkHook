@@ -2,29 +2,29 @@
 #include "l_ui.h"
 #include <WinUser.h>
 
-shok_EGUIX_CBaseWidget* l_uiCheckWid(lua_State* L, int i) {
+EGUIX::CBaseWidget* l_uiCheckWid(lua_State* L, int i) {
 	int id;
-	shok_widgetManager* wm = shok_widgetManager::GlobalObj();
+	EGUIX::WidgetManager* wm = EGUIX::WidgetManager::GlobalObj();
 	if (lua_isnumber(L, i)) {
 		id = luaL_checkint(L, i);
 	}
 	else {
 		id = wm->GetIdByName(luaL_checkstring(L, i));
 	}
-	shok_EGUIX_CBaseWidget* r = wm->GetWidgetByID(id);
+	EGUIX::CBaseWidget* r = wm->GetWidgetByID(id);
 	if (!r)
 		luaL_error(L, "no widget at %i", i);
 	return r;
 }
 
-void l_uiClearFunc(lua_State* L, shok_EGUIX_CLuaFunctionHelper* f) {
+void l_uiClearFunc(lua_State* L, EGUIX::CLuaFunctionHelper* f) {
 	if (f->FuncRefCommand.L) {
 		luaL_unref(f->FuncRefCommand.L, LUA_REGISTRYINDEX, f->FuncRefCommand.Ref);
 		f->FuncRefCommand.L = nullptr;
 		f->FuncRefCommand.Ref = LUA_NOREF;
 	}
 }
-void l_uiOverrideFunc(lua_State* L, shok_EGUIX_CLuaFunctionHelper* f, int i) {
+void l_uiOverrideFunc(lua_State* L, EGUIX::CLuaFunctionHelper* f, int i) {
 	lua_pushvalue(L, i);
 	l_uiClearFunc(L, f);
 	f->FuncRefCommand.L = L;
@@ -32,7 +32,7 @@ void l_uiOverrideFunc(lua_State* L, shok_EGUIX_CLuaFunctionHelper* f, int i) {
 	f->FuncRefCommand.NeedsCompile = 0;
 }
 
-void l_uiSetString(lua_State* L, shok_EGUIX_CSingleStringHandler& h, int i) {
+void l_uiSetString(lua_State* L, EGUIX::CSingleStringHandler& h, int i) {
 	const char* s = luaL_checkstring(L, i);
 	if (lua_toboolean(L, i + 1)) {
 		h.StringTableKey.assign(s);
@@ -56,9 +56,9 @@ const char* l_uiCheckFontString(const char* font) {
 }
 
 int l_uiGetWidAdr(lua_State* L) {
-	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* w = l_uiCheckWid(L, 1);
 	lua_pushnumber(L, reinterpret_cast<int>(w));
-	shok_EGUIX_CLuaFunctionHelper* bh = w->GetUpdateFunc();
+	EGUIX::CLuaFunctionHelper* bh = w->GetUpdateFunc();
 	if (bh) {
 		lua_pushnumber(L, (int)bh);
 		return 2;
@@ -67,7 +67,7 @@ int l_uiGetWidAdr(lua_State* L) {
 }
 
 int l_uiGetWidPosAndSize(lua_State* L) {
-	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* w = l_uiCheckWid(L, 1);
 	lua_pushnumber(L, w->PosAndSize.X);
 	lua_pushnumber(L, w->PosAndSize.Y);
 	lua_pushnumber(L, w->PosAndSize.W);
@@ -76,7 +76,7 @@ int l_uiGetWidPosAndSize(lua_State* L) {
 }
 
 int l_uiSetWidPosAndSize(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
 	float x, y, w, h;
 	if (lua_isnumber(L, 2))
 		x = luaL_checkfloat(L, 2);
@@ -99,8 +99,8 @@ int l_uiSetWidPosAndSize(lua_State* L) {
 }
 
 int l_uiGetUpdateManualFlag(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	byte* f = wid->GetUpdateManualFlag();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	bool* f = wid->GetUpdateManualFlag();
 	if (f) {
 		lua_pushboolean(L, *f);
 		return 1;
@@ -108,9 +108,9 @@ int l_uiGetUpdateManualFlag(lua_State* L) {
 	return luaL_error(L, "widget has no known updatemanual flag");
 }
 int l_uiSetUpdateManualFlag(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
 	bool flg = lua_toboolean(L, 2);
-	byte* f = wid->GetUpdateManualFlag();
+	bool* f = wid->GetUpdateManualFlag();
 	if (f) {
 		*f = flg;
 		return 0;
@@ -119,8 +119,8 @@ int l_uiSetUpdateManualFlag(lua_State* L) {
 }
 
 int l_uiGetUpdateFunc(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CLuaFunctionHelper* fh = wid->GetUpdateFunc();
 	luaext_assertPointer(L, fh, "widget has no known update func");
 	lua_pushstring(L, fh->LuaCommand.c_str());
 	if (fh->FuncRefCommand.L == L)
@@ -130,27 +130,27 @@ int l_uiGetUpdateFunc(lua_State* L) {
 	return 2;
 }
 int l_uiCallUpdateFunc(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CLuaFunctionHelper* fh = wid->GetUpdateFunc();
 	luaext_assertPointer(L, fh, "widget has no known update func");
 	fh->Call(wid->WidgetID);
 	return 0;
 }
 int l_uiOverrideUpdateFunc(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CLuaFunctionHelper* fh = wid->GetUpdateFunc();
 	luaext_assertPointer(L, fh, "widget has no known update func");
 	l_uiOverrideFunc(L, fh, 2);
 	return 0;
 }
 
 int l_uiGetAllSubWidgets(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	lua_newtable(L);
 	int i = 1;
-	for (shok_EGUIX_CBaseWidget* p : c->WidgetListHandler.SubWidgets) {
+	for (EGUIX::CBaseWidget* p : c->WidgetListHandler.SubWidgets) {
 		lua_pushnumber(L, p->WidgetID);
 		lua_rawseti(L, -2, i);
 		i++;
@@ -159,8 +159,8 @@ int l_uiGetAllSubWidgets(lua_State* L) {
 }
 
 int l_ui_IsContainerWid(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	if (shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid))
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	if (shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid))
 		lua_pushboolean(L, true);
 	else
 		lua_pushboolean(L, false);
@@ -168,9 +168,9 @@ int l_ui_IsContainerWid(lua_State* L) {
 }
 
 int l_uiGetMaterialTexCoord(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
 	int c = 0;
-	shok_EGUIX_CMaterial* m = wid->GetMaterials(&c);
+	EGUIX::CMaterial* m = wid->GetMaterials(&c);
 	luaext_assertPointer(L, m, "no known materials");
 	int min = luaL_checkint(L, 2);
 	luaext_assert(L, min >= 0 && min < c, "invalid index");
@@ -181,9 +181,9 @@ int l_uiGetMaterialTexCoord(lua_State* L) {
 	return 4;
 }
 int l_uiSetMaterialTexCoord(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
 	int c = 0;
-	shok_EGUIX_CMaterial* m = wid->GetMaterials(&c);
+	EGUIX::CMaterial* m = wid->GetMaterials(&c);
 	luaext_assertPointer(L, m, "no known materials");
 	int min = luaL_checkint(L, 2);
 	luaext_assert(L, min >= 0 && min < c, "invalid index");
@@ -199,8 +199,8 @@ int l_uiSetMaterialTexCoord(lua_State* L) {
 }
 
 int l_uiGetTooltipData(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	lua_pushnumber(L, tt->TargetWidget);
 	lua_pushboolean(L, tt->ControlTargetWidgetDisplayState);
@@ -208,8 +208,8 @@ int l_uiGetTooltipData(lua_State* L) {
 	return 3;
 }
 int l_uiSetTooltipData(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	if (!lua_isnoneornil(L, 2)) {
 		tt->TargetWidget = l_uiCheckWid(L, 2)->WidgetID;
@@ -222,24 +222,24 @@ int l_uiSetTooltipData(lua_State* L) {
 }
 
 int l_uiGetTooltipString(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	lua_pushstring(L, tt->ToolTipString.RawString.c_str());
 	lua_pushstring(L, tt->ToolTipString.StringTableKey.c_str());
 	return 2;
 }
 int l_uiSetTooltipString(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	l_uiSetString(L, tt->ToolTipString, 2);
 	return 0;
 }
 
 int l_uiTooltipGetFunc(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	lua_pushstring(L, tt->UpdateFunction.LuaCommand.c_str());
 	if (tt->UpdateFunction.FuncRefCommand.L == L)
@@ -249,23 +249,23 @@ int l_uiTooltipGetFunc(lua_State* L) {
 	return 2;
 }
 int l_uiTooltipCallFunc(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	tt->UpdateFunction.Call(wid->WidgetID);
 	return 0;
 }
 int l_uiTooltipOverrideFunc(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	l_uiOverrideFunc(L, &tt->UpdateFunction, 2);
 	return 0;
 }
 
 int l_uiButtonGetAction(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CButtonHelper* fh = wid->GetButtonHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CButtonHelper* fh = wid->GetButtonHelper();
 	luaext_assertPointer(L, fh, "widget has no known action func");
 	lua_pushstring(L, fh->ActionFunction.LuaCommand.c_str());
 	if (fh->ActionFunction.FuncRefCommand.L == L)
@@ -275,31 +275,31 @@ int l_uiButtonGetAction(lua_State* L) {
 	return 2;
 }
 int l_uiButtonCallAction(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CButtonHelper* fh = wid->GetButtonHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CButtonHelper* fh = wid->GetButtonHelper();
 	luaext_assertPointer(L, fh, "widget has no known action func");
 	fh->ActionFunction.Call(wid->WidgetID);
 	return 0;
 }
 int l_uiButtonOverrideAction(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CButtonHelper* fh = wid->GetButtonHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CButtonHelper* fh = wid->GetButtonHelper();
 	luaext_assertPointer(L, fh, "widget has no known action func");
 	l_uiOverrideFunc(L, &fh->ActionFunction, 2);
 	return 0;
 }
 
 int l_uiIsTooltipOfWidgetShown(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 	luaext_assertPointer(L, tt, "no known tooltip");
 	lua_pushboolean(L, tt->IsToolTipShown);
 	return 1;
 }
 
 int l_uiSetFont(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CWidgetStringHelper* s = wid->GetStringHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CWidgetStringHelper* s = wid->GetStringHelper();
 	luaext_assertPointer(L, s, "no known stringhelper");
 	const char* font = luaL_checkstring(L, 2);
 	const char* err = l_uiCheckFontString(font);
@@ -310,14 +310,14 @@ int l_uiSetFont(lua_State* L) {
 }
 
 int l_uiGetBaseWidgetData(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
 	lua_pushnumber(L, wid->ZPriority);
 	lua_pushboolean(L, wid->ForceToHandleMouseEventsFlag);
 	lua_pushboolean(L, wid->ForceToNeverBeFoundFlag);
 	return 3;
 }
 int l_uiSetBaseWidgetData(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
 	if (lua_isnumber(L, 2))
 		wid->ZPriority = luaL_checkfloat(L, 2);
 	if (lua_isboolean(L, 3))
@@ -328,55 +328,55 @@ int l_uiSetBaseWidgetData(lua_State* L) {
 }
 
 int l_uiGetWidgetStringFrameDistance(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CWidgetStringHelper* s = wid->GetStringHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CWidgetStringHelper* s = wid->GetStringHelper();
 	luaext_assertPointer(L, s, "no string helper");
 	lua_pushnumber(L, s->StringFrameDistance);
 	return 1;
 }
 int l_uiSetWidgetStringFrameDistance(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CWidgetStringHelper* s = wid->GetStringHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CWidgetStringHelper* s = wid->GetStringHelper();
 	luaext_assertPointer(L, s, "no string helper");
 	s->StringFrameDistance = luaL_checkfloat(L, 2);
 	return 0;
 }
 
 int l_uiGetStaticTextWidgetLineDistanceFactor(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CStaticTextWidget* tw = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticTextWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CStaticTextWidget* tw = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticTextWidget>(wid);
 	luaext_assertPointer(L, tw, "no static text widget");
 	lua_pushnumber(L, tw->LineDistanceFactor);
 	return 1;
 }
 int l_uiSetStaticTextWidgetLineDistanceFactor(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CStaticTextWidget* tw = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CStaticTextWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CStaticTextWidget* tw = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticTextWidget>(wid);
 	luaext_assertPointer(L, tw, "no static text widget");
 	tw->LineDistanceFactor = luaL_checkfloat(L, 2);
 	return 0;
 }
 
 int l_uiGetButtonShortCut(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CButtonHelper* b = wid->GetButtonHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CButtonHelper* b = wid->GetButtonHelper();
 	luaext_assertPointer(L, b, "no button");
 	lua_pushstring(L, b->ShortCutString.RawString.c_str());
 	lua_pushstring(L, b->ShortCutString.StringTableKey.c_str());
 	return 2;
 }
 int l_uiSetButtonShortCut(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CButtonHelper* b = wid->GetButtonHelper();
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CButtonHelper* b = wid->GetButtonHelper();
 	luaext_assertPointer(L, b, "no button");
 	l_uiSetString(L, b->ShortCutString, 2);
 	return 0;
 }
 
 int l_uiSetWidgetGroup(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
 	const char* s = luaL_checkstring(L, 2);
-	shok_EGUIX_CWidgetGroupManager* wgm = shok_EGUIX_CWidgetGroupManager::GlobalObj();
+	EGUIX::CWidgetGroupManager* wgm = EGUIX::CWidgetGroupManager::GlobalObj();
 	int g = wgm->GetGroupId(s);
 	if (!g)
 		g = wgm->CreateGroup(s);
@@ -385,114 +385,114 @@ int l_uiSetWidgetGroup(lua_State* L) {
 }
 
 int l_uiCreateStaticWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
-	shok_EGUIX_CStaticWidget* ne = shok_EGUIX_CStaticWidget::Create();
+	EGUIX::CStaticWidget* ne = EGUIX::CStaticWidget::Create();
 	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 int l_uiCreateStaticTextWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
-	shok_EGUIX_CStaticTextWidget* ne = shok_EGUIX_CStaticTextWidget::Create();
+	EGUIX::CStaticTextWidget* ne = EGUIX::CStaticTextWidget::Create();
 	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 int l_uiCreatePureTooltipWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
-	shok_EGUIX_CPureTooltipWidget* ne = shok_EGUIX_CPureTooltipWidget::Create();
+	EGUIX::CPureTooltipWidget* ne = EGUIX::CPureTooltipWidget::Create();
 	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 int l_uiCreateGFXButtonWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
-	shok_EGUIX_CGfxButtonWidget* ne = shok_EGUIX_CGfxButtonWidget::Create();
+	EGUIX::CGfxButtonWidget* ne = EGUIX::CGfxButtonWidget::Create();
 	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 int l_uiCreateTextButtonWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
-	shok_EGUIX_CTextButtonWidget* ne = shok_EGUIX_CTextButtonWidget::Create();
+	EGUIX::CTextButtonWidget* ne = EGUIX::CTextButtonWidget::Create();
 	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 int l_uiCreateProgessBarWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
-	shok_EGUIX_CProgressBarWidget* ne = shok_EGUIX_CProgressBarWidget::Create();
+	EGUIX::CProgressBarWidget* ne = EGUIX::CProgressBarWidget::Create();
 	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 int l_uiCreateContainerWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	if (!lua_isnoneornil(L, 3))
 		bef = l_uiCheckWid(L, 3);
-	shok_EGUIX_CContainerWidget* ne = shok_EGUIX_CContainerWidget::Create();
+	EGUIX::CContainerWidget* ne = EGUIX::CContainerWidget::Create();
 	c->AddWidget(ne, name, bef);
 	lua_pushnumber(L, c->WidgetID);
 	return 1;
 }
 int l_ui_CreateCustomWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* c = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
-	luaext_assert(L, shok_widgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
-	shok_EGUIX_CBaseWidget* bef = nullptr;
+	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
+	EGUIX::CBaseWidget* bef = nullptr;
 	const char* customname = luaL_check_string(L, 3);
 	if (!lua_isnoneornil(L, 4))
 		bef = l_uiCheckWid(L, 4);
-	shok_EGUIX_CCustomWidget* ne = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<shok_EGUIX_CCustomWidget>();
+	EGUIX::CCustomWidget* ne = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<EGUIX::CCustomWidget>();
 	c->AddWidget(ne, name, bef);
 	ne->CustomClassName.assign(customname);
 	ne->IntegerUserVariable0DefaultValue = luaL_optint(L, 5, 0);
@@ -514,8 +514,8 @@ int l_uiGetFontValues(lua_State* L) {
 	if (err)
 		luaL_error(L, err);
 	int id = 0;
-	shok_fontManager::LoadFont(&id, font);
-	shok_font* f = shok_fontManager::GlobalObj()->GetFontObj(id);
+	EGUIX::FontManager::LoadFont(&id, font);
+	EGUIX::Font* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 	lua_pushnumber(L, f->Size);
 	lua_pushnumber(L, f->Offset);
 	lua_pushnumber(L, f->Spacing);
@@ -527,8 +527,8 @@ int l_uiSetFontValues(lua_State* L) {
 	if (err)
 		luaL_error(L, err);
 	int id = 0;
-	shok_fontManager::LoadFont(&id, font);
-	shok_font* f = shok_fontManager::GlobalObj()->GetFontObj(id);
+	EGUIX::FontManager::LoadFont(&id, font);
+	EGUIX::Font* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 	if (lua_isnumber(L, 2))
 		f->Size = luaL_checkfloat(L, 2);
 	if (lua_isnumber(L, 3))
@@ -539,20 +539,20 @@ int l_uiSetFontValues(lua_State* L) {
 }
 
 int l_uiRemoveWidget(lua_State* L) {
-	shok_EGUIX_CBaseWidget* wid = l_uiCheckWid(L, 1);
-	shok_EGUIX_CContainerWidget* cw = shok_DynamicCast<shok_EGUIX_CBaseWidget, shok_EGUIX_CContainerWidget>(wid);
+	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
+	EGUIX::CContainerWidget* cw = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
 	if (cw)
 		luaext_assert(L, cw->WidgetListHandler.SubWidgets.size() == 0, "container widget has to be empty");
-	//shok_widgetManager::GlobalObj()->RemoveWidget(wid);
-	wid->Destructor(true); // destructor calls removewidget
+	//EGUIX::WidgetManager::GlobalObj()->RemoveWidget(wid);
+	delete wid;
 	return 0;
 }
 
 int l_uiTest(lua_State* L) {
 	const char* s = luaL_checkstring(L, 1);
-	int g = shok_EGUIX_CWidgetGroupManager::GlobalObj()->GetGroupId(s);
+	int g = EGUIX::CWidgetGroupManager::GlobalObj()->GetGroupId(s);
 	if (!g)
-		g = shok_EGUIX_CWidgetGroupManager::GlobalObj()->CreateGroup(s);
+		g = EGUIX::CWidgetGroupManager::GlobalObj()->CreateGroup(s);
 	lua_pushnumber(L, g);
 	return 1;
 }
@@ -561,7 +561,7 @@ int l_ui_SetCharTrigger(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
-		UIInput_Char_Callback = nullptr;
+		EGUIX::UIInput_Char_Callback = nullptr;
 		lua_pushlightuserdata(L, &l_ui_SetCharTrigger);
 		lua_pushnil(L);
 		lua_rawset(L, LUA_REGISTRYINDEX);
@@ -573,9 +573,9 @@ int l_ui_SetCharTrigger(lua_State* L) {
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
-	if (!UIInput_Char_Callback) {
-		HookUIInput();
-		UIInput_Char_Callback = [](int c) {
+	if (!EGUIX::UIInput_Char_Callback) {
+		EGUIX::HookUIInput();
+		EGUIX::UIInput_Char_Callback = [](int c) {
 			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 			bool r = false;
@@ -598,7 +598,7 @@ int l_ui_SetKeyTrigger(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
-		UIInput_Key_Callback = nullptr;
+		EGUIX::UIInput_Key_Callback = nullptr;
 		lua_pushlightuserdata(L, &l_ui_SetKeyTrigger);
 		lua_pushnil(L);
 		lua_rawset(L, LUA_REGISTRYINDEX);
@@ -610,9 +610,9 @@ int l_ui_SetKeyTrigger(lua_State* L) {
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
-	if (!UIInput_Key_Callback) {
-		HookUIInput();
-		UIInput_Key_Callback = [](int c, win_mouseEvents id) {
+	if (!EGUIX::UIInput_Key_Callback) {
+		EGUIX::HookUIInput();
+		EGUIX::UIInput_Key_Callback = [](int c, win_mouseEvents id) {
 			lua_State* L = *EScr::CScriptTriggerSystem::GameState;
 			int t = lua_gettop(L);
 			bool r = false;
@@ -635,7 +635,7 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
-		UIInput_Mouse_Callback = nullptr;
+		EGUIX::UIInput_Mouse_Callback = nullptr;
 		lua_pushlightuserdata(L, &l_ui_SetMouseTrigger);
 		lua_pushnil(L);
 		lua_rawset(L, LUA_REGISTRYINDEX);
@@ -647,9 +647,9 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
-	if (!UIInput_Mouse_Callback) {
-		HookUIInput();
-		UIInput_Mouse_Callback = [](win_mouseEvents id, int w, int l) {
+	if (!EGUIX::UIInput_Mouse_Callback) {
+		EGUIX::HookUIInput();
+		EGUIX::UIInput_Mouse_Callback = [](win_mouseEvents id, int w, int l) {
 			if (id == win_mouseEvents::MouseMove)
 				return false;
 
@@ -689,7 +689,7 @@ int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
 	if (HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
-		UIInput_Mouse_CallbackMainMenu = nullptr;
+		EGUIX::UIInput_Mouse_CallbackMainMenu = nullptr;
 		lua_pushlightuserdata(L, &l_ui_SetMouseTriggerMainMenu);
 		lua_pushnil(L);
 		lua_rawset(L, LUA_REGISTRYINDEX);
@@ -701,9 +701,9 @@ int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
 	lua_pushvalue(L, 1);
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
-	if (!UIInput_Mouse_CallbackMainMenu) {
-		HookUIInput();
-		UIInput_Mouse_CallbackMainMenu = [](win_mouseEvents id, int w, int l) {
+	if (!EGUIX::UIInput_Mouse_CallbackMainMenu) {
+		EGUIX::HookUIInput();
+		EGUIX::UIInput_Mouse_CallbackMainMenu = [](win_mouseEvents id, int w, int l) {
 			if (id == win_mouseEvents::MouseMove)
 				return false;
 
@@ -744,7 +744,7 @@ int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
 }
 
 int l_ui_ShowResFloatie(lua_State* L) {
-	(*shok_GGUI_C3DOnScreenInformationCustomWidget::GlobalObj)->ShowResourceFloatieOnEntity(luaext_checkEntityId(L, 1), luaL_checkint(L, 2));
+	(*GGUI::C3DOnScreenInformationCustomWidget::GlobalObj)->ShowResourceFloatieOnEntity(luaext_checkEntityId(L, 1), luaL_checkint(L, 2));
 	return 0;
 }
 
@@ -759,8 +759,8 @@ int l_ui_GetClientSize(lua_State* L) {
 }
 
 int l_ui_GetWidgetName(lua_State* L) {
-	shok_EGUIX_CBaseWidget* w = l_uiCheckWid(L, 1);
-	lua_pushstring(L, shok_widgetManager::GlobalObj()->WidgetNameManager->GetNameByID(w->WidgetID));
+	EGUIX::CBaseWidget* w = l_uiCheckWid(L, 1);
+	lua_pushstring(L, EGUIX::WidgetManager::GlobalObj()->WidgetNameManager->GetNameByID(w->WidgetID));
 	return 1;
 }
 
@@ -822,11 +822,6 @@ namespace CppLogic::UI {
 	unsigned int __stdcall GUIState_LuaSelection::GetClassIdentifier() const
 	{
 		return GUIState_LuaSelection::Identifier;
-	}
-
-	void* __stdcall GUIState_LuaSelection::CastToIdentifier(unsigned int id)
-	{
-		return nullptr;
 	}
 
 	bool GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev) {
@@ -903,18 +898,18 @@ namespace CppLogic::UI {
 
 
 void l_ui_cleanup(lua_State* L) {
-	UIInput_Char_Callback = nullptr;
-	UIInput_Key_Callback = nullptr;
-	UIInput_Mouse_Callback = nullptr;
-	if (shok_widgetManager* wm = shok_widgetManager::GlobalObj()) {
-		for (shok_EGUIX_CBaseWidget* wid : wm->Widgets) {
-			if (shok_EGUIX_CToolTipHelper* tt = wid->GetTooltipHelper()) {
+	EGUIX::UIInput_Char_Callback = nullptr;
+	EGUIX::UIInput_Key_Callback = nullptr;
+	EGUIX::UIInput_Mouse_Callback = nullptr;
+	if (EGUIX::WidgetManager* wm = EGUIX::WidgetManager::GlobalObj()) {
+		for (EGUIX::CBaseWidget* wid : wm->Widgets) {
+			if (EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper()) {
 				l_uiClearFunc(L, &tt->UpdateFunction);
 			}
-			if (shok_EGUIX_CLuaFunctionHelper* fh = wid->GetUpdateFunc()) {
+			if (EGUIX::CLuaFunctionHelper* fh = wid->GetUpdateFunc()) {
 				l_uiClearFunc(L, fh);
 			}
-			if (shok_EGUIX_CButtonHelper* bh = wid->GetButtonHelper()) {
+			if (EGUIX::CButtonHelper* bh = wid->GetButtonHelper()) {
 				l_uiClearFunc(L, &bh->ActionFunction);
 			}
 		}

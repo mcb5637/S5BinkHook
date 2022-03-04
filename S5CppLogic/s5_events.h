@@ -806,5 +806,7 @@ namespace shok {
 		MouseLeave = 0x50002,
 		AutoUpdate = 0x50003,
 		ManualUpdate = 0x50004,
+		WidgetShow = 0x50006,
+		WidgetHide = 0x50007,
 	};
 }

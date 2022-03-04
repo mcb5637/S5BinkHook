@@ -195,7 +195,7 @@ namespace BB {
 	public:
 		virtual ~IObject() = default;
 		virtual unsigned int __stdcall GetClassIdentifier() const = 0;
-		virtual void* __stdcall CastToIdentifier(unsigned int id) = 0;
+		virtual void* __stdcall CastToIdentifier(unsigned int id);
 
 		static constexpr int TypeDesc = 0x7FFE08;
 		static constexpr int vtp = 0x7620F0;

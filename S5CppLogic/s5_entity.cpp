@@ -1030,10 +1030,10 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	if (uiFeedback) {
 		if (attackerplayer) {
 			GGL::CFeedbackEventBattling ev{ shok::FeedbackEventIds::FEEDBACK_EVENT_BATTLING, EntityId, PlayerId, attacker ? attacker->Position : Position, attackerplayer };
-			shok_feedbackEventHandler::GlobalObj()->FireEvent(&ev);
+			EGUIX::FeedbackEventHandler::GlobalObj()->FireEvent(&ev);
 		}
 		EGL::CNetEventEntityIDAndInteger ev{ shok::FeedbackEventIds::FEEDBACK_EVENT_ENTITY_HURT, EntityId, damage };
-		shok_feedbackEventHandler::GlobalObj()->FireEvent(&ev);
+		EGUIX::FeedbackEventHandler::GlobalObj()->FireEvent(&ev);
 	}
 	if (attacker) {
 		ObserverEntities.ForAll([attacker](shok::Attachment* a) {

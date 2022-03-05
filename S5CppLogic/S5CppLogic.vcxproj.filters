@@ -43,6 +43,12 @@
     <Filter Include="shok\ui">
       <UniqueIdentifier>{18904ff9-e4fb-440d-846b-8806b0eee2e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shok\engine">
+      <UniqueIdentifier>{52775156-67e0-4b57-822e-136c294b1a87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shok\sound">
+      <UniqueIdentifier>{dffe835b-2c01-4134-ab45-63db55ea84a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -90,12 +96,6 @@
     <ClInclude Include="l_ui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s5framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="s5tasklist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -103,12 +103,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entityiterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="s5sound.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="s5RWEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Luapp\constexprTypename.h">
@@ -204,6 +198,18 @@
     <ClInclude Include="s5widget.h">
       <Filter>shok\ui</Filter>
     </ClInclude>
+    <ClInclude Include="s5RWEngine.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="s5framework.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5sound.h">
+      <Filter>shok\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="s5tasklist.h">
+      <Filter>shok\entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -248,19 +254,10 @@
     <ClCompile Include="l_ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="s5framework.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="s5tasklist.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="s5classfactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="entityiterator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="s5sound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5_datastructures.cpp">
@@ -328,6 +325,15 @@
     </ClCompile>
     <ClCompile Include="s5widget.cpp">
       <Filter>shok\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="s5framework.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5sound.cpp">
+      <Filter>shok\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="s5tasklist.cpp">
+      <Filter>shok\entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

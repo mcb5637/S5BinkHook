@@ -26,21 +26,21 @@ namespace EGL {
 	public:
 
 		struct modeldata {
-			int EntityID;
-			int EntityType;
-			int ModelOverride;
-			shok::Position Pos;
+			int EntityID = 0;
+			int EntityType = 0;
+			int ModelOverride = 0;
+			shok::Position Pos{};
 		};
 		struct playermodeldata {
-			int EntityType;
-			int EntityID;
-			int Player;
-			int ModelOverride;
+			int EntityType = 0;
+			int EntityID = 0;
+			int Player = 0;
+			int ModelOverride = 0;
 		};
 		struct posdata {
-			shok::PositionRot Pos;
-			float Scale;
-			int NumAuras;
+			shok::PositionRot Pos{};
+			float Scale = 0;
+			int NumAuras = 0;
 		};
 
 		virtual ~IEntityDisplay() = default;
@@ -70,12 +70,12 @@ namespace EGL {
 	class CGLEEntity : public BB::IObject, public IEntityDisplay, public EGL::TGLEAttachable<EGL::CGLEEntity, EGL::CEntityAttachmentProxy> {
 	public:
 		struct TaskIdAndTaskHandler {
-			shok_Task TaskID;
-			shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* TaskHandler;
+			shok::Task TaskID;
+			EGL::TaskHandler* TaskHandler;
 		};
 		struct StateIdAndStateHandler {
-			shok_TaskState StateID;
-			shok_EGL_IGLEStateHandler* StateHandler;
+			shok::TaskState StateID;
+			EGL::IGLEStateHandler* StateHandler;
 		};
 		struct EventIdAndEventHandler {
 			shok::EventIDs EventID;
@@ -104,7 +104,7 @@ namespace EGL {
 		byte UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
 		int TaskListToSet; // 29
 		shok::Vector<EGL::CGLEBehavior*> Behaviours; // 30, first field in 31
-		shok_TaskState CurrentState; // 34
+		shok::TaskState CurrentState; // 34
 		int EntityState, CurrentTaskListID, CurrentTaskIndex; // la37
 		shok::Set<StateIdAndStateHandler> StateHandlers; // 38
 		shok::Set<TaskIdAndTaskHandler> TaskHandlers; // 41
@@ -147,16 +147,16 @@ namespace EGL {
 	private:
 		virtual void UnknownEntityFunc1() = 0;
 	public:
-		virtual void ExecuteTask(shok_EGL_CGLETaskArgs* t) = 0;// 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
+		virtual void ExecuteTask(EGL::CGLETaskArgs* t) = 0;// 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 		virtual void FireEvent(BB::CEvent* ev) = 0;
 		virtual void AddBehavior(EGL::CGLEBehavior* b) = 0; // 17 probably not usable outside of createentity
 		virtual void AddSlot(EGL::ISlot* slot, int i) = 0;
-		virtual void AddTaskHandler(shok_Task t, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* handl) = 0; //19
+		virtual void AddTaskHandler(shok::Task t, EGL::TaskHandler* handl) = 0; //19
 		virtual void AddEventHandler(shok::EventIDs ev, EGL::EventHandler* handl) = 0; //20
-		virtual void AddStateHandler(shok_TaskState st, shok_EGL_IGLEStateHandler* handl) = 0;
+		virtual void AddStateHandler(shok::TaskState st, EGL::IGLEStateHandler* handl) = 0;
 		virtual void GetApproachPos(shok::Position* p) = 0;
 		virtual float GetApproachRot() = 0;
-		virtual void SetTaskState(shok_TaskState st) = 0; // 24
+		virtual void SetTaskState(shok::TaskState st) = 0; // 24
 	private:
 		virtual bool UnknownEntityFunc2() = 0;
 		virtual void UnknownEntityFunc3() = 0;
@@ -206,10 +206,10 @@ namespace EGL {
 		void SetHealth(int h);
 		void Hurt(int dmg);
 		void SetTaskList(int tl);
-		void SetTaskList(shok_EGL_CGLETaskList* tl);
-		shok_EGL_CGLETaskList* GetCurrentTaskList();
-		shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* GetTaskHandler(shok_Task task);
-		void ExecuteTask(shok_EGL_CGLETaskArgs& targ);
+		void SetTaskList(EGL::CGLETaskList* tl);
+		EGL::CGLETaskList* GetCurrentTaskList();
+		EGL::TaskHandler* GetTaskHandler(shok::Task task);
+		void ExecuteTask(EGL::CGLETaskArgs& targ);
 
 		void PerformHeal(int hp, bool healSoldiers);
 
@@ -229,12 +229,31 @@ namespace EGL {
 		void CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* other);
 
 		// todo make proper handler teplates for this stuff
-		void AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs)); // _ is undefined
-		void AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek)); // _ is undefined
-		void AddEventHandler(shok::EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, BB::CEvent* ev)); // _ is undefined
 
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
+
+		template<int id, class EventType, class ObjectType>
+		static EGL::EventHandler* CreateEventHandler(ObjectType* ob, void (ObjectType::* handler)(EventType*)) {
+			using hty = EGL::THandler<id, BB::CEvent, EventType, ObjectType, void>;
+			void* mem = shok::Malloc(sizeof(hty));
+			return new (mem) hty(ob, handler);
+		}
+
+		template<int id, class TaskArgs, class ObjectType>
+		static EGL::TaskHandler* CreateTaskHandler(ObjectType* ob, int (ObjectType::*handler)(TaskArgs*)) {
+			using hty = EGL::THandler<id, EGL::CGLETaskArgs, TaskArgs, ObjectType, int>;
+			void* mem = shok::Malloc(sizeof(hty));
+			return new (mem) hty(ob, handler);
+		}
+
+		template<class ObjectType>
+		static EGL::IGLEStateHandler* CreateStateHandler(ObjectType* ob, int (ObjectType::* handler)(int)) {
+			using hty = EGL::TStateHandler<ObjectType>;
+			void* mem = shok::Malloc(sizeof(hty));
+			return new (mem) hty(ob, handler);
+		}
+
 
 		static void HookDamageMod();
 		static void HookArmorMod();
@@ -248,6 +267,12 @@ namespace EGL {
 		static bool UseMaxHPTechBoni;
 		static void HookMaxHP();
 
+	private:
+		int ExecuteLuaTask(EGL::CTaskArgsInteger* arg);
+		int ExecuteLuaTaskState(int i);
+		static void __fastcall AddHandlerLuaTask(CGLEEntity* th);
+
+	public:
 		static int (*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
 		static void HookLuaTaskList();
 		static void HookNonCancelableAnim();

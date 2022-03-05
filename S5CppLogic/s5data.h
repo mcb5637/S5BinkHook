@@ -107,8 +107,8 @@ namespace shok {
 
 	// generic structs
 	struct Position {
-		float X;
-		float Y;
+		float X = -1;
+		float Y = -1;
 
 		void FloorToBuildingPlacement();
 		void RoundToBuildingPlacement();
@@ -133,7 +133,7 @@ namespace shok {
 		static shok_BB_CClassFactory_serializationData* SerializationData;
 	};
 	struct PositionRot : Position {
-		float r;
+		float r = 0;
 	};
 
 
@@ -242,25 +242,53 @@ namespace EGL {
 	};
 
 
-	template<class T, class V>
+	template<class EventType, class ReturnType>
 	class IGLEHandler {
 	public:
-		virtual void Handle(T* t) = 0;
+		virtual ReturnType Handle(EventType* t) = 0;
 	};
-	template<int HandlerID, class EventBase, class HandlerEvent, class T, class V>
-	class THandler : public IGLEHandler<EventBase, V> {
+	template<int HandlerID, class EventBase, class HandlerEvent, class ObjectType, class ReturnType>
+	class THandler : public IGLEHandler<EventBase, ReturnType> {
 	public:
-		typedef void (T::*HandlerType)(HandlerEvent* ev);
+		typedef ReturnType (ObjectType::*HandlerType)(HandlerEvent* ev);
 
-		T* Object;
+		ObjectType* Object;
 		HandlerType HandlerFunc;
 
-		virtual void Handle(EventBase* ev) override {
-			std::invoke(HandlerFunc, Object, static_cast<HandlerEvent*>(ev));
+		virtual ReturnType Handle(EventBase* ev) override {
+			return std::invoke(HandlerFunc, Object, static_cast<HandlerEvent*>(ev));
+		}
+
+		THandler(ObjectType* o, HandlerType h) {
+			Object = o;
+			HandlerFunc = h;
 		}
 	};
 
 	using EventHandler = EGL::IGLEHandler<BB::CEvent, void>;
+	using TaskHandler = EGL::IGLEHandler<EGL::CGLETaskArgs, int>;
+
+	class IGLEStateHandler {
+		virtual int Handle(int i) = 0;
+	};
+
+	template<class ObjectType>
+	class TStateHandler : public IGLEStateHandler {
+	public:
+		typedef int (ObjectType::* HandlerType)(int i);
+
+		ObjectType* Object;
+		HandlerType HandlerFunc;
+
+		virtual int Handle(int i) override {
+			return std::invoke(HandlerFunc, Object, i);
+		}
+
+		TStateHandler(ObjectType* o, HandlerType h) {
+			Object = o;
+			HandlerFunc = h;
+		}
+	};
 
 
 	class ISlot {
@@ -408,10 +436,10 @@ enum class win_mouseEvents : int {
 #include "s5_guistates.h"
 #include "s5ui.h"
 #include "s5widget.h"
+#include "s5sound.h"
 #include "s5framework.h"
 #include "s5tasklist.h"
 #include "s5classfactory.h"
-#include "s5sound.h"
 
 static inline void(_stdcall* const shok_SetHighPrecFPU)() = reinterpret_cast<void(_stdcall*)()>(0x5C8451);
 

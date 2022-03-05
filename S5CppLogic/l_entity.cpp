@@ -1176,7 +1176,7 @@ int l_buildingActivateOvertime(lua_State* L) {
 	GGL::CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, !b->IsOvertimeActive, "overtime already active");
 	luaext_assert(L, b->OvertimeCooldown <= 0, "cooldown active");
-	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != shok_TaskState::BuildingAlarmDefend, "building not idle");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != shok::TaskState::BuildingAlarmDefend, "building not idle");
 	b->ActivateOvertime();
 	return 0;
 }
@@ -1184,7 +1184,7 @@ int l_buildingActivateOvertime(lua_State* L) {
 int l_buildingDeactivateOvertime(lua_State* L) {
 	GGL::CBuilding* b = luaext_checkBulding(L, 1);
 	luaext_assert(L, b->IsOvertimeActive, "overtime not active");
-	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != shok_TaskState::BuildingAlarmDefend, "building not idle");
+	luaext_assert(L, b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != shok::TaskState::BuildingAlarmDefend, "building not idle");
 	b->DeactivateOvertime();
 	return 0;
 }
@@ -1512,40 +1512,42 @@ int l_settler_GetEnteredBuilding(lua_State* L) {
 
 const char* AnimTaskList = "TL_SCRIPT_ANIMATION";
 void l_settler_createAnimTaskList(lua_State* L) {
-	shok_EGL_CGLETaskListMgr* tmng = *shok_EGL_CGLETaskListMgr::GlobalObj;
+	EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
 	int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
 	if (!tid) {
-		shok_EGL_CGLETaskList* tl = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<shok_EGL_CGLETaskList>();
+		shok_BB_CClassFactory* fact = *shok_BB_CClassFactory::GlobalObj;
+		EGL::CGLETaskList* tl = fact->CreateObject<EGL::CGLETaskList>();
 
-		shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok::Allocator<shok_EGL_CGLETaskArgs*>>& v) {
-			shok_BB_CClassFactory* fact = *shok_BB_CClassFactory::GlobalObj;
+		{
+			auto v = tl->Task.SaveVector();
 			{
-				shok_EGL_CGLETaskArgsThousandths* t = fact->CreateObject<shok_EGL_CGLETaskArgsThousandths>();
-				t->TaskType = shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE;
+				EGL::CGLETaskArgsThousandths* t = fact->CreateObject<EGL::CGLETaskArgsThousandths>();
+				t->TaskType = shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE;
 				t->Thousandths = 1000;
-				v.push_back(t);
+				v.Vector.push_back(t);
 			}
 			{
-				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
-				t->TaskType = shok_Task::TASK_SET_BATTLE_IDLE_ANIM;
-				v.push_back(t);
+				EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+				t->TaskType = shok::Task::TASK_SET_BATTLE_IDLE_ANIM;
+				v.Vector.push_back(t);
 			}
 			{
-				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
-				t->TaskType = shok_Task::TASK_BATTLE_WAIT_UNTIL;
-				v.push_back(t);
+				EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+				t->TaskType = shok::Task::TASK_BATTLE_WAIT_UNTIL;
+				v.Vector.push_back(t);
 			}
 			{
-				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
-				t->TaskType = shok_Task::TASK_SET_DEFAULT_REACTION_TYPE;
-				v.push_back(t);
+				EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+				t->TaskType = shok::Task::TASK_SET_DEFAULT_REACTION_TYPE;
+				v.Vector.push_back(t);
 			}
 			{
-				shok_EGL_CGLETaskArgs* t = fact->CreateObject<shok_EGL_CGLETaskArgs>();
-				t->TaskType = shok_Task::TASK_LIST_DONE;
-				v.push_back(t);
+				EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+				t->TaskType = shok::Task::TASK_LIST_DONE;
+				v.Vector.push_back(t);
 			}
-			});
+		}
+
 		tid = tmng->RegisterTaskList(tl, AnimTaskList);
 		
 		int top = lua_gettop(L);
@@ -1557,7 +1559,7 @@ void l_settler_createAnimTaskList(lua_State* L) {
 	}
 }
 void l_settler_cleanupAnimTask(lua_State* L) {
-	shok_EGL_CGLETaskListMgr* tmng = *shok_EGL_CGLETaskListMgr::GlobalObj;
+	EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
 	if (!tmng)
 		return;
 	int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
@@ -1570,13 +1572,13 @@ int l_settler_playScriptAnim(lua_State* L) {
 		luaL_error(L, "does not work with SCELoader");
 	l_settler_createAnimTaskList(L);
 	EGL::CGLEEntity* e = luaext_checkEntity(L, 1);
-	shok_EGL_CGLETaskArgsAnimation setanim{};
-	setanim.TaskType = shok_Task::TASK_SET_ANIM;
+	EGL::CGLETaskArgsAnimation setanim{};
+	setanim.TaskType = shok::Task::TASK_SET_ANIM;
 	setanim.AnimID = (*BB::CIDManagerEx::AnimManager)->GetIdByName(luaL_checkstring(L, 2));
 	luaext_assert(L, setanim.AnimID, "not an animation");
 	setanim.PlayBackwards = luaext_optbool(L, 3, false);
-	shok_EGL_CGLETaskArgs reset{};
-	reset.TaskType = shok_Task::TASK_RESET_TASK_LIST_TIMER;
+	EGL::CGLETaskArgs reset{};
+	reset.TaskType = shok::Task::TASK_RESET_TASK_LIST_TIMER;
 	e->ExecuteTask(reset);
 	e->ExecuteTask(setanim);
 	GGL::CGLBehaviorAnimationEx* animbeh = e->GetBehavior<GGL::CGLBehaviorAnimationEx>();
@@ -1585,7 +1587,7 @@ int l_settler_playScriptAnim(lua_State* L) {
 	GGL::CBattleBehavior* batt = e->GetBehavior<GGL::CBattleBehavior>();
 	if (batt)
 		batt->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
-	e->SetTaskList((*shok_EGL_CGLETaskListMgr::GlobalObj)->TaskListManager->GetIdByName(AnimTaskList));
+	e->SetTaskList((*EGL::CGLETaskListMgr::GlobalObj)->TaskListManager->GetIdByName(AnimTaskList));
 	return 0;
 }
 

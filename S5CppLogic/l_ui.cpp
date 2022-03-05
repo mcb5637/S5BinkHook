@@ -707,7 +707,7 @@ int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
 			if (id == win_mouseEvents::MouseMove)
 				return false;
 
-			if ((*shok_Framework_CMain::GlobalObj)->CurrentMode != 1)
+			if ((*Framework::CMain::GlobalObj)->CurrentMode != 1)
 				return false;
 
 			lua_State* L = mainmenu_state;

@@ -944,7 +944,7 @@ namespace GGL {
 	class CDefendableBuildingBehavior : public EGL::CGLEBehavior {
 	public:
 		int RemainderMS;
-		shok_TaskState OldState;
+		shok::TaskState OldState;
 
 		// defined events: WorkerAlarmMode_Enable, WorkerAlarmMode_Disable, DefendableBuilding_XXX
 		// defined states: BuildingAlarmDefend

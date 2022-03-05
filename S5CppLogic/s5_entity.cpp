@@ -18,16 +18,16 @@ struct shok_vtable_EGL_CGLEEntity : shok_vtable_BB_IObject {
 	int(__thiscall* GetSector)(EGL::CGLEEntity* th); // 12
 	bool(__thiscall* IsInSector)(EGL::CGLEEntity* th, int sector);
 	PADDINGI(1); // maybe execute task?/ontick?, settler update auras
-	void(__thiscall* ExecuteTask)(EGL::CGLEEntity* th, shok_EGL_CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
+	void(__thiscall* ExecuteTask)(EGL::CGLEEntity* th, EGL::CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 	void(__thiscall* FireEvent)(EGL::CGLEEntity* th, BB::CEvent* d); // 16
 	void(__thiscall* AddBehavior)(EGL::CGLEEntity* th, EGL::CGLEBehavior* bh); // 17 probably not usable outside of createentity
 	PADDINGI(1); // add behavior slot
-	void(__thiscall* AddTaskHandler)(EGL::CGLEEntity* th, shok_Task task, shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* taskhandler); // 19
+	void(__thiscall* AddTaskHandler)(EGL::CGLEEntity* th, shok::Task task, EGL::TaskHandler* taskhandler); // 19
 	void(__thiscall* AddEventHandler)(EGL::CGLEEntity* th, shok::EventIDs eventid, EGL::EventHandler* eventhandler); // 20
-	void(__thiscall* AddStateHandler)(EGL::CGLEEntity* th, shok_TaskState state, shok_EGL_IGLEStateHandler* statehandler); // 21
+	void(__thiscall* AddStateHandler)(EGL::CGLEEntity* th, shok::TaskState state, EGL::IGLEStateHandler* statehandler); // 21
 	void(__thiscall* GetApproachPos)(EGL::CGLEEntity* th, shok::Position* outpos);
 	float(__thiscall* GetApproachRot)(EGL::CGLEEntity* th);
-	void(__thiscall* SetTaskState)(EGL::CGLEEntity* th, shok_TaskState state); // 24
+	void(__thiscall* SetTaskState)(EGL::CGLEEntity* th, shok::TaskState state); // 24
 	PADDINGI(3);
 	float(__thiscall* GetExploration)(EGL::CGLEEntity* e); // 28
 	PADDINGI(5); // get flags as float, then jmp to 33
@@ -247,7 +247,7 @@ bool GGL::CBuilding::IsIdle(bool forRecruitemnt)
 		return false;
 	if (IsUpgrading)
 		return false;
-	if (CurrentState == shok_TaskState::BuildingAlarmDefend) // alarm mode
+	if (CurrentState == shok::TaskState::BuildingAlarmDefend) // alarm mode
 		return false;
 	if (GetTechnologyInResearch())
 		return false;
@@ -312,23 +312,23 @@ void EGL::CGLEEntity::SetTaskList(int tl)
 {
 	shok_entity_settasklistbyid(this, tl, 1);
 }
-static inline void(__thiscall* const shok_entity_settasklist)(EGL::CGLEEntity* th, shok_EGL_CGLETaskList* tl, int t) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, shok_EGL_CGLETaskList*, int)>(0x57B208);
-void EGL::CGLEEntity::SetTaskList(shok_EGL_CGLETaskList* tl)
+static inline void(__thiscall* const shok_entity_settasklist)(EGL::CGLEEntity* th, EGL::CGLETaskList* tl, int t) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, EGL::CGLETaskList*, int)>(0x57B208);
+void EGL::CGLEEntity::SetTaskList(EGL::CGLETaskList* tl)
 {
 	shok_entity_settasklist(this, tl, 1);
 }
-static inline shok_EGL_CGLETaskList* (__thiscall* const shok_entity_GetCurrentTaskList)(EGL::CGLEEntity* th) = reinterpret_cast<shok_EGL_CGLETaskList * (__thiscall* const)(EGL::CGLEEntity*)>(0x57A892);
-shok_EGL_CGLETaskList* EGL::CGLEEntity::GetCurrentTaskList()
+static inline EGL::CGLETaskList* (__thiscall* const shok_entity_GetCurrentTaskList)(EGL::CGLEEntity* th) = reinterpret_cast<EGL::CGLETaskList * (__thiscall* const)(EGL::CGLEEntity*)>(0x57A892);
+EGL::CGLETaskList* EGL::CGLEEntity::GetCurrentTaskList()
 {
 	return shok_entity_GetCurrentTaskList(this);
 }
-static inline shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>* th, shok_Task id) = reinterpret_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int * (__thiscall* const)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>*, shok_Task)>(0x57BDD3);
-shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* EGL::CGLEEntity::GetTaskHandler(shok_Task task)
+static inline EGL::TaskHandler* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>* th, shok::Task id) = reinterpret_cast<EGL::TaskHandler * (__thiscall* const)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>*, shok::Task)>(0x57BDD3);
+EGL::TaskHandler* EGL::CGLEEntity::GetTaskHandler(shok::Task task)
 {
 	return shok_entitytaskhandler_gettaskhandler(&TaskHandlers, task);
 }
 
-void EGL::CGLEEntity::ExecuteTask(shok_EGL_CGLETaskArgs& targ)
+void EGL::CGLEEntity::ExecuteTask(EGL::CGLETaskArgs& targ)
 {
 	ExecuteTask(&targ);
 }
@@ -1306,40 +1306,32 @@ void EGL::CGLEEntity::HookMaxHP()
 }
 
 int (*EGL::CGLEEntity::LuaTaskListCallback)(EGL::CGLEEntity* e, int val) = nullptr;
-int __fastcall entity_executeluatask(EGL::CGLEEntity* th, int _, shok_EGL_CGLETaskArgs* args) {
+int EGL::CGLEEntity::ExecuteLuaTask(EGL::CTaskArgsInteger* arg)
+{
 	int i = 0;
-	int val = static_cast<shok_EGL_CTaskArgsInteger*>(args)->Value;
+	int val = static_cast<EGL::CTaskArgsInteger*>(arg)->Value;
 	if (EGL::CGLEEntity::LuaTaskListCallback)
-		i = EGL::CGLEEntity::LuaTaskListCallback(th, val);
+		i = EGL::CGLEEntity::LuaTaskListCallback(this, val);
 	if (i == 3) {
-		th->GetAdditionalData(true)->FakeTaskValue = val;
-		th->SetTaskState(shok_TaskState::LuaFunc);
+		GetAdditionalData(true)->FakeTaskValue = val;
+		SetTaskState(shok::TaskState::LuaFunc);
 		i = 1;
 	}
 	return i;
 }
-int __fastcall entity_executeluataskstate(EGL::CGLEEntity* th, int _, int onek) {
+int EGL::CGLEEntity::ExecuteLuaTaskState(int p)
+{
 	int i = -2;
 	if (EGL::CGLEEntity::LuaTaskListCallback)
-		if (EGL::CGLEEntity::LuaTaskListCallback(th, th->GetAdditionalData(true)->FakeTaskValue) == 3)
+		if (EGL::CGLEEntity::LuaTaskListCallback(this, GetAdditionalData(true)->FakeTaskValue) == 3)
 			i = -1;
 	return i;
 }
 void(__thiscall* const entityaddluatlhandlers)(EGL::CGLEEntity* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*)>(0x57BA34);
-void __fastcall entity_addluatlhandlershook(EGL::CGLEEntity* th) {
+void __fastcall EGL::CGLEEntity::AddHandlerLuaTask(EGL::CGLEEntity* th) {
 	entityaddluatlhandlers(th);
-	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
-	thand->vtable = 0x783D7C; // this is EGL::THandler<12,EGL::CGLETaskArgs,EGL::CGLETaskArgs,EGL::CGLEEntity,int>, but the func is always the same anyway...
-	thand->Object = th;
-	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(&entity_executeluatask);
-	thand->Zero = 0;
-	th->AddTaskHandler(shok_Task::TASK_LUA_FUNC, thand);
-	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
-	shand->vtable = 0x783D9C; // EGL::TStateHandler<EGL::CGLEEntity>
-	shand->Object = th;
-	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(&entity_executeluataskstate);
-	shand->Zero = 0;
-	th->AddStateHandler(shok_TaskState::LuaFunc, shand);
+	th->AddTaskHandler(shok::Task::TASK_LUA_FUNC, CreateTaskHandler<static_cast<int>(shok::Task::TASK_LUA_FUNC)>(th, &ExecuteLuaTask));
+	th->AddStateHandler(shok::TaskState::LuaFunc, CreateStateHandler(th, &ExecuteLuaTaskState));
 }
 bool HookLuaTaskList_Hooked = false;
 void EGL::CGLEEntity::HookLuaTaskList()
@@ -1348,29 +1340,38 @@ void EGL::CGLEEntity::HookLuaTaskList()
 		return;
 	HookLuaTaskList_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57D6CA), 10 };
-	RedirectCall(reinterpret_cast<void*>(0x57D6CA), &entity_addluatlhandlershook);
+	RedirectCall(reinterpret_cast<void*>(0x57D6CA), &EGL::CGLEEntity::AddHandlerLuaTask);
 }
 
-int __fastcall entity_hooknoncancelanim_task(GGL::CGLBehaviorAnimationEx* th, int _, shok_EGL_CGLETaskArgs* args) {
-	int wait = static_cast<shok_EGL_CGLETaskArgsThousandths*>(args)->Thousandths;
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-	th->TurnToWaitFor = th->StartTurn + th->Duration * wait / 1000;
-	e->SetTaskState(shok_TaskState::WaitForAnimNonCancelable);
-	return 1;
-}
+class CustomTaskHandler : public EGL::TaskHandler {
+public:
+	GGL::CGLBehaviorAnimationEx* th = nullptr;
+
+	virtual int Handle(EGL::CGLETaskArgs* args) override {
+		int wait = static_cast<EGL::CGLETaskArgsThousandths*>(args)->Thousandths;
+		EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
+		th->TurnToWaitFor = th->StartTurn + th->Duration * wait / 1000;
+		e->SetTaskState(shok::TaskState::WaitForAnimNonCancelable);
+		return 1;
+	}
+};
+static inline int(__thiscall* const behanim_statehandlerwait)(GGL::CGLBehaviorAnimationEx* th, int i) = reinterpret_cast<int(__thiscall*)(GGL::CGLBehaviorAnimationEx*, int)>(0x587E20);
+class CustomStateHandler : public EGL::IGLEStateHandler {
+public:
+	GGL::CGLBehaviorAnimationEx* th = nullptr;
+
+	virtual int Handle(int i) override {
+		return behanim_statehandlerwait(th, i);
+	}
+};
+
 void __stdcall entity_hooknoncancelanim(EGL::CGLEEntity* th, GGL::CGLBehaviorAnimationEx* beh) {
-	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
-	thand->vtable = 0x784A4C; // EGL::THandler<5,EGL::CGLETaskArgs,EGL::CGLETaskArgsThousandths,EGL::CBehaviorAnimation,int>
-	thand->Object = beh;
-	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(entity_hooknoncancelanim_task);
-	thand->Zero = 0;
-	th->AddTaskHandler(shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, thand);
-	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
-	shand->vtable = 0x784A7C; // EGL::TStateHandler<EGL::CBehaviorAnimation>
-	shand->Object = beh;
-	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(0x587E20);
-	shand->Zero = 0;
-	th->AddStateHandler(shok_TaskState::WaitForAnimNonCancelable, shand);
+	CustomTaskHandler* thand = new (shok::Malloc(sizeof(CustomTaskHandler))) CustomTaskHandler();
+	thand->th = beh;
+	th->AddTaskHandler(shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, thand);
+	CustomStateHandler* shand = new (shok::Malloc(sizeof(CustomStateHandler))) CustomStateHandler();
+	shand->th = beh;
+	th->AddStateHandler(shok::TaskState::WaitForAnimNonCancelable, shand);
 }
 void __declspec(naked) entity_hooknoncancelanim_asm() {
 	__asm {
@@ -1570,40 +1571,6 @@ void EGL::CGLEEntity::CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* 
 	}
 }
 
-void EGL::CGLEEntity::AddTaskHandler(shok_Task task, void* obj, int(__fastcall* Handler)(void* obj, int _, shok_EGL_CGLETaskArgs* taskargs))
-{
-	shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* thand = static_cast<shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(shok::Malloc(sizeof(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int)));
-	thand->vtable = 0x783D7C; // this is EGL::THandler<12,EGL::CGLETaskArgs,EGL::CGLETaskArgs,EGL::CGLEEntity,int>, but the func is always the same anyway...
-	thand->Object = obj;
-	thand->Func = reinterpret_cast<int(__thiscall*)(void* th, shok_EGL_CGLETaskArgs * args)>(Handler);
-	thand->Zero = 0;
-	AddTaskHandler(task, thand);
-}
-void EGL::CGLEEntity::AddTaskStateHandler(shok_TaskState state, void* obj, int(__fastcall* Handler)(void* obj, int _, int onek))
-{
-	shok_EGL_IGLEStateHandler* shand = static_cast<shok_EGL_IGLEStateHandler*>(shok::Malloc(sizeof(shok_EGL_IGLEStateHandler)));
-	shand->vtable = 0x783D9C; // EGL::TStateHandler<EGL::CGLEEntity>
-	shand->Object = obj;
-	shand->Func = reinterpret_cast<int(__thiscall*)(void*, int)>(Handler);
-	shand->Zero = 0;
-	AddStateHandler(state, shand);
-}
-class EntEventHandler : public EGL::IGLEHandler<BB::CEvent, void> {
-public:
-	void* Object;
-	void(__thiscall* Func)(void*, BB::CEvent*);
-
-	virtual void Handle(BB::CEvent* t) override {
-		Func(Object, t);
-	}
-};
-void EGL::CGLEEntity::AddEventHandler(shok::EventIDs ev, void* ob, void(__fastcall* Handler)(void* obj, int _, BB::CEvent* ev))
-{
-	EntEventHandler* ehand = new (shok::Malloc(sizeof(EntEventHandler))) EntEventHandler();
-	ehand->Object = ob;
-	ehand->Func = reinterpret_cast<void(__thiscall*)(void*, BB::CEvent*)>(Handler);
-	AddEventHandler(ev, ehand);
-}
 
 float __fastcall entitygetdamagemod(GGL::CBattleBehavior* b) {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(b->EntityId);

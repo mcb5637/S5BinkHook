@@ -1,25 +1,14 @@
 #include "pch.h"
 #include "s5data.h"
 
-struct shok_vtable_ESnd_CSoEMusic {
-	void(__thiscall* StartMusic)(shok_ESnd_CSoEMusic* th, const char* path, int vol, bool loop);
-	void(__thiscall* StopMusic)(shok_ESnd_CSoEMusic* th);
-	PADDINGI(2);
-};
-
-void shok_ESnd_CSoEMusic::StartMusic(const char* path, int vol, bool loop)
-{
-	reinterpret_cast<shok_vtable_ESnd_CSoEMusic*>(vtable)->StartMusic(this, path, vol, loop);
-}
-
-static inline void(__thiscall* const music_pause)(shok_ESnd_CSoEMusic* th, bool p) = reinterpret_cast<void(__thiscall*)(shok_ESnd_CSoEMusic*, bool)>(0x4964DF);
-void shok_ESnd_CSoEMusic::PauseMusic(bool p)
+static inline void(__thiscall* const music_pause)(ESnd::CSoEMusic* th, bool p) = reinterpret_cast<void(__thiscall*)(ESnd::CSoEMusic*, bool)>(0x4964DF);
+void ESnd::CSoEMusic::PauseMusic(bool p)
 {
 	music_pause(this, p);
 }
 
-static inline void(__thiscall* const music_setvoladj)(shok_ESnd_CSoEMusic* th, float f) = reinterpret_cast<void(__thiscall*)(shok_ESnd_CSoEMusic*, float)>(0x4963CE);
-void shok_ESnd_CSoEMusic::SetVolumeAdjustment(float ad)
+static inline void(__thiscall* const music_setvoladj)(ESnd::CSoEMusic* th, float f) = reinterpret_cast<void(__thiscall*)(ESnd::CSoEMusic*, float)>(0x4963CE);
+void ESnd::CSoEMusic::SetVolumeAdjustment(float ad)
 {
 	music_setvoladj(this, ad);
 }
@@ -73,7 +62,7 @@ void __declspec(naked) startmusic_patchasm() {
 }
 
 
-void shok_ESnd_CSoEMusic::HookStartMusicFilesystem()
+void ESnd::CSoEMusic::HookStartMusicFilesystem()
 {
 	shok::SaveVirtualProtect vp{ AIL_closestream ,4 };
 	AIL_closestreamBackup = *AIL_closestream;

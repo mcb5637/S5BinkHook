@@ -126,7 +126,7 @@ void initGame() {
     if (!Options.DoNotUseCenterFix)
         HookTextPrinting();
     l_logic_onload();
-    shok_ESnd_CSoEMusic::HookStartMusicFilesystem();
+    ESnd::CSoEMusic::HookStartMusicFilesystem();
 }
 
 constexpr double Version = 1.3002;

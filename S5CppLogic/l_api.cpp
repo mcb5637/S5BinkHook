@@ -102,9 +102,9 @@ namespace CppLogic::API {
 		int ty = L.CheckInt(2);
 		const char* cn = L.OptString(3, nullptr); // optional
 		const char* n = L.CheckString(1);
-		shok_framework_campagnInfo* ci = (*shok_Framework_CMain::GlobalObj)->GetCampagnInfo(ty, cn);
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->GetCampagnInfo(ty, cn);
 		L.Assert(ci, "invalid map type/campagn");
-		shok_framework_mapinfo* i = ci->GetMapInfoByName(n);
+		Framework::MapInfo* i = ci->GetMapInfoByName(n);
 		if (!i)
 			throw lua::LuaException("invalid map");
 		L.Push(i->MapFilePath.c_str());
@@ -113,7 +113,7 @@ namespace CppLogic::API {
 
 	int SaveGetMapInfo(lua::State L) {
 		const char* save = L.CheckString(1);
-		shok_framework_saveData* sdata = shok_framework_saveData::GlobalObj();
+		Framework::SaveData* sdata = Framework::SaveData::GlobalObj();
 		L.Assert(sdata->LoadSaveData(save), "save doesnt exist");
 		L.Push(sdata->CurrentSave->MapData.MapName.c_str());
 		L.Push(sdata->CurrentSave->MapData.MapType);
@@ -122,24 +122,26 @@ namespace CppLogic::API {
 		return 4;
 	}
 
-	int GetGDB(lua::State L) {
+	void PushGDBList(lua::State L, const GDB::CList& list) {
 		L.NewTable();
-		std::function<void(shok_GDBEntry*)> a = [&L, &a](shok_GDBEntry* e) {
-			L.Push(e->Key.c_str());
-			if (e->Data->vtable == shok_GDB_CString::vtp)
-				L.Push(static_cast<shok_GDB_CString*>(e->Data)->Data.c_str());
-			else if (e->Data->vtable == shok_GDB_CValue::vtp)
-				L.Push(static_cast<shok_GDB_CValue*>(e->Data)->Data);
-			else if (e->Data->vtable == shok_GDB_CList::vtp) {
+		for (const GDB::CList::GDBEntry& e : list.Entries) {
+			L.Push(e.Key.c_str());
+			if (const GDB::CString* s = dynamic_cast<const GDB::CString*>(e.Data))
+				L.Push(s->Data.c_str());
+			else if (const GDB::CValue* v = dynamic_cast<const GDB::CValue*>(e.Data))
+				L.Push(v->Data);
+			else if (const GDB::CList* l = dynamic_cast<const GDB::CList*>(e.Data)) {
 				L.CheckStack(4, "stackoverflow");
-				L.NewTable();
-				static_cast<shok_GDB_CList*>(e->Data)->Entries.ForAll(a);
+				PushGDBList(L, *l);
 			}
 			else
 				L.Push(true);
 			L.SetTableRaw(-3);
-		};
-		(*shok_Framework_CMain::GlobalObj)->GDB.Entries.ForAll(a);
+		}
+	}
+
+	int GetGDB(lua::State L) {
+		PushGDBList(L, (*Framework::CMain::GlobalObj)->GDB);
 		return 1;
 	}
 

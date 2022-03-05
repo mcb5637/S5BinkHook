@@ -7,12 +7,17 @@ namespace shok {
 	enum class FeedbackEventIds : int;
 	enum class EventIDs : int;
 	enum class InputEventIds : int;
+	enum class Task : int;
+	enum class TaskState : int;
 }
 namespace EGL {
 	class CGLEEntity;
 	class CGLEEntityCreator;
 	class LandscapeBlockingData;
 	class CGLELandscape;
+	class CGLETaskArgs;
+	class CGLETaskList;
+	class CTaskArgsInteger;
 }
 namespace GGL {
 	class CBuilding;
@@ -33,12 +38,3 @@ namespace GGUI {
 }
 
 struct shok_BB_CClassFactory_serializationData;
-
-struct shok_EGL_CGLETaskArgs;
-
-enum class shok_Task;
-enum class shok_TaskState;
-
-struct shok_EGL_CGLETaskList;
-struct shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int;
-struct shok_EGL_IGLEStateHandler;

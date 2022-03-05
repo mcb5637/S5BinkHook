@@ -2,67 +2,257 @@
 #include "s5data.h"
 
 struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
-    int(__thiscall* ExecuteTask)(shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int* th, shok_EGL_CGLETaskArgs* args);
+    int(__thiscall* ExecuteTask)(EGL::TaskHandler* th, EGL::CGLETaskArgs* args);
 };
 
-shok_EGL_CGLETaskArgs::shok_EGL_CGLETaskArgs()
+void EGL::CGLETaskArgs::SetVT(int vtp)
 {
-    vtable = shok_EGL_CGLETaskArgs::vtp;
+    *reinterpret_cast<int*>(this) = vtp;
 }
-shok_EGL_CGLETaskArgsAnimation::shok_EGL_CGLETaskArgsAnimation()
+EGL::CGLETaskArgs::CGLETaskArgs()
 {
-    vtable = shok_EGL_CGLETaskArgsAnimation::vtp;
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgs::GetClassIdentifier() const
+{
+    return Identifier;
+}
+bool EGL::CGLETaskArgs::RetZero()
+{
+    return false;
 }
 
-int shok_EGL_CGLETaskList::GetNumberOfTasks()
+EGL::CGLETaskArgsThousandths::CGLETaskArgsThousandths()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsThousandths::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsPosition::CGLETaskArgsPosition()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsPosition::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsPosAndOrientation::CGLETaskArgsPosAndOrientation()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsPosAndOrientation::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsAnimation::CGLETaskArgsAnimation()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsAnimation::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsSubAnim::CGLETaskArgsSubAnim()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsSubAnim::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsParticleEffectIndex::CTaskArgsParticleEffectIndex()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsParticleEffectIndex::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsParticleEffectIndexAndType::CTaskArgsParticleEffectIndexAndType()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsParticleEffectIndexAndType::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsEffectType::CTaskArgsEffectType()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsEffectType::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsTaskListID::CGLETaskArgsTaskListID()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsTaskListID::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsRandomWaitForAnim::CTaskArgsRandomWaitForAnim()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsRandomWaitForAnim::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsSound::CGLETaskArgsSound()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsSound::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsEntityType::CGLETaskArgsEntityType()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsEntityType::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CGLETaskArgsEntityTypeAndPos::CGLETaskArgsEntityTypeAndPos()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CGLETaskArgsEntityTypeAndPos::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsModelID::CTaskArgsModelID()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsModelID::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsUVAnim::CTaskArgsUVAnim()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsUVAnim::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsInteger::CTaskArgsInteger()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsInteger::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+EGL::CTaskArgsFloat::CTaskArgsFloat()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall EGL::CTaskArgsFloat::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+GGL::CGLTaskArgsPositionAndTarget::CGLTaskArgsPositionAndTarget()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall GGL::CGLTaskArgsPositionAndTarget::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+GGL::CGLTaskArgsTargetType::CGLTaskArgsTargetType()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall GGL::CGLTaskArgsTargetType::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+GGL::CGLTaskArgsGoodType::CGLTaskArgsGoodType()
+{
+    SetVT(vtp);
+}
+unsigned int __stdcall GGL::CGLTaskArgsGoodType::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+
+int EGL::CGLETaskList::GetNumberOfTasks()
 {
     return this->Task.size();
 }
-static inline shok_EGL_CGLETaskArgs* (__thiscall* const shok_EGL_CGLETaskList_gettask)(shok_EGL_CGLETaskList* th, int i) = reinterpret_cast<shok_EGL_CGLETaskArgs * (__thiscall* const)(shok_EGL_CGLETaskList*, int)>(0x57B196);
-shok_EGL_CGLETaskArgs* shok_EGL_CGLETaskList::GetTask(int i)
+static inline EGL::CGLETaskArgs* (__thiscall* const shok_EGL_CGLETaskList_gettask)(EGL::CGLETaskList* th, int i) = reinterpret_cast<EGL::CGLETaskArgs * (__thiscall* const)(EGL::CGLETaskList*, int)>(0x57B196);
+EGL::CGLETaskArgs* EGL::CGLETaskList::GetTask(int i)
 {
     return shok_EGL_CGLETaskList_gettask(this, i);
 }
 
-static inline shok_EGL_CGLETaskList* (__thiscall* const shok_CGLETaskListMgr_gettasklistbyid)(shok_EGL_CGLETaskListMgr* th, int id) = reinterpret_cast<shok_EGL_CGLETaskList * (__thiscall*)(shok_EGL_CGLETaskListMgr*, int)>(0x5832BF);
-shok_EGL_CGLETaskList* shok_EGL_CGLETaskListMgr::GetTaskListByID(int id)
+static inline EGL::CGLETaskList* (__thiscall* const shok_CGLETaskListMgr_gettasklistbyid)(EGL::CGLETaskListMgr* th, int id) = reinterpret_cast<EGL::CGLETaskList * (__thiscall*)(EGL::CGLETaskListMgr*, int)>(0x5832BF);
+EGL::CGLETaskList* EGL::CGLETaskListMgr::GetTaskListByID(int id)
 {
     return shok_CGLETaskListMgr_gettasklistbyid(this, id);
 }
 
-static inline const char* (__thiscall* const shok_CGLETaskListMgr_gettasklistnamebyid)(shok_EGL_CGLETaskListMgr* th, int id) = reinterpret_cast<const char* (__thiscall* const)(shok_EGL_CGLETaskListMgr*, int)>(0x583303);
-const char* shok_EGL_CGLETaskListMgr::GetTaskListNameByID(int i)
+static inline const char* (__thiscall* const shok_CGLETaskListMgr_gettasklistnamebyid)(EGL::CGLETaskListMgr* th, int id) = reinterpret_cast<const char* (__thiscall* const)(EGL::CGLETaskListMgr*, int)>(0x583303);
+const char* EGL::CGLETaskListMgr::GetTaskListNameByID(int i)
 {
     return shok_CGLETaskListMgr_gettasklistnamebyid(this, i);
 }
 
-int shok_EGL_CGLETaskListMgr::RegisterTaskList(shok_EGL_CGLETaskList* tl, const char* name)
+int EGL::CGLETaskListMgr::RegisterTaskList(EGL::CGLETaskList* tl, const char* name)
 {
     int tid = TaskListManager->GetIDByNameOrCreate(name);
     if (static_cast<int>(TaskLists.size()) != tid)
         throw std::exception("ids dont match!");
     tl->TaskListID = tid;
-    shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok::Allocator<shok_EGL_CGLETaskList*>>& v) {
-        v.push_back(tl);
-        });
+    auto v = TaskLists.SaveVector();
+    v.Vector.push_back(tl);
     return tid;
 }
-void shok_EGL_CGLETaskListMgr::RemoveTaskList(int tid)
+void EGL::CGLETaskListMgr::RemoveTaskList(int tid)
 {
     if (tid) {
         if (static_cast<int>(TaskLists.size()) != tid + 1)
             throw std::exception("ids dont match!");
-        shok_EGL_CGLETaskList* tl = GetTaskListByID(tid);
-        shok_saveVector<shok_EGL_CGLETaskArgs*>(&tl->Task, [](std::vector<shok_EGL_CGLETaskArgs*, shok::Allocator<shok_EGL_CGLETaskArgs*>>& v) {
-            for (shok_EGL_CGLETaskArgs* p : v) {
-                p->Destructor(true);
+        EGL::CGLETaskList* tl = GetTaskListByID(tid);
+        {
+            auto v = tl->Task.SaveVector();
+            for (EGL::CGLETaskArgs* p : v.Vector) {
+                delete p;
             }
-            v.clear();
-            });
-        tl->Destructor(true);
-        shok_saveVector<shok_EGL_CGLETaskList*>(&TaskLists, [tl](std::vector<shok_EGL_CGLETaskList*, shok::Allocator<shok_EGL_CGLETaskList*>>& v) {
-            v.pop_back();
-            });
+            v.Vector.clear();
+        }
+        delete tl;
+        {
+            auto v = TaskLists.SaveVector();
+            v.Vector.pop_back();
+        }
         TaskListManager->RemoveID(tid);
     }
 }
@@ -70,23 +260,16 @@ void shok_EGL_CGLETaskListMgr::RemoveTaskList(int tid)
 
 const char* TaskLuaFunc = "TASK_LUA_FUNC";
 const char* TaskWaitForAnimNonCancel = "TASK_WAIT_FOR_ANIM_NON_CANCELABLE";
-void shok_taskData::AddExtraTasks()
+void EGL::TaskData::AddExtraTasks()
 {
-    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok::Allocator<shok_taskData>>& v) {
-        v.push_back(shok_taskData{ TaskLuaFunc, 0xB3F8356D, shok_Task::TASK_LUA_FUNC });
-        v.push_back(shok_taskData{ TaskWaitForAnimNonCancel, 0x230862d8, shok_Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE });
-        });
+    auto v = (*EGL::TaskData::GlobalVector)->SaveVector();
+    v.Vector.push_back(EGL::TaskData{ TaskLuaFunc, 0xB3F8356D, shok::Task::TASK_LUA_FUNC });
+    v.Vector.push_back(EGL::TaskData{ TaskWaitForAnimNonCancel, 0x230862d8, shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE });
 }
-void shok_taskData::RemoveExtraTasks()
+void EGL::TaskData::RemoveExtraTasks()
 {
-    shok_saveVector<shok_taskData>(&(*shok_taskData::GlobalVector)->TaskData, [](std::vector<shok_taskData, shok::Allocator<shok_taskData>>& v) {
-        v.erase(std::remove_if(v.begin(), v.end(), [](shok_taskData& a) {
-            return a.TaskName == TaskLuaFunc || a.TaskName == TaskWaitForAnimNonCancel;
-            }), v.end());
-        });
-}
-
-int shok_EGL_IGLEHandler_EGL_CGLETaskArgs_int::ExecuteTask(shok_EGL_CGLETaskArgs* args)
-{
-    return reinterpret_cast<shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int*>(vtable)->ExecuteTask(this, args);
+    auto v = (*EGL::TaskData::GlobalVector)->SaveVector();
+    v.Vector.erase(std::remove_if(v.Vector.begin(), v.Vector.end(), [](EGL::TaskData& a) {
+        return a.TaskName == TaskLuaFunc || a.TaskName == TaskWaitForAnimNonCancel;
+        }), v.Vector.end());
 }

@@ -761,7 +761,7 @@ bool UnlimitedArmy::ExecuteHeroAbility(EGL::CGLEEntity* e)
 	}
 	if (EGL::CGLEEntity::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
 		GGL::CCamouflageBehavior* a = e->GetBehavior<GGL::CCamouflageBehavior>();
-		if (a != nullptr && !shok_DynamicCast<GGL::CCamouflageBehavior, GGL::CThiefCamouflageBehavior>(a)) {
+		if (a != nullptr && !dynamic_cast<GGL::CThiefCamouflageBehavior*>(a)) {
 			GGL::CCamouflageBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
 			if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 				if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {

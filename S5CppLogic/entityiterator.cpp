@@ -183,17 +183,17 @@ EntityIteratorPredicateInCircle::EntityIteratorPredicateInCircle(const shok::Pos
 
 bool EntityIteratorPredicateIsSettler::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e);
+	return dynamic_cast<GGL::CSettler*>(e);
 }
 
 bool EntityIteratorPredicateIsBuilding::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(e);
+	return dynamic_cast<GGL::CBuilding*>(e);
 }
 
 bool EntityIteratorPredicateIsRelevant::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return e->PlayerId != 0 && (shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e) || shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(e));
+	return e->PlayerId != 0 && (dynamic_cast<GGL::CSettler*>(e) || dynamic_cast<GGL::CBuilding*>(e));
 }
 
 bool EntityIteratorPredicateAnyPlayer::MatchesEntity(EGL::CGLEEntity* e, float* rangeOut, int* prio) const
@@ -332,7 +332,7 @@ bool EntityIteratorPredicateIsNotFleeingFrom::MatchesEntity(EGL::CGLEEntity* e, 
 
 bool EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(EGL::CGLEEntity* e, shok::Position Center, float Range)
 {
-	if (!shok_DynamicCast<EGL::CGLEEntity, EGL::CMovingEntity>(e))
+	if (!dynamic_cast<EGL::CMovingEntity*>(e))
 		return true;
 	if (e->GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED) != 0)
 		return false;

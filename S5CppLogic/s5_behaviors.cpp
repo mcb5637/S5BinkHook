@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "s5data.h"
 
-shok_BB_CClassFactory_serializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x86A828);
+BB::SerializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A828);
 
 void __declspec(naked) bombattachment_fix() {
 	__asm {
@@ -30,7 +30,7 @@ void GGL::CBombPlacerBehavior::FixBombAttachment()
 		return;
 	FixBombAttachment_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5062C6), 10 };
-	WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
 }
 
 int (*GGL::CSniperAbility::SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) = nullptr;
@@ -69,7 +69,7 @@ void GGL::CSniperAbility::OverrideSnipeTask()
 		return;
 	OverrideSnipeTask_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 10 };
-	WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
 }
 
 static inline float(__thiscall* const battleBehaviorGetMaxRange)(GGL::CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(GGL::CBattleBehavior*)>(0x50AB43);
@@ -95,9 +95,9 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 	{
 		if (int id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING)) {
 			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
-				if (GGL::CBuilding* b = shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(t)) {
+				if (GGL::CBuilding* b = dynamic_cast<GGL::CBuilding*>(t)) {
 					int dmg;
-					if (shok_DynamicCast<GGL::CBuilding, GGL::CBridgeEntity>(b)) {
+					if (dynamic_cast<GGL::CBridgeEntity*>(b)) {
 						dmg = b->Health;
 					}
 					else {

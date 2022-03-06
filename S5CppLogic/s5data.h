@@ -130,7 +130,7 @@ namespace shok {
 		float Dot(const Position& o) const;
 		auto operator<=>(const Position& o) const = default;
 
-		static shok_BB_CClassFactory_serializationData* SerializationData;
+		static BB::SerializationData* SerializationData;
 	};
 	struct PositionRot : Position {
 		float r = 0;
@@ -150,7 +150,7 @@ namespace shok {
 		AARect Sort() const;
 
 		// uses Blocked1 and Blocked2 for the 2 members
-		static shok_BB_CClassFactory_serializationData* SerializationData;
+		static BB::SerializationData* SerializationData;
 	};
 
 	struct CostInfo { // size 18
@@ -169,7 +169,7 @@ namespace shok {
 		void SubFromType(shok::ResourceType ty, float tosub);
 		bool HasResources(const CostInfo* has) const;
 
-		static inline shok_BB_CClassFactory_serializationData* SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D668);
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x85D668);
 	};
 	static_assert(sizeof(CostInfo) == 18 * 4);
 
@@ -199,6 +199,12 @@ namespace BB {
 
 		static constexpr int TypeDesc = 0x7FFE08;
 		static constexpr int vtp = 0x7620F0;
+
+		struct _vtableS {
+			void(__thiscall* dtor)(BB::IObject* th, bool free);
+			unsigned int(__stdcall* GetClassIdentifier)(const BB::IObject* th);
+			void* (__stdcall* CastToIdentifier)(BB::IObject* th, unsigned int id);
+		};
 	};
 
 	class IPostEvent {
@@ -302,91 +308,24 @@ namespace EGL {
 	};
 }
 
-template<class T>
-inline void shok_saveVector(std::vector<T, shok::Allocator<T>>* vec, std::function<void(std::vector<T, shok::Allocator<T>> &s)> func) {
-#ifdef _DEBUG
-	std::vector<T, shok::Allocator<T>> save{};
-	int* vecPoint = reinterpret_cast<int*>(vec);
-	int* savePoint = reinterpret_cast<int*>(&save);
-	int backu[3] = {};
-	for (int i = 1; i < 4; i++) {
-		backu[i - 1] = savePoint[i];
-		savePoint[i] = vecPoint[i];
+namespace CppLogic {
+	template<class T>
+	void* GetVTable(T* obj) {
+		struct O {
+			void* vt;
+		};
+		return reinterpret_cast<O*>(obj)->vt;
 	}
-	func(save);
-	for (int i = 1; i < 4; i++) {
-		vecPoint[i] = savePoint[i];
-		savePoint[i] = backu[i - 1];
+
+	template<class T>
+	bool ContainsValue(const T* data, const T search, int num) {
+		for (int i = 0; i < num; i++)
+			if (data[i] == search)
+				return true;
+		return false;
 	}
-#else
-	func(*vec);
-#endif
+
 }
-template<class T>
-inline void shok_saveList(std::list<T, shok::Allocator<T>>* vec, std::function<void(std::list<T, shok::Allocator<T>>& s)> func) {
-#ifdef _DEBUG
-	std::list<T, shok::Allocator<T>> save{};
-	int* vecPoint = reinterpret_cast<int*>(vec);
-	int* savePoint = reinterpret_cast<int*>(&save);
-	int backu[2] = {};
-	for (int i = 1; i < 3; i++) {
-		backu[i - 1] = savePoint[i];
-		savePoint[i] = vecPoint[i];
-	}
-	func(save);
-	for (int i = 1; i < 3; i++) {
-		vecPoint[i] = savePoint[i];
-		savePoint[i] = backu[i - 1];
-	}
-#else
-	func(*vec);
-#endif
-}
-
-// casts shok objects with runtime type chek. you can only cast objects that have a vtable (does not have to be known) and a known RTTI TypeDesc set in the class.
-// works almost the same way as dynamic_cast, just you can only cast pointers and you have to specify both current type and target type (without pointer).
-// example:
-// EGL::CGLEEntity* e = ...;
-// GGL::CSettler* sett = shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(e);
-// if (sett) { ...
-template<class CastFrom, class CastTo>
-inline CastTo* shok_DynamicCast(CastFrom* i) {
-	void* (__cdecl* const shok_dyncastFunc)(void* i, int off, int TypeDescSource, int TypeDescOut, bool isref) = reinterpret_cast<void* (__cdecl* const)(void*, int, int, int, bool)>(0x5C36EE);
-	return static_cast<CastTo*>(shok_dyncastFunc(i, 0, CastFrom::TypeDesc, CastTo::TypeDesc, false));
-}
-
-struct shok_object {
-	int vtable;
-};
-struct shok_BB_IObject : shok_object {
-
-	void Destructor(bool free); // not everything should be destroyed with this destructor, make sure there is not somenting extra for your type in question
-	unsigned int GetIdentifier() const;
-
-	static constexpr int TypeDesc = 0x7FFE08;
-	static constexpr int vtp = 0x7620F0;
-	// no identifier
-};
-
-struct shok_vtable_BB_IObject {
-	void(__thiscall* dtor)(shok_BB_IObject* th, bool free);
-	unsigned int(__thiscall* GetClassIdentifier)(const shok_BB_IObject* th);
-	PADDINGI(1); // unknown, thiscall (th, x,x), cast to identifier?
-};
-
-struct shok_BB_IPostEvent : shok_object {
-
-};
-
-template<class T>
-bool contains(const T* data, const T search, int num) {
-	for (int i = 0; i < num; i++)
-		if (data[i] == search)
-			return true;
-	return false;
-}
-
-const char* (__cdecl* const shok_GetStringTableText)(const char* key) = reinterpret_cast<const char* (__cdecl* const)(const char*)>(0x556D2E);
 
 
 enum class win_mouseEvents : int {
@@ -441,25 +380,32 @@ enum class win_mouseEvents : int {
 #include "s5tasklist.h"
 #include "s5classfactory.h"
 
-static inline void(_stdcall* const shok_SetHighPrecFPU)() = reinterpret_cast<void(_stdcall*)()>(0x5C8451);
+namespace shok {
+	const char* (__cdecl* const GetStringTableText)(const char* key) = reinterpret_cast<const char* (__cdecl* const)(const char*)>(0x556D2E);
+	extern const char* (*GetStringTableTextOverride)(const char* s);
+	void HookGetStringTableText();
 
-static inline int(__stdcall* const shok_loadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = reinterpret_cast<int(__stdcall*)(lua_State*, const char*, size_t, const char*)>(0x59BE57);
+	static inline void(_stdcall* const SetHighPrecFPU)() = reinterpret_cast<void(_stdcall*)()>(0x5C8451);
 
+	static inline int(__stdcall* const LoadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = reinterpret_cast<int(__stdcall*)(lua_State*, const char*, size_t, const char*)>(0x59BE57);
 
-extern lua_State* mainmenu_state;
-static inline HWND* shok_mainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
+	extern lua_State* LuaStateMainmenu;
+	static inline HWND* MainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
 
-void RedirectCall(void* call, void* redirect);
-void RedirectCallVP(void* call, void* redirect);
-long long WriteJump(void* adr, void* toJump);
-static_assert(sizeof(long long) == 8);
+	void HookTextPrinting();
+}
 
-bool HasSCELoader();
+namespace CppLogic::Hooks {
+	void RedirectCall(void* call, void* redirect);
+	void RedirectCallVP(void* call, void* redirect);
+	long long WriteJump(void* adr, void* toJump);
+	static_assert(sizeof(long long) == 8);
+}
 
-extern const char* (*GetStringTableTextOverride)(const char* s);
-void HookGetStringTableText();
+namespace CppLogic {
+	bool HasSCELoader();
+}
 
-void HookTextPrinting();
 
 template<class T>
 constexpr inline T rad2deg(T r) {

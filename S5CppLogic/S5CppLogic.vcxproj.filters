@@ -49,6 +49,9 @@
     <Filter Include="shok\sound">
       <UniqueIdentifier>{dffe835b-2c01-4134-ab45-63db55ea84a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="luafuncs">
+      <UniqueIdentifier>{5eb05b2f-be0b-468d-8590-292f15d17f28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -60,16 +63,7 @@
     <ClInclude Include="luaimport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s5data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="luaext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="l_mem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="l_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="l_effect.h">
@@ -99,13 +93,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s5classfactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="entityiterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Luapp\constexprTypename.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="s5_mem.h">
@@ -210,6 +198,21 @@
     <ClInclude Include="s5tasklist.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
+    <ClInclude Include="Luapp\constexprTypename.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="s5classfactory.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5data.h">
+      <Filter>shok</Filter>
+    </ClInclude>
+    <ClInclude Include="l_api.h">
+      <Filter>luafuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="l_mem.h">
+      <Filter>luafuncs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -219,15 +222,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="luaext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="s5data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="l_mem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="l_api.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="l_effect.cpp">
@@ -252,9 +246,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="l_ui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="s5classfactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="entityiterator.cpp">
@@ -334,6 +325,18 @@
     </ClCompile>
     <ClCompile Include="s5tasklist.cpp">
       <Filter>shok\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="s5classfactory.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5data.cpp">
+      <Filter>shok</Filter>
+    </ClCompile>
+    <ClCompile Include="l_api.cpp">
+      <Filter>luafuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="l_mem.cpp">
+      <Filter>luafuncs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

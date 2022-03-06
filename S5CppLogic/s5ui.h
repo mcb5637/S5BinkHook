@@ -40,7 +40,7 @@ namespace EGL {
 		// 12 more vfunc
 		static inline constexpr int vtp = 0x7837D0;
 	};
-	class CGLEGUIInterface : public shok_object {
+	class CGLEGUIInterface : public IGLEGUIInterface {
 	public:
 		static inline constexpr int vtp = 0x783840;
 	};
@@ -191,7 +191,7 @@ namespace GGUI {
 		GGL::CGLGUIInterface* GUIInterface; // 8
 		EGL::CGLETerrainHiRes* TerrainHiRes;
 	private:
-		shok_BB_IPostEvent* PostEvent;
+		BB::IPostEvent* PostEvent;
 	public:
 		shok::Vector<int> SelectedEntities; //11
 		int ControlledPlayer; // 15

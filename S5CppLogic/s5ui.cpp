@@ -3,7 +3,7 @@
 #include "entityiterator.h"
 
 struct shok_vtable_BB_IPostEvent {
-	void(__stdcall* PostEvent)(shok_BB_IPostEvent* th, BB::CEvent* ev);
+	void(__stdcall* PostEvent)(BB::IPostEvent* th, BB::CEvent* ev);
 };
 
 struct shok_vtable_GGL_CGLGUIInterface {
@@ -37,10 +37,10 @@ bool GGL::CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const 
 	return GetNearestFreePosForBuildingPlacement(ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);
 }
 
-void(__stdcall* PostEventOrig)(shok_BB_IPostEvent* th, BB::CEvent* ev) = nullptr;
+void(__stdcall* PostEventOrig)(BB::IPostEvent* th, BB::CEvent* ev) = nullptr;
 shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
 bool(*GGUI::CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;
-void __stdcall PostEventHook(shok_BB_IPostEvent* th, BB::CEvent* ev) {
+void __stdcall PostEventHook(BB::IPostEvent* th, BB::CEvent* ev) {
 	if (GGUI::CManager::PostEventCallback)
 		if (GGUI::CManager::PostEventCallback(ev))
 			return;
@@ -52,10 +52,10 @@ void GGUI::CManager::HackPostEvent()
 		shok::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
 	}
-	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(PostEvent->vtable);
+	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(CppLogic::GetVTable(PostEvent));
 	shok::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
-	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(shok_BB_IPostEvent * th, BB::CEvent * ev)>(&PostEventHook);
+	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(BB::IPostEvent * th, BB::CEvent * ev)>(&PostEventHook);
 }
 
 static inline int* (* const modifpressed_getobj)() = reinterpret_cast<int* (*)()>(0x558C16);

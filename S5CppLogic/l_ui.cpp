@@ -146,7 +146,7 @@ int l_uiOverrideUpdateFunc(lua_State* L) {
 
 int l_uiGetAllSubWidgets(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	lua_newtable(L);
 	int i = 1;
@@ -160,7 +160,7 @@ int l_uiGetAllSubWidgets(lua_State* L) {
 
 int l_ui_IsContainerWid(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	if (shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid))
+	if (dynamic_cast<EGUIX::CContainerWidget*>(wid))
 		lua_pushboolean(L, true);
 	else
 		lua_pushboolean(L, false);
@@ -344,14 +344,14 @@ int l_uiSetWidgetStringFrameDistance(lua_State* L) {
 
 int l_uiGetStaticTextWidgetLineDistanceFactor(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CStaticTextWidget* tw = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticTextWidget>(wid);
+	EGUIX::CStaticTextWidget* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
 	luaext_assertPointer(L, tw, "no static text widget");
 	lua_pushnumber(L, tw->LineDistanceFactor);
 	return 1;
 }
 int l_uiSetStaticTextWidgetLineDistanceFactor(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CStaticTextWidget* tw = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticTextWidget>(wid);
+	EGUIX::CStaticTextWidget* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
 	luaext_assertPointer(L, tw, "no static text widget");
 	tw->LineDistanceFactor = luaL_checkfloat(L, 2);
 	return 0;
@@ -386,7 +386,7 @@ int l_uiSetWidgetGroup(lua_State* L) {
 
 int l_uiCreateStaticWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -400,7 +400,7 @@ int l_uiCreateStaticWidget(lua_State* L) {
 }
 int l_uiCreateStaticTextWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -414,7 +414,7 @@ int l_uiCreateStaticTextWidget(lua_State* L) {
 }
 int l_uiCreatePureTooltipWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -428,7 +428,7 @@ int l_uiCreatePureTooltipWidget(lua_State* L) {
 }
 int l_uiCreateGFXButtonWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -442,7 +442,7 @@ int l_uiCreateGFXButtonWidget(lua_State* L) {
 }
 int l_uiCreateTextButtonWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -456,7 +456,7 @@ int l_uiCreateTextButtonWidget(lua_State* L) {
 }
 int l_uiCreateProgessBarWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -470,7 +470,7 @@ int l_uiCreateProgessBarWidget(lua_State* L) {
 }
 int l_uiCreateContainerWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -484,7 +484,7 @@ int l_uiCreateContainerWidget(lua_State* L) {
 }
 int l_ui_CreateCustomWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* c = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	luaext_assertPointer(L, c, "no container widget");
 	const char* name = luaL_checkstring(L, 2);
 	luaext_assert(L, EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) == 0, "name already in use");
@@ -492,7 +492,7 @@ int l_ui_CreateCustomWidget(lua_State* L) {
 	const char* customname = luaL_check_string(L, 3);
 	if (!lua_isnoneornil(L, 4))
 		bef = l_uiCheckWid(L, 4);
-	EGUIX::CCustomWidget* ne = (*shok_BB_CClassFactory::GlobalObj)->CreateObject<EGUIX::CCustomWidget>();
+	EGUIX::CCustomWidget* ne = (*BB::CClassFactory::GlobalObj)->CreateObject<EGUIX::CCustomWidget>();
 	c->AddWidget(ne, name, bef);
 	ne->CustomClassName.assign(customname);
 	ne->IntegerUserVariable0DefaultValue = luaL_optint(L, 5, 0);
@@ -540,7 +540,7 @@ int l_uiSetFontValues(lua_State* L) {
 
 int l_uiRemoveWidget(lua_State* L) {
 	EGUIX::CBaseWidget* wid = l_uiCheckWid(L, 1);
-	EGUIX::CContainerWidget* cw = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CContainerWidget>(wid);
+	EGUIX::CContainerWidget* cw = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 	if (cw)
 		luaext_assert(L, cw->WidgetListHandler.SubWidgets.size() == 0, "container widget has to be empty");
 	//EGUIX::WidgetManager::GlobalObj()->RemoveWidget(wid);
@@ -558,7 +558,7 @@ int l_uiTest(lua_State* L) {
 }
 
 int l_ui_SetCharTrigger(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
 		EGUIX::UIInput_Char_Callback = nullptr;
@@ -595,7 +595,7 @@ int l_ui_SetCharTrigger(lua_State* L) {
 	return 0;
 }
 int l_ui_SetKeyTrigger(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
 		EGUIX::UIInput_Key_Callback = nullptr;
@@ -632,7 +632,7 @@ int l_ui_SetKeyTrigger(lua_State* L) {
 	return 0;
 }
 int l_ui_SetMouseTrigger(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
 		EGUIX::UIInput_Mouse_Callback = nullptr;
@@ -686,7 +686,7 @@ int l_ui_SetMouseTrigger(lua_State* L) {
 	return 0;
 }
 int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
 		EGUIX::UIInput_Mouse_CallbackMainMenu = nullptr;
@@ -710,7 +710,7 @@ int l_ui_SetMouseTriggerMainMenu(lua_State* L) {
 			if ((*Framework::CMain::GlobalObj)->CurrentMode != 1)
 				return false;
 
-			lua_State* L = mainmenu_state;
+			lua_State* L = shok::LuaStateMainmenu;
 			int t = lua_gettop(L);
 			bool r = false;
 
@@ -750,7 +750,7 @@ int l_ui_ShowResFloatie(lua_State* L) {
 
 int l_ui_GetClientSize(lua_State* L) {
 	RECT r;
-	if (GetClientRect(*shok_mainWindowHandle, &r)) {
+	if (GetClientRect(*shok::MainWindowHandle, &r)) {
 		lua_pushnumber(L, r.right);
 		lua_pushnumber(L, r.bottom);
 		return 2;
@@ -880,7 +880,7 @@ namespace CppLogic::UI {
 	{
 		// add class to factory, best called on mainmenu lua state initialization (will be called before anything serious gets loaded)
 		// map lua state initialization will be to late, as most stuff is already loaded there
-		(*shok_BB_CClassFactory::GlobalObj)->AddClassToFactory(GUIState_LuaSelection::Identifier, "class CppLogic::GuiState_LuaSelection", &GUIState_LuaSelection::Create, nullptr);
+		(*BB::CClassFactory::GlobalObj)->AddClassToFactory(GUIState_LuaSelection::Identifier, "class CppLogic::GuiState_LuaSelection", &GUIState_LuaSelection::Create, nullptr);
 	}
 	
 	void GUIState_LuaSelection::Cancel(bool calllua)
@@ -973,7 +973,7 @@ void l_ui_init(lua_State* L)
 	luaext_registerFunc(L, "GetLandscapePosAtScreenPos", &l_ui_GetLandscapePosAtScreenPos);
 	luaext_registerFunc(L, "ShowCommandAcknowledgementAtPosition", &l_ui_ShowCommandAckAtPos);
 
-	if (L == mainmenu_state) {
+	if (L == shok::LuaStateMainmenu) {
 		luaext_registerFunc(L, "SetMouseTriggerMainMenu", &l_ui_SetMouseTriggerMainMenu);
 		CppLogic::UI::GUIState_LuaSelection::Initialize();
 	}

@@ -82,15 +82,15 @@ void GGUI::CPlaceBuildingState::HookPlacementRotation()
 		return;
 	HookConstructCommandRotation_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x538FF4), 10 };
-	WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding);
 	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x5389FB), 10 };
-	WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
 	shok::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
-	WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
 	shok::SaveVirtualProtect vp4{ reinterpret_cast<void*>(0x538BDB), 10 };
-	WriteJump(reinterpret_cast<void*>(0x538BDB), &constructcommand_checkpos);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538BDB), &constructcommand_checkpos);
 	shok::SaveVirtualProtect vp5{ reinterpret_cast<void*>(0x538C8D), 10 };
-	RedirectCall(reinterpret_cast<void*>(0x538C8D), &constructcommand_updatemodelsetpos_over);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x538C8D), &constructcommand_updatemodelsetpos_over);
 }
 
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(int ety, const shok::Position& p, float range)

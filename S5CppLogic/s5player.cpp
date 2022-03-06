@@ -55,11 +55,11 @@ void GGL::CPlayerAttractionHandler::HookCheckPayday()
 {
 	if (HookCheckPayday_Hooked)
 		return;
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		DEBUGGER_BREAK;
 	HookCheckPayday_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 10 };
-	WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday);
 }
 
 static inline int(__thiscall* const upgrademanager_getucatbybuilding)(GGL::CUpgradeManager* th, int id) = reinterpret_cast<int(__thiscall*)(GGL::CUpgradeManager*, int)>(0x4B3CA6);
@@ -149,5 +149,5 @@ void GGL::CPlayerStatus::HookCanPlaceBuilding()
 		return;
 	HookCanPlaceBuilding_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B45B9), 10 };
-	WriteJump(reinterpret_cast<void*>(0x4B45B9), &canplacebuildingasm);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B45B9), &canplacebuildingasm);
 }

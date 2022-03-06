@@ -3,17 +3,17 @@
 
 bool GGlue::CGlueEntityProps::IsSettlerType() const
 {
-	return shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(LogicProps);
+	return dynamic_cast<GGL::CGLSettlerProps*>(LogicProps);
 }
 
 bool GGlue::CGlueEntityProps::IsBuildingType() const
 {
-	return shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLBuildingProps>(LogicProps);
+	return dynamic_cast<GGL::CGLBuildingProps*>(LogicProps);
 }
 
 bool GGlue::CGlueEntityProps::IsCEntityProperties() const
 {
-	return shok_DynamicCast<EGL::CGLEEntityProps, GGL::CEntityProperties>(LogicProps);
+	return dynamic_cast<GGL::CEntityProperties*>(LogicProps);
 }
 
 bool GGlue::CGlueEntityProps::IsOfCategory(shok::EntityCategory cat) const

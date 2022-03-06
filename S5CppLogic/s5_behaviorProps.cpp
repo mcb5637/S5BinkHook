@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "s5data.h"
 
-shok_BB_CClassFactory_serializationData* EGL::CGLEBehaviorProps::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x86A768);
+BB::SerializationData* EGL::CGLEBehaviorProps::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A768);
 
 bool GGL::CRangedEffectAbilityProps::IsDefensive() const
 {

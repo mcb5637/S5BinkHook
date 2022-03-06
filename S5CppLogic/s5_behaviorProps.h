@@ -9,7 +9,7 @@ namespace EGL {
 		static inline constexpr int vtp = 0x772A2C;
 		static inline constexpr int TypeDesc = 0x813728;
 
-		static shok_BB_CClassFactory_serializationData* SerializationData;
+		static BB::SerializationData* SerializationData;
 	};
 	static_assert(offsetof(EGL::CGLEBehaviorProps, BehaviorIndex) == 2 * 4);
 

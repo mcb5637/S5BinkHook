@@ -99,7 +99,7 @@ float shok::Position::Dot(const shok::Position& o) const
 {
 	return this->X * o.X + this->Y * o.Y;
 }
-shok_BB_CClassFactory_serializationData* shok::Position::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85D9B0);
+BB::SerializationData* shok::Position::SerializationData = reinterpret_cast<BB::SerializationData*>(0x85D9B0);
 
 shok::AARect shok::AARect::operator+(const shok::AARect& other) const
 {
@@ -134,7 +134,7 @@ shok::AARect shok::AARect::Sort() const
 		std::swap(r.high.Y, r.low.Y);
 	return r;
 }
-shok_BB_CClassFactory_serializationData* shok::AARect::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x85DA90);
+BB::SerializationData* shok::AARect::SerializationData = reinterpret_cast<BB::SerializationData*>(0x85DA90);
 
 shok::Color::Color(int r, int g, int b, int a)
 {
@@ -149,7 +149,7 @@ void* __stdcall BB::IObject::CastToIdentifier(unsigned int id)
 	return nullptr;
 }
 
-void RedirectCall(void* call, void* redirect) {
+void CppLogic::Hooks::RedirectCall(void* call, void* redirect) {
 	byte* opcode = reinterpret_cast<byte*>(call);
 	if (*opcode==0xFF && opcode[1]==0x15) { // call by address
 		*opcode = 0xE8; // call
@@ -161,12 +161,12 @@ void RedirectCall(void* call, void* redirect) {
 	int* adr = reinterpret_cast<int*>(opcode + 1);
 	*adr = reinterpret_cast<int>(redirect) - reinterpret_cast<int>(adr + 1); // address relative to next instruction
 }
-void RedirectCallVP(void* call, void* redirect)
+void CppLogic::Hooks::RedirectCallVP(void* call, void* redirect)
 {
 	shok::SaveVirtualProtect vp{ call, 10 };
-	RedirectCall(call, redirect);
+	CppLogic::Hooks::RedirectCall(call, redirect);
 }
-long long WriteJump(void* adr, void* toJump) {
+long long CppLogic::Hooks::WriteJump(void* adr, void* toJump) {
 	long long r = *reinterpret_cast<long long*>(adr);
 	byte* opcode = reinterpret_cast<byte*>(adr);
 	*opcode = 0xE9; // jmp
@@ -175,7 +175,7 @@ long long WriteJump(void* adr, void* toJump) {
 	return r;
 }
 
-lua_State* mainmenu_state = nullptr;
+lua_State* shok::LuaStateMainmenu = nullptr;
 
 
 static inline float(__thiscall* const costinfo_getres)(const shok::CostInfo* th, shok::ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(const shok::CostInfo*, shok::ResourceType, bool)>(0x4A9606);
@@ -202,25 +202,16 @@ bool shok::CostInfo::HasResources(const shok::CostInfo* has) const
 	return constinfo_hasres(this, has);
 }
 
-void shok_BB_IObject::Destructor(bool free)
-{
-	reinterpret_cast<shok_vtable_BB_IObject*>(vtable)->dtor(this, free);
-}
-unsigned int shok_BB_IObject::GetIdentifier() const
-{
-	return reinterpret_cast<shok_vtable_BB_IObject*>(vtable)->GetClassIdentifier(this);
-}
-
-bool HasSCELoader()
+bool CppLogic::HasSCELoader()
 {
 	return GetModuleHandle("SCELoader.dll");
 }
 
-const char* (*GetStringTableTextOverride)(const char* s) = nullptr;
+const char* (*shok::GetStringTableTextOverride)(const char* s) = nullptr;
 const char* __stdcall hookstt(const char* s) {
-	if (!GetStringTableTextOverride)
+	if (!shok::GetStringTableTextOverride)
 		return nullptr;
-	return GetStringTableTextOverride(s);
+	return shok::GetStringTableTextOverride(s);
 }
 void __declspec(naked) hooksttasm() {
 	__asm {
@@ -239,15 +230,15 @@ void __declspec(naked) hooksttasm() {
 	}
 }
 bool HookGetStringTableText_Hooked = false;
-void HookGetStringTableText()
+void shok::HookGetStringTableText()
 {
 	if (HookGetStringTableText_Hooked)
 		return;
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		DEBUGGER_BREAK;
 	HookGetStringTableText_Hooked = true;
-	shok::SaveVirtualProtect vp{ shok_GetStringTableText , 10 };
-	WriteJump(shok_GetStringTableText, &hooksttasm);
+	shok::SaveVirtualProtect vp{ shok::GetStringTableText , 10 };
+	CppLogic::Hooks::WriteJump(shok::GetStringTableText, &hooksttasm);
 }
 
 void __declspec(naked) textprinting_getstringlen() {
@@ -311,13 +302,13 @@ void __declspec(naked) textprinting_getstringlen() {
 	}
 }
 bool HookTextPrinting_Hooked = false;
-void HookTextPrinting()
+void shok::HookTextPrinting()
 {
 	if (HookTextPrinting_Hooked)
 		return;
 	HookTextPrinting_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x557E47), 10 };
 	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x708F60), 10 };
-	WriteJump(reinterpret_cast<void*>(0x557E47), reinterpret_cast<void*>(0x557DAA)); // continue checking @ after center,... (redirecting an existing jmp, and removing a push for a previous parameter)
-	WriteJump(reinterpret_cast<void*>(0x708F60), &textprinting_getstringlen);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x557E47), reinterpret_cast<void*>(0x557DAA)); // continue checking @ after center,... (redirecting an existing jmp, and removing a push for a previous parameter)
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x708F60), &textprinting_getstringlen);
 }

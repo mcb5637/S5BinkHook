@@ -1,7 +1,76 @@
 #include "pch.h"
 #include "luaext.h"
-#include "luaimport.h"
-#include "s5data.h"
+
+luaext::EState::EState(lua::State L) : lua::State(L.GetState())
+{
+}
+luaext::EState::EState(lua_State* L) : lua::State(L)
+{
+}
+
+EGL::CGLEEntity* luaext::EState::CheckEntity(int i)
+{
+	EGL::CGLEEntity* d = OptEntity(i);
+	if (!d)
+		ThrowLuaFormatted("no entity at argument %d", i);
+	return d;
+}
+EGL::CGLEEntity* luaext::EState::OptEntity(int i)
+{
+	int id = 0;
+	if (IsString(i)) {
+		id = EGL::CGLEEntity::GetEntityIDByScriptName(ToString(i));
+	}
+	else if (IsNumber(i)) {
+		id = ToInteger(i);
+	}
+	if (id == 0)
+		return nullptr;
+	return EGL::CGLEEntity::GetEntityByID(id);
+}
+
+GGL::CSettler* luaext::EState::CheckSettler(int i)
+{
+	GGL::CSettler* s = OptSettler(i);
+	if (!s)
+		ThrowLuaFormatted("no settler at argument %d", i);
+	return s;
+}
+GGL::CSettler* luaext::EState::OptSettler(int i)
+{
+	return dynamic_cast<GGL::CSettler*>(OptEntity(i));
+}
+
+GGL::CBuilding* luaext::EState::CheckBuilding(int i)
+{
+	GGL::CBuilding* b = OptBuilding(i);
+	if (!b)
+		ThrowLuaFormatted("no building at argument %d", i);
+	return b;
+}
+GGL::CBuilding* luaext::EState::OptBuilding(int i)
+{
+	return dynamic_cast<GGL::CBuilding*>(OptEntity(i));
+}
+
+GGL::CResourceDoodad* luaext::EState::CheckResourceDoodad(int i)
+{
+	GGL::CResourceDoodad* d = OptResourceDoodad(i);
+	if (!d)
+		ThrowLuaFormatted("no resource entity at argument %d", i);
+	return d;
+}
+GGL::CResourceDoodad* luaext::EState::OptResourceDoodad(int i)
+{
+	return dynamic_cast<GGL::CResourceDoodad*>(OptEntity(i));
+}
+
+int luaext::EState::OptEntityId(int i)
+{
+	EGL::CGLEEntity* e = OptEntity(i);
+	return e ? e->EntityId : 0;
+}
+
 
 void luaext_registerFunc(lua_State* L, const char* name, lua_CFunction func)
 {
@@ -53,7 +122,7 @@ GGL::CSettler* luaext_optSettler(lua_State* L, int ind) {
 	EGL::CGLEEntity* d = luaext_optEntity(L, ind);
 	if (d == nullptr)
 		return nullptr;
-	return shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(d);
+	return dynamic_cast<GGL::CSettler*>(d);
 }
 
 GGL::CSettler* luaext_checkSettler(lua_State* L, int ind) {
@@ -67,7 +136,7 @@ GGL::CBuilding* luaext_optBuilding(lua_State* L, int ind) {
 	EGL::CGLEEntity* d = luaext_optEntity(L, ind);
 	if (d == nullptr)
 		return nullptr;
-	return shok_DynamicCast<EGL::CGLEEntity, GGL::CBuilding>(d);
+	return dynamic_cast<GGL::CBuilding*>(d);
 }
 
 GGL::CBuilding* luaext_checkBulding(lua_State* L, int ind) {
@@ -81,7 +150,7 @@ GGL::CResourceDoodad* luaext_optResourceDoodad(lua_State* L, int ind) {
 	EGL::CGLEEntity* d = luaext_optEntity(L, ind);
 	if (d == nullptr)
 		return nullptr;
-	return shok_DynamicCast<EGL::CGLEEntity, GGL::CResourceDoodad>(d);
+	return dynamic_cast<GGL::CResourceDoodad*>(d);
 }
 
 GGL::CResourceDoodad* luaext_checkResourceDoodad(lua_State* L, int ind) {

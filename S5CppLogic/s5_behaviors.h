@@ -17,7 +17,7 @@ namespace EGL {
 
 	public:
 		static inline constexpr int TypeDesc = 0x813778;
-		static shok_BB_CClassFactory_serializationData* SerializationData;
+		static BB::SerializationData* SerializationData;
 	};
 
 	class CCoarsePath {

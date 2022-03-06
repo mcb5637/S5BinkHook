@@ -394,7 +394,7 @@ int l_settlerSetOvereadWidget(lua_State* L) {
 
 int l_movingEntityGetTargetPos(lua_State* L) {
 	EGL::CGLEEntity* e = luaext_checkEntity(L, 1);
-	EGL::CMovingEntity* m = shok_DynamicCast<EGL::CGLEEntity, EGL::CMovingEntity>(e);
+	EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e);
 	luaext_assertPointer(L, m, "no moving entity at 1");
 	luaext_pushPos(L, m->TargetPosition);
 	if (m->TargetRotationValid) {
@@ -406,7 +406,7 @@ int l_movingEntityGetTargetPos(lua_State* L) {
 }
 int l_movingEntitySetTargetPos(lua_State* L) {
 	EGL::CGLEEntity* e = luaext_checkEntity(L, 1);
-	EGL::CMovingEntity* m = shok_DynamicCast<EGL::CGLEEntity, EGL::CMovingEntity>(e);
+	EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e);
 	luaext_assertPointer(L, m, "no moving entity at 1");
 	luaext_checkPos(L, m->TargetPosition, 2);
 	lua_pushstring(L, "r");
@@ -435,7 +435,7 @@ int l_settlerHeroCamouflageSetDurationLeft(lua_State* L) {
 	GGL::CSettler* s = luaext_checkSettler(L, 1);
 	GGL::CCamouflageBehavior* c = s->GetBehavior<GGL::CCamouflageBehavior>();
 	luaext_assertPointer(L, c, "no camo hero at 1");
-	luaext_assert(L, !shok_DynamicCast<GGL::CCamouflageBehavior, GGL::CThiefCamouflageBehavior>(c), "thief at 1, use ThiefSetCamouflageTimeTo instead");
+	luaext_assert(L, !dynamic_cast<GGL::CThiefCamouflageBehavior*>(c), "thief at 1, use ThiefSetCamouflageTimeTo instead");
 	c->InvisibilityRemaining = luaL_checkint(L, 2);
 	return 1;
 }
@@ -762,7 +762,7 @@ int l_settlerActivateCamo(lua_State* L) {
 	luaext_assertEntityAlive(L, e->EntityId, "entity dead at 1");
 	GGL::CCamouflageBehavior* b = e->GetBehavior<GGL::CCamouflageBehavior>();
 	luaext_assertPointer(L, b, "no matching ability at 1");
-	luaext_assert(L, !shok_DynamicCast<GGL::CCamouflageBehavior, GGL::CThiefCamouflageBehavior>(b), "thief camo cannot be manually activated");
+	luaext_assert(L, !dynamic_cast<GGL::CThiefCamouflageBehavior*>(b), "thief camo cannot be manually activated");
 	GGL::CCamouflageBehaviorProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
 	luaext_assert(L, b->SecondsCharged >= bp->RechargeTimeSeconds, "ability not ready at 1");
 	e->HeroAbilityActivateCamoflage();
@@ -993,7 +993,7 @@ int l_buildingFoundryBuildCannon(lua_State* L) {
 	}
 	luaext_assert(L, found, "foundry cannot build entitytype");
 	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
-	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(t->LogicProps)->Cost), "missing res");
+	luaext_assert(L, p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(t->LogicProps)->Cost), "missing res");
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	b->CommandBuildCannon(ety);
 	return 0;
@@ -1062,9 +1062,9 @@ int l_settlerSerfExtract(lua_State* L) {
 	GGL::CSettler* s = luaext_checkSettler(L, 1);
 	EGL::CGLEEntity* b = luaext_checkEntity(L, 2);
 	luaext_assertPointer(L, s->GetBehavior<GGL::CSerfBehavior>(), "no serf");
-	if (!shok_DynamicCast<EGL::CGLEEntity, GGL::CResourceDoodad>(b))
+	if (!dynamic_cast<GGL::CResourceDoodad*>(b))
 		b = EGL::CGLEEntity::ReplaceEntityWithResourceEntity(b);
-	if (b == nullptr || !shok_DynamicCast<EGL::CGLEEntity, GGL::CResourceDoodad>(b)) {
+	if (b == nullptr || !dynamic_cast<GGL::CResourceDoodad*>(b)) {
 		return luaL_error(L, "no resource entity");
 	}
 	s->SerfExtractResource(b->EntityId);
@@ -1140,7 +1140,7 @@ int l_buildingBuySoldierForLeader(lua_State* L) {
 	luaext_assert(L, curr < max, "no free soldier slot left");
 	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	GGL::CGLSettlerProps* sprop = shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(solty->LogicProps);
+	GGL::CGLSettlerProps* sprop = dynamic_cast<GGL::CGLSettlerProps*>(solty->LogicProps);
 	luaext_assertPointer(L, sprop, "error: soldier no settler type");
 	luaext_assert(L, p->CurrentResources.HasResources(&sprop->Cost), "missing res");
 	b->CommandRecruitSoldierForLeader(s->EntityId);
@@ -1215,7 +1215,7 @@ int l_buildingHQBuySerf(lua_State* L) {
 	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
 	GGlue::CGlueEntityProps* solty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
-	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(solty->LogicProps)->Cost), "missing res");
+	luaext_assert(L, p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(solty->LogicProps)->Cost), "missing res");
 	b->HQBuySerf();
 	return 0;
 }
@@ -1324,7 +1324,7 @@ int l_buildingMerchantOfferSetData(lua_State* L) {
 }
 
 int l_entitySetMaxHP(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity* b = luaext_checkEntity(L, 1);
 	EGL::CGLEEntity::HookDestroyEntity();
@@ -1349,7 +1349,7 @@ int l_entityCloneAddData(lua_State* L) {
 	return 0;
 }
 int l_entity_SetDamage(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity* b = luaext_checkEntity(L, 1);
 	EGL::CGLEEntity::HookDamageMod();
@@ -1359,7 +1359,7 @@ int l_entity_SetDamage(lua_State* L) {
 	return 0;
 }
 int l_entity_SetArmor(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity* b = luaext_checkEntity(L, 1);
 	EGL::CGLEEntity::HookArmorMod();
@@ -1369,7 +1369,7 @@ int l_entity_SetArmor(lua_State* L) {
 	return 0;
 }
 int l_entity_SetExploration(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity* b = luaext_checkEntity(L, 1);
 	EGL::CGLEEntity::HookExplorationMod();
@@ -1379,7 +1379,7 @@ int l_entity_SetExploration(lua_State* L) {
 	return 0;
 }
 int l_leader_SetRegen(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	GGL::CSettler* b = luaext_checkSettler(L, 1);
 	luaext_assertPointer(L, b->GetBehavior<GGL::CLeaderBehavior>(), "no leader");
@@ -1393,7 +1393,7 @@ int l_leader_SetRegen(lua_State* L) {
 	return 0;
 }
 int l_entity_SetAutoAttackMaxRange(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity* b = luaext_checkEntity(L, 1);
 	EGL::CGLEEntity::HookMaxRange();
@@ -1403,7 +1403,7 @@ int l_entity_SetAutoAttackMaxRange(lua_State* L) {
 	return 0;
 }
 int l_entity_SetDisplayName(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity* b = luaext_checkEntity(L, 1);
 	EGL::CGLEEntity::HookDisplayName();
@@ -1423,7 +1423,7 @@ int l_entity_GetDisplayName(lua_State* L) {
 }
 
 int l_leader_GetRegen(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	GGL::CSettler* b = luaext_checkSettler(L, 1);
 	luaext_assertPointer(L, b->GetBehavior<GGL::CLeaderBehavior>(), "no leader");
@@ -1433,7 +1433,7 @@ int l_leader_GetRegen(lua_State* L) {
 }
 
 int l_settler_EnableRangedEffectSoldierHeal(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity::HookRangedEffectActivateHeal(lua_toboolean(L, 1));
 	return 0;
@@ -1478,7 +1478,7 @@ int l_building_BarracksBuyLeaderByType(lua_State* L) {
 	luaext_assert(L, e->IsIdle(true), "building not idle");
 	GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
 	luaext_assert(L, p->PlayerAttractionHandler->GetAttractionUsage() < p->PlayerAttractionHandler->GetAttractionLimit(), "pop capped");
-	luaext_assert(L, p->CurrentResources.HasResources(&shok_DynamicCast<EGL::CGLEEntityProps, GGL::CGLSettlerProps>(ety->LogicProps)->Cost), "missing res");
+	luaext_assert(L, p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost), "missing res");
 	if (!lua_toboolean(L, 3)) {
 		int ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(e->EntityType);
 		luaext_assert(L, lp->BarrackUpgradeCategory == ucat, "leader type doesnt match barracks type");
@@ -1515,7 +1515,7 @@ void l_settler_createAnimTaskList(lua_State* L) {
 	EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
 	int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
 	if (!tid) {
-		shok_BB_CClassFactory* fact = *shok_BB_CClassFactory::GlobalObj;
+		BB::CClassFactory* fact = *BB::CClassFactory::GlobalObj;
 		EGL::CGLETaskList* tl = fact->CreateObject<EGL::CGLETaskList>();
 
 		{
@@ -1568,7 +1568,7 @@ void l_settler_cleanupAnimTask(lua_State* L) {
 	}
 }
 int l_settler_playScriptAnim(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "does not work with SCELoader");
 	l_settler_createAnimTaskList(L);
 	EGL::CGLEEntity* e = luaext_checkEntity(L, 1);

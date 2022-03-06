@@ -44,7 +44,7 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
-void dumpClassSerialization(lua_State* L, shok_BB_CClassFactory_serializationData* d) {
+void dumpClassSerialization(lua_State* L, const BB::SerializationData* d) {
     if (!d) {
         lua_pushstring(L, "unknown serialization data");
         return;
@@ -65,11 +65,11 @@ void dumpClassSerialization(lua_State* L, shok_BB_CClassFactory_serializationDat
 
         if (d->Type == 2) {
             lua_pushstring(L, "DataType");
-            if (d->DataConverter == shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeInt)
+            if (d->DataConverter == BB::FieldSerilaizer::TypeInt)
                 lua_pushstring(L, "Int");
-            else if (d->DataConverter == shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeFloat)
+            else if (d->DataConverter == BB::FieldSerilaizer::TypeFloat)
                 lua_pushstring(L, "Float");
-            else if (d->DataConverter == shok_BB_CClassFactory_serializationData_FieldSerilaizer::TypeBool)
+            else if (d->DataConverter == BB::FieldSerilaizer::TypeBool)
                 lua_pushstring(L, "Bool");
             else
                 lua_pushnumber(L, reinterpret_cast<int>(d->DataConverter));
@@ -92,31 +92,30 @@ void dumpClassSerialization(lua_State* L, shok_BB_CClassFactory_serializationDat
     }
 }
 void dumpClassSerialization(lua_State* L, unsigned int id) {
-    shok_BB_CClassFactory_serializationData* d = (*shok_BB_CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+    const BB::SerializationData* d = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
     dumpClassSerialization(L, d);
 }
 
-int testfunc(lua::State L) {
-    L.Push(42);
-    return 1;
-}
+#define typeandoffset(T,M) sizeof(decltype(T::M)), offsetof(T, M)
+
+struct testdata {
+    int x, y;
+};
 
 int test(lua::State L) {
-    char abs[300]{};
-    BB::IFileSystem::FileInfo i;
-    (*BB::CFileSystemMgr::GlobalObj)->GetFileInfo(&i, L.CheckString(1), 0, abs);
-    L.Push(abs);
-    L.Push(i.Size);
-    L.Push(i.Found);
-    L.Push(i.IsDirectory);
-    return 4;
+    BB::SerializationData s = BB::SerializationData::ValueData("y", typeandoffset(testdata, x), BB::FieldSerilaizer::GetSerilalizer<int>());
+    L.Push(static_cast<int>(s.Size));
+    L.Push(static_cast<int>(s.Position));
+    return 2;
 }
 
 int cleanup(lua_State* L) {
+    lua::State L2 = lua::State{ L };
+    CppLogic::Effect::Cleanup(L2);
+
     l_entity_cleanup(L);
     l_logic_cleanup(L);
     l_combat_cleanup(L);
-    l_effect_cleanup(L);
     l_tech_cleanup(L);
     l_ui_cleanup(L);
     return 0;
@@ -124,7 +123,7 @@ int cleanup(lua_State* L) {
 
 void initGame() {
     if (!Options.DoNotUseCenterFix)
-        HookTextPrinting();
+        shok::HookTextPrinting();
     l_logic_onload();
     ESnd::CSoEMusic::HookStartMusicFilesystem();
 }
@@ -141,8 +140,8 @@ int resetCppLogic(lua_State* L) {
 
  void install(lua_State * L) {
      lua::State L2 = lua::State{ L };
-     if (!mainmenu_state) {
-         mainmenu_state = L;
+     if (!shok::LuaStateMainmenu) {
+         shok::LuaStateMainmenu = L;
          initGame();
      }
 
@@ -176,7 +175,7 @@ int resetCppLogic(lua_State* L) {
 
     L2.Push("Effect");
     L2.NewTable();
-    l_effect_init(L);
+    CppLogic::Effect::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.Push("Combat");
@@ -226,7 +225,7 @@ int resetCppLogic(lua_State* L) {
 #else
         "release",
 #endif
-        reinterpret_cast<int>(L), static_cast<int>(HasSCELoader()));
+        reinterpret_cast<int>(L), static_cast<int>(CppLogic::HasSCELoader()));
 }
 
 // CUtilMemory.GetMemory(tonumber("897558", 16))

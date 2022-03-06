@@ -4,85 +4,97 @@
 #include "s5data.h"
 #include "luaext.h"
 
-void l_effectFlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
-	int id = eff->EffectID;
-	lua_State* L = *EScr::CScriptTriggerSystem::GameState;
-	int top = lua_gettop(L);
-	luaL_checkstack(L, 5, "");
-	lua_pushlightuserdata(L, &l_effect_init);
-	lua_rawget(L, LUA_REGISTRYINDEX);
-	lua_rawgeti(L, -1, id);
-	if (lua_isfunction(L, -1)) {
-		lua_pushnumber(L, id);
-		lua_pcall(L, 1, 0, 0);
+namespace CppLogic::Effect {
+	void PushToHitCallbackRegKey(lua::State L) {
+		L.PushLightUserdata(&Init);
 	}
-	lua_settop(L, top + 1);
-	lua_pushnil(L);
-	lua_rawseti(L, -2, id);
-	lua_settop(L, top);
-}
 
-int l_effect_createProjectile(lua_State* L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source)
-	CProjectileEffectCreator data = CProjectileEffectCreator();
-	data.EffectType = luaL_checkint(L, 1);
-	data.CurrentPos.X = data.StartPos.X = luaL_checkfloat(L, 2);
-	data.CurrentPos.Y = data.StartPos.Y = luaL_checkfloat(L, 3);
-	data.TargetPos.X = luaL_checkfloat(L, 4);
-	data.TargetPos.Y = luaL_checkfloat(L, 5);
-	data.Damage = luaL_optint(L, 6, 0);
-	data.DamageRadius = luaL_optfloat(L, 7, -1);
-	data.TargetID = luaext_optEntityId(L, 8);
-	data.AttackerID = luaext_optEntityId(L, 9);
-	int player = luaL_optint(L, 10, 0);
-	data.PlayerID = player;
-	data.SourcePlayer = player;
-	int dmgclass = luaL_optint(L, 11, 0);
-	data.DamageClass = dmgclass;
-	data.AdvancedDamageSourceOverride = luaL_optint(L, 13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
-	EGL::CGLEGameLogic* gl = *EGL::CGLEGameLogic::GlobalObj;
-	int id = gl->CreateEffect(&data);
-	EGL::CEffect* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
-	if (!GGL::CCannonBallEffect::FixDamageClass)
-		if (GGL::CCannonBallEffect* cbeff = shok_DynamicCast<EGL::CEffect, GGL::CCannonBallEffect>(ef))
-			cbeff->DamageClass = dmgclass;
-	if (lua_isfunction(L, 12)) {
-		EGL::CFlyingEffect::HookOnHit();
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback = &l_effectFlyingEffectOnHitCallback;
-		lua_pushlightuserdata(L, &l_effect_init);
-		lua_rawget(L, LUA_REGISTRYINDEX);
-		lua_pushvalue(L, 12);
-		lua_rawseti(L, -2, id);
+	void FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
+		int id = eff->EffectID;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		int top = L.GetTop();
+		if (!L.CheckStack(5))
+			return;
+		PushToHitCallbackRegKey(L);
+		L.GetTableRaw(L.REGISTRYINDEX);
+		L.GetTableRawI(-1, id);
+		if (L.IsFunction(-1)) {
+			L.Push(id);
+			L.PCall(1, 0, 0);
+		}
+		L.SetTop(top + 1);
+		L.Push();
+		L.SetTableRawI(-2, id);
+		L.SetTop(top);
 	}
-	lua_pushnumber(L, id);
-	return 1;
-}
 
-int l_effect_isValid(lua_State* L) {
-	int id = luaL_checkint(L, 1);
-	bool r = (*EGL::CGLEEffectManager::GlobalObj)->IsIdValid(id);
-	lua_pushboolean(L, r);
-	return 1;
-}
+	int CreateProjectile(lua::State l) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source)
+		luaext::EState L{ l };
+		CProjectileEffectCreator data = CProjectileEffectCreator();
+		data.EffectType = L.CheckInt(1);
+		data.CurrentPos.X = data.StartPos.X = static_cast<float>(L.CheckNumber(2));
+		data.CurrentPos.Y = data.StartPos.Y = static_cast<float>(L.CheckNumber(3));
+		data.TargetPos.X = static_cast<float>(L.CheckNumber(4));
+		data.TargetPos.Y = static_cast<float>(L.CheckNumber(5));
+		data.Damage = L.OptInteger(6, 0);
+		data.DamageRadius = static_cast<float>(L.OptNumber(7, -1));
+		data.TargetID = L.OptEntityId(8);
+		data.AttackerID = L.OptEntityId(9);
+		int player = L.OptInteger(10, 0);
+		data.PlayerID = player;
+		data.SourcePlayer = player;
+		int dmgclass = L.OptInteger(11, 0);
+		data.DamageClass = dmgclass;
+		data.AdvancedDamageSourceOverride = L.OptInteger(13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
+		EGL::CGLEGameLogic* gl = *EGL::CGLEGameLogic::GlobalObj;
+		int id = gl->CreateEffect(&data);
+		EGL::CEffect* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
+		if (!GGL::CCannonBallEffect::FixDamageClass)
+			if (GGL::CCannonBallEffect* cbeff = dynamic_cast<GGL::CCannonBallEffect*>(ef))
+				cbeff->DamageClass = dmgclass;
+		if (L.IsFunction(12)) {
+			EGL::CFlyingEffect::HookOnHit();
+			EGL::CFlyingEffect::FlyingEffectOnHitCallback = &FlyingEffectOnHitCallback;
+			PushToHitCallbackRegKey(L);
+			L.GetTableRaw(L.REGISTRYINDEX);
+			L.PushValue(12);
+			L.SetTableRawI(-2, id);
+		}
+		L.Push(id);
+		return 1;
+	}
 
-int l_effect_getCbs(lua_State* L) {
-	lua_pushlightuserdata(L, &l_effect_init);
-	lua_rawget(L, LUA_REGISTRYINDEX);
-	return 1;
-}
+	int IsValidEffect(lua::State L) {
+		int id = L.CheckInt(1);
+		bool r = (*EGL::CGLEEffectManager::GlobalObj)->IsIdValid(id);
+		L.Push(r);
+		return 1;
+	}
 
-void l_effect_init(lua_State* L)
-{
-	luaext_registerFunc(L, "CreateProjectile", &l_effect_createProjectile);
-	luaext_registerFunc(L, "IsValidEffect", &l_effect_isValid);
-	luaext_registerFunc(L, "GetProjectileCallbacks", &l_effect_getCbs);
+	int GetProjectileCallbacks(lua::State L) {
+		PushToHitCallbackRegKey(L);
+		L.GetTableRaw(L.REGISTRYINDEX);
+		return 1;
+	}
 
-	lua_pushlightuserdata(L, &l_effect_init);
-	lua_newtable(L);
-	lua_rawset(L, LUA_REGISTRYINDEX);
-}
+	constexpr std::array<lua::FuncReference, 3> Effect{ {
+			lua::FuncReference::GetRef<CreateProjectile>("CreateProjectile"),
+			lua::FuncReference::GetRef<IsValidEffect>("IsValidEffect"),
+			lua::FuncReference::GetRef<GetProjectileCallbacks>("GetProjectileCallbacks"),
+	} };
 
-void l_effect_cleanup(lua_State* L) {
-	EGL::CFlyingEffect::FlyingEffectOnHitCallback = nullptr;
+	void Init(lua::State L)
+	{
+		L.RegisterFuncs(Effect, -3);
+
+		PushToHitCallbackRegKey(L);
+		L.NewTable();
+		L.SetTableRaw(L.REGISTRYINDEX);
+	}
+
+	void Cleanup(lua::State L) {
+		EGL::CFlyingEffect::FlyingEffectOnHitCallback = nullptr;
+	}
 }
 
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-10000, y, x, y, 500, 1000, 0, 0, 1, 0, LuaDebugger.Log)

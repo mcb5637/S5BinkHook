@@ -32,9 +32,8 @@ namespace BB {
 	class CEvent;
 	class CIDManagerEx;
 	class CFileStreamEx;
+	struct SerializationData;
 }
 namespace GGUI {
 	class C3DViewHandler;
 }
-
-struct shok_BB_CClassFactory_serializationData;

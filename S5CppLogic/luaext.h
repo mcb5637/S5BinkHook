@@ -5,6 +5,26 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+namespace luaext {
+	class EState : public lua::State {
+	public:
+		EState(lua::State L);
+		EState(lua_State* L);
+
+		EGL::CGLEEntity* CheckEntity(int i);
+		EGL::CGLEEntity* OptEntity(int i);
+		GGL::CSettler* CheckSettler(int i);
+		GGL::CSettler* OptSettler(int i);
+		GGL::CBuilding* CheckBuilding(int i);
+		GGL::CBuilding* OptBuilding(int i);
+		GGL::CResourceDoodad* CheckResourceDoodad(int i);
+		GGL::CResourceDoodad* OptResourceDoodad(int i);
+
+		int OptEntityId(int i);
+	};
+}
+
+
 #define luaL_checkfloat (float)luaL_checknumber
 #define luaL_optfloat (float)luaL_optnumber
 

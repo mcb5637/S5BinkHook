@@ -69,5 +69,5 @@ void ESnd::CSoEMusic::HookStartMusicFilesystem()
 	*AIL_closestream = &ail_closestream_override;
 
 	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x496677) ,10 };
-	WriteJump(reinterpret_cast<void*>(0x496677), &startmusic_patchasm);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x496677), &startmusic_patchasm);
 }

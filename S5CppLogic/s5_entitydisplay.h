@@ -12,7 +12,7 @@ namespace ED {
 		static inline constexpr int TypeDesc = 0x80AC10;
 		static inline constexpr unsigned int Identifier = 0x1F78996D;
 
-		static shok_BB_CClassFactory_serializationData* SerializationData;
+		static BB::SerializationData* SerializationData;
 	};
 
 

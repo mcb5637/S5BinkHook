@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "s5data.h"
 
-struct shok_vtable_EGUIX_CBaseWidget : shok_vtable_BB_IObject {
+struct shok_vtable_EGUIX_CBaseWidget : BB::IObject::_vtableS {
     PADDINGI(4);
     int(__thiscall* SetSizeAndPos)(EGUIX::CBaseWidget* th, float x, float y, float w, float h); // 7
     PADDINGI(4);
@@ -153,7 +153,7 @@ void EGUIX::CButtonHelper::HookShortcutComparison()
         return;
     shortcutcmo_hooked = true;
     shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 10 };
-    WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm);
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm);
 }
 
 unsigned int __stdcall EGUIX::CToolTipHelper::GetClassIdentifier() const
@@ -169,35 +169,35 @@ void EGUIX::CToolTipHelper::OnRegistrationChanged(int id, int mode)
 
 bool* EGUIX::CBaseWidget::GetUpdateManualFlag()
 {
-    if (EGUIX::CStaticTextWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticTextWidget>(this))
+    if (EGUIX::CStaticTextWidget* w = dynamic_cast<EGUIX::CStaticTextWidget*>(this))
         return &w->UpdateManualFlag;
-    if (EGUIX::CGfxButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CGfxButtonWidget>(this))
+    if (EGUIX::CGfxButtonWidget* w = dynamic_cast<EGUIX::CGfxButtonWidget*>(this))
         return &w->UpdateManualFlag;
-    if (EGUIX::CTextButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CTextButtonWidget>(this))
+    if (EGUIX::CTextButtonWidget* w = dynamic_cast<EGUIX::CTextButtonWidget*>(this))
         return &w->UpdateManualFlag;
-    if (EGUIX::CProgressBarWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CProgressBarWidget>(this))
+    if (EGUIX::CProgressBarWidget* w = dynamic_cast<EGUIX::CProgressBarWidget*>(this))
         return &w->UpdateManualFlag;
     return nullptr;
 }
 EGUIX::CLuaFunctionHelper* EGUIX::CBaseWidget::GetUpdateFunc()
 {
-    if (EGUIX::CStaticTextWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticTextWidget>(this))
+    if (EGUIX::CStaticTextWidget* w = dynamic_cast<EGUIX::CStaticTextWidget*>(this))
         return &w->UpdateFunction;
-    if (EGUIX::CGfxButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CGfxButtonWidget>(this))
+    if (EGUIX::CGfxButtonWidget* w = dynamic_cast<EGUIX::CGfxButtonWidget*>(this))
         return &w->UpdateFunction;
-    if (EGUIX::CTextButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CTextButtonWidget>(this))
+    if (EGUIX::CTextButtonWidget* w = dynamic_cast<EGUIX::CTextButtonWidget*>(this))
         return &w->UpdateFunction;
-    if (EGUIX::CProgressBarWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CProgressBarWidget>(this))
+    if (EGUIX::CProgressBarWidget* w = dynamic_cast<EGUIX::CProgressBarWidget*>(this))
         return &w->UpdateFunction;
     return nullptr;
 }
 EGUIX::CMaterial* EGUIX::CBaseWidget::GetMaterials(int* count)
 {
-    if (EGUIX::CStaticWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticWidget>(this)) {
+    if (EGUIX::CStaticWidget* w = dynamic_cast<EGUIX::CStaticWidget*>(this)) {
         *count = 1;
         return &w->BackgroundMaterial;
     }
-    if (EGUIX::CButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CButtonWidget>(this)) {
+    if (EGUIX::CButtonWidget* w = dynamic_cast<EGUIX::CButtonWidget*>(this)) {
         *count = 5;
         return w->Materials;
     }
@@ -205,23 +205,23 @@ EGUIX::CMaterial* EGUIX::CBaseWidget::GetMaterials(int* count)
 }
 EGUIX::CButtonHelper* EGUIX::CBaseWidget::GetButtonHelper()
 {
-    if (EGUIX::CButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CButtonWidget>(this))
+    if (EGUIX::CButtonWidget* w = dynamic_cast<EGUIX::CButtonWidget*>(this))
         return &w->ButtonHelper;
     return nullptr;
 }
 EGUIX::CToolTipHelper* EGUIX::CBaseWidget::GetTooltipHelper()
 {
-    if (EGUIX::CButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CButtonWidget>(this))
+    if (EGUIX::CButtonWidget* w = dynamic_cast<EGUIX::CButtonWidget*>(this))
         return &w->ToolTipHelper;
-    if (EGUIX::CPureTooltipWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CPureTooltipWidget>(this))
+    if (EGUIX::CPureTooltipWidget* w = dynamic_cast<EGUIX::CPureTooltipWidget*>(this))
         return &w->ToolTipHelper;
     return nullptr;
 }
 EGUIX::CWidgetStringHelper* EGUIX::CBaseWidget::GetStringHelper()
 {
-    if (EGUIX::CStaticTextWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CStaticTextWidget>(this))
+    if (EGUIX::CStaticTextWidget* w = dynamic_cast<EGUIX::CStaticTextWidget*>(this))
         return &w->StringHelper;
-    if (EGUIX::CTextButtonWidget* w = shok_DynamicCast<EGUIX::CBaseWidget, EGUIX::CTextButtonWidget>(this))
+    if (EGUIX::CTextButtonWidget* w = dynamic_cast<EGUIX::CTextButtonWidget*>(this))
         return &w->StringHelper;
     return nullptr;
 }
@@ -435,7 +435,7 @@ void EGUIX::HookUIInput()
         return;
     HookUIInput_Hooked = true;
     shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
-    WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
 }
 
 void(__thiscall* const shok_feedbackEventHandler_fireevent)(EGUIX::FeedbackEventHandler* th, BB::CEvent* e) = reinterpret_cast<void(__thiscall*)(EGUIX::FeedbackEventHandler*, BB::CEvent*)>(0x582EB2);

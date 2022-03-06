@@ -239,10 +239,9 @@ namespace EGL {
 		EGL::GameLogicExplorationStuff* SomeStuff;
 
 	private:
-		virtual void unknown0() = 0;
 		virtual void unknown1() = 0;
 	public:
-		virtual ~CGLEGameLogic() = default;
+		virtual ~CGLEGameLogic() = default; // 2
 	private:
 		virtual int get2ndmember() = 0;
 		virtual void unknown3() = 0;

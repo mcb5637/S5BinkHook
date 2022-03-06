@@ -307,7 +307,7 @@ function CppLogic.Logic.GetWeatherQueue() end
 -- @param transition transition in sec >forerun <=200
 function CppLogic.Logic.ClearWeatherQueueAndAddInitial(state, duration, forerun, gfx, transition) end
 
---- sets a func to be called, if a tasklist contains TASK_LUA_FUNC.
+--- sets a func to be called, if a tasklist CppLogic::ContainsValue TASK_LUA_FUNC.
 -- define the task as <Task classname="EGL::CTaskArgsInteger" classid="0xb3f8356d"><TaskType>TASK_LUA_FUNC</TaskType> in the tasklist to use it.
 -- <Value> gets passed to your func, to identify what action should be executed.
 -- use the parameter funcs moveto(pos, ignorepathing, noncancelable) and settl(tl) to move the entity or set the task list.

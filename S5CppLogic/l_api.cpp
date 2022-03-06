@@ -10,9 +10,8 @@
 #include "luaext.h"
 
 namespace CppLogic::API {
-
 	void CheckEvalEnabled(lua::State L) {
-		if (HasSCELoader())
+		if (CppLogic::HasSCELoader())
 			L.Error("Loading lua code disabled for Kimichura");
 	}
 
@@ -42,7 +41,8 @@ namespace CppLogic::API {
 	}
 
 	int GetFuncDebug(lua::State L) {
-		L.Assert(L.IsFunction(1), "no func");
+		if (!L.IsFunction(1))
+			throw lua::LuaException("no func");
 		L.PushValue(1);
 		lua::DebugInfo ar = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Source | lua::DebugInfoOptions::Name | lua::DebugInfoOptions::Line | lua::DebugInfoOptions::Upvalues);
 
@@ -103,7 +103,8 @@ namespace CppLogic::API {
 		const char* cn = L.OptString(3, nullptr); // optional
 		const char* n = L.CheckString(1);
 		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->GetCampagnInfo(ty, cn);
-		L.Assert(ci, "invalid map type/campagn");
+		if (!ci)
+			throw lua::LuaException("invalid map type/campagn");
 		Framework::MapInfo* i = ci->GetMapInfoByName(n);
 		if (!i)
 			throw lua::LuaException("invalid map");
@@ -114,7 +115,8 @@ namespace CppLogic::API {
 	int SaveGetMapInfo(lua::State L) {
 		const char* save = L.CheckString(1);
 		Framework::SaveData* sdata = Framework::SaveData::GlobalObj();
-		L.Assert(sdata->LoadSaveData(save), "save doesnt exist");
+		if (!sdata->LoadSaveData(save))
+			throw lua::LuaException("save doesnt exist");
 		L.Push(sdata->CurrentSave->MapData.MapName.c_str());
 		L.Push(sdata->CurrentSave->MapData.MapType);
 		L.Push(sdata->CurrentSave->MapData.MapCampagnName.c_str());
@@ -146,7 +148,7 @@ namespace CppLogic::API {
 	}
 
 	void GetRuntimeStore() {
-		lua::State mm{ mainmenu_state };
+		lua::State mm{ shok::LuaStateMainmenu };
 		mm.PushLightUserdata(&GetRuntimeStore);
 		mm.GetTableRaw(mm.REGISTRYINDEX);
 		if (mm.IsNil(-1)) {
@@ -157,14 +159,15 @@ namespace CppLogic::API {
 		}
 	}
 	int RuntimeStoreSet(lua::State L) {
-		lua::State mm{ mainmenu_state };
+		lua::State mm{ shok::LuaStateMainmenu };
 		int t = mm.GetTop();
 
 		const char* s = L.CheckString(1);
 		const char* ds = nullptr;
 		lua::Number di = 0;
 		lua::LType ty = L.Type(2);
-		L.Assert(ty == lua::LType::Number || ty == lua::LType::String || ty == lua::LType::Nil, "not saveable");
+		if (!(ty == lua::LType::Number || ty == lua::LType::String || ty == lua::LType::Nil))
+			throw lua::LuaException("not saveable");
 		if (ty == lua::LType::Number)
 			di = L.ToNumber(2);
 		else if (ty == lua::LType::String)
@@ -183,7 +186,7 @@ namespace CppLogic::API {
 		return 0;
 	}
 	int RuntimeStoreGet(lua::State L) {
-		lua::State mm{ mainmenu_state };
+		lua::State mm{ shok::LuaStateMainmenu };
 		int t = mm.GetTop();
 
 		const char* s = L.CheckString(1);
@@ -238,7 +241,6 @@ namespace CppLogic::API {
 	{
 		L.RegisterFuncs(API, -3);
 	}
-
 }
 
 // CppLogic.API.Log("string")

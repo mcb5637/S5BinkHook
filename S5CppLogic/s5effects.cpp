@@ -33,12 +33,12 @@ CProjectileEffectCreator::CProjectileEffectCreator()
 
 bool EGL::CEffect::IsCannonBallEffect()
 {
-	return shok_DynamicCast<EGL::CEffect, GGL::CCannonBallEffect>(this);
+	return dynamic_cast<GGL::CCannonBallEffect*>(this);
 }
 
 bool EGL::CEffect::IsArrowEffect()
 {
-	return shok_DynamicCast<EGL::CEffect, GGL::CArrowEffect>(this);
+	return dynamic_cast<GGL::CArrowEffect*>(this);
 }
 
 unsigned int __stdcall EGL::CFlyingEffectSlot::GetClassIdentifier() const
@@ -80,7 +80,7 @@ void GGL::CCannonBallEffect::HookFromCreator()
 		return;
 	HookFromCreator_Hooked = true;
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 10 };
-	WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm);
 }
 
 EGL::CFlyingEffect* EGL::CFlyingEffect::CurrentHittingEffect = nullptr;

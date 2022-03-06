@@ -71,11 +71,11 @@ int l_logic_setpaydayfrequency(lua_State* L) {
 
 void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 	lua_newtable(L);
-	if (EGL::CNetEventEntityID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityID>(ev)) {
+	if (EGL::CNetEventEntityID* e = dynamic_cast<EGL::CNetEventEntityID*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
 		lua_rawset(L, -3);
-		if (GGL::CNetEventCannonCreator* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventCannonCreator>(ev)) {
+		if (GGL::CNetEventCannonCreator* e = dynamic_cast<GGL::CNetEventCannonCreator*>(ev)) {
 			lua_pushstring(L, "BottomType");
 			lua_pushnumber(L, e->BottomType);
 			lua_rawset(L, -3);
@@ -86,23 +86,23 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 			luaext_pushPos(L, e->Position);
 			lua_rawset(L, -3);
 		}
-		else if (GGL::CNetEventEntityIDAndUpgradeCategory* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventEntityIDAndUpgradeCategory>(ev)) {
+		else if (GGL::CNetEventEntityIDAndUpgradeCategory* e = dynamic_cast<GGL::CNetEventEntityIDAndUpgradeCategory*>(ev)) {
 			lua_pushstring(L, "UpgradeCategory");
 			lua_pushnumber(L, e->UpgradeCategory);
 			lua_rawset(L, -3);
 		}
-		else if (EGL::CNetEventEntityIDAndInteger* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityIDAndInteger>(ev)) {
+		else if (EGL::CNetEventEntityIDAndInteger* e = dynamic_cast<EGL::CNetEventEntityIDAndInteger*>(ev)) {
 			lua_pushstring(L, "Data");
 			lua_pushnumber(L, e->Data);
 			lua_rawset(L, -3);
 		}
-		else if (GGL::CNetEventTechnologyAndEntityID* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventTechnologyAndEntityID>(ev)) {
+		else if (GGL::CNetEventTechnologyAndEntityID* e = dynamic_cast<GGL::CNetEventTechnologyAndEntityID*>(ev)) {
 			lua_pushstring(L, "Technology");
 			lua_pushnumber(L, e->Technology);
 			lua_rawset(L, -3);
 		}
 	}
-	else if (EGL::CNetEvent2Entities* e = shok_DynamicCast<BB::CEvent, EGL::CNetEvent2Entities>(ev)) {
+	else if (EGL::CNetEvent2Entities* e = dynamic_cast<EGL::CNetEvent2Entities*>(ev)) {
 		lua_pushstring(L, "ActorId");
 		lua_pushnumber(L, e->ActorId);
 		lua_rawset(L, -3);
@@ -110,7 +110,7 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 		lua_pushnumber(L, e->TargetId);
 		lua_rawset(L, -3);
 	}
-	else if (EGL::CNetEventEntityAndPos* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityAndPos>(ev)) {
+	else if (EGL::CNetEventEntityAndPos* e = dynamic_cast<EGL::CNetEventEntityAndPos*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
 		lua_rawset(L, -3);
@@ -118,7 +118,7 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 		luaext_pushPos(L, e->Position);
 		lua_rawset(L, -3);
 	}
-	else if (EGL::CNetEventEntityAndPosArray* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityAndPosArray>(ev)) {
+	else if (EGL::CNetEventEntityAndPosArray* e = dynamic_cast<EGL::CNetEventEntityAndPosArray*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
 		lua_rawset(L, -3);
@@ -135,7 +135,7 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 		lua_pushnumber(L, e->Rotation == -1.0f ? -1.0 : rad2deg<double>(e->Rotation));
 		lua_rawset(L, -3);
 	}
-	else if (GGL::CNetEventExtractResource* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventExtractResource>(ev)) {
+	else if (GGL::CNetEventExtractResource* e = dynamic_cast<GGL::CNetEventExtractResource*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
 		lua_rawset(L, -3);
@@ -146,7 +146,7 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 		luaext_pushPos(L, e->Position);
 		lua_rawset(L, -3);
 	}
-	else if (GGL::CNetEventTransaction* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventTransaction>(ev)) {
+	else if (GGL::CNetEventTransaction* e = dynamic_cast<GGL::CNetEventTransaction*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_pushnumber(L, e->EntityId);
 		lua_rawset(L, -3);
@@ -160,11 +160,11 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 		lua_pushnumber(L, static_cast<int>(e->SellType));
 		lua_rawset(L, -3);
 	}
-	else if (EGL::CNetEventPlayerID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventPlayerID>(ev)) {
+	else if (EGL::CNetEventPlayerID* e = dynamic_cast<EGL::CNetEventPlayerID*>(ev)) {
 		lua_pushstring(L, "PlayerId");
 		lua_pushnumber(L, e->PlayerId);
 		lua_rawset(L, -3);
-		if (GGL::CNetEventBuildingCreator* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventBuildingCreator>(ev)) {
+		if (GGL::CNetEventBuildingCreator* e = dynamic_cast<GGL::CNetEventBuildingCreator*>(ev)) {
 			lua_pushstring(L, "UpgradeCategory");
 			lua_pushnumber(L, e->UpgradeCategory);
 			lua_rawset(L, -3);
@@ -181,33 +181,33 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 			}
 			lua_rawset(L, -3);
 		}
-		else if (EGL::CNetEventIntegerAndPlayerID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventIntegerAndPlayerID>(ev)) {
+		else if (EGL::CNetEventIntegerAndPlayerID* e = dynamic_cast<EGL::CNetEventIntegerAndPlayerID*>(ev)) {
 			lua_pushstring(L, "Data");
 			lua_pushnumber(L, e->Data);
 			lua_rawset(L, -3);
 		}
-		else if (EGL::CNetEventPlayerIDAndInteger* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventPlayerIDAndInteger>(ev)) {
+		else if (EGL::CNetEventPlayerIDAndInteger* e = dynamic_cast<EGL::CNetEventPlayerIDAndInteger*>(ev)) {
 			lua_pushstring(L, "Data");
 			lua_pushnumber(L, e->Data);
 			lua_rawset(L, -3);
 		}
-		else if (EGL::CNetEventEntityIDAndPlayerID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityIDAndPlayerID>(ev)) {
+		else if (EGL::CNetEventEntityIDAndPlayerID* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerID*>(ev)) {
 			lua_pushstring(L, "EntityId");
 			lua_pushnumber(L, e->EntityId);
 			lua_rawset(L, -3);
-			if (EGL::CNetEventEntityIDAndPlayerIDAndEntityType* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityIDAndPlayerIDAndEntityType>(ev)) {
+			if (EGL::CNetEventEntityIDAndPlayerIDAndEntityType* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerIDAndEntityType*>(ev)) {
 				lua_pushstring(L, "EntityType");
 				lua_pushnumber(L, e->EntityType);
 				lua_rawset(L, -3);
 			}
-			else if (GGL::CNetEventEntityIDPlayerIDAndInteger* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventEntityIDPlayerIDAndInteger>(ev)) {
+			else if (GGL::CNetEventEntityIDPlayerIDAndInteger* e = dynamic_cast<GGL::CNetEventEntityIDPlayerIDAndInteger*>(ev)) {
 				lua_pushstring(L, "Data");
 				lua_pushnumber(L, e->Data);
 				lua_rawset(L, -3);
 			}
 		}
 	}
-	else if (Framework::CEventGameSpeed* e = shok_DynamicCast<BB::CEvent, Framework::CEventGameSpeed>(ev)) {
+	else if (Framework::CEventGameSpeed* e = dynamic_cast<Framework::CEventGameSpeed*>(ev)) {
 		lua_pushstring(L, "Speed");
 		lua_pushnumber(L, e->SpeedFactor);
 		lua_rawset(L, -3);
@@ -215,7 +215,7 @@ void l_netPushEvent(lua_State* L, BB::CEvent* ev) {
 }
 bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 	bool allRead = true;
-	if (EGL::CNetEventEntityID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityID>(ev)) {
+	if (EGL::CNetEventEntityID* e = dynamic_cast<EGL::CNetEventEntityID*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
 		if (lua_isnumber(L, -1))
@@ -223,7 +223,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 		else
 			allRead = false;
 		lua_pop(L, 1);
-		if (GGL::CNetEventCannonCreator* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventCannonCreator>(ev)) {
+		if (GGL::CNetEventCannonCreator* e = dynamic_cast<GGL::CNetEventCannonCreator*>(ev)) {
 			lua_pushstring(L, "BottomType");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -246,7 +246,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 				allRead = false;
 			lua_pop(L, 1);
 		}
-		else if (GGL::CNetEventEntityIDAndUpgradeCategory* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventEntityIDAndUpgradeCategory>(ev)) {
+		else if (GGL::CNetEventEntityIDAndUpgradeCategory* e = dynamic_cast<GGL::CNetEventEntityIDAndUpgradeCategory*>(ev)) {
 			lua_pushstring(L, "UpgradeCategory");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -255,7 +255,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 				allRead = false;
 			lua_pop(L, 1);
 		}
-		else if (EGL::CNetEventEntityIDAndInteger* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityIDAndInteger>(ev)) {
+		else if (EGL::CNetEventEntityIDAndInteger* e = dynamic_cast<EGL::CNetEventEntityIDAndInteger*>(ev)) {
 			lua_pushstring(L, "Data");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -264,7 +264,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 				allRead = false;
 			lua_pop(L, 1);
 		}
-		else if (GGL::CNetEventTechnologyAndEntityID* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventTechnologyAndEntityID>(ev)) {
+		else if (GGL::CNetEventTechnologyAndEntityID* e = dynamic_cast<GGL::CNetEventTechnologyAndEntityID*>(ev)) {
 			lua_pushstring(L, "Technology");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -274,7 +274,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 			lua_pop(L, 1);
 		}
 	}
-	else if (EGL::CNetEvent2Entities* e = shok_DynamicCast<BB::CEvent, EGL::CNetEvent2Entities>(ev)) {
+	else if (EGL::CNetEvent2Entities* e = dynamic_cast<EGL::CNetEvent2Entities*>(ev)) {
 		lua_pushstring(L, "ActorId");
 		lua_rawget(L, -2);
 		if (lua_isnumber(L, -1))
@@ -290,7 +290,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (EGL::CNetEventEntityAndPos* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityAndPos>(ev)) {
+	else if (EGL::CNetEventEntityAndPos* e = dynamic_cast<EGL::CNetEventEntityAndPos*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
 		if (lua_isnumber(L, -1))
@@ -306,7 +306,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (EGL::CNetEventEntityAndPosArray* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityAndPosArray>(ev)) {
+	else if (EGL::CNetEventEntityAndPosArray* e = dynamic_cast<EGL::CNetEventEntityAndPosArray*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
 		if (lua_isnumber(L, -1))
@@ -348,7 +348,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (GGL::CNetEventExtractResource* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventExtractResource>(ev)) {
+	else if (GGL::CNetEventExtractResource* e = dynamic_cast<GGL::CNetEventExtractResource*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
 		if (lua_isnumber(L, -1))
@@ -371,7 +371,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (GGL::CNetEventTransaction* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventTransaction>(ev)) {
+	else if (GGL::CNetEventTransaction* e = dynamic_cast<GGL::CNetEventTransaction*>(ev)) {
 		lua_pushstring(L, "EntityId");
 		lua_rawget(L, -2);
 		if (lua_isnumber(L, -1))
@@ -401,7 +401,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 			allRead = false;
 		lua_pop(L, 1);
 	}
-	else if (EGL::CNetEventPlayerID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventPlayerID>(ev)) {
+	else if (EGL::CNetEventPlayerID* e = dynamic_cast<EGL::CNetEventPlayerID*>(ev)) {
 		lua_pushstring(L, "PlayerId");
 		lua_rawget(L, -2);
 		if (lua_isnumber(L, -1))
@@ -409,7 +409,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 		else
 			allRead = false;
 		lua_pop(L, 1);
-		if (GGL::CNetEventBuildingCreator* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventBuildingCreator>(ev)) {
+		if (GGL::CNetEventBuildingCreator* e = dynamic_cast<GGL::CNetEventBuildingCreator*>(ev)) {
 			lua_pushstring(L, "UpgradeCategory");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -445,7 +445,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 				allRead = false;
 			lua_pop(L, 1);
 		}
-		else if (EGL::CNetEventIntegerAndPlayerID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventIntegerAndPlayerID>(ev)) {
+		else if (EGL::CNetEventIntegerAndPlayerID* e = dynamic_cast<EGL::CNetEventIntegerAndPlayerID*>(ev)) {
 			lua_pushstring(L, "Data");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -454,7 +454,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 				allRead = false;
 			lua_pop(L, 1);
 		}
-		else if (EGL::CNetEventPlayerIDAndInteger* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventPlayerIDAndInteger>(ev)) {
+		else if (EGL::CNetEventPlayerIDAndInteger* e = dynamic_cast<EGL::CNetEventPlayerIDAndInteger*>(ev)) {
 			lua_pushstring(L, "Data");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -463,7 +463,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 				allRead = false;
 			lua_pop(L, 1);
 		}
-		else if (EGL::CNetEventEntityIDAndPlayerID* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityIDAndPlayerID>(ev)) {
+		else if (EGL::CNetEventEntityIDAndPlayerID* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerID*>(ev)) {
 			lua_pushstring(L, "EntityId");
 			lua_rawget(L, -2);
 			if (lua_isnumber(L, -1))
@@ -471,7 +471,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 			else
 				allRead = false;
 			lua_pop(L, 1);
-			if (EGL::CNetEventEntityIDAndPlayerIDAndEntityType* e = shok_DynamicCast<BB::CEvent, EGL::CNetEventEntityIDAndPlayerIDAndEntityType>(ev)) {
+			if (EGL::CNetEventEntityIDAndPlayerIDAndEntityType* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerIDAndEntityType*>(ev)) {
 				lua_pushstring(L, "EntityType");
 				lua_rawget(L, -2);
 				if (lua_isnumber(L, -1))
@@ -480,7 +480,7 @@ bool l_netReadEvent(lua_State* L, BB::CEvent* ev) {
 					allRead = false;
 				lua_pop(L, 1);
 			}
-			else if (GGL::CNetEventEntityIDPlayerIDAndInteger* e = shok_DynamicCast<BB::CEvent, GGL::CNetEventEntityIDPlayerIDAndInteger>(ev)) {
+			else if (GGL::CNetEventEntityIDPlayerIDAndInteger* e = dynamic_cast<GGL::CNetEventEntityIDPlayerIDAndInteger*>(ev)) {
 				lua_pushstring(L, "Data");
 				lua_rawget(L, -2);
 				if (lua_isnumber(L, -1))
@@ -650,7 +650,7 @@ int l_logicLandscapeGetNearesUnblockedPosInSector(lua_State* L) {
 }
 
 int l_logicHookHurtEntity(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	EGL::CGLEEntity::HookHurtEntity();
 	if (lua_isboolean(L, 1))
@@ -688,7 +688,7 @@ int l_logicHookHurtEntity(lua_State* L) {
 }
 
 int l_logicHurtEntityGetDamage(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	luaext_assertPointer(L, EGL::CGLEEntity::HurtEntityDamagePointer, "not in trigger");
 	lua_pushnumber(L, *EGL::CGLEEntity::HurtEntityDamagePointer);
@@ -697,7 +697,7 @@ int l_logicHurtEntityGetDamage(lua_State* L) {
 	return 3;
 }
 int l_logicHurtEntitySetDamage(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use CEntity instead");
 	luaext_assertPointer(L, EGL::CGLEEntity::HurtEntityDamagePointer, "not in trigger");
 	*EGL::CGLEEntity::HurtEntityDamagePointer = luaL_checkint(L, 1);
@@ -759,7 +759,7 @@ int l_logicAddFolder(lua_State* L) {
 }
 
 int l_logicEnableMaxHpTechMod(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supportet with SCELoader");
 	EGL::CGLEEntity::HookMaxHP();
 	EGL::CGLEEntity::UseMaxHPTechBoni = true;
@@ -810,7 +810,7 @@ int l_logicLandscapeGetBridgeHeight(lua_State* L) {
 }
 
 int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	int i = luaL_checkint(L, 1);
 	shok::Color c = (*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors->GetColorByIndex(i);
@@ -821,7 +821,7 @@ int l_logicGetColor(lua_State* L) { // ind -> r,g,b,a
 	return 4;
 }
 int l_logicSetColor(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	int i = luaL_checkint(L, 1);
 	int r = luaL_checkint(L, 2), g = luaL_checkint(L, 3), b = luaL_checkint(L, 4);
@@ -832,7 +832,7 @@ int l_logicSetColor(lua_State* L) {
 }
 
 int l_logicEnablePlayerPaydayCallback(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "use global GameCallback_PaydayPayed instead");
 	if (!lua_isfunction(L, 1))
 		luaL_error(L, "no func");
@@ -861,7 +861,7 @@ int l_logicEnablePlayerPaydayCallback(lua_State* L) {
 }
 
 int l_logicSetRegenerateSoldiers(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	EGL::CGLEEntity::HookLeaderRegen();
 	EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = lua_toboolean(L, 1);
@@ -869,16 +869,16 @@ int l_logicSetRegenerateSoldiers(lua_State* L) {
 }
 
 int l_logicOverrideStringTableText(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (L != *EScr::CScriptTriggerSystem::GameState)
 		luaL_error(L, "does only work ingame");
-	if (!GetStringTableTextOverride) {
-		HookGetStringTableText();
+	if (!shok::GetStringTableTextOverride) {
+		shok::HookGetStringTableText();
 		lua_pushlightuserdata(L, &l_logicOverrideStringTableText);
 		lua_newtable(L);
 		lua_rawset(L, LUA_REGISTRYINDEX);
-		GetStringTableTextOverride = [](const char* s) {
+		shok::GetStringTableTextOverride = [](const char* s) {
 			if (!s)
 				return s;
 			const char* r = nullptr;
@@ -911,7 +911,7 @@ int l_logicOverrideStringTableText(lua_State* L) {
 }
 
 int l_logic_SetPlaceBuildingCb(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	if (lua_isnil(L, 1)) {
 		GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
@@ -953,17 +953,17 @@ int l_logic_SetPlaceBuildingCb(lua_State* L) {
 }
 
 int l_logic_SetPlaceBuildingRotation(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	GGUI::CPlaceBuildingState::HookPlacementRotation();
 	GGUI::CPlaceBuildingState::PlacementRotation = deg2rad(luaL_checkfloat(L, 1));
-	GGUI::CPlaceBuildingState* s = shok_DynamicCast<GGUI::CState, GGUI::CPlaceBuildingState>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
+	GGUI::CPlaceBuildingState* s = dynamic_cast<GGUI::CPlaceBuildingState*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
 	if (s)
 		s->UpdateModel();
 	return 0;
 }
 int l_logic_GetPlaceBuildingRotation(lua_State* L) {
-	if (HasSCELoader())
+	if (CppLogic::HasSCELoader())
 		luaL_error(L, "not supported with SCELoader");
 	lua_pushnumber(L, rad2deg(GGUI::CPlaceBuildingState::PlacementRotation));
 	return 1;
@@ -1086,7 +1086,7 @@ int l_logic_setluataskfunc_settl(lua_State* L) {
 	return 0;
 }
 int l_logic_setluataskfunc(lua_State* L) {
-	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
+	luaext_assert(L, !CppLogic::HasSCELoader(), "does not work with SCELoader");
 
 	if (lua_isnil(L, 1)) {
 		EGL::CGLEEntity::LuaTaskListCallback = nullptr;
@@ -1133,7 +1133,7 @@ int l_logic_setluataskfunc(lua_State* L) {
 }
 
 int l_logic_makeTaskListWaitForAnimUncancelable(lua_State* L) {
-	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
+	luaext_assert(L, !CppLogic::HasSCELoader(), "does not work with SCELoader");
 
 	int i = luaL_checkint(L, 1);
 	EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
@@ -1153,7 +1153,7 @@ int l_logic_makeTaskListWaitForAnimUncancelable(lua_State* L) {
 	return 0;
 }
 int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
-	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
+	luaext_assert(L, !CppLogic::HasSCELoader(), "does not work with SCELoader");
 
 	int i = luaL_checkint(L, 1);
 	EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
@@ -1173,7 +1173,7 @@ int l_logic_makeTaskListWaitForAnimCancelable(lua_State* L) {
 	return 0;
 }
 int l_logic_setTaskListSetCheckUncancelable(lua_State* L) {
-	luaext_assert(L, !HasSCELoader(), "does not work with SCELoader");
+	luaext_assert(L, !CppLogic::HasSCELoader(), "does not work with SCELoader");
 	EGL::CGLEEntity::HookSetTaskListNonCancelable(luaext_optbool(L, 1, false));
 	return 0;
 }
@@ -1339,7 +1339,7 @@ int l_logic_loadtasks(lua_State* L)
 
 void l_logic_onload()
 {
-	if (!HasSCELoader())
+	if (!CppLogic::HasSCELoader())
 		l_logic_loadtasks(nullptr);
 }
 
@@ -1347,7 +1347,7 @@ void l_logic_cleanup(lua_State* L) {
 	l_netEventUnSetHook(L);
 	GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
 	EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
-	GetStringTableTextOverride = nullptr;
+	shok::GetStringTableTextOverride = nullptr;
 	GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
 	GGUI::CPlaceBuildingState::PlacementRotation = 0.0f;
 	EGL::CGLEEntity::UseMaxHPTechBoni = false;
@@ -1420,7 +1420,7 @@ void l_logic_init(lua_State* L)
 	luaext_registerFunc(L, "UnSetCallback", &l_netEventUnSetHook);
 	lua_rawset(L, -3);
 
-	if (L != mainmenu_state) {
+	if (L != shok::LuaStateMainmenu) {
 		luaext_prepareUserDataType<l_logicModel>(L);
 	}
 }

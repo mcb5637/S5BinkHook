@@ -7,9 +7,8 @@
 #include <array>
 
 namespace CppLogic::Mem {
-
 	int SetFPU(lua::State L) {
-		shok_SetHighPrecFPU();
+		shok::SetHighPrecFPU();
 		return 0;
 	}
 

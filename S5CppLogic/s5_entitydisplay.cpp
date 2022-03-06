@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "s5data.h"
 
-struct shok_vtable_ED_CBehaviorProps : shok_vtable_BB_IObject {
+struct shok_vtable_ED_CBehaviorProps : BB::IObject::_vtableS {
     void(__stdcall* OnAdd)(ED::IBehavior* th, ED::CEntity* edisplay, ED::CBehaviorProps* props, int _2); // called before ED::CEntity init
     void(__stdcall* Initialize)(ED::IBehavior* th, ED::CEntity* edisplay, ED::CBehaviorProps* props); // called after ED::CEntity init
     void(__stdcall* UpdateRenderNoTick)(ED::IBehavior* th, int count, float uk);
@@ -10,7 +10,7 @@ struct shok_vtable_ED_CBehaviorProps : shok_vtable_BB_IObject {
     PADDINGI(1); // 1 param, ret 100
 };
 
-struct shok_vtable_ED_CEntity : shok_vtable_BB_IObject {
+struct shok_vtable_ED_CEntity : BB::IObject::_vtableS {
     void(__thiscall* Initialize)(ED::CEntity* th, int* m); // m might be p to model id?
     void(__stdcall* OnRenderUpdate)(ED::CEntity* th, int tick, float seconds); // tick seems to be logic ticks, seconds in gametime (ticks/10)
     PADDINGI(1); // maybe update something
@@ -22,7 +22,7 @@ struct shok_vtable_ED_CEntity : shok_vtable_BB_IObject {
     PADDINGI(1); // return some float
 };
 
-shok_BB_CClassFactory_serializationData* ED::CBehaviorProps::SerializationData = reinterpret_cast<shok_BB_CClassFactory_serializationData*>(0x8586E8);
+BB::SerializationData* ED::CBehaviorProps::SerializationData = reinterpret_cast<BB::SerializationData*>(0x8586E8);
 
 
 void ED::CEntity::ResetPositionData()

@@ -244,9 +244,9 @@ void EGL::CGLETerrainLowRes::EnableHiResBridgeHeight()
 	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
 	*reinterpret_cast<float(__fastcall**)(ED::CLandscape*, int, float, float)>(0x76A410) = &shok_ED_CLandscape_overridegetwaterheightatpos;
 	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
-	WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc);
 	shok::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
-	WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight);
 }
 
 void EGL::CGLETerrainLowRes::CheckBridgeHeightSize()
@@ -456,10 +456,10 @@ void EGL::CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p, con
 	EntityIteratorPredicateInRect rec{ p.X + ar.low.X, p.Y + ar.low.Y, p.X + ar.high.X - 100, p.Y + ar.high.Y - 100 };
 	EntityIterator it{ &rec };
 	for (auto* ent : it) {
-		if (GGL::CSettler* s = shok_DynamicCast<EGL::CGLEEntity, GGL::CSettler>(ent)) {
+		if (GGL::CSettler* s = dynamic_cast<GGL::CSettler*>(ent)) {
 			s->KillSettlerByEnvironment();
 		}
-		else if (GGL::CAnimal* a = shok_DynamicCast<EGL::CGLEEntity, GGL::CAnimal>(ent)) {
+		else if (GGL::CAnimal* a = dynamic_cast<GGL::CAnimal*>(ent)) {
 			if (!a->GetFirstAttachedToMe(shok::AttachmentType::HERO_HAWK))
 				a->Destroy();
 		}

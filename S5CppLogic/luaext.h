@@ -21,6 +21,16 @@ namespace luaext {
 		GGL::CResourceDoodad* OptResourceDoodad(int i);
 
 		int OptEntityId(int i);
+
+		void PushPos(const shok::Position& p);
+		shok::Position CheckPos(int idx);
+
+		void CheckEntityAlive(int id, const char* msg);
+
+		void ReadCostInfo(int idx, shok::CostInfo& c, bool ignorezeroes);
+
+		GGlue::CGlueEntityProps* OptEntityType(int idx);
+		GGlue::CGlueEntityProps* CheckEntityType(int idx);
 	};
 }
 

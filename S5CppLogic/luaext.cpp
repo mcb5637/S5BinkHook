@@ -71,6 +71,107 @@ int luaext::EState::OptEntityId(int i)
 	return e ? e->EntityId : 0;
 }
 
+void luaext::EState::PushPos(const shok::Position& p)
+{
+	NewTable();
+	Push("X");
+	Push(p.X);
+	SetTableRaw(-3);
+	Push("Y");
+	Push(p.Y);
+	SetTableRaw(-3);
+}
+shok::Position luaext::EState::CheckPos(int idx)
+{
+	int i = ToAbsoluteIndex(idx);
+	Push("X");
+	GetTableRaw(i);
+	float x = CheckFloat(-1);
+	Push("Y");
+	GetTableRaw(i);
+	float y = CheckFloat(-1);
+	int size = *EGL::CGLEGameLogic::MapSize * 100;
+	if (!(x >= 0 && y >= 0 && x < size && y < size))
+		throw lua::LuaException("position outside of map");
+	Pop(2);
+	return shok::Position(x, y);
+}
+
+void luaext::EState::CheckEntityAlive(int id, const char* msg)
+{
+	if (EGL::CGLEEntity::EntityIDIsDead(id))
+		throw lua::LuaException(msg);
+}
+
+void luaext::EState::ReadCostInfo(int index, shok::CostInfo& c, bool ignoreZeroes)
+{
+	float i = 0;
+	GetTableRawI(index, static_cast<int>(shok::ResourceType::Clay));
+	if (IsNumber(-1)) {
+		i = CheckFloat(-1);
+		if (i != 0 || !ignoreZeroes)
+			c.Clay = i;
+	}
+	Pop(1);
+	GetTableRawI(index, static_cast<int>(shok::ResourceType::Gold));
+	if (IsNumber(-1)) {
+		i = CheckFloat(-1);
+		if (i != 0 || !ignoreZeroes)
+			c.Gold = i;
+	}
+	Pop(1);
+	GetTableRawI(index, static_cast<int>(shok::ResourceType::Iron));
+	if (IsNumber(-1)) {
+		i = CheckFloat(-1);
+		if (i != 0 || !ignoreZeroes)
+			c.Iron = i;
+	}
+	Pop(1);
+	GetTableRawI(index, static_cast<int>(shok::ResourceType::Silver));
+	if (IsNumber(-1)) {
+		i = CheckFloat(-1);
+		if (i != 0 || !ignoreZeroes)
+			c.Silver = i;
+	}
+	Pop(1);
+	GetTableRawI(index, static_cast<int>(shok::ResourceType::Stone));
+	if (IsNumber(-1)) {
+		i = CheckFloat(-1);
+		if (i != 0 || !ignoreZeroes)
+			c.Stone = i;
+	}
+	Pop(1);
+	GetTableRawI(index, static_cast<int>(shok::ResourceType::Sulfur));
+	if (IsNumber(-1)) {
+		i = CheckFloat(-1);
+		if (i != 0 || !ignoreZeroes)
+			c.Sulfur = i;
+	}
+	Pop(1);
+	GetTableRawI(index, static_cast<int>(shok::ResourceType::Wood));
+	if (IsNumber(-1)) {
+		i = CheckFloat(-1);
+		if (i != 0 || !ignoreZeroes)
+			c.Wood = i;
+	}
+	Pop(1);
+}
+
+GGlue::CGlueEntityProps* luaext::EState::OptEntityType(int idx)
+{
+	if (!IsNumber(idx))
+		return nullptr;
+	int t = CheckInt(idx);
+	return (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(t);
+}
+GGlue::CGlueEntityProps* luaext::EState::CheckEntityType(int idx)
+{
+	GGlue::CGlueEntityProps* t = OptEntityType(idx);
+	if (t == nullptr)
+		ThrowLuaFormatted("no entitytype at %d", idx);
+	return t;
+}
+
 
 void luaext_registerFunc(lua_State* L, const char* name, lua_CFunction func)
 {

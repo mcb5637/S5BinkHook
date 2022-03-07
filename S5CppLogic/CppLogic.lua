@@ -439,7 +439,7 @@ function CppLogic.API.ReadFileAsString(file) end
 --- checks if a file exists.
 -- @param file path to the file
 -- @return bool
-function CppLogic.API.BB::CFileSystemMgr::DoesFileExist(file) end
+function CppLogic.API.DoesFileExist(file) end
 
 --- compiles a lua chunk and executes it. shows the script in the debugger as file with the defined name.
 -- asserts if kimichuras dlls are detected.
@@ -1130,11 +1130,6 @@ function CppLogic.Entity.Building.SetHeight(id, h) end
 -- @param id barracks entity
 -- @return bool active
 function CppLogic.Entity.Building.GetBarracksAutoFillActive(id) end
-
---- construction site id.
--- @param id entity
--- @return id
-function CppLogic.Entity.Building.GetConstructionSite(id) end
 
 --- nearest construction slot.
 -- @param build building

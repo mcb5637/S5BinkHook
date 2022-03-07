@@ -112,16 +112,16 @@ int test(lua::State L) {
 int cleanup(lua_State* L) {
     lua::State L2 = lua::State{ L };
     CppLogic::Effect::Cleanup(L2);
+    CppLogic::Combat::Cleanup(L2);
+    CppLogic::Entity::Cleanup(L2);
 
-    l_entity_cleanup(L);
     l_logic_cleanup(L);
-    l_combat_cleanup(L);
     l_tech_cleanup(L);
     l_ui_cleanup(L);
     return 0;
 }
 
-void initGame() {
+void InitGame() {
     if (!Options.DoNotUseCenterFix)
         shok::HookTextPrinting();
     l_logic_onload();
@@ -130,11 +130,11 @@ void initGame() {
 
 constexpr double Version = 1.3002;
 
-int resetCppLogic(lua_State* L) {
-    lua_pushstring(L, "CppLogic");
-    lua_pushlightuserdata(L, &resetCppLogic);
-    lua_rawget(L, LUA_REGISTRYINDEX);
-    lua_rawset(L, LUA_GLOBALSINDEX);
+int ResetCppLogic(lua::State L) {
+    L.Push("CppLogic");
+    L.PushLightUserdata(&ResetCppLogic);
+    L.GetTableRaw(L.REGISTRYINDEX);
+    L.SetTableRaw(L.GLOBALSINDEX);
     return 0;
 }
 
@@ -142,7 +142,7 @@ int resetCppLogic(lua_State* L) {
      lua::State L2 = lua::State{ L };
      if (!shok::LuaStateMainmenu) {
          shok::LuaStateMainmenu = L;
-         initGame();
+         InitGame();
      }
 
 #ifdef _DEBUG
@@ -154,11 +154,11 @@ int resetCppLogic(lua_State* L) {
     L2.Push("CppLogic");
     L2.NewTable();
 
-    L2.PushLightUserdata(&resetCppLogic);
+    L2.PushLightUserdata(&ResetCppLogic);
     L2.PushValue(-2);
     L2.SetTableRaw(L2.REGISTRYINDEX);
 
-    luaext_registerFunc(L, "OnLeaveMap", &cleanup);
+    L2.RegisterFunc<cleanup>("OnLeaveMap", -3);
     L2.Push("Version");
     L2.Push(Version);
     L2.SetTableRaw(-3);
@@ -180,12 +180,12 @@ int resetCppLogic(lua_State* L) {
 
     L2.Push("Combat");
     L2.NewTable();
-    l_combat_init(L);
+    CppLogic::Combat::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.Push("Entity");
     L2.NewTable();
-    l_entity_init(L);
+    CppLogic::Entity::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.Push("EntityType");
@@ -215,7 +215,7 @@ int resetCppLogic(lua_State* L) {
 
     L2.SetTableRaw(L2.GLOBALSINDEX);
 
-    lua_register(L, "CppLogic_ResetGlobal", &resetCppLogic);
+    L2.RegisterFunc<ResetCppLogic>("CppLogic_ResetGlobal");
 
     luaopen_debug(L);
 

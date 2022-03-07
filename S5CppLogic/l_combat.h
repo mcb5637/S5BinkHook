@@ -1,5 +1,7 @@
 #pragma once
 #include "luaimport.h"
 
-void l_combat_init(lua_State* L);
-void l_combat_cleanup(lua_State* L);
+namespace CppLogic::Combat {
+	void Init(lua::State L);
+	void Cleanup(lua::State L);
+}

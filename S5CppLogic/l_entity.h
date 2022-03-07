@@ -3,5 +3,7 @@
 #include "luaimport.h"
 #include "s5data.h"
 
-void l_entity_init(lua_State* L);
-void l_entity_cleanup(lua_State* L);
+namespace CppLogic::Entity {
+	void Init(lua::State L);
+	void Cleanup(lua::State L);
+}

@@ -1938,7 +1938,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 32> Building{ {
+	constexpr std::array<lua::FuncReference, 31> Building{ {
 			lua::FuncReference::GetRef<BuildingGetBarracksAutoFillActive>("GetBarracksAutoFillActive"),
 			lua::FuncReference::GetRef<BuildingGetHeight>("GetHeight"),
 			lua::FuncReference::GetRef<BuildingSetHeight>("SetHeight"),

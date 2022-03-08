@@ -1,847 +1,975 @@
 #include "pch.h"
 #include "l_entitytype.h"
-#include "pch.h"
 #include "luaext.h"
 
-int l_leaderTyGetSoldierType(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	luaext_assert(L, t->IsSettlerType(), "no settler type at 1");
-	GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, p, "no leader type at 1");
-	lua_pushnumber(L, p->SoldierType);
-	return 1;
-}
-int l_leaderTySetSoldierType(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	luaext_assert(L, t->IsSettlerType(), "no settler type at 1");
-	GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, p, "no leader type at 1");
-	GGlue::CGlueEntityProps* t2 = luaext_checkEntityType(L, 2);
-	luaext_assert(L, t2->IsSettlerType(), "no settler type at 2");
-	luaext_assertPointer(L, t2->GetBehaviorProps<GGL::CSoldierBehaviorProps>(), "no soldier type at 2");
-	p->SoldierType = luaL_checkint(L, 2);
-	return 0;
-}
-
-int l_entityTyGetLimitedLifespanDur(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CLimitedLifespanBehaviorProps* l = t->GetBehaviorProps<GGL::CLimitedLifespanBehaviorProps>();
-	luaext_assertPointer(L, l, "no limited lifespan entitytype at 1");
-	lua_pushnumber(L, l->LifespanSeconds);
-	return 1;
-}
-int l_entityTySetLimitedLifespanDur(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CLimitedLifespanBehaviorProps* l = t->GetBehaviorProps<GGL::CLimitedLifespanBehaviorProps>();
-	luaext_assertPointer(L, l, "no limited lifespan entitytype at 1");
-	l->LifespanSeconds = luaL_checkint(L, 2);
-	return 0;
-}
-
-int l_leaderTyGetUpkeep(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	luaext_assert(L, t->IsSettlerType(), "no settler type at 1");
-	GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, p, "no leader type at 1");
-	lua_pushnumber(L, p->UpkeepCosts);
-	return 1;
-}
-int l_leaderTySetUpkeep(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	luaext_assert(L, t->IsSettlerType(), "no settler type at 1");
-	GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, p, "no leader type at 1");
-	p->UpkeepCosts = luaL_checkfloat(L, 2);
-	return 0;
-}
-
-int l_entityTyGetMaxHealth(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	lua_pushnumber(L, t->LogicProps->MaxHealth);
-	return 1;
-}
-int l_entityTySetMaxHealth(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	t->LogicProps->MaxHealth = luaL_checkint(L, 2);
-	return 0;
-}
-
-int l_buildingTyGetSabotageFactor(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	lua_pushnumber(L, bp->KegEffectFactor);
-	return 1;
-}
-int l_buildingTySetSabotageFactor(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	bp->KegEffectFactor = luaL_checkfloat(L, 2);
-	return 0;
-}
-
-int l_entityTyGetAffectMotivation(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CAffectMotivationBehaviorProps* a = t->GetBehaviorProps<GGL::CAffectMotivationBehaviorProps>();
-	luaext_assertPointer(L, a, "no affect motivation entitytype at 1");
-	lua_pushnumber(L, a->MotivationEffect);
-	return 1;
-}
-int l_entityTySetAffectMotivation(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CAffectMotivationBehaviorProps* a = t->GetBehaviorProps<GGL::CAffectMotivationBehaviorProps>();
-	luaext_assertPointer(L, a, "no affect motivation entitytype at 1");
-	a->MotivationEffect = luaL_checkfloat(L, 2);
-	return 0;
-}
-
-int l_entityTyGetSuspendedAnimation(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLAnimationBehaviorExProps* a = t->GetBehaviorProps<GGL::CGLAnimationBehaviorExProps>();
-	luaext_assertPointer(L, a, "no animated entitytype at 1");
-	lua_pushnumber(L, a->SuspensionAnimation);
-	return 1;
-}
-int l_entityTySetSuspendedAnimation(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLAnimationBehaviorExProps* a = t->GetBehaviorProps<GGL::CGLAnimationBehaviorExProps>();
-	luaext_assertPointer(L, a, "no animated entitytype at 1");
-	a->SuspensionAnimation = luaL_checkint(L, 2);
-	return 0;
-}
-
-int l_leaderTyGetRegen(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CLeaderBehaviorProps* l = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, l, "no leader entitytype at 1");
-	lua_pushnumber(L, l->HealingPoints);
-	lua_pushnumber(L, l->HealingSeconds);
-	return 2;
-}
-int l_leaderTySetRegen(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CLeaderBehaviorProps* l = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, l, "no leader entitytype at 1");
-	if (lua_isnumber(L, 2))
-		l->HealingPoints = luaL_checkint(L, 2);
-	if (lua_isnumber(L, 3))
-		l->HealingSeconds = luaL_checkint(L, 3);
-	return 0;
-}
-
-int l_entityTyGetAutoAttackDamage(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	if (b != nullptr) {
-		lua_pushnumber(L, b->DamageAmount);
-		lua_pushnumber(L, b->DamageClass);
-		return 2;
-	}
-	GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
-	if (a != nullptr) {
-		lua_pushnumber(L, a->DamageAmount);
-		lua_pushnumber(L, a->DamageClass);
-		return 2;
-	}
-	return luaL_error(L, "no battle or autocannon entity type at 1");
-}
-int l_entityTySetAutoAttackDamage(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	if (b != nullptr) {
-		b->DamageAmount = luaL_checkint(L, 2);
-		b->DamageClass = luaL_checkint(L, 3);
-		return 0;
-	}
-	GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
-	if (a != nullptr) {
-		a->DamageAmount = luaL_checkint(L, 2);
-		a->DamageClass = luaL_checkint(L, 3);
-		return 0;
-	}
-	return luaL_error(L, "no battle or autocannon entity type at 1");
-}
-
-int l_entityTypeAddEntityCat(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok::EntityCategory cat = static_cast<shok::EntityCategory>(luaL_checkint(L, 2));
-	luaext_assert(L, !t->IsOfCategory(cat), "entitytype is already of this cat");
-	auto v = t->LogicProps->Categories.SaveVector();
-	v.Vector.push_back(cat);
-	return 0;
-}
-int l_entityTypeRemoveEntityCat(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	shok::EntityCategory cat = static_cast<shok::EntityCategory>(luaL_checkint(L, 2));
-	auto v = t->LogicProps->Categories.SaveVector();
-	auto e = std::remove_if(v.Vector.begin(), v.Vector.end(), [cat](shok::EntityCategory c) { return c == cat; });
-	v.Vector.erase(e, v.Vector.end());
-	return 0;
-}
-
-int l_entityTyGetAutoAttackMissChance(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	luaext_assertPointer(L, b, "no battle entity at 1");
-	lua_pushnumber(L, b->MissChance);
-	return 1;
-}
-int l_entityTySetAutoAttackMissChance(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	luaext_assertPointer(L, b, "no battle entity at 1");
-	b->MissChance = luaL_checkint(L, 2);
-	return 0;
-}
-
-int l_entityTyGetRange(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	if (b != nullptr) {
-		lua_pushnumber(L, b->MaxRange);
-		lua_pushnumber(L, b->MinRange);
-		return 2;
-	}
-	GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
-	if (a != nullptr) {
-		lua_pushnumber(L, a->MaxAttackRange);
+namespace CppLogic::EntityType {
+	int LeaderTypeGetSoldierType(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (!t->IsSettlerType())
+			throw lua::LuaException("no settler type at 1");
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!p)
+			throw lua::LuaException("no leader type at 1");
+		L.Push(p->SoldierType);
 		return 1;
 	}
-	return luaL_error(L, "no battle or autocannon entity type at 1");
-}
-int l_entityTySetRange(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	if (b != nullptr) {
-		if (lua_isnumber(L, 2))
-			b->MaxRange = luaL_checkfloat(L, 2);
-		if (lua_isnumber(L, 3))
-			b->MinRange = luaL_checkfloat(L, 3);
+	int LeaderTypeSetSoldierType(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (!t->IsSettlerType())
+			throw lua::LuaException("no settler type at 1");
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!p)
+			throw lua::LuaException("no leader type at 1");
+		GGlue::CGlueEntityProps* t2 = L.CheckEntityType(2);
+		if (!t2->IsSettlerType())
+			throw lua::LuaException("no settler type at 2");
+		if (!t2->GetBehaviorProps<GGL::CSoldierBehaviorProps>())
+			throw lua::LuaException("no soldier type at 2");
+		p->SoldierType = L.CheckInt(2);
 		return 0;
 	}
-	GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
-	if (a != nullptr) {
-		if (lua_isnumber(L, 2))
-			a->MaxAttackRange = luaL_checkfloat(L, 2);
-		return 0;
-	}
-	return luaL_error(L, "no battle or autocannon entity type at 1");
-}
 
-int l_entityTyGetBattleWaitUntil(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	if (b != nullptr) {
-		lua_pushnumber(L, b->BattleWaitUntil);
+	int GetLimitedLifespanDuration(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CLimitedLifespanBehaviorProps* l = t->GetBehaviorProps<GGL::CLimitedLifespanBehaviorProps>();
+		if (!l)
+			throw lua::LuaException("no limited lifespan entitytype at 1");
+		L.Push(l->LifespanSeconds);
 		return 1;
 	}
-	GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
-	if (a != nullptr) {
-		lua_pushnumber(L, a->ReloadTime);
+	int SetLimitedLifespanDuration(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CLimitedLifespanBehaviorProps* l = t->GetBehaviorProps<GGL::CLimitedLifespanBehaviorProps>();
+		if(!l)
+			throw lua::LuaException("no limited lifespan entitytype at 1");
+		l->LifespanSeconds = L.CheckInt(2);
+		return 0;
+	}
+
+	int LeaderTypeGetUpkeep(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (!t->IsSettlerType())
+			throw lua::LuaException("no settler type at 1");
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!p)
+			throw lua::LuaException("no leader type at 1");
+		L.Push(p->UpkeepCosts);
 		return 1;
 	}
-	return luaL_error(L, "no battle or autocannon entity type at 1");
-}
-int l_entityTySetBattleWaitUntil(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
-	if (b != nullptr) {
-		b->BattleWaitUntil = luaL_checkint(L, 2);
+	int LeaderTypeSetUpkeep(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (!t->IsSettlerType())
+			throw lua::LuaException("no settler type at 1");
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!p)
+			throw lua::LuaException("no leader type at 1");
+		p->UpkeepCosts = L.CheckFloat(2);
 		return 0;
 	}
-	GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
-	if (a != nullptr) {
-		a->ReloadTime = luaL_checkint(L, 2);
+
+	int GetMaxHealth(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.Push(t->LogicProps->MaxHealth);
+		return 1;
+	}
+	int SetMaxHealth(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		t->LogicProps->MaxHealth = L.CheckInt(2);
 		return 0;
 	}
-	return luaL_error(L, "no battle or autocannon entity type at 1");
-}
 
-int l_leaderTyGetAutoAggressiveRange(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CLeaderBehaviorProps* b = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, b, "no battle entity at 1");
-	lua_pushnumber(L, b->AutoAttackRange);
-	return 1;
-}
-int l_leaderTySetAutoAggressiveRange(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CLeaderBehaviorProps* b = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
-	luaext_assertPointer(L, b, "no battle entity at 1");
-	b->AutoAttackRange = luaL_checkfloat(L, 2);
-	return 0;
-}
+	int GetSabotageFactor(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		L.Push(bp->KegEffectFactor);
+		return 1;
+	}
+	int SetSabotageFactor(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		bp->KegEffectFactor = L.CheckFloat(2);
+		return 0;
+	}
 
-int l_buildingTyGetVCAttractionPlaces(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	lua_pushnumber(L, bp->NumberOfAttractableSettlers);
-	return 1;
-}
-int l_buildingTySetVCAttractionPlaces(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	bp->NumberOfAttractableSettlers = luaL_checkint(L, 2);
-	return 0;
-}
+	int GetAffectMotivation(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CAffectMotivationBehaviorProps* a = t->GetBehaviorProps<GGL::CAffectMotivationBehaviorProps>();
+		if (!a)
+			throw lua::LuaException("no affect motivation entitytype at 1");
+		L.Push(a->MotivationEffect);
+		return 1;
+	}
+	int SetAffectMotivation(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CAffectMotivationBehaviorProps* a = t->GetBehaviorProps<GGL::CAffectMotivationBehaviorProps>();
+		if (!a)
+			throw lua::LuaException("no affect motivation entitytype at 1");
+		a->MotivationEffect = L.CheckFloat(2);
+		return 0;
+	}
 
-int l_settlerTyGetThiefStealingInfo(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CThiefBehaviorProperties* p = t->GetBehaviorProps<GGL::CThiefBehaviorProperties>();
-	luaext_assertPointer(L, p, "no thief entity at 1");
-	lua_pushnumber(L, p->SecondsNeededToSteal);
-	lua_pushnumber(L, p->MaximumAmountToSteal);
-	lua_pushnumber(L, p->MinimumAmountToSteal);
-	return 3;
-}
-int l_settlerTySetThiefStealingInfo(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CThiefBehaviorProperties* p = t->GetBehaviorProps<GGL::CThiefBehaviorProperties>();
-	luaext_assertPointer(L, p, "no thief entity at 1");
-	if (lua_isnumber(L, 2))
-		p->SecondsNeededToSteal = luaL_checkint(L, 2);
-	if (lua_isnumber(L, 3))
-		p->MaximumAmountToSteal = luaL_checkint(L, 3);
-	if (lua_isnumber(L, 4))
-		p->MinimumAmountToSteal = luaL_checkint(L, 4);
-	return 0;
-}
+	int GetSuspendedAnimation(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLAnimationBehaviorExProps* a = t->GetBehaviorProps<GGL::CGLAnimationBehaviorExProps>();
+		if (!a)
+			throw lua::LuaException("no animated entitytype at 1");
+		L.Push(a->SuspensionAnimation);
+		return 1;
+	}
+	int SetSuspendedAnimation(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLAnimationBehaviorExProps* a = t->GetBehaviorProps<GGL::CGLAnimationBehaviorExProps>();
+		if (!a)
+			throw lua::LuaException("no animated entitytype at 1");
+		a->SuspensionAnimation = L.CheckInt(2);
+		return 0;
+	}
 
-int l_settlerTyGetCamouflageAbilityData(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CCamouflageBehaviorProps* p = t->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
-	luaext_assertPointer(L, p, "no camoflague entity at 1");
-	lua_pushnumber(L, p->DurationSeconds);
-	lua_pushnumber(L, p->DiscoveryRange);
-	lua_pushnumber(L, p->RechargeTimeSeconds);
-	return 3;
-}
-int l_settlerTySetCamouflageAbilityData(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CCamouflageBehaviorProps* p = t->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
-	luaext_assertPointer(L, p, "no camoflague entity at 1");
-	if (lua_isnumber(L, 2))
-		p->DurationSeconds = luaL_checkint(L, 2);
-	if (lua_isnumber(L, 3))
-		p->DiscoveryRange = luaL_checkfloat(L, 3);
-	if (lua_isnumber(L, 4))
-		p->RechargeTimeSeconds = luaL_checkint(L, 4);
-	return 0;
-}
-
-int l_entityTyGetArmor(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	if (t->IsSettlerType()) {
-		GGL::CGLSettlerProps* s = (GGL::CGLSettlerProps*)t->LogicProps;
-		lua_pushnumber(L, s->ArmorAmount);
-		lua_pushnumber(L, s->ArmorClass);
+	int LeaderTypeGetRegeneration(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CLeaderBehaviorProps* l = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!l)
+			throw lua::LuaException("no leader entitytype at 1");
+		L.Push(l->HealingPoints);
+		L.Push(l->HealingSeconds);
 		return 2;
 	}
-	if (t->IsBuildingType()) {
-		GGL::CGLBuildingProps* s = (GGL::CGLBuildingProps*)t->LogicProps;
-		lua_pushnumber(L, s->ArmorAmount);
-		lua_pushnumber(L, s->ArmorClass);
-		return 2;
-	}
-	return luaL_error(L, "no settler or building entity type at 1");
-}
-int l_entityTySetArmor(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
-		if (lua_isnumber(L, 2))
-			s->ArmorAmount = luaL_checkint(L, 2);
-		if (lua_isnumber(L, 3))
-			s->ArmorClass = luaL_checkint(L, 3);
+	int LeaderTypeSetRegeneration(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CLeaderBehaviorProps* l = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!l)
+			throw lua::LuaException("no leader entitytype at 1");
+		if (L.IsNumber(2))
+			l->HealingPoints = L.CheckInt(2);
+		if (L.IsNumber(3))
+			l->HealingSeconds = L.CheckInt(3);
 		return 0;
 	}
-	if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
-		if (lua_isnumber(L, 2))
-			s->ArmorAmount = luaL_checkint(L, 2);
-		if (lua_isnumber(L, 3))
-			s->ArmorClass = luaL_checkint(L, 3);
+
+	int GetAutoAttackDamage(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (b != nullptr) {
+			L.Push(b->DamageAmount);
+			L.Push(b->DamageClass);
+			return 2;
+		}
+		GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
+		if (a != nullptr) {
+			L.Push(a->DamageAmount);
+			L.Push(a->DamageClass);
+			return 2;
+		}
+		throw lua::LuaException("no battle or autocannon entity type at 1");
+	}
+	int SetAutoAttackDamage(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (b != nullptr) {
+			b->DamageAmount = L.CheckInt(2);
+			b->DamageClass = L.CheckInt(3);
+			return 0;
+		}
+		GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
+		if (a != nullptr) {
+			a->DamageAmount = L.CheckInt(2);
+			a->DamageClass = L.CheckInt(3);
+			return 0;
+		}
+		throw lua::LuaException("no battle or autocannon entity type at 1");
+	}
+
+	int AddEntityCategory(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		shok::EntityCategory cat = static_cast<shok::EntityCategory>(L.CheckInt(2));
+		if (t->IsOfCategory(cat))
+			throw lua::LuaException("entitytype is already of this cat");
+		auto v = t->LogicProps->Categories.SaveVector();
+		v.Vector.push_back(cat);
 		return 0;
 	}
-	return luaL_error(L, "no settler or building entity type at 1");
-}
-
-int l_entityTyGetModels(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	for (int i = 0; i < 4; i++)
-		lua_pushnumber(L, t->DisplayProps->Model[i]);
-	return 4;
-}
-int l_entityTySetModels(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	for (int i = 0; i < 4; i++)
-		if (lua_isnumber(L, 1 + i))
-			t->DisplayProps->Model[i] = luaL_checkint(L, 1 + i);
-	return 0;
-}
-
-int l_settlerTyGetAbilityDataCircularAttack(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CCircularAttackProps* p = t->GetBehaviorProps<GGL::CCircularAttackProps>();
-	luaext_assertPointer(L, p, "no circularattack entity at 1");
-	lua_pushnumber(L, p->Damage);
-	lua_pushnumber(L, p->DamageClass);
-	lua_pushnumber(L, p->Range);
-	lua_pushnumber(L, p->RechargeTimeSeconds);
-	return 4;
-}
-int l_settlerTySetAbilityDataCircularAttack(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CCircularAttackProps* p = t->GetBehaviorProps<GGL::CCircularAttackProps>();
-	luaext_assertPointer(L, p, "no circularattack entity at 1");
-	if (lua_isnumber(L, 2))
-		p->Damage = luaL_checkint(L, 2);
-	if (lua_isnumber(L, 3))
-		p->DamageClass = luaL_checkint(L, 3);
-	if (lua_isnumber(L, 4))
-		p->Range = luaL_checkfloat(L, 4);
-	if (lua_isnumber(L, 5))
-		p->RechargeTimeSeconds = luaL_checkint(L, 5);
-	return 0;
-}
-
-int l_settlerTyGetAbilityDataShuriken(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CShurikenAbilityProps* p = t->GetBehaviorProps<GGL::CShurikenAbilityProps>();
-	luaext_assertPointer(L, p, "no shuriken entity at 1");
-	lua_pushnumber(L, p->DamageAmount);
-	lua_pushnumber(L, p->DamageClass);
-	lua_pushnumber(L, p->NumberShuriken);
-	lua_pushnumber(L, p->Range);
-	lua_pushnumber(L, p->MaxArcDegree);
-	lua_pushnumber(L, p->RechargeTimeSeconds);
-	lua_pushnumber(L, p->ProjectileType);
-	return 7;
-}
-int l_settlerTySetAbilityDataShuriken(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CShurikenAbilityProps* p = t->GetBehaviorProps<GGL::CShurikenAbilityProps>();
-	luaext_assertPointer(L, p, "no shuriken entity at 1");
-	if (lua_isnumber(L, 2))
-		p->DamageAmount = luaL_checkint(L, 2);
-	if (lua_isnumber(L, 3))
-		p->DamageClass = luaL_checkint(L, 3);
-	if (lua_isnumber(L, 4))
-		p->NumberShuriken = luaL_checkint(L, 4);
-	if (lua_isnumber(L, 5))
-		p->Range = luaL_checkfloat(L, 5);
-	if (lua_isnumber(L, 6))
-		p->MaxArcDegree = luaL_checkfloat(L, 6);
-	if (lua_isnumber(L, 7))
-		p->RechargeTimeSeconds = luaL_checkint(L, 7);
-	return 0;
-}
-
-int l_settlerTyGetAbilityDataSniper(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CSniperAbilityProps* p = t->GetBehaviorProps<GGL::CSniperAbilityProps>();
-	luaext_assertPointer(L, p, "no sniper entity at 1");
-	lua_pushnumber(L, p->DamageFactor);
-	lua_pushnumber(L, p->Range);
-	lua_pushnumber(L, p->RechargeTimeSeconds);
-	return 3;
-}
-int l_settlerTySetAbilityDataSniper(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CSniperAbilityProps* p = t->GetBehaviorProps<GGL::CSniperAbilityProps>();
-	luaext_assertPointer(L, p, "no sniper entity at 1");
-	if (lua_isnumber(L, 2))
-		p->DamageFactor = luaL_checkfloat(L, 2);
-	if (lua_isnumber(L, 3))
-		p->Range = luaL_checkfloat(L, 3);
-	if (lua_isnumber(L, 4))
-		p->RechargeTimeSeconds = luaL_checkint(L, 4);
-	return 0;
-}
-
-int l_settlerTyGetAbilityDataRangedEffect(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CRangedEffectAbilityProps* p = t->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
-	luaext_assertPointer(L, p, "no ranged effect entity at 1");
-	lua_pushnumber(L, p->DamageFactor);
-	lua_pushnumber(L, p->ArmorFactor);
-	lua_pushnumber(L, p->HealthRecoveryFactor);
-	lua_pushnumber(L, p->Range);
-	lua_pushnumber(L, p->RechargeTimeSeconds);
-	return 5;
-}
-int l_settlerTySetAbilityDataRangedEffect(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CRangedEffectAbilityProps* p = t->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
-	luaext_assertPointer(L, p, "no ranged effect entity at 1");
-	if (lua_isnumber(L, 2))
-		p->DamageFactor = luaL_checkfloat(L, 2);
-	if (lua_isnumber(L, 3))
-		p->ArmorFactor = luaL_checkfloat(L, 3);
-	if (lua_isnumber(L, 4))
-		p->HealthRecoveryFactor = luaL_checkfloat(L, 4);
-	if (lua_isnumber(L, 5))
-		p->Range = luaL_checkfloat(L, 5);
-	if (lua_isnumber(L, 6))
-		p->RechargeTimeSeconds = luaL_checkint(L, 6);
-	return 0;
-}
-
-int l_entityTyHasResourceTreeData(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CEntityProperties* l = dynamic_cast<GGL::CEntityProperties*>(t->LogicProps);
-	lua_pushboolean(L, l != nullptr);
-	return 1;
-}
-int l_entityTyGetResourceTreeData(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CEntityProperties* l = dynamic_cast<GGL::CEntityProperties*>(t->LogicProps);
-	luaext_assertPointer(L, l, "no resource tree entity at 1");
-	lua_pushnumber(L, l->ResourceEntity);
-	lua_pushnumber(L, l->ResourceAmount);
-	return 2;
-}
-int l_entityTySetResourceTreeData(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CEntityProperties* l = dynamic_cast<GGL::CEntityProperties*>(t->LogicProps);
-	luaext_assertPointer(L, l, "no resource tree entity at 1");
-	if (lua_isnumber(L, 2))
-		l->ResourceEntity = luaL_checkint(L, 2);
-	if (lua_isnumber(L, 3))
-		l->ResourceAmount = luaL_checkint(L, 3);
-	return 0;
-}
-
-int l_settlerTyGetFearless(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
-	luaext_assertPointer(L, s, "no settler entity at 1");
-	lua_pushboolean(L, s->Fearless);
-	return 1;
-}
-int l_settlerTySetFearless(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
-	luaext_assertPointer(L, s, "no settler entity at 1");
-	luaL_checkany(L, 2);
-	s->Fearless = lua_toboolean(L, 2);
-	return 0;
-}
-
-int l_settlerTyGetCost(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
-	luaext_assertPointer(L, s, "no settler entity at 1");
-	luaext_writeCostInfo(L, s->Cost);
-	return 1;
-}
-int l_settlerTySetCost(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
-	luaext_assertPointer(L, s, "no settler entity at 1");
-	bool ig = false;
-	if (lua_isboolean(L, 3))
-		ig = lua_toboolean(L, 3);
-	luaext_readCostInfo(L, 2, s->Cost, ig);
-	return 0;
-}
-
-int l_buildingGetCostConstr(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	luaext_writeCostInfo(L, bp->ConstructionInfo.Cost);
-	return 1;
-}
-int l_buildingSetCostConstr(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	bool ig = false;
-	if (lua_isboolean(L, 3))
-		ig = lua_toboolean(L, 3);
-	luaext_readCostInfo(L, 2, bp->ConstructionInfo.Cost, ig);
-	return 0;
-}
-
-int l_buildingGetCostUpgr(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	luaext_writeCostInfo(L, bp->Upgrade.Cost);
-	return 1;
-}
-int l_buildingSetCostUpgr(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
-	luaext_assertPointer(L, bp, "no building type at 1");
-	bool ig = false;
-	if (lua_isboolean(L, 3))
-		ig = lua_toboolean(L, 3);
-	luaext_readCostInfo(L, 2, bp->Upgrade.Cost, ig);
-	return 0;
-}
-
-int l_entityTypeGetBlocking(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	lua_newtable(L);
-	int i = 1;
-	for (const shok::AARect& r : t->LogicProps->BlockingArea) {
-		lua_newtable(L);
-		luaext_pushPos(L, r.low);
-		lua_rawseti(L, -2, 1);
-		luaext_pushPos(L, r.high);
-		lua_rawseti(L, -2, 2);
-		lua_rawseti(L, -2, i);
-		i++;
+	int RemoveEntityCategory(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		shok::EntityCategory cat = static_cast<shok::EntityCategory>(L.CheckInt(2));
+		auto v = t->LogicProps->Categories.SaveVector();
+		auto e = std::remove_if(v.Vector.begin(), v.Vector.end(), [cat](shok::EntityCategory c) { return c == cat; });
+		v.Vector.erase(e, v.Vector.end());
+		return 0;
 	}
-	lua_pushnumber(L, t->LogicProps->NumBlockedPoints);
-	if (GGL::CBuildBlockProperties* bb = dynamic_cast<GGL::CBuildBlockProperties*>(t->LogicProps)) {
-		lua_newtable(L);
-		luaext_pushPos(L, bb->BuildBlockArea.low);
-		lua_rawseti(L, -2, 1);
-		luaext_pushPos(L, bb->BuildBlockArea.high);
-		lua_rawseti(L, -2, 2);
+
+	int GetAutoAttackMissChance(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (!b)
+			throw lua::LuaException("no battle entity at 1");
+		L.Push(b->MissChance);
+		return 1;
+	}
+	int SetAutoAttackMissChance(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (!b)
+			throw lua::LuaException("no battle entity at 1");
+		b->MissChance = L.CheckInt(2);
+		return 0;
+	}
+
+	int GetAutoAttackRange(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (b != nullptr) {
+			L.Push(b->MaxRange);
+			L.Push(b->MinRange);
+			return 2;
+		}
+		GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
+		if (a != nullptr) {
+			L.Push(a->MaxAttackRange);
+			return 1;
+		}
+		throw lua::LuaException("no battle or autocannon entity type at 1");
+	}
+	int SetAutoAttackRange(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (b != nullptr) {
+			if (L.IsNumber(2))
+				b->MaxRange = L.CheckFloat(2);
+			if (L.IsNumber(3))
+				b->MinRange = L.CheckFloat(3);
+			return 0;
+		}
+		GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
+		if (a != nullptr) {
+			if (L.IsNumber(2))
+				a->MaxAttackRange = L.CheckFloat(2);
+			return 0;
+		}
+		throw lua::LuaException("no battle or autocannon entity type at 1");
+	}
+
+	int GetBattleWaitUntil(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (b != nullptr) {
+			L.Push(b->BattleWaitUntil);
+			return 1;
+		}
+		GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
+		if (a != nullptr) {
+			L.Push(a->ReloadTime);
+			return 1;
+		}
+		throw lua::LuaException("no battle or autocannon entity type at 1");
+	}
+	int SetBattleWaitUntil(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		if (b != nullptr) {
+			b->BattleWaitUntil = L.CheckInt(2);
+			return 0;
+		}
+		GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
+		if (a != nullptr) {
+			a->ReloadTime = L.CheckInt(2);
+			return 0;
+		}
+		throw lua::LuaException("no battle or autocannon entity type at 1");
+	}
+
+	int LeaderTypeGetAutoAggressiveRange(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CLeaderBehaviorProps* b = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!b)
+			throw lua::LuaException("no battle entity at 1");
+		L.Push(b->AutoAttackRange);
+		return 1;
+	}
+	int LeaderTypeSetAutoAggressiveRange(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CLeaderBehaviorProps* b = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		if (!b)
+			throw lua::LuaException("no battle entity at 1");
+		b->AutoAttackRange = L.CheckFloat(2);
+		return 0;
+	}
+
+	int GetVCAttractionSlotsProvided(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		L.Push(bp->NumberOfAttractableSettlers);
+		return 1;
+	}
+	int SetVCAttractionSlotsProvided(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		bp->NumberOfAttractableSettlers = L.CheckInt(2);
+		return 0;
+	}
+
+	int ThiefTypeGetStealingInfo(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CThiefBehaviorProperties* p = t->GetBehaviorProps<GGL::CThiefBehaviorProperties>();
+		if (!p)
+			throw lua::LuaException("no thief entity at 1");
+		L.Push(p->SecondsNeededToSteal);
+		L.Push(p->MaximumAmountToSteal);
+		L.Push(p->MinimumAmountToSteal);
 		return 3;
 	}
-	return 2;
-}
+	int ThiefTypeSetStealingInfo(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CThiefBehaviorProperties* p = t->GetBehaviorProps<GGL::CThiefBehaviorProperties>();
+		if (!p)
+			throw lua::LuaException("no thief entity at 1");
+		if (L.IsNumber(2))
+			p->SecondsNeededToSteal = L.CheckInt(2);
+		if (L.IsNumber(3))
+			p->MaximumAmountToSteal = L.CheckInt(3);
+		if (L.IsNumber(4))
+			p->MinimumAmountToSteal = L.CheckInt(4);
+		return 0;
+	}
 
-int l_entityTyGetArmorModifierTechs(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
-		lua_newtable(L);
+	int GetAbilityDataCamouflage(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CCamouflageBehaviorProps* p = t->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
+		if (!p)
+			throw lua::LuaException("no camoflague entity at 1");
+		L.Push(p->DurationSeconds);
+		L.Push(p->DiscoveryRange);
+		L.Push(p->RechargeTimeSeconds);
+		return 3;
+	}
+	int SetAbilityDataCamouflage(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CCamouflageBehaviorProps* p = t->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
+		if (!p)
+			throw lua::LuaException("no camoflague entity at 1");
+		if (L.IsNumber(2))
+			p->DurationSeconds = L.CheckInt(2);
+		if (L.IsNumber(3))
+			p->DiscoveryRange = L.CheckFloat(3);
+		if (L.IsNumber(4))
+			p->RechargeTimeSeconds = L.CheckInt(4);
+		return 0;
+	}
+
+	int GetArmor(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (t->IsSettlerType()) {
+			GGL::CGLSettlerProps* s = (GGL::CGLSettlerProps*)t->LogicProps;
+			L.Push(s->ArmorAmount);
+			L.Push(s->ArmorClass);
+			return 2;
+		}
+		if (t->IsBuildingType()) {
+			GGL::CGLBuildingProps* s = (GGL::CGLBuildingProps*)t->LogicProps;
+			L.Push(s->ArmorAmount);
+			L.Push(s->ArmorClass);
+			return 2;
+		}
+		throw lua::LuaException("no settler or building entity type at 1");
+	}
+	int SetArmor(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
+			if (L.IsNumber(2))
+				s->ArmorAmount = L.CheckInt(2);
+			if (L.IsNumber(3))
+				s->ArmorClass = L.CheckInt(3);
+			return 0;
+		}
+		if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
+			if (L.IsNumber(2))
+				s->ArmorAmount = L.CheckInt(2);
+			if (L.IsNumber(3))
+				s->ArmorClass = L.CheckInt(3);
+			return 0;
+		}
+		throw lua::LuaException("no settler or building entity type at 1");
+	}
+
+	int GetModels(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		for (int i = 0; i < 4; i++)
+			L.Push(t->DisplayProps->Model[i]);
+		return 4;
+	}
+	int SetModels(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		for (int i = 0; i < 4; i++)
+			if (L.IsNumber(1 + i))
+				t->DisplayProps->Model[i] = L.CheckInt(1 + i);
+		return 0;
+	}
+
+	int GetAbilityDataCircularAttack(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CCircularAttackProps* p = t->GetBehaviorProps<GGL::CCircularAttackProps>();
+		if (!p)
+			throw lua::LuaException("no circularattack entity at 1");
+		L.Push(p->Damage);
+		L.Push(p->DamageClass);
+		L.Push(p->Range);
+		L.Push(p->RechargeTimeSeconds);
+		return 4;
+	}
+	int SetAbilityDataCircularAttack(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CCircularAttackProps* p = t->GetBehaviorProps<GGL::CCircularAttackProps>();
+		if (!p)
+			throw lua::LuaException("no circularattack entity at 1");
+		if (L.IsNumber(2))
+			p->Damage = L.CheckInt(2);
+		if (L.IsNumber(3))
+			p->DamageClass = L.CheckInt(3);
+		if (L.IsNumber(4))
+			p->Range = L.CheckFloat(4);
+		if (L.IsNumber(5))
+			p->RechargeTimeSeconds = L.CheckInt(5);
+		return 0;
+	}
+
+	int GetAbilityDataShuriken(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CShurikenAbilityProps* p = t->GetBehaviorProps<GGL::CShurikenAbilityProps>();
+		if (!p)
+			throw lua::LuaException("no shuriken entity at 1");
+		L.Push(p->DamageAmount);
+		L.Push(p->DamageClass);
+		L.Push(p->NumberShuriken);
+		L.Push(p->Range);
+		L.Push(p->MaxArcDegree);
+		L.Push(p->RechargeTimeSeconds);
+		L.Push(p->ProjectileType);
+		return 7;
+	}
+	int SetAbilityDataShuriken(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CShurikenAbilityProps* p = t->GetBehaviorProps<GGL::CShurikenAbilityProps>();
+		if (!p)
+			throw lua::LuaException("no shuriken entity at 1");
+		if (L.IsNumber(2))
+			p->DamageAmount = L.CheckInt(2);
+		if (L.IsNumber(3))
+			p->DamageClass = L.CheckInt(3);
+		if (L.IsNumber(4))
+			p->NumberShuriken = L.CheckInt(4);
+		if (L.IsNumber(5))
+			p->Range = L.CheckFloat(5);
+		if (L.IsNumber(6))
+			p->MaxArcDegree = L.CheckFloat(6);
+		if (L.IsNumber(7))
+			p->RechargeTimeSeconds = L.CheckInt(7);
+		return 0;
+	}
+
+	int GetAbilityDataSniper(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CSniperAbilityProps* p = t->GetBehaviorProps<GGL::CSniperAbilityProps>();
+		if (!p)
+			throw lua::LuaException("no sniper entity at 1");
+		L.Push(p->DamageFactor);
+		L.Push(p->Range);
+		L.Push(p->RechargeTimeSeconds);
+		return 3;
+	}
+	int SetAbilityDataSniper(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CSniperAbilityProps* p = t->GetBehaviorProps<GGL::CSniperAbilityProps>();
+		if (!p)
+			throw lua::LuaException("no sniper entity at 1");
+		if (L.IsNumber(2))
+			p->DamageFactor = L.CheckFloat(2);
+		if (L.IsNumber(3))
+			p->Range = L.CheckFloat(3);
+		if (L.IsNumber(4))
+			p->RechargeTimeSeconds = L.CheckInt(4);
+		return 0;
+	}
+
+	int GetAbilityDataRangedEffect(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CRangedEffectAbilityProps* p = t->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
+		if (!p)
+			throw lua::LuaException("no ranged effect entity at 1");
+		L.Push(p->DamageFactor);
+		L.Push(p->ArmorFactor);
+		L.Push(p->HealthRecoveryFactor);
+		L.Push(p->Range);
+		L.Push(p->RechargeTimeSeconds);
+		return 5;
+	}
+	int SetAbilityDataRangedEffect(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CRangedEffectAbilityProps* p = t->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
+		if (!p)
+			throw lua::LuaException("no ranged effect entity at 1");
+		if (L.IsNumber(2))
+			p->DamageFactor = L.CheckFloat(2);
+		if (L.IsNumber(3))
+			p->ArmorFactor = L.CheckFloat(3);
+		if (L.IsNumber(4))
+			p->HealthRecoveryFactor = L.CheckFloat(4);
+		if (L.IsNumber(5))
+			p->Range = L.CheckFloat(5);
+		if (L.IsNumber(6))
+			p->RechargeTimeSeconds = L.CheckInt(6);
+		return 0;
+	}
+
+	int ResourceTreeTypeHasData(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CEntityProperties* l = dynamic_cast<GGL::CEntityProperties*>(t->LogicProps);
+		L.Push(l != nullptr);
+		return 1;
+	}
+	int ResourceTreeTypeGetData(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CEntityProperties* l = dynamic_cast<GGL::CEntityProperties*>(t->LogicProps);
+		if (!l)
+			throw lua::LuaException("no resource tree entity at 1");
+		L.Push(l->ResourceEntity);
+		L.Push(l->ResourceAmount);
+		return 2;
+	}
+	int ResourceTreeTypeSetData(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CEntityProperties* l = dynamic_cast<GGL::CEntityProperties*>(t->LogicProps);
+		if (!l)
+			throw lua::LuaException("no resource tree entity at 1");
+		if (L.IsNumber(2))
+			l->ResourceEntity = L.CheckInt(2);
+		if (L.IsNumber(3))
+			l->ResourceAmount = L.CheckInt(3);
+		return 0;
+	}
+
+	int GetFearless(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		L.Push(s->Fearless);
+		return 1;
+	}
+	int SetFearless(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		L.CheckType(2, lua::LType::Boolean);
+		s->Fearless = L.ToBoolean(2);
+		return 0;
+	}
+
+	int SettlerGetCost(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		L.PushCostInfo(s->Cost);
+		return 1;
+	}
+	int SettlerSetCost(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		bool ig = L.OptBool(3, false);
+		L.ReadCostInfo(2, s->Cost, ig);
+		return 0;
+	}
+
+	int GetConstructionCost(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		L.PushCostInfo(bp->ConstructionInfo.Cost);
+		return 1;
+	}
+	int SetConstructionCost(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		bool ig = L.OptBool(3, false);
+		L.ReadCostInfo(2, bp->ConstructionInfo.Cost, ig);
+		return 0;
+	}
+
+	int GetUpgradeCost(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		L.PushCostInfo(bp->Upgrade.Cost);
+		return 1;
+	}
+	int SetUpgradeCost(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLBuildingProps* bp = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps);
+		if (!bp)
+			throw lua::LuaException("no building type at 1");
+		bool ig = L.OptBool(3, false);
+		L.ReadCostInfo(2, bp->Upgrade.Cost, ig);
+		return 0;
+	}
+
+	int GetBlocking(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.NewTable();
+		int i = 1;
+		for (const shok::AARect& r : t->LogicProps->BlockingArea) {
+			L.NewTable();
+			L.PushPos(r.low);
+			L.SetTableRawI(-2, 1);
+			L.PushPos(r.high);
+			L.SetTableRawI(-2, 2);
+			L.SetTableRawI(-2, i);
+			i++;
+		}
+		L.Push(t->LogicProps->NumBlockedPoints);
+		if (GGL::CBuildBlockProperties* bb = dynamic_cast<GGL::CBuildBlockProperties*>(t->LogicProps)) {
+			L.NewTable();
+			L.PushPos(bb->BuildBlockArea.low);
+			L.SetTableRawI(-2, 1);
+			L.PushPos(bb->BuildBlockArea.high);
+			L.SetTableRawI(-2, 2);
+			return 3;
+		}
+		return 2;
+	}
+
+	int GetArmorModifierTechs(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
+			L.NewTable();
+			int c = 1;
+			for (int i : s->ModifyArmor.TechList) {
+				L.Push(i);
+				L.SetTableRawI(-2, c);
+				c++;
+			}
+			return 1;
+		}
+		if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
+			L.NewTable();
+			int c = 1;
+			for (int i : s->ModifyArmor.TechList) {
+				L.Push(i);
+				L.SetTableRawI(-2, c);
+				c++;
+			}
+			return 1;
+		}
+		throw lua::LuaException("no settler or building entity type at 1");
+	}
+
+	int GetExplorationModifierTechs(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
+			L.NewTable();
+			int c = 1;
+			for (int i : s->ModifyExploration.TechList) {
+				L.Push(i);
+				L.SetTableRawI(-2, c);
+				c++;
+			}
+			return 1;
+		}
+		if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
+			L.NewTable();
+			int c = 1;
+			for (int i : s->ModifyExploration.TechList) {
+				L.Push(i);
+				L.SetTableRawI(-2, c);
+				c++;
+			}
+			return 1;
+		}
+		throw lua::LuaException("no settler or building entity type at 1");
+	}
+
+	int GetDamageModifierTechs(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		L.NewTable();
 		int c = 1;
-		for (int i : s->ModifyArmor.TechList) {
-			lua_pushnumber(L, i);
-			lua_rawseti(L, -2, c);
+		for (int i : s->ModifyDamage.TechList) {
+			L.Push(i);
+			L.SetTableRawI(-2, c);
 			c++;
 		}
 		return 1;
 	}
-	if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
-		lua_newtable(L);
+
+	int GetMaxRangeModifierTechs(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		L.NewTable();
 		int c = 1;
-		for (int i : s->ModifyArmor.TechList) {
-			lua_pushnumber(L, i);
-			lua_rawseti(L, -2, c);
+		for (int i : s->ModifyMaxRange.TechList) {
+			L.Push(i);
+			L.SetTableRawI(-2, c);
 			c++;
 		}
 		return 1;
 	}
-	return luaL_error(L, "no settler or building entity type at 1");
-}
 
-int l_entityTyGetExploModifierTechs(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
-		lua_newtable(L);
+	int GetSpeedModifierTechs(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		L.NewTable();
 		int c = 1;
-		for (int i : s->ModifyExploration.TechList) {
-			lua_pushnumber(L, i);
-			lua_rawseti(L, -2, c);
+		for (int i : s->ModifySpeed.TechList) {
+			L.Push(i);
+			L.SetTableRawI(-2, c);
 			c++;
 		}
 		return 1;
 	}
-	if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
-		lua_newtable(L);
-		int c = 1;
-		for (int i : s->ModifyExploration.TechList) {
-			lua_pushnumber(L, i);
-			lua_rawseti(L, -2, c);
-			c++;
+
+	int AddHPTechMod(lua::State ls) {
+		luaext::EState L{ ls };
+		if (CppLogic::HasSCELoader())
+			throw lua::LuaException("not supportet with SCELoader");
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (!t->IsBuildingType())
+			throw lua::LuaException("no building type at 1");
+		int tech = L.CheckInt(2);
+		shok::Technology* techo = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tech);
+		if (!techo)
+			throw lua::LuaException("no tech at 2");
+		EGL::CGLEEntity::BuildingMaxHpTechBoni.emplace(L.CheckInt(1), tech);
+		return 0;
+	}
+
+	int GetBuildOnTypes(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (!t->IsBuildingType())
+			throw lua::LuaException("no building type at 1");
+		L.NewTable();
+		int i = 1;
+		for (int ty : dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)->BuildOn) {
+			L.Push(ty);
+			L.SetTableRawI(-2, i);
+			i++;
 		}
 		return 1;
 	}
-	return luaL_error(L, "no settler or building entity type at 1");
-}
 
-int l_entityTyGetDamageModifierTechs(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
-	luaext_assertPointer(L, s, "no settler entity at 1");
-	lua_newtable(L);
-	int c = 1;
-	for (int i : s->ModifyDamage.TechList) {
-		lua_pushnumber(L, i);
-		lua_rawseti(L, -2, c);
-		c++;
-	}
-	return 1;
-}
-
-int l_entityTyGetRangeModifierTechs(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
-	luaext_assertPointer(L, s, "no settler entity at 1");
-	lua_newtable(L);
-	int c = 1;
-	for (int i : s->ModifyMaxRange.TechList) {
-		lua_pushnumber(L, i);
-		lua_rawseti(L, -2, c);
-		c++;
-	}
-	return 1;
-}
-
-int l_entityTyGetSpeedModifierTechs(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
-	luaext_assertPointer(L, s, "no settler entity at 1");
-	lua_newtable(L);
-	int c = 1;
-	for (int i : s->ModifySpeed.TechList) {
-		lua_pushnumber(L, i);
-		lua_rawseti(L, -2, c);
-		c++;
-	}
-	return 1;
-}
-
-int l_buildingTyAddHPTechMod(lua_State* L) {
-	if (CppLogic::HasSCELoader())
-		luaL_error(L, "not supportet with SCELoader");
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	luaext_assert(L, t->IsBuildingType(), "no building type at 1");
-	int tech = luaL_checkint(L, 2);
-	shok::Technology* techo = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tech);
-	luaext_assertPointer(L, techo, "no tech at 2");
-	EGL::CGLEEntity::BuildingMaxHpTechBoni.emplace(luaL_checkint(L, 1), tech);
-	return 0;
-}
-
-int l_buildingTy_GetBuildOnTypes(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	luaext_assert(L, t->IsBuildingType(), "no building type at 1");
-	lua_newtable(L);
-	int i = 1;
-	for (int ty : dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)->BuildOn) {
-		lua_pushnumber(L, ty);
-		lua_rawseti(L, -2, i);
-		i++;
-	}
-	return 1;
-}
-
-int l_leaderTy_GetMaxNumOfSoldiers(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	GGL::CLimitedAttachmentBehaviorProperties* pr = t->GetBehaviorProps<GGL::CLimitedAttachmentBehaviorProperties>();
-	luaext_assertPointer(L, pr, "no limited attachment");
-	int limit = -1;
-	std::string_view v = "ATTACHMENT_LEADER_SOLDIER";
-	for (auto& l : pr->Attachments) {
-		if (v.compare(l.Type.c_str()) == 0) {
-			limit = l.Limit;
-			break;
+	int LeaderTypeGetMaxNumberOfSoldiers(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		GGL::CLimitedAttachmentBehaviorProperties* pr = t->GetBehaviorProps<GGL::CLimitedAttachmentBehaviorProperties>();
+		if (!pr)
+			throw lua::LuaException("no limited attachment");
+		std::string_view v = "ATTACHMENT_LEADER_SOLDIER";
+		for (auto& l : pr->Attachments) {
+			if (v.compare(l.Type.c_str()) == 0) {
+				L.Push(l.Limit);
+				return 1;
+			}
 		}
+		throw lua::LuaException("no attachment limit ATTACHMENT_LEADER_SOLDIER");
 	}
-	luaext_assert(L, limit >= 0, "no attachment limit ATTACHMENT_LEADER_SOLDIER");
-	lua_pushnumber(L, limit);
-	return 1;
+
+	int GetUpgradeCategory(lua::State ls) {
+		luaext::EState L{ ls };
+		L.CheckEntityType(1);
+		int ucat = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(1)->SettlerUpgradeManager->GetUpgradeCategoryOfEntityType(L.CheckInt(1));
+		L.Push(ucat);
+		return 1;
+	}
+
+	int GetDeleteWhenBuildOn(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.Push(t->LogicProps->DeleteWhenBuiltOn);
+		return 1;
+	}
+	int SetDeleteWhenBuildOn(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.CheckType(2, lua::LType::Boolean);
+		t->LogicProps->DeleteWhenBuiltOn = L.ToBoolean(2);
+		return 0;
+	}
+
+	constexpr std::array<lua::FuncReference, 30> EntityType{ {
+			lua::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
+			lua::FuncReference::GetRef<SetLimitedLifespanDuration>("SetLimitedLifespanDuration"),
+			lua::FuncReference::GetRef<GetMaxHealth>("GetMaxHealth"),
+			lua::FuncReference::GetRef<SetMaxHealth>("SetMaxHealth"),
+			lua::FuncReference::GetRef<GetAffectMotivation>("GetAffectMotivation"),
+			lua::FuncReference::GetRef<SetAffectMotivation>("SetAffectMotivation"),
+			lua::FuncReference::GetRef<GetSuspendedAnimation>("GetSuspendedAnimation"),
+			lua::FuncReference::GetRef<SetSuspendedAnimation>("SetSuspendedAnimation"),
+			lua::FuncReference::GetRef<GetAutoAttackDamage>("GetAutoAttackDamage"),
+			lua::FuncReference::GetRef<SetAutoAttackDamage>("SetAutoAttackDamage"),
+			lua::FuncReference::GetRef<AddEntityCategory>("AddEntityCategory"),
+			lua::FuncReference::GetRef<RemoveEntityCategory>("RemoveEntityCategory"),
+			lua::FuncReference::GetRef<GetAutoAttackMissChance>("GetAutoAttackMissChance"),
+			lua::FuncReference::GetRef<SetAutoAttackMissChance>("SetAutoAttackMissChance"),
+			lua::FuncReference::GetRef<GetAutoAttackRange>("GetAutoAttackRange"),
+			lua::FuncReference::GetRef<SetAutoAttackRange>("SetAutoAttackRange"),
+			lua::FuncReference::GetRef<GetArmor>("GetArmor"),
+			lua::FuncReference::GetRef<SetArmor>("SetArmor"),
+			lua::FuncReference::GetRef<GetModels>("GetModels"),
+			lua::FuncReference::GetRef<SetModels>("SetModels"),
+			lua::FuncReference::GetRef<ResourceTreeTypeHasData>("ResourceTreeTypeHasData"),
+			lua::FuncReference::GetRef<ResourceTreeTypeGetData>("ResourceTreeTypeGetData"),
+			lua::FuncReference::GetRef<ResourceTreeTypeSetData>("ResourceTreeTypeSetData"),
+			lua::FuncReference::GetRef<GetBlocking>("GetBlocking"),
+			lua::FuncReference::GetRef<GetArmorModifierTechs>("GetArmorModifierTechs"),
+			lua::FuncReference::GetRef<GetExplorationModifierTechs>("GetExplorationModifierTechs"),
+			lua::FuncReference::GetRef<GetDeleteWhenBuildOn>("GetDeleteWhenBuildOn"),
+			lua::FuncReference::GetRef<SetDeleteWhenBuildOn>("SetDeleteWhenBuildOn"),
+			lua::FuncReference::GetRef<GetBattleWaitUntil>("GetBattleWaitUntil"),
+			lua::FuncReference::GetRef<SetBattleWaitUntil>("SetBattleWaitUntil"),
+		} };
+
+	constexpr std::array<lua::FuncReference, 29> Settler{ {
+			lua::FuncReference::GetRef<LeaderTypeGetSoldierType>("LeaderTypeGetSoldierType"),
+			lua::FuncReference::GetRef<LeaderTypeSetSoldierType>("LeaderTypeSetSoldierType"),
+			lua::FuncReference::GetRef<LeaderTypeGetUpkeep>("LeaderTypeGetUpkeep"),
+			lua::FuncReference::GetRef<LeaderTypeSetUpkeep>("LeaderTypeSetUpkeep"),
+			lua::FuncReference::GetRef<LeaderTypeGetRegeneration>("LeaderTypeGetRegeneration"),
+			lua::FuncReference::GetRef<LeaderTypeSetRegeneration>("LeaderTypeSetRegeneration"),
+			lua::FuncReference::GetRef<LeaderTypeGetAutoAggressiveRange>("LeaderTypeGetAutoAggressiveRange"),
+			lua::FuncReference::GetRef<LeaderTypeSetAutoAggressiveRange>("LeaderTypeSetAutoAggressiveRange"),
+			lua::FuncReference::GetRef<ThiefTypeGetStealingInfo>("ThiefTypeGetStealingInfo"),
+			lua::FuncReference::GetRef<ThiefTypeSetStealingInfo>("ThiefTypeSetStealingInfo"),
+			lua::FuncReference::GetRef<GetAbilityDataCamouflage>("GetAbilityDataCamouflage"),
+			lua::FuncReference::GetRef<SetAbilityDataCamouflage>("SetAbilityDataCamouflage"),
+			lua::FuncReference::GetRef<GetAbilityDataCircularAttack>("GetAbilityDataCircularAttack"),
+			lua::FuncReference::GetRef<SetAbilityDataCircularAttack>("SetAbilityDataCircularAttack"),
+			lua::FuncReference::GetRef<GetAbilityDataShuriken>("GetAbilityDataShuriken"),
+			lua::FuncReference::GetRef<SetAbilityDataShuriken>("SetAbilityDataShuriken"),
+			lua::FuncReference::GetRef<GetAbilityDataSniper>("GetAbilityDataSniper"),
+			lua::FuncReference::GetRef<SetAbilityDataSniper>("SetAbilityDataSniper"),
+			lua::FuncReference::GetRef<GetAbilityDataRangedEffect>("GetAbilityDataRangedEffect"),
+			lua::FuncReference::GetRef<SetAbilityDataRangedEffect>("SetAbilityDataRangedEffect"),
+			lua::FuncReference::GetRef<GetFearless>("GetFearless"),
+			lua::FuncReference::GetRef<SetFearless>("SetFearless"),
+			lua::FuncReference::GetRef<SettlerGetCost>("GetCost"),
+			lua::FuncReference::GetRef<SettlerSetCost>("SetCost"),
+			lua::FuncReference::GetRef<GetDamageModifierTechs>("GetDamageModifierTechs"),
+			lua::FuncReference::GetRef<GetMaxRangeModifierTechs>("GetMaxRangeModifierTechs"),
+			lua::FuncReference::GetRef<GetSpeedModifierTechs>("GetSpeedModifierTechs"),
+			lua::FuncReference::GetRef<LeaderTypeGetMaxNumberOfSoldiers>("LeaderTypeGetMaxNumberOfSoldiers"),
+			lua::FuncReference::GetRef<GetUpgradeCategory>("GetUpgradeCategory"),
+		} };
+
+	constexpr std::array<lua::FuncReference, 10> Building{ {
+			lua::FuncReference::GetRef<GetSabotageFactor>("GetSabotageFactor"),
+			lua::FuncReference::GetRef<SetSabotageFactor>("SetSabotageFactor"),
+			lua::FuncReference::GetRef<GetVCAttractionSlotsProvided>("GetVCAttractionSlotsProvided"),
+			lua::FuncReference::GetRef<SetVCAttractionSlotsProvided>("SetVCAttractionSlotsProvided"),
+			lua::FuncReference::GetRef<GetConstructionCost>("GetConstructionCost"),
+			lua::FuncReference::GetRef<SetConstructionCost>("SetConstructionCost"),
+			lua::FuncReference::GetRef<GetUpgradeCost>("GetUpgradeCost"),
+			lua::FuncReference::GetRef<SetUpgradeCost>("SetUpgradeCost"),
+			lua::FuncReference::GetRef<AddHPTechMod>("AddHPTechMod"),
+			lua::FuncReference::GetRef<GetBuildOnTypes>("GetBuildOnTypes"),
+		} };
+
+	void Init(lua::State L)
+	{
+		L.RegisterFuncs(EntityType, -3);
+
+		L.Push("Settler");
+		L.NewTable();
+		L.RegisterFuncs(Settler, -3);
+		L.SetTableRaw(-3);
+
+		L.Push("Building");
+		L.NewTable();
+		L.RegisterFuncs(Building, -3);
+		L.SetTableRaw(-3);
+	}
 }
-
-int l_settlerTy_GetUpgradeCategory(lua_State* L) {
-	luaext_checkEntityType(L, 1);
-	int ucat = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(1)->SettlerUpgradeManager->GetUpgradeCategoryOfEntityType(luaL_checkint(L, 1));
-	lua_pushnumber(L, ucat);
-	return 1;
-}
-
-int l_entityTy_GetDeleteWhenBuildOn(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	lua_pushboolean(L, t->LogicProps->DeleteWhenBuiltOn);
-	return 1;
-}
-int l_entityTy_SetDeleteWhenBuildOn(lua_State* L) {
-	GGlue::CGlueEntityProps* t = luaext_checkEntityType(L, 1);
-	luaL_checktype(L, 2, LUA_TBOOLEAN);
-	t->LogicProps->DeleteWhenBuiltOn = lua_toboolean(L, 2);
-	return 0;
-}
-
-void l_entitytype_init(lua_State* L)
-{
-	luaext_registerFunc(L, "GetLimitedLifespanDuration", &l_entityTyGetLimitedLifespanDur);
-	luaext_registerFunc(L, "SetLimitedLifespanDuration", &l_entityTySetLimitedLifespanDur);
-	luaext_registerFunc(L, "GetMaxHealth", &l_entityTyGetMaxHealth);
-	luaext_registerFunc(L, "SetMaxHealth", &l_entityTySetMaxHealth);
-	luaext_registerFunc(L, "GetAffectMotivation", &l_entityTyGetAffectMotivation);
-	luaext_registerFunc(L, "SetAffectMotivation", &l_entityTySetAffectMotivation);
-	luaext_registerFunc(L, "GetSuspendedAnimation", &l_entityTyGetSuspendedAnimation);
-	luaext_registerFunc(L, "SetSuspendedAnimation", &l_entityTySetSuspendedAnimation);
-	luaext_registerFunc(L, "GetAutoAttackDamage", &l_entityTyGetAutoAttackDamage);
-	luaext_registerFunc(L, "SetAutoAttackDamage", &l_entityTySetAutoAttackDamage);
-	luaext_registerFunc(L, "AddEntityCategory", &l_entityTypeAddEntityCat);
-	luaext_registerFunc(L, "RemoveEntityCategory", &l_entityTypeRemoveEntityCat);
-	luaext_registerFunc(L, "GetAutoAttackMissChance", &l_entityTyGetAutoAttackMissChance);
-	luaext_registerFunc(L, "SetAutoAttackMissChance", &l_entityTySetAutoAttackMissChance);
-	luaext_registerFunc(L, "GetAutoAttackRange", &l_entityTyGetRange);
-	luaext_registerFunc(L, "SetAutoAttackRange", &l_entityTySetRange);
-	luaext_registerFunc(L, "GetArmor", &l_entityTyGetArmor);
-	luaext_registerFunc(L, "SetArmor", &l_entityTySetArmor);
-	luaext_registerFunc(L, "GetModels", &l_entityTyGetModels);
-	luaext_registerFunc(L, "SetModels", &l_entityTySetModels);
-	luaext_registerFunc(L, "ResourceTreeTypeHasData", &l_entityTyHasResourceTreeData);
-	luaext_registerFunc(L, "ResourceTreeTypeGetData", &l_entityTyGetResourceTreeData);
-	luaext_registerFunc(L, "ResourceTreeTypeSetData", &l_entityTySetResourceTreeData);
-	luaext_registerFunc(L, "GetBlocking", &l_entityTypeGetBlocking);
-	luaext_registerFunc(L, "GetArmorModifierTechs", &l_entityTyGetArmorModifierTechs);
-	luaext_registerFunc(L, "GetExplorationModifierTechs", &l_entityTyGetExploModifierTechs);
-	luaext_registerFunc(L, "GetDeleteWhenBuildOn", &l_entityTy_GetDeleteWhenBuildOn);
-	luaext_registerFunc(L, "SetDeleteWhenBuildOn", &l_entityTy_SetDeleteWhenBuildOn);
-	luaext_registerFunc(L, "GetBattleWaitUntil", &l_entityTyGetBattleWaitUntil);
-	luaext_registerFunc(L, "SetBattleWaitUntil", &l_entityTySetBattleWaitUntil);
-
-	lua_pushstring(L, "Settler");
-	lua_newtable(L);
-	luaext_registerFunc(L, "LeaderTypeGetSoldierType", &l_leaderTyGetSoldierType);
-	luaext_registerFunc(L, "LeaderTypeSetSoldierType", &l_leaderTySetSoldierType);
-	luaext_registerFunc(L, "LeaderTypeGetUpkeep", &l_leaderTyGetUpkeep);
-	luaext_registerFunc(L, "LeaderTypeSetUpkeep", &l_leaderTySetUpkeep);
-	luaext_registerFunc(L, "LeaderTypeGetRegeneration", &l_leaderTyGetRegen);
-	luaext_registerFunc(L, "LeaderTypeSetRegeneration", &l_leaderTySetRegen);
-	luaext_registerFunc(L, "LeaderTypeGetAutoAggressiveRange", &l_leaderTyGetAutoAggressiveRange);
-	luaext_registerFunc(L, "LeaderTypeSetAutoAggressiveRange", &l_leaderTySetAutoAggressiveRange);
-	luaext_registerFunc(L, "ThiefTypeGetStealingInfo", &l_settlerTyGetThiefStealingInfo);
-	luaext_registerFunc(L, "ThiefTypeSetStealingInfo", &l_settlerTySetThiefStealingInfo);
-	luaext_registerFunc(L, "GetAbilityDataCamouflage", &l_settlerTyGetCamouflageAbilityData);
-	luaext_registerFunc(L, "SetAbilityDataCamouflage", &l_settlerTySetCamouflageAbilityData);
-	luaext_registerFunc(L, "GetAbilityDataCircularAttack", &l_settlerTyGetAbilityDataCircularAttack);
-	luaext_registerFunc(L, "SetAbilityDataCircularAttack", &l_settlerTySetAbilityDataCircularAttack);
-	luaext_registerFunc(L, "GetAbilityDataShuriken", &l_settlerTyGetAbilityDataShuriken);
-	luaext_registerFunc(L, "SetAbilityDataShuriken", &l_settlerTySetAbilityDataShuriken);
-	luaext_registerFunc(L, "GetAbilityDataSniper", &l_settlerTyGetAbilityDataSniper);
-	luaext_registerFunc(L, "SetAbilityDataSniper", &l_settlerTySetAbilityDataSniper);
-	luaext_registerFunc(L, "GetAbilityDataRangedEffect", &l_settlerTyGetAbilityDataRangedEffect);
-	luaext_registerFunc(L, "SetAbilityDataRangedEffect", &l_settlerTySetAbilityDataRangedEffect);
-	luaext_registerFunc(L, "GetFearless", &l_settlerTyGetFearless);
-	luaext_registerFunc(L, "SetFearless", &l_settlerTySetFearless);
-	luaext_registerFunc(L, "GetCost", &l_settlerTyGetCost);
-	luaext_registerFunc(L, "SetCost", &l_settlerTySetCost);
-	luaext_registerFunc(L, "GetDamageModifierTechs", &l_entityTyGetDamageModifierTechs);
-	luaext_registerFunc(L, "GetMaxRangeModifierTechs", &l_entityTyGetRangeModifierTechs);
-	luaext_registerFunc(L, "GetSpeedModifierTechs", &l_entityTyGetSpeedModifierTechs);
-	luaext_registerFunc(L, "LeaderTypeGetMaxNumberOfSoldiers", &l_leaderTy_GetMaxNumOfSoldiers);
-	luaext_registerFunc(L, "GetUpgradeCategory", &l_settlerTy_GetUpgradeCategory);
-	lua_rawset(L, -3);
-
-	lua_pushstring(L, "Building");
-	lua_newtable(L);
-	luaext_registerFunc(L, "GetSabotageFactor", &l_buildingTyGetSabotageFactor);
-	luaext_registerFunc(L, "SetSabotageFactor", &l_buildingTySetSabotageFactor);
-	luaext_registerFunc(L, "GetVCAttractionSlotsProvided", &l_buildingTyGetVCAttractionPlaces);
-	luaext_registerFunc(L, "SetVCAttractionSlotsProvided", &l_buildingTySetVCAttractionPlaces);
-	luaext_registerFunc(L, "GetConstructionCost", &l_buildingGetCostConstr);
-	luaext_registerFunc(L, "SetConstructionCost", &l_buildingSetCostConstr);
-	luaext_registerFunc(L, "GetUpgradeCost", &l_buildingGetCostUpgr);
-	luaext_registerFunc(L, "SetUpgradeCost", &l_buildingSetCostUpgr);
-	luaext_registerFunc(L, "AddHPTechMod", &l_buildingTyAddHPTechMod);
-	luaext_registerFunc(L, "GetBuildOnTypes", &l_buildingTy_GetBuildOnTypes);
-	lua_rawset(L, -3);
-}
-
 // CppLogic.EntityType.Settler.LeaderTypeGetSoldierType(Entities.PU_LeaderSword1)
 // Logic.IsEntityInCategory(GUI.GetSelectedEntity(), 100)
 // CppLogic.EntityType.AddEntityCategory(Entities.PU_LeaderSword1, 100)

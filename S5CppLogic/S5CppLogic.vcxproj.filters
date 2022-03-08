@@ -66,15 +66,6 @@
     <ClInclude Include="luaext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="l_entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="l_entitytype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="l_logic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="l_tech.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -213,6 +204,15 @@
     <ClInclude Include="l_combat.h">
       <Filter>luafuncs</Filter>
     </ClInclude>
+    <ClInclude Include="l_entity.h">
+      <Filter>luafuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="l_entitytype.h">
+      <Filter>luafuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="l_logic.h">
+      <Filter>luafuncs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -222,15 +222,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="luaext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="l_entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="l_entitytype.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="l_logic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="l_tech.cpp">
@@ -336,6 +327,15 @@
       <Filter>luafuncs</Filter>
     </ClCompile>
     <ClCompile Include="l_combat.cpp">
+      <Filter>luafuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="l_entity.cpp">
+      <Filter>luafuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="l_entitytype.cpp">
+      <Filter>luafuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="l_logic.cpp">
       <Filter>luafuncs</Filter>
     </ClCompile>
   </ItemGroup>

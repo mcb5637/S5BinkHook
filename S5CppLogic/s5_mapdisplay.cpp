@@ -43,7 +43,7 @@ shok::Color ED::CPlayerColors::GetColorByIndex(int i)
 void ED::CPlayerColors::SetColorByIndex(int i, shok::Color c)
 {
 	if (i < 0 || i > 16)
-		return;
+		throw std::out_of_range("invalid color index");
 	Colors[i] = c;
 	(*ED::CGlobalsBaseEx::GlobalObj)->DisplayProps->MiniMapColor.data()[i] = c;
 }

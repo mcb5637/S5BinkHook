@@ -18,7 +18,7 @@ EGL::CGLEEntity* luaext::EState::CheckEntity(int i)
 EGL::CGLEEntity* luaext::EState::OptEntity(int i)
 {
 	int id = 0;
-	if (IsString(i)) {
+	if (Type(i) == lua::LType::String) {
 		id = EGL::CGLEEntity::GetEntityIDByScriptName(ToString(i));
 	}
 	else if (IsNumber(i)) {
@@ -90,11 +90,41 @@ shok::Position luaext::EState::CheckPos(int idx)
 	Push("Y");
 	GetTableRaw(i);
 	float y = CheckFloat(-1);
+	Pop(2);
 	int size = *EGL::CGLEGameLogic::MapSize * 100;
 	if (!(x >= 0 && y >= 0 && x < size && y < size))
 		throw lua::LuaException("position outside of map");
-	Pop(2);
 	return shok::Position(x, y);
+}
+shok::PositionRot luaext::EState::CheckPosRot(int i, bool rad)
+{
+	i = ToAbsoluteIndex(i);
+	Push("X");
+	GetTableRaw(i);
+	float x = CheckFloat(-1);
+	Push("Y");
+	GetTableRaw(i);
+	float y = CheckFloat(-1);
+	Push("r");
+	GetTableRaw(i);
+	float r = CheckFloat(-1);
+	if (rad)
+		r = deg2rad(r);
+	Pop(3);
+	int size = *EGL::CGLEGameLogic::MapSize * 100;
+	if (!(x >= 0 && y >= 0 && x < size&& y < size))
+		throw lua::LuaException("position outside of map");
+	return { x,y,r };
+}
+void luaext::EState::PushPosRot(const shok::PositionRot& p, bool rad)
+{
+	PushPos(p);
+	Push("r");
+	if (rad)
+		Push(rad2deg(p.r));
+	else
+		Push(p.r);
+	SetTableRaw(-3);
 }
 
 void luaext::EState::CheckEntityAlive(int id, const char* msg)
@@ -156,6 +186,28 @@ void luaext::EState::ReadCostInfo(int index, shok::CostInfo& c, bool ignoreZeroe
 	}
 	Pop(1);
 }
+void luaext::EState::PushCostInfo(const shok::CostInfo& c)
+{
+	NewTable();
+	for (int i = 1; i <= shok::ResourceType_MaxValue; i++) {
+		Push(0);
+		SetTableRawI(-2, i);
+	}
+	Push(c.Clay);
+	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Clay));
+	Push(c.Gold);
+	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Gold));
+	Push(c.Iron);
+	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Iron));
+	Push(c.Silver);
+	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Silver));
+	Push(c.Stone);
+	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Stone));
+	Push(c.Sulfur);
+	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Sulfur));
+	Push(c.Wood);
+	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Wood));
+}
 
 GGlue::CGlueEntityProps* luaext::EState::OptEntityType(int idx)
 {
@@ -170,6 +222,25 @@ GGlue::CGlueEntityProps* luaext::EState::CheckEntityType(int idx)
 	if (t == nullptr)
 		ThrowLuaFormatted("no entitytype at %d", idx);
 	return t;
+}
+
+void luaext::EState::StringToLower()
+{
+	Push("string");
+	GetTableRaw(GLOBALSINDEX);
+	Push("lower");
+	GetTableRaw(-2);
+	Remove(-2);
+	Insert(-2);
+	PCall(1, 1, 0);
+}
+
+shok::ResourceType luaext::EState::CheckResourceType(int i)
+{
+	int r = CheckInt(i);
+	if (r <= 0 || r > shok::ResourceType_MaxValue)
+		throw lua::LuaException("no resource type");
+	return static_cast<shok::ResourceType>(r);
 }
 
 

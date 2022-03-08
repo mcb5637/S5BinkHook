@@ -103,9 +103,10 @@ struct testdata {
 };
 
 int test(lua::State L) {
-    BB::SerializationData s = BB::SerializationData::ValueData("y", typeandoffset(testdata, x), BB::FieldSerilaizer::GetSerilalizer<int>());
-    L.Push(static_cast<int>(s.Size));
-    L.Push(static_cast<int>(s.Position));
+    luaext::EState L2{ L };
+    EGL::CGLEEntity* e = L2.CheckEntity(1);
+    L.Push((int)e);
+    L.Push((int)dynamic_cast<GGL::CSettler*>(e));
     return 2;
 }
 
@@ -114,8 +115,8 @@ int cleanup(lua_State* L) {
     CppLogic::Effect::Cleanup(L2);
     CppLogic::Combat::Cleanup(L2);
     CppLogic::Entity::Cleanup(L2);
+    CppLogic::Logic::Cleanup(L2);
 
-    l_logic_cleanup(L);
     l_tech_cleanup(L);
     l_ui_cleanup(L);
     return 0;
@@ -124,7 +125,7 @@ int cleanup(lua_State* L) {
 void InitGame() {
     if (!Options.DoNotUseCenterFix)
         shok::HookTextPrinting();
-    l_logic_onload();
+    CppLogic::Logic::OnLoad();
     ESnd::CSoEMusic::HookStartMusicFilesystem();
 }
 
@@ -190,12 +191,12 @@ int ResetCppLogic(lua::State L) {
 
     L2.Push("EntityType");
     L2.NewTable();
-    l_entitytype_init(L);
+    CppLogic::EntityType::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.Push("Logic");
     L2.NewTable();
-    l_logic_init(L);
+    CppLogic::Logic::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.Push("Technology");

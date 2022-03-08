@@ -24,13 +24,20 @@ namespace luaext {
 
 		void PushPos(const shok::Position& p);
 		shok::Position CheckPos(int idx);
+		shok::PositionRot CheckPosRot(int idx, bool rad = false);
+		void PushPosRot(const shok::PositionRot& p, bool rad = false);
 
 		void CheckEntityAlive(int id, const char* msg);
 
 		void ReadCostInfo(int idx, shok::CostInfo& c, bool ignorezeroes);
+		void PushCostInfo(const shok::CostInfo& c);
 
 		GGlue::CGlueEntityProps* OptEntityType(int idx);
 		GGlue::CGlueEntityProps* CheckEntityType(int idx);
+
+		void StringToLower();
+
+		shok::ResourceType CheckResourceType(int idx);
 	};
 }
 

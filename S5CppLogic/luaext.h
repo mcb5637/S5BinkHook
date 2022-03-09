@@ -38,6 +38,10 @@ namespace luaext {
 		void StringToLower();
 
 		shok::ResourceType CheckResourceType(int idx);
+
+		shok::Technology* CheckTech(int idx);
+
+		EGUIX::CBaseWidget* CheckWidget(int idx);
 	};
 }
 

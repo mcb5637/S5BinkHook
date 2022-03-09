@@ -152,12 +152,16 @@ namespace BB {
 	private:
 		template<class T>
 		static BB::IObject* __stdcall FactObjCreator() {
-			return new (shok::Malloc(sizeof(T))) T();
+			return new T();
 		}
 
 	public:
 		using IClassFactory::AddClassToFactory;
+		// add class to factory, best called on mainmenu lua state initialization (will be called before anything serious gets loaded)
+		// map lua state initialization will be to late, as most stuff is already loaded there
+		// overload new and delete operators to allocate via shok::Malloc
 		template<class T>
+		requires std::is_default_constructible_v<T>
 		void AddClassToFactory() {
 			AddClassToFactory(T::Identifier, typename_details::type_name<T>(), &FactObjCreator<T>, T::SerializationData);
 		}

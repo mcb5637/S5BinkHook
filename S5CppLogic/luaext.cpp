@@ -243,6 +243,29 @@ shok::ResourceType luaext::EState::CheckResourceType(int i)
 	return static_cast<shok::ResourceType>(r);
 }
 
+shok::Technology* luaext::EState::CheckTech(int idx)
+{
+	int tid = CheckInt(idx);
+	shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tid);
+	if (!tech)
+		ThrowLuaFormatted("no tech at %d", idx);
+	return tech;
+}
+
+EGUIX::CBaseWidget* luaext::EState::CheckWidget(int idx)
+{
+	int id;
+	EGUIX::WidgetManager* wm = EGUIX::WidgetManager::GlobalObj();
+	if (Type(idx) == lua::LType::String)
+		id = wm->GetIdByName(ToString(idx));
+	else
+		id = CheckInt(idx);
+	EGUIX::CBaseWidget* r = wm->GetWidgetByID(id);
+	if (!r)
+		ThrowLuaFormatted("no widget at %i", idx);
+	return r;
+}
+
 
 void luaext_registerFunc(lua_State* L, const char* name, lua_CFunction func)
 {

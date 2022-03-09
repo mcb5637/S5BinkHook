@@ -116,9 +116,8 @@ int cleanup(lua_State* L) {
     CppLogic::Combat::Cleanup(L2);
     CppLogic::Entity::Cleanup(L2);
     CppLogic::Logic::Cleanup(L2);
-
-    l_tech_cleanup(L);
-    l_ui_cleanup(L);
+    CppLogic::Tech::Cleanup(L2);
+    CppLogic::UI::Cleanup(L2);
     return 0;
 }
 
@@ -147,8 +146,6 @@ int ResetCppLogic(lua::State L) {
      }
 
 #ifdef _DEBUG
-    /*lua_pushcfunction(L, &test);
-    lua_setglobal(L, "test");*/
     L2.RegisterFunc<test>("test");
 #endif
     
@@ -201,17 +198,17 @@ int ResetCppLogic(lua::State L) {
 
     L2.Push("Technology");
     L2.NewTable();
-    l_tech_init(L);
+    CppLogic::Tech::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.Push("UI");
     L2.NewTable();
-    l_ui_init(L);
+    CppLogic::UI::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.Push("UA");
     L2.NewTable();
-    l_ua_init(L);
+    CppLogic::UA::Init(L2);
     L2.SetTableRaw(-3);
 
     L2.SetTableRaw(L2.GLOBALSINDEX);
@@ -336,20 +333,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        /*{
-            Options.LoadFromFile("./CppLogicOptions.txt");
-            if (Options.DoNotLoad)
-                return false;
-        }
-    
-        {
-            int *data = reinterpret_cast<int*>(SHOK_Import_LUA_OPEN);
-            shok::SaveVirtualProtect vp{ data, 4 };
-            *data = reinterpret_cast<int>(&__lua_open);
-            data = reinterpret_cast<int*>(SHOK_Import_LUA_CLOSE);
-            shok::SaveVirtualProtect vp2{ data, 4 };
-            *data = reinterpret_cast<int>(&__lua_close);
-        }*/
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:

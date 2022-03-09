@@ -24,10 +24,10 @@ namespace EScr {
 
 	class CLuaFuncRefCommand : public CLuaFuncRef {
 	public:
-		lua_State* L; // todo: refractor to luapp, check which of the funcs below are also used by CLuaFuncRefGlobal
+		lua::State L; // check which of the funcs below are also used by CLuaFuncRefGlobal
 		bool NeedsCompile;
 		PADDING(3);
-		int Ref; // 3
+		lua::Reference Ref; // 3
 		shok::String LuaCommand; // 4 - 10
 		PADDINGI(1); // 11
 
@@ -37,6 +37,8 @@ namespace EScr {
 		void CreateRef(); // unrefs anything previously refd
 		bool CheckRef(); // creates if not already done, then return if the ref is valid
 		bool Call(int nargs, int nres); // uses shok error handling, so you get a popup on errors
+
+		void ReplaceFunc(lua::State L, int idx);
 
 		static inline constexpr int vtp = 0x786BE0;
 		static inline constexpr int TypeDesc = 0x83B83C;

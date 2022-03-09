@@ -40,3 +40,14 @@ bool EScr::CLuaFuncRefCommand::Call(int nargs, int nres)
 {
 	return funccmd_call(this, nargs, nres);
 }
+
+void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
+{
+	CheckRef();
+	Clear();
+	this->L = L;
+	L.CheckType(idx, lua::LType::Function);
+	L.PushValue(idx);
+	Ref = L.Ref(L.REGISTRYINDEX);
+	NeedsCompile = false;
+}

@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "l_tech.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_tech.h"
+#include "s5_entity.h"
 #include "luaext.h"
 
 namespace CppLogic::Tech {

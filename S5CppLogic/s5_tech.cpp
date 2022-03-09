@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_tech.h"
 
 float shok::Technology::Modifier::ModifyValue(float i) const
 {

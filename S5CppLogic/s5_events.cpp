@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5_events.h"
+#include "s5_defines.h"
 
 BB::CEvent::CEvent(int eventid)
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 #include "s5_events.h"
 
 namespace EGL {

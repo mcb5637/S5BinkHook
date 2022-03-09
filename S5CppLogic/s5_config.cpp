@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "s5data.h"
+#include <stdexcept>
+#include "s5_config.h"
 
 float& GGL::CDamageClassProps::GetBonusVsArmorClass(int ac)
 {

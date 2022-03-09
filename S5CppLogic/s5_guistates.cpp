@@ -1,6 +1,13 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_guistates.h"
+#include "s5_config.h"
+#include "s5_mapdisplay.h"
 #include "entityiterator.h"
+#include "s5_ui.h"
+#include "s5_entitytype.h"
+#include "s5_defines.h"
+#include "s5_entity.h"
+#include "hooks.h"
 
 
 void(__stdcall* const placebuildingstate_updatemodel)(GGUI::CPlaceBuildingState* th) = reinterpret_cast<void(__stdcall*)(GGUI::CPlaceBuildingState*)>(0x538C46);
@@ -31,13 +38,13 @@ void __declspec(naked) constructcommand_checkposition() {
 	}
 }
 float __stdcall constructcommand_getrotindeg() {
-	return rad2deg(GGUI::CPlaceBuildingState::PlacementRotation);
+	return CppLogic::RadiansToDegrees(GGUI::CPlaceBuildingState::PlacementRotation);
 }
 void __declspec(naked) constructcommand_setmodelrot() {
 	__asm {
 		push ecx; // gets replaced with float
 		push eax;
-		call constructcommand_getrotindeg; // for some reason i cant call rad2deg<float> directly here...
+		call constructcommand_getrotindeg; // for some reason i cant call CppLogic::RadiansToDegrees<float> directly here...
 		fstp[esp + 4]; // replacing
 		mov ecx, edi;
 
@@ -72,7 +79,7 @@ void __declspec(naked) constructcommand_checkpos() {
 }
 void(__thiscall* const constructcommand_updatemodelsetpos)(GGUI::CPlaceBuildingState* th, int* p, int r) = reinterpret_cast<void(__thiscall*)(GGUI::CPlaceBuildingState*, int*, int)>(0x5269FE);
 void __fastcall constructcommand_updatemodelsetpos_over(GGUI::CPlaceBuildingState* th, int _, int* p, int r) {
-	th->C3DViewHandler->ClumpRenerable->Model->Rotate(rad2deg(GGUI::CPlaceBuildingState::PlacementRotation), ED::ModelInstance::TransformOperation::Set);
+	th->C3DViewHandler->ClumpRenerable->Model->Rotate(CppLogic::RadiansToDegrees(GGUI::CPlaceBuildingState::PlacementRotation), ED::ModelInstance::TransformOperation::Set);
 	constructcommand_updatemodelsetpos(th, p, r);
 }
 bool HookConstructCommandRotation_Hooked = false;
@@ -81,15 +88,15 @@ void GGUI::CPlaceBuildingState::HookPlacementRotation()
 	if (HookConstructCommandRotation_Hooked)
 		return;
 	HookConstructCommandRotation_Hooked = true;
-	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x538FF4), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x538FF4), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding);
-	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x5389FB), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x5389FB), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
-	shok::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
-	shok::SaveVirtualProtect vp4{ reinterpret_cast<void*>(0x538BDB), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp4{ reinterpret_cast<void*>(0x538BDB), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538BDB), &constructcommand_checkpos);
-	shok::SaveVirtualProtect vp5{ reinterpret_cast<void*>(0x538C8D), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp5{ reinterpret_cast<void*>(0x538C8D), 10 };
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x538C8D), &constructcommand_updatemodelsetpos_over);
 }
 

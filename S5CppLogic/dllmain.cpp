@@ -1,9 +1,23 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
-#include "luaimport.h"
-#include "s5data.h"
-#include "luaext.h"
 #include <string>
+#include <map>
+#include <set>
+#include <list>
+#include <iostream>
+#include <fstream>
+#include <string_view>
+#include "Luapp/luapp50.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_classfactory.h"
+#include "s5_entity.h"
+#include "s5_scriptsystem.h"
+#include "s5_sound.h"
+#include "s5_ui.h"
+#include "s5_maplogic.h"
+#include "hooks.h"
+#include "luaext.h"
 #include "l_mem.h"
 #include "l_api.h"
 #include "l_effect.h"
@@ -14,12 +28,6 @@
 #include "l_tech.h"
 #include "l_ua.h"
 #include "l_ui.h"
-#include <map>
-#include <set>
-#include <list>
-#include <iostream>
-#include <fstream>
-#include <string_view>
 
 struct CppLogicOptions {
     bool DoNotLoad = false;
@@ -44,80 +52,73 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
-void dumpClassSerialization(lua_State* L, const BB::SerializationData* d) {
+void DumpClassSerialization(lua::State L, const BB::SerializationData* d) {
     if (!d) {
-        lua_pushstring(L, "unknown serialization data");
+        L.Push("unknown serialization data");
         return;
     }
-    lua_newtable(L);
+    L.NewTable();
     while (d->Type) {
-        lua_pushnumber(L, d->Position);
-        lua_newtable(L);
+        L.Push(static_cast<int>(d->Position));
+        L.NewTable();
 
         if (d->SerializationName) {
-            lua_pushstring(L, "name");
-            lua_pushstring(L, d->SerializationName);
-            lua_rawset(L, -3);
+            L.Push("name");
+            L.Push(d->SerializationName);
+            L.SetTableRaw(-3);
         }
-        lua_pushstring(L, "size");
-        lua_pushnumber(L, d->Size);
-        lua_rawset(L, -3);
+        L.Push("size");
+        L.Push(static_cast<int>(d->Size));
+        L.SetTableRaw(-3);
 
         if (d->Type == 2) {
-            lua_pushstring(L, "DataType");
+            L.Push("DataType");
             if (d->DataConverter == BB::FieldSerilaizer::TypeInt)
-                lua_pushstring(L, "Int");
+                L.Push("Int");
             else if (d->DataConverter == BB::FieldSerilaizer::TypeFloat)
-                lua_pushstring(L, "Float");
+                L.Push("Float");
             else if (d->DataConverter == BB::FieldSerilaizer::TypeBool)
-                lua_pushstring(L, "Bool");
+                L.Push("Bool");
             else
-                lua_pushnumber(L, reinterpret_cast<int>(d->DataConverter));
-            lua_rawset(L, -3);
+                L.Push(reinterpret_cast<int>(d->DataConverter));
+            L.SetTableRaw(-3);
         }
         else if (d->Type == 3) {
-            lua_pushstring(L, "SubElement");
-            dumpClassSerialization(L, d->SubElementData);
-            lua_rawset(L, -3);
+            L.Push("SubElement");
+            DumpClassSerialization(L, d->SubElementData);
+            L.SetTableRaw(-3);
         }
 
         if (d->ListOptions) {
-            lua_pushstring(L, "ListOpions");
-            lua_pushnumber(L, reinterpret_cast<int>(d->ListOptions));
-            lua_rawset(L, -3);
+            L.Push("ListOpions");
+            L.Push(reinterpret_cast<int>(d->ListOptions));
+            L.SetTableRaw(-3);
         }
 
-        lua_rawset(L, -3);
+        L.SetTableRaw(-3);
         d++;
     }
 }
-void dumpClassSerialization(lua_State* L, unsigned int id) {
+void DumpClassSerialization(lua::State L, unsigned int id) {
     const BB::SerializationData* d = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
-    dumpClassSerialization(L, d);
+    DumpClassSerialization(L, d);
 }
 
 #define typeandoffset(T,M) sizeof(decltype(T::M)), offsetof(T, M)
 
-struct testdata {
-    int x, y;
-};
-
-int test(lua::State L) {
-    luaext::EState L2{ L };
-    EGL::CGLEEntity* e = L2.CheckEntity(1);
-    L.Push((int)e);
-    L.Push((int)dynamic_cast<GGL::CSettler*>(e));
-    return 2;
+int Test(lua::State Ls) {
+    luaext::EState L{ Ls };
+    DumpClassSerialization(L, EGL::CGLEEntity::Identifier);
+    return 1;
 }
 
-int cleanup(lua_State* L) {
-    lua::State L2 = lua::State{ L };
-    CppLogic::Effect::Cleanup(L2);
-    CppLogic::Combat::Cleanup(L2);
-    CppLogic::Entity::Cleanup(L2);
-    CppLogic::Logic::Cleanup(L2);
-    CppLogic::Tech::Cleanup(L2);
-    CppLogic::UI::Cleanup(L2);
+int Cleanup(lua::State L) {
+    CppLogic::Effect::Cleanup(L);
+    CppLogic::Combat::Cleanup(L);
+    CppLogic::Entity::Cleanup(L);
+    CppLogic::Logic::Cleanup(L);
+    CppLogic::Tech::Cleanup(L);
+    CppLogic::UI::Cleanup(L);
     return 0;
 }
 
@@ -138,84 +139,83 @@ int ResetCppLogic(lua::State L) {
     return 0;
 }
 
- void install(lua_State * L) {
-     lua::State L2 = lua::State{ L };
+ void Install(lua::State L) {
      if (!shok::LuaStateMainmenu) {
-         shok::LuaStateMainmenu = L;
+         shok::LuaStateMainmenu = L.GetState();
          InitGame();
      }
 
 #ifdef _DEBUG
-    L2.RegisterFunc<test>("test");
+    L.RegisterFunc<Test>("test");
 #endif
     
-    L2.Push("CppLogic");
-    L2.NewTable();
+    L.Push("CppLogic");
+    L.NewTable();
 
-    L2.PushLightUserdata(&ResetCppLogic);
-    L2.PushValue(-2);
-    L2.SetTableRaw(L2.REGISTRYINDEX);
+    L.PushLightUserdata(&ResetCppLogic);
+    L.PushValue(-2);
+    L.SetTableRaw(L.REGISTRYINDEX);
 
-    L2.RegisterFunc<cleanup>("OnLeaveMap", -3);
-    L2.Push("Version");
-    L2.Push(Version);
-    L2.SetTableRaw(-3);
+    L.RegisterFunc<Cleanup>("OnLeaveMap", -3);
+    L.Push("Version");
+    L.Push(Version);
+    L.SetTableRaw(-3);
 
-    L2.Push("Memory");
-    L2.NewTable();
-    CppLogic::Mem::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("Memory");
+    L.NewTable();
+    CppLogic::Mem::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("API");
-    L2.NewTable();
-    CppLogic::API::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("API");
+    L.NewTable();
+    CppLogic::API::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("Effect");
-    L2.NewTable();
-    CppLogic::Effect::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("Effect");
+    L.NewTable();
+    CppLogic::Effect::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("Combat");
-    L2.NewTable();
-    CppLogic::Combat::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("Combat");
+    L.NewTable();
+    CppLogic::Combat::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("Entity");
-    L2.NewTable();
-    CppLogic::Entity::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("Entity");
+    L.NewTable();
+    CppLogic::Entity::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("EntityType");
-    L2.NewTable();
-    CppLogic::EntityType::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("EntityType");
+    L.NewTable();
+    CppLogic::EntityType::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("Logic");
-    L2.NewTable();
-    CppLogic::Logic::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("Logic");
+    L.NewTable();
+    CppLogic::Logic::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("Technology");
-    L2.NewTable();
-    CppLogic::Tech::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("Technology");
+    L.NewTable();
+    CppLogic::Tech::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("UI");
-    L2.NewTable();
-    CppLogic::UI::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("UI");
+    L.NewTable();
+    CppLogic::UI::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.Push("UA");
-    L2.NewTable();
-    CppLogic::UA::Init(L2);
-    L2.SetTableRaw(-3);
+    L.Push("UA");
+    L.NewTable();
+    CppLogic::UA::Init(L);
+    L.SetTableRaw(-3);
 
-    L2.SetTableRaw(L2.GLOBALSINDEX);
+    L.SetTableRaw(L.GLOBALSINDEX);
 
-    L2.RegisterFunc<ResetCppLogic>("CppLogic_ResetGlobal");
+    L.RegisterFunc<ResetCppLogic>("CppLogic_ResetGlobal");
 
-    luaopen_debug(L);
+    //luaopen_debug(L);
 
     shok::LogString("loaded CppLogic %f %s into %X with SCELoader status %i\n", Version,
 #ifdef _DEBUG
@@ -223,20 +223,7 @@ int ResetCppLogic(lua::State L) {
 #else
         "release",
 #endif
-        reinterpret_cast<int>(L), static_cast<int>(CppLogic::HasSCELoader()));
-}
-
-// CUtilMemory.GetMemory(tonumber("897558", 16))
-
-extern "C" lua_State * __lua_open() {
-    lua_State* o = lua_open();
-    install(o);
-    return o;
-}
-void __lua_close(lua_State* L) { // TODO do something better than this when i come around writing a modloader...
-    cleanup(L);
-    lua_close(L);
-    EGL::CGLETerrainLowRes::ClearBridgeArea();
+        reinterpret_cast<int>(L.GetState()), static_cast<int>(CppLogic::HasSCELoader()));
 }
 
 struct DebuggerOrig {
@@ -272,14 +259,14 @@ DebuggerOrig dbg{};
 
 extern "C" {
     void __declspec(dllexport) __stdcall AddLuaState(lua_State* L) {
-        install(L);
+        Install(lua::State{ L });
         dbg.Load();
         if (dbg.AddLuaState)
             dbg.AddLuaState(L);
     }
 
     void __declspec(dllexport) __stdcall RemoveLuaState(lua_State* L) {
-        cleanup(L);
+        Cleanup(lua::State{ L }); // TODO do something better than this when i come around writing a modloader...
         EGL::CGLETerrainLowRes::ClearBridgeArea();
         if (dbg.RemoveLuaState)
             dbg.RemoveLuaState(L);

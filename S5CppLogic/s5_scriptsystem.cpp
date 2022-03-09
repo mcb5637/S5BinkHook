@@ -1,5 +1,7 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_scriptsystem.h"
+
+lua_State* shok::LuaStateMainmenu = nullptr;
 
 void EScr::CScriptTriggerSystem::RunTrigger(BB::CEvent* ev)
 {

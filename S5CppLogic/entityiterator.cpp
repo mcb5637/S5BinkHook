@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "entityiterator.h"
+#include "s5_entityandeffectmanager.h"
+#include "s5_maplogic.h"
+#include "s5_player.h"
+#include "s5_entitytype.h"
 
 
 EntityIterator::EntityIterator(const EntityIteratorPredicate* Predicate)

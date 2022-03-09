@@ -1,5 +1,11 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "Luapp/luapp50.h"
+
+namespace shok {
+	extern lua_State* LuaStateMainmenu;
+}
 
 namespace EScr {
 	class IScriptTriggerSystem : public BB::IObject, public BB::IPostEvent {

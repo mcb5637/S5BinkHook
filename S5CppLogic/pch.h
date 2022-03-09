@@ -10,5 +10,11 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 #include <exception>
+#include <vector>
+#include <array>
+#include <cstdint>
+#include <string>
+#include <functional>
+#include <numbers>
 
 #endif //PCH_H

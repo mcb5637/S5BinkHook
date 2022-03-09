@@ -1,12 +1,16 @@
 #include "pch.h"
-
-#include "l_api.h"
-
 #include <libloaderapi.h>
 #include <sstream>
 #include <string_view>
 #include <array>
-
+#include "l_api.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_filesystem.h"
+#include "s5_framework.h"
+#include "s5_scriptsystem.h"
+#include "s5_idmanager.h"
+#include "hooks.h"
 #include "luaext.h"
 
 namespace CppLogic::API {
@@ -213,11 +217,11 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int CreateExtraDataTables(lua_State* L) {
-		(*BB::CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L, "Animations");
-		(*BB::CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L, "TerrainTypes");
-		(*BB::CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L, "WaterTypes");
-		(*BB::CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L, "ArmorClasses");
+	int CreateExtraDataTables(lua::State L) {
+		(*BB::CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L.GetState(), "Animations");
+		(*BB::CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "TerrainTypes");
+		(*BB::CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "WaterTypes");
+		(*BB::CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L.GetState(), "ArmorClasses");
 		return 0;
 	}
 

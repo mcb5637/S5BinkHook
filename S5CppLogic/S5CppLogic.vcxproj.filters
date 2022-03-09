@@ -52,21 +52,12 @@
     <Filter Include="luafuncs">
       <UniqueIdentifier>{5eb05b2f-be0b-468d-8590-292f15d17f28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utility">
+      <UniqueIdentifier>{909c9675-a836-4937-a838-60d3df65811d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="luaimport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="luaext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="l_ua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -107,15 +98,6 @@
     </ClInclude>
     <ClInclude Include="s5_netevents.h">
       <Filter>shok\events</Filter>
-    </ClInclude>
-    <ClInclude Include="s5effects.h">
-      <Filter>shok\effect</Filter>
-    </ClInclude>
-    <ClInclude Include="s5player.h">
-      <Filter>shok\player</Filter>
-    </ClInclude>
-    <ClInclude Include="s5tech.h">
-      <Filter>shok\tech</Filter>
     </ClInclude>
     <ClInclude Include="s5_idmanager.h">
       <Filter>shok\globals</Filter>
@@ -159,32 +141,8 @@
     <ClInclude Include="s5_guistates.h">
       <Filter>shok\ui</Filter>
     </ClInclude>
-    <ClInclude Include="s5ui.h">
-      <Filter>shok\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="s5widget.h">
-      <Filter>shok\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="s5RWEngine.h">
-      <Filter>shok\engine</Filter>
-    </ClInclude>
-    <ClInclude Include="s5framework.h">
-      <Filter>shok\globals</Filter>
-    </ClInclude>
-    <ClInclude Include="s5sound.h">
-      <Filter>shok\sound</Filter>
-    </ClInclude>
-    <ClInclude Include="s5tasklist.h">
-      <Filter>shok\entity</Filter>
-    </ClInclude>
     <ClInclude Include="Luapp\constexprTypename.h">
       <Filter>lua</Filter>
-    </ClInclude>
-    <ClInclude Include="s5classfactory.h">
-      <Filter>shok\globals</Filter>
-    </ClInclude>
-    <ClInclude Include="s5data.h">
-      <Filter>shok</Filter>
     </ClInclude>
     <ClInclude Include="l_api.h">
       <Filter>luafuncs</Filter>
@@ -213,6 +171,48 @@
     <ClInclude Include="l_ui.h">
       <Filter>luafuncs</Filter>
     </ClInclude>
+    <ClInclude Include="l_ua.h">
+      <Filter>luafuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="luaext.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_baseDefs.h">
+      <Filter>shok</Filter>
+    </ClInclude>
+    <ClInclude Include="hooks.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_classfactory.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_effects.h">
+      <Filter>shok\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_framework.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_player.h">
+      <Filter>shok\player</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_RWEngine.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_sound.h">
+      <Filter>shok\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_tasklist.h">
+      <Filter>shok\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_tech.h">
+      <Filter>shok\tech</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_widget.h">
+      <Filter>shok\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="s5_ui.h">
+      <Filter>shok\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -221,19 +221,10 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="luaext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="l_ua.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="entityiterator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5_datastructures.cpp">
-      <Filter>shok</Filter>
-    </ClCompile>
-    <ClCompile Include="s5_mem.cpp">
       <Filter>shok</Filter>
     </ClCompile>
     <ClCompile Include="s5_behaviorProps.cpp">
@@ -256,15 +247,6 @@
     </ClCompile>
     <ClCompile Include="s5_netevents.cpp">
       <Filter>shok\events</Filter>
-    </ClCompile>
-    <ClCompile Include="s5effects.cpp">
-      <Filter>shok\effect</Filter>
-    </ClCompile>
-    <ClCompile Include="s5player.cpp">
-      <Filter>shok\player</Filter>
-    </ClCompile>
-    <ClCompile Include="s5tech.cpp">
-      <Filter>shok\tech</Filter>
     </ClCompile>
     <ClCompile Include="s5_idmanager.cpp">
       <Filter>shok\globals</Filter>
@@ -289,27 +271,6 @@
     </ClCompile>
     <ClCompile Include="s5_guistates.cpp">
       <Filter>shok\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="s5ui.cpp">
-      <Filter>shok\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="s5widget.cpp">
-      <Filter>shok\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="s5framework.cpp">
-      <Filter>shok\globals</Filter>
-    </ClCompile>
-    <ClCompile Include="s5sound.cpp">
-      <Filter>shok\sound</Filter>
-    </ClCompile>
-    <ClCompile Include="s5tasklist.cpp">
-      <Filter>shok\entity</Filter>
-    </ClCompile>
-    <ClCompile Include="s5classfactory.cpp">
-      <Filter>shok\globals</Filter>
-    </ClCompile>
-    <ClCompile Include="s5data.cpp">
-      <Filter>shok</Filter>
     </ClCompile>
     <ClCompile Include="l_api.cpp">
       <Filter>luafuncs</Filter>
@@ -338,6 +299,45 @@
     <ClCompile Include="l_ui.cpp">
       <Filter>luafuncs</Filter>
     </ClCompile>
+    <ClCompile Include="l_ua.cpp">
+      <Filter>luafuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="luaext.cpp">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_baseDefs.cpp">
+      <Filter>shok</Filter>
+    </ClCompile>
+    <ClCompile Include="hooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_classfactory.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_effects.cpp">
+      <Filter>shok\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_framework.cpp">
+      <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_player.cpp">
+      <Filter>shok\player</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_sound.cpp">
+      <Filter>shok\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_tasklist.cpp">
+      <Filter>shok\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_tech.cpp">
+      <Filter>shok\tech</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_ui.cpp">
+      <Filter>shok\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_widget.cpp">
+      <Filter>shok\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">
@@ -352,5 +352,8 @@
     <ResourceCompile Include="Resource.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="memedits.txt" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,9 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_widget.h"
+#include "s5_defines.h"
+#include "s5_events.h"
+#include "s5_mem.h"
+#include "hooks.h"
 
 struct shok_vtable_EGUIX_CBaseWidget : BB::IObject::_vtableS {
     PADDINGI(4);
@@ -83,7 +87,7 @@ void EGUIX::CButtonHelper::HookShortcutSignExtend()
     if (shortcutsignextend_hooked)
         return;
     shortcutsignextend_hooked = true;
-    shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x55A62B), 10 };
+    CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x55A62B), 10 };
     *reinterpret_cast<byte*>(0x55A62B) = 0xB6; // movsx to movzx (sign-extend to zero-extend) (middle part of 3 byte opcode)
 }
 
@@ -152,7 +156,7 @@ void EGUIX::CButtonHelper::HookShortcutComparison()
     if (shortcutcmo_hooked)
         return;
     shortcutcmo_hooked = true;
-    shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 10 };
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 10 };
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm);
 }
 
@@ -267,7 +271,7 @@ void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* n
         AddChild(toAdd);
         if (before) {
             auto l = WidgetListHandler.SubWidgets.SaveList();
-            std::list<EGUIX::CBaseWidget*, shok::Allocator<EGUIX::CBaseWidget*>>::iterator it = l.List.begin();
+            auto it = l.List.begin();
             while (it != l.List.end()) {
                 if (*it == before) {
                     l.List.splice(it, l.List, --l.List.end());
@@ -362,7 +366,7 @@ void GGUI::C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(int e
 
 void GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool showwood)
 {
-    shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
     *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok::ResourceType::WoodRaw);
 }
 
@@ -434,7 +438,7 @@ void EGUIX::HookUIInput()
     if (HookUIInput_Hooked)
         return;
     HookUIInput_Hooked = true;
-    shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
 }
 

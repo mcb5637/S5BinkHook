@@ -1,6 +1,6 @@
 #pragma once
 
-#include "luaimport.h"
+#include "Luapp/luapp50.h"
 
 namespace CppLogic::API {
 	void Init(lua::State L);

@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "l_combat.h"
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 #include "luaext.h"
-#include "l_entity.h"
+#include "s5_entity.h"
+#include "s5_effects.h"
 
 namespace CppLogic::Combat {
 	int DealDamage(lua::State l) {

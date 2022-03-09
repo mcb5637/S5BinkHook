@@ -1,5 +1,12 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_behaviors.h"
+#include "s5_entity.h"
+#include "s5_entitytype.h"
+#include "s5_behaviorProps.h"
+#include "s5_effects.h"
+#include "s5_maplogic.h"
+#include "s5_defines.h"
+#include "hooks.h"
 
 BB::SerializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A828);
 
@@ -29,7 +36,7 @@ void GGL::CBombPlacerBehavior::FixBombAttachment()
 	if (FixBombAttachment_Hooked)
 		return;
 	FixBombAttachment_Hooked = true;
-	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5062C6), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5062C6), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
 }
 
@@ -68,7 +75,7 @@ void GGL::CSniperAbility::OverrideSnipeTask()
 	if (OverrideSnipeTask_Hooked)
 		return;
 	OverrideSnipeTask_Hooked = true;
-	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
 }
 

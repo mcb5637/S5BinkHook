@@ -1,7 +1,6 @@
 #pragma once
 
-#include "luaimport.h"
-#include "s5data.h"
+#include "Luapp/luapp50.h"
 
 namespace CppLogic::Entity {
 	void Init(lua::State L);

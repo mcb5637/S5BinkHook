@@ -1,6 +1,10 @@
 #pragma once
-#include "s5data.h"
 #include <map>
+
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_tech.h"
+#include "s5_behaviors.h"
 
 namespace shok {
 	enum class AdvancedDealDamageSource : int {

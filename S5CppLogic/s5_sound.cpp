@@ -1,5 +1,7 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_sound.h"
+#include "s5_filesystem.h"
+#include "hooks.h"
 
 static inline void(__thiscall* const music_pause)(ESnd::CSoEMusic* th, bool p) = reinterpret_cast<void(__thiscall*)(ESnd::CSoEMusic*, bool)>(0x4964DF);
 void ESnd::CSoEMusic::PauseMusic(bool p)
@@ -64,10 +66,10 @@ void __declspec(naked) startmusic_patchasm() {
 
 void ESnd::CSoEMusic::HookStartMusicFilesystem()
 {
-	shok::SaveVirtualProtect vp{ AIL_closestream ,4 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ AIL_closestream ,4 };
 	AIL_closestreamBackup = *AIL_closestream;
 	*AIL_closestream = &ail_closestream_override;
 
-	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x496677) ,10 };
+	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x496677) ,10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x496677), &startmusic_patchasm);
 }

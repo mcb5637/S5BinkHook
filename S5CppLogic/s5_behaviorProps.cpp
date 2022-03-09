@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_behaviorProps.h"
 
 BB::SerializationData* EGL::CGLEBehaviorProps::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A768);
 

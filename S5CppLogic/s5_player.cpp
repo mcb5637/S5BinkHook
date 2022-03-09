@@ -1,6 +1,9 @@
 #include "pch.h"
-#include "s5data.h"
 #include <cmath>
+#include "s5_player.h"
+#include "s5_defines.h"
+#include "s5_maplogic.h"
+#include "hooks.h"
 
 static inline int(__thiscall* const plattracthandlerGetAttLimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C216F);
 int GGL::CPlayerAttractionHandler::GetAttractionLimit()
@@ -58,7 +61,7 @@ void GGL::CPlayerAttractionHandler::HookCheckPayday()
 	if (CppLogic::HasSCELoader())
 		DEBUGGER_BREAK;
 	HookCheckPayday_Hooked = true;
-	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday);
 }
 
@@ -148,6 +151,6 @@ void GGL::CPlayerStatus::HookCanPlaceBuilding()
 	if (HookCanPlaceBuilding_Hooked)
 		return;
 	HookCanPlaceBuilding_Hooked = true;
-	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B45B9), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B45B9), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B45B9), &canplacebuildingasm);
 }

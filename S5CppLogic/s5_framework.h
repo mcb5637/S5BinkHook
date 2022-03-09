@@ -1,5 +1,7 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_sound.h"
 
 namespace ECore {
 	class IReplayStreamExtension {
@@ -28,8 +30,7 @@ namespace Framework {
 		int MPGameOptionFlagSet;
 		shok::String MiniMapTextureName;
 		PADDINGI(1); // 1?
-		vector_padding;
-		std::vector<int, shok::Allocator<int>> Keys;
+		shok::Vector<int> Keys;
 		struct {
 			shok::String Data;
 		} GUID;
@@ -38,8 +39,7 @@ namespace Framework {
 	static_assert(sizeof(Framework::MapInfo) == 66 * 4);
 
 	struct CampagnInfo {
-		vector_padding;
-		std::vector<Framework::MapInfo, shok::Allocator<Framework::MapInfo>> Maps;
+		shok::Vector<Framework::MapInfo> Maps;
 
 		int GetMapIndexByName(const char* s);
 		Framework::MapInfo* GetMapInfoByName(const char* n);

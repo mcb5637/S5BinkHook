@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_framework.h"
 
 void ECore::IReplayStreamExtension::unknown0()
 {

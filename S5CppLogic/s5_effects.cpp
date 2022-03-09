@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_effects.h"
+#include "hooks.h"
 
 struct shok_vtable_EGL_CFlyingEffect {
 	PADDINGI(9);
@@ -79,7 +80,7 @@ void GGL::CCannonBallEffect::HookFromCreator()
 	if (HookFromCreator_Hooked)
 		return;
 	HookFromCreator_Hooked = true;
-	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm);
 }
 
@@ -119,10 +120,10 @@ int __fastcall ArrowOnHitHook(EGL::CFlyingEffect* th) {
 }
 void WriteProjectlileOnHits() {
 	shok_vtable_EGL_CFlyingEffect* vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(GGL::CCannonBallEffect::vtp);
-	shok::SaveVirtualProtect vp{ vt, 12 * 4 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ vt, 12 * 4 };
 	vt->OnHit = reinterpret_cast<int(__thiscall*)(EGL::CFlyingEffect*)>(&CannonBallOnHitHook);
 	vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(GGL::CArrowEffect::vtp);
-	shok::SaveVirtualProtect vp2{ vt, 12 * 4 };
+	CppLogic::Hooks::SaveVirtualProtect vp2{ vt, 12 * 4 };
 	vt->OnHit = reinterpret_cast<int(__thiscall*)(EGL::CFlyingEffect*)>(&ArrowOnHitHook);
 }
 void EGL::CFlyingEffect::HookOnHit()

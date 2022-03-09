@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -182,9 +182,8 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="entityiterator.h" />
-    <ClInclude Include="framework.h" />
+    <ClInclude Include="hooks.h" />
     <ClInclude Include="luaext.h" />
-    <ClInclude Include="luaimport.h" />
     <ClInclude Include="Luapp\constexprTypename.h" />
     <ClInclude Include="Luapp\luapp50.h" />
     <ClInclude Include="lua50\lauxlib.h" />
@@ -202,26 +201,26 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="l_ui.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="s5_baseDefs.h" />
     <ClInclude Include="s5_behaviorProps.h" />
     <ClInclude Include="s5_behaviors.h" />
-    <ClInclude Include="s5classfactory.h" />
-    <ClInclude Include="s5data.h" />
+    <ClInclude Include="s5_classfactory.h" />
     <ClInclude Include="s5_config.h" />
     <ClInclude Include="s5_cutscene.h" />
     <ClInclude Include="s5_defines.h" />
-    <ClInclude Include="s5effects.h" />
+    <ClInclude Include="s5_effects.h" />
     <ClInclude Include="s5_entity.h" />
     <ClInclude Include="s5_entityandeffectmanager.h" />
     <ClInclude Include="s5_entitytype.h" />
     <ClInclude Include="s5_events.h" />
-    <ClInclude Include="s5framework.h" />
-    <ClInclude Include="s5player.h" />
-    <ClInclude Include="s5RWEngine.h" />
-    <ClInclude Include="s5sound.h" />
-    <ClInclude Include="s5tasklist.h" />
-    <ClInclude Include="s5tech.h" />
-    <ClInclude Include="s5ui.h" />
-    <ClInclude Include="s5widget.h" />
+    <ClInclude Include="s5_framework.h" />
+    <ClInclude Include="s5_player.h" />
+    <ClInclude Include="s5_RWEngine.h" />
+    <ClInclude Include="s5_sound.h" />
+    <ClInclude Include="s5_tasklist.h" />
+    <ClInclude Include="s5_tech.h" />
+    <ClInclude Include="s5_ui.h" />
+    <ClInclude Include="s5_widget.h" />
     <ClInclude Include="s5_entitydisplay.h" />
     <ClInclude Include="s5_datastructures.h" />
     <ClInclude Include="s5_exception.h" />
@@ -238,6 +237,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="entityiterator.cpp" />
+    <ClCompile Include="hooks.cpp" />
     <ClCompile Include="luaext.cpp" />
     <ClCompile Include="Luapp\luapp50.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../pch.h</PrecompiledHeaderFile>
@@ -261,30 +261,29 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="s5_baseDefs.cpp" />
     <ClCompile Include="s5_behaviorProps.cpp" />
     <ClCompile Include="s5_behaviors.cpp" />
-    <ClCompile Include="s5classfactory.cpp" />
-    <ClCompile Include="s5data.cpp" />
-    <ClCompile Include="s5effects.cpp" />
+    <ClCompile Include="s5_classfactory.cpp" />
+    <ClCompile Include="s5_effects.cpp" />
     <ClCompile Include="s5_config.cpp" />
     <ClCompile Include="s5_entity.cpp" />
     <ClCompile Include="s5_entitydisplay.cpp" />
     <ClCompile Include="s5_entitytype.cpp" />
     <ClCompile Include="s5_events.cpp" />
-    <ClCompile Include="s5framework.cpp" />
-    <ClCompile Include="s5player.cpp" />
-    <ClCompile Include="s5sound.cpp" />
-    <ClCompile Include="s5tasklist.cpp" />
-    <ClCompile Include="s5tech.cpp" />
-    <ClCompile Include="s5ui.cpp" />
-    <ClCompile Include="s5widget.cpp" />
+    <ClCompile Include="s5_framework.cpp" />
+    <ClCompile Include="s5_player.cpp" />
+    <ClCompile Include="s5_sound.cpp" />
+    <ClCompile Include="s5_tasklist.cpp" />
+    <ClCompile Include="s5_tech.cpp" />
+    <ClCompile Include="s5_ui.cpp" />
+    <ClCompile Include="s5_widget.cpp" />
     <ClCompile Include="s5_datastructures.cpp" />
     <ClCompile Include="s5_filesystem.cpp" />
     <ClCompile Include="s5_guistates.cpp" />
     <ClCompile Include="s5_idmanager.cpp" />
     <ClCompile Include="s5_mapdisplay.cpp" />
     <ClCompile Include="s5_maplogic.cpp" />
-    <ClCompile Include="s5_mem.cpp" />
     <ClCompile Include="s5_netevents.cpp" />
     <ClCompile Include="s5_scriptsystem.cpp" />
   </ItemGroup>
@@ -299,6 +298,9 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="memedits.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

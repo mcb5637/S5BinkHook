@@ -1,5 +1,5 @@
 #pragma once
-#include "luaimport.h"
+#include "Luapp/luapp50.h"
 
 namespace CppLogic::Effect {
 	void Init(lua::State L);

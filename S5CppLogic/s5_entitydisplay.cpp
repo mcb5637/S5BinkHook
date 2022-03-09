@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_entitydisplay.h"
 
 struct shok_vtable_ED_CBehaviorProps : BB::IObject::_vtableS {
     void(__stdcall* OnAdd)(ED::IBehavior* th, ED::CEntity* edisplay, ED::CBehaviorProps* props, int _2); // called before ED::CEntity init

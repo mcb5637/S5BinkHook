@@ -1,6 +1,10 @@
 #pragma once
 
-#include "s5data.h"
+#include <functional>
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_defines.h"
+#include "s5_entity.h"
 
 class EntityIteratorPredicate {
 public:

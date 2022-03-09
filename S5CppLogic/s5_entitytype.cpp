@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_entitytype.h"
 
 bool GGlue::CGlueEntityProps::IsSettlerType() const
 {

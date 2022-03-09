@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_idmanager.h"
+#include "s5_mem.h"
 
 static inline int(__thiscall* const shok_getAnimIdByName)(BB::IIDManager* th, const char* name) = reinterpret_cast<int(__thiscall*)(BB::IIDManager * th, const char* name)>(0x54F19E);
 static inline int(__thiscall* const shok_BB_CIDManager_getidbyname)(void* th, const char* name, int nid) = reinterpret_cast<int(__thiscall*)(void*, const char*, int)>(0x54F656);

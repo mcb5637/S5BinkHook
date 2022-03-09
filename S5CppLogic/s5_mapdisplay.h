@@ -1,5 +1,8 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_maplogic.h"
+#include "s5_RWEngine.h"
 
 namespace ED {
 	class ILandscape {

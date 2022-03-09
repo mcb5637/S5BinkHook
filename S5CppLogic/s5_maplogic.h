@@ -1,5 +1,6 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 
 namespace EGL {
 	class ITerrainVertexColors {
@@ -49,10 +50,8 @@ namespace EGL {
 	class CGLETerrainLowRes : public CGLETerrainLowResDisplay {
 	public:
 		friend class EGL::CGLELandscape;
-		vector_padding;
-		std::vector<int, shok::Allocator<int>> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
-		vector_padding;
-		std::vector<int, shok::Allocator<int>> BridgeHeights;
+		shok::Vector<int> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
+		shok::Vector<int> BridgeHeights;
 		int MaxSizeX, MaxSizeY; // 9
 		int ArraySizeX, ArraySizeY; // 11
 

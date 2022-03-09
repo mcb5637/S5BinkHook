@@ -1,8 +1,17 @@
 #include "pch.h"
 #include "l_ua.h"
-#include "luaext.h"
-#include "l_entity.h"
 #include <random>
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_entity.h"
+#include "s5_maplogic.h"
+#include "s5_defines.h"
+#include "s5_events.h"
+#include "s5_behaviorProps.h"
+#include "s5_behaviors.h"
+#include "s5_entitytype.h"
+#include "s5_player.h"
+#include "luaext.h"
 #include "entityiterator.h"
 
 namespace CppLogic::UA {

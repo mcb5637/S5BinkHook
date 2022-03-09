@@ -1,9 +1,27 @@
 #include "pch.h"
 #include "l_logic.h"
-#include "luaext.h"
 #include <assert.h>
 #include <filesystem>
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_config.h"
+#include "s5_idmanager.h"
+#include "s5_maplogic.h"
+#include "s5_player.h"
+#include "s5_cutscene.h"
+#include "s5_ui.h"
+#include "s5_scriptsystem.h"
+#include "s5_entitytype.h"
+#include "s5_entity.h"
 #include "s5_netevents.h"
+#include "s5_filesystem.h"
+#include "s5_exception.h"
+#include "s5_mapdisplay.h"
+#include "s5_defines.h"
+#include "s5_guistates.h"
+#include "s5_tasklist.h"
+#include "luaext.h"
+#include "hooks.h"
 
 namespace CppLogic::Logic {
 	int GetDamageFactor(lua::State ls) {
@@ -143,7 +161,7 @@ namespace CppLogic::Logic {
 			}
 			L.SetTableRaw(-3);
 			L.Push("Rotation");
-			L.Push(e->Rotation == -1.0f ? -1.0 : rad2deg<double>(e->Rotation));
+			L.Push(e->Rotation == -1.0f ? -1.0 : CppLogic::RadiansToDegrees<double>(e->Rotation));
 			L.SetTableRaw(-3);
 		}
 		else if (GGL::CNetEventExtractResource* e = dynamic_cast<GGL::CNetEventExtractResource*>(ev)) {
@@ -352,7 +370,7 @@ namespace CppLogic::Logic {
 			if (L.IsNumber(-1)) {
 				e->Rotation = L.CheckFloat(-1);
 				if (e->Rotation != -1.0f) {
-					e->Rotation = static_cast<float>(deg2rad<double>(e->Rotation));
+					e->Rotation = static_cast<float>(CppLogic::DegreesToRadians<double>(e->Rotation));
 				}
 			}
 			else
@@ -570,7 +588,7 @@ namespace CppLogic::Logic {
 		int pl = L.CheckInt(2);
 		shok::Position p = L.CheckPos(3);
 		p.FloorToBuildingPlacement();
-		float r = deg2rad(L.CheckFloat(4));
+		float r = CppLogic::DegreesToRadians(L.CheckFloat(4));
 		if (L.IsNumber(5))
 			L.Push(GGL::CPlayerStatus::CanPlaceBuilding(ty, pl, &p, r, L.CheckInt(5)));
 		else
@@ -985,7 +1003,7 @@ namespace CppLogic::Logic {
 				L.Push(entitytype);
 				L.Push(player);
 				L.PushPos(*pos);
-				L.Push(rad2deg(rotation));
+				L.Push(CppLogic::RadiansToDegrees(rotation));
 				L.Push(buildOnId);
 				L.PCall(5, 1, 0);
 				if (L.IsBoolean(-1))
@@ -1003,7 +1021,7 @@ namespace CppLogic::Logic {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		GGUI::CPlaceBuildingState::HookPlacementRotation();
-		GGUI::CPlaceBuildingState::PlacementRotation = deg2rad(L.CheckFloat(1));
+		GGUI::CPlaceBuildingState::PlacementRotation = CppLogic::DegreesToRadians(L.CheckFloat(1));
 		GGUI::CPlaceBuildingState* s = dynamic_cast<GGUI::CPlaceBuildingState*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
 		if (s)
 			s->UpdateModel();
@@ -1012,7 +1030,7 @@ namespace CppLogic::Logic {
 	int GetPlaceBuildingRotation(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
-		L.Push(rad2deg(GGUI::CPlaceBuildingState::PlacementRotation));
+		L.Push(CppLogic::RadiansToDegrees(GGUI::CPlaceBuildingState::PlacementRotation));
 		return 1;
 	}
 
@@ -1234,10 +1252,10 @@ namespace CppLogic::Logic {
 		}
 		return 0;
 	}
-	int TaskListSetChangeTaskListCheckUncancelable(lua_State* L) {
+	int TaskListSetChangeTaskListCheckUncancelable(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
-		EGL::CGLEEntity::HookSetTaskListNonCancelable(luaext_optbool(L, 1, false));
+		EGL::CGLEEntity::HookSetTaskListNonCancelable(L.OptBool(1, false));
 		return 0;
 	}
 

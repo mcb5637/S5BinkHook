@@ -1,7 +1,12 @@
 #include "pch.h"
 #include "l_effect.h"
-#include "pch.h"
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_effects.h"
+#include "s5_scriptsystem.h"
+#include "s5_entity.h"
+#include "s5_maplogic.h"
+#include "s5_entityandeffectmanager.h"
 #include "luaext.h"
 
 namespace CppLogic::Effect {

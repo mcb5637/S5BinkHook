@@ -1,8 +1,14 @@
 #include "pch.h"
-#include "s5data.h"
+#include <stdexcept>
+#include "s5_maplogic.h"
 #include "s5_netevents.h"
+#include "s5_mapdisplay.h"
+#include "s5_entitytype.h"
+#include "s5_entity.h"
+#include "s5_mem.h"
+#include "s5_defines.h"
 #include "entityiterator.h"
-
+#include "hooks.h"
 
 
 struct shok_vtable_EGL_CGLEGameLogic {
@@ -241,11 +247,11 @@ void EGL::CGLETerrainLowRes::EnableHiResBridgeHeight()
 	if (EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled)
 		return;
 	EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled = true;
-	shok::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
 	*reinterpret_cast<float(__fastcall**)(ED::CLandscape*, int, float, float)>(0x76A410) = &shok_ED_CLandscape_overridegetwaterheightatpos;
-	shok::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc);
-	shok::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight);
 }
 
@@ -633,7 +639,7 @@ void EGL::CGLEGameLogic::HookCreateEffect()
 	if (CreateEffectHookedOrig)
 		return;
 	shok_vtable_EGL_CGLEGameLogic* vt = *reinterpret_cast<shok_vtable_EGL_CGLEGameLogic**>(this);
-	shok::SaveVirtualProtect vp{ vt, 25 * 4 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ vt, 25 * 4 };
 	CreateEffectHookedOrig = vt->CreateEffect;
 	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(EGL::CGLEGameLogic * th, EGL::CGLEEffectCreator * data)>(&CreateEffectHook);
 }

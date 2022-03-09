@@ -1,5 +1,6 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 
 namespace EGL {
 	class CGLEBehavior : public BB::IObject { // no vtable
@@ -582,8 +583,7 @@ namespace GGL {
 		shok::Position TerritoryCenter;
 		float TerritoryCenterRange;
 		int Experience; // 32
-		vector_padding;
-		std::vector<shok::Position, shok::Allocator<shok::Position>> PatrolPoints;
+		shok::Vector<shok::Position> PatrolPoints;
 		int NextPatrolPointIndex; // 37
 		float DefendOrientation;
 		int TrainingStartTurn;
@@ -740,8 +740,7 @@ namespace GGL {
 	class CCampBehavior : public EGL::CGLEBehavior {
 	public:
 		PADDINGI(1);
-		vector_padding;
-		std::vector<shok::Position> Slot; // not sure if it is positions in here
+		shok::Vector<shok::Position> Slot; // not sure if it is positions in here
 		int NumTurnsToDeletion;
 
 		// defined states: Default

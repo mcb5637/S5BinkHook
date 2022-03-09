@@ -1,6 +1,8 @@
 #pragma once
-#include "s5data.h"
-#include <list>
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_ui.h"
+#include "s5_scriptsystem.h"
 
 namespace EGUIX {
 	struct Rect { // size 4

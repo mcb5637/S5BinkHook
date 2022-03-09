@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "s5data.h"
+#include "s5_tasklist.h"
+#include "s5_idmanager.h"
 
 struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
     int(__thiscall* ExecuteTask)(EGL::TaskHandler* th, EGL::CGLETaskArgs* args);

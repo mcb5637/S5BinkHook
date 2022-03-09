@@ -1,7 +1,9 @@
 #pragma once
 
-#include "luaimport.h"
-#include "s5data.h"
+#include "Luapp/luapp50.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_defines.h"
 
 namespace CppLogic::UA {
 	void Init(lua::State L);

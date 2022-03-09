@@ -1,5 +1,21 @@
 #pragma once
 
+#define TOKENPASTE(x, y) x ## y
+#define TOKENPASTE2(x, y) TOKENPASTE(x, y)
+#define PADDING(size) private: char TOKENPASTE2(padding_, __LINE__) [size]={}; public:
+#define PADDINGI(size) PADDING(size*4)
+
+#define DEBUGGER_BREAK _asm int 3
+
+constexpr int SHOK_Import_LUA_OPEN = 0x761284;
+constexpr int SHOK_Import_LUA_CLOSE = 0x76126C;
+constexpr int SHOK_SEGMENTSTART = 0x401000;
+constexpr int SHOK_SEGMENTLENGTH = 0x64B000;
+
+typedef uint8_t byte;
+
+struct lua_State;
+
 namespace shok {
 	enum class ResourceType : int;
 	enum class AttachmentType : int;
@@ -9,6 +25,13 @@ namespace shok {
 	enum class InputEventIds : int;
 	enum class Task : int;
 	enum class TaskState : int;
+	enum class LeaderCommand : int;
+	enum class EntityCategory : int;
+	enum class DiploState : int;
+	enum class TechState : int;
+	enum class Keys : int;
+
+	class Technology;
 }
 namespace EGL {
 	class CGLEEntity;
@@ -18,22 +41,42 @@ namespace EGL {
 	class CGLETaskArgs;
 	class CGLETaskList;
 	class CTaskArgsInteger;
+	class CGLEBehaviorProps;
+	class IEntityDisplay;
+	class CEffect;
+	class CGLEEffectCreator;
 }
 namespace GGL {
 	class CBuilding;
+	class CHeroAbilityProps;
+	class CCamouflageBehaviorProps;
+	class CGLBuildingProps;
+	class CPlayerStatus;
+	class CResourceDoodad;
+	class CSettler;
 }
 namespace ED {
 	class CBehaviorProps;
 	class CEntity;
 	struct ModelInstance;
 	class CDisplayProps;
+	class CVisibleEntityManager;
+	struct ModelData;
 }
 namespace BB {
 	class CEvent;
 	class CIDManagerEx;
 	class CFileStreamEx;
 	struct SerializationData;
+	class CIDManager;
 }
 namespace GGUI {
 	class C3DViewHandler;
+	class CState;
+}
+namespace GGlue {
+	class CGlueEntityProps;
+}
+namespace EGUIX {
+	class CBaseWidget;
 }

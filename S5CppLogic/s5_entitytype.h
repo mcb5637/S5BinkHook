@@ -1,5 +1,6 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 
 namespace EGL {
 	class CGLEEntityProps : public BB::IObject {
@@ -135,8 +136,7 @@ namespace GGL {
 		class ConstructionInfo {
 		public:
 			PADDINGI(1);
-			vector_padding;
-			std::vector<shok::PositionRot, shok::Allocator<shok::PositionRot>> BuilderSlot;
+			shok::Vector<shok::PositionRot> BuilderSlot;
 			int Time;
 			shok::CostInfo Cost;
 			int ConstructionSite;

@@ -1,5 +1,7 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_entity.h"
 
 namespace ED {
 	class CBehaviorProps : public BB::IObject {

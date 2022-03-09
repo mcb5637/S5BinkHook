@@ -1,5 +1,7 @@
 #include "pch.h"
-#include "s5data.h"
+#include <stdexcept>
+#include "s5_mapdisplay.h"
+#include "s5_config.h"
 
 
 bool ED::CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)

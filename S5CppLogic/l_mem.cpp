@@ -1,9 +1,8 @@
 #include "pch.h"
 #include "l_mem.h"
-
-#include "luaimport.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 #include "luaext.h"
-#include "s5data.h"
 #include <array>
 
 namespace CppLogic::Mem {

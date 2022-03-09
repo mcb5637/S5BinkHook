@@ -1,6 +1,20 @@
 #include "pch.h"
 #include "l_entity.h"
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_entity.h"
+#include "s5_events.h"
+#include "s5_defines.h"
+#include "s5_entitytype.h"
+#include "s5_behaviors.h"
+#include "s5_behaviorProps.h"
+#include "s5_player.h"
+#include "s5_scriptsystem.h"
+#include "s5_maplogic.h"
+#include "s5_tasklist.h"
+#include "s5_idmanager.h"
+#include "s5_classfactory.h"
+#include "hooks.h"
 #include "luaext.h"
 #include "entityiterator.h"
 
@@ -329,7 +343,7 @@ namespace CppLogic::Entity {
 		if (!b)
 			throw lua::LuaException("no moving entity at 1");
 		L.Push(b->MovementSpeed);
-		L.Push(rad2deg(b->TurningSpeed));
+		L.Push(CppLogic::RadiansToDegrees(b->TurningSpeed));
 		return 2;
 	}
 	int SettlerSetBaseMovementSpeed(lua::State l) {
@@ -341,7 +355,7 @@ namespace CppLogic::Entity {
 		if (L.IsNumber(2))
 			b->MovementSpeed = L.CheckFloat(2);
 		if (L.IsNumber(3))
-			b->TurningSpeed = static_cast<float>(deg2rad(L.ToNumber(3)));
+			b->TurningSpeed = static_cast<float>(CppLogic::DegreesToRadians(L.ToNumber(3)));
 		return 0;
 	}
 
@@ -406,7 +420,7 @@ namespace CppLogic::Entity {
 		L.PushPos(m->TargetPosition);
 		if (m->TargetRotationValid) {
 			L.Push("r");
-			L.Push(rad2deg(m->TargetRotation));
+			L.Push(CppLogic::RadiansToDegrees(m->TargetRotation));
 			L.SetTableRaw(-3);
 		}
 		return 1;
@@ -421,7 +435,7 @@ namespace CppLogic::Entity {
 		L.Push("r");
 		L.GetTableRaw(2);
 		if (L.IsNumber(-1)) {
-			m->SetTargetRotation(static_cast<float>(deg2rad(L.ToNumber(-1))));
+			m->SetTargetRotation(static_cast<float>(CppLogic::DegreesToRadians(L.ToNumber(-1))));
 			EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
 			m->FireEvent(&ev);
 		}
@@ -1054,7 +1068,7 @@ namespace CppLogic::Entity {
 		}
 		e->Move(p);
 		if (L.IsNumber(3)) {
-			e->SetTargetRotation(static_cast<float>(deg2rad(L.ToNumber(3))));
+			e->SetTargetRotation(static_cast<float>(CppLogic::DegreesToRadians(L.ToNumber(3))));
 			EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
 			e->FireEvent(&ev);
 		}

@@ -1,5 +1,6 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 
 namespace EGL {
 	template<class ToManage, size_t MaxNum>

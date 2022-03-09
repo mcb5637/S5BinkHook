@@ -1,5 +1,40 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_maplogic.h"
+#include "s5_defines.h"
+
+enum class win_mouseEvents : int {
+	KeyDown = 0x100,
+	KeyUp = 0x101,
+	Char = 0x102,
+	SysKeyDown = 0x104,
+	SysKeyUp = 0x105,
+	MouseMove = 0x200,
+	LButtonDown = 0x201,
+	LButtonUp = 0x202,
+	LButtonDBl = 0x203,
+	RButtonDown = 0x204,
+	RButtonUp = 0x205,
+	RButtonDBl = 0x206,
+	MButtonDown = 0x207,
+	MButtonUp = 0x208,
+	MButtonDBl = 0x209,
+	MouseWheel = 0x20A,
+	XButtonDown = 0x20B,
+	XButtonUp = 0x20C,
+	XButtonDBl = 0x20D,
+};
+
+namespace shok {
+	static inline HWND* MainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
+
+	const char* (__cdecl* const GetStringTableText)(const char* key) = reinterpret_cast<const char* (__cdecl* const)(const char*)>(0x556D2E);
+	extern const char* (*GetStringTableTextOverride)(const char* s);
+	void HookGetStringTableText();
+
+	void HookTextPrinting();
+}
 
 namespace ERwTools {
 	class IRenderable {

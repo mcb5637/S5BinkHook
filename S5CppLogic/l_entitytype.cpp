@@ -1,6 +1,14 @@
 #include "pch.h"
 #include "l_entitytype.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+#include "s5_behaviorProps.h"
+#include "s5_entitytype.h"
+#include "s5_entity.h"
+#include "s5_maplogic.h"
+#include "s5_player.h"
 #include "luaext.h"
+#include "hooks.h"
 
 namespace CppLogic::EntityType {
 	int LeaderTypeGetSoldierType(lua::State ls) {

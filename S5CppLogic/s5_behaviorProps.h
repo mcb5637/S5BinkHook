@@ -1,5 +1,6 @@
 #pragma once
-#include "s5data.h"
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
 
 namespace EGL {
 	class CGLEBehaviorProps : public BB::IObject, public ECore::ICheckData {
@@ -353,8 +354,7 @@ namespace GGL {
 	};
 	class CCampBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		vector_padding;
-		std::vector<shok::Position> Slot;
+		shok::Vector<shok::Position> Slot;
 		int RemoveDelay;
 
 		static inline constexpr int vtp = 0x777854;
@@ -379,8 +379,7 @@ namespace GGL {
 	public:
 		float Radius, Delay;
 		int Damage, ExplosionEffectID;
-		vector_padding;
-		std::vector<int, shok::Allocator<int>> AffectedEntityTypes;
+		shok::Vector<int> AffectedEntityTypes;
 
 		static inline constexpr int vtp = 0x7784A0;
 		static inline constexpr int TypeDesc = 0x82587C;

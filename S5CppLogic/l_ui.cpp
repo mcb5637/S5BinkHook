@@ -1,6 +1,16 @@
 #include "pch.h"
 #include "l_ui.h"
 #include <WinUser.h>
+#include "s5_widget.h"
+#include "s5_filesystem.h"
+#include "s5_classfactory.h"
+#include "s5_framework.h"
+#include "s5_idmanager.h"
+#include "s5_mapdisplay.h"
+#include "s5_entity.h"
+#include "s5_events.h"
+#include "s5_defines.h"
+#include "hooks.h"
 
 namespace CppLogic::UI {
 	void StringHandlerSetString(luaext::EState L, EGUIX::CSingleStringHandler& h, int i) {

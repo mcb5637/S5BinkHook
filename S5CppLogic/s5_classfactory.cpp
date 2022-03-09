@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "s5classfactory.h"
+#include "s5_classfactory.h"
+#include "s5_filesystem.h"
 
 static inline BB::CXmlSerializer*(__stdcall* const xmlserializer_new)(int d) = reinterpret_cast<BB::CXmlSerializer*(__stdcall* const)(int)>(0x550731);
 BB::CXmlSerializer* BB::CXmlSerializer::Create()

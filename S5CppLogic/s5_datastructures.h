@@ -1,8 +1,9 @@
 #pragma once
-#include "s5data.h"
-
 #include <vector>
 #include <list>
+
+#include "s5_forwardDecls.h"
+#include "s5_mem.h"
 
 namespace shok {
 
@@ -155,10 +156,10 @@ namespace shok {
 		auto _Unchecked_end() const noexcept {
 			return Internal._Unchecked_end();
 		}
-		auto operator[](size_t p) {
+		auto& operator[](size_t p) {
 			return Internal[p];
 		}
-		const auto operator[](size_t p) const {
+		const auto& operator[](size_t p) const {
 			return Internal[p];
 		}
 		size_t size() const noexcept {

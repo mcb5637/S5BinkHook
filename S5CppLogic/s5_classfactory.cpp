@@ -16,6 +16,19 @@ void BB::CXmlSerializer::Deserialize(const char* filename, BB::IObject* ob)
     }
 }
 
+void BB::CXmlSerializer::Serialize(const char* filename, BB::IObject* ob)
+{
+    BB::CFileStreamEx filestr{};
+    if (filestr.OpenFile(filename, 0x121)) {
+        auto* s = BB::CXmlSerializer::Create();
+
+        s->Serialize(&filestr, ob);
+
+        s->Destroy();
+        filestr.Close();
+    }
+}
+
 void BB::CClassFactory::LoadObject(BB::IObject* ob, const char* filename)
 {
     BB::CXmlSerializer* s = BB::CXmlSerializer::Create();

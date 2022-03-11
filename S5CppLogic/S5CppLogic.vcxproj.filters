@@ -63,9 +63,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="entityiterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="s5_mem.h">
       <Filter>shok</Filter>
     </ClInclude>
@@ -213,15 +210,18 @@
     <ClInclude Include="s5_ui.h">
       <Filter>shok\ui</Filter>
     </ClInclude>
+    <ClInclude Include="entityiterator.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="luaserializer.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="entityiterator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="s5_datastructures.cpp">
@@ -308,9 +308,6 @@
     <ClCompile Include="s5_baseDefs.cpp">
       <Filter>shok</Filter>
     </ClCompile>
-    <ClCompile Include="hooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="s5_classfactory.cpp">
       <Filter>shok\globals</Filter>
     </ClCompile>
@@ -337,6 +334,15 @@
     </ClCompile>
     <ClCompile Include="s5_widget.cpp">
       <Filter>shok\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="entityiterator.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="luaserializer.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="hooks.cpp">
+      <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

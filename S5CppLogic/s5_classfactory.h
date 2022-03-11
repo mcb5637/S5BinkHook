@@ -26,8 +26,11 @@ namespace BB {
 		static inline constexpr int TypeDesc = 0x8311F0;
 
 		using IXmlSerializer::Deserialize;
+		using IXmlSerializer::Serialize;
 		static BB::CXmlSerializer* Create();
 		void Deserialize(const char* filename, BB::IObject* ob);
+		// i doubt this will ever get used outside of debugging
+		void Serialize(const char* filename, BB::IObject* ob);
 
 	private:
 		BB::CXmlSerializer() = default;
@@ -51,10 +54,10 @@ namespace BB {
 		static inline BB::FieldSerilaizer* const TypeModel = reinterpret_cast<BB::FieldSerilaizer*>(0x8585C0);
 
 		template<class T>
-		static BB::FieldSerilaizer* GetSerilalizer() = delete;
+		static constexpr BB::FieldSerilaizer* GetSerilalizer() = delete;
 
 		template<>
-		static BB::FieldSerilaizer* GetSerilalizer<int>() {
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<int>() {
 			return TypeInt;
 		}
 	};
@@ -77,13 +80,13 @@ namespace BB {
 	};
 
 	struct SerializationData { // use a 0-terminated array (default constructed is 0)
-		int Type = 0; // 2 direct val, 3 embedded
-		const char* SerializationName = nullptr;
+		int Type = 0; // 2 direct val (uses dataconverter), 3 embedded (uses subelement), 5 embedded bbobject, 6 p to bbobject (uses getidentifier or subelement)
+		const char* SerializationName = nullptr; // if not set, automatically follows subelementdata with a position of 0
 		size_t Position = 0;
 		size_t Size = 0;
-		BB::FieldSerilaizer* DataConverter = 0;
+		BB::FieldSerilaizer* DataConverter = nullptr;
 		BB::SerializationData* SubElementData = nullptr; //5
-		int Unknown2 = 0;
+		unsigned int (__stdcall* GetIdentifier)(void* data);
 		BB::SerializationListOptions* ListOptions = nullptr;
 		int Unknown3 = 0;
 

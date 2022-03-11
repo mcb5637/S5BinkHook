@@ -16,6 +16,8 @@
 #include "s5_sound.h"
 #include "s5_ui.h"
 #include "s5_maplogic.h"
+#include "s5_filesystem.h"
+#include "s5_exception.h"
 #include "hooks.h"
 #include "luaext.h"
 #include "l_mem.h"
@@ -28,6 +30,7 @@
 #include "l_tech.h"
 #include "l_ua.h"
 #include "l_ui.h"
+#include "luaserializer.h"
 
 struct CppLogicOptions {
     bool DoNotLoad = false;
@@ -108,7 +111,7 @@ void DumpClassSerialization(lua::State L, unsigned int id) {
 
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
-    DumpClassSerialization(L, EGL::CGLEEntity::Identifier);
+    CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     return 1;
 }
 

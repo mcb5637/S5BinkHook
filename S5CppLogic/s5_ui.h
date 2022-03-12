@@ -3,6 +3,7 @@
 #include "s5_baseDefs.h"
 #include "s5_maplogic.h"
 #include "s5_defines.h"
+#include "s5_player.h"
 
 enum class win_mouseEvents : int {
 	KeyDown = 0x100,
@@ -117,7 +118,7 @@ namespace GGL {
 		virtual bool IsWall(int ety) = 0;
 		virtual bool IsValidPos(float x, float y) = 0;
 		virtual bool IsPosBlocked(float x, float y) = 0; // 10
-		virtual int GetResourceTypeProvidedBy(int eid) = 0;
+		virtual shok::ResourceType GetResourceTypeProvidedBy(int eid) = 0;
 		virtual void FillMerchantData(MerchantData* d) = 0;
 		virtual void FillMineData(MineData* d) = 0; // works with mine building or resentity
 		virtual void FillMotivationData(MotivationData* d) = 0;
@@ -150,9 +151,64 @@ namespace GGL {
 		virtual void unknown5() = 0; // something buildingupgrademanager
 	public:
 		virtual bool IsConvertible(int eid, int player) = 0;
-		virtual bool IsAnimal(int eid) = 0; //38
+		virtual bool IsAnimal(int eid) = 0;
+		virtual bool IsMercenaryFree(int eid, int player) = 0;
+		virtual int MercenarySettlerGetBuilding(int id) = 0; //40
+		virtual int MouseoverEntityToTargetEntity(int id, int player) = 0;
+		virtual int CheckSniperTarget(int sniper, int target, int sniperplayer) = 0;
+		virtual int CheckShurikenTarget(int shur, int tar, int shurplay) = 0;
+		virtual bool IsNotHostile(int id, int player) = 0;
+		virtual int GetHealth(int id) = 0; // 45
+		virtual int GetMaxHealth(int id) = 0;
+		virtual int GetPlayer(int id) = 0;
+		virtual int BuildingGetTargetableId(int id) = 0;
+	private:
+		virtual void unknown6() = 0; // something entityiterator
+		virtual void unknown7() = 0; // 50
+		virtual void unknown8() = 0; // get some serf extract res
+	public:
+		virtual EGL::CGLEEntity* GetEntity(int id) = 0;
+	private:
+		virtual void unknown9() = 0; // get something building related
+		virtual void unknown10() = 0; // building get military info 4
+	public:
+		virtual void RoundPosToBuildingPlacement(float x, float y, float* xout, float* yout) = 0; //55
+	private:
+		virtual void unknown11() = 0;
+		virtual void unknown12() = 0;
+		virtual void unknown13() = 0;
+	public:
+		virtual bool IsBuildingType(int id) = 0;
+		virtual GGL::PlayerTributesManager* GetTributeManager(int player) = 0; //60
+		virtual GGL::PlayerQuestManager* GetQuestManager(int player) = 0;
+		virtual int* GetDiplomacyData(int player) = 0;
+		virtual GGL::CPlayerStatus* GetPlayerStatus(int player) = 0;
+	private:
+		virtual shok::ResourceType GetResourceTypeProvidedBy2(int eid) = 0; // same func as above
+		virtual void unknown14() = 0; //65
+		virtual void unknown15() = 0;
+		virtual void unknown16() = 0;
+	public:
+		virtual int GetSector(int entityid) = 0;
+		virtual int GetSector(const shok::Position* p) = 0;
+		virtual bool IsEntityInSector(int eid, int secor) = 0; //70
+		virtual bool GetTechUsedForStatistics(int techid) = 0;
+	private:
+		virtual void unknown17() = 0; //search some pos?
+	public:
+		virtual bool IsPositionExploredByPlayer(int pid, const shok::Position* p) = 0;
+		virtual int GetWorkCycleId(const char* name) = 0;
+		virtual int GetPrincipalTask(int tid) = 0; //75
+		virtual bool IsThief(int id) = 0;
+		virtual bool IsThiefCarryingSomething(int id) = 0;
+	private:
+		virtual void unknown18() = 0;
+		virtual void unknown19() = 0;
+	public:
+		virtual bool IsBridge(int id) = 0; //80
+		virtual bool IsBridgeTargetedBySabotage(int id) = 0;
+		virtual bool CanKegGetDisarmed(int id) = 0;
 
-		// 83 vfunc overall
 		static inline constexpr int vtp = 0x76D79C;
 	};
 	class CGLGUIInterface : public IGLGUIInterface {

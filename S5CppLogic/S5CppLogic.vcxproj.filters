@@ -350,6 +350,7 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="CppLogic.lua" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua50\S5Lua5.lib" />

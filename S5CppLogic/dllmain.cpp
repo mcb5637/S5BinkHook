@@ -55,63 +55,24 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
-void DumpClassSerialization(lua::State L, const BB::SerializationData* d) {
-    if (!d) {
-        L.Push("unknown serialization data");
-        return;
-    }
-    L.NewTable();
-    while (d->Type) {
-        L.Push(static_cast<int>(d->Position));
-        L.NewTable();
-
-        if (d->SerializationName) {
-            L.Push("name");
-            L.Push(d->SerializationName);
-            L.SetTableRaw(-3);
-        }
-        L.Push("size");
-        L.Push(static_cast<int>(d->Size));
-        L.SetTableRaw(-3);
-
-        if (d->Type == 2) {
-            L.Push("DataType");
-            if (d->DataConverter == BB::FieldSerilaizer::TypeInt)
-                L.Push("Int");
-            else if (d->DataConverter == BB::FieldSerilaizer::TypeFloat)
-                L.Push("Float");
-            else if (d->DataConverter == BB::FieldSerilaizer::TypeBool)
-                L.Push("Bool");
-            else
-                L.Push(reinterpret_cast<int>(d->DataConverter));
-            L.SetTableRaw(-3);
-        }
-        else if (d->Type == 3) {
-            L.Push("SubElement");
-            DumpClassSerialization(L, d->SubElementData);
-            L.SetTableRaw(-3);
-        }
-
-        if (d->ListOptions) {
-            L.Push("ListOpions");
-            L.Push(reinterpret_cast<int>(d->ListOptions));
-            L.SetTableRaw(-3);
-        }
-
-        L.SetTableRaw(-3);
-        d++;
-    }
-}
-void DumpClassSerialization(lua::State L, unsigned int id) {
-    const BB::SerializationData* d = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
-    DumpClassSerialization(L, d);
-}
-
-#define typeandoffset(T,M) sizeof(decltype(T::M)), offsetof(T, M)
+struct S {
+    int a;
+    int b;
+    shok::Position p;
+    BB::IObject* ob;
+};
+BB::SerializationData dat[6]{
+    BB::SerializationData::FieldData("a", MemberSerializationFieldData(S, a)),
+    BB::SerializationData::FieldData("b", MemberSerializationFieldData(S, b)),
+    BB::SerializationData::EmbeddedData("p", MemberSerializationEmbeddedData(S, p)),
+    BB::SerializationData::ObjectPointerData("ob", MemberSerializationSizeAndOffset(S, ob)),
+    BB::SerializationData::GuardData(),
+};
 
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
-    CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
+    //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
+    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, dat);
     return 1;
 }
 

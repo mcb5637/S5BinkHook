@@ -25,6 +25,7 @@ namespace BB {
 
 		static inline constexpr int vtp = 0x762114;
 		static inline constexpr int TypeDesc = 0x7FFE24;
+		static inline constexpr unsigned int Identifier = 0x472E2780;
 
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(unsigned int id) override;

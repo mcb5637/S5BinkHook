@@ -2,6 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "Luapp/constexprTypename.h"
+#include "Luapp/luapp50.h"
 
 namespace BB {
 	class IXmlSerializer {
@@ -15,8 +16,8 @@ namespace BB {
 	protected:
 		virtual ~IXmlSerializer() = default;
 	public:
-		virtual void __stdcall DeserializeByDada(BB::CFileStreamEx* f, BB::IObject* ob, BB::SerializationData* d) = 0;
-		// serialize by data, (BB::CXmlSerializer* th, BB::CFileStreamEx* f, shok_object* ob, BB::SerializationData* d, char* buff)?
+		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, BB::IObject* ob, BB::SerializationData* d) = 0;
+		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, BB::IObject* ob, BB::SerializationData* d, char* xmlrootname) = 0;
 	};
 	class CXmlSerializer : public IXmlSerializer {
 	public:
@@ -44,9 +45,11 @@ namespace BB {
 		// data?
 
 		static inline BB::FieldSerilaizer* const TypeInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810C98);
+		static inline BB::FieldSerilaizer* const TypeUInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810CD8);
 		static inline BB::FieldSerilaizer* const TypeFloat = reinterpret_cast<BB::FieldSerilaizer*>(0x810C78);
 		static inline BB::FieldSerilaizer* const TypeBool = reinterpret_cast<BB::FieldSerilaizer*>(0x810C58);
 		static inline BB::FieldSerilaizer* const TypeString = reinterpret_cast<BB::FieldSerilaizer*>(0x8640F0);
+		static inline BB::FieldSerilaizer* const TypeCharBuff = reinterpret_cast<BB::FieldSerilaizer*>(0x810CB8);
 		static inline BB::FieldSerilaizer* const TypeClassIdentifier = reinterpret_cast<BB::FieldSerilaizer*>(0x813978);
 		static inline BB::FieldSerilaizer* const TypeTaskList = reinterpret_cast<BB::FieldSerilaizer*>(0x85D4AC);
 		// does not add ids
@@ -60,6 +63,16 @@ namespace BB {
 		static constexpr BB::FieldSerilaizer* GetSerilalizer<int>() {
 			return TypeInt;
 		}
+
+		struct ExtendedInfo {
+			const char* Name;
+			void (* const Push)(lua::State L, void* data, const FieldSerilaizer* fs);
+			void (* const Check)(lua::State L, void* data, int idx, const FieldSerilaizer* fs);
+		};
+
+		std::string GetTypeDescName() const;
+
+		const ExtendedInfo& GetExtendedInfo() const;
 	};
 
 	struct SerializationListOptions {
@@ -84,26 +97,49 @@ namespace BB {
 		const char* SerializationName = nullptr; // if not set, automatically follows subelementdata with a position of 0
 		size_t Position = 0;
 		size_t Size = 0;
-		BB::FieldSerilaizer* DataConverter = nullptr;
-		BB::SerializationData* SubElementData = nullptr; //5
-		unsigned int (__stdcall* GetIdentifier)(void* data);
-		BB::SerializationListOptions* ListOptions = nullptr;
+		const BB::FieldSerilaizer* DataConverter = nullptr;
+		const BB::SerializationData* SubElementData = nullptr; //5
+		unsigned int (__stdcall* GetIdentifier)(void* data) = nullptr;
+		const BB::SerializationListOptions* ListOptions = nullptr;
 		int Unknown3 = 0;
 
-		static constexpr SerializationData ValueData(const char* name, size_t pos, size_t size, BB::FieldSerilaizer* converter, BB::SerializationListOptions* list = nullptr)
+	private:
+		static unsigned int __stdcall GetBBIdentifier(void* d);
+	public:
+		static constexpr SerializationData FieldData(const char* name, size_t pos, size_t size, const BB::FieldSerilaizer* converter, const BB::SerializationListOptions* list = nullptr)
 		{
-			return SerializationData{ 2, name, pos, size, converter, nullptr, 0, list, 0 };
+			return SerializationData{ 2, name, pos, size, converter, nullptr, nullptr, list, 0 };
 		}
-		static constexpr SerializationData EmbeddedData(const char* name, size_t pos, size_t size, SerializationData* subdata, BB::SerializationListOptions* list = nullptr)
+		static constexpr SerializationData EmbeddedData(const char* name, size_t pos, size_t size, const SerializationData* subdata, const BB::SerializationListOptions* list = nullptr)
 		{
-			return SerializationData{ 3, name, pos, size, nullptr, subdata, 0, list, 0 };
+			return SerializationData{ 3, name, pos, size, nullptr, subdata, nullptr, list, 0 };
 		}
 		static constexpr SerializationData GuardData()
 		{
-			return SerializationData{ 0, nullptr, 0, 0, nullptr, nullptr, 0, nullptr, 0 };
+			return SerializationData{ 0, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, 0 };
+		}
+		static constexpr SerializationData ObjectPointerData(const char* name, size_t pos, size_t size, const BB::SerializationListOptions* list = nullptr) {
+			return SerializationData{ 6, name, pos, size, nullptr, nullptr, &GetBBIdentifier, list, 0 };
+		}
+
+		static const SerializationData* GetSerializationData(unsigned int id);
+		template<class T>
+		static const SerializationData* GetSerializationData() = delete;
+		template<class T>
+		requires requires { T::SerializationData; }
+		static const SerializationData* GetSerializationData() {
+			return T::SerializationData;
+		}
+		template<class T>
+		requires requires { T::Identifier; }
+		static const SerializationData* GetSerializationData() {
+			return GetSerializationData(T::Identifier);
 		}
 	};
 	static_assert(sizeof(BB::SerializationData) == 4 * 9);
+#define MemberSerializationSizeAndOffset(T,M) offsetof(T, M), sizeof(decltype(T::M))
+#define MemberSerializationFieldData(T,M) MemberSerializationSizeAndOffset(T, M), BB::FieldSerilaizer::GetSerilalizer<decltype(T::M)>()
+#define MemberSerializationEmbeddedData(T,M) MemberSerializationSizeAndOffset(T, M), BB::SerializationData::GetSerializationData<decltype(T::M)>()
 
 	class IClassFactory {
 	public:

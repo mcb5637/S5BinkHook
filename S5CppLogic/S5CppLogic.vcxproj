@@ -290,6 +290,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClCompile Include="s5_scriptsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cpp.hint" />
     <None Include="CppLogic.lua">
       <DeploymentContent>true</DeploymentContent>
     </None>

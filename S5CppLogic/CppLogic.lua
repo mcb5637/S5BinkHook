@@ -3,7 +3,15 @@ assert(false, "do not load this file, this is documentation only!")
 
 --- CppLogic
 -- these changes are always active:
--- - text rendering: @color does now work after @center.
+-- - text rendering:
+--		- all @ codes do now work after alignment codes (only the last alignment code per line takes effect).
+--		- automatic line breaks do now work properly with non la alignment.
+--		- added @la alignment code.
+--		- no more removing of spaces (only spaces at the beginning of a new line or directly at a @bs get removed.)
+--		- checking for @ codes inside words (space before @ no longer needed).
+--		- all @ codes can be terminated by | instead of space (space will get rendered, | will not).
+--		- added @defaultcolor to reset color to the widgets default.
+--		- added @alignLines, which takes on or off as parameter, to turn off removing spaces at the beginning of a new line.
 -- - music can now be played from bba/s5x archives (make sure the s5x is loaded if you want to use music from it).
 CppLogic = {}
 CppLogic.Effect = {}

@@ -11,7 +11,7 @@ convert task 0x4FCD26 call redirect
 0x4D51A4 & 0x50163A activate camo call redirect
 0x49A6A7 settlerchangeplayer override func to fix it not returning new id
 0x4B8EAD constructionsite_getprogresspertick func override
-string render 0x557E47 to 0x557DAA jmp, string render getlen 0x708F60 jmp
+string render 0x5577E1 jmp override, string render getlen 0x708F00 jmp override
 entity execute task get task handler 0x57BF7A call redirect
 destroy entity 0x57C94A jmp
 snipe task 0x4DB5B8 jmp (func override)

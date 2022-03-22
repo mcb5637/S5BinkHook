@@ -15,6 +15,11 @@ struct shok_vtable_EGUIX_CContainerWidget : shok_vtable_EGUIX_CBaseWidget {
 };
 //constexpr int i = offsetof(shok_vtable_EGUIX_CContainerWidget, AddChild) / 4;
 
+shok::Color EGUIX::Color::ToShokColor() const
+{
+    return shok::Color{ Red, Green, Blue, Alpha };
+}
+
 static inline int(__thiscall* const texman_getid)(EGUIX::TextureManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::TextureManager*, const char*)>(0x55664A);
 int EGUIX::TextureManager::GetTextureID(const char* name)
 {
@@ -368,6 +373,34 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool 
 {
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
     *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok::ResourceType::WoodRaw);
+}
+
+static inline float* (__cdecl* const font_lengthdata_get)(void* ld) = reinterpret_cast<float* (__cdecl*)(void*)>(0x625D00);
+float* EGUIX::Font::GetLengthData()
+{
+    return font_lengthdata_get(LengthData);
+}
+static inline float(__cdecl* const font_getsize)(EGUIX::Font* th) = reinterpret_cast<float(__cdecl*)(EGUIX::Font*)>(0x708ED0);
+float EGUIX::Font::GetFontSize()
+{
+    return font_getsize(this);
+}
+static inline float(__cdecl* const font_getstrlen)(EGUIX::Font* th, const char* s, float m) = reinterpret_cast<float(__cdecl*)(EGUIX::Font*, const char*, float)>(0x708F00);
+float EGUIX::Font::GetTextLength(const char* s, float multiply)
+{
+    return font_getstrlen(this, s, multiply);
+}
+float EGUIX::Font::GetTextLength(const wchar_t* s, float multiply)
+{
+    return GetTextLength(reinterpret_cast<const char*>(s), multiply);
+}
+void EGUIX::Font::RenderText(const wchar_t* s, float lengthMultiplyer, float* screenpos, void* textRenderObj)
+{
+    RenderTxt(this, reinterpret_cast<const char*>(s), lengthMultiplyer, screenpos, textRenderObj);
+}
+void EGUIX::Font::RenderText(const char* s, float lengthMultiplyer, float* screenpos, void* textRenderObj)
+{
+    RenderTxt(this, s, lengthMultiplyer, screenpos, textRenderObj);
 }
 
 static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);

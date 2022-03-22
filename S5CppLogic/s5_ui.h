@@ -34,6 +34,32 @@ namespace shok {
 	extern const char* (*GetStringTableTextOverride)(const char* s);
 	void HookGetStringTableText();
 
+	class UIRenderer {
+	public:
+		PADDINGI(1);
+		bool ShouldRenderText;
+		PADDING(3);
+		PADDINGI(1);
+		float RenderSizeX, RenderSizeY;
+		bool SomeTextBool;
+		PADDING(3);
+		PADDINGI(1);
+		void* TextRenderObj;
+
+		void RenderText(const char* txt, int fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
+		void SetTextRenderColor(shok::Color c);
+
+		static inline size_t(__cdecl* const MultibyteToWString)(const char* in, wchar_t* out, size_t len) = reinterpret_cast<size_t(__cdecl*)(const char*, wchar_t*, size_t)>(0x55B73C);
+
+		static inline UIRenderer* (__cdecl* const GlobalObj)() = reinterpret_cast<UIRenderer * (__cdecl*)()>(0x556F5B);
+	};
+	class UIRenderCustomColorContext {
+	public:
+		const EGUIX::Color* GetColorByInt(int i);
+	};
+	//constexpr int i = offsetof(UIRenderer, RenderSizeX) / 4;
+
+
 	void HookTextPrinting();
 }
 

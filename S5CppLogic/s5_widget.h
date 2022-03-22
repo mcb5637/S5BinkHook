@@ -11,6 +11,8 @@ namespace EGUIX {
 
 	struct Color { // size 4
 		int Red, Green, Blue, Alpha; // >=0 && <=0xFF
+
+		shok::Color ToShokColor() const;
 	};
 
 	class TextureManager { // no vtable, does this thing do only gui textures, or something else too?
@@ -262,6 +264,7 @@ namespace EGUIX {
 		static EGUIX::CStaticTextWidget* Create();
 	};
 	static_assert(offsetof(CStaticTextWidget, StringHelper) == 27 * 4);
+	//constexpr int i = offsetof(CStaticTextWidget, StringHelper.Color) / 4;
 
 	class CButtonWidget : public EGUIX::CBaseWidget, public IRender, public IMaterialAccess { // irender 14
 	public:
@@ -415,7 +418,25 @@ namespace EGUIX {
 	public:
 		PADDINGI(1);
 		float Size, Offset, Spacing;
+		byte Flags; // 2 -> is wchar
+		PADDING(3);
+		PADDINGI(4);
+		int16_t CharData[128]; // 9
+		int ExtCharOffset; // 73
+		unsigned int ExtCharLength;
+		int16_t* ExtCharData;
+		PADDINGI(1);
+		void* LengthData; // 77
+		void(__cdecl* RenderTxt)(Font* f, const char* str, float lengthMultiplyer, float* screenpos, void* textRenderObj);
+
+		float* GetLengthData();
+		float GetFontSize();
+		float GetTextLength(const char* s, float multiply);
+		float GetTextLength(const wchar_t* s, float multiply);
+		void RenderText(const wchar_t* s, float lengthMultiplyer, float* screenpos, void* textRenderObj);
+		void RenderText(const char* s, float lengthMultiplyer, float* screenpos, void* textRenderObj);
 	};
+	//constexpr int i = offsetof(Font, CharData) / 4;
 
 	class FontManager { // no vtable either
 	public:

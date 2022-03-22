@@ -79,4 +79,5 @@ namespace GGlue {
 }
 namespace EGUIX {
 	class CBaseWidget;
+	struct Color;
 }

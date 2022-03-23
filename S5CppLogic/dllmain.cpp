@@ -91,6 +91,7 @@ void InitGame() {
         shok::HookTextPrinting();
     CppLogic::Logic::OnLoad();
     ESnd::CSoEMusic::HookStartMusicFilesystem();
+    EScr::CScriptTriggerSystem::HookRemoveFuncOverrides();
 }
 
 constexpr double Version = 1.3002;

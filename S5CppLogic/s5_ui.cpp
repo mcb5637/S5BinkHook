@@ -135,7 +135,6 @@ class TextRenderer {
 	const float linedistance;
 	bool containsat = false;
 	TextAlignment ali = TextAlignment::Left;
-	const float spacelength;
 	const T* strpos;
 	T* linepos;
 	shok::UIRenderCustomColorContext* customcolordata;
@@ -146,7 +145,7 @@ class TextRenderer {
 public:
 	TextRenderer(shok::UIRenderer* r, const T* txt, EGUIX::Font* f, float p[4], float ldf, shok::UIRenderCustomColorContext* customcolordata,
 		shok::Color defaultcolor)
-		: startx(p[0]), fontsize(f->GetFontSize()), linedistance(fontsize* (ldf == 0.0f ? 1.0f : ldf)), spacelength(f->GetTextLength(L"a", fontsize))
+		: startx(p[0]), fontsize(f->GetFontSize()), linedistance(fontsize* (ldf == 0.0f ? 1.0f : ldf))
 		, defaultcolor(defaultcolor) {
 		this->r = r;
 		this->buff = txt;
@@ -243,6 +242,7 @@ private:
 	void PrepareLine() {
 		T* lastwordpos = linepos;
 		const T* lastwordsourcepos = strpos;
+		containsat = false;
 		if (!doNotSkipWhitespaceAtSoL)
 			SkipWhitespace(strpos);
 		while (true) {

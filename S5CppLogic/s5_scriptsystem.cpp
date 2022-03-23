@@ -1,11 +1,25 @@
 #include "pch.h"
 #include "s5_scriptsystem.h"
+#include "hooks.h"
 
 lua_State* shok::LuaStateMainmenu = nullptr;
 
 void EScr::CScriptTriggerSystem::RunTrigger(BB::CEvent* ev)
 {
 	PostEvent(ev);
+}
+
+void __stdcall overrideluafunc_empty(lua_State* L, const char* name, lua::CFunction f) {
+
+}
+bool HookRemoveFuncOverrides_Hooked = false;
+void EScr::CScriptTriggerSystem::HookRemoveFuncOverrides()
+{
+	if (HookRemoveFuncOverrides_Hooked)
+		return;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x59BFD6), 0x59C012 - 0x59BFD6 + 10 };
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x59BFD6), &overrideluafunc_empty); // error
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x59C012), &overrideluafunc_empty); // pcall
 }
 
 lua::Reference __stdcall EScr::CLuaFuncRefCommand::GetRefToFunc()

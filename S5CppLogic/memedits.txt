@@ -24,6 +24,7 @@ AIL_closestream 0x7614A4 dllimport redirect
 0x57B223 entity settasklist jmp
 0x55A62A button check shortcut sign extension opcode fixed OR
 0x55A597 jmp button check shortcut logic override
+0x59BFD6 (error) and 0x59C012 (pcall) open lua state call redirect to nop
 
 only without SCELoader
 

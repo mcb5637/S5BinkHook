@@ -21,6 +21,8 @@ namespace EScr {
 
 		static inline EScr::CScriptTriggerSystem** const GlobalObj = reinterpret_cast<EScr::CScriptTriggerSystem**>(0x895DEC);
 		static inline lua_State** const GameState = reinterpret_cast<lua_State**>(0x853A9C);
+
+		static void HookRemoveFuncOverrides();
 	};
 
 	class CLuaFuncRef {
@@ -50,5 +52,4 @@ namespace EScr {
 		static inline constexpr int TypeDesc = 0x83B83C;
 	};
 	static_assert(sizeof(EScr::CLuaFuncRefCommand) == 12 * 4);
-
 }

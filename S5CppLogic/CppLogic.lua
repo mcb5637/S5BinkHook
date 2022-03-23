@@ -13,6 +13,7 @@ assert(false, "do not load this file, this is documentation only!")
 --		- added @defaultcolor to reset color to the widgets default.
 --		- added @alignLines, which takes on or off as parameter, to turn off removing spaces at the beginning of a new line.
 -- - music can now be played from bba/s5x archives (make sure the s5x is loaded if you want to use music from it).
+-- - removed override for the functions error and pcall, they now work as they should
 CppLogic = {}
 CppLogic.Effect = {}
 CppLogic.Memory = {}

@@ -23,7 +23,7 @@ namespace GGUI {
 
 	class CState : public BB::IObject { // no vtable
 	public:
-		GGUI::C3DViewHandler* C3DViewHandler;
+		GGUI::C3DViewHandler* C3DViewHandler = nullptr;
 
 		static inline constexpr int TypeDesc = 0x82CC10;
 

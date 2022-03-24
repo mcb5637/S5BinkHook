@@ -88,15 +88,28 @@ float __cdecl printstr_getlength_override(EGUIX::Font* f, const char* str, float
 		off = 0;
 	}
 	float len = 0;
+	bool lastat = false;
 	unsigned int c = static_cast<unsigned int>(static_cast<unsigned char>(str[0])) | (static_cast<unsigned int>(static_cast<unsigned char>(mask & static_cast<unsigned char>(str[off]))) << 8);
 	while (c > 0) {
 		bool skipthis = false;
-		if (addlen && c == '@')
+		if (addlen && c == '@') {
 			addlen = false;
-		else if (!addlen && c == ' ')
+			lastat = true;
+
+			str += charlen;
+			c = static_cast<unsigned int>(static_cast<unsigned char>(str[0])) | (static_cast<unsigned int>(static_cast<unsigned char>(mask & static_cast<unsigned char>(str[off]))) << 8);
+			continue;
+		}
+		else if (!addlen && c == '@' && lastat) {
 			addlen = true;
-		else if (!addlen && c == '|')
-			addlen = skipthis = true;
+		}
+		else if (!addlen && c == ' ') {
+			addlen = true;
+		}
+		else if (!addlen && c == '|') {
+			addlen = true;
+			skipthis = true;
+		}
 		if (addlen && !skipthis) {
 			int d;
 			if (c < 128) {
@@ -116,6 +129,7 @@ float __cdecl printstr_getlength_override(EGUIX::Font* f, const char* str, float
 			}
 		}
 
+		lastat = false;
 		str += charlen;
 		c = static_cast<unsigned int>(static_cast<unsigned char>(str[0])) | (static_cast<unsigned int>(static_cast<unsigned char>(mask & static_cast<unsigned char>(str[off]))) << 8);
 	}
@@ -139,7 +153,7 @@ class TextRenderer {
 	T* linepos;
 	shok::UIRenderCustomColorContext* customcolordata;
 	const shok::Color defaultcolor;
-	bool doNotSkipWhitespaceAtSoL = false;
+	bool skipWhitespace = true;
 
 	static inline T line[5001]{};
 public:
@@ -188,17 +202,17 @@ private:
 		else
 			return "bs";
 	}
-	constexpr const T* txt_aloff() {
+	constexpr const T* txt_wsoff() {
 		if constexpr (std::same_as<T, wchar_t>)
-			return L"alignLines:off";
+			return L"skipWhitespace:off";
 		else
-			return "alignLines:off";
+			return "skipWhitespace:off";
 	}
-	constexpr const T* txt_alon() {
+	constexpr const T* txt_wson() {
 		if constexpr (std::same_as<T, wchar_t>)
-			return L"alignLines:on";
+			return L"skipWhitespace:on";
 		else
-			return "alignLines:on";
+			return "skipWhitespace:on";
 	}
 	constexpr const T* txt_color() {
 		if constexpr (std::same_as<T, wchar_t>)
@@ -243,7 +257,7 @@ private:
 		T* lastwordpos = linepos;
 		const T* lastwordsourcepos = strpos;
 		containsat = false;
-		if (!doNotSkipWhitespaceAtSoL)
+		if (skipWhitespace)
 			SkipWhitespace(strpos);
 		while (true) {
 			if (!*strpos) {
@@ -259,7 +273,14 @@ private:
 				break;
 			}
 			if (*strpos == '@') {
-				if (charsmatch(&strpos[1], txt_cr(), true)) {
+				if (strpos[1] == '@') {
+					linepos[0] = '@';
+					linepos[1] = '@';
+					linepos += 2;
+					strpos += 2;
+					continue;
+				}
+				else if (charsmatch(&strpos[1], txt_cr(), true)) {
 					strpos += 3;
 					if (*strpos == '|')
 						++strpos;
@@ -269,23 +290,14 @@ private:
 				else if (charsmatch(&strpos[1], txt_ra(), true)) {
 					ali = TextAlignment::Right;
 					strpos += 3;
-					if (*strpos == '|')
-						++strpos;
-					continue;
 				}
 				else if (charsmatch(&strpos[1], txt_la(), true)) {
 					ali = TextAlignment::Left;
 					strpos += 3;
-					if (*strpos == '|')
-						++strpos;
-					continue;
 				}
 				else if (charsmatch(&strpos[1], txt_center(), true)) {
 					ali = TextAlignment::Center;
 					strpos += 7;
-					if (*strpos == '|')
-						++strpos;
-					continue;
 				}
 				else if (charsmatch(&strpos[1], txt_bs(), true)) {
 					if (linepos == line) {
@@ -310,23 +322,39 @@ private:
 					lastwordsourcepos = strpos;
 					continue;
 				}
-				else if (charsmatch(&strpos[1], txt_aloff(), true)) {
-					doNotSkipWhitespaceAtSoL = true;
-					strpos += 15;
-					if (*strpos == '|')
-						++strpos;
-					continue;
+				else if (charsmatch(&strpos[1], txt_wsoff(), true)) {
+					skipWhitespace = false;
+					strpos += 19;
 				}
-				else if (charsmatch(&strpos[1], txt_alon(), true)) {
-					doNotSkipWhitespaceAtSoL = false;
-					strpos += 14;
-					if (*strpos == '|')
-						++strpos;
-					continue;
+				else if (charsmatch(&strpos[1], txt_wson(), true)) {
+					skipWhitespace = true;
+					strpos += 18;
 				}
 				else {
 					containsat = true;
+					if (skipWhitespace) {
+						while (true) {
+							*linepos = *strpos;
+							++linepos;
+							++strpos;
+							if (*strpos == '\0')
+								break;
+							if (*strpos == '|' || *strpos == ' ') {
+								*linepos = '|';
+								++linepos;
+								++strpos;
+								SkipWhitespace(strpos);
+								break;
+							}
+						}
+						continue;
+					}
 				}
+				if (*strpos == '|')
+					++strpos;
+				if (skipWhitespace && linepos == line)
+					SkipWhitespace(strpos);
+				continue;
 			}
 			*linepos = *strpos;
 			++strpos;
@@ -343,6 +371,8 @@ private:
 				*linepos = ' ';
 				lastwordpos = linepos;
 				lastwordsourcepos = strpos;
+				if (skipWhitespace)
+					SkipWhitespace(strpos);
 			}
 			++linepos;
 		}
@@ -399,7 +429,13 @@ private:
 					break;
 				}
 				if (*plinepos == '@') {
-					if (charsmatch(&plinepos[1], txt_color(), false)) {
+					if (plinepos[1] == '@') {
+						*partlinepos = '@';
+						++partlinepos;
+						plinepos += 2;
+						continue;
+					}
+					else if (charsmatch(&plinepos[1], txt_color(), false)) {
 						shok::Color c{};
 						plinepos += 7;
 						bool colorvalid = false;
@@ -423,15 +459,17 @@ private:
 							}
 						}
 						if (colorvalid) {
-							*partlinepos = '\0';
-							f->RenderText(partialline, fontsize, p, r->TextRenderObj);
-							partlinepos = partialline;
+							if (partlinepos != partialline) {
+								*partlinepos = '\0';
+								f->RenderText(partialline, fontsize, p, r->TextRenderObj);
+								partlinepos = partialline;
+							}
 							r->SetTextRenderColor(c);
 						}
 						else {
 							SkipToEndOfAt(plinepos);
-							continue;
 						}
+						continue;
 					}
 					else if (charsmatch(&plinepos[1], txt_customcolor(), false)) {
 						plinepos += 13;
@@ -448,6 +486,7 @@ private:
 							}
 							SkipToEndOfAt(plinepos);
 						}
+						continue;
 					}
 					else if (charsmatch(&plinepos[1], txt_defaultcolor(), true)) {
 						plinepos += 13;
@@ -457,6 +496,7 @@ private:
 						f->RenderText(partialline, fontsize, p, r->TextRenderObj);
 						partlinepos = partialline;
 						r->SetTextRenderColor(defaultcolor);
+						continue;
 					}
 					else {
 						SkipToEndOfAt(plinepos);
@@ -511,7 +551,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	reinterpret_cast<void(*)()>(0x706D60)();
 	reinterpret_cast<void(__cdecl*)(void*, int)>(0x707A00)(r->TextRenderObj, 0);
 
-	const shok::Color c = color->ToShokColor();
+	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
 	r->SetTextRenderColor(c);
 	float p[4]{ x, y, xend, 0 };
 	if (uk) {

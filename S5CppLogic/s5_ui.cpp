@@ -554,7 +554,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
 	r->SetTextRenderColor(c);
 	float p[4]{ x, y, xend, 0 };
-	if (uk) {
+	if (!uk) {
 		p[0] = p[0] * 1024.0f / r->RenderSizeX;
 		p[1] = p[1] * 768.0f / r->RenderSizeY;
 		p[2] = p[2] * 1024.0f / r->RenderSizeX;

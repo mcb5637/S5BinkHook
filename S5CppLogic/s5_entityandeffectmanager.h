@@ -7,13 +7,15 @@ namespace EGL {
 	requires (MaxNum == 65535) // funcs only defined for this size
 	class TGLEItemManager {
 	public:
-		int Count;
-		PADDINGI(3);
+		int HighestUsedSlot;
+		int FreeSlot;
+		int NumberOfItems;
 	private:
 		struct {
-			ToManage* Point;
-			int Flags;
+			int ID;
+			ToManage* Item;
 		} Data[MaxNum + 1];
+		int UnknownInt;
 		bool Unknown;
 
 	public:
@@ -26,9 +28,9 @@ namespace EGL {
 			return f(this, id);
 		}
 		ToManage* GetInSlot(int id) {
-			if (Count <= id)
+			if (HighestUsedSlot < id)
 				return nullptr;
-			return Data[id + 1].Point;
+			return Data[id].Item;
 		}
 		virtual ~TGLEItemManager() = default;
 	private:
@@ -45,6 +47,9 @@ namespace EGL {
 
 	class CGLEEntityManager : public EGL::TGLEItemManager<EGL::CGLEEntity, 65535> {
 	public:
+		// map/list ScriptName of Name, EntityID
+		static inline BB::SerializationData* (__cdecl* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__cdecl*)()>(0x574083);
+
 		static inline constexpr int vtp = 0x783B70;
 
 		static inline EGL::CGLEEntityManager** const GlobalObj = reinterpret_cast<EGL::CGLEEntityManager**>(0x897558);

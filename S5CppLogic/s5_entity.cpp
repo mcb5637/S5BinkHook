@@ -109,18 +109,18 @@ void* __stdcall EGL::CGLEEntityCreator::CastToIdentifier(unsigned int id) {
 	return nullptr;
 }
 
-static inline bool(__thiscall* const shok_IsEntityInCategory)(EGL::CGLEEntity* e, shok::EntityCategory cat) = reinterpret_cast<bool(__thiscall*)(EGL::CGLEEntity * e, shok::EntityCategory)>(0x57BBEB);
-bool EGL::CGLEEntity::IsEntityInCategory(shok::EntityCategory cat)
+static inline bool(__thiscall* const shok_IsEntityInCategory)(const EGL::CGLEEntity* e, shok::EntityCategory cat) = reinterpret_cast<bool(__thiscall*)(const EGL::CGLEEntity * e, shok::EntityCategory)>(0x57BBEB);
+bool EGL::CGLEEntity::IsEntityInCategory(shok::EntityCategory cat) const
 {
 	return shok_IsEntityInCategory(this, cat);
 }
 
-int EGL::CGLEEntity::GetResourceProvided()
+shok::ResourceType EGL::CGLEEntity::GetResourceProvided() const
 {
 	return EGL::CGLEEntity::EntityIDGetProvidedResource(this->EntityId);
 }
 
-GGlue::CGlueEntityProps* EGL::CGLEEntity::GetEntityType()
+GGlue::CGlueEntityProps* EGL::CGLEEntity::GetEntityType() const
 {
 	return (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
 }
@@ -175,16 +175,22 @@ int EGL::CGLEEntity::ResourceTreeGetNearestSector()
 }
 
 
-int EGL::CGLEEntity::GetFirstAttachedToMe(shok::AttachmentType attachmentId)
+int EGL::CGLEEntity::GetFirstAttachedToMe(shok::AttachmentType attachmentId) const
 {
-	shok::Attachment* r = ObserverEntities.GetFirstMatch([attachmentId](shok::Attachment* a) {return a->AttachmentType == attachmentId; });
-	return r == nullptr ? 0 : r->EntityId;
+	for (const shok::Attachment& r : ObserverEntities) {
+		if (r.AttachmentType == attachmentId)
+			return r.EntityId;
+	}
+	return 0;
 }
 
-int EGL::CGLEEntity::GetFirstAttachedEntity(shok::AttachmentType attachmentId)
+int EGL::CGLEEntity::GetFirstAttachedEntity(shok::AttachmentType attachmentId) const
 {
-	shok::Attachment* r = ObservedEntities.GetFirstMatch([attachmentId](shok::Attachment* a) {return a->AttachmentType == attachmentId; });
-	return r == nullptr ? 0 : r->EntityId;
+	for (const shok::Attachment& r : ObservedEntities) {
+		if (r.AttachmentType == attachmentId)
+			return r.EntityId;
+	}
+	return 0;
 }
 static inline void(__thiscall* entattach_attach)(EGL::CGLEAttachableBase* th, shok::AttachmentType at, int id, shok::EventIDs evth, shok::EventIDs evot) = reinterpret_cast<void(__thiscall*)(EGL::CGLEAttachableBase*, shok::AttachmentType, int, shok::EventIDs, shok::EventIDs)>(0x4A61B3);
 void EGL::CGLEEntity::AttachEntity(shok::AttachmentType attachtype, int otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach)
@@ -207,6 +213,15 @@ bool EGL::CMovingEntity::IsMoving()
 	EGL::CEventGetValue_Bool d{ shok::EventIDs::Movement_IsMoving };
 	FireEvent(&d);
 	return d.Data;
+}
+
+bool EGL::CMovingEntity::IsFleeingFrom(const shok::Position& center, float range) const
+{
+	if (GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED) != 0)
+		return true;
+	float posrsq = Position.GetDistanceSquaredTo(center);
+	float tprsq = TargetPosition.GetDistanceSquaredTo(center);
+	return std::sqrtf(posrsq) + range < std::sqrtf(tprsq);
 }
 
 bool GGL::CSettler::IsIdle()

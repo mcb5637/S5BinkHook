@@ -194,10 +194,22 @@ namespace EGL {
 			}
 			return nullptr;
 		}
+		template<typename T>
+		requires std::derived_from<T, EGL::CGLEBehavior>
+		const T* GetBehavior() const {
+			for (const EGL::CGLEBehavior* b : Behaviours) {
+				if (b) {
+					const T* r = dynamic_cast<const T*>(b);
+					if (r)
+						return r;
+				}
+			}
+			return nullptr;
+		}
 
-		bool IsEntityInCategory(shok::EntityCategory cat);
-		int GetResourceProvided();
-		GGlue::CGlueEntityProps* GetEntityType();
+		bool IsEntityInCategory(shok::EntityCategory cat) const;
+		shok::ResourceType GetResourceProvided() const;
+		GGlue::CGlueEntityProps* GetEntityType() const;
 
 		int EventGetDamage();
 		int EventGetArmor();
@@ -219,8 +231,8 @@ namespace EGL {
 
 		void Destroy();
 
-		int GetFirstAttachedToMe(shok::AttachmentType attachmentId);
-		int GetFirstAttachedEntity(shok::AttachmentType attachmentId);
+		int GetFirstAttachedToMe(shok::AttachmentType attachmentId) const;
+		int GetFirstAttachedEntity(shok::AttachmentType attachmentId) const;
 		/**
 		fires event eventIdOnThisDetach on otherId, if this gets detached/destroyed, fires eventIdOnOtherDetach on this, if otherId gets detached/destroyed
 		**/
@@ -305,7 +317,7 @@ namespace EGL {
 		static inline void(__cdecl* const EntityHurtEntity)(EGL::CGLEEntity* attackerObj, EGL::CGLEEntity* targetObj, int damage) = reinterpret_cast<void(__cdecl*)(EGL::CGLEEntity*, EGL::CGLEEntity*, int)>(0x49F358);
 		static inline void(__cdecl* const EntityDealAoEDamage)(EGL::CGLEEntity* attacker, shok::Position* center, float range, int damage, int player, int damageclass) = reinterpret_cast<void(__cdecl*)(EGL::CGLEEntity*, shok::Position*, float, int, int, int)>(0x49F82A);
 		static inline int(__cdecl* const GetEntityIDByScriptName)(const char* str) = reinterpret_cast<int(__cdecl*)(const char* str)>(0x576624);
-		static inline int(__cdecl* const EntityIDGetProvidedResource)(int id) = reinterpret_cast<int(__cdecl*)(int id)>(0x4B8489);
+		static inline shok::ResourceType(__cdecl* const EntityIDGetProvidedResource)(int id) = reinterpret_cast<shok::ResourceType(__cdecl*)(int id)>(0x4B8489);
 		static inline bool(__cdecl* const EntityIDIsDead)(int id) = reinterpret_cast<bool(__cdecl*)(int)>(0x44B096);
 		static inline int(__cdecl* const EntityIDChangePlayer)(int entityid, int player) = reinterpret_cast<int(__cdecl*)(int, int)>(0x49A6A7);
 
@@ -380,6 +392,7 @@ namespace EGL {
 
 		int LeaderGetNearbyBarracks();
 		bool IsMoving();
+		bool IsFleeingFrom(const shok::Position& center, float range) const;
 	};
 	static_assert(sizeof(CMovingEntity) == 71 * 4);
 	static_assert(offsetof(CMovingEntity, MovementState) == 70 * 4);

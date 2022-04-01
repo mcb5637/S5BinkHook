@@ -569,6 +569,8 @@ function CppLogic.Entity.EntityIteratorGetNearest(...) end
 -- @param id entity
 -- @param pred predicate
 -- @return bool
+-- @return number range
+-- @return number priority
 function CppLogic.Entity.CheckPredicate(id, pred) end
 
 --- creates a predicate that performs an and of multiple predicates.

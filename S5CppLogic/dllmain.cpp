@@ -18,6 +18,7 @@
 #include "s5_maplogic.h"
 #include "s5_filesystem.h"
 #include "s5_exception.h"
+#include "entityiterator.h"
 #include "hooks.h"
 #include "luaext.h"
 #include "l_mem.h"
@@ -69,11 +70,55 @@ BB::SerializationData dat[6]{
     BB::SerializationData::GuardData(),
 };
 
+class Base {
+    int a = 0;
+    int b = 0;
+public:
+    virtual int get() { return 0; }
+    virtual ~Base() = default;
+    using BaseClass = Base;
+
+    static int sget(lua::State L) {
+        Base* b = L.GetUserData<Base>(1);
+        L.Push(b->get());
+        return 1;
+    }
+
+    static constexpr std::array<lua::FuncReference, 1> LuaMethods{ {
+            lua::FuncReference::GetRef<sget>("Get"),
+} };
+};
+class Derived : public Base {
+public:
+    int c;
+    Derived(int c) { this->c = c; }
+    virtual int get() override { return c; }
+
+    static int set(lua::State L) {
+        Derived* b = L.GetUserData<Derived>(1);
+        b->c = L.CheckInt(2);
+        return 0;
+    }
+
+    static constexpr std::array<lua::FuncReference, 2> LuaMethods{ {
+            lua::FuncReference::GetRef<sget>("Get"),
+            lua::FuncReference::GetRef<set>("Set"),
+} };
+};
+
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, dat);
-    return 1;
+    //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, EGL::CGLEEntityManager::SerializationData());
+    /*int t = L.CheckInt(1);
+    L.SetTop(0);
+    CppLogic::Iterator::EntityPredicateOfType pty{ t };
+    CppLogic::Iterator::MultiPlayerEntityIterator it{ &pty, {1,2,3} };
+    for (EGL::CGLEEntity* e : it) {
+        L.Push(e->EntityId);
+    }
+    return L.GetTop();*/
+    return 0;
 }
 
 int Cleanup(lua::State L) {

@@ -272,6 +272,13 @@ private:
 				}
 				break;
 			}
+			if (*strpos == '\r ' || *strpos == '\n') {
+				++strpos;
+				if (*strpos == '\r ' || *strpos == '\n')
+					++strpos;
+				*linepos = '\0';
+				break;
+			}
 			if (*strpos == '@') {
 				if (strpos[1] == '@') {
 					linepos[0] = '@';
@@ -308,7 +315,7 @@ private:
 						--linepos;
 					T prev = *linepos;
 					*linepos = '\0';
-					if ((f->GetTextLength(line, fontsize) + p[0]) >= p[2]) {
+					if (p[2] && (f->GetTextLength(line, fontsize) + p[0]) >= p[2]) {
 						if (linepos != lastwordpos && lastwordpos != line) {
 							linepos = lastwordpos;
 							*linepos = '\0';
@@ -592,6 +599,8 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 		TextRenderer<char> rend{ r, txt, f, p, ldf, customcolordata, c };
 		rend.MainRender();
 	}
+
+	reinterpret_cast<void(__cdecl*)()>(0x7071D0)();
 
 	return 1;
 }

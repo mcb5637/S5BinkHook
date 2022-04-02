@@ -24,7 +24,7 @@ namespace CppLogic::Iterator {
 
 	template<class T>
 	class ManagedIterator {
-		int current = 0;
+		int current = -1;
 	public:
 		const Predicate<T>* const Pred;
 		ManagedIterator(const Predicate<T>* const p) : Pred(p) {
@@ -35,7 +35,7 @@ namespace CppLogic::Iterator {
 		virtual T* GetCurrentBase(int c) const = 0;
 	public:
 		void Reset() {
-			current = 0;
+			current = -1;
 		}
 		T* GetNext(int& curr, float* rangeOut, int* prio) const {
 			while (true) {

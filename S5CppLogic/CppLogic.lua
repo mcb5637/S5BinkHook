@@ -550,6 +550,21 @@ function CppLogic.Combat.DisableCamoFix() end
 -- @return nil
 function CppLogic.Entity.EntityIterator(...) end
 
+--- iterates over all entities of one or more players that match a predicate.
+-- cannot iterate over player 0 entities.
+-- usually faster than EntityIterator and a player predicate.
+-- you have to manually create an and predicate.
+-- perfect to use with for loop.
+-- examples:
+-- - for id in CppLogic.Entity.EntityIterator(...) do Message(id) end  
+-- - for id, rsqu, prio in CppLogic.Entity.PlayerEntityIterator(CppLogic.Entity.Predicates.InCircle(...), 1) do Message(id.."   "..r) end  
+-- @param pred predicate userdata
+-- @param ... players
+-- @return nextEntity func
+-- @return iteratorStatus
+-- @return nil
+function CppLogic.Entity.PlayerEntityIterator(pred, ...) end
+
 --- gets all entities that match a predicate as a table.
 -- @param pred predicate userdata
 -- @return table of ids

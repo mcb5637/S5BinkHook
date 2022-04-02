@@ -215,7 +215,11 @@ namespace CppLogic::Entity {
 	}
 
 	int EntityIteratorNext(lua::State L) { // (state nil, last value) -> next value
-		auto* it = reinterpret_cast<CppLogic::Iterator::GlobalEntityIterator*>(L.ToUserdata(L.Upvalueindex(1))); // no error checking here, cause that would cost speed
+		// no error checking here, cause that would cost speed
+		// just expect no other c/c++ code will change the funcs upvalue
+		// make sure ManagedIterator is the first class inherited from the actual iterator and we do not use luapp inheritance here
+		// (both would break this simplified pointer)
+		auto* it = static_cast<CppLogic::Iterator::ManagedIterator<EGL::CGLEEntity>*>(L.ToUserdata(L.Upvalueindex(1)));
 		float r = -1;
 		int p = -1;
 		EGL::CGLEEntity* e = it->GetNext(&r, &p);
@@ -238,6 +242,27 @@ namespace CppLogic::Entity {
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 
 		L.NewUserData<CppLogic::Iterator::GlobalEntityIterator>(pred); // upvalue of func
+		L.Push<EntityIteratorNext>(1); // func
+		L.Push(); // state
+		L.Push(); // initial value
+		return 3;
+	}
+
+	int PlayerEntityIterator(lua::State L) {
+		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		if (L.GetTop() == 2) {
+			int pl = L.CheckInt(2);
+			L.NewUserData<CppLogic::Iterator::PlayerEntityIterator>(pl, pred); // upvalue of func
+		}
+		else {
+			int num = L.GetTop() - 1;
+			if (num > 8)
+				throw lua::LuaException("too many players");
+			auto* it = L.NewUserData<CppLogic::Iterator::MultiPlayerEntityIterator>(pred); // upvalue of func
+			for (int i = 0; i < num; ++i) {
+				it->Players[i] = L.CheckInt(i + 2);
+			}
+		}
 		L.Push<EntityIteratorNext>(1); // func
 		L.Push(); // state
 		L.Push(); // initial value
@@ -1796,7 +1821,7 @@ namespace CppLogic::Entity {
 		SettlerCleanupAnimTask(L);
 	}
 
-	constexpr std::array<lua::FuncReference, 31> Entity{ {
+	constexpr std::array<lua::FuncReference, 32> Entity{ {
 			lua::FuncReference::GetRef<GetScale>("GetScale"),
 			lua::FuncReference::GetRef<SetScale>("SetScale"),
 			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
@@ -1825,6 +1850,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PerformHeal>("PerformHeal"),
 			lua::FuncReference::GetRef<EntityIteratorTableize>("EntityIteratorTableize"),
 			lua::FuncReference::GetRef<LEntityIterator>("EntityIterator"),
+			lua::FuncReference::GetRef<PlayerEntityIterator>("PlayerEntityIterator"),
 			lua::FuncReference::GetRef<EntityIteratorGetNearest>("EntityIteratorGetNearest"),
 			lua::FuncReference::GetRef<EntityIteratorCount>("EntityIteratorCount"),
 			lua::FuncReference::GetRef<CheckPredicate>("CheckPredicate"),
@@ -1989,3 +2015,4 @@ namespace CppLogic::Entity {
 // CppLogic.Entity.Settler.GetBaseMovementSpeed(GUI.GetSelectedEntity())
 // CppLogic.Entity.MovingEntityGetTargetPos(GUI.GetSelectedEntity())
 // local x,y = GUI.Debug_GetMapPositionUnderMouse() CppLogic.Entity.MovingEntitySetTargetPos(GUI.GetSelectedEntity(), {X=x,Y=y})
+// for id in CppLogic.Entity.PlayerEntityIterator(CppLogic.Entity.Predicates.IsSettler(), 1) do LuaDebugger.Log(id) end

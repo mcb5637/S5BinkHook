@@ -59,11 +59,13 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(int&
 			++pl;
 			if (pl >= 9)
 				return nullptr;
-			if (Players[pl] >= 0)
-				break;
+			if (Players[pl] >= 0) {
+				ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(Players[pl])->PlayerAttractionHandler;
+				if (ah->EntityInSystem.size() > 0)
+					break;
+			}
 		}
 		base = 0;
-		ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(Players[pl])->PlayerAttractionHandler;
 	}
 	c = (pl << (6 * 4)) | base;
 	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah->EntityInSystem[base].EntityID);

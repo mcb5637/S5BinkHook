@@ -118,7 +118,10 @@ int Test(lua::State Ls) {
         L.Push(e->EntityId);
     }
     return L.GetTop();*/
-    return 0;
+    L.NewUserData<Derived>(1);
+    L.GetUserData<Base>(-1);
+    L.Push(L.GetTop());
+    return 2;
 }
 
 int Cleanup(lua::State L) {

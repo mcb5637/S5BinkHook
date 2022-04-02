@@ -491,10 +491,23 @@ function CppLogic.API.RuntimeStoreGet(name) end
 -- data gets read directly from the game, so anything you can use is in there.
 function CppLogic.API.CreateExtraDataTables() end
 
---- returnd debug information about a function.
+--- returns debug information about a function.
 -- @param f function func to check
 -- @return table funcdata {name, namewhat, nups, short_src, linedefined, what}, see lua_getinfo for what actually gets returned
 function CppLogic.API.GetFuncDebug(f) end
+
+--- returns the main SHoK game thread (the thread that opened the lua state).
+-- @return number threadid
+function CppLogic.API.GetMainThreadID(f) end
+
+--- returns the current running thread (this should always be the main thread, or the luadebugger thread).
+-- @return number threadid
+function CppLogic.API.GetCurrentThreadID(f) end
+
+--- returns the current time as a single number.
+-- useful for random seeds, use Framework.GetSystemTimeDateString if you want somwthing human readable.
+-- @return number time
+function CppLogic.API.GetCurrentTime(f) end
 
 --- deals damage to a target.
 -- calls respective hurt entity trigger.

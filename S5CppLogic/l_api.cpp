@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string_view>
 #include <array>
+#include <processthreadsapi.h>
+#include <ctime>
 #include "l_api.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
@@ -225,7 +227,22 @@ namespace CppLogic::API {
 		return 0;
 	}
 
-	constexpr std::array<lua::FuncReference, 13> API{ {
+	int MainThreadID = 0;
+	int GetMainThreadID(lua::State L) {
+		L.Push(MainThreadID);
+		return 1;
+	}
+	int GetCurrentThreadID(lua::State L) {
+		L.Push(static_cast<int>(GetCurrentThreadId()));
+		return 1;
+	}
+
+	int LGetCurrentTime(lua::State L) {
+		L.Push(static_cast<double>(std::time(nullptr)));
+		return 1;
+	}
+
+	constexpr std::array<lua::FuncReference, 16> API{ {
 			lua::FuncReference::GetRef<Eval>("Eval"),
 			lua::FuncReference::GetRef<Log>("Log"),
 			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
@@ -239,11 +256,15 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<RuntimeStoreGet>("RuntimeStoreGet"),
 			lua::FuncReference::GetRef<CreateExtraDataTables>("CreateExtraDataTables"),
 			lua::FuncReference::GetRef<GetFuncDebug>("GetFuncDebug"),
+			lua::FuncReference::GetRef<GetMainThreadID>("GetMainThreadID"),
+			lua::FuncReference::GetRef<GetCurrentThreadID>("GetCurrentThreadID"),
+			lua::FuncReference::GetRef<LGetCurrentTime>("GetCurrentTime"),
 	} };
 
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(API, -3);
+		MainThreadID = GetCurrentThreadId();
 	}
 }
 

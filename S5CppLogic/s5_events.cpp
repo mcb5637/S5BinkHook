@@ -89,7 +89,7 @@ EGL::CEventSubAnim::CEventSubAnim(shok::EventIDs e, int an, int subind, bool bac
 
 EGL::CEvent2Entities::CEvent2Entities(shok::EventIDs e, int aid, int tid) : BB::CEvent(e)
 {
-	SetVT(EGL::CEventSubAnim::vtp);
+	SetVT(EGL::CEvent2Entities::vtp);
 	ActorId = aid;
 	TargetId = tid;
 	*reinterpret_cast<int*>(static_cast<EGL::IEvent2Entities*>(this)) = EGL::CEvent2Entities::vtp_IEvent2Entities;

@@ -1198,26 +1198,18 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 	if (range <= 0)
 		return;
 	int pl = attacker ? attacker->PlayerId : player;
-	EntityIteratorPredicateIsRelevant irel{};
-	EntityIteratorPredicateInCircle icircl{ center, range };
-	EntityIteratorPredicateIsAlive iali{};
-	int buff[8];
-	int bufflen = 8;
-	if (pl)
-		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(pl, buff, bufflen);
-	EntityIteratorPredicateAnyPlayer ipl{buff, bufflen};
-	EntityIteratorPredicate* iandd[4] = { &irel, &icircl, &iali, &ipl };
-	EntityIteratorPredicateAnd iand{ iandd, pl ? 4 : 3 };
-	EntityIterator it{ &iand };
-	float cr = 0;
-	EGL::CGLEEntity* curr = it.GetNext(&cr, nullptr);
-	while (curr) {
+	CppLogic::Iterator::EntityPredicateIsCombatRelevant irel{};
+	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> icircl{ center, range * range };
+	CppLogic::Iterator::EntityPredicateIsAlive iali{};
+	CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 3> p{ &irel, &icircl, &iali };
+
+	auto lam = [range, damage, damageclass, attacker, pl, uiFeedback, xp, addStat, sourceInfo](EGL::CGLEEntity* curr, float cr) {
 		cr = std::sqrtf(cr) / range;
 		if (cr < 0 || cr > 1)
 			cr = 0;
 		else
 			cr = 1 - cr * cr;
-		
+
 		if (cr != 0) {
 			EGL::CEventGetValue_Int getac{ shok::EventIDs::GetArmorClass };
 			curr->FireEvent(&getac);
@@ -1234,8 +1226,20 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 
 			curr->AdvancedHurtEntityBy(attacker, static_cast<int>(dmg), pl, uiFeedback, xp, addStat, sourceInfo);
 		}
+	};
 
-		curr = it.GetNext(&cr, nullptr);
+	if (pl) {
+		CppLogic::Iterator::MultiPlayerEntityIterator it{ &p };
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, pl);
+		for (auto& ei : it.ExtendedIterate()) {
+			lam(ei.Object, ei.Range);
+		}
+	}
+	else {
+		CppLogic::Iterator::GlobalEntityIterator it{ &p };
+		for (auto& ei : it.ExtendedIterate()) {
+			lam(ei.Object, ei.Range);
+		}
 	}
 }
 

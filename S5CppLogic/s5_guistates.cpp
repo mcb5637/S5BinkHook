@@ -105,19 +105,20 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(int e
 	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 
-	EntityIteratorPredicateOfPlayer predpl{ 0 };
-	EntityIteratorPredicateAnyEntityType predety{ bp->BuildOn.data(), bp->BuildOn.size() };
-	EntityIteratorPredicateInCircle predcir{ p, range };
-	EntityIteratorPredicateFunc predfunc{ [](EGL::CGLEEntity* e) {
-			return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == 0;
+	CppLogic::Iterator::EntityPredicateOfPlayer pl{ 0 };
+	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, range * range };
+	CppLogic::Iterator::EntityPredicateOfAnyType pety{};
+	pety.entityTypes.reserve(bp->BuildOn.size());
+	for (int t : bp->BuildOn)
+		pety.entityTypes.push_back(t);
+	CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [](const EGL::CGLEEntity* e, float*, int*) {
+		return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == 0;
 	} };
-	EntityIteratorPredicate* preds[] = { &predpl, &predety, &predcir, &predfunc };
-	EntityIteratorPredicateAnd predand{ preds, 4 };
-	EntityIterator it{ &predand };
-	auto* ent = it.GetNearest(nullptr);
-	if (!ent)
-		return { -1,-1,0 };
-	return ent->Position;
+	CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> pr{ &pl, &pety, &cir, &fun };
+	CppLogic::Iterator::GlobalEntityIterator it{ &pr };
+	if (auto* ent = it.GetNearest(nullptr))
+		return ent->Position;
+	return { -1,-1,0 };
 }
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(int ety, const shok::PositionRot& p, float range)
 {

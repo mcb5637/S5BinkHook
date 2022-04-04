@@ -227,140 +227,153 @@ namespace CppLogic::UA {
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestTargetInArea(int player, shok::Position& p, float ran, bool notFleeing)
 	{
-		EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
-		int buff[8];
-		int bufflen = 8;
-		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
-		EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-		EntityIteratorPredicateOfEntityCategory catLeader = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetTypeLeader);
-		EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
-		EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
-		EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-		EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
-		EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-		EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-		EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetType);
-		EntityIteratorPredicatePriority prio1 = EntityIteratorPredicatePriority(2, &catLeader);
-		EntityIteratorPredicatePriority prio2 = EntityIteratorPredicatePriority(1, &buil);
-		EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
-		EntityIteratorPredicate* preds[11] = {
-			&relev, &pl, &cat, &al, &nsol, &vis, &notinbuild, &cir, &prio1, &prio2, &nflee
-		};
-		EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 11 : 10);
-		EntityIterator iter = EntityIterator(&a);
-		EGL::CGLEEntity* r = iter.GetNearest(nullptr);
-		return r;
+		CppLogic::Iterator::EntityPredicateIsCombatRelevant relev{};
+		CppLogic::Iterator::EntityPredicateOfEntityCategory catLeader{ shok::EntityCategory::TargetFilter_TargetTypeLeader };
+		CppLogic::Iterator::EntityPredicateIsNotSoldier nsol{};
+		CppLogic::Iterator::EntityPredicateIsVisible vis{};
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
+		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::TargetFilter_TargetType };
+		CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity> prio1{ &catLeader, 2 };
+		CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity> prio2{ &buil,1 };
+		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
+		if (notFleeing) {
+			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 10> a{
+				&relev, &cat, &ali, &nsol, &vis, &notinbuild, &cir, &prio1, &prio2, &nflee,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetNearest(nullptr);
+		}
+		else {
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 9> a{
+				&relev, &cat, &ali, &nsol, &vis, &notinbuild, &cir, &prio1, &prio2,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetNearest(nullptr);
+		}
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetFurthestConversionTargetInArea(int player, shok::Position& p, float ran, bool notFleeing)
 	{
-		EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
-		int buff[8];
-		int bufflen = 8;
-		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
-		EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-		EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetTypeLeader);
-		EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
-		EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
-		EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-		EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-		EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-		EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
-		EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](EGL::CGLEEntity* e) {
+		CppLogic::Iterator::EntityPredicateIsCombatRelevant relev{};
+		CppLogic::Iterator::EntityPredicateOfEntityCategory catLeader{ shok::EntityCategory::TargetFilter_TargetTypeLeader };
+		CppLogic::Iterator::EntityPredicateIsNotSoldier nsol{};
+		CppLogic::Iterator::EntityPredicateIsVisible vis{};
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
+		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
+		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
-			});
-		EntityIteratorPredicate* preds[10] = {
-			&relev, &pl, &cat, &al, &nsol, &vis, &notinbuild, &cir, &fun, &nflee
-		};
-		EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 10 : 9);
-		EntityIterator iter = EntityIterator(&a);
-		EGL::CGLEEntity* r = iter.GetFurthest(nullptr);
-		return r;
+		} };
+		if (notFleeing) {
+			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir, &nflee,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetFurthest(nullptr);
+		}
+		else {
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetFurthest(nullptr);
+		}
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestSettlerInArea(int player, shok::Position& p, float ran, bool notFleeing)
 	{
-		EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
-		int buff[8];
-		int bufflen = 8;
-		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
-		EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-		EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetTypeLeader);
-		EntityIteratorPredicateIsNotSoldier nsol = EntityIteratorPredicateIsNotSoldier();
-		EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
-		EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-		EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-		EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-		EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
-		EntityIteratorPredicate* preds[9] = {
-			&relev, &pl, &cat, &al, &nsol, &vis, &notinbuild, &cir, &nflee
-		};
-		EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 9 : 8);
-		EntityIterator iter = EntityIterator(&a);
-		return iter.GetNearest(nullptr);
+		CppLogic::Iterator::EntityPredicateIsCombatRelevant relev{};
+		CppLogic::Iterator::EntityPredicateOfEntityCategory catLeader{ shok::EntityCategory::TargetFilter_TargetTypeLeader };
+		CppLogic::Iterator::EntityPredicateIsNotSoldier nsol{};
+		CppLogic::Iterator::EntityPredicateIsVisible vis{};
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
+		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
+		if (notFleeing) {
+			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir, &nflee,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetNearest(nullptr);
+		}
+		else {
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetNearest(nullptr);
+		}
 	}
-	EGL::CGLEEntity* UnlimitedArmy::GetNearestBuildingInArea(int player, shok::Position& p, float ran) {
-		EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
-		int buff[8];
-		int bufflen = 8;
-		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
-		EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-		EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
-		EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
-		EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-		EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-		EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](EGL::CGLEEntity* e) {
+	EGL::CGLEEntity* UnlimitedArmy::GetNearestBuildingInArea(int player, shok::Position& p, float ran)
+	{
+		CppLogic::Iterator::EntityPredicateIsCombatRelevant relev{};
+		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateIsVisible vis{};
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
+		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 2);
-			});
-		EntityIteratorPredicate* preds[7] = {
-			&relev, &pl, &al, &buil, &vis, &cir, &fun
+		} };
+		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 6> a{
+			&relev, &buil, &ali, &vis, &cir, &fun,
 		};
-		EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, 7);
-		EntityIterator iter = EntityIterator(&a);
-		return iter.GetNearest(nullptr);
+		CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+		return it.GetNearest(nullptr);
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestBridgeInArea(shok::Position& p, float ran) {
-		EntityIteratorPredicateOfPlayer pl = EntityIteratorPredicateOfPlayer(0);
-		EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
-		EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::Bridge);
-		EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-		EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](EGL::CGLEEntity* e) {
+		CppLogic::Iterator::EntityPredicateOfPlayer pl{ 0 };
+		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::Bridge };
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
+		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
-			});
-		EntityIteratorPredicate* preds[5] = {
-			&pl, &buil, &cat, &cir, &fun
+		} };
+		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 5> a{
+			&pl, &buil, &cat, &cir, &fun,
 		};
-		EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, 5);
-		EntityIterator iter = EntityIterator(&a);
-		return iter.GetNearest(nullptr);
+		CppLogic::Iterator::GlobalEntityIterator it{ &a };
+		return it.GetNearest(nullptr);
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestSnipeTargetInArea(int player, shok::Position& p, float ran, bool notFleeing)
 	{
-		EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
-		int buff[8];
-		int bufflen = 8;
-		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
-		EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-
-		EntityIteratorPredicateOfEntityCategory he = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::Hero);
-		EntityIteratorPredicateOfEntityCategory can = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::Cannon);
-		EntityIteratorPredicate* cats[2] = {
-			&he, &can
-		};
-		EntityIteratorPredicateOr cat = EntityIteratorPredicateOr(cats, 2);
-
-		EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
-		EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-		EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-		EntityIteratorPredicateNotInBuilding notinbuild = EntityIteratorPredicateNotInBuilding();
-		EntityIteratorPredicateFunc fun = EntityIteratorPredicateFunc([this](EGL::CGLEEntity* e) {
+		CppLogic::Iterator::EntityPredicateIsCombatRelevant relev{};
+		CppLogic::Iterator::EntityPredicateOfEntityCategory catHe{ shok::EntityCategory::Hero };
+		CppLogic::Iterator::EntityPredicateOfEntityCategory catCan{ shok::EntityCategory::Cannon };
+		CppLogic::Iterator::EntityPredicateIsVisible vis{};
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
+		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
+		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
-			});
-		EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-		EntityIteratorPredicate* preds[9] = {
-			&relev, &pl, &cat, &al, &vis, &notinbuild, &cir, &fun, &nflee
-		};
-		EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 9 : 8);
-		EntityIterator iter = EntityIterator(&a);
-		return iter.GetNearest(nullptr);
+		} };
+		CppLogic::Iterator::PredicateStaticOr<EGL::CGLEEntity, 2> cat{ &catHe, &catCan };
+		if (notFleeing) {
+			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
+				&relev, &cat, &ali, &vis, &notinbuild, &cir, &fun, &nflee,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetNearest(nullptr);
+		}
+		else {
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
+				&relev, &cat, &ali, &vis, &notinbuild, &cir, &fun,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.GetNearest(nullptr);
+		}
 	}
 	bool UnlimitedArmy::IsTargetValid(int id)
 	{
@@ -375,7 +388,10 @@ namespace CppLogic::UA {
 		}
 		if (!IgnoreFleeing)
 			return true;
-		return EntityIteratorPredicateIsNotFleeingFrom::IsNotFleeingFrom(e, LastPos, 500);
+		if (EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e)) {
+			return !m->IsFleeingFrom(LastPos, 500);
+		}
+		return true;
 	}
 	void UnlimitedArmy::CheckStatus(UAStatus status)
 	{
@@ -545,31 +561,29 @@ namespace CppLogic::UA {
 	}
 	int UnlimitedArmy::CountTargetsInArea(int player, shok::Position& p, float ran, bool notFleeing)
 	{
-		EntityIteratorPredicateIsRelevant relev = EntityIteratorPredicateIsRelevant();
-		int buff[8];
-		int bufflen = 8;
-		EntityIteratorPredicateAnyPlayer::FillHostilePlayers(player, buff, bufflen);
-		EntityIteratorPredicateAnyPlayer pl = EntityIteratorPredicateAnyPlayer(buff, bufflen);
-		EntityIteratorPredicateOfEntityCategory cat = EntityIteratorPredicateOfEntityCategory(shok::EntityCategory::TargetFilter_TargetType);
-		EntityIteratorPredicateIsVisible vis = EntityIteratorPredicateIsVisible();
-		EntityIteratorPredicateInCircle cir = EntityIteratorPredicateInCircle(p.X, p.Y, ran);
-		EntityIteratorPredicateIsBuilding buil = EntityIteratorPredicateIsBuilding();
-		EntityIteratorPredicateIsAlive al = EntityIteratorPredicateIsAlive();
-		EntityIteratorPredicateIsNotFleeingFrom nflee = EntityIteratorPredicateIsNotFleeingFrom(p, 500);
-		EntityIteratorPredicate* preds[7] = {
-			&relev, &pl, &cat, &al, &vis, &cir, &nflee
-		};
-		EntityIteratorPredicateAnd a = EntityIteratorPredicateAnd(preds, notFleeing ? 7 : 6);
-		EntityIterator iter = EntityIterator(&a);
-		int count = 0;
-		EGL::CGLEEntity* e = nullptr;
-		while (true) {
-			e = iter.GetNext(nullptr, nullptr);
-			if (e == nullptr)
-				break;
-			count++;
+		CppLogic::Iterator::EntityPredicateIsCombatRelevant relev{};
+		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::TargetFilter_TargetType };
+		CppLogic::Iterator::EntityPredicateIsVisible vis{};
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
+		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		if (notFleeing) {
+			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 6> a{
+				&relev, &cat, &ali, &vis, &cir, &nflee,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.Count();
 		}
-		return count;
+		else {
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 5> a{
+				&relev, &cat, &ali, &vis, &cir,
+			};
+			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
+			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			return it.Count();
+		}
 	}
 	void UnlimitedArmy::CallFormation()
 	{

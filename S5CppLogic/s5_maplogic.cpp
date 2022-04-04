@@ -459,8 +459,8 @@ void EGL::CGLELandscape::UpdateBlocking(const shok::AARect& area)
 void EGL::CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot)
 {
 	shok::AARect ar = area.Rotate(rot).Sort();
-	EntityIteratorPredicateInRect rec{ p.X + ar.low.X, p.Y + ar.low.Y, p.X + ar.high.X - 100, p.Y + ar.high.Y - 100 };
-	EntityIterator it{ &rec };
+	CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity> rec{ p.X + ar.low.X, p.Y + ar.low.Y, p.X + ar.high.X - 100, p.Y + ar.high.Y - 100 };
+	CppLogic::Iterator::GlobalEntityIterator it{ &rec };
 	for (auto* ent : it) {
 		if (GGL::CSettler* s = dynamic_cast<GGL::CSettler*>(ent)) {
 			s->KillSettlerByEnvironment();
@@ -678,6 +678,8 @@ void GGL::CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, 
 		else
 			win_toremove.push_back(kae.WeatherIndex);
 	}
+	if (!current)
+		throw std::out_of_range("somehow we got no valid current");
 	// remove all elements
 	for (int i : win_toremove) {
 		int a = i;
@@ -699,6 +701,8 @@ void GGL::CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, 
 	// add transition nonperiodics
 	if (WeatherChange.State == 1) { // weatherchange in progress
 		current->IsPeriodic = false; // always delete
+		if (!changeto)
+			throw std::out_of_range("somehow we got no valid changeto");
 		if (changeto->IsPeriodic) { // remove asap
 			changeto->IsPeriodic = false;
 			changeto->Length = changeto->Transition;

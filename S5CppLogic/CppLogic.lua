@@ -498,16 +498,16 @@ function CppLogic.API.GetFuncDebug(f) end
 
 --- returns the main SHoK game thread (the thread that opened the lua state).
 -- @return number threadid
-function CppLogic.API.GetMainThreadID(f) end
+function CppLogic.API.GetMainThreadID() end
 
 --- returns the current running thread (this should always be the main thread, or the luadebugger thread).
 -- @return number threadid
-function CppLogic.API.GetCurrentThreadID(f) end
+function CppLogic.API.GetCurrentThreadID() end
 
 --- returns the current time as a single number.
 -- useful for random seeds, use Framework.GetSystemTimeDateString if you want somwthing human readable.
 -- @return number time
-function CppLogic.API.GetCurrentTime(f) end
+function CppLogic.API.GetCurrentTime() end
 
 --- deals damage to a target.
 -- calls respective hurt entity trigger.

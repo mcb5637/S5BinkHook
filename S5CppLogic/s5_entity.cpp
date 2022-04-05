@@ -164,7 +164,7 @@ int EGL::CGLEEntity::LimitedAttachmentGetMaximum(shok::AttachmentType attachType
 	FireEvent(&ev);
 	return ev.Data;
 }
-int EGL::CGLEEntity::ResourceTreeGetNearestSector()
+int EGL::CGLEEntity::ResourceTreeGetNearestSector() const
 {
 	shok::Position p = Position;
 	shok::Position p2 = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetNearestFreePos(&p, 600);

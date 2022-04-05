@@ -13,8 +13,8 @@ namespace EGL {
 		virtual int OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
 		virtual int OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
 	private:
-		virtual void unknownFuncBeh1(EGL::CGLEEntity* e) = 0; // on movement seems to copy a lot of data, maybe change behavior?
-		virtual void unknownFuncBeh2(int uk) = 0;
+		virtual void unknownFuncBeh1(EGL::CGLEEntity* e); // on movement seems to copy a lot of data, maybe change behavior?
+		virtual void unknownFuncBeh2(int uk);
 
 	public:
 		static inline constexpr int TypeDesc = 0x813778;

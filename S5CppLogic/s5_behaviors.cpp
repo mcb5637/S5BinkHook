@@ -8,6 +8,13 @@
 #include "s5_defines.h"
 #include "hooks.h"
 
+void EGL::CGLEBehavior::unknownFuncBeh1(EGL::CGLEEntity* e)
+{
+}
+void EGL::CGLEBehavior::unknownFuncBeh2(int uk)
+{
+}
+
 BB::SerializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A828);
 
 void __declspec(naked) bombattachment_fix() {

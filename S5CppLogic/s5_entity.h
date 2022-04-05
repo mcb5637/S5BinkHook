@@ -217,7 +217,7 @@ namespace EGL {
 		shok::LeaderCommand EventLeaderGetCurrentCommand();
 		int GetMaxHealth();
 		int LimitedAttachmentGetMaximum(shok::AttachmentType attachType);
-		int ResourceTreeGetNearestSector();
+		int ResourceTreeGetNearestSector() const;
 
 		void SetHealth(int h);
 		void Hurt(int dmg);

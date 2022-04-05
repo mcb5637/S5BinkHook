@@ -147,6 +147,11 @@ void* __stdcall BB::IObject::CastToIdentifier(unsigned int id)
 	return nullptr;
 }
 
+bool __stdcall ECore::ICheckData::Check()
+{
+	return true;
+}
+
 static inline float(__thiscall* const costinfo_getres)(const shok::CostInfo* th, shok::ResourceType ty, bool addRaw) = reinterpret_cast<float(__thiscall*)(const shok::CostInfo*, shok::ResourceType, bool)>(0x4A9606);
 float shok::CostInfo::GetResourceAmountFromType(shok::ResourceType ty, bool addRaw) const
 {

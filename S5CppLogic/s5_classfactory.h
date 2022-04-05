@@ -63,6 +63,10 @@ namespace BB {
 		static constexpr BB::FieldSerilaizer* GetSerilalizer<int>() {
 			return TypeInt;
 		}
+		template<>
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<float>() {
+			return TypeFloat;
+		}
 
 		struct ExtendedInfo {
 			const char* Name;

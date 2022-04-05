@@ -126,8 +126,7 @@ namespace ECore {
 	class ICheckData {
 	public:
 		virtual ~ICheckData() = default;
-	private:
-		virtual bool unknownFunc1(int) = 0;
+		virtual bool __stdcall Check();
 	};
 }
 

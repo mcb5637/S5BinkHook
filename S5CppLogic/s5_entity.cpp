@@ -236,7 +236,7 @@ void GGL::CResourceDoodad::SetCurrentResourceAmount(int am)
 	shok_GGL_CResourceDoodad_setresam(this, am);
 }
 
-int GGL::CBuilding::GetConstructionSite()
+int GGL::CBuilding::GetConstructionSite() const
 {
 	return GetFirstAttachedToMe(shok::AttachmentType::CONSTRUCTION_SITE_BUILDING);
 }
@@ -258,7 +258,7 @@ int GGL::CBuilding::GetNearestFreeRepairSlotFor(shok::Position* p)
 	return shok_build_getnearestfreeslot(this, p);
 }
 
-bool GGL::CBuilding::IsConstructionFinished()
+bool GGL::CBuilding::IsConstructionFinished() const
 {
 	return BuildingHeight >= 1;
 }

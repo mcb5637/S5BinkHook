@@ -222,7 +222,7 @@ namespace EGL {
 	};
 
 	class GameLogicExplorationStuff { // not sure what exaclty this is
-
+	public:
 		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(int pl);
 	};
 

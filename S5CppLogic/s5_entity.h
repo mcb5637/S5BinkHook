@@ -534,10 +534,10 @@ namespace GGL {
 		static inline constexpr int vtp_IEntityDisplay = 0x76EB78;
 		static inline constexpr unsigned int Identifier = 0x15EBDB60;
 
-		int GetConstructionSite();
+		int GetConstructionSite() const;
 		int GetNearestFreeConstructionSlotFor(shok::Position* p);
 		int GetNearestFreeRepairSlotFor(shok::Position* p);
-		bool IsConstructionFinished();
+		bool IsConstructionFinished() const;
 		bool IsIdle();
 		bool IsIdle(bool forRecruitemnt);
 		int GetTechnologyInResearch();

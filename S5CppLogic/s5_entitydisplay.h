@@ -33,7 +33,7 @@ namespace ED {
 		virtual void __stdcall UpdateRenderOneTick(int count, float uk) = 0;
 		virtual void __stdcall UpdateRenderManyTick(int count, float uk) = 0;
 	private:
-		virtual void __stdcall UnknownFuncRet100() = 0;
+		virtual int __stdcall UnknownFuncRet100();
 
 	public:
 		static inline constexpr int vtp = 0x76A9E4;

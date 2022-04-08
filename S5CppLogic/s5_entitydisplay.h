@@ -132,7 +132,9 @@ namespace ED {
 		virtual void UnknownEDisplayFunc4() = 0;
 		virtual void UnknownEDisplayFunc5(float) = 0; // stdcall? set some float?
 		virtual int UnknownEDisplayFunc6() = 0; // empty func, ret 0
+	public:
 		virtual void __stdcall SetPositionData(EGL::IEntityDisplay::posdata* data) = 0;
+	private:
 		virtual float UnknownEDisplayFunc7() = 0; // return some float
 
 		template<typename T>

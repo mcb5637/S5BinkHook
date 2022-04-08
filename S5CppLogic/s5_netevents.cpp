@@ -144,7 +144,7 @@ GGL::CFeedbackEventBattling::CFeedbackEventBattling(shok::FeedbackEventIds id, i
 	TargetPlayer = tp;
 }
 
-GGL::CFeedbackEventResource::CFeedbackEventResource(shok::FeedbackEventIds id, int player, int resentity, shok::ResourceType rty, int extrAm)
+GGL::CFeedbackEventResource::CFeedbackEventResource(shok::FeedbackEventIds id, int player, int resentity, shok::ResourceType rty, float extrAm)
 	: EGL::CNetEventEntityIDAndPlayerID(id, player, resentity)
 {
 	SetVT(GGL::CFeedbackEventResource::vtp);

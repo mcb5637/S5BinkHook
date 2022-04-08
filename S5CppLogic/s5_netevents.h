@@ -274,9 +274,9 @@ namespace GGL {
 	class CFeedbackEventResource : public EGL::CNetEventEntityIDAndPlayerID {
 	public:
 		shok::ResourceType ResourceType;
-		int ExtractionAmount;
+		float ExtractionAmount;
 
-		CFeedbackEventResource(shok::FeedbackEventIds id, int player, int resentity, shok::ResourceType rty, int extrAm);
+		CFeedbackEventResource(shok::FeedbackEventIds id, int player, int resentity, shok::ResourceType rty, float extrAm);
 		CFeedbackEventResource(CFeedbackEventResource&&) = default;
 		CFeedbackEventResource(const CFeedbackEventResource&) = default;
 		CFeedbackEventResource& operator=(CFeedbackEventResource&&) = default;

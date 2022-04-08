@@ -69,6 +69,7 @@ namespace BB {
 	class CFileStreamEx;
 	struct SerializationData;
 	class CIDManager;
+	class IStream;
 }
 namespace GGUI {
 	class C3DViewHandler;

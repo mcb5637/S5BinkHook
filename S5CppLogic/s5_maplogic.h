@@ -332,12 +332,28 @@ namespace GGL {
 		int GetTicksToNextPeriodicWeatherChange();
 		void AddWeatherElement(int state, int dur, bool peri, int forerun, int gfx, int transition); // all times in ticks
 		void ClearQueue(int state, int dur, int forerun, int gfx, int transition);
+
+		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49ECE9);
 	};
 
 	class IGLGameLogic {
-		virtual void unknown1() = 0;
 	public:
+		virtual void __stdcall Destroy() = 0;
+	protected:
 		virtual ~IGLGameLogic() = default;
+	private:
+		virtual int SomethingStream(BB::IStream* s) = 0;
+		virtual void unknown0(int) = 0;
+		virtual void __stdcall Tick() = 0;
+		virtual void Serialize(const char* savename) = 0;
+		virtual void Deserialize(const char* savename) = 0;
+		virtual void unknown3(int) = 0;
+		virtual GGL::CWeatherHandler* GetWeatherHandler() = 0;
+		virtual void unknown4(int, int) = 0;
+		virtual void unknown5() = 0;
+	public:
+		virtual void AddNetEventHandler(EGL::IGLEHandler<BB::CEvent, void>* h) = 0;
+		virtual void HandleNetEvent(BB::CEvent* ev) = 0;
 	};
 	class CGLGameLogic : public IGLGameLogic, public BB::IPostEvent {
 		PADDINGI(8);
@@ -349,8 +365,8 @@ namespace GGL {
 		shok::Vector<shok::Technology*>* TechList;
 	public:
 		PADDINGI(1);
-		bool GlobalInvulnerability;
-		PADDING(3);
+		bool GlobalInvulnerability, AreWeatherMachineEffectsActive;
+		PADDING(2);
 
 		static inline constexpr int vtp = 0x76E018;
 
@@ -363,5 +379,9 @@ namespace GGL {
 		void PlayerBlessSettlers(int player, int blessCat);
 
 		static inline GGL::CGLGameLogic** const GlobalObj = reinterpret_cast<GGL::CGLGameLogic**>(0x85A3A0);
+		// create net event handlers thiscall 0x49FD49()
+		static inline BB::SerializationData* (__stdcall* const SerializationDataPlayerArray)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
+		// only globalinvul and weathermachineactive
+		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49AC82);
 	};
 }

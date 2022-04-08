@@ -104,12 +104,13 @@ GGL::CNetEventTransaction::CNetEventTransaction(shok::NetEventIds id, int ent, s
 	BuyAmount = buyam;
 }
 
-GGL::CNetEventCannonCreator::CNetEventCannonCreator(shok::NetEventIds id, int ent, int bty, int tty, const shok::Position& pos) : EGL::CNetEventEntityID(id, ent)
+GGL::CNetEventCannonCreator::CNetEventCannonCreator(shok::NetEventIds id, int ent, int bty, int tty, const shok::PositionRot& pos) : EGL::CNetEventEntityID(id, ent)
 {
 	SetVT(GGL::CNetEventCannonCreator::vtp);
-	BottomType = bty;
-	TopType = tty;
-	Position = pos;
+	FoundationType = bty;
+	CannonType = tty;
+	Position = { pos.X, pos.Y };
+	Orientation = pos.r;
 }
 
 GGL::CNetEventEntityIDAndUpgradeCategory::CNetEventEntityIDAndUpgradeCategory(shok::NetEventIds id, int ent, int ucat) : EGL::CNetEventEntityID(id, ent)

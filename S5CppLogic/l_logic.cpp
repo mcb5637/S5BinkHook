@@ -106,13 +106,16 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			if (GGL::CNetEventCannonCreator* e = dynamic_cast<GGL::CNetEventCannonCreator*>(ev)) {
 				L.Push("BottomType");
-				L.Push(e->BottomType);
+				L.Push(e->FoundationType);
 				L.SetTableRaw(-3);
 				L.Push("TopType");
-				L.Push(e->TopType);
+				L.Push(e->CannonType);
 				L.SetTableRaw(-3);
 				L.Push("Position");
 				L.PushPos(e->Position);
+				L.SetTableRaw(-3);
+				L.Push("Orientation");
+				L.Push(e->Orientation);
 				L.SetTableRaw(-3);
 			}
 			else if (GGL::CNetEventEntityIDAndUpgradeCategory* e = dynamic_cast<GGL::CNetEventEntityIDAndUpgradeCategory*>(ev)) {
@@ -256,14 +259,14 @@ namespace CppLogic::Logic {
 				L.Push("BottomType");
 				L.GetTableRaw(-2);
 				if (L.IsNumber(-1))
-					e->BottomType = L.CheckInt(-1);
+					e->FoundationType = L.CheckInt(-1);
 				else
 					allRead = false;
 				L.Pop(1);
 				L.Push("TopType");
 				L.GetTableRaw(-2);
 				if (L.IsNumber(-1))
-					e->TopType = L.CheckInt(-1);
+					e->CannonType = L.CheckInt(-1);
 				else
 					allRead = false;
 				L.Pop(1);
@@ -271,6 +274,13 @@ namespace CppLogic::Logic {
 				L.GetTableRaw(-2);
 				if (L.IsTable(-1))
 					e->Position = L.CheckPos(-1);
+				else
+					allRead = false;
+				L.Pop(1);
+				L.Push("Position");
+				L.GetTableRaw(-2);
+				if (L.IsNumber(-1))
+					e->Orientation = L.CheckFloat(-1);
 				else
 					allRead = false;
 				L.Pop(1);

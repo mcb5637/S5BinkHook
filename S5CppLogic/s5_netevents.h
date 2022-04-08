@@ -148,8 +148,6 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x812340;
 		static inline constexpr int vtp = 0x77057C;
 	};
-
-
 }
 
 namespace GGL {
@@ -273,6 +271,20 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76DDA0;
 	};
 
+	class CFeedbackEventResource : public EGL::CNetEventEntityIDAndPlayerID {
+	public:
+		shok::ResourceType ResourceType;
+		int ExtractionAmount;
+
+		CFeedbackEventResource(shok::FeedbackEventIds id, int player, int resentity, shok::ResourceType rty, int extrAm);
+		CFeedbackEventResource(CFeedbackEventResource&&) = default;
+		CFeedbackEventResource(const CFeedbackEventResource&) = default;
+		CFeedbackEventResource& operator=(CFeedbackEventResource&&) = default;
+		CFeedbackEventResource& operator=(const CFeedbackEventResource&) = default;
+
+		static inline constexpr int TypeDesc = 0x81A3C4;
+		static inline constexpr int vtp = 0x774970;
+	};
 }
 
 namespace Framework {
@@ -353,29 +365,32 @@ namespace shok {
 	};
 
 	enum class FeedbackEventIds : int {
-		FEEDBACK_EVENT_RESOURCE_MINED = 0x13001,
-		FEEDBACK_EVENT_RESOURCE_RUNNING_OUT = 0x13002,
-		FEEDBACK_EVENT_MINE_RESOURCE_GONE = 0x13003,
-		FEEDBACK_EVENT_ENTITIES_EXCHANGED = 0x13004,
+		FEEDBACK_EVENT_RESOURCE_MINED = 0x13001, // GGL::CFeedbackEventResource
+		FEEDBACK_EVENT_RESOURCE_RUNNING_OUT = 0x13002, // GGL::CFeedbackEventResourceRunningOut
+		FEEDBACK_EVENT_MINE_RESOURCE_GONE = 0x13003, // GGL::CFeedbackEventResourceRunningOut
+		FEEDBACK_EVENT_ENTITIES_EXCHANGED = 0x13004, // EGL::CNetEvent2Entities
 		FEEDBACK_EVENT_BATTLING = 0x13005, // GGL::CFeedbackEventBattling attackerplayer, attackerid, targetplayer, attackerx, attackery
-		FEEDBACK_EVENT_SETTLER_WALK = 0x13006,
-		FEEDBACK_EVENT_TECHNOLOGY_RESEARCHED = 0x13007,
-		FEEDBACK_EVENT_SETTLER_GRIEVANCE = 0x13008,
-		FEEDBACK_EVENT_SETTLER_LEFT_SETTLEMENT = 0x13009,
-		FEEDBACK_EVENT_SETTLER_JOINED_SETTLEMENT = 0x1300A,
-		FEEDBACK_EVENT_QUEST_CHANGED = 0x1300B,
-		FEEDBACK_EVENT_MARKET_TRANSACTION_COMPLETE = 0x1300C,
-		FEEDBACK_EVENT_NO_MONEY = 0x1300D,
-		FEEDBACK_EVENT_PAYDAY = 0x1300E,
-		FEEDBACK_EVENT_NOT_ENOUGH_RESOURCES = 0x13010,
-		FEEDBACK_EVENT_LEADER_COMMAND = 0x13012,
-		FEEDBACK_EVENT_HERO_ABILITY = 0x13013,
-		FEEDBACK_EVENT_SEND_RESOURCES = 0x13014,
-		FEEDBACK_EVENT_GOT_RESOURCES = 0x13015,
-		FEEDBACK_EVENT_WEATHER_CHANGED = 0x13016,
-		FEEDBACK_EVENT_POPULATION_LIMIT_REACHED = 0x13017,
+		FEEDBACK_EVENT_SETTLER_WALK = 0x13006, // EGL::CNetEventEntityAndPo
+		FEEDBACK_EVENT_TECHNOLOGY_RESEARCHED = 0x13007, // GGL::CNetEventEventTechnologyPlayerIDAndEntityID
+		FEEDBACK_EVENT_SETTLER_GRIEVANCE = 0x13008, // EGL::CNetEventEntityIDAnd3Integer
+		FEEDBACK_EVENT_SETTLER_LEFT_SETTLEMENT = 0x13009, // EGL::CNetEventEntityIDAndInteger
+		FEEDBACK_EVENT_SETTLER_JOINED_SETTLEMENT = 0x1300A, // EGL::CNetEventEntityIDAndInteger
+		FEEDBACK_EVENT_QUEST_CHANGED = 0x1300B, // GGL::CFeedbackEventPlayerIDMapPositionInteger
+		FEEDBACK_EVENT_MARKET_TRANSACTION_COMPLETE = 0x1300C, // EGL::CNetEventEntityID
+		FEEDBACK_EVENT_NO_MONEY = 0x1300D, // EGL::CNetEventPlayerID
+		FEEDBACK_EVENT_PAYDAY = 0x1300E, // EGL::CNetEventPlayerID
+		FEEDBACK_EVENT_NOT_ENOUGH_RESOURCES = 0x13010, // EGL::CNetEventPlayerIDGoodTypeAndInteger
+		//? 13011 EGL::CNetEventEntityID convert/die?
+		FEEDBACK_EVENT_LEADER_COMMAND = 0x13012, // EGL::CNetEventEntityIDAndInteger
+		FEEDBACK_EVENT_HERO_ABILITY = 0x13013, // EGL::CNetEventEntityIDAndInteger
+		FEEDBACK_EVENT_SEND_RESOURCES = 0x13014, // EGL::CNetEventPlayerIDGoodTypeAndInteger
+		FEEDBACK_EVENT_GOT_RESOURCES = 0x13015, // EGL::CNetEventPlayerIDGoodTypeAndInteger
+		FEEDBACK_EVENT_WEATHER_CHANGED = 0x13016, // EGL::CEventValue<int,-27574121>
+		FEEDBACK_EVENT_POPULATION_LIMIT_REACHED = 0x13017, // EGL::CEventPlayerID
 
-		FEEDBACK_EVENT_SIMPLE = 0x23003,
+		// 23001 BB::CEvent map loaded?
+		// 23002 BB::CEvent map saved?
+		FEEDBACK_EVENT_SIMPLE = 0x23003, // EGL::CFeedbackEventSimple
 		FEEDBACK_EVENT_ENTITY_HURT = 0x23004, // EGL::CNetEventEntityIDAndInteger entity, damage
 
 		FEEDBACK_EVENT_FARM_LIMIT_REACHED = 0x25001,

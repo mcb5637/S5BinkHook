@@ -144,6 +144,14 @@ GGL::CFeedbackEventBattling::CFeedbackEventBattling(shok::FeedbackEventIds id, i
 	TargetPlayer = tp;
 }
 
+GGL::CFeedbackEventResource::CFeedbackEventResource(shok::FeedbackEventIds id, int player, int resentity, shok::ResourceType rty, int extrAm)
+	: EGL::CNetEventEntityIDAndPlayerID(id, player, resentity)
+{
+	SetVT(GGL::CFeedbackEventResource::vtp);
+	ResourceType = rty;
+	ExtractionAmount = extrAm;
+}
+
 
 Framework::CEventGameSpeed::CEventGameSpeed(shok::NetEventIds id, double speed) : BB::CEvent(id)
 {

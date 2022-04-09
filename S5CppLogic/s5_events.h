@@ -466,9 +466,9 @@ namespace shok {
 		Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
 		// 1000A serf something extract res get bool
 		ResourceRefiner_Refine = 0x1000B, //BB::CEvent
-		ResourceTree_Init = 0x1000C, //EGL::CEventGetValue<int,1211121895>
+		Tree_Init = 0x1000C, //EGL::CEventValue<int,-27574121>
 		Tree_UpdateModel = 0x1000D, //BB::CEvent
-		// 0x1000E res tree get bool
+		Tree_ApplyBlocking = 0x1000E, // EGL::CEventGetValue<bool,1709081367> called from GGL::CResourceDoodad::OnUpdateBlocking, if true skips resdoodad blocking
 
 		Thief_StealFromCommand = 0x10102, //EGL::CEvent1Entity
 		Thief_SecureGoodsCommand = 0x10103, //EGL::CEvent1Entity

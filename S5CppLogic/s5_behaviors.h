@@ -965,9 +965,6 @@ namespace GGL {
 
 	class CResourceDoodadBehavior : public EGL::CGLEBehavior {
 	public:
-		int OriginalEntityType; //4
-		shok::PositionRot Position;
-
 		// defined events: ResourceDoodad_RemoveOneRes
 
 		static inline constexpr int vtp = 0x774CCC;
@@ -977,7 +974,9 @@ namespace GGL {
 
 	class CTreeBehavior : public EGL::CGLEBehavior {
 	public:
-		// 4 some value
+		int OriginalEntityType; // 4
+		shok::Position Position;
+		float Orientation;
 
 		// defined events: Tree_XXX
 

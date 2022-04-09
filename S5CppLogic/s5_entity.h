@@ -502,8 +502,8 @@ namespace GGL {
 
 	class CResourceDoodad : public EGL::CGLEEntity {
 	public:
-		shok::ResourceType ResourceType;
-		int ResourceAmount, ResourceAmountAdd; //66
+		shok::ResourceType ResourceType; //66
+		int ResourceAmount, ResourceAmountAdd;
 
 		// set current res amount 4B864B thiscall (th, int)
 		void SetCurrentResourceAmount(int am);

@@ -1524,7 +1524,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntit
 	}
 	int id = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	EGL::CGLEEntity* r = EGL::CGLEEntity::GetEntityByID(id);
-	EGL::CEventValue_Int ev{ shok::EventIDs::ResourceTree_Init, e->EntityType };
+	EGL::CEventValue_Int ev{ shok::EventIDs::Tree_Init, e->EntityType };
 	r->FireEvent(&ev);
 	e->Destroy();
 	return r;

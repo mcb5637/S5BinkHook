@@ -5,13 +5,13 @@
 namespace EGL {
 	class CGLEBehavior : public BB::IObject { // no vtable
 	public:
-		int SlotIndex, EntityId;
-		EGL::CGLEBehaviorProps* PropPointer; // 3, warning this may not be set
+		int SlotIndex = 0, EntityId = 0;
+		EGL::CGLEBehaviorProps* PropPointer = nullptr; // 3, warning this may not be set
 
 	protected:
-		virtual int AddHandlers(int uk) = 0;
-		virtual int OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
-		virtual int OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
+		virtual void AddHandlers(int id) = 0;
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
 	private:
 		virtual void unknownFuncBeh1(EGL::CGLEEntity* e); // on movement seems to copy a lot of data, maybe change behavior?
 		virtual void unknownFuncBeh2(int uk);
@@ -127,12 +127,16 @@ namespace GGL {
 
 	class CHeroAbility : public EGL::CGLEBehavior { // no vtable
 	public:
-		GGL::CHeroAbilityProps* AbilityProps;
-		int SecondsCharged; // 5
+		GGL::CHeroAbilityProps* AbilityProps = nullptr;
+		int SecondsCharged = 0; // 5
 
+
+		virtual void AddHandlers(int id);
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p);
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p);
 		virtual bool IsAbility(int ability) = 0; // 8
-		virtual bool CanUseAbility() = 0;
-		virtual bool CheckAndResetCooldown() = 0;
+		virtual bool CanUseAbility();
+		virtual bool CheckAndResetCooldown();
 
 		// defined events: HeroAbility_XXX, Behavior_Tick, Die
 
@@ -258,6 +262,7 @@ namespace GGL {
 
 	class CCircularAttack : public GGL::CHeroAbility {
 	public:
+		GGL::CCircularAttackProps* CAProps;
 
 		// defined events: CircularAttack_ActivateCommand
 		// defined tasks: TASK_SET_SPECIAL_ATTACK_ANIM, TASK_PERFORM_SPECIAL_ATTACK

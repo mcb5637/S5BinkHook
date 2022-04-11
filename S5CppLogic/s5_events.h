@@ -184,6 +184,20 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x8079C8;
 	};
 
+	class CEventPositionAndTaskState : public CEventPosition {
+	public:
+		shok::TaskState State;
+
+		CEventPositionAndTaskState(shok::EventIDs e, const shok::Position& p, shok::TaskState s);
+		CEventPositionAndTaskState(CEventPositionAndTaskState&&) = default;
+		CEventPositionAndTaskState(const CEventPositionAndTaskState&) = default;
+		CEventPositionAndTaskState& operator=(CEventPositionAndTaskState&&) = default;
+		CEventPositionAndTaskState& operator=(const CEventPositionAndTaskState&) = default;
+
+		static inline constexpr int vtp = 0x775F78;
+		static inline constexpr int TypeDesc = 0x81D9C8;
+	};
+
 	class IEventPlayerID {
 	public:
 		virtual int GetPlayerID() const = 0;
@@ -243,6 +257,21 @@ namespace EGL {
 		static inline constexpr int vtp = 0x76D92C;
 		static inline constexpr int TypeDesc = 0x80E0BC;
 		static inline constexpr int vtp_IEvent2Entities = 0x76D920;
+	};
+
+	class CEventThousandthsGetInteger : public BB::CEvent {
+	public:
+		int Thousands;
+		int Data = 0;
+
+		CEventThousandthsGetInteger(shok::EventIDs e, int thousands);
+		CEventThousandthsGetInteger(CEventThousandthsGetInteger&&) = default;
+		CEventThousandthsGetInteger(const CEventThousandthsGetInteger&) = default;
+		CEventThousandthsGetInteger& operator=(CEventThousandthsGetInteger&&) = default;
+		CEventThousandthsGetInteger& operator=(const CEventThousandthsGetInteger&) = default;
+
+		static inline constexpr int vtp = 0x775F68;
+		static inline constexpr int TypeDesc = 0x81D998;
 	};
 }
 
@@ -372,8 +401,6 @@ namespace GGL {
 // EGL::CEventUVAnim
 // EGL::CEventGetPosition
 // GGL::CEventGoodsTraded -> GGL::CEventTransaction
-// EGL::CEventThousandthsGetInteger
-// EGL::CEventPositionAndTaskState
 // GGL::CEventFollowInfo
 // GGL::CEventKegInfo
 // GGL::CEventGetPositionFromID
@@ -772,11 +799,14 @@ namespace shok {
 		MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim
 		Behavior_Tick = 0x20005, //BB::CEvent ticks every second, also LogicEvent_Second
 		LogicEvent_OnTick = 0x20006, // 10 per sec
+		Movement_StatePerformMovementStep = 0x20008, //EGL::CEventThousandthsGetInteger pass state arg, returns state return
 		Movement_IsMoving = 0x20009, //EGL::CEventGetValue<bool,1709081367>
 		Die = 0x2000A, // BB::CEvent
 		// 0x2000D tasklist reset?
-
+		Movement_SetSpeedFactor = 0x2000E, // EGL::CEventValue<float,1278362727>
+		Movement_TaskMoveToPosAndSetState = 0x2000F, //EGL::CEventPositionAndTaskState pass pos and state, call Movement_StatePerformMovementStep from state
 		Movement_GetMovementBehavior = 0x20012, //EGL::CEventGetValue<EGL::CMovementBehavior *,212523703>
+		Movement_GetSpeedFactor = 0x20022, // EGL::CEventGetValue<float,1468983543>
 
 		Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
 		Animation_UnSuspend = 0x20014, //EGL::CEventValue<int,-27574121> argument is ticks spent suspended

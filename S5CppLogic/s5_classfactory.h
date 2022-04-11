@@ -55,6 +55,9 @@ namespace BB {
 		// does not add ids
 		static inline BB::FieldSerilaizer* const TypeEntityType = reinterpret_cast<BB::FieldSerilaizer*>(0x85D4D0);
 		static inline BB::FieldSerilaizer* const TypeModel = reinterpret_cast<BB::FieldSerilaizer*>(0x8585C0);
+		static inline BB::FieldSerilaizer* const TypeAnim = reinterpret_cast<BB::FieldSerilaizer*>(0x86057C);
+		static inline BB::FieldSerilaizer* const TypeDamageClass = reinterpret_cast<BB::FieldSerilaizer*>(0x860558);
+		static inline BB::FieldSerilaizer* const TypeEffectType = reinterpret_cast<BB::FieldSerilaizer*>(0x8605A0);
 
 		template<class T>
 		static constexpr BB::FieldSerilaizer* GetSerilalizer() = delete;

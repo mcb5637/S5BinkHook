@@ -17,6 +17,38 @@ void EGL::CGLEBehavior::unknownFuncBeh2(int uk)
 
 BB::SerializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A828);
 
+
+static inline void(__thiscall* const heroability_addhandlers)(GGL::CHeroAbility* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CHeroAbility*, int)>(0x4F4982);
+void GGL::CHeroAbility::AddHandlers(int id)
+{
+	heroability_addhandlers(this, id);
+}
+
+static inline void(__thiscall* const heroability_oncreate)(GGL::CHeroAbility* th, EGL::CGLEBehaviorProps* p) = reinterpret_cast<void(__thiscall*)(GGL::CHeroAbility*, EGL::CGLEBehaviorProps*)>(0x4F477B);
+void GGL::CHeroAbility::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+	heroability_oncreate(this, p);
+}
+
+static inline void(__thiscall* const heroability_onload)(GGL::CHeroAbility* th, EGL::CGLEBehaviorProps* p) = reinterpret_cast<void(__thiscall*)(GGL::CHeroAbility*, EGL::CGLEBehaviorProps*)>(0x4F4799);
+void GGL::CHeroAbility::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+	heroability_onload(this, p);
+}
+
+static inline bool(__thiscall* const heroability_canuse)(GGL::CHeroAbility* th) = reinterpret_cast<bool(__thiscall*)(GGL::CHeroAbility*)>(0x4F47DC);
+bool GGL::CHeroAbility::CanUseAbility()
+{
+	return heroability_canuse(this);
+}
+
+static inline bool(__thiscall* const heroability_checkandreset)(GGL::CHeroAbility* th) = reinterpret_cast<bool(__thiscall*)(GGL::CHeroAbility*)>(0x4F47ED);
+bool GGL::CHeroAbility::CheckAndResetCooldown()
+{
+	return heroability_checkandreset(this);
+}
+
+
 void __declspec(naked) bombattachment_fix() {
 	__asm {
 		push 0;

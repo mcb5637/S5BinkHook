@@ -68,6 +68,13 @@ EGL::CEventPosition::CEventPosition(shok::EventIDs e, const shok::Position& p) :
 	Position = p;
 }
 
+EGL::CEventPositionAndTaskState::CEventPositionAndTaskState(shok::EventIDs e, const shok::Position& p, shok::TaskState s)
+	: CEventPosition(e, p)
+{
+	SetVT(EGL::CEventPositionAndTaskState::vtp);
+	State = s;
+}
+
 int EGL::CEventPlayerID::GetPlayerID() const {
 	return PlayerID;
 }
@@ -101,6 +108,13 @@ int EGL::CEvent2Entities::GetActorID() const
 int EGL::CEvent2Entities::GetTargetID() const
 {
 	return TargetId;
+}
+
+EGL::CEventThousandthsGetInteger::CEventThousandthsGetInteger(shok::EventIDs e, int thousands)
+	: BB::CEvent(e)
+{
+	SetVT(EGL::CEventThousandthsGetInteger::vtp);
+	Thousands = thousands;
 }
 
 GGL::CEventAttachmentTypeGetInteger::CEventAttachmentTypeGetInteger(shok::EventIDs e, shok::AttachmentType t) : BB::CEvent(e)

@@ -5,7 +5,7 @@
 namespace EGL {
 	class CGLEBehaviorProps : public BB::IObject, public ECore::ICheckData {
 	public:
-		int BehaviorIndex, BehaviorClass;
+		int BehaviorIndex = 0, BehaviorClass = 0;
 
 		static inline constexpr int vtp = 0x772A2C;
 		static inline constexpr int TypeDesc = 0x813728;
@@ -36,10 +36,14 @@ namespace EGL {
 namespace GGL {
 	class CHeroAbilityProps : public EGL::CGLEBehaviorProps {
 	public:
-		int RechargeTimeSeconds; // 4
+		int RechargeTimeSeconds = 0; // 4
 
 		static inline constexpr int vtp = 0x773774;
 		static inline constexpr int TypeDesc = 0x816EA8;
+		static inline constexpr unsigned int Identifier = 0xA7450C5D;
+
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x86CB78);
 	};
 	static_assert(offsetof(GGL::CHeroAbilityProps, RechargeTimeSeconds) == 4 * 4);
 
@@ -111,6 +115,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7774A0;
 		static inline constexpr int TypeDesc = 0x82305C;
+		static inline constexpr unsigned int Identifier = 0xE3FB1C6D;
 	};
 
 

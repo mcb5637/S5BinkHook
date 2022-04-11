@@ -937,7 +937,7 @@ function CppLogic.Entity.Settler.CommandInflictFear(id) end
 -- @param p target
 function CppLogic.Entity.Settler.CommandPlaceBomb(id, p) end
 
---- command to inflict fear.
+--- command to place a cannon.
 -- asserts if ability cannot be used, checks position.
 -- does not check bottom & top entitytype.
 -- @param id entity
@@ -1482,6 +1482,12 @@ function CppLogic.EntityType.GetBattleWaitUntil(ty) end
 -- @param ty entitytype
 -- @param bwu battlewaituntil
 function CppLogic.EntityType.SetBattleWaitUntil(ty, bwu) end
+
+
+--- convertible flag of settlers and buildings (returns nil on other types).
+-- @param ty entitytype
+-- @return convertible boolean|nil
+function CppLogic.EntityType.IsConvertible(ty) end
 
 --- the soldier type of a leader type
 -- @param ty leader type

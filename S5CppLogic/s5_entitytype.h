@@ -94,7 +94,7 @@ namespace GGL {
 		int DodgeChance;
 		int IdleTaskList;
 		UpgradeInfo Upgrade;
-		byte Fearless, Convertible; //85
+		bool Fearless, Convertible; //85
 		PADDING(2);
 		ModifyEntityProps ModifyExploration, ModifyHitpoints, ModifySpeed, ModifyDamage, ModifyArmor, ModifyDodge, ModifyMaxRange, ModifyMinRange, ModifyDamageBonus, ModifyGroupLimit;
 		int AttractionSlots;
@@ -154,7 +154,7 @@ namespace GGL {
 		int MilitaryInfo[4];
 	public:
 		float CollapseTime;
-		byte Convertible; //113
+		bool Convertible; //113
 		PADDING(3);
 		ModifyEntityProps ModifyExploration, ModifyArmor;
 		float KegEffectFactor; // 124

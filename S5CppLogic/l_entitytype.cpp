@@ -885,7 +885,21 @@ namespace CppLogic::EntityType {
 		return 0;
 	}
 
-	constexpr std::array<lua::FuncReference, 30> EntityType{ {
+	int IsConvertible(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		if (auto* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
+			L.Push(s->Convertible);
+			return 1;
+		}
+		if (auto* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
+			L.Push(s->Convertible);
+			return 1;
+		}
+		return 0;
+	}
+
+	constexpr std::array<lua::FuncReference, 31> EntityType{ {
 			lua::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
 			lua::FuncReference::GetRef<SetLimitedLifespanDuration>("SetLimitedLifespanDuration"),
 			lua::FuncReference::GetRef<GetMaxHealth>("GetMaxHealth"),
@@ -916,6 +930,7 @@ namespace CppLogic::EntityType {
 			lua::FuncReference::GetRef<SetDeleteWhenBuildOn>("SetDeleteWhenBuildOn"),
 			lua::FuncReference::GetRef<GetBattleWaitUntil>("GetBattleWaitUntil"),
 			lua::FuncReference::GetRef<SetBattleWaitUntil>("SetBattleWaitUntil"),
+			lua::FuncReference::GetRef<IsConvertible>("IsConvertible"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 29> Settler{ {

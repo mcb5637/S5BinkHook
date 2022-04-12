@@ -79,6 +79,7 @@ namespace EGUIX {
 		static inline constexpr int vtp = 0x780890;
 		static inline constexpr int TypeDesc = 0x832A90;
 		static inline constexpr unsigned int Identifier = 0xF1CAFF46;
+		// ctor that sets data 55A978
 
 		void SetTexture(const char* name);
 
@@ -351,11 +352,15 @@ namespace EGUIX {
 		static EGUIX::CProgressBarWidget* Create();
 	};
 
-	class ICustomWidget {
+	class ICustomWidget { // size 35
 	public:
 		virtual ~ICustomWidget() = default;
 		// 5 more funcs
+
+		PADDINGI(6); // ctor memset 0
+		shok::String Strings[4];
 	};
+	static_assert(sizeof(ICustomWidget)==35*4);
 
 	class CCustomWidget : public EGUIX::CBaseWidget, public IRender {
 	public:
@@ -376,8 +381,199 @@ namespace EGUIX {
 }
 
 namespace GGUI {
+	class C3DOnScreenInformationCustomWidget;
+	class COnScreenElement {
+	public:
+		C3DOnScreenInformationCustomWidget* OSICW;
+		PADDINGI(64);
+
+		virtual ~COnScreenElement() = default;
+
+		static inline constexpr int vtp = 0x77E518;
+	};
+	class COnScreenElementMotivation : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E590;
+	};
+	class COnScreenElementBuilding : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E530;
+	};
+	class COnScreenElementTask : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E598;
+	};
+	class COnScreenElementExperience : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E580;
+	};
+	class COnScreenElementHealthbar : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E558;
+	};
+	class COnScreenElementWorkers : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E578;
+	};
+	class COnScreenElementConstructionSite : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E528;
+	};
+	class COnScreenElementResources : public COnScreenElement {
+	public:
+		bool u;
+		static inline constexpr int vtp = 0x77E588;
+	};
+	class COnScreenElementSleepers : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E568;
+	};
+	class COnScreenElementChomping : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E570;
+	};
+	class COnScreenElementType : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E5A0;
+	};
+	class COnScreenElementWorktime : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E5A8;
+	};
+	class COnScreenElementRefiner : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E520;
+	};
+	class COnScreenElementSoldiers : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E560;
+	};
+	class COnScreenElementNpc : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E5B0;
+	};
+	class COnScreenElementHero : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E5B8;
+	};
+	class COnScreenElementMerchantBuilding : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E5C0;
+	};
+	class COnScreenElementBridge : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E538;
+	};
+	class COnScreenElementThief : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E540;
+	};
+	class COnScreenElementBombTick : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E550;
+	};
+	class COnScreenElementPlunder : public COnScreenElement {
+	public:
+		static inline constexpr int vtp = 0x77E548;
+	};
+
+
 	class C3DOnScreenInformationCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
+		PADDINGI(1);
+		bool a, b;
+		EGUIX::Rect r1, r2; // not sure, but its 2 4 float objects
+		struct {
+
+			struct {
+				EGUIX::CMaterial Texture_DeadHero;
+				EGUIX::CMaterial Texture_NPCMarker;
+				EGUIX::CMaterial Texture_NoWorker;
+				EGUIX::CMaterial Texture_Alarm;
+				EGUIX::CMaterial Texture_Overtime;
+				EGUIX::CMaterial Texture_Locked;
+				EGUIX::CMaterial Texture_Healthbar0; // color to 0,0,0,125
+				EGUIX::CMaterial Texture_Healthbar0_again; // color to 0,180,0,255
+				EGUIX::CMaterial Texture_EmoteHappy;
+				EGUIX::CMaterial Texture_EmoteAngry;
+				EGUIX::CMaterial Texture_EmoteGood;
+				EGUIX::CMaterial Texture_EmoteSad;
+				EGUIX::CMaterial Texture_EmoteLeave;
+				EGUIX::CMaterial Texture_EmoteFlee;
+				EGUIX::CMaterial Texture_StatusEat;
+				EGUIX::CMaterial Texture_StatusRest;
+				EGUIX::CMaterial Texture_StatusLeave;
+				EGUIX::CMaterial Texture_StatusIdle;
+				EGUIX::CMaterial Texture_StatusWork;
+				EGUIX::CMaterial Texture_StatusFlee;
+				EGUIX::CMaterial Texture_EmblemSword;
+				EGUIX::CMaterial Texture_EmblemArcher;
+				EGUIX::CMaterial Texture_EmblemSpear;
+				EGUIX::CMaterial Texture_EmblemCavalry;
+				EGUIX::CMaterial Texture_EmblemCannon;
+				EGUIX::CMaterial Texture_EmblemThief;
+				EGUIX::CMaterial Texture_EmblemRifle;
+				EGUIX::CMaterial Texture_EmblemScout;
+				EGUIX::CMaterial Texture_RefineGold;
+				EGUIX::CMaterial Texture_RefineIron;
+				EGUIX::CMaterial Texture_RefineMud;
+				EGUIX::CMaterial Texture_RefineStone;
+				EGUIX::CMaterial Texture_RefineSulfur;
+				EGUIX::CMaterial Texture_RefineWood;
+				EGUIX::CMaterial Texture_ResGold;
+				EGUIX::CMaterial Texture_ResIron;
+				EGUIX::CMaterial Texture_ResMud;
+				EGUIX::CMaterial Texture_ResStone;
+				EGUIX::CMaterial Texture_ResSulfur;
+				EGUIX::CMaterial Texture_ResWood;
+				EGUIX::CMaterial Texture_OnscreenWorker;
+				EGUIX::CMaterial Texture_OnscreenSleeper;
+				EGUIX::CMaterial Texture_OnscreenChomping;
+				EGUIX::CMaterial Texture_OnscreenHearts;
+				EGUIX::CMaterial Texture_OnscreenStars1;
+				EGUIX::CMaterial Texture_OnscreenStars2;
+				EGUIX::CMaterial Texture_OnscreenStars3;
+				EGUIX::CMaterial Texture_OnscreenStars4;
+				EGUIX::CMaterial Texture_OnscreenStars5;
+				EGUIX::CMaterial Texture_MOEmpty;
+				int FontID_OnscreenNumbersSmall; // 500 in struct
+				int FontID_Onscreen10;
+				PADDINGI(3); // map? of entitytype -> texture gui/MO_NAME
+			} TextureData;
+			COnScreenElementMotivation OSEMotivation;
+			COnScreenElementBuilding OSEBuilding;
+			COnScreenElementTask OSETask;
+			COnScreenElementExperience OSEExperience;
+			COnScreenElementHealthbar OSEHealthbar;
+			COnScreenElementWorkers OSEWorkers;
+			COnScreenElementConstructionSite OSEConstructionSite;
+			COnScreenElementResources OSEResources;
+			COnScreenElementSleepers OSESleepers;
+			COnScreenElementChomping OSEChomping;
+			COnScreenElementType OSEType;
+			COnScreenElementWorktime OSEWorktime;
+			COnScreenElementRefiner OSERefiner;
+			COnScreenElementSoldiers OSESoldiers;
+			COnScreenElementNpc OSENpc;
+			COnScreenElementHero OSEHero;
+			COnScreenElementMerchantBuilding OSEMerchantBuilding;
+			COnScreenElementBridge OSEBridge;
+			COnScreenElementThief OSEThief;
+			COnScreenElementBombTick OSEBombTick;
+			COnScreenElementPlunder OSEPlunder;
+			struct {
+				struct Floatie {
+					PADDINGI(1);
+					C3DOnScreenInformationCustomWidget* OSICW;
+					int EntityId, Amount;
+				};
+
+				shok::Vector<Floatie> Floaties;
+				C3DOnScreenInformationCustomWidget* OSICW;
+			} FloatieManager;
+		} Data;
+
+
 		static inline constexpr int vtp = 0x77D490;
 		static inline constexpr int TypeDesc = 0x82E1E8;
 
@@ -387,6 +583,13 @@ namespace GGUI {
 
 		static inline GGUI::C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<GGUI::C3DOnScreenInformationCustomWidget**>(0x882F54);
 	};
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, a) == 37 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.TextureData) == 46 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.TextureData.FontID_OnscreenNumbersSmall) == 46 * 4 + 500 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.OSEMotivation) == 46 * 4 + 505 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.OSEBuilding) == 46 * 4 + 571 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.FloatieManager) == 46 * 4 + 1892 * 4);
+	static_assert(sizeof(C3DOnScreenInformationCustomWidget) == 1943 * 4);
 }
 
 

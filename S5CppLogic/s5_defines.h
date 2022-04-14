@@ -50,10 +50,10 @@ namespace shok {
 		SERF_MARKET = 29,
 		MARKET_MARKET = 30,
 		LEADER_SOLDIER = 31,
-		ATTACKER_TARGET = 32,
+		ATTACKER_TARGET = 32, // currently in combat engaged (not walking towarts to attack)
 		ATTACKED_DEAD = 33,
 		CAMP_SETTLER = 34,
-		ATTACKER_COMMAND_TARGET = 35,
+		ATTACKER_COMMAND_TARGET = 35, // targeting to engage in combat
 		BUILDING_BASE = 36,
 		FOLLOWER_FOLLOWED = 37,
 		WORKER_VILLAGE_CENTER = 38,
@@ -69,7 +69,7 @@ namespace shok {
 		DEFENDER_BUILDING = 48,
 		APPROACHING_DEFENDER_BUILDING = 49,
 		//[[ Missing ]]
-		LEADER_TARGET = 51,
+		LEADER_TARGET = 51, // command to attack (via direct command or autoassigned), might be garbage, check current command
 		WORKER_SUPPLIER = 52,
 		SETTLER_BUILDING_TO_LEAVE = 53,
 		SUMMONER_SUMMONED = 54,

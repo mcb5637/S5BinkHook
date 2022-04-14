@@ -1811,6 +1811,19 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
+	int GetBattleTarget(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* e = L.CheckEntity(1);
+		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_TARGET));
+		return 1;
+	}
+	int GetAttackCommandTarget(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* e = L.CheckEntity(1);
+		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::LEADER_TARGET));
+		return 1;
+	}
+
 
 	void Cleanup(lua::State L) {
 		DisableConversionHook(L);
@@ -1821,7 +1834,7 @@ namespace CppLogic::Entity {
 		SettlerCleanupAnimTask(L);
 	}
 
-	constexpr std::array<lua::FuncReference, 32> Entity{ {
+	constexpr std::array<lua::FuncReference, 34> Entity{ {
 			lua::FuncReference::GetRef<GetScale>("GetScale"),
 			lua::FuncReference::GetRef<SetScale>("SetScale"),
 			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
@@ -1854,6 +1867,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<EntityIteratorGetNearest>("EntityIteratorGetNearest"),
 			lua::FuncReference::GetRef<EntityIteratorCount>("EntityIteratorCount"),
 			lua::FuncReference::GetRef<CheckPredicate>("CheckPredicate"),
+			lua::FuncReference::GetRef<GetBattleTarget>("GetBattleTarget"),
+			lua::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
 	} };
 
 	constexpr std::array<lua::FuncReference, 20> Predicates{ {

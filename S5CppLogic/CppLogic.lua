@@ -837,6 +837,19 @@ function CppLogic.Entity.CloneOverrideData(from, to) end
 -- @param healTroopHp (optional, default false)
 function CppLogic.Entity.PerformHeal(id, heal, healTroopHp) end
 
+--- gets the currently engaged target entity of an entity.
+-- (walking towards to engage does not count).
+-- @param id entity
+-- @return target
+function CppLogic.Entity.GetBattleTarget(id) end
+
+--- gets target assigned to a leader, by direct command or automatically assigned.
+-- (might be different from GetBattleTarget, if that is a soldier of this).
+-- if id is not currently commanded to attack something, might be garbage (check command state/TL).
+-- @param id entity
+-- @return target
+function CppLogic.Entity.GetAttackCommandTarget(id) end
+
 --- gets the leader of a soldier.
 -- @param id id of the solder
 -- @return id of the leader

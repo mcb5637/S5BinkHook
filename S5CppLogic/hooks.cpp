@@ -43,6 +43,13 @@ long long CppLogic::Hooks::WriteJump(void* adr, void* toJump) {
 	return r;
 }
 
+void CppLogic::Hooks::WriteNops(void* adr, int num)
+{
+	byte* a = reinterpret_cast<byte*>(adr);
+	for (int i = 0; i < num; ++i)
+		a[i] = 0x90;
+}
+
 
 bool CppLogic::HasSCELoader()
 {

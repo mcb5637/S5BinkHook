@@ -373,6 +373,9 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool 
 {
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x529067), 10 };
     *reinterpret_cast<byte*>(0x529067) = showwood ? 0xFF : static_cast<int>(shok::ResourceType::WoodRaw);
+    CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x536362), 30 };
+    CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x536362), 4); // push arg
+    CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x536368), 9); // call, test, jz
 }
 
 static inline float* (__cdecl* const font_lengthdata_get)(void* ld) = reinterpret_cast<float* (__cdecl*)(void*)>(0x625D00);

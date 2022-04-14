@@ -481,7 +481,7 @@ namespace GGUI {
 	class C3DOnScreenInformationCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
 		PADDINGI(1);
-		bool a, b;
+		bool ShowAllInformationFlag, ShowEffects;
 		EGUIX::Rect r1, r2; // not sure, but its 2 4 float objects
 		struct {
 
@@ -579,11 +579,11 @@ namespace GGUI {
 
 		void ShowResourceFloatieOnEntity(int eid, int amount);
 
-		static void HookResourceFloatieShowWood(bool showwood); // unfortunately there is something else that prevents this...
+		static void HookResourceFloatieShowWood(bool showwood);
 
 		static inline GGUI::C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<GGUI::C3DOnScreenInformationCustomWidget**>(0x882F54);
 	};
-	static_assert(offsetof(C3DOnScreenInformationCustomWidget, a) == 37 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, ShowAllInformationFlag) == 37 * 4);
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.TextureData) == 46 * 4);
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.TextureData.FontID_OnscreenNumbersSmall) == 46 * 4 + 500 * 4);
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.OSEMotivation) == 46 * 4 + 505 * 4);

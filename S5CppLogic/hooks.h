@@ -6,6 +6,7 @@ namespace CppLogic::Hooks {
 	void RedirectCallVP(void* call, void* redirect);
 	long long WriteJump(void* adr, void* toJump);
 	static_assert(sizeof(long long) == 8);
+	void WriteNops(void* adr, int num);
 
 
 	// allows read/write/execute of the memory location pointed to until it goes out of scope.

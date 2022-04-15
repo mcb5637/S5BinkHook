@@ -1063,12 +1063,12 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		EGUIX::FeedbackEventHandler::GlobalObj()->FireEvent(&ev);
 	}
 	if (attacker) {
-		ObserverEntities.ForAll([attacker](shok::Attachment* a) {
-			if (a->AttachmentType == shok::AttachmentType::GUARD_GUARDED) {
+		for (auto& a : ObserverEntities) {
+			if (a.AttachmentType == shok::AttachmentType::GUARD_GUARDED) {
 				EGL::CEvent1Entity ev{ shok::EventIDs::Leader_OnGuardedAttackedBy, attacker->EntityId };
-				EGL::CGLEEntity::GetEntityByID(a->EntityId)->FireEvent(&ev);
+				EGL::CGLEEntity::GetEntityByID(a.EntityId)->FireEvent(&ev);
 			}
-			});
+		}
 	}
 
 	getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsBattleOrAutocannon };
@@ -1078,6 +1078,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	std::vector<int> idskilled{};
 	int xptoadd = 0;
 	EGL::CGLEEntity* firsttodie = this;
+	int damageDone = 0;
 	if (getbool.Data && !getbool2.Data) { // has potentially soldiers
 		getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsSoldier };
 		FireEvent(&getbool);
@@ -1097,15 +1098,16 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 			int troophp = lbeh->GetTroopHealth();
 			int hppersol = lbeh->GetTroopHealthPerSoldier();
 			int currentsol = 0;
-			attackedleader->ObservedEntities.ForAll([&currentsol](shok::Attachment* a) {
-				if (a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER)
+			for (auto& a : attackedleader->ObservedEntities) {
+				if (a.AttachmentType == shok::AttachmentType::LEADER_SOLDIER)
 					currentsol++;
-				});
+			}
 			while (troophp > 0 && damage > 0) {
 				int thissolhp = troophp - ((currentsol - 1) * hppersol);
 				if (damage >= thissolhp) {
 					damage -= thissolhp;
 					troophp -= thissolhp;
+					damageDone += thissolhp;
 					attackedleader->DetachObservedEntity(shok::AttachmentType::LEADER_SOLDIER, firsttodie->EntityId, false);
 					currentsol--;
 					idskilled.push_back(firsttodie->EntityId);
@@ -1123,6 +1125,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 						firsttodie = attackedleader;
 				}
 				else {
+					damageDone += damage;
 					troophp -= damage;
 					damage = 0;
 					break;
@@ -1134,6 +1137,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	}
 	if (damage > 0) {
 		if (damage >= firsttodie->Health) {
+			damageDone += firsttodie->Health;
 			idskilled.push_back(firsttodie->EntityId);
 			xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
 			GGL::CEventEntityIndex kev{ shok::EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
@@ -1143,8 +1147,13 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 			firsttodie->Hurt(firsttodie->Health);
 		}
 		else {
+			damageDone += damage;
 			firsttodie->Hurt(damage);
 		}
+	}
+	if (attacker) {
+		GGL::CEventEntityIndex dmgdone{ shok::EventIDs::CppL_OnDamageDealt, this->EntityId, damageDone };
+		attacker->FireEvent(&dmgdone);
 	}
 	if (xp && attacker && xptoadd) {
 		GGL::CLeaderBehavior* al = attacker->GetBehavior<GGL::CLeaderBehavior>();

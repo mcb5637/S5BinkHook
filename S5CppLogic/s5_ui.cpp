@@ -359,7 +359,7 @@ private:
 				}
 				if (*strpos == '|')
 					++strpos;
-				if (skipWhitespace && linepos == line)
+				if (skipWhitespace)
 					SkipWhitespace(strpos);
 				continue;
 			}

@@ -125,6 +125,9 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x773C50;
 		static inline constexpr int TypeDesc = 0x817DE4;
+		static inline constexpr unsigned int Identifier = 0x15C89FFD;
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x86D400);
 	};
 	class CSummonedBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:

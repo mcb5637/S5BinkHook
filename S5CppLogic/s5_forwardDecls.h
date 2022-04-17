@@ -51,6 +51,7 @@ namespace GGL {
 	class CHeroAbilityProps;
 	class CCamouflageBehaviorProps;
 	class CCircularAttackProps;
+	class CSummonBehaviorProps;
 	class CGLBuildingProps;
 	class CPlayerStatus;
 	class CResourceDoodad;

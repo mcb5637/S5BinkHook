@@ -214,6 +214,8 @@ namespace BB {
 		template<class T>
 		requires std::is_default_constructible_v<T>
 		void AddClassToFactory() {
+			if (GetClassDemangledName(T::Identifier))
+				throw std::invalid_argument("identifier already used");
 			AddClassToFactory(T::Identifier, typename_details::type_name<T>(), &FactObjCreator<T>, T::SerializationData);
 		}
 

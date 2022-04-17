@@ -79,6 +79,48 @@ void GGL::CBombPlacerBehavior::FixBombAttachment()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
 }
 
+static inline void(__thiscall* const summonbeh_eventdie)(GGL::CSummonBehavior* th, BB::CEvent* ev) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, BB::CEvent*)>(0x4D6F25);
+void GGL::CSummonBehavior::EventDie(BB::CEvent* ev)
+{
+	summonbeh_eventdie(this, ev);
+}
+
+static inline void(__thiscall* const summonbeh_eventactivate)(GGL::CSummonBehavior* th, BB::CEvent* ev) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, BB::CEvent*)>(0x4D6C2C);
+void GGL::CSummonBehavior::EventActivate(BB::CEvent* ev)
+{
+	summonbeh_eventactivate(this, ev);
+}
+
+static inline int(__thiscall* const summonbeh_tasksummon)(GGL::CSummonBehavior* th, EGL::CGLETaskArgs* a) = reinterpret_cast<int(__thiscall*)(GGL::CSummonBehavior*, EGL::CGLETaskArgs*)>(0x4D6F8F);
+int GGL::CSummonBehavior::TaskSummon(EGL::CGLETaskArgs* a)
+{
+	return summonbeh_tasksummon(this, a);
+}
+
+static inline void(__thiscall* const summonbeh_addhandl)(GGL::CSummonBehavior* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, int)>(0x4D6FBE);
+void GGL::CSummonBehavior::AddHandlers(int id)
+{
+	summonbeh_addhandl(this, id);
+}
+
+static inline void(__thiscall* const summonbeh_oncr)(GGL::CSummonBehavior* th, EGL::CGLEBehaviorProps* p) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, EGL::CGLEBehaviorProps*)>(0x4D6B52);
+void GGL::CSummonBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+	summonbeh_oncr(this, p);
+}
+
+static inline void(__thiscall* const summonbeh_onlo)(GGL::CSummonBehavior* th, EGL::CGLEBehaviorProps* p) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, EGL::CGLEBehaviorProps*)>(0x4D6B6D);
+void GGL::CSummonBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+	summonbeh_onlo(this, p);
+}
+
+static inline bool(__thiscall* const summonbeh_isab)(GGL::CSummonBehavior* th, int ab) = reinterpret_cast<bool(__thiscall*)(GGL::CSummonBehavior*, int)>(0x4D6A64);
+bool GGL::CSummonBehavior::IsAbility(int ability)
+{
+	return summonbeh_isab(this, ability);
+}
+
 int (*GGL::CSniperAbility::SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) = nullptr;
 int __fastcall sniperability_tasksnipeoverride(GGL::CSniperAbility* thi, int _, int taskargs) {
 	EGL::CGLEEntity* thent = EGL::CGLEEntity::GetEntityByID(thi->EntityId);

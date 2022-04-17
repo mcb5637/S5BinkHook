@@ -131,9 +131,9 @@ namespace GGL {
 		int SecondsCharged = 0; // 5
 
 
-		virtual void AddHandlers(int id);
-		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p);
-		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p);
+		virtual void AddHandlers(int id) override;
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
 		virtual bool IsAbility(int ability) = 0; // 8
 		virtual bool CanUseAbility();
 		virtual bool CheckAndResetCooldown();
@@ -141,6 +141,7 @@ namespace GGL {
 		// defined events: HeroAbility_XXX, Behavior_Tick, Die
 
 		static inline constexpr int TypeDesc = 0x816E2C;
+		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86CBE8);
 	};
 
 	struct SSlotArgsCamouflage {};
@@ -274,6 +275,7 @@ namespace GGL {
 
 	class CSummonBehavior : public GGL::CHeroAbility {
 	public:
+		GGL::CSummonBehaviorProps* SUProps;
 
 		// defined events: HeroAbility_Reset, Summon_ActivateCommand
 		// defined tasks: TASK_SUMMON_ENTITIES
@@ -281,6 +283,18 @@ namespace GGL {
 		static inline constexpr int vtp = 0x773C10;
 		static inline constexpr int TypeDesc = 0x817E0C;
 		static inline constexpr unsigned int Identifier = 0x2BA19F1D;
+		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86D4B8);
+
+
+		virtual void AddHandlers(int id) override;
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+		virtual bool IsAbility(int ability) override;
+
+	protected:
+		void EventDie(BB::CEvent* ev);
+		void EventActivate(BB::CEvent* ev);
+		int TaskSummon(EGL::CGLETaskArgs* a);
 	};
 	class CSummonedBehavior : public EGL::CGLEBehavior {
 	public:

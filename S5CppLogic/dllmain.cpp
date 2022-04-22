@@ -81,7 +81,7 @@ void InitGame() {
     EScr::CScriptTriggerSystem::HookRemoveFuncOverrides();
 }
 
-constexpr double Version = 1.3002;
+constexpr double Version = 1.4000;
 
 int ResetCppLogic(lua::State L) {
     L.Push("CppLogic");

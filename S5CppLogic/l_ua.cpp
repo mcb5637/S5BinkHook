@@ -99,6 +99,7 @@ namespace CppLogic::UA {
 		CallSpawner();
 		if (Leaders.size() == 0) {
 			CallCommandQueue();
+			CleanDead();
 			return;
 		}
 		PosLastUpdatedTick = -1;
@@ -139,6 +140,7 @@ namespace CppLogic::UA {
 			preventComands = true;
 		}
 		CallCommandQueue();
+		CleanDead();
 		if (Status == UAStatus::Battle)
 			BattleCommand();
 		else if (Status == UAStatus::Moving || Status == UAStatus::MovingNoBattle)
@@ -910,7 +912,7 @@ namespace CppLogic::UA {
 		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
 		int i = L.CheckInt(2);
 		i++;
-		if (i >= (int)a->LeaderInTransit.size()) {
+		if (i >= static_cast<int>(a->LeaderInTransit.size())) {
 			L.Push();
 			L.Push();
 		}

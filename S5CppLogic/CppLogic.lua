@@ -34,7 +34,7 @@ CppLogic.UI = {}
 CppLogic.UA = {}
 
 --- CppLogic version number.
-CppLogic.Version = 1.3002
+CppLogic.Version = 1.4000
 
 --- call this function to cleanup used hooks.
 -- does not reset values in entitytypes.
@@ -65,7 +65,7 @@ function CppLogic.Effect.IsValidEffect(id) end
 -- @param playerid attacker player id (optional, 0/nil if not used)
 -- @param dmgclass damageclass (optional, 0/nil if not used)
 -- @param callback function that gets called on hit (optional, nil if not used)
--- @param source what deals damage, used for triggers (default shok::AdvancedDealDamageSource.Script) max size 8 bit instead of 32
+-- @param source what deals damage, used for triggers (default AdvancedDealDamageSource.Script) max size 8 bit instead of 32
 -- @return effect id
 function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source) end
 
@@ -316,7 +316,7 @@ function CppLogic.Logic.GetWeatherQueue() end
 -- @param transition transition in sec >forerun <=200
 function CppLogic.Logic.ClearWeatherQueueAndAddInitial(state, duration, forerun, gfx, transition) end
 
---- sets a func to be called, if a tasklist CppLogic::ContainsValue TASK_LUA_FUNC.
+--- sets a func to be called, if a tasklist contains TASK_LUA_FUNC.
 -- define the task as <Task classname="EGL::CTaskArgsInteger" classid="0xb3f8356d"><TaskType>TASK_LUA_FUNC</TaskType> in the tasklist to use it.
 -- <Value> gets passed to your func, to identify what action should be executed.
 -- use the parameter funcs moveto(pos, ignorepathing, noncancelable) and settl(tl) to move the entity or set the task list.
@@ -518,7 +518,7 @@ function CppLogic.API.GetCurrentTime() end
 -- @param uiFeedback send battle feedback (default true)
 -- @param xp give attacker xp for kills (default true)
 -- @param addStat add kills to statistics (default true)
--- @param source what deals damage, used for triggers (default shok::AdvancedDealDamageSource.Script)
+-- @param source what deals damage, used for triggers (default AdvancedDealDamageSource.Script)
 function CppLogic.Combat.DealDamage(target, damage, attacker, attackerPlayerFallback, uiFeedback, xp, addStat, source) end
 
 --- deals damage in an area.
@@ -535,7 +535,7 @@ function CppLogic.Combat.DealDamage(target, damage, attacker, attackerPlayerFall
 -- @param uiFeedback send battle feedback (default true)
 -- @param xp give attacker xp for kills (default true)
 -- @param addStat add kills to statistics (default true)
--- @param source what deals damage, used for triggers (default shok::AdvancedDealDamageSource.Script)
+-- @param source what deals damage, used for triggers (default AdvancedDealDamageSource.Script)
 function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclass, uiFeedback, xp, addStat, source) end
 
 --- enables AoE projectile fix.

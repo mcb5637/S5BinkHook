@@ -699,19 +699,19 @@ namespace CppLogic::EntityType {
 		for (const shok::AARect& r : t->LogicProps->BlockingArea) {
 			L.NewTable();
 			L.PushPos(r.low);
-			L.SetTableRawI(-2, 1);
+			L.SetTableRaw(-2, 1);
 			L.PushPos(r.high);
-			L.SetTableRawI(-2, 2);
-			L.SetTableRawI(-2, i);
+			L.SetTableRaw(-2, 2);
+			L.SetTableRaw(-2, i);
 			i++;
 		}
 		L.Push(t->LogicProps->NumBlockedPoints);
 		if (GGL::CBuildBlockProperties* bb = dynamic_cast<GGL::CBuildBlockProperties*>(t->LogicProps)) {
 			L.NewTable();
 			L.PushPos(bb->BuildBlockArea.low);
-			L.SetTableRawI(-2, 1);
+			L.SetTableRaw(-2, 1);
 			L.PushPos(bb->BuildBlockArea.high);
-			L.SetTableRawI(-2, 2);
+			L.SetTableRaw(-2, 2);
 			return 3;
 		}
 		return 2;
@@ -725,7 +725,7 @@ namespace CppLogic::EntityType {
 			int c = 1;
 			for (int i : s->ModifyArmor.TechList) {
 				L.Push(i);
-				L.SetTableRawI(-2, c);
+				L.SetTableRaw(-2, c);
 				c++;
 			}
 			return 1;
@@ -735,7 +735,7 @@ namespace CppLogic::EntityType {
 			int c = 1;
 			for (int i : s->ModifyArmor.TechList) {
 				L.Push(i);
-				L.SetTableRawI(-2, c);
+				L.SetTableRaw(-2, c);
 				c++;
 			}
 			return 1;
@@ -751,7 +751,7 @@ namespace CppLogic::EntityType {
 			int c = 1;
 			for (int i : s->ModifyExploration.TechList) {
 				L.Push(i);
-				L.SetTableRawI(-2, c);
+				L.SetTableRaw(-2, c);
 				c++;
 			}
 			return 1;
@@ -761,7 +761,7 @@ namespace CppLogic::EntityType {
 			int c = 1;
 			for (int i : s->ModifyExploration.TechList) {
 				L.Push(i);
-				L.SetTableRawI(-2, c);
+				L.SetTableRaw(-2, c);
 				c++;
 			}
 			return 1;
@@ -779,7 +779,7 @@ namespace CppLogic::EntityType {
 		int c = 1;
 		for (int i : s->ModifyDamage.TechList) {
 			L.Push(i);
-			L.SetTableRawI(-2, c);
+			L.SetTableRaw(-2, c);
 			c++;
 		}
 		return 1;
@@ -795,7 +795,7 @@ namespace CppLogic::EntityType {
 		int c = 1;
 		for (int i : s->ModifyMaxRange.TechList) {
 			L.Push(i);
-			L.SetTableRawI(-2, c);
+			L.SetTableRaw(-2, c);
 			c++;
 		}
 		return 1;
@@ -811,7 +811,7 @@ namespace CppLogic::EntityType {
 		int c = 1;
 		for (int i : s->ModifySpeed.TechList) {
 			L.Push(i);
-			L.SetTableRawI(-2, c);
+			L.SetTableRaw(-2, c);
 			c++;
 		}
 		return 1;
@@ -841,7 +841,7 @@ namespace CppLogic::EntityType {
 		int i = 1;
 		for (int ty : dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)->BuildOn) {
 			L.Push(ty);
-			L.SetTableRawI(-2, i);
+			L.SetTableRaw(-2, i);
 			i++;
 		}
 		return 1;

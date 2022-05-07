@@ -145,7 +145,7 @@ namespace CppLogic::UI {
 		int i = 1;
 		for (EGUIX::CBaseWidget* p : c->WidgetListHandler.SubWidgets) {
 			L.Push(p->WidgetID);
-			L.SetTableRawI(-2, i);
+			L.SetTableRaw(-2, i);
 			i++;
 		}
 		return 1;

@@ -991,7 +991,7 @@ namespace CppLogic::UA {
 		int i = 1;
 		for (int l : a->Leaders) {
 			L.Push(l);
-			L.SetTableRawI(-2, i);
+			L.SetTableRaw(-2, i);
 			i++;
 		}
 		L.SetTableRaw(-3);
@@ -1000,7 +1000,7 @@ namespace CppLogic::UA {
 		i = 1;
 		for (int l : a->LeaderInTransit) {
 			L.Push(l);
-			L.SetTableRawI(-2, i);
+			L.SetTableRaw(-2, i);
 			i++;
 		}
 		L.SetTableRaw(-3);
@@ -1009,7 +1009,7 @@ namespace CppLogic::UA {
 		i = 1;
 		for (int l : a->DeadHeroes) {
 			L.Push(l);
-			L.SetTableRawI(-2, i);
+			L.SetTableRaw(-2, i);
 			i++;
 		}
 		L.SetTableRaw(-3);
@@ -1047,7 +1047,7 @@ namespace CppLogic::UA {
 		int i = 1;
 		a->Leaders.clear();
 		while (true) {
-			L.GetTableRawI(-1, i);
+			L.GetTableRaw(-1, i);
 			if (!L.IsNumber(-1)) {
 				L.Pop(1);
 				break;
@@ -1065,7 +1065,7 @@ namespace CppLogic::UA {
 		i = 1;
 		a->LeaderInTransit.clear();
 		while (true) {
-			L.GetTableRawI(-1, i);
+			L.GetTableRaw(-1, i);
 			if (!L.IsNumber(-1)) {
 				L.Pop(1);
 				break;
@@ -1080,7 +1080,7 @@ namespace CppLogic::UA {
 		i = 1;
 		a->DeadHeroes.clear();
 		while (true) {
-			L.GetTableRawI(-1, i);
+			L.GetTableRaw(-1, i);
 			if (!L.IsNumber(-1)) {
 				L.Pop(1);
 				break;
@@ -1155,15 +1155,15 @@ namespace CppLogic::UA {
 			L.Push(id);
 			EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
 			if (a->IsRanged(e)) {
-				L.SetTableRawI(-4, ran);
+				L.SetTableRaw(-4, ran);
 				ran++;
 			}
 			else if (a->IsNonCombat(e)) {
-				L.SetTableRawI(-2, nc);
+				L.SetTableRaw(-2, nc);
 				nc++;
 			}
 			else {
-				L.SetTableRawI(-3, mel);
+				L.SetTableRaw(-3, mel);
 				mel++;
 			}
 		}

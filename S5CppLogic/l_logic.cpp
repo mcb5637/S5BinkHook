@@ -159,7 +159,7 @@ namespace CppLogic::Logic {
 			int i = 1;
 			for (shok::Position p : e->Positions) {
 				L.PushPos(p);
-				L.SetTableRawI(-2, i);
+				L.SetTableRaw(-2, i);
 				i++;
 			}
 			L.SetTableRaw(-3);
@@ -208,7 +208,7 @@ namespace CppLogic::Logic {
 				int i = 1;
 				for (int s : e->Serfs) {
 					L.Push(s);
-					L.SetTableRawI(-2, i);
+					L.SetTableRaw(-2, i);
 					i++;
 				}
 				L.SetTableRaw(-3);
@@ -361,7 +361,7 @@ namespace CppLogic::Logic {
 				shok::Position p{};
 				v.Vector.clear();
 				while (true) {
-					L.GetTableRawI(-1, i);
+					L.GetTableRaw(-1, i);
 					if (!L.IsTable(-1)) {
 						L.Pop(1);
 						break;
@@ -470,7 +470,7 @@ namespace CppLogic::Logic {
 					auto v = e->Serfs.SaveVector();
 					v.Vector.clear();
 					while (true) {
-						L.GetTableRawI(-1, i);
+						L.GetTableRaw(-1, i);
 						if (!L.IsNumber(-1)) {
 							L.Pop(1);
 							break;
@@ -779,17 +779,17 @@ namespace CppLogic::Logic {
 		for (BB::IFileSystem* a : (*BB::CFileSystemMgr::GlobalObj)->LoadOrder) {
 			if (BB::CDirectoryFileSystem* a2 = dynamic_cast<BB::CDirectoryFileSystem*>(a)) {
 				L.Push(a2->Path);
-				L.SetTableRawI(-2, r);
+				L.SetTableRaw(-2, r);
 				r++;
 			}
 			else if (BB::CBBArchiveFile* a2 = dynamic_cast<BB::CBBArchiveFile*>(a)) {
 				L.Push(a2->Path);
-				L.SetTableRawI(-2, r);
+				L.SetTableRaw(-2, r);
 				r++;
 			}
 			else {
 				L.Push(typeid(*a).name());
-				L.SetTableRawI(-2, r);
+				L.SetTableRaw(-2, r);
 				r++;
 			}
 		}
@@ -1105,7 +1105,7 @@ namespace CppLogic::Logic {
 			L.Push(kae.WeatherElement.Forerun);
 			L.SetTableRaw(-3);
 
-			L.SetTableRawI(-2, kae.WeatherElement.StartTimeOffset);
+			L.SetTableRaw(-2, kae.WeatherElement.StartTimeOffset);
 		}
 		L.Push(wh->CurrentWeatherOffset);
 		L.Push(wh->NextPeriodicWeatherStartTimeOffset);

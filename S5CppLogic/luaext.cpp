@@ -140,49 +140,49 @@ void luaext::EState::CheckEntityAlive(int id, const char* msg)
 void luaext::EState::ReadCostInfo(int index, shok::CostInfo& c, bool ignoreZeroes)
 {
 	float i = 0;
-	GetTableRawI(index, static_cast<int>(shok::ResourceType::Clay));
+	GetTableRaw(index, static_cast<int>(shok::ResourceType::Clay));
 	if (IsNumber(-1)) {
 		i = CheckFloat(-1);
 		if (i != 0 || !ignoreZeroes)
 			c.Clay = i;
 	}
 	Pop(1);
-	GetTableRawI(index, static_cast<int>(shok::ResourceType::Gold));
+	GetTableRaw(index, static_cast<int>(shok::ResourceType::Gold));
 	if (IsNumber(-1)) {
 		i = CheckFloat(-1);
 		if (i != 0 || !ignoreZeroes)
 			c.Gold = i;
 	}
 	Pop(1);
-	GetTableRawI(index, static_cast<int>(shok::ResourceType::Iron));
+	GetTableRaw(index, static_cast<int>(shok::ResourceType::Iron));
 	if (IsNumber(-1)) {
 		i = CheckFloat(-1);
 		if (i != 0 || !ignoreZeroes)
 			c.Iron = i;
 	}
 	Pop(1);
-	GetTableRawI(index, static_cast<int>(shok::ResourceType::Silver));
+	GetTableRaw(index, static_cast<int>(shok::ResourceType::Silver));
 	if (IsNumber(-1)) {
 		i = CheckFloat(-1);
 		if (i != 0 || !ignoreZeroes)
 			c.Silver = i;
 	}
 	Pop(1);
-	GetTableRawI(index, static_cast<int>(shok::ResourceType::Stone));
+	GetTableRaw(index, static_cast<int>(shok::ResourceType::Stone));
 	if (IsNumber(-1)) {
 		i = CheckFloat(-1);
 		if (i != 0 || !ignoreZeroes)
 			c.Stone = i;
 	}
 	Pop(1);
-	GetTableRawI(index, static_cast<int>(shok::ResourceType::Sulfur));
+	GetTableRaw(index, static_cast<int>(shok::ResourceType::Sulfur));
 	if (IsNumber(-1)) {
 		i = CheckFloat(-1);
 		if (i != 0 || !ignoreZeroes)
 			c.Sulfur = i;
 	}
 	Pop(1);
-	GetTableRawI(index, static_cast<int>(shok::ResourceType::Wood));
+	GetTableRaw(index, static_cast<int>(shok::ResourceType::Wood));
 	if (IsNumber(-1)) {
 		i = CheckFloat(-1);
 		if (i != 0 || !ignoreZeroes)
@@ -195,22 +195,22 @@ void luaext::EState::PushCostInfo(const shok::CostInfo& c)
 	NewTable();
 	for (int i = 1; i <= shok::ResourceType_MaxValue; i++) {
 		Push(0);
-		SetTableRawI(-2, i);
+		SetTableRaw(-2, i);
 	}
 	Push(c.Clay);
-	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Clay));
+	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Clay));
 	Push(c.Gold);
-	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Gold));
+	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Gold));
 	Push(c.Iron);
-	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Iron));
+	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Iron));
 	Push(c.Silver);
-	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Silver));
+	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Silver));
 	Push(c.Stone);
-	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Stone));
+	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Stone));
 	Push(c.Sulfur);
-	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Sulfur));
+	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Sulfur));
 	Push(c.Wood);
-	SetTableRawI(-2, static_cast<int>(shok::ResourceType::Wood));
+	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Wood));
 }
 
 GGlue::CGlueEntityProps* luaext::EState::OptEntityType(int idx)

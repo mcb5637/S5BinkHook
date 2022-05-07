@@ -40,7 +40,7 @@ namespace CppLogic::Tech {
 		int i = 1;
 		for (shok::Technology::TechReq ec : tech->TecConditions) {
 			L.Push(ec.TecType);
-			L.SetTableRawI(-2, i);
+			L.SetTableRaw(-2, i);
 			i++;
 		}
 		L.Push(tech->RequiredUpgradeCategoryConditions);

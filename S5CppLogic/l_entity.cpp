@@ -68,7 +68,7 @@ namespace CppLogic::Entity {
 		L.Insert(2);
 		for (int i = num - 1; i >= 0; i--) { // keep predicates, so they dont get gced
 			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(-1));
-			L.SetTableRawI(2, i);
+			L.SetTableRaw(2, i);
 		}
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
@@ -84,7 +84,7 @@ namespace CppLogic::Entity {
 		L.Insert(2);
 		for (int i = num - 1; i >= 0; i--) { // keep predicates, so they dont get gced
 			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(-1));
-			L.SetTableRawI(2, i);
+			L.SetTableRaw(2, i);
 		}
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
@@ -181,7 +181,7 @@ namespace CppLogic::Entity {
 		CppLogic::Iterator::GlobalEntityIterator it{ pred };
 		for (EGL::CGLEEntity* e : it) {
 			L.Push(e->EntityId);
-			L.SetTableRawI(2, index);
+			L.SetTableRaw(2, index);
 			index++;
 		}
 		return 1;

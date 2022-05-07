@@ -22,14 +22,14 @@ namespace CppLogic::Effect {
 			return;
 		PushToHitCallbackRegKey(L);
 		L.GetTableRaw(L.REGISTRYINDEX);
-		L.GetTableRawI(-1, id);
+		L.GetTableRaw(-1, id);
 		if (L.IsFunction(-1)) {
 			L.Push(id);
 			L.PCall(1, 0, 0);
 		}
 		L.SetTop(top + 1);
 		L.Push();
-		L.SetTableRawI(-2, id);
+		L.SetTableRaw(-2, id);
 		L.SetTop(top);
 	}
 
@@ -63,7 +63,7 @@ namespace CppLogic::Effect {
 			PushToHitCallbackRegKey(L);
 			L.GetTableRaw(L.REGISTRYINDEX);
 			L.PushValue(12);
-			L.SetTableRawI(-2, id);
+			L.SetTableRaw(-2, id);
 		}
 		L.Push(id);
 		return 1;

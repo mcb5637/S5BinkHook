@@ -590,6 +590,60 @@ namespace GGUI {
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.OSEBuilding) == 46 * 4 + 571 * 4);
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.FloatieManager) == 46 * 4 + 1892 * 4);
 	static_assert(sizeof(C3DOnScreenInformationCustomWidget) == 1943 * 4);
+
+	class CMiniMapSignal {
+	public:
+		virtual ~CMiniMapSignal() = default;
+		// update
+
+		float StartTime = 0; // ret of 548B64, float 126?
+		float X = 0, Y = 0;
+		float Scale = 0;
+		int R = 0, G = 0, B = 0, A = 0;
+		float Rotation = 0; // zero
+		PADDINGI(1); // int 4 // 10
+
+		static inline constexpr int vtp = 0x77BA00;
+	};
+	class CMiniMapSignalPulse : public CMiniMapSignal {
+	public:
+		float Time = 2.5;
+		float Scale_Multiplier = 0.125; // caclulates Scale from this in update
+		int Mode = 1; // 1 pulsing, 2 static
+		float Time2 = 2.0;
+
+	public:
+		static inline constexpr int vtp = 0x77BA3C;
+		CMiniMapSignalPulse(float x, float y, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor);
+	};
+	class CMiniMapSignalDefault : public CMiniMapSignal {
+	public:
+		float Time = 0;
+		static inline constexpr int vtp = 0x77BA0C;
+		CMiniMapSignalDefault(float x, float y, int r, int g, int b, float scaleFactor);
+	};
+
+	class MiniMapMarkerHandler {
+	public:
+		// no vtable
+		PADDINGI(88);
+		PADDINGI(13);
+		shok::Vector<CMiniMapSignalDefault> Defaults;
+		PADDINGI(12);
+		shok::Vector<CMiniMapSignalPulse> Pulses;
+
+		void CreateMarker(const shok::Position& p, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor);
+		void CreateSignalDefault(const shok::Position& p, int r, int g, int b, float scaleFactor);
+
+		static inline MiniMapMarkerHandler* (__cdecl* const GlobalObj)() = reinterpret_cast<MiniMapMarkerHandler * (__cdecl*)()>(0x52FE1C);
+	};
+	static_assert(offsetof(MiniMapMarkerHandler, Pulses) == 117 * 4);
+	//constexpr int i = offsetof(MiniMapMarkerHandler, Pulses) / 4;
+	class CMiniMapCustomWidget : public EGUIX::CCustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77BF54;
+	};
 }
 
 

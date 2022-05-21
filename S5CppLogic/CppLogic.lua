@@ -2108,7 +2108,7 @@ function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
 
 --- gets the map position under a given screen position.
 -- @param x
--- @param y1
+-- @param y
 -- @return pos
 -- @return terrainHeigt
 function CppLogic.UI.GetLandscapePosAtScreenPos(x, y) end
@@ -2116,6 +2116,24 @@ function CppLogic.UI.GetLandscapePosAtScreenPos(x, y) end
 --- shows a command acknowledgement at a given position. (usually shown on move commands).
 -- @param p
 function CppLogic.UI.ShowCommandAcknowledgementAtPosition(p) end
+
+--- shows a minimap marker at a give position.
+-- @param p position
+-- @param pulsing boolean if false, marker is static (like GUI.CreateMinimapMarker), if true marker is animated (like GUI.CreateMinimapPulse)
+-- @param r color 0-255
+-- @param g color 0-255
+-- @param b color 0-255
+-- @param timefactor number on pulsing, changes animation speed >1 takes longer for animation to complete (optional, default 1)
+-- @param scalefactor number multiplied with scale (optional, default 1) (note, increasing the scale also increases animation speed)
+function CppLogic.UI.CreateMiniMapMarker(p, pulsing, r, g, b, timefactor, scalefactor) end
+
+--- shows a script marker at a give position (looks like GUI.ScriptSignal).
+-- @param p position
+-- @param r color 0-255
+-- @param g color 0-255
+-- @param b color 0-255
+-- @param scalefactor number multiplied with scale (optional, default 1)
+function CppLogic.UI.CreateMiniMapScriptSignal(p, pulsing, r, g, b, timefactor, scalefactor) end
 
 --- gets the main windows client size.
 -- == GUI.GetScreenSize(), but available in main menu.

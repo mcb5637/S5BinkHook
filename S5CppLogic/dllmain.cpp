@@ -18,6 +18,7 @@
 #include "s5_maplogic.h"
 #include "s5_filesystem.h"
 #include "s5_exception.h"
+#include "s5_widget.h"
 #include "entityiterator.h"
 #include "hooks.h"
 #include "luaext.h"
@@ -61,8 +62,10 @@ int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<BB::SerializationData*>(0x87F6D8));
-    L.Push((int)(*Framework::CMain::GlobalObj)->GluePropsManager);
-    return 1;
+    shok::Position p = L.CheckPos(1);
+    GGUI::MiniMapMarkerHandler* h = GGUI::MiniMapMarkerHandler::GlobalObj();
+    h->CreateMarker(p, true, 255, 0, 255, 10, 1);
+    return 0;
 }
 
 int Cleanup(lua::State L) {

@@ -236,6 +236,47 @@ EGUIX::CWidgetStringHelper* EGUIX::CBaseWidget::GetStringHelper()
 }
 
 
+static inline void(__thiscall* const minimappulse_ctor)(GGUI::CMiniMapSignalPulse* th, float x, float y, int colorcode, int mode, float time1, float speed2, float time2) = reinterpret_cast<void(__thiscall*)(GGUI::CMiniMapSignalPulse*, float, float, int, int, float, float, float)>(0x53D595);
+GGUI::CMiniMapSignalPulse::CMiniMapSignalPulse(float x, float y, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor)
+{
+    minimappulse_ctor(this, x, y, 0, pulsing ? 1 : 2, 2.0f * timeFactor, 2.5f, (pulsing ? 0.8f : 0.128f) * scaleFactor);
+    R = r;
+    G = g;
+    B = b;
+}
+
+static inline void(__thiscall* const minimapsignaldefault_ctor)(GGUI::CMiniMapSignalDefault* th, float x, float y, int colorcode) = reinterpret_cast<void(__thiscall*)(GGUI::CMiniMapSignalDefault*, float, float, int)>(0x53D688);
+GGUI::CMiniMapSignalDefault::CMiniMapSignalDefault(float x, float y, int r, int g, int b, float scaleFactor)
+{
+    minimapsignaldefault_ctor(this, x, y, 0);
+    R = r;
+    G = g;
+    B = b;
+    Scale *= scaleFactor;
+}
+
+static inline void(__thiscall* const minimapmarkerhandler_addpulse)(shok::Vector<GGUI::CMiniMapSignalPulse>* th, GGUI::CMiniMapSignalPulse* p) = reinterpret_cast<void(__thiscall*)(shok::Vector<GGUI::CMiniMapSignalPulse>*, GGUI::CMiniMapSignalPulse*)>(0x52AFA5);
+void GGUI::MiniMapMarkerHandler::CreateMarker(const shok::Position& p, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor)
+{
+    static constexpr float scale = 1.0f / 100.0f;
+    EGL::CGLETerrainHiRes* hire = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes;
+    float x = p.X * scale / hire->MaxSizeX;
+    float y = p.Y * scale / hire->MaxSizeY;
+    GGUI::CMiniMapSignalPulse pul{ x, y, pulsing, r, g, b, timeFactor, scaleFactor };
+    minimapmarkerhandler_addpulse(&Pulses, &pul);
+}
+
+static inline void(__thiscall* const minimapmarkerhandler_adddefault)(shok::Vector<GGUI::CMiniMapSignalDefault>* th, GGUI::CMiniMapSignalDefault* p) = reinterpret_cast<void(__thiscall*)(shok::Vector<GGUI::CMiniMapSignalDefault>*, GGUI::CMiniMapSignalDefault*)>(0x52AEA5);
+void GGUI::MiniMapMarkerHandler::CreateSignalDefault(const shok::Position& p, int r, int g, int b, float scaleFactor)
+{
+    static constexpr float scale = 1.0f / 100.0f;
+    EGL::CGLETerrainHiRes* hire = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes;
+    float x = p.X * scale / hire->MaxSizeX;
+    float y = p.Y * scale / hire->MaxSizeY;
+    GGUI::CMiniMapSignalDefault def{ x, y, r, g, b, scaleFactor };
+    minimapmarkerhandler_adddefault(&Defaults, &def);
+}
+
 static inline int(__thiscall* const widman_getidbyname)(EGUIX::WidgetManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x5588A0);
 int EGUIX::WidgetManager::GetIdByName(const char* name)
 {

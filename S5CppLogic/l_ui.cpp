@@ -840,6 +840,42 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int CreateMiniMapMarker(lua::State ls) {
+		luaext::EState L{ ls };
+		shok::Position p = L.CheckPos(1);
+		bool pulsing = L.CheckBool(2);
+		int r = L.CheckInt(3);
+		if (r < 0 || r > 255)
+			throw lua::LuaException("r out of range");
+		int g = L.CheckInt(4);
+		if (g < 0 || g > 255)
+			throw lua::LuaException("g out of range");
+		int b = L.CheckInt(5);
+		if (b < 0 || b > 255)
+			throw lua::LuaException("b out of range");
+		float timefactor = L.OptFloat(6, 1);
+		float scalefactor = L.OptFloat(7, 1);
+		GGUI::MiniMapMarkerHandler::GlobalObj()->CreateMarker(p, pulsing, r, g, b, timefactor, scalefactor);
+		return 0;
+	}
+
+	int CreateMiniMapScriptSignal(lua::State ls) {
+		luaext::EState L{ ls };
+		shok::Position p = L.CheckPos(1);
+		int r = L.CheckInt(2);
+		if (r < 0 || r > 255)
+			throw lua::LuaException("r out of range");
+		int g = L.CheckInt(3);
+		if (g < 0 || g > 255)
+			throw lua::LuaException("g out of range");
+		int b = L.CheckInt(4);
+		if (b < 0 || b > 255)
+			throw lua::LuaException("b out of range");
+		float scalefactor = L.OptFloat(5, 1);
+		GGUI::MiniMapMarkerHandler::GlobalObj()->CreateSignalDefault(p, r, g, b, scalefactor);
+		return 0;
+	}
+
 	int SetGUIStateLuaSelection(lua::State ls) {
 		luaext::EState L{ ls };
 		L.CheckType(1, lua::LType::Function);
@@ -968,7 +1004,7 @@ namespace CppLogic::UI {
 		}
 	}
 
-	constexpr std::array<lua::FuncReference, 51> UI{ {
+	constexpr std::array<lua::FuncReference, 53> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1020,6 +1056,8 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<SetGUIStateLuaSelection>("SetGUIStateLuaSelection"),
 		lua::FuncReference::GetRef<GetLandscapePosAtScreenPos>("GetLandscapePosAtScreenPos"),
 		lua::FuncReference::GetRef<ShowCommandAcknowledgementAtPosition>("ShowCommandAcknowledgementAtPosition"),
+		lua::FuncReference::GetRef<CreateMiniMapMarker>("CreateMiniMapMarker"),
+		lua::FuncReference::GetRef<CreateMiniMapScriptSignal>("CreateMiniMapScriptSignal"),
 	} };
 
 	void Init(lua::State L)

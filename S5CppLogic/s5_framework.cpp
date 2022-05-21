@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5_framework.h"
+#include "hooks.h"
 
 void ECore::IReplayStreamExtension::unknown0()
 {
@@ -77,8 +78,54 @@ Framework::CampagnInfo* Framework::CMain::GetCampagnInfo(GS3DTools::CMapData* d)
     return framew_getcinfo(this, d);
 }
 
-void(__thiscall* const framew_savegdb)(Framework::CMain* th) = reinterpret_cast<void(__thiscall* const)(Framework::CMain*)>(0x40AED0);
+inline void(__thiscall* const framew_savegdb)(Framework::CMain* th) = reinterpret_cast<void(__thiscall* const)(Framework::CMain*)>(0x40AED0);
 void Framework::CMain::SaveGDB()
 {
     framew_savegdb(this);
+}
+
+void (*Framework::CMain::OnModeChange)(NextMode mode) = nullptr;
+inline void(__thiscall* const cmain_startmapsp)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40A916);
+inline void(__thiscall* const cmain_gotomainmenu)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA1B);
+inline void(__thiscall* const cmain_loadsave)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA76);
+inline void(__thiscall* const cmain_startmapmp)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40ACFE);
+void __fastcall cmain_checktodo_hooked(Framework::CMain* th) {
+    if (th->ToDo != Framework::CMain::NextMode::NoChange)
+        if (Framework::CMain::OnModeChange)
+            Framework::CMain::OnModeChange(th->ToDo);
+    switch (th->ToDo)
+    {
+    case Framework::CMain::NextMode::StartMapSP:
+        cmain_startmapsp(th);
+        break;
+    case Framework::CMain::NextMode::ToMainMenu:
+        cmain_gotomainmenu(th);
+        break;
+    case Framework::CMain::NextMode::LoadSaveSP:
+        cmain_loadsave(th);
+        break;
+    case Framework::CMain::NextMode::StartMapMP:
+        cmain_startmapmp(th);
+        break;
+    case Framework::CMain::NextMode::RestartMapSP:
+        cmain_gotomainmenu(th);
+        cmain_startmapsp(th);
+        break;
+    case Framework::CMain::NextMode::LeaveGame:
+        PostQuitMessage(0);
+        break;
+    }
+    th->ToDo = Framework::CMain::NextMode::NoChange;
+}
+
+
+bool HookModeChange_Hooked = false;
+void Framework::CMain::HookModeChange()
+{
+    if (HookModeChange_Hooked)
+        return;
+    if (CppLogic::HasSCELoader())
+        throw 0;
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40B3BE), 10 };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40B3BE), &cmain_checktodo_hooked);
 }

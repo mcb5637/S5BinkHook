@@ -47,6 +47,7 @@ namespace BB {
 		static inline BB::FieldSerilaizer* const TypeInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810C98);
 		static inline BB::FieldSerilaizer* const TypeUInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810CD8);
 		static inline BB::FieldSerilaizer* const TypeFloat = reinterpret_cast<BB::FieldSerilaizer*>(0x810C78);
+		static inline BB::FieldSerilaizer* const TypeDouble = reinterpret_cast<BB::FieldSerilaizer*>(0x82BB38);
 		static inline BB::FieldSerilaizer* const TypeBool = reinterpret_cast<BB::FieldSerilaizer*>(0x810C58);
 		static inline BB::FieldSerilaizer* const TypeString = reinterpret_cast<BB::FieldSerilaizer*>(0x8640F0);
 		static inline BB::FieldSerilaizer* const TypeCharBuff = reinterpret_cast<BB::FieldSerilaizer*>(0x810CB8);
@@ -73,6 +74,10 @@ namespace BB {
 		template<>
 		static constexpr BB::FieldSerilaizer* GetSerilalizer<bool>() {
 			return TypeBool;
+		}
+		template<>
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<double>() {
+			return TypeDouble;
 		}
 
 		struct ExtendedInfo {

@@ -216,6 +216,9 @@
     <ClInclude Include="luaserializer.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_glue.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

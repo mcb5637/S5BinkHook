@@ -32,6 +32,7 @@
 #include "l_ua.h"
 #include "l_ui.h"
 #include "luaserializer.h"
+#include "s5_framework.h"
 
 struct CppLogicOptions {
     bool DoNotLoad = false;
@@ -59,7 +60,8 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CResourceDoodadBehavior::Identifier);
+    //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<BB::SerializationData*>(0x87F6D8));
+    L.Push((int)(*Framework::CMain::GlobalObj)->GluePropsManager);
     return 1;
 }
 
@@ -73,7 +75,17 @@ int Cleanup(lua::State L) {
     return 0;
 }
 
+void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
+    if ((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu) {
+        lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+        Cleanup(L);
+        //shok::LogString("cleanup done\n");
+    }
+}
+
 void InitGame() {
+    Framework::CMain::HookModeChange();
+    Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
     if (!Options.DoNotUseCenterFix)
         shok::HookTextPrinting();
     CppLogic::Logic::OnLoad();
@@ -88,6 +100,10 @@ int ResetCppLogic(lua::State L) {
     L.PushLightUserdata(&ResetCppLogic);
     L.GetTableRaw(L.REGISTRYINDEX);
     L.SetTableRaw(L.GLOBALSINDEX);
+    return 0;
+}
+
+int Nop(lua::State L) {
     return 0;
 }
 
@@ -108,7 +124,7 @@ int ResetCppLogic(lua::State L) {
     L.PushValue(-2);
     L.SetTableRaw(L.REGISTRYINDEX);
 
-    L.RegisterFunc<Cleanup>("OnLeaveMap", -3);
+    L.RegisterFunc<Nop>("OnLeaveMap", -3);
     L.Push("Version");
     L.Push(Version);
     L.SetTableRaw(-3);
@@ -218,7 +234,6 @@ extern "C" {
     }
 
     void __declspec(dllexport) __stdcall RemoveLuaState(lua_State* L) {
-        Cleanup(lua::State{ L }); // TODO do something better than this when i come around writing a modloader...
         EGL::CGLETerrainLowRes::ClearBridgeArea();
         if (dbg.RemoveLuaState)
             dbg.RemoveLuaState(L);

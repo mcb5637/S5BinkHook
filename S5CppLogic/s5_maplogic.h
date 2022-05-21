@@ -254,7 +254,7 @@ namespace EGL {
 		virtual void unknown10() = 0;
 		virtual void unknown11() = 0;
 		virtual void unknown12() = 0;
-		virtual void unknown13() = 0; // 15
+		virtual void StartMap(const char* mapPath) = 0; // 15
 		virtual void unknown14() = 0;
 		virtual void unknown15() = 0;
 		virtual void unknown16() = 0;

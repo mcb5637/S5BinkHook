@@ -80,6 +80,14 @@ void CheckFloat(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs
 }
 BB::FieldSerilaizer::ExtendedInfo InfoFloat{ "Float", &PushFloat, &CheckFloat };
 
+void PushDouble(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+    L.Push(*static_cast<double*>(data));
+}
+void CheckDouble(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+    *static_cast<double*>(data) = L.CheckNumber(idx);
+}
+BB::FieldSerilaizer::ExtendedInfo InfoDouble{ "Double", &PushDouble, &CheckDouble };
+
 void PushSString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<shok::String*>(data)->c_str());
 }
@@ -98,10 +106,12 @@ BB::FieldSerilaizer::ExtendedInfo InfoClassID{ "shok::ClassIdentifier", &PushUnk
 
 const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ {
     {0x810C58, &InfoBool},
+    {0x82BAF4, &InfoBool},
 
     {0x810C98, &InfoInt},
     {0x800108, &InfoInt},
     {0x8231C4, &InfoInt},
+    {0x82BB60, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
@@ -114,6 +124,9 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
 
     {0x810C78, &InfoFloat},
     {0x8231A4, &InfoFloat},
+    {0x82BB14, &InfoFloat},
+
+    {0x82BB38, &InfoDouble},
 
     {0x8640F0, &InfoString},
     {0x894954, &InfoString},

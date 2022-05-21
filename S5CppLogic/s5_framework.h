@@ -2,6 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_sound.h"
+#include "s5_glue.h"
 
 namespace ECore {
 	class IReplayStreamExtension {
@@ -101,18 +102,62 @@ namespace GDB {
 }
 
 namespace Framework {
+	class AGameModeBase : public BB::IPostEvent {
+	public:
+		virtual ~AGameModeBase() = default;
+		// 2 more pure virt funcs
+
+		static inline constexpr int vtp = 0x76307C;
+	};
+	class CSinglePlayerMode : public AGameModeBase {
+	public:
+		static inline constexpr int vtp = 0x7632C8;
+	};
+	class CMultiPlayerMode : public AGameModeBase {
+	public:
+		static inline constexpr int vtp = 0x7631BC;
+	};
+
+
 	class IGameCallBacks {
 		virtual void unknown0() = 0;
 	};
 
 	class CMain : public BB::IPostEvent, public IGameCallBacks, public ESnd::IAmbientSoundInfo {
 	public:
-		int CurrentMode; // 1 mainmenu, 2 ingame (sp?)
+		enum class Mode : int {
+			MainMenu = 1,
+			Singleplayer = 2,
+			Multiplayer = 3,
+		};
+		enum class NextMode : int {
+			NoChange = 0,
+			StartMapSP = 1,
+			ToMainMenu = 2,
+			LoadSaveSP = 3,
+			StartMapMP = 4,
+			RestartMapSP = 5,
+			LeaveGame = 6,
+		};
+
+
+		Mode CurrentMode; // 1 mainmenu, 2 ingame (sp?)
 		GS3DTools::CMapData CurrentMap; // 4
 		//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent
 		// GS3DTools::CMapData::vtable???
+		PADDINGI(63);
+		shok::String SavegameToLoad; // 90
 
-		PADDINGI(200);
+		PADDINGI(47);
+		lua_State* MainmenuState; // 144
+		bool MainmenuInitialized; // just call to reinit instead of init, lua scripts are loaded from winmain
+		PADDINGI(4);
+		GGlue::CGluePropsMgr* GluePropsManager; // 150
+		PADDINGI(18);
+		AGameModeBase* GameModeBase; // 169
+		PADDINGI(1);
+		NextMode ToDo; // 171
+		PADDINGI(55);
 		GDB::CList GDB; // 227
 
 		static inline constexpr int vtp = 0x76293C;
@@ -122,9 +167,17 @@ namespace Framework {
 		void SaveGDB();
 
 		static inline Framework::CMain** const GlobalObj = reinterpret_cast<Framework::CMain**>(0x84EF60);
+
+		static void HookModeChange();
+		static void (*OnModeChange)(NextMode mode);
 	};
 	static_assert(offsetof(Framework::CMain, CurrentMode) == 3 * 4);
-	//constexpr int i = offsetof(Framework::CMain, CurrentMode) / 4;
+	static_assert(offsetof(Framework::CMain, GDB) == 227 * 4);
+	static_assert(offsetof(Framework::CMain, ToDo) == 171 * 4);
+	static_assert(offsetof(Framework::CMain, GameModeBase) == 169 * 4);
+	static_assert(offsetof(Framework::CMain, SavegameToLoad) == 90 * 4);
+	static_assert(offsetof(Framework::CMain, GluePropsManager) == 150 * 4);
+	//constexpr int i = offsetof(Framework::CMain, GluePropsManager) / 4;
 }
 
 

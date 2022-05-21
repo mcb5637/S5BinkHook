@@ -63,6 +63,18 @@ namespace shok {
 	void HookTextPrinting();
 }
 
+namespace EToolsManager {
+	class CSimpleTool {
+		virtual void getsecmemb() = delete;
+
+		void* Data; // GS3DTools::CAppCamera
+		unsigned int Ident; // 0xCA334412
+	public:
+		static inline constexpr unsigned int Identifier = 0x425576F4; // from CRwCameraHandler casttoident
+		static inline constexpr int vtp = 0x78061C;
+	};
+}
+
 namespace ERwTools {
 	class IRenderable {
 	public:
@@ -93,6 +105,193 @@ namespace ERwTools {
 		void SetPosition(const shok::Position& p, float z);
 	};
 
+	struct CameraInfo {
+		float LookAtX, LookAtY, LookAtZ;
+		float Distance;
+	};
+	class ICameraHandle {
+	public:
+		virtual void SetDirty() = 0;
+		virtual int GetUpsdateZMode() = 0;
+		virtual CameraInfo* GetCameraInfo() = 0;
+		virtual float GetZoomFactor() = 0;
+	private:
+		virtual void Noop() = 0;
+	public:
+		virtual void ScrollSetLookAt(float x, float y, bool uk) = 0;
+		virtual void SetScrollLookAtTime(float t) = 0;
+		virtual void ScrollGetLookAt(float* x, float* y) = 0;
+		virtual void ScrollSetSpeed(float sp) = 0;
+		virtual void SetScrollLeft(int flag) = 0;
+		virtual void SetScrollRight(int flag) = 0;
+		virtual void SetScrollUp(int flag) = 0;
+		virtual void SetScrollDown(int flag) = 0;
+		virtual void SetScrollBorderFlag(int flag) = 0;
+		virtual void SetScrollMouseMode(int flag) = 0;
+		virtual void GetScrollMouseMode() = 0;
+		virtual void GetScrollBorderFlag() = 0;
+		virtual void SetUpdateZMode(int mode) = 0; // >= 0 && < 4
+		virtual void GetUpdateZMode() = 0;
+		virtual void SetLookAtZ(float z) = 0;
+		virtual void SetScrollSpeedZ(float a) = 0;
+		virtual void SetScrollZUp(int flag) = 0;
+		virtual void SetScrollZDown(int flag) = 0;
+		virtual void ScrollGameTimeSynced(int currentTurn, float x, float y) = 0;
+		virtual void FlyToLookAt(int currentTurn, float x, float y, float time) = 0;
+		virtual void SetZoomSpeed(float s) = 0;
+		virtual void SetZoomFactor(float f) = 0;
+		virtual void SetZoomFactorMin(float f) = 0;
+		virtual void SetZoomFactorMax(float f) = 0;
+		virtual void SetFOV(float fov) = 0;
+		virtual void SetVerticalAngle(float a) = 0;
+		virtual void SetCameraDistance(float d) = 0;
+		virtual void SetZoomIn(int flag) = 0;
+		virtual void SetZoomOut(int flag) = 0;
+		virtual void ScrollWheelZoom(int dir) = 0;
+		virtual void ZoomSetAngleGameTimeSynced(int currentTurn, float z) = 0;
+		virtual void ZoomSetDistanceGameTimeSynced(int currentTurn, float d) = 0;
+		virtual float GetVerticalAngle() = 0;
+		virtual float GetLookAtZ() = 0;
+		virtual void ZoomSetAngleFlight(int currentTurn, float angle, float time) = 0;
+		virtual void ZoomSetDistanceFlight(int currentTurn, float distance, float time) = 0;
+		virtual void SetRotationSpeed(float speed) = 0;
+		virtual void SetRotMaxAngle(float a) = 0;
+		virtual void SetRotFlipBack(int flag) = 0;
+		virtual void SetRotFlipBackSpeed(float speed) = 0;
+		virtual void SetHorizontalAngle(float a) = 0;
+		virtual float GetHorizontalAngle() = 0;
+		virtual void SetRotClockwise(int flag) = 0;
+		virtual void SetRotCounterClockwise(int flag) = 0;
+		virtual void SetRotDefaultAngle(float a) = 0;
+		virtual void RotGameTimeSynced(int currentTurn, float rot) = 0;
+		virtual void RotFlight(int currentTurn, float rot, float time) = 0;
+	private:
+		virtual void set49() = 0;
+		virtual void set50() = 0;
+		virtual void set51() = 0;
+		virtual void set52() = 0;
+	public:
+		virtual void SetEntityIDToFollow(int id) = 0;
+		virtual void SetControlMode(int mode) = 0;
+		virtual void GetScreenCoord(float x, float y, float z, float* xout, float* yout) = 0;
+	private:
+		virtual void get46() = 0;
+	public:
+		virtual void InitCameraFlight() = 0;
+		// get something from lookatxelem, then 2 file funcs
+
+
+
+		static inline constexpr unsigned int Identifier = 0xCB15D84;
+	};
+	class ICameraMovement {
+	private:
+		virtual void uk2() = 0;
+	public:
+		static inline constexpr unsigned int Identifier = 0x3D8FC4E4;
+	};
+	class ICameraSettings {
+	public:
+		virtual void CS_SetVerticalAngle(float a) = 0;
+		virtual void CS_SetFOV(float fov) = 0;
+	private:
+		virtual void setsomepos() = 0;
+	public:
+		virtual void CS_SetRotMaxAngle(float a) = 0;
+	private:
+		virtual void nop() = 0;
+	public:
+		virtual void SetUpLimit(float upLowLimit, float upHighLimit) = 0;
+		virtual void ResetFOV() = 0;
+
+
+		static inline constexpr unsigned int Identifier = 0x758445A4;
+	};
+	class CRwCameraHandler : public BB::IObject, public ICameraHandle, public ICameraMovement, public ICameraSettings {
+	public:
+		bool Dirty; // 4
+		int UpdateZMode; // >= 0 && < 4
+		bool bScrolling;
+		float FOV;
+		CameraInfo CameraInfo; // 8
+		float HorizontalAngle; // 12
+		float VerticalAngle;
+		float ZoomFactor;
+		float ZoomFactorMin;
+		float ZoomFactorMax;
+		float SpeedZ;
+		float UpLowLimit;
+		float UpHighLimit;
+		double LastRealTime; // 20
+		double GameTurnDuration;
+		int LastGameTurn;
+		bool bRotFlipBack;
+		float RotDir;
+		float RotSpeed;
+		float RotFlipBackSpeed;
+		float RotMaxAngle;
+		float RotDefaultAngle; // 30
+		float ScrollSpeed;
+		float ScrollSpeedX;
+		float ScrollSpeedY;
+		float ScrollTargetX;
+		float ScrollTargetY;
+		float ScrollLookAtTime;
+		float ScrollXDir;
+		float ScrollYDir;
+		float ScrollZDir;
+		bool ScrollBorderFlag; // 40
+		float ScrollSpeedZ;
+		int ScrollMouseMode;
+		float ZoomDir;
+		float ZoomSpeed;
+		float ZoomWheelFactor; // 45
+		PADDINGI(7);
+		EToolsManager::CSimpleTool SimpleTool; // 53
+		int EntityIDToFollow;
+		int ScrollGTSLastGameTurn;
+		float ScrollGTSLastLookAtX;
+		float ScrollGTSLastLookAtY;
+		int ScrollGTSTargetGameTurn; // 60
+		float ScrollGTSTargetLookAtX;
+		float ScrollGTSTargetLookAtY;
+		int ZoomAngleGTSLastGameTurn;
+		float ZoomAngleGTSLastAngle;
+		int ZoomAngleGTSTargetGameTurn;
+		float ZoomAngleGTSTargetAngle;
+		int ZoomDistanceGTSLastGameTurn;
+		float ZoomDistanceGTSLastDistance;
+		int ZoomDistanceGTSTargetGameTurn;
+		float ZoomDistanceGTSTargetDistance; // 70
+		int RotateGTSLastGameTurn;
+		float RotateGTSLastAngle;
+		int RotateGTSTargetGameTurn;
+		float RotateGTSTargetAngle;
+		int ControlMode;
+		struct {
+			struct {
+				struct Data
+				{
+					float Time, Data;
+				};
+
+				shok::Set<Data> LookAtXElement;
+				shok::Set<Data> LookAtYElement;
+				shok::Set<Data> ZoomAngleElement;
+				shok::Set<Data> ZoomDistanceElement;
+				shok::Set<Data> AngleElement;
+			} Handler;
+		} Flight;
+		PADDINGI(1);
+
+	public:
+		static inline constexpr int vtp = 0x77AD98;
+		static inline constexpr unsigned int Identifier = 0x45CAFEB1;
+
+		static inline ICameraHandle** const GlobalObj = reinterpret_cast<ICameraHandle**>(0x87EC68);
+	};
+	static_assert(sizeof(CRwCameraHandler) == 92*4);
+	constexpr int i = offsetof(CRwCameraHandler, CameraInfo.LookAtZ) / 4;
 }
 
 namespace EGL {

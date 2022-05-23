@@ -289,6 +289,8 @@ namespace ERwTools {
 		static inline constexpr unsigned int Identifier = 0x45CAFEB1;
 
 		static inline ICameraHandle** const GlobalObj = reinterpret_cast<ICameraHandle**>(0x87EC68);
+		static inline float* const CutsceneFarClipPlaneMax = reinterpret_cast<float*>(0x77A7E8);
+		static inline float* const CutsceneFarClipPlaneMin = reinterpret_cast<float*>(0x77A7F0);
 	};
 	static_assert(sizeof(CRwCameraHandler) == 92*4);
 	constexpr int i = offsetof(CRwCameraHandler, CameraInfo.LookAtZ) / 4;

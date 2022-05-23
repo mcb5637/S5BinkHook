@@ -2135,6 +2135,15 @@ function CppLogic.UI.CreateMiniMapMarker(p, pulsing, r, g, b, timefactor, scalef
 -- @param scalefactor number multiplied with scale (optional, default 1)
 function CppLogic.UI.CreateMiniMapScriptSignal(p, pulsing, r, g, b, timefactor, scalefactor) end
 
+--- gets the far clip plane min and max that are used in cutscenes. similar to Display.SetFarClipPlaneMinAndMax.
+-- @return max
+-- @return min
+function CppLogic.UI.GetCutsceneFarClipPlaneMinAndMax() end
+--- gets the far clip plane min and max that are used in cutscenes. similar to Display.SetFarClipPlaneMinAndMax.
+-- @param max
+-- @param min
+function CppLogic.UI.SetCutsceneFarClipPlaneMinAndMax(max, min) end
+
 --- gets the main windows client size.
 -- == GUI.GetScreenSize(), but available in main menu.
 -- @return right

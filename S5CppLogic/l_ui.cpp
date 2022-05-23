@@ -876,6 +876,23 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int GetCutsceneFarClipPlaneMinAndMax(lua::State L) {
+		L.Push(*ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMax);
+		L.Push(*ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMin);
+		return 2;
+	}
+	int SetCutsceneFarClipPlaneMinAndMax(lua::State L) {
+		float max = L.CheckFloat(1);
+		float min = L.CheckFloat(2);
+		if (max < min)
+			throw lua::LuaException("max < min");
+		CppLogic::Hooks::SaveVirtualProtect vp{ ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMax ,4 };
+		*ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMax = max;
+		CppLogic::Hooks::SaveVirtualProtect vp2{ ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMin ,4 };
+		*ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMin = min;
+		return 0;
+	}
+
 	int SetGUIStateLuaSelection(lua::State ls) {
 		luaext::EState L{ ls };
 		L.CheckType(1, lua::LType::Function);
@@ -1004,7 +1021,7 @@ namespace CppLogic::UI {
 		}
 	}
 
-	constexpr std::array<lua::FuncReference, 53> UI{ {
+	constexpr std::array<lua::FuncReference, 55> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1058,6 +1075,8 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<ShowCommandAcknowledgementAtPosition>("ShowCommandAcknowledgementAtPosition"),
 		lua::FuncReference::GetRef<CreateMiniMapMarker>("CreateMiniMapMarker"),
 		lua::FuncReference::GetRef<CreateMiniMapScriptSignal>("CreateMiniMapScriptSignal"),
+		lua::FuncReference::GetRef<GetCutsceneFarClipPlaneMinAndMax>("GetCutsceneFarClipPlaneMinAndMax"),
+		lua::FuncReference::GetRef<SetCutsceneFarClipPlaneMinAndMax>("SetCutsceneFarClipPlaneMinAndMax"),
 	} };
 
 	void Init(lua::State L)

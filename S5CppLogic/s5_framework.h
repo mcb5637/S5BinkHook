@@ -3,6 +3,7 @@
 #include "s5_baseDefs.h"
 #include "s5_sound.h"
 #include "s5_glue.h"
+#include "s5_scriptsystem.h"
 
 namespace ECore {
 	class IReplayStreamExtension {
@@ -25,12 +26,13 @@ namespace Framework {
 	struct MapInfo {
 		shok::String NameKey, DescKey, Name, Desc;
 		int SizeX, SizeY;
-		byte MPFlag;
+		bool MPFlag; // 30
 		PADDING(3);
 		int MPPlayerCount;
 		int MPGameOptionFlagSet;
 		shok::String MiniMapTextureName;
-		PADDINGI(1); // 1?
+		bool IsExternalmap; // ? 40
+		PADDING(3);
 		shok::Vector<int> Keys;
 		struct {
 			shok::String Data;
@@ -38,6 +40,7 @@ namespace Framework {
 		shok::String MapFileName, MapFilePath;
 	};
 	static_assert(sizeof(Framework::MapInfo) == 66 * 4);
+	//constexpr int i = offsetof(MapInfo, unknown) / 4;
 
 	struct CampagnInfo {
 		shok::Vector<Framework::MapInfo> Maps;
@@ -102,15 +105,41 @@ namespace GDB {
 }
 
 namespace Framework {
+	struct GameModeStartMapData {
+		int zero;
+		CLuaDebuggerPort* LuaDebuggerPort;
+		int* ptoone;
+		GS3DTools::CMapData* MapToLoad;
+		int* ptozero;
+		const char* Folder;
+	};
+
 	class AGameModeBase : public BB::IPostEvent {
 	public:
 		virtual ~AGameModeBase() = default;
 		// 2 more pure virt funcs
 
+		lua_State* IngameLuaState;
+		PADDINGI(1424);
+		bool IsExternalMap;
+
 		static inline constexpr int vtp = 0x76307C;
+
+		bool AddArchiveIfExternalmap(GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path);
+		void RemoveArchiveIfExternalmap();
+
+		static void (*PreStartMap)(lua_State* ingame, const char* name, const char* path, bool externalmap);
+		static void HookStartMap();
+		static bool DoNotRemoveNextArchive;
+		static void HookRemoveArchive();
+		static void (*PreLoadSave)(lua_State* ingame, GameModeStartMapData* data, bool externalmap);
+		static void HookLoadSave();
 	};
+	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);
+	//constexpr int i = offsetof(AGameModeBase, IsExternalMap);
 	class CSinglePlayerMode : public AGameModeBase {
 	public:
+
 		static inline constexpr int vtp = 0x7632C8;
 	};
 	class CMultiPlayerMode : public AGameModeBase {
@@ -148,16 +177,24 @@ namespace Framework {
 		PADDINGI(63);
 		shok::String SavegameToLoad; // 90
 
-		PADDINGI(47);
+		PADDINGI(46);
+		CLuaDebuggerPort* LuaDebuggerPort;
 		lua_State* MainmenuState; // 144
 		bool MainmenuInitialized; // just call to reinit instead of init, lua scripts are loaded from winmain
-		PADDINGI(4);
+		PADDINGI(3);
+	private:
+		int one;
+	public:
 		GGlue::CGluePropsMgr* GluePropsManager; // 150
 		PADDINGI(18);
 		AGameModeBase* GameModeBase; // 169
 		PADDINGI(1);
 		NextMode ToDo; // 171
-		PADDINGI(55);
+		PADDINGI(2);
+	private:
+		int CampagnInfoHandler;
+	public:
+		PADDINGI(52);
 		GDB::CList GDB; // 227
 
 		static inline constexpr int vtp = 0x76293C;

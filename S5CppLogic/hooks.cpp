@@ -50,6 +50,30 @@ void CppLogic::Hooks::WriteNops(void* adr, int num)
 		a[i] = 0x90;
 }
 
+std::vector<void*> CppLogic::Hooks::CheckMemFree::ToFree{};
+void __stdcall CppLogic::Hooks::CheckMemFree::OnFree(void* p)
+{
+	ToFree.erase(std::remove(ToFree.begin(), ToFree.end(), p), ToFree.end());
+}
+void __declspec(naked) checkfreemem_freeasm() {
+	__asm {
+		mov eax, [esp + 4];
+		push eax;
+		call CppLogic::Hooks::CheckMemFree::OnFree;
+
+		push 0xC;
+		push 0x788F48;
+
+		push 0x5C2E34;
+		ret;
+	};
+}
+void CppLogic::Hooks::CheckMemFree::EnableHook()
+{
+	SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5C2E2D), 10 };
+	WriteJump(reinterpret_cast<void*>(0x5C2E2D), &checkfreemem_freeasm);
+}
+
 
 bool CppLogic::HasSCELoader()
 {

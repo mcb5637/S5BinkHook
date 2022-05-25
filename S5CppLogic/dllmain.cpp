@@ -19,6 +19,8 @@
 #include "s5_filesystem.h"
 #include "s5_exception.h"
 #include "s5_widget.h"
+#include "s5_framework.h"
+#include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
 #include "luaext.h"
@@ -33,7 +35,6 @@
 #include "l_ua.h"
 #include "l_ui.h"
 #include "luaserializer.h"
-#include "s5_framework.h"
 
 struct CppLogicOptions {
     bool DoNotLoad = false;
@@ -62,13 +63,13 @@ int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<BB::SerializationData*>(0x87F6D8));
-    shok::Position p = L.CheckPos(1);
-    GGUI::MiniMapMarkerHandler* h = GGUI::MiniMapMarkerHandler::GlobalObj();
-    h->CreateMarker(p, true, 255, 0, 255, 10, 1);
+    
     return 0;
 }
 
 int Cleanup(lua::State L) {
+    if (!CppLogic::HasSCELoader())
+        CppLogic::ModLoader::ModLoader::Cleanup(L);
     CppLogic::Effect::Cleanup(L);
     CppLogic::Combat::Cleanup(L);
     CppLogic::Entity::Cleanup(L);
@@ -89,6 +90,8 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 void InitGame() {
     Framework::CMain::HookModeChange();
     Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
+    /*if (!CppLogic::HasSCELoader())
+        CppLogic::ModLoader::ModLoader::Initialize();*/
     if (!Options.DoNotUseCenterFix)
         shok::HookTextPrinting();
     CppLogic::Logic::OnLoad();

@@ -219,6 +219,9 @@
     <ClInclude Include="s5_glue.h">
       <Filter>shok\globals</Filter>
     </ClInclude>
+    <ClInclude Include="modloader.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -345,6 +348,9 @@
       <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="hooks.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="modloader.cpp">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>

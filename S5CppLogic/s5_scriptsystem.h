@@ -22,6 +22,9 @@ namespace EScr {
 		static inline EScr::CScriptTriggerSystem** const GlobalObj = reinterpret_cast<EScr::CScriptTriggerSystem**>(0x895DEC);
 		static inline lua_State** const GameState = reinterpret_cast<lua_State**>(0x853A9C);
 
+		// loads and executes a file from the internal filesystem. also passes it to the luadebugger.
+		static inline void(__stdcall* const LoadFileToLuaState)(lua_State* L, const char* name) = reinterpret_cast<void(__stdcall*) (lua_State*, const char*)> (0x59C04D);
+
 		static void HookRemoveFuncOverrides();
 	};
 
@@ -52,4 +55,17 @@ namespace EScr {
 		static inline constexpr int TypeDesc = 0x83B83C;
 	};
 	static_assert(sizeof(EScr::CLuaFuncRefCommand) == 12 * 4);
+
+	class ILuaDebugger {
+		// no vtable
+	public:
+		virtual void __stdcall NewFile(lua_State* L, const char* filename, const char* filedata, size_t dataLength) = 0;
+		virtual void __stdcall AddLuaState(lua_State* L) = 0;
+		virtual void __stdcall RemoveLuaState(lua_State* L) = 0;
+	};
 }
+
+class CLuaDebuggerPort : public EScr::ILuaDebugger {
+public:
+	static inline constexpr int vtp = 0x76233C;
+};

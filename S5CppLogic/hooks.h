@@ -1,5 +1,6 @@
 #pragma once
 #include "s5_forwardDecls.h"
+#include <vector>
 
 namespace CppLogic::Hooks {
 	void RedirectCall(void* call, void* redirect);
@@ -20,6 +21,15 @@ namespace CppLogic::Hooks {
 		void* Adr;
 		size_t Size;
 		unsigned long Prev;
+	};
+
+
+	class CheckMemFree {
+	public:
+		static std::vector<void*> ToFree;
+
+		static void __stdcall OnFree(void* p);
+		static void EnableHook();
 	};
 }
 

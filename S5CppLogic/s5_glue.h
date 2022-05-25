@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_entitytype.h"
 
 namespace GGlue {
 	class IAnimsPropsMgr {
@@ -51,8 +52,12 @@ namespace GGlue {
 		BB::CIDManagerEx* UpgradeCategoryManager; // 10
 		BB::CIDManagerEx* BlessCategoryManager;
 		BB::CIDManagerEx* BuildingBannerStatusManager;
-		// 2 more idmanager, then EGL::CGLEEntitiesProps embedded?
-
+	private:
+		BB::CIDManagerEx* unknown2;
+		BB::CIDManagerEx* unknown3;
+		void* CIDGroupsEx; // BB::CIDGroupsEx buildingbanner stuff
+	public:
+		EGL::CGLEEntitiesProps CGLEEntitiesProps;
 
 		static inline constexpr int vtp = 0x7887B4;
 	};

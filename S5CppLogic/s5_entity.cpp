@@ -726,8 +726,8 @@ void GGL::CBuilding::EnableConstructionSpeedTechs()
 	if (EnableConstructionSpeedTechs_Hooked)
 		return;
 	EnableConstructionSpeedTechs_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 0x4B8EB2 - 0x4B8EAD };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook, reinterpret_cast<void*>(0x4B8EB2));
 }
 
 
@@ -779,8 +779,8 @@ void EGL::CGLEEntity::ActivateEntityChangePlayerFix()
 	if (ActivateEntityChangePlayerFix_Hooked)
 		return;
 	ActivateEntityChangePlayerFix_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ EGL::CGLEEntity::EntityIDChangePlayer, 10 };
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityIDChangePlayer, &fixedChangePlayer);
+	CppLogic::Hooks::SaveVirtualProtect vp{ EGL::CGLEEntity::EntityIDChangePlayer, 0x49A6AC - 0x49A6A7 };
+	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityIDChangePlayer, &fixedChangePlayer, reinterpret_cast<void*>(0x49A6AC));
 }
 
 void (*EGL::CGLEEntity::Hero6ConvertHookCb)(int id, int pl, int nid, int converter) = nullptr;
@@ -814,8 +814,8 @@ void EGL::CGLEEntity::HookResetCamo()
 	if (HookResetCamo_Hooked)
 		return;
 	HookResetCamo_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5011DF), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5011DF), &camo_behaviorReset);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5011DF), 0x5011E6 - 0x5011DF };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5011DF), &camo_behaviorReset, reinterpret_cast<void*>(0x5011E6));
 }
 
 static inline int(__thiscall* const activateCamoOrig)(GGL::CCamouflageBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CCamouflageBehavior*)>(0x501561);
@@ -991,31 +991,35 @@ void EGL::CGLEEntity::HookHurtEntity()
 	if (HookHurtEntity_Hooked)
 		return;
 	if (CppLogic::HasSCELoader())
-		DEBUGGER_BREAK;
+		throw std::logic_error("hook hurt entity does not work with SCELoader");
 	HookHurtEntity_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ EGL::CGLEEntity::EntityHurtEntity, 10 };
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityHurtEntity, &hurtentity_override);
-	CppLogic::Hooks::SaveVirtualProtect vp2{ EGL::CGLEEntity::EntityDealAoEDamage, 10 };
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityDealAoEDamage, &hurtaoe_override);
-	CppLogic::Hooks::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x5113C2), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage);
-	CppLogic::Hooks::SaveVirtualProtect vp4{ reinterpret_cast<void*>(0x4DBA20), 10 }; // projectile creator bigger zero for AdvancedDamageSourceOverride
-	*reinterpret_cast<byte*>(0x4DBA20) = 0x89;
-	CppLogic::Hooks::SaveVirtualProtect vp5{ reinterpret_cast<void*>(0x511634), 20 }; // arrow projcetile AdvancedDamageSourceOverride
-	*reinterpret_cast<byte*>(0x511634) = 0x8B;
-	*reinterpret_cast<byte*>(0x511637) = 0x89;
-	CppLogic::Hooks::SaveVirtualProtect vp6{ reinterpret_cast<void*>(0x50CA59), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50CA59), &meleeonhit_damage);
-	CppLogic::Hooks::SaveVirtualProtect vp7{ reinterpret_cast<void*>(0x4FE722), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FE722), &circularatt_damage);
-	CppLogic::Hooks::SaveVirtualProtect vp8{ reinterpret_cast<void*>(0x4FF4EB), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF4EB), &cannonballhit_damage);
-	CppLogic::Hooks::SaveVirtualProtect vp9{ reinterpret_cast<void*>(0x506B28), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x506B28), &bombexplode_damage);
-	CppLogic::Hooks::SaveVirtualProtect vp10{ reinterpret_cast<void*>(0x4F1E77), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		EGL::CGLEEntity::EntityHurtEntity,
+		EGL::CGLEEntity::EntityDealAoEDamage,
+		reinterpret_cast<void*>(0x5113C2),
+		reinterpret_cast<void*>(0x4DBA20),
+		reinterpret_cast<void*>(0x511634),
+		reinterpret_cast<void*>(0x50CA59),
+		reinterpret_cast<void*>(0x4FE722),
+		reinterpret_cast<void*>(0x4FF4EB),
+		reinterpret_cast<void*>(0x506B28),
+		reinterpret_cast<void*>(0x4F1E77),
+		reinterpret_cast<void*>(0x4DC6D9)
+	} };
+	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityHurtEntity, &hurtentity_override, reinterpret_cast<void*>(0x49F35D));
+	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityDealAoEDamage, &hurtaoe_override, reinterpret_cast<void*>(0x49F82F));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage, reinterpret_cast<void*>(0x5113CF));
+	// projectile creator bigger zero for AdvancedDamageSourceOverride
+	*reinterpret_cast<byte*>(0x4DBA20) = 0x89; // mov [esi+0x44], al -> mov [esi+0x44], eax
+	// arrow projcetile AdvancedDamageSourceOverride
+	*reinterpret_cast<byte*>(0x511634) = 0x8B; // mov al, [edi+0x44] -> mov eax, [edi+0x44]
+	*reinterpret_cast<byte*>(0x511637) = 0x89; // mov [esi+0xC8], al -> mov [esi+0xC8], eax
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50CA59), &meleeonhit_damage, reinterpret_cast<void*>(0x50CA6D));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FE722), &circularatt_damage, reinterpret_cast<void*>(0x4FE72F));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF4EB), &cannonballhit_damage, reinterpret_cast<void*>(0x4FF51B));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x506B28), &bombexplode_damage, reinterpret_cast<void*>(0x506B3F));
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F1E77), &kegdealdmgproxy);
-	CppLogic::Hooks::SaveVirtualProtect vp11{ reinterpret_cast<void*>(0x4DC6D9), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DC6D9), &shurikenthrow);
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DC6D9), &shurikenthrow, reinterpret_cast<void*>(0x4DC6E2));
 
 	HookDamageMod(); // set projectile player field in creator
 	GGL::CBombPlacerBehavior::FixBombAttachment();
@@ -1335,14 +1339,16 @@ void EGL::CGLEEntity::HookMaxHP()
 	if (HookMaxHP_Hooked)
 		return;
 	if (CppLogic::HasSCELoader())
-		DEBUGGER_BREAK;
+		throw std::logic_error{ "does not work with SCELoader" };
 	HookMaxHP_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57B798), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x4BDED8), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x571B93), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57B798), &hookGetMaxHP);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4BDED8), &hookgetmaxhpui);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp);
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x16, {
+		reinterpret_cast<void*>(0x57B798),
+		reinterpret_cast<void*>(0x4BDED8),
+		reinterpret_cast<void*>(0x571B93)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57B798), &hookGetMaxHP, reinterpret_cast<void*>(0x57B7AD));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4BDED8), &hookgetmaxhpui, reinterpret_cast<void*>(0x4BDEE0));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp, reinterpret_cast<void*>(0x571B98));
 }
 
 int (*EGL::CGLEEntity::LuaTaskListCallback)(EGL::CGLEEntity* e, int val) = nullptr;
@@ -1433,8 +1439,8 @@ void EGL::CGLEEntity::HookNonCancelableAnim()
 	if (HookNonCancelableAnim_Hooked)
 		return;
 	HookNonCancelableAnim_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x588408), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x588408), &entity_hooknoncancelanim_asm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x588408), 0x588410 - 0x588408 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x588408), &entity_hooknoncancelanim_asm, reinterpret_cast<void*>(0x588410));
 }
 
 void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBehaviorDefaultMovement*, shok::Position*)>(0x586894);
@@ -1471,8 +1477,8 @@ void EGL::CGLEEntity::HookBuildOnSetPos()
 	if (HookBuildOnSetPos_Hooked)
 		return;
 	HookBuildOnSetPos_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4ADB16), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4ADB16), &entity_buildonsetpos_asm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4ADB16), 0x4ADB76 - 0x4ADB16 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4ADB16), &entity_buildonsetpos_asm, reinterpret_cast<void*>(0x4ADB76));
 }
 
 void __declspec(naked) HookSetTaskListNonCancelable_asm() {
@@ -1496,17 +1502,22 @@ void __declspec(naked) HookSetTaskListNonCancelable_asm() {
 	};
 }
 long long HookSetTaskListNonCancelable_backup = 0;
+bool HookSetTaskListNonCancelable_Active = false;
+byte HookSetTaskListNonCancelable_Backup[0x57B229 - 0x57B223 + 1]{};
 void EGL::CGLEEntity::HookSetTaskListNonCancelable(bool active)
 {
-	CppLogic::Hooks::SaveVirtualProtect vp{ (void*)0x57B223, 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57B223), 0x57B229 - 0x57B223 };
 	if (active) {
-		if (!HookSetTaskListNonCancelable_backup)
-			HookSetTaskListNonCancelable_backup = CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57B223), &HookSetTaskListNonCancelable_asm);
+		if (!HookSetTaskListNonCancelable_Active) {
+			CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57B223), &HookSetTaskListNonCancelable_asm, reinterpret_cast<void*>(0x57B229), HookSetTaskListNonCancelable_Backup);
+			HookSetTaskListNonCancelable_Active = true;
+		}
 	}
 	else {
-		if (HookSetTaskListNonCancelable_backup)
-			*reinterpret_cast<long long*>(0x57B223) = HookSetTaskListNonCancelable_backup;
-		HookSetTaskListNonCancelable_backup = 0;
+		if (HookSetTaskListNonCancelable_Active) {
+			CppLogic::Hooks::RestoreJumpBackup(reinterpret_cast<void*>(0x57B223), HookSetTaskListNonCancelable_Backup);
+			HookSetTaskListNonCancelable_Active = false;
+		}
 	}
 }
 
@@ -1575,8 +1586,8 @@ void EGL::CGLEEntity::HookDestroyEntity()
 	if (HookDestroyEntity_Hooked)
 		return;
 	HookDestroyEntity_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57C94A), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57C94A), &destroyentityhook);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57C94A), 0x57C957 - 0x57C94A };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57C94A), &destroyentityhook, reinterpret_cast<void*>(0x57C957));
 }
 EGL::CGLEEntity::EntityAddonData* EGL::CGLEEntity::GetAdditionalData(bool create)
 {
@@ -1707,12 +1718,18 @@ void EGL::CGLEEntity::HookDamageMod()
 	if (HookDamageMod_Hooked)
 		return;
 	HookDamageMod_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x50C235), 0x51076C - 0x50C235 + 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C785), &entitydamagemodeventbattleasm);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C235), &entitydamagemodbattlecalcsingletargetdmgasm);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F5ED), &entitydamagemodeventautocannonasm);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C3E7), &entitydamagemodbattleprojectile);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x51076C), &entitydamagemodautocannonprojectileasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x50C785),
+		reinterpret_cast<void*>(0x50C235),
+		reinterpret_cast<void*>(0x50F5ED),
+		reinterpret_cast<void*>(0x50C3E7),
+		reinterpret_cast<void*>(0x51076C),
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C785), &entitydamagemodeventbattleasm, reinterpret_cast<void*>(0x50C793));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C235), &entitydamagemodbattlecalcsingletargetdmgasm, reinterpret_cast<void*>(0x50C23B));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F5ED), &entitydamagemodeventautocannonasm, reinterpret_cast<void*>(0x50F5FD));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C3E7), &entitydamagemodbattleprojectile, reinterpret_cast<void*>(0x50C3F7));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x51076C), &entitydamagemodautocannonprojectileasm, reinterpret_cast<void*>(0x510776));
 }
 
 int __fastcall entityarmormod(EGL::CGLEEntity* e) {
@@ -1760,10 +1777,12 @@ void EGL::CGLEEntity::HookArmorMod()
 	if (HookArmorMod_Hooked)
 		return;
 	HookArmorMod_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4A6B15), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x4AB160), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4A6B15), &entityarmormodsettlerasm);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4AB160), &entityarmormodbuildingrasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x4A6B15),
+		reinterpret_cast<void*>(0x4AB160)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4A6B15), &entityarmormodsettlerasm, reinterpret_cast<void*>(0x4A6B25));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4AB160), &entityarmormodbuildingrasm, reinterpret_cast<void*>(0x04AB170));
 }
 
 float __fastcall entityexplmod(EGL::CGLEEntity* e) {
@@ -1805,10 +1824,12 @@ void EGL::CGLEEntity::HookExplorationMod()
 	if (HookExplorationMod_Hooked)
 		return;
 	HookExplorationMod_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4A4AC3), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x4AB199), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4A4AC3), &entityexplmodsettasm);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4AB199), &entityexplmodbuildasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x4A4AC3),
+		reinterpret_cast<void*>(0x4AB199)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4A4AC3), &entityexplmodsettasm, reinterpret_cast<void*>(0x4A4AD4));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4AB199), &entityexplmodbuildasm, reinterpret_cast<void*>(0x4AB1A4));
 }
 
 int GGL::CSettler::LeaderGetRegenHealth()
@@ -1891,10 +1912,12 @@ void EGL::CGLEEntity::HookLeaderRegen()
 	if (HookLeaderRegen_Hooked)
 		return;
 	HookLeaderRegen_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4EAE92), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x4EFC29), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EAE92), &leaderregen);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EFC29), &leaderregensecondsasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x4EAE92),
+		reinterpret_cast<void*>(0x4EFC29)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EAE92), &leaderregen, reinterpret_cast<void*>(0x4EAE9B));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EFC29), &leaderregensecondsasm, reinterpret_cast<void*>(0x4EFC42));
 }
 
 float __fastcall leadermaxrange(GGL::CBattleBehavior* th) {
@@ -1945,10 +1968,12 @@ void EGL::CGLEEntity::HookMaxRange()
 	if (HookMaxRange_Hooked)
 		return;
 	HookMaxRange_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x50AB48), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x50F50D), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50AB48), &leadermaxrangeasm);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F50D), &autocannonmaxrangeasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x50AB48),
+		reinterpret_cast<void*>(0x50F50D)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50AB48), &leadermaxrangeasm, reinterpret_cast<void*>(0x50AB50));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F50D), &autocannonmaxrangeasm, reinterpret_cast<void*>(0x50F515));
 }
 
 const char* __stdcall entitydisplayname(int* e, int type) {
@@ -1993,8 +2018,8 @@ void EGL::CGLEEntity::HookDisplayName()
 	if (HookDisplayName_Hooked)
 		return;
 	HookDisplayName_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x53F911), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x53F911), &entitydisplaynameasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x53F911), 0x53F91D - 0x53F911 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x53F911), &entitydisplaynameasm, reinterpret_cast<void*>(0x53F91D));
 }
 
 void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {

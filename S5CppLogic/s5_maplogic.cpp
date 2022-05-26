@@ -248,11 +248,11 @@ void EGL::CGLETerrainLowRes::EnableHiResBridgeHeight()
 		return;
 	EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
-	*reinterpret_cast<float(__fastcall**)(ED::CLandscape*, int, float, float)>(0x76A410) = &shok_ED_CLandscape_overridegetwaterheightatpos;
 	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc);
 	CppLogic::Hooks::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight);
+	*reinterpret_cast<float(__fastcall**)(ED::CLandscape*, int, float, float)>(0x76A410) = &shok_ED_CLandscape_overridegetwaterheightatpos;
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc, reinterpret_cast<void*>(0x47D30A));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight, reinterpret_cast<void*>(0x503C58));
 }
 
 void EGL::CGLETerrainLowRes::CheckBridgeHeightSize()

@@ -16,5 +16,6 @@
 #include <string>
 #include <functional>
 #include <numbers>
+#include <stdexcept>
 
 #endif //PCH_H

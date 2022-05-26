@@ -88,15 +88,17 @@ void GGUI::CPlaceBuildingState::HookPlacementRotation()
 	if (HookConstructCommandRotation_Hooked)
 		return;
 	HookConstructCommandRotation_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x538FF4), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding);
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x5389FB), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition);
-	CppLogic::Hooks::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x538B01), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot);
-	CppLogic::Hooks::SaveVirtualProtect vp4{ reinterpret_cast<void*>(0x538BDB), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538BDB), &constructcommand_checkpos);
-	CppLogic::Hooks::SaveVirtualProtect vp5{ reinterpret_cast<void*>(0x538C8D), 10 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x538FF4),
+		reinterpret_cast<void*>(0x5389FB),
+		reinterpret_cast<void*>(0x538B01),
+		reinterpret_cast<void*>(0x538BDB),
+		reinterpret_cast<void*>(0x538C8D)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538FF4), &constructcommand_placebuilding, reinterpret_cast<void*>(0x538FFC));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5389FB), &constructcommand_checkposition, reinterpret_cast<void*>(0x538A02));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538B01), &constructcommand_setmodelrot, reinterpret_cast<void*>(0x538B0A));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x538BDB), &constructcommand_checkpos, reinterpret_cast<void*>(0x538C0E));
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x538C8D), &constructcommand_updatemodelsetpos_over);
 }
 

@@ -49,8 +49,8 @@ void shok::HookGetStringTableText()
 	if (CppLogic::HasSCELoader())
 		throw 0;
 	HookGetStringTableText_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ shok::GetStringTableText , 10 };
-	CppLogic::Hooks::WriteJump(shok::GetStringTableText, &hooksttasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ shok::GetStringTableText , 0x20 };
+	CppLogic::Hooks::WriteJump(shok::GetStringTableText, &hooksttasm, reinterpret_cast<void*>(0x556D33));
 }
 
 static inline void(__thiscall* const uirender_rtext)(shok::UIRenderer* r, const char* txt, int font, float uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* ccc, float ldf) =
@@ -610,10 +610,10 @@ void shok::HookTextPrinting()
 	if (HookTextPrinting_Hooked)
 		return;
 	HookTextPrinting_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5577E1), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x708F00), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5577E1), &printstr_override);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x708F00), &printstr_getlength_override);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5577E1), 0x20 };
+	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x708F00), 0x20 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5577E1), &printstr_override, reinterpret_cast<void*>(0x5577EB));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x708F00), &printstr_getlength_override, reinterpret_cast<void*>(0x708F0E));
 }
 
 

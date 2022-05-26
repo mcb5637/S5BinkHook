@@ -75,8 +75,8 @@ void GGL::CBombPlacerBehavior::FixBombAttachment()
 	if (FixBombAttachment_Hooked)
 		return;
 	FixBombAttachment_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5062C6), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5062C6), 0x5062CD - 0x5062C6 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix, reinterpret_cast<void*>(0x5062CD));
 }
 
 static inline void(__thiscall* const summonbeh_eventdie)(GGL::CSummonBehavior* th, BB::CEvent* ev) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, BB::CEvent*)>(0x4D6F25);
@@ -156,8 +156,8 @@ void GGL::CSniperAbility::OverrideSnipeTask()
 	if (OverrideSnipeTask_Hooked)
 		return;
 	OverrideSnipeTask_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 0x4DB5BD - 0x4DB5B8 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DB5B8), &sniperability_tasksnipeoverride, reinterpret_cast<void*>(0x4DB5BD));
 }
 
 static inline float(__thiscall* const battleBehaviorGetMaxRange)(GGL::CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(GGL::CBattleBehavior*)>(0x50AB43);

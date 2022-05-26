@@ -80,8 +80,8 @@ void GGL::CCannonBallEffect::HookFromCreator()
 	if (HookFromCreator_Hooked)
 		return;
 	HookFromCreator_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm);
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FF942), 0x4FF951 - 0x4FF942 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm, reinterpret_cast<void*>(0x4FF951));
 }
 
 EGL::CFlyingEffect* EGL::CFlyingEffect::CurrentHittingEffect = nullptr;

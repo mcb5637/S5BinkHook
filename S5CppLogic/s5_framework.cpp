@@ -99,9 +99,11 @@ void Framework::AGameModeBase::HookRemoveArchive()
     if (HookRemoveArchive_Hooked)
         return;
     HookRemoveArchive_Hooked = true;
-    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40F8CD), 10 };
+    CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+        reinterpret_cast<void*>(0x40F8CD),
+        reinterpret_cast<void*>(0x40F604)
+    } };
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F8CD), &gamemodebase_removearchiveifexternalmap_override);
-    CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x40F604), 10 };
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F604), &gamemodebase_removearchiveifexternalmap_override);
 }
 
@@ -131,8 +133,8 @@ void Framework::AGameModeBase::HookLoadSave()
     if (HookLoadSave_Hooked)
         return;
     HookLoadSave_Hooked = true;
-    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40FB6E), 10 };
-    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40FB6E), &gamemodebase_onloadsave_asm);
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40FB6E), 0x40FB76 - 0x40FB6E };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40FB6E), &gamemodebase_onloadsave_asm, reinterpret_cast<void*>(0x40FB76));
 }
 
 Framework::CampagnInfo* Framework::CMain::GetCampagnInfo(int i, const char* n)
@@ -204,6 +206,6 @@ void Framework::CMain::HookModeChange()
     if (HookModeChange_Hooked)
         return;
     HookModeChange_Hooked = true;
-    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40B3BE), 10 };
-    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40B3BE), &cmain_checktodo_hooked);
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40B3BE), 0x40B3C7 - 0x40B3BE };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40B3BE), &cmain_checktodo_hooked, reinterpret_cast<void*>(0x40B3C7));
 }

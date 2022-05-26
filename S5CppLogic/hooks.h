@@ -4,10 +4,11 @@
 
 namespace CppLogic::Hooks {
 	void RedirectCall(void* call, void* redirect);
-	void RedirectCallVP(void* call, void* redirect);
-	long long WriteJump(void* adr, void* toJump);
-	static_assert(sizeof(long long) == 8);
+	void WriteJump(void* adr, void* toJump, void* nextvalid);
+	void WriteJump(void* adr, void* toJump, void* nextvalid, byte* backup);
+	void RestoreJumpBackup(void* adr, byte* backup);
 	void WriteNops(void* adr, int num);
+	void WriteNops(void* adr, void* nextvalid);
 
 
 	// allows read/write/execute of the memory location pointed to until it goes out of scope.
@@ -17,6 +18,7 @@ namespace CppLogic::Hooks {
 		SaveVirtualProtect();
 		SaveVirtualProtect(void* adr, size_t size);
 		~SaveVirtualProtect();
+		SaveVirtualProtect(size_t size, std::initializer_list<void*> adrs);
 	private:
 		void* Adr;
 		size_t Size;

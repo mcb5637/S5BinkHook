@@ -161,8 +161,8 @@ void EGUIX::CButtonHelper::HookShortcutComparison()
     if (shortcutcmo_hooked)
         return;
     shortcutcmo_hooked = true;
-    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 10 };
-    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm);
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55A597), 0x30 };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm, reinterpret_cast<void*>(0x55A5A5));
 }
 
 unsigned int __stdcall EGUIX::CToolTipHelper::GetClassIdentifier() const
@@ -516,7 +516,7 @@ void EGUIX::HookUIInput()
         return;
     HookUIInput_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
-    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm);
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm, reinterpret_cast<void*>(0x407456));
 }
 
 void(__thiscall* const shok_feedbackEventHandler_fireevent)(EGUIX::FeedbackEventHandler* th, BB::CEvent* e) = reinterpret_cast<void(__thiscall*)(EGUIX::FeedbackEventHandler*, BB::CEvent*)>(0x582EB2);

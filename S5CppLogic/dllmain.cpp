@@ -63,7 +63,7 @@ int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<BB::SerializationData*>(0x87F6D8));
-    
+    EGUIX::HookUIInput();
     return 0;
 }
 

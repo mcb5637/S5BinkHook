@@ -110,6 +110,135 @@ void CppLogic::Serializer::LuaSerializer::Serialize(lua::State L, BB::IObject* o
 	Serialize(L, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
 }
 
+void CppLogic::Serializer::LuaSerializer::DeserializeField(lua::State L, void* o, const BB::SerializationData* s, bool valuepushed)
+{
+	switch (s->Type) {
+	case 2:
+		if (!valuepushed) {
+			L.Push(s->SerializationName);
+			L.GetTableRaw(-2);
+		}
+
+		if (!L.IsNil(-1))
+			DeserializeCheckField(L, o, s);
+
+		if (!valuepushed)
+			L.Pop(1);
+		break;
+	case 3:
+		if (!valuepushed) {
+			L.Push(s->SerializationName);
+			L.GetTableRaw(-2);
+		}
+
+		if (!L.IsNil(-1))
+			DeserializeFields(L, o, s->SubElementData);
+
+		if (!valuepushed)
+			L.Pop(1);
+		break;
+	case 6:
+		o = *static_cast<void**>(o);
+	case 5:
+	{
+		if (!valuepushed) {
+			L.Push(s->SerializationName);
+			L.GetTableRaw(-2);
+		}
+
+		const BB::SerializationData* os = nullptr;
+		unsigned int id = 0;
+		if (s->GetIdentifier) {
+			id = s->GetIdentifier(o);
+			os = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+		}
+		else {
+			os = s->SubElementData;
+		}
+
+		if (os)
+			Deserialize(L, o, os, id);
+
+		if (!valuepushed)
+			L.Pop(1);
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void CppLogic::Serializer::LuaSerializer::DeserializeCheckField(lua::State L, void* o, const BB::SerializationData* s)
+{
+	s->DataConverter->GetExtendedInfo().Check(L, o, -1, s->DataConverter);
+}
+
+void CppLogic::Serializer::LuaSerializer::DeserializeFields(lua::State L, void* o, const BB::SerializationData* s)
+{
+	while (s->Size) {
+		if (s->SerializationName) {
+			void* data = reinterpret_cast<void*>(reinterpret_cast<int>(o) + static_cast<int>(s->Position));
+			if (s->ListOptions)
+				DeserializeList(L, data, s);
+			else
+				DeserializeField(L, data, s);
+		}
+		else if (s->SubElementData) {
+			DeserializeFields(L, o, s->SubElementData);
+		}
+		s++;
+	}
+}
+
+void CppLogic::Serializer::LuaSerializer::DeserializeList(lua::State L, void* o, const BB::SerializationData* s)
+{
+	L.Push(s->SerializationName);
+	L.GetTableRaw(-2);
+
+	if (L.IsTable(-1)) {
+		for (int k : L.IPairs(-1)) {
+			void* d = s->ListOptions->AddToList(o);
+			DeserializeField(L, d, s, true);
+		}
+	}
+
+	L.Pop(1);
+}
+
+void CppLogic::Serializer::LuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, unsigned int id)
+{
+	if (o == nullptr) {
+		if (id == 0) {
+			L.Push("ObjectClassIdentification");
+			L.GetTableRaw(-2);
+			if (!L.IsNil(-1))
+				id = static_cast<unsigned int>(L.CheckNumber(-1));
+			L.Pop(1);
+			if (id == 0) {
+				L.Push("ObjectClassName");
+				L.GetTableRaw(-2);
+				if (!L.IsNil(-1))
+					id = (*BB::CClassFactory::GlobalObj)->GetIdentifierByName(L.CheckString(-1));
+				L.Pop(1);
+			}
+		}
+		if (id == 0)
+			throw std::invalid_argument{ "no object and no id provided" };
+		o = (*BB::CClassFactory::GlobalObj)->CreateObject(id);
+		if (o == nullptr)
+			throw std::invalid_argument{ "invalid id provided" };
+		if (seri == nullptr) {
+			seri = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+		}
+	}
+	DeserializeFields(L, o, seri);
+}
+void CppLogic::Serializer::LuaSerializer::Deserialize(lua::State L, BB::IObject* o)
+{
+	unsigned int id = o->GetClassIdentifier();
+	Deserialize(L, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
+}
+
 void CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(lua::State L, const BB::SerializationData* d)
 {
 	if (!d) {

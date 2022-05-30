@@ -22,6 +22,7 @@
 #include "s5_tasklist.h"
 #include "luaext.h"
 #include "hooks.h"
+#include "luaserializer.h"
 
 namespace CppLogic::Logic {
 	int GetDamageFactor(lua::State ls) {
@@ -98,446 +99,32 @@ namespace CppLogic::Logic {
 	}
 
 
-	void NetPushEvent(luaext::EState L, BB::CEvent* ev) {
-		L.NewTable();
-		if (EGL::CNetEventEntityID* e = dynamic_cast<EGL::CNetEventEntityID*>(ev)) {
-			L.Push("EntityId");
-			L.Push(e->EntityId);
-			L.SetTableRaw(-3);
-			if (GGL::CNetEventCannonCreator* e = dynamic_cast<GGL::CNetEventCannonCreator*>(ev)) {
-				L.Push("BottomType");
-				L.Push(e->FoundationType);
-				L.SetTableRaw(-3);
-				L.Push("TopType");
-				L.Push(e->CannonType);
-				L.SetTableRaw(-3);
-				L.Push("Position");
-				L.PushPos(e->Position);
-				L.SetTableRaw(-3);
-				L.Push("Orientation");
-				L.Push(e->Orientation);
-				L.SetTableRaw(-3);
-			}
-			else if (GGL::CNetEventEntityIDAndUpgradeCategory* e = dynamic_cast<GGL::CNetEventEntityIDAndUpgradeCategory*>(ev)) {
-				L.Push("UpgradeCategory");
-				L.Push(e->UpgradeCategory);
-				L.SetTableRaw(-3);
-			}
-			else if (EGL::CNetEventEntityIDAndInteger* e = dynamic_cast<EGL::CNetEventEntityIDAndInteger*>(ev)) {
-				L.Push("Data");
-				L.Push(e->Data);
-				L.SetTableRaw(-3);
-			}
-			else if (GGL::CNetEventTechnologyAndEntityID* e = dynamic_cast<GGL::CNetEventTechnologyAndEntityID*>(ev)) {
-				L.Push("Technology");
-				L.Push(e->Technology);
-				L.SetTableRaw(-3);
-			}
-		}
-		else if (EGL::CNetEvent2Entities* e = dynamic_cast<EGL::CNetEvent2Entities*>(ev)) {
-			L.Push("ActorId");
-			L.Push(e->ActorId);
-			L.SetTableRaw(-3);
-			L.Push("TargetId");
-			L.Push(e->TargetId);
-			L.SetTableRaw(-3);
-		}
-		else if (EGL::CNetEventEntityAndPos* e = dynamic_cast<EGL::CNetEventEntityAndPos*>(ev)) {
-			L.Push("EntityId");
-			L.Push(e->EntityId);
-			L.SetTableRaw(-3);
-			L.Push("Position");
-			L.PushPos(e->Position);
-			L.SetTableRaw(-3);
-		}
-		else if (EGL::CNetEventEntityAndPosArray* e = dynamic_cast<EGL::CNetEventEntityAndPosArray*>(ev)) {
-			L.Push("EntityId");
-			L.Push(e->EntityId);
-			L.SetTableRaw(-3);
-			L.Push("Positions");
-			L.NewTable();
-			int i = 1;
-			for (shok::Position p : e->Positions) {
-				L.PushPos(p);
-				L.SetTableRaw(-2, i);
-				i++;
-			}
-			L.SetTableRaw(-3);
-			L.Push("Rotation");
-			L.Push(e->Rotation == -1.0f ? -1.0 : CppLogic::RadiansToDegrees<double>(e->Rotation));
-			L.SetTableRaw(-3);
-		}
-		else if (GGL::CNetEventExtractResource* e = dynamic_cast<GGL::CNetEventExtractResource*>(ev)) {
-			L.Push("EntityId");
-			L.Push(e->EntityId);
-			L.SetTableRaw(-3);
-			L.Push("ResourceType");
-			L.Push(static_cast<int>(e->ResourceType));
-			L.SetTableRaw(-3);
-			L.Push("Position");
-			L.PushPos(e->Position);
-			L.SetTableRaw(-3);
-		}
-		else if (GGL::CNetEventTransaction* e = dynamic_cast<GGL::CNetEventTransaction*>(ev)) {
-			L.Push("EntityId");
-			L.Push(e->EntityId);
-			L.SetTableRaw(-3);
-			L.Push("BuyType");
-			L.Push(static_cast<int>(e->BuyType));
-			L.SetTableRaw(-3);
-			L.Push("BuyAmount");
-			L.Push(e->BuyAmount);
-			L.SetTableRaw(-3);
-			L.Push("SellType");
-			L.Push(static_cast<int>(e->SellType));
-			L.SetTableRaw(-3);
-		}
-		else if (EGL::CNetEventPlayerID* e = dynamic_cast<EGL::CNetEventPlayerID*>(ev)) {
-			L.Push("PlayerId");
-			L.Push(e->PlayerId);
-			L.SetTableRaw(-3);
-			if (GGL::CNetEventBuildingCreator* e = dynamic_cast<GGL::CNetEventBuildingCreator*>(ev)) {
-				L.Push("UpgradeCategory");
-				L.Push(e->UpgradeCategory);
-				L.SetTableRaw(-3);
-				L.Push("Position");
-				L.PushPosRot(e->Position, true);
-				L.SetTableRaw(-3);
-				L.Push("Serfs");
-				L.NewTable();
-				int i = 1;
-				for (int s : e->Serfs) {
-					L.Push(s);
-					L.SetTableRaw(-2, i);
-					i++;
-				}
-				L.SetTableRaw(-3);
-			}
-			else if (EGL::CNetEventIntegerAndPlayerID* e = dynamic_cast<EGL::CNetEventIntegerAndPlayerID*>(ev)) {
-				L.Push("Data");
-				L.Push(e->Data);
-				L.SetTableRaw(-3);
-			}
-			else if (EGL::CNetEventPlayerIDAndInteger* e = dynamic_cast<EGL::CNetEventPlayerIDAndInteger*>(ev)) {
-				L.Push("Data");
-				L.Push(e->Data);
-				L.SetTableRaw(-3);
-			}
-			else if (EGL::CNetEventEntityIDAndPlayerID* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerID*>(ev)) {
-				L.Push("EntityId");
-				L.Push(e->EntityId);
-				L.SetTableRaw(-3);
-				if (EGL::CNetEventEntityIDAndPlayerIDAndEntityType* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerIDAndEntityType*>(ev)) {
-					L.Push("EntityType");
-					L.Push(e->EntityType);
-					L.SetTableRaw(-3);
-				}
-				else if (GGL::CNetEventEntityIDPlayerIDAndInteger* e = dynamic_cast<GGL::CNetEventEntityIDPlayerIDAndInteger*>(ev)) {
-					L.Push("Data");
-					L.Push(e->Data);
-					L.SetTableRaw(-3);
-				}
-			}
-		}
-		else if (Framework::CEventGameSpeed* e = dynamic_cast<Framework::CEventGameSpeed*>(ev)) {
-			L.Push("Speed");
-			L.Push(e->SpeedFactor);
-			L.SetTableRaw(-3);
-		}
-	}
-	bool NetReadEvent(luaext::EState L, BB::CEvent* ev) {
-		bool allRead = true;
-		if (EGL::CNetEventEntityID* e = dynamic_cast<EGL::CNetEventEntityID*>(ev)) {
-			L.Push("EntityId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->EntityId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			if (GGL::CNetEventCannonCreator* e = dynamic_cast<GGL::CNetEventCannonCreator*>(ev)) {
-				L.Push("BottomType");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->FoundationType = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-				L.Push("TopType");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->CannonType = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-				L.Push("Position");
-				L.GetTableRaw(-2);
-				if (L.IsTable(-1))
-					e->Position = L.CheckPos(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-				L.Push("Position");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->Orientation = L.CheckFloat(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-			}
-			else if (GGL::CNetEventEntityIDAndUpgradeCategory* e = dynamic_cast<GGL::CNetEventEntityIDAndUpgradeCategory*>(ev)) {
-				L.Push("UpgradeCategory");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->UpgradeCategory = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-			}
-			else if (EGL::CNetEventEntityIDAndInteger* e = dynamic_cast<EGL::CNetEventEntityIDAndInteger*>(ev)) {
-				L.Push("Data");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->Data = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-			}
-			else if (GGL::CNetEventTechnologyAndEntityID* e = dynamic_cast<GGL::CNetEventTechnologyAndEntityID*>(ev)) {
-				L.Push("Technology");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->Technology = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-			}
-		}
-		else if (EGL::CNetEvent2Entities* e = dynamic_cast<EGL::CNetEvent2Entities*>(ev)) {
-			L.Push("ActorId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->ActorId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("TargetId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->TargetId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-		}
-		else if (EGL::CNetEventEntityAndPos* e = dynamic_cast<EGL::CNetEventEntityAndPos*>(ev)) {
-			L.Push("EntityId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->EntityId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push( "Position");
-			L.GetTableRaw(-2);
-			if (L.IsTable(-1))
-				e->Position = L.CheckPos(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-		}
-		else if (EGL::CNetEventEntityAndPosArray* e = dynamic_cast<EGL::CNetEventEntityAndPosArray*>(ev)) {
-			L.Push("EntityId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->EntityId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("Positions");
-			L.GetTableRaw(-2);
-			if (L.IsTable(-1)) {
-				int i = 1;
-				auto v = e->Positions.SaveVector();
-				shok::Position p{};
-				v.Vector.clear();
-				while (true) {
-					L.GetTableRaw(-1, i);
-					if (!L.IsTable(-1)) {
-						L.Pop(1);
-						break;
-					}
-					p = L.CheckPos(-1);
-					L.Pop(1);
-					v.Vector.push_back(p);
-					i++;
-				}
-			}
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("Rotation");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1)) {
-				e->Rotation = L.CheckFloat(-1);
-				if (e->Rotation != -1.0f) {
-					e->Rotation = static_cast<float>(CppLogic::DegreesToRadians<double>(e->Rotation));
-				}
-			}
-			else
-				allRead = false;
-			L.Pop(1);
-		}
-		else if (GGL::CNetEventExtractResource* e = dynamic_cast<GGL::CNetEventExtractResource*>(ev)) {
-			L.Push("EntityId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->EntityId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("ResourceType");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->ResourceType = L.CheckResourceType(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("Position");
-			L.GetTableRaw(-2);
-			if (L.IsTable(-1))
-				e->Position = L.CheckPos(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-		}
-		else if (GGL::CNetEventTransaction* e = dynamic_cast<GGL::CNetEventTransaction*>(ev)) {
-			L.Push("EntityId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->EntityId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("BuyType");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->BuyType = L.CheckResourceType(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("BuyAmount");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->BuyAmount = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			L.Push("SellType");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->SellType = L.CheckResourceType(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-		}
-		else if (EGL::CNetEventPlayerID* e = dynamic_cast<EGL::CNetEventPlayerID*>(ev)) {
-			L.Push("PlayerId");
-			L.GetTableRaw(-2);
-			if (L.IsNumber(-1))
-				e->PlayerId = L.CheckInt(-1);
-			else
-				allRead = false;
-			L.Pop(1);
-			if (GGL::CNetEventBuildingCreator* e = dynamic_cast<GGL::CNetEventBuildingCreator*>(ev)) {
-				L.Push("UpgradeCategory");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->UpgradeCategory = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-				L.Push( "Position");
-				L.GetTableRaw(-2);
-				if (L.IsTable(-1))
-					e->Position = L.CheckPosRot(-1, true);
-				else
-					allRead = false;
-				L.Pop(1);
-				L.Push("Serfs");
-				L.GetTableRaw(-2);
-				if (L.IsTable(-1)) {
-					int i = 1;
-					auto v = e->Serfs.SaveVector();
-					v.Vector.clear();
-					while (true) {
-						L.GetTableRaw(-1, i);
-						if (!L.IsNumber(-1)) {
-							L.Pop(1);
-							break;
-						}
-						v.Vector.push_back(L.CheckInt(-1));
-						L.Pop(1);
-						i++;
-					}
-				}
-				else
-					allRead = false;
-				L.Pop(1);
-			}
-			else if (EGL::CNetEventIntegerAndPlayerID* e = dynamic_cast<EGL::CNetEventIntegerAndPlayerID*>(ev)) {
-				L.Push("Data");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->Data = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-			}
-			else if (EGL::CNetEventPlayerIDAndInteger* e = dynamic_cast<EGL::CNetEventPlayerIDAndInteger*>(ev)) {
-				L.Push("Data");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->Data = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-			}
-			else if (EGL::CNetEventEntityIDAndPlayerID* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerID*>(ev)) {
-				L.Push("EntityId");
-				L.GetTableRaw(-2);
-				if (L.IsNumber(-1))
-					e->EntityId = L.CheckInt(-1);
-				else
-					allRead = false;
-				L.Pop(1);
-				if (EGL::CNetEventEntityIDAndPlayerIDAndEntityType* e = dynamic_cast<EGL::CNetEventEntityIDAndPlayerIDAndEntityType*>(ev)) {
-					L.Push("EntityType");
-					L.GetTableRaw(-2);
-					if (L.IsNumber(-1))
-						e->EntityType = L.CheckInt(-1);
-					else
-						allRead = false;
-					L.Pop(1);
-				}
-				else if (GGL::CNetEventEntityIDPlayerIDAndInteger* e = dynamic_cast<GGL::CNetEventEntityIDPlayerIDAndInteger*>(ev)) {
-					L.Push("Data");
-					L.GetTableRaw(-2);
-					if (L.IsNumber(-1))
-						e->Data = L.CheckInt(-1);
-					else
-						allRead = false;
-					L.Pop(1);
-				}
-			}
-		}
-		// read back speed change?
-		return allRead;
-	}
-
 	int NetEventReadBack(lua::State L) {
 		BB::CEvent* ev = static_cast<BB::CEvent*>(L.ToUserdata(L.Upvalueindex(1)));
-		L.Push(NetReadEvent(L, ev));
-		return 1;
+		L.PushValue(1);
+		L.Push("EventType");
+		L.Push();
+		L.SetTableRaw(-3);
+		if (EGL::CNetEventEntityAndPosArray* e = dynamic_cast<EGL::CNetEventEntityAndPosArray*>(ev)) {
+			L.Push("Position");
+			L.GetTableRaw(-2);
+			if (!L.IsNil(-1)) {
+				auto v = e->Position.SaveVector();
+				v.Vector.clear();
+			}
+			L.Pop(1);
+		}
+		if (GGL::CNetEventBuildingCreator* e = dynamic_cast<GGL::CNetEventBuildingCreator*>(ev)) {
+			L.Push("Serf");
+			L.GetTableRaw(-2);
+			if (!L.IsNil(-1)) {
+				auto v = e->Serf.SaveVector();
+				v.Vector.clear();
+			}
+			L.Pop(1);
+		}
+		CppLogic::Serializer::LuaSerializer::Deserialize(L, ev);
+		return 0;
 	}
 
 	int NetEventSetHook(lua::State L) {
@@ -555,7 +142,7 @@ namespace CppLogic::Logic {
 			bool r = false;
 			if (L.IsFunction(-1)) {
 				L.Push(id);
-				NetPushEvent(L, ev);
+				CppLogic::Serializer::LuaSerializer::Serialize(L, ev);
 				L.PushLightUserdata(ev);
 				L.Push<NetEventReadBack>(1);
 				L.PCall(3, 1, 0);

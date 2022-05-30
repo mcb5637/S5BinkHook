@@ -5,78 +5,79 @@
 EGL::CNetEvent2Entities::CNetEvent2Entities(shok::NetEventIds id, int actor, int tar) : BB::CEvent(id)
 {
 	SetVT(EGL::CNetEvent2Entities::vtp);
-	ActorId = actor;
-	TargetId = tar;
+	EntityID1 = actor;
+	EntityID2 = tar;
 }
 
 EGL::CNetEventEntityAndPos::CNetEventEntityAndPos(shok::NetEventIds id, int ent, const shok::Position& pos) : BB::CEvent(id)
 {
 	SetVT(EGL::CNetEventEntityAndPos::vtp);
-	EntityId = ent;
-	Position = pos;
+	EntityID = ent;
+	X = pos.X;
+	Y = pos.Y;
 }
 
 EGL::CNetEventEntityAndPosArray::CNetEventEntityAndPosArray(shok::NetEventIds id, int ent, float r) : BB::CEvent(id)
 {
 	SetVT(EGL::CNetEventEntityAndPosArray::vtp);
-	EntityId = ent;
-	Rotation = r;
+	EntityID = ent;
+	Orientation = r;
 }
 
 EGL::CNetEventEntityID::CNetEventEntityID(shok::NetEventIds id, int ent) : BB::CEvent(id)
 {
 	SetVT(EGL::CNetEventEntityID::vtp);
-	EntityId = ent;
+	EntityID = ent;
 }
 EGL::CNetEventEntityID::CNetEventEntityID(shok::FeedbackEventIds id, int ent) : BB::CEvent(id)
 {
 	SetVT(EGL::CNetEventEntityID::vtp);
-	EntityId = ent;
+	EntityID = ent;
 }
 
 EGL::CNetEventEntityIDAndInteger::CNetEventEntityIDAndInteger(shok::NetEventIds id, int ent, int d) : EGL::CNetEventEntityID(id, ent)
 {
 	SetVT(EGL::CNetEventEntityIDAndInteger::vtp);
-	Data = d;
+	Value = d;
 }
 EGL::CNetEventEntityIDAndInteger::CNetEventEntityIDAndInteger(shok::FeedbackEventIds id, int ent, int d) : EGL::CNetEventEntityID(id, ent)
 {
 	SetVT(EGL::CNetEventEntityIDAndInteger::vtp);
-	Data = d;
+	Value = d;
 }
 
 EGL::CNetEventPlayerID::CNetEventPlayerID(shok::NetEventIds id, int pl) : BB::CEvent(id)
 {
 	SetVT(EGL::CNetEventPlayerID::vtp);
-	PlayerId = pl;
+	PlayerID = pl;
 }
 EGL::CNetEventPlayerID::CNetEventPlayerID(shok::FeedbackEventIds id, int pl) : BB::CEvent(id)
 {
 	SetVT(EGL::CNetEventPlayerID::vtp);
-	PlayerId = pl;
+	PlayerID = pl;
 }
 
 EGL::CNetEventIntegerAndPlayerID::CNetEventIntegerAndPlayerID(shok::NetEventIds id, int pl, int d) : EGL::CNetEventPlayerID(id, pl)
 {
 	SetVT(EGL::CNetEventIntegerAndPlayerID::vtp);
-	Data = d;
+	Value = d;
 }
 
 EGL::CNetEventPlayerIDAndInteger::CNetEventPlayerIDAndInteger(shok::NetEventIds id, int pl, int d) : EGL::CNetEventPlayerID(id, pl)
 {
 	SetVT(EGL::CNetEventPlayerIDAndInteger::vtp);
-	Data = d;
+	Value = d;
 }
 
 EGL::CNetEventEntityIDAndPlayerID::CNetEventEntityIDAndPlayerID(shok::NetEventIds id, int pl, int e) : EGL::CNetEventPlayerID(id, pl)
 {
 	SetVT(EGL::CNetEventEntityIDAndPlayerID::vtp);
-	EntityId = e;
+	EntityID = e;
 }
 EGL::CNetEventEntityIDAndPlayerID::CNetEventEntityIDAndPlayerID(shok::FeedbackEventIds id, int pl, int e) : EGL::CNetEventPlayerID(id, pl)
 {
 	SetVT(EGL::CNetEventEntityIDAndPlayerID::vtp);
-	EntityId = e;
+	EntityID = e;
 }
 
 EGL::CNetEventEntityIDAndPlayerIDAndEntityType::CNetEventEntityIDAndPlayerIDAndEntityType(shok::NetEventIds id, int pl, int e, int ety) : EGL::CNetEventEntityIDAndPlayerID(id, pl, e)
@@ -90,7 +91,7 @@ EGL::CNetEventEntityIDAndPlayerIDAndEntityType::CNetEventEntityIDAndPlayerIDAndE
 GGL::CNetEventExtractResource::CNetEventExtractResource(shok::NetEventIds id, int ent, shok::ResourceType resty, const shok::Position& pos) : BB::CEvent(id)
 {
 	SetVT(GGL::CNetEventExtractResource::vtp);
-	EntityId = ent;
+	SerfID = ent;
 	ResourceType = resty;
 	Position = pos;
 }
@@ -98,9 +99,9 @@ GGL::CNetEventExtractResource::CNetEventExtractResource(shok::NetEventIds id, in
 GGL::CNetEventTransaction::CNetEventTransaction(shok::NetEventIds id, int ent, shok::ResourceType sell, shok::ResourceType buy, int buyam) : BB::CEvent(id)
 {
 	SetVT(GGL::CNetEventTransaction::vtp);
-	EntityId = ent;
-	SellType = sell;
-	BuyType = buy;
+	MarketID = ent;
+	SellResource = sell;
+	BuyResource = buy;
 	BuyAmount = buyam;
 }
 
@@ -122,20 +123,21 @@ GGL::CNetEventEntityIDAndUpgradeCategory::CNetEventEntityIDAndUpgradeCategory(sh
 GGL::CNetEventTechnologyAndEntityID::CNetEventTechnologyAndEntityID(shok::NetEventIds id, int ent, int tech) : EGL::CNetEventEntityID(id, ent)
 {
 	SetVT(GGL::CNetEventTechnologyAndEntityID::vtp);
-	Technology = tech;
+	TechnologyType = tech;
 }
 
-GGL::CNetEventBuildingCreator::CNetEventBuildingCreator(shok::NetEventIds id, int pl, int ucat, const shok::PositionRot& p) : EGL::CNetEventPlayerID(id, pl)
+GGL::CNetEventBuildingCreator::CNetEventBuildingCreator(shok::NetEventIds id, int pl, int ety, const shok::PositionRot& p) : EGL::CNetEventPlayerID(id, pl)
 {
 	SetVT(GGL::CNetEventBuildingCreator::vtp);
-	UpgradeCategory = ucat;
-	Position = p;
+	EntityType = ety;
+	Position = { p.X, p.Y };
+	Orientation = p.r;
 }
 
 GGL::CNetEventEntityIDPlayerIDAndInteger::CNetEventEntityIDPlayerIDAndInteger(shok::NetEventIds id, int pl, int e, int d) : EGL::CNetEventEntityIDAndPlayerID(id, pl, e)
 {
 	SetVT(GGL::CNetEventEntityIDPlayerIDAndInteger::vtp);
-	Data = d;
+	Value = d;
 }
 
 GGL::CFeedbackEventBattling::CFeedbackEventBattling(shok::FeedbackEventIds id, int eid, int p, const shok::Position& pos, int tp) : EGL::CNetEventEntityIDAndPlayerID(id, p, eid)

@@ -55,6 +55,9 @@ BB::FieldSerilaizer::ExtendedInfo InfoModel{ "shok::ModelID", &PushInt, &CheckIn
 BB::FieldSerilaizer::ExtendedInfo InfoAnim{ "shok::AnimID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoDamageClass{ "shok::DamageClass", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoEffectType{ "shok::EffectType", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategory", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyID", &PushInt, &CheckInt };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -112,6 +115,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x800108, &InfoInt},
     {0x8231C4, &InfoInt},
     {0x82BB60, &InfoInt},
+    {0x812688, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
@@ -119,14 +123,19 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x86057C, &InfoAnim},
     {0x860558, &InfoDamageClass},
     {0x8605A0, &InfoEffectType},
+    {0x860510, &InfoResourceType},
+    {0x86414C, &InfoUpgradeCategory},
+    {0x85D560, &InfoTechnologyID},
 
     {0x810CD8, &InfoUInt},
 
     {0x810C78, &InfoFloat},
     {0x8231A4, &InfoFloat},
     {0x82BB14, &InfoFloat},
+    {0x812668, &InfoFloat},
 
     {0x82BB38, &InfoDouble},
+    {0x8000E0, &InfoDouble},
 
     {0x8640F0, &InfoString},
     {0x894954, &InfoString},

@@ -6,7 +6,7 @@
 namespace EGL {
 	class CNetEvent2Entities : public BB::CEvent {
 	public:
-		int ActorId, TargetId;
+		int EntityID1, EntityID2;
 
 		CNetEvent2Entities(shok::NetEventIds id, int actor, int tar);
 		CNetEvent2Entities(CNetEvent2Entities&&) = default;
@@ -16,12 +16,13 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x76DD60;
 		static inline constexpr int TypeDesc = 0x80FF1C;
+		static inline constexpr unsigned int Identifier = 0x84A88A7D;
 	};
 
 	class CNetEventEntityAndPos : public BB::CEvent {
 	public:
-		int EntityId;
-		shok::Position Position;
+		int EntityID;
+		float X, Y;
 
 		CNetEventEntityAndPos(shok::NetEventIds id, int ent, const shok::Position& pos);
 		CNetEventEntityAndPos(CNetEventEntityAndPos&&) = default;
@@ -31,13 +32,14 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x76DD50;
 		static inline constexpr int TypeDesc = 0x80FEF4;
+		static inline constexpr unsigned int Identifier = 0x573B9A0;
 	};
 
 	class CNetEventEntityAndPosArray : public BB::CEvent {
 	public:
-		int EntityId;
-		shok::Vector<shok::Position> Positions;
-		float Rotation;
+		int EntityID;
+		shok::Vector<shok::Position> Position;
+		float Orientation;
 
 		EGL::CNetEventEntityAndPosArray(shok::NetEventIds id, int ent, float r);
 		EGL::CNetEventEntityAndPosArray(const EGL::CNetEventEntityAndPosArray&) = default;
@@ -45,11 +47,12 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x770704;
 		static inline constexpr int TypeDesc = 0x8125EC;
+		static inline constexpr unsigned int Identifier = 0x4CD042B7;
 	};
 
 	class CNetEventEntityID : public BB::CEvent {
 	public:
-		int EntityId;
+		int EntityID;
 
 		CNetEventEntityID(shok::NetEventIds id, int ent);
 		CNetEventEntityID(shok::FeedbackEventIds id, int ent);
@@ -60,11 +63,12 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x766C28;
 		static inline constexpr int TypeDesc = 0x807924;
+		static inline constexpr unsigned int Identifier = 0x5D413628;
 	};
 
 	class CNetEventEntityIDAndInteger : public EGL::CNetEventEntityID {
 	public:
-		int Data;
+		int Value;
 
 		CNetEventEntityIDAndInteger(shok::NetEventIds id, int ent, int d);
 		CNetEventEntityIDAndInteger(shok::FeedbackEventIds id, int ent, int d);
@@ -75,11 +79,12 @@ namespace EGL {
 
 		static inline constexpr int TypeDesc = 0x807978;
 		static inline constexpr int vtp = 0x766C48;
+		static inline constexpr unsigned int Identifier = 0x8D682418;
 	};
 
 	class CNetEventPlayerID : public BB::CEvent {
 	public:
-		int PlayerId;
+		int PlayerID;
 
 		CNetEventPlayerID(shok::NetEventIds id, int pl);
 		CNetEventPlayerID(shok::FeedbackEventIds id, int pl);
@@ -90,11 +95,12 @@ namespace EGL {
 
 		static inline constexpr int TypeDesc = 0x807900;
 		static inline constexpr int vtp = 0x766C18;
+		static inline constexpr unsigned int Identifier = 0x59FA0FB7;
 	};
 
 	class CNetEventIntegerAndPlayerID : public EGL::CNetEventPlayerID {
 	public:
-		int Data;
+		int Value;
 
 		CNetEventIntegerAndPlayerID(shok::NetEventIds id, int pl, int d);
 		CNetEventIntegerAndPlayerID(CNetEventIntegerAndPlayerID&&) = default;
@@ -104,11 +110,12 @@ namespace EGL {
 
 		static inline constexpr int TypeDesc = 0x812404;
 		static inline constexpr int vtp = 0x7705BC;
+		static inline constexpr unsigned int Identifier = 0xB365483;
 	};
 
 	class CNetEventPlayerIDAndInteger : public EGL::CNetEventPlayerID {
 	public:
-		int Data;
+		int Value;
 
 		CNetEventPlayerIDAndInteger(shok::NetEventIds id, int pl, int d);
 		CNetEventPlayerIDAndInteger(CNetEventPlayerIDAndInteger&&) = default;
@@ -118,11 +125,12 @@ namespace EGL {
 
 		static inline constexpr int TypeDesc = 0x812434;
 		static inline constexpr int vtp = 0x7705CC;
+		static inline constexpr unsigned int Identifier = 0xAA030F86;
 	};
 
 	class CNetEventEntityIDAndPlayerID : public EGL::CNetEventPlayerID {
 	public:
-		int EntityId;
+		int EntityID;
 
 		CNetEventEntityIDAndPlayerID(shok::NetEventIds id, int pl, int e);
 		CNetEventEntityIDAndPlayerID(shok::FeedbackEventIds id, int pl, int e);
@@ -133,6 +141,7 @@ namespace EGL {
 
 		static inline constexpr int TypeDesc = 0x807948;
 		static inline constexpr int vtp = 0x766C38;
+		static inline constexpr unsigned int Identifier = 0xDD5C5BD7;
 	};
 
 	class CNetEventEntityIDAndPlayerIDAndEntityType : public EGL::CNetEventEntityIDAndPlayerID {
@@ -147,13 +156,14 @@ namespace EGL {
 
 		static inline constexpr int TypeDesc = 0x812340;
 		static inline constexpr int vtp = 0x77057C;
+		static inline constexpr unsigned int Identifier = 0xF1B577F8;
 	};
 }
 
 namespace GGL {
 	class CNetEventExtractResource : public BB::CEvent {
 	public:
-		int EntityId;
+		int SerfID;
 		shok::ResourceType ResourceType;
 		shok::Position Position;
 
@@ -165,12 +175,13 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77061C;
 		static inline constexpr int TypeDesc = 0x81252C;
+		static inline constexpr unsigned int Identifier = 0x315F6EB7;
 	};
 
 	class CNetEventTransaction : public BB::CEvent {
 	public:
-		int EntityId;
-		shok::ResourceType SellType, BuyType;
+		int MarketID;
+		shok::ResourceType SellResource, BuyResource;
 		int BuyAmount;
 
 		CNetEventTransaction(shok::NetEventIds id, int ent, shok::ResourceType sell, shok::ResourceType buy, int buyam);
@@ -181,6 +192,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77062C;
 		static inline constexpr int TypeDesc = 0x812558;
+		static inline constexpr unsigned int Identifier = 0xF18688D7;
 	};
 
 	class CNetEventCannonCreator : public EGL::CNetEventEntityID {
@@ -197,6 +209,7 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x812494;
 		static inline constexpr int vtp = 0x7705EC;
+		static inline constexpr unsigned int Identifier = 0xA0E8444D;
 	};
 
 	class CNetEventEntityIDAndUpgradeCategory : public EGL::CNetEventEntityID {
@@ -211,11 +224,12 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x8124F4;
 		static inline constexpr int vtp = 0x77060C;
+		static inline constexpr unsigned int Identifier = 0xE0855817;
 	};
 
 	class CNetEventTechnologyAndEntityID : public EGL::CNetEventEntityID {
 	public:
-		int Technology;
+		int TechnologyType;
 
 		CNetEventTechnologyAndEntityID(shok::NetEventIds id, int ent, int tech);
 		CNetEventTechnologyAndEntityID(CNetEventTechnologyAndEntityID&&) = default;
@@ -225,15 +239,17 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x8124C0;
 		static inline constexpr int vtp = 0x7705FC;
+		static inline constexpr unsigned int Identifier = 0x70DF356;
 	};
 
 	class CNetEventBuildingCreator : public EGL::CNetEventPlayerID { // add at least one serf, or it crashes
 	public:
-		int UpgradeCategory;
-		shok::PositionRot Position;
-		shok::Vector<int> Serfs;
+		int EntityType; // this is a upgradecategory
+		shok::Position Position;
+		float Orientation;
+		shok::Vector<int> Serf;
 
-		CNetEventBuildingCreator(shok::NetEventIds id, int pl, int ucat, const shok::PositionRot& p);
+		CNetEventBuildingCreator(shok::NetEventIds id, int pl, int ety, const shok::PositionRot& p);
 		CNetEventBuildingCreator(CNetEventBuildingCreator&&) = default;
 		CNetEventBuildingCreator(const CNetEventBuildingCreator&) = default;
 		CNetEventBuildingCreator& operator=(CNetEventBuildingCreator&&) = default;
@@ -241,11 +257,12 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x81261C;
 		static inline constexpr int vtp = 0x770714;
+		static inline constexpr unsigned int Identifier = 0xF446A1A3;
 	};
 
 	class CNetEventEntityIDPlayerIDAndInteger : public EGL::CNetEventEntityIDAndPlayerID {
 	public:
-		int Data;
+		int Value;
 
 		CNetEventEntityIDPlayerIDAndInteger(shok::NetEventIds id, int pl, int e, int d);
 		CNetEventEntityIDPlayerIDAndInteger(CNetEventEntityIDPlayerIDAndInteger&&) = default;
@@ -255,6 +272,7 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x8125B4;
 		static inline constexpr int vtp = 0x77064C;
+		static inline constexpr unsigned int Identifier = 0x7766FA33;
 	};
 
 	class CFeedbackEventBattling : public EGL::CNetEventEntityIDAndPlayerID {
@@ -270,6 +288,7 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x80FFE4;
 		static inline constexpr int vtp = 0x76DDA0;
+		static inline constexpr unsigned int Identifier = 0xFA523F5E;
 	};
 
 	class CFeedbackEventResource : public EGL::CNetEventEntityIDAndPlayerID {
@@ -285,6 +304,7 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x81A3C4;
 		static inline constexpr int vtp = 0x774970;
+		static inline constexpr unsigned int Identifier = 0x4AFA2726;
 	};
 }
 
@@ -301,6 +321,7 @@ namespace Framework {
 
 		static inline constexpr int TypeDesc = 0x800078;
 		static inline constexpr int vtp = 0x762474;
+		static inline constexpr unsigned int Identifier = 0x3C68E6F3;
 	};
 }
 

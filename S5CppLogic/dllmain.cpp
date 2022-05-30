@@ -62,9 +62,8 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-    //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<BB::SerializationData*>(0x87F6D8));
-    EGUIX::HookUIInput();
-    return 0;
+    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x3C68E6F3);
+    return 1;
 }
 
 int Cleanup(lua::State L) {
@@ -90,8 +89,8 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 void InitGame() {
     Framework::CMain::HookModeChange();
     Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
-    /*if (!CppLogic::HasSCELoader())
-        CppLogic::ModLoader::ModLoader::Initialize();*/
+    if (!CppLogic::HasSCELoader())
+        CppLogic::ModLoader::ModLoader::Initialize();
     if (!Options.DoNotUseCenterFix)
         shok::HookTextPrinting();
     CppLogic::Logic::OnLoad();

@@ -1,6 +1,12 @@
 #include "pch.h"
 #include "s5_entitytype.h"
 
+GGlue::CGlueEntityProps::CGlueEntityProps() {
+	*reinterpret_cast<int*>(this) = vtp;
+	LogicProps = nullptr;
+	DisplayProps = nullptr;
+}
+
 bool GGlue::CGlueEntityProps::IsSettlerType() const
 {
 	return dynamic_cast<GGL::CGLSettlerProps*>(LogicProps);
@@ -22,6 +28,10 @@ bool GGlue::CGlueEntityProps::IsOfCategory(shok::EntityCategory cat) const
 		if (i == cat)
 			return true;
 	return false;
+}
+
+unsigned int __stdcall GGlue::CGlueEntityProps::GetClassIdentifier() const {
+	return Identifier;
 }
 
 GGlue::CGlueEntityProps* EGL::CGLEEntitiesProps::GetEntityType(int i)

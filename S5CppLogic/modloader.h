@@ -12,6 +12,14 @@ namespace CppLogic::ModLoader {
 		static void PreMapStart(lua_State* ingame, const char* name, const char* path, bool externalmap);
 		static void PreSaveLoad(lua_State* ingame, Framework::GameModeStartMapData* data, bool externalmap);
 		static void Log(lua::State L, const char* log);
+		static void AddLib(lua::State L);
+		static void RemoveLib(lua::State L);
+
+		static int AddEntityType(lua::State L);
+
+		static constexpr std::array<lua::FuncReference, 1> LuaFuncs{ {
+				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
+		} };
 
 	public:
 		static void Initialize();

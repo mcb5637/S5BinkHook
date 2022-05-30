@@ -57,9 +57,15 @@ namespace GGlue {
 		BB::CIDManagerEx* unknown3;
 		void* CIDGroupsEx; // BB::CIDGroupsEx buildingbanner stuff
 	public:
-		EGL::CGLEEntitiesProps CGLEEntitiesProps;
+		EGL::CGLEEntitiesProps CGLEEntitiesProps; // 16 (Logic from Entities.xml ? )
+		// Entities.xml Display ?
 
 		static inline constexpr int vtp = 0x7887B4;
+
+		void LoadEntityTypeByID(int id);
+		// remember to also free in idmanager, free last id first
+		void PopEntityType(int id);
+		void FreeEntityType(int id);
 	};
 
 

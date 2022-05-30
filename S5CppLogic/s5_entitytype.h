@@ -228,7 +228,9 @@ namespace GGlue {
 
 		static inline constexpr int vtp = 0x788824;
 		static inline constexpr int TypeDesc = 0x83C8CC;
+		static inline constexpr unsigned int Identifier = 0xD397707;
 
+		CGlueEntityProps();
 
 		template<typename T>
 		T* GetBehaviorProps() {
@@ -244,6 +246,8 @@ namespace GGlue {
 		bool IsCEntityProperties() const;
 		bool IsOfCategory(shok::EntityCategory cat) const;
 
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+
 
 		static inline int* const EntityTypeIDSerf = reinterpret_cast<int*>(0x863830);
 	};
@@ -252,7 +256,7 @@ namespace GGlue {
 namespace EGL {
 	class CGLEEntitiesProps : public ECore::ICheckData {
 	public:
-		PADDINGI(1); // float 240
+		float DefaultWalkSpeed; // ?? loaded from Entities.xml
 		BB::CIDManagerEx* EntityTypeManager;
 		BB::CIDManagerEx* EntityCategoryManager;
 		BB::CIDManagerEx* UpgradeCategoryManager;

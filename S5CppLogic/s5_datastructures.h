@@ -172,6 +172,20 @@ namespace shok {
 			return Internal.data();
 		}
 
+#ifdef _DEBUG
+		Vector() = default;
+		Vector(Vector&& other) noexcept {
+			/// hacky move
+			std::memcpy(this, &other, sizeof(Vector));
+			std::memset(&other, 0, sizeof(Vector));
+		}
+		Vector(const Vector& other) : Vector() {
+			auto th = SaveVector();
+			auto oth = other.SaveVector();
+			th.Internal = oth.Internal;
+		}
+#endif
+
 		struct SaveVector_Data {
 #ifdef _DEBUG
 			std::vector<T, Allocator<T>> Vector{};

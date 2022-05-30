@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "modloader.h"
 #include "s5_filesystem.h"
+#include "s5_glue.h"
+#include "s5_entitytype.h"
+#include "s5_idmanager.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
@@ -13,6 +16,7 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, con
 	}
 	int t = L.GetTop();
 	EScr::CScriptTriggerSystem::LoadFileToLuaState(L.GetState(), mappath);
+	AddLib(L);
 	bool keeparchive = false;
 	L.Push("ModLoader");
 	L.GetTableRaw(L.GLOBALSINDEX);
@@ -35,6 +39,7 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, con
 			L.Pop(1);
 	}
 	Framework::AGameModeBase::DoNotRemoveNextArchive = keeparchive;
+	RemoveLib(L);
 	L.SetTop(t);
 	Log(L, "Done");
 }
@@ -66,6 +71,40 @@ void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::G
 	char mappath[bufflen];
 	snprintf(mappath, bufflen, "%s\\ModLoader.lua", externalmap ? "Maps\\ExternalMap" : internalmap_getpath(&sdata->CurrentSave->MapData));
 	Init(L, mappath, "LoadSave");
+}
+void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
+{
+	L.Push("CppLogic");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.Push("ModLoader");
+	L.NewTable();
+
+	L.RegisterFuncs(LuaFuncs, -3);
+
+	L.SetTableRaw(-3);
+	L.Pop(1);
+}
+void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
+{
+	L.Push("CppLogic");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.Push("ModLoader");
+	L.Push();
+	L.SetTableRaw(-3);
+	L.Pop(1);
+}
+
+int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	int id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->LoadEntityTypeByID(id);
+	L.Push("Entities");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	return 0;
 }
 
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)

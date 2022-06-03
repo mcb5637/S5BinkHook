@@ -231,6 +231,8 @@ namespace GGlue {
 		static inline constexpr unsigned int Identifier = 0xD397707;
 
 		CGlueEntityProps();
+		CGlueEntityProps(const CGlueEntityProps& o);
+		CGlueEntityProps(CGlueEntityProps&& o);
 
 		template<typename T>
 		T* GetBehaviorProps() {

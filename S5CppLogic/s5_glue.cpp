@@ -2,6 +2,71 @@
 #include "s5_glue.h"
 #include "s5_behaviorProps.h"
 #include "s5_entitydisplay.h"
+#include "s5_effecttype.h"
+#include "s5_idmanager.h"
+#include "s5_classfactory.h"
+#include "s5_filesystem.h"
+
+static inline void(__thiscall* effectlogic_init)(EGL::CGLEEffectProps* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEffectProps*)>(0x589297);
+void GGlue::CEffectsPropsMgr::LoadEffectTypeFromExtraFile(int id)
+{
+	if (id > static_cast<int>(EffectsProps.Effects.size()))
+		throw std::logic_error{ "somehow the id is too big" };
+	if (id == static_cast<int>(EffectsProps.Effects.size())) {
+		auto v = EffectsProps.Effects.SaveVector();
+		v.Vector.emplace_back();
+		auto vl = EffectsLogicProps.EffectTypes.SaveVector();
+		vl.Vector.push_back(nullptr);
+		auto vd = EffectsDisplayProps.EffectTypes.SaveVector();
+		vd.Vector.push_back(nullptr);
+	}
+	auto& t = EffectsProps.Effects[id];
+	std::string filename = "Data/Config/Effects/";
+	filename.append(EffectTypeManager->GetNameByID(id));
+	filename.append(".xml");
+	BB::CXmlSerializer* s = BB::CXmlSerializer::Create();
+	BB::CFileStreamEx filestr{};
+	if (filestr.OpenFile(filename.c_str(), 0x113)) {
+		s->DeserializeByData(&filestr, &t, t.SerializationData);
+		filestr.Close();
+	}
+	s->Destroy();
+	if (!t.Display || !t.Logic) {
+		FreeEffectType(id);
+		throw std::invalid_argument{ "invalid file" };
+	}
+	effectlogic_init(t.Logic);
+	EffectsLogicProps.EffectTypes[id] = t.Logic;
+	EffectsDisplayProps.EffectTypes[id] = t.Display;
+}
+void GGlue::CEffectsPropsMgr::FreeEffectType(int id)
+{
+	auto& t = EffectsProps.Effects[id];
+	delete t.Display;
+	delete t.Logic;
+	t.Display = nullptr;
+	t.Logic = nullptr;
+	EffectsLogicProps.EffectTypes[id] = nullptr;
+	EffectsDisplayProps.EffectTypes[id] = nullptr;
+}
+
+void GGlue::CEffectsPropsMgr::ReloadAllEffectTypes()
+{
+	for (unsigned int i = EffectsProps.Effects.size() - 1; i > 0; --i) {
+		FreeEffectType(i);
+		EffectTypeManager->RemoveID(i);
+	}
+	FreeEffectType(0); // there is no effect 0, just a placeholder. not sure if i need to remove it
+	{
+		auto v = EffectsProps.Effects.SaveVector();
+		v.Vector.clear();
+		auto vl = EffectsLogicProps.EffectTypes.SaveVector();
+		vl.Vector.clear();
+		auto vd = EffectsDisplayProps.EffectTypes.SaveVector();
+		vd.Vector.clear();
+	}
+	LoadData("Data\\Config\\Effects.xml");
+}
 
 static inline void(__thiscall* const epropsmng_loadentitytypebyid)(GGlue::CEntitiesPropsMgr* th, int id) = reinterpret_cast<void(__thiscall*)(GGlue::CEntitiesPropsMgr*, int)>(0x5B931B);
 void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(int id)
@@ -46,4 +111,6 @@ void GGlue::CEntitiesPropsMgr::FreeEntityType(int id)
 	delete e.DisplayProps;
 	e.LogicProps = nullptr;
 	e.DisplayProps = nullptr;
+	CGLEEntitiesProps.EntityTypesLogicProps[id] = nullptr;
+	CGLEEntitiesProps.EntityTypesDisplayProps[id] = nullptr;
 }

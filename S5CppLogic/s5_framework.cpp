@@ -57,6 +57,19 @@ unsigned int __stdcall GDB::CList::GetClassIdentifier() const
     return Identifier;
 }
 
+void __stdcall Framework::CEventTimeManager::PostEvent(BB::CEvent* ev)
+{
+    throw 0;
+}
+void __stdcall Framework::CCheckSumCalculator::PostEvent(BB::CEvent* ev)
+{
+    throw 0;
+}
+void __stdcall Framework::CEscapeEventHandler::PostEvent(BB::CEvent* ev)
+{
+    throw 0;
+}
+
 static inline bool(__thiscall* const gamemodebase_addarchiveifexternalmap)(Framework::AGameModeBase* th, Framework::GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path) = reinterpret_cast<bool(__thiscall*)(Framework::AGameModeBase*, Framework::GameModeStartMapData*, GS3DTools::CMapData*, const char*)>(0x40F109);
 bool Framework::AGameModeBase::AddArchiveIfExternalmap(GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path)
 {
@@ -135,6 +148,15 @@ void Framework::AGameModeBase::HookLoadSave()
     HookLoadSave_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40FB6E), 0x40FB76 - 0x40FB6E };
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40FB6E), &gamemodebase_onloadsave_asm, reinterpret_cast<void*>(0x40FB76));
+}
+
+void __stdcall Framework::CSinglePlayerMode::CNetworkEvent::PostEvent(BB::CEvent* ev)
+{
+    throw 0;
+}
+void __stdcall Framework::CMultiPlayerMode::CNetworkEvent::PostEvent(BB::CEvent* ev)
+{
+    throw 0;
 }
 
 Framework::CampagnInfo* Framework::CMain::GetCampagnInfo(int i, const char* n)

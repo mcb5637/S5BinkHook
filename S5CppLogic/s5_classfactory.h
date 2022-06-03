@@ -16,8 +16,8 @@ namespace BB {
 	protected:
 		virtual ~IXmlSerializer() = default;
 	public:
-		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, BB::IObject* ob, BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, BB::IObject* ob, BB::SerializationData* d, char* xmlrootname) = 0;
+		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, void* ob, BB::SerializationData* d) = 0;
+		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* ob, BB::SerializationData* d, char* xmlrootname) = 0;
 	};
 	class CXmlSerializer : public IXmlSerializer {
 	public:
@@ -35,6 +35,18 @@ namespace BB {
 
 	private:
 		BB::CXmlSerializer() = default;
+	};
+	class IBinarySerializer { // 6 funcs
+	public:
+		virtual ~IBinarySerializer() = default;
+		virtual void __stdcall Destroy() = 0;
+
+		static inline constexpr int vtp = 0x77F4C8;
+	};
+	class CBinarySerializer : public IBinarySerializer {
+	public:
+
+		static inline constexpr int vtp = 0x77F5A4;
 	};
 
 	struct FieldSerilaizer {

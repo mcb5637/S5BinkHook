@@ -15,14 +15,26 @@ namespace CppLogic::ModLoader {
 		static void AddLib(lua::State L);
 		static void RemoveLib(lua::State L);
 
-		static int AddEntityType(lua::State L);
+		static std::vector<int> EntityTypesToRemove;
+		static std::vector<int> EntityTypesToReload;
+		static bool ReloadEffectTypes;
 
-		static constexpr std::array<lua::FuncReference, 1> LuaFuncs{ {
+		static int AddEntityType(lua::State L);
+		static int ReloadEntityType(lua::State L);
+		static int SetEntityTypeToReload(lua::State L);
+		static int ReloadEffectType(lua::State L);
+		static int AddEffectType(lua::State L);
+
+		static constexpr std::array<lua::FuncReference, 5> LuaFuncs{ {
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
+				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
+				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
+				lua::FuncReference::GetRef<ReloadEffectType>("ReloadEffectType"),
+				lua::FuncReference::GetRef<AddEffectType>("AddEffectType"),
 		} };
 
 	public:
 		static void Initialize();
-		static void Cleanup(lua::State L);
+		static void Cleanup(Framework::CMain::NextMode n);
 	};
 }

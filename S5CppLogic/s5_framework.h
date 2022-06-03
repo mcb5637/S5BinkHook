@@ -4,6 +4,7 @@
 #include "s5_sound.h"
 #include "s5_glue.h"
 #include "s5_scriptsystem.h"
+#include "s5_filesystem.h"
 
 namespace ECore {
 	class IReplayStreamExtension {
@@ -104,7 +105,49 @@ namespace GDB {
 	};
 }
 
+class CTimeManager {
+public:
+	PADDINGI(1); // 0 int
+	PADDINGI(1); // 1 int
+	PADDINGI(2); // 2 double
+	PADDINGI(1); // 4 int
+	PADDINGI(1); // 5 ?
+	PADDINGI(2); // 6 double
+	PADDINGI(2); // 8 double
+	PADDINGI(2); // 10 double
+	PADDINGI(2); // 12 double
+};
+
 namespace Framework {
+	class IGameCallBacks {
+		virtual void unknown0() = 0;
+	};
+	class CEventTimeManager_UnknownInt {
+		PADDINGI(1);
+	};
+	class CEventTimeManager : public BB::IPostEvent, private CEventTimeManager_UnknownInt, public CTimeManager {
+	public:
+		PADDINGI(2); // 2 ints
+
+		static inline constexpr int vtp = 0x7630CC;
+
+		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+	};
+	static_assert(sizeof(CEventTimeManager) == 4 * 18);
+
+	class CCheckSumCalculator : public BB::IPostEvent {
+	public:
+		static inline constexpr int vtp = 0x76306C;
+
+		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+	};
+	class CEscapeEventHandler : public BB::IPostEvent {
+	public:
+		static inline constexpr int vtp = 0x763074;
+
+		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+	};
+
 	struct GameModeStartMapData {
 		int zero;
 		CLuaDebuggerPort* LuaDebuggerPort;
@@ -120,8 +163,17 @@ namespace Framework {
 		// 2 more pure virt funcs
 
 		lua_State* IngameLuaState;
-		PADDINGI(1424);
-		bool IsExternalMap;
+		PADDINGI(1); // EScr::CInputHandler
+		IGameCallBacks* GameCallbacks;
+		PADDINGI(2); //0,  EGL::CGLEAnimProps
+		CEventTimeManager TimeManager;
+		PADDINGI(1394);
+		CCheckSumCalculator CheckSumCalc;
+		PADDINGI(4);
+		CEscapeEventHandler EscapeHandler;
+		PADDINGI(2);
+		bool IsExternalMap; // 1426
+		PADDINGI(1);
 
 		static inline constexpr int vtp = 0x76307C;
 
@@ -136,21 +188,41 @@ namespace Framework {
 		static void HookLoadSave();
 	};
 	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);
+	static_assert(offsetof(AGameModeBase, EscapeHandler) == 1423 * 4);
+	static_assert(offsetof(AGameModeBase, CheckSumCalc) == 1418 * 4);
 	//constexpr int i = offsetof(AGameModeBase, IsExternalMap);
 	class CSinglePlayerMode : public AGameModeBase {
 	public:
+		class CNetworkEvent : public BB::IPostEvent {
+			CEventTimeManager* TimeManager1;
+			CEventTimeManager* TimeManager2;
+			BB::CBinarySerializer* BinarySerializer;
+			BB::CMemoryStream MemoryStream;
+
+			static inline constexpr int vtp = 0x7632C0;
+
+			virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+		};
+		CNetworkEvent NetworkEvent;
 
 		static inline constexpr int vtp = 0x7632C8;
 	};
+	static_assert(sizeof(CSinglePlayerMode) == 1438 * 4);
 	class CMultiPlayerMode : public AGameModeBase {
 	public:
+		class CNetworkEvent : public BB::IPostEvent {
+			CEventTimeManager* TimeManager;
+
+			static inline constexpr int vtp = 0x7631B4;
+
+			virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+		};
+		CNetworkEvent NetworkEvent;
+
 		static inline constexpr int vtp = 0x7631BC;
 	};
+	static_assert(sizeof(CMultiPlayerMode) == 1430 * 4);
 
-
-	class IGameCallBacks {
-		virtual void unknown0() = 0;
-	};
 
 	class CMain : public BB::IPostEvent, public IGameCallBacks, public ESnd::IAmbientSoundInfo {
 	public:

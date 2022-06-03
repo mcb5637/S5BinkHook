@@ -6,6 +6,18 @@ GGlue::CGlueEntityProps::CGlueEntityProps() {
 	LogicProps = nullptr;
 	DisplayProps = nullptr;
 }
+GGlue::CGlueEntityProps::CGlueEntityProps(const CGlueEntityProps& o) {
+	*reinterpret_cast<int*>(this) = vtp;
+	LogicProps = o.LogicProps;
+	DisplayProps = o.DisplayProps;
+	BehaviorProps = o.BehaviorProps;
+}
+GGlue::CGlueEntityProps::CGlueEntityProps(CGlueEntityProps&& o) {
+	*reinterpret_cast<int*>(this) = vtp;
+	LogicProps = o.LogicProps;
+	DisplayProps = o.DisplayProps;
+	BehaviorProps = std::move(o.BehaviorProps);
+}
 
 bool GGlue::CGlueEntityProps::IsSettlerType() const
 {

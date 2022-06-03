@@ -2,6 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_entitytype.h"
+#include "s5_effecttype.h"
 
 namespace GGlue {
 	class IAnimsPropsMgr {
@@ -25,9 +26,21 @@ namespace GGlue {
 		virtual void uk3() = 0;
 		virtual void uk4() = 0;
 		virtual void uk5() = 0;
-		virtual void __stdcall LoadData(const char* filename) = 0; // not completely sure
 	public:
+		virtual void __stdcall LoadData(const char* filepath) = 0;
+
+		BB::CIDManagerEx* EffectTypeManager;
+		BB::CIDManagerEx* WeatherEffectTextureManager;
+		EGL::CGLEEffectsProps EffectsLogicProps;
+		EGL::EffectsDisplayProps EffectsDisplayProps;
+		EGL::EffectsProps EffectsProps;
+
 		static inline constexpr int vtp = 0x7888D4;
+
+		void LoadEffectTypeFromExtraFile(int id);
+		// remember to also free in idmanager, free last id first
+		void FreeEffectType(int id);
+		void ReloadAllEffectTypes();
 	};
 
 	class IEntitiesPropsMgr : public ECore::ICheckData {
@@ -65,6 +78,7 @@ namespace GGlue {
 		void LoadEntityTypeByID(int id);
 		// remember to also free in idmanager, free last id first
 		void PopEntityType(int id);
+		// remember to also free in idmanager, free last id first
 		void FreeEntityType(int id);
 	};
 

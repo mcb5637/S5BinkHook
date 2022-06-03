@@ -21,6 +21,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x784B28;
 		static inline constexpr int TypeDesc = 0x822284;
+		static inline constexpr unsigned int Identifier = 0xF8536CED;
 
 		bool IsCannonBallEffect();
 		bool IsArrowEffect();
@@ -55,6 +56,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x7775E4;
 		static inline constexpr int TypeDesc = 0x8235EC;
+		static inline constexpr unsigned int Identifier = 0x8B5120CD;
 
 		static void HookOnHit();
 		static void (*FlyingEffectOnHitCallback)(EGL::CFlyingEffect* eff);
@@ -75,6 +77,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x778E24;
 		static inline constexpr int TypeDesc = 0x8289CC;
+		static inline constexpr unsigned int Identifier = 0x2320F01D;
 	};
 
 	class CCannonBallEffect : public EGL::CFlyingEffect {
@@ -92,6 +95,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x777690;
 		static inline constexpr int TypeDesc = 0x82365C;
+		static inline constexpr unsigned int Identifier = 0xDF09D9FD;
 	};
 }
 

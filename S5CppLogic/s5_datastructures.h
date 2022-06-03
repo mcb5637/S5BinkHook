@@ -173,7 +173,13 @@ namespace shok {
 		}
 
 #ifdef _DEBUG
-		Vector() = default;
+		Vector() {
+			// hacky way of getting rid of the std::vectors debug stuff, initialize the vector with 0 (as its done in shok)
+			byte a[sizeof(Vector)];
+			std::memcpy(a, this, sizeof(Vector));
+			std::memset(this, 0, sizeof(Vector));
+			reinterpret_cast<Vector*>(a)->~Vector();
+		}
 		Vector(Vector&& other) noexcept {
 			/// hacky move
 			std::memcpy(this, &other, sizeof(Vector));
@@ -181,8 +187,18 @@ namespace shok {
 		}
 		Vector(const Vector& other) : Vector() {
 			auto th = SaveVector();
-			auto oth = other.SaveVector();
-			th.Internal = oth.Internal;
+			th.Vector = other.Internal;
+		}
+		Vector& operator=(const Vector& other) {
+			auto th = SaveVector();
+			th.Vector = other.Internal;
+			return *this;
+		}
+		Vector& operator=(Vector&& other) noexcept {
+			/// hacky move
+			std::memcpy(this, &other, sizeof(Vector));
+			std::memset(&other, 0, sizeof(Vector));
+			return *this;
 		}
 #endif
 

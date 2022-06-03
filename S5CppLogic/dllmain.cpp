@@ -62,13 +62,11 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x3C68E6F3);
+    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x2C96B613);
     return 1;
 }
 
 int Cleanup(lua::State L) {
-    if (!CppLogic::HasSCELoader())
-        CppLogic::ModLoader::ModLoader::Cleanup(L);
     CppLogic::Effect::Cleanup(L);
     CppLogic::Combat::Cleanup(L);
     CppLogic::Entity::Cleanup(L);
@@ -79,10 +77,11 @@ int Cleanup(lua::State L) {
 }
 
 void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
+    if (!CppLogic::HasSCELoader())
+        CppLogic::ModLoader::ModLoader::Cleanup(n);
     if ((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu) {
         lua::State L{ *EScr::CScriptTriggerSystem::GameState };
         Cleanup(L);
-        //shok::LogString("cleanup done\n");
     }
 }
 

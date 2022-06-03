@@ -100,4 +100,9 @@ namespace BB {
 		int ReadToBuffer(void* buff, size_t s);
 		void Close();
 	};
+	class CMemoryStream : public IStream {
+		PADDINGI(5);
+	public:
+		static constexpr int vtp = 0x77F7CC;
+	};
 }

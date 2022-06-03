@@ -4,6 +4,8 @@
 #include "s5_glue.h"
 #include "s5_entitytype.h"
 #include "s5_idmanager.h"
+#include "s5_entityandeffectmanager.h"
+#include "entityiterator.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
@@ -94,16 +96,70 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 	L.Pop(1);
 }
 
+std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToReload{};
+bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
+
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	int id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
 	(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->LoadEntityTypeByID(id);
+	EntityTypesToRemove.push_back(id);
 	L.Push("Entities");
 	L.GetTableRaw(L.GLOBALSINDEX);
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadEntityType(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+	if (id <= 0 || id >= static_cast<int>(m->CGLEEntitiesProps.EntityTypes.size()))
+		throw lua::LuaException("invalid id");
+	m->FreeEntityType(id);
+	m->LoadEntityTypeByID(id);
+	EntityTypesToReload.push_back(id);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+	if (id <= 0 || id >= static_cast<int>(m->CGLEEntitiesProps.EntityTypes.size()))
+		throw lua::LuaException("invalid id");
+	EntityTypesToReload.push_back(id);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadEffectType(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
+	if (id <= 0 || id >= static_cast<int>(m->EffectsProps.Effects.size()))
+		throw lua::LuaException("invalid id");
+	m->FreeEffectType(id);
+	m->LoadEffectTypeFromExtraFile(id);
+	ReloadEffectTypes = true;
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
+	int id = m->EffectTypeManager->GetIDByNameOrCreate(t);
+	m->LoadEffectTypeFromExtraFile(id);
+	L.Push("GGL_Effects");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	ReloadEffectTypes = true;
 	return 0;
 }
 
@@ -135,26 +191,61 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	loadordertop = (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0];
 }
 
-void CppLogic::ModLoader::ModLoader::Cleanup(lua::State L)
+void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 {
-	Log(L, "Cleanup");
-	int t = L.GetTop();
-	L.Push("ModLoader");
-	L.GetTableRaw(L.GLOBALSINDEX);
-	if (L.IsTable(-1)) {
-		L.Push("Cleanup");
-		L.GetTableRaw(-2);
-		if (L.IsFunction(-1))
-			L.PCall(0, 0);
-		else
-			L.Pop(1);
-	}
-	L.SetTop(t);
+	if (((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu)) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 
-	Log(L, "Removing extra archives");
-	BB::CFileSystemMgr* fm = (*BB::CFileSystemMgr::GlobalObj);
-	while (fm->LoadOrder[0] != loadordertop) {
-		fm->RemoveTopArchive();
+		Log(L, "Cleanup");
+		int t = L.GetTop();
+		L.Push("ModLoader");
+		L.GetTableRaw(L.GLOBALSINDEX);
+		if (L.IsTable(-1)) {
+			L.Push("Cleanup");
+			L.GetTableRaw(-2);
+			if (L.IsFunction(-1))
+				L.PCall(0, 0);
+			else
+				L.Pop(1);
+		}
+		L.SetTop(t);
+
+		Log(L, "Removing extra archives");
+		BB::CFileSystemMgr* fm = (*BB::CFileSystemMgr::GlobalObj);
+		while (fm->LoadOrder[0] != loadordertop) {
+			fm->RemoveTopArchive();
+		}
+		Log(L, "Done");
 	}
-	Log(L, "Done");
+
+	if (n != Framework::CMain::NextMode::ToMainMenu) {
+		if (*EGL::CGLEEntityManager::GlobalObj) { // make sure there is no entity left that can access an entitytype we are deleting
+			CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> p{ [](const EGL::CGLEEntity*, float*, int*) { return true; } };
+			CppLogic::Iterator::GlobalEntityIterator it{ &p };
+			for (EGL::CGLEEntity* a : it) {
+				a->Destroy();
+			}
+		}
+
+
+		while (EntityTypesToRemove.size() != 0) {
+			int id = EntityTypesToRemove.back();
+			EntityTypesToRemove.pop_back();
+			(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->PopEntityType(id);
+			(*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->RemoveID(id);
+		}
+
+		for (int id : EntityTypesToReload) {
+			auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+			if (id <= 0 || id >= static_cast<int>(m->CGLEEntitiesProps.EntityTypes.size())) // might got popped above
+				continue;
+			m->FreeEntityType(id);
+			m->LoadEntityTypeByID(id);
+		}
+		EntityTypesToReload.clear();
+
+		if (ReloadEffectTypes)
+			(*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager->ReloadAllEffectTypes();
+		ReloadEffectTypes = false;
+	}
 }

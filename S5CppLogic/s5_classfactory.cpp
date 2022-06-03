@@ -58,6 +58,8 @@ BB::FieldSerilaizer::ExtendedInfo InfoEffectType{ "shok::EffectType", &PushInt, 
 BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategory", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyID", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundID", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureID", &PushInt, &CheckInt };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -66,6 +68,14 @@ void CheckUInt(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs)
     *static_cast<unsigned int*>(data) = static_cast<unsigned int>(L.CheckNumber(idx));
 }
 BB::FieldSerilaizer::ExtendedInfo InfoUInt{ "unsigned Int", &PushUInt, &CheckUInt };
+
+void PushUByte(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+    L.Push(static_cast<double>(*static_cast<byte*>(data)));
+}
+void CheckUByte(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+    *static_cast<unsigned int*>(data) = static_cast<byte>(L.CheckNumber(idx));
+}
+BB::FieldSerilaizer::ExtendedInfo InfoUByte{ "unsigned Byte", &PushUByte, &CheckUByte };
 
 void PushBool(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(*static_cast<bool*>(data));
@@ -110,29 +120,47 @@ BB::FieldSerilaizer::ExtendedInfo InfoClassID{ "shok::ClassIdentifier", &PushUnk
 const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ {
     {0x810C58, &InfoBool},
     {0x82BAF4, &InfoBool},
+    {0x822334, &InfoBool},
+    {0x84D164, &InfoBool},
 
     {0x810C98, &InfoInt},
     {0x800108, &InfoInt},
     {0x8231C4, &InfoInt},
     {0x82BB60, &InfoInt},
     {0x812688, &InfoInt},
+    {0x822374, &InfoInt},
+    {0x8236C0, &InfoInt},
+    {0x828A2C, &InfoInt},
+    {0x829F34, &InfoInt},
+    {0x80AE58, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
     {0x8585C0, &InfoModel},
     {0x86057C, &InfoAnim},
+    {0xA0C868, &InfoAnim},
     {0x860558, &InfoDamageClass},
     {0x8605A0, &InfoEffectType},
     {0x860510, &InfoResourceType},
     {0x86414C, &InfoUpgradeCategory},
     {0x85D560, &InfoTechnologyID},
+    {0x85A108, &InfoSoundID},
+    {0x8587D4, &InfoWeatherEffectTextureID},
 
     {0x810CD8, &InfoUInt},
+    {0x80AD90, &InfoUInt},
+
+    {0x80C380, &InfoUByte},
 
     {0x810C78, &InfoFloat},
     {0x8231A4, &InfoFloat},
     {0x82BB14, &InfoFloat},
     {0x812668, &InfoFloat},
+    {0x822354, &InfoFloat},
+    {0x8236A0, &InfoFloat},
+    {0x829F14, &InfoFloat},
+    {0x80AD70, &InfoFloat},
+    {0x80AE38, &InfoFloat},
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},
@@ -142,6 +170,8 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x810CB8, &InfoCharBuff},
 
     {0x813978, &InfoClassID},
+    {0x8223B4, &InfoClassID},
+    {0x80ADB0, &InfoClassID},
 } };
 
 std::string BB::FieldSerilaizer::GetTypeDescName() const

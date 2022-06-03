@@ -95,6 +95,8 @@ namespace shok {
 
 		Color(int r, int g, int b, int a);
 		Color() = default;
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x8594F8); // from rain effect
 	};
 	static_assert(sizeof(shok::Color) == 1 * 4);
 }

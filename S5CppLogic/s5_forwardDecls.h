@@ -70,6 +70,7 @@ namespace BB {
 	class CIDManagerEx;
 	class CFileStreamEx;
 	struct SerializationData;
+	class CBinarySerializer;
 	class CIDManager;
 	class IStream;
 }

@@ -212,6 +212,11 @@ namespace CppLogic::Iterator {
 		GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
 	};
 
+	class GlobalEffectIterator : public GlobalManagedIterator<EGL::CEffect> {
+	public:
+		GlobalEffectIterator(const Predicate<EGL::CEffect>* const p);
+	};
+
 	class PlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 		const GGL::CPlayerAttractionHandler& ah;
 	protected:

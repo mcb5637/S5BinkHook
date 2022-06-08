@@ -9,6 +9,11 @@ CppLogic::Iterator::GlobalEntityIterator::GlobalEntityIterator(const Predicate<E
 	: GlobalManagedIterator<EGL::CGLEEntity>(*EGL::CGLEEntityManager::GlobalObj, p) {
 }
 
+CppLogic::Iterator::GlobalEffectIterator::GlobalEffectIterator(const Predicate<EGL::CEffect>* const p)
+	: GlobalManagedIterator<EGL::CEffect>(*EGL::CGLEEffectManager::GlobalObj, p)
+{
+}
+
 CppLogic::Iterator::PlayerEntityIterator::PlayerEntityIterator(int player, const Predicate<EGL::CGLEEntity>* const p)
 	: ManagedIterator<EGL::CGLEEntity>(p), ah(*(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(player)->PlayerAttractionHandler)
 {

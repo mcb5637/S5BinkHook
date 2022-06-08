@@ -226,6 +226,13 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 				a->Destroy();
 			}
 		}
+		if (*EGL::CGLEEffectManager::GlobalObj) {
+			CppLogic::Iterator::PredicateFunc<EGL::CEffect> p{ [](const EGL::CEffect*, float*, int*) { return true; } };
+			CppLogic::Iterator::GlobalEffectIterator it{ &p };
+			for (EGL::CEffect* a : it) {
+				delete a;
+			}
+		}
 
 
 		while (EntityTypesToRemove.size() != 0) {

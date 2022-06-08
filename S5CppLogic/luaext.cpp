@@ -88,6 +88,7 @@ void luaext::EState::PushPos(const shok::Position& p)
 shok::Position luaext::EState::CheckPos(int idx)
 {
 	int i = ToAbsoluteIndex(idx);
+	CheckType(i, lua::LType::Table);
 	Push("X");
 	GetTableRaw(i);
 	float x = CheckFloat(-1);

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "s5_tasklist.h"
 #include "s5_idmanager.h"
+#include "s5_classfactory.h"
+#include "s5_filesystem.h"
 
 struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
     int(__thiscall* ExecuteTask)(EGL::TaskHandler* th, EGL::CGLETaskArgs* args);
@@ -255,6 +257,39 @@ void EGL::CGLETaskListMgr::RemoveTaskList(int tid)
             v.Vector.pop_back();
         }
         TaskListManager->RemoveID(tid);
+    }
+}
+
+void EGL::CGLETaskListMgr::FreeTaskList(int id)
+{
+    EGL::CGLETaskList* tl = GetTaskListByID(id);
+    {
+        auto v = tl->Task.SaveVector();
+        for (EGL::CGLETaskArgs* p : v.Vector) {
+            delete p;
+        }
+        v.Vector.clear();
+    }
+    delete tl;
+    TaskLists[id] = nullptr;
+}
+
+void EGL::CGLETaskListMgr::LoadTaskList(int id)
+{
+    const char* n = TaskListManager->GetNameByID(id);
+    if (!n)
+        throw std::logic_error{ "invalid tasklist id" };
+    std::string filename = "Data\\Config\\TaskLists\\";
+    filename.append(n);
+    filename.append(".xml");
+    EGL::CGLETaskList* tl = (*BB::CClassFactory::GlobalObj)->LoadObject<EGL::CGLETaskList>(filename.c_str());
+    tl->TaskListID = id;
+    if (id == static_cast<int>(TaskLists.size())) {
+        auto v = TaskLists.SaveVector();
+        v.Vector.push_back(tl);
+    }
+    else {
+        TaskLists[id] = tl;
     }
 }
 

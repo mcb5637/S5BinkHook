@@ -5,6 +5,9 @@
 #include "s5_entitytype.h"
 #include "s5_idmanager.h"
 #include "s5_entityandeffectmanager.h"
+#include "s5_tasklist.h"
+#include "s5_maplogic.h"
+#include "s5_tech.h"
 #include "entityiterator.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
@@ -96,13 +99,17 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 	L.Pop(1);
 }
 
+bool CppLogic::ModLoader::ModLoader::Initialized = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToReload{};
 bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
+std::vector<int> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
 	const char* t = L.CheckString(1);
+	if ((*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIdByName(t))
+		throw lua::LuaException{ "entitytype already exists" };
 	int id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
 	(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->LoadEntityTypeByID(id);
 	EntityTypesToRemove.push_back(id);
@@ -152,6 +159,8 @@ int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
+	if (m->EffectTypeManager->GetIdByName(t))
+		throw lua::LuaException{ "effecttype already exists" };
 	int id = m->EffectTypeManager->GetIDByNameOrCreate(t);
 	m->LoadEffectTypeFromExtraFile(id);
 	L.Push("GGL_Effects");
@@ -160,6 +169,45 @@ int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
 	L.Push(id);
 	L.SetTableRaw(-3);
 	ReloadEffectTypes = true;
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadTaskList(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
+	if (id <= 0 || id >= static_cast<int>(m->TaskLists.size()))
+		throw lua::LuaException("invalid id");
+	m->FreeTaskList(id);
+	m->LoadTaskList(id);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::AddTaskList(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
+	if (m->TaskListManager->GetIdByName(t))
+		throw lua::LuaException{ "tasklist already exists" };
+	int id = m->TaskListManager->GetIDByNameOrCreate(t);
+	m->LoadTaskList(id);
+	TaskListsToRemove.push_back(id);
+	L.Push("TaskLists");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadTechnology(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
+	if (id <= 0 || id >= static_cast<int>(m->Techs.size()))
+		throw lua::LuaException("invalid id");
+	m->FreeTech(id);
+	m->LoadTech(id);
 	return 0;
 }
 
@@ -189,6 +237,7 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	Framework::AGameModeBase::HookLoadSave();
 	Framework::AGameModeBase::PreLoadSave = &PreSaveLoad;
 	loadordertop = (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0];
+	Initialized = true;
 }
 
 void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
@@ -254,5 +303,24 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		if (ReloadEffectTypes)
 			(*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager->ReloadAllEffectTypes();
 		ReloadEffectTypes = false;
+
+		while (TaskListsToRemove.size() != 0) {
+			int id = TaskListsToRemove.back();
+			TaskListsToRemove.pop_back();
+			if (*EGL::CGLETaskListMgr::GlobalObj)
+				(*EGL::CGLETaskListMgr::GlobalObj)->RemoveTaskList(id);
+			else
+				(*BB::CIDManagerEx::TaskListManager)->RemoveID(id);
+		}
 	}
+}
+
+bool CppLogic::ModLoader::ModLoader::IsInitialized()
+{
+	return Initialized;
+}
+
+void CppLogic::ModLoader::ModLoader::AddTaskListToRemove(int id)
+{
+	TaskListsToRemove.push_back(id);
 }

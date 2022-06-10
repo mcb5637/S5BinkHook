@@ -20,6 +20,7 @@
 #include "s5_exception.h"
 #include "s5_widget.h"
 #include "s5_framework.h"
+#include "s5_tasklist.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -63,16 +64,8 @@ int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x2C96B613);
-    CppLogic::Iterator::PredicateInCircle<EGL::CEffect> ci{ L.CheckPos(1), 1000 * 1000 };
-    CppLogic::Iterator::GlobalEffectIterator it{ &ci };
-    L.NewTable();
-    int i = 1;
-    for (EGL::CEffect* e : it) {
-        L.Push(e->EffectID);
-        L.SetTableRaw(-2, i);
-        ++i;
-    }
-    return 1;
+    //(*GGL::CGLGameLogic::GlobalObj)->TechManager->FreeTech(1);
+    return 0;
 }
 
 int Cleanup(lua::State L) {

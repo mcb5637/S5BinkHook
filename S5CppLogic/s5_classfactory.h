@@ -16,8 +16,8 @@ namespace BB {
 	protected:
 		virtual ~IXmlSerializer() = default;
 	public:
-		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, void* ob, BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* ob, BB::SerializationData* d, char* xmlrootname) = 0;
+		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, void* ob, const BB::SerializationData* d) = 0;
+		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* ob, const BB::SerializationData* d, char* xmlrootname) = 0;
 	};
 	class CXmlSerializer : public IXmlSerializer {
 	public:
@@ -30,6 +30,7 @@ namespace BB {
 		using IXmlSerializer::Serialize;
 		static BB::CXmlSerializer* Create();
 		void Deserialize(const char* filename, BB::IObject* ob);
+		void Deserialize(const char* filename, void* ob, const BB::SerializationData* d);
 		// i doubt this will ever get used outside of debugging
 		void Serialize(const char* filename, BB::IObject* ob);
 
@@ -209,6 +210,7 @@ namespace BB {
 			LoadObject(ob, filename);
 			return ob;
 		}
+		void LoadObject(void* ob, const char* filename, const BB::SerializationData* seri);
 
 		using IClassFactory::GetSerializationDataForClass;
 		template<class T>

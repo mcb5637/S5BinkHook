@@ -15,26 +15,37 @@ namespace CppLogic::ModLoader {
 		static void AddLib(lua::State L);
 		static void RemoveLib(lua::State L);
 
+		static bool Initialized;
 		static std::vector<int> EntityTypesToRemove;
 		static std::vector<int> EntityTypesToReload;
 		static bool ReloadEffectTypes;
+		static std::vector<int> TaskListsToRemove;
 
 		static int AddEntityType(lua::State L);
 		static int ReloadEntityType(lua::State L);
 		static int SetEntityTypeToReload(lua::State L);
 		static int ReloadEffectType(lua::State L);
 		static int AddEffectType(lua::State L);
+		static int ReloadTaskList(lua::State L);
+		static int AddTaskList(lua::State L);
+		static int ReloadTechnology(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 5> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 8> LuaFuncs{ {
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
 				lua::FuncReference::GetRef<ReloadEffectType>("ReloadEffectType"),
 				lua::FuncReference::GetRef<AddEffectType>("AddEffectType"),
+				lua::FuncReference::GetRef<ReloadTaskList>("ReloadTaskList"),
+				lua::FuncReference::GetRef<AddTaskList>("AddTaskList"),
+				lua::FuncReference::GetRef<ReloadTechnology>("ReloadTechnology"),
 		} };
 
 	public:
 		static void Initialize();
 		static void Cleanup(Framework::CMain::NextMode n);
+
+		static bool IsInitialized();
+		static void AddTaskListToRemove(int id);
 	};
 }

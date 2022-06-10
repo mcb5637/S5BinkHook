@@ -290,7 +290,7 @@ namespace EGL {
     };
     static_assert(sizeof(EGL::CGLETaskList) == 8 * 4);
 
-    class CGLETaskListMgr : public BB::IObject {
+    class CGLETaskListMgr : public BB::IObject { // tasklist objects get reloaded every time, idmanager not
     public:
         BB::CIDManagerEx* TaskListManager;
         BB::CIDManagerEx* TaskManager;
@@ -301,6 +301,8 @@ namespace EGL {
         const char* GetTaskListNameByID(int i);
         int RegisterTaskList(EGL::CGLETaskList* tl, const char* name);
         void RemoveTaskList(int tid); // has to be the last tasklist. do not use if anything still uses that tasklist (only intended for cleanup)
+        void FreeTaskList(int id);
+        void LoadTaskList(int id);
 
         static inline constexpr int vtp = 0x7845EC;
         static inline constexpr int TypeDesc = 0x836F84;

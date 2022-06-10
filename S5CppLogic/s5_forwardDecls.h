@@ -32,6 +32,8 @@ namespace shok {
 	enum class Keys : int;
 
 	class Technology;
+	class TechCategoryManager;
+	class TechManager;
 }
 namespace EGL {
 	class CGLEEntity;

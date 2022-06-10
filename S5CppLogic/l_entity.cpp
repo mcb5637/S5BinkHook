@@ -17,6 +17,7 @@
 #include "hooks.h"
 #include "luaext.h"
 #include "entityiterator.h"
+#include "modloader.h"
 
 namespace CppLogic::Entity {
 	int PredicateOfType(lua::State L) {
@@ -1774,9 +1775,14 @@ namespace CppLogic::Entity {
 			L.Push(tid);
 			L.SetTableRaw(-3);
 			L.SetTop(top);
+
+			if (CppLogic::ModLoader::ModLoader::IsInitialized())
+				CppLogic::ModLoader::ModLoader::AddTaskListToRemove(tid);
 		}
 	}
 	void SettlerCleanupAnimTask(lua::State L) {
+		if (CppLogic::ModLoader::ModLoader::IsInitialized()) // modloader will take care of cleanup
+			return;
 		EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
 		if (!tmng)
 			return;

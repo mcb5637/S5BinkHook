@@ -722,9 +722,10 @@ GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(int i)
 
 shok::Technology* GGL::CGLGameLogic::GetTech(int i)
 {
-	if (static_cast<int>(TechList->size()) >= i)
+	--i;
+	if (i >= static_cast<int>(TechManager->Techs.size()))
 		return nullptr;
-	return (*TechList)[i];
+	return TechManager->Techs[i];
 }
 
 static inline void(__thiscall* const cglgamelogic_enablealarm)(GGL::CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FA14);

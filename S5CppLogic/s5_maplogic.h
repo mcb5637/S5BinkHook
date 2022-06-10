@@ -360,10 +360,8 @@ namespace GGL {
 	public:
 		GGL::CPlayerStatus** players; // 10
 		GGL::CWeatherHandler* WeatherHandler;
-		PADDINGI(1);
-	private:
-		shok::Vector<shok::Technology*>* TechList;
-	public:
+		shok::TechCategoryManager* TechCategoryManager;
+		shok::TechManager* TechManager; // 13
 		PADDINGI(1);
 		bool GlobalInvulnerability, AreWeatherMachineEffectsActive;
 		PADDING(2);

@@ -24,13 +24,7 @@ void GGlue::CEffectsPropsMgr::LoadEffectTypeFromExtraFile(int id)
 	std::string filename = "Data/Config/Effects/";
 	filename.append(EffectTypeManager->GetNameByID(id));
 	filename.append(".xml");
-	BB::CXmlSerializer* s = BB::CXmlSerializer::Create();
-	BB::CFileStreamEx filestr{};
-	if (filestr.OpenFile(filename.c_str(), 0x113)) {
-		s->DeserializeByData(&filestr, &t, t.SerializationData);
-		filestr.Close();
-	}
-	s->Destroy();
+	(*BB::CClassFactory::GlobalObj)->LoadObject(&t, filename.c_str(), t.SerializationData);
 	if (!t.Display || !t.Logic) {
 		FreeEffectType(id);
 		throw std::invalid_argument{ "invalid file" };

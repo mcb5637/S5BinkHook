@@ -60,6 +60,15 @@ void shok::TechManager::LoadTech(int id)
 	Techs[id] = t;
 }
 
+void shok::TechManager::PopTech(int id)
+{
+	if (id != static_cast<int>(Techs.size()))
+		throw std::out_of_range("invalid id");
+	FreeTech(id);
+	auto v = Techs.SaveVector();
+	v.Vector.pop_back();
+}
+
 float shok::AdditionalTechModifier::ModifyValue(float i) const
 {
 	switch (Operator) {

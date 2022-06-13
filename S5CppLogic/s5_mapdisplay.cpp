@@ -142,3 +142,8 @@ ED::ModelInstance* ED::ModelData::Instanciate() const
 {
 	return modeldata_instanciate(this);
 }
+
+unsigned int __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const
+{
+	return Identifier;
+}

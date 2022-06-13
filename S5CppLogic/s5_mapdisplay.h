@@ -68,9 +68,30 @@ namespace ED {
 	public:
 		virtual ~CModelsProps() = default;
 
+		struct ModelData {
+			const char* Effect;
+			const char* OrnamentalItemEffect;
+			const char* SelectionTexture;
+			float OnePassAlphaBlendingDistance;
+			float TerrainLightColorPortion;
+			float TerrainVertexColorPortion;
+			float SelectionOffsetX;
+			float SelectionOffsetY;
+			float SelectionRadius;
+			bool CastShadow, DoNotDestroyHierarchy, HasUVAnim, OcclusionCaster;
+			bool OcclusionReceiver, OrnamentalItem, ShareShadowRaster, UseAlphaBlending;
+			bool UseSurfaceHeight, TwoPassAlphaBlending, AlphaBlendHighQualityOnly; PADDING(1);
+			int DefaultAnimID; // 12
+		};
+
+		shok::Vector<ModelData> Model;
+
+
+		static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA1A2B0);
 
 		static inline constexpr int vtp = 0x7AE60C;
 	};
+	static_assert(sizeof(CModelsProps::ModelData) == 13 * 4);
 
 	class CCamera {
 	public:
@@ -167,7 +188,7 @@ namespace ED {
 	private:
 		virtual void unknown5() = 0;
 		virtual void unknown6() = 0;
-		virtual void unknown7() = 0;
+		virtual void* GetModelData() = 0;
 	};
 
 	class CResourceManager : public IResourceManager {
@@ -227,5 +248,90 @@ namespace ED {
 		static inline ED::CGlobalsBaseEx** const GlobalObj = reinterpret_cast<ED::CGlobalsBaseEx**>(0x857E8C);
 	};
 	//constexpr int i = offsetof(ED::CGlobalsBaseEx, DisplayWorld) / 4;
+	static_assert(sizeof(CGlobalsBaseEx) == 35 * 4);
 
+	class IDisplayBase {
+	public:
+		virtual ~IDisplayBase() = default;
+		virtual void Destroy() = 0;
+	private:
+		virtual int retsomethingfromCGlobalsBaseEx() = 0;
+	};
+
+	class CDisplayBase : public IDisplayBase {
+	public:
+		CGlobalsBaseEx* GlobalsBase;
+		PADDINGI(1);
+		CDisplayProps* DisplayProps; // 3
+		CModelsProps* ModelsProps;
+
+		static inline constexpr int vtp = 0x7AE3AC;
+	};
+	static_assert(sizeof(CDisplayBase) == 5 * 4);
+
+	class IDisplayRenderCallbacks {
+		virtual void __stdcall unknown(float a) = 0;
+	};
+}
+
+namespace GD {
+	class CBuildingEffectsProps : public BB::IObject {
+	public:
+		float HealthNoDamageEffects;
+		float HealthAllDamageEffects;
+		shok::Vector<int> DamageEffect;
+		shok::Vector<int> DestroyEffect;
+		PADDINGI(1);
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+
+		static inline constexpr int vtp = 0x76A810;
+		static inline constexpr unsigned int Identifier = 0xFC5B7F67;
+	};
+	static_assert(sizeof(CBuildingEffectsProps) == 12 * 4);
+
+	class CGlobalEffect {
+	public:
+		virtual ~CGlobalEffect() = default;
+
+		PADDINGI(3); // this+2 == ED::CEffectDisplay ??
+		int EffectID; // 3
+
+		static inline constexpr int vtp = 0x76AFA4;
+	};
+
+
+	class CGlobalEffects {
+	public:
+		virtual ~CGlobalEffects() = default;
+		CGlobalEffect* RainEfect;
+		CGlobalEffect* SnowEffect;
+
+		static inline constexpr int vtp = 0x76A984;
+	};
+
+	class IDDisplay {
+	public:
+		virtual ~IDDisplay() = default;
+		// 14 more methods
+	};
+
+	class CDDisplay : public IDDisplay, public ED::IDisplayRenderCallbacks {
+	public:
+		PADDINGI(2); // bool int?
+		CBuildingEffectsProps BuildingEffectsProps;
+		PADDINGI(3);
+		ED::CDisplayBase* DisplayBase;
+		PADDINGI(1);
+		PADDINGI(1); // p to GD::CGlobalsBase, size 8
+		CGlobalEffects* GlobalEfects;
+
+		static inline constexpr int vtp = 0x76A828;
+
+		static inline CDDisplay** const GlobalObj = reinterpret_cast<CDDisplay**>(0x8585B8);
+	};
+	static_assert(offsetof(CDDisplay, DisplayBase) == 19 * 4);
+	static_assert(offsetof(CDDisplay, GlobalEfects) == 22 * 4);
+	static_assert(sizeof(CDDisplay) == 23 * 4);
+	//constexpr int i = offsetof(CDDisplay, GlobalEfects) / 4;
 }

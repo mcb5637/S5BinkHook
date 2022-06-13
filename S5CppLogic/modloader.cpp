@@ -104,6 +104,7 @@ std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToReload{};
 bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::TechsToRemove{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -211,6 +212,23 @@ int CppLogic::ModLoader::ModLoader::ReloadTechnology(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::AddTechnology(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
+	if ((*BB::CIDManagerEx::TechnologiesManager)->GetIdByName(t))
+		throw lua::LuaException{ "tasklist already exists" };
+	int id = (*BB::CIDManagerEx::TechnologiesManager)->GetIDByNameOrCreate(t);
+	m->LoadTech(id);
+	TechsToRemove.push_back(id);
+	L.Push("Technologies");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -311,6 +329,14 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 				(*EGL::CGLETaskListMgr::GlobalObj)->RemoveTaskList(id);
 			else
 				(*BB::CIDManagerEx::TaskListManager)->RemoveID(id);
+		}
+
+		while (TechsToRemove.size() != 0) {
+			int id = TechsToRemove.back();
+			TechsToRemove.pop_back();
+			if (*GGL::CGLGameLogic::GlobalObj)
+				(*GGL::CGLGameLogic::GlobalObj)->TechManager->PopTech(id);
+			(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(id);
 		}
 	}
 }

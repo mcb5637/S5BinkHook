@@ -140,9 +140,9 @@ namespace ED {
 	public:
 		virtual ~CDisplayProps() = default;
 
-		byte ShadowBlur;
+		bool ShadowBlur;
 		PADDING(3);
-		int ShadowRasterSize;
+		unsigned int ShadowRasterSize;
 		float ShadowStrength;
 		shok::Color InvalidPositionColorModulate;
 		shok::Color InvalidPositionColorEmissive;
@@ -156,7 +156,11 @@ namespace ED {
 		shok::String AuraTexture;
 		int CommandAcknowledgementModel;
 		int CommandAcknowledgementDuration;
+		PADDINGI(1);
 
 		static inline constexpr int vtp = 0x7AE630;
+
+		static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA1A320);
 	};
+	static_assert(sizeof(CDisplayProps) == 29 * 4);
 }

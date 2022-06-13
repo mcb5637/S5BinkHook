@@ -200,6 +200,9 @@ namespace shok {
 			std::memset(&other, 0, sizeof(Vector));
 			return *this;
 		}
+		~Vector() noexcept {
+			*reinterpret_cast<int*>(this) = 0;
+		}
 #endif
 
 		struct SaveVector_Data {

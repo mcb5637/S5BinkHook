@@ -68,7 +68,7 @@ void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(int id)
 	if (id >= static_cast<int>(CGLEEntitiesProps.EntityTypes.size()))
 	{
 		auto glue = CGLEEntitiesProps.EntityTypes.SaveVector();
-		glue.Vector.push_back({});
+		glue.Vector.emplace_back();
 		auto log = CGLEEntitiesProps.EntityTypesLogicProps.SaveVector();
 		log.Vector.push_back(nullptr);
 		auto dis = CGLEEntitiesProps.EntityTypesDisplayProps.SaveVector();

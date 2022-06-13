@@ -70,6 +70,7 @@ namespace shok {
 
 		void FreeTech(int id);
 		void LoadTech(int id);
+		void PopTech(int id);
 	};
 
 	class TechCategoryManager {

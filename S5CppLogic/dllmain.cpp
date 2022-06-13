@@ -63,9 +63,10 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-    //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x2C96B613);
+    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0xFC5B7F67);
     //(*GGL::CGLGameLogic::GlobalObj)->TechManager->FreeTech(1);
-    return 0;
+
+    return 1;
 }
 
 int Cleanup(lua::State L) {

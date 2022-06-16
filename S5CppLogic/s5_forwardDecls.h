@@ -62,7 +62,6 @@ namespace GGL {
 namespace ED {
 	class CBehaviorProps;
 	class CEntity;
-	struct ModelInstance;
 	class CDisplayProps;
 	class CVisibleEntityManager;
 	struct ModelData;
@@ -86,4 +85,7 @@ namespace GGlue {
 namespace EGUIX {
 	class CBaseWidget;
 	struct Color;
+}
+namespace RWE {
+	struct RpClump;
 }

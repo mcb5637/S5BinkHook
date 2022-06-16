@@ -20,6 +20,7 @@
 #include "s5_defines.h"
 #include "s5_guistates.h"
 #include "s5_tasklist.h"
+#include "s5_RWEngine.h"
 #include "luaext.h"
 #include "hooks.h"
 #include "luaserializer.h"
@@ -877,14 +878,14 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
-	ED::ModelInstance::TransformOperation LogicModel_CheckTO(lua::State L, int idx) {
-		int i = L.OptInteger(idx, static_cast<int>(ED::ModelInstance::TransformOperation::Multiply));
+	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
+		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
 			throw lua::LuaException("invalid transform operation");
-		return static_cast<ED::ModelInstance::TransformOperation>(i);
+		return static_cast<RWE::RwOpCombineType>(i);
 	}
 	struct LogicModel {
-		ED::ModelInstance* Model = nullptr;
+		RWE::RpClump* Model = nullptr;
 
 		static int Clear(lua::State L) {
 			LogicModel* m = L.GetUserData<LogicModel>(1);
@@ -904,7 +905,7 @@ namespace CppLogic::Logic {
 				m->Model = nullptr;
 			}
 			m->Model = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
-			m->Model->Register();
+			m->Model->AddToDefaultWorld();
 			return 0;
 		}
 		static int Translate(lua::State L) {
@@ -923,7 +924,8 @@ namespace CppLogic::Logic {
 					h += t;
 				}
 			}
-			m->Model->Translate(p, h, LogicModel_CheckTO(L, 4));
+			RWE::RwV3d tr{ p.X, p.Y, h };
+			m->Model->GetFrame()->Translate(&tr, LogicModel_CheckTO(L, 4));
 			return 0;
 		}
 		static int Rotate(lua::State L) {
@@ -931,7 +933,7 @@ namespace CppLogic::Logic {
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			float r = L.CheckFloat(2);
-			m->Model->Rotate(r, LogicModel_CheckTO(L, 3));
+			m->Model->GetFrame()->Rotate(r, LogicModel_CheckTO(L, 3));
 			return 0;
 		}
 		static int Scale(lua::State L) {
@@ -939,14 +941,14 @@ namespace CppLogic::Logic {
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			float s = L.CheckFloat(2);
-			m->Model->Scale(s, LogicModel_CheckTO(L, 3));
+			m->Model->GetFrame()->Scale(s, LogicModel_CheckTO(L, 3));
 			return 0;
 		}
 		static int ResetTransform(lua::State L) {
 			LogicModel* m = L.GetUserData<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
-			m->Model->Rotate(0, ED::ModelInstance::TransformOperation::Set);
+			m->Model->GetFrame()->Rotate(0, RWE::RwOpCombineType::Replace);
 			return 0;
 		}
 		static int SetColorByPlayer(lua::State L) {
@@ -956,7 +958,7 @@ namespace CppLogic::Logic {
 			int p = L.CheckInt(2);
 			if (!(p >= 0 && p <= 9))
 				throw lua::LuaException("invalid player");
-			m->Model->SetColorByPlayerID(p);
+			m->Model->SetPlayerColor(p);
 			return 0;
 		}
 		static int DisableShadow(lua::State L) {
@@ -988,7 +990,7 @@ namespace CppLogic::Logic {
 			int g = L.CheckInt(3);
 			int b = L.CheckInt(4);
 			int a = L.OptInteger(5, 255);
-			m->Model->SetColorModulate(a, r, g, b);
+			m->Model->SetColorModulate(shok::Color{ r, g, b, a });
 			return 0;
 		}
 	

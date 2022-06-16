@@ -619,7 +619,7 @@ void shok::HookTextPrinting()
 
 void ERwTools::CRpClumpRenderable::SetModelData(const ED::ModelData* modeldata, float rotation)
 {
-	SetModelData(modeldata ? *reinterpret_cast<void**>(const_cast<ED::ModelData*>(modeldata)) : nullptr, rotation);
+	SetModelData(modeldata ? modeldata->Clump : nullptr, rotation);
 }
 void ERwTools::CRpClumpRenderable::SetPosition(const shok::Position& p, float z)
 {

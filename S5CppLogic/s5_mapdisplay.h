@@ -75,7 +75,7 @@ namespace ED {
 			float OnePassAlphaBlendingDistance;
 			float TerrainLightColorPortion;
 			float TerrainVertexColorPortion;
-			float SelectionOffsetX;
+			float SelectionOffsetX; // 6
 			float SelectionOffsetY;
 			float SelectionRadius;
 			bool CastShadow, DoNotDestroyHierarchy, HasUVAnim, OcclusionCaster;
@@ -139,39 +139,24 @@ namespace ED {
 		void ShowAck(const shok::Position& pos);
 	};
 
-	struct ModelInstance {
-		enum class TransformOperation : int {
-			Set = 0, // sets to identity, then performs the operation
-			Multiply = 1, // the new matrix is performed last
-			ReverseMultiply = 2, // the new matrix is performed first
-		};
-
-
-		PADDINGI(1);
-		struct {
-			PADDINGI(4);
-			float Matrix[4 * 4];
-		}*Transform;
-
-		void Register();
-		void Destroy();
-		void Rotate(float r, TransformOperation op);
-		void Rotate(float r, float* axis, TransformOperation op);
-		void Scale(float* s, TransformOperation op); // 3 coordinates (order?)
-		void Scale(float s, TransformOperation op);
-		void Translate(const shok::Position& p, float height, TransformOperation op);
-		void SetColorByPlayerID(int pl);
-		void DisableShadow();
-		void DisableParticleEffects();
-		void DisableTerrainDecal();
-		//argb =  r | (g << 8) | (b << 16) | (a << 24)
-		void SetColorModulate(shok::Color argb);
-		void SetColorModulate(int a, int r, int g, int b);
-	};
 	struct ModelData {
+		RWE::RpClump* Clump;
+		PADDINGI(5);
+		void* UVAnim; // 6
+		PADDINGI(2);
+		char* ModelName; // 9
+		PADDINGI(7);
+		float SelectionOffsetX; // 17
+		float SelectionOffsetY;
+		float SelectionRadius;
+		void* SelectionTexture; // texture loaded via RWE?
+		int DefaultAnimID;
 
-		ED::ModelInstance* Instanciate() const;
+
+		RWE::RpClump* Instanciate() const;
 	};
+	constexpr int i = offsetof(ModelData, ModelName) / 4;
+	static_assert(sizeof(ModelData) == 22 * 4);
 
 	class IResourceManager {
 	public:
@@ -183,7 +168,7 @@ namespace ED {
 		virtual void unknown3() = 0;
 		virtual void unknown4() = 0;
 	public:
-		virtual const ED::ModelData* GetModelDataByEntityType(int ety) = 0; //6
+		virtual const RWE::RpClump* GetModelDataByEntityType(int ety) = 0; //6
 		virtual const ED::ModelData* GetModelData(int modelid) = 0;
 	private:
 		virtual void unknown5() = 0;
@@ -193,8 +178,7 @@ namespace ED {
 
 	class CResourceManager : public IResourceManager {
 		PADDINGI(1); // conat char**?
-		void* ModelData; // most likely a vector
-		PADDINGI(3);
+		shok::Vector<ModelData*> Models; // get lazily loaded
 
 		static inline constexpr int vtp = 0x769824;
 	};
@@ -205,7 +189,7 @@ namespace ED {
 	};
 	class CWorld : public IWorld {
 	public:
-		void* SomeRenderObj;
+		RWE::RpWorld* World;
 
 		static inline constexpr int vtp = 0x769E94;
 	};

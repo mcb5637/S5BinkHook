@@ -2,11 +2,12 @@
 #include "s5_guistates.h"
 #include "s5_config.h"
 #include "s5_mapdisplay.h"
-#include "entityiterator.h"
 #include "s5_ui.h"
 #include "s5_entitytype.h"
 #include "s5_defines.h"
 #include "s5_entity.h"
+#include "s5_RWEngine.h"
+#include "entityiterator.h"
 #include "hooks.h"
 
 
@@ -79,7 +80,7 @@ void __declspec(naked) constructcommand_checkpos() {
 }
 void(__thiscall* const constructcommand_updatemodelsetpos)(GGUI::CPlaceBuildingState* th, int* p, int r) = reinterpret_cast<void(__thiscall*)(GGUI::CPlaceBuildingState*, int*, int)>(0x5269FE);
 void __fastcall constructcommand_updatemodelsetpos_over(GGUI::CPlaceBuildingState* th, int _, int* p, int r) {
-	th->C3DViewHandler->ClumpRenerable->Model->Rotate(CppLogic::RadiansToDegrees(GGUI::CPlaceBuildingState::PlacementRotation), ED::ModelInstance::TransformOperation::Set);
+	th->C3DViewHandler->ClumpRenerable->Model->GetFrame()->Rotate(CppLogic::RadiansToDegrees(GGUI::CPlaceBuildingState::PlacementRotation), RWE::RwOpCombineType::Replace);
 	constructcommand_updatemodelsetpos(th, p, r);
 }
 bool HookConstructCommandRotation_Hooked = false;

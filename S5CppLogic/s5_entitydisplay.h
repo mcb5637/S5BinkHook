@@ -112,7 +112,7 @@ namespace ED {
 		EGL::IEntityDisplay* Entity;
 		int EntityID;
 		int ModelOverrideID;
-		ED::ModelInstance* Model;
+		RWE::RpClump* Model;
 		PADDINGI(1); // some kind of flags? // 5
 		PADDINGI(1); // some counter
 		shok::Vector<ED::IBehavior*> DisplayBehaviors; // 7

@@ -88,12 +88,12 @@ namespace ERwTools {
 	private:
 		virtual void uk3() = 0;
 	protected:
-		virtual void SetModelData(void* model, float rot) = 0;
+		virtual void SetModelData(RWE::RpClump* model, float rot) = 0;
 	};
 	class CRpClumpRenderable : public IRenderable {
 	public:
 		int RenderMode; // red color?
-		ED::ModelInstance* Model;
+		RWE::RpClump* Model;
 		void* RenderObj; // from ED::CWorld
 
 		static inline constexpr int vtp = 0x7AEBF8;

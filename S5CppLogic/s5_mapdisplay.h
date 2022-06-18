@@ -154,33 +154,70 @@ namespace ED {
 
 
 		RWE::RpClump* Instanciate() const;
+
+		~ModelData();
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
 	};
 	constexpr int i = offsetof(ModelData, ModelName) / 4;
 	static_assert(sizeof(ModelData) == 22 * 4);
+
+	template<class T>
+	class CDEResourceList {
+	public:
+		struct Data { // check layout
+			int ID;
+			T* Data; // pointer?
+		};
+		shok::Set<Data> Map;
+		//check params
+		virtual void Load(int id, shok::String* name) {
+			throw 0;
+		}
+		virtual T* Get(int id) {
+			throw 0;
+		}
+	};
 
 	class IResourceManager {
 	public:
 		virtual ~IResourceManager() = default;
 	private:
-		virtual void unknown0() = 0;
-		virtual void unknown1() = 0;
-		virtual void unknown2() = 0;
-		virtual void unknown3() = 0;
-		virtual void unknown4() = 0;
+		virtual void Destroy() = 0;
 	public:
+		virtual RtAnimAnimation* GetAnimData(int animId) = 0;
+	private:
+		virtual void unknown2() = 0; // get from UnknownManager, then return float?
+	public:
+		virtual RwTexture* GetTextureData(int textureId) = 0;
+		virtual RwTexture* GetSelectionTexture() = 0;
 		virtual const RWE::RpClump* GetModelDataByEntityType(int ety) = 0; //6
 		virtual const ED::ModelData* GetModelData(int modelid) = 0;
+		virtual const RWE::RpClump* GetModelClumpByModelId(int id) = 0;
 	private:
-		virtual void unknown5() = 0;
-		virtual void unknown6() = 0;
+		virtual void unknown6() = 0;// get from UnknownManager, return something?
 		virtual void* GetModelData() = 0;
 	};
 
 	class CResourceManager : public IResourceManager {
-		PADDINGI(1); // conat char**?
-		shok::Vector<ModelData*> Models; // get lazily loaded
+		PADDINGI(1); // const char**?
+		struct {
+			shok::Vector<ModelData*> Models; // get lazily loaded
+			BB::CIDManagerEx* ModelIDManager;
+		} ModelManager;
+		struct {
+			shok::Vector<void*> Data;
+			BB::CIDManagerEx* IDManager;
+		} UnknownManager; // maybe also models? the idmanager seems to be the same
+		CDEResourceList<RtAnimAnimation> AnimManager;
+		CDEResourceList<RwTexture> TextureManager;
+		RwTexture* SelectionTexture;
 
 		static inline constexpr int vtp = 0x769824;
+
+	private:
+		ModelData* LoadModel(const char* name);
 	};
 
 	class IWorld {

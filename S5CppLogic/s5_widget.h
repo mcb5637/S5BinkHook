@@ -18,9 +18,10 @@ namespace EGUIX {
 	class TextureManager { // no vtable, does this thing do only gui textures, or something else too?
 	public:
 		BB::CIDManager* IdManager;
-		PADDINGI(4);
+		shok::Vector<RWE::RwTexture*> Textures; // loads texture lazily
 
 		int GetTextureID(const char* name);
+		RWE::RwTexture* GetTextureByID(int id);
 
 		static inline TextureManager* (__stdcall* const GlobalObj)() = reinterpret_cast<TextureManager * (__stdcall*)()>(0x556644);
 	};

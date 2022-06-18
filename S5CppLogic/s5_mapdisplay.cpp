@@ -65,6 +65,24 @@ RWE::RpClump* ED::ModelData::Instanciate() const
 {
 	return modeldata_instanciate(this);
 }
+static inline void(__thiscall* const modeldata_dtor)(ED::ModelData* d) = reinterpret_cast<void(__thiscall*)(ED::ModelData * d)>(0x475D83);
+ED::ModelData::~ModelData()
+{
+	modeldata_dtor(this);
+}
+void* ED::ModelData::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void ED::ModelData::operator delete(void* p) {
+	shok::Free(p);
+}
+
+static inline ED::ModelData* (__cdecl* const resmng_loadmodel)(const char* n) = reinterpret_cast<ED::ModelData* (__cdecl*)(const char*)>(0x472D71);
+ED::ModelData* ED::CResourceManager::LoadModel(const char* name)
+{
+	return resmng_loadmodel(name);
+}
 
 unsigned int __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const
 {

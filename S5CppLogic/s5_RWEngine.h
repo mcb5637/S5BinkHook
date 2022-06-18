@@ -16,11 +16,19 @@ namespace BBRw {
 	};
 }
 
+// this is c code, i just c++ified it to clean up my global namespace
+// need these for templates, so RTTI works
+struct RtAnimAnimation {
+
+};
+struct RwTexture;
 namespace RWE {
 	// real forward decls
 	struct RpClump;
 	struct RpAtomic;
 	struct RpWorld;
+	using RwTexture = ::RwTexture;
+	using RtAnimAnimation = ::RtAnimAnimation;
 
 	// not done
 	struct RwResEntry;
@@ -29,6 +37,8 @@ namespace RWE {
 	struct RpSector;
 	struct RxPipeline;
 	struct RpWorldSector;
+	struct RwRaster;
+	struct RwTexDictionary;
 
 	struct RwLinkList {
 		struct RwLLLink {
@@ -319,3 +329,16 @@ namespace RWE {
 	static_assert(offsetof(RwGlobals, memoryFuncs) == 264);
 	//constexpr int i = offsetof(RwGlobals, memoryAlloc)/4;
 }
+
+struct RwTexture {
+	RWE::RwRaster* raster;
+	RWE::RwTexDictionary* dict;
+	RWE::RwLinkList::RwLLLink lInDictionary;
+	char name[32];
+	char mask[32];
+	unsigned int filterAddressing; // 20
+	int refCount;
+
+	static RwTexture* Read(const char* name, const char* mask);
+	void Destroy();
+};

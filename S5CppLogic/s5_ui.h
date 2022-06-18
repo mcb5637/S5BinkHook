@@ -48,6 +48,7 @@ namespace shok {
 
 		void RenderText(const char* txt, int fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
 		void SetTextRenderColor(shok::Color c);
+		void RenderMaterial(const EGUIX::CMaterial* mat, bool scale, const EGUIX::Rect* pos);
 
 		static inline size_t(__cdecl* const MultibyteToWString)(const char* in, wchar_t* out, size_t len) = reinterpret_cast<size_t(__cdecl*)(const char*, wchar_t*, size_t)>(0x55B73C);
 

@@ -64,6 +64,11 @@ void shok::UIRenderer::SetTextRenderColor(shok::Color c)
 {
 	uirender_setcolor(TextRenderObj, &c, &c, &c, &c);
 }
+static inline void(__thiscall* const uirender_rmaterial)(shok::UIRenderer* r, const EGUIX::CMaterial* m, bool s, const EGUIX::Rect* p) = reinterpret_cast<void(__thiscall*)(shok::UIRenderer*, const EGUIX::CMaterial*, bool, const EGUIX::Rect*)>(0x557167);
+void shok::UIRenderer::RenderMaterial(const EGUIX::CMaterial* mat, bool scale, const EGUIX::Rect* pos)
+{
+	uirender_rmaterial(this, mat, scale, pos);
+}
 
 static inline const EGUIX::Color* (__thiscall* const uircustomcolorcont_getcol)(shok::UIRenderCustomColorContext* th, int i) = reinterpret_cast<const EGUIX::Color * (__thiscall*)(shok::UIRenderCustomColorContext*, int)>(0x5577B6);
 const EGUIX::Color* shok::UIRenderCustomColorContext::GetColorByInt(int i)

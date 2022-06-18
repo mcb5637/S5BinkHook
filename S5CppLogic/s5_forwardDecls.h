@@ -84,8 +84,12 @@ namespace GGlue {
 }
 namespace EGUIX {
 	class CBaseWidget;
+	class CMaterial;
+	struct Rect;
 	struct Color;
 }
+struct RwTexture;
 namespace RWE {
 	struct RpClump;
+	using RwTexture = ::RwTexture;
 }

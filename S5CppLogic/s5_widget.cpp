@@ -25,6 +25,11 @@ int EGUIX::TextureManager::GetTextureID(const char* name)
 {
     return texman_getid(this, name);
 }
+static inline RWE::RwTexture* (__thiscall* const texman_gettex)(EGUIX::TextureManager* th, int id) = reinterpret_cast<RWE::RwTexture* (__thiscall*)(EGUIX::TextureManager*, int)>(0x556B1C);
+RWE::RwTexture* EGUIX::TextureManager::GetTextureByID(int id)
+{
+    return texman_gettex(this, id);
+}
 
 unsigned int __stdcall EGUIX::CFontIDHandler::GetClassIdentifier() const
 {

@@ -121,3 +121,14 @@ RWE::RpWorld* RWE::RpWorld::RemoveClump(RpClump* clump)
 {
     return world_remclump(this, clump);
 }
+
+static inline RwTexture* (__cdecl* const texture_read)(const char* n, const char* m) = reinterpret_cast<RwTexture* (__cdecl*)(const char*, const char*)>(0x417DB0);
+RwTexture* RwTexture::Read(const char* name, const char* mask)
+{
+    return texture_read(name, mask);
+}
+static inline int(__cdecl* const texture_destroy)(RwTexture* t) = reinterpret_cast<int(__cdecl*)(RwTexture * t)>(0x417C00);
+void RwTexture::Destroy()
+{
+    texture_destroy(this);
+}

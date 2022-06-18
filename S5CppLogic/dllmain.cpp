@@ -22,6 +22,7 @@
 #include "s5_framework.h"
 #include "s5_tasklist.h"
 #include "s5_mapdisplay.h"
+#include "s5_idmanager.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -64,9 +65,9 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-    //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0xFC5B7F67);
+    //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A2B0));
     //(*GGL::CGLGameLogic::GlobalObj)->TechManager->FreeTech(1);
-    L.Push((int)(*ED::CGlobalsBaseEx::GlobalObj)->ResManager);
+    L.Push((int)(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager);
     return 1;
 }
 

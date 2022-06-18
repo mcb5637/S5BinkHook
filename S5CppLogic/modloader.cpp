@@ -7,6 +7,7 @@
 #include "s5_entityandeffectmanager.h"
 #include "s5_tasklist.h"
 #include "s5_maplogic.h"
+#include "s5_mapdisplay.h"
 #include "s5_tech.h"
 #include "entityiterator.h"
 
@@ -222,6 +223,23 @@ int CppLogic::ModLoader::ModLoader::AddTechnology(lua::State L)
 	m->LoadTech(id);
 	TechsToRemove.push_back(id);
 	L.Push("Technologies");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* mp = (*ED::CGlobalsBaseEx::GlobalObj)->ModelProps;
+	if (mp->ModelIdManager->GetIdByName(t))
+		throw lua::LuaException{ "model already exists" };
+	int id = mp->ModelIdManager->GetIDByNameOrCreate(t);
+	mp->LoadModelDataFromExtraFile(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(id);
+	L.Push("Models");
 	L.GetTableRaw(L.GLOBALSINDEX);
 	L.PushValue(1);
 	L.Push(id);

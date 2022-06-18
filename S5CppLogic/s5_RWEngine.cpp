@@ -54,6 +54,12 @@ RWE::RwFrame* RWE::RwFrame::Translate(const RwV3d* translation, RwOpCombineType 
     return frame_translate(this, translation, combineOp);
 }
 
+static inline int(__cdecl* const raster_destroy)(RWE::RwRaster* r) = reinterpret_cast<int(__cdecl*)(RWE::RwRaster*)>(0x418A90);
+void RWE::RwRaster::Destroy()
+{
+    raster_destroy(this);
+}
+
 static inline RWE::RpClump* (__cdecl* const clump_forallatomics)(RWE::RpClump* m, RWE::RpAtomicCallBack, void* data) = reinterpret_cast<RWE::RpClump* (__cdecl*)(RWE::RpClump*, RWE::RpAtomicCallBack, void*)>(0x628E30);
 RWE::RpClump* RWE::RpClump::ForAllAtomics(RpAtomicCallBack callback, void* pData)
 {

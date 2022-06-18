@@ -31,8 +31,9 @@ namespace CppLogic::ModLoader {
 		static int AddTaskList(lua::State L);
 		static int ReloadTechnology(lua::State L);
 		static int AddTechnology(lua::State L);
+		static int AddModel(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 9> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 10> LuaFuncs{ {
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -42,6 +43,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<AddTaskList>("AddTaskList"),
 				lua::FuncReference::GetRef<ReloadTechnology>("ReloadTechnology"),
 				lua::FuncReference::GetRef<AddTechnology>("AddTechnology"),
+				lua::FuncReference::GetRef<AddModel>("AddModel"),
 		} };
 
 	public:

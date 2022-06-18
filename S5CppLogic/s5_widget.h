@@ -15,7 +15,7 @@ namespace EGUIX {
 		shok::Color ToShokColor() const;
 	};
 
-	class TextureManager { // no vtable, does this thing do only gui textures, or something else too?
+	class TextureManager { // no vtable, only gui textures in here
 	public:
 		BB::CIDManager* IdManager;
 		shok::Vector<RWE::RwTexture*> Textures; // loads texture lazily

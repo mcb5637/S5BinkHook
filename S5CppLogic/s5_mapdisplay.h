@@ -64,32 +64,37 @@ namespace ED {
 		static inline ED::CGlobalsLogicEx** const GlobalObj = reinterpret_cast<ED::CGlobalsLogicEx**>(0x8581EC);
 	};
 
-	class CModelsProps { // models.xml gets loaded into this 71D6BD
+	class CModelsProps {
 	public:
 		virtual ~CModelsProps() = default;
 
 		struct ModelData {
-			const char* Effect;
-			const char* OrnamentalItemEffect;
-			const char* SelectionTexture;
-			float OnePassAlphaBlendingDistance;
-			float TerrainLightColorPortion;
-			float TerrainVertexColorPortion;
-			float SelectionOffsetX; // 6
-			float SelectionOffsetY;
-			float SelectionRadius;
-			bool CastShadow, DoNotDestroyHierarchy, HasUVAnim, OcclusionCaster;
-			bool OcclusionReceiver, OrnamentalItem, ShareShadowRaster, UseAlphaBlending;
-			bool UseSurfaceHeight, TwoPassAlphaBlending, AlphaBlendHighQualityOnly; PADDING(1);
-			int DefaultAnimID; // 12
+			const char* Effect = nullptr;
+			const char* OrnamentalItemEffect = nullptr;
+			const char* SelectionTexture = nullptr;
+			float OnePassAlphaBlendingDistance = 0;
+			float TerrainLightColorPortion = 0;
+			float TerrainVertexColorPortion = 0;
+			float SelectionOffsetX = 0; // 6
+			float SelectionOffsetY = 0;
+			float SelectionRadius = 0;
+			bool CastShadow = true, DoNotDestroyHierarchy = false, HasUVAnim = false, OcclusionCaster = false;
+			bool OcclusionReceiver = false, OrnamentalItem = false, ShareShadowRaster = false, UseAlphaBlending = false;
+			bool UseSurfaceHeight = false, TwoPassAlphaBlending = false, AlphaBlendHighQualityOnly = false; PADDING(1);
+			int DefaultAnimID = 0; // 12
+
+
+			static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA19F90);
 		};
 
 		shok::Vector<ModelData> Model;
-
+		BB::CIDManagerEx* ModelIdManager;
 
 		static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA1A2B0);
 
 		static inline constexpr int vtp = 0x7AE60C;
+
+		void LoadModelDataFromExtraFile(int id);
 	};
 	static_assert(sizeof(CModelsProps::ModelData) == 13 * 4);
 
@@ -140,21 +145,23 @@ namespace ED {
 	};
 
 	struct ModelData {
-		RWE::RpClump* Clump;
+		RWE::RpClump* Clump = nullptr;
 		PADDINGI(5);
-		void* UVAnim; // 6
+		void* UVAnim = nullptr; // 6
 		PADDINGI(2);
-		char* ModelName; // 9
+		char* ModelName = nullptr; // 9
 		PADDINGI(7);
-		float SelectionOffsetX; // 17
-		float SelectionOffsetY;
-		float SelectionRadius;
-		void* SelectionTexture; // texture loaded via RWE?
-		int DefaultAnimID;
+		float SelectionOffsetX = 0; // 17
+		float SelectionOffsetY = 0;
+		float SelectionRadius = 0;
+		void* SelectionTexture = nullptr; // texture loaded via RWE?
+		int DefaultAnimID = 0;
 
 
 		RWE::RpClump* Instanciate() const;
 
+		ModelData() = default;
+		ModelData(ModelData&& o) noexcept;
 		~ModelData();
 
 		void* operator new(size_t s);
@@ -183,21 +190,19 @@ namespace ED {
 	class IResourceManager {
 	public:
 		virtual ~IResourceManager() = default;
-	private:
 		virtual void Destroy() = 0;
-	public:
 		virtual RtAnimAnimation* GetAnimData(int animId) = 0;
 	private:
 		virtual void unknown2() = 0; // get from UnknownManager, then return float?
 	public:
-		virtual RwTexture* GetTextureData(int textureId) = 0;
-		virtual RwTexture* GetSelectionTexture() = 0;
+		virtual RWE::RwTexture* GetTextureData(int textureId) = 0;
+		virtual RWE::RwTexture* GetSelectionTexture() = 0;
 		virtual const RWE::RpClump* GetModelDataByEntityType(int ety) = 0; //6
 		virtual const ED::ModelData* GetModelData(int modelid) = 0;
 		virtual const RWE::RpClump* GetModelClumpByModelId(int id) = 0;
 	private:
 		virtual void unknown6() = 0;// get from UnknownManager, return something?
-		virtual void* GetModelData() = 0;
+		virtual void* GetModelManager() = 0;
 	};
 
 	class CResourceManager : public IResourceManager {
@@ -211,8 +216,8 @@ namespace ED {
 			BB::CIDManagerEx* IDManager;
 		} UnknownManager; // maybe also models? the idmanager seems to be the same
 		CDEResourceList<RtAnimAnimation> AnimManager;
-		CDEResourceList<RwTexture> TextureManager;
-		RwTexture* SelectionTexture;
+		CDEResourceList<RWE::RwTexture> TextureManager; // seems to be only lightning and snowflake textures
+		RWE::RwTexture* SelectionTexture;
 
 		static inline constexpr int vtp = 0x769824;
 

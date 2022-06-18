@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include "s5_mapdisplay.h"
 #include "s5_config.h"
+#include "s5_idmanager.h"
+#include "s5_classfactory.h"
 
 
 bool ED::CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)
@@ -34,6 +36,21 @@ EGL::CGLELandscape::BlockingMode ED::CGlobalsLogicEx::GetBlocking(const shok::Po
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return static_cast<EGL::CGLELandscape::BlockingMode>(Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]]);
+}
+
+void ED::CModelsProps::LoadModelDataFromExtraFile(int id)
+{
+	if (id > static_cast<int>(Model.size()))
+		throw std::logic_error{ "somehow the id is too big" };
+	if (id == static_cast<int>(Model.size())) {
+		auto v = Model.SaveVector();
+		v.Vector.emplace_back();
+	}
+	auto& t = Model[id];
+	std::string filename = "Data/Config/Models/";
+	filename.append(ModelIdManager->GetNameByID(id));
+	filename.append(".xml");
+	(*BB::CClassFactory::GlobalObj)->LoadObject(&t, filename.c_str(), t.SerializationData);
 }
 
 shok::Color ED::CPlayerColors::GetColorByIndex(int i)
@@ -69,6 +86,11 @@ static inline void(__thiscall* const modeldata_dtor)(ED::ModelData* d) = reinter
 ED::ModelData::~ModelData()
 {
 	modeldata_dtor(this);
+}
+ED::ModelData::ModelData(ModelData&& o) noexcept
+{
+	std::memcpy(this, &o, sizeof(ModelData));
+	std::memset(&o, 0, sizeof(ModelData));
 }
 void* ED::ModelData::operator new(size_t s)
 {

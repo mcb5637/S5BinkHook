@@ -904,7 +904,8 @@ namespace CppLogic::Logic {
 				m->Model->Destroy();
 				m->Model = nullptr;
 			}
-			m->Model = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid)->Instanciate();
+			auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid);
+			m->Model = mdata->Instanciate();
 			m->Model->AddToDefaultWorld();
 			return 0;
 		}

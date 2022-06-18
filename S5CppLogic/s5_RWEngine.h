@@ -37,7 +37,6 @@ namespace RWE {
 	struct RpSector;
 	struct RxPipeline;
 	struct RpWorldSector;
-	struct RwRaster;
 	struct RwTexDictionary;
 
 	struct RwLinkList {
@@ -130,6 +129,29 @@ namespace RWE {
 		RwObject object;
 		RwLinkList::RwLLLink lFrame;
 		RwObjectHasFrame* (*sync)(RwObjectHasFrame* object);
+	};
+
+	struct RwRaster {
+		// check this, all of this is device dependend according to RW docu
+		RwRaster* parent; /* Top level raster if a sub raster */
+		byte* cpPixels; /* Pixel pointer when locked */
+		byte* palette; /* Raster palette */
+		int width, height, depth; /* Dimensions of raster */
+		int stride; /* Lines bytes of raster */
+		short nOffsetX, nOffsetY; /* Sub raster offset */
+		byte cType;  /* Type of raster */
+		byte cFlags; /* Raster flags */
+		byte privateFlags; /* Raster private flags */
+		byte cFormat; /* Raster format */
+
+		byte* originalPixels;
+		int originalWidth;
+		int originalHeight;
+		int originalStride;
+
+		// destroys, no ref counting here
+		// destroy parent? (docu)
+		void Destroy();
 	};
 
 	struct RpInterpolator {
@@ -312,7 +334,7 @@ namespace RWE {
 
 		RwLinkList dirtyFrameList;
 
-		RwStringFunctions stringFuncs;
+		RwStringFunctions stringFuncs; // 49
 
 		RwMemoryFunctions memoryFuncs; // 66
 
@@ -327,7 +349,7 @@ namespace RWE {
 		static inline RwGlobals* const GlobalObj = reinterpret_cast<RwGlobals*>(0x8501C8);
 	};
 	static_assert(offsetof(RwGlobals, memoryFuncs) == 264);
-	//constexpr int i = offsetof(RwGlobals, memoryAlloc)/4;
+	//constexpr int i = offsetof(RwGlobals, stringFuncs)/4;
 }
 
 struct RwTexture {
@@ -340,5 +362,6 @@ struct RwTexture {
 	int refCount;
 
 	static RwTexture* Read(const char* name, const char* mask);
+	// destroys if no reference left
 	void Destroy();
 };

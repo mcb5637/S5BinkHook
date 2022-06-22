@@ -21,6 +21,7 @@ namespace CppLogic::ModLoader {
 		static bool ReloadEffectTypes;
 		static std::vector<int> TaskListsToRemove;
 		static std::vector<int> TechsToRemove;
+		static std::vector<int> ModelsToRemove;
 
 		static int AddEntityType(lua::State L);
 		static int ReloadEntityType(lua::State L);

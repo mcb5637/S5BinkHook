@@ -38,6 +38,24 @@ EGL::CGLELandscape::BlockingMode ED::CGlobalsLogicEx::GetBlocking(const shok::Po
 	return static_cast<EGL::CGLELandscape::BlockingMode>(Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]]);
 }
 
+ED::CModelsProps::ModelData::ModelData(ModelData&& o) noexcept
+{
+	std::memcpy(this, &o, sizeof(ModelData));
+	std::memset(&o, 0, sizeof(ModelData));
+}
+ED::CModelsProps::ModelData::~ModelData()
+{
+	if (Effect)
+		shok::Free(Effect);
+	Effect = nullptr;
+	if (OrnamentalItemEffect)
+		shok::Free(OrnamentalItemEffect);
+	OrnamentalItemEffect = nullptr;
+	if (SelectionTexture)
+		shok::Free(SelectionTexture);
+	SelectionTexture = nullptr;
+}
+
 void ED::CModelsProps::LoadModelDataFromExtraFile(int id)
 {
 	if (id > static_cast<int>(Model.size()))
@@ -51,6 +69,13 @@ void ED::CModelsProps::LoadModelDataFromExtraFile(int id)
 	filename.append(ModelIdManager->GetNameByID(id));
 	filename.append(".xml");
 	(*BB::CClassFactory::GlobalObj)->LoadObject(&t, filename.c_str(), t.SerializationData);
+}
+void ED::CModelsProps::PopModel(int id)
+{
+	if (id + 1 != static_cast<int>(Model.size()))
+		throw std::out_of_range("invalid id");
+	auto v = Model.SaveVector();
+	v.Vector.pop_back();
 }
 
 shok::Color ED::CPlayerColors::GetColorByIndex(int i)
@@ -98,6 +123,20 @@ void* ED::ModelData::operator new(size_t s)
 }
 void ED::ModelData::operator delete(void* p) {
 	shok::Free(p);
+}
+
+void ED::CResourceManager::FreeModel(int id)
+{
+	delete ModelManager.Models[id];
+	ModelManager.Models[id] = nullptr;
+}
+void ED::CResourceManager::PopModel(int id)
+{
+	if (id + 1 != static_cast<int>(ModelManager.Models.size()))
+		throw std::out_of_range("invalid id");
+	FreeModel(id);
+	auto v = ModelManager.Models.SaveVector();
+	v.Vector.pop_back();
 }
 
 static inline ED::ModelData* (__cdecl* const resmng_loadmodel)(const char* n) = reinterpret_cast<ED::ModelData* (__cdecl*)(const char*)>(0x472D71);

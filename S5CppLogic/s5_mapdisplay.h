@@ -69,9 +69,9 @@ namespace ED {
 		virtual ~CModelsProps() = default;
 
 		struct ModelData {
-			const char* Effect = nullptr;
-			const char* OrnamentalItemEffect = nullptr;
-			const char* SelectionTexture = nullptr;
+			char* Effect = nullptr;
+			char* OrnamentalItemEffect = nullptr;
+			char* SelectionTexture = nullptr;
 			float OnePassAlphaBlendingDistance = 0;
 			float TerrainLightColorPortion = 0;
 			float TerrainVertexColorPortion = 0;
@@ -83,6 +83,9 @@ namespace ED {
 			bool UseSurfaceHeight = false, TwoPassAlphaBlending = false, AlphaBlendHighQualityOnly = false; PADDING(1);
 			int DefaultAnimID = 0; // 12
 
+			ModelData() = default;
+			ModelData(ModelData&& o) noexcept;
+			~ModelData();
 
 			static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA19F90);
 		};
@@ -95,6 +98,8 @@ namespace ED {
 		static inline constexpr int vtp = 0x7AE60C;
 
 		void LoadModelDataFromExtraFile(int id);
+		// remember to free in idmanager and CResourceManager, free last id first
+		void PopModel(int id);
 	};
 	static_assert(sizeof(CModelsProps::ModelData) == 13 * 4);
 
@@ -167,7 +172,7 @@ namespace ED {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 	};
-	constexpr int i = offsetof(ModelData, ModelName) / 4;
+	//constexpr int i = offsetof(ModelData, ModelName) / 4;
 	static_assert(sizeof(ModelData) == 22 * 4);
 
 	template<class T>
@@ -220,6 +225,11 @@ namespace ED {
 		RWE::RwTexture* SelectionTexture;
 
 		static inline constexpr int vtp = 0x769824;
+
+		// gets reloaded when accessed next
+		void FreeModel(int id);
+		// remember to free in idmanager and CModelsProps, free last id first
+		void PopModel(int id);
 
 	private:
 		ModelData* LoadModel(const char* name);

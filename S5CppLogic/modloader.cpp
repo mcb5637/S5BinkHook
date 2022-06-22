@@ -106,6 +106,7 @@ std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToReload{};
 bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TechsToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -239,6 +240,7 @@ int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
 	int id = mp->ModelIdManager->GetIDByNameOrCreate(t);
 	mp->LoadModelDataFromExtraFile(id);
 	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(id);
+	ModelsToRemove.push_back(id);
 	L.Push("Models");
 	L.GetTableRaw(L.GLOBALSINDEX);
 	L.PushValue(1);
@@ -355,6 +357,14 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			if (*GGL::CGLGameLogic::GlobalObj)
 				(*GGL::CGLGameLogic::GlobalObj)->TechManager->PopTech(id);
 			(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(id);
+		}
+
+		while (ModelsToRemove.size() != 0) {
+			int id = ModelsToRemove.back();
+			ModelsToRemove.pop_back();
+			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->PopModel(id);
+			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->PopModel(id);
+			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager->RemoveID(id);
 		}
 	}
 }

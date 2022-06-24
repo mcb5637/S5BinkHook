@@ -81,6 +81,25 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x83AE4C;
 		static inline constexpr unsigned int Identifier = 0x0FCFC0D;
 	};
+
+	struct SSlotArgsAnimation {
+		bool PlayBackwards;
+		int AnimId;
+		int StartTurn;
+		int Duration;
+		float SpeedModifier;
+	};
+	class CBehaviorAnimation : public CGLEBehavior {
+	public:
+		class CSlotAnimation : public EGL::TSlot<EGL::SSlotArgsAnimation, 796165920> {
+		public:
+			CBehaviorAnimation* Behavior;
+
+			static constexpr int vtp = 0x784A84;
+		};
+
+		// all fields are in GGL::CGLBehaviorAnimationEx
+	};
 }
 
 namespace GGL {
@@ -144,7 +163,10 @@ namespace GGL {
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86CBE8);
 	};
 
-	struct SSlotArgsCamouflage {};
+	struct SSlotArgsCamouflage {
+		int LocalPlayer;
+		bool IsLocalPlayer, IsNotAlliedToLocalPlayer;
+	};
 	class CCamouflageBehavior : public GGL::CHeroAbility, public EGL::TSlot<GGL::SSlotArgsCamouflage, 0x3AA0169D> {
 	public:
 		GGL::CCamouflageBehaviorProps* CamoProps;
@@ -481,10 +503,10 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x5F1FFAD;
 	};
 
-	class CGLBehaviorAnimationEx : public EGL::CGLEBehavior {
+	class CGLBehaviorAnimationEx : public EGL::CBehaviorAnimation {
 	public:
 		int Animation, AnimCategory, SuspendedAnimation, StartTurn, Duration; // 4
-		byte PlayBackwards;
+		bool PlayBackwards; // 9
 		PADDING(3);
 		int TurnToWaitFor;
 		float SpeedModifier; // 11

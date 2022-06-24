@@ -42,6 +42,10 @@ bool EGL::CEffect::IsArrowEffect()
 	return dynamic_cast<GGL::CArrowEffect*>(this);
 }
 
+void EGL::CFlyingEffectSlot::FillSlot(SSlotArgsFlyingEffect* data)
+{
+	throw 0;
+}
 unsigned int __stdcall EGL::CFlyingEffectSlot::GetClassIdentifier() const
 {
 	return Identifier;

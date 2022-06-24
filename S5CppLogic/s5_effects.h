@@ -39,6 +39,7 @@ namespace EGL {
 		float x; // 6.28 ?
 		float Speed;
 
+		virtual void FillSlot(SSlotArgsFlyingEffect* data) override;
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
 

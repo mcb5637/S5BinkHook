@@ -53,6 +53,11 @@ RWE::RwFrame* RWE::RwFrame::Translate(const RwV3d* translation, RwOpCombineType 
 {
     return frame_translate(this, translation, combineOp);
 }
+static inline RWE::RwFrame* (__cdecl* const frame_forallchildren)(RWE::RwFrame* f, RWE::RwFrameCallBack cb, void* d) = reinterpret_cast<RWE::RwFrame* (__cdecl*)(RWE::RwFrame*, RWE::RwFrameCallBack, void*)>(0x414100);
+RWE::RwFrame* RWE::RwFrame::ForAllChildren(RwFrameCallBack callBack, void* data)
+{
+    return frame_forallchildren(this, callBack, data);
+}
 
 static inline int(__cdecl* const raster_destroy)(RWE::RwRaster* r) = reinterpret_cast<int(__cdecl*)(RWE::RwRaster*)>(0x418A90);
 void RWE::RwRaster::Destroy()

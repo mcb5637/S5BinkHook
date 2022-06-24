@@ -94,6 +94,7 @@ namespace RWE {
 
 	typedef RpClump* (*RpClumpCallBack)(RpClump* clump, void* data);
 	typedef RpAtomic* (*RpAtomicCallBack)(RpAtomic* atomic, void* data);
+	typedef RwFrame* (*RwFrameCallBack)(RwFrame* frame, void* data);
 
 	struct RwFrame {
 		RwObject object;
@@ -123,6 +124,8 @@ namespace RWE {
 		RwFrame* Scale(float scale, RwOpCombineType combineOp);
 		// returns this
 		RwFrame* Translate(const RwV3d* translation, RwOpCombineType combineOp);
+		// returns this
+		RwFrame* ForAllChildren(RwFrameCallBack callBack, void* data);
 	};
 
 	struct RwObjectHasFrame {

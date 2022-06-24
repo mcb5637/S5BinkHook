@@ -23,7 +23,7 @@ namespace ED {
 	class IBehavior : public BB::IObject {
 	public:
 		ED::CEntity* EntityDisplay = nullptr;
-		ED::CBehaviorProps* Props = nullptr;
+		//ED::CBehaviorProps* Props = nullptr; does seem to be only in subclasses
 
 	protected:
 		virtual void __stdcall OnAdd(ED::CEntity* edispl, ED::CBehaviorProps* props, int uk) = 0; // called before ED::CEntity init
@@ -84,10 +84,13 @@ namespace ED {
 
 	class CDisplayBehaviorBuildingAnimation : public ED::IBehavior {
 	public:
+		EGL::CBehaviorAnimation::CSlotAnimation* Slot;
+
 
 		static inline constexpr int vtp = 0x7AEAD4;
 		static inline constexpr int TypeDesc = 0x84D4CC;
 	};
+	static_assert(offsetof(CDisplayBehaviorBuildingAnimation, Slot) == 2 * 4);
 
 	class CDisplayBehaviorAnimationNoBlending : public ED::IBehavior {
 	public:
@@ -165,6 +168,13 @@ namespace ED {
 	};
 	static_assert(sizeof(CDisplayStaticEntity) == 4 * 17);
 
+	class CDisplayStaticWithHierarchy : public CDisplayStaticEntity {
+	public:
+		PADDINGI(1);
+
+		static inline constexpr int vtp = 0x76AE30;
+	};
+	static_assert(sizeof(CDisplayStaticWithHierarchy) == 4 * 18);
 }
 
 namespace GD {
@@ -224,6 +234,7 @@ namespace GD {
 
 	class CCamouflageBehavior : public ED::IBehavior {
 	public:
+		ED::CBehaviorProps* Props = nullptr;
 		void* Slot; // EGL::TSlot<GGL::SSlotArgsCamouflage,983570077>
 		bool UseAltModel;
 		PADDING(3);

@@ -300,6 +300,8 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <None Include="CppLogic.lua">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="doc\CppLogic.lua" />
+    <None Include="doc\ModLoader.lua" />
     <None Include="Source.def" />
   </ItemGroup>
   <ItemGroup>

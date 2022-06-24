@@ -55,6 +55,9 @@
     <Filter Include="utility">
       <UniqueIdentifier>{909c9675-a836-4937-a838-60d3df65811d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="doc">
+      <UniqueIdentifier>{41f84729-4e82-4d75-a339-5ba9990d81b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -369,6 +372,12 @@
     </None>
     <None Include="CppLogic.lua" />
     <None Include="cpp.hint" />
+    <None Include="doc\CppLogic.lua">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="doc\ModLoader.lua">
+      <Filter>doc</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua50\S5Lua5.lib" />

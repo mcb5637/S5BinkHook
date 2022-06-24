@@ -1,0 +1,49 @@
+Data Types:
+
+EntityType:
+path: data/config/entities/typename.xml (list of ids in data/config/entities.xml, dynamically changed)
+example: as originals
+
+EffectType:
+path: data/config/effects/typename.xml (usually data/config/effects.xml, dynamically changed)
+example:
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<Logic classname="GGL::CArrowEffectProps">
+		<Class>GGL::CArrowEffect</Class>
+		<Global>false</Global>
+		<Duration>0</Duration>
+		<Speed>1200.0</Speed>
+		<GravityFactor>600.0f</GravityFactor>
+		<HeightOffsetStart>160.0</HeightOffsetStart>
+		<HeightOffsetTarget>120.0</HeightOffsetTarget>
+		<Damage>0</Damage>
+	</Logic>
+	<Display classname="ED::CFlyingEffectProps">
+		<Class>ED::CFlyingEffect</Class>
+		<Model>XD_CannonBall</Model>
+	</Display>
+</root>
+
+TaskList:
+path: data/config/tasklists/tlname.xml (list of ids in data/config/tllist.xml, dynamically changed)
+example: as originals
+
+Technology:
+path: data/config/technologies/tname.xml, (list of ids in data/config/technologies.xml, dynamically changed)
+example: as originals
+
+Model:
+path: data/config/models/mname.xml and data/graphics/models/mname.dff (as well as referenced textures),
+		(usually data/config/models.xml", dynamically changed)
+example xml (see ED::CModelsProps::ModelData for full list of entries):
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<SelectionTexture>Selection_Building</SelectionTexture>
+	<CastShadow>false</CastShadow>
+</root>
+example dff: as originals
+
+GUITexture:
+path: data/graphics/textures/gui/tname.png (full path as id used)
+example: as originals

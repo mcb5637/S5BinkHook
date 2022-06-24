@@ -389,5 +389,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="memedits.txt" />
+    <Text Include="doc\data_notes.txt">
+      <Filter>doc</Filter>
+    </Text>
   </ItemGroup>
 </Project>

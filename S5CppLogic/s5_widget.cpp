@@ -3,6 +3,8 @@
 #include "s5_defines.h"
 #include "s5_events.h"
 #include "s5_mem.h"
+#include "s5_RWEngine.h"
+#include "s5_idmanager.h"
 #include "hooks.h"
 
 struct shok_vtable_EGUIX_CBaseWidget : BB::IObject::_vtableS {
@@ -25,10 +27,27 @@ int EGUIX::TextureManager::GetTextureID(const char* name)
 {
     return texman_getid(this, name);
 }
+static inline int(__thiscall* const texman_getidnoadd)(EGUIX::TextureManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::TextureManager*, const char*)>(0x5566A5);
+int EGUIX::TextureManager::GetTextureIDNoAdd(const char* name)
+{
+    return texman_getidnoadd(this, name);
+}
 static inline RWE::RwTexture* (__thiscall* const texman_gettex)(EGUIX::TextureManager* th, int id) = reinterpret_cast<RWE::RwTexture* (__thiscall*)(EGUIX::TextureManager*, int)>(0x556B1C);
 RWE::RwTexture* EGUIX::TextureManager::GetTextureByID(int id)
 {
     return texman_gettex(this, id);
+}
+static inline RWE::RwTexture* (__thiscall* const texman_reloadtext)(EGUIX::TextureManager* th, int id) = reinterpret_cast<RWE::RwTexture * (__thiscall*)(EGUIX::TextureManager*, int)>(0x556D03);
+RWE::RwTexture* EGUIX::TextureManager::ReloadTexture(int id)
+{
+    return texman_reloadtext(this, id);
+}
+void EGUIX::TextureManager::FreeTexture(int id)
+{
+    if (id + 1 != IdManager->size())
+        throw std::out_of_range("invalid id");
+    Textures[id]->Destroy();
+    Textures[id] = nullptr;
 }
 
 unsigned int __stdcall EGUIX::CFontIDHandler::GetClassIdentifier() const

@@ -37,3 +37,8 @@ void BB::IIDManager::DumpManagerToLuaGlobal(lua_State* L, const char* global)
 	idmanager_writemngtoglobal(L, global, this);
 }
 
+size_t BB::IIDManager::size()
+{
+	return TypeNames.size();
+}
+

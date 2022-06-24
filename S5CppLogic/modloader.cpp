@@ -9,6 +9,7 @@
 #include "s5_maplogic.h"
 #include "s5_mapdisplay.h"
 #include "s5_tech.h"
+#include "s5_widget.h"
 #include "entityiterator.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
@@ -95,7 +96,10 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 	L.Push("CppLogic");
 	L.GetTableRaw(L.GLOBALSINDEX);
 	L.Push("ModLoader");
-	L.Push();
+	L.NewTable();
+
+	L.RegisterFuncs(NoLoaderFuncs, -3);
+
 	L.SetTableRaw(-3);
 	L.Pop(1);
 }
@@ -107,6 +111,8 @@ bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TechsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToReload{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -121,7 +127,8 @@ int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
-	return 0;
+	L.Push(id);
+	return 1;
 }
 
 int CppLogic::ModLoader::ModLoader::ReloadEntityType(lua::State L)
@@ -172,7 +179,8 @@ int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
 	L.Push(id);
 	L.SetTableRaw(-3);
 	ReloadEffectTypes = true;
-	return 0;
+	L.Push(id);
+	return 1;
 }
 
 int CppLogic::ModLoader::ModLoader::ReloadTaskList(lua::State L)
@@ -200,7 +208,8 @@ int CppLogic::ModLoader::ModLoader::AddTaskList(lua::State L)
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
-	return 0;
+	L.Push(id);
+	return 1;
 }
 
 int CppLogic::ModLoader::ModLoader::ReloadTechnology(lua::State L)
@@ -228,7 +237,8 @@ int CppLogic::ModLoader::ModLoader::AddTechnology(lua::State L)
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
-	return 0;
+	L.Push(id);
+	return 1;
 }
 
 int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
@@ -246,6 +256,31 @@ int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::AddGUITexture(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = EGUIX::TextureManager::GlobalObj();
+	if (m->GetTextureIDNoAdd(t))
+		throw lua::LuaException{ "texture already exists" };
+	int id = m->GetTextureID(t);
+	m->GetTextureByID(id);
+	TexturesToRemove.push_back(id);
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadGUITexture(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = EGUIX::TextureManager::GlobalObj();
+	if (!m->IdManager->GetNameByID(id))
+		throw lua::LuaException{ "texture does not exist" };
+	m->ReloadTexture(id);
+	TexturesToReload.push_back(id);
 	return 0;
 }
 
@@ -285,6 +320,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		Log(L, "Cleanup");
 		int t = L.GetTop();
+		AddLib(L);
 		L.Push("ModLoader");
 		L.GetTableRaw(L.GLOBALSINDEX);
 		if (L.IsTable(-1)) {
@@ -295,6 +331,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			else
 				L.Pop(1);
 		}
+		// no need to remove lib, state gets destroyed anyway
 		L.SetTop(t);
 
 		Log(L, "Removing extra archives");
@@ -366,6 +403,18 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->PopModel(id);
 			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager->RemoveID(id);
 		}
+
+		while (TexturesToRemove.size() != 0) {
+			int id = TexturesToRemove.back();
+			TexturesToRemove.pop_back();
+			EGUIX::TextureManager::GlobalObj()->FreeTexture(id);
+			EGUIX::TextureManager::GlobalObj()->IdManager->RemoveID(id);
+		}
+		for (int id : TexturesToReload) {
+			if (static_cast<unsigned int>(id) < EGUIX::TextureManager::GlobalObj()->Textures.size())
+				EGUIX::TextureManager::GlobalObj()->ReloadTexture(id);
+		}
+		TexturesToReload.clear();
 	}
 }
 

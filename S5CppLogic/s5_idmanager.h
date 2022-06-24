@@ -23,6 +23,7 @@ namespace BB {
 		int GetIDByNameOrCreate(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
 		void RemoveID(int id); // remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
 		void DumpManagerToLuaGlobal(lua_State* L, const char* global);
+		size_t size();
 	};
 
 	class IIDManagerEx : public IIDManager {

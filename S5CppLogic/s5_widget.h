@@ -18,10 +18,15 @@ namespace EGUIX {
 	class TextureManager { // no vtable, only gui textures in here
 	public:
 		BB::CIDManager* IdManager;
-		shok::Vector<RWE::RwTexture*> Textures; // loads texture lazily
+		shok::Vector<RWE::RwTexture*> Textures; // loads texture lazily, vector seems to be bigger than number of ids
 
 		int GetTextureID(const char* name);
+		int GetTextureIDNoAdd(const char* name);
 		RWE::RwTexture* GetTextureByID(int id);
+		RWE::RwTexture* ReloadTexture(int id);
+
+		// last id first, remember to clear idmanager too
+		void FreeTexture(int id);
 
 		static inline TextureManager* (__stdcall* const GlobalObj)() = reinterpret_cast<TextureManager * (__stdcall*)()>(0x556644);
 	};

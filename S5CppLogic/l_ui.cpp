@@ -597,6 +597,17 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int PreLoadGUITexture(lua::State L) {
+		const char* n = L.CheckString(1);
+		if (!BB::CFileSystemMgr::DoesFileExist(n))
+			throw lua::LuaException{ "files does not exist" };
+		auto* m = EGUIX::TextureManager::GlobalObj();
+		int id = m->GetTextureID(n);
+		m->GetTextureByID(id);
+		L.Push(id);
+		return 1;
+	}
+
 	int RemoveWidget(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
@@ -1021,7 +1032,7 @@ namespace CppLogic::UI {
 		}
 	}
 
-	constexpr std::array<lua::FuncReference, 55> UI{ {
+	constexpr std::array<lua::FuncReference, 56> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1055,6 +1066,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<WidgetSetGroup>("WidgetSetGroup"),
 		lua::FuncReference::GetRef<FontGetConfig>("FontGetConfig"),
 		lua::FuncReference::GetRef<FontSetConfig>("FontSetConfig"),
+		lua::FuncReference::GetRef<PreLoadGUITexture>("PreLoadGUITexture"),
 		lua::FuncReference::GetRef<ContainerWidgetCreateStaticWidgetChild>("ContainerWidgetCreateStaticWidgetChild"),
 		lua::FuncReference::GetRef<ContainerWidgetCreateStaticTextWidgetChild>("ContainerWidgetCreateStaticTextWidgetChild"),
 		lua::FuncReference::GetRef<ContainerWidgetCreatePureTooltipWidgetChild>("ContainerWidgetCreatePureTooltipWidgetChild"),

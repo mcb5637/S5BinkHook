@@ -32,6 +32,11 @@ CppLogic.Logic = {}
 CppLogic.Logic.UICommands = {}
 CppLogic.UI = {}
 CppLogic.UA = {}
+--- ModLoader is not available, if Kimichuras dlls are loaded.
+-- otherwise the modloader looks for a `ModLoader.lua` file in your map directory. if it is there, this file gets loaded and the ModLoader executes.
+-- see default_ModLoader.lua for callbacks and variables.
+-- unless otherwise noted, modloader functions are only available during ModLoader callbacks.
+CppLogic.ModLoader = {}
 
 --- CppLogic version number.
 CppLogic.Version = 1.4000
@@ -1895,6 +1900,13 @@ function CppLogic.UI.FontSetConfig(fontName, size, offset, spacing) end
 -- @param fontName font
 function CppLogic.UI.WidgetSetFont(wid, fontName) end
 
+--- creates a texture id and loads the texture.
+-- useful if a texture is packed into an s5x.
+-- without modloader cannot get cleaned up.
+-- does nothing if the texture already exists.
+-- @param texture
+function CppLogic.UI.PreLoadGUITexture(texture) end
+
 --- basic widget data.
 -- @param wid widget
 -- @return zpriority
@@ -2154,6 +2166,80 @@ function CppLogic.UI.GetClientSize() end
 -- @param wid
 -- @return true/false
 function CppLogic.UI.IsContainerWidget(wid) end
+
+--- loads an entitytype from a xml file (data/config/entities/typename.xml).
+-- the entitytype gets automatically removed on leaving the map.
+-- load any additional models you want to use first.
+-- @param typename
+-- @return type_id
+function CppLogic.ModLoader.AddEntityType(typename) end
+
+--- reloads an entitytype from a xml file (data/config/entities/typename.xml).
+-- the entitytype gets automatically reloaded on leaving the map (after s5x archives got removed).
+-- load any additional models you want to use first.
+-- @param tid
+function CppLogic.ModLoader.ReloadEntityType(tid) end
+
+--- sets an entitytype to get automatically reloaded on leaving the map (after s5x archives got removed).
+-- (for editing it manually via CppLogic).
+-- @param tid
+function CppLogic.ModLoader.SetEntityTypeToReload(tid) end
+
+--- loads an effecttype from a xml file (data/config/effects/typename.xml) (not default location).
+-- the effecttype gets automatically removed on leaving the map.
+-- load any additional models you want to use first.
+-- @param typename
+-- @return type_id
+function CppLogic.ModLoader.AddEffectType(typename) end
+
+--- reloads an effecttype from a xml file (data/config/effects/typename.xml).
+-- if you use it, all effect types get reloaded on leaving the map.
+-- load any additional models you want to use first.
+-- @param tid
+function CppLogic.ModLoader.ReloadEffectType(tid) end
+
+--- loads a task list from a xml file (data/config/tasklists/tlname.xml).
+-- the task list gets automatically removed on leaving the map.
+-- @param tlname
+-- @return type_id
+function CppLogic.ModLoader.AddTaskList(tlname) end
+
+--- reloads an task list from a xml file (data/config/tasklists/tlname.xml).
+-- all tasklists get reloaded in any case on starting a new map.
+-- @param tid
+function CppLogic.ModLoader.ReloadTaskList(tid) end
+
+--- loads a technology from a xml file (data/config/technologies/tname.xml).
+-- the tech gets automatically removed on leaving the map.
+-- @param tlname
+-- @return type_id
+function CppLogic.ModLoader.AddTechnology(tname) end
+
+--- reloads a technology from a xml file (data/config/technologies/tname.xml).
+-- all technologies get reloaded in any case on starting a new map.
+-- @param tid
+function CppLogic.ModLoader.ReloadTechnology(tid) end
+
+--- loads a model from a xml and dff file (data/config/models/mname.xml and data/graphics/models/mname.dff).
+-- the xml contains the data from Models.xml, the dff is the actual model.
+-- also loads all required textures.
+-- the model gets automatically removed on leaving the map.
+-- there is no reload func for models, instead add a new model and change the id in entities/effects.
+-- @param tlname
+-- @return type_id
+function CppLogic.ModLoader.AddModel(mname) end
+
+--- loads a gui texture from a png file (data/graphics/textures/gui/tname.png).
+-- the texture gets automatically removed on leaving the map.
+-- note: this is similar to CppLogic.UI.PreLoadGUITexture, just that the texture gets cleaned up.
+-- @param tlname full path to texture
+-- @return type_id
+function CppLogic.ModLoader.AddGUITexture(tname) end
+
+--- reloads a gui texture from a png file (data/graphics/textures/gui/tname.png).
+-- the texture gets automatically reloaded on leaving the map.
+-- @param tid
+function CppLogic.ModLoader.ReloadGUITexture(tid) end
 
 --- resets the global CppLogic.
 -- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

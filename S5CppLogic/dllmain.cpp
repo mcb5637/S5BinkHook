@@ -67,7 +67,8 @@ int Test(lua::State Ls) {
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A2B0));
     //(*GGL::CGLGameLogic::GlobalObj)->TechManager->FreeTech(1);
-    L.Push((int)(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager);
+    auto s = L.ToDebugString(1);
+    L.Push(s);
     return 1;
 }
 

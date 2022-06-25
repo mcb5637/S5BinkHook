@@ -99,6 +99,8 @@ namespace shok {
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x8594F8); // from rain effect
 	};
 	static_assert(sizeof(shok::Color) == 1 * 4);
+
+	static inline char* (__cdecl* const CopyString)(const char* s) = reinterpret_cast<char* (__cdecl*)(const char*)>(0x547BD5);
 }
 
 namespace BB {

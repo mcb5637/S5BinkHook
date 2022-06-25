@@ -86,6 +86,7 @@ namespace ED {
 			ModelData() = default;
 			ModelData(ModelData&& o) noexcept;
 			~ModelData();
+			void operator=(const ModelData&) noexcept;
 
 			static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA19F90);
 		};
@@ -100,6 +101,7 @@ namespace ED {
 		void LoadModelDataFromExtraFile(int id);
 		// remember to free in idmanager and CResourceManager, free last id first
 		void PopModel(int id);
+		void ReloadAllModels();
 	};
 	static_assert(sizeof(CModelsProps::ModelData) == 13 * 4);
 

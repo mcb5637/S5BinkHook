@@ -27,6 +27,7 @@ namespace RWE {
 	struct RpClump;
 	struct RpAtomic;
 	struct RpWorld;
+	struct RwFrame;
 	using RwTexture = ::RwTexture;
 	using RtAnimAnimation = ::RtAnimAnimation;
 
@@ -47,9 +48,22 @@ namespace RWE {
 		RwLLLink link;
 	};
 
+	enum class RwObjectType : byte {
+		FRAME = 0,
+		ATOMIC = 1,
+		CLUMP = 2,
+		LIGHT = 3,
+		CAMERA = 4,
+		TEXDICTIONARY = 6,
+		WORLD = 7,
+		GEOMETRY = 8,
+		WorldSector = 0xFF, // not a true type?
+	};
+
 	struct RwObject {
+		RwObjectType type;
 	private:
-		unsigned char type, subType, flags, privateFlags;
+		byte subType, flags, privateFlags;
 	public:
 		void* parent;
 	};

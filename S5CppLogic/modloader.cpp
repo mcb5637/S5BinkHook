@@ -10,6 +10,8 @@
 #include "s5_mapdisplay.h"
 #include "s5_tech.h"
 #include "s5_widget.h"
+#include "s5_mapdisplay.h"
+#include "s5_entitydisplay.h"
 #include "entityiterator.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
@@ -111,6 +113,7 @@ bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TechsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
+bool CppLogic::ModLoader::ModLoader::ReloadModels = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToReload{};
 
@@ -260,6 +263,19 @@ int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
 	return 1;
 }
 
+int CppLogic::ModLoader::ModLoader::ReloadModel(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+	if (!m->ModelManager.ModelIDManager->GetNameByID(id))
+		throw lua::LuaException{ "invalid id" };
+	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->LoadModelDataFromExtraFile(id);
+	m->FreeModel(id);
+	m->GetModelData(id);
+	ReloadModels = true;
+	return 0;
+}
+
 int CppLogic::ModLoader::ModLoader::AddGUITexture(lua::State L)
 {
 	const char* t = L.CheckString(1);
@@ -340,13 +356,15 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			fm->RemoveTopArchive();
 		}
 		Log(L, "Done");
-	}
 
-	if (n != Framework::CMain::NextMode::ToMainMenu) {
-		if (*EGL::CGLEEntityManager::GlobalObj) { // make sure there is no entity left that can access an entitytype we are deleting
+		// make sure there is no entity/effect left that can access a type we are deleting
+		if (*EGL::CGLEEntityManager::GlobalObj) {
 			CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> p{ [](const EGL::CGLEEntity*, float*, int*) { return true; } };
 			CppLogic::Iterator::GlobalEntityIterator it{ &p };
+			auto* man = (*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager;
 			for (EGL::CGLEEntity* a : it) {
+				if (man->GetDisplayForEntity(a->EntityId))
+					man->DestroyDisplayForEntity(a->EntityId);
 				a->Destroy();
 			}
 		}
@@ -393,7 +411,8 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			TechsToRemove.pop_back();
 			if (*GGL::CGLGameLogic::GlobalObj)
 				(*GGL::CGLGameLogic::GlobalObj)->TechManager->PopTech(id);
-			(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(id);
+			if ((*BB::CIDManagerEx::TechnologiesManager))
+				(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(id);
 		}
 
 		while (ModelsToRemove.size() != 0) {
@@ -403,6 +422,15 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->PopModel(id);
 			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager->RemoveID(id);
 		}
+		if (ReloadModels) {
+			for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
+				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(id);
+				//(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(id);
+				// gets reloaded on next use anyway
+			}
+			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ReloadAllModels();
+		}
+		ReloadModels = false;
 
 		while (TexturesToRemove.size() != 0) {
 			int id = TexturesToRemove.back();

@@ -2211,7 +2211,7 @@ function CppLogic.ModLoader.ReloadTaskList(tid) end
 
 --- loads a technology from a xml file (data/config/technologies/tname.xml).
 -- the tech gets automatically removed on leaving the map.
--- @param tlname
+-- @param tname
 -- @return type_id
 function CppLogic.ModLoader.AddTechnology(tname) end
 
@@ -2224,15 +2224,21 @@ function CppLogic.ModLoader.ReloadTechnology(tid) end
 -- the xml contains the data from Models.xml, the dff is the actual model.
 -- also loads all required textures.
 -- the model gets automatically removed on leaving the map.
--- there is no reload func for models, instead add a new model and change the id in entities/effects.
--- @param tlname
+-- @param mname
 -- @return type_id
 function CppLogic.ModLoader.AddModel(mname) end
+
+--- reloads a model from a xml and dff file (data/config/models/mname.xml and data/graphics/models/mname.dff).
+-- the xml contains the data from Models.xml, the dff is the actual model.
+-- also loads all required textures.
+-- the model gets automatically reloaded on leaving the map.
+-- @param mname
+function CppLogic.ModLoader.ReloadModel(mname) end
 
 --- loads a gui texture from a png file (data/graphics/textures/gui/tname.png).
 -- the texture gets automatically removed on leaving the map.
 -- note: this is similar to CppLogic.UI.PreLoadGUITexture, just that the texture gets cleaned up.
--- @param tlname full path to texture
+-- @param tname full path to texture
 -- @return type_id
 function CppLogic.ModLoader.AddGUITexture(tname) end
 

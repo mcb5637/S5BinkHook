@@ -22,6 +22,7 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> TaskListsToRemove;
 		static std::vector<int> TechsToRemove;
 		static std::vector<int> ModelsToRemove;
+		static bool ReloadModels;
 		static std::vector<int> TexturesToRemove;
 		static std::vector<int> TexturesToReload;
 
@@ -35,10 +36,11 @@ namespace CppLogic::ModLoader {
 		static int ReloadTechnology(lua::State L);
 		static int AddTechnology(lua::State L);
 		static int AddModel(lua::State L);
+		static int ReloadModel(lua::State L);
 		static int AddGUITexture(lua::State L);
 		static int ReloadGUITexture(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 12> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 13> LuaFuncs{ {
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -49,6 +51,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReloadTechnology>("ReloadTechnology"),
 				lua::FuncReference::GetRef<AddTechnology>("AddTechnology"),
 				lua::FuncReference::GetRef<AddModel>("AddModel"),
+				lua::FuncReference::GetRef<ReloadModel>("ReloadModel"),
 				lua::FuncReference::GetRef<AddGUITexture>("AddGUITexture"),
 				lua::FuncReference::GetRef<ReloadGUITexture>("ReloadGUITexture"),
 		} };

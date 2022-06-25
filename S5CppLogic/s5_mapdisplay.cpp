@@ -45,6 +45,7 @@ ED::CModelsProps::ModelData::ModelData(ModelData&& o) noexcept
 }
 ED::CModelsProps::ModelData::~ModelData()
 {
+	// originally 0x719647, but this is easier
 	if (Effect)
 		shok::Free(Effect);
 	Effect = nullptr;
@@ -55,6 +56,25 @@ ED::CModelsProps::ModelData::~ModelData()
 		shok::Free(SelectionTexture);
 	SelectionTexture = nullptr;
 }
+void ED::CModelsProps::ModelData::operator=(const ModelData& o) noexcept
+{
+	// ged rid of previous strings
+	if (Effect)
+		shok::Free(Effect);
+	if (OrnamentalItemEffect)
+		shok::Free(OrnamentalItemEffect);
+	if (SelectionTexture)
+		shok::Free(SelectionTexture);
+	// copy everything
+	std::memcpy(this, &o, sizeof(ModelData));
+	// fix the strings again
+	if (o.Effect)
+		Effect = shok::CopyString(o.Effect);
+	if (o.OrnamentalItemEffect)
+		OrnamentalItemEffect = shok::CopyString(o.OrnamentalItemEffect);
+	if (o.SelectionTexture)
+		SelectionTexture = shok::CopyString(o.SelectionTexture);
+}
 
 void ED::CModelsProps::LoadModelDataFromExtraFile(int id)
 {
@@ -64,11 +84,13 @@ void ED::CModelsProps::LoadModelDataFromExtraFile(int id)
 		auto v = Model.SaveVector();
 		v.Vector.emplace_back();
 	}
-	auto& t = Model[id];
+	else {
+		Model[id] = ModelData{};
+	}
 	std::string filename = "Data/Config/Models/";
 	filename.append(ModelIdManager->GetNameByID(id));
 	filename.append(".xml");
-	(*BB::CClassFactory::GlobalObj)->LoadObject(&t, filename.c_str(), t.SerializationData);
+	(*BB::CClassFactory::GlobalObj)->LoadObject(&Model[id], filename.c_str(), ModelData::SerializationData);
 }
 void ED::CModelsProps::PopModel(int id)
 {
@@ -76,6 +98,18 @@ void ED::CModelsProps::PopModel(int id)
 		throw std::out_of_range("invalid id");
 	auto v = Model.SaveVector();
 	v.Vector.pop_back();
+}
+void ED::CModelsProps::ReloadAllModels()
+{
+	{
+		auto v = Model.SaveVector();
+		v.Vector.clear();
+		v.Vector.resize(ModelIdManager->size());
+	}
+	BB::CIDManagerEx** m = reinterpret_cast<BB::CIDManagerEx**>(0xA19F8C);
+	*m = ModelIdManager;
+	(*BB::CClassFactory::GlobalObj)->LoadObject(this, "Data\\Config\\Models.xml", SerializationData);
+	*m = nullptr;
 }
 
 shok::Color ED::CPlayerColors::GetColorByIndex(int i)

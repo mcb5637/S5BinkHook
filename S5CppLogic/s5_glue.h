@@ -42,6 +42,7 @@ namespace GGlue {
 		void FreeEffectType(int id);
 		void ReloadAllEffectTypes();
 	};
+	//constexpr int i = offsetof(CEffectsPropsMgr, EffectsDisplayProps) / 4;
 
 	class IEntitiesPropsMgr : public ECore::ICheckData {
 		// no vtable

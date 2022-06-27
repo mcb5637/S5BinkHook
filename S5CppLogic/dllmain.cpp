@@ -23,6 +23,7 @@
 #include "s5_tasklist.h"
 #include "s5_mapdisplay.h"
 #include "s5_idmanager.h"
+#include "s5_effects.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -67,9 +68,9 @@ int Test(lua::State Ls) {
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A2B0));
     //(*GGL::CGLGameLogic::GlobalObj)->TechManager->FreeTech(1);
-    auto s = L.ToDebugString(1);
-    L.Push(s);
-    return 1;
+    int id = L.CheckInt(1);
+    (*ED::CDEVisibleEffectManager::GlobalObj)->DestroyDisplayForEffect(id);
+    return 0;
 }
 
 int Cleanup(lua::State L) {

@@ -140,3 +140,34 @@ void EGL::CFlyingEffect::HookOnHit()
 	ArrowOnHit = vt->OnHit;
 	WriteProjectlileOnHits();
 }
+
+ED::IEffect* ED::CDEVisibleEffectManager::GetDisplayForEffectID(int id)
+{
+	for (auto& e : Effects) {
+		if (e.ID == id)
+			return e.Effect;
+	}
+	return nullptr;
+}
+
+void ED::CDEVisibleEffectManager::DestroyDisplayForEffect(int id)
+{
+	struct data {
+		data* p;
+		data* n;
+		VisEffect e;
+	};
+	data* d = nullptr;
+	for (auto& e : Effects) {
+		if (e.ID == id) {
+			int v = reinterpret_cast<int>(&e.Effect);
+			v -= offsetof(data, e.Effect);
+			d = reinterpret_cast<data*>(v);
+		}
+	}
+	if (d == nullptr)
+		return;
+	int nexout = 0;
+	delete d->e.Effect;
+	reinterpret_cast<void(__thiscall*)(int, void*, data*)>(0x7221EF)(reinterpret_cast<int>(this) + 8, &nexout, d);
+}

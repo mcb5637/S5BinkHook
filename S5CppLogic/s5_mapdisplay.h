@@ -259,7 +259,7 @@ namespace ED {
 		BB::CIDManagerEx* SpecialEffectManager; // lightning and snow textures?
 		PADDINGI(1); // empty BB::CIDManagerEx
 		ED::CDisplayProps* DisplayProps; // 5
-		BB::CIDManagerEx** EffectManager; // probably an object without vtable
+		EGL::EffectsDisplayProps* EffectDisplayProps;
 		BB::CIDManagerEx** EntityTypeManager; // probably an object without vtable
 		ED::CModelsProps* ModelProps;
 		PADDINGI(1); // p to something terrain related?

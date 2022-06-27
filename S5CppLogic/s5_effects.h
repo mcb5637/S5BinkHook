@@ -5,8 +5,23 @@
 namespace EGL {
 	class IEffectDisplay {
 	public:
+		struct TypeAndID {
+			int EffectType = 0;
+			int EffectID = 0;
+		};
+		struct TurnDurationAndPos {
+			int StartTurn = 0;
+			int Duration = 0;
+			shok::Position P;
+		};
+
+
 		virtual ~IEffectDisplay() = default;
-		// 5 more funcs
+		virtual int __stdcall GetEffectType() const = 0;
+		virtual void __stdcall FillTypeAndID(TypeAndID* d) const = 0;
+		virtual void __stdcall FillTurnDurationAndPos(TurnDurationAndPos* d) const = 0;
+		virtual void __stdcall GetPlayerID() const = 0;
+		virtual EGL::ISlot* __stdcall GetFlyingEffectSlot() = 0;
 	};
 
 	class CEffect : public BB::IObject, public IEffectDisplay, public EGL::TGLEAttachable<EGL::CEffect, EGL::CEffectAttachmentProxy> {
@@ -152,3 +167,103 @@ public:
 
 	CProjectileEffectCreator();
 };
+
+namespace ED {
+	class IEffect : public BB::IObject {
+	public:
+		// no vtable
+		virtual void Initialze(EGL::IEffectDisplay* eff, ED::CEffectProps* props) = 0;
+		virtual void UpdateGameTimeSynced(int ticks, float seconds) = 0;
+		virtual void UpdateRealTimeSynced() = 0;
+
+		EGL::IEffectDisplay* Effect;
+	};
+
+	class CEffectParticleSystem : public IEffect {
+	public:
+		RWE::RpClump* Clump;
+
+		static inline constexpr int vtp = 0x7AE790;
+		static inline constexpr unsigned int Identifier = 0x22C757DD;
+	};
+
+	class CHAnimEffect : public IEffect {
+	public:
+		RWE::RpClump* Clump;
+	private:
+		void* anim;
+		void* clumpanim;
+
+	public:
+		static inline constexpr int vtp = 0x7AE98C;
+		static inline constexpr unsigned int Identifier = 0x11E11B07;
+	};
+
+	class CFlyingEffect : public IEffect {
+	public:
+		RWE::RpClump* Clump;
+
+		static inline constexpr int vtp = 0x7AE9D0;
+		static inline constexpr unsigned int Identifier = 0xFCD5C1E7;
+	};
+}
+
+namespace GD {
+	class CEffectSnow : public ED::IEffect {
+
+	public:
+		static inline constexpr int vtp = 0x76AB88;
+		static inline constexpr unsigned int Identifier = 0xE6F4B223;
+	};
+
+	class CDisplayEffectRain : public ED::IEffect {
+
+	public:
+		static inline constexpr int vtp = 0x76AD38;
+		static inline constexpr unsigned int Identifier = 0x8D16CD43;
+	};
+
+	class CDisplayEffectLightning : public ED::IEffect {
+
+	public:
+		static inline constexpr int vtp = 0x76AE08;
+		static inline constexpr unsigned int Identifier = 0x72C52353;
+	};
+}
+
+namespace ED {
+	class IDEVisibleEffectManager {
+	public:
+		virtual ~IDEVisibleEffectManager() = default;
+		virtual void UpdateGameTimeSynced(int ticks, float sec) = 0;
+		virtual void UpdateRealTypeSynced() = 0;
+	};
+
+	class CDEVisibleEffectManager : public IDEVisibleEffectManager {
+		bool unknown;
+
+	public:
+		struct VisEffect {
+			int ID;
+		private:
+			bool unknown;
+			int ID2;
+		public:
+			ED::IEffect* Effect;
+		};
+
+		PADDINGI(1);
+		shok::List<VisEffect> Effects;
+		PADDINGI(4); // vector of list elements ???
+		PADDINGI(2);
+
+
+		static inline constexpr int vtp = 0x7AE368;
+
+		static inline CDEVisibleEffectManager** const GlobalObj = reinterpret_cast<CDEVisibleEffectManager**>(0xA19EA0);
+
+		ED::IEffect* GetDisplayForEffectID(int id);
+		void DestroyDisplayForEffect(int id);
+	};
+	static_assert(sizeof(CDEVisibleEffectManager) == 12 * 4);
+}

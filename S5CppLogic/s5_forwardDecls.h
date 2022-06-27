@@ -47,6 +47,7 @@ namespace EGL {
 	class IEntityDisplay;
 	class CEffect;
 	class CGLEEffectCreator;
+	class EffectsDisplayProps;
 }
 namespace GGL {
 	class CBuilding;
@@ -65,6 +66,7 @@ namespace ED {
 	class CDisplayProps;
 	class CVisibleEntityManager;
 	struct ModelData;
+	class CEffectProps;
 }
 namespace BB {
 	class CEvent;

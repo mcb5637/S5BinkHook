@@ -224,6 +224,8 @@ namespace EGL {
 	class GameLogicExplorationStuff { // not sure what exaclty this is
 	public:
 		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(int pl);
+		void SetShareExplorationFlag(int pl1, int pl2, bool share);
+		void ActivateUpdateOfExplorationForAllPlayers();
 	};
 
 	class IGLEGameLogic : public BB::IPostEvent {

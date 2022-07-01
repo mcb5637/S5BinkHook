@@ -323,6 +323,12 @@ float GGL::CBuilding::GetMarketProgress()
 	return ev.Data;
 }
 
+static inline float(__thiscall* building_getupremainingtime)(GGL::CBuilding* th) = reinterpret_cast<float(__thiscall*)(GGL::CBuilding*)>(0x4ABA5B);
+float GGL::CBuilding::GetRemainingUpgradeTime()
+{
+	return building_getupremainingtime(this);
+}
+
 static inline void(__thiscall* const entitysethealth)(EGL::CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, int)>(0x57A6D9);
 void EGL::CGLEEntity::SetHealth(int h)
 {

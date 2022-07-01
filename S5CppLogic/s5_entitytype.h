@@ -34,7 +34,7 @@ namespace EGL {
 		float Exploration;
 		int ExperiencePoints, AccessCategory, NumBlockedPoints; //20
 		float SnapTolerance; //23 seems to be a max change in every coordinate on entity placement
-		byte DeleteWhenBuiltOn, NeedsPlayer;
+		bool DeleteWhenBuiltOn, NeedsPlayer;
 		PADDING(2);
 		shok::Vector<EGL::CGLEBehaviorProps*> BehaviorProps; // 25
 		int NumberOfBehaviors; //29
@@ -145,7 +145,7 @@ namespace GGL {
 		shok::Position DoorPos, LeavePos;
 		ConstructionInfo ConstructionInfo;
 		shok::Vector<int> BuildOn; // 75
-		byte HideBase, CanBeSold, IsWall; // 79
+		bool HideBase, CanBeSold, IsWall; // 79
 		PADDING(1);
 		UpgradeInfo Upgrade;
 		int UpgradeSite, ArmorClass, ArmorAmount;

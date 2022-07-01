@@ -599,6 +599,16 @@ EGL::CPlayerExplorationHandler* EGL::GameLogicExplorationStuff::GetExplorationHa
 	}
 	return nullptr;
 }
+static inline void(__thiscall* const gamelogicexplo_setshare)(EGL::GameLogicExplorationStuff* th, int p1, int p2, bool f) = reinterpret_cast<void(__thiscall*)(EGL::GameLogicExplorationStuff*, int, int, bool)>(0x57584B);
+void EGL::GameLogicExplorationStuff::SetShareExplorationFlag(int pl1, int pl2, bool share)
+{
+	gamelogicexplo_setshare(this, pl1, pl2, share);
+}
+static inline void(__thiscall* const gamelogicexplo_activateexploforall)(EGL::GameLogicExplorationStuff* th) = reinterpret_cast<void(__thiscall*)(EGL::GameLogicExplorationStuff*)>(0x575884);
+void EGL::GameLogicExplorationStuff::ActivateUpdateOfExplorationForAllPlayers()
+{
+	gamelogicexplo_activateexploforall(this);
+}
 
 int EGL::CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
 {

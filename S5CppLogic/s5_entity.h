@@ -104,8 +104,8 @@ namespace EGL {
 		shok::PositionRot Position; // 22
 		float Scale; // 25
 		PADDINGI(1);
-		byte StandardBehaviorActive, TaskAdvanceNextTurnNextTask, ValidPosition, IsOnWater;
-		byte UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
+		bool StandardBehaviorActive, TaskAdvanceNextTurnNextTask, ValidPosition, IsOnWater;
+		bool UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
 		int TaskListToSet; // 29
 		shok::Vector<EGL::CGLEBehavior*> Behaviours; // 30, first field in 31
 		shok::TaskState CurrentState; // 34
@@ -122,7 +122,7 @@ namespace EGL {
 		float Exploration;
 		int TaskListStart; // 54
 		PADDINGI(2);
-		byte InvulnerabilityFlag, Suspended; // 57
+		bool InvulnerabilityFlag, Suspended; // 57
 		PADDING(2);
 		int SuspensionTurn;
 		int ScriptingValue[4]; // 59
@@ -515,8 +515,8 @@ namespace GGL {
 	class CBuilding : public EGL::CGLEEntity {
 	public:
 		shok::Position ApproachPosition, LeavePosition; // fi 66
-		byte IsActive, IsRegistered, IsUpgrading, IsOvertimeActive;
-		byte HQAlarmActive;
+		bool IsActive, IsRegistered, IsUpgrading, IsOvertimeActive;
+		bool HQAlarmActive;
 		PADDING(3);
 		int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn; // 72
 		float BuildingHeight, Helathbar, UpgradeProgress; //la78
@@ -541,6 +541,8 @@ namespace GGL {
 		int GetTechnologyInResearch();
 		int GetCannonProgress();
 		float GetMarketProgress();
+		// returns max time if not currently upgrading
+		float GetRemainingUpgradeTime();
 
 		void StartUpgrade();
 		void CancelUpgrade();

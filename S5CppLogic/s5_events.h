@@ -727,13 +727,13 @@ namespace shok {
 		Market_WorkStep = 0x17007, //BB::CEvent
 		University_ResearchStep = 0x17008, //BB::CEvent
 		Market_GetProgress = 0x17009, //EGL::CEventGetValue<float,1468983543>
-		AffectMotivation_GetEffect = 0x17010, //EGL::CEventGetValue<float,1468983543>
 		Market_StartTrade = 0x1700A, //EGL::CEventGetValue<float,1468983543>
 		Market_CancelTrade = 0x1700B, //BB::CEvent
 		// 0x1700C university get tech progress?
 		// 0x1700D constructionsite complete
 		// 0x1700E settler 1 entity ? building 0x20003
 		WorkerAlarmMode_OnBuildingDetach = 0x1700F, //EGL::CEvent1Entity
+		AffectMotivation_GetEffect = 0x17010, //EGL::CEventGetValue<float,1468983543>
 		// 0x17011 resourcerefiner get supplier?/can work?
 		Worker_ResetTaskList = 0x17012, //BB::CEvent
 		Foundry_GetProgress = 0x17014, //EGL::CEventGetValue<int,1211121895>
@@ -756,12 +756,12 @@ namespace shok {
 		BuildingMercenary_AddOffer = 0x17025, //GGL::CEventMercenaryOffer
 		BuildingMercenary_GetOffer = 0x17026, //GGL::CEventGetMercenaryOffer
 		BuildingMercenary_BuyOffer = 0x17027, //GGL::CEventPlayerIDInteger
-		// 0x17028 buildmerc ret true
+		IsMercenaryBuilding = 0x17028, //EGL::CEventGetValue<bool, 1709081367>
 		BuildingMerchant_GetNumberOfOffers = 0x17029, //EGL::CEventGetValue<int,1211121895>
 		// 0x1702A buildingmerch ret true
 		BuildingTechTrader_AddOffer = 0x1702B, //GGL::CEventTechOffer
 		BuildingTechTrader_GetOffer = 0x1702C, //GGL::CEventGetTechOffer
-		// 0x1702D builtechtrad ret true
+		IsTechTraderBuilding = 0x1702D, //EGL::CEventGetValue<bool, 1709081367>
 
 		IsSerf = 0x18002, //EGL::CEventGetValue<bool, 1709081367>
 		IsWorker = 0x18003, //EGL::CEventGetValue<bool, 1709081367>
@@ -805,6 +805,7 @@ namespace shok {
 		// 0x2000D tasklist reset?
 		Movement_SetSpeedFactor = 0x2000E, // EGL::CEventValue<float,1278362727>
 		Movement_TaskMoveToPosAndSetState = 0x2000F, //EGL::CEventPositionAndTaskState pass pos and state, call Movement_StatePerformMovementStep from state
+		Movement_RotateTo = 0x20010, //  EGL::CEventValue<float,1278362727>
 		Movement_GetMovementBehavior = 0x20012, //EGL::CEventGetValue<EGL::CMovementBehavior *,212523703>
 		Movement_GetSpeedFactor = 0x20022, // EGL::CEventGetValue<float,1468983543>
 
@@ -815,6 +816,9 @@ namespace shok {
 		LogicEvent_EntityDestroyed = 0x20017,
 		LogicEvent_PlayerDied = 0x20018,
 		LogicEvent_InRange = 0x20019,
+		ParticleEffectSwitch_Activate = 0x2001A, //EGL::CEventValue<int,-27574121>
+		ParticleEffectSwitch_Deactivate = 0x2001B, //EGL::CEventValue<int,-27574121>
+		ParticleEffectAttachment_CreateEffect = 0x2001C, //EGL::CEventIndexAndEffectType
 		Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 		Animation_ResetTaskType = 0x2001E, //BB::CEvent
 		// worker 20024 get some int, leader get something barracks related, soldier simmilar, serf get terrainH < waterHeight

@@ -36,6 +36,75 @@ int GGL::CPlayerAttractionHandler::GetNumberOfLeaders()
 {
 	return shok_playerattractionhandler_getnumleaders(this);
 }
+static inline bool(__thiscall* const playerattractionhandler_isslotavail)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C28D0);
+bool GGL::CPlayerAttractionHandler::IsAttractionsSlotAvailable()
+{
+	return playerattractionhandler_isslotavail(this);
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getnumsettlers)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C1B62);
+int GGL::CPlayerAttractionHandler::GetNumberOfSettlers()
+{
+	return shok_playerattractionhandler_getnumsettlers(this);
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getnummilitary)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C1BCB);
+int GGL::CPlayerAttractionHandler::GetNumberOfMilitaryUnits()
+{
+	return shok_playerattractionhandler_getnummilitary(this);
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getsleepplacelimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C21AA);
+int GGL::CPlayerAttractionHandler::GetSleepPlaceLimit()
+{
+	return shok_playerattractionhandler_getsleepplacelimit(this);
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getfreesleepplaces)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C2226);
+int GGL::CPlayerAttractionHandler::GetFreeSleepPlaces()
+{
+	return shok_playerattractionhandler_getfreesleepplaces(this);
+}
+int GGL::CPlayerAttractionHandler::GetUsedSleepPlaces()
+{
+	return GetSleepPlaceLimit() - GetFreeSleepPlaces(); // 0x4C22A2 does the same
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getnummissingsleeplaces)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C2D62);
+int GGL::CPlayerAttractionHandler::GetNumberOfWorkersWithoutSleepPlace()
+{
+	return shok_playerattractionhandler_getnummissingsleeplaces(this);
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getfarmplacelimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C22B9);
+int GGL::CPlayerAttractionHandler::GetFarmPlaceLimit()
+{
+	return shok_playerattractionhandler_getfarmplacelimit(this);
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getfreefarmplaces)(GGL::CPlayerAttractionHandler* th, bool uk) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*,bool)>(0x4C3C4C);
+int GGL::CPlayerAttractionHandler::GetFreeFarmPlace()
+{
+	return shok_playerattractionhandler_getfreefarmplaces(this, true);
+}
+int GGL::CPlayerAttractionHandler::GetUsedFarmPlaces()
+{
+	return GetFarmPlaceLimit() - GetFreeFarmPlace(); // 0x4C3D90 does the same
+}
+static inline int(__thiscall* const shok_playerattractionhandler_getnummissingfarmlaces)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C2D8B);
+int GGL::CPlayerAttractionHandler::GetNumberOfWorkersWithoutFarmPlace()
+{
+	return shok_playerattractionhandler_getnummissingfarmlaces(this);
+}
+static inline int(__thiscall* const shok_playerattractionhandler_gettimetopayday)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C1AF4);
+int GGL::CPlayerAttractionHandler::GetTimeToNextPayday()
+{
+	return shok_playerattractionhandler_gettimetopayday(this);
+}
+static inline float(__thiscall* const shok_playerattractionhandler_getavmoti)(GGL::CPlayerAttractionHandler* th, int z) = reinterpret_cast<float(__thiscall* const)(GGL::CPlayerAttractionHandler*, int)>(0x4B5494);
+float GGL::CPlayerAttractionHandler::GetAverageMotivation()
+{
+	return shok_playerattractionhandler_getavmoti(this, 0);
+}
+
+static inline int(__thiscall* const shok_playerattractionhandler_attachworkers)(GGL::CPlayerAttractionHandler* th, bool force) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*, bool)>(0x4C4302);
+void GGL::CPlayerAttractionHandler::CheckWorkerAttachment(bool forceReAttach)
+{
+	shok_playerattractionhandler_attachworkers(this, forceReAttach);
+}
 
 void (*GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th) = nullptr;
 void __fastcall hookedcheckpayday_call(GGL::CPlayerAttractionHandler* th) {
@@ -77,6 +146,38 @@ int GGL::CSettlerUpgradeManager::GetSettlerTypeByUCat(int ucat)
 	return settlerupmanager_getstybyucat(this, ucat);
 }
 
+static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, int ownerent, int offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, int, int, const char*)>(0x4BE63E);
+void GGL::PlayerTributesManager::SetTributeData(int tid, const shok::CostInfo& c, int ownerEntityId, int offeringPlayerId, const char* text)
+{
+	tributemanager_setdata(this, tid, &c, ownerEntityId, offeringPlayerId, text);
+}
+static inline bool(__thiscall* const tributemanager_remove)(GGL::PlayerTributesManager* th, int tid) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTributesManager*, int)>(0x4BE520);
+bool GGL::PlayerTributesManager::RemoveTribute(int tid)
+{
+	return tributemanager_remove(this, tid);
+}
+
+static inline void(__thiscall* const questmanager_setdata)(GGL::PlayerQuestManager* th, int qid, GGL::PlayerQuestManager::QuestStatus qty, const char* name, const char* txt, const shok::Position* p, int info) = reinterpret_cast<void(__thiscall*)(GGL::PlayerQuestManager*, int, GGL::PlayerQuestManager::QuestStatus, const char*, const char*, const shok::Position*, int)>(0x4C8474);
+void GGL::PlayerQuestManager::SetQuestData(int questId, QuestStatus questType, const char* name, const char* text, const shok::Position* pos, bool info)
+{
+	questmanager_setdata(this, questId, questType, name, text, pos, info);
+}
+static inline void(__thiscall* const questmanager_settype)(GGL::PlayerQuestManager* th, int qid, GGL::PlayerQuestManager::QuestStatus qty, int info) = reinterpret_cast<void(__thiscall*)(GGL::PlayerQuestManager*, int, GGL::PlayerQuestManager::QuestStatus, int)>(0x4C8564);
+void GGL::PlayerQuestManager::SetQuestType(int questId, QuestStatus questType, bool info)
+{
+	questmanager_settype(this, questId, questType, info);
+}
+static inline void(__thiscall* const questmanager_setpos)(GGL::PlayerQuestManager* th, int qid, const shok::Position* p, int info) = reinterpret_cast<void(__thiscall*)(GGL::PlayerQuestManager*, int, const shok::Position*, int)>(0x4C80B4);
+void GGL::PlayerQuestManager::SetQuestPosition(int questId, const shok::Position* pos, bool info)
+{
+	questmanager_setpos(this, questId, pos, info);
+}
+static inline bool(__thiscall* const questmanager_removequest)(GGL::PlayerQuestManager* th, int qid, int info) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerQuestManager*, int, int)>(0x4C818E);
+bool GGL::PlayerQuestManager::RemoveQuest(int questId, bool info)
+{
+	return questmanager_removequest(this, questId, info);
+}
+
 unsigned int __stdcall GGL::CResourceStatistics::GetClassIdentifier() const
 {
 	return 0xC1488787;
@@ -97,6 +198,29 @@ static inline shok::TechState(__thiscall* const playerstatus_gettechstatus)(GGL:
 shok::TechState GGL::CPlayerStatus::GetTechStatus(int tech)
 {
 	return playerstatus_gettechstatus(&TechnologyStates, tech);
+}
+
+static inline int(__thiscall* const playerstatus_gettaxperworker)(GGL::CPlayerStatus* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerStatus*)>(0x4B4AC5);
+int GGL::CPlayerStatus::GetTaxPerWorker()
+{
+	return playerstatus_gettaxperworker(this);
+}
+
+static inline int(__thiscall* const playerstatus_getlevytaxperworker)(GGL::CPlayerStatus* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerStatus*)>(0x4B4A93);
+int GGL::CPlayerStatus::GetLevyTaxPerWorker()
+{
+	return playerstatus_getlevytaxperworker(this);
+}
+static inline int(__thiscall* const playerstatus_getlevytax)(GGL::CPlayerStatus* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerStatus*)>(0x4B4AA9);
+int GGL::CPlayerStatus::GetLevyTaxAmount()
+{
+	return playerstatus_getlevytax(this);
+}
+
+static inline bool(__thiscall* const playerstatus_setstatus)(GGL::CPlayerStatus* th, GGL::CPlayerStatus::PlayerStatus s) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerStatus*, GGL::CPlayerStatus::PlayerStatus)>(0x4B4B38);
+bool GGL::CPlayerStatus::SetState(PlayerStatus s)
+{
+	return playerstatus_setstatus(this, s);
 }
 
 

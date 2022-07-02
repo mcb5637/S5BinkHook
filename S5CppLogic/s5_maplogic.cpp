@@ -7,6 +7,7 @@
 #include "s5_entity.h"
 #include "s5_mem.h"
 #include "s5_defines.h"
+#include "s5_netevents.h"
 #include "entityiterator.h"
 #include "hooks.h"
 
@@ -771,4 +772,11 @@ void GGL::CGLGameLogic::PlayerBlessSettlers(int player, int blessCat)
 {
 	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandMonasteryBlessSettlerGroup, player, blessCat };
 	cglgamelogic_blesssettlers(this, &ev);
+}
+
+static inline void(__thiscall* const cglgamelogic_setdiplo)(GGL::CGLGameLogic* th, EGL::CNetEvent2PlayerIDsAndInteger* ev) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEvent2PlayerIDsAndInteger*)>(0x49872D);
+void GGL::CGLGameLogic::SetDiplomacy(int p1, int p2, shok::DiploState state)
+{
+	EGL::CNetEvent2PlayerIDsAndInteger ev{ shok::NetEventIds::SetDiplomacy, p1, p2, static_cast<int>(state) };
+	cglgamelogic_setdiplo(this, &ev);
 }

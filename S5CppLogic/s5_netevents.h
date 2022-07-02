@@ -158,6 +158,37 @@ namespace EGL {
 		static inline constexpr int vtp = 0x77057C;
 		static inline constexpr unsigned int Identifier = 0xF1B577F8;
 	};
+
+	class CNetEvent2PlayerIDs : public BB::CEvent {
+	public:
+		int PlayerID1;
+		int PlayerID2;
+
+		CNetEvent2PlayerIDs(shok::NetEventIds id, int p1, int p2);
+		CNetEvent2PlayerIDs(CNetEvent2PlayerIDs&&) = default;
+		CNetEvent2PlayerIDs(const CNetEvent2PlayerIDs&) = default;
+		CNetEvent2PlayerIDs& operator=(CNetEvent2PlayerIDs&&) = default;
+		CNetEvent2PlayerIDs& operator=(const CNetEvent2PlayerIDs&) = default;
+
+		static inline constexpr int TypeDesc = 0x8123DC;
+		static inline constexpr int vtp = 0x7705AC;
+		static inline constexpr unsigned int Identifier = 0xD39DDE58;
+	};
+
+	class CNetEvent2PlayerIDsAndInteger : public CNetEvent2PlayerIDs {
+	public:
+		int Value;
+
+		CNetEvent2PlayerIDsAndInteger(shok::NetEventIds id, int p1, int p2, int v);
+		CNetEvent2PlayerIDsAndInteger(CNetEvent2PlayerIDsAndInteger&&) = default;
+		CNetEvent2PlayerIDsAndInteger(const CNetEvent2PlayerIDsAndInteger&) = default;
+		CNetEvent2PlayerIDsAndInteger& operator=(CNetEvent2PlayerIDsAndInteger&&) = default;
+		CNetEvent2PlayerIDsAndInteger& operator=(const CNetEvent2PlayerIDsAndInteger&) = default;
+
+		static inline constexpr int TypeDesc = 0x812464;
+		static inline constexpr int vtp = 0x7705DC;
+		static inline constexpr unsigned int Identifier = 0x82DAE6F6;
+	};
 }
 
 namespace GGL {
@@ -355,6 +386,7 @@ namespace shok {
 		CommandHeroPlaceBombAt = 0x11024,
 		CommandEntityPatrol = 0x11025,
 		CommandPlayerPayTribute = 0x11026,
+		SetDiplomacy = 0x11027, // not sure if this can be used normally
 		CommandBuildingSetCurrentMaxWorkers = 0x11028,
 		CommandHeroSendHawkToPos = 0x1102C,
 		CommandBattleSerfTurnToSerf = 0x1102D,

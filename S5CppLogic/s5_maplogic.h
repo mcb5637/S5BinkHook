@@ -377,6 +377,7 @@ namespace GGL {
 		void UpgradeSettlerCategory(int pl, int ucat);
 		void PlayerActivateWeathermachine(int player, int weathertype);
 		void PlayerBlessSettlers(int player, int blessCat);
+		void SetDiplomacy(int p1, int p2, shok::DiploState state);
 
 		static inline GGL::CGLGameLogic** const GlobalObj = reinterpret_cast<GGL::CGLGameLogic**>(0x85A3A0);
 		// create net event handlers thiscall 0x49FD49()

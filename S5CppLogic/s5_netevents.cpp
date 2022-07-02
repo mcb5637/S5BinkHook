@@ -86,6 +86,19 @@ EGL::CNetEventEntityIDAndPlayerIDAndEntityType::CNetEventEntityIDAndPlayerIDAndE
 	EntityType = ety;
 }
 
+EGL::CNetEvent2PlayerIDs::CNetEvent2PlayerIDs(shok::NetEventIds id, int p1, int p2) : BB::CEvent(id)
+{
+	SetVT(vtp);
+	PlayerID1 = p1;
+	PlayerID2 = p2;
+}
+
+EGL::CNetEvent2PlayerIDsAndInteger::CNetEvent2PlayerIDsAndInteger(shok::NetEventIds id, int p1, int p2, int v) : CNetEvent2PlayerIDs(id, p1, p2)
+{
+	SetVT(vtp);
+	Value = v;
+}
+
 
 
 GGL::CNetEventExtractResource::CNetEventExtractResource(shok::NetEventIds id, int ent, shok::ResourceType resty, const shok::Position& pos) : BB::CEvent(id)

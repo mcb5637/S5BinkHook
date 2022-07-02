@@ -133,6 +133,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x84D164, &InfoBool},
     {0x84CC44, &InfoBool},
     {0x84CCE8, &InfoBool},
+    {0x81182C, &InfoBool},
 
     {0x810C98, &InfoInt},
     {0x800108, &InfoInt},

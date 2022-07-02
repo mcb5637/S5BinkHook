@@ -22,23 +22,23 @@ namespace GGL {
 		};
 
 		int PlayerID;
-		byte PaydayActive;
+		bool PaydayActive;
 		PADDING(3);
 		int PaydayFirstOccuraceGameTurn;
-		byte AIPlayerFlag, PayLeaderFlag;
+		bool AIPlayerFlag, PayLeaderFlag;
 		PADDING(2);
 		PADDINGI(2); // maybe char pointer? GUI_WorkersWithoutSleepPlace m_GUI_WorkersWithoutEatPlace
 		shok::Vector<EntityInSystemData> EntityInSystem;
 		shok::Vector<int> HeadquarterArray;
 		shok::Vector<int> VillageCenterArray;
 		shok::Vector<int> WorkBuildingsArray;
-		shok::Vector<int> ResidenceBuildingArray;
-		shok::Vector<int> FarmBuildingArray;
+		shok::Vector<int> ResidenceBuildingArray; // 23
+		shok::Vector<int> FarmBuildingArray; // 27
 		shok::Vector<int> BarrackBuildingArray;
-		shok::Vector<int> FreeWorkerArray;
-		shok::Vector<int> EmployedWorkerArray;
-		shok::Vector<int> SoldierArray;
-		shok::Vector<int> LeaderArray;
+		shok::Vector<int> FreeWorkerArray; // 35
+		shok::Vector<int> EmployedWorkerArray; // 39
+		shok::Vector<int> SoldierArray; // 43
+		shok::Vector<int> LeaderArray; // 47
 		shok::Vector<int> HeroArray;
 		shok::Vector<int> SerfArray;
 		shok::Vector<TypeThatLeftData> EntityTypeThatLeft;
@@ -48,15 +48,36 @@ namespace GGL {
 
 		int GetAttractionLimit();
 		int GetAttractionUsage();
+		// taxes from workers
 		int GetWorkerPaydayIncome();
 		int GetNumberOfAttractedWorkers();
 		float GetLeaderPaydayCost();
 		int GetNumberOfLeaders();
+		// checks VC capactity and motivation. always true if AIPlayerFlag set.
+		bool IsAttractionsSlotAvailable();
+		int GetNumberOfSettlers();
+		int GetNumberOfMilitaryUnits();
+		// in 1/100 ticks
+		int GetTimeToNextPayday();
+		float GetAverageMotivation();
+
+		int GetSleepPlaceLimit();
+		int GetFreeSleepPlaces();
+		int GetUsedSleepPlaces();
+		int GetNumberOfWorkersWithoutSleepPlace();
+
+		int GetFarmPlaceLimit();
+		int GetFreeFarmPlace();
+		int GetUsedFarmPlaces();
+		int GetNumberOfWorkersWithoutFarmPlace();
+
+		void CheckWorkerAttachment(bool forceReAttach);
 
 		// checkpayday 4C25FB thiscall
 		static void HookCheckPayday();
 		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);
 	};
+	//constexpr int i = offsetof(CPlayerAttractionHandler, EmployedWorkerArray) / 4;
 
 	class CUpgradeManager : public BB::IObject {
 	public:
@@ -128,28 +149,52 @@ namespace GGL {
 		struct Tribute {
 			int UniqueTributeID;
 			shok::CostInfo Costs;
-			int OwnerEntityID;
+			int OwnerEntityID; // 19
 			int OfferingPlayerID;
 			shok::String OfferStringTableKey;
 		};
 
 		int PlayerID;
 		shok::Vector<Tribute> Tributes;
+
+		// creates tribute or overrides it, if it has an existing id
+		void SetTributeData(int tid, const shok::CostInfo& c, int ownerEntityId, int offeringPlayerId, const char* text);
+		// returns if it was there
+		bool RemoveTribute(int tid);
 	};
 	static_assert(sizeof(PlayerTributesManager) == 5 * 4);
+	//constexpr int i = offsetof(PlayerTributesManager::Tribute, OwnerEntityID) / 4;
 
 	struct PlayerQuestManager {
+		enum class QuestStatus : int {
+			MainQuest_Open = 1,
+			MainQuest_Closed = 2,
+			SubQuest_Open = 11,
+			SubQuest_Closed = 12,
+		};
+
 		struct Quest {
 			int UniqueQuestID;
-			int QuestType;
+			QuestStatus QuestType;
 			shok::String QuestNameStringTableKey, QuestDescriptionStringTableKey;
-			int SubQuestDoneFlagArray[6]; // type?
+			shok::Position Pos; // not serialized
+			bool SubQuestDoneFlagArray[20]; // not sure about the size and the full layout
 		};
 
 
 		int PlayerID;
 		shok::List<Quest> Quests;
+
+		// pos can be nullptr, creates quest or overrides it
+		void SetQuestData(int questId, QuestStatus questType, const char* name, const char* text, const shok::Position* pos, bool info);
+		void SetQuestType(int questId, QuestStatus questType, bool info);
+		// pos can be nullptr
+		void SetQuestPosition(int questId, const shok::Position* pos, bool info);
+		// returns if it was there
+		bool RemoveQuest(int questId, bool info);
 	};
+	static_assert(sizeof(PlayerQuestManager::Quest) == 23 * 4);
+	//constexpr int i = offsetof(PlayerQuestManager::Quest, SubQuestDoneFlagArray) / 4;
 
 	struct GameStatisticsTimeline {
 		shok::Vector<int> Amounts;
@@ -198,22 +243,29 @@ namespace GGL {
 
 	class CPlayerStatus : public BB::IObject {
 	public:
+		enum class PlayerStatus : int {
+			Playing = 1,
+			Won = 2,
+			Lost = 3,
+			Left = 4,
+		};
+
 		int PlayerGameState;
-		byte PlayerHasLeftGameFlag;
+		bool PlayerHasLeftGameFlag;
 		PADDING(3);
 		int PlayerGameStateChangeGameTurn;
-		byte PlayerIsHumanFlag;
+		bool PlayerIsHumanFlag;
 		PADDING(3);
 		int PlayerColorR, PlayerColorG, PlayerColorB;
 		int PlayerID;
 		shok::String PlayerNameStringTableKey, PlayerNameStringRaw;
 		shok::CostInfo CurrentResources; // 23
-		float TaxAmountFactor;
+		float TaxAmountFactor; // used only for levytax
 		int TaxLevel; // 42
 		float CurrentMaxMotivation;
 		int DurationOfWeatherChange; // seems to be always 0
 		int NumberOfBuyableHeros;
-		byte WorkerAlarmMode;
+		bool WorkerAlarmMode;
 		PADDING(3);
 		int AlarmRechargeTime;
 		int DiplomacyData[11]; // 48
@@ -232,6 +284,13 @@ namespace GGL {
 		shok::DiploState GetDiploStateTo(int p);
 		shok::TechState GetTechStatus(int tech);
 
+		int GetTaxPerWorker();
+		int GetLevyTaxPerWorker();
+		int GetLevyTaxAmount();
+
+		// returns if successful
+		bool SetState(PlayerStatus s);
+
 
 		static bool ArePlayersHostile(int p1, int p2);
 		static bool ArePlayersFriendly(int p1, int p2);
@@ -243,5 +302,6 @@ namespace GGL {
 		static void HookCanPlaceBuilding();
 
 	};
+	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;
 
 }

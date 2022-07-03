@@ -139,6 +139,7 @@ namespace EGL {
 	public:
 		virtual ~CGLEAttachableBase() = default;
 		// 8 more funcs
+		// 7 is attached to (this, atype, id) ?
 
 		shok::Set<shok::Attachment> ObserverEntities; // 8
 		shok::Set<shok::Attachment> ObserverEffects; // 11

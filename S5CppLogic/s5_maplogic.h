@@ -283,7 +283,7 @@ namespace EGL {
 
 namespace GGL {
 	class IWeatherSystem {
-
+		// no vtable
 	};
 	class CWeatherHandler : public IWeatherSystem {
 		virtual void GetStateChangingProgress(void*) = 0;
@@ -333,6 +333,7 @@ namespace GGL {
 		int GetNextWeatherState();
 		int GetTicksToNextPeriodicWeatherChange();
 		void AddWeatherElement(int state, int dur, bool peri, int forerun, int gfx, int transition); // all times in ticks
+		void SetOffset(int o);
 		void ClearQueue(int state, int dur, int forerun, int gfx, int transition);
 
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49ECE9);

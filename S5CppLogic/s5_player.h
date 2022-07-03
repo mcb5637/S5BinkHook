@@ -127,6 +127,26 @@ namespace GGL {
 		shok::Vector<ResData> TradeData;
 
 		static inline constexpr int vtp = 0x772860;
+
+		struct TradeOrder {
+			int Player;
+			shok::ResourceType SellResourceType, BuyResourceType;
+			float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam * workamount + sellam * workamount
+
+			// calculates price
+			void SetData(int player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm);
+			// checks resource count and CanBeSold+CanBeBought flags
+			// does not get used by normal market behavior
+			bool IsTradeValid();
+			float GetProgressMax();
+			bool IsFinished();
+			bool RemoveSellRes();
+			void Complete(bool removeSell);
+			// calls complete(false) if progress reaches max
+			void AdvanceProgress(float p);
+		};
+
+		void ApplyPriceChangesOfTrade(const TradeOrder* o);
 	};
 
 	struct PlayerTechManager { // size 12
@@ -277,7 +297,7 @@ namespace GGL {
 		GGL::CPlayerAttractionHandler* PlayerAttractionHandler; // 197
 		GGL::CBuildingUpgradeManager* BuildingUpgradeManager;
 		GGL::CSettlerUpgradeManager* SettlerUpgradeManager;
-		GGL::CTradeManager* TradeManager;
+		GGL::CTradeManager* TradeManager; // 200
 
 		static inline constexpr int vtp = 0x76FA88;
 

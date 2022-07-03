@@ -666,6 +666,11 @@ void GGL::CWeatherHandler::AddWeatherElement(int state, int dur, bool peri, int 
 {
 	weatherdata_addelement(this, state, dur, peri, forerun, gfx, transition);
 }
+static inline void(__thiscall* const weatherdata_setoffset)(GGL::CWeatherHandler* th, int o) = reinterpret_cast<void(__thiscall*)(GGL::CWeatherHandler*, int)>(0x4B9635);
+void GGL::CWeatherHandler::SetOffset(int o)
+{
+	weatherdata_setoffset(this, o);
+}
 
 static inline void(__thiscall* const weatherdata_elements_remove)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>*, int*)>(0x513D32);
 static inline void(__thiscall* const weatherdata_elements_add)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>* th, GGL::CWeatherHandler::WeatherElementData* e) = reinterpret_cast<void(__thiscall*)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>*, GGL::CWeatherHandler::WeatherElementData*)>(0x513CB6);

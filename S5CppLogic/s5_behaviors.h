@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_player.h"
 
 namespace EGL {
 	class CGLEBehavior : public BB::IObject { // no vtable
@@ -935,9 +936,7 @@ namespace GGL {
 
 	class CMarketBehavior : public EGL::CGLEBehavior {
 	public:
-		PADDINGI(1); //4 probably player
-		int SellResourceType, BuyResourceType;
-		float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam * workamount + sellam * workamount
+		GGL::CTradeManager::TradeOrder CurrentTrade; // 4
 
 		// defined events: Market_XXX
 

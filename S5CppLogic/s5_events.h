@@ -668,6 +668,11 @@ namespace shok {
 
 		HeroHawk_SendHawk = 0x16002, //EGL::CEventPosition
 
+		Hero_GetActionPoints = 0x16003, //EGL::CEventGetValue<int,1211121895> unused
+		Hero_GetActionPointsMaximum = 0x16004, //EGL::CEventGetValue<int,1211121895> unused
+		Hero_SetActionPoints = 0x16006, //EGL::CEventValue<int,-27574121> unused
+		Hero_GetActionPointsForAbility = 0x16007, //GGL::CEventHeroAbilityGetInteger unused
+
 		HeroAbility_IsAbilitySupported = 0x16008, //GGL::CEventHeroAbilityInteger
 		HeroAbility_StandUpOrInit = 0x16009, //BB::CEvent
 		CannonBuilder_BuildCannonCommand = 0x1600A, //GGL::CEventPositionAnd2EntityTypes

@@ -97,7 +97,7 @@ namespace GGL {
 		bool Fearless, Convertible; //85
 		PADDING(2);
 		ModifyEntityProps ModifyExploration, ModifyHitpoints, ModifySpeed, ModifyDamage, ModifyArmor, ModifyDodge, ModifyMaxRange, ModifyMinRange, ModifyDamageBonus, ModifyGroupLimit;
-		int AttractionSlots;
+		int AttractionSlots; // 136
 
 		static inline constexpr int vtp = 0x76E498;
 		static inline constexpr int TypeDesc = 0x810B30;

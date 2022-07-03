@@ -146,6 +146,47 @@ int GGL::CSettlerUpgradeManager::GetSettlerTypeByUCat(int ucat)
 	return settlerupmanager_getstybyucat(this, ucat);
 }
 
+static inline void(__thiscall* const tradeorder_setdata)(GGL::CTradeManager::TradeOrder* th, int pl, shok::ResourceType s, shok::ResourceType bu, float am) = reinterpret_cast<void(__thiscall*)(GGL::CTradeManager::TradeOrder*, int, shok::ResourceType, shok::ResourceType, float)>(0x4E7CFF);
+void GGL::CTradeManager::TradeOrder::SetData(int player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm)
+{
+	tradeorder_setdata(this, player, sellTy, buyTy, buyAm);
+}
+static inline bool(__thiscall* const tradeorder_isvalid)(GGL::CTradeManager::TradeOrder* th) = reinterpret_cast<bool(__thiscall*)(GGL::CTradeManager::TradeOrder*)>(0x516E6E);
+bool GGL::CTradeManager::TradeOrder::IsTradeValid()
+{
+	return tradeorder_isvalid(this);
+}
+static inline float(__thiscall* const tradeorder_getpmax)(GGL::CTradeManager::TradeOrder* th) = reinterpret_cast<float(__thiscall*)(GGL::CTradeManager::TradeOrder*)>(0x516EFD);
+float GGL::CTradeManager::TradeOrder::GetProgressMax()
+{
+	return tradeorder_getpmax(this);
+}
+bool GGL::CTradeManager::TradeOrder::IsFinished()
+{
+	return GetProgressMax() <= ProgressAmount; // also 0x5170B3
+}
+static inline bool(__thiscall* const tradeorder_remsell)(GGL::CTradeManager::TradeOrder* th) = reinterpret_cast<bool(__thiscall*)(GGL::CTradeManager::TradeOrder*)>(0x516F45);
+bool GGL::CTradeManager::TradeOrder::RemoveSellRes()
+{
+	return tradeorder_remsell(this);
+}
+static inline bool(__thiscall* const tradeorder_complete)(GGL::CTradeManager::TradeOrder* th, bool rs) = reinterpret_cast<bool(__thiscall*)(GGL::CTradeManager::TradeOrder*, bool)>(0x517027);
+void GGL::CTradeManager::TradeOrder::Complete(bool removeSell)
+{
+	tradeorder_complete(this, removeSell);
+}
+static inline bool(__thiscall* const tradeorder_adv)(GGL::CTradeManager::TradeOrder* th, float p) = reinterpret_cast<bool(__thiscall*)(GGL::CTradeManager::TradeOrder*, float)>(0x517080);
+void GGL::CTradeManager::TradeOrder::AdvanceProgress(float p)
+{
+	tradeorder_adv(this, p);
+}
+
+static inline void(__thiscall* const trademng_applytrade)(GGL::CTradeManager* th, const GGL::CTradeManager::TradeOrder* o) = reinterpret_cast<void(__thiscall*)(GGL::CTradeManager*, const GGL::CTradeManager::TradeOrder*)>(0x4C8903);
+void GGL::CTradeManager::ApplyPriceChangesOfTrade(const TradeOrder* o)
+{
+	trademng_applytrade(this, o);
+}
+
 static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, int ownerent, int offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, int, int, const char*)>(0x4BE63E);
 void GGL::PlayerTributesManager::SetTributeData(int tid, const shok::CostInfo& c, int ownerEntityId, int offeringPlayerId, const char* text)
 {

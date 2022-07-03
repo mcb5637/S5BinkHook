@@ -567,11 +567,11 @@ namespace CppLogic::Entity {
 		GGL::CMarketBehavior* m = b->GetBehavior<GGL::CMarketBehavior>();
 		if (!m)
 			throw lua::LuaException("no market at 1");
-		L.Push(m->BuyResourceType);
-		L.Push(m->SellResourceType);
-		L.Push(m->BuyAmount);
-		L.Push(m->SellAmount);
-		L.Push(m->ProgressAmount);
+		L.Push(static_cast<int>(m->CurrentTrade.BuyResourceType));
+		L.Push(static_cast<int>(m->CurrentTrade.SellResourceType));
+		L.Push(m->CurrentTrade.BuyAmount);
+		L.Push(m->CurrentTrade.SellAmount);
+		L.Push(m->CurrentTrade.ProgressAmount);
 		return 5;
 	}
 	int BuildingMarketSetCurrentTradeData(lua::State l) {
@@ -581,15 +581,15 @@ namespace CppLogic::Entity {
 		if (!m)
 			throw lua::LuaException("no market at 1");
 		if (L.IsNumber(2))
-			m->BuyResourceType = L.CheckInt(2);
+			m->CurrentTrade.BuyResourceType = static_cast<shok::ResourceType>(L.CheckInt(2));
 		if (L.IsNumber(3))
-			m->SellResourceType = L.CheckInt(3);
+			m->CurrentTrade.SellResourceType = static_cast<shok::ResourceType>(L.CheckInt(3));
 		if (L.IsNumber(4))
-			m->BuyAmount = L.CheckFloat(4);
+			m->CurrentTrade.BuyAmount = L.CheckFloat(4);
 		if (L.IsNumber(5))
-			m->SellAmount = L.CheckFloat(5);
+			m->CurrentTrade.SellAmount = L.CheckFloat(5);
 		if (L.IsNumber(6))
-			m->ProgressAmount = L.CheckFloat(6);
+			m->CurrentTrade.ProgressAmount = L.CheckFloat(6);
 		return 0;
 	}
 

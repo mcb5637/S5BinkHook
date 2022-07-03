@@ -1860,6 +1860,13 @@ void GGL::CSettler::KillSettlerByEnvironment()
 	settler_killbyenviro(this);
 }
 
+static inline void(__thiscall* const settler_upgrade)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x4A6C4A);
+void GGL::CSettler::Upgrade()
+{
+	settler_upgrade(this);
+}
+
+
 void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)
 {
 	int hp = Health, mhp = GetMaxHealth();

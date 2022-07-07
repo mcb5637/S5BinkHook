@@ -78,8 +78,8 @@ namespace EToolsManager {
 
 namespace ERwTools {
 	class IRenderable {
-	public:
-		virtual void SetBuildingRedColor(bool r) = 0;
+	protected:
+		virtual void SetBuildingRedColorI(int r) = 0;
 	private:
 		virtual void uk0() = 0;
 		virtual void uk1() = 0;
@@ -104,6 +104,7 @@ namespace ERwTools {
 
 		void SetModelData(const ED::ModelData* modeldata, float rotation);
 		void SetPosition(const shok::Position& p, float z);
+		void SetBuildingRedColor(bool r);
 	};
 
 	struct CameraInfo {

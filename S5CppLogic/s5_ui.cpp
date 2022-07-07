@@ -631,6 +631,11 @@ void ERwTools::CRpClumpRenderable::SetPosition(const shok::Position& p, float z)
 	SetPosition(p.X, p.Y, z);
 }
 
+void ERwTools::CRpClumpRenderable::SetBuildingRedColor(bool r)
+{
+	SetBuildingRedColorI(r ? 2 : 1);
+}
+
 static inline void(__thiscall*const c3dviewhandler_setguistate)(GGUI::C3DViewHandler* th, unsigned int id, GGUI::SStateParameters* p) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, unsigned int, GGUI::SStateParameters*)>(0x52820C);
 void GGUI::C3DViewHandler::SetGUIStateByIdentifier(unsigned int identifier)
 {

@@ -546,8 +546,8 @@ namespace GGL {
 		shok::ResourceType ResourceType; //66
 		int ResourceAmount, ResourceAmountAdd;
 
-		// sets max and current
-		void SetResourceAmount(int am);
+		// sets current and refreshes model depending on max
+		void SetCurrentResourceAmount(int am);
 
 		static inline constexpr int vtp = 0x76FEA4;
 		static inline constexpr int TypeDesc = 0x8118AC;

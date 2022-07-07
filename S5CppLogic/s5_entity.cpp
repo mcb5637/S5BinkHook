@@ -242,7 +242,7 @@ bool GGL::CSettler::IsIdle()
 }
 
 static inline void(__thiscall* const shok_GGL_CResourceDoodad_setresam)(GGL::CResourceDoodad* th, int am) = reinterpret_cast<void(__thiscall* const)(GGL::CResourceDoodad*, int)>(0x4B864B);
-void GGL::CResourceDoodad::SetResourceAmount(int am)
+void GGL::CResourceDoodad::SetCurrentResourceAmount(int am)
 {
 	shok_GGL_CResourceDoodad_setresam(this, am);
 }

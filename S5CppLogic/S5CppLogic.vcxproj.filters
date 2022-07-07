@@ -228,6 +228,9 @@
     <ClInclude Include="s5_effecttype.h">
       <Filter>shok\effect</Filter>
     </ClInclude>
+    <ClInclude Include="s5_staticlist.h">
+      <Filter>shok\globals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -364,6 +367,9 @@
     </ClCompile>
     <ClCompile Include="s5_RWEngine.cpp">
       <Filter>shok\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_staticlist.cpp">
+      <Filter>shok\globals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

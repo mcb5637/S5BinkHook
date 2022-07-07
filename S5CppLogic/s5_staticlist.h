@@ -1,0 +1,80 @@
+#pragma once
+#include "s5_forwardDecls.h"
+#include "s5_baseDefs.h"
+
+
+namespace EGL {
+	class CStaticEntry {
+	public:
+		virtual void Apply() const = 0;
+
+		int Id = 0;
+		shok::String Name;
+		CStaticEntry* Prev = nullptr;
+
+		static inline constexpr int vtp = 0x766CDC;
+	};
+#ifdef __INTELLISENSE__
+#pragma diag_suppress 2784
+#endif
+	static_assert(offsetof(CStaticEntry, Prev) == 4 * 9);
+#ifdef __INTELLISENSE__
+#pragma diag_default 2784
+#endif
+
+	class CStaticListEx {
+	public:
+		virtual void Add(CStaticEntry* e) = 0;
+		virtual void ApplyAll() const = 0;
+
+		CStaticEntry* First = nullptr;
+
+		static inline constexpr int vtp = 0x766B44;
+
+		static inline CStaticListEx(__cdecl* const GlobalHeroAbilities)() = reinterpret_cast<CStaticListEx(__cdecl*)()>(0x498312);
+	};
+
+
+
+	class CStaticEntityTypeID : public EGL::CStaticEntry {
+	public:
+		static inline constexpr int vtp = 0x766CEC;
+	};
+
+	class CStaticEffectTypeID : public EGL::CStaticEntry {
+	public:
+		static inline constexpr int vtp = 0x76EB20;
+	};
+
+	class CStaticTaskListID : public EGL::CStaticEntry {
+	public:
+		static inline constexpr int vtp = 0x76FF54;
+	};
+}
+
+namespace GGL {
+	class CStaticHeroAbilityID : public EGL::CStaticEntry {
+	public:
+		virtual void Apply() const override;
+
+		static inline constexpr int vtp = 0x7768AC;
+
+		// creates and adds it to the GlobalHeroAbilities list
+		CStaticHeroAbilityID(const char* name, int id);
+	};
+
+	class CStaticArmorClassID : public EGL::CStaticEntry {
+	public:
+		static inline constexpr int vtp = 0x778E6C;
+	};
+
+	class CStaticCategoryID : public EGL::CStaticEntry {
+	public:
+		static inline constexpr int vtp = 0x766CE4;
+	};
+
+	class CStaticAttachmentTypeID : public EGL::CStaticEntry {
+	public:
+		static inline constexpr int vtp = 0x770B20;
+	};
+}

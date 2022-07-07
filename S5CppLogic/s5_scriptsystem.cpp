@@ -9,6 +9,14 @@ void EScr::CScriptTriggerSystem::RunTrigger(BB::CEvent* ev)
 	PostEvent(ev);
 }
 
+static inline void(__thiscall* const scripttriggersys_create)(EScr::CScriptTriggerSystem* th, int* id, EScr::CScriptTrigger* t) = reinterpret_cast<void(__thiscall*)(EScr::CScriptTriggerSystem*, int*, EScr::CScriptTrigger*)>(0x5A0FDA);
+int EScr::CScriptTriggerSystem::CreateTrigger(CScriptTrigger* trigger)
+{
+	int id = 0;
+	scripttriggersys_create(this, &id, trigger);
+	return id;
+}
+
 void __stdcall overrideluafunc_empty(lua_State* L, const char* name, lua::CFunction f) {
 
 }
@@ -33,28 +41,28 @@ void EScr::CLuaFuncRefCommand::SetCommandString(const char* c)
 	funccmd_set(this, c);
 }
 
-static inline void(__stdcall* const funccmd_clear)(EScr::CLuaFuncRefCommand* th) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRefCommand*)>(0x5A15E5);
-void EScr::CLuaFuncRefCommand::Clear()
+static inline void(__stdcall* const funcref_clear)(EScr::CLuaFuncRef* th) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRef*)>(0x5A15E5);
+void EScr::CLuaFuncRef::Clear()
 {
-	funccmd_clear(this);
+	funcref_clear(this);
 }
 
-static inline void(__stdcall* const funccmd_createref)(EScr::CLuaFuncRefCommand* th) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRefCommand*)>(0x5A1665);
-void EScr::CLuaFuncRefCommand::CreateRef()
+static inline void(__stdcall* const funcref_createref)(EScr::CLuaFuncRef* th) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRef*)>(0x5A1665);
+void EScr::CLuaFuncRef::CreateRef()
 {
-	funccmd_createref(this);
+	funcref_createref(this);
 }
 
-static inline bool(__stdcall* const funccmd_checkref)(EScr::CLuaFuncRefCommand* th) = reinterpret_cast<bool(__stdcall*)(EScr::CLuaFuncRefCommand*)>(0x51B247);
-bool EScr::CLuaFuncRefCommand::CheckRef()
+static inline bool(__stdcall* const funcref_checkref)(EScr::CLuaFuncRef* th) = reinterpret_cast<bool(__stdcall*)(EScr::CLuaFuncRef*)>(0x51B247);
+bool EScr::CLuaFuncRef::CheckRef()
 {
-	return funccmd_checkref(this);
+	return funcref_checkref(this);
 }
 
-static inline bool(__stdcall* const funccmd_call)(EScr::CLuaFuncRefCommand* th, int a, int r) = reinterpret_cast<bool(__stdcall*)(EScr::CLuaFuncRefCommand*, int, int)>(0x5A16BD);
-bool EScr::CLuaFuncRefCommand::Call(int nargs, int nres)
+static inline bool(__stdcall* const funcref_call)(EScr::CLuaFuncRef* th, int a, int r) = reinterpret_cast<bool(__stdcall*)(EScr::CLuaFuncRef*, int, int)>(0x5A16BD);
+bool EScr::CLuaFuncRef::Call(int nargs, int nres)
 {
-	return funccmd_call(this, nargs, nres);
+	return funcref_call(this, nargs, nres);
 }
 
 void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
@@ -66,4 +74,15 @@ void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
 	L.PushValue(idx);
 	Ref = L.Ref(L.REGISTRYINDEX);
 	NeedsCompile = false;
+}
+
+lua::Reference __stdcall EScr::CLuaFuncRefGlobal::GetRefToFunc()
+{
+	throw 0;
+}
+
+static inline void(__stdcall* const funcglo_set)(EScr::CLuaFuncRefGlobal* th, const char* c) = reinterpret_cast<void(__stdcall* const)(EScr::CLuaFuncRefGlobal*, const char*)>(0x5A18EB);
+void EScr::CLuaFuncRefGlobal::SetCommandString(const char* c)
+{
+	funcglo_set(this, c);
 }

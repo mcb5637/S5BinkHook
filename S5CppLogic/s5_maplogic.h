@@ -228,16 +228,23 @@ namespace EGL {
 		void ActivateUpdateOfExplorationForAllPlayers();
 	};
 
+	struct LogicGameTime {
+		int Tick;
+		int TicksPerMS;
+	};
+
 	class IGLEGameLogic : public BB::IPostEvent {
 
 	};
 	class CGLEGameLogic : public IGLEGameLogic {
 		PADDINGI(6);
-		int* InGameTime; // 7
+		LogicGameTime* InGameTime; // 7
 		PADDINGI(1);
 		EGL::CGLELandscape* Landscape; // 9
 		PADDINGI(9);
-		EGL::GameLogicExplorationStuff* SomeStuff;
+		EGL::GameLogicExplorationStuff* SomeStuff; // 19
+		PADDINGI(14);
+		int RandomSeed; // 34
 
 	private:
 		virtual void unknown1() = 0;
@@ -279,6 +286,7 @@ namespace EGL {
 		static inline EGL::CGLEGameLogic** const GlobalObj = reinterpret_cast<EGL::CGLEGameLogic**>(0x895DAC); // also 85A3A4
 		static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 	};
+	//constexpr int i = offsetof(CGLEGameLogic, RandomSeed)/4;
 }
 
 namespace GGL {

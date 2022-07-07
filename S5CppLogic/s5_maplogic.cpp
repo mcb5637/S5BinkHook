@@ -618,12 +618,12 @@ int EGL::CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
 
 int EGL::CGLEGameLogic::GetTimeMS()
 {
-	return InGameTime[0] * InGameTime[1];
+	return InGameTime->Tick * InGameTime->TicksPerMS;
 }
 
 int EGL::CGLEGameLogic::GetTick()
 {
-	return InGameTime[0];
+	return InGameTime->Tick;
 }
 
 int(__thiscall* CreateEffectHookedOrig)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = nullptr;

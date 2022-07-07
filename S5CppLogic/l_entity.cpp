@@ -285,7 +285,7 @@ namespace CppLogic::Entity {
 	int SettlerGetLeaderOfSoldier(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		L.Push(s->LeaderId);
+		L.Push(s->GetFirstAttachedToMe(shok::AttachmentType::LEADER_SOLDIER));
 		return 1;
 	}
 
@@ -390,7 +390,7 @@ namespace CppLogic::Entity {
 	int SettlerGetOverheadWidget(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		L.Push(s->OverheadWidget);
+		L.Push(s->ModifierProfile.OverheadWidget);
 		return 1;
 	}
 	int SettlerSetOverheadWidget(lua::State l) {
@@ -399,7 +399,7 @@ namespace CppLogic::Entity {
 		int ov = L.CheckInt(2);
 		if (!(ov >= 0 && ov <= 4))
 			throw lua::LuaException("invalid overhead code");
-		s->OverheadWidget = ov;
+		s->ModifierProfile.OverheadWidget = ov;
 		return 1;
 	}
 

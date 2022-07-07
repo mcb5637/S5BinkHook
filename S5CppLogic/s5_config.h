@@ -122,6 +122,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76EFCC;
 
 		static inline GGL::CLogicProperties** const GlobalObj = reinterpret_cast<GGL::CLogicProperties**>(0x85A3E0);
+
+		static inline float(__stdcall* const ExperiencePointsToLevels)(float xp) = reinterpret_cast<float(__stdcall*)(float)>(0x4C674D);
 	};
 
 	class CPlayerAttractionProps : public BB::IObject {

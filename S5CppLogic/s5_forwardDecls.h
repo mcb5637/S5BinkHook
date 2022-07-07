@@ -95,3 +95,6 @@ namespace RWE {
 	struct RpClump;
 	using RwTexture = ::RwTexture;
 }
+namespace EScr {
+	class CScriptTrigger;
+}

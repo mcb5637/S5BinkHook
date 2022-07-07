@@ -620,7 +620,7 @@ namespace shok {
 		Leader_GetNudgeCount = 0x15019, //EGL::CEventGetValue<int, 1211121895>
 		// 1501C soldier some other entity
 		Battle_OnTargetDetached = 0x1501D, //EGL::CEvent1Entity
-		// 1501E leader get some unknown int +100, soldier something other entity???
+		Leader_GetSoldierType = 0x1501E, //EGL::CEventGetValue<int,1211121895>
 		Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
 		GetArmorClass = 0x15020, //EGL::CEventGetValue<int,1211121895>
 		Leader_GetAttackTarget = 0x15021, //EGL::CEventGetValue<int, 1211121895> soldier forwards to leader
@@ -638,16 +638,16 @@ namespace shok {
 		Leader_AttackMove = 0x1502E, //EGL::CEventPosition
 		Leader_HoldPosition = 0x1502F, //BB::CEvent
 		// 15030 leader disable territory?
-		Leader_RunAwayFromFearEffect = 0x15031, //EGL::CEvent1Entity TODO validate
+		Leader_Guard = 0x15031, //EGL::CEvent1Entity
 		Leader_Defend = 0x15032, //BB::CEvent
 		BombPlacer_CommandPlaceBomb = 0x15033, //EGL::CEventPosition
-		// 15034 also something with fear
+		LeaderPatrol = 0x15034, //EGL::CEventPosition
 		Barracks_BuyLeader = 0x15035, //EGL::CEventValue<int,-27574121> ucat
 		Leader_GetNearbyBarracks = 0x15036, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_BuySoldierForLeader = 0x15037, //EGL::CEvent1Entity
 		// 15038 leader? goes to defend after something else
 		Leader_OnGuardedAttackedBy = 15039, //EGL::CEvent1Entity
-		// 1503A leader
+		LeaderPatrolAddPoint = 0x1503A, //EGL::CEventPosition
 		Leader_SetIsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
 		// 1503C serf some kind of stop?
 		GetArmor = 0x1503E, //EGL::CEventGetValue<int, 1211121895>
@@ -772,9 +772,9 @@ namespace shok {
 		IsWorker = 0x18003, //EGL::CEventGetValue<bool, 1709081367>
 		IsLeader = 0x18004, //EGL::CEventGetValue<bool, 1709081367>
 		IsSoldier = 0x18005, //EGL::CEventGetValue<bool, 1709081367>
+		IsHero = 0x18006, //EGL::CEventGetValue<bool, 1709081367>
 		IsBattleOrAutocannon = 0x18007, //EGL::CEventGetValue<bool, 1709081367>
 		IsSettlerOrBuilding = 0x18008, //EGL::CEventGetValue<bool, 1709081367>
-		IsHero = 0x18006, //EGL::CEventGetValue<bool, 1709081367>
 		IsSerfOrWorker = 0x18009, //EGL::CEventGetValue<bool, 1709081367>
 		DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
 		// 0x1800B building get bool?
@@ -849,6 +849,7 @@ namespace shok {
 		MouseLeave = 0x50002,
 		AutoUpdate = 0x50003,
 		ManualUpdate = 0x50004,
+		UnHighlightGroup = 0x50005, // EGUIX::CGroupEvent
 		WidgetShow = 0x50006,
 		WidgetHide = 0x50007,
 	};

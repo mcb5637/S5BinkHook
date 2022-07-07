@@ -370,6 +370,8 @@ namespace shok {
 		CommandPlayerSetTaxes = 0x1100E,
 		CommandSettlerExpell = 0x1100F,
 		CommandEntityAttackEntity = 0x11012,
+		LeaderAttachOneSoldier = 0x11013,
+		LeaderExpellOneSoldier = 0x11014,
 		CommandLeaderSetFormation = 0x11015,
 		CommandSerfConstructBuilding = 0x11017,
 		CommandSerfRepairBuilding = 0x11018,

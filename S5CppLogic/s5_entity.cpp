@@ -224,6 +224,17 @@ bool EGL::CMovingEntity::IsFleeingFrom(const shok::Position& center, float range
 	return std::sqrtf(posrsq) + range < std::sqrtf(tprsq);
 }
 
+float EGL::IProfileModifierSetObserver::GetModifiedValue(ModifierType t, float z)
+{
+	throw 0;
+}
+
+static inline float(__thiscall* const modentitydb_getmod)(GGL::ModifierEntityDatabase* th, int id, GGL::CEntityProfile::ModifierType ty, float initial) = reinterpret_cast<float(__thiscall*)(GGL::ModifierEntityDatabase*, int, GGL::CEntityProfile::ModifierType, float)>(0x584078);
+float GGL::ModifierEntityDatabase::GetModifiedStat(int id, CEntityProfile::ModifierType ty, float initial)
+{
+	return modentitydb_getmod(this, id, ty, initial);
+}
+
 bool GGL::CSettler::IsIdle()
 {
 	shok::LeaderCommand com = EventLeaderGetCurrentCommand();
@@ -231,7 +242,7 @@ bool GGL::CSettler::IsIdle()
 }
 
 static inline void(__thiscall* const shok_GGL_CResourceDoodad_setresam)(GGL::CResourceDoodad* th, int am) = reinterpret_cast<void(__thiscall* const)(GGL::CResourceDoodad*, int)>(0x4B864B);
-void GGL::CResourceDoodad::SetCurrentResourceAmount(int am)
+void GGL::CResourceDoodad::SetResourceAmount(int am)
 {
 	shok_GGL_CResourceDoodad_setresam(this, am);
 }
@@ -2056,7 +2067,7 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 				(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
 			}
 			if (toheal->GetBehavior<GGL::CSoldierBehavior>()) {
-				toheal = EGL::CGLEEntity::GetEntityByID(static_cast<GGL::CSettler*>(toheal)->LeaderId);
+				toheal = EGL::CGLEEntity::GetEntityByID(toheal->GetFirstAttachedToMe(shok::AttachmentType::LEADER_SOLDIER));
 			}
 			if (!toheal)
 				return;

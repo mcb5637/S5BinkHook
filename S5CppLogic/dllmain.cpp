@@ -67,10 +67,8 @@ int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A2B0));
-    //(*GGL::CGLGameLogic::GlobalObj)->TechManager->FreeTech(1);
-    int id = L.CheckInt(1);
-    (*ED::CDEVisibleEffectManager::GlobalObj)->DestroyDisplayForEffect(id);
-    return 0;
+    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x3F9B1F03);
+    return 1;
 }
 
 int Cleanup(lua::State L) {

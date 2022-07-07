@@ -412,9 +412,84 @@ namespace EGL {
 		static inline constexpr unsigned int Identifier = 0xE12A3723;
 	};
 	static_assert(offsetof(CAmbientSoundEntity, AmbientSoundType) == 67 * 4);
+
+	class IProfileModifierSetObserver {
+		// no vtable
+	public:
+		enum class ModifierType : int {
+			MovingSpeed = 0,
+			HealthBar = 100,
+			MaxHealth = 101,
+			Exploration = 102,
+			Damage = 103,
+			DamageBonus = 104,
+			MaxAttackRange = 105,
+			// 106 unknown value at 36
+			ExperienceLevels = 108,
+			// 109 unknown just asses through initial
+			Experience = 107,
+			Armor = 110,
+			Motivation = 111,
+			CurrentSoldierAmount = 112,
+			MaxSoldierAmount = 113,
+			Dodge = 114,
+			AutoAttackRange = 115,
+			HealingPoints = 116,
+			MissChance = 117,
+		};
+
+		virtual float GetModifiedValue(ModifierType t, float z);
+	};
 }
 
 namespace GGL {
+	class CEntityProfile : public EGL::IProfileModifierSetObserver {
+	public:
+		struct ModifyableValue {
+			bool NeedsRefresh;
+			PADDING(3);
+			float Value;
+		};
+
+		PADDINGI(4); // vector?
+		int EntityId;
+		ModifyableValue ExperiencePoints; // 6, 84 in settler
+		ModifyableValue ExperienceLevel;
+		ModifyableValue MovingSpeed; // 10
+		ModifyableValue Damage; // 12
+		ModifyableValue Dodge; // 14
+		ModifyableValue Motivation; //16
+		ModifyableValue Armor; // 18
+		ModifyableValue CurrentAmountSoldiers; // 20
+		ModifyableValue MaxAmountSoldiers; //22
+		ModifyableValue DamageBonus; // 24
+		ModifyableValue Exploration; // 26
+		ModifyableValue MaxAttackRange; // 28
+		ModifyableValue AutoAttackRange; // 30
+		ModifyableValue HealingPoints; // 32
+		ModifyableValue MissChance; // 34, 112 in settler
+		PADDINGI(1); // 0
+		float HealthBar; //37
+		float HealthMax; // 38
+		PADDINGI(2);
+		PADDINGI(7); // string?
+		PADDINGI(4);
+		int OverheadWidget;
+		int ExperienceClass;
+		PADDINGI(2);
+
+
+		static inline constexpr int vtp = 0x7727A4;
+	};
+	static_assert(sizeof(CEntityProfile) == 56 * 4);
+	struct ModifierEntityDatabase {
+		PADDINGI(3); // map?
+
+		static inline ModifierEntityDatabase* const GlobalObj = reinterpret_cast<ModifierEntityDatabase*>(0x895E5C);
+
+		float GetModifiedStat(int id, CEntityProfile::ModifierType ty, float initial);
+	};
+
 	class CEvadingEntity : public EGL::CMovingEntity {
 	public:
 		PADDINGI(4);
@@ -428,45 +503,9 @@ namespace GGL {
 	class CSettler : public GGL::CEvadingEntity {
 	public:
 		int TimeToWait, HeadIndex, HeadParams; // la77
-		PADDINGI(7);
-		float ExperiencePoints; // 85
-		int ExperienceLevel;
-		PADDINGI(2);
-		float MovingSpeed; //89
-		PADDINGI(1);
-		float Damage;
-		PADDINGI(1);
-		float Dodge;
-		PADDINGI(1);
-		float Motivation;
-		PADDINGI(1);
-		float Armor;
-		PADDINGI(1);
-		float CurrentAmountSoldiers;
-		PADDINGI(1);
-		float MaxAmountSoldiers;
-		PADDINGI(1);
-		float DamageBonus;
-		PADDINGI(1);
-		float ExplorationCache;
-		PADDINGI(1);
-		float MaxAttackRange;
-		PADDINGI(1);
-		float AutoAttackRange;
-		PADDINGI(1);
-		float HealingPoints;
-		PADDINGI(1);
-		float MissChance;
-		PADDINGI(1);
-		float Healthbar; // 115
-		PADDINGI(7);
-		float SomeIntRegardingTaskLists; // 123
-		PADDINGI(3);
-		int LeaderId;
-		PADDINGI(2);
-		int OverheadWidget;
-		int ExperienceClass;
-		PADDINGI(2);
+
+		CEntityProfile ModifierProfile;
+
 		int BlessBuff, NPCMarker, LeaveBuildingTurn; //la136
 
 		static inline constexpr int vtp = 0x76E3CC;
@@ -488,6 +527,8 @@ namespace GGL {
 		// defined states: BattleWaitUntilAutoCannon, Default (set tl to default)
 	};
 	static_assert(sizeof(CSettler) == 137 * 4);
+	static_assert(offsetof(CSettler, ModifierProfile.OverheadWidget) == 130 * 4);
+	//constexpr int i = offsetof(CSettler, ModifierProfile.OverheadWidget) / 4;
 
 	class CAnimal : public EGL::CMovingEntity {
 	public:
@@ -505,8 +546,8 @@ namespace GGL {
 		shok::ResourceType ResourceType; //66
 		int ResourceAmount, ResourceAmountAdd;
 
-		// set current res amount 4B864B thiscall (th, int)
-		void SetCurrentResourceAmount(int am);
+		// sets max and current
+		void SetResourceAmount(int am);
 
 		static inline constexpr int vtp = 0x76FEA4;
 		static inline constexpr int TypeDesc = 0x8118AC;

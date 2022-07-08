@@ -54,6 +54,8 @@ namespace GGUI {
 
 	class CCommandState : public GGUI::CBasicState { // no vtable
 	public:
+		int ExclusiveRecipientId;
+
 		static inline constexpr int TypeDesc = 0x82CC88;
 	};
 

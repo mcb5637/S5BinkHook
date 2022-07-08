@@ -376,7 +376,6 @@
     <None Include="Source.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="CppLogic.lua" />
     <None Include="cpp.hint" />
     <None Include="doc\CppLogic.lua">
       <Filter>doc</Filter>

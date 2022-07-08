@@ -524,6 +524,8 @@ namespace GGUI {
 	public:
 		static inline constexpr int vtp = 0x77B2F8;
 
+		void SetControlledPlayer(int pl);
+
 		void HackPostEvent();
 
 		static inline GGUI::CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<GGUI::CManager * (__cdecl*)()>(0x525622);

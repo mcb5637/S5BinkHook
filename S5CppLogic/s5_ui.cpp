@@ -652,6 +652,12 @@ bool GGL::CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const 
 	return GetNearestFreePosForBuildingPlacement(ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);
 }
 
+static inline void(__thiscall* const guimng_setpl)(GGUI::CManager* th, int p) = reinterpret_cast<void(__thiscall*)(GGUI::CManager*, int)>(0x52371C);
+void GGUI::CManager::SetControlledPlayer(int pl)
+{
+	guimng_setpl(this, pl);
+}
+
 void(__stdcall* PostEventOrig)(BB::IPostEvent* th, BB::CEvent* ev) = nullptr;
 shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
 bool(*GGUI::CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;

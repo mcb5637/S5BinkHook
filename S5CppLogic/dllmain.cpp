@@ -24,6 +24,7 @@
 #include "s5_mapdisplay.h"
 #include "s5_idmanager.h"
 #include "s5_effects.h"
+#include "s5_staticlist.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -67,7 +68,17 @@ int Test(lua::State Ls) {
     luaext::EState L{ Ls };
     //CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
     //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A2B0));
-    CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x3F9B1F03);
+    //CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x3F9B1F03);
+    EGL::CStaticListEx* l = reinterpret_cast<EGL::CStaticListEx*>(0x853C4C);
+    L.NewTable();
+    int i = 1;
+    EGL::CStaticEntry* e = l->First;
+    while (e) {
+        L.Push(e->Name.c_str());
+        L.SetTableRaw(-2, i);
+        ++i;
+        e = e->Prev;
+    }
     return 1;
 }
 

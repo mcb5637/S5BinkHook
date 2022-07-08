@@ -32,6 +32,8 @@ namespace EGL {
 		static inline constexpr int vtp = 0x766B44;
 
 		static inline CStaticListEx(__cdecl* const GlobalHeroAbilities)() = reinterpret_cast<CStaticListEx(__cdecl*)()>(0x498312);
+		// every category is in there multiple times ([26, 29] times). somebody probably put the initialization into a header xD
+		static inline CStaticListEx(__cdecl* const GlobalEntityCategories)() = reinterpret_cast<CStaticListEx(__cdecl*)()>(0x449D04);
 	};
 
 
@@ -70,7 +72,12 @@ namespace GGL {
 
 	class CStaticCategoryID : public EGL::CStaticEntry {
 	public:
+		virtual void Apply() const override;
+
 		static inline constexpr int vtp = 0x766CE4;
+
+		// creates and adds it to the GlobalHeroAbilities list (you cannot define the int value of the id, but it is getting set by Apply)
+		CStaticCategoryID(const char* name);
 	};
 
 	class CStaticAttachmentTypeID : public EGL::CStaticEntry {

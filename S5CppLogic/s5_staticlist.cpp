@@ -11,3 +11,14 @@ void GGL::CStaticHeroAbilityID::Apply() const
 {
 	throw 0;
 }
+
+void GGL::CStaticCategoryID::Apply() const
+{
+	throw 0;
+}
+
+static inline void(__thiscall* const staticcat_ctor)(GGL::CStaticCategoryID* th, const char* n) = reinterpret_cast<void(__thiscall*)(GGL::CStaticCategoryID*, const char*)>(0x44B1BF);
+GGL::CStaticCategoryID::CStaticCategoryID(const char* name)
+{
+	staticcat_ctor(this, name);
+}

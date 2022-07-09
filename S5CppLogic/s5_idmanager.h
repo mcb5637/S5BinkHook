@@ -41,6 +41,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const EntityTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0x895DC0); // A0C834 same
 		static inline BB::CIDManagerEx** const UpgradeCategoryManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C84C);
 		static inline BB::CIDManagerEx** const EntityCategoryManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3C4); // 867838 same
+		static inline BB::CIDManagerEx** const EntityCategoryManager2 = reinterpret_cast<BB::CIDManagerEx**>(0x867838); // same object
 		static inline BB::CIDManagerEx** const DamageClassManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3B8); // A0D034 same
 		static inline BB::CIDManagerEx** const TechnologiesManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3BC); // 8640EC same
 		static inline BB::CIDManagerEx** const TechnologyCategoryManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3C0); // 864854 same

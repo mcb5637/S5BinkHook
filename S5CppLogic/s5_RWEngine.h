@@ -18,9 +18,7 @@ namespace BBRw {
 
 // this is c code, i just c++ified it to clean up my global namespace
 // need these for templates, so RTTI works
-struct RtAnimAnimation {
-
-};
+struct RtAnimAnimation;
 struct RwTexture;
 namespace RWE {
 	// real forward decls
@@ -380,5 +378,13 @@ struct RwTexture {
 
 	static RwTexture* Read(const char* name, const char* mask);
 	// destroys if no reference left
+	void Destroy();
+};
+
+struct RtAnimAnimation {
+
+
+
+	static RtAnimAnimation* Read(const char* name);
 	void Destroy();
 };

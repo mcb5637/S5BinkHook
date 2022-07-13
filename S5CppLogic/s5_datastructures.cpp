@@ -35,3 +35,12 @@ void shok::String::assign(const char* s)
 shok::String::String() : shok::String("")
 {
 }
+
+std::strong_ordering shok::String::operator<=>(const String& r) const
+{
+	return std::string_view{ this->c_str(), this->size() } <=> std::string_view{ r.c_str(), r.size() };
+}
+bool shok::String::operator==(const String& r) const
+{
+	return (*this <=> r) == std::strong_ordering::equal;
+}

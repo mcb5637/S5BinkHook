@@ -1,19 +1,55 @@
 #pragma once
+#include <compare>
 #include <vector>
 #include <list>
+#include <set>
+#include <functional>
+#include <type_traits>
 
 #include "s5_forwardDecls.h"
 #include "s5_mem.h"
 
 namespace shok {
-
 	template<class T>
-	class Set {
+	const T& Tree_DefaultExtractKey(const T& t) {
+		return t;
+	}
+	template<class T>
+	requires std::three_way_comparable<T>
+	std::strong_ordering Tree_DefaultComparator(const T& l, const T& r) {
+		return std::compare_strong_order_fallback(l, r);
+	}
+
+	template<class T, class K
+		, const K&(*KeyExtractor)(const T&) = Tree_DefaultExtractKey
+		, std::strong_ordering (*Comparator)(const K&, const K&)=Tree_DefaultComparator
+		, bool Multi = false>
+	class Tree {
 	private:
+		enum class Color : byte {
+			Red = 0,
+			Black = 1,
+		};
+
 		struct TreeNode {
-			TreeNode* left, * parent, * right;
+			TreeNode* left = nullptr;
+			TreeNode* parent = nullptr;
+			TreeNode* right = nullptr;
 			T data;
-			bool redblack;
+			Color c = Color::Red;
+			bool isnil = false;
+
+
+			void* operator new(size_t s) {
+				return shok::Malloc(s);
+			}
+			void operator delete(void* p) {
+				shok::Free(p);
+			}
+
+			template<class ... Args>
+			TreeNode(Args&& ... args) : data(std::forward<Args>(args)...) {
+			}
 		};
 		PADDINGI(1);
 		TreeNode* root;
@@ -28,6 +64,40 @@ namespace shok {
 			lambda(&d->data);
 			ForAllRec(d->right, lambda);
 		}
+		TreeNode* FollowDownLeft(TreeNode* node) const {
+			if (!node)
+				return nullptr;
+			while (node->left != root) {
+				node = node->left;
+			}
+			return node;
+		}
+		TreeNode* FollowDownRight(TreeNode* node) const {
+			if (!node)
+				return nullptr;
+			while (node->right != root) {
+				node = node->right;
+			}
+			return node;
+		}
+		TreeNode* NextNodeIteration(TreeNode* node) const {
+			if (node->right != root) { // first check right, then go down left as far as possible
+				node = node->right;
+				return FollowDownLeft(node);
+			}
+			else { // go back up until we hit root or did get there by going left
+				TreeNode* p = node->parent;
+				while (p != root && node == p->right) {
+					node = p;
+					p = p->parent;
+				}
+				if (p == root)
+					return nullptr;
+				else
+					return p;
+			}
+		}
+
 	public:
 		void ForAll(std::function<void(T*)> lambda) {
 			ForAllRec(root->parent, lambda);
@@ -42,45 +112,26 @@ namespace shok {
 		}
 
 		class Iter {
-			friend class Set;
+			friend class Tree;
 			TreeNode* node;
-			const Set<T>* set;
-			Iter(TreeNode* n, const Set<T>* s) {
+			const Tree<T, K, KeyExtractor, Comparator, Multi>* set;
+			Iter(TreeNode* n, const Tree<T, K, KeyExtractor, Comparator, Multi>* s) {
 				node = n;
 				set = s;
-			}
-
-			void FollowDownLeft() {
-				if (!node)
-					return;
-				while (node->left != set->root) {
-					node = node->left;
-				}
 			}
 
 		public:
 			T& operator*() const {
 				return node->data;
 			}
+			T* operator->() const {
+				return &node->data;
+			}
 			bool operator==(const Iter& o) const {
 				return this->node == o.node;
 			}
 			Iter& operator++() {
-				if (node->right != set->root) { // first check right, then go down left as far as possible
-					node = node->right;
-					FollowDownLeft();
-				}
-				else { // go back up until we hit root or did get there by going left
-					TreeNode* p = node->parent;
-					while (p != set->root && node == p->right) {
-						node = p;
-						p = p->parent;
-					}
-					if (p == set->root)
-						node = nullptr;
-					else
-						node = p;
-				}
+				node = set->NextNodeIteration(node);
 				return *this;
 			}
 			Iter operator++(int) {
@@ -89,18 +140,421 @@ namespace shok {
 				return r;
 			}
 		};
+		friend class Tree<T, K, KeyExtractor, Comparator, Multi>::Iter;
 
 		Iter begin() const {
-			Iter i { root->parent, this };
-			i.FollowDownLeft();
+			Iter i { root->left, this };
 			return i;
 		}
 		Iter end() const {
 			return { nullptr, this };
 		}
 
+		static std::strong_ordering Compare(const T& l, const T& r) {
+			return Comparator(KeyExtractor(l), KeyExtractor(r));
+		}
+		static std::strong_ordering CompareKV(const K& l, const T& r) {
+			return Comparator(l, KeyExtractor(r));
+		}
+		static std::strong_ordering CompareVK(const T& l, const K& r) {
+			return Comparator(KeyExtractor(l), r);
+		}
+
+	private:
+		void RotateLeft(TreeNode* n) {
+			TreeNode* pn = n->right;
+			n->right = pn->left;
+
+			if (!pn->left->isnil) {
+				pn->left->parent = n;
+			}
+
+			pn->parent = n->parent;
+
+			if (n == root->parent) {
+				root->parent = pn;
+			}
+			else if (n == n->parent->left) {
+				n->parent->left = pn;
+			}
+			else {
+				n->parent->right = pn;
+			}
+
+			pn->left = n;
+			n->parent = pn;
+		}
+		void RotateRight(TreeNode* n) {
+			TreeNode* pn = n->left;
+			n->left = pn->right;
+
+			if (!pn->right->isnil) {
+				pn->right->parent = n;
+			}
+
+			pn->parent = n->parent;
+
+			if (n == root->parent) {
+				root->parent = pn;
+			}
+			else if (n == n->parent->right) {
+				n->parent->right = pn;
+			}
+			else {
+				n->parent->left = pn;
+			}
+
+			pn->right = n;
+			n->parent = pn;
+		}
+
+		struct InsertInfo {
+			TreeNode* parent = nullptr;
+			TreeNode* bound = nullptr;
+			bool asLeft = false;
+		};
+
+		TreeNode* InsertNode(const InsertInfo& i, TreeNode* newnode) {
+			++size;
+			newnode->parent = i.parent;
+			if (i.parent == root) { // first in tree
+				root->left = newnode;
+				root->parent = newnode;
+				root->right = newnode;
+				newnode->c = Color::Black;
+				return newnode;
+			}
+
+			if (!i.asLeft) {
+				i.parent->right = newnode;
+				if (i.parent == root->right)
+					root->right = newnode;
+			}
+			else {
+				i.parent->left = newnode;
+				if (i.parent == root->left)
+					root->left = newnode;
+			}
+
+			for (TreeNode* pn = newnode; pn->parent->c == Color::Red;) {
+				if (pn->parent == pn->parent->parent->left) {
+					TreeNode* ppr = pn->parent->parent->right;
+					if (ppr->c == Color::Red) {
+						pn->parent->c = Color::Black;
+						ppr->c = Color::Black;
+						pn->parent->parent->c = Color::Red;
+						pn = pn->parent->parent;
+					}
+					else {
+						if (pn == pn->parent->right) {
+							pn = pn->parent;
+							RotateLeft(pn);
+						}
+						pn->parent->c = Color::Black;
+						pn->parent->parent->c = Color::Red;
+						RotateRight(pn->parent->parent);
+					}
+				}
+				else {
+					TreeNode* ppl = pn->parent->parent->left;
+					if (ppl->c == Color::Red) {
+						pn->parent->c = Color::Black;
+						ppl->c = Color::Black;
+						pn->parent->parent->c = Color::Red;
+						pn = pn->parent->parent;
+					}
+					else {
+						if (pn == pn->parent->left) {
+							pn = pn->parent;
+							RotateRight(pn);
+						}
+						pn->parent->c = Color::Black;
+						pn->parent->parent->c = Color::Red;
+						RotateLeft(pn->parent->parent);
+					}
+				}
+			}
+
+			root->parent->c = Color::Black;
+			return newnode;
+		}
+
+		InsertInfo FindUpperBound(const K& key) {
+			InsertInfo r{ root->parent, root, false };
+			TreeNode* tn = root->parent;
+			while (!tn->isnil) {
+				r.parent = tn;
+				if (CompareKV(key, tn->data) == std::strong_ordering::less) {
+					r.asLeft = true;
+					r.bound = tn;
+					tn = tn->left;
+				}
+				else {
+					r.asLeft = false;
+					tn = tn->right;
+				}
+			}
+			return r;
+		}
+
+		InsertInfo FindLowerBound(const K& key) {
+			InsertInfo r{ root->parent, root, false };
+			TreeNode* tn = root->parent;
+			while (!tn->isnil) {
+				r.parent = tn;
+				if (CompareVK(tn->data, key) == std::strong_ordering::less) {
+					r.asLeft = false;
+					tn = tn->right;
+				}
+				else {
+					r.asLeft = true;
+					r.bound = tn;
+					tn = tn->left;
+				}
+			}
+			return r;
+		}
+		bool LowerBoundDuplicate(TreeNode* b, const K& key) {
+			return !b->isnil && !(CompareKV(key, b->data) == std::strong_ordering::less);
+		}
+
+		template<class ... Args>
+		std::pair<TreeNode*, bool> Emplace(Args&& ... args) {
+			TreeNode* toinsert = new TreeNode(std::forward<Args>(args)...);
+			toinsert->right = root;
+			toinsert->parent = root;
+			toinsert->left = root;
+			const K& key = KeyExtractor(toinsert->data);
+			if constexpr (Multi) {
+				InsertInfo i = FindUpperBound(key);
+				return { InsertNode(i, toinsert), true };
+			}
+			else {
+				InsertInfo i = FindLowerBound(key);
+				if (LowerBoundDuplicate(i.bound, key)) {
+					delete toinsert;
+					return { i.bound, false };
+				}
+				return { InsertNode(i, toinsert), true };
+			}
+		}
+
+		void Extract(TreeNode* ex) {
+			TreeNode* fixnode = nullptr;
+			TreeNode* fixnodeparent = nullptr;
+			TreeNode* pn = ex;
+			
+			if (pn->left->isnil) {
+				fixnode = pn->right;
+			}
+			else if (pn->right->isnil) {
+				fixnode = pn->left;
+			}
+			else {
+				pn = NextNodeIteration(pn);
+				fixnode = pn->right;
+			}
+
+			if (pn == ex) {
+				fixnodeparent = ex->parent;
+				if (!fixnode->isnil)
+					fixnode->parent = fixnodeparent;
+
+				if (root->parent == ex) {
+					root->parent = fixnode;
+				}
+				else if (fixnodeparent->left == ex) {
+					fixnodeparent->left = fixnode;
+				}
+				else {
+					fixnodeparent->right = fixnode;
+				}
+
+				if (root->left == ex) {
+					root->left = fixnode->isnil ? fixnodeparent : FollowDownLeft(fixnode);
+				}
+
+				if (root->right == ex) {
+					root->right = fixnode->isnil ? fixnodeparent : FollowDownRight(fixnode);
+				}
+			}
+			else {
+				ex->left->parent = pn;
+				pn->left = ex->left;
+
+				if (pn == ex->right) {
+					fixnodeparent = pn;
+				}
+				else {
+					fixnodeparent = pn->parent;
+					if (!fixnode->isnil) {
+						fixnode->parent = fixnodeparent;
+					}
+
+					fixnodeparent->left = fixnode;
+					pn->right = ex->right;
+					ex->right->parent = pn;
+				}
+
+				if (root->parent == ex) {
+					root->parent = pn;
+				}
+				else if (ex->parent->left == ex) {
+					ex->parent->left = pn;
+				}
+				else {
+					ex->parent->right = pn;
+				}
+
+				pn->parent = ex->parent;
+				std::swap(pn->c, ex->c);
+			}
+
+			if (ex->c == Color::Black) {
+				for (; fixnode != root->parent && fixnode->c == Color::Black; fixnodeparent = fixnode->parent) {
+					if (fixnode == fixnodeparent->left) {
+						pn = fixnodeparent->right;
+						if (pn->c == Color::Red) {
+							pn->c = Color::Black;
+							fixnodeparent->c = Color::Red;
+							RotateLeft(fixnodeparent);
+							pn = fixnodeparent->right;
+						}
+
+						if (pn->isnil) {
+							fixnode = fixnodeparent;
+						}
+						else if (pn->left->c == Color::Black && pn->right->c == Color::Black) {
+							pn->c = Color::Red;
+							fixnode = fixnodeparent;
+						}
+						else {
+							if (pn->right->c == Color::Black) {
+								pn->left->c = Color::Black;
+								pn->c = Color::Red;
+								RotateRight(pn);
+								pn = fixnodeparent->right;
+							}
+							pn->c = fixnodeparent->c;
+							fixnodeparent->c = Color::Black;
+							pn->right->c = Color::Black;
+							RotateLeft(fixnodeparent);
+							break;
+						}
+					}
+					else {
+						pn = fixnodeparent->left;
+						if (pn->c == Color::Red) {
+							pn->c = Color::Black;
+							fixnodeparent->c = Color::Red;
+							RotateRight(fixnodeparent);
+							pn = fixnodeparent->left;
+						}
+
+						if (pn->isnil) {
+							fixnode = fixnodeparent;
+						}
+						else if (pn->right->c == Color::Black && pn->left->c == Color::Black) {
+							pn->c = Color::Red;
+							fixnode = fixnodeparent;
+						}
+						else {
+							if (pn->left->c == Color::Black) {
+								pn->right->c = Color::Black;
+								pn->c = Color::Red;
+								RotateLeft(pn);
+								pn = fixnodeparent->left;
+							}
+
+							pn->c = fixnodeparent->c;
+							fixnodeparent->c = Color::Black;
+							pn->left->c = Color::Black;
+							RotateRight(fixnodeparent);
+							break;
+						}
+					}
+				}
+
+				fixnode->c = Color::Black;
+			}
+
+			if (size > 0)
+				--size;
+		}
+
+		T* SearchRec(const K& c, TreeNode* n) {
+			if (n == root)
+				return nullptr;
+			std::strong_ordering cmp = CompareKV(c, n->data);
+			if (cmp == std::strong_ordering::equal)
+				return &n->data;
+			if (cmp == std::strong_ordering::less)
+				return SearchRec(c, n->left);
+			else
+				return SearchRec(c, n->right);
+		}
+	public:
+		void insert(T&& d) {
+			Emplace(std::forward<T>(d));
+		}
+		template<class ... Args>
+		void emplace(Args&& ... args) {
+			Emplace(std::forward<Args>(args)...);
+		}
+		Iter erase(Iter wh) {
+			Iter next = wh;
+			++next;
+			TreeNode* toex = wh.node;
+			Extract(toex);
+			delete toex;
+			return next;
+		}
+		T* Search(const K& c) {
+			return SearchRec(c, root->parent);
+		}
+	};
+	static_assert(sizeof(Tree<int, int>) == 3 * 4);
+
+	template<class T>
+	requires std::three_way_comparable<T>
+	class Set : public Tree<T, T, Tree_DefaultExtractKey, Tree_DefaultComparator, false> {
+		
 	};
 	static_assert(sizeof(Set<int>) == 3 * 4);
+
+	template<class K, class V>
+	const K& Map_DefaultExtractKey(const std::pair<K, V>& d) {
+		return d.first;
+	}
+
+	template<class K, class V, std::strong_ordering(*Comparator)(const K&, const K&)=Tree_DefaultComparator>
+	requires std::three_way_comparable<K>
+	class Map : public Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, false> {
+
+	public:
+		V& at(const K& key) {
+			std::pair<K, V>* d = Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, false>::Search(key);
+			if (d == nullptr)
+				throw std::out_of_range{ "key not in map" };
+			return d->second;
+		}
+		void insert(K&& key, V&& val) {
+			std::pair<K, V> i{ key, val };
+			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, false>::insert(std::move(i));
+		}
+	};
+	static_assert(sizeof(Map<int, int>) == 3 * 4);
+
+	template<class K, class V, std::strong_ordering(*Comparator)(const K&, const K&) = Tree_DefaultComparator>
+	requires std::three_way_comparable<K>
+	class MultiMap : public Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true> {
+	public:
+		void insert(K&& key, V&& val) {
+			std::pair<K, V> i{ key, val };
+			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::insert(std::move(i));
+		}
+	};
+	static_assert(sizeof(MultiMap<int, int>) == 3 * 4);
 
 
 	struct String {
@@ -119,6 +573,8 @@ namespace shok {
 		size_t size() const;
 		~String();
 		String();
+		std::strong_ordering operator<=>(const String& r) const;
+		bool operator==(const String& r) const;
 	};
 	static_assert(sizeof(String) == 7 * 4);
 

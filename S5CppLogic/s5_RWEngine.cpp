@@ -143,3 +143,14 @@ void RwTexture::Destroy()
 {
     texture_destroy(this);
 }
+
+static inline RtAnimAnimation* (__cdecl* const anim_read)(const char* name) = reinterpret_cast<RtAnimAnimation * (__cdecl*)(const char*)>(0x6EB180);
+RtAnimAnimation* RtAnimAnimation::Read(const char* name)
+{
+    return anim_read(name);
+}
+static inline void(__cdecl* const anim_destroy)(RtAnimAnimation* a) = reinterpret_cast<void(__cdecl*)(RtAnimAnimation*)>(0x6EAC50);
+void RtAnimAnimation::Destroy()
+{
+    anim_destroy(this);
+}

@@ -22,7 +22,7 @@ namespace ED {
 
 	class IBehavior : public BB::IObject {
 	public:
-		ED::CEntity* EntityDisplay = nullptr;
+		//ED::CEntity* EntityDisplay = nullptr;
 		//ED::CBehaviorProps* Props = nullptr; does seem to be only in subclasses
 
 	protected:
@@ -84,6 +84,7 @@ namespace ED {
 
 	class CDisplayBehaviorBuildingAnimation : public ED::IBehavior {
 	public:
+		ED::CEntity* EntityDisplay = nullptr;
 		EGL::CBehaviorAnimation::CSlotAnimation* Slot;
 
 
@@ -92,8 +93,11 @@ namespace ED {
 	};
 	static_assert(offsetof(CDisplayBehaviorBuildingAnimation, Slot) == 2 * 4);
 
+	class CDisplayStaticWithHierarchy;
 	class CDisplayBehaviorAnimationNoBlending : public ED::IBehavior {
 	public:
+		ED::CDisplayStaticWithHierarchy* EntityDisplay = nullptr;
+		EGL::TSlot<EGL::SSlotArgsAnimation, 796165920>* Slot = nullptr;
 
 		static inline constexpr int vtp = 0x7AEB08;
 		static inline constexpr int TypeDesc = 0x84D5B4;
@@ -234,6 +238,7 @@ namespace GD {
 
 	class CCamouflageBehavior : public ED::IBehavior {
 	public:
+		ED::CEntity* EntityDisplay = nullptr;
 		ED::CBehaviorProps* Props = nullptr;
 		void* Slot; // EGL::TSlot<GGL::SSlotArgsCamouflage,983570077>
 		bool UseAltModel;

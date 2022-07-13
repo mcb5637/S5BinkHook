@@ -225,7 +225,7 @@ namespace CppLogic::Logic {
 		if (i <= 0 || i >= 9)
 			throw lua::LuaException("invalid player");
 		int ucat = L.CheckInt(2);
-		auto* u = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.GetFirstMatch([ucat](GGL::CSettlerUpgradeManager::UCatEntry* u) {return u->UCat == ucat; });
+		auto* u = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.Search(ucat);
 		if (!u)
 			throw lua::LuaException("invalid ucat");
 		(*GGL::CGLGameLogic::GlobalObj)->UpgradeSettlerCategory(i, ucat);
@@ -678,22 +678,22 @@ namespace CppLogic::Logic {
 		for (const auto& kae : wh->Elements) {
 			L.NewTable();
 			L.Push("State");
-			L.Push(kae.WeatherElement.State);
+			L.Push(kae.second.State);
 			L.SetTableRaw(-3);
 			L.Push("GFX");
-			L.Push(kae.WeatherElement.GfxSet);
+			L.Push(kae.second.GfxSet);
 			L.SetTableRaw(-3);
 			L.Push("IsPeriodic");
-			L.Push(kae.WeatherElement.IsPeriodic);
+			L.Push(kae.second.IsPeriodic);
 			L.SetTableRaw(-3);
 			L.Push("Length");
-			L.Push(kae.WeatherElement.Length);
+			L.Push(kae.second.Length);
 			L.SetTableRaw(-3);
 			L.Push("Forerun");
-			L.Push(kae.WeatherElement.Forerun);
+			L.Push(kae.second.Forerun);
 			L.SetTableRaw(-3);
 
-			L.SetTableRaw(-2, kae.WeatherElement.StartTimeOffset);
+			L.SetTableRaw(-2, kae.second.StartTimeOffset);
 		}
 		L.Push(wh->CurrentWeatherOffset);
 		L.Push(wh->NextPeriodicWeatherStartTimeOffset);

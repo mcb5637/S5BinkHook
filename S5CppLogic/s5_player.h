@@ -81,19 +81,14 @@ namespace GGL {
 
 	class CUpgradeManager : public BB::IObject {
 	public:
-		struct Job {
-			int Category;
-			shok::Set<int[3]> UpgradeJobData; // UpgradeProgress, Category, UpgradeManager
-		};
 		struct UCatEntry {
-			int UCat;
 			int NumUpgrades;
 			int FirstEntityType;
 		};
 
 
-		shok::Set<Job> JobData; // empty
-		shok::Set<UCatEntry> UpgradeCategories;
+		shok::Map<int, int[3]> JobData; // empty Category -> UpgradeJobData (UpgradeProgress, Category, UpgradeManager)
+		shok::Map<int, UCatEntry> UpgradeCategories; // UCat -> UCatEntry
 		int PlayerID;
 
 		static inline constexpr int vtp = 0x7728CC;
@@ -102,7 +97,7 @@ namespace GGL {
 	};
 	class CBuildingUpgradeManager : public GGL::CUpgradeManager {
 	public:
-		shok::Set<int[3]> ScholarInfoElement; // Category, ScholarInfo { ?, CurrentAmount } ?
+		PADDINGI(3);// ScholarInfoElement; // map? Category, ScholarInfo { ?, CurrentAmount } ?
 
 		static inline constexpr int vtp = 0x772948;
 	};

@@ -84,10 +84,7 @@ namespace shok {
 
 
 	struct Attachment {
-		shok::AttachmentType AttachmentType;
-		int EntityId, EventID; // does event id exist, or is it just in attachmentinfo loader?
-
-		auto operator<=>(const Attachment& o) const = default;
+		int EntityId, EventID;
 	};
 
 	struct Color {
@@ -141,10 +138,10 @@ namespace EGL {
 		// 8 more funcs
 		// 7 is attached to (this, atype, id) ?
 
-		shok::Set<shok::Attachment> ObserverEntities; // 8
-		shok::Set<shok::Attachment> ObserverEffects; // 11
-		shok::Set<shok::Attachment> ObservedEntities; // 14
-		shok::Set<shok::Attachment> ObservedEffects; // 17
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEntities; // 8
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEffects; // 11
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEntities; // 14
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEffects; // 17
 		bool SendEvent; // 20
 		PADDING(3);
 

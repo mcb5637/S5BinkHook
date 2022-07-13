@@ -657,10 +657,10 @@ namespace CppLogic::UA {
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
 						static_cast<GGL::CSettler*>(e)->HeroAbilitySummon();
-						e->ObservedEntities.ForAll([this](shok::Attachment* a) {
-							if (a->AttachmentType == shok::AttachmentType::SUMMONER_SUMMONED)
-								AddLeader(EGL::CGLEEntity::GetEntityByID(a->EntityId));
-							});
+						for (const auto& a : e->ObservedEntities) {
+							if (a.first == shok::AttachmentType::SUMMONER_SUMMONED)
+								AddLeader(EGL::CGLEEntity::GetEntityByID(a.second.EntityId));
+						}
 					}
 				}
 			}

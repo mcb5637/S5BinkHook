@@ -132,13 +132,13 @@ namespace CppLogic::API {
 
 	void PushGDBList(lua::State L, const GDB::CList& list) {
 		L.NewTable();
-		for (const GDB::CList::GDBEntry& e : list.Entries) {
-			L.Push(e.Key.c_str());
-			if (const GDB::CString* s = dynamic_cast<const GDB::CString*>(e.Data))
+		for (const auto& e : list.Entries) {
+			L.Push(e.first.c_str());
+			if (const GDB::CString* s = dynamic_cast<const GDB::CString*>(e.second))
 				L.Push(s->Data.c_str());
-			else if (const GDB::CValue* v = dynamic_cast<const GDB::CValue*>(e.Data))
+			else if (const GDB::CValue* v = dynamic_cast<const GDB::CValue*>(e.second))
 				L.Push(v->Data);
-			else if (const GDB::CList* l = dynamic_cast<const GDB::CList*>(e.Data)) {
+			else if (const GDB::CList* l = dynamic_cast<const GDB::CList*>(e.second)) {
 				L.CheckStack(4, "stackoverflow");
 				PushGDBList(L, *l);
 			}

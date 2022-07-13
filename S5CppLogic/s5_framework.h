@@ -83,13 +83,7 @@ namespace GDB {
 
 	class CList : public BB::IObject {
 	public:
-		struct GDBEntry {
-			shok::String Key;
-			BB::IObject* Data; // GDB::CValue, GDB::CString, or GDB::CList
-		};
-
-
-		shok::Set<GDBEntry> Entries;
+		shok::Map<shok::String, BB::IObject*> Entries; // GDB::CValue, GDB::CString, or GDB::CList
 
 		bool IsKeyValid(const char* key);
 		const char* GetString(const char* key);

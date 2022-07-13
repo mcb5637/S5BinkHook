@@ -14,13 +14,7 @@ namespace EScr {
 
 	class CScriptTriggerSystem : public IScriptTriggerSystem {
 	public:
-		struct TriggerData {
-			struct {
-				unsigned int UniqueID;
-			} UniqueID;
-			CScriptTrigger* Data;
-		};
-		shok::Set<TriggerData> Trigger;
+		shok::Map<unsigned int, CScriptTrigger*> Trigger; // UniqueID -> Data
 		PADDINGI(3); // map of active triggers???
 		unsigned int UniqueTriggerID; // next trigger id 8
 		bool TriggerSystemDisabled;

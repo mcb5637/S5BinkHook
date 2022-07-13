@@ -309,17 +309,13 @@ namespace GGL {
 			int GfxSet = 0;
 			int Transition = 0;
 		};
-		struct KeyAndWeatherElement {
-			int WeatherIndex;
-			WeatherElementData WeatherElement;
-		};
 
 		int CurrentWeatherState;
 		int CurrentWeatherIndex;
 		PADDINGI(1);// 3 next nonperiodic weather?
 		int NextWeatherIndex;
 		int CurrentWeatherOffset; // 5
-		shok::Set<KeyAndWeatherElement> Elements;
+		shok::Map<int, WeatherElementData> Elements;
 		int NextPeriodicWeatherStartTimeOffset;
 		struct { // 10
 			int CurrentWeatherGFXState; //0

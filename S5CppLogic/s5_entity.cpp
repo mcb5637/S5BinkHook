@@ -177,18 +177,18 @@ int EGL::CGLEEntity::ResourceTreeGetNearestSector() const
 
 int EGL::CGLEEntity::GetFirstAttachedToMe(shok::AttachmentType attachmentId) const
 {
-	for (const shok::Attachment& r : ObserverEntities) {
-		if (r.AttachmentType == attachmentId)
-			return r.EntityId;
+	for (const auto& r : ObserverEntities) {
+		if (r.first == attachmentId)
+			return r.second.EntityId;
 	}
 	return 0;
 }
 
 int EGL::CGLEEntity::GetFirstAttachedEntity(shok::AttachmentType attachmentId) const
 {
-	for (const shok::Attachment& r : ObservedEntities) {
-		if (r.AttachmentType == attachmentId)
-			return r.EntityId;
+	for (const auto& r : ObservedEntities) {
+		if (r.first == attachmentId)
+			return r.second.EntityId;
 	}
 	return 0;
 }
@@ -300,16 +300,16 @@ bool GGL::CBuilding::IsIdle(bool forRecruitemnt)
 
 		if (forRecruitemnt) {
 			int c = 0;
-			ObserverEntities.ForAll([&c](shok::Attachment* a) {
-				if (a->AttachmentType == shok::AttachmentType::FIGHTER_BARRACKS && !EGL::CGLEEntity::GetEntityByID(a->EntityId)->GetBehavior<GGL::CSoldierBehavior>())
+			for (const auto& a : ObserverEntities)
+				if (a.first == shok::AttachmentType::FIGHTER_BARRACKS && !EGL::CGLEEntity::GetEntityByID(a.second.EntityId)->GetBehavior<GGL::CSoldierBehavior>())
 					c++;
-				});
 			if (c >= 3)
 				return false;
 		}
 		else {
-			if (ObserverEntities.GetFirstMatch([](shok::Attachment* a) { return a->AttachmentType == shok::AttachmentType::FIGHTER_BARRACKS; }))
-				return false;
+			for (const auto& a : ObserverEntities)
+				if (a.first == shok::AttachmentType::FIGHTER_BARRACKS)
+					return false;
 		}
 
 	}
@@ -366,7 +366,7 @@ EGL::CGLETaskList* EGL::CGLEEntity::GetCurrentTaskList()
 {
 	return shok_entity_GetCurrentTaskList(this);
 }
-static inline EGL::TaskHandler* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>* th, shok::Task id) = reinterpret_cast<EGL::TaskHandler * (__thiscall* const)(shok::Set<EGL::CGLEEntity::TaskIdAndTaskHandler>*, shok::Task)>(0x57BDD3);
+static inline EGL::TaskHandler* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Map<shok::Task, EGL::TaskHandler*>* th, shok::Task id) = reinterpret_cast<EGL::TaskHandler * (__thiscall* const)(shok::Map<shok::Task, EGL::TaskHandler*>*, shok::Task)>(0x57BDD3);
 EGL::TaskHandler* EGL::CGLEEntity::GetTaskHandler(shok::Task task)
 {
 	return shok_entitytaskhandler_gettaskhandler(&TaskHandlers, task);
@@ -385,14 +385,14 @@ void EGL::CGLEEntity::Destroy()
 void EGL::CGLEEntity::ClearAttackers()
 {
 	std::vector<GGL::CSettler*> tomove = std::vector<GGL::CSettler*>();
-	ObserverEntities.ForAll([&tomove](shok::Attachment* a) {
-		if (a->AttachmentType == shok::AttachmentType::ATTACKER_COMMAND_TARGET || a->AttachmentType == shok::AttachmentType::LEADER_TARGET || a->AttachmentType == shok::AttachmentType::FOLLOWER_FOLLOWED) {
-			EGL::CGLEEntity* at = EGL::CGLEEntity::GetEntityByID(a->EntityId);
+	for (const auto& a : ObserverEntities) {
+		if (a.first == shok::AttachmentType::ATTACKER_COMMAND_TARGET || a.first == shok::AttachmentType::LEADER_TARGET || a.first == shok::AttachmentType::FOLLOWER_FOLLOWED) {
+			EGL::CGLEEntity* at = EGL::CGLEEntity::GetEntityByID(a.second.EntityId);
 			if (GGL::CSettler* s = dynamic_cast<GGL::CSettler*>(at)) {
 				tomove.emplace_back(s);
 			}
 		}
-		});
+	}
 	for (GGL::CSettler* s : tomove)
 		s->Defend();
 }
@@ -443,7 +443,7 @@ void EGL::CMovingEntity::LeaderAttachSoldier(int soldierId)
 static inline void(__thiscall* const shok_entity_expellSettler)(EGL::CGLEEntity* th, int i) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*, int)>(0x4A39BB);
 void EGL::CMovingEntity::SettlerExpell()
 {
-	if (GetBehavior<GGL::CLeaderBehavior>() && ObservedEntities.GetFirstMatch([](shok::Attachment* a) { return a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER; })) {
+	if (GetBehavior<GGL::CLeaderBehavior>() && ObservedEntities.GetFirstMatch([](std::pair<shok::AttachmentType, shok::Attachment>* a) { return a->first == shok::AttachmentType::LEADER_SOLDIER; })) {
 		EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_ExpellSoldier, true };
 		FireEvent(&ev);
 	}
@@ -773,7 +773,10 @@ int __cdecl fixedChangePlayer(int id, int pl) {
 		GGL::CLeaderBehavior* lb = e->GetBehavior<GGL::CLeaderBehavior>();
 		if (lb) {
 			std::vector<int> sol = std::vector<int>();
-			e->ObservedEntities.ForAll([&sol](shok::Attachment* a) { if (a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER) sol.push_back(a->EntityId); });
+			for (const auto& a : e->ObservedEntities) {
+				if (a.first == shok::AttachmentType::LEADER_SOLDIER)
+					sol.push_back(a.second.EntityId);
+			}
 			GGL::CSettler* settler = static_cast<GGL::CSettler*>(EGL::CGLEEntity::GetEntityByID(nid));
 			for (int i : sol) {
 				settler->LeaderAttachSoldier(fixedChangePlayer(i, pl));
@@ -1085,9 +1088,9 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	}
 	if (attacker) {
 		for (auto& a : ObserverEntities) {
-			if (a.AttachmentType == shok::AttachmentType::GUARD_GUARDED) {
+			if (a.first == shok::AttachmentType::GUARD_GUARDED) {
 				EGL::CEvent1Entity ev{ shok::EventIDs::Leader_OnGuardedAttackedBy, attacker->EntityId };
-				EGL::CGLEEntity::GetEntityByID(a.EntityId)->FireEvent(&ev);
+				EGL::CGLEEntity::GetEntityByID(a.second.EntityId)->FireEvent(&ev);
 			}
 		}
 	}
@@ -1120,7 +1123,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 			int hppersol = lbeh->GetTroopHealthPerSoldier();
 			int currentsol = 0;
 			for (auto& a : attackedleader->ObservedEntities) {
-				if (a.AttachmentType == shok::AttachmentType::LEADER_SOLDIER)
+				if (a.first == shok::AttachmentType::LEADER_SOLDIER)
 					currentsol++;
 			}
 			while (troophp > 0 && damage > 0) {
@@ -1895,7 +1898,10 @@ void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)
 	if (lb && healSoldiers) {
 		int shp = lb->GetTroopHealth(), smp = lb->GetTroopHealthPerSoldier();
 		int numsol = 0;
-		ObservedEntities.ForAll([&numsol](shok::Attachment* a) { if (a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER) numsol++; });
+		for (const auto& a : ObservedEntities) {
+			if (a.first == shok::AttachmentType::LEADER_SOLDIER)
+				numsol++;
+		}
 		smp *= numsol;
 		shp += r;
 		if (shp > smp)
@@ -2055,9 +2061,9 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 	EGL::CGLEEffectCreator ecr{};
 	ecr.PlayerID = e->PlayerId;
 	ecr.EffectType = pr->HealEffect;
-	e->ObservedEntities.ForAll([hpfact, &ecr](shok::Attachment* a) {
-		if (a->AttachmentType == shok::AttachmentType::HERO_AFFECTED) {
-			EGL::CGLEEntity* toheal = EGL::CGLEEntity::GetEntityByID(a->EntityId);
+	for (const auto& a : e->ObservedEntities) {
+		if (a.first == shok::AttachmentType::HERO_AFFECTED) {
+			EGL::CGLEEntity* toheal = EGL::CGLEEntity::GetEntityByID(a.second.EntityId);
 			if (!toheal)
 				return;
 			float heal = toheal->GetMaxHealth() * hpfact;
@@ -2073,7 +2079,7 @@ void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
 				return;
 			toheal->PerformHeal(static_cast<int>(heal), true);
 		}
-		});
+	}
 }
 void EGL::CGLEEntity::HookRangedEffectActivateHeal(bool hookActive)
 {

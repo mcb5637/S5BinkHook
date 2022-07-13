@@ -739,15 +739,14 @@ namespace GGL {
 	};
 	class CLimitedAttachmentBehavior : public EGL::CGLEBehavior, public EGL::TSlot<GGL::SSlotArgsLimitedAttachment, 0x13C4316D> {
 	public:
-		class AttachmentData {
+		class AttachmentInfo {
 		public:
-			shok::AttachmentType AttachmentType;
-			int Limit; // these 2 are a struct called AttachmentInfo
-			byte IsActive;
+			int Limit = 0;
+			bool IsActive = false;
 			PADDING(3);
 		};
 
-		shok::Set<AttachmentData> AttachmentMap;
+		shok::Map<shok::AttachmentType, AttachmentInfo> AttachmentMap;
 
 		// defined evets: LimitedAttachment_XXX
 

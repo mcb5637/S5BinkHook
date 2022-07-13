@@ -272,16 +272,12 @@ namespace ERwTools {
 		int ControlMode;
 		struct {
 			struct {
-				struct Data
-				{
-					float Time, Data;
-				};
-
-				shok::Set<Data> LookAtXElement;
-				shok::Set<Data> LookAtYElement;
-				shok::Set<Data> ZoomAngleElement;
-				shok::Set<Data> ZoomDistanceElement;
-				shok::Set<Data> AngleElement;
+				// all Time -> Data;
+				shok::Map<float, float> LookAtXElement;
+				shok::Map<float, float> LookAtYElement;
+				shok::Map<float, float> ZoomAngleElement;
+				shok::Map<float, float> ZoomDistanceElement;
+				shok::Map<float, float> AngleElement;
 			} Handler;
 		} Flight;
 		PADDINGI(1);

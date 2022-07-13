@@ -800,9 +800,9 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("ability not ready at 1");
 		e->HeroAbilitySummon();
 		int summoned = 0;
-		for (const shok::Attachment& a : e->ObserverEntities) {
-			if (a.AttachmentType == shok::AttachmentType::SUMMONER_SUMMONED) {
-				L.Push(a.EntityId);
+		for (const auto& a : e->ObserverEntities) {
+			if (a.first == shok::AttachmentType::SUMMONER_SUMMONED) {
+				L.Push(a.second.EntityId);
 				summoned++;
 			}
 		}
@@ -1213,8 +1213,8 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("no barracks");
 		int i = 0;
 		for (const auto& a : b->ObserverEntities) {
-			if (a.AttachmentType == shok::AttachmentType::FIGHTER_BARRACKS && !EGL::CGLEEntity::GetEntityByID(a.EntityId)->GetBehavior<GGL::CSoldierBehavior>()) {
-				L.Push(a.EntityId);
+			if (a.first == shok::AttachmentType::FIGHTER_BARRACKS && !EGL::CGLEEntity::GetEntityByID(a.second.EntityId)->GetBehavior<GGL::CSoldierBehavior>()) {
+				L.Push(a.second.EntityId);
 				i++;
 			}
 		}
@@ -1263,7 +1263,7 @@ namespace CppLogic::Entity {
 		int max = s->LimitedAttachmentGetMaximum(shok::AttachmentType::LEADER_SOLDIER);
 		int curr = 0;
 		for (const auto& a : s->ObservedEntities) {
-			if (a.AttachmentType == shok::AttachmentType::LEADER_SOLDIER)
+			if (a.first == shok::AttachmentType::LEADER_SOLDIER)
 				curr++;
 		}
 		if (curr >= max)
@@ -1472,10 +1472,13 @@ namespace CppLogic::Entity {
 		int limit = L.CheckInt(2);
 		if (limit < 0)
 			throw lua::LuaException("limit < 0");
-		auto* a = l->AttachmentMap.GetFirstMatch([](auto a) { return a->AttachmentType == shok::AttachmentType::LEADER_SOLDIER; });
-		if (!a)
-			throw lua::LuaException("no matching limited attachment");
-		a->Limit = limit;
+		try {
+			auto& a = l->AttachmentMap.at(shok::AttachmentType::LEADER_SOLDIER);
+			a.Limit = limit;
+		}
+		catch (const std::out_of_range&) {
+			throw lua::LuaException{ "invalid attachment type" };
+		}
 		return 0;
 	}
 

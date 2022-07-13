@@ -180,11 +180,7 @@ namespace ED {
 	template<class T>
 	class CDEResourceList {
 	public:
-		struct Data { // check layout
-			int ID;
-			T* Data; // pointer?
-		};
-		shok::Set<Data> Map;
+		shok::Map<int, T*> Map;
 		//check params
 		virtual void Load(int id, shok::String* name) {
 			throw 0;
@@ -198,7 +194,7 @@ namespace ED {
 	public:
 		virtual ~IResourceManager() = default;
 		virtual void Destroy() = 0;
-		virtual RtAnimAnimation* GetAnimData(int animId) = 0;
+		virtual RWE::RtAnimAnimation* GetAnimData(int animId) = 0;
 	private:
 		virtual void unknown2() = 0; // get from UnknownManager, then return float?
 	public:
@@ -222,7 +218,7 @@ namespace ED {
 			shok::Vector<void*> Data;
 			BB::CIDManagerEx* IDManager;
 		} UnknownManager; // maybe also models? the idmanager seems to be the same
-		CDEResourceList<RtAnimAnimation> AnimManager;
+		CDEResourceList<RWE::RtAnimAnimation> AnimManager;
 		CDEResourceList<RWE::RwTexture> TextureManager; // seems to be only lightning and snowflake textures
 		RWE::RwTexture* SelectionTexture;
 

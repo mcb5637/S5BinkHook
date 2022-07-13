@@ -672,8 +672,8 @@ void GGL::CWeatherHandler::SetOffset(int o)
 	weatherdata_setoffset(this, o);
 }
 
-static inline void(__thiscall* const weatherdata_elements_remove)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>*, int*)>(0x513D32);
-static inline void(__thiscall* const weatherdata_elements_add)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>* th, GGL::CWeatherHandler::WeatherElementData* e) = reinterpret_cast<void(__thiscall*)(shok::Set<GGL::CWeatherHandler::KeyAndWeatherElement>*, GGL::CWeatherHandler::WeatherElementData*)>(0x513CB6);
+static inline void(__thiscall* const weatherdata_elements_remove)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>*, int*)>(0x513D32);
+static inline void(__thiscall* const weatherdata_elements_add)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>* th, GGL::CWeatherHandler::WeatherElementData* e) = reinterpret_cast<void(__thiscall*)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>*, GGL::CWeatherHandler::WeatherElementData*)>(0x513CB6);
 void GGL::CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, int transition)
 {
 	// save data
@@ -681,12 +681,12 @@ void GGL::CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, 
 	GGL::CWeatherHandler::WeatherElementData* changeto = nullptr;
 	std::vector<int> win_toremove{};
 	for (auto& kae : Elements) {
-		if (this->CurrentWeatherIndex == kae.WeatherIndex)
-			current = &kae.WeatherElement;
-		else if (this->WeatherChange.WIndexToChangeTo == kae.WeatherIndex)
-			changeto = &kae.WeatherElement;
+		if (this->CurrentWeatherIndex == kae.first)
+			current = &kae.second;
+		else if (this->WeatherChange.WIndexToChangeTo == kae.first)
+			changeto = &kae.second;
 		else
-			win_toremove.push_back(kae.WeatherIndex);
+			win_toremove.push_back(kae.first);
 	}
 	if (!current)
 		throw std::out_of_range("somehow we got no valid current");

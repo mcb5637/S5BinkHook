@@ -73,18 +73,6 @@ namespace EGL {
 
 	class CGLEEntity : public BB::IObject, public IEntityDisplay, public EGL::TGLEAttachable<EGL::CGLEEntity, EGL::CEntityAttachmentProxy> {
 	public:
-		struct TaskIdAndTaskHandler {
-			shok::Task TaskID;
-			EGL::TaskHandler* TaskHandler;
-		};
-		struct StateIdAndStateHandler {
-			shok::TaskState StateID;
-			EGL::IGLEStateHandler* StateHandler;
-		};
-		struct EventIdAndEventHandler {
-			shok::EventIDs EventID;
-			EGL::EventHandler* EventHandler;
-		};
 		struct EntityAddonData {
 			int EntityId = 0;
 			int HealthOverride = -1;
@@ -110,10 +98,10 @@ namespace EGL {
 		shok::Vector<EGL::CGLEBehavior*> Behaviours; // 30, first field in 31
 		shok::TaskState CurrentState; // 34
 		int EntityState, CurrentTaskListID, CurrentTaskIndex; // la37
-		shok::Set<StateIdAndStateHandler> StateHandlers; // 38
-		shok::Set<TaskIdAndTaskHandler> TaskHandlers; // 41
+		shok::Map<shok::TaskState, EGL::IGLEStateHandler*> StateHandlers; // 38
+		shok::Map<shok::Task, EGL::TaskHandler*> TaskHandlers; // 41
 		PADDINGI(1);
-		shok::Set<EventIdAndEventHandler> EventHandlers; //45
+		shok::Map<shok::EventIDs, EGL::EventHandler*> EventHandlers; //45
 		PADDINGI(1);
 		EGL::ISlot* Slots; // same size as behavioProps vector of type, initialized on create
 		int Health; // 50

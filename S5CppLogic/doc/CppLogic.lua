@@ -2202,6 +2202,7 @@ function CppLogic.ModLoader.ReloadEntityType(tid) end
 
 --- sets an entitytype to get automatically reloaded on leaving the map (after s5x archives got removed).
 --- (for editing it manually via CppLogic).
+--- this function is available after ModLoader finishes.
 --- @param tid number
 function CppLogic.ModLoader.SetEntityTypeToReload(tid) end
 
@@ -2258,6 +2259,7 @@ function CppLogic.ModLoader.ReloadModel(mid) end
 --- loads a gui texture from a png file (data/graphics/textures/gui/tname.png).
 --- the texture gets automatically removed on leaving the map.
 --- note: this is similar to CppLogic.UI.PreLoadGUITexture, just that the texture gets cleaned up.
+--- this function is available after ModLoader finishes.
 --- @param tname string full path to texture
 --- @return number type_id
 function CppLogic.ModLoader.AddGUITexture(tname) end
@@ -2265,6 +2267,7 @@ function CppLogic.ModLoader.AddGUITexture(tname) end
 --- reloads a gui texture from a png file (data/graphics/textures/gui/tname.png).
 --- the texture gets automatically reloaded on leaving the map (after s5x archives got removed).
 --- (different to other reload funcs in ModLoader, this one takes the name (full path) of the texture instead of its id as parameter).
+--- this function is available after ModLoader finishes.
 --- @param tname string full path to texture
 function CppLogic.ModLoader.ReloadGUITexture(tname) end
 

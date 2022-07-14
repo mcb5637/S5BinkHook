@@ -42,8 +42,12 @@ example xml (see ED::CModelsProps::ModelData for full list of entries):
 	<SelectionTexture>Selection_Building</SelectionTexture>
 	<CastShadow>false</CastShadow>
 </root>
-example dff: as originals
+example dff: as originals (note: hard to save/load, best possibility is a GTA blender tool)
 
 GUITexture:
 path: data/graphics/textures/gui/tname.png (full path as id used)
 example: as originals
+
+Animation:
+path: data/graphics/animations/aname.anm
+example: as originals (note: currently no effective tool known to edit animations)

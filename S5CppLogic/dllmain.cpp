@@ -70,33 +70,26 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A2B0));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x3F9B1F03);
 	auto* e = L.CheckEntity(1);
-	int id = L.CheckInt(2);
-	int id2 = L.CheckInt(3);
-	auto it = e->ObservedEntities.begin();
-	while (it != e->ObservedEntities.end()) {
-		if (it->first == static_cast<shok::AttachmentType>(id2)) {
-			it = e->ObservedEntities.erase(it);
-		}
-		else
-			++it;
-	}
+	shok::AttachmentType id = static_cast<shok::AttachmentType>(L.CheckInt(2));
+	auto it = e->ObservedEntities.lower_bound(id);
+	auto end = e->ObservedEntities.upper_bound(id);
 
-	e->ObservedEntities.insert(static_cast<shok::AttachmentType>(id), { e->EntityId, 0});
 	L.NewTable();
 	int i = 1;
-	for (const auto& a : e->ObservedEntities) {
+	while (it != end) {
 		L.NewTable();
 		L.Push("attchtype");
-		L.Push(static_cast<int>(a.first));
+		L.Push(static_cast<int>(it->first));
 		L.SetTableRaw(-3);
 		L.Push("eid");
-		L.Push(a.second.EntityId);
+		L.Push(it->second.EntityId);
 		L.SetTableRaw(-3);
 		L.Push("event");
-		L.Push(a.second.EventID);
+		L.Push(it->second.EventID);
 		L.SetTableRaw(-3);
 		L.SetTableRaw(-2, i);
 		++i;
+		++it;
 	}
 	L.Push("size");
 	L.Push(e->ObservedEntities.size);

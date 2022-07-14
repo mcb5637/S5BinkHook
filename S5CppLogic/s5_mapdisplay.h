@@ -229,6 +229,10 @@ namespace ED {
 		// remember to free in idmanager and CModelsProps, free last id first
 		void PopModel(int id);
 
+		// remember to free in idmanager too, free last id first
+		void FreeAnim(int id);
+
+
 	private:
 		ModelData* LoadModel(const char* name);
 	};

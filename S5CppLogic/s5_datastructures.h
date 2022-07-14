@@ -54,7 +54,7 @@ namespace shok {
 		PADDINGI(1);
 		TreeNode* root;
 	public:
-		int size;
+		int size = 0;
 
 	private:
 		void ForAllRec(TreeNode* d, std::function<void(T*)> lambda) {
@@ -482,16 +482,20 @@ namespace shok {
 				--size;
 		}
 
-		T* SearchRec(const K& c, TreeNode* n) {
+		TreeNode* SearchRec(const K& c, TreeNode* n) {
 			if (n == root)
 				return nullptr;
 			std::strong_ordering cmp = CompareKV(c, n->data);
 			if (cmp == std::strong_ordering::equal)
-				return &n->data;
+				return n;
 			if (cmp == std::strong_ordering::less)
 				return SearchRec(c, n->left);
 			else
 				return SearchRec(c, n->right);
+		}
+	protected:
+		TreeNode* Search(const K& c) {
+			return SearchRec(c, root->parent);
 		}
 	public:
 		void insert(T&& d) {
@@ -509,8 +513,45 @@ namespace shok {
 			delete toex;
 			return next;
 		}
-		T* Search(const K& c) {
-			return SearchRec(c, root->parent);
+		Iter erase(Iter beg, Iter end) {
+			while (beg != end) {
+				beg = erase(beg);
+			}
+			return beg;
+		}
+		// could be more efficent, but it works...
+		void clear() {
+			Iter i = begin();
+			while (i != end())
+				i = erase(i);
+		}
+		Iter find(const K& key) {
+			return { Search(key), this };
+		}
+		Iter lower_bound(const K& key) {
+			InsertInfo i = FindLowerBound(key);
+			return { i.bound == root ? nullptr : i.bound, this };
+		}
+		Iter upper_bound(const K& key) {
+			InsertInfo i = FindUpperBound(key);
+			return { i.bound == root ? nullptr : i.bound, this };
+		}
+
+		Tree() {
+			// not call ctor, to not call data ctor, root does not have actual data
+			root = static_cast<TreeNode*>(shok::Malloc(sizeof(TreeNode)));
+			std::memset(root, 0, sizeof(TreeNode));
+			root->isnil = true;
+			root->c = Color::Black;
+			root->right = root;
+			root->parent = root;
+			root->left = root;
+		}
+		~Tree() {
+			clear();
+			// not call dtor, to not call data dtor, root does not have actual data
+			shok::Free(root);
+			root = nullptr;
 		}
 	};
 	static_assert(sizeof(Tree<int, int>) == 3 * 4);
@@ -533,8 +574,8 @@ namespace shok {
 
 	public:
 		V& at(const K& key) {
-			std::pair<K, V>* d = Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, false>::Search(key);
-			if (d == nullptr)
+			auto d = Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, false>::find(key);
+			if (d == Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, false>::end())
 				throw std::out_of_range{ "key not in map" };
 			return d->second;
 		}

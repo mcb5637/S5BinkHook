@@ -116,6 +116,8 @@ std::vector<int> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
 bool CppLogic::ModLoader::ModLoader::ReloadModels = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToReload{};
+std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToReload{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -291,12 +293,49 @@ int CppLogic::ModLoader::ModLoader::AddGUITexture(lua::State L)
 
 int CppLogic::ModLoader::ModLoader::ReloadGUITexture(lua::State L)
 {
-	int id = L.CheckInt(1);
+	const char* t = L.CheckString(1);
 	auto* m = EGUIX::TextureManager::GlobalObj();
-	if (!m->IdManager->GetNameByID(id))
+	int id = m->GetTextureIDNoAdd(t);
+	if (id == 0)
 		throw lua::LuaException{ "texture does not exist" };
 	m->ReloadTexture(id);
 	TexturesToReload.push_back(id);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::AddAnimation(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+	if ((*BB::CIDManagerEx::AnimManager)->GetIdByName(t))
+		throw lua::LuaException{ "animation already exists" };
+	int id = (*BB::CIDManagerEx::AnimManager)->GetIDByNameOrCreate(t);
+	shok::String s{ t };
+	m->AnimManager.Load(id, &s);
+	AnimsToRemove.push_back(id);
+	L.Push("Animations");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	if (L.IsTable(-1)) {
+		L.PushValue(1);
+		L.Push(id);
+		L.SetTableRaw(-3);
+	}
+	// func exit cleans stack anyway, so no need to pop
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadAnimation(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+	const char* n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(id);
+	if (!n)
+		throw lua::LuaException{ "invalid animation" };
+	m->FreeAnim(id);
+	shok::String s{ n };
+	m->AnimManager.Load(id, &s);
+	AnimsToReload.push_back(id);
 	return 0;
 }
 
@@ -443,6 +482,23 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 				EGUIX::TextureManager::GlobalObj()->ReloadTexture(id);
 		}
 		TexturesToReload.clear();
+
+		while (AnimsToRemove.size() != 0) {
+			int id = AnimsToRemove.back();
+			AnimsToRemove.pop_back();
+			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeAnim(id);
+			(*BB::CIDManagerEx::AnimManager)->RemoveID(id);
+		}
+		for (int id : AnimsToReload) {
+			auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+			const char* n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(id);
+			if (n) {
+				m->FreeAnim(id);
+				shok::String s{ n };
+				m->AnimManager.Load(id, &s);
+			}
+		}
+		AnimsToReload.clear();
 	}
 }
 

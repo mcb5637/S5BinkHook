@@ -2213,7 +2213,7 @@ function CppLogic.ModLoader.SetEntityTypeToReload(tid) end
 function CppLogic.ModLoader.AddEffectType(typename) end
 
 --- reloads an effecttype from a xml file (data/config/effects/typename.xml).
---- if you use it, all effect types get reloaded on leaving the map.
+--- if you use it, all effect types get reloaded on leaving the map (after s5x archives got removed).
 --- load any additional models you want to use first.
 --- @param tid number
 function CppLogic.ModLoader.ReloadEffectType(tid) end
@@ -2251,9 +2251,9 @@ function CppLogic.ModLoader.AddModel(mname) end
 --- reloads a model from a xml and dff file (data/config/models/mname.xml and data/graphics/models/mname.dff).
 --- the xml contains the data from Models.xml, the dff is the actual model.
 --- also loads all required textures.
---- the model gets automatically reloaded on leaving the map.
---- @param mname number
-function CppLogic.ModLoader.ReloadModel(mname) end
+--- the model gets automatically reloaded on leaving the map (after s5x archives got removed).
+--- @param mid number
+function CppLogic.ModLoader.ReloadModel(mid) end
 
 --- loads a gui texture from a png file (data/graphics/textures/gui/tname.png).
 --- the texture gets automatically removed on leaving the map.
@@ -2263,9 +2263,23 @@ function CppLogic.ModLoader.ReloadModel(mname) end
 function CppLogic.ModLoader.AddGUITexture(tname) end
 
 --- reloads a gui texture from a png file (data/graphics/textures/gui/tname.png).
---- the texture gets automatically reloaded on leaving the map.
---- @param tid number
-function CppLogic.ModLoader.ReloadGUITexture(tid) end
+--- the texture gets automatically reloaded on leaving the map (after s5x archives got removed).
+--- (different to other reload funcs in ModLoader, this one takes the name (full path) of the texture instead of its id as parameter).
+--- @param tname string full path to texture
+function CppLogic.ModLoader.ReloadGUITexture(tname) end
+
+--- loads an animation from an anm file (data/graphics/animations/aname.anm).
+--- the animation gets automatically removed on leaving the map.
+--- only writes the id to Animations if it exists.
+--- @param aname string
+--- @return number type_id
+function CppLogic.ModLoader.AddAnimation(aname) end
+
+--- reloads an animation from an anm file (data/graphics/animations/aname.anm).
+--- the animation gets automatically reloaded on leaving the map (after s5x archives got removed).
+--- use CppLogic.API.CreateExtraDataTables to get the Animations table with all ids.
+--- @param aid number
+function CppLogic.ModLoader.ReloadAnimation(aid) end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

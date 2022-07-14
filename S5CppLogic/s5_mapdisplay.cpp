@@ -173,6 +173,14 @@ void ED::CResourceManager::PopModel(int id)
 	v.Vector.pop_back();
 }
 
+
+void ED::CResourceManager::FreeAnim(int id)
+{
+	RWE::RtAnimAnimation* a = AnimManager.Get(id);
+	a->Destroy();
+	AnimManager.Map.erase(AnimManager.Map.find(id));
+}
+
 static inline ED::ModelData* (__cdecl* const resmng_loadmodel)(const char* n) = reinterpret_cast<ED::ModelData* (__cdecl*)(const char*)>(0x472D71);
 ED::ModelData* ED::CResourceManager::LoadModel(const char* name)
 {

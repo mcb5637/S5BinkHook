@@ -17,6 +17,7 @@ namespace BB {
 		PADDINGI(1);
 		shok::Vector<IDData> TypeNames;
 
+		// does not add
 		int GetIdByName(const char* name);
 		const char* GetNameByID(int id);
 		int GetIDByNameOrCreate(const char* name); // throws if id invalid

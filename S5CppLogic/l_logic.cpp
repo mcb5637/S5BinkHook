@@ -225,8 +225,8 @@ namespace CppLogic::Logic {
 		if (i <= 0 || i >= 9)
 			throw lua::LuaException("invalid player");
 		int ucat = L.CheckInt(2);
-		auto* u = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.Search(ucat);
-		if (!u)
+		auto u = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.find(ucat);
+		if (u == (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.end())
 			throw lua::LuaException("invalid ucat");
 		(*GGL::CGLGameLogic::GlobalObj)->UpgradeSettlerCategory(i, ucat);
 		return 0;

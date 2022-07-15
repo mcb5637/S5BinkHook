@@ -568,7 +568,7 @@ namespace shok {
         HeroGoToNPC = 25,
         ConvertBuilding = 26,
         // 27 settler entered building?
-        ComvertSettler = 28,
+        ConvertSettler = 28,
         Merchant_WaitForHero = 29,
         ThiefStealGoods = 30,
         ThiefSabotage = 31,

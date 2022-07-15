@@ -674,14 +674,14 @@ namespace shok {
 		Hero_GetActionPointsForAbility = 0x16007, //GGL::CEventHeroAbilityGetInteger unused
 
 		HeroAbility_IsAbilitySupported = 0x16008, //GGL::CEventHeroAbilityInteger
-		HeroAbility_StandUpOrInit = 0x16009, //BB::CEvent
+		HeroAbility_StandUp = 0x16009, //BB::CEvent
 		CannonBuilder_BuildCannonCommand = 0x1600A, //GGL::CEventPositionAnd2EntityTypes
 		AutoCannon_OnFoundationDetach = 0x1600B, //EGL::CEvent1Entity
 		Foundation_OnAutoCannonDetach = 0x1600C, //EGL::CEvent1Entity
 		HeroAbility_Cancel = 0x1600D, //BB::CEvent
 		OnBuilderDetaches = 0x1600E, //EGL::CEvent1Entity foundation detach builder & top then die, neutralbridge detach architects
 		// 1500E convert cancel?
-		// 0x1600F hawk destroy?
+		Hawk_OnHeroDetach = 0x1600F, //BB::CEvent
 		HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
 		HeroAbility_GetChargeMax = 0x16011, //GGL::CEventHeroAbilityInteger
 		HeroAbility_SetChargeCurrent = 0x16012, //GGL::CEventHeroAbilityInteger

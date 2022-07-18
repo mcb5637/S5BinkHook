@@ -68,32 +68,8 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A2B0));
-	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x3F9B1F03);
-	auto* e = L.CheckEntity(1);
-	shok::AttachmentType id = static_cast<shok::AttachmentType>(L.CheckInt(2));
-	auto it = e->ObservedEntities.lower_bound(id);
-	auto end = e->ObservedEntities.upper_bound(id);
-
-	L.NewTable();
-	int i = 1;
-	while (it != end) {
-		L.NewTable();
-		L.Push("attchtype");
-		L.Push(static_cast<int>(it->first));
-		L.SetTableRaw(-3);
-		L.Push("eid");
-		L.Push(it->second.EntityId);
-		L.SetTableRaw(-3);
-		L.Push("event");
-		L.Push(it->second.EventID);
-		L.SetTableRaw(-3);
-		L.SetTableRaw(-2, i);
-		++i;
-		++it;
-	}
-	L.Push("size");
-	L.Push(e->ObservedEntities.size);
-	L.SetTableRaw(-3);
+	CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x6987C1B3);
+	
 	return 1;
 }
 

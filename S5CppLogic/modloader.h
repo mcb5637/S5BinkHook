@@ -27,6 +27,7 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> TexturesToReload;
 		static std::vector<int> AnimsToRemove;
 		static std::vector<int> AnimsToReload;
+		static std::vector<int> SettlerUCatsToRemove;
 
 		static int AddEntityType(lua::State L);
 		static int ReloadEntityType(lua::State L);
@@ -43,8 +44,9 @@ namespace CppLogic::ModLoader {
 		static int ReloadGUITexture(lua::State L);
 		static int AddAnimation(lua::State L);
 		static int ReloadAnimation(lua::State L);
+		static int AddSettlerUpgradeCategory(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 15> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 16> LuaFuncs{ {
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -60,6 +62,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReloadGUITexture>("ReloadGUITexture"),
 				lua::FuncReference::GetRef<AddAnimation>("AddAnimation"),
 				lua::FuncReference::GetRef<ReloadAnimation>("ReloadAnimation"),
+				lua::FuncReference::GetRef<AddSettlerUpgradeCategory>("AddSettlerUpgradeCategory"),
 		} };
 
 		static constexpr std::array<lua::FuncReference, 3> NoLoaderFuncs{ {

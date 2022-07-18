@@ -704,6 +704,16 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
+	int SettlerGetHawkOfHero(lua::State l) {
+		luaext::EState L{ l };
+		GGL::CSettler* e = L.CheckSettler(1);
+		GGL::CHeroHawkBehavior* b = e->GetBehavior<GGL::CHeroHawkBehavior>();
+		if (!b)
+			throw lua::LuaException("no matching ability at 1");
+		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::HERO_HAWK));
+		return 1;
+	}
+
 	int SettlerCommandInflictFear(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* e = L.CheckSettler(1);
@@ -1903,7 +1913,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 51> Settlers{ {
+	constexpr std::array<lua::FuncReference, 52> Settlers{ {
 			lua::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),
 			lua::FuncReference::GetRef<SettlerGetBaseMovementSpeed>("GetBaseMovementSpeed"),
 			lua::FuncReference::GetRef<SettlerSetBaseMovementSpeed>("SetBaseMovementSpeed"),
@@ -1922,6 +1932,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<SettlerIsVisible>("IsVisible"),
 			lua::FuncReference::GetRef<SettlerIsIdle>("IsIdle"),
 			lua::FuncReference::GetRef<SettlerCommandSendHawk>("CommandSendHawk"),
+			lua::FuncReference::GetRef<SettlerGetHawkOfHero>("GetHawkOfHero"),
 			lua::FuncReference::GetRef<SettlerCommandInflictFear>("CommandInflictFear"),
 			lua::FuncReference::GetRef<SettlerCommandPlaceBomb>("CommandPlaceBomb"),
 			lua::FuncReference::GetRef<SettlerCommandPlaceCannon>("CommandPlaceCannon"),

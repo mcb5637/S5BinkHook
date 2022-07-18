@@ -140,10 +140,25 @@ int GGL::CUpgradeManager::GetUpgradeCategoryOfEntityType(int etype)
 	return upgrademanager_getucatbybuilding(this, etype);
 }
 
-static inline int(__thiscall* const settlerupmanager_getstybyucat)(GGL::CSettlerUpgradeManager* th, int ucat) = reinterpret_cast<int(__thiscall*)(GGL::CSettlerUpgradeManager*, int)>(0x4B3280);
-int GGL::CSettlerUpgradeManager::GetSettlerTypeByUCat(int ucat)
+static inline int(__thiscall* const upmanager_getetybyucat)(GGL::CUpgradeManager* th, int ucat) = reinterpret_cast<int(__thiscall*)(GGL::CUpgradeManager*, int)>(0x4B3280);
+int GGL::CUpgradeManager::GetTypeByUCat(int ucat)
 {
-	return settlerupmanager_getstybyucat(this, ucat);
+	return upmanager_getetybyucat(this, ucat);
+}
+
+static inline void(__thiscall* const upmanager_addcat)(GGL::CUpgradeManager* th, int ucat, int ety) = reinterpret_cast<void(__thiscall*)(GGL::CUpgradeManager*, int, int)>(0x4B3D42);
+void GGL::CSettlerUpgradeManager::AddCategory(int ucat, int firstEntity)
+{
+	upmanager_addcat(this, ucat, firstEntity);
+}
+
+static inline GGL::CBuildingUpgradeManager::ScholarInfo* (__thiscall* const buildupmanager_getscolarinfo)(void* th, int* ucat) = reinterpret_cast<GGL::CBuildingUpgradeManager::ScholarInfo * (__thiscall*)(void*, int*)>(0x4CA5A2);
+void GGL::CBuildingUpgradeManager::AddCategory(int ucat, int firstEntity, int maxscholar)
+{
+	upmanager_addcat(this, ucat, firstEntity);
+	auto* i = buildupmanager_getscolarinfo(&ScholarInfoElement, &ucat);
+	i->CurrentAmount = 0;
+	i->MaxAmount = maxscholar;
 }
 
 static inline void(__thiscall* const tradeorder_setdata)(GGL::CTradeManager::TradeOrder* th, int pl, shok::ResourceType s, shok::ResourceType bu, float am) = reinterpret_cast<void(__thiscall*)(GGL::CTradeManager::TradeOrder*, int, shok::ResourceType, shok::ResourceType, float)>(0x4E7CFF);

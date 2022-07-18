@@ -959,6 +959,11 @@ function CppLogic.Entity.Settler.IsIdle(id) end
 --- @param p Position target
 function CppLogic.Entity.Settler.CommandSendHawk(id, p) end
 
+--- get darios hawk from dario. may be 0 (if dario is dead).
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetHawkOfHero(id) end
+
 --- command to inflict fear.
 --- asserts if ability cannot be used.
 --- @param id entity
@@ -2283,6 +2288,13 @@ function CppLogic.ModLoader.AddAnimation(aname) end
 --- use CppLogic.API.CreateExtraDataTables to get the Animations table with all ids.
 --- @param aid number
 function CppLogic.ModLoader.ReloadAnimation(aid) end
+
+--- adds a settler upgradecategory. to create a upgradecategory, fill in the Upgrade xml entry in the entities, but leave out Category.
+--- then call this function with the upgradecategory and the first entitytype. (this will fill in the missing Category).
+--- @param ucatname string
+--- @param firstid number
+--- @return number type_id
+function CppLogic.ModLoader.AddSettlerUpgradeCategory(ucatname, firstid) end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

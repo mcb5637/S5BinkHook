@@ -44,8 +44,6 @@ RWE::RwTexture* EGUIX::TextureManager::ReloadTexture(int id)
 }
 void EGUIX::TextureManager::FreeTexture(int id)
 {
-    if (id + 1 != IdManager->size())
-        throw std::out_of_range("invalid id");
     Textures[id]->Destroy();
     Textures[id] = nullptr;
 }

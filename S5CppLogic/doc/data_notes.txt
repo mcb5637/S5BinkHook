@@ -51,3 +51,9 @@ example: as originals
 Animation:
 path: data/graphics/animations/aname.anm
 example: as originals (note: currently no effective tool known to edit animations)
+
+Upgrade Categories:
+path: none (normally data/config/logic.xml, dynamically changed)
+usage: add the Upgrade field to all EntityTypes that are supposed to be in the upgradecategory (you need at least Type for everything but the last).
+		do not add the Category field, this will be set by the AddCategory function.
+		last, call AddSettlerUpgradeCategory or AddBuildingUpgradeCategory with the upgradecategory name and the first entitytype.

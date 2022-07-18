@@ -12,7 +12,9 @@
 #include "s5_widget.h"
 #include "s5_mapdisplay.h"
 #include "s5_entitydisplay.h"
+#include "s5_config.h"
 #include "entityiterator.h"
+#include "luaext.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
@@ -118,6 +120,7 @@ std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToReload{};
+std::vector<int> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -339,6 +342,41 @@ int CppLogic::ModLoader::ModLoader::ReloadAnimation(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::AddSettlerUpgradeCategory(lua::State l)
+{
+	luaext::EState L{ l };
+	const char* t = L.CheckString(1);
+	auto* sty = L.CheckEntityType(2);
+	if (!sty->IsSettlerType())
+		throw lua::LuaException{ "not a settler type" };
+	if ((*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t) != 0)
+		throw lua::LuaException{ "upgrade categoty already exists" };
+	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
+	int first = L.CheckInt(2);
+	{
+		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
+		v.Vector.emplace_back(id, first);
+	}
+	int ctype = first;
+	while (ctype != 0) {
+		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
+		auto* sty = dynamic_cast<GGL::CGLSettlerProps*>(cty->LogicProps);
+		if (sty == nullptr)
+			throw lua::LuaException{ "non settler type in settler ucat" };
+		sty->Upgrade.Category = id;
+		ctype = sty->Upgrade.Type;
+	}
+	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
+	SettlerUCatsToRemove.push_back(id);
+	L.Push("UpgradeCategories");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	L.Push(id);
+	return 1;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -499,6 +537,18 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			}
 		}
 		AnimsToReload.clear();
+
+		{
+			auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
+			while (SettlerUCatsToRemove.size() != 0) {
+				int id = SettlerUCatsToRemove.back();
+				SettlerUCatsToRemove.pop_back();
+				if (v.Vector.back().Category == id) {
+					v.Vector.pop_back();
+				}
+				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(id);
+			}
+		}
 	}
 }
 

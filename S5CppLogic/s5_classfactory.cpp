@@ -148,6 +148,8 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x80AE58, &InfoInt},
     {0x84CD28, &InfoInt},
     {0x83BA50, &InfoInt},
+    {0x813408, &InfoInt},
+    {0x813514, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
@@ -158,6 +160,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x8605A0, &InfoEffectType},
     {0x860510, &InfoResourceType},
     {0x86414C, &InfoUpgradeCategory},
+    {0x85D53C, &InfoUpgradeCategory},
     {0x85D560, &InfoTechnologyID},
     {0x85A108, &InfoSoundID},
     {0x8587D4, &InfoWeatherEffectTextureID},
@@ -181,6 +184,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x84CC64, &InfoFloat},
     {0x84CD08, &InfoFloat},
     {0x80A994, &InfoFloat},
+    {0x8133E8, &InfoFloat},
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},

@@ -22,7 +22,7 @@ namespace GGL {
 	public:
 		struct SBuildingUpgradeCategory {
 			int Category, FirstBuilding;
-			PADDINGI(1);
+			int NumScholars;
 
 			static inline constexpr int vtp = 0x76EF10;
 			virtual unsigned int GetClassIdentifier() const = 0;
@@ -31,7 +31,11 @@ namespace GGL {
 			int Category, FirstSettler;
 
 			static inline constexpr int vtp = 0x76EF18;
-			virtual unsigned int GetClassIdentifier() const = 0;
+			static inline constexpr unsigned int Identifier = 0x8DC75427;
+			virtual unsigned int GetClassIdentifier() const;
+
+			SSettlerUpgradeCategory(int cat, int first);
+			SSettlerUpgradeCategory(SSettlerUpgradeCategory&& o) noexcept;
 		};
 		struct STaxationLevel {
 			int RegularTax;

@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_entitytype.h"
 
 namespace GGL {
 	class CSerfManager : public BB::IObject {
@@ -81,32 +82,51 @@ namespace GGL {
 
 	class CUpgradeManager : public BB::IObject {
 	public:
+		virtual EGL::CGLEEntityProps::UpgradeInfo* GetUpgradeInfo(int ety) = 0;
+		virtual void UpgradeEntity(int id) = 0;
+		// 2 more empty funcs
+
+		struct JobDataEntry {
+			float UpgradeProgress;
+			int Category; //ucat
+			BB::IObject* UpgradeManager;
+		};
 		struct UCatEntry {
-			int NumUpgrades;
-			int FirstEntityType;
+			int CurrentLevel;
+			int Level0TypeID;
 		};
 
-
-		shok::Map<int, int[3]> JobData; // empty Category -> UpgradeJobData (UpgradeProgress, Category, UpgradeManager)
-		shok::Map<int, UCatEntry> UpgradeCategories; // UCat -> UCatEntry
+		shok::Map<int, JobDataEntry> JobData; // Category -> UpgradeJobData empty
+		shok::Map<int, UCatEntry> UpgradeCategories; // Category -> Info gets filled by player ctor
 		int PlayerID;
 
 		static inline constexpr int vtp = 0x7728CC;
 
 		int GetUpgradeCategoryOfEntityType(int etype);
+		int GetTypeByUCat(int ucat);
 	};
 	class CBuildingUpgradeManager : public GGL::CUpgradeManager {
 	public:
-		PADDINGI(3);// ScholarInfoElement; // map? Category, ScholarInfo { ?, CurrentAmount } ?
+		struct ScholarInfo {
+			int MaxAmount;
+			int CurrentAmount;
+		};
 
+		shok::Map<int, ScholarInfo> ScholarInfoElement; // Category -> ScholarInfo gets filled by player ctor
+
+		static inline constexpr unsigned int Identifier = 0x6987C1B3;
 		static inline constexpr int vtp = 0x772948;
+
+		void AddCategory(int ucat, int firstEntity, int maxscholar);
 	};
+	static_assert(sizeof(CBuildingUpgradeManager) == 11 * 4);
 	class CSettlerUpgradeManager : public GGL::CUpgradeManager {
 	public:
 
+		static inline constexpr unsigned int Identifier = 0x126CFE03;
 		static inline constexpr int vtp = 0x772904;
 
-		int GetSettlerTypeByUCat(int ucat);
+		void AddCategory(int ucat, int firstEntity);
 	};
 
 	class CTradeManager : public BB::IObject {

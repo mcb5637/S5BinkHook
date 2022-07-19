@@ -25,7 +25,11 @@ namespace GGL {
 			int NumScholars;
 
 			static inline constexpr int vtp = 0x76EF10;
-			virtual unsigned int GetClassIdentifier() const = 0;
+			static inline constexpr unsigned int Identifier = 0x9498E0E7;
+			virtual unsigned int GetClassIdentifier() const;
+
+			SBuildingUpgradeCategory(int car, int first);
+			SBuildingUpgradeCategory(SBuildingUpgradeCategory&& o) noexcept;
 		};
 		struct SSettlerUpgradeCategory {
 			int Category, FirstSettler;
@@ -138,6 +142,40 @@ namespace GGL {
 		static inline constexpr int vtp = 0x770834;
 
 		static inline GGL::CPlayerAttractionProps** const GlobalObj = reinterpret_cast<GGL::CPlayerAttractionProps**>(0x866A80);
+	};
+
+	class ExperienceClass {
+	public:
+		shok::String Table;
+
+		struct LevelData { // size 9
+			float DamageAmount; // works
+			float DamageBonus; // works
+			float HealingPoints; // works
+			float DodgeChance; // works
+			float AutoAttackRange; // works
+			float MaxRange; // works
+			float Speed; // works
+			float Exploration; // works
+			float MissChance; // works for positive
+			// only checked if the modification in entity works, not if the value gets actually called to modify
+		};
+
+		shok::Vector<LevelData> Level;
+
+		LevelData* GetLevel(int lvl);
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x87CE88);
+	};
+	static_assert(sizeof(ExperienceClass::LevelData) == 9 * 4);
+	class ExperienceClassHolder {
+	public:
+		shok::Vector<ExperienceClass> Classes;
+		bool Loaded;
+
+		ExperienceClass* GetClass(shok::ExperienceClass cl);
+
+		static ExperienceClassHolder* GlobalObj();
 	};
 }
 

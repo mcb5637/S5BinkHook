@@ -3,6 +3,7 @@ Data Types:
 EntityType:
 path: data/config/entities/typename.xml (list of ids in data/config/entities.xml, dynamically changed)
 example: as originals
+Note: the last added entity type has no blocking.
 
 EffectType:
 path: data/config/effects/typename.xml (usually data/config/effects.xml, dynamically changed)
@@ -57,3 +58,5 @@ path: none (normally data/config/logic.xml, dynamically changed)
 usage: add the Upgrade field to all EntityTypes that are supposed to be in the upgradecategory (you need at least Type for everything but the last).
 		do not add the Category field, this will be set by the AddCategory function.
 		last, call AddSettlerUpgradeCategory or AddBuildingUpgradeCategory with the upgradecategory name and the first entitytype.
+		Note: Add the entitytypes in reverse order, so the id gets loaded properly.
+Note: not all entity behaviors support upgrading. (as an example: darios hawk does not get removed and causes an infinite loop on destroying it.)

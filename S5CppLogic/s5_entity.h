@@ -5,6 +5,7 @@
 #include "s5_baseDefs.h"
 #include "s5_tech.h"
 #include "s5_behaviors.h"
+#include "s5_config.h"
 
 namespace shok {
 	enum class AdvancedDealDamageSource : int {
@@ -414,7 +415,7 @@ namespace EGL {
 			MaxAttackRange = 105,
 			// 106 unknown value at 36
 			ExperienceLevels = 108,
-			// 109 unknown just asses through initial
+			// 109 unknown just passes through initial
 			Experience = 107,
 			Armor = 110,
 			Motivation = 111,
@@ -459,12 +460,24 @@ namespace GGL {
 		PADDINGI(1); // 0
 		float HealthBar; //37
 		float HealthMax; // 38
-		PADDINGI(2);
-		PADDINGI(7); // string?
-		PADDINGI(4);
-		int OverheadWidget;
-		int ExperienceClass;
-		PADDINGI(2);
+		PADDINGI(1); // 39
+		PADDINGI(7); // 40 string?
+		struct EntityRef {
+			EGL::CGLEEntity* Self;
+			EGL::CGLEEntity* Leader; // self if it is a leader
+			int LeaderId;
+			GGL::CSettler* SelfSett;
+			bool NeedsInitialization;
+			PADDING(3);
+			int OverheadWidget; // 5, 130 in settler, soldier=4, leader=3, worker=2, serf=1
+			shok::ExperienceClass ExperienceClass; // 6 gets set by checking entitycategories
+			int EntityId; // 7
+			GGL::CGLSettlerProps* Props;
+
+			void CheckInit();
+		} EntityReference;
+
+		const GGL::ExperienceClass::LevelData* GetExperienceClassLevel();
 
 
 		static inline constexpr int vtp = 0x7727A4;
@@ -515,7 +528,7 @@ namespace GGL {
 		// defined states: BattleWaitUntilAutoCannon, Default (set tl to default)
 	};
 	static_assert(sizeof(CSettler) == 137 * 4);
-	static_assert(offsetof(CSettler, ModifierProfile.OverheadWidget) == 130 * 4);
+	static_assert(offsetof(CSettler, ModifierProfile.EntityReference.OverheadWidget) == 130 * 4);
 	//constexpr int i = offsetof(CSettler, ModifierProfile.OverheadWidget) / 4;
 
 	class CAnimal : public EGL::CMovingEntity {

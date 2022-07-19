@@ -224,6 +224,47 @@ namespace CppLogic::API {
 		(*BB::CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "TerrainTypes");
 		(*BB::CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "WaterTypes");
 		(*BB::CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L.GetState(), "ArmorClasses");
+
+		{
+			L.Push("ExperienceClasses");
+			L.NewTable();
+
+			L.Push("Invalid");
+			L.Push(static_cast<int>(shok::ExperienceClass::Invalid));
+			L.SetTableRaw(-3);
+
+			L.Push("Sword");
+			L.Push(static_cast<int>(shok::ExperienceClass::Sword));
+			L.SetTableRaw(-3);
+
+			L.Push("Bow");
+			L.Push(static_cast<int>(shok::ExperienceClass::Bow));
+			L.SetTableRaw(-3);
+
+			L.Push("Spear");
+			L.Push(static_cast<int>(shok::ExperienceClass::Spear));
+			L.SetTableRaw(-3);
+
+			L.Push("LightCavalry");
+			L.Push(static_cast<int>(shok::ExperienceClass::LightCavalry));
+			L.SetTableRaw(-3);
+
+			L.Push("HeavyCavalry");
+			L.Push(static_cast<int>(shok::ExperienceClass::HeavyCavalry));
+			L.SetTableRaw(-3);
+
+			L.Push("Cannon");
+			L.Push(static_cast<int>(shok::ExperienceClass::Cannon));
+			L.SetTableRaw(-3);
+
+			L.Push("Rifle");
+			L.Push(static_cast<int>(shok::ExperienceClass::Rifle));
+			L.SetTableRaw(-3);
+
+			L.SetTableRaw(L.GLOBALSINDEX);
+		}
+
+
 		return 0;
 	}
 

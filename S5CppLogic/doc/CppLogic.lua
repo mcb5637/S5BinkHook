@@ -494,7 +494,7 @@ function CppLogic.API.RuntimeStoreSet(name, value) end
 --- @return string|number|nil value data
 function CppLogic.API.RuntimeStoreGet(name) end
 
---- creates the global tables Animations, TerrainTypes, WaterTypes, ArmorClasses.
+--- creates the global tables Animations, TerrainTypes, WaterTypes, ArmorClasses, ExperienceClasses.
 --- data gets read directly from the game, so anything you can use is in there.
 function CppLogic.API.CreateExtraDataTables() end
 
@@ -903,6 +903,11 @@ function CppLogic.Entity.Settler.GetOverheadWidget(id) end
 --- @param id settler
 --- @param wid number widget code
 function CppLogic.Entity.Settler.SetOverheadWidget(id, wid) end
+
+--- settler experience class
+--- @param id settler
+--- @return number
+function CppLogic.Entity.Settler.GetExperienceClass(id) end
 
 --- camouflage duration left (ari: seconds, thief: invis ? 15 : 0).
 --- @param id entity
@@ -2295,6 +2300,13 @@ function CppLogic.ModLoader.ReloadAnimation(aid) end
 --- @param firstid number
 --- @return number type_id
 function CppLogic.ModLoader.AddSettlerUpgradeCategory(ucatname, firstid) end
+
+--- adds a building upgradecategory. to create a upgradecategory, fill in the Upgrade xml entry in the entities, but leave out Category.
+--- then call this function with the upgradecategory and the first entitytype. (this will fill in the missing Category).
+--- @param ucatname string
+--- @param firstid number
+--- @return number type_id
+function CppLogic.ModLoader.AddBuildingUpgradeCategory(ucatname, firstid) end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

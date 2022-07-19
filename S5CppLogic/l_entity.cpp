@@ -390,7 +390,8 @@ namespace CppLogic::Entity {
 	int SettlerGetOverheadWidget(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		L.Push(s->ModifierProfile.OverheadWidget);
+		s->ModifierProfile.EntityReference.CheckInit();
+		L.Push(s->ModifierProfile.EntityReference.OverheadWidget);
 		return 1;
 	}
 	int SettlerSetOverheadWidget(lua::State l) {
@@ -399,7 +400,8 @@ namespace CppLogic::Entity {
 		int ov = L.CheckInt(2);
 		if (!(ov >= 0 && ov <= 4))
 			throw lua::LuaException("invalid overhead code");
-		s->ModifierProfile.OverheadWidget = ov;
+		s->ModifierProfile.EntityReference.CheckInit();
+		s->ModifierProfile.EntityReference.OverheadWidget = ov;
 		return 1;
 	}
 
@@ -1830,6 +1832,14 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
+	int SettlerGetExperienceClass(lua::State l) {
+		luaext::EState L{ l };
+		auto* s = L.CheckSettler(1);
+		s->ModifierProfile.EntityReference.CheckInit();
+		L.Push(static_cast<int>(s->ModifierProfile.EntityReference.ExperienceClass));
+		return 1;
+	}
+
 	int GetBattleTarget(lua::State ls) {
 		luaext::EState L{ ls };
 		auto* e = L.CheckEntity(1);
@@ -1913,7 +1923,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 52> Settlers{ {
+	constexpr std::array<lua::FuncReference, 53> Settlers{ {
 			lua::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),
 			lua::FuncReference::GetRef<SettlerGetBaseMovementSpeed>("GetBaseMovementSpeed"),
 			lua::FuncReference::GetRef<SettlerSetBaseMovementSpeed>("SetBaseMovementSpeed"),
@@ -1966,6 +1976,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<SettlerSniperGetTarget>("SniperGetTarget"),
 			lua::FuncReference::GetRef<SettlerGetEnteredBuilding>("GetEnteredBuilding"),
 			lua::FuncReference::GetRef<SettlerPlayScriptAnimation>("PlayScriptAnimation"),
+			lua::FuncReference::GetRef<SettlerGetExperienceClass>("GetExperienceClass"),
 	} };
 
 	constexpr std::array<lua::FuncReference, 8> Leader{ {

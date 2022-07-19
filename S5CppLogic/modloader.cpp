@@ -121,6 +121,7 @@ std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::BuildingUCatsToRemove{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -377,6 +378,41 @@ int CppLogic::ModLoader::ModLoader::AddSettlerUpgradeCategory(lua::State l)
 	return 1;
 }
 
+int CppLogic::ModLoader::ModLoader::AddBuildingUpgradeCategory(lua::State l)
+{
+	luaext::EState L{ l };
+	const char* t = L.CheckString(1);
+	auto* sty = L.CheckEntityType(2);
+	if (!sty->IsBuildingType())
+		throw lua::LuaException{ "not a building type" };
+	if ((*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t) != 0)
+		throw lua::LuaException{ "upgrade categoty already exists" };
+	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
+	int first = L.CheckInt(2);
+	{
+		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
+		v.Vector.emplace_back(id, first);
+	}
+	int ctype = first;
+	while (ctype != 0) {
+		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
+		auto* bty = dynamic_cast<GGL::CGLBuildingProps*>(cty->LogicProps);
+		if (bty == nullptr)
+			throw lua::LuaException{ "non building type in building ucat" };
+		bty->Upgrade.Category = id;
+		ctype = bty->Upgrade.Type;
+	}
+	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
+	BuildingUCatsToRemove.push_back(id);
+	L.Push("UpgradeCategories");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	L.Push(id);
+	return 1;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -543,6 +579,17 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			while (SettlerUCatsToRemove.size() != 0) {
 				int id = SettlerUCatsToRemove.back();
 				SettlerUCatsToRemove.pop_back();
+				if (v.Vector.back().Category == id) {
+					v.Vector.pop_back();
+				}
+				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(id);
+			}
+		}
+		{
+			auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
+			while (BuildingUCatsToRemove.size() != 0) {
+				int id = BuildingUCatsToRemove.back();
+				BuildingUCatsToRemove.pop_back();
 				if (v.Vector.back().Category == id) {
 					v.Vector.pop_back();
 				}

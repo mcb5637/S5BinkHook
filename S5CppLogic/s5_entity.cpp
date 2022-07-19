@@ -229,6 +229,18 @@ float EGL::IProfileModifierSetObserver::GetModifiedValue(ModifierType t, float z
 	throw 0;
 }
 
+static inline void(__thiscall* const entityprofile_ref_checkinit)(GGL::CEntityProfile::EntityRef* th) = reinterpret_cast<void(__thiscall*)(GGL::CEntityProfile::EntityRef*)>(0x4C7062);
+void GGL::CEntityProfile::EntityRef::CheckInit()
+{
+	entityprofile_ref_checkinit(this);
+}
+
+static inline GGL::ExperienceClass::LevelData* (__thiscall* const entityref_getxpclasslvl)(GGL::CEntityProfile::EntityRef* th, int lvl) = reinterpret_cast<GGL::ExperienceClass::LevelData * (__thiscall*)(GGL::CEntityProfile::EntityRef*, int)>(0x4C66BA);
+const GGL::ExperienceClass::LevelData* GGL::CEntityProfile::GetExperienceClassLevel()
+{
+	return entityref_getxpclasslvl(&this->EntityReference, static_cast<int>(ExperienceLevel.Value));
+}
+
 static inline float(__thiscall* const modentitydb_getmod)(GGL::ModifierEntityDatabase* th, int id, GGL::CEntityProfile::ModifierType ty, float initial) = reinterpret_cast<float(__thiscall*)(GGL::ModifierEntityDatabase*, int, GGL::CEntityProfile::ModifierType, float)>(0x584078);
 float GGL::ModifierEntityDatabase::GetModifiedStat(int id, CEntityProfile::ModifierType ty, float initial)
 {

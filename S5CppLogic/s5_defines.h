@@ -307,6 +307,16 @@ namespace shok {
 	constexpr shok::Keys operator~(shok::Keys a) {
 		using under = std::underlying_type<shok::Keys>::type;
 		return static_cast<shok::Keys>(~static_cast<under>(a));
-
 	}
+
+	enum class ExperienceClass : int {
+		Invalid = -1,
+		Sword = 0,
+		Bow = 1,
+		Spear = 2,
+		LightCavalry = 3,
+		HeavyCavalry = 4,
+		Cannon = 5,
+		Rifle = 6, // also scout and thief
+	};
 }

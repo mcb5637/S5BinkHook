@@ -185,6 +185,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x84CD08, &InfoFloat},
     {0x80A994, &InfoFloat},
     {0x8133E8, &InfoFloat},
+    {0x829844, &InfoFloat},
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},
@@ -194,6 +195,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x894954, &InfoString},
     {0xA1A588, &InfoString},
     {0xA0654C, &InfoString},
+    {0x87CEF8, &InfoString},
     {0x810CB8, &InfoCharBuff},
     {0x84CC84, &InfoCharBuff},
 

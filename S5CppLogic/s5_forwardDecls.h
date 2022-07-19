@@ -30,6 +30,7 @@ namespace shok {
 	enum class DiploState : int;
 	enum class TechState : int;
 	enum class Keys : int;
+	enum class ExperienceClass : int;
 
 	class Technology;
 	class TechCategoryManager;

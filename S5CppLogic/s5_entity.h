@@ -410,21 +410,21 @@ namespace EGL {
 			HealthBar = 100,
 			MaxHealth = 101,
 			Exploration = 102,
-			Damage = 103,
-			DamageBonus = 104,
+			Damage = 103, // gets called
+			DamageBonus = 104, // gets called
 			MaxAttackRange = 105,
 			// 106 unknown value at 36
+			Experience = 107,
 			ExperienceLevels = 108,
 			// 109 unknown just passes through initial
-			Experience = 107,
-			Armor = 110,
+			Armor = 110, // gets called
 			Motivation = 111,
 			CurrentSoldierAmount = 112,
 			MaxSoldierAmount = 113,
-			Dodge = 114,
+			Dodge = 114, // as far as i know, the entire dodge mechanic is abandoned
 			AutoAttackRange = 115,
 			HealingPoints = 116,
-			MissChance = 117,
+			MissChance = 117, // gets called
 		};
 
 		virtual float GetModifiedValue(ModifierType t, float z);

@@ -149,16 +149,16 @@ namespace GGL {
 		shok::String Table;
 
 		struct LevelData { // size 9
-			float DamageAmount; // works
-			float DamageBonus; // works
-			float HealingPoints; // works
-			float DodgeChance; // works
-			float AutoAttackRange; // works
-			float MaxRange; // works
-			float Speed; // works
-			float Exploration; // works
+			float DamageAmount;
+			float DamageBonus;
+			float HealingPoints;
+			float DodgeChance;
+			float AutoAttackRange;
+			float MaxRange;
+			float Speed;
+			float Exploration;
 			float MissChance; // works for positive
-			// only checked if the modification in entity works, not if the value gets actually called to modify
+			// all of them get called by profile modification, check if the modifucation is actually called
 		};
 
 		shok::Vector<LevelData> Level;

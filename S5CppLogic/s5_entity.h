@@ -406,24 +406,24 @@ namespace EGL {
 		// no vtable
 	public:
 		enum class ModifierType : int {
-			MovingSpeed = 0,
+			MovingSpeed = 0, // gets called
 			HealthBar = 100,
 			MaxHealth = 101,
-			Exploration = 102,
-			Damage = 103, // gets called
+			Exploration = 102, // gets called
+			Damage = 103, // gets called, also shuriken, circularattack
 			DamageBonus = 104, // gets called
-			MaxAttackRange = 105,
+			MaxAttackRange = 105, // gets called, battle+autocannon?
 			// 106 unknown value at 36
 			Experience = 107,
 			ExperienceLevels = 108,
-			// 109 unknown just passes through initial
+			// 109 unknown just passes through initial, called max soldiers?
 			Armor = 110, // gets called
 			Motivation = 111,
 			CurrentSoldierAmount = 112,
 			MaxSoldierAmount = 113,
-			Dodge = 114, // as far as i know, the entire dodge mechanic is abandoned
-			AutoAttackRange = 115,
-			HealingPoints = 116,
+			Dodge = 114, // dodge mechanics migth actually work, todo check, melee taskhurt
+			AutoAttackRange = 115, // gets called
+			HealingPoints = 116, // gets called
 			MissChance = 117, // gets called
 		};
 

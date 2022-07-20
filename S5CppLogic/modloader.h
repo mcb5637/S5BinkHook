@@ -29,6 +29,7 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> AnimsToReload;
 		static std::vector<int> SettlerUCatsToRemove;
 		static std::vector<int> BuildingUCatsToRemove;
+		static bool ReloadWaterTypes;
 
 		static int AddEntityType(lua::State L);
 		static int ReloadEntityType(lua::State L);
@@ -47,8 +48,10 @@ namespace CppLogic::ModLoader {
 		static int ReloadAnimation(lua::State L);
 		static int AddSettlerUpgradeCategory(lua::State L);
 		static int AddBuildingUpgradeCategory(lua::State L);
+		static int AddWaterType(lua::State L);
+		static int ReloadWaterType(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 17> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 19> LuaFuncs{ {
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -66,6 +69,8 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReloadAnimation>("ReloadAnimation"),
 				lua::FuncReference::GetRef<AddSettlerUpgradeCategory>("AddSettlerUpgradeCategory"),
 				lua::FuncReference::GetRef<AddBuildingUpgradeCategory>("AddBuildingUpgradeCategory"),
+				lua::FuncReference::GetRef<AddWaterType>("AddWaterType"),
+				lua::FuncReference::GetRef<ReloadWaterType>("ReloadWaterType"),
 		} };
 
 		static constexpr std::array<lua::FuncReference, 3> NoLoaderFuncs{ {

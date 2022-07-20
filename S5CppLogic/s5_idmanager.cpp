@@ -42,3 +42,15 @@ size_t BB::IIDManager::size()
 	return TypeNames.size();
 }
 
+void BB::IIDManager::clear()
+{
+	auto v = TypeNames.SaveVector();
+	{
+		for (auto& i : v.Vector) {
+			shok::Free(i.Name);
+			i.Name = nullptr;
+		}
+	}
+	v.Vector.clear();
+	v.Vector.push_back({ nullptr, 0 });
+}

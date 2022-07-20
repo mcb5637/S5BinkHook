@@ -25,6 +25,7 @@ namespace BB {
 		void RemoveID(int id); // remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
 		void DumpManagerToLuaGlobal(lua_State* L, const char* global);
 		size_t size();
+		void clear();
 	};
 
 	class IIDManagerEx : public IIDManager {

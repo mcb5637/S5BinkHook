@@ -60,3 +60,28 @@ usage: add the Upgrade field to all EntityTypes that are supposed to be in the u
 		last, call AddSettlerUpgradeCategory or AddBuildingUpgradeCategory with the upgradecategory name and the first entitytype.
 		Note: Add the entitytypes in reverse order, so the id gets loaded properly.
 Note: not all entity behaviors support upgrading. (as an example: darios hawk does not get removed and causes an infinite loop on destroying it.)
+
+WaterTypes:
+path: data/graphics/watertypes/wname.xml (usually data/graphics/water.xml, dynamically changed)
+example:
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<Logic>
+		<Freezes>false</Freezes>
+	</Logic>
+	<Display>
+		<Color>
+			<Red>255</Red>
+			<Green>0</Green>
+			<Blue>0</Blue>
+		</Color>
+		<TransparencyFactor>0.005</TransparencyFactor>
+		<TransparencyOffset>0.3</TransparencyOffset>
+		<TransparencyMin>0.0</TransparencyMin>
+		<TransparencyMax>1</TransparencyMax>
+		<DrawShoreWave>false</DrawShoreWave>
+		<Freezes>false</Freezes>
+		<IceBaseTexture>Water/Ice01Base</IceBaseTexture>
+		<IceDetailTexture>Water/Ice01Detail</IceDetailTexture>
+	</Display>
+</root>

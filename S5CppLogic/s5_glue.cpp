@@ -108,3 +108,52 @@ void GGlue::CEntitiesPropsMgr::FreeEntityType(int id)
 	CGLEEntitiesProps.EntityTypesLogicProps[id] = nullptr;
 	CGLEEntitiesProps.EntityTypesDisplayProps[id] = nullptr;
 }
+
+static inline void(__thiscall* const watertype_display_init)(GGlue::WaterTypeData::DisplayData* th) = reinterpret_cast<void(__thiscall*)(GGlue::WaterTypeData::DisplayData*)>(0x5BE750);
+void GGlue::WaterTypeData::DisplayData::Initialize()
+{
+	watertype_display_init(this);
+}
+
+void GGlue::CGlueWaterPropsMgr::ReloadWaterTypes()
+{
+	WaterTypeManager->clear();
+	Display.ShoreWaveTypeManager->clear();
+	shok::Free(Display.WaterBumpTexName);
+	Display.WaterBumpTexName = nullptr;
+	shok::Free(Display.SkyTexName);
+	Display.SkyTexName = nullptr;
+	{
+		auto v = Display.ShoreWaveKeyFrame.SaveVector();
+		v.Vector.clear();
+	}
+	{
+		auto v = Display.ShoreWave.SaveVector();
+		v.Vector.clear();
+	}
+	// main vecors get cleared by load
+	Load("Data\\Config\\Water.xml");
+}
+
+void GGlue::CGlueWaterPropsMgr::LoadWaterTypeFromExtraFile(int id)
+{
+	if (id > static_cast<int>(Display.WaterDisplay.size()))
+		throw std::logic_error{ "somehow the id is too big" };
+	WaterTypeData d{};
+
+	std::string filename = "Data/Config/WaterTypes/";
+	filename.append(WaterTypeManager->GetNameByID(id));
+	filename.append(".xml");
+	(*BB::CClassFactory::GlobalObj)->LoadObject(&d, filename.c_str(), d.SerializationData);
+	d.Display.Initialize();
+	
+	auto lv = Logic.WaterLogic.SaveVector();
+	auto dv = Display.WaterDisplay.SaveVector();
+	while (id > static_cast<int>(Display.WaterDisplay.size())) {
+		lv.Vector.emplace_back();
+		dv.Vector.emplace_back();
+	}
+
+	lv.Vector.at(id) = d.Logic;
+	dv.Vector.at(id) = d.Display;
+}

@@ -13,6 +13,7 @@
 #include "s5_mapdisplay.h"
 #include "s5_entitydisplay.h"
 #include "s5_config.h"
+#include "s5_exception.h"
 #include "entityiterator.h"
 #include "luaext.h"
 
@@ -122,6 +123,7 @@ std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::BuildingUCatsToRemove{};
+bool CppLogic::ModLoader::ModLoader::ReloadWaterTypes = false;
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -413,6 +415,44 @@ int CppLogic::ModLoader::ModLoader::AddBuildingUpgradeCategory(lua::State l)
 	return 1;
 }
 
+int CppLogic::ModLoader::ModLoader::AddWaterType(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	int id = L.OptInteger(2, 0);
+	if ((*BB::CIDManagerEx::WaterTypeManager)->GetIdByName(t) != 0)
+		throw lua::LuaException{ "water type already exists" };
+	try {
+		id = (*BB::CIDManagerEx::WaterTypeManager)->GetIDByNameOrCreate(t, id);
+	}
+	catch (const BB::CInvalidIDException& e) {
+		char buff[201]{};
+		e.CopyMessage(buff, 200);
+		throw lua::LuaException{ buff };
+	}
+	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(id);
+	ReloadWaterTypes = true;
+	L.Push("WaterTypes");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	if (L.IsTable(-1)) {
+		L.PushValue(1);
+		L.Push(id);
+		L.SetTableRaw(-3);
+	}
+	// func exit cleans stack anyway, so no need to pop
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadWaterType(lua::State L)
+{
+	int id = L.CheckInt(1);
+	if ((*BB::CIDManagerEx::WaterTypeManager)->GetNameByID(id) == nullptr)
+		throw lua::LuaException{ "water type does not exists" };
+	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(id);
+	ReloadWaterTypes = true;
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -595,6 +635,11 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 				}
 				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(id);
 			}
+		}
+
+		if (ReloadWaterTypes) {
+			(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->ReloadWaterTypes();
+			ReloadWaterTypes = false;
 		}
 	}
 }

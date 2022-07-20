@@ -69,6 +69,7 @@ BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategory", 
 BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureID", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTexture", &PushInt, &CheckInt };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -135,6 +136,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x84CCE8, &InfoBool},
     {0x81182C, &InfoBool},
     {0x83BA08, &InfoBool},
+    {0x83CDC8, &InfoBool},
 
     {0x810C98, &InfoInt},
     {0x800108, &InfoInt},
@@ -150,6 +152,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x83BA50, &InfoInt},
     {0x813408, &InfoInt},
     {0x813514, &InfoInt},
+    {0x83CE08, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
@@ -164,13 +167,16 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x85D560, &InfoTechnologyID},
     {0x85A108, &InfoSoundID},
     {0x8587D4, &InfoWeatherEffectTextureID},
+    {0xA0D634, &InfoTerrainTextureTextureID},
 
     {0x810CD8, &InfoUInt},
     {0x80AD90, &InfoUInt},
     {0x84CD48, &InfoUInt},
     {0x80DE60, &InfoUInt},
+    {0x83CE48, &InfoUInt},
 
     {0x80C380, &InfoUByte},
+    {0x84DD48, &InfoUByte},
 
     {0x810C78, &InfoFloat},
     {0x8231A4, &InfoFloat},
@@ -186,6 +192,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x80A994, &InfoFloat},
     {0x8133E8, &InfoFloat},
     {0x829844, &InfoFloat},
+    {0x83CDE8, &InfoFloat},
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},
@@ -196,8 +203,10 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0xA1A588, &InfoString},
     {0xA0654C, &InfoString},
     {0x87CEF8, &InfoString},
+    {0xA0D9CC, &InfoString},
     {0x810CB8, &InfoCharBuff},
     {0x84CC84, &InfoCharBuff},
+    {0x83CE28, &InfoCharBuff},
 
     {0x813978, &InfoClassID},
     {0x8223B4, &InfoClassID},

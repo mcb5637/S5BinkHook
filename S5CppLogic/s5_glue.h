@@ -107,6 +107,8 @@ namespace GGlue {
 
 	class ITerrainPropsMgr { // vtable 7
 	public:
+		virtual void __stdcall Destroy() = 0;
+
 		static inline constexpr int vtp = 0x788AD8;
 	};
 	class CTerrainPropsMgr : public ITerrainPropsMgr { //size 20
@@ -129,6 +131,7 @@ namespace GGlue {
 			PADDING(2);
 			int IceBaseTexture = 0;
 			int IceDetailTexture = 0; // 7
+			// after this, gets calculated by initialize
 			float TransparencyFactorTimes255 = 0;
 			float TransparencyOffsetTimes255 = 0;
 			float TransparencyMinTimes255 = 0;
@@ -183,14 +186,11 @@ namespace GGlue {
 	};
 	class CGlueWaterPropsMgr : public IGlueWaterPropsMgr { // size 31
 	public:
-
-
 		BB::CIDManagerEx* WaterTypeManager; // 1
 		WaterPropsLogic Logic;
 		WaterPropsDisplay Display; // 7
 
 		shok::Vector<WaterTypeData> WaterType; // 27 seems to get cleared after load
-
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0DE88);
 		static inline constexpr int vtp = 0x788C94;
@@ -202,7 +202,7 @@ namespace GGlue {
 	static_assert(offsetof(WaterPropsDisplay, ShoreWave) == 16 * 4);
 	static_assert(offsetof(CGlueWaterPropsMgr, WaterType) == 27 * 4);
 	static_assert(sizeof(WaterTypeData) == 13 * 4);
-	//constexpr int i = offsetof(CGlueWaterPropsMgr, Display.WaterTypeManager) / 4;
+	static_assert(sizeof(CGlueWaterPropsMgr) == 31 * 4);
 
 	class CGluePropsMgr {
 	public:

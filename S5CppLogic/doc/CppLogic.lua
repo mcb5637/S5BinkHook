@@ -2308,7 +2308,7 @@ function CppLogic.ModLoader.AddSettlerUpgradeCategory(ucatname, firstid) end
 --- @return number type_id
 function CppLogic.ModLoader.AddBuildingUpgradeCategory(ucatname, firstid) end
 
---- loads a water type from a xml file (data/graphics/watertypes/wname.xml).
+--- loads a water type from a xml file (data/config/watertypes/wname.xml).
 --- all water types get reloaded on exiting the map.
 --- you may request a specific id, or get one automatically by passing 0.
 --- if you request a specific id and it does already exist, throws.
@@ -2318,7 +2318,7 @@ function CppLogic.ModLoader.AddBuildingUpgradeCategory(ucatname, firstid) end
 --- @return number type_id
 function CppLogic.ModLoader.AddWaterType(wname, id) end
 
---- reloads a water type from a xml file (data/graphics/watertypes/wname.xml).
+--- reloads a water type from a xml file (data/config/watertypes/wname.xml).
 --- all water types get reloaded on exiting the map.
 --- @param id number
 function CppLogic.ModLoader.ReloadWaterType(id) end

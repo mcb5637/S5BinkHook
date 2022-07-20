@@ -62,7 +62,7 @@ usage: add the Upgrade field to all EntityTypes that are supposed to be in the u
 Note: not all entity behaviors support upgrading. (as an example: darios hawk does not get removed and causes an infinite loop on destroying it.)
 
 WaterTypes:
-path: data/graphics/watertypes/wname.xml (usually data/graphics/water.xml, dynamically changed)
+path: data/config/watertypes/wname.xml (usually data/config/water.xml, dynamically changed)
 example:
 <?xml version="1.0" encoding="utf-8" ?>
 <root>

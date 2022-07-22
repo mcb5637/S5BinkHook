@@ -95,6 +95,14 @@ void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
 
 	L.SetTableRaw(-3);
 	L.Pop(1);
+
+	// preload selection textures, so modloader doesnt break them
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
+	mng->Get("Selection");
+	mng->Get("Selection_civilian");
+	mng->Get("Selection_hero");
+	mng->Get("Selection_Soldier");
+	mng->Get("Selection_Building");
 }
 void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 {
@@ -124,6 +132,8 @@ std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::BuildingUCatsToRemove{};
 bool CppLogic::ModLoader::ModLoader::ReloadWaterTypes = false;
+std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToReload{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -453,6 +463,31 @@ int CppLogic::ModLoader::ModLoader::ReloadWaterType(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::AddSelectionTexture(lua::State L)
+{
+	const char* n = L.CheckString(1);
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
+	if (mng->IdManager->GetIdByName(n) != 0)
+		throw lua::LuaException{ "selection texture already exists" };
+	auto d = mng->Get(n);
+	SelectionTexturesToRemove.push_back(d->Id);
+	d->Get();
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadSelectionTexture(lua::State L)
+{
+	const char* n = L.CheckString(1);
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
+	if (mng->IdManager->GetIdByName(n) == 0)
+		throw lua::LuaException{ "selection texture does not exist" };
+	auto d = mng->Get(n);
+	SelectionTexturesToReload.push_back(d->Id);
+	d->FreeCache();
+	d->Get();
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -641,6 +676,20 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->ReloadWaterTypes();
 			ReloadWaterTypes = false;
 		}
+
+		while (SelectionTexturesToRemove.size() != 0) {
+			int id = SelectionTexturesToRemove.back();
+			SelectionTexturesToRemove.pop_back();
+			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
+			mng->PopId(id);
+		}
+		for (int id : SelectionTexturesToReload) {
+			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
+			auto* d = mng->Get(id);
+			d->FreeCache();
+			d->Get();
+		}
+		SelectionTexturesToReload.clear();
 	}
 }
 

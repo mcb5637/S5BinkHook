@@ -3,19 +3,6 @@
 #include "s5_baseDefs.h"
 
 // a lot of info about renderware comes from here: https://github.com/DK22Pac/vice-37
-
-namespace BBRw {
-	class IEngine {
-	public:
-		virtual ~IEngine() = default;
-	};
-
-	class CEngine : public IEngine {
-	public:
-		static inline constexpr int vtp = 0x76B534;
-	};
-}
-
 // this is c code, i just c++ified it to clean up my global namespace
 // need these for templates, so RTTI works
 struct RtAnimAnimation;
@@ -388,3 +375,101 @@ struct RtAnimAnimation {
 	static RtAnimAnimation* Read(const char* name);
 	void Destroy();
 };
+
+namespace BB {
+	template<class T> requires std::same_as<T, RWE::RwTexture*> class TResourceManager;
+
+	template<class T>
+	requires std::same_as<T, RWE::RwTexture*> // not sure if others exist
+	class TResourceProxyBase {
+	public:
+		virtual ~TResourceProxyBase() = default;
+		virtual T __stdcall Load() = 0;
+		virtual void __stdcall Free(T d) = 0;
+		virtual void __stdcall Override(T d) {
+			FreeCache();
+			Cache = d;
+		};
+
+		T Cache;
+		PADDINGI(1); // refCounter?
+		TResourceManager<T>* Manager; // 3
+		int Id;
+
+		T Get() { // 0x46CFAD
+			if (!Cache) {
+				Cache = Load();
+			}
+			return Cache;
+		}
+		void __stdcall FreeCache() { // 0x4728BE
+			if (Cache) {
+				Free(Cache);
+				Cache = nullptr;
+			}
+		}
+
+		// vtp for RWE::RwTexture* 0x769F9C
+	};
+	template<class T>
+	requires std::same_as<T, RWE::RwTexture*> // not sure if others exist
+	class TResourceProxyResMgr : public TResourceProxyBase<T> {
+
+		// vtp for RWE::RwTexture* 0x769FD0
+	};
+#ifdef __INTELLISENSE__
+#pragma diag_suppress 2784
+#endif
+	static_assert(offsetof(TResourceProxyBase<RWE::RwTexture*>, Cache) == 4 * 1);
+	static_assert(offsetof(TResourceProxyResMgr<RWE::RwTexture*>, Cache) == 4 * 1);
+#ifdef __INTELLISENSE__
+#pragma diag_default 2784
+#endif
+
+	template<class T>
+	requires std::same_as<T, RWE::RwTexture*> // not sure if others exist
+	class TResourceManager {
+	public:
+		virtual ~TResourceManager() = default;
+		virtual T __stdcall Read(const char* name) = 0;
+		virtual void __stdcall Destroy(T) = 0;
+
+
+		BB::CIDManagerEx* IdManager;
+		shok::Vector<TResourceProxyResMgr<T>*> Data;
+
+		void PopId(int id) {
+			if (id + 1 != static_cast<int>(Data.size()))
+				throw std::out_of_range{ "invaild id" };
+			auto v = Data.SaveVector();
+			v.Vector[id]->FreeCache();
+			delete v.Vector[id];
+			v.Vector.pop_back();
+			IdManager->RemoveID(id);
+		}
+
+		// vtp for RWE::RwTexture* 0x76BD90
+	};
+}
+
+namespace BBRw {
+	class CRwTextures : public BB::TResourceManager<RWE::RwTexture*> {
+	public:
+		static inline constexpr int vtp = 0x76BDA0;
+
+		BB::TResourceProxyResMgr<RWE::RwTexture*>* Get(const char* name);
+		BB::TResourceProxyResMgr<RWE::RwTexture*>* Get(int id);
+	};
+
+	class IEngine {
+	public:
+		virtual ~IEngine() = default;
+	};
+
+	class CEngine : public IEngine {
+	public:
+		static inline constexpr int vtp = 0x76B534;
+		PADDINGI(3);
+		CRwTextures* SelectionTextures; // also shorewave
+	};
+}

@@ -67,8 +67,10 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0DE88));
+	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0DE88));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x6987C1B3);
+	int id = L.CheckInt(1);
+	L.Push((int)(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(id)->SelectionTexture);
 	return 1;
 }
 

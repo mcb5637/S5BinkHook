@@ -45,9 +45,24 @@ example xml (see ED::CModelsProps::ModelData for full list of entries):
 </root>
 example dff: as originals (note: hard to save/load, best possibility is a GTA blender tool)
 
+Model Texture:
+path: data/graphics/textures/tname.dds, data/graphics/textureslow/tname.dds and data/graphics/texturesmed/tname.dds
+example: as originals (there is a git plugin to edit them, but you might want to edit them alongside models)
+Note: cannot be loaded directly, gets loaded via the referencing model.
+
+Selection Texture:
+path: data/graphics/textures/tname.dds, data/graphics/textureslow/tname.dds and data/graphics/texturesmed/tname.dds
+example: as originals (there is a git plugin to edit them)
+Note: selection textures are referenced by the additional model data. they could get loaded without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
+Note2: water/shorewave.dds can also be modified with the same functions.
+
+Terrain Texture:
+TODO
+
 GUITexture:
 path: data/graphics/textures/gui/tname.png (full path as id used)
 example: as originals
+Note: GUI textures are used only for widgets. referenced by the gui xml and loaded from there without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
 
 Animation:
 path: data/graphics/animations/aname.anm
@@ -60,6 +75,9 @@ usage: add the Upgrade field to all EntityTypes that are supposed to be in the u
 		last, call AddSettlerUpgradeCategory or AddBuildingUpgradeCategory with the upgradecategory name and the first entitytype.
 		Note: Add the entitytypes in reverse order, so the id gets loaded properly.
 Note: not all entity behaviors support upgrading. (as an example: darios hawk does not get removed and causes an infinite loop on destroying it.)
+
+TerrainType:
+TODO
 
 WaterTypes:
 path: data/config/watertypes/wname.xml (usually data/config/water.xml, dynamically changed)

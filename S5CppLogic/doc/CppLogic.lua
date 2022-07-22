@@ -2253,7 +2253,7 @@ function CppLogic.ModLoader.ReloadTechnology(tid) end
 
 --- loads a model from a xml and dff file (data/config/models/mname.xml and data/graphics/models/mname.dff).
 --- the xml contains the data from Models.xml, the dff is the actual model.
---- also loads all required textures.
+--- also loads all required textures (remember to put the 3 thexture sizes into the correct folders).
 --- the model gets automatically removed on leaving the map.
 --- @param mname string
 --- @return number type_id
@@ -2261,7 +2261,7 @@ function CppLogic.ModLoader.AddModel(mname) end
 
 --- reloads a model from a xml and dff file (data/config/models/mname.xml and data/graphics/models/mname.dff).
 --- the xml contains the data from Models.xml, the dff is the actual model.
---- also loads all required textures.
+--- also loads all required textures (remember to put the 3 thexture sizes into the correct folders).
 --- the model gets automatically reloaded on leaving the map (after s5x archives got removed).
 --- @param mid number
 function CppLogic.ModLoader.ReloadModel(mid) end
@@ -2307,6 +2307,19 @@ function CppLogic.ModLoader.AddSettlerUpgradeCategory(ucatname, firstid) end
 --- @param firstid number
 --- @return number type_id
 function CppLogic.ModLoader.AddBuildingUpgradeCategory(ucatname, firstid) end
+
+--- loads a selection texture file (data/graphics/textures/tname.xml).
+--- the texture name is referenced in the additional model data.
+--- remember to put the 3 texture sizes into the correct folders.
+--- the texture gets removed on leaving the map.
+--- @param tname string
+function CppLogic.ModLoader.AddSelectionTexture(tname) end
+
+--- reloads a selection texture file (data/graphics/textures/tname.xml).
+--- remember to put the 3 texture sizes into the correct folders.
+--- the texture gets reloaded on leaving the map.
+--- @param tname string
+function CppLogic.ModLoader.ReloadSelectionTexture(tname) end
 
 --- loads a water type from a xml file (data/config/watertypes/wname.xml).
 --- all water types get reloaded on exiting the map.

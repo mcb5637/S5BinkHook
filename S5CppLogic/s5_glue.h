@@ -105,16 +105,62 @@ namespace GGlue {
 
 	};
 
+	struct TerrainTypeData {
+		struct LogicData {
+			bool Blocked, BuildBlocked;
+			float WalkModifier;
+		} Logic;
+		struct DisplayData {
+			int Priority;
+			int BaseTexture;
+			int TransitionsTexture;
+			int SnowTexture;
+			int Quads;
+			shok::Color Color;
+			shok::String ReplacementTerrainType;
+			bool TransitionsColorModulate;
+		} Display;
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D958);
+	};
+	static_assert(sizeof(TerrainTypeData) == 16 * 4);
+	class TerrainPropsLogic {
+	public:
+		BB::CIDManagerEx* TerrainTypeManager;
+		shok::Vector<TerrainTypeData::LogicData> LogicProps;
+	};
+	class TerrainPropsDisplay {
+		char* TransitionTexture;
+		char* SnowTransitionTexture;
+		BB::CIDManagerEx* TerrainTypeManager;
+		BB::CIDManagerEx* TerrainTextureManager;
+		shok::Vector<TerrainTypeData::DisplayData> DisplayProps;
+	};
 	class ITerrainPropsMgr { // vtable 7
 	public:
 		virtual void __stdcall Destroy() = 0;
+		virtual BB::CIDManagerEx* __stdcall GetTerrainTypeManager() = 0;
+		virtual BB::CIDManagerEx* __stdcall GetTerrainTextureManager() = 0;
+		virtual TerrainPropsLogic* __stdcall GetLogicProps() = 0;
+		virtual TerrainPropsDisplay* __stdcall GetDisplayProps() = 0;
+		virtual void __stdcall Load(const char* file) = 0;
+		virtual ~ITerrainPropsMgr() = default;
 
 		static inline constexpr int vtp = 0x788AD8;
 	};
 	class CTerrainPropsMgr : public ITerrainPropsMgr { //size 20
 	public:
+		BB::CIDManagerEx* TerrainTypeManager;
+		BB::CIDManagerEx* TerrainTextureManager;
+		TerrainPropsLogic Logic; // 3
+		TerrainPropsDisplay Display; // 8
+		shok::Vector<TerrainTypeData> TerrainType; //16, cleared after loading
+
 		static inline constexpr int vtp = 0x788BB4;
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D8A8);
 	};
+	//constexpr int i = offsetof(CTerrainPropsMgr, TerrainType) / 4;
 
 	struct WaterTypeData { // size 13
 		struct LogicData {

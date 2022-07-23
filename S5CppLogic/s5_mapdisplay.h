@@ -248,6 +248,41 @@ namespace ED {
 		static inline constexpr int vtp = 0x769E94;
 	};
 
+	class TerrainTextureManager { // size 25
+	public:
+		struct TerrainType {
+			int Id;
+			int Priority;
+			int BaseTextureId;
+			int SnowTextureId;
+			int TransitionTextureId;
+			float OneDiv4TimesQuads;
+			int ReplacementTerrainType;
+			bool TransitionsColorModulate;
+			bool TransitionTextureIs_Transitions01;
+		};
+
+		GGlue::TerrainPropsDisplay* DisplayProps;
+		shok::Vector<TerrainType> TerrainTypes; // 1 modified if lower graphics settings
+		shok::Vector<TerrainType> OriginalTerrainTypes; // 5 stays as it is
+		shok::Vector<RWE::RwTexture*> Textures; // 9, lazily loaded
+		shok::Vector<int> TextureIdsOrderedByPriority; // 13
+		int BlackInternalUseOnlyId; // 17 terrainid
+		int Transitions01Id; // 18 textureid
+		shok::Vector<int> Uk; // 19 terrainid->terrainid ?
+		int TextureQualityOption;
+		int TextureQualityOptionChangedCounter; // ?
+
+		void ReloadAllTextures();
+	};
+	static_assert(sizeof(TerrainTextureManager::TerrainType) == 8 * 4);
+	static_assert(sizeof(TerrainTextureManager) == 25 * 4);
+	class TerrainDisplay { // size 9
+	public:
+		PADDINGI(2);
+		TerrainTextureManager* TextureManager;
+	};
+
 	class CGlobalsBase {
 	public:
 		virtual ~CGlobalsBase() = default;
@@ -278,22 +313,23 @@ namespace ED {
 		ED::CPlayerColors* PlayerColors; // 22
 		PADDINGI(3); // 25 p ED::CRenderSettingsEx
 		ED::CResourceManager* ResManager; // 26
-		PADDINGI(7);
-		ED::CWorld* DisplayWorld;
+		PADDINGI(3);
+		TerrainDisplay* TerrainManager; // 30
+		PADDINGI(3);
+		ED::CWorld* DisplayWorld; // 34
 
 		static inline constexpr int vtp = 0x769478;
 
 		static inline ED::CGlobalsBaseEx** const GlobalObj = reinterpret_cast<ED::CGlobalsBaseEx**>(0x857E8C);
 	};
-	//constexpr int i = offsetof(ED::CGlobalsBaseEx, DisplayWorld) / 4;
+	//constexpr int i = offsetof(ED::CGlobalsBaseEx, TerrainTextureManager) / 4;
 	static_assert(sizeof(CGlobalsBaseEx) == 35 * 4);
 
 	class IDisplayBase {
 	public:
 		virtual ~IDisplayBase() = default;
 		virtual void Destroy() = 0;
-	private:
-		virtual int retsomethingfromCGlobalsBaseEx() = 0;
+		virtual void ReloadAllTerrainTextures() = 0;
 	};
 
 	class CDisplayBase : public IDisplayBase {

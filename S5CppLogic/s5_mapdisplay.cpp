@@ -187,6 +187,12 @@ ED::ModelData* ED::CResourceManager::LoadModel(const char* name)
 	return resmng_loadmodel(name);
 }
 
+static inline void(__thiscall* const terraintexturemng_reloadall)(ED::TerrainTextureManager* th) = reinterpret_cast<void(__thiscall*)(ED::TerrainTextureManager*)>(0x470927);
+void ED::TerrainTextureManager::ReloadAllTextures()
+{
+	terraintexturemng_reloadall(this);
+}
+
 unsigned int __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const
 {
 	return Identifier;

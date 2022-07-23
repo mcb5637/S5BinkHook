@@ -84,6 +84,7 @@ namespace GGUI {
 }
 namespace GGlue {
 	class CGlueEntityProps;
+	class TerrainPropsDisplay;
 }
 namespace EGUIX {
 	class CBaseWidget;

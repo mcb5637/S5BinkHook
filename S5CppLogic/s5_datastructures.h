@@ -668,6 +668,12 @@ namespace shok {
 		T* data() noexcept {
 			return Internal.data();
 		}
+		T& at(size_t p) {
+			return Internal.at(p);
+		}
+		const T& at(size_t p) const {
+			return Internal.at(p);
+		}
 
 #ifdef _DEBUG
 		Vector() {

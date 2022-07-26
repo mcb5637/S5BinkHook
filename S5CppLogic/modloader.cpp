@@ -134,6 +134,9 @@ std::vector<int> CppLogic::ModLoader::ModLoader::BuildingUCatsToRemove{};
 bool CppLogic::ModLoader::ModLoader::ReloadWaterTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToReload{};
+std::vector<int> CppLogic::ModLoader::ModLoader::TerrainTexturesToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::TerrainTexturesToReload{};
+bool CppLogic::ModLoader::ModLoader::ReloadTerrainTypes = false;
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -488,6 +491,70 @@ int CppLogic::ModLoader::ModLoader::ReloadSelectionTexture(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::AddTerrainTexture(lua::State L)
+{
+	const char* n = L.CheckString(1);
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager;
+	if (mng->DisplayProps->TerrainTextureManager->GetIdByName(n) != 0)
+		throw lua::LuaException{ "terrain texture already exists" };
+	int id = mng->DisplayProps->TerrainTextureManager->GetIDByNameOrCreate(n);
+	mng->LoadTexture(id);
+	TerrainTexturesToRemove.push_back(id);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadTerrainTexture(lua::State L)
+{
+	const char* n = L.CheckString(1);
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager;
+	int id = mng->DisplayProps->TerrainTextureManager->GetIdByName(n);
+	if (id == 0)
+		throw lua::LuaException{ "terrain texture does not exists" };
+	mng->LoadTexture(id);
+	TerrainTexturesToReload.push_back(id);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::AddTerrainType(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	int id = L.OptInteger(2, 0);
+	if ((*BB::CIDManagerEx::TerrainTypeManager)->GetIdByName(t) != 0)
+		throw lua::LuaException{ "terrain type already exists" };
+	try {
+		id = (*BB::CIDManagerEx::TerrainTypeManager)->GetIDByNameOrCreate(t, id);
+	}
+	catch (const BB::CInvalidIDException& e) {
+		char buff[201]{};
+		e.CopyMessage(buff, 200);
+		throw lua::LuaException{ buff };
+	}
+	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(id);
+	ReloadTerrainTypes = true;
+	L.Push("TerrainTypes");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	if (L.IsTable(-1)) {
+		L.PushValue(1);
+		L.Push(id);
+		L.SetTableRaw(-3);
+	}
+	// func exit cleans stack anyway, so no need to pop
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadTerrainType(lua::State L)
+{
+	int id = L.CheckInt(1);
+	if ((*BB::CIDManagerEx::TerrainTypeManager)->GetNameByID(id) == nullptr)
+		throw lua::LuaException{ "terrain type does not exists" };
+	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(id);
+	ReloadTerrainTypes = true;
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -690,6 +757,23 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			d->Get();
 		}
 		SelectionTexturesToReload.clear();
+
+		while (TerrainTexturesToRemove.size() != 0) {
+			int id = TerrainTexturesToRemove.back();
+			TerrainTexturesToRemove.pop_back();
+			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->PopTexture(id);
+			(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->TerrainTextureManager->RemoveID(id);
+		}
+		for (int id : TerrainTexturesToReload) {
+			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->LoadTexture(id);
+		}
+		TerrainTexturesToReload.clear();
+
+		if (ReloadTerrainTypes) {
+			(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->ReloadTerrainTypes();
+			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyAllTerrainTypes();
+			ReloadTerrainTypes = false;
+		}
 	}
 }
 

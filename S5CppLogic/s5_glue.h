@@ -107,18 +107,18 @@ namespace GGlue {
 
 	struct TerrainTypeData {
 		struct LogicData {
-			bool Blocked, BuildBlocked;
-			float WalkModifier;
+			bool Blocked = false, BuildBlocked = false;
+			float WalkModifier = 1.0f;
 		} Logic;
 		struct DisplayData {
-			int Priority;
-			int BaseTexture;
-			int TransitionsTexture;
-			int SnowTexture;
-			int Quads;
-			shok::Color Color;
-			shok::String ReplacementTerrainType;
-			bool TransitionsColorModulate;
+			int Priority = 0;
+			int BaseTexture = 0;
+			int TransitionsTexture = 0;
+			int SnowTexture = 0;
+			int Quads = 0;
+			shok::Color Color{ 0xFF, 0, 0, 0 };
+			shok::String ReplacementTerrainType{};
+			bool TransitionsColorModulate = false;
 		} Display;
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D958);
@@ -130,6 +130,7 @@ namespace GGlue {
 		shok::Vector<TerrainTypeData::LogicData> LogicProps;
 	};
 	class TerrainPropsDisplay {
+	public:
 		char* TransitionTexture;
 		char* SnowTransitionTexture;
 		BB::CIDManagerEx* TerrainTypeManager;
@@ -159,6 +160,9 @@ namespace GGlue {
 		static inline constexpr int vtp = 0x788BB4;
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D8A8);
+
+		void ReloadTerrainTypes();
+		void LoadTerrainTypeFromExtraFile(int id);
 	};
 	//constexpr int i = offsetof(CTerrainPropsMgr, TerrainType) / 4;
 

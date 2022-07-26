@@ -2322,7 +2322,7 @@ function CppLogic.ModLoader.AddSelectionTexture(tname) end
 function CppLogic.ModLoader.ReloadSelectionTexture(tname) end
 
 --- loads a water type from a xml file (data/config/watertypes/wname.xml).
---- all water types get reloaded on exiting the map.
+--- all water types get reloaded on exiting the map, after using this function.
 --- you may request a specific id, or get one automatically by passing 0.
 --- if you request a specific id and it does already exist, throws.
 --- only writes the id to WaterTypes if it exists.
@@ -2332,9 +2332,37 @@ function CppLogic.ModLoader.ReloadSelectionTexture(tname) end
 function CppLogic.ModLoader.AddWaterType(wname, id) end
 
 --- reloads a water type from a xml file (data/config/watertypes/wname.xml).
---- all water types get reloaded on exiting the map.
+--- all water types get reloaded on exiting the map, after using this function.
 --- @param id number
 function CppLogic.ModLoader.ReloadWaterType(id) end
+
+--- loads a terrain texture file (data/graphics/textures/tname.xml).
+--- the texture name is referenced in water and terrain types.
+--- remember to put the 3 texture sizes into the correct folders.
+--- the texture gets removed on leaving the map.
+--- @param tname string
+function CppLogic.ModLoader.AddTerrainTexture(tname) end
+
+--- reloads a terrain texture file (data/graphics/textures/tname.xml).
+--- remember to put the 3 texture sizes into the correct folders.
+--- the texture gets reloaded on leaving the map.
+--- @param tname string
+function CppLogic.ModLoader.ReloadTerrainTexture(tname) end
+
+--- loads a terrain type from a xml file (data/config/terraintypes/tname.xml).
+--- all terrain types get reloaded on exiting the map, after using this function.
+--- you may request a specific id, or get one automatically by passing 0.
+--- if you request a specific id and it does already exist, throws.
+--- only writes the id to TerrainTypes if it exists.
+--- @param tname string
+--- @param id number|nil optional id, default == 0
+--- @return number type_id
+function CppLogic.ModLoader.AddTerrainType(tname, id) end
+
+--- reloads a terrain type from a xml file (data/config/terraintypes/tname.xml).
+--- all terrain types get reloaded on exiting the map, after using this function.
+--- @param id number
+function CppLogic.ModLoader.ReloadTerrainType(id) end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

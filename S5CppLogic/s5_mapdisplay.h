@@ -251,15 +251,15 @@ namespace ED {
 	class TerrainTextureManager { // size 25
 	public:
 		struct TerrainType {
-			int Id;
-			int Priority;
-			int BaseTextureId;
-			int SnowTextureId;
-			int TransitionTextureId;
-			float OneDiv4TimesQuads;
-			int ReplacementTerrainType;
-			bool TransitionsColorModulate;
-			bool TransitionTextureIs_Transitions01;
+			int Id = 0;
+			int Priority = 0;
+			int BaseTextureId = 0;
+			int SnowTextureId = 0;
+			int TransitionTextureId = 0;
+			float OneDiv4TimesQuads = 0;
+			int ReplacementTerrainType = 0;
+			bool TransitionsColorModulate = false;
+			bool TransitionTextureIs_Transitions01 = false;
 		};
 
 		GGlue::TerrainPropsDisplay* DisplayProps;
@@ -269,11 +269,19 @@ namespace ED {
 		shok::Vector<int> TextureIdsOrderedByPriority; // 13
 		int BlackInternalUseOnlyId; // 17 terrainid
 		int Transitions01Id; // 18 textureid
-		shok::Vector<int> Uk; // 19 terrainid->terrainid ?
+		shok::Vector<int> TextureReplacement; // 19 terrainindex->terrainindex
 		int TextureQualityOption;
 		int TextureQualityOptionChangedCounter; // ?
 
 		void ReloadAllTextures();
+		void ApplyTextureQuality();
+
+		void PopTexture(int id);
+		void LoadTexture(int id);
+		void ReApplyTerrainType(int id);
+		void ReApplyAllTerrainTypes();
+	private:
+		TerrainType CreateTerrainType(int id);
 	};
 	static_assert(sizeof(TerrainTextureManager::TerrainType) == 8 * 4);
 	static_assert(sizeof(TerrainTextureManager) == 25 * 4);

@@ -1,9 +1,11 @@
 #include "pch.h"
 #include <stdexcept>
+#include <map>
 #include "s5_mapdisplay.h"
 #include "s5_config.h"
 #include "s5_idmanager.h"
 #include "s5_classfactory.h"
+#include "s5_glue.h"
 
 
 bool ED::CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)
@@ -191,6 +193,127 @@ static inline void(__thiscall* const terraintexturemng_reloadall)(ED::TerrainTex
 void ED::TerrainTextureManager::ReloadAllTextures()
 {
 	terraintexturemng_reloadall(this);
+}
+static inline void(__thiscall* const terraintexturemng_applyquality)(ED::TerrainTextureManager* th) = reinterpret_cast<void(__thiscall*)(ED::TerrainTextureManager*)>(0x4716C5);
+void ED::TerrainTextureManager::ApplyTextureQuality()
+{
+	terraintexturemng_applyquality(this);
+}
+
+void ED::TerrainTextureManager::PopTexture(int id)
+{
+	if (Textures[id]) {
+		Textures[id]->Destroy();
+		Textures[id] = nullptr;
+	}
+	if (id + 1 == static_cast<int>(Textures.size())) {
+		auto v = Textures.SaveVector();
+		v.Vector.pop_back();
+	}
+}
+void ED::TerrainTextureManager::LoadTexture(int id)
+{
+	auto v = Textures.SaveVector();
+	if (id + 2 == static_cast<int>(Textures.size())) {
+		v.Vector.push_back(RWE::RwTexture::Read(DisplayProps->TerrainTextureManager->GetNameByID(id), nullptr));
+	}
+	else {
+		if (v.Vector.at(id))
+			v.Vector[id]->Destroy();
+		v.Vector[id] = RWE::RwTexture::Read(DisplayProps->TerrainTextureManager->GetNameByID(id), nullptr);
+	}
+}
+void ED::TerrainTextureManager::ReApplyTerrainType(int id)
+{
+	TerrainType t = CreateTerrainType(id);
+
+	std::map<int, int> PriorityToTerrainid{};
+	for (unsigned int id2 = 0; id2 < DisplayProps->TerrainTypeManager->size(); ++id2) {
+		int prio = DisplayProps->DisplayProps[id2].Priority;
+		if (id2 != id && DisplayProps->TerrainTypeManager->GetNameByID(id2) != nullptr) {
+			while (PriorityToTerrainid.find(prio) != PriorityToTerrainid.end())
+				++prio;
+			PriorityToTerrainid[prio] = id2;
+		}
+	}
+	while (PriorityToTerrainid.find(t.Priority) != PriorityToTerrainid.end())
+		++t.Priority;
+	PriorityToTerrainid[t.Priority] = t.Id;
+	{
+		auto ottv = OriginalTerrainTypes.SaveVector();
+		while (static_cast<int>(ottv.Vector.size()) <= id)
+			ottv.Vector.emplace_back();
+		ottv.Vector[id] = t;
+		auto ttv = TerrainTypes.SaveVector();
+		while (static_cast<int>(ttv.Vector.size()) <= id)
+			ttv.Vector.emplace_back();
+		ttv.Vector[id] = t;
+		auto trv = TextureReplacement.SaveVector();
+		while (static_cast<int>(trv.Vector.size()) <= id)
+			trv.Vector.emplace_back();
+		trv.Vector[id] = id;
+		auto tidsord = TextureIdsOrderedByPriority.SaveVector();
+		tidsord.Vector.clear();
+		tidsord.Vector.push_back(0);
+		for (const auto& kv : PriorityToTerrainid) {
+			int s = tidsord.Vector.size();
+			tidsord.Vector.push_back(kv.second);
+			ttv.Vector[kv.second].Priority = s;
+			ottv.Vector[kv.second].Priority = s;
+		}
+	}
+	if (TextureQualityOption != 2) {
+		ApplyTextureQuality();
+		--TextureQualityOptionChangedCounter;
+	}
+}
+void ED::TerrainTextureManager::ReApplyAllTerrainTypes()
+{
+	{
+		auto ottv = OriginalTerrainTypes.SaveVector();
+		ottv.Vector.clear();
+		auto ttv = TerrainTypes.SaveVector();
+		ttv.Vector.clear();
+		auto tidsord = TextureIdsOrderedByPriority.SaveVector();
+		tidsord.Vector.clear();
+		std::map<int, int> PriorityToTerrainid{};
+		for (unsigned int id = 0; id < DisplayProps->TerrainTypeManager->size(); ++id) {
+			TerrainType t = CreateTerrainType(id);
+			if (DisplayProps->TerrainTypeManager->GetNameByID(id) != nullptr) {
+				while (PriorityToTerrainid.find(t.Priority) != PriorityToTerrainid.end())
+					++t.Priority;
+				PriorityToTerrainid[t.Priority] = t.Id;
+			}
+			ottv.Vector.push_back(t);
+			ttv.Vector.push_back(t);
+		}
+		tidsord.Vector.push_back(0);
+		for (const auto& kv : PriorityToTerrainid) {
+			int s = tidsord.Vector.size();
+			tidsord.Vector.push_back(kv.second);
+			ttv.Vector[kv.second].Priority = s;
+			ottv.Vector[kv.second].Priority = s;
+		}
+	}
+	BlackInternalUseOnlyId = DisplayProps->TerrainTypeManager->GetIdByName("BlackInternalUseOnly");
+	Transitions01Id = DisplayProps->TerrainTextureManager->GetIdByName("Transitions01");
+	ApplyTextureQuality();
+	--TextureQualityOptionChangedCounter;
+}
+ED::TerrainTextureManager::TerrainType ED::TerrainTextureManager::CreateTerrainType(int id)
+{
+	TerrainType t{};
+	const auto& dis = DisplayProps->DisplayProps.at(id);
+	t.Id = id;
+	t.Priority = dis.Priority;
+	t.BaseTextureId = dis.BaseTexture;
+	t.SnowTextureId = dis.SnowTexture;
+	t.TransitionTextureId = dis.TransitionsTexture;
+	t.OneDiv4TimesQuads = 1.0f / (4 * (dis.Quads <= 0 ? 4 : dis.Quads));
+	t.ReplacementTerrainType = DisplayProps->TerrainTypeManager->GetIdByName(dis.ReplacementTerrainType.c_str());
+	t.TransitionsColorModulate = dis.TransitionsColorModulate;
+	t.TransitionTextureIs_Transitions01 = t.TransitionTextureId == Transitions01Id;
+	return t;
 }
 
 unsigned int __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const

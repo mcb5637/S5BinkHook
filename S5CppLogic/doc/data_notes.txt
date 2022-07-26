@@ -44,6 +44,7 @@ example xml (see ED::CModelsProps::ModelData for full list of entries):
 	<CastShadow>false</CastShadow>
 </root>
 example dff: as originals (note: hard to save/load, best possibility is a GTA blender tool)
+Note: remember to load SelectionTexture as Selection Texture, if you are not using a vanilla texture.
 
 Model Texture:
 path: data/graphics/textures/tname.dds, data/graphics/textureslow/tname.dds and data/graphics/texturesmed/tname.dds
@@ -57,7 +58,9 @@ Note: selection textures are referenced by the additional model data. they could
 Note2: water/shorewave.dds can also be modified with the same functions.
 
 Terrain Texture:
-TODO
+path: data/graphics/textures/tname.dds, data/graphics/textureslow/tname.dds and data/graphics/texturesmed/tname.dds
+example: as originals (there is a git plugin to edit them)
+Note: Terran Textures are referenced in TerrainTypes and WaterTypes (Ice Textures). They should get loaded without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
 
 GUITexture:
 path: data/graphics/textures/gui/tname.png (full path as id used)
@@ -69,7 +72,7 @@ path: data/graphics/animations/aname.anm
 example: as originals (note: currently no effective tool known to edit animations)
 
 Upgrade Categories:
-path: none (normally data/config/logic.xml, dynamically changed)
+path: none (usually data/config/logic.xml, dynamically changed)
 usage: add the Upgrade field to all EntityTypes that are supposed to be in the upgradecategory (you need at least Type for everything but the last).
 		do not add the Category field, this will be set by the AddCategory function.
 		last, call AddSettlerUpgradeCategory or AddBuildingUpgradeCategory with the upgradecategory name and the first entitytype.
@@ -77,7 +80,27 @@ usage: add the Upgrade field to all EntityTypes that are supposed to be in the u
 Note: not all entity behaviors support upgrading. (as an example: darios hawk does not get removed and causes an infinite loop on destroying it.)
 
 TerrainType:
-TODO
+path: data/config/terraintypes/tname.xml (usually data/config/terrain.xml, dynamically changed)
+example:
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<root>
+	<Logic>
+		<Blocked>True</Blocked>
+	</Logic>
+	<Display>
+		<Priority>500</Priority>
+		<BaseTexture>StrangeTerrain</BaseTexture>
+		<TransitionsTexture>Transitions01</TransitionsTexture>
+		<SnowTexture>StrangeTerrain</SnowTexture>
+		<Quads>4</Quads>
+		<Color>
+			<R>255</R>
+			<G>0</G>
+			<B>255</B>
+		</Color>														
+	</Display>
+</root>
+Note: remember to load BaseTexture, TransitionsTexture and SnowTexture as Terrain Textures, if you are not using a vanilla texture.
 
 WaterTypes:
 path: data/config/watertypes/wname.xml (usually data/config/water.xml, dynamically changed)
@@ -103,3 +126,4 @@ example:
 		<IceDetailTexture>Water/Ice01Detail</IceDetailTexture>
 	</Display>
 </root>
+Note: remember to load IceBaseTexture and IceDetailTexture as Terrain Textures, if you are not using a vanilla texture.

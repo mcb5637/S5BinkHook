@@ -69,7 +69,14 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D8A8));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x6987C1B3);
-	L.Push((int)(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager);
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager;
+	L.NewTable();
+	int i = 1;
+	for (int d : mng->TextureIdsOrderedByPriority) {
+		L.Push(d);
+		L.SetTableRaw(-2, i);
+		++i;
+	}
 	return 1;
 }
 

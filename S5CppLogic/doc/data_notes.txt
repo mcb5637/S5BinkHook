@@ -67,6 +67,7 @@ path: data/graphics/textures/gui/tname.png (full path as id used)
 example: as originals
 Note: GUI textures are used only for widgets. referenced by the gui xml and loaded from there without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
 Note2: Since GUITextures are not known until ModLoader finishes, it is best to load them on normal GameStart and SaveLoaded functions, together with all other GUI modifications.
+Note3: The full path to the texture is used as id, and having data in front can make the difference between overriding an existing function and loading a new one. have a look at data/menu/projects/ingame.xml to see what path is used.
 
 Animation:
 path: data/graphics/animations/aname.anm

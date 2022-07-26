@@ -55,7 +55,7 @@ Selection Texture:
 path: data/graphics/textures/tname.dds, data/graphics/textureslow/tname.dds and data/graphics/texturesmed/tname.dds
 example: as originals (there is a git plugin to edit them)
 Note: selection textures are referenced by the additional model data. they could get loaded without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
-Note2: water/shorewave.dds can also be modified with the same functions.
+Note2: water/shorewave.dds can also be modified with the same functions (but i did not test, if this actually does something).
 
 Terrain Texture:
 path: data/graphics/textures/tname.dds, data/graphics/textureslow/tname.dds and data/graphics/texturesmed/tname.dds
@@ -66,6 +66,7 @@ GUITexture:
 path: data/graphics/textures/gui/tname.png (full path as id used)
 example: as originals
 Note: GUI textures are used only for widgets. referenced by the gui xml and loaded from there without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
+Note2: Since GUITextures are not known until ModLoader finishes, it is best to load them on normal GameStart and SaveLoaded functions, together with all other GUI modifications.
 
 Animation:
 path: data/graphics/animations/aname.anm

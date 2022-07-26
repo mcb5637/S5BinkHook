@@ -2308,14 +2308,14 @@ function CppLogic.ModLoader.AddSettlerUpgradeCategory(ucatname, firstid) end
 --- @return number type_id
 function CppLogic.ModLoader.AddBuildingUpgradeCategory(ucatname, firstid) end
 
---- loads a selection texture file (data/graphics/textures/tname.xml).
+--- loads a selection texture file (data/graphics/textures/tname.dds).
 --- the texture name is referenced in the additional model data.
 --- remember to put the 3 texture sizes into the correct folders.
 --- the texture gets removed on leaving the map.
 --- @param tname string
 function CppLogic.ModLoader.AddSelectionTexture(tname) end
 
---- reloads a selection texture file (data/graphics/textures/tname.xml).
+--- reloads a selection texture file (data/graphics/textures/tname.dds).
 --- remember to put the 3 texture sizes into the correct folders.
 --- the texture gets reloaded on leaving the map.
 --- @param tname string

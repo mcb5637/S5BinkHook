@@ -1,5 +1,6 @@
 #pragma once
 
+#include <random>
 #include "Luapp/luapp50.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
@@ -51,6 +52,8 @@ namespace CppLogic::UA {
 		lua::Reference Formation = lua::State::NoRef, CommandQueue = lua::State::NoRef, Spawner = lua::State::NoRef, Normalize = lua::State::NoRef;
 		float AutoRotateFormation = -1;
 		float LastRotation = 0;
+
+		std::minstd_rand RNG;
 
 		static std::vector<UACannonBuilderAbilityData> CannonBuilderAbilityData;
 

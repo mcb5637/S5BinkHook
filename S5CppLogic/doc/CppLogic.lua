@@ -2409,7 +2409,7 @@ function UACore:SetSabotageBridges(s) end
 --- creates new ua.
 --- @param pl number player
 --- @return UACore ua
-function CppLogic.UA.New(pl, format, commandqueue, spawner, normalize) end
+function CppLogic.UA.New(pl, format, commandqueue, spawner, normalize, seed) end
 
 --- gets next enemy in area.
 function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area, ignoreFleeing) end

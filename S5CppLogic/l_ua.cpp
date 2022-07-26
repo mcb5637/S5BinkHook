@@ -11,6 +11,7 @@
 #include "s5_behaviors.h"
 #include "s5_entitytype.h"
 #include "s5_player.h"
+#include "s5_ui.h"
 #include "luaext.h"
 #include "entityiterator.h"
 
@@ -618,8 +619,6 @@ namespace CppLogic::UA {
 		L.TCall(2, 0);
 		L.SetTop(t);
 	}
-	std::random_device                  rand_dev;
-	std::mt19937                        generator(rand_dev());
 	std::uniform_int_distribution<int>  distr(-10, 10);
 	bool UnlimitedArmy::ExecuteHeroAbility(EGL::CGLEEntity* e)
 	{
@@ -700,11 +699,12 @@ namespace CppLogic::UA {
 					auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
 					if (d != CannonBuilderAbilityData.end() && CountTargetsInArea(Player, e->Position, 2000, IgnoreFleeing) >= 10) {
 						shok::Position p = e->Position;
-						p.X += distr(generator) * 100;
-						p.Y += distr(generator) * 100;
+						p.X += distr(RNG) * 100;
+						p.Y += distr(RNG) * 100;
+						shok::Position out;
 						p.FloorToBuildingPlacement();
-						if (GGL::CPlayerStatus::CanPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
+						if (GGUI::CManager::GlobalObj()->GUIInterface->GetNearestFreePosForBuildingPlacement(d->BottomType, p, out)) {
+							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(out, d->BottomType, d->TopType);
 							return true;
 						}
 					}
@@ -810,11 +810,12 @@ namespace CppLogic::UA {
 					auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
 					if (d != CannonBuilderAbilityData.end()) {
 						shok::Position p = e->Position;
-						p.X += distr(generator) * 100;
-						p.Y += distr(generator) * 100;
+						p.X += distr(RNG) * 100;
+						p.Y += distr(RNG) * 100;
+						shok::Position out;
 						p.FloorToBuildingPlacement();
-						if (GGL::CPlayerStatus::CanPlaceBuilding(d->BottomType, Player, &p, 0, 0)) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(p, d->BottomType, d->TopType);
+						if (GGUI::CManager::GlobalObj()->GUIInterface->GetNearestFreePosForBuildingPlacement(d->BottomType, p, out)) {
+							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(out, d->BottomType, d->TopType);
 							return true;
 						}
 					}
@@ -1222,6 +1223,7 @@ namespace CppLogic::UA {
 		a->Spawner = L.Ref(L.REGISTRYINDEX);
 		L.PushValue(5);
 		a->Normalize = L.Ref(L.REGISTRYINDEX);
+		a->RNG.seed(L.CheckInt(6));
 		return 1;
 	}
 

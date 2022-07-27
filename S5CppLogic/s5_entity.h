@@ -406,25 +406,27 @@ namespace EGL {
 		// no vtable
 	public:
 		enum class ModifierType : int {
-			MovingSpeed = 0, // gets called
-			HealthBar = 100,
-			MaxHealth = 101,
-			Exploration = 102, // gets called
-			Damage = 103, // gets called, also shuriken, circularattack
-			DamageBonus = 104, // gets called
-			MaxAttackRange = 105, // gets called, battle+autocannon?
-			// 106 unknown value at 36
-			Experience = 107,
-			ExperienceLevels = 108,
+			MovingSpeed = 0, // gets called, modified by tech, experience and weather
+			HealthBar = 100, // no modification, straight from entity
+			MaxHealth = 101, // no modification, straigt from GetMaxHealth func
+			Exploration = 102, // gets called, modified by tech and experience (returns constant for dead hero)
+			Damage = 103, // gets called, also shuriken, circularattack, modified by tech and experience
+			DamageBonus = 104, // gets called, modified by tech and experience
+			MaxAttackRange = 105, // gets called, battle+autocannon?, modified by tech and experience
+			MinAttackRange = 106, // modified by tech
+			Experience = 107, // no modifier, straight to event Leader_GetXP
+			ExperienceLevels = 108, // no modifier, straigt calculaton from Experience
 			// 109 unknown just passes through initial, called max soldiers?
-			Armor = 110, // gets called
-			Motivation = 111,
-			CurrentSoldierAmount = 112,
-			MaxSoldierAmount = 113,
-			Dodge = 114, // dodge mechanics migth actually work, todo check, melee taskhurt
-			AutoAttackRange = 115, // gets called
-			HealingPoints = 116, // gets called
-			MissChance = 117, // gets called
+			Armor = 110, // gets called, modified by technology
+			Motivation = 111, // no modifier, straight to event Worker_GetMotivation (if not dead)
+			CurrentSoldierAmount = 112, // no modifier, straight to event Leader_GetCurrentNumSoldier
+			MaxSoldierAmount = 113, // no modifier, straight to event Leader_GetMaxNumSoldier
+			Dodge = 114, // dodge mechanics migth actually work, todo check, melee taskhurt, modified by tech and experience
+			AutoAttackRange = 115, // gets called, modified by experience
+			HealingPoints = 116, // gets called, modified by experience
+			MissChance = 117, // gets called, modified by experience
+
+			// note: buindings do not have a IProfileModifierSetObserver, but they have a tech modifier call on the virtual GetExploration and the GetArmor event
 		};
 
 		virtual float GetModifiedValue(ModifierType t, float z);

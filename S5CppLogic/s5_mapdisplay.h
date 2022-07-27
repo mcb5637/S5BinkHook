@@ -291,6 +291,28 @@ namespace ED {
 		TerrainTextureManager* TextureManager;
 	};
 
+	class CEntitiesTypeFlags {
+	public:
+		virtual ~CEntitiesTypeFlags() = default;
+
+		enum class Flags : byte {
+			RenderInFoW = 1,
+			RenderNormalQuality = 2,
+			HighQualityOnly = 4,
+		};
+
+		Flags* Data = nullptr;
+		size_t NumberOfFlags = 0;
+
+		CEntitiesTypeFlags(ED::EntityTypeDisplayProps* entityTypeDisplays);
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		static inline constexpr int vtp = 0x769E70;
+	};
+	static_assert(sizeof(CEntitiesTypeFlags) == 3 * 4);
+
 	class CGlobalsBase {
 	public:
 		virtual ~CGlobalsBase() = default;
@@ -303,7 +325,7 @@ namespace ED {
 		PADDINGI(1); // empty BB::CIDManagerEx
 		ED::CDisplayProps* DisplayProps; // 5
 		EGL::EffectsDisplayProps* EffectDisplayProps;
-		BB::CIDManagerEx** EntityTypeManager; // probably an object without vtable
+		ED::EntityTypeDisplayProps* EntityTypeDisplays;
 		ED::CModelsProps* ModelProps;
 		PADDINGI(1); // p to something terrain related?
 		PADDINGI(1); // p to something water related? // 10
@@ -311,7 +333,7 @@ namespace ED {
 		PADDINGI(1); // p to ED::CAuras
 		ED::CCameraEx* Camera;
 		ED::CCommandAcknowledgements* CommandAcks;
-		PADDINGI(1); // p to ED::CEntitiesTypeFlags // 15
+		ED::CEntitiesTypeFlags* EntityTypeFlags; // 15
 		PADDINGI(1); // p to ED::CGUIScene
 		PADDINGI(1); // unknown
 		PADDINGI(1); // p to ED::CLight

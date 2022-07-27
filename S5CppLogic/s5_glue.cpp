@@ -6,6 +6,7 @@
 #include "s5_idmanager.h"
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
+#include "s5_mapdisplay.h"
 
 static inline void(__thiscall* effectlogic_init)(EGL::CGLEEffectProps* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEffectProps*)>(0x589297);
 void GGlue::CEffectsPropsMgr::LoadEffectTypeFromExtraFile(int id)
@@ -65,34 +66,38 @@ void GGlue::CEffectsPropsMgr::ReloadAllEffectTypes()
 static inline void(__thiscall* const epropsmng_loadentitytypebyid)(GGlue::CEntitiesPropsMgr* th, int id) = reinterpret_cast<void(__thiscall*)(GGlue::CEntitiesPropsMgr*, int)>(0x5B931B);
 void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(int id)
 {
-	if (id >= static_cast<int>(CGLEEntitiesProps.EntityTypes.size()))
+	if (id >= static_cast<int>(EntityTypes.size()))
 	{
-		auto glue = CGLEEntitiesProps.EntityTypes.SaveVector();
+		auto glue = EntityTypes.SaveVector();
 		glue.Vector.emplace_back();
 		auto log = CGLEEntitiesProps.EntityTypesLogicProps.SaveVector();
 		log.Vector.push_back(nullptr);
-		auto dis = CGLEEntitiesProps.EntityTypesDisplayProps.SaveVector();
+		auto dis = DisplayProps.EntityTypesDisplayProps.SaveVector();
 		dis.Vector.push_back(nullptr);
 	}
 	epropsmng_loadentitytypebyid(this, id);
+	auto* ty = CGLEEntitiesProps.GetEntityType(id);
+	ty->LogicProps->InitializeBlocking();
+	RefreshDisplayFlags();
 }
 
 void GGlue::CEntitiesPropsMgr::PopEntityType(int id)
 {
-	if (id + 1 != static_cast<int>(CGLEEntitiesProps.EntityTypes.size()))
+	if (id + 1 != static_cast<int>(EntityTypes.size()))
 		throw std::out_of_range("invalid id");
 	FreeEntityType(id);
-	auto glue = CGLEEntitiesProps.EntityTypes.SaveVector();
+	auto glue = EntityTypes.SaveVector();
 	glue.Vector.pop_back();
 	auto log = CGLEEntitiesProps.EntityTypesLogicProps.SaveVector();
 	log.Vector.pop_back();
-	auto dis = CGLEEntitiesProps.EntityTypesDisplayProps.SaveVector();
+	auto dis = DisplayProps.EntityTypesDisplayProps.SaveVector();
 	dis.Vector.pop_back();
+	RefreshDisplayFlags();
 }
 
 void GGlue::CEntitiesPropsMgr::FreeEntityType(int id)
 {
-	GGlue::CGlueEntityProps& e = CGLEEntitiesProps.EntityTypes[id];
+	GGlue::CGlueEntityProps& e = EntityTypes[id];
 	for (auto& b : e.BehaviorProps) {
 		delete b.Logic;
 		delete b.Display;
@@ -106,7 +111,13 @@ void GGlue::CEntitiesPropsMgr::FreeEntityType(int id)
 	e.LogicProps = nullptr;
 	e.DisplayProps = nullptr;
 	CGLEEntitiesProps.EntityTypesLogicProps[id] = nullptr;
-	CGLEEntitiesProps.EntityTypesDisplayProps[id] = nullptr;
+	DisplayProps.EntityTypesDisplayProps[id] = nullptr;
+}
+
+void GGlue::CEntitiesPropsMgr::RefreshDisplayFlags()
+{
+	delete (*ED::CGlobalsBaseEx::GlobalObj)->EntityTypeFlags;
+	(*ED::CGlobalsBaseEx::GlobalObj)->EntityTypeFlags = new ED::CEntitiesTypeFlags((*ED::CGlobalsBaseEx::GlobalObj)->EntityTypeDisplays);
 }
 
 void GGlue::CTerrainPropsMgr::ReloadTerrainTypes()

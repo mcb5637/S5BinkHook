@@ -159,7 +159,7 @@ int CppLogic::ModLoader::ModLoader::ReloadEntityType(lua::State L)
 {
 	int id = L.CheckInt(1);
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-	if (id <= 0 || id >= static_cast<int>(m->CGLEEntitiesProps.EntityTypes.size()))
+	if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size()))
 		throw lua::LuaException("invalid id");
 	m->FreeEntityType(id);
 	m->LoadEntityTypeByID(id);
@@ -171,7 +171,7 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 {
 	int id = L.CheckInt(1);
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-	if (id <= 0 || id >= static_cast<int>(m->CGLEEntitiesProps.EntityTypes.size()))
+	if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size()))
 		throw lua::LuaException("invalid id");
 	EntityTypesToReload.push_back(id);
 	return 0;
@@ -641,7 +641,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		for (int id : EntityTypesToReload) {
 			auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-			if (id <= 0 || id >= static_cast<int>(m->CGLEEntitiesProps.EntityTypes.size())) // might got popped above
+			if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size())) // might got popped above
 				continue;
 			m->FreeEntityType(id);
 			m->LoadEntityTypeByID(id);

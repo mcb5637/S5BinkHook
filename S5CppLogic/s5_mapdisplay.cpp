@@ -316,6 +316,21 @@ ED::TerrainTextureManager::TerrainType ED::TerrainTextureManager::CreateTerrainT
 	return t;
 }
 
+static inline void(__thiscall* const entitestypeflags_ctor)(ED::CEntitiesTypeFlags* th, ED::EntityTypeDisplayProps* p) = reinterpret_cast<void(__thiscall*)(ED::CEntitiesTypeFlags*, ED::EntityTypeDisplayProps*)>(0x46FE7E);
+ED::CEntitiesTypeFlags::CEntitiesTypeFlags(ED::EntityTypeDisplayProps* entityTypeDisplays)
+{
+	entitestypeflags_ctor(this, entityTypeDisplays);
+}
+
+void* ED::CEntitiesTypeFlags::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void ED::CEntitiesTypeFlags::operator delete(void* p) {
+	shok::Free(p);
+}
+
+
 unsigned int __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const
 {
 	return Identifier;

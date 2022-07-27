@@ -70,6 +70,8 @@ BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyID", &PushI
 BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTexture", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategoryID", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::EntityAccessCategoryID", &PushInt, &CheckInt };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -170,6 +172,9 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x85A108, &InfoSoundID},
     {0x8587D4, &InfoWeatherEffectTextureID},
     {0xA0D634, &InfoTerrainTextureTextureID},
+    {0x85D4F4, &InfoEntityCategory},
+
+    {0x810D18, &InfoAccessCategory},
 
     {0x810CD8, &InfoUInt},
     {0x80AD90, &InfoUInt},
@@ -216,6 +221,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x813978, &InfoClassID},
     {0x8223B4, &InfoClassID},
     {0x80ADB0, &InfoClassID},
+    {0x810CF8, &InfoClassID},
 } };
 
 std::string BB::FieldSerilaizer::GetTypeDescName() const

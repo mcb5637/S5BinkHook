@@ -3,6 +3,19 @@
 #include "s5_baseDefs.h"
 
 namespace shok {
+	enum class TechModifierType : int {
+		SpeedModifier = 0, // technically this is a default in a switch case...
+		ExplorationModifier = 1,
+		HitpointModifier = 2,
+		DamageModifier = 3,
+		ArmorModifier = 4,
+		DodgeModifier = 5,
+		RangeModifier = 6,
+		MinRangeModifier = 7,
+		DamageBonusModifier = 8,
+		GroupLimitModifier = 9,
+	};
+
 	class Technology {
 	public:
 		struct Modifier {
@@ -61,6 +74,8 @@ namespace shok {
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
+
+		Modifier& GetModifierOfType(TechModifierType t);
 	};
 	static_assert(sizeof(Technology) == 0x204);
 

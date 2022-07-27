@@ -35,6 +35,12 @@ void shok::Technology::operator delete(void* p) {
 	shok::Free(p);
 }
 
+static inline shok::Technology::Modifier* (__thiscall* const tech_getmodif)(shok::Technology* th, shok::TechModifierType t) = reinterpret_cast<shok::Technology::Modifier* (__thiscall*)(shok::Technology*, shok::TechModifierType)>(0x4C78CC);
+shok::Technology::Modifier& shok::Technology::GetModifierOfType(TechModifierType t)
+{
+	return *tech_getmodif(this, t);
+}
+
 void shok::TechManager::FreeTech(int id)
 {
 	--id;

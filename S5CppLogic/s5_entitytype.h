@@ -7,8 +7,10 @@ namespace EGL {
 	public:
 		class ModifyEntityProps {
 		public:
-			int MysteriousInt;
+			shok::TechModifierType ModifierType;
 			shok::Vector<int> TechList;
+
+			float ModifyValue(int player, float initial);
 		};
 		class UpgradeInfo {
 		public:
@@ -23,10 +25,10 @@ namespace EGL {
 		shok::Vector<shok::EntityCategory> Categories;
 		shok::PositionRot ApproachPos;
 	private:
-		int Race;
+		int Race; // unused
 	public:
-		byte CanFloat, CanDrown, MapFileDontSave, DividesTwoSectors; // 11
-		byte ForceNoPlayer, AdjustWalkAnimSpeed, Visible, DoNotExecute; // 12
+		bool CanFloat, CanDrown, MapFileDontSave, NeedsPlayer; // 11
+		bool ForceNoPlayer, AdjustWalkAnimSpeed, Visible, DoNotExecute; // 12
 		int MaxHealth; // 13
 	private:
 		int Models[5];
@@ -34,15 +36,18 @@ namespace EGL {
 		float Exploration;
 		int ExperiencePoints, AccessCategory, NumBlockedPoints; //20
 		float SnapTolerance; //23 seems to be a max change in every coordinate on entity placement
-		bool DeleteWhenBuiltOn, NeedsPlayer;
+		bool DeleteWhenBuiltOn, DividesTwoSectors;
 		PADDING(2);
 		shok::Vector<EGL::CGLEBehaviorProps*> BehaviorProps; // 25
 		int NumberOfBehaviors; //29
-		PADDINGI(4);
-		shok::Vector<shok::AARect> BlockingArea; // la37
+		shok::AARect Blocked; // 30 as Blocked1 and Blocked2 in xml
+		shok::Vector<shok::AARect> BlockingArea; // 34 la37
 
 		static inline constexpr int vtp = 0x76E47C;
 		static inline constexpr int TypeDesc = 0x810B0C;
+		static inline constexpr unsigned int Identifier = 0x23962D3D;
+
+		void InitializeBlocking();
 
 		template<class T>
 		requires std::derived_from<T, EGL::CGLEBehaviorProps>
@@ -70,8 +75,7 @@ namespace EGL {
 		}
 	};
 	static_assert(offsetof(EGL::CGLEEntityProps, ApproachPos) == 4 * 7);
-
-
+	static_assert(offsetof(EGL::CGLEEntityProps, BlockingArea) == 4 * 34);
 }
 
 namespace GGL {
@@ -96,12 +100,22 @@ namespace GGL {
 		UpgradeInfo Upgrade;
 		bool Fearless, Convertible; //85
 		PADDING(2);
-		ModifyEntityProps ModifyExploration, ModifyHitpoints, ModifySpeed, ModifyDamage, ModifyArmor, ModifyDodge, ModifyMaxRange, ModifyMinRange, ModifyDamageBonus, ModifyGroupLimit;
+		ModifyEntityProps ModifyExploration; // 86
+		ModifyEntityProps ModifyHitpoints; // 91
+		ModifyEntityProps ModifySpeed; // 96
+		ModifyEntityProps ModifyDamage; // 101
+		ModifyEntityProps ModifyArmor; // 106
+		ModifyEntityProps ModifyDodge; // 111
+		ModifyEntityProps ModifyMaxRange; // 116
+		ModifyEntityProps ModifyMinRange; // 121
+		ModifyEntityProps ModifyDamageBonus; // 126
+		ModifyEntityProps ModifyGroupLimit; // 131
 		int AttractionSlots; // 136
 
 		static inline constexpr int vtp = 0x76E498;
 		static inline constexpr int TypeDesc = 0x810B30;
 	};
+	//constexpr int i = offsetof(CGLSettlerProps, ModifyGroupLimit) / 4;
 
 	class CGLAnimalProps : public EGL::CGLEEntityProps {
 	public:
@@ -232,7 +246,7 @@ namespace GGlue {
 
 		CGlueEntityProps();
 		CGlueEntityProps(const CGlueEntityProps& o);
-		CGlueEntityProps(CGlueEntityProps&& o);
+		CGlueEntityProps(CGlueEntityProps&& o) noexcept;
 
 		template<typename T>
 		T* GetBehaviorProps() {
@@ -264,9 +278,6 @@ namespace EGL {
 		BB::CIDManagerEx* UpgradeCategoryManager;
 		BB::CIDManagerEx* BlessCategoryManager;
 		shok::Vector<EGL::CGLEEntityProps*> EntityTypesLogicProps; // 6
-		BB::CIDManagerEx* EntityTypeManagerAgain;
-		shok::Vector<ED::CDisplayEntityProps*> EntityTypesDisplayProps; // 11
-		shok::Vector<GGlue::CGlueEntityProps> EntityTypes; // 15
 
 		static inline constexpr int vtp = 0x788834;
 
@@ -275,5 +286,15 @@ namespace EGL {
 		static inline EGL::CGLEEntitiesProps** const GlobalObj = reinterpret_cast<EGL::CGLEEntitiesProps**>(0x895DB0);
 
 		static const char* GetEntityTypeDisplayName(int i);
+
+		// init blocking for everything but the last: 5846BE
+	};
+}
+
+namespace ED {
+	class EntityTypeDisplayProps {
+	public:
+		BB::CIDManagerEx* EntityTypeManagerAgain;
+		shok::Vector<ED::CDisplayEntityProps*> EntityTypesDisplayProps; // 11
 	};
 }

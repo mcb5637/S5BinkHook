@@ -31,6 +31,7 @@ namespace shok {
 	enum class TechState : int;
 	enum class Keys : int;
 	enum class ExperienceClass : int;
+	enum class TechModifierType : int;
 
 	class Technology;
 	class TechCategoryManager;
@@ -68,6 +69,7 @@ namespace ED {
 	class CVisibleEntityManager;
 	struct ModelData;
 	class CEffectProps;
+	class EntityTypeDisplayProps;
 }
 namespace BB {
 	class CEvent;

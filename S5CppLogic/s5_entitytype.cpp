@@ -1,5 +1,16 @@
 #include "pch.h"
 #include "s5_entitytype.h"
+#include "s5_framework.h"
+
+static inline void(__thiscall* const ety_initblock)(EGL::CGLEEntityProps* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntityProps*)>(0x58466C);
+void EGL::CGLEEntityProps::InitializeBlocking() {
+	ety_initblock(this);
+}
+
+static inline float(__thiscall* const modeprops_mod)(EGL::CGLEEntityProps::ModifyEntityProps* th, int p, float i) = reinterpret_cast<float(__thiscall*)(EGL::CGLEEntityProps::ModifyEntityProps*, int, float)>(0x4C797D);
+float EGL::CGLEEntityProps::ModifyEntityProps::ModifyValue(int player, float initial) {
+	return modeprops_mod(this, player, initial);
+}
 
 GGlue::CGlueEntityProps::CGlueEntityProps() {
 	*reinterpret_cast<int*>(this) = vtp;
@@ -12,7 +23,7 @@ GGlue::CGlueEntityProps::CGlueEntityProps(const CGlueEntityProps& o) {
 	DisplayProps = o.DisplayProps;
 	BehaviorProps = o.BehaviorProps;
 }
-GGlue::CGlueEntityProps::CGlueEntityProps(CGlueEntityProps&& o) {
+GGlue::CGlueEntityProps::CGlueEntityProps(CGlueEntityProps&& o) noexcept {
 	*reinterpret_cast<int*>(this) = vtp;
 	LogicProps = o.LogicProps;
 	DisplayProps = o.DisplayProps;
@@ -48,9 +59,10 @@ unsigned int __stdcall GGlue::CGlueEntityProps::GetClassIdentifier() const {
 
 GGlue::CGlueEntityProps* EGL::CGLEEntitiesProps::GetEntityType(int i)
 {
-	if (i <= 0 || i >= static_cast<int>(EntityTypes.size()))
+	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+	if (i <= 0 || i >= static_cast<int>(m->EntityTypes.size()))
 		return nullptr;
-	return EntityTypes.data() + i;
+	return m->EntityTypes.data() + i;
 }
 
 const char* (__stdcall* const getentitydisplayname)(int i) = reinterpret_cast<const char* (__stdcall* const)(int i)>(0x52EFCF);

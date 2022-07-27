@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "modloader.h"
+
+#include <regex>
+
 #include "s5_filesystem.h"
 #include "s5_glue.h"
 #include "s5_entitytype.h"
@@ -16,6 +19,7 @@
 #include "s5_exception.h"
 #include "entityiterator.h"
 #include "luaext.h"
+#include "dump_guitextures.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
@@ -315,8 +319,16 @@ int CppLogic::ModLoader::ModLoader::ReloadGUITexture(lua::State L)
 	const char* t = L.CheckString(1);
 	auto* m = EGUIX::TextureManager::GlobalObj();
 	int id = m->GetTextureIDNoAdd(t);
-	if (id == 0)
-		throw lua::LuaException{ "texture does not exist" };
+	if (id == 0) {
+		for (const char* tex : dump::GUITextures) {
+			if (std::strcmp(tex, t) == 0) {
+				id = m->GetTextureID(t);
+				break;
+			}
+		}
+		if (id == 0)
+			throw lua::LuaException{ "texture does not exist" };
+	}
 	m->ReloadTexture(id);
 	TexturesToReload.push_back(id);
 	return 0;

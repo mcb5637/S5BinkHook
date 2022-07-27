@@ -231,6 +231,9 @@
     <ClInclude Include="s5_staticlist.h">
       <Filter>shok\globals</Filter>
     </ClInclude>
+    <ClInclude Include="dump_guitextures.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

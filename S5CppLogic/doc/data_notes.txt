@@ -3,7 +3,6 @@ Data Types:
 EntityType:
 path: data/config/entities/typename.xml (list of ids in data/config/entities.xml, dynamically changed)
 example: as originals
-Note: the last added entity type has no blocking.
 
 EffectType:
 path: data/config/effects/typename.xml (usually data/config/effects.xml, dynamically changed)
@@ -66,8 +65,8 @@ GUITexture:
 path: data/graphics/textures/gui/tname.png (full path as id used)
 example: as originals
 Note: GUI textures are used only for widgets. referenced by the gui xml and loaded from there without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
-Note2: Since GUITextures are not known until ModLoader finishes, it is best to load them on ingame GameStart and SaveLoaded functions, together with all other GUI modifications (i recommend AddMapStartAndSaveLoadedCallback from my triggerfix).
-Note3: The full path to the texture is used as id, and having data in front can make the difference between overriding an existing function and loading a new one. have a look at data/menu/projects/ingame.xml to see what path is used.
+Note2: The full path to the texture is used as id, and having data in front can make the difference between overriding an existing function and loading a new one. have a look at data/menu/projects/ingame.xml to see what path is used.
+Note3: a few GUI textures are only getting added via lua later on, namely worker icons, motivation icons and the payday clock. these can be changed by Replace as well.
 
 Animation:
 path: data/graphics/animations/aname.anm

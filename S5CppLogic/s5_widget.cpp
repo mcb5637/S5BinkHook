@@ -40,7 +40,9 @@ RWE::RwTexture* EGUIX::TextureManager::GetTextureByID(int id)
 static inline RWE::RwTexture* (__thiscall* const texman_reloadtext)(EGUIX::TextureManager* th, int id) = reinterpret_cast<RWE::RwTexture * (__thiscall*)(EGUIX::TextureManager*, int)>(0x556D03);
 RWE::RwTexture* EGUIX::TextureManager::ReloadTexture(int id)
 {
-    return texman_reloadtext(this, id);
+    if (id >= static_cast<int>(Textures.size()))
+        return GetTextureByID(id);
+    return texman_reloadtext(this, id); // this thing actually throws if the texture vector is too small
 }
 void EGUIX::TextureManager::FreeTexture(int id)
 {

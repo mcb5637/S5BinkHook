@@ -451,6 +451,11 @@ void EGL::CGLELandscape::UpdateBlocking(const shok::AARect& area)
 		throw std::out_of_range{ "UpdateBlocking high out of range" };
 	landscape_updateblocking(this, low, high);
 }
+static inline void(__thiscall* const lanscape_weatherchangeupdateblockig)(EGL::CGLELandscape* th, int z) = reinterpret_cast<void(__thiscall*)(EGL::CGLELandscape*, int)>(0x579613);
+void EGL::CGLELandscape::WeatherChangeBlockingUpdate()
+{
+	lanscape_weatherchangeupdateblockig(this, 0);
+}
 void EGL::CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot)
 {
 	shok::AARect ar = area.Rotate(rot).Sort();

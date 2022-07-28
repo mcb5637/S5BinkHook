@@ -394,6 +394,12 @@ void EGL::CGLEEntity::Destroy()
 	Destroy(0);
 }
 
+static inline bool(__stdcall* const entity_checkdodge)(EGL::CGLEEntity* th) = reinterpret_cast<bool(__stdcall*)(EGL::CGLEEntity*)>(0x50ABB9);
+bool EGL::CGLEEntity::CheckDodge()
+{
+	return !entity_checkdodge(this); // returns dodge failed
+}
+
 void EGL::CGLEEntity::ClearAttackers()
 {
 	std::vector<GGL::CSettler*> tomove = std::vector<GGL::CSettler*>();
@@ -1867,10 +1873,12 @@ void EGL::CGLEEntity::HookExplorationMod()
 int GGL::CSettler::LeaderGetRegenHealth()
 {
 	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	int i;
 	if (d && d->RegenHPOverride >= 0)
-		return d->RegenHPOverride;
+		i = d->RegenHPOverride;
 	else
-		return GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->HealingPoints;
+		i = GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->HealingPoints;
+	return static_cast<int>(ModifierProfile.GetModifiedValue(EGL::IProfileModifierSetObserver::ModifierType::HealingPoints, static_cast<float>(i)));
 }
 int GGL::CSettler::LeaderGetRegenHealthSeconds()
 {
@@ -1884,6 +1892,11 @@ static inline void(__thiscall* const settler_killbyenviro)(GGL::CSettler* th) = 
 void GGL::CSettler::KillSettlerByEnvironment()
 {
 	settler_killbyenviro(this);
+}
+static inline int(__thiscall* const settler_getdodge)(GGL::CSettler* th) = reinterpret_cast<int(__thiscall*)(GGL::CSettler*)>(0x4A4C1E);
+int GGL::CSettler::GetDodgeChance()
+{
+	return settler_getdodge(this);
 }
 
 static inline void(__thiscall* const settler_upgrade)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x4A6C4A);

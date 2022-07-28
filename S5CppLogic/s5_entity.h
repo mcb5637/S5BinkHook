@@ -217,6 +217,7 @@ namespace EGL {
 		void ExecuteTask(EGL::CGLETaskArgs& targ);
 
 		void PerformHeal(int hp, bool healSoldiers);
+		bool CheckDodge(); // rolls random, returns if dodge successful
 
 		void Destroy();
 
@@ -421,7 +422,7 @@ namespace EGL {
 			Motivation = 111, // no modifier, straight to event Worker_GetMotivation (if not dead)
 			CurrentSoldierAmount = 112, // no modifier, straight to event Leader_GetCurrentNumSoldier
 			MaxSoldierAmount = 113, // no modifier, straight to event Leader_GetMaxNumSoldier
-			Dodge = 114, // dodge mechanics migth actually work, todo check, melee taskhurt, modified by tech and experience
+			Dodge = 114, // gets called, modified by tech and experience
 			AutoAttackRange = 115, // gets called, modified by experience
 			HealingPoints = 116, // gets called, modified by experience
 			MissChance = 117, // gets called, modified by experience
@@ -521,6 +522,7 @@ namespace GGL {
 		int LeaderGetRegenHealth();
 		int LeaderGetRegenHealthSeconds();
 		void KillSettlerByEnvironment();
+		int GetDodgeChance(); // used in melee combat, percent
 
 		void Upgrade();
 

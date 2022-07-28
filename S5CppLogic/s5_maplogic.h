@@ -133,7 +133,8 @@ namespace EGL {
 		PADDINGI(3); // set/list of BB::TSlotEx1<EGL::CGLEGameLogic,EGL::C2DVector const &>
 		EGL::CGLETerrainHiRes* HiRes;
 		EGL::CGLETerrainLowRes* LowRes;
-		EGL::CTerrainVertexColors* VertexColors;
+		EGL::CTerrainVertexColors* VertexColors; // 9
+		bool IsNotWinter;
 
 		static inline constexpr int vtp = 0x783C38;
 
@@ -179,6 +180,7 @@ namespace EGL {
 		void RemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
 		void AdvancedApplyBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot, int height);
 		void UpdateBlocking(const shok::AARect& area);
+		void WeatherChangeBlockingUpdate();
 		void AdvancedRemoveBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot);
 		void AdvancedApplyBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
 		void AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
@@ -199,6 +201,7 @@ namespace EGL {
 		using under = std::underlying_type<EGL::CGLELandscape::BlockingMode>::type;
 		return static_cast<EGL::CGLELandscape::BlockingMode>(static_cast<under>(a) ^ static_cast<under>(b));
 	}
+	//constexpr int i = offsetof(CGLELandscape, CurrentWeather) / 4;
 
 	class LandscapeBlockingData {
 	public:
@@ -231,6 +234,7 @@ namespace EGL {
 	struct LogicGameTime {
 		int Tick;
 		int TicksPerMS;
+		float CurrentWeatherSpeedFactor;
 	};
 
 	class IGLEGameLogic : public BB::IPostEvent {

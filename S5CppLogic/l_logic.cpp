@@ -878,6 +878,11 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
+	int BlockingUpdateWeatherChange(lua::State L) {
+		(*EGL::CGLEGameLogic::GlobalObj)->Landscape->WeatherChangeBlockingUpdate();
+		return 0;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1049,7 +1054,7 @@ namespace CppLogic::Logic {
 		EGL::CGLEEntity::HookSetTaskListNonCancelable(false);
 	}
 
-	constexpr std::array<lua::FuncReference, 50> Logic{ {
+	constexpr std::array<lua::FuncReference, 51> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1100,6 +1105,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<EnableBuildOnMovementFix>("EnableBuildOnMovementFix"),
 			lua::FuncReference::GetRef<CreateFreeModel>("CreateFreeModel"),
 			lua::FuncReference::GetRef<GetNearestFreePosForBuilding>("GetNearestFreePosForBuilding"),
+			lua::FuncReference::GetRef<BlockingUpdateWeatherChange>("BlockingUpdateWeatherChange"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {

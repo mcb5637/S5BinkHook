@@ -26,6 +26,8 @@ AIL_closestream 0x7614A4 dllimport redirect
 0x55A597 jmp button check shortcut logic override
 0x59BFD6 (error) and 0x59C012 (pcall) open lua state call redirect to nop
 0x40B3BE framework todo check jmp override
+changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C6E5C, 0x4C6B15, 0x4C6BA1 and 0x4C6F09 (all GGL::CEntityProfile check experience level)
+0x4C6F28 GGL::CEntityProfile get miss chance noped out check for negative modifier
 
 only without SCELoader
 
@@ -67,3 +69,4 @@ EGL::CGLETerrainLowRes::BridgeHeights vector modified (hires bridge area)
 gamemodebase start map 0x40F851 and 0x40F566 call redirect
 gamemodebase remove archive if externalmap 0x40F8CD and 0x40F604 call redirect
 gamemodebase (sp?) load savegame 0x40FB6E jmp
+0x4C71CA GGL::CEntityProfile init (set experience class) jmp

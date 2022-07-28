@@ -141,6 +141,8 @@ std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TerrainTexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::TerrainTexturesToReload{};
 bool CppLogic::ModLoader::ModLoader::ReloadTerrainTypes = false;
+std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToRemove{};
+std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToReload{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -567,6 +569,41 @@ int CppLogic::ModLoader::ModLoader::ReloadTerrainType(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::AddExperienceClass(lua::State L)
+{
+	GGL::CEntityProfile::HookExperienceClassAssignment(true);
+	const char* n = L.CheckString(1);
+	shok::EntityCategory cat = static_cast<shok::EntityCategory>(L.CheckInt(2));
+	auto* mng = GGL::ExperienceClassHolder::GlobalObj();
+	for (auto* cl : mng->Classes) {
+		if (std::strcmp(cl->Table.c_str(), n) == 0)
+			throw lua::LuaException{ "already exists" };
+	}
+	shok::ExperienceClass id = mng->AddExperienceClass(n, cat);
+	ExperienceClassesToRemove.push_back(id);
+	L.Push("ExperienceClasses");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	if (L.IsTable(-1)) {
+		L.PushValue(1);
+		L.Push(static_cast<int>(id));
+		L.SetTableRaw(-3);
+	}
+	// func exit cleans stack anyway, so no need to pop
+	L.Push(static_cast<int>(id));
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::ReloadExperienceClass(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* mng = GGL::ExperienceClassHolder::GlobalObj();
+	if (id <= 0 || id >= static_cast<int>(mng->Classes.size()))
+		throw lua::LuaException{ "invalid experienceclass" };
+	mng->LoadExperienceClass(static_cast<shok::ExperienceClass>(id));
+	ExperienceClassesToReload.push_back(static_cast<shok::ExperienceClass>(id));
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -786,6 +823,17 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyAllTerrainTypes();
 			ReloadTerrainTypes = false;
 		}
+
+		while (ExperienceClassesToRemove.size() != 0) {
+			shok::ExperienceClass id = ExperienceClassesToRemove.back();
+			ExperienceClassesToRemove.pop_back();
+			GGL::ExperienceClassHolder::GlobalObj()->PopExpeienceClass(id);
+		}
+		for (shok::ExperienceClass id : ExperienceClassesToReload) {
+			GGL::ExperienceClassHolder::GlobalObj()->LoadExperienceClass(id);
+		}
+		ExperienceClassesToReload.clear();
+		GGL::CEntityProfile::HookExperienceClassAssignment(false);
 	}
 }
 

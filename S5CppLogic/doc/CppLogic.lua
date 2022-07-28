@@ -368,6 +368,13 @@ function CppLogic.Logic.EnableBuildOnMovementFix(f) end
 --- @return PositionR pos with rotation
 function CppLogic.Logic.GetNearestFreePosForBuilding(ety, p, range) end
 
+--- performs the same blocking and sector update that a weather change would have done.
+function CppLogic.Logic.BlockingUpdateWeatherChange() end
+
+--- enables/disables applying the effects of experience level 1 and applying a negative MissChance on any level.
+--- @param active boolean
+function CppLogic.Logic.EnableExperienceClassFix(active) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -2363,6 +2370,21 @@ function CppLogic.ModLoader.AddTerrainType(tname, id) end
 --- all terrain types get reloaded on exiting the map, after using this function.
 --- @param id number
 function CppLogic.ModLoader.ReloadTerrainType(id) end
+
+--- loads an ExperienceClass from a xml file (data/config/experiencexpclassname.xml).
+--- assigns this experienceclass to every entity that has the category ecategory.
+--- the ExperienceClass is removed on exiting the map.
+--- (ecategory may be a random int that can get attached to entitytypes via CppLogic.EntityType.AddEntityCategory, just remember to remove it again).
+--- only writes the id to ExperienceClasses if it exists.
+--- @param xpclassname string
+--- @param ecategory number
+--- @return number type_id
+function CppLogic.ModLoader.AddExperienceClass(xpclassname, ecategory) end
+
+--- reloads an ExperienceClass from a xml file (data/config/experiencexpclassname.xml).
+--- the ExperienceClass is reloaded on exiting the map.
+--- @param id number
+function CppLogic.ModLoader.ReloadExperienceClass(id) end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

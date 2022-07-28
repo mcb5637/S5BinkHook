@@ -128,3 +128,9 @@ example:
 	</Display>
 </root>
 Note: remember to load IceBaseTexture and IceDetailTexture as Terrain Textures, if you are not using a vanilla texture.
+
+ExperienceClases:
+path: data/config/experiencexpclassname.xml (note that the file to name Hero is named ExperienceHero.xml and not Hero.xml)
+example: as originals (Note: you do not need to provide the Table field, this gets set by AddExperienceClass)
+Note: the ExperienceClass of a entity depends on its EntityCategories. the first EntityCategory that has a ExperienceClass assocciated with it gets choosen, if multiple apply.
+Note2: with CppLogic.EntityType.AddEntityCategory you can add random ints as EntityCategory (which AddExperienceClass accepts as well), to not need to use a predefined EntityCategory. just remember to clean it up.

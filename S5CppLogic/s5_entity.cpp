@@ -241,6 +241,69 @@ const GGL::ExperienceClass::LevelData* GGL::CEntityProfile::GetExperienceClassLe
 	return entityref_getxpclasslvl(&this->EntityReference, static_cast<int>(ExperienceLevel.Value));
 }
 
+
+void GGL::CEntityProfile::HookExperience(bool active)
+{
+	byte opcode = active ? 0x7C : 0x7E; // ? JumpIfLess : JumpIfLessOrEqual
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
+		reinterpret_cast<void*>(0x4C6A68),
+		reinterpret_cast<void*>(0x4C6CE8),
+		reinterpret_cast<void*>(0x4C6C4E),
+		reinterpret_cast<void*>(0x4C6FB7),
+		reinterpret_cast<void*>(0x4C6DD3),
+		reinterpret_cast<void*>(0x4C6E5C),
+		reinterpret_cast<void*>(0x4C6B15),
+		reinterpret_cast<void*>(0x4C6BA1),
+		reinterpret_cast<void*>(0x4C6F09),
+
+		reinterpret_cast<void*>(0x4C6F28),
+	} };
+	*reinterpret_cast<byte*>(0x4C6A68) = opcode; // get explo
+	*reinterpret_cast<byte*>(0x4C6CE8) = opcode; // get move speed
+	*reinterpret_cast<byte*>(0x4C6C4E) = opcode; // get damage
+	*reinterpret_cast<byte*>(0x4C6FB7) = opcode; // get max attack range
+	*reinterpret_cast<byte*>(0x4C6DD3) = opcode; // get damage bonus
+	*reinterpret_cast<byte*>(0x4C6E5C) = opcode; // get dodge
+	*reinterpret_cast<byte*>(0x4C6B15) = opcode; // get autoattack range
+	*reinterpret_cast<byte*>(0x4C6BA1) = opcode; // get healing points
+	*reinterpret_cast<byte*>(0x4C6F09) = opcode; // get miss chance
+	if (active) {
+		CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x4C6F28), 2); // nop out the check to only use positive xp miss chance modifiers
+	}
+	else {
+		*reinterpret_cast<byte*>(0x4C6F28) = 0x74;
+		*reinterpret_cast<byte*>(0x4C6F29) = 0x08;
+	}
+}
+
+void __fastcall entityprofile_experienceclassassignmenthook(GGL::CEntityProfile::EntityRef* th) {
+	th->ExperienceClass = shok::ExperienceClass::Invalid;
+	for (const auto& d : GGL::ExperienceClassHolder::EntityCategoryToExperienceClass) {
+		if (th->Self->IsEntityInCategory(d.EntityCategory)) {
+			th->ExperienceClass = d.ExperienceClass;
+			break;
+		}
+	}
+}
+void __declspec(naked) entityprofile_experienceclassassignmenthook_asm() {
+	__asm {
+		mov ecx, esi;
+		call entityprofile_experienceclassassignmenthook;
+
+		push 0x4C72AB;
+		ret;
+	};
+}
+byte entityprofile_experienceclassassignmenthook_backup[10]{};
+void GGL::CEntityProfile::HookExperienceClassAssignment(bool active) {
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C71CA), 0x10 };
+	if (active)
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C71CA), &entityprofile_experienceclassassignmenthook_asm, reinterpret_cast<void*>(0x4C71D0), entityprofile_experienceclassassignmenthook_backup);
+	else if (entityprofile_experienceclassassignmenthook_backup[0])
+		CppLogic::Hooks::RestoreJumpBackup(reinterpret_cast<void*>(0x4C71CA), entityprofile_experienceclassassignmenthook_backup);
+}
+
+
 static inline float(__thiscall* const modentitydb_getmod)(GGL::ModifierEntityDatabase* th, int id, GGL::CEntityProfile::ModifierType ty, float initial) = reinterpret_cast<float(__thiscall*)(GGL::ModifierEntityDatabase*, int, GGL::CEntityProfile::ModifierType, float)>(0x584078);
 float GGL::ModifierEntityDatabase::GetModifiedStat(int id, CEntityProfile::ModifierType ty, float initial)
 {

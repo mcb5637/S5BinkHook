@@ -484,6 +484,9 @@ namespace GGL {
 
 
 		static inline constexpr int vtp = 0x7727A4;
+
+		static void HookExperience(bool active);
+		static void HookExperienceClassAssignment(bool active);
 	};
 	static_assert(sizeof(CEntityProfile) == 56 * 4);
 	struct ModifierEntityDatabase {

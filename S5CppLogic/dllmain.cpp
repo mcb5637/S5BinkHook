@@ -70,12 +70,8 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D8A8));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x23962D3D);
-	L.Push((int)(*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(L.CheckInt(1)));
-	if (L.OptBool(2, false)) {
-		DEBUGGER_BREAK;
-		(*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->CreateDisplayForEntity(L.CheckEntity(1));
-	}
-	return 1;
+	GGL::CEntityProfile::HookExperienceClassAssignment(L.ToBoolean(1));
+	return 0;
 }
 
 int Cleanup(lua::State L) {

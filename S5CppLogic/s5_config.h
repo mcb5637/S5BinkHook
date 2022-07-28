@@ -158,24 +158,38 @@ namespace GGL {
 			float Speed;
 			float Exploration;
 			float MissChance; // works for positive
-			// all of them get called by profile modification, check if the modifucation is actually called
+			// all of them get used by profile modification, check there, if it actually gets used somewhere
 		};
 
 		shok::Vector<LevelData> Level;
 
 		LevelData* GetLevel(int lvl);
 
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x87CE88);
 	};
 	static_assert(sizeof(ExperienceClass::LevelData) == 9 * 4);
+	static_assert(sizeof(ExperienceClass) == 11 * 4);
 	class ExperienceClassHolder {
 	public:
-		shok::Vector<ExperienceClass> Classes;
+		shok::Vector<ExperienceClass*> Classes;
 		bool Loaded;
 
 		ExperienceClass* GetClass(shok::ExperienceClass cl);
 
-		static ExperienceClassHolder* GlobalObj();
+		static ExperienceClassHolder* GlobalObj(); // loads on first use
+
+		void LoadExperienceClass(shok::ExperienceClass c);
+		shok::ExperienceClass AddExperienceClass(const char* name, shok::EntityCategory cat);
+		void PopExpeienceClass(shok::ExperienceClass c);
+
+		struct EntityCategoryToExperienceClassData {
+			shok::EntityCategory EntityCategory;
+			shok::ExperienceClass ExperienceClass;
+		};
+		static std::vector<EntityCategoryToExperienceClassData> EntityCategoryToExperienceClass;
 	};
 }
 

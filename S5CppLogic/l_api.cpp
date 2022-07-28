@@ -12,6 +12,7 @@
 #include "s5_framework.h"
 #include "s5_scriptsystem.h"
 #include "s5_idmanager.h"
+#include "s5_config.h"
 #include "hooks.h"
 #include "luaext.h"
 
@@ -233,33 +234,12 @@ namespace CppLogic::API {
 			L.Push(static_cast<int>(shok::ExperienceClass::Invalid));
 			L.SetTableRaw(-3);
 
-			L.Push("Sword");
-			L.Push(static_cast<int>(shok::ExperienceClass::Sword));
-			L.SetTableRaw(-3);
-
-			L.Push("Bow");
-			L.Push(static_cast<int>(shok::ExperienceClass::Bow));
-			L.SetTableRaw(-3);
-
-			L.Push("Spear");
-			L.Push(static_cast<int>(shok::ExperienceClass::Spear));
-			L.SetTableRaw(-3);
-
-			L.Push("LightCavalry");
-			L.Push(static_cast<int>(shok::ExperienceClass::LightCavalry));
-			L.SetTableRaw(-3);
-
-			L.Push("HeavyCavalry");
-			L.Push(static_cast<int>(shok::ExperienceClass::HeavyCavalry));
-			L.SetTableRaw(-3);
-
-			L.Push("Cannon");
-			L.Push(static_cast<int>(shok::ExperienceClass::Cannon));
-			L.SetTableRaw(-3);
-
-			L.Push("Rifle");
-			L.Push(static_cast<int>(shok::ExperienceClass::Rifle));
-			L.SetTableRaw(-3);
+			auto* mng = GGL::ExperienceClassHolder::GlobalObj();
+			for (int i = 0; i < mng->Classes.size(); ++i) {
+				L.Push(mng->Classes[i]->Table.c_str());
+				L.Push(i);
+				L.SetTableRaw(-3);
+			}
 
 			L.SetTableRaw(L.GLOBALSINDEX);
 		}

@@ -35,6 +35,8 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> TerrainTexturesToRemove;
 		static std::vector<int> TerrainTexturesToReload;
 		static bool ReloadTerrainTypes;
+		static std::vector<shok::ExperienceClass> ExperienceClassesToRemove;
+		static std::vector<shok::ExperienceClass> ExperienceClassesToReload;
 
 		static int AddEntityType(lua::State L);
 		static int ReloadEntityType(lua::State L);
@@ -61,8 +63,10 @@ namespace CppLogic::ModLoader {
 		static int ReloadTerrainTexture(lua::State L);
 		static int AddTerrainType(lua::State L);
 		static int ReloadTerrainType(lua::State L);
+		static int AddExperienceClass(lua::State L);
+		static int ReloadExperienceClass(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 25> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 27> LuaFuncs{ {
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -88,6 +92,8 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReloadTerrainTexture>("ReloadTerrainTexture"),
 				lua::FuncReference::GetRef<AddTerrainType>("AddTerrainType"),
 				lua::FuncReference::GetRef<ReloadTerrainType>("ReloadTerrainType"),
+				lua::FuncReference::GetRef<AddExperienceClass>("AddExperienceClass"),
+				lua::FuncReference::GetRef<ReloadExperienceClass>("ReloadExperienceClass"),
 		} };
 
 		static constexpr std::array<lua::FuncReference, 3> NoLoaderFuncs{ {

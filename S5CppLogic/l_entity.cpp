@@ -1853,6 +1853,15 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int BuildingRefreshRelativePositions(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* b = L.CheckBuilding(1);
+		auto* t = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps);
+		b->ApproachPosition = b->Position + t->ApproachPos;
+		b->LeavePosition = b->Position + t->LeavePos;
+		return 0;
+	}
+
 
 	void Cleanup(lua::State L) {
 		DisableConversionHook(L);
@@ -1990,7 +1999,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 31> Building{ {
+	constexpr std::array<lua::FuncReference, 32> Building{ {
 			lua::FuncReference::GetRef<BuildingGetBarracksAutoFillActive>("GetBarracksAutoFillActive"),
 			lua::FuncReference::GetRef<BuildingGetHeight>("GetHeight"),
 			lua::FuncReference::GetRef<BuildingSetHeight>("SetHeight"),
@@ -2022,6 +2031,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<BuildingGetConstructionSite>("GetConstructionSite"),
 			lua::FuncReference::GetRef<ConstructionSiteGetBuilding>("ConstructionSiteGetBuilding"),
 			lua::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
+			lua::FuncReference::GetRef<BuildingRefreshRelativePositions>("RefreshRelativePositions"),
 	} };
 
 	void Init(lua::State L)

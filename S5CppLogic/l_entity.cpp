@@ -1853,13 +1853,16 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int BuildingRefreshRelativePositions(lua::State ls) {
+	int BuildingGetRelativePositions(lua::State ls) {
 		luaext::EState L{ ls };
 		auto* b = L.CheckBuilding(1);
-		auto* t = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps);
-		b->ApproachPosition = b->Position + t->ApproachPos;
-		b->LeavePosition = b->Position + t->LeavePos;
-		return 0;
+		auto* p = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps);
+		shok::Position approach;
+		b->GetApproachPos(&approach);
+		L.PushPos(b->Position + approach);
+		L.PushPos(b->Position + p->LeavePos);
+		L.PushPos(b->Position + p->DoorPos);
+		return 3;
 	}
 
 
@@ -2031,7 +2034,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<BuildingGetConstructionSite>("GetConstructionSite"),
 			lua::FuncReference::GetRef<ConstructionSiteGetBuilding>("ConstructionSiteGetBuilding"),
 			lua::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
-			lua::FuncReference::GetRef<BuildingRefreshRelativePositions>("RefreshRelativePositions"),
+			lua::FuncReference::GetRef<BuildingGetRelativePositions>("GetRelativePositions"),
 	} };
 
 	void Init(lua::State L)

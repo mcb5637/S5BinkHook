@@ -95,9 +95,13 @@ namespace EGUIX {
 	struct Color;
 }
 struct RwTexture;
+struct RtAnimAnimation;
 namespace RWE {
 	struct RpClump;
 	using RwTexture = ::RwTexture;
+	using RtAnimAnimation = ::RtAnimAnimation;
+	struct RtAnimationFrameHandler;
+	struct RtAnimationFrameHandler;
 }
 namespace EScr {
 	class CScriptTrigger;

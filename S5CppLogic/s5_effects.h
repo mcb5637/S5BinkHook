@@ -189,15 +189,15 @@ namespace ED {
 
 	class CHAnimEffect : public IEffect {
 	public:
-		RWE::RpClump* Clump;
-	private:
-		void* anim;
-		void* clumpanim;
+		RWE::RpClump* Clump; // 2
+		RWE::RtAnimAnimation* Anim;
+		RWE::RtAnimationFrameHandler* AnimHandler; // 4
 
 	public:
 		static inline constexpr int vtp = 0x7AE98C;
 		static inline constexpr unsigned int Identifier = 0x11E11B07;
 	};
+	//constexpr int i = offsetof(CHAnimEffect, Clump) / 4;
 
 	class CFlyingEffect : public IEffect {
 	public:

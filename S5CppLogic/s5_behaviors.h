@@ -84,6 +84,7 @@ namespace EGL {
 	};
 
 	struct SSlotArgsAnimation {
+		PADDING(1);
 		bool PlayBackwards;
 		int AnimId;
 		int StartTurn;

@@ -235,7 +235,7 @@ namespace CppLogic::API {
 			L.SetTableRaw(-3);
 
 			auto* mng = GGL::ExperienceClassHolder::GlobalObj();
-			for (int i = 0; i < mng->Classes.size(); ++i) {
+			for (int i = 0; i < static_cast<int>(mng->Classes.size()); ++i) {
 				L.Push(mng->Classes[i]->Table.c_str());
 				L.Push(i);
 				L.SetTableRaw(-3);

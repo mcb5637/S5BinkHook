@@ -1377,9 +1377,12 @@ function CppLogic.Entity.Building.ConstructionSiteGetBuilding(id) end
 --- @return number id
 function CppLogic.Entity.Building.BarracksBuyLeaderByType(id, ety, checkType) end
 
---- refreshes ApproachPosition and LeavePosition of a building. DoorPos is always relative.
+--- gets ApproachPosition, LeavePosition and DoorPos of a building.
 --- @param id entity
-function CppLogic.Entity.Building.RefreshRelativePositions(id) end
+--- @return Position approach
+--- @return Position leave
+--- @return Position door
+function CppLogic.Entity.Building.GetRelativePositions(id) end
 
 
 --- entity type max health.

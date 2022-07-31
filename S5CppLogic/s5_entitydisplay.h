@@ -94,21 +94,31 @@ namespace ED {
 	static_assert(offsetof(CDisplayBehaviorBuildingAnimation, Slot) == 2 * 4);
 
 	class CDisplayStaticWithHierarchy;
-	class CDisplayBehaviorAnimationNoBlending : public ED::IBehavior {
+	class CDisplayBehaviorAnimationNoBlending : public ED::IBehavior { // size 9
 	public:
 		ED::CDisplayStaticWithHierarchy* EntityDisplay = nullptr;
-		EGL::TSlot<EGL::SSlotArgsAnimation, 796165920>* Slot = nullptr;
+		EGL::TSlot<EGL::SSlotArgsAnimation, 796165920>* Slot = nullptr; // 2
+		RWE::RtAnimationFrameHandler* AnimHandlerData;
+		int CurrentAnimId; // 4
+		float AnimSpeed; //?
+		float StartTime; // 6
+		float SpeedModifier;
+		bool PlayBackwards;
+
+
 
 		static inline constexpr int vtp = 0x7AEB08;
 		static inline constexpr int TypeDesc = 0x84D5B4;
 	};
 
-	class CDisplayBehaviorAnimation : public CDisplayBehaviorAnimationNoBlending {
+	class CDisplayBehaviorAnimation : public CDisplayBehaviorAnimationNoBlending { // size 15
 	public:
+		RWE::RtAnimationFrameHandler* AnimHandlerData2; // 9
 
 		static inline constexpr int vtp = 0x7AEB40;
 		static inline constexpr int TypeDesc = 0x84D6A4;
 	};
+	//constexpr int i = offsetof(CDisplayBehaviorAnimationNoBlending, Slot) / 4;
 
 
 
@@ -174,7 +184,7 @@ namespace ED {
 
 	class CDisplayStaticWithHierarchy : public CDisplayStaticEntity {
 	public:
-		PADDINGI(1);
+		RWE::RtAnimationFrameHandler* Handler; // 17
 
 		static inline constexpr int vtp = 0x76AE30;
 	};

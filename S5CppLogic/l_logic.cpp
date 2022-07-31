@@ -896,12 +896,14 @@ namespace CppLogic::Logic {
 	}
 	struct LogicModel {
 		RWE::RpClump* Model = nullptr;
+		RWE::RtAnimationFrameHandler* AnimHandler = nullptr;
 
 		static int Clear(lua::State L) {
 			LogicModel* m = L.GetUserData<LogicModel>(1);
 			if (m->Model) {
 				m->Model->Destroy();
 				m->Model = nullptr;
+				m->AnimHandler = nullptr;
 			}
 			return 0;
 		}
@@ -913,10 +915,27 @@ namespace CppLogic::Logic {
 			if (m->Model) {
 				m->Model->Destroy();
 				m->Model = nullptr;
+				m->AnimHandler = nullptr;
 			}
 			auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid);
 			m->Model = mdata->Instanciate();
 			m->Model->AddToDefaultWorld();
+			return 0;
+		}
+		static int SetAnim(lua::State L) {
+			LogicModel* m = L.GetUserData<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			int anim = L.CheckInt(2);
+			m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
+			if (!m->AnimHandler)
+				throw lua::LuaException{ "no animhandler?" };
+			reinterpret_cast<void(__cdecl*)(void*)>(0x6EC7E0)(m->AnimHandler);
+			reinterpret_cast<byte*>(m->AnimHandler)[1] |= 0x10;
+			auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(anim);
+			m->AnimHandler->SetAnimation(adata);
+			m->AnimHandler->SetTimeOfAnim(0.0f);
+			m->AnimHandler->ApplyTransforms();
 			return 0;
 		}
 		static int Translate(lua::State L) {
@@ -1005,7 +1024,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 	
-		static constexpr const std::array<lua::FuncReference,11> LuaMethods = {
+		static constexpr const std::array<lua::FuncReference,12> LuaMethods = {
 			lua::FuncReference::GetRef<Clear>("Clear"),
 			lua::FuncReference::GetRef<SetModel>("SetModel"),
 			lua::FuncReference::GetRef<Translate>("Translate"),
@@ -1017,6 +1036,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<DisableParticleEffects>("DisableParticleEffects"),
 			lua::FuncReference::GetRef<DisableTerrainDecal>("DisableTerrainDecal"),
 			lua::FuncReference::GetRef<SetColorModulate>("SetColorModulate"),
+			lua::FuncReference::GetRef<SetAnim>("SetAnim"),
 		};
 
 		~LogicModel() {

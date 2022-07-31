@@ -125,6 +125,7 @@ namespace RWE {
 		RwFrame* Translate(const RwV3d* translation, RwOpCombineType combineOp);
 		// returns this
 		RwFrame* ForAllChildren(RwFrameCallBack callBack, void* data);
+		RtAnimationFrameHandler* GetAnimFrameHandler();
 	};
 
 	struct RwObjectHasFrame {
@@ -352,6 +353,25 @@ namespace RWE {
 	};
 	static_assert(offsetof(RwGlobals, memoryFuncs) == 264);
 	//constexpr int i = offsetof(RwGlobals, stringFuncs)/4;
+
+	struct RtAnimationFrameHandler { // attached to a frame, plugin? not sure what this does size 9?
+		int Data;
+		PADDINGI(1);
+		PADDINGI(5); // pointer?
+		PADDINGI(1);
+		struct AnimData {
+			RWE::RtAnimAnimation* Anim;
+			float Time;
+			void* Data;
+		}* Animation; // 8
+
+		RtAnimationFrameHandler* Clone();
+		void SetAnimation(RWE::RtAnimAnimation* a);
+		void Destroy();
+		void SetTimeOfAnim(float t);
+		void ApplyTransforms();
+	};
+	//constexpr int i = offsetof(RtAnimationFrameHandler, Timer)/4;
 }
 
 struct RwTexture {

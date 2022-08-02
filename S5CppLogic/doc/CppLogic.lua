@@ -2211,6 +2211,11 @@ function CppLogic.UI.GetClientSize() end
 --- @return boolean
 function CppLogic.UI.IsContainerWidget(wid) end
 
+--- reloads the GUI xml.
+--- this function is for compatibility with old Hook code specifically, i do recommend using the newer ContainerWidgetCreate... functions with the lua export of the GUIEditor.
+--- @param path string
+function CppLogic.UI.ReloadGUI(path) end
+
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed on leaving the map.
 --- load any additional models you want to use first.

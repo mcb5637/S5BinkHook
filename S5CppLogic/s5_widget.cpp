@@ -548,3 +548,9 @@ void EGUIX::FeedbackEventHandler::FireEvent(BB::CEvent* ev)
 {
     shok_feedbackEventHandler_fireevent(this, ev);
 }
+
+void(__thiscall* const widloader_load)(EGUIX::WidgetLoader* th, const char* f, bool fa) = reinterpret_cast<void(__thiscall*)(EGUIX::WidgetLoader*, const char*, bool)>(0x556464);
+void EGUIX::WidgetLoader::LoadGUI(const char* file)
+{
+    widloader_load(this, file, false);
+}

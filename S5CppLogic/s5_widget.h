@@ -334,6 +334,16 @@ namespace EGUIX {
 	};
 	static_assert(sizeof(CContainerWidget) == 20 * 4);
 
+	class CProjectWidget : public CContainerWidget {
+	public:
+		PADDINGI(1);
+
+		static inline constexpr int vtp = 0x780910;
+		static inline constexpr int TypeDesc = 0x832DFC;
+		static inline constexpr unsigned int Identifier = 0x5CA15E96;
+	};
+	static_assert(sizeof(CProjectWidget) == 21 * 4);
+
 	class CPureTooltipWidget : public EGUIX::CBaseWidget {
 	public:
 		EGUIX::CToolTipHelper ToolTipHelper;
@@ -720,5 +730,16 @@ namespace EGUIX {
 		void FireEvent(BB::CEvent* ev);
 
 		static inline EGUIX::FeedbackEventHandler* (* const GlobalObj)() = reinterpret_cast<EGUIX::FeedbackEventHandler * (*)()>(0x582EE1);
+	};
+
+	class WidgetLoader {
+	public:
+		shok::String PathToGame;
+		CProjectWidget* RootWid;
+		bool Unknown; // seems to be always false?
+
+		void LoadGUI(const char* file);
+
+		static inline WidgetLoader* (* const GlobalObj)() = reinterpret_cast<WidgetLoader * (*)()>(0x5563CC);
 	};
 }

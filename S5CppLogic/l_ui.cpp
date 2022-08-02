@@ -619,6 +619,14 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int ReloadGUI(lua::State L) {
+		const char* str = L.OptString(1, "Data\\Menu\\Projects\\Ingame.xml");
+		if (!BB::CFileSystemMgr::DoesFileExist(str))
+			throw lua::LuaException{ "files does not exist" };
+		EGUIX::WidgetLoader::GlobalObj()->LoadGUI(str);
+		return 0;
+	}
+
 	int SetCharTrigger(lua::State ls) {
 		luaext::EState L{ ls };
 		if (CppLogic::HasSCELoader())
@@ -1032,7 +1040,7 @@ namespace CppLogic::UI {
 		}
 	}
 
-	constexpr std::array<lua::FuncReference, 56> UI{ {
+	constexpr std::array<lua::FuncReference, 57> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1089,6 +1097,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<CreateMiniMapScriptSignal>("CreateMiniMapScriptSignal"),
 		lua::FuncReference::GetRef<GetCutsceneFarClipPlaneMinAndMax>("GetCutsceneFarClipPlaneMinAndMax"),
 		lua::FuncReference::GetRef<SetCutsceneFarClipPlaneMinAndMax>("SetCutsceneFarClipPlaneMinAndMax"),
+		lua::FuncReference::GetRef<ReloadGUI>("ReloadGUI"),
 	} };
 
 	void Init(lua::State L)

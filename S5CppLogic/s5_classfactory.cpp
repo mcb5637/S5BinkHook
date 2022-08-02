@@ -68,6 +68,7 @@ BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushI
 BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategory", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundID", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTexture", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategoryID", &PushInt, &CheckInt };
@@ -140,6 +141,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x83BA08, &InfoBool},
     {0x83CDC8, &InfoBool},
     {0x83CCF8, &InfoBool},
+    {0x80DC80, &InfoBool},
 
     {0x810C98, &InfoInt},
     {0x800108, &InfoInt},
@@ -157,6 +159,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x813514, &InfoInt},
     {0x83CE08, &InfoInt},
     {0x83CD38, &InfoInt},
+    {0x80DCE8, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
@@ -170,6 +173,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x85D53C, &InfoUpgradeCategory},
     {0x85D560, &InfoTechnologyID},
     {0x85A108, &InfoSoundID},
+    {0x85A12C, &InfoAmbientSoundID},
     {0x8587D4, &InfoWeatherEffectTextureID},
     {0xA0D634, &InfoTerrainTextureTextureID},
     {0x85D4F4, &InfoEntityCategory},
@@ -201,6 +205,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x829844, &InfoFloat},
     {0x83CDE8, &InfoFloat},
     {0x83CD18, &InfoFloat},
+    {0x80DCA0, &InfoFloat},
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},

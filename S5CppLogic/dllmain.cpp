@@ -68,10 +68,9 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D8A8));
+	CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x23962D3D);
-	GGL::CEntityProfile::HookExperienceClassAssignment(L.ToBoolean(1));
-	return 0;
+	return 1;
 }
 
 int Cleanup(lua::State L) {

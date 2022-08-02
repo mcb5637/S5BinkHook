@@ -2393,6 +2393,15 @@ function CppLogic.ModLoader.AddExperienceClass(xpclassname, ecategory) end
 --- @param id number
 function CppLogic.ModLoader.ReloadExperienceClass(id) end
 
+--- loads multiple sounds from multiple files (data/sounds/soundname.wav).
+--- the sounds get reloaded any time they get started, so you have to keep the archive loaded.
+--- all sounds get automatically removed on exiting the map.
+--- all sounds added in one call of AddSounds form a random group, on playing one of them, one of the group gets randomly played.
+--- @param soundname string
+--- @param ... string additional sounds for the group
+--- @return number type_id id of first sound
+function CppLogic.ModLoader.AddSounds(soundname, ...) end
+
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.
 function CppLogic_ResetGlobal() end

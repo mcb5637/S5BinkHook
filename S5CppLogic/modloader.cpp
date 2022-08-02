@@ -17,6 +17,7 @@
 #include "s5_entitydisplay.h"
 #include "s5_config.h"
 #include "s5_exception.h"
+#include "s5_sound.h"
 #include "entityiterator.h"
 #include "luaext.h"
 #include "dump_guitextures.h"
@@ -143,6 +144,7 @@ std::vector<int> CppLogic::ModLoader::ModLoader::TerrainTexturesToReload{};
 bool CppLogic::ModLoader::ModLoader::ReloadTerrainTypes = false;
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToRemove{};
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToReload{};
+std::vector<int> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
 
 int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 {
@@ -604,6 +606,41 @@ int CppLogic::ModLoader::ModLoader::ReloadExperienceClass(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
+{
+	int num = L.GetTop();
+	for (int i = 1; i <= num; ++i) {
+		const char* n = L.CheckString(i);
+		if ((*BB::CIDManagerEx::SoundsManager)->GetIdByName(n) != 0)
+			throw lua::LuaException{ "sound already exists" };
+	}
+	auto* mng = *ESnd::CSoESound::GlobalObj;
+	L.Push("Sounds");
+	L.GetTableRaw(L.GLOBALSINDEX);
+	int firstid;
+	{
+		const char* n = L.CheckString(1);
+		firstid = mng->AddSoundToNewGroup(n);
+		std::string s{ n };
+		std::replace(s.begin(), s.end(), '\\', '_');
+		L.Push(s);
+		L.Push(firstid);
+		L.SetTableRaw(-3);
+	}
+	for (int i = 2; i <= num; ++i) {
+		const char* n = L.CheckString(i);
+		int id = mng->AddSoundToLastGroup(n);
+		std::string s{ n };
+		std::replace(s.begin(), s.end(), '\\', '_');
+		L.Push(s);
+		L.Push(id);
+		L.SetTableRaw(-3);
+	}
+	L.Push(firstid);
+	SoundGroupsToRemove.push_back(firstid);
+	return 1;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -834,6 +871,12 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		}
 		ExperienceClassesToReload.clear();
 		GGL::CEntityProfile::HookExperienceClassAssignment(false);
+
+		while (SoundGroupsToRemove.size() != 0) {
+			int id = SoundGroupsToRemove.back();
+			SoundGroupsToRemove.pop_back();
+			(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(id);
+		}
 	}
 }
 

@@ -273,6 +273,23 @@ namespace EGL {
 		static inline constexpr int vtp = 0x775F68;
 		static inline constexpr int TypeDesc = 0x81D998;
 	};
+
+	class CEventSoundPositionAndID : public BB::CEvent {
+	public:
+		int SoundId;
+		bool HasPosition;
+		float X, Y, Z;
+		int Volume;
+		bool Looped;
+
+		CEventSoundPositionAndID(shok::EventIDs e, int soundid, bool hasPos, const shok::Position& p, float z, int vol, bool looped);
+		CEventSoundPositionAndID(CEventSoundPositionAndID&&) = default;
+		CEventSoundPositionAndID(const CEventSoundPositionAndID&) = default;
+		CEventSoundPositionAndID& operator=(CEventSoundPositionAndID&&) = default;
+		CEventSoundPositionAndID& operator=(const CEventSoundPositionAndID&) = default;
+
+		static inline constexpr int vtp = 0x76D4B0;
+	};
 }
 
 namespace GGL {
@@ -830,6 +847,9 @@ namespace shok {
 		ReplaceableEntity_Disable = 0x20025, //BB::CEvent
 		// 20026 set uv anim?
 		// 20027 BB::CEvent also suspend?
+
+		Sound_Start = 0x22001, // EGL::CEventSoundPositionAndID
+		Sound_Stop = 0x22002, // EGL::CEventSoundPositionAndID
 
 		CppL_OnEntityDestroy = 0x50000, // BB::CEvent
 		CppL_OnEntityKilled = 0x50001, // GGL::CEventEntityIndex index is attacker player

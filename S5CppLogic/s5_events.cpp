@@ -117,6 +117,19 @@ EGL::CEventThousandthsGetInteger::CEventThousandthsGetInteger(shok::EventIDs e, 
 	Thousands = thousands;
 }
 
+EGL::CEventSoundPositionAndID::CEventSoundPositionAndID(shok::EventIDs e, int soundid, bool haspos, const shok::Position& p, float z, int vol, bool looped)
+	: BB::CEvent(e)
+{
+	SetVT(vtp);
+	SoundId = soundid;
+	HasPosition = haspos;
+	X = p.X;
+	Y = p.Y;
+	Z = z;
+	Volume = vol;
+	Looped = looped;
+}
+
 GGL::CEventAttachmentTypeGetInteger::CEventAttachmentTypeGetInteger(shok::EventIDs e, shok::AttachmentType t) : BB::CEvent(e)
 {
 	SetVT(GGL::CEventAttachmentTypeGetInteger::vtp);

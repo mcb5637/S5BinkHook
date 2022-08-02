@@ -134,3 +134,11 @@ path: data/config/experiencexpclassname.xml (note that the file to name Hero is 
 example: as originals (Note: you do not need to provide the Table field, this gets set by AddExperienceClass)
 Note: the ExperienceClass of a entity depends on its EntityCategories. the first EntityCategory that has a ExperienceClass assocciated with it gets choosen, if multiple apply.
 Note2: with CppLogic.EntityType.AddEntityCategory you can add random ints as EntityCategory (which AddExperienceClass accepts as well), to not need to use a predefined EntityCategory. just remember to clean it up.
+
+Sound:
+path data/sounds/soundname.wav (note that sounds get only loaded when played, so you have to keep the archive loaded)
+example: as originals
+Note: sounds get categorized into groups by comparing the name before `_rnd_`. when you try to play one sound, one of its group gets randomly played.
+		the AddSounds function does not compare file names, instead all sounds added in one call form a group (which can be of size 1, to always play that one sound).
+Note2: there is no replace for sounds, as they are loaded every time they get used. just replace the file and the modifed sound will get used.
+Note3: if you use folders to organize sounds, use \\ as path separator in AddSounds. this will get chaged to _ in the Sounds table.

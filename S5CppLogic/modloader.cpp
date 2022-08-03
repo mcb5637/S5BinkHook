@@ -146,13 +146,25 @@ std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceCla
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
 
-int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
+int CppLogic::ModLoader::ModLoader::PreLoadEntityType(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	if ((*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIdByName(t))
 		throw lua::LuaException{ "entitytype already exists" };
 	int id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
-	(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->LoadEntityTypeByID(id);
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	int id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIdByName(t);
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+	if (id != 0 && id < static_cast<int>(mng->EntityTypes.size()))
+		throw lua::LuaException{ "entitytype already exists" };
+	id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
+	mng->LoadEntityTypeByID(id);
 	EntityTypesToRemove.push_back(id);
 	L.Push("Entities");
 	L.GetTableRaw(L.GLOBALSINDEX);
@@ -185,6 +197,17 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::PreLoadEffectType(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
+	if (m->EffectTypeManager->GetIdByName(t))
+		throw lua::LuaException{ "effecttype already exists" };
+	int id = m->EffectTypeManager->GetIDByNameOrCreate(t);
+	L.Push(id);
+	return 1;
+}
+
 int CppLogic::ModLoader::ModLoader::ReloadEffectType(lua::State L)
 {
 	int id = L.CheckInt(1);
@@ -201,9 +224,10 @@ int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
-	if (m->EffectTypeManager->GetIdByName(t))
+	int id = m->EffectTypeManager->GetIdByName(t);
+	if (id != 0 && id < static_cast<int>(m->EffectsProps.Effects.size()))
 		throw lua::LuaException{ "effecttype already exists" };
-	int id = m->EffectTypeManager->GetIDByNameOrCreate(t);
+	id = m->EffectTypeManager->GetIDByNameOrCreate(t);
 	m->LoadEffectTypeFromExtraFile(id);
 	L.Push("GGL_Effects");
 	L.GetTableRaw(L.GLOBALSINDEX);
@@ -211,6 +235,17 @@ int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
 	L.Push(id);
 	L.SetTableRaw(-3);
 	ReloadEffectTypes = true;
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::PreLoadTaskList(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
+	if (m->TaskListManager->GetIdByName(t))
+		throw lua::LuaException{ "tasklist already exists" };
+	int id = m->TaskListManager->GetIDByNameOrCreate(t);
 	L.Push(id);
 	return 1;
 }
@@ -230,9 +265,10 @@ int CppLogic::ModLoader::ModLoader::AddTaskList(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
-	if (m->TaskListManager->GetIdByName(t))
+	int id = m->TaskListManager->GetIdByName(t);
+	if (id != 0 && id < static_cast<int>(m->TaskLists.size()))
 		throw lua::LuaException{ "tasklist already exists" };
-	int id = m->TaskListManager->GetIDByNameOrCreate(t);
+	id = m->TaskListManager->GetIDByNameOrCreate(t);
 	m->LoadTaskList(id);
 	TaskListsToRemove.push_back(id);
 	L.Push("TaskLists");
@@ -240,6 +276,17 @@ int CppLogic::ModLoader::ModLoader::AddTaskList(lua::State L)
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
+	L.Push(id);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::PreLoadTechnology(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
+	if ((*BB::CIDManagerEx::TechnologiesManager)->GetIdByName(t))
+		throw lua::LuaException{ "tasklist already exists" };
+	int id = (*BB::CIDManagerEx::TechnologiesManager)->GetIDByNameOrCreate(t);
 	L.Push(id);
 	return 1;
 }
@@ -259,9 +306,10 @@ int CppLogic::ModLoader::ModLoader::AddTechnology(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
-	if ((*BB::CIDManagerEx::TechnologiesManager)->GetIdByName(t))
+	int id = (*BB::CIDManagerEx::TechnologiesManager)->GetIdByName(t);
+	if (id != 0 && id < static_cast<int>(m->Techs.size()))
 		throw lua::LuaException{ "tasklist already exists" };
-	int id = (*BB::CIDManagerEx::TechnologiesManager)->GetIDByNameOrCreate(t);
+	id = (*BB::CIDManagerEx::TechnologiesManager)->GetIDByNameOrCreate(t);
 	m->LoadTech(id);
 	TechsToRemove.push_back(id);
 	L.Push("Technologies");

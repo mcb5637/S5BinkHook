@@ -39,13 +39,17 @@ namespace CppLogic::ModLoader {
 		static std::vector<shok::ExperienceClass> ExperienceClassesToReload;
 		static std::vector<int> SoundGroupsToRemove;
 
+		static int PreLoadEntityType(lua::State L);
 		static int AddEntityType(lua::State L);
 		static int ReloadEntityType(lua::State L);
 		static int SetEntityTypeToReload(lua::State L);
+		static int PreLoadEffectType(lua::State L);
 		static int ReloadEffectType(lua::State L);
 		static int AddEffectType(lua::State L);
+		static int PreLoadTaskList(lua::State L);
 		static int ReloadTaskList(lua::State L);
 		static int AddTaskList(lua::State L);
+		static int PreLoadTechnology(lua::State L);
 		static int ReloadTechnology(lua::State L);
 		static int AddTechnology(lua::State L);
 		static int AddModel(lua::State L);
@@ -68,14 +72,18 @@ namespace CppLogic::ModLoader {
 		static int ReloadExperienceClass(lua::State L);
 		static int AddSounds(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 28> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 32> LuaFuncs{ {
+				lua::FuncReference::GetRef<PreLoadEntityType>("PreLoadEntityType"),
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
 				lua::FuncReference::GetRef<ReloadEffectType>("ReloadEffectType"),
+				lua::FuncReference::GetRef<PreLoadEffectType>("PreLoadEffectType"),
 				lua::FuncReference::GetRef<AddEffectType>("AddEffectType"),
+				lua::FuncReference::GetRef<PreLoadTaskList>("PreLoadTaskList"),
 				lua::FuncReference::GetRef<ReloadTaskList>("ReloadTaskList"),
 				lua::FuncReference::GetRef<AddTaskList>("AddTaskList"),
+				lua::FuncReference::GetRef<PreLoadTechnology>("PreLoadTechnology"),
 				lua::FuncReference::GetRef<ReloadTechnology>("ReloadTechnology"),
 				lua::FuncReference::GetRef<AddTechnology>("AddTechnology"),
 				lua::FuncReference::GetRef<AddModel>("AddModel"),

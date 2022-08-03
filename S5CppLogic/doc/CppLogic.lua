@@ -2229,6 +2229,11 @@ function CppLogic.ModLoader.AddEntityType(typename) end
 --- @param tid number
 function CppLogic.ModLoader.ReloadEntityType(tid) end
 
+--- assigns an id in the EntityType IdManager. A call to AddEntityType is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadEntityType(typename) end
+
 --- sets an entitytype to get automatically reloaded on leaving the map (after s5x archives got removed).
 --- (for editing it manually via CppLogic).
 --- this function is available after ModLoader finishes.
@@ -2248,6 +2253,11 @@ function CppLogic.ModLoader.AddEffectType(typename) end
 --- @param tid number
 function CppLogic.ModLoader.ReloadEffectType(tid) end
 
+--- assigns an id in the EffectType IdManager. A call to AddEffectType is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadEffectType(typename) end
+
 --- loads a task list from a xml file (data/config/tasklists/tlname.xml).
 --- the task list gets automatically removed on leaving the map.
 --- @param tlname string
@@ -2259,6 +2269,11 @@ function CppLogic.ModLoader.AddTaskList(tlname) end
 --- @param tid number
 function CppLogic.ModLoader.ReloadTaskList(tid) end
 
+--- assigns an id in the TaskList IdManager. A call to AddTaskList is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadTaskList(typename) end
+
 --- loads a technology from a xml file (data/config/technologies/tname.xml).
 --- the tech gets automatically removed on leaving the map.
 --- @param tname string
@@ -2269,6 +2284,11 @@ function CppLogic.ModLoader.AddTechnology(tname) end
 --- all technologies get reloaded in any case on starting a new map.
 --- @param tid number
 function CppLogic.ModLoader.ReloadTechnology(tid) end
+
+--- assigns an id in the Technologies IdManager. A call to AddTechnology is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadTechnology(typename) end
 
 --- loads a model from a xml and dff file (data/config/models/mname.xml and data/graphics/models/mname.dff).
 --- the xml contains the data from Models.xml, the dff is the actual model.

@@ -301,6 +301,8 @@ void GGL::CEntityProfile::HookExperienceClassAssignment(bool active) {
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C71CA), &entityprofile_experienceclassassignmenthook_asm, reinterpret_cast<void*>(0x4C71D0), entityprofile_experienceclassassignmenthook_backup);
 	else if (entityprofile_experienceclassassignmenthook_backup[0])
 		CppLogic::Hooks::RestoreJumpBackup(reinterpret_cast<void*>(0x4C71CA), entityprofile_experienceclassassignmenthook_backup);
+	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x4C7039), 0x10 };
+	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x4C7039), reinterpret_cast<void*>(0x4C703E));
 }
 
 

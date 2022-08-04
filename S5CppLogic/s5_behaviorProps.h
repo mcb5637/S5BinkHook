@@ -121,7 +121,7 @@ namespace GGL {
 
 	class CSummonBehaviorProps : public GGL::CHeroAbilityProps {
 	public:
-		int SummonedEntityType, NumberOfSummonedEntities, SummonTaskList;
+		int SummonedEntityType = 0, NumberOfSummonedEntities = 0, SummonTaskList = 0;
 
 		static inline constexpr int vtp = 0x773C50;
 		static inline constexpr int TypeDesc = 0x817DE4;

@@ -299,7 +299,7 @@ namespace GGL {
 
 	class CSummonBehavior : public GGL::CHeroAbility {
 	public:
-		GGL::CSummonBehaviorProps* SUProps;
+		GGL::CSummonBehaviorProps* SUProps = nullptr;
 
 		// defined events: HeroAbility_Reset, Summon_ActivateCommand
 		// defined tasks: TASK_SUMMON_ENTITIES

@@ -82,8 +82,11 @@ void Framework::AGameModeBase::RemoveArchiveIfExternalmap()
 }
 
 void (*Framework::AGameModeBase::PreStartMap)(lua_State* ingame, const char* name, const char* path, bool externalmap) = nullptr;
+void (*Framework::AGameModeBase::PreStartMap2)(lua_State* ingame, const char* name, const char* path, bool externalmap) = nullptr;
 static inline bool(__thiscall* const gamemodebase_startmap)(Framework::AGameModeBase* mode, const char* name, const char* path) = reinterpret_cast<bool(__thiscall*)(Framework::AGameModeBase*, const char*, const char*)>(0x40E5F0);
 bool __fastcall gamemodebase_startmapoverride(Framework::AGameModeBase* mode, int _, const char* name, const char* path) {
+    if (Framework::AGameModeBase::PreStartMap2)
+        Framework::AGameModeBase::PreStartMap2(mode->IngameLuaState, name, path, mode->IsExternalMap);
     if (Framework::AGameModeBase::PreStartMap)
         Framework::AGameModeBase::PreStartMap(mode->IngameLuaState, name, path, mode->IsExternalMap);
     return gamemodebase_startmap(mode, name, path);
@@ -122,7 +125,10 @@ void Framework::AGameModeBase::HookRemoveArchive()
 
 
 void (*Framework::AGameModeBase::PreLoadSave)(lua_State* ingame, GameModeStartMapData* data, bool externalmap) = nullptr;
+void (*Framework::AGameModeBase::PreLoadSave2)(lua_State* ingame, GameModeStartMapData* data, bool externalmap) = nullptr;
 void __fastcall gamemodebase_onsaveload(Framework::AGameModeBase* th, Framework::GameModeStartMapData* d) {
+    if (Framework::AGameModeBase::PreLoadSave2)
+        Framework::AGameModeBase::PreLoadSave2(th->IngameLuaState, d, th->IsExternalMap);
     if (Framework::AGameModeBase::PreLoadSave)
         Framework::AGameModeBase::PreLoadSave(th->IngameLuaState, d, th->IsExternalMap);
 }

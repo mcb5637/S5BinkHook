@@ -175,10 +175,12 @@ namespace Framework {
 		void RemoveArchiveIfExternalmap();
 
 		static void (*PreStartMap)(lua_State* ingame, const char* name, const char* path, bool externalmap);
+		static void (*PreStartMap2)(lua_State* ingame, const char* name, const char* path, bool externalmap);
 		static void HookStartMap();
 		static bool DoNotRemoveNextArchive;
 		static void HookRemoveArchive();
 		static void (*PreLoadSave)(lua_State* ingame, GameModeStartMapData* data, bool externalmap);
+		static void (*PreLoadSave2)(lua_State* ingame, GameModeStartMapData* data, bool externalmap);
 		static void HookLoadSave();
 	};
 	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);

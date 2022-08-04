@@ -194,7 +194,7 @@ namespace ED {
 		int DisplayClass;
 		int Model[4];
 		bool DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
-		shok::Vector<int> AnimList;
+		shok::Vector<int> AnimList; // 8
 		shok::Vector<ED::CBehaviorProps*> DisplayBehaviorProps;
 
 		template<class T>
@@ -226,6 +226,7 @@ namespace ED {
 		static inline constexpr int TypeDesc = 0x83C918;
 	};
 	static_assert(sizeof(ED::CDisplayEntityProps) == 16 * 4);
+	//constexpr int i = offsetof(CDisplayEntityProps, AnimList)/4;
 }
 
 namespace GGlue {

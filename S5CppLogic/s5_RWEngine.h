@@ -371,7 +371,7 @@ namespace RWE {
 		void SetTimeOfAnim(float t);
 		void ApplyTransforms();
 	};
-	//constexpr int i = offsetof(RtAnimationFrameHandler, Timer)/4;
+	//constexpr int i = offsetof(RtAnimationFrameHandler, Animation)/4;
 }
 
 struct RwTexture {

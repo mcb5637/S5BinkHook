@@ -897,6 +897,7 @@ namespace CppLogic::Logic {
 	struct LogicModel {
 		RWE::RpClump* Model = nullptr;
 		RWE::RtAnimationFrameHandler* AnimHandler = nullptr;
+		float Lasttime = 0;
 
 		static int Clear(lua::State L) {
 			LogicModel* m = L.GetUserData<LogicModel>(1);
@@ -930,12 +931,25 @@ namespace CppLogic::Logic {
 			m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
 			if (!m->AnimHandler)
 				throw lua::LuaException{ "no animhandler?" };
-			reinterpret_cast<void(__cdecl*)(void*)>(0x6EC7E0)(m->AnimHandler);
-			reinterpret_cast<byte*>(m->AnimHandler)[1] |= 0x10;
+			//reinterpret_cast<void(__cdecl*)(void*)>(0x6EC7E0)(m->AnimHandler);
+			//reinterpret_cast<byte*>(m->AnimHandler)[1] |= 0x10;
 			auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(anim);
 			m->AnimHandler->SetAnimation(adata);
 			m->AnimHandler->SetTimeOfAnim(0.0f);
 			m->AnimHandler->ApplyTransforms();
+			m->Lasttime = static_cast<float>((*EGL::CGLEGameLogic::GlobalObj)->InGameTime->Tick) * (*EGL::CGLEGameLogic::GlobalObj)->InGameTime->TicksPerMS / 1000;
+			return 0;
+		}
+		static int AdvanceAnim(lua::State L) {
+			LogicModel* m = L.GetUserData<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			if (!m->AnimHandler)
+				throw lua::LuaException{ "set an anim first" };
+			float t = static_cast<float>((*EGL::CGLEGameLogic::GlobalObj)->InGameTime->Tick) * (*EGL::CGLEGameLogic::GlobalObj)->InGameTime->TicksPerMS / 1000;
+			m->AnimHandler->SetTimeOfAnim(t - m->Lasttime);
+			m->AnimHandler->ApplyTransforms();
+			m->Lasttime = t;
 			return 0;
 		}
 		static int Translate(lua::State L) {
@@ -1024,7 +1038,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 	
-		static constexpr const std::array<lua::FuncReference,12> LuaMethods = {
+		static constexpr const std::array<lua::FuncReference,13> LuaMethods = {
 			lua::FuncReference::GetRef<Clear>("Clear"),
 			lua::FuncReference::GetRef<SetModel>("SetModel"),
 			lua::FuncReference::GetRef<Translate>("Translate"),
@@ -1037,6 +1051,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<DisableTerrainDecal>("DisableTerrainDecal"),
 			lua::FuncReference::GetRef<SetColorModulate>("SetColorModulate"),
 			lua::FuncReference::GetRef<SetAnim>("SetAnim"),
+			lua::FuncReference::GetRef<AdvanceAnim>("AdvanceAnim"),
 		};
 
 		~LogicModel() {

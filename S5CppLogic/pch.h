@@ -8,6 +8,7 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
+#define NOMINMAX
 #include "framework.h"
 #include <exception>
 #include <vector>
@@ -17,5 +18,6 @@
 #include <functional>
 #include <numbers>
 #include <stdexcept>
+#include <algorithm>
 
 #endif //PCH_H

@@ -207,7 +207,7 @@ float EGL::CGLETerrainLowRes::GetBridgeHeightFloat(float x, float y)
 
 
 float __fastcall shok_ED_CLandscape_overridegetwaterheightatpos(ED::CLandscape* th, int _, float x, float y) { // this func breaks its arguments, so i have to rewrite it instead of patching a few instructions
-	shok::Position p{ min(max(0, x), th->WorldSizeX),min(max(0, y), th->WorldSizeY) };
+	shok::Position p{ std::min(std::max(0.0f, x), th->WorldSizeX),std::min(std::max(0.0f, y), th->WorldSizeY) };
 	if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&p, EGL::CGLELandscape::BlockingMode::BridgeArea)) {
 		return static_cast<float>(th->TerrainLowRes->GetBridgeHeight(p));
 	}
@@ -302,14 +302,14 @@ EGL::CGLELandscape::AdvancedAARectIterator::AdvancedAARectIterator(const shok::P
 	shok::AARect rotated = area;
 	rotated.low = area.low.Rotate(rot);
 	rotated.high = area.high.Rotate(rot);
-	shok::Position p2{ min(rotated.low.X, rotated.high.X) + p.X, min(rotated.low.Y, rotated.high.Y) + p.Y };
+	shok::Position p2{ std::min(rotated.low.X, rotated.high.X) + p.X, std::min(rotated.low.Y, rotated.high.Y) + p.Y };
 	int low[2] = { 0,0 };
 	int high[2] = { 0,0 };
 	if (LowRes)
 		EGL::CGLETerrainLowRes::ToQuadCoord(p2, low);
 	else
 		EGL::CGLETerrainHiRes::ToTerrainCoord(p2, low);
-	p2 = { max(rotated.low.X, rotated.high.X) + p.X, max(rotated.low.Y, rotated.high.Y) + p.Y };
+	p2 = { std::max(rotated.low.X, rotated.high.X) + p.X, std::max(rotated.low.Y, rotated.high.Y) + p.Y };
 	if (LowRes)
 		EGL::CGLETerrainLowRes::ToQuadCoord(p2, high);
 	else
@@ -439,11 +439,11 @@ void EGL::CGLELandscape::RemoveBlocking(const shok::Position& p, const shok::AAR
 static inline void(__thiscall* const landscape_updateblocking)(EGL::CGLELandscape* th, int* low, int* high) = reinterpret_cast<void(__thiscall*)(EGL::CGLELandscape*, int*, int*)>(0x5796A2);
 void EGL::CGLELandscape::UpdateBlocking(const shok::AARect& area)
 {
-	shok::Position p{ min(area.low.X, area.high.X), min(area.low.Y, area.high.Y) };
+	shok::Position p{ std::min(area.low.X, area.high.X), std::min(area.low.Y, area.high.Y) };
 	int low[2] = { 0,0 };
 	int high[2] = { 0,0 };
 	HiRes->ToTerrainCoord(p, low);
-	p = { max(area.low.X, area.high.X), max(area.low.Y, area.high.Y) };
+	p = { std::max(area.low.X, area.high.X), std::max(area.low.Y, area.high.Y) };
 	HiRes->ToTerrainCoord(p, high);
 	if (!HiRes->IsCoordValid(low))
 		throw std::out_of_range{ "UpdateBlocking low out of range" };

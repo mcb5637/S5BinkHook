@@ -420,9 +420,9 @@ namespace CppLogic::Iterator {
 	class PredicateInRect : public Predicate<T> {
 		const shok::AARect rect;
 	public:
-		PredicateInRect(const shok::AARect& r) : rect{ min(r.low.X, r.high.X), min(r.low.Y, r.high.Y), max(r.low.X, r.high.X), max(r.low.Y, r.high.Y) } {
+		PredicateInRect(const shok::AARect& r) : rect{ std::min(r.low.X, r.high.X), std::min(r.low.Y, r.high.Y), std::max(r.low.X, r.high.X), std::max(r.low.Y, r.high.Y) } {
 		}
-		PredicateInRect(float x1, float y1, float x2, float y2) : rect{ min(x1, x2), min(y1, y2), max(x1, x2), max(y1, y2) } {
+		PredicateInRect(float x1, float y1, float x2, float y2) : rect{ std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2) } {
 		}
 		virtual bool Matches(const T* e, float* rangeOut, int* prio) const override {
 			return rect.low.X <= e->Position.X && e->Position.X <= rect.high.X && rect.low.Y <= e->Position.Y && e->Position.Y <= rect.high.Y;

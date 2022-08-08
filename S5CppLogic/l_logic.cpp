@@ -962,7 +962,7 @@ namespace CppLogic::Logic {
 				float t = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
 				if (L.OptBool(6, false)) {
 					float w = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
-					h += max(t, w);
+					h += std::max(t, w);
 				}
 				else {
 					h += t;

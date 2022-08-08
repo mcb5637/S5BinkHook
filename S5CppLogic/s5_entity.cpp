@@ -1977,7 +1977,7 @@ void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)
 	if (hp <= 0)
 		return;
 	if (hp < mhp) {
-		int healsel = min(r, mhp - hp);
+		int healsel = std::min(r, mhp - hp);
 		hp += healsel;
 		r -= healsel;
 		SetHealth(hp);

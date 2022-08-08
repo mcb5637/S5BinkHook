@@ -1264,6 +1264,13 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	}
 	if (xp && attacker && xptoadd) {
 		GGL::CLeaderBehavior* al = attacker->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CEventEntityIndex xpev{ shok::EventIDs::CppL_AffectedExperienceGained, attacker->EntityId, xptoadd };
+		for (const auto& at : attacker->ObserverEntities) {
+			if (at.first == shok::AttachmentType::HERO_AFFECTED) {
+				EGL::CGLEEntity::GetEntityByID(at.second.EntityId)->FireEvent(&xpev);
+			}
+		}
+		xptoadd = xpev.Index;
 		if (al) {
 			al->Experience += xptoadd;
 		}

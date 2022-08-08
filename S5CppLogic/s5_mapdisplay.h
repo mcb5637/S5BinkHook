@@ -1,4 +1,5 @@
 #pragma once
+#include "enumflags.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_maplogic.h"
@@ -78,9 +79,9 @@ namespace ED {
 			float SelectionOffsetX = 0; // 6
 			float SelectionOffsetY = 0;
 			float SelectionRadius = 0;
-			bool CastShadow = true, DoNotDestroyHierarchy = false, HasUVAnim = false, OcclusionCaster = false;
-			bool OcclusionReceiver = false, OrnamentalItem = false, ShareShadowRaster = false, UseAlphaBlending = false;
-			bool UseSurfaceHeight = false, TwoPassAlphaBlending = false, AlphaBlendHighQualityOnly = false; PADDING(1);
+			bool CastShadow = true, DoNotDestroyHierarchy = false, HasUVAnim = false, OcclusionCaster = false; // 9
+			bool OcclusionReceiver = false, OrnamentalItem = false, ShareShadowRaster = false, UseAlphaBlending = false; // 10
+			bool UseSurfaceHeight = false, TwoPassAlphaBlending = false, AlphaBlendHighQualityOnly = false; PADDING(1); // 11
 			int DefaultAnimID = 0; // 12
 
 			ModelData() = default;
@@ -152,10 +153,26 @@ namespace ED {
 	};
 
 	struct ModelData {
+		enum class ModelFlags : unsigned int {
+			None = 0,
+			HasUnknownAddon = 1,
+			ShareShadowRaster = 2,
+			HasAnotherUnknownAddon = 4,
+			CastShadow = 8,
+			UseAlphaBlending = 0x10,
+			UseAlphaBlending_1 = 0x20,
+			UseAlphaBlending_DistanceGreater0 = 0x40,
+			UseSurfaceHeight = 0x200,
+			HierarchyDestroyed = 0x400,
+			AlphaBlendHighQualityOnly = 0x800,
+		};
+
 		RWE::RpClump* Clump = nullptr;
-		PADDINGI(5);
+		PADDINGI(4);
+		ModelFlags Flags;
 		void* UVAnim = nullptr; // 6
-		PADDINGI(2);
+		float OnePassAlphaBlendingDistanceSquared = 0;
+		PADDINGI(1);
 		char* ModelName = nullptr; // 9
 		PADDINGI(7);
 		float SelectionOffsetX = 0; // 17
@@ -176,6 +193,8 @@ namespace ED {
 	};
 	//constexpr int i = offsetof(ModelData, ModelName) / 4;
 	static_assert(sizeof(ModelData) == 22 * 4);
+	template<>
+	class ::enum_is_flags<ED::ModelData::ModelFlags> : public std::true_type {};
 
 	template<class T>
 	class CDEResourceList {

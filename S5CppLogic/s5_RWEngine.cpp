@@ -140,10 +140,10 @@ RWE::RpWorld* RWE::RpWorld::RemoveClump(RpClump* clump)
     return world_remclump(this, clump);
 }
 
-static inline RWE::RtAnimationFrameHandler* (__cdecl* const animframehandler_clone)(RWE::RtAnimationFrameHandler* th, int d, void* da) = reinterpret_cast<RWE::RtAnimationFrameHandler * (__cdecl*)(RWE::RtAnimationFrameHandler*, int, void*)>(0x6EBB30);
+static inline RWE::RtAnimationFrameHandler* (__cdecl* const animframehandler_clone)(RWE::RtAnimationFrameHandler* th, RWE::RtAnimationFrameHandler::AnimFlags d, void* da) = reinterpret_cast<RWE::RtAnimationFrameHandler * (__cdecl*)(RWE::RtAnimationFrameHandler*, RWE::RtAnimationFrameHandler::AnimFlags, void*)>(0x6EBB30);
 RWE::RtAnimationFrameHandler* RWE::RtAnimationFrameHandler::Clone()
 {
-    return animframehandler_clone(this, Data, Animation->Data);
+    return animframehandler_clone(this, Flags, Animation->Data);
 }
 static inline void(__cdecl* const animframehandler_anim_setanim)(RWE::RtAnimationFrameHandler::AnimData* th, RWE::RtAnimAnimation* a) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, RWE::RtAnimAnimation*)>(0x6EAE10);
 void RWE::RtAnimationFrameHandler::SetAnimation(RWE::RtAnimAnimation* a)
@@ -164,6 +164,34 @@ static inline void(__cdecl* const animframehandler_apply)(RWE::RtAnimationFrameH
 void RWE::RtAnimationFrameHandler::ApplyTransforms()
 {
     animframehandler_apply(this);
+}
+
+void RWE::RtAnimationFrameHandler::SetupForModel(RWE::RpClump* c)
+{
+    struct data {
+        RWE::RtAnimationFrameHandler* th;
+        bool found = false;
+    };
+    data d{ this };
+    c->ForAllAtomics(reinterpret_cast<RWE::RpAtomicCallBack>(0x487D1A), &d);
+    struct unknownclumpaddon {
+        PADDINGI(3);
+        ED::ModelData* ModelData;
+    };
+    unknownclumpaddon* a = reinterpret_cast<unknownclumpaddon*>(reinterpret_cast<int>(c) + *reinterpret_cast<int*>(0x858228));
+    ED::ModelData::ModelFlags flags = ED::ModelData::ModelFlags::None;
+    if (a->ModelData) {
+        flags = a->ModelData->Flags;
+    }
+    if (d.found && (flags & ED::ModelData::ModelFlags::HierarchyDestroyed) != ED::ModelData::ModelFlags::None) {
+        //reinterpret_cast<byte*>(this)[1] &= 0xCFu; // ~0x30
+        Flags = Flags & ~(AnimFlags::DoNotDestroyHierarchy | AnimFlags::HierarchyNotDestroyed);
+    }
+    else {
+        //reinterpret_cast<byte*>(this)[1] |= 0x10;
+        Flags = Flags | AnimFlags::DoNotDestroyHierarchy;
+        reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler*)>(0x6EC7E0)(this);
+    }
 }
 
 static inline RwTexture* (__cdecl* const texture_read)(const char* n, const char* m) = reinterpret_cast<RwTexture* (__cdecl*)(const char*, const char*)>(0x417DB0);

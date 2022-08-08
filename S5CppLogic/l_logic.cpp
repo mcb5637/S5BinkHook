@@ -931,9 +931,8 @@ namespace CppLogic::Logic {
 			m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
 			if (!m->AnimHandler)
 				throw lua::LuaException{ "no animhandler?" };
-			//reinterpret_cast<void(__cdecl*)(void*)>(0x6EC7E0)(m->AnimHandler);
-			//reinterpret_cast<byte*>(m->AnimHandler)[1] |= 0x10;
 			auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(anim);
+			m->AnimHandler->SetupForModel(m->Model);
 			m->AnimHandler->SetAnimation(adata);
 			m->AnimHandler->SetTimeOfAnim(0.0f);
 			m->AnimHandler->ApplyTransforms();

@@ -183,6 +183,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
   <ItemGroup>
     <ClInclude Include="dump_guitextures.h" />
     <ClInclude Include="entityiterator.h" />
+    <ClInclude Include="enumflags.h" />
     <ClInclude Include="hooks.h" />
     <ClInclude Include="luaext.h" />
     <ClInclude Include="Luapp\constexprTypename.h" />

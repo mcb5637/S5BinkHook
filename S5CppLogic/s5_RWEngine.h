@@ -1,4 +1,5 @@
 #pragma once
+#include "enumflags.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 
@@ -355,7 +356,14 @@ namespace RWE {
 	//constexpr int i = offsetof(RwGlobals, stringFuncs)/4;
 
 	struct RtAnimationFrameHandler { // attached to a frame, plugin? not sure what this does size 9?
-		int Data;
+		enum class AnimFlags : unsigned int {
+			None = 0,
+			DoNotDestroyHierarchy = 0x1000,
+			HierarchyNotDestroyed = 0x2000,
+		};
+
+
+		AnimFlags Flags;
 		PADDINGI(1);
 		PADDINGI(5); // pointer?
 		PADDINGI(1);
@@ -370,7 +378,10 @@ namespace RWE {
 		void Destroy();
 		void SetTimeOfAnim(float t);
 		void ApplyTransforms();
+		void SetupForModel(RWE::RpClump* c);
 	};
+	template<>
+	class ::enum_is_flags<RtAnimationFrameHandler::AnimFlags> : public std::true_type {};
 	//constexpr int i = offsetof(RtAnimationFrameHandler, Animation)/4;
 }
 

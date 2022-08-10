@@ -14,8 +14,8 @@ namespace EScr {
 
 	class CScriptTriggerSystem : public IScriptTriggerSystem {
 	public:
-		shok::Map<unsigned int, CScriptTrigger*> Trigger; // UniqueID -> Data
-		PADDINGI(3); // map of active triggers???
+		shok::Map<unsigned int, CScriptTrigger*> Trigger; // 2 UniqueID -> Data
+		shok::Map<shok::EventIDs, shok::Vector<CScriptTrigger*>> ActiveTrigger;
 		unsigned int UniqueTriggerID; // next trigger id 8
 		bool TriggerSystemDisabled;
 
@@ -35,7 +35,7 @@ namespace EScr {
 
 		static void HookRemoveFuncOverrides();
 	};
-	//constexpr int i = offsetof(CScriptTriggerSystem, UniqueTriggerID) / 4;
+	//constexpr int i = offsetof(CScriptTriggerSystem, Trigger) / 4;
 
 	class CLuaFuncRef {
 	public:
@@ -92,7 +92,7 @@ namespace EScr {
 		bool Switch; // active
 		CLuaFuncRefGlobal ConditionFunc;
 		CLuaFuncRefGlobal ActionFunc;
-		PADDINGI(1); // 1 bool, unrequest?
+		bool MarkedForUnrequest; // 25
 		struct {
 			unsigned int UniqueID;
 		} UniqueID; // 26
@@ -101,6 +101,9 @@ namespace EScr {
 
 		static inline constexpr int vtp = 0x786664;
 		static inline constexpr unsigned int Identifier = 0x772113A3;
+
+		bool CallCondition();
+		bool CallAction();
 	};
 	static_assert(offsetof(CScriptTrigger, ActionFunc) == 14 * 4);
 	static_assert(sizeof(CScriptTrigger) == 35 * 4);

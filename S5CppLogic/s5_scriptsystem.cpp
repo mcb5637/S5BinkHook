@@ -86,3 +86,15 @@ void EScr::CLuaFuncRefGlobal::SetCommandString(const char* c)
 {
 	funcglo_set(this, c);
 }
+
+static inline int(__thiscall* const scripttrigger_callcond)(EScr::CScriptTrigger* th) = reinterpret_cast<int(__thiscall*)(EScr::CScriptTrigger*)>(0x59EEE4);
+bool EScr::CScriptTrigger::CallCondition()
+{
+	return scripttrigger_callcond(this);
+}
+
+static inline int(__thiscall* const scripttrigger_callact)(EScr::CScriptTrigger* th) = reinterpret_cast<int(__thiscall*)(EScr::CScriptTrigger*)>(0x59EF21);
+bool EScr::CScriptTrigger::CallAction()
+{
+	return scripttrigger_callact(this);
+}

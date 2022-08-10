@@ -244,8 +244,12 @@ namespace Framework {
 		// GS3DTools::CMapData::vtable???
 		PADDINGI(63);
 		shok::String SavegameToLoad; // 90
-
-		PADDINGI(46);
+		PADDINGI(14);
+		shok::String Language; // 111
+		shok::String OldGameVersion; // 118 unused, SHOKPC1.05
+		shok::String UbiComGameName; // 125
+		shok::String SoundtrackLanguage; // 132
+		PADDINGI(4);
 		CLuaDebuggerPort* LuaDebuggerPort;
 		lua_State* MainmenuState; // 144
 		bool MainmenuInitialized; // just call to reinit instead of init, lua scripts are loaded from winmain
@@ -272,6 +276,7 @@ namespace Framework {
 		void SaveGDB();
 
 		static inline Framework::CMain** const GlobalObj = reinterpret_cast<Framework::CMain**>(0x84EF60);
+		static inline const int* const ExtraNum = reinterpret_cast<int*>(0x886BA8);
 
 		static void HookModeChange();
 		static void (*OnModeChange)(NextMode mode);
@@ -282,7 +287,7 @@ namespace Framework {
 	static_assert(offsetof(Framework::CMain, GameModeBase) == 169 * 4);
 	static_assert(offsetof(Framework::CMain, SavegameToLoad) == 90 * 4);
 	static_assert(offsetof(Framework::CMain, GluePropsManager) == 150 * 4);
-	//constexpr int i = offsetof(Framework::CMain, GluePropsManager) / 4;
+	//constexpr int i = offsetof(Framework::CMain, MainmenuState) / 4;
 }
 
 

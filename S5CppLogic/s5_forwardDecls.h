@@ -50,6 +50,7 @@ namespace EGL {
 	class CEffect;
 	class CGLEEffectCreator;
 	class EffectsDisplayProps;
+	class CGLEAnimProps;
 }
 namespace GGL {
 	class CBuilding;
@@ -70,6 +71,10 @@ namespace ED {
 	struct ModelData;
 	class CEffectProps;
 	class EntityTypeDisplayProps;
+	class CTerrainDecalBase;
+}
+namespace GD {
+	class CDDisplay;
 }
 namespace BB {
 	class CEvent;

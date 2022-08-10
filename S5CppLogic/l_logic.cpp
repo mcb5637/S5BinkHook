@@ -888,6 +888,14 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int GetAnimationDuration(lua::State L) {
+		int id = L.CheckInt(1);
+		if ((*BB::CIDManagerEx::AnimManager)->GetNameByID(id) == nullptr)
+			throw lua::LuaException{ "not an animation" };
+		L.Push((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimationDuration(id));
+		return 1;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -897,7 +905,7 @@ namespace CppLogic::Logic {
 	struct LogicModel {
 		RWE::RpClump* Model = nullptr;
 		RWE::RtAnimationFrameHandler* AnimHandler = nullptr;
-		float Lasttime = 0;
+		float StartTime = 0;
 
 		static int Clear(lua::State L) {
 			LogicModel* m = L.GetUserData<LogicModel>(1);
@@ -928,6 +936,8 @@ namespace CppLogic::Logic {
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			int anim = L.CheckInt(2);
+			if ((*BB::CIDManagerEx::AnimManager)->GetNameByID(anim) == nullptr)
+				throw lua::LuaException{ "not an animation" };
 			m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
 			if (!m->AnimHandler)
 				throw lua::LuaException{ "no animhandler?" };
@@ -936,19 +946,20 @@ namespace CppLogic::Logic {
 			m->AnimHandler->SetAnimation(adata);
 			m->AnimHandler->SetTimeOfAnim(0.0f);
 			m->AnimHandler->ApplyTransforms();
-			m->Lasttime = static_cast<float>((*EGL::CGLEGameLogic::GlobalObj)->InGameTime->Tick) * (*EGL::CGLEGameLogic::GlobalObj)->InGameTime->TicksPerMS / 1000;
+			m->StartTime = (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds();
 			return 0;
 		}
-		static int AdvanceAnim(lua::State L) {
+		static int SetTimeOfAnim(lua::State L) {
 			LogicModel* m = L.GetUserData<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			if (!m->AnimHandler)
 				throw lua::LuaException{ "set an anim first" };
-			float t = static_cast<float>((*EGL::CGLEGameLogic::GlobalObj)->InGameTime->Tick) * (*EGL::CGLEGameLogic::GlobalObj)->InGameTime->TicksPerMS / 1000;
-			m->AnimHandler->SetTimeOfAnim(t - m->Lasttime);
+			float t = L.OptFloat(2, (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds());
+			if (L.OptBool(3, true))
+				t -= m->StartTime;
+			m->AnimHandler->SetTimeOfAnim(t);
 			m->AnimHandler->ApplyTransforms();
-			m->Lasttime = t;
 			return 0;
 		}
 		static int Translate(lua::State L) {
@@ -1050,7 +1061,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<DisableTerrainDecal>("DisableTerrainDecal"),
 			lua::FuncReference::GetRef<SetColorModulate>("SetColorModulate"),
 			lua::FuncReference::GetRef<SetAnim>("SetAnim"),
-			lua::FuncReference::GetRef<AdvanceAnim>("AdvanceAnim"),
+			lua::FuncReference::GetRef<SetTimeOfAnim>("SetTimeOfAnim"),
 		};
 
 		~LogicModel() {
@@ -1094,7 +1105,7 @@ namespace CppLogic::Logic {
 		GGL::CEntityProfile::HookExperience(false);
 	}
 
-	constexpr std::array<lua::FuncReference, 52> Logic{ {
+	constexpr std::array<lua::FuncReference, 53> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1147,6 +1158,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<GetNearestFreePosForBuilding>("GetNearestFreePosForBuilding"),
 			lua::FuncReference::GetRef<BlockingUpdateWeatherChange>("BlockingUpdateWeatherChange"),
 			lua::FuncReference::GetRef<EnableExperienceClassFix>("EnableExperienceClassFix"),
+			lua::FuncReference::GetRef<GetAnimationDuration>("GetAnimationDuration"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {

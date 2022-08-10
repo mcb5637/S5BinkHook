@@ -1,4 +1,5 @@
 #pragma once
+#include "enumflags.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 
@@ -189,18 +190,8 @@ namespace EGL {
 	private:
 		void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 	};
-	constexpr EGL::CGLELandscape::BlockingMode operator&(EGL::CGLELandscape::BlockingMode a, EGL::CGLELandscape::BlockingMode b) {
-		using under = std::underlying_type<EGL::CGLELandscape::BlockingMode>::type;
-		return static_cast<EGL::CGLELandscape::BlockingMode>(static_cast<under>(a) & static_cast<under>(b));
-	}
-	constexpr EGL::CGLELandscape::BlockingMode operator|(EGL::CGLELandscape::BlockingMode a, EGL::CGLELandscape::BlockingMode b) {
-		using under = std::underlying_type<EGL::CGLELandscape::BlockingMode>::type;
-		return static_cast<EGL::CGLELandscape::BlockingMode>(static_cast<under>(a) | static_cast<under>(b));
-	}
-	constexpr EGL::CGLELandscape::BlockingMode operator^(EGL::CGLELandscape::BlockingMode a, EGL::CGLELandscape::BlockingMode b) {
-		using under = std::underlying_type<EGL::CGLELandscape::BlockingMode>::type;
-		return static_cast<EGL::CGLELandscape::BlockingMode>(static_cast<under>(a) ^ static_cast<under>(b));
-	}
+	template<>
+	class ::enum_is_flags<CGLELandscape::BlockingMode> : public std::true_type {};
 	//constexpr int i = offsetof(CGLELandscape, CurrentWeather) / 4;
 
 	class LandscapeBlockingData {
@@ -266,7 +257,7 @@ namespace EGL {
 		virtual void unknown9() = 0;
 		virtual void unknown10() = 0;
 		virtual void unknown11() = 0;
-		virtual void unknown12() = 0;
+		virtual int GetTickVT() = 0;
 		virtual void StartMap(const char* mapPath) = 0; // 15
 		virtual void unknown14() = 0;
 		virtual void unknown15() = 0;
@@ -283,6 +274,7 @@ namespace EGL {
 		int CreateEntity(EGL::CGLEEntityCreator* cr);
 		int GetTimeMS();
 		int GetTick();
+		float GetTimeSeconds();
 
 		void HookCreateEffect(); // currently unused
 		static void(*CreateEffectHookCallback)(int id, void* ret);

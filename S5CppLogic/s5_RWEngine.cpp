@@ -155,7 +155,17 @@ void RWE::RtAnimationFrameHandler::Destroy()
 {
     animframehandler_destroy(this);
 }
-static inline void(__cdecl* const animframehandler_anim_settime)(RWE::RtAnimationFrameHandler::AnimData* th, float t) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, float t)>(0x6EAF10);
+static inline void(__cdecl* const animframehandler_anim_advtime)(RWE::RtAnimationFrameHandler::AnimData* th, float t) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, float t)>(0x6EAF10);
+void RWE::RtAnimationFrameHandler::AdvanceTime(float t)
+{
+    animframehandler_anim_advtime(Animation, t);
+}
+static inline void(__cdecl* const animframehandler_anim_subtime)(RWE::RtAnimationFrameHandler::AnimData* th, float t) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, float t)>(0x6EB280);
+void RWE::RtAnimationFrameHandler::SubstractTime(float t)
+{
+    animframehandler_anim_subtime(Animation, t);
+}
+static inline void(__cdecl* const animframehandler_anim_settime)(RWE::RtAnimationFrameHandler::AnimData* th, float t) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, float t)>(0x6EB400);
 void RWE::RtAnimationFrameHandler::SetTimeOfAnim(float t)
 {
     animframehandler_anim_settime(Animation, t);
@@ -192,6 +202,12 @@ void RWE::RtAnimationFrameHandler::SetupForModel(RWE::RpClump* c)
         Flags = Flags | AnimFlags::DoNotDestroyHierarchy;
         reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler*)>(0x6EC7E0)(this);
     }
+}
+
+static inline void(__cdecl* const animframehandler_fuse)(RWE::RtAnimationFrameHandler::AnimData* th, RWE::RtAnimationFrameHandler::AnimData* a1, RWE::RtAnimationFrameHandler::AnimData* a2, float r) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, RWE::RtAnimationFrameHandler::AnimData*, RWE::RtAnimationFrameHandler::AnimData*, float)>(0x6EB0E0);
+void RWE::RtAnimationFrameHandler::FuseAnimations(RtAnimationFrameHandler* anim1, RtAnimationFrameHandler* anim2, float ratio)
+{
+    animframehandler_fuse(Animation, anim1->Animation, anim2->Animation, ratio);
 }
 
 static inline RwTexture* (__cdecl* const texture_read)(const char* n, const char* m) = reinterpret_cast<RwTexture* (__cdecl*)(const char*, const char*)>(0x417DB0);

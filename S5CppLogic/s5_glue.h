@@ -9,13 +9,19 @@ namespace GGlue {
 		// no vtable
 	};
 	class CGlueAnimsPropsMgr : public IAnimsPropsMgr {
-	private:
-		virtual void freesomething(void*) = 0;
-		// load anims?
-		// return p1+4
 	public:
+		virtual void __stdcall Destroy() = 0;
+		virtual void __stdcall LoadAnimData(void* unknown, GD::CDDisplay* display, BB::CIDManagerEx* animmanager) = 0;
+		virtual shok::Vector<EGL::CGLEAnimProps*>* __stdcall GetData() = 0;
+
 		static inline constexpr int vtp = 0x788D8C;
+
+		shok::Vector<EGL::CGLEAnimProps*> Data;
+
+		void CreateAnimProps(int id);
+		void PopAnimPops(int id);
 	};
+	static_assert(sizeof(CGlueAnimsPropsMgr) == 5 * 4);
 
 	class IEffectsPropsMgr : public ECore::ICheckData {
 		// no vtable

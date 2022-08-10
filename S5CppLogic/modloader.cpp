@@ -395,6 +395,7 @@ int CppLogic::ModLoader::ModLoader::AddAnimation(lua::State L)
 	int id = (*BB::CIDManagerEx::AnimManager)->GetIDByNameOrCreate(t);
 	shok::String s{ t };
 	m->AnimManager.Load(id, &s);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
 	AnimsToRemove.push_back(id);
 	L.Push("Animations");
 	L.GetTableRaw(L.GLOBALSINDEX);
@@ -418,6 +419,7 @@ int CppLogic::ModLoader::ModLoader::ReloadAnimation(lua::State L)
 	m->FreeAnim(id);
 	shok::String s{ n };
 	m->AnimManager.Load(id, &s);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
 	AnimsToReload.push_back(id);
 	return 0;
 }
@@ -838,6 +840,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			AnimsToRemove.pop_back();
 			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeAnim(id);
 			(*BB::CIDManagerEx::AnimManager)->RemoveID(id);
+			(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->PopAnimPops(id);
 		}
 		for (int id : AnimsToReload) {
 			auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
@@ -846,6 +849,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 				m->FreeAnim(id);
 				shok::String s{ n };
 				m->AnimManager.Load(id, &s);
+				(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
 			}
 		}
 		AnimsToReload.clear();

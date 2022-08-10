@@ -2,6 +2,28 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 
+namespace EGL {
+	class CGLEAnimProps : public BB::IObject {
+	public:
+		int Duration = 0; // ticks
+		bool IsWalkOrRun = false;
+
+		static inline constexpr int vtp = 0x788D7C;
+		static inline constexpr unsigned int Identifier = 0x12FC4F78;
+
+		CGLEAnimProps();
+		CGLEAnimProps(const CGLEAnimProps& o);
+		CGLEAnimProps(CGLEAnimProps&& o) noexcept;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+	private:
+		void SetVT(int vt);
+	};
+}
+
 namespace GGL {
 	class CDamageClassProps : public BB::IObject {
 		float BonusVsArmorClass[7]; // remember to access with ArmorClass - 1

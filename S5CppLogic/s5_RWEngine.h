@@ -376,9 +376,12 @@ namespace RWE {
 		RtAnimationFrameHandler* Clone();
 		void SetAnimation(RWE::RtAnimAnimation* a);
 		void Destroy();
+		void AdvanceTime(float t);
+		void SubstractTime(float t);
 		void SetTimeOfAnim(float t);
 		void ApplyTransforms();
 		void SetupForModel(RWE::RpClump* c);
+		void FuseAnimations(RtAnimationFrameHandler* anim1, RtAnimationFrameHandler* anim2, float ratio);
 	};
 	template<>
 	class ::enum_is_flags<RtAnimationFrameHandler::AnimFlags> : public std::true_type {};
@@ -400,7 +403,8 @@ struct RwTexture {
 };
 
 struct RtAnimAnimation {
-
+	PADDINGI(3);
+	float Duration; // 3
 
 
 	static RtAnimAnimation* Read(const char* name);

@@ -4,6 +4,41 @@
 #include "s5_defines.h"
 #include "s5_classfactory.h"
 
+EGL::CGLEAnimProps::CGLEAnimProps()
+{
+    SetVT(vtp);
+}
+EGL::CGLEAnimProps::CGLEAnimProps(const CGLEAnimProps& o)
+{
+    SetVT(vtp);
+    Duration = o.Duration;
+    IsWalkOrRun = o.IsWalkOrRun;
+}
+EGL::CGLEAnimProps::CGLEAnimProps(CGLEAnimProps&& o) noexcept
+{
+    SetVT(vtp);
+    Duration = o.Duration;
+    IsWalkOrRun = o.IsWalkOrRun;
+}
+
+void* EGL::CGLEAnimProps::operator new(size_t s)
+{
+    return shok::Malloc(s);
+}
+void EGL::CGLEAnimProps::operator delete(void* p) {
+    shok::Free(p);
+}
+
+unsigned int __stdcall EGL::CGLEAnimProps::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+void EGL::CGLEAnimProps::SetVT(int vt)
+{
+    *reinterpret_cast<int*>(this) = vt;
+}
+
 float& GGL::CDamageClassProps::GetBonusVsArmorClass(int ac)
 {
     --ac;

@@ -631,6 +631,11 @@ int EGL::CGLEGameLogic::GetTick()
 	return InGameTime->Tick;
 }
 
+float EGL::CGLEGameLogic::GetTimeSeconds()
+{
+	return GetTimeMS() / 1000.0f;
+}
+
 int(__thiscall* CreateEffectHookedOrig)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = nullptr;
 void(*EGL::CGLEGameLogic::CreateEffectHookCallback)(int id, void* ret) = nullptr;
 int __fastcall CreateEffectHook(EGL::CGLEGameLogic* th, int _, EGL::CGLEEffectCreator* data)

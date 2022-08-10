@@ -39,6 +39,60 @@ namespace ED {
 	};
 	static_assert(sizeof(ED::CLandscape) == 10 * 4);
 
+	class ITerrainDecal : public BB::CNonCopyable {
+	public:
+		static inline constexpr int vtp = 0x76A1F4;
+		virtual ~ITerrainDecal() = default;
+		virtual void Destroy() = 0;
+		// 2 more funcs, empty in alignment
+	};
+	class CTerrainDecalBase : public ITerrainDecal {
+	public:
+		static inline constexpr int vtp = 0x76A238;
+		static inline constexpr unsigned int Identifier = 0x5A4A43C1; // from entitydisplay casttoident
+	};
+	class CTerrainDecalAligned : public CTerrainDecalBase { // size 10
+	public:
+		static inline constexpr int vtp = 0x76A260;
+	};
+	class CTerrainDecal : public CTerrainDecalBase { // size 14
+	public:
+		static inline constexpr int vtp = 0x76A24C;
+	};
+
+	class ITerrainDecals : public BB::CNonCopyable {
+	public:
+		static inline constexpr int vtp = 0x76A208;
+
+		virtual ~ITerrainDecals() = default;
+		virtual void Destroy() = 0;
+		virtual CTerrainDecal* CreateTerrainDecal(int, int, float, float, float, float) = 0;
+		virtual CTerrainDecalAligned* CreateAlignedDecal(int, const shok::Position* p, void*) = 0;
+		// 6 more funcs
+
+	};
+	class CTerrainDecals : public ITerrainDecals {
+	public:
+		static inline constexpr int vtp = 0x76A274;
+		float MapsizeX;
+		float MapsizeY;
+		float MapsizeX2;
+		float MapsizeY2;
+		int MapsizeXBase;
+		int MapsizeYBase;
+		int MapsizeXDiv32;
+		int MapsizeYDiv32; // 8
+		struct {
+			PADDINGI(4);
+		} Data[576];
+		void* EmptyDecal; // 2313
+		void* DecalShadow;
+		void* DecalSelection;
+		void* DecalDoodad;
+		RWE::RwTexture* XD_Decals;
+	};
+	//constexpr int i = offsetof(CTerrainDecals, DecalShadow) / 4;
+
 	class CGlobalsLogic {
 	public:
 		virtual ~CGlobalsLogic() = default;
@@ -53,7 +107,9 @@ namespace ED {
 		PADDINGI(1); // p EGL::CPlayerExplorationHandler
 		ED::CLandscape* Landscape;
 		// p ED::CLandscapeFogOfWar, 
-		PADDINGI(7);
+		PADDINGI(5);
+		CTerrainDecals* TerrainTecalsManager; // 17
+		PADDINGI(1);
 		ED::CVisibleEntityManager* VisibleEntityManager; // 19
 
 		static inline constexpr int vtp = 0x769F74;
@@ -64,6 +120,7 @@ namespace ED {
 
 		static inline ED::CGlobalsLogicEx** const GlobalObj = reinterpret_cast<ED::CGlobalsLogicEx**>(0x8581EC);
 	};
+	//constexpr int i = offsetof(CGlobalsLogicEx, TerrainTecalsManager) / 4;
 
 	class CModelsProps {
 	public:
@@ -174,7 +231,8 @@ namespace ED {
 		float OnePassAlphaBlendingDistanceSquared = 0;
 		PADDINGI(1);
 		char* ModelName = nullptr; // 9
-		PADDINGI(7);
+		PADDINGI(6);
+		void* TerrainDecal = nullptr;
 		float SelectionOffsetX = 0; // 17
 		float SelectionOffsetY = 0;
 		float SelectionRadius = 0;
@@ -214,9 +272,7 @@ namespace ED {
 		virtual ~IResourceManager() = default;
 		virtual void Destroy() = 0;
 		virtual RWE::RtAnimAnimation* GetAnimData(int animId) = 0;
-	private:
-		virtual void unknown2() = 0; // get from UnknownManager, then return float?
-	public:
+		virtual float GetAnimationDuration(int animid) = 0;
 		virtual RWE::RwTexture* GetTextureData(int textureId) = 0;
 		virtual RWE::RwTexture* GetSelectionTexture() = 0;
 		virtual const RWE::RpClump* GetModelDataByEntityType(int ety) = 0; //6
@@ -436,7 +492,7 @@ namespace GD {
 	class IDDisplay {
 	public:
 		virtual ~IDDisplay() = default;
-		// 14 more methods
+		// 14 more methods, // 7 anim get duration (jmp resmanager getduration)
 	};
 
 	class CDDisplay : public IDDisplay, public ED::IDisplayRenderCallbacks {

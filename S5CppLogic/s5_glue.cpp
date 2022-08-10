@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5_glue.h"
+#include <cstring>
 #include "s5_behaviorProps.h"
 #include "s5_entitydisplay.h"
 #include "s5_effecttype.h"
@@ -7,6 +8,35 @@
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
 #include "s5_mapdisplay.h"
+
+void GGlue::CGlueAnimsPropsMgr::CreateAnimProps(int id)
+{
+	if (id > static_cast<int>(Data.size()))
+		throw std::logic_error{ "somehow the id is too big" };
+	if (id == static_cast<int>(Data.size())) {
+		auto v = Data.SaveVector();
+		v.Vector.push_back(new EGL::CGLEAnimProps());
+	}
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+	char buff[0x101]{};
+	strcpy_s(buff, 0x100, (*BB::CIDManagerEx::AnimManager)->GetNameByID(id));
+	shok::StringToLowerCase(buff);
+	auto* t = Data.at(id);
+	t->Duration = static_cast<int>(mng->GetAnimationDuration(id) * 10.0f); // * 1000 / 100
+	if (strstr(buff, "_walk") != nullptr || strstr(buff, "_run") != nullptr)
+		t->IsWalkOrRun = true;
+	else
+		t->IsWalkOrRun = false;
+}
+
+void GGlue::CGlueAnimsPropsMgr::PopAnimPops(int id)
+{
+	if (id + 1 != static_cast<int>(Data.size()))
+		throw std::out_of_range{ "invalid id" };
+	auto v = Data.SaveVector();
+	delete v.Vector.back();
+	v.Vector.pop_back();
+}
 
 static inline void(__thiscall* effectlogic_init)(EGL::CGLEEffectProps* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEffectProps*)>(0x589297);
 void GGlue::CEffectsPropsMgr::LoadEffectTypeFromExtraFile(int id)

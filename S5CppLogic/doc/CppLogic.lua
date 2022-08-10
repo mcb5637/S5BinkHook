@@ -375,6 +375,11 @@ function CppLogic.Logic.BlockingUpdateWeatherChange() end
 --- @param active boolean
 function CppLogic.Logic.EnableExperienceClassFix(active) end
 
+--- returns the duration of an animation in seconds.
+--- @param anim number
+--- @return number seconds
+function CppLogic.Logic.GetAnimationDuration(anim) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -433,6 +438,15 @@ function LogicModel:DisableTerrainDecal() end
 --- @param b number blue, [0-255]
 --- @param a number alpha, [0-255] (optional, default 255) (does not work with all models)
 function LogicModel:SetColorModulate(r, g, b, a) end
+--- sets the animation to be played. (some models do not work without an animation, and some have no animation).
+--- @param anim number animation id
+function LogicModel:SetAnim(anim) end
+--- sets the time of the animation to be played. may move time forwards or backwards.
+--- for normal animations, it is recommended to call this from some GUIUpdate function.
+--- if you advance an animation for longer than its duration, it gets looped.
+--- @param t number|nil time (optional, default current time)
+--- @param absolute boolean|nil if true, subtracts the animation start time (optional, default true)
+function LogicModel:SetTimeOfAnim(t, absolute) end
 
 --- creates a new LogicModel.
 --- @return LogicModel

@@ -68,9 +68,13 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
+	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x23962D3D);
-	return 1;
+	EGL::CGLEAnimProps* d = (*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->Data.at(L.CheckInt(1));
+	L.Push((int)d);
+	L.Push((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimationDuration(L.CheckInt(1)));
+	L.Push(d->Duration);
+	return 3;
 }
 
 int Cleanup(lua::State L) {

@@ -175,7 +175,7 @@ namespace ED {
 
 	class CDisplayStaticEntity : public ED::CEntity {
 	public:
-		PADDINGI(1); // p ED::CTerrainDecalAligned // 15
+		ED::CTerrainDecalBase* TerrainDecal; // 15 (maybe only aligned)
 		PADDINGI(1); // 0
 
 		static inline constexpr int vtp = 0x7AE3C4;

@@ -96,6 +96,8 @@ namespace GDB {
 		static inline constexpr int vtp = 0x76289C;
 		static inline constexpr int TypeDesc = 0x80040C;
 		static inline constexpr unsigned int Identifier = 0x5070AAC3;
+
+		void RemoveKey(const std::string& k);
 	};
 }
 

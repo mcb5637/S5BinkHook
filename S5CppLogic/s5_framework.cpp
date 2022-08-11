@@ -57,6 +57,30 @@ unsigned int __stdcall GDB::CList::GetClassIdentifier() const
     return Identifier;
 }
 
+void GDB::CList::RemoveKey(const std::string& k)
+{
+    size_t off = k.find('\\');
+    if (off == std::string::npos) {
+        shok::String s{ k.c_str() };
+        auto i = Entries.find(s);
+        if (i != Entries.end()) {
+            delete i->second;
+            Entries.erase(i);
+        }
+    }
+    else {
+        std::string key = k.substr(0, off);
+        std::string next = k.substr(off + 1);
+        shok::String s{ key.c_str() };
+        auto i = Entries.find(s);
+        if (i != Entries.end()) {
+            if (auto* n = dynamic_cast<GDB::CList*>(i->second)) {
+                n->RemoveKey(next);
+            }
+        }
+    }
+}
+
 void __stdcall Framework::CEventTimeManager::PostEvent(BB::CEvent* ev)
 {
     throw 0;

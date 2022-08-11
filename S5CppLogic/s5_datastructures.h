@@ -143,8 +143,9 @@ namespace shok {
 		friend class Tree<T, K, KeyExtractor, Comparator, Multi>::Iter;
 
 		Iter begin() const {
-			Iter i { root->left, this };
-			return i;
+			if (root->left == root)
+				return end();
+			return { root->left, this };
 		}
 		Iter end() const {
 			return { nullptr, this };

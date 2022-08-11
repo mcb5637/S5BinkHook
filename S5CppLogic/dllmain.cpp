@@ -70,8 +70,9 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x23962D3D);
-	L.Push((int)&(*Framework::CMain::GlobalObj)->Language);
-	return 1;
+	std::string s = L.CheckStdString(1);
+	(*Framework::CMain::GlobalObj)->GDB.RemoveKey(s);
+	return 0;
 }
 
 int Cleanup(lua::State L) {

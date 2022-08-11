@@ -154,6 +154,12 @@ namespace CppLogic::API {
 		return 1;
 	}
 
+	int RemoveGDBKey(lua::State L) {
+		std::string k = L.CheckStdString(1);
+		(*Framework::CMain::GlobalObj)->GDB.RemoveKey(k);
+		return 0;
+	}
+
 	void GetRuntimeStore() {
 		lua::State mm{ shok::LuaStateMainmenu };
 		mm.PushLightUserdata(&GetRuntimeStore);
@@ -263,7 +269,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 16> API{ {
+	constexpr std::array<lua::FuncReference, 17> API{ {
 			lua::FuncReference::GetRef<Eval>("Eval"),
 			lua::FuncReference::GetRef<Log>("Log"),
 			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
@@ -280,6 +286,7 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<GetMainThreadID>("GetMainThreadID"),
 			lua::FuncReference::GetRef<GetCurrentThreadID>("GetCurrentThreadID"),
 			lua::FuncReference::GetRef<LGetCurrentTime>("GetCurrentTime"),
+			lua::FuncReference::GetRef<RemoveGDBKey>("RemoveGDBKey"),
 	} };
 
 	void Init(lua::State L)

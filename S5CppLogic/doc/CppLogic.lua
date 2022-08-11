@@ -506,6 +506,17 @@ function CppLogic.API.SaveGetMapInfo(save) end
 --- @return table
 function CppLogic.API.GetGDB() end
 
+--- removes a key in GDB.
+--- the key gets split at every \ to follow down the layered map. only the last part of the key gets removed, so its neighbors stay.
+--- you can remove a node, all its children will automatically get removed as well.
+--- does not automatically save GDB.
+--- be careful when removing keys used by SHoK, you may break things.
+--- example: you have the structure: `data = {root = {a=1, b=2, c=3}}`
+--- if you remove "data\\root\\a", the result is `data = {root = {b=2, c=3}}`
+--- if you then remove "data\\root", the result is `data = {}`
+--- @param key string
+function CppLogic.API.RemoveGDBKey(key) end
+
 --- saves a value in the mainmenu lua state (gets only removed on game restart, not on map load/start).
 --- @param name string key
 --- @param value string|number|nil data to store, only string/number/nil allowed

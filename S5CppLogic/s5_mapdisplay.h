@@ -303,6 +303,7 @@ namespace ED {
 		void FreeModel(int id);
 		// remember to free in idmanager and CModelsProps, free last id first
 		void PopModel(int id);
+		const ED::ModelData* LoadModel(int id);
 
 		// remember to free in idmanager too, free last id first
 		void FreeAnim(int id);

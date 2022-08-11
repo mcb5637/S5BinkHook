@@ -174,6 +174,14 @@ void ED::CResourceManager::PopModel(int id)
 	auto v = ModelManager.Models.SaveVector();
 	v.Vector.pop_back();
 }
+const ED::ModelData* ED::CResourceManager::LoadModel(int id)
+{
+	if (id >= static_cast<int>(ModelManager.Models.size())) {
+		auto v = ModelManager.Models.SaveVector();
+		v.Vector.resize(id + 1, nullptr);
+	}
+	return GetModelData(id);
+}
 
 
 void ED::CResourceManager::FreeAnim(int id)

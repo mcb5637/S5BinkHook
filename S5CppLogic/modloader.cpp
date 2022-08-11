@@ -329,7 +329,7 @@ int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
 		throw lua::LuaException{ "model already exists" };
 	int id = mp->ModelIdManager->GetIDByNameOrCreate(t);
 	mp->LoadModelDataFromExtraFile(id);
-	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->LoadModel(id);
 	ModelsToRemove.push_back(id);
 	L.Push("Models");
 	L.GetTableRaw(L.GLOBALSINDEX);
@@ -348,7 +348,7 @@ int CppLogic::ModLoader::ModLoader::ReloadModel(lua::State L)
 		throw lua::LuaException{ "invalid id" };
 	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->LoadModelDataFromExtraFile(id);
 	m->FreeModel(id);
-	m->GetModelData(id);
+	m->LoadModel(id);
 	ReloadModels = true;
 	return 0;
 }

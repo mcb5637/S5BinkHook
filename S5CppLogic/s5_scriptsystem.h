@@ -9,16 +9,23 @@ namespace shok {
 
 namespace EScr {
 	class IScriptTriggerSystem : public BB::IObject, public BB::IPostEvent {
-
+	public:
+		virtual void __stdcall Destroy() = 0;
+		virtual void RegisterEventFuncGet(const char* funcName, int(__cdecl* getIntFromEvent)(BB::CEvent* ev)) = 0;
+		virtual void RegisterEventFuncSet(const char* funcName, void(__cdecl* setIntFromEvent)(BB::CEvent* ev, int i)) = 0;
+		virtual void __stdcall CallGlobal(const char* globalName, BB::CEvent* ev) = 0; // actually sets CurrentRunningEventSet
+	private:
+		virtual void __stdcall RefreshFuncs() = 0;
+		virtual void* GetDebugIterator(int) = 0; // returns new EScr::CTriggerDebugDataIterator
 	};
 
 	class CScriptTriggerSystem : public IScriptTriggerSystem {
 	public:
 		shok::Map<unsigned int, CScriptTrigger*> Trigger; // 2 UniqueID -> Data
-		shok::Map<shok::EventIDs, shok::Vector<CScriptTrigger*>> ActiveTrigger;
+		shok::Map<shok::EventIDs, shok::Vector<CScriptTrigger*>> ActiveTrigger; // 5
 		unsigned int UniqueTriggerID; // next trigger id 8
 		bool TriggerSystemDisabled;
-
+		lua_State* State;
 
 
 		static inline constexpr int vtp = 0x78667C;
@@ -26,16 +33,20 @@ namespace EScr {
 
 		void RunTrigger(BB::CEvent* ev);
 		int CreateTrigger(CScriptTrigger* trigger);
+		void EnableTrigger(unsigned int id);
+		void DisableTrigger(unsigned int id);
 
 		static inline EScr::CScriptTriggerSystem** const GlobalObj = reinterpret_cast<EScr::CScriptTriggerSystem**>(0x895DEC); // also 0xA06548
 		static inline lua_State** const GameState = reinterpret_cast<lua_State**>(0x853A9C);
+		static inline BB::CEvent** const CurrentRunningEventSet = reinterpret_cast<BB::CEvent**>(0xA06544); // always nullptr
+		static inline BB::CEvent** const CurrentRunningEventGet = reinterpret_cast<BB::CEvent**>(0xA06540);
 
 		// loads and executes a file from the internal filesystem. also passes it to the luadebugger.
 		static inline void(__stdcall* const LoadFileToLuaState)(lua_State* L, const char* name) = reinterpret_cast<void(__stdcall*) (lua_State*, const char*)> (0x59C04D);
 
 		static void HookRemoveFuncOverrides();
 	};
-	//constexpr int i = offsetof(CScriptTriggerSystem, Trigger) / 4;
+	//constexpr int i = offsetof(CScriptTriggerSystem, ActiveTrigger) / 4;
 
 	class CLuaFuncRef {
 	public:
@@ -88,10 +99,10 @@ namespace EScr {
 			shok::String String;
 		};
 
-		shok::EventIDs EventType;
-		bool Switch; // active
-		CLuaFuncRefGlobal ConditionFunc;
-		CLuaFuncRefGlobal ActionFunc;
+		shok::EventIDs EventType; // 1
+		bool Switch; // active, 2
+		CLuaFuncRefGlobal ConditionFunc; // 3
+		CLuaFuncRefGlobal ActionFunc; // 14
 		bool MarkedForUnrequest; // 25
 		struct {
 			unsigned int UniqueID;

@@ -17,6 +17,30 @@ int EScr::CScriptTriggerSystem::CreateTrigger(CScriptTrigger* trigger)
 	return id;
 }
 
+static inline void(__thiscall* const scripttriggersys_pushtoactive)(EScr::CScriptTriggerSystem* th, shok::EventIDs id, EScr::CScriptTrigger* t) = reinterpret_cast<void(__thiscall*)(EScr::CScriptTriggerSystem*, shok::EventIDs, EScr::CScriptTrigger*)>(0x5A0C7D);
+void EScr::CScriptTriggerSystem::EnableTrigger(unsigned int id)
+{
+	auto i = Trigger.find(id);
+	if (i == Trigger.end())
+		throw std::logic_error{ "invalid trigger" };
+	CScriptTrigger* t = i->second;
+	if (t->ActionFunc.CheckRef()) {
+		scripttriggersys_pushtoactive(this, t->EventType, t);
+	}
+	t->Switch = true;
+}
+
+static inline void(__thiscall* const scripttriggersys_removefromactive)(EScr::CScriptTriggerSystem* th, shok::EventIDs id, EScr::CScriptTrigger* t) = reinterpret_cast<void(__thiscall*)(EScr::CScriptTriggerSystem*, shok::EventIDs, EScr::CScriptTrigger*)>(0x59F3F4);
+void EScr::CScriptTriggerSystem::DisableTrigger(unsigned int id)
+{
+	auto i = Trigger.find(id);
+	if (i == Trigger.end())
+		throw std::logic_error{ "invalid trigger" };
+	CScriptTrigger* t = i->second;
+	scripttriggersys_removefromactive(this, t->EventType, t);
+	t->Switch = false;
+}
+
 void __stdcall overrideluafunc_empty(lua_State* L, const char* name, lua::CFunction f) {
 
 }

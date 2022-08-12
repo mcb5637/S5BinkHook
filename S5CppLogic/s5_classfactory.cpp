@@ -11,7 +11,7 @@ BB::CXmlSerializer* BB::CXmlSerializer::Create()
 void BB::CXmlSerializer::Deserialize(const char* filename, BB::IObject* ob)
 {
     BB::CFileStreamEx filestr{};
-    if (filestr.OpenFile(filename, 0x113)) {
+    if (filestr.OpenFile(filename, BB::CFileStreamEx::Flags::DefaultRead)) {
         Deserialize(&filestr, ob);
         filestr.Close();
     }
@@ -20,7 +20,7 @@ void BB::CXmlSerializer::Deserialize(const char* filename, BB::IObject* ob)
 void BB::CXmlSerializer::Deserialize(const char* filename, void* ob, const BB::SerializationData* d)
 {
     BB::CFileStreamEx filestr{};
-    if (filestr.OpenFile(filename, 0x113)) {
+    if (filestr.OpenFile(filename, BB::CFileStreamEx::Flags::DefaultRead)) {
         DeserializeByData(&filestr, ob, d);
         filestr.Close();
     }
@@ -29,7 +29,7 @@ void BB::CXmlSerializer::Deserialize(const char* filename, void* ob, const BB::S
 void BB::CXmlSerializer::Serialize(const char* filename, BB::IObject* ob)
 {
     BB::CFileStreamEx filestr{};
-    if (filestr.OpenFile(filename, 0x121)) {
+    if (filestr.OpenFile(filename, BB::CFileStreamEx::Flags::DefaultWrite)) {
         auto* s = BB::CXmlSerializer::Create();
 
         s->Serialize(&filestr, ob);

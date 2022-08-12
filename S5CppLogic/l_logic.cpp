@@ -371,7 +371,7 @@ namespace CppLogic::Logic {
 				r++;
 			}
 			else if (BB::CBBArchiveFile* a2 = dynamic_cast<BB::CBBArchiveFile*>(a)) {
-				L.Push(a2->Path);
+				L.Push(a2->ArchiveFile.Filename);
 				L.SetTableRaw(-2, r);
 				r++;
 			}
@@ -405,7 +405,7 @@ namespace CppLogic::Logic {
 		BB::CBBArchiveFile* a = dynamic_cast<BB::CBBArchiveFile*>((*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0]);
 		if (!a)
 			throw lua::LuaException("may only remove archives");
-		std::string_view path = a->Path;
+		std::string_view path = a->ArchiveFile.Filename;
 		if (path.starts_with("base") || path.starts_with("extra1") || path.starts_with("extra2"))
 			throw lua::LuaException("may not remove BB archives");
 		(*BB::CFileSystemMgr::GlobalObj)->RemoveTopArchive();

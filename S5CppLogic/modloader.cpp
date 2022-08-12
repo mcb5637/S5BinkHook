@@ -746,7 +746,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		while (fm->LoadOrder[0] != loadordertop) {
 			fm->RemoveTopArchive();
 		}
-		Log(L, "Done");
+		Log(L, "Resetting data");
 
 		// make sure there is no entity/effect left that can access a type we are deleting
 		if (*EGL::CGLEEntityManager::GlobalObj) {
@@ -929,6 +929,8 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			SoundGroupsToRemove.pop_back();
 			(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(id);
 		}
+
+		Log(L, "Done");
 	}
 }
 

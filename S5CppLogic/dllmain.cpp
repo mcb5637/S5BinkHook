@@ -45,8 +45,14 @@
 struct CppLogicOptions {
 	bool DoNotLoad = false;
 	bool DoNotUseCenterFix = false;
+	bool DisableModLoader = false;
+
+	bool Loaded = false;
 
 	void LoadFromFile(const char* name) {
+		if (Loaded)
+			return;
+		Loaded = true;
 		std::ifstream f{ name, std::ios::in };
 		if (f.is_open()) {
 			std::string line;
@@ -56,6 +62,9 @@ struct CppLogicOptions {
 				}
 				else if (line == "DoNotUseCenterFix") {
 					f >> DoNotUseCenterFix;
+				}
+				else if (line == "DisableModLoader") {
+					f >> DisableModLoader;
 				}
 				f.ignore();
 			}
@@ -70,8 +79,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x23962D3D);
-	std::string s = L.CheckStdString(1);
-	(*Framework::CMain::GlobalObj)->GDB.RemoveKey(s);
+
 	return 0;
 }
 
@@ -86,7 +94,7 @@ int Cleanup(lua::State L) {
 }
 
 void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
-	if (!CppLogic::HasSCELoader())
+	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Cleanup(n);
 	if ((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu) {
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
@@ -97,7 +105,7 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 void InitGame() {
 	Framework::CMain::HookModeChange();
 	Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
-	if (!CppLogic::HasSCELoader())
+	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Initialize();
 	if (!Options.DoNotUseCenterFix)
 		shok::HookTextPrinting();
@@ -240,7 +248,9 @@ DebuggerOrig dbg{};
 
 extern "C" {
 	void __declspec(dllexport) __stdcall AddLuaState(lua_State* L) {
-		Install(lua::State{ L });
+		Options.LoadFromFile(".\\bin\\CppLogicOptions.txt");
+		if (!Options.DoNotLoad)
+			Install(lua::State{ L });
 		dbg.Load();
 		if (dbg.AddLuaState)
 			dbg.AddLuaState(L);

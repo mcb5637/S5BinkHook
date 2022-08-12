@@ -1,6 +1,16 @@
 #include "pch.h"
 #include "s5_filesystem.h"
 
+static inline bool(__thiscall* const dirfilesys_filter_allowedI)(BB::CDirectoryFileSystem::FilterData* th, const char* f) = reinterpret_cast<bool(__thiscall*)(BB::CDirectoryFileSystem::FilterData*, const char*)>(0x5532C4);
+bool BB::CDirectoryFileSystem::FilterData::IsAllowedCaseInsensitive(const char* filename)
+{
+	return dirfilesys_filter_allowedI(this, filename);
+}
+static inline bool(__thiscall* const dirfilesys_filter_allowed)(BB::CDirectoryFileSystem::FilterData* th, const char* f) = reinterpret_cast<bool(__thiscall*)(BB::CDirectoryFileSystem::FilterData*, const char*)>(0x5532F8);
+bool BB::CDirectoryFileSystem::FilterData::IsAllowed(const char* filename)
+{
+	return dirfilesys_filter_allowed(this, filename);
+}
 
 static inline void(__cdecl* const filesystem_addfolder)(const char* p, char* d) = reinterpret_cast<void(__cdecl*)(const char*, char*)>(0x546514);
 void BB::CFileSystemMgr::AddFolder(const char* path)
@@ -18,11 +28,6 @@ void BB::CFileSystemMgr::AddFolder(const char* path)
 void BB::CFileSystemMgr::AddArchive(const char* path)
 {
 	AddArchiveI(path, true);
-}
-
-void BB::CFileSystemMgr::RemoveTopArchive()
-{
-	RemoveTop();
 }
 
 bool BB::CFileSystemMgr::OpenFileAsHandle(const char* path, int& handle, size_t& size)
@@ -144,21 +149,7 @@ const char* BB::CFileSystemMgr::ReadFileToString(const char* name, size_t* size)
 
 bool BB::CFileSystemMgr::DoesFileExist(const char* name)
 {
-	bool r = false;
-	try
-	{
-		BB::CFileStreamEx filestr{};
-		if (filestr.OpenFile(name, BB::CFileStreamEx::Flags::DefaultRead)) {
-			size_t s = filestr.GetSize();
-			if (s > 0) {
-				r = true;
-			}
-			filestr.Close();
-		}
-	}
-	catch (...)
-	{
-		return false;
-	}
-	return r;
+	FileInfo i{};
+	(*GlobalObj)->GetFileInfo(&i, name, 0);
+	return i.Found && !i.IsDirectory;
 }

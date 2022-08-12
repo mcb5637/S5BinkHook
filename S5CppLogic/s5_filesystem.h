@@ -85,11 +85,11 @@ namespace BB {
 	class IFileSystem {
 	public:
 		struct FileInfo {
-			int DateTimeLow;
-			int DateTimeHigh;
-			int Size;
-			bool Found;
-			bool IsDirectory;
+			int DateTimeLow = 0;
+			int DateTimeHigh = 0;
+			int Size = 0;
+			bool Found = false;
+			bool IsDirectory = false;
 		};
 		enum class SearchOptions : int {
 			None = 0,
@@ -119,10 +119,15 @@ namespace BB {
 	public:
 		char* Path;
 		size_t PathLen;
-		struct {
-			size_t Length;
-			char Data[28];
-		} Filters[5]; // not sure what these are good for
+		struct FilterData {
+			struct {
+				size_t Length;
+				char Data[28];
+			} Filters[5]; // not sure what these are good for
+
+			bool IsAllowedCaseInsensitive(const char* path);
+			bool IsAllowed(const char* path);
+		} Filters;
 
 		static inline constexpr int vtp = 0x7803B4;
 	};
@@ -146,28 +151,24 @@ namespace BB {
 	class IFileSystemMgr : public IFileSystem {
 	protected:
 		virtual void AddArchiveI(const char* path, bool onTop) = 0;
-	private:
-		virtual void unknownfunc3() = 0;
-	protected:
+		virtual void SetOverrideArchive(const char* file) = 0; // better not use it, not sure how well it works
 		virtual void AddFolderI(const char* path, bool readonly, shok::Set<shok::String>* filters) = 0; // 8
-	private:
-		virtual void unknownfunc4() = 0;
-	protected:
-		virtual void RemoveTop() = 0; // 10
-	private:
-		virtual void unknownfunc5() = 0;
+		virtual void Clear() = 0;
 	public:
+		virtual void RemoveTopArchive() = 0; // 10
+		virtual void SetRemoveData() = 0;
 		virtual void MakeAbsolute(char* abs, const char* rel) = 0; // 12 seems only to work with external files, not with files in bba archives
 	};
 	class CFileSystemMgr : public IFileSystemMgr {
 	public:
 		shok::Vector<BB::IFileSystem*> LoadOrder;
+		BB::IFileSystem* Override; // 5
+		bool RemoveData;
 		
 		static inline constexpr int vtp = 0x77F794;
 
 		void AddFolder(const char* path);
 		void AddArchive(const char* path);
-		void RemoveTopArchive();
 		// handle + size get set, use BB::CFileSystemMgr::CloseHandle to close the file after you dont need it any more.
 		// to read/write a file more easily, use BB::CFileStreamEx.
 		// remove data/ before usage, this func does not do that by itself.
@@ -181,7 +182,7 @@ namespace BB {
 		static const char* ReadFileToString(const char* name, size_t* size);
 		static bool DoesFileExist(const char* name);
 	};
-
+	//constexpr int i = offsetof(CFileSystemMgr, Override) / 4;
 
 
 	// looks up file in BB::CFileSystemMgr::GlobalObj and wraps around it

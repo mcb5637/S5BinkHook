@@ -45,6 +45,53 @@ namespace RWE {
 		GEOMETRY = 8,
 		WorldSector = 0xFF, // not a true type?
 	};
+	enum class RwCorePluginID : int {
+		NAOBJECT = 0,
+		STRUCT = 1,
+		STRING = 2,
+		EXTENSION = 3,
+		CAMERA = 5,
+		TEXTURE = 6,
+		MATERIAL = 7,
+		MATLIST = 8,
+		ATOMICSECT = 9,
+		PLANESECT = 0xA,
+		WORLD = 0xB,
+		SPLINE = 0xC,
+		MATRIX = 0xD,
+		FRAMELIST = 0xE,
+		GEOMETRY = 0xF,
+		CLUMP = 0x10,
+		LIGHT = 0x12,
+		UNICODESTRING = 0x13,
+		ATOMIC = 0x14,
+		TEXTURENATIVE = 0x15,
+		TEXDICTIONARY = 0x16,
+		ANIMDATABASE = 0x17,
+		IMAGE = 0x18,
+		SKINANIMATION = 0x19,
+		GEOMETRYLIST = 0x1A,
+		ANIMANIMATION = 0x1B,
+		HANIMANIMATION = 0x1B,
+		TEAM = 0x1C,
+		CROWD = 0x1D,
+		DMORPHANIMATION = 0x1E,
+		RIGHTTORENDER = 0x1f,
+		MTEFFECTNATIVE = 0x20,
+		MTEFFECTDICT = 0x21,
+		TEAMDICTIONARY = 0x22,
+		PITEXDICTIONARY = 0x23,
+		TOC = 0x24,
+		PRTSTDGLOBALDATA = 0x25,
+		ALTPIPE = 0x26,
+		PIPEDS = 0x27,
+		PATCHMESH = 0x28,
+		CHUNKGROUPSTART = 0x29,
+		CHUNKGROUPEND = 0x2A,
+		UVANIMDICT = 0x2B,
+		COLLTREE = 0x2C,
+		ENVIRONMENT = 0x2D,
+	};
 
 	struct RwObject {
 		RwObjectType type;
@@ -135,6 +182,65 @@ namespace RWE {
 		RwObjectHasFrame* (*sync)(RwObjectHasFrame* object);
 	};
 
+	enum class RwStreamType : int
+	{
+		rwNASTREAM = 0,     /**<Invalid stream type */
+		rwSTREAMFILE,       /**<File */
+		rwSTREAMFILENAME,   /**<File name */
+		rwSTREAMMEMORY,     /**<Memory*/
+		rwSTREAMCUSTOM,     /**<Custom */
+	};
+	enum class RwStreamAccessType : int
+	{
+		rwNASTREAMACCESS = 0,   /**<Invalid stream access */
+		rwSTREAMREAD,           /**<Read */
+		rwSTREAMWRITE,          /**<Write */
+		rwSTREAMAPPEND,         /**<Append */
+	};
+	struct RwStreamMemory
+	{
+		int position; /* Current 'memory' position 0 is first byte */
+		int nSize;  /* Space allocated currently */
+		byte* memBlock; /* Current memory block pointer */
+	};
+	union RwStreamFile
+	{
+		void* fpFile;               /**< file pointer */
+		const void* constfpFile;    /**< const file pointer */
+	};
+	struct RwStreamCustom
+	{
+		int(*sfnclose)(void* d);
+		unsigned int (*sfnread)(void* d, void* buff, unsigned int l);
+		int(*sfnwrite)(void* d, const void* buff, unsigned int l);
+		int(*sfnskip)(void* d, unsigned int l);
+		void* data;
+	};
+	union RwStreamUnion
+	{
+		RwStreamMemory memory; /**< memory */
+		RwStreamFile file; /**< file */
+		RwStreamCustom custom; /**< custom */
+	};
+	struct RwMemory
+	{
+		byte* start; /**< Starting address. */
+		unsigned int length; /**< Length in bytes. */
+	};
+	struct RwStream {
+		RwStreamType type;
+		RwStreamAccessType accessType;
+		int position;
+		RwStreamUnion Type;
+		int rwOwned;
+
+		static inline RwStream* (__cdecl* const Open)(RwStreamType type, RwStreamAccessType ac, void* data) = reinterpret_cast<RwStream * (__cdecl*)(RwStreamType, RwStreamAccessType, void*)>(0x41A8E0);
+		bool Close(void* data = nullptr);
+		void Skip(size_t len);
+		bool FindChunk(RwCorePluginID ty, size_t* length, unsigned int* version);
+		size_t Read(void* buff, size_t toRead);
+	};
+
 	struct RwRaster {
 		// check this, all of this is device dependend according to RW docu
 		RwRaster* parent; /* Top level raster if a sub raster */
@@ -221,6 +327,9 @@ namespace RWE {
 		void DisableParticleEffects();
 		void DisableTerrainDecal();
 		void SetColorModulate(shok::Color argb);
+		void AddAtomic(RpAtomic* atomic);
+
+		static inline RpClump* (__cdecl* const Read)(RwStream* s) = reinterpret_cast<RpClump * (__cdecl*)(RwStream*)>(0x629990);
 	};
 
 	struct RpMaterialList {

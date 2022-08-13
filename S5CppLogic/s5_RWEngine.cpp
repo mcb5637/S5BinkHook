@@ -66,6 +66,27 @@ RWE::RtAnimationFrameHandler* RWE::RwFrame::GetAnimFrameHandler()
     return h;
 }
 
+static inline int(__cdecl* const stream_close)(RWE::RwStream* s, void* d) = reinterpret_cast<int(__cdecl*)(RWE::RwStream*, void*)>(0x41A810);
+bool RWE::RwStream::Close(void* data)
+{
+    return stream_close(this, data);
+}
+static inline RWE::RwStream*(__cdecl* const stream_skip)(RWE::RwStream* s, size_t l) = reinterpret_cast<RWE::RwStream*(__cdecl*)(RWE::RwStream*, size_t)>(0x41A700);
+void RWE::RwStream::Skip(size_t len)
+{
+    stream_skip(this, len);
+}
+static inline int (__cdecl* const stream_findchunk)(RWE::RwStream* s, RWE::RwCorePluginID ty, size_t* l, unsigned int* v) = reinterpret_cast<int (__cdecl*)(RWE::RwStream*, RWE::RwCorePluginID ty, size_t*, unsigned int*)>(0x4290A0);
+bool RWE::RwStream::FindChunk(RwCorePluginID ty, size_t* length, unsigned int* version)
+{
+    return stream_findchunk(this, ty, length, version);
+}
+static inline size_t(__cdecl* const stream_read)(RWE::RwStream* s, void* b, size_t l) = reinterpret_cast<size_t(__cdecl*)(RWE::RwStream*, void*, size_t)>(0x41A3E0);
+size_t RWE::RwStream::Read(void* buff, size_t toRead)
+{
+    return stream_read(this, buff, toRead);
+}
+
 static inline int(__cdecl* const raster_destroy)(RWE::RwRaster* r) = reinterpret_cast<int(__cdecl*)(RWE::RwRaster*)>(0x418A90);
 void RWE::RwRaster::Destroy()
 {
@@ -127,6 +148,11 @@ void RWE::RpClump::DisableTerrainDecal()
 void RWE::RpClump::SetColorModulate(shok::Color argb)
 {
     ForAllAtomics(RpAtomic::SetColorModulateCb, &argb);
+}
+static inline RWE::RpClump* (__cdecl* const clump_addAtomic)(RWE::RpClump* t, RWE::RpAtomic* a) = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpAtomic*)>(0x629090);
+void RWE::RpClump::AddAtomic(RWE::RpAtomic* a)
+{
+    clump_addAtomic(this, a);
 }
 
 static inline RWE::RpWorld* (__cdecl* const world_addclump)(RWE::RpWorld* w, RWE::RpClump* c) = reinterpret_cast<RWE::RpWorld * (__cdecl*)(RWE::RpWorld*, RWE::RpClump*)>(0x627130);

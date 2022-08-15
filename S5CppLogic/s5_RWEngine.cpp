@@ -93,6 +93,27 @@ void RWE::RwRaster::Destroy()
     raster_destroy(this);
 }
 
+static inline int(__cdecl* const atomic_isparticleemitter)(RWE::RpAtomic* a) = reinterpret_cast<int(__cdecl*)(RWE::RpAtomic*)>(0x5D9210);
+bool RWE::RpAtomic::IsParticleEmitter()
+{
+    return atomic_isparticleemitter(this);;
+}
+static inline void(__cdecl* const atomic_destroy)(RWE::RpAtomic* a) = reinterpret_cast<void(__cdecl*)(RWE::RpAtomic*)>(0x628F90);
+void RWE::RpAtomic::Destroy()
+{
+    atomic_destroy(this);
+}
+static inline RWE::RpAtomic* (__cdecl* const atomic_forallemitters)(RWE::RpAtomic* a, RWE::Particles::RpPrtStdEmitterCallBack cb, void* data) = reinterpret_cast<RWE::RpAtomic * (__cdecl*)(RWE::RpAtomic*, RWE::Particles::RpPrtStdEmitterCallBack, void*)>(0x5D9230);
+void RWE::RpAtomic::ForAllEmitters(RWE::Particles::RpPrtStdEmitterCallBack cb, void* data)
+{
+    atomic_forallemitters(this, cb, data);
+}
+static inline RWE::RpAtomic* (__cdecl* const atomic_addemitter)(RWE::RpAtomic* th, RWE::Particles::RpPrtStdEmitter* ad) = reinterpret_cast<RWE::RpAtomic * (__cdecl*)(RWE::RpAtomic*, RWE::Particles::RpPrtStdEmitter*)>(0x5D9280);
+void RWE::RpAtomic::AddEmitter(RWE::Particles::RpPrtStdEmitter* em)
+{
+    atomic_addemitter(this, em);
+}
+
 static inline RWE::RpClump* (__cdecl* const clump_forallatomics)(RWE::RpClump* m, RWE::RpAtomicCallBack, void* data) = reinterpret_cast<RWE::RpClump* (__cdecl*)(RWE::RpClump*, RWE::RpAtomicCallBack, void*)>(0x628E30);
 RWE::RpClump* RWE::RpClump::ForAllAtomics(RpAtomicCallBack callback, void* pData)
 {
@@ -153,6 +174,11 @@ static inline RWE::RpClump* (__cdecl* const clump_addAtomic)(RWE::RpClump* t, RW
 void RWE::RpClump::AddAtomic(RWE::RpAtomic* a)
 {
     clump_addAtomic(this, a);
+}
+static inline RWE::RpClump* (__cdecl* const clump_remAtomic)(RWE::RpClump* t, RWE::RpAtomic* a) = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpAtomic*)>(0x6290C0);
+void RWE::RpClump::RemoveAtomic(RpAtomic* atomic)
+{
+    clump_remAtomic(this, atomic);
 }
 
 static inline RWE::RpWorld* (__cdecl* const world_addclump)(RWE::RpWorld* w, RWE::RpClump* c) = reinterpret_cast<RWE::RpWorld * (__cdecl*)(RWE::RpWorld*, RWE::RpClump*)>(0x627130);

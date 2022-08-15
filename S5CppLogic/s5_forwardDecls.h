@@ -103,10 +103,15 @@ struct RwTexture;
 struct RtAnimAnimation;
 namespace RWE {
 	struct RpClump;
+	struct RpAtomic;
 	using RwTexture = ::RwTexture;
 	using RtAnimAnimation = ::RtAnimAnimation;
 	struct RtAnimationFrameHandler;
 	struct RtAnimationFrameHandler;
+}
+namespace RWE::Particles {
+	struct RpPrtStdEmitter;
+	typedef RpPrtStdEmitter* (__cdecl* RpPrtStdEmitterCallBack) (RWE::RpAtomic* atomic, RpPrtStdEmitter* emt, void* data);
 }
 namespace EScr {
 	class CScriptTrigger;

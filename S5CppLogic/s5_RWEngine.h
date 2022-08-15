@@ -91,6 +91,8 @@ namespace RWE {
 		UVANIMDICT = 0x2B,
 		COLLTREE = 0x2C,
 		ENVIRONMENT = 0x2D,
+
+		PrtStd = 304,
 	};
 
 	struct RwObject {
@@ -277,7 +279,7 @@ namespace RWE {
 		RpGeometry* geometry;
 		RwSphere boundingSphere;
 		RwSphere worldBoundingSphere;
-		RpClump* clump;
+		RpClump* clump; // 15
 		RwLinkList::RwLLLink inClumpLink;
 
 		RpAtomic* (*renderCallBack)(RpAtomic* atomic);
@@ -294,12 +296,18 @@ namespace RWE {
 			Render = 4,
 		};
 
+		bool IsParticleEmitter();
+		void Destroy();
+		void ForAllEmitters(RWE::Particles::RpPrtStdEmitterCallBack cb, void* data);
+		void AddEmitter(RWE::Particles::RpPrtStdEmitter* em);
+
 		static inline const RpAtomicCallBack SetPlayerColorCb = reinterpret_cast<RpAtomicCallBack>(0x48F361);
 		static inline const RpAtomicCallBack DisableShadowCb = reinterpret_cast<RpAtomicCallBack>(0x721FD8);
-		static inline const RpAtomicCallBack DisableParticleEffectsCb = reinterpret_cast<RpAtomicCallBack>(0x721F87);
+		static inline const RpAtomicCallBack DisableParticleEffectsCb = reinterpret_cast<RpAtomicCallBack>(0x721F87); // destroys clumps that are IsParticleEmitter
 		static inline const RpAtomicCallBack DisableTerrainDecalCb = reinterpret_cast<RpAtomicCallBack>(0x721FB2);
 		static inline const RpAtomicCallBack SetColorModulateCb = reinterpret_cast<RpAtomicCallBack>(0x47B6E3);
 	};
+	//constexpr int i = offsetof(RpAtomic, clump) / 4;
 
 	struct RpClump {
 
@@ -328,6 +336,7 @@ namespace RWE {
 		void DisableTerrainDecal();
 		void SetColorModulate(shok::Color argb);
 		void AddAtomic(RpAtomic* atomic);
+		void RemoveAtomic(RpAtomic* atomic);
 
 		static inline RpClump* (__cdecl* const Read)(RwStream* s) = reinterpret_cast<RpClump * (__cdecl*)(RwStream*)>(0x629990);
 	};

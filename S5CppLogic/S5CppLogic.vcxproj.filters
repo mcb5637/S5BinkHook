@@ -237,6 +237,9 @@
     <ClInclude Include="enumflags.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_RWE_particles.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -376,6 +379,9 @@
     </ClCompile>
     <ClCompile Include="s5_staticlist.cpp">
       <Filter>shok\globals</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_RWE_particles.cpp">
+      <Filter>shok\engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

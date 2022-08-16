@@ -110,8 +110,31 @@ namespace RWE {
 		Postconcat, // transformation in world space, M = M*S
 	};
 
+	struct RwRGBA
+	{
+		byte red;
+		byte green;
+		byte blue;
+		byte alpha;
+	};
+	struct RwRGBAReal
+	{
+		float red;
+		float green;
+		float blue;
+		float alpha;
+	};
+	struct RwTexCoords
+	{
+		float u;
+		float v;
+	};
+
 	struct RwV3d {
 		float x, y, z;
+	};
+	struct RwV2d {
+		float x, y;
 	};
 	struct RwMatrix {
 		RwV3d right;

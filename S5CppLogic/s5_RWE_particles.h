@@ -16,6 +16,19 @@ namespace RWE::Particles {
 	 */
 	struct RpPrtStdPropertyTable
 	{
+		enum class Properties : int {
+			EMITTER = 0,
+			STANDARD = 1,
+			PRTCOLOR = 2,
+			PRTTEXCOORDS = 3,
+			PRT2DROTATE = 4,
+			PRTSIZE = 5,
+			PTANK = 6,
+			PRTVELOCITY = 7,
+			PRTMATRIX = 8,
+		};
+
+
 		unsigned int* propPtr; /**< Internal usage */
 		RpPrtStdPropertyTable* next; /**< Internal usage */
 		int id; /**< Property table's id */
@@ -29,8 +42,30 @@ namespace RWE::Particles {
 
 		static inline RpPrtStdPropertyTable* (__cdecl* const Get)(int id) = reinterpret_cast<RpPrtStdPropertyTable * (__cdecl*)(int)>(0x5D9820);
 		void Destroy(); // decrements refcount, destroys when unused
+		int GetPropOffset(Properties id);
 	};
 	
+	/**
+	 * \ingroup rpprtstd
+	 * \ref RpPrtStdEmitterCallBackCode, this type represents the different callbacks for
+	 * processing a \ref RpPrtStdEmitter. These callbacks will be called at various point for
+	 * processing the emitter's custom data.
+	 */
+	enum class RpPrtStdEmitterCallBackCode : int
+	{
+		PRTSTDEMITTERCALLBACKEMIT = 0, /**< Emitter particle emission callback */
+		PRTSTDEMITTERCALLBACKBEGINUPDATE,              /**< Emitter begin update call back */
+		PRTSTDEMITTERCALLBACKENDUPDATE,                /**< Emitter end update callback */
+		PRTSTDEMITTERCALLBACKBEGINRENDER,              /**< Emitter begin render callback */
+		PRTSTDEMITTERCALLBACKENDRENDER,                /**< Emitter end render callback */
+		PRTSTDEMITTERCALLBACKCREATE,                   /**< Emitter create callback */
+		PRTSTDEMITTERCALLBACKDESTROY,                  /**< Emitter destroy callback */
+		PRTSTDEMITTERCALLBACKSTREAMREAD,               /**< Emitter stream input callback */
+		PRTSTDEMITTERCALLBACKSTREAMWRITE,              /**< Emitter stream output callback */
+		PRTSTDEMITTERCALLBACKSTREAMGETSIZE,            /**< Emitter stream get size callback */
+		PRTSTDEMITTERCALLBACKCLONE,                    /**< Emitter clone  callback */
+	};
+
 	/**
 	 * \ingroup rpprtstd
 	 * \ref RpPrtStdEmitterCallBack
@@ -55,13 +90,25 @@ namespace RWE::Particles {
 	 */
 	struct RpPrtStdEmitterClass
 	{
+		static constexpr int NumEmitterCallbacksInArray = 11;
+		typedef RpPrtStdEmitterCallBack RpPrtStdEmitterCallBackArray[NumEmitterCallbacksInArray];
+
 		RpPrtStdEmitterClass* next; /**< Internal usage */
 		int id; /**< Emitter class's id */
 		int refCount; /**< Reference count. Internal usage */
 		int objSize; /**< Size of the emitter */
 		RpPrtStdPropertyTable* propTab; /**< Reference to a table of emitter properties */
 		int numCallback; /**< Number of callback arrays */
-		RpPrtStdEmitter** callback; /**< Array of emitter callback functions */
+		RpPrtStdEmitterCallBackArray* callback; /**< Array of emitter callback functions */
+
+
+		void Destroy();
+		void SetProperties(RpPrtStdPropertyTable* p);
+		void SetCallback(int numCb, RpPrtStdEmitterCallBackArray* cbs); // copies array
+		static inline RpPrtStdEmitterClass* (__cdecl* const GetByPropTab)(RpPrtStdPropertyTable* p) = reinterpret_cast<RpPrtStdEmitterClass * (__cdecl*)(RpPrtStdPropertyTable*)>(0x5DA4E0);
+		static inline RpPrtStdEmitterClass* (__cdecl* const Get)(int id) = reinterpret_cast<RpPrtStdEmitterClass * (__cdecl*)(int)>(0x5DA4B0);
+		// setup callback 5DE1A0
+		RpPrtStdEmitterCallBack GetCallbackNum(RpPrtStdEmitterCallBackCode c, int cn);
 	};
 
 	struct RpPrtStdParticleBatch;
@@ -97,10 +144,137 @@ namespace RWE::Particles {
 		RpPrtStdParticleCallBack** callback; /**< Array of particle batch callback functions */
 
 		void SetProperties(RpPrtStdPropertyTable* p);
-		// set callback 5DA740
+		void Destroy();
+		static inline RpPrtStdParticleClass* (__cdecl* const GetByPropTab)(RpPrtStdPropertyTable* p) = reinterpret_cast<RpPrtStdParticleClass * (__cdecl*)(RpPrtStdPropertyTable*)>(0x5DA810);
+		static inline RpPrtStdParticleClass* (__cdecl* const Get)(int id) = reinterpret_cast<RpPrtStdParticleClass * (__cdecl*)(int)>(0x5DA7E0);
+		// setup callback 5DA740
+	};
+
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdEmitterStandard
+	 * A structure represent the set of properties for a basic emitter. The structure is stored as
+	 * a single optional data in the emitter property table.
+	 *
+	 * The basic emitter uses a 'time' variable to control particle emissions. A large time gap between
+	 * emission can give pulse effects where as a small time gap produces a streaming effects. Particles
+	 * can be emitted from a single point, line, area or a volume.
+	 *
+	 * Particles emitted from an emitter are of the same type. An emitter cannot emit different types of
+	 * particles. Once an emitter has reached its maximum number of particles, no further particles are
+	 * emitted until some of the existing particles have died.
+	 *
+	 * Most properties have a bias value to vary the property's value. This uses the seed field
+	 * to give a degreee of randomness.
+	 */
+	struct RpPrtStdEmitterStandard
+	{
+		int seed; /**< Seed for random number generator */
+		int maxPrt; /**< Maximum number of active particles */
+		float currTime; /**< Current timestamp for emitter */
+		float prevTime; /**< Previous timestamp for emitter */
+		RwV3d force; /**< External force applied to particles */
+		RwV3d emtPos; /**< Emitter position */
+		RwV3d emtSize; /**< 10 Emitter size. This is the volume where new particles are emitted */
+		float emtEmitGap, /**< 13 Time gap between emission */
+			emtEmitGapBias, /**< Time gap bias */
+			emtPrevEmitTime, /**< Previous particle emission time */
+			emtEmitTime; /**< Next particle emission time */
+		int emtPrtEmit, /**< 17 Number of particle emit per emission */
+			emtPrtEmitBias; /**< Particle emission bias */
+
+		float prtInitVel, /**< Particle's initial speed */
+			prtInitVelBias; /**< 20 Particle's initial speed bias */
+		float prtLife, /**< Particle's duration */
+			prtLifeBias; /**< Particle's duration bias */
+
+		RwV3d prtInitDir, /**<23 Particle's initial direction */
+			prtInitDirBias; /**<26 particle's initial direction bias */
+
+		RwV2d prtSize; /**<29 Particle's size. This is ignored if each particle has its own size. */
+
+		RwRGBA prtColor; /**<31 Particle's color. This is ignored if each particle has its own colors. */
+
+		float prtDelta2DRotate; /**<32 Particle's 2D rotation in radians. This is ignored if each particle has its own rotation. */
+
+		RwTexCoords prtUV[4]; /**<33 Particle's texture coordindates */
+		RwTexture* texture; /**< Particle's texture */
+
+		RwMatrix* ltm; /**< LTM to transform particle coordinates from local space to world space */
+	};
+	//constexpr int i = offsetof(RpPrtStdEmitterStandard, prtDelta2DRotate) / 4;
+
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdEmitterPrtColor
+	 * An optional structure to represent the change in color of a particle from birth to death.
+	 * The particles will start with the prtStartCol and ends with endPrtColor. The particle's
+	 * life is used to interpolate the colors.
+	 *
+	 * If this structure is not present, then the particles will have a constant color.
+	 */
+	struct RpPrtStdEmitterPrtColor
+	{
+		RwRGBAReal prtStartCol, /**< Particle start color */
+			prtStartColBias; /**< Particle start color bias */
+		RwRGBAReal prtEndCol, /**< Particle end color */
+			prtEndColBias; /**< Particle end color bias */
+	};
+
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdEmitterPrtTexCoords
+	 * An optional structure to represent the change in texcoords of a particle from birth to death.
+	 * The particles will start with prtStartUV0 and prtStartUV1 and ends with endPrtEndUV0 and endPrtEndUV1.
+	 * The particle's life is used to interpolate the texcoords.
+	 *
+	 * A particle can have two texcoords representing the top left and bottom right respectively. By varying
+	 * the texcoords can give an animated texture effect on a particle.
+	 *
+	 * If this structure is not present, then the particles will have a constant texcoords.
+	 */
+	struct RpPrtStdEmitterPrtTexCoords
+	{
+		RwTexCoords prtStartUV0, /**< Particle start top left texcoords */
+			prtStartUV0Bias; /**< Particle start top left texcoords bias */
+		RwTexCoords prtEndUV0, /**< Particle end top left texcoords */
+			prtEndUV0Bias; /**< Particle end top left texcoords bias */
+		RwTexCoords prtStartUV1, /**< Particle start bottom right texcoords */
+			prtStartUV1Bias; /**< Particle start botton right texcoords bias */
+		RwTexCoords prtEndUV1, /**< Particle end bottom right texcoords */
+			prtEndUV1Bias; /**< Particle end bottom right texcoords bias */
+	};
+
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdEmitterPrtMatrix
+	 *
+	 * An optional structure to construct a matrix for each particle during emissions. A particle
+	 * can be represented as a single matrix. This gives the particles an orientation rather than
+	 * just a simple position.
+	 *
+	 * This allows transformation to be applied to the particles, such as rotation. If
+	 * \ref rpPRTSTDEMITTERPRTMTXFLAGSCNSMTX is set in the flag, then the prtCnsMatrix is applied to each
+	 * particle during particle update.
+	 *
+	 * If this structure is not present, then it assumes the  particles will have just a position
+	 * property.
+	 */
+	struct RpPrtStdEmitterPrtMatrix
+	{
+		RwMatrix prtCnsMtx; /**< Transformation matrix to be applied to each particle */
+
+		RwV3d prtPosMtxAt, /**< Particle initial look at vector */
+			prtPosMtxAtBias; /**< Particle initial look at vector bias */
+		RwV3d prtPosMtxUp, /**< Particle initial up vector. */
+			prtPosMtxUpBias; /**< Particle initial up vector bias */
+
+		int flags; /**< Particle matrix flag. See \ref RpPrtStdEmitterPrtMatrixFlags */
 	};
 
 	struct RpPrtStdEmitter {
+
+
 		RpPrtStdEmitter* next; /**< Pointer to the next emitter */
 
 		unsigned int flag; /**< Emitter's property flag */
@@ -119,6 +293,13 @@ namespace RWE::Particles {
 		float boundingSphere; /**< Emitter's bounding sphere. */
 
 		void AddEmitter(RpPrtStdEmitter* em);
+
+		RpPrtStdEmitterStandard* GetStandard();
+		RpPrtStdEmitterPrtColor* GetColor();
+		RpPrtStdEmitterPrtTexCoords* GetTexCoords();
+		RpPrtStdEmitterPrtMatrix* GetMatrix();
+	private:
+		void* GetDataById(RpPrtStdPropertyTable::Properties p);
 	};
 
 }

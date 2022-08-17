@@ -247,6 +247,124 @@ namespace RWE::Particles {
 
 	/**
 	 * \ingroup rpprtstd
+	 * \struct RpPrtStdEmitterPrt2DRotate
+	 * An optional structure to represent the 2D rotation of a particle from birth to death.
+	 * The particles will start with being rotated by prtStart2DRotate and ends with being rotated by prtEnd2DRotate.
+	 * The rotation is specified in radians. The starting rotation must be between -PI and PI.
+	 * Multiple revolutions can be obtained by specifying an end rotation > the start rotation + 2 PI.
+	 *
+	 * The particle's life is used to interpolate the size.
+	 *
+	 * If this structure is not present, then the particles will either have a global rotation or no rotation.
+	 */
+	struct RpPrtStdEmitterPrt2DRotate
+	{
+		float prtStart2DRotate, /**< Particle start 2D rotate */
+			prtStart2DRotateBias; /**< Particle start 2D rotate bias */
+		float prtEnd2DRotate, /**< Particle end 2D rotate */
+			prtEnd2DRotateBias; /**< Particle end 2D rotate bias */
+	};
+
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdEmitterPrtSize
+	 * An optional structure to represent the change in size of a particle from birth to death.
+	 * The particles will start with prtStartSize and ends with prtEndSize. The particle's life
+	 * is used to interpolate the size.
+	 *
+	 * If this structure is not present, then the particles will have a constant size.
+	 */
+	struct RpPrtStdEmitterPrtSize
+	{
+		RwV2d prtStartSize, /**< Particle start size */
+			prtStartSizeBias; /**< Particle start size bias */
+		RwV2d prtEndSize, /**< Particle end size */
+			prtEndSizeBias; /**< Particle end size bias */
+	};
+
+	/**
+	 * \ingroup rpptank
+	 * Passed to \ref RpPTankAtomicCreate, these flags specify
+	 * the type and properties held by the particles.
+	 * Some flags are mutually exclusive and should not be mixed.
+	 * The debug version of the library will assert and signal these problems.
+	 */
+	enum class RpPTankDataFlags : int
+	{
+		NONE = ((int)0x00000000),
+		POSITION = ((int)0x00000001),   /**<Uses a position per particle*/
+		COLOR = ((int)0x00000002),   /**<Uses a color per particle*/
+		SIZE = ((int)0x00000004),   /**<Uses a size per particle. This flag is ignored if the particle is a matrix.*/
+		MATRIX = ((int)0x00000008),   /**<Uses a matrix per particle*/
+		NORMAL = ((int)0x00000010),   /**<Uses a normal per particle*/
+		F2DROTATE = ((int)0x00000020),   /**<Uses a 2D rotation per particle*/
+		VTXCOLOR = ((int)0x00000040),   /**<Uses a color per Billboard vertex*/
+		VTX2TEXCOORDS = ((int)0x00000080),   /**<Uses Top-Left and Bottom-Right Texture coordinates*/
+		VTX4TEXCOORDS = ((int)0x00000100),   /**<Uses a texture UV per vertex*/
+		CNSMATRIX = ((int)0x00008000),   /**<Uses a constant matrix*/
+		CNS2DROTATE = ((int)0x00020000),   /**<Uses a constant 2D rotation*/
+		CNSVTXCOLOR = ((int)0x00040000),   /**<Uses a constant color per Billboard vertex*/
+		CNSVTX2TEXCOORDS = ((int)0x00080000),   /**<Uses constant Top-Left and Bottom-Right Texture coordinates*/
+		CNSVTX4TEXCOORDS = ((int)0x00100000),   /**<Uses a constant texture UV per vertex*/
+		USECENTER = ((int)0x01000000),    /**<The position of the particles are shifted*/
+		ARRAY = ((int)0x10000000),    /**<Data is organized in an array */
+		STRUCTURE = ((int)0x20000000),    /**<Data is organized in a structure */
+	};
+	template<>
+	class ::enum_is_flags<RpPTankDataFlags> : public std::true_type {};
+
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdEmitterPTank
+	 *
+	 * A structure for storing the data required to create a RpPTank for use
+	 * with the emitter. The structure allows the user to create a RpPTank
+	 * manually.
+	 */
+	struct RpPrtStdEmitterPTank
+	{
+		int dataFlags, /**< Data flag used in RpPTank creation. See \ref RpPTankAtomicCreate  */
+			platFlags, /**< Platform flag used in RpPTank creation. See \ref RpPTankAtomicCreate */
+			numPrt, /**< An integer representing the current number of active * particles */
+			maxPrt; /**< An integer representing the maxiumum number of particles * stored in the RpPTank */
+		RpPTankDataFlags updateFlags, /**< A flag representing the properties to be updated by the particle emiiter during update. A user may select to
+							 * update some properties manually by unsetting the relevant bits in the flag. The flag settings are the same as \ref RpPTankDataFlags */
+			emitFlags; /**< A flag representing the properties to be initialized * by the particle emitter during particles emission. A user
+							 * may select to initialize some properties manually by unsetting the relevant bits in the flag.
+							 * The flag settings are the same as \ref RpPTankDataFlags */
+		RpAtomic* pTank; /**< Pointer to the RpPTank \ref RpAtomic. */
+		char** dataInPtrs, /**< An array of pointers pointing to the particle's property buffers in RpPTank. This array points to the input values to
+							  * be updated. The pointers must be incremented after each particle is processed.
+							  * The size of the array is dependant on the number of particle properties. The order of the properties is constant.
+							  * \see RpPTankDataLockFlags. */
+			** dataOutPtrs;  /**< An array of pointers pointing to the particle's property
+							 * buffers in RpPTank. This array points to where updated values
+							 * are to be written. This can be in the input buffer or a
+							 * seperate output buffer. Dead particles are removed by being
+							 * overwritten by live particles. So the pointers should only
+							 * be incremented for each live particle updated.
+							 * The size of the array is dependant on the number of particle
+							 * properties. The order of the properties is constant.
+							 * \see RpPTankDataLockFlags. */
+		int* dataStride;    /**< An array of \ref RwInt32 to store the stride of the
+													 * particle properties in the RpPTank. This is the value the
+													 * data pointers need to be incremented to the next particle.
+													 * The size of the array is dependant on the number of particle
+													 * properties. The order of the stride is constant.
+													 * \see RpPTankDataLockFlags. */
+		unsigned int strSrcBlend;    /**< This is used to set the source blend mode for the RpPTank
+													 * \ref RpAtomic when it is created for the first time.
+													 * \see RpPTankAtomicSetBlendModes. */
+		unsigned int strDstBlend;    /**< This is used to set the destination blend mode for the RpPTank
+													 * \ref RpAtomic when it is created for the first time.
+													 * \see RpPTankAtomicSetBlendModes. */
+		int strVtxABlend;   /**< This is used to enable vertex alpha blending for the
+													 * RpTank \ref RpAtomic when it is created for the first time.
+													 * \see RpPTankAtomicSetVertexAlpha. */
+	};
+
+	/**
+	 * \ingroup rpprtstd
 	 * \struct RpPrtStdEmitterPrtMatrix
 	 *
 	 * An optional structure to construct a matrix for each particle during emissions. A particle
@@ -297,6 +415,9 @@ namespace RWE::Particles {
 		RpPrtStdEmitterStandard* GetStandard();
 		RpPrtStdEmitterPrtColor* GetColor();
 		RpPrtStdEmitterPrtTexCoords* GetTexCoords();
+		RpPrtStdEmitterPrt2DRotate* GetRotate();
+		RpPrtStdEmitterPrtSize* GetSize();
+		RpPrtStdEmitterPTank* GetTank();
 		RpPrtStdEmitterPrtMatrix* GetMatrix();
 	private:
 		void* GetDataById(RpPrtStdPropertyTable::Properties p);

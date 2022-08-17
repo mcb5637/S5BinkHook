@@ -70,6 +70,21 @@ RWE::Particles::RpPrtStdEmitterPrtTexCoords* RWE::Particles::RpPrtStdEmitter::Ge
     return static_cast<RpPrtStdEmitterPrtTexCoords*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTTEXCOORDS));
 }
 
+RWE::Particles::RpPrtStdEmitterPrt2DRotate* RWE::Particles::RpPrtStdEmitter::GetRotate()
+{
+    return static_cast<RpPrtStdEmitterPrt2DRotate*>(GetDataById(RpPrtStdPropertyTable::Properties::PRT2DROTATE));
+}
+
+RWE::Particles::RpPrtStdEmitterPrtSize* RWE::Particles::RpPrtStdEmitter::GetSize()
+{
+    return static_cast<RpPrtStdEmitterPrtSize*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTSIZE));
+}
+
+RWE::Particles::RpPrtStdEmitterPTank* RWE::Particles::RpPrtStdEmitter::GetTank()
+{
+    return static_cast<RpPrtStdEmitterPTank*>(GetDataById(RpPrtStdPropertyTable::Properties::PTANK));
+}
+
 RWE::Particles::RpPrtStdEmitterPrtMatrix* RWE::Particles::RpPrtStdEmitter::GetMatrix()
 {
     return static_cast<RpPrtStdEmitterPrtMatrix*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTMATRIX));

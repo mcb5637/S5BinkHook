@@ -26,6 +26,9 @@ namespace RWE::Particles {
 			PTANK = 6,
 			PRTVELOCITY = 7,
 			PRTMATRIX = 8,
+
+			Ex_FogEmitter = 0x1000006,
+			Ex_CircularEmitter = 0x1000007,
 		};
 
 
@@ -390,6 +393,19 @@ namespace RWE::Particles {
 		int flags; /**< Particle matrix flag. See \ref RpPrtStdEmitterPrtMatrixFlags */
 	};
 
+	struct Ex_CircularEmitter {
+		float Radius, InPlaneRandomness, HeightRandomness;
+		int IsHorizontal;
+		float Angle; // rad
+	};
+
+	struct Ex_FogEmitter {
+		int Size;
+		int Bool1, Bool2;
+		RwV3d* SpawnOffsets;
+		RwV3d* Data;
+	};
+
 	struct RpPrtStdEmitter {
 
 
@@ -419,6 +435,8 @@ namespace RWE::Particles {
 		RpPrtStdEmitterPrtSize* GetSize();
 		RpPrtStdEmitterPTank* GetTank();
 		RpPrtStdEmitterPrtMatrix* GetMatrix();
+		Ex_CircularEmitter* GetCircularEmitter();
+		Ex_FogEmitter* GetFogEmitter();
 	private:
 		void* GetDataById(RpPrtStdPropertyTable::Properties p);
 	};

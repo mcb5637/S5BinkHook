@@ -90,6 +90,16 @@ RWE::Particles::RpPrtStdEmitterPrtMatrix* RWE::Particles::RpPrtStdEmitter::GetMa
     return static_cast<RpPrtStdEmitterPrtMatrix*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTMATRIX));
 }
 
+RWE::Particles::Ex_CircularEmitter* RWE::Particles::RpPrtStdEmitter::GetCircularEmitter()
+{
+    return static_cast<Ex_CircularEmitter*>(GetDataById(RpPrtStdPropertyTable::Properties::Ex_CircularEmitter));
+}
+
+RWE::Particles::Ex_FogEmitter* RWE::Particles::RpPrtStdEmitter::GetFogEmitter()
+{
+    return static_cast<Ex_FogEmitter*>(GetDataById(RpPrtStdPropertyTable::Properties::Ex_FogEmitter));
+}
+
 void* RWE::Particles::RpPrtStdEmitter::GetDataById(RpPrtStdPropertyTable::Properties p)
 {
     int off = emtClass->propTab->GetPropOffset(p);

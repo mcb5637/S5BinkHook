@@ -98,7 +98,7 @@ namespace ED {
 	public:
 		ED::CDisplayStaticWithHierarchy* EntityDisplay = nullptr;
 		EGL::TSlot<EGL::SSlotArgsAnimation, 796165920>* Slot = nullptr; // 2
-		RWE::RtAnimationFrameHandler* AnimHandlerData;
+		RWE::Anim::RpHAnimHierarchy* AnimHandlerData;
 		int CurrentAnimId; // 4
 		float AnimSpeed; //?
 		float StartTime; // 6
@@ -113,7 +113,7 @@ namespace ED {
 
 	class CDisplayBehaviorAnimation : public CDisplayBehaviorAnimationNoBlending { // size 15
 	public:
-		RWE::RtAnimationFrameHandler* AnimHandlerData2; // 9
+		RWE::Anim::RpHAnimHierarchy* AnimHandlerData2; // 9
 
 		static inline constexpr int vtp = 0x7AEB40;
 		static inline constexpr int TypeDesc = 0x84D6A4;
@@ -184,7 +184,7 @@ namespace ED {
 
 	class CDisplayStaticWithHierarchy : public CDisplayStaticEntity {
 	public:
-		RWE::RtAnimationFrameHandler* Handler; // 17
+		RWE::Anim::RpHAnimHierarchy* Handler; // 17
 
 		static inline constexpr int vtp = 0x76AE30;
 	};

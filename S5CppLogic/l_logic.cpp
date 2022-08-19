@@ -21,6 +21,7 @@
 #include "s5_guistates.h"
 #include "s5_tasklist.h"
 #include "s5_RWEngine.h"
+#include "s5_RWE_anim.h"
 #include "luaext.h"
 #include "hooks.h"
 #include "luaserializer.h"
@@ -904,7 +905,7 @@ namespace CppLogic::Logic {
 	}
 	struct LogicModel {
 		RWE::RpClump* Model = nullptr;
-		RWE::RtAnimationFrameHandler* AnimHandler = nullptr;
+		RWE::Anim::RpHAnimHierarchy* AnimHandler = nullptr;
 		float StartTime = 0;
 
 		static int Clear(lua::State L) {
@@ -943,9 +944,9 @@ namespace CppLogic::Logic {
 				throw lua::LuaException{ "no animhandler?" };
 			auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(anim);
 			m->AnimHandler->SetupForModel(m->Model);
-			m->AnimHandler->SetAnimation(adata);
-			m->AnimHandler->SetTimeOfAnim(0.0f);
-			m->AnimHandler->ApplyTransforms();
+			m->AnimHandler->currentAnim->SetAnimation(adata);
+			m->AnimHandler->currentAnim->SetCurrentTime(0.0f);
+			m->AnimHandler->UpdateMatrices();
 			m->StartTime = (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds();
 			return 0;
 		}
@@ -958,8 +959,8 @@ namespace CppLogic::Logic {
 			float t = L.OptFloat(2, (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds());
 			if (L.OptBool(3, true))
 				t -= m->StartTime;
-			m->AnimHandler->SetTimeOfAnim(t);
-			m->AnimHandler->ApplyTransforms();
+			m->AnimHandler->currentAnim->SetCurrentTime(t);
+			m->AnimHandler->UpdateMatrices();
 			return 0;
 		}
 		static int Translate(lua::State L) {

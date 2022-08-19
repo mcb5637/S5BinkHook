@@ -240,6 +240,9 @@
     <ClInclude Include="s5_RWE_particles.h">
       <Filter>shok\engine</Filter>
     </ClInclude>
+    <ClInclude Include="s5_RWE_anim.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -381,6 +384,9 @@
       <Filter>shok\globals</Filter>
     </ClCompile>
     <ClCompile Include="s5_RWE_particles.cpp">
+      <Filter>shok\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_RWE_anim.cpp">
       <Filter>shok\engine</Filter>
     </ClCompile>
   </ItemGroup>

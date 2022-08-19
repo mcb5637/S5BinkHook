@@ -190,8 +190,8 @@ namespace ED {
 	class CHAnimEffect : public IEffect {
 	public:
 		RWE::RpClump* Clump; // 2
-		RWE::RtAnimAnimation* Anim;
-		RWE::RtAnimationFrameHandler* AnimHandler; // 4
+		RWE::Anim::RtAnimAnimation* Anim;
+		RWE::Anim::RpHAnimHierarchy* AnimHandler; // 4
 
 	public:
 		static inline constexpr int vtp = 0x7AE98C;

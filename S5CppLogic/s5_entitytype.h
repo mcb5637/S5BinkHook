@@ -114,6 +114,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76E498;
 		static inline constexpr int TypeDesc = 0x810B30;
+		static inline constexpr unsigned int Identifier = 0xA2A53F58;
 	};
 	//constexpr int i = offsetof(CGLSettlerProps, ModifyGroupLimit) / 4;
 

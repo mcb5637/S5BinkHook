@@ -78,9 +78,9 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
-	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, 0x23962D3D);
+	CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 
-	return 0;
+	return 1;
 }
 
 int Cleanup(lua::State L) {

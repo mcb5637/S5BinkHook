@@ -59,9 +59,9 @@ RWE::RwFrame* RWE::RwFrame::ForAllChildren(RwFrameCallBack callBack, void* data)
     return frame_forallchildren(this, callBack, data);
 }
 static inline RWE::RwFrameCallBack frame_getanimhandler = reinterpret_cast<RWE::RwFrameCallBack>(0x720440);
-RWE::RtAnimationFrameHandler* RWE::RwFrame::GetAnimFrameHandler()
+RWE::Anim::RpHAnimHierarchy* RWE::RwFrame::GetAnimFrameHandler()
 {
-    RWE::RtAnimationFrameHandler* h = nullptr;
+    RWE::Anim::RpHAnimHierarchy* h = nullptr;
     ForAllChildren(frame_getanimhandler, &h);
     return h;
 }
@@ -192,75 +192,6 @@ RWE::RpWorld* RWE::RpWorld::RemoveClump(RpClump* clump)
     return world_remclump(this, clump);
 }
 
-static inline RWE::RtAnimationFrameHandler* (__cdecl* const animframehandler_clone)(RWE::RtAnimationFrameHandler* th, RWE::RtAnimationFrameHandler::AnimFlags d, void* da) = reinterpret_cast<RWE::RtAnimationFrameHandler * (__cdecl*)(RWE::RtAnimationFrameHandler*, RWE::RtAnimationFrameHandler::AnimFlags, void*)>(0x6EBB30);
-RWE::RtAnimationFrameHandler* RWE::RtAnimationFrameHandler::Clone()
-{
-    return animframehandler_clone(this, Flags, Animation->Data);
-}
-static inline void(__cdecl* const animframehandler_anim_setanim)(RWE::RtAnimationFrameHandler::AnimData* th, RWE::RtAnimAnimation* a) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, RWE::RtAnimAnimation*)>(0x6EAE10);
-void RWE::RtAnimationFrameHandler::SetAnimation(RWE::RtAnimAnimation* a)
-{
-    animframehandler_anim_setanim(Animation, a);
-}
-static inline void(__cdecl* const animframehandler_destroy)(RWE::RtAnimationFrameHandler* th) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler*)>(0x6EB990);
-void RWE::RtAnimationFrameHandler::Destroy()
-{
-    animframehandler_destroy(this);
-}
-static inline void(__cdecl* const animframehandler_anim_advtime)(RWE::RtAnimationFrameHandler::AnimData* th, float t) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, float t)>(0x6EAF10);
-void RWE::RtAnimationFrameHandler::AdvanceTime(float t)
-{
-    animframehandler_anim_advtime(Animation, t);
-}
-static inline void(__cdecl* const animframehandler_anim_subtime)(RWE::RtAnimationFrameHandler::AnimData* th, float t) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, float t)>(0x6EB280);
-void RWE::RtAnimationFrameHandler::SubstractTime(float t)
-{
-    animframehandler_anim_subtime(Animation, t);
-}
-static inline void(__cdecl* const animframehandler_anim_settime)(RWE::RtAnimationFrameHandler::AnimData* th, float t) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, float t)>(0x6EB400);
-void RWE::RtAnimationFrameHandler::SetTimeOfAnim(float t)
-{
-    animframehandler_anim_settime(Animation, t);
-}
-static inline void(__cdecl* const animframehandler_apply)(RWE::RtAnimationFrameHandler* th) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler*)>(0x6EC080);
-void RWE::RtAnimationFrameHandler::ApplyTransforms()
-{
-    animframehandler_apply(this);
-}
-
-void RWE::RtAnimationFrameHandler::SetupForModel(RWE::RpClump* c)
-{
-    struct data {
-        RWE::RtAnimationFrameHandler* th;
-        bool found = false;
-    };
-    data d{ this };
-    c->ForAllAtomics(reinterpret_cast<RWE::RpAtomicCallBack>(0x487D1A), &d);
-    struct unknownclumpaddon {
-        PADDINGI(3);
-        ED::ModelData* ModelData;
-    };
-    unknownclumpaddon* a = reinterpret_cast<unknownclumpaddon*>(reinterpret_cast<int>(c) + *reinterpret_cast<int*>(0x858228));
-    ED::ModelData::ModelFlags flags = ED::ModelData::ModelFlags::None;
-    if (a->ModelData) {
-        flags = a->ModelData->Flags;
-    }
-    if (d.found && (flags & ED::ModelData::ModelFlags::HierarchyDestroyed) != ED::ModelData::ModelFlags::None) {
-        //reinterpret_cast<byte*>(this)[1] &= 0xCFu; // ~0x30
-        Flags = Flags & ~(AnimFlags::DoNotDestroyHierarchy | AnimFlags::HierarchyNotDestroyed);
-    }
-    else {
-        //reinterpret_cast<byte*>(this)[1] |= 0x10;
-        Flags = Flags | AnimFlags::DoNotDestroyHierarchy;
-        reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler*)>(0x6EC7E0)(this);
-    }
-}
-
-static inline void(__cdecl* const animframehandler_fuse)(RWE::RtAnimationFrameHandler::AnimData* th, RWE::RtAnimationFrameHandler::AnimData* a1, RWE::RtAnimationFrameHandler::AnimData* a2, float r) = reinterpret_cast<void(__cdecl*)(RWE::RtAnimationFrameHandler::AnimData*, RWE::RtAnimationFrameHandler::AnimData*, RWE::RtAnimationFrameHandler::AnimData*, float)>(0x6EB0E0);
-void RWE::RtAnimationFrameHandler::FuseAnimations(RtAnimationFrameHandler* anim1, RtAnimationFrameHandler* anim2, float ratio)
-{
-    animframehandler_fuse(Animation, anim1->Animation, anim2->Animation, ratio);
-}
 
 static inline RwTexture* (__cdecl* const texture_read)(const char* n, const char* m) = reinterpret_cast<RwTexture* (__cdecl*)(const char*, const char*)>(0x417DB0);
 RwTexture* RwTexture::Read(const char* name, const char* mask)
@@ -271,17 +202,6 @@ static inline int(__cdecl* const texture_destroy)(RwTexture* t) = reinterpret_ca
 void RwTexture::Destroy()
 {
     texture_destroy(this);
-}
-
-static inline RtAnimAnimation* (__cdecl* const anim_read)(const char* name) = reinterpret_cast<RtAnimAnimation * (__cdecl*)(const char*)>(0x6EB180);
-RtAnimAnimation* RtAnimAnimation::Read(const char* name)
-{
-    return anim_read(name);
-}
-static inline void(__cdecl* const anim_destroy)(RtAnimAnimation* a) = reinterpret_cast<void(__cdecl*)(RtAnimAnimation*)>(0x6EAC50);
-void RtAnimAnimation::Destroy()
-{
-    anim_destroy(this);
 }
 
 static inline BB::TResourceProxyResMgr<RWE::RwTexture*>** (__thiscall* const crwtextures_get)(BBRw::CRwTextures* th, const char* n, int z) = reinterpret_cast<BB::TResourceProxyResMgr<RWE::RwTexture*>**(__thiscall*)(BBRw::CRwTextures*, const char*, int)>(0x472CCA);

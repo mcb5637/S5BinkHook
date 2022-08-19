@@ -198,7 +198,7 @@ namespace RWE {
 		RwFrame* Translate(const RwV3d* translation, RwOpCombineType combineOp);
 		// returns this
 		RwFrame* ForAllChildren(RwFrameCallBack callBack, void* data);
-		RtAnimationFrameHandler* GetAnimFrameHandler();
+		RWE::Anim::RpHAnimHierarchy* GetAnimFrameHandler();
 	};
 
 	struct RwObjectHasFrame {
@@ -495,38 +495,6 @@ namespace RWE {
 	};
 	static_assert(offsetof(RwGlobals, memoryFuncs) == 264);
 	//constexpr int i = offsetof(RwGlobals, stringFuncs)/4;
-
-	struct RtAnimationFrameHandler { // attached to a frame, plugin? not sure what this does size 9?
-		enum class AnimFlags : unsigned int {
-			None = 0,
-			DoNotDestroyHierarchy = 0x1000,
-			HierarchyNotDestroyed = 0x2000,
-		};
-
-
-		AnimFlags Flags;
-		PADDINGI(1);
-		PADDINGI(5); // pointer?
-		PADDINGI(1);
-		struct AnimData {
-			RWE::RtAnimAnimation* Anim;
-			float Time;
-			void* Data;
-		}* Animation; // 8
-
-		RtAnimationFrameHandler* Clone();
-		void SetAnimation(RWE::RtAnimAnimation* a);
-		void Destroy();
-		void AdvanceTime(float t);
-		void SubstractTime(float t);
-		void SetTimeOfAnim(float t);
-		void ApplyTransforms();
-		void SetupForModel(RWE::RpClump* c);
-		void FuseAnimations(RtAnimationFrameHandler* anim1, RtAnimationFrameHandler* anim2, float ratio);
-	};
-	template<>
-	class ::enum_is_flags<RtAnimationFrameHandler::AnimFlags> : public std::true_type {};
-	//constexpr int i = offsetof(RtAnimationFrameHandler, Animation)/4;
 }
 
 struct RwTexture {
@@ -540,15 +508,6 @@ struct RwTexture {
 
 	static RwTexture* Read(const char* name, const char* mask);
 	// destroys if no reference left
-	void Destroy();
-};
-
-struct RtAnimAnimation {
-	PADDINGI(3);
-	float Duration; // 3
-
-
-	static RtAnimAnimation* Read(const char* name);
 	void Destroy();
 };
 

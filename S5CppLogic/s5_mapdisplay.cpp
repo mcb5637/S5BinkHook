@@ -6,6 +6,7 @@
 #include "s5_idmanager.h"
 #include "s5_classfactory.h"
 #include "s5_glue.h"
+#include "s5_RWE_anim.h"
 
 
 bool ED::CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)

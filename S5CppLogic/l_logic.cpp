@@ -534,12 +534,12 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.GetState() != *EScr::CScriptTriggerSystem::GameState)
 			throw lua::LuaException("does only work ingame");
-		if (!shok::GetStringTableTextOverride) {
-			shok::HookGetStringTableText();
+		if (!BB::StringTableText::GetStringTableTextOverride) {
+			BB::StringTableText::HookGetStringTableText();
 			L.PushLightUserdata(&SetStringTableText);
 			L.NewTable();
 			L.SetTableRaw(L.REGISTRYINDEX);
-			shok::GetStringTableTextOverride = [](const char* s) {
+			BB::StringTableText::GetStringTableTextOverride = [](const char* s) {
 				if (!s)
 					return s;
 				const char* r = nullptr;
@@ -1094,7 +1094,7 @@ namespace CppLogic::Logic {
 		NetEventUnSetHook(L);
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
 		EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
-		shok::GetStringTableTextOverride = nullptr;
+		BB::StringTableText::GetStringTableTextOverride = nullptr;
 		GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
 		GGUI::CPlaceBuildingState::PlacementRotation = 0.0f;
 		EGL::CGLEEntity::UseMaxHPTechBoni = false;

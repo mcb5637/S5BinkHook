@@ -27,12 +27,62 @@ enum class win_mouseEvents : int {
 	XButtonDBl = 0x20D,
 };
 
+namespace BB {
+	class ITextSet {
+	public:
+		static inline constexpr int vtp = 0x7AECB0;
+		virtual ~ITextSet() = default;
+		virtual void __stdcall Destroy() = 0;
+		virtual const char* __stdcall GetTextById(int id) = 0;
+		virtual const char* __stdcall GetText(const char* key) = 0;
+		virtual void __stdcall CopyText(const char* targetKey, const char* sourceKey) = 0;
+		virtual void __stdcall Load(const char* dir) = 0;
+		virtual BB::CIDManagerEx* __stdcall GetIdManager() = 0;
+	};
+	class CTextSet : public ITextSet {
+	public:
+		static inline constexpr int vtp = 0x7AED08;
+		char Language[4];
+		char* Directory; // ingame
+		PADDINGI(1);
+		BB::CIDManagerEx* IdManager;
+		shok::Vector<char*> Strings; // 5
+
+		void Load();
+		void Merge(CTextSet* other);
+	};
+	static_assert(sizeof(CTextSet) == 4 * 9);
+	class IText {
+	public:
+		static inline constexpr int vtp = 0x7AECD0;
+		virtual ~IText() = default;
+		virtual void __stdcall Destroy() = 0;
+		virtual void __stdcall SetLanguage(const char* l) = 0; // 2 letters code
+		virtual CTextSet* __stdcall CreateTextSet() = 0;
+		virtual CTextSet* __stdcall CreateTextSetAndLoadFromDir(const char* dir) = 0;
+		virtual CTextSet* __stdcall CreateSetAndLoadFrom2Dirs(const char* dir1, const char* dir2) = 0;
+	};
+	class CText : public IText {
+	public:
+		static inline constexpr int vtp = 0x7AECEC;
+		char Language[4];
+	};
+	static_assert(sizeof(CText) == 2 * 4);
+	struct StringTableText {
+		CText* Text;
+		CTextSet* TextSet;
+
+		static inline const char* (__cdecl* const GetStringTableText)(const char* key) = reinterpret_cast<const char* (__cdecl* const)(const char*)>(0x556D2E);
+		static const char* (*GetStringTableTextOverride)(const char* s);
+		static void HookGetStringTableText();
+
+		static inline StringTableText** const GlobalObj = reinterpret_cast<StringTableText**>(0x894508);
+	};
+}
+
 namespace shok {
 	static inline HWND* MainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
 
-	const char* (__cdecl* const GetStringTableText)(const char* key) = reinterpret_cast<const char* (__cdecl* const)(const char*)>(0x556D2E);
-	extern const char* (*GetStringTableTextOverride)(const char* s);
-	void HookGetStringTableText();
 
 	class UIRenderer {
 	public:

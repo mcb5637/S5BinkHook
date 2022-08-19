@@ -18,12 +18,22 @@ struct shok_vtable_GGL_CGLGUIInterface {
 	bool(__thiscall* GetNearestFreeBuildingPos)(GGL::CGLGUIInterface* th, int ety, float inx, float iny, float* outx, float* outy, float range);
 };
 
+static inline void(__thiscall* const textset_load)(BB::CTextSet* th) = reinterpret_cast<void(__thiscall*)(BB::CTextSet*)>(0x723647);
+void BB::CTextSet::Load()
+{
+	textset_load(this);
+}
+static inline void(__thiscall* const textset_merge)(BB::CTextSet* th, BB::CTextSet* o) = reinterpret_cast<void(__thiscall*)(BB::CTextSet*, BB::CTextSet*)>(0x723647);
+void BB::CTextSet::Merge(CTextSet* other)
+{
+	textset_merge(this, other);
+}
 
-const char* (*shok::GetStringTableTextOverride)(const char* s) = nullptr;
+const char* (*BB::StringTableText::GetStringTableTextOverride)(const char* s) = nullptr;
 const char* __stdcall hookstt(const char* s) {
-	if (!shok::GetStringTableTextOverride)
+	if (!BB::StringTableText::GetStringTableTextOverride)
 		return nullptr;
-	return shok::GetStringTableTextOverride(s);
+	return BB::StringTableText::GetStringTableTextOverride(s);
 }
 void __declspec(naked) hooksttasm() {
 	__asm {
@@ -42,15 +52,15 @@ void __declspec(naked) hooksttasm() {
 	}
 }
 bool HookGetStringTableText_Hooked = false;
-void shok::HookGetStringTableText()
+void BB::StringTableText::HookGetStringTableText()
 {
 	if (HookGetStringTableText_Hooked)
 		return;
 	if (CppLogic::HasSCELoader())
 		throw 0;
 	HookGetStringTableText_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ shok::GetStringTableText , 0x20 };
-	CppLogic::Hooks::WriteJump(shok::GetStringTableText, &hooksttasm, reinterpret_cast<void*>(0x556D33));
+	CppLogic::Hooks::SaveVirtualProtect vp{ BB::StringTableText::GetStringTableText , 0x20 };
+	CppLogic::Hooks::WriteJump(BB::StringTableText::GetStringTableText, &hooksttasm, reinterpret_cast<void*>(0x556D33));
 }
 
 static inline void(__thiscall* const uirender_rtext)(shok::UIRenderer* r, const char* txt, int font, float uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* ccc, float ldf) =

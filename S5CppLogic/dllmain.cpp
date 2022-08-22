@@ -79,8 +79,8 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
-	L.Push((int)(*ED::CGlobalsBaseEx::GlobalObj)->Auras);
-	return 1;
+	EGL::CGLEEntity::HookCanCancelState();
+	return 0;
 }
 
 int Cleanup(lua::State L) {

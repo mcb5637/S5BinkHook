@@ -283,6 +283,8 @@ namespace EGL {
 		static bool BuildOnSetPosFixMovement;
 		static void HookBuildOnSetPos();
 		static void HookSetTaskListNonCancelable(bool active);
+		static std::vector<shok::TaskState> AdditionalCancelableStates;
+		static void HookCanCancelState();
 
 		static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
 		static void HookHero6Convert();

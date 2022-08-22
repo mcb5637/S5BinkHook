@@ -1631,6 +1631,39 @@ void EGL::CGLEEntity::HookSetTaskListNonCancelable(bool active)
 	}
 }
 
+int __stdcall cancancelstate_check(EGL::CGLEEntity* e) {
+	for (auto a : EGL::CGLEEntity::AdditionalCancelableStates)
+		if (a == e->CurrentState)
+			return 1;
+	return 0;
+}
+void __declspec(naked) cancancelstate_check_asm() {
+	__asm {
+		push ecx;
+		push ecx;
+		call cancancelstate_check;
+		pop ecx;
+		test eax, eax;
+		jz cont;
+		ret;
+
+	cont:
+		mov eax, [ecx + 0x88];
+		push 0x57A689;
+		ret;
+	};
+}
+std::vector<shok::TaskState> EGL::CGLEEntity::AdditionalCancelableStates{};
+bool HookCanCancelState_Hooked = false;
+void EGL::CGLEEntity::HookCanCancelState()
+{
+	if (HookCanCancelState_Hooked)
+		return;
+	HookCanCancelState_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57A683) , 0x10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57A683), &cancancelstate_check_asm, reinterpret_cast<void*>(0x57A689));
+}
+
 
 EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntity* e)
 {

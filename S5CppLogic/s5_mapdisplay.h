@@ -3,7 +3,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_maplogic.h"
-#include "s5_RWEngine.h"
+#include "s5_BBRw.h"
 
 namespace ED {
 	class ILandscape {
@@ -389,6 +389,28 @@ namespace ED {
 	};
 	static_assert(sizeof(CEntitiesTypeFlags) == 3 * 4);
 
+	class IAuras {
+	public:
+		static inline constexpr int vtp = 0x7695EC;
+		static inline constexpr unsigned int Identifier = 0x17F36327; // iauras and cauras ?
+
+		virtual unsigned int __stdcall GetClassIdentifier() const = 0;
+		virtual ~IAuras() = default;
+		virtual void Destroy() = 0;
+		virtual void ClearAuras() = 0;
+		virtual void AddAura(RWE::RpClump* clump) = 0;
+		virtual void RenderAuras() = 0;
+	};
+	class CAuras : public IAuras {
+	public:
+		shok::Vector<RWE::RpClump*> Clumps;
+		void* Shader; //BB::TResourceProxyResMgr<BBRw::CEffect *>
+		RWE::RwTexture* Texture;
+
+		static inline constexpr int vtp = 0x769608;
+	};
+	static_assert(sizeof(CAuras) == 4 * 7);
+
 	class CGlobalsBase {
 	public:
 		virtual ~CGlobalsBase() = default;
@@ -406,7 +428,7 @@ namespace ED {
 		PADDINGI(1); // p to something terrain related?
 		PADDINGI(1); // p to something water related? // 10
 		BBRw::CEngine* RWEngine; // p to BBRw::CEngine
-		PADDINGI(1); // p to ED::CAuras
+		CAuras* Auras;
 		ED::CCameraEx* Camera;
 		ED::CCommandAcknowledgements* CommandAcks;
 		ED::CEntitiesTypeFlags* EntityTypeFlags; // 15

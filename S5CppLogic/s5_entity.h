@@ -138,7 +138,7 @@ namespace EGL {
 		virtual int GetSector() = 0;
 		virtual bool IsInSector(int sec) = 0;
 	private:
-		virtual void UnknownEntityFunc1() = 0;
+		virtual void UnknownEntityFunc1() = 0; // update numauras + other updates?
 	public:
 		virtual void ExecuteTask(EGL::CGLETaskArgs* t) = 0;// 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 		virtual void FireEvent(BB::CEvent* ev) = 0;

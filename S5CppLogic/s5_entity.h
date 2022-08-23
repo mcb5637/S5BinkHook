@@ -140,7 +140,7 @@ namespace EGL {
 	private:
 		virtual void UnknownEntityFunc1() = 0; // update numauras + other updates?
 	public:
-		virtual void ExecuteTask(EGL::CGLETaskArgs* t) = 0;// 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
+		virtual int ExecuteTask(EGL::CGLETaskArgs* t) = 0;// 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
 		virtual void FireEvent(BB::CEvent* ev) = 0;
 		virtual void AddBehavior(EGL::CGLEBehavior* b) = 0; // 17 probably not usable outside of createentity
 		virtual void AddSlot(EGL::ISlot* slot, int i) = 0;

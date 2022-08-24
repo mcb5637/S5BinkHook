@@ -381,6 +381,48 @@ namespace GGL {
 			shok::ResourceType ResType = shok::ResourceType::None;
 			float ResAmount = 0, RawAmount = 0;
 		};
+		struct UIData {
+			float CamouflageBar = 0;
+			float LimitedLifespanBar = 0;
+			bool IsMine = false, BuildingIsMotivationLocked = false;
+			float HeroResurrectionTimePassed = 0;
+			float HeroResurrectionTimeMax = 0;
+			bool WorkerIsFleeing = false, IsHero = false; // 5
+			int KegTimeToExplode = 0;
+			int NPCMarker = 0;
+			bool BuildingOvertimeActive = false;
+			float ThiefSabotageOrDefuseBar = 0;
+			float BuildingAttachedThiefStealProgress = 0; // 10
+			float WorkerWorktimeBar = 0;
+			float LeaderCurrentSoldierAmount = 0;
+			float LeaderMaxSoldierAmount = 0;
+			float HealthBar = 0;
+			float BuildingProgressNumber = 0; // 15 upgrade and research
+			int LeaderExperienceLevels = 0;//float?
+			int EntityId = 0;
+			float WorkerMotivation = 0;
+			bool IsRefiner = false, IsWorkerOverhead = false, IsSerfOverhead = false, IsSoldierOverhead = false;
+			bool IsLeaderOverhead = false, IsBuildingAlarmActive = false; //20
+			shok::String TaskListName;
+			PADDINGI(14);
+			ED::CEntity* Entity = nullptr; // 42
+			GGL::CSettler* Settler = nullptr;
+			EGL::CGLEEntity* BuildingToDisplay = nullptr; // mine, constructionsite, building
+			GGL::CSettler* Leader = nullptr; //45
+			GGL::CBuilding* ConstructionSite = nullptr;
+			float Unknown = 0; //600 building, 310 cav experience class, 200 other settlers
+			int WorkplaceNumberOfWorkersAttached = 0;
+			int NumberOfSerfsAttachedToConstructionSite = 0;
+			int WorkplaceMaxNumberOfWorkers = 0; //50
+			int ResidenceNumberOfSleepers = 0;
+			int NumberOfSettlersEnteredBuilding = 0;
+			int ResidenceMaxNumberOfSleepers = 0;
+			int MaxNumberOfSerfsAttachedToConstructionSite = 0;
+			int FarmNumberOfEaters = 0; // 55
+			int FarmMaxNumberOfEaters = 0;
+			float BuildingProgressBar = 0; // bridge progress, building height, market trade
+			bool IsMercenaryBuilding = false;
+		};
 
 		virtual ~IGLGUIInterface() = default;
 		virtual bool CanPlaceBuildingAtPos(int ety, float x, float y, float r) = 0; // checks building func or buildblock of entity blocking
@@ -398,8 +440,8 @@ namespace GGL {
 		virtual void FillMineData(MineData* d) = 0; // works with mine building or resentity
 		virtual void FillMotivationData(MotivationData* d) = 0;
 		virtual void FillRefinerData(RefinerData* d) = 0;
+		virtual void FillUIData(int player, UIData* d) = 0;
 	private:
-		virtual void unknown0() = 0; // fill some data, maybe name related?
 		virtual void unknown1() = 0; // get workplace string???
 		virtual void unknown2() = 0; // get residence string???
 		virtual void unknown3() = 0; // get farm string???
@@ -486,6 +528,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76D79C;
 	};
+	//constexpr int i = offsetof(IGLGUIInterface::UIData, Entity) / 4;
 	class CGLGUIInterface : public IGLGUIInterface {
 	public:
 

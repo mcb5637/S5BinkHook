@@ -428,6 +428,133 @@ void EGUIX::CCustomWidget::InitializeCustomWidget()
     customwid_initwid(this);
 }
 
+
+static inline void(__thiscall* const onscreenmoti_render)(GGUI::COnScreenElementMotivation* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementMotivation*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53E93C);
+void GGUI::COnScreenElementMotivation::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenmoti_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenbuilding_inactive)(GGUI::COnScreenElementBuilding* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementBuilding*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x540922);
+void GGUI::COnScreenElementBuilding::RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenbuilding_inactive(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreentask_render)(GGUI::COnScreenElementTask* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementTask*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53F762);
+void GGUI::COnScreenElementTask::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreentask_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenexp_render)(GGUI::COnScreenElementExperience* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementExperience*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53F392);
+void GGUI::COnScreenElementExperience::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenexp_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenhealthbar_render)(GGUI::COnScreenElementHealthbar* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementHealthbar*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x540109);
+void GGUI::COnScreenElementHealthbar::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenhealthbar_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenworkers_render)(GGUI::COnScreenElementWorkers* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementWorkers*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x540E9C);
+void GGUI::COnScreenElementWorkers::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenworkers_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenres_render)(GGUI::COnScreenElementResources* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementResources*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53F5E8);
+void GGUI::COnScreenElementResources::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenres_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreensleep_render)(GGUI::COnScreenElementSleepers* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementSleepers*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x540C74);
+void GGUI::COnScreenElementSleepers::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreensleep_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenchom_render)(GGUI::COnScreenElementChomping* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementChomping*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x540D88);
+void GGUI::COnScreenElementChomping::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenchom_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreentype_render)(GGUI::COnScreenElementType* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data, int c) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementType*, const shok::Position*, const GGL::IGLGUIInterface::UIData*, int)>(0x53F8E6);
+void GGUI::COnScreenElementType::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+{
+    onscreentype_render(this, screenPos, data, centered);
+}
+
+static inline void(__thiscall* const onscreenrefiner_render)(GGUI::COnScreenElementRefiner* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementRefiner*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53EBBB);
+void GGUI::COnScreenElementRefiner::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+{
+    onscreenrefiner_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreensol_render)(GGUI::COnScreenElementSoldiers* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementSoldiers*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x540552);
+void GGUI::COnScreenElementSoldiers::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+{
+    onscreensol_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreennpc_inactive)(GGUI::COnScreenElementNpc* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementNpc*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53EAB5);
+void GGUI::COnScreenElementNpc::RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreennpc_inactive(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenhero_inactive)(GGUI::COnScreenElementHero* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementHero*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53FBBA);
+void GGUI::COnScreenElementHero::RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenhero_inactive(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenmerch_render)(GGUI::COnScreenElementMerchantBuilding* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementMerchantBuilding*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x54002D);
+void GGUI::COnScreenElementMerchantBuilding::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+{
+    onscreenmerch_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenbridge_inactive)(GGUI::COnScreenElementBridge* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementBridge*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53ED0E);
+void GGUI::COnScreenElementBridge::RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenbridge_inactive(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenthief_render)(GGUI::COnScreenElementThief* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementThief*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53EEFE);
+void GGUI::COnScreenElementThief::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+{
+    onscreenthief_render(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenbombtick_inactive)(GGUI::COnScreenElementBombTick* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementBombTick*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53F2F8);
+void GGUI::COnScreenElementBombTick::RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenbombtick_inactive(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreenplunder_inactive)(GGUI::COnScreenElementPlunder* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementPlunder*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53F0FB);
+void GGUI::COnScreenElementPlunder::RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreenplunder_inactive(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreeninfo_render_inactive)(GGUI::OnScreenInfoRenderer* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::OnScreenInfoRenderer*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x54167B);
+void GGUI::OnScreenInfoRenderer::RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreeninfo_render_inactive(this, screenPos, data);
+}
+
+static inline void(__thiscall* const onscreeninfo_render_active)(GGUI::OnScreenInfoRenderer* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::OnScreenInfoRenderer*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x54170B);
+void GGUI::OnScreenInfoRenderer::RenderActive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
+{
+    onscreeninfo_render_active(this, screenPos, data);
+}
+
 static inline void(__thiscall* const showresfloatie)(GGUI::C3DOnScreenInformationCustomWidget* th, int eid, int am) = reinterpret_cast<void(__thiscall*)(GGUI::C3DOnScreenInformationCustomWidget*, int, int)>(0x536361);
 void GGUI::C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(int eid, int amount)
 {

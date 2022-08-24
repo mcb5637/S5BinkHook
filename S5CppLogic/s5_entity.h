@@ -468,7 +468,7 @@ namespace GGL {
 		PADDINGI(1); // 39
 		PADDINGI(7); // 40 string?
 		struct EntityRef {
-			EGL::CGLEEntity* Self;
+			EGL::CGLEEntity* Self; // 125 in settler
 			EGL::CGLEEntity* Leader; // self if it is a leader
 			int LeaderId;
 			GGL::CSettler* SelfSett;
@@ -538,6 +538,7 @@ namespace GGL {
 	};
 	static_assert(sizeof(CSettler) == 137 * 4);
 	static_assert(offsetof(CSettler, ModifierProfile.EntityReference.OverheadWidget) == 130 * 4);
+	static_assert(offsetof(CSettler, ModifierProfile.EntityReference.Self) == 125 * 4);
 	//constexpr int i = offsetof(CSettler, ModifierProfile.OverheadWidget) / 4;
 
 	class CAnimal : public EGL::CMovingEntity {

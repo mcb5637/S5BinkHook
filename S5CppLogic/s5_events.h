@@ -795,7 +795,7 @@ namespace shok {
 		IsSerfOrWorker = 0x18009, //EGL::CEventGetValue<bool, 1709081367>
 		DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
 		// 0x1800B building get bool?
-		// 1800C resourcerefiner ret true
+		IsRefiner = 0x1800C, //EGL::CEventGetValue<bool, 1709081367>
 		IsThief = 0x1800D, //EGL::CEventGetValue<bool, 1709081367>
 
 		LimitedAttachment_Attach = 0x1A002, //GGL::CEventEntityAttachment

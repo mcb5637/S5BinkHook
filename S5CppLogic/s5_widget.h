@@ -371,7 +371,14 @@ namespace EGUIX {
 	class ICustomWidget { // size 35
 	public:
 		virtual ~ICustomWidget() = default;
-		// 5 more funcs
+	private:
+		virtual void uk() = 0;
+	public:
+		virtual void Destroy() = 0;
+		virtual void Render(CBaseWidget widget, float* zero) = 0;
+	private:
+		virtual void uk2(int, int) = 0;
+		virtual int uk3() = 0;
 
 		PADDINGI(6); // ctor memset 0
 		shok::String Strings[4];
@@ -397,10 +404,10 @@ namespace EGUIX {
 }
 
 namespace GGUI {
-	class C3DOnScreenInformationCustomWidget;
+	class OnScreenInfoRenderer;
 	class COnScreenElement {
 	public:
-		C3DOnScreenInformationCustomWidget* OSICW;
+		OnScreenInfoRenderer* OSIR;
 		PADDINGI(64);
 
 		virtual ~COnScreenElement() = default;
@@ -410,26 +417,38 @@ namespace GGUI {
 	class COnScreenElementMotivation : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E590;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // moti bubble
 	};
 	class COnScreenElementBuilding : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E530;
+
+		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // alarm, unknown playercolor+worker?, moti locked, overtime, progress perc
 	};
 	class COnScreenElementTask : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E598;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // work cycle icon
 	};
 	class COnScreenElementExperience : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E580;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // starts, leader type icon (does nothing, if not one of the hardcoded ecats)
 	};
 	class COnScreenElementHealthbar : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E558;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // health bar, limited lifespan bar
 	};
 	class COnScreenElementWorkers : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E578;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // worker icons
 	};
 	class COnScreenElementConstructionSite : public COnScreenElement {
 	public:
@@ -439,18 +458,26 @@ namespace GGUI {
 	public:
 		bool u;
 		static inline constexpr int vtp = 0x77E588;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // res icon and amount for mines and similar
 	};
 	class COnScreenElementSleepers : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E568;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // sleeper icons
 	};
 	class COnScreenElementChomping : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E570;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // eater icons
 	};
 	class COnScreenElementType : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E5A0;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // type name
 	};
 	class COnScreenElementWorktime : public COnScreenElement {
 	public:
@@ -459,135 +486,157 @@ namespace GGUI {
 	class COnScreenElementRefiner : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E520;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // res icon and res count
 	};
 	class COnScreenElementSoldiers : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E560;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // solder amount boxes
 	};
 	class COnScreenElementNpc : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E5B0;
+
+		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // npc marker
 	};
 	class COnScreenElementHero : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E5B8;
+
+		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // resurrect bar/icon, camo bar
 	};
 	class COnScreenElementMerchantBuilding : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E5C0;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // text
 	};
 	class COnScreenElementBridge : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E538;
+
+		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // progress bar
 	};
 	class COnScreenElementThief : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E540;
+
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // sabotage/defuse bar
 	};
 	class COnScreenElementBombTick : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E550;
+
+		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // countdown
 	};
 	class COnScreenElementPlunder : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E548;
+
+		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // thief steal bar
 	};
 
+	class OnScreenInfoRenderer {
+	public:
+		struct {
+			EGUIX::CMaterial Texture_DeadHero; // 46
+			EGUIX::CMaterial Texture_NPCMarker;
+			EGUIX::CMaterial Texture_NoWorker; // 66
+			EGUIX::CMaterial Texture_Alarm;
+			EGUIX::CMaterial Texture_Overtime;
+			EGUIX::CMaterial Texture_Locked;
+			EGUIX::CMaterial Texture_Healthbar0; // color to 0,0,0,125
+			EGUIX::CMaterial Texture_Healthbar0_again; // color to 0,180,0,255
+			EGUIX::CMaterial Texture_EmoteHappy;
+			EGUIX::CMaterial Texture_EmoteAngry;
+			EGUIX::CMaterial Texture_EmoteGood;
+			EGUIX::CMaterial Texture_EmoteSad;
+			EGUIX::CMaterial Texture_EmoteLeave; // 166
+			EGUIX::CMaterial Texture_EmoteFlee; // 176
+			EGUIX::CMaterial Texture_StatusEat; // 186
+			EGUIX::CMaterial Texture_StatusRest;
+			EGUIX::CMaterial Texture_StatusLeave;
+			EGUIX::CMaterial Texture_StatusIdle;
+			EGUIX::CMaterial Texture_StatusWork;
+			EGUIX::CMaterial Texture_StatusFlee;
+			EGUIX::CMaterial Texture_EmblemSword; // 246
+			EGUIX::CMaterial Texture_EmblemArcher;
+			EGUIX::CMaterial Texture_EmblemSpear;
+			EGUIX::CMaterial Texture_EmblemCavalry;
+			EGUIX::CMaterial Texture_EmblemCannon;
+			EGUIX::CMaterial Texture_EmblemThief;
+			EGUIX::CMaterial Texture_EmblemRifle;
+			EGUIX::CMaterial Texture_EmblemScout;
+			EGUIX::CMaterial Texture_RefineGold;
+			EGUIX::CMaterial Texture_RefineIron;
+			EGUIX::CMaterial Texture_RefineMud;
+			EGUIX::CMaterial Texture_RefineStone;
+			EGUIX::CMaterial Texture_RefineSulfur;
+			EGUIX::CMaterial Texture_RefineWood;
+			EGUIX::CMaterial Texture_ResGold;
+			EGUIX::CMaterial Texture_ResIron;
+			EGUIX::CMaterial Texture_ResMud;
+			EGUIX::CMaterial Texture_ResStone;
+			EGUIX::CMaterial Texture_ResSulfur;
+			EGUIX::CMaterial Texture_ResWood;
+			EGUIX::CMaterial Texture_OnscreenWorker;
+			EGUIX::CMaterial Texture_OnscreenSleeper;
+			EGUIX::CMaterial Texture_OnscreenChomping;
+			EGUIX::CMaterial Texture_OnscreenHearts;
+			EGUIX::CMaterial Texture_OnscreenStars1;
+			EGUIX::CMaterial Texture_OnscreenStars2;
+			EGUIX::CMaterial Texture_OnscreenStars3;
+			EGUIX::CMaterial Texture_OnscreenStars4;
+			EGUIX::CMaterial Texture_OnscreenStars5;
+			EGUIX::CMaterial Texture_MOEmpty;
+			int FontID_OnscreenNumbersSmall; // 500 in struct
+			int FontID_Onscreen10;
+			PADDINGI(3); // map? of entitytype -> texture gui/MO_NAME
+		} TextureData;
+		COnScreenElementMotivation OSEMotivation; // 551
+		COnScreenElementBuilding OSEBuilding; // 617
+		COnScreenElementTask OSETask; // 683
+		COnScreenElementExperience OSEExperience; // 749
+		COnScreenElementHealthbar OSEHealthbar; // 815
+		COnScreenElementWorkers OSEWorkers; // 881
+		COnScreenElementConstructionSite OSEConstructionSite;
+		COnScreenElementResources OSEResources; // 1013
+		COnScreenElementSleepers OSESleepers; // 1080
+		COnScreenElementChomping OSEChomping; // 1146
+		COnScreenElementType OSEType; // 1212
+		COnScreenElementWorktime OSEWorktime;
+		COnScreenElementRefiner OSERefiner; // 1344
+		COnScreenElementSoldiers OSESoldiers; // 1410
+		COnScreenElementNpc OSENpc; // 1476
+		COnScreenElementHero OSEHero; // 1542
+		COnScreenElementMerchantBuilding OSEMerchantBuilding; // 1608
+		COnScreenElementBridge OSEBridge; // 1674
+		COnScreenElementThief OSEThief; // 1740
+		COnScreenElementBombTick OSEBombTick; // 1806
+		COnScreenElementPlunder OSEPlunder; // 1872
+		struct {
+			struct Floatie {
+				PADDINGI(1);
+				OnScreenInfoRenderer* OSIR;
+				int EntityId, Amount;
+			};
+
+			shok::Vector<Floatie> Floaties;
+			OnScreenInfoRenderer* OSIR;
+		} FloatieManager;
+
+		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data);
+		void RenderActive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data);
+	};
 
 	class C3DOnScreenInformationCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
 		PADDINGI(1);
-		bool ShowAllInformationFlag, ShowEffects;
-		EGUIX::Rect r1, r2; // not sure, but its 2 4 float objects
-		struct {
-
-			struct {
-				EGUIX::CMaterial Texture_DeadHero;
-				EGUIX::CMaterial Texture_NPCMarker;
-				EGUIX::CMaterial Texture_NoWorker;
-				EGUIX::CMaterial Texture_Alarm;
-				EGUIX::CMaterial Texture_Overtime;
-				EGUIX::CMaterial Texture_Locked;
-				EGUIX::CMaterial Texture_Healthbar0; // color to 0,0,0,125
-				EGUIX::CMaterial Texture_Healthbar0_again; // color to 0,180,0,255
-				EGUIX::CMaterial Texture_EmoteHappy;
-				EGUIX::CMaterial Texture_EmoteAngry;
-				EGUIX::CMaterial Texture_EmoteGood;
-				EGUIX::CMaterial Texture_EmoteSad;
-				EGUIX::CMaterial Texture_EmoteLeave;
-				EGUIX::CMaterial Texture_EmoteFlee;
-				EGUIX::CMaterial Texture_StatusEat;
-				EGUIX::CMaterial Texture_StatusRest;
-				EGUIX::CMaterial Texture_StatusLeave;
-				EGUIX::CMaterial Texture_StatusIdle;
-				EGUIX::CMaterial Texture_StatusWork;
-				EGUIX::CMaterial Texture_StatusFlee;
-				EGUIX::CMaterial Texture_EmblemSword;
-				EGUIX::CMaterial Texture_EmblemArcher;
-				EGUIX::CMaterial Texture_EmblemSpear;
-				EGUIX::CMaterial Texture_EmblemCavalry;
-				EGUIX::CMaterial Texture_EmblemCannon;
-				EGUIX::CMaterial Texture_EmblemThief;
-				EGUIX::CMaterial Texture_EmblemRifle;
-				EGUIX::CMaterial Texture_EmblemScout;
-				EGUIX::CMaterial Texture_RefineGold;
-				EGUIX::CMaterial Texture_RefineIron;
-				EGUIX::CMaterial Texture_RefineMud;
-				EGUIX::CMaterial Texture_RefineStone;
-				EGUIX::CMaterial Texture_RefineSulfur;
-				EGUIX::CMaterial Texture_RefineWood;
-				EGUIX::CMaterial Texture_ResGold;
-				EGUIX::CMaterial Texture_ResIron;
-				EGUIX::CMaterial Texture_ResMud;
-				EGUIX::CMaterial Texture_ResStone;
-				EGUIX::CMaterial Texture_ResSulfur;
-				EGUIX::CMaterial Texture_ResWood;
-				EGUIX::CMaterial Texture_OnscreenWorker;
-				EGUIX::CMaterial Texture_OnscreenSleeper;
-				EGUIX::CMaterial Texture_OnscreenChomping;
-				EGUIX::CMaterial Texture_OnscreenHearts;
-				EGUIX::CMaterial Texture_OnscreenStars1;
-				EGUIX::CMaterial Texture_OnscreenStars2;
-				EGUIX::CMaterial Texture_OnscreenStars3;
-				EGUIX::CMaterial Texture_OnscreenStars4;
-				EGUIX::CMaterial Texture_OnscreenStars5;
-				EGUIX::CMaterial Texture_MOEmpty;
-				int FontID_OnscreenNumbersSmall; // 500 in struct
-				int FontID_Onscreen10;
-				PADDINGI(3); // map? of entitytype -> texture gui/MO_NAME
-			} TextureData;
-			COnScreenElementMotivation OSEMotivation;
-			COnScreenElementBuilding OSEBuilding;
-			COnScreenElementTask OSETask;
-			COnScreenElementExperience OSEExperience;
-			COnScreenElementHealthbar OSEHealthbar;
-			COnScreenElementWorkers OSEWorkers;
-			COnScreenElementConstructionSite OSEConstructionSite;
-			COnScreenElementResources OSEResources;
-			COnScreenElementSleepers OSESleepers;
-			COnScreenElementChomping OSEChomping;
-			COnScreenElementType OSEType;
-			COnScreenElementWorktime OSEWorktime;
-			COnScreenElementRefiner OSERefiner;
-			COnScreenElementSoldiers OSESoldiers;
-			COnScreenElementNpc OSENpc;
-			COnScreenElementHero OSEHero;
-			COnScreenElementMerchantBuilding OSEMerchantBuilding;
-			COnScreenElementBridge OSEBridge;
-			COnScreenElementThief OSEThief;
-			COnScreenElementBombTick OSEBombTick;
-			COnScreenElementPlunder OSEPlunder;
-			struct {
-				struct Floatie {
-					PADDINGI(1);
-					C3DOnScreenInformationCustomWidget* OSICW;
-					int EntityId, Amount;
-				};
-
-				shok::Vector<Floatie> Floaties;
-				C3DOnScreenInformationCustomWidget* OSICW;
-			} FloatieManager;
-		} Data;
+		bool ShowAllInformationFlag, ShowEffects; // 37
+		EGUIX::Rect r1, r2; // not sure, but its 2 4 float objects, second 42 probably something with mouseover entity
+		OnScreenInfoRenderer Renderer;
 
 
 		static inline constexpr int vtp = 0x77D490;
@@ -600,11 +649,11 @@ namespace GGUI {
 		static inline GGUI::C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<GGUI::C3DOnScreenInformationCustomWidget**>(0x882F54);
 	};
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, ShowAllInformationFlag) == 37 * 4);
-	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.TextureData) == 46 * 4);
-	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.TextureData.FontID_OnscreenNumbersSmall) == 46 * 4 + 500 * 4);
-	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.OSEMotivation) == 46 * 4 + 505 * 4);
-	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.OSEBuilding) == 46 * 4 + 571 * 4);
-	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Data.FloatieManager) == 46 * 4 + 1892 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.TextureData) == 46 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.TextureData.FontID_OnscreenNumbersSmall) == 46 * 4 + 500 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.OSEMotivation) == 46 * 4 + 505 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.OSEBuilding) == 46 * 4 + 571 * 4);
+	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.FloatieManager) == 46 * 4 + 1892 * 4);
 	static_assert(sizeof(C3DOnScreenInformationCustomWidget) == 1943 * 4);
 
 	class CMiniMapSignal {

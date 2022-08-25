@@ -555,6 +555,18 @@ void GGUI::OnScreenInfoRenderer::RenderActive(const shok::Position* screenPos, c
     onscreeninfo_render_active(this, screenPos, data);
 }
 
+static inline EGUIX::CMaterial* (__thiscall* const onscreeninforender_getresicon)(GGUI::OnScreenInfoRenderer* th, shok::ResourceType rt) = reinterpret_cast<EGUIX::CMaterial * (__thiscall*)(GGUI::OnScreenInfoRenderer*, shok::ResourceType)>(0x541B43);
+EGUIX::CMaterial* GGUI::OnScreenInfoRenderer::GetResourceIcon(shok::ResourceType rt)
+{
+    return onscreeninforender_getresicon(this, rt);
+}
+
+static inline EGUIX::CMaterial* (__thiscall* const onscreeninforender_getrefresicon)(GGUI::OnScreenInfoRenderer* th, shok::ResourceType rt) = reinterpret_cast<EGUIX::CMaterial * (__thiscall*)(GGUI::OnScreenInfoRenderer*, shok::ResourceType)>(0x541AD6);
+EGUIX::CMaterial* GGUI::OnScreenInfoRenderer::GetRefinerResourceIcon(shok::ResourceType rt)
+{
+    return onscreeninforender_getrefresicon(this, rt);
+}
+
 static inline void(__thiscall* const showresfloatie)(GGUI::C3DOnScreenInformationCustomWidget* th, int eid, int am) = reinterpret_cast<void(__thiscall*)(GGUI::C3DOnScreenInformationCustomWidget*, int, int)>(0x536361);
 void GGUI::C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(int eid, int amount)
 {
@@ -568,6 +580,41 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool 
     CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x536362), 30 };
     CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x536362), 4); // push arg
     CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x536368), 9); // call, test, jz
+}
+
+
+EGUIX::CMaterial* __fastcall osir_getresicon_override(GGUI::OnScreenInfoRenderer* th, int, shok::ResourceType rt) {
+    switch (rt) {
+    case shok::ResourceType::Gold:
+    case shok::ResourceType::GoldRaw:
+        return &th->TextureData.Texture_ResGold;
+    case shok::ResourceType::Stone:
+    case shok::ResourceType::StoneRaw:
+        return &th->TextureData.Texture_ResStone;
+    case shok::ResourceType::Iron:
+    case shok::ResourceType::IronRaw:
+        return &th->TextureData.Texture_ResIron;
+    case shok::ResourceType::Sulfur:
+    case shok::ResourceType::SulfurRaw:
+        return &th->TextureData.Texture_ResSulfur;
+    case shok::ResourceType::Clay:
+    case shok::ResourceType::ClayRaw:
+        return &th->TextureData.Texture_ResMud;
+    case shok::ResourceType::Wood:
+    case shok::ResourceType::WoodRaw:
+        return &th->TextureData.Texture_ResWood;
+    default:
+        return &th->TextureData.Texture_ResSulfur;
+    }
+}
+
+void GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(bool showwood)
+{
+    CppLogic::Hooks::SaveVirtualProtect vp{ 10, {reinterpret_cast<void*>(0x53F62E),
+        onscreeninforender_getresicon
+    } };
+    *reinterpret_cast<byte*>(0x53F62E) = showwood ? 0xFF : static_cast<int>(shok::ResourceType::WoodRaw);
+    CppLogic::Hooks::WriteJump(onscreeninforender_getresicon, &osir_getresicon_override, reinterpret_cast<void*>(0x541B48));
 }
 
 static inline float* (__cdecl* const font_lengthdata_get)(void* ld) = reinterpret_cast<float* (__cdecl*)(void*)>(0x625D00);

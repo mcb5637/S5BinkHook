@@ -629,6 +629,8 @@ namespace GGUI {
 
 		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data);
 		void RenderActive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data);
+		EGUIX::CMaterial* GetResourceIcon(shok::ResourceType rt); // does not return wood icon without patching
+		EGUIX::CMaterial* GetRefinerResourceIcon(shok::ResourceType rt);
 	};
 
 	class C3DOnScreenInformationCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
@@ -645,6 +647,7 @@ namespace GGUI {
 		void ShowResourceFloatieOnEntity(int eid, int amount);
 
 		static void HookResourceFloatieShowWood(bool showwood);
+		static void HookResourceElementWood(bool showwood);
 
 		static inline GGUI::C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<GGUI::C3DOnScreenInformationCustomWidget**>(0x882F54);
 	};

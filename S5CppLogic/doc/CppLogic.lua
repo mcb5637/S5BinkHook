@@ -2241,6 +2241,10 @@ function CppLogic.UI.IsContainerWidget(wid) end
 --- @param path string
 function CppLogic.UI.ReloadGUI(path) end
 
+--- overrides some hardcoded checks for showing wood as resource floaties and mouseover info.
+--- @param show boolean
+function CppLogic.UI.SetShowWoodInUI(show) end
+
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed on leaving the map.
 --- load any additional models you want to use first.

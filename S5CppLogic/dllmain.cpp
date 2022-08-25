@@ -79,7 +79,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
-	EGL::CGLEEntity::HookCanCancelState();
+	GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(L.CheckBool(1));
 	return 0;
 }
 

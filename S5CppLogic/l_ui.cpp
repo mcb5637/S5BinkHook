@@ -627,6 +627,13 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int SetShowWoodInUI(lua::State L) {
+		bool s = L.CheckBool(1);
+		GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(s);
+		GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(s);
+		return 0;
+	}
+
 	int SetCharTrigger(lua::State ls) {
 		luaext::EState L{ ls };
 		if (CppLogic::HasSCELoader())
@@ -1025,6 +1032,8 @@ namespace CppLogic::UI {
 		EGUIX::UIInput_Char_Callback = nullptr;
 		EGUIX::UIInput_Key_Callback = nullptr;
 		EGUIX::UIInput_Mouse_Callback = nullptr;
+		GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(false);
+		GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(false);
 		if (EGUIX::WidgetManager* wm = EGUIX::WidgetManager::GlobalObj()) {
 			for (EGUIX::CBaseWidget* wid : wm->Widgets) {
 				if (EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper()) {
@@ -1040,7 +1049,7 @@ namespace CppLogic::UI {
 		}
 	}
 
-	constexpr std::array<lua::FuncReference, 57> UI{ {
+	constexpr std::array<lua::FuncReference, 58> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1098,6 +1107,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<GetCutsceneFarClipPlaneMinAndMax>("GetCutsceneFarClipPlaneMinAndMax"),
 		lua::FuncReference::GetRef<SetCutsceneFarClipPlaneMinAndMax>("SetCutsceneFarClipPlaneMinAndMax"),
 		lua::FuncReference::GetRef<ReloadGUI>("ReloadGUI"),
+		lua::FuncReference::GetRef<SetShowWoodInUI>("SetShowWoodInUI"),
 	} };
 
 	void Init(lua::State L)

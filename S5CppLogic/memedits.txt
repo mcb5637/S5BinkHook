@@ -15,7 +15,10 @@ string render 0x5577E1 jmp override, string render getlen 0x708F00 jmp override
 entity execute task get task handler 0x57BF7A call redirect
 destroy entity 0x57C94A jmp
 snipe task 0x4DB5B8 jmp (func override)
-0x529067 feedback event handler res mined show floatie
+0x529067 feedback event handler res mined show floatie comparison changed
+0x536362 show resource floatie skipped a check to allow trees to have floaties
+0x53F62E COnScreenElementResources render comparison changed
+0x541B43 GGUI::OnScreenInfoRenderer get resource icon func replace
 0x57D6CA entity ctor jmp to add TASK_LUA_FUNC handlers
 0x588408 behavioranim_addhandlers jmp to add TASK_WAIT_FOR_ANIM_NON_CANCELABLE handlers
 0x4ADB16 on building init blocking check jmp to fix move tasks (seems not to conflict with CUtil.ActivateTaskIncrementBugfix)

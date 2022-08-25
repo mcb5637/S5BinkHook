@@ -6,6 +6,7 @@
 #include "s5_RWEngine.h"
 #include "s5_idmanager.h"
 #include "hooks.h"
+#include "mod.h"
 
 struct shok_vtable_EGUIX_CBaseWidget : BB::IObject::_vtableS {
     PADDINGI(4);
@@ -615,6 +616,45 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(bool show
     } };
     *reinterpret_cast<byte*>(0x53F62E) = showwood ? 0xFF : static_cast<int>(shok::ResourceType::WoodRaw);
     CppLogic::Hooks::WriteJump(onscreeninforender_getresicon, &osir_getresicon_override, reinterpret_cast<void*>(0x541B48));
+}
+
+void __stdcall OSIRenderer_renderhooked(GGUI::C3DOnScreenInformationCustomWidget* cw, shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active) {
+    bool skip = false;
+    if (cw->ShowAllInformationFlag && data->Settler)
+        *active = true;
+    if (data->Entity) {
+        for (auto* b : data->Entity->DisplayBehaviors) {
+            if (auto* rb = dynamic_cast<CppLogic::Mod::OnScreenInfoDisplayBehavior*>(b)) {
+                skip |= rb->RenderUI(&cw->Renderer, screenPos, data, active);
+            }
+        }
+    }
+    if (!skip) {
+        cw->Renderer.RenderInactive(screenPos, data);
+        if (*active)
+            cw->Renderer.RenderActive(screenPos, data);
+    }
+}
+void __declspec(naked) OSIRenderer_renderhookedasm() {
+    __asm {
+        lea eax, [ebp - 0xD];
+        push eax;
+        lea eax, [ebp - 0x10C];
+        push eax;
+        lea eax, [ebp - 0x1C];
+        push eax;
+        push ebx;
+        call OSIRenderer_renderhooked;
+
+        push 0x53680F;
+        ret;
+    };
+}
+
+void GGUI::C3DOnScreenInformationCustomWidget::HookOnScreenInfoDisplayBehavior()
+{
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5367D0), 10 };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5367D0), &OSIRenderer_renderhookedasm, reinterpret_cast<void*>(0x5367D7));
 }
 
 static inline float* (__cdecl* const font_lengthdata_get)(void* ld) = reinterpret_cast<float* (__cdecl*)(void*)>(0x625D00);

@@ -648,6 +648,7 @@ namespace GGUI {
 
 		static void HookResourceFloatieShowWood(bool showwood);
 		static void HookResourceElementWood(bool showwood);
+		static void HookOnScreenInfoDisplayBehavior();
 
 		static inline GGUI::C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<GGUI::C3DOnScreenInformationCustomWidget**>(0x882F54);
 	};

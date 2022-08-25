@@ -88,6 +88,7 @@ namespace EGUIX {
 		// ctor that sets data 55A978
 
 		void SetTexture(const char* name);
+		shok::Position GetSize();
 
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 	};

@@ -88,6 +88,14 @@ void EGUIX::CMaterial::SetTexture(const char* name)
     materi_settex(this, name);
 }
 
+static inline void(__thiscall* const materi_getsize)(EGUIX::CMaterial* th, float* x, float* y) = reinterpret_cast<void(__thiscall*)(EGUIX::CMaterial*, float*, float*)>(0x55AA52);
+shok::Position EGUIX::CMaterial::GetSize()
+{
+    shok::Position r{};
+    materi_getsize(this, &r.X, &r.Y);
+    return r;
+}
+
 
 unsigned int __stdcall EGUIX::CLuaFunctionHelper::GetClassIdentifier() const
 {
@@ -643,7 +651,8 @@ void __declspec(naked) OSIRenderer_renderhookedasm() {
         push eax;
         lea eax, [ebp - 0x1C];
         push eax;
-        push ebx;
+        lea eax, [ebx - 4];
+        push eax;
         call OSIRenderer_renderhooked;
 
         push 0x53680F;

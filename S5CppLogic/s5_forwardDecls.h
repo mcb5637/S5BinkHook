@@ -32,6 +32,8 @@ namespace shok {
 	enum class Keys : int;
 	enum class ExperienceClass : int;
 	enum class TechModifierType : int;
+	enum class TaskStateExecutionResult : int;
+	enum class TaskExecutionResult : int;
 
 	class Technology;
 	class TechCategoryManager;

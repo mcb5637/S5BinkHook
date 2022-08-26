@@ -557,7 +557,7 @@ namespace shok {
 		// 0x11014 evadingent to 0x11011 cevent
 		// 0x11015 evadingent
 
-		// 0x12002 stop?
+		Settler_SetDefaultTaskList = 0x12002, //BB::CEvent
 		// 0x12003 camp detach worker?
 		// 0x12004 settler wait? state 5 EGL::CEventValue<int,-27574121>
 		Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121

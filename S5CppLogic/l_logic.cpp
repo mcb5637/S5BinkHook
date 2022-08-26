@@ -790,13 +790,13 @@ namespace CppLogic::Logic {
 
 				L.SetTop(t);
 				if (d.HasMoved)
-					return 1;
+					return shok::TaskExecutionResult::StateChanged;
 				else if (d.HasSetTl)
-					return 2;
+					return shok::TaskExecutionResult::TaskListChanged;
 				else if (d.Ret)
-					return 3;
+					return shok::TaskExecutionResult::LuaTaskState;
 				else
-					return 0;
+					return shok::TaskExecutionResult::NextTask;
 			};
 		}
 

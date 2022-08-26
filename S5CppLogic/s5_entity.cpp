@@ -802,6 +802,13 @@ int GGL::CBuilding::BuyLeaderByType(int ety)
 	return id;
 }
 
+static inline void(__thiscall* const build_getabsapproachpos)(GGL::CBuilding* th, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*, shok::Position*)>(0x4A9F0B);
+shok::Position GGL::CBuilding::GetAbsoluteApproachPos()
+{
+	shok::Position p{};
+	build_getabsapproachpos(this, &p);
+	return p;
+}
 
 std::vector<shok::AdditionalTechModifier> GGL::CBuilding::ConstructionSpeedModifiers{};
 float __fastcall constructionsite_getprogresspertick_hook(GGL::CBuilding* th) { // param is constructionsite, just not done yet ;)
@@ -1461,33 +1468,33 @@ void EGL::CGLEEntity::HookMaxHP()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp, reinterpret_cast<void*>(0x571B98));
 }
 
-int (*EGL::CGLEEntity::LuaTaskListCallback)(EGL::CGLEEntity* e, int val) = nullptr;
+shok::TaskExecutionResult(*EGL::CGLEEntity::LuaTaskListCallback)(EGL::CGLEEntity* e, int val) = nullptr;
 int EGL::CGLEEntity::ExecuteLuaTask(EGL::CTaskArgsInteger* arg)
 {
-	int i = 0;
+	shok::TaskExecutionResult i = shok::TaskExecutionResult::NextTask;
 	int val = static_cast<EGL::CTaskArgsInteger*>(arg)->Value;
 	if (EGL::CGLEEntity::LuaTaskListCallback)
 		i = EGL::CGLEEntity::LuaTaskListCallback(this, val);
-	if (i == 3) {
+	if (i == shok::TaskExecutionResult::LuaTaskState) {
 		GetAdditionalData(true)->FakeTaskValue = val;
 		SetTaskState(shok::TaskState::LuaFunc);
-		i = 1;
+		i = shok::TaskExecutionResult::StateChanged;
 	}
-	return i;
+	return static_cast<int>(i);
 }
-int EGL::CGLEEntity::ExecuteLuaTaskState(int p)
+shok::TaskStateExecutionResult EGL::CGLEEntity::ExecuteLuaTaskState(int p)
 {
-	int i = -2;
+	shok::TaskStateExecutionResult i = shok::TaskStateExecutionResult::Finished;
 	if (EGL::CGLEEntity::LuaTaskListCallback)
-		if (EGL::CGLEEntity::LuaTaskListCallback(this, GetAdditionalData(true)->FakeTaskValue) == 3)
-			i = -1;
+		if (EGL::CGLEEntity::LuaTaskListCallback(this, GetAdditionalData(true)->FakeTaskValue) == shok::TaskExecutionResult::LuaTaskState)
+			i = shok::TaskStateExecutionResult::NotFinished;
 	return i;
 }
 void(__thiscall* const entityaddluatlhandlers)(EGL::CGLEEntity* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*)>(0x57BA34);
 void __fastcall EGL::CGLEEntity::AddHandlerLuaTask(EGL::CGLEEntity* th) {
 	entityaddluatlhandlers(th);
-	th->AddTaskHandler(shok::Task::TASK_LUA_FUNC, CreateTaskHandler<static_cast<int>(shok::Task::TASK_LUA_FUNC)>(th, &ExecuteLuaTask));
-	th->AddStateHandler(shok::TaskState::LuaFunc, CreateStateHandler(th, &ExecuteLuaTaskState));
+	th->CreateTaskHandler<shok::Task::TASK_LUA_FUNC>(th, &ExecuteLuaTask);
+	th->CreateStateHandler<shok::TaskState::LuaFunc>(th, &ExecuteLuaTaskState);
 }
 bool HookLuaTaskList_Hooked = false;
 void EGL::CGLEEntity::HookLuaTaskList()
@@ -1511,12 +1518,12 @@ public:
 		return 1;
 	}
 };
-static inline int(__thiscall* const behanim_statehandlerwait)(GGL::CGLBehaviorAnimationEx* th, int i) = reinterpret_cast<int(__thiscall*)(GGL::CGLBehaviorAnimationEx*, int)>(0x587E20);
+static inline shok::TaskStateExecutionResult(__thiscall* const behanim_statehandlerwait)(GGL::CGLBehaviorAnimationEx* th, int i) = reinterpret_cast<shok::TaskStateExecutionResult(__thiscall*)(GGL::CGLBehaviorAnimationEx*, int)>(0x587E20);
 class CustomStateHandler : public EGL::IGLEStateHandler {
 public:
 	GGL::CGLBehaviorAnimationEx* th = nullptr;
 
-	virtual int Handle(int i) override {
+	virtual shok::TaskStateExecutionResult Handle(int i) override {
 		return behanim_statehandlerwait(th, i);
 	}
 };

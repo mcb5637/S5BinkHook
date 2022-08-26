@@ -183,30 +183,46 @@ namespace EGL {
 			Object = o;
 			HandlerFunc = h;
 		}
+
+		void* operator new(size_t s)
+		{
+			return shok::Malloc(s);
+		}
+		void operator delete(void* p) {
+			shok::Free(p);
+		}
 	};
 
 	using EventHandler = EGL::IGLEHandler<BB::CEvent, void>;
 	using TaskHandler = EGL::IGLEHandler<EGL::CGLETaskArgs, int>;
 
 	class IGLEStateHandler {
-		virtual int Handle(int i) = 0;
+		virtual shok::TaskStateExecutionResult Handle(int i) = 0;
 	};
 
 	template<class ObjectType>
 	class TStateHandler : public IGLEStateHandler {
 	public:
-		typedef int (ObjectType::* HandlerType)(int i);
+		typedef shok::TaskStateExecutionResult(ObjectType::* HandlerType)(int i);
 
 		ObjectType* Object;
 		HandlerType HandlerFunc;
 
-		virtual int Handle(int i) override {
+		virtual shok::TaskStateExecutionResult Handle(int i) override {
 			return std::invoke(HandlerFunc, Object, i);
 		}
 
 		TStateHandler(ObjectType* o, HandlerType h) {
 			Object = o;
 			HandlerFunc = h;
+		}
+
+		void* operator new(size_t s)
+		{
+			return shok::Malloc(s);
+		}
+		void operator delete(void* p) {
+			shok::Free(p);
 		}
 	};
 

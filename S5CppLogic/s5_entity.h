@@ -23,6 +23,16 @@ namespace shok {
 
 		Script = 25,
 	};
+	enum class TaskExecutionResult : int {
+		NextTask = 0,
+		StateChanged = 1,
+		TaskListChanged = 2,
+		LuaTaskState = 3,
+	};
+	enum class TaskStateExecutionResult : int {
+		NotFinished = -1,
+		Finished = -2,
+	};
 }
 
 
@@ -140,7 +150,7 @@ namespace EGL {
 	private:
 		virtual void UnknownEntityFunc1() = 0; // update numauras + other updates?
 	public:
-		virtual int ExecuteTask(EGL::CGLETaskArgs* t) = 0;// 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
+		virtual shok::TaskExecutionResult ExecuteTask(EGL::CGLETaskArgs* t) = 0;
 		virtual void FireEvent(BB::CEvent* ev) = 0;
 		virtual void AddBehavior(EGL::CGLEBehavior* b) = 0; // 17 probably not usable outside of createentity
 		virtual void AddSlot(EGL::ISlot* slot, int i) = 0;
@@ -237,25 +247,23 @@ namespace EGL {
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 
-		template<int id, class EventType, class ObjectType>
-		static EGL::EventHandler* CreateEventHandler(ObjectType* ob, void (ObjectType::* handler)(EventType*)) {
-			using hty = EGL::THandler<id, BB::CEvent, EventType, ObjectType, void>;
-			void* mem = shok::Malloc(sizeof(hty));
-			return new (mem) hty(ob, handler);
+		template<shok::EventIDs id, class EventType, class ObjectType>
+		void CreateEventHandler(ObjectType* ob, void (ObjectType::* handler)(EventType*)) {
+			using hty = EGL::THandler<static_cast<int>(id), BB::CEvent, EventType, ObjectType, void>;
+			AddEventHandler(id, new hty(ob, handler));
 		}
 
-		template<int id, class TaskArgs, class ObjectType>
-		static EGL::TaskHandler* CreateTaskHandler(ObjectType* ob, int (ObjectType::*handler)(TaskArgs*)) {
-			using hty = EGL::THandler<id, EGL::CGLETaskArgs, TaskArgs, ObjectType, int>;
-			void* mem = shok::Malloc(sizeof(hty));
-			return new (mem) hty(ob, handler);
+		// task handlers return value does actually get ignored. instread it gets reconstructed via the changed counters.
+		template<shok::Task id, class TaskArgs, class ObjectType>
+		void CreateTaskHandler(ObjectType* ob, int (ObjectType::* handler)(TaskArgs*)) {
+			using hty = EGL::THandler<static_cast<int>(id), EGL::CGLETaskArgs, TaskArgs, ObjectType, int>;
+			AddTaskHandler(id, new hty(ob, handler));
 		}
 
-		template<class ObjectType>
-		static EGL::IGLEStateHandler* CreateStateHandler(ObjectType* ob, int (ObjectType::* handler)(int)) {
+		template<shok::TaskState id, class ObjectType>
+		void CreateStateHandler(ObjectType* ob, shok::TaskStateExecutionResult(ObjectType::* handler)(int)) {
 			using hty = EGL::TStateHandler<ObjectType>;
-			void* mem = shok::Malloc(sizeof(hty));
-			return new (mem) hty(ob, handler);
+			AddStateHandler(id, new hty(ob, handler));
 		}
 
 
@@ -273,11 +281,11 @@ namespace EGL {
 
 	private:
 		int ExecuteLuaTask(EGL::CTaskArgsInteger* arg);
-		int ExecuteLuaTaskState(int i);
+		shok::TaskStateExecutionResult ExecuteLuaTaskState(int i);
 		static void __fastcall AddHandlerLuaTask(CGLEEntity* th);
 
 	public:
-		static int (*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
+		static shok::TaskExecutionResult(*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
 		static void HookLuaTaskList();
 		static void HookNonCancelableAnim();
 		static bool BuildOnSetPosFixMovement;
@@ -613,6 +621,7 @@ namespace GGL {
 		void MarketStartTrade(shok::ResourceType ResourceTypeSell, shok::ResourceType ResourceTypeBuy, float BuyAmount);
 		void MarketCancelTrade();
 		int BuyLeaderByType(int ety);
+		shok::Position GetAbsoluteApproachPos();
 
 		// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 

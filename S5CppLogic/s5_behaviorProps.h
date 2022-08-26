@@ -447,7 +447,7 @@ namespace GGL {
 			int Technology;
 			float Factor;
 		};
-		int ResourceType; // 4
+		shok::ResourceType ResourceType; // 4
 		float InitialFactor;
 		shok::Vector<EfficencyUpgrade> Efficiency;
 		int SupplierCategory;

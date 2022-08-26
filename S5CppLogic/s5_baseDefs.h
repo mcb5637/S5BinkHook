@@ -78,6 +78,8 @@ namespace shok {
 		void SubFromType(shok::ResourceType ty, float tosub);
 		bool HasResources(const CostInfo* has) const;
 
+		static inline shok::ResourceType(__cdecl* const ResourceTypeToRaw)(shok::ResourceType rt) = reinterpret_cast<shok::ResourceType(__cdecl*)(shok::ResourceType)>(0x4A9299);
+
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x85D668);
 	};
 	static_assert(sizeof(CostInfo) == 18 * 4);

@@ -1,4 +1,6 @@
 #pragma once
+#include <random>
+
 #include "enumflags.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
@@ -231,6 +233,8 @@ namespace EGL {
 	class IGLEGameLogic : public BB::IPostEvent {
 
 	};
+	using RandomNumberGenerator = std::linear_congruential_engine<uint32_t, 1812433253, 1, 0>;
+	static_assert(sizeof(RandomNumberGenerator) == 4);
 	class CGLEGameLogic : public IGLEGameLogic {
 		PADDINGI(6);
 		LogicGameTime* InGameTime; // 7
@@ -239,7 +243,7 @@ namespace EGL {
 		PADDINGI(9);
 		EGL::GameLogicExplorationStuff* SomeStuff; // 19
 		PADDINGI(14);
-		int RandomSeed; // 34
+		RandomNumberGenerator RNG; // 34 pretty sure this is not c++ std originally, but this one does the same as the original.
 
 	private:
 		virtual void unknown1() = 0;

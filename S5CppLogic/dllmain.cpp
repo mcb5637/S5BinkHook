@@ -79,8 +79,9 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
-	GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(L.CheckBool(1));
-	return 0;
+	std::uniform_int_distribution d{ 1, 100 };
+	L.Push(d((*EGL::CGLEGameLogic::GlobalObj)->RNG));
+	return 1;
 }
 
 int Cleanup(lua::State L) {

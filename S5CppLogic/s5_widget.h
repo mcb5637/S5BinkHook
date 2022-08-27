@@ -6,11 +6,11 @@
 
 namespace EGUIX {
 	struct Rect { // size 4
-		float X, Y, W, H;
+		float X = 0.0f, Y = 0.0f, W = 1.0f, H = 1.0f;
 	};
 
 	struct Color { // size 4
-		int Red, Green, Blue, Alpha; // >=0 && <=0xFF
+		int Red = 0xFF, Green = 0xFF, Blue = 0xFF, Alpha = 0xFF; // >=0 && <=0xFF
 
 		shok::Color ToShokColor() const;
 	};
@@ -78,7 +78,7 @@ namespace EGUIX {
 
 	class CMaterial : public BB::IObject {
 	public:
-		int Texture; // type? // 1
+		int Texture = 0; // type? // 1
 		EGUIX::Rect TextureCoordinates; // la 5
 		EGUIX::Color Color; // la 10
 
@@ -87,6 +87,7 @@ namespace EGUIX {
 		static inline constexpr unsigned int Identifier = 0xF1CAFF46;
 		// ctor that sets data 55A978
 
+		CMaterial();
 		void SetTexture(const char* name);
 		shok::Position GetSize();
 

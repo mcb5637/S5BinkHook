@@ -82,6 +82,11 @@ unsigned int __stdcall EGUIX::CMaterial::GetClassIdentifier() const
     return Identifier;
 }
 
+EGUIX::CMaterial::CMaterial()
+{
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
 static inline int(__thiscall* const materi_settex)(EGUIX::CMaterial* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::CMaterial*, const char*)>(0x55AA38);
 void EGUIX::CMaterial::SetTexture(const char* name)
 {

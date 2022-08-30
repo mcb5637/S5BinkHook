@@ -380,6 +380,27 @@ function CppLogic.Logic.EnableExperienceClassFix(active) end
 --- @return number seconds
 function CppLogic.Logic.GetAnimationDuration(anim) end
 
+--- returns the global trade data.
+--- local player trade data is accessible in Logic.
+--- @param rt number
+--- @return number baseprice (only used at start of map)
+--- @return number minprice (respected n price changes)
+--- @return number maxprice (respected n price changes)
+--- @return number inflation (only used at start of map)
+--- @return number deflation (only used at start of map)
+--- @return number workamount
+function CppLogic.Logic.GetTradeDataForResource(rt) end
+--- sets the global trade data. (nil on any value leaves it unmodified).
+--- local player trade data is accessible in Logic.
+--- @param rt number
+--- @param baseprice number|nil (only used at start of map)
+--- @param minprice number|nil (respected n price changes)
+--- @param maxprice number|nil (respected n price changes)
+--- @param inflation number|nil (only used at start of map)
+--- @param deflation number|nil (only used at start of map)
+--- @param workamount number|nil
+function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxprice, inflation, deflation, workamount) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.

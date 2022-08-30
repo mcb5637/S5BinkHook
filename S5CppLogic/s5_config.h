@@ -153,6 +153,8 @@ namespace GGL {
 
 		static inline GGL::CLogicProperties** const GlobalObj = reinterpret_cast<GGL::CLogicProperties**>(0x85A3E0);
 
+		STradeResource* GetResource(shok::ResourceType rt);
+
 		static inline float(__stdcall* const ExperiencePointsToLevels)(float xp) = reinterpret_cast<float(__stdcall*)(float)>(0x4C674D); // -1->level 0, 0->lvl1...
 	};
 

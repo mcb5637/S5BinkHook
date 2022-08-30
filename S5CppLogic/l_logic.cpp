@@ -897,6 +897,41 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
+	int GetTradeDataForResource(lua::State L) {
+		shok::ResourceType rt = static_cast<shok::ResourceType>(L.CheckInt(1));
+		if (rt != shok::ResourceType::Gold && rt != shok::ResourceType::Stone && rt != shok::ResourceType::Iron
+			&& rt != shok::ResourceType::Sulfur && rt != shok::ResourceType::Clay && rt != shok::ResourceType::Wood)
+			throw lua::LuaException{ "invalid resource type" };
+		auto* t = (*GGL::CLogicProperties::GlobalObj)->GetResource(rt);
+		L.Push(t->BasePrice);
+		L.Push(t->MinPrice);
+		L.Push(t->MaxPrice);
+		L.Push(t->Inflation);
+		L.Push(t->Deflation);
+		L.Push(t->WorkAmount);
+		return 6;
+	}
+	int SetTradeDataForResource(lua::State L) {
+		shok::ResourceType rt = static_cast<shok::ResourceType>(L.CheckInt(1));
+		if (rt != shok::ResourceType::Gold && rt != shok::ResourceType::Stone && rt != shok::ResourceType::Iron
+			&& rt != shok::ResourceType::Sulfur && rt != shok::ResourceType::Clay && rt != shok::ResourceType::Wood)
+			throw lua::LuaException{ "invalid resource type" };
+		auto* t = (*GGL::CLogicProperties::GlobalObj)->GetResource(rt);
+		if (!L.IsNoneOrNil(2))
+			t->BasePrice = L.CheckFloat(2);
+		if (!L.IsNoneOrNil(3))
+			t->MinPrice = L.CheckFloat(3);
+		if (!L.IsNoneOrNil(4))
+			t->MaxPrice = L.CheckFloat(4);
+		if (!L.IsNoneOrNil(5))
+			t->Inflation = L.CheckFloat(5);
+		if (!L.IsNoneOrNil(6))
+			t->Deflation = L.CheckFloat(6);
+		if (!L.IsNoneOrNil(7))
+			t->WorkAmount = L.CheckFloat(7);
+		return 0;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1106,7 +1141,7 @@ namespace CppLogic::Logic {
 		GGL::CEntityProfile::HookExperience(false);
 	}
 
-	constexpr std::array<lua::FuncReference, 53> Logic{ {
+	constexpr std::array<lua::FuncReference, 55> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1160,6 +1195,8 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<BlockingUpdateWeatherChange>("BlockingUpdateWeatherChange"),
 			lua::FuncReference::GetRef<EnableExperienceClassFix>("EnableExperienceClassFix"),
 			lua::FuncReference::GetRef<GetAnimationDuration>("GetAnimationDuration"),
+			lua::FuncReference::GetRef<GetTradeDataForResource>("GetTradeDataForResource"),
+			lua::FuncReference::GetRef<SetTradeDataForResource>("SetTradeDataForResource"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {

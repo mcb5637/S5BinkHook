@@ -161,6 +161,12 @@ void GGL::CBuildingUpgradeManager::AddCategory(int ucat, int firstEntity, int ma
 	i->MaxAmount = maxscholar;
 }
 
+static inline void(__thiscall* const trademng_resdata_adjust)(GGL::CTradeManager::ResData* th, float a, bool b) = reinterpret_cast<void(__thiscall*)(GGL::CTradeManager::ResData*, float, bool)>(0x4C866C);
+void GGL::CTradeManager::ResData::AdjustPrice(float amount, bool buyed)
+{
+	trademng_resdata_adjust(this, amount, buyed);
+}
+
 static inline void(__thiscall* const tradeorder_setdata)(GGL::CTradeManager::TradeOrder* th, int pl, shok::ResourceType s, shok::ResourceType bu, float am) = reinterpret_cast<void(__thiscall*)(GGL::CTradeManager::TradeOrder*, int, shok::ResourceType, shok::ResourceType, float)>(0x4E7CFF);
 void GGL::CTradeManager::TradeOrder::SetData(int player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm)
 {
@@ -200,6 +206,12 @@ static inline void(__thiscall* const trademng_applytrade)(GGL::CTradeManager* th
 void GGL::CTradeManager::ApplyPriceChangesOfTrade(const TradeOrder* o)
 {
 	trademng_applytrade(this, o);
+}
+
+static inline GGL::CTradeManager::ResData* (__thiscall* const trademng_getres)(GGL::CTradeManager* th, shok::ResourceType rt) = reinterpret_cast<GGL::CTradeManager::ResData * (__thiscall*)(GGL::CTradeManager*, shok::ResourceType)>(0x4C8732);
+GGL::CTradeManager::ResData* GGL::CTradeManager::GetResource(shok::ResourceType rt)
+{
+	return trademng_getres(this, rt);
 }
 
 static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, int ownerent, int offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, int, int, const char*)>(0x4BE63E);

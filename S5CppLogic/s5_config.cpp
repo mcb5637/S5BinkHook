@@ -83,6 +83,12 @@ unsigned int GGL::CLogicProperties::SBuildingUpgradeCategory::GetClassIdentifier
     return Identifier;
 }
 
+static inline GGL::CLogicProperties::STradeResource* (__thiscall* const logicprops_gettraderes)(GGL::CLogicProperties* th, shok::ResourceType rt) = reinterpret_cast<GGL::CLogicProperties::STradeResource * (__thiscall*)(GGL::CLogicProperties*, shok::ResourceType)>(0x4B015F);
+GGL::CLogicProperties::STradeResource* GGL::CLogicProperties::GetResource(shok::ResourceType rt)
+{
+    return logicprops_gettraderes(this, rt);
+}
+
 static inline GGL::ExperienceClass::LevelData* (__thiscall* const xpclass_getlevel)(GGL::ExperienceClass* th, int l) = reinterpret_cast<GGL::ExperienceClass::LevelData * (__thiscall*)(GGL::ExperienceClass*, int)>(0x515270);
 GGL::ExperienceClass::LevelData* GGL::ExperienceClass::GetLevel(int lvl)
 {

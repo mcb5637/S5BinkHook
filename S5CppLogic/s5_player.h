@@ -135,6 +135,9 @@ namespace GGL {
 			int ResourceType;
 			float CurrentPrice, CurrentInflation, CurrentDeflation;
 			bool CanBeSold, CanBeBought;
+
+			// adjusts one price (except gold, hardcoded) respects min/max in GGL::CLogicProperties::GlobalObj
+			void AdjustPrice(float amount, bool buyed);
 		};
 
 
@@ -162,6 +165,7 @@ namespace GGL {
 		};
 
 		void ApplyPriceChangesOfTrade(const TradeOrder* o);
+		ResData* GetResource(shok::ResourceType rt);
 	};
 
 	struct PlayerTechManager { // size 12

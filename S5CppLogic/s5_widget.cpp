@@ -504,13 +504,13 @@ void GGUI::COnScreenElementType::Render(const shok::Position* screenPos, const G
 }
 
 static inline void(__thiscall* const onscreenrefiner_render)(GGUI::COnScreenElementRefiner* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementRefiner*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53EBBB);
-void GGUI::COnScreenElementRefiner::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+void GGUI::COnScreenElementRefiner::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
 {
     onscreenrefiner_render(this, screenPos, data);
 }
 
 static inline void(__thiscall* const onscreensol_render)(GGUI::COnScreenElementSoldiers* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementSoldiers*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x540552);
-void GGUI::COnScreenElementSoldiers::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+void GGUI::COnScreenElementSoldiers::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
 {
     onscreensol_render(this, screenPos, data);
 }
@@ -528,7 +528,7 @@ void GGUI::COnScreenElementHero::RenderInactive(const shok::Position* screenPos,
 }
 
 static inline void(__thiscall* const onscreenmerch_render)(GGUI::COnScreenElementMerchantBuilding* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementMerchantBuilding*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x54002D);
-void GGUI::COnScreenElementMerchantBuilding::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+void GGUI::COnScreenElementMerchantBuilding::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
 {
     onscreenmerch_render(this, screenPos, data);
 }
@@ -540,7 +540,7 @@ void GGUI::COnScreenElementBridge::RenderInactive(const shok::Position* screenPo
 }
 
 static inline void(__thiscall* const onscreenthief_render)(GGUI::COnScreenElementThief* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementThief*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53EEFE);
-void GGUI::COnScreenElementThief::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
+void GGUI::COnScreenElementThief::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
 {
     onscreenthief_render(this, screenPos, data);
 }

@@ -489,13 +489,13 @@ namespace GGUI {
 	public:
 		static inline constexpr int vtp = 0x77E520;
 
-		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // res icon and res count
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // res icon and res count
 	};
 	class COnScreenElementSoldiers : public COnScreenElement {
 	public:
 		static inline constexpr int vtp = 0x77E560;
 
-		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // solder amount boxes
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // solder amount boxes
 	};
 	class COnScreenElementNpc : public COnScreenElement {
 	public:
@@ -513,7 +513,7 @@ namespace GGUI {
 	public:
 		static inline constexpr int vtp = 0x77E5C0;
 
-		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // text
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // text
 	};
 	class COnScreenElementBridge : public COnScreenElement {
 	public:
@@ -525,7 +525,7 @@ namespace GGUI {
 	public:
 		static inline constexpr int vtp = 0x77E540;
 
-		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // sabotage/defuse bar
+		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data); // sabotage/defuse bar
 	};
 	class COnScreenElementBombTick : public COnScreenElement {
 	public:

@@ -244,6 +244,7 @@ namespace EGL {
 		EGL::CGLEEntity::EntityAddonData* GetAdditionalData(bool create);
 		void CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* other);
 
+		static bool AdvHurtEntity_CheckOverHeal;
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 

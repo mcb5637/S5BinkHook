@@ -1135,6 +1135,7 @@ void EGL::CGLEEntity::HookHurtEntity()
 	GGL::CBombPlacerBehavior::FixBombAttachment();
 	GGL::CCannonBallEffect::AddDamageSourceOverride = true;
 }
+bool EGL::CGLEEntity::AdvHurtEntity_CheckOverHeal = false;
 void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
 {
 	if ((*GGL::CGLGameLogic::GlobalObj)->GlobalInvulnerability)
@@ -1212,6 +1213,11 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 			int troophp = lbeh->GetTroopHealth();
 			int hppersol = lbeh->GetTroopHealthPerSoldier();
 			int currentsol = 0;
+			if (AdvHurtEntity_CheckOverHeal && attackedleader->Health > attackedleader->GetMaxHealth()) {
+				int h = std::min(attackedleader->Health - attackedleader->GetMaxHealth(), damage);
+				attackedleader->Hurt(h);
+				damage -= h;
+			}
 			for (auto& a : attackedleader->ObservedEntities) {
 				if (a.first == shok::AttachmentType::LEADER_SOLDIER)
 					currentsol++;

@@ -206,7 +206,23 @@ int CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(std::arra
 	for (int p = 1; p <= 8; p++) {
 		if (ps->GetDiploStateTo(p) == shok::DiploState::Hostile) {
 			players[curr] = p;
-			curr++;
+			++curr;
+		}
+	}
+	return curr;
+}
+int  CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillFriendlyPlayers(std::array<int, 9>& players, int pl, bool addSelf)
+{
+	int curr = 0;
+	if (addSelf) {
+		players[curr] = pl;
+		++curr;
+	}
+	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pl);
+	for (int p = 1; p <= 8; p++) {
+		if (ps->GetDiploStateTo(p) == shok::DiploState::Friendly) {
+			players[curr] = p;
+			++curr;
 		}
 	}
 	return curr;

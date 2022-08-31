@@ -475,6 +475,7 @@ namespace CppLogic::Iterator {
 		EntityPredicateOfAnyPlayer(std::initializer_list<int> pl);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 		static int FillHostilePlayers(std::array<int, 9>& players, int pl);
+		static int FillFriendlyPlayers(std::array<int, 9>& players, int pl, bool addSelf);
 	};
 	class EntityPredicateOfAnyType : public Predicate<EGL::CGLEEntity> {
 	public:

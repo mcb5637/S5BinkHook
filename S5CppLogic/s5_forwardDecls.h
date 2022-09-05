@@ -118,6 +118,10 @@ namespace RWE::Anim {
 	struct RtAnimInterpolator;
 	struct RpHAnimHierarchy;
 }
+namespace RWE::P2D {
+	struct Rt2dFont;
+	struct Rt2dBrush;
+}
 namespace EScr {
 	class CScriptTrigger;
 }

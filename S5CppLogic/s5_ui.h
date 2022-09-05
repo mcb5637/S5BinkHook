@@ -94,7 +94,7 @@ namespace shok {
 		bool SomeTextBool;
 		PADDING(3);
 		PADDINGI(1);
-		void* TextRenderObj;
+		RWE::P2D::Rt2dBrush* TextRenderObj;
 
 		void RenderText(const char* txt, int fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
 		void SetTextRenderColor(shok::Color c);

@@ -224,6 +224,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5_glue.h" />
     <ClInclude Include="s5_player.h" />
     <ClInclude Include="s5_RWEngine.h" />
+    <ClInclude Include="s5_RWE_2d.h" />
     <ClInclude Include="s5_RWE_anim.h" />
     <ClInclude Include="s5_RWE_particles.h" />
     <ClInclude Include="s5_sound.h" />
@@ -289,6 +290,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClCompile Include="s5_glue.cpp" />
     <ClCompile Include="s5_player.cpp" />
     <ClCompile Include="s5_RWEngine.cpp" />
+    <ClCompile Include="s5_RWE_2d.cpp" />
     <ClCompile Include="s5_RWE_anim.cpp" />
     <ClCompile Include="s5_RWE_particles.cpp" />
     <ClCompile Include="s5_sound.cpp" />

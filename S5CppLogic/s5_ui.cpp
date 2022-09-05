@@ -4,6 +4,7 @@
 #include "s5_guistates.h"
 #include "s5_defines.h"
 #include "s5_widget.h"
+#include "s5_RWE_2d.h"
 #include "entityiterator.h"
 #include "hooks.h"
 #include <stdlib.h>
@@ -86,7 +87,7 @@ const EGUIX::Color* shok::UIRenderCustomColorContext::GetColorByInt(int i)
 	return uircustomcolorcont_getcol(this, i);
 }
 
-float __cdecl printstr_getlength_override(EGUIX::Font* f, const char* str, float multiply) {
+float __cdecl printstr_getlength_override(RWE::P2D::Rt2dFont* f, const char* str, float multiply) {
 	int charlen;
 	unsigned char mask;
 	int off;
@@ -157,8 +158,9 @@ class TextRenderer {
 	};
 	shok::UIRenderer* r;
 	const T* buff;
-	EGUIX::Font* f;
-	float p[4];
+	RWE::P2D::Rt2dFont* f;
+	RWE::RwV2d anchor;
+	float end;
 	const float startx;
 	const float fontsize;
 	const float linedistance;
@@ -172,15 +174,15 @@ class TextRenderer {
 
 	static inline T line[5001]{};
 public:
-	TextRenderer(shok::UIRenderer* r, const T* txt, EGUIX::Font* f, float p[4], float ldf, shok::UIRenderCustomColorContext* customcolordata,
+	TextRenderer(shok::UIRenderer* r, const T* txt, RWE::P2D::Rt2dFont* f, const RWE::RwV2d& anchor, float end, float ldf, shok::UIRenderCustomColorContext* customcolordata,
 		shok::Color defaultcolor)
-		: startx(p[0]), fontsize(f->GetFontSize()), linedistance(fontsize* (ldf == 0.0f ? 1.0f : ldf))
+		: startx(anchor.x), fontsize(f->GetHeight()), linedistance(fontsize* (ldf == 0.0f ? 1.0f : ldf))
 		, defaultcolor(defaultcolor) {
 		this->r = r;
 		this->buff = txt;
 		this->f = f;
-		for (unsigned int i = 0; i < 4; ++i)
-			this->p[i] = p[i];
+		this->anchor = anchor;
+		this->end = end;
 		strpos = buff;
 		linepos = line;
 		this->customcolordata = customcolordata;
@@ -277,8 +279,8 @@ private:
 		while (true) {
 			if (!*strpos) {
 				*linepos = '\0';
-				if (p[2] && linepos != lastwordpos && lastwordpos != line) {
-					if ((f->GetTextLength(line, fontsize) + p[0]) >= p[2]) {
+				if (end && linepos != lastwordpos && lastwordpos != line) {
+					if ((f->GetStringWidth(line, fontsize) + anchor.x) >= end) {
 						linepos = lastwordpos;
 						*linepos = '\0';
 						strpos = lastwordsourcepos;
@@ -330,7 +332,7 @@ private:
 						--linepos;
 					T prev = *linepos;
 					*linepos = '\0';
-					if (p[2] && (f->GetTextLength(line, fontsize) + p[0]) >= p[2]) {
+					if (end && (f->GetStringWidth(line, fontsize) + anchor.x) >= end) {
 						if (linepos != lastwordpos && lastwordpos != line) {
 							linepos = lastwordpos;
 							*linepos = '\0';
@@ -380,9 +382,9 @@ private:
 			}
 			*linepos = *strpos;
 			++strpos;
-			if (*linepos == ' ' && p[2] && linepos != line) {
+			if (*linepos == ' ' && end && linepos != line) {
 				*linepos = '\0';
-				if ((f->GetTextLength(line, fontsize) + p[0]) >= p[2]) {
+				if ((f->GetStringWidth(line, fontsize) + anchor.x) >= end) {
 					if (linepos != lastwordpos && lastwordpos != line) {
 						linepos = lastwordpos;
 						*linepos = '\0';
@@ -401,8 +403,8 @@ private:
 	}
 
 	void NextLine() {
-		p[0] = startx;
-		p[1] -= linedistance;
+		anchor.x = startx;
+		anchor.y -= linedistance;
 	}
 
 	int ParseIntParam(T*& plinepos) {
@@ -483,7 +485,7 @@ private:
 						if (colorvalid) {
 							if (partlinepos != partialline) {
 								*partlinepos = '\0';
-								f->RenderText(partialline, fontsize, p, r->TextRenderObj);
+								f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
 								partlinepos = partialline;
 							}
 							r->SetTextRenderColor(c);
@@ -501,7 +503,7 @@ private:
 								const EGUIX::Color* c = customcolordata->GetColorByInt(i);
 								if (c) {
 									*partlinepos = '\0';
-									f->RenderText(partialline, fontsize, p, r->TextRenderObj);
+									f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
 									partlinepos = partialline;
 									r->SetTextRenderColor(c->ToShokColor());
 								}
@@ -515,7 +517,7 @@ private:
 						if (*plinepos == '|')
 							++plinepos;
 						*partlinepos = '\0';
-						f->RenderText(partialline, fontsize, p, r->TextRenderObj);
+						f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
 						partlinepos = partialline;
 						r->SetTextRenderColor(defaultcolor);
 						continue;
@@ -529,7 +531,7 @@ private:
 				++partlinepos;
 				++plinepos;
 			}
-			f->RenderText(partialline, fontsize, p, r->TextRenderObj);
+			f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
 			partlinepos = partialline;
 		}
 	}
@@ -539,20 +541,20 @@ public:
 		while (*strpos) {
 			PrepareLine();
 			if (ali == TextAlignment::Right) {
-				float linelen = f->GetTextLength(line, fontsize);
-				p[0] = p[2] - linelen;
+				float linelen = f->GetStringWidth(line, fontsize);
+				anchor.x = end - linelen;
 			}
 			else if (ali == TextAlignment::Center) {
-				float linelen = f->GetTextLength(line, fontsize);
-				if (p[2])
-					p[0] = (p[2] + p[0]) / 2 - linelen / 2;
+				float linelen = f->GetStringWidth(line, fontsize);
+				if (end)
+					anchor.x = (end + anchor.x) / 2 - linelen / 2;
 				else
-					p[0] = p[0] - linelen / 2;
+					anchor.x = anchor.x - linelen / 2;
 			}
 			if (containsat)
 				RenderAtLine();
 			else
-				f->RenderText(line, fontsize, p, r->TextRenderObj);
+				f->RenderText(line, fontsize, &anchor, r->TextRenderObj);
 
 			NextLine();
 			linepos = line;
@@ -565,7 +567,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 		return 0;
 	if (!txt || *txt == 0)
 		return 1;
-	EGUIX::Font* f = EGUIX::FontManager::GlobalObj()->GetFontObj(font);
+	auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(font);
 	if (!f)
 		return 0;
 	// no idea what these funcs do
@@ -575,14 +577,15 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 
 	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
 	r->SetTextRenderColor(c);
-	float p[4]{ x, y, xend, 0 };
+	RWE::RwV2d anchor = { x,y };
+	float end = xend;
 	if (!uk) {
-		p[0] = p[0] * 1024.0f / r->RenderSizeX;
-		p[1] = p[1] * 768.0f / r->RenderSizeY;
-		p[2] = p[2] * 1024.0f / r->RenderSizeX;
+		anchor.x = anchor.x * 1024.0f / r->RenderSizeX;
+		anchor.y = anchor.y * 768.0f / r->RenderSizeY;
+		end = end * 1024.0f / r->RenderSizeX;
 	}
 
-	const float fontsize = f->GetFontSize();
+	const float fontsize = f->GetHeight();
 	const float linedistance = fontsize * (ldf == 0.0f ? 1.0f : ldf);
 
 	float somesize[2];
@@ -590,14 +593,14 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	float unknownfa1[2];
 	// also no idea what this exactly does
 	reinterpret_cast<void(__cdecl*)(float*, float*, float*)>(0x707400)(somesize, unknownfa0, unknownfa1);
-	p[0] = p[0] * somesize[0] * r->RenderSizeX / 1024.0f;
-	p[2] = p[2] * somesize[0] * r->RenderSizeX / 1024.0f;
+	anchor.x = anchor.x * somesize[0] * r->RenderSizeX / 1024.0f;
+	end = end * somesize[0] * r->RenderSizeX / 1024.0f;
 	if (!r->SomeTextBool) {
 		reinterpret_cast<void(__cdecl*)(float, float)>(0x707200)(1024.0f / r->RenderSizeX, 768.0f / r->RenderSizeY);
-		p[1] = r->RenderSizeY / 768.0f - (fontsize * 768.0f + p[1]) / 768.0f;
+		anchor.y = r->RenderSizeY / 768.0f - (fontsize * 768.0f + anchor.y) / 768.0f;
 	}
 	else {
-		p[1] = 1.0f - (fontsize * 768.0f + p[1]) / 768.0f;
+		anchor.y = 1.0f - (fontsize * 768.0f + anchor.y) / 768.0f;
 	}
 	
 	reinterpret_cast<void(__cdecl*)(int, int)>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(0x8501C8) + 32))(1, 0);
@@ -607,11 +610,11 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	if (f->Flags & 2) {
 		static wchar_t buff[5001]{}; // same size that is used in the original func
 		shok::UIRenderer::MultibyteToWString(txt, buff, 5000);
-		TextRenderer<wchar_t> rend{ r, buff, f, p, ldf, customcolordata, c };
+		TextRenderer<wchar_t> rend{ r, buff, f, anchor, end, ldf, customcolordata, c };
 		rend.MainRender();
 	}
 	else {
-		TextRenderer<char> rend{ r, txt, f, p, ldf, customcolordata, c };
+		TextRenderer<char> rend{ r, txt, f, anchor, end, ldf, customcolordata, c };
 		rend.MainRender();
 	}
 

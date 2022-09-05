@@ -671,41 +671,13 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookOnScreenInfoDisplayBehavior()
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5367D0), &OSIRenderer_renderhookedasm, reinterpret_cast<void*>(0x5367D7));
 }
 
-static inline float* (__cdecl* const font_lengthdata_get)(void* ld) = reinterpret_cast<float* (__cdecl*)(void*)>(0x625D00);
-float* EGUIX::Font::GetLengthData()
-{
-    return font_lengthdata_get(LengthData);
-}
-static inline float(__cdecl* const font_getsize)(EGUIX::Font* th) = reinterpret_cast<float(__cdecl*)(EGUIX::Font*)>(0x708ED0);
-float EGUIX::Font::GetFontSize()
-{
-    return font_getsize(this);
-}
-static inline float(__cdecl* const font_getstrlen)(EGUIX::Font* th, const char* s, float m) = reinterpret_cast<float(__cdecl*)(EGUIX::Font*, const char*, float)>(0x708F00);
-float EGUIX::Font::GetTextLength(const char* s, float multiply)
-{
-    return font_getstrlen(this, s, multiply);
-}
-float EGUIX::Font::GetTextLength(const wchar_t* s, float multiply)
-{
-    return GetTextLength(reinterpret_cast<const char*>(s), multiply);
-}
-void EGUIX::Font::RenderText(const wchar_t* s, float lengthMultiplyer, float* screenpos, void* textRenderObj)
-{
-    RenderTxt(this, reinterpret_cast<const char*>(s), lengthMultiplyer, screenpos, textRenderObj);
-}
-void EGUIX::Font::RenderText(const char* s, float lengthMultiplyer, float* screenpos, void* textRenderObj)
-{
-    RenderTxt(this, s, lengthMultiplyer, screenpos, textRenderObj);
-}
-
 static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);
 void EGUIX::FontManager::LoadFont(int* outFontID, const char* fontName)
 {
     loadfont(outFontID, fontName);
 }
-static inline EGUIX::Font* (__thiscall* const fontmng_getfont)(EGUIX::FontManager* th, int id) = reinterpret_cast<EGUIX::Font * (__thiscall*)(EGUIX::FontManager*, int)>(0x5597C7);
-EGUIX::Font* EGUIX::FontManager::GetFontObj(int id)
+static inline RWE::P2D::Rt2dFont* (__thiscall* const fontmng_getfont)(EGUIX::FontManager* th, int id) = reinterpret_cast<RWE::P2D::Rt2dFont * (__thiscall*)(EGUIX::FontManager*, int)>(0x5597C7);
+RWE::P2D::Rt2dFont* EGUIX::FontManager::GetFontObj(int id)
 {
     return fontmng_getfont(this, id);
 }

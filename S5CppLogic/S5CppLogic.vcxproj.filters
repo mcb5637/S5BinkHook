@@ -249,6 +249,9 @@
     <ClInclude Include="mod.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_RWE_2d.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -396,6 +399,9 @@
       <Filter>shok\engine</Filter>
     </ClCompile>
     <ClCompile Include="s5_BBRw.cpp">
+      <Filter>shok\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_RWE_2d.cpp">
       <Filter>shok\engine</Filter>
     </ClCompile>
   </ItemGroup>

@@ -742,34 +742,10 @@ namespace EGUIX {
 		static inline EGUIX::CWidgetGroupManager* (__stdcall* const GlobalObj)() = reinterpret_cast<EGUIX::CWidgetGroupManager * (__stdcall*)()>(0x55B688);
 	};
 
-	class Font {
-	public:
-		PADDINGI(1);
-		float Size, Offset, Spacing;
-		byte Flags; // 2 -> is wchar
-		PADDING(3);
-		PADDINGI(4);
-		int16_t CharData[128]; // 9
-		int ExtCharOffset; // 73
-		unsigned int ExtCharLength;
-		int16_t* ExtCharData;
-		PADDINGI(1);
-		void* LengthData; // 77
-		void(__cdecl* RenderTxt)(Font* f, const char* str, float lengthMultiplyer, float* screenpos, void* textRenderObj);
-
-		float* GetLengthData();
-		float GetFontSize();
-		float GetTextLength(const char* s, float multiply);
-		float GetTextLength(const wchar_t* s, float multiply);
-		void RenderText(const wchar_t* s, float lengthMultiplyer, float* screenpos, void* textRenderObj);
-		void RenderText(const char* s, float lengthMultiplyer, float* screenpos, void* textRenderObj);
-	};
-	//constexpr int i = offsetof(Font, CharData) / 4;
-
 	class FontManager { // no vtable either
 	public:
 		static void LoadFont(int* outFontID, const char* fontName);
-		EGUIX::Font* GetFontObj(int id);
+		RWE::P2D::Rt2dFont* GetFontObj(int id);
 
 		static inline EGUIX::FontManager* (* const GlobalObj)() = reinterpret_cast<EGUIX::FontManager * (*)()>(0x5593AD);
 	};

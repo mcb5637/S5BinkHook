@@ -10,6 +10,7 @@
 #include "s5_entity.h"
 #include "s5_events.h"
 #include "s5_defines.h"
+#include "s5_RWE_2d.h"
 #include "hooks.h"
 
 namespace CppLogic::UI {
@@ -575,7 +576,7 @@ namespace CppLogic::UI {
 		CheckFontString(font);
 		int id = 0;
 		EGUIX::FontManager::LoadFont(&id, font);
-		EGUIX::Font* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
+		auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 		L.Push(f->Size);
 		L.Push(f->Offset);
 		L.Push(f->Spacing);
@@ -587,7 +588,7 @@ namespace CppLogic::UI {
 		CheckFontString(font);
 		int id = 0;
 		EGUIX::FontManager::LoadFont(&id, font);
-		EGUIX::Font* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
+		auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 		if (L.IsNumber(2))
 			f->Size = L.CheckFloat(2);
 		if (L.IsNumber(3))

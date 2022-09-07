@@ -1142,6 +1142,8 @@ namespace CppLogic::UI {
 // CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\medium11bold.met") --"data\\menu\\fonts\\mainmenularge.met"
 // CppLogic.UI.FontGetConfig("data\\menu\\fonts\\standard10.met")
 // XGUIEng.SetText("StartMenu00_EndGame", "@center @color:0,255,0 test")
+// XGUIEng.SetText("StartMenu00_EndGame", "test@icon:graphics\\textures\\gui\\i_refine_iron|test")
+// XGUIEng.SetText("StartMenu00_EndGame", "test@icon:data\\graphics\\textures\\gui\\b_units_heroes.png,2.500000e-001,0.000000e+000,2.500000e-001,6.250000e-002|test") XGUIEng.SetText("StartMenu00_StartSinglePlayer", "test@icon:data\\graphics\\textures\\gui\\b_units_heroes.png,2.500000e-001,0.000000e+000,2.500000e-001,6.250000e-002|test")
 // CppLogic.UI.RemoveWidget("StartMenu00_VersionNumber")
 // CppLogic.UI.SetGUIStateLuaSelection(function(x, y) LuaDebugger.Log(x.."/"..y) end)
 // CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test", "EGUIX::CVideoPlaybackCustomWidget"); XGUIEng.ShowWidget("test", 1); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 250, 250); XGUIEng.StartVideoPlayback("test", "data\\graphics\\videos\\pu_farmer.bik", 1);

@@ -12,6 +12,10 @@ assert(false, "do not load this file, this is documentation only!")
 ---		- added @defaultcolor to reset color to the widgets default.
 ---		- added @skipWhitespace, which takes on or off as parameter, to turn off condensing multiple spaces to one.
 ---		- added @@ to print one @ (escape sequence)
+---		- added @icon:iconid,texX,texY,texW,texH,sizeX,sizeY renders a EGUIX::CMaterial as a char inside the text
+---			- iconid is the path to the file, same format as for widgets. (this is a GUITexture, you may use the corresponding  ModLoader functions for them).
+---			- texX, texY, texW, texH are texture coordinates to display part of the texture only (optional, default 0,0,1,1, either all or none) (easiest to copy them out of the GUIEdito).
+---			- sizeX, sizeY size multipliers (optional, default Y=X, X=1, you may specify only one) (if you want to use them, texture coordinates are required).
 --- - music can now be played from bba/s5x archives (make sure the s5x is loaded if you want to use music from it).
 --- - removed override for the functions error and pcall, they now work as they should
 CppLogic = {}

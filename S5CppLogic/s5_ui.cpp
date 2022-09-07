@@ -160,6 +160,7 @@ class TextRenderer {
 	const T* buff;
 	RWE::P2D::Rt2dFont* f;
 	RWE::RwV2d anchor;
+	RWE::RwV2d posTransform;
 	float end;
 	const float startx;
 	const float fontsize;
@@ -174,7 +175,7 @@ class TextRenderer {
 
 	static inline T line[5001]{};
 public:
-	TextRenderer(shok::UIRenderer* r, const T* txt, RWE::P2D::Rt2dFont* f, const RWE::RwV2d& anchor, float end, float ldf, shok::UIRenderCustomColorContext* customcolordata,
+	TextRenderer(shok::UIRenderer* r, const T* txt, RWE::P2D::Rt2dFont* f, const RWE::RwV2d& anchor, float end, float ldf, const RWE::RwV2d& posTransform, shok::UIRenderCustomColorContext* customcolordata,
 		shok::Color defaultcolor)
 		: startx(anchor.x), fontsize(f->GetHeight()), linedistance(fontsize* (ldf == 0.0f ? 1.0f : ldf))
 		, defaultcolor(defaultcolor) {
@@ -183,6 +184,7 @@ public:
 		this->f = f;
 		this->anchor = anchor;
 		this->end = end;
+		this->posTransform = posTransform;
 		strpos = buff;
 		linepos = line;
 		this->customcolordata = customcolordata;
@@ -248,6 +250,12 @@ private:
 			return L"defaultcolor";
 		else
 			return "defaultcolor";
+	}
+	constexpr const T* txt_icon() {
+		if constexpr (std::same_as<T, wchar_t>)
+			return L"icon";
+		else
+			return "icon";
 	}
 
 	bool charsmatch(const T* txt, const T* sear, bool checkend) {
@@ -426,6 +434,39 @@ private:
 			++plinepos;
 		}
 	}
+	float ParseFloatParam(T*& plinepos) {
+		T* st = plinepos;
+		while (true) {
+			if (*plinepos == ',' || *plinepos == ' ' || *plinepos == '|' || *plinepos == '\0') {
+				T prev = *plinepos;
+				*plinepos = '\0';
+				double r;
+				if constexpr (std::same_as<T, wchar_t>) {
+					r = _wtof(st); // todo, fix for char if that is actually used somewhere
+				}
+				else {
+					r = atof(st);
+				}
+				*plinepos = prev;
+				return static_cast<float>(r);
+			}
+			++plinepos;
+		}
+	}
+	void ParseMaterialNameParam(T*& plinepos, EGUIX::CMaterial& m) {
+		char name[500]{};
+		int off = 0;
+		while (off < 500) {
+			if (*plinepos == ',' || *plinepos == ' ' || *plinepos == '|' || *plinepos == '\0') {
+				break;
+			}
+			name[off] = static_cast<char>(*plinepos);
+			++plinepos;
+			++off;
+		}
+		name[off] = '\0';
+		m.SetTexture(name);
+	}
 
 	void SkipToEndOfAt(T*& plinepos) {
 		while (true) {
@@ -522,6 +563,68 @@ private:
 						r->SetTextRenderColor(defaultcolor);
 						continue;
 					}
+					else if (charsmatch(&plinepos[1], txt_icon(), false)) {
+						plinepos += 5;
+						if (*plinepos == ':') {
+							++plinepos;
+							EGUIX::CMaterial mat{};
+							ParseMaterialNameParam(plinepos, mat);
+							bool coordvalid = false;
+							if (*plinepos == ',') {
+								++plinepos;
+								mat.TextureCoordinates.X = ParseFloatParam(plinepos);
+								if (*plinepos == ',') {
+									++plinepos;
+									mat.TextureCoordinates.Y = ParseFloatParam(plinepos);
+									if (*plinepos == ',') {
+										++plinepos;
+										mat.TextureCoordinates.W = ParseFloatParam(plinepos);
+										if (*plinepos == ',') {
+											++plinepos;
+											mat.TextureCoordinates.H = ParseFloatParam(plinepos);
+											coordvalid = true;
+										}
+									}
+								}
+							}
+							if (!coordvalid) {
+								mat.TextureCoordinates = { 0.0f, 0.0f, 1.0f, 1.0f };
+							}
+							shok::Position siz = mat.GetSize();
+							siz.X *= mat.TextureCoordinates.W;
+							siz.Y *= mat.TextureCoordinates.H;
+
+							shok::Position smult = { 1.0f, 1.0f };
+							if (*plinepos == ',') {
+								++plinepos;
+								smult.X = ParseFloatParam(plinepos);
+								if (*plinepos == ',') {
+									++plinepos;
+									smult.Y = ParseFloatParam(plinepos);
+								}
+								else {
+									smult.Y = smult.X;
+								}
+							}
+
+							*partlinepos = '\0';
+							f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
+							partlinepos = partialline;
+
+							// recover scaled screen coords where to put the icon
+							EGUIX::Rect pos{ anchor.x / posTransform.x, (anchor.y - 1.0f) * -shok::UIRenderer::ScaledScreenSize.Y - fontsize * shok::UIRenderer::ScaledScreenSize.Y, siz.X, siz.Y };
+							// scale icon to match font size, keeping proportions
+							pos.W = pos.W / pos.H * fontsize / posTransform.x * smult.X;
+							pos.H = fontsize * shok::UIRenderer::ScaledScreenSize.Y * smult.Y;
+							// adjust height
+							pos.Y += fontsize * shok::UIRenderer::ScaledScreenSize.Y * (1.0f - smult.Y);
+							r->RenderMaterial(&mat, true, &pos);
+							// adjust position for next text
+							anchor.x += pos.W * posTransform.x;
+						}
+						SkipToEndOfAt(plinepos);
+						continue;
+					}
 					else {
 						SkipToEndOfAt(plinepos);
 						continue;
@@ -578,11 +681,12 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
 	r->SetTextRenderColor(c);
 	RWE::RwV2d anchor = { x,y };
+	RWE::RwV2d posTransform = { 1.0f, 1.0f };
 	float end = xend;
 	if (!uk) {
-		anchor.x = anchor.x * 1024.0f / r->RenderSizeX;
-		anchor.y = anchor.y * 768.0f / r->RenderSizeY;
-		end = end * 1024.0f / r->RenderSizeX;
+		anchor.x = anchor.x * shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX;
+		anchor.y = anchor.y * shok::UIRenderer::ScaledScreenSize.Y / r->RenderSizeY;
+		end = end * shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX;
 	}
 
 	const float fontsize = f->GetHeight();
@@ -593,14 +697,17 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	float unknownfa1[2];
 	// also no idea what this exactly does
 	reinterpret_cast<void(__cdecl*)(float*, float*, float*)>(0x707400)(somesize, unknownfa0, unknownfa1);
-	anchor.x = anchor.x * somesize[0] * r->RenderSizeX / 1024.0f;
-	end = end * somesize[0] * r->RenderSizeX / 1024.0f;
+	anchor.x = anchor.x * somesize[0] * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	posTransform.x = posTransform.x * somesize[0] * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	end = end * somesize[0] * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
 	if (!r->SomeTextBool) {
-		reinterpret_cast<void(__cdecl*)(float, float)>(0x707200)(1024.0f / r->RenderSizeX, 768.0f / r->RenderSizeY);
-		anchor.y = r->RenderSizeY / 768.0f - (fontsize * 768.0f + anchor.y) / 768.0f;
+		reinterpret_cast<void(__cdecl*)(float, float)>(0x707200)(shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX, shok::UIRenderer::ScaledScreenSize.Y / r->RenderSizeY);
+		anchor.y = r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
+		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
 	}
 	else {
-		anchor.y = 1.0f - (fontsize * 768.0f + anchor.y) / 768.0f;
+		anchor.y = 1.0f - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
+		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
 	}
 	
 	reinterpret_cast<void(__cdecl*)(int, int)>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(0x8501C8) + 32))(1, 0);
@@ -610,11 +717,11 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	if (f->Flags & 2) {
 		static wchar_t buff[5001]{}; // same size that is used in the original func
 		shok::UIRenderer::MultibyteToWString(txt, buff, 5000);
-		TextRenderer<wchar_t> rend{ r, buff, f, anchor, end, ldf, customcolordata, c };
+		TextRenderer<wchar_t> rend{ r, buff, f, anchor, end, ldf, posTransform, customcolordata, c };
 		rend.MainRender();
 	}
 	else {
-		TextRenderer<char> rend{ r, txt, f, anchor, end, ldf, customcolordata, c };
+		TextRenderer<char> rend{ r, txt, f, anchor, end, ldf, posTransform, customcolordata, c };
 		rend.MainRender();
 	}
 

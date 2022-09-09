@@ -17,9 +17,13 @@ namespace GS3DTools {
 	public:
 		shok::String MapName;
 		int MapType;
-		shok::String MapCampagnName, MapGUID;
+		shok::String MapCampagnName;
+		shok::String MapGUID; // theoretically a struct with only a string as member Data
+
+		CMapData& operator=(const CMapData& o);
 
 		static inline constexpr int vtp = 0x761D34;
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E7D0);
 	};
 }
 
@@ -51,16 +55,25 @@ namespace Framework {
 	};
 
 	struct SaveData {
-		struct {
-			shok::String SavePath;
-			GS3DTools::CMapData MapData;
-		}*CurrentSave;
+		shok::String SavePath;
+		GS3DTools::CMapData MapData;
+		shok::String AdditionalInfo; // savegame name
+		shok::Vector<int> Key; // seems to be unused
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E920);
+		// ctor 403180, dtor 403083
+	};
+	static_assert(sizeof(SaveData) == 41 * 4);
+
+	struct SavegameSystem {
+		SaveData* CurrentSave;
 		char* SaveDir;
 		char* DebugSaveDir;
 
-		bool LoadSaveData(const char* name);
+		bool LoadSaveData(const char* name); // fills CurrentSave
+		void SaveGame(const char* slot, GS3DTools::CMapData* mapdata, const char* name, bool debugSave = false);
 
-		static inline Framework::SaveData* (* const GlobalObj)() = reinterpret_cast<Framework::SaveData * (* const)()>(0x403158);
+		static inline Framework::SavegameSystem* (* const GlobalObj)() = reinterpret_cast<Framework::SavegameSystem * (* const)()>(0x403158);
 	};
 }
 

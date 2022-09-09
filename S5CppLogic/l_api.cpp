@@ -121,7 +121,7 @@ namespace CppLogic::API {
 
 	int SaveGetMapInfo(lua::State L) {
 		const char* save = L.CheckString(1);
-		Framework::SaveData* sdata = Framework::SaveData::GlobalObj();
+		Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
 		if (!sdata->LoadSaveData(save))
 			throw lua::LuaException("save doesnt exist");
 		L.Push(sdata->CurrentSave->MapData.MapName.c_str());

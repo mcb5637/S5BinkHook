@@ -77,11 +77,10 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x85A310));
+	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x84E920));
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
-	std::uniform_int_distribution d{ 1, 100 };
-	L.Push(d((*EGL::CGLEGameLogic::GlobalObj)->RNG));
-	return 1;
+	
+	return 0;
 }
 
 int Cleanup(lua::State L) {

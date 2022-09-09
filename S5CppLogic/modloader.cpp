@@ -80,7 +80,7 @@ const char* internalmap_getpath(GS3DTools::CMapData* d) {
 }
 void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::GameModeStartMapData* data, bool externalmap)
 {
-	Framework::SaveData* sdata = Framework::SaveData::GlobalObj();
+	Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
 	if (!sdata->LoadSaveData(data->Folder))
 		throw 0;
 	lua::State L{ ingame };

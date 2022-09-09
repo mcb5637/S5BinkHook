@@ -6,6 +6,14 @@ void ECore::IReplayStreamExtension::unknown0()
 {
 }
 
+inline GS3DTools::CMapData* (__thiscall* const mapdata_assign)(GS3DTools::CMapData* th, const GS3DTools::CMapData* o) = reinterpret_cast<GS3DTools::CMapData * (__thiscall*)(GS3DTools::CMapData*, const GS3DTools::CMapData*)>(0x4029B8);
+GS3DTools::CMapData& GS3DTools::CMapData::operator=(const GS3DTools::CMapData& o)
+{
+    if (this == &o)
+        return *this;
+    return *mapdata_assign(this, &o);
+}
+
 int(__thiscall* const cinfo_getindex)(Framework::CampagnInfo* th, const char* s) = reinterpret_cast<int(__thiscall* const)(Framework::CampagnInfo*, const char*)>(0x51A23B);
 int Framework::CampagnInfo::GetMapIndexByName(const char* s)
 {
@@ -20,10 +28,16 @@ Framework::MapInfo* Framework::CampagnInfo::GetMapInfoByName(const char* n)
     return &Maps[i];
 }
 
-bool(__thiscall* const savedata_load)(Framework::SaveData* th, const char* s) = reinterpret_cast<bool(__thiscall* const)(Framework::SaveData*, const char*)>(0x403253);
-bool Framework::SaveData::LoadSaveData(const char* name)
+inline bool(__thiscall* const savedata_load)(Framework::SavegameSystem* th, const char* s) = reinterpret_cast<bool(__thiscall* const)(Framework::SavegameSystem*, const char*)>(0x403253);
+bool Framework::SavegameSystem::LoadSaveData(const char* name)
 {
     return savedata_load(this, name);
+}
+
+inline void(__thiscall* const savedata_save)(Framework::SavegameSystem* th, const char* slot, GS3DTools::CMapData* mapdata, const char* name, bool debugSave) = reinterpret_cast<void(__thiscall*)(Framework::SavegameSystem*, const char*, GS3DTools::CMapData*, const char*, bool)>(0x4031C4);
+void Framework::SavegameSystem::SaveGame(const char* slot, GS3DTools::CMapData* mapdata, const char* name, bool debugSave)
+{
+    savedata_save(this, slot, mapdata, name, debugSave);
 }
 
 bool(__thiscall* const gdb_iskeyvalid)(GDB::CList* th, const char* k) = reinterpret_cast<bool(__thiscall* const)(GDB::CList*, const char*)>(0x40E038);

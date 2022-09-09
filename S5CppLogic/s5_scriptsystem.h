@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_filesystem.h"
 #include "Luapp/luapp50.h"
 
 namespace shok {
@@ -125,6 +126,23 @@ namespace EScr {
 		virtual void __stdcall NewFile(lua_State* L, const char* filename, const char* filedata, size_t dataLength) = 0;
 		virtual void __stdcall AddLuaState(lua_State* L) = 0;
 		virtual void __stdcall RemoveLuaState(lua_State* L) = 0;
+	};
+
+	class LuaStateSerializer {
+	public:
+		BB::CMemoryStream Stream;
+		int TableDepth = 0;
+		shok::Vector<int> References; // refs to tables
+
+		// ctor 572E2A
+		// serialize table 5A19EF (this, L, index)
+		// serialize table kv pair 5A1E50 (this, L) primitive type, value, primitive key string, return success, if false, have to remove type from stream wtf?
+		// serialize primitive 5A19AB (this, data*, len) writes len, data
+		// deserialize primitive 5A1AA6 (this, len*) reads len, then data, fixed size buffer 0xA06C98! end 0xA0AB18?
+		// deseraialize primitive, throw away size 5A1B6D (this)
+		// deserialize table 5A1BB0 (this, L, index)
+		void SerializeState(lua_State* L);
+		void DeserializeState(lua_State* L);
 	};
 }
 

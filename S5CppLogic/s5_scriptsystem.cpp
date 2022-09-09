@@ -122,3 +122,14 @@ bool EScr::CScriptTrigger::CallAction()
 {
 	return scripttrigger_callact(this);
 }
+
+inline void(__thiscall* const stateseri_serialize)(EScr::LuaStateSerializer* th, lua_State* L) = reinterpret_cast<void(__thiscall*)(EScr::LuaStateSerializer*, lua_State*)>(0x5A1A78);
+void EScr::LuaStateSerializer::SerializeState(lua_State* L)
+{
+	stateseri_serialize(this, L);
+}
+inline void(__thiscall* const stateseri_deserialize)(EScr::LuaStateSerializer* th, lua_State* L) = reinterpret_cast<void(__thiscall*)(EScr::LuaStateSerializer*, lua_State*)>(0x5A1D98);
+void EScr::LuaStateSerializer::DeserializeState(lua_State* L)
+{
+	stateseri_deserialize(this, L);
+}

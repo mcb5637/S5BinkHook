@@ -352,7 +352,7 @@ namespace GGL {
 		virtual int SomethingStream(BB::IStream* s) = 0;
 		virtual void unknown0(int) = 0;
 		virtual void __stdcall Tick() = 0;
-		virtual void Serialize(const char* savename) = 0;
+		virtual void Serialize(const char* savename) = 0; // 5
 		virtual void Deserialize(const char* savename) = 0;
 		virtual void unknown3(int) = 0;
 		virtual GGL::CWeatherHandler* GetWeatherHandler() = 0;

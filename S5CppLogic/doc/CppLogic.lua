@@ -28,6 +28,7 @@ assert(false, "do not load this file, this is documentation only!")
 ---			- function & string size no longer limited
 ---			- any table keys (not of one of the forbidden types above) (also no size limit) (also no more type changes between numbers <-> strings)
 ---			- metatables
+---			- function identity does now stay as it is. (so if 2 functions are == before saving + loading, they are also after doing so)
 ---		- please note that savegames made with this change active cannot be loaded without CppLogic. (but you can load old saves, just without any of these features)
 CppLogic = {}
 CppLogic.Effect = {}

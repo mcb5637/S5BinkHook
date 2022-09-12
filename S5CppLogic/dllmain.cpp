@@ -44,8 +44,9 @@
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
-	bool DoNotUseCenterFix = false;
+	bool DisableAdvStringPrinting = false;
 	bool DisableModLoader = false;
+	bool DisableAdvLuaSerializer = false;
 
 	bool Loaded = false;
 
@@ -60,11 +61,14 @@ struct CppLogicOptions {
 				if (line == "DoNotLoad") {
 					f >> DoNotLoad;
 				}
-				else if (line == "DoNotUseCenterFix") {
-					f >> DoNotUseCenterFix;
+				else if (line == "DisableAdvStringPrinting") {
+					f >> DisableAdvStringPrinting;
 				}
 				else if (line == "DisableModLoader") {
 					f >> DisableModLoader;
+				}
+				else if (line == "DisableAdvLuaSerializer") {
+					f >> DisableAdvLuaSerializer;
 				}
 				f.ignore();
 			}
@@ -81,6 +85,14 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 	
 	return 0;
+}
+
+int GetOptions(lua::State L) {
+	L.Push(Options.DisableAdvStringPrinting);
+	L.Push(Options.DisableAdvLuaSerializer);
+	L.Push(Options.DisableModLoader);
+	L.Push(CppLogic::HasSCELoader());
+	return 4;
 }
 
 int Cleanup(lua::State L) {
@@ -107,11 +119,13 @@ void InitGame() {
 	Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
 	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Initialize();
-	if (!Options.DoNotUseCenterFix)
+	if (!Options.DisableAdvStringPrinting)
 		shok::HookTextPrinting();
 	CppLogic::Logic::OnLoad();
 	ESnd::CSoEMusic::HookStartMusicFilesystem();
 	EScr::CScriptTriggerSystem::HookRemoveFuncOverrides();
+	if (!Options.DisableAdvLuaSerializer)
+		EScr::LuaStateSerializer::HookSerializationOverride();
 }
 
 constexpr double Version = 1.4000;
@@ -140,6 +154,8 @@ void Install(lua::State L) {
 
 	L.Push("CppLogic");
 	L.NewTable();
+
+	L.RegisterFunc<GetOptions>("GetOptions", -3);
 
 	L.PushLightUserdata(&ResetCppLogic);
 	L.PushValue(-2);

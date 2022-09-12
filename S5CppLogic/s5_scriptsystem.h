@@ -143,6 +143,11 @@ namespace EScr {
 		// deserialize table 5A1BB0 (this, L, index)
 		void SerializeState(lua_State* L);
 		void DeserializeState(lua_State* L);
+		LuaStateSerializer();
+
+		static inline shok::Vector<shok::String>* (__cdecl* const DoNotSerializeGlobals)() = reinterpret_cast<shok::Vector<shok::String>*(__cdecl*)()>(0x5A1DC5);
+
+		static void HookSerializationOverride();
 	};
 }
 

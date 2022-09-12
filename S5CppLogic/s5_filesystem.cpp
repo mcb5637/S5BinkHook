@@ -104,6 +104,16 @@ BB::CMemoryStream::CMemoryStream()
 {
 	*reinterpret_cast<int*>(this) = vtp;
 }
+inline void(__thiscall* const memstream_copyto)(const BB::CMemoryStream* th, BB::IStream* to) = reinterpret_cast<void(__thiscall*)(const BB::CMemoryStream*, BB::IStream*)>(0x5A19D1);
+void BB::CMemoryStream::CopyToStream(IStream& to) const
+{
+	memstream_copyto(this, &to);
+}
+inline void(__thiscall* const memstream_copyfrom)(BB::CMemoryStream* th, BB::IStream* fr) = reinterpret_cast<void(__thiscall*)(BB::CMemoryStream*, BB::IStream*)>(0x5A1B04);
+void BB::CMemoryStream::CopyFromStream(IStream& from)
+{
+	memstream_copyfrom(this, &from);
+}
 
 static inline bool(__thiscall* const shok_BB_CFileStreamEx_OpenFile)(BB::CFileStreamEx* th, const char* name, BB::CFileStreamEx::Flags m) = reinterpret_cast<bool(__thiscall*)(BB::CFileStreamEx*, const char*, BB::CFileStreamEx::Flags)>(0x54924D);
 static inline void(__thiscall* const shok_BB_CFileStreamEx_Close)(BB::CFileStreamEx* th) = reinterpret_cast<void(__thiscall*)(BB::CFileStreamEx*)>(0x54920A);

@@ -77,6 +77,8 @@ namespace BB {
 		static constexpr int vtp = 0x77F7CC;
 
 		CMemoryStream();
+		void CopyToStream(IStream& to) const;
+		void CopyFromStream(IStream& from);
 	};
 
 

@@ -18,6 +18,16 @@ assert(false, "do not load this file, this is documentation only!")
 ---			- sizeX, sizeY size multipliers (optional, default Y=X, X=1, you may specify only one) (if you want to use them, texture coordinates are required).
 --- - music can now be played from bba/s5x archives (make sure the s5x is loaded if you want to use music from it).
 --- - removed override for the functions error and pcall, they now work as they should
+--- - savegame lua state handling:
+---		- completely rewritten, now able to save anything that is not of the following:
+---			- lua functions with upvalues
+---			- C functions (although they should get readded by SHoK)
+---			- userdata
+---			- threads (coroutines)
+---		- note that the following does now work:
+---			- function & string size no longer limited
+---			- any table keys (not of one of the forbidden types above) (also no size limit) (also no more type changes between numbers <-> strings)
+---			- metatables
 CppLogic = {}
 CppLogic.Effect = {}
 CppLogic.Memory = {}
@@ -47,6 +57,13 @@ CppLogic.Version = 1.4000
 
 --- no longer needed.
 function CppLogic.OnLeaveMap() end
+
+--- returns settings from CppLogicOptions.txt.
+--- @return boolean DisableAdvStringPrinting
+--- @return boolean DisableAdvLuaSerializer
+--- @return boolean DisableModLoader
+--- @return boolean HasSCELoader
+function CppLogic.GetOptions() end
 
 --- check if an effect is valid
 --- @param id number id

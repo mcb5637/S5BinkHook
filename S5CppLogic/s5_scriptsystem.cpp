@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "s5_scriptsystem.h"
+#include <format>
+#include "s5_exception.h"
 #include "hooks.h"
+#include "luaserializer.h"
 
 lua_State* shok::LuaStateMainmenu = nullptr;
 
@@ -132,4 +135,102 @@ inline void(__thiscall* const stateseri_deserialize)(EScr::LuaStateSerializer* t
 void EScr::LuaStateSerializer::DeserializeState(lua_State* L)
 {
 	stateseri_deserialize(this, L);
+}
+inline void(__thiscall* const stateseri_ctor)(EScr::LuaStateSerializer* th) = reinterpret_cast<void(__thiscall*)(EScr::LuaStateSerializer * th)>(0x572E2A);
+EScr::LuaStateSerializer::LuaStateSerializer() {
+	stateseri_ctor(this);
+}
+
+void __stdcall luastateseri_hookserialize(BB::CFileStreamEx* f, lua_State* L, const char* filename) {
+	try {
+		int wr = 4;
+		f->Write(&wr, sizeof(int));
+		wr = 0;
+		f->Write(&wr, sizeof(int));
+		CppLogic::Serializer::AdvLuaStateSerializer seri{ *f, L };
+		seri.SerializeState();
+	}
+	catch (const std::format_error& fe) {
+		shok::LogString("AdvLuaStateSerializer: serialize std::format_error: %s\n", fe.what());
+		throw;
+	}
+	catch (const BB::CException& be) {
+		char buff[201]{};
+		be.CopyMessage(buff, 200);
+		shok::LogString("AdvLuaStateSerializer: serialize BB::CException: %s\n", buff);
+		throw;
+	}
+}
+void __declspec(naked) luastateseri_hookserializeasm() {
+	__asm {
+		lea eax, [ebp - 0x250];
+		push eax;
+		mov eax, 0x895DE8;
+		mov eax, [eax];
+		push eax;
+		lea eax, [ebp - 0x18];
+		push eax;
+		call luastateseri_hookserialize;
+
+		push 0x57510B;
+		ret;
+	};
+}
+void __stdcall lusstateseri_hookdeseri(BB::CFileStreamEx* f, lua_State* L, const char* filename) {
+	int resi = 0;
+	f->Read(&resi, sizeof(int));
+	int renull = 0;
+	f->Read(&renull, sizeof(int));
+	if (resi == 4 && renull == 0) {
+		try {
+			CppLogic::Serializer::AdvLuaStateSerializer seri{ *f, L };
+			seri.DeserializeState();
+		}
+		catch (const std::format_error& fe) {
+			shok::LogString("AdvLuaStateSerializer: deserialize std::format_error: %s\n", fe.what());
+			throw;
+		}
+		catch (const BB::CException& be) {
+			char buff[201]{};
+			be.CopyMessage(buff, 200);
+			shok::LogString("AdvLuaStateSerializer: deserialize BB::CException: %s\n", buff);
+			throw;
+		}
+	}
+	else {
+		f->Close();
+		f->OpenFile(filename, BB::IStream::Flags::DefaultRead);
+		EScr::LuaStateSerializer se{};
+		se.Stream.CopyFromStream(*f);
+		se.DeserializeState(L);
+	}
+}
+void __declspec(naked) lusstateseri_hookdeseriasm() {
+	__asm {
+		// overriden func call (EScr::LuaStateSerializer ctor, only call it to not have to patch out its inlined dtor)
+		mov eax, 0x572E2A;
+		call eax;
+
+		lea eax, [ebp - 0x250];
+		push eax;
+		mov eax, 0x895DE8;
+		mov eax, [eax];
+		push eax;
+		lea eax, [ebp - 0x1C];
+		push eax;
+		call lusstateseri_hookdeseri;
+
+		push 0x575334;
+		ret;
+	};
+}
+
+void EScr::LuaStateSerializer::HookSerializationOverride()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x5750ED),
+		reinterpret_cast<void*>(0x575311),
+		} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5750ED), &luastateseri_hookserializeasm, reinterpret_cast<void*>(0x5750F3));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575311), &lusstateseri_hookdeseriasm, reinterpret_cast<void*>(0x57531A));
 }

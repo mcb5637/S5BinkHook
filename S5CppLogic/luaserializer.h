@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_defines.h"
@@ -26,5 +27,56 @@ namespace CppLogic::Serializer {
 
 		static void DumpClassSerializationData(lua::State L, const BB::SerializationData* seri);
 		static void DumpClassSerializationData(lua::State L, unsigned int id);
+	};
+
+	class AdvLuaStateSerializer {
+		struct Reference {
+			lua::LType Type;
+			const void* Id;
+
+			auto operator<=>(const Reference&) const = default;
+		};
+
+
+		BB::CFileStreamEx& IO;
+		lua::State L;
+		void* Data = nullptr;
+		size_t DataLength = 0;
+		std::map<Reference, int> RefToNumber;
+		int NextRefereceNumber = 1;
+		int IndexOfReferenceHolder = 0;
+
+		// a reference to something already serialized/deserialized
+		static constexpr lua::LType ReferenceType = static_cast<lua::LType>(-2);
+
+		void WritePrimitive(const void* d, size_t len);
+		size_t ReadPrimitive();
+
+		void SerializeType(lua::LType t);
+		lua::LType DeserializeType();
+		void SerializeBool(int idx);
+		void DeserializeBool();
+		void SerializeNumber(int idx);
+		void DeserializeNumber();
+		void SerializeString(int idx);
+		void DeserializeString();
+		void SerializeReference(int ref);
+		int DeserializeReference();
+		void DeserializeReferencedValue();
+		void SerializeTable(int idx);
+		void DeserializeTable(bool create);
+		void SerializeFunction(int idx);
+		void DeserializeFunction();
+		void SerializeAnything(int idx);
+		void DeserializeAnything();
+		bool CanSerialize(int idx);
+		bool IsGlobalSkipped(const char* n);
+
+	public:
+		AdvLuaStateSerializer(BB::CFileStreamEx& io, lua_State* l);
+		~AdvLuaStateSerializer();
+
+		void SerializeState();
+		void DeserializeState();
 	};
 }

@@ -263,8 +263,8 @@ namespace EGL {
 		virtual void unknown11() = 0;
 		virtual int GetTickVT() = 0;
 		virtual void StartMap(const char* mapPath) = 0; // 15
-		virtual void unknown14() = 0;
-		virtual void unknown15() = 0;
+		virtual void Serialize(const char* folder) = 0;
+		virtual void Deserialize(const char* folder) = 0;
 		virtual void unknown16() = 0;
 		virtual void unknown17() = 0;
 		virtual void unknown18() = 0; // 20

@@ -4,7 +4,7 @@
 #include "s5_filesystem.h"
 #include "s5_scriptsystem.h"
 
-void CppLogic::Serializer::LuaSerializer::SerializeField(lua::State L, void* o, const BB::SerializationData* s, bool keypushed)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(lua::State L, void* o, const BB::SerializationData* s, bool keypushed)
 {
 	switch (s->Type) {
 	case 2:
@@ -53,7 +53,7 @@ void CppLogic::Serializer::LuaSerializer::SerializeField(lua::State L, void* o, 
 	}
 }
 
-void CppLogic::Serializer::LuaSerializer::SerializeFields(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializeFields(lua::State L, void* o, const BB::SerializationData* s)
 {
 	while (s->Size) {
 		if (s->SerializationName) {
@@ -70,12 +70,12 @@ void CppLogic::Serializer::LuaSerializer::SerializeFields(lua::State L, void* o,
 	}
 }
 
-void CppLogic::Serializer::LuaSerializer::SerializePushField(lua::State L, void* data, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializePushField(lua::State L, void* data, const BB::SerializationData* s)
 {
 	s->DataConverter->GetExtendedInfo().Push(L, data, s->DataConverter);
 }
 
-void CppLogic::Serializer::LuaSerializer::SerializeList(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializeList(lua::State L, void* o, const BB::SerializationData* s)
 {
 	L.Push(s->SerializationName);
 	L.NewTable();
@@ -94,7 +94,7 @@ void CppLogic::Serializer::LuaSerializer::SerializeList(lua::State L, void* o, c
 	L.SetTableRaw(-3);
 }
 
-void CppLogic::Serializer::LuaSerializer::Serialize(lua::State L, void* o, const BB::SerializationData* seri, unsigned int id)
+void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(lua::State L, void* o, const BB::SerializationData* seri, unsigned int id)
 {
 	L.NewTable();
 	if (id) {
@@ -107,13 +107,13 @@ void CppLogic::Serializer::LuaSerializer::Serialize(lua::State L, void* o, const
 	}
 	SerializeFields(L, o, seri);
 }
-void CppLogic::Serializer::LuaSerializer::Serialize(lua::State L, BB::IObject* o)
+void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(lua::State L, BB::IObject* o)
 {
 	unsigned int id = o->GetClassIdentifier();
 	Serialize(L, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
 }
 
-void CppLogic::Serializer::LuaSerializer::DeserializeField(lua::State L, void* o, const BB::SerializationData* s, bool valuepushed)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(lua::State L, void* o, const BB::SerializationData* s, bool valuepushed)
 {
 	switch (s->Type) {
 	case 2:
@@ -171,12 +171,12 @@ void CppLogic::Serializer::LuaSerializer::DeserializeField(lua::State L, void* o
 	}
 }
 
-void CppLogic::Serializer::LuaSerializer::DeserializeCheckField(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeCheckField(lua::State L, void* o, const BB::SerializationData* s)
 {
 	s->DataConverter->GetExtendedInfo().Check(L, o, -1, s->DataConverter);
 }
 
-void CppLogic::Serializer::LuaSerializer::DeserializeFields(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeFields(lua::State L, void* o, const BB::SerializationData* s)
 {
 	while (s->Size) {
 		if (s->SerializationName) {
@@ -193,7 +193,7 @@ void CppLogic::Serializer::LuaSerializer::DeserializeFields(lua::State L, void* 
 	}
 }
 
-void CppLogic::Serializer::LuaSerializer::DeserializeList(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeList(lua::State L, void* o, const BB::SerializationData* s)
 {
 	L.Push(s->SerializationName);
 	L.GetTableRaw(-2);
@@ -208,7 +208,7 @@ void CppLogic::Serializer::LuaSerializer::DeserializeList(lua::State L, void* o,
 	L.Pop(1);
 }
 
-void CppLogic::Serializer::LuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, unsigned int id)
+void CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, unsigned int id)
 {
 	if (o == nullptr) {
 		if (id == 0) {
@@ -236,13 +236,13 @@ void CppLogic::Serializer::LuaSerializer::Deserialize(lua::State L, void* o, con
 	}
 	DeserializeFields(L, o, seri);
 }
-void CppLogic::Serializer::LuaSerializer::Deserialize(lua::State L, BB::IObject* o)
+void CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, BB::IObject* o)
 {
 	unsigned int id = o->GetClassIdentifier();
 	Deserialize(L, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
 }
 
-void CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(lua::State L, const BB::SerializationData* d)
+void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua::State L, const BB::SerializationData* d)
 {
 	if (!d) {
 		L.Push("nullptr");
@@ -304,7 +304,7 @@ void CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(lua::State 
 		d++;
 	}
 }
-void CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(lua::State L, unsigned int id)
+void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua::State L, unsigned int id)
 {
 	DumpClassSerializationData(L, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id));
 }
@@ -505,6 +505,53 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 	L.SetTableRaw(IndexOfReferenceHolder, ref);
 }
 
+void CppLogic::Serializer::AdvLuaStateSerializer::SerializeUserdata(int idx)
+{
+	Reference r{ lua::LType::Userdata, L.ToPointer(idx) };
+	auto refn = RefToNumber.find(r);
+	if (refn == RefToNumber.end()) {
+		idx = L.ToAbsoluteIndex(idx);
+		int refnum = NextRefereceNumber;
+		++NextRefereceNumber;
+		RefToNumber.insert(std::make_pair(r, refnum));
+		SerializeType(lua::LType::Userdata);
+		SerializeReference(refnum);
+		if (!L.GetMetatable(idx))
+			throw std::format_error{ "cannot serialize a userdata without serializer" };
+		L.Push(UserdataSerializerMetaEvent);
+		L.GetTableRaw(-2);
+		if (!L.IsFunction(-1))
+			throw std::format_error{ "cannot serialize a userdata without serializer function" };
+		L.PushValue(idx);
+		L.TCall(1, 2);
+		SerializeString(-2); // name
+		SerializeAnything(-1); // probably a table or function
+		L.Pop(3);
+	}
+	else {
+		SerializeType(ReferenceType);
+		SerializeReference(refn->second);
+	}
+}
+void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeUserdata()
+{
+	int ref = DeserializeReference();
+
+	if (DeserializeType() != lua::LType::String)
+		throw std::format_error{ "deserialize udata name error" };
+	size_t len = ReadPrimitive();
+	std::string tname{ static_cast<const char*>(Data), len };
+	auto f = UserdataDeserializer.find(tname);
+	if (f == UserdataDeserializer.end())
+		throw std::format_error{ "deserialize udata name not found" };
+	L.Push(f->second);
+	DeserializeAnything();
+	L.TCall(1, 1);
+
+	L.PushValue(-1);
+	L.SetTableRaw(IndexOfReferenceHolder, ref);
+}
+
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeAnything(int idx)
 {
 	switch (L.Type(idx)) {
@@ -525,6 +572,9 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeAnything(int idx)
 		break;
 	case lua::LType::Function:
 		SerializeFunction(idx);
+		break;
+	case lua::LType::Userdata:
+		SerializeUserdata(idx);
 		break;
 	default:
 		throw std::format_error{ "invalid type" };
@@ -550,6 +600,9 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeAnything()
 		break;
 	case lua::LType::Function:
 		DeserializeFunction();
+		break;
+	case lua::LType::Userdata:
+		DeserializeUserdata();
 		break;
 	case ReferenceType:
 		DeserializeReferencedValue();
@@ -579,6 +632,16 @@ bool CppLogic::Serializer::AdvLuaStateSerializer::CanSerialize(int idx)
 		}
 		return true;
 	}
+	case lua::LType::Userdata:
+	{
+		if (!L.GetMetatable(idx))
+			return false;
+		L.Push(UserdataSerializerMetaEvent);
+		L.GetTableRaw(-2);
+		bool r = L.IsFunction(-1);
+		L.Pop(2);
+		return r;
+	}
 	default:
 		return false;
 	}
@@ -595,6 +658,8 @@ bool CppLogic::Serializer::AdvLuaStateSerializer::IsGlobalSkipped(const char* n)
 	}
 	return false;
 }
+
+std::map<std::string, lua::CFunction> CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer{};
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeState()
 {

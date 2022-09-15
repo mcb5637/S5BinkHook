@@ -78,13 +78,50 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
+class TestUD {
+	int i = 0;
+
+	static int SetI(lua::State L) {
+		TestUD* t = L.GetUserData<TestUD>(1);
+		t->i = L.CheckInt(2);
+		return 0;
+	}
+	static int GetI(lua::State L) {
+		TestUD* t = L.GetUserData<TestUD>(1);
+		L.Push(t->i);
+		return 1;
+	}
+
+public:
+	static int Serialize(lua::State L) {
+		TestUD* t = L.GetUserData<TestUD>(1);
+		L.Push(typename_details::type_name<TestUD>());
+		L.Push(t->i);
+		return 2;
+	}
+	static int Deserialize(lua::State L) {
+		L.NewUserData<TestUD>()->i = L.CheckInt(1);
+		return 1;
+	}
+
+	static constexpr std::array<lua::FuncReference, 2> LuaMethods{ {
+			lua::FuncReference::GetRef<SetI>("SetI"),
+			lua::FuncReference::GetRef<GetI>("GetI"),
+		} };
+
+
+};
+
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
-	//CppLogic::Serializer::LuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x84E920));
-	//CppLogic::Serializer::LuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
+	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x84E920));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 	
-	return 0;
+	L.NewUserData<TestUD>();
+	L.GetUserDataMetatable<TestUD>();
+
+	return 2;
 }
 
 int GetOptions(lua::State L) {
@@ -221,6 +258,13 @@ void Install(lua::State L) {
 	L.RegisterFunc<ResetCppLogic>("CppLogic_ResetGlobal");
 
 	//luaopen_debug(L);
+
+	L.GetUserDataMetatable<TestUD>();
+	L.RegisterFunc<TestUD::Serialize>("__serialize", -3);
+	L.Pop(1);
+	std::string k{ typename_details::type_name<TestUD>() };
+	CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[k] = &lua::CppToCFunction<TestUD::Deserialize>;
+
 
 	shok::LogString("loaded CppLogic %f %s into %X with SCELoader status %i\n", Version,
 #ifdef _DEBUG

@@ -125,7 +125,7 @@ namespace CppLogic::Logic {
 			}
 			L.Pop(1);
 		}
-		CppLogic::Serializer::LuaSerializer::Deserialize(L, ev);
+		CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, ev);
 		return 0;
 	}
 
@@ -144,7 +144,7 @@ namespace CppLogic::Logic {
 			bool r = false;
 			if (L.IsFunction(-1)) {
 				L.Push(id);
-				CppLogic::Serializer::LuaSerializer::Serialize(L, ev);
+				CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, ev);
 				L.PushLightUserdata(ev);
 				L.Push<NetEventReadBack>(1);
 				L.PCall(3, 1, 0);

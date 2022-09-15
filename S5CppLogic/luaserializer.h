@@ -7,7 +7,7 @@
 #include "Luapp/luapp50.h"
 
 namespace CppLogic::Serializer {
-	class LuaSerializer {
+	class ObjectToLuaSerializer {
 		static void SerializeField(lua::State L, void* o, const BB::SerializationData* s, bool keypushed = false);
 		static void SerializeFields(lua::State L, void* o, const BB::SerializationData* s);
 		static void SerializePushField(lua::State L, void* o, const BB::SerializationData* s);
@@ -29,6 +29,15 @@ namespace CppLogic::Serializer {
 		static void DumpClassSerializationData(lua::State L, unsigned int id);
 	};
 
+	/// <summary>
+	/// better serialization of lua states.
+	/// serialize writes the type (so it can write a reference instead).
+	/// deserialize checks type then dispatches.
+	/// <para>to serialize userdata: put a serializer function into metatable[UserdataSerializerMetaEvent], func(ud)->typenameString, anything.</para>
+	/// <para>and registry a deserializer for that name in UserdataDeserializer[typenameString] = lua::CppToCFunction&lt;...&gt;, func(anything)->ud.
+	/// anything can be any serializable lua value, including a table, but may not reference the to-be-serialized userdata (other serializable userdata is allowed).</para>
+	/// <para>you may use CppLogic::Serializer::ObjectToLuaSerializer to turn a C++ object via BB::SerializationData into a table and back.</para>
+	/// </summary>
 	class AdvLuaStateSerializer {
 		struct Reference {
 			lua::LType Type;
@@ -67,6 +76,8 @@ namespace CppLogic::Serializer {
 		void DeserializeTable(bool create);
 		void SerializeFunction(int idx);
 		void DeserializeFunction();
+		void SerializeUserdata(int idx);
+		void DeserializeUserdata();
 		void SerializeAnything(int idx);
 		void DeserializeAnything();
 		bool CanSerialize(int idx);
@@ -78,5 +89,8 @@ namespace CppLogic::Serializer {
 
 		void SerializeState();
 		void DeserializeState();
+
+		static constexpr const char* UserdataSerializerMetaEvent = "__serialize";
+		static std::map<std::string, lua::CFunction> UserdataDeserializer;
 	};
 }

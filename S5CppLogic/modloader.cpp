@@ -36,7 +36,7 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, con
 	AddLib(L);
 	bool keeparchive = false;
 	L.Push("ModLoader");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	if (L.IsTable(-1)) {
 		L.Push("Initialize");
 		L.GetTableRaw(-2);
@@ -92,7 +92,7 @@ void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::G
 void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
 {
 	L.Push("CppLogic");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.Push("ModLoader");
 	L.NewTable();
 
@@ -112,7 +112,7 @@ void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
 void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 {
 	L.Push("CppLogic");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.Push("ModLoader");
 	L.NewTable();
 
@@ -167,7 +167,7 @@ int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 	mng->LoadEntityTypeByID(id);
 	EntityTypesToRemove.push_back(id);
 	L.Push("Entities");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
@@ -230,7 +230,7 @@ int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
 	id = m->EffectTypeManager->GetIDByNameOrCreate(t);
 	m->LoadEffectTypeFromExtraFile(id);
 	L.Push("GGL_Effects");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
@@ -272,7 +272,7 @@ int CppLogic::ModLoader::ModLoader::AddTaskList(lua::State L)
 	m->LoadTaskList(id);
 	TaskListsToRemove.push_back(id);
 	L.Push("TaskLists");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
@@ -313,7 +313,7 @@ int CppLogic::ModLoader::ModLoader::AddTechnology(lua::State L)
 	m->LoadTech(id);
 	TechsToRemove.push_back(id);
 	L.Push("Technologies");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
@@ -332,7 +332,7 @@ int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
 	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->LoadModel(id);
 	ModelsToRemove.push_back(id);
 	L.Push("Models");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
@@ -398,7 +398,7 @@ int CppLogic::ModLoader::ModLoader::AddAnimation(lua::State L)
 	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
 	AnimsToRemove.push_back(id);
 	L.Push("Animations");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	if (L.IsTable(-1)) {
 		L.PushValue(1);
 		L.Push(id);
@@ -451,7 +451,7 @@ int CppLogic::ModLoader::ModLoader::AddSettlerUpgradeCategory(lua::State l)
 	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
 	SettlerUCatsToRemove.push_back(id);
 	L.Push("UpgradeCategories");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
@@ -486,7 +486,7 @@ int CppLogic::ModLoader::ModLoader::AddBuildingUpgradeCategory(lua::State l)
 	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
 	BuildingUCatsToRemove.push_back(id);
 	L.Push("UpgradeCategories");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	L.PushValue(1);
 	L.Push(id);
 	L.SetTableRaw(-3);
@@ -511,7 +511,7 @@ int CppLogic::ModLoader::ModLoader::AddWaterType(lua::State L)
 	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(id);
 	ReloadWaterTypes = true;
 	L.Push("WaterTypes");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	if (L.IsTable(-1)) {
 		L.PushValue(1);
 		L.Push(id);
@@ -599,7 +599,7 @@ int CppLogic::ModLoader::ModLoader::AddTerrainType(lua::State L)
 	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(id);
 	ReloadTerrainTypes = true;
 	L.Push("TerrainTypes");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	if (L.IsTable(-1)) {
 		L.PushValue(1);
 		L.Push(id);
@@ -634,7 +634,7 @@ int CppLogic::ModLoader::ModLoader::AddExperienceClass(lua::State L)
 	shok::ExperienceClass id = mng->AddExperienceClass(n, cat);
 	ExperienceClassesToRemove.push_back(id);
 	L.Push("ExperienceClasses");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	if (L.IsTable(-1)) {
 		L.PushValue(1);
 		L.Push(static_cast<int>(id));
@@ -666,7 +666,7 @@ int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
 	}
 	auto* mng = *ESnd::CSoESound::GlobalObj;
 	L.Push("Sounds");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	int firstid;
 	{
 		const char* n = L.CheckString(1);
@@ -696,7 +696,7 @@ void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 	shok::LogString("ModLoader: %s\n", log);
 	int t = L.GetTop();
 	L.Push("LuaDebugger");
-	L.GetTableRaw(L.GLOBALSINDEX);
+	L.GetGlobal();
 	if (L.IsTable(-1)) {
 		L.Push("Log");
 		L.GetTableRaw(-2);
@@ -729,7 +729,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		int t = L.GetTop();
 		AddLib(L);
 		L.Push("ModLoader");
-		L.GetTableRaw(L.GLOBALSINDEX);
+		L.GetGlobal();
 		if (L.IsTable(-1)) {
 			L.Push("Cleanup");
 			L.GetTableRaw(-2);

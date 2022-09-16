@@ -37,10 +37,14 @@ namespace BB {
 	private:
 		BB::CXmlSerializer() = default;
 	};
-	class IBinarySerializer { // 6 funcs
+	class IBinarySerializer {
 	public:
 		virtual ~IBinarySerializer() = default;
 		virtual void __stdcall Destroy() = 0;
+		virtual void __stdcall DeserializeById(BB::CFileStreamEx* f, BB::IObject* b) = 0;
+		virtual void __stdcall SerializeById(BB::CFileStreamEx* f, BB::IObject* b) = 0;
+		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, void* o, const BB::SerializationData* d) = 0;
+		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* o, const BB::SerializationData* d, unsigned int id) = 0; // id gets ignored
 
 		static inline constexpr int vtp = 0x77F4C8;
 	};
@@ -48,14 +52,21 @@ namespace BB {
 	public:
 
 		static inline constexpr int vtp = 0x77F5A4;
+
+		static CBinarySerializer* Create(int uk);
+
+	private:
+		CBinarySerializer() = default;
 	};
 
 	struct FieldSerilaizer {
-		int(__stdcall* DeserializeFromString)(void* data, const char* buff);
-		int(__stdcall* SerializeToString)(char* buff, size_t s, void* data);
-		// probably the same for binary
-		// int, int
-		// data?
+		void(__stdcall* DeserializeFromString)(void* data, const char* buff);
+		int(__stdcall* SerializeToString)(char* buff, size_t s, const void* data); // returns num chars written if buffer would be sufficient, negative on error
+		void(__stdcall* DeserializeFromStream)(void* data, BB::IStream* str);
+		void(__stdcall* SerializeToStream)(BB::IStream* str, const void* data);
+		BB::CIDManagerEx* (__stdcall* GetIdManager)() = nullptr; // may be nullptr
+		bool IsPrimitive = false;
+		void* Buffer; // p to a memory block of the serialized type, usually the buffer is directly after the serializer structure
 
 		static inline BB::FieldSerilaizer* const TypeInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810C98);
 		static inline BB::FieldSerilaizer* const TypeUInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810CD8);
@@ -179,7 +190,7 @@ namespace BB {
 		virtual void unknown2() = 0;
 	public:
 		virtual BB::IObject* __stdcall CreateObject(unsigned int id) = 0;
-		virtual unsigned int __stdcall GetIdentifierByName(const char* name) = 0;
+		virtual unsigned int __stdcall GetIdentifierByName(const char* name) = 0; // 5
 		virtual const char* __stdcall GetClassDemangledName(unsigned int id) = 0;
 		virtual const BB::SerializationData* __stdcall GetSerializationDataForClass(unsigned int id) = 0; // returns a 0-terminated array
 	private:

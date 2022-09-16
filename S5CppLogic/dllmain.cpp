@@ -118,10 +118,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x84E920));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 	
-	L.NewUserData<TestUD>();
-	L.GetUserDataMetatable<TestUD>();
-
-	return 2;
+	return 0;
 }
 
 int GetOptions(lua::State L) {
@@ -171,7 +168,7 @@ int ResetCppLogic(lua::State L) {
 	L.Push("CppLogic");
 	L.PushLightUserdata(&ResetCppLogic);
 	L.GetTableRaw(L.REGISTRYINDEX);
-	L.SetTableRaw(L.GLOBALSINDEX);
+	L.SetGlobal();
 	return 0;
 }
 
@@ -253,7 +250,7 @@ void Install(lua::State L) {
 	CppLogic::UA::Init(L);
 	L.SetTableRaw(-3);
 
-	L.SetTableRaw(L.GLOBALSINDEX);
+	L.SetGlobal();
 
 	L.RegisterFunc<ResetCppLogic>("CppLogic_ResetGlobal");
 

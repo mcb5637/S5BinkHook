@@ -619,6 +619,10 @@ namespace shok {
 		bool operator==(const String& r) const;
 	};
 	static_assert(sizeof(String) == 7 * 4);
+	std::strong_ordering operator<=>(const String& a, const char* b);
+	bool operator==(const String& a, const char* b);
+	std::strong_ordering operator<=>(const char* a, const String& b);
+	bool operator==(const char* a, const String& b);
 
 	template<class T>
 	struct Vector {

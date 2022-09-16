@@ -22,7 +22,7 @@ assert(false, "do not load this file, this is documentation only!")
 ---		- completely rewritten, now able to save anything that is not of the following:
 ---			- lua functions with upvalues
 ---			- C functions (although they should get readded by SHoK)
----			- userdata (except if it follows a specific protocol)
+---			- userdata (except if it follows a specific protocol, see CppLogic::Serializer::AdvLuaStateSerializer)
 ---			- threads (coroutines)
 ---		- note that the following does now work:
 ---			- function & string size no longer limited

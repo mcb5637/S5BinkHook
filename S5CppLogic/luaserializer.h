@@ -72,7 +72,7 @@ namespace CppLogic::Serializer {
 		void SerializeReference(int ref);
 		int DeserializeReference();
 		void DeserializeReferencedValue();
-		void SerializeTable(int idx);
+		void SerializeTable(int idx, bool isglobal = false);
 		void DeserializeTable(bool create);
 		void SerializeFunction(int idx);
 		void DeserializeFunction();
@@ -92,5 +92,6 @@ namespace CppLogic::Serializer {
 
 		static constexpr const char* UserdataSerializerMetaEvent = "__serialize";
 		static std::map<std::string, lua::CFunction> UserdataDeserializer;
+		static constexpr int FileVersion = 1;
 	};
 }

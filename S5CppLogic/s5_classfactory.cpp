@@ -39,6 +39,12 @@ void BB::CXmlSerializer::Serialize(const char* filename, BB::IObject* ob)
     }
 }
 
+inline BB::CBinarySerializer* (__stdcall* const binaryseri_create)(int z, int uk) = reinterpret_cast<BB::CBinarySerializer * (__stdcall*)(int, int)>(0x54C272);
+BB::CBinarySerializer* BB::CBinarySerializer::Create(int uk)
+{
+    return binaryseri_create(0, uk);
+}
+
 void PushUnknownValue(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     char buff[201]{};
     fs->SerializeToString(buff, 200, data);

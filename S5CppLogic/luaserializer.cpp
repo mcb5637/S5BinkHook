@@ -408,7 +408,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeReferencedValue()
 		throw std::format_error{ "error reading reference, invalid" };
 }
 
-void CppLogic::Serializer::AdvLuaStateSerializer::SerializeTable(int idx)
+void CppLogic::Serializer::AdvLuaStateSerializer::SerializeTable(int idx, bool isglobal)
 {
 	Reference r{ lua::LType::Table, L.ToPointer(idx) };
 	auto refn = RefToNumber.find(r);
@@ -422,7 +422,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeTable(int idx)
 		idx = L.ToAbsoluteIndex(idx);
 		for (auto kv : L.Pairs(idx)) {
 			if (CanSerialize(-1) && CanSerialize(-2)) {
-				if (idx == L.GLOBALSINDEX && L.IsString(-2) && IsGlobalSkipped(L.ToString(-2)))
+				if (isglobal && L.IsString(-2) && IsGlobalSkipped(L.ToString(-2)))
 					continue;
 				SerializeAnything(-2);
 				SerializeAnything(-1);
@@ -663,13 +663,22 @@ std::map<std::string, lua::CFunction> CppLogic::Serializer::AdvLuaStateSerialize
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeState()
 {
-	SerializeTable(L.GLOBALSINDEX);
+	int t = L.GetTop();
+	L.PushGlobalTable();
+	int vers = FileVersion;
+	WritePrimitive(&vers, sizeof(int));
+	SerializeTable(-1, true);
+	L.SetTop(t);
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeState()
 {
+	if (ReadPrimitive() != sizeof(int))
+		throw std::format_error{ "fileversion invalid size" };
+	if (*static_cast<int*>(Data) != FileVersion)
+		throw std::format_error{ "invalid fileversion" };
 	L.NewTable();
 	IndexOfReferenceHolder = L.GetTop();
-	L.PushValue(L.GLOBALSINDEX);
+	L.PushGlobalTable();
 	if (DeserializeType() != lua::LType::Table)
 		throw std::format_error{ "_G is not a table" };
 	DeserializeTable(false);

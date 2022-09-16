@@ -1315,7 +1315,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 		L.Push(callback);
-		L.GetTableRaw(L.GLOBALSINDEX);
+		L.GetGlobal();
 		L.Push(attackerplayer);
 		L.Push(this->PlayerId);
 		L.Push(attacker ? attacker->EntityId : 0);

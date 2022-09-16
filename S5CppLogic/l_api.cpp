@@ -247,7 +247,7 @@ namespace CppLogic::API {
 				L.SetTableRaw(-3);
 			}
 
-			L.SetTableRaw(L.GLOBALSINDEX);
+			L.SetGlobal();
 		}
 
 

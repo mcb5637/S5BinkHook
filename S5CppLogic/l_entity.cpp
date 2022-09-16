@@ -1785,7 +1785,7 @@ namespace CppLogic::Entity {
 		
 			int top = L.GetTop();
 			L.Push("TaskLists");
-			L.GetTableRaw(L.GLOBALSINDEX);
+			L.GetGlobal();
 			L.Push(AnimTaskList);
 			L.Push(tid);
 			L.SetTableRaw(-3);

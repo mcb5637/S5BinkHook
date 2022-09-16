@@ -232,7 +232,7 @@ GGlue::CGlueEntityProps* luaext::EState::CheckEntityType(int idx)
 void luaext::EState::StringToLower()
 {
 	Push("string");
-	GetTableRaw(GLOBALSINDEX);
+	GetGlobal();
 	Push("lower");
 	GetTableRaw(-2);
 	Remove(-2);

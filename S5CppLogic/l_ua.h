@@ -1,7 +1,7 @@
 #pragma once
 
 #include <random>
-#include "Luapp/luapp50.h"
+#include "luaext.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_defines.h"

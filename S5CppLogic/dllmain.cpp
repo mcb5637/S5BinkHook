@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <string_view>
-#include "Luapp/luapp50.h"
+#include "luaext.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_classfactory.h"

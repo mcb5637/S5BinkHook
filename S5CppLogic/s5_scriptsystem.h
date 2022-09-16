@@ -2,7 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_filesystem.h"
-#include "Luapp/luapp50.h"
+#include "luaext.h"
 
 namespace shok {
 	extern lua_State* LuaStateMainmenu;

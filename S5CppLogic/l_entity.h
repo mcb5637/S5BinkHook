@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Luapp/luapp50.h"
+#include "luaext.h"
 
 namespace CppLogic::Entity {
 	void Init(lua::State L);

@@ -11,7 +11,7 @@
 #include "s5_effects.h"
 #include "s5_entityandeffectmanager.h"
 #include "s5_player.h"
-#include "Luapp/luapp50.h"
+#include "luaext.h"
 
 namespace CppLogic::Iterator {
 	template<class T>

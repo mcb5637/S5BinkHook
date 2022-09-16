@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Luapp/luapp50.h"
+#include "luapp/luapp50.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_defines.h"

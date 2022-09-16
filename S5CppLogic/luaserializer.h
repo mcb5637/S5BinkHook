@@ -4,7 +4,7 @@
 #include "s5_baseDefs.h"
 #include "s5_defines.h"
 #include "s5_classfactory.h"
-#include "Luapp/luapp50.h"
+#include "luaext.h"
 
 namespace CppLogic::Serializer {
 	class ObjectToLuaSerializer {

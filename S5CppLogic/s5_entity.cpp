@@ -14,7 +14,7 @@
 #include "s5_widget.h"
 #include "s5_config.h"
 #include "s5_behaviorProps.h"
-#include "Luapp/luapp50.h"
+#include "luaext.h"
 #include "hooks.h"
 
 struct shok_vtable_EGL_CGLEEntity : BB::IObject::_vtableS {

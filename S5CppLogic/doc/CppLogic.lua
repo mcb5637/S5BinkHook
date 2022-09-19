@@ -2500,6 +2500,17 @@ function CppLogic.ModLoader.ReloadExperienceClass(id) end
 --- @return number type_id id of first sound
 function CppLogic.ModLoader.AddSounds(soundname, ...) end
 
+--- loads an AnimSet from a xml file (data/config/animsets/setname.xml).
+--- the AnimSet gets automatically removed when exiting the map.
+--- @param setname string
+--- @return number type_id
+function CppLogic.ModLoader.AddAnimSet(setname) end
+
+--- reloads an AnimSet from a xml file (data/config/animsets/setname.xml).
+--- the AnimSet is reloaded on exiting the map.
+--- @param id number
+function CppLogic.ModLoader.ReloadAnimSet(id) end
+
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.
 function CppLogic_ResetGlobal() end

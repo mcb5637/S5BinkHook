@@ -145,6 +145,8 @@ bool CppLogic::ModLoader::ModLoader::ReloadTerrainTypes = false;
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToRemove{};
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::AnimSetsToRemove{};
+std::vector<int> CppLogic::ModLoader::ModLoader::AnimSetsToReload{};
 
 int CppLogic::ModLoader::ModLoader::PreLoadEntityType(lua::State L)
 {
@@ -691,6 +693,37 @@ int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
 	return 1;
 }
 
+int CppLogic::ModLoader::ModLoader::AddAnimSet(lua::State L)
+{
+	const char* name = L.CheckString(1);
+	auto* idm = *BB::CIDManagerEx::AnimSetManager;
+	if (idm->GetIdByName(name))
+		throw lua::LuaException{ "animset already exists" };
+	auto* mng = *EGL::AnimSetManager::GlobalObj;
+	int id = idm->GetIDByNameOrCreate(name);
+	mng->LoadAnimSet(id);
+	AnimSetsToRemove.push_back(id);
+	L.Push("AnimSets");
+	L.GetGlobal();
+	L.PushValue(1);
+	L.Push(id);
+	L.SetTableRaw(-3);
+	L.Push(id);
+	return 1;
+}
+int CppLogic::ModLoader::ModLoader::ReloadAnimSet(lua::State L)
+{
+	int id = L.CheckInt(1);
+	auto* mng = *EGL::AnimSetManager::GlobalObj;
+	auto* idm = *BB::CIDManagerEx::AnimSetManager;
+	if (idm->GetNameByID(id) == nullptr)
+		throw lua::LuaException{ "anim set does not exists" };
+	mng->FreeAnimSet(id);
+	mng->LoadAnimSet(id);
+	AnimSetsToReload.push_back(id);
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -929,6 +962,19 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			SoundGroupsToRemove.pop_back();
 			(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(id);
 		}
+
+		while (AnimSetsToRemove.size() != 0) {
+			int id = AnimSetsToRemove.back();
+			AnimSetsToRemove.pop_back();
+			(*EGL::AnimSetManager::GlobalObj)->PopAnimSet(id);
+			(*BB::CIDManagerEx::AnimSetManager)->RemoveID(id);
+		}
+		for (int id : AnimSetsToReload) {
+			auto* mng = *EGL::AnimSetManager::GlobalObj;
+			mng->FreeAnimSet(id);
+			mng->LoadAnimSet(id);
+		}
+		AnimSetsToReload.clear();
 
 		Log(L, "Done");
 	}

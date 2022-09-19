@@ -528,6 +528,8 @@ namespace GGL {
 		// defined tasks: TASK_SET_ANIM (x2), TASK_WAIT_FOR_ANIM, TASK_RANDOM_WAIT_FOR_ANIM
 		// defined events: Animation_XXX
 
+		EGL::CGLEAnimSet* GetAnimSet();
+
 		static inline constexpr int vtp = 0x776B64;
 		static inline constexpr int TypeDesc = 0x820BE8;
 		static inline constexpr unsigned int Identifier = 0x0A4947238;

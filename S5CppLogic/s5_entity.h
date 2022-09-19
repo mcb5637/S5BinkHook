@@ -74,7 +74,7 @@ namespace EGL {
 		playermodeldata GetPlayerModelData() const;
 		posdata GetPosData() const;
 
-		int EntityId;
+		int EntityId; // 2 in entity
 		PADDINGI(1); // some type of flags
 		int EntityType;
 		int ModelOverride;

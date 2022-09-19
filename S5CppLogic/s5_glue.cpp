@@ -8,6 +8,7 @@
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
 #include "s5_mapdisplay.h"
+#include "s5_animset.h"
 
 void GGlue::CGlueAnimsPropsMgr::CreateAnimProps(int id)
 {
@@ -244,4 +245,47 @@ void GGlue::CGlueWaterPropsMgr::LoadWaterTypeFromExtraFile(int id)
 
 	lv.Vector.at(id) = d.Logic;
 	dv.Vector.at(id) = d.Display;
+}
+
+inline EGL::CGLEAnimSet* (__thiscall* const animsetmng_get)(EGL::AnimSetManager* th, int id) = reinterpret_cast<EGL::CGLEAnimSet * (__thiscall*)(EGL::AnimSetManager*, int)>(0x588487);
+EGL::CGLEAnimSet* EGL::AnimSetManager::GetAnimSet(int id)
+{
+	return animsetmng_get(this, id);
+}
+
+void EGL::AnimSetManager::FreeAnimSet(int id)
+{
+	--id;
+	delete AnimSets[id];
+	AnimSets[id] = nullptr;
+}
+void EGL::AnimSetManager::LoadAnimSet(int id)
+{
+	int off = id - 1;
+	if (off > static_cast<int>(AnimSets.size()))
+		throw std::logic_error{ "somehow the id is too big" };
+
+	CGLEAnimSet* set = new CGLEAnimSet();
+	set->Id = id;
+	std::string file{ "Data\\Config\\AnimSets\\" };
+	file.append((*BB::CIDManagerEx::AnimSetManager)->GetNameByID(id));
+	file.append(".xml");
+	(*BB::CClassFactory::GlobalObj)->LoadObject(set, file.c_str());
+
+	if (off == static_cast<int>(AnimSets.size())) {
+		auto v = AnimSets.SaveVector();
+		v.Vector.push_back(set);
+	}
+	else {
+		AnimSets[off] = set;
+	}
+}
+void EGL::AnimSetManager::PopAnimSet(int id)
+{
+	--id;
+	if (id + 1 != static_cast<int>(AnimSets.size()))
+		throw std::out_of_range("invalid id");
+	FreeAnimSet(id);
+	auto v = AnimSets.SaveVector();
+	v.Vector.pop_back();
 }

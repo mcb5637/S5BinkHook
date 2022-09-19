@@ -53,6 +53,7 @@ namespace EGL {
 	class CGLEEffectCreator;
 	class EffectsDisplayProps;
 	class CGLEAnimProps;
+	class CGLEAnimSet;
 }
 namespace GGL {
 	class CBuilding;

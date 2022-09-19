@@ -17,3 +17,9 @@ bool GGL::CRangedEffectAbilityProps::IsHeal() const
 {
 	return (AffectsFriends || AffectsOwn) && HealthRecoveryFactor > 0;
 }
+
+inline int(__thiscall* const animexprops_getanimset)(GGL::CGLAnimationBehaviorExProps* th, int o) = reinterpret_cast<int(__thiscall*)(GGL::CGLAnimationBehaviorExProps*, int)>(0x4F5A4B);
+int GGL::CGLAnimationBehaviorExProps::GetAnimSet(int modelOverride)
+{
+	return animexprops_getanimset(this, modelOverride);
+}

@@ -214,6 +214,12 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 	}
 }
 
+inline EGL::CGLEAnimSet* (__thiscall* const behanimex_getanimset)(GGL::CGLBehaviorAnimationEx* th) = reinterpret_cast<EGL::CGLEAnimSet * (__thiscall*)(GGL::CGLBehaviorAnimationEx*)>(0x4F5D54);
+EGL::CGLEAnimSet* GGL::CGLBehaviorAnimationEx::GetAnimSet()
+{
+	return behanimex_getanimset(this);
+}
+
 static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(GGL::CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(GGL::CAutoCannonBehavior*)>(0x50F508);
 float GGL::CAutoCannonBehavior::GetMaxRange()
 {

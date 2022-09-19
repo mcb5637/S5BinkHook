@@ -72,6 +72,10 @@ Animation:
 path: data/graphics/animations/aname.anm
 example: as originals (note: currently no effective tool known to edit animations)
 
+AnimSet:
+path: data/config/animsets/setname.xml (list of ids in data/config/animsets.xml, dynamically changed)
+example: as originals
+
 Upgrade Categories:
 path: none (usually data/config/logic.xml, dynamically changed)
 usage: add the Upgrade field to all EntityTypes that are supposed to be in the upgradecategory (you need at least Type for everything but the last).

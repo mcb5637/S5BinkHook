@@ -280,3 +280,20 @@ namespace GGlue {
 	};
 }
 
+namespace EGL {
+	class AnimSetManager {
+	public:
+		shok::Vector<CGLEAnimSet*> AnimSets;
+
+		CGLEAnimSet* GetAnimSet(int id);
+
+		// remember to also free in idmanager, free last id first
+		void FreeAnimSet(int id);
+		void LoadAnimSet(int id);
+		// remember to also free in idmanager, free last id first
+		void PopAnimSet(int id);
+
+
+		static inline AnimSetManager** const GlobalObj = reinterpret_cast<AnimSetManager**>(0x895DE0);
+	};
+}

@@ -40,6 +40,10 @@ ModLoader = {
 		Animations = {
 
 		},
+		--- AnimSets to load or reload. put in a string to load, and a number to reload (AnimSets.Typename).
+		AnimSets = {
+
+		},
 		--- Selection Textures to add.
 		SelectionTextures_Add = {
 
@@ -163,6 +167,13 @@ function ModLoader.ApplyManifest()
 			CppLogic.ModLoader.AddAnimation(n)
 		elseif type(n)=="number" then
 			CppLogic.ModLoader.ReloadAnimation(n)
+		end
+	end
+	for _,n in ipairs(ModLoader.Manifest.AnimSets) do
+		if type(n)=="string" then
+			CppLogic.ModLoader.AddAnimSet(n)
+		elseif type(n)=="number" then
+			CppLogic.ModLoader.ReloadAnimSet(n)
 		end
 	end
 	for _,n in ipairs(ModLoader.Manifest.Models) do

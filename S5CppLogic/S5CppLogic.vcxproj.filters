@@ -252,6 +252,9 @@
     <ClInclude Include="s5_RWE_2d.h">
       <Filter>shok\engine</Filter>
     </ClInclude>
+    <ClInclude Include="s5_animset.h">
+      <Filter>shok\entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -403,6 +406,9 @@
     </ClCompile>
     <ClCompile Include="s5_RWE_2d.cpp">
       <Filter>shok\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_animset.cpp">
+      <Filter>shok\entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

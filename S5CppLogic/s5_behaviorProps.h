@@ -245,6 +245,9 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776C48;
 		static inline constexpr int TypeDesc = 0x820B90;
+
+		// looks up ExtraSet, if not found, returns AnimSet
+		int GetAnimSet(int modelOverride);
 	};
 
 	class CWorkerBehaviorProps : public EGL::CGLEBehaviorProps {

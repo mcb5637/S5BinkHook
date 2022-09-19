@@ -38,6 +38,8 @@ namespace CppLogic::ModLoader {
 		static std::vector<shok::ExperienceClass> ExperienceClassesToRemove;
 		static std::vector<shok::ExperienceClass> ExperienceClassesToReload;
 		static std::vector<int> SoundGroupsToRemove;
+		static std::vector<int> AnimSetsToRemove;
+		static std::vector<int> AnimSetsToReload;
 
 		static int PreLoadEntityType(lua::State L);
 		static int AddEntityType(lua::State L);
@@ -71,8 +73,10 @@ namespace CppLogic::ModLoader {
 		static int AddExperienceClass(lua::State L);
 		static int ReloadExperienceClass(lua::State L);
 		static int AddSounds(lua::State L);
+		static int AddAnimSet(lua::State L);
+		static int ReloadAnimSet(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 32> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 34> LuaFuncs{ {
 				lua::FuncReference::GetRef<PreLoadEntityType>("PreLoadEntityType"),
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
@@ -105,6 +109,8 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<AddExperienceClass>("AddExperienceClass"),
 				lua::FuncReference::GetRef<ReloadExperienceClass>("ReloadExperienceClass"),
 				lua::FuncReference::GetRef<AddSounds>("AddSounds"),
+				lua::FuncReference::GetRef<AddAnimSet>("AddAnimSet"),
+				lua::FuncReference::GetRef<ReloadAnimSet>("ReloadAnimSet"),
 		} };
 
 		static constexpr std::array<lua::FuncReference, 3> NoLoaderFuncs{ {

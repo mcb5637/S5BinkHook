@@ -116,8 +116,8 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
-	
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
+	L.GetMetatable(1);
 	return 1;
 }
 

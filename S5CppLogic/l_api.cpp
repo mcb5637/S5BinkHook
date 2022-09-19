@@ -269,7 +269,86 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 17> API{ {
+	int RNG::Int(lua::State L)
+	{
+		RNG* th = L.GetUserData<RNG>(1);
+		int min = L.CheckInt(2);
+		int max;
+		if (L.IsNoneOrNil(3)) {
+			max = min;
+			min = 1;
+		}
+		else
+			max = L.CheckInt(3);
+		std::uniform_int_distribution d{ min, max };
+		L.Push(d(th->Core));
+		return 1;
+	}
+
+	int RNG::Number(lua::State L)
+	{
+		RNG* th = L.GetUserData<RNG>(1);
+		double min;
+		double max;
+		if (L.IsNoneOrNil(1)) {
+			min = 0;
+			max = 1;
+		}
+		else if (L.IsNoneOrNil(3)) {
+			min = 1;
+			max = L.CheckNumber(2);
+		}
+		else {
+			min = L.CheckNumber(2);
+			max = L.CheckNumber(3);
+		}
+		std::uniform_real_distribution d{ min, max };
+		L.Push(d(th->Core));
+		return 1;
+	}
+
+	int RNG::Serialize(lua::State L)
+	{
+		RNG* th = L.GetUserData<RNG>(1);
+		L.Push(typename_details::type_name<RNG>());
+		static_assert(sizeof(RNG) == 1 * 4);
+		L.PushFString("%d", *reinterpret_cast<int*>(th));
+		return 2;
+	}
+
+	RNG::RNG()
+		: Core(static_cast<unsigned int>(std::time(nullptr)))
+	{
+	}
+
+	RNG::RNG(unsigned int seed)
+		: Core(seed)
+	{
+	}
+
+	int RNG::Deserialize(lua::State L)
+	{
+		const char* s = L.CheckString(1);
+		auto* ud = L.NewUserData<RNG>();
+		*reinterpret_cast<int*>(ud) = std::atol(s);
+		return 1;
+	}
+
+	void RNG::Register(lua::State L)
+	{
+		L.PrepareUserDataType<RNG>();
+		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[typename_details::type_name<RNG>()] = &lua::CppToCFunction<RNG::Deserialize>;
+	}
+
+	int CreateRNG(lua::State L) {
+		if (L.IsNoneOrNil(1))
+			L.NewUserData<RNG>();
+		else
+			L.NewUserData<RNG>(L.CheckInt(1));
+		return 1;
+	}
+
+	constexpr std::array<lua::FuncReference, 18> API{ {
 			lua::FuncReference::GetRef<Eval>("Eval"),
 			lua::FuncReference::GetRef<Log>("Log"),
 			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
@@ -287,12 +366,14 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<GetCurrentThreadID>("GetCurrentThreadID"),
 			lua::FuncReference::GetRef<LGetCurrentTime>("GetCurrentTime"),
 			lua::FuncReference::GetRef<RemoveGDBKey>("RemoveGDBKey"),
+			lua::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
 	} };
 
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(API, -3);
 		MainThreadID = GetCurrentThreadId();
+		RNG::Register(L);
 	}
 }
 

@@ -595,6 +595,26 @@ function CppLogic.API.GetCurrentThreadID() end
 --- @return number time
 function CppLogic.API.GetCurrentTime() end
 
+---@class RNG
+local RNG = {}
+
+--- returns a random integer in [min,max] (or [1,min], if max is not set)
+--- @param min number
+--- @param max number|nil
+function RNG:Int(min, max) end
+
+--- returns a random number (double) between [min,max) (or [1,min), if max is not set, or [0,1) if both not set)
+--- @param min number|nil
+--- @param max number|nil
+function RNG:Number(min, max) end
+
+--- creates a RNG object.
+--- each RNG object has its own seed (not shared with other RNG objects or Logic/math)
+--- serializable
+--- @param seed number|nil seed for the RNG, gets derived from current time if nil
+--- @return RNG rng
+function CppLogic.API.CreateRandomNumberGenerator(seed) end
+
 --- deals damage to a target.
 --- calls respective hurt entity trigger.
 --- @param target number entity to be damaged

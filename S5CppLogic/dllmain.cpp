@@ -78,46 +78,19 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
-class TestUD {
-	int i = 0;
-
-	static int SetI(lua::State L) {
-		TestUD* t = L.GetUserData<TestUD>(1);
-		t->i = L.CheckInt(2);
-		return 0;
-	}
-	static int GetI(lua::State L) {
-		TestUD* t = L.GetUserData<TestUD>(1);
-		L.Push(t->i);
-		return 1;
-	}
-
-public:
-	static int Serialize(lua::State L) {
-		TestUD* t = L.GetUserData<TestUD>(1);
-		L.Push(typename_details::type_name<TestUD>());
-		L.Push(t->i);
-		return 2;
-	}
-	static int Deserialize(lua::State L) {
-		L.NewUserData<TestUD>()->i = L.CheckInt(1);
-		return 1;
-	}
-
-	static constexpr std::array<lua::FuncReference, 2> LuaMethods{ {
-			lua::FuncReference::GetRef<SetI>("SetI"),
-			lua::FuncReference::GetRef<GetI>("GetI"),
-		} };
-
-
-};
-
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
-	L.GetMetatable(1);
+	L.NewTable();
+	int i = 1;
+	auto* v = EScr::LuaStateSerializer::DoNotSerializeGlobals();
+	for (const auto& s : *v) {
+		L.Push(s.c_str());
+		L.SetTableRaw(-2, i);
+		++i;
+	}
 	return 1;
 }
 
@@ -182,11 +155,15 @@ void Install(lua::State L) {
 		InitGame();
 	}
 
+	static constexpr const char* CppLogic = "CppLogic";
+
+	EScr::LuaStateSerializer::AddGlobalToNotSerialize(CppLogic);
+
 #ifdef _DEBUG
 	L.RegisterFunc<Test>("test");
 #endif
 
-	L.Push("CppLogic");
+	L.Push(CppLogic);
 	L.NewTable();
 
 	L.RegisterFunc<GetOptions>("GetOptions", -3);
@@ -255,13 +232,6 @@ void Install(lua::State L) {
 	L.RegisterFunc<ResetCppLogic>("CppLogic_ResetGlobal");
 
 	//luaopen_debug(L);
-
-	L.GetUserDataMetatable<TestUD>();
-	L.RegisterFunc<TestUD::Serialize>("__serialize", -3);
-	L.Pop(1);
-	std::string k{ typename_details::type_name<TestUD>() };
-	CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[k] = &lua::CppToCFunction<TestUD::Deserialize>;
-
 
 	shok::LogString("loaded CppLogic %f %s into %X with SCELoader status %i\n", Version,
 #ifdef _DEBUG

@@ -146,6 +146,7 @@ namespace EScr {
 		LuaStateSerializer();
 
 		static inline shok::Vector<shok::String>* (__cdecl* const DoNotSerializeGlobals)() = reinterpret_cast<shok::Vector<shok::String>*(__cdecl*)()>(0x5A1DC5);
+		static inline void(__cdecl* const AddGlobalToNotSerialize)(const char* n) = reinterpret_cast<void(__cdecl*)(const char*)>(0x5A1E0C);
 
 		static void HookSerializationOverride();
 	};

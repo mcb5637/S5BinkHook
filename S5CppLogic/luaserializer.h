@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <format>
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_defines.h"
@@ -28,6 +29,10 @@ namespace CppLogic::Serializer {
 		static void DumpClassSerializationData(lua::State L, const BB::SerializationData* seri);
 		static void DumpClassSerializationData(lua::State L, unsigned int id);
 	};
+	template<class T>
+	concept LuaHasUpvalue = requires (T l) {
+		{l.Debug_UpvalueID(1, 1) } -> std::same_as<const void*>;
+	};
 
 	/// <summary>
 	/// better serialization of lua states.
@@ -45,6 +50,10 @@ namespace CppLogic::Serializer {
 
 			auto operator<=>(const Reference&) const = default;
 		};
+		struct UpvalueReference {
+			int FuncReference;
+			int UpvalueNum;
+		};
 
 
 		BB::CFileStreamEx& IO;
@@ -52,14 +61,27 @@ namespace CppLogic::Serializer {
 		void* Data = nullptr;
 		size_t DataLength = 0;
 		std::map<Reference, int> RefToNumber;
+		std::map<const void*, UpvalueReference> UpRefs;
 		int NextRefereceNumber = 1;
 		int IndexOfReferenceHolder = 0;
 
 		// a reference to something already serialized/deserialized
 		static constexpr lua::LType ReferenceType = static_cast<lua::LType>(-2);
+		// a reference to a already serilaized/deserialized upvalue
+		static constexpr lua::LType UpvalueReferenceType = static_cast<lua::LType>(-3);
 
 		void WritePrimitive(const void* d, size_t len);
 		size_t ReadPrimitive();
+		template<class T>
+		void WritePrimitive(const T d) {
+			WritePrimitive(&d, sizeof(T));
+		}
+		template<class T>
+		T ReadPrimitive(const char* ex) {
+			if (ReadPrimitive() != sizeof(T))
+				throw std::format_error{ ex };
+			return *static_cast<T*>(Data);
+		}
 
 		void SerializeType(lua::LType t);
 		lua::LType DeserializeType();
@@ -80,8 +102,30 @@ namespace CppLogic::Serializer {
 		void DeserializeUserdata();
 		void SerializeAnything(int idx);
 		void DeserializeAnything();
+		void DeserializeAnything(lua::LType t);
 		bool CanSerialize(int idx);
 		bool IsGlobalSkipped(const char* n);
+
+		template<class State>
+		requires LuaHasUpvalue<State>
+		const void* UpID(State s, int idx, int n) {
+			return s.Debug_UpvalueID(idx, n);
+		}
+		template<class State>
+		requires (!LuaHasUpvalue<State>)
+		const void* UpID(State s, int idx, int n) {
+			throw 0;
+		}
+		template<class State>
+		requires LuaHasUpvalue<State>
+		const void* UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
+			return s.Debug_UpvalueJoin(funcMod, upMod, funcTar, upTar);
+		}
+		template<class State>
+		requires (!LuaHasUpvalue<State>)
+		const void* UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
+			throw 0;
+		}
 
 	public:
 		AdvLuaStateSerializer(BB::CFileStreamEx& io, lua_State* l);

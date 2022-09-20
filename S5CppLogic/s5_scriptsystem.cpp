@@ -225,12 +225,26 @@ void __declspec(naked) lusstateseri_hookdeseriasm() {
 	};
 }
 
+void __cdecl luastateser_overrideaddglobalnosave(const char* n)
+{
+	shok::String s{ n };
+	auto* v = EScr::LuaStateSerializer::DoNotSerializeGlobals();
+	for (const auto& i : *v) {
+		if (s == i)
+			return;
+	}
+	auto sv = v->SaveVector();
+	sv.Vector.push_back(s);
+}
+
 void EScr::LuaStateSerializer::HookSerializationOverride()
 {
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
 		reinterpret_cast<void*>(0x5750ED),
 		reinterpret_cast<void*>(0x575311),
+		AddGlobalToNotSerialize,
 		} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5750ED), &luastateseri_hookserializeasm, reinterpret_cast<void*>(0x5750F3));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575311), &lusstateseri_hookdeseriasm, reinterpret_cast<void*>(0x57531A));
+	CppLogic::Hooks::WriteJump(AddGlobalToNotSerialize, &luastateser_overrideaddglobalnosave, reinterpret_cast<void*>(0x5A1E16));
 }

@@ -339,14 +339,12 @@ size_t CppLogic::Serializer::AdvLuaStateSerializer::ReadPrimitive()
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeType(lua::LType t)
 {
-	WritePrimitive(&t, sizeof(lua::LType));
+	WritePrimitive(t);
 }
 lua::LType CppLogic::Serializer::AdvLuaStateSerializer::DeserializeType()
 {
-	if (ReadPrimitive() != sizeof(lua::LType))
-		throw std::format_error{ "error reading lua type, size mismatch" };
-	lua::LType r = *static_cast<lua::LType*>(Data);
-	if ((static_cast<int>(r) < static_cast<int>(lua::LType::Nil) || static_cast<int>(r) > static_cast<int>(lua::LType::Thread)) && r != ReferenceType)
+	lua::LType r = ReadPrimitive<lua::LType>("error reading lua type, size mismatch");
+	if ((static_cast<int>(r) < static_cast<int>(lua::LType::Nil) || static_cast<int>(r) > static_cast<int>(lua::LType::Thread)) && r != ReferenceType && r != UpvalueReferenceType)
 		throw std::format_error{ "error reading lua type, not a valid type" };
 	return r;
 }
@@ -354,27 +352,23 @@ lua::LType CppLogic::Serializer::AdvLuaStateSerializer::DeserializeType()
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeBool(int idx)
 {
 	SerializeType(lua::LType::Boolean);
-	int b = L.ToBoolean(idx);
-	WritePrimitive(&b, sizeof(int));
+	bool b = L.ToBoolean(idx);
+	WritePrimitive(b);
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeBool()
 {
-	if (ReadPrimitive() != sizeof(int))
-		throw std::format_error{ "error reading bool, size mismatch" };
-	L.Push(static_cast<bool>(*static_cast<int*>(Data)));
+	L.Push(ReadPrimitive<bool>("error reading bool, size mismatch"));
 }
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeNumber(int idx)
 {
 	SerializeType(lua::LType::Number);
 	double n = L.ToNumber(idx);
-	WritePrimitive(&n, sizeof(double));
+	WritePrimitive(n);
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeNumber()
 {
-	if (ReadPrimitive() != sizeof(double))
-		throw std::format_error{ "error reading number, size mismatch" };
-	L.Push(*static_cast<double*>(Data));
+	L.Push(ReadPrimitive<double>("error reading number, size mismatch"));
 }
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeString(int idx)
@@ -392,13 +386,11 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeString()
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeReference(int ref)
 {
-	WritePrimitive(&ref, sizeof(int));
+	WritePrimitive(ref);
 }
 int CppLogic::Serializer::AdvLuaStateSerializer::DeserializeReference()
 {
-	if (ReadPrimitive() != sizeof(int))
-		throw std::format_error{ "error reading reference, size mismatch" };
-	return *static_cast<int*>(Data);
+	return ReadPrimitive<int>("error reading reference, size mismatch");
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeReferencedValue()
 {
@@ -471,8 +463,10 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 {
 	L.PushValue(idx);
 	lua::DebugInfo i = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Upvalues);
-	if (i.NumUpvalues > 0)
-		throw std::format_error{ "cannot serialize a lua function with upvalues" };
+	if constexpr (!LuaHasUpvalue<lua::State>) {
+		if (i.NumUpvalues > 0)
+			throw std::format_error{ "cannot serialize a lua function with upvalues" };
+	}
 
 	Reference r{ lua::LType::Function, L.ToPointer(idx) };
 	auto refn = RefToNumber.find(r);
@@ -487,6 +481,24 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 			th->WritePrimitive(d, len);
 			return 0;
 			}, this);
+		WritePrimitive(i.NumUpvalues);
+		if constexpr (LuaHasUpvalue<lua::State>) {
+			for (int n = 1; n <= i.NumUpvalues; ++n) {
+				const void* id = UpID(L, idx, n);
+				auto uref = UpRefs.find(id);
+				if (uref == UpRefs.end()) {
+					UpRefs.insert(std::make_pair(id, UpvalueReference{ refnum, n }));
+					L.Debug_GetUpvalue(idx, n);
+					SerializeAnything(-1);
+					L.Pop(1);
+				}
+				else {
+					SerializeType(UpvalueReferenceType);
+					WritePrimitive(uref->second.FuncReference);
+					WritePrimitive(uref->second.UpvalueNum);
+				}
+			}
+		}
 	}
 	else {
 		SerializeType(ReferenceType);
@@ -503,6 +515,29 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 		}, this, nullptr);
 	L.PushValue(-1);
 	L.SetTableRaw(IndexOfReferenceHolder, ref);
+	int nups = ReadPrimitive<int>("deserialze func invalid upvalue number");
+	if constexpr (LuaHasUpvalue<lua::State>) {
+		for (int n = 1; n <= nups; ++n) {
+			lua::LType t = DeserializeType();
+			if (t == UpvalueReferenceType) {
+				int funcref = ReadPrimitive<int>("deserialze func invalid upvalue reference func");
+				int upnum = ReadPrimitive<int>("deserialze func invalid upvalue reference up");
+				L.GetTableRaw(IndexOfReferenceHolder, funcref);
+				if (L.IsNil(-1))
+					throw std::format_error{ "error reading upvalue reference, invalid" };
+				UpJoin(L, -2, n, -1, upnum);
+				L.Pop(1);
+			}
+			else {
+				DeserializeAnything(t);
+				L.Debug_SetUpvalue(-2, n);
+			}
+		}
+	}
+	else {
+		if (nups > 0)
+			throw std::format_error{ "attempting to deserialize func with upvalues when upvalue serilaization is not available" };
+	}
 }
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeUserdata(int idx)
@@ -582,7 +617,11 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeAnything(int idx)
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeAnything()
 {
-	switch (DeserializeType()) {
+	DeserializeAnything(DeserializeType());
+}
+void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeAnything(lua::LType t)
+{
+	switch (t) {
 	case lua::LType::Nil:
 		L.Push();
 		break;
@@ -624,11 +663,13 @@ bool CppLogic::Serializer::AdvLuaStateSerializer::CanSerialize(int idx)
 	{
 		if (L.IsCFunction(idx))
 			return false;
-		L.PushValue(idx);
-		lua::DebugInfo i = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Upvalues);
-		if (i.NumUpvalues > 0) {
-			shok::LogString("AdvLuaStateSerializer: cannot serialize function with upvalues");
-			return false;
+		if constexpr (!LuaHasUpvalue<lua::State>) {
+			L.PushValue(idx);
+			lua::DebugInfo i = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Upvalues);
+			if (i.NumUpvalues > 0) {
+				shok::LogString("AdvLuaStateSerializer: cannot serialize function with upvalues");
+				return false;
+			}
 		}
 		return true;
 	}

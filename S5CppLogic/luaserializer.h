@@ -118,12 +118,12 @@ namespace CppLogic::Serializer {
 		}
 		template<class State>
 		requires LuaHasUpvalue<State>
-		const void* UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
-			return s.Debug_UpvalueJoin(funcMod, upMod, funcTar, upTar);
+		void UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
+			s.Debug_UpvalueJoin(funcMod, upMod, funcTar, upTar);
 		}
 		template<class State>
 		requires (!LuaHasUpvalue<State>)
-		const void* UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
+		void UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
 			throw 0;
 		}
 

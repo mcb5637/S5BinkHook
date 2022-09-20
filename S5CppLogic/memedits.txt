@@ -31,6 +31,9 @@ AIL_closestream 0x7614A4 dllimport redirect
 0x40B3BE framework todo check jmp override
 changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C6E5C, 0x4C6B15, 0x4C6BA1 and 0x4C6F09 (all GGL::CEntityProfile check experience level)
 0x4C6F28 GGL::CEntityProfile get miss chance noped out check for negative modifier
+0x5750ED gamelogic serialization call to lua serializer jmp
+0x575311 gamelogic deserialization call to lua serializer jmp
+0x5A1E0C luaserializer setnotserializeglobal jmp func replace
 
 only without SCELoader
 

@@ -303,10 +303,7 @@ namespace EGL {
 		static void (*CamoActivateCb)(GGL::CCamouflageBehavior* th);
 		static void HookCamoActivate();
 		static void HookHurtEntity();
-		static int* HurtEntityDamagePointer;
 		static bool HurtEntityCallWithNoAttacker;
-		static shok::AdvancedDealDamageSource HurtEntityDamageSource;
-		static int HurtEntityAttackerPlayer;
 		static void (*HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc);
 		static void HookDestroyEntity();
 		static std::map<int, EGL::CGLEEntity::EntityAddonData> AddonDataMap;

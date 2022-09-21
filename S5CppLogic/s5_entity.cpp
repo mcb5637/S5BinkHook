@@ -950,10 +950,7 @@ void EGL::CGLEEntity::HookCamoActivate()
 
 
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
-int* EGL::CGLEEntity::HurtEntityDamagePointer = nullptr;
 bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
-shok::AdvancedDealDamageSource EGL::CGLEEntity::HurtEntityDamageSource = shok::AdvancedDealDamageSource::Unknown;
-int  EGL::CGLEEntity::HurtEntityAttackerPlayer = 0;
 void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc) = nullptr;
 bool HookHurtEntity_Hooked = false;
 void __cdecl hurtentity_override(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg) {
@@ -1150,12 +1147,9 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		return;
 	int attackerplayer = attacker ? attacker->PlayerId : attackerFallback;
 	if (attacker || EGL::CGLEEntity::HurtEntityCallWithNoAttacker) {
-		EGL::CEvent2Entities ev{ shok::EventIDs::LogicEvent_HurtEntity, attacker ? attacker->EntityId : 0, EntityId };
-		EGL::CGLEEntity::HurtEntityDamagePointer = &damage;
-		EGL::CGLEEntity::HurtEntityDamageSource = sourceInfo;
-		EGL::CGLEEntity::HurtEntityAttackerPlayer = attackerplayer;
+		CppLogic::Events::AdvHurtEvent ev{ shok::EventIDs::LogicEvent_HurtEntity, attacker ? attacker->EntityId : 0, EntityId, damage, sourceInfo, attackerplayer };
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
-		EGL::CGLEEntity::HurtEntityDamagePointer = nullptr;
+		damage = ev.Damage;
 	}
 	if (damage <= 0)
 		return;
@@ -1234,8 +1228,9 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 					xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
 					GGL::CEventEntityIndex kev{ shok::EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
 					firsttodie->FireEvent(&kev);
-					if (EGL::CGLEEntity::HurtEntityOnKillCb)
-						EGL::CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
+					CppLogic::Events::AdvHurtEvent ev{ shok::EventIDs::CppLogicEvent_OnEntityKilled, attacker ? attacker->EntityId : 0, firsttodie->EntityId, damage, sourceInfo, attackerplayer };
+					(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+
 					firsttodie->Hurt(firsttodie->Health);
 
 					int id = attackedleader->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
@@ -1262,8 +1257,8 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 			xptoadd += firsttodie->GetEntityType()->LogicProps->ExperiencePoints;
 			GGL::CEventEntityIndex kev{ shok::EventIDs::CppL_OnEntityKilled, attacker ? attacker->EntityId : 0, attackerplayer };
 			firsttodie->FireEvent(&kev);
-			if (EGL::CGLEEntity::HurtEntityOnKillCb)
-				EGL::CGLEEntity::HurtEntityOnKillCb(attacker, firsttodie, attackerplayer, sourceInfo);
+			CppLogic::Events::AdvHurtEvent ev{ shok::EventIDs::CppLogicEvent_OnEntityKilled, attacker ? attacker->EntityId : 0, firsttodie->EntityId, damage, sourceInfo, attackerplayer };
+			(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 			firsttodie->Hurt(firsttodie->Health);
 		}
 		else {

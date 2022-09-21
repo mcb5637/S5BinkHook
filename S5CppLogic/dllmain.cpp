@@ -26,6 +26,7 @@
 #include "s5_effects.h"
 #include "s5_staticlist.h"
 #include "s5_entitydisplay.h"
+#include "s5_events.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -83,15 +84,9 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
-	L.NewTable();
-	int i = 1;
-	auto* v = EScr::LuaStateSerializer::DoNotSerializeGlobals();
-	for (const auto& s : *v) {
-		L.Push(s.c_str());
-		L.SetTableRaw(-2, i);
-		++i;
-	}
-	return 1;
+	BB::CEvent ev{ shok::EventIDs::Die };
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+	return 0;
 }
 
 int GetOptions(lua::State L) {
@@ -121,9 +116,15 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 	}
 }
 
+void OnSaveLoaded() {
+	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+	CppLogic::Logic::OnSaveLoaded(L);
+}
+
 void InitGame() {
 	Framework::CMain::HookModeChange();
 	Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
+	Framework::CMain::OnSaveLoaded = &OnSaveLoaded;
 	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Initialize();
 	if (!Options.DisableAdvStringPrinting)

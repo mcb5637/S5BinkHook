@@ -709,19 +709,32 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeState()
 	int vers = FileVersion;
 	WritePrimitive(&vers, sizeof(int));
 	SerializeTable(-1, true);
+
+	PushSerializedRegistry(L);
+	SerializeTable(-1, false);
+
 	L.SetTop(t);
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeState()
 {
-	if (ReadPrimitive() != sizeof(int))
-		throw std::format_error{ "fileversion invalid size" };
-	if (*static_cast<int*>(Data) != FileVersion)
+	if (ReadPrimitive<int>("fileversion invalid size") != FileVersion)
 		throw std::format_error{ "invalid fileversion" };
 	L.NewTable();
 	IndexOfReferenceHolder = L.GetTop();
+
 	L.PushGlobalTable();
 	if (DeserializeType() != lua::LType::Table)
 		throw std::format_error{ "_G is not a table" };
 	DeserializeTable(false);
+
+	L.Push(RegistrySerializeKeys);
+	DeserializeAnything();
+	L.SetTableRaw(L.REGISTRYINDEX);
+
 	L.SetTop(IndexOfReferenceHolder - 1);
+}
+
+void CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(lua::State L)
+{
+	L.GetSubTable(RegistrySerializeKeys, L.REGISTRYINDEX);
 }

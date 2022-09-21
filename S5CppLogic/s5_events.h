@@ -239,7 +239,9 @@ namespace EGL {
 	public:
 		virtual int GetActorID() const = 0;
 		virtual int GetTargetID() const = 0;
+
 		static inline constexpr int vtp = 0x76D790;
+		static inline constexpr unsigned int Identifier = 0x84682AC3;
 	};
 	class CEvent2Entities : public BB::CEvent, public IEvent2Entities {
 	public:
@@ -253,10 +255,12 @@ namespace EGL {
 
 		virtual int GetActorID() const override;
 		virtual int GetTargetID() const override;
+		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
 
 		static inline constexpr int vtp = 0x76D92C;
 		static inline constexpr int TypeDesc = 0x80E0BC;
 		static inline constexpr int vtp_IEvent2Entities = 0x76D920;
+		static inline constexpr unsigned int Identifier = 0x472E2780;
 	};
 
 	class CEventThousandthsGetInteger : public BB::CEvent {
@@ -497,6 +501,21 @@ namespace BB {
 //	void* Object;
 //	void(__thiscall* Func)(void* th, BB::CEvent* ev);
 //};
+
+namespace CppLogic::Events {
+	class AdvHurtEvent : public EGL::CEvent2Entities {
+	public:
+		int Damage;
+		shok::AdvancedDealDamageSource Source;
+		int AttackerPlayer;
+
+		AdvHurtEvent(shok::EventIDs e, int aid, int tid, int dmg, shok::AdvancedDealDamageSource sou, int attpl);
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+
+		static inline constexpr unsigned int Identifier = 0x1001;
+	};
+}
 
 namespace shok {
 	enum class EventIDs : int {
@@ -813,7 +832,7 @@ namespace shok {
 		LogicEvent_ResearchDone = 0x1C004,
 		LogicEvent_TradeCompleted = 0x1C005,
 		LogicEvent_WeatherChanged = 0x1C006,
-		LogicEvent_HurtEntity = 0x1C007,
+		LogicEvent_HurtEntity = 0x1C007, // original EGL::CEvent2Entities, now CppLogic::Events::AdvHurtEvent (subclass)
 
 		// 20001 move to entity?
 		Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity
@@ -851,10 +870,14 @@ namespace shok {
 		Sound_Start = 0x22001, // EGL::CEventSoundPositionAndID
 		Sound_Stop = 0x22002, // EGL::CEventSoundPositionAndID
 
+		// entity events
 		CppL_OnEntityDestroy = 0x50000, // BB::CEvent
 		CppL_OnEntityKilled = 0x50001, // GGL::CEventEntityIndex index is attacker player
 		CppL_OnDamageDealt = 0x50002, // GGL::CEventEntityIndex entity is damaged, index is damage
 		CppL_AffectedExperienceGained = 0x50003, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker
+
+		// script events
+		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent
 	};
 
 	enum class InputEventIds : int {

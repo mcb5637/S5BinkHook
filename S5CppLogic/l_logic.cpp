@@ -22,6 +22,7 @@
 #include "s5_tasklist.h"
 #include "s5_RWEngine.h"
 #include "s5_RWE_anim.h"
+#include "s5_events.h"
 #include "luaext.h"
 #include "hooks.h"
 #include "luaserializer.h"
@@ -311,33 +312,10 @@ namespace CppLogic::Logic {
 			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = L.ToBoolean(1);
 		else
 			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = true;
-		if (L.IsFunction(2)) {
-			L.PushLightUserdata(&EnableAllHurtEntityTrigger);
-			L.PushValue(2);
-			L.SetTableRaw(L.REGISTRYINDEX);
-
-			EGL::CGLEEntity::HurtEntityOnKillCb = [](EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc) {
-				lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-
-				int t = L.GetTop();
-
-				L.PushLightUserdata(&EnableAllHurtEntityTrigger);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(att ? att->EntityId : 0);
-				L.Push(kill->EntityId);
-				L.Push(attpl);
-				L.Push(static_cast<int>(sourc));
-				L.PCall(4, 0, 0);
-
-				L.SetTop(t);
-			};
-		}
-		else {
-			EGL::CGLEEntity::HurtEntityOnKillCb = nullptr;
-			L.PushLightUserdata(&EnableAllHurtEntityTrigger);
-			L.Push();
-			L.SetTableRaw(L.REGISTRYINDEX);
-		}
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(HurtEntityCallWithNoAttackerRegKey);
+		L.Push(EGL::CGLEEntity::HurtEntityCallWithNoAttacker);
+		L.SetTableRaw(-3);
 		return 0;
 	}
 
@@ -345,20 +323,22 @@ namespace CppLogic::Logic {
 		luaext::EState L{ ls };
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		if (!EGL::CGLEEntity::HurtEntityDamagePointer)
+		auto* ev = dynamic_cast<CppLogic::Events::AdvHurtEvent*>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (!ev)
 			throw lua::LuaException("not in trigger");
-		L.Push(*EGL::CGLEEntity::HurtEntityDamagePointer);
-		L.Push(static_cast<int>(EGL::CGLEEntity::HurtEntityDamageSource));
-		L.Push(EGL::CGLEEntity::HurtEntityAttackerPlayer);
+		L.Push(ev->Damage);
+		L.Push(static_cast<int>(ev->Source));
+		L.Push(ev->AttackerPlayer);
 		return 3;
 	}
 	int HurtEntitySetDamage(lua::State ls) {
 		luaext::EState L{ ls };
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		if (!EGL::CGLEEntity::HurtEntityDamagePointer)
+		auto* ev = dynamic_cast<CppLogic::Events::AdvHurtEvent*>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (!ev)
 			throw lua::LuaException("not in trigger");
-		*EGL::CGLEEntity::HurtEntityDamagePointer = L.CheckInt(1);
+		ev->Damage = L.CheckInt(1);
 		return 0;
 	}
 
@@ -1218,7 +1198,25 @@ namespace CppLogic::Logic {
 
 		if (L.GetState() != shok::LuaStateMainmenu) {
 			L.PrepareUserDataType<LogicModel>();
+
+			L.GetSubTable("Events");
+			L.Push("CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnEntityKilled));
+			L.SetTableRaw(-3);
+			L.Pop(1);
 		}
+	}
+
+	void OnSaveLoaded(lua::State L)
+	{
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(HurtEntityCallWithNoAttackerRegKey);
+		L.GetTableRaw(-2);
+		if (L.IsBoolean(-1)) {
+			EGL::CGLEEntity::HookHurtEntity();
+			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = L.ToBoolean(-1);
+		}
+		L.Pop(2);
 	}
 }
 

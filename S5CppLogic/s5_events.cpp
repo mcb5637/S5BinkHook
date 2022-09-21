@@ -109,6 +109,12 @@ int EGL::CEvent2Entities::GetTargetID() const
 {
 	return TargetId;
 }
+void* __stdcall EGL::CEvent2Entities::CastToIdentifier(unsigned int id)
+{
+	if (id == IEvent2Entities::Identifier)
+		return static_cast<IEvent2Entities*>(this);
+	return nullptr;
+}
 
 EGL::CEventThousandthsGetInteger::CEventThousandthsGetInteger(shok::EventIDs e, int thousands)
 	: BB::CEvent(e)
@@ -207,4 +213,16 @@ BB::CKeyPressEvent::CKeyPressEvent(shok::InputEventIds id, int keychar, shok::Ke
 	SetVT(BB::CKeyPressEvent::vtp);
 	KeyChar = keychar;
 	KeyModifier = keymodif;
+}
+
+CppLogic::Events::AdvHurtEvent::AdvHurtEvent(shok::EventIDs e, int aid, int tid, int dmg, shok::AdvancedDealDamageSource sou, int attpl)
+	: EGL::CEvent2Entities(e, aid, tid)
+{
+	Damage = dmg;
+	Source = sou;
+	AttackerPlayer = attpl;
+}
+unsigned int __stdcall CppLogic::Events::AdvHurtEvent::GetClassIdentifier() const
+{
+	return Identifier;
 }

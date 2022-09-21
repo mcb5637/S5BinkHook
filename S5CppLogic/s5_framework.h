@@ -295,6 +295,7 @@ namespace Framework {
 
 		static void HookModeChange();
 		static void (*OnModeChange)(NextMode mode);
+		static void (*OnSaveLoaded)();
 	};
 	static_assert(offsetof(Framework::CMain, CurrentMode) == 3 * 4);
 	static_assert(offsetof(Framework::CMain, GDB) == 227 * 4);

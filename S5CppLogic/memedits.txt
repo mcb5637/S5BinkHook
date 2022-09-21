@@ -78,3 +78,7 @@ gamemodebase (sp?) load savegame 0x40FB6E jmp
 0x4C71CA GGL::CEntityProfile init (set experience class) jmp
 0x4C7039 GGL::CSettler dtor->GGL::CEntityProfile dtor noped call to unload experienceclasses
 0x57A683 EGL::CGLEEntity can cancel state jmp
+
+list of used identifiers
+0x1000 CppLogic::UI::GUIState_LuaSelection
+0x1001 CppLogic::Events::AdvHurtEvent

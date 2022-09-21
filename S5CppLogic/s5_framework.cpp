@@ -232,6 +232,7 @@ void Framework::CMain::SaveGDB()
 }
 
 void (*Framework::CMain::OnModeChange)(NextMode mode) = nullptr;
+void (*Framework::CMain::OnSaveLoaded)() = nullptr;
 inline void(__thiscall* const cmain_startmapsp)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40A916);
 inline void(__thiscall* const cmain_gotomainmenu)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA1B);
 inline void(__thiscall* const cmain_loadsave)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA76);
@@ -250,6 +251,8 @@ void __fastcall cmain_checktodo_hooked(Framework::CMain* th) {
         break;
     case Framework::CMain::NextMode::LoadSaveSP:
         cmain_loadsave(th);
+        if (Framework::CMain::OnSaveLoaded)
+            Framework::CMain::OnSaveLoaded();
         break;
     case Framework::CMain::NextMode::StartMapMP:
         cmain_startmapmp(th);

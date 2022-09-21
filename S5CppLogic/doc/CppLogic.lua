@@ -232,13 +232,12 @@ function CppLogic.Logic.LandscapeGetBlocking(p) end
 --- @return number bridgeHeight
 function CppLogic.Logic.LandscapeGetBridgeHeight(p) end
 
---- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0.
+--- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0 and allows access to more info for that event.
 --- also sets the hero as attacker on bomb explode.
---- calls killfunc on killing an entity.
+--- fires trigger CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY on killing an entity.
 --- does not work with SCELoader.
 --- @param b boolean enable (optional, default true)
---- @param killfunc fun(attackerid:number, killid:number, attackerplayer:number, source:number), (optional, default nil)
-function CppLogic.Logic.EnableAllHurtEntityTrigger(b, killfunc) end
+function CppLogic.Logic.EnableAllHurtEntityTrigger(b) end
 
 --- enables entity max hp to be modified by techs.
 --- does not work with SCELoader.

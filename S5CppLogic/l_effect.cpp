@@ -8,10 +8,21 @@
 #include "s5_maplogic.h"
 #include "s5_entityandeffectmanager.h"
 #include "luaext.h"
+#include "luaserializer.h"
 
 namespace CppLogic::Effect {
-	void PushToHitCallbackRegKey(lua::State L) {
-		L.PushLightUserdata(&Init);
+	void PushToHitCallbackReg(lua::State L) {
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(EffectOnHitKey);
+		L.GetTableRaw(-2);
+		if (!L.IsTable(-1)) {
+			L.Pop(1);
+			L.NewTable();
+			L.Push(EffectOnHitKey);
+			L.PushValue(-2);
+			L.SetTableRaw(-4);
+		}
+		L.Remove(-2);
 	}
 
 	void FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
@@ -20,8 +31,7 @@ namespace CppLogic::Effect {
 		int top = L.GetTop();
 		if (!L.CheckStack(5))
 			return;
-		PushToHitCallbackRegKey(L);
-		L.GetTableRaw(L.REGISTRYINDEX);
+		PushToHitCallbackReg(L);
 		L.GetTableRaw(-1, id);
 		if (L.IsFunction(-1)) {
 			L.Push(id);
@@ -60,8 +70,7 @@ namespace CppLogic::Effect {
 		if (L.IsFunction(12)) {
 			EGL::CFlyingEffect::HookOnHit();
 			EGL::CFlyingEffect::FlyingEffectOnHitCallback = &FlyingEffectOnHitCallback;
-			PushToHitCallbackRegKey(L);
-			L.GetTableRaw(L.REGISTRYINDEX);
+			PushToHitCallbackReg(L);
 			L.PushValue(12);
 			L.SetTableRaw(-2, id);
 		}
@@ -77,8 +86,7 @@ namespace CppLogic::Effect {
 	}
 
 	int GetProjectileCallbacks(lua::State L) {
-		PushToHitCallbackRegKey(L);
-		L.GetTableRaw(L.REGISTRYINDEX);
+		PushToHitCallbackReg(L);
 		return 1;
 	}
 
@@ -91,10 +99,6 @@ namespace CppLogic::Effect {
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(Effect, -3);
-
-		PushToHitCallbackRegKey(L);
-		L.NewTable();
-		L.SetTableRaw(L.REGISTRYINDEX);
 	}
 
 	void Cleanup(lua::State L) {
@@ -102,6 +106,6 @@ namespace CppLogic::Effect {
 	}
 }
 
-// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-10000, y, x, y, 500, 1000, 0, 0, 1, 0, LuaDebugger.Log)
+// local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, x-10000, y, x, y, 500, 1000, 0, 0, 1, 0, function(id) LuaDebugger.Log(id) end)
 // local id = e(); local p = GetPosition(id); return CppLogic.Effect.CreateProjectile(GGL_Effects.FXCannonBallShrapnel, p.X-1000, p.Y, p.X, p.Y, 100, 1000, 0, 0, 1, 0)
 // CppLogic.Effect.IsValidEffect(effid)

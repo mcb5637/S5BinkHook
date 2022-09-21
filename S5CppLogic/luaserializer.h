@@ -134,8 +134,12 @@ namespace CppLogic::Serializer {
 		void SerializeState();
 		void DeserializeState();
 
+		// pushes a registry subtable that will get serialized in savegames. (creates one if it does not exist)
+		static void PushSerializedRegistry(lua::State L);
+
 		static constexpr const char* UserdataSerializerMetaEvent = "__serialize";
 		static std::map<std::string, lua::CFunction> UserdataDeserializer;
 		static constexpr int FileVersion = 1;
+		static constexpr const char* RegistrySerializeKeys = "CppLogic::Serializer::AdvLuaStateSerializer_SerlializedRegistry";
 	};
 }

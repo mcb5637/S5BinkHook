@@ -309,7 +309,7 @@ function CppLogic.Logic.SetPlaceBuildingAdditionalCheck(func) end
 function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
 
 --- sets a stringtabletexts accosiated text. automatically resets on leaving the game.
---- (stored in lua registry).
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param key string key to replace
 --- @param text string replacement string or nil to restore default
@@ -358,6 +358,7 @@ function CppLogic.Logic.ClearWeatherQueueAndAddInitial(state, duration, forerun,
 --- return true, to call the function again next tick (not available if you have used moveto or settl).
 --- do not save&use moveto and settl later, will cause crashes!
 --- do not use moveto if you are repeating the call via return true.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param func fun(entityid:number, value:number, moveto:fun(p:Position,ignorePathing:boolean,nonCancelable:boolean), settl:fun(tl:number)):boolean ->repeat
 function CppLogic.Logic.SetLuaTaskListFunc(func) end
@@ -375,12 +376,14 @@ function CppLogic.Logic.TaskListMakeWaitForAnimsUnCancelable(tl, tind) end
 function CppLogic.Logic.TaskListMakeWaitForAnimsCancelable(tl, tind) end
 
 --- prevents changes in tasklists to cancel TASK_WAIT_FOR_ANIM_NON_CANCELABLE. other states may still be cancelled.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param b boolean|nil (default false)
 function CppLogic.Logic.TaskListSetChangeTaskListCheckUncancelable(b) end
 
 --- enables/disables fixing movement tasks when a building is placed on top of a moving entity.
 --- with the fix active, issues a new move task to the same position, instead of potentially skipping the move.
+--- status of this gets saved into a savegame.
 --- @param f boolean enabled
 function CppLogic.Logic.EnableBuildOnMovementFix(f) end
 
@@ -399,6 +402,7 @@ function CppLogic.Logic.GetNearestFreePosForBuilding(ety, p, range) end
 function CppLogic.Logic.BlockingUpdateWeatherChange() end
 
 --- enables/disables applying the effects of experience level 1 and applying a negative MissChance on any level.
+--- status of this gets saved into a savegame.
 --- @param active boolean
 function CppLogic.Logic.EnableExperienceClassFix(active) end
 
@@ -433,13 +437,15 @@ function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxpric
 --- function can return true to skip further event execution.
 --- call writeback(eventData) with a modified eventData to change event values.
 --- writeback has the event as a upvalue, do not save it and call it later, you will override a random c stack position!
+--- status of this gets saved into a savegame.
 --- @param f fun(eventId:number, eventData:table, writeBack:fun(eventData:table))
 function CppLogic.Logic.UICommands.SetCallback(f) end
 --- ui command callback.
+--- status of this gets saved into a savegame.
 function CppLogic.Logic.UICommands.UnSetCallback() end
 
 --- renders only a model without any entity or effect.
---- automatically gets cleared when the userdata is gc'd / lua state gets closed (you have to recreate them after save load).
+--- automatically gets cleared when the userdata is gc'd / lua state gets closed (gets saved into the lua state).
 --- rendering happens regardless of local player FoW and camera pos, use it only when needed.
 --- Transform options: Set=0 (removes any other), Multiply=1 (default), ReverseMultiply=2 (as if called with Multiply in opposite order)
 --- usual order for transforms is: translate, scale, rotate.

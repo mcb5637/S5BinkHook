@@ -9,4 +9,6 @@ namespace CppLogic::Logic {
 	void OnSaveLoaded(lua::State L);
 	constexpr const char* CanPlaceBuildingCallbackRegKey = "CppLogic::Logic::CanPlaceBuildingCallback";
 	constexpr const char* SnipeDamageOverrideRegKey = "CppLogic::Logic::SnipeDamageOverride";
+	constexpr const char* SetLuaTaskListFuncRegKey = "CppLogic::Logic::SetLuaTaskListFunc";
+	constexpr const char* NetEventSetHookRegKey = "CppLogic::Logic::NetEventSetHook";
 }

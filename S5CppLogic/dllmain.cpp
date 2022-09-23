@@ -87,16 +87,8 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
 	/*CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride["a"] = "b";
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride["c"] = "d";*/
-	L.NewTable();
-	for (const auto& kv : CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride) {
-		L.Push(kv.first);
-		L.Push(kv.second);
-		L.SetTableRaw(-3);
-	}
-	return 1;
+	return 0;
 }
-
-// todo stt rework
 
 int GetOptions(lua::State L) {
 	L.Push(Options.DisableAdvStringPrinting);

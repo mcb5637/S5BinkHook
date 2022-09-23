@@ -131,36 +131,43 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	bool NetEventSetHook_Hook(BB::CEvent* ev) {
+		int id = ev->EventTypeId;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		int top = L.GetTop();
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(NetEventSetHookRegKey);
+		L.GetTableRaw(-2);
+		bool r = false;
+		if (L.IsFunction(-1)) {
+			L.Push(id);
+			CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, ev);
+			L.PushLightUserdata(ev);
+			L.Push<NetEventReadBack>(1);
+			L.PCall(3, 1, 0);
+			if (L.IsBoolean(-1))
+				r = L.ToBoolean(-1);
+		}
+		L.SetTop(top);
+		return r;
+	};
 	int NetEventSetHook(lua::State L) {
 		if (!L.IsFunction(1))
 			throw lua::LuaException("no func");
-		L.PushLightUserdata(&NetEventSetHook);
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(NetEventSetHookRegKey);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
-		GGUI::CManager::PostEventCallback = [](BB::CEvent* ev) {
-			int id = ev->EventTypeId;
-			lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-			int top = L.GetTop();
-			L.PushLightUserdata(&NetEventSetHook);
-			L.GetTableRaw(L.REGISTRYINDEX);
-			bool r = false;
-			if (L.IsFunction(-1)) {
-				L.Push(id);
-				CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, ev);
-				L.PushLightUserdata(ev);
-				L.Push<NetEventReadBack>(1);
-				L.PCall(3, 1, 0);
-				if (L.IsBoolean(-1))
-					r = L.ToBoolean(-1);
-			}
-			L.SetTop(top);
-			return r;
-		};
+		L.SetTableRaw(-3);
+		GGUI::CManager::PostEventCallback = &NetEventSetHook_Hook;
 		GGUI::CManager::GlobalObj()->HackPostEvent();
 		return 0;
 	}
 	int NetEventUnSetHook(lua::State L) {
 		GGUI::CManager::PostEventCallback = nullptr;
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(NetEventSetHookRegKey);
+		L.Push();
+		L.SetTableRaw(-3);
 		return 0;
 	}
 
@@ -488,6 +495,19 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	const char* SetStringTableText_GetText(const char* s)
+	{
+		if (!s)
+			return s;
+		
+		std::string sfor{ s };
+		auto f = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.find(sfor);
+
+		if (f != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.end())
+			return f->second.c_str();
+		else
+			return nullptr;
+	}
 	int SetStringTableText(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
@@ -495,28 +515,7 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("does only work ingame");
 		if (!BB::StringTableText::GetStringTableTextOverride) {
 			BB::StringTableText::HookGetStringTableText();
-			L.PushLightUserdata(&SetStringTableText);
-			L.NewTable();
-			L.SetTableRaw(L.REGISTRYINDEX);
-			BB::StringTableText::GetStringTableTextOverride = [](const char* s) {
-				if (!s)
-					return s;
-				const char* r = nullptr;
-				lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-				int t = L.GetTop();
-
-				L.PushLightUserdata(&SetStringTableText);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(s);
-				luaext::EState{ L }.StringToLower();
-				L.GetTableRaw(-2);
-				if (L.IsString(-1)) {
-					r = L.ToString(-1); // stored in registry, so its ok to return it
-				}
-
-				L.SetTop(t);
-				return r;
-			};
+			BB::StringTableText::GetStringTableTextOverride = &SetStringTableText_GetText;
 		}
 
 		if (!L.IsString(1))
@@ -524,12 +523,15 @@ namespace CppLogic::Logic {
 		if (!L.IsString(2) && !L.IsNil(2))
 			throw lua::LuaException("replacement not string or nil");
 
-		L.PushLightUserdata(&SetStringTableText);
-		L.GetTableRaw(L.REGISTRYINDEX);
 		L.PushValue(1);
 		luaext::EState{ L }.StringToLower();
-		L.PushValue(2);
-		L.SetTableRaw(-3);
+		if (L.IsNil(2)) {
+			auto r = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.find(L.CheckStdString(-1));
+			if (r != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.end())
+				CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.erase(r);
+			return 0;
+		}
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride[L.CheckStdString(-1)] = L.CheckStdString(2);
 		return 0;
 	}
 
@@ -722,49 +724,56 @@ namespace CppLogic::Logic {
 		d->HasSetTl = true;
 		return 0;
 	}
+	shok::TaskExecutionResult SetLuaTaskListFunc_Func(EGL::CGLEEntity* e, int val)
+	{
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		int t = L.GetTop();
+
+		SetLuaTaskListFunc_Info d{ e, false, false, false };
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(SetLuaTaskListFuncRegKey);
+		L.GetTableRaw(-3);
+		L.Push(e->EntityId);
+		L.Push(val);
+		L.PushLightUserdata(&d);
+		L.Push<SetLuaTaskListFunc_Move>(1);
+		L.PushLightUserdata(&d);
+		L.Push<SetLuaTaskListFunc_SetTl>(1);
+		L.PCall(4, 1, 0);
+		if (L.ToBoolean(-1))
+			d.Ret = true;
+
+		L.SetTop(t);
+		if (d.HasMoved)
+			return shok::TaskExecutionResult::StateChanged;
+		else if (d.HasSetTl)
+			return shok::TaskExecutionResult::TaskListChanged;
+		else if (d.Ret)
+			return shok::TaskExecutionResult::LuaTaskState;
+		else
+			return shok::TaskExecutionResult::NextTask;
+	}
 	int SetLuaTaskListFunc(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
 
 		if (L.IsNil(1)) {
 			EGL::CGLEEntity::LuaTaskListCallback = nullptr;
+			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.Push(SetLuaTaskListFuncRegKey);
+			L.Push();
+			L.SetTableRaw(-3);
 			return 0;
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		L.PushLightUserdata(&SetLuaTaskListFunc);
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(SetLuaTaskListFuncRegKey);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
-
+		L.SetTableRaw(-3);
 
 		if (!EGL::CGLEEntity::LuaTaskListCallback) {
-			EGL::CGLEEntity::LuaTaskListCallback = [](EGL::CGLEEntity* e, int val) {
-				lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-				int t = L.GetTop();
-
-				SetLuaTaskListFunc_Info d{ e, false, false, false };
-				L.PushLightUserdata(&SetLuaTaskListFunc);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(e->EntityId);
-				L.Push(val);
-				L.PushLightUserdata(&d);
-				L.Push<SetLuaTaskListFunc_Move>(1);
-				L.PushLightUserdata(&d);
-				L.Push<SetLuaTaskListFunc_SetTl>(1);
-				L.PCall(4, 1, 0);
-				if (L.ToBoolean(-1))
-					d.Ret = true;
-
-				L.SetTop(t);
-				if (d.HasMoved)
-					return shok::TaskExecutionResult::StateChanged;
-				else if (d.HasSetTl)
-					return shok::TaskExecutionResult::TaskListChanged;
-				else if (d.Ret)
-					return shok::TaskExecutionResult::LuaTaskState;
-				else
-					return shok::TaskExecutionResult::NextTask;
-			};
+			EGL::CGLEEntity::LuaTaskListCallback = &SetLuaTaskListFunc_Func;
 		}
 
 		return 0;
@@ -821,7 +830,9 @@ namespace CppLogic::Logic {
 	int TaskListSetChangeTaskListCheckUncancelable(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
-		EGL::CGLEEntity::HookSetTaskListNonCancelable(L.OptBool(1, false));
+		bool b = L.OptBool(1, false);
+		EGL::CGLEEntity::HookSetTaskListNonCancelable(b);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ChangeTaskListCheckUncancelable = b;
 		return 0;
 	}
 
@@ -829,6 +840,7 @@ namespace CppLogic::Logic {
 		EGL::CGLEEntity::BuildOnSetPosFixMovement = L.ToBoolean(1);
 		if (EGL::CGLEEntity::BuildOnSetPosFixMovement)
 			EGL::CGLEEntity::HookBuildOnSetPos();
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.BuildOnMovementFix = EGL::CGLEEntity::BuildOnSetPosFixMovement;
 		return 0;
 	}
 
@@ -852,7 +864,9 @@ namespace CppLogic::Logic {
 	}
 
 	int EnableExperienceClassFix(lua::State L) {
-		GGL::CEntityProfile::HookExperience(L.CheckBool(1));
+		bool b = L.CheckBool(1);
+		GGL::CEntityProfile::HookExperience(b);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExperienceClassFix = b;
 		return 0;
 	}
 
@@ -906,9 +920,14 @@ namespace CppLogic::Logic {
 		return static_cast<RWE::RwOpCombineType>(i);
 	}
 	struct LogicModel {
+		int ModelId = 0, AnimId = 0;
 		RWE::RpClump* Model = nullptr;
 		RWE::Anim::RpHAnimHierarchy* AnimHandler = nullptr;
 		float StartTime = 0;
+		float CurrentTime = 0;
+		int PlayerColor = -1;
+		bool NoShadow = false, NoParticleEffects = false, NoTerrainDecal = false;
+		shok::Color Modulate = shok::Color{ 255,255,255,255 };
 
 		static int Clear(lua::State L) {
 			LogicModel* m = L.GetUserData<LogicModel>(1);
@@ -917,6 +936,13 @@ namespace CppLogic::Logic {
 				m->Model = nullptr;
 				m->AnimHandler = nullptr;
 			}
+			m->ModelId = 0;
+			m->AnimId = 0;
+			m->PlayerColor = -1;
+			m->NoShadow = false;
+			m->NoParticleEffects = false;
+			m->NoTerrainDecal = false;
+			m->Modulate = shok::Color{ 255,255,255,255 };
 			return 0;
 		}
 		static int SetModel(lua::State L) {
@@ -932,6 +958,13 @@ namespace CppLogic::Logic {
 			auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid);
 			m->Model = mdata->Instanciate();
 			m->Model->AddToDefaultWorld();
+			m->ModelId = mid;
+			m->AnimId = 0;
+			m->PlayerColor = -1;
+			m->NoShadow = false;
+			m->NoParticleEffects = false;
+			m->NoTerrainDecal = false;
+			m->Modulate = shok::Color{ 255,255,255,255 };
 			return 0;
 		}
 		static int SetAnim(lua::State L) {
@@ -950,6 +983,8 @@ namespace CppLogic::Logic {
 			m->AnimHandler->currentAnim->SetCurrentTime(0.0f);
 			m->AnimHandler->UpdateMatrices();
 			m->StartTime = (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds();
+			m->AnimId = anim;
+			m->CurrentTime = m->StartTime;
 			return 0;
 		}
 		static int SetTimeOfAnim(lua::State L) {
@@ -961,6 +996,7 @@ namespace CppLogic::Logic {
 			float t = L.OptFloat(2, (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds());
 			if (L.OptBool(3, true))
 				t -= m->StartTime;
+			m->CurrentTime = t;
 			m->AnimHandler->currentAnim->SetCurrentTime(t);
 			m->AnimHandler->UpdateMatrices();
 			return 0;
@@ -1016,6 +1052,7 @@ namespace CppLogic::Logic {
 			if (!(p >= 0 && p <= 9))
 				throw lua::LuaException("invalid player");
 			m->Model->SetPlayerColor(p);
+			m->PlayerColor = p;
 			return 0;
 		}
 		static int DisableShadow(lua::State L) {
@@ -1023,6 +1060,7 @@ namespace CppLogic::Logic {
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableShadow();
+			m->NoShadow = true;
 			return 0;
 		}
 		static int DisableParticleEffects(lua::State L) {
@@ -1030,6 +1068,7 @@ namespace CppLogic::Logic {
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableParticleEffects();
+			m->NoParticleEffects = true;
 			return 0;
 		}
 		static int DisableTerrainDecal(lua::State L) {
@@ -1037,6 +1076,7 @@ namespace CppLogic::Logic {
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableTerrainDecal();
+			m->NoTerrainDecal = true;
 			return 0;
 		}
 		static int SetColorModulate(lua::State L) {
@@ -1047,8 +1087,169 @@ namespace CppLogic::Logic {
 			int g = L.CheckInt(3);
 			int b = L.CheckInt(4);
 			int a = L.OptInteger(5, 255);
-			m->Model->SetColorModulate(shok::Color{ r, g, b, a });
+			m->Modulate = shok::Color{ r, g, b, a };
+			m->Model->SetColorModulate(m->Modulate);
 			return 0;
+		}
+		static int Serialize(lua::State L) {
+			LogicModel* m = L.GetUserData<LogicModel>(1);
+			L.Push(typename_details::type_name<LogicModel>());
+			L.NewTable();
+
+			L.Push("Model");
+			L.Push(m->ModelId);
+			L.SetTableRaw(-3);
+
+			L.Push("Anim");
+			L.Push(m->AnimId);
+			L.SetTableRaw(-3);
+
+			L.Push("StartTime");
+			L.Push(m->StartTime);
+			L.SetTableRaw(-3);
+
+			L.Push("CurrentTime");
+			L.Push(m->CurrentTime);
+			L.SetTableRaw(-3);
+
+			if (m->Model) {
+				auto* f = m->Model->GetFrame();
+				float* mat = reinterpret_cast<float*>(&f->modelling);
+				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
+					L.Push(mat[i]);
+					L.SetTableRaw(-2, i + 1);
+				}
+			}
+			L.Push("PlayerColor");
+			L.Push(m->PlayerColor);
+			L.SetTableRaw(-3);
+
+			L.Push("NoShadow");
+			L.Push(m->NoShadow);
+			L.SetTableRaw(-3);
+
+			L.Push("NoParticleEffects");
+			L.Push(m->NoParticleEffects);
+			L.SetTableRaw(-3);
+
+			L.Push("NoTerrainDecal");
+			L.Push(m->NoTerrainDecal);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateR");
+			L.Push(m->Modulate.R);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateG");
+			L.Push(m->Modulate.G);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateB");
+			L.Push(m->Modulate.B);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateA");
+			L.Push(m->Modulate.A);
+			L.SetTableRaw(-3);
+
+			return 2;
+		}
+		static int Deserialize(lua::State L) {
+			auto* m = L.NewUserData<LogicModel>();
+			L.Push("Model");
+			L.GetTableRaw(1);
+			m->ModelId = L.CheckInt(-1);
+			L.Pop(1);
+
+			L.Push("Anim");
+			L.GetTableRaw(1);
+			m->AnimId = L.CheckInt(-1);
+			L.Pop(1);
+
+			L.Push("StartTime");
+			L.GetTableRaw(1);
+			m->StartTime = L.CheckFloat(-1);
+			L.Pop(1);
+
+			L.Push("CurrentTime");
+			L.GetTableRaw(1);
+			m->CurrentTime = L.CheckFloat(-1);
+			L.Pop(1);
+
+			L.Push("PlayerColor");
+			L.GetTableRaw(1);
+			m->PlayerColor = L.CheckInt(-1);
+			L.Pop(1);
+
+			L.Push("NoShadow");
+			L.GetTableRaw(1);
+			m->NoShadow = L.CheckBool(-1);
+			L.Pop(1);
+
+			L.Push("NoParticleEffects");
+			L.GetTableRaw(1);
+			m->NoParticleEffects = L.CheckBool(-1);
+			L.Pop(1);
+
+			L.Push("NoTerrainDecal");
+			L.GetTableRaw(1);
+			m->NoTerrainDecal = L.CheckBool(-1);
+			L.Pop(1);
+
+			L.Push("ModulateR");
+			L.GetTableRaw(1);
+			m->Modulate.R = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			L.Push("ModulateG");
+			L.GetTableRaw(1);
+			m->Modulate.G = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			L.Push("ModulateB");
+			L.GetTableRaw(1);
+			m->Modulate.B = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			L.Push("ModulateA");
+			L.GetTableRaw(1);
+			m->Modulate.A = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			if (m->ModelId) {
+				auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(m->ModelId);
+				m->Model = mdata->Instanciate();
+				m->Model->AddToDefaultWorld();
+				if (m->AnimId) {
+					m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
+					if (!m->AnimHandler)
+						throw lua::LuaException{ "no animhandler?" };
+					auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(m->AnimId);
+					m->AnimHandler->SetupForModel(m->Model);
+					m->AnimHandler->currentAnim->SetAnimation(adata);
+					m->AnimHandler->currentAnim->SetCurrentTime(m->CurrentTime);
+					m->AnimHandler->UpdateMatrices();
+				}
+				auto* f = m->Model->GetFrame();
+				float* mat = reinterpret_cast<float*>(&f->modelling);
+				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
+					L.GetTableRaw(1, i + 1);
+					if (L.IsNumber(-1))
+						mat[i] = L.CheckFloat(-1);
+					L.Pop(1);
+				}
+				f->UpdateObjects();
+				if (m->PlayerColor >= 0)
+					m->Model->SetPlayerColor(m->PlayerColor);
+				if (m->NoParticleEffects)
+					m->Model->DisableParticleEffects();
+				if (m->NoShadow)
+					m->Model->DisableShadow();
+				if (m->NoTerrainDecal)
+					m->Model->DisableTerrainDecal();
+				m->Model->SetColorModulate(m->Modulate);
+			}
+			return 1;
 		}
 	
 		static constexpr const std::array<lua::FuncReference,13> LuaMethods = {
@@ -1066,6 +1267,9 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<SetAnim>("SetAnim"),
 			lua::FuncReference::GetRef<SetTimeOfAnim>("SetTimeOfAnim"),
 		};
+		static constexpr const std::array<lua::FuncReference, 1> LuaMetaMethods{ {
+				lua::FuncReference::GetRef<Serialize>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
+		} };
 
 		~LogicModel() {
 			if (Model) {
@@ -1185,6 +1389,7 @@ namespace CppLogic::Logic {
 
 		if (L.GetState() != shok::LuaStateMainmenu) {
 			L.PrepareUserDataType<LogicModel>();
+			CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[typename_details::type_name<LogicModel>()] = &lua::CppToCFunction<LogicModel::Deserialize>;
 
 			L.GetSubTable("Events");
 			L.Push("CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY");
@@ -1224,6 +1429,21 @@ namespace CppLogic::Logic {
 			EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers;
 			if (EGL::CGLEEntity::LeaderRegenRegenerateSoldiers)
 				EGL::CGLEEntity::HookLeaderRegen();
+
+			L.Push(SetLuaTaskListFuncRegKey);
+			L.GetTableRaw(-2);
+			if (!L.IsNil(-1)) {
+				EGL::CGLEEntity::LuaTaskListCallback = &SetLuaTaskListFunc_Func;
+			}
+			L.Pop(1);
+
+			if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ChangeTaskListCheckUncancelable)
+				EGL::CGLEEntity::HookSetTaskListNonCancelable(true);
+
+			if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.size() > 0) {
+				BB::StringTableText::HookGetStringTableText();
+				BB::StringTableText::GetStringTableTextOverride = &SetStringTableText_GetText;
+			}
 		}
 		L.Push(SnipeDamageOverrideRegKey);
 		L.GetTableRaw(-2);
@@ -1233,6 +1453,13 @@ namespace CppLogic::Logic {
 				GGL::CSniperAbility::SnipeDamageOverride = &SnipeDamageCb;
 		}
 		L.Pop(1);
+
+		EGL::CGLEEntity::BuildOnSetPosFixMovement = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.BuildOnMovementFix;
+		if (EGL::CGLEEntity::BuildOnSetPosFixMovement)
+			EGL::CGLEEntity::HookBuildOnSetPos();
+
+		GGL::CEntityProfile::HookExperience(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExperienceClassFix);
+
 		L.Pop(1);
 	}
 }

@@ -10,6 +10,9 @@ namespace CppLogic::SavegameExtra {
 		bool UseMaxHPTechBoni = false;
 		bool PaydayTrigger = false;
 		bool LeaderRegenRegenerateSoldiers = false;
+		bool ChangeTaskListCheckUncancelable = false;
+		bool BuildOnMovementFix = false;
+		bool ExperienceClassFix = false;
 		std::map<const std::string, std::string> StringTableTextOverride;
 
 		void SerializeTo(const char* path, const char* savename);

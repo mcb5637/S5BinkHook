@@ -60,6 +60,9 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	BB::SerializationData::FieldData("UseMaxHPTechBoni", MemberSerializationFieldData(SerializedMapdata, UseMaxHPTechBoni)),
 	BB::SerializationData::FieldData("PaydayTrigger", MemberSerializationFieldData(SerializedMapdata, PaydayTrigger)),
 	BB::SerializationData::FieldData("LeaderRegenRegenerateSoldiers", MemberSerializationFieldData(SerializedMapdata, LeaderRegenRegenerateSoldiers)),
+	BB::SerializationData::FieldData("ChangeTaskListCheckUncancelable", MemberSerializationFieldData(SerializedMapdata, ChangeTaskListCheckUncancelable)),
+	BB::SerializationData::FieldData("BuildOnMovementFix", MemberSerializationFieldData(SerializedMapdata, BuildOnMovementFix)),
+	BB::SerializationData::FieldData("ExperienceClassFix", MemberSerializationFieldData(SerializedMapdata, ExperienceClassFix)),
 	BB::SerializationData::EmbeddedData("StringTableTextOverride", MemberSerializationSizeAndOffset(SerializedMapdata ,StringTableTextOverride), PairStrings, &StringMap),
 	BB::SerializationData::GuardData(),
 };
@@ -71,5 +74,8 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	UseMaxHPTechBoni = false;
 	PaydayTrigger = false;
 	LeaderRegenRegenerateSoldiers = false;
+	ChangeTaskListCheckUncancelable = false;
+	BuildOnMovementFix = false;
+	ExperienceClassFix = false;
 	StringTableTextOverride.clear();
 }

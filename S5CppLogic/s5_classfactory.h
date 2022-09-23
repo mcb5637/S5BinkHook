@@ -17,7 +17,7 @@ namespace BB {
 		virtual ~IXmlSerializer() = default;
 	public:
 		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, void* ob, const BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* ob, const BB::SerializationData* d, char* xmlrootname) = 0;
+		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* ob, const BB::SerializationData* d, const char* xmlrootname) = 0;
 	};
 	class CXmlSerializer : public IXmlSerializer {
 	public:
@@ -60,13 +60,13 @@ namespace BB {
 	};
 
 	struct FieldSerilaizer {
-		void(__stdcall* DeserializeFromString)(void* data, const char* buff);
-		int(__stdcall* SerializeToString)(char* buff, size_t s, const void* data); // returns num chars written if buffer would be sufficient, negative on error
-		void(__stdcall* DeserializeFromStream)(void* data, BB::IStream* str);
-		void(__stdcall* SerializeToStream)(BB::IStream* str, const void* data);
+		void(__stdcall* DeserializeFromString)(void* data, const char* buff) = nullptr;
+		int(__stdcall* SerializeToString)(char* buff, size_t s, const void* data) = nullptr; // returns num chars written if buffer would be sufficient, negative on error
+		void(__stdcall* DeserializeFromStream)(void* data, BB::IStream* str) = nullptr;
+		void(__stdcall* SerializeToStream)(BB::IStream* str, const void* data) = nullptr;
 		BB::CIDManagerEx* (__stdcall* GetIdManager)() = nullptr; // may be nullptr
 		bool IsPrimitive = false;
-		void* Buffer; // p to a memory block of the serialized type, usually the buffer is directly after the serializer structure
+		void* Buffer = nullptr; // p to a memory block of the serialized type, usually the buffer is directly after the serializer structure
 
 		static inline BB::FieldSerilaizer* const TypeInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810C98);
 		static inline BB::FieldSerilaizer* const TypeUInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810CD8);
@@ -117,19 +117,16 @@ namespace BB {
 	};
 
 	struct SerializationListOptions {
-		struct iter {
-			void* List;
-			unsigned int data; // usually a pointer
-			bool first = true;
+		struct Iter {
 		};
 
 		void* (__stdcall* AddToList)(void* List) = nullptr; // gets list, allocates, then returns p to new object
 		int z = 0;
-		iter* (__stdcall* AllocIter)(void* List) = nullptr;
-		bool(__stdcall* IterNext)(iter* i) = nullptr;
-		void* (__stdcall* IterCurrent)(iter* i) = nullptr;
-		void(__stdcall* FreeIter)(iter* i) = nullptr;
-		int nullsub = 0x52B509;
+		Iter* (__stdcall* AllocIter)(void* List) = nullptr;
+		bool(__stdcall* IterNext)(Iter* i) = nullptr;
+		void* (__stdcall* IterCurrent)(Iter* i) = nullptr;
+		void(__stdcall* FreeIter)(Iter* i) = nullptr;
+		void(__stdcall* FinalizeAddToList)(void* List) = nullptr;
 		size_t(__stdcall* GetSize)(void* List) = nullptr;
 	};
 
@@ -257,38 +254,159 @@ namespace BB {
 
 namespace CppLogic {
 	template<class T>
-	struct SerializationListOptions_ForVector : BB::SerializationListOptions { // do not use with shok::Vector !
-		SerializationListOptions_ForVector() {
-			AddToList = [](void* l) {
-				std::vector<T>* v = static_cast<std::vector<T>*>(l);
-				v->push_back(T{});
-				return static_cast<void*>(v->data() + (v->size() - 1));
-			};
-			AllocIter = [](void* l) {
-				return new iter{ l, 0, true };
-			};
-			IterNext = [](iter* i) {
-				std::vector<T>* v = static_cast<std::vector<T>*>(i->List);
-				if (i->first) {
-					i->first = false;
-					i->data = 0;
-				}
-				else {
-					i->data++;
-				}
-				return i->data < v->size();
-			};
-			IterCurrent = [](iter* i) {
-				std::vector<T>* v = static_cast<std::vector<T>*>(i->List);
-				return static_cast<void*>(v->data() + i->data);
-			};
-			FreeIter = [](iter* i) {
-				delete i;
-			};
-			GetSize = [](void* l) {
-				std::vector<T>* v = static_cast<std::vector<T>*>(l);;
-				return v->size();
-			};
+	class SerializationListOptions_ForVector : public BB::SerializationListOptions { // do only use with std::vector<T> !
+		using VectT = std::vector<T>;
+		using IterT = std::vector<T>::iterator;
+		
+		struct IterImpl : Iter {
+			VectT* Vector;
+			IterT It;
+			bool First = true;
+
+			IterImpl(VectT* v)
+			{
+				Vector = v;
+			}
+		};
+		
+		static void* __stdcall AddToListImp(void* l)
+		{
+			auto* v = static_cast<VectT*>(l);
+			v->emplace_back();
+			return &v->back();
 		}
+		static Iter* __stdcall AllocIterImp(void* l)
+		{
+			return new IterImpl{ static_cast<VectT*>(l) };
+		}
+		static bool __stdcall IterNextImp(Iter* i)
+		{
+			IterImpl* it = static_cast<IterImpl*>(i);
+			if (it->First) {
+				it->It = it->Vector->begin();
+				it->First = false;
+			}
+			else {
+				++it->It;
+			}
+			return it->It != it->Vector->end();
+		}
+		static void* __stdcall IterCurrentImp(Iter* i)
+		{
+			IterImpl* it = static_cast<IterImpl*>(i);
+			return &*it->It;
+		}
+		static void __stdcall FreeIterImp(Iter* i)
+		{
+			IterImpl* it = static_cast<IterImpl*>(i);
+			delete it;
+		}
+		static size_t __stdcall GetSizeImp(void* l)
+		{
+			auto* v = static_cast<VectT*>(l);
+			return v->size();
+		}
+		static void __stdcall FinalizeAddToListImp(void* List)
+		{
+
+		}
+		
+	public:
+		SerializationListOptions_ForVector()
+		{
+			AddToList = &AddToListImp;
+			AllocIter = &AllocIterImp;
+			IterNext = &IterNextImp;
+			IterCurrent = &IterCurrentImp;
+			FreeIter = &FreeIterImp;
+			FinalizeAddToList = &FinalizeAddToListImp;
+			GetSize = &GetSizeImp;
+		}
+	};
+
+
+	template<class K, class V>
+	class SerializationListOptions_ForMap : public BB::SerializationListOptions { // do only use with std::map<K, V> !
+		using VectT = std::map<K, V>;
+		using IterT = VectT::iterator;
+
+		struct IterImpl : Iter {
+			VectT* Vector;
+			IterT It;
+			bool First = true;
+
+			IterImpl(VectT* v)
+			{
+				Vector = v;
+			}
+		};
+
+		static inline std::pair<K, V> CurrentlyAdding{};
+
+		static void* __stdcall AddToListImp(void* l)
+		{
+			return &CurrentlyAdding;
+		}
+		static Iter* __stdcall AllocIterImp(void* l)
+		{
+			return new IterImpl{ static_cast<VectT*>(l) };
+		}
+		static bool __stdcall IterNextImp(Iter* i)
+		{
+			IterImpl* it = static_cast<IterImpl*>(i);
+			if (it->First) {
+				it->It = it->Vector->begin();
+				it->First = false;
+			}
+			else {
+				++it->It;
+			}
+			return it->It != it->Vector->end();
+		}
+		static void* __stdcall IterCurrentImp(Iter* i)
+		{
+			IterImpl* it = static_cast<IterImpl*>(i);
+			return &*it->It;
+		}
+		static void __stdcall FreeIterImp(Iter* i)
+		{
+			IterImpl* it = static_cast<IterImpl*>(i);
+			delete it;
+		}
+		static size_t __stdcall GetSizeImp(void* l)
+		{
+			auto* v = static_cast<VectT*>(l);
+			return v->size();
+		}
+		static void __stdcall FinalizeAddToListImp(void* l)
+		{
+			auto* v = static_cast<VectT*>(l);
+			v->insert(CurrentlyAdding);
+		}
+
+	public:
+		SerializationListOptions_ForMap()
+		{
+			AddToList = &AddToListImp;
+			AllocIter = &AllocIterImp;
+			IterNext = &IterNextImp;
+			IterCurrent = &IterCurrentImp;
+			FreeIter = &FreeIterImp;
+			FinalizeAddToList = &FinalizeAddToListImp;
+			GetSize = &GetSizeImp;
+		}
+	};
+
+	class StringSerializer : public BB::FieldSerilaizer {
+		std::string ActualBuffer;
+
+		static void __stdcall DeserializeFromStringImp(void* data, const char* buff);
+		static int __stdcall SerializeToStringImp(char* buff, size_t s, const void* data);
+		static void __stdcall DeserializeFromStreamImp(void* data, BB::IStream* str);
+		static void __stdcall SerializeToStreamImp(BB::IStream* str, const void* data);
+
+	public:
+		StringSerializer();
+		static StringSerializer GlobalObj;
 	};
 }

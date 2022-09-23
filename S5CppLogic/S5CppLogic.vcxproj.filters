@@ -255,6 +255,9 @@
     <ClInclude Include="s5_animset.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
+    <ClInclude Include="savegame_extra.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -409,6 +412,9 @@
     </ClCompile>
     <ClCompile Include="s5_animset.cpp">
       <Filter>shok\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="savegame_extra.cpp">
+      <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

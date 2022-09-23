@@ -3,6 +3,8 @@
 #include "s5_player.h"
 #include "s5_defines.h"
 #include "s5_maplogic.h"
+#include "s5_events.h"
+#include "s5_scriptsystem.h"
 #include "hooks.h"
 
 static inline int(__thiscall* const plattracthandlerGetAttLimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C216F);
@@ -110,6 +112,9 @@ void (*GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)(GGL::CPlayerAttract
 void __fastcall hookedcheckpayday_call(GGL::CPlayerAttractionHandler* th) {
 	if (GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback(th);
+	GGL::CEventGoodsTraded ev{ shok::EventIDs::CppLogicEvent_OnPayday, shok::ResourceType::Gold, shok::ResourceType::GoldRaw,
+		static_cast<float>(th->GetWorkerPaydayIncome()), th->PlayerID, static_cast<float>(th->GetLeaderPaydayCost())};
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
 void __declspec(naked) hookedcheckpayday() {
 	__asm {
@@ -128,7 +133,7 @@ void GGL::CPlayerAttractionHandler::HookCheckPayday()
 	if (HookCheckPayday_Hooked)
 		return;
 	if (CppLogic::HasSCELoader())
-		DEBUGGER_BREAK;
+		throw 0;
 	HookCheckPayday_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 0x4C275E - 0x4C2754 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday, reinterpret_cast<void*>(0x4C275E));

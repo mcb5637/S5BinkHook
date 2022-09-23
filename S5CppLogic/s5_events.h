@@ -145,6 +145,7 @@ namespace EGL {
 	public:
 		virtual int GetEntityID() const = 0;
 		static inline constexpr int vtp = 0x766B34;
+		static inline constexpr unsigned int Identifier = 0x4E0C8853;
 	};
 	class CEvent1Entity : public BB::CEvent, public IEventEntityID {
 	public:
@@ -157,10 +158,12 @@ namespace EGL {
 		CEvent1Entity& operator=(const CEvent1Entity&) = default;
 
 		virtual int GetEntityID() const override;
+		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
 
 		static inline constexpr int vtp = 0x766C60;
 		static inline constexpr int TypeDesc = 0x8079A8;
 		static inline constexpr int vtp_IEventEntityID = 0x766C58;
+		static inline constexpr unsigned int Identifier = 0x3B55826D;
 	};
 #ifdef __INTELLISENSE__
 #pragma diag_suppress 2784
@@ -344,7 +347,7 @@ namespace GGL {
 	class CEventTransaction : public BB::CEvent {
 	public:
 		shok::ResourceType SellType, BuyType;
-		float BuyAmount;
+		float BuyAmount; // 4
 
 		CEventTransaction(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm);
 		CEventTransaction(CEventTransaction&&) = default;
@@ -354,6 +357,19 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76D93C;
 		static inline constexpr int TypeDesc = 0x80E0E0;
+	};
+
+	class CEventGoodsTraded : public CEventTransaction, public EGL::IEventEntityID {
+	public:
+		int Entity;
+		float SellAmount; //7
+
+		CEventGoodsTraded(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm, int en, float sellam);
+		virtual int GetEntityID() const override;
+
+		static inline constexpr int vtp = 0x775CF8;
+		static inline constexpr int vtp_IEventEntityID = 0x775CF0;
+		static inline constexpr unsigned int Identifier = 0x90CC5403;
 	};
 
 	class CEventPositionAnd2EntityTypes : public EGL::CEventPosition {
@@ -421,7 +437,6 @@ namespace GGL {
 // GGL::CEventAttachmentTypeGetBool
 // EGL::CEventUVAnim
 // EGL::CEventGetPosition
-// GGL::CEventGoodsTraded -> GGL::CEventTransaction
 // GGL::CEventFollowInfo
 // GGL::CEventKegInfo
 // GGL::CEventGetPositionFromID
@@ -514,6 +529,18 @@ namespace CppLogic::Events {
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr unsigned int Identifier = 0x1001;
+	};
+
+	class ResourceEvent : public EGL::CEvent1Entity {
+	public:
+		shok::ResourceType Type;
+		int ResourceAmount;
+
+		ResourceEvent(shok::EventIDs e, int id, shok::ResourceType rt, int am);
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+
+		static inline constexpr unsigned int Identifier = 0x1002;
 	};
 }
 
@@ -878,6 +905,7 @@ namespace shok {
 
 		// script events
 		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent
+		CppLogicEvent_OnPayday = 0x50004, // GGL::CEventGoodsTraded
 	};
 
 	enum class InputEventIds : int {

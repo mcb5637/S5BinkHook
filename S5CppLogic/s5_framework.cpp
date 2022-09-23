@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5_framework.h"
+#include "s5_mapdisplay.h"
 #include "hooks.h"
 
 void ECore::IReplayStreamExtension::unknown0()
@@ -34,10 +35,24 @@ bool Framework::SavegameSystem::LoadSaveData(const char* name)
     return savedata_load(this, name);
 }
 
-inline void(__thiscall* const savedata_save)(Framework::SavegameSystem* th, const char* slot, GS3DTools::CMapData* mapdata, const char* name, bool debugSave) = reinterpret_cast<void(__thiscall*)(Framework::SavegameSystem*, const char*, GS3DTools::CMapData*, const char*, bool)>(0x4031C4);
+inline void(__thiscall* const savesys_save)(Framework::SavegameSystem* th, const char* slot, GS3DTools::CMapData* mapdata, const char* name, bool debugSave) = reinterpret_cast<void(__thiscall*)(Framework::SavegameSystem*, const char*, GS3DTools::CMapData*, const char*, bool)>(0x4031C4);
 void Framework::SavegameSystem::SaveGame(const char* slot, GS3DTools::CMapData* mapdata, const char* name, bool debugSave)
 {
-    savedata_save(this, slot, mapdata, name, debugSave);
+    savesys_save(this, slot, mapdata, name, debugSave);
+}
+
+void (*Framework::SavegameSystem::OnGameSavedTo)(const char* folder, const char* savename) = nullptr;
+inline void(__thiscall* const savedata_save)(Framework::SaveData* th, const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name) = reinterpret_cast<void(__thiscall*)(Framework::SaveData*, const char*, GGL::CGLGameLogic*, GS3DTools::CMapData*, const char*)>(0x402DAD);
+void __fastcall hooksavegame(Framework::SaveData* th, int _, const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name)
+{
+    savedata_save(th, path, gl, mapdata, name);
+    if (Framework::SavegameSystem::OnGameSavedTo)
+        Framework::SavegameSystem::OnGameSavedTo(path, name);
+}
+void Framework::SavegameSystem::HookSaveGame()
+{
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x403235), 0x10 };
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x403235), &hooksavegame);
 }
 
 bool(__thiscall* const gdb_iskeyvalid)(GDB::CList* th, const char* k) = reinterpret_cast<bool(__thiscall* const)(GDB::CList*, const char*)>(0x40E038);

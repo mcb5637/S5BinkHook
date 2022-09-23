@@ -74,6 +74,9 @@ namespace Framework {
 		void SaveGame(const char* slot, GS3DTools::CMapData* mapdata, const char* name, bool debugSave = false);
 
 		static inline Framework::SavegameSystem* (* const GlobalObj)() = reinterpret_cast<Framework::SavegameSystem * (* const)()>(0x403158);
+
+		static void (*OnGameSavedTo)(const char* folder, const char* savename);
+		static void HookSaveGame();
 	};
 }
 

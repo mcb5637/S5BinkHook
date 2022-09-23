@@ -290,3 +290,45 @@ void BB::CClassFactory::LoadObject(void* ob, const char* filename, const BB::Ser
     s->Deserialize(filename, ob, seri);
     s->Destroy();
 }
+
+void __stdcall CppLogic::StringSerializer::DeserializeFromStringImp(void* data, const char* buff)
+{
+    static_cast<std::string*>(data)->assign(buff);
+}
+
+int __stdcall CppLogic::StringSerializer::SerializeToStringImp(char* buff, size_t s, const void* data)
+{
+    const auto* d = static_cast<const std::string*>(data);
+    std::memcpy(buff, d->c_str(), std::min(s, d->size()));
+    return d->size();
+}
+
+void __stdcall CppLogic::StringSerializer::DeserializeFromStreamImp(void* data, BB::IStream* str)
+{
+    auto* d = static_cast<std::string*>(data);
+    size_t s = 0;
+    str->Read(&s, sizeof(s));
+    char* buff = new char[s];
+    str->Read(buff, s);
+    d->assign(buff, s);
+    delete[] buff;
+}
+
+void __stdcall CppLogic::StringSerializer::SerializeToStreamImp(BB::IStream* str, const void* data)
+{
+    const auto* d = static_cast<const std::string*>(data);
+    size_t s = d->size();
+    str->Write(&s, sizeof(s));
+    str->Write(d->c_str(), s);
+}
+
+CppLogic::StringSerializer::StringSerializer()
+{
+    DeserializeFromString = &DeserializeFromStringImp;
+    SerializeToString = &SerializeToStringImp;
+    DeserializeFromStream = &DeserializeFromStreamImp;
+    SerializeToStream = &SerializeToStreamImp;
+    Buffer = &ActualBuffer;
+}
+
+CppLogic::StringSerializer CppLogic::StringSerializer::GlobalObj{};

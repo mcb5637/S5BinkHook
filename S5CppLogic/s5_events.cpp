@@ -54,6 +54,12 @@ int EGL::CEvent1Entity::GetEntityID() const
 {
 	return EntityID;
 }
+void* __stdcall EGL::CEvent1Entity::CastToIdentifier(unsigned int id)
+{
+	if (id == IEventEntityID::Identifier)
+		return static_cast<IEventEntityID*>(this);
+	return nullptr;
+}
 
 EGL::CEvent1Entity::CEvent1Entity(shok::EventIDs e, int ent) : BB::CEvent(e)
 {
@@ -163,6 +169,19 @@ GGL::CEventTransaction::CEventTransaction(shok::EventIDs e, shok::ResourceType s
 	BuyAmount = buyAm;
 }
 
+GGL::CEventGoodsTraded::CEventGoodsTraded(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm, int en, float sellam)
+	: CEventTransaction(e, sell, buy, buyAm)
+{
+	SetVT(vtp);
+	*reinterpret_cast<int*>(static_cast<EGL::IEventEntityID*>(this)) = vtp_IEventEntityID;
+	Entity = en;
+	SellAmount = sellam;
+}
+int GGL::CEventGoodsTraded::GetEntityID() const
+{
+	return Entity;
+}
+
 GGL::CEventPositionAnd2EntityTypes::CEventPositionAnd2EntityTypes(shok::EventIDs e, const shok::Position& p, int t1, int t2) : EGL::CEventPosition(e, p)
 {
 	SetVT(GGL::CEventPositionAnd2EntityTypes::vtp);
@@ -223,6 +242,17 @@ CppLogic::Events::AdvHurtEvent::AdvHurtEvent(shok::EventIDs e, int aid, int tid,
 	AttackerPlayer = attpl;
 }
 unsigned int __stdcall CppLogic::Events::AdvHurtEvent::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+CppLogic::Events::ResourceEvent::ResourceEvent(shok::EventIDs e, int id, shok::ResourceType rt, int am)
+	: EGL::CEvent1Entity(e, id)
+{
+	Type = rt;
+	ResourceAmount = am;
+}
+unsigned int __stdcall CppLogic::Events::ResourceEvent::GetClassIdentifier() const
 {
 	return Identifier;
 }

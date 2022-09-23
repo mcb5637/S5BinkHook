@@ -26,6 +26,7 @@
 #include "luaext.h"
 #include "hooks.h"
 #include "luaserializer.h"
+#include "savegame_extra.h"
 
 namespace CppLogic::Logic {
 	int GetDamageFactor(lua::State ls) {
@@ -312,10 +313,7 @@ namespace CppLogic::Logic {
 			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = L.ToBoolean(1);
 		else
 			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = true;
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
-		L.Push(HurtEntityCallWithNoAttackerRegKey);
-		L.Push(EGL::CGLEEntity::HurtEntityCallWithNoAttacker);
-		L.SetTableRaw(-3);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker = EGL::CGLEEntity::HurtEntityCallWithNoAttacker;
 		return 0;
 	}
 
@@ -404,6 +402,7 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("not supportet with SCELoader");
 		EGL::CGLEEntity::HookMaxHP();
 		EGL::CGLEEntity::UseMaxHPTechBoni = true;
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.UseMaxHPTechBoni = EGL::CGLEEntity::UseMaxHPTechBoni;
 		return 0;
 	}
 
@@ -475,29 +474,8 @@ namespace CppLogic::Logic {
 	int SetPaydayCallback(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use global GameCallback_PaydayPayed instead");
-		if (!L.IsFunction(1))
-			throw lua::LuaException("no func");
 		GGL::CPlayerAttractionHandler::HookCheckPayday();
-		L.PushLightUserdata(&SetPaydayCallback);
-		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
-		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = [](GGL::CPlayerAttractionHandler* th) {
-			lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-			int t = L.GetTop();
-			L.PushLightUserdata(&SetPaydayCallback);
-			L.GetTableRaw(L.REGISTRYINDEX);
-			L.Push(th->PlayerID);
-			L.Push(th->GetWorkerPaydayIncome());
-			L.PCall(2, 1, 0);
-			if (L.IsNumber(-1)) {
-				float add = L.CheckFloat(-1);
-				if (add > 0)
-					(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.AddToType(shok::ResourceType::GoldRaw, add);
-				else if (add < 0)
-					(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerID)->CurrentResources.SubFromType(shok::ResourceType::Gold, -add);
-			}
-			L.SetTop(t);
-		};
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.PaydayTrigger = true;
 		return 0;
 	}
 
@@ -506,6 +484,7 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("not supported with SCELoader");
 		EGL::CGLEEntity::HookLeaderRegen();
 		EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = L.ToBoolean(1);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers = EGL::CGLEEntity::LeaderRegenRegenerateSoldiers;
 		return 0;
 	}
 
@@ -554,43 +533,47 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	bool CanPlaceBuildingCb(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
+		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
+		int t = L.GetTop();
+		bool r = true;
+
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(CanPlaceBuildingCallbackRegKey);
+		L.GetTableRaw(-2);
+		L.Push(entitytype);
+		L.Push(player);
+		L.PushPos(*pos);
+		L.Push(CppLogic::RadiansToDegrees(rotation));
+		L.Push(buildOnId);
+		L.PCall(5, 1, 0);
+		if (L.IsBoolean(-1))
+			r = L.ToBoolean(-1);
+
+		L.SetTop(t);
+		return r;
+	}
 	int SetPlaceBuildingAdditionalCheck(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
-			L.PushLightUserdata(&SetPlaceBuildingAdditionalCheck);
+			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.Push(CanPlaceBuildingCallbackRegKey);
 			L.Push();
-			L.SetTableRaw(L.REGISTRYINDEX);
+			L.SetTableRaw(-3);
 			return 0;
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		L.PushLightUserdata(&SetPlaceBuildingAdditionalCheck);
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(CanPlaceBuildingCallbackRegKey);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
+		L.SetTableRaw(-3);
 
 
 		if (!GGL::CPlayerStatus::CanPlaceBuildingCallback) {
-			GGL::CPlayerStatus::CanPlaceBuildingCallback = [](int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
-				luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
-				int t = L.GetTop();
-				bool r = true;
-
-				L.PushLightUserdata(&SetPlaceBuildingAdditionalCheck);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(entitytype);
-				L.Push(player);
-				L.PushPos(*pos);
-				L.Push(CppLogic::RadiansToDegrees(rotation));
-				L.Push(buildOnId);
-				L.PCall(5, 1, 0);
-				if (L.IsBoolean(-1))
-					r = L.ToBoolean(-1);
-
-				L.SetTop(t);
-				return r;
-			};
+			GGL::CPlayerStatus::CanPlaceBuildingCallback = &CanPlaceBuildingCb;
 			GGL::CPlayerStatus::HookCanPlaceBuilding();
 		}
 		return 0;
@@ -613,37 +596,41 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
+	int SnipeDamageCb(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		int t = L.GetTop();
+
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(SnipeDamageOverrideRegKey);
+		L.GetTableRaw(-2);
+		L.Push(sniper->EntityId);
+		L.Push(tar->EntityId);
+		L.Push(dmg);
+		L.PCall(3, 1, 0);
+		if (L.IsNumber(-1))
+			dmg = L.CheckInt(-1);
+
+		L.SetTop(t);
+		return dmg;
+	}
 	int FixSnipeDamage(lua::State L) {
 		GGL::CSniperAbility::OverrideSnipeTask();
 		if (L.IsNil(1)) {
 			GGL::CSniperAbility::SnipeDamageOverride = nullptr;
+			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.Push(SnipeDamageOverrideRegKey);
+			L.Push(true);
+			L.SetTableRaw(-3);
 			return 0;
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		L.PushLightUserdata(&FixSnipeDamage);
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(SnipeDamageOverrideRegKey);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
+		L.SetTableRaw(-3);
 
-
-		if (!GGL::CSniperAbility::SnipeDamageOverride) {
-			GGL::CSniperAbility::SnipeDamageOverride = [](EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) {
-				lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-				int t = L.GetTop();
-
-				L.PushLightUserdata(&FixSnipeDamage);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(sniper->EntityId);
-				L.Push(tar->EntityId);
-				L.Push(dmg);
-				L.PCall(3, 1, 0);
-				if (L.IsNumber(-1))
-					dmg = L.CheckInt(-1);
-
-				L.SetTop(t);
-				return dmg;
-			};
-		}
+		GGL::CSniperAbility::SnipeDamageOverride = &SnipeDamageCb;
 	
 		return 0;
 	}
@@ -1203,6 +1190,9 @@ namespace CppLogic::Logic {
 			L.Push("CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnEntityKilled));
 			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_PAYDAY");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnPayday));
+			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
 	}
@@ -1210,13 +1200,40 @@ namespace CppLogic::Logic {
 	void OnSaveLoaded(lua::State L)
 	{
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
-		L.Push(HurtEntityCallWithNoAttackerRegKey);
-		L.GetTableRaw(-2);
-		if (L.IsBoolean(-1)) {
-			EGL::CGLEEntity::HookHurtEntity();
-			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = L.ToBoolean(-1);
+		if (!CppLogic::HasSCELoader())
+		{
+			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker;
+			if (EGL::CGLEEntity::HurtEntityCallWithNoAttacker)
+				EGL::CGLEEntity::HookHurtEntity();
+
+			EGL::CGLEEntity::UseMaxHPTechBoni = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.UseMaxHPTechBoni;
+			if (EGL::CGLEEntity::UseMaxHPTechBoni)
+				EGL::CGLEEntity::HookMaxHP();
+
+			if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.PaydayTrigger)
+				GGL::CPlayerAttractionHandler::HookCheckPayday();
+
+			L.Push(CanPlaceBuildingCallbackRegKey);
+			L.GetTableRaw(-2);
+			if (!L.IsNil(-1)) {
+				GGL::CPlayerStatus::CanPlaceBuildingCallback = &CanPlaceBuildingCb;
+				GGL::CPlayerStatus::HookCanPlaceBuilding();
+			}
+			L.Pop(1);
+
+			EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers;
+			if (EGL::CGLEEntity::LeaderRegenRegenerateSoldiers)
+				EGL::CGLEEntity::HookLeaderRegen();
 		}
-		L.Pop(2);
+		L.Push(SnipeDamageOverrideRegKey);
+		L.GetTableRaw(-2);
+		if (!L.IsNil(-1)) {
+			GGL::CSniperAbility::OverrideSnipeTask();
+			if (L.IsFunction(-1))
+				GGL::CSniperAbility::SnipeDamageOverride = &SnipeDamageCb;
+		}
+		L.Pop(1);
+		L.Pop(1);
 	}
 }
 

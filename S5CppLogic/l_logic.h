@@ -7,5 +7,6 @@ namespace CppLogic::Logic {
 	void Cleanup(lua::State L);
 	void OnLoad();
 	void OnSaveLoaded(lua::State L);
-	constexpr const char* HurtEntityCallWithNoAttackerRegKey = "CppLogic::Logic::HurtEntityCallWithNoAttacker";
+	constexpr const char* CanPlaceBuildingCallbackRegKey = "CppLogic::Logic::CanPlaceBuildingCallback";
+	constexpr const char* SnipeDamageOverrideRegKey = "CppLogic::Logic::SnipeDamageOverride";
 }

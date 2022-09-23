@@ -236,11 +236,13 @@ function CppLogic.Logic.LandscapeGetBridgeHeight(p) end
 --- also sets the hero as attacker on bomb explode.
 --- fires trigger CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY on killing an entity.
 --- does not work with SCELoader.
+--- status of this gets saved into a savegame.
 --- @param b boolean enable (optional, default true)
 function CppLogic.Logic.EnableAllHurtEntityTrigger(b) end
 
 --- enables entity max hp to be modified by techs.
 --- does not work with SCELoader.
+--- status of this gets saved into a savegame.
 --- use a techs HitpointModifier to set up the boni.
 --- then use ModifyHitpoints on settlers and CppLogic.EntityType.Building.AddHPTechMod for buildings to add the techs.
 function CppLogic.Logic.EnableMaxHPTechMod() end
@@ -287,19 +289,21 @@ function CppLogic.Logic.GetColorByColorIndex(index) end
 --- @param a number (optional, default 255)
 function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
 
---- sets a function to be called after payday was done.
+--- enables the trigger CPPLOGIC_EVENT_ON_PAYDAY.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
---- @param func fun(playerID:number, taxes:number):number to be called (playerId, taxes)->GoldToAdd
-function CppLogic.Logic.SetPaydayCallback(func) end
+function CppLogic.Logic.SetPaydayCallback() end
 
 --- sets a function to be called for building placement checks.
 --- only gets called if all usual conditions for placement are satisfied.
 --- set to nil to remove.
---- (with SCELoader player is always -1, and buildOnID is a bool instead of an id).
+--- status of this gets saved into a savegame.
+--- does not work with SCELoader.
 --- @param func fun(entityType:number, playerId:number, pos:Position, rotation:number, buildOnID:number):boolean to be called (entitytype, playerId, pos, rotation, buildOnID)->canBuild
 function CppLogic.Logic.SetPlaceBuildingAdditionalCheck(func) end
 
 --- sets if leader regenration regenerates troop hp.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param b boolean
 function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
@@ -321,6 +325,7 @@ function CppLogic.Logic.GetPlaceBuildingRotation() end
 function CppLogic.Logic.SetPlaceBuildingRotation(r) end
 
 --- fixes snipe task, now it actually shoots a projectile which does damage.
+--- status of this gets saved into a savegame.
 --- @param override nil|fun(sniper:number, target:number, dmg:number):number (optional, default nil) (sniper, target, dmg)->dmgOverride called before the projectile gets fired, can change the damage)
 function CppLogic.Logic.FixSnipeDamage(override) end
 

@@ -42,6 +42,7 @@
 #include "l_ua.h"
 #include "l_ui.h"
 #include "luaserializer.h"
+#include "savegame_extra.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -84,10 +85,18 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
-	BB::CEvent ev{ shok::EventIDs::Die };
-	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
-	return 0;
+	/*CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride["a"] = "b";
+	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride["c"] = "d";*/
+	L.NewTable();
+	for (const auto& kv : CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride) {
+		L.Push(kv.first);
+		L.Push(kv.second);
+		L.SetTableRaw(-3);
+	}
+	return 1;
 }
+
+// todo stt rework
 
 int GetOptions(lua::State L) {
 	L.Push(Options.DisableAdvStringPrinting);
@@ -117,14 +126,22 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 }
 
 void OnSaveLoaded() {
+	auto* s = Framework::SavegameSystem::GlobalObj()->CurrentSave;
+	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.DeserializeFrom(s->SavePath.c_str(), s->AdditionalInfo.c_str());
 	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 	CppLogic::Logic::OnSaveLoaded(L);
+}
+
+void OnSaveDone(const char* path, const char* savename) {
+	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.SerializeTo(path, savename);
 }
 
 void InitGame() {
 	Framework::CMain::HookModeChange();
 	Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
 	Framework::CMain::OnSaveLoaded = &OnSaveLoaded;
+	Framework::SavegameSystem::HookSaveGame();
+	Framework::SavegameSystem::OnGameSavedTo = &OnSaveDone;
 	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Initialize();
 	if (!Options.DisableAdvStringPrinting)

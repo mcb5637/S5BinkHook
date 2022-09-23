@@ -13,6 +13,7 @@
 #include <exception>
 #include <vector>
 #include <array>
+#include <map>
 #include <cstdint>
 #include <string>
 #include <functional>

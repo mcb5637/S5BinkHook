@@ -620,7 +620,7 @@ namespace GGUI {
 		COnScreenElementPlunder OSEPlunder; // 1872
 		struct {
 			struct Floatie {
-				PADDINGI(1);
+				float StartTime;
 				OnScreenInfoRenderer* OSIR;
 				int EntityId, Amount;
 			};
@@ -631,6 +631,7 @@ namespace GGUI {
 
 		void RenderInactive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data);
 		void RenderActive(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data);
+		void RenderFloaties();
 		EGUIX::CMaterial* GetResourceIcon(shok::ResourceType rt); // does not return wood icon without patching
 		EGUIX::CMaterial* GetRefinerResourceIcon(shok::ResourceType rt);
 	};
@@ -651,6 +652,7 @@ namespace GGUI {
 		static void HookResourceFloatieShowWood(bool showwood);
 		static void HookResourceElementWood(bool showwood);
 		static void HookOnScreenInfoDisplayBehavior();
+		static void HookAdditionalFloaties();
 
 		static inline GGUI::C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<GGUI::C3DOnScreenInformationCustomWidget**>(0x882F54);
 	};
@@ -661,6 +663,23 @@ namespace GGUI {
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.OSEBuilding) == 46 * 4 + 571 * 4);
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.FloatieManager) == 46 * 4 + 1892 * 4);
 	static_assert(sizeof(C3DOnScreenInformationCustomWidget) == 1943 * 4);
+
+	class AdvancedFloatieManager {
+	public:
+		struct Floatie {
+			shok::Position Pos;
+			float Height;
+			float StartTime;
+			std::string Text;
+		};
+		std::vector<Floatie> Floaties;
+
+		void RenderFloaties();
+		void AddFloatie(const shok::Position& pos, const char* txt);
+		void AddFloatie(const shok::Position& pos, float height, const char* txt);
+
+		static AdvancedFloatieManager GlobalObj;
+	};
 
 	class CMiniMapSignal {
 	public:

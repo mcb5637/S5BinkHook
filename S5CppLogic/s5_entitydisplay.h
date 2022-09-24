@@ -271,9 +271,23 @@ namespace GD {
 
 
 namespace ED {
+	class IVisibleEntityManager {
+	public:
+		virtual void Destroy() = 0;
+	private:
+		virtual void uk1() = 0;
+		virtual void uk2() = 0;
+	public:
+		virtual ED::CEntity* GetDisplayForEntity(int eid) = 0;
+		// 3 more funcs
+		// dtor
+
+		static inline constexpr int vtp = 0x76A180;
+	};
+
 	// creates ED::CEntity objects as the corresponding entity appears on screen, and deletes them when they go off screen.
 	// (a entity hidden by FoW counts as offscreen in this case).
-	class CVisibleEntityManager {
+	class CVisibleEntityManager : public IVisibleEntityManager {
 	public:
 		PADDINGI(1); // p EGL::CGLEEntitiesDisplay
 		PADDINGI(1); // p to ?
@@ -282,12 +296,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x76A1A4;
 
-	private:
-		virtual void UnknownVEntManFunc1() = 0;
-
-	public:
 		ED::CEntity* CreateDisplayForEntity(EGL::IEntityDisplay* e);
-		ED::CEntity* GetDisplayForEntity(int eid);
 		void DestroyDisplayForEntity(int eid);
 	};
 }

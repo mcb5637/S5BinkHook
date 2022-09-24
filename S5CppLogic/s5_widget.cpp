@@ -5,6 +5,7 @@
 #include "s5_mem.h"
 #include "s5_RWEngine.h"
 #include "s5_idmanager.h"
+#include "s5_mapdisplay.h"
 #include "hooks.h"
 #include "mod.h"
 
@@ -569,6 +570,12 @@ void GGUI::OnScreenInfoRenderer::RenderActive(const shok::Position* screenPos, c
     onscreeninfo_render_active(this, screenPos, data);
 }
 
+inline void(__thiscall* const onscreeninfo_render_floaties)(GGUI::OnScreenInfoRenderer* th) = reinterpret_cast<void(__thiscall*)(GGUI::OnScreenInfoRenderer*)>(0x540FD7);
+void GGUI::OnScreenInfoRenderer::RenderFloaties()
+{
+    onscreeninfo_render_floaties(this);
+}
+
 static inline EGUIX::CMaterial* (__thiscall* const onscreeninforender_getresicon)(GGUI::OnScreenInfoRenderer* th, shok::ResourceType rt) = reinterpret_cast<EGUIX::CMaterial * (__thiscall*)(GGUI::OnScreenInfoRenderer*, shok::ResourceType)>(0x541B43);
 EGUIX::CMaterial* GGUI::OnScreenInfoRenderer::GetResourceIcon(shok::ResourceType rt)
 {
@@ -664,11 +671,60 @@ void __declspec(naked) OSIRenderer_renderhookedasm() {
         ret;
     };
 }
-
+bool HookOnScreenInfoDisplayBehavior_Hooked = false;
 void GGUI::C3DOnScreenInformationCustomWidget::HookOnScreenInfoDisplayBehavior()
 {
+    if (HookOnScreenInfoDisplayBehavior_Hooked)
+        return;
+    HookOnScreenInfoDisplayBehavior_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5367D0), 10 };
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5367D0), &OSIRenderer_renderhookedasm, reinterpret_cast<void*>(0x5367D7));
+}
+
+void __fastcall onscreenrender_additionalfloatierenderhook(GGUI::OnScreenInfoRenderer* th) {
+    th->RenderFloaties();
+    GGUI::AdvancedFloatieManager::GlobalObj.RenderFloaties();
+}
+
+bool HookAdditionalFloaties_Hooked = false;
+void GGUI::C3DOnScreenInformationCustomWidget::HookAdditionalFloaties()
+{
+    if (HookAdditionalFloaties_Hooked)
+        return;
+    HookAdditionalFloaties_Hooked = true;
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x536842), 0x10 };
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x536842), &onscreenrender_additionalfloatierenderhook);
+}
+
+GGUI::AdvancedFloatieManager GGUI::AdvancedFloatieManager::GlobalObj{};
+void GGUI::AdvancedFloatieManager::RenderFloaties()
+{
+    float ct = shok::GetCurrentTimeFloat();
+    auto f = Floaties.begin();
+    while (f != Floaties.end()) {
+        float t = ct - f->StartTime;
+        if (t > 3.0) {
+            f = Floaties.erase(f);
+            continue;
+        }
+        float x, y;
+        if ((*ERwTools::CRwCameraHandler::GlobalObj)->GetScreenCoord(f->Pos.X, f->Pos.Y, f->Height, &x, &y)) {
+            y -= t * 40;
+            EGUIX::Color c{ 255, 255, 0, t > 1.5f ? static_cast<int>(255.0f - (t * 1.5f) * 170.0f) : 255};
+            shok::UIRenderer::GlobalObj()->RenderText(f->Text.c_str(), (*GGUI::C3DOnScreenInformationCustomWidget::GlobalObj)->Renderer.TextureData.FontID_OnscreenNumbersSmall
+                , x, y, 0, &c, 0);
+        }
+        ++f;
+    }
+}
+void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, float height, const char* txt)
+{
+    Floaties.emplace_back(pos, height, shok::GetCurrentTimeFloat(), txt);
+}
+void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, const char* txt)
+{
+    float h = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(pos);
+    AddFloatie(pos, h, txt);
 }
 
 static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);

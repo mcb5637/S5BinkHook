@@ -182,7 +182,7 @@ namespace RWE {
 
 		RwFrame* child;
 		RwFrame* next;
-		RwFrame* root;
+		RwFrame* root; //40
 
 		// returns this
 		RwFrame* UpdateObjects();
@@ -199,7 +199,9 @@ namespace RWE {
 		// returns this
 		RwFrame* ForAllChildren(RwFrameCallBack callBack, void* data);
 		RWE::Anim::RpHAnimHierarchy* GetAnimFrameHandler();
+		RwMatrix* GetLTM();
 	};
+	//constexpr int i = offsetof(RwFrame, root)/4;
 
 	struct RwObjectHasFrame {
 		RwObject object;

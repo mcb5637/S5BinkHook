@@ -1114,7 +1114,7 @@ namespace CppLogic::Logic {
 
 			if (m->Model) {
 				auto* f = m->Model->GetFrame();
-				float* mat = reinterpret_cast<float*>(&f->modelling);
+				float* mat = reinterpret_cast<float*>(f->GetLTM());
 				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
 					L.Push(mat[i]);
 					L.SetTableRaw(-2, i + 1);
@@ -1231,7 +1231,7 @@ namespace CppLogic::Logic {
 					m->AnimHandler->UpdateMatrices();
 				}
 				auto* f = m->Model->GetFrame();
-				float* mat = reinterpret_cast<float*>(&f->modelling);
+				float* mat = reinterpret_cast<float*>(f->GetLTM());
 				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
 					L.GetTableRaw(1, i + 1);
 					if (L.IsNumber(-1))

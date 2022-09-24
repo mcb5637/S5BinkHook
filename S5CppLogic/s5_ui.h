@@ -177,7 +177,7 @@ namespace ERwTools {
 		virtual void ScrollGetLookAt(float* x, float* y) = 0;
 		virtual void ScrollSetSpeed(float sp) = 0;
 		virtual void SetScrollLeft(int flag) = 0;
-		virtual void SetScrollRight(int flag) = 0;
+		virtual void SetScrollRight(int flag) = 0; //10
 		virtual void SetScrollUp(int flag) = 0;
 		virtual void SetScrollDown(int flag) = 0;
 		virtual void SetScrollBorderFlag(int flag) = 0;
@@ -187,7 +187,7 @@ namespace ERwTools {
 		virtual void SetUpdateZMode(int mode) = 0; // >= 0 && < 4
 		virtual void GetUpdateZMode() = 0;
 		virtual void SetLookAtZ(float z) = 0;
-		virtual void SetScrollSpeedZ(float a) = 0;
+		virtual void SetScrollSpeedZ(float a) = 0; // 20
 		virtual void SetScrollZUp(int flag) = 0;
 		virtual void SetScrollZDown(int flag) = 0;
 		virtual void ScrollGameTimeSynced(int currentTurn, float x, float y) = 0;
@@ -197,7 +197,7 @@ namespace ERwTools {
 		virtual void SetZoomFactorMin(float f) = 0;
 		virtual void SetZoomFactorMax(float f) = 0;
 		virtual void SetFOV(float fov) = 0;
-		virtual void SetVerticalAngle(float a) = 0;
+		virtual void SetVerticalAngle(float a) = 0; // 30
 		virtual void SetCameraDistance(float d) = 0;
 		virtual void SetZoomIn(int flag) = 0;
 		virtual void SetZoomOut(int flag) = 0;
@@ -207,7 +207,7 @@ namespace ERwTools {
 		virtual float GetVerticalAngle() = 0;
 		virtual float GetLookAtZ() = 0;
 		virtual void ZoomSetAngleFlight(int currentTurn, float angle, float time) = 0;
-		virtual void ZoomSetDistanceFlight(int currentTurn, float distance, float time) = 0;
+		virtual void ZoomSetDistanceFlight(int currentTurn, float distance, float time) = 0; // 40
 		virtual void SetRotationSpeed(float speed) = 0;
 		virtual void SetRotMaxAngle(float a) = 0;
 		virtual void SetRotFlipBack(int flag) = 0;
@@ -217,7 +217,7 @@ namespace ERwTools {
 		virtual void SetRotClockwise(int flag) = 0;
 		virtual void SetRotCounterClockwise(int flag) = 0;
 		virtual void SetRotDefaultAngle(float a) = 0;
-		virtual void RotGameTimeSynced(int currentTurn, float rot) = 0;
+		virtual void RotGameTimeSynced(int currentTurn, float rot) = 0; // 50
 		virtual void RotFlight(int currentTurn, float rot, float time) = 0;
 	private:
 		virtual void set49() = 0;
@@ -227,7 +227,7 @@ namespace ERwTools {
 	public:
 		virtual void SetEntityIDToFollow(int id) = 0;
 		virtual void SetControlMode(int mode) = 0;
-		virtual void GetScreenCoord(float x, float y, float z, float* xout, float* yout) = 0;
+		virtual bool GetScreenCoord(float x, float y, float z, float* xout, float* yout) = 0; // 58
 	private:
 		virtual void get46() = 0;
 	public:

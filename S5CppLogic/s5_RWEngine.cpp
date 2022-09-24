@@ -65,6 +65,11 @@ RWE::Anim::RpHAnimHierarchy* RWE::RwFrame::GetAnimFrameHandler()
     ForAllChildren(frame_getanimhandler, &h);
     return h;
 }
+inline RWE::RwMatrix* (__cdecl* const frame_getltm)(RWE::RwFrame* f) = reinterpret_cast<RWE::RwMatrix * (__cdecl*)(RWE::RwFrame*)>(0x414060);
+RWE::RwMatrix* RWE::RwFrame::GetLTM()
+{
+    return frame_getltm(this);
+}
 
 static inline int(__cdecl* const stream_close)(RWE::RwStream* s, void* d) = reinterpret_cast<int(__cdecl*)(RWE::RwStream*, void*)>(0x41A810);
 bool RWE::RwStream::Close(void* data)

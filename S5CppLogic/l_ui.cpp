@@ -830,6 +830,13 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int ShowAdvancedFloatie(lua::State ls) {
+		luaext::EState L{ ls };
+		GGUI::C3DOnScreenInformationCustomWidget::HookAdditionalFloaties();
+		GGUI::AdvancedFloatieManager::GlobalObj.AddFloatie(L.CheckPos(1), L.CheckString(2));
+		return 0;
+	}
+
 	int GetClientSize(lua::State L) {
 		RECT r;
 		if (GetClientRect(*shok::MainWindowHandle, &r)) {
@@ -1050,7 +1057,7 @@ namespace CppLogic::UI {
 		}
 	}
 
-	constexpr std::array<lua::FuncReference, 58> UI{ {
+	constexpr std::array<lua::FuncReference, 59> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1097,6 +1104,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<SetKeyTrigger>("SetKeyTrigger"),
 		lua::FuncReference::GetRef<SetMouseTrigger>("SetMouseTrigger"),
 		lua::FuncReference::GetRef<ShowResourceFloatieOnEntity>("ShowResourceFloatieOnEntity"),
+		lua::FuncReference::GetRef<ShowAdvancedFloatie>("ShowAdvancedFloatie"),
 		lua::FuncReference::GetRef<GetClientSize>("GetClientSize"),
 		lua::FuncReference::GetRef<IsContainerWidget>("IsContainerWidget"),
 		lua::FuncReference::GetRef<GetWidgetName>("GetWidgetName"),

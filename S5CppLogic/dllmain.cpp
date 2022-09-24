@@ -85,9 +85,9 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
-	/*CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride["a"] = "b";
-	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride["c"] = "d";*/
-	return 0;
+	int id = L.CheckInt(1);
+	L.Push((int)(*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(id));
+	return 1;
 }
 
 int GetOptions(lua::State L) {

@@ -5,6 +5,11 @@
 namespace CppLogic::SavegameExtra {
 	class SerializedMapdata {
 	public:
+		class StringComparator {
+		public:
+			bool operator()(const std::string& a, const std::string& b) const noexcept;
+		};
+
 		std::string SavegameName;
 		bool HurtEntityCallWithNoAttacker = false;
 		bool UseMaxHPTechBoni = false;
@@ -16,7 +21,7 @@ namespace CppLogic::SavegameExtra {
 		bool AoEDamageFix = false;
 		bool CamoFix = false;
 		bool ConversionTrigger = false;
-		std::map<const std::string, std::string> StringTableTextOverride;
+		std::map<const std::string, std::string, StringComparator> StringTableTextOverride;
 
 		void SerializeTo(const char* path, const char* savename);
 		void DeserializeFrom(const char* path, const char* savename);

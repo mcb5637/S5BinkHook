@@ -4,6 +4,11 @@
 #include "s5_filesystem.h"
 #include "s5_exception.h"
 
+bool CppLogic::SavegameExtra::SerializedMapdata::StringComparator::operator()(const std::string& a, const std::string& b) const noexcept
+{
+	return _stricmp(a.c_str(), b.c_str()) < 0;
+}
+
 void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, const char* savename)
 {
 	SavegameName = savename;

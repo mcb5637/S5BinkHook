@@ -524,7 +524,7 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("replacement not string or nil");
 
 		L.PushValue(1);
-		luaext::EState{ L }.StringToLower();
+		//luaext::EState{ L }.StringToLower();
 		if (L.IsNil(2)) {
 			auto r = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.find(L.CheckStdString(-1));
 			if (r != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.end())

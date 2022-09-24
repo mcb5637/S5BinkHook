@@ -2225,6 +2225,11 @@ function CppLogic.UI.ContainerWidgetCreateCustomWidgetChild(wid, name, customcla
 --- @param amount number to show (abs of this int gets shown)
 function CppLogic.UI.ShowResourceFloatieOnEntity(entity, amount) end
 
+--- shows a resources gained text at a specific position.
+--- @param pos Position map position
+--- @param txt text to show (font is onscreenumberssmall, so not all chars can be displayed)
+function CppLogic.UI.ShowAdvancedFloatie(pos, txt) end
+
 --- char entered callback. use string.char to get the character.
 --- does not work with SCELoader.
 --- gets called when a key (or key kombination) is pressed that can be converted to a char.

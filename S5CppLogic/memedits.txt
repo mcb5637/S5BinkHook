@@ -83,3 +83,4 @@ list of used identifiers
 0x1000 CppLogic::UI::GUIState_LuaSelection
 0x1001 CppLogic::Events::AdvHurtEvent
 0x1002 CppLogic::Events::ResourceEvent
+0x1003 CppLogic::Events::ConversionEvent

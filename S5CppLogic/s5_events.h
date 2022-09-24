@@ -542,6 +542,24 @@ namespace CppLogic::Events {
 
 		static inline constexpr unsigned int Identifier = 0x1002;
 	};
+
+	class ConversionEvent : public BB::CEvent, public EGL::IEventEntityID, public EGL::IEvent2Entities {
+	public:
+		int ConverterId;
+		int TargetIDOld, TargetIDNew;
+
+		ConversionEvent(shok::EventIDs e, int id, int told, int tnew);
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
+
+		virtual int GetEntityID() const override;
+
+		virtual int GetActorID() const override;
+		virtual int GetTargetID() const override;
+
+		static inline constexpr unsigned int Identifier = 0x1003;
+	};
 }
 
 namespace shok {
@@ -906,6 +924,7 @@ namespace shok {
 		// script events
 		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent
 		CppLogicEvent_OnPayday = 0x50004, // GGL::CEventGoodsTraded
+		CppLogicEvent_OnConvert = 0x50005, // CppLogic::Events::ConversionEvent
 	};
 
 	enum class InputEventIds : int {

@@ -256,3 +256,35 @@ unsigned int __stdcall CppLogic::Events::ResourceEvent::GetClassIdentifier() con
 {
 	return Identifier;
 }
+
+CppLogic::Events::ConversionEvent::ConversionEvent(shok::EventIDs e, int id, int told, int tnew)
+	: BB::CEvent(e)
+{
+	ConverterId = id;
+	TargetIDOld = told;
+	TargetIDNew = tnew;
+}
+unsigned int __stdcall CppLogic::Events::ConversionEvent::GetClassIdentifier() const
+{
+	return Identifier;
+}
+void* __stdcall CppLogic::Events::ConversionEvent::CastToIdentifier(unsigned int id)
+{
+	if (id == EGL::IEventEntityID::Identifier)
+		return static_cast<EGL::IEventEntityID*>(this);
+	if (id == EGL::IEvent2Entities::Identifier)
+		return static_cast<EGL::IEvent2Entities*>(this);
+	return nullptr;
+}
+int CppLogic::Events::ConversionEvent::GetEntityID() const
+{
+	return ConverterId;
+}
+int CppLogic::Events::ConversionEvent::GetActorID() const
+{
+	return TargetIDOld;
+}
+int CppLogic::Events::ConversionEvent::GetTargetID() const
+{
+	return TargetIDNew;
+}

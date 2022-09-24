@@ -5,6 +5,7 @@
 #include "luaext.h"
 #include "s5_entity.h"
 #include "s5_effects.h"
+#include "savegame_extra.h"
 
 namespace CppLogic::Combat {
 	int DealDamage(lua::State l) {
@@ -37,21 +38,23 @@ namespace CppLogic::Combat {
 		GGL::CCannonBallEffect::HookFromCreator();
 		GGL::CCannonBallEffect::FixDamageClass = true;
 		EGL::CGLEEntity::HookDamageMod();
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AoEDamageFix = true;
 		return 0;
 	}
 
 	int DisableAoEProjectileFix(lua::State L) {
 		GGL::CCannonBallEffect::FixDamageClass = false;
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AoEDamageFix = false;
 		return 0;
 	}
 
 	void l_combat_FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff, bool post) {
 		if (post)
 			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
-		else if (eff->IsArrowEffect())
-			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((GGL::CArrowEffect*)eff)->AttackerID;
-		else if (eff->IsCannonBallEffect())
-			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = ((GGL::CCannonBallEffect*)eff)->AttackerID;
+		else if (auto* aef = dynamic_cast<GGL::CArrowEffect*>(eff))
+			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = aef->AttackerID;
+		else if (auto* cef = dynamic_cast<GGL::CCannonBallEffect*>(eff))
+			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = cef->AttackerID;
 	}
 	void l_combat_ActivateCamo(GGL::CCamouflageBehavior* th) {
 		EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
@@ -65,6 +68,7 @@ namespace CppLogic::Combat {
 		EGL::CGLEEntity::HookResetCamo();
 		EGL::CGLEEntity::HookCamoActivate();
 		EGL::CGLEEntity::CamoActivateCb = &l_combat_ActivateCamo;
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CamoFix = true;
 		return 0;
 	}
 
@@ -72,6 +76,7 @@ namespace CppLogic::Combat {
 		EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
 		EGL::CGLEEntity::CamoActivateCb = nullptr;
 		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CamoFix = false;
 		return 0;
 	}
 
@@ -92,6 +97,14 @@ namespace CppLogic::Combat {
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(Combat, -3);
+	}
+
+	void CppLogic::Combat::OnSaveLoaded(lua::State L)
+	{
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AoEDamageFix)
+			EnableAoEProjectileFix(L);
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CamoFix)
+			EnableCamoFix(L);
 	}
 }
 // CppLogic.Combat.DealDamage(GUI.GetEntityAtPosition(GUI.GetMousePosition()), 100)

@@ -656,16 +656,20 @@ function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclas
 
 --- enables AoE projectile fix.
 --- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
+--- status of this gets saved into a savegame.
 function CppLogic.Combat.EnableAoEProjectileFix() end
 --- disables AoE projectile fix.
 --- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
+--- status of this gets saved into a savegame.
 function CppLogic.Combat.DisableAoEProjectileFix() end
 
 --- enables camoflage projectile fix.
 --- when enabled, camoflage does not get reset by ranged attacks, also all attackers get cleared on entering camo.
+--- status of this gets saved into a savegame.
 function CppLogic.Combat.EnableCamoFix() end
 --- disabes camoflage projectile fix.
 --- when enabled, camoflage does not get reset by ranged attacks, also all attackers get cleared on entering camo.
+--- status of this gets saved into a savegame.
 function CppLogic.Combat.DisableCamoFix() end
 
 --- @class Predicate
@@ -898,7 +902,7 @@ function CppLogic.Entity.GetLimitedLifespanRemaining(id) end
 --- limited lifespan remaining seconds.
 --- @param id entity
 --- @param t number duration
-function CppLogic.Entity.GetLimitedLifespanRemaining(id, t) end
+function CppLogic.Entity.SetLimitedLifespanRemaining(id, t) end
 
 --- replaces a tree with its ResourceTree equivalent.
 --- @param id entity
@@ -1208,11 +1212,11 @@ function CppLogic.Entity.Settler.CommandSerfRepairBuilding(id, tid) end
 --- @return number resourceEntityId (might be different than tid)
 function CppLogic.Entity.Settler.CommandSerfExtract(id, tid) end
 
---- enables conversion hook. gets called after conversion.
+--- evables tigger Events.CPPLOGIC_EVENT_ON_CONVERT_ENTITY.
 --- targetid is the old converted entity, it is no longer valid.
---- @param func fun(targetId:number, player:number, newId:number, converterId:number)
-function CppLogic.Entity.Settler.EnableConversionHook(func) end
---- disables conversion hook.
+--- status of this gets saved into a savegame.
+function CppLogic.Entity.Settler.EnableConversionHook() end
+--- nop.
 function CppLogic.Entity.Settler.DisableConversionHook() end
 
 --- command to expell a settler.

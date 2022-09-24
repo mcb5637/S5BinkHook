@@ -121,6 +121,8 @@ void OnSaveLoaded() {
 	auto* s = Framework::SavegameSystem::GlobalObj()->CurrentSave;
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.DeserializeFrom(s->SavePath.c_str(), s->AdditionalInfo.c_str());
 	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+	CppLogic::Combat::OnSaveLoaded(L);
+	CppLogic::Entity::OnSaveLoaded(L);
 	CppLogic::Logic::OnSaveLoaded(L);
 }
 

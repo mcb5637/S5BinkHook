@@ -63,6 +63,9 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	BB::SerializationData::FieldData("ChangeTaskListCheckUncancelable", MemberSerializationFieldData(SerializedMapdata, ChangeTaskListCheckUncancelable)),
 	BB::SerializationData::FieldData("BuildOnMovementFix", MemberSerializationFieldData(SerializedMapdata, BuildOnMovementFix)),
 	BB::SerializationData::FieldData("ExperienceClassFix", MemberSerializationFieldData(SerializedMapdata, ExperienceClassFix)),
+	BB::SerializationData::FieldData("AoEDamageFix", MemberSerializationFieldData(SerializedMapdata, AoEDamageFix)),
+	BB::SerializationData::FieldData("CamoFix", MemberSerializationFieldData(SerializedMapdata, CamoFix)),
+	BB::SerializationData::FieldData("ConversionTrigger", MemberSerializationFieldData(SerializedMapdata, ConversionTrigger)),
 	BB::SerializationData::EmbeddedData("StringTableTextOverride", MemberSerializationSizeAndOffset(SerializedMapdata ,StringTableTextOverride), PairStrings, &StringMap),
 	BB::SerializationData::GuardData(),
 };
@@ -77,5 +80,8 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	ChangeTaskListCheckUncancelable = false;
 	BuildOnMovementFix = false;
 	ExperienceClassFix = false;
+	AoEDamageFix = false;
+	CamoFix = false;
+	ConversionTrigger = false;
 	StringTableTextOverride.clear();
 }

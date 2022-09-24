@@ -18,6 +18,7 @@
 #include "luaext.h"
 #include "entityiterator.h"
 #include "modloader.h"
+#include "savegame_extra.h"
 
 namespace CppLogic::Entity {
 	int PredicateOfType(lua::State L) {
@@ -1024,28 +1025,11 @@ namespace CppLogic::Entity {
 	}
 
 	int EnableConversionHook(lua::State L) {
-		if (!L.IsFunction(1))
-			throw lua::LuaException("no func");
-		L.PushLightUserdata(&EnableConversionHook);
-		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
 		EGL::CGLEEntity::HookHero6Convert();
-		EGL::CGLEEntity::Hero6ConvertHookCb = [](int id, int pl, int nid, int converter) {
-			lua::State L {*EScr::CScriptTriggerSystem::GameState};
-			int t = L.GetTop();
-			L.PushLightUserdata(&EnableConversionHook);
-			L.GetTableRaw(L.REGISTRYINDEX);
-			L.Push(id);
-			L.Push(pl);
-			L.Push(nid);
-			L.Push(converter);
-			L.PCall(4, 0, 0);
-			L.SetTop(t);
-		};
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConversionTrigger = true;
 		return 0;
 	}
 	int DisableConversionHook(lua::State L) {
-		EGL::CGLEEntity::Hero6ConvertHookCb = nullptr;
 		return 0;
 	}
 
@@ -2060,6 +2044,21 @@ namespace CppLogic::Entity {
 		L.NewTable();
 		L.RegisterFuncs(Building, -3);
 		L.SetTableRaw(-3);
+
+		if (L.GetState() != shok::LuaStateMainmenu) {
+			L.GetSubTable("Events");
+			L.Push("CPPLOGIC_EVENT_ON_CONVERT_ENTITY");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnConvert));
+			L.SetTableRaw(-3);
+
+			L.Pop(1);
+		}
+	}
+
+	void OnSaveLoaded(lua::State L)
+	{
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConversionTrigger)
+			EnableConversionHook(L);
 	}
 }
 

@@ -900,6 +900,8 @@ int _cdecl hero6convertchangeplayer(int id, int pl) {
 	int r = EGL::CGLEEntity::EntityIDChangePlayer(id, pl);
 	if (EGL::CGLEEntity::Hero6ConvertHookCb)
 		EGL::CGLEEntity::Hero6ConvertHookCb(id, pl, r, c->EntityId);
+	CppLogic::Events::ConversionEvent ev{ shok::EventIDs::CppLogicEvent_OnConvert, c->EntityId, id, r };
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 	return r;
 }
 bool HookHero6Convert_Hooked = false;

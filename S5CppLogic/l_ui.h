@@ -7,6 +7,12 @@
 namespace CppLogic::UI {
 	void Init(lua::State L);
 	void Cleanup(lua::State L);
+	void OnSaveLoaded(lua::State L);
+
+
+	constexpr const char* CharTriggerRegKey = "CppLogic::UI::CharTrigger";
+	constexpr const char* KeyTriggerRegKey = "CppLogic::UI::KeyTrigger";
+	constexpr const char* MouseTriggerRegKey = "CppLogic::UI::MouseTrigger";
 
 	class GUIState_LuaSelection : public GGUI::CState {
 	public:

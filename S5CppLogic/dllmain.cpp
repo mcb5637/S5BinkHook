@@ -85,10 +85,11 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xA7B5DFB8);
-	int id = L.CheckInt(1);
-	L.Push((int)(*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(id));
+	CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
 	return 1;
 }
+
+// hp tech mod add?, construction speed techs?
 
 int GetOptions(lua::State L) {
 	L.Push(Options.DisableAdvStringPrinting);
@@ -121,9 +122,12 @@ void OnSaveLoaded() {
 	auto* s = Framework::SavegameSystem::GlobalObj()->CurrentSave;
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.DeserializeFrom(s->SavePath.c_str(), s->AdditionalInfo.c_str());
 	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+	int t = L.GetTop();
 	CppLogic::Combat::OnSaveLoaded(L);
 	CppLogic::Entity::OnSaveLoaded(L);
 	CppLogic::Logic::OnSaveLoaded(L);
+	CppLogic::UI::OnSaveLoaded(L);
+	L.SetTop(t);
 }
 
 void OnSaveDone(const char* path, const char* savename) {
@@ -166,6 +170,8 @@ void Install(lua::State L) {
 		shok::LuaStateMainmenu = L.GetState();
 		InitGame();
 	}
+
+	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.Clear();
 
 	static constexpr const char* CppLogic = "CppLogic";
 

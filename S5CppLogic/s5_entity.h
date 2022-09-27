@@ -96,6 +96,8 @@ namespace EGL {
 			float MaxRangeOverride = -1.0f;
 			std::string NameOverride = "";
 			int FakeTaskValue = 0;
+
+			static BB::SerializationData SerializationData[];
 		};
 
 
@@ -306,7 +308,6 @@ namespace EGL {
 		static bool HurtEntityCallWithNoAttacker;
 		static void (*HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc);
 		static void HookDestroyEntity();
-		static std::map<int, EGL::CGLEEntity::EntityAddonData> AddonDataMap;
 		static EGL::CGLEEntity::EntityAddonData LastRemovedEntityAddonData;
 
 		static inline EGL::CGLEEntity* (__stdcall* const GetEntityByID)(int id) = reinterpret_cast<EGL::CGLEEntity * (__stdcall*)(int)>(0x5825B4);

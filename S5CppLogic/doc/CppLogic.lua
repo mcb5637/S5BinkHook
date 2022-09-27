@@ -910,6 +910,7 @@ function CppLogic.Entity.SetLimitedLifespanRemaining(id, t) end
 function CppLogic.Entity.ReplaceWithResourceEntity(id) end
 
 --- overrides an entities max hp.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param hp number|nil (optional, <0 to disable)
@@ -918,12 +919,14 @@ function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
 
 --- overrides an entities damage.
 --- does not work for trapcannon.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param dmg number (<0 disable)
 function CppLogic.Entity.SetDamage(id, dmg) end
 
 --- overrides an entities armor.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param armor number (<0 disable)
@@ -931,18 +934,21 @@ function CppLogic.Entity.SetArmor(id, armor) end
 
 --- overrides a settlers/buildings exploration.
 --- use Logic for scriptentities.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param ex number (<0 disable)
 function CppLogic.Entity.SetExploration(id, ex) end
 
 --- overrides a settlers/autocannons max attack range.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param ran number (<0 disable)
 function CppLogic.Entity.SetAutoAttackMaxRange(id, ran) end
 
 --- overrides an entities display name.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param n number ("" disable)
@@ -1236,6 +1242,7 @@ function CppLogic.Entity.Settler.CommandTurnBattleSerfToSerf(id) end
 function CppLogic.Entity.Settler.SetPosition(id, p) end
 
 --- enables ranged effect advanced healing. heal gets transfered from solder to leader, first healing the leader, and if something is left, the troop hp pool.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param enabl boolean
 function CppLogic.Entity.Settler.EnableRangedEffectSoldierHeal(enabl) end
@@ -1259,7 +1266,6 @@ function CppLogic.Entity.Settler.GetEnteredBuilding(id) end
 --- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
 --- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).
 --- the tasklist TL_SCRIPT_ANIMATION gets created at first use, it may not be there before you call this func.
---- requires call to CppLogic.OnLeaveMap() to not crash on map exit (TriggerFixCppLogicExtension does this for you).
 --- does not work with SCELoader.
 --- @param id entity
 --- @param animname string name of the animation (can be copied from entity xml) does not check if the anim matches the model!
@@ -1303,6 +1309,7 @@ function CppLogic.Entity.Leader.SetSoldierLimit(id, limit) end
 --- @return number sec seconds between refreshes
 function CppLogic.Entity.Leader.GetRegeneration(id) end
 --- a leaders regeneration.
+--- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param hp number regenerated
@@ -1861,6 +1868,7 @@ function CppLogic.EntityType.Building.GetUpradeCost(ty) end
 function CppLogic.EntityType.Building.SetUpradeCost(ty, c, ignoreZeroes) end
 
 --- adds a tech modifier for building hp.
+--- does not get saved into savegame.
 --- does not work with SCELoader.
 --- has no effect without EnableMaxHPTechMod.
 --- @param ty number entitytype
@@ -2235,6 +2243,7 @@ function CppLogic.UI.ShowAdvancedFloatie(pos, txt) end
 --- gets called when a key (or key kombination) is pressed that can be converted to a char.
 --- you can return true to skip all additional message handling.
 --- set to nil to remove.
+--- status of this gets saved into a savegame.
 --- @param f fun(c:number):boolean to be called (char)->handeled
 function CppLogic.UI.SetCharTrigger(f) end
 --- key pressed callback.
@@ -2244,6 +2253,7 @@ function CppLogic.UI.SetCharTrigger(f) end
 --- if the key keepd pressed, after a short delay the trigger is called in fast succession.
 --- you can return true to skip all additional message handling.
 --- set to nil to remove.
+--- status of this gets saved into a savegame.
 --- @param f fun(k:number, up:boolean):boolean to be called (key, up)->handeled
 function CppLogic.UI.SetKeyTrigger(f) end
 --- mouse event callback.
@@ -2257,6 +2267,7 @@ function CppLogic.UI.SetKeyTrigger(f) end
 --- x and y cooridates are screen coordinates not processed by SHoK and are equals to what GUI.GetMousePosition returns you (not scaled to widget coordinates).
 --- you can return true to skip all additional message handling.
 --- set to nil to remove.
+--- status of this gets saved into a savegame.
 --- @param f fun(id:number, x:number, y:number, forward:boolean):boolean to be called
 function CppLogic.UI.SetMouseTrigger(f) end
 --- same as CppLogic.UI.SetMouseTrigger, just designed for mainmenu

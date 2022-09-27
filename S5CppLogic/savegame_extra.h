@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_entity.h"
 
 namespace CppLogic::SavegameExtra {
 	class SerializedMapdata {
@@ -21,15 +22,23 @@ namespace CppLogic::SavegameExtra {
 		bool AoEDamageFix = false;
 		bool CamoFix = false;
 		bool ConversionTrigger = false;
+		bool HookDestroyEntity = false;
+		bool HookMaxHP = false;
+		bool HookDamage = false;
+		bool HookArmor = false;
+		bool HookExploration = false;
+		bool HookRegen = false;
+		bool HookMaxRange = false;
+		bool HookDisplayName = false;
+		bool RangedEffectSoldierHeal = false;
 		std::map<const std::string, std::string, StringComparator> StringTableTextOverride;
+		std::map<int, EGL::CGLEEntity::EntityAddonData> EntityAddonDataMap;
 
 		void SerializeTo(const char* path, const char* savename);
 		void DeserializeFrom(const char* path, const char* savename);
+		void Clear();
 
 		static SerializedMapdata GlobalObj;
 		static BB::SerializationData SerializationData[];
-
-	private:
-		void Clear();
 	};
 }

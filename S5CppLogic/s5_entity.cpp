@@ -14,8 +14,10 @@
 #include "s5_widget.h"
 #include "s5_config.h"
 #include "s5_behaviorProps.h"
+#include "s5_classfactory.h"
 #include "luaext.h"
 #include "hooks.h"
+#include "savegame_extra.h"
 
 struct shok_vtable_EGL_CGLEEntity : BB::IObject::_vtableS {
 	void(__thiscall* Destroy)(EGL::CGLEEntity* th, int i); // 3
@@ -75,6 +77,21 @@ EGL::IEntityDisplay::posdata EGL::IEntityDisplay::GetPosData() const
 	GetPosData(&r);
 	return r;
 }
+
+BB::SerializationData EGL::CGLEEntity::EntityAddonData::SerializationData[]{
+	BB::SerializationData::FieldData("EntityId", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, EntityId)),
+	BB::SerializationData::FieldData("HealthOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, HealthOverride)),
+	BB::SerializationData::FieldData("HealthUseBoni", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, HealthUseBoni)),
+	BB::SerializationData::FieldData("DamageOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, DamageOverride)),
+	BB::SerializationData::FieldData("ArmorOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, ArmorOverride)),
+	BB::SerializationData::FieldData("ExplorationOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, ExplorationOverride)),
+	BB::SerializationData::FieldData("RegenHPOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, RegenHPOverride)),
+	BB::SerializationData::FieldData("RegenSecondsOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, RegenSecondsOverride)),
+	BB::SerializationData::FieldData("MaxRangeOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, MaxRangeOverride)),
+	BB::SerializationData::FieldData("NameOverride", MemberSerializationSizeAndOffset(EGL::CGLEEntity::EntityAddonData, NameOverride), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::FieldData("FakeTaskValue", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, FakeTaskValue)),
+	BB::SerializationData::GuardData(),
+};
 
 static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(EGL::CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntityCreator*)>(0x4493A4);
 EGL::CGLEEntityCreator::CGLEEntityCreator()
@@ -1704,15 +1721,14 @@ EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntit
 }
 
 
-std::map<int, EGL::CGLEEntity::EntityAddonData> EGL::CGLEEntity::AddonDataMap = std::map<int, EGL::CGLEEntity::EntityAddonData>();
 EGL::CGLEEntity::EntityAddonData EGL::CGLEEntity::LastRemovedEntityAddonData = EGL::CGLEEntity::EntityAddonData();
 void __fastcall destroyentity_gemoveadd(EGL::CGLEEntity* e) {
 	BB::CEvent ev{ shok::EventIDs::CppL_OnEntityDestroy };
 	e->FireEvent(&ev);
-	auto a = EGL::CGLEEntity::AddonDataMap.find(e->EntityId);
-	if (a != EGL::CGLEEntity::AddonDataMap.end()) {
+	auto a = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.find(e->EntityId);
+	if (a != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.end()) {
 		EGL::CGLEEntity::LastRemovedEntityAddonData = a->second;
-		EGL::CGLEEntity::AddonDataMap.erase(a);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.erase(a);
 	}
 }
 void __declspec(naked) destroyentityhook() {
@@ -1744,16 +1760,16 @@ void EGL::CGLEEntity::HookDestroyEntity()
 }
 EGL::CGLEEntity::EntityAddonData* EGL::CGLEEntity::GetAdditionalData(bool create)
 {
-	auto a = EGL::CGLEEntity::AddonDataMap.find(EntityId);
-	if (a != EGL::CGLEEntity::AddonDataMap.end()) {
+	auto a = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.find(EntityId);
+	if (a != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.end()) {
 		return &a->second;
 	}
 	if (!create) {
 		return nullptr;
 	}
 	else {
-		EGL::CGLEEntity::AddonDataMap[EntityId] = EGL::CGLEEntity::EntityAddonData();
-		EGL::CGLEEntity::EntityAddonData* r = &EGL::CGLEEntity::AddonDataMap[EntityId];
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap[EntityId] = EGL::CGLEEntity::EntityAddonData();
+		EGL::CGLEEntity::EntityAddonData* r = &CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap[EntityId];
 		r->EntityId = EntityId;
 		return r;
 	}

@@ -13,15 +13,7 @@
 namespace CppLogic::Effect {
 	void PushToHitCallbackReg(lua::State L) {
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
-		L.Push(EffectOnHitKey);
-		L.GetTableRaw(-2);
-		if (!L.IsTable(-1)) {
-			L.Pop(1);
-			L.NewTable();
-			L.Push(EffectOnHitKey);
-			L.PushValue(-2);
-			L.SetTableRaw(-4);
-		}
+		L.GetSubTable(EffectOnHitKey);
 		L.Remove(-2);
 	}
 

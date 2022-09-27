@@ -12,6 +12,7 @@
 #include "s5_defines.h"
 #include "s5_RWE_2d.h"
 #include "hooks.h"
+#include "luaserializer.h"
 
 namespace CppLogic::UI {
 	void StringHandlerSetString(luaext::EState L, EGUIX::CSingleStringHandler& h, int i) {
@@ -635,42 +636,63 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	bool SetCharTrigger_CB(int c) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		int t = L.GetTop();
+		bool r = false;
+
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(CharTriggerRegKey);
+		L.GetTableRaw(-2);
+		L.Push(c);
+		if (L.PCall(1, 1, 0) == lua::ErrorCode::Success) {
+			r = L.OptBool(-1, false);
+		}
+
+		L.SetTop(t);
+		return r;
+	}
 	int SetCharTrigger(lua::State ls) {
 		luaext::EState L{ ls };
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			EGUIX::UIInput_Char_Callback = nullptr;
-			L.PushLightUserdata(&SetCharTrigger);
+			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.Push(CharTriggerRegKey);
 			L.Push();
-			L.SetTableRaw(L.REGISTRYINDEX);
+			L.SetTableRaw(-3);
 			return 0;
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		L.PushLightUserdata(&SetCharTrigger);
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(CharTriggerRegKey);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
+		L.SetTableRaw(-3);
 
 		if (!EGUIX::UIInput_Char_Callback) {
 			EGUIX::HookUIInput();
-			EGUIX::UIInput_Char_Callback = [](int c) {
-				lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-				int t = L.GetTop();
-				bool r = false;
-
-				L.PushLightUserdata(&SetCharTrigger);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(c);
-				if (L.PCall(1, 1, 0) == lua::ErrorCode::Success) {
-					r = L.OptBool(-1, false);
-				}
-
-				L.SetTop(t);
-				return r;
-			};
+			EGUIX::UIInput_Char_Callback = &SetCharTrigger_CB;
 		}
 		return 0;
+	}
+	bool SetKeyTrigger_CB(int c, win_mouseEvents id) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		int t = L.GetTop();
+		bool r = false;
+
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(KeyTriggerRegKey);
+		L.GetTableRaw(-2);
+		L.Push(c);
+		L.Push(id == win_mouseEvents::KeyUp || id == win_mouseEvents::SysKeyUp);
+		if (L.PCall(2, 1, 0) == lua::ErrorCode::Success) {
+			r = L.OptBool(-1, false);
+		}
+
+		L.SetTop(t);
+		return r;
 	}
 	int SetKeyTrigger(lua::State ls) {
 		luaext::EState L{ ls };
@@ -678,37 +700,58 @@ namespace CppLogic::UI {
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			EGUIX::UIInput_Key_Callback = nullptr;
-			L.PushLightUserdata(&SetKeyTrigger);
+			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.Push(KeyTriggerRegKey);
 			L.Push();
-			L.SetTableRaw(L.REGISTRYINDEX);
+			L.SetTableRaw(-3);
 			return 0;
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		L.PushLightUserdata(&SetKeyTrigger);
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(KeyTriggerRegKey);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
+		L.SetTableRaw(-3);
 
 		if (!EGUIX::UIInput_Key_Callback) {
 			EGUIX::HookUIInput();
-			EGUIX::UIInput_Key_Callback = [](int c, win_mouseEvents id) {
-				lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-				int t = L.GetTop();
-				bool r = false;
-
-				L.PushLightUserdata(&SetKeyTrigger);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(c);
-				L.Push(id == win_mouseEvents::KeyUp || id == win_mouseEvents::SysKeyUp);
-				if (L.PCall(2, 1, 0) == lua::ErrorCode::Success) {
-					r = L.OptBool(-1, false);
-				}
-
-				L.SetTop(t);
-				return r;
-			};
+			EGUIX::UIInput_Key_Callback = &SetKeyTrigger_CB;
 		}
 		return 0;
+	}
+	bool SetMouseTrigger_CB(win_mouseEvents id, int w, int l) {
+		if (id == win_mouseEvents::MouseMove)
+			return false;
+
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		int t = L.GetTop();
+		bool r = false;
+
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(MouseTriggerRegKey);
+		L.GetTableRaw(-2);
+		L.Push(static_cast<int>(id));
+		L.Push(l & 0xFFFF);
+		L.Push((l >> 16) & 0xFFFF);
+		lua::ErrorCode res = lua::ErrorCode::Syntax;
+
+		if (id >= win_mouseEvents::LButtonDown && id <= win_mouseEvents::MButtonDBl) {
+			res = L.PCall(3, 1, 0);
+		}
+		else if (id == win_mouseEvents::MouseWheel) {
+			L.Push(w > 0);
+			res = L.PCall(4, 1, 0);
+		}
+		else if (id >= win_mouseEvents::XButtonDown && id <= win_mouseEvents::XButtonDBl) {
+			L.Push(((w >> 16) & 0xFFFF) - 1);
+			res = L.PCall(4, 1, 0);
+		}
+		if (res == lua::ErrorCode::Success) {
+			r = L.OptBool(-1, false);
+		}
+
+		L.SetTop(t);
+		return r;
 	}
 	int SetMouseTrigger(lua::State ls) {
 		luaext::EState L{ ls };
@@ -716,52 +759,22 @@ namespace CppLogic::UI {
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			EGUIX::UIInput_Mouse_Callback = nullptr;
-			L.PushLightUserdata(&SetMouseTrigger);
+			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.Push(MouseTriggerRegKey);
 			L.Push();
-			L.SetTableRaw(L.REGISTRYINDEX);
+			L.SetTableRaw(-3);
 			return 0;
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		L.PushLightUserdata(&SetMouseTrigger);
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.Push(MouseTriggerRegKey);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
+		L.SetTableRaw(-3);
 
 		if (!EGUIX::UIInput_Mouse_Callback) {
 			EGUIX::HookUIInput();
-			EGUIX::UIInput_Mouse_Callback = [](win_mouseEvents id, int w, int l) {
-				if (id == win_mouseEvents::MouseMove)
-					return false;
-
-				lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-				int t = L.GetTop();
-				bool r = false;
-
-				L.PushLightUserdata(&SetMouseTrigger);
-				L.GetTableRaw(L.REGISTRYINDEX);
-				L.Push(static_cast<int>(id));
-				L.Push(l & 0xFFFF);
-				L.Push((l >> 16) & 0xFFFF);
-				lua::ErrorCode res = lua::ErrorCode::Syntax;
-
-				if (id >= win_mouseEvents::LButtonDown && id <= win_mouseEvents::MButtonDBl) {
-					res = L.PCall(3, 1, 0);
-				}
-				else if (id == win_mouseEvents::MouseWheel) {
-					L.Push(w > 0);
-					res = L.PCall(4, 1, 0);
-				}
-				else if (id >= win_mouseEvents::XButtonDown && id <= win_mouseEvents::XButtonDBl) {
-					L.Push(((w >> 16) & 0xFFFF) - 1);
-					res = L.PCall(4, 1, 0);
-				}
-				if (res == lua::ErrorCode::Success) {
-					r = L.OptBool(-1, false);
-				}
-
-				L.SetTop(t);
-				return r;
-			};
+			EGUIX::UIInput_Mouse_Callback = &SetMouseTrigger_CB;
 		}
 		return 0;
 	}
@@ -1055,6 +1068,37 @@ namespace CppLogic::UI {
 				}
 			}
 		}
+	}
+
+	void CppLogic::UI::OnSaveLoaded(lua::State L)
+	{
+		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+
+		L.Push(CharTriggerRegKey);
+		L.GetTableRaw(-2);
+		if (!L.IsNil(-1)) {
+			EGUIX::HookUIInput();
+			EGUIX::UIInput_Char_Callback = &SetCharTrigger_CB;
+		}
+		L.Pop(1);
+
+		L.Push(KeyTriggerRegKey);
+		L.GetTableRaw(-2);
+		if (!L.IsNil(-1)) {
+			EGUIX::HookUIInput();
+			EGUIX::UIInput_Key_Callback = &SetKeyTrigger_CB;
+		}
+		L.Pop(1);
+
+		L.Push(MouseTriggerRegKey);
+		L.GetTableRaw(-2);
+		if (!L.IsNil(-1)) {
+			EGUIX::HookUIInput();
+			EGUIX::UIInput_Mouse_Callback = &SetMouseTrigger_CB;
+		}
+		L.Pop(1);
+
+		L.Pop(1);
 	}
 
 	constexpr std::array<lua::FuncReference, 59> UI{ {

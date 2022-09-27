@@ -17,7 +17,7 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 	auto* s = BB::CXmlSerializer::Create();
 	try {
 		BB::CFileStreamEx f{};
-		if (f.OpenFile(p.c_str(), BB::IStream::Flags::GenericWrite)) {
+		if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultWrite)) {
 			s->SerializeByData(&f, this, SerializationData, "SerializedMapdata");
 		}
 		f.Close();
@@ -52,10 +52,18 @@ void CppLogic::SavegameExtra::SerializedMapdata::DeserializeFrom(const char* pat
 CppLogic::SavegameExtra::SerializedMapdata CppLogic::SavegameExtra::SerializedMapdata::GlobalObj{};
 
 CppLogic::SerializationListOptions_ForMap<const std::string, std::string> StringMap{};
-using ptype = std::pair<const std::string, std::string>;
+using pair_conststring_string = std::pair<const std::string, std::string>;
 BB::SerializationData PairStrings[]{
-	BB::SerializationData::FieldData("Key", MemberSerializationSizeAndOffset(ptype, first), &CppLogic::StringSerializer::GlobalObj),
-	BB::SerializationData::FieldData("Value", MemberSerializationSizeAndOffset(ptype, second), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::FieldData("Key", MemberSerializationSizeAndOffset(pair_conststring_string, first), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::FieldData("Value", MemberSerializationSizeAndOffset(pair_conststring_string, second), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::GuardData(),
+};
+
+CppLogic::SerializationListOptions_ForMap<int, EGL::CGLEEntity::EntityAddonData> AddonMap{};
+using pair_int_addondata = std::pair<int, EGL::CGLEEntity::EntityAddonData>;
+BB::SerializationData PairIntAddon[]{
+	BB::SerializationData::FieldData("Key", MemberSerializationFieldData(pair_int_addondata, first)),
+	BB::SerializationData::EmbeddedData("Value", MemberSerializationEmbeddedData(pair_int_addondata, second)),
 	BB::SerializationData::GuardData(),
 };
 
@@ -71,7 +79,17 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	BB::SerializationData::FieldData("AoEDamageFix", MemberSerializationFieldData(SerializedMapdata, AoEDamageFix)),
 	BB::SerializationData::FieldData("CamoFix", MemberSerializationFieldData(SerializedMapdata, CamoFix)),
 	BB::SerializationData::FieldData("ConversionTrigger", MemberSerializationFieldData(SerializedMapdata, ConversionTrigger)),
+	BB::SerializationData::FieldData("HookDestroyEntity", MemberSerializationFieldData(SerializedMapdata, HookDestroyEntity)),
+	BB::SerializationData::FieldData("HookMaxHP", MemberSerializationFieldData(SerializedMapdata, HookMaxHP)),
+	BB::SerializationData::FieldData("HookDamage", MemberSerializationFieldData(SerializedMapdata, HookDamage)),
+	BB::SerializationData::FieldData("HookArmor", MemberSerializationFieldData(SerializedMapdata, HookArmor)),
+	BB::SerializationData::FieldData("HookExploration", MemberSerializationFieldData(SerializedMapdata, HookExploration)),
+	BB::SerializationData::FieldData("HookRegen", MemberSerializationFieldData(SerializedMapdata, HookRegen)),
+	BB::SerializationData::FieldData("HookMaxRange", MemberSerializationFieldData(SerializedMapdata, HookMaxRange)),
+	BB::SerializationData::FieldData("HookDisplayName", MemberSerializationFieldData(SerializedMapdata, HookDisplayName)),
+	BB::SerializationData::FieldData("RangedEffectSoldierHeal", MemberSerializationFieldData(SerializedMapdata, RangedEffectSoldierHeal)),
 	BB::SerializationData::EmbeddedData("StringTableTextOverride", MemberSerializationSizeAndOffset(SerializedMapdata ,StringTableTextOverride), PairStrings, &StringMap),
+	BB::SerializationData::EmbeddedData("EntityAddonDataMap", MemberSerializationSizeAndOffset(SerializedMapdata ,EntityAddonDataMap), PairIntAddon, &AddonMap),
 	BB::SerializationData::GuardData(),
 };
 
@@ -88,5 +106,15 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	AoEDamageFix = false;
 	CamoFix = false;
 	ConversionTrigger = false;
+	HookDestroyEntity = false;
+	HookMaxHP = false;
+	HookDamage = false;
+	HookArmor = false;
+	HookExploration = false;
+	HookRegen = false;
+	HookMaxRange = false;
+	HookDisplayName = false;
+	RangedEffectSoldierHeal = false;
 	StringTableTextOverride.clear();
+	EntityAddonDataMap.clear();
 }

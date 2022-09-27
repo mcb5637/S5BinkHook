@@ -13,12 +13,12 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 {
 	SavegameName = savename;
 	std::string p{ path };
-	p.append("\\CppLogic.xml");
-	auto* s = BB::CXmlSerializer::Create();
+	p.append("\\CppLogic.bin");
+	auto* s = BB::CBinarySerializer::Create(0);
 	try {
 		BB::CFileStreamEx f{};
 		if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultWrite)) {
-			s->SerializeByData(&f, this, SerializationData, "SerializedMapdata");
+			s->SerializeByData(&f, this, SerializationData, 0);
 		}
 		f.Close();
 	}
@@ -33,15 +33,21 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 void CppLogic::SavegameExtra::SerializedMapdata::DeserializeFrom(const char* path, const char* savename)
 {
 	std::string p{ path };
-	p.append("\\CppLogic.xml");
+	p.append("\\CppLogic.bin");
+	auto* s = BB::CBinarySerializer::Create(0);
 	try {
-		(*BB::CClassFactory::GlobalObj)->LoadObject(this, p.c_str(), SerializationData);
+		BB::CFileStreamEx f{};
+		if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultRead)) {
+			s->DeserializeByData(&f, this, SerializationData);
+		}
+		f.Close();
 	}
 	catch (const BB::CFileException& e) {
 		char buff[201]{};
 		e.CopyMessage(buff, 200);
 		shok::LogString(__FUNCSIG__" error: %s\n", buff);
 	}
+	s->Destroy();
 	if (SavegameName != savename)
 	{
 		shok::LogString(__FUNCSIG__" save name does not match, is %s, should be %s\n", SavegameName.c_str(), savename);

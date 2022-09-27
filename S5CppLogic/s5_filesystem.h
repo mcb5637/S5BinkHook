@@ -180,6 +180,7 @@ namespace BB {
 		static inline BB::CFileSystemMgr** const GlobalObj = reinterpret_cast<BB::CFileSystemMgr**>(0x88F088);
 		static inline const char* (__cdecl* const PathGetExtension)(const char* path) = reinterpret_cast<const char* (__cdecl*)(const char*)>(0x40BAB3);
 
+		static BB::IFileSystem* LoadorderTop;
 
 		static const char* ReadFileToString(const char* name, size_t* size);
 		static bool DoesFileExist(const char* name);

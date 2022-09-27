@@ -388,11 +388,7 @@ namespace CppLogic::Logic {
 	int RemoveTopArchive(lua::State L) {
 		if ((*BB::CFileSystemMgr::GlobalObj)->LoadOrder.size() <= 0)
 			throw lua::LuaException("loadorder empty");
-		BB::CBBArchiveFile* a = dynamic_cast<BB::CBBArchiveFile*>((*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0]);
-		if (!a)
-			throw lua::LuaException("may only remove archives");
-		std::string_view path = a->ArchiveFile.Filename;
-		if (path.starts_with("base") || path.starts_with("extra1") || path.starts_with("extra2"))
+		if ((*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0] == BB::CFileSystemMgr::LoadorderTop)
 			throw lua::LuaException("may not remove BB archives");
 		(*BB::CFileSystemMgr::GlobalObj)->RemoveTopArchive();
 		return 0;

@@ -130,6 +130,8 @@ void BB::CFileStreamEx::Close()
 	shok_BB_CFileStreamEx_Close(this);
 }
 
+BB::IFileSystem* BB::CFileSystemMgr::LoadorderTop = nullptr;
+
 const char* BB::CFileSystemMgr::ReadFileToString(const char* name, size_t* size)
 {
 	char* buff = nullptr;

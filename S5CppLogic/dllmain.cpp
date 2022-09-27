@@ -168,6 +168,7 @@ int Nop(lua::State L) {
 void Install(lua::State L) {
 	if (!shok::LuaStateMainmenu) {
 		shok::LuaStateMainmenu = L.GetState();
+		BB::CFileSystemMgr::LoadorderTop = (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0];
 		InitGame();
 	}
 

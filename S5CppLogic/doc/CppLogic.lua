@@ -269,7 +269,7 @@ function CppLogic.Logic.GetLoadOrder() end
 --- adds a archive on top of your load order.
 --- @param arch string archive, relative to current dir, so "extra2\\shr\\maps\\user\\map.s5x for a map file
 function CppLogic.Logic.AddArchive(arch) end
---- removes the top archive. may only remove .s5x map archives.
+--- removes the top archive. may only remove archives that you added yourself.
 function CppLogic.Logic.RemoveTopArchive() end
 
 --- color by color index.

@@ -741,7 +741,6 @@ void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 	L.SetTop(t);
 }
 
-BB::IFileSystem* loadordertop = nullptr;
 void CppLogic::ModLoader::ModLoader::Initialize()
 {
 	Framework::AGameModeBase::HookStartMap();
@@ -749,7 +748,6 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	Framework::AGameModeBase::HookRemoveArchive();
 	Framework::AGameModeBase::HookLoadSave();
 	Framework::AGameModeBase::PreLoadSave = &PreSaveLoad;
-	loadordertop = (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0];
 	Initialized = true;
 }
 
@@ -776,7 +774,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		Log(L, "Removing extra archives");
 		BB::CFileSystemMgr* fm = (*BB::CFileSystemMgr::GlobalObj);
-		while (fm->LoadOrder[0] != loadordertop) {
+		while (fm->LoadOrder[0] != BB::CFileSystemMgr::LoadorderTop) {
 			fm->RemoveTopArchive();
 		}
 		Log(L, "Resetting data");

@@ -2235,7 +2235,7 @@ function CppLogic.UI.ShowResourceFloatieOnEntity(entity, amount) end
 
 --- shows a resources gained text at a specific position.
 --- @param pos Position map position
---- @param txt text to show (font is onscreenumberssmall, so not all chars can be displayed)
+--- @param txt string text to show (font is onscreenumberssmall, so not all chars can be displayed)
 function CppLogic.UI.ShowAdvancedFloatie(pos, txt) end
 
 --- char entered callback. use string.char to get the character.
@@ -2570,7 +2570,7 @@ local UACore = {}
 function UACore:AddLeader(id) end
 ---@return Position
 function UACore:GetPos() end
-function UACore:Tick() end
+function UACore:Tick(self) end
 ---@return fun(state:userdata, index:number):number,number
 ---@return userdata
 ---@return number

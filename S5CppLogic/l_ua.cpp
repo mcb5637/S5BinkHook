@@ -18,6 +18,56 @@
 namespace CppLogic::UA {
 	std::vector<UACannonBuilderAbilityData> UnlimitedArmy::CannonBuilderAbilityData = std::vector<UACannonBuilderAbilityData>();
 
+	const BB::SerializationData UACannonData::SerializationData[]{
+		BB::SerializationData::FieldData("EntityId", MemberSerializationFieldData(UACannonData, EntityId)),
+		BB::SerializationData::FieldData("LastUpdated", MemberSerializationFieldData(UACannonData, LastUpdated)),
+		BB::SerializationData::GuardData(),
+	};
+	const BB::SerializationData UACannonBuilderAbilityData::SerializationData[]{
+		BB::SerializationData::FieldData("HeroType", MemberSerializationFieldData(UACannonBuilderAbilityData, HeroType)),
+		BB::SerializationData::FieldData("BottomType", MemberSerializationFieldData(UACannonBuilderAbilityData, BottomType)),
+		BB::SerializationData::FieldData("TopType", MemberSerializationFieldData(UACannonBuilderAbilityData, TopType)),
+		BB::SerializationData::GuardData(),
+	};
+	const BB::SerializationData UATargetCache::SerializationData[]{
+		BB::SerializationData::FieldData("EntityId", MemberSerializationFieldData(UATargetCache, EntityId)),
+		BB::SerializationData::FieldData("Tick", MemberSerializationFieldData(UATargetCache, Tick)),
+		BB::SerializationData::FieldData("Num", MemberSerializationFieldData(UATargetCache, Num)),
+		BB::SerializationData::GuardData(),
+	};
+	const BB::SerializationData UAReset::SerializationData[]{
+		BB::SerializationData::FieldData("EntityId", MemberSerializationFieldData(UAReset, EntityId)),
+		BB::SerializationData::EmbeddedData("Pos", MemberSerializationEmbeddedData(UAReset, Pos)),
+		BB::SerializationData::GuardData(),
+	};
+	CppLogic::SerializationListOptions_ForVector<int> ListOptVectInt{};
+	CppLogic::SerializationListOptions_ForVector<UACannonData> ListOptVectCannondata{};
+	CppLogic::SerializationListOptions_ForVector<UATargetCache> ListOptVectTCache{};
+	CppLogic::SerializationListOptions_ForVector<UAReset> ListOptVectReset{};
+	const BB::SerializationData UnlimitedArmy::SerializationData[]{
+		BB::SerializationData::FieldData("Player", MemberSerializationFieldData(UnlimitedArmy, Player)),
+		BB::SerializationData::FieldData("Leaders", MemberSerializationSizeAndOffset(UnlimitedArmy, Leaders), BB::FieldSerilaizer::TypeInt, &ListOptVectInt),
+		BB::SerializationData::FieldData("LeaderInTransit", MemberSerializationSizeAndOffset(UnlimitedArmy, LeaderInTransit), BB::FieldSerilaizer::TypeInt, &ListOptVectInt),
+		BB::SerializationData::EmbeddedData("Cannons", MemberSerializationSizeAndOffset(UnlimitedArmy, Cannons), UACannonData::SerializationData, &ListOptVectCannondata),
+		BB::SerializationData::FieldData("DeadHeroes", MemberSerializationSizeAndOffset(UnlimitedArmy, DeadHeroes), BB::FieldSerilaizer::TypeInt, &ListOptVectInt),
+		BB::SerializationData::EmbeddedData("TargetCache", MemberSerializationSizeAndOffset(UnlimitedArmy, TargetCache), UATargetCache::SerializationData, &ListOptVectTCache),
+		BB::SerializationData::EmbeddedData("PrepDefenseReset", MemberSerializationSizeAndOffset(UnlimitedArmy, PrepDefenseReset), UAReset::SerializationData, &ListOptVectReset),
+		BB::SerializationData::EmbeddedData("LastPos", MemberSerializationEmbeddedData(UnlimitedArmy, LastPos)),
+		BB::SerializationData::FieldData("PosLastUpdatedTick", MemberSerializationFieldData(UnlimitedArmy, PosLastUpdatedTick)),
+		BB::SerializationData::FieldData("Status", MemberSerializationSizeAndOffset(UnlimitedArmy, Status), BB::FieldSerilaizer::TypeInt),
+		BB::SerializationData::FieldData("Area", MemberSerializationFieldData(UnlimitedArmy, Area)),
+		BB::SerializationData::FieldData("CurrentBattleTarget", MemberSerializationFieldData(UnlimitedArmy, CurrentBattleTarget)),
+		BB::SerializationData::EmbeddedData("Target", MemberSerializationEmbeddedData(UnlimitedArmy, Target)),
+		BB::SerializationData::FieldData("ReMove", MemberSerializationFieldData(UnlimitedArmy, ReMove)),
+		BB::SerializationData::FieldData("IgnoreFleeing", MemberSerializationFieldData(UnlimitedArmy, IgnoreFleeing)),
+		BB::SerializationData::FieldData("PrepDefense", MemberSerializationFieldData(UnlimitedArmy, PrepDefense)),
+		BB::SerializationData::FieldData("SabotageBridges", MemberSerializationFieldData(UnlimitedArmy, SabotageBridges)),
+		BB::SerializationData::FieldData("AutoRotateFormation", MemberSerializationFieldData(UnlimitedArmy, AutoRotateFormation)),
+		BB::SerializationData::FieldData("LastRotation", MemberSerializationFieldData(UnlimitedArmy, LastRotation)),
+		BB::SerializationData::FieldData("RNG", MemberSerializationSizeAndOffset(UnlimitedArmy, RNG), BB::FieldSerilaizer::TypeInt),
+		BB::SerializationData::GuardData(),
+	};
+
 	UnlimitedArmy::~UnlimitedArmy()
 	{
 		L.UnRef(Formation, L.REGISTRYINDEX);
@@ -592,31 +642,35 @@ namespace CppLogic::UA {
 	{
 		int t = L.GetTop();
 		L.Push(Formation, L.REGISTRYINDEX);
+		L.PushValue(2);
 		L.Push(LastRotation);
-		L.TCall(1, 0);
+		L.TCall(2, 0);
 		L.SetTop(t);
 	}
 	void UnlimitedArmy::CallCommandQueue()
 	{
 		int t = L.GetTop();
 		L.Push(CommandQueue, L.REGISTRYINDEX);
-		L.TCall(0, 0);
+		L.PushValue(2);
+		L.TCall(1, 0);
 		L.SetTop(t);
 	}
 	void UnlimitedArmy::CallSpawner()
 	{
 		int t = L.GetTop();
 		L.Push(Spawner, L.REGISTRYINDEX);
-		L.TCall(0, 0);
+		L.PushValue(2);
+		L.TCall(1, 0);
 		L.SetTop(t);
 	}
 	void UnlimitedArmy::NormalizeSpeed(bool normalize, bool force)
 	{
 		int t = L.GetTop();
 		L.Push(Normalize, L.REGISTRYINDEX);
+		L.PushValue(2);
 		L.Push(normalize);
 		L.Push(force);
-		L.TCall(2, 0);
+		L.TCall(3, 0);
 		L.SetTop(t);
 	}
 	std::uniform_int_distribution<int>  distr(-10, 10);
@@ -986,144 +1040,49 @@ namespace CppLogic::UA {
 	{
 		luaext::EState L{ Ls };
 		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
-		L.NewTable();
-		L.Push("Leaders");
-		L.NewTable();
-		int i = 1;
-		for (int l : a->Leaders) {
-			L.Push(l);
-			L.SetTableRaw(-2, i);
-			i++;
-		}
+
+		L.Push(typename_details::type_name<UnlimitedArmy>());
+
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, a, UnlimitedArmy::SerializationData);
+
+		L.Push("Formation");
+		L.Push(a->Formation);
 		L.SetTableRaw(-3);
-		L.Push("LeadersTransit");
-		L.NewTable();
-		i = 1;
-		for (int l : a->LeaderInTransit) {
-			L.Push(l);
-			L.SetTableRaw(-2, i);
-			i++;
-		}
+		L.Push("CommandQueue");
+		L.Push(a->CommandQueue);
 		L.SetTableRaw(-3);
-		L.Push("DeadHeroes");
-		L.NewTable();
-		i = 1;
-		for (int l : a->DeadHeroes) {
-			L.Push(l);
-			L.SetTableRaw(-2, i);
-			i++;
-		}
+		L.Push("Spawner");
+		L.Push(a->Spawner);
 		L.SetTableRaw(-3);
-		L.Push("Player");
-		L.Push(a->Player);
+		L.Push("Normalize");
+		L.Push(a->Normalize);
 		L.SetTableRaw(-3);
-		L.Push("Status");
-		L.Push(static_cast<int>(a->Status));
-		L.SetTableRaw(-3);
-		L.Push("Area");
-		L.Push(a->Area);
-		L.SetTableRaw(-3);
-		L.Push("CurrentBattleTarget");
-		L.Push(a->CurrentBattleTarget);
-		L.SetTableRaw(-3);
-		L.Push("Target");
-		L.PushPos(a->Target);
-		L.SetTableRaw(-3);
-		L.Push("ReMove");
-		L.Push(a->ReMove);
-		L.SetTableRaw(-3);
-		L.Push("IgnoreFleeing");
-		L.Push(a->IgnoreFleeing);
-		L.SetTableRaw(-3);
-		L.Push("AutoRotateFormation");
-		L.Push(a->AutoRotateFormation);
-		L.SetTableRaw(-3);
-		return 1;
+
+		return 2;
 	}
 	int UnlimitedArmy::ReadTable(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
-		L.Push("Leaders");
-		L.GetTableRaw(2);
-		int i = 1;
-		a->Leaders.clear();
-		while (true) {
-			L.GetTableRaw(-1, i);
-			if (!L.IsNumber(-1)) {
-				L.Pop(1);
-				break;
-			}
-			int id = L.CheckInt(-1);
-			a->Leaders.emplace_back(id);
-			if (EGL::CGLEEntity::GetEntityByID(id)->IsEntityInCategory(shok::EntityCategory::Cannon))
-				a->Cannons.push_back({ id, -1 });
-			L.Pop(1);
-			i++;
-		}
+		UnlimitedArmy* a = L.NewUserData<UnlimitedArmy>(0); // player gets deserialized later
+
+		L.PushValue(1);
+		CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, a, UnlimitedArmy::SerializationData);
 		L.Pop(1);
-		L.Push("LeadersTransit");
-		L.GetTableRaw(2);
-		i = 1;
-		a->LeaderInTransit.clear();
-		while (true) {
-			L.GetTableRaw(-1, i);
-			if (!L.IsNumber(-1)) {
-				L.Pop(1);
-				break;
-			}
-			a->LeaderInTransit.emplace_back(L.CheckInt(-1));
-			L.Pop(1);
-			i++;
-		}
-		L.Pop(1);
-		L.Push("DeadHeroes");
-		L.GetTableRaw(2);
-		i = 1;
-		a->DeadHeroes.clear();
-		while (true) {
-			L.GetTableRaw(-1, i);
-			if (!L.IsNumber(-1)) {
-				L.Pop(1);
-				break;
-			}
-			a->DeadHeroes.emplace_back(L.CheckInt(-1));
-			L.Pop(1);
-			i++;
-		}
-		L.Pop(1);
-		L.Push("Player");
-		L.GetTableRaw(2);
-		a->Player = L.CheckInt(-1);
-		L.Pop(1);
-		L.Push("Status");
-		L.GetTableRaw(2);
-		a->Status = static_cast<UAStatus>(L.CheckInt(-1));
-		L.Pop(1);
-		L.Push("Area");
-		L.GetTableRaw(2);
-		a->Area = L.CheckFloat(-1);
-		L.Pop(1);
-		L.Push("CurrentBattleTarget");
-		L.GetTableRaw(2);
-		a->CurrentBattleTarget = L.CheckInt(-1);
-		L.Pop(1);
-		L.Push("Target");
-		L.GetTableRaw(2);
-		a->Target = luaext::EState{ L }.CheckPos(-1);
-		L.Pop(1);
-		L.Push("ReMove");
-		L.GetTableRaw(2);
-		a->ReMove = L.ToBoolean(-1);
-		L.Pop(1);
-		L.Push("IgnoreFleeing");
-		L.GetTableRaw(2);
-		a->IgnoreFleeing = L.ToBoolean(-1);
-		L.Pop(1);
-		L.Push("AutoRotateFormation");
-		L.GetTableRaw(2);
-		a->AutoRotateFormation = L.CheckFloat(-1);
-		L.Pop(1);
-		return 0;
+
+		a->L = L;
+		L.Push("Formation");
+		L.GetTableRaw(1);
+		a->Formation = L.Ref();
+		L.Push("CommandQueue");
+		L.GetTableRaw(1);
+		a->CommandQueue = L.Ref();
+		L.Push("Spawner");
+		L.GetTableRaw(1);
+		a->Spawner = L.Ref();
+		L.Push("Normalize");
+		L.GetTableRaw(1);
+		a->Normalize = L.Ref();
+
+		return 1;
 	}
 
 	int UnlimitedArmy::SetStatus(lua::State L)
@@ -1255,6 +1214,12 @@ namespace CppLogic::UA {
 		return 0;
 	}
 
+	void CppLogic::UA::UnlimitedArmy::RegisterUDType(lua::State L)
+	{
+		L.PrepareUserDataType<UnlimitedArmy>();
+		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[typename_details::type_name<UnlimitedArmy>()] = &lua::CppToCFunction<ReadTable>;
+	}
+
 	constexpr std::array<lua::FuncReference, 4> UA{ {
 			lua::FuncReference::GetRef<New>("New"),
 			lua::FuncReference::GetRef<GetNearestEnemyInArea>("GetNearestEnemyInArea"),
@@ -1266,7 +1231,8 @@ namespace CppLogic::UA {
 	{
 		L.RegisterFuncs(UA, -3);
 
-		L.PrepareUserDataType<UnlimitedArmy>();
+		UnlimitedArmy::RegisterUDType(L);
+		UnlimitedArmy::CannonBuilderAbilityData.clear();
 	}
 }
 // local x,y = GUI.Debug_GetMapPositionUnderMouse(); return CppLogic.UA.GetNearestEnemyInArea(1, x,y, 1000)

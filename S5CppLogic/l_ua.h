@@ -5,6 +5,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_defines.h"
+#include "luaserializer.h"
 
 namespace CppLogic::UA {
 	void Init(lua::State L);
@@ -20,16 +21,24 @@ namespace CppLogic::UA {
 
 	struct UACannonData {
 		int EntityId, LastUpdated;
+
+		static const BB::SerializationData SerializationData[];
 	};
 	struct UACannonBuilderAbilityData {
 		int HeroType, BottomType, TopType;
+
+		static const BB::SerializationData SerializationData[];
 	};
 	struct UATargetCache {
 		int EntityId, Tick, Num;
+
+		static const BB::SerializationData SerializationData[];
 	};
 	struct UAReset {
 		int EntityId = 0;
 		shok::PositionRot Pos;
+
+		static const BB::SerializationData SerializationData[];
 	};
 
 	class UnlimitedArmy {
@@ -57,6 +66,9 @@ namespace CppLogic::UA {
 
 		static std::vector<UACannonBuilderAbilityData> CannonBuilderAbilityData;
 
+		// not serialized references, lua state
+		static const BB::SerializationData SerializationData[];
+
 		UnlimitedArmy(int p);
 		~UnlimitedArmy();
 		void CalculatePos();
@@ -77,6 +89,7 @@ namespace CppLogic::UA {
 		EGL::CGLEEntity* GetFurthestConversionTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
 		static int CountTargetsInArea(int player, shok::Position& p, float ran, bool notFleeing);
 
+		static void RegisterUDType(lua::State L);
 
 
 	private:
@@ -125,7 +138,7 @@ namespace CppLogic::UA {
 		static int SetSabotageBridges(lua::State L);
 
 	public:
-		static constexpr const std::array<lua::FuncReference, 23> LuaMethods = { {
+		static constexpr const std::array<lua::FuncReference, 21> LuaMethods = { {
 				lua::FuncReference::GetRef<AddLeader>("AddLeader"),
 				lua::FuncReference::GetRef<GetPos>("GetPos"),
 				lua::FuncReference::GetRef<Tick>("Tick"),
@@ -138,8 +151,8 @@ namespace CppLogic::UA {
 				lua::FuncReference::GetRef<GetStatus>("GetStatus"),
 				lua::FuncReference::GetRef<SetArea>("SetArea"),
 				lua::FuncReference::GetRef<SetTarget>("SetTarget"),
-				lua::FuncReference::GetRef<DumpTable>("DumpTable"),
-				lua::FuncReference::GetRef<ReadTable>("ReadTable"),
+				//lua::FuncReference::GetRef<DumpTable>("DumpTable"),
+				//lua::FuncReference::GetRef<ReadTable>("ReadTable"),
 				lua::FuncReference::GetRef<SetStatus>("SetStatus"),
 				lua::FuncReference::GetRef<SetReMove>("SetReMove"),
 				lua::FuncReference::GetRef<SetCurrentBattleTarget>("SetCurrentBattleTarget"),
@@ -149,6 +162,10 @@ namespace CppLogic::UA {
 				lua::FuncReference::GetRef<GetFirstDeadHero>("GetFirstDeadHero"),
 				lua::FuncReference::GetRef<SetPrepDefense>("SetPrepDefense"),
 				lua::FuncReference::GetRef<SetSabotageBridges>("SetSabotageBridges"),
+		} };
+
+		static constexpr const std::array<lua::FuncReference, 1> LuaMetaMethods{ {
+				lua::FuncReference::GetRef<DumpTable>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
 		} };
 	};
 }

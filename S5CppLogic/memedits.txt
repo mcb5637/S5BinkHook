@@ -34,6 +34,9 @@ changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C
 0x5750ED gamelogic serialization call to lua serializer jmp
 0x575311 gamelogic deserialization call to lua serializer jmp
 0x5A1E0C luaserializer setnotserializeglobal jmp func replace
+0x7775F8 EGL::CFlyingEffect::OnLoaded vtable override empty func replaced
+0x778E38 GGL::CArrowEffect::OnLoaded vtable override empty func replaced
+0x7776A4 GGL::CCannonBallEffect::OnLoaded vtable override empty func replaced
 
 only without SCELoader
 

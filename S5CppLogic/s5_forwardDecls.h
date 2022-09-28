@@ -55,6 +55,7 @@ namespace EGL {
 	class EffectsDisplayProps;
 	class CGLEAnimProps;
 	class CGLEAnimSet;
+	class CFlyingEffectProps;
 }
 namespace GGL {
 	class CBuilding;
@@ -66,6 +67,8 @@ namespace GGL {
 	class CPlayerStatus;
 	class CResourceDoodad;
 	class CSettler;
+	class CArrowEffectProps;
+	class CCannonBallEffectProps;
 }
 namespace ED {
 	class CBehaviorProps;

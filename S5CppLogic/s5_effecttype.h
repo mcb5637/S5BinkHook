@@ -22,7 +22,7 @@ namespace EGL {
 
 	class CFlyingEffectProps : public CGLEEffectProps {
 	public:
-		float Speed;
+		float Speed; // 9
 		float GravityFactor;
 		float HeightOffsetStart;
 		float HeightOffsetTarget; // 12
@@ -165,7 +165,7 @@ namespace EGL {
 
 
 		static inline constexpr int vtp = 0x7888F8;
-		static inline CGLEEffectsProps* const GlobalObj = reinterpret_cast<CGLEEffectsProps*>(0x895DB4);
+		static inline CGLEEffectsProps** const GlobalObj = reinterpret_cast<CGLEEffectsProps**>(0x895DB4);
 	};
 	class EffectsDisplayProps {
 	public:

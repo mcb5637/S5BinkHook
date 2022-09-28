@@ -30,29 +30,39 @@ namespace EGL {
 		int StartTurn; // 18
 		int Duration;
 		int EffectType; // 20
-		int EffectFlags;
+		int EffectFlags; // 1->has duration
 		int PlayerID;
 		int EffectID; // 23
+		PADDINGI(4); // set of eventhandlers? then bool?
 
 		static inline constexpr int vtp = 0x784B28;
 		static inline constexpr int TypeDesc = 0x822284;
 		static inline constexpr unsigned int Identifier = 0xF8536CED;
 
-		bool IsCannonBallEffect();
-		bool IsArrowEffect();
+		virtual void FromCreator(EGL::CGLEEffectCreator* ct) = 0; // 3
+		virtual void OnCreated() = 0;
+		virtual void OnLoaded() = 0; // 5
+		virtual void OnTick() = 0;
+	private:
+		virtual void fireevent(void* ev) = 0; // not sure about that, does not seem to be called
+		virtual void emptyfunc2() = 0; // 8
 	};
 	static_assert(offsetof(CEffect, StartTurn) == 18 * 4);
 
 	class SSlotArgsFlyingEffect {
 	};
 	class CFlyingEffectSlot : public EGL::TSlot<EGL::SSlotArgsFlyingEffect, 1944101197>, public BB::IObject {
-		int StartTurn;
-		float a; // gravity factor
-		float b;
-		float c;
-		shok::Position StartPosition, TargetPosition, Position, LastPosition;
-		float x; // 6.28 ?
-		float Speed;
+	public:
+		int StartTurn; // in effect 30
+		float GravityFactor; // gravity factor, "a" in seridata
+		float b; // current height?
+		float HeightStart; // , "c" in seridata
+		shok::Position StartPosition; // in effect, 34
+		shok::Position TargetPosition; // in effect, 36
+		shok::Position Position; // in effect, 38
+		shok::Position LastPosition; // in effect, 40
+		float x; // angle rad, flight direction?
+		float Speed; // in effect 43
 
 		virtual void FillSlot(SSlotArgsFlyingEffect* data) override;
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
@@ -65,20 +75,26 @@ namespace EGL {
 
 	class CFlyingEffect : public EGL::CEffect {
 	public:
-		PADDINGI(4);
 		EGL::CFlyingEffectSlot FlyingEffectSlot; // 28
 		shok::Position TargetPosition; // 44 la 45
-		PADDINGI(1);
+		EGL::CFlyingEffectProps* FlyingEffectProps; // 46
 
 		static inline constexpr int vtp = 0x7775E4;
 		static inline constexpr int TypeDesc = 0x8235EC;
 		static inline constexpr unsigned int Identifier = 0x8B5120CD;
+
+		virtual void OnHit() = 0;
+		virtual void CalculateGravityStuff() = 0;
+
+		static void __fastcall FixOnLoad(EGL::CFlyingEffect* th);
+		static void HookOnLoadFix();
 
 		static void HookOnHit();
 		static void (*FlyingEffectOnHitCallback)(EGL::CFlyingEffect* eff);
 		static void (*FlyingEffectOnHitCallback2)(EGL::CFlyingEffect* eff, bool post);
 		static EGL::CFlyingEffect* CurrentHittingEffect;
 	};
+	//constexpr int i = offsetof(CFlyingEffect, FlyingEffectSlot.Speed) / 4;
 }
 
 namespace GGL {
@@ -90,6 +106,9 @@ namespace GGL {
 		byte Misses; // 50
 		PADDING(2);
 		byte AdvancedDamageSourceOverride;
+		GGL::CArrowEffectProps* ArrowEffectProps;
+
+		static void __fastcall FixOnLoad(GGL::CArrowEffect* th);
 
 		static inline constexpr int vtp = 0x778E24;
 		static inline constexpr int TypeDesc = 0x8289CC;
@@ -100,10 +119,12 @@ namespace GGL {
 	public:
 		int AttackerID; // 47
 		int SourcePlayer; // 48
-		void* Props;
+		GGL::CCannonBallEffectProps* CannonBallEffectProps;
 		int DamageAmount; // 50
 		float AoERange;
 		int DamageClass; // 52
+
+		static void __fastcall FixOnLoad(GGL::CCannonBallEffect* th);
 
 		static bool FixDamageClass;
 		static bool AddDamageSourceOverride;

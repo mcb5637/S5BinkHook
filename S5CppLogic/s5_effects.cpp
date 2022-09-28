@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "s5_effects.h"
+#include "s5_effecttype.h"
 #include "hooks.h"
+#include "entityiterator.h"
 
 struct shok_vtable_EGL_CFlyingEffect {
 	PADDINGI(9);
@@ -32,16 +34,6 @@ CProjectileEffectCreator::CProjectileEffectCreator()
 	SetVT(CProjectileEffectCreator::vtp);
 }
 
-bool EGL::CEffect::IsCannonBallEffect()
-{
-	return dynamic_cast<GGL::CCannonBallEffect*>(this);
-}
-
-bool EGL::CEffect::IsArrowEffect()
-{
-	return dynamic_cast<GGL::CArrowEffect*>(this);
-}
-
 void EGL::CFlyingEffectSlot::FillSlot(SSlotArgsFlyingEffect* data)
 {
 	throw 0;
@@ -54,6 +46,40 @@ void* __stdcall EGL::CFlyingEffectSlot::CastToIdentifier(unsigned int id)
 {
 	return nullptr;
 }
+
+void __fastcall EGL::CFlyingEffect::FixOnLoad(EGL::CFlyingEffect* th)
+{
+	auto* pr = (*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[th->EffectType];
+	th->FlyingEffectProps = dynamic_cast<EGL::CFlyingEffectProps*>(pr);
+	th->FlyingEffectSlot.Speed = th->FlyingEffectProps->Speed; // probably gets reset to 0 somewhere, cause it should get serialized
+	th->FlyingEffectSlot.TargetPosition = th->TargetPosition;
+	th->FlyingEffectSlot.LastPosition = th->Position; // not entirely correct, but seems to be better than nothing
+}
+
+void __fastcall GGL::CArrowEffect::FixOnLoad(GGL::CArrowEffect* th)
+{
+	EGL::CFlyingEffect::FixOnLoad(th);
+	th->ArrowEffectProps = dynamic_cast<GGL::CArrowEffectProps*>(th->FlyingEffectProps);
+}
+
+void __fastcall GGL::CCannonBallEffect::FixOnLoad(GGL::CCannonBallEffect* th)
+{
+	EGL::CFlyingEffect::FixOnLoad(th);
+	th->CannonBallEffectProps = dynamic_cast<GGL::CCannonBallEffectProps*>(th->FlyingEffectProps);
+}
+
+void EGL::CFlyingEffect::HookOnLoadFix()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 4, {
+		reinterpret_cast<void*>(0x7775F8),
+		reinterpret_cast<void*>(0x778E38),
+		reinterpret_cast<void*>(0x7776A4),
+	} };
+	*reinterpret_cast<void(__fastcall**)(EGL::CFlyingEffect*)>(0x7775F8) = &CFlyingEffect::FixOnLoad;
+	*reinterpret_cast<void(__fastcall**)(GGL::CArrowEffect*)>(0x778E38) = &GGL::CArrowEffect::FixOnLoad;
+	*reinterpret_cast<void(__fastcall**)(GGL::CCannonBallEffect*)>(0x7776A4) = &GGL::CCannonBallEffect::FixOnLoad;
+}
+
 
 bool GGL::CCannonBallEffect::FixDamageClass = false;
 bool GGL::CCannonBallEffect::AddDamageSourceOverride = false;

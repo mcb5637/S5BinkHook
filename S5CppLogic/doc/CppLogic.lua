@@ -30,6 +30,7 @@ assert(false, "do not load this file, this is documentation only!")
 ---			- metatables
 ---			- function identity does now stay as it is. (so if 2 functions are == before saving + loading, they are also after doing so)
 ---		- please note that savegames made with this change active cannot be loaded without CppLogic. (but you can load old saves, just without any of these features)
+--- - arrow and cannonball effect on loaded fix (they now continue flying and hitting after loading a savegame) (this works even for old saves)
 CppLogic = {}
 CppLogic.Effect = {}
 CppLogic.Memory = {}

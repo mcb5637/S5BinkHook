@@ -258,6 +258,9 @@
     <ClInclude Include="savegame_extra.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="directx.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

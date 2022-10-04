@@ -11,3 +11,9 @@ BB::TResourceProxyResMgr<RWE::RwTexture*>* BBRw::CRwTextures::Get(int id)
 {
     return *crwtextures_getid(this, id);
 }
+
+inline BB::TResourceProxyResMgr<BBRw::CEffect*>** (__thiscall* const ieffects_get)(BBRw::IEffects* th, const char* n, int z) = reinterpret_cast<BB::TResourceProxyResMgr<BBRw::CEffect*>**(__thiscall*)(BBRw::IEffects*, const char*, int)>(0x46B83B);
+BB::TResourceProxyResMgr<BBRw::CEffect*>* BBRw::IEffects::Get(const char* name)
+{
+    return *ieffects_get(this, name, 0);
+}

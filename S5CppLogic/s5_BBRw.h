@@ -3,6 +3,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_RWEngine.h"
+#include "directx.h"
 
 namespace BBRw {
 	class CEffect {
@@ -110,7 +111,7 @@ namespace BBRw {
 
 		static inline constexpr int vtp = 0x76B1E8;
 
-
+		BB::TResourceProxyResMgr<BBRw::CEffect*>* Get(const char* name);
 	};
 
 	class IEngine {
@@ -121,7 +122,9 @@ namespace BBRw {
 	class CEngine : public IEngine {
 	public:
 		static inline constexpr int vtp = 0x76B534;
-		PADDINGI(3);
+		PADDINGI(1);
+		IEffects* Effects;
+		PADDINGI(1);
 		CRwTextures* SelectionTextures; // also shorewave
 	};
 }

@@ -146,3 +146,9 @@ Note: sounds get categorized into groups by comparing the name before `_rnd_`. w
 		the AddSounds function does not compare file names, instead all sounds added in one call form a group (which can be of size 1, to always play that one sound).
 Note2: there is no replace for sounds, as they are loaded every time they get used. just replace the file and the modifed sound will get used.
 Note3: if you use folders to organize sounds, use \\ as path separator in AddSounds. this will get chaged to _ in the Sounds table.
+
+DirectX Effect:
+path: data/graphics/effects/ename.fx and data/graphics/effects/ffp/ename.fx (the file used depends on graphics settings)
+example: as originals
+Note: DirectX Effects are 2 shaders (with some other data) bundled together. you can find old mircosoft docs about them, but they are deprecated in modern DirectX.
+Note2: Yes, confusingly BB created their EGL::CEffect, while ID3DXEffect gets encapsulated into a BBRw::CEffect.

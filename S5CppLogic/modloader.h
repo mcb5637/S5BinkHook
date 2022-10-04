@@ -40,6 +40,7 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> SoundGroupsToRemove;
 		static std::vector<int> AnimSetsToRemove;
 		static std::vector<int> AnimSetsToReload;
+		static std::vector<int> DirectXEffectsToFree;
 
 		static int PreLoadEntityType(lua::State L);
 		static int AddEntityType(lua::State L);
@@ -75,8 +76,9 @@ namespace CppLogic::ModLoader {
 		static int AddSounds(lua::State L);
 		static int AddAnimSet(lua::State L);
 		static int ReloadAnimSet(lua::State L);
+		static int LoadDirectXEffect(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 34> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 35> LuaFuncs{ {
 				lua::FuncReference::GetRef<PreLoadEntityType>("PreLoadEntityType"),
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
@@ -111,6 +113,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<AddSounds>("AddSounds"),
 				lua::FuncReference::GetRef<AddAnimSet>("AddAnimSet"),
 				lua::FuncReference::GetRef<ReloadAnimSet>("ReloadAnimSet"),
+				lua::FuncReference::GetRef<LoadDirectXEffect>("LoadDirectXEffect"),
 		} };
 
 		static constexpr std::array<lua::FuncReference, 3> NoLoaderFuncs{ {

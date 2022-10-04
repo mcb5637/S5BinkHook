@@ -181,6 +181,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="directx.h" />
     <ClInclude Include="dump_guitextures.h" />
     <ClInclude Include="entityiterator.h" />
     <ClInclude Include="enumflags.h" />

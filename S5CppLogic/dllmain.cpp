@@ -84,11 +84,10 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
 	/*int id = L.CheckInt(1);
 	auto* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);*/
-	
-	return 1;
+	return 0;
 }
 
 // hp tech mod add?, construction speed techs?

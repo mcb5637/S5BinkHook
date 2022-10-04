@@ -147,6 +147,7 @@ std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceCla
 std::vector<int> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::AnimSetsToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::AnimSetsToReload{};
+std::vector<int> CppLogic::ModLoader::ModLoader::DirectXEffectsToFree{};
 
 int CppLogic::ModLoader::ModLoader::PreLoadEntityType(lua::State L)
 {
@@ -724,6 +725,18 @@ int CppLogic::ModLoader::ModLoader::ReloadAnimSet(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::LoadDirectXEffect(lua::State L)
+{
+	const char* name = L.CheckString(1);
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
+	if (!mng->IdManager->GetIdByName(name))
+		mng->IdManager->GetIDByNameOrCreate(name);
+	auto* s = mng->Get(name);
+	s->FreeCache();
+	DirectXEffectsToFree.push_back(s->Id);
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -973,6 +986,18 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			mng->LoadAnimSet(id);
 		}
 		AnimSetsToReload.clear();
+
+		if (DirectXEffectsToFree.size() > 0) {
+			for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
+				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(id);
+				// gets reloaded on next use anyway
+			}
+			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
+			for (int id : DirectXEffectsToFree) {
+				mng->Data[id]->FreeCache();
+			}
+			DirectXEffectsToFree.clear();
+		}
 
 		Log(L, "Done");
 	}

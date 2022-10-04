@@ -331,8 +331,15 @@ int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
 	if (mp->ModelIdManager->GetIdByName(t))
 		throw lua::LuaException{ "model already exists" };
 	int id = mp->ModelIdManager->GetIDByNameOrCreate(t);
-	mp->LoadModelDataFromExtraFile(id);
-	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->LoadModel(id);
+	try {
+		mp->LoadModelDataFromExtraFile(id);
+		(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->LoadModel(id);
+	}
+	catch (const BB::CException& e) {
+		char buff[201];
+		e.CopyMessage(buff, 200);
+		throw lua::LuaException{ buff };
+	}
 	ModelsToRemove.push_back(id);
 	L.Push("Models");
 	L.GetGlobal();

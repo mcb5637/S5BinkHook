@@ -2563,7 +2563,7 @@ function CppLogic.ModLoader.AddAnimSet(setname) end
 function CppLogic.ModLoader.ReloadAnimSet(id) end
 
 --- loads or reloads a DirectX effect (shader pair) from a fx file (data/graphics/effects/ename.fx and data/graphics/effects/ffp/ename.fx).
---- the effect gets loaded when first used (so keep your bba/s5x around), and removed when exiting the map.
+--- the effect gets automatically removed when exiting the map.
 --- be careful, the ids of these effects cannot be reused.
 --- @param ename string
 function CppLogic.ModLoader.LoadDirectXEffect(ename) end

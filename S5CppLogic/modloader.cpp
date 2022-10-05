@@ -740,6 +740,7 @@ int CppLogic::ModLoader::ModLoader::LoadDirectXEffect(lua::State L)
 		mng->IdManager->GetIDByNameOrCreate(name);
 	auto* s = mng->Get(name);
 	s->FreeCache();
+	s->Get();
 	DirectXEffectsToFree.push_back(s->Id);
 	return 0;
 }
@@ -1000,10 +1001,15 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 				// gets reloaded on next use anyway
 			}
 			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
-			for (int id : DirectXEffectsToFree) {
+			while (DirectXEffectsToFree.size() > 0) {
+				int id = DirectXEffectsToFree.back();
+				DirectXEffectsToFree.pop_back();
 				mng->Data[id]->FreeCache();
+				if (id + 1 == static_cast<int>(mng->Data.size()))
+					mng->PopId(id);
+				else
+					mng->IdManager->RemoveID(id);
 			}
-			DirectXEffectsToFree.clear();
 		}
 
 		Log(L, "Done");

@@ -6,7 +6,7 @@ CppLogic.API.CreateExtraDataTables()
 ModLoader = {
 	--- if this flag is set, then the s5x archive is kept in the internal filesystem, after the map is loaded.
 	--- this is not required for most ModLoader functionality, but you might want to load something out of it at a later time.
-	--- you need this, if you have sounds or DirectX Effects (shaders) packed in your s5x.
+	--- you need this, if you have sounds packed in your s5x.
 	--- also please set it, if you load another archive (and using a s5x).
 	KeepArchive = false,
 	--- anything in Manifest gest applied by calling ModLoader.ApplyManifest() from ModLoader.Initialize()
@@ -88,7 +88,7 @@ ModLoader = {
 		SoundGroups = {
 
 		},
-		--- DirectX Effects to load. no difference between load and reload (requires keeping the bba/s5x that contains them loaded).
+		--- DirectX Effects to load. no difference between load and reload.
 		DirectXEffects = {
 
 		}

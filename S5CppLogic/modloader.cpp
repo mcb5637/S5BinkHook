@@ -434,6 +434,15 @@ int CppLogic::ModLoader::ModLoader::ReloadAnimation(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::PreLoadUpgradeCategory(lua::State L)
+{
+	const char* t = L.CheckString(1);
+	if ((*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t))
+		throw lua::LuaException{ "upgradecategory already exists" };
+	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
+	L.Push(id);
+	return 1;
+}
 int CppLogic::ModLoader::ModLoader::AddSettlerUpgradeCategory(lua::State l)
 {
 	luaext::EState L{ l };
@@ -441,9 +450,10 @@ int CppLogic::ModLoader::ModLoader::AddSettlerUpgradeCategory(lua::State l)
 	auto* sty = L.CheckEntityType(2);
 	if (!sty->IsSettlerType())
 		throw lua::LuaException{ "not a settler type" };
-	if ((*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t) != 0)
+	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t);
+	if (id != 0 && id < static_cast<int>((*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.size()))
 		throw lua::LuaException{ "upgrade categoty already exists" };
-	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
+	id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
 	int first = L.CheckInt(2);
 	{
 		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
@@ -476,9 +486,10 @@ int CppLogic::ModLoader::ModLoader::AddBuildingUpgradeCategory(lua::State l)
 	auto* sty = L.CheckEntityType(2);
 	if (!sty->IsBuildingType())
 		throw lua::LuaException{ "not a building type" };
-	if ((*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t) != 0)
+	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t);
+	if (id != 0 && id < static_cast<int>((*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.size()))
 		throw lua::LuaException{ "upgrade categoty already exists" };
-	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
+	id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
 	int first = L.CheckInt(2);
 	{
 		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();

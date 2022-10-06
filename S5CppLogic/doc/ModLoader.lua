@@ -99,7 +99,7 @@ ModLoader = {
 -- called on both map start and save load.
 -- this is the place to modify something like EntityTypes, as all entities get created after this method,
 -- so even changing behaviors completely works without problems.
--- it is recommended, that you edit data required by others first. so as an example, first add an model, and after that the entitytytpe requiring it.
+-- it is recommended, that you edit data required by others first. so as an example, first add a model, and after that the entitytytpe requiring it (Manifest does that for you).
 function ModLoader.Initialize()
 	--- applying everything in Manifest
 	ModLoader.ApplyManifest()
@@ -123,6 +123,12 @@ function ModLoader.ApplyManifest()
 	ModLoader.PreloadManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.PreLoadTaskList, TaskLists)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.PreLoadEntityType, Entities)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.PreLoadTechnology, Technologies)
+	for uc, et in pairs(ModLoader.Manifest.SettlerUpgradeCategory) do
+		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
+	end
+	for uc, et in pairs(ModLoader.Manifest.BuildingUpgradeCategory) do
+		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
+	end
 
 	for _,n in ipairs(ModLoader.Manifest.DirectXEffects) do
 		CppLogic.ModLoader.LoadDirectXEffect(n)

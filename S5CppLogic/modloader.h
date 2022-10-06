@@ -61,6 +61,7 @@ namespace CppLogic::ModLoader {
 		static int ReloadGUITexture(lua::State L);
 		static int AddAnimation(lua::State L);
 		static int ReloadAnimation(lua::State L);
+		static int PreLoadUpgradeCategory(lua::State L);
 		static int AddSettlerUpgradeCategory(lua::State L);
 		static int AddBuildingUpgradeCategory(lua::State L);
 		static int AddWaterType(lua::State L);
@@ -78,7 +79,7 @@ namespace CppLogic::ModLoader {
 		static int ReloadAnimSet(lua::State L);
 		static int LoadDirectXEffect(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 35> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 36> LuaFuncs{ {
 				lua::FuncReference::GetRef<PreLoadEntityType>("PreLoadEntityType"),
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
@@ -98,6 +99,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReloadGUITexture>("ReloadGUITexture"),
 				lua::FuncReference::GetRef<AddAnimation>("AddAnimation"),
 				lua::FuncReference::GetRef<ReloadAnimation>("ReloadAnimation"),
+				lua::FuncReference::GetRef<PreLoadUpgradeCategory>("PreLoadUpgradeCategory"),
 				lua::FuncReference::GetRef<AddSettlerUpgradeCategory>("AddSettlerUpgradeCategory"),
 				lua::FuncReference::GetRef<AddBuildingUpgradeCategory>("AddBuildingUpgradeCategory"),
 				lua::FuncReference::GetRef<AddWaterType>("AddWaterType"),

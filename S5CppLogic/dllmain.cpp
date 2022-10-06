@@ -85,9 +85,15 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
-	/*int id = L.CheckInt(1);
-	auto* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);*/
-	return 0;
+	auto* v = EGL::EntityCategoryCache::GlobalObj->GetEntitiyTypeWithCategory(static_cast<shok::EntityCategory>(L.CheckInt(1)));
+	L.NewTable();
+	int i = 1;
+	for (int t : *v) {
+		L.Push(t);
+		L.SetTableRaw(-2, i);
+		++i;
+	}
+	return 1;
 }
 
 // hp tech mod add?, construction speed techs?

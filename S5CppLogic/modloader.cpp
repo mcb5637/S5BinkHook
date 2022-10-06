@@ -756,6 +756,12 @@ int CppLogic::ModLoader::ModLoader::LoadDirectXEffect(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::RefreshEntityCategoryCache(lua::State L)
+{
+	EGL::EntityCategoryCache::RefreshCache(*EGL::CGLEEntitiesProps::GlobalObj);
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);

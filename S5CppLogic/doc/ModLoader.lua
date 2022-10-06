@@ -105,6 +105,10 @@ function ModLoader.Initialize()
 	ModLoader.ApplyManifest()
 
 	--- manual code should go here
+
+
+	--- refresh caches
+	CppLogic.ModLoader.RefreshEntityCategoryCache()
 end
 
 --- this function gets called after Initialize, only if the map starts fresh.

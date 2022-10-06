@@ -78,8 +78,9 @@ namespace CppLogic::ModLoader {
 		static int AddAnimSet(lua::State L);
 		static int ReloadAnimSet(lua::State L);
 		static int LoadDirectXEffect(lua::State L);
+		static int RefreshEntityCategoryCache(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 36> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 37> LuaFuncs{ {
 				lua::FuncReference::GetRef<PreLoadEntityType>("PreLoadEntityType"),
 				lua::FuncReference::GetRef<AddEntityType>("AddEntityType"),
 				lua::FuncReference::GetRef<ReloadEntityType>("ReloadEntityType"),
@@ -116,12 +117,14 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<AddAnimSet>("AddAnimSet"),
 				lua::FuncReference::GetRef<ReloadAnimSet>("ReloadAnimSet"),
 				lua::FuncReference::GetRef<LoadDirectXEffect>("LoadDirectXEffect"),
+				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 		} };
 
-		static constexpr std::array<lua::FuncReference, 3> NoLoaderFuncs{ {
+		static constexpr std::array<lua::FuncReference, 4> NoLoaderFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
 				lua::FuncReference::GetRef<AddGUITexture>("AddGUITexture"),
 				lua::FuncReference::GetRef<ReloadGUITexture>("ReloadGUITexture"),
+				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 		} };
 
 	public:

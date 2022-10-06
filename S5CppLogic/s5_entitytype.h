@@ -291,6 +291,15 @@ namespace EGL {
 
 		// init blocking for everything but the last: 5846BE
 	};
+
+	class EntityCategoryCache {
+	public:
+		shok::Map<shok::EntityCategory, shok::Vector<int>> CategoryToEntityTypes;
+
+		static inline EntityCategoryCache* const GlobalObj = reinterpret_cast<EntityCategoryCache*>(0x8975A4);
+		static inline void(__cdecl* const RefreshCache)(CGLEEntitiesProps* props) = reinterpret_cast<void(__cdecl*)(CGLEEntitiesProps*)>(0x5770CA);
+		static inline shok::Vector<int>* (__cdecl* const GetEntitiyTypeWithCategory)(shok::EntityCategory cat) = reinterpret_cast<shok::Vector<int>*(__cdecl*)(shok::EntityCategory)>(0x5765A8);
+	};
 }
 
 namespace ED {

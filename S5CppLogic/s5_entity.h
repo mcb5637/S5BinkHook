@@ -580,7 +580,7 @@ namespace GGL {
 		bool HQAlarmActive;
 		PADDING(3);
 		int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn; // 72
-		float BuildingHeight, Helathbar, UpgradeProgress; //la78
+		float BuildingHeight, Healthbar, UpgradeProgress; //la78
 		PADDINGI(2);// list Slots with NumberOfRepairingSerfs?
 		int NumberOfRepairingSerfs;
 		int OvertimeCooldown;

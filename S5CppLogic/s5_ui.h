@@ -399,7 +399,7 @@ namespace GGL {
 			float LeaderCurrentSoldierAmount = 0;
 			float LeaderMaxSoldierAmount = 0;
 			float HealthBar = 0;
-			float BuildingProgressNumber = 0; // 15 upgrade and research
+			float BuildingProgressNumber = 0; // 15 upgrade, research, market trade
 			int LeaderExperienceLevels = 0;//float?
 			int EntityId = 0;
 			float WorkerMotivation = 0;
@@ -422,7 +422,7 @@ namespace GGL {
 			int MaxNumberOfSerfsAttachedToConstructionSite = 0;
 			int FarmNumberOfEaters = 0; // 55
 			int FarmMaxNumberOfEaters = 0;
-			float BuildingProgressBar = 0; // bridge progress, building height, market trade
+			float BuildingProgressBar = 0; // bridge progress, building height
 			bool IsMercenaryBuilding = false;
 		};
 

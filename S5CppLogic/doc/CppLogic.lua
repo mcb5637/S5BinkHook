@@ -952,7 +952,7 @@ function CppLogic.Entity.SetAutoAttackMaxRange(id, ran) end
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
---- @param n number ("" disable)
+--- @param n string ("" disable)
 function CppLogic.Entity.SetDisplayName(id, n) end
 --- gets the display name of an entity.
 --- @param id entity

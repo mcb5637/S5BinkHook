@@ -83,16 +83,9 @@ CppLogicOptions Options{};
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0x8989F8));
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
-	auto* v = EGL::EntityCategoryCache::GlobalObj->GetEntitiyTypeWithCategory(static_cast<shok::EntityCategory>(L.CheckInt(1)));
-	L.NewTable();
-	int i = 1;
-	for (int t : *v) {
-		L.Push(t);
-		L.SetTableRaw(-2, i);
-		++i;
-	}
+	
 	return 1;
 }
 

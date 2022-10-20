@@ -24,6 +24,8 @@ namespace ECS {
 	// c manager
 	class CManager : public ICutsceneManager { 
 	public:
+		// map string->cutscene
+
 		static inline constexpr int vtp = 0x7860B4;
 
 		static inline ECS::CManager*** const GlobalObj = reinterpret_cast<ECS::CManager***>(0xA0344C);

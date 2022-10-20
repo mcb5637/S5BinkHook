@@ -150,6 +150,7 @@ void InitGame() {
 	EGL::CFlyingEffect::HookOnLoadFix();
 	if (!Options.DisableAdvLuaSerializer)
 		EScr::LuaStateSerializer::HookSerializationOverride();
+	EScr::CScriptTriggerSystem::HookFireEvent();
 }
 
 constexpr double Version = 1.4000;

@@ -2,6 +2,7 @@
 #include "s5_scriptsystem.h"
 #include <format>
 #include "s5_exception.h"
+#include "s5_events.h"
 #include "hooks.h"
 #include "luaserializer.h"
 
@@ -42,6 +43,53 @@ void EScr::CScriptTriggerSystem::DisableTrigger(unsigned int id)
 	CScriptTrigger* t = i->second;
 	scripttriggersys_removefromactive(this, t->EventType, t);
 	t->Switch = false;
+}
+
+void __stdcall ScriptTriggerSys_FireEventHooked(BB::IPostEvent* th, BB::CEvent* ev) {
+	auto* t = static_cast<EScr::CScriptTriggerSystem*>(th);
+	BB::CEvent* oldget = *EScr::CScriptTriggerSystem::CurrentRunningEventGet;
+	BB::CEvent* oldset = *EScr::CScriptTriggerSystem::CurrentRunningEventSet;
+
+	if (!t->TriggerSystemDisabled) {
+		auto vec = t->ActiveTrigger.find(static_cast<shok::EventIDs>(ev->EventTypeId));
+		if (vec != t->ActiveTrigger.end()) {
+			for (auto* tr : vec->second) {
+				if (!tr->Switch)
+					continue;
+				if (tr->MarkedForUnrequest)
+					continue;
+				*EScr::CScriptTriggerSystem::CurrentRunningEventGet = ev;
+				*EScr::CScriptTriggerSystem::CurrentRunningEventSet = ev;
+				if (!tr->ConditionFunc.CheckRef() || tr->CallCondition()) {
+					*EScr::CScriptTriggerSystem::CurrentRunningEventGet = ev;
+					*EScr::CScriptTriggerSystem::CurrentRunningEventSet = ev;
+					tr->MarkedForUnrequest = tr->CallAction();
+				}
+			}
+
+			auto v = vec->second.SaveVector();
+			auto it = v.Vector.begin();
+			while (it != v.Vector.end()) {
+				auto* tr = *it;
+				if (tr->MarkedForUnrequest) {
+					// i could use BB funcs here, but why bother when this works
+					t->Trigger.erase(t->Trigger.find(tr->UniqueID.UniqueID)); // 0x59FCFD
+					it = v.Vector.erase(it); // 0x44803A
+					delete tr;
+				}
+				else
+					++it;
+			}
+		}
+	}
+
+	*EScr::CScriptTriggerSystem::CurrentRunningEventGet = oldget;
+	*EScr::CScriptTriggerSystem::CurrentRunningEventSet = oldset;
+}
+void EScr::CScriptTriggerSystem::HookFireEvent()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x786674), 4 };
+	*reinterpret_cast<void(__stdcall**)(BB::IPostEvent*, BB::CEvent*)>(0x786674) = &ScriptTriggerSys_FireEventHooked;;
 }
 
 void __stdcall overrideluafunc_empty(lua_State* L, const char* name, lua::CFunction f) {

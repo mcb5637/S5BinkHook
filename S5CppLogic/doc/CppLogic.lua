@@ -1583,8 +1583,8 @@ function CppLogic.EntityType.SetAutoAttackRange(ty, maxrange, minrange) end
 function CppLogic.EntityType.GetArmor(ty) end
 --- settler or building type armor and armorclass.
 --- @param ty number entitytype
---- @param ar number armor
---- @param acl number armorclass
+--- @param ar number|nil armor
+--- @param acl number|nil armorclass
 function CppLogic.EntityType.SetArmor(ty, ar, acl) end
 
 --- settler or building type armor modifier techs.
@@ -1659,6 +1659,23 @@ function CppLogic.EntityType.SetBattleWaitUntil(ty, bwu) end
 --- @param ty number entitytype
 --- @return boolean|nil
 function CppLogic.EntityType.IsConvertible(ty) end
+
+--- checks for a building type.
+--- @param ty number entitytype
+--- @return boolean
+function CppLogic.EntityType.IsBuildingType(ty) end
+--- checks for a settler type.
+--- @param ty number entitytype
+--- @return boolean
+function CppLogic.EntityType.IsSettlerType(ty) end
+--- checks for a leader type.
+--- @param ty number entitytype
+--- @return boolean
+function CppLogic.EntityType.IsLeaderType(ty) end
+--- checks for a soldier type.
+--- @param ty number entitytype
+--- @return boolean
+function CppLogic.EntityType.IsSoldierType(ty) end
 
 --- the soldier type of a leader type
 --- @param ty number leader type

@@ -899,7 +899,32 @@ namespace CppLogic::EntityType {
 		return 0;
 	}
 
-	constexpr std::array<lua::FuncReference, 31> EntityType{ {
+	int IsBuildingType(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.Push(static_cast<bool>(dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)));
+		return 1;
+	}
+	int IsSettlerType(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.Push(static_cast<bool>(dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)));
+		return 1;
+	}
+	int IsLeaderType(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.Push(static_cast<bool>(t->GetBehaviorProps<GGL::CLeaderBehaviorProps>()));
+		return 1;
+	}
+	int IsSoldierType(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		L.Push(static_cast<bool>(t->GetBehaviorProps<GGL::CSoldierBehaviorProps>()));
+		return 1;
+	}
+
+	constexpr std::array<lua::FuncReference, 35> EntityType{ {
 			lua::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
 			lua::FuncReference::GetRef<SetLimitedLifespanDuration>("SetLimitedLifespanDuration"),
 			lua::FuncReference::GetRef<GetMaxHealth>("GetMaxHealth"),
@@ -931,6 +956,10 @@ namespace CppLogic::EntityType {
 			lua::FuncReference::GetRef<GetBattleWaitUntil>("GetBattleWaitUntil"),
 			lua::FuncReference::GetRef<SetBattleWaitUntil>("SetBattleWaitUntil"),
 			lua::FuncReference::GetRef<IsConvertible>("IsConvertible"),
+			lua::FuncReference::GetRef<IsBuildingType>("IsBuildingType"),
+			lua::FuncReference::GetRef<IsSettlerType>("IsSettlerType"),
+			lua::FuncReference::GetRef<IsLeaderType>("IsLeaderType"),
+			lua::FuncReference::GetRef<IsSoldierType>("IsSoldierType"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 29> Settler{ {

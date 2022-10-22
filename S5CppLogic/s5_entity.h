@@ -230,6 +230,8 @@ namespace EGL {
 
 		void PerformHeal(int hp, bool healSoldiers);
 		bool CheckDodge(); // rolls random, returns if dodge successful
+		bool IsInBlocking() const;
+		bool IsDead() const;
 
 		void Destroy();
 

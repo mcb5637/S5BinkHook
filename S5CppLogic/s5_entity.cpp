@@ -482,6 +482,17 @@ bool EGL::CGLEEntity::CheckDodge()
 	return !entity_checkdodge(this); // returns dodge failed
 }
 
+inline bool(__thiscall* const entity_isinblocking)(const EGL::CGLEEntity* th) = reinterpret_cast<bool(__thiscall*)(const EGL::CGLEEntity*)>(0x57ACF5);
+bool EGL::CGLEEntity::IsInBlocking() const
+{
+	return entity_isinblocking(this);
+}
+
+bool EGL::CGLEEntity::IsDead() const
+{
+	return Health <= 0 || IsInBlocking();
+}
+
 void EGL::CGLEEntity::ClearAttackers()
 {
 	std::vector<GGL::CSettler*> tomove = std::vector<GGL::CSettler*>();

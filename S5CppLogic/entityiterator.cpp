@@ -175,7 +175,7 @@ bool CppLogic::Iterator::EntityPredicateIsVisible::Matches(const EGL::CGLEEntity
 }
 bool CppLogic::Iterator::EntityPredicateIsAlive::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return !EGL::CGLEEntity::EntityIDIsDead(e->EntityId); // performance improvement by not doing obj -> id ->obj ?
+	return !e->IsDead();
 }
 bool CppLogic::Iterator::EntityPredicateIsNotInBuilding::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {

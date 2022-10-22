@@ -85,7 +85,14 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
-	
+	auto* e = L.CheckEntity(1);
+	L.NewTable();
+	int i = 1;
+	for (const auto& s : e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER)) {
+		L.Push(s.second.EntityId);
+		L.SetTableRaw(-2, i);
+		++i;
+	}
 	return 1;
 }
 

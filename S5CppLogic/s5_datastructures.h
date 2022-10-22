@@ -595,6 +595,29 @@ namespace shok {
 			std::pair<K, V> i{ key, val };
 			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::insert(std::move(i));
 		}
+
+		class IterateOverValues {
+			friend class MultiMap;
+			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter b, e;
+			IterateOverValues(Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter begin,
+				Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter end) : 
+				b(std::move(begin)),
+				e(std::move(end))
+			{
+			}
+		public:
+			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter begin() {
+				return b;
+			}
+			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter end() {
+				return e;
+			}
+		};
+
+		IterateOverValues ForKeys(const K& k)
+		{
+			return IterateOverValues{ Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::lower_bound(k), Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::upper_bound(k) };
+		}
 	};
 	static_assert(sizeof(MultiMap<int, int>) == 3 * 4);
 

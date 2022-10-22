@@ -57,8 +57,9 @@ namespace CppLogic::UA {
 		int CurrentBattleTarget = 0;
 		shok::Position Target = { -1,-1 };
 		bool ReMove = false, IgnoreFleeing = false, PrepDefense = false, SabotageBridges = false;
+		bool DoNotNormalizeSpeed = false;
 		lua::State L = nullptr;
-		lua::Reference Formation = lua::State::NoRef, CommandQueue = lua::State::NoRef, Spawner = lua::State::NoRef, Normalize = lua::State::NoRef;
+		lua::Reference Formation = lua::State::NoRef, CommandQueue = lua::State::NoRef, Spawner = lua::State::NoRef;
 		float AutoRotateFormation = -1;
 		float LastRotation = 0;
 
@@ -136,9 +137,10 @@ namespace CppLogic::UA {
 		static int GetFirstDeadHero(lua::State L);
 		static int SetPrepDefense(lua::State L);
 		static int SetSabotageBridges(lua::State L);
+		static int SetDoNotNormalizeSpeed(lua::State L);
 
 	public:
-		static constexpr const std::array<lua::FuncReference, 21> LuaMethods = { {
+		static constexpr const std::array<lua::FuncReference, 22> LuaMethods = { {
 				lua::FuncReference::GetRef<AddLeader>("AddLeader"),
 				lua::FuncReference::GetRef<GetPos>("GetPos"),
 				lua::FuncReference::GetRef<Tick>("Tick"),
@@ -162,6 +164,7 @@ namespace CppLogic::UA {
 				lua::FuncReference::GetRef<GetFirstDeadHero>("GetFirstDeadHero"),
 				lua::FuncReference::GetRef<SetPrepDefense>("SetPrepDefense"),
 				lua::FuncReference::GetRef<SetSabotageBridges>("SetSabotageBridges"),
+				lua::FuncReference::GetRef<SetDoNotNormalizeSpeed>("SetDoNotNormalizeSpeed"),
 		} };
 
 		static constexpr const std::array<lua::FuncReference, 1> LuaMetaMethods{ {

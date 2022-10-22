@@ -2625,12 +2625,13 @@ function UACore:SetAutoRotateFormation(ar) end
 function UACore:GetFirstDeadHero() end
 function UACore:SetPrepDefense(p) end
 function UACore:SetSabotageBridges(s) end
+function UACore:SetDoNotNormalizeSpeed(n) end
 
 
 --- creates new ua.
 --- @param pl number player
 --- @return UACore ua
-function CppLogic.UA.New(pl, format, commandqueue, spawner, normalize, seed) end
+function CppLogic.UA.New(pl, format, commandqueue, spawner, seed) end
 
 --- gets next enemy in area.
 function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area, ignoreFleeing) end

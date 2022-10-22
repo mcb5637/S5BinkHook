@@ -62,6 +62,7 @@ namespace CppLogic::UA {
 		BB::SerializationData::FieldData("IgnoreFleeing", MemberSerializationFieldData(UnlimitedArmy, IgnoreFleeing)),
 		BB::SerializationData::FieldData("PrepDefense", MemberSerializationFieldData(UnlimitedArmy, PrepDefense)),
 		BB::SerializationData::FieldData("SabotageBridges", MemberSerializationFieldData(UnlimitedArmy, SabotageBridges)),
+		BB::SerializationData::FieldData("DoNotNormalizeSpeed", MemberSerializationFieldData(UnlimitedArmy, DoNotNormalizeSpeed)),
 		BB::SerializationData::FieldData("AutoRotateFormation", MemberSerializationFieldData(UnlimitedArmy, AutoRotateFormation)),
 		BB::SerializationData::FieldData("LastRotation", MemberSerializationFieldData(UnlimitedArmy, LastRotation)),
 		BB::SerializationData::FieldData("RNG", MemberSerializationSizeAndOffset(UnlimitedArmy, RNG), BB::FieldSerilaizer::TypeInt),
@@ -73,7 +74,6 @@ namespace CppLogic::UA {
 		L.UnRef(Formation, L.REGISTRYINDEX);
 		L.UnRef(CommandQueue, L.REGISTRYINDEX);
 		L.UnRef(Spawner, L.REGISTRYINDEX);
-		L.UnRef(Normalize, L.REGISTRYINDEX);
 	}
 	UnlimitedArmy::UnlimitedArmy(int p)
 	{
@@ -665,13 +665,41 @@ namespace CppLogic::UA {
 	}
 	void UnlimitedArmy::NormalizeSpeed(bool normalize, bool force)
 	{
-		int t = L.GetTop();
-		L.Push(Normalize, L.REGISTRYINDEX);
-		L.PushValue(2);
-		L.Push(normalize);
-		L.Push(force);
-		L.TCall(3, 0);
-		L.SetTop(t);
+		if (DoNotNormalizeSpeed && !force)
+			return;
+		if (normalize && !DoNotNormalizeSpeed) {
+			float lowest = -1.0f;
+			for (int id : Leaders) {
+				EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
+				float s = e->GetBehavior<GGL::CBehaviorDefaultMovement>()->GetMovementSpeed();
+				if (lowest < 0 || s < lowest)
+					lowest = s;
+			}
+			EGL::CEventValue_Float ev{ shok::EventIDs::Movement_SetSpeedFactor, 1.0f };
+			for (int id : Leaders) {
+				EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
+				float s = e->GetBehavior<GGL::CBehaviorDefaultMovement>()->GetMovementSpeed();
+				ev.Data = lowest / s;
+				e->FireEvent(&ev);
+				for (const auto& s : e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER)) {
+					EGL::CGLEEntity* es = EGL::CGLEEntity::GetEntityByID(s.second.EntityId);
+					if (es && !es->IsDead())
+						es->FireEvent(&ev);
+				}
+			}
+		}
+		else {
+			EGL::CEventValue_Float ev{ shok::EventIDs::Movement_SetSpeedFactor, 1.0f };
+			for (int id : Leaders) {
+				EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
+				e->FireEvent(&ev);
+				for (const auto& s : e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER)) {
+					EGL::CGLEEntity* es = EGL::CGLEEntity::GetEntityByID(s.second.EntityId);
+					if (es && !es->IsDead())
+						es->FireEvent(&ev);
+				}
+			}
+		}
 	}
 	std::uniform_int_distribution<int>  distr(-10, 10);
 	bool UnlimitedArmy::ExecuteHeroAbility(EGL::CGLEEntity* e)
@@ -1054,9 +1082,6 @@ namespace CppLogic::UA {
 		L.Push("Spawner");
 		L.Push(a->Spawner);
 		L.SetTableRaw(-3);
-		L.Push("Normalize");
-		L.Push(a->Normalize);
-		L.SetTableRaw(-3);
 
 		return 2;
 	}
@@ -1078,9 +1103,6 @@ namespace CppLogic::UA {
 		L.Push("Spawner");
 		L.GetTableRaw(1);
 		a->Spawner = L.Ref();
-		L.Push("Normalize");
-		L.GetTableRaw(1);
-		a->Normalize = L.Ref();
 
 		return 1;
 	}
@@ -1165,13 +1187,18 @@ namespace CppLogic::UA {
 		a->SabotageBridges = L.ToBoolean(2);
 		return 0;
 	}
+	int CppLogic::UA::UnlimitedArmy::SetDoNotNormalizeSpeed(lua::State L)
+	{
+		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		a->DoNotNormalizeSpeed = L.ToBoolean(2);
+		return 0;
+	}
 
 	int New(lua::State L) {
 		int pl = L.CheckInt(1);
 		L.CheckType(2, lua::LType::Function);
 		L.CheckType(3, lua::LType::Function);
 		L.CheckType(4, lua::LType::Function);
-		L.CheckType(5, lua::LType::Function);
 		UnlimitedArmy* a = L.NewUserData<UnlimitedArmy>(pl);
 		a->L = L;
 		L.PushValue(2);
@@ -1180,9 +1207,7 @@ namespace CppLogic::UA {
 		a->CommandQueue = L.Ref(L.REGISTRYINDEX);
 		L.PushValue(4);
 		a->Spawner = L.Ref(L.REGISTRYINDEX);
-		L.PushValue(5);
-		a->Normalize = L.Ref(L.REGISTRYINDEX);
-		a->RNG.seed(L.CheckInt(6));
+		a->RNG.seed(L.CheckInt(5));
 		return 1;
 	}
 

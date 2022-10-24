@@ -56,7 +56,7 @@ CppLogic.UA = {}
 CppLogic.ModLoader = {}
 
 --- CppLogic version number.
-CppLogic.Version = 1.4000
+CppLogic.Version = 2.0000
 
 --- no longer needed.
 function CppLogic.OnLeaveMap() end

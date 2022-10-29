@@ -80,19 +80,26 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
+class base1 {
+public:
+	virtual ~base1() = default;
+
+	virtual int foo() { return 0; }
+};
+
+class derived : public base1, BB::IPostEvent {
+public:
+	virtual void __stdcall PostEvent(BB::CEvent* ev) override {};
+	virtual int foo() override { return 1; }
+};
+
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
-	auto* e = L.CheckEntity(1);
-	L.NewTable();
-	int i = 1;
-	for (const auto& s : e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER)) {
-		L.Push(s.second.EntityId);
-		L.SetTableRaw(-2, i);
-		++i;
-	}
+	auto* a = (*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[L.CheckInt(1)];
+	CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, a);
 	return 1;
 }
 

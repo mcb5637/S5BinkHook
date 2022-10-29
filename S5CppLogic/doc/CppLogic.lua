@@ -252,7 +252,6 @@ function CppLogic.Logic.EnableMaxHPTechMod() end
 --- requires activated CppLogic.Logic.EnableAllHurtEntityTrigger.
 --- - CppLogic.Logic.FixSnipeDamage is required for damage source AbilitySnipe.
 --- - cannonball damage source override requires CppLogic.Combat.EnableAoEProjectileFix().
---- - salims trap shows up as unknown (todo?)
 --- does not work with SCELoader.
 --- @return number dmg
 --- @return number damageSource

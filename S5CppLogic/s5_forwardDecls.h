@@ -69,6 +69,7 @@ namespace GGL {
 	class CSettler;
 	class CArrowEffectProps;
 	class CCannonBallEffectProps;
+	class CAutoCannonBehaviorProps;
 }
 namespace ED {
 	class CBehaviorProps;

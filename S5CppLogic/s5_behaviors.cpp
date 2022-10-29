@@ -6,7 +6,11 @@
 #include "s5_effects.h"
 #include "s5_maplogic.h"
 #include "s5_defines.h"
+#include "s5_entityandeffectmanager.h"
+#include "s5_events.h"
+#include "s5_tasklist.h"
 #include "hooks.h"
+#include "s5_effecttype.h"
 
 void EGL::CGLEBehavior::unknownFuncBeh1(EGL::CGLEEntity* e)
 {
@@ -224,6 +228,79 @@ static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(GGL::CAutoC
 float GGL::CAutoCannonBehavior::GetMaxRange()
 {
 	return autocannonBehaviorGetMaxRange(this);
+}
+
+int GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETaskArgs* a)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* base = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::TOP_ENTITY_FOUNDATION));
+	if (base == nullptr || e->Health == 0 || base->Health == 0) {
+		e->Hurt(e->Health);
+		return 1;
+	}
+	auto* tar = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_TARGET));
+	if (tar == nullptr)
+		return 0;
+	auto* p = ACProps;
+	if (p->CannonBallEffectType) {
+		CProjectileEffectCreator ct{};
+		ct.EffectType = p->CannonBallEffectType;
+		ct.PlayerID = e->PlayerId;
+		ct.CurrentPos = ct.StartPos = e->Position;
+		ct.TargetPos = tar->Position;
+		ct.AttackerID = e->EntityId;
+		ct.TargetID = tar->EntityId;
+
+		if (!dynamic_cast<GGL::CArrowEffectProps*>((*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[p->CannonBallEffectType])) {
+			ct.Damage = p->DamageAmount;
+			ct.DamageRadius = p->DamageRange;
+			ct.DamageClass = p->DamageClass;
+			ct.SourcePlayer = e->PlayerId;
+		}
+		else {
+			EGL::CEventGetValue_Int getac{ shok::EventIDs::GetArmorClass };
+			tar->FireEvent(&getac);
+			EGL::CEventGetValue_Int geta{ shok::EventIDs::GetArmor };
+			tar->FireEvent(&geta);
+
+			float dmg = static_cast<float>(p->DamageAmount);
+			if (p->DamageClass > 0 && p->DamageClass < static_cast<int>((*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size()))
+				dmg *= (*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[p->DamageClass]->GetBonusVsArmorClass(getac.Data);
+			dmg -= geta.Data;
+
+			if (dmg < 1)
+				dmg = 1;
+
+			ct.Damage = static_cast<int>(dmg);
+		}
+
+		(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ct);
+	}
+	else {
+		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, p->DamageRange, p->DamageAmount, e->PlayerId, p->DamageClass, true, true, true, shok::AdvancedDealDamageSource::Cannonball);
+		if (p->ImpactEffectType != 0) {
+			EGL::CGLEEffectCreator ct{};
+			ct.EffectType = p->ImpactEffectType;
+			ct.StartPos = e->Position;
+			ct.PlayerID = e->PlayerId;
+			(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ct);
+		}
+	}
+	if (p->NumberOfShots > 0) {
+		--ShotsLeft;
+		if (ShotsLeft == 0) {
+			e->Hurt(e->Health);
+			e->EntityState = 0x10003;
+			if (p->SelfDestructTaskList != 0) {
+				e->SetTaskList(p->SelfDestructTaskList);
+				return 2;
+			}
+			e->SetTaskState(shok::TaskState::Default);
+			e->Destroy();
+			return 1;
+		}
+	}
+	return 0;
 }
 
 static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);

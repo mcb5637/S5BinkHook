@@ -33,6 +33,61 @@ namespace CppLogic::Hooks {
 		static void __stdcall OnFree(void* p);
 		static void EnableHook();
 	};
+
+	template<class PointerType>
+	requires std::is_member_function_pointer_v<PointerType>
+	union MemberFuncPointer {
+		friend void* MemberFuncPointerToVoid<PointerType>(PointerType, ptrdiff_t);
+		friend PointerType VoidToMemberFuncPointer<PointerType>(void*, ptrdiff_t);
+	private:
+		PointerType Pointer = nullptr;
+		struct {
+			void* Pointer;
+			ptrdiff_t Off;
+		} RawOff;
+		struct {
+			void* Pointer;
+		} Raw;
+	};
+	template<class PointerType>
+	requires std::is_member_function_pointer_v<PointerType>
+	void* MemberFuncPointerToVoid(PointerType p, ptrdiff_t expectedOff)
+	{
+		MemberFuncPointer<PointerType> d{};
+		d.Pointer = p;
+		if constexpr (sizeof(PointerType) == 4) {
+			if (expectedOff != 0)
+				throw std::logic_error{ "unexpected offset" };
+			return d.Raw.Pointer;
+		}
+		else if constexpr (sizeof(PointerType) == 8) {
+			if (expectedOff != d.RawOff.Off)
+				throw std::logic_error{ "unexpected offset" };
+			return d.RawOff.Pointer;
+		}
+		else {
+			throw std::logic_error{ "unexpected size" };
+		}
+	}
+	template<class PointerType>
+	requires std::is_member_function_pointer_v<PointerType>
+	PointerType VoidToMemberFuncPointer(void* p, ptrdiff_t off)
+	{
+		MemberFuncPointer<PointerType> d{};
+		if constexpr (sizeof(PointerType) == 4) {
+			if (off != 0)
+				throw std::logic_error{ "unexpected offset" };
+			d.Raw.Pointer = p;
+		}
+		else if constexpr (sizeof(PointerType) == 8) {
+			d.RawOff.Pointer = p;
+			d.RawOff.Off = off;
+		}
+		else {
+			throw std::logic_error{ "unexpected size" };
+		}
+		return d.Pointer;
+	}
 }
 
 namespace CppLogic {

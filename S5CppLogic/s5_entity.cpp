@@ -1876,22 +1876,6 @@ void __declspec(naked) entitydamagemodbattleprojectile() {
 		ret;
 	}
 }
-void __declspec(naked) entitydamagemodautocannonprojectileasm() {
-	__asm {
-		push ecx;
-
-		mov ecx, edi;
-		mov eax, [ecx + 6 * 4]; // player
-		mov[ebp - 0x38], eax; // source player
-		call EGL::CGLEEntity::EventGetDamage;
-		mov[ebp - 0x44], eax; // damage
-
-		pop ecx;
-
-		push 0x510776;
-		ret;
-	}
-}
 bool HookDamageMod_Hooked = false;
 void EGL::CGLEEntity::HookDamageMod()
 {
@@ -1903,13 +1887,13 @@ void EGL::CGLEEntity::HookDamageMod()
 		reinterpret_cast<void*>(0x50C235),
 		reinterpret_cast<void*>(0x50F5ED),
 		reinterpret_cast<void*>(0x50C3E7),
-		reinterpret_cast<void*>(0x51076C),
+		reinterpret_cast<void*>(0x510638),
 	} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C785), &entitydamagemodeventbattleasm, reinterpret_cast<void*>(0x50C793));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C235), &entitydamagemodbattlecalcsingletargetdmgasm, reinterpret_cast<void*>(0x50C23B));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F5ED), &entitydamagemodeventautocannonasm, reinterpret_cast<void*>(0x50F5FD));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C3E7), &entitydamagemodbattleprojectile, reinterpret_cast<void*>(0x50C3F7));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x51076C), &entitydamagemodautocannonprojectileasm, reinterpret_cast<void*>(0x510776));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x510638), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CAutoCannonBehavior::TaskFireProjectileOverride, 0), reinterpret_cast<void*>(0x510647));
 }
 
 int __fastcall entityarmormod(EGL::CGLEEntity* e) {

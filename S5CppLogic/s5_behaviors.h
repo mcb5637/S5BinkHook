@@ -691,8 +691,10 @@ namespace GGL {
 	// GGL::CWorkerBattleBehavior unused
 
 	class CAutoCannonBehavior : public EGL::CGLEBehavior {
+		friend class EGL::CGLEEntity;
 	public:
-		PADDINGI(2); //4, 5 p to props
+		PADDINGI(1); //4
+		GGL::CAutoCannonBehaviorProps* ACProps;
 		int LatestHitTurn, LatestAttackerID, WaitMS, LastTargetCheckTurn; //6
 		int ShotsLeft; //10
 		float LastTurnOrientation;
@@ -708,6 +710,9 @@ namespace GGL {
 		static inline constexpr int vtp = 0x778CF0;
 		static inline constexpr int TypeDesc = 0x8288A0;
 		static inline constexpr unsigned int Identifier = 0x143C5EFD;
+
+	private:
+		int TaskFireProjectileOverride(EGL::CGLETaskArgs* a);
 	};
 	class CFoundationBehavior : public EGL::CGLEBehavior {
 	public:

@@ -381,6 +381,18 @@ function CppLogic.Logic.TaskListMakeWaitForAnimsCancelable(tl, tind) end
 --- @param b boolean|nil (default false)
 function CppLogic.Logic.TaskListSetChangeTaskListCheckUncancelable(b) end
 
+--- inserts a TASK_WAIT_FOR_LATEST_ATTACK task into the tasklist at the position tind.
+--- @param tl number tasklist
+--- @param tind number task index
+function CppLogic.Logic.TaskListInsertWaitForLatestAttack(tl, tind) end
+--- inserts a TASK_SET_LATEST_ATTACK_TURN task into the tasklist at the position tind.
+--- @param tl number tasklist
+--- @param tind number task index
+function CppLogic.Logic.TaskListInsertSetLatestAttack(tl, tind) end
+--- removes all TASK_SET_LATEST_ATTACK_TURN and TASK_WAIT_FOR_LATEST_ATTACK tasks from the tasklist
+--- @param tl number tasklist
+function CppLogic.Logic.TaskListRemoveLatestAttack(tl) end
+
 --- enables/disables fixing movement tasks when a building is placed on top of a moving entity.
 --- with the fix active, issues a new move task to the same position, instead of potentially skipping the move.
 --- status of this gets saved into a savegame.

@@ -98,7 +98,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
-	auto* a = (*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[L.CheckInt(1)];
+	auto* a = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckInt(1));
 	CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, a);
 	return 1;
 }

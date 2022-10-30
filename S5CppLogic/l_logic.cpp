@@ -23,6 +23,7 @@
 #include "s5_RWEngine.h"
 #include "s5_RWE_anim.h"
 #include "s5_events.h"
+#include "s5_classfactory.h"
 #include "luaext.h"
 #include "hooks.h"
 #include "luaserializer.h"
@@ -832,6 +833,51 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int TaskListInsertWaitForLatestAttack(lua::State L) {
+		int i = L.CheckInt(1);
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+		if (!tl)
+			throw lua::LuaException("invalid tasklist");
+		i = L.CheckInt(2);
+		if (i < 0 || i > static_cast<int>(tl->Task.size()))
+			throw lua::LuaException("invalid task");
+		EGL::CGLETaskArgs* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
+		t->TaskType = shok::Task::TASK_WAIT_FOR_LATEST_ATTACK;
+		auto vec = tl->Task.SaveVector();
+		vec.Vector.insert(vec.Vector.begin() + i, t);
+		return 0;
+	}
+	int TaskListInsertSetLatestAttack(lua::State L) {
+		int i = L.CheckInt(1);
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+		if (!tl)
+			throw lua::LuaException("invalid tasklist");
+		i = L.CheckInt(2);
+		if (i < 0 || i > static_cast<int>(tl->Task.size()))
+			throw lua::LuaException("invalid task");
+		EGL::CGLETaskArgs* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
+		t->TaskType = shok::Task::TASK_SET_LATEST_ATTACK_TURN;
+		auto vec = tl->Task.SaveVector();
+		vec.Vector.insert(vec.Vector.begin() + i, t);
+		return 0;
+	}
+	int TaskListRemoveLatestAttack(lua::State L) {
+		int i = L.CheckInt(1);
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+		if (!tl)
+			throw lua::LuaException("invalid tasklist");
+		auto vec = tl->Task.SaveVector();
+		vec.Vector.erase(std::remove_if(vec.Vector.begin(), vec.Vector.end(), 
+			[](EGL::CGLETaskArgs* a) {
+				if (a->TaskType == shok::Task::TASK_WAIT_FOR_LATEST_ATTACK || a->TaskType == shok::Task::TASK_SET_LATEST_ATTACK_TURN) {
+					delete a;
+					return true;
+				}
+				return false;
+			}), vec.Vector.end());
+		return 0;
+	}
+
 	int EnableBuildOnMovementFix(lua::State L) {
 		EGL::CGLEEntity::BuildOnSetPosFixMovement = L.ToBoolean(1);
 		if (EGL::CGLEEntity::BuildOnSetPosFixMovement)
@@ -1308,7 +1354,7 @@ namespace CppLogic::Logic {
 		GGL::CEntityProfile::HookExperience(false);
 	}
 
-	constexpr std::array<lua::FuncReference, 55> Logic{ {
+	constexpr std::array<lua::FuncReference, 58> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1364,6 +1410,9 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<GetAnimationDuration>("GetAnimationDuration"),
 			lua::FuncReference::GetRef<GetTradeDataForResource>("GetTradeDataForResource"),
 			lua::FuncReference::GetRef<SetTradeDataForResource>("SetTradeDataForResource"),
+			lua::FuncReference::GetRef<TaskListInsertWaitForLatestAttack>("TaskListInsertWaitForLatestAttack"),
+			lua::FuncReference::GetRef<TaskListInsertSetLatestAttack>("TaskListInsertSetLatestAttack"),
+			lua::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {

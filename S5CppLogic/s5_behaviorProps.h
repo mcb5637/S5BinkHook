@@ -276,12 +276,13 @@ namespace GGL {
 		float DamageRange;
 		int ProjectileEffectID;
 		float ProjectileOffsetFront, ProjectileOffsetRight, ProjectileOffsetHeight;
-		int BattleWaitUntil, MissChance;
+		int BattleWaitUntil, MissChance; // 21
 		float MaxRange, MinRange;
 
 		static inline constexpr int vtp = 0x7731C0;
 		static inline constexpr int TypeDesc = 0x815F68;
 	};
+	//constexpr int i = offsetof(CBattleBehaviorProps, BattleWaitUntil) / 4;
 
 	class CLeaderBehaviorProps : public GGL::CBattleBehaviorProps {
 	public:

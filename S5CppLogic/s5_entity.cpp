@@ -1670,6 +1670,8 @@ void EGL::CGLEEntity::HookSetTaskListNonCancelable(bool active)
 }
 
 int __stdcall cancancelstate_check(EGL::CGLEEntity* e) {
+	if (e->Health <= 0)
+		return 1;
 	for (auto a : EGL::CGLEEntity::AdditionalCancelableStates)
 		if (a == e->CurrentState)
 			return 1;

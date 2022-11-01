@@ -729,7 +729,7 @@ namespace CppLogic::Logic {
 		SetLuaTaskListFunc_Info d{ e, false, false, false };
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
 		L.Push(SetLuaTaskListFuncRegKey);
-		L.GetTableRaw(-3);
+		L.GetTableRaw(-2);
 		L.Push(e->EntityId);
 		L.Push(val);
 		L.PushLightUserdata(&d);

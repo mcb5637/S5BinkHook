@@ -1191,6 +1191,7 @@ namespace CppLogic::UA {
 	{
 		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
 		a->DoNotNormalizeSpeed = L.ToBoolean(2);
+		a->NormalizeSpeed(a->Status == UAStatus::Moving || a->Status == UAStatus::MovingNoBattle, true);
 		return 0;
 	}
 

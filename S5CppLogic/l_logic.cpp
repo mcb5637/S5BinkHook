@@ -47,7 +47,7 @@ namespace CppLogic::Logic {
 		if (dmgclass <= 0 || dmgclass >= size)
 			throw lua::LuaException("invalid damagecass");
 		int amclass = L.CheckInt(2);
-		(*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[dmgclass]->GetBonusVsArmorClass(amclass) = L.CheckFloat(2);
+		(*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[dmgclass]->GetBonusVsArmorClass(amclass) = L.CheckFloat(3);
 		return 0;
 	}
 

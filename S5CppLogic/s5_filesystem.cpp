@@ -55,39 +55,39 @@ bool __stdcall BB::IStream::rettrue2()
 }
 const char* __stdcall BB::IStream::GetFileName()
 {
-	return nullptr;
+	return (*reinterpret_cast<const char* (__stdcall***)(BB::IStream*)>(this))[4](this);
 }
 int64_t __stdcall BB::IStream::GetLastWriteTime()
 {
-	return 0;
+	return (*reinterpret_cast<int64_t(__stdcall***)(BB::IStream*)>(this))[5](this);
 }
 size_t __stdcall BB::IStream::GetSize()
 {
-	return 0;
+	return (*reinterpret_cast<size_t(__stdcall***)(BB::IStream*)>(this))[6](this);
 }
 void __stdcall BB::IStream::SetFileSize(long size)
 {
-	throw 0;
+	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, long)>(this))[7](this, size);
 }
 long __stdcall BB::IStream::GetFilePointer()
 {
-	throw 0;
+	return (*reinterpret_cast<long(__stdcall***)(BB::IStream*)>(this))[8](this);
 }
 void __stdcall BB::IStream::SetFilePointer(long fp)
 {
-	throw 0;
+	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, long)>(this))[9](this, fp);
 }
 long __stdcall BB::IStream::Read(void* buff, long numBytesToRead)
 {
-	throw 0;
+	return (*reinterpret_cast<long(__stdcall***)(BB::IStream*, void*, long)>(this))[10](this, buff, numBytesToRead);
 }
 void __stdcall BB::IStream::Seek(long seek, SeekMode mode)
 {
-	throw 0;
+	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, long, SeekMode)>(this))[11](this, seek, mode);
 }
 void __stdcall BB::IStream::Write(const void* buff, long numBytesToWrite)
 {
-	throw 0;
+	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, const void*, long)>(this))[12](this, buff, numBytesToWrite);
 }
 
 BB::CFileStream::CFileStream()

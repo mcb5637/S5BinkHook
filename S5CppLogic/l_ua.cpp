@@ -214,6 +214,8 @@ namespace CppLogic::UA {
 				Target = e->Position;
 			}
 			NeedFormat();
+			if (Status == UAStatus::Moving || Status == UAStatus::MovingNoBattle)
+				ReMove = true;
 			if (e->IsEntityInCategory(shok::EntityCategory::Cannon))
 				Cannons.push_back({ e->EntityId, -1 });
 		}
@@ -595,6 +597,8 @@ namespace CppLogic::UA {
 		en = std::remove_if(LeaderInTransit.begin(), LeaderInTransit.end(), f);
 		LeaderInTransit.erase(en, LeaderInTransit.end());
 		NeedFormat();
+		if (Status == UAStatus::Moving || Status == UAStatus::MovingNoBattle)
+			ReMove = true;
 	}
 	bool UnlimitedArmy::IsIdle()
 	{
@@ -1155,7 +1159,7 @@ namespace CppLogic::UA {
 	int UnlimitedArmy::SetIgnoreFleeing(lua::State L)
 	{
 		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
-		a->IgnoreFleeing = L.ToBoolean(2);
+		a->IgnoreFleeing = L.OptBool(2, false);
 		return 0;
 	}
 	int UnlimitedArmy::SetAutoRotateFormation(lua::State L)
@@ -1178,19 +1182,19 @@ namespace CppLogic::UA {
 	int UnlimitedArmy::SetPrepDefense(lua::State L)
 	{
 		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
-		a->PrepDefense = L.ToBoolean(2);
+		a->PrepDefense = L.OptBool(2, false);
 		return 0;
 	}
 	int UnlimitedArmy::SetSabotageBridges(lua::State L)
 	{
 		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
-		a->SabotageBridges = L.ToBoolean(2);
+		a->SabotageBridges = L.OptBool(2, false);
 		return 0;
 	}
 	int CppLogic::UA::UnlimitedArmy::SetDoNotNormalizeSpeed(lua::State L)
 	{
 		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
-		a->DoNotNormalizeSpeed = L.ToBoolean(2);
+		a->DoNotNormalizeSpeed = L.OptBool(2, false);
 		a->NormalizeSpeed(a->Status == UAStatus::Moving || a->Status == UAStatus::MovingNoBattle, true);
 		return 0;
 	}

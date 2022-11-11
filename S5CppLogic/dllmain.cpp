@@ -80,19 +80,6 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
-class base1 {
-public:
-	virtual ~base1() = default;
-
-	virtual int foo() { return 0; }
-};
-
-class derived : public base1, BB::IPostEvent {
-public:
-	virtual void __stdcall PostEvent(BB::CEvent* ev) override {};
-	virtual int foo() override { return 1; }
-};
-
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
@@ -102,8 +89,6 @@ int Test(lua::State Ls) {
 	CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, a);
 	return 1;
 }
-
-// hp tech mod add?, construction speed techs?
 
 int GetOptions(lua::State L) {
 	L.Push(Options.DisableAdvStringPrinting);

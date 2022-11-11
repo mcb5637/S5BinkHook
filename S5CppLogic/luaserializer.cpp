@@ -700,27 +700,52 @@ bool CppLogic::Serializer::AdvLuaStateSerializer::IsGlobalSkipped(const char* n)
 	return false;
 }
 
-std::map<std::string, lua::CFunction> CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer{};
-
-void CppLogic::Serializer::AdvLuaStateSerializer::SerializeState()
+void CppLogic::Serializer::AdvLuaStateSerializer::PrepareSerialize()
 {
-	int t = L.GetTop();
-	L.PushGlobalTable();
 	int vers = FileVersion;
 	WritePrimitive(&vers, sizeof(int));
-	SerializeTable(-1, true);
-
-	PushSerializedRegistry(L);
-	SerializeTable(-1, false);
-
-	L.SetTop(t);
+	IndexOfReferenceHolder = L.GetTop();
 }
-void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeState()
+void CppLogic::Serializer::AdvLuaStateSerializer::CleanupSerialize()
+{
+	L.SetTop(IndexOfReferenceHolder);
+}
+void CppLogic::Serializer::AdvLuaStateSerializer::PrepareDeserialize()
 {
 	if (ReadPrimitive<int>("fileversion invalid size") != FileVersion)
 		throw std::format_error{ "invalid fileversion" };
 	L.NewTable();
 	IndexOfReferenceHolder = L.GetTop();
+}
+void CppLogic::Serializer::AdvLuaStateSerializer::CleanupDeserialize(bool ret)
+{
+	int t = L.GetTop();
+	if (ret) {
+		L.Insert(IndexOfReferenceHolder);
+		L.SetTop(IndexOfReferenceHolder);
+	}
+	else {
+		L.SetTop(IndexOfReferenceHolder - 1);
+	}
+}
+
+std::map<std::string, lua::CFunction> CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer{};
+
+void CppLogic::Serializer::AdvLuaStateSerializer::SerializeState()
+{
+	PrepareSerialize();
+
+	L.PushGlobalTable();
+	SerializeTable(-1, true);
+
+	PushSerializedRegistry(L);
+	SerializeTable(-1, false);
+
+	CleanupSerialize();
+}
+void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeState()
+{
+	PrepareDeserialize();
 
 	L.PushGlobalTable();
 	if (DeserializeType() != lua::LType::Table)
@@ -731,7 +756,24 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeState()
 	DeserializeAnything();
 	L.SetTableRaw(L.REGISTRYINDEX);
 
-	L.SetTop(IndexOfReferenceHolder - 1);
+	CleanupDeserialize(false);
+}
+
+void CppLogic::Serializer::AdvLuaStateSerializer::SerializeVariable(int i)
+{
+	PrepareSerialize();
+
+	SerializeAnything(i);
+
+	CleanupSerialize();
+}
+void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeVariable()
+{
+	PrepareDeserialize();
+
+	DeserializeAnything();
+
+	CleanupDeserialize(true);
 }
 
 void CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(lua::State L)

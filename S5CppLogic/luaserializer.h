@@ -106,6 +106,11 @@ namespace CppLogic::Serializer {
 		bool CanSerialize(int idx);
 		bool IsGlobalSkipped(const char* n);
 
+		void PrepareSerialize();
+		void CleanupSerialize();
+		void PrepareDeserialize();
+		void CleanupDeserialize(bool ret);
+
 		template<class State>
 		requires LuaHasUpvalue<State>
 		const void* UpID(State s, int idx, int n) {
@@ -133,6 +138,9 @@ namespace CppLogic::Serializer {
 
 		void SerializeState();
 		void DeserializeState();
+
+		void SerializeVariable(int i);
+		void DeserializeVariable();
 
 		// pushes a registry subtable that will get serialized in savegames. (creates one if it does not exist)
 		static void PushSerializedRegistry(lua::State L);

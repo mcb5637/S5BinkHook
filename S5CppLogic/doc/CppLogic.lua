@@ -1,3 +1,4 @@
+---@diagnostic disable: missing-return
 
 assert(false, "do not load this file, this is documentation only!")
 
@@ -595,6 +596,34 @@ function CppLogic.API.RuntimeStoreGet(name) end
 --- creates the global tables Animations, TerrainTypes, WaterTypes, ArmorClasses, ExperienceClasses.
 --- data gets read directly from the game, so anything you can use is in there.
 function CppLogic.API.CreateExtraDataTables() end
+
+--- saves a lua variable into a persistent map file.
+--- persistent map files are saved in the folder PersistentMapFiles next to a users savegames.
+--- the user has to create that folder manually to enable persistent map files for himself.
+--- persistent map files are identified by the GUID of their respective Map.
+--- the lua variable to be saved can be anything that adheres to the rules specified for serialization of a lua state.
+--- note, that saving _G does not get resolved to the new _G on loading, you will instead gain a new table with all of _Gs previous contents.
+---@param var any data to save
+---@param mapname string name of map
+---@param maptype number map type
+---@param cname string|nil campagn name
+---@return string file path to the saved file
+function CppLogic.API.SavePersistentMapFile(var, mapname, maptype, cname) end
+--- loads a previously saved persistent map file.
+--- throws if file does not exist.
+---@param mapname string name of map
+---@param maptype number map type
+---@param cname string|nil campagn name
+---@return any var loaded data
+function CppLogic.API.LoadPersistentMapFile(mapname, maptype, cname) end
+--- checks if a persistent map file exists.
+--- also checks if the persistent map file system is enabled in this particular user.
+---@param mapname string name of map
+---@param maptype number map type
+---@param cname string|nil campagn name
+---@return boolean fileExists
+---@return boolean enabled
+function CppLogic.API.HasPersistentMapFile(mapname, maptype, cname) end
 
 --- @class FuncData
 local FuncData = {name="", namewhat="", nups=1, short_src="", linedefined=1, what=""}

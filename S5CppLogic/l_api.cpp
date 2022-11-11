@@ -5,6 +5,7 @@
 #include <array>
 #include <processthreadsapi.h>
 #include <ctime>
+#include <filesystem>
 #include "l_api.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
@@ -13,6 +14,7 @@
 #include "s5_scriptsystem.h"
 #include "s5_idmanager.h"
 #include "s5_config.h"
+#include "s5_exception.h"
 #include "hooks.h"
 #include "luaext.h"
 
@@ -254,6 +256,76 @@ namespace CppLogic::API {
 		return 0;
 	}
 
+	std::filesystem::path GetPersistentMapFilesDir() {
+		std::filesystem::path p{ Framework::SavegameSystem::GlobalObj()->SaveDir };
+		p.replace_filename("PersistentMapFiles");
+		return p;
+	}
+	void AppendPersistendMapFileName(lua::State L, std::filesystem::path& p, int indexoff) {
+		int ty = L.CheckInt(2 + indexoff);
+		const char* cn = L.OptString(3 + indexoff, nullptr); // optional
+		const char* n = L.CheckString(1 + indexoff);
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->GetCampagnInfo(ty, cn);
+		if (!ci)
+			throw lua::LuaException("invalid map type/campagn");
+		Framework::MapInfo* i = ci->GetMapInfoByName(n);
+		if (!i)
+			throw lua::LuaException("invalid map");
+		p.append(i->GUID.Data.c_str()).replace_extension("bin");
+	}
+
+	int SavePersistentMapFile(lua::State L) {
+		std::filesystem::path p = GetPersistentMapFilesDir();
+		AppendPersistendMapFileName(L, p, 1);
+
+		try {
+			BB::CFileStreamEx fs{};
+			if (!fs.OpenFile(p.string().c_str(), BB::IStream::Flags::DefaultWrite))
+				throw lua::LuaException{ "cannot open file" };
+			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState() };
+			seri.SerializeVariable(1);
+			fs.Close();
+		}
+		catch (const BB::CFileException& ex) {
+			char buff[255]{};
+			ex.CopyMessage(buff, 254);
+			throw lua::LuaException{ buff };
+		}
+
+		L.Push(p.string().c_str());
+		return 1;
+	}
+	int LoadPersistentMapFile(lua::State L) {
+		std::filesystem::path p = GetPersistentMapFilesDir();
+		AppendPersistendMapFileName(L, p, 0);
+
+		try {
+			BB::CFileStreamEx fs{};
+			if (!fs.OpenFile(p.string().c_str(), BB::IStream::Flags::DefaultRead))
+				throw lua::LuaException{ "cannot open file" };
+			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState() };
+			seri.DeserializeVariable();
+			fs.Close();
+		}
+		catch (const BB::CFileException& ex) {
+			char buff[255]{};
+			ex.CopyMessage(buff, 254);
+			throw lua::LuaException{ buff };
+		}
+
+		return 1;
+	}
+	int HasPersistentMapFile(lua::State L) {
+		std::filesystem::path p = GetPersistentMapFilesDir();
+		AppendPersistendMapFileName(L, p, 0);
+
+		bool direxists = std::filesystem::exists(p) && std::filesystem::is_directory(p);
+
+		L.Push(std::filesystem::exists(p) && std::filesystem::is_regular_file(p));
+		L.Push(direxists);
+		return 2;
+	}
+
 	int MainThreadID = 0;
 	int GetMainThreadID(lua::State L) {
 		L.Push(MainThreadID);
@@ -348,7 +420,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 18> API{ {
+	constexpr std::array<lua::FuncReference, 21> API{ {
 			lua::FuncReference::GetRef<Eval>("Eval"),
 			lua::FuncReference::GetRef<Log>("Log"),
 			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
@@ -366,6 +438,9 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<GetCurrentThreadID>("GetCurrentThreadID"),
 			lua::FuncReference::GetRef<LGetCurrentTime>("GetCurrentTime"),
 			lua::FuncReference::GetRef<RemoveGDBKey>("RemoveGDBKey"),
+			lua::FuncReference::GetRef<SavePersistentMapFile>("SavePersistentMapFile"),
+			lua::FuncReference::GetRef<LoadPersistentMapFile>("LoadPersistentMapFile"),
+			lua::FuncReference::GetRef<HasPersistentMapFile>("HasPersistentMapFile"),
 			lua::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
 	} };
 

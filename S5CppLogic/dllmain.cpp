@@ -152,7 +152,7 @@ void InitGame() {
 	EScr::CScriptTriggerSystem::HookFireEvent();
 }
 
-constexpr double Version = 2.0003;
+constexpr double Version = 2.0004;
 
 int ResetCppLogic(lua::State L) {
 	L.Push("CppLogic");

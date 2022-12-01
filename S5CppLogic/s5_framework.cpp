@@ -170,10 +170,12 @@ void Framework::AGameModeBase::HookRemoveArchive()
     HookRemoveArchive_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
         reinterpret_cast<void*>(0x40F8CD),
-        reinterpret_cast<void*>(0x40F604)
+        reinterpret_cast<void*>(0x40F604),
+        reinterpret_cast<void*>(0x40FC68)
     } };
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F8CD), &gamemodebase_removearchiveifexternalmap_override);
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F604), &gamemodebase_removearchiveifexternalmap_override);
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40FC68), &gamemodebase_removearchiveifexternalmap_override);
 }
 
 

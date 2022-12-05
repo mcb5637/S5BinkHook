@@ -1593,7 +1593,7 @@ void EGL::CGLEEntity::HookNonCancelableAnim()
 
 void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBehaviorDefaultMovement*, shok::Position*)>(0x586894);
 void __fastcall entity_buildonsetpos(EGL::CMovingEntity* e) {
-	if (e->MovementState && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
+	if (!e->MovementState && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
 		GGL::CBehaviorDefaultMovement* mov = e->GetBehavior<GGL::CBehaviorDefaultMovement>();
 		if (mov) {
 			movementbeh_setmovetarget(mov, &e->TargetPosition);

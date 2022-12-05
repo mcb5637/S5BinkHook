@@ -347,7 +347,7 @@ namespace EGL {
 		byte TargetRotationValid;
 		PADDING(3);
 		float TargetRotation;
-		int MovementState; // 70
+		int MovementState; // 70 0 when staning, 2 when moving
 
 		static inline constexpr int vtp = 0x783F84;
 		static inline constexpr int TypeDesc = 0x8077EC;

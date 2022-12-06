@@ -107,7 +107,7 @@ void EScr::CScriptTriggerSystem::HookRemoveFuncOverrides()
 
 lua::Reference __stdcall EScr::CLuaFuncRefCommand::GetRefToFunc()
 {
-	throw 0;
+	return reinterpret_cast<lua::Reference(__stdcall* const)(CLuaFuncRefCommand*)>(0x5A1884)(this);
 }
 
 static inline void(__stdcall* const funccmd_set)(EScr::CLuaFuncRefCommand* th, const char* c) = reinterpret_cast<void(__stdcall* const)(EScr::CLuaFuncRefCommand*, const char*)>(0x5A18EB);
@@ -153,7 +153,7 @@ void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
 
 lua::Reference __stdcall EScr::CLuaFuncRefGlobal::GetRefToFunc()
 {
-	throw 0;
+	return reinterpret_cast<lua::Reference(__stdcall* const)(CLuaFuncRefGlobal*)>(0x5A180C)(this);
 }
 
 static inline void(__stdcall* const funcglo_set)(EScr::CLuaFuncRefGlobal* th, const char* c) = reinterpret_cast<void(__stdcall* const)(EScr::CLuaFuncRefGlobal*, const char*)>(0x5A18EB);

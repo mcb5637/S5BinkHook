@@ -5,15 +5,11 @@ EGL::CGLEAnimSet::CGLEAnimSet()
 {
 	SetVT();
 }
-EGL::CGLEAnimSet::CGLEAnimSet(const CGLEAnimSet& o)
-{
-	SetVT();
-}
-EGL::CGLEAnimSet::CGLEAnimSet(CGLEAnimSet&& o) noexcept
-{
-	SetVT();
-}
 
+EGL::CGLEAnimSet::~CGLEAnimSet()
+{
+	reinterpret_cast<void(__thiscall*)(CGLEAnimSet*, bool)>(0x5885A4)(this, false);
+}
 
 void* EGL::CGLEAnimSet::operator new(size_t s)
 {

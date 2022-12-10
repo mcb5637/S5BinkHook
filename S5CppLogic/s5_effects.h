@@ -64,7 +64,8 @@ namespace EGL {
 		float x; // angle rad, flight direction?
 		float Speed; // in effect 43
 
-		virtual void FillSlot(SSlotArgsFlyingEffect* data) override;
+		// dtor empty
+		virtual void __stdcall FillSlot(SSlotArgsFlyingEffect* data) override;
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
 
@@ -86,7 +87,7 @@ namespace EGL {
 		virtual void OnHit() = 0;
 		virtual void CalculateGravityStuff() = 0;
 
-		static void __fastcall FixOnLoad(EGL::CFlyingEffect* th);
+		void FixOnLoad();
 		static void HookOnLoadFix();
 
 		static void HookOnHit();
@@ -108,7 +109,7 @@ namespace GGL {
 		byte AdvancedDamageSourceOverride;
 		GGL::CArrowEffectProps* ArrowEffectProps;
 
-		static void __fastcall FixOnLoad(GGL::CArrowEffect* th);
+		void FixOnLoad();
 
 		static inline constexpr int vtp = 0x778E24;
 		static inline constexpr int TypeDesc = 0x8289CC;
@@ -124,7 +125,7 @@ namespace GGL {
 		float AoERange;
 		int DamageClass; // 52
 
-		static void __fastcall FixOnLoad(GGL::CCannonBallEffect* th);
+		void FixOnLoad();
 
 		static bool FixDamageClass;
 		static bool AddDamageSourceOverride;
@@ -164,6 +165,7 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x810254;
 		CGLEEffectCreator();
 
+		// dtor empty
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
 	protected:

@@ -24,14 +24,15 @@ namespace EGL {
 		static inline constexpr unsigned int Identifier = 0xA4C5BB88;
 
 		CGLEAnimSet();
-		CGLEAnimSet(const CGLEAnimSet& o);
-		CGLEAnimSet(CGLEAnimSet&& o) noexcept;
+		CGLEAnimSet(const CGLEAnimSet& o) = delete;
+		CGLEAnimSet(CGLEAnimSet&& o) noexcept = delete;
 
 		int GetAnim(int category);
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
+		virtual ~CGLEAnimSet() override;
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 	private:
 		void SetVT();

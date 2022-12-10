@@ -34,9 +34,9 @@ CProjectileEffectCreator::CProjectileEffectCreator()
 	SetVT(CProjectileEffectCreator::vtp);
 }
 
-void EGL::CFlyingEffectSlot::FillSlot(SSlotArgsFlyingEffect* data)
+void __stdcall EGL::CFlyingEffectSlot::FillSlot(SSlotArgsFlyingEffect* data)
 {
-	throw 0;
+	reinterpret_cast<void(__stdcall*)(CFlyingEffectSlot*, SSlotArgsFlyingEffect*)>(0x589338)(this, data);
 }
 unsigned int __stdcall EGL::CFlyingEffectSlot::GetClassIdentifier() const
 {
@@ -47,25 +47,25 @@ void* __stdcall EGL::CFlyingEffectSlot::CastToIdentifier(unsigned int id)
 	return nullptr;
 }
 
-void __fastcall EGL::CFlyingEffect::FixOnLoad(EGL::CFlyingEffect* th)
+void EGL::CFlyingEffect::FixOnLoad()
 {
-	auto* pr = (*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[th->EffectType];
-	th->FlyingEffectProps = dynamic_cast<EGL::CFlyingEffectProps*>(pr);
-	th->FlyingEffectSlot.Speed = th->FlyingEffectProps->Speed; // probably gets reset to 0 somewhere, cause it should get serialized
-	th->FlyingEffectSlot.TargetPosition = th->TargetPosition;
-	th->FlyingEffectSlot.LastPosition = th->Position; // not entirely correct, but seems to be better than nothing
+	auto* pr = (*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[this->EffectType];
+	this->FlyingEffectProps = dynamic_cast<EGL::CFlyingEffectProps*>(pr);
+	this->FlyingEffectSlot.Speed = this->FlyingEffectProps->Speed; // probably gets reset to 0 somewhere, cause it should get serialized
+	this->FlyingEffectSlot.TargetPosition = this->TargetPosition;
+	this->FlyingEffectSlot.LastPosition = this->Position; // not entirely correct, but seems to be better than nothing
 }
 
-void __fastcall GGL::CArrowEffect::FixOnLoad(GGL::CArrowEffect* th)
+void GGL::CArrowEffect::FixOnLoad()
 {
-	EGL::CFlyingEffect::FixOnLoad(th);
-	th->ArrowEffectProps = dynamic_cast<GGL::CArrowEffectProps*>(th->FlyingEffectProps);
+	EGL::CFlyingEffect::FixOnLoad();
+	this->ArrowEffectProps = dynamic_cast<GGL::CArrowEffectProps*>(this->FlyingEffectProps);
 }
 
-void __fastcall GGL::CCannonBallEffect::FixOnLoad(GGL::CCannonBallEffect* th)
+void GGL::CCannonBallEffect::FixOnLoad()
 {
-	EGL::CFlyingEffect::FixOnLoad(th);
-	th->CannonBallEffectProps = dynamic_cast<GGL::CCannonBallEffectProps*>(th->FlyingEffectProps);
+	EGL::CFlyingEffect::FixOnLoad();
+	this->CannonBallEffectProps = dynamic_cast<GGL::CCannonBallEffectProps*>(this->FlyingEffectProps);
 }
 
 void EGL::CFlyingEffect::HookOnLoadFix()
@@ -75,9 +75,9 @@ void EGL::CFlyingEffect::HookOnLoadFix()
 		reinterpret_cast<void*>(0x778E38),
 		reinterpret_cast<void*>(0x7776A4),
 	} };
-	*reinterpret_cast<void(__fastcall**)(EGL::CFlyingEffect*)>(0x7775F8) = &CFlyingEffect::FixOnLoad;
-	*reinterpret_cast<void(__fastcall**)(GGL::CArrowEffect*)>(0x778E38) = &GGL::CArrowEffect::FixOnLoad;
-	*reinterpret_cast<void(__fastcall**)(GGL::CCannonBallEffect*)>(0x7776A4) = &GGL::CCannonBallEffect::FixOnLoad;
+	*reinterpret_cast<void**>(0x7775F8) = CppLogic::Hooks::MemberFuncPointerToVoid(&CFlyingEffect::FixOnLoad, 0);
+	*reinterpret_cast<void**>(0x778E38) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CArrowEffect::FixOnLoad, 0);
+	*reinterpret_cast<void**>(0x7776A4) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CCannonBallEffect::FixOnLoad, 0);
 }
 
 

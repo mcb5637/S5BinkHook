@@ -239,7 +239,7 @@ namespace EGL {
 	template<class T, unsigned int id>
 	class TSlot : public ISlot {
 	public:
-		virtual void FillSlot(T* data) = 0;
+		virtual void __stdcall FillSlot(T* data) = 0;
 	};
 }
 

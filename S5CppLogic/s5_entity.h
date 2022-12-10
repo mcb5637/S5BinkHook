@@ -661,9 +661,9 @@ namespace EGL {
 		// i call the original constructor and replace the vtable with that, so they really dont matter.
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
+		virtual ~CGLEEntityCreator() override;
 
 		CGLEEntityCreator();
-		~CGLEEntityCreator();
 	protected:
 		CGLEEntityCreator(int _);
 	};

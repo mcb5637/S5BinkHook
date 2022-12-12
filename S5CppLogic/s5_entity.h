@@ -232,6 +232,8 @@ namespace EGL {
 		bool CheckDodge(); // rolls random, returns if dodge successful
 		bool IsInBlocking() const;
 		bool IsDead() const;
+		shok::AccessCategory GetAccessCategory() const;
+		float __thiscall GetBaseExploration();
 
 		void Destroy();
 
@@ -249,6 +251,7 @@ namespace EGL {
 		void CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* other);
 
 		static bool AdvHurtEntity_CheckOverHeal;
+		float CalculateDamageAgainstMe(int damage, int damageclass, float aoeFactor = 1.0f);
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 
@@ -537,6 +540,7 @@ namespace GGL {
 		int LeaderGetRegenHealthSeconds();
 		void KillSettlerByEnvironment();
 		int GetDodgeChance(); // used in melee combat, percent
+		int __thiscall GetBaseArmor();
 
 		void Upgrade();
 
@@ -606,6 +610,7 @@ namespace GGL {
 		float GetMarketProgress();
 		// returns max time if not currently upgrading
 		float GetRemainingUpgradeTime();
+		int __thiscall GetBaseArmor();
 
 		void StartUpgrade();
 		void CancelUpgrade();

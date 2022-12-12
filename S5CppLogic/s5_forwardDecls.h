@@ -35,6 +35,8 @@ namespace shok {
 	enum class TaskStateExecutionResult : int;
 	enum class TaskExecutionResult : int;
 	enum class AdvancedDealDamageSource : int;
+	enum class AccessCategory : int;
+	enum class WeatherState : int;
 
 	class Technology;
 	class TechCategoryManager;
@@ -56,6 +58,13 @@ namespace EGL {
 	class CGLEAnimProps;
 	class CGLEAnimSet;
 	class CFlyingEffectProps;
+
+	template<class T, unsigned int id>
+	requires (std::same_as<T, bool>&& id == 0x65DE8317) || (std::same_as<T, int> && id == 0x483040E7) || (std::same_as<T, float> && id == 0x578EE8F7)
+	class CEventGetValue;
+	using CEventGetValue_Bool = CEventGetValue<bool, 0x65DE8317>;
+	using CEventGetValue_Int = CEventGetValue<int, 0x483040E7>;
+	using CEventGetValue_Float = CEventGetValue<float, 0x578EE8F7>;
 }
 namespace GGL {
 	class CBuilding;
@@ -70,6 +79,7 @@ namespace GGL {
 	class CArrowEffectProps;
 	class CCannonBallEffectProps;
 	class CAutoCannonBehaviorProps;
+	class CBattleBehaviorProps;
 }
 namespace ED {
 	class CBehaviorProps;

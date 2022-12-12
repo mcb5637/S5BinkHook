@@ -659,8 +659,8 @@ void EGL::CGLEGameLogic::HookCreateEffect()
 	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(EGL::CGLEGameLogic * th, EGL::CGLEEffectCreator * data)>(&CreateEffectHook);
 }
 
-static inline int(__thiscall* const weatherdata_getnext)(GGL::CWeatherHandler* th) = reinterpret_cast<int(__thiscall*)(GGL::CWeatherHandler*)>(0x4B93BD);
-int GGL::CWeatherHandler::GetNextWeatherState()
+static inline shok::WeatherState(__thiscall* const weatherdata_getnext)(GGL::CWeatherHandler* th) = reinterpret_cast<shok::WeatherState(__thiscall*)(GGL::CWeatherHandler*)>(0x4B93BD);
+shok::WeatherState GGL::CWeatherHandler::GetNextWeatherState()
 {
 	return weatherdata_getnext(this);
 }
@@ -684,7 +684,7 @@ void GGL::CWeatherHandler::SetOffset(int o)
 
 static inline void(__thiscall* const weatherdata_elements_remove)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>*, int*)>(0x513D32);
 static inline void(__thiscall* const weatherdata_elements_add)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>* th, GGL::CWeatherHandler::WeatherElementData* e) = reinterpret_cast<void(__thiscall*)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>*, GGL::CWeatherHandler::WeatherElementData*)>(0x513CB6);
-void GGL::CWeatherHandler::ClearQueue(int state, int dur, int forerun, int gfx, int transition)
+void GGL::CWeatherHandler::ClearQueue(shok::WeatherState state, int dur, int forerun, int gfx, int transition)
 {
 	// save data
 	GGL::CWeatherHandler::WeatherElementData* current = nullptr;

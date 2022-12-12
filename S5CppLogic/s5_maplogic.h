@@ -296,11 +296,11 @@ namespace GGL {
 	class CWeatherHandler : public IWeatherSystem {
 		virtual void GetStateChangingProgress(void*) = 0;
 	public:
-		virtual int GetCurrentWeatherState() = 0;
+		virtual shok::WeatherState GetCurrentWeatherState() = 0;
 		struct WeatherElementData {
 			int StartTimeOffset = 0; // ticks, sec*10
 			int Length = 0; // ticks, sec*10
-			int State = 0;
+			shok::WeatherState State = static_cast<shok::WeatherState>(0);
 			PADDINGI(1); // nonperiodic index?
 			bool IsPeriodic = false;
 			PADDING(3);
@@ -310,7 +310,7 @@ namespace GGL {
 			int Transition = 0;
 		};
 
-		int CurrentWeatherState;
+		shok::WeatherState CurrentWeatherState;
 		int CurrentWeatherIndex;
 		PADDINGI(1);// 3 next nonperiodic weather?
 		int NextWeatherIndex;
@@ -323,8 +323,8 @@ namespace GGL {
 			int StartedTimeOffset;
 			int ToGFXState; //3 0 if no chnage
 			int TransitionLength;
-			int StateToChangeFrom;
-			int StateToChangeTo;
+			shok::WeatherState StateToChangeFrom;
+			shok::WeatherState StateToChangeTo;
 			int WeatherStateChangeTimeOffset; //7
 			int WIndexToChangeTo;
 			int State; // 1 changing, 2 fix
@@ -334,11 +334,11 @@ namespace GGL {
 		static inline constexpr int vtp = 0x770140;
 		static inline constexpr int TypeDesc = 0x811DE8;
 
-		int GetNextWeatherState();
+		shok::WeatherState GetNextWeatherState();
 		int GetTicksToNextPeriodicWeatherChange();
 		void AddWeatherElement(int state, int dur, bool peri, int forerun, int gfx, int transition); // all times in ticks
 		void SetOffset(int o);
-		void ClearQueue(int state, int dur, int forerun, int gfx, int transition);
+		void ClearQueue(shok::WeatherState state, int dur, int forerun, int gfx, int transition);
 
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49ECE9);
 	};

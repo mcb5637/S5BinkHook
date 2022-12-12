@@ -263,7 +263,7 @@ namespace CppLogic::Logic {
 		int w = L.CheckInt(2);
 		if (w < 1 || w >= 4)
 			throw lua::LuaException("invalid weathertype");
-		if ((*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.StateToChangeTo)
+		if ((*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.StateToChangeTo != shok::WeatherState::Invalid)
 			throw lua::LuaException("weather currently changing");
 		if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.WeatherEnergy < (*GGL::CLogicProperties::GlobalObj)->EnergyRequiredForWeatherChange)
 			throw lua::LuaException("not enough weather energy");
@@ -645,7 +645,7 @@ namespace CppLogic::Logic {
 		for (const auto& kae : wh->Elements) {
 			L.NewTable();
 			L.Push("State");
-			L.Push(kae.second.State);
+			L.Push(static_cast<int>(kae.second.State));
 			L.SetTableRaw(-3);
 			L.Push("GFX");
 			L.Push(kae.second.GfxSet);
@@ -687,7 +687,7 @@ namespace CppLogic::Logic {
 			wh->AddWeatherElement(state, dur, true, fore, gfx, trans);
 		}
 		else {
-			wh->ClearQueue(state, dur, fore, gfx, trans);
+			wh->ClearQueue(static_cast<shok::WeatherState>(state), dur, fore, gfx, trans);
 		}
 		return 0;
 	}

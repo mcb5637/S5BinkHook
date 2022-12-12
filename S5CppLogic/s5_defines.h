@@ -319,4 +319,19 @@ namespace shok {
 		Cannon = 5,
 		Rifle = 6, // also scout and thief
 	};
+	enum class AccessCategory : int {
+		AccessCategoryNone = 0,
+		AccessCategorySettler = 1,
+		AccessCategoryAnimal = 2,
+		AccessCategoryBuilding = 3,
+		AccessCategoryResourceDoodad = 4,
+		AccessCategoryStatic = 5,
+		AccessCategoryOrnamental = 6,
+	};
+	enum class WeatherState : int {
+		Invalid = 0,
+		Summer = 1,
+		Rain = 2,
+		Winter = 3,
+	};
 }

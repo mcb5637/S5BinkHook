@@ -129,9 +129,6 @@ namespace EGL {
 		CEventGetValue& operator=(CEventGetValue&&) = default;
 		CEventGetValue& operator=(const CEventGetValue&) = default;
 	};
-	using CEventGetValue_Bool = CEventGetValue<bool, 0x65DE8317>;
-	using CEventGetValue_Int = CEventGetValue<int, 0x483040E7>;
-	using CEventGetValue_Float = CEventGetValue<float, 0x578EE8F7>;
 	// EGL::CEventGetValue<GGL::CBuildingMerchantBehaviorProps const *,-1872076829> 7704A4
 	// EGL::CEventGetValue<GGL::CNeutralBridgeBehavior *,1150290935>
 	// EGL::CEventGetValue<GGL::CBattleBehavior *,-646837913>

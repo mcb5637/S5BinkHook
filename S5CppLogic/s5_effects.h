@@ -87,7 +87,9 @@ namespace EGL {
 		virtual void OnHit() = 0;
 		virtual void CalculateGravityStuff() = 0;
 
+	protected:
 		void FixOnLoad();
+	public:
 		static void HookOnLoadFix();
 
 		static void HookOnHit();
@@ -100,6 +102,7 @@ namespace EGL {
 
 namespace GGL {
 	class CArrowEffect : public EGL::CFlyingEffect {
+		friend class EGL::CFlyingEffect;
 	public:
 		int AttackerID; // 47
 		int TargetID;
@@ -109,14 +112,17 @@ namespace GGL {
 		byte AdvancedDamageSourceOverride;
 		GGL::CArrowEffectProps* ArrowEffectProps;
 
+	protected:
 		void FixOnLoad();
 
+	public:
 		static inline constexpr int vtp = 0x778E24;
 		static inline constexpr int TypeDesc = 0x8289CC;
 		static inline constexpr unsigned int Identifier = 0x2320F01D;
 	};
 
 	class CCannonBallEffect : public EGL::CFlyingEffect {
+		friend class EGL::CFlyingEffect;
 	public:
 		int AttackerID; // 47
 		int SourcePlayer; // 48
@@ -125,8 +131,10 @@ namespace GGL {
 		float AoERange;
 		int DamageClass; // 52
 
+	protected:
 		void FixOnLoad();
 
+	public:
 		static bool FixDamageClass;
 		static bool AddDamageSourceOverride;
 		static void HookFromCreator();

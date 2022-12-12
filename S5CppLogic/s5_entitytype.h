@@ -34,7 +34,9 @@ namespace EGL {
 		int Models[5];
 	public:
 		float Exploration;
-		int ExperiencePoints, AccessCategory, NumBlockedPoints; //20
+		int ExperiencePoints;
+		shok::AccessCategory AccessCategory;
+		int NumBlockedPoints; //20
 		float SnapTolerance; //23 seems to be a max change in every coordinate on entity placement
 		bool DeleteWhenBuiltOn, DividesTwoSectors;
 		PADDING(2);

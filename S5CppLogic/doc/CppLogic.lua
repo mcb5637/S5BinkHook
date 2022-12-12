@@ -959,7 +959,7 @@ function CppLogic.Entity.ReplaceWithResourceEntity(id) end
 function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
 
 --- overrides an entities damage.
---- does not work for trapcannon.
+--- for autocannons (towers, heroabilities...) apply it to the turret (via Logic.GetFoundationTop(id)).
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity

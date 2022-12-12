@@ -244,7 +244,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x8255D0;
 		static inline constexpr unsigned int Identifier = 0x29AF8F97;
 
-		static void FixBombAttachment();
+		static void HookFixBombAttachment();
 	};
 	class CBombBehavior : public EGL::CGLEBehavior {
 	public:
@@ -592,7 +592,7 @@ namespace GGL {
 		byte StartFollowing, StopFollowing; // 10
 		PADDING(2);
 		int FollowStatus;
-		PADDINGI(1); // 12 p to behprops
+		GGL::CBattleBehaviorProps* BattleProps; // 12 p to behprops
 		int LatestHitTurn;
 		int LatestAttackerID, BattleStatus; // la15
 		byte NoMoveNecessary, NormalRangeCheckNecessary;
@@ -618,7 +618,19 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x815EEC;
 		static inline constexpr unsigned int Identifier = 0x0C4F1C42D;
 
-		float GetMaxRange();
+		float GetMaxRange() const;
+		int GetDamage() const;
+		int GetMaxRandomDamage() const;
+		int GetRandomDamage(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
+		int __thiscall GetDamageAgainst(EGL::CGLEEntity* target);
+		EGL::CGLEEntity* GetTarget() const;
+		float GetMissChance() const;
+		bool CheckMiss(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
+
+		static void HookDamageOverride();
+	private:
+		void __thiscall EventOverrideGetDamage(EGL::CEventGetValue_Int* ev);
+		int __thiscall TaskOverrideFireProjctile(EGL::CGLETaskArgs* a);
 	};
 
 	class CLeaderBehavior : public GGL::CBattleBehavior {
@@ -691,7 +703,6 @@ namespace GGL {
 	// GGL::CWorkerBattleBehavior unused
 
 	class CAutoCannonBehavior : public EGL::CGLEBehavior {
-		friend class EGL::CGLEEntity;
 	public:
 		PADDINGI(1); //4
 		GGL::CAutoCannonBehaviorProps* ACProps;
@@ -705,14 +716,17 @@ namespace GGL {
 		// defined events: Leader_AttackEntity, Leader_OnAttackTargetDetached, Battle_GetDamageClass, Battle_GetLatestAttackerID, Battle_GetLatestHitTurn, GetDamage, OnAttackedBy,
 		//		AutoCannon_XXX
 
-		float GetMaxRange();
+		float GetMaxRange() const;
+		int GetDamage() const;
 
 		static inline constexpr int vtp = 0x778CF0;
 		static inline constexpr int TypeDesc = 0x8288A0;
 		static inline constexpr unsigned int Identifier = 0x143C5EFD;
 
+		static void HookDamageOverride();
 	private:
-		int TaskFireProjectileOverride(EGL::CGLETaskArgs* a);
+		int __thiscall TaskFireProjectileOverride(EGL::CGLETaskArgs* a);
+		void __thiscall EventGetDamageOverride(EGL::CEventGetValue_Int* ev);
 	};
 	class CFoundationBehavior : public EGL::CGLEBehavior {
 	public:

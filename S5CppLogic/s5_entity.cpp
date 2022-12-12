@@ -434,6 +434,17 @@ float GGL::CBuilding::GetRemainingUpgradeTime()
 	return building_getupremainingtime(this);
 }
 
+int __thiscall GGL::CBuilding::GetBaseArmor()
+{
+	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	if (d && d->ArmorOverride >= 0)
+		return d->ArmorOverride;
+	GGlue::CGlueEntityProps* p = GetEntityType();
+	if (const auto* l = dynamic_cast<GGL::CGLBuildingProps*>(p->LogicProps))
+		return l->ArmorAmount;
+	return 0;
+}
+
 static inline void(__thiscall* const entitysethealth)(EGL::CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, int)>(0x57A6D9);
 void EGL::CGLEEntity::SetHealth(int h)
 {
@@ -491,6 +502,20 @@ bool EGL::CGLEEntity::IsInBlocking() const
 bool EGL::CGLEEntity::IsDead() const
 {
 	return Health <= 0 || IsInBlocking();
+}
+
+inline shok::AccessCategory(__thiscall* const entity_getaccesscat)(const EGL::CGLEEntity* e) = reinterpret_cast<shok::AccessCategory(__thiscall*)(const EGL::CGLEEntity*)>(0x57BA1F);
+shok::AccessCategory EGL::CGLEEntity::GetAccessCategory() const
+{
+	return entity_getaccesscat(this);
+}
+
+float __thiscall EGL::CGLEEntity::GetBaseExploration()
+{
+	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	if (d && d->ExplorationOverride >= 0.0f)
+		return d->ExplorationOverride;
+	return GetEntityType()->LogicProps->Exploration;
 }
 
 void EGL::CGLEEntity::ClearAttackers()
@@ -1159,9 +1184,24 @@ void EGL::CGLEEntity::HookHurtEntity()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DC6D9), &shurikenthrow, reinterpret_cast<void*>(0x4DC6E2));
 
 	HookDamageMod(); // set projectile player field in creator
-	GGL::CBombPlacerBehavior::FixBombAttachment();
+	GGL::CBombPlacerBehavior::HookFixBombAttachment();
 	GGL::CCannonBallEffect::AddDamageSourceOverride = true;
 }
+
+float EGL::CGLEEntity::CalculateDamageAgainstMe(int damage, int damageclass, float aoeFactor)
+{
+	float dmg = static_cast<float>(damage) * aoeFactor;
+	EGL::CEventGetValue_Int getac{ shok::EventIDs::GetArmorClass };
+	FireEvent(&getac);
+	EGL::CEventGetValue_Int geta{ shok::EventIDs::GetArmor };
+	FireEvent(&geta);
+
+	if (damageclass > 0 && damageclass < static_cast<int>((*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size()))
+		dmg *= (*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[damageclass]->GetBonusVsArmorClass(getac.Data);
+	dmg -= geta.Data;
+	return dmg;
+}
+
 bool EGL::CGLEEntity::AdvHurtEntity_CheckOverHeal = false;
 void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
 {
@@ -1372,15 +1412,7 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 			cr = 1 - cr * cr;
 
 		if (cr != 0) {
-			EGL::CEventGetValue_Int getac{ shok::EventIDs::GetArmorClass };
-			curr->FireEvent(&getac);
-			EGL::CEventGetValue_Int geta{ shok::EventIDs::GetArmor };
-			curr->FireEvent(&geta);
-
-			float dmg = damage * cr;
-			if (damageclass > 0 && damageclass < static_cast<int>((*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size()))
-				dmg *= (*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[damageclass]->GetBonusVsArmorClass(getac.Data);
-			dmg -= geta.Data;
+			float dmg = curr->CalculateDamageAgainstMe(damage, damageclass, cr);
 
 			if (dmg < 1)
 				dmg = 1;
@@ -1805,41 +1837,6 @@ void EGL::CGLEEntity::CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* 
 }
 
 
-float __fastcall entitygetdamagemod(GGL::CBattleBehavior* b) {
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(b->EntityId);
-	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
-	if (d && d->DamageOverride >= 0)
-		return static_cast<float>(d->DamageOverride);
-	else
-		return static_cast<float>(e->GetEntityType()->GetBehaviorProps<GGL::CBattleBehaviorProps>()->DamageAmount);
-}
-void __declspec(naked) entitydamagemodeventbattleasm() {
-	__asm {
-		sub esp, 0x24;
-		push ebx;
-		push esi;
-		mov esi, ecx;
-
-		call entitygetdamagemod;
-
-		push esi;
-		push 0x50C793;
-		ret;
-	}
-}
-void __declspec(naked) entitydamagemodbattlecalcsingletargetdmgasm() {
-	__asm {
-		pushad;
-
-		mov ecx, esi;
-		call entitygetdamagemod;
-
-		popad;
-
-		push 0x50C23B;
-		ret;
-	}
-}
 EGL::CEventGetValue_Int* __fastcall entitydamagemodeventautocannonasm(GGL::CAutoCannonBehavior* th, int, EGL::CEventGetValue_Int* ev) {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
@@ -1849,72 +1846,22 @@ EGL::CEventGetValue_Int* __fastcall entitydamagemodeventautocannonasm(GGL::CAuto
 		ev->Data = e->GetEntityType()->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>()->DamageAmount;
 	return ev;
 }
-void __declspec(naked) entitydamagemodbattleprojectile() {
-	__asm {
-		test al, al;
-		jz arrow;
-
-		mov ecx, [ebp - 0x10]; // attacker obj
-		mov eax, [ecx + 6 * 4]; // player
-		mov[ebp - 0x28], eax; // creator source player
-		mov[ebp - 0x5C], eax; // creator player
-
-		call EGL::CGLEEntity::EventGetDamage;
-		push 0x50C3F7;
-		ret;
-
-	arrow:
-
-		mov ecx, [ebp - 0x10]; // attacker obj
-		mov eax, [ecx + 6 * 4]; // player
-		mov[ebp - 0x5C], eax; // creator player
-
-		
-		push esi;
-		mov ecx, edi;
-		mov eax, 0x50C1CD;
-		call eax;
-		push 0x50C3F7;
-		ret;
-	}
-}
 bool HookDamageMod_Hooked = false;
 void EGL::CGLEEntity::HookDamageMod()
 {
 	if (HookDamageMod_Hooked)
 		return;
 	HookDamageMod_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
-		reinterpret_cast<void*>(0x50C785),
-		reinterpret_cast<void*>(0x50C235),
-		reinterpret_cast<void*>(0x50F5ED),
-		reinterpret_cast<void*>(0x50C3E7),
-		reinterpret_cast<void*>(0x510638),
-	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C785), &entitydamagemodeventbattleasm, reinterpret_cast<void*>(0x50C793));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C235), &entitydamagemodbattlecalcsingletargetdmgasm, reinterpret_cast<void*>(0x50C23B));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F5ED), &entitydamagemodeventautocannonasm, reinterpret_cast<void*>(0x50F5FD));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C3E7), &entitydamagemodbattleprojectile, reinterpret_cast<void*>(0x50C3F7));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x510638), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CAutoCannonBehavior::TaskFireProjectileOverride, 0), reinterpret_cast<void*>(0x510647));
+	GGL::CBattleBehavior::HookDamageOverride();
+	GGL::CAutoCannonBehavior::HookDamageOverride();
 }
 
-int __fastcall entityarmormod(EGL::CGLEEntity* e) {
-	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
-	if (d && d->ArmorOverride >= 0)
-		return d->ArmorOverride;
-	GGlue::CGlueEntityProps* p = e->GetEntityType();
-	if (p->IsSettlerType())
-		return static_cast<GGL::CGLSettlerProps*>(p->LogicProps)->ArmorAmount;
-	else if (p->IsBuildingType())
-		return static_cast<GGL::CGLBuildingProps*>(p->LogicProps)->ArmorAmount;
-	return 0;
-}
 void __declspec(naked) entityarmormodsettlerasm() {
 	__asm {
 		mov esi, ecx;
 		push[esi + 0x10];
 
-		call entityarmormod;
+		call GGL::CSettler::GetBaseArmor;
 
 		push 0x4A6B25;
 		ret;
@@ -1925,7 +1872,7 @@ void __declspec(naked) entityarmormodbuildingrasm() {
 		mov esi, ecx;
 		push[esi + 0x10];
 
-		call entityarmormod;
+		call GGL::CBuilding::GetBaseArmor;
 		push eax;
 		fild[esp];
 		pop eax;
@@ -1951,18 +1898,12 @@ void EGL::CGLEEntity::HookArmorMod()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4AB160), &entityarmormodbuildingrasm, reinterpret_cast<void*>(0x04AB170));
 }
 
-float __fastcall entityexplmod(EGL::CGLEEntity* e) {
-	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
-	if (d && d->ExplorationOverride >= 0.0f)
-		return d->ExplorationOverride;
-	return e->GetEntityType()->LogicProps->Exploration;
-}
 void __declspec(naked) entityexplmodsettasm() {
 	__asm {
 		push esi;
 		push[esi + 0x10];
 
-		call entityexplmod;
+		call EGL::CGLEEntity::GetBaseExploration;
 
 		push 0x4A4AD4;
 		ret;
@@ -1977,7 +1918,7 @@ void __declspec(naked) entityexplmodbuildasm() {
 
 		push eax;
 		mov ecx, esi;
-		call entityexplmod;
+		call EGL::CGLEEntity::GetBaseExploration;
 		pop eax;
 
 		push 0x4AB1A4;
@@ -2025,6 +1966,17 @@ static inline int(__thiscall* const settler_getdodge)(GGL::CSettler* th) = reint
 int GGL::CSettler::GetDodgeChance()
 {
 	return settler_getdodge(this);
+}
+
+int __thiscall GGL::CSettler::GetBaseArmor()
+{
+	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	if (d && d->ArmorOverride >= 0)
+		return d->ArmorOverride;
+	GGlue::CGlueEntityProps* p = GetEntityType();
+	if (const auto* l = dynamic_cast<GGL::CGLSettlerProps*>(p->LogicProps))
+		return l->ArmorAmount;
+	return 0;
 }
 
 static inline void(__thiscall* const settler_upgrade)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x4A6C4A);

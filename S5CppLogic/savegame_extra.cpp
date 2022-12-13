@@ -65,14 +65,6 @@ BB::SerializationData PairStrings[]{
 	BB::SerializationData::GuardData(),
 };
 
-CppLogic::SerializationListOptions_ForMap<int, EGL::CGLEEntity::EntityAddonData> AddonMap{};
-using pair_int_addondata = std::pair<int, EGL::CGLEEntity::EntityAddonData>;
-BB::SerializationData PairIntAddon[]{
-	BB::SerializationData::FieldData("Key", MemberSerializationFieldData(pair_int_addondata, first)),
-	BB::SerializationData::EmbeddedData("Value", MemberSerializationEmbeddedData(pair_int_addondata, second)),
-	BB::SerializationData::GuardData(),
-};
-
 BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationData[]{
 	BB::SerializationData::FieldData("SavegameName", MemberSerializationSizeAndOffset(SerializedMapdata, SavegameName), &CppLogic::StringSerializer::GlobalObj),
 	BB::SerializationData::FieldData("HurtEntityCallWithNoAttacker", MemberSerializationFieldData(SerializedMapdata, HurtEntityCallWithNoAttacker)),
@@ -95,7 +87,6 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	BB::SerializationData::FieldData("HookDisplayName", MemberSerializationFieldData(SerializedMapdata, HookDisplayName)),
 	BB::SerializationData::FieldData("RangedEffectSoldierHeal", MemberSerializationFieldData(SerializedMapdata, RangedEffectSoldierHeal)),
 	BB::SerializationData::EmbeddedData("StringTableTextOverride", MemberSerializationSizeAndOffset(SerializedMapdata ,StringTableTextOverride), PairStrings, &StringMap),
-	BB::SerializationData::EmbeddedData("EntityAddonDataMap", MemberSerializationSizeAndOffset(SerializedMapdata ,EntityAddonDataMap), PairIntAddon, &AddonMap),
 	BB::SerializationData::GuardData(),
 };
 
@@ -122,5 +113,4 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	HookDisplayName = false;
 	RangedEffectSoldierHeal = false;
 	StringTableTextOverride.clear();
-	EntityAddonDataMap.clear();
 }

@@ -19,6 +19,7 @@
 #include "entityiterator.h"
 #include "modloader.h"
 #include "savegame_extra.h"
+#include "EntityAddonData.h"
 
 namespace CppLogic::Entity {
 	int PredicateOfType(lua::State L) {
@@ -1519,7 +1520,7 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookMaxHP();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxHP = true;
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(true);
+		auto* d = b->GetAdditionalData(true);
 		if (L.IsNumber(2)) {
 			d->HealthOverride = L.CheckInt(2);
 		}
@@ -1532,10 +1533,13 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* fro = L.OptEntity(1);
 		EGL::CGLEEntity* to = L.CheckEntity(2);
-		if (fro)
-			to->CloneAdditionalDataFrom(fro->GetAdditionalData(false));
+		if (fro) {
+			auto* add = fro->GetAdditionalData();
+			if (add)
+				to->CloneAdditionalDataFrom(*add);
+		}
 		else if (EGL::CGLEEntity::LastRemovedEntityAddonData.EntityId == L.CheckInt(1))
-			to->CloneAdditionalDataFrom(&EGL::CGLEEntity::LastRemovedEntityAddonData);
+			to->CloneAdditionalDataFrom(EGL::CGLEEntity::LastRemovedEntityAddonData);
 		return 0;
 	}
 	int SetDamage(lua::State l) {
@@ -1547,7 +1551,7 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookDestroyEntity();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDamage = true;
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(true);
+		auto* d = b->GetAdditionalData(true);
 		d->DamageOverride = L.CheckInt(2);
 		return 0;
 	}
@@ -1560,7 +1564,7 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookDestroyEntity();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookArmor = true;
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(true);
+		auto* d = b->GetAdditionalData(true);
 		d->ArmorOverride = L.CheckInt(2);
 		return 0;
 	}
@@ -1573,7 +1577,7 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookDestroyEntity();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookExploration = true;
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(true);
+		auto* d = b->GetAdditionalData(true);
 		d->ExplorationOverride = L.CheckFloat(2);
 		return 0;
 	}
@@ -1584,11 +1588,11 @@ namespace CppLogic::Entity {
 		GGL::CSettler* b = L.CheckSettler(1);
 		if (!b->GetBehavior<GGL::CLeaderBehavior>())
 			throw lua::LuaException("no leader");
-		EGL::CGLEEntity::HookLeaderRegen();
+		GGL::CLeaderBehavior::HookLeaderRegen();
 		EGL::CGLEEntity::HookDestroyEntity();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookRegen = true;
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(true);
+		auto* d = b->GetAdditionalData(true);
 		if (L.IsNumber(2))
 			d->RegenHPOverride = L.CheckInt(2);
 		if (L.IsNumber(3))
@@ -1604,7 +1608,7 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookDestroyEntity();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxRange = true;
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(true);
+		auto* d = b->GetAdditionalData(true);
 		d->MaxRangeOverride = L.CheckFloat(2);
 		return 0;
 	}
@@ -1617,14 +1621,14 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookDestroyEntity();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDisplayName = true;
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(true);
+		auto* d = b->GetAdditionalData(true);
 		d->NameOverride = L.CheckString(2);
 		return 0;
 	}
 	int GetDisplayName(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
-		EGL::CGLEEntity::EntityAddonData* d = b->GetAdditionalData(false);
+		auto* d = b->GetAdditionalData(false);
 		if (d && !d->NameOverride.empty())
 			L.Push(d->NameOverride);
 		else
@@ -1649,7 +1653,7 @@ namespace CppLogic::Entity {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		bool a = L.ToBoolean(1);
-		EGL::CGLEEntity::HookRangedEffectActivateHeal(a);
+		GGL::CRangedEffectAbility::HookHealAffected(a);
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RangedEffectSoldierHeal = a;
 		return 0;
 	}
@@ -1870,7 +1874,7 @@ namespace CppLogic::Entity {
 		DisableConversionHook(L);
 		EGL::CGLEEntity::BuildingMaxHpTechBoni.clear();
 		EGL::CGLEEntity::LastRemovedEntityAddonData.EntityId = 0;
-		EGL::CGLEEntity::HookRangedEffectActivateHeal(false);
+		GGL::CRangedEffectAbility::HookHealAffected(false);
 		SettlerCleanupAnimTask(L);
 	}
 
@@ -2087,13 +2091,13 @@ namespace CppLogic::Entity {
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookExploration)
 			EGL::CGLEEntity::HookExplorationMod();
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookRegen)
-			EGL::CGLEEntity::HookLeaderRegen();
+			GGL::CLeaderBehavior::HookLeaderRegen();
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxRange)
 			EGL::CGLEEntity::HookMaxRange();
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDisplayName)
 			EGL::CGLEEntity::HookDisplayName();
 
-		EGL::CGLEEntity::HookRangedEffectActivateHeal(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RangedEffectSoldierHeal);
+		GGL::CRangedEffectAbility::HookHealAffected(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RangedEffectSoldierHeal);
 	}
 }
 

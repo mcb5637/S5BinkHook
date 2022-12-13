@@ -101,6 +101,9 @@ namespace EGL {
 		};
 
 		// all fields are in GGL::CGLBehaviorAnimationEx
+
+	protected:
+		shok::TaskStateExecutionResult StateWaitForAnim(int i);
 	};
 }
 
@@ -283,6 +286,10 @@ namespace GGL {
 		static inline constexpr int vtp = 0x774E54;
 		static inline constexpr int TypeDesc = 0x81B7AC;
 		static inline constexpr unsigned int Identifier = 0x0F622BC1D;
+
+		void __thiscall AdvHealAffected(); // heals all attached with HERO_AFFECTED
+
+		static void HookHealAffected(bool active);
 	};
 
 	class CCircularAttack : public GGL::CHeroAbility {
@@ -371,6 +378,8 @@ namespace GGL {
 
 		static void OverrideSnipeTask();
 		static int (*SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg);
+	private:
+		int __thiscall TaskOverrideSnipe(EGL::CGLETaskArgs* a);
 	};
 
 	class CMotivateWorkersAbility : public GGL::CHeroAbility {
@@ -533,6 +542,11 @@ namespace GGL {
 		static inline constexpr int vtp = 0x776B64;
 		static inline constexpr int TypeDesc = 0x820BE8;
 		static inline constexpr unsigned int Identifier = 0x0A4947238;
+
+		static void HookNonCancelableAnim();
+	private:
+		int TaskWaitForAnimNonCancelable(EGL::CGLETaskArgsThousandths* a);
+		void __stdcall AddNonCancelableHandlers();
 	};
 
 	class CBehaviorWalkCommand : public EGL::CGLEBehavior {
@@ -626,8 +640,10 @@ namespace GGL {
 		EGL::CGLEEntity* GetTarget() const;
 		float GetMissChance() const;
 		bool CheckMiss(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
+		float __thiscall GetMaxRangeBase() const;
 
 		static void HookDamageOverride();
+		static void HookRangeOverride();
 	private:
 		void __thiscall EventOverrideGetDamage(EGL::CEventGetValue_Int* ev);
 		int __thiscall TaskOverrideFireProjctile(EGL::CGLETaskArgs* a);
@@ -661,6 +677,12 @@ namespace GGL {
 
 		int GetTroopHealth();
 		int GetTroopHealthPerSoldier();
+		void PerformRegeneration();
+
+		static bool LeaderRegenRegenerateSoldiers;
+		static void HookLeaderRegen();
+	private:
+		void __thiscall CheckRegen();
 	};
 
 	class CSoldierBehavior : public GGL::CBattleBehavior {
@@ -718,12 +740,14 @@ namespace GGL {
 
 		float GetMaxRange() const;
 		int GetDamage() const;
+		float __thiscall GetMaxRangeBase() const;
 
 		static inline constexpr int vtp = 0x778CF0;
 		static inline constexpr int TypeDesc = 0x8288A0;
 		static inline constexpr unsigned int Identifier = 0x143C5EFD;
 
 		static void HookDamageOverride();
+		static void HookRangeOverride();
 	private:
 		int __thiscall TaskFireProjectileOverride(EGL::CGLETaskArgs* a);
 		void __thiscall EventGetDamageOverride(EGL::CEventGetValue_Int* ev);

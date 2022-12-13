@@ -27,6 +27,7 @@
 #include "s5_staticlist.h"
 #include "s5_entitydisplay.h"
 #include "s5_events.h"
+#include "s5_behaviorProps.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -43,6 +44,7 @@
 #include "l_ui.h"
 #include "luaserializer.h"
 #include "savegame_extra.h"
+#include "EntityAddonData.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -85,8 +87,11 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
-	auto* a = L.CheckEntityType(1);
-	return 0;
+	auto* a = L.CheckEntity(1);
+	auto v = a->Behaviours.SaveVector();
+	L.Push((int)v.Vector.size());
+	L.Push((int)v.Vector.capacity());
+	return 2;
 }
 
 int GetOptions(lua::State L) {
@@ -149,6 +154,7 @@ void InitGame() {
 	if (!Options.DisableAdvLuaSerializer)
 		EScr::LuaStateSerializer::HookSerializationOverride();
 	EScr::CScriptTriggerSystem::HookFireEvent();
+	CppLogic::EntityAddon::EntityAddonData::Init();
 }
 
 constexpr double Version = 2.0004;

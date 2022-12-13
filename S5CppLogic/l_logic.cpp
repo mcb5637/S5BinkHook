@@ -486,9 +486,9 @@ namespace CppLogic::Logic {
 	int SetLeadersRegenerateTroopHealth(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
-		EGL::CGLEEntity::HookLeaderRegen();
-		EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = L.ToBoolean(1);
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers = EGL::CGLEEntity::LeaderRegenRegenerateSoldiers;
+		GGL::CLeaderBehavior::HookLeaderRegen();
+		GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = L.ToBoolean(1);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers = GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers;
 		return 0;
 	}
 
@@ -1329,7 +1329,7 @@ namespace CppLogic::Logic {
 	{
 		EGL::TaskData::AddExtraTasks();
 		EGL::CGLEEntity::HookLuaTaskList();
-		EGL::CGLEEntity::HookNonCancelableAnim();
+		GGL::CGLBehaviorAnimationEx::HookNonCancelableAnim();
 	}
 
 	void OnLoad()
@@ -1341,7 +1341,7 @@ namespace CppLogic::Logic {
 	void Cleanup(lua::State L) {
 		NetEventUnSetHook(L);
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
-		EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
+		GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = false;
 		BB::StringTableText::GetStringTableTextOverride = nullptr;
 		GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
 		GGUI::CPlaceBuildingState::PlacementRotation = 0.0f;
@@ -1471,9 +1471,9 @@ namespace CppLogic::Logic {
 			}
 			L.Pop(1);
 
-			EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers;
-			if (EGL::CGLEEntity::LeaderRegenRegenerateSoldiers)
-				EGL::CGLEEntity::HookLeaderRegen();
+			GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers;
+			if (GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers)
+				GGL::CLeaderBehavior::HookLeaderRegen();
 
 			L.Push(SetLuaTaskListFuncRegKey);
 			L.GetTableRaw(-2);

@@ -32,7 +32,6 @@ namespace CppLogic::SavegameExtra {
 		bool HookDisplayName = false;
 		bool RangedEffectSoldierHeal = false;
 		std::map<const std::string, std::string, StringComparator> StringTableTextOverride;
-		std::map<int, EGL::CGLEEntity::EntityAddonData> EntityAddonDataMap;
 
 		void SerializeTo(const char* path, const char* savename);
 		void DeserializeFrom(const char* path, const char* savename);

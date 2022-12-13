@@ -84,23 +84,6 @@ namespace EGL {
 
 	class CGLEEntity : public BB::IObject, public IEntityDisplay, public EGL::TGLEAttachable<EGL::CGLEEntity, EGL::CEntityAttachmentProxy> {
 	public:
-		struct EntityAddonData {
-			int EntityId = 0;
-			int HealthOverride = -1;
-			bool HealthUseBoni = true;
-			int DamageOverride = -1;
-			int ArmorOverride = -1;
-			float ExplorationOverride = -1.0f;
-			int RegenHPOverride = -1;
-			int RegenSecondsOverride = -1;
-			float MaxRangeOverride = -1.0f;
-			std::string NameOverride = "";
-			int FakeTaskValue = 0;
-
-			static BB::SerializationData SerializationData[];
-		};
-
-
 		int SetNewTaskListDepth;
 		shok::PositionRot Position; // 22
 		float Scale; // 25
@@ -247,8 +230,9 @@ namespace EGL {
 
 		void ClearAttackers();
 
-		EGL::CGLEEntity::EntityAddonData* GetAdditionalData(bool create);
-		void CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* other);
+		CppLogic::EntityAddon::EntityAddonData* GetAdditionalData(bool create = false);
+		const CppLogic::EntityAddon::EntityAddonData* GetAdditionalData() const;
+		void CloneAdditionalDataFrom(const CppLogic::EntityAddon::EntityAddonData& other);
 
 		static bool AdvHurtEntity_CheckOverHeal;
 		float CalculateDamageAgainstMe(int damage, int damageclass, float aoeFactor = 1.0f);
@@ -278,11 +262,8 @@ namespace EGL {
 		static void HookDamageMod();
 		static void HookArmorMod();
 		static void HookExplorationMod();
-		static bool LeaderRegenRegenerateSoldiers;
-		static void HookLeaderRegen();
 		static void HookMaxRange();
 		static void HookDisplayName();
-		static void HookRangedEffectActivateHeal(bool hookActive);
 		static std::multimap<int, int> BuildingMaxHpTechBoni; // ety->techid
 		static bool UseMaxHPTechBoni;
 		static void HookMaxHP();
@@ -290,12 +271,11 @@ namespace EGL {
 	private:
 		int ExecuteLuaTask(EGL::CTaskArgsInteger* arg);
 		shok::TaskStateExecutionResult ExecuteLuaTaskState(int i);
-		static void __fastcall AddHandlerLuaTask(CGLEEntity* th);
+		void __thiscall AddHandlerLuaTask();
 
 	public:
 		static shok::TaskExecutionResult(*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
 		static void HookLuaTaskList();
-		static void HookNonCancelableAnim();
 		static bool BuildOnSetPosFixMovement;
 		static void HookBuildOnSetPos();
 		static void HookSetTaskListNonCancelable(bool active);
@@ -313,7 +293,7 @@ namespace EGL {
 		static bool HurtEntityCallWithNoAttacker;
 		static void (*HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc);
 		static void HookDestroyEntity();
-		static EGL::CGLEEntity::EntityAddonData LastRemovedEntityAddonData;
+		static CppLogic::EntityAddon::EntityAddonData LastRemovedEntityAddonData;
 
 		static inline EGL::CGLEEntity* (__stdcall* const GetEntityByID)(int id) = reinterpret_cast<EGL::CGLEEntity * (__stdcall*)(int)>(0x5825B4);
 		static inline void(__cdecl* const EntityHurtEntity)(EGL::CGLEEntity* attackerObj, EGL::CGLEEntity* targetObj, int damage) = reinterpret_cast<void(__cdecl*)(EGL::CGLEEntity*, EGL::CGLEEntity*, int)>(0x49F358);

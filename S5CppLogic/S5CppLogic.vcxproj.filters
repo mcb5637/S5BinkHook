@@ -261,6 +261,9 @@
     <ClInclude Include="directx.h">
       <Filter>shok\engine</Filter>
     </ClInclude>
+    <ClInclude Include="EntityAddonData.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -417,6 +420,9 @@
       <Filter>shok\entity</Filter>
     </ClCompile>
     <ClCompile Include="savegame_extra.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityAddonData.cpp">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>

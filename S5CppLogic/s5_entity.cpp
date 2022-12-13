@@ -18,6 +18,7 @@
 #include "luaext.h"
 #include "hooks.h"
 #include "savegame_extra.h"
+#include "EntityAddonData.h"
 
 struct shok_vtable_EGL_CGLEEntity : BB::IObject::_vtableS {
 	void(__thiscall* Destroy)(EGL::CGLEEntity* th, int i); // 3
@@ -78,20 +79,7 @@ EGL::IEntityDisplay::posdata EGL::IEntityDisplay::GetPosData() const
 	return r;
 }
 
-BB::SerializationData EGL::CGLEEntity::EntityAddonData::SerializationData[]{
-	BB::SerializationData::FieldData("EntityId", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, EntityId)),
-	BB::SerializationData::FieldData("HealthOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, HealthOverride)),
-	BB::SerializationData::FieldData("HealthUseBoni", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, HealthUseBoni)),
-	BB::SerializationData::FieldData("DamageOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, DamageOverride)),
-	BB::SerializationData::FieldData("ArmorOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, ArmorOverride)),
-	BB::SerializationData::FieldData("ExplorationOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, ExplorationOverride)),
-	BB::SerializationData::FieldData("RegenHPOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, RegenHPOverride)),
-	BB::SerializationData::FieldData("RegenSecondsOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, RegenSecondsOverride)),
-	BB::SerializationData::FieldData("MaxRangeOverride", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, MaxRangeOverride)),
-	BB::SerializationData::FieldData("NameOverride", MemberSerializationSizeAndOffset(EGL::CGLEEntity::EntityAddonData, NameOverride), &CppLogic::StringSerializer::GlobalObj),
-	BB::SerializationData::FieldData("FakeTaskValue", MemberSerializationFieldData(EGL::CGLEEntity::EntityAddonData, FakeTaskValue)),
-	BB::SerializationData::GuardData(),
-};
+
 
 static inline void(__thiscall* const shok_EGL_CGLEEntityCreator_ctor)(EGL::CGLEEntityCreator* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntityCreator*)>(0x4493A4);
 EGL::CGLEEntityCreator::CGLEEntityCreator()
@@ -436,7 +424,7 @@ float GGL::CBuilding::GetRemainingUpgradeTime()
 
 int __thiscall GGL::CBuilding::GetBaseArmor()
 {
-	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	auto* d = GetAdditionalData(false);
 	if (d && d->ArmorOverride >= 0)
 		return d->ArmorOverride;
 	GGlue::CGlueEntityProps* p = GetEntityType();
@@ -512,7 +500,7 @@ shok::AccessCategory EGL::CGLEEntity::GetAccessCategory() const
 
 float __thiscall EGL::CGLEEntity::GetBaseExploration()
 {
-	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	auto* d = GetAdditionalData(false);
 	if (d && d->ExplorationOverride >= 0.0f)
 		return d->ExplorationOverride;
 	return GetEntityType()->LogicProps->Exploration;
@@ -1440,7 +1428,7 @@ std::multimap<int, int> EGL::CGLEEntity::BuildingMaxHpTechBoni = std::multimap<i
 bool EGL::CGLEEntity::UseMaxHPTechBoni = false;
 int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
 	float hp;
-	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
+	auto* d = e->GetAdditionalData(false);
 	GGlue::CGlueEntityProps* et = e->GetEntityType();
 	if (d && d->HealthOverride > 0) {
 		hp = static_cast<float>(d->HealthOverride);
@@ -1554,10 +1542,10 @@ shok::TaskStateExecutionResult EGL::CGLEEntity::ExecuteLuaTaskState(int p)
 	return i;
 }
 void(__thiscall* const entityaddluatlhandlers)(EGL::CGLEEntity* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*)>(0x57BA34);
-void __fastcall EGL::CGLEEntity::AddHandlerLuaTask(EGL::CGLEEntity* th) {
-	entityaddluatlhandlers(th);
-	th->CreateTaskHandler<shok::Task::TASK_LUA_FUNC>(th, &ExecuteLuaTask);
-	th->CreateStateHandler<shok::TaskState::LuaFunc>(th, &ExecuteLuaTaskState);
+void __thiscall EGL::CGLEEntity::AddHandlerLuaTask() {
+	entityaddluatlhandlers(this);
+	CreateTaskHandler<shok::Task::TASK_LUA_FUNC>(this, &EGL::CGLEEntity::ExecuteLuaTask);
+	CreateStateHandler<shok::TaskState::LuaFunc>(this, &EGL::CGLEEntity::ExecuteLuaTaskState);
 }
 bool HookLuaTaskList_Hooked = false;
 void EGL::CGLEEntity::HookLuaTaskList()
@@ -1566,61 +1554,7 @@ void EGL::CGLEEntity::HookLuaTaskList()
 		return;
 	HookLuaTaskList_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57D6CA), 10 };
-	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x57D6CA), &EGL::CGLEEntity::AddHandlerLuaTask);
-}
-
-class CustomTaskHandler : public EGL::TaskHandler {
-public:
-	GGL::CGLBehaviorAnimationEx* th = nullptr;
-
-	virtual int Handle(EGL::CGLETaskArgs* args) override {
-		int wait = static_cast<EGL::CGLETaskArgsThousandths*>(args)->Thousandths;
-		EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-		th->TurnToWaitFor = th->StartTurn + th->Duration * wait / 1000;
-		e->SetTaskState(shok::TaskState::WaitForAnimNonCancelable);
-		return 1;
-	}
-};
-static inline shok::TaskStateExecutionResult(__thiscall* const behanim_statehandlerwait)(GGL::CGLBehaviorAnimationEx* th, int i) = reinterpret_cast<shok::TaskStateExecutionResult(__thiscall*)(GGL::CGLBehaviorAnimationEx*, int)>(0x587E20);
-class CustomStateHandler : public EGL::IGLEStateHandler {
-public:
-	GGL::CGLBehaviorAnimationEx* th = nullptr;
-
-	virtual shok::TaskStateExecutionResult Handle(int i) override {
-		return behanim_statehandlerwait(th, i);
-	}
-};
-
-void __stdcall entity_hooknoncancelanim(EGL::CGLEEntity* th, GGL::CGLBehaviorAnimationEx* beh) {
-	CustomTaskHandler* thand = new (shok::Malloc(sizeof(CustomTaskHandler))) CustomTaskHandler();
-	thand->th = beh;
-	th->AddTaskHandler(shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, thand);
-	CustomStateHandler* shand = new (shok::Malloc(sizeof(CustomStateHandler))) CustomStateHandler();
-	shand->th = beh;
-	th->AddStateHandler(shok::TaskState::WaitForAnimNonCancelable, shand);
-}
-void __declspec(naked) entity_hooknoncancelanim_asm() {
-	__asm {
-		mov ecx, esi;
-		call[eax + 0x48];
-
-		push edi;
-		push esi;
-		call entity_hooknoncancelanim;
-
-		mov ecx, [ebp + 0xC];
-		push 0x588410;
-		ret;
-	};
-}
-bool HookNonCancelableAnim_Hooked = false;
-void EGL::CGLEEntity::HookNonCancelableAnim()
-{
-	if (HookNonCancelableAnim_Hooked)
-		return;
-	HookNonCancelableAnim_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x588408), 0x588410 - 0x588408 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x588408), &entity_hooknoncancelanim_asm, reinterpret_cast<void*>(0x588410));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x57D6CA), CppLogic::Hooks::MemberFuncPointerToVoid(&AddHandlerLuaTask, 0));
 }
 
 void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBehaviorDefaultMovement*, shok::Position*)>(0x586894);
@@ -1766,14 +1700,13 @@ EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntit
 }
 
 
-EGL::CGLEEntity::EntityAddonData EGL::CGLEEntity::LastRemovedEntityAddonData = EGL::CGLEEntity::EntityAddonData();
+CppLogic::EntityAddon::EntityAddonData EGL::CGLEEntity::LastRemovedEntityAddonData{};
 void __fastcall destroyentity_gemoveadd(EGL::CGLEEntity* e) {
 	BB::CEvent ev{ shok::EventIDs::CppL_OnEntityDestroy };
 	e->FireEvent(&ev);
-	auto a = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.find(e->EntityId);
-	if (a != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.end()) {
-		EGL::CGLEEntity::LastRemovedEntityAddonData = a->second;
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.erase(a);
+	auto a = e->GetAdditionalData();
+	if (a) {
+		EGL::CGLEEntity::LastRemovedEntityAddonData = *a;
 	}
 }
 void __declspec(naked) destroyentityhook() {
@@ -1803,43 +1736,29 @@ void EGL::CGLEEntity::HookDestroyEntity()
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57C94A), 0x57C957 - 0x57C94A };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57C94A), &destroyentityhook, reinterpret_cast<void*>(0x57C957));
 }
-EGL::CGLEEntity::EntityAddonData* EGL::CGLEEntity::GetAdditionalData(bool create)
+CppLogic::EntityAddon::EntityAddonData* EGL::CGLEEntity::GetAdditionalData(bool create)
 {
-	auto a = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.find(EntityId);
-	if (a != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap.end()) {
-		return &a->second;
+	auto* a = GetBehavior<CppLogic::EntityAddon::EntityAddonData>();
+	if (a == nullptr && create) {
+		a = (*BB::CClassFactory::GlobalObj)->CreateObject<CppLogic::EntityAddon::EntityAddonData>();
+		AddBehavior(a);
 	}
-	if (!create) {
-		return nullptr;
-	}
-	else {
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap[EntityId] = EGL::CGLEEntity::EntityAddonData();
-		EGL::CGLEEntity::EntityAddonData* r = &CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EntityAddonDataMap[EntityId];
-		r->EntityId = EntityId;
-		return r;
-	}
+	return a;
 }
-void EGL::CGLEEntity::CloneAdditionalDataFrom(EGL::CGLEEntity::EntityAddonData* other)
+const CppLogic::EntityAddon::EntityAddonData* EGL::CGLEEntity::GetAdditionalData() const
 {
-	if (other) {
-		EGL::CGLEEntity::EntityAddonData* t = GetAdditionalData(true);
-		t->HealthOverride = other->HealthOverride;
-		t->HealthUseBoni = other->HealthUseBoni;
-		t->DamageOverride = other->DamageOverride;
-		t->ArmorOverride = other->ArmorOverride;
-		t->ExplorationOverride = other->ExplorationOverride;
-		t->RegenHPOverride = other->RegenHPOverride;
-		t->RegenSecondsOverride = other->RegenSecondsOverride;
-		t->MaxRangeOverride = other->MaxRangeOverride;
-		t->NameOverride = other->NameOverride;
-		t->FakeTaskValue = other->FakeTaskValue;
-	}
+	return GetBehavior<CppLogic::EntityAddon::EntityAddonData>();
+}
+void EGL::CGLEEntity::CloneAdditionalDataFrom(const CppLogic::EntityAddon::EntityAddonData& other)
+{
+	auto* t = GetAdditionalData(true);
+	*t = other;
 }
 
 
 EGL::CEventGetValue_Int* __fastcall entitydamagemodeventautocannonasm(GGL::CAutoCannonBehavior* th, int, EGL::CEventGetValue_Int* ev) {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
+	auto* d = e->GetAdditionalData(false);
 	if (d && d->DamageOverride >= 0)
 		ev->Data = d->DamageOverride;
 	else
@@ -1941,7 +1860,7 @@ void EGL::CGLEEntity::HookExplorationMod()
 
 int GGL::CSettler::LeaderGetRegenHealth()
 {
-	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	auto* d = GetAdditionalData(false);
 	int i;
 	if (d && d->RegenHPOverride >= 0)
 		i = d->RegenHPOverride;
@@ -1951,7 +1870,7 @@ int GGL::CSettler::LeaderGetRegenHealth()
 }
 int GGL::CSettler::LeaderGetRegenHealthSeconds()
 {
-	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	auto* d = GetAdditionalData(false);
 	if (d && d->RegenSecondsOverride >= 0)
 		return d->RegenSecondsOverride;
 	else
@@ -1970,7 +1889,7 @@ int GGL::CSettler::GetDodgeChance()
 
 int __thiscall GGL::CSettler::GetBaseArmor()
 {
-	EGL::CGLEEntity::EntityAddonData* d = GetAdditionalData(false);
+	auto* d = GetAdditionalData(false);
 	if (d && d->ArmorOverride >= 0)
 		return d->ArmorOverride;
 	GGlue::CGlueEntityProps* p = GetEntityType();
@@ -2016,99 +1935,10 @@ void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)
 	}
 }
 
-bool EGL::CGLEEntity::LeaderRegenRegenerateSoldiers = false;
-void __fastcall leaderregen(GGL::CLeaderBehavior* th) {
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-	th->SecondsSinceHPRefresh = 0;
-	int hp = e->Health, mhp = e->GetMaxHealth();
-	if (hp <= 0)
-		return;
-	int r = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealth();
-	e->PerformHeal(r, EGL::CGLEEntity::LeaderRegenRegenerateSoldiers);
-}
-void __fastcall leaderregenseconds(GGL::CLeaderBehavior* th) {
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-	int max = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealthSeconds();
-	th->SecondsSinceHPRefresh++;
-	if (th->SecondsSinceHPRefresh >= max)
-		leaderregen(th);
-}
-void __declspec(naked) leaderregensecondsasm() {
-	__asm {
-		mov ecx, esi;
-		call leaderregenseconds;
-		push 0x4EFC42;
-		ret;
-	}
-}
-bool HookLeaderRegen_Hooked = false;
-void EGL::CGLEEntity::HookLeaderRegen()
-{
-	if (HookLeaderRegen_Hooked)
-		return;
-	HookLeaderRegen_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
-		reinterpret_cast<void*>(0x4EAE92),
-		reinterpret_cast<void*>(0x4EFC29)
-	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EAE92), &leaderregen, reinterpret_cast<void*>(0x4EAE9B));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EFC29), &leaderregensecondsasm, reinterpret_cast<void*>(0x4EFC42));
-}
-
-float __fastcall leadermaxrange(GGL::CBattleBehavior* th) {
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
-	if (d && d->MaxRangeOverride >= 0)
-		return d->MaxRangeOverride;
-	else
-		return e->GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->MaxRange;
-}
-void __declspec(naked) leadermaxrangeasm() {
-	__asm {
-		mov esi, ecx;
-
-		pushad;
-		call leadermaxrange;
-		popad;
-
-		mov eax, [esi + 0x30];
-		push 0x50AB50;
-		ret;
-	}
-}
-float __fastcall autocannonmaxrange(GGL::CAutoCannonBehavior* th) {
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-	EGL::CGLEEntity::EntityAddonData* d = e->GetAdditionalData(false);
-	if (d && d->MaxRangeOverride >= 0)
-		return d->MaxRangeOverride;
-	else
-		return e->GetEntityType()->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>()->MaxAttackRange;
-}
-void __declspec(naked) autocannonmaxrangeasm() {
-	__asm {
-		mov esi, ecx;
-
-		pushad;
-		call autocannonmaxrange;
-		popad;
-
-		mov eax, [esi + 0x14];
-		push 0x50F515;
-		ret;
-	}
-}
-bool HookMaxRange_Hooked = false;
 void EGL::CGLEEntity::HookMaxRange()
 {
-	if (HookMaxRange_Hooked)
-		return;
-	HookMaxRange_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
-		reinterpret_cast<void*>(0x50AB48),
-		reinterpret_cast<void*>(0x50F50D)
-	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50AB48), &leadermaxrangeasm, reinterpret_cast<void*>(0x50AB50));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F50D), &autocannonmaxrangeasm, reinterpret_cast<void*>(0x50F515));
+	GGL::CBattleBehavior::HookRangeOverride();
+	GGL::CAutoCannonBehavior::HookRangeOverride();
 }
 
 const char* __stdcall entitydisplayname(int* e, int type) {
@@ -2130,7 +1960,7 @@ const char* __stdcall entitydisplayname(int* e, int type) {
 		}
 	}
 	if (ent) {
-		EGL::CGLEEntity::EntityAddonData* d = ent->GetAdditionalData(false);
+		auto* d = ent->GetAdditionalData(false);
 		if (d && d->NameOverride.size() > 0) {
 			return d->NameOverride.c_str();
 		}
@@ -2155,42 +1985,4 @@ void EGL::CGLEEntity::HookDisplayName()
 	HookDisplayName_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x53F911), 0x53F91D - 0x53F911 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x53F911), &entitydisplaynameasm, reinterpret_cast<void*>(0x53F91D));
-}
-
-void __fastcall rangedeffecthealhook(GGL::CRangedEffectAbility* th) {
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
-	GGL::CRangedEffectAbilityProps* pr = e->GetEntityType()->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
-	float hpfact = pr->HealthRecoveryFactor;
-	if (hpfact <= 0)
-		return;
-	EGL::CGLEEffectCreator ecr{};
-	ecr.PlayerID = e->PlayerId;
-	ecr.EffectType = pr->HealEffect;
-	for (const auto& a : e->ObservedEntities) {
-		if (a.first == shok::AttachmentType::HERO_AFFECTED) {
-			EGL::CGLEEntity* toheal = EGL::CGLEEntity::GetEntityByID(a.second.EntityId);
-			if (!toheal)
-				return;
-			float heal = toheal->GetMaxHealth() * hpfact;
-			if (ecr.EffectType) {
-				ecr.StartPos.X = toheal->Position.X;
-				ecr.StartPos.Y = toheal->Position.Y;
-				(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
-			}
-			if (toheal->GetBehavior<GGL::CSoldierBehavior>()) {
-				toheal = EGL::CGLEEntity::GetEntityByID(toheal->GetFirstAttachedToMe(shok::AttachmentType::LEADER_SOLDIER));
-			}
-			if (!toheal)
-				return;
-			toheal->PerformHeal(static_cast<int>(heal), true);
-		}
-	}
-}
-void EGL::CGLEEntity::HookRangedEffectActivateHeal(bool hookActive)
-{
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4E3C78), 10 };
-	if (hookActive)
-		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4E3C78), &rangedeffecthealhook);
-	else
-		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4E3C78), reinterpret_cast<void*>(0x4E39B4));
 }

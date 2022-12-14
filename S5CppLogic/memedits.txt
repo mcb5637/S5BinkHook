@@ -6,7 +6,7 @@ EGL_CGLEGameLogic.CreateEffect vtable redirect
 GGL_CCannonBallEffect & GGL_CArrowEffect . OnHit vtable redirect
 cannonball effect from creator 0x4FF942 jmp
 GGUI_CManager.PostEvent vtable redirect
-convert task 0x4FCD26 call redirect
+0x4FCCFE convert settler beh state convert jmp (replace conversion, not touching countdown)
 0x5011DF reset camo func override
 0x4D51A4 & 0x50163A activate camo call redirect
 0x49A6A7 settlerchangeplayer override func to fix it not returning new id

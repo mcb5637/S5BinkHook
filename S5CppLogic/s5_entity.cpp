@@ -878,51 +878,58 @@ void GGL::CBuilding::EnableConstructionSpeedTechs()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook, reinterpret_cast<void*>(0x4B8EB2));
 }
 
+EGL::CGLEEntity* EGL::CGLEEntity::AdvChangePlayer(int player)
+{
+	if (PlayerId == player)
+		return this;
 
-int __cdecl fixedChangePlayer(int id, int pl) {
-	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
-	if (!e)
-		return 0;
-	if (e->PlayerId == pl)
-		return id;
 	EGL::CGLEEntityCreator c{};
-	c.EntityType = e->EntityType;
-	c.PlayerId = pl;
-	c.Pos = e->Position;
-	c.Scale = e->Scale;
-	c.Health = e->Health;
-	if (e->ScriptName) {
-		size_t len = strlen(e->ScriptName) + 1;
+	c.EntityType = EntityType;
+	c.PlayerId = player;
+	c.Pos = Position;
+	c.Scale = Scale;
+	c.Health = Health;
+	if (ScriptName) {
+		size_t len = strlen(ScriptName) + 1;
 		c.ScriptName = (char*)shok::Malloc(sizeof(char) * len);
-		strcpy_s(c.ScriptName, len, e->ScriptName);
+		strcpy_s(c.ScriptName, len, ScriptName);
 	}
 	else {
 		c.ScriptName = nullptr;
 	}
 	int nid = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&c);
-	if (dynamic_cast<GGL::CSettler*>(e)) {
-		GGL::CLeaderBehavior* lb = e->GetBehavior<GGL::CLeaderBehavior>();
-		if (lb) {
-			std::vector<int> sol = std::vector<int>();
-			for (const auto& a : e->ObservedEntities) {
-				if (a.first == shok::AttachmentType::LEADER_SOLDIER)
-					sol.push_back(a.second.EntityId);
-			}
-			GGL::CSettler* settler = static_cast<GGL::CSettler*>(EGL::CGLEEntity::GetEntityByID(nid));
-			for (int i : sol) {
-				settler->LeaderAttachSoldier(fixedChangePlayer(i, pl));
-			}
-			GGL::CLeaderBehavior* nlb = settler->GetBehavior<GGL::CLeaderBehavior>();
-			nlb->Experience = lb->Experience;
-			nlb->TroopHealthCurrent = lb->TroopHealthCurrent;
-			nlb->TroopHealthPerSoldier = lb->TroopHealthPerSoldier;
+	EGL::CGLEEntity* ne = EGL::CGLEEntity::GetEntityByID(nid);
+
+	if (GGL::CLeaderBehavior* lb = GetBehavior<GGL::CLeaderBehavior>()) {
+		std::vector<int> sol = std::vector<int>();
+		for (const auto& a : ObservedEntities) {
+			if (a.first == shok::AttachmentType::LEADER_SOLDIER)
+				sol.push_back(a.second.EntityId);
 		}
+		GGL::CSettler* settler = static_cast<GGL::CSettler*>(ne);
+		for (int i : sol) {
+			settler->LeaderAttachSoldier(EGL::CGLEEntity::GetEntityByID(i)->AdvChangePlayer(player)->EntityId);
+		}
+		GGL::CLeaderBehavior* nlb = settler->GetBehavior<GGL::CLeaderBehavior>();
+		nlb->Experience = lb->Experience;
+		nlb->TroopHealthCurrent = lb->TroopHealthCurrent;
+		nlb->TroopHealthPerSoldier = lb->TroopHealthPerSoldier;
 	}
-	if (GGL::CReplaceableEntityBehavior* rep = e->GetBehavior<GGL::CReplaceableEntityBehavior>()) {
+
+	if (GGL::CReplaceableEntityBehavior* rep = GetBehavior<GGL::CReplaceableEntityBehavior>()) {
 		rep->IsReplacementActive = false;
 	}
-	e->Destroy();
-	return nid;
+
+	Destroy();
+	return ne;
+}
+int __cdecl EGL::CGLEEntity::FixedChangePlayer(int id, int pl)
+{
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
+	if (e == nullptr) {
+		return 0;
+	}
+	return e->AdvChangePlayer(pl)->EntityId;
 }
 bool ActivateEntityChangePlayerFix_Hooked = false;
 void EGL::CGLEEntity::ActivateEntityChangePlayerFix()
@@ -931,29 +938,7 @@ void EGL::CGLEEntity::ActivateEntityChangePlayerFix()
 		return;
 	ActivateEntityChangePlayerFix_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ EGL::CGLEEntity::EntityIDChangePlayer, 0x49A6AC - 0x49A6A7 };
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityIDChangePlayer, &fixedChangePlayer, reinterpret_cast<void*>(0x49A6AC));
-}
-
-void (*EGL::CGLEEntity::Hero6ConvertHookCb)(int id, int pl, int nid, int converter) = nullptr;
-int _cdecl hero6convertchangeplayer(int id, int pl) {
-	EGL::CGLEEntity* c = (EGL::CGLEEntity*)1;
-	_asm { mov c, esi }
-	int r = EGL::CGLEEntity::EntityIDChangePlayer(id, pl);
-	if (EGL::CGLEEntity::Hero6ConvertHookCb)
-		EGL::CGLEEntity::Hero6ConvertHookCb(id, pl, r, c->EntityId);
-	CppLogic::Events::ConversionEvent ev{ shok::EventIDs::CppLogicEvent_OnConvert, c->EntityId, id, r };
-	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
-	return r;
-}
-bool HookHero6Convert_Hooked = false;
-void EGL::CGLEEntity::HookHero6Convert()
-{
-	if (HookHero6Convert_Hooked)
-		return;
-	HookHero6Convert_Hooked = true;
-	EGL::CGLEEntity::ActivateEntityChangePlayerFix();
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FCD26), 10 };
-	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4FCD26), &hero6convertchangeplayer);
+	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityIDChangePlayer, &EGL::CGLEEntity::FixedChangePlayer, reinterpret_cast<void*>(0x49A6AC));
 }
 
 int EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
@@ -1615,7 +1600,6 @@ void __declspec(naked) HookSetTaskListNonCancelable_asm() {
 		ret;
 	};
 }
-long long HookSetTaskListNonCancelable_backup = 0;
 bool HookSetTaskListNonCancelable_Active = false;
 byte HookSetTaskListNonCancelable_Backup[0x57B229 - 0x57B223 + 1]{};
 void EGL::CGLEEntity::HookSetTaskListNonCancelable(bool active)

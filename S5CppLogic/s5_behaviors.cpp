@@ -10,6 +10,7 @@
 #include "s5_events.h"
 #include "s5_tasklist.h"
 #include "s5_effecttype.h"
+#include "s5_scriptsystem.h"
 #include "hooks.h"
 #include "EntityAddonData.h"
 
@@ -146,6 +147,38 @@ static inline int(__thiscall* const summonbeh_tasksummon)(GGL::CSummonBehavior* 
 int GGL::CSummonBehavior::TaskSummon(EGL::CGLETaskArgs* a)
 {
 	return summonbeh_tasksummon(this, a);
+}
+
+void __thiscall GGL::CConvertSettlerAbility::PerformConversion()
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	int tid = e->GetFirstAttachedEntity(shok::AttachmentType::CONVERTER_SETTLER);
+	auto* t = EGL::CGLEEntity::GetEntityByID(tid);
+	if (t) {
+		e->DetachObservedEntity(shok::AttachmentType::CONVERTER_SETTLER, tid, false);
+		auto* n = t->AdvChangePlayer(e->PlayerId);
+		CppLogic::Events::ConversionEvent ev{ shok::EventIDs::CppLogicEvent_OnConvert, e->EntityId, tid, n->EntityId };
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+	}
+}
+void __declspec(naked) convertsettler_hookasm() {
+	__asm {
+		mov ecx, edi;
+		call GGL::CConvertSettlerAbility::PerformConversion;
+
+		push 0x4FCD2D;
+		ret;
+	};
+}
+bool HookConvert_Hooked = false;
+void GGL::CConvertSettlerAbility::HookConvertEvent()
+{
+	if (HookConvert_Hooked)
+		return;
+	HookConvert_Hooked = true;
+	EGL::CGLEEntity::ActivateEntityChangePlayerFix();
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FCCFE), 0x4FCD05 - 0x4FCCFE };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FCCFE), &convertsettler_hookasm, reinterpret_cast<void*>(0x4FCD05));
 }
 
 static inline void(__thiscall* const summonbeh_addhandl)(GGL::CSummonBehavior* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, int)>(0x4D6FBE);
@@ -501,7 +534,7 @@ int GGL::CGLBehaviorAnimationEx::TaskWaitForAnimNonCancelable(EGL::CGLETaskArgsT
 	e->SetTaskState(shok::TaskState::WaitForAnimNonCancelable);
 	return 1;
 }
-void __stdcall GGL::CGLBehaviorAnimationEx::AddNonCancelableHandlers()
+void __thiscall GGL::CGLBehaviorAnimationEx::AddNonCancelableHandlers()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	e->CreateTaskHandler<shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE>(this, &CGLBehaviorAnimationEx::TaskWaitForAnimNonCancelable);
@@ -512,8 +545,7 @@ void __declspec(naked) anim_hooknoncancelanim_asm() {
 		mov ecx, esi;
 		call[eax + 0x48];
 
-		push edi;
-		push esi;
+		mov ecx, edi;
 		call GGL::CGLBehaviorAnimationEx::AddNonCancelableHandlers;
 
 		mov ecx, [ebp + 0xC];

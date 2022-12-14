@@ -348,6 +348,9 @@ namespace GGL {
 		static inline constexpr int vtp = 0x777294;
 		static inline constexpr int TypeDesc = 0x8227D8;
 		static inline constexpr unsigned int Identifier = 0x0E8276B7D;
+
+		static void HookConvertEvent();
+		void __thiscall PerformConversion();
 	};
 
 	class CConvertBuildingAbility : public GGL::CHeroAbility {
@@ -546,7 +549,7 @@ namespace GGL {
 		static void HookNonCancelableAnim();
 	private:
 		int TaskWaitForAnimNonCancelable(EGL::CGLETaskArgsThousandths* a);
-		void __stdcall AddNonCancelableHandlers();
+		void __thiscall AddNonCancelableHandlers();
 	};
 
 	class CBehaviorWalkCommand : public EGL::CGLEBehavior {

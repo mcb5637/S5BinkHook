@@ -238,6 +238,7 @@ namespace EGL {
 		float CalculateDamageAgainstMe(int damage, int damageclass, float aoeFactor = 1.0f);
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
+		CGLEEntity* AdvChangePlayer(int player); // destroys entity, returns new one
 
 		template<shok::EventIDs id, class EventType, class ObjectType>
 		void CreateEventHandler(ObjectType* ob, void (ObjectType::* handler)(EventType*)) {
@@ -282,9 +283,10 @@ namespace EGL {
 		static std::vector<shok::TaskState> AdditionalCancelableStates;
 		static void HookCanCancelState();
 
-		static void (*Hero6ConvertHookCb)(int id, int pl, int nid, int converter);
-		static void HookHero6Convert();
 		static void ActivateEntityChangePlayerFix();
+	private:
+		static int __cdecl FixedChangePlayer(int id, int pl);
+	public:
 		static int ResetCamoIgnoreIfNotEntity;
 		static void HookResetCamo();
 		static void (*CamoActivateCb)(GGL::CCamouflageBehavior* th);

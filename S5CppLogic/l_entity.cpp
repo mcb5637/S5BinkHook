@@ -1026,7 +1026,7 @@ namespace CppLogic::Entity {
 	}
 
 	int EnableConversionHook(lua::State L) {
-		EGL::CGLEEntity::HookHero6Convert();
+		GGL::CConvertSettlerAbility::HookConvertEvent();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConversionTrigger = true;
 		return 0;
 	}

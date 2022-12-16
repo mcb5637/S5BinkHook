@@ -636,6 +636,12 @@ float EGL::CGLEGameLogic::GetTimeSeconds()
 	return GetTimeMS() / 1000.0f;
 }
 
+inline void(__thiscall* const egl_gamelogic_cleardest)(EGL::CGLEGameLogic* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEGameLogic*)>(0x5720FE);
+void EGL::CGLEGameLogic::ClearToDestroy()
+{
+	egl_gamelogic_cleardest(this);
+}
+
 int(__thiscall* CreateEffectHookedOrig)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = nullptr;
 void(*EGL::CGLEGameLogic::CreateEffectHookCallback)(int id, void* ret) = nullptr;
 int __fastcall CreateEffectHook(EGL::CGLEGameLogic* th, int _, EGL::CGLEEffectCreator* data)

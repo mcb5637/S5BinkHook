@@ -242,7 +242,9 @@ namespace EGL {
 		EGL::CGLELandscape* Landscape; // 9
 		PADDINGI(9);
 		EGL::GameLogicExplorationStuff* SomeStuff; // 19
-		PADDINGI(14);
+		PADDINGI(8);
+		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
+		PADDINGI(2);
 		RandomNumberGenerator RNG; // 34 pretty sure this is not c++ std originally, but this one does the same as the original.
 
 	private:
@@ -260,7 +262,7 @@ namespace EGL {
 		virtual void unknown8() = 0; // 10
 		virtual void unknown9() = 0;
 		virtual void unknown10() = 0;
-		virtual void unknown11() = 0;
+		virtual void Tick() = 0;
 		virtual int GetTickVT() = 0;
 		virtual void StartMap(const char* mapPath) = 0; // 15
 		virtual void Serialize(const char* folder) = 0;
@@ -279,6 +281,7 @@ namespace EGL {
 		int GetTimeMS();
 		int GetTick();
 		float GetTimeSeconds();
+		void ClearToDestroy();
 
 		void HookCreateEffect(); // currently unused
 		static void(*CreateEffectHookCallback)(int id, void* ret);
@@ -286,7 +289,7 @@ namespace EGL {
 		static inline EGL::CGLEGameLogic** const GlobalObj = reinterpret_cast<EGL::CGLEGameLogic**>(0x895DAC); // also 85A3A4
 		static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 	};
-	//constexpr int i = offsetof(CGLEGameLogic, RandomSeed)/4;
+	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;
 }
 
 namespace GGL {

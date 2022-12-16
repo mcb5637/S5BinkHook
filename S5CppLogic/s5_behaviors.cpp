@@ -17,7 +17,7 @@
 void EGL::CGLEBehavior::unknownFuncBeh1(EGL::CGLEEntity* e)
 {
 }
-void EGL::CGLEBehavior::unknownFuncBeh2(int uk)
+void EGL::CGLEBehavior::OnEntityDestroy(bool uk)
 {
 }
 

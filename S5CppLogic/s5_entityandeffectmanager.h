@@ -33,8 +33,7 @@ namespace EGL {
 			return Data[id].Item;
 		}
 		virtual ~TGLEItemManager() = default;
-	private:
-		virtual void UnknownFunc() = 0;
+		virtual void Tick() = 0;
 	};
 	static_assert(sizeof(TGLEItemManager<EGL::CEffect, 65535>) == 524312);
 

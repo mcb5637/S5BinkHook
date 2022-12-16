@@ -472,7 +472,7 @@ void EGL::CGLEEntity::ExecuteTask(EGL::CGLETaskArgs& targ)
 
 void EGL::CGLEEntity::Destroy()
 {
-	Destroy(0);
+	DestroyVT(0);
 }
 
 static inline bool(__stdcall* const entity_checkdodge)(EGL::CGLEEntity* th) = reinterpret_cast<bool(__stdcall*)(EGL::CGLEEntity*)>(0x50ABB9);

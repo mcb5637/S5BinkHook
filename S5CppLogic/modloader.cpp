@@ -827,6 +827,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 					man->DestroyDisplayForEntity(a->EntityId);
 				a->Destroy();
 			}
+			(*EGL::CGLEGameLogic::GlobalObj)->ClearToDestroy();
 		}
 		if (*EGL::CGLEEffectManager::GlobalObj) {
 			CppLogic::Iterator::PredicateFunc<EGL::CEffect> p{ [](const EGL::CEffect*, float*, int*) { return true; } };

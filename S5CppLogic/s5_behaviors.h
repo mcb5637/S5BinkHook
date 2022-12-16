@@ -15,7 +15,8 @@ namespace EGL {
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
 	private:
 		virtual void unknownFuncBeh1(EGL::CGLEEntity* e); // on movement seems to copy a lot of data, maybe change behavior?
-		virtual void unknownFuncBeh2(int uk);
+	public:
+		virtual void OnEntityDestroy(bool ev); // usually empty, ev is true when destroyed normally, entity is still valid when called (not the case in dtor)
 
 	public:
 		static inline constexpr int TypeDesc = 0x813778;

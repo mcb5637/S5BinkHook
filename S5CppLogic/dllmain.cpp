@@ -88,10 +88,9 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
 	auto* a = L.CheckEntity(1);
-	auto v = a->Behaviours.SaveVector();
-	L.Push((int)v.Vector.size());
-	L.Push((int)v.Vector.capacity());
-	return 2;
+	CppLogic::Hooks::CheckMemFree::ToFree.push_back(a);
+	CppLogic::Hooks::CheckMemFree::EnableHook();
+	return 0;
 }
 
 int GetOptions(lua::State L) {

@@ -120,8 +120,8 @@ namespace EGL {
 		static inline constexpr unsigned int Identifier = 0x3F2913E0;
 
 	private:
-		virtual void Destroy(int i) = 0;
-		virtual void TaskState0ThenDestroy(int i) = 0;
+		virtual void OnDestroy(int i) = 0;
+		virtual void DestroyVT(int i) = 0;
 		virtual void InitializeFromCreator(const EGL::CGLEEntityCreator* cr) = 0; // 5
 		virtual void CopyToCreator(EGL::CGLEEntityCreator* cr) const = 0;
 		virtual void OnCreated() = 0;
@@ -133,7 +133,7 @@ namespace EGL {
 		virtual int GetSector() = 0;
 		virtual bool IsInSector(int sec) = 0;
 	private:
-		virtual void UnknownEntityFunc1() = 0; // update numauras + other updates?
+		virtual void Tick() = 0;
 	public:
 		virtual shok::TaskExecutionResult ExecuteTask(EGL::CGLETaskArgs* t) = 0;
 		virtual void FireEvent(BB::CEvent* ev) = 0;

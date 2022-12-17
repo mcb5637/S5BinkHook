@@ -273,6 +273,7 @@ namespace EGL {
 		int ExecuteLuaTask(EGL::CTaskArgsInteger* arg);
 		shok::TaskStateExecutionResult ExecuteLuaTaskState(int i);
 		void __thiscall AddHandlerLuaTask();
+		int __stdcall CanCancelStateAdditionalCheck();
 
 	public:
 		static shok::TaskExecutionResult(*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
@@ -326,6 +327,7 @@ namespace EGL {
 	static_assert(sizeof(CGLEEntity) == 66 * 4);
 
 	class CMovingEntity : public EGL::CGLEEntity {
+		friend class EGL::CGLEEntity;
 		virtual void KillThenSimpleFeedbackEvent4() = 0; // 39
 	public:
 		shok::Position TargetPosition; // la67
@@ -377,6 +379,9 @@ namespace EGL {
 		int LeaderGetNearbyBarracks();
 		bool IsMoving();
 		bool IsFleeingFrom(const shok::Position& center, float range) const;
+
+	private:
+		void __thiscall BuildOnSetPosFixed();
 	};
 	static_assert(sizeof(CMovingEntity) == 71 * 4);
 	static_assert(offsetof(CMovingEntity, MovementState) == 70 * 4);

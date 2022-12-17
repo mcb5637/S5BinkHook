@@ -1543,27 +1543,28 @@ void EGL::CGLEEntity::HookLuaTaskList()
 }
 
 void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBehaviorDefaultMovement*, shok::Position*)>(0x586894);
-void __fastcall entity_buildonsetpos(EGL::CMovingEntity* e) {
-	if (!e->MovementState && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
-		GGL::CBehaviorDefaultMovement* mov = e->GetBehavior<GGL::CBehaviorDefaultMovement>();
+void __thiscall EGL::CMovingEntity::BuildOnSetPosFixed()
+{
+	if (!MovementState && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
+		GGL::CBehaviorDefaultMovement* mov = GetBehavior<GGL::CBehaviorDefaultMovement>();
 		if (mov) {
-			movementbeh_setmovetarget(mov, &e->TargetPosition);
+			movementbeh_setmovetarget(mov, &TargetPosition);
 		}
 	}
 	else {
 		BB::CEvent ev{ 0x2000D };
-		e->FireEvent(&ev);
-		if (e->MovementState == 0) {
+		FireEvent(&ev);
+		if (MovementState == 0) {
 			ev.EventTypeId = 0x11017;
-			e->FireEvent(&ev);
-			e->MovementState = 0; // ?? original code
+			FireEvent(&ev);
+			MovementState = 0; // ?? original code
 		}
 	}
 }
 void __declspec(naked) entity_buildonsetpos_asm() {
 	__asm {
 		mov ecx, edi;
-		call entity_buildonsetpos;
+		call EGL::CMovingEntity::BuildOnSetPosFixed;
 
 		push 0x4ADB76;
 		ret;
@@ -1619,11 +1620,12 @@ void EGL::CGLEEntity::HookSetTaskListNonCancelable(bool active)
 	}
 }
 
-int __stdcall cancancelstate_check(EGL::CGLEEntity* e) {
-	if (e->Health <= 0)
+int __stdcall EGL::CGLEEntity::CanCancelStateAdditionalCheck()
+{
+	if (Health <= 0)
 		return 1;
 	for (auto a : EGL::CGLEEntity::AdditionalCancelableStates)
-		if (a == e->CurrentState)
+		if (a == CurrentState)
 			return 1;
 	return 0;
 }
@@ -1631,7 +1633,7 @@ void __declspec(naked) cancancelstate_check_asm() {
 	__asm {
 		push ecx;
 		push ecx;
-		call cancancelstate_check;
+		call EGL::CGLEEntity::CanCancelStateAdditionalCheck;
 		pop ecx;
 		test eax, eax;
 		jz cont;

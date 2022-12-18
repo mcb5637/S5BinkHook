@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "EntityAddonData.h"
 #include "s5_classfactory.h"
+#include "s5_entity.h"
 
 void CppLogic::EntityAddon::EntityAddonData::operator=(const EntityAddonData& other)
 {
@@ -35,6 +36,11 @@ void CppLogic::EntityAddon::EntityAddonData::OnEntityCreate(EGL::CGLEBehaviorPro
 void CppLogic::EntityAddon::EntityAddonData::OnEntityLoad(EGL::CGLEBehaviorProps* p)
 {
 	PropPointer = p;
+}
+
+void CppLogic::EntityAddon::EntityAddonData::OnEntityDestroy(bool ev)
+{
+	EGL::CGLEEntity::LastRemovedEntityAddonData = *this;
 }
 
 void* CppLogic::EntityAddon::EntityAddonData::operator new(size_t s)

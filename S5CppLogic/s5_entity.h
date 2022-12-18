@@ -296,8 +296,6 @@ namespace EGL {
 		static void HookCamoActivate();
 		static void HookHurtEntity();
 		static bool HurtEntityCallWithNoAttacker;
-		static void (*HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc);
-		static void HookDestroyEntity();
 		static CppLogic::EntityAddon::EntityAddonData LastRemovedEntityAddonData;
 
 		static inline EGL::CGLEEntity* (__stdcall* const GetEntityByID)(int id) = reinterpret_cast<EGL::CGLEEntity * (__stdcall*)(int)>(0x5825B4);

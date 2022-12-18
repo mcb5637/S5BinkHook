@@ -1516,9 +1516,7 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("use CEntity instead");
 		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
-		EGL::CGLEEntity::HookDestroyEntity();
 		EGL::CGLEEntity::HookMaxHP();
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxHP = true;
 		auto* d = b->GetAdditionalData(true);
 		if (L.IsNumber(2)) {
@@ -1548,8 +1546,6 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookDamageMod();
-		EGL::CGLEEntity::HookDestroyEntity();
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDamage = true;
 		auto* d = b->GetAdditionalData(true);
 		d->DamageOverride = L.CheckInt(2);
@@ -1561,8 +1557,6 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookArmorMod();
-		EGL::CGLEEntity::HookDestroyEntity();
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookArmor = true;
 		auto* d = b->GetAdditionalData(true);
 		d->ArmorOverride = L.CheckInt(2);
@@ -1574,8 +1568,6 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookExplorationMod();
-		EGL::CGLEEntity::HookDestroyEntity();
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookExploration = true;
 		auto* d = b->GetAdditionalData(true);
 		d->ExplorationOverride = L.CheckFloat(2);
@@ -1589,8 +1581,6 @@ namespace CppLogic::Entity {
 		if (!b->GetBehavior<GGL::CLeaderBehavior>())
 			throw lua::LuaException("no leader");
 		GGL::CLeaderBehavior::HookLeaderRegen();
-		EGL::CGLEEntity::HookDestroyEntity();
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookRegen = true;
 		auto* d = b->GetAdditionalData(true);
 		if (L.IsNumber(2))
@@ -1605,8 +1595,6 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookMaxRange();
-		EGL::CGLEEntity::HookDestroyEntity();
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxRange = true;
 		auto* d = b->GetAdditionalData(true);
 		d->MaxRangeOverride = L.CheckFloat(2);
@@ -1618,8 +1606,6 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookDisplayName();
-		EGL::CGLEEntity::HookDestroyEntity();
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity = true;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDisplayName = true;
 		auto* d = b->GetAdditionalData(true);
 		d->NameOverride = L.CheckString(2);
@@ -2078,9 +2064,6 @@ namespace CppLogic::Entity {
 	{
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConversionTrigger)
 			EnableConversionHook(L);
-
-		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDestroyEntity)
-			EGL::CGLEEntity::HookDestroyEntity();
 
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxHP)
 			EGL::CGLEEntity::HookMaxHP();

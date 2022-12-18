@@ -77,7 +77,6 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	BB::SerializationData::FieldData("AoEDamageFix", MemberSerializationFieldData(SerializedMapdata, AoEDamageFix)),
 	BB::SerializationData::FieldData("CamoFix", MemberSerializationFieldData(SerializedMapdata, CamoFix)),
 	BB::SerializationData::FieldData("ConversionTrigger", MemberSerializationFieldData(SerializedMapdata, ConversionTrigger)),
-	BB::SerializationData::FieldData("HookDestroyEntity", MemberSerializationFieldData(SerializedMapdata, HookDestroyEntity)),
 	BB::SerializationData::FieldData("HookMaxHP", MemberSerializationFieldData(SerializedMapdata, HookMaxHP)),
 	BB::SerializationData::FieldData("HookDamage", MemberSerializationFieldData(SerializedMapdata, HookDamage)),
 	BB::SerializationData::FieldData("HookArmor", MemberSerializationFieldData(SerializedMapdata, HookArmor)),
@@ -103,7 +102,6 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	AoEDamageFix = false;
 	CamoFix = false;
 	ConversionTrigger = false;
-	HookDestroyEntity = false;
 	HookMaxHP = false;
 	HookDamage = false;
 	HookArmor = false;

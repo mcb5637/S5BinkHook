@@ -22,7 +22,6 @@ namespace CppLogic::SavegameExtra {
 		bool AoEDamageFix = false;
 		bool CamoFix = false;
 		bool ConversionTrigger = false;
-		bool HookDestroyEntity = false;
 		bool HookMaxHP = false;
 		bool HookDamage = false;
 		bool HookArmor = false;

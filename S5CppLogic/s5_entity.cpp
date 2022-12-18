@@ -979,7 +979,6 @@ void EGL::CGLEEntity::HookCamoActivate()
 
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
 bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
-void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc) = nullptr;
 bool HookHurtEntity_Hooked = false;
 void __cdecl EGL::CGLEEntity::FixedHurtEntity(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg)
 {
@@ -1540,41 +1539,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::ReplaceEntityWithResourceEntity(EGL::CGLEEntit
 
 
 CppLogic::EntityAddon::EntityAddonData EGL::CGLEEntity::LastRemovedEntityAddonData{};
-void __fastcall destroyentity_gemoveadd(EGL::CGLEEntity* e) {
-	BB::CEvent ev{ shok::EventIDs::CppL_OnEntityDestroy };
-	e->FireEvent(&ev);
-	auto a = e->GetAdditionalData();
-	if (a) {
-		EGL::CGLEEntity::LastRemovedEntityAddonData = *a;
-	}
-}
-void __declspec(naked) destroyentityhook() {
-	__asm {
-		push ecx;
-		call destroyentity_gemoveadd;
-		pop ecx;
 
-		push esi;
-		mov esi, ecx;
-		cmp byte ptr[esi + 0x6D], 0;
-		jnz jump;
-		push 0x57C957;
-		ret;
-	jump:
-		push 0x57C9DE;
-		ret;
-	}
-
-}
-bool HookDestroyEntity_Hooked = false;
-void EGL::CGLEEntity::HookDestroyEntity()
-{
-	if (HookDestroyEntity_Hooked)
-		return;
-	HookDestroyEntity_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57C94A), 0x57C957 - 0x57C94A };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57C94A), &destroyentityhook, reinterpret_cast<void*>(0x57C957));
-}
 CppLogic::EntityAddon::EntityAddonData* EGL::CGLEEntity::GetAdditionalData(bool create)
 {
 	auto* a = GetBehavior<CppLogic::EntityAddon::EntityAddonData>();

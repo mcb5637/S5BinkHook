@@ -28,6 +28,7 @@ namespace CppLogic::EntityAddon {
 		virtual void AddHandlers(int id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityDestroy(bool ev) override;
 
 		void* operator new(size_t s);
 		void operator delete(void* p);

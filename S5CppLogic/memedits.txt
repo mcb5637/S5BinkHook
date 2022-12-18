@@ -13,7 +13,6 @@ GGUI_CManager.PostEvent vtable redirect
 0x4B8EAD constructionsite_getprogresspertick func override
 string render 0x5577E1 jmp override, string render getlen 0x708F00 jmp override
 entity execute task get task handler 0x57BF7A call redirect
-destroy entity 0x57C94A jmp
 snipe task 0x4DB5B8 jmp (func override)
 0x529067 feedback event handler res mined show floatie comparison changed
 0x536362 show resource floatie skipped a check to allow trees to have floaties

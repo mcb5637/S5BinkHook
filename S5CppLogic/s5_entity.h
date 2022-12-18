@@ -467,6 +467,7 @@ namespace GGL {
 		PADDINGI(1); // 39
 		PADDINGI(7); // 40 string?
 		struct EntityRef {
+			friend class CEntityProfile;
 			EGL::CGLEEntity* Self; // 125 in settler
 			EGL::CGLEEntity* Leader; // self if it is a leader
 			int LeaderId;
@@ -479,6 +480,8 @@ namespace GGL {
 			GGL::CGLSettlerProps* Props;
 
 			void CheckInit();
+		private:
+			void AssignAdvExperienceClass();
 		} EntityReference;
 
 		const GGL::ExperienceClass::LevelData* GetExperienceClassLevel();

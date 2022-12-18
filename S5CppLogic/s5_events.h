@@ -913,7 +913,7 @@ namespace shok {
 		Sound_Stop = 0x22002, // EGL::CEventSoundPositionAndID
 
 		// entity events
-		CppL_OnEntityDestroy = 0x50000, // BB::CEvent
+		CppL_OnEntityDestroy = 0x50000, // BB::CEvent deprectated
 		CppL_OnEntityKilled = 0x50001, // GGL::CEventEntityIndex index is attacker player
 		CppL_OnDamageDealt = 0x50002, // GGL::CEventEntityIndex entity is damaged, index is damage
 		CppL_AffectedExperienceGained = 0x50003, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker

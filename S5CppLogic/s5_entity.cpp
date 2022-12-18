@@ -281,11 +281,12 @@ void GGL::CEntityProfile::HookExperience(bool active)
 	}
 }
 
-void __fastcall entityprofile_experienceclassassignmenthook(GGL::CEntityProfile::EntityRef* th) {
-	th->ExperienceClass = shok::ExperienceClass::Invalid;
+void GGL::CEntityProfile::EntityRef::AssignAdvExperienceClass()
+{
+	ExperienceClass = shok::ExperienceClass::Invalid;
 	for (const auto& d : GGL::ExperienceClassHolder::EntityCategoryToExperienceClass) {
-		if (th->Self->IsEntityInCategory(d.EntityCategory)) {
-			th->ExperienceClass = d.ExperienceClass;
+		if (Self->IsEntityInCategory(d.EntityCategory)) {
+			ExperienceClass = d.ExperienceClass;
 			break;
 		}
 	}
@@ -293,7 +294,7 @@ void __fastcall entityprofile_experienceclassassignmenthook(GGL::CEntityProfile:
 void __declspec(naked) entityprofile_experienceclassassignmenthook_asm() {
 	__asm {
 		mov ecx, esi;
-		call entityprofile_experienceclassassignmenthook;
+		call GGL::CEntityProfile::EntityRef::AssignAdvExperienceClass;
 
 		push 0x4C72AB;
 		ret;

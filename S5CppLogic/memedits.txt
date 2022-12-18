@@ -42,9 +42,9 @@ only without SCELoader
 
 EGL::CGLEEntity::EntityHurtEntity 0x49F358 jmp patched, func override
 EntityDealAoEDamage 0x49F82A func override
-0x5113C2 arrow onhit jmp
+0x5113C2 arrow onhit jmp call to advdamage
 0x4DBA20 projectile creator ctor more zeroing out
-0x511634 projectile from creator copy more data
+0x511634 arrow effect from creator copy more data
 0x50CA59 melee hit jmp
 0x4FE722 circular attack jmp
 0x4FF4EB cannonball onhit jmp

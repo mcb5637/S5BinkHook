@@ -114,6 +114,87 @@ void GGL::CCannonBallEffect::HookFromCreator()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF942), &hookcannonfromcreatorasm, reinterpret_cast<void*>(0x4FF951));
 }
 
+void __declspec(naked) arrowonhit_damage() {
+	__asm {
+		mov ebx, 0;
+		mov bl, [esi + 50 * 4 + 3]; // AdvancedDamageSourceOverride
+		cmp ebx, 0;
+		jne pu;
+		mov ebx, 2; // arrow
+
+	pu:
+		push ebx;
+		push 1;
+		push 1;
+		push 1;
+
+		push[esi + 22 * 4]; // effect player
+
+		push ecx;
+		push eax;
+
+		mov ecx, [ebp - 0x10];
+		call EGL::CGLEEntity::AdvancedHurtEntityBy;
+
+		push 0x5113CF;
+		ret;
+	};
+}
+void GGL::CArrowEffect::HookDealDamage()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		reinterpret_cast<void*>(0x5113C2),
+		reinterpret_cast<byte*>(0x4DBA20),
+		reinterpret_cast<byte*>(0x511637),
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage, reinterpret_cast<void*>(0x5113CF));
+	// projectile creator bigger zero for AdvancedDamageSourceOverride
+	*reinterpret_cast<byte*>(0x4DBA20) = 0x89; // mov [esi+0x44], al -> mov [esi+0x44], eax
+	// arrow projcetile AdvancedDamageSourceOverride
+	*reinterpret_cast<byte*>(0x511634) = 0x8B; // mov al, [edi+0x44] -> mov eax, [edi+0x44]
+	*reinterpret_cast<byte*>(0x511637) = 0x89; // mov [esi+0xC8], al -> mov [esi+0xC8], eax
+}
+
+void __declspec(naked) cannonballhit_damage() {
+	__asm {
+		mov eax, [esi + 52 * 4];
+		shr eax, 24;
+		cmp eax, 0;
+		jne pu;
+
+		mov eax, 3;
+	pu:
+		push eax;
+
+		push 1;
+		push 1;
+		push 1;
+		mov eax, [esi + 52 * 4];
+		and eax, 0xFFFFFF;
+		push eax;
+		push[esi + 48 * 4];
+		push edx;
+		push edx;
+		fstp[esp];
+
+		lea eax, [esi + 16 * 4]; // pos
+		push eax;
+		push ebx;
+		call EGL::CGLEEntity::AdvancedDealAoEDamage;
+
+		mov eax, [esi + 0xC4];
+		push 0x4FF51B;
+		ret;
+	};
+}
+void GGL::CCannonBallEffect::HookDealDamage()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		reinterpret_cast<void*>(0x4FF4EB)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF4EB), &cannonballhit_damage, reinterpret_cast<void*>(0x4FF51B));
+}
+
 EGL::CFlyingEffect* EGL::CFlyingEffect::CurrentHittingEffect = nullptr;
 void (*EGL::CFlyingEffect::FlyingEffectOnHitCallback2)(EGL::CFlyingEffect* eff, bool post) = nullptr;
 void (*EGL::CFlyingEffect::FlyingEffectOnHitCallback)(EGL::CFlyingEffect* eff) = nullptr;

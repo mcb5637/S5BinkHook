@@ -119,6 +119,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x778E24;
 		static inline constexpr int TypeDesc = 0x8289CC;
 		static inline constexpr unsigned int Identifier = 0x2320F01D;
+
+		static void HookDealDamage();
 	};
 
 	class CCannonBallEffect : public EGL::CFlyingEffect {
@@ -138,6 +140,7 @@ namespace GGL {
 		static bool FixDamageClass;
 		static bool AddDamageSourceOverride;
 		static void HookFromCreator();
+		static void HookDealDamage();
 
 		static inline constexpr int vtp = 0x777690;
 		static inline constexpr int TypeDesc = 0x82365C;

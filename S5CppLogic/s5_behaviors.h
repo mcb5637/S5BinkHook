@@ -259,6 +259,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x778468;
 		static inline constexpr int TypeDesc = 0x8258A8;
 		static inline constexpr unsigned int Identifier = 0x76AE8807;
+
+		static void HookDealDamage();
 	};
 
 	class CCannonBuilderBehavior : public GGL::CHeroAbility {
@@ -303,6 +305,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x777464;
 		static inline constexpr int TypeDesc = 0x823038;
 		static inline constexpr unsigned int Identifier = 0x522330D;
+
+		static void HookDealDamage();
 	};
 
 	class CSummonBehavior : public GGL::CHeroAbility {
@@ -408,6 +412,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x774658;
 		static inline constexpr int TypeDesc = 0x819310;
 		static inline constexpr unsigned int Identifier = 0x3A0D7DAD;
+
+		static void HookDealDamage();
 	};
 
 	class CKegPlacerBehavior : public GGL::CHeroAbility {
@@ -439,6 +445,8 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x14A85A47;
 
 		void AdvancedDealDamage();
+
+		static void HookDealDamage();
 	};
 
 	class CAbilityScoutBinocular : public GGL::CHeroAbility {
@@ -648,6 +656,7 @@ namespace GGL {
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();
+		static void HookDealDamage();
 	private:
 		void __thiscall EventOverrideGetDamage(EGL::CEventGetValue_Int* ev);
 		int __thiscall TaskOverrideFireProjctile(EGL::CGLETaskArgs* a);

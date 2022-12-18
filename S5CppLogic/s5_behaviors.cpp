@@ -91,6 +91,36 @@ void GGL::CBombPlacerBehavior::HookFixBombAttachment()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5062C6), &bombattachment_fix, reinterpret_cast<void*>(0x5062CD));
 }
 
+void __declspec(naked) bombexplode_damage() {
+	__asm {
+		push 12;
+		push 1;
+		push 1;
+		push 1;
+		push 0;
+		push edi;
+		push ebx;
+
+		push ebx;
+		fstp[esp];
+
+		lea eax, [eax + 22 * 4];
+		push eax;
+		push[ebp - 0x10];
+		call EGL::CGLEEntity::AdvancedDealAoEDamage;
+
+		push 0x506B3F;
+		ret;
+	};
+}
+void GGL::CBombBehavior::HookDealDamage()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		reinterpret_cast<void*>(0x506B28)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x506B28), &bombexplode_damage, reinterpret_cast<void*>(0x506B3F));
+}
+
 void __thiscall GGL::CRangedEffectAbility::AdvHealAffected()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -129,6 +159,30 @@ void GGL::CRangedEffectAbility::HookHealAffected(bool active)
 		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4E3C78), CppLogic::Hooks::MemberFuncPointerToVoid(&AdvHealAffected, 0));
 	else
 		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4E3C78), reinterpret_cast<void*>(0x4E39B4));
+}
+
+void __declspec(naked) circularatt_damage() {
+	__asm {
+		push 11;
+		push 1;
+		push 1;
+		push 1;
+		push 0;
+		push eax;
+		push esi;
+		mov ecx, [ebp - 0x10];
+		call EGL::CGLEEntity::AdvancedHurtEntityBy;
+
+		push 0x4FE72F;
+		ret;
+	};
+}
+void GGL::CCircularAttack::HookDealDamage()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		   reinterpret_cast<void*>(0x4FE722)
+	   } };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FE722), &circularatt_damage, reinterpret_cast<void*>(0x4FE72F));
 }
 
 static inline void(__thiscall* const summonbeh_eventdie)(GGL::CSummonBehavior* th, BB::CEvent* ev) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, BB::CEvent*)>(0x4D6F25);
@@ -243,6 +297,29 @@ void GGL::CSniperAbility::OverrideSnipeTask()
 	OverrideSnipeTask_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4DB5B8), 0x4DB5BD - 0x4DB5B8 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DB5B8), CppLogic::Hooks::MemberFuncPointerToVoid(&TaskOverrideSnipe, 0), reinterpret_cast<void*>(0x4DB5BD));
+}
+
+void __declspec(naked) shurikenthrow() {
+	__asm {
+		lea edx, [ebp - 0x5C];
+
+		mov byte ptr[edx + 17 * 4 + 3], 15;
+
+		mov[ebp - 0x20], eax;
+		mov eax, [ecx];
+		push edx;
+
+
+		push 0x4DC6E2;
+		ret;
+	};
+}
+void GGL::CShurikenAbility::HookDealDamage()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		   reinterpret_cast<void*>(0x4DC6D9)
+	   } };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DC6D9), &shurikenthrow, reinterpret_cast<void*>(0x4DC6E2));
 }
 
 static inline float(__thiscall* const battleBehaviorGetMaxRange)(const GGL::CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(const GGL::CBattleBehavior*)>(0x50AB43);
@@ -432,6 +509,35 @@ void GGL::CBattleBehavior::HookRangeOverride()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50AB48), &battlemaxrangeasm, reinterpret_cast<void*>(0x50AB50));
 }
 
+
+void __declspec(naked) meleeonhit_damage() {
+	__asm {
+		push 1;
+		push 1;
+		push 1;
+		push 1;
+		push 0;
+		push[ebp - 0x10];
+
+		push[edi + 8];
+		call EGL::CGLEEntity::GetEntityByID;
+		push eax;
+
+		mov ecx, esi;
+		call EGL::CGLEEntity::AdvancedHurtEntityBy;
+
+		push 0x50CA6D;
+		ret;
+	};
+}
+void GGL::CBattleBehavior::HookDealDamage()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		   reinterpret_cast<void*>(0x50CA59),
+	   } };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50CA59), &meleeonhit_damage, reinterpret_cast<void*>(0x50CA6D));
+}
+
 static inline int(__thiscall* const leaderbehgettroophealth)(GGL::CBattleBehavior*) = reinterpret_cast<int(__thiscall*)(GGL::CBattleBehavior*)>(0x4EE1D6);
 int GGL::CLeaderBehavior::GetTroopHealth()
 {
@@ -518,6 +624,14 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 		GGL::CKegBehaviorProperties* pr = static_cast<GGL::CKegBehaviorProperties*>(PropPointer);
 		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, 0, true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageBlast);
 	}
+}
+
+void GGL::CKegBehavior::HookDealDamage()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+		   reinterpret_cast<void*>(0x4F1E77)
+	   } };
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F1E77), CppLogic::Hooks::MemberFuncPointerToVoid(&CKegBehavior::AdvancedDealDamage, 0));
 }
 
 inline EGL::CGLEAnimSet* (__thiscall* const behanimex_getanimset)(GGL::CGLBehaviorAnimationEx* th) = reinterpret_cast<EGL::CGLEAnimSet * (__thiscall*)(GGL::CGLBehaviorAnimationEx*)>(0x4F5D54);

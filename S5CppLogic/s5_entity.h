@@ -287,6 +287,8 @@ namespace EGL {
 		static void ActivateEntityChangePlayerFix();
 	private:
 		static int __cdecl FixedChangePlayer(int id, int pl);
+		static void __cdecl FixedHurtEntity(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg);
+		static void __cdecl FixedHurtEntityAoE(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl);
 	public:
 		static int ResetCamoIgnoreIfNotEntity;
 		static void HookResetCamo();

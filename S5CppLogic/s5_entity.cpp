@@ -981,145 +981,13 @@ static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at,
 bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
 void (*EGL::CGLEEntity::HurtEntityOnKillCb)(EGL::CGLEEntity* att, EGL::CGLEEntity* kill, int attpl, shok::AdvancedDealDamageSource sourc) = nullptr;
 bool HookHurtEntity_Hooked = false;
-void __cdecl hurtentity_override(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg) {
+void __cdecl EGL::CGLEEntity::FixedHurtEntity(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg)
+{
 	tar->AdvancedHurtEntityBy(att, dmg, 0, true, true, true, shok::AdvancedDealDamageSource::Unknown);
 }
-void __cdecl hurtaoe_override(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl) {
+void __cdecl EGL::CGLEEntity::FixedHurtEntityAoE(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl)
+{
 	EGL::CGLEEntity::AdvancedDealAoEDamage(att, *p, r, dmg, pl, dmgcl, true, true, true, shok::AdvancedDealDamageSource::Unknown);
-}
-void __declspec(naked) arrowonhit_damage() {
-	__asm {
-		mov ebx, 0;
-		mov bl, [esi + 50*4 + 3]; // AdvancedDamageSourceOverride
-		cmp ebx, 0;
-		jne pu;
-		mov ebx, 2; // arrow
-
-	pu:
-		push ebx;
-		push 1;
-		push 1;
-		push 1;
-
-		push[esi + 22 * 4]; // effect player
-
-		push ecx;
-		push eax;
-
-		mov ecx, [ebp - 0x10];
-		call EGL::CGLEEntity::AdvancedHurtEntityBy;
-
-		push 0x5113CF;
-		ret;
-	};
-}
-void __declspec(naked) meleeonhit_damage() {
-	__asm {
-		push 1;
-		push 1;
-		push 1;
-		push 1;
-		push 0;
-		push[ebp - 0x10];
-
-		push[edi + 8];
-		call EGL::CGLEEntity::GetEntityByID;
-		push eax;
-
-		mov ecx, esi;
-		call EGL::CGLEEntity::AdvancedHurtEntityBy;
-
-		push 0x50CA6D;
-		ret;
-	};
-}
-void __declspec(naked) circularatt_damage() {
-	__asm {
-		push 11;
-		push 1;
-		push 1;
-		push 1;
-		push 0;
-		push eax;
-		push esi;
-		mov ecx, [ebp - 0x10];
-		call EGL::CGLEEntity::AdvancedHurtEntityBy;
-
-		push 0x4FE72F;
-		ret;
-	};
-}
-void __declspec(naked) cannonballhit_damage() {
-	__asm {
-		mov eax, [esi + 52 * 4];
-		shr eax, 24;
-		cmp eax, 0;
-		jne pu;
-
-		mov eax, 3;
-	pu:
-		push eax;
-
-		push 1;
-		push 1;
-		push 1;
-		mov eax, [esi + 52 * 4];
-		and eax, 0xFFFFFF;
-		push eax;
-		push[esi + 48 * 4];
-		push edx;
-		push edx;
-		fstp[esp];
-
-		lea eax, [esi + 16 * 4]; // pos
-		push eax;
-		push ebx;
-		call EGL::CGLEEntity::AdvancedDealAoEDamage;
-
-		mov eax, [esi + 0xC4];
-		push 0x4FF51B;
-		ret;
-	};
-}
-void __declspec(naked) bombexplode_damage() {
-	__asm {
-		push 12;
-		push 1;
-		push 1;
-		push 1;
-		push 0;
-		push edi;
-		push ebx;
-
-		push ebx;
-		fstp[esp];
-
-		lea eax, [eax + 22 * 4];
-		push eax;
-		push[ebp - 0x10];
-		call EGL::CGLEEntity::AdvancedDealAoEDamage;
-
-		push 0x506B3F;
-		ret;
-	};
-}
-void __fastcall kegdealdmgproxy(GGL::CKegBehavior* th) {
-	th->AdvancedDealDamage();
-}
-void __declspec(naked) shurikenthrow() {
-	__asm {
-		lea edx, [ebp - 0x5C];
-
-		mov byte ptr [edx + 17 * 4 + 3], 15;
-
-		mov[ebp - 0x20], eax;
-		mov eax, [ecx];
-		push edx;
-
-
-		push 0x4DC6E2;
-		ret;
-	};
 }
 void EGL::CGLEEntity::HookHurtEntity()
 {
@@ -1131,30 +999,15 @@ void EGL::CGLEEntity::HookHurtEntity()
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
 		EGL::CGLEEntity::EntityHurtEntity,
 		EGL::CGLEEntity::EntityDealAoEDamage,
-		reinterpret_cast<void*>(0x5113C2),
-		reinterpret_cast<void*>(0x4DBA20),
-		reinterpret_cast<void*>(0x511634),
-		reinterpret_cast<void*>(0x50CA59),
-		reinterpret_cast<void*>(0x4FE722),
-		reinterpret_cast<void*>(0x4FF4EB),
-		reinterpret_cast<void*>(0x506B28),
-		reinterpret_cast<void*>(0x4F1E77),
-		reinterpret_cast<void*>(0x4DC6D9)
 	} };
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityHurtEntity, &hurtentity_override, reinterpret_cast<void*>(0x49F35D));
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityDealAoEDamage, &hurtaoe_override, reinterpret_cast<void*>(0x49F82F));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage, reinterpret_cast<void*>(0x5113CF));
-	// projectile creator bigger zero for AdvancedDamageSourceOverride
-	*reinterpret_cast<byte*>(0x4DBA20) = 0x89; // mov [esi+0x44], al -> mov [esi+0x44], eax
-	// arrow projcetile AdvancedDamageSourceOverride
-	*reinterpret_cast<byte*>(0x511634) = 0x8B; // mov al, [edi+0x44] -> mov eax, [edi+0x44]
-	*reinterpret_cast<byte*>(0x511637) = 0x89; // mov [esi+0xC8], al -> mov [esi+0xC8], eax
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50CA59), &meleeonhit_damage, reinterpret_cast<void*>(0x50CA6D));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FE722), &circularatt_damage, reinterpret_cast<void*>(0x4FE72F));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FF4EB), &cannonballhit_damage, reinterpret_cast<void*>(0x4FF51B));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x506B28), &bombexplode_damage, reinterpret_cast<void*>(0x506B3F));
-	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F1E77), &kegdealdmgproxy);
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DC6D9), &shurikenthrow, reinterpret_cast<void*>(0x4DC6E2));
+	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityHurtEntity, &EGL::CGLEEntity::FixedHurtEntity, reinterpret_cast<void*>(0x49F35D));
+	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityDealAoEDamage, &EGL::CGLEEntity::FixedHurtEntityAoE, reinterpret_cast<void*>(0x49F82F));
+	GGL::CArrowEffect::HookDealDamage();
+	GGL::CBattleBehavior::HookDealDamage();
+	GGL::CCircularAttack::HookDealDamage();
+	GGL::CCannonBallEffect::HookDealDamage();
+	GGL::CBombBehavior::HookDealDamage();
+	GGL::CShurikenAbility::HookDealDamage();
 
 	HookDamageMod(); // set projectile player field in creator
 	GGL::CBombPlacerBehavior::HookFixBombAttachment();

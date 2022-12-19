@@ -31,7 +31,8 @@ void BB::CTextSet::Merge(CTextSet* other)
 }
 
 const char* (*BB::StringTableText::GetStringTableTextOverride)(const char* s) = nullptr;
-const char* __stdcall hookstt(const char* s) {
+const char* __stdcall BB::StringTableText::GetSTTOverride(const char* s)
+{
 	if (!BB::StringTableText::GetStringTableTextOverride)
 		return nullptr;
 	return BB::StringTableText::GetStringTableTextOverride(s);
@@ -40,7 +41,7 @@ void __declspec(naked) hooksttasm() {
 	__asm {
 		//int 3
 		push[esp + 4];
-		call hookstt;
+		call BB::StringTableText::GetSTTOverride;
 		test eax, eax;
 		jz notfound;
 		ret;
@@ -735,8 +736,9 @@ void shok::HookTextPrinting()
 	if (HookTextPrinting_Hooked)
 		return;
 	HookTextPrinting_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5577E1), 0x20 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x708F00), 0x20 };
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {reinterpret_cast<void*>(0x5577E1), 
+		reinterpret_cast<void*>(0x708F00),
+	} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5577E1), &printstr_override, reinterpret_cast<void*>(0x5577EB));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x708F00), &printstr_getlength_override, reinterpret_cast<void*>(0x708F0E));
 }

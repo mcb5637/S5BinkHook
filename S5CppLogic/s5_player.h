@@ -77,6 +77,9 @@ namespace GGL {
 		// checkpayday 4C25FB thiscall
 		static void HookCheckPayday();
 		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);
+
+	private:
+		void __thiscall CheckPaydayHook();
 	};
 	//constexpr int i = offsetof(CPlayerAttractionHandler, EmployedWorkerArray) / 4;
 
@@ -339,6 +342,9 @@ namespace GGL {
 
 		static bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId);
 		static void HookCanPlaceBuilding();
+
+	private:
+		static int __stdcall CanPlaceBuildingHook(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId);
 
 	};
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;

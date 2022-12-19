@@ -77,6 +77,9 @@ namespace BB {
 		static void HookGetStringTableText();
 
 		static inline StringTableText** const GlobalObj = reinterpret_cast<StringTableText**>(0x894508);
+
+	private:
+		static const char* __stdcall GetSTTOverride(const char* s);
 	};
 }
 

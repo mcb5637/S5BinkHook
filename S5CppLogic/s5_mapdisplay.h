@@ -20,6 +20,7 @@ namespace ED {
 	};
 
 	class CLandscape : public ILandscape {
+		friend class EGL::CGLETerrainLowRes;
 	public:
 		EGL::CGLETerrainHiRes* TerrainHiRes;
 		EGL::CGLETerrainLowRes* TerrainLowRes;
@@ -36,6 +37,8 @@ namespace ED {
 
 	private:
 		virtual float retzero(int, int) = 0;
+
+		float __thiscall GetWaterHeightAtPosOverride(float x, float y);
 	};
 	static_assert(sizeof(ED::CLandscape) == 10 * 4);
 

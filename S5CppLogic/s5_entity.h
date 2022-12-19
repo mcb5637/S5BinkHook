@@ -627,11 +627,15 @@ namespace GGL {
 	};
 
 	class CBridgeEntity : public GGL::CBuilding {
+		friend class EGL::CGLETerrainLowRes;
 	public:
 		static inline constexpr int vtp = 0x77805C;
 		static inline constexpr int TypeDesc = 0x812054;
 		static inline constexpr int vtp_IEntityDisplay = 0x778040;
 		static inline constexpr unsigned int Identifier = 0x3736FF8E;
+
+	private:
+		void __thiscall ApplyHeightOverride();
 	};
 
 }

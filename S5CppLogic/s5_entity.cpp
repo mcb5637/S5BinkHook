@@ -879,6 +879,21 @@ void GGL::CBuilding::EnableConstructionSpeedTechs()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook, reinterpret_cast<void*>(0x4B8EB2));
 }
 
+void __thiscall GGL::CBridgeEntity::ApplyHeightOverride()
+{
+	GGL::CBridgeProperties* p = static_cast<GGL::CBridgeProperties*>(GetEntityType()->LogicProps);
+	auto* lr = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes;
+	int h = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(Position) + p->Height;
+	for (const shok::AARect& area : p->BridgeArea) {
+		EGL::CGLELandscape::AdvancedAARectIterator it{ Position, area, Position.r, !EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled, true };
+		for (const auto& c : it) {
+			if (!lr->IsBridgeHeightCoordValid(c.x, c.y))
+				continue;
+			*lr->GetBridgeHeightP(c.x, c.y) = h;
+		}
+	}
+}
+
 EGL::CGLEEntity* EGL::CGLEEntity::AdvChangePlayer(int player)
 {
 	if (PlayerId == player)

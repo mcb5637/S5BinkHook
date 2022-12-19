@@ -206,15 +206,7 @@ float EGL::CGLETerrainLowRes::GetBridgeHeightFloat(float x, float y)
 }
 
 
-float __fastcall shok_ED_CLandscape_overridegetwaterheightatpos(ED::CLandscape* th, int _, float x, float y) { // this func breaks its arguments, so i have to rewrite it instead of patching a few instructions
-	shok::Position p{ std::min(std::max(0.0f, x), th->WorldSizeX),std::min(std::max(0.0f, y), th->WorldSizeY) };
-	if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&p, EGL::CGLELandscape::BlockingMode::BridgeArea)) {
-		return static_cast<float>(th->TerrainLowRes->GetBridgeHeight(p));
-	}
-	else {
-		return static_cast<float>(th->TerrainLowRes->GetWaterHeightAt(p));
-	}
-}
+
 void __declspec(naked) hiresbridgearea_somewaterregionfunc() {
 	__asm {
 		push[ebp - 0x4]; // y
@@ -227,20 +219,6 @@ void __declspec(naked) hiresbridgearea_somewaterregionfunc() {
 		ret;
 	};
 }
-void __fastcall shok_bridge_applyheight(GGL::CBridgeEntity* th) {
-	GGL::CBridgeProperties* p = static_cast<GGL::CBridgeProperties*>(th->GetEntityType()->LogicProps);
-	auto* lr = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes;
-	int h = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(th->Position) + p->Height;
-	for (const shok::AARect& area : p->BridgeArea) {
-		EGL::CGLELandscape::AdvancedAARectIterator it{ th->Position, area, th->Position.r, !EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled, true };
-		for (const auto& c : it) {
-			if (!lr->IsBridgeHeightCoordValid(c.x, c.y))
-				continue;
-			*lr->GetBridgeHeightP(c.x, c.y) = h;
-		}
-	}
-}
-
 bool EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled = false;
 int* EGL::CGLETerrainLowRes::Dbg_bh = nullptr;
 void EGL::CGLETerrainLowRes::EnableHiResBridgeHeight()
@@ -248,12 +226,13 @@ void EGL::CGLETerrainLowRes::EnableHiResBridgeHeight()
 	if (EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled)
 		return;
 	EGL::CGLETerrainLowRes::HiResBridgeHeightEnabled = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x76A410), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x47D301), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp3{ reinterpret_cast<void*>(0x503C50), 10 };
-	*reinterpret_cast<float(__fastcall**)(ED::CLandscape*, int, float, float)>(0x76A410) = &shok_ED_CLandscape_overridegetwaterheightatpos;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, { reinterpret_cast<void*>(0x76A410),
+		reinterpret_cast<void*>(0x47D301),
+		reinterpret_cast<void*>(0x503C50),
+	} };
+	*reinterpret_cast<void**>(0x76A410) = CppLogic::Hooks::MemberFuncPointerToVoid(&ED::CLandscape::GetWaterHeightAtPosOverride, 0);
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x47D301), &hiresbridgearea_somewaterregionfunc, reinterpret_cast<void*>(0x47D30A));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x503C50), &shok_bridge_applyheight, reinterpret_cast<void*>(0x503C58));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x503C50), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CBridgeEntity::ApplyHeightOverride, 0), reinterpret_cast<void*>(0x503C58));
 }
 
 void EGL::CGLETerrainLowRes::CheckBridgeHeightSize()

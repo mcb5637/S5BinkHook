@@ -55,6 +55,7 @@ namespace Framework {
 	};
 
 	struct SaveData {
+		friend struct SavegameSystem;
 		shok::String SavePath;
 		GS3DTools::CMapData MapData;
 		shok::String AdditionalInfo; // savegame name
@@ -62,6 +63,9 @@ namespace Framework {
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E920);
 		// ctor 403180, dtor 403083
+
+	private:
+		void __thiscall SaveGameOverride(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
 	};
 	static_assert(sizeof(SaveData) == 41 * 4);
 
@@ -200,6 +204,11 @@ namespace Framework {
 		static void (*PreLoadSave)(lua_State* ingame, GameModeStartMapData* data, bool externalmap);
 		static void (*PreLoadSave2)(lua_State* ingame, GameModeStartMapData* data, bool externalmap);
 		static void HookLoadSave();
+
+	private:
+		bool __thiscall StartMapOverride(const char* name, const char* path);
+		void __thiscall RemoveArchiveIfExternalmapOverride();
+		void __fastcall OnSaveLoadedEx(Framework::GameModeStartMapData* d);
 	};
 	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);
 	static_assert(offsetof(AGameModeBase, EscapeHandler) == 1423 * 4);
@@ -299,6 +308,9 @@ namespace Framework {
 		static void HookModeChange();
 		static void (*OnModeChange)(NextMode mode);
 		static void (*OnSaveLoaded)();
+
+	private:
+		void __thiscall CheckToDoOverride();
 	};
 	static_assert(offsetof(Framework::CMain, CurrentMode) == 3 * 4);
 	static_assert(offsetof(Framework::CMain, GDB) == 227 * 4);

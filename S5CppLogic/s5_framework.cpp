@@ -43,16 +43,17 @@ void Framework::SavegameSystem::SaveGame(const char* slot, GS3DTools::CMapData* 
 
 void (*Framework::SavegameSystem::OnGameSavedTo)(const char* folder, const char* savename) = nullptr;
 inline void(__thiscall* const savedata_save)(Framework::SaveData* th, const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name) = reinterpret_cast<void(__thiscall*)(Framework::SaveData*, const char*, GGL::CGLGameLogic*, GS3DTools::CMapData*, const char*)>(0x402DAD);
-void __fastcall hooksavegame(Framework::SaveData* th, int _, const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name)
+
+void __thiscall Framework::SaveData::SaveGameOverride(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name)
 {
-    savedata_save(th, path, gl, mapdata, name);
+    savedata_save(this, path, gl, mapdata, name);
     if (Framework::SavegameSystem::OnGameSavedTo)
         Framework::SavegameSystem::OnGameSavedTo(path, name);
 }
 void Framework::SavegameSystem::HookSaveGame()
 {
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x403235), 0x10 };
-    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x403235), &hooksavegame);
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x403235), CppLogic::Hooks::MemberFuncPointerToVoid(&SaveData::SaveGameOverride, 0));
 }
 
 bool(__thiscall* const gdb_iskeyvalid)(GDB::CList* th, const char* k) = reinterpret_cast<bool(__thiscall* const)(GDB::CList*, const char*)>(0x40E038);
@@ -137,12 +138,13 @@ void Framework::AGameModeBase::RemoveArchiveIfExternalmap()
 void (*Framework::AGameModeBase::PreStartMap)(lua_State* ingame, const char* name, const char* path, bool externalmap) = nullptr;
 void (*Framework::AGameModeBase::PreStartMap2)(lua_State* ingame, const char* name, const char* path, bool externalmap) = nullptr;
 static inline bool(__thiscall* const gamemodebase_startmap)(Framework::AGameModeBase* mode, const char* name, const char* path) = reinterpret_cast<bool(__thiscall*)(Framework::AGameModeBase*, const char*, const char*)>(0x40E5F0);
-bool __fastcall gamemodebase_startmapoverride(Framework::AGameModeBase* mode, int _, const char* name, const char* path) {
+bool __thiscall Framework::AGameModeBase::StartMapOverride(const char* name, const char* path)
+{
     if (Framework::AGameModeBase::PreStartMap2)
-        Framework::AGameModeBase::PreStartMap2(mode->IngameLuaState, name, path, mode->IsExternalMap);
+        Framework::AGameModeBase::PreStartMap2(IngameLuaState, name, path, IsExternalMap);
     if (Framework::AGameModeBase::PreStartMap)
-        Framework::AGameModeBase::PreStartMap(mode->IngameLuaState, name, path, mode->IsExternalMap);
-    return gamemodebase_startmap(mode, name, path);
+        Framework::AGameModeBase::PreStartMap(IngameLuaState, name, path, IsExternalMap);
+    return gamemodebase_startmap(this, name, path);
 }
 bool HookStartMap_Hooked = false;
 void Framework::AGameModeBase::HookStartMap()
@@ -150,16 +152,19 @@ void Framework::AGameModeBase::HookStartMap()
     if (HookStartMap_Hooked)
         return;
     HookStartMap_Hooked = true;
-    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40F851), 10 };
-    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F851), &gamemodebase_startmapoverride);
-    CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x40F566), 10 };
-    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F566), &gamemodebase_startmapoverride);
+    CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {reinterpret_cast<void*>(0x40F851),
+        reinterpret_cast<void*>(0x40F566)
+    } };
+    // sp
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F851), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::StartMapOverride, 0));
+    // mp
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F566), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::StartMapOverride, 0));
 }
 
-bool Framework::AGameModeBase::DoNotRemoveNextArchive = false;
-void __fastcall gamemodebase_removearchiveifexternalmap_override(Framework::AGameModeBase* th) {
+bool Framework::AGameModeBase::DoNotRemoveNextArchive = false; void __thiscall Framework::AGameModeBase::RemoveArchiveIfExternalmapOverride()
+{
     if (!Framework::AGameModeBase::DoNotRemoveNextArchive)
-        th->RemoveArchiveIfExternalmap();
+        RemoveArchiveIfExternalmap();
     Framework::AGameModeBase::DoNotRemoveNextArchive = false;
 }
 bool HookRemoveArchive_Hooked = false;
@@ -173,25 +178,29 @@ void Framework::AGameModeBase::HookRemoveArchive()
         reinterpret_cast<void*>(0x40F604),
         reinterpret_cast<void*>(0x40FC68)
     } };
-    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F8CD), &gamemodebase_removearchiveifexternalmap_override);
-    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F604), &gamemodebase_removearchiveifexternalmap_override);
-    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40FC68), &gamemodebase_removearchiveifexternalmap_override);
+    //sp load map
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F8CD), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::RemoveArchiveIfExternalmapOverride, 0));
+    // mp
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F604), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::RemoveArchiveIfExternalmapOverride, 0));
+    // sp load save
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40FC68), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::RemoveArchiveIfExternalmapOverride, 0));
 }
 
 
 void (*Framework::AGameModeBase::PreLoadSave)(lua_State* ingame, GameModeStartMapData* data, bool externalmap) = nullptr;
 void (*Framework::AGameModeBase::PreLoadSave2)(lua_State* ingame, GameModeStartMapData* data, bool externalmap) = nullptr;
-void __fastcall gamemodebase_onsaveload(Framework::AGameModeBase* th, Framework::GameModeStartMapData* d) {
+void __fastcall Framework::AGameModeBase::OnSaveLoadedEx(Framework::GameModeStartMapData* d)
+{
     if (Framework::AGameModeBase::PreLoadSave2)
-        Framework::AGameModeBase::PreLoadSave2(th->IngameLuaState, d, th->IsExternalMap);
+        Framework::AGameModeBase::PreLoadSave2(IngameLuaState, d, IsExternalMap);
     if (Framework::AGameModeBase::PreLoadSave)
-        Framework::AGameModeBase::PreLoadSave(th->IngameLuaState, d, th->IsExternalMap);
+        Framework::AGameModeBase::PreLoadSave(IngameLuaState, d, IsExternalMap);
 }
 void __declspec(naked) gamemodebase_onloadsave_asm() {
     __asm {
         mov ecx, esi;
         mov edx, [ebp + 8];
-        call gamemodebase_onsaveload;
+        call Framework::AGameModeBase::OnSaveLoadedEx;
 
         mov edi, [esi + 0x10];
         mov eax, 0x403158;
@@ -254,35 +263,36 @@ inline void(__thiscall* const cmain_startmapsp)(Framework::CMain* th) = reinterp
 inline void(__thiscall* const cmain_gotomainmenu)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA1B);
 inline void(__thiscall* const cmain_loadsave)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA76);
 inline void(__thiscall* const cmain_startmapmp)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40ACFE);
-void __fastcall cmain_checktodo_hooked(Framework::CMain* th) {
-    if (th->ToDo != Framework::CMain::NextMode::NoChange)
+void __thiscall Framework::CMain::CheckToDoOverride()
+{
+    if (ToDo != Framework::CMain::NextMode::NoChange)
         if (Framework::CMain::OnModeChange)
-            Framework::CMain::OnModeChange(th->ToDo);
-    switch (th->ToDo)
+            Framework::CMain::OnModeChange(ToDo);
+    switch (ToDo)
     {
     case Framework::CMain::NextMode::StartMapSP:
-        cmain_startmapsp(th);
+        cmain_startmapsp(this);
         break;
     case Framework::CMain::NextMode::ToMainMenu:
-        cmain_gotomainmenu(th);
+        cmain_gotomainmenu(this);
         break;
     case Framework::CMain::NextMode::LoadSaveSP:
-        cmain_loadsave(th);
+        cmain_loadsave(this);
         if (Framework::CMain::OnSaveLoaded)
             Framework::CMain::OnSaveLoaded();
         break;
     case Framework::CMain::NextMode::StartMapMP:
-        cmain_startmapmp(th);
+        cmain_startmapmp(this);
         break;
     case Framework::CMain::NextMode::RestartMapSP:
-        cmain_gotomainmenu(th);
-        cmain_startmapsp(th);
+        cmain_gotomainmenu(this);
+        cmain_startmapsp(this);
         break;
     case Framework::CMain::NextMode::LeaveGame:
         PostQuitMessage(0);
         break;
     }
-    th->ToDo = Framework::CMain::NextMode::NoChange;
+    ToDo = Framework::CMain::NextMode::NoChange;
 }
 
 
@@ -293,5 +303,5 @@ void Framework::CMain::HookModeChange()
         return;
     HookModeChange_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40B3BE), 0x40B3C7 - 0x40B3BE };
-    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40B3BE), &cmain_checktodo_hooked, reinterpret_cast<void*>(0x40B3C7));
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40B3BE), CppLogic::Hooks::MemberFuncPointerToVoid(&CMain::CheckToDoOverride, 0), reinterpret_cast<void*>(0x40B3C7));
 }

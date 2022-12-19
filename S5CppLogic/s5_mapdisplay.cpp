@@ -23,6 +23,17 @@ float ED::CLandscape::GetWaterHeightAtPos(const shok::Position& p)
 	return GetWaterHeightAtPosF(p.X, p.Y);
 }
 
+float __thiscall ED::CLandscape::GetWaterHeightAtPosOverride(float x, float y)
+{ // this func breaks its arguments, so i have to rewrite it instead of patching a few instructions
+	shok::Position p{ std::min(std::max(0.0f, x), WorldSizeX),std::min(std::max(0.0f, y), WorldSizeY) };
+	if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&p, EGL::CGLELandscape::BlockingMode::BridgeArea)) {
+		return static_cast<float>(TerrainLowRes->GetBridgeHeight(p));
+	}
+	else {
+		return static_cast<float>(TerrainLowRes->GetWaterHeightAt(p));
+	}
+}
+
 void ED::CGlobalsLogicEx::ToTerrainCoord(const shok::Position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));

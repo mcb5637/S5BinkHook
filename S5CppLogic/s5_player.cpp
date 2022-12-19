@@ -109,17 +109,18 @@ void GGL::CPlayerAttractionHandler::CheckWorkerAttachment(bool forceReAttach)
 }
 
 void (*GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th) = nullptr;
-void __fastcall hookedcheckpayday_call(GGL::CPlayerAttractionHandler* th) {
+void __thiscall GGL::CPlayerAttractionHandler::CheckPaydayHook()
+{
 	if (GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)
-		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback(th);
+		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback(this);
 	GGL::CEventGoodsTraded ev{ shok::EventIDs::CppLogicEvent_OnPayday, shok::ResourceType::Gold, shok::ResourceType::GoldRaw,
-		static_cast<float>(th->GetWorkerPaydayIncome()), th->PlayerID, static_cast<float>(th->GetLeaderPaydayCost())};
+		static_cast<float>(GetWorkerPaydayIncome()), PlayerID, static_cast<float>(GetLeaderPaydayCost())};
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
 void __declspec(naked) hookedcheckpayday() {
 	__asm {
 		mov ecx, esi;
-		call hookedcheckpayday_call;
+		call GGL::CPlayerAttractionHandler::CheckPaydayHook;
 
 		mov esi, [esi + 4];
 		mov[ebp + 0x18], 0x1300E;
@@ -313,7 +314,8 @@ bool GGL::CPlayerStatus::ArePlayersFriendly(int p1, int p2)
 }
 
 bool (*GGL::CPlayerStatus::CanPlaceBuildingCallback)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) = nullptr;
-int __stdcall canplacebuilding(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
+int __stdcall GGL::CPlayerStatus::CanPlaceBuildingHook(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId)
+{
 	if (GGL::CPlayerStatus::CanPlaceBuildingCallback)
 		return GGL::CPlayerStatus::CanPlaceBuildingCallback(entitytype, player, pos, rotation, buildOnId);
 	return true;
@@ -329,7 +331,7 @@ void __declspec(naked) canplacebuildingasm() {
 		push[ebp + 0x10];
 		push[ebp + 0xC];
 		push[ebp + 0x8];
-		call canplacebuilding;
+		call GGL::CPlayerStatus::CanPlaceBuildingHook;
 		jmp modif;
 
 	retu:

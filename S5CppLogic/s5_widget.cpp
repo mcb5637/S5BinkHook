@@ -604,28 +604,29 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(bool 
 }
 
 
-EGUIX::CMaterial* __fastcall osir_getresicon_override(GGUI::OnScreenInfoRenderer* th, int, shok::ResourceType rt) {
+EGUIX::CMaterial* __thiscall GGUI::OnScreenInfoRenderer::GetResourceIconOverride(shok::ResourceType rt)
+{
     switch (rt) {
     case shok::ResourceType::Gold:
     case shok::ResourceType::GoldRaw:
-        return &th->TextureData.Texture_ResGold;
+        return &TextureData.Texture_ResGold;
     case shok::ResourceType::Stone:
     case shok::ResourceType::StoneRaw:
-        return &th->TextureData.Texture_ResStone;
+        return &TextureData.Texture_ResStone;
     case shok::ResourceType::Iron:
     case shok::ResourceType::IronRaw:
-        return &th->TextureData.Texture_ResIron;
+        return &TextureData.Texture_ResIron;
     case shok::ResourceType::Sulfur:
     case shok::ResourceType::SulfurRaw:
-        return &th->TextureData.Texture_ResSulfur;
+        return &TextureData.Texture_ResSulfur;
     case shok::ResourceType::Clay:
     case shok::ResourceType::ClayRaw:
-        return &th->TextureData.Texture_ResMud;
+        return &TextureData.Texture_ResMud;
     case shok::ResourceType::Wood:
     case shok::ResourceType::WoodRaw:
-        return &th->TextureData.Texture_ResWood;
+        return &TextureData.Texture_ResWood;
     default:
-        return &th->TextureData.Texture_ResSulfur;
+        return &TextureData.Texture_ResSulfur;
     }
 }
 
@@ -635,24 +636,25 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(bool show
         onscreeninforender_getresicon
     } };
     *reinterpret_cast<byte*>(0x53F62E) = showwood ? 0xFF : static_cast<int>(shok::ResourceType::WoodRaw);
-    CppLogic::Hooks::WriteJump(onscreeninforender_getresicon, &osir_getresicon_override, reinterpret_cast<void*>(0x541B48));
+    CppLogic::Hooks::WriteJump(onscreeninforender_getresicon, CppLogic::Hooks::MemberFuncPointerToVoid(&OnScreenInfoRenderer::GetResourceIconOverride, 0), reinterpret_cast<void*>(0x541B48));
 }
 
-void __stdcall OSIRenderer_renderhooked(GGUI::C3DOnScreenInformationCustomWidget* cw, shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active) {
+void __stdcall GGUI::C3DOnScreenInformationCustomWidget::RenderHooked(shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active)
+{
     bool skip = false;
-    if (cw->ShowAllInformationFlag && data->Settler)
+    if (ShowAllInformationFlag && data->Settler)
         *active = true;
     if (data->Entity) {
         for (auto* b : data->Entity->DisplayBehaviors) {
             if (auto* rb = dynamic_cast<CppLogic::Mod::OnScreenInfoDisplayBehavior*>(b)) {
-                skip |= rb->RenderUI(&cw->Renderer, screenPos, data, active);
+                skip |= rb->RenderUI(&Renderer, screenPos, data, active);
             }
         }
     }
     if (!skip) {
-        cw->Renderer.RenderInactive(screenPos, data);
+        Renderer.RenderInactive(screenPos, data);
         if (*active)
-            cw->Renderer.RenderActive(screenPos, data);
+            Renderer.RenderActive(screenPos, data);
     }
 }
 void __declspec(naked) OSIRenderer_renderhookedasm() {
@@ -665,7 +667,7 @@ void __declspec(naked) OSIRenderer_renderhookedasm() {
         push eax;
         lea eax, [ebx - 4];
         push eax;
-        call OSIRenderer_renderhooked;
+        call GGUI::C3DOnScreenInformationCustomWidget::RenderHooked;
 
         push 0x53680F;
         ret;
@@ -681,8 +683,9 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookOnScreenInfoDisplayBehavior()
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5367D0), &OSIRenderer_renderhookedasm, reinterpret_cast<void*>(0x5367D7));
 }
 
-void __fastcall onscreenrender_additionalfloatierenderhook(GGUI::OnScreenInfoRenderer* th) {
-    th->RenderFloaties();
+void __thiscall GGUI::OnScreenInfoRenderer::RenderFloatiesHooked()
+{
+    RenderFloaties();
     GGUI::AdvancedFloatieManager::GlobalObj.RenderFloaties();
 }
 
@@ -693,7 +696,7 @@ void GGUI::C3DOnScreenInformationCustomWidget::HookAdditionalFloaties()
         return;
     HookAdditionalFloaties_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x536842), 0x10 };
-    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x536842), &onscreenrender_additionalfloatierenderhook);
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x536842), CppLogic::Hooks::MemberFuncPointerToVoid(&OnScreenInfoRenderer::RenderFloatiesHooked, 0));
 }
 
 GGUI::AdvancedFloatieManager GGUI::AdvancedFloatieManager::GlobalObj{};

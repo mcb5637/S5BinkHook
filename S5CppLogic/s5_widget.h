@@ -541,6 +541,7 @@ namespace GGUI {
 	};
 
 	class OnScreenInfoRenderer {
+		friend class C3DOnScreenInformationCustomWidget;
 	public:
 		struct {
 			EGUIX::CMaterial Texture_DeadHero; // 46
@@ -634,6 +635,10 @@ namespace GGUI {
 		void RenderFloaties();
 		EGUIX::CMaterial* GetResourceIcon(shok::ResourceType rt); // does not return wood icon without patching
 		EGUIX::CMaterial* GetRefinerResourceIcon(shok::ResourceType rt);
+
+	private:
+		EGUIX::CMaterial* __thiscall GetResourceIconOverride(shok::ResourceType rt);
+		void __thiscall RenderFloatiesHooked();
 	};
 
 	class C3DOnScreenInformationCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
@@ -655,6 +660,9 @@ namespace GGUI {
 		static void HookAdditionalFloaties();
 
 		static inline GGUI::C3DOnScreenInformationCustomWidget** const GlobalObj = reinterpret_cast<GGUI::C3DOnScreenInformationCustomWidget**>(0x882F54);
+
+	private:
+		void __stdcall RenderHooked(shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active);
 	};
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, ShowAllInformationFlag) == 37 * 4);
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.TextureData) == 46 * 4);

@@ -150,6 +150,10 @@ namespace EScr {
 		static inline void(__cdecl* const AddGlobalToNotSerialize)(const char* n) = reinterpret_cast<void(__cdecl*)(const char*)>(0x5A1E0C);
 
 		static void HookSerializationOverride();
+	private:
+		static void __stdcall SerializeOverride(BB::CFileStreamEx* f, lua_State* L, const char* filename);
+		static void __stdcall DeserializeOverride(BB::CFileStreamEx* f, lua_State* L, const char* filename);
+		static void __cdecl AddGlobalNoSaveOverride(const char* n);
 	};
 }
 

@@ -447,8 +447,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="memedits.txt" />
     <Text Include="doc\data_notes.txt">
+      <Filter>doc</Filter>
+    </Text>
+    <Text Include="memedits.txt">
       <Filter>doc</Filter>
     </Text>
   </ItemGroup>

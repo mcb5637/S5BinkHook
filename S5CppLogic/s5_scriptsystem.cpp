@@ -189,7 +189,8 @@ EScr::LuaStateSerializer::LuaStateSerializer() {
 	stateseri_ctor(this);
 }
 
-void __stdcall luastateseri_hookserialize(BB::CFileStreamEx* f, lua_State* L, const char* filename) {
+void __stdcall EScr::LuaStateSerializer::SerializeOverride(BB::CFileStreamEx* f, lua_State* L, const char* filename)
+{
 	try {
 		int wr = 4;
 		f->Write(&wr, sizeof(int));
@@ -218,13 +219,14 @@ void __declspec(naked) luastateseri_hookserializeasm() {
 		push eax;
 		lea eax, [ebp - 0x18];
 		push eax;
-		call luastateseri_hookserialize;
+		call EScr::LuaStateSerializer::SerializeOverride;
 
 		push 0x57510B;
 		ret;
 	};
 }
-void __stdcall lusstateseri_hookdeseri(BB::CFileStreamEx* f, lua_State* L, const char* filename) {
+void __stdcall EScr::LuaStateSerializer::DeserializeOverride(BB::CFileStreamEx* f, lua_State* L, const char* filename)
+{
 	int resi = 0;
 	f->Read(&resi, sizeof(int));
 	int renull = 0;
@@ -266,14 +268,14 @@ void __declspec(naked) lusstateseri_hookdeseriasm() {
 		push eax;
 		lea eax, [ebp - 0x1C];
 		push eax;
-		call lusstateseri_hookdeseri;
+		call EScr::LuaStateSerializer::DeserializeOverride;
 
 		push 0x575334;
 		ret;
 	};
 }
 
-void __cdecl luastateser_overrideaddglobalnosave(const char* n)
+void __cdecl EScr::LuaStateSerializer::AddGlobalNoSaveOverride(const char* n)
 {
 	shok::String s{ n };
 	auto* v = EScr::LuaStateSerializer::DoNotSerializeGlobals();
@@ -294,5 +296,5 @@ void EScr::LuaStateSerializer::HookSerializationOverride()
 		} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5750ED), &luastateseri_hookserializeasm, reinterpret_cast<void*>(0x5750F3));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575311), &lusstateseri_hookdeseriasm, reinterpret_cast<void*>(0x57531A));
-	CppLogic::Hooks::WriteJump(AddGlobalToNotSerialize, &luastateser_overrideaddglobalnosave, reinterpret_cast<void*>(0x5A1E16));
+	CppLogic::Hooks::WriteJump(AddGlobalToNotSerialize, &AddGlobalNoSaveOverride, reinterpret_cast<void*>(0x5A1E16));
 }

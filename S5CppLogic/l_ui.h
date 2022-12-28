@@ -31,10 +31,45 @@ namespace CppLogic::UI {
 		static void Initialize();
 		void Cancel(bool calllua);
 
+		static constexpr const char* Name = "LuaSelectionState";
+		static constexpr int Id = 27;
+
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
 		static constexpr unsigned int Identifier = 0x1000;
+		static constexpr BB::SerializationData* SerializationData = nullptr;
+	};
+
+	class GUIState_PlaceBuildingEx : public GGUI::CPlaceBuildingState {
+	public:
+		int CurrentStep = 0;
+
+		static constexpr int NumSteps = 4;
+		static constexpr float StepToDegrees = 360 / NumSteps;
+
+		static void Initialize();
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual const char* GetName() override;
+
+		virtual bool OnMouseEvent(BB::CEvent* ev) override;
+		virtual bool CheckCommandValid(TargetData* d, int z) override;
+		virtual void ExecuteCommand(TargetData* d, ExecuteData* selectedID) override;
+		virtual TargetData* GetTargetData(TargetData* d, int x, int y) override;
+		virtual void OnMouseMove(int x, int y) override;
+
+		void UpdateModel(int x, int y);
+		float GetRotation();
+		void SetRotation(float deg);
+
+		static constexpr const char* Name = "PlaceBuildingStateEx";
+		static constexpr int Id = 28;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		static constexpr unsigned int Identifier = 0x1005;
 		static constexpr BB::SerializationData* SerializationData = nullptr;
 	};
 }

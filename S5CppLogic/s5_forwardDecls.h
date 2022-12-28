@@ -109,6 +109,7 @@ namespace BB {
 namespace GGUI {
 	class C3DViewHandler;
 	class CState;
+	struct SStateParameters;
 }
 namespace GGlue {
 	class CGlueEntityProps;

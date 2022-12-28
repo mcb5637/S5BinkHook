@@ -15,9 +15,12 @@ namespace GGUI {
 		static inline constexpr int TypeDesc = 0x82EBA8;
 	};
 	struct SPlaceBuildingStateParameters : public SStateParameters {
+		int UCat;
 
 		static inline constexpr int vtp = 0x77DCA0;
 		static inline constexpr int TypeDesc = 0x82EC8C;
+
+		SPlaceBuildingStateParameters(int ucat);
 	};
 
 
@@ -39,16 +42,31 @@ namespace GGUI {
 		static inline constexpr int TypeDesc = 0x82CC2C;
 
 		struct TargetData {
-			int TargetID;
+			int TargetID = 0;
 			shok::Position TargetPos;
 			shok::PositionRot TargetPosWithZ;
 			PADDINGI(2);
+
+			void FillPosWithZFromPos();
 		};
+		struct ExecuteData {
+			int CurrentID;
+			unsigned int CurrentNumber;
+			int FirstID;
+			unsigned int NumberOfEntities;
+		};
+
+		virtual bool OnMouseEvent(BB::CEvent* ev) override;
+		virtual bool Cancel() override;
+
 		virtual bool CheckCommandValid(TargetData* d, int z) = 0;
-		virtual void ExecuteCommand(TargetData* d, int* selectedID) = 0; // check if that id is actually the parameter, might also be 0?
-		virtual TargetData* GetTargetData(TargetData* d, float x, float y) = 0; // write data into d, then return d
-		virtual void OnMouseMove(float x, float y) = 0;
+		virtual void ExecuteCommand(TargetData* d, ExecuteData* selectedID) = 0; // check if that id is actually the parameter, might also be 0?
+		virtual TargetData* GetTargetData(TargetData* d, int x, int y) = 0; // write data into d, then return d
+		virtual void OnMouseMove(int x, int y) = 0;
 		virtual bool OnCancel() = 0; // Cancel redirects here, no idea why we need a 2nd method for that...
+
+		void FillPosData(TargetData* d, int x, int y);
+		void FillEntityData(TargetData* d, int x, int y);
 	};
 	static_assert(sizeof(CBasicState::TargetData) == 8 * 4);
 
@@ -252,11 +270,23 @@ namespace GGUI {
 	};
 	class CPlaceBuildingState : public GGUI::CBasicState {
 	public:
-		int UpgradeCategory;
+		int UpgradeCategory = 0;
 		shok::Position PosToBuild;
-		int MouseX, MouseY; // screenpos
+		int MouseX = 0, MouseY = 0; // screenpos
 
 		void UpdateModel();
+		void SetModelToRender();
+		void SetModelToRender(RWE::RpClump* c, float r);
+
+		CPlaceBuildingState();
+		virtual ~CPlaceBuildingState() override;
+		virtual void SetStateParameters(SStateParameters* p) override;
+		virtual int OnSelectionChanged(int z) override;
+		virtual bool CheckCommandValid(TargetData* d, int z) override;
+		virtual void ExecuteCommand(TargetData* d, ExecuteData* selectedID) override;
+		virtual TargetData* GetTargetData(TargetData* d, int x, int y) override;
+		virtual void OnMouseMove(int x, int y) override;
+		virtual bool OnCancel() override;
 
 		static inline constexpr int vtp = 0x77DCA8;
 		static inline constexpr int TypeDesc = 0x82ECC0;
@@ -264,7 +294,7 @@ namespace GGUI {
 
 		// maybe increase the objects size and make this not global?
 		static float PlacementRotation;
-		static void HookPlacementRotation();
+		static [[deprecated]] void HookPlacementRotation();
 
 		static shok::PositionRot GetNearestPlacementPosBuildOn(int ety, const shok::Position& p, float range);
 		static shok::PositionRot GetNearestPlacementPosFree(int ety, const shok::PositionRot& p, float range);

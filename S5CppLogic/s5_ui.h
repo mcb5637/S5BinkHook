@@ -556,11 +556,11 @@ namespace GGUI {
 		PADDINGI(2); // probably pos mouseover
 		int MouseX, MouseY;
 
-		void SetGUIStateByIdentifier(unsigned int identifier);
+		void SetGUIStateByIdentifier(unsigned int identifier, const GGUI::SStateParameters* p = nullptr);
 		template<class T>
 		requires std::derived_from<T, GGUI::CState>
-		void SetGUIState() {
-			SetGUIStateByIdentifier(T::Identifier);
+		void SetGUIState(const GGUI::SStateParameters* p = nullptr) {
+			SetGUIStateByIdentifier(T::Identifier, p);
 		}
 		void SetGUIStateByIdentfierOnNextUpdate(unsigned int identifier);
 		template<class T>
@@ -612,7 +612,7 @@ namespace GGUI {
 		PADDINGI(3);
 		shok::Vector<StateIdData*> CommandStates;
 		CMouseEffect* MouseEffect;
-		lua_State* GameState;
+		lua_State* GameState; // 24
 		CMouseCursorManager* MouseCursorManager;
 
 	public:
@@ -625,7 +625,9 @@ namespace GGUI {
 		static inline GGUI::CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<GGUI::CManager * (__cdecl*)()>(0x525622);
 		static bool(*PostEventCallback)(BB::CEvent* ev);
 
+		static inline void(__cdecl* const PostEventFromUI)(BB::CEvent* ev) = reinterpret_cast<void(__cdecl*)(BB::CEvent*)>(0x525D77);
 
 		static bool IsModifierPressed(shok::Keys modif);
 	};
+	//constexpr int i = offsetof(CManager, GameState) / 4;
 }

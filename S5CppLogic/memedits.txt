@@ -94,3 +94,4 @@ list of used identifiers
 0x1002 CppLogic::Events::ResourceEvent
 0x1003 CppLogic::Events::ConversionEvent
 0x1004 CppLogic::EntityAddon::EntityAddonData
+0x1005 CppLogic::UI::GUIState_PlaceBuildingEx

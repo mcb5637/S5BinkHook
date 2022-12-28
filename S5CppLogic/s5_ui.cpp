@@ -758,10 +758,10 @@ void ERwTools::CRpClumpRenderable::SetBuildingRedColor(bool r)
 	SetBuildingRedColorI(r ? 2 : 1);
 }
 
-static inline void(__thiscall*const c3dviewhandler_setguistate)(GGUI::C3DViewHandler* th, unsigned int id, GGUI::SStateParameters* p) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, unsigned int, GGUI::SStateParameters*)>(0x52820C);
-void GGUI::C3DViewHandler::SetGUIStateByIdentifier(unsigned int identifier)
+static inline void(__thiscall*const c3dviewhandler_setguistate)(GGUI::C3DViewHandler* th, unsigned int id, const GGUI::SStateParameters* p) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, unsigned int, const GGUI::SStateParameters*)>(0x52820C);
+void GGUI::C3DViewHandler::SetGUIStateByIdentifier(unsigned int identifier, const GGUI::SStateParameters* p)
 {
-	c3dviewhandler_setguistate(this, identifier, nullptr);
+	c3dviewhandler_setguistate(this, identifier, p);
 }
 static inline void(__thiscall* const c3dviewhandler_setguistateonupdate)(GGUI::C3DViewHandler* th, unsigned int id) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, unsigned int)>(0x5280DE);
 void GGUI::C3DViewHandler::SetGUIStateByIdentfierOnNextUpdate(unsigned int identifier)

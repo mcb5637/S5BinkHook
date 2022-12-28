@@ -316,10 +316,12 @@ function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
 --- @param text string replacement string or nil to restore default
 function CppLogic.Logic.SetStringTableText(key, text) end
 
+--- deprecated
 --- serf ui place building rotaton.
 --- does not work with SCELoader.
 --- @return number rotation
 function CppLogic.Logic.GetPlaceBuildingRotation() end
+--- deprecated
 --- serf ui place building rotaton.
 --- does not work with SCELoader.
 --- @param r number
@@ -2338,6 +2340,16 @@ function CppLogic.UI.SetMouseTriggerMainMenu(f) end
 --- @param onclick fun(x:number,y:number):boolean ->endstate
 --- @param oncancel fun()
 function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
+
+--- sets a GUI State to place a construction site and choose its rotation.
+--- @param ucat number building upgrade category
+function CppLogic.UI.SetGUIStatePlaceBuildingEx(ucat) end
+--- changes the rotation of a PlaceBuildingEx state.
+--- @param deg number
+function CppLogic.UI.SetPlaceBuildingRotation(deg) end
+--- gets the rotation of a PlaceBuildingEx state.
+--- @return number deg
+function CppLogic.UI.GetPlaceBuildingRotation() end
 
 --- gets the map position under a given screen position.
 --- @param x number

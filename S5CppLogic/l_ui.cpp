@@ -11,6 +11,8 @@
 #include "s5_events.h"
 #include "s5_defines.h"
 #include "s5_RWE_2d.h"
+#include "s5_ui.h"
+#include "s5_netevents.h"
 #include "hooks.h"
 #include "luaserializer.h"
 
@@ -944,7 +946,7 @@ namespace CppLogic::UI {
 		luaext::EState L{ ls };
 		L.CheckType(1, lua::LType::Function);
 		auto* vh = GGUI::CManager::GlobalObj()->C3DViewHandler;
-		vh->StateIdManager->GetIDByNameOrCreate("LuaSelectionState", 27); // make sure the state id exists
+		vh->StateIdManager->GetIDByNameOrCreate(GUIState_LuaSelection::Name, GUIState_LuaSelection::Id); // make sure the state id exists
 		vh->SetGUIState<CppLogic::UI::GUIState_LuaSelection>();
 		CppLogic::UI::GUIState_LuaSelection* s = dynamic_cast<CppLogic::UI::GUIState_LuaSelection*>(vh->CurrentState);
 		L.PushValue(1);
@@ -955,6 +957,30 @@ namespace CppLogic::UI {
 			s->RefOnCancel = L.Ref(L.REGISTRYINDEX);
 		}
 		return 0;
+	}
+
+	int SetGUIStatePlaceBuildingEx(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* vh = GGUI::CManager::GlobalObj()->C3DViewHandler;
+		vh->StateIdManager->GetIDByNameOrCreate(GUIState_PlaceBuildingEx::Name, GUIState_PlaceBuildingEx::Id); // make sure the state id exists
+		GGUI::SPlaceBuildingStateParameters p{ static_cast<int>(L.CheckInt(1)) };
+		vh->SetGUIState<CppLogic::UI::GUIState_PlaceBuildingEx>(&p);
+		return 0;
+	}
+
+	int SetPlaceBuildingRotation(lua::State L) {
+		//GGUI::CPlaceBuildingState::HookPlacementRotation();
+		auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
+		if (s)
+			s->SetRotation(L.CheckFloat(1));
+		return 0;
+	}
+	int GetPlaceBuildingRotation(lua::State L) {
+		auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
+		if (!s)
+			return 0;
+		L.Push(s->GetRotation());
+		return 1;
 	}
 
 
@@ -1020,7 +1046,7 @@ namespace CppLogic::UI {
 
 	const char* GUIState_LuaSelection::GetName()
 	{
-		return "LuaSelectionState";
+		return Name;
 	}
 
 	int GUIState_LuaSelection::OnSelectionChanged(int z)
@@ -1048,6 +1074,157 @@ namespace CppLogic::UI {
 		C3DViewHandler->SetGUIStateByIdentfierOnNextUpdate<GGUI::CSelectionState>();
 	}
 
+	void CppLogic::UI::GUIState_PlaceBuildingEx::Initialize()
+	{
+		(*BB::CClassFactory::GlobalObj)->AddClassToFactory<GUIState_PlaceBuildingEx>();
+	}
+
+	void* CppLogic::UI::GUIState_PlaceBuildingEx::operator new(size_t s)
+	{
+		return shok::Malloc(s);
+	}
+	void CppLogic::UI::GUIState_PlaceBuildingEx::operator delete(void* p)
+	{
+		shok::Free(p);
+	}
+
+	unsigned int __stdcall CppLogic::UI::GUIState_PlaceBuildingEx::GetClassIdentifier() const
+	{
+		return Identifier;
+	}
+
+	const char* CppLogic::UI::GUIState_PlaceBuildingEx::GetName()
+	{
+		return Name;
+	}
+
+	bool CppLogic::UI::GUIState_PlaceBuildingEx::OnMouseEvent(BB::CEvent* ev)
+	{
+		if (auto* e = dynamic_cast<BB::CMouseEvent*>(ev)) {
+			if (e->IsEvent(shok::InputEventIds::MouseWheel)) {
+				if (e->Delta < 0) {
+					CurrentStep = (CurrentStep + 1) % NumSteps;
+				}
+				else {
+					CurrentStep--;
+					while (CurrentStep < 0)
+						CurrentStep += NumSteps;
+				}
+				MouseX = -1;
+				MouseY = -1;
+				UpdateModel(e->X, e->Y);
+				e->EventHandeled = true;
+				return true;
+			}
+		}
+
+		return GGUI::CPlaceBuildingState::OnMouseEvent(ev);
+	}
+
+	bool CppLogic::UI::GUIState_PlaceBuildingEx::CheckCommandValid(TargetData* d, int z)
+	{
+		auto m = GGUI::CManager::GlobalObj();
+		auto i = m->GUIInterface;
+		int ety = i->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
+		if (!i->CheckBuildingPlacementAndCost(m->ControlledPlayer, ety, d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())))
+			return false;
+		bool hasserf = false;
+		bool hassector = false;
+		int sector = i->GetSector(&d->TargetPos);
+		for (int id : m->SelectedEntities) {
+			if (i->IsSerf(id)) {
+				hasserf = true;
+				if (i->GetSector(id) == sector) {
+					hassector = true;
+					break;
+				}
+			}
+		}
+		if (!hasserf)
+			return false;
+		if (!hassector)
+			return false;
+		if (!i->IsPositionExploredByPlayer(m->ControlledPlayer, &d->TargetPos))
+			return false;
+		return true;
+	}
+
+	void CppLogic::UI::GUIState_PlaceBuildingEx::ExecuteCommand(TargetData* d, ExecuteData* selectedID)
+	{
+		if (selectedID->CurrentID == selectedID->FirstID) {
+			if (CheckCommandValid(d, 0)) {
+				auto m = GGUI::CManager::GlobalObj();
+				GGL::CNetEventBuildingCreator ev{ shok::NetEventIds::CommandPlaceBuilding, m->ControlledPlayer, UpgradeCategory, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())}};
+				{
+					auto v = ev.Serf.SaveVector();
+					for (int id : m->SelectedEntities) {
+						if (m->GUIInterface->IsSerf(id))
+							v.Vector.push_back(id);
+					}
+				}
+				GGUI::CManager::PostEventFromUI(&ev);
+				lua::State L{ m->GameState };
+				int top = L.GetTop();
+				L.GetGlobal("GameCallback_GUI_AfterBuildingPlacement");
+				L.PCall(0, 0);
+				L.SetTop(top);
+				SetModelToRender(nullptr, 0);
+			}
+		}
+	}
+
+	GGUI::CBasicState::TargetData* CppLogic::UI::GUIState_PlaceBuildingEx::GetTargetData(TargetData* d, int x, int y)
+	{
+		if (UpgradeCategory) {
+			auto m = GGUI::CManager::GlobalObj();
+			int ety = m->GUIInterface->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
+			FillPosData(d, x, y);
+			d->TargetPos.FloorToBuildingPlacement();
+			if (static_cast<int>(d->TargetPos.X) == MouseX && static_cast<int>(d->TargetPos.Y) == MouseY) {
+				d->TargetPos = PosToBuild;
+			}
+			else {
+				MouseX = static_cast<int>(d->TargetPos.X);
+				MouseY = static_cast<int>(d->TargetPos.Y);
+				shok::PositionRot p = GetNearestPlacementPos(ety, shok::PositionRot{ d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation()) }, (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
+				if (p.X >= 0) {
+					d->TargetPos.X = p.X;
+					d->TargetPos.Y = p.Y;
+					SetRotation(CppLogic::RadiansToDegrees(p.r));
+				}
+				PosToBuild = d->TargetPos;
+			}
+			d->FillPosWithZFromPos();
+		}
+		return d;
+	}
+
+	void CppLogic::UI::GUIState_PlaceBuildingEx::OnMouseMove(int x, int y)
+	{
+		UpdateModel(x, y);
+	}
+
+	void CppLogic::UI::GUIState_PlaceBuildingEx::UpdateModel(int x, int y)
+	{
+		if (!UpgradeCategory)
+			return;
+		SetModelToRender();
+		C3DViewHandler->ClumpRenerable->Model->GetFrame()->Rotate(GetRotation(), RWE::RwOpCombineType::Replace);
+		TargetData d{};
+		GetTargetData(&d, x, y);
+		C3DViewHandler->ClumpRenerable->SetBuildingRedColor(!CheckCommandValid(&d, 0));
+		C3DViewHandler->ClumpRenerable->SetPosition(d.TargetPos, d.TargetPosWithZ.r);
+	}
+
+	float CppLogic::UI::GUIState_PlaceBuildingEx::GetRotation()
+	{
+		return StepToDegrees * CurrentStep;
+	}
+
+	void CppLogic::UI::GUIState_PlaceBuildingEx::SetRotation(float deg)
+	{
+		CurrentStep = static_cast<int>(std::roundf(deg / StepToDegrees));
+	}
 
 	void Cleanup(lua::State L) {
 		EGUIX::UIInput_Char_Callback = nullptr;
@@ -1101,7 +1278,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 59> UI{ {
+	constexpr std::array<lua::FuncReference, 62> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1161,6 +1338,9 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<SetCutsceneFarClipPlaneMinAndMax>("SetCutsceneFarClipPlaneMinAndMax"),
 		lua::FuncReference::GetRef<ReloadGUI>("ReloadGUI"),
 		lua::FuncReference::GetRef<SetShowWoodInUI>("SetShowWoodInUI"),
+		lua::FuncReference::GetRef<SetGUIStatePlaceBuildingEx>("SetGUIStatePlaceBuildingEx"),
+		lua::FuncReference::GetRef<SetPlaceBuildingRotation>("SetPlaceBuildingRotation"),
+		lua::FuncReference::GetRef<GetPlaceBuildingRotation>("GetPlaceBuildingRotation"),
 	} };
 
 	void Init(lua::State L)
@@ -1173,6 +1353,7 @@ namespace CppLogic::UI {
 		if (L.GetState() == shok::LuaStateMainmenu) {
 			L.RegisterFunc<SetMouseTriggerMainMenu>("SetMouseTriggerMainMenu", -3);
 			CppLogic::UI::GUIState_LuaSelection::Initialize();
+			GUIState_PlaceBuildingEx::Initialize();
 		}
 	}
 }

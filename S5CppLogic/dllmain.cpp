@@ -82,13 +82,194 @@ struct CppLogicOptions {
 };
 CppLogicOptions Options{};
 
+class BreakOnCmdBehavior : public EGL::CGLEBehavior {
+	static constexpr bool VsDbg = true;
+	static constexpr bool Int3Dbg = false;
+	// note no serf, heroability, building cmds
+
+	void EventMove(EGL::CEventPosition* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventAttack(EGL::CEvent1Entity* ev) {
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventAMove(EGL::CEventPosition* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventHoldPos(BB::CEvent* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventDefend(BB::CEvent* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventGuard(EGL::CEvent1Entity* ev) {
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventPatrol(EGL::CEventPosition* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+
+	void EventStealGoods(EGL::CEvent1Entity* ev) {
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventSecureGoods(EGL::CEvent1Entity* ev) {
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventSabotage(EGL::CEvent1Entity* ev) {
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventDisarm(EGL::CEvent1Entity* ev) {
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventBinoc(EGL::CEventPosition* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventTorch(EGL::CEventPosition* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+	void EventPointRes(BB::CEvent* ev) {
+		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if constexpr (VsDbg)
+			__debugbreak();
+		else if constexpr (Int3Dbg)
+			DEBUGGER_BREAK;
+		auto s = L.GenerateStackTrace(true, true);
+		auto _ = s.c_str();
+	}
+
+
+protected:
+	virtual void AddHandlers(int id) override {
+		EntityId = id;
+		auto* e = EGL::CGLEEntity::GetEntityByID(id);
+		e->CreateEventHandler<shok::EventIDs::MoveCommand_Move>(this, &BreakOnCmdBehavior::EventMove);
+		e->CreateEventHandler<shok::EventIDs::Leader_AttackEntity>(this, &BreakOnCmdBehavior::EventAttack);
+		e->CreateEventHandler<shok::EventIDs::Leader_AttackMove>(this, &BreakOnCmdBehavior::EventAMove);
+		e->CreateEventHandler<shok::EventIDs::Leader_Defend>(this, &BreakOnCmdBehavior::EventDefend);
+		e->CreateEventHandler<shok::EventIDs::Leader_HoldPosition>(this, &BreakOnCmdBehavior::EventHoldPos);
+		e->CreateEventHandler<shok::EventIDs::Leader_Guard>(this, &BreakOnCmdBehavior::EventGuard);
+		e->CreateEventHandler<shok::EventIDs::LeaderPatrol>(this, &BreakOnCmdBehavior::EventPatrol);
+		e->CreateEventHandler<shok::EventIDs::LeaderPatrolAddPoint>(this, &BreakOnCmdBehavior::EventPatrol);
+
+		e->CreateEventHandler<shok::EventIDs::Thief_StealFromCommand>(this, &BreakOnCmdBehavior::EventStealGoods);
+		e->CreateEventHandler<shok::EventIDs::Thief_SecureGoodsCommand>(this, &BreakOnCmdBehavior::EventSecureGoods);
+		e->CreateEventHandler<shok::EventIDs::KegPlacer_SabotageCommand>(this, &BreakOnCmdBehavior::EventSabotage);
+		e->CreateEventHandler<shok::EventIDs::KegPlacer_DefuseCommand>(this, &BreakOnCmdBehavior::EventDisarm);
+		e->CreateEventHandler<shok::EventIDs::Binocular_ExploreCommand>(this, &BreakOnCmdBehavior::EventBinoc);
+		e->CreateEventHandler<shok::EventIDs::PointToResources_Activate>(this, &BreakOnCmdBehavior::EventPointRes);
+	}
+	virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override {
+
+	}
+	virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override {
+
+	}
+public:
+
+	void* operator new(size_t s)
+	{
+		return shok::Malloc(s);
+	}
+	void operator delete(void* p)
+	{
+		shok::Free(p);
+	}
+	static inline constexpr unsigned int Identifier = 0x1006;
+	virtual unsigned int __stdcall GetClassIdentifier() const {
+		return Identifier;
+	}
+};
+
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
-	L.Push(-90 % 360);
-	return 1;
+	/*auto e = L.CheckEntity(1);
+	auto cf = *BB::CClassFactory::GlobalObj;
+	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
+		cf->AddClassToFactory<BreakOnCmdBehavior>();
+	}
+	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
+	return 0;
 }
 
 int GetOptions(lua::State L) {

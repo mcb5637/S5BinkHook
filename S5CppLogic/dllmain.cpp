@@ -93,7 +93,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventAttack(EGL::CEvent1Entity* ev) {
@@ -102,7 +102,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventAMove(EGL::CEventPosition* ev) {
@@ -111,7 +111,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventHoldPos(BB::CEvent* ev) {
@@ -120,7 +120,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventDefend(BB::CEvent* ev) {
@@ -129,7 +129,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventGuard(EGL::CEvent1Entity* ev) {
@@ -138,7 +138,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventPatrol(EGL::CEventPosition* ev) {
@@ -147,7 +147,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 
@@ -157,7 +157,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventSecureGoods(EGL::CEvent1Entity* ev) {
@@ -166,7 +166,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventSabotage(EGL::CEvent1Entity* ev) {
@@ -175,7 +175,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventDisarm(EGL::CEvent1Entity* ev) {
@@ -184,7 +184,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventBinoc(EGL::CEventPosition* ev) {
@@ -193,7 +193,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventTorch(EGL::CEventPosition* ev) {
@@ -202,7 +202,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventPointRes(BB::CEvent* ev) {
@@ -211,7 +211,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		auto s = L.GenerateStackTrace(true, true);
+		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 

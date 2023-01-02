@@ -1761,48 +1761,7 @@ void EGL::CGLEEntity::HookMaxRange()
 	GGL::CAutoCannonBehavior::HookRangeOverride();
 }
 
-const char* __stdcall entitydisplayname(int* e, int type) {
-	// lots of hacks to recover that entity pointer in a safe way
-	// there are 2 branches that can end up calling this, with 2 different pointers in eax
-	int d[5] = { EGL::CGLEEntity::vtp_IEntityDisplay, GGL::CSettler::vtp_IEntityDisplay, GGL::CBuilding::vtp_IEntityDisplay,
-		GGL::CResourceDoodad::vtp_IEntityDisplay, GGL::CBridgeEntity::vtp_IEntityDisplay
-	};
-	EGL::CGLEEntity* ent = nullptr;
-	if (CppLogic::ContainsValue(d, *e, 5)) {
-		ent = reinterpret_cast<EGL::CGLEEntity*>(e - 1);
-	}
-	else {
-		int d2[5] = { EGL::CGLEEntity::vtp, GGL::CSettler::vtp, GGL::CBuilding::vtp,
-			GGL::CResourceDoodad::vtp, GGL::CBridgeEntity::vtp
-		};
-		if (CppLogic::ContainsValue(d2, *e, 5)) {
-			ent = reinterpret_cast<EGL::CGLEEntity*>(e);
-		}
-	}
-	if (ent) {
-		auto* d = ent->GetAdditionalData(false);
-		if (d && d->NameOverride.size() > 0) {
-			return d->NameOverride.c_str();
-		}
-	}
-
-	return EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(type);
-}
-void __declspec(naked) entitydisplaynameasm() {
-	__asm {
-		push eax;
-		call entitydisplayname;
-
-		push 0x53F91D;
-		ret;
-	}
-}
-bool HookDisplayName_Hooked = false;
 void EGL::CGLEEntity::HookDisplayName()
 {
-	if (HookDisplayName_Hooked)
-		return;
-	HookDisplayName_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x53F911), 0x53F91D - 0x53F911 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x53F911), &entitydisplaynameasm, reinterpret_cast<void*>(0x53F91D));
+	GGUI::COnScreenElementType::HookDisplayName();
 }

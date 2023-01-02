@@ -8,6 +8,7 @@
 #include "s5_mapdisplay.h"
 #include "hooks.h"
 #include "mod.h"
+#include "EntityAddonData.h"
 
 struct shok_vtable_EGUIX_CBaseWidget : BB::IObject::_vtableS {
     PADDINGI(4);
@@ -502,6 +503,42 @@ static inline void(__thiscall* const onscreentype_render)(GGUI::COnScreenElement
 void GGUI::COnScreenElementType::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered)
 {
     onscreentype_render(this, screenPos, data, centered);
+}
+
+const char* __stdcall GGUI::COnScreenElementType::GetDisplayName(const GGL::IGLGUIInterface::UIData* data)
+{
+    EGL::CGLEEntity* e = data->BuildingToDisplay;
+    if (!e) {
+        e = static_cast<EGL::CGLEEntity*>(data->Entity->Entity);
+    }
+    if (!e)
+        return "";
+    auto* d = e->GetAdditionalData(false);
+    if (d && d->NameOverride.size() > 0) {
+        return d->NameOverride.c_str();
+    }
+    return EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(e->EntityType);
+}
+void __declspec(naked) displaynamehook_asm() {
+    __asm {
+        push edi;
+        mov edi, ecx;
+
+        push[ebp + 0xC];
+        call GGUI::COnScreenElementType::GetDisplayName;
+
+        push 0x53F91D;
+        ret;
+    }
+}
+bool HookDisplayName_Hooked = false;
+void GGUI::COnScreenElementType::HookDisplayName()
+{
+    if (HookDisplayName_Hooked)
+        return;
+    HookDisplayName_Hooked = true;
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x53F8F1), 0x53F8F9 - 0x53F8F1 };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x53F8F1), &displaynamehook_asm, reinterpret_cast<void*>(0x53F8F9));
 }
 
 static inline void(__thiscall* const onscreenrefiner_render)(GGUI::COnScreenElementRefiner* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementRefiner*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53EBBB);

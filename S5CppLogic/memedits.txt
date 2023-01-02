@@ -68,7 +68,7 @@ shok_playerattractionhandler_checkpayday 0x4C25FB jmp at 0x4C2754
 0x50AB48 battle beh get max range jmp
 0x50F50D autocannon beh get max range jmp
 GetStringTableText 0x556D2E jmp
-display entity name overhead 0x53F911 jmp
+0x53F8F1 GGUI::COnScreenElementType::Render jmp replace get string from entity
 check building placement 0x4B45B9 jmp
 place building create net event 0x538FF4 jmp
 place building pos check 0x5389FB jmp
@@ -95,3 +95,4 @@ list of used identifiers
 0x1003 CppLogic::Events::ConversionEvent
 0x1004 CppLogic::EntityAddon::EntityAddonData
 0x1005 CppLogic::UI::GUIState_PlaceBuildingEx
+0x1006 BreakOnCmdBehavior debug only

@@ -480,6 +480,10 @@ namespace GGUI {
 		static inline constexpr int vtp = 0x77E5A0;
 
 		void Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data, bool centered); // type name
+
+		static void HookDisplayName();
+	private:
+		static const char* __stdcall GetDisplayName(const GGL::IGLGUIInterface::UIData* data);
 	};
 	class COnScreenElementWorktime : public COnScreenElement {
 	public:

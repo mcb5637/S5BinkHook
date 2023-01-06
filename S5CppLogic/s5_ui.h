@@ -542,6 +542,8 @@ namespace GGL {
 		bool GetNearestFreePosForBuildingPlacement(int ety, const shok::Position& inp, shok::Position& outp);
 
 		static inline constexpr int vtp = 0x76D9A4;
+
+		static void HookFillDataHealth();
 	};
 }
 

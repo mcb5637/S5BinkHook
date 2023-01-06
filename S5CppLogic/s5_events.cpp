@@ -288,3 +288,15 @@ int CppLogic::Events::ConversionEvent::GetTargetID() const
 {
 	return TargetIDNew;
 }
+
+CppLogic::Events::AdvHurtByEvent::AdvHurtByEvent(shok::EventIDs e, int aid, int dmg, shok::AdvancedDealDamageSource sou, int attpl)
+	: EGL::CEvent1Entity(e, aid)
+{
+	Damage = dmg;
+	Source = sou;
+	AttackerPlayer = attpl;
+}
+unsigned int __stdcall CppLogic::Events::AdvHurtByEvent::GetClassIdentifier() const
+{
+	return Identifier;
+}

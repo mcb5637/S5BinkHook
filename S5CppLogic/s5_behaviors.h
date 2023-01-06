@@ -180,11 +180,18 @@ namespace GGL {
 
 		virtual void UpdateCamo() = 0;
 
-		// defined events: Behavior_Tick, Camouflage_XXX, 1504A and 16013 return isinvisible, AttackEntity 1500E camo reset
+		// defined events: Behavior_Tick, Camouflage_XXX, Battle_DisableAutoAttack, AttackEntity 1500E camo reset
 
 		static inline constexpr int vtp = 0x7738F4;
 		static inline constexpr int TypeDesc = 0x8172E8;
 		static inline constexpr unsigned int Identifier = 0x0E2D7A5DD;
+
+		static void HookOnAttacked();
+		static void (*CamoActivateCb)(GGL::CCamouflageBehavior* th);
+		static void HookActivate();
+	private:
+		void EventOverrideOnAttacked(BB::CEvent* ev);
+		int __thiscall ActivateCamoOverride();
 	};
 	static_assert(offsetof(CCamouflageBehavior, InvisibilityRemaining) == 8 * 4);
 
@@ -653,6 +660,7 @@ namespace GGL {
 		float GetMissChance() const;
 		bool CheckMiss(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
 		float __thiscall GetMaxRangeBase() const;
+		bool CanAutoAttack(); // checks feared, leadercommand (not heroability,move,guard) and event Battle_DisableAutoAttack
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();

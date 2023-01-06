@@ -774,6 +774,25 @@ bool GGL::CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const 
 	return GetNearestFreePosForBuildingPlacement(ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);
 }
 
+void __declspec(naked) hookgetmaxhpui() {
+	__asm {
+		mov ecx, [ebp + 0xC];
+		call EGL::CGLEEntity::GetMaxHPOverride;
+		push eax;
+		fild[esp];
+		pop eax;
+		push 0x4BDEE0;
+		ret;
+	}
+}
+void GGL::CGLGUIInterface::HookFillDataHealth()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x16, {
+		reinterpret_cast<void*>(0x4BDED8)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4BDED8), &hookgetmaxhpui, reinterpret_cast<void*>(0x4BDEE0));
+}
+
 static inline void(__thiscall* const guimng_setpl)(GGUI::CManager* th, int p) = reinterpret_cast<void(__thiscall*)(GGUI::CManager*, int)>(0x52371C);
 void GGUI::CManager::SetControlledPlayer(int pl)
 {

@@ -13,6 +13,7 @@
 #include "s5_scriptsystem.h"
 #include "hooks.h"
 #include "EntityAddonData.h"
+#include "savegame_extra.h"
 
 void EGL::CGLEBehavior::unknownFuncBeh1(EGL::CGLEEntity* e)
 {
@@ -58,6 +59,50 @@ static inline bool(__thiscall* const heroability_checkandreset)(GGL::CHeroAbilit
 bool GGL::CHeroAbility::CheckAndResetCooldown()
 {
 	return heroability_checkandreset(this);
+}
+
+void GGL::CCamouflageBehavior::EventOverrideOnAttacked(BB::CEvent* ev)
+{
+	if (ev->IsEvent(shok::EventIDs::OnAttackedBy) && CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CamoFix) {
+		if (auto* a = dynamic_cast<CppLogic::Events::AdvHurtByEvent*>(ev)) {
+			if (a->Source == shok::AdvancedDealDamageSource::Arrow || a->Source == shok::AdvancedDealDamageSource::Cannonball)
+				return;
+		}
+	}
+	InvisibilityRemaining = 0;
+}
+bool HookResetCamo_Hooked = false;
+void GGL::CCamouflageBehavior::HookOnAttacked()
+{
+	EGL::CGLEEntity::HookHurtEntity();
+	if (HookResetCamo_Hooked)
+		return;
+	HookResetCamo_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5011DF), 0x5011E6 - 0x5011DF };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5011DF), CppLogic::Hooks::MemberFuncPointerToVoid(&EventOverrideOnAttacked, 0), reinterpret_cast<void*>(0x5011E6));
+}
+
+static inline int(__thiscall* const activateCamoOrig)(GGL::CCamouflageBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CCamouflageBehavior*)>(0x501561);
+void (*GGL::CCamouflageBehavior::CamoActivateCb)(GGL::CCamouflageBehavior* th);
+int __thiscall GGL::CCamouflageBehavior::ActivateCamoOverride()
+{
+	int i = activateCamoOrig(this);
+	if (GGL::CCamouflageBehavior::CamoActivateCb)
+		GGL::CCamouflageBehavior::CamoActivateCb(this);
+	return i;
+}
+bool HookCamoActivate_Hooked = false;
+void GGL::CCamouflageBehavior::HookActivate()
+{
+	if (HookCamoActivate_Hooked)
+		return;
+	HookCamoActivate_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, { reinterpret_cast<void*>(0x4D51A4),
+		reinterpret_cast<void*>(0x50163A)
+	} };
+	void* t = CppLogic::Hooks::MemberFuncPointerToVoid(&ActivateCamoOverride, 0);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4D51A4), t);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x50163A), t);
 }
 
 
@@ -400,6 +445,12 @@ bool GGL::CBattleBehavior::CheckMiss()
 		return false;
 	std::uniform_int_distribution dist{ 0, 100 };
 	return c > dist((*EGL::CGLEGameLogic::GlobalObj)->RNG);
+}
+
+inline bool(__thiscall* const battlebeh_canattack)(GGL::CBattleBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CBattleBehavior*)>(0x50B8A0);
+bool GGL::CBattleBehavior::CanAutoAttack()
+{
+	return battlebeh_canattack(this);
 }
 
 float __thiscall GGL::CBattleBehavior::GetMaxRangeBase() const

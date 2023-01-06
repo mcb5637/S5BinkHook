@@ -51,8 +51,8 @@ EntityDealAoEDamage 0x49F82A func override
 0x4F1E77 keg explode damage jmp
 0x4DC6D9 throw shuriken projecile jmp
 0x5062C6 place bomb jmp
-entity get max hp 0x57B798 jmp, settler overhead hp bar 0x4BDED8 jmp, createentity 0x571B93 jmp set hp
-create entity 0x571B93 jmp to fix max hp
+0x57B798 entity get max hp jmp
+0x571B93 create entity jmp to fix max hp
 0x4BDED8 ui settler overhead hp bar maxhp jmp
 shok_playerattractionhandler_checkpayday 0x4C25FB jmp at 0x4C2754
 0x50C77B battle beh event get damage override
@@ -96,3 +96,4 @@ list of used identifiers
 0x1004 CppLogic::EntityAddon::EntityAddonData
 0x1005 CppLogic::UI::GUIState_PlaceBuildingEx
 0x1006 BreakOnCmdBehavior debug only
+0x1007 CppLogic::Events::AdvHurtByEvent

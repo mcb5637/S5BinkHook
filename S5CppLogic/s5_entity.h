@@ -202,6 +202,12 @@ namespace EGL {
 		int GetMaxHealth();
 		int LimitedAttachmentGetMaximum(shok::AttachmentType attachType);
 		int ResourceTreeGetNearestSector() const;
+		bool EventIsInvisible(); // GGL::CCamouflageBehavior
+		bool EventIsSettlerOrBuilding();
+		bool EventIsWorker();
+		bool EventIsBattleOrAutocannon();
+		bool EventIsSerfOrWorker();
+		bool EventIsSoldier();
 
 		void SetHealth(int h);
 		void Hurt(int dmg);
@@ -274,6 +280,8 @@ namespace EGL {
 		shok::TaskStateExecutionResult ExecuteLuaTaskState(int i);
 		void __thiscall AddHandlerLuaTask();
 		int __stdcall CanCancelStateAdditionalCheck();
+		int __thiscall GetMaxHPOverride();
+		void __thiscall OnCreateFixHP(const EGL::CGLEEntityCreator* c);
 
 	public:
 		static shok::TaskExecutionResult(*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
@@ -290,10 +298,6 @@ namespace EGL {
 		static void __cdecl FixedHurtEntity(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg);
 		static void __cdecl FixedHurtEntityAoE(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl);
 	public:
-		static int ResetCamoIgnoreIfNotEntity;
-		static void HookResetCamo();
-		static void (*CamoActivateCb)(GGL::CCamouflageBehavior* th);
-		static void HookCamoActivate();
 		static void HookHurtEntity();
 		static bool HurtEntityCallWithNoAttacker;
 		static CppLogic::EntityAddon::EntityAddonData LastRemovedEntityAddonData;

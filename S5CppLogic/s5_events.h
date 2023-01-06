@@ -557,6 +557,19 @@ namespace CppLogic::Events {
 
 		static inline constexpr unsigned int Identifier = 0x1003;
 	};
+
+	class AdvHurtByEvent : public EGL::CEvent1Entity {
+	public:
+		int Damage;
+		shok::AdvancedDealDamageSource Source;
+		int AttackerPlayer;
+
+		AdvHurtByEvent(shok::EventIDs e, int aid, int dmg, shok::AdvancedDealDamageSource sou, int attpl);
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+
+		static inline constexpr unsigned int Identifier = 0x1007;
+	};
 }
 
 namespace shok {
@@ -688,7 +701,7 @@ namespace shok {
 		Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
 		// 1500C battle set target?, autocannon too?
 		Leader_OnAttackTargetDetached = 0x1500D, //EGL::CEvent1Entity
-		OnAttackedBy = 0x1500E, //EGL::CEvent1Entity
+		OnAttackedBy = 0x1500E, //EGL::CEvent1Entity, CppLogic::Events::AdvHurtByEvent (subclass of EGL::CEvent1Entity) with EGL::CGLEEntity::HookHurtEntity
 		Battle_GetBattleStatus = 0x15011, //EGL::CEventGetValue<int, 1211121895>
 		Battle_SetBattleStatus = 0x15012, //EGL::CEventValue<int,-27574121>
 		Battle_GetDamageClass = 0x15013, //EGL::CEventGetValue<int, 1211121895>
@@ -739,6 +752,7 @@ namespace shok {
 		WorkerAlarmMode_Enable = 0x15047, //BB::CEvent
 		WorkerAlarmMode_Disable = 0x15048, //BB::CEvent
 		Battle_IsInBattleTL = 0x15049, //EGL::CEventGetValue<bool,1709081367>
+		Battle_DisableAutoAttack = 0x1504A, //EGL::CEventGetValue<bool,1709081367> only used by camo
 		Leader_GetUpkeepCost = 0x1504C, //EGL::CEventGetValue<float, 1468983543>
 
 		GetDamage = 0x1503D, //EGL::CEventGetValue<int, 1211121895>
@@ -765,8 +779,8 @@ namespace shok {
 		HeroAbility_SetChargeCurrent = 0x16012, //GGL::CEventHeroAbilityInteger
 		// 16013 ? fire projectile event???
 
-		Camouflage_IsInvisible = 0x16013, //EGL::CEventGetValue<bool,1709081367>, 1504A same
-		ThiefCamouflage_Reset = 0x16014, //BB::CEvent
+		Camouflage_IsInvisible = 0x16013, //EGL::CEventGetValue<bool,1709081367>
+		ThiefCamouflage_Reset = 0x16014, //BB::CEvent fired from sabotage and steal goods
 		Camouflage_Activate = 0x16015, //BB::CEvent
 		Camouflage_GetDurationMax = 0x16016, //EGL::CEventGetValue<int,1211121895>
 		Camouflage_GetDurationCurrent = 0x16017, //EGL::CEventGetValue<int,1211121895>

@@ -178,6 +178,42 @@ int EGL::CGLEEntity::ResourceTreeGetNearestSector() const
 	}
 	return (*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p2);
 }
+bool EGL::CGLEEntity::EventIsInvisible()
+{
+	EGL::CEventGetValue_Bool ev{ shok::EventIDs::Camouflage_IsInvisible };
+	FireEvent(&ev);
+	return ev.Data;
+}
+bool EGL::CGLEEntity::EventIsSettlerOrBuilding()
+{
+	EGL::CEventGetValue_Bool ev{ shok::EventIDs::IsSettlerOrBuilding };
+	FireEvent(&ev);
+	return ev.Data;
+}
+bool EGL::CGLEEntity::EventIsWorker()
+{
+	EGL::CEventGetValue_Bool ev{ shok::EventIDs::IsWorker };
+	FireEvent(&ev);
+	return ev.Data;
+}
+bool EGL::CGLEEntity::EventIsBattleOrAutocannon()
+{
+	EGL::CEventGetValue_Bool ev{ shok::EventIDs::IsBattleOrAutocannon };
+	FireEvent(&ev);
+	return ev.Data;
+}
+bool EGL::CGLEEntity::EventIsSerfOrWorker()
+{
+	EGL::CEventGetValue_Bool ev{ shok::EventIDs::IsSerfOrWorker };
+	FireEvent(&ev);
+	return ev.Data;
+}
+bool EGL::CGLEEntity::EventIsSoldier()
+{
+	EGL::CEventGetValue_Bool ev{ shok::EventIDs::IsSoldier };
+	FireEvent(&ev);
+	return ev.Data;
+}
 
 
 int EGL::CGLEEntity::GetFirstAttachedToMe(shok::AttachmentType attachmentId) const
@@ -957,41 +993,6 @@ void EGL::CGLEEntity::ActivateEntityChangePlayerFix()
 	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityIDChangePlayer, &EGL::CGLEEntity::FixedChangePlayer, reinterpret_cast<void*>(0x49A6AC));
 }
 
-int EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
-void __fastcall camo_behaviorReset(GGL::CCamouflageBehavior* th, int _, int a) {
-	if (EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity == 0 || th->EntityId == EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity)
-		th->InvisibilityRemaining = 0;
-}
-bool HookResetCamo_Hooked = false;
-void EGL::CGLEEntity::HookResetCamo()
-{
-	if (HookResetCamo_Hooked)
-		return;
-	HookResetCamo_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5011DF), 0x5011E6 - 0x5011DF };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5011DF), &camo_behaviorReset, reinterpret_cast<void*>(0x5011E6));
-}
-
-static inline int(__thiscall* const activateCamoOrig)(GGL::CCamouflageBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CCamouflageBehavior*)>(0x501561);
-void (*EGL::CGLEEntity::CamoActivateCb)(GGL::CCamouflageBehavior* th);
-int __fastcall camoActivateHook(GGL::CCamouflageBehavior* th) {
-	int i = activateCamoOrig(th);
-	if (EGL::CGLEEntity::CamoActivateCb)
-		EGL::CGLEEntity::CamoActivateCb(th);
-	return i;
-}
-bool HookCamoActivate_Hooked = false;
-void EGL::CGLEEntity::HookCamoActivate()
-{
-	if (HookCamoActivate_Hooked)
-		return;
-	HookCamoActivate_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4D51A4), 10 };
-	CppLogic::Hooks::SaveVirtualProtect vp2{ reinterpret_cast<void*>(0x50163A), 10 };
-	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4D51A4), &camoActivateHook);
-	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x50163A), &camoActivateHook);
-}
-
 
 static inline void(__thiscall* const event2entitiesctor)(int* e, int id, int at, int de) = reinterpret_cast<void(__thiscall*)(int*, int, int, int)>(0x49847F);
 bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
@@ -1050,9 +1051,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		return;
 	if (Health <= 0)
 		return;
-	EGL::CEventGetValue_Bool getbool{ shok::EventIDs::IsSettlerOrBuilding };
-	FireEvent(&getbool);
-	if (!getbool.Data && !dynamic_cast<GGL::CBridgeEntity*>(this))
+	if (!EventIsSettlerOrBuilding() && !dynamic_cast<GGL::CBridgeEntity*>(this))
 		return;
 	if (GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) || GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE))
 		return;
@@ -1064,12 +1063,10 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	}
 	if (damage <= 0)
 		return;
-	getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsWorker };
-	FireEvent(&getbool);
-	if (attacker) {
-		if (!getbool.Data || !(*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, EGL::CGLELandscape::BlockingMode::Blocked)) {
+	if (attacker && !attacker->EventIsInvisible()) {
+		if (!EventIsWorker() || !(*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&Position, EGL::CGLELandscape::BlockingMode::Blocked)) {
 			if (!GGL::CPlayerStatus::ArePlayersFriendly(PlayerId, attacker->PlayerId)) {
-				EGL::CEvent1Entity ev{ shok::EventIDs::OnAttackedBy, attacker->EntityId };
+				CppLogic::Events::AdvHurtByEvent ev{ shok::EventIDs::OnAttackedBy, attacker->EntityId, damage, sourceInfo, attackerplayer };
 				FireEvent(&ev);
 			}
 		}
@@ -1091,19 +1088,13 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		}
 	}
 
-	getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsBattleOrAutocannon };
-	FireEvent(&getbool);
-	EGL::CEventGetValue_Bool getbool2{ shok::EventIDs::IsSerfOrWorker };
-	FireEvent(&getbool2);
 	std::vector<int> idskilled{};
 	int xptoadd = 0;
 	EGL::CGLEEntity* firsttodie = this;
 	int damageDone = 0;
-	if (getbool.Data && !getbool2.Data) { // has potentially soldiers
-		getbool = EGL::CEventGetValue_Bool{ shok::EventIDs::IsSoldier };
-		FireEvent(&getbool);
+	if (EventIsBattleOrAutocannon() && !EventIsSerfOrWorker()) { // has potentially soldiers
 		EGL::CGLEEntity* attackedleader = this;
-		if (getbool.Data) {
+		if (EventIsSoldier()) {
 			int id = this->GetFirstAttachedToMe(shok::AttachmentType::LEADER_SOLDIER);
 			if (id)
 				attackedleader = EGL::CGLEEntity::GetEntityByID(id);
@@ -1279,10 +1270,11 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 
 std::multimap<int, int> EGL::CGLEEntity::BuildingMaxHpTechBoni = std::multimap<int, int>();
 bool EGL::CGLEEntity::UseMaxHPTechBoni = false;
-int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
+int __thiscall EGL::CGLEEntity::GetMaxHPOverride()
+{
 	float hp;
-	auto* d = e->GetAdditionalData(false);
-	GGlue::CGlueEntityProps* et = e->GetEntityType();
+	auto* d = GetAdditionalData(false);
+	GGlue::CGlueEntityProps* et = GetEntityType();
 	if (d && d->HealthOverride > 0) {
 		hp = static_cast<float>(d->HealthOverride);
 	}
@@ -1293,63 +1285,52 @@ int __fastcall hookGetMaxHP(EGL::CGLEEntity* e) {
 		return static_cast<int>(hp);
 	if (EGL::CGLEEntity::UseMaxHPTechBoni)
 	{
-		if (dynamic_cast<GGL::CSettler*>(e)) {
+		auto player = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(PlayerId);
+		if (dynamic_cast<GGL::CSettler*>(this)) {
 			for (int t : static_cast<GGL::CGLSettlerProps*>(et->LogicProps)->ModifyHitpoints.TechList) {
-				if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
+				if (player->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
 				shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
-		else if (dynamic_cast<GGL::CSettler*>(e)) {
-			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = EGL::CGLEEntity::BuildingMaxHpTechBoni.equal_range(e->EntityType);
+		else if (dynamic_cast<GGL::CBuilding*>(this)) {
+			std::pair<std::multimap<int, int>::iterator, std::multimap<int, int>::iterator> it = EGL::CGLEEntity::BuildingMaxHpTechBoni.equal_range(EntityType);
 			for (std::multimap<int, int>::iterator i = it.first; i != it.second; ++i) {
 				int t = i->second;
-				if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->GetTechStatus(t) != shok::TechState::Researched)
+				if (player->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
 				shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
 	}
-	return (int)hp;
+	return static_cast<int>(hp);
 }
-void __declspec(naked) hookgetmaxhpui() {
-	__asm {
-		mov ecx, [ebp + 0xC];
-		call hookGetMaxHP;
-		push eax;
-		fild[esp];
-		pop eax;
-		push 0x4BDEE0;
-		ret;
-	}
-}
-void __fastcall createentityfixhp(EGL::CGLEEntity* th, int hpIn) {
-	if (hpIn != -1)
+void __thiscall EGL::CGLEEntity::OnCreateFixHP(const EGL::CGLEEntityCreator* c)
+{
+	if (c->Health != -1)
 		return;
-	if (dynamic_cast<GGL::CSettler*>(th)) {
-		th->Health = th->GetMaxHealth();
+	if (dynamic_cast<GGL::CSettler*>(this)) {
+		Health = GetMaxHealth();
 	}
-	else if (GGL::CBuilding* b = dynamic_cast<GGL::CBuilding*>(th)) {
-		th->Health = th->GetMaxHealth();
+	else if (GGL::CBuilding* b = dynamic_cast<GGL::CBuilding*>(this)) {
+		Health = GetMaxHealth();
 		if (!b->IsConstructionFinished()) {
-			th->Health = static_cast<int>(th->Health * (*GGL::CLogicProperties::GlobalObj)->ConstructionSiteHealthFactor);
+			Health = static_cast<int>(Health * (*GGL::CLogicProperties::GlobalObj)->ConstructionSiteHealthFactor);
 		}
 	}
 }
 void __declspec(naked) hookcreatentityfixhp() {
 	__asm {
 		mov ecx, esi;
-		pop edx; // creator, param for eax+0x14
-		mov eax, [edx + 7 * 4]; // health
-		push eax; // push health, then old param
-		push edx;
-		mov eax, [ecx];
-		call[eax + 0x14]; // call
+		push edi; // param for OnCreateFixHP
+		call[eax + 0x14]; // InitializeFromCreator
+
 		mov ecx, esi; // get params
-		pop edx;
-		call createentityfixhp; // hp fix
+		call EGL::CGLEEntity::OnCreateFixHP;
+
+
 		push 0x571B98;
 		ret;
 	}
@@ -1364,12 +1345,11 @@ void EGL::CGLEEntity::HookMaxHP()
 	HookMaxHP_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x16, {
 		reinterpret_cast<void*>(0x57B798),
-		reinterpret_cast<void*>(0x4BDED8),
 		reinterpret_cast<void*>(0x571B93)
 	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57B798), &hookGetMaxHP, reinterpret_cast<void*>(0x57B7AD));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4BDED8), &hookgetmaxhpui, reinterpret_cast<void*>(0x4BDEE0));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57B798), CppLogic::Hooks::MemberFuncPointerToVoid(&GetMaxHPOverride, 0), reinterpret_cast<void*>(0x57B7AD));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x571B93), &hookcreatentityfixhp, reinterpret_cast<void*>(0x571B98));
+	GGL::CGLGUIInterface::HookFillDataHealth();
 }
 
 shok::TaskExecutionResult(*EGL::CGLEEntity::LuaTaskListCallback)(EGL::CGLEEntity* e, int val) = nullptr;

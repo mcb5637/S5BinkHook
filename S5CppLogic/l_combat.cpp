@@ -48,14 +48,6 @@ namespace CppLogic::Combat {
 		return 0;
 	}
 
-	void l_combat_FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff, bool post) {
-		if (post)
-			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
-		else if (auto* aef = dynamic_cast<GGL::CArrowEffect*>(eff))
-			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = aef->AttackerID;
-		else if (auto* cef = dynamic_cast<GGL::CCannonBallEffect*>(eff))
-			EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = cef->AttackerID;
-	}
 	void l_combat_ActivateCamo(GGL::CCamouflageBehavior* th) {
 		EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 		if (e)
@@ -63,19 +55,16 @@ namespace CppLogic::Combat {
 	}
 
 	int EnableCamoFix(lua::State L) {
-		EGL::CFlyingEffect::HookOnHit();
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = &l_combat_FlyingEffectOnHitCallback;
-		EGL::CGLEEntity::HookResetCamo();
-		EGL::CGLEEntity::HookCamoActivate();
-		EGL::CGLEEntity::CamoActivateCb = &l_combat_ActivateCamo;
+		GGL::CCamouflageBehavior::HookOnAttacked();
+		GGL::CCamouflageBehavior::HookActivate();
+		GGL::CCamouflageBehavior::CamoActivateCb = &l_combat_ActivateCamo;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CamoFix = true;
 		return 0;
 	}
 
 	int DisableCamoFix(lua::State L) {
 		EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
-		EGL::CGLEEntity::CamoActivateCb = nullptr;
-		EGL::CGLEEntity::ResetCamoIgnoreIfNotEntity = 0;
+		GGL::CCamouflageBehavior::CamoActivateCb = nullptr;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CamoFix = false;
 		return 0;
 	}

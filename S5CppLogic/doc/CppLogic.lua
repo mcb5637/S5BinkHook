@@ -708,6 +708,7 @@ function CppLogic.Combat.DisableAoEProjectileFix() end
 
 --- enables camoflage projectile fix.
 --- when enabled, camoflage does not get reset by ranged attacks, also all attackers get cleared on entering camo.
+--- requires and automatically enables CppLogic.Logic.EnableAllHurtEntityTrigger.
 --- status of this gets saved into a savegame.
 function CppLogic.Combat.EnableCamoFix() end
 --- disabes camoflage projectile fix.

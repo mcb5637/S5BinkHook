@@ -870,7 +870,7 @@ namespace CppLogic::UA {
 				}
 			}
 		}
-		if (EGL::CGLEEntity::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
+		if (GGL::CCamouflageBehavior::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
 			GGL::CCamouflageBehavior* a = e->GetBehavior<GGL::CCamouflageBehavior>();
 			if (a != nullptr && !dynamic_cast<GGL::CThiefCamouflageBehavior*>(a)) {
 				GGL::CCamouflageBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();

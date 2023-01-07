@@ -439,15 +439,31 @@ namespace RWE {
 	static_assert(sizeof(RwDevice) == 56);
 
 	struct RwStringFunctions {
-		PADDINGI(17);
+		int (__cdecl*vecSprintf)(char* buffer, const char* format, ...);
+		int (__cdecl*vecVsprintf)(char* buffer, const char* format, va_list argptr); // 50
+		char* (__cdecl*vecStrcpy)(char* dest, const char* srce);
+		char* (__cdecl*vecStrncpy)(char* dest, const char* srce, size_t size);
+		char* (__cdecl*vecStrcat)(char* dest, const char* srce);
+		char* (__cdecl*vecStrncat)(char* dest, const char* srce, size_t size);
+		char* (__cdecl*vecStrrchr)(const char* string, int findThis); // 55
+		char* (__cdecl*vecStrchr)(const char* string, int findThis);
+		char* (__cdecl*vecStrstr)(const char* string, const char* findThis);
+		int (__cdecl*vecStrcmp)(const char* string1, const char* string2); // 0 on equal
+		int (__cdecl*vecStrncmp)(const char* string1, const char* string2, size_t max_size);
+		int (__cdecl*vecStricmp)(const char* string1, const char* string2); // 60
+		size_t(__cdecl*vecStrlen)(const char* string);
+		char* (__cdecl*vecStrupr)(char* string);
+		char* (__cdecl*vecStrlwr)(char* string);
+		char* (__cdecl*vecStrtok)(char* string, const char* delimit);
+		int (__cdecl*vecSscanf)(const char* buffer, const char* format, ...); // 65
 	};
 	static_assert(sizeof(RwStringFunctions) == 68);
 
 	struct RwMemoryFunctions {
-		void* (*rwmalloc)(size_t size, unsigned int hint);
+		void* (*rwmalloc)(size_t size, unsigned int hint); // 66
 		void  (*rwfree)(void* mem);
 		void* (*rwrealloc)(void* mem, size_t newSize, unsigned int hint);
-		void* (*rwcalloc)(size_t numObj, size_t sizeObj, unsigned int hint);
+		void* (*rwcalloc)(size_t numObj, size_t sizeObj, unsigned int hint); //69
 	};
 	struct RwFreeList {
 		size_t entrySize;

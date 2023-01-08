@@ -12,11 +12,13 @@ assert(false, "do not load this file, this is documentation only!")
 ---		- all @ codes can be terminated by | instead of space (space will get rendered, | will not).
 ---		- added @defaultcolor to reset color to the widgets default.
 ---		- added @skipWhitespace, which takes on or off as parameter, to turn off condensing multiple spaces to one.
----		- added @@ to print one @ (escape sequence)
----		- added @icon:iconid,texX,texY,texW,texH,sizeX,sizeY renders a EGUIX::CMaterial as a char inside the text
+---		- added @@ to print one @ (escape sequence).
+---		- added @icon:iconid,texX,texY,texW,texH,sizeX,sizeY,r,g,b,a renders a EGUIX::CMaterial as a char inside the text
 ---			- iconid is the path to the file, same format as for widgets. (this is a GUITexture, you may use the corresponding  ModLoader functions for them).
 ---			- texX, texY, texW, texH are texture coordinates to display part of the texture only (optional, default 0,0,1,1, either all or none) (easiest to copy them out of the GUIEdito).
 ---			- sizeX, sizeY size multipliers (optional, default Y=X, X=1, you may specify only one) (if you want to use them, texture coordinates are required).
+---			- r, g, b, a material color override (optional, default 255,255,255,255, you may only specify r,g,b) (if you want to use them, texture coordinates and both sizes are required).
+---		- for @color each color channel can be replaced by one letter r, g, b or a to use the matching default (widget) color channel (also works in @icon).
 --- - music can now be played from bba/s5x archives (make sure the s5x is loaded if you want to use music from it).
 --- - removed override for the functions error and pcall, they now work as they should
 --- - savegame lua state handling:

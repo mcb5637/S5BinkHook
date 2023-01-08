@@ -416,7 +416,25 @@ private:
 		anchor.y -= linedistance;
 	}
 
-	int ParseIntParam(T*& plinepos) {
+	int ParseIntParam(T*& plinepos, bool colorshort = false) {
+		if (colorshort) {
+			if (*plinepos == 'r' && (plinepos[1] == ',' || plinepos[1] == ' ' || plinepos[1] == '|' || plinepos[1] == '\0')) {
+				++plinepos;
+				return defaultcolor.R;
+			}
+			if (*plinepos == 'g' && (plinepos[1] == ',' || plinepos[1] == ' ' || plinepos[1] == '|' || plinepos[1] == '\0')) {
+				++plinepos;
+				return defaultcolor.G;
+			}
+			if (*plinepos == 'b' && (plinepos[1] == ',' || plinepos[1] == ' ' || plinepos[1] == '|' || plinepos[1] == '\0')) {
+				++plinepos;
+				return defaultcolor.B;
+			}
+			if (*plinepos == 'a' && (plinepos[1] == ',' || plinepos[1] == ' ' || plinepos[1] == '|' || plinepos[1] == '\0')) {
+				++plinepos;
+				return defaultcolor.A;
+			}
+		}
 		T* st = plinepos;
 		while (true) {
 			if (*plinepos == ',' || *plinepos == ' ' || *plinepos == '|' || *plinepos == '\0') {
@@ -505,16 +523,16 @@ private:
 						shok::Color c{};
 						plinepos += 7;
 						bool colorvalid = false;
-						c.R = static_cast<byte>(ParseIntParam(plinepos));
+						c.R = static_cast<byte>(ParseIntParam(plinepos, true));
 						if (*plinepos == ',') {
 							++plinepos;
-							c.G = static_cast<byte>(ParseIntParam(plinepos));
+							c.G = static_cast<byte>(ParseIntParam(plinepos, true));
 							if (*plinepos == ',') {
 								++plinepos;
-								c.B = static_cast<byte>(ParseIntParam(plinepos));
+								c.B = static_cast<byte>(ParseIntParam(plinepos, true));
 								if (*plinepos == ',') {
 									++plinepos;
-									c.A = static_cast<byte>(ParseIntParam(plinepos));
+									c.A = static_cast<byte>(ParseIntParam(plinepos, true));
 								}
 								else {
 									c.A = 255;
@@ -595,6 +613,7 @@ private:
 							siz.X *= mat.TextureCoordinates.W;
 							siz.Y *= mat.TextureCoordinates.H;
 
+							bool colorvalid = false;
 							shok::Position smult = { 1.0f, 1.0f };
 							if (*plinepos == ',') {
 								++plinepos;
@@ -602,9 +621,35 @@ private:
 								if (*plinepos == ',') {
 									++plinepos;
 									smult.Y = ParseFloatParam(plinepos);
+									colorvalid = true;
 								}
 								else {
 									smult.Y = smult.X;
+								}
+							}
+
+							if (colorvalid && *plinepos == ',') {
+								++plinepos;
+								colorvalid = false;
+								mat.Color.Red = ParseIntParam(plinepos, true);
+								if (*plinepos == ',') {
+									++plinepos;
+									mat.Color.Green = ParseIntParam(plinepos, true);
+									if (*plinepos == ',') {
+										++plinepos;
+										mat.Color.Blue = ParseIntParam(plinepos, true);
+										if (*plinepos == ',') {
+											++plinepos;
+											mat.Color.Alpha = ParseIntParam(plinepos, true);
+										}
+										else {
+											mat.Color.Alpha = 255;
+										}
+										colorvalid = true;
+									}
+								}
+								if (!colorvalid) {
+									mat.Color = EGUIX::Color{};
 								}
 							}
 

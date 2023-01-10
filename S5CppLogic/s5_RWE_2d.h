@@ -4,6 +4,22 @@
 #include "s5_RWEngine.h"
 
 namespace RWE::P2D {
+	struct Device {
+
+		static inline int(__cdecl* const GetStep)(RwV2d* xstep, RwV2d* ystep, RwV2d* origin) = reinterpret_cast<int(__cdecl*)(RwV2d*, RwV2d*, RwV2d*)>(0x707400);
+	};
+
+	struct CTM {
+
+		static inline int(__cdecl* const Push)() = reinterpret_cast<int(__cdecl*)()>(0x707170);
+		static inline int(__cdecl* const Translate)(float x, float y) = reinterpret_cast<int(__cdecl*)(float x, float y)>(0x707250);
+		static inline int(__cdecl* const Scale)(float x, float y) = reinterpret_cast<int(__cdecl*)(float x, float y)>(0x707200);
+		static inline RwMatrix* (__cdecl* const Get)() = reinterpret_cast<RwMatrix * (__cdecl*)()>(0x7072A0);
+		static inline int (__cdecl* const Pop)() = reinterpret_cast<int(__cdecl*)()>(0x7071D0);
+		static inline int(__cdecl* const SetIdentity)() = reinterpret_cast<int(__cdecl*)()>(0x706D60);
+
+	};
+
 	struct Rt2dBrush {
 
 	};
@@ -28,6 +44,7 @@ namespace RWE::P2D {
 		float GetStringWidth(const wchar_t* s, float height);
 		void RenderText(const wchar_t* s, float height, RWE::RwV2d* anchor, Rt2dBrush* brush);
 		void RenderText(const char* s, float height, RWE::RwV2d* anchor, Rt2dBrush* brush);
+		bool IsWchar();
 
 		void Destroy();
 

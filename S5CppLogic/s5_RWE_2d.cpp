@@ -29,6 +29,10 @@ void RWE::P2D::Rt2dFont::RenderText(const char* s, float height, RWE::RwV2d* anc
 {
     RenderTxt(this, s, height, anchor, brush);
 }
+bool RWE::P2D::Rt2dFont::IsWchar()
+{
+    return Flags & 2;
+}
 
 inline void(__cdecl* const font_destroy)(RWE::P2D::Rt2dFont* f) = reinterpret_cast<void(__cdecl*)(RWE::P2D::Rt2dFont*)>(0x708FC0);
 void RWE::P2D::Rt2dFont::Destroy()

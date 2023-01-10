@@ -720,8 +720,8 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	if (!f)
 		return 0;
 	// no idea what these funcs do
-	reinterpret_cast<void(*)()>(0x707170)();
-	reinterpret_cast<void(*)()>(0x706D60)();
+	RWE::P2D::CTM::Push();
+	RWE::P2D::CTM::SetIdentity();
 	reinterpret_cast<void(__cdecl*)(void*, int)>(0x707A00)(r->TextRenderObj, 0);
 
 	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
@@ -738,16 +738,15 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	const float fontsize = f->GetHeight();
 	const float linedistance = fontsize * (ldf == 0.0f ? 1.0f : ldf);
 
-	float somesize[2];
-	float unknownfa0[2];
-	float unknownfa1[2];
-	// also no idea what this exactly does
-	reinterpret_cast<void(__cdecl*)(float*, float*, float*)>(0x707400)(somesize, unknownfa0, unknownfa1);
-	anchor.x = anchor.x * somesize[0] * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
-	posTransform.x = posTransform.x * somesize[0] * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
-	end = end * somesize[0] * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	RWE::RwV2d stepx;
+	RWE::RwV2d stepy;
+	RWE::RwV2d stepori;
+	RWE::P2D::Device::GetStep(&stepx, &stepy, &stepori);
+	anchor.x = anchor.x * stepx.x * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	posTransform.x = posTransform.x * stepx.x * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	end = end * stepx.x * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
 	if (!r->SomeTextBool) {
-		reinterpret_cast<void(__cdecl*)(float, float)>(0x707200)(shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX, shok::UIRenderer::ScaledScreenSize.Y / r->RenderSizeY);
+		RWE::P2D::CTM::Scale(shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX, shok::UIRenderer::ScaledScreenSize.Y / r->RenderSizeY);
 		anchor.y = r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
 		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
 	}
@@ -760,7 +759,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	reinterpret_cast<void(__cdecl*)(int, int)>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(0x8501C8) + 32))(9, 2);
 
 	// i dont think this was a template when BB did this, but this is way nicer as one
-	if (f->Flags & 2) {
+	if (f->IsWchar()) {
 		static wchar_t buff[5001]{}; // same size that is used in the original func
 		shok::UIRenderer::MultibyteToWString(txt, buff, 5000);
 		TextRenderer<wchar_t> rend{ r, buff, f, anchor, end, ldf, posTransform, customcolordata, c };
@@ -771,7 +770,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 		rend.MainRender();
 	}
 
-	reinterpret_cast<void(__cdecl*)()>(0x7071D0)();
+	RWE::P2D::CTM::Pop();
 
 	return 1;
 }

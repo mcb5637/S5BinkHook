@@ -22,6 +22,16 @@ RWE::RwMatrix* RWE::RwMatrix::Translate(const RwV3d* translation, RwOpCombineTyp
 {
     return matrix_translate(this, translation, combineOp);
 }
+inline RWE::RwMatrix* (__cdecl* const matrix_mul)(RWE::RwMatrix* out, const RWE::RwMatrix* i1, const RWE::RwMatrix* i2) = reinterpret_cast<RWE::RwMatrix * (__cdecl*)(RWE::RwMatrix*, const RWE::RwMatrix*, const RWE::RwMatrix*)>(0x41B370);
+RWE::RwMatrix* RWE::RwMatrix::Multiply(const RwMatrix* MatrixIn1, const RwMatrix* matrixIn2)
+{
+    return matrix_mul(this, MatrixIn1, matrixIn2);
+}
+inline RWE::RwMatrix* (__cdecl* const matrix_inv)(RWE::RwMatrix* out, const RWE::RwMatrix* i) = reinterpret_cast<RWE::RwMatrix * (__cdecl*)(RWE::RwMatrix*, const RWE::RwMatrix*)>(0x41B690);
+RWE::RwMatrix* RWE::RwMatrix::Invert(const RwMatrix* matrixIn)
+{
+    return matrix_inv(this, matrixIn);
+}
 
 static inline RWE::RwFrame* (__cdecl* const frame_updateobjects)(RWE::RwFrame* f) = reinterpret_cast<RWE::RwFrame* (__cdecl*)(RWE::RwFrame*)>(0x413FE0);
 RWE::RwFrame* RWE::RwFrame::UpdateObjects()

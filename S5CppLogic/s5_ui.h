@@ -93,7 +93,7 @@ namespace shok {
 		bool ShouldRenderText;
 		PADDING(3);
 		PADDINGI(1);
-		float RenderSizeX, RenderSizeY;
+		float RenderSizeX, RenderSizeY; // 3
 		bool SomeTextBool;
 		PADDING(3);
 		PADDINGI(1);

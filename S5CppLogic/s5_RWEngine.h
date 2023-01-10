@@ -154,6 +154,12 @@ namespace RWE {
 		RwMatrix* Scale(const RwV3d* scale, RwOpCombineType combineOp);
 		// returns this
 		RwMatrix* Translate(const RwV3d* translation, RwOpCombineType combineOp);
+		// returns this (result)
+		RwMatrix* Multiply(const RwMatrix* MatrixIn1, const RwMatrix* matrixIn2);
+		// returns this (result)
+		RwMatrix* Invert(const RwMatrix* matrixIn);
+
+		static inline RwMatrix* (__cdecl* const Create)() = reinterpret_cast<RwMatrix * (__cdecl*)()>(0x41BA80);
 	};
 	struct RwSphere {
 		RwV3d center;

@@ -20,9 +20,34 @@ namespace RWE::P2D {
 
 	};
 
-	struct Rt2dBrush {
-
+	struct rt2dShadeParameters
+	{
+		RwRGBAReal col;
+		RwV2d uv;
 	};
+
+	struct Rt2dBrush {
+		rt2dShadeParameters top;
+		rt2dShadeParameters dtop;
+		rt2dShadeParameters bottom;
+		rt2dShadeParameters dbottom;
+		RwRGBA colorCache;
+		int flag;
+		RwTexture* texture;
+		RpMaterial* material;
+		float halfwidth;
+		int refCount;
+
+		Rt2dBrush* SetTexture(RwTexture* texture);
+		Rt2dBrush* SetUV(RwV2d* uv0, RwV2d* uv1, RwV2d* uv2, RwV2d* uv3);
+		Rt2dBrush* SetRGBA(RwRGBA* col0, RwRGBA* col1, RwRGBA* col2, RwRGBA* col3);
+		int Destroy();
+		static inline Rt2dBrush* (__cdecl* const Create)() = reinterpret_cast<Rt2dBrush * (__cdecl*)()>(0x707A40);
+
+		// open 0x707660
+		// close 0x707620
+	};
+
 	struct Rt2dFont {
 	public:
 		int IsOutline;

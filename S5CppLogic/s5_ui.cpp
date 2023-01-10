@@ -71,10 +71,10 @@ void shok::UIRenderer::RenderText(const char* txt, int fontid, float x, float y,
 {
 	uirender_rtext(this, txt, fontid, 1, x, y, xend, color, nullptr, linedistancefactor);
 }
-static inline void(__cdecl* const uirender_setcolor)(void* rd, shok::Color* c1, shok::Color* c2, shok::Color* c3, shok::Color* c4) = reinterpret_cast<void(__cdecl*)(void*, shok::Color*, shok::Color*, shok::Color*, shok::Color*)>(0x7077F0);
 void shok::UIRenderer::SetTextRenderColor(shok::Color c)
 {
-	uirender_setcolor(TextRenderObj, &c, &c, &c, &c);
+	RWE::RwRGBA co{ c.R, c.G, c.B, c.A };
+	Brush->SetRGBA(&co, &co, &co, &co);
 }
 static inline void(__thiscall* const uirender_rmaterial)(shok::UIRenderer* r, const EGUIX::CMaterial* m, bool s, const EGUIX::Rect* p) = reinterpret_cast<void(__thiscall*)(shok::UIRenderer*, const EGUIX::CMaterial*, bool, const EGUIX::Rect*)>(0x557167);
 void shok::UIRenderer::RenderMaterial(const EGUIX::CMaterial* mat, bool scale, const EGUIX::Rect* pos)
@@ -545,7 +545,7 @@ private:
 						if (colorvalid) {
 							if (partlinepos != partialline) {
 								*partlinepos = '\0';
-								f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
+								f->RenderText(partialline, fontsize, &anchor, r->Brush);
 								partlinepos = partialline;
 							}
 							r->SetTextRenderColor(c);
@@ -563,7 +563,7 @@ private:
 								const EGUIX::Color* c = customcolordata->GetColorByInt(i);
 								if (c) {
 									*partlinepos = '\0';
-									f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
+									f->RenderText(partialline, fontsize, &anchor, r->Brush);
 									partlinepos = partialline;
 									r->SetTextRenderColor(c->ToShokColor());
 								}
@@ -577,7 +577,7 @@ private:
 						if (*plinepos == '|')
 							++plinepos;
 						*partlinepos = '\0';
-						f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
+						f->RenderText(partialline, fontsize, &anchor, r->Brush);
 						partlinepos = partialline;
 						r->SetTextRenderColor(defaultcolor);
 						continue;
@@ -654,7 +654,7 @@ private:
 							}
 
 							*partlinepos = '\0';
-							f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
+							f->RenderText(partialline, fontsize, &anchor, r->Brush);
 							partlinepos = partialline;
 
 							// recover scaled screen coords where to put the icon
@@ -680,7 +680,7 @@ private:
 				++partlinepos;
 				++plinepos;
 			}
-			f->RenderText(partialline, fontsize, &anchor, r->TextRenderObj);
+			f->RenderText(partialline, fontsize, &anchor, r->Brush);
 			partlinepos = partialline;
 		}
 	}
@@ -703,7 +703,7 @@ public:
 			if (containsat)
 				RenderAtLine();
 			else
-				f->RenderText(line, fontsize, &anchor, r->TextRenderObj);
+				f->RenderText(line, fontsize, &anchor, r->Brush);
 
 			NextLine();
 			linepos = line;
@@ -722,7 +722,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 	// no idea what these funcs do
 	RWE::P2D::CTM::Push();
 	RWE::P2D::CTM::SetIdentity();
-	reinterpret_cast<void(__cdecl*)(void*, int)>(0x707A00)(r->TextRenderObj, 0);
+	r->Brush->SetTexture(nullptr);
 
 	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
 	r->SetTextRenderColor(c);
@@ -755,8 +755,8 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
 	}
 	
-	reinterpret_cast<void(__cdecl*)(int, int)>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(0x8501C8) + 32))(1, 0);
-	reinterpret_cast<void(__cdecl*)(int, int)>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(0x8501C8) + 32))(9, 2);
+	RWE::RwGlobals::GlobalObj->dOpenDevice.fpRenderStateSet(RWE::RwRenderState::rwRENDERSTATETEXTURERASTER, 0);
+	RWE::RwGlobals::GlobalObj->dOpenDevice.fpRenderStateSet(RWE::RwRenderState::rwRENDERSTATETEXTUREFILTER, reinterpret_cast<void*>(static_cast<int>(RWE::RwTextureFilterMode::rwFILTERLINEAR)));
 
 	// i dont think this was a template when BB did this, but this is way nicer as one
 	if (f->IsWchar()) {

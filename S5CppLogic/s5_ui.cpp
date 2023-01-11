@@ -755,8 +755,8 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
 	}
 	
-	RWE::RwGlobals::GlobalObj->dOpenDevice.fpRenderStateSet(RWE::RwRenderState::rwRENDERSTATETEXTURERASTER, 0);
-	RWE::RwGlobals::GlobalObj->dOpenDevice.fpRenderStateSet(RWE::RwRenderState::rwRENDERSTATETEXTUREFILTER, reinterpret_cast<void*>(static_cast<int>(RWE::RwTextureFilterMode::rwFILTERLINEAR)));
+	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureRaster(nullptr);
+	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureFilterMode(RWE::RwTextureFilterMode::rwFILTERLINEAR);
 
 	// i dont think this was a template when BB did this, but this is way nicer as one
 	if (f->IsWchar()) {

@@ -264,6 +264,9 @@
     <ClInclude Include="EntityAddonData.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_RWE_enums.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -207,6 +207,24 @@ RWE::RpWorld* RWE::RpWorld::RemoveClump(RpClump* clump)
     return world_remclump(this, clump);
 }
 
+int RWE::RwDevice::SetTextureFilterMode(RwTextureFilterMode m)
+{
+    return fpRenderStateSet(RwRenderState::rwRENDERSTATETEXTUREFILTER, reinterpret_cast<void*>(static_cast<int>(m)));
+}
+int RWE::RwDevice::SetCullMode(RwCullMode m)
+{
+    return fpRenderStateSet(RwRenderState::rwRENDERSTATECULLMODE, reinterpret_cast<void*>(static_cast<int>(m)));
+}
+RWE::RwCullMode RWE::RwDevice::GetCullMode()
+{
+    RwCullMode m;
+    fpRenderStateGet(RwRenderState::rwRENDERSTATECULLMODE, &m);
+    return m;
+}
+int RWE::RwDevice::SetTextureRaster(RWE::RwRaster* r)
+{
+    return fpRenderStateSet(RwRenderState::rwRENDERSTATETEXTURERASTER, r);
+}
 
 static inline RwTexture* (__cdecl* const texture_read)(const char* n, const char* m) = reinterpret_cast<RwTexture* (__cdecl*)(const char*, const char*)>(0x417DB0);
 RwTexture* RwTexture::Read(const char* name, const char* mask)

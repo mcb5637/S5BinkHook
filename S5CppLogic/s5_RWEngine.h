@@ -2,6 +2,7 @@
 #include "enumflags.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_RWE_enums.h"
 
 // a lot of info about renderware comes from here: https://github.com/DK22Pac/vice-37
 // this is c code, i just c++ified it to clean up my global namespace
@@ -34,67 +35,6 @@ namespace RWE {
 		RwLLLink link;
 	};
 
-	enum class RwObjectType : byte {
-		FRAME = 0,
-		ATOMIC = 1,
-		CLUMP = 2,
-		LIGHT = 3,
-		CAMERA = 4,
-		TEXDICTIONARY = 6,
-		WORLD = 7,
-		GEOMETRY = 8,
-		WorldSector = 0xFF, // not a true type?
-	};
-	enum class RwCorePluginID : int {
-		NAOBJECT = 0,
-		STRUCT = 1,
-		STRING = 2,
-		EXTENSION = 3,
-		CAMERA = 5,
-		TEXTURE = 6,
-		MATERIAL = 7,
-		MATLIST = 8,
-		ATOMICSECT = 9,
-		PLANESECT = 0xA,
-		WORLD = 0xB,
-		SPLINE = 0xC,
-		MATRIX = 0xD,
-		FRAMELIST = 0xE,
-		GEOMETRY = 0xF,
-		CLUMP = 0x10,
-		LIGHT = 0x12,
-		UNICODESTRING = 0x13,
-		ATOMIC = 0x14,
-		TEXTURENATIVE = 0x15,
-		TEXDICTIONARY = 0x16,
-		ANIMDATABASE = 0x17,
-		IMAGE = 0x18,
-		SKINANIMATION = 0x19,
-		GEOMETRYLIST = 0x1A,
-		ANIMANIMATION = 0x1B,
-		HANIMANIMATION = 0x1B,
-		TEAM = 0x1C,
-		CROWD = 0x1D,
-		DMORPHANIMATION = 0x1E,
-		RIGHTTORENDER = 0x1f,
-		MTEFFECTNATIVE = 0x20,
-		MTEFFECTDICT = 0x21,
-		TEAMDICTIONARY = 0x22,
-		PITEXDICTIONARY = 0x23,
-		TOC = 0x24,
-		PRTSTDGLOBALDATA = 0x25,
-		ALTPIPE = 0x26,
-		PIPEDS = 0x27,
-		PATCHMESH = 0x28,
-		CHUNKGROUPSTART = 0x29,
-		CHUNKGROUPEND = 0x2A,
-		UVANIMDICT = 0x2B,
-		COLLTREE = 0x2C,
-		ENVIRONMENT = 0x2D,
-
-		PrtStd = 304,
-	};
-
 	struct RwObject {
 		RwObjectType type;
 	private:
@@ -103,12 +43,6 @@ namespace RWE {
 		void* parent;
 	};
 	static_assert(sizeof(RwObject) == 8);
-
-	enum class RwOpCombineType : int {
-		Replace = 0, // completely replaces the old matrix
-		Preconcat, // transformation in object space, M = S*M
-		Postconcat, // transformation in world space, M = M*S
-	};
 
 	struct RwRGBA
 	{
@@ -215,21 +149,6 @@ namespace RWE {
 		RwObjectHasFrame* (*sync)(RwObjectHasFrame* object);
 	};
 
-	enum class RwStreamType : int
-	{
-		rwNASTREAM = 0,     /**<Invalid stream type */
-		rwSTREAMFILE,       /**<File */
-		rwSTREAMFILENAME,   /**<File name */
-		rwSTREAMMEMORY,     /**<Memory*/
-		rwSTREAMCUSTOM,     /**<Custom */
-	};
-	enum class RwStreamAccessType : int
-	{
-		rwNASTREAMACCESS = 0,   /**<Invalid stream access */
-		rwSTREAMREAD,           /**<Read */
-		rwSTREAMWRITE,          /**<Write */
-		rwSTREAMAPPEND,         /**<Append */
-	};
 	struct RwStreamMemory
 	{
 		int position; /* Current 'memory' position 0 is first byte */
@@ -425,188 +344,21 @@ namespace RWE {
 
 
 	/**
-	 * \ingroup rwrenderstate
-	 * RwRenderState represents the global state variables that control
-	 * rendering. These may be set and queried using the
-	 * \ref RwRenderStateSet and \ref RwRenderStateGet functions respectively.
-	 *
-	 * Refer to the \ref rwrenderstateoverview for an overview of this system.
-	 *
-	 * \note The texture render states (raster, address & filter modes) would
-	 * normally just be used when rendering in immediate mode and should be
-	 * specificied completely every time a texture is used. Retained mode
-	 * pipelines will frequently set theses states internally, usually based on
-	 * \ref RwTexture objects.
+	 * \ingroup rwcoredriverd3d9
+	 * \struct RwD3D9Vertex
+	 * D3D9 vertex structure definition for 2D geometry
 	 */
-	enum class RwRenderState : int {
-		rwRENDERSTATENARENDERSTATE = 0,
-
-		rwRENDERSTATETEXTURERASTER,
-		/**<Raster used for texturing (normally used in immediate mode).
-		 *  The value is a pointer to an \ref RwRaster.
-		 * Default: NULL.
-		 */
-		 rwRENDERSTATETEXTUREADDRESS,
-		 /**<\ref RwTextureAddressMode: wrap, clamp, mirror or border.
-		  * Default: rwTEXTUREADDRESSWRAP.
-		  */
-		  rwRENDERSTATETEXTUREADDRESSU,
-		  /**<\ref RwTextureAddressMode in u only.
-		   * Default: rwTEXTUREADDRESSWRAP.
-		   */
-		   rwRENDERSTATETEXTUREADDRESSV,
-		   /**<\ref RwTextureAddressMode in v only.
-			* Default: rwTEXTUREADDRESSWRAP.
-			*/
-			rwRENDERSTATETEXTUREPERSPECTIVE,
-			/**<Perspective correction on/off (always enabled on many platforms).
-			 */
-			 rwRENDERSTATEZTESTENABLE,
-			 /**<Z-buffer test on/off.
-			  * Default: TRUE.
-			  */
-			  rwRENDERSTATESHADEMODE,
-			  /**<\ref RwShadeMode: flat or gouraud shading.
-			   * Default: rwSHADEMODEGOURAUD.
-			   */
-			   rwRENDERSTATEZWRITEENABLE,
-			   /**<Z-buffer write on/off.
-				* Default: TRUE.
-				*/
-				rwRENDERSTATETEXTUREFILTER,
-				/**<\ref RwTextureFilterMode: point sample, bilinear, trilinear, etc.
-				 * Default: rwFILTERLINEAR.
-				 */
-				 rwRENDERSTATESRCBLEND,
-				 /**<\ref RwBlendFunction used to modulate the source pixel color
-				  *  when blending to the frame buffer.
-				  * Default: rwBLENDSRCALPHA.
-				  */
-				  rwRENDERSTATEDESTBLEND,
-				  /**<\ref RwBlendFunction used to modulate the destination pixel
-				   *  color in the frame buffer when blending. The resulting pixel
-				   *  color is given by the formula
-				   *  (SRCBLEND * srcColor + DESTBLEND * destColor) for each RGB
-				   *  component. For a particular platform, not all combinations
-				   *  of blend function are allowed (see platform specific
-				   *  restrictions).
-				   * Default: rwBLENDINVSRCALPHA.
-				   */
-				   rwRENDERSTATEVERTEXALPHAENABLE,
-				   /**<Alpha blending on/off (always enabled on some platforms).
-					*  This is normally used in immediate mode to enable alpha blending
-					*  when vertex colors or texture rasters have transparency. Retained
-					*  mode pipelines will usually set this state based on material colors
-					*  and textures.
-					* Default: FALSE.
-					*/
-					rwRENDERSTATEBORDERCOLOR,
-					/**<Border color for \ref RwTextureAddressMode
-					 *  \ref rwTEXTUREADDRESSBORDER. The value should be a packed
-					 *  RwUInt32 in a platform specific format. The macro
-					 *  RWRGBALONG(r, g, b, a) may be used to construct this using
-					 *  8-bit color components.
-					 * Default: RWRGBALONG(0, 0, 0, 0).
-					 */
-					 rwRENDERSTATEFOGENABLE,
-					 /**<Fogging on/off (all polygons will be fogged).
-					  * Default: FALSE.
-					  */
-					  rwRENDERSTATEFOGCOLOR,
-					  /**<Color used for fogging. The value should be a packed RwUInt32
-					   *  in a platform specific format. The macro RWRGBALONG(r, g, b, a)
-					   *  may be used to construct this using 8-bit color components.
-					   * Default: RWRGBALONG(0, 0, 0, 0).
-					   */
-					   rwRENDERSTATEFOGTYPE,
-					   /**<\ref RwFogType, the type of fogging to use.
-						* Default: rwFOGTYPELINEAR.
-						*/
-						rwRENDERSTATEFOGDENSITY,
-						/**<Fog density for \ref RwFogType of
-						 *  \ref rwFOGTYPEEXPONENTIAL or \ref rwFOGTYPEEXPONENTIAL2.
-						 *  The value should be a pointer to an RwReal in the
-						 *  range 0 to 1.
-						 * Default: 1.
-						 */
-						 rwRENDERSTATECULLMODE = 20,
-						 /**<\ref RwCullMode, for selecting front/back face culling, or
-						  *  no culling.
-						  * Default: rwCULLMODECULLBACK.
-						  */
-						  rwRENDERSTATESTENCILENABLE,
-						  /**<Stenciling on/off.
-						   *  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-						   * Default: FALSE.
-						   */
-						   rwRENDERSTATESTENCILFAIL,
-						   /**<\ref RwStencilOperation used when the stencil test passes.
-							*  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-							* Default: rwSTENCILOPERATIONKEEP.
-							*/
-							rwRENDERSTATESTENCILZFAIL,
-							/**<\ref RwStencilOperation used when the stencil test passes and
-							 *  the depth test (z-test) fails.
-							 *  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-							 * Default: rwSTENCILOPERATIONKEEP.
-							 */
-							 rwRENDERSTATESTENCILPASS,
-							 /**<\ref RwStencilOperation used when both the stencil and the depth
-							  *  (z) tests pass.
-							  *  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-							  * Default: rwSTENCILOPERATIONKEEP.
-							  */
-							  rwRENDERSTATESTENCILFUNCTION,
-							  /**<\ref RwStencilFunction for the stencil test.
-							   *  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-							   * Default: rwSTENCILFUNCTIONALWAYS.
-							   */
-							   rwRENDERSTATESTENCILFUNCTIONREF,
-							   /**<Integer reference value for the stencil test.
-								*  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-								* Default: 0.
-								*/
-								rwRENDERSTATESTENCILFUNCTIONMASK,
-								/**<Mask applied to the reference value and each stencil buffer
-								 *  entry to determine the significant bits for the stencil test.
-								 *  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-								 * Default: 0xffffffff.
-								 */
-								 rwRENDERSTATESTENCILFUNCTIONWRITEMASK,
-								 /**<Write mask applied to values written into the stencil buffer.
-								  *  <i> Supported on Xbox, D3D8, D3D9, and OpenGL only. </i>
-								  * Default: 0xffffffff.
-								  */
-								  rwRENDERSTATEALPHATESTFUNCTION,
-								  /**<\ref RwAlphaTestFunction for the alpha test. When a pixel fails,
-								   * neither the frame buffer nor the Z-buffer are updated.
-								   * Default: rwALPHATESTFUNCTIONGREATER (GameCube, Xbox, D3D8, D3D9
-								   * and OpenGL). The default PS2 behaviour is to always update the
-								   * frame buffer and update the Z-buffer only if a greater than or
-								   * equal test passes.
-								   */
-								   rwRENDERSTATEALPHATESTFUNCTIONREF,
-								   /**<Integer reference value for the alpha test.
-									*  <i> Range is 0 to 255, mapped to the platform's actual range </i>
-									* Default: 128 (PS2) 0 (GameCube, Xbox, D3D8, D3D9 and OpenGL).
-									*/
-
-	};
-	/**
-	 * \ingroup rwrenderstate
-	 * RwTextureFilterMode represents the texture filtering modes that may
-	 * be set using the \ref RwRenderState \ref rwRENDERSTATETEXTUREFILTER in
-	 * immediate mode, or \ref RwTextureSetFilterMode in retained mode.
-	 */
-	enum class RwTextureFilterMode : int
+	struct RwIm2DVertex
 	{
-		rwFILTERNAFILTERMODE = 0,
-		rwFILTERNEAREST,                /**<Point sampled */
-		rwFILTERLINEAR,                 /**<Bilinear */
-		rwFILTERMIPNEAREST,             /**<Point sampled per pixel mip map */
-		rwFILTERMIPLINEAR,              /**<Bilinear per pixel mipmap */
-		rwFILTERLINEARMIPNEAREST,       /**<MipMap interp point sampled */
-		rwFILTERLINEARMIPLINEAR,        /**<Trilinear */
+		float x; /**< Screen X */
+		float y; /**< Screen Y */
+		float z; /**< Screen Z */
+		float rhw; /**< Reciprocal of homogeneous W */
+
+		unsigned int emissiveColor; /**< Vertex color */
+
+		float u; /**< Texture coordinate U */
+		float v; /**< Texture coordinate V */
 	};
 
 	struct RwDevice {
@@ -616,15 +368,20 @@ namespace RWE {
 		int(__cdecl* fpRenderStateSet)(RwRenderState nState, void* pParam); // 8
 		int(__cdecl* fpRenderStateGet)(RwRenderState nState, void* pParam);
 
-		void* fpIm2DRenderLine;
+		void* fpIm2DRenderLine; // 10
 		void* fpIm2DRenderTriangle;
-		void* fpIm2DRenderPrimitive;
+		int(__cdecl* fpIm2DRenderPrimitive)(RwPrimitiveType primType, RwIm2DVertex* vertices, int numVertices);// 12
 		void* fpIm2DRenderIndexedPrimitive;
 
 		void* fpIm3DRenderLine;
 		void* fpIm3DRenderTriangle;
 		void* fpIm3DRenderPrimitive;
 		void* fpIm3DRenderIndexedPrimitive;
+
+		int SetTextureFilterMode(RwTextureFilterMode m);
+		int SetCullMode(RwCullMode m);
+		RwCullMode GetCullMode();
+		int SetTextureRaster(RWE::RwRaster* r);
 	};
 	static_assert(sizeof(RwDevice) == 56);
 
@@ -699,9 +456,10 @@ namespace RWE {
 
 		unsigned int resArenaInitSize;
 
-		static inline RwGlobals* const GlobalObj = reinterpret_cast<RwGlobals*>(0x8501C8);
+		static inline RwGlobals** const GlobalObj = reinterpret_cast<RwGlobals**>(0x8501C8);
 	};
 	static_assert(offsetof(RwGlobals, memoryFuncs) == 264);
+	static_assert(offsetof(RwGlobals, dOpenDevice.fpRenderStateSet) == 4*8);
 	//constexpr int i = offsetof(RwGlobals, dOpenDevice)/4;
 }
 

@@ -335,7 +335,7 @@ void InitGame() {
 	CppLogic::EntityAddon::EntityAddonData::Init();
 }
 
-constexpr double Version = 2.0004;
+constexpr double Version = 2.0005;
 
 int ResetCppLogic(lua::State L) {
 	L.Push("CppLogic");

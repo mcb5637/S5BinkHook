@@ -270,6 +270,9 @@
     <ClInclude Include="s5_RWE_3d.h">
       <Filter>shok\engine</Filter>
     </ClInclude>
+    <ClInclude Include="s5_RWE_io.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

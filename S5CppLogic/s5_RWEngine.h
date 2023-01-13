@@ -342,6 +342,29 @@ namespace RWE {
 		RpWorld* RemoveClump(RpClump* clump);
 	};
 
+	/**
+	 * \ingroup rwimage
+	 * \struct RwImage
+	 * Image containing device-independent pixels.
+	 * This should be considered an opaque type.
+	 * Use the RwImage API functions to access.
+	 */
+	struct RwImage
+	{
+		int flags;
+
+		int width;  /* Device may have different ideas */
+		int height; /* internally !! */
+
+		int depth;  /* Of referenced image */
+		int stride;
+
+		uint8_t* cpPixels;
+		RwRGBA* palette;
+
+		// create 414CC0, alloc pix 414D20, destroy 415B50, free pix 414DE0
+	};
+
 
 	/**
 	 * \ingroup rwcoredriverd3d9
@@ -476,3 +499,17 @@ struct RwTexture {
 	// destroys if no reference left
 	void Destroy();
 };
+
+// misc renderware funcs:
+// 0x41CD50 RwChar* StringStreamRead(RwChar* nativeString, RwStream* stream, RwUInt32 length) (strange calling conv?)
+// 0x41CE10 RwChar* UnicodeStringStreamRead(RwChar* nativeString, RwStream* stream, RwUInt32 length) (strange calling conv?)
+// 0x41CF00 RwChar* _rwStringStreamFindAndRead(RwChar* string, RwStream* stream)
+// 0x417A50 RwBool RwTextureGetMipmapping(void)
+// 0x417A80 RwBool RwTextureGetAutoMipmapping(void)
+// 0x417A30 RwBool RwTextureSetMipmapping(RwBool enable)
+// 0x417A60 RwBool RwTextureSetAutoMipmapping(RwBool enable)
+// 0x626100 const RwPluginRegistry* _rwPluginRegistrySkipDataChunks(const RwPluginRegistry* reg, RwStream* stream)
+// 0x41CCB0 RwUInt32 _rwStringStreamGetSize(const RwChar* string)
+// 0x41A530 RwStream* RwStreamWrite(RwStream* stream, void const* buffer, RwUInt32 length)
+// 0x429040 RwStream* _rwStreamWriteVersionedChunkHeader(RwStream* stream, RwInt32 type, RwInt32 size, RwUInt32 version, RwUInt32 buildNum)
+// 0x41CCE0 const RwChar* _rwStringStreamWrite(const RwChar* string, RwStream* stream)

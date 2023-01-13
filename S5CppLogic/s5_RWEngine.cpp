@@ -207,6 +207,22 @@ RWE::RpWorld* RWE::RpWorld::RemoveClump(RpClump* clump)
     return world_remclump(this, clump);
 }
 
+inline RWE::RwImage* (__cdecl* const image_allocpix)(RWE::RwImage* th) = reinterpret_cast<RWE::RwImage* (__cdecl*)(RWE::RwImage*)>(0x414D20);
+RWE::RwImage* RWE::RwImage::AllocatePixels()
+{
+    return image_allocpix(this);
+}
+inline RWE::RwImage* (__cdecl* const image_freepix)(RWE::RwImage* th) = reinterpret_cast<RWE::RwImage* (__cdecl*)(RWE::RwImage*)>(0x414DE0);
+RWE::RwImage* RWE::RwImage::FreePixels()
+{
+    return image_freepix(this);
+}
+inline int(__cdecl* const image_destroy)(RWE::RwImage* th) = reinterpret_cast<int(__cdecl*)(RWE::RwImage*)>(0x415B50);
+int RWE::RwImage::Destroy()
+{
+    return image_destroy(this);
+}
+
 int RWE::RwDevice::SetTextureFilterMode(RwTextureFilterMode m)
 {
     return fpRenderStateSet(RwRenderState::rwRENDERSTATETEXTUREFILTER, reinterpret_cast<void*>(static_cast<int>(m)));

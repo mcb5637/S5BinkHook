@@ -362,6 +362,11 @@ namespace RWE {
 		uint8_t* cpPixels;
 		RwRGBA* palette;
 
+		static inline RwImage* (__cdecl* const Create)(int width, int height, int depth) = reinterpret_cast<RwImage * (__cdecl*)(int, int, int)>(0x414CC0);
+		RwImage* AllocatePixels();
+		RwImage* FreePixels();
+		int Destroy();
+
 		// create 414CC0, alloc pix 414D20, destroy 415B50, free pix 414DE0
 	};
 

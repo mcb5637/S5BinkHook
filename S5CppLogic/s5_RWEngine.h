@@ -366,8 +366,6 @@ namespace RWE {
 		RwImage* AllocatePixels();
 		RwImage* FreePixels();
 		int Destroy();
-
-		// create 414CC0, alloc pix 414D20, destroy 415B50, free pix 414DE0
 	};
 
 

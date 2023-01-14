@@ -197,6 +197,13 @@ GGL::CEventEntityAttachment::CEventEntityAttachment(shok::EventIDs e, shok::Atta
 	DetachEvent = detach;
 }
 
+GGL::CEventChangeMotivation::CEventChangeMotivation(shok::EventIDs e, float d, shok::WorkerReason r)
+	: EGL::CEventValue_Float(e, d)
+{
+	SetVT(GGL::CEventChangeMotivation::vtp);
+	Reason = r;
+}
+
 BB::CInputEvent::CInputEvent(shok::InputEventIds id) : BB::CEvent(id)
 {
 	SetVT(BB::CInputEvent::vtp);

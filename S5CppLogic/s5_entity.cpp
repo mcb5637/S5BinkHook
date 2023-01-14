@@ -214,6 +214,16 @@ bool EGL::CGLEEntity::EventIsSoldier()
 	FireEvent(&ev);
 	return ev.Data;
 }
+int EGL::CGLEEntity::EventGetWorktime()
+{
+	return EventGetIntById(shok::EventIDs::Worker_GetWorkTimeRemaining);
+}
+float EGL::CGLEEntity::EventGetMotivation()
+{
+	EGL::CEventGetValue_Float ev{ shok::EventIDs::Worker_GetMotivation };
+	FireEvent(&ev);
+	return ev.Data;
+}
 
 
 int EGL::CGLEEntity::GetFirstAttachedToMe(shok::AttachmentType attachmentId) const

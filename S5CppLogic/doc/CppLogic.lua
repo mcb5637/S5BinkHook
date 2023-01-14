@@ -1046,14 +1046,25 @@ function CppLogic.Entity.Settler.GetBaseMovementSpeed(id) end
 --- @param rotate number|nil optional new rotation speed
 function CppLogic.Entity.Settler.SetBaseMovementSpeed(id, move, rotate) end
 
---- settler current work time.
+--- settler current and max work time.
 --- @param id entity
 --- @return number workTime
+--- @return number maxWorkTime
 function CppLogic.Entity.Settler.WorkerGetCurrentWorkTime(id) end
 --- settler current work time.
 --- @param id entity
 --- @param wt number work time
 function CppLogic.Entity.Settler.WorkerSetCurrentWorkTime(id, wt) end
+
+--- settler current motivation.
+--- @param id entity
+--- @return number moti
+function CppLogic.Entity.Settler.WorkerGetMotivation(id) end
+--- settler current motivation.
+--- @param id entity
+--- @param m number change in motivation
+--- @param r number reason (0->unknown (better not use if the worker could leave as a result), 1->Taxes, 2->Overtime, 3->NoWork, 4->NoFood, 5->NoRest, 6->NoPay)
+function CppLogic.Entity.Settler.WorkerChangeMotivation(id, m, r) end
 
 --- settler overhead widget.
 --- 0->only name, 1->name+bar(anything), 2->worker, 3->name+bar(leader), 4->nothing.

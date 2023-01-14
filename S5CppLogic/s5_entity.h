@@ -208,6 +208,8 @@ namespace EGL {
 		bool EventIsBattleOrAutocannon();
 		bool EventIsSerfOrWorker();
 		bool EventIsSoldier();
+		int EventGetWorktime();
+		float EventGetMotivation();
 
 		void SetHealth(int h);
 		void Hurt(int dmg);

@@ -553,7 +553,8 @@ namespace CppLogic::Entity {
 		if (!w)
 			throw lua::LuaException("no worker at 1");
 		L.Push(w->WorkTimeRemaining);
-		return 1;
+		L.Push(s->EventGetMaxWorktime());
+		return 2;
 	}
 	int WorkerSetCurrentWorkTime(lua::State l) {
 		luaext::EState L{ l };
@@ -562,6 +563,29 @@ namespace CppLogic::Entity {
 		if (!w)
 			throw lua::LuaException("no worker at 1");
 		w->WorkTimeRemaining = L.CheckInt(2);
+		return 0;
+	}
+
+	int WorkerGetMotivation(lua::State l) {
+		luaext::EState L{ l };
+		GGL::CSettler* s = L.CheckSettler(1);
+		GGL::CWorkerBehavior* w = s->GetBehavior<GGL::CWorkerBehavior>();
+		if (!w)
+			throw lua::LuaException("no worker at 1");
+		L.Push(s->EventGetMotivation());
+		return 1;
+	}
+	int WorkerChangeMotivation(lua::State l) {
+		luaext::EState L{ l };
+		GGL::CSettler* s = L.CheckSettler(1);
+		GGL::CWorkerBehavior* w = s->GetBehavior<GGL::CWorkerBehavior>();
+		if (!w)
+			throw lua::LuaException("no worker at 1");
+		int r = L.CheckInt(3);
+		if (r < static_cast<int>(shok::WorkerReason::None) || r > static_cast<int>(shok::WorkerReason::NoPay))
+			throw lua::LuaException{ "invalid reason" };
+		GGL::CEventChangeMotivation ev{ shok::EventIDs::Worker_ChangeMoti, L.CheckFloat(2), static_cast<shok::WorkerReason>(r) };
+		s->FireEvent(&ev);
 		return 0;
 	}
 
@@ -1924,7 +1948,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 53> Settlers{ {
+	constexpr std::array<lua::FuncReference, 55> Settlers{ {
 			lua::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),
 			lua::FuncReference::GetRef<SettlerGetBaseMovementSpeed>("GetBaseMovementSpeed"),
 			lua::FuncReference::GetRef<SettlerSetBaseMovementSpeed>("SetBaseMovementSpeed"),
@@ -1978,6 +2002,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<SettlerGetEnteredBuilding>("GetEnteredBuilding"),
 			lua::FuncReference::GetRef<SettlerPlayScriptAnimation>("PlayScriptAnimation"),
 			lua::FuncReference::GetRef<SettlerGetExperienceClass>("GetExperienceClass"),
+			lua::FuncReference::GetRef<WorkerGetMotivation>("WorkerGetMotivation"),
+			lua::FuncReference::GetRef<WorkerChangeMotivation>("WorkerChangeMotivation"),
 	} };
 
 	constexpr std::array<lua::FuncReference, 8> Leader{ {

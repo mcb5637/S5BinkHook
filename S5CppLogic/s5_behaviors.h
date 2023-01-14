@@ -588,7 +588,7 @@ namespace GGL {
 		int BehaviorProps2; //7
 	public:
 		int CycleIndex; // seems to be 0->working, 1->eating, 2->resting, 5->joining settlement
-		int TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn;
+		int TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn; // 9
 		byte CouldConsumeResource, IsLeaving; // 15
 		PADDING(2);
 		PADDINGI(1);

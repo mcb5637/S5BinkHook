@@ -334,4 +334,13 @@ namespace shok {
 		Rain = 2,
 		Winter = 3,
 	};
+	enum class WorkerReason : int {
+		None = 0,
+		Taxes = 1,
+		Overtime = 2, // 'Too Much Work' in xml
+		NoWork = 3,
+		NoFood = 4,
+		NoRest = 5,
+		NoPay = 6,
+	};
 }

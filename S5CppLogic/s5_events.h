@@ -398,6 +398,16 @@ namespace GGL {
 		static inline constexpr int vtp = 0x770844;
 		static inline constexpr int TypeDesc = 0x8129E0;
 	};
+
+	class CEventChangeMotivation : public EGL::CEventValue_Float {
+	public:
+		shok::WorkerReason Reason;
+
+		CEventChangeMotivation(shok::EventIDs e, float d, shok::WorkerReason r);
+
+		static inline constexpr int vtp = 0x76F904;
+		static inline constexpr int TypeDesc = 0x8117E0;
+	};
 }
 
 // GGL::CEventHeroAbilityInteger -> valueint

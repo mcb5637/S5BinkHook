@@ -365,23 +365,32 @@ private:
 				}
 				else {
 					containsat = true;
-					if (skipWhitespace) {
-						while (true) {
-							*linepos = *strpos;
+					while (true) {
+						*linepos = *strpos;
+						++linepos;
+						++strpos;
+						if (*strpos == '\0')
+							break;
+						if (*strpos == '|') {
+							*linepos = '|';
 							++linepos;
 							++strpos;
-							if (*strpos == '\0')
-								break;
-							if (*strpos == '|' || *strpos == ' ') {
-								*linepos = '|';
-								++linepos;
+							if (skipWhitespace) {
+								SkipWhitespace(strpos);
+							}
+							break;
+						}
+						if (*strpos == ' ') {
+							*linepos = '|';
+							++linepos;
+							if (skipWhitespace) {
 								++strpos;
 								SkipWhitespace(strpos);
-								break;
 							}
+							break;
 						}
-						continue;
 					}
+					continue;
 				}
 				if (*strpos == '|')
 					++strpos;
@@ -657,13 +666,14 @@ private:
 							f->RenderText(partialline, fontsize, &anchor, r->Brush);
 							partlinepos = partialline;
 
+							float sf = fontsize * 0.75f;
 							// recover scaled screen coords where to put the icon
-							EGUIX::Rect pos{ anchor.x / posTransform.x, (anchor.y - 1.0f) * -shok::UIRenderer::ScaledScreenSize.Y - fontsize * shok::UIRenderer::ScaledScreenSize.Y, siz.X, siz.Y };
+							EGUIX::Rect pos{ anchor.x / posTransform.x, (anchor.y - 1.0f) * -shok::UIRenderer::ScaledScreenSize.Y - sf * shok::UIRenderer::ScaledScreenSize.Y, siz.X, siz.Y };
 							// scale icon to match font size, keeping proportions
-							pos.W = pos.W / pos.H * fontsize / posTransform.x * smult.X;
-							pos.H = fontsize * shok::UIRenderer::ScaledScreenSize.Y * smult.Y;
+							pos.W = pos.W / pos.H * sf / posTransform.x * smult.X;
+							pos.H = sf * shok::UIRenderer::ScaledScreenSize.Y * smult.Y;
 							// adjust height
-							pos.Y += fontsize * shok::UIRenderer::ScaledScreenSize.Y * (1.0f - smult.Y);
+							pos.Y += sf * shok::UIRenderer::ScaledScreenSize.Y * (1.0f - smult.Y);
 							r->RenderMaterial(&mat, true, &pos);
 							// adjust position for next text
 							anchor.x += pos.W * posTransform.x;

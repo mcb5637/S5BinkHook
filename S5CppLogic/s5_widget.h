@@ -90,6 +90,7 @@ namespace EGUIX {
 		CMaterial();
 		void SetTexture(const char* name);
 		shok::Position GetSize();
+		RWE::RwTexture* GetTexture();
 
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 	};

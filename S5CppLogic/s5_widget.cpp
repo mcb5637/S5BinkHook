@@ -103,6 +103,11 @@ shok::Position EGUIX::CMaterial::GetSize()
     return r;
 }
 
+RWE::RwTexture* EGUIX::CMaterial::GetTexture()
+{
+    return TextureManager::GlobalObj()->GetTextureByID(Texture);
+}
+
 
 unsigned int __stdcall EGUIX::CLuaFunctionHelper::GetClassIdentifier() const
 {

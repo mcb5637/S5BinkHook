@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <deque>
 #include <list>
 #include <iostream>
 #include <fstream>
@@ -269,6 +270,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
+	
 	return 0;
 }
 

@@ -2365,6 +2365,12 @@ function CppLogic.UI.SetPlaceBuildingRotation(deg) end
 --- @return number deg
 function CppLogic.UI.GetPlaceBuildingRotation() end
 
+--- gets upgrade category of the currently active PlaceBuilding or PlaceBuildingEx state.
+--- also gets the foundation and top entitytype of a PlaceCannon state.
+--- @return number ucat
+--- @return number|nil top
+function CppLogic.UI.GetPlaceBuildingUCat() end
+
 --- gets the map position under a given screen position.
 --- @param x number
 --- @param y number

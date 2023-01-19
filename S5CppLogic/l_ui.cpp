@@ -983,6 +983,20 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
+	int GetPlaceBuildingUCat(lua::State L) {
+		auto s = GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState;
+		if (auto* pb = dynamic_cast<GGUI::CPlaceBuildingState*>(s)) {
+			L.Push(pb->UpgradeCategory);
+			return 1;
+		}
+		else if (auto* pc = dynamic_cast<GGUI::CPlaceCannonState*>(s)) {
+			L.Push(pc->FoundationType);
+			L.Push(pc->TopType);
+			return 2;
+		}
+		throw lua::LuaException{ "invalid gui state" };
+	}
+
 
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
@@ -1278,7 +1292,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 62> UI{ {
+	constexpr std::array<lua::FuncReference, 63> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1341,6 +1355,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<SetGUIStatePlaceBuildingEx>("SetGUIStatePlaceBuildingEx"),
 		lua::FuncReference::GetRef<SetPlaceBuildingRotation>("SetPlaceBuildingRotation"),
 		lua::FuncReference::GetRef<GetPlaceBuildingRotation>("GetPlaceBuildingRotation"),
+		lua::FuncReference::GetRef<GetPlaceBuildingUCat>("GetPlaceBuildingUCat"),
 	} };
 
 	void Init(lua::State L)

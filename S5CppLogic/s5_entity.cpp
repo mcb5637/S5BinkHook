@@ -516,6 +516,11 @@ void EGL::CGLEEntity::ExecuteTask(EGL::CGLETaskArgs& targ)
 {
 	ExecuteTask(&targ);
 }
+static inline void(__thiscall* const entity_adddelayedevent)(EGL::CGLEEntity* th, BB::CEvent* ev, int u) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*, BB::CEvent*, int)>(0x57D078);
+void EGL::CGLEEntity::AddDelayedEvent(BB::CEvent* ev)
+{
+	entity_adddelayedevent(this, ev, 0);
+}
 
 void EGL::CGLEEntity::Destroy()
 {

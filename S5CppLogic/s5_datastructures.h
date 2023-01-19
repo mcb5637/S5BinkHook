@@ -3,6 +3,7 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <deque>
 #include <functional>
 #include <type_traits>
 
@@ -847,4 +848,15 @@ namespace shok {
 		}
 	};
 	static_assert(sizeof(List<int>) == 3 * 4);
+
+	template<class T>
+	struct Deque {
+	private:
+		std::deque<T, shok::Allocator<T>> Internal{};
+
+
+	public:
+		// standard iterators dont seem to work
+	};
+	static_assert(sizeof(Deque<int>) == 4 * 5);
 }

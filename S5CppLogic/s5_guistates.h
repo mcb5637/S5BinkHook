@@ -10,6 +10,8 @@ namespace GGUI {
 		static inline constexpr int TypeDesc = 0x82EB84;
 	};
 	struct SPlaceCannonStateParameters : public SStateParameters {
+		int TopType;
+		int FoundationType;
 
 		static inline constexpr int vtp = 0x77DC04;
 		static inline constexpr int TypeDesc = 0x82EBA8;
@@ -264,6 +266,10 @@ namespace GGUI {
 
 	class CPlaceCannonState : public GGUI::CCommandState {
 	public:
+		PADDINGI(2);
+		int TopType; // 5
+		int FoundationType;
+
 		static inline constexpr int vtp = 0x77DC0C;
 		static inline constexpr int TypeDesc = 0x82EBD8;
 		static inline constexpr unsigned int Identifier = 0x8BF90FCD;

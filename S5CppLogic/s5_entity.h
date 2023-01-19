@@ -81,6 +81,11 @@ namespace EGL {
 		int PlayerId;
 	};
 
+	class DelayedEventExecutor {
+	public:
+		shok::Deque<BB::CEvent*> Events;
+		CGLEEntity* Entity;
+	};
 
 	class CGLEEntity : public BB::IObject, public IEntityDisplay, public EGL::TGLEAttachable<EGL::CGLEEntity, EGL::CEntityAttachmentProxy> {
 	public:
@@ -105,7 +110,8 @@ namespace EGL {
 		char* ScriptCommandLine;
 		float Exploration;
 		int TaskListStart; // 54
-		PADDINGI(2);
+		PADDINGI(1);
+		DelayedEventExecutor* DelayedEvents; // 56
 		bool InvulnerabilityFlag, Suspended; // 57
 		PADDING(2);
 		int SuspensionTurn;
@@ -218,6 +224,8 @@ namespace EGL {
 		EGL::CGLETaskList* GetCurrentTaskList();
 		EGL::TaskHandler* GetTaskHandler(shok::Task task);
 		void ExecuteTask(EGL::CGLETaskArgs& targ);
+		// adds event to queue, gets executed as soon as state is cancelable, then event get deleted, so make sure you allocate on shok heap
+		void AddDelayedEvent(BB::CEvent* ev);
 
 		void PerformHeal(int hp, bool healSoldiers);
 		bool CheckDodge(); // rolls random, returns if dodge successful
@@ -331,10 +339,11 @@ namespace EGL {
 	static_assert(offsetof(CGLEEntity, Position) == 22 * 4);
 	static_assert(offsetof(CGLEEntity, NumberOfAuras) == 65 * 4);
 	static_assert(sizeof(CGLEEntity) == 66 * 4);
+	//constexpr int i = offsetof(CGLEEntity, DelayedEvents) / 4;
 
 	class CMovingEntity : public EGL::CGLEEntity {
 		friend class EGL::CGLEEntity;
-		virtual void KillThenSimpleFeedbackEvent4() = 0; // 39
+		virtual void Drown() = 0; // 39
 	public:
 		shok::Position TargetPosition; // la67
 		byte TargetRotationValid;

@@ -900,6 +900,8 @@ namespace shok {
 		LogicEvent_WeatherChanged = 0x1C006,
 		LogicEvent_HurtEntity = 0x1C007, // original EGL::CEvent2Entities, now CppLogic::Events::AdvHurtEvent (subclass)
 
+		Animal_FleeFrom = 0x1E002, // EGL::CEventPosition
+
 		// 20001 move to entity?
 		Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity
 		Movement_TaskMoveToPos = 0x20003, //EGL::CEventPosition

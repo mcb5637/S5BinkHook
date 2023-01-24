@@ -568,6 +568,9 @@ namespace GGL {
 		static inline constexpr int vtp = 0x778F7C;
 		static inline constexpr int TypeDesc = 0x812038;
 		static inline constexpr unsigned int Identifier = 0x5D6B737;
+
+		// defined tasks: TASK_WANDER, TASK_SET_TASK_LIST, TASK_BACK_TO_DEFAULT_TASKLIST, TASK_FLEE
+		// defined events: Animal_XXX, Die, Leader_SetTerritory
 	};
 
 	class CResourceDoodad : public EGL::CGLEEntity {

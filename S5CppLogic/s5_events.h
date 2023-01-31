@@ -628,6 +628,7 @@ namespace shok {
 		Follow_StartFollowing = 0x1100A, //GGL::CEventFollowInfo
 		Follow_CheckTargetStillAlive = 0x1100B, //BB::CEvent
 		Follow_GetFollowBehavior = 0x1100C, //EGL::CEventGetValue<GGL::CBehaviorFollow *,-1301899769>
+		// 0x1100F evade behavior? BB::CEvent
 		Leader_ApproachPos = 0x1101A, //EGL::CEventPosition
 		// 1101B follow semms to return -1, lots of calls
 		Battle_SetBattleWalkAnim = 0x1101C, //BB::CEvent

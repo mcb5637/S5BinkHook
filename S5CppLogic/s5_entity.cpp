@@ -1408,7 +1408,7 @@ void EGL::CGLEEntity::HookLuaTaskList()
 void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBehaviorDefaultMovement*, shok::Position*)>(0x586894);
 void __thiscall EGL::CMovingEntity::BuildOnSetPosFixed()
 {
-	if (!MovementState && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
+	if (MovementState != shok::MovementState::Moving && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
 		GGL::CBehaviorDefaultMovement* mov = GetBehavior<GGL::CBehaviorDefaultMovement>();
 		if (mov) {
 			movementbeh_setmovetarget(mov, &TargetPosition);
@@ -1417,10 +1417,10 @@ void __thiscall EGL::CMovingEntity::BuildOnSetPosFixed()
 	else {
 		BB::CEvent ev{ 0x2000D };
 		FireEvent(&ev);
-		if (MovementState == 0) {
+		if (MovementState == shok::MovementState::Moving) {
 			ev.EventTypeId = 0x11017;
 			FireEvent(&ev);
-			MovementState = 0; // ?? original code
+			MovementState = shok::MovementState::Moving; // ?? original code
 		}
 	}
 }

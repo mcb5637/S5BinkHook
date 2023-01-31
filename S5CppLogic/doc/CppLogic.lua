@@ -236,6 +236,15 @@ function CppLogic.Logic.LandscapeGetBlocking(p) end
 --- @return number bridgeHeight
 function CppLogic.Logic.LandscapeGetBridgeHeight(p) end
 
+--- navigates from from to to and returns a path.
+--- a path is a array of positions, with the first position at path[table.getn(path)] and the last position at path[1].
+--- if no path is found, returns nil.
+--- throws if from or to is blocked.
+--- @param from Position
+--- @param to Position
+--- @return Position[]|nil path
+function CppLogic.Logic.Navigate(from, to) end
+
 --- enables Events.LOGIC_EVENT_ENTITY_HURT_ENTITY trigger, even if attacker is 0 and allows access to more info for that event.
 --- also sets the hero as attacker on bomb explode.
 --- fires trigger CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY on killing an entity.
@@ -1577,7 +1586,7 @@ function CppLogic.EntityType.GetSuspendedAnimation(ty) end
 --- entity type suspended animation.
 --- @param ty number entitytype
 --- @param a number anim
-function CppLogic.EntityType.GetSuspendedAnimation(ty, a) end
+function CppLogic.EntityType.SetSuspendedAnimation(ty, a) end
 
 --- limited lifespan duration seconds.
 --- @param ty number entitytype

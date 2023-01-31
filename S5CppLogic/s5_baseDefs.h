@@ -31,6 +31,7 @@ namespace shok {
 		Position Rotate(float r) const;
 		// requires rad
 		Position RotateAround(float r, const Position& center) const;
+		Position Normalize() const;
 
 		Position operator+(const Position& other) const;
 		Position& operator+=(const Position& other);
@@ -45,6 +46,9 @@ namespace shok {
 	};
 	struct PositionRot : Position {
 		float r = 0;
+
+		// everything in rad, corrects angle diff to [-180,+180]
+		static inline float(__cdecl* const AngleDifference)(float a1, float a2) = reinterpret_cast<float(__cdecl*)(float, float)>(0x57EF7E);
 	};
 
 

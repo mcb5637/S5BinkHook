@@ -958,6 +958,28 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int Navigate(lua::State Ls) {
+		luaext::EState L{ Ls };
+		shok::Position from = L.CheckPos(1);
+		shok::Position to = L.CheckPos(2);
+		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&from, EGL::CGLELandscape::BlockingMode::Blocked))
+			throw lua::LuaException{ "from is blocked" };
+		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&to, EGL::CGLELandscape::BlockingMode::Blocked))
+			throw lua::LuaException{ "to is blocked" };
+		EGL::CCoarsePath p{};
+		if (p.Navigate(from, to)) {
+			L.NewTable();
+			int i = 1;
+			for (int k = 0; k < p.WayPoints.CacheCount; ++k) {
+				L.PushPos(p.WayPoints.GetWaypoint(k));
+				L.SetTableRaw(-2, i);
+				++i;
+			}
+			return 1;
+		}
+		return 0;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1357,7 +1379,7 @@ namespace CppLogic::Logic {
 		GGL::CEntityProfile::HookExperience(false);
 	}
 
-	constexpr std::array<lua::FuncReference, 58> Logic{ {
+	constexpr std::array<lua::FuncReference, 59> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1416,6 +1438,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<TaskListInsertWaitForLatestAttack>("TaskListInsertWaitForLatestAttack"),
 			lua::FuncReference::GetRef<TaskListInsertSetLatestAttack>("TaskListInsertSetLatestAttack"),
 			lua::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
+			lua::FuncReference::GetRef<Navigate>("Navigate"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {

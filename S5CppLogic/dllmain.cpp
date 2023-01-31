@@ -270,7 +270,17 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	
+	EGL::CCoarsePath p{};
+	if (p.Navigate(L.CheckPos(1), L.CheckPos(2))) {
+		L.NewTable();
+		int i = 1;
+		for (int k = 0; k < p.WayPoints.CacheCount; ++k) {
+			L.PushPos(p.WayPoints.GetWaypoint(k));
+			L.SetTableRaw(-2, i);
+			++i;
+		}
+		return 1;
+	}
 	return 0;
 }
 

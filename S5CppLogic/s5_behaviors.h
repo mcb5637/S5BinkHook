@@ -10,13 +10,13 @@ namespace EGL {
 		EGL::CGLEBehaviorProps* PropPointer = nullptr; // 3, warning this may not be set
 
 	protected:
-		virtual void AddHandlers(int id) = 0;
-		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
-		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
+		virtual void __thiscall AddHandlers(int id) = 0; // 3
+		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
+		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
 	private:
-		virtual void unknownFuncBeh1(EGL::CGLEEntity* e); // on movement seems to copy a lot of data, maybe change behavior?
+		virtual void __thiscall unknownFuncBeh1(EGL::CGLEEntity* e); // on movement seems to copy a lot of data, maybe change behavior?
 	public:
-		virtual void OnEntityDestroy(bool ev); // usually empty, ev is false when destroyed normally, entity is still valid when called (not the case in dtor)
+		virtual void __thiscall OnEntityDestroy(bool ev); // 7 usually empty, ev is false when destroyed normally, entity is still valid when called (not the case in dtor)
 
 	public:
 		static inline constexpr int TypeDesc = 0x813778;
@@ -25,24 +25,34 @@ namespace EGL {
 
 	class CCoarsePath {
 	public:
-		int vtable;
-		struct {
-			int Goal;
-			int GoalDistance;
-			int WaypointsCount;
-			int CacheCount;
-			int CacheTail;
-			int CacheItem[33];
-			bool GoalCached;
+		virtual ~CCoarsePath() = default;
+
+		struct WaypointData {
+			int Goal = 0; // 21 in CBehaviorDefaultMovement
+			int GoalDistance = 0;
+			int WaypointsCount = 0;
+			int CacheCount = 0;
+			int CacheTail = 0; // 25
+			int CacheItem[33] = {}; // lower 16 bit x, upper 16 bit y
+			bool GoalCached = false;
 			PADDING(3);
+
+			void RemoveLastWaypoint();
+			shok::Position GetWaypoint(int i);
 		} WayPoints;
+
+		static inline constexpr int vtp = 0x7786A4;
+
+		void Clear();
+		bool Navigate(const shok::Position& from, const shok::Position& to);
 	};
+	static_assert(sizeof(CCoarsePath) == 40 * 4);
 	class CMovementBehavior : public EGL::CGLEBehavior {
 	public:
-		int CurrentTurn;
+		int CurrentTurn; // 4
 		float MovementSpeed, TurningSpeed, SpeedFactor; // la7
 		PADDINGI(1);
-		shok::PositionRot NextWayPoint, LastTurnPos;
+		shok::PositionRot NextWayPoint, LastTurnPos; // 9, 12
 		bool IsPathingUsed, IsMoveFinished; // 15
 		PADDING(2);
 		PADDINGI(1); // p to EGL::CMovementBehavior::CSlotMovingEntity
@@ -51,15 +61,17 @@ namespace EGL {
 		PADDING(1);
 
 	private:
-		virtual void unknownFuncMove1() = 0; // seems to reste some behavior variables
+		virtual void __thiscall OnSetMoveTo() = 0; // 8 seems to reset some behavior variables
 	public:
-		virtual float GetMovementSpeed() = 0;
-		virtual float GetTurningSpeed() = 0;
+		virtual float __thiscall GetMovementSpeed() = 0;
+		virtual float __thiscall GetTurningSpeed() = 0; // 10
 	private:
-		virtual void unknownFuncMove3(float*) = 0; // check some blocking data?
-		virtual void unknownFuncMove4(float*) = 0;
-		virtual void unknownFuncMove5(float*, float*, float*) = 0; // pos in rect?
-		virtual void unknownFuncMove6() = 0; // seems to be always empty
+		virtual void __thiscall GetNextWaypoint(shok::Position* p) = 0;
+		virtual void __thiscall RotateToStep(float targetRotation) = 0;
+		virtual void __thiscall IsOneCoordinateInRect(shok::Position* p, shok::Position* r1, shok::Position* r2) = 0; // pos in rect?
+		virtual void unknownFuncMove6() = 0; // 14 seems to be always empty
+
+		// move to step __thiscall(this, float movespeed, EGL::CMovingEntity* ent, shok::position* currentpos, bool* posreactedout) 0x5860D5
 
 	public:
 		static inline constexpr int vtp = 0x7848DC;

@@ -56,6 +56,13 @@ shok::Position shok::Position::RotateAround(float r, const shok::Position& cente
 	p = p.Rotate(r);
 	return p + center;
 }
+inline void(__thiscall* const pos_normalize)(const shok::Position* p, shok::Position* r) = reinterpret_cast<void(__thiscall*)(const shok::Position*, shok::Position*)>(0x57D7F7);
+shok::Position shok::Position::Normalize() const
+{
+	shok::Position r;
+	pos_normalize(this, &r);
+	return r;
+}
 
 shok::Position shok::Position::operator+(const shok::Position& other) const
 {

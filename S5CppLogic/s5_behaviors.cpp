@@ -24,6 +24,33 @@ void EGL::CGLEBehavior::OnEntityDestroy(bool uk)
 
 BB::SerializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A828);
 
+inline void(__thiscall* const path_waypoint_removelast)(EGL::CCoarsePath::WaypointData* th) = reinterpret_cast<void(__thiscall*)(EGL::CCoarsePath::WaypointData*)>(0x508988);
+void EGL::CCoarsePath::WaypointData::RemoveLastWaypoint()
+{
+	path_waypoint_removelast(this);
+}
+shok::Position EGL::CCoarsePath::WaypointData::GetWaypoint(int i)
+{
+	if (i < 0 || i > CacheCount)
+		throw std::out_of_range{ "invalid waypoint" };
+	int c = CacheItem[i];
+	int x = c & 0xFFFF;
+	int y = (c >> 16) & 0xFFFF;
+	return shok::Position{ static_cast<float>(x) * 100, static_cast<float>(y) * 100 };
+}
+inline bool(__thiscall* const path_navigate)(EGL::CCoarsePath* th, shok::Position* from, shok::Position* to, int one) = reinterpret_cast<bool(__thiscall*)(EGL::CCoarsePath*, shok::Position*, shok::Position*, int)>(0x5827A7);
+bool EGL::CCoarsePath::Navigate(const shok::Position& from, const shok::Position& to)
+{
+	shok::Position f = from;
+	shok::Position t = to;
+	return path_navigate(this, &f, &t, 1);
+}
+
+inline void(__thiscall* const path_clear)(EGL::CCoarsePath* th) = reinterpret_cast<void(__thiscall*)(EGL::CCoarsePath*)>(0x582848);
+void EGL::CCoarsePath::Clear()
+{
+	path_clear(this);
+}
 
 inline shok::TaskStateExecutionResult(__thiscall* const behanim_statehandlerwait)(EGL::CBehaviorAnimation* th, int i) = reinterpret_cast<shok::TaskStateExecutionResult(__thiscall*)(EGL::CBehaviorAnimation*, int)>(0x587E20);
 shok::TaskStateExecutionResult EGL::CBehaviorAnimation::StateWaitForAnim(int i)

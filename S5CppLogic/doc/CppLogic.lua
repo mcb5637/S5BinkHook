@@ -240,6 +240,7 @@ function CppLogic.Logic.LandscapeGetBridgeHeight(p) end
 --- a path is a array of positions, with the first position at path[table.getn(path)] and the last position at path[1].
 --- if no path is found, returns nil.
 --- throws if from or to is blocked.
+--- navigation is done via SHoK settler pathfinding.
 --- @param from Position
 --- @param to Position
 --- @return Position[]|nil path

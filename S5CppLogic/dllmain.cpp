@@ -263,25 +263,14 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2320F01D);
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x15EBDB60);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	EGL::CCoarsePath p{};
-	if (p.Navigate(L.CheckPos(1), L.CheckPos(2))) {
-		L.NewTable();
-		int i = 1;
-		for (int k = 0; k < p.WayPoints.CacheCount; ++k) {
-			L.PushPos(p.WayPoints.GetWaypoint(k));
-			L.SetTableRaw(-2, i);
-			++i;
-		}
-		return 1;
-	}
-	return 0;
+	return 1;
 }
 
 int GetOptions(lua::State L) {

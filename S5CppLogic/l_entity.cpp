@@ -63,32 +63,36 @@ namespace CppLogic::Entity {
 	}
 
 	int PredicateAnd(lua::State L) {
-		int num = L.GetTop();
+		const int num = L.GetTop();
 		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicAnd<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
 		L.Insert(1);
 		L.NewTable();
 		L.Insert(2);
-		for (int i = num - 1; i >= 0; i--) { // keep predicates, so they dont get gced
-			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(-1));
+		for (int i = 3; i <= (num + 2); ++i) { // keep predicates, so they dont get gced
+			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
+			L.PushValue(i);
 			L.SetTableRaw(2, i);
 		}
+		L.Pop(num);
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
 		return 1;
 	}
 
 	int PredicateOr(lua::State L) {
-		int num = L.GetTop();
+		const int num = L.GetTop();
 		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicOr<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
 		L.Insert(1);
 		L.NewTable();
 		L.Insert(2);
-		for (int i = num - 1; i >= 0; i--) { // keep predicates, so they dont get gced
-			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(-1));
+		for (int i = 3; i <= (num + 2); ++i) { // keep predicates, so they dont get gced
+			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
+			L.PushValue(i);
 			L.SetTableRaw(2, i);
 		}
+		L.Pop(num);
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
 		return 1;
@@ -119,6 +123,11 @@ namespace CppLogic::Entity {
 	}
 
 	int PredicateIsBuilding(lua::State L) {
+		L.NewUserData<CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite>();
+		return 1;
+	}
+
+	int PredicateIsBuildingOrConstructionSite(lua::State L) {
 		L.NewUserData<CppLogic::Iterator::EntityPredicateIsBuilding>();
 		return 1;
 	}
@@ -379,13 +388,13 @@ namespace CppLogic::Entity {
 	int BuildingGetHeight(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		L.Push(b->BuildingHeight);
+		L.Push(b->ConstructionProgress);
 		return 1;
 	}
 	int BuildingSetHeight(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		b->BuildingHeight = L.CheckFloat(2);
+		b->ConstructionProgress = L.CheckFloat(2);
 		return 0;
 	}
 
@@ -1339,7 +1348,7 @@ namespace CppLogic::Entity {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (b->IsOvertimeActive)
 			throw lua::LuaException("overtime already active");
-		if (b->OvertimeCooldown > 0)
+		if (b->OvertimeRechargeTime > 0)
 			throw lua::LuaException("cooldown active");
 		if (!(b->IsConstructionFinished() && !b->IsUpgrading && b->CurrentState != shok::TaskState::BuildingAlarmDefend))
 			throw lua::LuaException("building not idle");
@@ -1704,6 +1713,13 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int IsConstructionSite(lua::State l) {
+		luaext::EState L{ l };
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		L.Push(e->GetClassIdentifier() == GGL::CConstructionSite::Identifier);
+		return 1;
+	}
+
 	int BarracksBuyLeaderByType(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CBuilding* e = L.CheckBuilding(1);
@@ -1925,7 +1941,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 20> Predicates{ {
+	constexpr std::array<lua::FuncReference, 21> Predicates{ {
 			lua::FuncReference::GetRef<PredicateAnd>("And"),
 			lua::FuncReference::GetRef<PredicateOr>("Or"),
 			lua::FuncReference::GetRef<PredicateNot>("Not"),
@@ -1946,6 +1962,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateOfUpgradeCategory>("OfUpgradeCategory"),
 			lua::FuncReference::GetRef<PredicateIsAlive>("IsAlive"),
 			lua::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
+			lua::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
 	} };
 
 	constexpr std::array<lua::FuncReference, 55> Settlers{ {
@@ -2017,7 +2034,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 32> Building{ {
+	constexpr std::array<lua::FuncReference, 33> Building{ {
 			lua::FuncReference::GetRef<BuildingGetBarracksAutoFillActive>("GetBarracksAutoFillActive"),
 			lua::FuncReference::GetRef<BuildingGetHeight>("GetHeight"),
 			lua::FuncReference::GetRef<BuildingSetHeight>("SetHeight"),
@@ -2047,6 +2064,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<BuildingGetBuildOnEntity>("GetBuildOnEntity"),
 			lua::FuncReference::GetRef<BuildOnEntityGetBuilding>("BuildOnEntityGetBuilding"),
 			lua::FuncReference::GetRef<BuildingGetConstructionSite>("GetConstructionSite"),
+			lua::FuncReference::GetRef<IsConstructionSite>("IsConstructionSite"),
 			lua::FuncReference::GetRef<ConstructionSiteGetBuilding>("ConstructionSiteGetBuilding"),
 			lua::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
 			lua::FuncReference::GetRef<BuildingGetRelativePositions>("GetRelativePositions"),

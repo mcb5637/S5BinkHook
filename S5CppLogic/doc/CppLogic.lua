@@ -821,8 +821,14 @@ function CppLogic.Entity.Predicates.OfPlayer(pl) end
 function CppLogic.Entity.Predicates.InCircle(x, y, r) end
 
 --- creates a predicate that checks for building.
+--- (GGL::CConstructionSite entities get filtred out, their attached GGL::CBuilding not.)
 --- @return Predicate
 function CppLogic.Entity.Predicates.IsBuilding() end
+
+--- creates a predicate that checks for building.
+--- matches the GGL::CConstructionSite as well as the GGL::CBuilding under construction.
+--- @return Predicate
+function CppLogic.Entity.Predicates.PredicateIsBuildingOrConstructionSite() end
 
 --- creates a predicate that checks for settlers.
 --- @return Predicate
@@ -1545,6 +1551,12 @@ function CppLogic.Entity.Building.GetConstructionSite(id) end
 --- @param id entity
 --- @return number id id or 0
 function CppLogic.Entity.Building.ConstructionSiteGetBuilding(id) end
+
+--- checks if a building is a GGL::CConstructionSite.
+--- (not to confuse with a GGL::CBuilding under construction, use Logic.IsConstructionComplete to check GGL::CBuilding construction state).
+--- @param id entity
+--- @return boolean
+function CppLogic.Entity.Building.IsConstructionSite(id) end
 
 --- buys a leader in a barracks by entitytype.
 --- uses resources, asserts if not possible.

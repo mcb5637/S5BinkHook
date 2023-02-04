@@ -158,6 +158,10 @@ bool CppLogic::Iterator::EntityPredicateIsBuilding::Matches(const EGL::CGLEEntit
 {
 	return dynamic_cast<const GGL::CBuilding*>(e) != nullptr;
 }
+bool CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
+{
+	return EntityPredicateIsBuilding::Matches(e, rangeOut, prio) && e->GetClassIdentifier() != GGL::CConstructionSite::Identifier;
+}
 bool CppLogic::Iterator::EntityPredicateIsCombatRelevant::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	return e->PlayerId != 0 && (dynamic_cast<const GGL::CSettler*>(e) != nullptr || dynamic_cast<const GGL::CBuilding*>(e) != nullptr);

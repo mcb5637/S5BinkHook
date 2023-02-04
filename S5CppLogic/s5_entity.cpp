@@ -400,7 +400,7 @@ int GGL::CBuilding::GetNearestFreeRepairSlotFor(shok::Position* p)
 
 bool GGL::CBuilding::IsConstructionFinished() const
 {
-	return BuildingHeight >= 1;
+	return ConstructionProgress >= 1;
 }
 
 bool GGL::CBuilding::IsIdle()
@@ -904,9 +904,9 @@ shok::Position GGL::CBuilding::GetAbsoluteApproachPos()
 }
 
 std::vector<shok::AdditionalTechModifier> GGL::CBuilding::ConstructionSpeedModifiers{};
-float __fastcall constructionsite_getprogresspertick_hook(GGL::CBuilding* th) { // param is constructionsite, just not done yet ;)
+float __fastcall constructionsite_getprogresspertick_hook(GGL::CConstructionSite* th) { // param is constructionsite, just not done yet ;)
 	GGL::CGLSettlerProps* serf = static_cast<GGL::CGLSettlerProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf)->LogicProps);
-	GGL::CGLBuildingProps* bty = static_cast<GGL::CGLBuildingProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(th->ConstructionSiteType)->LogicProps);
+	GGL::CGLBuildingProps* bty = static_cast<GGL::CGLBuildingProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(th->BuildingType)->LogicProps);
 	float constructionfactor = serf->BuildFactor;
 	GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerId);
 	for (const shok::AdditionalTechModifier& tmod : GGL::CBuilding::ConstructionSpeedModifiers) {

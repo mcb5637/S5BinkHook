@@ -595,15 +595,14 @@ namespace GGL {
 	class CBuilding : public EGL::CGLEEntity {
 	public:
 		shok::Position ApproachPosition, LeavePosition; // fi 66
-		bool IsActive, IsRegistered, IsUpgrading, IsOvertimeActive;
-		bool HQAlarmActive;
+		bool IsActive, IsRegistered, IsUpgrading, IsOvertimeActive; // 70
+		bool WorkerAlarmModeActive;
 		PADDING(3);
 		int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn; // 72
-		float BuildingHeight, Healthbar, UpgradeProgress; //la78
-		PADDINGI(2);// list Slots with NumberOfRepairingSerfs?
+		float ConstructionProgress, RepairProgress, UpgradeProgress; //la78
+		PADDINGI(2);// list Slots with NumberOfRepairingSerfs? 79
 		int NumberOfRepairingSerfs;
-		int OvertimeCooldown;
-		int ConstructionSiteType; // 83
+		int OvertimeRechargeTime; // 82
 
 		// a lot more v funcs
 
@@ -648,6 +647,20 @@ namespace GGL {
 		static std::vector<shok::AdditionalTechModifier> ConstructionSpeedModifiers;
 		static void EnableConstructionSpeedTechs();
 	};
+	static_assert(offsetof(CBuilding, IsActive) == 70 * 4);
+	static_assert(offsetof(CBuilding, UpgradeProgress) == 78 * 4);
+
+	class CConstructionSite : public CBuilding {
+	public:
+		int BuildingType;
+
+		static inline constexpr int vtp = 0x77003C;
+		static inline constexpr int TypeDesc = 0x8078DC;
+		static inline constexpr int vtp_IEntityDisplay = 0x77001C;
+		static inline constexpr unsigned int Identifier = 0x2B5B9C80;
+	};
+	static_assert(offsetof(CConstructionSite, BuildingType) == 83 * 4);
+	static_assert(sizeof(CConstructionSite) == 84 * 4);
 
 	class CBridgeEntity : public GGL::CBuilding {
 		friend class EGL::CGLETerrainLowRes;

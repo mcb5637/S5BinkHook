@@ -287,7 +287,7 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateIsNotSoldier nsol{};
 		CppLogic::Iterator::EntityPredicateIsVisible vis{};
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
-		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite buil{};
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
 		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::TargetFilter_TargetType };
 		CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity> prio1{ &catLeader, 2 };
@@ -371,7 +371,7 @@ namespace CppLogic::UA {
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestBuildingInArea(int player, shok::Position& p, float ran)
 	{
 		CppLogic::Iterator::EntityPredicateIsCombatRelevant relev{};
-		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite buil{};
 		CppLogic::Iterator::EntityPredicateIsVisible vis{};
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
@@ -387,7 +387,7 @@ namespace CppLogic::UA {
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestBridgeInArea(shok::Position& p, float ran) {
 		CppLogic::Iterator::EntityPredicateOfPlayer pl{ 0 };
-		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite buil{};
 		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::Bridge };
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
 		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
@@ -622,7 +622,7 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::TargetFilter_TargetType };
 		CppLogic::Iterator::EntityPredicateIsVisible vis{};
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
-		CppLogic::Iterator::EntityPredicateIsBuilding buil{};
+		CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite buil{};
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };

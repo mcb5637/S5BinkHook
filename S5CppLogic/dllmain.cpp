@@ -366,7 +366,7 @@ void Install(lua::State L) {
 
 	EScr::LuaStateSerializer::AddGlobalToNotSerialize(CppLogic);
 
-#ifndef _DEBUG
+#ifdef _DEBUG
 	L.RegisterFunc<Test>("test");
 #endif
 

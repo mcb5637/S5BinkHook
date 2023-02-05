@@ -38,6 +38,7 @@ namespace ED {
 	public:
 		static inline constexpr int vtp = 0x76A9E4;
 		static inline constexpr int TypeDesc = 0x80AA54;
+		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
 	};
 
 	class CUVAnimBehavior : public ED::IBehavior {
@@ -45,6 +46,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE8EC;
 		static inline constexpr int TypeDesc = 0x84CF0C;
+		static inline constexpr unsigned int Identifier = 0x257D793D;
 	};
 
 	class CPermanentUVAnimBehavior : public ED::IBehavior {
@@ -52,6 +54,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE914;
 		static inline constexpr int TypeDesc = 0x84CFD0;
+		static inline constexpr unsigned int Identifier = 0x162356CD;
 	};
 
 	class CParticleEffectAttachmentBehavior : public ED::IBehavior {
@@ -59,6 +62,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE93C;
 		static inline constexpr int TypeDesc = 0x84D01C;
+		static inline constexpr unsigned int Identifier = 0x2DB43D17;
 	};
 
 	class CParticleEffectSwitchBehavior : public ED::IBehavior {
@@ -66,6 +70,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE964;
 		static inline constexpr int TypeDesc = 0x84D050;
+		static inline constexpr unsigned int Identifier = 0xD6E2E097;
 	};
 
 	class CDisplayBehaviorWaterfallAnimation : public ED::IBehavior {
@@ -73,6 +78,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEA44;
 		static inline constexpr int TypeDesc = 0x84D354;
+		static inline constexpr unsigned int Identifier = 0x29B4B323;
 	};
 
 	class CDisplayBehaviorMovement : public ED::IBehavior {
@@ -80,6 +86,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEAA4;
 		static inline constexpr int TypeDesc = 0x84D3E8;
+		static inline constexpr unsigned int Identifier = 0x166A8A03;
 	};
 
 	class CDisplayBehaviorBuildingAnimation : public ED::IBehavior {
@@ -90,6 +97,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEAD4;
 		static inline constexpr int TypeDesc = 0x84D4CC;
+		static inline constexpr unsigned int Identifier = 0x72DD7A54;
 	};
 	static_assert(offsetof(CDisplayBehaviorBuildingAnimation, Slot) == 2 * 4);
 
@@ -109,6 +117,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEB08;
 		static inline constexpr int TypeDesc = 0x84D5B4;
+		static inline constexpr unsigned int Identifier = 0x1304C08D;
 	};
 
 	class CDisplayBehaviorAnimation : public CDisplayBehaviorAnimationNoBlending { // size 15
@@ -117,6 +126,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEB40;
 		static inline constexpr int TypeDesc = 0x84D6A4;
+		static inline constexpr unsigned int Identifier = 0xB79FC943;
 	};
 	//constexpr int i = offsetof(CDisplayBehaviorAnimationNoBlending, Slot) / 4;
 
@@ -154,12 +164,48 @@ namespace ED {
 	private:
 		virtual float UnknownEDisplayFunc7() = 0; // return some float
 
-		template<typename T>
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
 		requires std::derived_from<T, ED::IBehavior>
 		T* GetDisplayBehavior() {
 			for (ED::IBehavior* b : DisplayBehaviors) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
+		template<typename T>
+		requires std::derived_from<T, ED::IBehavior>
+		T* GetDisplayBehaviorDynamic() {
+			for (ED::IBehavior* b : DisplayBehaviors) {
 				if (b) {
 					T* r = dynamic_cast<T*>(b);
+					if (r)
+						return r;
+				}
+			}
+			return nullptr;
+		}
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
+		requires std::derived_from<T, ED::IBehavior>
+		const T* GetDisplayBehavior() const {
+			for (const ED::IBehavior* b : DisplayBehaviors) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<const T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
+		template<typename T>
+		requires std::derived_from<T, ED::IBehavior>
+		const T* GetDisplayBehaviorDynamic() const {
+			for (const ED::IBehavior* b : DisplayBehaviors) {
+				if (b) {
+					const T* r = dynamic_cast<const T*>(b);
 					if (r)
 						return r;
 				}
@@ -170,6 +216,8 @@ namespace ED {
 		void ResetPositionData();
 
 		static inline constexpr int vtp = 0x76A494;
+		static inline constexpr int TypeDesc = 0x8099C0;
+		static inline constexpr unsigned int Identifier = 0x2A5844BD;
 	};
 	static_assert(sizeof(ED::CEntity) == 4 * 15);
 
@@ -179,6 +227,8 @@ namespace ED {
 		PADDINGI(1); // 0
 
 		static inline constexpr int vtp = 0x7AE3C4;
+		static inline constexpr int TypeDesc = 0x8099DC;
+		static inline constexpr unsigned int Identifier = 0x814643;
 	};
 	static_assert(sizeof(CDisplayStaticEntity) == 4 * 17);
 
@@ -187,6 +237,8 @@ namespace ED {
 		RWE::Anim::RpHAnimHierarchy* Handler; // 17
 
 		static inline constexpr int vtp = 0x76AE30;
+		static inline constexpr int TypeDesc = 0x80AF54;
+		static inline constexpr unsigned int Identifier = 0x3D31B843;
 	};
 	static_assert(sizeof(CDisplayStaticWithHierarchy) == 4 * 18);
 }
@@ -237,6 +289,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AA0C;
 		static inline constexpr int TypeDesc = 0x80AA70;
+		static inline constexpr unsigned int Identifier = 0xBDB4C703;
 	};
 
 	class CLimitedAttachmentBannerBehavior : public ED::IBehavior {
@@ -244,6 +297,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AB2C;
 		static inline constexpr int TypeDesc = 0x80AC68;
+		static inline constexpr unsigned int Identifier = 0x1DE7EFFD;
 	};
 
 	class CCamouflageBehavior : public ED::IBehavior {
@@ -265,6 +319,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AF54;
 		static inline constexpr int TypeDesc = 0x80B1E8;
+		static inline constexpr unsigned int Identifier = 0x76786DD;
 	};
 
 }

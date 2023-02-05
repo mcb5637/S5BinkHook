@@ -447,7 +447,7 @@ namespace CppLogic::Iterator {
 	public:
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
-	class EntityPredicateIsBuildingAndNotConstructionSite : public EntityPredicateIsBuilding {
+	class EntityPredicateIsBuildingAndNotConstructionSite : public Predicate<EGL::CGLEEntity> {
 	public:
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};

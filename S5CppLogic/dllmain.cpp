@@ -263,13 +263,16 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x15EBDB60);
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x15EBDB60);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
+	auto* e = L.CheckEntity(1);
+	auto* a = BB::IdentifierCast<GGL::CBehaviorDefaultMovement, EGL::CGLEBehavior, GGL::CLeaderMovement, GGL::CSettlerMovement>(e->Behaviours[1]);
+	L.Push((int)a);
 	return 1;
 }
 
@@ -363,7 +366,7 @@ void Install(lua::State L) {
 
 	EScr::LuaStateSerializer::AddGlobalToNotSerialize(CppLogic);
 
-#ifdef _DEBUG
+#ifndef _DEBUG
 	L.RegisterFunc<Test>("test");
 #endif
 

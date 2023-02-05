@@ -344,7 +344,7 @@ int __thiscall GGL::CSniperAbility::TaskOverrideSnipe(EGL::CGLETaskArgs* a)
 	int dmg = static_cast<int>(tar->GetMaxHealth() * pr->DamageFactor);
 	if (GGL::CSniperAbility::SnipeDamageOverride)
 		dmg = GGL::CSniperAbility::SnipeDamageOverride(thent, tar, dmg);
-	GGL::CBattleBehaviorProps* bpr = thent->GetEntityType()->GetBehaviorProps< GGL::CBattleBehaviorProps>();
+	GGL::CBattleBehaviorProps* bpr = thent->GetEntityType()->GetBehaviorPropsDynamic< GGL::CBattleBehaviorProps>();
 	CProjectileEffectCreator cr{};
 	cr.EffectType = bpr->ProjectileEffectID;
 	cr.PlayerID = thent->PlayerId;

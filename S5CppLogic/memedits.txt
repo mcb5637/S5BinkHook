@@ -95,5 +95,6 @@ list of used identifiers
 0x1003 CppLogic::Events::ConversionEvent
 0x1004 CppLogic::EntityAddon::EntityAddonData
 0x1005 CppLogic::UI::GUIState_PlaceBuildingEx
-0x1006 BreakOnCmdBehavior debug only
+0x1006 BreakOnCmdBehavior (debug only)
 0x1007 CppLogic::Events::AdvHurtByEvent
+0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

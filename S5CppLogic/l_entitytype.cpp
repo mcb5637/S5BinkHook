@@ -16,7 +16,7 @@ namespace CppLogic::EntityType {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		if (!t->IsSettlerType())
 			throw lua::LuaException("no settler type at 1");
-		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!p)
 			throw lua::LuaException("no leader type at 1");
 		L.Push(p->SoldierType);
@@ -27,7 +27,7 @@ namespace CppLogic::EntityType {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		if (!t->IsSettlerType())
 			throw lua::LuaException("no settler type at 1");
-		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!p)
 			throw lua::LuaException("no leader type at 1");
 		GGlue::CGlueEntityProps* t2 = L.CheckEntityType(2);
@@ -63,7 +63,7 @@ namespace CppLogic::EntityType {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		if (!t->IsSettlerType())
 			throw lua::LuaException("no settler type at 1");
-		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!p)
 			throw lua::LuaException("no leader type at 1");
 		L.Push(p->UpkeepCosts);
@@ -74,7 +74,7 @@ namespace CppLogic::EntityType {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		if (!t->IsSettlerType())
 			throw lua::LuaException("no settler type at 1");
-		GGL::CLeaderBehaviorProps* p = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* p = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!p)
 			throw lua::LuaException("no leader type at 1");
 		p->UpkeepCosts = L.CheckFloat(2);
@@ -154,7 +154,7 @@ namespace CppLogic::EntityType {
 	int LeaderTypeGetRegeneration(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CLeaderBehaviorProps* l = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* l = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!l)
 			throw lua::LuaException("no leader entitytype at 1");
 		L.Push(l->HealingPoints);
@@ -164,7 +164,7 @@ namespace CppLogic::EntityType {
 	int LeaderTypeSetRegeneration(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CLeaderBehaviorProps* l = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* l = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!l)
 			throw lua::LuaException("no leader entitytype at 1");
 		if (L.IsNumber(2))
@@ -177,7 +177,7 @@ namespace CppLogic::EntityType {
 	int GetAutoAttackDamage(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (b != nullptr) {
 			L.Push(b->DamageAmount);
 			L.Push(b->DamageClass);
@@ -194,7 +194,7 @@ namespace CppLogic::EntityType {
 	int SetAutoAttackDamage(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (b != nullptr) {
 			b->DamageAmount = L.CheckInt(2);
 			b->DamageClass = L.CheckInt(3);
@@ -232,7 +232,7 @@ namespace CppLogic::EntityType {
 	int GetAutoAttackMissChance(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (!b)
 			throw lua::LuaException("no battle entity at 1");
 		L.Push(b->MissChance);
@@ -241,7 +241,7 @@ namespace CppLogic::EntityType {
 	int SetAutoAttackMissChance(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (!b)
 			throw lua::LuaException("no battle entity at 1");
 		b->MissChance = L.CheckInt(2);
@@ -251,7 +251,7 @@ namespace CppLogic::EntityType {
 	int GetAutoAttackRange(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (b != nullptr) {
 			L.Push(b->MaxRange);
 			L.Push(b->MinRange);
@@ -267,7 +267,7 @@ namespace CppLogic::EntityType {
 	int SetAutoAttackRange(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (b != nullptr) {
 			if (L.IsNumber(2))
 				b->MaxRange = L.CheckFloat(2);
@@ -287,7 +287,7 @@ namespace CppLogic::EntityType {
 	int GetBattleWaitUntil(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (b != nullptr) {
 			L.Push(b->BattleWaitUntil);
 			return 1;
@@ -302,7 +302,7 @@ namespace CppLogic::EntityType {
 	int SetBattleWaitUntil(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CBattleBehaviorProps* b = t->GetBehaviorProps<GGL::CBattleBehaviorProps>();
+		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (b != nullptr) {
 			b->BattleWaitUntil = L.CheckInt(2);
 			return 0;
@@ -318,7 +318,7 @@ namespace CppLogic::EntityType {
 	int LeaderTypeGetAutoAggressiveRange(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CLeaderBehaviorProps* b = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!b)
 			throw lua::LuaException("no battle entity at 1");
 		L.Push(b->AutoAttackRange);
@@ -327,7 +327,7 @@ namespace CppLogic::EntityType {
 	int LeaderTypeSetAutoAggressiveRange(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CLeaderBehaviorProps* b = t->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!b)
 			throw lua::LuaException("no battle entity at 1");
 		b->AutoAttackRange = L.CheckFloat(2);
@@ -382,7 +382,7 @@ namespace CppLogic::EntityType {
 	int GetAbilityDataCamouflage(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CCamouflageBehaviorProps* p = t->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
+		GGL::CCamouflageBehaviorProps* p = t->GetBehaviorPropsDynamic<GGL::CCamouflageBehaviorProps>();
 		if (!p)
 			throw lua::LuaException("no camoflague entity at 1");
 		L.Push(p->DurationSeconds);
@@ -393,7 +393,7 @@ namespace CppLogic::EntityType {
 	int SetAbilityDataCamouflage(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		GGL::CCamouflageBehaviorProps* p = t->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
+		GGL::CCamouflageBehaviorProps* p = t->GetBehaviorPropsDynamic<GGL::CCamouflageBehaviorProps>();
 		if (!p)
 			throw lua::LuaException("no camoflague entity at 1");
 		if (L.IsNumber(2))
@@ -914,7 +914,7 @@ namespace CppLogic::EntityType {
 	int IsLeaderType(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		L.Push(static_cast<bool>(t->GetBehaviorProps<GGL::CLeaderBehaviorProps>()));
+		L.Push(static_cast<bool>(t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>()));
 		return 1;
 	}
 	int IsSoldierType(lua::State ls) {

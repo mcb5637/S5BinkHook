@@ -20,7 +20,7 @@ namespace CppLogic::EntityAddon {
 
 		void operator =(const EntityAddonData& other);
 
-		static inline constexpr int Identifier = 0x1004;
+		static constexpr unsigned int Identifier = 0x1004;
 		static BB::SerializationData SerializationData[];
 
 		virtual ~EntityAddonData() override = default;

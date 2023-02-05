@@ -709,7 +709,7 @@ namespace CppLogic::Logic {
 		bool usepathing = true;
 		if (L.ToBoolean(2))
 			usepathing = false;
-		d->e->GetBehavior<GGL::CBehaviorDefaultMovement>()->IsPathingUsed = usepathing;
+		d->e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>()->IsPathingUsed = usepathing;
 		if (L.ToBoolean(3) && d->e->CurrentState == shok::TaskState::Move)
 			d->e->CurrentState = shok::TaskState::Move_NonCancelable;
 		return 0;

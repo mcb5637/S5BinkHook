@@ -132,9 +132,9 @@ CppLogic::Iterator::EntityPredicateOfUpgradeCategory::EntityPredicateOfUpgradeCa
 bool CppLogic::Iterator::EntityPredicateOfUpgradeCategory::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	const GGlue::CGlueEntityProps* t = e->GetEntityType();
-	if (const GGL::CGLSettlerProps* s = dynamic_cast<const GGL::CGLSettlerProps*>(t->LogicProps))
+	if (const GGL::CGLSettlerProps* s = BB::IdentifierCast<const GGL::CGLSettlerProps>(t->LogicProps))
 		return s->Upgrade.Category == ucat;
-	if (const GGL::CGLBuildingProps* s = dynamic_cast<const GGL::CGLBuildingProps*>(t->LogicProps))
+	if (const GGL::CGLBuildingProps* s = BB::IdentifierCast<const GGL::CGLBuildingProps, EGL::CGLEEntityProps, GGL::CBridgeProperties>(t->LogicProps))
 		return s->Upgrade.Category == ucat;
 	return false;
 }
@@ -152,19 +152,24 @@ bool CppLogic::Iterator::EntityPredicateIsNotFleeingFrom::Matches(const EGL::CGL
 
 bool CppLogic::Iterator::EntityPredicateIsSettler::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return dynamic_cast<const GGL::CSettler*>(e) != nullptr;
+	const unsigned int id = e->GetClassIdentifier();
+	return id == GGL::CSettler::Identifier;
 }
 bool CppLogic::Iterator::EntityPredicateIsBuilding::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return dynamic_cast<const GGL::CBuilding*>(e) != nullptr;
+	const unsigned int id = e->GetClassIdentifier();
+	return id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier || id == GGL::CConstructionSite::Identifier;
 }
 bool CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return EntityPredicateIsBuilding::Matches(e, rangeOut, prio) && e->GetClassIdentifier() != GGL::CConstructionSite::Identifier;
+	const unsigned int id = e->GetClassIdentifier();
+	return id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier;
 }
 bool CppLogic::Iterator::EntityPredicateIsCombatRelevant::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return e->PlayerId != 0 && (dynamic_cast<const GGL::CSettler*>(e) != nullptr || dynamic_cast<const GGL::CBuilding*>(e) != nullptr);
+	const unsigned int id = e->GetClassIdentifier();
+	return e->PlayerId != 0
+		&& (id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier || id == GGL::CConstructionSite::Identifier || id == GGL::CSettler::Identifier);
 }
 bool CppLogic::Iterator::EntityPredicateIsNotSoldier::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
@@ -172,7 +177,7 @@ bool CppLogic::Iterator::EntityPredicateIsNotSoldier::Matches(const EGL::CGLEEnt
 }
 bool CppLogic::Iterator::EntityPredicateIsVisible::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	if (const GGL::CCamouflageBehavior* c = e->GetBehavior<GGL::CCamouflageBehavior>()) {
+	if (const GGL::CCamouflageBehavior* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>()) {
 		return c->InvisibilityRemaining <= 0;
 	}
 	return true;

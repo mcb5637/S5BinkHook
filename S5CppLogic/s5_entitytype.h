@@ -51,9 +51,21 @@ namespace EGL {
 
 		void InitializeBlocking();
 
-		template<class T>
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
 		requires std::derived_from<T, EGL::CGLEBehaviorProps>
 		T* GetBehaviorProps() {
+			for (EGL::CGLEBehaviorProps* b : BehaviorProps) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
+		template<class T>
+		requires std::derived_from<T, EGL::CGLEBehaviorProps>
+		T* GetBehaviorPropsDynamic() {
 			for (EGL::CGLEBehaviorProps* b : BehaviorProps) {
 				if (b) {
 					T* r = dynamic_cast<T*>(b);
@@ -63,9 +75,21 @@ namespace EGL {
 			}
 			return nullptr;
 		}
-		template<class T>
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
 		requires std::derived_from<T, EGL::CGLEBehaviorProps>
 		const T* GetBehaviorProps() const {
+			for (const EGL::CGLEBehaviorProps* b : BehaviorProps) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<const T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
+		template<class T>
+		requires std::derived_from<T, EGL::CGLEBehaviorProps>
+		const T* GetBehaviorPropsDynamic() const {
 			for (const EGL::CGLEBehaviorProps* b : BehaviorProps) {
 				if (b) {
 					const T* r = dynamic_cast<const T*>(b);
@@ -87,6 +111,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776FEC;
 		static inline constexpr int TypeDesc = 0x81192C;
+		static inline constexpr unsigned int Identifier = 0xC58BF747;
 	};
 
 	class CGLSettlerProps : public EGL::CGLEEntityProps {
@@ -128,6 +153,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x779074;
 		static inline constexpr int TypeDesc = 0x828DD0;
+		static inline constexpr unsigned int Identifier = 0x21487A57;
 	};
 
 	class CBuildBlockProperties : public EGL::CGLEEntityProps {
@@ -136,6 +162,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76EB38;
 		static inline constexpr int TypeDesc = 0x811284;
+		static inline constexpr unsigned int Identifier = 0xDE473B17;
 	};
 
 	class CResourceDoodadProperties : public GGL::CBuildBlockProperties {
@@ -146,6 +173,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76FF68;
 		static inline constexpr int TypeDesc = 0x811900;
+		static inline constexpr unsigned int Identifier = 0x9B03A097;
 	};
 
 	class CGLBuildingProps : public GGL::CBuildBlockProperties {
@@ -178,6 +206,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76EC78;
 		static inline constexpr int TypeDesc = 0x811210;
+		static inline constexpr unsigned int Identifier = 0x3A4D8B20;
 	};
 
 	class CBridgeProperties : public GGL::CGLBuildingProps {
@@ -187,6 +216,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x778148;
 		static inline constexpr int TypeDesc = 0x824A84;
+		static inline constexpr unsigned int Identifier = 0x7706B02E;
 	};
 
 }
@@ -200,9 +230,21 @@ namespace ED {
 		shok::Vector<int> AnimList; // 8
 		shok::Vector<ED::CBehaviorProps*> DisplayBehaviorProps;
 
-		template<class T>
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
 		requires std::derived_from<T, ED::CBehaviorProps>
 		T* GetDisplayBehaviorProps() {
+			for (ED::CBehaviorProps* b : DisplayBehaviorProps) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
+		template<class T>
+		requires std::derived_from<T, ED::CBehaviorProps>
+		T* GetDisplayBehaviorPropsDynamic() {
 			for (ED::CBehaviorProps* b : DisplayBehaviorProps) {
 				if (b) {
 					T* r = dynamic_cast<T*>(b);
@@ -212,6 +254,18 @@ namespace ED {
 			}
 			return nullptr;
 		}
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
+		requires std::derived_from<T, ED::CBehaviorProps>
+		const T* GetDisplayBehaviorProps() const {
+			for (const ED::CBehaviorProps* b : DisplayBehaviorProps) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<const T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
 		template<class T>
 		requires std::derived_from<T, ED::CBehaviorProps>
 		const T* GetDisplayBehaviorProps() const {
@@ -227,6 +281,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x788840;
 		static inline constexpr int TypeDesc = 0x83C918;
+		static inline constexpr unsigned int Identifier = 0x20E25C5D;
 	};
 	static_assert(sizeof(ED::CDisplayEntityProps) == 16 * 4);
 	//constexpr int i = offsetof(CDisplayEntityProps, AnimList)/4;
@@ -252,13 +307,29 @@ namespace GGlue {
 		CGlueEntityProps(const CGlueEntityProps& o);
 		CGlueEntityProps(CGlueEntityProps&& o) noexcept;
 
-		template<typename T>
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
+		requires std::derived_from<T, EGL::CGLEBehaviorProps>
 		T* GetBehaviorProps() {
 			return LogicProps->GetBehaviorProps<T>();
 		}
-		template<typename T>
+		// dynamic_cast, may return subclasses
+		template<class T>
+		requires std::derived_from<T, EGL::CGLEBehaviorProps>
+		T* GetBehaviorPropsDynamic() {
+			return LogicProps->GetBehaviorPropsDynamic<T>();
+		}
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
+		requires std::derived_from<T, ED::CBehaviorProps>
 		T* GetDisplayBehaviorProps() {
 			return DisplayProps->GetDisplayBehaviorProps<T>();
+		}
+		// dynamic_cast, may return subclasses
+		template<typename T>
+		requires std::derived_from<T, ED::CBehaviorProps>
+		T* GetDisplayBehaviorPropsDynamic() {
+			return DisplayProps->GetDisplayBehaviorPropsDynamic<T>();
 		}
 
 		bool IsSettlerType() const;

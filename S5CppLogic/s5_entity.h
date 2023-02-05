@@ -177,9 +177,21 @@ namespace EGL {
 		virtual void UnknownEntityFunc8(int) = 0; // 38
 
 	public:
-		template<typename T>
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
 		requires std::derived_from<T, EGL::CGLEBehavior>
 		T* GetBehavior() {
+			for (EGL::CGLEBehavior* b : Behaviours) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
+		template<typename T>
+		requires std::derived_from<T, EGL::CGLEBehavior>
+		T* GetBehaviorDynamic() {
 			for (EGL::CGLEBehavior* b : Behaviours) {
 				if (b) {
 					T* r = dynamic_cast<T*>(b);
@@ -189,9 +201,21 @@ namespace EGL {
 			}
 			return nullptr;
 		}
-		template<typename T>
+		// checks identifier, only returns exact class, no subclasses
+		template<BB::HasValidIdentifier T>
 		requires std::derived_from<T, EGL::CGLEBehavior>
 		const T* GetBehavior() const {
+			for (const EGL::CGLEBehavior* b : Behaviours) {
+				if (b && b->GetClassIdentifier() == T::Identifier) {
+					return static_cast<const T*>(b);
+				}
+			}
+			return nullptr;
+		}
+		// dynamic_cast, may return subclasses
+		template<typename T>
+		requires std::derived_from<T, EGL::CGLEBehavior>
+		const T* GetBehaviorDynamic() const {
 			for (const EGL::CGLEBehavior* b : Behaviours) {
 				if (b) {
 					const T* r = dynamic_cast<const T*>(b);
@@ -691,6 +715,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x766B50;
 		static inline constexpr int TypeDesc = 0x807874;
+		static inline constexpr unsigned int Identifier = 0x753286D;
 
 		// i have to implement them so the compiler stops complaining.
 		// i call the original constructor and replace the vtable with that, so they really dont matter.
@@ -711,6 +736,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x770114;
 		static inline constexpr int TypeDesc = 0x811A80;
+		static inline constexpr unsigned int Identifier = 0xF088740;
 
 		CGLConstructionSiteCreator();
 	};
@@ -720,6 +746,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774898;
 		static inline constexpr int TypeDesc = 0x811974;
+		static inline constexpr unsigned int Identifier = 0x85589767;
 
 		CResourceDoodadCreator();
 	};

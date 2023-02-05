@@ -303,7 +303,7 @@ namespace CppLogic::Entity {
 	int LeaderGetExperience(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		L.Push(b->Experience);
@@ -312,7 +312,7 @@ namespace CppLogic::Entity {
 	int LeaderSetExperience(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		b->Experience = L.CheckInt(2);
@@ -322,7 +322,7 @@ namespace CppLogic::Entity {
 	int LeaderGetTroopHealth(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		L.Push(b->GetTroopHealth());
@@ -332,7 +332,7 @@ namespace CppLogic::Entity {
 	int LeaderSetTroopHealth(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		b->TroopHealthCurrent = L.CheckInt(2);
@@ -342,7 +342,7 @@ namespace CppLogic::Entity {
 	int SettlerGetBaseMovementSpeed(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CBehaviorDefaultMovement* b = s->GetBehavior<GGL::CBehaviorDefaultMovement>();
+		GGL::CBehaviorDefaultMovement* b = s->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!b)
 			throw lua::LuaException("no moving entity at 1");
 		L.Push(b->MovementSpeed);
@@ -352,7 +352,7 @@ namespace CppLogic::Entity {
 	int SettlerSetBaseMovementSpeed(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CBehaviorDefaultMovement* b = s->GetBehavior<GGL::CBehaviorDefaultMovement>();
+		GGL::CBehaviorDefaultMovement* b = s->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!b)
 			throw lua::LuaException("no moving entity at 1");
 		if (L.IsNumber(2))
@@ -455,7 +455,7 @@ namespace CppLogic::Entity {
 	int HeroGetCamouflageDurationLeft(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CCamouflageBehavior* c = s->GetBehavior<GGL::CCamouflageBehavior>();
+		GGL::CCamouflageBehavior* c = s->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (!c)
 			throw lua::LuaException("no camo hero at 1");
 		L.Push(c->InvisibilityRemaining);
@@ -464,7 +464,7 @@ namespace CppLogic::Entity {
 	int HeroSetCamouflageDurationLeft(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CCamouflageBehavior* c = s->GetBehavior<GGL::CCamouflageBehavior>();
+		GGL::CCamouflageBehavior* c = s->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (!c)
 			throw lua::LuaException("no camo hero at 1");
 		if (dynamic_cast<GGL::CThiefCamouflageBehavior*>(c))
@@ -548,7 +548,7 @@ namespace CppLogic::Entity {
 	int MovingEntityGetSpeedFactor(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CBehaviorDefaultMovement* m = e->GetBehavior<GGL::CBehaviorDefaultMovement>();
+		GGL::CBehaviorDefaultMovement* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!m)
 			throw lua::LuaException("no moving entity at 1");
 		L.Push(m->SpeedFactor);
@@ -673,7 +673,7 @@ namespace CppLogic::Entity {
 	int GetAutoAttackMaxRange(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CBattleBehavior* b = e->GetBehavior<GGL::CBattleBehavior>();
+		GGL::CBattleBehavior* b = e->GetBehaviorDynamic<GGL::CBattleBehavior>();
 		if (b) {
 			L.Push(b->GetMaxRange());
 			return 1;
@@ -707,7 +707,7 @@ namespace CppLogic::Entity {
 	int GetSpeed(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CBehaviorDefaultMovement* m = e->GetBehavior<GGL::CBehaviorDefaultMovement>();
+		GGL::CBehaviorDefaultMovement* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!m)
 			throw lua::LuaException("no moving entity at 1");
 		L.Push(m->GetMovementSpeed() * 10.0);
@@ -717,7 +717,7 @@ namespace CppLogic::Entity {
 	int SettlerIsVisible(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CCamouflageBehavior* c = e->GetBehavior<GGL::CCamouflageBehavior>();
+		GGL::CCamouflageBehavior* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (c != nullptr) {
 			L.Push(c->InvisibilityRemaining <= 0);
 			return 1;
@@ -860,12 +860,12 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		GGL::CSettler* e = L.CheckSettler(1);
 		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CCamouflageBehavior* b = e->GetBehavior<GGL::CCamouflageBehavior>();
+		GGL::CCamouflageBehavior* b = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (!b)
 			throw lua::LuaException("no matching ability at 1");
 		if (dynamic_cast<GGL::CThiefCamouflageBehavior*>(b))
 			throw lua::LuaException("thief camo cannot be manually activated");
-		GGL::CCamouflageBehaviorProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
+		GGL::CCamouflageBehaviorProps* bp = e->GetEntityType()->GetBehaviorPropsDynamic<GGL::CCamouflageBehaviorProps>();
 		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
 			throw lua::LuaException("ability not ready at 1");
 		e->HeroAbilityActivateCamoflage();
@@ -1277,7 +1277,7 @@ namespace CppLogic::Entity {
 		if (!(b->IsConstructionFinished() && !b->IsUpgrading))
 			throw lua::LuaException("barracks is upgrading or under construction");
 		GGL::CLeaderBehavior* l = s->GetBehavior<GGL::CLeaderBehavior>();
-		GGL::CLeaderBehaviorProps* lp = s->GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* lp = s->GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!l)
 			throw lua::LuaException("no leader");
 		if (b->PlayerId != s->PlayerId)
@@ -1314,12 +1314,12 @@ namespace CppLogic::Entity {
 		luaext::EState L{ ls };
 		GGL::CSettler* l = L.CheckSettler(1);
 		GGL::CSettler* s = L.CheckSettler(2);
-		GGL::CLeaderBehavior* lb = l->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* lb = l->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!lb)
 			throw lua::LuaException("no leader");
 		if (!s->GetBehavior<GGL::CSoldierBehavior>())
 			throw lua::LuaException("no soldier");
-		if (s->EntityType != l->GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->SoldierType)
+		if (s->EntityType != l->GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>()->SoldierType)
 			throw lua::LuaException("leader and soldier type doesnt match");
 		l->LeaderAttachSoldier(s->EntityId);
 		return 0;
@@ -1515,7 +1515,7 @@ namespace CppLogic::Entity {
 	int MercenaryRemoveLastOffer(lua::State ls) {
 		luaext::EState L{ ls };
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CBuildingMerchantBehavior* m = b->GetBehavior<GGL::CBuildingMerchantBehavior>();
+		GGL::CBuildingMerchantBehavior* m = b->GetBehaviorDynamic<GGL::CBuildingMerchantBehavior>();
 		if (!m)
 			throw lua::LuaException("no merchant");
 		if (m->Offer.size() == 0)
@@ -1528,7 +1528,7 @@ namespace CppLogic::Entity {
 	int MercenarySetOfferData(lua::State ls) {
 		luaext::EState L{ ls };
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CBuildingMerchantBehavior* m = b->GetBehavior<GGL::CBuildingMerchantBehavior>();
+		GGL::CBuildingMerchantBehavior* m = b->GetBehaviorDynamic<GGL::CBuildingMerchantBehavior>();
 		int i = L.CheckInt(2);
 		if (!m)
 			throw lua::LuaException("no merchant");
@@ -1611,7 +1611,7 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("use CEntity instead");
 		luaext::EState L{ l };
 		GGL::CSettler* b = L.CheckSettler(1);
-		if (!b->GetBehavior<GGL::CLeaderBehavior>())
+		if (!b->GetBehaviorDynamic<GGL::CLeaderBehavior>())
 			throw lua::LuaException("no leader");
 		GGL::CLeaderBehavior::HookLeaderRegen();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookRegen = true;
@@ -1660,7 +1660,7 @@ namespace CppLogic::Entity {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		GGL::CSettler* b = L.CheckSettler(1);
-		if (!b->GetBehavior<GGL::CLeaderBehavior>())
+		if (!b->GetBehaviorDynamic<GGL::CLeaderBehavior>())
 			throw lua::LuaException("no leader");
 		L.Push(b->LeaderGetRegenHealth());
 		L.Push(b->LeaderGetRegenHealthSeconds());
@@ -1726,7 +1726,7 @@ namespace CppLogic::Entity {
 		if (!e->GetBehavior<GGL::CBarrackBehavior>())
 			throw lua::LuaException("no barracks");
 		GGlue::CGlueEntityProps* ety = L.CheckEntityType(2);
-		GGL::CLeaderBehaviorProps* lp = ety->GetBehaviorProps<GGL::CLeaderBehaviorProps>();
+		GGL::CLeaderBehaviorProps* lp = ety->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!lp)
 			throw lua::LuaException("no leader type");
 		if (!e->IsIdle(true))
@@ -1852,10 +1852,10 @@ namespace CppLogic::Entity {
 		reset.TaskType = shok::Task::TASK_RESET_TASK_LIST_TIMER;
 		e->ExecuteTask(reset);
 		e->ExecuteTask(setanim);
-		GGL::CGLBehaviorAnimationEx* animbeh = e->GetBehavior<GGL::CGLBehaviorAnimationEx>();
+		GGL::CGLBehaviorAnimationEx* animbeh = e->GetBehaviorDynamic<GGL::CGLBehaviorAnimationEx>();
 		animbeh->SpeedModifier = L.OptFloat(4, 1);
 		animbeh->Duration = static_cast<int>(animbeh->Duration / animbeh->SpeedModifier);
-		GGL::CBattleBehavior* batt = e->GetBehavior<GGL::CBattleBehavior>();
+		GGL::CBattleBehavior* batt = e->GetBehaviorDynamic<GGL::CBattleBehavior>();
 		if (batt)
 			batt->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
 		e->SetTaskList((*EGL::CGLETaskListMgr::GlobalObj)->TaskListManager->GetIdByName(AnimTaskList));

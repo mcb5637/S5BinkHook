@@ -437,7 +437,7 @@ namespace CppLogic::UA {
 		EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
 		if (!LastPos.IsInRange(e->Position, Area))
 			return false;
-		GGL::CCamouflageBehavior* c = e->GetBehavior<GGL::CCamouflageBehavior>();
+		GGL::CCamouflageBehavior* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (c != nullptr) {
 			return c->InvisibilityRemaining <= 0;
 		}
@@ -675,14 +675,14 @@ namespace CppLogic::UA {
 			float lowest = -1.0f;
 			for (int id : Leaders) {
 				EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
-				float s = e->GetBehavior<GGL::CBehaviorDefaultMovement>()->GetMovementSpeed();
+				float s = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>()->GetMovementSpeed();
 				if (lowest < 0 || s < lowest)
 					lowest = s;
 			}
 			EGL::CEventValue_Float ev{ shok::EventIDs::Movement_SetSpeedFactor, 1.0f };
 			for (int id : Leaders) {
 				EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
-				float s = e->GetBehavior<GGL::CBehaviorDefaultMovement>()->GetMovementSpeed();
+				float s = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>()->GetMovementSpeed();
 				ev.Data = lowest / s;
 				e->FireEvent(&ev);
 				for (const auto& s : e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER)) {
@@ -872,7 +872,7 @@ namespace CppLogic::UA {
 		}
 		if (GGL::CCamouflageBehavior::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
 			GGL::CCamouflageBehavior* a = e->GetBehavior<GGL::CCamouflageBehavior>();
-			if (a != nullptr && !dynamic_cast<GGL::CThiefCamouflageBehavior*>(a)) {
+			if (a != nullptr) {
 				GGL::CCamouflageBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {

@@ -110,6 +110,11 @@ namespace shok {
 }
 
 namespace BB {
+	constexpr unsigned int InvalidIdentifier = 0xEEFFFFFF; // guranteed to not appear in shok
+
+	template<class T>
+	concept HasValidIdentifier = std::is_same_v<decltype(T::Identifier), const unsigned int> && T::Identifier != BB::InvalidIdentifier;
+
 	class IObject {
 	public:
 		virtual ~IObject() = default;
@@ -118,6 +123,7 @@ namespace BB {
 
 		static constexpr int TypeDesc = 0x7FFE08;
 		static constexpr int vtp = 0x7620F0;
+		static inline constexpr unsigned int Identifier = InvalidIdentifier;
 
 		struct _vtableS {
 			void(__thiscall* dtor)(BB::IObject* th, bool free);
@@ -125,6 +131,22 @@ namespace BB {
 			void* (__stdcall* CastToIdentifier)(BB::IObject* th, unsigned int id);
 		};
 	};
+
+	template<HasValidIdentifier CastTo, class CastFrom, HasValidIdentifier... AdditionalSubClasses>
+	requires std::derived_from<CastTo, CastFrom> && std::derived_from<CastFrom, IObject> && (std::derived_from<AdditionalSubClasses, CastTo> && ...)
+	CastTo* IdentifierCast(CastFrom* f) {
+		const unsigned int id = f->GetClassIdentifier();
+		if (id == CastTo::Identifier)
+			return static_cast<CastTo*>(f);
+		if constexpr (sizeof...(AdditionalSubClasses) != 0) {
+			std::array<const unsigned int, sizeof...(AdditionalSubClasses)> additionalIdentifiers = { AdditionalSubClasses::Identifier... };
+			for (const unsigned int addid : additionalIdentifiers) {
+				if (id == addid)
+					return static_cast<CastTo*>(f);
+			}
+		}
+		return static_cast<CastTo*>(f->CastToIdentifier(CastTo::Identifier));
+	}
 
 	class IPostEvent {
 	public:

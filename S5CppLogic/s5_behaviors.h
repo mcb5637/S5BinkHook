@@ -21,6 +21,7 @@ namespace EGL {
 	public:
 		static inline constexpr int TypeDesc = 0x813778;
 		static BB::SerializationData* SerializationData;
+		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
 	};
 
 	class CCoarsePath {
@@ -75,6 +76,7 @@ namespace EGL {
 
 	public:
 		static inline constexpr int vtp = 0x7848DC;
+		static inline constexpr unsigned int Identifier = 0xAC0E3657;
 	};
 
 	class GLEBehaviorMultiSubAnims : public EGL::CGLEBehavior {
@@ -93,7 +95,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x785EEC;
 		static inline constexpr int TypeDesc = 0x83AE4C;
-		static inline constexpr unsigned int Identifier = 0x0FCFC0D;
+		static inline constexpr unsigned int Identifier = 0xFCFC0D;
 	};
 
 	struct SSlotArgsAnimation {
@@ -117,6 +119,8 @@ namespace EGL {
 
 	protected:
 		shok::TaskStateExecutionResult StateWaitForAnim(int i);
+	public:
+		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
 	};
 }
 
@@ -179,6 +183,7 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x816E2C;
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86CBE8);
+		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
 	};
 
 	struct SSlotArgsCamouflage {
@@ -224,7 +229,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7766F0;
 		static inline constexpr int TypeDesc = 0x81FE84;
-		static inline constexpr unsigned int Identifier = 0x0FE5FCD9D;
+		static inline constexpr unsigned int Identifier = 0xFE5FCD9D;
 	};
 	class CHawkBehavior : public EGL::CGLEBehavior {
 	public:
@@ -627,6 +632,7 @@ namespace GGL {
 	class CBehaviorFollow : public EGL::CGLEBehavior {
 	public:
 		static inline constexpr int vtp = 0x776E40;
+		static inline constexpr unsigned int Identifier = 0xDBF96E77;
 	};
 
 	class CBattleBehavior : public GGL::CBehaviorFollow {

@@ -203,14 +203,14 @@ namespace BB {
 		static inline constexpr int TypeDesc = 0x830C80;
 
 		using IClassFactory::CreateObject;
-		template<class T>
+		template<HasValidIdentifier T>
 		T* CreateObject()
 		{
 			return dynamic_cast<T*>(CreateObject(T::Identifier));
 		}
 
 		void LoadObject(BB::IObject* ob, const char* filename);
-		template<class T>
+		template<HasValidIdentifier T>
 		T* LoadObject(const char* filename)
 		{
 			T* ob = CreateObject<T>();
@@ -222,7 +222,7 @@ namespace BB {
 		void LoadObject(void* ob, const char* filename, const BB::SerializationData* seri);
 
 		using IClassFactory::GetSerializationDataForClass;
-		template<class T>
+		template<HasValidIdentifier T>
 		const BB::SerializationData* GetSerializationDataForClass()
 		{
 			return GetSerializationDataForClass(T::Identifier);

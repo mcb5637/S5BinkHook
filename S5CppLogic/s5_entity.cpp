@@ -152,7 +152,7 @@ int EGL::CGLEEntity::EventGetMaxWorktime()
 
 shok::LeaderCommand EGL::CGLEEntity::EventLeaderGetCurrentCommand()
 {
-	if (GetBehavior<GGL::CLeaderBehavior>() == nullptr)
+	if (GetBehaviorDynamic<GGL::CLeaderBehavior>() == nullptr)
 		return shok::LeaderCommand::Unknown;
 	return static_cast<shok::LeaderCommand>(EventGetIntById(shok::EventIDs::Leader_GetCommand));
 }
@@ -619,7 +619,7 @@ void EGL::CMovingEntity::LeaderAttachSoldier(int soldierId)
 static inline void(__thiscall* const shok_entity_expellSettler)(EGL::CGLEEntity* th, int i) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEntity*, int)>(0x4A39BB);
 void EGL::CMovingEntity::SettlerExpell()
 {
-	if (GetBehavior<GGL::CLeaderBehavior>() && ObservedEntities.GetFirstMatch([](std::pair<shok::AttachmentType, shok::Attachment>* a) { return a->first == shok::AttachmentType::LEADER_SOLDIER; })) {
+	if (GetBehaviorDynamic<GGL::CLeaderBehavior>() && ObservedEntities.GetFirstMatch([](std::pair<shok::AttachmentType, shok::Attachment>* a) { return a->first == shok::AttachmentType::LEADER_SOLDIER; })) {
 		EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_ExpellSoldier, true };
 		FireEvent(&ev);
 	}
@@ -967,7 +967,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::AdvChangePlayer(int player)
 	int nid = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&c);
 	EGL::CGLEEntity* ne = EGL::CGLEEntity::GetEntityByID(nid);
 
-	if (GGL::CLeaderBehavior* lb = GetBehavior<GGL::CLeaderBehavior>()) {
+	if (GGL::CLeaderBehavior* lb = GetBehaviorDynamic<GGL::CLeaderBehavior>()) {
 		std::vector<int> sol = std::vector<int>();
 		for (const auto& a : ObservedEntities) {
 			if (a.first == shok::AttachmentType::LEADER_SOLDIER)
@@ -977,7 +977,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::AdvChangePlayer(int player)
 		for (int i : sol) {
 			settler->LeaderAttachSoldier(EGL::CGLEEntity::GetEntityByID(i)->AdvChangePlayer(player)->EntityId);
 		}
-		GGL::CLeaderBehavior* nlb = settler->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* nlb = settler->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		nlb->Experience = lb->Experience;
 		nlb->TroopHealthCurrent = lb->TroopHealthCurrent;
 		nlb->TroopHealthPerSoldier = lb->TroopHealthPerSoldier;
@@ -1114,7 +1114,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 			if (id)
 				attackedleader = EGL::CGLEEntity::GetEntityByID(id);
 		}
-		GGL::CLeaderBehavior* lbeh = attackedleader->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* lbeh = attackedleader->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (lbeh && firsttodie == attackedleader) {
 			int id = attackedleader->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
 			if (id)
@@ -1188,7 +1188,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		attacker->FireEvent(&dmgdone);
 	}
 	if (xp && attacker && xptoadd) {
-		GGL::CLeaderBehavior* al = attacker->GetBehavior<GGL::CLeaderBehavior>();
+		GGL::CLeaderBehavior* al = attacker->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		GGL::CEventEntityIndex xpev{ shok::EventIDs::CppL_AffectedExperienceGained, attacker->EntityId, xptoadd };
 		for (const auto& at : attacker->ObserverEntities) {
 			if (at.first == shok::AttachmentType::HERO_AFFECTED) {
@@ -1409,7 +1409,7 @@ void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, sh
 void __thiscall EGL::CMovingEntity::BuildOnSetPosFixed()
 {
 	if (MovementState != shok::MovementState::Moving && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
-		GGL::CBehaviorDefaultMovement* mov = GetBehavior<GGL::CBehaviorDefaultMovement>();
+		GGL::CBehaviorDefaultMovement* mov = GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (mov) {
 			movementbeh_setmovetarget(mov, &TargetPosition);
 		}
@@ -1680,7 +1680,7 @@ int GGL::CSettler::LeaderGetRegenHealth()
 	if (d && d->RegenHPOverride >= 0)
 		i = d->RegenHPOverride;
 	else
-		i = GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->HealingPoints;
+		i = GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>()->HealingPoints;
 	return static_cast<int>(ModifierProfile.GetModifiedValue(EGL::IProfileModifierSetObserver::ModifierType::HealingPoints, static_cast<float>(i)));
 }
 int GGL::CSettler::LeaderGetRegenHealthSeconds()
@@ -1689,7 +1689,7 @@ int GGL::CSettler::LeaderGetRegenHealthSeconds()
 	if (d && d->RegenSecondsOverride >= 0)
 		return d->RegenSecondsOverride;
 	else
-		return GetEntityType()->GetBehaviorProps<GGL::CLeaderBehaviorProps>()->HealingSeconds;
+		return GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>()->HealingSeconds;
 }
 static inline void(__thiscall* const settler_killbyenviro)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x4A5049);
 void GGL::CSettler::KillSettlerByEnvironment()

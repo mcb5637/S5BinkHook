@@ -732,6 +732,7 @@ function CppLogic.Combat.DisableCamoFix() end
 local Predicate = {}
 
 --- iterates over all entities that match a predicate.
+--- you may create/destroy entities while iterating, even the current one.
 --- perfect to use with for loop.
 --- examples:
 --- - for id in CppLogic.Entity.EntityIterator(...) do Message(id) end  
@@ -745,6 +746,7 @@ function CppLogic.Entity.EntityIterator(...) end
 --- iterates over all entities of one or more players that match a predicate.
 --- cannot iterate over player 0 entities.
 --- usually faster than EntityIterator and a player predicate.
+--- do not create/destroy entities while iterating.
 --- you have to manually create an and predicate.
 --- perfect to use with for loop.
 --- examples:

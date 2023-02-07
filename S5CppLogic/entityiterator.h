@@ -207,16 +207,19 @@ namespace CppLogic::Iterator {
 		}
 	};
 
+	// you may create/destroy entities while iterating, even the current one (just dont try to get the current one from the iterator after destroying)
 	class GlobalEntityIterator : public GlobalManagedIterator<EGL::CGLEEntity> {
 	public:
 		GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
 	};
 
+	// you may create/destroy entities while iterating, even the current one (just dont try to get the current one from the iterator after destroying)
 	class GlobalEffectIterator : public GlobalManagedIterator<EGL::CEffect> {
 	public:
 		GlobalEffectIterator(const Predicate<EGL::CEffect>* const p);
 	};
 
+	// you may not create/destroy entities while iterating
 	class PlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 		const GGL::CPlayerAttractionHandler& ah;
 	protected:
@@ -225,6 +228,7 @@ namespace CppLogic::Iterator {
 	public:
 		PlayerEntityIterator(int player, const Predicate<EGL::CGLEEntity>* const p);
 	};
+	// you may not create/destroy entities while iterating
 	class MultiPlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 	public:
 		std::array<int, 9> Players;

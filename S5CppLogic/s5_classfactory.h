@@ -168,8 +168,7 @@ namespace BB {
 		static const SerializationData* GetSerializationData() {
 			return T::SerializationData;
 		}
-		template<class T>
-		requires requires { T::Identifier; }
+		template<HasValidIdentifier T>
 		static const SerializationData* GetSerializationData() {
 			return GetSerializationData(T::Identifier);
 		}

@@ -66,33 +66,32 @@ namespace CppLogic::Entity {
 		const int num = L.GetTop();
 		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicAnd<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
-		L.Insert(1);
 		L.NewTable();
-		L.Insert(2);
-		for (int i = 3; i <= (num + 2); ++i) { // keep predicates, so they dont get gced
+		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
 			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
 			L.PushValue(i);
-			L.SetTableRaw(2, i);
+			L.SetTableRaw(-2, i);
 		}
-		L.Pop(num);
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
 		return 1;
+	}
+	void PredicateAndAutoCreate(lua::State L) { // clear stack after creating and predicate
+		PredicateAnd(L);
+		L.Insert(1);
+		L.SetTop(1);
 	}
 
 	int PredicateOr(lua::State L) {
 		const int num = L.GetTop();
 		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicOr<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
-		L.Insert(1);
 		L.NewTable();
-		L.Insert(2);
-		for (int i = 3; i <= (num + 2); ++i) { // keep predicates, so they dont get gced
+		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
 			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
 			L.PushValue(i);
-			L.SetTableRaw(2, i);
+			L.SetTableRaw(-2, i);
 		}
-		L.Pop(num);
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
 		return 1;
@@ -185,7 +184,7 @@ namespace CppLogic::Entity {
 
 	int EntityIteratorTableize(lua::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
-			PredicateAnd(L);
+			PredicateAndAutoCreate(L);
 		}
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		int index = 1;
@@ -201,7 +200,7 @@ namespace CppLogic::Entity {
 
 	int EntityIteratorCount(lua::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
-			PredicateAnd(L);
+			PredicateAndAutoCreate(L);
 		}
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		int count = 0;
@@ -215,7 +214,7 @@ namespace CppLogic::Entity {
 
 	int EntityIteratorGetNearest(lua::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
-			PredicateAnd(L);
+			PredicateAndAutoCreate(L);
 		}
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		CppLogic::Iterator::GlobalEntityIterator it{ pred };
@@ -249,7 +248,7 @@ namespace CppLogic::Entity {
 	}
 	int LEntityIterator(lua::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
-			PredicateAnd(L);
+			PredicateAndAutoCreate(L);
 		}
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 

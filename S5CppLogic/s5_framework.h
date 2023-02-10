@@ -125,13 +125,17 @@ class CTimeManager {
 public:
 	PADDINGI(1); // 0 int
 	PADDINGI(1); // 1 int
-	PADDINGI(2); // 2 double
+	double CurrentGameTimeFactor; // 2
 	PADDINGI(1); // 4 int
-	PADDINGI(1); // 5 ?
-	PADDINGI(2); // 6 double
+	PADDINGI(1); // 5 float?
+	double FixedUpdateTime; // 6
 	PADDINGI(2); // 8 double
-	PADDINGI(2); // 10 double
-	PADDINGI(2); // 12 double
+	PADDINGI(2); // 10 double update time?
+	PADDINGI(2); // 12 double update time?
+
+	void SetFixedUpdateTime(double t);
+	void SetTimeFactor(double f);
+	// 406DE2 updates 12 as 10 - 8 / 2 (or just 10 if 0)
 };
 
 namespace Framework {
@@ -143,7 +147,8 @@ namespace Framework {
 	};
 	class CEventTimeManager : public BB::IPostEvent, private CEventTimeManager_UnknownInt, public CTimeManager {
 	public:
-		PADDINGI(2); // 2 ints
+		PADDINGI(1); // 1 ints
+		lua_State* LuaState; // 17
 
 		static inline constexpr int vtp = 0x7630CC;
 
@@ -182,7 +187,7 @@ namespace Framework {
 		PADDINGI(1); // EScr::CInputHandler
 		IGameCallBacks* GameCallbacks;
 		PADDINGI(2); //0,  EGL::CGLEAnimProps
-		CEventTimeManager TimeManager;
+		CEventTimeManager TimeManager; // 6, CTimeManager 8
 		PADDINGI(1394);
 		CCheckSumCalculator CheckSumCalc;
 		PADDINGI(4);
@@ -213,7 +218,7 @@ namespace Framework {
 	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);
 	static_assert(offsetof(AGameModeBase, EscapeHandler) == 1423 * 4);
 	static_assert(offsetof(AGameModeBase, CheckSumCalc) == 1418 * 4);
-	//constexpr int i = offsetof(AGameModeBase, IsExternalMap);
+	//constexpr int i = offsetof(AGameModeBase, TimeManager)/4;
 	class CSinglePlayerMode : public AGameModeBase {
 	public:
 		class CNetworkEvent : public BB::IPostEvent {

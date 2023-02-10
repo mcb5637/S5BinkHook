@@ -111,6 +111,17 @@ void GDB::CList::RemoveKey(const std::string& k)
     }
 }
 
+inline void(__thiscall* const timemng_setfixedupdate)(CTimeManager* th, double t) = reinterpret_cast<void(__thiscall*)(CTimeManager*, double)>(0x406D5E);
+void CTimeManager::SetFixedUpdateTime(double t)
+{
+    timemng_setfixedupdate(this, t);
+}
+inline void(__thiscall* const timemng_settimefactor)(CTimeManager* th, double t) = reinterpret_cast<void(__thiscall*)(CTimeManager*, double)>(0x406E23);
+void CTimeManager::SetTimeFactor(double f)
+{
+    timemng_settimefactor(this, f);
+}
+
 void __stdcall Framework::CEventTimeManager::PostEvent(BB::CEvent* ev)
 {
     throw 0;

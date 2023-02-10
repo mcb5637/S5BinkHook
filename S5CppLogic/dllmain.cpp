@@ -270,9 +270,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto* e = L.CheckEntity(1);
-	auto* a = BB::IdentifierCast<GGL::CBehaviorDefaultMovement, EGL::CGLEBehavior, GGL::CLeaderMovement, GGL::CSettlerMovement>(e->Behaviours[1]);
-	L.Push((int)a);
+	L.Push((int)&(*Framework::CMain::GlobalObj)->GameModeBase->TimeManager);
 	return 1;
 }
 

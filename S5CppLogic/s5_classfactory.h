@@ -84,6 +84,7 @@ namespace BB {
 		static inline BB::FieldSerilaizer* const TypeAnimCategory = reinterpret_cast<BB::FieldSerilaizer*>(0x875494);
 		static inline BB::FieldSerilaizer* const TypeDamageClass = reinterpret_cast<BB::FieldSerilaizer*>(0x860558);
 		static inline BB::FieldSerilaizer* const TypeEffectType = reinterpret_cast<BB::FieldSerilaizer*>(0x8605A0);
+		static inline BB::FieldSerilaizer* const TypeWidgetID = reinterpret_cast<BB::FieldSerilaizer*>(0x894708);
 
 		template<class T>
 		static constexpr BB::FieldSerilaizer* GetSerilalizer() = delete;

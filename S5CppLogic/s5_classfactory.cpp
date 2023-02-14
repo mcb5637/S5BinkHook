@@ -81,6 +81,7 @@ BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategoryID", 
 BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::EntityAccessCategoryID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoAnimCategory{ "shok::AnimCategoryID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoWidgetID{ "shok::WidgetID", &PushInt, &CheckInt };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -188,6 +189,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x85D4F4, &InfoEntityCategory},
     {0x875494, &InfoAnimCategory},
     {0x8754B8, &InfoGoods},
+    {0x894708, &InfoWidgetID},
 
     {0x810D18, &InfoAccessCategory},
 

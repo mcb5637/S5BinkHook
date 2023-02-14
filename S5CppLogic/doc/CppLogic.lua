@@ -2256,6 +2256,7 @@ function CppLogic.UI.StringInputWidgetGetIgnoreNextChar(wid) end
 function CppLogic.UI.StringInputWidgetSetIgnoreNextChar(wid, flag) end
 
 --- EGUIX::CStringInputCustomWidget buffer size.
+--- clears current input.
 --- @param wid widget
 --- @param s number
 function CppLogic.UI.StringInputWidgetSetBufferSize(wid, s) end

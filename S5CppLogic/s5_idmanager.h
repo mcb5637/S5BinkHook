@@ -74,6 +74,8 @@ namespace BB {
 	class CIDManager : public IIDManager {
 	public:
 		static inline constexpr int vtp = 0x76C028;
+
+		static inline BB::CIDManager** const WidgetIDManager = reinterpret_cast<BB::CIDManager**>(0x8945C8);
 	};
 
 }

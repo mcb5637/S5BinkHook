@@ -287,7 +287,7 @@ namespace EGUIX {
 
 		static inline constexpr int vtp = 0x780E5C;
 		static inline constexpr int TypeDesc = 0x834148;
-		static inline constexpr unsigned int Identifier = 0x0FE028496;
+		static inline constexpr unsigned int Identifier = 0xFE028496;
 		// 55F782 ctor
 	};
 	static_assert(sizeof(EGUIX::CButtonWidget) == 146 * 4);
@@ -341,7 +341,7 @@ namespace EGUIX {
 
 	class CProjectWidget : public CContainerWidget {
 	public:
-		PADDINGI(1);
+		int CurrentRootWidget;
 
 		static inline constexpr int vtp = 0x780910;
 		static inline constexpr int TypeDesc = 0x832DFC;
@@ -441,6 +441,10 @@ namespace EGUIX {
 		void Assign(const char* buff);
 		void Close(CCustomWidget* wid);
 		bool HandleInput(CCustomWidget* wid, shok::Keys keyCode, char keyChar); // remove modifier on keyCode
+
+		static inline constexpr int vtp = 0x780AFC;
+		static inline constexpr int TypeDesc = 0x833B10;
+		static inline constexpr unsigned int Identifier = 0xBF22E2D6;
 	};
 	static_assert(offsetof(CStringInputCustomWidget, AlwaysVisible) == 4 * 37);
 	static_assert(sizeof(CStringInputCustomWidget) == 55 * 4);

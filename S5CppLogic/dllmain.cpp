@@ -263,16 +263,13 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA063C0));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x15EBDB60);
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x5CA15E96);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
-	auto* cw = dynamic_cast<EGUIX::CStringInputCustomWidget*>(w->CustomWidget);
-	L.Push(cw->BufferSize);
 	return 1;
 }
 

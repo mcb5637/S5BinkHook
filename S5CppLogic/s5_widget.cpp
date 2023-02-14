@@ -6,6 +6,7 @@
 #include "s5_RWEngine.h"
 #include "s5_idmanager.h"
 #include "s5_mapdisplay.h"
+#include "s5_classfactory.h"
 #include "hooks.h"
 #include "mod.h"
 #include "EntityAddonData.h"
@@ -381,36 +382,28 @@ static inline void(__thiscall* const widlisthandler_ctor)(EGUIX::CWidgetListHand
 static inline void(__thiscall* const statwid_ctor)(EGUIX::CStaticWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CStaticWidget*)>(0x5603F1);
 EGUIX::CStaticWidget* EGUIX::CStaticWidget::Create()
 {
-    EGUIX::CStaticWidget* r = reinterpret_cast<EGUIX::CStaticWidget*>(shok::Malloc(sizeof(EGUIX::CStaticWidget)));
-    memset(r, 0, sizeof(EGUIX::CStaticWidget));
-    statwid_ctor(r);
+    EGUIX::CStaticWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CStaticWidget>();
     r->IsShown = false;
     return r;
 }
 static inline void(__thiscall* const stattextwid_ctor)(EGUIX::CStaticTextWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CStaticTextWidget*)>(0x55FBB1);
 EGUIX::CStaticTextWidget* EGUIX::CStaticTextWidget::Create()
 {
-    EGUIX::CStaticTextWidget* r = reinterpret_cast<EGUIX::CStaticTextWidget*>(shok::Malloc(sizeof(EGUIX::CStaticTextWidget)));
-    memset(r, 0, sizeof(EGUIX::CStaticTextWidget));
-    stattextwid_ctor(r);
+    EGUIX::CStaticTextWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CStaticTextWidget>();
     r->IsShown = false;
     return r;
 }
 static inline void(__thiscall* const purettwid_ctor)(EGUIX::CPureTooltipWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CPureTooltipWidget*)>(0x55DF3E);
 EGUIX::CPureTooltipWidget* EGUIX::CPureTooltipWidget::Create()
 {
-    EGUIX::CPureTooltipWidget* r = reinterpret_cast<EGUIX::CPureTooltipWidget*>(shok::Malloc(sizeof(EGUIX::CPureTooltipWidget)));
-    memset(r, 0, sizeof(EGUIX::CPureTooltipWidget));
-    purettwid_ctor(r);
+    EGUIX::CPureTooltipWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CPureTooltipWidget>();
     r->IsShown = false;
     return r;
 }
 static inline void(__thiscall* const gfxbutwid_ctor)(EGUIX::CGfxButtonWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CGfxButtonWidget*)>(0x55E917);
 EGUIX::CGfxButtonWidget* EGUIX::CGfxButtonWidget::Create()
 {
-    EGUIX::CGfxButtonWidget* r = reinterpret_cast<EGUIX::CGfxButtonWidget*>(shok::Malloc(sizeof(EGUIX::CGfxButtonWidget)));
-    memset(r, 0, sizeof(EGUIX::CGfxButtonWidget));
-    gfxbutwid_ctor(r);
+    EGUIX::CGfxButtonWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CGfxButtonWidget>();
     r->IsShown = false;
     r->IconMaterial.Color.Alpha = 0;
     return r;
@@ -418,27 +411,21 @@ EGUIX::CGfxButtonWidget* EGUIX::CGfxButtonWidget::Create()
 static inline void(__thiscall* const txtbutwid_ctor)(EGUIX::CTextButtonWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CTextButtonWidget*)>(0x55EFA3);
 EGUIX::CTextButtonWidget* EGUIX::CTextButtonWidget::Create()
 {
-    EGUIX::CTextButtonWidget* r = reinterpret_cast<EGUIX::CTextButtonWidget*>(shok::Malloc(sizeof(EGUIX::CTextButtonWidget)));
-    memset(r, 0, sizeof(EGUIX::CTextButtonWidget));
-    txtbutwid_ctor(r);
+    EGUIX::CTextButtonWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CTextButtonWidget>();
     r->IsShown = false;
     return r;
 }
 static inline void(__thiscall* const progbarwid_ctor)(EGUIX::CProgressBarWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CProgressBarWidget*)>(0x55E300);
 EGUIX::CProgressBarWidget* EGUIX::CProgressBarWidget::Create()
 {
-    EGUIX::CProgressBarWidget* r = reinterpret_cast<EGUIX::CProgressBarWidget*>(shok::Malloc(sizeof(EGUIX::CProgressBarWidget)));
-    memset(r, 0, sizeof(EGUIX::CProgressBarWidget));
-    progbarwid_ctor(r);
+    EGUIX::CProgressBarWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CProgressBarWidget>();
     r->IsShown = false;
     return r;
 }
 static inline void(__thiscall* const contwid_ctor)(EGUIX::CContainerWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CContainerWidget*)>(0x560DAD);
 EGUIX::CContainerWidget* EGUIX::CContainerWidget::Create()
 {
-    EGUIX::CContainerWidget* r = reinterpret_cast<EGUIX::CContainerWidget*>(shok::Malloc(sizeof(EGUIX::CContainerWidget)));
-    memset(r, 0, sizeof(EGUIX::CContainerWidget));
-    contwid_ctor(r);
+    EGUIX::CContainerWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CContainerWidget>();
     r->IsShown = false;
     return r;
 }

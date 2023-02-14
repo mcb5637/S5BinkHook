@@ -449,6 +449,38 @@ void EGUIX::CCustomWidget::InitializeCustomWidget()
     customwid_initwid(this);
 }
 
+inline const char* (__thiscall* const stringinputcw_buffer_get)(EGUIX::CStringInputCustomWidget::Buffer* th, bool pwm) = reinterpret_cast<const char* (__thiscall*)(EGUIX::CStringInputCustomWidget::Buffer*, bool)>(0x55D283);
+const char* EGUIX::CStringInputCustomWidget::GetBuffer(bool passwordMask)
+{
+    return stringinputcw_buffer_get(&Buff, passwordMask);
+}
+inline void(__thiscall* const stringinputcw_buffer_reserve)(EGUIX::CStringInputCustomWidget::Buffer* th, size_t s) = reinterpret_cast<void(__thiscall*)(EGUIX::CStringInputCustomWidget::Buffer*, size_t)>(0x55D35D);
+void EGUIX::CStringInputCustomWidget::Reserve(size_t s)
+{
+    stringinputcw_buffer_reserve(&Buff, s);
+}
+inline void(__thiscall* const stringinputcw_conf)(EGUIX::CStringInputCustomWidget* th, const char* buff, EGUIX::CCustomWidget* cw) = reinterpret_cast<void(__thiscall*)(EGUIX::CStringInputCustomWidget*, const char*, EGUIX::CCustomWidget*)>(0x55D599);
+void EGUIX::CStringInputCustomWidget::CallOnConfirm(CCustomWidget* wid, const char* content)
+{
+    if (content == nullptr)
+        content = GetBuffer();
+    stringinputcw_conf(this, content, wid);
+}
+inline void(__thiscall* const stringinputcw_assing)(EGUIX::CStringInputCustomWidget* th, const char* buff) = reinterpret_cast<void(__thiscall*)(EGUIX::CStringInputCustomWidget*, const char*)>(0x55D1CE);
+void EGUIX::CStringInputCustomWidget::Assign(const char* buff)
+{
+    stringinputcw_assing(this, buff);
+}
+inline void(__thiscall* const stringinputcw_close)(EGUIX::CStringInputCustomWidget* th, EGUIX::CCustomWidget* cw) = reinterpret_cast<void(__thiscall*)(EGUIX::CStringInputCustomWidget*, EGUIX::CCustomWidget*)>(0x55D2F5);
+void EGUIX::CStringInputCustomWidget::Close(CCustomWidget* wid)
+{
+    stringinputcw_close(this, wid);
+}
+inline bool(__thiscall* const stringinputcw_input)(EGUIX::CStringInputCustomWidget* th, EGUIX::CCustomWidget* cw, shok::Keys keyCode, char keyChar) = reinterpret_cast<bool(__thiscall*)(EGUIX::CStringInputCustomWidget*, EGUIX::CCustomWidget*, shok::Keys, char)>(0x55D60D);
+bool EGUIX::CStringInputCustomWidget::HandleInput(CCustomWidget* wid, shok::Keys keyCode, char keyChar)
+{
+    return stringinputcw_input(this, wid, keyCode, keyChar);
+}
 
 static inline void(__thiscall* const onscreenmoti_render)(GGUI::COnScreenElementMotivation* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementMotivation*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53E93C);
 void GGUI::COnScreenElementMotivation::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)

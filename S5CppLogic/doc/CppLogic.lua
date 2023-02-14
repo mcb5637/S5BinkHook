@@ -2237,6 +2237,29 @@ function CppLogic.UI.RemoveWidget(wid) end
 --- @return string name
 function CppLogic.UI.GetWidgetName(wid) end
 
+--- gets the widget at the current position.
+--- if ForceToNeverBeFoundFlag is set, that widget gets ignored by this function.
+--- can not return container widgets.
+--- @param baseWidget widget starts searching at this widget, "root" should make the most sense, x,y is relative to this widget
+--- @param x number
+--- @param y number
+--- @return number widget
+function CppLogic.UI.GetWidgetAtPosition(baseWidget, x, y) end
+
+--- EGUIX::CStringInputCustomWidget ignore next char flag.
+--- @param wid widget
+--- @return boolean
+function CppLogic.UI.StringInputWidgetGetIgnoreNextChar(wid) end
+--- EGUIX::CStringInputCustomWidget ignore next char flag.
+--- @param wid widget
+--- @param flag boolean
+function CppLogic.UI.StringInputWidgetSetIgnoreNextChar(wid, flag) end
+
+--- EGUIX::CStringInputCustomWidget buffer size.
+--- @param wid widget
+--- @param s number
+function CppLogic.UI.StringInputWidgetSetBufferSize(wid, s) end
+
 
 --- creates a new static widget and registers it as its child.
 --- the widget is initially hidden and all variables at a default value.

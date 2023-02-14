@@ -997,6 +997,53 @@ namespace CppLogic::UI {
 		throw lua::LuaException{ "invalid gui state" };
 	}
 
+	int GetWidgetAtPosition(lua::State ls) {
+		luaext::EState L{ ls };
+		float p[2]{ L.CheckFloat(2), L.CheckFloat(3) };
+		auto* rel = L.CheckWidget(1);
+		L.Push(rel->GetMouseOverWidget(p, true, false));
+		return 1;
+	}
+
+	int StringInputWidgetGetIgnoreNextChar(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "no customwidget" };
+		auto* cw = dynamic_cast<EGUIX::CStringInputCustomWidget*>(w->CustomWidget);
+		if (cw == nullptr)
+			throw lua::LuaException{ "no string input wiget" };
+		L.Push(cw->IgnoreNextChar);
+		return 1;
+	}
+	int StringInputWidgetSetIgnoreNextChar(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "no customwidget" };
+		auto* cw = dynamic_cast<EGUIX::CStringInputCustomWidget*>(w->CustomWidget);
+		if (cw == nullptr)
+			throw lua::LuaException{ "no string input wiget" };
+		cw->IgnoreNextChar = L.CheckBool(2);
+		return 0;
+	}
+
+	int StringInputWidgetSetBufferSize(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "no customwidget" };
+		auto* cw = dynamic_cast<EGUIX::CStringInputCustomWidget*>(w->CustomWidget);
+		if (cw == nullptr)
+			throw lua::LuaException{ "no string input wiget" };
+		int s = L.CheckInt(2);
+		if (s <= 0)
+			throw lua::LuaException{ "size <= 0" };
+		cw->BufferSize = s;
+		cw->Reserve(cw->BufferSize);
+		return 0;
+	}
+
 
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
@@ -1292,7 +1339,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 63> UI{ {
+	constexpr std::array<lua::FuncReference, 67> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1356,6 +1403,10 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<SetPlaceBuildingRotation>("SetPlaceBuildingRotation"),
 		lua::FuncReference::GetRef<GetPlaceBuildingRotation>("GetPlaceBuildingRotation"),
 		lua::FuncReference::GetRef<GetPlaceBuildingUCat>("GetPlaceBuildingUCat"),
+		lua::FuncReference::GetRef<GetWidgetAtPosition>("GetWidgetAtPosition"),
+		lua::FuncReference::GetRef<StringInputWidgetGetIgnoreNextChar>("StringInputWidgetGetIgnoreNextChar"),
+		lua::FuncReference::GetRef<StringInputWidgetSetIgnoreNextChar>("StringInputWidgetSetIgnoreNextChar"),
+		lua::FuncReference::GetRef<StringInputWidgetSetBufferSize>("StringInputWidgetSetBufferSize"),
 	} };
 
 	void Init(lua::State L)

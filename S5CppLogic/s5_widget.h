@@ -161,7 +161,7 @@ namespace EGUIX {
 	class IOnEvent {
 	public:
 		virtual ~IOnEvent() = default;
-		virtual int HandleEvent(BB::CEvent* ev, int uk) = 0; // return id of wid that handeled event or 0?
+		virtual int HandleEvent(BB::CEvent* ev, BB::CEvent* evAgain) = 0; // return id of wid that handeled event or 0?
 
 		static inline constexpr unsigned int Identifier = 0xF284ED96;
 	};
@@ -170,6 +170,8 @@ namespace EGUIX {
 		virtual ~IRender() = default;
 	private:
 		virtual bool Render(float* uk) = 0; // possibly possize rect?
+
+		static inline constexpr unsigned int Identifier = 0x876EC256;
 	};
 	class IMaterialAccess {
 	public:
@@ -216,15 +218,15 @@ namespace EGUIX {
 		virtual CBaseWidget* Clone() = 0; // 3
 		virtual void Initialize() = 0;
 	private:
-		virtual void unknown0() = 0; // does something on wid geristr cb on mother wid? 5
+		virtual void unknown0() = 0; // does something on wid geristr cb on mother wid? unused? 5
 	public:
 		virtual bool SetName(const char* name) = 0; // no idea what return is
 		virtual int SetPosAndSize(float x, float y, float w, float h) = 0;
 		virtual bool SetVisibility(bool vis) = 0; // returns changed
-		virtual int GetMouseOverWidget(float* mousePosrelativeToWidget, int uk1, int uk2) = 0; // 10
+		virtual int GetMouseOverWidget(float* mousePosrelativeToWidget, bool checkSubwidgets, bool containerWidget) = 0; // 10
 		virtual bool IsWidgetID(int id) = 0; // not sure what this is exactly about
 	private:
-		virtual bool retzero() = 0;
+		virtual bool retzero() = 0; // button & containerwid true, customwid forward
 	public:
 
 		bool* GetUpdateManualFlag();
@@ -371,22 +373,25 @@ namespace EGUIX {
 		static EGUIX::CProgressBarWidget* Create();
 	};
 
-	class ICustomWidget { // size 35
+	class CCustomWidget;
+	class ICustomWidget { // size 36
 	public:
 		virtual ~ICustomWidget() = default;
-	private:
-		virtual void uk() = 0;
-	public:
+		virtual void Initialize() = 0;
 		virtual void Destroy() = 0;
-		virtual void Render(CBaseWidget widget, float* zero) = 0;
+		virtual void Render(CCustomWidget* widget, float* zero) = 0;
+		virtual bool HandleEvent(CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain) = 0;
 	private:
-		virtual void uk2(int, int) = 0;
-		virtual int uk3() = 0;
+		virtual int uk3() = 0; // 5 forwareded to CBaseWidget::retzero
 
-		PADDINGI(6); // ctor memset 0
-		shok::String Strings[4];
+		int IntegerUserVariable0, IntegerUserVariable1, IntegerUserVariable2, IntegerUserVariable3,
+			IntegerUserVariable4, IntegerUserVariable5; // ctor memset 0
+		shok::String StringUserVariable[4]; // 7
+		int WidgetId;
+
+		static inline constexpr unsigned int Identifier = 0x156D9BF;
 	};
-	static_assert(sizeof(ICustomWidget)==35*4);
+	static_assert(sizeof(ICustomWidget)==36*4);
 
 	class CCustomWidget : public EGUIX::CBaseWidget, public IRender {
 	public:
@@ -404,6 +409,42 @@ namespace EGUIX {
 	};
 	static_assert(sizeof(EGUIX::CCustomWidget) == 43 * 4);
 
+	// int user variable0 bool always visible, if false ignores first char after reset and auto hides first mother container widget on enter/esc
+	// int user variable1 bool keep content on close
+	// int user variable2 mode, 2->cd-key, 1->password/cheat, 0->chat
+	// int user variable3 bool no confirm call
+	// int user variable4 buffer size
+	// string user var 0 confirm lua func in _G (inputString, widgetId)
+	class CStringInputCustomWidget : public BB::IObject, public ICustomWidget {
+	public:
+		bool AlwaysVisible = false; // 37
+		std::string OnConfirm; // initialized with StringUserVariable0
+		bool KeepContentOnClose = true, ModePassword = false, ModeCDKeyInput = false, DoNotCallConfirm = false; // 45
+		int BufferSize = 0;
+		bool IgnoreNextChar = false;
+		struct Buffer { // 48
+			bool Allocated = 0;
+			PADDING(3);
+			size_t BuffSize = 0;
+			size_t CurrentEditPos = 0;
+			char* ActualText = nullptr;
+			char* OutputText = nullptr;
+			bool PasswordMode = false, CDKeyMode = false; // 53
+
+			// 55CF81(this, keyCode, keyChar) handle key -> enter->3, escape->4, 1->handeled, 2->not handeled
+		} Buff;
+		int FontID = 0; // Data\\Menu\\Fonts\\standard10.met
+
+		const char* GetBuffer(bool passwordMask = false);
+		void Reserve(size_t s); // also clears buffer
+		void CallOnConfirm(CCustomWidget* wid, const char* content = nullptr);
+		void Assign(const char* buff);
+		void Close(CCustomWidget* wid);
+		bool HandleInput(CCustomWidget* wid, shok::Keys keyCode, char keyChar); // remove modifier on keyCode
+	};
+	static_assert(offsetof(CStringInputCustomWidget, AlwaysVisible) == 4 * 37);
+	static_assert(sizeof(CStringInputCustomWidget) == 55 * 4);
+	//constexpr int i = offsetof(CStringInputCustomWidget, Buff.PasswordMode) / 4;
 }
 
 namespace GGUI {
@@ -648,7 +689,6 @@ namespace GGUI {
 
 	class C3DOnScreenInformationCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
-		PADDINGI(1);
 		bool ShowAllInformationFlag, ShowEffects; // 37
 		EGUIX::Rect r1, r2; // not sure, but its 2 4 float objects, second 42 probably something with mouseover entity
 		OnScreenInfoRenderer Renderer;

@@ -270,7 +270,9 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	L.Push((int)&(*Framework::CMain::GlobalObj)->GameModeBase->TimeManager);
+	auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
+	auto* cw = dynamic_cast<EGUIX::CStringInputCustomWidget*>(w->CustomWidget);
+	L.Push(cw->BufferSize);
 	return 1;
 }
 

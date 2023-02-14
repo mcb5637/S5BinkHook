@@ -181,8 +181,8 @@ namespace GGL {
 			float MaxRange;
 			float Speed;
 			float Exploration;
-			float MissChance; // works for positive
-			// all of them get used by profile modification, check there, if it actually gets used somewhere
+			float MissChance; // without GGL::CEntityProfile::HookExperience only positive modifiers apply
+			// all of them get used by profile modification
 		};
 
 		shok::Vector<LevelData> Level;

@@ -60,14 +60,14 @@ namespace shok {
 		shok::String Effect_Script; // 41 Effect -> Script, not sure if this is used for something
 		Modifier ExplorationModifier; // 48
 		Modifier SpeedModifier; // 56
-		Modifier HitpointModifier; // 64
-		Modifier DamageModifier; // 72
+		Modifier HitpointModifier; // 64 unused (except CppLogic)
+		Modifier DamageModifier; // 72 also affects ciruclarattack/shuriken
 		Modifier DamageBonusModifier; // 80
 		Modifier RangeModifier; // 88
 		Modifier MinRangeModifier; // 96
 		Modifier ArmorModifier; // 104
 		Modifier DodgeModifier; // 112
-		Modifier GroupLimitModifier; // 120
+		Modifier GroupLimitModifier; // 120 unused
 		bool UseForStatisticsFlag = false; // 128
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x8645C8);

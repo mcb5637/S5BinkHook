@@ -853,6 +853,32 @@ void GGUI::CManager::SetControlledPlayer(int pl)
 	guimng_setpl(this, pl);
 }
 
+inline bool(__thiscall* const guimng_sel_isselected)(const shok::Vector<GGUI::CManager::SelectionData>* th, int id) = reinterpret_cast<bool(__thiscall*)(const shok::Vector<GGUI::CManager::SelectionData>*, int)>(0x721E7B);
+bool GGUI::CManager::IsEntitySelected(int id) const
+{
+	return guimng_sel_isselected(&SelectedEntities, id);
+}
+inline bool(__thiscall* const guimng_selectent)(GGUI::CManager* th, int id) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, int)>(0x525828);
+bool GGUI::CManager::SelectEntity(int id)
+{
+	return guimng_selectent(this, id);
+}
+inline void(__thiscall* const guimng_selectionchanged)(GGUI::CManager* th, int uk) = reinterpret_cast<void(__thiscall*)(GGUI::CManager*, int)>(0x5235BC);
+void GGUI::CManager::OnSelectionChanged()
+{
+	guimng_selectionchanged(this, 0); // TODO check what that param is, only call with 1 is from event handler of FEEDBACK_EVENT_ENTITIES_EXCHANGED via 0x5235D4
+}
+inline bool(__thiscall* const guimng_deselect)(GGUI::CManager* th, int id) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, int)>(0x524A98);
+bool GGUI::CManager::DeselectEntity(int id)
+{
+	return guimng_deselect(this, id);
+}
+inline bool(__thiscall* const guimng_clearsel)(GGUI::CManager* th) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*)>(0x523590);
+bool GGUI::CManager::ClearSelection()
+{
+	return guimng_clearsel(this);
+}
+
 void(__stdcall* PostEventOrig)(BB::IPostEvent* th, BB::CEvent* ev) = nullptr;
 shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
 bool(*GGUI::CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;

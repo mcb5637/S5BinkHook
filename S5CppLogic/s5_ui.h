@@ -353,7 +353,21 @@ namespace EGL {
 	class IGLEGUIInterface {
 	public:
 		virtual ~IGLEGUIInterface() = default;
-		// 12 more vfunc
+		virtual bool GetEntityPosition(int id, float* x, float* y, float* r) = 0;
+		virtual int GetEntityPlayer(int id) = 0;
+		virtual int GetEntityTypeByName(const char* typeName) = 0;
+		virtual int GetEntityType(int id) = 0;
+		virtual float GetDistanceTo(int id, float x, float y) = 0; // 5
+		virtual const char* GetEntityTypeName(int ety) = 0;
+		virtual int GetEntityHealth(int id) = 0;
+		virtual bool IsEntityValid(int id) = 0;
+		virtual bool IsEntityState0x10003(int id) = 0;
+		virtual bool IsEntityOfCategory(int id, shok::EntityCategory cat) = 0; // 10
+	private:
+		virtual bool unknownfunc1(int pl) = 0; // check exploration active for player?
+	public:
+		virtual int GetGameTick() = 0;
+
 		static inline constexpr int vtp = 0x7837D0;
 	};
 	class CGLEGUIInterface : public IGLEGUIInterface {
@@ -495,8 +509,8 @@ namespace GGL {
 		virtual void unknown10() = 0; // building get military info 4
 	public:
 		virtual void RoundPosToBuildingPlacement(float x, float y, float* xout, float* yout) = 0; //55
+		virtual void FillSoldiersOfLaeder(int id, shok::Vector<int>* soldiers) = 0;
 	private:
-		virtual void unknown11() = 0;
 		virtual void unknown12() = 0;
 		virtual void unknown13() = 0;
 	public:
@@ -600,6 +614,10 @@ namespace GGUI {
 			int Id;
 			GGUI::CState* State;
 		};
+		struct SelectionData {
+			int Id;
+			bool IsSoldier;
+		};
 
 		PADDINGI(5);
 		GGUI::C3DViewHandler* C3DViewHandler; // 6
@@ -609,9 +627,9 @@ namespace GGUI {
 	private:
 		BB::IPostEvent* PostEvent;
 	public:
-		shok::Vector<int> SelectedEntities; //11
+		shok::Vector<SelectionData> SelectedEntities; //11
 		int ControlledPlayer; // 15
-		PADDINGI(3);
+		PADDINGI(3); // first 8 bytes bool[] can select player?
 		shok::Vector<StateIdData*> CommandStates;
 		CMouseEffect* MouseEffect;
 		lua_State* GameState; // 24
@@ -620,7 +638,15 @@ namespace GGUI {
 	public:
 		static inline constexpr int vtp = 0x77B2F8;
 
+		// select entity standard thiscall 0x721EF6(selectedVector*, id)
+		// select entity solier of leader thiscall 0x721F12(selectedVector*, id)
+
 		void SetControlledPlayer(int pl);
+		bool IsEntitySelected(int id) const;
+		bool SelectEntity(int id); // returns successful
+		bool DeselectEntity(int id); // returns successful
+		bool ClearSelection(); // returns successful
+		void OnSelectionChanged(); // calls lua+guistate, has to be called manually after changing selection
 
 		void HackPostEvent();
 
@@ -628,6 +654,9 @@ namespace GGUI {
 		static bool(*PostEventCallback)(BB::CEvent* ev);
 
 		static inline void(__cdecl* const PostEventFromUI)(BB::CEvent* ev) = reinterpret_cast<void(__cdecl*)(BB::CEvent*)>(0x525D77);
+
+		// checks if entity is selectable, including player, selectable flag, ...
+		static inline int(__cdecl* const GetSelectableEntity)(int id, bool soldierToLeader) = reinterpret_cast<int(__cdecl*)(int, bool)>(0x525B3E);
 
 		static bool IsModifierPressed(shok::Keys modif);
 	};

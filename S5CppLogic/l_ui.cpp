@@ -1192,10 +1192,10 @@ namespace CppLogic::UI {
 		bool hasserf = false;
 		bool hassector = false;
 		int sector = i->GetSector(&d->TargetPos);
-		for (int id : m->SelectedEntities) {
-			if (i->IsSerf(id)) {
+		for (const auto& e : m->SelectedEntities) {
+			if (i->IsSerf(e.Id)) {
 				hasserf = true;
-				if (i->GetSector(id) == sector) {
+				if (i->GetSector(e.Id) == sector) {
 					hassector = true;
 					break;
 				}
@@ -1218,9 +1218,9 @@ namespace CppLogic::UI {
 				GGL::CNetEventBuildingCreator ev{ shok::NetEventIds::CommandPlaceBuilding, m->ControlledPlayer, UpgradeCategory, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())}};
 				{
 					auto v = ev.Serf.SaveVector();
-					for (int id : m->SelectedEntities) {
-						if (m->GUIInterface->IsSerf(id))
-							v.Vector.push_back(id);
+					for (const auto& se : m->SelectedEntities) {
+						if (m->GUIInterface->IsSerf(se.Id))
+							v.Vector.push_back(se.Id);
 					}
 				}
 				GGUI::CManager::PostEventFromUI(&ev);

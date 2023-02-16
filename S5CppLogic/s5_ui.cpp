@@ -878,6 +878,16 @@ bool GGUI::CManager::ClearSelection()
 {
 	return guimng_clearsel(this);
 }
+inline bool(__thiscall* const guimng_isstatevalid)(GGUI::CManager* th, GGUI::CManager::StateIdData* s, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, GGUI::CManager::StateIdData*, int, GGUI::CBasicState::TargetData*, GGUI::CBasicState::ExecuteData*)>(0x5237A2);
+bool GGUI::CManager::IsCommandStateValid(StateIdData* s, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata)
+{
+	return guimng_isstatevalid(this, s, entity, tdata, edata);
+}
+inline GGUI::CBasicState* (__thiscall* const guimng_getcmdstate)(GGUI::CManager* th, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata) = reinterpret_cast<GGUI::CBasicState * (__thiscall*)(GGUI::CManager*, int, GGUI::CBasicState::TargetData*, GGUI::CBasicState::ExecuteData*)>(0x523FEC);
+GGUI::CBasicState* GGUI::CManager::GetCommandStateFor(int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata)
+{
+	return guimng_getcmdstate(this, entity, tdata, edata);
+}
 
 void(__stdcall* PostEventOrig)(BB::IPostEvent* th, BB::CEvent* ev) = nullptr;
 shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;

@@ -270,8 +270,8 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	L.Push(GGUI::CManager::GetSelectableEntity(L.CheckInt(1), false));
-	return 1;
+	
+	return 0;
 }
 
 int GetOptions(lua::State L) {

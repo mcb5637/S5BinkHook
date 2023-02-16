@@ -4,6 +4,7 @@
 #include "s5_maplogic.h"
 #include "s5_defines.h"
 #include "s5_player.h"
+#include "s5_guistates.h"
 
 enum class win_mouseEvents : int {
 	KeyDown = 0x100,
@@ -611,8 +612,8 @@ namespace GGUI {
 	public:
 
 		struct StateIdData {
-			int Id;
-			GGUI::CState* State;
+			shok::EntityCategory ApplyTo;
+			GGUI::CBasicState* State;
 		};
 		struct SelectionData {
 			int Id;
@@ -629,8 +630,8 @@ namespace GGUI {
 	public:
 		shok::Vector<SelectionData> SelectedEntities; //11
 		int ControlledPlayer; // 15
-		PADDINGI(3); // first 8 bytes bool[] can select player?
-		shok::Vector<StateIdData*> CommandStates;
+		bool CanSelectEntitiesOfPlayer[9];
+		shok::Vector<StateIdData*> CommandStates; // 19
 		CMouseEffect* MouseEffect;
 		lua_State* GameState; // 24
 		CMouseCursorManager* MouseCursorManager;
@@ -647,6 +648,10 @@ namespace GGUI {
 		bool DeselectEntity(int id); // returns successful
 		bool ClearSelection(); // returns successful
 		void OnSelectionChanged(); // calls lua+guistate, has to be called manually after changing selection
+		// checks if entity is of category and GGUI::CBasicState::CheckCommandValid
+		bool IsCommandStateValid(StateIdData* s, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
+		// goes through CommandStates and returns the first valid one
+		GGUI::CBasicState* GetCommandStateFor(int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
 
 		void HackPostEvent();
 
@@ -660,5 +665,5 @@ namespace GGUI {
 
 		static bool IsModifierPressed(shok::Keys modif);
 	};
-	//constexpr int i = offsetof(CManager, GameState) / 4;
+	//constexpr int i = offsetof(CManager, CommandStates) / 4;
 }

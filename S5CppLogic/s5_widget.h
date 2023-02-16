@@ -418,7 +418,7 @@ namespace EGUIX {
 	class CStringInputCustomWidget : public BB::IObject, public ICustomWidget {
 	public:
 		bool AlwaysVisible = false; // 37
-		std::string OnConfirm; // initialized with StringUserVariable0
+		shok::String OnConfirm; // initialized with StringUserVariable0
 		bool KeepContentOnClose = true, ModePassword = false, ModeCDKeyInput = false, DoNotCallConfirm = false; // 45
 		int BufferSize = 0;
 		bool IgnoreNextChar = false;

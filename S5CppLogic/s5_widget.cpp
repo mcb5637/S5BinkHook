@@ -545,6 +545,7 @@ const char* __stdcall GGUI::COnScreenElementType::GetDisplayName(const GGL::IGLG
 }
 void __declspec(naked) displaynamehook_asm() {
     __asm {
+        xor ebx, ebx;
         push edi;
         mov edi, ecx;
 

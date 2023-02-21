@@ -11,15 +11,6 @@
 #include "entityiterator.h"
 #include "hooks.h"
 
-
-struct shok_vtable_EGL_CGLEGameLogic {
-	PADDINGI(22);
-	int(__thiscall* CreateEntity)(EGL::CGLEGameLogic* th, EGL::CGLEEntityCreator* data, int i); // 22
-	int(__thiscall* CreateEffect)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data); // 23
-};
-
-
-
 void EGL::CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)
 {
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
@@ -621,27 +612,23 @@ void EGL::CGLEGameLogic::ClearToDestroy()
 	egl_gamelogic_cleardest(this);
 }
 
-int(__thiscall* CreateEffectHookedOrig)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = nullptr;
-void(*EGL::CGLEGameLogic::CreateEffectHookCallback)(int id, void* ret) = nullptr;
-int __fastcall CreateEffectHook(EGL::CGLEGameLogic* th, int _, EGL::CGLEEffectCreator* data)
+inline int(__thiscall* const CreateEffectHookedOrig)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = reinterpret_cast<int(__thiscall*)(EGL::CGLEGameLogic*, EGL::CGLEEffectCreator*)>(0x571BBB);
+void(*EGL::CGLEGameLogic::CreateEffectHookCallback)(int id) = nullptr;
+int EGL::CGLEGameLogic::CreateEffectOverride(EGL::CGLEEffectCreator* data)
 {
-	void** ebp_var = (void**)1;
-	_asm {
-		mov ebp_var, ebp;
-	}
-	int id = CreateEffectHookedOrig(th, data);
+	int id = CreateEffectHookedOrig(this, data);
 	if (EGL::CGLEGameLogic::CreateEffectHookCallback)
-		EGL::CGLEGameLogic::CreateEffectHookCallback(id, ebp_var[1]);
+		EGL::CGLEGameLogic::CreateEffectHookCallback(id);
 	return id;
 }
+bool CreateEffectHooked = false;
 void EGL::CGLEGameLogic::HookCreateEffect()
 {
-	if (CreateEffectHookedOrig)
+	if (CreateEffectHooked)
 		return;
-	shok_vtable_EGL_CGLEGameLogic* vt = *reinterpret_cast<shok_vtable_EGL_CGLEGameLogic**>(this);
-	CppLogic::Hooks::SaveVirtualProtect vp{ vt, 25 * 4 };
-	CreateEffectHookedOrig = vt->CreateEffect;
-	vt->CreateEffect = reinterpret_cast<int(__thiscall*)(EGL::CGLEGameLogic * th, EGL::CGLEEffectCreator * data)>(&CreateEffectHook);
+	CreateEffectHooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x783A28), 4 };
+	*reinterpret_cast<void**>(0x783A28) = CppLogic::Hooks::MemberFuncPointerToVoid(&CGLEGameLogic::CreateEffectOverride, 0);
 }
 
 static inline shok::WeatherState(__thiscall* const weatherdata_getnext)(GGL::CWeatherHandler* th) = reinterpret_cast<shok::WeatherState(__thiscall*)(GGL::CWeatherHandler*)>(0x4B93BD);

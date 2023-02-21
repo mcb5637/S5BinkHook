@@ -4,6 +4,8 @@
 #include "s5_entity.h"
 #include "s5_maplogic.h"
 #include "s5_widget.h"
+#include "s5_effects.h"
+#include "s5_entityandeffectmanager.h"
 
 luaext::EState::EState(lua::State L) : lua::State(L.GetState())
 {
@@ -67,6 +69,21 @@ GGL::CResourceDoodad* luaext::EState::CheckResourceDoodad(int i)
 GGL::CResourceDoodad* luaext::EState::OptResourceDoodad(int i)
 {
 	return dynamic_cast<GGL::CResourceDoodad*>(OptEntity(i));
+}
+
+EGL::CEffect* luaext::EState::OptEffect(int i)
+{
+	int id = OptInteger(i, 0);
+	if (id == 0)
+		return nullptr;
+	return (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
+}
+EGL::CEffect* luaext::EState::CheckEffect(int i)
+{
+	EGL::CEffect* d = OptEffect(i);
+	if (!d)
+		ThrowLuaFormatted("no effect at argument %d", i);
+	return d;
 }
 
 int luaext::EState::OptEntityId(int i)

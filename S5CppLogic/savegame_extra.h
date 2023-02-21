@@ -30,6 +30,7 @@ namespace CppLogic::SavegameExtra {
 		bool HookMaxRange = false;
 		bool HookDisplayName = false;
 		bool RangedEffectSoldierHeal = false;
+		bool EffectTriggers = false;
 		std::map<const std::string, std::string, StringComparator> StringTableTextOverride;
 
 		void SerializeTo(const char* path, const char* savename);

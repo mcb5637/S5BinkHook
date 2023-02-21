@@ -76,6 +76,61 @@ function CppLogic.GetOptions() end
 --- @return boolean v true/false
 function CppLogic.Effect.IsValidEffect(id) end
 
+--- gets the effect type of an effect
+--- @param id number id
+--- @return number
+function CppLogic.Effect.GetType(id) end
+
+--- gets the position of an effect
+--- @param id number id
+--- @return Position
+function CppLogic.Effect.GetPosition(id) end
+
+--- gets the player of an effect
+--- @param id number id
+--- @return number
+function CppLogic.Effect.GetPlayer(id) end
+
+--- pchecks if the effect is an arrow effect.
+--- @param id number id
+--- @return boolean
+function CppLogic.Effect.IsArrow(id) end
+
+--- checks is the effect is a cannonball effect.
+--- @param id number id
+--- @return boolean
+function CppLogic.Effect.IsCannonBall(id) end
+
+--- gets the start and end position of an cannonball or arrow effect.
+--- use CppLogic.Effect.GetPosition to get the current position.
+--- @param id number id
+--- @return Position start
+--- @return Position end
+function CppLogic.Effect.GetFlyingEffectStartEnd(id) end
+
+--- gets the combat data of an arrow effect
+--- @param id number id
+--- @return number attackerId
+--- @return number tartegId
+--- @return number damage
+--- @return boolean misses
+function CppLogic.Effect.GetArrowEffectData(id) end
+
+--- gets the combat data of a cannonball effect.
+--- @param id number id
+--- @return number attackerId
+--- @return number damage
+--- @return number aoeRange
+--- @return number damageClass
+--- @return number sourcePlayer
+--- @return Position impactPos (note: same as end position of CppLogic.Effect.GetFlyingEffectStartEnd)
+function CppLogic.Effect.GetCannonBallEffectData(id) end
+
+--- enables effect triggers: CPPLOGIC_EVENT_ON_EFFECT_CREATED, CPPLOGIC_EVENT_ON_FLYINGEFFECT_HIT, CPPLOGIC_EVENT_ON_EFFECT_DESTROYED
+--- status of this gets saved into a savegame.
+--- @param enable boolean
+function CppLogic.Effect.EnableEffectTriggers(enable) end
+
 --- create a projectile.
 --- to deal damage on impact use:
 --- - single target: dmg > 0.

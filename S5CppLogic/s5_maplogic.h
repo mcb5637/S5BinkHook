@@ -283,11 +283,14 @@ namespace EGL {
 		float GetTimeSeconds();
 		void ClearToDestroy();
 
-		void HookCreateEffect(); // currently unused
-		static void(*CreateEffectHookCallback)(int id, void* ret);
+		static void HookCreateEffect();
+		static void(*CreateEffectHookCallback)(int id);
 
 		static inline EGL::CGLEGameLogic** const GlobalObj = reinterpret_cast<EGL::CGLEGameLogic**>(0x895DAC); // also 85A3A4
 		static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
+
+	private:
+		int CreateEffectOverride(EGL::CGLEEffectCreator* data);
 	};
 	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;
 }

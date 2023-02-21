@@ -949,6 +949,9 @@ namespace shok {
 		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent
 		CppLogicEvent_OnPayday = 0x50004, // GGL::CEventGoodsTraded
 		CppLogicEvent_OnConvert = 0x50005, // CppLogic::Events::ConversionEvent
+		CppLogicEvent_OnEffectCreated = 0x50006, // EGL::CEvent1Entity
+		CppLogicEvent_OnFlyingEffectHit = 0x50007, // EGL::CEvent1Entity
+		CppLogicEvent_OnEffectDestroyed = 0x50008, // EGL::CEvent1Entity
 	};
 
 	enum class InputEventIds : int {

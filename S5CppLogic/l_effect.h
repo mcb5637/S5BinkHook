@@ -4,6 +4,7 @@
 namespace CppLogic::Effect {
 	void Init(lua::State L);
 	void Cleanup(lua::State L);
+	void OnSaveLoaded(lua::State L);
 
 	constexpr const char* EffectOnHitKey = "CppLogic::Effect_OnHit";
 }

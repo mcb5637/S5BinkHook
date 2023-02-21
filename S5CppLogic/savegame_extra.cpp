@@ -85,6 +85,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	BB::SerializationData::FieldData("HookMaxRange", MemberSerializationFieldData(SerializedMapdata, HookMaxRange)),
 	BB::SerializationData::FieldData("HookDisplayName", MemberSerializationFieldData(SerializedMapdata, HookDisplayName)),
 	BB::SerializationData::FieldData("RangedEffectSoldierHeal", MemberSerializationFieldData(SerializedMapdata, RangedEffectSoldierHeal)),
+	BB::SerializationData::FieldData("EffectTriggers", MemberSerializationFieldData(SerializedMapdata, EffectTriggers)),
 	BB::SerializationData::EmbeddedData("StringTableTextOverride", MemberSerializationSizeAndOffset(SerializedMapdata ,StringTableTextOverride), PairStrings, &StringMap),
 	BB::SerializationData::GuardData(),
 };
@@ -110,5 +111,6 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	HookMaxRange = false;
 	HookDisplayName = false;
 	RangedEffectSoldierHeal = false;
+	EffectTriggers = false;
 	StringTableTextOverride.clear();
 }

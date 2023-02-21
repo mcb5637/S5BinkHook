@@ -4,10 +4,31 @@
 #include "hooks.h"
 #include "entityiterator.h"
 
-struct shok_vtable_EGL_CFlyingEffect {
-	PADDINGI(9);
-	int(__thiscall* OnHit)(EGL::CFlyingEffect* th);
-};
+void(__stdcall*EGL::CEffect::OnDestroyCb)(EGL::CEffect* th) = nullptr;
+void __declspec(naked) effect_ondestroyhookasm() {
+	__asm {
+		mov dword ptr[edi], 0x784AE4;
+
+		mov eax, EGL::CEffect::OnDestroyCb;
+		cmp eax, 0;
+		je retu;
+		push ecx;
+		call eax;
+
+	retu:
+		push 0x588FE0;
+		ret;
+	};
+}
+bool HookOnDestroyHooked = false;
+void EGL::CEffect::HookOnDestroy()
+{
+	if (HookOnDestroyHooked)
+		return;
+	HookOnDestroyHooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x588FDA), 10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x588FDA), &effect_ondestroyhookasm, reinterpret_cast<void*>(0x588FE0));
+}
 
 
 EGL::CGLEEffectCreator::CGLEEffectCreator()
@@ -196,56 +217,39 @@ void GGL::CCannonBallEffect::HookDealDamage()
 }
 
 EGL::CFlyingEffect* EGL::CFlyingEffect::CurrentHittingEffect = nullptr;
-void (*EGL::CFlyingEffect::FlyingEffectOnHitCallback2)(EGL::CFlyingEffect* eff, bool post) = nullptr;
+void (*EGL::CFlyingEffect::FlyingEffectOnHitCallback2)(EGL::CFlyingEffect* eff) = nullptr;
 void (*EGL::CFlyingEffect::FlyingEffectOnHitCallback)(EGL::CFlyingEffect* eff) = nullptr;
-int(__thiscall* CannonBallOnHit)(EGL::CFlyingEffect* th) = nullptr;
-int __fastcall ArrowOnHitHook(EGL::CFlyingEffect* th);
-void WriteProjectlileOnHits();
-int __fastcall CannonBallOnHitHook(EGL::CFlyingEffect* th) {
-	EGL::CFlyingEffect::CurrentHittingEffect = th;
+inline void(__thiscall* const CannonBallOnHit)(GGL::CCannonBallEffect* th) = reinterpret_cast<void(__thiscall*)(GGL::CCannonBallEffect*)>(0x4FF476);
+void GGL::CCannonBallEffect::OnHitHooked()
+{
+	EGL::CFlyingEffect::CurrentHittingEffect = this;
 	if (EGL::CFlyingEffect::FlyingEffectOnHitCallback)
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback(th);
+		EGL::CFlyingEffect::FlyingEffectOnHitCallback(this);
 	if (EGL::CFlyingEffect::FlyingEffectOnHitCallback2)
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback2(th, false);
-	int i = CannonBallOnHit(th);
-	if (EGL::CFlyingEffect::FlyingEffectOnHitCallback2)
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback2(th, true);
+		EGL::CFlyingEffect::FlyingEffectOnHitCallback2(this);
+	CannonBallOnHit(this);
 	EGL::CFlyingEffect::CurrentHittingEffect = nullptr;
 	// TODO remove rewriting vtable after kimichura removes the reset of it
-	WriteProjectlileOnHits();
-	return i;
+	HookOnHit();
 }
-int(__thiscall* ArrowOnHit)(EGL::CFlyingEffect* th) = nullptr;
-int __fastcall ArrowOnHitHook(EGL::CFlyingEffect* th) {
-	EGL::CFlyingEffect::CurrentHittingEffect = th;
+inline void(__thiscall* const ArrowOnHit)(GGL::CArrowEffect* th) = reinterpret_cast<void(__thiscall*)(GGL::CArrowEffect*)>(0x511336);
+void GGL::CArrowEffect::OnHitHooked()
+{
+	EGL::CFlyingEffect::CurrentHittingEffect = this;
 	if (EGL::CFlyingEffect::FlyingEffectOnHitCallback)
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback(th);
+		EGL::CFlyingEffect::FlyingEffectOnHitCallback(this);
 	if (EGL::CFlyingEffect::FlyingEffectOnHitCallback2)
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback2(th, false);
-	int i = ArrowOnHit(th);
-	if (EGL::CFlyingEffect::FlyingEffectOnHitCallback2)
-		EGL::CFlyingEffect::FlyingEffectOnHitCallback2(th, true);
+		EGL::CFlyingEffect::FlyingEffectOnHitCallback2(this);
+	ArrowOnHit(this);
 	EGL::CFlyingEffect::CurrentHittingEffect = nullptr;
-	WriteProjectlileOnHits();
-	return i;
-}
-void WriteProjectlileOnHits() {
-	shok_vtable_EGL_CFlyingEffect* vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(GGL::CCannonBallEffect::vtp);
-	CppLogic::Hooks::SaveVirtualProtect vp{ vt, 12 * 4 };
-	vt->OnHit = reinterpret_cast<int(__thiscall*)(EGL::CFlyingEffect*)>(&CannonBallOnHitHook);
-	vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(GGL::CArrowEffect::vtp);
-	CppLogic::Hooks::SaveVirtualProtect vp2{ vt, 12 * 4 };
-	vt->OnHit = reinterpret_cast<int(__thiscall*)(EGL::CFlyingEffect*)>(&ArrowOnHitHook);
+	HookOnHit();
 }
 void EGL::CFlyingEffect::HookOnHit()
 {
-	if (CannonBallOnHit)
-		return;
-	shok_vtable_EGL_CFlyingEffect* vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(GGL::CCannonBallEffect::vtp);
-	CannonBallOnHit = vt->OnHit;
-	vt = reinterpret_cast<shok_vtable_EGL_CFlyingEffect*>(GGL::CArrowEffect::vtp);
-	ArrowOnHit = vt->OnHit;
-	WriteProjectlileOnHits();
+	CppLogic::Hooks::SaveVirtualProtect vp{ 4, {reinterpret_cast<void*>(0x778E48),
+			reinterpret_cast<void*>(0x7776B4) }};
+	*reinterpret_cast<void**>(0x778E48) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CArrowEffect::OnHitHooked, 0);
+	*reinterpret_cast<void**>(0x7776B4) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CCannonBallEffect::OnHitHooked, 0);
 }
 
 ED::IEffect* ED::CDEVisibleEffectManager::GetDisplayForEffectID(int id)

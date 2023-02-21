@@ -19,6 +19,8 @@ namespace luaext {
 		GGL::CBuilding* OptBuilding(int i);
 		GGL::CResourceDoodad* CheckResourceDoodad(int i);
 		GGL::CResourceDoodad* OptResourceDoodad(int i);
+		EGL::CEffect* OptEffect(int i);
+		EGL::CEffect* CheckEffect(int i);
 
 		int OptEntityId(int i);
 

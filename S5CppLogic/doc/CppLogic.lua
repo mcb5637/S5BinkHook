@@ -36,6 +36,7 @@ assert(false, "do not load this file, this is documentation only!")
 --- - arrow and cannonball effect on loaded fix (they now continue flying and hitting after loading a savegame) (this works even for old saves)
 CppLogic = {}
 CppLogic.Effect = {}
+CppLogic.Effect.Predicates = {}
 CppLogic.Memory = {}
 CppLogic.API = {}
 CppLogic.Combat = {}
@@ -154,6 +155,29 @@ function CppLogic.Effect.EnableEffectTriggers(enable) end
 --- @param source number what deals damage, used for triggers (default AdvancedDealDamageSource.Script) max size 8 bit instead of 32
 --- @return number effectId id
 function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source) end
+
+---@class EffectPrecticate
+local EffectPrecticate = {}
+
+--- iterates over all effect that match a predicate.
+--- you may create/destroy effects while iterating, even the current one.
+--- perfect to use with for loop.
+--- examples:
+--- - for id in CppLogic.Effect.EffectIterator(...) do Message(id) end  
+--- - for id, rsqu, prio in CppLogic.Effect.EffectIterator(CppLogic.Entity.Effect.InCircle(...), ...) do Message(id.."   "..r) end  
+--- (note that there is currently only a InCircle predicate, others can be made when needed)
+--- @param pred EffectPrecticate
+--- @return fun():number,number,number nextEntity
+--- @return nil iteratorStatus
+--- @return nil
+function CppLogic.Effect.EffectIterator(pred) end
+
+--- creates a predicate that checks for an area.
+--- when used in loop iterator, can also return the range squared for each matched entity as 2nd loop parameter (optional).
+--- @param p Position center of circle
+--- @param r number radius of circle
+--- @return EffectPrecticate
+function CppLogic.Effect.Predicates.InCircle(p, r) end
 
 --- sets high precision FPU (gets reset on every API call, so call id directly before your calculations)
 function CppLogic.Memory.SetFPU() end

@@ -11,6 +11,7 @@
 #include "luaext.h"
 #include "luaserializer.h"
 #include "savegame_extra.h"
+#include "entityiterator.h"
 
 namespace CppLogic::Effect {
 	void PushToHitCallbackReg(lua::State L) {
@@ -184,7 +185,47 @@ namespace CppLogic::Effect {
 		return 0;
 	}
 
-	constexpr std::array<lua::FuncReference, 12> Effect{ {
+	int PredicateInCircle(lua::State ls) {
+		luaext::EState L{ ls };
+		auto p = L.CheckPos(1);
+		float r = L.CheckFloat(2);
+		L.NewUserData<CppLogic::Iterator::PredicateInCircle<EGL::CEffect>>(p, r * r);
+		return 1;
+	}
+
+	int IteratorNext(lua::State L) { // (state nil, last value) -> next value
+		// no error checking here, cause that would cost speed
+		// just expect no other c/c++ code will change the funcs upvalue
+		// make sure ManagedIterator is the first class inherited from the actual iterator and we do not use luapp inheritance here
+		// (both would break this simplified pointer)
+		auto* it = static_cast<CppLogic::Iterator::ManagedIterator<EGL::CEffect>*>(L.ToUserdata(L.Upvalueindex(1)));
+		float r = -1;
+		int p = -1;
+		EGL::CEffect* e = it->GetNext(&r, &p);
+		if (e == nullptr) {
+			L.Push();
+			L.Push();
+			L.Push();
+		}
+		else {
+			L.Push(e->EffectID);
+			L.Push(r);
+			L.Push(p);
+		}
+		return 3;
+	}
+	int EffectIterator(lua::State L) {
+
+		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+
+		L.NewUserData<CppLogic::Iterator::GlobalEffectIterator>(pred); // upvalue of func
+		L.Push<IteratorNext>(1); // func
+		L.Push(); // state
+		L.Push(); // initial value
+		return 3;
+	}
+
+	constexpr std::array<lua::FuncReference, 13> Effect{ {
 			lua::FuncReference::GetRef<CreateProjectile>("CreateProjectile"),
 			lua::FuncReference::GetRef<IsValidEffect>("IsValidEffect"),
 			lua::FuncReference::GetRef<GetProjectileCallbacks>("GetProjectileCallbacks"),
@@ -197,11 +238,21 @@ namespace CppLogic::Effect {
 			lua::FuncReference::GetRef<GetCannonBallEffectData>("GetCannonBallEffectData"),
 			lua::FuncReference::GetRef<IsArrow>("IsArrow"),
 			lua::FuncReference::GetRef<IsCannonBall>("IsCannonBall"),
+			lua::FuncReference::GetRef<EffectIterator>("EffectIterator"),
+	} };
+	constexpr std::array<lua::FuncReference, 1> Predicates{ {
+			lua::FuncReference::GetRef<PredicateInCircle>("PredicateInCircle"),
 	} };
 
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(Effect, -3);
+
+		L.Push("Predicates");
+		L.NewTable();
+		L.RegisterFuncs(Predicates, -3);
+		L.SetTableRaw(-3);
+
 
 		if (L.GetState() != shok::LuaStateMainmenu) {
 			L.GetSubTable("Events");

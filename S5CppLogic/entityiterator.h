@@ -213,7 +213,7 @@ namespace CppLogic::Iterator {
 		GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
 	};
 
-	// you may create/destroy entities while iterating, even the current one (just dont try to get the current one from the iterator after destroying)
+	// you may create/destroy effects while iterating, even the current one (just dont try to get the current one from the iterator after destroying)
 	class GlobalEffectIterator : public GlobalManagedIterator<EGL::CEffect> {
 	public:
 		GlobalEffectIterator(const Predicate<EGL::CEffect>* const p);

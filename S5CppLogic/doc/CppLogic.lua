@@ -739,6 +739,10 @@ function CppLogic.API.GetCurrentThreadID() end
 --- @return number time
 function CppLogic.API.GetCurrentTime() end
 
+--- returns the current active cutscene (empty string if no cutscnene active)
+--- @return string name
+function CppLogic.API.GetCurrentCutscene() end
+
 ---@class RNG
 local RNG = {}
 

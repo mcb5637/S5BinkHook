@@ -15,6 +15,7 @@
 #include "s5_idmanager.h"
 #include "s5_config.h"
 #include "s5_exception.h"
+#include "s5_cutscene.h"
 #include "hooks.h"
 #include "luaext.h"
 
@@ -341,6 +342,11 @@ namespace CppLogic::API {
 		return 1;
 	}
 
+	int GetCurrentCutscene(lua::State L) {
+		L.Push((**ECS::CManager::GlobalObj)->ActiveCutscene.c_str());
+		return 1;
+	}
+
 	int RNG::Int(lua::State L)
 	{
 		RNG* th = L.GetUserData<RNG>(1);
@@ -420,7 +426,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 21> API{ {
+	constexpr std::array<lua::FuncReference, 22> API{ {
 			lua::FuncReference::GetRef<Eval>("Eval"),
 			lua::FuncReference::GetRef<Log>("Log"),
 			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
@@ -442,6 +448,7 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<LoadPersistentMapFile>("LoadPersistentMapFile"),
 			lua::FuncReference::GetRef<HasPersistentMapFile>("HasPersistentMapFile"),
 			lua::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
+			lua::FuncReference::GetRef<GetCurrentCutscene>("GetCurrentCutscene"),
 	} };
 
 	void Init(lua::State L)

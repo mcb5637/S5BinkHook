@@ -230,7 +230,7 @@ namespace ERwTools {
 		virtual void set52() = 0;
 	public:
 		virtual void SetEntityIDToFollow(int id) = 0;
-		virtual void SetControlMode(int mode) = 0;
+		virtual void SetControlMode(int mode) = 0; // 2 cutscene, 0 normal
 		virtual bool GetScreenCoord(float x, float y, float z, float* xout, float* yout) = 0; // 58
 	private:
 		virtual void get46() = 0;

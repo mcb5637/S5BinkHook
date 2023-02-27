@@ -1,13 +1,14 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_RWEngine.h"
 
 namespace ECS {
 	class ICallbacks {
 	public:
 		virtual void OnStart(const char* cutsceneName) = 0;
 		virtual void OnFinished(const char* cutsceneName) = 0;
-		virtual void OnTick(float[3], float[3]) = 0; // probably cam position, lookat?
+		virtual void OnTick(RWE::RwV3d*, RWE::RwV3d*) = 0; // probably cam position, lookat?
 	};
 	// Framework::CCutsceneCallBackReceiver : ICallbacks
 
@@ -16,26 +17,67 @@ namespace ECS {
 		static inline constexpr int vtp = 0x786084;
 		virtual ~ICutsceneManager() = default;
 		virtual bool IsCutsceneRunning() = 0;
-	protected:
-		virtual bool setmember13(int) = 0;
-	public:
+		virtual bool SetCallback(ICallbacks* cb) = 0;
 		virtual void ReloadCutscene(const char* path) = 0; // 3
-	protected:
-		virtual void unknownFailedAnalys() = 0;
-	public:
+		virtual void SaveCutscenesTo(const char* path) = 0;
 		virtual void Cancel() = 0; // 5
 		virtual void Start(const char* name) = 0;
 		virtual void Tick(float, float) = 0; // params from framework time mng
 	};
 
 	struct Cutscene {
+		struct PosWithTangents {
+			RWE::RwV3d Position, InTangent, OutTangent;
+
+			static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA05E38);
+		};
+
+		struct PositionFlight {
+			shok::Map<float, PosWithTangents> Element; // as Time, Data::Positios
+
+			static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA05FD8);
+		};
+		struct PositionFlightList {
+			shok::Map<float, PositionFlight> Element; // as Time, Data::Positios
+
+			static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA06260);
+		};
+
+		struct FuncFlight {
+			shok::Map<float, shok::String> Element; // as Time, FuncName
+
+			static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA06108);
+		};
+		struct FuncFlightList {
+			shok::Map<float, FuncFlight> Element;
+
+			static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA06320);
+		};
+
 		shok::String Name;
-		PADDINGI(3); // cam pos
-		PADDINGI(3); // cam lookat
-		PADDINGI(3); // luafunc
-		PADDINGI(8); // single ints/floats?
+		PositionFlightList CameraPos; // 7 CameraPos::Flights
+		PositionFlightList CameraLookAt; // CameraLookAt::Flights
+		FuncFlightList LuaFunctions; // LuaFunctions::Flights
+		int Status; // 16, 2->normal?, 1->finished?, 0->paused?
+		float StartTime1;
+		float StartTime2;
+		float Time1Last;
+		float Time1Current; // 20
+		float Time2Last;
+		float Time2Currrent;
+		float Duration; // 23 just a guess
+
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA063C0);
+
+		// start 0x59AC07 (this,float,float)
+		// update timers 0x59AC62 (this,float,float)
+		// get cam pos 0x59AC9C (this,RWE::RwV3d*)
+		// get lookat pos 0x59ACB9 (this,RWE::RwV3d*)
+		// get update funcs 0x59ACFE (this,shok::Vector<shok::String>*)
 	};
 	static_assert(sizeof(Cutscene) == 24 * 4);
+	static_assert(sizeof(Cutscene::PosWithTangents) == 9 * 4);
+	//constexpr int i = offsetof(Cutscene, i) / 4;
 
 	// cutscene manager
 	class CManager : public ICutsceneManager { 

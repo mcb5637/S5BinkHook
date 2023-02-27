@@ -65,10 +65,12 @@ namespace RWE {
 	};
 
 	struct RwV3d {
-		float x, y, z;
+		float x = 0, y = 0, z = 0;
+
+		static const inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA05D50);
 	};
 	struct RwV2d {
-		float x, y;
+		float x = 0, y = 0;
 	};
 	struct RwMatrix {
 		RwV3d right;

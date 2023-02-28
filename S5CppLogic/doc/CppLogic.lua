@@ -156,8 +156,8 @@ function CppLogic.Effect.EnableEffectTriggers(enable) end
 --- @return number effectId id
 function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source) end
 
----@class EffectPrecticate
-local EffectPrecticate = {}
+---@class EffectPredicate
+local EffectPredicate = {}
 
 --- iterates over all effect that match a predicate.
 --- you may create/destroy effects while iterating, even the current one.
@@ -165,19 +165,75 @@ local EffectPrecticate = {}
 --- examples:
 --- - for id in CppLogic.Effect.EffectIterator(...) do Message(id) end  
 --- - for id, rsqu, prio in CppLogic.Effect.EffectIterator(CppLogic.Entity.Effect.InCircle(...), ...) do Message(id.."   "..r) end  
---- (note that there is currently only a InCircle predicate, others can be made when needed)
---- @param pred EffectPrecticate
+--- @param ... EffectPredicate
 --- @return fun():number,number,number nextEntity
 --- @return nil iteratorStatus
 --- @return nil
-function CppLogic.Effect.EffectIterator(pred) end
+function CppLogic.Effect.EffectIterator(...) end
+
+--- gets all effects that match a predicate as a table.
+--- @param ... EffectPredicate
+--- @return number[]
+function CppLogic.Effect.EffectIteratorTableize(...) end
+
+--- creates a predicate that performs an and of multiple predicates.
+--- @param ... EffectPredicate
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.And(...) end
+
+--- creates a predicate that performs an or of multiple predicates.
+--- @param ... EffectPredicate
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.Or(...) end
+
+--- creates a predicate that performs an not of anoher predicate.
+--- @param p EffectPredicate
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.Not(p) end
+
+--- creates a predicate that always matches, but sets the priority to prio if p matches it.
+--- @param p EffectPredicate
+--- @param prio number
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.SetPriority(p, prio) end
 
 --- creates a predicate that checks for an area.
 --- when used in loop iterator, can also return the range squared for each matched entity as 2nd loop parameter (optional).
 --- @param p Position center of circle
 --- @param r number radius of circle
---- @return EffectPrecticate
+--- @return EffectPredicate
 function CppLogic.Effect.Predicates.InCircle(p, r) end
+
+--- creates a predicate that checks for an rectangular area.
+--- order of coordinates does not matter, just have to be grouped as x,y,x,y.
+--- @param x1 number x coordinate 1
+--- @param y1 number y coordinate 1
+--- @param x2 number x coordinate 2
+--- @param y2 number y coordinate 2
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.InRect(x1, y1, x2, y2) end
+
+--- creates a predicate that checks for an effecttype.
+--- @param t number effect type
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.OfType(t) end
+
+--- creates a predicate that checks for an effecttype.
+--- @param p number
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.OfPlayer(p) end
+
+--- creates a predicate that checks for arrow effects
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.IsArrow() end
+
+--- creates a predicate that checks for cannonball effects
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.IsCannonBall() end
+
+--- creates a predicate that checks for arrow or cannonball effects
+--- @return EffectPredicate
+function CppLogic.Effect.Predicates.IsArrowOrCannonBall() end
 
 --- sets high precision FPU (gets reset on every API call, so call id directly before your calculations)
 function CppLogic.Memory.SetFPU() end
@@ -883,7 +939,7 @@ function CppLogic.Entity.Predicates.Not(p) end
 
 --- creates a predicate that always matches, but sets the priority to prio if p matches it.
 --- @param p Predicate
---- @param prio Predicate
+--- @param prio number
 --- @return Predicate
 function CppLogic.Entity.Predicates.SetPriority(p, prio) end
 
@@ -906,7 +962,7 @@ function CppLogic.Entity.Predicates.OfPlayer(pl) end
 function CppLogic.Entity.Predicates.InCircle(x, y, r) end
 
 --- creates a predicate that checks for building.
---- (GGL::CConstructionSite entities get filtred out, their attached GGL::CBuilding not.)
+--- (GGL::CConstructionSite entities get filtered out, their attached GGL::CBuilding not.)
 --- @return Predicate
 function CppLogic.Entity.Predicates.IsBuilding() end
 

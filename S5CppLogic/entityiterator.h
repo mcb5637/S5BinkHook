@@ -492,4 +492,29 @@ namespace CppLogic::Iterator {
 		EntityPredicateOfAnyType(std::initializer_list<int> ety);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
+
+	class EffectPredicateOfType : public Predicate<EGL::CEffect> {
+		int Type;
+	public:
+		EffectPredicateOfType(int ty);
+		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
+	};
+	class EffectPredicateOfPlayer : public Predicate<EGL::CEffect> {
+		int Player;
+	public:
+		EffectPredicateOfPlayer(int pl);
+		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
+	};
+	class EffectPredicateIsArrow : public Predicate<EGL::CEffect> {
+	public:
+		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
+	};
+	class EffectPredicateIsCannonBall : public Predicate<EGL::CEffect> {
+	public:
+		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
+	};
+	class EffectPredicateIsArrowOrCannonBall : public Predicate<EGL::CEffect> {
+	public:
+		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
+	};
 }

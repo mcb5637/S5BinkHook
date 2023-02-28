@@ -249,3 +249,37 @@ bool CppLogic::Iterator::EntityPredicateOfAnyType::Matches(const EGL::CGLEEntity
 			return true;
 	return false;
 }
+
+CppLogic::Iterator::EffectPredicateOfType::EffectPredicateOfType(int ty)
+{
+	Type = ty;
+}
+bool CppLogic::Iterator::EffectPredicateOfType::Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const
+{
+	return e->EffectType == Type;
+}
+
+CppLogic::Iterator::EffectPredicateOfPlayer::EffectPredicateOfPlayer(int pl)
+{
+	Player = pl;
+}
+bool CppLogic::Iterator::EffectPredicateOfPlayer::Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const
+{
+	return e->PlayerID == Player;
+}
+
+bool CppLogic::Iterator::EffectPredicateIsArrow::Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const
+{
+	return e->GetClassIdentifier() == GGL::CArrowEffect::Identifier;
+}
+
+bool CppLogic::Iterator::EffectPredicateIsCannonBall::Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const
+{
+	return e->GetClassIdentifier() == GGL::CCannonBallEffect::Identifier;
+}
+
+bool CppLogic::Iterator::EffectPredicateIsArrowOrCannonBall::Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const
+{
+	unsigned int id = e->GetClassIdentifier();
+	return id == GGL::CArrowEffect::Identifier || id == GGL::CCannonBallEffect::Identifier;
+}

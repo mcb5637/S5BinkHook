@@ -193,6 +193,95 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
+	int PredicateInRect(lua::State L) {
+		float x1 = L.CheckFloat(1);
+		float y1 = L.CheckFloat(2);
+		float x2 = L.CheckFloat(3);
+		float y2 = L.CheckFloat(4);
+		L.NewUserData<CppLogic::Iterator::PredicateInRect<EGL::CEffect>>(x1, y1, x2, y2);
+		return 1;
+	}
+
+	int PredicateOfType(lua::State L) {
+		L.NewUserData<CppLogic::Iterator::EffectPredicateOfType>(L.CheckInt(1));
+		return 1;
+	}
+
+	int PredicateOfPlayer(lua::State L) {
+		L.NewUserData<CppLogic::Iterator::EffectPredicateOfPlayer>(L.CheckInt(1));
+		return 1;
+	}
+
+	int PredicateIsArrow(lua::State L) {
+		L.NewUserData<CppLogic::Iterator::EffectPredicateIsArrow>();
+		return 1;
+	}
+
+	int PredicateIsCannonBall(lua::State L) {
+		L.NewUserData<CppLogic::Iterator::EffectPredicateIsCannonBall>();
+		return 1;
+	}
+
+	int PredicateIsArrowOrCannonBall(lua::State L) {
+		L.NewUserData<CppLogic::Iterator::EffectPredicateIsArrowOrCannonBall>();
+		return 1;
+	}
+
+	int PredicateAnd(lua::State L) {
+		const int num = L.GetTop();
+		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicAnd<EGL::CEffect>>();
+		p->preds.reserve(num);
+		L.NewTable();
+		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
+			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(i));
+			L.PushValue(i);
+			L.SetTableRaw(-2, i);
+		}
+		p->L = L.GetState();
+		p->r = L.Ref(L.REGISTRYINDEX);
+		return 1;
+	}
+	void PredicateAndAutoCreate(lua::State L) { // clear stack after creating and predicate
+		PredicateAnd(L);
+		L.Insert(1);
+		L.SetTop(1);
+	}
+
+	int PredicateOr(lua::State L) {
+		const int num = L.GetTop();
+		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicOr<EGL::CEffect>>();
+		p->preds.reserve(num);
+		L.NewTable();
+		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
+			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(i));
+			L.PushValue(i);
+			L.SetTableRaw(-2, i);
+		}
+		p->L = L.GetState();
+		p->r = L.Ref(L.REGISTRYINDEX);
+		return 1;
+	}
+
+	int PredicateNot(lua::State L) {
+		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+		auto* p = L.NewUserData<CppLogic::Iterator::PredicateNot<EGL::CEffect>>(pred);
+		L.PushValue(1);// keep predicate, so they dont get gced
+		p->L = L.GetState();
+		p->r = L.Ref(L.REGISTRYINDEX);
+		return 1;
+	}
+
+	int PredicateSetPriority(lua::State L) {
+		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+		int pri = L.CheckInt(2);
+		auto* p = L.NewUserData<CppLogic::Iterator::PredicatePriority<EGL::CEffect>>(pred, pri);
+		L.PushValue(1);// keep predicate, so they dont get gced
+		p->L = L.GetState();
+		p->r = L.Ref(L.REGISTRYINDEX);
+		return 1;
+	}
+
+
 	int IteratorNext(lua::State L) { // (state nil, last value) -> next value
 		// no error checking here, cause that would cost speed
 		// just expect no other c/c++ code will change the funcs upvalue
@@ -215,9 +304,10 @@ namespace CppLogic::Effect {
 		return 3;
 	}
 	int EffectIterator(lua::State L) {
-
+		if (L.GetTop() > 1) { // auto create an and predicate
+			PredicateAndAutoCreate(L);
+		}
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
-
 		L.NewUserData<CppLogic::Iterator::GlobalEffectIterator>(pred); // upvalue of func
 		L.Push<IteratorNext>(1); // func
 		L.Push(); // state
@@ -225,7 +315,23 @@ namespace CppLogic::Effect {
 		return 3;
 	}
 
-	constexpr std::array<lua::FuncReference, 13> Effect{ {
+	int EffectIteratorTableize(lua::State L) {
+		if (L.GetTop() > 1) { // auto create an and predicate
+			PredicateAndAutoCreate(L);
+		}
+		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+		int index = 1;
+		L.NewTable();
+		CppLogic::Iterator::GlobalEffectIterator it{ pred };
+		for (EGL::CEffect* e : it) {
+			L.Push(e->EffectID);
+			L.SetTableRaw(2, index);
+			index++;
+		}
+		return 1;
+	}
+
+	constexpr std::array<lua::FuncReference, 14> Effect{ {
 			lua::FuncReference::GetRef<CreateProjectile>("CreateProjectile"),
 			lua::FuncReference::GetRef<IsValidEffect>("IsValidEffect"),
 			lua::FuncReference::GetRef<GetProjectileCallbacks>("GetProjectileCallbacks"),
@@ -239,9 +345,20 @@ namespace CppLogic::Effect {
 			lua::FuncReference::GetRef<IsArrow>("IsArrow"),
 			lua::FuncReference::GetRef<IsCannonBall>("IsCannonBall"),
 			lua::FuncReference::GetRef<EffectIterator>("EffectIterator"),
+			lua::FuncReference::GetRef<EffectIteratorTableize>("EffectIteratorTableize"),
 	} };
-	constexpr std::array<lua::FuncReference, 1> Predicates{ {
-			lua::FuncReference::GetRef<PredicateInCircle>("PredicateInCircle"),
+	constexpr std::array<lua::FuncReference, 11> Predicates{ {
+			lua::FuncReference::GetRef<PredicateInCircle>("InCircle"),
+			lua::FuncReference::GetRef<PredicateInRect>("InRect"),
+			lua::FuncReference::GetRef<PredicateOfType>("OfType"),
+			lua::FuncReference::GetRef<PredicateOfPlayer>("OfPlayer"),
+			lua::FuncReference::GetRef<PredicateIsArrow>("IsArrow"),
+			lua::FuncReference::GetRef<PredicateIsCannonBall>("IsCannonBall"),
+			lua::FuncReference::GetRef<PredicateIsArrowOrCannonBall>("IsArrowOrCannonBall"),
+			lua::FuncReference::GetRef<PredicateAnd>("And"),
+			lua::FuncReference::GetRef<PredicateOr>("Or"),
+			lua::FuncReference::GetRef<PredicateNot>("Not"),
+			lua::FuncReference::GetRef<PredicateSetPriority>("SetPriority"),
 	} };
 
 	void Init(lua::State L)

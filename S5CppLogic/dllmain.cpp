@@ -259,11 +259,26 @@ public:
 	}
 };
 
+std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
+{
+	try {
+		std::rethrow_exception(ex);
+	}
+	catch (const BB::CException& e) {
+		char buff[200]{};
+		e.CopyMessage(buff, sizeof(buff));
+		return std::format("{}: {} in {}", typeid(e).name(), buff, funcsig);
+	}
+	catch (const exception& e) {
+		return std::format("{}: {} in {}", typeid(e).name(), e.what(), funcsig);
+	}
+}
+
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x59A344)());
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x59A344)());
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x5CA15E96);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -271,8 +286,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	
-	return 1;
+	return 0;
 }
 
 int GetOptions(lua::State L) {
@@ -320,6 +334,7 @@ void OnSaveDone(const char* path, const char* savename) {
 }
 
 void InitGame() {
+	lua::ExceptionConverter = &BBExceptionConverter;
 	Framework::CMain::HookModeChange();
 	Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
 	Framework::CMain::OnSaveLoaded = &OnSaveLoaded;

@@ -20,3 +20,12 @@ namespace BB {
 		static inline constexpr int vtp = 0x77F46C;
 	};
 }
+
+// standard libary used by shok (no idea why this is not std::exception)
+class exception {
+public:
+	virtual ~exception() = default;
+	virtual const char* what() const = 0;
+
+	static inline constexpr int vtp = 0x788EF8;
+};

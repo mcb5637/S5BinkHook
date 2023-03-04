@@ -107,6 +107,8 @@ namespace shok {
 
 	static inline char* (__cdecl* const CopyString)(const char* s) = reinterpret_cast<char* (__cdecl*)(const char*)>(0x547BD5);
 	static inline void(__cdecl* const StringToLowerCase)(char* s) = reinterpret_cast<void(__cdecl*)(char* s)>(0x547C81);
+
+	// dynamic cast 0x5C36EE __cdecl(obj, vtoffset, from, to, reference)
 }
 
 namespace BB {

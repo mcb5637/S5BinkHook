@@ -611,7 +611,7 @@ void EGL::CMovingEntity::LeaderAttachSoldier(int soldierId)
 {
 	EGL::CEvent1Entity ev{ shok::EventIDs::Leader_AttachSoldier, soldierId };
 	FireEvent(&ev);
-	BB::CEvent e2{ shok::EventIDs::Formation_AssumePosition };
+	BB::CEvent e2{ shok::EventIDs::Formation_SetFormationTaskList };
 	EGL::CGLEEntity* sol = EGL::CGLEEntity::GetEntityByID(soldierId);
 	sol->FireEvent(&e2);
 }
@@ -1408,7 +1408,7 @@ void EGL::CGLEEntity::HookLuaTaskList()
 void(__thiscall* movementbeh_setmovetarget)(GGL::CBehaviorDefaultMovement* m, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBehaviorDefaultMovement*, shok::Position*)>(0x586894);
 void __thiscall EGL::CMovingEntity::BuildOnSetPosFixed()
 {
-	if (MovementState != shok::MovementState::Moving && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
+	if (MovementState == shok::MovementState::Moving && EGL::CGLEEntity::BuildOnSetPosFixMovement) {
 		GGL::CBehaviorDefaultMovement* mov = GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (mov) {
 			movementbeh_setmovetarget(mov, &TargetPosition);

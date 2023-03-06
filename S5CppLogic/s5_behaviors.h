@@ -847,11 +847,13 @@ namespace GGL {
 
 		// defined tasks: TASK_ASSUME_POSITION_IN_FORMATION, TASK_IDLE_IN_FORMATION
 		// defined states: IdleInFormation, AssumePositionInFormation
-		// defined events: Formation_AssumePosition
+		// defined events: Formation_XXX
 
 		static inline constexpr int vtp = 0x776D60;
 		static inline constexpr int TypeDesc = 0x8212A4;
 		static inline constexpr unsigned int Identifier = 0x0C9C36977;
+
+		shok::Position GetFormationPosition();
 	};
 
 	class CCamperBehavior : public EGL::CGLEBehavior {

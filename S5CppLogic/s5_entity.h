@@ -36,7 +36,7 @@ namespace shok {
 	enum class MovementState : int {
 		Moving = 0,
 		//MoveDone = 1, ? rotate?
-		Standing = 0,
+		Standing = 2,
 	};
 }
 
@@ -378,7 +378,7 @@ namespace EGL {
 		byte TargetRotationValid;
 		PADDING(3);
 		float TargetRotation;
-		shok::MovementState MovementState; // 70 0 when staning, 2 when moving
+		shok::MovementState MovementState; // 70
 
 		static inline constexpr int vtp = 0x783F84;
 		static inline constexpr int TypeDesc = 0x8077EC;

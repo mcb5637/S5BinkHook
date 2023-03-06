@@ -142,6 +142,12 @@ EGL::CEventSoundPositionAndID::CEventSoundPositionAndID(shok::EventIDs e, int so
 	Looped = looped;
 }
 
+EGL::CEventGetPosition::CEventGetPosition(shok::EventIDs e)
+	: BB::CEvent(e)
+{
+	SetVT(vtp);
+}
+
 GGL::CEventAttachmentTypeGetInteger::CEventAttachmentTypeGetInteger(shok::EventIDs e, shok::AttachmentType t) : BB::CEvent(e)
 {
 	SetVT(GGL::CEventAttachmentTypeGetInteger::vtp);

@@ -893,6 +893,16 @@ void GGL::CAutoCannonBehavior::HookRangeOverride()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F50D), &autocannonmaxrangeasm, reinterpret_cast<void*>(0x50F515));
 }
 
+inline void(__thiscall* const formationbeh_getfrompos)(GGL::CFormationBehavior* th, shok::Position* p, EGL::CGLEEntity* lead) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, shok::Position*, EGL::CGLEEntity*)>(0x4F7962);
+shok::Position GGL::CFormationBehavior::GetFormationPosition()
+{
+	shok::Position p;
+	int leaderid = EGL::CGLEEntity::GetEntityByID(EntityId)->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
+	auto* lead = EGL::CGLEEntity::GetEntityByID(leaderid);
+	formationbeh_getfrompos(this, &p, lead);
+	return p;
+}
+
 static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);
 GGL::CPositionAtResourceFinder* GGL::CPositionAtResourceFinder::CreateByEntity(int entityid)
 {

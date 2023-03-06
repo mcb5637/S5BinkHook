@@ -294,6 +294,19 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x76D4B0;
 	};
+
+	class CEventGetPosition : public BB::CEvent {
+	public:
+		shok::Position Position;
+
+		CEventGetPosition(shok::EventIDs e);
+		CEventGetPosition(CEventGetPosition&&) = default;
+		CEventGetPosition(const CEventGetPosition&) = default;
+		CEventGetPosition& operator=(CEventGetPosition&&) = default;
+		CEventGetPosition& operator=(const CEventGetPosition&) = default;
+
+		static inline constexpr int vtp = 0x7743CC;
+	};
 }
 
 namespace GGL {
@@ -584,7 +597,7 @@ namespace CppLogic::Events {
 
 namespace shok {
 	enum class EventIDs : int {
-		NoDetachEvent = 0, // only use for attachmen detach event
+		NoDetachEvent = 0, // only use for attachment detach event
 
 		ResourceDoodad_RemoveOneRes = 0x10002, //BB::CEvent unused
 		OnResourceDoodadDetach = 0x10003, //EGL::CEvent1Entity, also bserf
@@ -628,13 +641,17 @@ namespace shok {
 		Follow_StartFollowing = 0x1100A, //GGL::CEventFollowInfo
 		Follow_CheckTargetStillAlive = 0x1100B, //BB::CEvent
 		Follow_GetFollowBehavior = 0x1100C, //EGL::CEventGetValue<GGL::CBehaviorFollow *,-1301899769>
+
+		Movement_GetNextFineWaypoint = 0x1100E, //EGL::CEventGetPosition
+		Movement_MoveTo = 0x1100D, //EGL::CEventPosition better not use this, use MoveCommand
+		Movement_OnSetMoveTo = 0x11017, //BB::CEvent better not use this, use MoveCommand
 		// 0x1100F evade behavior? BB::CEvent
 		Leader_ApproachPos = 0x1101A, //EGL::CEventPosition
 		// 1101B follow semms to return -1, lots of calls
 		Battle_SetBattleWalkAnim = 0x1101C, //BB::CEvent
-		// 1101E formation get pos in formation?
 
-		// 1100D, 1100E, 11017 something default movement
+		Formation_GetPosInFormation = 0x1101E, //EGL::CEventPosition
+
 		// 11002 bino cancel
 		// 11003 serfbattle, set territory?
 
@@ -717,9 +734,9 @@ namespace shok {
 		Battle_SetBattleStatus = 0x15012, //EGL::CEventValue<int,-27574121>
 		Battle_GetDamageClass = 0x15013, //EGL::CEventGetValue<int, 1211121895>
 		Leader_GetCurrentNumSoldier = 0x15016, //EGL::CEventGetValue<int, 1211121895>
-		Formation_AssumePosition = 0x15017, //BB::CEvent
-		Leader_SetNudgeCount = 0x15018, //EGL::CEventValue<int,-27574121>
-		Leader_GetNudgeCount = 0x15019, //EGL::CEventGetValue<int, 1211121895>
+		Formation_SetFormationTaskList = 0x15017, //BB::CEvent
+		Leader_SetFormation = 0x15018, //EGL::CEventValue<int,-27574121>
+		Leader_GetFormation = 0x15019, //EGL::CEventGetValue<int, 1211121895>
 		// 1501C soldier some other entity
 		Battle_OnTargetDetached = 0x1501D, //EGL::CEvent1Entity
 		Leader_GetSoldierType = 0x1501E, //EGL::CEventGetValue<int,1211121895>

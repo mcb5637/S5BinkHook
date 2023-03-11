@@ -13,9 +13,7 @@ namespace EGL {
 		virtual void __thiscall AddHandlers(int id) = 0; // 3
 		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
 		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
-	private:
-		virtual void __thiscall unknownFuncBeh1(EGL::CGLEEntity* e); // on movement seems to copy a lot of data, maybe change behavior?
-	public:
+		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old); // on movement seems to copy a lot of data, maybe change behavior?
 		virtual void __thiscall OnEntityDestroy(bool ev); // 7 usually empty, ev is false when destroyed normally, entity is still valid when called (not the case in dtor)
 
 	public:
@@ -862,7 +860,21 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x0C9C36977;
 
 		shok::Position GetFormationPosition();
+
+	protected:
+		virtual void __thiscall AddHandlers(int id) override;
+		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old) override;
+
+		int TaskAssumePositionInForation(EGL::CGLETaskArgs* t);
+		int TaskIdleInFormation(EGL::CGLETaskArgs* t);
+		void EventAssumePositionInFormation(BB::CEvent* ev);
+		void EventGetPositionInFormation(EGL::CEventGetPosition* ev);
+		shok::TaskStateExecutionResult StateIdleInFormation(int u);
+		shok::TaskStateExecutionResult StateAssumePositionInFormation(int u);
 	};
+	static_assert(sizeof(CFormationBehavior) == 6 * 4);
 
 	class CCamperBehavior : public EGL::CGLEBehavior {
 	public:

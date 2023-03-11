@@ -15,7 +15,7 @@
 #include "EntityAddonData.h"
 #include "savegame_extra.h"
 
-void EGL::CGLEBehavior::unknownFuncBeh1(EGL::CGLEEntity* e)
+void EGL::CGLEBehavior::OnEntityUpgrade(EGL::CGLEEntity* e)
 {
 }
 void EGL::CGLEBehavior::OnEntityDestroy(bool uk)
@@ -913,6 +913,56 @@ shok::Position GGL::CFormationBehavior::GetFormationPosition()
 	auto* lead = EGL::CGLEEntity::GetEntityByID(leaderid);
 	formationbeh_getfrompos(this, &p, lead);
 	return p;
+}
+
+inline void(__thiscall* const formationbeh_addhandlers)(GGL::CFormationBehavior* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, int)>(0x4F8C51);
+void __thiscall GGL::CFormationBehavior::AddHandlers(int id)
+{
+	formationbeh_addhandlers(this, id);
+}
+void __thiscall GGL::CFormationBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+void __thiscall GGL::CFormationBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+inline void(__thiscall* const formationbeh_onupgrade)(GGL::CFormationBehavior* th, EGL::CGLEEntity* o) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, EGL::CGLEEntity*)>(0x4F71A9);
+void __thiscall GGL::CFormationBehavior::OnEntityUpgrade(EGL::CGLEEntity* old)
+{
+	formationbeh_onupgrade(this, old);
+}
+
+inline int(__thiscall* const formationbeh_taskassumepos)(GGL::CFormationBehavior* th, EGL::CGLETaskArgs* t) = reinterpret_cast<int(__thiscall*)(GGL::CFormationBehavior*, EGL::CGLETaskArgs*)>(0x4F8780);
+int GGL::CFormationBehavior::TaskAssumePositionInForation(EGL::CGLETaskArgs* t)
+{
+	return formationbeh_taskassumepos(this, t);
+}
+inline int(__thiscall* const formationbeh_idleinform)(GGL::CFormationBehavior* th, EGL::CGLETaskArgs* t) = reinterpret_cast<int(__thiscall*)(GGL::CFormationBehavior*, EGL::CGLETaskArgs*)>(0x4F7152);
+int GGL::CFormationBehavior::TaskIdleInFormation(EGL::CGLETaskArgs* t)
+{
+	return formationbeh_idleinform(this, t);
+}
+inline void(__thiscall* const formationbeh_eventassumepos)(GGL::CFormationBehavior* th, BB::CEvent* ev) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, BB::CEvent*)>(0x4F7176);
+void GGL::CFormationBehavior::EventAssumePositionInFormation(BB::CEvent* ev)
+{
+	formationbeh_eventassumepos(this, ev);
+}
+inline void(__thiscall* const formationbeh_eventgetposinform)(GGL::CFormationBehavior* th, EGL::CEventGetPosition* ev) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, EGL::CEventGetPosition*)>(0x4F884B);
+void GGL::CFormationBehavior::EventGetPositionInFormation(EGL::CEventGetPosition* ev)
+{
+	formationbeh_eventgetposinform(this, ev);
+}
+inline shok::TaskStateExecutionResult(__thiscall* const formationbeh_stateidleinform)(GGL::CFormationBehavior* th, int u) = reinterpret_cast<shok::TaskStateExecutionResult(__thiscall*)(GGL::CFormationBehavior*, int)>(0x4F8898);
+shok::TaskStateExecutionResult GGL::CFormationBehavior::StateIdleInFormation(int u)
+{
+	return formationbeh_stateidleinform(this, u);
+}
+inline shok::TaskStateExecutionResult(__thiscall* const formationbeh_stateassumepos)(GGL::CFormationBehavior* th, int u) = reinterpret_cast<shok::TaskStateExecutionResult(__thiscall*)(GGL::CFormationBehavior*, int)>(0x4F8957);
+shok::TaskStateExecutionResult GGL::CFormationBehavior::StateAssumePositionInFormation(int u)
+{
+	return formationbeh_stateassumepos(this, u);
 }
 
 static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);

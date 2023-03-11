@@ -68,6 +68,8 @@ namespace EGL {
 	using CEventGetValue_Bool = CEventGetValue<bool, 0x65DE8317>;
 	using CEventGetValue_Int = CEventGetValue<int, 0x483040E7>;
 	using CEventGetValue_Float = CEventGetValue<float, 0x578EE8F7>;
+
+	class CEventGetPosition;
 }
 namespace GGL {
 	class CBuilding;

@@ -663,11 +663,17 @@ namespace GGL {
 		//		TASK_BATTLE_WAIT_UNTIL, TASK_SET_LATEST_ATTACK_TURN, TASK_WAIT_FOR_LATEST_ATTACK, TASK_RESOLVE_BATTLE_COLLISION
 
 		virtual void SetCurrentCommand(shok::LeaderCommand cmd) = 0; // only sets the command int, not the tasklist
+	private:
+		virtual int retzero() = 0;
+		virtual void __stdcall unknownbattle() = 0;
+	public:
+		virtual void GetCurrentDefendPos(shok::Position* out) = 0; // current or defend if leader+defend Command
+
 		// 5 more virt funcs
 
 		static inline constexpr int vtp = 0x77313C;
 		static inline constexpr int TypeDesc = 0x815EEC;
-		static inline constexpr unsigned int Identifier = 0x0C4F1C42D;
+		static inline constexpr unsigned int Identifier = 0xC4F1C42D;
 
 		float GetMaxRange() const;
 		int GetDamage() const;
@@ -679,6 +685,8 @@ namespace GGL {
 		bool CheckMiss(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
 		float __thiscall GetMaxRangeBase() const;
 		bool CanAutoAttack(); // checks feared, leadercommand (not heroability,move,guard) and event Battle_DisableAutoAttack
+		float GetDamageClassFactorAgainst(EGL::CGLEEntity* target);
+		int GetRandomAttackAnim(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();
@@ -728,7 +736,7 @@ namespace GGL {
 	public:
 
 		// defined states: 1, 24
-		// defined events: Leader_Hurt, Leader_GetAttackTarget (forwards to leader), HeroAbility_Reset, Soldier_XXX, IsSoldier
+		// defined events: Leader_Hurt, Leader_GetAttackTarget (forwards to leader), HeroAbility_Reset, Soldier_XXX, IsSoldier, Battle_OnAttackAnimStartsAgainst
 		// defined tasks: TASK_GO_TO_POS, TASK_LEAVE_BARRACKS
 
 		static inline constexpr int vtp = 0x773CC8;

@@ -722,6 +722,7 @@ namespace shok {
 
 		Leader_AttackEntity = 0x15004, //EGL::CEvent1Entity
 		Leader_OnAttackCommandTargetDetach = 0x15005, //EGL::CEvent1Entity
+		Battle_OnAttackAnimStartsAgainst = 0x15006, //EGL::CEvent1Entity
 		Soldier_OnLeaderDetach = 0x15007, //EGL::CEvent1Entity
 		Leader_OnSoldierDetach = 0x15008, //EGL::CEvent1Entity
 		Leader_AttachSoldier = 0x15009, //EGL::CEvent1Entity

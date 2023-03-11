@@ -279,17 +279,16 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x59A344)());
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x5CA15E96);
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x866ADB5D);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto* s = L.CheckSettler(1);
-	EGL::CEventGetPosition ev{ (shok::EventIDs)0x1100E };
-	s->FireEvent(&ev);
-	L.PushPos(ev.Position);
+	auto s = L.CheckSettler(1);
+	auto b = s->GetBehaviorDynamic<GGL::CBattleBehavior>();
+	L.Push(reinterpret_cast<float(__thiscall*)(void*, void*)>(0x50B668)(b, L.CheckEntity(2)));
 	return 1;
 }
 

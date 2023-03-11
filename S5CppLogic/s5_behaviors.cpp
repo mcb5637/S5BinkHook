@@ -480,6 +480,18 @@ bool GGL::CBattleBehavior::CanAutoAttack()
 	return battlebeh_canattack(this);
 }
 
+inline float(__thiscall* const battlebeh_getdmgclsfactvs)(GGL::CBattleBehavior* th, EGL::CGLEEntity* t) = reinterpret_cast<float(__thiscall*)(GGL::CBattleBehavior*, EGL::CGLEEntity*)>(0x50B668);
+float GGL::CBattleBehavior::GetDamageClassFactorAgainst(EGL::CGLEEntity* target)
+{
+	return battlebeh_getdmgclsfactvs(this, target);
+}
+
+inline int (__thiscall*const attlebeh_getrandomattanim)(GGL::CBattleBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CBattleBehavior*)>(0x50AA39);
+int GGL::CBattleBehavior::GetRandomAttackAnim()
+{
+	return attlebeh_getrandomattanim(this);
+}
+
 float __thiscall GGL::CBattleBehavior::GetMaxRangeBase() const
 {
 	const EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);

@@ -273,6 +273,9 @@
     <ClInclude Include="s5_RWE_io.h">
       <Filter>shok\engine</Filter>
     </ClInclude>
+    <ClInclude Include="ModBehavior.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -433,6 +436,9 @@
     </ClCompile>
     <ClCompile Include="EntityAddonData.cpp">
       <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ModBehavior.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

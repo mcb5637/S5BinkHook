@@ -14,6 +14,7 @@
 #include "hooks.h"
 #include "EntityAddonData.h"
 #include "savegame_extra.h"
+#include "mod.h"
 
 void EGL::CGLEBehavior::OnEntityUpgrade(EGL::CGLEEntity* e)
 {
@@ -21,8 +22,6 @@ void EGL::CGLEBehavior::OnEntityUpgrade(EGL::CGLEEntity* e)
 void EGL::CGLEBehavior::OnEntityDestroy(bool uk)
 {
 }
-
-BB::SerializationData* EGL::CGLEBehavior::SerializationData = reinterpret_cast<BB::SerializationData*>(0x86A828);
 
 inline void(__thiscall* const path_waypoint_removelast)(EGL::CCoarsePath::WaypointData* th) = reinterpret_cast<void(__thiscall*)(EGL::CCoarsePath::WaypointData*)>(0x508988);
 void EGL::CCoarsePath::WaypointData::RemoveLastWaypoint()
@@ -906,12 +905,16 @@ void GGL::CAutoCannonBehavior::HookRangeOverride()
 }
 
 inline void(__thiscall* const formationbeh_getfrompos)(GGL::CFormationBehavior* th, shok::Position* p, EGL::CGLEEntity* lead) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, shok::Position*, EGL::CGLEEntity*)>(0x4F7962);
+void GGL::CFormationBehavior::GetFormationPosition(EGL::CGLEEntity* leader, shok::Position* out)
+{
+	formationbeh_getfrompos(this, out, leader);
+}
 shok::Position GGL::CFormationBehavior::GetFormationPosition()
 {
 	shok::Position p;
 	int leaderid = EGL::CGLEEntity::GetEntityByID(EntityId)->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
 	auto* lead = EGL::CGLEEntity::GetEntityByID(leaderid);
-	formationbeh_getfrompos(this, &p, lead);
+	GetFormationPosition(lead, &p);
 	return p;
 }
 
@@ -963,6 +966,34 @@ inline shok::TaskStateExecutionResult(__thiscall* const formationbeh_stateassume
 shok::TaskStateExecutionResult GGL::CFormationBehavior::StateAssumePositionInFormation(int u)
 {
 	return formationbeh_stateassumepos(this, u);
+}
+
+shok::Position* __thiscall GGL::CFormationBehavior::GetPosOverride(shok::Position* p, EGL::CGLEEntity* leader)
+{
+	auto* i = CastToIdentifier<CppLogic::Mod::IFormationBehaviorExtProvider>();
+	if (i == nullptr)
+		GetFormationPosition(leader, p);
+	else
+		*p = i->GetPosExt(leader);
+	return p;
+}
+bool Form_HookGetPosExtIHooked = false;
+void GGL::CFormationBehavior::HookGetPosExtI()
+{
+	if (Form_HookGetPosExtIHooked)
+		return;
+	Form_HookGetPosExtIHooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
+		reinterpret_cast<void*>(0x4F8818),
+		reinterpret_cast<void*>(0x4F8880),
+		reinterpret_cast<void*>(0x4F892D),
+		reinterpret_cast<void*>(0x4F89D1),
+	} };
+	void* tocall = CppLogic::Hooks::MemberFuncPointerToVoid(&CFormationBehavior::GetPosOverride, 0);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F8818), tocall);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F8880), tocall);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F892D), tocall);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F89D1), tocall);
 }
 
 static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);

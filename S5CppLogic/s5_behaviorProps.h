@@ -11,7 +11,7 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x813728;
 		static inline constexpr unsigned int Identifier = 0x29B5CF4D;
 
-		static BB::SerializationData* SerializationData;
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x86A768);
 	};
 	static_assert(offsetof(EGL::CGLEBehaviorProps, BehaviorIndex) == 2 * 4);
 
@@ -386,7 +386,10 @@ namespace GGL {
 		static inline constexpr int vtp = 0x776DE4;
 		static inline constexpr int TypeDesc = 0x8212CC;
 		static inline constexpr unsigned int Identifier = 0xB55A9DE7;
+
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x875A40);
 	};
+	static_assert(sizeof(CFormationBehaviorProperties) == 8 * 4);
 
 	class CCamperBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:

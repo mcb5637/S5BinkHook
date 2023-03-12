@@ -132,6 +132,11 @@ namespace BB {
 			unsigned int(__stdcall* GetClassIdentifier)(const BB::IObject* th);
 			void* (__stdcall* CastToIdentifier)(BB::IObject* th, unsigned int id);
 		};
+
+		template<HasValidIdentifier To>
+		To* CastToIdentifier() {
+			return static_cast<To*>(CastToIdentifier(To::Identifier));
+		}
 	};
 
 	template<HasValidIdentifier CastTo, class CastFrom, HasValidIdentifier... AdditionalSubClasses>

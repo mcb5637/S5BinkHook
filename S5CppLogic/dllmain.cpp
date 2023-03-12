@@ -46,6 +46,7 @@
 #include "luaserializer.h"
 #include "savegame_extra.h"
 #include "EntityAddonData.h"
+#include "ModBehavior.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -355,6 +356,7 @@ void InitGame() {
 		EScr::LuaStateSerializer::HookSerializationOverride();
 	EScr::CScriptTriggerSystem::HookFireEvent();
 	CppLogic::EntityAddon::EntityAddonData::Init();
+	CppLogic::Mod::RegisterClasses();
 }
 
 constexpr double Version = 2.0005;

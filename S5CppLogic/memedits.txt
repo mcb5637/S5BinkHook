@@ -37,6 +37,7 @@ changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C
 0x778E38 GGL::CArrowEffect::OnLoaded vtable override empty func replaced
 0x7776A4 GGL::CCannonBallEffect::OnLoaded vtable override empty func replaced
 0x588FDA EGL::CEffect dtor jmp
+0x4F8818, 0x4F8880, 0x4F892D, 0x4F89D1 all calls to GGL::CFormationBehavior::GetFormationPosition redirect
 
 only without SCELoader
 
@@ -98,4 +99,7 @@ list of used identifiers
 0x1005 CppLogic::UI::GUIState_PlaceBuildingEx
 0x1006 BreakOnCmdBehavior (debug only)
 0x1007 CppLogic::Events::AdvHurtByEvent
+0x1008 CppLogic::Mod::IFormationBehaviorExtProvider
+0x1009 CppLogic::Mod::FormationSpacedBehaviorProps
+0x1010 CppLogic::Mod::FormationSpacedBehavior
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

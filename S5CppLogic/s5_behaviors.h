@@ -18,7 +18,7 @@ namespace EGL {
 
 	public:
 		static inline constexpr int TypeDesc = 0x813778;
-		static BB::SerializationData* SerializationData;
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x86A828);
 		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
 	};
 
@@ -857,7 +857,9 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776D60;
 		static inline constexpr int TypeDesc = 0x8212A4;
-		static inline constexpr unsigned int Identifier = 0x0C9C36977;
+		static inline constexpr unsigned int Identifier = 0xC9C36977;
+
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x875988);
 
 		shok::Position GetFormationPosition();
 
@@ -873,6 +875,12 @@ namespace GGL {
 		void EventGetPositionInFormation(EGL::CEventGetPosition* ev);
 		shok::TaskStateExecutionResult StateIdleInFormation(int u);
 		shok::TaskStateExecutionResult StateAssumePositionInFormation(int u);
+
+		void GetFormationPosition(EGL::CGLEEntity* leader, shok::Position* out);
+
+		static void HookGetPosExtI();
+	private:
+		shok::Position* __thiscall GetPosOverride(shok::Position* p, EGL::CGLEEntity* leader);
 	};
 	static_assert(sizeof(CFormationBehavior) == 6 * 4);
 

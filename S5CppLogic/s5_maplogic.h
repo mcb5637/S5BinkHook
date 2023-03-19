@@ -230,6 +230,24 @@ namespace EGL {
 		float CurrentWeatherSpeedFactor;
 	};
 
+	struct RegionDataEntity { // not sure if it has anything to do with region
+		struct Entry {
+			shok::Vector<EGL::CGLEEntity*> EntitiesByAccessCategory[7];
+			PADDINGI(2);
+
+			shok::Vector<EGL::CGLEEntity*>& GetByAccessCategory(shok::AccessCategory ac);
+		};
+		shok::Vector<Entry> Data;
+
+		Entry* GetEntry(const shok::Position& p);
+	private:
+		size_t GetEntryId(const shok::Position& p);
+		// add entity 587AF1
+		// remove entity 587A1C
+		// on entity move 587B4D __thiscall(this, entity, lastpos)
+	};
+	static_assert(sizeof(RegionDataEntity::Entry) == 120);
+
 	class IGLEGameLogic : public BB::IPostEvent {
 
 	};
@@ -240,7 +258,8 @@ namespace EGL {
 		LogicGameTime* InGameTime; // 7
 		PADDINGI(1);
 		EGL::CGLELandscape* Landscape; // 9
-		PADDINGI(9);
+		RegionDataEntity RegionDataEntityObj; // 10
+		PADDINGI(5);
 		EGL::GameLogicExplorationStuff* SomeStuff; // 19
 		PADDINGI(8);
 		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
@@ -292,6 +311,7 @@ namespace EGL {
 	private:
 		int CreateEffectOverride(EGL::CGLEEffectCreator* data);
 	};
+	static_assert(offsetof(CGLEGameLogic, RNG) == 4 * 34);
 	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;
 }
 

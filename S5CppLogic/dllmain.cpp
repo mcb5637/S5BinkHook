@@ -287,9 +287,17 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto s = L.CheckSettler(1);
-	auto b = s->GetBehaviorDynamic<GGL::CBattleBehavior>();
-	L.Push(reinterpret_cast<float(__thiscall*)(void*, void*)>(0x50B668)(b, L.CheckEntity(2)));
+	shok::Position p = L.CheckPos(1);
+	auto ac = static_cast<shok::AccessCategory>(L.CheckInt(2));
+	EGL::RegionDataEntity& d = (*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj;
+	auto* ent = d.GetEntry(p);
+	L.NewTable();
+	int i = 1;
+	for (auto* e : ent->GetByAccessCategory(ac)) {
+		L.Push(e->EntityId);
+		L.SetTableRaw(-2, i);
+		++i;
+	}
 	return 1;
 }
 

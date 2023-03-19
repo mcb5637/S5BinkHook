@@ -586,6 +586,25 @@ void EGL::GameLogicExplorationStuff::ActivateUpdateOfExplorationForAllPlayers()
 	gamelogicexplo_activateexploforall(this);
 }
 
+shok::Vector<EGL::CGLEEntity*>& EGL::RegionDataEntity::Entry::GetByAccessCategory(shok::AccessCategory ac)
+{
+	return EntitiesByAccessCategory[static_cast<unsigned int>(ac)];
+}
+
+EGL::RegionDataEntity::Entry* EGL::RegionDataEntity::GetEntry(const shok::Position& p)
+{
+	auto id = GetEntryId(p);
+	if (id == *reinterpret_cast<size_t*>(0x898990))
+		return nullptr;
+	return &Data[id];
+}
+
+inline size_t(__thiscall* const regiondataent_getentry)(EGL::RegionDataEntity* th, const shok::Position* p) = reinterpret_cast<size_t(__thiscall*)(EGL::RegionDataEntity*, const shok::Position*)>(0x58763C);
+size_t EGL::RegionDataEntity::GetEntryId(const shok::Position& p)
+{
+	return regiondataent_getentry(this, &p);
+}
+
 int EGL::CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
 {
 	return CreateEntity(cr, 1);

@@ -367,7 +367,7 @@ void InitGame() {
 	CppLogic::Mod::RegisterClasses();
 }
 
-constexpr double Version = 2.0005;
+constexpr double Version = 2.0006;
 
 int ResetCppLogic(lua::State L) {
 	L.Push("CppLogic");

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <filesystem>
 #include "savegame_extra.h"
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
@@ -13,8 +14,8 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 {
 	SavegameName = savename;
 	std::string p{ path };
-	p.append("\\CppLogic.bin");
-	auto* s = BB::CBinarySerializer::Create(0);
+	p.append("\\CppLogic.xml");
+	auto* s = BB::CXmlSerializer::Create();
 	try {
 		BB::CFileStreamEx f{};
 		if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultWrite)) {
@@ -28,13 +29,23 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 		shok::LogString(__FUNCSIG__" error: %s\n", buff);
 	}
 	s->Destroy();
+	try {
+		std::filesystem::path pa{ path };
+		pa.concat("\\CppLogic.bin");
+		if (std::filesystem::exists(pa)) {
+			std::filesystem::remove(pa);
+		}
+	}
+	catch (const std::exception& e) {
+		shok::LogString(__FUNCSIG__" error: %s\n", e.what());
+	}
 }
 
 void CppLogic::SavegameExtra::SerializedMapdata::DeserializeFrom(const char* path, const char* savename)
 {
 	std::string p{ path };
-	p.append("\\CppLogic.bin");
-	auto* s = BB::CBinarySerializer::Create(0);
+	p.append("\\CppLogic.xml");
+	auto* s = BB::CXmlSerializer::Create();
 	try {
 		BB::CFileStreamEx f{};
 		if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultRead)) {

@@ -304,7 +304,6 @@ namespace CppLogic::Entity {
 		luaext::EState L{ Ls };
 		shok::Position p = L.CheckPos(1);
 		float r = L.CheckFloat(2);
-		shok::AARect area{ p + shok::Position{r,r}, p - shok::Position{r,r} };
 		shok::AccessCategoryFlags acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
 		L.Remove(3);
 		L.Remove(2);
@@ -316,7 +315,7 @@ namespace CppLogic::Entity {
 
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 
-		L.NewUserData<CppLogic::Iterator::MultiRegionEntityIterator>(area, acf, pred); // upvalue of func
+		L.NewUserData<CppLogic::Iterator::MultiRegionEntityIterator>(p, r, acf, pred); // upvalue of func
 		L.Push<EntityIteratorNext>(1); // func
 		L.Push(); // state
 		L.Push(); // initial value

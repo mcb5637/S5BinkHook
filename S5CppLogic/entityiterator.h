@@ -247,7 +247,9 @@ namespace CppLogic::Iterator {
 		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
 		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<int> pls);
 	};
-
+	// you may not create/destroy entities while iterating
+	// area defines only the regions to search, you need a predicate for an exact area check
+	// the actually searched area may (and likely is) bigger than the constructors area, but never smaller
 	class MultiRegionEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 		const int BaseX, BaseY;
 		const int EndX, EndY;
@@ -259,7 +261,9 @@ namespace CppLogic::Iterator {
 		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
 		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
+		MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* const p);
 		MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* const p);
+		MultiRegionEntityIterator(const shok::Position& center, float range, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* const p);
 	};
 
 	template<class T, size_t s>

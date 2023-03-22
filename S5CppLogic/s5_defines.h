@@ -330,7 +330,8 @@ namespace shok {
 		AccessCategoryOrnamental = 6,
 	};
 	enum class AccessCategoryFlags : int {
-		AccessCategoryNone = 0,
+		None = 0,
+		AccessCategoryNone = 1,
 		AccessCategorySettler = 1 << 1,
 		AccessCategoryAnimal = 1 << 2,
 		AccessCategoryBuilding = 1 << 3,

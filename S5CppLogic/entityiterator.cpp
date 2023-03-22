@@ -88,13 +88,23 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetCurrentBase(c
 	return(*EGL::CGLEEntityManager::GlobalObj)->GetById(ah->EntityInSystem[base].EntityID);
 }
 
-CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories,
+CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories,
 	const Predicate<EGL::CGLEEntity>* const p)
 	: ManagedIterator<EGL::CGLEEntity>(p), ac(accessCategories),
-	BaseX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(area.high.X, area.low.X))),
-	BaseY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(area.high.Y, area.low.Y))),
-	EndX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(area.high.X, area.low.X))),
-	EndY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(area.high.Y, area.low.Y)))
+	BaseX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(x1, x2))),
+	BaseY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(y1, y2))),
+	EndX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(x1, x2))),
+	EndY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(y1, y2)))
+{
+}
+CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories,
+	const Predicate<EGL::CGLEEntity>* const p)
+	: MultiRegionEntityIterator(area.high.X, area.high.Y, area.low.X, area.low.Y, accessCategories, p)
+{
+}
+CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(const shok::Position& center, float range, shok::AccessCategoryFlags accessCategories,
+	const Predicate<EGL::CGLEEntity>* const p)
+	: MultiRegionEntityIterator(center.X + range, center.Y + range, center.X - range, center.Y - range, accessCategories, p)
 {
 }
 

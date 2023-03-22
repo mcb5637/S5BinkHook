@@ -18,18 +18,18 @@ CppLogic::Iterator::PlayerEntityIterator::PlayerEntityIterator(int player, const
 	: ManagedIterator<EGL::CGLEEntity>(p), ah(*(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(player)->PlayerAttractionHandler)
 {
 }
-EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetNextBase(int& c) const
+EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetNextBase(EntityIteratorStatus& c) const
 {
-	c++;
-	if (c >= static_cast<int>(ah.EntityInSystem.size()))
+	c.EntityIndex++;
+	if (c.EntityIndex >= static_cast<int>(ah.EntityInSystem.size()))
 		return nullptr;
-	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah.EntityInSystem[c].EntityID);
+	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah.EntityInSystem[c.EntityIndex].EntityID);
 }
-EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetCurrentBase(int c) const
+EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetCurrentBase(const EntityIteratorStatus& c) const
 {
-	if (c >= static_cast<int>(ah.EntityInSystem.size()))
+	if (c.EntityIndex >= static_cast<int>(ah.EntityInSystem.size()))
 		return nullptr;
-	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah.EntityInSystem[c].EntityID);
+	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah.EntityInSystem[c.EntityIndex].EntityID);
 }
 
 CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p)
@@ -44,19 +44,19 @@ CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const P
 		throw std::out_of_range("too many players");
 	std::copy(pls.begin(), pls.end(), Players.begin());
 }
-EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(int& c) const
+EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(EntityIteratorStatus& c) const
 {
 	int base;
 	int pl;
-	if (c == -1) {
+	if (c.EntityIndex == -1) {
 		if (Players[0] <= 0)
 			return nullptr;
 		base = 0;
 		pl = 0;
 	}
 	else {
-		base = (c & 0xFFFFFF) + 1;
-		pl = (c & 0xF000000) >> (6 * 4);
+		base = c.EntityIndex + 1;
+		pl = c.X;
 	}
 	const GGL::CPlayerAttractionHandler* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(Players[pl])->PlayerAttractionHandler;
 	if (base >= static_cast<int>(ah->EntityInSystem.size())) {
@@ -72,19 +72,95 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(int&
 		}
 		base = 0;
 	}
-	c = (pl << (6 * 4)) | base;
+	c.EntityIndex = base;
+	c.X = pl;
 	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah->EntityInSystem[base].EntityID);
 }
-EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetCurrentBase(int c) const
+EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetCurrentBase(const EntityIteratorStatus& c) const
 {
-	if (c == -1)
+	if (c.EntityIndex == -1)
 		return nullptr;
-	int base = (c & 0xFFFFFF);
-	int pl = (c & 0xF000000) >> (6 * 4);
+	int base = c.EntityIndex;
+	int pl = c.X;
 	const GGL::CPlayerAttractionHandler* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(Players[pl])->PlayerAttractionHandler;
 	if (base >= static_cast<int>(ah->EntityInSystem.size()))
 		return nullptr;
 	return(*EGL::CGLEEntityManager::GlobalObj)->GetById(ah->EntityInSystem[base].EntityID);
+}
+
+CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories,
+	const Predicate<EGL::CGLEEntity>* const p)
+	: ManagedIterator<EGL::CGLEEntity>(p), ac(accessCategories),
+	BaseX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(area.high.X, area.low.X))),
+	BaseY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(area.high.Y, area.low.Y))),
+	EndX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(area.high.X, area.low.X))),
+	EndY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(area.high.Y, area.low.Y)))
+{
+}
+
+EGL::CGLEEntity* CppLogic::Iterator::MultiRegionEntityIterator::GetNextBase(EntityIteratorStatus& c) const
+{
+	if (c.EntityIndex == -1) {
+		c.X = BaseX - 1;
+		c.Y = BaseY;
+		NextRegion(c);
+	}
+	EGL::RegionDataEntity& reg = (*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj;
+	while (true) {
+		++c.EntityIndex;
+		auto* ent = reg.GetEntry(c.X, c.Y);
+		if (c.EntityIndex < static_cast<int>(ent->GetByAccessCategory(c.ac).size()))
+			return ent->GetByAccessCategory(c.ac)[c.EntityIndex];
+		if (NextAccessCategory(c))
+			continue;
+		if (NextRegion(c))
+			continue;
+		return nullptr;
+	}
+	return nullptr;
+}
+EGL::CGLEEntity* CppLogic::Iterator::MultiRegionEntityIterator::GetCurrentBase(const EntityIteratorStatus& c) const
+{
+	if (c.EntityIndex == -1)
+		return nullptr;
+	EGL::RegionDataEntity& reg = (*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj;
+	auto* ent = reg.GetEntry(c.X, c.Y);
+	return ent->GetByAccessCategory(c.ac)[c.EntityIndex];
+}
+bool CppLogic::Iterator::MultiRegionEntityIterator::NextAccessCategory(EntityIteratorStatus& c) const {
+	int ac = static_cast<int>(c.ac);
+	c.EntityIndex = -1;
+	while (true) {
+		++ac;
+		if (ac > static_cast<int>(shok::AccessCategory::AccessCategoryOrnamental)) {
+			c.ac = shok::AccessCategory::AccessCategoryNone;
+			return false;
+		}
+		if ((1 << ac) & static_cast<int>(this->ac)) {
+			c.ac = static_cast<shok::AccessCategory>(ac);
+			return true;
+		}
+	}
+}
+bool CppLogic::Iterator::MultiRegionEntityIterator::NextRegion(EntityIteratorStatus& c) const {
+	int s = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes->MaxSizeX >> 5;
+	while (true) {
+		++c.X;
+		if (c.X > EndX) {
+			c.X = BaseX - 1;
+			++c.Y;
+			if (c.Y > EndY)
+				return false;
+			continue;
+		}
+		if (c.X < 0 || c.X > s)
+			continue;
+		if (c.Y < 0 || c.Y > s)
+			continue;
+		c.ac = shok::AccessCategory::AccessCategoryNone;
+		NextAccessCategory(c);
+		return true;
+	}
 }
 
 

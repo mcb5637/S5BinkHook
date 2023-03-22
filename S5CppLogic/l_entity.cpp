@@ -280,6 +280,49 @@ namespace CppLogic::Entity {
 		return 3;
 	}
 
+	int RegionEntityIteratorRect(lua::State Ls) {
+		luaext::EState L{ Ls };
+		shok::AARect area{ L.CheckPos(1), L.CheckPos(2) };
+		shok::AccessCategoryFlags acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
+		L.Remove(3);
+		L.Remove(2);
+		L.NewUserData<CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity>>(area);
+		if (L.GetTop() > 1) { // auto create an and predicate
+			L.Replace(1);
+			PredicateAndAutoCreate(L);
+		}
+
+		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+
+		L.NewUserData<CppLogic::Iterator::MultiRegionEntityIterator>(area, acf, pred); // upvalue of func
+		L.Push<EntityIteratorNext>(1); // func
+		L.Push(); // state
+		L.Push(); // initial value
+		return 3;
+	}
+	int RegionEntityIteratorCircle(lua::State Ls) {
+		luaext::EState L{ Ls };
+		shok::Position p = L.CheckPos(1);
+		float r = L.CheckFloat(2);
+		shok::AARect area{ p + shok::Position{r,r}, p - shok::Position{r,r} };
+		shok::AccessCategoryFlags acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
+		L.Remove(3);
+		L.Remove(2);
+		L.NewUserData<CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity>>(p, r * r);
+		if (L.GetTop() > 1) { // auto create an and predicate
+			L.Replace(1);
+			PredicateAndAutoCreate(L);
+		}
+
+		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+
+		L.NewUserData<CppLogic::Iterator::MultiRegionEntityIterator>(area, acf, pred); // upvalue of func
+		L.Push<EntityIteratorNext>(1); // func
+		L.Push(); // state
+		L.Push(); // initial value
+		return 3;
+	}
+
 	int CheckPredicate(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* s = L.CheckEntity(1);
@@ -1903,7 +1946,7 @@ namespace CppLogic::Entity {
 		SettlerCleanupAnimTask(L);
 	}
 
-	constexpr std::array<lua::FuncReference, 34> Entity{ {
+	constexpr std::array<lua::FuncReference, 36> Entity{ {
 			lua::FuncReference::GetRef<GetScale>("GetScale"),
 			lua::FuncReference::GetRef<SetScale>("SetScale"),
 			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
@@ -1933,6 +1976,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<EntityIteratorTableize>("EntityIteratorTableize"),
 			lua::FuncReference::GetRef<LEntityIterator>("EntityIterator"),
 			lua::FuncReference::GetRef<PlayerEntityIterator>("PlayerEntityIterator"),
+			lua::FuncReference::GetRef<RegionEntityIteratorRect>("RegionEntityIteratorRect"),
+			lua::FuncReference::GetRef<RegionEntityIteratorCircle>("RegionEntityIteratorCircle"),
 			lua::FuncReference::GetRef<EntityIteratorGetNearest>("EntityIteratorGetNearest"),
 			lua::FuncReference::GetRef<EntityIteratorCount>("EntityIteratorCount"),
 			lua::FuncReference::GetRef<CheckPredicate>("CheckPredicate"),

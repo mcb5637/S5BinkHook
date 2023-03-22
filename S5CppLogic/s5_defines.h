@@ -1,4 +1,5 @@
 #pragma once
+#include "enumflags.h"
 
 namespace shok {
 	enum class DiploState : int {
@@ -328,6 +329,17 @@ namespace shok {
 		AccessCategoryStatic = 5,
 		AccessCategoryOrnamental = 6,
 	};
+	enum class AccessCategoryFlags : int {
+		AccessCategoryNone = 0,
+		AccessCategorySettler = 1 << 1,
+		AccessCategoryAnimal = 1 << 2,
+		AccessCategoryBuilding = 1 << 3,
+		AccessCategoryResourceDoodad = 1 << 4,
+		AccessCategoryStatic = 1 << 5,
+		AccessCategoryOrnamental = 1 << 6,
+	};
+	template<>
+	class ::enum_is_flags<AccessCategoryFlags> : public std::true_type {};
 	enum class WeatherState : int {
 		Invalid = 0,
 		Summer = 1,

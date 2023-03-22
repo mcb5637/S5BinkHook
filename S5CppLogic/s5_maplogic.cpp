@@ -604,6 +604,27 @@ size_t EGL::RegionDataEntity::GetEntryId(const shok::Position& p)
 {
 	return regiondataent_getentry(this, &p);
 }
+inline void(__thiscall* const regiondataent_getcomp)(EGL::RegionDataEntity* th, const shok::Position* p, int* x, int* y) = reinterpret_cast<void(__thiscall*)(EGL::RegionDataEntity*, const shok::Position*, int*, int*)>(0x5875B7);
+void EGL::RegionDataEntity::GetEntryComponents(const shok::Position& p, int& x, int& y)
+{
+	regiondataent_getcomp(this, &p, &x, &y);
+}
+inline size_t(__thiscall* const regiondataent_getidbycomp)(EGL::RegionDataEntity* th, int x, int y) = reinterpret_cast<size_t(__thiscall*)(EGL::RegionDataEntity*, int, int)>(0x57A237);
+size_t EGL::RegionDataEntity::GetEntryIdByComponents(int x, int y)
+{
+	return regiondataent_getidbycomp(this, x, y);
+}
+EGL::RegionDataEntity::Entry* EGL::RegionDataEntity::GetEntry(int x, int y)
+{
+	auto id = GetEntryIdByComponents(x, y);
+	if (id == *reinterpret_cast<size_t*>(0x898990))
+		return nullptr;
+	return &Data[id];
+}
+int EGL::RegionDataEntity::GetSingleEntryComponent(float x)
+{
+	return static_cast<int>(std::floor(x * *reinterpret_cast<float*>(0x784A18)));
+}
 
 int EGL::CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
 {

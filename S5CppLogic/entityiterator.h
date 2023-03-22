@@ -22,22 +22,30 @@ namespace CppLogic::Iterator {
 		using BaseClass = Predicate<T>;
 	};
 
+	struct EntityIteratorStatus {
+		int EntityIndex = -1, X = -1, Y = -1;
+		shok::AccessCategory ac = shok::AccessCategory::AccessCategoryNone;
+
+		auto operator<=>(const EntityIteratorStatus&) const = default;
+	};
 	template<class T>
 	class ManagedIterator {
-		int current = -1;
+	public:
+	private:
+		EntityIteratorStatus current;
 	public:
 		const Predicate<T>* const Pred;
 		ManagedIterator(const Predicate<T>* const p) : Pred(p) {
 		}
 	protected:
 		// return nullptr on end
-		virtual T* GetNextBase(int& c) const = 0;
-		virtual T* GetCurrentBase(int c) const = 0;
+		virtual T* GetNextBase(EntityIteratorStatus& c) const = 0;
+		virtual T* GetCurrentBase(const EntityIteratorStatus& c) const = 0;
 	public:
 		void Reset() {
-			current = -1;
+			current = EntityIteratorStatus{};
 		}
-		T* GetNext(int& curr, float* rangeOut, int* prio) const {
+		T* GetNext(EntityIteratorStatus& curr, float* rangeOut, int* prio) const {
 			while (true) {
 				T* c = GetNextBase(curr);
 				if (!c)
@@ -53,9 +61,9 @@ namespace CppLogic::Iterator {
 		class Iter {
 			friend class ManagedIterator<T>;
 			const ManagedIterator& it;
-			int curr;
+			EntityIteratorStatus curr;
 
-			Iter(const ManagedIterator& i, int curr) : it(i) {
+			Iter(const ManagedIterator& i, EntityIteratorStatus curr) : it(i) {
 				this->curr = curr;
 			}
 		public:
@@ -67,7 +75,7 @@ namespace CppLogic::Iterator {
 			}
 			Iter& operator++() {
 				if (!it.GetNext(curr, nullptr, nullptr))
-					curr = -1;
+					curr = EntityIteratorStatus{};
 				return *this;
 			}
 			Iter operator++(int) {
@@ -77,12 +85,12 @@ namespace CppLogic::Iterator {
 			}
 		};
 		Iter begin() {
-			Iter i{ *this, -1 };
+			Iter i{ *this, EntityIteratorStatus{} };
 			++i;
 			return i;
 		}
 		Iter end() {
-			return { *this, -1 };
+			return { *this, EntityIteratorStatus{} };
 		}
 
 		struct ExtendedData {
@@ -93,10 +101,10 @@ namespace CppLogic::Iterator {
 		class EIter {
 			friend class ManagedIterator<T>;
 			const ManagedIterator& it;
-			int curr;
+			EntityIteratorStatus curr;
 			ExtendedData Data;
 
-			EIter(const ManagedIterator& i, int curr) : it(i) {
+			EIter(const ManagedIterator& i, EntityIteratorStatus curr) : it(i) {
 				this->curr = curr;
 			}
 		public:
@@ -111,7 +119,7 @@ namespace CppLogic::Iterator {
 				Data.Priority = -1;
 				Data.Object = it.GetNext(curr, &Data.Range, &Data.Priority);
 				if (!Data.Object)
-					curr = -1;
+					curr = EntityIteratorStatus{};
 				return *this;
 			}
 			EIter operator++(int) {
@@ -121,12 +129,12 @@ namespace CppLogic::Iterator {
 			}
 		};
 		EIter Ebegin() {
-			EIter i{ *this, -1 };
+			EIter i{ *this, EntityIteratorStatus{} };
 			++i;
 			return i;
 		}
 		EIter Eend() {
-			return { *this, -1 };
+			return { *this, EntityIteratorStatus{} };
 		}
 		class EIterCreator {
 			friend class ManagedIterator<T>;
@@ -192,18 +200,18 @@ namespace CppLogic::Iterator {
 			manager = mng;
 		}
 
-		virtual T* GetNextBase(int& c) const override {
+		virtual T* GetNextBase(EntityIteratorStatus& c) const override {
 			while (true) {
-				c++;
-				if (c > manager->HighestUsedSlot)
+				c.EntityIndex++;
+				if (c.EntityIndex > manager->HighestUsedSlot)
 					return nullptr;
-				T* r = manager->GetInSlot(c);
+				T* r = manager->GetInSlot(c.EntityIndex);
 				if (r)
 					return r;
 			}
 		}
-		virtual T* GetCurrentBase(int c) const override {
-			return manager->GetInSlot(c);
+		virtual T* GetCurrentBase(const EntityIteratorStatus& c) const override {
+			return manager->GetInSlot(c.EntityIndex);
 		}
 	};
 
@@ -223,8 +231,8 @@ namespace CppLogic::Iterator {
 	class PlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 		const GGL::CPlayerAttractionHandler& ah;
 	protected:
-		virtual EGL::CGLEEntity* GetNextBase(int& c) const override;
-		virtual EGL::CGLEEntity* GetCurrentBase(int c) const override;
+		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
+		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
 		PlayerEntityIterator(int player, const Predicate<EGL::CGLEEntity>* const p);
 	};
@@ -233,11 +241,25 @@ namespace CppLogic::Iterator {
 	public:
 		std::array<int, 9> Players;
 	protected:
-		virtual EGL::CGLEEntity* GetNextBase(int& c) const override;
-		virtual EGL::CGLEEntity* GetCurrentBase(int c) const override;
+		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
+		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
 		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
 		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<int> pls);
+	};
+
+	class MultiRegionEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
+		const int BaseX, BaseY;
+		const int EndX, EndY;
+		const shok::AccessCategoryFlags ac;
+
+		bool NextAccessCategory(EntityIteratorStatus& c) const;
+		bool NextRegion(EntityIteratorStatus& c) const;
+	protected:
+		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
+		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
+	public:
+		MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* const p);
 	};
 
 	template<class T, size_t s>

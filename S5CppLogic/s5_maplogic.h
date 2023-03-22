@@ -240,13 +240,23 @@ namespace EGL {
 		shok::Vector<Entry> Data;
 
 		Entry* GetEntry(const shok::Position& p);
+		void GetEntryComponents(const shok::Position& p, int& x, int& y);
+		Entry* GetEntry(int x, int y);
+		int GetSingleEntryComponent(float x);
 	private:
+		size_t GetEntryIdByComponents(int x, int y);
 		size_t GetEntryId(const shok::Position& p);
 		// add entity 587AF1
 		// remove entity 587A1C
 		// on entity move 587B4D __thiscall(this, entity, lastpos)
 	};
 	static_assert(sizeof(RegionDataEntity::Entry) == 120);
+
+	// multi region entity iterator
+	// ctor 582FB7 (this, pos, range, accessCategoryBits, 0, predicate)
+	// go next 5830BD -> has next
+	// get current 583027
+	// dtor 58300C
 
 	class IGLEGameLogic : public BB::IPostEvent {
 

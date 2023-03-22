@@ -873,6 +873,7 @@ local Predicate = {}
 --- iterates over all entities that match a predicate.
 --- you may create/destroy entities while iterating, even the current one.
 --- perfect to use with for loop.
+--- needs at least 1 predicate.
 --- examples:
 --- - for id in CppLogic.Entity.EntityIterator(...) do Message(id) end  
 --- - for id, rsqu, prio in CppLogic.Entity.EntityIterator(CppLogic.Entity.Predicates.InCircle(...), ...) do Message(id.."   "..r) end  
@@ -888,8 +889,9 @@ function CppLogic.Entity.EntityIterator(...) end
 --- do not create/destroy entities while iterating.
 --- you have to manually create an and predicate.
 --- perfect to use with for loop.
+--- needs exactly 1 predicate.
 --- examples:
---- - for id in CppLogic.Entity.EntityIterator(...) do Message(id) end  
+--- - for id in CppLogic.Entity.PlayerEntityIterator(...) do Message(id) end  
 --- - for id, rsqu, prio in CppLogic.Entity.PlayerEntityIterator(CppLogic.Entity.Predicates.InCircle(...), 1) do Message(id.."   "..r) end  
 --- @param pred Predicate userdata
 --- @param ... number players
@@ -897,6 +899,40 @@ function CppLogic.Entity.EntityIterator(...) end
 --- @return nil iteratorStatus
 --- @return nil
 function CppLogic.Entity.PlayerEntityIterator(pred, ...) end
+
+--- iterates over all entities in a circle based on Regions that match a predicate.
+--- for small areas faster than EntityIterator and a InCircle predicate.
+--- do not create/destroy entities while iterating.
+--- automatically creates a InCircle predicate.
+--- perfect to use with for loop.
+--- examples:
+--- - for id in CppLogic.Entity.RegionEntityIteratorCircle(...) do Message(id) end  
+--- - for id, rsqu, prio in CppLogic.Entity.RegionEntityIteratorCircle(...) do Message(id.."   "..r) end  
+--- @param pos Position center of circle
+--- @param range number radius of circle
+--- @param accessCategories number accessCategories bitfield (2->settler, 4->animal, 8->building, 16->resource doodad, 32->static, 64->ornamental)
+--- @param ... Predicate
+--- @return fun():number,number,number nextEntity
+--- @return nil iteratorStatus
+--- @return nil
+function CppLogic.Entity.RegionEntityIteratorCircle(pos, range, accessCategories, ...) end
+
+--- iterates over all entities in a circle based on Regions that match a predicate.
+--- for small areas faster than EntityIterator and a InRect predicate.
+--- do not create/destroy entities while iterating.
+--- automatically creates a InRect predicate.
+--- perfect to use with for loop.
+--- examples:
+--- - for id in CppLogic.Entity.RegionEntityIteratorRect(...) do Message(id) end  
+--- - for id, rsqu, prio in CppLogic.Entity.RegionEntityIteratorRect(...) do Message(id.."   "..r) end  
+--- @param pos1 Position position 1
+--- @param pos2 Position posotion 2
+--- @param accessCategories number accessCategories bitfield (2->settler, 4->animal, 8->building, 16->resource doodad, 32->static, 64->ornamental)
+--- @param ... Predicate
+--- @return fun():number,number,number nextEntity
+--- @return nil iteratorStatus
+--- @return nil
+function CppLogic.Entity.RegionEntityIteratorRect(pos1, pos2, accessCategories, ...) end
 
 --- gets all entities that match a predicate as a table.
 --- @param ... Predicate userdata

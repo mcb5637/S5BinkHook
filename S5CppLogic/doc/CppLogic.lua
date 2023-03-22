@@ -917,7 +917,7 @@ function CppLogic.Entity.PlayerEntityIterator(pred, ...) end
 --- @return nil
 function CppLogic.Entity.RegionEntityIteratorCircle(pos, range, accessCategories, ...) end
 
---- iterates over all entities in a circle based on Regions that match a predicate.
+--- iterates over all entities in a rect based on Regions that match a predicate.
 --- for small areas faster than EntityIterator and a InRect predicate.
 --- do not create/destroy entities while iterating.
 --- automatically creates a InRect predicate.

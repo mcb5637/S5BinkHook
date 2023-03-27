@@ -252,12 +252,6 @@ namespace EGL {
 	};
 	static_assert(sizeof(RegionDataEntity::Entry) == 120);
 
-	// multi region entity iterator
-	// ctor 582FB7 (this, pos, range, accessCategoryBits, 0, predicate)
-	// go next 5830BD -> has next
-	// get current 583027
-	// dtor 58300C
-
 	class IGLEGameLogic : public BB::IPostEvent {
 
 	};

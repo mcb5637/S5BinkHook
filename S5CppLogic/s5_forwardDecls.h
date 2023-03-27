@@ -38,6 +38,7 @@ namespace shok {
 	enum class AccessCategory : int;
 	enum class WeatherState : int;
 	enum class WorkerReason : int;
+	enum class AccessCategoryFlags : int;
 
 	class Technology;
 	class TechCategoryManager;

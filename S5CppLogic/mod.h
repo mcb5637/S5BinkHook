@@ -6,9 +6,12 @@
 #include "s5_widget.h"
 
 namespace CppLogic::Mod {
+	// note that you need to override CastToIdentifier for this
 	class OnScreenInfoDisplayBehavior : public ED::IBehavior {
 	public:
 		virtual bool RenderUI(GGUI::OnScreenInfoRenderer* renderer, shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active) = 0;
+
+		static inline constexpr unsigned int Identifier = 0x100A;
 	};
 
 	// note that you need to override CastToIdentifier for this

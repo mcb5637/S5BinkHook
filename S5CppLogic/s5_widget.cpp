@@ -708,7 +708,7 @@ void __stdcall GGUI::C3DOnScreenInformationCustomWidget::RenderHooked(shok::Posi
         *active = true;
     if (data->Entity) {
         for (auto* b : data->Entity->DisplayBehaviors) {
-            if (auto* rb = dynamic_cast<CppLogic::Mod::OnScreenInfoDisplayBehavior*>(b)) {
+            if (auto* rb = b->CastToIdentifier<CppLogic::Mod::OnScreenInfoDisplayBehavior>()) {
                 skip |= rb->RenderUI(&Renderer, screenPos, data, active);
             }
         }

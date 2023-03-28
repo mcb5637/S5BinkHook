@@ -337,6 +337,17 @@ namespace GGL {
 		static inline constexpr int vtp = 0x774970;
 		static inline constexpr unsigned int Identifier = 0x4AFA2726;
 	};
+
+	class CNetEventEventTechnologyPlayerIDAndEntityID : public EGL::CNetEventEntityIDAndPlayerID {
+	public:
+		int TechId;
+
+		CNetEventEventTechnologyPlayerIDAndEntityID(shok::NetEventIds id, int pl, int e, int t);
+
+		static inline constexpr int TypeDesc = 0x80FF7C;
+		static inline constexpr int vtp = 0x76DD80;
+		static inline constexpr unsigned int Identifier = 0x3F0173;
+	};
 }
 
 namespace Framework {

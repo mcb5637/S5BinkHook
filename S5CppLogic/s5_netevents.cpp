@@ -168,6 +168,13 @@ GGL::CFeedbackEventResource::CFeedbackEventResource(shok::FeedbackEventIds id, i
 	ExtractionAmount = extrAm;
 }
 
+GGL::CNetEventEventTechnologyPlayerIDAndEntityID::CNetEventEventTechnologyPlayerIDAndEntityID(shok::NetEventIds id, int pl, int e, int t)
+	: EGL::CNetEventEntityIDAndPlayerID(id, pl, e)
+{
+	SetVT(GGL::CNetEventEventTechnologyPlayerIDAndEntityID::vtp);
+	TechId = t;
+}
+
 
 Framework::CEventGameSpeed::CEventGameSpeed(shok::NetEventIds id, double speed) : BB::CEvent(id)
 {

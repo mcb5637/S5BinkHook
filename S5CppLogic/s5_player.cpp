@@ -220,6 +220,22 @@ GGL::CTradeManager::ResData* GGL::CTradeManager::GetResource(shok::ResourceType 
 	return trademng_getres(this, rt);
 }
 
+inline bool(__thiscall* const techmng_addprograw)(GGL::PlayerTechManager* th, int t, float a) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, int, float)>(0x4A1A29);
+bool GGL::PlayerTechManager::AddTechProgressRaw(int techId, float amount)
+{
+	return techmng_addprograw(this, techId, amount);
+}
+inline void(__thiscall* const techmng_researched)(GGL::PlayerTechManager* th, int t, int id) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, int, int)>(0x4A1C6D);
+void GGL::PlayerTechManager::TechResearched(int techId, int researcherId)
+{
+	techmng_researched(this, techId, researcherId);
+}
+inline void(__thiscall* const techmng_addprogworker)(GGL::PlayerTechManager* th, int t, float a) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, int, float)>(0x4A1D02);
+void GGL::PlayerTechManager::AddTechProgressWorker(int techId, float amount)
+{
+	techmng_addprogworker(this, techId, amount);
+}
+
 static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, int ownerent, int offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, int, int, const char*)>(0x4BE63E);
 void GGL::PlayerTributesManager::SetTributeData(int tid, const shok::CostInfo& c, int ownerEntityId, int offeringPlayerId, const char* text)
 {

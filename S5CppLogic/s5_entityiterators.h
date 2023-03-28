@@ -4,7 +4,7 @@
 #include "s5_baseDefs.h"
 #include "s5_maplogic.h"
 
-// note that i recomment using CppLogic::Iterator
+// note that i recommend using CppLogic::Iterator
 
 namespace EGL {
 	class IGLEEntityPredicate {

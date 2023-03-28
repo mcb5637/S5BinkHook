@@ -419,5 +419,7 @@ namespace GGL {
 		static inline BB::SerializationData* (__stdcall* const SerializationDataPlayerArray)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
 		// only globalinvul and weathermachineactive
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49AC82);
+
+		// on tech researched event void __stdcall(this, const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&) 0x49A75F, put into GGL::PlayerTechManager
 	};
 }

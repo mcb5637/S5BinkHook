@@ -87,6 +87,7 @@ namespace GGL {
 	class CAutoCannonBehaviorProps;
 	class CBattleBehaviorProps;
 	class CGLGameLogic;
+	class CNetEventEventTechnologyPlayerIDAndEntityID;
 }
 namespace ED {
 	class CBehaviorProps;

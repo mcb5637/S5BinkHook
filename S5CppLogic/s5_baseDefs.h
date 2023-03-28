@@ -162,6 +162,42 @@ namespace BB {
 
 	class CNonCopyable {
 	};
+
+	class CSlotBase {
+	public:
+		static inline constexpr int vtp = 0x769528;
+		virtual ~CSlotBase() = default;
+	};
+	template<class ToHandle>
+	class TSlot1 : public CSlotBase {
+	public:
+		virtual void __stdcall Handle(ToHandle toHandle) = 0;
+	};
+	template<class ObjectType, class ToHandle>
+	class TSlotEx1 : public TSlot1<ToHandle> {
+	public:
+		typedef void(__stdcall ObjectType::* HandlerType)(ToHandle i);
+
+		ObjectType* Object;
+		HandlerType Handler;
+
+		virtual void __stdcall Handle(ToHandle toHandle) override {
+			std::invoke(Handler, Object, toHandle);
+		}
+
+		TSlotEx1(ObjectType* o, HandlerType h) {
+			Object = o;
+			Handler = h;
+		}
+
+		void* operator new(size_t s)
+		{
+			return shok::Malloc(s);
+		}
+		void operator delete(void* p) {
+			shok::Free(p);
+		}
+	};
 }
 
 namespace ECore {

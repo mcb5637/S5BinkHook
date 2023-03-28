@@ -180,10 +180,18 @@ namespace GGL {
 		};
 
 
-		int PlayerID;
-		shok::Vector<Tech> TechnologyState;
-		PADDINGI(4); // vector<?> TechnologyInProcess
-		PADDINGI(3);
+		int PlayerID; // 0
+		shok::Vector<Tech> TechnologyState; // 1
+		shok::Vector<int> TechnologyInProgress; // only AutomaticResearch==true 5
+		shok::List<BB::TSlot1<const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&>> OnResearched; // 9
+
+		// just adds progress and sets tech state if done, returns tech done, amount * 1000
+		bool AddTechProgressRaw(int techId, float amount);
+		void TechResearched(int techId, int researcherId);
+		void AddTechProgressWorker(int techId, float amount);
+		// on update 0x4A1B42 __thiscall()
+		// start research 0x4A29DD __thiscall(techId, researcherId) only to be called by building::startResearch
+		// can research tech 0x4A2772 __thiscall(techId, GGL::CTechConditionPredicate*) ?
 	};
 	static_assert(sizeof(PlayerTechManager) == 12 * 4);
 

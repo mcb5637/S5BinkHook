@@ -154,11 +154,11 @@ namespace shok {
 
 	enum class TechState : int {
 		Forbidden = 0,
-		Waiting = 1,
-		Allowed = 2,
+		Waiting = 1, // fake, all tech requirements have their tech requirements fullfilled or are researched
+		Allowed = 2, // can be researched at this time
 		InProgress = 3,
 		Researched = 4,
-		Future = 5,
+		Future = 5, // fake, Allowed, but not Waiting
 	};
 
 	enum class ResourceType : int {

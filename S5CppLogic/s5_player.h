@@ -171,27 +171,49 @@ namespace GGL {
 		ResData* GetResource(shok::ResourceType rt);
 	};
 
+	struct PlayerTechManager;
+	// checks for TechState::Researched (4)
+	class CTechConditionPredicate {
+	public:
+		virtual bool CheckTech(PlayerTechManager* mng, int techId) const = 0;
+
+		CTechConditionPredicate();
+
+		static constexpr int vtp = 0x766B3C;
+	};
+	// checks if all own requirements fulfill CTechConditionPredicate
+	class CPreConditionPredicate : public CTechConditionPredicate {
+	public:
+		CPreConditionPredicate();
+
+		static constexpr int vtp = 0x76E0F4;
+	};
+
 	struct PlayerTechManager { // size 12
 		struct Tech {
-			int TechStatus;
+			shok::TechState TechStatus; // dos not contain Waiting or Future
 			int ResearchProgress;
 			int StartTick;
 			int ResearcherId;
 		};
 
-
 		int PlayerID; // 0
-		shok::Vector<Tech> TechnologyState; // 1
-		shok::Vector<int> TechnologyInProgress; // only AutomaticResearch==true 5
+		shok::Vector<Tech> TechnologyState; // 1 indexed by tech id
+		shok::Vector<int> TechnologyInProgress; // 5 only AutomaticResearch==true
 		shok::List<BB::TSlot1<const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&>> OnResearched; // 9
 
 		// just adds progress and sets tech state if done, returns tech done, amount * 1000
 		bool AddTechProgressRaw(int techId, float amount);
 		void TechResearched(int techId, int researcherId);
 		void AddTechProgressWorker(int techId, float amount);
+		bool CheckTechnologyRequirementsFor(int tech, const CTechConditionPredicate& p);
+		bool CheckAllRequirementsFor(int tech, const CTechConditionPredicate& p);
+		shok::TechState GetTechState(int tech); // may also return substates of allowed
+		void ForceResearch(int tech);
 		// on update 0x4A1B42 __thiscall()
 		// start research 0x4A29DD __thiscall(techId, researcherId) only to be called by building::startResearch
-		// can research tech 0x4A2772 __thiscall(techId, GGL::CTechConditionPredicate*) ?
+
+		void ForceResearchNoFeedback(int tech);
 	};
 	static_assert(sizeof(PlayerTechManager) == 12 * 4);
 
@@ -288,6 +310,8 @@ namespace GGL {
 		virtual unsigned int __stdcall GetClassIdentifier() const;
 
 		static inline constexpr int vtp = 0x76E0E0;
+
+		void AddTechResearched(int tech);
 	};
 	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
 

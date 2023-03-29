@@ -2207,6 +2207,16 @@ function CppLogic.Technology.GetSpeedModifier(tid) end
 --- @param op string operation to perform, accepted is "+" "-" "*" "/"
 function CppLogic.Technology.TechAddConstructionSpeedModifier(tech, value, op) end
 
+--- instantly researchs a technology without showing a feedback flag.
+---@param player number
+---@param tech number
+function CppLogic.Technology.ResearchTechnologyNoFeedback(player, tech) end
+
+--- gets the researched techs of a player (from Statistics). note: because of a BB bug, every tech that gets researched via AutomaticResearch does not show up here.
+---@param player number
+---@return {Technology : number, Time : number}[]
+function CppLogic.Technology.GetResearchedTechs(player) end
+
 ---@alias widget string|number
 
 --- gets a widgets position and size.

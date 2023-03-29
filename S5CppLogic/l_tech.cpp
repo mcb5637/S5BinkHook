@@ -4,6 +4,7 @@
 #include "s5_baseDefs.h"
 #include "s5_tech.h"
 #include "s5_entity.h"
+#include "s5_maplogic.h"
 #include "luaext.h"
 
 namespace CppLogic::Tech {
@@ -98,7 +99,39 @@ namespace CppLogic::Tech {
 		return 0;
 	}
 
-	constexpr std::array<lua::FuncReference, 9> Techs{ {
+	int ResearchTechnologyNoFeedback(lua::State ls) {
+		luaext::EState L{ ls };
+		int i = L.CheckInt(1);
+		if (i <= 0 || i >= 9)
+			throw lua::LuaException("invalid player");
+		GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
+		L.CheckTech(2);
+		pl->TechnologyStates.ForceResearchNoFeedback(L.CheckInt(2));
+		return 0;
+	}
+
+	int GetResearchedTechs(lua::State L) {
+		int pid = L.CheckInt(1);
+		if (pid <= 0 || pid >= 9)
+			throw lua::LuaException("invalid player");
+		GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid);
+		L.NewTable();
+		int i = 1;
+		for (const auto& r : pl->Statistics.ResearchedTechnologies) {
+			L.NewTable();
+			L.Push("Technology");
+			L.Push(r.TechnologyType);
+			L.SetTableRaw(-3);
+			L.Push("Time");
+			L.Push(r.Time);
+			L.SetTableRaw(-3);
+			L.SetTableRaw(-2, i);
+			++i;
+		}
+		return 1;
+	}
+
+	constexpr std::array<lua::FuncReference, 11> Techs{ {
 			lua::FuncReference::GetRef<GetResearchInfo>("GetResearchInfo"),
 			lua::FuncReference::GetRef<SetResearchInfo>("SetResearchInfo"),
 			lua::FuncReference::GetRef<GetRequirements>("GetRequirements"),
@@ -108,6 +141,8 @@ namespace CppLogic::Tech {
 			lua::FuncReference::GetRef<GetRangeModifier>("GetRangeModifier"),
 			lua::FuncReference::GetRef<GetSpeedModifier>("GetSpeedModifier"),
 			lua::FuncReference::GetRef<TechAddConstructionSpeedModifier>("TechAddConstructionSpeedModifier"),
+			lua::FuncReference::GetRef<ResearchTechnologyNoFeedback>("ResearchTechnologyNoFeedback"),
+			lua::FuncReference::GetRef<GetResearchedTechs>("GetResearchedTechs"),
 	} };
 
 	void Cleanup(lua::State L) {

@@ -26,7 +26,7 @@ namespace shok {
 			Modifier();
 		};
 		struct TechReq {
-			int TecType = 0;
+			int TecType = 0; // if 0, tries to check TecCategoryType, might be buggy (access tech -1?)
 			int TecCategoryType = 0;
 		};
 		struct ETypeReq {
@@ -46,17 +46,17 @@ namespace shok {
 
 		int TecCategoryType = 0;
 		float TimeToResearch = 0;
-		bool AutomaticResearch = true;
+		bool AutomaticResearch = true; // bug auto-research does not set statistics flag
 		PADDING(3);
 		shok::CostInfo ResourceCosts;
-		int RequiredTecConditions = 0;
+		int RequiredTecConditions = 0; // 21 TecConditions.size() if 0
 		shok::Vector<TechReq> TecConditions;
-		int RequiredEntityConditions = 0;
+		int RequiredEntityConditions = 0; // 26 EntityConditions.size() if 0
 		shok::Vector<ETypeReq> EntityConditions;
-		int RequiredEntityCategoryConditions = 0;
+		int RequiredEntityCategoryConditions = 0; // 31 EntityCategoryConditions.size() if 0
 		shok::Vector<ECatReq> EntityCategoryConditions;
-		int RequiredUpgradeCategoryConditions = 0;
-		shok::Vector<UCatReq> UpgradeCategoryConditions; // 38
+		int RequiredUpgradeCategoryConditions = 0; // 36 UpgradeCategoryConditions.size() if 0
+		shok::Vector<UCatReq> UpgradeCategoryConditions;
 		shok::String Effect_Script; // 41 Effect -> Script, not sure if this is used for something
 		Modifier ExplorationModifier; // 48
 		Modifier SpeedModifier; // 56
@@ -68,7 +68,7 @@ namespace shok {
 		Modifier ArmorModifier; // 104
 		Modifier DodgeModifier; // 112
 		Modifier GroupLimitModifier; // 120 unused
-		bool UseForStatisticsFlag = false; // 128
+		bool UseForStatisticsFlag = false; // 128 only statistics window, gamecallback will be called in any case
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x8645C8);
 
@@ -81,7 +81,7 @@ namespace shok {
 
 	class TechManager {
 	public:
-		shok::Vector<shok::Technology*> Techs;
+		shok::Vector<shok::Technology*> Techs; // indexed by id-1
 
 		void FreeTech(int id);
 		void LoadTech(int id);

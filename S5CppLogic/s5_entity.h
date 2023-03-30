@@ -155,9 +155,9 @@ namespace EGL {
 		virtual void AddStateHandler(shok::TaskState st, EGL::IGLEStateHandler* handl) = 0;
 		virtual void GetApproachPos(shok::Position* p) = 0;
 		virtual float GetApproachRot() = 0;
-		virtual void SetTaskState(shok::TaskState st) = 0; // 24
+		virtual void SetTaskState(shok::TaskState st) = 0;
+		virtual bool CountsForTechConditions() = 0; // 25 maybe also used for other stuff?
 	private:
-		virtual bool UnknownEntityFunc2() = 0;
 		virtual void UnknownEntityFunc3() = 0;
 		virtual void UnknownEntityFunc4() = 0;
 	public:
@@ -174,7 +174,7 @@ namespace EGL {
 		virtual void UnknownEntityFunc6() = 0;
 		virtual void UnknownEntityFunc7() = 0;
 		virtual void OnEntityUpgrade(CGLEEntity* old) = 0;
-		virtual void UnknownEntityFunc8(int) = 0; // 38
+		virtual void OnHealthDecrease(int oldHealth) = 0; // 38
 
 	public:
 		// checks identifier, only returns exact class, no subclasses
@@ -265,13 +265,14 @@ namespace EGL {
 
 		void Destroy();
 
-		int GetFirstAttachedToMe(shok::AttachmentType attachmentId) const;
-		int GetFirstAttachedEntity(shok::AttachmentType attachmentId) const;
+		int GetFirstAttachedToMe(shok::AttachmentType attachmentId) const; // other -> this
+		int GetFirstAttachedEntity(shok::AttachmentType attachmentId) const; // this -> other
 		/**
 		fires event eventIdOnThisDetach on otherId, if this gets detached/destroyed, fires eventIdOnOtherDetach on this, if otherId gets detached/destroyed
 		**/
-		void AttachEntity(shok::AttachmentType attachtype, int otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach);
-		void DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent);
+		void AttachEntity(shok::AttachmentType attachtype, int otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach); // this -> other
+		void DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent); // this -> other
+		void DetachObserverEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent); // other -> this
 
 		void ClearAttackers();
 
@@ -664,6 +665,9 @@ namespace GGL {
 		void MarketCancelTrade();
 		int BuyLeaderByType(int ety);
 		shok::Position GetAbsoluteApproachPos();
+		bool IsHealthBurning(int health);
+		bool IsHealthBurning();
+		void CatchFire();
 
 		// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 

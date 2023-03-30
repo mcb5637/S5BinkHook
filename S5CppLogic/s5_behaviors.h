@@ -622,6 +622,8 @@ namespace GGL {
 		// 	   TASK_INCREASE_BRIDGE_PROGRESS
 		// defined events: Worker_XXX
 
+		// on attached building destroyed 4CFE73 thiscall(id)
+
 		static inline constexpr int vtp = 0x772B30;
 		static inline constexpr int TypeDesc = 0x813B1C;
 		static inline constexpr unsigned int Identifier = 0x0DCDBAB9D;

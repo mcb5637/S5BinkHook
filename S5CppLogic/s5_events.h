@@ -694,7 +694,7 @@ namespace shok {
 		Worker_GetMaxWorkTime = 0x1301A, //EGL::CEventGetValue<int, 1211121895>
 		Worker_GetWorkTimeRemaining = 0x1301B, //EGL::CEventGetValue<int, 1211121895>
 		// 0x1301C foundry something progress?
-		// 1301D worker something entity
+		Worker_OnBuildingCatchFire = 0x1301D, //EGL::CEvent1Entity worker something entity
 		Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
 		WorkerFlee_IsFleeing = 0x1301F, //EGL::CEventGetValue<bool,1709081367>
 		// 13018 worker leave? EGL::CEvent1Entity

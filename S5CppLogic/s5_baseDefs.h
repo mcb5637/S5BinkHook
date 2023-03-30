@@ -92,7 +92,8 @@ namespace shok {
 
 
 	struct Attachment {
-		int EntityId, EventID;
+		int EntityId;
+		shok::EventIDs EventID;
 	};
 
 	struct Color {
@@ -212,13 +213,21 @@ namespace EGL {
 	class CGLEAttachableBase {
 	public:
 		virtual ~CGLEAttachableBase() = default;
-		// 8 more funcs
-		// 7 is attached to (this, atype, id) ?
+	protected:
+		virtual void OnOtherEntityAttachToMe_vt(shok::AttachmentType ty, int otherId, shok::EventIDs onThisDetachEvent) = 0; // other -> this
+		virtual void OnOtherEffectAttachToMe_vt(shok::AttachmentType ty, int otherId, shok::EventIDs onThisDetachEvent) = 0; // other -> this
+		virtual void OnOtherEntityDetachFromMe_vt(shok::AttachmentType ty, int otherId) = 0; // other -> this
+		virtual void OnOtherEffectDetachFromMe_vt(shok::AttachmentType ty, int otherId) = 0; // other -> this
+		virtual void DetachObservedEntity_vt(shok::AttachmentType ty, int otherId) = 0; // this -> other 5
+		virtual void DetachObservedEffect_vt(shok::AttachmentType ty, int otherId) = 0; // this -> other
+	public:
+		virtual bool IsAttachedToEntity(shok::AttachmentType ty, int otherId) = 0; // this -> other
+		virtual bool IsAttachedToEffect(shok::AttachmentType ty, int otherId) = 0; // this -> other
 
-		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEntities; // 8
-		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEffects; // 11
-		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEntities; // 14
-		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEffects; // 17
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEntities; // 8 other -> this
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEffects; // 11 other -> this
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEntities; // 14 this -> other
+		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEffects; // 17 this -> other
 		bool SendEvent; // 20
 		PADDING(3);
 
@@ -230,7 +239,9 @@ namespace EGL {
 	class CEffectAttachmentProxy {
 	};
 	template<class T, class V>
+	requires (std::same_as<T, EGL::CGLEEntity> && std::same_as<V, CEntityAttachmentProxy>) || (std::same_as<T, EGL::CEffect> && std::same_as<V, CEffectAttachmentProxy>)
 	class TGLEAttachable : public CGLEAttachableBase {
+	public:
 
 	};
 

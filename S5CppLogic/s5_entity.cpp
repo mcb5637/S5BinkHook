@@ -253,6 +253,20 @@ void EGL::CGLEEntity::DetachObservedEntity(shok::AttachmentType attachtype, int 
 {
 	entattach_detach(static_cast<EGL::CGLEAttachableBase*>(this), attachtype, otherId, fireEvent);
 }
+void EGL::CGLEEntity::DetachObserverEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent)
+{
+	for (const auto& r : ObserverEntities) {
+		if (r.first == attachtype && r.second.EntityId == otherId) {
+			auto* other = GetEntityByID(otherId);
+			if (fireEvent && r.second.EventID != shok::EventIDs::NoDetachEvent) {
+				EGL::CEvent1Entity ev{ r.second.EventID, EntityId };
+				other->FireEvent(&ev);
+			}
+			other->DetachObservedEntity(attachtype, EntityId, false);
+			break;
+		}
+	}
+}
 
 int EGL::CMovingEntity::LeaderGetNearbyBarracks()
 {
@@ -901,6 +915,21 @@ shok::Position GGL::CBuilding::GetAbsoluteApproachPos()
 	shok::Position p{};
 	build_getabsapproachpos(this, &p);
 	return p;
+}
+inline bool(__thiscall* const building_ishealthburning)(GGL::CBuilding* th, int h) = reinterpret_cast<bool(__thiscall*)(GGL::CBuilding*, int)>(0x4AA01C);
+bool GGL::CBuilding::IsHealthBurning(int health)
+{
+	return building_ishealthburning(this, health);
+}
+inline bool(__thiscall* const building_ishealthburningt)(GGL::CBuilding* th) = reinterpret_cast<bool(__thiscall*)(GGL::CBuilding*)>(0x4AA592);
+bool GGL::CBuilding::IsHealthBurning()
+{
+	return building_ishealthburningt(this);
+}
+inline bool(__thiscall* const building_catchfire)(GGL::CBuilding* th) = reinterpret_cast<bool(__thiscall*)(GGL::CBuilding*)>(0x4AE601);
+void GGL::CBuilding::CatchFire()
+{
+	building_catchfire(this);
 }
 
 std::vector<shok::AdditionalTechModifier> GGL::CBuilding::ConstructionSpeedModifiers{};

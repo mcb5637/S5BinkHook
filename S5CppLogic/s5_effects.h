@@ -43,8 +43,8 @@ namespace EGL {
 		virtual void OnCreated() = 0;
 		virtual void OnLoaded() = 0; // 5
 		virtual void OnTick() = 0;
+		virtual void FireEvent(BB::CEvent* ev) = 0;
 	private:
-		virtual void fireevent(void* ev) = 0; // not sure about that, does not seem to be called
 		virtual void emptyfunc2() = 0; // 8
 
 	public:

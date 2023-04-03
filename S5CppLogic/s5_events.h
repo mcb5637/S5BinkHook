@@ -137,6 +137,16 @@ namespace EGL {
 	// EGL::CEventGetValue<GGL::CBehaviorFollow *,-1301899769>
 	// EGL::CEventGetValue<EGL::CMovementBehavior *,212523703>
 
+	class CEventEntityGetBool : public CEventGetValue_Bool {
+	public:
+		int Entity;
+
+		CEventEntityGetBool(shok::EventIDs e, int eid);
+
+		static inline constexpr int vtp = 0x7704B4;
+		static inline constexpr unsigned int Identifier = 0xB5641427;
+	};
+
 
 	class IEventEntityID {
 	public:
@@ -337,6 +347,15 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x775E28;
 		static inline constexpr int TypeDesc = 0x81D3A8;
+	};
+	class CEventAttachmentTypeGetBool : public BB::CEvent {
+	public:
+		shok::AttachmentType AttachmentType;
+		bool Data = 0;
+
+		CEventAttachmentTypeGetBool(shok::EventIDs e, shok::AttachmentType t);
+
+		static inline constexpr int vtp = 0x776EF0;
 	};
 
 	class CEventEntityIndex : public BB::CEvent {
@@ -605,7 +624,7 @@ namespace shok {
 		Follow_GetFollowStatus = 0x10008, //EGL::CEventGetValue<int,1211121895>
 		Mine_GetResourcesRemaining = 0x10007, //EGL::CEventGetValue<int,1211121895>
 		Serf_ExtractResource = 0x10009, //EGL::CEvent1Entity, serfbattle same as 14003
-		// 1000A serf something extract res get bool
+		Serf_CanPathToResourceEntity = 0x1000A, //EGL::CEventEntityGetBool
 		ResourceRefiner_Refine = 0x1000B, //BB::CEvent
 		Tree_Init = 0x1000C, //EGL::CEventValue<int,-27574121>
 		Tree_UpdateModel = 0x1000D, //BB::CEvent
@@ -765,11 +784,11 @@ namespace shok {
 		Barracks_BuyLeader = 0x15035, //EGL::CEventValue<int,-27574121> ucat
 		Leader_GetNearbyBarracks = 0x15036, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_BuySoldierForLeader = 0x15037, //EGL::CEvent1Entity
-		// 15038 leader? goes to defend after something else
+		Leader_OnCCEnd = 0x15038, //EGL::CEvent1Entity
 		Leader_OnGuardedAttackedBy = 15039, //EGL::CEvent1Entity
 		LeaderPatrolAddPoint = 0x1503A, //EGL::CEventPosition
 		Leader_SetIsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
-		// 1503C serf some kind of stop?
+		SerfBattle_OnTurnToSerfCommand = 0x1503C, //BB::CEvent
 		GetArmor = 0x1503E, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTaskList = 0x1503F, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTime = 0x15040, //EGL::CEventGetValue<float, 1468983543>
@@ -801,12 +820,10 @@ namespace shok {
 		Foundation_OnAutoCannonDetach = 0x1600C, //EGL::CEvent1Entity
 		HeroAbility_Cancel = 0x1600D, //BB::CEvent
 		OnBuilderDetaches = 0x1600E, //EGL::CEvent1Entity foundation detach builder & top then die, neutralbridge detach architects
-		// 1500E convert cancel?
 		Hawk_OnHeroDetach = 0x1600F, //BB::CEvent
 		HeroAbility_GetChargeCurrent = 0x16010, //GGL::CEventHeroAbilityInteger
 		HeroAbility_GetChargeMax = 0x16011, //GGL::CEventHeroAbilityInteger
 		HeroAbility_SetChargeCurrent = 0x16012, //GGL::CEventHeroAbilityInteger
-		// 16013 ? fire projectile event???
 
 		Camouflage_IsInvisible = 0x16013, //EGL::CEventGetValue<bool,1709081367>
 		ThiefCamouflage_Reset = 0x16014, //BB::CEvent fired from sabotage and steal goods
@@ -849,18 +866,18 @@ namespace shok {
 		WorkPlace_OnWorkerAttach = 0x17003, //EGL::CEvent1Entity
 		WorkPlace_OnWorkerDetach = 0x17004, //EGL::CEvent1Entity
 		Building_OnConstructionComplete = 0x17005, //BB::CEvent affectmoti affect moti, foundation init, defendablebuil activate defendmode construction complete
-		// 0x17006 buildingbeh worward to 0x17004
+		// 0x17006 buildingbeh forward to 0x17004
 		Market_WorkStep = 0x17007, //BB::CEvent
 		University_ResearchStep = 0x17008, //BB::CEvent
 		Market_GetProgress = 0x17009, //EGL::CEventGetValue<float,1468983543>
 		Market_StartTrade = 0x1700A, //EGL::CEventGetValue<float,1468983543>
 		Market_CancelTrade = 0x1700B, //BB::CEvent
-		// 0x1700C university get tech progress?
-		// 0x1700D constructionsite complete
-		// 0x1700E settler 1 entity ? building 0x20003
+		University_GetTechResearchedProgress = 0x1700C, //EGL::CEventGetValue<float,1468983543> 0-100, seems to be unused
+		ConstructionSite_OnBuildingDetach = 0x1700D, //EGL::CEvent1Entity
+		Settler_MoveToBuildingApproachPos = 0x1700E, //EGL::CEvent1Entity
 		WorkerAlarmMode_OnBuildingDetach = 0x1700F, //EGL::CEvent1Entity
 		AffectMotivation_GetEffect = 0x17010, //EGL::CEventGetValue<float,1468983543>
-		// 0x17011 resourcerefiner get supplier?/can work?
+		ResourceRefiner_GetNearestSupplier = 0x17011, //EGL::CEventGetValue<int,1211121895> returns entity id
 		Worker_ResetTaskList = 0x17012, //BB::CEvent
 		Foundry_GetProgress = 0x17014, //EGL::CEventGetValue<int,1211121895>
 		Foundry_SetProgress = 0x17015, //EGL::CEventValue<int,-27574121>
@@ -868,7 +885,7 @@ namespace shok {
 		Foundry_WorkStep = 0x17018, //BB::CEvent
 		// 0x17019 affectmoti affect moti, foundation init, not called?
 		Building_OnUpgradeStart = 0x1701A, //BB::CEvent
-		// 0x1701B mine detach res
+		Building_OnBuildOnDetached = 0x1701B, //BB::CEvent used by mine
 		Building_OnUpgradeCancel = 0x1701C, //BB::CEvent
 		IsConvertible = 0x1701D, //EGL::CEventGetValue<bool,1709081367>
 
@@ -882,9 +899,9 @@ namespace shok {
 		BuildingMercenary_AddOffer = 0x17025, //GGL::CEventMercenaryOffer
 		BuildingMercenary_GetOffer = 0x17026, //GGL::CEventGetMercenaryOffer
 		BuildingMercenary_BuyOffer = 0x17027, //GGL::CEventPlayerIDInteger
-		IsMercenaryBuilding = 0x17028, //EGL::CEventGetValue<bool, 1709081367>
+		IsMercenaryBuilding = 0x17028, //EGL::CEventGetValue<bool, 1709081367> GGL::CBuildingMercenaryBehavior
 		BuildingMerchant_GetNumberOfOffers = 0x17029, //EGL::CEventGetValue<int,1211121895>
-		// 0x1702A buildingmerch ret true
+		IsMerchantBuilding = 0x1702A,  //EGL::CEventGetValue<bool, 1709081367> GGL::CBuildingMerchantBehavior
 		BuildingTechTrader_AddOffer = 0x1702B, //GGL::CEventTechOffer
 		BuildingTechTrader_GetOffer = 0x1702C, //GGL::CEventGetTechOffer
 		IsTechTraderBuilding = 0x1702D, //EGL::CEventGetValue<bool, 1709081367>
@@ -898,13 +915,13 @@ namespace shok {
 		IsSettlerOrBuilding = 0x18008, //EGL::CEventGetValue<bool, 1709081367>
 		IsSerfOrWorker = 0x18009, //EGL::CEventGetValue<bool, 1709081367>
 		DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
-		// 0x1800B building get bool?
+		IsMilitaryBuilding =  0x1800B, //EGL::CEventGetValue<bool,1709081367> building & (ofCategory Military | MilitaryBuilding)
 		IsRefiner = 0x1800C, //EGL::CEventGetValue<bool, 1709081367>
 		IsThief = 0x1800D, //EGL::CEventGetValue<bool, 1709081367>
 
 		LimitedAttachment_Attach = 0x1A002, //GGL::CEventEntityAttachment
 		LimitedAttachment_Dettach = 0x1A003, //GGL::CEventEntityAttachment
-		// 1A004 limitedattach maybe get is full? maybe get is limited?, is unused
+		LimitedAttacgment_IsActiveAndNotFull = 0x1A004, //GGL::CEventAttachmentTypeGetBool, is unused
 		LimitedAttachment_IsActive = 0x1A005, //GGL::CEventAttachmentTypeGetBool
 		LimitedAttachment_SetLimit = 0x1A006, //GGL::CEventAttachmentTypeInteger
 		LimitedAttachment_GetMax = 0x1A007, //GGL::CEventAttachmentTypeGetInteger

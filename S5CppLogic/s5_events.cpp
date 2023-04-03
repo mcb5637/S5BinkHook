@@ -50,6 +50,13 @@ void* __stdcall BB::CEvent::CastToIdentifier(unsigned int id)
 	return nullptr;
 }
 
+EGL::CEventEntityGetBool::CEventEntityGetBool(shok::EventIDs e, int eid)
+	: CEventGetValue_Bool(e)
+{
+	SetVT(vtp);
+	Entity = eid;
+}
+
 int EGL::CEvent1Entity::GetEntityID() const
 {
 	return EntityID;
@@ -158,6 +165,12 @@ GGL::CEventAttachmentTypeInteger::CEventAttachmentTypeInteger(shok::EventIDs e, 
 	SetVT(GGL::CEventAttachmentTypeInteger::vtp);
 	AttachmentType = t;
 	Data = d;
+}
+
+GGL::CEventAttachmentTypeGetBool::CEventAttachmentTypeGetBool(shok::EventIDs e, shok::AttachmentType t) : BB::CEvent(e)
+{
+	SetVT(vtp);
+	AttachmentType = t;
 }
 
 GGL::CEventEntityIndex::CEventEntityIndex(shok::EventIDs e, int eid, int ind) : BB::CEvent(e)

@@ -287,8 +287,10 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(1);
-	L.Push((int) &p->TechnologyStates);
+	auto* e = L.CheckEntity(1);
+	EGL::CEventEntityGetBool ev{ (shok::EventIDs)0x1000A, L.CheckInt(2) };
+	e->FireEvent(&ev);
+	L.Push(ev.Data);
 	return 1;
 }
 

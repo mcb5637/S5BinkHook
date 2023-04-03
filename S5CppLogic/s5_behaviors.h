@@ -763,6 +763,7 @@ namespace GGL {
 		// padding 2, shok_pos territory?
 
 		// defined events: MoveCommand_Move, Leader_AttackEntity, Leader_GetAttackTarget, Behavior_Tick, OnAttackedBy, Leader_OnAttackCommandTargetDetach
+		//		SerfBattle_OnTurnToSerfCommand
 		// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE
 
 		static inline constexpr int vtp = 0x774A98;
@@ -998,7 +999,7 @@ namespace GGL {
 		int TraderEntityID;
 		shok::Vector<GGL::CBuildingMerchantBehavior::COffer*> Offer;
 
-		// defined events: Behavior_Tick, BuildingMerchant_XXX
+		// defined events: Behavior_Tick, BuildingMerchant_XXX, IsMerchantBuilding
 
 		static inline constexpr int vtp = 0x778208;
 		static inline constexpr int TypeDesc = 0x824DFC;
@@ -1015,7 +1016,7 @@ namespace GGL {
 			static inline constexpr unsigned int Identifier = 0x0D9705E63;
 		};
 
-		// defined events: BuildingMercenary_XXX
+		// defined events: BuildingMercenary_XXX, IsMercenaryBuilding
 
 		static inline constexpr int vtp = 0x7782C0;
 		static inline constexpr int TypeDesc = 0x8250E4;
@@ -1166,7 +1167,7 @@ namespace GGL {
 	class CMineBehavior : public EGL::CGLEBehavior {
 	public:
 
-		// defined events: Mine_XXX, OnResourceDoodadDetach
+		// defined events: Mine_XXX, OnResourceDoodadDetach, Building_OnBuildOnDetached
 
 		static inline constexpr int vtp = 0x7757CC;
 		static inline constexpr int TypeDesc = 0x81C5EC;
@@ -1196,7 +1197,7 @@ namespace GGL {
 	class CConstructionSiteBehavior : public EGL::CGLEBehavior {
 	public:
 
-		// defined events: WorkPlace_OnWorkerAttach, WorkPlace_OnWorkerDetach
+		// defined events: WorkPlace_OnWorkerAttach, WorkPlace_OnWorkerDetach, ConstructionSite_OnBuildingDetach
 
 		static inline constexpr int vtp = 0x777424;
 		static inline constexpr int TypeDesc = 0x822EC4;

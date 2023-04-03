@@ -272,7 +272,7 @@ namespace EGL {
 		**/
 		void AttachEntity(shok::AttachmentType attachtype, int otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach); // this -> other
 		void DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent); // this -> other
-		void DetachObserverEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent); // other -> this
+		void DetachObserverEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent); // other -> this, in shok only triggered by other dying
 
 		void ClearAttackers();
 

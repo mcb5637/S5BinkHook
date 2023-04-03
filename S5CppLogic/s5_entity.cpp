@@ -574,17 +574,19 @@ float __thiscall EGL::CGLEEntity::GetBaseExploration()
 
 void EGL::CGLEEntity::ClearAttackers()
 {
-	std::vector<GGL::CSettler*> tomove = std::vector<GGL::CSettler*>();
+	struct ven {
+		int en;
+		shok::AttachmentType ty;
+	};
+	std::vector<ven> todetach{};
 	for (const auto& a : ObserverEntities) {
-		if (a.first == shok::AttachmentType::ATTACKER_COMMAND_TARGET || a.first == shok::AttachmentType::LEADER_TARGET || a.first == shok::AttachmentType::FOLLOWER_FOLLOWED) {
-			EGL::CGLEEntity* at = EGL::CGLEEntity::GetEntityByID(a.second.EntityId);
-			if (GGL::CSettler* s = dynamic_cast<GGL::CSettler*>(at)) {
-				tomove.emplace_back(s);
-			}
+		if (a.first == shok::AttachmentType::ATTACKER_COMMAND_TARGET || a.first == shok::AttachmentType::LEADER_TARGET || a.first == shok::AttachmentType::FOLLOWER_FOLLOWED
+			|| a.first == shok::AttachmentType::ATTACKER_TARGET || a.first == shok::AttachmentType::CONVERTER_SETTLER) {
+			todetach.emplace_back(a.second.EntityId, a.first);
 		}
 	}
-	for (GGL::CSettler* s : tomove)
-		s->Defend();
+	for (const auto& s : todetach)
+		DetachObserverEntity(s.ty, s.en, true);
 }
 
 

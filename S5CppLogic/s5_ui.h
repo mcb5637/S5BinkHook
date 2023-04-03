@@ -501,9 +501,9 @@ namespace GGL {
 		virtual int BuildingGetTargetableId(int id) = 0;
 	private:
 		virtual void unknown6() = 0; // something entityiterator
-		virtual void unknown7() = 0; // 50
-		virtual void unknown8() = 0; // get some serf extract res
 	public:
+		virtual bool SerfCanPathToNearestResourceEntity(int serfId, shok::ResourceType rt, float x, float y) = 0; // 50
+		virtual bool SerfCanPathToResourceEntity(int serfId, int resourceId) = 0;
 		virtual EGL::CGLEEntity* GetEntity(int id) = 0;
 	private:
 		virtual void unknown9() = 0; // get something building related

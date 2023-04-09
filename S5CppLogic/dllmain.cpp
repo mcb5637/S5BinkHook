@@ -287,10 +287,13 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto* e = L.CheckEntity(1);
-	EGL::CEventEntityGetBool ev{ (shok::EventIDs)0x1000A, L.CheckInt(2) };
-	e->FireEvent(&ev);
-	L.Push(ev.Data);
+	auto* m = EScr::StateAddon::Get(L.GetState());
+	L.NewTable();
+	for (const auto& d : m->Docs) {
+		L.Push(d.first.c_str());
+		L.Push(d.second);
+		L.SetTableRaw(-3);
+	}
 	return 1;
 }
 

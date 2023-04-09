@@ -139,12 +139,17 @@ bool EScr::CLuaFuncRef::Call(int nargs, int nres)
 {
 	return funcref_call(this, nargs, nres);
 }
+inline void(__stdcall* const funcref_setstate)(EScr::CLuaFuncRef* th, lua::State L) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRef*, lua::State)>(0x5A1617);
+void EScr::CLuaFuncRef::SetState(lua::State L)
+{
+	funcref_setstate(this, L);
+}
 
 void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
 {
 	CheckRef();
 	Clear();
-	this->L = L;
+	SetState(L);
 	L.CheckType(idx, lua::LType::Function);
 	L.PushValue(idx);
 	Ref = L.Ref(L.REGISTRYINDEX);

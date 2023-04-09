@@ -47,6 +47,8 @@ namespace EScr {
 
 		static void HookFireEvent();
 		static void HookRemoveFuncOverrides();
+
+		// handle error code 5A28A7 __stdcall(lua_State*, int errorCode, 0)
 	};
 	//constexpr int i = offsetof(CScriptTriggerSystem, ActiveTrigger) / 4;
 
@@ -63,6 +65,7 @@ namespace EScr {
 		void CreateRef(); // unrefs anything previously refd
 		bool CheckRef(); // creates if not already done, then return if the ref is valid
 		bool Call(int nargs, int nres); // uses shok error handling, so you get a popup on errors
+		void SetState(lua::State L); // removes from prev StateAddon and adds to new one (both with null check)
 	};
 
 	class CLuaFuncRefCommand : public CLuaFuncRef {
@@ -155,6 +158,19 @@ namespace EScr {
 		static void __stdcall DeserializeOverride(BB::CFileStreamEx* f, lua_State* L, const char* filename);
 		static void __cdecl AddGlobalNoSaveOverride(const char* n);
 	};
+
+	struct StateAddon {
+		shok::Map<shok::String, const char*> Docs;
+		ILuaDebugger* LuaDebugger;
+		bool DebugScript;
+		shok::List<CLuaFuncRef*> RefsToClose;
+
+		// ctor 0x5A282C, dtor 0x59D39F
+
+		static inline StateAddon* (__stdcall* const Get)(lua_State* L) = reinterpret_cast<StateAddon* (__stdcall*)(lua_State*)>(0x59B1A3);
+		static inline void(__stdcall* const Set)(lua_State* L, StateAddon* a) = reinterpret_cast<void(__stdcall*)(lua_State*, StateAddon*)>(0x5A21FC);
+	};
+	static_assert(sizeof(StateAddon) == 8 * 4);
 }
 
 class CLuaDebuggerPort : public EScr::ILuaDebugger {

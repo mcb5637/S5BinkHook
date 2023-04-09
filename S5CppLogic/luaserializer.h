@@ -29,10 +29,6 @@ namespace CppLogic::Serializer {
 		static void DumpClassSerializationData(lua::State L, const BB::SerializationData* seri);
 		static void DumpClassSerializationData(lua::State L, unsigned int id);
 	};
-	template<class T>
-	concept LuaHasUpvalue = requires (T l) {
-		{l.Debug_UpvalueID(1, 1) } -> std::same_as<const void*>;
-	};
 
 	/// <summary>
 	/// better serialization of lua states.
@@ -64,6 +60,8 @@ namespace CppLogic::Serializer {
 		std::map<const void*, UpvalueReference> UpRefs;
 		int NextRefereceNumber = 1;
 		int IndexOfReferenceHolder = 0;
+		void* (__cdecl*lua_upvalueid)(lua_State* L, int funcindex, int n) = nullptr;
+		void(__cdecl* lua_upvaluejoin)(lua_State* L, int funcindex1, int n1, int funcindex2, int n2) = nullptr;
 
 		// a reference to something already serialized/deserialized
 		static constexpr lua::LType ReferenceType = static_cast<lua::LType>(-2);
@@ -111,27 +109,6 @@ namespace CppLogic::Serializer {
 		void PrepareDeserialize();
 		void CleanupDeserialize(bool ret);
 
-		template<class State>
-		requires LuaHasUpvalue<State>
-		const void* UpID(State s, int idx, int n) {
-			return s.Debug_UpvalueID(idx, n);
-		}
-		template<class State>
-		requires (!LuaHasUpvalue<State>)
-		const void* UpID(State s, int idx, int n) {
-			throw 0;
-		}
-		template<class State>
-		requires LuaHasUpvalue<State>
-		void UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
-			s.Debug_UpvalueJoin(funcMod, upMod, funcTar, upTar);
-		}
-		template<class State>
-		requires (!LuaHasUpvalue<State>)
-		void UpJoin(State s, int funcMod, int upMod, int funcTar, int upTar) {
-			throw 0;
-		}
-
 	public:
 		AdvLuaStateSerializer(BB::CFileStreamEx& io, lua_State* l);
 		~AdvLuaStateSerializer();
@@ -147,7 +124,7 @@ namespace CppLogic::Serializer {
 
 		static constexpr const char* UserdataSerializerMetaEvent = "__serialize";
 		static std::map<std::string, lua::CFunction> UserdataDeserializer;
-		static constexpr int FileVersion = 1;
+		static constexpr int FileVersion = 2;
 		static constexpr const char* RegistrySerializeKeys = "CppLogic::Serializer::AdvLuaStateSerializer_SerlializedRegistry";
 	};
 }

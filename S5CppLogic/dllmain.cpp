@@ -287,13 +287,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto* m = EScr::StateAddon::Get(L.GetState());
-	L.NewTable();
-	for (const auto& d : m->Docs) {
-		L.Push(d.first.c_str());
-		L.Push(d.second);
-		L.SetTableRaw(-3);
-	}
+	L.Push(L.Version());
 	return 1;
 }
 

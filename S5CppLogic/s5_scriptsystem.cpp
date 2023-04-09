@@ -205,13 +205,19 @@ void __stdcall EScr::LuaStateSerializer::SerializeOverride(BB::CFileStreamEx* f,
 		seri.SerializeState();
 	}
 	catch (const std::format_error& fe) {
-		shok::LogString("AdvLuaStateSerializer: serialize std::format_error: %s\n", fe.what());
+		std::string errmnsg{ "AdvLuaStateSerializer: serialize std::format_error: " };
+		errmnsg.append(fe.what());
+		MessageBox(0, errmnsg.c_str(), "", 0);
+		shok::LogString("%s\n", errmnsg.c_str());
 		throw;
 	}
 	catch (const BB::CException& be) {
 		char buff[201]{};
 		be.CopyMessage(buff, 200);
-		shok::LogString("AdvLuaStateSerializer: serialize BB::CException: %s\n", buff);
+		std::string errmnsg{ "AdvLuaStateSerializer: serialize BB::CException: " };
+		errmnsg.append(buff);
+		MessageBox(0, errmnsg.c_str(), "", 0);
+		shok::LogString("%s\n", errmnsg.c_str());
 		throw;
 	}
 }
@@ -242,13 +248,19 @@ void __stdcall EScr::LuaStateSerializer::DeserializeOverride(BB::CFileStreamEx* 
 			seri.DeserializeState();
 		}
 		catch (const std::format_error& fe) {
-			shok::LogString("AdvLuaStateSerializer: deserialize std::format_error: %s\n", fe.what());
+			std::string errmnsg{ "AdvLuaStateSerializer: deserialize std::format_error: " };
+			errmnsg.append(fe.what());
+			MessageBox(0, errmnsg.c_str(), "", 0);
+			shok::LogString("%s\n", errmnsg.c_str());
 			throw;
 		}
 		catch (const BB::CException& be) {
 			char buff[201]{};
 			be.CopyMessage(buff, 200);
-			shok::LogString("AdvLuaStateSerializer: deserialize BB::CException: %s\n", buff);
+			std::string errmnsg{ "AdvLuaStateSerializer: deserialize BB::CException: " };
+			errmnsg.append(buff);
+			MessageBox(0, errmnsg.c_str(), "", 0);
+			shok::LogString("%s\n", errmnsg.c_str());
 			throw;
 		}
 	}

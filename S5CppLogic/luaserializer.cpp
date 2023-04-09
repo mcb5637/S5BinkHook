@@ -312,6 +312,11 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua
 CppLogic::Serializer::AdvLuaStateSerializer::AdvLuaStateSerializer(BB::CFileStreamEx& io, lua_State* l)
 	: IO{ io }, L{ l }
 {
+	HMODULE h = GetModuleHandle("S5Lua5.dll"); // get the already loaded dll, and then the (possibly existing) funcs
+	if (h) {
+		lua_upvalueid = reinterpret_cast<void* (__cdecl*)(lua_State*, int, int)>(GetProcAddress(h, "lua_upvalueid"));
+		lua_upvaluejoin = reinterpret_cast<void(__cdecl*)(lua_State*, int, int, int, int)>(GetProcAddress(h, "lua_upvaluejoin"));
+	}
 }
 CppLogic::Serializer::AdvLuaStateSerializer::~AdvLuaStateSerializer()
 {
@@ -463,7 +468,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 {
 	L.PushValue(idx);
 	lua::DebugInfo i = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Upvalues);
-	if constexpr (!LuaHasUpvalue<lua::State>) {
+	if (!(lua_upvalueid && lua_upvaluejoin)) {
 		if (i.NumUpvalues > 0)
 			throw std::format_error{ "cannot serialize a lua function with upvalues" };
 	}
@@ -482,9 +487,9 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 			return 0;
 			}, this);
 		WritePrimitive(i.NumUpvalues);
-		if constexpr (LuaHasUpvalue<lua::State>) {
+		if (lua_upvalueid && lua_upvaluejoin) {
 			for (int n = 1; n <= i.NumUpvalues; ++n) {
-				const void* id = UpID(L, idx, n);
+				const void* id = lua_upvalueid(L.GetState(), idx, n);
 				auto uref = UpRefs.find(id);
 				if (uref == UpRefs.end()) {
 					UpRefs.insert(std::make_pair(id, UpvalueReference{ refnum, n }));
@@ -516,7 +521,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 	L.PushValue(-1);
 	L.SetTableRaw(IndexOfReferenceHolder, ref);
 	int nups = ReadPrimitive<int>("deserialze func invalid upvalue number");
-	if constexpr (LuaHasUpvalue<lua::State>) {
+	if (lua_upvalueid && lua_upvaluejoin) {
 		for (int n = 1; n <= nups; ++n) {
 			lua::LType t = DeserializeType();
 			if (t == UpvalueReferenceType) {
@@ -525,7 +530,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 				L.GetTableRaw(IndexOfReferenceHolder, funcref);
 				if (L.IsNil(-1))
 					throw std::format_error{ "error reading upvalue reference, invalid" };
-				UpJoin(L, -2, n, -1, upnum);
+				lua_upvaluejoin(L.GetState(), -2, n, -1, upnum);
 				L.Pop(1);
 			}
 			else {
@@ -663,7 +668,7 @@ bool CppLogic::Serializer::AdvLuaStateSerializer::CanSerialize(int idx)
 	{
 		if (L.IsCFunction(idx))
 			return false;
-		if constexpr (!LuaHasUpvalue<lua::State>) {
+		if (!(lua_upvalueid && lua_upvaluejoin)) {
 			L.PushValue(idx);
 			lua::DebugInfo i = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Upvalues);
 			if (i.NumUpvalues > 0) {
@@ -702,8 +707,8 @@ bool CppLogic::Serializer::AdvLuaStateSerializer::IsGlobalSkipped(const char* n)
 
 void CppLogic::Serializer::AdvLuaStateSerializer::PrepareSerialize()
 {
-	int vers = FileVersion;
-	WritePrimitive(&vers, sizeof(int));
+	WritePrimitive(FileVersion);
+	WritePrimitive(L.Version());
 	IndexOfReferenceHolder = L.GetTop();
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::CleanupSerialize()
@@ -712,8 +717,20 @@ void CppLogic::Serializer::AdvLuaStateSerializer::CleanupSerialize()
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::PrepareDeserialize()
 {
-	if (ReadPrimitive<int>("fileversion invalid size") != FileVersion)
+	int v = ReadPrimitive<int>("fileversion invalid size");
+	if (v == 1) { // legacy save format
+		lua_upvalueid = nullptr;
+		lua_upvaluejoin = nullptr;
+		// try to load anyway, will crash on invalid version
+	}
+	else if (v == FileVersion) {
+		double luaver = ReadPrimitive<double>("luaversion invalid size");
+		if (L.Version() != luaver)
+			throw std::format_error{ "file version missmatch" };
+	}
+	else {
 		throw std::format_error{ "invalid fileversion" };
+	}
 	L.NewTable();
 	IndexOfReferenceHolder = L.GetTop();
 }

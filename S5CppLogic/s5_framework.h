@@ -130,7 +130,7 @@ public:
 	PADDINGI(1); // 5 float?
 	double FixedUpdateTime; // 6
 	PADDINGI(2); // 8 double
-	PADDINGI(2); // 10 double update time?
+	double RealTimeMS; // 10 since start of exe, updated each tick
 	PADDINGI(2); // 12 double update time?
 
 	void SetFixedUpdateTime(double t);
@@ -218,7 +218,7 @@ namespace Framework {
 	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);
 	static_assert(offsetof(AGameModeBase, EscapeHandler) == 1423 * 4);
 	static_assert(offsetof(AGameModeBase, CheckSumCalc) == 1418 * 4);
-	//constexpr int i = offsetof(AGameModeBase, TimeManager)/4;
+	//constexpr int i = offsetof(AGameModeBase, TimeManager.RealTimeMS)/4;
 	class CSinglePlayerMode : public AGameModeBase {
 	public:
 		class CNetworkEvent : public BB::IPostEvent {

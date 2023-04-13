@@ -680,7 +680,7 @@ namespace shok {
 
 		Settler_SetDefaultTaskList = 0x12002, //BB::CEvent
 		// 0x12003 camp detach worker?
-		// 0x12004 settler wait? state 5 EGL::CEventValue<int,-27574121>
+		Settler_TaskWait = 0x12004, // EGL::CEventValue<int,-27574121>
 		Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
 		// 12008 leader hurt?
 

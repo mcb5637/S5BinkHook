@@ -782,7 +782,7 @@ namespace GGL {
 		int LatestAttackTurn, MilliSecondsToWait;
 
 		// defined tasks: TASK_SET_ORIENTATION_TO_TARGET, TASK_CHECK_RANGE, TASK_FIRE_PROJECTILE, TASK_BATTLE_WAIT_UNTIL, TASK_SET_LATEST_ATTACK_TURN, TASK_WAIT_FOR_LATEST_ATTACK
-		// defined states: Rotate, BattleWaitUntilAutoCannon, BattleWait (TASK_WAIT_FOR_LATEST_ATTACK), Default
+		// defined states: Rotate, Wait (TASK_BATTLE_WAIT_UNTIL), BattleWait (TASK_WAIT_FOR_LATEST_ATTACK), Default
 		// defined events: Leader_AttackEntity, Leader_OnAttackTargetDetached, Battle_GetDamageClass, Battle_GetLatestAttackerID, Battle_GetLatestHitTurn, GetDamage, OnAttackedBy,
 		//		AutoCannon_XXX
 

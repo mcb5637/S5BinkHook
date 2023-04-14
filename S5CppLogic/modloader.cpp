@@ -70,7 +70,7 @@ void CppLogic::ModLoader::ModLoader::PreMapStart(lua_State* ingame, const char* 
 	Init(L, mappath, "MapStart");
 }
 const char* internalmap_getpath(GS3DTools::CMapData* d) {
-	Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->GetCampagnInfo(d);
+	Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(d);
 	if (!ci)
 		return "";
 	Framework::MapInfo* i = ci->GetMapInfoByName(d->MapName.c_str());

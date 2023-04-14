@@ -706,6 +706,8 @@ function CppLogic.API.DoString(code, name) end
 --- @param typ number type code
 --- @param campname string campagn name
 --- @return string path
+--- @return string GUID
+--- @return number[] keys
 function CppLogic.API.MapGetDataPath(mapname, typ, campname) end
 
 --- returns the map a save is accociated with.

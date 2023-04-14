@@ -240,10 +240,12 @@ void __stdcall Framework::CMultiPlayerMode::CNetworkEvent::PostEvent(BB::CEvent*
     throw 0;
 }
 
-Framework::CampagnInfo* Framework::CMain::GetCampagnInfo(int i, const char* n)
+Framework::CampagnInfo* Framework::CMain::CIH::GetCampagnInfo(int i, const char* n)
 {
+    if (i < -1 || i >= 4)
+        return nullptr;
     Framework::CampagnInfo* r = nullptr;
-    int* th = &CampagnInfoHandler;
+    auto* th = this;
     __asm {
         push n;
         mov ecx, th;
@@ -255,11 +257,10 @@ Framework::CampagnInfo* Framework::CMain::GetCampagnInfo(int i, const char* n)
     }
     return r;
 }
-Framework::CampagnInfo*(__thiscall* const framew_getcinfo)(int* th, const GS3DTools::CMapData* s) = reinterpret_cast<Framework::CampagnInfo*(__thiscall* const)(int*, const GS3DTools::CMapData*)>(0x5190D5);
-Framework::CampagnInfo* Framework::CMain::GetCampagnInfo(GS3DTools::CMapData* d)
+Framework::CampagnInfo*(__thiscall* const framew_getcinfo)(void* th, const GS3DTools::CMapData* s) = reinterpret_cast<Framework::CampagnInfo*(__thiscall* const)(void*, const GS3DTools::CMapData*)>(0x5190D5);
+Framework::CampagnInfo* Framework::CMain::CIH::GetCampagnInfo(GS3DTools::CMapData* d)
 {
-    static_assert(offsetof(Framework::CMain, CampagnInfoHandler) == 174 * 4);
-    return framew_getcinfo(&CampagnInfoHandler, d);
+    return framew_getcinfo(this, d);
 }
 
 inline void(__thiscall* const framew_savegdb)(Framework::CMain* th) = reinterpret_cast<void(__thiscall* const)(Framework::CMain*)>(0x40AED0);

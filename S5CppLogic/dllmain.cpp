@@ -287,7 +287,8 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	L.Push(L.CheckSettler(1)->TimeToWait);
+	auto* a = &(*Framework::CMain::GlobalObj)->CampagnInfoHandler;
+	L.Push((int)a);
 	return 1;
 }
 

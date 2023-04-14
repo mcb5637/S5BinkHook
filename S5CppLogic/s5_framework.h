@@ -38,7 +38,7 @@ namespace Framework {
 		shok::String MiniMapTextureName;
 		bool IsExternalmap; // ? 40
 		PADDING(3);
-		shok::Vector<int> Keys;
+		shok::Vector<int> Keys; // check goes for every map key has to be in shok keys
 		struct {
 			shok::String Data;
 		} GUID;
@@ -49,10 +49,31 @@ namespace Framework {
 
 	struct CampagnInfo {
 		shok::Vector<Framework::MapInfo> Maps;
+		shok::String CampagnName;
 
 		int GetMapIndexByName(const char* s);
 		Framework::MapInfo* GetMapInfoByName(const char* n);
+
+		// load 51AA04 __thiscall(path, shok::Vector<int>* Keys, bool isSp)
 	};
+	static_assert(sizeof(CampagnInfo) == 11 * 4);
+	struct ActualCampagnInfo { // CampaignInfo.xml in the campagn folder
+		struct MapInfo {
+			int ID;
+			int NextMapID;
+			shok::String Name;
+
+			static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x87ED18);
+		};
+
+		int Desc;
+		shok::Vector<MapInfo> Maps; // as far as i know unused
+		shok::String Name;
+		CampagnInfo Info; // not serialized
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x87EDD0);
+	};
+	static_assert(sizeof(ActualCampagnInfo) == 23 * 4);
 
 	struct SaveData {
 		friend struct SavegameSystem;
@@ -295,16 +316,28 @@ namespace Framework {
 		PADDINGI(1);
 		NextMode ToDo; // 171
 		PADDINGI(2);
-	private:
-		int CampagnInfoHandler;
-	public:
-		PADDINGI(52);
+		struct CIH {
+			shok::Vector<ActualCampagnInfo> Campagns; // access with -1 + name
+			CampagnInfo Infos[4];
+			struct {
+				shok::Vector<int> Keys;
+				// set to extra num 51BA6A __thiscall
+				// check normal 51B9F7 __thiscall(shok::vector<int>*)
+				// check sp 51BA3C __thiscall(shok::vector<int>*) for some reason also checks if vectors sizes match
+			} Keys;
+
+			Framework::CampagnInfo* GetCampagnInfo(int i, const char* n);
+			Framework::CampagnInfo* GetCampagnInfo(GS3DTools::CMapData* d);
+
+			// load maps 51908F __thiscall
+			// load campagns 51A11A __thiscall(path, shok::Vector<int>* Keys)
+
+		} CampagnInfoHandler;
+		PADDINGI(1);
 		GDB::CList GDB; // 227
 
 		static inline constexpr int vtp = 0x76293C;
 
-		Framework::CampagnInfo* GetCampagnInfo(int i, const char* n);
-		Framework::CampagnInfo* GetCampagnInfo(GS3DTools::CMapData* d);
 		void SaveGDB();
 
 		static inline Framework::CMain** const GlobalObj = reinterpret_cast<Framework::CMain**>(0x84EF60);
@@ -323,6 +356,7 @@ namespace Framework {
 	static_assert(offsetof(Framework::CMain, GameModeBase) == 169 * 4);
 	static_assert(offsetof(Framework::CMain, SavegameToLoad) == 90 * 4);
 	static_assert(offsetof(Framework::CMain, GluePropsManager) == 150 * 4);
+	static_assert(offsetof(Framework::CMain, CampagnInfoHandler) == 174 * 4);
 	//constexpr int i = offsetof(Framework::CMain, MainmenuState) / 4;
 }
 

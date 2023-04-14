@@ -112,14 +112,22 @@ namespace CppLogic::API {
 		int ty = L.CheckInt(2);
 		const char* cn = L.OptString(3, nullptr); // optional
 		const char* n = L.CheckString(1);
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->GetCampagnInfo(ty, cn);
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
 		if (!ci)
 			throw lua::LuaException("invalid map type/campagn");
 		Framework::MapInfo* i = ci->GetMapInfoByName(n);
 		if (!i)
 			throw lua::LuaException("invalid map");
 		L.Push(i->MapFilePath.c_str());
-		return 1;
+		L.Push(i->GUID.Data.c_str());
+		L.NewTable();
+		int j = 1;
+		for (int k : i->Keys) {
+			L.Push(k);
+			L.SetTableRaw(-2, j);
+			++j;
+		}
+		return 3;
 	}
 
 	int SaveGetMapInfo(lua::State L) {
@@ -266,7 +274,7 @@ namespace CppLogic::API {
 		int ty = L.CheckInt(2 + indexoff);
 		const char* cn = L.OptString(3 + indexoff, nullptr); // optional
 		const char* n = L.CheckString(1 + indexoff);
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->GetCampagnInfo(ty, cn);
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
 		if (!ci)
 			throw lua::LuaException("invalid map type/campagn");
 		Framework::MapInfo* i = ci->GetMapInfoByName(n);

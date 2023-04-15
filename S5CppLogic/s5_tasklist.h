@@ -274,11 +274,18 @@ namespace GGL {
 }
 
 namespace EGL {
+    enum class PrincipalTasks : int {
+        Work = 1,
+        Idle = 2,
+        Eat = 3,
+        Rest = 4,
+    };
+
     class CGLETaskList : public BB::IObject {
     public:
         shok::Vector<EGL::CGLETaskArgs*> Task;
         int TaskListID;
-        int PrincipalTask;
+        PrincipalTasks PrincipalTask;
         char* Script;
 
         int GetNumberOfTasks();

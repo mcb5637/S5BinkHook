@@ -671,24 +671,21 @@ namespace shok {
 
 		Formation_GetPosInFormation = 0x1101E, //EGL::CEventPosition
 
-		// 11002 bino cancel
-		// 11003 serfbattle, set territory?
-
 		// 0x11013 evadingent
 		// 0x11014 evadingent to 0x11011 cevent
 		// 0x11015 evadingent
-
-		Settler_SetDefaultTaskList = 0x12002, //BB::CEvent
-		// 0x12003 camp detach worker?
-		Settler_TaskWait = 0x12004, // EGL::CEventValue<int,-27574121>
-		Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121
-		// 12008 leader hurt?
 
 		Binocular_ExploreCommand = 0x11102, //EGL::CEventPosition
 		TorchPlacer_PlaceTorch = 0x11103, //EGL::CEventPosition
 		PointToResources_Activate = 0x11104, //BB::CEvent
 
-		Worker_WorkPlaceBuildingDestroyed = 0x13002, //EGL::CEvent1Entity serf probably construction/repair destr
+		Settler_SetDefaultTaskList = 0x12002, //BB::CEvent
+		Camp_OnWorkerDetach = 0x12003, //EGL::CEvent1Entity
+		Settler_TaskWait = 0x12004, // EGL::CEventValue<int,-27574121>
+		Animation_SetAnimSet = 0x12007, //EGL::CEventValue<int,-27574121>
+		Leader_ChangePlayer = 0x12008, //EGL::CEventValue<int,-27574121> (better use EGL::CGLEEntity::AdvChangePlayer)
+
+		Worker_OnWorkPlaceBuildingDestroyed = 0x13002, //EGL::CEvent1Entity serf probably construction/repair destr
 		Worker_FarmBuildingDestroyed = 0x13003, //EGL::CEvent1Entity
 		Worker_ResidencePlaceBuildingDestroyed = 0x13004, //EGL::CEvent1Entity
 		FeedbackEvent_BattleOnDamageDealt = 0x13005, //GGL::CFeedbackEventBattling
@@ -697,18 +694,19 @@ namespace shok {
 		Worker_GetWorkTaskList = 0x13009, //EGL::CEventGetValue<int,1211121895> checks building, then props
 		Worker_LevyTaxes = 0x1300A, //BB::CEvent
 		Worker_ForceToWork = 0x1300B, //BB::CEvent
-		// 1300C most likely worker leave
-		// 0x1300D camp get num slots?
-		// 0x1300E camp get pos from slot?
-		// 0x1300F camp attach worker?
-		// 0x13010 camp has free slot?
-		// 0x13011 worker on camp detach?
-		// 13012 camper beh forward to 12003 on camp
+		// 1300C most likely worker leave, called by task gotodefendbuildingcheck?
+		Camp_GetNextFreeSlot = 0x1300D, //EGL::CEventGetValue<int,1211121895> returns slot id, on error?
+		Camp_GetPositionOfSlot = 0x1300E, //GGL::CEventGetPositionFromID
+		Camp_AttachCamper = 0x1300F, //GGL::CEventEntityIndex
+		Camp_HasFreeSlot = 0x13010, //EGL::CEventGetValue<bool,1709081367>
+		Camper_OnCampDetach = 0x13011, //EGL::CEvent1Entity
+		Camper_LeaveCamp = 0x13012, //BB::CEvent
 		// worker 13013 get int something cycleindex
 		// worker 13014 empty EGL::CEventValue<int,-27574121>
 		Worker_Bless = 0x13015, //BB::CEvent
 		Worker_AdvanceInCycles = 0x13016, //BB::CEvent
 		// worker 13017 CycleIndex=5
+		Worker_OnLeaveBuildingDetach = 0x13018, //EGL::CEvent1Entity
 		Worker_ChangeMoti = 0x13019, //GGL::CEventChangeMotivation
 		Worker_GetMaxWorkTime = 0x1301A, //EGL::CEventGetValue<int, 1211121895>
 		Worker_GetWorkTimeRemaining = 0x1301B, //EGL::CEventGetValue<int, 1211121895>
@@ -716,7 +714,6 @@ namespace shok {
 		Worker_OnBuildingCatchFire = 0x1301D, //EGL::CEvent1Entity worker something entity
 		Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
 		WorkerFlee_IsFleeing = 0x1301F, //EGL::CEventGetValue<bool,1709081367>
-		// 13018 worker leave? EGL::CEvent1Entity
 		// 13020 worker get some bool condidtionally forwards to 18007
 		Worker_IsLeaving = 0x13021, //EGL::CEventGetValue<bool,1709081367>
 		Worker_GetTransportModel = 0x13022, //EGL::CEventGetValue<int, 1211121895>
@@ -736,8 +733,6 @@ namespace shok {
 		BattleSerf_CommandTurnToSerf = 0x14006, //BB::CEvent serf stop if toserf tl
 		Serf_GetResourceAttachmentOffset = 0x14007, //EGL::CEventGetValue<float,1468983543> used for resouce finder
 		BattleSerf_GetTimeToChangeBack = 0x14008, //EGL::CEventGetValue<int, 1211121895>
-
-		// 18003 get bool true
 
 		Leader_AttackEntity = 0x15004, //EGL::CEvent1Entity
 		Leader_OnAttackCommandTargetDetach = 0x15005, //EGL::CEvent1Entity
@@ -792,7 +787,7 @@ namespace shok {
 		GetArmor = 0x1503E, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTaskList = 0x1503F, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTime = 0x15040, //EGL::CEventGetValue<float, 1468983543>
-		// 0x15041 rax is training allowed?
+		// 0x15041 rax is training allowed? unused
 		Leader_SetTrainingTL = 0x15042, //EGL::CEventValue<int,-27574121>
 		Barracks_GetLeaveTaskList = 0x15043, //EGL::CEventGetValue<int, 1211121895>
 		Leader_OnBarracksDetach = 0x15044, //EGL::CEvent1Entity
@@ -866,7 +861,7 @@ namespace shok {
 		WorkPlace_OnWorkerAttach = 0x17003, //EGL::CEvent1Entity
 		WorkPlace_OnWorkerDetach = 0x17004, //EGL::CEvent1Entity
 		Building_OnConstructionComplete = 0x17005, //BB::CEvent affectmoti affect moti, foundation init, defendablebuil activate defendmode construction complete
-		// 0x17006 buildingbeh forward to 0x17004
+		BuildingBeh_OnWorkerDetach = 0x17006, //EGL::CEvent1Entity forward to WorkPlace_OnWorkerDetach
 		Market_WorkStep = 0x17007, //BB::CEvent
 		University_ResearchStep = 0x17008, //BB::CEvent
 		Market_GetProgress = 0x17009, //EGL::CEventGetValue<float,1468983543>
@@ -938,7 +933,7 @@ namespace shok {
 
 		Animal_FleeFrom = 0x1E002, // EGL::CEventPosition
 
-		// 20001 move to entity?
+		Movement_TaskMoveToApproachPosOf = 0x20001, //EGL::CEvent1Entity
 		Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity
 		Movement_TaskMoveToPos = 0x20003, //EGL::CEventPosition
 		MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim

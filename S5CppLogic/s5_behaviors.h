@@ -479,7 +479,7 @@ namespace GGL {
 		shok::Position ExlorationPosition;
 
 		// defined tasks: TASK_EXPLORE, TASK_TURN_TO_EXPLORE_POSITION
-		// defined events: Binocular_XXX, OnAttackedBy, 11002
+		// defined events: Binocular_XXX, OnAttackedBy, MoveCommand_Move
 
 		static inline constexpr int vtp = 0x779218;
 		static inline constexpr int TypeDesc = 0x829248;
@@ -763,7 +763,7 @@ namespace GGL {
 		// padding 2, shok_pos territory?
 
 		// defined events: MoveCommand_Move, Leader_AttackEntity, Leader_GetAttackTarget, Behavior_Tick, OnAttackedBy, Leader_OnAttackCommandTargetDetach
-		//		SerfBattle_OnTurnToSerfCommand
+		//		SerfBattle_OnTurnToSerfCommand, Leader_SetTerritory
 		// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE
 
 		static inline constexpr int vtp = 0x774A98;
@@ -896,12 +896,14 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x823720;
 		static inline constexpr unsigned int Identifier = 0x1ADA8097;
 	};
+	class CCampBehaviorProperties;
 	class CCampBehavior : public EGL::CGLEBehavior {
 	public:
-		PADDINGI(1);
-		shok::Vector<shok::Position> Slot; // not sure if it is positions in here
-		int NumTurnsToDeletion;
+		GGL::CCampBehaviorProperties* CampProps;
+		shok::Vector<int> Slot; // 5 attached entity ids
+		int NumTurnsToDeletion; // 9
 
+		// defined events: Camp_XXX
 		// defined states: Default
 
 		static inline constexpr int vtp = 0x777864;
@@ -1209,7 +1211,7 @@ namespace GGL {
 		// 5 p to GGL::CBuildingBehavior::CSlotBuilding ?
 
 		// defined states: Default, ?
-		// defined events: Die
+		// defined events: Die, BuildingBeh_XXX
 
 		static inline constexpr int vtp = 0x777FBC;
 		static inline constexpr int TypeDesc = 0x8247AC;

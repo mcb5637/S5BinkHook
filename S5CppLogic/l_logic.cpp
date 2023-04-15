@@ -402,6 +402,29 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int GetArchiveOfFile(lua::State L) {
+		const char* s = L.CheckString(1);
+		auto* mng = (*BB::CFileSystemMgr::GlobalObj);
+		BB::IFileSystem::FileInfo info{};
+		for (unsigned int i = 0; i < mng->LoadOrder.size(); ++i) {
+			mng->LoadOrder[i]->GetFileInfo(&info, s);
+			if (info.Found) {
+				if (BB::CDirectoryFileSystem* a2 = dynamic_cast<BB::CDirectoryFileSystem*>(mng->LoadOrder[i])) {
+					L.Push(a2->Path);
+				}
+				else if (BB::CBBArchiveFile* a2 = dynamic_cast<BB::CBBArchiveFile*>(mng->LoadOrder[i])) {
+					L.Push(a2->ArchiveFile.Filename);
+				}
+				else {
+					L.Push(typeid(*mng->LoadOrder[i]).name());
+				}
+				L.Push(static_cast<int>(i + 1));
+				return 2;
+			}
+		}
+		return 0;
+	}
+
 	int EnableMaxHPTechMod(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supportet with SCELoader");
@@ -1379,7 +1402,7 @@ namespace CppLogic::Logic {
 		GGL::CEntityProfile::HookExperience(false);
 	}
 
-	constexpr std::array<lua::FuncReference, 59> Logic{ {
+	constexpr std::array<lua::FuncReference, 60> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1403,6 +1426,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<GetLoadOrder>("GetLoadOrder"),
 			lua::FuncReference::GetRef<AddArchive>("AddArchive"),
 			lua::FuncReference::GetRef<RemoveTopArchive>("RemoveTopArchive"),
+			lua::FuncReference::GetRef<GetArchiveOfFile>("GetArchiveOfFile"),
 			lua::FuncReference::GetRef<EnableMaxHPTechMod>("EnableMaxHPTechMod"),
 			lua::FuncReference::GetRef<LandscapeGetTerrainType>("LandscapeGetTerrainType"),
 			lua::FuncReference::GetRef<LandscapeGetWaterType>("LandscapeGetWaterType"),

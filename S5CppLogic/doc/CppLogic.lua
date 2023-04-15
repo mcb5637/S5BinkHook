@@ -419,6 +419,12 @@ function CppLogic.Logic.GetLoadOrder() end
 function CppLogic.Logic.AddArchive(arch) end
 --- removes the top archive. may only remove archives that you added yourself.
 function CppLogic.Logic.RemoveTopArchive() end
+--- tries to locate the file in the loadorder and return its archive/folder.
+--- requires \\ as path separator and no leading data\\, also requires no absolute path (starting with a drive letter).
+---@param file string
+---@return string|nil archive
+---@return number|nil archiveIndex
+function CppLogic.Logic.GetArchiveOfFile(file) end
 
 --- color by color index.
 --- does not work with SCELoader.

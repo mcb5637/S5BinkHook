@@ -766,6 +766,63 @@ void GGL::CGLBehaviorAnimationEx::HookNonCancelableAnim()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x588408), &anim_hooknoncancelanim_asm, reinterpret_cast<void*>(0x588410));
 }
 
+inline GGL::CBuilding* (__thiscall* const workerbeh_gefirstattachedbuild)(GGL::CWorkerBehavior* th, shok::AttachmentType a) = reinterpret_cast<GGL::CBuilding * (__thiscall*)(GGL::CWorkerBehavior*, shok::AttachmentType)>(0x4CE720);
+GGL::CBuilding* GGL::CWorkerBehavior::GetFirstAttachedBuilding(shok::AttachmentType a)
+{
+	return workerbeh_gefirstattachedbuild(this, a);
+}
+
+inline GGL::CBuilding* (__thiscall* const workerbeh_geworkplace)(GGL::CWorkerBehavior* th) = reinterpret_cast<GGL::CBuilding * (__thiscall*)(GGL::CWorkerBehavior*)>(0x4CEAA9);
+GGL::CBuilding* GGL::CWorkerBehavior::GetWorkplace()
+{
+	return workerbeh_geworkplace(this);
+}
+
+inline bool (__thiscall* const workerbeh_isresearching)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool (__thiscall*)(GGL::CWorkerBehavior*)>(0x4CFA8B);
+bool GGL::CWorkerBehavior::IsResearchingSomething()
+{
+	return workerbeh_isresearching(this);
+}
+
+void __declspec(naked) workerbehavior_hooksupplierskipasm() {
+	__asm {
+		mov ecx, [ebp - 0x10];
+		call GGL::CWorkerBehavior::AddSupplierSkip;
+
+		mov ecx, [ebp - 0xC];
+		pop edi;
+		pop esi;
+		pop ebx;
+
+		push 0x4D168F;
+		ret;
+	};
+}
+bool HookSupplierSkip_Hooked = false;
+void GGL::CWorkerBehavior::HookSupplierSkip()
+{
+	if (HookSupplierSkip_Hooked)
+		return;
+	HookSupplierSkip_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4D1689), 0x10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4D1689), &workerbehavior_hooksupplierskipasm, reinterpret_cast<void*>(0x4D168F));
+}
+
+int GGL::CWorkerBehavior::TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg)
+{
+	if (IsResearchingSomething()) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+		e->CurrentTaskIndex = arg->Value - 1;
+	}
+	return 0;
+}
+
+void __thiscall GGL::CWorkerBehavior::AddSupplierSkip()
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	e->CreateTaskHandler<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING>(this, &CWorkerBehavior::TaskSkipSupplierIfResearching);
+}
+
 static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(const GGL::CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(const GGL::CAutoCannonBehavior*)>(0x50F508);
 float GGL::CAutoCannonBehavior::GetMaxRange() const
 {

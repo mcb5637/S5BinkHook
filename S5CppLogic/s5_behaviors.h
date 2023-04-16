@@ -627,6 +627,15 @@ namespace GGL {
 		static inline constexpr int vtp = 0x772B30;
 		static inline constexpr int TypeDesc = 0x813B1C;
 		static inline constexpr unsigned int Identifier = 0x0DCDBAB9D;
+
+		GGL::CBuilding* GetFirstAttachedBuilding(shok::AttachmentType a);
+		GGL::CBuilding* GetWorkplace(); // fires workplace detached if no workplace found
+		bool IsResearchingSomething();
+
+		static void HookSupplierSkip();
+	private:
+		int TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg);
+		void __thiscall AddSupplierSkip();
 	};
 
 	class CBehaviorFollow : public EGL::CGLEBehavior {

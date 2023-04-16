@@ -335,7 +335,7 @@ namespace shok {
         //  GGL::CSoldierBehavior+GGL::CeaderBehavior pos relative to barracks, GGL::CSettlerMerchantBehavior pos relative to merch building,
         //  GGL::CHawkBehavior pos relative to hero)
         //  ignores blocking
-        TASK_GO_TO_POS = 2,
+        TASK_GO_TO_POS = 2, //EGL::CGLETaskArgsPosition (unused)
         TASK_SET_ANIM = 3, //EGL::CGLETaskArgsAnimation (GGL::CGLBehaviorAnimationEx, EGL::CBehaviorAnimation)
         TASK_SET_SUB_ANIM = 4, //EGL::CGLETaskArgsSubAnim (EGL::GLEBehaviorMultiSubAnims)
         TASK_WAIT_FOR_ANIM = 5, //EGL::CGLETaskArgsThousands (EGL::CBehaviorAnimation) wait to part of anims duration 1000->1, always timed from start of animation.
@@ -353,43 +353,43 @@ namespace shok {
         TASK_DEACTIVATE_PARTICLE_EFFECT = 17, //EGL::CTaskArgsParticleEffectIndex (GGL::CWorkerBehavior)
         TASK_SPAWN_PARTICLE_EFFECT = 18, //EGL::CTaskArgsParticleEffectIndexAndType (EGL::CParticleEffectAttachmentBehavior)
         TASK_ACTIVATE_UVANIM = 19, //EGL::CTaskArgsUVAnim (GGL::CWorkerBehavior, GGL::CLeaderBehavior)
-        TASK_SET_ANIM_AT_BUILDING = 20,
+        TASK_SET_ANIM_AT_BUILDING = 20, //EGL::CGLETaskArgsSubAnim (unused)
         TASK_VANISH = 21, //EGL::CGLETaskArgs (GGL::CSettler)
         TASK_APPEAR = 22, //EGL::CGLETaskArgs (GGL::CSettler)
         TASK_LIST_DONE = 23, //EGL::CGLETaskArgs (GGL::CSettler)
-        TASK_CREATE_OBJ = 24,
-        TASK_DELETE_OBJ = 25,
+        TASK_CREATE_OBJ = 24, //EGL::CGLETaskArgs (unused)
+        TASK_DELETE_OBJ = 25, //EGL::CGLETaskArgs (unused)
         TASK_ENTER_BUILDING = 26, //GGL::CGLTaskArgsTargetType (GGL::CSettler)
         TASK_LEAVE_BUILDING = 27, //EGL::CGLETaskArgs (GGL::CSettler)
         TASK_GO_TO_MAIN_HOUSE = 28, //EGL::CGLETaskArgs (GGL::CSerfBehavior, GGL::CBattleSerfBehavior)
-        TASK_CHANGE_TYPE = 29,
-        TASK_ATTACH_TOOL = 30,
-        TASK_PUT_ON_PILE = 31,
-        TASK_GET_FROM_PILE = 32,
-        TASK_GO_TO_ENTITY = 33,
-        TASK_GO_TO_WORK_AREA = 34,
-        TASK_GO_TO_BLOCKED_PILE = 35,
-        TASK_GO_TO_PILE = 36,
-        TASK_GO_TO_PILE_COMMAND_POS = 37,
-        TASK_CREATE_PILE_AND_PUT_GOOD_TO_IT = 38,
-        TASK_ATTACH_GOOD = 39,
-        TASK_DETACH_GOOD = 40,
-        TASK_DECREASE_RESOURCE = 41,
-        TASK_SEARCH_FOR_RESOURCE = 42,
-        TASK_SEARCH_FOR_PILE = 43,
+        TASK_CHANGE_TYPE = 29, //EGL::CGLETaskArgs (unused)
+        TASK_ATTACH_TOOL = 30, //EGL::CGLETaskArgs (unused)
+        TASK_PUT_ON_PILE = 31, //EGL::CGLETaskArgs (unused)
+        TASK_GET_FROM_PILE = 32, //EGL::CGLETaskArgs (unused)
+        TASK_GO_TO_ENTITY = 33, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_GO_TO_WORK_AREA = 34, //EGL::CGLETaskArgs (unused)
+        TASK_GO_TO_BLOCKED_PILE = 35, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_GO_TO_PILE = 36, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_GO_TO_PILE_COMMAND_POS = 37, //EGL::CGLETaskArgs (unused)
+        TASK_CREATE_PILE_AND_PUT_GOOD_TO_IT = 38, //EGL::CGLETaskArgs (unused)
+        TASK_ATTACH_GOOD = 39, //GGL::CGLTaskArgsGoodType (unused)
+        TASK_DETACH_GOOD = 40, //GGL::CGLTaskArgsGoodType (unused)
+        TASK_DECREASE_RESOURCE = 41, //GGL::CGLTaskArgsGoodType (unused)
+        TASK_SEARCH_FOR_RESOURCE = 42, //EGL::CGLETaskArgs (unused)
+        TASK_SEARCH_FOR_PILE = 43, //EGL::CGLETaskArgs (unused)
         TASK_WALK = 44, //EGL::CGLETaskArgs (GGL::CBehaviorWalkCommand)
-        TASK_DECREASE_COLLECTED_RESOURCE = 45,
-        TASK_DESTROY = 46,
-        TASK_GET_FROM_PILE_OF_TYPE = 47,
-        TASK_CHECK_START_HARVESTING = 48,
-        TASK_START_FARMING = 49,
-        TASK_SOW = 50,
+        TASK_DECREASE_COLLECTED_RESOURCE = 45, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_DESTROY = 46, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_GET_FROM_PILE_OF_TYPE = 47, //GGL::CGLTaskArgsGoodType (unused)
+        TASK_CHECK_START_HARVESTING = 48, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_START_FARMING = 49, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_SOW = 50, //EGL::CGLETaskArgs (unused)
 
-        TASK_PERFORM_ATTACK = 51,
+        TASK_PERFORM_ATTACK = 51, //EGL::CGLETaskArgs (unused)
         TASK_CREATE_ENTITY = 52, //EGL::CGLETaskArgsEntityTypeAndPos (GGL::CGLBehaviorDying)
-        TASK_REPAIR = 53,
-        TASK_RETURN_TO_EMPLOYER = 54,
-        TASK_GO_TO_POS_EX = 55,
+        TASK_REPAIR = 53, //GGL::CGLTaskArgsTargetType (unused)
+        TASK_RETURN_TO_EMPLOYER = 54, //EGL::CGLETaskArgs (unused)
+        TASK_GO_TO_POS_EX = 55, //GGL::CGLTaskArgsPositionAndTarget (unused)
         TASK_WANDER = 56, //EGL::CGLETaskArgs (GGL::CAnimal)
         TASK_BACK_TO_DEFAULT_TASKLIST = 57, //EGL::CGLETaskArgs (GGL::CAnimal)
         TASK_WAIT_UNTIL = 58, //EGL::CGLETaskArgsThousandths (GGL::CSettler) wait for definedTime + 100*(entity.TaskListStart - currentTick) (time since TASK_RESET_TASK_LIST_TIMER)
@@ -414,14 +414,14 @@ namespace shok {
         TASK_INCREASE_PLAYER_WEATHERENERGY = 77, //EGL::CTaskArgsInteger (GGL::CWorkerBehavior)
         TASK_INCREASE_PLAYER_KNOWLEDGE = 78, //EGL::CTaskArgsInteger (GGL::CWorkerBehavior)
         TASK_INCREASE_PLAYER_FAITH = 79, //EGL::CTaskArgsInteger (GGL::CWorkerBehavior)
-        TASK_CONSUME_RESOURCE = 80,
+        TASK_CONSUME_RESOURCE = 80, //EGL::CTaskArgsInteger (unused)
         TASK_MINED_RESOURCE = 81, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_GO_TO_WORK_BUILDING = 82, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
-        TASK_GO_TO_EAT_BUILDING = 83,
+        TASK_GO_TO_EAT_BUILDING = 83, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_GO_TO_REST_BUILDING = 84, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_GO_TO_LEAVE_BUILDING = 85, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
-        TASK_NEW_MOTIVATION_MODIFIER = 86,
-        TASK_CHECK_MOTIVATION = 87,
+        TASK_NEW_MOTIVATION_MODIFIER = 86, //EGL::CTaskArgsInteger (unused)
+        TASK_CHECK_MOTIVATION = 87, //EGL::CTaskArgs (unused?)
         TASK_WORK_WAIT_UNTIL = 88, //EGL::CGLETaskArgs (GGL::CWorkerBehavior) TASK_WAIT_UNTIL with CWorkerBehaviorProps->WorkWaitUntil
         TASK_EAT_WAIT = 89, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_REST_WAIT = 90, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
@@ -436,9 +436,9 @@ namespace shok {
         TASK_ASSUME_POSITION_IN_FORMATION = 99, //EGL::CGLETaskArgs (GGL::CFormationBehavior)
 
         TASK_IDLE_IN_FORMATION = 100, //EGL::CGLETaskArgs (GGL::CFormationBehavior)
-        TASK_FIND_RESEARCH_BUILDING = 101,
-        TASK_GO_TO_RESEARCH_BUILDING = 102,
-        TASK_DO_RESEARCH = 103,
+        TASK_FIND_RESEARCH_BUILDING = 101, //EGL::CTaskArgs (unused)
+        TASK_GO_TO_RESEARCH_BUILDING = 102, //EGL::CTaskArgs (unused)
+        TASK_DO_RESEARCH = 103, //EGL::CTaskArgs (unused)
         TASK_CHECK_RANGE = 104, //EGL::CGLETaskArgs (GGL::CBattleBehavior, GGL::CAutoCannonBehavior)
         TASK_ABANDON_CURRENT_JOB = 105, //EGL::CGLETaskArgs (GGL::CSerfBehavior)
         TASK_GO_TO_RESOURCE = 106, //EGL::CGLETaskArgs (GGL::CSerfBehavior)
@@ -495,7 +495,7 @@ namespace shok {
         TASK_CHECK_GO_TO_WORK_BUILDING_SUCCESS = 156, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_CHECK_GO_TO_VILLAGE_CENTER_SUCCESS = 157, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_CHECK_GO_TO_DEFENDABLE_BUILDING_SUCCESS = 158, //EGL::CGLETaskArgs (GGL::CWorkerAlarmModeBehavior)
-        TASK_TAKE_FROM_STOCK = 159,
+        TASK_TAKE_FROM_STOCK = 159, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_SET_CARRIER_MODEL = 160, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_CHECK_GO_TO_SUPPLIER_SUCCESS = 161, //EGL::CGLETaskArgs (GGL::CWorkerBehavior)
         TASK_LEFT_BUILDING = 162, //EGL::CGLETaskArgs (GGL::CSettler)
@@ -506,7 +506,7 @@ namespace shok {
         TASK_INTERACT_WITH_NPC = 167, //EGL::CGLETaskArgs (GGL::CHeroBehavior)
         TASK_SET_SPECIAL_ATTACK_ANIM = 168, //EGL::CGLETaskArgs (GGL::CInflictFearAbility, GGL::CCircularAttack)
         TASK_PERFORM_SPECIAL_ATTACK = 169, //EGL::CGLETaskArgs (GGL::CInflictFearAbility, GGL::CCircularAttack)
-        TASK_RETURN_TO_OLD_TASK_LIST = 170,
+        TASK_RETURN_TO_OLD_TASK_LIST = 170, //EGL::CGLETaskArgs (unused?)
         TASK_CHECK_MIN_RADIUS = 171, //EGL::CGLETaskArgs (GGL::CLeaderBehavior)
         TASK_MOVE_TO_BUILDING_TO_CONVERT = 172, //EGL::CGLETaskArgs (GGL::CConvertBuildingAbility)
         TASK_CONVERT_BUILDING = 173, //EGL::CGLETaskArgs (GGL::CConvertBuildingAbility)
@@ -549,8 +549,9 @@ namespace shok {
         TASK_TURN_TO_SNIPER_TARGET = 209, //EGL::CGLETaskArgs (GGL::CSniperAbility)
         TASK_TURN_TO_SHURIKEN_TARGET = 210, //EGL::CGLETaskArgs (GGL::CShurikenAbility)
 
-        TASK_LUA_FUNC = 1500,
-        TASK_WAIT_FOR_ANIM_NON_CANCELABLE = 1501,
+        TASK_LUA_FUNC = 1500, //EGL::CTaskArgsInteger (EGL::CGLEEntity::HookLuaTaskList)
+        TASK_WAIT_FOR_ANIM_NON_CANCELABLE = 1501, //EGL::CGLETaskArgsThousandths (GGL::CGLBehaviorAnimationEx::HookNonCancelableAnim)
+        TASK_SKIP_SUPPLIER_IF_RESEARCHING = 1502, //EGL::CTaskArgsInteger (GGL::CWorkerBehavior::HookSupplierSkip)
     };
 
     enum class TaskState : int {
@@ -590,4 +591,6 @@ namespace shok {
         LuaFunc = 500,
         WaitForAnimNonCancelable = 501,
     };
+
+    extern std::map<TaskState, std::string_view> TaskStateToName;
 }

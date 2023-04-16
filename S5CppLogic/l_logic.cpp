@@ -1378,6 +1378,7 @@ namespace CppLogic::Logic {
 		EGL::TaskData::AddExtraTasks();
 		EGL::CGLEEntity::HookLuaTaskList();
 		GGL::CGLBehaviorAnimationEx::HookNonCancelableAnim();
+		GGL::CWorkerBehavior::HookSupplierSkip();
 	}
 
 	void OnLoad()

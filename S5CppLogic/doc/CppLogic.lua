@@ -1085,6 +1085,13 @@ function CppLogic.Entity.GetTaskListIndex(id) end
 --- @param i number index
 function CppLogic.Entity.SetTaskListIndex(id, i) end
 
+--- entity TaskList debug info, usefull for debugging TaskLists.
+--- @param id entity
+--- @return string tasklist
+--- @return string|nil task
+--- @return string|number|nil state
+function CppLogic.Entity.Debug_GetTaskInfo(id) end
+
 --- moving entity speed factor (set via logic).
 --- @param id entity
 --- @return number factor

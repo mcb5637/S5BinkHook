@@ -586,6 +586,23 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
+	int Debug_GetTaskInfo(lua::State l) {
+		luaext::EState L{ l };
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		L.Push((*BB::CIDManagerEx::TaskListManager)->GetNameByID(e->CurrentTaskListID));
+		auto* tl = e->GetCurrentTaskList();
+		if (tl == nullptr)
+			return 1;
+		// CurrentTaskIndex gets increased after task exec, no matter if we go into state or not, so correct that
+		L.Push((*BB::CIDManagerEx::TaskManager)->GetNameByID(static_cast<int>(tl->GetTask(e->CurrentTaskIndex - 1)->TaskType)));
+		auto s = shok::TaskStateToName.find(e->CurrentState);
+		if (s == shok::TaskStateToName.end())
+			L.Push(static_cast<int>(e->CurrentState));
+		else
+			L.Push(s->second.data());
+		return 3;
+	}
+
 	int MovingEntityGetSpeedFactor(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
@@ -1945,7 +1962,7 @@ namespace CppLogic::Entity {
 		SettlerCleanupAnimTask(L);
 	}
 
-	constexpr std::array<lua::FuncReference, 36> Entity{ {
+	constexpr std::array<lua::FuncReference, 37> Entity{ {
 			lua::FuncReference::GetRef<GetScale>("GetScale"),
 			lua::FuncReference::GetRef<SetScale>("SetScale"),
 			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
@@ -1982,6 +1999,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<CheckPredicate>("CheckPredicate"),
 			lua::FuncReference::GetRef<GetBattleTarget>("GetBattleTarget"),
 			lua::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
+			lua::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
 	} };
 
 	constexpr std::array<lua::FuncReference, 21> Predicates{ {

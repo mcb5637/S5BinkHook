@@ -186,6 +186,9 @@ namespace GGL {
 			shok::CostInfo Cost;
 			int ConstructionSite;
 		};
+		struct WorkTL {
+			int Start, Work;
+		};
 		int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker; // 42
 		shok::Position DoorPos, LeavePos;
 		ConstructionInfo ConstructionInfo;
@@ -194,7 +197,7 @@ namespace GGL {
 		PADDING(1);
 		UpgradeInfo Upgrade;
 		int UpgradeSite, ArmorClass, ArmorAmount;
-		shok::Vector<int> WorkTaskList; // 104
+		shok::Vector<WorkTL> WorkTaskList; // 104
 	private:
 		int MilitaryInfo[4];
 	public:

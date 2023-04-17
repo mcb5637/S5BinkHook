@@ -280,21 +280,15 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x59A344)());
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x671CDCE7);
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x3A4D8B20);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	shok::Task t = static_cast<shok::Task>(L.CheckInt(1));
-	for (const auto& d : (**EGL::TaskData::GlobalVector)) {
-		if (d.ID == t) {
-			L.Push((*BB::CClassFactory::GlobalObj)->GetClassDemangledName(d.TaskArgsClassID));
-			return 1;
-		}
-	}
-	return 0;
+	
+	return 1;
 }
 
 int GetOptions(lua::State L) {

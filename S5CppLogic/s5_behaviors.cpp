@@ -778,10 +778,82 @@ GGL::CBuilding* GGL::CWorkerBehavior::GetWorkplace()
 	return workerbeh_geworkplace(this);
 }
 
+inline GGL::CBuilding* (__thiscall* const workerbeh_getentered)(GGL::CWorkerBehavior* th) = reinterpret_cast<GGL::CBuilding * (__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE7A1);
+GGL::CBuilding* GGL::CWorkerBehavior::GetEnteredBuilding()
+{
+	return workerbeh_getentered(this);
+}
+
 inline bool (__thiscall* const workerbeh_isresearching)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool (__thiscall*)(GGL::CWorkerBehavior*)>(0x4CFA8B);
 bool GGL::CWorkerBehavior::IsResearchingSomething()
 {
 	return workerbeh_isresearching(this);
+}
+
+inline bool(__thiscall* const workerbeh_isbuildclosed)(GGL::CWorkerBehavior* th, int id) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*, int)>(0x4CD865);
+bool GGL::CWorkerBehavior::IsBuildingClosed(int bid)
+{
+	return workerbeh_isbuildclosed(this, bid);
+}
+
+inline void(__thiscall* const workerbeh_leaveifpossible)(GGL::CWorkerBehavior* th) = reinterpret_cast<void(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CF215);
+void GGL::CWorkerBehavior::LeaveIfPossible()
+{
+	workerbeh_leaveifpossible(this);
+}
+
+inline bool(__thiscall* const workerbeh_checkhasworkplace)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CF468);
+bool GGL::CWorkerBehavior::CheckHasOpenedWorkplace()
+{
+	return workerbeh_checkhasworkplace(this);
+}
+
+inline void(__thiscall* const workerbeh_moticheck)(GGL::CWorkerBehavior* th, shok::WorkerReason r) = reinterpret_cast<void(__thiscall*)(GGL::CWorkerBehavior*, shok::WorkerReason)>(0x4CF317);
+void GGL::CWorkerBehavior::MotivationFeedbackAndLeaveCheck(shok::WorkerReason r)
+{
+	workerbeh_moticheck(this, r);
+}
+
+inline bool(__thiscall* const workerbeh_isenteredbuilattacked)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CEBBA);
+bool GGL::CWorkerBehavior::IsEnteredBuildingRecentlyAttacked()
+{
+	return workerbeh_isenteredbuilattacked(this);
+}
+
+inline bool(__thiscall* const workerbeh_isovertime)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE7D3);
+bool GGL::CWorkerBehavior::IsOvertimeActive()
+{
+	return workerbeh_isovertime(this);
+}
+
+inline void(__thiscall* const workerbeh_hide)(GGL::CWorkerBehavior* th) = reinterpret_cast<void(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CEBFC);
+void GGL::CWorkerBehavior::HideInBuildingForRecentlyAttacked()
+{
+	workerbeh_hide(this);
+}
+
+inline bool(__thiscall* const workerbeh_noeat)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE80E);
+bool GGL::CWorkerBehavior::DoesNotWantToEat()
+{
+	return workerbeh_noeat(this);
+}
+
+inline bool(__thiscall* const workerbeh_norest)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE83A);
+bool GGL::CWorkerBehavior::DoesNotWantToRest()
+{
+	return workerbeh_norest(this);
+}
+
+inline bool(__thiscall* const workerbeh_canwork)(GGL::CWorkerBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CEC73);
+bool GGL::CWorkerBehavior::CanWork()
+{
+	return workerbeh_canwork(this);
+}
+
+inline int(__thiscall* const workerbeh_getworktl)(GGL::CWorkerBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE75A);
+int GGL::CWorkerBehavior::GetWorkTaskList()
+{
+	return workerbeh_getworktl(this);
 }
 
 void __declspec(naked) workerbehavior_hooksupplierskipasm() {

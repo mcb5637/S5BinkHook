@@ -356,4 +356,10 @@ namespace shok {
 		NoRest = 5,
 		NoPay = 6,
 	};
+	enum class WorkerGrievance : int {
+		Happy = 1,
+		Sad = 2,
+		Angry = 3,
+		Leaving = 4,
+	};
 }

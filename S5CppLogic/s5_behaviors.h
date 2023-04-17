@@ -597,19 +597,38 @@ namespace GGL {
 
 	class CWorkerBehavior : public EGL::CGLEBehavior {
 	public:
+		enum class Cycle : int {
+			Work = 0,
+			Eat = 1,
+			Rest = 2,
+			RestartCycle = 4,
+			Join = 4,
+			DoneWithJoining = 5,
+		};
+		enum class NextCycleAction : int {
+			JoinSettlementTask = -1, // sets WorkerJoinSettlement State
+			CheckWork = 1,
+			CheckHunger = 2,
+			CheckRest = 3,
+		};
+		// index with static_cast<int>(Cycle)
+		// 1,2,3,0,-1,0
+		static inline const NextCycleAction* CycleToNext = reinterpret_cast<NextCycleAction*>(0x772AC8);
+
+
 		int WorkTimeRemaining, TargetWorkTime; // 4
 		float Motivation;
 	private:
 		int BehaviorProps2; //7
 	public:
-		int CycleIndex; // seems to be 0->working, 1->eating, 2->resting, 5->joining settlement
+		Cycle CycleIndex; // seems to be 0->working, 1->eating, 2->resting, 5->joining settlement
 		int TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn; // 9
 		byte CouldConsumeResource, IsLeaving; // 15
 		PADDING(2);
 		PADDINGI(1);
 		float CarriedResourceAmount; // 17
 
-		// defined states: unknown 13,21
+		// defined states: WorkerJoinSettlement (sets TL TL_JOIN_SETTLEMENT),21
 		// defined tasks: TASK_LEAVE_SETTLEMENT, TASK_GO_TO_POS, TASK_ADVANCE_IN_CYCLE, TASK_INCREASE_PLAYER_XXX,
 		// 	   TASK_CHANGE_WORK_TIME_ABSOLUTE, TASK_CHANGE_WORK_TIME_RELATIVE, TASK_CHANGE_WORK_TIME_XXX, TASK_GO_TO_WORK_BUILDING,
 		// 	   TASK_GO_TO_EAT_BUILDING, TASK_GO_TO_REST_BUILDING, TASK_GO_TO_LEAVE_BUILDING,
@@ -623,6 +642,8 @@ namespace GGL {
 		// defined events: Worker_XXX
 
 		// on attached building destroyed 4CFE73 thiscall(id)
+		// adv in cycle 4CF61F, exec current cycle 4CF6C9
+		// is entered building recentyl attacked && !is battle or autocannon 4CF140
 
 		static inline constexpr int vtp = 0x772B30;
 		static inline constexpr int TypeDesc = 0x813B1C;
@@ -630,7 +651,19 @@ namespace GGL {
 
 		GGL::CBuilding* GetFirstAttachedBuilding(shok::AttachmentType a);
 		GGL::CBuilding* GetWorkplace(); // fires workplace detached if no workplace found
+		GGL::CBuilding* GetEnteredBuilding();
 		bool IsResearchingSomething();
+		bool IsBuildingClosed(int bid); // checks upgrading+health%
+		void LeaveIfPossible();
+		bool CheckHasOpenedWorkplace(); // checks IsBuildingClosed, if no workplace checks JoblessSinceTurn and possibly calls LeaveIfPossible
+		void MotivationFeedbackAndLeaveCheck(shok::WorkerReason r); // feedback events, leaves if low moti
+		bool IsEnteredBuildingRecentlyAttacked();
+		bool IsOvertimeActive();
+		void HideInBuildingForRecentlyAttacked(); // hides inside current building until RecentlyAttacked passes (no further checks for new attacks) (wait state)
+		bool DoesNotWantToEat(); // always true if no farm
+		bool DoesNotWantToRest(); // always true if no resi
+		bool CanWork(); // always false if no workplace, checks worktime if no overtime, checks moti if overtime
+		int GetWorkTaskList(); // first workplace, then own props as fallback
 
 		static void HookSupplierSkip();
 	private:

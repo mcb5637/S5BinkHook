@@ -565,7 +565,7 @@ namespace shok {
         SetNextTaskList = 7,
         // 9 & 10 building behavior
         Move_NonCancelable = 12,
-        // 13 something worker
+        WorkerJoinSettlement = 13,
         IdleInFormation = 14,
         AssumePositionInFormation = 15,
         SerfSearchResource = 16,

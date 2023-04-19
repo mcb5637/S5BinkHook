@@ -548,6 +548,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x778B80;
 		static inline constexpr int TypeDesc = 0x827F78;
 		static inline constexpr unsigned int Identifier = 0x852B75D7;
+
+		int GetTaskList(int cannonType);
 	};
 
 	class CBuildingMerchantBehaviorProps : public EGL::CGLEBehaviorProps {

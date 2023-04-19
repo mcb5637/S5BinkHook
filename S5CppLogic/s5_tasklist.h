@@ -573,7 +573,7 @@ namespace shok {
         HeroComatose = 18,
         BuildingAlarmDefend = 19,
         BattleWait = 20,
-        // 21 something worker
+        DoWorkAtFoundry = 21, // waits for task to appear
         LeaderGetCloseTotarget = 22,
         MoveToTarget = 23,
         // 24 soldier formation?

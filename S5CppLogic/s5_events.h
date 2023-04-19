@@ -694,39 +694,39 @@ namespace shok {
 		Worker_GetWorkTaskList = 0x13009, //EGL::CEventGetValue<int,1211121895> checks building, then props
 		Worker_LevyTaxes = 0x1300A, //BB::CEvent
 		Worker_ForceToWork = 0x1300B, //BB::CEvent
-		// 1300C most likely worker leave, called by task gotodefendbuildingcheck?
+		Worker_OnGoToDefendableBuildingFailed = 0x1300C, //BB::CEvent
 		Camp_GetNextFreeSlot = 0x1300D, //EGL::CEventGetValue<int,1211121895> returns slot id, on error?
 		Camp_GetPositionOfSlot = 0x1300E, //GGL::CEventGetPositionFromID
 		Camp_AttachCamper = 0x1300F, //GGL::CEventEntityIndex
 		Camp_HasFreeSlot = 0x13010, //EGL::CEventGetValue<bool,1709081367>
 		Camper_OnCampDetach = 0x13011, //EGL::CEvent1Entity
 		Camper_LeaveCamp = 0x13012, //BB::CEvent
-		// worker 13013 get int something cycleindex
-		// worker 13014 empty EGL::CEventValue<int,-27574121>
+		Worker_GetNextCycleAction = 0x13013, //EGL::CEventValue<int,-27574121>, gets used by playerattractionhandler
+		Worker_SetWorkTaskListsPerCycle = 0x13014, //EGL::CEventValue<int,-27574121> empty
 		Worker_Bless = 0x13015, //BB::CEvent
 		Worker_AdvanceInCycles = 0x13016, //BB::CEvent
-		// worker 13017 CycleIndex=5
+		Worker_ToJoinedCycle = 0x13017, //BB::CEvent
 		Worker_OnLeaveBuildingDetach = 0x13018, //EGL::CEvent1Entity
 		Worker_ChangeMoti = 0x13019, //GGL::CEventChangeMotivation
 		Worker_GetMaxWorkTime = 0x1301A, //EGL::CEventGetValue<int, 1211121895>
 		Worker_GetWorkTimeRemaining = 0x1301B, //EGL::CEventGetValue<int, 1211121895>
-		// 0x1301C foundry something progress?
+		Foundry_GetTaskListForCurrentCannon = 0x1301C, //EGL::CEventGetValue<int, 1211121895>
 		Worker_OnBuildingCatchFire = 0x1301D, //EGL::CEvent1Entity worker something entity
 		Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
 		WorkerFlee_IsFleeing = 0x1301F, //EGL::CEventGetValue<bool,1709081367>
-		// 13020 worker get some bool condidtionally forwards to 18007
+		Worker_IsEnteredBuldingRecentlyAttacked = 0x13020, //EGL::CEventGetValue<bool,1709081367>
 		Worker_IsLeaving = 0x13021, //EGL::CEventGetValue<bool,1709081367>
 		Worker_GetTransportModel = 0x13022, //EGL::CEventGetValue<int, 1211121895>
 		SettlerMerchant_MoveInCommand = 0x13023, //BB::CEvent
 		SettlerMerchant_MoveOutCommand = 0x13024, //BB::CEvent
-		// 13025 worker emtpty EGL::CEvent1Entity
-		// 0x13026 neutralbridge progress?
+		Worker_OnApproachingBridgeDetach = 0x13025, //EGL::CEvent1Entity empty
+		NeutralBridge_IncreaseProgress = 0x13026, //GGL::CEventBridgeProgress (destroys if reaches 100)
 		NeutralBridge_GetNeutralBridgeBehavior = 0x13027, //EGL::CEventGetValue<GGL::CNeutralBridgeBehavior *,1150290935>
-		// 0x13028 neutralbridge get progress?
+		NeutralBrifge_GetProgress = 0x13028, //GGL::CEventBridgeProgress
 		Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
 		SettlerMerchant_GetBuildingId = 0x1302A, //EGL::CEventGetValue<int, 1211121895>
 
-		// 0x14002 buildingbeh 1 ent
+		BuildingBeh_OnSerfDetach = 0x14002, //EGL::CEvent1Entity construction & repairing
 		Serf_Construct = 0x14003, // GGL::CEventEntityIndex serfbattle?
 		Keep_BuySerfCommand = 0x14004, //BB::CEvent
 		Serf_CommandTurnToBattleSerf = 0x14005, //BB::CEvent battleserf stop if toserf tl
@@ -742,7 +742,7 @@ namespace shok {
 		Leader_AttachSoldier = 0x15009, //EGL::CEvent1Entity
 		Leader_GetHealthPlusTroopHealth = 0x1500A, //EGL::CEventGetValue<int, 1211121895>
 		Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
-		// 1500C battle set target?, autocannon too?
+		Battle_InternalEngageTarget =0x1500C, //EGL::CEvent1Entity attaches as ATTACKER_TARGET
 		Leader_OnAttackTargetDetached = 0x1500D, //EGL::CEvent1Entity
 		OnAttackedBy = 0x1500E, //EGL::CEvent1Entity, CppLogic::Events::AdvHurtByEvent (subclass of EGL::CEvent1Entity) with EGL::CGLEEntity::HookHurtEntity
 		Battle_GetBattleStatus = 0x15011, //EGL::CEventGetValue<int, 1211121895>
@@ -767,7 +767,7 @@ namespace shok {
 		SoldierGetLeaderID = 0x15029, //EGL::CEventGetValue<int, 1211121895>
 		Leader_GetXP = 0x1502A, //EGL::CEventGetValue<int, 1211121895>
 		Leader_SetXP = 0x1502B, //EGL::CEventValue<int,-27574121>
-		// 1502C leader empty
+		Leader_OnAttackedDied = 0x1502C, //BB::CEvent based on leaderBeh->LatestAttackerID, empty
 		Leader_GetCommand = 0x1502D, //EGL::CEventGetValue<int, 1211121895>
 		Leader_AttackMove = 0x1502E, //EGL::CEventPosition
 		Leader_HoldPosition = 0x1502F, //BB::CEvent
@@ -787,7 +787,7 @@ namespace shok {
 		GetArmor = 0x1503E, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTaskList = 0x1503F, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTime = 0x15040, //EGL::CEventGetValue<float, 1468983543>
-		// 0x15041 rax is training allowed? unused
+		Barracks_HasSpaceForOneMoreLeader = 0x15041, //EGL::CEventGetValue<bool,1709081367> (unused)
 		Leader_SetTrainingTL = 0x15042, //EGL::CEventValue<int,-27574121>
 		Barracks_GetLeaveTaskList = 0x15043, //EGL::CEventGetValue<int, 1211121895>
 		Leader_OnBarracksDetach = 0x15044, //EGL::CEvent1Entity
@@ -799,7 +799,7 @@ namespace shok {
 		Leader_GetUpkeepCost = 0x1504C, //EGL::CEventGetValue<float, 1468983543>
 
 		GetDamage = 0x1503D, //EGL::CEventGetValue<int, 1211121895>
-		// 15045 battle maybe cancel?
+		Battle_CheckHelp = 0x15045, //EGL::CEvent1Entity unused, probably not working (does some range checnking, then attacking?)
 
 		HeroHawk_SendHawk = 0x16002, //EGL::CEventPosition
 
@@ -877,6 +877,7 @@ namespace shok {
 		Foundry_GetProgress = 0x17014, //EGL::CEventGetValue<int,1211121895>
 		Foundry_SetProgress = 0x17015, //EGL::CEventValue<int,-27574121>
 		Foundry_BuildCannonCommand = 0x17016, //EGL::CEventValue<int,-27574121>
+		Foundry_GetCannonType = 0x17017, //EGL::CEventGetValue<int,1211121895>
 		Foundry_WorkStep = 0x17018, //BB::CEvent
 		// 0x17019 affectmoti affect moti, foundation init, not called?
 		Building_OnUpgradeStart = 0x1701A, //BB::CEvent
@@ -941,13 +942,14 @@ namespace shok {
 		LogicEvent_OnTick = 0x20006, // 10 per sec
 		Movement_StatePerformMovementStep = 0x20008, //EGL::CEventThousandthsGetInteger pass state arg, returns state return
 		Movement_IsMoving = 0x20009, //EGL::CEventGetValue<bool,1709081367>
-		Die = 0x2000A, // BB::CEvent
-		// 0x2000D tasklist reset?
-		Movement_SetSpeedFactor = 0x2000E, // EGL::CEventValue<float,1278362727>
-		Movement_TaskMoveToPosAndSetState = 0x2000F, //EGL::CEventPositionAndTaskState pass pos and state, call Movement_StatePerformMovementStep from state
-		Movement_RotateTo = 0x20010, //  EGL::CEventValue<float,1278362727>
+		Die = 0x2000A, //BB::CEvent
+		Movement_StopMove = 0x2000D, // BB::CEvent
+		Movement_SetSpeedFactor = 0x2000E, //EGL::CEventValue<float,1278362727>
+		//EGL::CEventPositionAndTaskState pass pos and state, call Movement_StatePerformMovementStep from state
+		Movement_TaskMoveToPosAndSetState = 0x2000F,
+		Movement_RotateTo = 0x20010, // EGL::CEventValue<float,1278362727>
 		Movement_GetMovementBehavior = 0x20012, //EGL::CEventGetValue<EGL::CMovementBehavior *,212523703>
-		Movement_GetSpeedFactor = 0x20022, // EGL::CEventGetValue<float,1468983543>
+		Movement_GetSpeedFactor = 0x20022, //EGL::CEventGetValue<float,1468983543>
 
 		Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
 		Animation_UnSuspend = 0x20014, //EGL::CEventValue<int,-27574121> argument is ticks spent suspended
@@ -961,10 +963,11 @@ namespace shok {
 		ParticleEffectAttachment_CreateEffect = 0x2001C, //EGL::CEventIndexAndEffectType
 		Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 		Animation_ResetTaskType = 0x2001E, //BB::CEvent
-		// worker 20024 get some int, leader get something barracks related, soldier simmilar, serf get terrainH < waterHeight
+		//EGL::CEventValue<int,-27574121> settler only?, only works for specific circumstances, gets called by GetSector methods
+		InternalGetSectorIfSomething = 0x20024,
 		ReplaceableEntity_Disable = 0x20025, //BB::CEvent
-		// 20026 set uv anim?
-		// 20027 BB::CEvent also suspend?
+		UVAnim_SetStatus = 0x20026, //EGL::CEventUVAnim
+		Animation_SetSuspendedAnim = 0x20027, //BB::CEvent
 
 		Sound_Start = 0x22001, // EGL::CEventSoundPositionAndID
 		Sound_Stop = 0x22002, // EGL::CEventSoundPositionAndID

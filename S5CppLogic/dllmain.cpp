@@ -280,14 +280,16 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x59A344)());
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x3A4D8B20);
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x2503860D);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	
+	EGL::CEventGetValue_Bool ev{ (shok::EventIDs)0x15041 };
+	L.CheckEntity(1)->FireEvent(&ev);
+	L.Push(ev.Data);
 	return 1;
 }
 

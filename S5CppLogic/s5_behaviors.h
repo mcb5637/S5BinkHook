@@ -120,6 +120,26 @@ namespace EGL {
 	public:
 		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
 	};
+
+	struct SSlotArgsUVAnims {
+		bool Active0, Active1, Active2, Active3;
+	};
+	class CSlotUVAnims : public EGL::TSlot<EGL::SSlotArgsUVAnims, 429242765> {
+	public:
+		virtual void __stdcall FillSlot(SSlotArgsUVAnims* data) override;
+
+		SSlotArgsUVAnims SlotArgsUVAnims;
+	};
+	class CUVAnimBehavior : public CGLEBehavior {
+	public:
+		CSlotUVAnims m_SlotUVAnims; // 4
+
+		static inline constexpr int vtp = 0x7854E0;
+		static inline constexpr int TypeDesc = 0x839A8C;
+		static inline constexpr unsigned int Identifier = 0x2503860D;
+
+		// defined events: UVAnim_SetStatus
+	};
 }
 
 namespace GGL {
@@ -625,10 +645,10 @@ namespace GGL {
 		int TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn; // 9
 		byte CouldConsumeResource, IsLeaving; // 15
 		PADDING(2);
-		PADDINGI(1);
+		int FoundryWaitUntil; // set by TASK_DO_WORK_AT_FOUNDRY to props->WorkWaitUntil/100, then counted down by state
 		float CarriedResourceAmount; // 17
 
-		// defined states: WorkerJoinSettlement (sets TL TL_JOIN_SETTLEMENT),21
+		// defined states: WorkerJoinSettlement (sets TL TL_JOIN_SETTLEMENT), DoWorkAtFoundry
 		// defined tasks: TASK_LEAVE_SETTLEMENT, TASK_GO_TO_POS, TASK_ADVANCE_IN_CYCLE, TASK_INCREASE_PLAYER_XXX,
 		// 	   TASK_CHANGE_WORK_TIME_ABSOLUTE, TASK_CHANGE_WORK_TIME_RELATIVE, TASK_CHANGE_WORK_TIME_XXX, TASK_GO_TO_WORK_BUILDING,
 		// 	   TASK_GO_TO_EAT_BUILDING, TASK_GO_TO_REST_BUILDING, TASK_GO_TO_LEAVE_BUILDING,
@@ -639,7 +659,7 @@ namespace GGL {
 		// 	   TASK_GO_TO_SUPPLIER, TASK_TAKE_FROM_STOCK, TASK_SET_CARRIER_MODEL, TASK_CHECK_GO_TO_SUPPLIER_SUCCESS, TASK_ACTIVATE_UVANIM,
 		// 	   TASK_START_WORK_IF_AT_WORKPLACE, TASK_ACTIVATE_PARTICLE_EFFECT, TASK_DEACTIVATE_PARTICLE_EFFECT,TASK_GO_TO_NEAREST_NEUTRAL_BRIDGE, TASK_CHECK_GO_TO_BRIDGE_SUCCESS,
 		// 	   TASK_INCREASE_BRIDGE_PROGRESS
-		// defined events: Worker_XXX
+		// defined events: Worker_XXX, InternalGetSectorIfSomething
 
 		// on attached building destroyed 4CFE73 thiscall(id)
 		// adv in cycle 4CF61F, exec current cycle 4CF6C9
@@ -647,7 +667,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x772B30;
 		static inline constexpr int TypeDesc = 0x813B1C;
-		static inline constexpr unsigned int Identifier = 0x0DCDBAB9D;
+		static inline constexpr unsigned int Identifier = 0xDCDBAB9D;
 
 		GGL::CBuilding* GetFirstAttachedBuilding(shok::AttachmentType a);
 		GGL::CBuilding* GetWorkplace(); // fires workplace detached if no workplace found
@@ -756,7 +776,7 @@ namespace GGL {
 		int IndexOfFirstChaoticPosition; //46
 
 		// defined states: Train, LeaderGetCloseTotarget
-		// defined events: Leader_XXX, MoveCommand_Move, Behavior_Tick (regen), HeroAbility_Reset, IsLeader
+		// defined events: Leader_XXX, MoveCommand_Move, Behavior_Tick (regen), HeroAbility_Reset, IsLeader, InternalGetSectorIfSomething
 		// defined tasks: TASK_SET_DEFAULT_REACTION_TYPE, TASK_GO_TO_POS, TASK_ACTIVATE_UVANIM, TASK_LEAVE_BARRACKS, TASK_SET_ANIM_AT_BARRACKS, TASK_TRAIN,
 		//		TASK_GET_CLOSE_TO_TARGET, TASK_ATTACK, TASK_CHECK_MIN_RADIUS
 
@@ -778,7 +798,8 @@ namespace GGL {
 	public:
 
 		// defined states: 1, 24
-		// defined events: Leader_Hurt, Leader_GetAttackTarget (forwards to leader), HeroAbility_Reset, Soldier_XXX, IsSoldier, Battle_OnAttackAnimStartsAgainst
+		// defined events: Leader_Hurt, Leader_GetAttackTarget (forwards to leader), HeroAbility_Reset, Soldier_XXX, IsSoldier,
+		//		Battle_OnAttackAnimStartsAgainst, InternalGetSectorIfSomething
 		// defined tasks: TASK_GO_TO_POS, TASK_LEAVE_BARRACKS
 
 		static inline constexpr int vtp = 0x773CC8;
@@ -863,7 +884,8 @@ namespace GGL {
 		// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_GO_TO_CONSTRUCTION_SITE, TASK_TURN_TO_CONSTRUCTION_SITE, TASK_CHANGE_ATTACHMENT_TO_CONSTRUCTION_SITE,
 		//		TASK_GO_TO_CONSTRUCTION_SITE_SLOT, TASK_LEAVE_SETTLEMENT, TASK_ABANDON_CURRENT_JOB, TASK_GO_TO_RESOURCE, TASK_TURN_TO_RESOURCE, TASK_WAIT_EXTRACTION_DELAY
 		//		TASK_EXTRACT_RESOURCE, TASK_GO_TO_RESOURCE_SLOT, TASK_TURN_INTO_BATTLE_SERF
-		// defined events: Worker_WorkPlaceBuildingDestroyed, Serf_XXX, BattleSerf_CommandTurnToSerf, Leader_AttackEntity, OnResourceDoodadDetach, IsSerf
+		// defined events: Worker_WorkPlaceBuildingDestroyed, Serf_XXX, BattleSerf_CommandTurnToSerf, Leader_AttackEntity, OnResourceDoodadDetach, IsSerf,
+		//		InternalGetSectorIfSomething
 		// defined states: SerfSearchResource, 1
 
 		static inline constexpr int vtp = 0x774874;
@@ -1272,13 +1294,15 @@ namespace GGL {
 
 	class CNeutralBridgeBehavior : public EGL::CGLEBehavior {
 	public:
-		PADDINGI(9); //Progress
-		PADDINGI(3); //SlotShoreA
-		PADDINGI(3); //SlotShoreB
+		float Progress[9]; // per player
+		shok::Map<int, int> SlotShoreA; //Index ->BuilderID
+		shok::Map<int, int> SlotShoreB; //Index ->BuilderID
+
+		// defined events: NeutralBridge_XXX, OnBuilderDetaches (detached same attachment???)
 
 		static inline constexpr int vtp = 0x779BC4;
 		static inline constexpr int TypeDesc = 0x829AA8;
-		static inline constexpr unsigned int Identifier = 0x0D26CD737;
+		static inline constexpr unsigned int Identifier = 0xD26CD737;
 	};
 
 

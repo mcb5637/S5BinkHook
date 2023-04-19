@@ -21,3 +21,9 @@ int GGL::CGLAnimationBehaviorExProps::GetAnimSet(int modelOverride)
 {
 	return animexprops_getanimset(this, modelOverride);
 }
+
+inline int(__thiscall* const foundryprops_gettl)(GGL::CFoundryBehaviorProperties* th, int ct) = reinterpret_cast<int(__thiscall*)(GGL::CFoundryBehaviorProperties*, int)>(0x50DEBA);
+int GGL::CFoundryBehaviorProperties::GetTaskList(int cannonType)
+{
+	return foundryprops_gettl(this, cannonType);
+}

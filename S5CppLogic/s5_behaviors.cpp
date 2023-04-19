@@ -57,6 +57,12 @@ shok::TaskStateExecutionResult EGL::CBehaviorAnimation::StateWaitForAnim(int i)
 	return behanim_statehandlerwait(this, i);
 }
 
+inline void(__stdcall* const slotuvanims_fill)(EGL::CSlotUVAnims* th, EGL::SSlotArgsUVAnims* data) = reinterpret_cast<void(__stdcall*) (EGL::CSlotUVAnims*, EGL::SSlotArgsUVAnims*)> (0x5170E0);
+void __stdcall EGL::CSlotUVAnims::FillSlot(SSlotArgsUVAnims* data)
+{
+	slotuvanims_fill(this, data);
+}
+
 static inline void(__thiscall* const heroability_addhandlers)(GGL::CHeroAbility* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CHeroAbility*, int)>(0x4F4982);
 void GGL::CHeroAbility::AddHandlers(int id)
 {

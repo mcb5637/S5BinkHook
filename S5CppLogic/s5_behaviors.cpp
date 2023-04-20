@@ -861,6 +861,11 @@ int GGL::CWorkerBehavior::GetWorkTaskList()
 {
 	return workerbeh_getworktl(this);
 }
+inline int(__thiscall* const workerbeh_getworktimemax)(GGL::CWorkerBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE866);
+int GGL::CWorkerBehavior::GetWorktimeMax()
+{
+	return workerbeh_getworktimemax(this);
+}
 
 void __declspec(naked) workerbehavior_hooksupplierskipasm() {
 	__asm {

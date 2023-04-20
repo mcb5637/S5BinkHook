@@ -1,0 +1,30 @@
+Everything in here should work without CppLogic, this is just documentation of game mechanics. if CppLogic changes something, this is clearly marked.
+
+
+Workers:
+	Motivation:
+		- Motivation is always a float, where 1.0 is shown as 100% in the GUI (and 0.0 as 0% respectively)
+		- Each Player has a CurrentMaxMotivation which is capped by logic.xml->MotivationAbsoluteMaxMotivation
+		- A Player can manipulate its Player->CurrentMaxMotivation with buildings that have a GGL::CAffectMotivationBehavior
+		- Each Worker has his own Motivation
+		- This Worker->Motivation can be decreased by Taxes and Overtimes
+		- It can be increased by GGL::CAffectMotivationBehavior Buildings, as well as Taxes and Blessings
+		- Worker->Motivation regularly gets reset to Player->CurrentMaxMotivation, if it is higher
+		- Workers will leave, if their Motivation falls too low
+		- A Players average Motivation will get calculated as a average of all Workers
+		- If average Motivation is too low, no Settlers can join (Workers, Serfs, Leaders, Soldiers)
+		- newly joined Workers start out at their Players average Motivation
+	Worktime:
+		- Each Worker has his own Worktime
+		- Each Worker follows the basic pattern of Work->Eat->Rest->Work (if he has no Farm/Residence, Eat/Rest will be replaced by Camp, up to 2 times Camp if he has neither)
+		- MaximumWorktime gets calculated from (logic.xml->WorkTimeBase + Worker->Props->WorkTimeMaxCangeFarm (if he has a Farm) + Worker->Props->WorkTimeMaxChangeResidence (if he has a Residence)) * Worker->Motivation
+		- Worker->WorkTimeRemaining gets decreased by Working (by Worker->Props->WorkTimeChangeWork), if it reaches a threshold, the Worker leaves Work to Eat and Rest
+		- Overtimes disable leaving for Eat+Rest, at the cost of Motivation (you loose Worker->Props->ExhaustedWorkMotivationMalus each time the Worker looses Worktime and it would be 0, this may cause the Worker to leave)
+		- Eating, Resting and Camping replenishes Worktime by Factor * (MaxWorktime - logic.xml->WorkTimeThresholdWork), where Factor is Worker->Props->(WorkTimeChangeFarm, WorkTimeChangeResidence, WorkTimeChangeCamp)
+		- there is a minimum of 0, but no real maximum (if you manage to trap a Refiner without access to a Supplier, they skip Work and quickly increase their Worktime)
+		- the GGL::CMotivateWorkersAbility (Yuki) increases the Worktime of each nearby Worker by a flat amount (and not the Motivation as the name might suggest)
+		- newly joined Workers start out at Work with their Maximum Worktime (calculated before any Farm/Residence get attached, you can see the Worktime bar decrease on joining, this is actually just the Maximum increasing, no change in the actual Worktime)
+		- best efficency:
+			- Motivation affects MaximumWorktime, which affects Worktime replenishment (loss by Work is not affected by Motivation)
+			- having a Farm/Residence not only replenishes more of the MaximumWorktime (compared to Camp), it also increases the MaximumWorktime (Farm replenishes more, while Residence adds more Maximum, for a typical Worker, this can be changed on a per EntityType basis)
+			- each cycle replenishes 20/100(no Farm/Residence), 160/225 (just Farm), 300/525 (just Residence), 720/625 (Farm and Residence) (at 1 Motivation)

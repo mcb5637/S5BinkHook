@@ -361,10 +361,14 @@ namespace GGL {
 		int GetTaxPerWorker();
 		int GetLevyTaxPerWorker();
 		int GetLevyTaxAmount();
+		float GetMaxMotivation(); // checks MotivationAbsoluteMaxMotivation
+		void ChangeMotivationForAllWorkers(float delta, shok::WorkerReason reason);
+		void ChangeMaxMotivation(float delta); // forwards to ChangeMotivationForAllWorkers with max(delta, 0) and WorkerReason::None
 
 		// returns if successful
 		bool SetState(PlayerStatus s);
 
+		bool HasResourcesFeedback(const shok::CostInfo& c, bool feedback = true);
 
 		static bool ArePlayersHostile(int p1, int p2);
 		static bool ArePlayersFriendly(int p1, int p2);

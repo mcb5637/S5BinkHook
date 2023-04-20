@@ -99,7 +99,7 @@ namespace GGL {
 		int TaxAmount;
 		float TaxPenalty;
 		int InitialTaxLevel; // 36
-		shok::CostInfo BlessingCost;
+		shok::CostInfo BlessingCost; // per settler cost
 		float BlessingBonus; // 55
 		PADDINGI(1);
 		int ForceToWorkPenalty;

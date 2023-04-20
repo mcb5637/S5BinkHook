@@ -182,3 +182,8 @@ bool shok::CostInfo::HasResources(const shok::CostInfo* has) const
 {
 	return constinfo_hasres(this, has);
 }
+inline bool(__thiscall* const costinfo_subci)(shok::CostInfo* th, const shok::CostInfo* s) = reinterpret_cast<bool(__thiscall*)(shok::CostInfo*, const shok::CostInfo*)>(0x4A971F);
+bool shok::CostInfo::SubResources(const CostInfo& tosub)
+{
+	return costinfo_subci(this, &tosub);
+}

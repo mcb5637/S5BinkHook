@@ -359,6 +359,21 @@ int GGL::CPlayerStatus::GetLevyTaxAmount()
 {
 	return playerstatus_getlevytax(this);
 }
+inline float(__thiscall* const playerstatus_getmaxmoti)(GGL::CPlayerStatus* th) = reinterpret_cast<float(__thiscall*)(GGL::CPlayerStatus*)>(0x4B4AE9);
+float GGL::CPlayerStatus::GetMaxMotivation()
+{
+	return playerstatus_getmaxmoti(this);
+}
+inline void(__thiscall* const playerstatus_changemoti)(GGL::CPlayerStatus* th, float delta, shok::WorkerReason reason) = reinterpret_cast<void(__thiscall*)(GGL::CPlayerStatus*, float, shok::WorkerReason)>(0x4B5401);
+void GGL::CPlayerStatus::ChangeMotivationForAllWorkers(float delta, shok::WorkerReason reason)
+{
+	playerstatus_changemoti(this, delta, reason);
+}
+inline void(__thiscall* const playerstatus_changemaxmoti)(GGL::CPlayerStatus* th, float deltan) = reinterpret_cast<void(__thiscall*)(GGL::CPlayerStatus*, float)>(0x4B587F);
+void GGL::CPlayerStatus::ChangeMaxMotivation(float delta)
+{
+	playerstatus_changemaxmoti(this, delta);
+}
 
 static inline bool(__thiscall* const playerstatus_setstatus)(GGL::CPlayerStatus* th, GGL::CPlayerStatus::PlayerStatus s) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerStatus*, GGL::CPlayerStatus::PlayerStatus)>(0x4B4B38);
 bool GGL::CPlayerStatus::SetState(PlayerStatus s)
@@ -366,6 +381,11 @@ bool GGL::CPlayerStatus::SetState(PlayerStatus s)
 	return playerstatus_setstatus(this, s);
 }
 
+inline bool(__thiscall* const playerstatus_hasresfeedback)(GGL::CPlayerStatus* th, const shok::CostInfo* c, bool fb) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerStatus*, const shok::CostInfo*, bool)>(0x4B619D);
+bool GGL::CPlayerStatus::HasResourcesFeedback(const shok::CostInfo& c, bool feedback)
+{
+	return playerstatus_hasresfeedback(this, &c, feedback);
+}
 
 bool GGL::CPlayerStatus::ArePlayersHostile(int p1, int p2)
 {

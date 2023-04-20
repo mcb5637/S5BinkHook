@@ -1269,6 +1269,7 @@ function CppLogic.Entity.Settler.WorkerSetCurrentWorkTime(id, wt) end
 --- @return number moti
 function CppLogic.Entity.Settler.WorkerGetMotivation(id) end
 --- settler current motivation.
+--- (if it is higher than the players max motivation, it will quickly be lowered to that)
 --- @param id entity
 --- @param m number change in motivation
 --- @param r number reason (0->unknown (better not use if the worker could leave as a result), 1->Taxes, 2->Overtime, 3->NoWork, 4->NoFood, 5->NoRest, 6->NoPay)

@@ -83,6 +83,7 @@ namespace shok {
 		void AddToType(shok::ResourceType ty, float toadd);
 		void SubFromType(shok::ResourceType ty, float tosub);
 		bool HasResources(const CostInfo* has) const;
+		bool SubResources(const CostInfo& tosub); // returns hadRes, does not sub anything if one res type is missing
 
 		static inline shok::ResourceType(__cdecl* const ResourceTypeToRaw)(shok::ResourceType rt) = reinterpret_cast<shok::ResourceType(__cdecl*)(shok::ResourceType)>(0x4A9299);
 

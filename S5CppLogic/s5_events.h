@@ -703,7 +703,7 @@ namespace shok {
 		Camper_LeaveCamp = 0x13012, //BB::CEvent
 		Worker_GetNextCycleAction = 0x13013, //EGL::CEventValue<int,-27574121>, gets used by playerattractionhandler
 		Worker_SetWorkTaskListsPerCycle = 0x13014, //EGL::CEventValue<int,-27574121> empty
-		Worker_Bless = 0x13015, //BB::CEvent
+		Worker_Bless = 0x13015, //BB::CEvent (checks and subs per settler BlessingCost, default 0, then adds BlessingBonus)
 		Worker_AdvanceInCycles = 0x13016, //BB::CEvent
 		Worker_ToJoinedCycle = 0x13017, //BB::CEvent
 		Worker_OnLeaveBuildingDetach = 0x13018, //EGL::CEvent1Entity
@@ -879,7 +879,7 @@ namespace shok {
 		Foundry_BuildCannonCommand = 0x17016, //EGL::CEventValue<int,-27574121>
 		Foundry_GetCannonType = 0x17017, //EGL::CEventGetValue<int,1211121895>
 		Foundry_WorkStep = 0x17018, //BB::CEvent
-		// 0x17019 affectmoti affect moti, foundation init, not called?
+		Unused_Init = 0x17019, //BB::CEvent deprecated, never called
 		Building_OnUpgradeStart = 0x1701A, //BB::CEvent
 		Building_OnBuildOnDetached = 0x1701B, //BB::CEvent used by mine
 		Building_OnUpgradeCancel = 0x1701C, //BB::CEvent

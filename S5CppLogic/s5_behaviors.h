@@ -684,6 +684,7 @@ namespace GGL {
 		bool DoesNotWantToRest(); // always true if no resi
 		bool CanWork(); // always false if no workplace, checks worktime if no overtime, checks moti if overtime
 		int GetWorkTaskList(); // first workplace, then own props as fallback
+		int GetWorktimeMax();
 
 		static void HookSupplierSkip();
 	private:
@@ -866,7 +867,7 @@ namespace GGL {
 	class CFoundationBehavior : public EGL::CGLEBehavior {
 	public:
 
-		// defined events: Leader_AttackEntity, Foundation_XXX, Building_OnUpgradeStart, Building_OnUpgradeCancel, OnBuilderDetaches
+		// defined events: Leader_AttackEntity, Foundation_XXX, Building_OnUpgradeStart, Building_OnUpgradeCancel, OnBuilderDetaches, Unused_Init
 
 		static inline constexpr int vtp = 0x776CA0;
 		static inline constexpr int TypeDesc = 0x820F44;
@@ -1011,14 +1012,19 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x340C4B57;
 	};
 
+	class CAffectMotivationBehaviorProps;
 	class CAffectMotivationBehavior : public EGL::CGLEBehavior {
 	public:
-		PADDINGI(1); //p to props
+		CAffectMotivationBehaviorProps* Props; //p to props
 		int PlayerID; //5
-		byte MotivationAffected;
+		bool MotivationAffected;
 		PADDING(3);
 
-		// defined events: AffectMotivation_XXX
+		// get playerStatus 512C26 (has some check)
+		// add to moti 512CFA
+		// sub from moti 512D19 (only if MotivationAffected is set, does not reset, called from dtor)
+
+		// defined events: AffectMotivation_XXX, Building_OnConstructionComplete, Unused_Init
 
 		static inline constexpr int vtp = 0x77918C;
 		static inline constexpr int TypeDesc = 0x829024;

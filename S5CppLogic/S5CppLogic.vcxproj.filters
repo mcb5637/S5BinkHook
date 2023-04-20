@@ -471,7 +471,7 @@
     <Text Include="memedits.txt">
       <Filter>doc</Filter>
     </Text>
-    <Text Include="gamemechanics_documentation.txt">
+    <Text Include="doc\gamemechanics_documentation.txt">
       <Filter>doc</Filter>
     </Text>
   </ItemGroup>

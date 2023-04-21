@@ -60,6 +60,11 @@ Combat:
 		- they usually apply multiplicative to the Damage before Armor gets subtraced
 		- each Damageclass has a factor defined for each Armorclass (because of this, Damageclasses can be added by modifying game files, but Armorclasses cannot)
 		- Bug: due to a typo in the damageclasses.xml all factors against ArmorClassFur are 0.0 (may be fixed by CppLogic.Logic.SetDamageFactor)
+	AoE Damage:
+		- input Player, Damage, AoERange, Position, DamageClass
+		- calculates RangeFactor against every Target by 1 - (Distance(Affected->Position, Position) / AoERange)^2
+		- calculates Damage agaist every Target as Damage * RangeFactor * (DamageClass ? Damageclass[Target->Props->Armorclass] : 1.0) - Target->Armor * Target->RangedEffectsFactor
+		- deals Damage to every (Player ? hostile : any diplomacy) Entity in AoERange
 	Settler Melee:
 		- Damage gets calculated as (AttackerSettler->Damage + AttackerSettler->RandomDamage) * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] * Attacker->RangedEffectsFactor - Target->Armor * Target->RangedEffectsFactor
 		- if Target->DodgeChance fails its random check, nothing more happens
@@ -75,27 +80,25 @@ Combat:
 		- calculates Cannonball->Damage as Attacker->Props->DamageAmount
 		- Bug: does not include normal RandomDamage, Technologies, ExperienceLevels and GGL::CRangedEffectAbility (fixed by CppLogic.Combat.EnableAoEProjectileFix, to (Attacker->Damage + Attacker->RandomDamage) * Attacker->RangedEffectsFactor)
 		- then fires the Cannonball at the Target->Position
-		- as soon as the Cannonball hits, damages all enemy Entities close to the impact Position
+		- as soon as the Cannonball hits, deals AoE Damage at the impact position
+		- you can outrun the AoE range if the flight time is long enough
 		- Bug: if the Attacker gets Destroyed during Cannonball flight, damages all Entities close to impact Position (fixed by CppLogic.Combat.EnableAoEProjectileFix)
-		- calculates RangeFactor against every target by 1 - (Distance(Affected, Impact) / AoERange)^2
-		- calculates Damage as Cannonball->Damage * RangeFactor - Target->Armor * Target->RangedEffectsFactor
-		- Bug: does not include Damageclass/Armorclass (fixed by CppLogic.Combat.EnableAoEProjectileFix, to Cannonball->Damage * RangeFactor * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] - Target->Armor * Target->RangedEffectsFactor
-		- notet that lvl2 Rifles use Cannonballs with extremely small AoE
+		- Bug: does not include Damageclass/Armorclass (fixed by CppLogic.Combat.EnableAoEProjectileFix)
+		- note that lvl2 Rifles use Cannonballs with extremely small AoE
 	Turret Cannonball:
 		- calculates Cannonball->Damage as Attacker->Props->DamageAmount
-		- then continue as in Settler Canonball
+		- then continue as in Settler Canonball, with the same 2 Bugs
 	Turret Trap:
-		- deals AoEDamage on its position
-		- calculate Damage as in Settler Cannonball with CppLogic.Combat.EnableAoEProjectileFix enabled
+		- deals Attacker->Props->DamageAmount AoEDamage on its position
 	Turret Arrow:
 		- fires a Arrow that never misses and always deals Attacker->Props->DamageAmount damage with no Armor or Damage/Armorclass taken into account
 		- Bug: no Damage calculation (fixed by CppLogic.Combat.EnableAoEProjectileFix, to Attacker->Props->DamageAmount * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] - Target->Armor * Target->RangedEffectsFactor)
 	GGL::CBombBehavior (GGL::CBombPlacerBehavior):
-		- the same AoE Damage as default Settler Cannonball, with Props->Damage from the Bomb (no Damageclass)
+		- deals Props->Damage AoEDamage on its position (no Damageclass)
 		- Bug: no Statistics for kills (fixed by CppLogic.Combat.EnableAoEProjectileFix)
 	GGL::CCircularAttack:
+		- calculate Damage as Attacker->CCircularAttackProps->Damage modified by Technologies, ExperienceLevels and RangedEffectsFactor
 		- deals AoEDamage on its position
-		- calculate Damage as in Settler Cannonball with CppLogic.Combat.EnableAoEProjectileFix enabled with Attacker->CCircularAttackProps->Damage modified by Technologies, ExperienceLevels and RangedEffectsFactor
 	GGL::CSniperAbility:
 		- calculate Damage as Target->MaxHealth * Attacker->HPFactor
 		- Bug: Damage is dealt immediately, not with a Arrow (fixed by CppLogic.Logic.FixSnipeDamage)

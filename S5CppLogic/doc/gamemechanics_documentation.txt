@@ -28,3 +28,74 @@ Workers:
 			- Motivation affects MaximumWorktime, which affects Worktime replenishment (loss by Work is not affected by Motivation)
 			- having a Farm/Residence not only replenishes more of the MaximumWorktime (compared to Camp), it also increases the MaximumWorktime (Farm replenishes more, while Residence adds more Maximum, for a typical Worker, this can be changed on a per EntityType basis)
 			- each cycle replenishes 20/100(no Farm/Residence), 160/225 (just Farm), 300/525 (just Residence), 720/625 (Farm and Residence) (at 1 Motivation)
+			- maximizing Worktime per cycle is especially important for any Refiners, as they only use Raw Resources at the start of their Work and then produce Resources until their Worktime runs out
+
+Combat:
+	Base Values:
+		- Settler->Damage gets calculated based off their Props->DamageAmount modified by Technologies, ExperienceLevels
+		- Workers usually do not have any GGL::CBattleBehavior, so they have no Damage
+		- Towers have no own Damage, but they (may) have a Turret Entity attached (this includes (Dark) Ballista/Cannontowers, Evil_Towers and hero placed Cannons and Traps)
+		- Turret->Damage is just Props->DamageAmount
+		- Settler->Armor gets calculated based of their Props->ArmorAmount modified by Technologies
+		- Building->Armor gets calculated based of their Props->ArmorAmount modified by Technologies
+		- Settler->RandomDamage calculates its maximum off Props->MaxDamageRandomBonus modified by Technologies and ExperienceLevels, then randomly rolled between [0,max)
+		- Settler->MissChance gets calculated based off their Props->MissChance modified by ExperienceLevels
+		- Settler->DodgeChance gets calculated based off their Props->MissChance modified by Technologies and ExperienceLevels
+		- Bug: Experience level 1 does not give any boni, MissChance cannot be reduced by any ExperienceLevel (fixed by CppLogic.Logic.EnableExperienceClassFix)
+		- Bug: Soldiers do not have a Armorclass and a Armor value of 0 (can be fixed with CppLogic.EntityType.SetArmor)
+		- UI shows Damage = Settler->Damage * RangedEffectsFactor and Armor = Entity->Armor * (Settler ? RangedEffectsFactor : 1.0)
+		- Bug: Towers with Turrets do not show any Damage (can be fixed in Lua by querying the Turret and then its Damage)
+	GGL::CRangedEffectAbility:
+		- may affect Armor and/or Damage of nearby Settlers (own/allied or hostile)
+		- area calculation gets refreshed every Second
+		- each RangedEffect applies a multiplier to the base value
+		- multiple RangedEffects stack as follows: newFactor = Props->Factor - 1.0 + oldFactor (where Props->Factor is the DamageFactor or ArmorFactor of the current RangedEffect) (even the first RangedEffect gets added this way to 1.0)
+	Leaders + Soldiers:
+		- each Leader has a hidden pool of HP for its soldiers
+		- if the Leader or one Soldier takes damage it first goes to that shared pool
+		- remaining damage goes to the Leader
+		- Bug? shared pool does not regenerate or gets healed by GGL::CRangedEffectAbility (fixed by CppLogic.Logic.SetLeadersRegenerateTroopHealth and CppLogic.Entity.Settler.EnableRangedEffectSoldierHeal)
+	Damage/Armorclass:
+		- these are the main way Unit counters work
+		- they usually apply multiplicative to the Damage before Armor gets subtraced
+		- each Damageclass has a factor defined for each Armorclass (because of this, Damageclasses can be added by modifying game files, but Armorclasses cannot)
+		- Bug: due to a typo in the damageclasses.xml all factors against ArmorClassFur are 0.0 (may be fixed by CppLogic.Logic.SetDamageFactor)
+	Settler Melee:
+		- Damage gets calculated as (AttackerSettler->Damage + AttackerSettler->RandomDamage) * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] * Attacker->RangedEffectsFactor - Target->Armor * Target->RangedEffectsFactor
+		- if Target->DodgeChance fails its random check, nothing more happens
+		- otherwise Targe takes the calculated amount of damage immediately
+	Settler Arrow:
+		- Damage gets calculated as (AttackerSettler->Damage + AttackerSettler->RandomDamage) * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] * Attacker->RangedEffectsFactor - Target->Armor * Target->RangedEffectsFactor
+		- if Attacker->MissChance fails its random check, the Arrow will still get fired, it just does no damage
+		- otherwise the Arrow will get fired, and the Target will take the calculated amount of damage as soon as the Arrow lands (if the Target moves, does not matter)
+		- if a Arrow gets fired at a Soldier and the Soldier dies during the Arrows travel, no damage is dealt
+		- Damage gets calculated at the time of firing the Arrow, any changes during flight are not taken into account
+		- note that lvl1 Rifles use Arrows
+	Settler Canonball:
+		- calculates Cannonball->Damage as Attacker->Props->DamageAmount
+		- Bug: does not include normal RandomDamage, Technologies, ExperienceLevels and GGL::CRangedEffectAbility (fixed by CppLogic.Combat.EnableAoEProjectileFix, to (Attacker->Damage + Attacker->RandomDamage) * Attacker->RangedEffectsFactor)
+		- then fires the Cannonball at the Target->Position
+		- as soon as the Cannonball hits, damages all enemy Entities close to the impact Position
+		- Bug: if the Attacker gets Destroyed during Cannonball flight, damages all Entities close to impact Position (fixed by CppLogic.Combat.EnableAoEProjectileFix)
+		- calculates RangeFactor against every target by 1 - (Distance(Affected, Impact) / AoERange)^2
+		- calculates Damage as Cannonball->Damage * RangeFactor - Target->Armor * Target->RangedEffectsFactor
+		- Bug: does not include Damageclass/Armorclass (fixed by CppLogic.Combat.EnableAoEProjectileFix, to Cannonball->Damage * RangeFactor * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] - Target->Armor * Target->RangedEffectsFactor
+		- notet that lvl2 Rifles use Cannonballs with extremely small AoE
+	Turret Cannonball:
+		- calculates Cannonball->Damage as Attacker->Props->DamageAmount
+		- then continue as in Settler Canonball
+	Turret Trap:
+		- deals AoEDamage on its position
+		- calculate Damage as in Settler Cannonball with CppLogic.Combat.EnableAoEProjectileFix enabled
+	Turret Arrow:
+		- fires a Arrow that never misses and always deals Attacker->Props->DamageAmount damage with no Armor or Damage/Armorclass taken into account
+		- Bug: no Damage calculation (fixed by CppLogic.Combat.EnableAoEProjectileFix, to Attacker->Props->DamageAmount * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] - Target->Armor * Target->RangedEffectsFactor)
+	GGL::CBombBehavior (GGL::CBombPlacerBehavior):
+		- the same AoE Damage as default Settler Cannonball, with Props->Damage from the Bomb (no Damageclass)
+		- Bug: no Statistics for kills (fixed by CppLogic.Combat.EnableAoEProjectileFix)
+	GGL::CCircularAttack:
+		- deals AoEDamage on its position
+		- calculate Damage as in Settler Cannonball with CppLogic.Combat.EnableAoEProjectileFix enabled with Attacker->CCircularAttackProps->Damage modified by Technologies, ExperienceLevels and RangedEffectsFactor
+	GGL::CSniperAbility:
+		- calculate Damage as Target->MaxHealth * Attacker->HPFactor
+		- Bug: Damage is dealt immediately, not with a Arrow (fixed by CppLogic.Logic.FixSnipeDamage)

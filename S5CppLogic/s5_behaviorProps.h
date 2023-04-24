@@ -284,7 +284,8 @@ namespace GGL {
 		float WorkTimeChangeFarm, WorkTimeChangeResidence, WorkTimeChangeCamp; // la20
 		int WorkTimeMaxCangeFarm, WorkTimeMaxChangeResidence;
 		float ExhaustedWorkMotivationMalus;
-		int TransportAmount, TransportModel, TransportAnim, ResourceToRefine;
+		int TransportAmount, TransportModel, TransportAnim;
+		shok::ResourceType ResourceToRefine;
 		float BridgeProgress, MaximumDistanceToBridge; // la 29
 
 		static inline constexpr int vtp = 0x772B90;

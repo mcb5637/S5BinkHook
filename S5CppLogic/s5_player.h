@@ -312,6 +312,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76E0E0;
 
 		void AddTechResearched(int tech);
+		void OnResRefined(shok::ResourceType rt, float am);
+		void OnResMined(shok::ResourceType rt, float am); // use normal res type, not raw
 	};
 	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
 

@@ -600,6 +600,11 @@ function CppLogic.Logic.GetTradeDataForResource(rt) end
 --- @param workamount number|nil
 function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxprice, inflation, deflation, workamount) end
 
+--- enables/disables resource triggers (Events.CPPLOGIC_EVENT_ON_RESOURCE_REFINED, Events.CPPLOGIC_EVENT_ON_RESOURCE_MINED and Events.CPPLOGIC_EVENT_ON_REFINER_SUPPLY_TAKEN).
+--- also fixes 2 mining bugs: almost empty mines mining not existent resources and serfs not putting their resources into the resource mined statistic.
+--- @param enabled boolean|nil (default true)
+function CppLogic.Logic.EnableResourceTriggers(enabled) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.

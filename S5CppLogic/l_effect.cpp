@@ -177,6 +177,8 @@ namespace CppLogic::Effect {
 		}
 		else {
 			EGL::CGLEGameLogic::CreateEffectHookCallback = nullptr;
+			EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
+			EGL::CEffect::OnDestroyCb = nullptr;
 			CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EffectTriggers = false;
 		}
 	}
@@ -391,6 +393,9 @@ namespace CppLogic::Effect {
 
 	void Cleanup(lua::State L) {
 		EGL::CFlyingEffect::FlyingEffectOnHitCallback = nullptr;
+		EGL::CGLEGameLogic::CreateEffectHookCallback = nullptr;
+		EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
+		EGL::CEffect::OnDestroyCb = nullptr;
 	}
 
 	void CppLogic::Effect::OnSaveLoaded(lua::State L)

@@ -287,10 +287,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	EGL::CEventGetValue_Bool ev{ (shok::EventIDs)0x15041 };
-	L.CheckEntity(1)->FireEvent(&ev);
-	L.Push(ev.Data);
-	return 1;
+	return 0;
 }
 
 int GetOptions(lua::State L) {

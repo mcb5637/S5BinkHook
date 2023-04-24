@@ -606,7 +606,7 @@ namespace GGL {
 	class CResourceDoodad : public EGL::CGLEEntity {
 	public:
 		shok::ResourceType ResourceType; //66
-		int ResourceAmount, ResourceAmountAdd;
+		int ResourceAmount, ResourceAmountAdd; // current, max
 
 		// sets current and refreshes model depending on max
 		void SetCurrentResourceAmount(int am);

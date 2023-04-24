@@ -297,18 +297,20 @@ void EGL::CGLETaskListMgr::LoadTaskList(int id)
 const char* TaskLuaFunc = "TASK_LUA_FUNC";
 const char* TaskWaitForAnimNonCancel = "TASK_WAIT_FOR_ANIM_NON_CANCELABLE";
 const char* TaskSkipSupplier = "TASK_SKIP_SUPPLIER_IF_RESEARCHING";
+const char* TaskResetCarriedRes = "TASK_REFINER_RESET_CARRIED_RESOURES";
 void EGL::TaskData::AddExtraTasks()
 {
     auto v = (*EGL::TaskData::GlobalVector)->SaveVector();
     v.Vector.push_back(EGL::TaskData{ TaskLuaFunc, EGL::CTaskArgsInteger::Identifier, shok::Task::TASK_LUA_FUNC });
     v.Vector.push_back(EGL::TaskData{ TaskWaitForAnimNonCancel, EGL::CGLETaskArgsThousandths::Identifier, shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE });
     v.Vector.push_back(EGL::TaskData{ TaskSkipSupplier, EGL::CTaskArgsInteger::Identifier, shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING });
+    v.Vector.push_back(EGL::TaskData{ TaskResetCarriedRes, EGL::CTaskArgsInteger::Identifier, shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES });
 }
 void EGL::TaskData::RemoveExtraTasks()
 {
     auto v = (*EGL::TaskData::GlobalVector)->SaveVector();
     v.Vector.erase(std::remove_if(v.Vector.begin(), v.Vector.end(), [](EGL::TaskData& a) {
-        return a.TaskName == TaskLuaFunc || a.TaskName == TaskWaitForAnimNonCancel || a.TaskName == TaskSkipSupplier;
+        return a.TaskName == TaskLuaFunc || a.TaskName == TaskWaitForAnimNonCancel || a.TaskName == TaskSkipSupplier || a.TaskName == TaskResetCarriedRes;
         }), v.Vector.end());
 }
 

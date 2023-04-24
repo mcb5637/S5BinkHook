@@ -330,6 +330,16 @@ void GGL::CGameStatistics::AddTechResearched(int tech)
 {
 	gamestatistics_addtech(this, tech);
 }
+inline void(__thiscall* const gamestatistics_resrefined)(GGL::CGameStatistics* th, shok::ResourceType rt, float am) = reinterpret_cast<void(__thiscall*)(GGL::CGameStatistics*, shok::ResourceType, float)>(0x4E101E);
+void GGL::CGameStatistics::OnResRefined(shok::ResourceType rt, float am)
+{
+	gamestatistics_resrefined(this, rt, am);
+}
+inline void(__thiscall* const gamestatistics_resmined)(GGL::CGameStatistics* th, shok::ResourceType rt, float am) = reinterpret_cast<void(__thiscall*)(GGL::CGameStatistics*, shok::ResourceType, float)>(0x4E6544);
+void GGL::CGameStatistics::OnResMined(shok::ResourceType rt, float am)
+{
+	gamestatistics_resmined(this, rt, am);
+}
 
 static inline shok::DiploState(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(int* d, int p) = reinterpret_cast<shok::DiploState(__thiscall*)(int* d, int p)>(0x4B4D5B);
 shok::DiploState GGL::CPlayerStatus::GetDiploStateTo(int p)

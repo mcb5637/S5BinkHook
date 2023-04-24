@@ -656,6 +656,17 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
+	int WorkerGetResourceCarried(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* e = L.CheckSettler(1);
+		auto* b = e->GetBehavior<GGL::CWorkerBehavior>();
+		if (!b)
+			throw lua::LuaException{ "not a worker" };
+		L.Push(b->CarriedResourceAmount);
+		L.Push(b->CouldConsumeResource);
+		return 2;
+	}
+
 	int BuildingMarketGetCurrentTradeData(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CBuilding* b = L.CheckBuilding(1);
@@ -2026,7 +2037,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 55> Settlers{ {
+	constexpr std::array<lua::FuncReference, 56> Settlers{ {
 			lua::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),
 			lua::FuncReference::GetRef<SettlerGetBaseMovementSpeed>("GetBaseMovementSpeed"),
 			lua::FuncReference::GetRef<SettlerSetBaseMovementSpeed>("SetBaseMovementSpeed"),
@@ -2082,6 +2093,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<SettlerGetExperienceClass>("GetExperienceClass"),
 			lua::FuncReference::GetRef<WorkerGetMotivation>("WorkerGetMotivation"),
 			lua::FuncReference::GetRef<WorkerChangeMotivation>("WorkerChangeMotivation"),
+			lua::FuncReference::GetRef<WorkerGetResourceCarried>("WorkerGetResourceCarried"),
 	} };
 
 	constexpr std::array<lua::FuncReference, 8> Leader{ {

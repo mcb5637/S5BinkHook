@@ -1003,6 +1003,19 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	void EnableResourceTriggers(bool e) {
+		GGL::CWorkerBehavior::HookWorkEvents();
+		GGL::CResourceRefinerBehavior::HookRefineTrigger();
+		GGL::CMineBehavior::HookMineTrigger();
+		GGL::CSerfBehavior::HookMineTrigger();
+		GGL::CWorkerBehavior::ResourceTriggers = e;
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers = GGL::CWorkerBehavior::ResourceTriggers;
+	}
+	int EnableResourceTriggers(lua::State L) {
+		EnableResourceTriggers(L.OptBool(1, true));
+		return 0;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1401,9 +1414,10 @@ namespace CppLogic::Logic {
 		EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
 		EGL::CGLEEntity::HookSetTaskListNonCancelable(false);
 		GGL::CEntityProfile::HookExperience(false);
+		GGL::CWorkerBehavior::ResourceTriggers = false;
 	}
 
-	constexpr std::array<lua::FuncReference, 60> Logic{ {
+	constexpr std::array<lua::FuncReference, 61> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1464,6 +1478,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<TaskListInsertSetLatestAttack>("TaskListInsertSetLatestAttack"),
 			lua::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
 			lua::FuncReference::GetRef<Navigate>("Navigate"),
+			lua::FuncReference::GetRef<EnableResourceTriggers>("EnableResourceTriggers"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {
@@ -1493,6 +1508,15 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_PAYDAY");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnPayday));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_RESOURCE_REFINED");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnResourceRefined));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_REFINER_SUPPLY_TAKEN");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnRefinerSupplyTaken));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_RESOURCE_MINED");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnResourceMined));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
@@ -1555,6 +1579,9 @@ namespace CppLogic::Logic {
 			EGL::CGLEEntity::HookBuildOnSetPos();
 
 		GGL::CEntityProfile::HookExperience(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExperienceClassFix);
+
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers)
+			EnableResourceTriggers(true);
 
 		L.Pop(1);
 	}

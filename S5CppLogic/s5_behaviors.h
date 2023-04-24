@@ -615,6 +615,7 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x0E23732C7;
 	};
 
+	class CWorkerBehaviorProps;
 	class CWorkerBehavior : public EGL::CGLEBehavior {
 	public:
 		enum class Cycle : int {
@@ -638,9 +639,7 @@ namespace GGL {
 
 		int WorkTimeRemaining, TargetWorkTime; // 4
 		float Motivation;
-	private:
-		int BehaviorProps2; //7
-	public:
+		GGL::CWorkerBehaviorProps* BehaviorProps2; //7
 		Cycle CycleIndex; // seems to be 0->working, 1->eating, 2->resting, 5->joining settlement
 		int TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn; // 9
 		byte CouldConsumeResource, IsLeaving; // 15
@@ -687,9 +686,15 @@ namespace GGL {
 		int GetWorktimeMax();
 
 		static void HookSupplierSkip();
+		static void HookWorkEvents();
+
+		static bool ResourceTriggers;
 	private:
 		int TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg);
+		int TaskResetCarriedResources(EGL::CGLETaskArgs* arg);
 		void __thiscall AddSupplierSkip();
+		int __thiscall DoWorkEvents(GGL::CBuilding* b, EGL::CGLETaskArgs* t);
+		void __thiscall TaskSupplyAdditional();
 	};
 
 	class CBehaviorFollow : public EGL::CGLEBehavior {
@@ -892,6 +897,10 @@ namespace GGL {
 		static inline constexpr int vtp = 0x774874;
 		static inline constexpr int TypeDesc = 0x819AFC;
 		static inline constexpr unsigned int Identifier = 0x1A1A688D;
+
+		static void HookMineTrigger();
+	private:
+		void TaskExtractAdditional(int am, GGL::CResourceDoodad* d);
 	};
 
 	struct SSlotArgsLimitedAttachment {
@@ -1010,6 +1019,14 @@ namespace GGL {
 		static inline constexpr int vtp = 0x774BCC;
 		static inline constexpr int TypeDesc = 0x81AD80;
 		static inline constexpr unsigned int Identifier = 0x340C4B57;
+
+		float GetRefineAmount(); // checks highest Props->Efficiency with researched tech, Props->InitialFactor as default
+		shok::ResourceType GetResource();
+		shok::ResourceType GetRawResource();
+
+		static void HookRefineTrigger();
+	private:
+		void __thiscall EventRefineOverride(BB::CEvent* ev);
 	};
 
 	class CAffectMotivationBehaviorProps;
@@ -1244,6 +1261,12 @@ namespace GGL {
 		static inline constexpr int vtp = 0x7757CC;
 		static inline constexpr int TypeDesc = 0x81C5EC;
 		static inline constexpr unsigned int Identifier = 0x0DE005127;
+
+		GGL::CResourceDoodad* GetResDoodad();
+
+		static void HookMineTrigger();
+	private:
+		void __thiscall TaskMineAdd(int* am, GGL::CResourceDoodad* d, BB::CEvent* ev);
 	};
 
 	class CKeepBehavior : public EGL::CGLEBehavior {

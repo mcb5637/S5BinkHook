@@ -985,6 +985,9 @@ namespace shok {
 		CppLogicEvent_OnEffectCreated = 0x50006, // EGL::CEvent1Entity
 		CppLogicEvent_OnFlyingEffectHit = 0x50007, // EGL::CEvent1Entity
 		CppLogicEvent_OnEffectDestroyed = 0x50008, // EGL::CEvent1Entity
+		CppLogicEvent_OnResourceRefined = 0x50009, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker, BuyAmount can be changed)
+		CppLogicEvent_OnRefinerSupplyTaken = 0x5000A, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker)
+		CppLogicEvent_OnResourceMined = 0x5000B, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker/serf)
 	};
 
 	enum class InputEventIds : int {

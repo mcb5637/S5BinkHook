@@ -44,11 +44,11 @@ namespace EScr {
 
 		// loads and executes a file from the internal filesystem. also passes it to the luadebugger.
 		static inline void(__stdcall* const LoadFileToLuaState)(lua_State* L, const char* name) = reinterpret_cast<void(__stdcall*) (lua_State*, const char*)> (0x59C04D);
+		// funcName may be nullptr, does nothing on success
+		static inline void(__stdcall* const HandleLuaError)(lua_State* L, lua::ErrorCode e, const char* funcName) = reinterpret_cast<void(__stdcall*)(lua_State*, lua::ErrorCode, const char*)>(0x5A28A7);
 
 		static void HookFireEvent();
 		static void HookRemoveFuncOverrides();
-
-		// handle error code 5A28A7 __stdcall(lua_State*, int errorCode, 0)
 	};
 	//constexpr int i = offsetof(CScriptTriggerSystem, ActiveTrigger) / 4;
 

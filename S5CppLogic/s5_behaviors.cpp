@@ -11,6 +11,7 @@
 #include "s5_tasklist.h"
 #include "s5_effecttype.h"
 #include "s5_scriptsystem.h"
+#include "s5_netevents.h"
 #include "hooks.h"
 #include "EntityAddonData.h"
 #include "savegame_extra.h"
@@ -891,6 +892,87 @@ void GGL::CWorkerBehavior::HookSupplierSkip()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4D1689), &workerbehavior_hooksupplierskipasm, reinterpret_cast<void*>(0x4D168F));
 }
 
+int __thiscall GGL::CWorkerBehavior::DoWorkEvents(GGL::CBuilding* b, EGL::CGLETaskArgs* t)
+{
+	if (t->TaskType == shok::Task::TASK_DO_RESEARCH_STEP) {
+		EGL::CEvent1Entity ev{ shok::EventIDs::University_ResearchStep, EntityId };
+		b->FireEvent(&ev);
+		return 0;
+	}
+	int tech = b->GetTechnologyInResearch();
+	if (tech) {
+		(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId)->TechnologyStates.AddTechProgressWorker(tech, BehaviorProps2->AmountResearched);
+	}
+	else {
+		EGL::CEvent1Entity ev{ shok::EventIDs::NoDetachEvent, EntityId };
+		switch (t->TaskType) {
+		case shok::Task::TASK_MINED_RESOURCE:
+			ev.EventTypeId = static_cast<int>(shok::EventIDs::Mine_DoWorkStep);
+			break;
+		case shok::Task::TASK_REFINE_RESOURCE:
+			ev.EventTypeId = static_cast<int>(shok::EventIDs::ResourceRefiner_Refine);
+			break;
+		case shok::Task::TASK_DO_TRADE_STEP:
+			ev.EventTypeId = static_cast<int>(shok::EventIDs::Market_WorkStep);
+			break;
+		default:
+			return 0;
+		}
+		b->FireEvent(&ev);
+	}
+	return 0;
+}
+void __declspec(naked) workerbeh_workeventsasm() {
+	__asm {
+		mov ecx, esi;
+		push[ebp + 8];
+		push eax;
+		call GGL::CWorkerBehavior::DoWorkEvents;
+
+		push 0x4CE70D;
+		ret;
+	};
+}
+void __thiscall GGL::CWorkerBehavior::TaskSupplyAdditional()
+{
+	if (ResourceTriggers) {
+		float am = CarriedResourceAmount;
+		auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+		auto* wp = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::WORKER_WORKPLACE));
+		GGL::CEventGoodsTraded ev{ shok::EventIDs::CppLogicEvent_OnRefinerSupplyTaken, BehaviorProps2->ResourceToRefine, shok::ResourceType::None, 0.0f, EntityId, am };
+		e->FireEvent(&ev);
+		wp->FireEvent(&ev);
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+	}
+}
+void __declspec(naked) workerbeh_tasksupplyadd() {
+	__asm {
+		mov eax, 0x4A963D;
+		call eax;
+
+		mov ecx, esi;
+		call GGL::CWorkerBehavior::TaskSupplyAdditional;
+
+		push 0x4CFB73;
+		ret;
+	};
+}
+
+bool HookWorkEvents_Hooked = false;
+void GGL::CWorkerBehavior::HookWorkEvents()
+{
+	if (HookWorkEvents_Hooked)
+		return;
+	HookWorkEvents_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
+		reinterpret_cast<void*>(0x4CE641),
+		reinterpret_cast<void*>(0x4CFB6E),
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4CE641), &workerbeh_workeventsasm, reinterpret_cast<void*>(0x4CE648));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4CFB6E), &workerbeh_tasksupplyadd, reinterpret_cast<void*>(0x4CFB73));
+}
+bool GGL::CWorkerBehavior::ResourceTriggers = false;
+
 int GGL::CWorkerBehavior::TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg)
 {
 	if (IsResearchingSomething()) {
@@ -900,10 +982,17 @@ int GGL::CWorkerBehavior::TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* a
 	return 0;
 }
 
+int GGL::CWorkerBehavior::TaskResetCarriedResources(EGL::CGLETaskArgs* arg)
+{
+	CarriedResourceAmount = 0.0f;
+	return 0;
+}
+
 void __thiscall GGL::CWorkerBehavior::AddSupplierSkip()
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	e->CreateTaskHandler<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING>(this, &CWorkerBehavior::TaskSkipSupplierIfResearching);
+	e->CreateTaskHandler<shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES>(this, &CWorkerBehavior::TaskResetCarriedResources);
 }
 
 static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(const GGL::CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(const GGL::CAutoCannonBehavior*)>(0x50F508);
@@ -1044,6 +1133,48 @@ void GGL::CAutoCannonBehavior::HookRangeOverride()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F50D), &autocannonmaxrangeasm, reinterpret_cast<void*>(0x50F515));
 }
 
+void GGL::CSerfBehavior::TaskExtractAdditional(int am, GGL::CResourceDoodad* d)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	if (GGL::CWorkerBehavior::ResourceTriggers) {
+		GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceMined, shok::ResourceType::None, d->ResourceType, static_cast<float>(am), EntityId, 0.0f };
+		e->FireEvent(&ev3);
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
+	}
+	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
+	auto rt = shok::CostInfo::RawToResourceType(d->ResourceType);
+	if (rt != shok::ResourceType::None)
+		pl->Statistics.OnResMined(rt, static_cast<float>(am));
+}
+void __declspec(naked) serfbeh_extractaddasm() {
+	__asm {
+		push ebx; // orig
+		push edi; // add resdoodad
+		mov ebx, [eax]; // orig
+		push ebx; // add amount
+		mov[ebp - 0x1c], ebx; // orig
+		mov ecx, esi; // add this
+		call GGL::CSerfBehavior::TaskExtractAdditional; // add
+
+		mov ecx, esi; // orig
+
+		push 0x4DEAEA;
+		ret;
+	};
+}
+
+bool HookMineTriggerSerf_Hooked = false;
+void GGL::CSerfBehavior::HookMineTrigger()
+{
+	if (HookMineTriggerSerf_Hooked)
+		return;
+	HookMineTriggerSerf_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x4DEAE2)
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DEAE2), &serfbeh_extractaddasm, reinterpret_cast<void*>(0x4DEAE7));
+}
+
 inline void(__thiscall* const formationbeh_getfrompos)(GGL::CFormationBehavior* th, shok::Position* p, EGL::CGLEEntity* lead) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, shok::Position*, EGL::CGLEEntity*)>(0x4F7962);
 void GGL::CFormationBehavior::GetFormationPosition(EGL::CGLEEntity* leader, shok::Position* out)
 {
@@ -1148,4 +1279,113 @@ shok::Position GGL::CPositionAtResourceFinder::CalcPositionFromFloat(float f)
 	//reinterpret_cast<shok_vtable_shok_GGL_CPositionAtResourceFinder*>(vtable)->GetPosition(this, &p, f);
 	shok_GGL_CPositionAtResourceFinder_getposbyfloat(this, &p, f);
 	return p;
+}
+
+inline float(__thiscall* const resrefiner_getam)(GGL::CResourceRefinerBehavior* th) = reinterpret_cast<float(__thiscall*)(GGL::CResourceRefinerBehavior*)>(0x4E1201);
+float GGL::CResourceRefinerBehavior::GetRefineAmount()
+{
+	return resrefiner_getam(this);
+}
+inline shok::ResourceType(__thiscall* const resrefiner_getrt)(GGL::CResourceRefinerBehavior* th) = reinterpret_cast<shok::ResourceType(__thiscall*)(GGL::CResourceRefinerBehavior*)>(0x4E1035);
+shok::ResourceType GGL::CResourceRefinerBehavior::GetResource()
+{
+	return resrefiner_getrt(this);
+}
+inline shok::ResourceType(__thiscall* const resrefiner_getrrt)(GGL::CResourceRefinerBehavior* th) = reinterpret_cast<shok::ResourceType(__thiscall*)(GGL::CResourceRefinerBehavior*)>(0x4E1052);
+shok::ResourceType GGL::CResourceRefinerBehavior::GetRawResource()
+{
+	return resrefiner_getrrt(this);
+}
+
+void __thiscall GGL::CResourceRefinerBehavior::EventRefineOverride(BB::CEvent* ev)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
+	auto raw = GetRawResource();
+	if (pl->CurrentResources.GetResourceAmountFromType(raw, false) > 0) {
+		float am = GetRefineAmount();
+		auto rt = GetResource();
+
+		auto* ev2 = BB::IdentifierCast<EGL::CEvent1Entity>(ev);
+
+		if (GGL::CWorkerBehavior::ResourceTriggers && ev2) {
+			GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceRefined, raw, rt, am, ev2->EntityID, 0 };
+			EGL::CGLEEntity::GetEntityByID(ev2->EntityID)->FireEvent(&ev3);
+			e->FireEvent(&ev3);
+			(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
+			am = ev3.BuyAmount;
+		}
+
+		pl->CurrentResources.AddToType(rt, am);
+		{
+			luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
+			int t = L.GetTop();
+			L.GetGlobal("GameCallback_GainedResources");
+			L.Push(e->PlayerId);
+			L.Push(static_cast<int>(rt));
+			L.Push(am);
+			EScr::CScriptTriggerSystem::HandleLuaError(L.GetState(), L.PCall(3, 0), "GameCallback_GainedResources");
+			L.SetTop(t);
+		}
+
+		pl->Statistics.OnResRefined(rt, am);
+		GGL::CFeedbackEventResource ev4{ shok::FeedbackEventIds::FEEDBACK_EVENT_RESOURCE_MINED, e->PlayerId, e->EntityId, rt, am };
+		EGUIX::FeedbackEventHandler::GlobalObj()->FireEvent(&ev4);
+	}
+}
+
+bool HookRefineTrigger_Hooked = false;
+void GGL::CResourceRefinerBehavior::HookRefineTrigger()
+{
+	if (HookRefineTrigger_Hooked)
+		return;
+	HookRefineTrigger_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4E128B), 0x10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4E128B), CppLogic::Hooks::MemberFuncPointerToVoid(&CResourceRefinerBehavior::EventRefineOverride, 0), reinterpret_cast<void*>(0x4E1295));
+}
+
+inline GGL::CResourceDoodad* (__thiscall* const minebeh_getresdoodad)(GGL::CMineBehavior* th) = reinterpret_cast<GGL::CResourceDoodad * (__thiscall*)(GGL::CMineBehavior*)>(0x4E68E9);
+GGL::CResourceDoodad* GGL::CMineBehavior::GetResDoodad()
+{
+	return minebeh_getresdoodad(this);
+}
+
+void __thiscall GGL::CMineBehavior::TaskMineAdd(int* am, GGL::CResourceDoodad* d, BB::CEvent* ev)
+{
+	if (d->ResourceAmount < *am)
+		*am = d->ResourceAmount;
+	auto* ev2 = BB::IdentifierCast<EGL::CEvent1Entity>(ev);
+	if (GGL::CWorkerBehavior::ResourceTriggers && ev2) {
+		GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceMined, shok::ResourceType::None, d->ResourceType, static_cast<float>(*am), ev2->EntityID, 0.0f};
+		EGL::CGLEEntity::GetEntityByID(ev2->EntityID)->FireEvent(&ev3);
+		EGL::CGLEEntity::GetEntityByID(EntityId)->FireEvent(&ev3);
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
+	}
+}
+void __declspec(naked) minebeh_taskmineaddasm() {
+	__asm {
+		mov[ebp - 0x14], eax;
+
+		push[ebp + 8];
+		push eax;
+		lea eax, [ebp - 0x18];
+		push eax;
+		mov ecx, esi;
+		call GGL::CMineBehavior::TaskMineAdd;
+
+		mov ecx, [ebp - 0x14];
+
+		push 0x4E6966;
+		ret;
+	};
+}
+
+bool HookMineTrigger_Hooked = false;
+void GGL::CMineBehavior::HookMineTrigger()
+{
+	if (HookMineTrigger_Hooked)
+		return;
+	HookMineTrigger_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4E6961), 0x10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4E6961), &minebeh_taskmineaddasm, reinterpret_cast<void*>(0x4E6966));
 }

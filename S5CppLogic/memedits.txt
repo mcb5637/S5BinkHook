@@ -38,6 +38,12 @@ changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C
 0x7776A4 GGL::CCannonBallEffect::OnLoaded vtable override empty func replaced
 0x588FDA EGL::CEffect dtor jmp
 0x4F8818, 0x4F8880, 0x4F892D, 0x4F89D1 all calls to GGL::CFormationBehavior::GetFormationPosition redirect
+0x4D1689 GGL::CWorkerBehavior::AddHandlers jmp
+0x4CE641 GGL::CWorkerBehavior::EventVariousWork jmp
+0x4CFB6E GGL::CWorkerBehavior::TaskSupply jmp
+0x4DEAE2 GGL::CSerfBehavior::taskExtractRes jmp
+0x4E128B GGL::CResourceRefinerBehavior::EventRefine jmp
+0x4E6961 GGL::CMineBehavior::Work jmp
 
 only without SCELoader
 

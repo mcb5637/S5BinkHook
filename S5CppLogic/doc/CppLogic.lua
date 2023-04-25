@@ -1241,6 +1241,13 @@ function CppLogic.Entity.GetBattleTarget(id) end
 --- @return number target
 function CppLogic.Entity.GetAttackCommandTarget(id) end
 
+--- gets the produced and consumed resources of a entity.
+--- requires the entity type having a CppLogic::Mod::ResourceTrackerBehavior behavior and activated CppLogic.Logic.EnableResourceTriggers.
+--- @param id entity
+--- @return CostInfo|nil produced
+--- @return CostInfo|nil used
+function CppLogic.Entity.GetTrackedResources(id) end
+
 --- gets the leader of a soldier.
 --- @param id entity
 --- @return number id

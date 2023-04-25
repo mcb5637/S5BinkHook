@@ -37,4 +37,26 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 	};
+
+	class ResourceTrackerBehavior : public EGL::CGLEBehavior {
+	public:
+		shok::CostInfo Produced, Used;
+
+		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual void __thiscall AddHandlers(int id) override;
+		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old) override;
+
+
+		static inline constexpr unsigned int Identifier = 0x100B;
+		static const BB::SerializationData SerializationData[];
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+	private:
+		void EventMinedOrRefined(GGL::CEventGoodsTraded* ev);
+		void EventSupplied(GGL::CEventGoodsTraded* ev);
+	};
 }

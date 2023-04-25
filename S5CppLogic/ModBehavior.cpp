@@ -8,6 +8,7 @@ void CppLogic::Mod::RegisterClasses()
     BB::CClassFactory* f = *BB::CClassFactory::GlobalObj;
     f->AddClassToFactory<FormationSpacedBehaviorProps>();
     f->AddClassToFactory<FormationSpacedBehavior>();
+    f->AddClassToFactory<ResourceTrackerBehavior>();
 }
 
 unsigned int __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
@@ -68,4 +69,58 @@ void* CppLogic::Mod::FormationSpacedBehavior::operator new(size_t s)
 }
 void CppLogic::Mod::FormationSpacedBehavior::operator delete(void* p) {
     shok::Free(p);
+}
+
+unsigned int __stdcall CppLogic::Mod::ResourceTrackerBehavior::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+const BB::SerializationData CppLogic::Mod::ResourceTrackerBehavior::SerializationData[]{
+    BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(EGL::CGLEBehavior), EGL::CGLEBehavior::SerializationData),
+    BB::SerializationData::EmbeddedData("Produced", MemberSerializationSizeAndOffset(ResourceTrackerBehavior, Produced), shok::CostInfo::SerializationData),
+    BB::SerializationData::EmbeddedData("Used", MemberSerializationSizeAndOffset(ResourceTrackerBehavior, Used), shok::CostInfo::SerializationData),
+    BB::SerializationData::GuardData(),
+};
+
+void* CppLogic::Mod::ResourceTrackerBehavior::operator new(size_t s)
+{
+    return shok::Malloc(s);
+}
+void CppLogic::Mod::ResourceTrackerBehavior::operator delete(void* p) {
+    shok::Free(p);
+}
+
+void __thiscall CppLogic::Mod::ResourceTrackerBehavior::AddHandlers(int id)
+{
+    EntityId = id;
+    auto* e = EGL::CGLEEntity::GetEntityByID(id);
+    e->CreateEventHandler<shok::EventIDs::CppLogicEvent_OnResourceMined>(this, &ResourceTrackerBehavior::EventMinedOrRefined);
+    e->CreateEventHandler<shok::EventIDs::CppLogicEvent_OnResourceRefined>(this, &ResourceTrackerBehavior::EventMinedOrRefined);
+    e->CreateEventHandler<shok::EventIDs::CppLogicEvent_OnRefinerSupplyTaken>(this, &ResourceTrackerBehavior::EventSupplied);
+}
+void __thiscall CppLogic::Mod::ResourceTrackerBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+    PropPointer = p;
+}
+void __thiscall CppLogic::Mod::ResourceTrackerBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+    PropPointer = p;
+}
+void __thiscall CppLogic::Mod::ResourceTrackerBehavior::OnEntityUpgrade(EGL::CGLEEntity* old)
+{
+    auto* o = old->GetBehavior<ResourceTrackerBehavior>();
+    if (o) {
+        Produced = o->Produced;
+        Used = o->Used;
+    }
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::EventMinedOrRefined(GGL::CEventGoodsTraded* ev)
+{
+    Produced.AddToType(ev->BuyType, ev->BuyAmount);
+}
+void CppLogic::Mod::ResourceTrackerBehavior::EventSupplied(GGL::CEventGoodsTraded* ev)
+{
+    Used.AddToType(ev->SellType, ev->SellAmount);
 }

@@ -212,23 +212,9 @@ void luaext::EState::PushCostInfo(const shok::CostInfo& c)
 {
 	NewTable();
 	for (int i = 1; i <= shok::ResourceType_MaxValue; i++) {
-		Push(0);
+		Push(c.GetResourceAmountFromType(static_cast<shok::ResourceType>(i), false));
 		SetTableRaw(-2, i);
 	}
-	Push(c.Clay);
-	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Clay));
-	Push(c.Gold);
-	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Gold));
-	Push(c.Iron);
-	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Iron));
-	Push(c.Silver);
-	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Silver));
-	Push(c.Stone);
-	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Stone));
-	Push(c.Sulfur);
-	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Sulfur));
-	Push(c.Wood);
-	SetTableRaw(-2, static_cast<int>(shok::ResourceType::Wood));
 }
 
 GGlue::CGlueEntityProps* luaext::EState::OptEntityType(int idx)

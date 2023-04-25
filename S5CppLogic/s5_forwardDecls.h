@@ -88,6 +88,7 @@ namespace GGL {
 	class CBattleBehaviorProps;
 	class CGLGameLogic;
 	class CNetEventEventTechnologyPlayerIDAndEntityID;
+	class CEventGoodsTraded;
 }
 namespace ED {
 	class CBehaviorProps;

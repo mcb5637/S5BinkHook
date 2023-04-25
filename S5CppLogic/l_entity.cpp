@@ -20,6 +20,7 @@
 #include "modloader.h"
 #include "savegame_extra.h"
 #include "EntityAddonData.h"
+#include "ModBehavior.h"
 
 namespace CppLogic::Entity {
 	int PredicateOfType(lua::State L) {
@@ -601,6 +602,17 @@ namespace CppLogic::Entity {
 		else
 			L.Push(s->second.data());
 		return 3;
+	}
+
+	int GetTrackedResources(lua::State l) {
+		luaext::EState L{ l };
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		auto* b = e->GetBehavior<CppLogic::Mod::ResourceTrackerBehavior>();
+		if (!b)
+			return 0;
+		L.PushCostInfo(b->Produced);
+		L.PushCostInfo(b->Used);
+		return 2;
 	}
 
 	int MovingEntityGetSpeedFactor(lua::State l) {
@@ -1973,7 +1985,7 @@ namespace CppLogic::Entity {
 		SettlerCleanupAnimTask(L);
 	}
 
-	constexpr std::array<lua::FuncReference, 37> Entity{ {
+	constexpr std::array<lua::FuncReference, 38> Entity{ {
 			lua::FuncReference::GetRef<GetScale>("GetScale"),
 			lua::FuncReference::GetRef<SetScale>("SetScale"),
 			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
@@ -2011,6 +2023,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<GetBattleTarget>("GetBattleTarget"),
 			lua::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
 			lua::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
+			lua::FuncReference::GetRef<GetTrackedResources>("GetTrackedResources"),
 	} };
 
 	constexpr std::array<lua::FuncReference, 21> Predicates{ {

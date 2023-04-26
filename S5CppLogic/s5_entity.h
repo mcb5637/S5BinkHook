@@ -13,6 +13,7 @@ namespace shok {
 		Melee = 1,
 		Arrow = 2,
 		Cannonball = 3,
+		DefenderArrow = 4,
 
 		AbilitySnipe = 10,
 		AbilityCircularAttack = 11,

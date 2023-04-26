@@ -553,6 +553,7 @@ namespace shok {
         TASK_WAIT_FOR_ANIM_NON_CANCELABLE = 1501, //EGL::CGLETaskArgsThousandths (GGL::CGLBehaviorAnimationEx::HookNonCancelableAnim)
         TASK_SKIP_SUPPLIER_IF_RESEARCHING = 1502, //EGL::CTaskArgsInteger (GGL::CWorkerBehavior::HookSupplierSkip)
         TASK_REFINER_RESET_CARRIED_RESOURES = 1503, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
+        TASK_REFINER_CHECK_NEEDS_RESOURCES = 1504, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
     };
 
     enum class TaskState : int {

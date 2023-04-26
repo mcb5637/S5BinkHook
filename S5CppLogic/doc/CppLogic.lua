@@ -602,8 +602,11 @@ function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxpric
 
 --- enables/disables resource triggers (Events.CPPLOGIC_EVENT_ON_RESOURCE_REFINED, Events.CPPLOGIC_EVENT_ON_RESOURCE_MINED and Events.CPPLOGIC_EVENT_ON_REFINER_SUPPLY_TAKEN).
 --- also fixes 2 mining bugs: almost empty mines mining not existent resources and serfs not putting their resources into the resource mined statistic.
+--- the optional refinerFix fixes refiner resource consumption, requires external editing of tasklists and enabled.
+--- status of this gets saved into a savegame.
 --- @param enabled boolean|nil (default true)
-function CppLogic.Logic.EnableResourceTriggers(enabled) end
+--- @param refinerFix boolean|nil (default false)
+function CppLogic.Logic.EnableResourceTriggers(enabled, refinerFix) end
 
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).

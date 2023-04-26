@@ -1003,16 +1003,18 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	void EnableResourceTriggers(bool e) {
+	void EnableResourceTriggers(bool e, bool ref) {
 		GGL::CWorkerBehavior::HookWorkEvents();
 		GGL::CResourceRefinerBehavior::HookRefineTrigger();
 		GGL::CMineBehavior::HookMineTrigger();
 		GGL::CSerfBehavior::HookMineTrigger();
 		GGL::CWorkerBehavior::ResourceTriggers = e;
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers = GGL::CWorkerBehavior::ResourceTriggers;
+		GGL::CWorkerBehavior::RefinerFix = ref;
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers = e;
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix = ref;
 	}
 	int EnableResourceTriggers(lua::State L) {
-		EnableResourceTriggers(L.OptBool(1, true));
+		EnableResourceTriggers(L.OptBool(1, true), L.OptBool(2, false));
 		return 0;
 	}
 
@@ -1415,6 +1417,7 @@ namespace CppLogic::Logic {
 		EGL::CGLEEntity::HookSetTaskListNonCancelable(false);
 		GGL::CEntityProfile::HookExperience(false);
 		GGL::CWorkerBehavior::ResourceTriggers = false;
+		GGL::CWorkerBehavior::RefinerFix = false;
 	}
 
 	constexpr std::array<lua::FuncReference, 61> Logic{ {
@@ -1580,8 +1583,8 @@ namespace CppLogic::Logic {
 
 		GGL::CEntityProfile::HookExperience(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExperienceClassFix);
 
-		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers)
-			EnableResourceTriggers(true);
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers || CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix)
+			EnableResourceTriggers(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers, CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix);
 
 		L.Pop(1);
 	}

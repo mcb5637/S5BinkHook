@@ -44,6 +44,11 @@ changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C
 0x4DEAE2 GGL::CSerfBehavior::taskExtractRes jmp
 0x4E128B GGL::CResourceRefinerBehavior::EventRefine jmp
 0x4E6961 GGL::CMineBehavior::Work jmp
+0x4CFAD2 GGL::CWorkerBehavior::TaskTakeFromStock call redirect
+0x4CFB8C GGL::CWorkerBehavior::TaskSetCarryModel call redirect
+0x4CFC0D GGL::CWorkerBehavior::TaskCheckGoToSupplier call redirect
+0x4D018A GGL::CWorkerBehavior::TaskGoToSupplier call redirect
+0x4FC40C GGL::CDefendableBuildingBehavior::FireArrow jmp
 
 only without SCELoader
 

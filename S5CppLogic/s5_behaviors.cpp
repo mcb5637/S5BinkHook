@@ -867,6 +867,11 @@ int GGL::CWorkerBehavior::GetWorktimeMax()
 {
 	return workerbeh_getworktimemax(this);
 }
+inline void(__thiscall* const workerbeh_goRestIgnoreworktime)(GGL::CWorkerBehavior* th, int bid) = reinterpret_cast<void(__thiscall*)(GGL::CWorkerBehavior*, int)>(0x4CFF56);
+void GGL::CWorkerBehavior::GoRestIgnoreWorktime()
+{
+	workerbeh_goRestIgnoreworktime(this, EGL::CGLEEntity::GetEntityByID(EntityId)->GetFirstAttachedEntity(shok::AttachmentType::WORKER_WORKPLACE));
+}
 
 void __declspec(naked) workerbehavior_hooksupplierskipasm() {
 	__asm {
@@ -967,11 +972,21 @@ void GGL::CWorkerBehavior::HookWorkEvents()
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
 		reinterpret_cast<void*>(0x4CE641),
 		reinterpret_cast<void*>(0x4CFB6E),
+		reinterpret_cast<void*>(0x4CFAD2),
+		reinterpret_cast<void*>(0x4CFB8C),
+		reinterpret_cast<void*>(0x4CFC0D),
+		reinterpret_cast<void*>(0x4D018A),
 	} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4CE641), &workerbeh_workeventsasm, reinterpret_cast<void*>(0x4CE648));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4CFB6E), &workerbeh_tasksupplyadd, reinterpret_cast<void*>(0x4CFB73));
+	void* over = CppLogic::Hooks::MemberFuncPointerToVoid(&CWorkerBehavior::IsResearchingOverride, 0);
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4CFAD2), over); // take from stock
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4CFB8C), over); // set carry model
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4CFC0D), over); // goto supplier check
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4D018A), over); // goto supplier
 }
 bool GGL::CWorkerBehavior::ResourceTriggers = false;
+bool GGL::CWorkerBehavior::RefinerFix = false;
 
 int GGL::CWorkerBehavior::TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg)
 {
@@ -988,11 +1003,38 @@ int GGL::CWorkerBehavior::TaskResetCarriedResources(EGL::CGLETaskArgs* arg)
 	return 0;
 }
 
+int GGL::CWorkerBehavior::TaskCheckNeedsRes(EGL::CGLETaskArgs* arg)
+{
+	if (CarriedResourceAmount > 0 || IsResearchingSomething())
+		return 0;
+	if (WorkTimeRemaining < TargetWorkTime * 3)
+		GoRestIgnoreWorktime();
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* b = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::WORKER_WORKPLACE));
+	for (const auto& wt : static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps)->WorkTaskList) {
+		if (wt.Work == e->CurrentTaskListID) {
+			e->SetTaskList(wt.Start);
+			return 0;
+		}
+	}
+	// fallback if for some reason the tasklist is not found
+	GoRestIgnoreWorktime();
+	return 0;
+}
+
+bool __thiscall GGL::CWorkerBehavior::IsResearchingOverride()
+{
+	if (GGL::CWorkerBehavior::RefinerFix)
+		return false;
+	return IsResearchingSomething();
+}
+
 void __thiscall GGL::CWorkerBehavior::AddSupplierSkip()
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	e->CreateTaskHandler<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING>(this, &CWorkerBehavior::TaskSkipSupplierIfResearching);
 	e->CreateTaskHandler<shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES>(this, &CWorkerBehavior::TaskResetCarriedResources);
+	e->CreateTaskHandler<shok::Task::TASK_REFINER_CHECK_NEEDS_RESOURCES>(this, &CWorkerBehavior::TaskCheckNeedsRes);
 }
 
 static inline float(__thiscall* const autocannonBehaviorGetMaxRange)(const GGL::CAutoCannonBehavior*) = reinterpret_cast<float(__thiscall*)(const GGL::CAutoCannonBehavior*)>(0x50F508);
@@ -1302,11 +1344,16 @@ void __thiscall GGL::CResourceRefinerBehavior::EventRefineOverride(BB::CEvent* e
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
 	auto raw = GetRawResource();
-	if (pl->CurrentResources.GetResourceAmountFromType(raw, false) > 0) {
+	auto* ev2 = BB::IdentifierCast<EGL::CEvent1Entity>(ev);
+	bool allow;
+	if (GGL::CWorkerBehavior::RefinerFix && ev2)
+		allow = EGL::CGLEEntity::GetEntityByID(ev2->EntityID)->GetBehavior<GGL::CWorkerBehavior>()->CarriedResourceAmount > 0;
+	else
+		allow = pl->CurrentResources.GetResourceAmountFromType(raw, false) > 0;
+
+	if (allow) {
 		float am = GetRefineAmount();
 		auto rt = GetResource();
-
-		auto* ev2 = BB::IdentifierCast<EGL::CEvent1Entity>(ev);
 
 		if (GGL::CWorkerBehavior::ResourceTriggers && ev2) {
 			GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceRefined, raw, rt, am, ev2->EntityID, 0 };
@@ -1342,6 +1389,49 @@ void GGL::CResourceRefinerBehavior::HookRefineTrigger()
 	HookRefineTrigger_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4E128B), 0x10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4E128B), CppLogic::Hooks::MemberFuncPointerToVoid(&CResourceRefinerBehavior::EventRefineOverride, 0), reinterpret_cast<void*>(0x4E1295));
+}
+
+inline EGL::CGLEEntity* (__thiscall*const defbuild_gettar)(GGL::CDefendableBuildingBehavior* th, const shok::Position* p) = reinterpret_cast<EGL::CGLEEntity * (__thiscall*)(GGL::CDefendableBuildingBehavior*, const shok::Position*)>(0x4FC22F);
+EGL::CGLEEntity* GGL::CDefendableBuildingBehavior::GetAttackTarget(const shok::Position& pos)
+{
+	return defbuild_gettar(this, &pos);
+}
+inline bool(__thiscall* const defbuild_rollmiss)(GGL::CDefendableBuildingBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CDefendableBuildingBehavior*)>(0x4FBD49);
+bool GGL::CDefendableBuildingBehavior::RollAttackMiss()
+{
+	return defbuild_rollmiss(this);;
+}
+inline int(__thiscall* const defbuild_calcdmg)(GGL::CDefendableBuildingBehavior* th, EGL::CGLEEntity* tar) = reinterpret_cast<int(__thiscall*)(GGL::CDefendableBuildingBehavior*, EGL::CGLEEntity*)>(0x4FC13B);
+int GGL::CDefendableBuildingBehavior::CalcDamageAgainst(EGL::CGLEEntity* tar)
+{
+	return defbuild_calcdmg(this, tar);;
+}
+inline void(__thiscall* const defbuild_fire)(GGL::CDefendableBuildingBehavior* th) = reinterpret_cast<void(__thiscall*)(GGL::CDefendableBuildingBehavior*)>(0x4FC37F);
+void GGL::CDefendableBuildingBehavior::FireAtNearestTarget()
+{
+	defbuild_fire(this);
+}
+
+static_assert(- 0x5C + static_cast<int>(offsetof(CProjectileEffectCreator, AdvancedDamageSourceOverride))==-21);
+void __declspec(naked) defendbuildingbeh_dealdmgsrcasm() {
+	__asm {
+		mov byte ptr[ebp -21], 4;
+
+		mov ecx, 0x895DAC;
+		mov ecx, [ecx];
+
+		push 0x4FC412;
+		ret;
+	};
+}
+bool HookDealDamageSource_Hooked = false;
+void GGL::CDefendableBuildingBehavior::HookDealDamageSource()
+{
+	if (HookDealDamageSource_Hooked)
+		return;
+	HookDealDamageSource_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FC40C), 0x10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FC40C), &defendbuildingbeh_dealdmgsrcasm, reinterpret_cast<void*>(0x4FC412));
 }
 
 inline GGL::CResourceDoodad* (__thiscall* const minebeh_getresdoodad)(GGL::CMineBehavior* th) = reinterpret_cast<GGL::CResourceDoodad * (__thiscall*)(GGL::CMineBehavior*)>(0x4E68E9);

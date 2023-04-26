@@ -98,6 +98,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	BB::SerializationData::FieldData("RangedEffectSoldierHeal", MemberSerializationFieldData(SerializedMapdata, RangedEffectSoldierHeal)),
 	BB::SerializationData::FieldData("EffectTriggers", MemberSerializationFieldData(SerializedMapdata, EffectTriggers)),
 	BB::SerializationData::FieldData("ResourceTriggers", MemberSerializationFieldData(SerializedMapdata, ResourceTriggers)),
+	BB::SerializationData::FieldData("RefinerFix", MemberSerializationFieldData(SerializedMapdata, RefinerFix)),
 	BB::SerializationData::EmbeddedData("StringTableTextOverride", MemberSerializationSizeAndOffset(SerializedMapdata ,StringTableTextOverride), PairStrings, &StringMap),
 	BB::SerializationData::GuardData(),
 };

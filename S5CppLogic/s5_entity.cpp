@@ -1075,6 +1075,7 @@ void EGL::CGLEEntity::HookHurtEntity()
 	GGL::CCannonBallEffect::HookDealDamage();
 	GGL::CBombBehavior::HookDealDamage();
 	GGL::CShurikenAbility::HookDealDamage();
+	GGL::CDefendableBuildingBehavior::HookDealDamageSource();
 
 	HookDamageMod(); // set projectile player field in creator
 	GGL::CBombPlacerBehavior::HookFixBombAttachment();

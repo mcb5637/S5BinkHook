@@ -684,17 +684,21 @@ namespace GGL {
 		bool CanWork(); // always false if no workplace, checks worktime if no overtime, checks moti if overtime
 		int GetWorkTaskList(); // first workplace, then own props as fallback
 		int GetWorktimeMax();
+		void GoRestIgnoreWorktime(); // on no supplier found
 
 		static void HookSupplierSkip();
 		static void HookWorkEvents();
 
 		static bool ResourceTriggers;
+		static bool RefinerFix;
 	private:
 		int TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg);
 		int TaskResetCarriedResources(EGL::CGLETaskArgs* arg);
+		int TaskCheckNeedsRes(EGL::CGLETaskArgs* arg);
 		void __thiscall AddSupplierSkip();
 		int __thiscall DoWorkEvents(GGL::CBuilding* b, EGL::CGLETaskArgs* t);
 		void __thiscall TaskSupplyAdditional();
+		bool __thiscall IsResearchingOverride();
 	};
 
 	class CBehaviorFollow : public EGL::CGLEBehavior {
@@ -1175,7 +1179,7 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x83A6BCAD;
 	};
 
-	class CWorkerAlarmModeBehavior : public EGL::CGLEBehavior {
+	class CWorkerAlarmModeBehavior : public EGL::CGLEBehavior { // on the worker
 	public:
 
 		// defined tasks: TASK_CHANGE_DEFENDABLE_BUILDING_ATTACHMENT, TASK_MOVE_TO_DEFENDABLE_BUILDING, TASK_DEFEND, TASK_CHECK_GO_TO_DEFENDABLE_BUILDING_SUCCESS
@@ -1186,7 +1190,7 @@ namespace GGL {
 		static inline constexpr unsigned int Identifier = 0x8076034D;
 	};
 
-	class CDefendableBuildingBehavior : public EGL::CGLEBehavior {
+	class CDefendableBuildingBehavior : public EGL::CGLEBehavior { // on the building
 	public:
 		int RemainderMS;
 		shok::TaskState OldState;
@@ -1194,9 +1198,18 @@ namespace GGL {
 		// defined events: WorkerAlarmMode_Enable, WorkerAlarmMode_Disable, DefendableBuilding_XXX
 		// defined states: BuildingAlarmDefend
 
+		// get shots this tick 4FC1D8 __thiscall (updates RemainderMS)
+
+		EGL::CGLEEntity* GetAttackTarget(const shok::Position& pos);
+		bool RollAttackMiss();
+		int CalcDamageAgainst(EGL::CGLEEntity* tar);
+		void FireAtNearestTarget();
+
 		static inline constexpr int vtp = 0x7771DC;
 		static inline constexpr int TypeDesc = 0x822428;
 		static inline constexpr unsigned int Identifier = 0x0B663EA8D;
+
+		static void HookDealDamageSource();
 	};
 
 	class CUniversityBehavior : public EGL::CGLEBehavior {

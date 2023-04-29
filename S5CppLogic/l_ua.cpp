@@ -290,24 +290,24 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite buil{};
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
 		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::TargetFilter_TargetType };
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
 		CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity> prio1{ &catLeader, 2 };
 		CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity> prio2{ &buil,1 };
 		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 10> a{
-				&relev, &cat, &ali, &nsol, &vis, &notinbuild, &cir, &prio1, &prio2, &nflee,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 11> a{
+				&relev, &cat, &ali, &nsol, &vis, &notinbuild, &cir, &pl, &prio1, &prio2, &nflee,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategoryBuilding | shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetNearest(nullptr);
 		}
 		else {
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 9> a{
-				&relev, &cat, &ali, &nsol, &vis, &notinbuild, &cir, &prio1, &prio2,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 10> a{
+				&relev, &cat, &ali, &nsol, &vis, &notinbuild, &cir, &pl, &prio1, &prio2,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategoryBuilding | shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetNearest(nullptr);
 		}
 	}
@@ -320,24 +320,24 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
 		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
 		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
 		} };
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
-				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir, &nflee,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 9> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &pl, &cir, &nflee,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetFurthest(nullptr);
 		}
 		else {
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
-				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &pl, &cir,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetFurthest(nullptr);
 		}
 	}
@@ -350,21 +350,21 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
 		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
-				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir, &nflee,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 9> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &pl, &cir, &nflee,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetNearest(nullptr);
 		}
 		else {
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
-				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &cir,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
+				&relev, &catLeader, &ali, &nsol, &vis, &notinbuild, &pl, &cir,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetNearest(nullptr);
 		}
 	}
@@ -375,14 +375,15 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateIsVisible vis{};
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran * ran };
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
 		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 2);
 		} };
-		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 6> a{
-			&relev, &buil, &ali, &vis, &cir, &fun,
+		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
+			&relev, &buil, &ali, &vis, &pl, &cir, &fun,
 		};
-		CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+		CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategoryBuilding, &a };
 		return it.GetNearest(nullptr);
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestBridgeInArea(shok::Position& p, float ran) {
@@ -396,7 +397,7 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 5> a{
 			&pl, &buil, &cat, &cir, &fun,
 		};
-		CppLogic::Iterator::GlobalEntityIterator it{ &a };
+		CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategoryBuilding, &a };
 		return it.GetNearest(nullptr);
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestSnipeTargetInArea(int player, shok::Position& p, float ran, bool notFleeing)
@@ -408,25 +409,25 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
 		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
 		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
 		} };
 		CppLogic::Iterator::PredicateStaticOr<EGL::CGLEEntity, 2> cat{ &catHe, &catCan };
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
-				&relev, &cat, &ali, &vis, &notinbuild, &cir, &fun, &nflee,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 9> a{
+				&relev, &cat, &ali, &vis, &notinbuild, &pl, &cir, &fun, &nflee,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetNearest(nullptr);
 		}
 		else {
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
-				&relev, &cat, &ali, &vis, &notinbuild, &cir, &fun,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 8> a{
+				&relev, &cat, &ali, &vis, &notinbuild, &pl, &cir, &fun,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.GetNearest(nullptr);
 		}
 	}
@@ -624,21 +625,21 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
 		CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite buil{};
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 6> a{
-				&relev, &cat, &ali, &vis, &cir, &nflee,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
+				&relev, &cat, &ali, &vis, &pl, &cir, &nflee,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategoryBuilding | shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.Count();
 		}
 		else {
-			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 5> a{
-				&relev, &cat, &ali, &vis, &cir,
+			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 6> a{
+				&relev, &cat, &ali, &vis, &pl, &cir,
 			};
-			CppLogic::Iterator::MultiPlayerEntityIterator it{ &a };
-			CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(it.Players, player);
+			CppLogic::Iterator::MultiRegionEntityIterator it{ p, ran, shok::AccessCategoryFlags::AccessCategoryBuilding | shok::AccessCategoryFlags::AccessCategorySettler, &a };
 			return it.Count();
 		}
 	}

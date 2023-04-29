@@ -559,7 +559,7 @@ namespace GGL {
 	class CSentinelBehavior : public EGL::CGLEBehavior {
 	public:
 		PADDINGI(1);
-		int Urgency; // 5 ???
+		int Urgency; // 5 (fake bool, one enemy in range)
 
 		// defined events: Behavior_Tick, Sentinel_GetUrgency
 

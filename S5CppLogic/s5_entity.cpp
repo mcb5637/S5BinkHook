@@ -1304,18 +1304,22 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 		}
 	};
 
+	static constexpr auto acflags = shok::AccessCategoryFlags::AccessCategorySettler
+		| shok::AccessCategoryFlags::AccessCategoryAnimal | shok::AccessCategoryFlags::AccessCategoryBuilding
+		| shok::AccessCategoryFlags::AccessCategoryResourceDoodad | shok::AccessCategoryFlags::AccessCategoryStatic
+		| shok::AccessCategoryFlags::AccessCategoryOrnamental;
 	if (pl) {
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer ipl{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(ipl.players, pl);
 		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> p{ &irel, &iali, &ipl, &icircl };
-		CppLogic::Iterator::MultiRegionEntityIterator it{ center, range, shok::AccessCategoryFlags::AccessCategorySettler | shok::AccessCategoryFlags::AccessCategoryBuilding, &p };
+		CppLogic::Iterator::MultiRegionEntityIterator it{ center, range, acflags, &p };
 		for (auto& ei : it.ExtendedIterate()) {
 			lam(ei.Object, ei.Range);
 		}
 	}
 	else {
 		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 3> p{ &irel, &icircl, &iali };
-		CppLogic::Iterator::MultiRegionEntityIterator it{ center, range, shok::AccessCategoryFlags::AccessCategorySettler | shok::AccessCategoryFlags::AccessCategoryBuilding, &p };
+		CppLogic::Iterator::MultiRegionEntityIterator it{ center, range, acflags, &p };
 		for (auto& ei : it.ExtendedIterate()) {
 			lam(ei.Object, ei.Range);
 		}

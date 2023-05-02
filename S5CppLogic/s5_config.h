@@ -92,8 +92,10 @@ namespace GGL {
 		shok::Vector<STaxationLevel> TaxationLevels;
 		shok::Vector<STradeResource> TradeResources;
 		shok::Vector<SBlessCategory> BlessCategories; // 18
-		float BuildingUnderConstructionExplorationFactor, BuildingPlacementSnapDistance, BuildingClosedHealthFactor, WeatherExplorationBuildingSnowFactor, WeatherExplorationSettlerSnowFactor;
-		float WeatherMoveSpeedSnowFactor, WeatherExplorationBuildingRainFactor, WeatherExplorationSettlerRainFactor, WeatherMoveSpeedRainFactor;
+		float BuildingUnderConstructionExplorationFactor, BuildingPlacementSnapDistance, BuildingClosedHealthFactor; // 22
+		float WeatherExplorationBuildingSnowFactor, WeatherExplorationSettlerSnowFactor; // 25
+		float WeatherMoveSpeedSnowFactor, WeatherExplorationBuildingRainFactor, WeatherExplorationSettlerRainFactor;
+		float WeatherMoveSpeedRainFactor; // 30
 		int WeatherMissChanceChangeRain, WeatherMissChanceChangeSnow;
 		float AttackMoveRange; // 33
 		int TaxAmount;
@@ -105,7 +107,7 @@ namespace GGL {
 		int ForceToWorkPenalty;
 		PADDINGI(1);
 		int ResourceDoodadWarnAmount; // 59
-		int FeedbackHandlerUpdateFrequency;
+		int FeedbackHandlerUpdateFrequency; // 60
 		int FeedbackHandlerTimeStaysInSystem;
 		float MilitaryLeaderAutoAttackRange;
 		float MilitaryBuildingAutoAttackRangeFactor;
@@ -157,6 +159,7 @@ namespace GGL {
 
 		static inline float(__stdcall* const ExperiencePointsToLevels)(float xp) = reinterpret_cast<float(__stdcall*)(float)>(0x4C674D); // -1->level 0, 0->lvl1...
 	};
+	//constexpr int i = offsetof(CLogicProperties, MilitaryBuildingAutoAttackRangeFactor) / 4;
 
 	class CPlayerAttractionProps : public BB::IObject {
 	public:

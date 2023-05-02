@@ -307,7 +307,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x815F68;
 		static inline constexpr unsigned int Identifier = 0x866ADB5D;
 	};
-	//constexpr int i = offsetof(CBattleBehaviorProps, BattleWaitUntil) / 4;
+	//constexpr int i = offsetof(CBattleBehaviorProps, MinRange) / 4;
 
 	class CLeaderBehaviorProps : public GGL::CBattleBehaviorProps {
 	public:

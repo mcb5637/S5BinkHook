@@ -399,6 +399,7 @@ namespace shok {
 		CommandEntityAttackPos = 0x1101F,
 		CommandEntityGuardEntity = 0x11020,
 		CommandLeaderHoldPosition = 0x11021,
+		CommandLeaderAggressive = 0x11022, // deprecated, leader seems to do the same as defend
 		CommandLeaderDefend = 0x11023,
 		CommandHeroPlaceBombAt = 0x11024,
 		CommandEntityPatrol = 0x11025,

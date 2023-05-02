@@ -11,6 +11,7 @@ namespace shok {
 	enum class LeaderCommand : int {
 		Unknown = -1,
 		Attack = 0,
+		Aggressive = 2, // deprecated, seems to do the same as defend
 		Defend = 3,
 		Patrol = 4,
 		AttackMove = 5,

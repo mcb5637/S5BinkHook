@@ -759,6 +759,7 @@ namespace GGL {
 		bool CanAutoAttack(); // checks feared, leadercommand (not heroability,move,guard) and event Battle_DisableAutoAttack
 		float GetDamageClassFactorAgainst(EGL::CGLEEntity* target);
 		int GetRandomAttackAnim(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
+		float GetMinRange() const; // only value from props
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();
@@ -768,9 +769,11 @@ namespace GGL {
 		int __thiscall TaskOverrideFireProjctile(EGL::CGLETaskArgs* a);
 	};
 
+	class CLeaderBehaviorProps;
 	class CLeaderBehavior : public GGL::CBattleBehavior {
 	public:
-		PADDINGI(2);
+		PADDINGI(1);
+		GGL::CLeaderBehaviorProps* LeaderBehProps; // 26
 		int TroopHealthCurrent, TroopHealthPerSoldier; // 27
 		shok::Position TerritoryCenter;
 		float TerritoryCenterRange;
@@ -794,8 +797,22 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x81EF80;
 		static inline constexpr unsigned int Identifier = 0x6DACD5ED;
 
+		// clear attack target 0x50BB85()
+		// check attack target 0x4ED0A3() detaches if no longer hostile or dead
+		// autoattack target 0x4EB53E(int id)
+		// check autoattack 0x4ED8D4
+		// exec guard cmd 0x4EF7C4
+		// exec defend/patrol 0x4EF6DA
+
 		int GetTroopHealth();
 		int GetTroopHealthPerSoldier();
+		float GetAutoAttackRange() const; // for some reason modified by config->WeatherExplorationBuildingRainFactor/config->WeatherExplorationBuildingSnowFactor
+		float GetAutoAttackRangeVsOther() const; // config for attackmove, max for defend, GetAutoAttackRange otherwise
+		float GetAutoAttackRangeVsBuildings() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryBuildingAutoAttackRangeFactor otherwise
+		float GetAutoAttackRangeVsCivillians() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryCivilianAutoAttackRangeFactor otherwise
+		bool HasMeleeCategory() const; // Melee, Sword or Spear
+		int SearchAutoAttackTarget();
+
 		void PerformRegeneration();
 
 		static bool LeaderRegenRegenerateSoldiers;

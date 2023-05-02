@@ -492,10 +492,16 @@ float GGL::CBattleBehavior::GetDamageClassFactorAgainst(EGL::CGLEEntity* target)
 	return battlebeh_getdmgclsfactvs(this, target);
 }
 
-inline int (__thiscall*const attlebeh_getrandomattanim)(GGL::CBattleBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CBattleBehavior*)>(0x50AA39);
+inline int (__thiscall*const battlebeh_getrandomattanim)(GGL::CBattleBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CBattleBehavior*)>(0x50AA39);
 int GGL::CBattleBehavior::GetRandomAttackAnim()
 {
-	return attlebeh_getrandomattanim(this);
+	return battlebeh_getrandomattanim(this);
+}
+
+inline float(__thiscall* const battlebeh_getminrange)(const GGL::CBattleBehavior* th) = reinterpret_cast<float(__thiscall*)(const GGL::CBattleBehavior*)>(0x50AC09);
+float GGL::CBattleBehavior::GetMinRange() const
+{
+	return battlebeh_getminrange(this);
 }
 
 float __thiscall GGL::CBattleBehavior::GetMaxRangeBase() const
@@ -643,6 +649,42 @@ static inline int(__thiscall* const leaderbehgettroophealthpersol)(GGL::CBattleB
 int GGL::CLeaderBehavior::GetTroopHealthPerSoldier()
 {
 	return leaderbehgettroophealthpersol(this);
+}
+
+inline float(__thiscall* const leaderbeh_getautoattackrange)(const GGL::CLeaderBehavior* th) = reinterpret_cast<float(__thiscall*)(const GGL::CLeaderBehavior*)>(0x4EAEFD);
+float GGL::CLeaderBehavior::GetAutoAttackRange() const
+{
+	return leaderbeh_getautoattackrange(this);
+}
+
+inline float(__thiscall* const leaderbeh_getautoattackrangevsother)(const GGL::CLeaderBehavior* th) = reinterpret_cast<float(__thiscall*)(const GGL::CLeaderBehavior*)>(0x4EAF62);
+float GGL::CLeaderBehavior::GetAutoAttackRangeVsOther() const
+{
+	return leaderbeh_getautoattackrangevsother(this);
+}
+
+inline float(__thiscall* const leaderbeh_getautoattackrangevsbuild)(const GGL::CLeaderBehavior* th) = reinterpret_cast<float(__thiscall*)(const GGL::CLeaderBehavior*)>(0x4EAF84);
+float GGL::CLeaderBehavior::GetAutoAttackRangeVsBuildings() const
+{
+	return leaderbeh_getautoattackrangevsbuild(this);
+}
+
+inline float(__thiscall* const leaderbeh_getautoattackrangevsciv)(const GGL::CLeaderBehavior* th) = reinterpret_cast<float(__thiscall*)(const GGL::CLeaderBehavior*)>(0x4EAFC0);
+float GGL::CLeaderBehavior::GetAutoAttackRangeVsCivillians() const
+{
+	return leaderbeh_getautoattackrangevsciv(this);
+}
+
+inline bool(__thiscall* const leaderbeh_hasmeleecat)(const GGL::CLeaderBehavior* th) = reinterpret_cast<bool(__thiscall*)(const GGL::CLeaderBehavior*)>(0x50AAB2);
+bool GGL::CLeaderBehavior::HasMeleeCategory() const
+{
+	return leaderbeh_hasmeleecat(this);
+}
+
+inline int(__thiscall* const leaderbehsearchautoattacktar)(GGL::CLeaderBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CLeaderBehavior*)>(0x4EC894);
+int GGL::CLeaderBehavior::SearchAutoAttackTarget()
+{
+	return leaderbehsearchautoattacktar(this);
 }
 
 void GGL::CLeaderBehavior::PerformRegeneration()

@@ -742,7 +742,7 @@ namespace shok {
 		Leader_AttachSoldier = 0x15009, //EGL::CEvent1Entity
 		Leader_GetHealthPlusTroopHealth = 0x1500A, //EGL::CEventGetValue<int, 1211121895>
 		Leader_GetMaxHealthPlusTroopHealth = 0x1500B, //EGL::CEventGetValue<int, 1211121895>
-		Battle_InternalEngageTarget =0x1500C, //EGL::CEvent1Entity attaches as ATTACKER_TARGET
+		Battle_InternalEngageTarget = 0x1500C, //EGL::CEvent1Entity attaches as ATTACKER_TARGET
 		Leader_OnAttackTargetDetached = 0x1500D, //EGL::CEvent1Entity
 		OnAttackedBy = 0x1500E, //EGL::CEvent1Entity, CppLogic::Events::AdvHurtByEvent (subclass of EGL::CEvent1Entity) with EGL::CGLEEntity::HookHurtEntity
 		Battle_GetBattleStatus = 0x15011, //EGL::CEventGetValue<int, 1211121895>
@@ -752,7 +752,7 @@ namespace shok {
 		Formation_SetFormationTaskList = 0x15017, //BB::CEvent
 		Leader_SetFormation = 0x15018, //EGL::CEventValue<int,-27574121>
 		Leader_GetFormation = 0x15019, //EGL::CEventGetValue<int, 1211121895>
-		// 1501C soldier some other entity
+		Soldier_OnSomethingTargetDetaches = 0x1501C, //EGL::CEvent1Entity probably better to not use, seems to conditionaly forward to detach, Battle_InternalEngageTarget, Leader_Defend
 		Battle_OnTargetDetached = 0x1501D, //EGL::CEvent1Entity
 		Leader_GetSoldierType = 0x1501E, //EGL::CEventGetValue<int,1211121895>
 		Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
@@ -771,7 +771,7 @@ namespace shok {
 		Leader_GetCommand = 0x1502D, //EGL::CEventGetValue<int, 1211121895>
 		Leader_AttackMove = 0x1502E, //EGL::CEventPosition
 		Leader_HoldPosition = 0x1502F, //BB::CEvent
-		// 15030 leader disable territory?
+		Leader_Aggressive = 0x15030, //BB::CEvent deprecated, leader seems to do the same as defend
 		Leader_Guard = 0x15031, //EGL::CEvent1Entity
 		Leader_Defend = 0x15032, //BB::CEvent
 		BombPlacer_CommandPlaceBomb = 0x15033, //EGL::CEventPosition

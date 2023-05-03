@@ -323,6 +323,23 @@ namespace EGL {
 	public:
 		virtual void __stdcall FillSlot(T* data) = 0;
 	};
+
+	template<int NumBits>
+	class C2DBitArray : public BB::IObject {
+	public:
+		int SizeX, SizeY;
+		int SizeXEx;
+		unsigned int BufferSize;
+		shok::Vector<unsigned int> ValueArray; // likely binary data, just gets serialized as uints
+
+		// NumBits==1 vtp 0x784EC0
+	};
+	class C2DArray1Bit : public C2DBitArray<1> {
+	public:
+
+		static constexpr int vtp = 0x784ED0;
+		static constexpr unsigned int Identifier = 0xEE435293;
+	};
 }
 
 namespace CppLogic {

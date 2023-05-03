@@ -209,19 +209,42 @@ namespace EGL {
 
 	class CPlayerExplorationHandler : public BB::IObject {
 	public:
-		PADDINGI(2);
+		struct ExCircle {
+			int CenterV, CenterW, Radius;
+		};
+
+		int PlayerID;
+		int ShareExplorationWithPlayersMask;
 		int SizeX, SizeY; // 3
+		EGL::C2DArray1Bit* ExplorationMapWork; // 5
+		EGL::C2DArray1Bit* ExplorationMapCurrent;
+		EGL::C2DArray1Bit* ExplorationMapSeen;
+		shok::Vector<ExCircle> ExplorationCircle; // 8
+		unsigned int UpdateCounter; // 12
 
 		bool IsPositionExplored(const shok::Position& p);
 
 		static inline constexpr int vtp = 0x784E04;
+		static constexpr unsigned int Identifier = 0xEE20FA93;
 	};
 
 	class GameLogicExplorationStuff { // not sure what exaclty this is
 	public:
+		struct Player {
+			bool PlayerInGame;
+			BB::IObject* PlayerData; // nullptr mp related?
+			CPlayerExplorationHandler* ExplorationHandler;
+			BB::IObject* FeedbackHandler; // EGL::CPlayerFeedbackHandler
+			BB::IObject* EntityVectorMap; // EGL::CEntityVectorMap
+		};
+		Player Player[9];
+		BB::IObject* ExplorationUpdate;
+
 		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(int pl);
 		void SetShareExplorationFlag(int pl1, int pl2, bool share);
 		void ActivateUpdateOfExplorationForAllPlayers();
+
+		// seridata of this thing is 0x897508, but it is missing its guard
 	};
 
 	struct LogicGameTime {

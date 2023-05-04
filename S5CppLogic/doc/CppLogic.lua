@@ -608,6 +608,23 @@ function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxpric
 --- @param refinerFix boolean|nil (default false)
 function CppLogic.Logic.EnableResourceTriggers(enabled, refinerFix) end
 
+--- gets the exploration status of a position.
+--- you may need to use Logic.ActivateUpdateOfExplorationForAllPlayers to use it with AI players.
+---@param player number
+---@param pos Position
+---@return boolean currentlyVisible
+---@return boolean wasVisible
+---@return boolean update
+function CppLogic.Logic.IsPositionExplored(player, pos) end
+
+--- sets the exploration status of an area (only the was visible status, currently visible gets updated too often).
+--- affects the area inside the AxisAlignedBoundingBox formed by pos1 and pos2 (you may set pos1=pos2 to affect only this one position).
+---@param player number
+---@param pos1 Position
+---@param pos2 Position
+---@param explored boolean
+function CppLogic.Logic.SetPositionExploration(player, pos1, pos2, explored) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.

@@ -287,8 +287,12 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	EGL::GameLogicExplorationStuff* p = (*EGL::CGLEGameLogic::GlobalObj)->SomeStuff;
-	L.Push((int)p);
+	auto pos = L.CheckPos(1);
+	EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
+	auto* ex = p->GetExplorationHandlerByPlayer(1);
+	auto x = static_cast<unsigned int>(pos.X / 100.0f);
+	auto y = static_cast<unsigned int>(pos.Y / 100.0f);
+	L.Push(ex->ExplorationMapSeen->Get(x, y) + ex->ExplorationMapCurrent->Get(x, y)*10 + ex->ExplorationMapWork->Get(x, y)*100);
 	return 1;
 }
 

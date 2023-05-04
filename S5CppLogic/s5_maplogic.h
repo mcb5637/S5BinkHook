@@ -216,7 +216,7 @@ namespace EGL {
 		int PlayerID;
 		int ShareExplorationWithPlayersMask;
 		int SizeX, SizeY; // 3
-		EGL::C2DArray1Bit* ExplorationMapWork; // 5
+		EGL::C2DArray1Bit* ExplorationMapWork; // 5 updating?
 		EGL::C2DArray1Bit* ExplorationMapCurrent;
 		EGL::C2DArray1Bit* ExplorationMapSeen;
 		shok::Vector<ExCircle> ExplorationCircle; // 8
@@ -228,7 +228,7 @@ namespace EGL {
 		static constexpr unsigned int Identifier = 0xEE20FA93;
 	};
 
-	class GameLogicExplorationStuff { // not sure what exaclty this is
+	class PlayerManager { // name from the file in savegames
 	public:
 		struct Player {
 			bool PlayerInGame;
@@ -287,7 +287,7 @@ namespace EGL {
 		EGL::CGLELandscape* Landscape; // 9
 		RegionDataEntity RegionDataEntityObj; // 10
 		PADDINGI(5);
-		EGL::GameLogicExplorationStuff* SomeStuff; // 19
+		EGL::PlayerManager* PlayerMng; // 19
 		PADDINGI(8);
 		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
 		PADDINGI(2);

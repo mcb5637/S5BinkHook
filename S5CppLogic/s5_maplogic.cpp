@@ -565,23 +565,23 @@ bool EGL::CPlayerExplorationHandler::IsPositionExplored(const shok::Position& p)
 	return explohandler_isexplored(this, i[0], i[1]);
 }
 
-static inline int(__thiscall* somegamelogicstuff_getexplomin)(EGL::GameLogicExplorationStuff* th) = reinterpret_cast<int(__thiscall*)(EGL::GameLogicExplorationStuff*)>(0x5758FB);
-static inline int(__thiscall* somegamelogicstuff_getexplomax)(EGL::GameLogicExplorationStuff* th) = reinterpret_cast<int(__thiscall*)(EGL::GameLogicExplorationStuff*)>(0x575904);
-static inline EGL::CPlayerExplorationHandler* (__thiscall* somegamelogicstuff_getexplo)(EGL::GameLogicExplorationStuff* th, int pl) = reinterpret_cast<EGL::CPlayerExplorationHandler * (__thiscall*)(EGL::GameLogicExplorationStuff*, int)>(0x575895);
-EGL::CPlayerExplorationHandler* EGL::GameLogicExplorationStuff::GetExplorationHandlerByPlayer(int pl)
+static inline int(__thiscall* somegamelogicstuff_getexplomin)(EGL::PlayerManager* th) = reinterpret_cast<int(__thiscall*)(EGL::PlayerManager*)>(0x5758FB);
+static inline int(__thiscall* somegamelogicstuff_getexplomax)(EGL::PlayerManager* th) = reinterpret_cast<int(__thiscall*)(EGL::PlayerManager*)>(0x575904);
+static inline EGL::CPlayerExplorationHandler* (__thiscall* somegamelogicstuff_getexplo)(EGL::PlayerManager* th, int pl) = reinterpret_cast<EGL::CPlayerExplorationHandler * (__thiscall*)(EGL::PlayerManager*, int)>(0x575895);
+EGL::CPlayerExplorationHandler* EGL::PlayerManager::GetExplorationHandlerByPlayer(int pl)
 {
 	if (pl >= somegamelogicstuff_getexplomin(this) && pl >= somegamelogicstuff_getexplomax(this)) {
 		return somegamelogicstuff_getexplo(this, pl);
 	}
 	return nullptr;
 }
-static inline void(__thiscall* const gamelogicexplo_setshare)(EGL::GameLogicExplorationStuff* th, int p1, int p2, bool f) = reinterpret_cast<void(__thiscall*)(EGL::GameLogicExplorationStuff*, int, int, bool)>(0x57584B);
-void EGL::GameLogicExplorationStuff::SetShareExplorationFlag(int pl1, int pl2, bool share)
+static inline void(__thiscall* const gamelogicexplo_setshare)(EGL::PlayerManager* th, int p1, int p2, bool f) = reinterpret_cast<void(__thiscall*)(EGL::PlayerManager*, int, int, bool)>(0x57584B);
+void EGL::PlayerManager::SetShareExplorationFlag(int pl1, int pl2, bool share)
 {
 	gamelogicexplo_setshare(this, pl1, pl2, share);
 }
-static inline void(__thiscall* const gamelogicexplo_activateexploforall)(EGL::GameLogicExplorationStuff* th) = reinterpret_cast<void(__thiscall*)(EGL::GameLogicExplorationStuff*)>(0x575884);
-void EGL::GameLogicExplorationStuff::ActivateUpdateOfExplorationForAllPlayers()
+static inline void(__thiscall* const gamelogicexplo_activateexploforall)(EGL::PlayerManager* th) = reinterpret_cast<void(__thiscall*)(EGL::PlayerManager*)>(0x575884);
+void EGL::PlayerManager::ActivateUpdateOfExplorationForAllPlayers()
 {
 	gamelogicexplo_activateexploforall(this);
 }

@@ -325,14 +325,32 @@ namespace EGL {
 	};
 
 	template<int NumBits>
+	requires (NumBits == 1)
 	class C2DBitArray : public BB::IObject {
 	public:
 		int SizeX, SizeY;
-		int SizeXEx;
-		unsigned int BufferSize;
-		shok::Vector<unsigned int> ValueArray; // likely binary data, just gets serialized as uints
+		int SizeXEx; // y coord multiplyer, (SizeX + 31) & 0xFFFFFFE0
+		unsigned int BufferSize; // in bytes, 4 * ((SizeY * SizeXEx >> 5) + 1) & 0xFFFFFFFE
+		shok::Vector<unsigned int> ValueArray; // likely binary data, just gets serialized as uints, rets reserved as BufferSize/4
 
 		// NumBits==1 vtp 0x784EC0
+
+
+		int Get(unsigned int x, unsigned int y) {
+			unsigned int p = x + y * SizeXEx;
+			unsigned int bit = p & 0x1F;
+			return (ValueArray[p >> 5] & (1 << bit)) >> bit;
+		}
+		void Set(unsigned int x, unsigned int y, int v) {
+			unsigned int p = x + y * SizeXEx;
+			unsigned int bit = p & 0x1F;
+			unsigned int d = 1 << bit;
+			unsigned int& ar = ValueArray[p >> 5];
+			if (v)
+				ar |= d;
+			else
+				ar &= ~d;
+		}
 	};
 	class C2DArray1Bit : public C2DBitArray<1> {
 	public:

@@ -1018,6 +1018,41 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int IsPositionExplored(lua::State l) {
+		luaext::EState L{ l };
+		int pl = L.CheckInt(1);
+		if (pl <= 0 || pl > 8)
+			throw lua::LuaException{ "invalid player" };
+		auto pos = L.CheckPos(2);
+		EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
+		auto* ex = p->GetExplorationHandlerByPlayer(pl);
+		auto x = static_cast<unsigned int>(pos.X / 100.0f);
+		auto y = static_cast<unsigned int>(pos.Y / 100.0f);
+		L.Push(static_cast<bool>(ex->ExplorationMapCurrent->Get(x, y)));
+		L.Push(static_cast<bool>(ex->ExplorationMapSeen->Get(x, y)));
+		L.Push(static_cast<bool>(ex->ExplorationMapWork->Get(x, y)));
+		return 3;
+	}
+
+	int SetPositionExploration(lua::State l) {
+		luaext::EState L{ l };
+		int pl = L.CheckInt(1);
+		if (pl <= 0 || pl > 8)
+			throw lua::LuaException{ "invalid player" };
+		auto rect = shok::AARect{ L.CheckPos(2), L.CheckPos(3) }.Sort();
+		EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
+		auto* ex = p->GetExplorationHandlerByPlayer(pl);
+		auto xl = static_cast<unsigned int>(rect.low.X / 100.0f);
+		auto yl = static_cast<unsigned int>(rect.low.Y / 100.0f);
+		auto xh = static_cast<unsigned int>(rect.high.X / 100.0f);
+		auto yh = static_cast<unsigned int>(rect.high.Y / 100.0f);
+		bool b = L.CheckBool(4);
+		for (unsigned int x = xl; x <= xh; ++x)
+			for (unsigned int y = yl; y <= yh; ++y)
+				ex->ExplorationMapSeen->Set(x, y, b);
+		return 0;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1420,7 +1455,7 @@ namespace CppLogic::Logic {
 		GGL::CWorkerBehavior::RefinerFix = false;
 	}
 
-	constexpr std::array<lua::FuncReference, 61> Logic{ {
+	constexpr std::array<lua::FuncReference, 63> Logic{ {
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1482,6 +1517,8 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
 			lua::FuncReference::GetRef<Navigate>("Navigate"),
 			lua::FuncReference::GetRef<EnableResourceTriggers>("EnableResourceTriggers"),
+			lua::FuncReference::GetRef<IsPositionExplored>("IsPositionExplored"),
+			lua::FuncReference::GetRef<SetPositionExploration>("SetPositionExploration"),
 		} };
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {

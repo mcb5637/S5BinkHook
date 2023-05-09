@@ -565,6 +565,12 @@ bool EGL::CPlayerExplorationHandler::IsPositionExplored(const shok::Position& p)
 	return explohandler_isexplored(this, i[0], i[1]);
 }
 
+inline void(__thiscall* const playerexploupdate_setplayers)(EGL::CPlayerExplorationUpdate* th, int f, int l) = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationUpdate*, int, int)>(0x58C724);
+void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(int first, int last)
+{
+	playerexploupdate_setplayers(this, first, last);
+}
+
 static inline int(__thiscall* somegamelogicstuff_getexplomin)(EGL::PlayerManager* th) = reinterpret_cast<int(__thiscall*)(EGL::PlayerManager*)>(0x5758FB);
 static inline int(__thiscall* somegamelogicstuff_getexplomax)(EGL::PlayerManager* th) = reinterpret_cast<int(__thiscall*)(EGL::PlayerManager*)>(0x575904);
 static inline EGL::CPlayerExplorationHandler* (__thiscall* somegamelogicstuff_getexplo)(EGL::PlayerManager* th, int pl) = reinterpret_cast<EGL::CPlayerExplorationHandler * (__thiscall*)(EGL::PlayerManager*, int)>(0x575895);
@@ -584,6 +590,11 @@ static inline void(__thiscall* const gamelogicexplo_activateexploforall)(EGL::Pl
 void EGL::PlayerManager::ActivateUpdateOfExplorationForAllPlayers()
 {
 	gamelogicexplo_activateexploforall(this);
+}
+inline EGL::CPlayerExplorationUpdate* (__thiscall* const playermng_getupdate)(EGL::PlayerManager* th) = reinterpret_cast<EGL::CPlayerExplorationUpdate * (__thiscall*)(EGL::PlayerManager*)>(0x5757A8);
+EGL::CPlayerExplorationUpdate* EGL::PlayerManager::GetUpdate()
+{
+	return playermng_getupdate(this);
 }
 
 shok::Vector<EGL::CGLEEntity*>& EGL::RegionDataEntity::Entry::GetByAccessCategory(shok::AccessCategory ac)

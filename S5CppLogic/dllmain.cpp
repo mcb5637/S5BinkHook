@@ -280,19 +280,15 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x575B2B)());
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xEE435293);
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x81E57CD);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto pos = L.CheckPos(1);
-	EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
-	auto* ex = p->GetExplorationHandlerByPlayer(1);
-	auto x = static_cast<unsigned int>(pos.X / 100.0f);
-	auto y = static_cast<unsigned int>(pos.Y / 100.0f);
-	L.Push(ex->ExplorationMapSeen->Get(x, y) + ex->ExplorationMapCurrent->Get(x, y)*10 + ex->ExplorationMapWork->Get(x, y)*100);
+	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
+	//L.Push((int)&p->ExplorationUpdate);
 	return 1;
 }
 

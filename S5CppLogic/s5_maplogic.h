@@ -228,6 +228,24 @@ namespace EGL {
 		static constexpr unsigned int Identifier = 0xEE20FA93;
 	};
 
+	class CPlayerExplorationUpdate : public BB::IObject {
+	public:
+		int State;
+		int FirstPlayerToUpdate;
+		int LastPlayerToUpdate;
+		int DrawCirclesCurrentPlayerToUpdate;
+		int DrawCirclesCurrentPlayerDrawCircles;
+		int DrawCirclesCurrentIndex;
+		int DrawCirclesTurnCounter;
+		unsigned int DrawCirclesNumCirclesToDrawPerTurn;
+
+		static inline constexpr int vtp = 0x784D1C;
+		static constexpr unsigned int Identifier = 0x81E57CD;
+
+		void SetPlayersToUpdate(int first, int last);
+	};
+	static_assert(sizeof(CPlayerExplorationUpdate) == 9 * 4);
+
 	class PlayerManager { // name from the file in savegames
 	public:
 		struct Player {
@@ -237,15 +255,19 @@ namespace EGL {
 			BB::IObject* FeedbackHandler; // EGL::CPlayerFeedbackHandler
 			BB::IObject* EntityVectorMap; // EGL::CEntityVectorMap
 		};
-		Player Player[9];
-		BB::IObject* ExplorationUpdate;
+		Player Players[9];
+		PADDINGI(1); // seridata-> belongs to array, 0 wtf???
+		CPlayerExplorationUpdate* ExplorationUpdate; //46
 
 		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(int pl);
 		void SetShareExplorationFlag(int pl1, int pl2, bool share);
 		void ActivateUpdateOfExplorationForAllPlayers();
+		CPlayerExplorationUpdate* GetUpdate(); // creates if nullptr
 
 		// seridata of this thing is 0x897508, but it is missing its guard
 	};
+	static_assert(sizeof(PlayerManager::Player) * 9 + 4 == 184);
+	static_assert(offsetof(PlayerManager, ExplorationUpdate) == 46 * 4);
 
 	struct LogicGameTime {
 		int Tick;

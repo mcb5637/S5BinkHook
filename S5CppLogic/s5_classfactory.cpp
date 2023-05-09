@@ -2,6 +2,7 @@
 #include <map>
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
+#include "s5_entity.h"
 
 static inline BB::CXmlSerializer*(__stdcall* const xmlserializer_new)(int d) = reinterpret_cast<BB::CXmlSerializer*(__stdcall* const)(int)>(0x550731);
 BB::CXmlSerializer* BB::CXmlSerializer::Create()
@@ -137,6 +138,15 @@ void PushCharBuff(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 BB::FieldSerilaizer::ExtendedInfo InfoCharBuff{ "char*" , &PushCharBuff, &CheckUnknownValue }; // let the original xml variant alloc the mem
 
 
+void PushEntId(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+    L.Push((*static_cast<EGL::CGLEEntity**>(data))->EntityId);
+}
+void CheckEntId(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+    *static_cast<EGL::CGLEEntity**>(data) = luaext::EState{ L }.CheckEntity(idx);
+}
+// only to be used after entities are loaded
+BB::FieldSerilaizer::ExtendedInfo EntitySerializedById{ "EGL::CGLEEntity (by Id)", &PushEntId, &CheckEntId };
+
 BB::FieldSerilaizer::ExtendedInfo InfoClassID{ "shok::ClassIdentifier", &PushUnknownValue, &CheckUnknownValue };
 
 const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ {
@@ -177,6 +187,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x8395e8, &InfoInt},
     {0x83acb0, &InfoInt},
     {0x8394b8, &InfoInt},
+    {0x837254, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
@@ -196,9 +207,12 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x85D4F4, &InfoEntityCategory},
     {0x875494, &InfoAnimCategory},
     {0x8754B8, &InfoGoods},
+    {0x8683e4, &InfoGoods},
     {0x894708, &InfoWidgetID},
 
     {0x810D18, &InfoAccessCategory},
+
+    {reinterpret_cast<int(__cdecl*)()>(0x58A92E)(), &EntitySerializedById},
 
     {0x810CD8, &InfoUInt},
     {0x80AD90, &InfoUInt},

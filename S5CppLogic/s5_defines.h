@@ -184,6 +184,17 @@ namespace shok {
 	};
 	constexpr int ResourceType_MaxValue = 17;
 
+	enum class Goods : int {
+		XG_Gold = 2,
+		XG_Iron = 1,
+		XG_Stone = 3,
+		XG_Sulfur = 4,
+		XVG_Gold = 6,
+		XVG_Iron = 7,
+		XVG_Stone = 5,
+		XVG_Sulfur = 8,
+	};
+
 	enum class Keys : int {
 		None = 0,
 		A = 65,

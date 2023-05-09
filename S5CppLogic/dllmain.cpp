@@ -280,7 +280,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x575B2B)());
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x81E57CD);
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0xC375BEA3);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
@@ -289,6 +289,7 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
+
 	return 1;
 }
 

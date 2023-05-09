@@ -246,14 +246,63 @@ namespace EGL {
 	};
 	static_assert(sizeof(CPlayerExplorationUpdate) == 9 * 4);
 
+	class CEntityVectorMap : public BB::IObject {
+	public:
+		shok::Map<int, shok::Vector<EGL::CGLEEntity*>> Items; // EntityType (shok::EntityTypeID) -> EntityVector.Item
+
+		static inline constexpr int vtp = 0x783B4C;
+		static constexpr unsigned int Identifier = 0x1A5477F7;
+	};
+
+	class CPlayerFeedbackHandler : public BB::IObject {
+	public:
+		struct SingleFeedack {
+			int FeedbackReason;
+			int FeedbackState;
+			int EntityType;
+			int GameTurn;
+
+			auto operator<=>(const SingleFeedack&) const noexcept = default;
+		};
+		struct SingleArrival {
+			int EntityType, GameTurn;
+		};
+		struct SingleResOut {
+			shok::Goods GoodType;
+			shok::Position MapPosition;
+			int GameTurn;
+		};
+
+		int PlayerID;
+		int UpdateFeedbackFrequency;
+		int TimeFeedbackStaysInSystem;
+		struct {
+			shok::Set<SingleFeedack> SettlerFeedBack;
+		} SettlerFeedbackList[7];
+		PADDINGI(1); // part of SettlerFeedbackList?
+		shok::Vector<SingleArrival> SettlerEntityTypeArrival;
+		struct {
+			int LastGameTurn, EntityID;
+		} GenericMessageData[4];
+		PADDINGI(1); // part of GenericMessageData?
+		shok::Vector<SingleResOut> ResourceRunningOutMessageData;
+
+		static inline constexpr int vtp = 0x7847A8;
+		static constexpr unsigned int Identifier = 0xC375BEA3;
+	};
+	static_assert(offsetof(CPlayerFeedbackHandler, SettlerFeedbackList) == 16);
+	static_assert(sizeof(CPlayerFeedbackHandler::SettlerFeedbackList) == 12*7);
+	static_assert(offsetof(CPlayerFeedbackHandler, SettlerEntityTypeArrival) == 104);
+	static_assert(offsetof(CPlayerFeedbackHandler, GenericMessageData) == 120);
+
 	class PlayerManager { // name from the file in savegames
 	public:
 		struct Player {
 			bool PlayerInGame;
 			BB::IObject* PlayerData; // nullptr mp related?
 			CPlayerExplorationHandler* ExplorationHandler;
-			BB::IObject* FeedbackHandler; // EGL::CPlayerFeedbackHandler
-			BB::IObject* EntityVectorMap; // EGL::CEntityVectorMap
+			CPlayerFeedbackHandler* FeedbackHandler;
+			CEntityVectorMap* EntityVectorMap;
 		};
 		Player Players[9];
 		PADDINGI(1); // seridata-> belongs to array, 0 wtf???

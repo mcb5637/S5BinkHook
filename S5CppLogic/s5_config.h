@@ -249,3 +249,15 @@ namespace ED {
 	};
 	static_assert(sizeof(CDisplayProps) == 29 * 4);
 }
+
+namespace GGUI {
+	class CGuiProperties : public BB::IObject {
+	public:
+		float ShortMessageDisplayTime, ShortMessageHistoryTime;
+
+		static constexpr int vtp = 0x77BCA8;
+		static constexpr unsigned int Identifier = 0x700839B6;
+
+		static inline CGuiProperties* (__cdecl* const GlobalObj)() = reinterpret_cast<CGuiProperties * (__cdecl*)()>(0x52EBC6);
+	};
+}

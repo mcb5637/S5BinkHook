@@ -792,6 +792,29 @@ void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, const c
     AddFloatie(pos, h, txt);
 }
 
+inline void(__thiscall* const shortmsg_entr_add)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries* th, GGUI::CShortMessagesWindowControllerCustomWidget::MessageType type, BB::CEvent* ev, float duration, const shok::Position* pos, const char* tooltip)
+= reinterpret_cast<void(__thiscall*)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries*, GGUI::CShortMessagesWindowControllerCustomWidget::MessageType, BB::CEvent*, float, const shok::Position*, const char*)>(0x532054);
+void GGUI::CShortMessagesWindowControllerCustomWidget::Entries::Add(MessageType type, BB::CEvent* ev, float duration, const shok::Position* pos, const char* tooltip)
+{
+    shortmsg_entr_add(this, type, ev, duration, pos, tooltip);
+}
+inline void(__thiscall* const shortmsg_entr_clearold)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries* th) = reinterpret_cast<void(__thiscall* const)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries*)>(0x531B72);
+void GGUI::CShortMessagesWindowControllerCustomWidget::Entries::ClearOldMessages()
+{
+    shortmsg_entr_clearold(this);
+}
+
+inline GGUI::CShortMessagesWindowControllerCustomWidget::Message* (__thiscall* const shortmsg_entr_get)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries* th, int id) = reinterpret_cast<GGUI::CShortMessagesWindowControllerCustomWidget::Message * (__thiscall* const)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries*, int)>(0x53162B);
+GGUI::CShortMessagesWindowControllerCustomWidget::Message* GGUI::CShortMessagesWindowControllerCustomWidget::Entries::GetMessageWithId(int id)
+{
+    return shortmsg_entr_get(this, id);
+}
+inline void (__thiscall* const shortmsg_entr_rem)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries* th, int id) = reinterpret_cast<void (__thiscall* const)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries*, int)>(0x531B36);
+void GGUI::CShortMessagesWindowControllerCustomWidget::Entries::RemoveMessage(int id)
+{
+    shortmsg_entr_rem(this, id);
+}
+
 static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);
 void EGUIX::FontManager::LoadFont(int* outFontID, const char* fontName)
 {

@@ -2710,6 +2710,49 @@ function CppLogic.UI.ReloadGUI(path) end
 --- @param show boolean
 function CppLogic.UI.SetShowWoodInUI(show) end
 
+---@class ShortMessage
+local ShortMessage = {
+	Type = 1,
+	StartTime = 1.0,
+	Duration = 1.0,
+	Tooltip = "",
+	---@type Position
+	Pos = {X=0,Y=0},
+	Id = 1,
+}
+--- returns all current ShortMessages and all History entries (these block new ShortMessages depending on type).
+--- check doc of CppLogic.UI.CreateShortMessage for type
+---@return ShortMessage[] messages visible messages
+---@return ShortMessage[] history blocks some short messages
+function CppLogic.UI.GetShortMessages() end
+
+--- reinitializes the size of the ShortMessagesListWindow stored inside of the ShortMessagesListWindowController.
+function CppLogic.UI.ReInitShortMessagesSize() end
+
+--- creates a ShortMessage. type determines button texture. max 20 messages, oldest gets removed first.
+--- 1->ShortMessagesListWindowGfxPrototypeMilitarySettlerAttacked
+--- 2->ShortMessagesListWindowGfxPrototypeMilitaryHouseAttacked
+--- 3->ShortMessagesListWindowGfxPrototypeSettlerLeft
+--- 4,5,6,7,8->ShortMessagesListWindowGfxPrototypeSettlerAngry (taxes, overtime, noWork, noFood, noResi)
+--- 10->ShortMessagesListWindowGfxPrototypeUpgradePossible
+--- 11->ShortMessagesListWindowGfxPrototypeLimitReached
+--- 12->ShortMessagesListWindowGfxPrototypeFarmLimitReached
+--- 13->ShortMessagesListWindowGfxPrototypeResidenceLimitReached
+--- 14,15->ShortMessagesListWindowGfxPrototypeQuestChanged (quest, market)
+--- 9->ShortMessagesListWindowGfxPrototypeNewTech
+--- other->ShortMessagesListWindowGfxPrototypeNewTech
+---@param type number
+---@param duration number
+---@param tooltip string
+---@param pos Position|nil
+function CppLogic.UI.CreateShortMessage(type, duration, tooltip, pos) end
+
+---removes the ShortMessage with the specified id. does nothing, if id invalid.
+---check CppLogic.UI.GetShortMessages for the ids.
+---@param id number
+function CppLogic.UI.RemoveShortMessage(id) end
+
+
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed on leaving the map.
 --- load any additional models you want to use first.

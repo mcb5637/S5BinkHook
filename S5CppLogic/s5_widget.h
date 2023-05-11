@@ -738,6 +738,71 @@ namespace GGUI {
 		static AdvancedFloatieManager GlobalObj;
 	};
 
+	class CShortMessagesWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget { // size 91
+	public:
+		enum class MessageType : int { // button texture is hardcoded from this
+			SettlerAttacked = 1,
+			BuildingAttacked = 2,
+			WorkerLeft = 3,
+			WorkerAngryTaxes = 4,
+			WorkerAngryTooMuchWork = 5,
+			WorkerAngryNoWork = 6,
+			WorkerAngryNoFood = 7,
+			WorkerAngryNoRest = 8,
+			UpgradePossible = 10,
+			AttractionLimitReached = 11,
+			FarmLimitReached = 12,
+			ResidenceLimitReached = 13,
+			QuestChanged = 14,
+			TransactionComplete = 15,
+		};
+
+		struct Message {
+			int MessageId; // 0x82DA54 source
+			MessageType Type;
+			BB::CEvent* ev; // source?
+			float StartTime;
+			float Duration; // guessed?
+			shok::String Tooltip;
+			shok::Position Pos;
+		};
+
+		struct Entries {
+			shok::List<Message*> Messages;
+			shok::Position LastPos;
+
+			void Add(MessageType type, BB::CEvent* ev, float duration, const shok::Position* pos, const char* tooltip);
+			void ClearOldMessages(); // removes depending on duration+starttime
+			Message* GetMessageWithId(int id);
+			void RemoveMessage(int id);
+			// limit to 0x531BD5 __thiscall(uint limit) (removes oldest messages first)
+		};
+
+		struct Button {
+			EGUIX::CButtonWidget* Widget;
+			int MessageId; // matches id of displayed StandardMessage
+		};
+
+
+		Entries StandardMessage; // 37
+		Entries History; // blocks new messages 42
+		Button Buttons[20]; //47
+		EGUIX::Rect ShortMessagesListWindowPosAndSize; // 87
+
+		static constexpr int vtp = 0x77C718;
+		static constexpr unsigned int Identifier = 0x6E6AE2C6;
+
+		// show tooltip for 0x53192F __thiscall(int idx) (ShortMessagesOutputWindowInfoString and ShortMessagesOutputWindow are hardcoded)
+		// button clicked 0x531C8E __thiscall(int idx)
+		// init buttons 0x531573 __thiscall (nop on already initialized)
+		// update buttons 0x531803 __thiscall
+
+		static inline CShortMessagesWindowControllerCustomWidget** const GlobalObj = reinterpret_cast<CShortMessagesWindowControllerCustomWidget**>(0x882C34);
+	};
+	static_assert(sizeof(CShortMessagesWindowControllerCustomWidget::Message) == 14 * 4);
+	static_assert(sizeof(CShortMessagesWindowControllerCustomWidget) == 91 * 4);
+	constexpr int i = offsetof(CShortMessagesWindowControllerCustomWidget, Buttons) / 4;
+
 	class CMiniMapSignal {
 	public:
 		virtual ~CMiniMapSignal() = default;

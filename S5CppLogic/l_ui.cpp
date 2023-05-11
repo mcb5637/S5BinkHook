@@ -1044,6 +1044,72 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int GetShortMessages(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
+		int i = 1;
+		auto dump = [&L, &i](const GGUI::CShortMessagesWindowControllerCustomWidget::Message& m) {
+			L.NewTable();
+			L.Push("Id");
+			L.Push(m.MessageId);
+			L.SetTableRaw(-3);
+			L.Push("Type");
+			L.Push(static_cast<int>(m.Type));
+			L.SetTableRaw(-3);
+			L.Push("StartTime");
+			L.Push(m.StartTime);
+			L.SetTableRaw(-3);
+			L.Push("Duration");
+			L.Push(m.Duration);
+			L.SetTableRaw(-3);
+			L.Push("Tooltip");
+			L.Push(m.Tooltip.c_str());
+			L.SetTableRaw(-3);
+			L.Push("Pos");
+			L.PushPos(m.Pos);
+			L.SetTableRaw(-3);
+			L.SetTableRaw(-2, i);
+			++i;
+		};
+
+		L.NewTable();
+		for (const auto* m : mes->StandardMessage.Messages) {
+			dump(*m);
+		}
+		i = 1;
+		L.NewTable();
+		for (const auto* m : mes->History.Messages) {
+			dump(*m);
+		}
+		return 2;
+	}
+
+	int ReInitShortMessagesSize(lua::State L) {
+		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
+		mes->Initialize();
+		return 0;
+	}
+
+	int CreateShortMessage(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
+		shok::Position po{};
+		shok::Position* p = nullptr;
+		if (!L.IsNoneOrNil(4)) {
+			po = L.CheckPos(4);
+			p = &po;
+		}
+		mes->StandardMessage.Add(static_cast<GGUI::CShortMessagesWindowControllerCustomWidget::MessageType>(L.CheckInt(1)),
+			nullptr, L.CheckFloat(2), p, L.CheckString(3)
+			);
+		return 0;
+	}
+
+	int RemoveShortMessage(lua::State L) {
+		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
+		mes->StandardMessage.RemoveMessage(L.CheckInt(1));
+		return 0;
+	}
 
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
@@ -1339,7 +1405,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 67> UI{ {
+	constexpr std::array<lua::FuncReference, 71> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1407,6 +1473,10 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<StringInputWidgetGetIgnoreNextChar>("StringInputWidgetGetIgnoreNextChar"),
 		lua::FuncReference::GetRef<StringInputWidgetSetIgnoreNextChar>("StringInputWidgetSetIgnoreNextChar"),
 		lua::FuncReference::GetRef<StringInputWidgetSetBufferSize>("StringInputWidgetSetBufferSize"),
+		lua::FuncReference::GetRef<GetShortMessages>("GetShortMessages"),
+		lua::FuncReference::GetRef<ReInitShortMessagesSize>("ReInitShortMessagesSize"),
+		lua::FuncReference::GetRef<CreateShortMessage>("CreateShortMessage"),
+		lua::FuncReference::GetRef<RemoveShortMessage>("RemoveShortMessage"),
 	} };
 
 	void Init(lua::State L)

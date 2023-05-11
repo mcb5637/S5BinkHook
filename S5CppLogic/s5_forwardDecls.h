@@ -40,6 +40,7 @@ namespace shok {
 	enum class WorkerReason : int;
 	enum class AccessCategoryFlags : int;
 	enum class Goods : int;
+	enum class EntityType : int;
 
 	class Technology;
 	class TechCategoryManager;

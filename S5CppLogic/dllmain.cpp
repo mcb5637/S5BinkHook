@@ -289,7 +289,7 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
-
+	L.Push((int)BB::GetEntityType(L.CheckString(1)));
 	return 1;
 }
 

@@ -78,4 +78,15 @@ namespace BB {
 		static inline BB::CIDManager** const WidgetIDManager = reinterpret_cast<BB::CIDManager**>(0x8945C8);
 	};
 
+	template<class En>
+	requires std::is_enum_v<En> && std::is_same_v<int, std::underlying_type_t<En>>
+	En GetIdFromManager(const char* name, BB::CIDManagerEx* mng) {
+		int id = mng->GetIdByName(name);
+		if (id == 0)
+			throw std::invalid_argument{ "invalid id" };
+		return static_cast<En>(id);
+	}
+	inline auto GetEntityType(const char* name) {
+		return GetIdFromManager<shok::EntityType>(name, *CIDManagerEx::EntityTypeManager);
+	}
 }

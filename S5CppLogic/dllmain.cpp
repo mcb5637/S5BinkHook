@@ -289,10 +289,8 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
-	auto* m = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
-	L.Push((int)&m->StandardMessage);
-	m->StandardMessage.Add(GGUI::CShortMessagesWindowControllerCustomWidget::MessageType::UpgradePossible, nullptr, 5, nullptr, "test");
-	return 1;
+	
+	return 0;
 }
 
 int GetOptions(lua::State L) {

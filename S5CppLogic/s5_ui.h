@@ -364,9 +364,7 @@ namespace EGL {
 		virtual bool IsEntityValid(int id) = 0;
 		virtual bool IsEntityState0x10003(int id) = 0;
 		virtual bool IsEntityOfCategory(int id, shok::EntityCategory cat) = 0; // 10
-	private:
-		virtual bool unknownfunc1(int pl) = 0; // check exploration active for player?
-	public:
+		virtual bool IsPlayerActive(int pl) = 0; // checks EGL::PlayerManager, not GGL::CPlayerStatus
 		virtual int GetGameTick() = 0;
 
 		static inline constexpr int vtp = 0x7837D0;

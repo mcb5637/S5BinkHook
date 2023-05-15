@@ -815,6 +815,34 @@ void GGUI::CShortMessagesWindowControllerCustomWidget::Entries::RemoveMessage(in
     shortmsg_entr_rem(this, id);
 }
 
+inline void(__thiscall* const statrender_stat_toggletime)(GGUI::CStatisticsRendererCustomWidget::StatToRender* th) = reinterpret_cast<void(__thiscall*)(GGUI::CStatisticsRendererCustomWidget::StatToRender*)>(0x53069A);
+void GGUI::CStatisticsRendererCustomWidget::StatToRender::ToggleTimeScale()
+{
+    statrender_stat_toggletime(this);
+}
+inline int(__thiscall* const statrender_stat_getmin)(GGUI::CStatisticsRendererCustomWidget::StatToRender* th, int pl, GGUI::CStatisticsRendererCustomWidget* cw) = reinterpret_cast<int(__thiscall*)(GGUI::CStatisticsRendererCustomWidget::StatToRender*, int, GGUI::CStatisticsRendererCustomWidget*)>(0x530B2C);
+int GGUI::CStatisticsRendererCustomWidget::StatToRender::GetMinutes(int pl, CStatisticsRendererCustomWidget* cw)
+{
+    return statrender_stat_getmin(this, pl, cw);
+}
+
+inline int(__thiscall* const statrender_getplayer)(const GGUI::CStatisticsRendererCustomWidget* th) = reinterpret_cast<int(__thiscall*)(const GGUI::CStatisticsRendererCustomWidget*)>(0x5309F8);
+int GGUI::CStatisticsRendererCustomWidget::GetPlayer() const
+{
+    return statrender_getplayer(this);
+}
+inline bool(__thiscall* const statrender_ishuman)(const GGUI::CStatisticsRendererCustomWidget* th) = reinterpret_cast<bool(__thiscall*)(const GGUI::CStatisticsRendererCustomWidget*)>(0x530840);
+bool GGUI::CStatisticsRendererCustomWidget::IsHumanPlayer(int pl) const
+{
+    return statrender_ishuman(this);
+}
+
+inline GGL::CGameStatistics* (__thiscall* const statrender_getstat)(GGUI::CStatisticsRendererCustomWidget* th, int pl) = reinterpret_cast<GGL::CGameStatistics * (__thiscall*)(GGUI::CStatisticsRendererCustomWidget*, int)>(0x53080A);
+GGL::CGameStatistics* GGUI::CStatisticsRendererCustomWidget::GetStatistics(int player)
+{
+    return statrender_getstat(this, player);
+}
+
 static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);
 void EGUIX::FontManager::LoadFont(int* outFontID, const char* fontName)
 {

@@ -301,9 +301,9 @@ namespace GGL {
 		int PlayerID;
 		int NumberOfUnitsKilled, NumberOfUnitsDied, NumberOfBuildingsDestroyed, NumberOfBuildingsLost;
 		GGL::CResourceStatistics ResourceStatistics; //6
-		GGL::GameStatisticsTimeline UnitsKilledTimeLine, UnitsDiedTimeLine, BuildingsDestroyedTimeLine, BuildingsLostTimeLine, // 12, 18
-			SerfTimeLine, WorkerTimeLine, LeaderTimeLine, HeroTimeLine, SoldierTimeLine, FarmTimeLine, ResidenceTimeLine,
-			WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine; // la 102, 96, 90
+		GGL::GameStatisticsTimeline UnitsKilledTimeLine, UnitsDiedTimeLine, BuildingsDestroyedTimeLine, BuildingsLostTimeLine, // 12, 18, 24, 30
+			SerfTimeLine, WorkerTimeLine, LeaderTimeLine, HeroTimeLine, SoldierTimeLine, FarmTimeLine, ResidenceTimeLine, // 36, 42, 48, 54, 60, 66, 72
+			WorkplaceTimeLine, MilitaryBuildingTimeLine, VillageCenterTimeLine, BuildingTimeLine, MotivationTimeLine; // 78, 84, 90, 96, 102
 		shok::Vector<TechResearchData> ResearchedTechnologies;
 		shok::Vector<BuildingUpgradedData> UpgradedBuildings;
 
@@ -316,6 +316,7 @@ namespace GGL {
 		void OnResMined(shok::ResourceType rt, float am); // use normal res type, not raw
 	};
 	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
+	//constexpr int i = offsetof(CGameStatistics, MotivationTimeLine) / 4;
 
 	class CPlayerStatus : public BB::IObject {
 	public:

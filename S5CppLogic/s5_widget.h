@@ -168,8 +168,7 @@ namespace EGUIX {
 	class IRender {
 	public:
 		virtual ~IRender() = default;
-	private:
-		virtual bool Render(float* uk) = 0; // possibly possize rect?
+		virtual bool Render(const Rect* screenCoords) = 0;
 
 		static inline constexpr unsigned int Identifier = 0x876EC256;
 	};
@@ -379,7 +378,7 @@ namespace EGUIX {
 		virtual ~ICustomWidget() = default;
 		virtual void Initialize() = 0;
 		virtual void Destroy() = 0;
-		virtual void Render(CCustomWidget* widget, float* zero) = 0;
+		virtual void Render(CCustomWidget* widget, const Rect* screenCoords) = 0;
 		virtual bool HandleEvent(CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain) = 0;
 	private:
 		virtual int uk3() = 0; // 5 forwareded to CBaseWidget::retzero
@@ -802,6 +801,67 @@ namespace GGUI {
 	static_assert(sizeof(CShortMessagesWindowControllerCustomWidget::Message) == 14 * 4);
 	static_assert(sizeof(CShortMessagesWindowControllerCustomWidget) == 91 * 4);
 	constexpr int i = offsetof(CShortMessagesWindowControllerCustomWidget, Buttons) / 4;
+
+	// IntegerUserVariable0 bool is mainmenu
+	class CStatisticsRendererCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+	public:
+		enum class StatType : int {
+			Houses = 0,
+			Military = 1,
+			Resources = 2,
+			Settlers = 3,
+			Technologies = 4,
+			Scores = 5,
+			SettlersSerfs = 10,
+			SettlersWorkers = 11,
+			SettlersMilitary = 12,
+			SettlersMotivation = 13,
+			MilitaryUnitsBuildingsKilled = 20,
+			MilitaryUnitsKilled = 21,
+			MilitaryUnitsBuildingsLost = 22,
+			MilitaryUnitsLost = 23,
+			HousesAll = 30,
+			HousesFarms = 31,
+			HousesResidences = 32,
+			HousesWorkers = 33,
+			ResourcesMoney = 40,
+			ResourcesClay = 41,
+			ResourcesIron = 22,
+			ResourcesStone = 43,
+			ResourcesSulphur = 44,
+			ResourcesWood = 45,
+		};
+		enum class TimeScale : int {
+			Min60 = 1,
+			Min120 = 2,
+			Min240 = 3,
+			All = 4,
+			Min30 = 5,
+		};
+
+		struct StatToRender {
+			StatType Selected;
+			TimeScale Scale;
+			int PlayerId;
+
+			void ToggleTimeScale();
+			int GetMinutes(int pl, CStatisticsRendererCustomWidget* cw);
+
+			static inline StatToRender** const GlobalObj = reinterpret_cast<StatToRender**>(0x882B00);
+		};
+
+		bool IsMainMenu; // 37
+
+
+		static constexpr int vtp = 0x77C3D0;
+		static constexpr unsigned int Identifier = 0x9A90FE66;
+
+		int GetPlayer() const;
+		bool IsHumanPlayer(int pl) const;
+		GGL::CGameStatistics* GetStatistics(int player);
+	};
+	static_assert(offsetof(CStatisticsRendererCustomWidget, IsMainMenu) == 37 * 4);
+	static_assert(sizeof(CStatisticsRendererCustomWidget) == 38 * 4);
 
 	class CMiniMapSignal {
 	public:

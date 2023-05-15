@@ -47,6 +47,7 @@
 #include "savegame_extra.h"
 #include "EntityAddonData.h"
 #include "ModBehavior.h"
+#include "ModUI.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -357,6 +358,9 @@ void InitGame() {
 	EScr::CScriptTriggerSystem::HookFireEvent();
 	CppLogic::EntityAddon::EntityAddonData::Init();
 	CppLogic::Mod::RegisterClasses();
+#ifdef _DEBUG
+	CppLogic::Mod::CustomWidgetRenderTest::Register();
+#endif
 }
 
 constexpr double Version = 2.0006;

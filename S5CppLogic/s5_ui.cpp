@@ -81,6 +81,11 @@ void shok::UIRenderer::RenderMaterial(const EGUIX::CMaterial* mat, bool scale, c
 {
 	uirender_rmaterial(this, mat, scale, pos);
 }
+inline void(__thiscall* const uirender_rline)(shok::UIRenderer* r, const EGUIX::Color* c, bool scale, float x1, float y1, float x2, float y2) = reinterpret_cast<void(__thiscall*)(shok::UIRenderer*, const EGUIX::Color*, bool, float, float, float, float)>(0x557576);
+void shok::UIRenderer::RenderLine(const EGUIX::Color* c, bool scale, float x1, float y1, float x2, float y2)
+{
+	uirender_rline(this, c, scale, x1, y1, x2, y2);
+}
 
 static inline const EGUIX::Color* (__thiscall* const uircustomcolorcont_getcol)(shok::UIRenderCustomColorContext* th, int i) = reinterpret_cast<const EGUIX::Color * (__thiscall*)(shok::UIRenderCustomColorContext*, int)>(0x5577B6);
 const EGUIX::Color* shok::UIRenderCustomColorContext::GetColorByInt(int i)

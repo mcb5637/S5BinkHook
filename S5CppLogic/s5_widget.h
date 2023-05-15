@@ -381,14 +381,17 @@ namespace EGUIX {
 		virtual void Render(CCustomWidget* widget, const Rect* screenCoords) = 0;
 		virtual bool HandleEvent(CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain) = 0;
 	private:
-		virtual int uk3() = 0; // 5 forwareded to CBaseWidget::retzero
+		virtual int uk3(); // 5
+	public:
 
-		int IntegerUserVariable0, IntegerUserVariable1, IntegerUserVariable2, IntegerUserVariable3,
-			IntegerUserVariable4, IntegerUserVariable5; // ctor memset 0
+		int IntegerUserVariable0 = 0, IntegerUserVariable1 = 0, IntegerUserVariable2 = 0, IntegerUserVariable3 = 0,
+			IntegerUserVariable4 = 0, IntegerUserVariable5 = 0; // ctor memset 0
 		shok::String StringUserVariable[4]; // 7
-		int WidgetId;
+		int WidgetId = 0;
 
-		static inline constexpr unsigned int Identifier = 0x156D9BF;
+		void RenderLine(const Rect* screenCoords, const EGUIX::Color* c, float x1, float y1, float x2, float y2); // coordinates relative to widget
+
+		static inline constexpr unsigned int Identifier = 0x156D9BF6;
 	};
 	static_assert(sizeof(ICustomWidget)==36*4);
 

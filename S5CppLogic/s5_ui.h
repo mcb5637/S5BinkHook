@@ -103,6 +103,7 @@ namespace shok {
 		void RenderText(const char* txt, int fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
 		void SetTextRenderColor(shok::Color c);
 		void RenderMaterial(const EGUIX::CMaterial* mat, bool scale, const EGUIX::Rect* pos);
+		void RenderLine(const EGUIX::Color* c, bool scale, float x1, float y1, float x2, float y2);
 
 		static constexpr shok::Position ScaledScreenSize{ 1024.0f, 768.0f };
 

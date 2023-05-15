@@ -282,6 +282,9 @@
     <ClInclude Include="s5_enumdump.h">
       <Filter>shok</Filter>
     </ClInclude>
+    <ClInclude Include="ModUI.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -444,6 +447,9 @@
       <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="ModBehavior.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ModUI.cpp">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>

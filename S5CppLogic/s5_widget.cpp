@@ -430,6 +430,17 @@ EGUIX::CContainerWidget* EGUIX::CContainerWidget::Create()
     return r;
 }
 
+int EGUIX::ICustomWidget::uk3()
+{
+    return 0;
+}
+
+inline void(__thiscall* const icustomwid_renderline)(EGUIX::ICustomWidget* th, const EGUIX::Rect* screenCoords, const EGUIX::Color* c, float x1, float y1, float x2, float y2) = reinterpret_cast<void(__thiscall*)(EGUIX::ICustomWidget*, const EGUIX::Rect*, const EGUIX::Color*, float, float, float, float)>(0x530726);
+void EGUIX::ICustomWidget::RenderLine(const Rect* screenCoords, const EGUIX::Color* c, float x1, float y1, float x2, float y2)
+{
+    icustomwid_renderline(this, screenCoords, c, x1, y1, x2, y2);
+}
+
 static inline void(__thiscall* const customwid_initwid)(EGUIX::CCustomWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CCustomWidget*)>(0x560BA3);
 void EGUIX::CCustomWidget::InitializeCustomWidget()
 {

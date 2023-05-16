@@ -38,10 +38,11 @@ bool CppLogic::Mod::CustomWidgetRenderTest::HandleEvent(EGUIX::CCustomWidget* wi
 {
 	auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev);
 	if (me) {
-		if (me->IsEvent(shok::InputEventIds::MouseEnter))
-			a = true;
-		if (me->IsEvent(shok::InputEventIds::MouseLeave))
-			a = false;
+		if (me->IsEvent(shok::InputEventIds::MouseWheel)) {
+			a = me->Delta > 0;
+			me->EventHandeled = true;
+			me->KeyData = shok::Keys::MouseMButton;
+		}
 	}
 	return false;
 }

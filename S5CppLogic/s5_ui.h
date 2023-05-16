@@ -131,6 +131,14 @@ namespace EToolsManager {
 		static inline constexpr unsigned int Identifier = 0x425576F4; // from CRwCameraHandler casttoident
 		static inline constexpr int vtp = 0x78061C;
 	};
+
+	class IInputDriven {
+	public:
+		virtual ~IInputDriven() = default;
+		virtual bool PostEvent(BB::CEvent* ev, int uk) = 0;
+
+		static constexpr int vtp = 0x77AE0C;
+	};
 }
 
 namespace ERwTools {
@@ -349,6 +357,23 @@ namespace ERwTools {
 	};
 	static_assert(sizeof(CRwCameraHandler) == 92*4);
 	constexpr int i = offsetof(CRwCameraHandler, CameraInfo.LookAtZ) / 4;
+
+	class ICameraBehaviour : public EToolsManager::IInputDriven {
+	public:
+		// 3 more methods
+
+		static constexpr int vtp = 0x77AEF0;
+	};
+
+	class CDefCameraBehaviour : public BB::IObject, public ICameraBehaviour {
+	public:
+
+
+		static constexpr int vtp = 0x77AF20;
+		static constexpr unsigned int Identifier = 0x45CAFEBB;
+
+		static void HookEnableZoom(bool ena);
+	};
 }
 
 namespace EGL {

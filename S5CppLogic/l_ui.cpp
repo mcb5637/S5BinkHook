@@ -1225,23 +1225,36 @@ namespace CppLogic::UI {
 		return Name;
 	}
 
+	void CppLogic::UI::GUIState_PlaceBuildingEx::SetStateParameters(GGUI::SStateParameters* p)
+	{
+		GGUI::CPlaceBuildingState::SetStateParameters(p);
+		ERwTools::CDefCameraBehaviour::HookEnableZoom(false);
+	}
+
 	bool CppLogic::UI::GUIState_PlaceBuildingEx::OnMouseEvent(BB::CEvent* ev)
 	{
-		if (auto* e = dynamic_cast<BB::CMouseEvent*>(ev)) {
+		if (auto* e = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 			if (e->IsEvent(shok::InputEventIds::MouseWheel)) {
-				if (e->Delta < 0) {
-					CurrentStep = (CurrentStep + 1) % NumSteps;
+				if (e->IsModifier(shok::Keys::ModifierControl)) {
+					(*ERwTools::CRwCameraHandler::GlobalObj)->ScrollWheelZoom(e->Delta);
+					e->EventHandeled = true;
+					return true;
 				}
 				else {
-					CurrentStep--;
-					while (CurrentStep < 0)
-						CurrentStep += NumSteps;
+					if (e->Delta < 0) {
+						CurrentStep = (CurrentStep + 1) % NumSteps;
+					}
+					else {
+						CurrentStep--;
+						while (CurrentStep < 0)
+							CurrentStep += NumSteps;
+					}
+					MouseX = -1;
+					MouseY = -1;
+					UpdateModel(e->X, e->Y);
+					e->EventHandeled = true;
+					return true;
 				}
-				MouseX = -1;
-				MouseY = -1;
-				UpdateModel(e->X, e->Y);
-				e->EventHandeled = true;
-				return true;
 			}
 		}
 
@@ -1329,6 +1342,12 @@ namespace CppLogic::UI {
 	void CppLogic::UI::GUIState_PlaceBuildingEx::OnMouseMove(int x, int y)
 	{
 		UpdateModel(x, y);
+	}
+
+	bool CppLogic::UI::GUIState_PlaceBuildingEx::OnCancel()
+	{
+		ERwTools::CDefCameraBehaviour::HookEnableZoom(true);
+		return GGUI::CPlaceBuildingState::OnCancel();
 	}
 
 	void CppLogic::UI::GUIState_PlaceBuildingEx::UpdateModel(int x, int y)

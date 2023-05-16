@@ -293,7 +293,7 @@ namespace Framework {
 
 		Mode CurrentMode; // 1 mainmenu, 2 ingame (sp?)
 		GS3DTools::CMapData CurrentMap; // 4
-		//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent
+		//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent event 0x518C5B
 		// GS3DTools::CMapData::vtable???
 		PADDINGI(63);
 		shok::String SavegameToLoad; // 90

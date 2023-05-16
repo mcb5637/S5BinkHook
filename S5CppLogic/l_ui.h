@@ -53,11 +53,13 @@ namespace CppLogic::UI {
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 		virtual const char* GetName() override;
 
+		virtual void SetStateParameters(GGUI::SStateParameters* p) override;
 		virtual bool OnMouseEvent(BB::CEvent* ev) override;
 		virtual bool CheckCommandValid(TargetData* d, int z) override;
 		virtual void ExecuteCommand(TargetData* d, ExecuteData* selectedID) override;
 		virtual TargetData* GetTargetData(TargetData* d, int x, int y) override;
 		virtual void OnMouseMove(int x, int y) override;
+		virtual bool OnCancel() override;
 
 		void UpdateModel(int x, int y);
 		float GetRotation();

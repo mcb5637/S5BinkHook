@@ -80,6 +80,8 @@ namespace EGL {
 		CEventValue(const CEventValue&) = default;
 		CEventValue& operator=(CEventValue&&) = default;
 		CEventValue& operator=(const CEventValue&) = default;
+
+		static constexpr unsigned int Identifier = id;
 	};
 	using CEventValue_Int = CEventValue<int, 0xFE5B4097>;
 	using CEventValue_Bool = CEventValue<bool, 0x29EC0467>;
@@ -128,6 +130,8 @@ namespace EGL {
 		CEventGetValue(const CEventGetValue&) = default;
 		CEventGetValue& operator=(CEventGetValue&&) = default;
 		CEventGetValue& operator=(const CEventGetValue&) = default;
+
+		static constexpr unsigned int Identifier = id;
 	};
 	// EGL::CEventGetValue<GGL::CBuildingMerchantBehaviorProps const *,-1872076829> 7704A4
 	// EGL::CEventGetValue<GGL::CNeutralBridgeBehavior *,1150290935>
@@ -172,13 +176,6 @@ namespace EGL {
 		static inline constexpr int vtp_IEventEntityID = 0x766C58;
 		static inline constexpr unsigned int Identifier = 0x3B55826D;
 	};
-#ifdef __INTELLISENSE__
-#pragma diag_suppress 2784
-#endif
-	//static_assert(offsetof(CEvent1Entity, EntityID) == 4 * 4);
-#ifdef __INTELLISENSE__
-#pragma diag_default 2784
-#endif
 
 	class CEventPosition : public BB::CEvent {
 	public:
@@ -192,6 +189,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x766C70;
 		static inline constexpr int TypeDesc = 0x8079C8;
+		static constexpr unsigned int Identifier = 0x175247D;
 	};
 
 	class CEventPositionAndTaskState : public CEventPosition {
@@ -206,12 +204,14 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x775F78;
 		static inline constexpr int TypeDesc = 0x81D9C8;
+		static constexpr unsigned int Identifier = 0x5ADDA397;
 	};
 
 	class IEventPlayerID {
 	public:
 		virtual int GetPlayerID() const = 0;
 		static inline constexpr int vtp = 0x76D788;
+		static constexpr unsigned int Identifier = 0x7B28CFC3;
 	};
 	class CEventPlayerID : public BB::CEvent, public IEventPlayerID {
 	public:
@@ -228,6 +228,7 @@ namespace EGL {
 		static inline constexpr int vtp = 0x76D900;
 		static inline constexpr int TypeDesc = 0x80E078;
 		static inline constexpr int vtp_IEventPlayerID = 0x76D8F8;
+		static constexpr unsigned int Identifier = 0xE2540573;
 	};
 
 	class CEventSubAnim : public BB::CEvent {
@@ -243,6 +244,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x76D910;
 		static inline constexpr int TypeDesc = 0x80E09C;
+		static constexpr unsigned int Identifier = 0x175247D;
 	};
 
 	class IEvent2Entities {
@@ -286,6 +288,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x775F68;
 		static inline constexpr int TypeDesc = 0x81D998;
+		static constexpr unsigned int Identifier = 0x202DA887;
 	};
 
 	class CEventSoundPositionAndID : public BB::CEvent {
@@ -303,6 +306,7 @@ namespace EGL {
 		CEventSoundPositionAndID& operator=(const CEventSoundPositionAndID&) = default;
 
 		static inline constexpr int vtp = 0x76D4B0;
+		static constexpr unsigned int Identifier = 0x956FCE37;
 	};
 
 	class CEventGetPosition : public BB::CEvent {
@@ -316,6 +320,7 @@ namespace EGL {
 		CEventGetPosition& operator=(const CEventGetPosition&) = default;
 
 		static inline constexpr int vtp = 0x7743CC;
+		static constexpr unsigned int Identifier = 0x89C73967;
 	};
 }
 
@@ -333,6 +338,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x766C80;
 		static inline constexpr int TypeDesc = 0x8079EC;
+		static constexpr unsigned int Identifier = 0x8745CA77;
 	};
 	class CEventAttachmentTypeInteger : public BB::CEvent {
 	public:
@@ -345,8 +351,7 @@ namespace GGL {
 		CEventAttachmentTypeInteger& operator=(CEventAttachmentTypeInteger&&) = default;
 		CEventAttachmentTypeInteger& operator=(const CEventAttachmentTypeInteger&) = default;
 
-		static inline constexpr int vtp = 0x775E28;
-		static inline constexpr int TypeDesc = 0x81D3A8;
+		// no vtable/identifier/typedesc?
 	};
 	class CEventAttachmentTypeGetBool : public BB::CEvent {
 	public:
@@ -356,6 +361,7 @@ namespace GGL {
 		CEventAttachmentTypeGetBool(shok::EventIDs e, shok::AttachmentType t);
 
 		static inline constexpr int vtp = 0x776EF0;
+		static constexpr unsigned int Identifier = 0x8745CA77;
 	};
 
 	class CEventEntityIndex : public BB::CEvent {
@@ -371,6 +377,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x766C90;
 		static inline constexpr int TypeDesc = 0x807A20;
+		static constexpr unsigned int Identifier = 0x472E2780;
 	};
 
 	class CEventTransaction : public BB::CEvent {
@@ -386,6 +393,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76D93C;
 		static inline constexpr int TypeDesc = 0x80E0E0;
+		static constexpr unsigned int Identifier = 0x86EF8F47;
 	};
 
 	class CEventGoodsTraded : public CEventTransaction, public EGL::IEventEntityID {
@@ -413,6 +421,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76D94C;
 		static inline constexpr int TypeDesc = 0x80E104;
+		static constexpr unsigned int Identifier = 0x5FF4D28D;
 	};
 
 	class CEventEntityAttachment : public BB::CEvent {
@@ -429,6 +438,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x770844;
 		static inline constexpr int TypeDesc = 0x8129E0;
+		static constexpr unsigned int Identifier = 0xB17BC067;
 	};
 
 	class CEventChangeMotivation : public EGL::CEventValue_Float {
@@ -439,6 +449,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76F904;
 		static inline constexpr int TypeDesc = 0x8117E0;
+		static constexpr unsigned int Identifier = 0x992A8BCD;
 	};
 }
 
@@ -498,6 +509,7 @@ namespace BB {
 
 		static inline constexpr int TypeDesc = 0x7FFE3C;
 		static inline constexpr int vtp = 0x762124;
+		static constexpr unsigned int Identifier = 0x232A806D;
 	};
 
 	class CMouseEvent : public BB::CInputEvent {
@@ -517,6 +529,7 @@ namespace BB {
 
 		static inline constexpr int TypeDesc = 0x7FFE98;
 		static inline constexpr int vtp = 0x762154;
+		static constexpr unsigned int Identifier = 0x7B2E4D60;
 	};
 
 	class CKeyEvent : public BB::CInputEvent {
@@ -531,6 +544,7 @@ namespace BB {
 
 		static inline constexpr int TypeDesc = 0x7FFE5C;
 		static inline constexpr int vtp = 0x762134;
+		static constexpr unsigned int Identifier = 0x6FC080E0;
 	};
 
 	class CKeyPressEvent : public BB::CInputEvent {
@@ -546,6 +560,7 @@ namespace BB {
 
 		static inline constexpr int TypeDesc = 0x7FFE78;
 		static inline constexpr int vtp = 0x762144;
+		static constexpr unsigned int Identifier = 0x77699AE0;
 	};
 }
 

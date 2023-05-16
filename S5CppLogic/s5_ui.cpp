@@ -828,6 +828,12 @@ void GGUI::C3DViewHandler::SetGUIStateByIdentfierOnNextUpdate(unsigned int ident
 	c3dviewhandler_setguistateonupdate(this, identifier);
 }
 
+void ERwTools::CDefCameraBehaviour::HookEnableZoom(bool ena)
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x52212B), 10 };
+	*reinterpret_cast<byte*>(0x52212B) = ena ? 0x75 : 0xEB; // jnz : jmp
+}
+
 bool GGL::CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const shok::Position& inp, shok::Position& outp)
 {
 	return GetNearestFreePosForBuildingPlacement(ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);

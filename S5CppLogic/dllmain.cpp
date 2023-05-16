@@ -290,7 +290,7 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
-	
+	ERwTools::CDefCameraBehaviour::HookEnableZoom(L.CheckBool(1));
 	return 0;
 }
 

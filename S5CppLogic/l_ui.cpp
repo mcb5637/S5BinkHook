@@ -1133,7 +1133,7 @@ namespace CppLogic::UI {
 	}
 
 	bool GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev) {
-		BB::CMouseEvent* mev = dynamic_cast<BB::CMouseEvent*>(ev);
+		BB::CMouseEvent* mev = BB::IdentifierCast<BB::CMouseEvent>(ev);
 		if (mev && mev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
 			if (mev->IsKey(shok::Keys::MouseLButton)) {
 				bool r = true;

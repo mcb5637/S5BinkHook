@@ -352,6 +352,7 @@ namespace GGL {
 		CEventAttachmentTypeInteger& operator=(const CEventAttachmentTypeInteger&) = default;
 
 		// no vtable/identifier/typedesc?
+		static constexpr unsigned int Identifier = BB::InvalidIdentifier;
 	};
 	class CEventAttachmentTypeGetBool : public BB::CEvent {
 	public:

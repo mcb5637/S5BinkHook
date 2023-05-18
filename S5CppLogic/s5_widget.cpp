@@ -323,6 +323,12 @@ void GGUI::MiniMapMarkerHandler::CreateSignalDefault(const shok::Position& p, in
     minimapmarkerhandler_adddefault(&Defaults, &def);
 }
 
+inline void(__thiscall* const scrollbar_update)(EGUIX::CScrollBarButtonCustomWidget* th, int val, bool cb, EGUIX::CBaseWidget* wid) = reinterpret_cast<void(__thiscall*)(EGUIX::CScrollBarButtonCustomWidget*, int, bool, EGUIX::CBaseWidget*)>(0x55CB11);
+void EGUIX::CScrollBarButtonCustomWidget::UpdateSlider(int value, bool callback)
+{
+    scrollbar_update(this, value, callback, callback ? EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(WidgetId) : nullptr);
+}
+
 static inline int(__thiscall* const widman_getidbyname)(EGUIX::WidgetManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x5588A0);
 int EGUIX::WidgetManager::GetIdByName(const char* name)
 {
@@ -936,4 +942,10 @@ void(__thiscall* const widloader_load)(EGUIX::WidgetLoader* th, const char* f, b
 void EGUIX::WidgetLoader::LoadGUI(const char* file)
 {
     widloader_load(this, file, false);
+}
+
+static inline bool(__thiscall* const eventmng_ispressed)(shok::Keys* ob7, shok::Keys m) = reinterpret_cast<bool(__thiscall*)(shok::Keys*, shok::Keys)>(0x558C1C);
+bool EGUIX::CEventManager::IsModifierPressed(shok::Keys m)
+{
+    return eventmng_ispressed(&CurrentModifiers, m);
 }

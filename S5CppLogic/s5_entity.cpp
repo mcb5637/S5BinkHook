@@ -938,6 +938,11 @@ int GGL::CBuilding::GetWorkTaskList()
 {
 	return building_getworktl(this);
 }
+inline int(__thiscall* const building_workerty)(const GGL::CBuilding* th) = reinterpret_cast<int(__thiscall*)(const GGL::CBuilding*)>(0x4AB0EE);
+int GGL::CBuilding::GetWorkerType() const
+{
+	return building_workerty(this);
+}
 
 std::vector<shok::AdditionalTechModifier> GGL::CBuilding::ConstructionSpeedModifiers{};
 float __fastcall constructionsite_getprogresspertick_hook(GGL::CConstructionSite* th) { // param is constructionsite, just not done yet ;)

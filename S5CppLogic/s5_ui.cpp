@@ -921,9 +921,7 @@ void GGUI::CManager::HackPostEvent()
 	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(BB::IPostEvent * th, BB::CEvent * ev)>(&PostEventHook);
 }
 
-static inline int* (* const modifpressed_getobj)() = reinterpret_cast<int* (*)()>(0x558C16);
-static inline bool(__thiscall* const modifpressed_ispressed)(int* ob7, shok::Keys m) = reinterpret_cast<bool(__thiscall*)(int*, shok::Keys)>(0x558C1C);
 bool GGUI::CManager::IsModifierPressed(shok::Keys modif)
 {
-	return modifpressed_ispressed(modifpressed_getobj() + 7, modif);
+	return EGUIX::CEventManager::GlobalObj()->IsModifierPressed(modif);
 }

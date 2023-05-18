@@ -1013,7 +1013,7 @@ namespace shok {
 		MouseMove = 0x1004,
 		MouseButtonDown = 0x1005,
 		MouseButtonUp = 0x1006,
-		MouseWheel = 0x1007,
+		MouseWheel = 0x1007, // if you want to use just mousewheel without modifiers, use ERwTools::CDefCameraBehaviour::HookEnableZoom to disable zoom
 
 		MouseEnter = 0x50001,
 		MouseLeave = 0x50002,

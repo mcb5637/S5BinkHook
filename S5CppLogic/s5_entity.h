@@ -670,6 +670,7 @@ namespace GGL {
 		bool IsHealthBurning();
 		void CatchFire();
 		int GetWorkTaskList(); // gets first unused tasklist, or last tasklist
+		int GetWorkerType() const;
 
 		// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 

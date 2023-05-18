@@ -18,9 +18,6 @@ namespace GGL {
 		struct TypeThatLeftData {
 			int EntityType, GameTurn;
 		};
-		struct TypeCountMapData {
-			int EntityType, Count;
-		};
 
 		int PlayerID;
 		bool PaydayActive;
@@ -28,22 +25,22 @@ namespace GGL {
 		int PaydayFirstOccuraceGameTurn;
 		bool AIPlayerFlag, PayLeaderFlag;
 		PADDING(2);
-		PADDINGI(2); // maybe char pointer? GUI_WorkersWithoutSleepPlace m_GUI_WorkersWithoutEatPlace
-		shok::Vector<EntityInSystemData> EntityInSystem;
-		shok::Vector<int> HeadquarterArray;
-		shok::Vector<int> VillageCenterArray;
-		shok::Vector<int> WorkBuildingsArray;
+		int GUI_WorkersWithoutSleepPlace, m_GUI_WorkersWithoutEatPlace; // just the number of workers, dont ask me why there is this m_
+		shok::Vector<EntityInSystemData> EntityInSystem; // 7
+		shok::Vector<int> HeadquarterArray; // 11
+		shok::Vector<int> VillageCenterArray; // 15
+		shok::Vector<int> WorkBuildingsArray; // 19
 		shok::Vector<int> ResidenceBuildingArray; // 23
 		shok::Vector<int> FarmBuildingArray; // 27
-		shok::Vector<int> BarrackBuildingArray;
+		shok::Vector<int> BarrackBuildingArray; // 31
 		shok::Vector<int> FreeWorkerArray; // 35
 		shok::Vector<int> EmployedWorkerArray; // 39
 		shok::Vector<int> SoldierArray; // 43
 		shok::Vector<int> LeaderArray; // 47
 		shok::Vector<int> HeroArray;
-		shok::Vector<int> SerfArray;
-		shok::Vector<TypeThatLeftData> EntityTypeThatLeft;
-		shok::Vector<TypeCountMapData> EntityTypeCountMap;
+		shok::Vector<int> SerfArray; // 55
+		shok::Map<int, int> EntityTypeCountMap; // 59 EntityType->Count
+		shok::List<TypeThatLeftData> EntityTypeThatLeft; // 62
 
 		static inline constexpr int vtp = 0x770868;
 
@@ -73,15 +70,18 @@ namespace GGL {
 		int GetNumberOfWorkersWithoutFarmPlace();
 
 		void CheckWorkerAttachment(bool forceReAttach);
+		bool AttachWorker(int worker, int building);
 
 		// checkpayday 4C25FB thiscall
 		static void HookCheckPayday();
 		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);
 
+		// on entity created 0x4C38FE __thiscall(id)
+
 	private:
 		void __thiscall CheckPaydayHook();
 	};
-	//constexpr int i = offsetof(CPlayerAttractionHandler, EmployedWorkerArray) / 4;
+	constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
 
 	class CUpgradeManager : public BB::IObject {
 	public:

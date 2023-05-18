@@ -29,6 +29,34 @@ Workers:
 			- having a Farm/Residence not only replenishes more of the MaximumWorktime (compared to Camp), it also increases the MaximumWorktime (Farm replenishes more, while Residence adds more Maximum, for a typical Worker, this can be changed on a per EntityType basis)
 			- each cycle replenishes 20/100(no Farm/Residence), 160/225 (just Farm), 300/525 (just Residence), 720/625 (Farm and Residence) (at 1 Motivation)
 			- maximizing Worktime per cycle is especially important for any Refiners, as they only use Raw Resources at the start of their Work and then produce Resources until their Worktime runs out
+	Attachments:
+		- each Tick:
+			- moves all Workers that lost their Workplace from EmployedWorkers to FreeWorkers
+		- each Update (automatic updates happen every playerattraction.xml->ReAttachWorkerFrequency (10) Seconds, manual via Logic.PlayerReAttachAllWorker)
+			- detach all Farms and Residences
+			- go through all Workplaces and try to attach one missing free Worker (20 times)
+			- attach the nearest Farm to each employed Worker (max distance playerattraction.xml->MaximumDistanceWorkerToFarm)
+			- attach the nearest Residence to each employed Worker (max distance playerattraction.xml->MaximumDistanceWorkerToFarm)
+			- attach the nearest Farm to each unemployed Worker (max distance playerattraction.xml->MaximumDistanceWorkerToFarm)
+			- attach the nearest Residence to each unemployed Worker (max distance playerattraction.xml->MaximumDistanceWorkerToFarm)
+			- the order of attachments goes from first employed to last employed (or free)
+			- distance to Farm/Residence is measured from Workplace position (if existing)
+		- each Tick:
+			- go through all Workplaces and try to attach one missing free Worker
+			- for each employed worker, attach a Farm/Residence if he has none (same as on Update)
+			- for each unemployed worker, attach a Farm/Residence if he has none (same as on Update)
+		- each SpawnUpdate (playerattraction.xml->AttractionFrequency (2) Seconds):
+			- for human Players: check Motivation, more than 1 VillageCenter, free VC space
+			- for ai Players: check Motivation, more than one VillageCenter or Headquarters
+			- get all Workplaces that are missing a Worker and who have a WorkerType that is not banned due to a Worker of that Type recently leaving
+			- take the Workplace with the least percentage of Workers
+			- search for the nearest reachable VillageCenter (if none found, search for the nearest reachable HQ instead)
+			- spawn a Worker at that VC/HQ and attach it to the selected Workplace
+		- summary + one trick:
+			- employed Workers always steal Farm/Residence from unemployed Workers
+			- Farm/Residence priority is determined by employment time
+			- you can bump Workers down in Farm/Residence priority by unemploying and reemploying them
+
 
 Combat:
 	Base Values:

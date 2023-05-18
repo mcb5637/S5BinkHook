@@ -6,7 +6,7 @@
 #include "mod.h"
 
 
-namespace CppLogic::Mod {
+namespace CppLogic::Mod::UI {
 	class CustomWidgetRenderTest : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
 		virtual unsigned int __stdcall GetClassIdentifier() const override;

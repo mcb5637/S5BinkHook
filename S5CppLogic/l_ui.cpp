@@ -1535,4 +1535,3 @@ namespace CppLogic::UI {
 // CppLogic.UI.RemoveWidget("StartMenu00_VersionNumber")
 // CppLogic.UI.SetGUIStateLuaSelection(function(x, y) LuaDebugger.Log(x.."/"..y) end)
 // CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test", "EGUIX::CVideoPlaybackCustomWidget"); XGUIEng.ShowWidget("test", 1); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 250, 250); XGUIEng.StartVideoPlayback("test", "data\\graphics\\videos\\pu_farmer.bik", 1);
-// CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test", "CppLogic::Mod::CustomWidgetRenderTest"); XGUIEng.ShowWidget("test", 1); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 250, 250);

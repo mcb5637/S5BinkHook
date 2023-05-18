@@ -108,6 +108,12 @@ void GGL::CPlayerAttractionHandler::CheckWorkerAttachment(bool forceReAttach)
 	shok_playerattractionhandler_attachworkers(this, forceReAttach);
 }
 
+inline bool(__thiscall* const playerattractionhand_attachwork)(GGL::CPlayerAttractionHandler* th, int w, int b) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerAttractionHandler*, int, int)>(0x4C383E);
+bool GGL::CPlayerAttractionHandler::AttachWorker(int worker, int building)
+{
+	return playerattractionhand_attachwork(this, worker, building);
+}
+
 void (*GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th) = nullptr;
 void __thiscall GGL::CPlayerAttractionHandler::CheckPaydayHook()
 {

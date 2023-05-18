@@ -161,7 +161,7 @@ namespace EGUIX {
 	class IOnEvent {
 	public:
 		virtual ~IOnEvent() = default;
-		virtual int HandleEvent(BB::CEvent* ev, BB::CEvent* evAgain) = 0; // return id of wid that handeled event or 0?
+		virtual int HandleEvent(BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) = 0; // return id of wid that handeled event or 0?
 
 		static inline constexpr unsigned int Identifier = 0xF284ED96;
 	};
@@ -236,6 +236,7 @@ namespace EGUIX {
 		EGUIX::CWidgetStringHelper* GetStringHelper();
 	};
 	static_assert(sizeof(CBaseWidget) == 14 * 4);
+	//constexpr int i = offsetof(CBaseWidget, PosAndSize.H) / 4;
 
 	class CWidgetListHandler {
 	public:
@@ -379,7 +380,7 @@ namespace EGUIX {
 		virtual void Initialize() = 0;
 		virtual void Destroy() = 0;
 		virtual void Render(CCustomWidget* widget, const Rect* screenCoords) = 0;
-		virtual bool HandleEvent(CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain) = 0;
+		virtual bool HandleEvent(CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) = 0;
 	private:
 		virtual int uk3(); // 5
 	public:
@@ -387,13 +388,14 @@ namespace EGUIX {
 		int IntegerUserVariable0 = 0, IntegerUserVariable1 = 0, IntegerUserVariable2 = 0, IntegerUserVariable3 = 0,
 			IntegerUserVariable4 = 0, IntegerUserVariable5 = 0; // ctor memset 0
 		shok::String StringUserVariable[4]; // 7
-		int WidgetId = 0;
+		int WidgetId = 0; // 35
 
 		void RenderLine(const Rect* screenCoords, const EGUIX::Color* c, float x1, float y1, float x2, float y2); // coordinates relative to widget
 
 		static inline constexpr unsigned int Identifier = 0x156D9BF6;
 	};
 	static_assert(sizeof(ICustomWidget)==36*4);
+	static_assert(offsetof(ICustomWidget, WidgetId) == 35 * 4);
 
 	class CCustomWidget : public EGUIX::CBaseWidget, public IRender {
 	public:
@@ -923,6 +925,25 @@ namespace GGUI {
 
 
 namespace EGUIX {
+	//string user var0: lua callback (in _G) (value, widgetId)
+	//string user var1: slider widget name (not actually set to visible, just the material stolen from)
+	//ScrollVertical is set, if height > width
+	class CScrollBarButtonCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+	public:
+		bool RMBDown = false, ScrollVertical = true; //37
+		int SliderValue; // 38
+		shok::AARect CurrentScreenPos; // 39
+		shok::String Callback, SliderName; // 43, 50
+		int SliderWidgetId; // 57
+
+
+		static constexpr int vtp = 0x780A60;
+		static constexpr unsigned int Identifier = 0xFF947B86;
+
+		void UpdateSlider(int value, bool callback);
+		// set value to mouse pos 0x55CB97 __thiscall(EGUIX::CCustomWidget* wid)
+	};
+
 	class WidgetManager { // this thing has no vtable...
 	public:
 		BB::CIDManagerEx* WidgetNameManager;
@@ -977,4 +998,16 @@ namespace EGUIX {
 
 		static inline WidgetLoader* (* const GlobalObj)() = reinterpret_cast<WidgetLoader * (*)()>(0x5563CC);
 	};
+
+	class CEventManager : public IWidgetRegistrationCallback {
+	public:
+		shok::Position CurrentMousePos;
+		PADDINGI(4);
+		shok::Keys CurrentModifiers; // 7
+
+		static inline CEventManager* (__cdecl* const GlobalObj)() = reinterpret_cast<CEventManager * (__cdecl*)()>(0x558C16);
+
+		bool IsModifierPressed(shok::Keys m);
+	};
+	static_assert(offsetof(CEventManager, CurrentModifiers) == 7 * 4);
 }

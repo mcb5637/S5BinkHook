@@ -49,7 +49,7 @@ changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C
 0x4CFC0D GGL::CWorkerBehavior::TaskCheckGoToSupplier call redirect
 0x4D018A GGL::CWorkerBehavior::TaskGoToSupplier call redirect
 0x4FC40C GGL::CDefendableBuildingBehavior::FireArrow jmp
-0x52212B ERwTools::CDefCameraBehaviour::HookEnableZoom single opcode changed (disable mousewheel zoom)
+0x52212B ERwTools::CDefCameraBehaviour::InputEvent single opcode changed (disable mousewheel zoom)
 
 only without SCELoader
 
@@ -115,6 +115,6 @@ list of used identifiers
 0x1009 CppLogic::Mod::FormationSpacedBehaviorProps
 0x100A CppLogic::Mod::OnScreenInfoDisplayBehavior
 0x100B CppLogic::Mod::ResourceTrackerBehavior
-0x100C CppLogic::Mod::CustomWidgetRenderTest
+0x100C CppLogic::Mod::AutoScrollCustomWidget
 0x1010 CppLogic::Mod::FormationSpacedBehavior
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

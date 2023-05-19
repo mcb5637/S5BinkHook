@@ -281,7 +281,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x575B2B)());
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x5EFAC113);
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x5EFAC113);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
@@ -290,7 +290,11 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
-	return 1;
+	auto* w = L.CheckWidget(1);
+	auto* m = static_cast<EGUIX::CContainerWidget*>( EGUIX::WidgetManager::GlobalObj()->GetWidgetByID( w->MotherWidgetID));
+	m->AddWidget(w->Clone(), L.CheckString(2), nullptr);
+	w->PosAndSize.Y -= 10;
+	return 0;
 }
 
 int GetOptions(lua::State L) {
@@ -357,9 +361,7 @@ void InitGame() {
 	EScr::CScriptTriggerSystem::HookFireEvent();
 	CppLogic::EntityAddon::EntityAddonData::Init();
 	CppLogic::Mod::RegisterClasses();
-#ifdef _DEBUG
-	CppLogic::Mod::UI::CustomWidgetRenderTest::Register();
-#endif
+	CppLogic::Mod::UI::RegisterClasses();
 }
 
 constexpr double Version = 2.0006;

@@ -7,7 +7,14 @@
 
 
 namespace CppLogic::Mod::UI {
-	class CustomWidgetRenderTest : public BB::IObject, public EGUIX::ICustomWidget {
+	void RegisterClasses();
+
+	// string user var 0 scrollbar handle name
+	// string user var 1 to scroll widget blueprint
+	// int user var 0 spacing (space between scrolled widgets)
+	// int user var 1 slider spacing (space between slider and top/bottom)
+	// current item can be read out on the scrollables by XGUIEng.GetBaseWidgetUserVariable(XGUIEng.GetCurrentWidgetID(), 0) [0-ElementCount)
+	class AutoScrollCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
@@ -17,7 +24,12 @@ namespace CppLogic::Mod::UI {
 		virtual void Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords) override;
 		virtual bool HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain) override;
 
-		bool a = false;
+		float Offset = 0;
+		int ElementCount = 0;
+		int WidgetCount = 0;
+		std::vector<EGUIX::CBaseWidget*> Widgets;
+		EGUIX::CBaseWidget* Slider = nullptr;
+		bool Dragging = false;
 
 		static constexpr unsigned int Identifier = 0x100C;
 		static constexpr BB::SerializationData* SerializationData = nullptr;
@@ -25,6 +37,11 @@ namespace CppLogic::Mod::UI {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		static void Register();
+		void ReInit();
+		void Update(EGUIX::CBaseWidget* w);
+		void Clamp(EGUIX::CBaseWidget* cw);
+	private:
+		void UpdateBySlider(EGUIX::CBaseWidget* cw, int x, int y);
+		bool ClickedOnSlider(EGUIX::CBaseWidget* cw, int x, int y);
 	};
 }

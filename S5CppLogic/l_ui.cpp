@@ -15,6 +15,7 @@
 #include "s5_netevents.h"
 #include "hooks.h"
 #include "luaserializer.h"
+#include "ModUI.h"
 
 namespace CppLogic::UI {
 	void StringHandlerSetString(luaext::EState L, EGUIX::CSingleStringHandler& h, int i) {
@@ -1111,6 +1112,37 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int InitAutoScrollCustomWidget(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		sc->ElementCount = L.CheckInt(2);
+		sc->ReInit();
+		return 0;
+	}
+	int GetAutoScrollCustomWidgetOffset(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		L.Push(static_cast<int>(sc->Offset));
+		return 1;
+	}
+	int AutoScrollCustomWidgetModOffset(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		sc->Offset += L.CheckFloat(2);
+		sc->Clamp(w);
+		sc->Update(w);
+		return 0;
+	}
+
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
 		return shok::Malloc(s);
@@ -1424,7 +1456,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 71> UI{ {
+	constexpr std::array<lua::FuncReference, 74> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1496,6 +1528,9 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<ReInitShortMessagesSize>("ReInitShortMessagesSize"),
 		lua::FuncReference::GetRef<CreateShortMessage>("CreateShortMessage"),
 		lua::FuncReference::GetRef<RemoveShortMessage>("RemoveShortMessage"),
+		lua::FuncReference::GetRef<InitAutoScrollCustomWidget>("InitAutoScrollCustomWidget"),
+		lua::FuncReference::GetRef<GetAutoScrollCustomWidgetOffset>("GetAutoScrollCustomWidgetOffset"),
+		lua::FuncReference::GetRef<AutoScrollCustomWidgetModOffset>("AutoScrollCustomWidgetModOffset"),
 	} };
 
 	void Init(lua::State L)

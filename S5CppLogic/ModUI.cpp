@@ -96,11 +96,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 	WidgetCount = static_cast<int>(cwid->PosAndSize.H / childs);
 	auto* mother = static_cast<EGUIX::CContainerWidget*>(mng->GetWidgetByID(cwid->MotherWidgetID));
 	for (int o = Widgets.size(); o < std::min(WidgetCount, ElementCount); ++o) {
-		auto w = Widgets[0]->Clone();
-		std::string n = std::format("{}_{}", mng->WidgetNameManager->GetNameByID(Widgets[0]->WidgetID), o);
-		w->UserVariable[0] = o;
-		mother->AddWidget(w, n.c_str(), Widgets.back());
-		Widgets.push_back(w);
+		Widgets.push_back(CloneWidget(Widgets[0], mother, o, Widgets.back()));
 	}
 	Clamp(cwid);
 	Update(cwid);
@@ -164,4 +160,33 @@ bool CppLogic::Mod::UI::AutoScrollCustomWidget::ClickedOnSlider(EGUIX::CBaseWidg
 		}
 	}
 	return false;
+}
+
+EGUIX::CBaseWidget* CppLogic::Mod::UI::AutoScrollCustomWidget::CloneWidget(EGUIX::CBaseWidget* cw, EGUIX::CContainerWidget* mother, int o, EGUIX::CBaseWidget* prev)
+{
+	auto* mng = EGUIX::WidgetManager::GlobalObj();
+	EGUIX::CBaseWidget* w;
+	auto* cont = dynamic_cast<EGUIX::CContainerWidget*>(cw);
+	EGUIX::CContainerWidget* contcl = nullptr;
+	std::string n = std::format("{}_{}", mng->WidgetNameManager->GetNameByID(cw->WidgetID), o);
+	if (cont) {
+		contcl = EGUIX::CContainerWidget::Create();
+		w = contcl;
+		contcl->PosAndSize = cont->PosAndSize;
+		contcl->IsShown = cont->IsShown;
+		contcl->ZPriority = cont->ZPriority;
+		contcl->Group = cont->Group;
+		contcl->ForceToHandleMouseEventsFlag = cont->ForceToHandleMouseEventsFlag;
+		contcl->ForceToNeverBeFoundFlag = cont->ForceToNeverBeFoundFlag;
+	}
+	else {
+		w = cw->Clone();
+	}
+	mother->AddWidget(w, n.c_str(), prev);
+	if (cont) {
+		for (auto* chi : cont->WidgetListHandler.SubWidgets) {
+			CloneWidget(chi, contcl, o, nullptr);
+		}
+	}
+	return w;
 }

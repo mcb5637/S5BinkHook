@@ -951,9 +951,14 @@ namespace EGUIX {
 
 		int GetIdByName(const char* name);
 		EGUIX::CBaseWidget* GetWidgetByID(int id);
-		void RemoveWidget(EGUIX::CBaseWidget* w);
+		void RemoveWidget(EGUIX::CBaseWidget* w); // does not delete
 
 		static inline EGUIX::WidgetManager* (* const GlobalObj)() = reinterpret_cast<EGUIX::WidgetManager * (*)()>(0x558473);
+
+	private:
+		friend class EGUIX::CContainerWidget;
+		void AddWidget(EGUIX::CBaseWidget* w, int id); // widget still needs id and mother
+		int RegisterName(const char* name);
 	};
 
 	class CWidgetGroupManager : public IWidgetRegistrationCallback {

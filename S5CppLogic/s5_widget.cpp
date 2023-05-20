@@ -345,6 +345,16 @@ void EGUIX::WidgetManager::RemoveWidget(EGUIX::CBaseWidget* w)
 {
     widman_removewid(this, w, w->WidgetID);
 }
+static inline void(__thiscall* const widman_addWidget)(EGUIX::WidgetManager* th, EGUIX::CBaseWidget* a, int id) = reinterpret_cast<void(__thiscall*)(EGUIX::WidgetManager*, EGUIX::CBaseWidget*, int)>(0x558AA2);
+void EGUIX::WidgetManager::AddWidget(EGUIX::CBaseWidget* w, int id)
+{
+    widman_addWidget(this, w, id);
+}
+static inline int(__thiscall* const widman_registerName)(EGUIX::WidgetManager* th, const char* name) = reinterpret_cast<int(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x55884F);
+int EGUIX::WidgetManager::RegisterName(const char* name)
+{
+    return widman_registerName(this, name);
+}
 
 static inline int(__thiscall* const widgroupman_getgroupid)(EGUIX::CWidgetGroupManager* th, const char* s) = reinterpret_cast<int(__thiscall*)(EGUIX::CWidgetGroupManager*, const char*)>(0x583214);
 int EGUIX::CWidgetGroupManager::GetGroupId(const char* s)
@@ -357,15 +367,13 @@ int EGUIX::CWidgetGroupManager::CreateGroup(const char* s)
     return widgroupman_creategroup(*reinterpret_cast<int*>(0x894EA4), s, 0);
 }
 
-static inline int(__thiscall* const widman_registerName)(EGUIX::WidgetManager* th, const char* name) = reinterpret_cast<int(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x55884F);
-static inline void(__thiscall* const widman_addWidget)(EGUIX::WidgetManager* th, EGUIX::CBaseWidget* a, int id) = reinterpret_cast<void(__thiscall*)(EGUIX::WidgetManager*, EGUIX::CBaseWidget*, int)>(0x558AA2);
 void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* name, const EGUIX::CBaseWidget* before)
 {
     EGUIX::WidgetManager* m = EGUIX::WidgetManager::GlobalObj();
-    int newId = widman_registerName(m, name);
+    int newId = m->RegisterName(name);
     if (newId) {
         toAdd->WidgetID = newId;
-        widman_addWidget(m, toAdd, newId);
+        m->AddWidget(toAdd, newId);
         AddChild(toAdd);
         if (before) {
             auto l = WidgetListHandler.SubWidgets.SaveList();

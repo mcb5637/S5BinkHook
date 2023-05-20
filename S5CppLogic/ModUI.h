@@ -43,5 +43,6 @@ namespace CppLogic::Mod::UI {
 	private:
 		void UpdateBySlider(EGUIX::CBaseWidget* cw, int x, int y);
 		bool ClickedOnSlider(EGUIX::CBaseWidget* cw, int x, int y);
+		EGUIX::CBaseWidget* CloneWidget(EGUIX::CBaseWidget* cw, EGUIX::CContainerWidget* mother, int o, EGUIX::CBaseWidget* prev);
 	};
 }

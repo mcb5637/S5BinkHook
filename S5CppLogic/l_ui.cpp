@@ -1120,8 +1120,9 @@ namespace CppLogic::UI {
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
 		sc->ElementCount = L.CheckInt(2);
 		sc->ReInit();
+		L.Push(sc->ElementCount);
 		L.Push(sc->WidgetCount);
-		return 1;
+		return 2;
 	}
 	int GetAutoScrollCustomWidgetOffset(lua::State l) {
 		luaext::EState L{ l };
@@ -1129,7 +1130,7 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
-		L.Push(static_cast<int>(sc->Offset));
+		L.Push(sc->Offset);
 		L.Push(sc->WidgetCount);
 		L.Push(sc->ElementCount);
 		return 3;

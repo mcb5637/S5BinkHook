@@ -2760,7 +2760,7 @@ function CppLogic.UI.InitAutoScrollCustomWidget(id, numToScroll) end
 
 ---gets the offset, widget count and element count of a CppLogic::Mod::UI::AutoScrollCustomWidget.
 ---@param id number
----@return number offset offset of rendered widgets (clamped to int)
+---@return number offset offset of rendered widgets (float, floor to get the base offset)
 ---@return number widgetCount number of widgets active
 ---@return number elementCount number of elements to scroll
 function CppLogic.UI.GetAutoScrollCustomWidgetOffset(id) end

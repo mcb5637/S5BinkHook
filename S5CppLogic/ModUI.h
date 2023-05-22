@@ -9,11 +9,16 @@
 namespace CppLogic::Mod::UI {
 	void RegisterClasses();
 
-	// string user var 0 scrollbar handle name
+	// string user var 0 scrollbar handle name (may be empty)
 	// string user var 1 to scroll widget blueprint
 	// int user var 0 spacing (space between scrolled widgets)
-	// int user var 1 slider spacing (space between slider and top/bottom)
 	// current item can be read out on the scrollables by XGUIEng.GetBaseWidgetUserVariable(XGUIEng.GetCurrentWidgetID(), 0) [0-ElementCount)
+	// set up EGUIX::CContainerWidget with AutoScrollCustomWidget at full size. add one toScroll widget (may be EGUIX::CContainerWidget) and set its name in AutoScrollCustomWidget.
+	//		(this widget will get cloned to fill the space of the AutoScrollCustomWidget).
+	// if you want to use the bar (and not just the mousewheel) add a Container where the scrollbar travels (has to be directly in the same
+	//		Container as the AutoScrollCustomWidget) and a EGUIX::CStaticWidget as the scroll handle into it. then just set the handles name in AutoScrollCustomWidget).
+	//		You also might want to add up and down Buttons over and under the scrollbar travel container.
+	//		The scrollbar handle will be set visible only if it is needed, so you might want to do the same to any background and button elements.
 	class AutoScrollCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
 		virtual unsigned int __stdcall GetClassIdentifier() const override;
@@ -28,7 +33,7 @@ namespace CppLogic::Mod::UI {
 		int ElementCount = 0;
 		int WidgetCount = 0;
 		std::vector<EGUIX::CBaseWidget*> Widgets;
-		EGUIX::CBaseWidget* Slider = nullptr;
+		EGUIX::CBaseWidget* Slider = nullptr, * SliderTravel = nullptr;
 		bool Dragging = false;
 
 		static constexpr unsigned int Identifier = 0x100C;

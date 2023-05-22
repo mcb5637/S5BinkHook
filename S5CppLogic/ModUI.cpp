@@ -32,7 +32,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Destroy()
 }
 void CppLogic::Mod::UI::AutoScrollCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
 {
-	
+
 }
 bool CppLogic::Mod::UI::AutoScrollCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain)
 {
@@ -89,6 +89,9 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 		id = mng->GetIdByName(StringUserVariable[0].c_str());
 		if (id) {
 			Slider = mng->GetWidgetByID(id);
+			if (Slider) {
+				SliderTravel = mng->GetWidgetByID(Slider->MotherWidgetID);
+			}
 		}
 	}
 	auto* cwid = mng->GetWidgetByID(WidgetId);
@@ -122,8 +125,8 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Update(EGUIX::CBaseWidget* cw)
 	if (Slider) {
 		if (ElementCount > WidgetCount) {
 			Slider->SetVisibility(true);
-			float barlen = cw->PosAndSize.H - Slider->PosAndSize.H - IntegerUserVariable1 * 2;
-			Slider->PosAndSize.Y = IntegerUserVariable1 + Offset / (ElementCount - WidgetCount) * barlen;
+			float barlen = SliderTravel->PosAndSize.H - Slider->PosAndSize.H;
+			Slider->PosAndSize.Y = Offset / (ElementCount - WidgetCount) * barlen;
 		}
 		else {
 			Slider->SetVisibility(false);
@@ -142,8 +145,8 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Clamp(EGUIX::CBaseWidget* cw)
 void CppLogic::Mod::UI::AutoScrollCustomWidget::UpdateBySlider(EGUIX::CBaseWidget* cw, int x, int y)
 {
 	if (Slider && ElementCount > WidgetCount) {
-		float barlen = cw->PosAndSize.H - Slider->PosAndSize.H - IntegerUserVariable1 * 2;
-		Offset = (y - IntegerUserVariable1 - Slider->PosAndSize.H / 2) / barlen * (ElementCount - WidgetCount);
+		float barlen = SliderTravel->PosAndSize.H - Slider->PosAndSize.H;
+		Offset = (y - SliderTravel->PosAndSize.Y - Slider->PosAndSize.H / 2) / barlen * (ElementCount - WidgetCount);
 		Clamp(cw);
 	}
 }
@@ -151,10 +154,10 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::UpdateBySlider(EGUIX::CBaseWidge
 bool CppLogic::Mod::UI::AutoScrollCustomWidget::ClickedOnSlider(EGUIX::CBaseWidget* cw, int x, int y)
 {
 	if (Slider && ElementCount > WidgetCount) {
-		float xh = Slider->PosAndSize.X + Slider->PosAndSize.W + IntegerUserVariable0;
-		float xl = Slider->PosAndSize.X - IntegerUserVariable0;
-		float yl = static_cast<float>(IntegerUserVariable1);
-		float yh = cw->PosAndSize.H - IntegerUserVariable1;
+		float xl = SliderTravel->PosAndSize.X;
+		float xh = SliderTravel->PosAndSize.X + SliderTravel->PosAndSize.W;
+		float yl = SliderTravel->PosAndSize.Y;
+		float yh = SliderTravel->PosAndSize.Y + SliderTravel->PosAndSize.H;
 		if (xl <= x && x <= xh && yl <= y && y <= yh) {
 			return true;
 		}

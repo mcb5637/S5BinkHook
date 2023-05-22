@@ -377,14 +377,12 @@ void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* n
         AddChild(toAdd);
         if (before) {
             auto l = WidgetListHandler.SubWidgets.SaveList();
-            auto it = l.List.begin();
-            while (it != l.List.end()) {
-                if (*it == before) {
-                    l.List.splice(it, l.List, --l.List.end());
-                    break;
-                }
-
-                it++;
+            auto newit = std::find(l.List.begin(), l.List.end(), toAdd);
+            if (newit == l.List.end()) // wtf, just added it
+                return;
+            auto it = std::find(l.List.begin(), l.List.end(), before);
+            if (it != l.List.end()) {
+                l.List.splice(it, l.List, newit);
             }
         }
     }

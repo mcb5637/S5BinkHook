@@ -123,7 +123,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Update(EGUIX::CBaseWidget* cw)
 		if (ElementCount > WidgetCount) {
 			Slider->SetVisibility(true);
 			float barlen = cw->PosAndSize.H - Slider->PosAndSize.H - IntegerUserVariable1 * 2;
-			Slider->PosAndSize.Y = IntegerUserVariable1 + Offset / ElementCount * barlen;
+			Slider->PosAndSize.Y = IntegerUserVariable1 + Offset / (ElementCount - WidgetCount) * barlen;
 		}
 		else {
 			Slider->SetVisibility(false);
@@ -143,7 +143,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::UpdateBySlider(EGUIX::CBaseWidge
 {
 	if (Slider && ElementCount > WidgetCount) {
 		float barlen = cw->PosAndSize.H - Slider->PosAndSize.H - IntegerUserVariable1 * 2;
-		Offset = (y - IntegerUserVariable1 - Slider->PosAndSize.H / 2) / barlen * ElementCount;
+		Offset = (y - IntegerUserVariable1 - Slider->PosAndSize.H / 2) / barlen * (ElementCount - WidgetCount);
 		Clamp(cw);
 	}
 }
@@ -181,6 +181,11 @@ EGUIX::CBaseWidget* CppLogic::Mod::UI::AutoScrollCustomWidget::CloneWidget(EGUIX
 	}
 	else {
 		w = cw->Clone();
+	}
+	if (auto* stxtw = BB::IdentifierCast<EGUIX::CStaticTextWidget>(cw)) {
+		auto* cotxt = static_cast<EGUIX::CStaticTextWidget*>(w);
+		cotxt->FirstLineToPrint = stxtw->FirstLineToPrint;
+		cotxt->NumberOfLinesToPrint = stxtw->NumberOfLinesToPrint;
 	}
 	mother->AddWidget(w, n.c_str(), prev);
 	if (cont) {

@@ -203,7 +203,7 @@ namespace EGUIX {
 		EGUIX::Rect PosAndSize;
 		bool IsShown; //9
 		PADDING(3);
-		float ZPriority;
+		float ZPriority; // 10 CContainerWidget sorts widgets based on this, lower value gets bumped down to lower list pos
 		int MotherWidgetID;
 		int Group; // 12
 		bool ForceToHandleMouseEventsFlag, ForceToNeverBeFoundFlag;
@@ -267,7 +267,7 @@ namespace EGUIX {
 		bool UpdateManualFlag;
 		PADDING(3);
 		int FirstLineToPrint, NumberOfLinesToPrint;
-		float LineDistanceFactor;
+		float LineDistanceFactor; // 73
 
 		static inline constexpr int vtp = 0x780EE4;
 		static inline constexpr int TypeDesc = 0x82D95C;

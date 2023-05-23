@@ -319,6 +319,7 @@ namespace EGUIX {
 		static inline constexpr unsigned int Identifier = 0x5DD085A6;
 
 		static EGUIX::CTextButtonWidget* Create();
+		static void HookFixTextRender();
 	};
 
 	class CContainerWidget : public EGUIX::CBaseWidget, public IRender, public IWidgetRegistrationCallback { // irender 15

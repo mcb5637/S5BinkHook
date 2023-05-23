@@ -50,6 +50,7 @@ changed jump condition on 0x4C6A68, 0x4C6CE8, 0x4C6C4E, 0x4C6FB7, 0x4C6DD3, 0x4C
 0x4D018A GGL::CWorkerBehavior::TaskGoToSupplier call redirect
 0x4FC40C GGL::CDefendableBuildingBehavior::FireArrow jmp
 0x52212B ERwTools::CDefCameraBehaviour::InputEvent single opcode changed (disable mousewheel zoom)
+0x55F14F EGUIX::CTextButtonWidget::Render noped out some screensize garbage that moved text away from the button
 
 only without SCELoader
 

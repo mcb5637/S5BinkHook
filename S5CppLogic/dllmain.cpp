@@ -362,6 +362,7 @@ void InitGame() {
 	CppLogic::EntityAddon::EntityAddonData::Init();
 	CppLogic::Mod::RegisterClasses();
 	CppLogic::Mod::UI::RegisterClasses();
+	EGUIX::CTextButtonWidget::HookFixTextRender();
 }
 
 constexpr double Version = 2.0006;

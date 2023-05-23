@@ -427,6 +427,13 @@ EGUIX::CTextButtonWidget* EGUIX::CTextButtonWidget::Create()
     r->IsShown = false;
     return r;
 }
+void EGUIX::CTextButtonWidget::HookFixTextRender()
+{
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55F14F), 0x55F17C - 0x55F14F };
+    CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x55F14F), reinterpret_cast<void*>(0x55F15D));
+    CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x55F16A), reinterpret_cast<void*>(0x55F17C));
+}
+
 static inline void(__thiscall* const progbarwid_ctor)(EGUIX::CProgressBarWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CProgressBarWidget*)>(0x55E300);
 EGUIX::CProgressBarWidget* EGUIX::CProgressBarWidget::Create()
 {

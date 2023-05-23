@@ -388,6 +388,40 @@ void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* n
     }
 }
 
+EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* toClone, std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)> nameGen, EGUIX::CBaseWidget* before)
+{
+    auto* mng = EGUIX::WidgetManager::GlobalObj();
+    EGUIX::CBaseWidget* w;
+    auto* cont = dynamic_cast<EGUIX::CContainerWidget*>(toClone);
+    EGUIX::CContainerWidget* contcl = nullptr;
+    std::string n = nameGen(mng->WidgetNameManager->GetNameByID(toClone->WidgetID), toClone);
+    if (cont) {
+        contcl = EGUIX::CContainerWidget::Create();
+        w = contcl;
+        contcl->PosAndSize = cont->PosAndSize;
+        contcl->IsShown = cont->IsShown;
+        contcl->ZPriority = cont->ZPriority;
+        contcl->Group = cont->Group;
+        contcl->ForceToHandleMouseEventsFlag = cont->ForceToHandleMouseEventsFlag;
+        contcl->ForceToNeverBeFoundFlag = cont->ForceToNeverBeFoundFlag;
+    }
+    else {
+        w = toClone->Clone();
+    }
+    if (auto* stxtw = BB::IdentifierCast<EGUIX::CStaticTextWidget>(toClone)) {
+        auto* cotxt = static_cast<EGUIX::CStaticTextWidget*>(w);
+        cotxt->FirstLineToPrint = stxtw->FirstLineToPrint;
+        cotxt->NumberOfLinesToPrint = stxtw->NumberOfLinesToPrint;
+    }
+    this->AddWidget(w, n.c_str(), before);
+    if (cont) {
+        for (auto* chi : cont->WidgetListHandler.SubWidgets) {
+            contcl->CloneAsChild(chi, nameGen, nullptr);
+        }
+    }
+    return w;
+}
+
 void(__thiscall* const shok_EGUIX_CLuaFunctionHelper_ctor)(EGUIX::CLuaFunctionHelper* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CLuaFunctionHelper * th)>(0x55BEA2);
 static inline void(__thiscall* const widlisthandler_ctor)(EGUIX::CWidgetListHandler* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CWidgetListHandler*)>(0x55BB26);
 

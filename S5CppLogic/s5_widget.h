@@ -336,6 +336,7 @@ namespace EGUIX {
 
 	public:
 		void AddWidget(EGUIX::CBaseWidget* toAdd, const char* name, const EGUIX::CBaseWidget* before);
+		EGUIX::CBaseWidget* CloneAsChild(EGUIX::CBaseWidget* toClone, std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)> nameGen, EGUIX::CBaseWidget* before = nullptr);
 		static EGUIX::CContainerWidget* Create();
 	};
 	static_assert(sizeof(CContainerWidget) == 20 * 4);

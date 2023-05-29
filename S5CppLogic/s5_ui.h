@@ -691,3 +691,21 @@ namespace GGUI {
 	};
 	//constexpr int i = offsetof(CManager, CommandStates) / 4;
 }
+
+namespace ED {
+	class IGUIScene {
+	public:
+		virtual ~IGUIScene() = default;
+		virtual void Destroy() = 0;
+
+		static constexpr int vtp = 0x769490;
+	};
+	class CGUIScene : public IGUIScene {
+	public:
+		PADDINGI(1); // some renderware obj
+		ED::CGUICamera* Camera;
+		PADDINGI(1); // some renderware obj
+
+		static constexpr int vtp = 0x76949C;
+	};
+}

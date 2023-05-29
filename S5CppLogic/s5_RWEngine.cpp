@@ -242,6 +242,13 @@ int RWE::RwDevice::SetTextureRaster(RWE::RwRaster* r)
     return fpRenderStateSet(RwRenderState::rwRENDERSTATETEXTURERASTER, r);
 }
 
+inline RWE::RwVideoMode* (__cdecl* const videomode_getinfo)(RWE::RwVideoMode* m, int mode) = reinterpret_cast<RWE::RwVideoMode * (__cdecl*)(RWE::RwVideoMode*, int)>(0x40FEC0);
+bool RWE::RwVideoMode::GetInfo(int mode)
+{
+    return videomode_getinfo(this, mode) != nullptr;
+}
+
+
 static inline RwTexture* (__cdecl* const texture_read)(const char* n, const char* m) = reinterpret_cast<RwTexture* (__cdecl*)(const char*, const char*)>(0x417DB0);
 RwTexture* RwTexture::Read(const char* name, const char* mask)
 {

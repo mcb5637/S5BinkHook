@@ -101,6 +101,8 @@ namespace ED {
 	class CEffectProps;
 	class EntityTypeDisplayProps;
 	class CTerrainDecalBase;
+	class CGUIScene;
+	class CGUICamera;
 }
 namespace GD {
 	class CDDisplay;

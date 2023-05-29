@@ -169,6 +169,7 @@ namespace ED {
 	class CCamera {
 	public:
 		virtual ~CCamera() = default;
+		// 1 more func
 	};
 	class CCameraEx : public CCamera {
 	public:
@@ -176,6 +177,11 @@ namespace ED {
 		void* SomeCameraData;
 
 		static inline constexpr int vtp = 0x769E64;
+	};
+	class CGUICamera : public CCamera {
+	public:
+
+		static constexpr int vtp = 0x769EB0;
 	};
 
 	class IPlayerColors {
@@ -435,7 +441,7 @@ namespace ED {
 		ED::CCameraEx* Camera;
 		ED::CCommandAcknowledgements* CommandAcks;
 		ED::CEntitiesTypeFlags* EntityTypeFlags; // 15
-		PADDINGI(1); // p to ED::CGUIScene
+		ED::CGUIScene* Scene;
 		PADDINGI(1); // unknown
 		PADDINGI(1); // p to ED::CLight
 		PADDINGI(1); // unknown

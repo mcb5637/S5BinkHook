@@ -905,7 +905,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("b out of range");
 		float timefactor = L.OptFloat(6, 1);
 		float scalefactor = L.OptFloat(7, 1);
-		GGUI::MiniMapMarkerHandler::GlobalObj()->CreateMarker(p, pulsing, r, g, b, timefactor, scalefactor);
+		GGUI::MiniMapHandler::GlobalObj()->CreateMarker(p, pulsing, r, g, b, timefactor, scalefactor);
 		return 0;
 	}
 
@@ -922,7 +922,7 @@ namespace CppLogic::UI {
 		if (b < 0 || b > 255)
 			throw lua::LuaException("b out of range");
 		float scalefactor = L.OptFloat(5, 1);
-		GGUI::MiniMapMarkerHandler::GlobalObj()->CreateSignalDefault(p, r, g, b, scalefactor);
+		GGUI::MiniMapHandler::GlobalObj()->CreateSignalDefault(p, r, g, b, scalefactor);
 		return 0;
 	}
 

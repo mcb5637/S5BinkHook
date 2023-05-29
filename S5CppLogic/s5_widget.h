@@ -902,10 +902,12 @@ namespace GGUI {
 		CMiniMapSignalDefault(float x, float y, int r, int g, int b, float scaleFactor);
 	};
 
-	class MiniMapMarkerHandler {
+	class MiniMapHandler { // size 251
 	public:
 		// no vtable
-		PADDINGI(88);
+		PADDINGI(2);
+		EGUIX::Rect MiniMapRenderPos;
+		PADDINGI(82);
 		PADDINGI(13);
 		shok::Vector<CMiniMapSignalDefault> Defaults;
 		PADDINGI(12);
@@ -914,14 +916,18 @@ namespace GGUI {
 		void CreateMarker(const shok::Position& p, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor);
 		void CreateSignalDefault(const shok::Position& p, int r, int g, int b, float scaleFactor);
 
-		static inline MiniMapMarkerHandler* (__cdecl* const GlobalObj)() = reinterpret_cast<MiniMapMarkerHandler * (__cdecl*)()>(0x52FE1C);
+		static inline MiniMapHandler* (__cdecl* const GlobalObj)() = reinterpret_cast<MiniMapHandler * (__cdecl*)()>(0x52FE1C); // ret 0x882AB8
+		// ctor 0x52FDBB
+		// set render rect 0x53D9E0 __thiscall(EGUIX::Rect*)
 	};
-	static_assert(offsetof(MiniMapMarkerHandler, Pulses) == 117 * 4);
-	//constexpr int i = offsetof(MiniMapMarkerHandler, Pulses) / 4;
-	class CMiniMapCustomWidget : public EGUIX::CCustomWidget {
+	static_assert(offsetof(MiniMapHandler, MiniMapRenderPos) == 2 * 4);
+	static_assert(offsetof(MiniMapHandler, Pulses) == 117 * 4);
+	//constexpr int i = offsetof(MiniMapHandler, Pulses) / 4;
+	class CMiniMapCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
 		static inline constexpr int vtp = 0x77BF54;
+		static constexpr unsigned int Identifier = 0x98C68876;
 	};
 }
 

@@ -489,6 +489,70 @@ namespace RWE {
 	static_assert(offsetof(RwGlobals, memoryFuncs) == 264);
 	static_assert(offsetof(RwGlobals, dOpenDevice.fpRenderStateSet) == 4*8);
 	//constexpr int i = offsetof(RwGlobals, dOpenDevice)/4;
+
+	enum class RwVideoModeFlag : int
+	{
+		rwVIDEOMODEEXCLUSIVE = 0x0001, /**<Exclusive (i.e. full-screen) */
+		rwVIDEOMODEINTERLACE = 0x0002, /**<Interlaced                   */
+		rwVIDEOMODEFFINTERLACE = 0x0004, /**<Flicker Free Interlaced      */
+
+		/* Platform specific video mode flags. */
+
+		rwVIDEOMODE_PS2_FSAASHRINKBLIT = 0x0100,
+		/**< \if sky2
+		 *   Full-screen antialiasing mode 0
+		 *   \endif
+		 */
+		rwVIDEOMODE_PS2_FSAAREADCIRCUIT = 0x0200,
+		/**< \if sky2
+		 *   Full-screen antialiasing mode 1
+		 *   \endif
+		 */
+
+		rwVIDEOMODE_XBOX_WIDESCREEN = 0x0100,
+		/**< \if xbox
+		 *   Wide screen.
+		 *   \endif
+		 */
+		rwVIDEOMODE_XBOX_PROGRESSIVE = 0x0200,
+		/**< \if xbox
+		 *   Progressive.
+		 *   \endif
+		 */
+		rwVIDEOMODE_XBOX_FIELD = 0x0400,
+		/**< \if xbox
+		 *   Field rendering.
+		 *   \endif
+		 */
+		rwVIDEOMODE_XBOX_10X11PIXELASPECT = 0x0800,
+		/**< \if xbox
+		 *   The frame buffer is centered on the display.
+		 *   On a TV that is 704 pixels across, this would leave 32 pixels of black
+		 *   border on the left and 32 pixels of black border on the right.
+		 *   \endif
+		 */
+	};
+	/**
+	 * \ingroup rwengine
+	 * \struct RwVideoMode
+	 * This type represents a video mode available on a device specified
+	 * by the frame buffer resolution (width and height) and depth,
+	 * and a flag indicating  whether the device has exclusive use of
+	 * the mode (see API function \ref RwEngineGetVideoModeInfo): */
+	struct RwVideoMode
+	{
+		int         width;   /**< Width  */
+		int         height;  /**< Height */
+		int         depth;   /**< Depth  */
+		RwVideoModeFlag flags;   /**< Flags  */
+		int         refRate; /**< Approximate refresh rate */
+		int         format;  /**< Raster format \see RwRasterFormat */
+
+		static inline int(__cdecl*const GetNumVideoModes)() = reinterpret_cast<int(__cdecl*)()>(0x40FE70);
+		bool GetInfo(int mode); // returns sucess
+		static inline int(__cdecl* const SetVideoMode)(int mode) = reinterpret_cast<int(__cdecl*)(int mode)>(0x40FF70);
+		static inline int(__cdecl* const GetVideoMode)() = reinterpret_cast<int(__cdecl*)()>(0x40FF20);
+	};
 }
 
 struct RwTexture {

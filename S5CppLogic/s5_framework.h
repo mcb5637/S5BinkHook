@@ -295,14 +295,23 @@ namespace Framework {
 		GS3DTools::CMapData CurrentMap; // 4
 		//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent event 0x518C5B
 		// GS3DTools::CMapData::vtable???
-		PADDINGI(63);
+		PADDINGI(49);
+		shok::String ReplayToLoad; // 76 from commandline, not sure if it does anything
+		shok::String GUIReplay; // 83 from commandline, not sure it does anything
 		shok::String SavegameToLoad; // 90
-		PADDINGI(14);
+		shok::String SaveAfterXSeconds; // 97 from commandline, not sure it does anything
+		PADDINGI(2);
+		bool UseExeDir, MP, GrabScreenshots; // 106 from commandline, not sure if they do anything
+		PADDINGI(1);
+		double Tickrate; // 108
+		bool HideGUI, RecordGUI; // 110
 		shok::String Language; // 111
 		shok::String OldGameVersion; // 118 unused, SHOKPC1.05
 		shok::String UbiComGameName; // 125
 		shok::String SoundtrackLanguage; // 132
-		PADDINGI(4);
+		int ExtraCmdOnly; // 139
+		bool DebugScript;
+		PADDINGI(2);
 		CLuaDebuggerPort* LuaDebuggerPort;
 		lua_State* MainmenuState; // 144
 		bool MainmenuInitialized; // just call to reinit instead of init, lua scripts are loaded from winmain
@@ -311,7 +320,18 @@ namespace Framework {
 		int one;
 	public:
 		GGlue::CGluePropsMgr* GluePropsManager; // 150
-		PADDINGI(18);
+		PADDINGI(9);
+		struct SWindowData {
+			HWND MainWindow;
+			void* someFunc;
+			PADDINGI(1);
+			bool Windowed;
+			int Width;
+			int Height;
+			int ColorDepth;
+			bool Initialized;
+			int TextureResolution;
+		} WindowData; // 160
 		AGameModeBase* GameModeBase; // 169
 		PADDINGI(1);
 		NextMode ToDo; // 171
@@ -338,6 +358,8 @@ namespace Framework {
 
 		static inline constexpr int vtp = 0x76293C;
 
+		// parse cmd args 0x4082F3 uknownObj->__thiscall(const char* str, void* CMainp4)
+
 		void SaveGDB();
 
 		static inline Framework::CMain** const GlobalObj = reinterpret_cast<Framework::CMain**>(0x84EF60);
@@ -357,7 +379,8 @@ namespace Framework {
 	static_assert(offsetof(Framework::CMain, SavegameToLoad) == 90 * 4);
 	static_assert(offsetof(Framework::CMain, GluePropsManager) == 150 * 4);
 	static_assert(offsetof(Framework::CMain, CampagnInfoHandler) == 174 * 4);
-	//constexpr int i = offsetof(Framework::CMain, MainmenuState) / 4;
+	static_assert(sizeof(Framework::CMain::SWindowData) == 4 * 9);
+	constexpr int i = offsetof(Framework::CMain, MainmenuState) / 4;
 }
 
 

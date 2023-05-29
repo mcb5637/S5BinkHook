@@ -290,10 +290,10 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
-	auto* w = L.CheckWidget(1);
-	auto* m = static_cast<EGUIX::CContainerWidget*>( EGUIX::WidgetManager::GlobalObj()->GetWidgetByID( w->MotherWidgetID));
-	m->AddWidget(w->Clone(), L.CheckString(2), nullptr);
-	w->PosAndSize.Y -= 10;
+	MoveWindow(*shok::MainWindowHandle, 0, 0, 1600, 900, true);
+	auto* r = shok::UIRenderer::GlobalObj();
+	r->RenderSizeX = 1600;
+	r->RenderSizeY = 900;
 	return 0;
 }
 

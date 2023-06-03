@@ -7,6 +7,13 @@ void ECore::IReplayStreamExtension::unknown0()
 {
 }
 
+void __stdcall GS3DTools::CGUIReplaySystem::PostEvent(BB::CEvent* ev)
+{
+}
+void __stdcall GS3DTools::CGUIReplaySystem::CPlayingReplay::PostEvent(BB::CEvent* ev)
+{
+}
+
 inline GS3DTools::CMapData* (__thiscall* const mapdata_assign)(GS3DTools::CMapData* th, const GS3DTools::CMapData* o) = reinterpret_cast<GS3DTools::CMapData * (__thiscall*)(GS3DTools::CMapData*, const GS3DTools::CMapData*)>(0x4029B8);
 GS3DTools::CMapData& GS3DTools::CMapData::operator=(const GS3DTools::CMapData& o)
 {
@@ -267,6 +274,11 @@ inline void(__thiscall* const framew_savegdb)(Framework::CMain* th) = reinterpre
 void Framework::CMain::SaveGDB()
 {
     framew_savegdb(this);
+}
+inline ED::CGUICamera* (__thiscall* const framew_getcam)(Framework::CMain* th) = reinterpret_cast<ED::CGUICamera * (__thiscall*)(Framework::CMain*)>(0x4088AF);
+ED::CGUICamera* Framework::CMain::GetCamera()
+{
+    return framew_getcam(this);
 }
 
 void (*Framework::CMain::OnModeChange)(NextMode mode) = nullptr;

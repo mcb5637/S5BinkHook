@@ -315,4 +315,50 @@ namespace RWE {
 									* (except on PlayStation 2), it is intended
 									* for use by user-created pipelines */
 	};
+
+	enum class RwStandardFunc : int {
+		rwSTANDARDNASTANDARD = 0,
+		rwSTANDARDCAMERABEGINUPDATE = 1,   /* Start 3d camera update */
+		rwSTANDARDRGBTOPIXEL = 2,   /* For an RGB value return a pixel value */
+		rwSTANDARDPIXELTORGB = 3,   /* For a pixel value returns a RGB value */
+		rwSTANDARDRASTERCREATE = 4,   /* Create an raster */
+		rwSTANDARDRASTERDESTROY = 5,   /* Raster destroy */
+		rwSTANDARDIMAGEGETRASTER = 6,   /* Get image from a raster */
+		rwSTANDARDRASTERSETIMAGE = 7,   /* Set raster from an image */
+		rwSTANDARDTEXTURESETRASTER = 8,   /* Set texture's raster */
+		rwSTANDARDIMAGEFINDRASTERFORMAT = 9,   /* Find a suitable raster format for an image */
+		rwSTANDARDCAMERAENDUPDATE = 10,  /* End 3d camera update */
+		rwSTANDARDSETRASTERCONTEXT = 11,  /* Start destination of 2d operations */
+		rwSTANDARDRASTERSUBRASTER = 12,  /* Make a raster inside another raster */
+		rwSTANDARDRASTERCLEARRECT = 13,  /* Clear a rectangle of the current dest raster */
+		rwSTANDARDRASTERCLEAR = 14,  /* Clear the current dest raster */
+		rwSTANDARDRASTERLOCK = 15, /* Lock a raster to get it's pixels */
+		rwSTANDARDRASTERUNLOCK = 16,  /* Unlock a raster to return it's pixels */
+		rwSTANDARDRASTERRENDER = 17,  /* Render a raster (not scaled, but masked) */
+		rwSTANDARDRASTERRENDERSCALED = 18,  /* Render a raster (scaled and masked) */
+		rwSTANDARDRASTERRENDERFAST = 19,  /* Render a raster (not scaled or masked) */
+		rwSTANDARDRASTERSHOWRASTER = 20,  /* Show a camera raster */
+		rwSTANDARDCAMERACLEAR = 21,  /* Clear a camera's raster and/or Z raster */
+		rwSTANDARDHINTRENDERF2B = 22,  /* Set hint for rendering direction in the world */
+		rwSTANDARDRASTERLOCKPALETTE = 23,  /* Lock a raster to get it's palette */
+		rwSTANDARDRASTERUNLOCKPALETTE = 24,  /* Unlock a raster to return it's palette */
+		rwSTANDARDNATIVETEXTUREGETSIZE = 25,  /* Get size of native texture when written to a stream */
+		rwSTANDARDNATIVETEXTUREREAD = 26,  /* Read native texture from the stream */
+		rwSTANDARDNATIVETEXTUREWRITE = 27,  /* Write native texture to the stream */
+		rwSTANDARDRASTERGETMIPLEVELS = 28,  /* Get the number of mip levels in a raster */
+		rwSTANDARDNUMOFSTANDARD = 29,
+	};
+
+	enum class RwCameraClearMode : int
+	{
+		rwCAMERACLEARIMAGE = 0x1,   /**<Clear the frame buffer */
+		rwCAMERACLEARZ = 0x2,       /**<Clear the Z buffer */
+		rwCAMERACLEARSTENCIL = 0x4, /**<\if xbox   Clear the stencil buffer \endif
+									  * \if d3d8   Clear the stencil buffer \endif
+									  * \if d3d9   Clear the stencil buffer \endif
+									  * \if opengl Clear the stencil buffer \endif
+									  */
+	};
+	template<>
+	class ::enum_is_flags<RwCameraClearMode> : public std::true_type {};
 }

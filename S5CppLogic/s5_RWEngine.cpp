@@ -80,6 +80,11 @@ RWE::RwMatrix* RWE::RwFrame::GetLTM()
 {
     return frame_getltm(this);
 }
+inline void(__cdecl* const frame_destroy)(RWE::RwFrame* f) = reinterpret_cast<void(__cdecl*)(RWE::RwFrame*)>(0x414470);
+void RWE::RwFrame::Destroy()
+{
+    frame_destroy(this);
+}
 
 static inline int(__cdecl* const stream_close)(RWE::RwStream* s, void* d) = reinterpret_cast<int(__cdecl*)(RWE::RwStream*, void*)>(0x41A810);
 bool RWE::RwStream::Close(void* data)
@@ -106,6 +111,11 @@ static inline int(__cdecl* const raster_destroy)(RWE::RwRaster* r) = reinterpret
 void RWE::RwRaster::Destroy()
 {
     raster_destroy(this);
+}
+inline RWE::RwRaster* (__cdecl* const raster_show)(RWE::RwRaster* th, HWND w, int vs) = reinterpret_cast<RWE::RwRaster * (__cdecl*)(RWE::RwRaster*, HWND, int)>(0x418B70);
+bool RWE::RwRaster::ShowRaster(HWND window, bool vsync)
+{
+    return raster_show(this, window, vsync ? 1 : 0);
 }
 
 static inline int(__cdecl* const atomic_isparticleemitter)(RWE::RpAtomic* a) = reinterpret_cast<int(__cdecl*)(RWE::RpAtomic*)>(0x5D9210);
@@ -196,6 +206,66 @@ void RWE::RpClump::RemoveAtomic(RpAtomic* atomic)
     clump_remAtomic(this, atomic);
 }
 
+inline void(__cdecl* const camera_setframe)(RWE::RwCamera* cam, RWE::RwFrame* f) = reinterpret_cast<void(__cdecl*)(RWE::RwCamera*, RWE::RwFrame*)>(0x42C290);
+void RWE::RwCamera::SetFrame(RwFrame* f)
+{
+    camera_setframe(this, f);
+}
+inline void(__cdecl* const camera_destroy)(RWE::RwCamera* c) = reinterpret_cast<void(__cdecl*)(RWE::RwCamera*)>(0x41A070);
+void RWE::RwCamera::Destroy()
+{
+    camera_destroy(this);
+}
+inline void(__cdecl* const camera_destroyext)(RWE::RwCamera* c) = reinterpret_cast<void(__cdecl*)(RWE::RwCamera*)>(0x467C09);
+void RWE::RwCamera::ExtendedDestroy()
+{
+    camera_destroyext(this);
+}
+inline void(__cdecl* const camera_setnearclip)(RWE::RwCamera* c, float n) = reinterpret_cast<void(__cdecl*)(RWE::RwCamera*, float)>(0x419E60);
+void RWE::RwCamera::SetNearClipPlane(float ne)
+{
+    camera_setnearclip(this, ne);
+}
+inline void(__cdecl* const camera_setfarclip)(RWE::RwCamera* c, float n) = reinterpret_cast<void(__cdecl*)(RWE::RwCamera*, float)>(0x419E90);
+void RWE::RwCamera::SetFarClipPlane(float fa)
+{
+    camera_setfarclip(this, fa);
+}
+inline RWE::RwCamera*(__cdecl* const camera_setpro)(RWE::RwCamera* c, RWE::RwCameraProjection p) = reinterpret_cast<RWE::RwCamera*(__cdecl*)(RWE::RwCamera*, RWE::RwCameraProjection)>(0x419F90);
+bool RWE::RwCamera::SetProjection(RwCameraProjection pro)
+{
+    return camera_setpro(this, pro) != nullptr;
+}
+inline void (__cdecl* const camera_setvwind)(RWE::RwCamera* c, RWE::RwV2d* v) = reinterpret_cast<void (__cdecl*)(RWE::RwCamera*, RWE::RwV2d*)>(0x41A000);
+void RWE::RwCamera::SetViewWindow(RwV2d* viewWind)
+{
+    camera_setvwind(this, viewWind);
+}
+RWE::RwFrame* RWE::RwCamera::GetFrame() const
+{
+    return static_cast<RWE::RwFrame*>(object.object.parent);
+}
+inline RWE::RwCamera* (__cdecl* const camera_clear)(RWE::RwCamera* th, RWE::RwRGBA* color, RWE::RwCameraClearMode clearMode) = reinterpret_cast<RWE::RwCamera * (__cdecl*)(RWE::RwCamera*, RWE::RwRGBA*, RWE::RwCameraClearMode)>(0x419F30);
+bool RWE::RwCamera::Clear(RwRGBA color, RwCameraClearMode clearMode)
+{
+    return camera_clear(this, &color, clearMode) != nullptr;
+}
+inline RWE::RwCamera* (__cdecl* const camera_beginupdate)(RWE::RwCamera* th) = reinterpret_cast<RWE::RwCamera * (__cdecl*)(RWE::RwCamera*)>(0x419E20);
+bool RWE::RwCamera::BeginUpdate()
+{
+    return camera_beginupdate(this) != nullptr;
+}
+inline RWE::RwCamera* (__cdecl* const camera_endupdate)(RWE::RwCamera* th) = reinterpret_cast<RWE::RwCamera * (__cdecl*)(RWE::RwCamera*)>(0x419E10);
+bool RWE::RwCamera::EndUpdate()
+{
+    return camera_endupdate(this) != nullptr;
+}
+inline RWE::RwCamera* (__cdecl* const camera_show)(RWE::RwCamera* th, HWND w, int vs) = reinterpret_cast<RWE::RwCamera * (__cdecl*)(RWE::RwCamera*, HWND, int)>(0x419F60);
+bool RWE::RwCamera::ShowRaster(HWND window, bool vsync)
+{
+    return camera_show(this, window, vsync ? 1 : 0);
+}
+
 static inline RWE::RpWorld* (__cdecl* const world_addclump)(RWE::RpWorld* w, RWE::RpClump* c) = reinterpret_cast<RWE::RpWorld * (__cdecl*)(RWE::RpWorld*, RWE::RpClump*)>(0x627130);
 RWE::RpWorld* RWE::RpWorld::AddClump(RpClump* clump)
 {
@@ -205,6 +275,16 @@ static inline RWE::RpWorld* (__cdecl* const world_remclump)(RWE::RpWorld* w, RWE
 RWE::RpWorld* RWE::RpWorld::RemoveClump(RpClump* clump)
 {
     return world_remclump(this, clump);
+}
+inline void(__cdecl* const world_addcam)(RWE::RpWorld* w, RWE::RwCamera* c) = reinterpret_cast<void(__cdecl*)(RWE::RpWorld*, RWE::RwCamera*)>(0x626CC0);
+void RWE::RpWorld::AddCamera(RwCamera* cam)
+{
+    world_addcam(this, cam);
+}
+inline void(__cdecl* const world_remcam)(RWE::RpWorld* w, RWE::RwCamera* c) = reinterpret_cast<void(__cdecl*)(RWE::RpWorld*, RWE::RwCamera*)>(0x626CF0);
+void RWE::RpWorld::RemoveCamera(RwCamera* cam)
+{
+    world_remcam(this, cam);
 }
 
 inline RWE::RwImage* (__cdecl* const image_allocpix)(RWE::RwImage* th) = reinterpret_cast<RWE::RwImage* (__cdecl*)(RWE::RwImage*)>(0x414D20);

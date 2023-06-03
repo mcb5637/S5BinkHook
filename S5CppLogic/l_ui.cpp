@@ -1157,6 +1157,45 @@ namespace CppLogic::UI {
 		sc->Update(w);
 		return 0;
 	}
+
+	int DumpVideoModes(lua::State L) {
+		L.NewTable();
+		RWE::RwVideoMode m{};
+		int ma = RWE::RwVideoMode::GetNumVideoModes();
+		for (int i = 0; i < ma; ++i) {
+			L.NewTable();
+			m.GetInfo(i);
+
+			L.Push("width");
+			L.Push(m.width);
+			L.SetTableRaw(-3);
+
+			L.Push("height");
+			L.Push(m.height);
+			L.SetTableRaw(-3);
+
+			L.Push("depth");
+			L.Push(m.depth);
+			L.SetTableRaw(-3);
+
+			L.Push("flags");
+			L.Push((int)m.flags);
+			L.SetTableRaw(-3);
+
+			L.Push("refRate");
+			L.Push(m.refRate);
+			L.SetTableRaw(-3);
+
+			L.Push("format");
+			L.Push(m.format);
+			L.SetTableRaw(-3);
+
+			L.SetTableRaw(-2, i);
+		}
+		L.Push(RWE::RwVideoMode::GetVideoMode());
+		return 2;
+	}
+
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
 		return shok::Malloc(s);
@@ -1470,7 +1509,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 75> UI{ {
+	constexpr std::array<lua::FuncReference, 76> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1546,6 +1585,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<GetAutoScrollCustomWidgetOffset>("GetAutoScrollCustomWidgetOffset"),
 		lua::FuncReference::GetRef<AutoScrollCustomWidgetModOffset>("AutoScrollCustomWidgetModOffset"),
 		lua::FuncReference::GetRef<AutoScrollCustomWidgetSetOffset>("AutoScrollCustomWidgetSetOffset"),
+		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
 	} };
 
 	void Init(lua::State L)

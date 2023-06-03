@@ -67,7 +67,7 @@ namespace ESnd {
 		virtual ISoESoundPlayBack* __stdcall GetPlayback() = 0;
 		virtual CSoEMusic* __stdcall GetMusic() = 0;
 	private:
-		virtual void __stdcall unknown(float) = 0;
+		virtual void __stdcall unknown(float) = 0; // update?, param is current time float
 	public:
 		virtual void __stdcall Set3DPosition(float x, float y, float z) = 0;
 		virtual void __stdcall Set3DOrientation(float, float, float, float, float, float) = 0; // 5 parameters??

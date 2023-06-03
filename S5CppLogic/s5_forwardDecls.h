@@ -137,6 +137,8 @@ namespace RWE {
 	struct RpClump;
 	struct RpAtomic;
 	using RwTexture = ::RwTexture;
+	struct RpWorld;
+	struct RwCamera;
 }
 namespace RWE::Particles {
 	struct RpPrtStdEmitter;
@@ -157,4 +159,7 @@ namespace EScr {
 }
 namespace CppLogic::EntityAddon {
 	class EntityAddonData;
+}
+namespace BBRw {
+	class CEngine;
 }

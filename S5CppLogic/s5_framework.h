@@ -25,6 +25,33 @@ namespace GS3DTools {
 		static inline constexpr int vtp = 0x761D34;
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E7D0);
 	};
+
+	class CGUIReplaySystem : public ECore::IReplayStreamExtension, public BB::IPostEvent {
+	public:
+		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+
+		class CPlayingReplay : public BB::IPostEvent {
+			virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+		};
+
+		CMapData MapData;
+		int DisplaySizeX, DisplaySizeY; // 25
+		PADDINGI(1);
+		PADDINGI(2); // 28 double -1
+		PADDINGI(3); // last float 0.001
+		shok::String SomeString; // 33
+		PADDINGI(1);
+		PADDINGI(2);
+		CPlayingReplay PlayingReplay; // 43
+
+		static inline constexpr int vtp = 0x779F80;
+
+		// ctor 518EBB
+		// set displ size 518BA1
+	};
+	static_assert(offsetof(CGUIReplaySystem, SomeString) == 33 * 4);
+	static_assert(offsetof(CGUIReplaySystem, PlayingReplay) == 43 * 4);
+	//constexpr int i = offsetof(CGUIReplaySystem, PlayingReplay) / 4;
 }
 
 namespace Framework {
@@ -293,9 +320,9 @@ namespace Framework {
 
 		Mode CurrentMode; // 1 mainmenu, 2 ingame (sp?)
 		GS3DTools::CMapData CurrentMap; // 4
-		//int, GS3DTools::CGUIReplaySystem::vtable 779F80, GS3DTools::CGUIReplaySystem.BB::IPostEvent event 0x518C5B
-		// GS3DTools::CMapData::vtable???
-		PADDINGI(49);
+		PADDINGI(1);
+		GS3DTools::CGUIReplaySystem ReplaySystem; // 28
+		PADDINGI(4);
 		shok::String ReplayToLoad; // 76 from commandline, not sure if it does anything
 		shok::String GUIReplay; // 83 from commandline, not sure it does anything
 		shok::String SavegameToLoad; // 90
@@ -315,7 +342,9 @@ namespace Framework {
 		CLuaDebuggerPort* LuaDebuggerPort;
 		lua_State* MainmenuState; // 144
 		bool MainmenuInitialized; // just call to reinit instead of init, lua scripts are loaded from winmain
-		PADDINGI(3);
+		BBRw::CEngine* Engine; // 146
+		ED::CGUIScene* GUIScene;
+		ESnd::CSoESound* Sound;
 	private:
 		int one;
 	public:
@@ -329,7 +358,7 @@ namespace Framework {
 			int Width;
 			int Height;
 			int ColorDepth;
-			bool Initialized;
+			PADDINGI(1); // some bool that never seems to be able to be true
 			int TextureResolution;
 		} WindowData; // 160
 		AGameModeBase* GameModeBase; // 169
@@ -361,6 +390,7 @@ namespace Framework {
 		// parse cmd args 0x4082F3 uknownObj->__thiscall(const char* str, void* CMainp4)
 
 		void SaveGDB();
+		ED::CGUICamera* GetCamera(); // gets mainmenu or ingame camera
 
 		static inline Framework::CMain** const GlobalObj = reinterpret_cast<Framework::CMain**>(0x84EF60);
 		static inline const int* const ExtraNum = reinterpret_cast<int*>(0x886BA8);
@@ -380,7 +410,7 @@ namespace Framework {
 	static_assert(offsetof(Framework::CMain, GluePropsManager) == 150 * 4);
 	static_assert(offsetof(Framework::CMain, CampagnInfoHandler) == 174 * 4);
 	static_assert(sizeof(Framework::CMain::SWindowData) == 4 * 9);
-	constexpr int i = offsetof(Framework::CMain, MainmenuState) / 4;
+	//constexpr int i = offsetof(Framework::CMain, ReplayToLoad) / 4;
 }
 
 

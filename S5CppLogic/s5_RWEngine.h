@@ -142,6 +142,8 @@ namespace RWE {
 		RwFrame* ForAllChildren(RwFrameCallBack callBack, void* data);
 		RWE::Anim::RpHAnimHierarchy* GetAnimFrameHandler();
 		RwMatrix* GetLTM();
+		static inline RwFrame* (__cdecl* const Create)() = reinterpret_cast<RwFrame * (__cdecl*)()>(0x413F10);
+		void Destroy();
 	};
 	//constexpr int i = offsetof(RwFrame, root)/4;
 
@@ -216,6 +218,8 @@ namespace RWE {
 		// destroys, no ref counting here
 		// destroy parent? (docu)
 		void Destroy();
+		static inline RwRaster* (__cdecl* const Create)(int width, int height, int depth, int flags) = reinterpret_cast<RwRaster * (__cdecl*)(int, int, int, int)>(0x418BA0);
+		bool ShowRaster(HWND window, bool vsync);
 	};
 
 	struct RpInterpolator {
@@ -293,6 +297,92 @@ namespace RWE {
 		static inline RpClump* (__cdecl* const Read)(RwStream* s) = reinterpret_cast<RpClump * (__cdecl*)(RwStream*)>(0x629990);
 	};
 
+	/**
+	 * \ingroup rwcamera
+	 * RwCameraProjection
+	 * This type represents the options available for
+	 * setting the camera projection model, either perspective projection or
+	* parallel projection (see API function \ref RwCameraSetProjection)*/
+	enum class RwCameraProjection : int
+	{
+		rwNACAMERAPROJECTION = 0,   /**<Invalid projection */
+		rwPERSPECTIVE = 1,          /**<Perspective projection */
+		rwPARALLEL = 2,             /**<Parallel projection */
+	};
+	/*
+	 * This type represents a plane
+	 */
+	struct RwPlane
+	{
+		RwV3d normal;    /**< Normal to the plane */
+		float distance; /**< Distance to plane from origin in normal direction*/
+	};
+	/*
+	 * Structure describing a frustrum plane.
+	 */
+	struct RwFrustumPlane
+	{
+		RwPlane             plane;
+		uint8_t             closestX;
+		uint8_t             closestY;
+		uint8_t             closestZ;
+		uint8_t             pad;
+	};
+	struct RwCamera
+	{
+		RwObjectHasFrame    object;
+
+		/* Parallel or perspective projection */
+		RwCameraProjection  projectionType;
+
+		/* Start/end update functions */
+		RwCamera*(__cdecl* beginUpdate)(RwCamera*); // 6
+		RwCamera* (__cdecl* endUpdate)(RwCamera*);
+
+		/* The view matrix */
+		RwMatrix            viewMatrix;
+
+		/* The cameras image buffer */
+		RwRaster* frameBuffer; // 24
+
+		/* The Z buffer */
+		RwRaster* zBuffer;
+
+		/* Cameras mathmatical characteristics */
+		RwV2d               viewWindow; // 16
+		RwV2d               recipViewWindow;
+		RwV2d               viewOffset; // 30
+		float              nearPlane;
+		float              farPlane; // 33
+		float              fogPlane;
+
+		/* Transformation to turn camera z or 1/z into a Z buffer z */
+		float              zScale, zShift; // 35
+
+		/* The clip-planes making up the viewing frustum */
+		RwFrustumPlane      frustumPlanes[6];
+		RwBBox              frustumBoundBox;
+
+		/* Points on the tips of the view frustum */
+		RwV3d               frustumCorners[8];
+
+		static inline RwCamera* (__cdecl* const Create)() = reinterpret_cast<RwCamera * (__cdecl*)()>(0x41A0B0);
+		static inline RwCamera* (__cdecl* const CreateExtended)(int width, int height, int bit) = reinterpret_cast<RwCamera * (__cdecl*)(int, int, int)>(0x467C76); // shok, creates with all rasters+frame
+		void SetFrame(RwFrame* f);
+		void Destroy();
+		void ExtendedDestroy(); // shok, also destroys rasters+frame
+		void SetNearClipPlane(float ne);
+		void SetFarClipPlane(float fa);
+		bool SetProjection(RwCameraProjection pro);
+		void SetViewWindow(RwV2d* viewWind);
+		RwFrame* GetFrame() const;
+		bool Clear(RwRGBA color, RwCameraClearMode clearMode); // clears camera to color, needs to be outside of update
+		bool BeginUpdate();
+		bool EndUpdate();
+		bool ShowRaster(HWND window, bool vsync);
+	};
+	//constexpr int i = offsetof(RwCamera, farPlane) / 4;
+
 	struct RpMaterialList {
 		RpMaterial** materials;
 		int numMaterials;
@@ -342,6 +432,9 @@ namespace RWE {
 		RpWorld* AddClump(RpClump* clump);
 		// returns this
 		RpWorld* RemoveClump(RpClump* clump);
+		void AddCamera(RwCamera* cam);
+		void RemoveCamera(RwCamera* cam);
+		static inline RpWorld* (__cdecl* const Create)(RwBBox* boundingBox) = reinterpret_cast<RpWorld * (__cdecl*)(RwBBox*)>(0x628370);
 	};
 
 	/**
@@ -468,7 +561,7 @@ namespace RWE {
 
 		RwDevice dOpenDevice; // 4
 
-		void* stdFunc[29];
+		int(__cdecl* stdFunc[29])(void* pout, void* pinout, int inint); // 18
 
 		RwLinkList dirtyFrameList;
 
@@ -488,7 +581,7 @@ namespace RWE {
 	};
 	static_assert(offsetof(RwGlobals, memoryFuncs) == 264);
 	static_assert(offsetof(RwGlobals, dOpenDevice.fpRenderStateSet) == 4*8);
-	//constexpr int i = offsetof(RwGlobals, dOpenDevice)/4;
+	//constexpr int i = offsetof(RwGlobals, stdFunc)/4;
 
 	enum class RwVideoModeFlag : int
 	{
@@ -541,12 +634,12 @@ namespace RWE {
 	 * the mode (see API function \ref RwEngineGetVideoModeInfo): */
 	struct RwVideoMode
 	{
-		int         width;   /**< Width  */
-		int         height;  /**< Height */
-		int         depth;   /**< Depth  */
-		RwVideoModeFlag flags;   /**< Flags  */
-		int         refRate; /**< Approximate refresh rate */
-		int         format;  /**< Raster format \see RwRasterFormat */
+		int         width = 0;   /**< Width  */
+		int         height = 0;  /**< Height */
+		int         depth = 0;   /**< Depth  */
+		RwVideoModeFlag flags = static_cast<RwVideoModeFlag>(0);   /**< Flags  */
+		int         refRate = 0; /**< Approximate refresh rate */
+		int         format = 0;  /**< Raster format \see RwRasterFormat */
 
 		static inline int(__cdecl*const GetNumVideoModes)() = reinterpret_cast<int(__cdecl*)()>(0x40FE70);
 		bool GetInfo(int mode); // returns sucess

@@ -90,14 +90,14 @@ namespace shok {
 
 	class UIRenderer {
 	public:
-		PADDINGI(1);
+		RWE::RwCamera* Camera;
 		bool ShouldRenderText;
 		PADDING(3);
-		PADDINGI(1);
+		float DistanceBetweenRenderPlanesX100;
 		float RenderSizeX, RenderSizeY; // 3
 		bool SomeTextBool;
 		PADDING(3);
-		PADDINGI(1);
+		int UpscaledFlag;
 		RWE::P2D::Rt2dBrush* Brush;
 
 		void RenderText(const char* txt, int fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
@@ -702,10 +702,13 @@ namespace ED {
 	};
 	class CGUIScene : public IGUIScene {
 	public:
-		PADDINGI(1); // some renderware obj
+		RWE::RpWorld* World;
 		ED::CGUICamera* Camera;
 		PADDINGI(1); // some renderware obj
 
 		static constexpr int vtp = 0x76949C;
+
+		// ctor 467992 (x, y, bit)
 	};
+	static_assert(sizeof(ED::CGUIScene) == 4 * 4);
 }

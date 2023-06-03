@@ -348,6 +348,8 @@ namespace EGUIX {
 		static inline constexpr int vtp = 0x780910;
 		static inline constexpr int TypeDesc = 0x832DFC;
 		static inline constexpr unsigned int Identifier = 0x5CA15E96;
+
+		// render all 0x55B056 __thiscall()
 	};
 	static_assert(sizeof(CProjectWidget) == 21 * 4);
 
@@ -1004,12 +1006,15 @@ namespace EGUIX {
 	class WidgetLoader {
 	public:
 		shok::String PathToGame;
-		CProjectWidget* RootWid;
+		CProjectWidget* RootWid; // 7
 		bool Unknown; // seems to be always false?
 
 		void LoadGUI(const char* file);
 
 		static inline WidgetLoader* (* const GlobalObj)() = reinterpret_cast<WidgetLoader * (*)()>(0x5563CC);
+
+		// update tome event 0x556489 __thiscall(float)
+		// render all 0x556409 __thiscall()
 	};
 
 	class CEventManager : public IWidgetRegistrationCallback {
@@ -1021,6 +1026,7 @@ namespace EGUIX {
 		static inline CEventManager* (__cdecl* const GlobalObj)() = reinterpret_cast<CEventManager * (__cdecl*)()>(0x558C16);
 
 		bool IsModifierPressed(shok::Keys m);
+		// fire event on widget 558C2E __thiscall(CProjectWidget*, BB::CEvent*)
 	};
 	static_assert(offsetof(CEventManager, CurrentModifiers) == 7 * 4);
 }

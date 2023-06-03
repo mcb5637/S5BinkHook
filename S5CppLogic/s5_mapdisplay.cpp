@@ -12,7 +12,7 @@
 bool ED::CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)
 {
 	float mp[] = { static_cast<float>(x), static_cast<float>(y) };
-	return GetLandscapePosFromMousePos((*ED::CGlobalsBaseEx::GlobalObj)->Camera->SomeCameraData, mp, &outpos, 3);
+	return GetLandscapePosFromMousePos((*ED::CGlobalsBaseEx::GlobalObj)->Camera->Camera, mp, &outpos, 3);
 }
 float ED::CLandscape::GetTerrainHeightAtPos(const shok::Position& p)
 {
@@ -124,6 +124,28 @@ void ED::CModelsProps::ReloadAllModels()
 	*m = ModelIdManager;
 	(*BB::CClassFactory::GlobalObj)->LoadObject(this, "Data\\Config\\Models.xml", SerializationData);
 	*m = nullptr;
+}
+
+inline void(__thiscall* const edcamera_clear)(ED::CCamera* th) = reinterpret_cast<void(__thiscall*)(ED::CCamera*)>(0x467B94);
+void ED::CCamera::Clear()
+{
+	edcamera_clear(this);
+}
+
+inline bool(__thiscall* const edcamera_begin)(ED::CCamera* th) = reinterpret_cast<bool(__thiscall*)(ED::CCamera*)>(0x467BAB);
+bool ED::CCamera::BeginRender()
+{
+	return edcamera_begin(this);
+}
+inline int(__thiscall* const edcamera_end)(ED::CCamera* th) = reinterpret_cast<int(__thiscall*)(ED::CCamera*)>(0x467BE1);
+bool ED::CCamera::EndRender()
+{
+	return edcamera_end(this);
+}
+inline void(__thiscall* const edcamera_show)(ED::CCamera* th, HWND w) = reinterpret_cast<void(__thiscall*)(ED::CCamera*, HWND)>(0x467BF0);
+void ED::CCamera::Show(HWND window)
+{
+	edcamera_show(this, window);
 }
 
 shok::Color ED::CPlayerColors::GetColorByIndex(int i)

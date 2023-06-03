@@ -117,14 +117,23 @@ namespace BBRw {
 	class IEngine {
 	public:
 		virtual ~IEngine() = default;
+		virtual void Destroy() = 0;
+	private:
+		virtual void emptyFunc1() = 0;
+	public:
+		virtual void GetWindowSize(int* width, int* height, int* bitDepth) = 0;
 	};
 
 	class CEngine : public IEngine {
 	public:
 		static inline constexpr int vtp = 0x76B534;
-		PADDINGI(1);
+		HWND MainWindow;
 		IEffects* Effects;
 		PADDINGI(1);
 		CRwTextures* SelectionTextures; // also shorewave
+
+		// init 0x48C77B
+
+		static inline CEngine** const GlobalObj = reinterpret_cast<CEngine**>(0x8595E8); // technically IEngine, but CEngine is the only thing that ever ends up here
 	};
 }

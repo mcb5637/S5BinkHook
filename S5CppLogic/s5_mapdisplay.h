@@ -16,7 +16,7 @@ namespace ED {
 		virtual float GetWaterHeightAtPosF(float x, float y) = 0;
 		virtual float GetHigherTerrainOrWaterHeightAtPos(float x, float y) = 0;
 	protected:
-		virtual bool GetLandscapePosFromMousePos(void* cam, float* mousepos, shok::PositionRot* outpos, int flag) = 0;
+		virtual bool GetLandscapePosFromMousePos(RWE::RwCamera* cam, float* mousepos, shok::PositionRot* outpos, int flag) = 0;
 	};
 
 	class CLandscape : public ILandscape {
@@ -170,18 +170,30 @@ namespace ED {
 	public:
 		virtual ~CCamera() = default;
 		// 1 more func
+
+		PADDINGI(1); //1
+		RWE::RwCamera* Camera;
+		RWE::RwRGBA ClearColor;
+
+		void Clear();
+		bool BeginRender();
+		bool EndRender();
+		void Show(HWND window);
 	};
 	class CCameraEx : public CCamera {
 	public:
-		PADDINGI(1); //1
-		void* SomeCameraData;
+		RWE::RpWorld* World;
 
 		static inline constexpr int vtp = 0x769E64;
+
+		// ctor 46FCF4 (x, y, bit, ?)
 	};
 	class CGUICamera : public CCamera {
 	public:
 
 		static constexpr int vtp = 0x769EB0;
+
+		// ctor 4700B3 (x, y, bit)
 	};
 
 	class IPlayerColors {

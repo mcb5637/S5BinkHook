@@ -750,7 +750,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, in
 		end = end * shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX;
 	}
 
-	const float fontsize = f->GetHeight();
+	const float fontsize = f->GetHeight(); //0.036
 	const float linedistance = fontsize * (ldf == 0.0f ? 1.0f : ldf);
 
 	RWE::RwV2d stepx;

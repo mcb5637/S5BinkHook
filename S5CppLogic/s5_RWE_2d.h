@@ -4,9 +4,15 @@
 #include "s5_RWEngine.h"
 
 namespace RWE::P2D {
+	// Rt2dOpen 7075C0 __cdecl(cam)
+	// globals 0xA1B720
+
 	struct Device {
 
 		static inline int(__cdecl* const GetStep)(RwV2d* xstep, RwV2d* ystep, RwV2d* origin) = reinterpret_cast<int(__cdecl*)(RwV2d*, RwV2d*, RwV2d*)>(0x707400);
+		static inline bool(__cdecl* const SetCamera)(RWE::RwCamera* cam) = reinterpret_cast<bool(__cdecl*)(RWE::RwCamera*)>(0x706E80);
+		static inline RWE::RwCamera* (__cdecl* const GetCamera)() = reinterpret_cast<RWE::RwCamera * (__cdecl*)()>(0x706F70);
+		static inline int(__cdecl* const SetLayerDepth)(float d) = reinterpret_cast<int(__cdecl*)(float)>(0x706E50);
 	};
 
 	struct CTM {

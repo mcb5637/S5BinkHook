@@ -361,4 +361,48 @@ namespace RWE {
 	};
 	template<>
 	class ::enum_is_flags<RwCameraClearMode> : public std::true_type {};
+	enum class RwVideoModeFlag : int
+	{
+		rwVIDEOMODEEXCLUSIVE = 0x0001, /**<Exclusive (i.e. full-screen) */
+		rwVIDEOMODEINTERLACE = 0x0002, /**<Interlaced                   */
+		rwVIDEOMODEFFINTERLACE = 0x0004, /**<Flicker Free Interlaced      */
+
+		/* Platform specific video mode flags. */
+
+		rwVIDEOMODE_PS2_FSAASHRINKBLIT = 0x0100,
+		/**< \if sky2
+		 *   Full-screen antialiasing mode 0
+		 *   \endif
+		 */
+		rwVIDEOMODE_PS2_FSAAREADCIRCUIT = 0x0200,
+		/**< \if sky2
+		 *   Full-screen antialiasing mode 1
+		 *   \endif
+		 */
+
+		rwVIDEOMODE_XBOX_WIDESCREEN = 0x0100,
+		/**< \if xbox
+		 *   Wide screen.
+		 *   \endif
+		 */
+		rwVIDEOMODE_XBOX_PROGRESSIVE = 0x0200,
+		/**< \if xbox
+		 *   Progressive.
+		 *   \endif
+		 */
+		rwVIDEOMODE_XBOX_FIELD = 0x0400,
+		/**< \if xbox
+		 *   Field rendering.
+		 *   \endif
+		 */
+		rwVIDEOMODE_XBOX_10X11PIXELASPECT = 0x0800,
+		/**< \if xbox
+		 *   The frame buffer is centered on the display.
+		 *   On a TV that is 704 pixels across, this would leave 32 pixels of black
+		 *   border on the left and 32 pixels of black border on the right.
+		 *   \endif
+		 */
+	};
+	template<>
+	class ::enum_is_flags<RwVideoModeFlag> : public std::true_type {};
 }

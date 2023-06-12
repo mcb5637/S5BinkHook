@@ -13,8 +13,9 @@ namespace CppLogic::Mod::UI {
 	// string user var 1 to scroll widget blueprint
 	// int user var 0 spacing (space between scrolled widgets)
 	// current item can be read out on the scrollables by XGUIEng.GetBaseWidgetUserVariable(XGUIEng.GetCurrentWidgetID(), 0) [0-ElementCount)
-	// set up EGUIX::CContainerWidget with AutoScrollCustomWidget at full size. add one toScroll widget (may be EGUIX::CContainerWidget) and set its name in AutoScrollCustomWidget.
-	//		(this widget will get cloned to fill the space of the AutoScrollCustomWidget).
+	// set up EGUIX::CContainerWidget with AutoScrollCustomWidget. add one toScroll widget (may be EGUIX::CContainerWidget) and set its name in AutoScrollCustomWidget.
+	//		(this widget will get cloned to fill the space of the Container).
+	//		(you may put a EGUIX::CContainerWidget between the toScroll widget and the AutoScrollCustomWidget mother widget to make the mouse sensitive area bigger than the toScroll list).
 	// if you want to use the bar (and not just the mousewheel) add a Container where the scrollbar travels (has to be directly in the same
 	//		Container as the AutoScrollCustomWidget) and a EGUIX::CStaticWidget as the scroll handle into it. then just set the handles name in AutoScrollCustomWidget).
 	//		You also might want to add up and down Buttons over and under the scrollbar travel container.
@@ -34,7 +35,9 @@ namespace CppLogic::Mod::UI {
 		int WidgetCount = 0;
 		std::vector<EGUIX::CBaseWidget*> Widgets;
 		EGUIX::CBaseWidget* Slider = nullptr, * SliderTravel = nullptr;
+		EGUIX::CContainerWidget* WidgetContainer = nullptr;
 		bool Dragging = false;
+		EGUIX::CMaterial PartialWidget;
 
 		static constexpr unsigned int Identifier = 0x100C;
 		static constexpr BB::SerializationData* SerializationData = nullptr;
@@ -43,10 +46,11 @@ namespace CppLogic::Mod::UI {
 		void operator delete(void* p);
 
 		void ReInit();
-		void Update(EGUIX::CBaseWidget* w);
-		void Clamp(EGUIX::CBaseWidget* cw);
+		void Update();
+		void Clamp();
 	private:
-		void UpdateBySlider(EGUIX::CBaseWidget* cw, int x, int y);
-		bool ClickedOnSlider(EGUIX::CBaseWidget* cw, int x, int y);
+		void UpdateBySlider(int x, int y);
+		bool ClickedOnSlider(int x, int y);
+		float UIOffset() const;
 	};
 }

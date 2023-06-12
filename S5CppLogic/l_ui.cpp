@@ -1142,8 +1142,8 @@ namespace CppLogic::UI {
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
 		sc->Offset += L.CheckFloat(2);
-		sc->Clamp(w);
-		sc->Update(w);
+		sc->Clamp();
+		sc->Update();
 		return 0;
 	}
 	int AutoScrollCustomWidgetSetOffset(lua::State l) {
@@ -1153,8 +1153,25 @@ namespace CppLogic::UI {
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
 		sc->Offset = L.CheckFloat(2);
-		sc->Clamp(w);
-		sc->Update(w);
+		sc->Clamp();
+		sc->Update();
+		return 0;
+	}
+	int AutoScrollCustomWidgetSetMaterial(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		sc->PartialWidget.SetTexture(L.CheckString(2));
+		sc->PartialWidget.TextureCoordinates.X = L.CheckFloat(3);
+		sc->PartialWidget.TextureCoordinates.Y = L.CheckFloat(4);
+		sc->PartialWidget.TextureCoordinates.W = L.CheckFloat(5);
+		sc->PartialWidget.TextureCoordinates.H = L.CheckFloat(6);
+		sc->PartialWidget.Color.Red = L.CheckInt(7);
+		sc->PartialWidget.Color.Green = L.CheckInt(8);
+		sc->PartialWidget.Color.Blue = L.CheckInt(9);
+		sc->PartialWidget.Color.Alpha = L.CheckInt(10);
 		return 0;
 	}
 
@@ -1509,7 +1526,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 76> UI{ {
+	constexpr std::array<lua::FuncReference, 77> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1585,6 +1602,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<GetAutoScrollCustomWidgetOffset>("GetAutoScrollCustomWidgetOffset"),
 		lua::FuncReference::GetRef<AutoScrollCustomWidgetModOffset>("AutoScrollCustomWidgetModOffset"),
 		lua::FuncReference::GetRef<AutoScrollCustomWidgetSetOffset>("AutoScrollCustomWidgetSetOffset"),
+		lua::FuncReference::GetRef<AutoScrollCustomWidgetSetMaterial>("AutoScrollCustomWidgetSetMaterial"),
 		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
 	} };
 

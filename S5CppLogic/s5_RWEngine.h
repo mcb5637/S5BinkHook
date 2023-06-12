@@ -26,6 +26,7 @@ namespace RWE {
 	struct RxPipeline;
 	struct RpWorldSector;
 	struct RwTexDictionary;
+	struct RwMatrix;
 
 	struct RwLinkList {
 		struct RwLLLink {
@@ -68,6 +69,9 @@ namespace RWE {
 		float x = 0, y = 0, z = 0;
 
 		static const inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA05D50);
+
+		RwV3d Transform(const RwMatrix* matrix) const;
+		RwV3d TransformPoint(const RwMatrix* matrix) const;
 	};
 	struct RwV2d {
 		float x = 0, y = 0;
@@ -583,48 +587,6 @@ namespace RWE {
 	static_assert(offsetof(RwGlobals, dOpenDevice.fpRenderStateSet) == 4*8);
 	//constexpr int i = offsetof(RwGlobals, stdFunc)/4;
 
-	enum class RwVideoModeFlag : int
-	{
-		rwVIDEOMODEEXCLUSIVE = 0x0001, /**<Exclusive (i.e. full-screen) */
-		rwVIDEOMODEINTERLACE = 0x0002, /**<Interlaced                   */
-		rwVIDEOMODEFFINTERLACE = 0x0004, /**<Flicker Free Interlaced      */
-
-		/* Platform specific video mode flags. */
-
-		rwVIDEOMODE_PS2_FSAASHRINKBLIT = 0x0100,
-		/**< \if sky2
-		 *   Full-screen antialiasing mode 0
-		 *   \endif
-		 */
-		rwVIDEOMODE_PS2_FSAAREADCIRCUIT = 0x0200,
-		/**< \if sky2
-		 *   Full-screen antialiasing mode 1
-		 *   \endif
-		 */
-
-		rwVIDEOMODE_XBOX_WIDESCREEN = 0x0100,
-		/**< \if xbox
-		 *   Wide screen.
-		 *   \endif
-		 */
-		rwVIDEOMODE_XBOX_PROGRESSIVE = 0x0200,
-		/**< \if xbox
-		 *   Progressive.
-		 *   \endif
-		 */
-		rwVIDEOMODE_XBOX_FIELD = 0x0400,
-		/**< \if xbox
-		 *   Field rendering.
-		 *   \endif
-		 */
-		rwVIDEOMODE_XBOX_10X11PIXELASPECT = 0x0800,
-		/**< \if xbox
-		 *   The frame buffer is centered on the display.
-		 *   On a TV that is 704 pixels across, this would leave 32 pixels of black
-		 *   border on the left and 32 pixels of black border on the right.
-		 *   \endif
-		 */
-	};
 	/**
 	 * \ingroup rwengine
 	 * \struct RwVideoMode
@@ -675,3 +637,24 @@ struct RwTexture {
 // 0x41A530 RwStream* RwStreamWrite(RwStream* stream, void const* buffer, RwUInt32 length)
 // 0x429040 RwStream* _rwStreamWriteVersionedChunkHeader(RwStream* stream, RwInt32 type, RwInt32 size, RwUInt32 version, RwUInt32 buildNum)
 // 0x41CCE0 const RwChar* _rwStringStreamWrite(const RwChar* string, RwStream* stream)
+
+// directX
+// sdk version 0x20u
+// 0x410B60 D3D9DeviceSystemOpen (optimized calling convention?)
+// 0x850224 WindowHandle
+// 0x8018B8 _RwD3DAdapterType
+// 0x85022C _RwD3DAdapterIndex
+// 0xA1B280 _RwD3D9DeviceCaps
+// 0x410AA0 D3D9CalculateMaxMultisamplingLevels
+// 0x420190 _rwCPUHaveMMX
+// 0x4201F0 _rwCPUHaveSSE
+// 0x420250 _rwCPUHaveSSE2
+// 0x4202B0 _rwCPUHave3DNow
+// 0x411700 D3D9DeviceReleaseVideoMemory
+// 0x411830 D3D9DeviceRestoreVideoMemory
+// 0x424360 _rxD3D9VideoMemoryRasterListRestore
+// 0x420F50 _rwD3D9DynamicVertexBufferRestore
+// 0x424EE0 _rwD3D9Im3DRenderOpen
+// 0x41E090 _rwD3D9Im2DRenderOpen
+// 0x410A40 D3D9RestoreCacheLights
+// 0x41FF70 _rwD3D9RenderStateReset

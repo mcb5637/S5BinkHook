@@ -2,6 +2,21 @@
 #include "s5_RWEngine.h"
 #include "s5_mapdisplay.h"
 
+inline void(__cdecl* const vec3d_transform)(RWE::RwV3d* ou, const RWE::RwV3d* i, const RWE::RwMatrix* m) = reinterpret_cast<void(__cdecl*)(RWE::RwV3d*, const RWE::RwV3d*, const RWE::RwMatrix*)>(0x41C770);
+RWE::RwV3d RWE::RwV3d::Transform(const RwMatrix* matrix) const
+{
+    RwV3d r{};
+    vec3d_transform(&r, this, matrix);
+    return r;
+}
+inline void(__cdecl* const vec3d_transformPoint)(RWE::RwV3d* ou, const RWE::RwV3d* i, const RWE::RwMatrix* m) = reinterpret_cast<void(__cdecl*)(RWE::RwV3d*, const RWE::RwV3d*, const RWE::RwMatrix*)>(0x41C710);
+RWE::RwV3d RWE::RwV3d::TransformPoint(const RwMatrix* matrix) const
+{
+    RwV3d r{};
+    vec3d_transformPoint(&r, this, matrix);
+    return r;
+}
+
 static inline RWE::RwMatrix* (__cdecl* const matrix_optimize)(RWE::RwMatrix* m, const void* tolerance) = reinterpret_cast<RWE::RwMatrix* (__cdecl*)(RWE::RwMatrix*, const void*)>(0x41B2A0);
 RWE::RwMatrix* RWE::RwMatrix::Optimize()
 {

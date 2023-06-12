@@ -6,6 +6,8 @@
 namespace RWE::P2D {
 	// Rt2dOpen 7075C0 __cdecl(cam)
 	// globals 0xA1B720
+	// _rt2dGetTolerance 707530
+	// Rt2dClose 7075F0 
 
 	struct Device {
 

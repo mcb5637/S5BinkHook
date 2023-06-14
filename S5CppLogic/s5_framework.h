@@ -382,7 +382,21 @@ namespace Framework {
 			// load campagns 51A11A __thiscall(path, shok::Vector<int>* Keys)
 
 		} CampagnInfoHandler;
-		PADDINGI(1);
+		struct SUserPaths {
+			shok::String SaveGames, // 0
+				Temp_DebugSaves, // 7
+				Temp_Replays, // 14
+				Data, // 21
+				Temp_Logs_TinCat, // 28
+				Data2, // 35
+				Temp_UbiCom, // 42
+				Script, // 49
+				Screenshots, // 56
+				Temp_Grab, // 63
+				Temp_Logs_Game, // 70
+				Temp_MiniDump; // 77
+			shok::String Empties[7];
+		}* UserPaths;
 		GDB::CList GDB; // 227
 
 		static inline constexpr int vtp = 0x76293C;
@@ -410,6 +424,8 @@ namespace Framework {
 	static_assert(offsetof(Framework::CMain, GluePropsManager) == 150 * 4);
 	static_assert(offsetof(Framework::CMain, CampagnInfoHandler) == 174 * 4);
 	static_assert(sizeof(Framework::CMain::SWindowData) == 4 * 9);
+	static_assert(sizeof(Framework::CMain::SUserPaths) == 133 * 4);
+	//constexpr int i = sizeof(Framework::CMain::SUserPaths) / 4;
 	//constexpr int i = offsetof(Framework::CMain, ReplayToLoad) / 4;
 }
 

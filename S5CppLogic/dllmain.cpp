@@ -29,6 +29,7 @@
 #include "s5_entitydisplay.h"
 #include "s5_events.h"
 #include "s5_behaviorProps.h"
+#include "s5_RWE_2d.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -290,10 +291,6 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
-	MoveWindow(*shok::MainWindowHandle, 0, 0, 1600, 900, true);
-	auto* r = shok::UIRenderer::GlobalObj();
-	r->RenderSizeX = 1600;
-	r->RenderSizeY = 900;
 	return 0;
 }
 

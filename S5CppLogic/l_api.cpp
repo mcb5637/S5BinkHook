@@ -112,7 +112,7 @@ namespace CppLogic::API {
 		int ty = L.CheckInt(2);
 		const char* cn = L.OptString(3, nullptr); // optional
 		const char* n = L.CheckString(1);
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(static_cast<shok::MapType>(ty), cn);
 		if (!ci)
 			throw lua::LuaException("invalid map type/campagn");
 		Framework::MapInfo* i = ci->GetMapInfoByName(n);
@@ -136,7 +136,7 @@ namespace CppLogic::API {
 		if (!sdata->LoadSaveData(save))
 			throw lua::LuaException("save doesnt exist");
 		L.Push(sdata->CurrentSave->MapData.MapName.c_str());
-		L.Push(sdata->CurrentSave->MapData.MapType);
+		L.Push(static_cast<int>(sdata->CurrentSave->MapData.MapType));
 		L.Push(sdata->CurrentSave->MapData.MapCampagnName.c_str());
 		L.Push(sdata->CurrentSave->MapData.MapGUID.c_str());
 		return 4;
@@ -274,7 +274,7 @@ namespace CppLogic::API {
 		int ty = L.CheckInt(2 + indexoff);
 		const char* cn = L.OptString(3 + indexoff, nullptr); // optional
 		const char* n = L.CheckString(1 + indexoff);
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(static_cast<shok::MapType>(ty), cn);
 		if (!ci)
 			throw lua::LuaException("invalid map type/campagn");
 		Framework::MapInfo* i = ci->GetMapInfoByName(n);

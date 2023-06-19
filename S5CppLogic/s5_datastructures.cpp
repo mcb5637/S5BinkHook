@@ -14,9 +14,9 @@ shok::String::String(const shok::String& c)
 const char* shok::String::c_str() const
 {
 	if (allocated < 16)
-		return reinterpret_cast<const char*>(&data);
+		return data.inlin;
 	else
-		return reinterpret_cast<const char*>(data);
+		return data.alloc;
 }
 size_t shok::String::size() const
 {
@@ -25,7 +25,7 @@ size_t shok::String::size() const
 shok::String::~String()
 {
 	if (allocated >= 16)
-		shok::Free(reinterpret_cast<void*>(data));
+		shok::Free(data.alloc);
 }
 static inline void(__thiscall* const str_assign)(shok::String* th, const char* c) = reinterpret_cast<void(__thiscall*)(shok::String*, const char*)>(0x40182E);
 void shok::String::assign(const char* s)

@@ -2753,13 +2753,13 @@ function CppLogic.UI.CreateShortMessage(type, duration, tooltip, pos) end
 function CppLogic.UI.RemoveShortMessage(id) end
 
 ---initializes a CppLogic::Mod::UI::AutoScrollCustomWidget.
----@param id number
+---@param id number|string
 ---@param numToScroll number number of elements to scroll through
 ---@return number widCount number of widgets active
 function CppLogic.UI.InitAutoScrollCustomWidget(id, numToScroll) end
 
 ---gets the offset, widget count and element count of a CppLogic::Mod::UI::AutoScrollCustomWidget.
----@param id number
+---@param id number|string
 ---@return number offset offset of rendered widgets (float, floor to get the base offset)
 ---@return number widgetCount number of widgets active
 ---@return number elementCount number of elements to scroll
@@ -2767,12 +2767,12 @@ function CppLogic.UI.GetAutoScrollCustomWidgetOffset(id) end
 
 ---modifies the offset of a CppLogic::Mod::UI::AutoScrollCustomWidget.
 ---automatically clamps the resulting offset.
----@param id number
+---@param id number|string
 ---@param off number modify offset by
 function CppLogic.UI.AutoScrollCustomWidgetModOffset(id, off) end
 
 ---sets the offset of a CppLogic::Mod::UI::AutoScrollCustomWidget.
----@param id number
+---@param id number|string
 ---@param off number set offset to
 function CppLogic.UI.AutoScrollCustomWidgetSetOffset(id, off) end
 

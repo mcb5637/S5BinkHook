@@ -247,16 +247,17 @@ void __stdcall Framework::CMultiPlayerMode::CNetworkEvent::PostEvent(BB::CEvent*
     throw 0;
 }
 
-Framework::CampagnInfo* Framework::CMain::CIH::GetCampagnInfo(int i, const char* n)
+Framework::CampagnInfo* Framework::CMain::CIH::GetCampagnInfo(shok::MapType i, const char* n)
 {
-    if (i < -1 || i >= 4)
+    int i2 = static_cast<int>(i);
+    if (i2 < -1 || i2 >= 4)
         return nullptr;
     Framework::CampagnInfo* r = nullptr;
     auto* th = this;
     __asm {
         push n;
         mov ecx, th;
-        mov eax, i;
+        mov eax, i2;
         mov edx, 0x40BB16; // this thing has first param in eax, no known calling convention, so i have to improvise
         call edx;
         pop edx;

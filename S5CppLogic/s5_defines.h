@@ -374,4 +374,12 @@ namespace shok {
 		Angry = 3,
 		Leaving = 4,
 	};
+
+	enum class MapType : int {
+		Campagn = -1,
+		Singleplayer = 0,
+		Development = 1,
+		Multiplayer = 2,
+		User = 3, // s5x and folder, sp and mp
+	};
 }

@@ -16,7 +16,7 @@ namespace GS3DTools {
 	class CMapData : public ECore::IReplayStreamExtension {
 	public:
 		shok::String MapName;
-		int MapType;
+		shok::MapType MapType;
 		shok::String MapCampagnName;
 		shok::String MapGUID; // theoretically a struct with only a string as member Data
 
@@ -375,7 +375,7 @@ namespace Framework {
 				// check sp 51BA3C __thiscall(shok::vector<int>*) for some reason also checks if vectors sizes match
 			} Keys;
 
-			Framework::CampagnInfo* GetCampagnInfo(int i, const char* n);
+			Framework::CampagnInfo* GetCampagnInfo(shok::MapType i, const char* n);
 			Framework::CampagnInfo* GetCampagnInfo(GS3DTools::CMapData* d);
 
 			// load maps 51908F __thiscall

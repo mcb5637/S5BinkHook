@@ -41,6 +41,7 @@ namespace shok {
 	enum class AccessCategoryFlags : int;
 	enum class Goods : int;
 	enum class EntityType : int;
+	enum class MapType : int;
 
 	class Technology;
 	class TechCategoryManager;

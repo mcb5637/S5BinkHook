@@ -626,8 +626,10 @@ namespace shok {
 	struct String {
 	private:
 		int u1 = 0;
-		int data;
-		int u[3] = { 0 };
+		union {
+			char* alloc;
+			char inlin[4 * 4];
+		} data;
 		size_t size_v = 0;
 		size_t allocated = 0;
 

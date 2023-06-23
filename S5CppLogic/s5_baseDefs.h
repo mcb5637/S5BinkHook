@@ -386,4 +386,10 @@ namespace CppLogic {
 		return static_cast<T>(static_cast<double>(d) * std::numbers::pi / 180);
 	}
 
+	template<class T>
+	struct DestroyCaller {
+		void operator()(T* o) {
+			o->Destroy();
+		}
+	};
 }

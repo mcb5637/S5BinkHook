@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "s5_framework.h"
+
+#include <format>
+
 #include "s5_mapdisplay.h"
+#include "s5_classfactory.h"
+#include "s5_exception.h"
 #include "hooks.h"
 
 void ECore::IReplayStreamExtension::unknown0()
@@ -12,6 +17,12 @@ void __stdcall GS3DTools::CGUIReplaySystem::PostEvent(BB::CEvent* ev)
 }
 void __stdcall GS3DTools::CGUIReplaySystem::CPlayingReplay::PostEvent(BB::CEvent* ev)
 {
+}
+
+inline bool(__thiscall* skeys_checknorm)(const Framework::SKeys* th, const Framework::SKeys* map) = reinterpret_cast<bool(__thiscall*)(const Framework::SKeys*, const Framework::SKeys*)>(0x51B9F7);
+bool Framework::SKeys::Check(const SKeys& map) const
+{
+    return skeys_checknorm(this, &map);
 }
 
 inline GS3DTools::CMapData* (__thiscall* const mapdata_assign)(GS3DTools::CMapData* th, const GS3DTools::CMapData* o) = reinterpret_cast<GS3DTools::CMapData * (__thiscall*)(GS3DTools::CMapData*, const GS3DTools::CMapData*)>(0x4029B8);
@@ -34,6 +45,66 @@ Framework::MapInfo* Framework::CampagnInfo::GetMapInfoByName(const char* n)
     if (i < 0)
         return nullptr;
     return &Maps[i];
+}
+
+void Framework::CampagnInfo::HookLoad()
+{
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x51AA04), 0x10 };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x51AA04), CppLogic::Hooks::MemberFuncPointerToVoid(&CampagnInfo::LoadOverride, 0), reinterpret_cast<void*>(0x51AA0E));
+}
+void __thiscall Framework::CampagnInfo::LoadOverride(const char* path, const SKeys* keys, bool isSp)
+{
+    auto* fs = *BB::CFileSystemMgr::GlobalObj;
+    auto ar = std::unique_ptr<BB::CBBArchiveFile, CppLogic::DestroyCaller<BB::CBBArchiveFile>>(BB::CBBArchiveFile::Create());
+    auto seri = std::unique_ptr<BB::CXmlSerializer, CppLogic::DestroyCaller<BB::CXmlSerializer>>(BB::CXmlSerializer::Create());
+    CampagnName = strrchr(path, '\\') + 1;
+    BB::SerializationData* data = reinterpret_cast<BB::SerializationData * (*)()>(0x51A41D)();
+    shok::Set<shok::String> maps{};
+    fs->FillFilesInDirectory(&maps, path, BB::IFileSystem::SearchOptions::None);
+    auto v = Maps.SaveVector();
+    v.Vector.clear();
+    for (const shok::String& m : maps) {
+        Framework::MapInfo inf{};
+        inf.MapFileName = m;
+        inf.MapFilePath = std::format("{}\\{}", path, static_cast<std::string_view>(m));
+        BB::IFileSystem::FileInfo finf{};
+        char abspath[2001]{};
+        fs->GetFileInfo(&finf, inf.MapFilePath.c_str(), 0);
+        fs->MakeAbsolute(abspath, inf.MapFilePath.c_str());
+        if (!finf.IsDirectory) {
+            if (!static_cast<std::string_view>(m).ends_with(".s5x"))
+                continue;
+            try {
+                ar->OpenArchive(abspath);
+                auto file = std::unique_ptr<BB::IStream>(ar->OpenFileStream("Maps\\ExternalMap\\Info.xml", BB::IStream::Flags::DefaultRead));
+                seri->DeserializeByData(file.get(), &inf, data);
+                inf.MapFilePath = abspath;
+                inf.MapFileName = static_cast<std::string_view>(m).substr(0, m.size() - 4);
+                ar->CloseArchive();
+            }
+            catch (const BB::CFileException&) {
+                ar->CloseArchive();
+                continue;
+            }
+            inf.IsExternalmap = true;
+        }
+        else {
+            auto infoxml = std::format("{}\\{}", abspath[0] ? abspath : inf.MapFilePath.c_str(), "Info.xml");
+            BB::CFileStreamEx file{};
+            try {
+                file.OpenFile(infoxml.c_str(), BB::IStream::Flags::DefaultRead);
+                seri->DeserializeByData(&file, &inf, data);
+                file.Close();
+            }
+            catch (const BB::CFileException&) {
+                file.Close();
+                continue;
+            }
+            inf.IsExternalmap = false;
+        }
+        if (keys->Check(inf.Keys))
+            v.Vector.push_back(inf);
+    }
 }
 
 inline bool(__thiscall* const savedata_load)(Framework::SavegameSystem* th, const char* s) = reinterpret_cast<bool(__thiscall* const)(Framework::SavegameSystem*, const char*)>(0x403253);

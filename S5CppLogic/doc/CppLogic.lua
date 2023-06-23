@@ -34,6 +34,7 @@ assert(false, "do not load this file, this is documentation only!")
 ---			- function identity does now stay as it is. (so if 2 functions are == before saving + loading, they are also after doing so)
 ---		- please note that savegames made with this change active cannot be loaded without CppLogic. (but you can load old saves, just without any of these features)
 --- - arrow and cannonball effect on loaded fix (they now continue flying and hitting after loading a savegame) (this works even for old saves)
+--- - s5x maps are no longer blocked while SHoK is running
 CppLogic = {}
 CppLogic.Effect = {}
 CppLogic.Effect.Predicates = {}
@@ -831,6 +832,10 @@ function CppLogic.API.GetCurrentTime() end
 --- returns the current active cutscene (empty string if no cutscnene active)
 --- @return string name
 function CppLogic.API.GetCurrentCutscene() end
+
+--- reloads the externalmaps (s5x and folder) (only in mainmenu)
+--- run LoadMap.Init() to refresh the UI afterwards
+function CppLogic.API.ReloadExternalmaps() end
 
 ---@class RNG
 local RNG = {}

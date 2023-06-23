@@ -628,7 +628,7 @@ namespace shok {
 		int u1 = 0;
 		union {
 			char* alloc;
-			char inlin[4 * 4];
+			char inlin[4 * 4] = {};
 		} data;
 		size_t size_v = 0;
 		size_t allocated = 0;
@@ -636,13 +636,21 @@ namespace shok {
 	public:
 		String(const char* s);
 		String(const String& c);
+		String(const std::string& s);
+		String(const std::string_view& s);
 		void assign(const char* s);
+		void assign(const char* s, size_t len);
 		const char* c_str() const;
 		size_t size() const;
 		~String();
 		String();
 		std::strong_ordering operator<=>(const String& r) const;
 		bool operator==(const String& r) const;
+		void operator=(const String& s);
+		void operator=(const std::string& s);
+		void operator=(const std::string_view& s);
+		void operator=(const char* s);
+		operator std::string_view() const;
 	};
 	static_assert(sizeof(String) == 7 * 4);
 	std::strong_ordering operator<=>(const String& a, const char* b);

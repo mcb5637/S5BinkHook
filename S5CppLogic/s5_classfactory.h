@@ -8,16 +8,16 @@ namespace BB {
 	class IXmlSerializer {
 	public:
 		virtual void __stdcall Destroy() = 0;
-		virtual void __stdcall Deserialize(BB::CFileStreamEx* f, BB::IObject* ob) = 0; // open file in mode 0x113
+		virtual void __stdcall Deserialize(BB::IStream* f, BB::IObject* ob) = 0; // open file in mode 0x113
 	private:
 		virtual void unknown() = 0;
 	public:
-		virtual void __stdcall Serialize(BB::CFileStreamEx* f, BB::IObject* ob) = 0; // open file in mode 0x121
+		virtual void __stdcall Serialize(BB::IStream* f, BB::IObject* ob) = 0; // open file in mode 0x121
 	protected:
 		virtual ~IXmlSerializer() = default;
 	public:
-		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, void* ob, const BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* ob, const BB::SerializationData* d, const char* xmlrootname) = 0;
+		virtual void __stdcall DeserializeByData(BB::IStream* f, void* ob, const BB::SerializationData* d) = 0;
+		virtual void __stdcall SerializeByData(BB::IStream* f, void* ob, const BB::SerializationData* d, const char* xmlrootname) = 0;
 	};
 	class CXmlSerializer : public IXmlSerializer {
 	public:
@@ -41,10 +41,10 @@ namespace BB {
 	public:
 		virtual ~IBinarySerializer() = default;
 		virtual void __stdcall Destroy() = 0;
-		virtual void __stdcall DeserializeById(BB::CFileStreamEx* f, BB::IObject* b) = 0;
-		virtual void __stdcall SerializeById(BB::CFileStreamEx* f, BB::IObject* b) = 0;
-		virtual void __stdcall DeserializeByData(BB::CFileStreamEx* f, void* o, const BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::CFileStreamEx* f, void* o, const BB::SerializationData* d, unsigned int id) = 0; // id gets ignored
+		virtual void __stdcall DeserializeById(BB::IStream* f, BB::IObject* b) = 0;
+		virtual void __stdcall SerializeById(BB::IStream* f, BB::IObject* b) = 0;
+		virtual void __stdcall DeserializeByData(BB::IStream* f, void* o, const BB::SerializationData* d) = 0;
+		virtual void __stdcall SerializeByData(BB::IStream* f, void* o, const BB::SerializationData* d, unsigned int id) = 0; // id gets ignored
 
 		static inline constexpr int vtp = 0x77F4C8;
 	};

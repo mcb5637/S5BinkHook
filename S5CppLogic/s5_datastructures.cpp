@@ -11,6 +11,14 @@ shok::String::String(const shok::String& c)
 {
 	str_ctorcopy(this, &c);
 }
+shok::String::String(const std::string& s)
+{
+	*this = s;
+}
+shok::String::String(const std::string_view& s)
+{
+	*this = s;
+}
 const char* shok::String::c_str() const
 {
 	if (allocated < 16)
@@ -32,6 +40,11 @@ void shok::String::assign(const char* s)
 {
 	str_assign(this, s);
 }
+inline void(__thiscall* const str_assign_l)(shok::String* th, const char* c, size_t l) = reinterpret_cast<void(__thiscall*)(shok::String*, const char*, size_t)>(0x401799);
+void shok::String::assign(const char* s, size_t len)
+{
+	str_assign_l(this, s, len);
+}
 shok::String::String() : shok::String("")
 {
 }
@@ -43,6 +56,26 @@ std::strong_ordering shok::String::operator<=>(const String& r) const
 bool shok::String::operator==(const String& r) const
 {
 	return (*this <=> r) == std::strong_ordering::equal;
+}
+void shok::String::operator=(const String& s)
+{
+	assign(s.c_str(), s.size());
+}
+void shok::String::operator=(const std::string& s)
+{
+	assign(s.c_str(), s.size());
+}
+void shok::String::operator=(const std::string_view& s)
+{
+	assign(s.data(), s.size());
+}
+void shok::String::operator=(const char* s)
+{
+	assign(s);
+}
+shok::String::operator std::string_view() const
+{
+	return { c_str(), size() };
 }
 
 std::strong_ordering shok::operator<=>(const String& a, const char* b)

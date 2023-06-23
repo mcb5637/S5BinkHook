@@ -55,21 +55,31 @@ namespace GS3DTools {
 }
 
 namespace Framework {
+	struct SKeys {
+		shok::Vector<int> Keys;
+
+		bool Check(const SKeys& map) const;
+		// set to extra num 51BA6A __thiscall
+		// check sp 51BA3C __thiscall(shok::vector<int>*) for some reason also checks if vectors sizes match
+	};
+
 	struct MapInfo {
 		shok::String NameKey, DescKey, Name, Desc;
-		int SizeX, SizeY;
-		bool MPFlag; // 30
+		int SizeX = 0, SizeY = 0;
+		bool MPFlag = false; // 30
 		PADDING(3);
-		int MPPlayerCount;
-		int MPGameOptionFlagSet;
+		int MPPlayerCount = 0;
+		int MPGameOptionFlagSet = 0;
 		shok::String MiniMapTextureName;
-		bool IsExternalmap; // ? 40
+		bool IsExternalmap = false; // ? 40
 		PADDING(3);
-		shok::Vector<int> Keys; // check goes for every map key has to be in shok keys
+		SKeys Keys; // check goes for every map key has to be in shok keys
 		struct {
 			shok::String Data;
 		} GUID;
 		shok::String MapFileName, MapFilePath;
+
+		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x87EA10);
 	};
 	static_assert(sizeof(Framework::MapInfo) == 66 * 4);
 	//constexpr int i = offsetof(MapInfo, unknown) / 4;
@@ -81,7 +91,9 @@ namespace Framework {
 		int GetMapIndexByName(const char* s);
 		Framework::MapInfo* GetMapInfoByName(const char* n);
 
-		// load 51AA04 __thiscall(path, shok::Vector<int>* Keys, bool isSp)
+		// load 51AA04 __thiscall(path, SKeys* Keys, bool isSp) memoryleaks BB::CBBArchiveFile objects, no point in using the original
+		static void HookLoad();
+		void __thiscall LoadOverride(const char* path, const SKeys* keys, bool isSp = false);
 	};
 	static_assert(sizeof(CampagnInfo) == 11 * 4);
 	struct ActualCampagnInfo { // CampaignInfo.xml in the campagn folder
@@ -368,12 +380,7 @@ namespace Framework {
 		struct CIH {
 			shok::Vector<ActualCampagnInfo> Campagns; // access with -1 + name
 			CampagnInfo Infos[4];
-			struct {
-				shok::Vector<int> Keys;
-				// set to extra num 51BA6A __thiscall
-				// check normal 51B9F7 __thiscall(shok::vector<int>*)
-				// check sp 51BA3C __thiscall(shok::vector<int>*) for some reason also checks if vectors sizes match
-			} Keys;
+			SKeys Keys;
 
 			Framework::CampagnInfo* GetCampagnInfo(shok::MapType i, const char* n);
 			Framework::CampagnInfo* GetCampagnInfo(GS3DTools::CMapData* d);
@@ -396,7 +403,7 @@ namespace Framework {
 				Temp_Logs_Game, // 70
 				Temp_MiniDump; // 77
 			shok::String Empties[7];
-		}* UserPaths;
+		}*UserPaths;
 		GDB::CList GDB; // 227
 
 		static inline constexpr int vtp = 0x76293C;
@@ -428,5 +435,3 @@ namespace Framework {
 	//constexpr int i = sizeof(Framework::CMain::SUserPaths) / 4;
 	//constexpr int i = offsetof(Framework::CMain, ReplayToLoad) / 4;
 }
-
-

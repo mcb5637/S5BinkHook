@@ -55,6 +55,7 @@ struct CppLogicOptions {
 	bool DisableAdvStringPrinting = false;
 	bool DisableModLoader = false;
 	bool DisableAdvLuaSerializer = false;
+	bool DisableMapListFix = false;
 
 	bool Loaded = false;
 
@@ -77,6 +78,9 @@ struct CppLogicOptions {
 				}
 				else if (line == "DisableAdvLuaSerializer") {
 					f >> DisableAdvLuaSerializer;
+				}
+				else if (line == "DisableMapListFix") {
+					f >> DisableMapListFix;
 				}
 				f.ignore();
 			}
@@ -362,6 +366,8 @@ void InitGame() {
 	CppLogic::Mod::RegisterClasses();
 	CppLogic::Mod::UI::RegisterClasses();
 	EGUIX::CTextButtonWidget::HookFixTextRender();
+	if (!Options.DisableMapListFix)
+		Framework::CampagnInfo::HookLoad();
 }
 
 constexpr double Version = 2.0006;

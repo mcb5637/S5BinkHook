@@ -122,7 +122,7 @@ namespace CppLogic::API {
 		L.Push(i->GUID.Data.c_str());
 		L.NewTable();
 		int j = 1;
-		for (int k : i->Keys) {
+		for (int k : i->Keys.Keys) {
 			L.Push(k);
 			L.SetTableRaw(-2, j);
 			++j;
@@ -355,6 +355,14 @@ namespace CppLogic::API {
 		return 1;
 	}
 
+	int ReloadExternalmaps(lua::State L) {
+		auto* m = *Framework::CMain::GlobalObj;
+		if (m->CurrentMode != Framework::CMain::Mode::MainMenu)
+			throw lua::LuaException{"not in mainmenu"};
+		m->CampagnInfoHandler.Infos[3].LoadOverride("maps\\user", &m->CampagnInfoHandler.Keys);
+		return 0;
+	}
+
 	int RNG::Int(lua::State L)
 	{
 		RNG* th = L.GetUserData<RNG>(1);
@@ -462,6 +470,9 @@ namespace CppLogic::API {
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(API, -3);
+		if (L.GetState() == shok::LuaStateMainmenu) {
+			L.RegisterFunc<ReloadExternalmaps>("ReloadExternalmaps", -3);
+		}
 		MainThreadID = GetCurrentThreadId();
 		RNG::Register(L);
 	}

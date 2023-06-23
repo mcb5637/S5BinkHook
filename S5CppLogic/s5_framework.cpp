@@ -55,8 +55,8 @@ void Framework::CampagnInfo::HookLoad()
 void __thiscall Framework::CampagnInfo::LoadOverride(const char* path, const SKeys* keys, bool isSp)
 {
     auto* fs = *BB::CFileSystemMgr::GlobalObj;
-    auto ar = std::unique_ptr<BB::CBBArchiveFile, CppLogic::DestroyCaller<BB::CBBArchiveFile>>(BB::CBBArchiveFile::Create());
-    auto seri = std::unique_ptr<BB::CXmlSerializer, CppLogic::DestroyCaller<BB::CXmlSerializer>>(BB::CXmlSerializer::Create());
+    auto ar = BB::CBBArchiveFile::CreateUnique();
+    auto seri = BB::CXmlSerializer::CreateUnique();
     CampagnName = strrchr(path, '\\') + 1;
     BB::SerializationData* data = reinterpret_cast<BB::SerializationData * (*)()>(0x51A41D)();
     shok::Set<shok::String> maps{};
@@ -76,7 +76,7 @@ void __thiscall Framework::CampagnInfo::LoadOverride(const char* path, const SKe
                 continue;
             try {
                 ar->OpenArchive(abspath);
-                auto file = std::unique_ptr<BB::IStream>(ar->OpenFileStream("Maps\\ExternalMap\\Info.xml", BB::IStream::Flags::DefaultRead));
+                auto file = ar->OpenFileStreamUnique("Maps\\ExternalMap\\Info.xml", BB::IStream::Flags::DefaultRead);
                 seri->DeserializeByData(file.get(), &inf, data);
                 inf.MapFilePath = abspath;
                 inf.MapFileName = static_cast<std::string_view>(m).substr(0, m.size() - 4);

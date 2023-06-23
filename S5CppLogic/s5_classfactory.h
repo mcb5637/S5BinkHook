@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "Luapp/constexprTypename.h"
@@ -29,9 +30,9 @@ namespace BB {
 		using IXmlSerializer::Deserialize;
 		using IXmlSerializer::Serialize;
 		static BB::CXmlSerializer* Create();
+		static std::unique_ptr<CXmlSerializer, CppLogic::DestroyCaller<CXmlSerializer>> CreateUnique();
 		void Deserialize(const char* filename, BB::IObject* ob);
 		void Deserialize(const char* filename, void* ob, const BB::SerializationData* d);
-		// i doubt this will ever get used outside of debugging
 		void Serialize(const char* filename, BB::IObject* ob);
 
 	private:

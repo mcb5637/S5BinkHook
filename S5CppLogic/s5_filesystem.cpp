@@ -25,6 +25,11 @@ void BB::CFileSystemMgr::AddFolder(const char* path)
 	v.Vector[0] = last;
 }
 
+std::unique_ptr<BB::CBBArchiveFile, CppLogic::DestroyCaller<BB::CBBArchiveFile>> BB::CBBArchiveFile::CreateUnique()
+{
+	return std::unique_ptr<CBBArchiveFile, CppLogic::DestroyCaller<CBBArchiveFile>>(Create());
+}
+
 void BB::CFileSystemMgr::AddArchive(const char* path)
 {
 	AddArchiveI(path, true);
@@ -113,6 +118,11 @@ inline void(__thiscall* const memstream_copyfrom)(BB::CMemoryStream* th, BB::ISt
 void BB::CMemoryStream::CopyFromStream(IStream& from)
 {
 	memstream_copyfrom(this, &from);
+}
+
+std::unique_ptr<BB::IStream> BB::IFileSystem::OpenFileStreamUnique(const char* path, BB::IStream::Flags mode)
+{
+	return std::unique_ptr<IStream>(OpenFileStream(path, mode));
 }
 
 static inline bool(__thiscall* const shok_BB_CFileStreamEx_OpenFile)(BB::CFileStreamEx* th, const char* name, BB::CFileStreamEx::Flags m) = reinterpret_cast<bool(__thiscall*)(BB::CFileStreamEx*, const char*, BB::CFileStreamEx::Flags)>(0x54924D);

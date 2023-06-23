@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "enumflags.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
@@ -107,6 +108,8 @@ namespace BB {
 		virtual IStream* OpenFileStream(const char* path, BB::IStream::Flags mode) = 0;
 		virtual bool OpenFileHandle(const char* path, int* pHandle, size_t* psize) = 0; // 5
 
+		std::unique_ptr<IStream> OpenFileStreamUnique(const char* path, BB::IStream::Flags mode);
+
 		static inline constexpr int vtp = 0x77F778;
 	};
 	template<>
@@ -147,6 +150,7 @@ namespace BB {
 		static inline constexpr int vtp = 0x77FABC;
 
 		static inline CBBArchiveFile* (__stdcall* const Create)() = reinterpret_cast<CBBArchiveFile * (__stdcall*)()>(0x551701);
+		static std::unique_ptr<CBBArchiveFile, CppLogic::DestroyCaller<CBBArchiveFile>> CreateUnique();
 	};
 
 	class IFileSystemMgr : public IFileSystem {

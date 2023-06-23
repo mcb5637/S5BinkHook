@@ -9,6 +9,10 @@ BB::CXmlSerializer* BB::CXmlSerializer::Create()
 {
     return xmlserializer_new(0);
 }
+std::unique_ptr<BB::CXmlSerializer, CppLogic::DestroyCaller<BB::CXmlSerializer>> BB::CXmlSerializer::CreateUnique()
+{
+    return std::unique_ptr<CXmlSerializer, CppLogic::DestroyCaller<CXmlSerializer>>(Create());
+}
 void BB::CXmlSerializer::Deserialize(const char* filename, BB::IObject* ob)
 {
     BB::CFileStreamEx filestr{};
@@ -31,11 +35,10 @@ void BB::CXmlSerializer::Serialize(const char* filename, BB::IObject* ob)
 {
     BB::CFileStreamEx filestr{};
     if (filestr.OpenFile(filename, BB::CFileStreamEx::Flags::DefaultWrite)) {
-        auto* s = BB::CXmlSerializer::Create();
+        auto s = BB::CXmlSerializer::CreateUnique();
 
         s->Serialize(&filestr, ob);
 
-        s->Destroy();
         filestr.Close();
     }
 }
@@ -309,16 +312,14 @@ unsigned int __stdcall BB::SerializationData::GetBBIdentifier(void* d)
 
 void BB::CClassFactory::LoadObject(BB::IObject* ob, const char* filename)
 {
-    BB::CXmlSerializer* s = BB::CXmlSerializer::Create();
+    auto s = BB::CXmlSerializer::CreateUnique();
     s->Deserialize(filename, ob);
-    s->Destroy();
 }
 
 void BB::CClassFactory::LoadObject(void* ob, const char* filename, const BB::SerializationData* seri)
 {
-    BB::CXmlSerializer* s = BB::CXmlSerializer::Create();
+    auto s = BB::CXmlSerializer::Create();
     s->Deserialize(filename, ob, seri);
-    s->Destroy();
 }
 
 void __stdcall CppLogic::StringSerializer::DeserializeFromStringImp(void* data, const char* buff)

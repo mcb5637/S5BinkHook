@@ -947,7 +947,7 @@ namespace GGL {
 
 	class CFormationBehavior : public EGL::CGLEBehavior {
 	public:
-		int AnimStartTurn, AnimDuration;
+		int AnimStartTurn = 0, AnimDuration = 0;
 
 		// defined tasks: TASK_ASSUME_POSITION_IN_FORMATION, TASK_IDLE_IN_FORMATION
 		// defined states: IdleInFormation, AssumePositionInFormation

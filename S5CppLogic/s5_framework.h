@@ -10,6 +10,19 @@ namespace ECore {
 	class IReplayStreamExtension {
 		virtual void unknown0();
 	};
+
+	class CReplayHandler : public BB::IPostEvent {
+		// 7 BB::CBinarySerializer* of CReplayMgr
+	};
+
+	class IReplayMgr {
+		virtual void unknown0() = 0;
+	};
+	class CReplayMgr : public IReplayMgr {
+		CReplayHandler* ReplayHandler; // probably unique ptr
+		PADDINGI(2);
+		BB::CBinarySerializer* Serializer;
+	};
 }
 
 namespace GS3DTools {
@@ -207,12 +220,12 @@ namespace Framework {
 	};
 	class CEventTimeManager : public BB::IPostEvent, private CEventTimeManager_UnknownInt, public CTimeManager {
 	public:
-		PADDINGI(1); // 1 ints
+		BB::IPostEvent* ReplayHandler; // ECore::CReplayHandler
 		lua_State* LuaState; // 17
 
 		static inline constexpr int vtp = 0x7630CC;
 
-		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+		virtual void __stdcall PostEvent(BB::CEvent* ev) override; // handles time event directly, everyting else goes to replayhandler
 	};
 	static_assert(sizeof(CEventTimeManager) == 4 * 18);
 
@@ -238,10 +251,11 @@ namespace Framework {
 		const char* Folder;
 	};
 
-	class AGameModeBase : public BB::IPostEvent {
+	class AGameModeBase : public BB::IPostEvent { // postevent does ui events (partial), to GGUI::CManager (GGUI::CMouseEffect) and EScr::CInputHandler
 	public:
 		virtual ~AGameModeBase() = default;
-		// 2 more pure virt funcs
+		virtual void Update(int) = 0; // todo param? p to one of CMain, embedded struct?
+		virtual BB::IPostEvent* GetCNetworkEvent() = 0;
 
 		lua_State* IngameLuaState;
 		PADDINGI(1); // EScr::CInputHandler
@@ -283,19 +297,22 @@ namespace Framework {
 	public:
 		class CNetworkEvent : public BB::IPostEvent {
 			CEventTimeManager* TimeManager1;
-			CEventTimeManager* TimeManager2;
+			CEventTimeManager* TimeManager2; // same pointer
 			BB::CBinarySerializer* BinarySerializer;
-			BB::CMemoryStream MemoryStream;
+			BB::CMemoryStream MemoryStream; // stores GUI events between recieving and executing, then goes to TimeManager2
 
 			static inline constexpr int vtp = 0x7632C0;
 
-			virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+			virtual void __stdcall PostEvent(BB::CEvent* ev) override; // speed event to TimeManager1, otherwise stored to MemoryStream
+
+			// update 40F9B5 __thiscall()
 		};
-		CNetworkEvent NetworkEvent;
+		CNetworkEvent NetworkEvent; //1428
 
 		static inline constexpr int vtp = 0x7632C8;
 	};
 	static_assert(sizeof(CSinglePlayerMode) == 1438 * 4);
+	static_assert(offsetof(CSinglePlayerMode, NetworkEvent) == 1428 * 4);
 	class CMultiPlayerMode : public AGameModeBase {
 	public:
 		class CNetworkEvent : public BB::IPostEvent {
@@ -358,7 +375,7 @@ namespace Framework {
 		ED::CGUIScene* GUIScene;
 		ESnd::CSoESound* Sound;
 	private:
-		int one;
+		int one; // some update value?
 	public:
 		GGlue::CGluePropsMgr* GluePropsManager; // 150
 		PADDINGI(9);

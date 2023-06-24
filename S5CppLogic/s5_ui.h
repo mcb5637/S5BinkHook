@@ -632,8 +632,8 @@ public:
 
 namespace GGUI {
 	class CManager { // size 26*4
-		virtual void unknown() = 0;
 	public:
+		virtual void __stdcall PostEvent(BB::CEvent* ev) = 0; // for gui events, forward to MouseEffect
 
 		struct StateIdData {
 			shok::EntityCategory ApplyTo;
@@ -650,7 +650,7 @@ namespace GGUI {
 		GGL::CGLGUIInterface* GUIInterface; // 8
 		EGL::CGLETerrainHiRes* TerrainHiRes;
 	private:
-		BB::IPostEvent* PostEvent;
+		BB::IPostEvent* PostEvent; // for GUI events, p to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent
 	public:
 		shok::Vector<SelectionData> SelectedEntities; //11
 		int ControlledPlayer; // 15

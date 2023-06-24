@@ -295,9 +295,11 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
-	auto* p = &(*Framework::CMain::GlobalObj)->CampagnInfoHandler;
+	auto* p = (GGUI::CManager::GlobalObj());
 	L.Push((int)p);
-	return 1;
+	auto* gm = &(*Framework::CMain::GlobalObj)->GameModeBase->TimeManager;
+	L.Push((int)gm);
+	return 2;
 }
 
 int GetOptions(lua::State L) {

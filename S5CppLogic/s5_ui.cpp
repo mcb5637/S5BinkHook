@@ -915,7 +915,7 @@ void GGUI::CManager::HackPostEvent()
 		CppLogic::Hooks::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
 	}
-	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(CppLogic::GetVTable(PostEvent));
+	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(CppLogic::GetVTable(PostGUIEvent));
 	CppLogic::Hooks::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
 	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
 	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(BB::IPostEvent * th, BB::CEvent * ev)>(&PostEventHook);

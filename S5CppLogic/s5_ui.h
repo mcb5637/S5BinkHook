@@ -650,7 +650,7 @@ namespace GGUI {
 		GGL::CGLGUIInterface* GUIInterface; // 8
 		EGL::CGLETerrainHiRes* TerrainHiRes;
 	private:
-		BB::IPostEvent* PostEvent; // for GUI events, p to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent
+		BB::IPostEvent* PostGUIEvent; // for GUI events, p to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent
 	public:
 		shok::Vector<SelectionData> SelectedEntities; //11
 		int ControlledPlayer; // 15
@@ -665,6 +665,13 @@ namespace GGUI {
 
 		// select entity standard thiscall 0x721EF6(selectedVector*, id)
 		// select entity solier of leader thiscall 0x721F12(selectedVector*, id)
+		// feedback event handler stdcall 0x529200(this, event*) calls in order:
+		//	feedback event handler minimap thiscall 0x528F43(this, event*)
+		//	feedback event handler onscreenRes thiscall 0x52901E(this, event*)
+		//	feedback event handler entityIdChanged thiscall 0x529082(this, event*)
+		//	feedback event handler resourceSend thiscall 0x529114(this, event*) (also recieved, MP)
+		//  sound handler 526CEF()->(thiscall*0x5279DE)(event*)
+		//  GGUI::CShortMessagesWindowControllerCustomWidget::HandleFeedbackEvent
 
 		void SetControlledPlayer(int pl);
 		bool IsEntitySelected(int id) const;

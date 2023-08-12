@@ -804,6 +804,7 @@ namespace GGUI {
 		// button clicked 0x531C8E __thiscall(int idx)
 		// init buttons 0x531573 __thiscall (nop on already initialized)
 		// update buttons 0x531803 __thiscall
+		// feedbackEvent 0x5320DF __thiscall(event*)
 
 		static inline CShortMessagesWindowControllerCustomWidget** const GlobalObj = reinterpret_cast<CShortMessagesWindowControllerCustomWidget**>(0x882C34);
 	};
@@ -998,10 +999,15 @@ namespace EGUIX {
 
 	class FeedbackEventHandler { // another no vtable
 	public:
+		shok::List<BB::TSlot1<BB::CEvent const&>> Handlers;
+
+		// add feedback event handler thiscall 0x525022(GGUI::CManager* obj, void* handler func) (creates BB::TSlotEx1<GGUI::CManager,BB::CEvent const &>)
+
 		void FireEvent(BB::CEvent* ev);
 
 		static inline EGUIX::FeedbackEventHandler* (* const GlobalObj)() = reinterpret_cast<EGUIX::FeedbackEventHandler * (*)()>(0x582EE1);
 	};
+	static_assert(sizeof(FeedbackEventHandler) == 3 * 4);
 
 	class WidgetLoader {
 	public:

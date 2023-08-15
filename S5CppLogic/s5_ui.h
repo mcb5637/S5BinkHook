@@ -670,7 +670,7 @@ namespace GGUI {
 		//	feedback event handler onscreenRes thiscall 0x52901E(this, event*)
 		//	feedback event handler entityIdChanged thiscall 0x529082(this, event*)
 		//	feedback event handler resourceSend thiscall 0x529114(this, event*) (also recieved, MP)
-		//  sound handler 526CEF()->(thiscall*0x5279DE)(event*)
+		//  GGUI::SoundFeedback::GlobalObj()->HandleFeedbackEvent(event)
 		//  GGUI::CShortMessagesWindowControllerCustomWidget::HandleFeedbackEvent
 
 		void SetControlledPlayer(int pl);
@@ -697,6 +697,180 @@ namespace GGUI {
 		static bool IsModifierPressed(shok::Keys modif);
 	};
 	//constexpr int i = offsetof(CManager, CommandStates) / 4;
+
+	class SoundFeedback { // another no vtable, size 24
+	public:
+		class AData : public BB::IObject {
+		public:
+			bool Warn, StopOnValid; // needs confirm
+
+			virtual shok::SoundId GetSoundIdIfApplies(void*) const = 0;
+		};
+		class AValueSound : public BB::IObject {
+		public:
+			shok::SoundId SoundID;
+
+			virtual int GetValue() const = 0;
+		};
+
+		class CSingleSound : public AData { // always returns that one sound
+		public:
+			shok::SoundId SoundID;
+
+			static inline constexpr int vtp = 0x77E36C;
+			static inline constexpr unsigned int Identifier = 0xD8C12453;
+		};
+		class CParamValueSound : public AData { // returns Data->GetSoundIdIfApplies(...) if parameter matches ParameterValue
+		public:
+			AData* Data;
+			int ParameterIndex;
+			int ParameterValue;
+			bool CanBeIgnored;
+
+			static inline constexpr int vtp = 0x77E380;
+			static inline constexpr unsigned int Identifier = 0x90C03583;
+		};
+		class CParamValueExSound : public AData { // returns Data->GetSoundIdIfApplies(...) if parameter matches ParameterValue->GetValue()
+		public:
+			AData* Data;
+			int ParameterIndex;
+			AValueSound* ParameterValue;
+			bool CanBeIgnored;
+
+			static inline constexpr int vtp = 0x77E394;
+			static inline constexpr unsigned int Identifier = 0x49C94153;
+		};
+		class CData : public AData { // returns ValueSound[i]->SoundId where ValueSound[i]->GetValue() matches parameter
+		public:
+			shok::Vector<AValueSound*> ValueSound;
+			int ParameterIndex;
+
+			static inline constexpr int vtp = 0x77E3F8;
+			static inline constexpr unsigned int Identifier = 0x85435E63;
+		};
+
+		class CAbilityType : public AValueSound {
+		public:
+			shok::AbilityId AbilityType;
+
+			static inline constexpr int vtp = 0x77E2F4;
+			static inline constexpr unsigned int Identifier = 0x3FF3BAC3;
+		};
+		class CEntityType : public AValueSound {
+		public:
+			shok::EntityType EntityType;
+
+			static inline constexpr int vtp = 0x77E308;
+			static inline constexpr unsigned int Identifier = 0x34AECF3;
+		};
+		class CGoodType : public AValueSound {
+		public:
+			shok::ResourceType GoodType;
+
+			static inline constexpr int vtp = 0x77E31C;
+			static inline constexpr unsigned int Identifier = 0x67C6B5C3;
+		};
+		class CTechnologyType : public AValueSound {
+		public:
+			shok::TechnologyId TechnologyType;
+
+			static inline constexpr int vtp = 0x77E330;
+			static inline constexpr unsigned int Identifier = 0x451B5863;
+		};
+		class CUpgradeCategory : public AValueSound {
+		public:
+			shok::UpgradeCategoryId UpgradeCategory;
+
+			static inline constexpr int vtp = 0x77E344;
+			static inline constexpr unsigned int Identifier = 0xCD0D0AC3;
+		};
+		class CNormalValue : public AValueSound {
+		public:
+			int Value;
+
+			static inline constexpr int vtp = 0x77E358;
+			static inline constexpr unsigned int Identifier = 0x70295D23;
+		};
+
+		struct FeedbackState {
+			struct SFilter {
+				struct SEvent {
+					shok::FeedbackEventIds EventType;
+					int Parameter1, Parameter2, Parameter3; // negative value means, all of this type (comment)
+					PADDINGI(1);
+
+					auto operator<=>(const SEvent&) const noexcept = default; // pretty sure this is something different, but this will be enough for now 52B485
+				};
+				struct SData {
+					struct SIgnore {
+						SEvent Event;
+						float Time;
+						// Empty Event.EventType means ignore own event
+						// Event.Parameter:
+						//   -1 means, all of this type
+						//   <= -2 means same as input parameter..warning use only with events that has same parameter value
+					};
+
+					float LifeTime; // Time this event is hold in to be played memory
+					int Priority; // Priority of sound, lower priority is better
+					shok::Vector<SIgnore> Ignore; // Ignore Events for time
+				};
+
+				shok::Map<SEvent, SData> EventDataMapElement;
+			};
+			struct STransition {
+				struct SData {
+					int NumberOfEvents;
+					float Duration;
+				};
+
+				shok::Map<shok::FeedbackEventIds, SData> EventDataMapElement;
+				shok::FeedbackStateId TargetState;
+			};
+
+
+			float LifeTime; // zero means endless lifetime
+			SFilter Filter;
+			shok::Vector<STransition> Transition;
+			shok::Map<shok::FeedbackEventIds, float> EventIncreaseLifeTimeMapElement; // EventType->IncreasingTime
+
+			static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x882900);
+		};
+
+		struct FeedbackEventSoundData {
+			shok::Vector<AData*> Sound;
+
+
+			static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x883720);
+		};
+
+		PADDINGI(6); // 2 maps, queued, cooldown????
+		PADDINGI(1); // 0
+		EGL::CPlayerEntityIterator* Iterator;
+		PADDINGI(2); // 2 floats, counters?
+		PADDINGI(3); // 10 map
+		struct FeedbackStates {
+			shok::Vector<FeedbackState*> States;
+
+			// load 52DE51
+		} FS; // 13
+		struct SoundDatas {
+			shok::Map<shok::FeedbackEventIds, FeedbackEventSoundData*> SoundData;
+
+			// load 53C51A
+		} SD; // 17
+		PADDINGI(3); // map?
+		bool PlaySounds; // 23
+
+		// ctor 5278ED
+		// HandleFeedbackEvent thiscall 0x5279DE (event*)
+
+
+
+		static inline GGUI::SoundFeedback* (* const GlobalObj)() = reinterpret_cast<GGUI::SoundFeedback * (*)()>(0x52799B);
+	};
+	static_assert(sizeof(SoundFeedback) == 24 * 4);
+	static_assert(offsetof(SoundFeedback, FS) == 13 * 4);
 }
 
 namespace ED {

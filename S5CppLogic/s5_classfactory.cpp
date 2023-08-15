@@ -86,6 +86,9 @@ BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::EntityAccessCategor
 BB::FieldSerilaizer::ExtendedInfo InfoAnimCategory{ "shok::AnimCategoryID", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckInt };
 BB::FieldSerilaizer::ExtendedInfo InfoWidgetID{ "shok::WidgetID", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventId", & PushInt, & CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", & PushInt, & CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", & PushInt, & CheckInt };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -166,6 +169,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x80DC80, &InfoBool},
     {0x839AB0, &InfoBool},
     {0x83578c, &InfoBool},
+    { 0x82F6E0, &InfoBool },
 
     {0x810C98, &InfoInt},
     {0x800108, &InfoInt},
@@ -191,6 +195,9 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x83acb0, &InfoInt},
     {0x8394b8, &InfoInt},
     {0x837254, &InfoInt},
+    { 0x82CAE8, &InfoInt },
+    { 0x82D348, &InfoInt },
+    { 0x82F700, &InfoInt },
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
@@ -212,6 +219,9 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x8754B8, &InfoGoods},
     {0x8683e4, &InfoGoods},
     {0x894708, &InfoWidgetID},
+    { 0x880494, &InfoFeedbackEventId },
+    { 0x8804B8, &InfoFeedbackStateId },
+    { 0x883088, &InfoAbilityId },
 
     {0x810D18, &InfoAccessCategory},
 
@@ -249,6 +259,8 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x83B65C, &InfoFloat},
     {0x829AF4, &InfoFloat},
     {0x82D62C, &InfoFloat},
+    { 0x82D328, &InfoFloat },
+    { 0x82CAC8, &InfoFloat },
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},

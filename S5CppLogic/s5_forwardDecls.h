@@ -42,6 +42,11 @@ namespace shok {
 	enum class Goods : int;
 	enum class EntityType : int;
 	enum class MapType : int;
+	enum class FeedbackStateId : int;
+	enum class SoundId : int;
+	enum class AbilityId : int;
+	enum class TechnologyId : int;
+	enum class UpgradeCategoryId : int;
 
 	class Technology;
 	class TechCategoryManager;
@@ -65,6 +70,7 @@ namespace EGL {
 	class CFlyingEffectProps;
 	class CGLETaskArgsThousandths;
 	class CGLETerrainLowRes;
+	class CPlayerEntityIterator;
 
 	template<class T, unsigned int id>
 	requires (std::same_as<T, bool>&& id == 0x65DE8317) || (std::same_as<T, int> && id == 0x483040E7) || (std::same_as<T, float> && id == 0x578EE8F7)

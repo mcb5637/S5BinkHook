@@ -2,7 +2,7 @@
 
 namespace shok {
 	// do not expect this enum to be correct in any case
-	enum class EntityType : int {
+	enum class EntityTypeId : int {
 		CB_Abbey01 = 92,
 		CB_Abbey02 = 93,
 		CB_Abbey03 = 94,

@@ -758,7 +758,7 @@ namespace GGUI {
 		};
 		class CEntityType : public AValueSound {
 		public:
-			shok::EntityType EntityType;
+			shok::EntityTypeId EntityType;
 
 			static inline constexpr int vtp = 0x77E308;
 			static inline constexpr unsigned int Identifier = 0x34AECF3;

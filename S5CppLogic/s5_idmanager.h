@@ -1,6 +1,8 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include <format>
+#include "Luapp/constexprTypename.h"
 
 namespace BB {
 	class IIDManager {
@@ -77,16 +79,83 @@ namespace BB {
 
 		static inline BB::CIDManager** const WidgetIDManager = reinterpret_cast<BB::CIDManager**>(0x8945C8);
 	};
+}
+
+namespace CppLogic {
+	template<class En>
+	requires std::is_enum_v<En>&& std::is_same_v<int, std::underlying_type_t<En>>
+	class EnumIdManager {
+		BB::IIDManager* Manager;
+
+	public:
+		EnumIdManager(BB::IIDManager* mng) : Manager(mng) {
+
+		}
+
+		// does not add
+		En GetIdByName(const char* name) {
+			return static_cast<En>(Manager->GetIdByName(name));
+		}
+		const char* GetNameByID(En id) {
+			return Manager->GetNameByID(static_cast<int>(id));
+		}
+		// throws if id invalid
+		En GetIDByNameOrCreate(const char* name) {
+			return static_cast<En>(Manager->GetIDByNameOrCreate(name));
+		}
+		// sets id id >0, throws otherwise or if id does not match or already used
+		En GetIDByNameOrCreate(const char* name, En newid) {
+			return static_cast<En>(Manager->GetIDByNameOrCreate(name, static_cast<int>(newid)));
+		}
+		// remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
+		void RemoveID(En id) {
+			Manager->RemoveID(static_cast<int>(id));
+		}
+		void DumpManagerToLuaGlobal(lua_State* L, const char* global) {
+			Manager->DumpManagerToLuaGlobal(L, global);
+		}
+		size_t size() {
+			return Manager->size();
+		}
+		void clear() {
+			Manager->clear();
+		}
+	};
 
 	template<class En>
-	requires std::is_enum_v<En> && std::is_same_v<int, std::underlying_type_t<En>>
-	En GetIdFromManager(const char* name, BB::CIDManagerEx* mng) {
-		int id = mng->GetIdByName(name);
-		if (id == 0)
-			throw std::invalid_argument{ "invalid id" };
-		return static_cast<En>(id);
-	}
-	inline auto GetEntityType(const char* name) {
-		return GetIdFromManager<shok::EntityType>(name, *CIDManagerEx::EntityTypeManager);
+	struct IdManagerMapping {
+	};
+	template<>
+	struct IdManagerMapping<shok::EntityTypeId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::EntityTypeManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::FeedbackStateId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::FeedbackStateManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::SoundId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::SoundsManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::AbilityId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AbilityManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::TechnologyId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TechnologiesManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::UpgradeCategoryId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::UpgradeCategoryManager;
+	};
+
+	template<class En>
+	requires std::is_enum_v<En> && std::is_same_v<int, std::underlying_type_t<En>> && requires {IdManagerMapping<En>::Manager; }
+	inline EnumIdManager<En> GetIdManager() {
+		auto mng = *IdManagerMapping<En>::Manager;
+		if (mng == nullptr)
+			throw std::runtime_error{std::format("{} manager not yet initialized", typename_details::type_name<En>())};
+		return EnumIdManager<En>{mng};
 	}
 }

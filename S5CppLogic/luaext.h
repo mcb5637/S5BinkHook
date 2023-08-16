@@ -4,6 +4,8 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_defines.h"
+#include "s5_idmanager.h"
+#include <format>
 
 namespace luaext {
 	class EState : public lua::State {
@@ -44,6 +46,22 @@ namespace luaext {
 		shok::Technology* CheckTech(int idx);
 
 		EGUIX::CBaseWidget* CheckWidget(int idx);
+
+		template<class En>
+		requires std::is_enum_v<En>
+		void PushEnum(En id) {
+			Push(static_cast<std::underlying_type_t<En>>(id));
+		}
+		template<class En>
+		requires std::is_enum_v<En>
+		En CheckEnum(int idx) {
+			En id = static_cast<En>(CheckInt(idx));
+			auto mng = CppLogic::GetIdManager<En>();
+			if (mng.GetNameByID(id) == nullptr) {
+				throw lua::LuaException{std::format("invalid {} at {}: {} does not exist", typename_details::type_name<En>(), idx, static_cast<int>(id))};
+			}
+			return id;
+		}
 	};
 }
 

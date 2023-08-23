@@ -145,7 +145,7 @@ BB::FieldSerilaizer::ExtendedInfo InfoCharBuff{ "char*" , &PushCharBuff, &CheckU
 
 
 void PushEntId(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
-    L.Push((*static_cast<EGL::CGLEEntity**>(data))->EntityId);
+    L.Push(static_cast<int>((*static_cast<EGL::CGLEEntity**>(data))->EntityId));
 }
 void CheckEntId(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
     *static_cast<EGL::CGLEEntity**>(data) = luaext::EState{ L }.CheckEntity(idx);
@@ -312,12 +312,12 @@ const BB::FieldSerilaizer::ExtendedInfo& BB::FieldSerilaizer::GetExtendedInfo() 
     return InfoUnknown;
 }
 
-const BB::SerializationData* BB::SerializationData::GetSerializationData(unsigned int id)
+const BB::SerializationData* BB::SerializationData::GetSerializationData(shok::ClassId id)
 {
     return (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
 }
 
-unsigned int __stdcall BB::SerializationData::GetBBIdentifier(void* d)
+shok::ClassId __stdcall BB::SerializationData::GetBBIdentifier(void* d)
 {
     return static_cast<BB::IObject*>(d)->GetClassIdentifier();
 }

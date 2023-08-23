@@ -10,8 +10,9 @@
 #include "s5_mapdisplay.h"
 #include "s5_animset.h"
 
-void GGlue::CGlueAnimsPropsMgr::CreateAnimProps(int id)
+void GGlue::CGlueAnimsPropsMgr::CreateAnimProps(shok::AnimationId i)
 {
+	int id = static_cast<int>(i);
 	if (id > static_cast<int>(Data.size()))
 		throw std::logic_error{ "somehow the id is too big" };
 	if (id == static_cast<int>(Data.size())) {
@@ -23,15 +24,16 @@ void GGlue::CGlueAnimsPropsMgr::CreateAnimProps(int id)
 	strcpy_s(buff, 0x100, (*BB::CIDManagerEx::AnimManager)->GetNameByID(id));
 	shok::StringToLowerCase(buff);
 	auto* t = Data.at(id);
-	t->Duration = static_cast<int>(mng->GetAnimationDuration(id) * 10.0f); // * 1000 / 100
+	t->Duration = static_cast<int>(mng->GetAnimationDuration(i) * 10.0f); // * 1000 / 100
 	if (strstr(buff, "_walk") != nullptr || strstr(buff, "_run") != nullptr)
 		t->IsWalkOrRun = true;
 	else
 		t->IsWalkOrRun = false;
 }
 
-void GGlue::CGlueAnimsPropsMgr::PopAnimPops(int id)
+void GGlue::CGlueAnimsPropsMgr::PopAnimPops(shok::AnimationId i)
 {
+	int id = static_cast<int>(i);
 	if (id + 1 != static_cast<int>(Data.size()))
 		throw std::out_of_range{ "invalid id" };
 	auto v = Data.SaveVector();
@@ -40,8 +42,9 @@ void GGlue::CGlueAnimsPropsMgr::PopAnimPops(int id)
 }
 
 static inline void(__thiscall* effectlogic_init)(EGL::CGLEEffectProps* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEEffectProps*)>(0x589297);
-void GGlue::CEffectsPropsMgr::LoadEffectTypeFromExtraFile(int id)
+void GGlue::CEffectsPropsMgr::LoadEffectTypeFromExtraFile(shok::EffectTypeId i)
 {
+	int id = static_cast<int>(i);
 	if (id > static_cast<int>(EffectsProps.Effects.size()))
 		throw std::logic_error{ "somehow the id is too big" };
 	if (id == static_cast<int>(EffectsProps.Effects.size())) {
@@ -58,15 +61,16 @@ void GGlue::CEffectsPropsMgr::LoadEffectTypeFromExtraFile(int id)
 	filename.append(".xml");
 	(*BB::CClassFactory::GlobalObj)->LoadObject(&t, filename.c_str(), t.SerializationData);
 	if (!t.Display || !t.Logic) {
-		FreeEffectType(id);
+		FreeEffectType(i);
 		throw std::invalid_argument{ "invalid file" };
 	}
 	effectlogic_init(t.Logic);
 	EffectsLogicProps.EffectTypes[id] = t.Logic;
 	EffectsDisplayProps.EffectTypes[id] = t.Display;
 }
-void GGlue::CEffectsPropsMgr::FreeEffectType(int id)
+void GGlue::CEffectsPropsMgr::FreeEffectType(shok::EffectTypeId i)
 {
+	int id = static_cast<int>(i);
 	auto& t = EffectsProps.Effects[id];
 	delete t.Display;
 	delete t.Logic;
@@ -79,10 +83,10 @@ void GGlue::CEffectsPropsMgr::FreeEffectType(int id)
 void GGlue::CEffectsPropsMgr::ReloadAllEffectTypes()
 {
 	for (unsigned int i = EffectsProps.Effects.size() - 1; i > 0; --i) {
-		FreeEffectType(i);
+		FreeEffectType(static_cast<shok::EffectTypeId>(i));
 		EffectTypeManager->RemoveID(i);
 	}
-	FreeEffectType(0); // there is no effect 0, just a placeholder. not sure if i need to remove it
+	FreeEffectType(static_cast<shok::EffectTypeId>(0)); // there is no effect 0, just a placeholder. not sure if i need to remove it
 	{
 		auto v = EffectsProps.Effects.SaveVector();
 		v.Vector.clear();
@@ -95,8 +99,9 @@ void GGlue::CEffectsPropsMgr::ReloadAllEffectTypes()
 }
 
 static inline void(__thiscall* const epropsmng_loadentitytypebyid)(GGlue::CEntitiesPropsMgr* th, int id) = reinterpret_cast<void(__thiscall*)(GGlue::CEntitiesPropsMgr*, int)>(0x5B931B);
-void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(int id)
+void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(shok::EntityTypeId i)
 {
+	int id = static_cast<int>(i);
 	if (id >= static_cast<int>(EntityTypes.size()))
 	{
 		auto glue = EntityTypes.SaveVector();
@@ -107,16 +112,17 @@ void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(int id)
 		dis.Vector.push_back(nullptr);
 	}
 	epropsmng_loadentitytypebyid(this, id);
-	auto* ty = CGLEEntitiesProps.GetEntityType(id);
+	auto* ty = CGLEEntitiesProps.GetEntityType(i);
 	ty->LogicProps->InitializeBlocking();
 	RefreshDisplayFlags();
 }
 
-void GGlue::CEntitiesPropsMgr::PopEntityType(int id)
+void GGlue::CEntitiesPropsMgr::PopEntityType(shok::EntityTypeId i)
 {
+	int id = static_cast<int>(i);
 	if (id + 1 != static_cast<int>(EntityTypes.size()))
 		throw std::out_of_range("invalid id");
-	FreeEntityType(id);
+	FreeEntityType(i);
 	auto glue = EntityTypes.SaveVector();
 	glue.Vector.pop_back();
 	auto log = CGLEEntitiesProps.EntityTypesLogicProps.SaveVector();
@@ -126,8 +132,9 @@ void GGlue::CEntitiesPropsMgr::PopEntityType(int id)
 	RefreshDisplayFlags();
 }
 
-void GGlue::CEntitiesPropsMgr::FreeEntityType(int id)
+void GGlue::CEntitiesPropsMgr::FreeEntityType(shok::EntityTypeId i)
 {
+	int id = static_cast<int>(i);
 	GGlue::CGlueEntityProps& e = EntityTypes[id];
 	for (auto& b : e.BehaviorProps) {
 		delete b.Logic;
@@ -175,8 +182,9 @@ void GGlue::CTerrainPropsMgr::ReloadTerrainTypes()
 	TerrainType.SaveVector().Vector.clear();
 }
 
-void GGlue::CTerrainPropsMgr::LoadTerrainTypeFromExtraFile(int id)
+void GGlue::CTerrainPropsMgr::LoadTerrainTypeFromExtraFile(shok::TerrainTypeId i)
 {
+	int id = static_cast<int>(i);
 	if (id > static_cast<int>(Display.DisplayProps.size()))
 		throw std::logic_error{ "somehow the id is too big" };
 	TerrainTypeData d{};
@@ -224,8 +232,9 @@ void GGlue::CGlueWaterPropsMgr::ReloadWaterTypes()
 	Load("Data\\Config\\Water.xml");
 }
 
-void GGlue::CGlueWaterPropsMgr::LoadWaterTypeFromExtraFile(int id)
+void GGlue::CGlueWaterPropsMgr::LoadWaterTypeFromExtraFile(shok::WaterTypeId i)
 {
+	int id = static_cast<int>(i);
 	if (id > static_cast<int>(Display.WaterDisplay.size()))
 		throw std::logic_error{ "somehow the id is too big" };
 	WaterTypeData d{};
@@ -247,26 +256,28 @@ void GGlue::CGlueWaterPropsMgr::LoadWaterTypeFromExtraFile(int id)
 	dv.Vector.at(id) = d.Display;
 }
 
-inline EGL::CGLEAnimSet* (__thiscall* const animsetmng_get)(EGL::AnimSetManager* th, int id) = reinterpret_cast<EGL::CGLEAnimSet * (__thiscall*)(EGL::AnimSetManager*, int)>(0x588487);
-EGL::CGLEAnimSet* EGL::AnimSetManager::GetAnimSet(int id)
+inline EGL::CGLEAnimSet* (__thiscall* const animsetmng_get)(EGL::AnimSetManager* th, shok::AnimSetId id) = reinterpret_cast<EGL::CGLEAnimSet * (__thiscall*)(EGL::AnimSetManager*, shok::AnimSetId)>(0x588487);
+EGL::CGLEAnimSet* EGL::AnimSetManager::GetAnimSet(shok::AnimSetId id)
 {
 	return animsetmng_get(this, id);
 }
 
-void EGL::AnimSetManager::FreeAnimSet(int id)
+void EGL::AnimSetManager::FreeAnimSet(shok::AnimSetId i)
 {
+	int id = static_cast<int>(i);
 	--id;
 	delete AnimSets[id];
 	AnimSets[id] = nullptr;
 }
-void EGL::AnimSetManager::LoadAnimSet(int id)
+void EGL::AnimSetManager::LoadAnimSet(shok::AnimSetId i)
 {
+	int id = static_cast<int>(i);
 	int off = id - 1;
 	if (off > static_cast<int>(AnimSets.size()))
 		throw std::logic_error{ "somehow the id is too big" };
 
 	CGLEAnimSet* set = new CGLEAnimSet();
-	set->Id = id;
+	set->Id = i;
 	std::string file{ "Data\\Config\\AnimSets\\" };
 	file.append((*BB::CIDManagerEx::AnimSetManager)->GetNameByID(id));
 	file.append(".xml");
@@ -280,12 +291,13 @@ void EGL::AnimSetManager::LoadAnimSet(int id)
 		AnimSets[off] = set;
 	}
 }
-void EGL::AnimSetManager::PopAnimSet(int id)
+void EGL::AnimSetManager::PopAnimSet(shok::AnimSetId i)
 {
+	int id = static_cast<int>(i);
 	--id;
 	if (id + 1 != static_cast<int>(AnimSets.size()))
 		throw std::out_of_range("invalid id");
-	FreeAnimSet(id);
+	FreeAnimSet(i);
 	auto v = AnimSets.SaveVector();
 	v.Vector.pop_back();
 }

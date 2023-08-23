@@ -16,30 +16,30 @@ namespace CppLogic::ModLoader {
 		static void RemoveLib(lua::State L);
 
 		static bool Initialized;
-		static std::vector<int> EntityTypesToRemove;
-		static std::vector<int> EntityTypesToReload;
+		static std::vector<shok::EntityTypeId> EntityTypesToRemove;
+		static std::vector<shok::EntityTypeId> EntityTypesToReload;
 		static bool ReloadEffectTypes;
-		static std::vector<int> TaskListsToRemove;
-		static std::vector<int> TechsToRemove;
-		static std::vector<int> ModelsToRemove;
+		static std::vector<shok::TaskListId> TaskListsToRemove;
+		static std::vector<shok::TechnologyId> TechsToRemove;
+		static std::vector<shok::ModelId> ModelsToRemove;
 		static bool ReloadModels;
-		static std::vector<int> TexturesToRemove;
-		static std::vector<int> TexturesToReload;
-		static std::vector<int> AnimsToRemove;
-		static std::vector<int> AnimsToReload;
-		static std::vector<int> SettlerUCatsToRemove;
-		static std::vector<int> BuildingUCatsToRemove;
+		static std::vector<shok::GUITextureId> TexturesToRemove;
+		static std::vector<shok::GUITextureId> TexturesToReload;
+		static std::vector<shok::AnimationId> AnimsToRemove;
+		static std::vector<shok::AnimationId> AnimsToReload;
+		static std::vector<shok::UpgradeCategoryId> SettlerUCatsToRemove;
+		static std::vector<shok::UpgradeCategoryId> BuildingUCatsToRemove;
 		static bool ReloadWaterTypes;
 		static std::vector<int> SelectionTexturesToRemove;
 		static std::vector<int> SelectionTexturesToReload;
-		static std::vector<int> TerrainTexturesToRemove;
-		static std::vector<int> TerrainTexturesToReload;
+		static std::vector<shok::TerrainTextureId> TerrainTexturesToRemove;
+		static std::vector<shok::TerrainTextureId> TerrainTexturesToReload;
 		static bool ReloadTerrainTypes;
 		static std::vector<shok::ExperienceClass> ExperienceClassesToRemove;
 		static std::vector<shok::ExperienceClass> ExperienceClassesToReload;
-		static std::vector<int> SoundGroupsToRemove;
-		static std::vector<int> AnimSetsToRemove;
-		static std::vector<int> AnimSetsToReload;
+		static std::vector<shok::SoundId> SoundGroupsToRemove;
+		static std::vector<shok::AnimSetId> AnimSetsToRemove;
+		static std::vector<shok::AnimSetId> AnimSetsToReload;
 		static std::vector<int> DirectXEffectsToFree;
 
 		static int PreLoadEntityType(lua::State L);
@@ -132,6 +132,6 @@ namespace CppLogic::ModLoader {
 		static void Cleanup(Framework::CMain::NextMode n);
 
 		static bool IsInitialized();
-		static void AddTaskListToRemove(int id);
+		static void AddTaskListToRemove(shok::TaskListId id);
 	};
 }

@@ -52,7 +52,7 @@ namespace ED {
 	class CTerrainDecalBase : public ITerrainDecal {
 	public:
 		static inline constexpr int vtp = 0x76A238;
-		static inline constexpr unsigned int Identifier = 0x5A4A43C1; // from entitydisplay casttoident
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5A4A43C1); // from entitydisplay casttoident
 	};
 	class CTerrainDecalAligned : public CTerrainDecalBase { // size 10
 	public:
@@ -142,7 +142,7 @@ namespace ED {
 			bool CastShadow = true, DoNotDestroyHierarchy = false, HasUVAnim = false, OcclusionCaster = false; // 9
 			bool OcclusionReceiver = false, OrnamentalItem = false, ShareShadowRaster = false, UseAlphaBlending = false; // 10
 			bool UseSurfaceHeight = false, TwoPassAlphaBlending = false, AlphaBlendHighQualityOnly = false; PADDING(1); // 11
-			int DefaultAnimID = 0; // 12
+			shok::AnimationId DefaultAnimID = {}; // 12
 
 			ModelData() = default;
 			ModelData(ModelData&& o) noexcept;
@@ -159,9 +159,9 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE60C;
 
-		void LoadModelDataFromExtraFile(int id);
+		void LoadModelDataFromExtraFile(shok::ModelId id);
 		// remember to free in idmanager and CResourceManager, free last id first
-		void PopModel(int id);
+		void PopModel(shok::ModelId id);
 		void ReloadAllModels();
 	};
 	static_assert(sizeof(CModelsProps::ModelData) == 13 * 4);
@@ -258,7 +258,7 @@ namespace ED {
 		float SelectionOffsetY = 0;
 		float SelectionRadius = 0;
 		void* SelectionTexture = nullptr; // texture loaded via RWE?
-		int DefaultAnimID = 0;
+		shok::AnimationId DefaultAnimID = {};
 
 
 		RWE::RpClump* Instanciate() const;
@@ -292,13 +292,13 @@ namespace ED {
 	public:
 		virtual ~IResourceManager() = default;
 		virtual void Destroy() = 0;
-		virtual RWE::RtAnimAnimation* GetAnimData(int animId) = 0;
-		virtual float GetAnimationDuration(int animid) = 0;
+		virtual RWE::RtAnimAnimation* GetAnimData(shok::AnimationId animId) = 0;
+		virtual float GetAnimationDuration(shok::AnimationId animid) = 0;
 		virtual RWE::RwTexture* GetTextureData(int textureId) = 0;
 		virtual RWE::RwTexture* GetSelectionTexture() = 0;
-		virtual const RWE::RpClump* GetModelDataByEntityType(int ety) = 0; //6
-		virtual const ED::ModelData* GetModelData(int modelid) = 0;
-		virtual const RWE::RpClump* GetModelClumpByModelId(int id) = 0;
+		virtual const RWE::RpClump* GetModelDataByEntityType(shok::EntityTypeId ety) = 0; //6
+		virtual const ED::ModelData* GetModelData(shok::ModelId modelid) = 0;
+		virtual const RWE::RpClump* GetModelClumpByModelId(shok::ModelId id) = 0;
 	private:
 		virtual void unknown6() = 0;// get from UnknownManager, return something?
 		virtual void* GetModelManager() = 0;
@@ -321,13 +321,13 @@ namespace ED {
 		static inline constexpr int vtp = 0x769824;
 
 		// gets reloaded when accessed next
-		void FreeModel(int id);
+		void FreeModel(shok::ModelId id);
 		// remember to free in idmanager and CModelsProps, free last id first
-		void PopModel(int id);
-		const ED::ModelData* LoadModel(int id);
+		void PopModel(shok::ModelId id);
+		const ED::ModelData* LoadModel(shok::ModelId id);
 
 		// remember to free in idmanager too, free last id first
-		void FreeAnim(int id);
+		void FreeAnim(shok::AnimationId id);
 
 
 	private:
@@ -348,13 +348,13 @@ namespace ED {
 	class TerrainTextureManager { // size 25
 	public:
 		struct TerrainType {
-			int Id = 0;
+			shok::TerrainTypeId Id = {};
 			int Priority = 0;
-			int BaseTextureId = 0;
-			int SnowTextureId = 0;
-			int TransitionTextureId = 0;
+			shok::TerrainTextureId BaseTextureId = {};
+			shok::TerrainTextureId SnowTextureId = {};
+			shok::TerrainTextureId TransitionTextureId = {};
 			float OneDiv4TimesQuads = 0;
-			int ReplacementTerrainType = 0;
+			shok::TerrainTypeId ReplacementTerrainType = {};
 			bool TransitionsColorModulate = false;
 			bool TransitionTextureIs_Transitions01 = false;
 		};
@@ -363,9 +363,9 @@ namespace ED {
 		shok::Vector<TerrainType> TerrainTypes; // 1 modified if lower graphics settings
 		shok::Vector<TerrainType> OriginalTerrainTypes; // 5 stays as it is
 		shok::Vector<RWE::RwTexture*> Textures; // 9, lazily loaded
-		shok::Vector<int> TextureIdsOrderedByPriority; // 13
-		int BlackInternalUseOnlyId; // 17 terrainid
-		int Transitions01Id; // 18 textureid
+		shok::Vector<shok::TerrainTypeId> TextureIdsOrderedByPriority; // 13
+		shok::TerrainTypeId BlackInternalUseOnlyId; // 17 terrainid
+		shok::TerrainTextureId Transitions01Id; // 18 textureid
 		shok::Vector<int> TextureReplacement; // 19 terrainindex->terrainindex
 		int TextureQualityOption;
 		int TextureQualityOptionChangedCounter; // ?
@@ -373,12 +373,12 @@ namespace ED {
 		void ReloadAllTextures();
 		void ApplyTextureQuality();
 
-		void PopTexture(int id);
-		void LoadTexture(int id);
-		void ReApplyTerrainType(int id);
+		void PopTexture(shok::TerrainTextureId id);
+		void LoadTexture(shok::TerrainTextureId id);
+		void ReApplyTerrainType(shok::TerrainTypeId id);
 		void ReApplyAllTerrainTypes();
 	private:
-		TerrainType CreateTerrainType(int id);
+		TerrainType CreateTerrainType(shok::TerrainTypeId id);
 	};
 	static_assert(sizeof(TerrainTextureManager::TerrainType) == 8 * 4);
 	static_assert(sizeof(TerrainTextureManager) == 25 * 4);
@@ -413,7 +413,7 @@ namespace ED {
 	class IAuras {
 	public:
 		static inline constexpr int vtp = 0x7695EC;
-		static inline constexpr unsigned int Identifier = 0x17F36327; // iauras and cauras ?
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x17F36327); // iauras and cauras ?
 
 		virtual unsigned int __stdcall GetClassIdentifier() const = 0;
 		virtual ~IAuras() = default;
@@ -502,14 +502,14 @@ namespace GD {
 	public:
 		float HealthNoDamageEffects;
 		float HealthAllDamageEffects;
-		shok::Vector<int> DamageEffect;
-		shok::Vector<int> DestroyEffect;
+		shok::Vector<shok::ModelId> DamageEffect;
+		shok::Vector<shok::ModelId> DestroyEffect;
 		PADDINGI(1);
 
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr int vtp = 0x76A810;
-		static inline constexpr unsigned int Identifier = 0xFC5B7F67;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFC5B7F67);
 	};
 	static_assert(sizeof(CBuildingEffectsProps) == 12 * 4);
 
@@ -518,7 +518,7 @@ namespace GD {
 		virtual ~CGlobalEffect() = default;
 
 		PADDINGI(3); // this+2 == ED::CEffectDisplay ??
-		int EffectID; // 3
+		shok::EffectTypeId EffectID; // 3
 
 		static inline constexpr int vtp = 0x76AFA4;
 	};

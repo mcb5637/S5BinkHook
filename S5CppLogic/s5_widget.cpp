@@ -26,35 +26,36 @@ shok::Color EGUIX::Color::ToShokColor() const
     return shok::Color{ Red, Green, Blue, Alpha };
 }
 
-static inline int(__thiscall* const texman_getid)(EGUIX::TextureManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::TextureManager*, const char*)>(0x55664A);
-int EGUIX::TextureManager::GetTextureID(const char* name)
+static inline shok::GUITextureId(__thiscall* const texman_getid)(EGUIX::TextureManager* th, const char* n) = reinterpret_cast<shok::GUITextureId(__thiscall*)(EGUIX::TextureManager*, const char*)>(0x55664A);
+shok::GUITextureId EGUIX::TextureManager::GetTextureID(const char* name)
 {
     return texman_getid(this, name);
 }
-static inline int(__thiscall* const texman_getidnoadd)(EGUIX::TextureManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::TextureManager*, const char*)>(0x5566A5);
-int EGUIX::TextureManager::GetTextureIDNoAdd(const char* name)
+static inline shok::GUITextureId(__thiscall* const texman_getidnoadd)(EGUIX::TextureManager* th, const char* n) = reinterpret_cast<shok::GUITextureId(__thiscall*)(EGUIX::TextureManager*, const char*)>(0x5566A5);
+shok::GUITextureId EGUIX::TextureManager::GetTextureIDNoAdd(const char* name)
 {
     return texman_getidnoadd(this, name);
 }
-static inline RWE::RwTexture* (__thiscall* const texman_gettex)(EGUIX::TextureManager* th, int id) = reinterpret_cast<RWE::RwTexture* (__thiscall*)(EGUIX::TextureManager*, int)>(0x556B1C);
-RWE::RwTexture* EGUIX::TextureManager::GetTextureByID(int id)
+static inline RWE::RwTexture* (__thiscall* const texman_gettex)(EGUIX::TextureManager* th, shok::GUITextureId id) = reinterpret_cast<RWE::RwTexture* (__thiscall*)(EGUIX::TextureManager*, shok::GUITextureId)>(0x556B1C);
+RWE::RwTexture* EGUIX::TextureManager::GetTextureByID(shok::GUITextureId id)
 {
     return texman_gettex(this, id);
 }
-static inline RWE::RwTexture* (__thiscall* const texman_reloadtext)(EGUIX::TextureManager* th, int id) = reinterpret_cast<RWE::RwTexture * (__thiscall*)(EGUIX::TextureManager*, int)>(0x556D03);
-RWE::RwTexture* EGUIX::TextureManager::ReloadTexture(int id)
+static inline RWE::RwTexture* (__thiscall* const texman_reloadtext)(EGUIX::TextureManager* th, shok::GUITextureId id) = reinterpret_cast<RWE::RwTexture * (__thiscall*)(EGUIX::TextureManager*, shok::GUITextureId)>(0x556D03);
+RWE::RwTexture* EGUIX::TextureManager::ReloadTexture(shok::GUITextureId id)
 {
-    if (id >= static_cast<int>(Textures.size()))
+    if (static_cast<int>(id) >= static_cast<int>(Textures.size()))
         return GetTextureByID(id);
     return texman_reloadtext(this, id); // this thing actually throws if the texture vector is too small
 }
-void EGUIX::TextureManager::FreeTexture(int id)
+void EGUIX::TextureManager::FreeTexture(shok::GUITextureId i)
 {
+    int id = static_cast<int>(i);
     Textures[id]->Destroy();
     Textures[id] = nullptr;
 }
 
-unsigned int __stdcall EGUIX::CFontIDHandler::GetClassIdentifier() const
+shok::ClassId __stdcall EGUIX::CFontIDHandler::GetClassIdentifier() const
 {
     return Identifier;
 }
@@ -64,7 +65,7 @@ void EGUIX::CFontIDHandler::LoadFont(const char* name)
     EGUIX::FontManager::LoadFont(&FontID, name);
 }
 
-unsigned int __stdcall EGUIX::CSingleStringHandler::GetClassIdentifier() const
+shok::ClassId __stdcall EGUIX::CSingleStringHandler::GetClassIdentifier() const
 {
     return Identifier;
 }
@@ -75,12 +76,12 @@ const char* EGUIX::CSingleStringHandler::GetString()
     return sinstringhand_getstr(this);
 }
 
-unsigned int __stdcall EGUIX::CWidgetStringHelper::GetClassIdentifier() const
+shok::ClassId __stdcall EGUIX::CWidgetStringHelper::GetClassIdentifier() const
 {
     return Identifier;
 }
 
-unsigned int __stdcall EGUIX::CMaterial::GetClassIdentifier() const
+shok::ClassId __stdcall EGUIX::CMaterial::GetClassIdentifier() const
 {
     return Identifier;
 }
@@ -110,24 +111,24 @@ RWE::RwTexture* EGUIX::CMaterial::GetTexture()
 }
 
 
-unsigned int __stdcall EGUIX::CLuaFunctionHelper::GetClassIdentifier() const
+shok::ClassId __stdcall EGUIX::CLuaFunctionHelper::GetClassIdentifier() const
 {
     return Identifier;
 }
 
-static inline void(__thiscall* const funchelper_call)(EGUIX::CLuaFunctionHelper* th, int widgetID) = reinterpret_cast<void(__thiscall*)(EGUIX::CLuaFunctionHelper*, int)>(0x55BDDE);
-void EGUIX::CLuaFunctionHelper::Call(int widgetID)
+static inline void(__thiscall* const funchelper_call)(EGUIX::CLuaFunctionHelper* th, shok::WidgetId widgetID) = reinterpret_cast<void(__thiscall*)(EGUIX::CLuaFunctionHelper*, shok::WidgetId)>(0x55BDDE);
+void EGUIX::CLuaFunctionHelper::Call(shok::WidgetId widgetID)
 {
     funchelper_call(this, widgetID);
 }
 
-unsigned int __stdcall EGUIX::CButtonHelper::GetClassIdentifier() const
+shok::ClassId __stdcall EGUIX::CButtonHelper::GetClassIdentifier() const
 {
     return Identifier;
 }
 
-static inline void(__thiscall* const butthelp_callaction)(EGUIX::CButtonHelper* th, int wid) = reinterpret_cast<void(__thiscall*)(EGUIX::CButtonHelper*, int)>(0x55A3F1);
-void EGUIX::CButtonHelper::PressButton(int widgetID)
+static inline void(__thiscall* const butthelp_callaction)(EGUIX::CButtonHelper* th, shok::WidgetId wid) = reinterpret_cast<void(__thiscall*)(EGUIX::CButtonHelper*, shok::WidgetId)>(0x55A3F1);
+void EGUIX::CButtonHelper::PressButton(shok::WidgetId widgetID)
 {
     butthelp_callaction(this, widgetID);
 }
@@ -211,12 +212,12 @@ void EGUIX::CButtonHelper::HookShortcutComparison()
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55A597), &buttohelp_shortcutcomparisonasm, reinterpret_cast<void*>(0x55A5A5));
 }
 
-unsigned int __stdcall EGUIX::CToolTipHelper::GetClassIdentifier() const
+shok::ClassId __stdcall EGUIX::CToolTipHelper::GetClassIdentifier() const
 {
     return Identifier;
 }
 
-void EGUIX::CToolTipHelper::OnRegistrationChanged(int id, int mode)
+void EGUIX::CToolTipHelper::OnRegistrationChanged(shok::WidgetId id, int mode)
 {
     throw 0;
 }
@@ -329,40 +330,40 @@ void EGUIX::CScrollBarButtonCustomWidget::UpdateSlider(int value, bool callback)
     scrollbar_update(this, value, callback, callback ? EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(WidgetId) : nullptr);
 }
 
-static inline int(__thiscall* const widman_getidbyname)(EGUIX::WidgetManager* th, const char* n) = reinterpret_cast<int(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x5588A0);
-int EGUIX::WidgetManager::GetIdByName(const char* name)
+static inline shok::WidgetId(__thiscall* const widman_getidbyname)(EGUIX::WidgetManager* th, const char* n) = reinterpret_cast<shok::WidgetId(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x5588A0);
+shok::WidgetId EGUIX::WidgetManager::GetIdByName(const char* name)
 {
     return widman_getidbyname(this, name);
 }
 
-static inline EGUIX::CBaseWidget* (__thiscall* const widman_getwid)(EGUIX::WidgetManager* th, int id) = reinterpret_cast<EGUIX::CBaseWidget * (__thiscall*)(EGUIX::WidgetManager*, int)>(0x558966);
-EGUIX::CBaseWidget* EGUIX::WidgetManager::GetWidgetByID(int id)
+static inline EGUIX::CBaseWidget* (__thiscall* const widman_getwid)(EGUIX::WidgetManager* th, shok::WidgetId id) = reinterpret_cast<EGUIX::CBaseWidget * (__thiscall*)(EGUIX::WidgetManager*, shok::WidgetId)>(0x558966);
+EGUIX::CBaseWidget* EGUIX::WidgetManager::GetWidgetByID(shok::WidgetId id)
 {
     return widman_getwid(this, id);
 }
-static inline void(__thiscall* const widman_removewid)(EGUIX::WidgetManager* th, EGUIX::CBaseWidget* w, int id) = reinterpret_cast<void(__thiscall*)(EGUIX::WidgetManager*, EGUIX::CBaseWidget * w, int)>(0x558915);
+static inline void(__thiscall* const widman_removewid)(EGUIX::WidgetManager* th, EGUIX::CBaseWidget* w, shok::WidgetId id) = reinterpret_cast<void(__thiscall*)(EGUIX::WidgetManager*, EGUIX::CBaseWidget * w, shok::WidgetId)>(0x558915);
 void EGUIX::WidgetManager::RemoveWidget(EGUIX::CBaseWidget* w)
 {
     widman_removewid(this, w, w->WidgetID);
 }
-static inline void(__thiscall* const widman_addWidget)(EGUIX::WidgetManager* th, EGUIX::CBaseWidget* a, int id) = reinterpret_cast<void(__thiscall*)(EGUIX::WidgetManager*, EGUIX::CBaseWidget*, int)>(0x558AA2);
-void EGUIX::WidgetManager::AddWidget(EGUIX::CBaseWidget* w, int id)
+static inline void(__thiscall* const widman_addWidget)(EGUIX::WidgetManager* th, EGUIX::CBaseWidget* a, shok::WidgetId id) = reinterpret_cast<void(__thiscall*)(EGUIX::WidgetManager*, EGUIX::CBaseWidget*, shok::WidgetId)>(0x558AA2);
+void EGUIX::WidgetManager::AddWidget(EGUIX::CBaseWidget* w, shok::WidgetId id)
 {
     widman_addWidget(this, w, id);
 }
-static inline int(__thiscall* const widman_registerName)(EGUIX::WidgetManager* th, const char* name) = reinterpret_cast<int(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x55884F);
-int EGUIX::WidgetManager::RegisterName(const char* name)
+static inline shok::WidgetId(__thiscall* const widman_registerName)(EGUIX::WidgetManager* th, const char* name) = reinterpret_cast<shok::WidgetId(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x55884F);
+shok::WidgetId EGUIX::WidgetManager::RegisterName(const char* name)
 {
     return widman_registerName(this, name);
 }
 
-static inline int(__thiscall* const widgroupman_getgroupid)(EGUIX::CWidgetGroupManager* th, const char* s) = reinterpret_cast<int(__thiscall*)(EGUIX::CWidgetGroupManager*, const char*)>(0x583214);
-int EGUIX::CWidgetGroupManager::GetGroupId(const char* s)
+static inline shok::WidgetGroupId(__thiscall* const widgroupman_getgroupid)(EGUIX::CWidgetGroupManager* th, const char* s) = reinterpret_cast<shok::WidgetGroupId(__thiscall*)(EGUIX::CWidgetGroupManager*, const char*)>(0x583214);
+shok::WidgetGroupId EGUIX::CWidgetGroupManager::GetGroupId(const char* s)
 {
     return widgroupman_getgroupid(this, s);
 }
-static inline int(__thiscall* const widgroupman_creategroup)(int man, const char* s, int z) = reinterpret_cast<int(__thiscall*)(int, const char*, int)>(0x54F656);
-int EGUIX::CWidgetGroupManager::CreateGroup(const char* s)
+static inline shok::WidgetGroupId(__thiscall* const widgroupman_creategroup)(int man, const char* s, int z) = reinterpret_cast<shok::WidgetGroupId(__thiscall*)(int, const char*, int)>(0x54F656);
+shok::WidgetGroupId EGUIX::CWidgetGroupManager::CreateGroup(const char* s)
 {
     return widgroupman_creategroup(*reinterpret_cast<int*>(0x894EA4), s, 0);
 }
@@ -370,8 +371,8 @@ int EGUIX::CWidgetGroupManager::CreateGroup(const char* s)
 void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* name, const EGUIX::CBaseWidget* before)
 {
     EGUIX::WidgetManager* m = EGUIX::WidgetManager::GlobalObj();
-    int newId = m->RegisterName(name);
-    if (newId) {
+    shok::WidgetId newId = m->RegisterName(name);
+    if (newId != static_cast<shok::WidgetId>(0)) {
         toAdd->WidgetID = newId;
         m->AddWidget(toAdd, newId);
         AddChild(toAdd);
@@ -394,7 +395,7 @@ EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* to
     EGUIX::CBaseWidget* w;
     auto* cont = dynamic_cast<EGUIX::CContainerWidget*>(toClone);
     EGUIX::CContainerWidget* contcl = nullptr;
-    std::string n = nameGen(mng->WidgetNameManager->GetNameByID(toClone->WidgetID), toClone);
+    std::string n = nameGen(mng->WidgetNameManager->GetNameByID(static_cast<int>(toClone->WidgetID)), toClone);
     if (cont) {
         contcl = EGUIX::CContainerWidget::Create();
         w = contcl;
@@ -714,8 +715,8 @@ EGUIX::CMaterial* GGUI::OnScreenInfoRenderer::GetRefinerResourceIcon(shok::Resou
     return onscreeninforender_getrefresicon(this, rt);
 }
 
-static inline void(__thiscall* const showresfloatie)(GGUI::C3DOnScreenInformationCustomWidget* th, int eid, int am) = reinterpret_cast<void(__thiscall*)(GGUI::C3DOnScreenInformationCustomWidget*, int, int)>(0x536361);
-void GGUI::C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(int eid, int amount)
+static inline void(__thiscall* const showresfloatie)(GGUI::C3DOnScreenInformationCustomWidget* th, shok::EntityId eid, int am) = reinterpret_cast<void(__thiscall*)(GGUI::C3DOnScreenInformationCustomWidget*, shok::EntityId, int)>(0x536361);
+void GGUI::C3DOnScreenInformationCustomWidget::ShowResourceFloatieOnEntity(shok::EntityId eid, int amount)
 {
     showresfloatie(this, eid, amount);
 }
@@ -884,36 +885,36 @@ void GGUI::CStatisticsRendererCustomWidget::StatToRender::ToggleTimeScale()
 {
     statrender_stat_toggletime(this);
 }
-inline int(__thiscall* const statrender_stat_getmin)(GGUI::CStatisticsRendererCustomWidget::StatToRender* th, int pl, GGUI::CStatisticsRendererCustomWidget* cw) = reinterpret_cast<int(__thiscall*)(GGUI::CStatisticsRendererCustomWidget::StatToRender*, int, GGUI::CStatisticsRendererCustomWidget*)>(0x530B2C);
-int GGUI::CStatisticsRendererCustomWidget::StatToRender::GetMinutes(int pl, CStatisticsRendererCustomWidget* cw)
+inline int(__thiscall* const statrender_stat_getmin)(GGUI::CStatisticsRendererCustomWidget::StatToRender* th, shok::PlayerId pl, GGUI::CStatisticsRendererCustomWidget* cw) = reinterpret_cast<int(__thiscall*)(GGUI::CStatisticsRendererCustomWidget::StatToRender*, shok::PlayerId, GGUI::CStatisticsRendererCustomWidget*)>(0x530B2C);
+int GGUI::CStatisticsRendererCustomWidget::StatToRender::GetMinutes(shok::PlayerId pl, CStatisticsRendererCustomWidget* cw)
 {
     return statrender_stat_getmin(this, pl, cw);
 }
 
-inline int(__thiscall* const statrender_getplayer)(const GGUI::CStatisticsRendererCustomWidget* th) = reinterpret_cast<int(__thiscall*)(const GGUI::CStatisticsRendererCustomWidget*)>(0x5309F8);
-int GGUI::CStatisticsRendererCustomWidget::GetPlayer() const
+inline shok::PlayerId(__thiscall* const statrender_getplayer)(const GGUI::CStatisticsRendererCustomWidget* th) = reinterpret_cast<shok::PlayerId(__thiscall*)(const GGUI::CStatisticsRendererCustomWidget*)>(0x5309F8);
+shok::PlayerId GGUI::CStatisticsRendererCustomWidget::GetPlayer() const
 {
     return statrender_getplayer(this);
 }
-inline bool(__thiscall* const statrender_ishuman)(const GGUI::CStatisticsRendererCustomWidget* th) = reinterpret_cast<bool(__thiscall*)(const GGUI::CStatisticsRendererCustomWidget*)>(0x530840);
-bool GGUI::CStatisticsRendererCustomWidget::IsHumanPlayer(int pl) const
+inline bool(__thiscall* const statrender_ishuman)(const GGUI::CStatisticsRendererCustomWidget* th, shok::PlayerId pl) = reinterpret_cast<bool(__thiscall*)(const GGUI::CStatisticsRendererCustomWidget*, shok::PlayerId)>(0x530840);
+bool GGUI::CStatisticsRendererCustomWidget::IsHumanPlayer(shok::PlayerId pl) const
 {
-    return statrender_ishuman(this);
+    return statrender_ishuman(this, pl);
 }
 
-inline GGL::CGameStatistics* (__thiscall* const statrender_getstat)(GGUI::CStatisticsRendererCustomWidget* th, int pl) = reinterpret_cast<GGL::CGameStatistics * (__thiscall*)(GGUI::CStatisticsRendererCustomWidget*, int)>(0x53080A);
-GGL::CGameStatistics* GGUI::CStatisticsRendererCustomWidget::GetStatistics(int player)
+inline GGL::CGameStatistics* (__thiscall* const statrender_getstat)(GGUI::CStatisticsRendererCustomWidget* th, shok::PlayerId pl) = reinterpret_cast<GGL::CGameStatistics * (__thiscall*)(GGUI::CStatisticsRendererCustomWidget*, shok::PlayerId)>(0x53080A);
+GGL::CGameStatistics* GGUI::CStatisticsRendererCustomWidget::GetStatistics(shok::PlayerId player)
 {
     return statrender_getstat(this, player);
 }
 
-static inline void(__stdcall* const loadfont)(int* out, const char* name) = reinterpret_cast<void(__stdcall*)(int*, const char*)>(0x55D99E);
-void EGUIX::FontManager::LoadFont(int* outFontID, const char* fontName)
+static inline void(__stdcall* const loadfont)(shok::FontId* out, const char* name) = reinterpret_cast<void(__stdcall*)(shok::FontId*, const char*)>(0x55D99E);
+void EGUIX::FontManager::LoadFont(shok::FontId* outFontID, const char* fontName)
 {
     loadfont(outFontID, fontName);
 }
-static inline RWE::P2D::Rt2dFont* (__thiscall* const fontmng_getfont)(EGUIX::FontManager* th, int id) = reinterpret_cast<RWE::P2D::Rt2dFont * (__thiscall*)(EGUIX::FontManager*, int)>(0x5597C7);
-RWE::P2D::Rt2dFont* EGUIX::FontManager::GetFontObj(int id)
+static inline RWE::P2D::Rt2dFont* (__thiscall* const fontmng_getfont)(EGUIX::FontManager* th, shok::FontId id) = reinterpret_cast<RWE::P2D::Rt2dFont * (__thiscall*)(EGUIX::FontManager*, shok::FontId)>(0x5597C7);
+RWE::P2D::Rt2dFont* EGUIX::FontManager::GetFontObj(shok::FontId id)
 {
     return fontmng_getfont(this, id);
 }

@@ -64,8 +64,8 @@ void __stdcall EGL::CSlotUVAnims::FillSlot(SSlotArgsUVAnims* data)
 	slotuvanims_fill(this, data);
 }
 
-static inline void(__thiscall* const heroability_addhandlers)(GGL::CHeroAbility* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CHeroAbility*, int)>(0x4F4982);
-void GGL::CHeroAbility::AddHandlers(int id)
+static inline void(__thiscall* const heroability_addhandlers)(GGL::CHeroAbility* th, shok::EntityId id) = reinterpret_cast<void(__thiscall*)(GGL::CHeroAbility*, shok::EntityId)>(0x4F4982);
+void GGL::CHeroAbility::AddHandlers(shok::EntityId id)
 {
 	heroability_addhandlers(this, id);
 }
@@ -215,7 +215,7 @@ void __thiscall GGL::CRangedEffectAbility::AdvHealAffected()
 			if (!toheal)
 				return;
 			float heal = toheal->GetMaxHealth() * hpfact;
-			if (ecr.EffectType) {
+			if (ecr.EffectType != static_cast<shok::EffectTypeId>(0)) {
 				ecr.StartPos.X = toheal->Position.X;
 				ecr.StartPos.Y = toheal->Position.Y;
 				(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
@@ -284,7 +284,7 @@ int GGL::CSummonBehavior::TaskSummon(EGL::CGLETaskArgs* a)
 void __thiscall GGL::CConvertSettlerAbility::PerformConversion()
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	int tid = e->GetFirstAttachedEntity(shok::AttachmentType::CONVERTER_SETTLER);
+	auto tid = e->GetFirstAttachedEntity(shok::AttachmentType::CONVERTER_SETTLER);
 	auto* t = EGL::CGLEEntity::GetEntityByID(tid);
 	if (t) {
 		e->DetachObservedEntity(shok::AttachmentType::CONVERTER_SETTLER, tid, false);
@@ -313,8 +313,8 @@ void GGL::CConvertSettlerAbility::HookConvertEvent()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FCCFE), &convertsettler_hookasm, reinterpret_cast<void*>(0x4FCD05));
 }
 
-static inline void(__thiscall* const summonbeh_addhandl)(GGL::CSummonBehavior* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, int)>(0x4D6FBE);
-void GGL::CSummonBehavior::AddHandlers(int id)
+static inline void(__thiscall* const summonbeh_addhandl)(GGL::CSummonBehavior* th, shok::EntityId id) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, shok::EntityId)>(0x4D6FBE);
+void GGL::CSummonBehavior::AddHandlers(shok::EntityId id)
 {
 	summonbeh_addhandl(this, id);
 }
@@ -331,8 +331,8 @@ void GGL::CSummonBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
 	summonbeh_onlo(this, p);
 }
 
-static inline bool(__thiscall* const summonbeh_isab)(GGL::CSummonBehavior* th, int ab) = reinterpret_cast<bool(__thiscall*)(GGL::CSummonBehavior*, int)>(0x4D6A64);
-bool GGL::CSummonBehavior::IsAbility(int ability)
+static inline bool(__thiscall* const summonbeh_isab)(GGL::CSummonBehavior* th, shok::AbilityId ab) = reinterpret_cast<bool(__thiscall*)(GGL::CSummonBehavior*, shok::AbilityId)>(0x4D6A64);
+bool GGL::CSummonBehavior::IsAbility(shok::AbilityId ability)
 {
 	return summonbeh_isab(this, ability);
 }
@@ -361,7 +361,7 @@ int __thiscall GGL::CSniperAbility::TaskOverrideSnipe(EGL::CGLETaskArgs* a)
 	cr.TargetID = tar->EntityId;
 	cr.Damage = dmg;
 	cr.DamageRadius = -1;
-	cr.DamageClass = 0;
+	cr.DamageClass = static_cast<shok::DamageClassId>(0);
 	cr.SourcePlayer = thent->PlayerId;
 	cr.AdvancedDamageSourceOverride = static_cast<byte>(shok::AdvancedDealDamageSource::AbilitySnipe);
 	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
@@ -523,7 +523,7 @@ int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjctile(EGL::CGLETaskArgs
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto* tar = GetTarget();
 	if (tar == nullptr) {
-		EGL::CEvent1Entity ev{ shok::EventIDs::Leader_OnAttackTargetDetached, 0 };
+		EGL::CEvent1Entity ev{ shok::EventIDs::Leader_OnAttackTargetDetached, static_cast<shok::EntityId>(0) };
 		en->FireEvent(&ev);
 		return 2;
 	}
@@ -543,7 +543,7 @@ int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjctile(EGL::CGLETaskArgs
 	ct.TargetID = tar->EntityId;
 	ct.SourcePlayer = en->PlayerId;
 
-	if (!dynamic_cast<GGL::CArrowEffectProps*>((*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[BattleProps->ProjectileEffectID])) {
+	if (!dynamic_cast<GGL::CArrowEffectProps*>((*EGL::CGLEEffectsProps::GlobalObj)->GetLogic(BattleProps->ProjectileEffectID))) {
 		ct.Damage = static_cast<int>(GetDamage()) + GetRandomDamage();
 		ct.DamageRadius = BattleProps->DamageRange;
 		ct.DamageClass = BattleProps->DamageClass;
@@ -731,7 +731,7 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	{
-		if (int id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING)) {
+		if (shok::EntityId id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING); id != static_cast<shok::EntityId>(0)) {
 			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
 				if (GGL::CBuilding* b = dynamic_cast<GGL::CBuilding*>(t)) {
 					int dmg;
@@ -744,23 +744,23 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 						int mhp = b->GetMaxHealth();
 						dmg = static_cast<int>(kegeff * dmgperc * mhp / 100);
 					}
-					b->AdvancedHurtEntityBy(e, dmg, 0, false, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
+					b->AdvancedHurtEntityBy(e, dmg, shok::PlayerId::P0, false, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
 				}
 			}
 		}
 	}
 	{
-		if (int id = e->GetFirstAttachedToMe(shok::AttachmentType::DISARMING_THIEF_KEG)) {
+		if (shok::EntityId id = e->GetFirstAttachedToMe(shok::AttachmentType::DISARMING_THIEF_KEG); id != static_cast<shok::EntityId>(0)) {
 			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
 				if (t->Position.IsInRange(e->Position, 3)) {
-					t->AdvancedHurtEntityBy(e, t->Health, 0, true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
+					t->AdvancedHurtEntityBy(e, t->Health, shok::PlayerId::P0, true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
 				}
 			}
 		}
 	}
 	{
 		GGL::CKegBehaviorProperties* pr = static_cast<GGL::CKegBehaviorProperties*>(PropPointer);
-		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, 0, true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageBlast);
+		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, static_cast<shok::DamageClassId>(0), true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageBlast);
 	}
 }
 
@@ -839,8 +839,8 @@ bool GGL::CWorkerBehavior::IsResearchingSomething()
 	return workerbeh_isresearching(this);
 }
 
-inline bool(__thiscall* const workerbeh_isbuildclosed)(GGL::CWorkerBehavior* th, int id) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*, int)>(0x4CD865);
-bool GGL::CWorkerBehavior::IsBuildingClosed(int bid)
+inline bool(__thiscall* const workerbeh_isbuildclosed)(GGL::CWorkerBehavior* th, shok::EntityId id) = reinterpret_cast<bool(__thiscall*)(GGL::CWorkerBehavior*, shok::EntityId)>(0x4CD865);
+bool GGL::CWorkerBehavior::IsBuildingClosed(shok::EntityId bid)
 {
 	return workerbeh_isbuildclosed(this, bid);
 }
@@ -899,8 +899,8 @@ bool GGL::CWorkerBehavior::CanWork()
 	return workerbeh_canwork(this);
 }
 
-inline int(__thiscall* const workerbeh_getworktl)(GGL::CWorkerBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE75A);
-int GGL::CWorkerBehavior::GetWorkTaskList()
+inline shok::TaskListId(__thiscall* const workerbeh_getworktl)(GGL::CWorkerBehavior* th) = reinterpret_cast<shok::TaskListId(__thiscall*)(GGL::CWorkerBehavior*)>(0x4CE75A);
+shok::TaskListId GGL::CWorkerBehavior::GetWorkTaskList()
 {
 	return workerbeh_getworktl(this);
 }
@@ -909,7 +909,7 @@ int GGL::CWorkerBehavior::GetWorktimeMax()
 {
 	return workerbeh_getworktimemax(this);
 }
-inline void(__thiscall* const workerbeh_goRestIgnoreworktime)(GGL::CWorkerBehavior* th, int bid) = reinterpret_cast<void(__thiscall*)(GGL::CWorkerBehavior*, int)>(0x4CFF56);
+inline void(__thiscall* const workerbeh_goRestIgnoreworktime)(GGL::CWorkerBehavior* th, shok::EntityId bid) = reinterpret_cast<void(__thiscall*)(GGL::CWorkerBehavior*, shok::EntityId)>(0x4CFF56);
 void GGL::CWorkerBehavior::GoRestIgnoreWorktime()
 {
 	workerbeh_goRestIgnoreworktime(this, EGL::CGLEEntity::GetEntityByID(EntityId)->GetFirstAttachedEntity(shok::AttachmentType::WORKER_WORKPLACE));
@@ -946,8 +946,8 @@ int __thiscall GGL::CWorkerBehavior::DoWorkEvents(GGL::CBuilding* b, EGL::CGLETa
 		b->FireEvent(&ev);
 		return 0;
 	}
-	int tech = b->GetTechnologyInResearch();
-	if (tech) {
+	shok::TechnologyId tech = b->GetTechnologyInResearch();
+	if (tech != static_cast<shok::TechnologyId>(0)) {
 		(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId)->TechnologyStates.AddTechProgressWorker(tech, BehaviorProps2->AmountResearched);
 	}
 	else {
@@ -1117,7 +1117,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 	if (tar == nullptr)
 		return 0;
 	auto* p = ACProps;
-	if (p->CannonBallEffectType) {
+	if (p->CannonBallEffectType != static_cast<shok::EffectTypeId>(0)) {
 		CProjectileEffectCreator ct{};
 		ct.EffectType = p->CannonBallEffectType;
 		ct.PlayerID = e->PlayerId;
@@ -1126,7 +1126,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 		ct.AttackerID = e->EntityId;
 		ct.TargetID = tar->EntityId;
 
-		if (!dynamic_cast<GGL::CArrowEffectProps*>((*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[p->CannonBallEffectType])) {
+		if (!dynamic_cast<GGL::CArrowEffectProps*>((*EGL::CGLEEffectsProps::GlobalObj)->GetLogic(p->CannonBallEffectType))) {
 			ct.Damage = GetDamage();
 			ct.DamageRadius = p->DamageRange;
 			ct.DamageClass = p->DamageClass;
@@ -1145,7 +1145,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 	}
 	else {
 		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, p->DamageRange, GetDamage(), e->PlayerId, p->DamageClass, true, true, true, shok::AdvancedDealDamageSource::Cannonball);
-		if (p->ImpactEffectType != 0) {
+		if (p->ImpactEffectType != static_cast<shok::EffectTypeId>(0)) {
 			EGL::CGLEEffectCreator ct{};
 			ct.EffectType = p->ImpactEffectType;
 			ct.StartPos = e->Position;
@@ -1157,8 +1157,8 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 		--ShotsLeft;
 		if (ShotsLeft == 0) {
 			e->Hurt(e->Health);
-			e->EntityState = 0x10003;
-			if (p->SelfDestructTaskList != 0) {
+			e->EntityState = static_cast<shok::EntityStaus>(0x10003);
+			if (p->SelfDestructTaskList != static_cast<shok::TaskListId>(0)) {
 				e->SetTaskList(p->SelfDestructTaskList);
 				return 2;
 			}
@@ -1267,14 +1267,14 @@ void GGL::CFormationBehavior::GetFormationPosition(EGL::CGLEEntity* leader, shok
 shok::Position GGL::CFormationBehavior::GetFormationPosition()
 {
 	shok::Position p;
-	int leaderid = EGL::CGLEEntity::GetEntityByID(EntityId)->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
+	shok::EntityId leaderid = EGL::CGLEEntity::GetEntityByID(EntityId)->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
 	auto* lead = EGL::CGLEEntity::GetEntityByID(leaderid);
 	GetFormationPosition(lead, &p);
 	return p;
 }
 
-inline void(__thiscall* const formationbeh_addhandlers)(GGL::CFormationBehavior* th, int id) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, int)>(0x4F8C51);
-void __thiscall GGL::CFormationBehavior::AddHandlers(int id)
+inline void(__thiscall* const formationbeh_addhandlers)(GGL::CFormationBehavior* th, shok::EntityId id) = reinterpret_cast<void(__thiscall*)(GGL::CFormationBehavior*, shok::EntityId)>(0x4F8C51);
+void __thiscall GGL::CFormationBehavior::AddHandlers(shok::EntityId id)
 {
 	formationbeh_addhandlers(this, id);
 }
@@ -1351,8 +1351,8 @@ void GGL::CFormationBehavior::HookGetPosExtI()
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F89D1), tocall);
 }
 
-static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(int id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(int)>(0x4CB1C1);
-GGL::CPositionAtResourceFinder* GGL::CPositionAtResourceFinder::CreateByEntity(int entityid)
+static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(shok::EntityId id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(shok::EntityId)>(0x4CB1C1);
+GGL::CPositionAtResourceFinder* GGL::CPositionAtResourceFinder::CreateByEntity(shok::EntityId entityid)
 {
 	return shok_GGL_CPositionAtResourceFinder_greatebyent(entityid);
 }

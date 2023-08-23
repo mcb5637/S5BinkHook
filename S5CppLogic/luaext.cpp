@@ -23,14 +23,14 @@ EGL::CGLEEntity* luaext::EState::CheckEntity(int i)
 }
 EGL::CGLEEntity* luaext::EState::OptEntity(int i)
 {
-	int id = 0;
+	shok::EntityId id = {};
 	if (Type(i) == lua::LType::String) {
 		id = EGL::CGLEEntity::GetEntityIDByScriptName(ToString(i));
 	}
 	else if (IsNumber(i)) {
-		id = ToInteger(i);
+		id = static_cast<shok::EntityId>(ToInteger(i));
 	}
-	if (id == 0)
+	if (id == static_cast<shok::EntityId>(0))
 		return nullptr;
 	return EGL::CGLEEntity::GetEntityByID(id);
 }
@@ -76,7 +76,7 @@ EGL::CEffect* luaext::EState::OptEffect(int i)
 	int id = OptInteger(i, 0);
 	if (id == 0)
 		return nullptr;
-	return (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
+	return (*EGL::CGLEEffectManager::GlobalObj)->GetById(static_cast<shok::EffectId>(id));
 }
 EGL::CEffect* luaext::EState::CheckEffect(int i)
 {
@@ -86,10 +86,10 @@ EGL::CEffect* luaext::EState::CheckEffect(int i)
 	return d;
 }
 
-int luaext::EState::OptEntityId(int i)
+shok::EntityId luaext::EState::OptEntityId(int i)
 {
 	EGL::CGLEEntity* e = OptEntity(i);
-	return e ? e->EntityId : 0;
+	return e ? e->EntityId : static_cast<shok::EntityId>(0);
 }
 
 void luaext::EState::PushPos(const shok::Position& p)
@@ -149,7 +149,7 @@ void luaext::EState::PushPosRot(const shok::PositionRot& p, bool rad)
 	SetTableRaw(-3);
 }
 
-void luaext::EState::CheckEntityAlive(int id, const char* msg)
+void luaext::EState::CheckEntityAlive(shok::EntityId id, const char* msg)
 {
 	if (EGL::CGLEEntity::EntityIDIsDead(id))
 		throw lua::LuaException(msg);
@@ -219,9 +219,9 @@ void luaext::EState::PushCostInfo(const shok::CostInfo& c)
 
 GGlue::CGlueEntityProps* luaext::EState::OptEntityType(int idx)
 {
-	if (!IsNumber(idx))
+	if (!IsNumber(idx) && !IsString(idx))
 		return nullptr;
-	int t = CheckInt(idx);
+	auto t = CheckEnum<shok::EntityTypeId>(idx);
 	return (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(t);
 }
 GGlue::CGlueEntityProps* luaext::EState::CheckEntityType(int idx)
@@ -243,31 +243,38 @@ void luaext::EState::StringToLower()
 	PCall(1, 1, 0);
 }
 
-shok::ResourceType luaext::EState::CheckResourceType(int i)
-{
-	int r = CheckInt(i);
-	if (r <= 0 || r > shok::ResourceType_MaxValue)
-		throw lua::LuaException("no resource type");
-	return static_cast<shok::ResourceType>(r);
-}
-
 shok::Technology* luaext::EState::CheckTech(int idx)
 {
-	int tid = CheckInt(idx);
+	auto tid = CheckEnum<shok::TechnologyId>(idx);
 	shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tid);
 	if (!tech)
 		ThrowLuaFormatted("no tech at %d", idx);
 	return tech;
 }
+shok::PlayerId luaext::EState::CheckPlayerId(int idx, bool allowZero)
+{
+	int p = CheckInt(idx);
+	if (!allowZero && p == 0)
+		ThrowLuaFormatted("player 0 invalid at %d", idx);
+	if (p < 0 || p > 8)
+		ThrowLuaFormatted("player %d invalid at %d", p, idx);
+	return static_cast<shok::PlayerId>(p);
+}
+shok::PlayerId luaext::EState::OptPlayerId(int idx, shok::PlayerId def, bool allowZero)
+{
+	if (!IsNoneOrNil(idx))
+		return CheckPlayerId(idx, allowZero);
+	return def;
+}
 
 EGUIX::CBaseWidget* luaext::EState::CheckWidget(int idx)
 {
-	int id;
+	shok::WidgetId id;
 	EGUIX::WidgetManager* wm = EGUIX::WidgetManager::GlobalObj();
 	if (Type(idx) == lua::LType::String)
 		id = wm->GetIdByName(ToString(idx));
 	else
-		id = CheckInt(idx);
+		id = static_cast<shok::WidgetId>(CheckInt(idx));
 	EGUIX::CBaseWidget* r = wm->GetWidgetByID(id);
 	if (!r)
 		ThrowLuaFormatted("no widget at %i", idx);

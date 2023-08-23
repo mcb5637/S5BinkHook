@@ -11,7 +11,7 @@ namespace CppLogic::Mod {
 	public:
 		virtual bool RenderUI(GGUI::OnScreenInfoRenderer* renderer, shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active) = 0;
 
-		static inline constexpr unsigned int Identifier = 0x100A;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100A);
 	};
 
 	// note that you need to override CastToIdentifier for this
@@ -20,6 +20,6 @@ namespace CppLogic::Mod {
 		virtual shok::Position GetPosExt(EGL::CGLEEntity* leader) = 0;
 
 
-		static inline constexpr unsigned int Identifier = 0x1008;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1008);
 	};
 }

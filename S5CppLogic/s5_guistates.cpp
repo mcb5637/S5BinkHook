@@ -10,7 +10,7 @@
 #include "entityiterator.h"
 #include "hooks.h"
 
-GGUI::SPlaceBuildingStateParameters::SPlaceBuildingStateParameters(int ucat)
+GGUI::SPlaceBuildingStateParameters::SPlaceBuildingStateParameters(shok::UpgradeCategoryId ucat)
 {
 	UCat = ucat;
 }
@@ -141,7 +141,7 @@ void __declspec(naked) constructcommand_setmodelrot() {
 		ret;
 	};
 }
-bool __stdcall constructcommand_getnearestpos(int ety, float x, float y, float* xo, float* yo) {
+bool __stdcall constructcommand_getnearestpos(shok::EntityTypeId ety, float x, float y, float* xo, float* yo) {
 	shok::PositionRot p = GGUI::CPlaceBuildingState::GetNearestPlacementPos(ety, { x, y, GGUI::CPlaceBuildingState::PlacementRotation }, (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
 	if (p.X >= 0) {
 		*xo = p.X;
@@ -191,19 +191,19 @@ void GGUI::CPlaceBuildingState::HookPlacementRotation()
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x538C8D), &constructcommand_updatemodelsetpos_over);
 }
 
-shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(int ety, const shok::Position& p, float range)
+shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(shok::EntityTypeId ety, const shok::Position& p, float range)
 {
 	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 
-	CppLogic::Iterator::EntityPredicateOfPlayer pl{ 0 };
+	CppLogic::Iterator::EntityPredicateOfPlayer pl{ static_cast<shok::PlayerId>(0) };
 	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, range * range };
 	CppLogic::Iterator::EntityPredicateOfAnyType pety{};
 	pety.entityTypes.reserve(bp->BuildOn.size());
-	for (int t : bp->BuildOn)
+	for (auto t : bp->BuildOn)
 		pety.entityTypes.push_back(t);
 	CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [](const EGL::CGLEEntity* e, float*, int*) {
-		return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == 0;
+		return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == static_cast<shok::EntityId>(0);
 	} };
 	CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> pr{ &pl, &pety, &cir, &fun };
 	CppLogic::Iterator::GlobalEntityIterator it{ &pr };
@@ -211,7 +211,7 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(int e
 		return ent->Position;
 	return { -1,-1,0 };
 }
-shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(int ety, const shok::PositionRot& p, float range)
+shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(shok::EntityTypeId ety, const shok::PositionRot& p, float range)
 {
 	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
@@ -219,7 +219,7 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(int ety,
 	shok::Position r = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
 	return { r.X, r.Y, p.r };
 }
-shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPos(int ety, const shok::PositionRot& p, float range)
+shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPos(shok::EntityTypeId ety, const shok::PositionRot& p, float range)
 {
 	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);

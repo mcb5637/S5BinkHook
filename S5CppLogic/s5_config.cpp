@@ -29,7 +29,7 @@ void EGL::CGLEAnimProps::operator delete(void* p) {
     shok::Free(p);
 }
 
-unsigned int __stdcall EGL::CGLEAnimProps::GetClassIdentifier() const
+shok::ClassId __stdcall EGL::CGLEAnimProps::GetClassIdentifier() const
 {
     return Identifier;
 }
@@ -39,15 +39,24 @@ void EGL::CGLEAnimProps::SetVT(int vt)
     *reinterpret_cast<int*>(this) = vt;
 }
 
-float& GGL::CDamageClassProps::GetBonusVsArmorClass(int ac)
+float& GGL::CDamageClassProps::GetBonusVsArmorClass(shok::ArmorClassId ac)
 {
-    --ac;
-    if (ac < 0 || ac > 7)
+    int i = static_cast<int>(ac);
+    --i;
+    if (i < 0 || i > 7)
         throw std::out_of_range{ "invalid armorclass" };
-    return BonusVsArmorClass[ac];
+    return BonusVsArmorClass[i];
 }
 
-GGL::CLogicProperties::SSettlerUpgradeCategory::SSettlerUpgradeCategory(int cat, int first)
+GGL::CDamageClassProps* GGL::DamageClassesHolder::TryGet(shok::DamageClassId id)
+{
+    int i = static_cast<int>(id);
+    if ( i > 0 && i < static_cast<int>(DamageClassList.size()))
+        return DamageClassList[i];
+    return nullptr;
+}
+
+GGL::CLogicProperties::SSettlerUpgradeCategory::SSettlerUpgradeCategory(shok::UpgradeCategoryId cat, shok::EntityTypeId first)
 {
     *reinterpret_cast<int*>(this) = vtp;
     Category = cat;
@@ -59,12 +68,12 @@ GGL::CLogicProperties::SSettlerUpgradeCategory::SSettlerUpgradeCategory(SSettler
     Category = o.Category;
     FirstSettler = o.FirstSettler;
 }
-unsigned int GGL::CLogicProperties::SSettlerUpgradeCategory::GetClassIdentifier() const
+shok::ClassId GGL::CLogicProperties::SSettlerUpgradeCategory::GetClassIdentifier() const
 {
     return Identifier;
 }
 
-GGL::CLogicProperties::SBuildingUpgradeCategory::SBuildingUpgradeCategory(int cat, int first)
+GGL::CLogicProperties::SBuildingUpgradeCategory::SBuildingUpgradeCategory(shok::UpgradeCategoryId cat, shok::EntityTypeId first)
 {
     *reinterpret_cast<int*>(this) = vtp;
     Category = cat;
@@ -78,7 +87,7 @@ GGL::CLogicProperties::SBuildingUpgradeCategory::SBuildingUpgradeCategory(SBuild
     FirstBuilding = o.FirstBuilding;
     NumScholars = o.NumScholars;
 }
-unsigned int GGL::CLogicProperties::SBuildingUpgradeCategory::GetClassIdentifier() const
+shok::ClassId GGL::CLogicProperties::SBuildingUpgradeCategory::GetClassIdentifier() const
 {
     return Identifier;
 }

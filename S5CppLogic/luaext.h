@@ -24,14 +24,14 @@ namespace luaext {
 		EGL::CEffect* OptEffect(int i);
 		EGL::CEffect* CheckEffect(int i);
 
-		int OptEntityId(int i);
+		shok::EntityId OptEntityId(int i);
 
 		void PushPos(const shok::Position& p);
 		shok::Position CheckPos(int idx);
 		shok::PositionRot CheckPosRot(int idx, bool rad = false);
 		void PushPosRot(const shok::PositionRot& p, bool rad = false);
 
-		void CheckEntityAlive(int id, const char* msg);
+		void CheckEntityAlive(shok::EntityId id, const char* msg);
 
 		void ReadCostInfo(int idx, shok::CostInfo& c, bool ignorezeroes);
 		void PushCostInfo(const shok::CostInfo& c);
@@ -41,26 +41,53 @@ namespace luaext {
 
 		void StringToLower();
 
-		shok::ResourceType CheckResourceType(int idx);
-
 		shok::Technology* CheckTech(int idx);
+		shok::PlayerId CheckPlayerId(int idx, bool allowZero = true);
+		shok::PlayerId OptPlayerId(int idx, shok::PlayerId def, bool allowZero = true);
 
 		EGUIX::CBaseWidget* CheckWidget(int idx);
 
+		using State::Push;
 		template<class En>
 		requires std::is_enum_v<En>
-		void PushEnum(En id) {
+		void Push(En id) {
 			Push(static_cast<std::underlying_type_t<En>>(id));
 		}
 		template<class En>
 		requires std::is_enum_v<En>
-		En CheckEnum(int idx) {
-			En id = static_cast<En>(CheckInt(idx));
-			auto mng = CppLogic::GetIdManager<En>();
-			if (mng.GetNameByID(id) == nullptr) {
-				throw lua::LuaException{std::format("invalid {} at {}: {} does not exist", typename_details::type_name<En>(), idx, static_cast<int>(id))};
+		En CheckEnum(int idx, bool allowZero = false) {
+			auto t = Type(idx);
+			if (t == lua::LType::Number) {
+				En id = static_cast<En>(ToInteger(idx));
+				if (allowZero && id == static_cast<En>(0))
+					return id;
+				auto mng = CppLogic::GetIdManager<En>();
+				if (mng.GetNameByID(id) == nullptr) {
+					throw lua::LuaException{std::format("invalid {} at {}: {} does not exist", typename_details::type_name<En>(), idx, static_cast<int>(id))};
+				}
+				return id;
 			}
-			return id;
+			else if (t == lua::LType::String) {
+				const char* s = ToString(idx);
+				auto mng = CppLogic::GetIdManager<En>();
+				En id = mng.GetIdByName(s);
+				if (id == static_cast<En>(0)) {
+					throw lua::LuaException{std::format("invalid {} at {}: {} does not exist", typename_details::type_name<En>(), idx, s)};
+				}
+				return id;
+			}
+			else {
+				throw lua::LuaException{std::format("invalid {} at {}: invalid type", typename_details::type_name<En>(), idx)};
+			}
+		}
+		template<class En>
+		requires std::is_enum_v<En>
+		En OptEnum(int idx) {
+			auto t = Type(idx);
+			if (t == lua::LType::Number || t == lua::LType::String) {
+				return CheckEnum<En>(idx);
+			}
+			return static_cast<En>(0);
 		}
 	};
 }

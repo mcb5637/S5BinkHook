@@ -42,12 +42,43 @@ namespace shok {
 	enum class Goods : int;
 	enum class MapType : int;
 
+	// only forward decl of these, most may change at runtime
+	enum class AnimationId : int;
 	enum class EntityTypeId : int;
-	enum class FeedbackStateId : int;
-	enum class SoundId : int;
-	enum class AbilityId : int;
-	enum class TechnologyId : int;
 	enum class UpgradeCategoryId : int;
+	enum class DamageClassId : int;
+	enum class TechnologyId : int;
+	enum class TechnologyCategoryId : int;
+	enum class AbilityId : int;
+	enum class ArmorClassId : int;
+	enum class SoundId : int;
+	enum class AmbientSoundId : int;
+	enum class FeedbackStateId : int;
+	enum class PrincipalTaskId : int;
+	enum class AnimationCategoryId : int;
+	enum class AnimSetId : int;
+	enum class EffectTypeId : int;
+	enum class TaskListId : int;
+	enum class BlessCategoryId : int;
+	enum class WeatherEffectTextureId : int;
+	enum class TerrainTypeId : int;
+	enum class TerrainTextureId : int;
+	enum class WaterTypeId : int;
+	enum class ShorewaveTypeId : int;
+	enum class ModelId : int;
+	enum class WidgetId : int;
+	enum class PlayerId : int;
+	enum class EntityStaus : int;
+	enum class ClassId : unsigned int;
+	enum class WeatherGFXSet : int;
+	enum class FontId : int;
+	enum class GUITextureId : int;
+	enum class WidgetGroupId : int;
+	enum class TriggerId : unsigned int;
+	// these definitely change at runtime
+	enum class EffectId : int;
+	enum class EntityId : int;
+	enum class SectorId : int;
 
 	class Technology;
 	class TechCategoryManager;
@@ -72,6 +103,7 @@ namespace EGL {
 	class CGLETaskArgsThousandths;
 	class CGLETerrainLowRes;
 	class CPlayerEntityIterator;
+	class CGLEEffectProps;
 
 	template<class T, unsigned int id>
 	requires (std::same_as<T, bool>&& id == 0x65DE8317) || (std::same_as<T, int> && id == 0x483040E7) || (std::same_as<T, float> && id == 0x578EE8F7)

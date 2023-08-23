@@ -12,11 +12,11 @@ void CppLogic::Mod::UI::RegisterClasses()
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<AutoScrollCustomWidget>();
 }
 
-unsigned int CppLogic::Mod::UI::AutoScrollCustomWidget::GetClassIdentifier() const
+shok::ClassId CppLogic::Mod::UI::AutoScrollCustomWidget::GetClassIdentifier() const
 {
 	return Identifier;
 }
-void* __stdcall CppLogic::Mod::UI::AutoScrollCustomWidget::CastToIdentifier(unsigned int id)
+void* __stdcall CppLogic::Mod::UI::AutoScrollCustomWidget::CastToIdentifier(shok::ClassId id)
 {
 	if (id == EGUIX::ICustomWidget::Identifier)
 		return static_cast<EGUIX::ICustomWidget*>(this);
@@ -109,8 +109,8 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 {
 	auto* mng = EGUIX::WidgetManager::GlobalObj();
 	if (Widgets.empty()) {
-		int id = mng->GetIdByName(StringUserVariable[1].c_str());
-		if (id == 0)
+		auto id = mng->GetIdByName(StringUserVariable[1].c_str());
+		if (id == static_cast<shok::WidgetId>(0))
 			return;
 		auto* w = mng->GetWidgetByID(id);
 		if (w == nullptr)
@@ -127,7 +127,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 		}
 
 		id = mng->GetIdByName(StringUserVariable[0].c_str());
-		if (id) {
+		if (id == static_cast<shok::WidgetId>(0)) {
 			Slider = mng->GetWidgetByID(id);
 			if (Slider) {
 				SliderTravel = mng->GetWidgetByID(Slider->MotherWidgetID);

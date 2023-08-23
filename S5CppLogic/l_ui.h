@@ -21,7 +21,7 @@ namespace CppLogic::UI {
 		lua::Reference RefOnCancel = lua::State::NoRef;
 
 		virtual ~GUIState_LuaSelection() override;
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual bool OnMouseEvent(BB::CEvent* ev) override;
 		virtual void SetStateParameters(GGUI::SStateParameters* p) override;
 		virtual bool Cancel() override;
@@ -37,7 +37,7 @@ namespace CppLogic::UI {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		static constexpr unsigned int Identifier = 0x1000;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1000);
 		static constexpr BB::SerializationData* SerializationData = nullptr;
 	};
 
@@ -50,7 +50,7 @@ namespace CppLogic::UI {
 
 		static void Initialize();
 
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual const char* GetName() override;
 
 		virtual void SetStateParameters(GGUI::SStateParameters* p) override;
@@ -71,7 +71,7 @@ namespace CppLogic::UI {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		static constexpr unsigned int Identifier = 0x1005;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1005);
 		static constexpr BB::SerializationData* SerializationData = nullptr;
 	};
 }

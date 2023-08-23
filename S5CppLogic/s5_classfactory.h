@@ -45,7 +45,7 @@ namespace BB {
 		virtual void __stdcall DeserializeById(BB::IStream* f, BB::IObject* b) = 0;
 		virtual void __stdcall SerializeById(BB::IStream* f, BB::IObject* b) = 0;
 		virtual void __stdcall DeserializeByData(BB::IStream* f, void* o, const BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::IStream* f, void* o, const BB::SerializationData* d, unsigned int id) = 0; // id gets ignored
+		virtual void __stdcall SerializeByData(BB::IStream* f, void* o, const BB::SerializationData* d, shok::ClassId id) = 0; // id gets ignored
 
 		static inline constexpr int vtp = 0x77F4C8;
 	};
@@ -139,12 +139,12 @@ namespace BB {
 		size_t Size = 0;
 		const BB::FieldSerilaizer* DataConverter = nullptr;
 		const BB::SerializationData* SubElementData = nullptr; //5
-		unsigned int (__stdcall* GetIdentifier)(void* data) = nullptr;
+		shok::ClassId (__stdcall* GetIdentifier)(void* data) = nullptr;
 		const BB::SerializationListOptions* ListOptions = nullptr;
 		int Unknown3 = 0;
 
 	private:
-		static unsigned int __stdcall GetBBIdentifier(void* d);
+		static shok::ClassId __stdcall GetBBIdentifier(void* d);
 	public:
 		static constexpr SerializationData FieldData(const char* name, size_t pos, size_t size, const BB::FieldSerilaizer* converter, const BB::SerializationListOptions* list = nullptr)
 		{
@@ -162,7 +162,7 @@ namespace BB {
 			return SerializationData{ 6, name, pos, size, nullptr, nullptr, &GetBBIdentifier, list, 0 };
 		}
 
-		static const SerializationData* GetSerializationData(unsigned int id);
+		static const SerializationData* GetSerializationData(shok::ClassId id);
 		template<class T>
 		static const SerializationData* GetSerializationData() = delete;
 		template<class T>
@@ -188,14 +188,14 @@ namespace BB {
 		virtual void unknown1() = 0;
 		virtual void unknown2() = 0;
 	public:
-		virtual BB::IObject* __stdcall CreateObject(unsigned int id) = 0;
-		virtual unsigned int __stdcall GetIdentifierByName(const char* name) = 0; // 5
-		virtual const char* __stdcall GetClassDemangledName(unsigned int id) = 0;
-		virtual const BB::SerializationData* __stdcall GetSerializationDataForClass(unsigned int id) = 0; // returns a 0-terminated array
+		virtual BB::IObject* __stdcall CreateObject(shok::ClassId id) = 0;
+		virtual shok::ClassId __stdcall GetIdentifierByName(const char* name) = 0; // 5
+		virtual const char* __stdcall GetClassDemangledName(shok::ClassId id) = 0;
+		virtual const BB::SerializationData* __stdcall GetSerializationDataForClass(shok::ClassId id) = 0; // returns a 0-terminated array
 	private:
 		virtual void unknown3() = 0;
 	public:
-		virtual void __stdcall AddClassToFactory(unsigned int id, const char* name, BB::IObject* (__stdcall* NewObj)(), const BB::SerializationData* data) = 0;
+		virtual void __stdcall AddClassToFactory(shok::ClassId id, const char* name, BB::IObject* (__stdcall* NewObj)(), const BB::SerializationData* data) = 0;
 	};
 
 	class CClassFactory : public IClassFactory {

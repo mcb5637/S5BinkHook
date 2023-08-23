@@ -22,8 +22,8 @@ namespace CppLogic::Mod::UI {
 	//		The scrollbar handle will be set visible only if it is needed, so you might want to do the same to any background and button elements.
 	class AutoScrollCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
-		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		virtual void Initialize() override;
 		virtual void Destroy() override;
@@ -39,7 +39,7 @@ namespace CppLogic::Mod::UI {
 		bool Dragging = false;
 		EGUIX::CMaterial PartialWidget;
 
-		static constexpr unsigned int Identifier = 0x100C;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100C);
 		static constexpr BB::SerializationData* SerializationData = nullptr;
 
 		void* operator new(size_t s);

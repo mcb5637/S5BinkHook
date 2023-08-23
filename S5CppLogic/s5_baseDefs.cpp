@@ -149,7 +149,7 @@ shok::Color::Color(int r, int g, int b, int a)
 	A = a & 0xFF;
 }
 
-void* __stdcall BB::IObject::CastToIdentifier(unsigned int id)
+void* __stdcall BB::IObject::CastToIdentifier(shok::ClassId id)
 {
 	return nullptr;
 }

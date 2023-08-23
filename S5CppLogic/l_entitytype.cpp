@@ -35,7 +35,7 @@ namespace CppLogic::EntityType {
 			throw lua::LuaException("no settler type at 2");
 		if (!t2->GetBehaviorProps<GGL::CSoldierBehaviorProps>())
 			throw lua::LuaException("no soldier type at 2");
-		p->SoldierType = L.CheckInt(2);
+		p->SoldierType = L.CheckEnum<shok::EntityTypeId>(2);
 		return 0;
 	}
 
@@ -147,7 +147,7 @@ namespace CppLogic::EntityType {
 		GGL::CGLAnimationBehaviorExProps* a = t->GetBehaviorProps<GGL::CGLAnimationBehaviorExProps>();
 		if (!a)
 			throw lua::LuaException("no animated entitytype at 1");
-		a->SuspensionAnimation = L.CheckInt(2);
+		a->SuspensionAnimation = L.CheckEnum<shok::AnimationId>(2);
 		return 0;
 	}
 
@@ -197,13 +197,13 @@ namespace CppLogic::EntityType {
 		GGL::CBattleBehaviorProps* b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
 		if (b != nullptr) {
 			b->DamageAmount = L.CheckInt(2);
-			b->DamageClass = L.CheckInt(3);
+			b->DamageClass = L.CheckEnum<shok::DamageClassId>(3);
 			return 0;
 		}
 		GGL::CAutoCannonBehaviorProps* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
 		if (a != nullptr) {
 			a->DamageAmount = L.CheckInt(2);
-			a->DamageClass = L.CheckInt(3);
+			a->DamageClass = L.CheckEnum<shok::DamageClassId>(3);
 			return 0;
 		}
 		throw lua::LuaException("no battle or autocannon entity type at 1");
@@ -429,14 +429,14 @@ namespace CppLogic::EntityType {
 			if (L.IsNumber(2))
 				s->ArmorAmount = L.CheckInt(2);
 			if (L.IsNumber(3))
-				s->ArmorClass = L.CheckInt(3);
+				s->ArmorClass = L.CheckEnum<shok::ArmorClassId>(3);
 			return 0;
 		}
 		if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
 			if (L.IsNumber(2))
 				s->ArmorAmount = L.CheckInt(2);
 			if (L.IsNumber(3))
-				s->ArmorClass = L.CheckInt(3);
+				s->ArmorClass = L.CheckEnum<shok::ArmorClassId>(3);
 			return 0;
 		}
 		throw lua::LuaException("no settler or building entity type at 1");
@@ -454,7 +454,7 @@ namespace CppLogic::EntityType {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		for (int i = 0; i < 4; i++)
 			if (L.IsNumber(1 + i))
-				t->DisplayProps->Model[i] = L.CheckInt(1 + i);
+				t->DisplayProps->Model[i] = L.CheckEnum<shok::ModelId>(1 + i);
 		return 0;
 	}
 
@@ -479,7 +479,7 @@ namespace CppLogic::EntityType {
 		if (L.IsNumber(2))
 			p->Damage = L.CheckInt(2);
 		if (L.IsNumber(3))
-			p->DamageClass = L.CheckInt(3);
+			p->DamageClass = L.CheckEnum<shok::DamageClassId>(3);
 		if (L.IsNumber(4))
 			p->Range = L.CheckFloat(4);
 		if (L.IsNumber(5))
@@ -511,7 +511,7 @@ namespace CppLogic::EntityType {
 		if (L.IsNumber(2))
 			p->DamageAmount = L.CheckInt(2);
 		if (L.IsNumber(3))
-			p->DamageClass = L.CheckInt(3);
+			p->DamageClass = L.CheckEnum<shok::DamageClassId>(3);
 		if (L.IsNumber(4))
 			p->NumberShuriken = L.CheckInt(4);
 		if (L.IsNumber(5))
@@ -605,7 +605,7 @@ namespace CppLogic::EntityType {
 		if (!l)
 			throw lua::LuaException("no resource tree entity at 1");
 		if (L.IsNumber(2))
-			l->ResourceEntity = L.CheckInt(2);
+			l->ResourceEntity = L.CheckEnum<shok::EntityTypeId>(2);
 		if (L.IsNumber(3))
 			l->ResourceAmount = L.CheckInt(3);
 		return 0;
@@ -723,7 +723,7 @@ namespace CppLogic::EntityType {
 		if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
 			L.NewTable();
 			int c = 1;
-			for (int i : s->ModifyArmor.TechList) {
+			for (auto i : s->ModifyArmor.TechList) {
 				L.Push(i);
 				L.SetTableRaw(-2, c);
 				c++;
@@ -733,7 +733,7 @@ namespace CppLogic::EntityType {
 		if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
 			L.NewTable();
 			int c = 1;
-			for (int i : s->ModifyArmor.TechList) {
+			for (auto i : s->ModifyArmor.TechList) {
 				L.Push(i);
 				L.SetTableRaw(-2, c);
 				c++;
@@ -749,7 +749,7 @@ namespace CppLogic::EntityType {
 		if (GGL::CGLSettlerProps* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps)) {
 			L.NewTable();
 			int c = 1;
-			for (int i : s->ModifyExploration.TechList) {
+			for (auto i : s->ModifyExploration.TechList) {
 				L.Push(i);
 				L.SetTableRaw(-2, c);
 				c++;
@@ -759,7 +759,7 @@ namespace CppLogic::EntityType {
 		if (GGL::CGLBuildingProps* s = dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)) {
 			L.NewTable();
 			int c = 1;
-			for (int i : s->ModifyExploration.TechList) {
+			for (auto i : s->ModifyExploration.TechList) {
 				L.Push(i);
 				L.SetTableRaw(-2, c);
 				c++;
@@ -777,7 +777,7 @@ namespace CppLogic::EntityType {
 			throw lua::LuaException("no settler entity at 1");
 		L.NewTable();
 		int c = 1;
-		for (int i : s->ModifyDamage.TechList) {
+		for (auto i : s->ModifyDamage.TechList) {
 			L.Push(i);
 			L.SetTableRaw(-2, c);
 			c++;
@@ -793,7 +793,7 @@ namespace CppLogic::EntityType {
 			throw lua::LuaException("no settler entity at 1");
 		L.NewTable();
 		int c = 1;
-		for (int i : s->ModifyMaxRange.TechList) {
+		for (auto i : s->ModifyMaxRange.TechList) {
 			L.Push(i);
 			L.SetTableRaw(-2, c);
 			c++;
@@ -809,7 +809,7 @@ namespace CppLogic::EntityType {
 			throw lua::LuaException("no settler entity at 1");
 		L.NewTable();
 		int c = 1;
-		for (int i : s->ModifySpeed.TechList) {
+		for (auto i : s->ModifySpeed.TechList) {
 			L.Push(i);
 			L.SetTableRaw(-2, c);
 			c++;
@@ -824,11 +824,11 @@ namespace CppLogic::EntityType {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		if (!t->IsBuildingType())
 			throw lua::LuaException("no building type at 1");
-		int tech = L.CheckInt(2);
+		auto tech = L.CheckEnum<shok::TechnologyId>(2);
 		shok::Technology* techo = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tech);
 		if (!techo)
 			throw lua::LuaException("no tech at 2");
-		EGL::CGLEEntity::BuildingMaxHpTechBoni.emplace(L.CheckInt(1), tech);
+		EGL::CGLEEntity::BuildingMaxHpTechBoni.emplace(L.CheckEnum<shok::EntityTypeId>(1), tech);
 		return 0;
 	}
 
@@ -839,7 +839,7 @@ namespace CppLogic::EntityType {
 			throw lua::LuaException("no building type at 1");
 		L.NewTable();
 		int i = 1;
-		for (int ty : dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)->BuildOn) {
+		for (auto ty : dynamic_cast<GGL::CGLBuildingProps*>(t->LogicProps)->BuildOn) {
 			L.Push(ty);
 			L.SetTableRaw(-2, i);
 			i++;
@@ -865,8 +865,7 @@ namespace CppLogic::EntityType {
 
 	int GetUpgradeCategory(lua::State ls) {
 		luaext::EState L{ ls };
-		L.CheckEntityType(1);
-		int ucat = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(1)->SettlerUpgradeManager->GetUpgradeCategoryOfEntityType(L.CheckInt(1));
+		auto ucat = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(shok::PlayerId::P1)->SettlerUpgradeManager->GetUpgradeCategoryOfEntityType(L.CheckEnum<shok::EntityTypeId>(1));
 		L.Push(ucat);
 		return 1;
 	}

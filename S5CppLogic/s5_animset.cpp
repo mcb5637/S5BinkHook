@@ -19,13 +19,13 @@ void EGL::CGLEAnimSet::operator delete(void* p) {
 	shok::Free(p);
 }
 
-inline int(__thiscall* const animset_getanim)(EGL::CGLEAnimSet* th, int c) = reinterpret_cast<int(__thiscall*)(EGL::CGLEAnimSet*, int)>(0x588464);
-int EGL::CGLEAnimSet::GetAnim(int category)
+inline shok::AnimationId(__thiscall* const animset_getanim)(EGL::CGLEAnimSet* th, shok::AnimationCategoryId c) = reinterpret_cast<shok::AnimationId(__thiscall*)(EGL::CGLEAnimSet*, shok::AnimationCategoryId)>(0x588464);
+shok::AnimationId EGL::CGLEAnimSet::GetAnim(shok::AnimationCategoryId category)
 {
 	return animset_getanim(this, category);
 }
 
-unsigned int __stdcall EGL::CGLEAnimSet::GetClassIdentifier() const
+shok::ClassId __stdcall EGL::CGLEAnimSet::GetClassIdentifier() const
 {
 	return Identifier;
 }
@@ -35,7 +35,7 @@ void EGL::CGLEAnimSet::SetVT()
 	*reinterpret_cast<int*>(this) = vtp;
 }
 
-unsigned int __stdcall GGL::CGLGoodDependentAnim::GetClassIdentifier() const
+shok::ClassId __stdcall GGL::CGLGoodDependentAnim::GetClassIdentifier() const
 {
 	return Identifier;
 }

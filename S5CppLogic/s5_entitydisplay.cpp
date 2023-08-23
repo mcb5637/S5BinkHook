@@ -41,7 +41,7 @@ ED::CEntity* ED::CVisibleEntityManager::CreateDisplayForEntity(EGL::IEntityDispl
     return shok_ED_CVisibleEntityManager_create(this, e);
 }
 static inline void(__thiscall* const shok_ED_CVisibleEntityManager_destroy)(ED::CVisibleEntityManager* th, int id) = reinterpret_cast<void(__thiscall*)(ED::CVisibleEntityManager*, int)>(0x476066);
-void ED::CVisibleEntityManager::DestroyDisplayForEntity(int eid)
+void ED::CVisibleEntityManager::DestroyDisplayForEntity(shok::EntityId eid)
 {
-    shok_ED_CVisibleEntityManager_destroy(this, eid & 0xFFFF);
+    shok_ED_CVisibleEntityManager_destroy(this, static_cast<int>(eid) & 0xFFFF);
 }

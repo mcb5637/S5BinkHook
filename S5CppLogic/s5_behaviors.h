@@ -6,11 +6,12 @@
 namespace EGL {
 	class CGLEBehavior : public BB::IObject { // no vtable
 	public:
-		int SlotIndex = 0, EntityId = 0;
+		int SlotIndex = 0;
+		shok::EntityId EntityId = static_cast<shok::EntityId>(0);
 		EGL::CGLEBehaviorProps* PropPointer = nullptr; // 3, warning this may not be set
 
 	protected:
-		virtual void __thiscall AddHandlers(int id) = 0; // 3
+		virtual void __thiscall AddHandlers(shok::EntityId id) = 0; // 3
 		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
 		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
 		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old); // on movement seems to copy a lot of data, maybe change behavior?
@@ -19,7 +20,7 @@ namespace EGL {
 	public:
 		static inline constexpr int TypeDesc = 0x813778;
 		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x86A828);
-		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
+		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
 	};
 
 	class CCoarsePath {
@@ -55,7 +56,7 @@ namespace EGL {
 		bool IsPathingUsed, IsMoveFinished; // 15
 		PADDING(2);
 		PADDINGI(1); // p to EGL::CMovementBehavior::CSlotMovingEntity
-		int ResumeModelID; // 17
+		shok::ModelId ResumeModelID; // 17
 		bool PauseMode, WasMoving, IsObstructed;
 		PADDING(1);
 
@@ -74,7 +75,7 @@ namespace EGL {
 
 	public:
 		static inline constexpr int vtp = 0x7848DC;
-		static inline constexpr unsigned int Identifier = 0xAC0E3657;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xAC0E3657);
 	};
 
 	class GLEBehaviorMultiSubAnims : public EGL::CGLEBehavior {
@@ -82,9 +83,10 @@ namespace EGL {
 		PADDINGI(1);
 		int LastUpdateTurn;
 		struct {
-			byte Active, PlayBackwards, IsLooped;
+			bool Active, PlayBackwards, IsLooped;
 			PADDING(1);
-			int AnimID, StartTurn, Duration;
+			shok::AnimationId AnimID;
+			int StartTurn, Duration;
 			float Speed;
 		} AnimSlot[4];
 
@@ -93,13 +95,13 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x785EEC;
 		static inline constexpr int TypeDesc = 0x83AE4C;
-		static inline constexpr unsigned int Identifier = 0xFCFC0D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFCFC0D);
 	};
 
 	struct SSlotArgsAnimation {
 		PADDING(1);
 		bool PlayBackwards;
-		int AnimId;
+		shok::AnimationId AnimId;
 		int StartTurn;
 		int Duration;
 		float SpeedModifier;
@@ -118,7 +120,7 @@ namespace EGL {
 	protected:
 		shok::TaskStateExecutionResult StateWaitForAnim(int i);
 	public:
-		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
+		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
 	};
 
 	struct SSlotArgsUVAnims {
@@ -136,7 +138,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x7854E0;
 		static inline constexpr int TypeDesc = 0x839A8C;
-		static inline constexpr unsigned int Identifier = 0x2503860D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2503860D);
 
 		// defined events: UVAnim_SetStatus
 	};
@@ -152,7 +154,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7786AC;
 		static inline constexpr int TypeDesc = 0x818DF0;
-		static inline constexpr unsigned int Identifier = 0x3B4EFD17;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3B4EFD17);
 
 		// defined states: Move, Move_NonCancelable, Rotate
 		// defined events: Movement_XXX, 1100D, 1100E, 11017
@@ -162,25 +164,25 @@ namespace GGL {
 	public:
 		static inline constexpr int vtp = 0x77471C;
 		static inline constexpr int TypeDesc = 0x81961C;
-		static inline constexpr unsigned int Identifier = 0x786A407;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x786A407);
 	};
 	class CLeaderMovement : public GGL::CBehaviorDefaultMovement {
 	public:
 		static inline constexpr int vtp = 0x775ED4;
 		static inline constexpr int TypeDesc = 0x81D7E4;
-		static inline constexpr unsigned int Identifier = 0x0E66510C3;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E66510C3);
 	};
 	class CSoldierMovement : public GGL::CBehaviorDefaultMovement {
 	public:
 		static inline constexpr int vtp = 0x77438C;
 		static inline constexpr int TypeDesc = 0x818E1C;
-		static inline constexpr unsigned int Identifier = 0x19BC8A93;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x19BC8A93);
 	};
 	class CBehaviorAnimalMovement : public GGL::CBehaviorDefaultMovement {
 	public:
 		static inline constexpr int vtp = 0x77880C;
 		static inline constexpr int TypeDesc = 0x826844;
-		static inline constexpr unsigned int Identifier = 0x29093B37;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x29093B37);
 	};
 
 
@@ -190,10 +192,10 @@ namespace GGL {
 		int SecondsCharged = 0; // 5
 
 
-		virtual void AddHandlers(int id) override;
+		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
-		virtual bool IsAbility(int ability) = 0; // 8
+		virtual bool IsAbility(shok::AbilityId ability) = 0; // 8
 		virtual bool CanUseAbility();
 		virtual bool CheckAndResetCooldown();
 
@@ -201,11 +203,11 @@ namespace GGL {
 
 		static inline constexpr int TypeDesc = 0x816E2C;
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86CBE8);
-		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
+		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
 	};
 
 	struct SSlotArgsCamouflage {
-		int LocalPlayer;
+		shok::PlayerId LocalPlayer;
 		bool IsLocalPlayer, IsNotAlliedToLocalPlayer;
 	};
 	class CCamouflageBehavior : public GGL::CHeroAbility, public EGL::TSlot<GGL::SSlotArgsCamouflage, 0x3AA0169D> {
@@ -219,7 +221,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7738F4;
 		static inline constexpr int TypeDesc = 0x8172E8;
-		static inline constexpr unsigned int Identifier = 0x0E2D7A5DD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E2D7A5DD);
 
 		static void HookOnAttacked();
 		static void (*CamoActivateCb)(GGL::CCamouflageBehavior* th);
@@ -238,7 +240,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x773934;
 		static inline constexpr int TypeDesc = 0x817310;
-		static inline constexpr unsigned int Identifier = 0x51D6A267;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x51D6A267);
 	};
 
 	class CHeroHawkBehavior : public GGL::CHeroAbility {
@@ -247,7 +249,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7766F0;
 		static inline constexpr int TypeDesc = 0x81FE84;
-		static inline constexpr unsigned int Identifier = 0xFE5FCD9D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFE5FCD9D);
 	};
 	class CHawkBehavior : public EGL::CGLEBehavior {
 	public:
@@ -260,7 +262,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776A24;
 		static inline constexpr int TypeDesc = 0x8207C4;
-		static inline constexpr unsigned int Identifier = 0x0CB26FC4D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0CB26FC4D);
 	};
 
 
@@ -274,13 +276,13 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776638;
 		static inline constexpr int TypeDesc = 0x81FBD8;
-		static inline constexpr unsigned int Identifier = 0x400E6C6D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x400E6C6D);
 	};
 
 	class CBombPlacerBehavior : public GGL::CHeroAbility {
 	public:
 		shok::Position StartPosition, TargetPosition;
-		byte PlacedBomb; // 10
+		bool PlacedBomb; // 10
 		PADDING(3);
 
 		// defined events: BombPlacer_XXX, HeroAbility_Cancel
@@ -288,7 +290,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7783D8;
 		static inline constexpr int TypeDesc = 0x8255D0;
-		static inline constexpr unsigned int Identifier = 0x29AF8F97;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x29AF8F97);
 
 		static void HookFixBombAttachment();
 	};
@@ -300,7 +302,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x778468;
 		static inline constexpr int TypeDesc = 0x8258A8;
-		static inline constexpr unsigned int Identifier = 0x76AE8807;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x76AE8807);
 
 		static void HookDealDamage();
 	};
@@ -309,8 +311,8 @@ namespace GGL {
 	public:
 		PADDINGI(1);
 		shok::Position StartPosition;
-		int CannonType, FoundationType;
-		byte PlacedCannon; // 11
+		shok::EntityTypeId CannonType, FoundationType;
+		bool PlacedCannon; // 11
 		PADDING(3);
 
 		// defined events: CannonBuilder_XXX, HeroAbility_Cancel, Die, 1600B some form of stop?->12002
@@ -318,7 +320,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7774D4;
 		static inline constexpr int TypeDesc = 0x823254;
-		static inline constexpr unsigned int Identifier = 0x259E7B1D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x259E7B1D);
 	};
 
 	class CRangedEffectAbility : public GGL::CHeroAbility {
@@ -330,7 +332,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774E54;
 		static inline constexpr int TypeDesc = 0x81B7AC;
-		static inline constexpr unsigned int Identifier = 0x0F622BC1D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0F622BC1D);
 
 		void __thiscall AdvHealAffected(); // heals all attached with HERO_AFFECTED
 
@@ -346,7 +348,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x777464;
 		static inline constexpr int TypeDesc = 0x823038;
-		static inline constexpr unsigned int Identifier = 0x522330D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x522330D);
 
 		static void HookDealDamage();
 	};
@@ -360,14 +362,14 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x773C10;
 		static inline constexpr int TypeDesc = 0x817E0C;
-		static inline constexpr unsigned int Identifier = 0x2BA19F1D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2BA19F1D);
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86D4B8);
 
 
-		virtual void AddHandlers(int id) override;
+		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
-		virtual bool IsAbility(int ability) override;
+		virtual bool IsAbility(shok::AbilityId ability) override;
 
 	protected:
 		void EventDie(BB::CEvent* ev);
@@ -380,7 +382,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x773BB8;
 		static inline constexpr int TypeDesc = 0x817CD4;
-		static inline constexpr unsigned int Identifier = 0x83CAFB3D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x83CAFB3D);
 	};
 
 	class CConvertSettlerAbility : public GGL::CHeroAbility {
@@ -394,7 +396,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x777294;
 		static inline constexpr int TypeDesc = 0x8227D8;
-		static inline constexpr unsigned int Identifier = 0x0E8276B7D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E8276B7D);
 
 		static void HookConvertEvent();
 		void __thiscall PerformConversion();
@@ -411,20 +413,20 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77739C;
 		static inline constexpr int TypeDesc = 0x822B98;
-		static inline constexpr unsigned int Identifier = 0x0FF68C96D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0FF68C96D);
 	};
 
 	class CSniperAbility : public GGL::CHeroAbility {
 	public:
 		PADDINGI(1);
-		int TargetId; // 7
+		shok::EntityId TargetId; // 7
 
 		// defined tasks: TASK_SET_SNIPE_ANIM, TASK_SNIPE, TASK_TURN_TO_SNIPER_TARGET
 		// defined events: Sniper_XXX
 
 		static inline constexpr int vtp = 0x7745AC;
 		static inline constexpr int TypeDesc = 0x819044;
-		static inline constexpr unsigned int Identifier = 0x0D167211D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0D167211D);
 
 		static void OverrideSnipeTask();
 		static int (*SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg);
@@ -440,20 +442,20 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77574C;
 		static inline constexpr int TypeDesc = 0x81C408;
-		static inline constexpr unsigned int Identifier = 0x33A2FBFD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x33A2FBFD);
 	};
 
 	class CShurikenAbility : public GGL::CHeroAbility {
 	public:
 		PADDINGI(1);
-		int TargetId;
+		shok::EntityId TargetId;
 
 		// defined tasks: TASK_SET_THROW_SHURIKEN_ANIM, TASK_THROW_SHURIKEN, TASK_TURN_TO_SHURIKEN_TARGET
 		// defined events: Shuriken_XXX
 
 		static inline constexpr int vtp = 0x774658;
 		static inline constexpr int TypeDesc = 0x819310;
-		static inline constexpr unsigned int Identifier = 0x3A0D7DAD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3A0D7DAD);
 
 		static void HookDealDamage();
 	};
@@ -461,7 +463,7 @@ namespace GGL {
 	class CKegPlacerBehavior : public GGL::CHeroAbility {
 	public:
 		shok::Position StartPosition, TargetPosition;
-		byte PlacedKeg; // 10
+		bool PlacedKeg; // 10
 		PADDING(3);
 		int TurnsUntilArmed, TurnsUntilDisarmed; // 11
 
@@ -471,11 +473,11 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776368;
 		static inline constexpr int TypeDesc = 0x81F084;
-		static inline constexpr unsigned int Identifier = 0x0BF115057;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0BF115057);
 	};
 	class CKegBehavior : public EGL::CGLEBehavior {
 	public:
-		byte IsArmed;
+		bool IsArmed;
 		PADDING(3);
 		int TimeToExplode; //5
 
@@ -484,7 +486,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7764D8;
 		static inline constexpr int TypeDesc = 0x81F6BC;
-		static inline constexpr unsigned int Identifier = 0x14A85A47;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x14A85A47);
 
 		void AdvancedDealDamage();
 
@@ -494,7 +496,7 @@ namespace GGL {
 	class CAbilityScoutBinocular : public GGL::CHeroAbility {
 	public:
 		PADDINGI(1);
-		byte Active; // 7
+		bool Active; // 7
 		PADDING(3);
 		shok::Position ExlorationPosition;
 
@@ -503,13 +505,13 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x779218;
 		static inline constexpr int TypeDesc = 0x829248;
-		static inline constexpr unsigned int Identifier = 0x0E7661C1D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E7661C1D);
 	};
 
 	class CTorchPlacerBehavior : public GGL::CHeroAbility {
 	public:
 		shok::Position StartPosition, TargetPosition; // 5
-		byte PlacedTorch;
+		bool PlacedTorch;
 		PADDING(3);
 
 		// defined tasks: TASK_GO_TO_TORCH_DESTINATION, TASK_PLACE_TORCH
@@ -517,7 +519,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x773738;
 		static inline constexpr int TypeDesc = 0x816E4C;
-		static inline constexpr unsigned int Identifier = 0x0A5AB3F17;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0A5AB3F17);
 	};
 	class CTorchBehavior : public EGL::CGLEBehavior {
 	public:
@@ -527,7 +529,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x773848;
 		static inline constexpr int TypeDesc = 0x817174;
-		static inline constexpr unsigned int Identifier = 0x0A27E4FF7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0A27E4FF7);
 	};
 
 	class CPointToResourceBehavior : public GGL::CHeroAbility {
@@ -539,12 +541,15 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774FB0;
 		static inline constexpr int TypeDesc = 0x81BB84;
-		static inline constexpr unsigned int Identifier = 0x0EC055D7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0EC055D7);
 	};
 
 	class CThiefBehavior : public EGL::CGLEBehavior {
 	public:
-		int Amount, ResourceType, StolenFromPlayer, TimeToSteal; //4
+		int Amount;
+		shok::ResourceType ResourceType;
+		shok::PlayerId StolenFromPlayer;
+		int TimeToSteal; //4
 
 		// defined tasks: TASK_GO_TO_TARGET_BUILDING, TASK_CHECK_GO_TO_TARGET_BUILDING_SUCCESS, TASK_GO_TO_SECURE_BUILDING, TASK_CHECK_GO_TO_SECURE_BUILDING_SUCCESS,
 		//		TASK_STEAL_GOODS, TASK_SECURE_STOLEN_GOODS, TASK_SET_THIEF_MODEL, TASK_THIEF_IDLE
@@ -553,7 +558,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7739B0;
 		static inline constexpr int TypeDesc = 0x8173DC;
-		static inline constexpr unsigned int Identifier = 0x7AE64E17;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7AE64E17);
 	};
 
 	class CSentinelBehavior : public EGL::CGLEBehavior {
@@ -565,12 +570,15 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774B6C;
 		static inline constexpr int TypeDesc = 0x81ABC0;
-		static inline constexpr unsigned int Identifier = 0x5F1FFAD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5F1FFAD);
 	};
 
 	class CGLBehaviorAnimationEx : public EGL::CBehaviorAnimation {
 	public:
-		int Animation, AnimCategory, SuspendedAnimation, StartTurn, Duration; // 4
+		shok::AnimationId Animation;
+		shok::AnimationCategoryId AnimCategory;
+		shok::AnimationId SuspendedAnimation;
+		int StartTurn, Duration; // 4
 		bool PlayBackwards; // 9
 		PADDING(3);
 		int TurnToWaitFor;
@@ -579,13 +587,13 @@ namespace GGL {
 		PADDINGI(1); // p to props
 		struct {
 			PADDINGI(1);
-			int TaskType; // 15
-			int AnimID;
-			int Category;
-			byte PlayBackwards;
+			shok::Task TaskType; // 15
+			shok::AnimationId AnimID;
+			shok::AnimationCategoryId Category;
+			bool PlayBackwards;
 			PADDING(3);
 		} AnimToRestore;
-		int AnimSet; // 19
+		shok::AnimSetId AnimSet; // 19
 
 		// defined states: WaitForAnim
 		// defined tasks: TASK_SET_ANIM (x2), TASK_WAIT_FOR_ANIM, TASK_RANDOM_WAIT_FOR_ANIM
@@ -595,7 +603,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776B64;
 		static inline constexpr int TypeDesc = 0x820BE8;
-		static inline constexpr unsigned int Identifier = 0x0A4947238;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0A4947238);
 
 		static void HookNonCancelableAnim();
 	private:
@@ -612,7 +620,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7736A4;
 		static inline constexpr int TypeDesc = 0x816A78;
-		static inline constexpr unsigned int Identifier = 0x0E23732C7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E23732C7);
 	};
 
 	class CWorkerBehaviorProps;
@@ -642,7 +650,7 @@ namespace GGL {
 		GGL::CWorkerBehaviorProps* BehaviorProps2; //7
 		Cycle CycleIndex; // seems to be 0->working, 1->eating, 2->resting, 5->joining settlement
 		int TimesWorked, TimesNoWork, TimesNoFood, TimesNoRest, TimesNoPay, JoblessSinceTurn; // 9
-		byte CouldConsumeResource, IsLeaving; // 15
+		bool CouldConsumeResource, IsLeaving; // 15
 		PADDING(2);
 		int FoundryWaitUntil; // set by TASK_DO_WORK_AT_FOUNDRY to props->WorkWaitUntil/100, then counted down by state
 		float CarriedResourceAmount; // 17
@@ -666,13 +674,13 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x772B30;
 		static inline constexpr int TypeDesc = 0x813B1C;
-		static inline constexpr unsigned int Identifier = 0xDCDBAB9D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDCDBAB9D);
 
 		GGL::CBuilding* GetFirstAttachedBuilding(shok::AttachmentType a);
 		GGL::CBuilding* GetWorkplace(); // fires workplace detached if no workplace found
 		GGL::CBuilding* GetEnteredBuilding();
 		bool IsResearchingSomething();
-		bool IsBuildingClosed(int bid); // checks upgrading+health%
+		bool IsBuildingClosed(shok::EntityId bid); // checks upgrading+health%
 		void LeaveIfPossible();
 		bool CheckHasOpenedWorkplace(); // checks IsBuildingClosed, if no workplace checks JoblessSinceTurn and possibly calls LeaveIfPossible
 		void MotivationFeedbackAndLeaveCheck(shok::WorkerReason r); // feedback events, leaves if low moti
@@ -682,7 +690,7 @@ namespace GGL {
 		bool DoesNotWantToEat(); // always true if no farm
 		bool DoesNotWantToRest(); // always true if no resi
 		bool CanWork(); // always false if no workplace, checks worktime if no overtime, checks moti if overtime
-		int GetWorkTaskList(); // first workplace, then own props as fallback
+		shok::TaskListId GetWorkTaskList(); // first workplace, then own props as fallback
 		int GetWorktimeMax();
 		void GoRestIgnoreWorktime(); // on no supplier found
 
@@ -704,7 +712,7 @@ namespace GGL {
 	class CBehaviorFollow : public EGL::CGLEBehavior {
 	public:
 		static inline constexpr int vtp = 0x776E40;
-		static inline constexpr unsigned int Identifier = 0xDBF96E77;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDBF96E77);
 	};
 
 	class CBattleBehavior : public GGL::CBehaviorFollow {
@@ -712,20 +720,21 @@ namespace GGL {
 		float SuccessDistance, FailureDistance; // 4
 		int TimeOutTime, StartTurn;
 		shok::Position TargetPosition;
-		byte StartFollowing, StopFollowing; // 10
+		bool StartFollowing, StopFollowing; // 10
 		PADDING(2);
 		int FollowStatus;
 		GGL::CBattleBehaviorProps* BattleProps; // 12 p to behprops
 		int LatestHitTurn;
-		int LatestAttackerID, BattleStatus; // la15
-		byte NoMoveNecessary, NormalRangeCheckNecessary;
+		shok::EntityId LatestAttackerID;
+		int BattleStatus; // la15
+		bool NoMoveNecessary, NormalRangeCheckNecessary;
 		PADDING(2);
 		shok::LeaderCommand Command;
 		shok::Position AttackMoveTarget;
-		byte Helping;
+		bool Helping;
 		PADDING(3);
 		int MilliSecondsToWait, MSToPlayHitAnimation;
-		byte HitPlayed; // 23
+		bool HitPlayed; // 23
 		PADDING(3);
 		int LatestAttackTurn;
 
@@ -745,7 +754,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77313C;
 		static inline constexpr int TypeDesc = 0x815EEC;
-		static inline constexpr unsigned int Identifier = 0xC4F1C42D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC4F1C42D);
 
 		float GetMaxRange() const;
 		int GetDamage() const;
@@ -782,7 +791,7 @@ namespace GGL {
 		int NextPatrolPointIndex; // 37
 		float DefendOrientation;
 		int TrainingStartTurn;
-		byte PatrolIndexCountingDown, UsingTargetOrientation, UsingTerritory; // 40
+		bool PatrolIndexCountingDown, UsingTargetOrientation, UsingTerritory; // 40
 		PADDING(1);
 		int SecondsSinceHPRefresh, NudgeCount, FormationType;
 		shok::Position StartBattlePosition;
@@ -795,7 +804,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7761E0;
 		static inline constexpr int TypeDesc = 0x81EF80;
-		static inline constexpr unsigned int Identifier = 0x6DACD5ED;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6DACD5ED);
 
 		// clear attack target 0x50BB85()
 		// check attack target 0x4ED0A3() detaches if no longer hostile or dead
@@ -831,7 +840,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x773CC8;
 		static inline constexpr int TypeDesc = 0x817FC4;
-		static inline constexpr unsigned int Identifier = 0x0B1DACA7D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0B1DACA7D);
 	};
 
 	class CBattleSerfBehavior : public GGL::CLeaderBehavior {
@@ -845,7 +854,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7788C4;
 		static inline constexpr int TypeDesc = 0x826BB4;
-		static inline constexpr unsigned int Identifier = 0x738D051D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x738D051D);
 	};
 
 	class CSerfBattleBehavior : public GGL::CBattleBehavior {
@@ -858,7 +867,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774A98;
 		static inline constexpr int TypeDesc = 0x81A4FC;
-		static inline constexpr unsigned int Identifier = 0x0AAB009AD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0AAB009AD);
 	};
 	// GGL::CWorkerBattleBehavior unused
 
@@ -882,7 +891,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x778CF0;
 		static inline constexpr int TypeDesc = 0x8288A0;
-		static inline constexpr unsigned int Identifier = 0x143C5EFD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x143C5EFD);
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();
@@ -897,7 +906,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776CA0;
 		static inline constexpr int TypeDesc = 0x820F44;
-		static inline constexpr unsigned int Identifier = 0x0B68167D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0B68167D);
 	};
 
 	class CSerfBehavior : public EGL::CGLEBehavior {
@@ -917,7 +926,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774874;
 		static inline constexpr int TypeDesc = 0x819AFC;
-		static inline constexpr unsigned int Identifier = 0x1A1A688D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1A1A688D);
 
 		static void HookMineTrigger();
 	private:
@@ -941,7 +950,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x775E84;
 		static inline constexpr int TypeDesc = 0x81D6DC;
-		static inline constexpr unsigned int Identifier = 0x2776847;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2776847);
 	};
 	static_assert(offsetof(CLimitedAttachmentBehavior, AttachmentMap) == 5 * 4);
 
@@ -955,14 +964,14 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776D60;
 		static inline constexpr int TypeDesc = 0x8212A4;
-		static inline constexpr unsigned int Identifier = 0xC9C36977;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC9C36977);
 
 		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x875988);
 
 		shok::Position GetFormationPosition();
 
 	protected:
-		virtual void __thiscall AddHandlers(int id) override;
+		virtual void __thiscall AddHandlers(shok::EntityId id) override;
 		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
 		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old) override;
@@ -989,7 +998,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77777C;
 		static inline constexpr int TypeDesc = 0x823720;
-		static inline constexpr unsigned int Identifier = 0x1ADA8097;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1ADA8097);
 	};
 	class CCampBehaviorProperties;
 	class CCampBehavior : public EGL::CGLEBehavior {
@@ -1003,7 +1012,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x777864;
 		static inline constexpr int TypeDesc = 0x823C48;
-		static inline constexpr unsigned int Identifier = 0x671CDCE7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x671CDCE7);
 	};
 
 	class CGLBehaviorDying : public EGL::CGLEBehavior {
@@ -1013,14 +1022,14 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7785E4;
 		static inline constexpr int TypeDesc = 0x825F14;
-		static inline constexpr unsigned int Identifier = 0x0C035C4ED;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0C035C4ED);
 	};
 
 	class CHeroBehavior : public EGL::CGLEBehavior {
 	public:
 		PADDINGI(1);
 		int ResurrectionTimePassed, SpawnTurn; // 5
-		byte FriendNear, EnemyNear;
+		bool FriendNear, EnemyNear;
 		PADDING(2);
 
 		// defined events: Die, HeroBehavior_XXX
@@ -1029,7 +1038,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77677C;
 		static inline constexpr int TypeDesc = 0x820070;
-		static inline constexpr unsigned int Identifier = 0x0FCB04BAD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0FCB04BAD);
 	};
 
 	class CResourceRefinerBehavior : public EGL::CGLEBehavior {
@@ -1039,7 +1048,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774BCC;
 		static inline constexpr int TypeDesc = 0x81AD80;
-		static inline constexpr unsigned int Identifier = 0x340C4B57;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x340C4B57);
 
 		float GetRefineAmount(); // checks highest Props->Efficiency with researched tech, Props->InitialFactor as default
 		shok::ResourceType GetResource();
@@ -1054,7 +1063,7 @@ namespace GGL {
 	class CAffectMotivationBehavior : public EGL::CGLEBehavior {
 	public:
 		CAffectMotivationBehaviorProps* Props; //p to props
-		int PlayerID; //5
+		shok::PlayerId PlayerID; //5
 		bool MotivationAffected;
 		PADDING(3);
 
@@ -1066,7 +1075,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77918C;
 		static inline constexpr int TypeDesc = 0x829024;
-		static inline constexpr unsigned int Identifier = 0x6280C00D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6280C00D);
 	};
 
 	class CLimitedLifespanBehavior : public EGL::CGLEBehavior {
@@ -1078,19 +1087,19 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x775D9C;
 		static inline constexpr int TypeDesc = 0x81D0B0;
-		static inline constexpr unsigned int Identifier = 0x66243B3D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x66243B3D);
 	};
 
 	class CBarrackBehavior : public EGL::CGLEBehavior {
 	public:
-		byte AutoFillActive; //4
+		bool AutoFillActive; //4
 		PADDING(3);
 
 		// defined events: Barracks_XXX
 
 		static inline constexpr int vtp = 0x778A68;
 		static inline constexpr int TypeDesc = 0x8278DC;
-		static inline constexpr unsigned int Identifier = 0x0FE724607;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0FE724607);
 	};
 
 	class CBuildingMerchantBehavior : public EGL::CGLEBehavior {
@@ -1102,52 +1111,52 @@ namespace GGL {
 
 			static inline constexpr int vtp = 0x7781B4;
 			static inline constexpr int TypeDesc = 0x824BC8;
-			static inline constexpr unsigned int Identifier = 0x1079FB13;
+			static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1079FB13);
 		};
 
-		int CurrentPlayer; //4
-		int TraderEntityID;
+		shok::PlayerId CurrentPlayer; //4
+		shok::EntityId TraderEntityID;
 		shok::Vector<GGL::CBuildingMerchantBehavior::COffer*> Offer;
 
 		// defined events: Behavior_Tick, BuildingMerchant_XXX, IsMerchantBuilding
 
 		static inline constexpr int vtp = 0x778208;
 		static inline constexpr int TypeDesc = 0x824DFC;
-		static inline constexpr unsigned int Identifier = 0x8D87CCB3;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8D87CCB3);
 	};
 	class CBuildingMercenaryBehavior : public GGL::CBuildingMerchantBehavior {
 	public:
 		class CTechOffer : public GGL::CBuildingMerchantBehavior::COffer {
 		public:
-			int OfferedTechnologyType;
+			shok::TechnologyId OfferedTechnologyType;
 
 			static inline constexpr int vtp = 0x7781C4;
 			static inline constexpr int TypeDesc = 0x824BFC;
-			static inline constexpr unsigned int Identifier = 0x0D9705E63;
+			static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0D9705E63);
 		};
 
 		// defined events: BuildingMercenary_XXX, IsMercenaryBuilding
 
 		static inline constexpr int vtp = 0x7782C0;
 		static inline constexpr int TypeDesc = 0x8250E4;
-		static inline constexpr unsigned int Identifier = 0x2B61C163;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2B61C163);
 	};
 	class CBuildingTechTraderBehavior : public GGL::CBuildingMerchantBehavior {
 	public:
 		class CMercenaryOffer : public GGL::CBuildingMerchantBehavior::COffer {
 		public:
-			int OfferedEntityType;
+			shok::EntityTypeId OfferedEntityType;
 
 			static inline constexpr int vtp = 0x778284;
 			static inline constexpr int TypeDesc = 0x824ED8;
-			static inline constexpr unsigned int Identifier = 0x339B693;
+			static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x339B693);
 		};
 
 		// defined events: BuildingTechTrader_XXX, BuildingMercenary_BuyOffer
 
 		static inline constexpr int vtp = 0x77822C;
 		static inline constexpr int TypeDesc = 0x824E28;
-		static inline constexpr unsigned int Identifier = 0x41EEB893;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x41EEB893);
 	};
 	class CSettlerMerchantBehavior : public EGL::CGLEBehavior {
 	public:
@@ -1158,7 +1167,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77477C;
 		static inline constexpr int TypeDesc = 0x819710;
-		static inline constexpr unsigned int Identifier = 0x0AB50F013;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0AB50F013);
 	};
 
 	class CMarketBehavior : public EGL::CGLEBehavior {
@@ -1169,18 +1178,19 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x775CCC;
 		static inline constexpr int TypeDesc = 0x81CE24;
-		static inline constexpr unsigned int Identifier = 0x90A53E97;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x90A53E97);
 	};
 
 	class CFoundryBehavior : public EGL::CGLEBehavior {
 	public:
-		int CannonType, CannonProgress; //4
+		shok::EntityTypeId CannonType;
+		int CannonProgress; //4
 
 		// defined events: Foundry_XXX
 
 		static inline constexpr int vtp = 0x778A8C;
 		static inline constexpr int TypeDesc = 0x827900;
-		static inline constexpr unsigned int Identifier = 0x8EB5DC97;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8EB5DC97);
 	};
 
 	class CWorkerFleeBehavior : public EGL::CGLEBehavior {
@@ -1193,7 +1203,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7729FC;
 		static inline constexpr int TypeDesc = 0x813798;
-		static inline constexpr unsigned int Identifier = 0x83A6BCAD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x83A6BCAD);
 	};
 
 	class CWorkerAlarmModeBehavior : public EGL::CGLEBehavior { // on the worker
@@ -1204,7 +1214,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7734DC;
 		static inline constexpr int TypeDesc = 0x8164E4;
-		static inline constexpr unsigned int Identifier = 0x8076034D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8076034D);
 	};
 
 	class CDefendableBuildingBehavior : public EGL::CGLEBehavior { // on the building
@@ -1224,7 +1234,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7771DC;
 		static inline constexpr int TypeDesc = 0x822428;
-		static inline constexpr unsigned int Identifier = 0x0B663EA8D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0B663EA8D);
 
 		static void HookDealDamageSource();
 	};
@@ -1236,7 +1246,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7736F4;
 		static inline constexpr int TypeDesc = 0x816C74;
-		static inline constexpr unsigned int Identifier = 0x5F780A67;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5F780A67);
 	};
 
 	class CResourceDoodadBehavior : public EGL::CGLEBehavior {
@@ -1245,12 +1255,12 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774CCC;
 		static inline constexpr int TypeDesc = 0x81B1A4;
-		static inline constexpr unsigned int Identifier = 0x707CD967;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x707CD967);
 	};
 
 	class CTreeBehavior : public EGL::CGLEBehavior {
 	public:
-		int OriginalEntityType; // 4
+		shok::EntityTypeId OriginalEntityType; // 4
 		shok::Position Position;
 		float Orientation;
 
@@ -1258,7 +1268,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774CF0;
 		static inline constexpr int TypeDesc = 0x81B1D0;
-		static inline constexpr unsigned int Identifier = 0x74CA1CA7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x74CA1CA7);
 	};
 
 	class CResourceDependentBuildingBehavior : public EGL::CGLEBehavior {
@@ -1268,19 +1278,19 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774D94;
 		static inline constexpr int TypeDesc = 0x81B478;
-		static inline constexpr unsigned int Identifier = 0x4267D337;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x4267D337);
 	};
 
 	class CReplaceableEntityBehavior : public EGL::CGLEBehavior {
 	public:
-		byte IsReplacementActive; // 4
+		bool IsReplacementActive; // 4
 		PADDING(3);
 
 		// defined events: ReplaceableEntity_Disable
 
 		static inline constexpr int vtp = 0x774DEC;
 		static inline constexpr int TypeDesc = 0x081B61C;
-		static inline constexpr unsigned int Identifier = 0x981BE357;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x981BE357);
 	};
 
 	class CMineBehavior : public EGL::CGLEBehavior {
@@ -1290,7 +1300,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7757CC;
 		static inline constexpr int TypeDesc = 0x81C5EC;
-		static inline constexpr unsigned int Identifier = 0x0DE005127;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0DE005127);
 
 		GGL::CResourceDoodad* GetResDoodad();
 
@@ -1306,7 +1316,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7765C8;
 		static inline constexpr int TypeDesc = 0x81FA60;
-		static inline constexpr unsigned int Identifier = 0x995E7AF7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x995E7AF7);
 	};
 
 	class CFarmBehavior : public EGL::CGLEBehavior {
@@ -1316,7 +1326,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x776EBC;
 		static inline constexpr int TypeDesc = 0x821970;
-		static inline constexpr unsigned int Identifier = 0x6EF4A627;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6EF4A627);
 	};
 
 	class CConstructionSiteBehavior : public EGL::CGLEBehavior {
@@ -1326,7 +1336,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x777424;
 		static inline constexpr int TypeDesc = 0x822EC4;
-		static inline constexpr unsigned int Identifier = 0x0E69FE40;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E69FE40);
 	};
 
 	class CBuildingBehavior : public EGL::CGLEBehavior {
@@ -1338,7 +1348,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x777FBC;
 		static inline constexpr int TypeDesc = 0x8247AC;
-		static inline constexpr unsigned int Identifier = 0x0F3538D37;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0F3538D37);
 	};
 
 	class CBarrierBehavior : public EGL::CGLEBehavior {
@@ -1348,7 +1358,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x778A10;
 		static inline constexpr int TypeDesc = 0x8277DC;
-		static inline constexpr unsigned int Identifier = 0x310288C7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x310288C7);
 	};
 
 	class CNeutralBridgeBehavior : public EGL::CGLEBehavior {
@@ -1361,7 +1371,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x779BC4;
 		static inline constexpr int TypeDesc = 0x829AA8;
-		static inline constexpr unsigned int Identifier = 0xD26CD737;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD26CD737);
 	};
 
 
@@ -1369,7 +1379,7 @@ namespace GGL {
 	class CPositionAtResourceFinder {
 	public:
 
-		static GGL::CPositionAtResourceFinder* CreateByEntity(int entityid);
+		static GGL::CPositionAtResourceFinder* CreateByEntity(shok::EntityId entityid);
 		shok::Position CalcPositionFromFloat(float f);
 
 		virtual ~CPositionAtResourceFinder() = default;

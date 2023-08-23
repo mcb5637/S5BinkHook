@@ -22,20 +22,20 @@ namespace EScr {
 
 	class CScriptTriggerSystem : public IScriptTriggerSystem {
 	public:
-		shok::Map<unsigned int, CScriptTrigger*> Trigger; // 2 UniqueID -> Data
+		shok::Map<shok::TriggerId, CScriptTrigger*> Trigger; // 2 UniqueID -> Data
 		shok::Map<shok::EventIDs, shok::Vector<CScriptTrigger*>> ActiveTrigger; // 5
-		unsigned int UniqueTriggerID; // next trigger id 8
+		shok::TriggerId UniqueTriggerID; // next trigger id 8
 		bool TriggerSystemDisabled;
 		lua_State* State;
 
 
 		static inline constexpr int vtp = 0x78667C;
-		static inline constexpr unsigned int Identifier = 0x3F9B1F03;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3F9B1F03);
 
 		void RunTrigger(BB::CEvent* ev);
-		int CreateTrigger(CScriptTrigger* trigger);
-		void EnableTrigger(unsigned int id);
-		void DisableTrigger(unsigned int id);
+		shok::TriggerId CreateTrigger(CScriptTrigger* trigger);
+		void EnableTrigger(shok::TriggerId id);
+		void DisableTrigger(shok::TriggerId id);
 
 		static inline EScr::CScriptTriggerSystem** const GlobalObj = reinterpret_cast<EScr::CScriptTriggerSystem**>(0x895DEC); // also 0xA06548
 		static inline lua_State** const GameState = reinterpret_cast<lua_State**>(0x853A9C);
@@ -110,13 +110,13 @@ namespace EScr {
 		CLuaFuncRefGlobal ActionFunc; // 14
 		bool MarkedForUnrequest; // 25
 		struct {
-			unsigned int UniqueID;
+			shok::TriggerId UniqueID;
 		} UniqueID; // 26
 		shok::Vector<Parameter> ConditionParameter;
 		shok::Vector<Parameter> ActionParameter;
 
 		static inline constexpr int vtp = 0x786664;
-		static inline constexpr unsigned int Identifier = 0x772113A3;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x772113A3);
 
 		bool CallCondition();
 		bool CallAction();

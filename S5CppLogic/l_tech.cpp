@@ -95,25 +95,22 @@ namespace CppLogic::Tech {
 		GGL::CBuilding::EnableConstructionSpeedTechs();
 		shok::Technology* tech = L.CheckTech(1);
 		char op = L.CheckString(3)[0];
-		GGL::CBuilding::ConstructionSpeedModifiers.push_back({ L.CheckInt(1), L.CheckFloat(2), op });
+		GGL::CBuilding::ConstructionSpeedModifiers.push_back({ L.CheckEnum<shok::TechnologyId>(1), L.CheckFloat(2), op });
 		return 0;
 	}
 
 	int ResearchTechnologyNoFeedback(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		L.CheckTech(2);
-		pl->TechnologyStates.ForceResearchNoFeedback(L.CheckInt(2));
+		pl->TechnologyStates.ForceResearchNoFeedback(L.CheckEnum<shok::TechnologyId>(2));
 		return 0;
 	}
 
-	int GetResearchedTechs(lua::State L) {
-		int pid = L.CheckInt(1);
-		if (pid <= 0 || pid >= 9)
-			throw lua::LuaException("invalid player");
+	int GetResearchedTechs(lua::State ls) {
+		luaext::EState L{ ls };
+		auto pid = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid);
 		L.NewTable();
 		int i = 1;

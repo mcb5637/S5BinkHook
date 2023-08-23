@@ -62,7 +62,7 @@ namespace GGL {
 		static inline constexpr int vtp = 0x7768AC;
 
 		// creates and adds it to the GlobalHeroAbilities list
-		CStaticHeroAbilityID(const char* name, int id);
+		CStaticHeroAbilityID(const char* name, shok::AbilityId id);
 	};
 
 	class CStaticArmorClassID : public EGL::CStaticEntry {

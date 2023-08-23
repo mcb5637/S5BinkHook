@@ -6,34 +6,34 @@
 namespace EGL {
 	class CGLEAnimCategory : public BB::IObject {
 	public:
-		int Name; // anim category
-		int Animation;
+		shok::AnimationCategoryId Name; // anim category
+		shok::AnimationId Animation;
 
 
 		static inline constexpr int vtp = 0x776C6C;
-		static inline constexpr unsigned int Identifier = 0xCEB17718;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCEB17718);
 	};
 
 	class CGLEAnimSet : public BB::IObject {
 	public:
-		int Id = 0;
+		shok::AnimSetId Id = static_cast<shok::AnimSetId>(0);
 		shok::Vector<CGLEAnimCategory*> Anims;
 
 
 		static inline constexpr int vtp = 0x784A90;
-		static inline constexpr unsigned int Identifier = 0xA4C5BB88;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xA4C5BB88);
 
 		CGLEAnimSet();
 		CGLEAnimSet(const CGLEAnimSet& o) = delete;
 		CGLEAnimSet(CGLEAnimSet&& o) noexcept = delete;
 
-		int GetAnim(int category);
+		shok::AnimationId GetAnim(shok::AnimationCategoryId category);
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
 		virtual ~CGLEAnimSet() override;
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	private:
 		void SetVT();
 	};
@@ -43,13 +43,13 @@ namespace EGL {
 namespace GGL {
 	class CGLGoodDependentAnim {
 	public:
-		int GoodType;
-		int Animation;
+		shok::Goods GoodType;
+		shok::AnimationId Animation;
 
 		static inline constexpr int vtp = 0x776C64;
-		static inline constexpr unsigned int Identifier = 0xB240C758;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB240C758);
 
-		virtual unsigned int __stdcall GetClassIdentifier() const;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const;
 	};
 	static_assert(sizeof(CGLGoodDependentAnim) == 4 * 3);
 	class CGLAnimCategory : public EGL::CGLEAnimCategory {
@@ -57,7 +57,7 @@ namespace GGL {
 		shok::Vector<CGLGoodDependentAnim> GoodDependentAnim;
 
 		static inline constexpr int vtp = 0x776C7C;
-		static inline constexpr unsigned int Identifier = 0xA7B5DFB8;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xA7B5DFB8);
 	};
 }
 

@@ -13,16 +13,16 @@ void EScr::CScriptTriggerSystem::RunTrigger(BB::CEvent* ev)
 	PostEvent(ev);
 }
 
-static inline void(__thiscall* const scripttriggersys_create)(EScr::CScriptTriggerSystem* th, int* id, EScr::CScriptTrigger* t) = reinterpret_cast<void(__thiscall*)(EScr::CScriptTriggerSystem*, int*, EScr::CScriptTrigger*)>(0x5A0FDA);
-int EScr::CScriptTriggerSystem::CreateTrigger(CScriptTrigger* trigger)
+static inline void(__thiscall* const scripttriggersys_create)(EScr::CScriptTriggerSystem* th, shok::TriggerId* id, EScr::CScriptTrigger* t) = reinterpret_cast<void(__thiscall*)(EScr::CScriptTriggerSystem*, shok::TriggerId*, EScr::CScriptTrigger*)>(0x5A0FDA);
+shok::TriggerId EScr::CScriptTriggerSystem::CreateTrigger(CScriptTrigger* trigger)
 {
-	int id = 0;
+	shok::TriggerId id = {};
 	scripttriggersys_create(this, &id, trigger);
 	return id;
 }
 
 static inline void(__thiscall* const scripttriggersys_pushtoactive)(EScr::CScriptTriggerSystem* th, shok::EventIDs id, EScr::CScriptTrigger* t) = reinterpret_cast<void(__thiscall*)(EScr::CScriptTriggerSystem*, shok::EventIDs, EScr::CScriptTrigger*)>(0x5A0C7D);
-void EScr::CScriptTriggerSystem::EnableTrigger(unsigned int id)
+void EScr::CScriptTriggerSystem::EnableTrigger(shok::TriggerId id)
 {
 	auto i = Trigger.find(id);
 	if (i == Trigger.end())
@@ -35,7 +35,7 @@ void EScr::CScriptTriggerSystem::EnableTrigger(unsigned int id)
 }
 
 static inline void(__thiscall* const scripttriggersys_removefromactive)(EScr::CScriptTriggerSystem* th, shok::EventIDs id, EScr::CScriptTrigger* t) = reinterpret_cast<void(__thiscall*)(EScr::CScriptTriggerSystem*, shok::EventIDs, EScr::CScriptTrigger*)>(0x59F3F4);
-void EScr::CScriptTriggerSystem::DisableTrigger(unsigned int id)
+void EScr::CScriptTriggerSystem::DisableTrigger(shok::TriggerId id)
 {
 	auto i = Trigger.find(id);
 	if (i == Trigger.end())

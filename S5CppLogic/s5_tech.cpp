@@ -41,16 +41,18 @@ shok::Technology::Modifier& shok::Technology::GetModifierOfType(TechModifierType
 	return *tech_getmodif(this, t);
 }
 
-void shok::TechManager::FreeTech(int id)
+void shok::TechManager::FreeTech(shok::TechnologyId i)
 {
+	int id = static_cast<int>(i);
 	--id;
 	Technology* t = Techs[id];
 	delete t;
 	Techs[id] = nullptr;
 }
 
-void shok::TechManager::LoadTech(int id)
+void shok::TechManager::LoadTech(shok::TechnologyId i)
 {
+	int id = static_cast<int>(i);
 	--id;
 	if (id > static_cast<int>(Techs.size()))
 		throw std::logic_error{ "somehow the id is too big" };
@@ -66,11 +68,12 @@ void shok::TechManager::LoadTech(int id)
 	Techs[id] = t;
 }
 
-void shok::TechManager::PopTech(int id)
+void shok::TechManager::PopTech(shok::TechnologyId i)
 {
+	int id = static_cast<int>(i);
 	if (id != static_cast<int>(Techs.size()))
 		throw std::out_of_range("invalid id");
-	FreeTech(id);
+	FreeTech(i);
 	auto v = Techs.SaveVector();
 	v.Vector.pop_back();
 }

@@ -5,19 +5,19 @@
 namespace EGL {
 	class CGLEEffectProps : public BB::IObject, public ECore::ICheckData {
 	public:
-		int Class;
+		shok::ClassId Class;
 		bool Global;
 		PADDING(3);
 		float Duration;
 		PADDINGI(1); // probably some modified duration
-		int SoundID;
+		shok::SoundId SoundID;
 		int SoundVolume;
 		bool SoundLooped; // 8
 		PADDING(3);
 
 
 		static inline constexpr int vtp = 0x777120;
-		static inline constexpr unsigned int Identifier = 0x1E9EDB9D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1E9EDB9D);
 	};
 
 	class CFlyingEffectProps : public CGLEEffectProps {
@@ -28,7 +28,7 @@ namespace EGL {
 		float HeightOffsetTarget; // 12
 
 		static inline constexpr int vtp = 0x777590;
-		static inline constexpr unsigned int Identifier = 0x9D656D6D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9D656D6D);
 	};
 }
 
@@ -38,30 +38,30 @@ namespace GGL {
 		int SpreadTime;
 		int SpreadDelay;
 		float SpreadRadius;
-		int SoundIDAgain; // 12
+		shok::SoundId SoundIDAgain; // 12
 
 		static inline constexpr int vtp = 0x77713C;
-		static inline constexpr unsigned int Identifier = 0x8BA99D0;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8BA99D0);
 	};
 
 	class CCannonBallEffectProps : public EGL::CFlyingEffectProps {
 	public:
 		int Damage;
 		float Radius;
-		int ImpactEffectID; // 15
+		shok::EffectTypeId ImpactEffectID; // 15
 
 		static inline constexpr int vtp = 0x777620;
-		static inline constexpr unsigned int Identifier = 0xC46E396D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC46E396D);
 	};
 
 	class CArrowEffectProps : public EGL::CFlyingEffectProps {
 	public:
 		int Damage;
-		int ImpactEffectID; // 14
+		shok::EffectTypeId ImpactEffectID; // 14
 
 
 		static inline constexpr int vtp = 0x778DD0;
-		static inline constexpr unsigned int Identifier = 0x696E8EED;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x696E8EED);
 	};
 
 	class CGLEffectLightningProps : public EGL::CGLEEffectProps {
@@ -71,45 +71,45 @@ namespace GGL {
 		float SpawnRadius;
 
 		static inline constexpr int vtp = 0x779D20;
-		static inline constexpr unsigned int Identifier = 0x322AE630;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x322AE630);
 	};
 }
 
 namespace ED {
 	class CEffectProps : public BB::IObject {
 	public:
-		int Class;
+		shok::ClassId Class;
 		shok::Vector<int> Texture; // weathereffecttexture
 
 		static inline constexpr int vtp = 0x76ABA4;
-		static inline constexpr unsigned int Identifier = 0x1B2E185D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1B2E185D);
 	};
 
 	class CEffectParticleSystemProps : public ED::CEffectProps {
 	public:
-		int Model; // 6
+		shok::ModelId Model; // 6
 
 		static inline constexpr int vtp = 0x7AE7AC;
-		static inline constexpr unsigned int Identifier = 0x124ACAED;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x124ACAED);
 	};
 
 	class CHAnimEffectProps : public ED::CEffectProps {
 	public:
-		int Model; // 6
-		int Anim;
+		shok::ModelId Model; // 6
+		shok::AnimationId Anim;
 		bool UsePlayerID;
 		PADDING(3);
 
 		static inline constexpr int vtp = 0x7AE9A8;
-		static inline constexpr unsigned int Identifier = 0x8D2B3BE7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8D2B3BE7);
 	};
 
 	class CFlyingEffectProps : public ED::CEffectProps {
 	public:
-		int Model; // 6
+		shok::ModelId Model; // 6
 
 		static inline constexpr int vtp = 0x7AE9EC;
-		static inline constexpr unsigned int Identifier = 0xFEB81B27;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFEB81B27);
 	};
 }
 
@@ -135,7 +135,7 @@ namespace GD {
 		float ForceTimeMax; // 22
 
 		static inline constexpr int vtp = 0x76ABB4;
-		static inline constexpr unsigned int Identifier = 0x3101C3A3;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3101C3A3);
 	};
 
 	class CDisplayEffectRainProps : public ED::CEffectProps {
@@ -153,7 +153,7 @@ namespace GD {
 		float DirectionRandomRatio; // 16
 
 		static inline constexpr int vtp = 0x76AD54;
-		static inline constexpr unsigned int Identifier = 0x2C96B613;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2C96B613);
 	};
 }
 
@@ -162,6 +162,10 @@ namespace EGL {
 	public:
 		BB::CIDManagerEx* EffectTypeManager;
 		shok::Vector<CGLEEffectProps*> EffectTypes;
+
+		inline CGLEEffectProps* GetLogic(shok::EffectTypeId id) {
+			return EffectTypes.at(static_cast<int>(id));
+		}
 
 
 		static inline constexpr int vtp = 0x7888F8;

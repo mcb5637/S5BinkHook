@@ -20,22 +20,24 @@ namespace CppLogic::UA {
 	};
 
 	struct UACannonData {
-		int EntityId, LastUpdated;
+		shok::EntityId EntityId;
+		int LastUpdated;
 
 		static const BB::SerializationData SerializationData[];
 	};
 	struct UACannonBuilderAbilityData {
-		int HeroType, BottomType, TopType;
+		shok::EntityTypeId HeroType, BottomType, TopType;
 
 		static const BB::SerializationData SerializationData[];
 	};
 	struct UATargetCache {
-		int EntityId, Tick, Num;
+		shok::EntityId EntityId;
+		int Tick, Num;
 
 		static const BB::SerializationData SerializationData[];
 	};
 	struct UAReset {
-		int EntityId = 0;
+		shok::EntityId EntityId = shok::EntityId::Invalid;
 		shok::PositionRot Pos;
 
 		static const BB::SerializationData SerializationData[];
@@ -43,18 +45,18 @@ namespace CppLogic::UA {
 
 	class UnlimitedArmy {
 	public:
-		int Player;
-		std::vector<int> Leaders;
-		std::vector<int> LeaderInTransit;
+		shok::PlayerId Player;
+		std::vector<shok::EntityId> Leaders;
+		std::vector<shok::EntityId> LeaderInTransit;
 		std::vector<UACannonData> Cannons;
-		std::vector<int> DeadHeroes;
+		std::vector<shok::EntityId> DeadHeroes;
 		std::vector<UATargetCache> TargetCache;
 		std::vector<UAReset> PrepDefenseReset;
 		shok::Position LastPos = { -1,-1 };
 		int PosLastUpdatedTick = -1;
 		UAStatus Status = UAStatus::Idle;
 		float Area = 0;
-		int CurrentBattleTarget = 0;
+		shok::EntityId CurrentBattleTarget = shok::EntityId::Invalid;
 		shok::Position Target = { -1,-1 };
 		bool ReMove = false, IgnoreFleeing = false, PrepDefense = false, SabotageBridges = false;
 		bool DoNotNormalizeSpeed = false;
@@ -70,25 +72,25 @@ namespace CppLogic::UA {
 		// not serialized references, lua state
 		static const BB::SerializationData SerializationData[];
 
-		UnlimitedArmy(int p);
+		UnlimitedArmy(shok::PlayerId p);
 		~UnlimitedArmy();
 		void CalculatePos();
 		void Tick();
 		void AddLeader(EGL::CGLEEntity* e);
-		void OnIdChanged(int ol, int ne);
+		void OnIdChanged(shok::EntityId ol, shok::EntityId ne);
 		int GetSize(bool transit, bool hero);
 		void RemoveLeader(EGL::CGLEEntity* e);
 		bool IsIdle();
 		bool IsRanged(EGL::CGLEEntity* e);
 		bool IsNonCombat(EGL::CGLEEntity* e);
 
-		static EGL::CGLEEntity* GetNearestTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
-		static EGL::CGLEEntity* GetNearestSettlerInArea(int player, shok::Position& p, float ran, bool notFleeing);
-		EGL::CGLEEntity* GetNearestBuildingInArea(int player, shok::Position& p, float ran);
+		static EGL::CGLEEntity* GetNearestTargetInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
+		static EGL::CGLEEntity* GetNearestSettlerInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
+		EGL::CGLEEntity* GetNearestBuildingInArea(shok::PlayerId player, shok::Position& p, float ran);
 		EGL::CGLEEntity* GetNearestBridgeInArea(shok::Position& p, float r);
-		EGL::CGLEEntity* GetNearestSnipeTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
-		EGL::CGLEEntity* GetFurthestConversionTargetInArea(int player, shok::Position& p, float ran, bool notFleeing);
-		static int CountTargetsInArea(int player, shok::Position& p, float ran, bool notFleeing);
+		EGL::CGLEEntity* GetNearestSnipeTargetInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
+		EGL::CGLEEntity* GetFurthestConversionTargetInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
+		static int CountTargetsInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
 
 		static void RegisterUDType(lua::State L);
 
@@ -97,7 +99,7 @@ namespace CppLogic::UA {
 		void CleanDead();
 		inline void NeedFormat();
 		void CheckTransit();
-		bool IsTargetValid(int id);
+		bool IsTargetValid(shok::EntityId id);
 		void CheckStatus(UAStatus status);
 		bool LeaderIsMoving(EGL::CGLEEntity* e);
 		bool LeaderIsIdle(EGL::CGLEEntity* e);
@@ -111,8 +113,8 @@ namespace CppLogic::UA {
 		void NormalizeSpeed(bool normalize, bool force);
 		bool ExecuteHeroAbility(EGL::CGLEEntity* e);
 		bool ExecutePrepDefense(EGL::CGLEEntity* e);
-		bool CheckTargetCache(int id, int count);
-		void UpdateTargetCache(int id, int time);
+		bool CheckTargetCache(shok::EntityId id, int count);
+		void UpdateTargetCache(shok::EntityId id, int time);
 
 		static int AddLeader(lua::State L);
 		static int GetPos(lua::State L);

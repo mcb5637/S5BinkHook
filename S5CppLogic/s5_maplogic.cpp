@@ -341,15 +341,15 @@ EGL::CGLELandscape::AdvancedAARectIterator::Iter::Iter(const AdvancedAARectItera
 	Curr = c;
 }
 
-static inline int(__thiscall* const shokLandscape_getSector)(EGL::CGLELandscape* th, const shok::Position* p) = reinterpret_cast<int(__thiscall*)(EGL::CGLELandscape*, const shok::Position*)>(0x5778BE);
-int EGL::CGLELandscape::GetSector(const shok::Position* p)
+static inline shok::SectorId(__thiscall* const shokLandscape_getSector)(EGL::CGLELandscape* th, const shok::Position* p) = reinterpret_cast<shok::SectorId(__thiscall*)(EGL::CGLELandscape*, const shok::Position*)>(0x5778BE);
+shok::SectorId EGL::CGLELandscape::GetSector(const shok::Position* p)
 {
 	return shokLandscape_getSector(this, p);
 }
 
-static inline void(__thiscall* const shoklandscape_getnearestcon)(int* pred, bool* one, int sector, EGL::CGLELandscape* l) = reinterpret_cast<void(__thiscall*)(int*, bool*, int, EGL::CGLELandscape*)>(0x57F253);
+static inline void(__thiscall* const shoklandscape_getnearestcon)(int* pred, bool* one, shok::SectorId sector, EGL::CGLELandscape* l) = reinterpret_cast<void(__thiscall*)(int*, bool*, shok::SectorId, EGL::CGLELandscape*)>(0x57F253);
 static inline bool(__thiscall* const shoklandscape_getnearest)(EGL::CGLELandscape* th, const shok::Position* pIn, float range, int* pred, shok::Position* pOut) = reinterpret_cast<bool(__thiscall*)(EGL::CGLELandscape*, const shok::Position*, float, int*, shok::Position*)>(0x5775AF);
-bool EGL::CGLELandscape::GetNearestPositionInSector(const shok::Position* pIn, float range, int sector, shok::Position* pOut)
+bool EGL::CGLELandscape::GetNearestPositionInSector(const shok::Position* pIn, float range, shok::SectorId sector, shok::Position* pOut)
 {
 	int pred[5];
 	bool one = true;
@@ -436,7 +436,7 @@ void EGL::CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p, con
 			s->KillSettlerByEnvironment();
 		}
 		else if (GGL::CAnimal* a = dynamic_cast<GGL::CAnimal*>(ent)) {
-			if (!a->GetFirstAttachedToMe(shok::AttachmentType::HERO_HAWK))
+			if (a->GetFirstAttachedToMe(shok::AttachmentType::HERO_HAWK) != static_cast<shok::EntityId>(0))
 				a->Destroy();
 		}
 	}
@@ -571,18 +571,18 @@ void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(int first, int last)
 	playerexploupdate_setplayers(this, first, last);
 }
 
-static inline int(__thiscall* somegamelogicstuff_getexplomin)(EGL::PlayerManager* th) = reinterpret_cast<int(__thiscall*)(EGL::PlayerManager*)>(0x5758FB);
-static inline int(__thiscall* somegamelogicstuff_getexplomax)(EGL::PlayerManager* th) = reinterpret_cast<int(__thiscall*)(EGL::PlayerManager*)>(0x575904);
-static inline EGL::CPlayerExplorationHandler* (__thiscall* somegamelogicstuff_getexplo)(EGL::PlayerManager* th, int pl) = reinterpret_cast<EGL::CPlayerExplorationHandler * (__thiscall*)(EGL::PlayerManager*, int)>(0x575895);
-EGL::CPlayerExplorationHandler* EGL::PlayerManager::GetExplorationHandlerByPlayer(int pl)
+static inline shok::PlayerId(__thiscall* somegamelogicstuff_getexplomin)(EGL::PlayerManager* th) = reinterpret_cast<shok::PlayerId(__thiscall*)(EGL::PlayerManager*)>(0x5758FB);
+static inline shok::PlayerId(__thiscall* somegamelogicstuff_getexplomax)(EGL::PlayerManager* th) = reinterpret_cast<shok::PlayerId(__thiscall*)(EGL::PlayerManager*)>(0x575904);
+static inline EGL::CPlayerExplorationHandler* (__thiscall* somegamelogicstuff_getexplo)(EGL::PlayerManager* th, shok::PlayerId pl) = reinterpret_cast<EGL::CPlayerExplorationHandler * (__thiscall*)(EGL::PlayerManager*, shok::PlayerId)>(0x575895);
+EGL::CPlayerExplorationHandler* EGL::PlayerManager::GetExplorationHandlerByPlayer(shok::PlayerId pl)
 {
 	if (pl >= somegamelogicstuff_getexplomin(this) && pl >= somegamelogicstuff_getexplomax(this)) {
 		return somegamelogicstuff_getexplo(this, pl);
 	}
 	return nullptr;
 }
-static inline void(__thiscall* const gamelogicexplo_setshare)(EGL::PlayerManager* th, int p1, int p2, bool f) = reinterpret_cast<void(__thiscall*)(EGL::PlayerManager*, int, int, bool)>(0x57584B);
-void EGL::PlayerManager::SetShareExplorationFlag(int pl1, int pl2, bool share)
+static inline void(__thiscall* const gamelogicexplo_setshare)(EGL::PlayerManager* th, shok::PlayerId p1, shok::PlayerId p2, bool f) = reinterpret_cast<void(__thiscall*)(EGL::PlayerManager*, shok::PlayerId, shok::PlayerId, bool)>(0x57584B);
+void EGL::PlayerManager::SetShareExplorationFlag(shok::PlayerId pl1, shok::PlayerId pl2, bool share)
 {
 	gamelogicexplo_setshare(this, pl1, pl2, share);
 }
@@ -637,7 +637,7 @@ int EGL::RegionDataEntity::GetSingleEntryComponent(float x)
 	return static_cast<int>(std::floor(x * *reinterpret_cast<float*>(0x784A18)));
 }
 
-int EGL::CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
+shok::EntityId EGL::CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
 {
 	return CreateEntity(cr, 1);
 }
@@ -663,11 +663,11 @@ void EGL::CGLEGameLogic::ClearToDestroy()
 	egl_gamelogic_cleardest(this);
 }
 
-inline int(__thiscall* const CreateEffectHookedOrig)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = reinterpret_cast<int(__thiscall*)(EGL::CGLEGameLogic*, EGL::CGLEEffectCreator*)>(0x571BBB);
-void(*EGL::CGLEGameLogic::CreateEffectHookCallback)(int id) = nullptr;
-int EGL::CGLEGameLogic::CreateEffectOverride(EGL::CGLEEffectCreator* data)
+inline shok::EffectId(__thiscall* const CreateEffectHookedOrig)(EGL::CGLEGameLogic* th, EGL::CGLEEffectCreator* data) = reinterpret_cast<shok::EffectId(__thiscall*)(EGL::CGLEGameLogic*, EGL::CGLEEffectCreator*)>(0x571BBB);
+void(*EGL::CGLEGameLogic::CreateEffectHookCallback)(shok::EffectId id) = nullptr;
+shok::EffectId EGL::CGLEGameLogic::CreateEffectOverride(EGL::CGLEEffectCreator* data)
 {
-	int id = CreateEffectHookedOrig(this, data);
+	shok::EffectId id = CreateEffectHookedOrig(this, data);
 	if (EGL::CGLEGameLogic::CreateEffectHookCallback)
 		EGL::CGLEGameLogic::CreateEffectHookCallback(id);
 	return id;
@@ -694,8 +694,8 @@ int GGL::CWeatherHandler::GetTicksToNextPeriodicWeatherChange()
 	return weatherdata_gettimetonext(this);
 }
 
-static inline void(__thiscall* const weatherdata_addelement)(GGL::CWeatherHandler* th, int state, int dur, bool peri, int fore, int gfx, int trans) = reinterpret_cast<void(__thiscall*)(GGL::CWeatherHandler*, int, int, bool, int, int, int)>(0x4B95A8);
-void GGL::CWeatherHandler::AddWeatherElement(int state, int dur, bool peri, int forerun, int gfx, int transition)
+static inline void(__thiscall* const weatherdata_addelement)(GGL::CWeatherHandler* th, shok::WeatherState state, int dur, bool peri, int fore, shok::WeatherGFXSet gfx, int trans) = reinterpret_cast<void(__thiscall*)(GGL::CWeatherHandler*, shok::WeatherState, int, bool, int, shok::WeatherGFXSet, int)>(0x4B95A8);
+void GGL::CWeatherHandler::AddWeatherElement(shok::WeatherState state, int dur, bool peri, int forerun, shok::WeatherGFXSet gfx, int transition)
 {
 	weatherdata_addelement(this, state, dur, peri, forerun, gfx, transition);
 }
@@ -707,7 +707,7 @@ void GGL::CWeatherHandler::SetOffset(int o)
 
 static inline void(__thiscall* const weatherdata_elements_remove)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>* th, int* ind) = reinterpret_cast<void(__thiscall*)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>*, int*)>(0x513D32);
 static inline void(__thiscall* const weatherdata_elements_add)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>* th, GGL::CWeatherHandler::WeatherElementData* e) = reinterpret_cast<void(__thiscall*)(shok::Map<int, GGL::CWeatherHandler::WeatherElementData>*, GGL::CWeatherHandler::WeatherElementData*)>(0x513CB6);
-void GGL::CWeatherHandler::ClearQueue(shok::WeatherState state, int dur, int forerun, int gfx, int transition)
+void GGL::CWeatherHandler::ClearQueue(shok::WeatherState state, int dur, int forerun, shok::WeatherGFXSet gfx, int transition)
 {
 	// save data
 	GGL::CWeatherHandler::WeatherElementData* current = nullptr;
@@ -763,14 +763,15 @@ void GGL::CWeatherHandler::ClearQueue(shok::WeatherState state, int dur, int for
 	}
 }
 
-static inline GGL::CPlayerStatus* (__thiscall* const gamelogic_getplayer)(GGL::CPlayerStatus** pl, int p) = reinterpret_cast<GGL::CPlayerStatus * (__thiscall*) (GGL::CPlayerStatus**, int)>(0x4A91BC);
-GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(int i)
+static inline GGL::CPlayerStatus* (__thiscall* const gamelogic_getplayer)(GGL::CPlayerStatus** pl, shok::PlayerId p) = reinterpret_cast<GGL::CPlayerStatus * (__thiscall*) (GGL::CPlayerStatus**, shok::PlayerId)>(0x4A91BC);
+GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(shok::PlayerId i)
 {
 	return gamelogic_getplayer(this->players, i);
 }
 
-shok::Technology* GGL::CGLGameLogic::GetTech(int i)
+shok::Technology* GGL::CGLGameLogic::GetTech(shok::TechnologyId id)
 {
+	int i = static_cast<int>(id);
 	--i;
 	if (i >= static_cast<int>(TechManager->Techs.size()))
 		return nullptr;
@@ -778,42 +779,42 @@ shok::Technology* GGL::CGLGameLogic::GetTech(int i)
 }
 
 static inline void(__thiscall* const cglgamelogic_enablealarm)(GGL::CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FA14);
-void GGL::CGLGameLogic::EnableAlarmForPlayer(int pl)
+void GGL::CGLGameLogic::EnableAlarmForPlayer(shok::PlayerId pl)
 {
 	EGL::CNetEventPlayerID ev{ shok::NetEventIds::CommandPlayerActivateAlarm, pl };
 	cglgamelogic_enablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_disablealarm)(GGL::CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FAD7);
-void GGL::CGLGameLogic::DisableAlarmForPlayer(int pl)
+void GGL::CGLGameLogic::DisableAlarmForPlayer(shok::PlayerId pl)
 {
 	EGL::CNetEventPlayerID ev{ shok::NetEventIds::CommandPlayerDeactivateAlarm, pl };
 	cglgamelogic_disablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_upgradesettlercat)(GGL::CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x4985C5);
-void GGL::CGLGameLogic::UpgradeSettlerCategory(int pl, int ucat)
+void GGL::CGLGameLogic::UpgradeSettlerCategory(shok::PlayerId pl, shok::UpgradeCategoryId ucat)
 {
-	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::PlayerUpgradeSettlerCategory, pl, ucat };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::PlayerUpgradeSettlerCategory, pl, static_cast<int>(ucat) };
 	cglgamelogic_upgradesettlercat(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_activateweatherm)(GGL::CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x49BF7A);
-void GGL::CGLGameLogic::PlayerActivateWeathermachine(int player, int weathertype)
+void GGL::CGLGameLogic::PlayerActivateWeathermachine(shok::PlayerId player, shok::WeatherState weathertype)
 {
-	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandWeathermachineChangeWeather, player, weathertype };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandWeathermachineChangeWeather, player, static_cast<int>(weathertype) };
 	cglgamelogic_activateweatherm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_blesssettlers)(GGL::CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x49B7E6);
-void GGL::CGLGameLogic::PlayerBlessSettlers(int player, int blessCat)
+void GGL::CGLGameLogic::PlayerBlessSettlers(shok::PlayerId player, shok::BlessCategoryId blessCat)
 {
-	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandMonasteryBlessSettlerGroup, player, blessCat };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandMonasteryBlessSettlerGroup, player, static_cast<int>(blessCat) };
 	cglgamelogic_blesssettlers(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_setdiplo)(GGL::CGLGameLogic* th, EGL::CNetEvent2PlayerIDsAndInteger* ev) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEvent2PlayerIDsAndInteger*)>(0x49872D);
-void GGL::CGLGameLogic::SetDiplomacy(int p1, int p2, shok::DiploState state)
+void GGL::CGLGameLogic::SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState state)
 {
 	EGL::CNetEvent2PlayerIDsAndInteger ev{ shok::NetEventIds::SetDiplomacy, p1, p2, static_cast<int>(state) };
 	cglgamelogic_setdiplo(this, &ev);

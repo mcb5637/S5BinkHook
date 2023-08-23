@@ -14,7 +14,7 @@ CppLogic::Iterator::GlobalEffectIterator::GlobalEffectIterator(const Predicate<E
 {
 }
 
-CppLogic::Iterator::PlayerEntityIterator::PlayerEntityIterator(int player, const Predicate<EGL::CGLEEntity>* const p)
+CppLogic::Iterator::PlayerEntityIterator::PlayerEntityIterator(shok::PlayerId player, const Predicate<EGL::CGLEEntity>* const p)
 	: ManagedIterator<EGL::CGLEEntity>(p), ah(*(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(player)->PlayerAttractionHandler)
 {
 }
@@ -23,21 +23,22 @@ EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetNextBase(EntityIte
 	c.EntityIndex++;
 	if (c.EntityIndex >= static_cast<int>(ah.EntityInSystem.size()))
 		return nullptr;
-	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah.EntityInSystem[c.EntityIndex].EntityID);
+	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(static_cast<int>(ah.EntityInSystem[c.EntityIndex].EntityID));
 }
 EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetCurrentBase(const EntityIteratorStatus& c) const
 {
 	if (c.EntityIndex >= static_cast<int>(ah.EntityInSystem.size()))
 		return nullptr;
-	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah.EntityInSystem[c.EntityIndex].EntityID);
+	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(static_cast<int>(ah.EntityInSystem[c.EntityIndex].EntityID));
 }
 
 CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p)
 	: ManagedIterator<EGL::CGLEEntity>(p)
 {
-	Players = { -1,-1,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 };
+	static constexpr auto ip = static_cast<shok::PlayerId>(-1);
+	Players = { ip,ip,ip ,ip ,ip ,ip ,ip ,ip ,ip };
 }
-CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<int> pls)
+CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<shok::PlayerId> pls)
 	: MultiPlayerEntityIterator(p)
 {
 	if (pls.size() > 9)
@@ -49,7 +50,7 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(Enti
 	int base;
 	int pl;
 	if (c.EntityIndex == -1) {
-		if (Players[0] <= 0)
+		if (Players[0] <= static_cast<shok::PlayerId>(0))
 			return nullptr;
 		base = 0;
 		pl = 0;
@@ -64,7 +65,7 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(Enti
 			++pl;
 			if (pl >= 9)
 				return nullptr;
-			if (Players[pl] >= 0) {
+			if (Players[pl] >= static_cast<shok::PlayerId>(0)) {
 				ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(Players[pl])->PlayerAttractionHandler;
 				if (ah->EntityInSystem.size() > 0)
 					break;
@@ -74,7 +75,7 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(Enti
 	}
 	c.EntityIndex = base;
 	c.X = pl;
-	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(ah->EntityInSystem[base].EntityID);
+	return (*EGL::CGLEEntityManager::GlobalObj)->GetById(static_cast<int>(ah->EntityInSystem[base].EntityID));
 }
 EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetCurrentBase(const EntityIteratorStatus& c) const
 {
@@ -85,7 +86,7 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetCurrentBase(c
 	const GGL::CPlayerAttractionHandler* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(Players[pl])->PlayerAttractionHandler;
 	if (base >= static_cast<int>(ah->EntityInSystem.size()))
 		return nullptr;
-	return(*EGL::CGLEEntityManager::GlobalObj)->GetById(ah->EntityInSystem[base].EntityID);
+	return(*EGL::CGLEEntityManager::GlobalObj)->GetById(static_cast<int>(ah->EntityInSystem[base].EntityID));
 }
 
 CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories,
@@ -175,7 +176,7 @@ bool CppLogic::Iterator::MultiRegionEntityIterator::NextRegion(EntityIteratorSta
 
 
 
-CppLogic::Iterator::EntityPredicateOfType::EntityPredicateOfType(int ety)
+CppLogic::Iterator::EntityPredicateOfType::EntityPredicateOfType(shok::EntityTypeId ety)
 {
 	this->ety = ety;
 }
@@ -184,7 +185,7 @@ bool CppLogic::Iterator::EntityPredicateOfType::Matches(const EGL::CGLEEntity* e
 	return e->EntityType == ety;
 }
 
-CppLogic::Iterator::EntityPredicateOfPlayer::EntityPredicateOfPlayer(int pl)
+CppLogic::Iterator::EntityPredicateOfPlayer::EntityPredicateOfPlayer(shok::PlayerId pl)
 {
 	player = pl;
 }
@@ -211,7 +212,7 @@ bool CppLogic::Iterator::EntityPredicateProvidesResource::Matches(const EGL::CGL
 	return e->GetResourceProvided() == res;
 }
 
-CppLogic::Iterator::EntityPredicateOfUpgradeCategory::EntityPredicateOfUpgradeCategory(int category)
+CppLogic::Iterator::EntityPredicateOfUpgradeCategory::EntityPredicateOfUpgradeCategory(shok::UpgradeCategoryId category)
 {
 	ucat = category;
 }
@@ -238,23 +239,23 @@ bool CppLogic::Iterator::EntityPredicateIsNotFleeingFrom::Matches(const EGL::CGL
 
 bool CppLogic::Iterator::EntityPredicateIsSettler::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	const unsigned int id = e->GetClassIdentifier();
+	const auto id = e->GetClassIdentifier();
 	return id == GGL::CSettler::Identifier;
 }
 bool CppLogic::Iterator::EntityPredicateIsBuilding::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	const unsigned int id = e->GetClassIdentifier();
+	const auto id = e->GetClassIdentifier();
 	return id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier || id == GGL::CConstructionSite::Identifier;
 }
 bool CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	const unsigned int id = e->GetClassIdentifier();
+	const auto id = e->GetClassIdentifier();
 	return id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier;
 }
 bool CppLogic::Iterator::EntityPredicateIsCombatRelevant::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	const unsigned int id = e->GetClassIdentifier();
-	return e->PlayerId != 0
+	const auto id = e->GetClassIdentifier();
+	return e->PlayerId != static_cast<shok::PlayerId>(0)
 		&& (id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier || id == GGL::CConstructionSite::Identifier || id == GGL::CSettler::Identifier);
 }
 bool CppLogic::Iterator::EntityPredicateIsNotSoldier::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
@@ -274,14 +275,15 @@ bool CppLogic::Iterator::EntityPredicateIsAlive::Matches(const EGL::CGLEEntity* 
 }
 bool CppLogic::Iterator::EntityPredicateIsNotInBuilding::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return !e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) && !e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE);
+	return e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) == static_cast<shok::EntityId>(0) && e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE) == static_cast<shok::EntityId>(0);
 }
 
 CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer()
 {
-	players = { -1,-1,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 };
+	static constexpr auto ip = static_cast<shok::PlayerId>(-1);
+	players = { ip,ip,ip ,ip ,ip ,ip ,ip ,ip ,ip };
 }
-CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer(std::initializer_list<int> pl) : EntityPredicateOfAnyPlayer()
+CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer(std::initializer_list<shok::PlayerId> pl) : EntityPredicateOfAnyPlayer()
 {
 	if (pl.size() > players.size())
 		throw std::out_of_range("too many players");
@@ -289,24 +291,24 @@ CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer(std::
 }
 bool CppLogic::Iterator::EntityPredicateOfAnyPlayer::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	for (int pl : players)
+	for (auto pl : players)
 		if (e->PlayerId == pl)
 			return true;
 	return false;
 }
-int CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(std::array<int, 9>& players, int pl)
+int CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl)
 {
 	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pl);
 	int curr = 0;
 	for (int p = 1; p <= 8; p++) {
-		if (ps->GetDiploStateTo(p) == shok::DiploState::Hostile) {
-			players[curr] = p;
+		if (ps->GetDiploStateTo(static_cast<shok::PlayerId>(p)) == shok::DiploState::Hostile) {
+			players[curr] = static_cast<shok::PlayerId>(p);
 			++curr;
 		}
 	}
 	return curr;
 }
-int  CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillFriendlyPlayers(std::array<int, 9>& players, int pl, bool addSelf)
+int  CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillFriendlyPlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl, bool addSelf)
 {
 	int curr = 0;
 	if (addSelf) {
@@ -315,28 +317,28 @@ int  CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillFriendlyPlayers(std::ar
 	}
 	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pl);
 	for (int p = 1; p <= 8; p++) {
-		if (ps->GetDiploStateTo(p) == shok::DiploState::Friendly) {
-			players[curr] = p;
+		if (ps->GetDiploStateTo(static_cast<shok::PlayerId>(p)) == shok::DiploState::Friendly) {
+			players[curr] = static_cast<shok::PlayerId>(p);
 			++curr;
 		}
 	}
 	return curr;
 }
 
-CppLogic::Iterator::EntityPredicateOfAnyType::EntityPredicateOfAnyType(std::initializer_list<int> ety)
+CppLogic::Iterator::EntityPredicateOfAnyType::EntityPredicateOfAnyType(std::initializer_list<shok::EntityTypeId> ety)
 {
 	entityTypes.resize(ety.size());
 	std::copy(ety.begin(), ety.end(), entityTypes.begin());
 }
 bool CppLogic::Iterator::EntityPredicateOfAnyType::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	for (int ety : entityTypes)
+	for (shok::EntityTypeId ety : entityTypes)
 		if (e->EntityType == ety)
 			return true;
 	return false;
 }
 
-CppLogic::Iterator::EffectPredicateOfType::EffectPredicateOfType(int ty)
+CppLogic::Iterator::EffectPredicateOfType::EffectPredicateOfType(shok::EffectTypeId ty)
 {
 	Type = ty;
 }
@@ -345,7 +347,7 @@ bool CppLogic::Iterator::EffectPredicateOfType::Matches(const EGL::CEffect* e, f
 	return e->EffectType == Type;
 }
 
-CppLogic::Iterator::EffectPredicateOfPlayer::EffectPredicateOfPlayer(int pl)
+CppLogic::Iterator::EffectPredicateOfPlayer::EffectPredicateOfPlayer(shok::PlayerId pl)
 {
 	Player = pl;
 }
@@ -366,6 +368,6 @@ bool CppLogic::Iterator::EffectPredicateIsCannonBall::Matches(const EGL::CEffect
 
 bool CppLogic::Iterator::EffectPredicateIsArrowOrCannonBall::Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const
 {
-	unsigned int id = e->GetClassIdentifier();
+	auto id = e->GetClassIdentifier();
 	return id == GGL::CArrowEffect::Identifier || id == GGL::CCannonBallEffect::Identifier;
 }

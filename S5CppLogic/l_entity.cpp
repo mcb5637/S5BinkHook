@@ -23,14 +23,16 @@
 #include "ModBehavior.h"
 
 namespace CppLogic::Entity {
-	int PredicateOfType(lua::State L) {
-		int ty = L.CheckInt(1);
+	int PredicateOfType(lua::State ls) {
+		luaext::EState L{ ls };
+		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
 		L.NewUserData<CppLogic::Iterator::EntityPredicateOfType>(ty);
 		return 1;
 	}
 
-	int PredicateOfPlayer(lua::State L) {
-		int pl = L.CheckInt(1);
+	int PredicateOfPlayer(lua::State ls) {
+		luaext::EState L{ ls };
+		auto pl = L.CheckPlayerId(1);
 		L.NewUserData<CppLogic::Iterator::EntityPredicateOfPlayer>(pl);
 		return 1;
 	}
@@ -43,23 +45,25 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateOfAnyPlayer(lua::State L) {
+	int PredicateOfAnyPlayer(lua::State l) {
+		luaext::EState L{ l };
 		int num = L.GetTop();
 		if (num > 9)
 			throw lua::LuaException("too many players to check");
 		auto* p = L.NewUserData<CppLogic::Iterator::EntityPredicateOfAnyPlayer>();
 		for (int i = 0; i < num; ++i) {
-			p->players[i] = L.CheckInt(i + 1);
+			p->players[i] = L.CheckPlayerId(i);
 		}
 		return 1;
 	}
 
-	int PredicateOfAnyEntityType(lua::State L) {
+	int PredicateOfAnyEntityType(lua::State l) {
+		luaext::EState L{ l };
 		int num = L.GetTop();
 		auto* p = L.NewUserData<CppLogic::Iterator::EntityPredicateOfAnyType>();
 		p->entityTypes.reserve(num);
 		for (int i = 1; i <= num; ++i)
-			p->entityTypes.push_back(L.CheckInt(i));
+			p->entityTypes.push_back(L.CheckEnum<shok::EntityTypeId>(i));
 		return 1;
 	}
 
@@ -141,15 +145,17 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateOfEntityCategory(lua::State L) {
-		int c = L.CheckInt(1);
-		L.NewUserData<CppLogic::Iterator::EntityPredicateOfEntityCategory>(static_cast<shok::EntityCategory>(c));
+	int PredicateOfEntityCategory(lua::State ls) {
+		luaext::EState L{ ls };
+		auto c = L.CheckEnum<shok::EntityCategory>(1);
+		L.NewUserData<CppLogic::Iterator::EntityPredicateOfEntityCategory>(c);
 		return 1;
 	}
 
-	int PredicateProvidesResource(lua::State L) {
-		int ty = L.CheckInt(1);
-		L.NewUserData<CppLogic::Iterator::EntityPredicateProvidesResource>(static_cast<shok::ResourceType>(ty));
+	int PredicateProvidesResource(lua::State ls) {
+		luaext::EState L{ ls };
+		auto ty = L.CheckEnum<shok::ResourceType>(1);
+		L.NewUserData<CppLogic::Iterator::EntityPredicateProvidesResource>(ty);
 		return 1;
 	}
 
@@ -167,8 +173,9 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateOfUpgradeCategory(lua::State L) {
-		int ty = L.CheckInt(1);
+	int PredicateOfUpgradeCategory(lua::State ls) {
+		luaext::EState L{ ls };
+		auto ty = L.CheckEnum<shok::UpgradeCategoryId>(1);
 		L.NewUserData<CppLogic::Iterator::EntityPredicateOfUpgradeCategory>(ty);
 		return 1;
 	}
@@ -183,7 +190,8 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int EntityIteratorTableize(lua::State L) {
+	int EntityIteratorTableize(lua::State l) {
+		luaext::EState L{ l };
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
@@ -221,12 +229,13 @@ namespace CppLogic::Entity {
 		CppLogic::Iterator::GlobalEntityIterator it{ pred };
 		float maxR = -1;
 		EGL::CGLEEntity* e = it.GetNearest(&maxR);
-		L.Push(e == nullptr ? 0 : e->EntityId);
+		L.Push(e == nullptr ? 0 : static_cast<int>(e->EntityId));
 		L.Push(maxR);
 		return 2;
 	}
 
-	int EntityIteratorNext(lua::State L) { // (state nil, last value) -> next value
+	int EntityIteratorNext(lua::State l) { // (state nil, last value) -> next value
+		luaext::EState L{ l };
 		// no error checking here, cause that would cost speed
 		// just expect no other c/c++ code will change the funcs upvalue
 		// make sure ManagedIterator is the first class inherited from the actual iterator and we do not use luapp inheritance here
@@ -260,10 +269,11 @@ namespace CppLogic::Entity {
 		return 3;
 	}
 
-	int PlayerEntityIterator(lua::State L) {
+	int PlayerEntityIterator(lua::State l) {
+		luaext::EState L{ l };
 		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		if (L.GetTop() == 2) {
-			int pl = L.CheckInt(2);
+			auto pl = L.CheckPlayerId(2);
 			L.NewUserData<CppLogic::Iterator::PlayerEntityIterator>(pl, pred); // upvalue of func
 		}
 		else {
@@ -272,7 +282,7 @@ namespace CppLogic::Entity {
 				throw lua::LuaException("too many players");
 			auto* it = L.NewUserData<CppLogic::Iterator::MultiPlayerEntityIterator>(pred); // upvalue of func
 			for (int i = 0; i < num; ++i) {
-				it->Players[i] = L.CheckInt(i + 2);
+				it->Players[i] = L.CheckPlayerId(i + 2, false);
 			}
 		}
 		L.Push<EntityIteratorNext>(1); // func
@@ -590,7 +600,7 @@ namespace CppLogic::Entity {
 	int Debug_GetTaskInfo(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		L.Push((*BB::CIDManagerEx::TaskListManager)->GetNameByID(e->CurrentTaskListID));
+		L.Push(CppLogic::GetIdManager<shok::TaskListId>().GetNameByID(e->CurrentTaskListID));
 		auto* tl = e->GetCurrentTaskList();
 		if (tl == nullptr)
 			return 1;
@@ -736,18 +746,18 @@ namespace CppLogic::Entity {
 		GGL::CThiefBehavior* t = e->GetBehavior<GGL::CThiefBehavior>();
 		if (!t)
 			throw lua::LuaException("no thief at 1");
-		int ty = L.CheckInt(2);
+		shok::ResourceType ty = L.CheckEnum<shok::ResourceType>(2, true);
 		int am;
-		if (ty == 0)
+		if (ty == shok::ResourceType::None)
 			am = 0;
 		else
 			am = L.CheckInt(3);
 		t->ResourceType = ty;
 		t->Amount = am;
-		if (ty == 0)
-			t->StolenFromPlayer = 0;
+		if (ty == shok::ResourceType::None)
+			t->StolenFromPlayer = shok::PlayerId::P0;
 		else if (L.IsNumber(4))
-			t->StolenFromPlayer = L.CheckInt(4); // todo: check for func that refreshes model
+			t->StolenFromPlayer = L.CheckPlayerId(4); // todo: check for func that refreshes model
 		return 0;
 	}
 
@@ -770,8 +780,8 @@ namespace CppLogic::Entity {
 	int GetModel(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		int m = e->ModelOverride;
-		if (m == 0) {
+		auto m = e->ModelOverride;
+		if (m == shok::ModelId::Invalid) {
 			m = e->GetEntityType()->DisplayProps->Model[0];
 		}
 		L.Push(m);
@@ -873,16 +883,16 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("ability not ready at 1");
 		shok::Position p = L.CheckPos(2);
 		p.FloorToBuildingPlacement();
-		int bottom = L.CheckInt(3);
+		auto bottom = L.CheckEnum<shok::EntityTypeId>(3);
 		GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
 		if (!ety)
 			throw lua::LuaException("no bottom entitytype");
 		if (!ety->IsBuildingType())
 			throw lua::LuaException("bottom not a building");
-		int top = L.CheckInt(4);
+		auto top = L.CheckEnum<shok::EntityTypeId>(4);
 		if (!(*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(top))
 			throw lua::LuaException("no top entitytype");
-		if (!GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &p, 0, 0))
+		if (!GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &p, 0, shok::EntityId::Invalid))
 			throw lua::LuaException("cannot place foundation at that position");
 		e->HeroAbilityPlaceCannon(p, bottom, top);
 		return 0;
@@ -1035,7 +1045,7 @@ namespace CppLogic::Entity {
 		GGL::CKegPlacerBehaviorProperties* bp = e->GetEntityType()->GetBehaviorProps<GGL::CKegPlacerBehaviorProperties>();
 		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
 			throw lua::LuaException("ability not ready at 1");
-		if (!(e->GetBehavior<GGL::CThiefBehavior>()->ResourceType == 0))
+		if (!(e->GetBehavior<GGL::CThiefBehavior>()->ResourceType == shok::ResourceType::None))
 			throw lua::LuaException("is carrying resources");
 		GGL::CBuilding* t = L.CheckBuilding(2);
 		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
@@ -1052,7 +1062,7 @@ namespace CppLogic::Entity {
 		GGL::CKegPlacerBehavior* b = e->GetBehavior<GGL::CKegPlacerBehavior>();
 		if (!b)
 			throw lua::LuaException("no matching ability at 1");
-		if (!(e->GetBehavior<GGL::CThiefBehavior>()->ResourceType == 0))
+		if (!(e->GetBehavior<GGL::CThiefBehavior>()->ResourceType == shok::ResourceType::None))
 			throw lua::LuaException("is carrying resources");
 		EGL::CGLEEntity* t = L.CheckEntity(2);
 		if (!t->GetBehavior<GGL::CKegBehavior>())
@@ -1127,7 +1137,7 @@ namespace CppLogic::Entity {
 		GGL::CThiefBehavior* b = e->GetBehavior<GGL::CThiefBehavior>();
 		if (!b)
 			throw lua::LuaException("no matching ability at 1");
-		if (!(b->ResourceType != 0))
+		if (!(b->ResourceType != shok::ResourceType::None))
 			throw lua::LuaException("no resources carried");
 		GGL::CBuilding* t = L.CheckBuilding(2);
 		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
@@ -1151,8 +1161,8 @@ namespace CppLogic::Entity {
 	int IsFeared(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		int id = e->GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED);
-		if (id == 0)
+		auto id = e->GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED);
+		if (id == shok::EntityId::Invalid)
 			L.Push(false);
 		else
 			L.Push(id);
@@ -1164,7 +1174,7 @@ namespace CppLogic::Entity {
 		GGL::CSettler* e = L.CheckSettler(1);
 		shok::Position p = L.CheckPos(2);
 		EGL::CGLELandscape* ls = (*EGL::CGLEGameLogic::GlobalObj)->Landscape;
-		if (ls->GetSector(&p) == 0) {
+		if (ls->GetSector(&p) == shok::SectorId::Invalid) {
 			shok::Position pou;
 			if (ls->GetNearestPositionInSector(&p, 1000, e->GetSector(), &pou))
 				p = pou;
@@ -1198,7 +1208,7 @@ namespace CppLogic::Entity {
 		if (!b->IsIdle())
 			throw lua::LuaException("is not idle");
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(2);
-		int ety = L.CheckInt(2);
+		auto ety = L.CheckEnum<shok::EntityTypeId>(2);
 		bool found = false;
 		for (GGL::CFoundryBehaviorProperties::CannonInfoData& i : b->GetEntityType()->GetBehaviorProps<GGL::CFoundryBehaviorProperties>()->CannonInfo) {
 			if (i.Cannon == ety)
@@ -1367,7 +1377,7 @@ namespace CppLogic::Entity {
 		if (!solty)
 			throw lua::LuaException("no soldier type set");
 		if (!L.ToBoolean(3)) {
-			int ucat = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(1)->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(b->EntityType);
+			auto ucat = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(shok::PlayerId::P1)->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(b->EntityType);
 			if (lp->BarrackUpgradeCategory != ucat)
 				throw lua::LuaException("leader type doesnt match barracks type");
 		}
@@ -1506,7 +1516,7 @@ namespace CppLogic::Entity {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->IsIdle())
 			throw lua::LuaException("building not idle");
-		int tech = L.CheckInt(2);
+		auto tech = L.CheckEnum<shok::TechnologyId>(2);
 		shok::Technology* techo = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tech);
 		if (!techo)
 			throw lua::LuaException("no tech at 2");
@@ -1523,7 +1533,7 @@ namespace CppLogic::Entity {
 	int BuildingCancelResearch(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		if (b->GetTechnologyInResearch())
+		if (b->GetTechnologyInResearch() != shok::TechnologyId::Invalid)
 			throw lua::LuaException("no tech in research");
 		b->CancelResearch();
 		return 0;
@@ -1568,7 +1578,7 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
 		shok::Position p = L.CheckPos(2);
-		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p) == 0)
+		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p) == shok::SectorId::Invalid)
 			throw lua::LuaException("position is blocked");
 		s->SetPosition(p);
 		return 0;
@@ -1650,7 +1660,7 @@ namespace CppLogic::Entity {
 			if (add)
 				to->CloneAdditionalDataFrom(*add);
 		}
-		else if (EGL::CGLEEntity::LastRemovedEntityAddonData.EntityId == L.CheckInt(1))
+		else if (EGL::CGLEEntity::LastRemovedEntityAddonData.EntityId == static_cast<shok::EntityId>(L.CheckInt(1)))
 			to->CloneAdditionalDataFrom(EGL::CGLEEntity::LastRemovedEntityAddonData);
 		return 0;
 	}
@@ -1818,11 +1828,11 @@ namespace CppLogic::Entity {
 		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost))
 			throw lua::LuaException("missing res");
 		if (!L.ToBoolean(3)) {
-			int ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(e->EntityType);
+			auto ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(e->EntityType);
 			if (lp->BarrackUpgradeCategory != ucat)
 				throw lua::LuaException("leader type doesnt match barracks type");
 		}
-		int id = e->BuyLeaderByType(L.CheckInt(2));
+		auto id = e->BuyLeaderByType(L.CheckEnum<shok::EntityTypeId>(2));
 		L.Push(id);
 		return 1;
 	}
@@ -1855,10 +1865,11 @@ namespace CppLogic::Entity {
 	}
 
 	const char* AnimTaskList = "TL_SCRIPT_ANIMATION";
-	void SettlerCreateAnimTaskList(lua::State L) {
+	void SettlerCreateAnimTaskList(lua::State l) {
+		luaext::EState L{ l };
 		EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
-		int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
-		if (!tid) {
+		auto tid = CppLogic::GetIdManager<shok::TaskListId>().GetIdByName(AnimTaskList);
+		if (tid == shok::TaskListId::Invalid) {
 			BB::CClassFactory* fact = *BB::CClassFactory::GlobalObj;
 			EGL::CGLETaskList* tl = fact->CreateObject<EGL::CGLETaskList>();
 
@@ -1912,8 +1923,8 @@ namespace CppLogic::Entity {
 		EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
 		if (!tmng)
 			return;
-		int tid = tmng->TaskListManager->GetIdByName(AnimTaskList);
-		if (tid) {
+		auto tid = CppLogic::GetIdManager<shok::TaskListId>().GetIdByName(AnimTaskList);
+		if (tid != shok::TaskListId::Invalid) {
 			tmng->RemoveTaskList(tid);
 		}
 	}
@@ -1925,8 +1936,8 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		EGL::CGLETaskArgsAnimation setanim{};
 		setanim.TaskType = shok::Task::TASK_SET_ANIM;
-		setanim.AnimID = (*BB::CIDManagerEx::AnimManager)->GetIdByName(L.CheckString(2));
-		if (!setanim.AnimID)
+		setanim.AnimID = L.CheckEnum<shok::AnimationId>(2);
+		if (setanim.AnimID == shok::AnimationId::Invalid)
 			throw lua::LuaException("not an animation");
 		setanim.PlayBackwards = L.OptBool(3, false);
 		EGL::CGLETaskArgs reset{};
@@ -1939,7 +1950,7 @@ namespace CppLogic::Entity {
 		GGL::CBattleBehavior* batt = e->GetBehaviorDynamic<GGL::CBattleBehavior>();
 		if (batt)
 			batt->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
-		e->SetTaskList((*EGL::CGLETaskListMgr::GlobalObj)->TaskListManager->GetIdByName(AnimTaskList));
+		e->SetTaskList(CppLogic::GetIdManager<shok::TaskListId>().GetIdByName(AnimTaskList));
 		return 0;
 	}
 
@@ -1980,7 +1991,7 @@ namespace CppLogic::Entity {
 	void Cleanup(lua::State L) {
 		DisableConversionHook(L);
 		EGL::CGLEEntity::BuildingMaxHpTechBoni.clear();
-		EGL::CGLEEntity::LastRemovedEntityAddonData.EntityId = 0;
+		EGL::CGLEEntity::LastRemovedEntityAddonData.EntityId = shok::EntityId::Invalid;
 		GGL::CRangedEffectAbility::HookHealAffected(false);
 		SettlerCleanupAnimTask(L);
 	}

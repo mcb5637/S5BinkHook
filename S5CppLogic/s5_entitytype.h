@@ -8,7 +8,7 @@ namespace EGL {
 		class ModifyEntityProps {
 		public:
 			shok::TechModifierType ModifierType;
-			shok::Vector<int> TechList;
+			shok::Vector<shok::TechnologyId> TechList;
 
 			float ModifyValue(int player, float initial);
 		};
@@ -16,12 +16,13 @@ namespace EGL {
 		public:
 			float Time;
 			shok::CostInfo Cost;
-			int Type, Category;
+			shok::EntityTypeId Type;
+			shok::UpgradeCategoryId Category;
 		};
 
 
 		PADDINGI(1);
-		int Class;
+		shok::ClassId Class;
 		shok::Vector<shok::EntityCategory> Categories;
 		shok::PositionRot ApproachPos;
 	private:
@@ -31,7 +32,7 @@ namespace EGL {
 		bool ForceNoPlayer, AdjustWalkAnimSpeed, Visible, DoNotExecute; // 12
 		int MaxHealth; // 13
 	private:
-		int Models[5];
+		shok::ModelId Models[5];
 	public:
 		float Exploration;
 		int ExperiencePoints;
@@ -47,7 +48,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x76E47C;
 		static inline constexpr int TypeDesc = 0x810B0C;
-		static inline constexpr unsigned int Identifier = 0x23962D3D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x23962D3D);
 
 		void InitializeBlocking();
 
@@ -107,11 +108,13 @@ namespace EGL {
 namespace GGL {
 	class CEntityProperties : public EGL::CGLEEntityProps {
 	public:
-		int ResourceEntity, ResourceAmount, SummerEffect, WinterEffect;
+		shok::EntityTypeId ResourceEntity;
+		int ResourceAmount;
+		shok::EffectTypeId SummerEffect, WinterEffect;
 
 		static inline constexpr int vtp = 0x776FEC;
 		static inline constexpr int TypeDesc = 0x81192C;
-		static inline constexpr unsigned int Identifier = 0xC58BF747;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC58BF747);
 	};
 
 	class CGLSettlerProps : public EGL::CGLEEntityProps {
@@ -120,10 +123,10 @@ namespace GGL {
 	public:
 		shok::CostInfo Cost;
 		float BuildFactor, RepairFactor;
-		int ArmorClass;
+		shok::ArmorClassId ArmorClass;
 		int ArmorAmount; // 61
 		int DodgeChance;
-		int IdleTaskList;
+		shok::TaskListId IdleTaskList;
 		UpgradeInfo Upgrade;
 		bool Fearless, Convertible; //85
 		PADDING(2);
@@ -141,19 +144,19 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76E498;
 		static inline constexpr int TypeDesc = 0x810B30;
-		static inline constexpr unsigned int Identifier = 0xA2A53F58;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xA2A53F58);
 	};
 	//constexpr int i = offsetof(CGLSettlerProps, ModifyGroupLimit) / 4;
 
 	class CGLAnimalProps : public EGL::CGLEEntityProps {
 	public:
-		int DefaultTaskList;
+		shok::TaskListId DefaultTaskList;
 		float TerritoryRadius, WanderRangeMin, WanderRangeMax, ShyRange, MaxBuildingPollution;
-		int FleeTaskList;
+		shok::TaskListId FleeTaskList;
 
 		static inline constexpr int vtp = 0x779074;
 		static inline constexpr int TypeDesc = 0x828DD0;
-		static inline constexpr unsigned int Identifier = 0x21487A57;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x21487A57);
 	};
 
 	class CBuildBlockProperties : public EGL::CGLEEntityProps {
@@ -162,18 +165,19 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76EB38;
 		static inline constexpr int TypeDesc = 0x811284;
-		static inline constexpr unsigned int Identifier = 0xDE473B17;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDE473B17);
 	};
 
 	class CResourceDoodadProperties : public GGL::CBuildBlockProperties {
 	public:
 		float Radius;
 		shok::Position Center, LineStart, LineEnd;
-		int ExtractTaskList, Model1, Model2;
+		shok::TaskListId ExtractTaskList;
+		shok::ModelId Model1, Model2;
 
 		static inline constexpr int vtp = 0x76FF68;
 		static inline constexpr int TypeDesc = 0x811900;
-		static inline constexpr unsigned int Identifier = 0x9B03A097;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9B03A097);
 	};
 
 	class CGLBuildingProps : public GGL::CBuildBlockProperties {
@@ -184,19 +188,22 @@ namespace GGL {
 			shok::Vector<shok::PositionRot> BuilderSlot;
 			int Time;
 			shok::CostInfo Cost;
-			int ConstructionSite;
+			shok::EntityTypeId ConstructionSite;
 		};
 		struct WorkTL {
-			int Start, Work;
+			shok::TaskListId Start, Work;
 		};
-		int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers, Worker; // 42
+		int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers;
+		shok::EntityTypeId Worker; // 42
 		shok::Position DoorPos, LeavePos;
 		ConstructionInfo ConstructionInfo;
-		shok::Vector<int> BuildOn; // 75
+		shok::Vector<shok::EntityTypeId> BuildOn; // 75
 		bool HideBase, CanBeSold, IsWall; // 79
 		PADDING(1);
 		UpgradeInfo Upgrade;
-		int UpgradeSite, ArmorClass, ArmorAmount;
+		shok::EntityTypeId UpgradeSite;
+		shok::ArmorClassId ArmorClass;
+		int ArmorAmount;
 		shok::Vector<WorkTL> WorkTaskList; // 104
 	private:
 		int MilitaryInfo[4];
@@ -209,17 +216,18 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76EC78;
 		static inline constexpr int TypeDesc = 0x811210;
-		static inline constexpr unsigned int Identifier = 0x3A4D8B20;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3A4D8B20);
 	};
 
 	class CBridgeProperties : public GGL::CGLBuildingProps {
 	public:
 		shok::Vector<shok::AARect> BridgeArea;
-		int Height, ConstructionModel0, ConstructionModel1, ConstructionModel2;
+		int Height;
+		shok::ModelId ConstructionModel0, ConstructionModel1, ConstructionModel2;
 
 		static inline constexpr int vtp = 0x778148;
 		static inline constexpr int TypeDesc = 0x824A84;
-		static inline constexpr unsigned int Identifier = 0x7706B02E;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7706B02E);
 	};
 
 }
@@ -227,10 +235,10 @@ namespace GGL {
 namespace ED {
 	class CDisplayEntityProps : public BB::IObject {
 	public:
-		int DisplayClass;
-		int Model[4];
+		shok::ClassId DisplayClass;
+		shok::ModelId Model[4];
 		bool DrawPlayerColor, CastShadow, RenderInFoW, HighQualityOnly, MapEditor_Rotateable, MapEditor_Placeable;
-		shok::Vector<int> AnimList; // 8
+		shok::Vector<shok::AnimationId> AnimList; // 8
 		shok::Vector<ED::CBehaviorProps*> DisplayBehaviorProps;
 
 		// checks identifier, only returns exact class, no subclasses
@@ -284,7 +292,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x788840;
 		static inline constexpr int TypeDesc = 0x83C918;
-		static inline constexpr unsigned int Identifier = 0x20E25C5D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x20E25C5D);
 	};
 	static_assert(sizeof(ED::CDisplayEntityProps) == 16 * 4);
 	//constexpr int i = offsetof(CDisplayEntityProps, AnimList)/4;
@@ -304,7 +312,7 @@ namespace GGlue {
 
 		static inline constexpr int vtp = 0x788824;
 		static inline constexpr int TypeDesc = 0x83C8CC;
-		static inline constexpr unsigned int Identifier = 0xD397707;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD397707);
 
 		CGlueEntityProps();
 		CGlueEntityProps(const CGlueEntityProps& o);
@@ -340,10 +348,10 @@ namespace GGlue {
 		bool IsCEntityProperties() const;
 		bool IsOfCategory(shok::EntityCategory cat) const;
 
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 
-		static inline int* const EntityTypeIDSerf = reinterpret_cast<int*>(0x863830);
+		static inline shok::EntityTypeId* const EntityTypeIDSerf = reinterpret_cast<shok::EntityTypeId*>(0x863830);
 	};
 }
 
@@ -359,18 +367,18 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x788834;
 
-		GGlue::CGlueEntityProps* GetEntityType(int i);
+		GGlue::CGlueEntityProps* GetEntityType(shok::EntityTypeId i);
 
 		static inline EGL::CGLEEntitiesProps** const GlobalObj = reinterpret_cast<EGL::CGLEEntitiesProps**>(0x895DB0);
 
-		static const char* GetEntityTypeDisplayName(int i);
+		static const char* GetEntityTypeDisplayName(shok::EntityTypeId i);
 
 		// init blocking for everything but the last: 5846BE
 	};
 
 	class EntityCategoryCache {
 	public:
-		shok::Map<shok::EntityCategory, shok::Vector<int>> CategoryToEntityTypes;
+		shok::Map<shok::EntityCategory, shok::Vector<shok::EntityTypeId>> CategoryToEntityTypes;
 
 		static inline EntityCategoryCache* const GlobalObj = reinterpret_cast<EntityCategoryCache*>(0x8975A4);
 		static inline void(__cdecl* const RefreshCache)(CGLEEntitiesProps* props) = reinterpret_cast<void(__cdecl*)(CGLEEntitiesProps*)>(0x5770CA);

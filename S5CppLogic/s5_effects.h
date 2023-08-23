@@ -6,8 +6,8 @@ namespace EGL {
 	class IEffectDisplay {
 	public:
 		struct TypeAndID {
-			int EffectType = 0;
-			int EffectID = 0;
+			shok::EffectTypeId EffectType = static_cast<shok::EffectTypeId>(0);
+			shok::EffectId EffectID = static_cast<shok::EffectId>(0);
 		};
 		struct TurnDurationAndPos {
 			int StartTurn = 0;
@@ -17,7 +17,7 @@ namespace EGL {
 
 
 		virtual ~IEffectDisplay() = default;
-		virtual int __stdcall GetEffectType() const = 0;
+		virtual shok::EffectTypeId __stdcall GetEffectType() const = 0;
 		virtual void __stdcall FillTypeAndID(TypeAndID* d) const = 0;
 		virtual void __stdcall FillTurnDurationAndPos(TurnDurationAndPos* d) const = 0;
 		virtual void __stdcall GetPlayerID() const = 0;
@@ -29,15 +29,15 @@ namespace EGL {
 		shok::Position Position; // 16
 		int StartTurn; // 18
 		int Duration;
-		int EffectType; // 20
+		shok::EffectTypeId EffectType; // 20
 		int EffectFlags; // 1->has duration
-		int PlayerID;
-		int EffectID; // 23
+		shok::PlayerId PlayerID;
+		shok::EffectId EffectID; // 23
 		PADDINGI(4); // set of eventhandlers? then bool?
 
 		static inline constexpr int vtp = 0x784B28;
 		static inline constexpr int TypeDesc = 0x822284;
-		static inline constexpr unsigned int Identifier = 0xF8536CED;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF8536CED);
 
 		virtual void FromCreator(EGL::CGLEEffectCreator* ct) = 0; // 3
 		virtual void OnCreated() = 0;
@@ -48,6 +48,9 @@ namespace EGL {
 		virtual void emptyfunc2() = 0; // 8
 
 	public:
+
+		CGLEEffectProps* LogicProps() const;
+
 		static void(__stdcall*OnDestroyCb)(CEffect* th);
 		static void HookOnDestroy();
 	};
@@ -70,12 +73,12 @@ namespace EGL {
 
 		// dtor empty
 		virtual void __stdcall FillSlot(SSlotArgsFlyingEffect* data) override;
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
-		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		static inline constexpr int vtp = 0x777640;
 		static inline constexpr int TypeDesc = 0x823638;
-		static inline constexpr unsigned int Identifier = 0xD1E5044D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD1E5044D);
 	};
 
 	class CFlyingEffect : public EGL::CEffect {
@@ -86,7 +89,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x7775E4;
 		static inline constexpr int TypeDesc = 0x8235EC;
-		static inline constexpr unsigned int Identifier = 0x8B5120CD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8B5120CD);
 
 		virtual void OnHit() = 0;
 		virtual void CalculateGravityStuff() = 0;
@@ -108,10 +111,10 @@ namespace GGL {
 	class CArrowEffect : public EGL::CFlyingEffect {
 		friend class EGL::CFlyingEffect;
 	public:
-		int AttackerID; // 47
-		int TargetID;
+		shok::EntityId AttackerID; // 47
+		shok::EntityId TargetID;
 		int DamageAmount;
-		byte Misses; // 50
+		bool Misses; // 50
 		PADDING(2);
 		byte AdvancedDamageSourceOverride;
 		GGL::CArrowEffectProps* ArrowEffectProps;
@@ -123,7 +126,7 @@ namespace GGL {
 	public:
 		static inline constexpr int vtp = 0x778E24;
 		static inline constexpr int TypeDesc = 0x8289CC;
-		static inline constexpr unsigned int Identifier = 0x2320F01D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2320F01D);
 
 		static void HookDealDamage();
 	};
@@ -131,12 +134,12 @@ namespace GGL {
 	class CCannonBallEffect : public EGL::CFlyingEffect {
 		friend class EGL::CFlyingEffect;
 	public:
-		int AttackerID; // 47
-		int SourcePlayer; // 48
+		shok::EffectId AttackerID; // 47
+		shok::PlayerId SourcePlayer; // 48
 		GGL::CCannonBallEffectProps* CannonBallEffectProps;
 		int DamageAmount; // 50
 		float AoERange;
-		int DamageClass; // 52
+		shok::DamageClassId DamageClass; // 52
 
 	protected:
 		void FixOnLoad();
@@ -150,26 +153,27 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x777690;
 		static inline constexpr int TypeDesc = 0x82365C;
-		static inline constexpr unsigned int Identifier = 0xDF09D9FD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDF09D9FD);
 	};
 }
 
 namespace EGL {
 	class CGLEEffectCreator : public BB::IObject {
 	public:
-		int EffectType = 0;
+		shok::EffectTypeId EffectType = static_cast<shok::EffectTypeId>(0);
 	private:
 		int Zero1 = 0;
 	public:
-		int PlayerID = 0;
+		shok::PlayerId PlayerID = static_cast<shok::PlayerId>(0);
 		shok::Position StartPos = { 0,0 }, CurrentPos = { 0,0 }, TargetPos = { 0,0 };
 	private:
 		int Zero2 = 0; // height offset unused
 	public:
-		int AttackerID = 0, TargetID = 0, Damage = 0; // la 13
+		shok::EntityId AttackerID = static_cast<shok::EntityId>(0), TargetID = static_cast<shok::EntityId>(0);
+		int Damage = 0; // 13
 		float DamageRadius = 0;
-		int DamageClass = 0; // unused
-		int SourcePlayer = 0; // 16
+		shok::DamageClassId DamageClass = static_cast<shok::DamageClassId>(0); // unused
+		shok::PlayerId SourcePlayer = static_cast<shok::PlayerId>(0); // 16
 		bool Misses = false; // 17
 	private:
 		bool Zero5[2] = { false, false };
@@ -180,11 +184,12 @@ namespace EGL {
 	public:
 		static inline constexpr int vtp = 0x76E140;
 		static inline constexpr int TypeDesc = 0x810254;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x78BD3AED);
 		CGLEEffectCreator();
 
 		// dtor empty
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
-		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 	protected:
 		void SetVT(int vt);
 	};
@@ -224,7 +229,7 @@ namespace ED {
 		RWE::RpClump* Clump;
 
 		static inline constexpr int vtp = 0x7AE790;
-		static inline constexpr unsigned int Identifier = 0x22C757DD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x22C757DD);
 	};
 
 	class CHAnimEffect : public IEffect {
@@ -235,7 +240,7 @@ namespace ED {
 
 	public:
 		static inline constexpr int vtp = 0x7AE98C;
-		static inline constexpr unsigned int Identifier = 0x11E11B07;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x11E11B07);
 	};
 	//constexpr int i = offsetof(CHAnimEffect, Clump) / 4;
 
@@ -244,7 +249,7 @@ namespace ED {
 		RWE::RpClump* Clump;
 
 		static inline constexpr int vtp = 0x7AE9D0;
-		static inline constexpr unsigned int Identifier = 0xFCD5C1E7;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFCD5C1E7);
 	};
 }
 
@@ -253,21 +258,21 @@ namespace GD {
 
 	public:
 		static inline constexpr int vtp = 0x76AB88;
-		static inline constexpr unsigned int Identifier = 0xE6F4B223;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xE6F4B223);
 	};
 
 	class CDisplayEffectRain : public ED::IEffect {
 
 	public:
 		static inline constexpr int vtp = 0x76AD38;
-		static inline constexpr unsigned int Identifier = 0x8D16CD43;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8D16CD43);
 	};
 
 	class CDisplayEffectLightning : public ED::IEffect {
 
 	public:
 		static inline constexpr int vtp = 0x76AE08;
-		static inline constexpr unsigned int Identifier = 0x72C52353;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x72C52353);
 	};
 }
 
@@ -284,10 +289,10 @@ namespace ED {
 
 	public:
 		struct VisEffect {
-			int ID;
+			shok::EffectId ID;
 		private:
 			bool unknown;
-			int ID2;
+			shok::EffectId ID2;
 		public:
 			ED::IEffect* Effect;
 		};
@@ -302,8 +307,8 @@ namespace ED {
 
 		static inline CDEVisibleEffectManager** const GlobalObj = reinterpret_cast<CDEVisibleEffectManager**>(0xA19EA0);
 
-		ED::IEffect* GetDisplayForEffectID(int id);
-		void DestroyDisplayForEffect(int id);
+		ED::IEffect* GetDisplayForEffectID(shok::EffectId id);
+		void DestroyDisplayForEffect(shok::EffectId id);
 	};
 	static_assert(sizeof(CDEVisibleEffectManager) == 12 * 4);
 }

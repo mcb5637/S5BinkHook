@@ -169,8 +169,8 @@ namespace EGL {
 			Iter end() const;
 		};
 
-		int GetSector(const shok::Position* p);
-		bool GetNearestPositionInSector(const shok::Position* pIn, float range, int sector, shok::Position* pOut);
+		shok::SectorId GetSector(const shok::Position* p);
+		bool GetNearestPositionInSector(const shok::Position* pIn, float range, shok::SectorId sector, shok::Position* pOut);
 		shok::Position GetNearestFreePos(const shok::Position* p, float range);
 		bool IsValidPos(shok::Position* p);
 		shok::Position GetMapSize();
@@ -213,7 +213,7 @@ namespace EGL {
 			int CenterV, CenterW, Radius;
 		};
 
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		int ShareExplorationWithPlayersMask;
 		int SizeX, SizeY; // 3
 		EGL::C2DArray1Bit* ExplorationMapWork; // 5 updating?
@@ -225,7 +225,7 @@ namespace EGL {
 		bool IsPositionExplored(const shok::Position& p);
 
 		static inline constexpr int vtp = 0x784E04;
-		static constexpr unsigned int Identifier = 0xEE20FA93;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEE20FA93);
 	};
 
 	class CPlayerExplorationUpdate : public BB::IObject {
@@ -240,7 +240,7 @@ namespace EGL {
 		unsigned int DrawCirclesNumCirclesToDrawPerTurn;
 
 		static inline constexpr int vtp = 0x784D1C;
-		static constexpr unsigned int Identifier = 0x81E57CD;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x81E57CD);
 
 		void SetPlayersToUpdate(int first, int last);
 	};
@@ -248,24 +248,25 @@ namespace EGL {
 
 	class CEntityVectorMap : public BB::IObject {
 	public:
-		shok::Map<int, shok::Vector<EGL::CGLEEntity*>> Items; // EntityType (shok::EntityTypeID) -> EntityVector.Item
+		shok::Map<shok::EntityTypeId, shok::Vector<EGL::CGLEEntity*>> Items; // EntityType -> EntityVector.Item
 
 		static inline constexpr int vtp = 0x783B4C;
-		static constexpr unsigned int Identifier = 0x1A5477F7;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1A5477F7);
 	};
 
 	class CPlayerFeedbackHandler : public BB::IObject {
 	public:
 		struct SingleFeedack {
 			int FeedbackReason;
-			int FeedbackState;
-			int EntityType;
+			shok::FeedbackStateId FeedbackState;
+			shok::EntityTypeId EntityType;
 			int GameTurn;
 
 			auto operator<=>(const SingleFeedack&) const noexcept = default;
 		};
 		struct SingleArrival {
-			int EntityType, GameTurn;
+			shok::EntityTypeId EntityType;
+			int GameTurn;
 		};
 		struct SingleResOut {
 			shok::Goods GoodType;
@@ -273,7 +274,7 @@ namespace EGL {
 			int GameTurn;
 		};
 
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		int UpdateFeedbackFrequency;
 		int TimeFeedbackStaysInSystem;
 		struct {
@@ -282,13 +283,14 @@ namespace EGL {
 		PADDINGI(1); // part of SettlerFeedbackList?
 		shok::Vector<SingleArrival> SettlerEntityTypeArrival;
 		struct {
-			int LastGameTurn, EntityID;
+			int LastGameTurn;
+			shok::EntityTypeId EntityID;
 		} GenericMessageData[4];
 		PADDINGI(1); // part of GenericMessageData?
 		shok::Vector<SingleResOut> ResourceRunningOutMessageData;
 
 		static inline constexpr int vtp = 0x7847A8;
-		static constexpr unsigned int Identifier = 0xC375BEA3;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC375BEA3);
 	};
 	static_assert(offsetof(CPlayerFeedbackHandler, SettlerFeedbackList) == 16);
 	static_assert(sizeof(CPlayerFeedbackHandler::SettlerFeedbackList) == 12*7);
@@ -308,8 +310,8 @@ namespace EGL {
 		PADDINGI(1); // seridata-> belongs to array, 0 wtf???
 		CPlayerExplorationUpdate* ExplorationUpdate; //46
 
-		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(int pl);
-		void SetShareExplorationFlag(int pl1, int pl2, bool share);
+		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(shok::PlayerId pl);
+		void SetShareExplorationFlag(shok::PlayerId pl1, shok::PlayerId pl2, bool share);
 		void ActivateUpdateOfExplorationForAllPlayers();
 		CPlayerExplorationUpdate* GetUpdate(); // creates if nullptr
 
@@ -388,26 +390,26 @@ namespace EGL {
 		virtual void unknown17() = 0;
 		virtual void unknown18() = 0; // 20
 		virtual void unknown19() = 0;
-		virtual int CreateEntity(EGL::CGLEEntityCreator* data, int i) = 0; // 22
+		virtual shok::EntityId CreateEntity(EGL::CGLEEntityCreator* data, int i) = 0; // 22
 	public:
-		virtual int CreateEffect(EGL::CGLEEffectCreator* data) = 0;
+		virtual shok::EffectId CreateEffect(EGL::CGLEEffectCreator* data) = 0;
 
 		static inline constexpr int vtp = 0x7839CC;
 
-		int CreateEntity(EGL::CGLEEntityCreator* cr);
+		shok::EntityId CreateEntity(EGL::CGLEEntityCreator* cr);
 		int GetTimeMS();
 		int GetTick();
 		float GetTimeSeconds();
 		void ClearToDestroy();
 
 		static void HookCreateEffect();
-		static void(*CreateEffectHookCallback)(int id);
+		static void(*CreateEffectHookCallback)(shok::EffectId id);
 
 		static inline EGL::CGLEGameLogic** const GlobalObj = reinterpret_cast<EGL::CGLEGameLogic**>(0x895DAC); // also 85A3A4
 		static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 
 	private:
-		int CreateEffectOverride(EGL::CGLEEffectCreator* data);
+		shok::EffectId CreateEffectOverride(EGL::CGLEEffectCreator* data);
 	};
 	static_assert(offsetof(CGLEGameLogic, RNG) == 4 * 34);
 	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;
@@ -430,7 +432,7 @@ namespace GGL {
 			PADDING(3);
 			int WeatherIndex = 0; //5
 			int Forerun = 0;
-			int GfxSet = 0;
+			shok::WeatherGFXSet GfxSet = {};
 			int Transition = 0;
 		};
 
@@ -443,9 +445,9 @@ namespace GGL {
 		int NextPeriodicWeatherStartTimeOffset;
 		struct { // 10
 			int CurrentWeatherGFXState; //0
-			int FromGFXState;
+			shok::WeatherGFXSet FromGFXState;
 			int StartedTimeOffset;
-			int ToGFXState; //3 0 if no chnage
+			shok::WeatherGFXSet ToGFXState; //3 0 if no chnage
 			int TransitionLength;
 			shok::WeatherState StateToChangeFrom;
 			shok::WeatherState StateToChangeTo;
@@ -460,9 +462,9 @@ namespace GGL {
 
 		shok::WeatherState GetNextWeatherState();
 		int GetTicksToNextPeriodicWeatherChange();
-		void AddWeatherElement(int state, int dur, bool peri, int forerun, int gfx, int transition); // all times in ticks
+		void AddWeatherElement(shok::WeatherState state, int dur, bool peri, int forerun, shok::WeatherGFXSet gfx, int transition); // all times in ticks
 		void SetOffset(int o);
-		void ClearQueue(shok::WeatherState state, int dur, int forerun, int gfx, int transition);
+		void ClearQueue(shok::WeatherState state, int dur, int forerun, shok::WeatherGFXSet gfx, int transition);
 
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49ECE9);
 	};
@@ -499,14 +501,14 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76E018;
 
-		GGL::CPlayerStatus* GetPlayer(int i);
-		shok::Technology* GetTech(int i);
-		void EnableAlarmForPlayer(int pl);
-		void DisableAlarmForPlayer(int pl);
-		void UpgradeSettlerCategory(int pl, int ucat);
-		void PlayerActivateWeathermachine(int player, int weathertype);
-		void PlayerBlessSettlers(int player, int blessCat);
-		void SetDiplomacy(int p1, int p2, shok::DiploState state);
+		GGL::CPlayerStatus* GetPlayer(shok::PlayerId i);
+		shok::Technology* GetTech(shok::TechnologyId i);
+		void EnableAlarmForPlayer(shok::PlayerId pl);
+		void DisableAlarmForPlayer(shok::PlayerId pl);
+		void UpgradeSettlerCategory(shok::PlayerId pl, shok::UpgradeCategoryId ucat);
+		void PlayerActivateWeathermachine(shok::PlayerId player, shok::WeatherState weathertype);
+		void PlayerBlessSettlers(shok::PlayerId player, shok::BlessCategoryId blessCat);
+		void SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState state);
 
 		static inline GGL::CGLGameLogic** const GlobalObj = reinterpret_cast<GGL::CGLGameLogic**>(0x85A3A0);
 		// create net event handlers thiscall 0x49FD49()

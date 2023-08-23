@@ -90,25 +90,27 @@ void ED::CModelsProps::ModelData::operator=(const ModelData& o) noexcept
 		SelectionTexture = shok::CopyString(o.SelectionTexture);
 }
 
-void ED::CModelsProps::LoadModelDataFromExtraFile(int id)
+void ED::CModelsProps::LoadModelDataFromExtraFile(shok::ModelId id)
 {
-	if (id > static_cast<int>(Model.size()))
+	int i = static_cast<int>(id);
+	if (i > static_cast<int>(Model.size()))
 		throw std::logic_error{ "somehow the id is too big" };
-	if (id == static_cast<int>(Model.size())) {
+	if (i == static_cast<int>(Model.size())) {
 		auto v = Model.SaveVector();
 		v.Vector.emplace_back();
 	}
 	else {
-		Model[id] = ModelData{};
+		Model[i] = ModelData{};
 	}
 	std::string filename = "Data/Config/Models/";
-	filename.append(ModelIdManager->GetNameByID(id));
+	filename.append(ModelIdManager->GetNameByID(i));
 	filename.append(".xml");
-	(*BB::CClassFactory::GlobalObj)->LoadObject(&Model[id], filename.c_str(), ModelData::SerializationData);
+	(*BB::CClassFactory::GlobalObj)->LoadObject(&Model[i], filename.c_str(), ModelData::SerializationData);
 }
-void ED::CModelsProps::PopModel(int id)
+void ED::CModelsProps::PopModel(shok::ModelId id)
 {
-	if (id + 1 != static_cast<int>(Model.size()))
+	int i = static_cast<int>(id);
+	if (i + 1 != static_cast<int>(Model.size()))
 		throw std::out_of_range("invalid id");
 	auto v = Model.SaveVector();
 	v.Vector.pop_back();
@@ -195,34 +197,38 @@ void ED::ModelData::operator delete(void* p) {
 	shok::Free(p);
 }
 
-void ED::CResourceManager::FreeModel(int id)
+void ED::CResourceManager::FreeModel(shok::ModelId id)
 {
-	delete ModelManager.Models[id];
-	ModelManager.Models[id] = nullptr;
+	int i = static_cast<int>(id);
+	delete ModelManager.Models[i];
+	ModelManager.Models[i] = nullptr;
 }
-void ED::CResourceManager::PopModel(int id)
+void ED::CResourceManager::PopModel(shok::ModelId id)
 {
-	if (id + 1 != static_cast<int>(ModelManager.Models.size()))
+	int i = static_cast<int>(id);
+	if (i + 1 != static_cast<int>(ModelManager.Models.size()))
 		throw std::out_of_range("invalid id");
 	FreeModel(id);
 	auto v = ModelManager.Models.SaveVector();
 	v.Vector.pop_back();
 }
-const ED::ModelData* ED::CResourceManager::LoadModel(int id)
+const ED::ModelData* ED::CResourceManager::LoadModel(shok::ModelId id)
 {
-	if (id >= static_cast<int>(ModelManager.Models.size())) {
+	int i = static_cast<int>(id);
+	if (i >= static_cast<int>(ModelManager.Models.size())) {
 		auto v = ModelManager.Models.SaveVector();
-		v.Vector.resize(id + 1, nullptr);
+		v.Vector.resize(i + 1, nullptr);
 	}
 	return GetModelData(id);
 }
 
 
-void ED::CResourceManager::FreeAnim(int id)
+void ED::CResourceManager::FreeAnim(shok::AnimationId id)
 {
-	RWE::RtAnimAnimation* a = AnimManager.Get(id);
+	int i = static_cast<int>(id);
+	RWE::RtAnimAnimation* a = AnimManager.Get(i);
 	a->Destroy();
-	AnimManager.Map.erase(AnimManager.Map.find(id));
+	AnimManager.Map.erase(AnimManager.Map.find(i));
 }
 
 static inline ED::ModelData* (__cdecl* const resmng_loadmodel)(const char* n) = reinterpret_cast<ED::ModelData* (__cdecl*)(const char*)>(0x472D71);
@@ -242,37 +248,40 @@ void ED::TerrainTextureManager::ApplyTextureQuality()
 	terraintexturemng_applyquality(this);
 }
 
-void ED::TerrainTextureManager::PopTexture(int id)
+void ED::TerrainTextureManager::PopTexture(shok::TerrainTextureId id)
 {
-	if (Textures[id]) {
-		Textures[id]->Destroy();
-		Textures[id] = nullptr;
+	int i = static_cast<int>(id);
+	if (Textures[i]) {
+		Textures[i]->Destroy();
+		Textures[i] = nullptr;
 	}
-	if (id + 1 == static_cast<int>(Textures.size())) {
+	if (i + 1 == static_cast<int>(Textures.size())) {
 		auto v = Textures.SaveVector();
 		v.Vector.pop_back();
 	}
 }
-void ED::TerrainTextureManager::LoadTexture(int id)
+void ED::TerrainTextureManager::LoadTexture(shok::TerrainTextureId id)
 {
+	int i = static_cast<int>(id);
 	auto v = Textures.SaveVector();
-	if (id + 2 == static_cast<int>(Textures.size())) {
-		v.Vector.push_back(RWE::RwTexture::Read(DisplayProps->TerrainTextureManager->GetNameByID(id), nullptr));
+	if (i + 2 == static_cast<int>(Textures.size())) {
+		v.Vector.push_back(RWE::RwTexture::Read(DisplayProps->TerrainTextureManager->GetNameByID(i), nullptr));
 	}
 	else {
-		if (v.Vector.at(id))
-			v.Vector[id]->Destroy();
-		v.Vector[id] = RWE::RwTexture::Read(DisplayProps->TerrainTextureManager->GetNameByID(id), nullptr);
+		if (v.Vector.at(i))
+			v.Vector[i]->Destroy();
+		v.Vector[i] = RWE::RwTexture::Read(DisplayProps->TerrainTextureManager->GetNameByID(i), nullptr);
 	}
 }
-void ED::TerrainTextureManager::ReApplyTerrainType(int id)
+void ED::TerrainTextureManager::ReApplyTerrainType(shok::TerrainTypeId id)
 {
+	int i = static_cast<int>(id);
 	TerrainType t = CreateTerrainType(id);
 
 	std::map<int, int> PriorityToTerrainid{};
 	for (unsigned int id2 = 0; id2 < DisplayProps->TerrainTypeManager->size(); ++id2) {
 		int prio = DisplayProps->DisplayProps[id2].Priority;
-		if (id2 != id && DisplayProps->TerrainTypeManager->GetNameByID(id2) != nullptr) {
+		if (id2 != i && DisplayProps->TerrainTypeManager->GetNameByID(id2) != nullptr) {
 			while (PriorityToTerrainid.find(prio) != PriorityToTerrainid.end())
 				++prio;
 			PriorityToTerrainid[prio] = id2;
@@ -280,26 +289,26 @@ void ED::TerrainTextureManager::ReApplyTerrainType(int id)
 	}
 	while (PriorityToTerrainid.find(t.Priority) != PriorityToTerrainid.end())
 		++t.Priority;
-	PriorityToTerrainid[t.Priority] = t.Id;
+	PriorityToTerrainid[t.Priority] = static_cast<int>(t.Id);
 	{
 		auto ottv = OriginalTerrainTypes.SaveVector();
-		while (static_cast<int>(ottv.Vector.size()) <= id)
+		while (static_cast<int>(ottv.Vector.size()) <= i)
 			ottv.Vector.emplace_back();
-		ottv.Vector[id] = t;
+		ottv.Vector[i] = t;
 		auto ttv = TerrainTypes.SaveVector();
-		while (static_cast<int>(ttv.Vector.size()) <= id)
+		while (static_cast<int>(ttv.Vector.size()) <= i)
 			ttv.Vector.emplace_back();
-		ttv.Vector[id] = t;
+		ttv.Vector[i] = t;
 		auto trv = TextureReplacement.SaveVector();
-		while (static_cast<int>(trv.Vector.size()) <= id)
+		while (static_cast<int>(trv.Vector.size()) <= i)
 			trv.Vector.emplace_back();
-		trv.Vector[id] = id;
+		trv.Vector[i] = i;
 		auto tidsord = TextureIdsOrderedByPriority.SaveVector();
 		tidsord.Vector.clear();
-		tidsord.Vector.push_back(0);
+		tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(0));
 		for (const auto& kv : PriorityToTerrainid) {
 			int s = tidsord.Vector.size();
-			tidsord.Vector.push_back(kv.second);
+			tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(kv.second));
 			ttv.Vector[kv.second].Priority = s;
 			ottv.Vector[kv.second].Priority = s;
 		}
@@ -320,39 +329,40 @@ void ED::TerrainTextureManager::ReApplyAllTerrainTypes()
 		tidsord.Vector.clear();
 		std::map<int, int> PriorityToTerrainid{};
 		for (unsigned int id = 0; id < DisplayProps->TerrainTypeManager->size(); ++id) {
-			TerrainType t = CreateTerrainType(id);
+			TerrainType t = CreateTerrainType(static_cast<shok::TerrainTypeId>(id));
 			if (DisplayProps->TerrainTypeManager->GetNameByID(id) != nullptr) {
 				while (PriorityToTerrainid.find(t.Priority) != PriorityToTerrainid.end())
 					++t.Priority;
-				PriorityToTerrainid[t.Priority] = t.Id;
+				PriorityToTerrainid[t.Priority] = static_cast<int>(t.Id);
 			}
 			ottv.Vector.push_back(t);
 			ttv.Vector.push_back(t);
 		}
-		tidsord.Vector.push_back(0);
+		tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(0));
 		for (const auto& kv : PriorityToTerrainid) {
 			int s = tidsord.Vector.size();
-			tidsord.Vector.push_back(kv.second);
+			tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(kv.second));
 			ttv.Vector[kv.second].Priority = s;
 			ottv.Vector[kv.second].Priority = s;
 		}
 	}
-	BlackInternalUseOnlyId = DisplayProps->TerrainTypeManager->GetIdByName("BlackInternalUseOnly");
-	Transitions01Id = DisplayProps->TerrainTextureManager->GetIdByName("Transitions01");
+	BlackInternalUseOnlyId = static_cast<shok::TerrainTypeId>(DisplayProps->TerrainTypeManager->GetIdByName("BlackInternalUseOnly"));
+	Transitions01Id = static_cast<shok::TerrainTextureId>(DisplayProps->TerrainTextureManager->GetIdByName("Transitions01"));
 	ApplyTextureQuality();
 	--TextureQualityOptionChangedCounter;
 }
-ED::TerrainTextureManager::TerrainType ED::TerrainTextureManager::CreateTerrainType(int id)
+ED::TerrainTextureManager::TerrainType ED::TerrainTextureManager::CreateTerrainType(shok::TerrainTypeId id)
 {
+	int i = static_cast<int>(id);
 	TerrainType t{};
-	const auto& dis = DisplayProps->DisplayProps.at(id);
+	const auto& dis = DisplayProps->DisplayProps.at(i);
 	t.Id = id;
 	t.Priority = dis.Priority;
 	t.BaseTextureId = dis.BaseTexture;
 	t.SnowTextureId = dis.SnowTexture;
 	t.TransitionTextureId = dis.TransitionsTexture;
 	t.OneDiv4TimesQuads = 1.0f / (4 * (dis.Quads <= 0 ? 4 : dis.Quads));
-	t.ReplacementTerrainType = DisplayProps->TerrainTypeManager->GetIdByName(dis.ReplacementTerrainType.c_str());
+	t.ReplacementTerrainType = static_cast<shok::TerrainTypeId>(DisplayProps->TerrainTypeManager->GetIdByName(dis.ReplacementTerrainType.c_str()));
 	t.TransitionsColorModulate = dis.TransitionsColorModulate;
 	t.TransitionTextureIs_Transitions01 = t.TransitionTextureId == Transitions01Id;
 	return t;
@@ -373,7 +383,7 @@ void ED::CEntitiesTypeFlags::operator delete(void* p) {
 }
 
 
-unsigned int __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const
+shok::ClassId __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const
 {
 	return Identifier;
 }

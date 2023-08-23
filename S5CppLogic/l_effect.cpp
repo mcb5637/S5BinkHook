@@ -21,7 +21,7 @@ namespace CppLogic::Effect {
 	}
 
 	void FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
-		int id = eff->EffectID;
+		int id = static_cast<int>(eff->EffectID);
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int top = L.GetTop();
 		if (!L.CheckStack(5))
@@ -41,7 +41,7 @@ namespace CppLogic::Effect {
 	int CreateProjectile(lua::State l) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source)
 		luaext::EState L{ l };
 		CProjectileEffectCreator data = CProjectileEffectCreator();
-		data.EffectType = L.CheckInt(1);
+		data.EffectType = L.CheckEnum<shok::EffectTypeId>(1);
 		data.CurrentPos.X = data.StartPos.X = static_cast<float>(L.CheckNumber(2));
 		data.CurrentPos.Y = data.StartPos.Y = static_cast<float>(L.CheckNumber(3));
 		data.TargetPos.X = static_cast<float>(L.CheckNumber(4));
@@ -50,14 +50,14 @@ namespace CppLogic::Effect {
 		data.DamageRadius = static_cast<float>(L.OptNumber(7, -1));
 		data.TargetID = L.OptEntityId(8);
 		data.AttackerID = L.OptEntityId(9);
-		int player = L.OptInteger(10, 0);
+		auto player = L.OptPlayerId(10, shok::PlayerId::P0);
 		data.PlayerID = player;
 		data.SourcePlayer = player;
-		int dmgclass = L.OptInteger(11, 0);
+		auto dmgclass = L.OptEnum<shok::DamageClassId>(11);
 		data.DamageClass = dmgclass;
 		data.AdvancedDamageSourceOverride = L.OptInteger(13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
 		EGL::CGLEGameLogic* gl = *EGL::CGLEGameLogic::GlobalObj;
-		int id = gl->CreateEffect(&data);
+		auto id = gl->CreateEffect(&data);
 		EGL::CEffect* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
 		if (!GGL::CCannonBallEffect::FixDamageClass)
 			if (GGL::CCannonBallEffect* cbeff = dynamic_cast<GGL::CCannonBallEffect*>(ef))
@@ -67,7 +67,7 @@ namespace CppLogic::Effect {
 			EGL::CFlyingEffect::FlyingEffectOnHitCallback = &FlyingEffectOnHitCallback;
 			PushToHitCallbackReg(L);
 			L.PushValue(12);
-			L.SetTableRaw(-2, id);
+			L.SetTableRaw(-2, static_cast<int>(id));
 		}
 		L.Push(id);
 		return 1;
@@ -75,7 +75,7 @@ namespace CppLogic::Effect {
 
 	int IsValidEffect(lua::State L) {
 		int id = L.CheckInt(1);
-		bool r = (*EGL::CGLEEffectManager::GlobalObj)->IsIdValid(id);
+		bool r = (*EGL::CGLEEffectManager::GlobalObj)->IsIdValid(static_cast<shok::EffectId>(id));
 		L.Push(r);
 		return 1;
 	}
@@ -153,16 +153,16 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
-	void EffectOnCreate(int id) {
-		EGL::CEvent1Entity ev{ shok::EventIDs::CppLogicEvent_OnEffectCreated, id };
+	void EffectOnCreate(shok::EffectId id) {
+		EGL::CEvent1Entity ev{ shok::EventIDs::CppLogicEvent_OnEffectCreated, static_cast<shok::EntityId>(static_cast<int>(id)) };
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 	}
 	void EffectOnHit(EGL::CFlyingEffect* eff) {
-		EGL::CEvent1Entity ev{ shok::EventIDs::CppLogicEvent_OnFlyingEffectHit, eff->EffectID };
+		EGL::CEvent1Entity ev{ shok::EventIDs::CppLogicEvent_OnFlyingEffectHit, static_cast<shok::EntityId>(static_cast<int>(eff->EffectID)) };
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 	}
 	void __stdcall EffectOnDestroy(EGL::CEffect* eff) {
-		EGL::CEvent1Entity ev{ shok::EventIDs::CppLogicEvent_OnEffectDestroyed, eff->EffectID };
+		EGL::CEvent1Entity ev{ shok::EventIDs::CppLogicEvent_OnEffectDestroyed, static_cast<shok::EntityId>(static_cast<int>(eff->EffectID)) };
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 	}
 	void SetupEffectTriggers(bool enable) {
@@ -204,13 +204,15 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
-	int PredicateOfType(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EffectPredicateOfType>(L.CheckInt(1));
+	int PredicateOfType(lua::State ls) {
+		luaext::EState L{ ls };
+		L.NewUserData<CppLogic::Iterator::EffectPredicateOfType>(L.CheckEnum<shok::EffectTypeId>(1));
 		return 1;
 	}
 
-	int PredicateOfPlayer(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EffectPredicateOfPlayer>(L.CheckInt(1));
+	int PredicateOfPlayer(lua::State ls) {
+		luaext::EState L{ ls };
+		L.NewUserData<CppLogic::Iterator::EffectPredicateOfPlayer>(L.CheckPlayerId(1));
 		return 1;
 	}
 
@@ -299,7 +301,7 @@ namespace CppLogic::Effect {
 			L.Push();
 		}
 		else {
-			L.Push(e->EffectID);
+			L.Push(static_cast<int>(e->EffectID));
 			L.Push(r);
 			L.Push(p);
 		}
@@ -326,7 +328,7 @@ namespace CppLogic::Effect {
 		L.NewTable();
 		CppLogic::Iterator::GlobalEffectIterator it{ pred };
 		for (EGL::CEffect* e : it) {
-			L.Push(e->EffectID);
+			L.Push(static_cast<int>(e->EffectID));
 			L.SetTableRaw(2, index);
 			index++;
 		}

@@ -18,12 +18,12 @@ void CppLogic::EntityAddon::EntityAddonData::operator=(const EntityAddonData& ot
 	FakeTaskValue = other.FakeTaskValue;
 }
 
-unsigned int __stdcall CppLogic::EntityAddon::EntityAddonData::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::EntityAddon::EntityAddonData::GetClassIdentifier() const
 {
 	return Identifier;
 }
 
-void CppLogic::EntityAddon::EntityAddonData::AddHandlers(int id)
+void CppLogic::EntityAddon::EntityAddonData::AddHandlers(shok::EntityId id)
 {
 	EntityId = id;
 }

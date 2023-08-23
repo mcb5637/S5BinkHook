@@ -47,16 +47,16 @@ namespace EGL {
 	public:
 
 		struct modeldata {
-			int EntityID = 0;
-			int EntityType = 0;
-			int ModelOverride = 0;
+			shok::EntityId EntityID = static_cast<shok::EntityId>(0);
+			shok::EntityTypeId EntityType = static_cast<shok::EntityTypeId>(0);
+			shok::ModelId ModelOverride = static_cast<shok::ModelId>(0);
 			shok::Position Pos{};
 		};
 		struct playermodeldata {
-			int EntityType = 0;
-			int EntityID = 0;
-			int Player = 0;
-			int ModelOverride = 0;
+			shok::EntityTypeId EntityType = static_cast<shok::EntityTypeId>(0);
+			shok::EntityId EntityID = static_cast<shok::EntityId>(0);
+			shok::PlayerId Player = static_cast<shok::PlayerId>(0);
+			shok::ModelId ModelOverride = static_cast<shok::ModelId>(0);
 		};
 		struct posdata {
 			shok::PositionRot Pos{};
@@ -80,11 +80,11 @@ namespace EGL {
 		playermodeldata GetPlayerModelData() const;
 		posdata GetPosData() const;
 
-		int EntityId; // 2 in entity
+		shok::EntityId EntityId; // 2 in entity
 		PADDINGI(1); // some type of flags
-		int EntityType;
-		int ModelOverride;
-		int PlayerId;
+		shok::EntityTypeId EntityType;
+		shok::ModelId ModelOverride;
+		shok::PlayerId PlayerId;
 	};
 
 	class DelayedEventExecutor {
@@ -101,10 +101,12 @@ namespace EGL {
 		PADDINGI(1);
 		bool StandardBehaviorActive, TaskAdvanceNextTurnNextTask, ValidPosition, IsOnWater;
 		bool UserSelectableFlag, UserControlableFlag, IsVisible, OnlySetTaskListWhenAlive;
-		int TaskListToSet; // 29
+		shok::TaskListId TaskListToSet; // 29
 		shok::Vector<EGL::CGLEBehavior*> Behaviours; // 30, first field in 31
 		shok::TaskState CurrentState; // 34
-		int EntityState, CurrentTaskListID, CurrentTaskIndex; // la37
+		shok::EntityStaus EntityState;
+		shok::TaskListId CurrentTaskListID;
+		int CurrentTaskIndex; // 37
 		shok::Map<shok::TaskState, EGL::IGLEStateHandler*> StateHandlers; // 38
 		shok::Map<shok::Task, EGL::TaskHandler*> TaskHandlers; // 41
 		PADDINGI(1);
@@ -129,7 +131,7 @@ namespace EGL {
 		static inline constexpr int vtp = 0x783E74;
 		static inline constexpr int TypeDesc = 0x8077CC;
 		static inline constexpr int vtp_IEntityDisplay = 0x783E58;
-		static inline constexpr unsigned int Identifier = 0x3F2913E0;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3F2913E0);
 
 	private:
 		virtual void OnDestroy(int i) = 0;
@@ -142,8 +144,8 @@ namespace EGL {
 	public:
 		virtual void SetPosition(shok::Position* p) = 0; // 10 works for settlers, check if it does for other stuff to, called every tick
 		virtual void SetRotation(float r) = 0;
-		virtual int GetSector() = 0;
-		virtual bool IsInSector(int sec) = 0;
+		virtual shok::SectorId GetSector() = 0;
+		virtual bool IsInSector(shok::SectorId sec) = 0;
 	private:
 		virtual void Tick() = 0;
 	public:
@@ -237,7 +239,7 @@ namespace EGL {
 		shok::LeaderCommand EventLeaderGetCurrentCommand();
 		int GetMaxHealth();
 		int LimitedAttachmentGetMaximum(shok::AttachmentType attachType);
-		int ResourceTreeGetNearestSector() const;
+		shok::SectorId ResourceTreeGetNearestSector() const;
 		bool EventIsInvisible(); // GGL::CCamouflageBehavior
 		bool EventIsSettlerOrBuilding();
 		bool EventIsWorker();
@@ -249,7 +251,7 @@ namespace EGL {
 
 		void SetHealth(int h);
 		void Hurt(int dmg);
-		void SetTaskList(int tl);
+		void SetTaskList(shok::TaskListId tl);
 		void SetTaskList(EGL::CGLETaskList* tl);
 		EGL::CGLETaskList* GetCurrentTaskList();
 		EGL::TaskHandler* GetTaskHandler(shok::Task task);
@@ -266,14 +268,14 @@ namespace EGL {
 
 		void Destroy();
 
-		int GetFirstAttachedToMe(shok::AttachmentType attachmentId) const; // other -> this
-		int GetFirstAttachedEntity(shok::AttachmentType attachmentId) const; // this -> other
+		shok::EntityId GetFirstAttachedToMe(shok::AttachmentType attachmentId) const; // other -> this
+		shok::EntityId GetFirstAttachedEntity(shok::AttachmentType attachmentId) const; // this -> other
 		/**
 		fires event eventIdOnThisDetach on otherId, if this gets detached/destroyed, fires eventIdOnOtherDetach on this, if otherId gets detached/destroyed
 		**/
-		void AttachEntity(shok::AttachmentType attachtype, int otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach); // this -> other
-		void DetachObservedEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent); // this -> other
-		void DetachObserverEntity(shok::AttachmentType attachtype, int otherId, bool fireEvent); // other -> this, in shok only triggered by other dying
+		void AttachEntity(shok::AttachmentType attachtype, shok::EntityId otherId, shok::EventIDs eventIdOnThisDetach, shok::EventIDs eventIdOnOtherDetach); // this -> other
+		void DetachObservedEntity(shok::AttachmentType attachtype, shok::EntityId otherId, bool fireEvent); // this -> other
+		void DetachObserverEntity(shok::AttachmentType attachtype, shok::EntityId otherId, bool fireEvent); // other -> this, in shok only triggered by other dying
 
 		void ClearAttackers();
 
@@ -282,10 +284,10 @@ namespace EGL {
 		void CloneAdditionalDataFrom(const CppLogic::EntityAddon::EntityAddonData& other);
 
 		static bool AdvHurtEntity_CheckOverHeal;
-		float CalculateDamageAgainstMe(int damage, int damageclass, float aoeFactor = 1.0f);
-		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, int attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
-		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, int player, int damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
-		CGLEEntity* AdvChangePlayer(int player); // destroys entity, returns new one
+		float CalculateDamageAgainstMe(int damage, shok::DamageClassId damageclass, float aoeFactor = 1.0f);
+		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, shok::PlayerId attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
+		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, shok::PlayerId player, shok::DamageClassId damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
+		CGLEEntity* AdvChangePlayer(shok::PlayerId player); // destroys entity, returns new one
 
 		template<shok::EventIDs id, class EventType, class ObjectType>
 		void CreateEventHandler(ObjectType* ob, void (ObjectType::* handler)(EventType*)) {
@@ -312,7 +314,7 @@ namespace EGL {
 		static void HookExplorationMod();
 		static void HookMaxRange();
 		static void HookDisplayName();
-		static std::multimap<int, int> BuildingMaxHpTechBoni; // ety->techid
+		static std::multimap<shok::EntityTypeId, shok::TechnologyId> BuildingMaxHpTechBoni; // ety->techid
 		static bool UseMaxHPTechBoni;
 		static void HookMaxHP();
 
@@ -335,21 +337,21 @@ namespace EGL {
 
 		static void ActivateEntityChangePlayerFix();
 	private:
-		static int __cdecl FixedChangePlayer(int id, int pl);
+		static shok::EntityId __cdecl FixedChangePlayer(shok::EntityId id, shok::PlayerId pl);
 		static void __cdecl FixedHurtEntity(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg);
-		static void __cdecl FixedHurtEntityAoE(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, int pl, int dmgcl);
+		static void __cdecl FixedHurtEntityAoE(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, shok::PlayerId pl, shok::DamageClassId dmgcl);
 	public:
 		static void HookHurtEntity();
 		static bool HurtEntityCallWithNoAttacker;
 		static CppLogic::EntityAddon::EntityAddonData LastRemovedEntityAddonData;
 
-		static inline EGL::CGLEEntity* (__stdcall* const GetEntityByID)(int id) = reinterpret_cast<EGL::CGLEEntity * (__stdcall*)(int)>(0x5825B4);
+		static inline EGL::CGLEEntity* (__stdcall* const GetEntityByID)(shok::EntityId id) = reinterpret_cast<EGL::CGLEEntity * (__stdcall*)(shok::EntityId)>(0x5825B4);
 		static inline void(__cdecl* const EntityHurtEntity)(EGL::CGLEEntity* attackerObj, EGL::CGLEEntity* targetObj, int damage) = reinterpret_cast<void(__cdecl*)(EGL::CGLEEntity*, EGL::CGLEEntity*, int)>(0x49F358);
-		static inline void(__cdecl* const EntityDealAoEDamage)(EGL::CGLEEntity* attacker, shok::Position* center, float range, int damage, int player, int damageclass) = reinterpret_cast<void(__cdecl*)(EGL::CGLEEntity*, shok::Position*, float, int, int, int)>(0x49F82A);
-		static inline int(__cdecl* const GetEntityIDByScriptName)(const char* str) = reinterpret_cast<int(__cdecl*)(const char* str)>(0x576624);
-		static inline shok::ResourceType(__cdecl* const EntityIDGetProvidedResource)(int id) = reinterpret_cast<shok::ResourceType(__cdecl*)(int id)>(0x4B8489);
-		static inline bool(__cdecl* const EntityIDIsDead)(int id) = reinterpret_cast<bool(__cdecl*)(int)>(0x44B096);
-		static inline int(__cdecl* const EntityIDChangePlayer)(int entityid, int player) = reinterpret_cast<int(__cdecl*)(int, int)>(0x49A6A7);
+		static inline void(__cdecl* const EntityDealAoEDamage)(EGL::CGLEEntity* attacker, shok::Position* center, float range, int damage, shok::PlayerId player, shok::DamageClassId damageclass) = reinterpret_cast<void(__cdecl*)(EGL::CGLEEntity*, shok::Position*, float, int, shok::PlayerId, shok::DamageClassId)>(0x49F82A);
+		static inline shok::EntityId(__cdecl* const GetEntityIDByScriptName)(const char* str) = reinterpret_cast<shok::EntityId(__cdecl*)(const char* str)>(0x576624);
+		static inline shok::ResourceType(__cdecl* const EntityIDGetProvidedResource)(shok::EntityId id) = reinterpret_cast<shok::ResourceType(__cdecl*)(shok::EntityId)>(0x4B8489);
+		static inline bool(__cdecl* const EntityIDIsDead)(shok::EntityId id) = reinterpret_cast<bool(__cdecl*)(shok::EntityId)>(0x44B096);
+		static inline shok::EntityId(__cdecl* const EntityIDChangePlayer)(shok::EntityId entityid, shok::PlayerId player) = reinterpret_cast<shok::EntityId(__cdecl*)(shok::EntityId, shok::PlayerId)>(0x49A6A7);
 
 		static EGL::CGLEEntity* ReplaceEntityWithResourceEntity(EGL::CGLEEntity* e);
 
@@ -377,45 +379,45 @@ namespace EGL {
 		virtual void Drown() = 0; // 39
 	public:
 		shok::Position TargetPosition; // la67
-		byte TargetRotationValid;
+		bool TargetRotationValid;
 		PADDING(3);
 		float TargetRotation;
 		shok::MovementState MovementState; // 70
 
 		static inline constexpr int vtp = 0x783F84;
 		static inline constexpr int TypeDesc = 0x8077EC;
-		static inline constexpr unsigned int Identifier = 0x77D4E427;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x77D4E427);
 
 		void AttackMove(const shok::Position& p);
-		void AttackEntity(int targetId);
+		void AttackEntity(shok::EntityId targetId);
 		void HoldPosition();
 		void Defend();
 		void Move(const shok::Position& p);
-		void LeaderAttachSoldier(int soldierId);
+		void LeaderAttachSoldier(shok::EntityId soldierId);
 		void SettlerExpell();
 		void HeroAbilitySendHawk(shok::Position& p);
 		void HeroAbilityInflictFear();
 		void HeroAbilityPlaceBomb(shok::Position& p);
-		void HeroAbilityPlaceCannon(shok::Position& p, int FoundationType, int CannonType);
+		void HeroAbilityPlaceCannon(shok::Position& p, shok::EntityTypeId FoundationType, shok::EntityTypeId CannonType);
 		void HeroAbilityRangedEffect();
 		void HeroAbilityCircularAttack();
 		void HeroAbilitySummon();
-		void HeroAbilityConvert(int target);
-		void HeroAbilityConvertBuilding(int target);
-		void HeroAbilitySnipe(int tid);
-		void HeroAbilityShuriken(int tid);
+		void HeroAbilityConvert(shok::EntityId target);
+		void HeroAbilityConvertBuilding(shok::EntityId target);
+		void HeroAbilitySnipe(shok::EntityId tid);
+		void HeroAbilityShuriken(shok::EntityId tid);
 		void HeroAbilityMotivateWorkers();
 		void HeroAbilityActivateCamoflage();
-		void ThiefSabotage(int tid);
-		void ThiefDefuse(int tid);
-		void ThiefStealFrom(int tid);
-		void ThiefSecureGoods(int tid);
+		void ThiefSabotage(shok::EntityId tid);
+		void ThiefDefuse(shok::EntityId tid);
+		void ThiefStealFrom(shok::EntityId tid);
+		void ThiefSecureGoods(shok::EntityId tid);
 		void ScoutBinoculars(shok::Position& p);
 		void ScoutFindResource();
 		void ScoutPlaceTorch(shok::Position& p);
 		bool SerfConstructBuilding(GGL::CBuilding* build);
 		bool SerfRepairBuilding(GGL::CBuilding* build);
-		void SerfExtractResource(int id);
+		void SerfExtractResource(shok::EntityId id);
 		void SerfTurnToBattleSerf();
 		void BattleSerfTurnToSerf();
 		void SetTargetRotation(float f);
@@ -442,11 +444,11 @@ namespace EGL {
 
 	class CAmbientSoundEntity : public EGL::CGLEEntity, public IEntitySound {
 	public:
-		int AmbientSoundType;
+		shok::AmbientSoundId AmbientSoundType;
 
 		static inline constexpr int vtp = 0x78568C;
 		static inline constexpr int TypeDesc = 0x839FF0;
-		static inline constexpr unsigned int Identifier = 0xE12A3723;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xE12A3723);
 	};
 	static_assert(offsetof(CAmbientSoundEntity, AmbientSoundType) == 67 * 4);
 
@@ -491,7 +493,7 @@ namespace GGL {
 		};
 
 		PADDINGI(4); // vector?
-		int EntityId;
+		shok::EntityId EntityId;
 		ModifyableValue ExperiencePoints; // 6, 84 in settler
 		ModifyableValue ExperienceLevel;
 		ModifyableValue MovingSpeed; // 10
@@ -516,13 +518,13 @@ namespace GGL {
 			friend class CEntityProfile;
 			EGL::CGLEEntity* Self; // 125 in settler
 			EGL::CGLEEntity* Leader; // self if it is a leader
-			int LeaderId;
+			shok::EntityId LeaderId;
 			GGL::CSettler* SelfSett;
 			bool NeedsInitialization;
 			PADDING(3);
 			int OverheadWidget; // 5, 130 in settler, soldier=4, leader=3, worker=2, serf=1
 			shok::ExperienceClass ExperienceClass; // 6 gets set by checking entitycategories
-			int EntityId; // 7
+			shok::EntityId EntityId; // 7
 			GGL::CGLSettlerProps* Props;
 
 			void CheckInit();
@@ -544,7 +546,7 @@ namespace GGL {
 
 		static inline ModifierEntityDatabase* const GlobalObj = reinterpret_cast<ModifierEntityDatabase*>(0x895E5C);
 
-		float GetModifiedStat(int id, CEntityProfile::ModifierType ty, float initial);
+		float GetModifiedStat(shok::EntityId id, CEntityProfile::ModifierType ty, float initial);
 	};
 
 	class CEvadingEntity : public EGL::CMovingEntity {
@@ -553,7 +555,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x770A7C;
 		static inline constexpr int TypeDesc = 0x810C34;
-		static inline constexpr unsigned int Identifier = 0x42D23A53;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x42D23A53);
 	};
 	static_assert(sizeof(CEvadingEntity) == 75 * 4);
 
@@ -568,7 +570,7 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76E3CC;
 		static inline constexpr int TypeDesc = 0x807858;
 		static inline constexpr int vtp_IEntityDisplay = 0x76E3B0;
-		static inline constexpr unsigned int Identifier = 0x0EDC11EA8;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0EDC11EA8);
 
 		bool IsIdle();
 
@@ -598,7 +600,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x778F7C;
 		static inline constexpr int TypeDesc = 0x812038;
-		static inline constexpr unsigned int Identifier = 0x5D6B737;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5D6B737);
 
 		// defined tasks: TASK_WANDER, TASK_SET_TASK_LIST, TASK_BACK_TO_DEFAULT_TASKLIST, TASK_FLEE
 		// defined events: Animal_XXX, Die, Leader_SetTerritory
@@ -615,7 +617,7 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76FEA4;
 		static inline constexpr int TypeDesc = 0x8118AC;
 		static inline constexpr int vtp_IEntityDisplay = 0x76FE88;
-		static inline constexpr unsigned int Identifier = 0xB0778F47;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB0778F47);
 	};
 
 	class CBuilding : public EGL::CGLEEntity {
@@ -624,7 +626,9 @@ namespace GGL {
 		bool IsActive, IsRegistered, IsUpgrading, IsOvertimeActive; // 70
 		bool WorkerAlarmModeActive;
 		PADDING(3);
-		int MaxNumWorkers, CurrentTechnology, LatestAttackTurn, MostRecentDepartureTurn; // 72
+		int MaxNumWorkers;
+		shok::TechnologyId CurrentTechnology;
+		int LatestAttackTurn, MostRecentDepartureTurn; // 72
 		float ConstructionProgress, RepairProgress, UpgradeProgress; //la78
 		PADDINGI(2);// list Slots with NumberOfRepairingSerfs? 79
 		int NumberOfRepairingSerfs;
@@ -635,15 +639,15 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76EB94;
 		static inline constexpr int TypeDesc = 0x807898;
 		static inline constexpr int vtp_IEntityDisplay = 0x76EB78;
-		static inline constexpr unsigned int Identifier = 0x15EBDB60;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x15EBDB60);
 
-		int GetConstructionSite() const;
+		shok::EntityId GetConstructionSite() const;
 		int GetNearestFreeConstructionSlotFor(shok::Position* p);
 		int GetNearestFreeRepairSlotFor(shok::Position* p);
 		bool IsConstructionFinished() const;
 		bool IsIdle();
 		bool IsIdle(bool forRecruitemnt);
-		int GetTechnologyInResearch();
+		shok::TechnologyId GetTechnologyInResearch();
 		int GetCannonProgress();
 		float GetMarketProgress();
 		// returns max time if not currently upgrading
@@ -652,25 +656,25 @@ namespace GGL {
 
 		void StartUpgrade();
 		void CancelUpgrade();
-		void CommandBuildCannon(int entitytype);
-		void CommandRecruitSoldierForLeader(int id);
+		void CommandBuildCannon(shok::EntityTypeId entitytype);
+		void CommandRecruitSoldierForLeader(shok::EntityId id);
 		void ActivateOvertime();
 		void DeactivateOvertime();
 		void BarracksRecruitGroups();
 		void BarracksRecruitLeaders();
 		void HQBuySerf();
 		void SellBuilding();
-		void StartResearch(int tech);
+		void StartResearch(shok::TechnologyId tech);
 		void CancelResearch();
 		void MarketStartTrade(shok::ResourceType ResourceTypeSell, shok::ResourceType ResourceTypeBuy, float BuyAmount);
 		void MarketCancelTrade();
-		int BuyLeaderByType(int ety);
+		shok::EntityId BuyLeaderByType(shok::EntityTypeId ety);
 		shok::Position GetAbsoluteApproachPos();
 		bool IsHealthBurning(int health);
 		bool IsHealthBurning();
 		void CatchFire();
-		int GetWorkTaskList(); // gets first unused tasklist, or last tasklist
-		int GetWorkerType() const;
+		shok::TaskListId GetWorkTaskList(); // gets first unused tasklist, or last tasklist
+		shok::EntityTypeId GetWorkerType() const;
 
 		// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 
@@ -683,12 +687,12 @@ namespace GGL {
 
 	class CConstructionSite : public CBuilding {
 	public:
-		int BuildingType;
+		shok::EntityTypeId BuildingType;
 
 		static inline constexpr int vtp = 0x77003C;
 		static inline constexpr int TypeDesc = 0x8078DC;
 		static inline constexpr int vtp_IEntityDisplay = 0x77001C;
-		static inline constexpr unsigned int Identifier = 0x2B5B9C80;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2B5B9C80);
 	};
 	static_assert(offsetof(CConstructionSite, BuildingType) == 83 * 4);
 	static_assert(sizeof(CConstructionSite) == 84 * 4);
@@ -699,7 +703,7 @@ namespace GGL {
 		static inline constexpr int vtp = 0x77805C;
 		static inline constexpr int TypeDesc = 0x812054;
 		static inline constexpr int vtp_IEntityDisplay = 0x778040;
-		static inline constexpr unsigned int Identifier = 0x3736FF8E;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3736FF8E);
 
 	private:
 		void __thiscall ApplyHeightOverride();
@@ -710,24 +714,24 @@ namespace GGL {
 namespace EGL {
 	class CGLEEntityCreator : public BB::IObject {
 	public:
-		int EntityType = 0;
+		shok::EntityTypeId EntityType = static_cast<shok::EntityTypeId>(0);
 		shok::PositionRot Pos = { 0,0,0 };
 		int Flags = 0; // 5
-		int PlayerId = 0;
+		shok::PlayerId PlayerId = static_cast<shok::PlayerId>(0);
 		int Health = 0; // 7
 		char* ScriptName = nullptr; // use shok::Malloc, gets freed by destructor
 		char* ScriptCommandLine = nullptr; // use shok::Malloc, gets freed by destructor
-		int AmbientSoundType = 0;
+		shok::AmbientSoundId AmbientSoundType = static_cast<shok::AmbientSoundId>(0);
 		float Scale = 0; // 11
 
 		static inline constexpr int vtp = 0x766B50;
 		static inline constexpr int TypeDesc = 0x807874;
-		static inline constexpr unsigned int Identifier = 0x753286D;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x753286D);
 
 		// i have to implement them so the compiler stops complaining.
 		// i call the original constructor and replace the vtable with that, so they really dont matter.
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
-		virtual void* __stdcall CastToIdentifier(unsigned int id) override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 		virtual ~CGLEEntityCreator() override;
 
 		CGLEEntityCreator();
@@ -739,11 +743,11 @@ namespace EGL {
 namespace GGL {
 	class CGLConstructionSiteCreator : public EGL::CGLEEntityCreator {
 	public:
-		int BuildingType = 0; // set EntityType to construction site type (from building props) and BuildingType to the building youactually want to construct
+		shok::EntityTypeId BuildingType = static_cast<shok::EntityTypeId>(0); // set EntityType to construction site type (from building props) and BuildingType to the building youactually want to construct
 
 		static inline constexpr int vtp = 0x770114;
 		static inline constexpr int TypeDesc = 0x811A80;
-		static inline constexpr unsigned int Identifier = 0xF088740;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF088740);
 
 		CGLConstructionSiteCreator();
 	};
@@ -753,7 +757,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x774898;
 		static inline constexpr int TypeDesc = 0x811974;
-		static inline constexpr unsigned int Identifier = 0x85589767;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x85589767);
 
 		CResourceDoodadCreator();
 	};

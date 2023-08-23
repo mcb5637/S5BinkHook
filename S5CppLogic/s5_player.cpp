@@ -108,8 +108,8 @@ void GGL::CPlayerAttractionHandler::CheckWorkerAttachment(bool forceReAttach)
 	shok_playerattractionhandler_attachworkers(this, forceReAttach);
 }
 
-inline bool(__thiscall* const playerattractionhand_attachwork)(GGL::CPlayerAttractionHandler* th, int w, int b) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerAttractionHandler*, int, int)>(0x4C383E);
-bool GGL::CPlayerAttractionHandler::AttachWorker(int worker, int building)
+inline bool(__thiscall* const playerattractionhand_attachwork)(GGL::CPlayerAttractionHandler* th, shok::EntityId w, shok::EntityId b) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerAttractionHandler*, shok::EntityId, shok::EntityId)>(0x4C383E);
+bool GGL::CPlayerAttractionHandler::AttachWorker(shok::EntityId worker, shok::EntityId building)
 {
 	return playerattractionhand_attachwork(this, worker, building);
 }
@@ -120,7 +120,7 @@ void __thiscall GGL::CPlayerAttractionHandler::CheckPaydayHook()
 	if (GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback(this);
 	GGL::CEventGoodsTraded ev{ shok::EventIDs::CppLogicEvent_OnPayday, shok::ResourceType::Gold, shok::ResourceType::GoldRaw,
-		static_cast<float>(GetWorkerPaydayIncome()), PlayerID, static_cast<float>(GetLeaderPaydayCost())};
+		static_cast<float>(GetWorkerPaydayIncome()), static_cast<shok::EntityId>(static_cast<int>(PlayerID)), static_cast<float>(GetLeaderPaydayCost())};
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
 void __declspec(naked) hookedcheckpayday() {
@@ -146,26 +146,26 @@ void GGL::CPlayerAttractionHandler::HookCheckPayday()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday, reinterpret_cast<void*>(0x4C275E));
 }
 
-static inline int(__thiscall* const upgrademanager_getucatbybuilding)(GGL::CUpgradeManager* th, int id) = reinterpret_cast<int(__thiscall*)(GGL::CUpgradeManager*, int)>(0x4B3CA6);
-int GGL::CUpgradeManager::GetUpgradeCategoryOfEntityType(int etype)
+static inline shok::UpgradeCategoryId(__thiscall* const upgrademanager_getucatbybuilding)(GGL::CUpgradeManager* th, shok::EntityTypeId id) = reinterpret_cast<shok::UpgradeCategoryId(__thiscall*)(GGL::CUpgradeManager*, shok::EntityTypeId)>(0x4B3CA6);
+shok::UpgradeCategoryId GGL::CUpgradeManager::GetUpgradeCategoryOfEntityType(shok::EntityTypeId etype)
 {
 	return upgrademanager_getucatbybuilding(this, etype);
 }
 
-static inline int(__thiscall* const upmanager_getetybyucat)(GGL::CUpgradeManager* th, int ucat) = reinterpret_cast<int(__thiscall*)(GGL::CUpgradeManager*, int)>(0x4B3280);
-int GGL::CUpgradeManager::GetTypeByUCat(int ucat)
+static inline shok::EntityTypeId(__thiscall* const upmanager_getetybyucat)(GGL::CUpgradeManager* th, shok::UpgradeCategoryId ucat) = reinterpret_cast<shok::EntityTypeId(__thiscall*)(GGL::CUpgradeManager*, shok::UpgradeCategoryId)>(0x4B3280);
+shok::EntityTypeId GGL::CUpgradeManager::GetTypeByUCat(shok::UpgradeCategoryId ucat)
 {
 	return upmanager_getetybyucat(this, ucat);
 }
 
-static inline void(__thiscall* const upmanager_addcat)(GGL::CUpgradeManager* th, int ucat, int ety) = reinterpret_cast<void(__thiscall*)(GGL::CUpgradeManager*, int, int)>(0x4B3D42);
-void GGL::CSettlerUpgradeManager::AddCategory(int ucat, int firstEntity)
+static inline void(__thiscall* const upmanager_addcat)(GGL::CUpgradeManager* th, shok::UpgradeCategoryId ucat, shok::EntityTypeId ety) = reinterpret_cast<void(__thiscall*)(GGL::CUpgradeManager*, shok::UpgradeCategoryId, shok::EntityTypeId)>(0x4B3D42);
+void GGL::CSettlerUpgradeManager::AddCategory(shok::UpgradeCategoryId ucat, shok::EntityTypeId firstEntity)
 {
 	upmanager_addcat(this, ucat, firstEntity);
 }
 
-static inline GGL::CBuildingUpgradeManager::ScholarInfo* (__thiscall* const buildupmanager_getscolarinfo)(void* th, int* ucat) = reinterpret_cast<GGL::CBuildingUpgradeManager::ScholarInfo * (__thiscall*)(void*, int*)>(0x4CA5A2);
-void GGL::CBuildingUpgradeManager::AddCategory(int ucat, int firstEntity, int maxscholar)
+static inline GGL::CBuildingUpgradeManager::ScholarInfo* (__thiscall* const buildupmanager_getscolarinfo)(void* th, shok::UpgradeCategoryId* ucat) = reinterpret_cast<GGL::CBuildingUpgradeManager::ScholarInfo * (__thiscall*)(void*, shok::UpgradeCategoryId*)>(0x4CA5A2);
+void GGL::CBuildingUpgradeManager::AddCategory(shok::UpgradeCategoryId ucat, shok::EntityTypeId firstEntity, int maxscholar)
 {
 	upmanager_addcat(this, ucat, firstEntity);
 	auto* i = buildupmanager_getscolarinfo(&ScholarInfoElement, &ucat);
@@ -179,8 +179,8 @@ void GGL::CTradeManager::ResData::AdjustPrice(float amount, bool buyed)
 	trademng_resdata_adjust(this, amount, buyed);
 }
 
-static inline void(__thiscall* const tradeorder_setdata)(GGL::CTradeManager::TradeOrder* th, int pl, shok::ResourceType s, shok::ResourceType bu, float am) = reinterpret_cast<void(__thiscall*)(GGL::CTradeManager::TradeOrder*, int, shok::ResourceType, shok::ResourceType, float)>(0x4E7CFF);
-void GGL::CTradeManager::TradeOrder::SetData(int player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm)
+static inline void(__thiscall* const tradeorder_setdata)(GGL::CTradeManager::TradeOrder* th, shok::PlayerId pl, shok::ResourceType s, shok::ResourceType bu, float am) = reinterpret_cast<void(__thiscall*)(GGL::CTradeManager::TradeOrder*, shok::PlayerId, shok::ResourceType, shok::ResourceType, float)>(0x4E7CFF);
+void GGL::CTradeManager::TradeOrder::SetData(shok::PlayerId player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm)
 {
 	tradeorder_setdata(this, player, sellTy, buyTy, buyAm);
 }
@@ -235,53 +235,54 @@ GGL::CPreConditionPredicate::CPreConditionPredicate()
 	*reinterpret_cast<int*>(this) = vtp;
 }
 
-inline bool(__thiscall* const techmng_addprograw)(GGL::PlayerTechManager* th, int t, float a) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, int, float)>(0x4A1A29);
-bool GGL::PlayerTechManager::AddTechProgressRaw(int techId, float amount)
+inline bool(__thiscall* const techmng_addprograw)(GGL::PlayerTechManager* th, shok::TechnologyId t, float a) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, float)>(0x4A1A29);
+bool GGL::PlayerTechManager::AddTechProgressRaw(shok::TechnologyId techId, float amount)
 {
 	return techmng_addprograw(this, techId, amount);
 }
-inline void(__thiscall* const techmng_researched)(GGL::PlayerTechManager* th, int t, int id) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, int, int)>(0x4A1C6D);
-void GGL::PlayerTechManager::TechResearched(int techId, int researcherId)
+inline void(__thiscall* const techmng_researched)(GGL::PlayerTechManager* th, shok::TechnologyId t, shok::EntityId id) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, shok::EntityId)>(0x4A1C6D);
+void GGL::PlayerTechManager::TechResearched(shok::TechnologyId techId, shok::EntityId researcherId)
 {
 	techmng_researched(this, techId, researcherId);
 }
-inline void(__thiscall* const techmng_addprogworker)(GGL::PlayerTechManager* th, int t, float a) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, int, float)>(0x4A1D02);
-void GGL::PlayerTechManager::AddTechProgressWorker(int techId, float amount)
+inline void(__thiscall* const techmng_addprogworker)(GGL::PlayerTechManager* th, shok::TechnologyId t, float a) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, float)>(0x4A1D02);
+void GGL::PlayerTechManager::AddTechProgressWorker(shok::TechnologyId techId, float amount)
 {
 	techmng_addprogworker(this, techId, amount);
 }
-inline bool(__thiscall* const techmng_checktechreq)(GGL::PlayerTechManager* th, int t, const GGL::CTechConditionPredicate* p) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, int, const GGL::CTechConditionPredicate*)>(0x4A2640);
-bool GGL::PlayerTechManager::CheckTechnologyRequirementsFor(int tech, const CTechConditionPredicate& p)
+inline bool(__thiscall* const techmng_checktechreq)(GGL::PlayerTechManager* th, shok::TechnologyId t, const GGL::CTechConditionPredicate* p) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, const GGL::CTechConditionPredicate*)>(0x4A2640);
+bool GGL::PlayerTechManager::CheckTechnologyRequirementsFor(shok::TechnologyId tech, const CTechConditionPredicate& p)
 {
 	return techmng_checktechreq(this, tech, &p);
 }
-inline bool(__thiscall* const techmng_checkallreq)(GGL::PlayerTechManager* th, int t, const GGL::CTechConditionPredicate* p) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, int, const GGL::CTechConditionPredicate*)>(0x4A2772);
-bool GGL::PlayerTechManager::CheckAllRequirementsFor(int tech, const CTechConditionPredicate& p)
+inline bool(__thiscall* const techmng_checkallreq)(GGL::PlayerTechManager* th, shok::TechnologyId t, const GGL::CTechConditionPredicate* p) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, const GGL::CTechConditionPredicate*)>(0x4A2772);
+bool GGL::PlayerTechManager::CheckAllRequirementsFor(shok::TechnologyId tech, const CTechConditionPredicate& p)
 {
 	return techmng_checkallreq(this, tech, &p);
 }
-inline shok::TechState(__thiscall* const techmng_getstate)(GGL::PlayerTechManager* th, int t) = reinterpret_cast<shok::TechState(__thiscall*)(GGL::PlayerTechManager*, int)>(0x4A2A8D);
-shok::TechState GGL::PlayerTechManager::GetTechState(int tech)
+inline shok::TechState(__thiscall* const techmng_getstate)(GGL::PlayerTechManager* th, shok::TechnologyId t) = reinterpret_cast<shok::TechState(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId)>(0x4A2A8D);
+shok::TechState GGL::PlayerTechManager::GetTechState(shok::TechnologyId tech)
 {
 	return techmng_getstate(this, tech);
 }
-inline void(__thiscall* const techmng_forceresearch)(GGL::PlayerTechManager* th, int t) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, int)>(0x4A1CE0);
-void GGL::PlayerTechManager::ForceResearch(int tech)
+inline void(__thiscall* const techmng_forceresearch)(GGL::PlayerTechManager* th, shok::TechnologyId t) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId)>(0x4A1CE0);
+void GGL::PlayerTechManager::ForceResearch(shok::TechnologyId tech)
 {
 	return techmng_forceresearch(this, tech);
 }
 
-void GGL::PlayerTechManager::ForceResearchNoFeedback(int tech)
+void GGL::PlayerTechManager::ForceResearchNoFeedback(shok::TechnologyId tech)
 {
-	TechnologyState[tech].TechStatus = shok::TechState::Researched;
-	TechnologyState[tech].ResearchProgress = 0;
+	int te = static_cast<int>(tech);
+	TechnologyState[te].TechStatus = shok::TechState::Researched;
+	TechnologyState[te].ResearchProgress = 0;
 
 	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 	int t = L.GetTop();
 	L.Push("GameCallback_OnTechnologyResearched");
 	L.GetGlobal();
-	L.Push(PlayerID);
-	L.Push(tech);
+	L.Push(static_cast<int>(PlayerID));
+	L.Push(te);
 	L.Push(0);
 	L.PCall(3, 0);
 	L.SetTop(t);
@@ -289,8 +290,8 @@ void GGL::PlayerTechManager::ForceResearchNoFeedback(int tech)
 	(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(PlayerID)->Statistics.AddTechResearched(tech);
 }
 
-static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, int ownerent, int offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, int, int, const char*)>(0x4BE63E);
-void GGL::PlayerTributesManager::SetTributeData(int tid, const shok::CostInfo& c, int ownerEntityId, int offeringPlayerId, const char* text)
+static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, shok::EntityId ownerent, shok::PlayerId offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, shok::EntityId, shok::PlayerId, const char*)>(0x4BE63E);
+void GGL::PlayerTributesManager::SetTributeData(int tid, const shok::CostInfo& c, shok::EntityId ownerEntityId, shok::PlayerId offeringPlayerId, const char* text)
 {
 	tributemanager_setdata(this, tid, &c, ownerEntityId, offeringPlayerId, text);
 }
@@ -331,8 +332,8 @@ unsigned int __stdcall GGL::CGameStatistics::GetClassIdentifier() const
 	return 0x964BEA57;
 }
 
-inline void(__thiscall* const gamestatistics_addtech)(GGL::CGameStatistics* th, int t) = reinterpret_cast<void(__thiscall*)(GGL::CGameStatistics*, int)>(0x4C15A1);
-void GGL::CGameStatistics::AddTechResearched(int tech)
+inline void(__thiscall* const gamestatistics_addtech)(GGL::CGameStatistics* th, shok::TechnologyId t) = reinterpret_cast<void(__thiscall*)(GGL::CGameStatistics*, shok::TechnologyId)>(0x4C15A1);
+void GGL::CGameStatistics::AddTechResearched(shok::TechnologyId tech)
 {
 	gamestatistics_addtech(this, tech);
 }
@@ -347,14 +348,14 @@ void GGL::CGameStatistics::OnResMined(shok::ResourceType rt, float am)
 	gamestatistics_resmined(this, rt, am);
 }
 
-static inline shok::DiploState(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(int* d, int p) = reinterpret_cast<shok::DiploState(__thiscall*)(int* d, int p)>(0x4B4D5B);
-shok::DiploState GGL::CPlayerStatus::GetDiploStateTo(int p)
+static inline shok::DiploState(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(int* d, shok::PlayerId p) = reinterpret_cast<shok::DiploState(__thiscall*)(int* d, shok::PlayerId p)>(0x4B4D5B);
+shok::DiploState GGL::CPlayerStatus::GetDiploStateTo(shok::PlayerId p)
 {
 	return shok_GGL_CPlayerStatus_getDiploState(DiplomacyData, p);
 }
 
-static inline shok::TechState(__thiscall* const playerstatus_gettechstatus)(GGL::PlayerTechManager* th, int tech) = reinterpret_cast<shok::TechState(__thiscall*)(GGL::PlayerTechManager*, int)>(0x4A2A8D);
-shok::TechState GGL::CPlayerStatus::GetTechStatus(int tech)
+static inline shok::TechState(__thiscall* const playerstatus_gettechstatus)(GGL::PlayerTechManager* th, shok::TechnologyId tech) = reinterpret_cast<shok::TechState(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId)>(0x4A2A8D);
+shok::TechState GGL::CPlayerStatus::GetTechStatus(shok::TechnologyId tech)
 {
 	return playerstatus_gettechstatus(&TechnologyStates, tech);
 }
@@ -403,14 +404,14 @@ bool GGL::CPlayerStatus::HasResourcesFeedback(const shok::CostInfo& c, bool feed
 	return playerstatus_hasresfeedback(this, &c, feedback);
 }
 
-bool GGL::CPlayerStatus::ArePlayersHostile(int p1, int p2)
+bool GGL::CPlayerStatus::ArePlayersHostile(shok::PlayerId p1, shok::PlayerId p2)
 {
 	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p1);
 	if (!ps)
 		return false;
 	return ps->GetDiploStateTo(p2) == shok::DiploState::Hostile;
 }
-bool GGL::CPlayerStatus::ArePlayersFriendly(int p1, int p2)
+bool GGL::CPlayerStatus::ArePlayersFriendly(shok::PlayerId p1, shok::PlayerId p2)
 {
 	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p1);
 	if (!ps)
@@ -418,8 +419,8 @@ bool GGL::CPlayerStatus::ArePlayersFriendly(int p1, int p2)
 	return ps->GetDiploStateTo(p2) == shok::DiploState::Friendly;
 }
 
-bool (*GGL::CPlayerStatus::CanPlaceBuildingCallback)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) = nullptr;
-int __stdcall GGL::CPlayerStatus::CanPlaceBuildingHook(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId)
+bool (*GGL::CPlayerStatus::CanPlaceBuildingCallback)(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId) = nullptr;
+int __stdcall GGL::CPlayerStatus::CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId)
 {
 	if (GGL::CPlayerStatus::CanPlaceBuildingCallback)
 		return GGL::CPlayerStatus::CanPlaceBuildingCallback(entitytype, player, pos, rotation, buildOnId);

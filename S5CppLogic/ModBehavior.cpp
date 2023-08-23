@@ -11,7 +11,7 @@ void CppLogic::Mod::RegisterClasses()
     f->AddClassToFactory<ResourceTrackerBehavior>();
 }
 
-unsigned int __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
 {
     return Identifier;
 }
@@ -30,12 +30,12 @@ const BB::SerializationData CppLogic::Mod::FormationSpacedBehaviorProps::Seriali
     BB::SerializationData::GuardData(),
 };
 
-unsigned int __stdcall CppLogic::Mod::FormationSpacedBehavior::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehavior::GetClassIdentifier() const
 {
     return Identifier;
 }
 
-void* __stdcall CppLogic::Mod::FormationSpacedBehavior::CastToIdentifier(unsigned int id)
+void* __stdcall CppLogic::Mod::FormationSpacedBehavior::CastToIdentifier(shok::ClassId id)
 {
     if (id == IFormationBehaviorExtProvider::Identifier)
         return static_cast<IFormationBehaviorExtProvider*>(this);
@@ -71,7 +71,7 @@ void CppLogic::Mod::FormationSpacedBehavior::operator delete(void* p) {
     shok::Free(p);
 }
 
-unsigned int __stdcall CppLogic::Mod::ResourceTrackerBehavior::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::Mod::ResourceTrackerBehavior::GetClassIdentifier() const
 {
     return Identifier;
 }
@@ -91,7 +91,7 @@ void CppLogic::Mod::ResourceTrackerBehavior::operator delete(void* p) {
     shok::Free(p);
 }
 
-void __thiscall CppLogic::Mod::ResourceTrackerBehavior::AddHandlers(int id)
+void __thiscall CppLogic::Mod::ResourceTrackerBehavior::AddHandlers(shok::EntityId id)
 {
     EntityId = id;
     auto* e = EGL::CGLEEntity::GetEntityByID(id);

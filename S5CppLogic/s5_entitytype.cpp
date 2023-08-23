@@ -53,20 +53,21 @@ bool GGlue::CGlueEntityProps::IsOfCategory(shok::EntityCategory cat) const
 	return false;
 }
 
-unsigned int __stdcall GGlue::CGlueEntityProps::GetClassIdentifier() const {
+shok::ClassId __stdcall GGlue::CGlueEntityProps::GetClassIdentifier() const {
 	return Identifier;
 }
 
-GGlue::CGlueEntityProps* EGL::CGLEEntitiesProps::GetEntityType(int i)
+GGlue::CGlueEntityProps* EGL::CGLEEntitiesProps::GetEntityType(shok::EntityTypeId id)
 {
+	int i = static_cast<int>(id);
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	if (i <= 0 || i >= static_cast<int>(m->EntityTypes.size()))
 		return nullptr;
 	return m->EntityTypes.data() + i;
 }
 
-const char* (__stdcall* const getentitydisplayname)(int i) = reinterpret_cast<const char* (__stdcall* const)(int i)>(0x52EFCF);
-const char* EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(int i)
+const char* (__stdcall* const getentitydisplayname)(shok::EntityTypeId i) = reinterpret_cast<const char* (__stdcall* const)(shok::EntityTypeId i)>(0x52EFCF);
+const char* EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(shok::EntityTypeId i)
 {
 	return getentitydisplayname(i);
 }

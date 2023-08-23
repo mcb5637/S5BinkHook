@@ -225,7 +225,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 
 
 protected:
-	virtual void AddHandlers(int id) override {
+	virtual void AddHandlers(shok::EntityId id) override {
 		EntityId = id;
 		auto* e = EGL::CGLEEntity::GetEntityByID(id);
 		e->CreateEventHandler<shok::EventIDs::MoveCommand_Move>(this, &BreakOnCmdBehavior::EventMove);
@@ -260,8 +260,8 @@ public:
 	{
 		shok::Free(p);
 	}
-	static inline constexpr unsigned int Identifier = 0x1006;
-	virtual unsigned int __stdcall GetClassIdentifier() const {
+	static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1006);
+	virtual shok::ClassId __stdcall GetClassIdentifier() const {
 		return Identifier;
 	}
 };
@@ -296,7 +296,7 @@ int Test(lua::State Ls) {
 	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 	//L.Push((int)&p->ExplorationUpdate);
 	auto id = L.CheckEnum<shok::SoundId>(1);
-	L.PushEnum(id);
+	L.Push(id);
 	L.Push(CppLogic::GetIdManager<shok::SoundId>().GetNameByID(id));
 	return 2;
 }

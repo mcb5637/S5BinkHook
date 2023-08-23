@@ -234,18 +234,18 @@ namespace CppLogic::Iterator {
 		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
 		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
-		PlayerEntityIterator(int player, const Predicate<EGL::CGLEEntity>* const p);
+		PlayerEntityIterator(shok::PlayerId player, const Predicate<EGL::CGLEEntity>* const p);
 	};
 	// you may not create/destroy entities while iterating
 	class MultiPlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 	public:
-		std::array<int, 9> Players;
+		std::array<shok::PlayerId, 9> Players;
 	protected:
 		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
 		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
 		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
-		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<int> pls);
+		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<shok::PlayerId> pls);
 	};
 	// you may not create/destroy entities while iterating
 	// area defines only the regions to search, you need a predicate for an exact area check
@@ -395,15 +395,15 @@ namespace CppLogic::Iterator {
 
 
 	class EntityPredicateOfType : public Predicate<EGL::CGLEEntity> {
-		int ety;
+		shok::EntityTypeId ety;
 	public:
-		EntityPredicateOfType(int ety);
+		EntityPredicateOfType(shok::EntityTypeId ety);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
 	class EntityPredicateOfPlayer : public Predicate<EGL::CGLEEntity> {
-		int player;
+		shok::PlayerId player;
 	public:
-		EntityPredicateOfPlayer(int pl);
+		EntityPredicateOfPlayer(shok::PlayerId pl);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
 	class EntityPredicateOfEntityCategory : public Predicate<EGL::CGLEEntity> {
@@ -419,9 +419,9 @@ namespace CppLogic::Iterator {
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
 	class EntityPredicateOfUpgradeCategory : public Predicate<EGL::CGLEEntity> {
-		int ucat;
+		shok::UpgradeCategoryId ucat;
 	public:
-		EntityPredicateOfUpgradeCategory(int category);
+		EntityPredicateOfUpgradeCategory(shok::UpgradeCategoryId category);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
 	class EntityPredicateIsNotFleeingFrom : public Predicate<EGL::CGLEEntity> {
@@ -504,31 +504,31 @@ namespace CppLogic::Iterator {
 
 	class EntityPredicateOfAnyPlayer : public Predicate<EGL::CGLEEntity> {
 	public:
-		std::array<int, 9> players;
+		std::array<shok::PlayerId, 9> players;
 		EntityPredicateOfAnyPlayer();
-		EntityPredicateOfAnyPlayer(std::initializer_list<int> pl);
+		EntityPredicateOfAnyPlayer(std::initializer_list<shok::PlayerId> pl);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
-		static int FillHostilePlayers(std::array<int, 9>& players, int pl);
-		static int FillFriendlyPlayers(std::array<int, 9>& players, int pl, bool addSelf);
+		static int FillHostilePlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl);
+		static int FillFriendlyPlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl, bool addSelf);
 	};
 	class EntityPredicateOfAnyType : public Predicate<EGL::CGLEEntity> {
 	public:
-		std::vector<int> entityTypes;
+		std::vector<shok::EntityTypeId> entityTypes;
 		EntityPredicateOfAnyType() = default;
-		EntityPredicateOfAnyType(std::initializer_list<int> ety);
+		EntityPredicateOfAnyType(std::initializer_list<shok::EntityTypeId> ety);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
 
 	class EffectPredicateOfType : public Predicate<EGL::CEffect> {
-		int Type;
+		shok::EffectTypeId Type;
 	public:
-		EffectPredicateOfType(int ty);
+		EffectPredicateOfType(shok::EffectTypeId ty);
 		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
 	};
 	class EffectPredicateOfPlayer : public Predicate<EGL::CEffect> {
-		int Player;
+		shok::PlayerId Player;
 	public:
-		EffectPredicateOfPlayer(int pl);
+		EffectPredicateOfPlayer(shok::PlayerId pl);
 		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
 	};
 	class EffectPredicateIsArrow : public Predicate<EGL::CEffect> {

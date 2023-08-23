@@ -100,7 +100,7 @@ namespace shok {
 		int UpscaledFlag;
 		RWE::P2D::Rt2dBrush* Brush;
 
-		void RenderText(const char* txt, int fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
+		void RenderText(const char* txt, shok::FontId fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
 		void SetTextRenderColor(shok::Color c);
 		void RenderMaterial(const EGUIX::CMaterial* mat, bool scale, const EGUIX::Rect* pos);
 		void RenderLine(const EGUIX::Color* c, bool scale, float x1, float y1, float x2, float y2);
@@ -128,7 +128,7 @@ namespace EToolsManager {
 		void* Data; // GS3DTools::CAppCamera
 		unsigned int Ident; // 0xCA334412
 	public:
-		static inline constexpr unsigned int Identifier = 0x425576F4; // from CRwCameraHandler casttoident
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x425576F4); // from CRwCameraHandler casttoident
 		static inline constexpr int vtp = 0x78061C;
 	};
 
@@ -238,7 +238,7 @@ namespace ERwTools {
 		virtual void set51() = 0;
 		virtual void set52() = 0;
 	public:
-		virtual void SetEntityIDToFollow(int id) = 0;
+		virtual void SetEntityIDToFollow(shok::EntityId id) = 0;
 		virtual void SetControlMode(int mode) = 0; // 2 cutscene, 0 normal
 		virtual bool GetScreenCoord(float x, float y, float z, float* xout, float* yout) = 0; // 58
 	private:
@@ -249,13 +249,13 @@ namespace ERwTools {
 
 
 
-		static inline constexpr unsigned int Identifier = 0xCB15D84;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCB15D84);
 	};
 	class ICameraMovement {
 	private:
 		virtual void uk2() = 0;
 	public:
-		static inline constexpr unsigned int Identifier = 0x3D8FC4E4;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3D8FC4E4);
 	};
 	class ICameraSettings {
 	public:
@@ -272,7 +272,7 @@ namespace ERwTools {
 		virtual void ResetFOV() = 0;
 
 
-		static inline constexpr unsigned int Identifier = 0x758445A4;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x758445A4);
 	};
 	class CRwCameraHandler : public BB::IObject, public ICameraHandle, public ICameraMovement, public ICameraSettings {
 	public:
@@ -315,7 +315,7 @@ namespace ERwTools {
 		float ZoomWheelFactor; // 45
 		PADDINGI(7);
 		EToolsManager::CSimpleTool SimpleTool; // 53
-		int EntityIDToFollow;
+		shok::EntityId EntityIDToFollow;
 		int ScrollGTSLastGameTurn;
 		float ScrollGTSLastLookAtX;
 		float ScrollGTSLastLookAtY;
@@ -349,7 +349,7 @@ namespace ERwTools {
 
 	public:
 		static inline constexpr int vtp = 0x77AD98;
-		static inline constexpr unsigned int Identifier = 0x45CAFEB1;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x45CAFEB1);
 
 		static inline ICameraHandle** const GlobalObj = reinterpret_cast<ICameraHandle**>(0x87EC68);
 		static inline float* const CutsceneFarClipPlaneMax = reinterpret_cast<float*>(0x77A7E8);
@@ -370,7 +370,7 @@ namespace ERwTools {
 
 
 		static constexpr int vtp = 0x77AF20;
-		static constexpr unsigned int Identifier = 0x45CAFEBB;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x45CAFEBB);
 
 		static void HookEnableZoom(bool ena);
 	};
@@ -380,17 +380,17 @@ namespace EGL {
 	class IGLEGUIInterface {
 	public:
 		virtual ~IGLEGUIInterface() = default;
-		virtual bool GetEntityPosition(int id, float* x, float* y, float* r) = 0;
-		virtual int GetEntityPlayer(int id) = 0;
-		virtual int GetEntityTypeByName(const char* typeName) = 0;
-		virtual int GetEntityType(int id) = 0;
-		virtual float GetDistanceTo(int id, float x, float y) = 0; // 5
-		virtual const char* GetEntityTypeName(int ety) = 0;
-		virtual int GetEntityHealth(int id) = 0;
-		virtual bool IsEntityValid(int id) = 0;
-		virtual bool IsEntityState0x10003(int id) = 0;
-		virtual bool IsEntityOfCategory(int id, shok::EntityCategory cat) = 0; // 10
-		virtual bool IsPlayerActive(int pl) = 0; // checks EGL::PlayerManager, not GGL::CPlayerStatus
+		virtual bool GetEntityPosition(shok::EntityId id, float* x, float* y, float* r) = 0;
+		virtual shok::PlayerId GetEntityPlayer(shok::EntityId id) = 0;
+		virtual shok::EntityTypeId GetEntityTypeByName(const char* typeName) = 0;
+		virtual shok::EntityTypeId GetEntityType(shok::EntityId id) = 0;
+		virtual float GetDistanceTo(shok::EntityId id, float x, float y) = 0; // 5
+		virtual const char* GetEntityTypeName(shok::EntityTypeId ety) = 0;
+		virtual int GetEntityHealth(shok::EntityId id) = 0;
+		virtual bool IsEntityValid(shok::EntityId id) = 0;
+		virtual bool IsEntityState0x10003(shok::EntityId id) = 0;
+		virtual bool IsEntityOfCategory(shok::EntityId id, shok::EntityCategory cat) = 0; // 10
+		virtual bool IsPlayerActive(shok::PlayerId pl) = 0; // checks EGL::PlayerManager, not GGL::CPlayerStatus
 		virtual int GetGameTick() = 0;
 
 		static inline constexpr int vtp = 0x7837D0;
@@ -405,23 +405,23 @@ namespace GGL {
 	class IGLGUIInterface {
 	public:
 		struct MerchantData {
-			int Entity;
+			shok::EntityId Entity;
 			bool HasOffers = 0;
 			PADDING(3);
-			int BlockingPlayer = 0;
+			shok::PlayerId BlockingPlayer = {};
 			PADDINGI(2); // unknown entries of beh props, strings?
 		};
 		struct MineData {
-			int Entity;
+			shok::EntityId Entity;
 			int ResAmount = 0;
-			int ResType = 0;
+			shok::ResourceType ResType = {};
 		};
 		struct MotivationData {
-			int Entity;
+			shok::EntityId Entity;
 			float Max, ThresholdSad, ThresholdAngry, ThresholdLeave, VCLockedThreshold, ThresholdHappy;
 		};
 		struct RefinerData {
-			int Entity;
+			shok::EntityId Entity;
 			shok::ResourceType ResType = shok::ResourceType::None;
 			float ResAmount = 0, RawAmount = 0;
 		};
@@ -443,7 +443,7 @@ namespace GGL {
 			float HealthBar = 0;
 			float BuildingProgressNumber = 0; // 15 upgrade, research, market trade
 			int LeaderExperienceLevels = 0;//float?
-			int EntityId = 0;
+			shok::EntityId EntityId = {};
 			float WorkerMotivation = 0;
 			bool IsRefiner = false, IsWorkerOverhead = false, IsSerfOverhead = false, IsSoldierOverhead = false;
 			bool IsLeaderOverhead = false, IsBuildingAlarmActive = false; //20
@@ -469,106 +469,106 @@ namespace GGL {
 		};
 
 		virtual ~IGLGUIInterface() = default;
-		virtual bool CanPlaceBuildingAtPos(int ety, float x, float y, float r) = 0; // checks building func or buildblock of entity blocking
-		virtual bool CanPlaceEntityAtPos(int ety, float x, float y, float r) = 0; // checks buildblock+block of entity blocking
-		virtual bool IsBuildOnBuilding(int ety) = 0;
-		virtual bool GetNearestFreePosForBuildingPlacement(int ety, float x, float y, float* xout, float* yout, float range) = 0;
-		virtual bool DoesBuildOnTypeMatches(int ety, int eid) = 0;
-		virtual bool CheckBuildingPlacementAndCost(int pl, int ety, float x, float y, float r) = 0;
-		virtual int GetSettlerTypeByUCat(int pl, int ucat) = 0;
-		virtual bool IsWall(int ety) = 0;
+		virtual bool CanPlaceBuildingAtPos(shok::EntityTypeId ety, float x, float y, float r) = 0; // checks building func or buildblock of entity blocking
+		virtual bool CanPlaceEntityAtPos(shok::EntityTypeId ety, float x, float y, float r) = 0; // checks buildblock+block of entity blocking
+		virtual bool IsBuildOnBuilding(shok::EntityTypeId ety) = 0;
+		virtual bool GetNearestFreePosForBuildingPlacement(shok::EntityTypeId ety, float x, float y, float* xout, float* yout, float range) = 0;
+		virtual bool DoesBuildOnTypeMatches(shok::EntityTypeId ety, shok::EntityId eid) = 0;
+		virtual bool CheckBuildingPlacementAndCost(shok::PlayerId pl, shok::EntityTypeId ety, float x, float y, float r) = 0;
+		virtual shok::EntityTypeId GetSettlerTypeByUCat(shok::PlayerId pl, shok::UpgradeCategoryId ucat) = 0;
+		virtual bool IsWall(shok::EntityTypeId ety) = 0;
 		virtual bool IsValidPos(float x, float y) = 0;
 		virtual bool IsPosBlocked(float x, float y) = 0; // 10
-		virtual shok::ResourceType GetResourceTypeProvidedBy(int eid) = 0;
+		virtual shok::ResourceType GetResourceTypeProvidedBy(shok::EntityId eid) = 0;
 		virtual void FillMerchantData(MerchantData* d) = 0;
 		virtual void FillMineData(MineData* d) = 0; // works with mine building or resentity
 		virtual void FillMotivationData(MotivationData* d) = 0;
 		virtual void FillRefinerData(RefinerData* d) = 0;
-		virtual void FillUIData(int player, UIData* d) = 0;
+		virtual void FillUIData(shok::PlayerId player, UIData* d) = 0;
 	private:
 		virtual void unknown1() = 0; // get workplace string???
 		virtual void unknown2() = 0; // get residence string???
 		virtual void unknown3() = 0; // get farm string???
 	public:
-		virtual int GetModelOverride(int eid) = 0; // 20
-		virtual int GetCurrentResourceAmount(int eid) = 0;
-		virtual bool DoesSetTaskListDepthMatch(int eid, int tlde) = 0;
-		virtual bool IsWorker(int eid) = 0;
-		virtual bool IsSettler(int eid) = 0;
-		virtual bool IsSoldier(int eid) = 0;
-		virtual int GetEntityOrBaseEntity(int eid) = 0; // BuildOn base
-		virtual int GetLeaderOfSoldier(int eid) = 0;
-		virtual bool IsLeader(int eid) = 0;
-		virtual bool IsHero(int eid) = 0;
-		virtual bool IsNPCMarkerOn(int eid) = 0; // 30
-		virtual bool IsSerf(int eid) = 0;
+		virtual shok::ModelId GetModelOverride(shok::EntityId eid) = 0; // 20
+		virtual int GetCurrentResourceAmount(shok::EntityId eid) = 0;
+		virtual bool DoesSetTaskListDepthMatch(shok::EntityId eid, int tlde) = 0;
+		virtual bool IsWorker(shok::EntityId eid) = 0;
+		virtual bool IsSettler(shok::EntityId eid) = 0;
+		virtual bool IsSoldier(shok::EntityId eid) = 0;
+		virtual shok::EntityId GetEntityOrBaseEntity(shok::EntityId eid) = 0; // BuildOn base
+		virtual shok::EntityId GetLeaderOfSoldier(shok::EntityId eid) = 0;
+		virtual bool IsLeader(shok::EntityId eid) = 0;
+		virtual bool IsHero(shok::EntityId eid) = 0;
+		virtual bool IsNPCMarkerOn(shok::EntityId eid) = 0; // 30
+		virtual bool IsSerf(shok::EntityId eid) = 0;
 	private:
 		virtual void unknown4() = 0; // maybe player related
 	public:
-		virtual bool IsBuilding(int eid) = 0;
-		virtual bool IsConstructionSite(int eid) = 0;
-		virtual bool IsBuildingSellable(int eid, int player) = 0;
+		virtual bool IsBuilding(shok::EntityId eid) = 0;
+		virtual bool IsConstructionSite(shok::EntityId eid) = 0;
+		virtual bool IsBuildingSellable(shok::EntityId eid, shok::PlayerId player) = 0;
 	private:
 		virtual void unknown5() = 0; // something buildingupgrademanager
 	public:
-		virtual bool IsConvertible(int eid, int player) = 0;
-		virtual bool IsAnimal(int eid) = 0;
-		virtual bool IsMercenaryFree(int eid, int player) = 0;
-		virtual int MercenarySettlerGetBuilding(int id) = 0; //40
-		virtual int MouseoverEntityToTargetEntity(int id, int player) = 0;
-		virtual int CheckSniperTarget(int sniper, int target, int sniperplayer) = 0;
-		virtual int CheckShurikenTarget(int shur, int tar, int shurplay) = 0;
-		virtual bool IsNotHostile(int id, int player) = 0;
-		virtual int GetHealth(int id) = 0; // 45
-		virtual int GetMaxHealth(int id) = 0;
-		virtual int GetPlayer(int id) = 0;
-		virtual int BuildingGetTargetableId(int id) = 0;
+		virtual bool IsConvertible(shok::EntityId eid, shok::PlayerId player) = 0;
+		virtual bool IsAnimal(shok::EntityId eid) = 0;
+		virtual bool IsMercenaryFree(shok::EntityId eid, shok::PlayerId player) = 0;
+		virtual shok::EntityId MercenarySettlerGetBuilding(shok::EntityId id) = 0; //40
+		virtual shok::EntityId MouseoverEntityToTargetEntity(shok::EntityId id, shok::PlayerId player) = 0;
+		virtual shok::EntityId CheckSniperTarget(shok::EntityId sniper, shok::EntityId target, shok::PlayerId sniperplayer) = 0;
+		virtual shok::EntityId CheckShurikenTarget(shok::EntityId shur, shok::EntityId tar, shok::PlayerId shurplay) = 0;
+		virtual bool IsNotHostile(shok::EntityId id, shok::PlayerId player) = 0;
+		virtual int GetHealth(shok::EntityId id) = 0; // 45
+		virtual int GetMaxHealth(shok::EntityId id) = 0;
+		virtual shok::PlayerId GetPlayer(shok::EntityId id) = 0;
+		virtual shok::EntityId BuildingGetTargetableId(shok::EntityId id) = 0;
 	private:
 		virtual void unknown6() = 0; // something entityiterator
 	public:
-		virtual bool SerfCanPathToNearestResourceEntity(int serfId, shok::ResourceType rt, float x, float y) = 0; // 50
-		virtual bool SerfCanPathToResourceEntity(int serfId, int resourceId) = 0;
-		virtual EGL::CGLEEntity* GetEntity(int id) = 0;
+		virtual bool SerfCanPathToNearestResourceEntity(shok::EntityId serfId, shok::ResourceType rt, float x, float y) = 0; // 50
+		virtual bool SerfCanPathToResourceEntity(shok::EntityId serfId, shok::EntityId resourceId) = 0;
+		virtual EGL::CGLEEntity* GetEntity(shok::EntityId id) = 0;
 	private:
 		virtual void unknown9() = 0; // get something building related
 		virtual void unknown10() = 0; // building get military info 4
 	public:
 		virtual void RoundPosToBuildingPlacement(float x, float y, float* xout, float* yout) = 0; //55
-		virtual void FillSoldiersOfLaeder(int id, shok::Vector<int>* soldiers) = 0;
+		virtual void FillSoldiersOfLeader(shok::EntityId id, shok::Vector<shok::EntityId>* soldiers) = 0;
 	private:
 		virtual void unknown12() = 0;
 		virtual void unknown13() = 0;
 	public:
-		virtual bool IsBuildingType(int id) = 0;
-		virtual GGL::PlayerTributesManager* GetTributeManager(int player) = 0; //60
-		virtual GGL::PlayerQuestManager* GetQuestManager(int player) = 0;
-		virtual int* GetDiplomacyData(int player) = 0;
-		virtual GGL::CPlayerStatus* GetPlayerStatus(int player) = 0;
+		virtual bool IsBuildingType(shok::EntityTypeId id) = 0;
+		virtual GGL::PlayerTributesManager* GetTributeManager(shok::PlayerId player) = 0; //60
+		virtual GGL::PlayerQuestManager* GetQuestManager(shok::PlayerId player) = 0;
+		virtual int* GetDiplomacyData(shok::PlayerId player) = 0;
+		virtual GGL::CPlayerStatus* GetPlayerStatus(shok::PlayerId player) = 0;
 	private:
-		virtual shok::ResourceType GetResourceTypeProvidedBy2(int eid) = 0; // same func as above
+		virtual shok::ResourceType GetResourceTypeProvidedBy2(shok::EntityId eid) = 0; // same func as above
 		virtual void unknown14() = 0; //65
 		virtual void unknown15() = 0;
 		virtual void unknown16() = 0;
 	public:
-		virtual int GetSector(int entityid) = 0;
-		virtual int GetSector(const shok::Position* p) = 0;
-		virtual bool IsEntityInSector(int eid, int secor) = 0; //70
-		virtual bool GetTechUsedForStatistics(int techid) = 0;
+		virtual shok::SectorId GetSector(shok::EntityId entityid) = 0;
+		virtual shok::SectorId GetSector(const shok::Position* p) = 0;
+		virtual bool IsEntityInSector(shok::EntityId eid, shok::SectorId secor) = 0; //70
+		virtual bool GetTechUsedForStatistics(shok::TechnologyId techid) = 0;
 	private:
 		virtual void unknown17() = 0; //search some pos?
 	public:
-		virtual bool IsPositionExploredByPlayer(int pid, const shok::Position* p) = 0;
+		virtual bool IsPositionExploredByPlayer(shok::PlayerId pid, const shok::Position* p) = 0;
 		virtual int GetWorkCycleId(const char* name) = 0;
-		virtual int GetPrincipalTask(int tid) = 0; //75
-		virtual bool IsThief(int id) = 0;
-		virtual bool IsThiefCarryingSomething(int id) = 0;
+		virtual shok::PrincipalTaskId GetPrincipalTask(shok::TaskListId tid) = 0; //75
+		virtual bool IsThief(shok::EntityId id) = 0;
+		virtual bool IsThiefCarryingSomething(shok::EntityId id) = 0;
 	private:
 		virtual void unknown18() = 0;
 		virtual void unknown19() = 0;
 	public:
-		virtual bool IsBridge(int id) = 0; //80
-		virtual bool IsBridgeTargetedBySabotage(int id) = 0;
-		virtual bool CanKegGetDisarmed(int id) = 0;
+		virtual bool IsBridge(shok::EntityId id) = 0; //80
+		virtual bool IsBridgeTargetedBySabotage(shok::EntityId id) = 0;
+		virtual bool CanKegGetDisarmed(shok::EntityId id) = 0;
 
 		static inline constexpr int vtp = 0x76D79C;
 	};
@@ -578,7 +578,7 @@ namespace GGL {
 
 		using IGLGUIInterface::GetNearestFreePosForBuildingPlacement;
 
-		bool GetNearestFreePosForBuildingPlacement(int ety, const shok::Position& inp, shok::Position& outp);
+		bool GetNearestFreePosForBuildingPlacement(shok::EntityTypeId ety, const shok::Position& inp, shok::Position& outp);
 
 		static inline constexpr int vtp = 0x76D9A4;
 
@@ -597,13 +597,13 @@ namespace GGUI {
 		PADDINGI(2); // probably pos mouseover
 		int MouseX, MouseY;
 
-		void SetGUIStateByIdentifier(unsigned int identifier, const GGUI::SStateParameters* p = nullptr);
+		void SetGUIStateByIdentifier(shok::ClassId identifier, const GGUI::SStateParameters* p = nullptr);
 		template<class T>
 		requires std::derived_from<T, GGUI::CState>
 		void SetGUIState(const GGUI::SStateParameters* p = nullptr) {
 			SetGUIStateByIdentifier(T::Identifier, p);
 		}
-		void SetGUIStateByIdentfierOnNextUpdate(unsigned int identifier);
+		void SetGUIStateByIdentfierOnNextUpdate(shok::ClassId identifier);
 		template<class T>
 		requires std::derived_from<T, GGUI::CState>
 		void SetGUIStateByIdentfierOnNextUpdate() {
@@ -640,7 +640,7 @@ namespace GGUI {
 			GGUI::CBasicState* State;
 		};
 		struct SelectionData {
-			int Id;
+			shok::EntityId Id;
 			bool IsSoldier;
 		};
 
@@ -653,7 +653,7 @@ namespace GGUI {
 		BB::IPostEvent* PostGUIEvent; // for GUI events, p to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent
 	public:
 		shok::Vector<SelectionData> SelectedEntities; //11
-		int ControlledPlayer; // 15
+		shok::PlayerId ControlledPlayer; // 15
 		bool CanSelectEntitiesOfPlayer[9];
 		shok::Vector<StateIdData*> CommandStates; // 19
 		CMouseEffect* MouseEffect;
@@ -673,16 +673,16 @@ namespace GGUI {
 		//  GGUI::SoundFeedback::GlobalObj()->HandleFeedbackEvent(event)
 		//  GGUI::CShortMessagesWindowControllerCustomWidget::HandleFeedbackEvent
 
-		void SetControlledPlayer(int pl);
-		bool IsEntitySelected(int id) const;
-		bool SelectEntity(int id); // returns successful
-		bool DeselectEntity(int id); // returns successful
+		void SetControlledPlayer(shok::PlayerId pl);
+		bool IsEntitySelected(shok::EntityId id) const;
+		bool SelectEntity(shok::EntityId id); // returns successful
+		bool DeselectEntity(shok::EntityId id); // returns successful
 		bool ClearSelection(); // returns successful
 		void OnSelectionChanged(); // calls lua+guistate, has to be called manually after changing selection
 		// checks if entity is of category and GGUI::CBasicState::CheckCommandValid
-		bool IsCommandStateValid(StateIdData* s, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
+		bool IsCommandStateValid(StateIdData* s, shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
 		// goes through CommandStates and returns the first valid one
-		GGUI::CBasicState* GetCommandStateFor(int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
+		GGUI::CBasicState* GetCommandStateFor(shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
 
 		void HackPostEvent();
 
@@ -692,7 +692,7 @@ namespace GGUI {
 		static inline void(__cdecl* const PostEventFromUI)(BB::CEvent* ev) = reinterpret_cast<void(__cdecl*)(BB::CEvent*)>(0x525D77);
 
 		// checks if entity is selectable, including player, selectable flag, ...
-		static inline int(__cdecl* const GetSelectableEntity)(int id, bool soldierToLeader) = reinterpret_cast<int(__cdecl*)(int, bool)>(0x525B3E);
+		static inline int(__cdecl* const GetSelectableEntity)(shok::EntityId id, bool soldierToLeader) = reinterpret_cast<int(__cdecl*)(shok::EntityId, bool)>(0x525B3E);
 
 		static bool IsModifierPressed(shok::Keys modif);
 	};
@@ -718,7 +718,7 @@ namespace GGUI {
 			shok::SoundId SoundID;
 
 			static inline constexpr int vtp = 0x77E36C;
-			static inline constexpr unsigned int Identifier = 0xD8C12453;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD8C12453);
 		};
 		class CParamValueSound : public AData { // returns Data->GetSoundIdIfApplies(...) if parameter matches ParameterValue
 		public:
@@ -728,7 +728,7 @@ namespace GGUI {
 			bool CanBeIgnored;
 
 			static inline constexpr int vtp = 0x77E380;
-			static inline constexpr unsigned int Identifier = 0x90C03583;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x90C03583);
 		};
 		class CParamValueExSound : public AData { // returns Data->GetSoundIdIfApplies(...) if parameter matches ParameterValue->GetValue()
 		public:
@@ -738,7 +738,7 @@ namespace GGUI {
 			bool CanBeIgnored;
 
 			static inline constexpr int vtp = 0x77E394;
-			static inline constexpr unsigned int Identifier = 0x49C94153;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x49C94153);
 		};
 		class CData : public AData { // returns ValueSound[i]->SoundId where ValueSound[i]->GetValue() matches parameter
 		public:
@@ -746,7 +746,7 @@ namespace GGUI {
 			int ParameterIndex;
 
 			static inline constexpr int vtp = 0x77E3F8;
-			static inline constexpr unsigned int Identifier = 0x85435E63;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x85435E63);
 		};
 
 		class CAbilityType : public AValueSound {
@@ -754,42 +754,42 @@ namespace GGUI {
 			shok::AbilityId AbilityType;
 
 			static inline constexpr int vtp = 0x77E2F4;
-			static inline constexpr unsigned int Identifier = 0x3FF3BAC3;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3FF3BAC3);
 		};
 		class CEntityType : public AValueSound {
 		public:
 			shok::EntityTypeId EntityType;
 
 			static inline constexpr int vtp = 0x77E308;
-			static inline constexpr unsigned int Identifier = 0x34AECF3;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x34AECF3);
 		};
 		class CGoodType : public AValueSound {
 		public:
 			shok::ResourceType GoodType;
 
 			static inline constexpr int vtp = 0x77E31C;
-			static inline constexpr unsigned int Identifier = 0x67C6B5C3;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x67C6B5C3);
 		};
 		class CTechnologyType : public AValueSound {
 		public:
 			shok::TechnologyId TechnologyType;
 
 			static inline constexpr int vtp = 0x77E330;
-			static inline constexpr unsigned int Identifier = 0x451B5863;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x451B5863);
 		};
 		class CUpgradeCategory : public AValueSound {
 		public:
 			shok::UpgradeCategoryId UpgradeCategory;
 
 			static inline constexpr int vtp = 0x77E344;
-			static inline constexpr unsigned int Identifier = 0xCD0D0AC3;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCD0D0AC3);
 		};
 		class CNormalValue : public AValueSound {
 		public:
 			int Value;
 
 			static inline constexpr int vtp = 0x77E358;
-			static inline constexpr unsigned int Identifier = 0x70295D23;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x70295D23);
 		};
 
 		struct FeedbackState {

@@ -26,25 +26,25 @@ namespace shok {
 			Modifier();
 		};
 		struct TechReq {
-			int TecType = 0; // if 0, tries to check TecCategoryType, might be buggy (access tech -1?)
-			int TecCategoryType = 0;
+			shok::TechnologyId TecType = {}; // if 0, tries to check TecCategoryType, might be buggy (access tech -1?)
+			shok::TechnologyCategoryId TecCategoryType = {};
 		};
 		struct ETypeReq {
-			int EntityType = 0;
+			shok::EntityTypeId EntityType = {};
 			int Amount = 0;
 		};
 		struct ECatReq {
-			int EntityCategory = 0;
+			shok::EntityCategory EntityCategory = {};
 			int Amount = 0;
 		};
 		struct UCatReq {
-			int UpgradeCategory = 0;
+			shok::UpgradeCategoryId UpgradeCategory = {};
 			int Amount = 0;
 		};
 
 
 
-		int TecCategoryType = 0;
+		shok::TechnologyCategoryId TecCategoryType = {};
 		float TimeToResearch = 0;
 		bool AutomaticResearch = true; // bug auto-research does not set statistics flag
 		PADDING(3);
@@ -83,20 +83,20 @@ namespace shok {
 	public:
 		shok::Vector<shok::Technology*> Techs; // indexed by id-1
 
-		void FreeTech(int id);
-		void LoadTech(int id);
-		void PopTech(int id);
+		void FreeTech(shok::TechnologyId id);
+		void LoadTech(shok::TechnologyId id);
+		void PopTech(shok::TechnologyId id);
 	};
 
 	class TechCategoryManager {
 	public:
 		BB::CIDManagerEx* TechCategoryManager;
-		shok::Vector<int*> TechnologyCategoryToFirstTechnologyType;
+		shok::Vector<int*> TechnologyCategoryToFirstTechnologyType; // type?
 		// gets loaded from Data\\Config\\TechnologyCategories.xml into temp vector, then creates this vector out of it
 	};
 
 	struct AdditionalTechModifier {
-		int TechID;
+		shok::TechnologyId TechID;
 		float Value;
 		char Operator;
 

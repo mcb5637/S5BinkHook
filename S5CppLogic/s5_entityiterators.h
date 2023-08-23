@@ -18,13 +18,13 @@ namespace EGL {
 	public:
 		static inline constexpr int vtp = 0x766CA0;
 
-		int EntityType;
+		shok::EntityTypeId EntityType;
 	};
 	class CEntityTypesPredicate : public IGLEEntityPredicate {
 	public:
 		static inline constexpr int vtp = 0x76EB14;
 
-		shok::Vector<int> EntityTypes;
+		shok::Vector<shok::EntityTypeId> EntityTypes;
 
 		// ctor 57A58A
 	};
@@ -54,7 +54,7 @@ namespace EGL {
 		virtual void __stdcall Reset() = 0;
 		virtual void __stdcall Destroy() = 0;
 
-		int CurrentId;
+		shok::EntityId CurrentId;
 		IGLEEntityPredicate* Predicate;
 
 		static inline constexpr int vtp = 0x76D738;

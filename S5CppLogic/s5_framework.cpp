@@ -160,7 +160,7 @@ void GDB::CList::SetValue(const char* key, float value)
     gdb_setval(this, key, value);
 }
 
-unsigned int __stdcall GDB::CList::GetClassIdentifier() const
+shok::ClassId __stdcall GDB::CList::GetClassIdentifier() const
 {
     return Identifier;
 }

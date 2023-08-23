@@ -5,6 +5,7 @@
 
 #include "s5_forwardDecls.h"
 #include "s5_datastructures.h"
+#include "s5_defines.h"
 
 namespace shok {
 	// format i int, f float, x hex int, c char, s const char*
@@ -94,7 +95,7 @@ namespace shok {
 
 
 	struct Attachment {
-		int EntityId;
+		shok::EntityId EntityId; // may aso be shok::EffectId (but that seems to be unused)
 		shok::EventIDs EventID;
 	};
 
@@ -115,25 +116,25 @@ namespace shok {
 }
 
 namespace BB {
-	constexpr unsigned int InvalidIdentifier = 0xEEFFFFFF; // guranteed to not appear in shok
+	constexpr shok::ClassId InvalidIdentifier = shok::ClassId::Invalid; // guranteed to not appear in shok
 
 	template<class T>
-	concept HasValidIdentifier = std::is_same_v<decltype(T::Identifier), const unsigned int> && T::Identifier != BB::InvalidIdentifier;
+	concept HasValidIdentifier = std::is_same_v<decltype(T::Identifier), const shok::ClassId> && T::Identifier != BB::InvalidIdentifier;
 
 	class IObject {
 	public:
 		virtual ~IObject() = default;
-		virtual unsigned int __stdcall GetClassIdentifier() const = 0;
-		virtual void* __stdcall CastToIdentifier(unsigned int id);
+		virtual shok::ClassId __stdcall GetClassIdentifier() const = 0;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id);
 
 		static constexpr int TypeDesc = 0x7FFE08;
 		static constexpr int vtp = 0x7620F0;
-		static inline constexpr unsigned int Identifier = InvalidIdentifier;
+		static constexpr shok::ClassId Identifier = InvalidIdentifier;
 
 		struct _vtableS {
 			void(__thiscall* dtor)(BB::IObject* th, bool free);
-			unsigned int(__stdcall* GetClassIdentifier)(const BB::IObject* th);
-			void* (__stdcall* CastToIdentifier)(BB::IObject* th, unsigned int id);
+			shok::ClassId(__stdcall* GetClassIdentifier)(const BB::IObject* th);
+			void* (__stdcall* CastToIdentifier)(BB::IObject* th, shok::ClassId id);
 		};
 
 		template<HasValidIdentifier To>
@@ -145,12 +146,12 @@ namespace BB {
 	template<HasValidIdentifier CastTo, class CastFrom, HasValidIdentifier... AdditionalSubClasses>
 	requires std::derived_from<CastTo, CastFrom> && std::derived_from<CastFrom, IObject> && (std::derived_from<AdditionalSubClasses, CastTo> && ...)
 	CastTo* IdentifierCast(CastFrom* f) {
-		const unsigned int id = f->GetClassIdentifier();
+		const shok::ClassId id = f->GetClassIdentifier();
 		if (id == CastTo::Identifier)
 			return static_cast<CastTo*>(f);
 		if constexpr (sizeof...(AdditionalSubClasses) != 0) {
-			std::array<const unsigned int, sizeof...(AdditionalSubClasses)> additionalIdentifiers = { AdditionalSubClasses::Identifier... };
-			for (const unsigned int addid : additionalIdentifiers) {
+			std::array<const shok::ClassId, sizeof...(AdditionalSubClasses)> additionalIdentifiers = { AdditionalSubClasses::Identifier... };
+			for (const shok::ClassId addid : additionalIdentifiers) {
 				if (id == addid)
 					return static_cast<CastTo*>(f);
 			}
@@ -216,15 +217,15 @@ namespace EGL {
 	public:
 		virtual ~CGLEAttachableBase() = default;
 	protected:
-		virtual void OnOtherEntityAttachToMe_vt(shok::AttachmentType ty, int otherId, shok::EventIDs onThisDetachEvent) = 0; // other -> this
-		virtual void OnOtherEffectAttachToMe_vt(shok::AttachmentType ty, int otherId, shok::EventIDs onThisDetachEvent) = 0; // other -> this
-		virtual void OnOtherEntityDetachFromMe_vt(shok::AttachmentType ty, int otherId) = 0; // other -> this
-		virtual void OnOtherEffectDetachFromMe_vt(shok::AttachmentType ty, int otherId) = 0; // other -> this
-		virtual void DetachObservedEntity_vt(shok::AttachmentType ty, int otherId) = 0; // this -> other 5
-		virtual void DetachObservedEffect_vt(shok::AttachmentType ty, int otherId) = 0; // this -> other
+		virtual void OnOtherEntityAttachToMe_vt(shok::AttachmentType ty, shok::EntityId otherId, shok::EventIDs onThisDetachEvent) = 0; // other -> this
+		virtual void OnOtherEffectAttachToMe_vt(shok::AttachmentType ty, shok::EffectId otherId, shok::EventIDs onThisDetachEvent) = 0; // other -> this
+		virtual void OnOtherEntityDetachFromMe_vt(shok::AttachmentType ty, shok::EntityId otherId) = 0; // other -> this
+		virtual void OnOtherEffectDetachFromMe_vt(shok::AttachmentType ty, shok::EffectId otherId) = 0; // other -> this
+		virtual void DetachObservedEntity_vt(shok::AttachmentType ty, shok::EntityId otherId) = 0; // this -> other 5
+		virtual void DetachObservedEffect_vt(shok::AttachmentType ty, shok::EffectId otherId) = 0; // this -> other
 	public:
-		virtual bool IsAttachedToEntity(shok::AttachmentType ty, int otherId) = 0; // this -> other
-		virtual bool IsAttachedToEffect(shok::AttachmentType ty, int otherId) = 0; // this -> other
+		virtual bool IsAttachedToEntity(shok::AttachmentType ty, shok::EntityId otherId) = 0; // this -> other
+		virtual bool IsAttachedToEffect(shok::AttachmentType ty, shok::EffectId otherId) = 0; // this -> other
 
 		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEntities; // 8 other -> this
 		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEffects; // 11 other -> this
@@ -356,7 +357,7 @@ namespace EGL {
 	public:
 
 		static constexpr int vtp = 0x784ED0;
-		static constexpr unsigned int Identifier = 0xEE435293;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEE435293);
 	};
 }
 

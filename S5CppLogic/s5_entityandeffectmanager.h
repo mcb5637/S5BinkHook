@@ -41,6 +41,13 @@ namespace EGL {
 	public:
 		static inline constexpr int vtp = 0x784528;
 
+		bool IsIdValid(shok::EffectId id) const {
+			return EGL::TGLEItemManager<EGL::CEffect, 65535>::IsIdValid(static_cast<int>(id));
+		}
+		EGL::CEffect* GetById(shok::EffectId id) {
+			return EGL::TGLEItemManager<EGL::CEffect, 65535>::GetById(static_cast<int>(id));
+		}
+
 		static inline EGL::CGLEEffectManager** const GlobalObj = reinterpret_cast<EGL::CGLEEffectManager**>(0x898144);
 	};
 

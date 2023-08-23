@@ -123,30 +123,30 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 }
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::EntityTypesToReload{};
+std::vector<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::EntityTypesToRemove{};
+std::vector<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::EntityTypesToReload{};
 bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
-std::vector<int> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::TechsToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
+std::vector<shok::TaskListId> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
+std::vector<shok::TechnologyId> CppLogic::ModLoader::ModLoader::TechsToRemove{};
+std::vector<shok::ModelId> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
 bool CppLogic::ModLoader::ModLoader::ReloadModels = false;
-std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::TexturesToReload{};
-std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::AnimsToReload{};
-std::vector<int> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::BuildingUCatsToRemove{};
+std::vector<shok::GUITextureId> CppLogic::ModLoader::ModLoader::TexturesToRemove{};
+std::vector<shok::GUITextureId> CppLogic::ModLoader::ModLoader::TexturesToReload{};
+std::vector<shok::AnimationId> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
+std::vector<shok::AnimationId> CppLogic::ModLoader::ModLoader::AnimsToReload{};
+std::vector<shok::UpgradeCategoryId> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
+std::vector<shok::UpgradeCategoryId> CppLogic::ModLoader::ModLoader::BuildingUCatsToRemove{};
 bool CppLogic::ModLoader::ModLoader::ReloadWaterTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToReload{};
-std::vector<int> CppLogic::ModLoader::ModLoader::TerrainTexturesToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::TerrainTexturesToReload{};
+std::vector<shok::TerrainTextureId> CppLogic::ModLoader::ModLoader::TerrainTexturesToRemove{};
+std::vector<shok::TerrainTextureId> CppLogic::ModLoader::ModLoader::TerrainTexturesToReload{};
 bool CppLogic::ModLoader::ModLoader::ReloadTerrainTypes = false;
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToRemove{};
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToReload{};
-std::vector<int> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::AnimSetsToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::AnimSetsToReload{};
+std::vector<shok::SoundId> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
+std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToRemove{};
+std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::DirectXEffectsToFree{};
 
 int CppLogic::ModLoader::ModLoader::PreLoadEntityType(lua::State L)
@@ -167,8 +167,8 @@ int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
 	if (id != 0 && id < static_cast<int>(mng->EntityTypes.size()))
 		throw lua::LuaException{ "entitytype already exists" };
 	id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
-	mng->LoadEntityTypeByID(id);
-	EntityTypesToRemove.push_back(id);
+	mng->LoadEntityTypeByID(static_cast<shok::EntityTypeId>(id));
+	EntityTypesToRemove.push_back(static_cast<shok::EntityTypeId>(id));
 	L.Push("Entities");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -184,9 +184,9 @@ int CppLogic::ModLoader::ModLoader::ReloadEntityType(lua::State L)
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size()))
 		throw lua::LuaException("invalid id");
-	m->FreeEntityType(id);
-	m->LoadEntityTypeByID(id);
-	EntityTypesToReload.push_back(id);
+	m->FreeEntityType(static_cast<shok::EntityTypeId>(id));
+	m->LoadEntityTypeByID(static_cast<shok::EntityTypeId>(id));
+	EntityTypesToReload.push_back(static_cast<shok::EntityTypeId>(id));
 	return 0;
 }
 
@@ -196,7 +196,7 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size()))
 		throw lua::LuaException("invalid id");
-	EntityTypesToReload.push_back(id);
+	EntityTypesToReload.push_back(static_cast<shok::EntityTypeId>(id));
 	return 0;
 }
 
@@ -217,8 +217,8 @@ int CppLogic::ModLoader::ModLoader::ReloadEffectType(lua::State L)
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
 	if (id <= 0 || id >= static_cast<int>(m->EffectsProps.Effects.size()))
 		throw lua::LuaException("invalid id");
-	m->FreeEffectType(id);
-	m->LoadEffectTypeFromExtraFile(id);
+	m->FreeEffectType(static_cast<shok::EffectTypeId>(id));
+	m->LoadEffectTypeFromExtraFile(static_cast<shok::EffectTypeId>(id));
 	ReloadEffectTypes = true;
 	return 0;
 }
@@ -231,7 +231,7 @@ int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
 	if (id != 0 && id < static_cast<int>(m->EffectsProps.Effects.size()))
 		throw lua::LuaException{ "effecttype already exists" };
 	id = m->EffectTypeManager->GetIDByNameOrCreate(t);
-	m->LoadEffectTypeFromExtraFile(id);
+	m->LoadEffectTypeFromExtraFile(static_cast<shok::EffectTypeId>(id));
 	L.Push("GGL_Effects");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -259,8 +259,8 @@ int CppLogic::ModLoader::ModLoader::ReloadTaskList(lua::State L)
 	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
 	if (id <= 0 || id >= static_cast<int>(m->TaskLists.size()))
 		throw lua::LuaException("invalid id");
-	m->FreeTaskList(id);
-	m->LoadTaskList(id);
+	m->FreeTaskList(static_cast<shok::TaskListId>(id));
+	m->LoadTaskList(static_cast<shok::TaskListId>(id));
 	return 0;
 }
 
@@ -272,8 +272,8 @@ int CppLogic::ModLoader::ModLoader::AddTaskList(lua::State L)
 	if (id != 0 && id < static_cast<int>(m->TaskLists.size()))
 		throw lua::LuaException{ "tasklist already exists" };
 	id = m->TaskListManager->GetIDByNameOrCreate(t);
-	m->LoadTaskList(id);
-	TaskListsToRemove.push_back(id);
+	m->LoadTaskList(static_cast<shok::TaskListId>(id));
+	TaskListsToRemove.push_back(static_cast<shok::TaskListId>(id));
 	L.Push("TaskLists");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -300,8 +300,8 @@ int CppLogic::ModLoader::ModLoader::ReloadTechnology(lua::State L)
 	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
 	if (id <= 0 || id >= static_cast<int>(m->Techs.size()))
 		throw lua::LuaException("invalid id");
-	m->FreeTech(id);
-	m->LoadTech(id);
+	m->FreeTech(static_cast<shok::TechnologyId>(id));
+	m->LoadTech(static_cast<shok::TechnologyId>(id));
 	return 0;
 }
 
@@ -313,8 +313,8 @@ int CppLogic::ModLoader::ModLoader::AddTechnology(lua::State L)
 	if (id != 0 && id < static_cast<int>(m->Techs.size()))
 		throw lua::LuaException{ "tasklist already exists" };
 	id = (*BB::CIDManagerEx::TechnologiesManager)->GetIDByNameOrCreate(t);
-	m->LoadTech(id);
-	TechsToRemove.push_back(id);
+	m->LoadTech(static_cast<shok::TechnologyId>(id));
+	TechsToRemove.push_back(static_cast<shok::TechnologyId>(id));
 	L.Push("Technologies");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -332,15 +332,15 @@ int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
 		throw lua::LuaException{ "model already exists" };
 	int id = mp->ModelIdManager->GetIDByNameOrCreate(t);
 	try {
-		mp->LoadModelDataFromExtraFile(id);
-		(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->LoadModel(id);
+		mp->LoadModelDataFromExtraFile(static_cast<shok::ModelId>(id));
+		(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->LoadModel(static_cast<shok::ModelId>(id));
 	}
 	catch (const BB::CException& e) {
 		char buff[201];
 		e.CopyMessage(buff, 200);
 		throw lua::LuaException{ buff };
 	}
-	ModelsToRemove.push_back(id);
+	ModelsToRemove.push_back(static_cast<shok::ModelId>(id));
 	L.Push("Models");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -356,9 +356,9 @@ int CppLogic::ModLoader::ModLoader::ReloadModel(lua::State L)
 	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
 	if (!m->ModelManager.ModelIDManager->GetNameByID(id))
 		throw lua::LuaException{ "invalid id" };
-	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->LoadModelDataFromExtraFile(id);
-	m->FreeModel(id);
-	m->LoadModel(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->LoadModelDataFromExtraFile(static_cast<shok::ModelId>(id));
+	m->FreeModel(static_cast<shok::ModelId>(id));
+	m->LoadModel(static_cast<shok::ModelId>(id));
 	ReloadModels = true;
 	return 0;
 }
@@ -367,12 +367,12 @@ int CppLogic::ModLoader::ModLoader::AddGUITexture(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	auto* m = EGUIX::TextureManager::GlobalObj();
-	if (m->GetTextureIDNoAdd(t))
+	if (m->GetTextureIDNoAdd(t) != shok::GUITextureId::Invalid)
 		throw lua::LuaException{ "texture already exists" };
-	int id = m->GetTextureID(t);
+	auto id = m->GetTextureID(t);
 	m->GetTextureByID(id);
 	TexturesToRemove.push_back(id);
-	L.Push(id);
+	L.Push(static_cast<int>(id));
 	return 1;
 }
 
@@ -380,15 +380,15 @@ int CppLogic::ModLoader::ModLoader::ReloadGUITexture(lua::State L)
 {
 	const char* t = L.CheckString(1);
 	auto* m = EGUIX::TextureManager::GlobalObj();
-	int id = m->GetTextureIDNoAdd(t);
-	if (id == 0) {
+	auto id = m->GetTextureIDNoAdd(t);
+	if (id == shok::GUITextureId::Invalid) {
 		for (const char* tex : dump::GUITextures) {
 			if (std::strcmp(tex, t) == 0) {
 				id = m->GetTextureID(t);
 				break;
 			}
 		}
-		if (id == 0)
+		if (id == shok::GUITextureId::Invalid)
 			throw lua::LuaException{ "texture does not exist" };
 	}
 	m->ReloadTexture(id);
@@ -405,8 +405,8 @@ int CppLogic::ModLoader::ModLoader::AddAnimation(lua::State L)
 	int id = (*BB::CIDManagerEx::AnimManager)->GetIDByNameOrCreate(t);
 	shok::String s{ t };
 	m->AnimManager.Load(id, &s);
-	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
-	AnimsToRemove.push_back(id);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(static_cast<shok::AnimationId>(id));
+	AnimsToRemove.push_back(static_cast<shok::AnimationId>(id));
 	L.Push("Animations");
 	L.GetGlobal();
 	if (L.IsTable(-1)) {
@@ -426,11 +426,11 @@ int CppLogic::ModLoader::ModLoader::ReloadAnimation(lua::State L)
 	const char* n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(id);
 	if (!n)
 		throw lua::LuaException{ "invalid animation" };
-	m->FreeAnim(id);
+	m->FreeAnim(static_cast<shok::AnimationId>(id));
 	shok::String s{ n };
 	m->AnimManager.Load(id, &s);
-	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
-	AnimsToReload.push_back(id);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(static_cast<shok::AnimationId>(id));
+	AnimsToReload.push_back(static_cast<shok::AnimationId>(id));
 	return 0;
 }
 
@@ -454,22 +454,22 @@ int CppLogic::ModLoader::ModLoader::AddSettlerUpgradeCategory(lua::State l)
 	if (id != 0 && id < static_cast<int>((*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.size()))
 		throw lua::LuaException{ "upgrade categoty already exists" };
 	id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
-	int first = L.CheckInt(2);
+	auto first = L.CheckEnum<shok::EntityTypeId>(2);
 	{
 		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
-		v.Vector.emplace_back(id, first);
+		v.Vector.emplace_back(static_cast<shok::UpgradeCategoryId>(id), first);
 	}
-	int ctype = first;
-	while (ctype != 0) {
+	auto ctype = first;
+	while (ctype != shok::EntityTypeId::Invalid) {
 		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
 		auto* sty = dynamic_cast<GGL::CGLSettlerProps*>(cty->LogicProps);
 		if (sty == nullptr)
 			throw lua::LuaException{ "non settler type in settler ucat" };
-		sty->Upgrade.Category = id;
+		sty->Upgrade.Category = static_cast<shok::UpgradeCategoryId>(id);
 		ctype = sty->Upgrade.Type;
 	}
 	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
-	SettlerUCatsToRemove.push_back(id);
+	SettlerUCatsToRemove.push_back(static_cast<shok::UpgradeCategoryId>(id));
 	L.Push("UpgradeCategories");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -490,22 +490,22 @@ int CppLogic::ModLoader::ModLoader::AddBuildingUpgradeCategory(lua::State l)
 	if (id != 0 && id < static_cast<int>((*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.size()))
 		throw lua::LuaException{ "upgrade categoty already exists" };
 	id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
-	int first = L.CheckInt(2);
+	auto first = L.CheckEnum<shok::EntityTypeId>(2);
 	{
 		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
-		v.Vector.emplace_back(id, first);
+		v.Vector.emplace_back(static_cast<shok::UpgradeCategoryId>(id), first);
 	}
-	int ctype = first;
-	while (ctype != 0) {
+	auto ctype = first;
+	while (ctype != shok::EntityTypeId::Invalid) {
 		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
 		auto* bty = dynamic_cast<GGL::CGLBuildingProps*>(cty->LogicProps);
 		if (bty == nullptr)
 			throw lua::LuaException{ "non building type in building ucat" };
-		bty->Upgrade.Category = id;
+		bty->Upgrade.Category = static_cast<shok::UpgradeCategoryId>(id);
 		ctype = bty->Upgrade.Type;
 	}
 	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
-	BuildingUCatsToRemove.push_back(id);
+	BuildingUCatsToRemove.push_back(static_cast<shok::UpgradeCategoryId>(id));
 	L.Push("UpgradeCategories");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -529,7 +529,7 @@ int CppLogic::ModLoader::ModLoader::AddWaterType(lua::State L)
 		e.CopyMessage(buff, 200);
 		throw lua::LuaException{ buff };
 	}
-	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(id);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(static_cast<shok::WaterTypeId>(id));
 	ReloadWaterTypes = true;
 	L.Push("WaterTypes");
 	L.GetGlobal();
@@ -548,7 +548,7 @@ int CppLogic::ModLoader::ModLoader::ReloadWaterType(lua::State L)
 	int id = L.CheckInt(1);
 	if ((*BB::CIDManagerEx::WaterTypeManager)->GetNameByID(id) == nullptr)
 		throw lua::LuaException{ "water type does not exists" };
-	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(id);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(static_cast<shok::WaterTypeId>(id));
 	ReloadWaterTypes = true;
 	return 0;
 }
@@ -585,8 +585,8 @@ int CppLogic::ModLoader::ModLoader::AddTerrainTexture(lua::State L)
 	if (mng->DisplayProps->TerrainTextureManager->GetIdByName(n) != 0)
 		throw lua::LuaException{ "terrain texture already exists" };
 	int id = mng->DisplayProps->TerrainTextureManager->GetIDByNameOrCreate(n);
-	mng->LoadTexture(id);
-	TerrainTexturesToRemove.push_back(id);
+	mng->LoadTexture(static_cast<shok::TerrainTextureId>(id));
+	TerrainTexturesToRemove.push_back(static_cast<shok::TerrainTextureId>(id));
 	return 0;
 }
 
@@ -597,8 +597,8 @@ int CppLogic::ModLoader::ModLoader::ReloadTerrainTexture(lua::State L)
 	int id = mng->DisplayProps->TerrainTextureManager->GetIdByName(n);
 	if (id == 0)
 		throw lua::LuaException{ "terrain texture does not exists" };
-	mng->LoadTexture(id);
-	TerrainTexturesToReload.push_back(id);
+	mng->LoadTexture(static_cast<shok::TerrainTextureId>(id));
+	TerrainTexturesToReload.push_back(static_cast<shok::TerrainTextureId>(id));
 	return 0;
 }
 
@@ -616,8 +616,8 @@ int CppLogic::ModLoader::ModLoader::AddTerrainType(lua::State L)
 		e.CopyMessage(buff, 200);
 		throw lua::LuaException{ buff };
 	}
-	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(id);
-	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(id);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(static_cast<shok::TerrainTypeId>(id));
+	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(static_cast<shok::TerrainTypeId>(id));
 	ReloadTerrainTypes = true;
 	L.Push("TerrainTypes");
 	L.GetGlobal();
@@ -636,8 +636,8 @@ int CppLogic::ModLoader::ModLoader::ReloadTerrainType(lua::State L)
 	int id = L.CheckInt(1);
 	if ((*BB::CIDManagerEx::TerrainTypeManager)->GetNameByID(id) == nullptr)
 		throw lua::LuaException{ "terrain type does not exists" };
-	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(id);
-	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(id);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(static_cast<shok::TerrainTypeId>(id));
+	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(static_cast<shok::TerrainTypeId>(id));
 	ReloadTerrainTypes = true;
 	return 0;
 }
@@ -708,7 +708,7 @@ int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
 		L.SetTableRaw(-3);
 	}
 	L.Push(firstid);
-	SoundGroupsToRemove.push_back(firstid);
+	SoundGroupsToRemove.push_back(static_cast<shok::SoundId>(firstid));
 	return 1;
 }
 
@@ -720,8 +720,8 @@ int CppLogic::ModLoader::ModLoader::AddAnimSet(lua::State L)
 		throw lua::LuaException{ "animset already exists" };
 	auto* mng = *EGL::AnimSetManager::GlobalObj;
 	int id = idm->GetIDByNameOrCreate(name);
-	mng->LoadAnimSet(id);
-	AnimSetsToRemove.push_back(id);
+	mng->LoadAnimSet(static_cast<shok::AnimSetId>(id));
+	AnimSetsToRemove.push_back(static_cast<shok::AnimSetId>(id));
 	L.Push("AnimSets");
 	L.GetGlobal();
 	L.PushValue(1);
@@ -737,9 +737,9 @@ int CppLogic::ModLoader::ModLoader::ReloadAnimSet(lua::State L)
 	auto* idm = *BB::CIDManagerEx::AnimSetManager;
 	if (idm->GetNameByID(id) == nullptr)
 		throw lua::LuaException{ "anim set does not exists" };
-	mng->FreeAnimSet(id);
-	mng->LoadAnimSet(id);
-	AnimSetsToReload.push_back(id);
+	mng->FreeAnimSet(static_cast<shok::AnimSetId>(id));
+	mng->LoadAnimSet(static_cast<shok::AnimSetId>(id));
+	AnimSetsToReload.push_back(static_cast<shok::AnimSetId>(id));
 	return 0;
 }
 
@@ -839,15 +839,15 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 
 		while (EntityTypesToRemove.size() != 0) {
-			int id = EntityTypesToRemove.back();
+			auto id = EntityTypesToRemove.back();
 			EntityTypesToRemove.pop_back();
 			(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->PopEntityType(id);
-			(*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->RemoveID(id);
+			(*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->RemoveID(static_cast<int>(id));
 		}
 
-		for (int id : EntityTypesToReload) {
+		for (auto id : EntityTypesToReload) {
 			auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-			if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size())) // might got popped above
+			if (static_cast<int>(id) <= 0 || static_cast<int>(id) >= static_cast<int>(m->EntityTypes.size())) // might got popped above
 				continue;
 			m->FreeEntityType(id);
 			m->LoadEntityTypeByID(id);
@@ -859,33 +859,33 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		ReloadEffectTypes = false;
 
 		while (TaskListsToRemove.size() != 0) {
-			int id = TaskListsToRemove.back();
+			auto id = TaskListsToRemove.back();
 			TaskListsToRemove.pop_back();
 			if (*EGL::CGLETaskListMgr::GlobalObj)
 				(*EGL::CGLETaskListMgr::GlobalObj)->RemoveTaskList(id);
 			else
-				(*BB::CIDManagerEx::TaskListManager)->RemoveID(id);
+				(*BB::CIDManagerEx::TaskListManager)->RemoveID(static_cast<int>(id));
 		}
 
 		while (TechsToRemove.size() != 0) {
-			int id = TechsToRemove.back();
+			auto id = TechsToRemove.back();
 			TechsToRemove.pop_back();
 			if (*GGL::CGLGameLogic::GlobalObj)
 				(*GGL::CGLGameLogic::GlobalObj)->TechManager->PopTech(id);
 			if ((*BB::CIDManagerEx::TechnologiesManager))
-				(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(id);
+				(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(static_cast<int>(id));
 		}
 
 		while (ModelsToRemove.size() != 0) {
-			int id = ModelsToRemove.back();
+			auto id = ModelsToRemove.back();
 			ModelsToRemove.pop_back();
 			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->PopModel(id);
 			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->PopModel(id);
-			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager->RemoveID(id);
+			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager->RemoveID(static_cast<int>(id));
 		}
 		if (ReloadModels) {
 			for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
-				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(id);
+				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(static_cast<shok::ModelId>(id));
 				//(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(id);
 				// gets reloaded on next use anyway
 			}
@@ -894,31 +894,31 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		ReloadModels = false;
 
 		while (TexturesToRemove.size() != 0) {
-			int id = TexturesToRemove.back();
+			auto id = TexturesToRemove.back();
 			TexturesToRemove.pop_back();
 			EGUIX::TextureManager::GlobalObj()->FreeTexture(id);
-			EGUIX::TextureManager::GlobalObj()->IdManager->RemoveID(id);
+			EGUIX::TextureManager::GlobalObj()->IdManager->RemoveID(static_cast<int>(id));
 		}
-		for (int id : TexturesToReload) {
+		for (auto id : TexturesToReload) {
 			if (static_cast<unsigned int>(id) < EGUIX::TextureManager::GlobalObj()->Textures.size())
 				EGUIX::TextureManager::GlobalObj()->ReloadTexture(id);
 		}
 		TexturesToReload.clear();
 
 		while (AnimsToRemove.size() != 0) {
-			int id = AnimsToRemove.back();
+			auto id = AnimsToRemove.back();
 			AnimsToRemove.pop_back();
 			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeAnim(id);
-			(*BB::CIDManagerEx::AnimManager)->RemoveID(id);
+			(*BB::CIDManagerEx::AnimManager)->RemoveID(static_cast<int>(id));
 			(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->PopAnimPops(id);
 		}
-		for (int id : AnimsToReload) {
+		for (auto id : AnimsToReload) {
 			auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
-			const char* n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(id);
+			const char* n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(static_cast<int>(id));
 			if (n) {
 				m->FreeAnim(id);
 				shok::String s{ n };
-				m->AnimManager.Load(id, &s);
+				m->AnimManager.Load(static_cast<int>(id), &s);
 				(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
 			}
 		}
@@ -927,23 +927,23 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		{
 			auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
 			while (SettlerUCatsToRemove.size() != 0) {
-				int id = SettlerUCatsToRemove.back();
+				auto id = SettlerUCatsToRemove.back();
 				SettlerUCatsToRemove.pop_back();
 				if (v.Vector.back().Category == id) {
 					v.Vector.pop_back();
 				}
-				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(id);
+				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(static_cast<int>(id));
 			}
 		}
 		{
 			auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
 			while (BuildingUCatsToRemove.size() != 0) {
-				int id = BuildingUCatsToRemove.back();
+				auto id = BuildingUCatsToRemove.back();
 				BuildingUCatsToRemove.pop_back();
 				if (v.Vector.back().Category == id) {
 					v.Vector.pop_back();
 				}
-				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(id);
+				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(static_cast<int>(id));
 			}
 		}
 
@@ -967,12 +967,12 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		SelectionTexturesToReload.clear();
 
 		while (TerrainTexturesToRemove.size() != 0) {
-			int id = TerrainTexturesToRemove.back();
+			auto id = TerrainTexturesToRemove.back();
 			TerrainTexturesToRemove.pop_back();
 			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->PopTexture(id);
-			(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->TerrainTextureManager->RemoveID(id);
+			(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->TerrainTextureManager->RemoveID(static_cast<int>(id));
 		}
-		for (int id : TerrainTexturesToReload) {
+		for (auto id : TerrainTexturesToReload) {
 			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->LoadTexture(id);
 		}
 		TerrainTexturesToReload.clear();
@@ -995,18 +995,18 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		GGL::CEntityProfile::HookExperienceClassAssignment(false);
 
 		while (SoundGroupsToRemove.size() != 0) {
-			int id = SoundGroupsToRemove.back();
+			auto id = SoundGroupsToRemove.back();
 			SoundGroupsToRemove.pop_back();
-			(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(id);
+			(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(static_cast<int>(id));
 		}
 
 		while (AnimSetsToRemove.size() != 0) {
-			int id = AnimSetsToRemove.back();
+			auto id = AnimSetsToRemove.back();
 			AnimSetsToRemove.pop_back();
 			(*EGL::AnimSetManager::GlobalObj)->PopAnimSet(id);
-			(*BB::CIDManagerEx::AnimSetManager)->RemoveID(id);
+			(*BB::CIDManagerEx::AnimSetManager)->RemoveID(static_cast<int>(id));
 		}
-		for (int id : AnimSetsToReload) {
+		for (auto id : AnimSetsToReload) {
 			auto* mng = *EGL::AnimSetManager::GlobalObj;
 			mng->FreeAnimSet(id);
 			mng->LoadAnimSet(id);
@@ -1015,7 +1015,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		if (DirectXEffectsToFree.size() > 0) {
 			for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
-				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(id);
+				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(static_cast<shok::ModelId>(id));
 				// gets reloaded on next use anyway
 			}
 			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
@@ -1039,7 +1039,7 @@ bool CppLogic::ModLoader::ModLoader::IsInitialized()
 	return Initialized;
 }
 
-void CppLogic::ModLoader::ModLoader::AddTaskListToRemove(int id)
+void CppLogic::ModLoader::ModLoader::AddTaskListToRemove(shok::TaskListId id)
 {
 	TaskListsToRemove.push_back(id);
 }

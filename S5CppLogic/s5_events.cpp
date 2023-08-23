@@ -41,34 +41,34 @@ void BB::CEvent::SetVT(int vt)
 {
 	*reinterpret_cast<int*>(this) = vt;
 }
-unsigned int __stdcall BB::CEvent::GetClassIdentifier() const
+shok::ClassId __stdcall BB::CEvent::GetClassIdentifier() const
 {
-	return 0;
+	return Identifier;
 }
-void* __stdcall BB::CEvent::CastToIdentifier(unsigned int id)
+void* __stdcall BB::CEvent::CastToIdentifier(shok::ClassId id)
 {
 	return nullptr;
 }
 
-EGL::CEventEntityGetBool::CEventEntityGetBool(shok::EventIDs e, int eid)
+EGL::CEventEntityGetBool::CEventEntityGetBool(shok::EventIDs e, shok::EntityId eid)
 	: CEventGetValue_Bool(e)
 {
 	SetVT(vtp);
 	Entity = eid;
 }
 
-int EGL::CEvent1Entity::GetEntityID() const
+shok::EntityId EGL::CEvent1Entity::GetEntityID() const
 {
 	return EntityID;
 }
-void* __stdcall EGL::CEvent1Entity::CastToIdentifier(unsigned int id)
+void* __stdcall EGL::CEvent1Entity::CastToIdentifier(shok::ClassId id)
 {
 	if (id == IEventEntityID::Identifier)
 		return static_cast<IEventEntityID*>(this);
 	return nullptr;
 }
 
-EGL::CEvent1Entity::CEvent1Entity(shok::EventIDs e, int ent) : BB::CEvent(e)
+EGL::CEvent1Entity::CEvent1Entity(shok::EventIDs e, shok::EntityId ent) : BB::CEvent(e)
 {
 	SetVT(EGL::CEvent1Entity::vtp);
 	EntityID = ent;
@@ -88,17 +88,17 @@ EGL::CEventPositionAndTaskState::CEventPositionAndTaskState(shok::EventIDs e, co
 	State = s;
 }
 
-int EGL::CEventPlayerID::GetPlayerID() const {
+shok::PlayerId EGL::CEventPlayerID::GetPlayerID() const {
 	return PlayerID;
 }
-EGL::CEventPlayerID::CEventPlayerID(shok::EventIDs e, int p) : BB::CEvent(e)
+EGL::CEventPlayerID::CEventPlayerID(shok::EventIDs e, shok::PlayerId p) : BB::CEvent(e)
 {
 	SetVT(EGL::CEventPlayerID::vtp);
 	PlayerID = p;
 	*reinterpret_cast<int*>(static_cast<EGL::IEventPlayerID*>(this)) = EGL::CEventPlayerID::vtp_IEventPlayerID;
 }
 
-EGL::CEventSubAnim::CEventSubAnim(shok::EventIDs e, int an, int subind, bool back, bool loop) : BB::CEvent(e)
+EGL::CEventSubAnim::CEventSubAnim(shok::EventIDs e, shok::AnimationId an, int subind, bool back, bool loop) : BB::CEvent(e)
 {
 	SetVT(EGL::CEventSubAnim::vtp);
 	AnimId = an;
@@ -107,22 +107,22 @@ EGL::CEventSubAnim::CEventSubAnim(shok::EventIDs e, int an, int subind, bool bac
 	IsLooped = loop;
 }
 
-EGL::CEvent2Entities::CEvent2Entities(shok::EventIDs e, int aid, int tid) : BB::CEvent(e)
+EGL::CEvent2Entities::CEvent2Entities(shok::EventIDs e, shok::EntityId aid, shok::EntityId tid) : BB::CEvent(e)
 {
 	SetVT(EGL::CEvent2Entities::vtp);
 	ActorId = aid;
 	TargetId = tid;
 	*reinterpret_cast<int*>(static_cast<EGL::IEvent2Entities*>(this)) = EGL::CEvent2Entities::vtp_IEvent2Entities;
 }
-int EGL::CEvent2Entities::GetActorID() const
+shok::EntityId EGL::CEvent2Entities::GetActorID() const
 {
 	return ActorId;
 }
-int EGL::CEvent2Entities::GetTargetID() const
+shok::EntityId EGL::CEvent2Entities::GetTargetID() const
 {
 	return TargetId;
 }
-void* __stdcall EGL::CEvent2Entities::CastToIdentifier(unsigned int id)
+void* __stdcall EGL::CEvent2Entities::CastToIdentifier(shok::ClassId id)
 {
 	if (id == IEvent2Entities::Identifier)
 		return static_cast<IEvent2Entities*>(this);
@@ -136,7 +136,7 @@ EGL::CEventThousandthsGetInteger::CEventThousandthsGetInteger(shok::EventIDs e, 
 	Thousands = thousands;
 }
 
-EGL::CEventSoundPositionAndID::CEventSoundPositionAndID(shok::EventIDs e, int soundid, bool haspos, const shok::Position& p, float z, int vol, bool looped)
+EGL::CEventSoundPositionAndID::CEventSoundPositionAndID(shok::EventIDs e, shok::SoundId soundid, bool haspos, const shok::Position& p, float z, int vol, bool looped)
 	: BB::CEvent(e)
 {
 	SetVT(vtp);
@@ -173,7 +173,7 @@ GGL::CEventAttachmentTypeGetBool::CEventAttachmentTypeGetBool(shok::EventIDs e, 
 	AttachmentType = t;
 }
 
-GGL::CEventEntityIndex::CEventEntityIndex(shok::EventIDs e, int eid, int ind) : BB::CEvent(e)
+GGL::CEventEntityIndex::CEventEntityIndex(shok::EventIDs e, shok::EntityId eid, int ind) : BB::CEvent(e)
 {
 	SetVT(GGL::CEventEntityIndex::vtp);
 	EntityId = eid;
@@ -188,7 +188,7 @@ GGL::CEventTransaction::CEventTransaction(shok::EventIDs e, shok::ResourceType s
 	BuyAmount = buyAm;
 }
 
-GGL::CEventGoodsTraded::CEventGoodsTraded(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm, int en, float sellam)
+GGL::CEventGoodsTraded::CEventGoodsTraded(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm, shok::EntityId en, float sellam)
 	: CEventTransaction(e, sell, buy, buyAm)
 {
 	SetVT(vtp);
@@ -196,19 +196,19 @@ GGL::CEventGoodsTraded::CEventGoodsTraded(shok::EventIDs e, shok::ResourceType s
 	Entity = en;
 	SellAmount = sellam;
 }
-int GGL::CEventGoodsTraded::GetEntityID() const
+shok::EntityId GGL::CEventGoodsTraded::GetEntityID() const
 {
 	return Entity;
 }
 
-GGL::CEventPositionAnd2EntityTypes::CEventPositionAnd2EntityTypes(shok::EventIDs e, const shok::Position& p, int t1, int t2) : EGL::CEventPosition(e, p)
+GGL::CEventPositionAnd2EntityTypes::CEventPositionAnd2EntityTypes(shok::EventIDs e, const shok::Position& p, shok::EntityTypeId t1, shok::EntityTypeId t2) : EGL::CEventPosition(e, p)
 {
 	SetVT(GGL::CEventPositionAnd2EntityTypes::vtp);
 	Type1 = t1;
 	Type2 = t2;
 }
 
-GGL::CEventEntityAttachment::CEventEntityAttachment(shok::EventIDs e, shok::AttachmentType ty, int eid, shok::EventIDs detach) : BB::CEvent(e)
+GGL::CEventEntityAttachment::CEventEntityAttachment(shok::EventIDs e, shok::AttachmentType ty, shok::EntityId eid, shok::EventIDs detach) : BB::CEvent(e)
 {
 	SetVT(GGL::CEventEntityAttachment::vtp);
 	Type = ty;
@@ -260,41 +260,41 @@ BB::CKeyPressEvent::CKeyPressEvent(shok::InputEventIds id, int keychar, shok::Ke
 	KeyModifier = keymodif;
 }
 
-CppLogic::Events::AdvHurtEvent::AdvHurtEvent(shok::EventIDs e, int aid, int tid, int dmg, shok::AdvancedDealDamageSource sou, int attpl)
+CppLogic::Events::AdvHurtEvent::AdvHurtEvent(shok::EventIDs e, shok::EntityId aid, shok::EntityId tid, int dmg, shok::AdvancedDealDamageSource sou, shok::PlayerId attpl)
 	: EGL::CEvent2Entities(e, aid, tid)
 {
 	Damage = dmg;
 	Source = sou;
 	AttackerPlayer = attpl;
 }
-unsigned int __stdcall CppLogic::Events::AdvHurtEvent::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::Events::AdvHurtEvent::GetClassIdentifier() const
 {
 	return Identifier;
 }
 
-CppLogic::Events::ResourceEvent::ResourceEvent(shok::EventIDs e, int id, shok::ResourceType rt, int am)
+CppLogic::Events::ResourceEvent::ResourceEvent(shok::EventIDs e, shok::EntityId id, shok::ResourceType rt, int am)
 	: EGL::CEvent1Entity(e, id)
 {
 	Type = rt;
 	ResourceAmount = am;
 }
-unsigned int __stdcall CppLogic::Events::ResourceEvent::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::Events::ResourceEvent::GetClassIdentifier() const
 {
 	return Identifier;
 }
 
-CppLogic::Events::ConversionEvent::ConversionEvent(shok::EventIDs e, int id, int told, int tnew)
+CppLogic::Events::ConversionEvent::ConversionEvent(shok::EventIDs e, shok::EntityId id, shok::EntityId told, shok::EntityId tnew)
 	: BB::CEvent(e)
 {
 	ConverterId = id;
 	TargetIDOld = told;
 	TargetIDNew = tnew;
 }
-unsigned int __stdcall CppLogic::Events::ConversionEvent::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::Events::ConversionEvent::GetClassIdentifier() const
 {
 	return Identifier;
 }
-void* __stdcall CppLogic::Events::ConversionEvent::CastToIdentifier(unsigned int id)
+void* __stdcall CppLogic::Events::ConversionEvent::CastToIdentifier(shok::ClassId id)
 {
 	if (id == EGL::IEventEntityID::Identifier)
 		return static_cast<EGL::IEventEntityID*>(this);
@@ -302,27 +302,27 @@ void* __stdcall CppLogic::Events::ConversionEvent::CastToIdentifier(unsigned int
 		return static_cast<EGL::IEvent2Entities*>(this);
 	return nullptr;
 }
-int CppLogic::Events::ConversionEvent::GetEntityID() const
+shok::EntityId CppLogic::Events::ConversionEvent::GetEntityID() const
 {
 	return ConverterId;
 }
-int CppLogic::Events::ConversionEvent::GetActorID() const
+shok::EntityId CppLogic::Events::ConversionEvent::GetActorID() const
 {
 	return TargetIDOld;
 }
-int CppLogic::Events::ConversionEvent::GetTargetID() const
+shok::EntityId CppLogic::Events::ConversionEvent::GetTargetID() const
 {
 	return TargetIDNew;
 }
 
-CppLogic::Events::AdvHurtByEvent::AdvHurtByEvent(shok::EventIDs e, int aid, int dmg, shok::AdvancedDealDamageSource sou, int attpl)
+CppLogic::Events::AdvHurtByEvent::AdvHurtByEvent(shok::EventIDs e, shok::EntityId aid, int dmg, shok::AdvancedDealDamageSource sou, shok::PlayerId attpl)
 	: EGL::CEvent1Entity(e, aid)
 {
 	Damage = dmg;
 	Source = sou;
 	AttackerPlayer = attpl;
 }
-unsigned int __stdcall CppLogic::Events::AdvHurtByEvent::GetClassIdentifier() const
+shok::ClassId __stdcall CppLogic::Events::AdvHurtByEvent::GetClassIdentifier() const
 {
 	return Identifier;
 }

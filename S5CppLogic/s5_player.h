@@ -13,13 +13,15 @@ namespace GGL {
 	class CPlayerAttractionHandler : public BB::IObject {
 	public:
 		struct EntityInSystemData {
-			int EntityID, GameTurn;
+			shok::EntityId EntityID;
+			int GameTurn;
 		};
 		struct TypeThatLeftData {
-			int EntityType, GameTurn;
+			shok::EntityTypeId EntityType;
+			int GameTurn;
 		};
 
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		bool PaydayActive;
 		PADDING(3);
 		int PaydayFirstOccuraceGameTurn;
@@ -27,19 +29,19 @@ namespace GGL {
 		PADDING(2);
 		int GUI_WorkersWithoutSleepPlace, m_GUI_WorkersWithoutEatPlace; // just the number of workers, dont ask me why there is this m_
 		shok::Vector<EntityInSystemData> EntityInSystem; // 7
-		shok::Vector<int> HeadquarterArray; // 11
-		shok::Vector<int> VillageCenterArray; // 15
-		shok::Vector<int> WorkBuildingsArray; // 19
-		shok::Vector<int> ResidenceBuildingArray; // 23
-		shok::Vector<int> FarmBuildingArray; // 27
-		shok::Vector<int> BarrackBuildingArray; // 31
-		shok::Vector<int> FreeWorkerArray; // 35
-		shok::Vector<int> EmployedWorkerArray; // 39
-		shok::Vector<int> SoldierArray; // 43
-		shok::Vector<int> LeaderArray; // 47
-		shok::Vector<int> HeroArray;
-		shok::Vector<int> SerfArray; // 55
-		shok::Map<int, int> EntityTypeCountMap; // 59 EntityType->Count
+		shok::Vector<shok::EntityId> HeadquarterArray; // 11
+		shok::Vector<shok::EntityId> VillageCenterArray; // 15
+		shok::Vector<shok::EntityId> WorkBuildingsArray; // 19
+		shok::Vector<shok::EntityId> ResidenceBuildingArray; // 23
+		shok::Vector<shok::EntityId> FarmBuildingArray; // 27
+		shok::Vector<shok::EntityId> BarrackBuildingArray; // 31
+		shok::Vector<shok::EntityId> FreeWorkerArray; // 35
+		shok::Vector<shok::EntityId> EmployedWorkerArray; // 39
+		shok::Vector<shok::EntityId> SoldierArray; // 43
+		shok::Vector<shok::EntityId> LeaderArray; // 47
+		shok::Vector<shok::EntityId> HeroArray;
+		shok::Vector<shok::EntityId> SerfArray; // 55
+		shok::Map<shok::EntityTypeId, int> EntityTypeCountMap; // 59 EntityType->Count
 		shok::List<TypeThatLeftData> EntityTypeThatLeft; // 62
 
 		static inline constexpr int vtp = 0x770868;
@@ -70,7 +72,7 @@ namespace GGL {
 		int GetNumberOfWorkersWithoutFarmPlace();
 
 		void CheckWorkerAttachment(bool forceReAttach);
-		bool AttachWorker(int worker, int building);
+		bool AttachWorker(shok::EntityId worker, shok::EntityId building);
 
 		// checkpayday 4C25FB thiscall
 		static void HookCheckPayday();
@@ -85,28 +87,28 @@ namespace GGL {
 
 	class CUpgradeManager : public BB::IObject {
 	public:
-		virtual EGL::CGLEEntityProps::UpgradeInfo* GetUpgradeInfo(int ety) = 0;
-		virtual void UpgradeEntity(int id) = 0;
+		virtual EGL::CGLEEntityProps::UpgradeInfo* GetUpgradeInfo(shok::EntityTypeId ety) = 0;
+		virtual void UpgradeEntity(shok::EntityId id) = 0;
 		// 2 more empty funcs
 
 		struct JobDataEntry {
 			float UpgradeProgress;
-			int Category; //ucat
+			shok::UpgradeCategoryId Category; //ucat
 			BB::IObject* UpgradeManager;
 		};
 		struct UCatEntry {
 			int CurrentLevel;
-			int Level0TypeID;
+			shok::EntityTypeId Level0TypeID;
 		};
 
-		shok::Map<int, JobDataEntry> JobData; // Category -> UpgradeJobData empty
-		shok::Map<int, UCatEntry> UpgradeCategories; // Category -> Info gets filled by player ctor
-		int PlayerID;
+		shok::Map<shok::UpgradeCategoryId, JobDataEntry> JobData; // Category -> UpgradeJobData empty
+		shok::Map<shok::UpgradeCategoryId, UCatEntry> UpgradeCategories; // Category -> Info gets filled by player ctor
+		shok::PlayerId PlayerID;
 
 		static inline constexpr int vtp = 0x7728CC;
 
-		int GetUpgradeCategoryOfEntityType(int etype);
-		int GetTypeByUCat(int ucat);
+		shok::UpgradeCategoryId GetUpgradeCategoryOfEntityType(shok::EntityTypeId etype);
+		shok::EntityTypeId GetTypeByUCat(shok::UpgradeCategoryId ucat);
 	};
 	class CBuildingUpgradeManager : public GGL::CUpgradeManager {
 	public:
@@ -115,27 +117,27 @@ namespace GGL {
 			int CurrentAmount;
 		};
 
-		shok::Map<int, ScholarInfo> ScholarInfoElement; // Category -> ScholarInfo gets filled by player ctor
+		shok::Map<shok::UpgradeCategoryId, ScholarInfo> ScholarInfoElement; // Category -> ScholarInfo gets filled by player ctor
 
-		static inline constexpr unsigned int Identifier = 0x6987C1B3;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6987C1B3);
 		static inline constexpr int vtp = 0x772948;
 
-		void AddCategory(int ucat, int firstEntity, int maxscholar);
+		void AddCategory(shok::UpgradeCategoryId ucat, shok::EntityTypeId firstEntity, int maxscholar);
 	};
 	static_assert(sizeof(CBuildingUpgradeManager) == 11 * 4);
 	class CSettlerUpgradeManager : public GGL::CUpgradeManager {
 	public:
 
-		static inline constexpr unsigned int Identifier = 0x126CFE03;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x126CFE03);
 		static inline constexpr int vtp = 0x772904;
 
-		void AddCategory(int ucat, int firstEntity);
+		void AddCategory(shok::UpgradeCategoryId ucat, shok::EntityTypeId firstEntity);
 	};
 
 	class CTradeManager : public BB::IObject {
 	public:
 		struct ResData {
-			int ResourceType;
+			shok::ResourceType ResourceType;
 			float CurrentPrice, CurrentInflation, CurrentDeflation;
 			bool CanBeSold, CanBeBought;
 
@@ -144,18 +146,18 @@ namespace GGL {
 		};
 
 
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		shok::Vector<ResData> TradeData;
 
 		static inline constexpr int vtp = 0x772860;
 
 		struct TradeOrder {
-			int Player;
+			shok::PlayerId Player;
 			shok::ResourceType SellResourceType, BuyResourceType;
 			float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam * workamount + sellam * workamount
 
 			// calculates price
-			void SetData(int player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm);
+			void SetData(shok::PlayerId player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm);
 			// checks resource count and CanBeSold+CanBeBought flags
 			// does not get used by normal market behavior
 			bool IsTradeValid();
@@ -175,7 +177,7 @@ namespace GGL {
 	// checks for TechState::Researched (4)
 	class CTechConditionPredicate {
 	public:
-		virtual bool CheckTech(PlayerTechManager* mng, int techId) const = 0;
+		virtual bool CheckTech(PlayerTechManager* mng, shok::Technology techId) const = 0;
 
 		CTechConditionPredicate();
 
@@ -194,26 +196,26 @@ namespace GGL {
 			shok::TechState TechStatus; // dos not contain Waiting or Future
 			int ResearchProgress;
 			int StartTick;
-			int ResearcherId;
+			shok::EntityId ResearcherId;
 		};
 
-		int PlayerID; // 0
+		shok::PlayerId PlayerID; // 0
 		shok::Vector<Tech> TechnologyState; // 1 indexed by tech id
-		shok::Vector<int> TechnologyInProgress; // 5 only AutomaticResearch==true
+		shok::Vector<shok::TechnologyId> TechnologyInProgress; // 5 only AutomaticResearch==true
 		shok::List<BB::TSlot1<const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&>> OnResearched; // 9
 
 		// just adds progress and sets tech state if done, returns tech done, amount * 1000
-		bool AddTechProgressRaw(int techId, float amount);
-		void TechResearched(int techId, int researcherId);
-		void AddTechProgressWorker(int techId, float amount);
-		bool CheckTechnologyRequirementsFor(int tech, const CTechConditionPredicate& p);
-		bool CheckAllRequirementsFor(int tech, const CTechConditionPredicate& p);
-		shok::TechState GetTechState(int tech); // may also return substates of allowed
-		void ForceResearch(int tech);
+		bool AddTechProgressRaw(shok::TechnologyId techId, float amount);
+		void TechResearched(shok::TechnologyId techId, shok::EntityId researcherId);
+		void AddTechProgressWorker(shok::TechnologyId techId, float amount);
+		bool CheckTechnologyRequirementsFor(shok::TechnologyId tech, const CTechConditionPredicate& p);
+		bool CheckAllRequirementsFor(shok::TechnologyId tech, const CTechConditionPredicate& p);
+		shok::TechState GetTechState(shok::TechnologyId tech); // may also return substates of allowed
+		void ForceResearch(shok::TechnologyId tech);
 		// on update 0x4A1B42 __thiscall()
 		// start research 0x4A29DD __thiscall(techId, researcherId) only to be called by building::startResearch
 
-		void ForceResearchNoFeedback(int tech);
+		void ForceResearchNoFeedback(shok::TechnologyId tech);
 	};
 	static_assert(sizeof(PlayerTechManager) == 12 * 4);
 
@@ -221,16 +223,16 @@ namespace GGL {
 		struct Tribute {
 			int UniqueTributeID;
 			shok::CostInfo Costs;
-			int OwnerEntityID; // 19
-			int OfferingPlayerID;
+			shok::EntityId OwnerEntityID; // 19
+			shok::PlayerId OfferingPlayerID;
 			shok::String OfferStringTableKey;
 		};
 
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		shok::Vector<Tribute> Tributes;
 
 		// creates tribute or overrides it, if it has an existing id
-		void SetTributeData(int tid, const shok::CostInfo& c, int ownerEntityId, int offeringPlayerId, const char* text);
+		void SetTributeData(int tid, const shok::CostInfo& c, shok::EntityId ownerEntityId, shok::PlayerId offeringPlayerId, const char* text);
 		// returns if it was there
 		bool RemoveTribute(int tid);
 	};
@@ -254,7 +256,7 @@ namespace GGL {
 		};
 
 
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		shok::List<Quest> Quests;
 
 		// pos can be nullptr, creates quest or overrides it
@@ -270,13 +272,13 @@ namespace GGL {
 
 	struct GameStatisticsTimeline {
 		shok::Vector<int> Amounts;
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		int LastGatherTurn;
 	};
 	class CResourceStatistics {
 	public:
 		struct ResData {
-			int ResourceType;
+			shok::ResourceType ResourceType;
 			int AmountMined;
 			int AmountRefined;
 			GGL::GameStatisticsTimeline TimeLine;
@@ -292,13 +294,15 @@ namespace GGL {
 	class CGameStatistics {
 	public:
 		struct TechResearchData {
-			int TechnologyType, Time;
+			shok::TechnologyId TechnologyType;
+			int Time;
 		};
 		struct BuildingUpgradedData {
-			int BuildingType, Time;
+			shok::EntityTypeId BuildingType;
+			int Time;
 		};
 
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		int NumberOfUnitsKilled, NumberOfUnitsDied, NumberOfBuildingsDestroyed, NumberOfBuildingsLost;
 		GGL::CResourceStatistics ResourceStatistics; //6
 		GGL::GameStatisticsTimeline UnitsKilledTimeLine, UnitsDiedTimeLine, BuildingsDestroyedTimeLine, BuildingsLostTimeLine, // 12, 18, 24, 30
@@ -311,7 +315,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76E0E0;
 
-		void AddTechResearched(int tech);
+		void AddTechResearched(shok::TechnologyId tech);
 		void OnResRefined(shok::ResourceType rt, float am);
 		void OnResMined(shok::ResourceType rt, float am); // use normal res type, not raw
 	};
@@ -334,7 +338,7 @@ namespace GGL {
 		bool PlayerIsHumanFlag;
 		PADDING(3);
 		int PlayerColorR, PlayerColorG, PlayerColorB;
-		int PlayerID;
+		shok::PlayerId PlayerID;
 		shok::String PlayerNameStringTableKey, PlayerNameStringRaw;
 		shok::CostInfo CurrentResources; // 23
 		float TaxAmountFactor; // used only for levytax
@@ -358,8 +362,8 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76FA88;
 
-		shok::DiploState GetDiploStateTo(int p);
-		shok::TechState GetTechStatus(int tech);
+		shok::DiploState GetDiploStateTo(shok::PlayerId p);
+		shok::TechState GetTechStatus(shok::TechnologyId tech);
 
 		int GetTaxPerWorker();
 		int GetLevyTaxPerWorker();
@@ -373,17 +377,17 @@ namespace GGL {
 
 		bool HasResourcesFeedback(const shok::CostInfo& c, bool feedback = true);
 
-		static bool ArePlayersHostile(int p1, int p2);
-		static bool ArePlayersFriendly(int p1, int p2);
+		static bool ArePlayersHostile(shok::PlayerId p1, shok::PlayerId p2);
+		static bool ArePlayersFriendly(shok::PlayerId p1, shok::PlayerId p2);
 
-		static inline bool(_cdecl* const CanPlaceBuilding)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) = reinterpret_cast<bool(_cdecl*)(int, int, shok::Position*, float, int)>(0x4B442C);
-		static inline bool(_cdecl* const CanPlaceBuildingAtPos)(int entitytype, int player, shok::Position* pos, float rotation) = reinterpret_cast<bool(_cdecl*)(int, int, shok::Position*, float)>(0x4B45C8);
+		static inline bool(_cdecl* const CanPlaceBuilding)(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId) = reinterpret_cast<bool(_cdecl*)(shok::EntityTypeId, shok::PlayerId, shok::Position*, float, shok::EntityId)>(0x4B442C);
+		static inline bool(_cdecl* const CanPlaceBuildingAtPos)(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation) = reinterpret_cast<bool(_cdecl*)(shok::EntityTypeId, shok::PlayerId, shok::Position*, float)>(0x4B45C8);
 
-		static bool (*CanPlaceBuildingCallback)(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId);
+		static bool (*CanPlaceBuildingCallback)(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
 		static void HookCanPlaceBuilding();
 
 	private:
-		static int __stdcall CanPlaceBuildingHook(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId);
+		static int __stdcall CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
 
 	};
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;

@@ -6,13 +6,13 @@
 namespace ED {
 	class CBehaviorProps : public BB::IObject {
 	public:
-		int Class = 0;
+		shok::ClassId Class = static_cast<shok::ClassId>(0);
 		int Index = 0;
 		int Unknown = 100; // 100?? 3
 
 		static inline constexpr int vtp = 0x76AB0C;
 		static inline constexpr int TypeDesc = 0x80AC10;
-		static inline constexpr unsigned int Identifier = 0x1F78996D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1F78996D);
 
 		static BB::SerializationData* SerializationData;
 	};
@@ -38,7 +38,7 @@ namespace ED {
 	public:
 		static inline constexpr int vtp = 0x76A9E4;
 		static inline constexpr int TypeDesc = 0x80AA54;
-		static inline constexpr unsigned int Identifier = BB::InvalidIdentifier;
+		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
 	};
 
 	class CUVAnimBehavior : public ED::IBehavior {
@@ -46,7 +46,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE8EC;
 		static inline constexpr int TypeDesc = 0x84CF0C;
-		static inline constexpr unsigned int Identifier = 0x257D793D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x257D793D);
 	};
 
 	class CPermanentUVAnimBehavior : public ED::IBehavior {
@@ -54,7 +54,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE914;
 		static inline constexpr int TypeDesc = 0x84CFD0;
-		static inline constexpr unsigned int Identifier = 0x162356CD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x162356CD);
 	};
 
 	class CParticleEffectAttachmentBehavior : public ED::IBehavior {
@@ -62,7 +62,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE93C;
 		static inline constexpr int TypeDesc = 0x84D01C;
-		static inline constexpr unsigned int Identifier = 0x2DB43D17;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2DB43D17);
 	};
 
 	class CParticleEffectSwitchBehavior : public ED::IBehavior {
@@ -70,7 +70,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE964;
 		static inline constexpr int TypeDesc = 0x84D050;
-		static inline constexpr unsigned int Identifier = 0xD6E2E097;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD6E2E097);
 	};
 
 	class CDisplayBehaviorWaterfallAnimation : public ED::IBehavior {
@@ -78,7 +78,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEA44;
 		static inline constexpr int TypeDesc = 0x84D354;
-		static inline constexpr unsigned int Identifier = 0x29B4B323;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x29B4B323);
 	};
 
 	class CDisplayBehaviorMovement : public ED::IBehavior {
@@ -86,7 +86,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEAA4;
 		static inline constexpr int TypeDesc = 0x84D3E8;
-		static inline constexpr unsigned int Identifier = 0x166A8A03;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x166A8A03);
 	};
 
 	class CDisplayBehaviorBuildingAnimation : public ED::IBehavior {
@@ -97,7 +97,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEAD4;
 		static inline constexpr int TypeDesc = 0x84D4CC;
-		static inline constexpr unsigned int Identifier = 0x72DD7A54;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x72DD7A54);
 	};
 	static_assert(offsetof(CDisplayBehaviorBuildingAnimation, Slot) == 2 * 4);
 
@@ -107,7 +107,7 @@ namespace ED {
 		ED::CDisplayStaticWithHierarchy* EntityDisplay = nullptr;
 		EGL::TSlot<EGL::SSlotArgsAnimation, 796165920>* Slot = nullptr; // 2
 		RWE::Anim::RpHAnimHierarchy* AnimHandlerData;
-		int CurrentAnimId; // 4
+		shok::AnimationId CurrentAnimId; // 4
 		float AnimSpeed; //?
 		float StartTime; // 6
 		float SpeedModifier;
@@ -117,7 +117,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEB08;
 		static inline constexpr int TypeDesc = 0x84D5B4;
-		static inline constexpr unsigned int Identifier = 0x1304C08D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1304C08D);
 	};
 
 	class CDisplayBehaviorAnimation : public CDisplayBehaviorAnimationNoBlending { // size 15
@@ -126,7 +126,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AEB40;
 		static inline constexpr int TypeDesc = 0x84D6A4;
-		static inline constexpr unsigned int Identifier = 0xB79FC943;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB79FC943);
 	};
 	//constexpr int i = offsetof(CDisplayBehaviorAnimationNoBlending, Slot) / 4;
 
@@ -137,8 +137,8 @@ namespace ED {
 	class CEntity : public BB::IObject {
 	public:
 		EGL::IEntityDisplay* Entity;
-		int EntityID;
-		int ModelOverrideID;
+		shok::EntityId EntityID;
+		shok::ModelId ModelOverrideID;
 		RWE::RpClump* Model;
 		PADDINGI(1); // some kind of flags? // 5
 		PADDINGI(1); // some counter
@@ -217,7 +217,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x76A494;
 		static inline constexpr int TypeDesc = 0x8099C0;
-		static inline constexpr unsigned int Identifier = 0x2A5844BD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2A5844BD);
 	};
 	static_assert(sizeof(ED::CEntity) == 4 * 15);
 
@@ -228,7 +228,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x7AE3C4;
 		static inline constexpr int TypeDesc = 0x8099DC;
-		static inline constexpr unsigned int Identifier = 0x814643;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x814643);
 	};
 	static_assert(sizeof(CDisplayStaticEntity) == 4 * 17);
 
@@ -238,7 +238,7 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x76AE30;
 		static inline constexpr int TypeDesc = 0x80AF54;
-		static inline constexpr unsigned int Identifier = 0x3D31B843;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3D31B843);
 	};
 	static_assert(sizeof(CDisplayStaticWithHierarchy) == 4 * 18);
 }
@@ -250,17 +250,17 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AB1C;
 		static inline constexpr int TypeDesc = 0x80AC30;
-		static inline constexpr unsigned int Identifier = 0x156D5E5D;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x156D5E5D);
 	};
 
 	class CCamouflageBehaviorProps : public ED::CBehaviorProps {
 	public:
-		int CamouflageModelID; //4
+		shok::ModelId CamouflageModelID; //4
 		int CamouflageAlpha;
 
 		static inline constexpr int vtp = 0x76AEA0;
 		static inline constexpr int TypeDesc = 0x80B048;
-		static inline constexpr unsigned int Identifier = 0x15CB25AD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x15CB25AD);
 	};
 
 	class CBuildingBehaviorProps : public ED::CBehaviorProps {
@@ -269,7 +269,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AF1C;
 		static inline constexpr int TypeDesc = 0x80B1C0;
-		static inline constexpr unsigned int Identifier = 0x2A2142BD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2A2142BD);
 	};
 
 	class CWaterfallAnimationBehaviorProps : public ED::CBehaviorProps { // seems to be unused
@@ -278,7 +278,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x7AEA34;
 		static inline constexpr int TypeDesc = 0x84D320;
-		static inline constexpr unsigned int Identifier = 0x38F70CA3;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x38F70CA3);
 	};
 
 
@@ -289,7 +289,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AA0C;
 		static inline constexpr int TypeDesc = 0x80AA70;
-		static inline constexpr unsigned int Identifier = 0xBDB4C703;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xBDB4C703);
 	};
 
 	class CLimitedAttachmentBannerBehavior : public ED::IBehavior {
@@ -297,7 +297,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AB2C;
 		static inline constexpr int TypeDesc = 0x80AC68;
-		static inline constexpr unsigned int Identifier = 0x1DE7EFFD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1DE7EFFD);
 	};
 
 	class CCamouflageBehavior : public ED::IBehavior {
@@ -310,7 +310,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AEB0;
 		static inline constexpr int TypeDesc = 0x80B0B8;
-		static inline constexpr unsigned int Identifier = 0x26C048ED;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x26C048ED);
 	};
 	static_assert(sizeof(CCamouflageBehavior) == 5 * 4);
 
@@ -319,7 +319,7 @@ namespace GD {
 
 		static inline constexpr int vtp = 0x76AF54;
 		static inline constexpr int TypeDesc = 0x80B1E8;
-		static inline constexpr unsigned int Identifier = 0x76786DD;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x76786DD);
 	};
 
 }
@@ -333,7 +333,7 @@ namespace ED {
 		virtual void uk1() = 0;
 		virtual void uk2() = 0;
 	public:
-		virtual ED::CEntity* GetDisplayForEntity(int eid) = 0;
+		virtual ED::CEntity* GetDisplayForEntity(shok::EntityId eid) = 0;
 		// 3 more funcs
 		// dtor
 
@@ -352,7 +352,7 @@ namespace ED {
 		static inline constexpr int vtp = 0x76A1A4;
 
 		ED::CEntity* CreateDisplayForEntity(EGL::IEntityDisplay* e);
-		void DestroyDisplayForEntity(int eid);
+		void DestroyDisplayForEntity(shok::EntityId eid);
 	};
 }
 

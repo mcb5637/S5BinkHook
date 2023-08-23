@@ -20,12 +20,12 @@ namespace CppLogic::EntityAddon {
 
 		void operator =(const EntityAddonData& other);
 
-		static constexpr unsigned int Identifier = 0x1004;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1004);
 		static BB::SerializationData SerializationData[];
 
 		virtual ~EntityAddonData() override = default;
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
-		virtual void AddHandlers(int id) override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityDestroy(bool ev) override;

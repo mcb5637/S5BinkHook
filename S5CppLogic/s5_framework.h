@@ -163,7 +163,7 @@ namespace GDB {
 		float Data;
 
 		static inline constexpr int vtp = 0x76300C;
-		static inline constexpr unsigned int Identifier = 0x93BCC6F3;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x93BCC6F3);
 	};
 
 	class CString : public BB::IObject {
@@ -171,7 +171,7 @@ namespace GDB {
 		shok::String Data;
 
 		static inline constexpr int vtp = 0x76302C;
-		static inline constexpr unsigned int Identifier = 0xAA9646F3;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xAA9646F3);
 	};
 
 	class CList : public BB::IObject {
@@ -184,11 +184,11 @@ namespace GDB {
 		float GetValue(const char* key);
 		void SetValue(const char* key, float value);
 
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr int vtp = 0x76289C;
 		static inline constexpr int TypeDesc = 0x80040C;
-		static inline constexpr unsigned int Identifier = 0x5070AAC3;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5070AAC3);
 
 		void RemoveKey(const std::string& k);
 	};

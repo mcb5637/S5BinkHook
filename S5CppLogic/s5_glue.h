@@ -18,8 +18,8 @@ namespace GGlue {
 
 		shok::Vector<EGL::CGLEAnimProps*> Data;
 
-		void CreateAnimProps(int id);
-		void PopAnimPops(int id);
+		void CreateAnimProps(shok::AnimationId id);
+		void PopAnimPops(shok::AnimationId id);
 	};
 	static_assert(sizeof(CGlueAnimsPropsMgr) == 5 * 4);
 
@@ -43,9 +43,9 @@ namespace GGlue {
 
 		static inline constexpr int vtp = 0x7888D4;
 
-		void LoadEffectTypeFromExtraFile(int id);
+		void LoadEffectTypeFromExtraFile(shok::EffectTypeId id);
 		// remember to also free in idmanager, free last id first
-		void FreeEffectType(int id);
+		void FreeEffectType(shok::EffectTypeId id);
 		void ReloadAllEffectTypes();
 	};
 	//constexpr int i = offsetof(CEffectsPropsMgr, EffectsDisplayProps) / 4;
@@ -84,11 +84,11 @@ namespace GGlue {
 
 		static inline constexpr int vtp = 0x7887B4;
 
-		void LoadEntityTypeByID(int id);
+		void LoadEntityTypeByID(shok::EntityTypeId id);
 		// remember to also free in idmanager, free last id first
-		void PopEntityType(int id);
+		void PopEntityType(shok::EntityTypeId id);
 		// remember to also free in idmanager, free last id first
-		void FreeEntityType(int id);
+		void FreeEntityType(shok::EntityTypeId id);
 		void RefreshDisplayFlags();
 	};
 
@@ -121,9 +121,9 @@ namespace GGlue {
 		} Logic;
 		struct DisplayData {
 			int Priority = 0;
-			int BaseTexture = 0;
-			int TransitionsTexture = 0;
-			int SnowTexture = 0;
+			shok::TerrainTextureId BaseTexture = {};
+			shok::TerrainTextureId TransitionsTexture = {};
+			shok::TerrainTextureId SnowTexture = {};
 			int Quads = 0;
 			shok::Color Color{ 0xFF, 0, 0, 0 };
 			shok::String ReplacementTerrainType{};
@@ -171,7 +171,7 @@ namespace GGlue {
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D8A8);
 
 		void ReloadTerrainTypes();
-		void LoadTerrainTypeFromExtraFile(int id);
+		void LoadTerrainTypeFromExtraFile(shok::TerrainTypeId id);
 	};
 	//constexpr int i = offsetof(CTerrainPropsMgr, TerrainType) / 4;
 
@@ -256,7 +256,7 @@ namespace GGlue {
 
 		// clears idmanagers
 		void ReloadWaterTypes();
-		void LoadWaterTypeFromExtraFile(int id);
+		void LoadWaterTypeFromExtraFile(shok::WaterTypeId id);
 	};
 	static_assert(offsetof(WaterPropsDisplay, ShoreWave) == 16 * 4);
 	static_assert(offsetof(CGlueWaterPropsMgr, WaterType) == 27 * 4);
@@ -285,13 +285,13 @@ namespace EGL {
 	public:
 		shok::Vector<CGLEAnimSet*> AnimSets;
 
-		CGLEAnimSet* GetAnimSet(int id);
+		CGLEAnimSet* GetAnimSet(shok::AnimSetId id);
 
 		// remember to also free in idmanager, free last id first
-		void FreeAnimSet(int id);
-		void LoadAnimSet(int id);
+		void FreeAnimSet(shok::AnimSetId id);
+		void LoadAnimSet(shok::AnimSetId id);
 		// remember to also free in idmanager, free last id first
-		void PopAnimSet(int id);
+		void PopAnimSet(shok::AnimSetId id);
 
 
 		static inline AnimSetManager** const GlobalObj = reinterpret_cast<AnimSetManager**>(0x895DE0);

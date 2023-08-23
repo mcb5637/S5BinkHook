@@ -14,7 +14,7 @@ namespace CppLogic::Combat {
 		int dmg = L.CheckInt(2);
 		EGL::CGLEEntity* att = L.OptEntity(3);
 		shok::AdvancedDealDamageSource sou = static_cast<shok::AdvancedDealDamageSource>(L.OptInteger(8, static_cast<int>(shok::AdvancedDealDamageSource::Script)));
-		targ->AdvancedHurtEntityBy(att, dmg, L.OptInteger(4, 0), L.OptBool(5, true), L.OptBool(6, true), L.OptBool(7, true), sou);
+		targ->AdvancedHurtEntityBy(att, dmg, L.OptPlayerId(4, shok::PlayerId::P0), L.OptBool(5, true), L.OptBool(6, true), L.OptBool(7, true), sou);
 		return 0;
 	}
 
@@ -26,8 +26,8 @@ namespace CppLogic::Combat {
 		pos.Y = static_cast<float>(L.CheckNumber(3));
 		float range = static_cast<float>(L.CheckNumber(4));
 		int dmg = L.CheckInt(5);
-		int player = L.OptInteger(6, 0);
-		int dmgclass = L.OptInteger(7, 0);
+		auto player = L.OptPlayerId(4, shok::PlayerId::P0);
+		auto dmgclass = L.OptEnum<shok::DamageClassId>(7);
 		shok::AdvancedDealDamageSource sou = static_cast<shok::AdvancedDealDamageSource>(L.OptInteger(11, static_cast<int>(shok::AdvancedDealDamageSource::Script)));
 		EGL::CGLEEntity::AdvancedDealAoEDamage(source, pos, range, dmg, player, dmgclass, L.OptBool(8, true), L.OptBool(9, true), L.OptBool(10, true), sou);
 		return 0;

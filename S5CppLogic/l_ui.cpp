@@ -419,8 +419,8 @@ namespace CppLogic::UI {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		const char* s = L.CheckString(2);
 		EGUIX::CWidgetGroupManager* wgm = EGUIX::CWidgetGroupManager::GlobalObj();
-		int g = wgm->GetGroupId(s);
-		if (!g)
+		auto g = wgm->GetGroupId(s);
+		if (g==shok::WidgetGroupId::Invalid)
 			g = wgm->CreateGroup(s);
 		wid->Group = g;
 		return 0;
@@ -433,7 +433,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		if (!L.IsNoneOrNil(3))
@@ -450,7 +450,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		if (!L.IsNoneOrNil(3))
@@ -467,7 +467,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		if (!L.IsNoneOrNil(3))
@@ -484,7 +484,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		if (!L.IsNoneOrNil(3))
@@ -501,7 +501,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		if (!L.IsNoneOrNil(3))
@@ -518,7 +518,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		if (!L.IsNoneOrNil(3))
@@ -535,7 +535,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		if (!L.IsNoneOrNil(3))
@@ -552,7 +552,7 @@ namespace CppLogic::UI {
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
-		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != 0)
+		if (EGUIX::WidgetManager::GlobalObj()->GetIdByName(name) != shok::WidgetId::Invalid)
 			throw lua::LuaException("name already in use");
 		EGUIX::CBaseWidget* bef = nullptr;
 		const char* customname = L.CheckString(3);
@@ -578,7 +578,7 @@ namespace CppLogic::UI {
 		luaext::EState L{ ls };
 		const char* font = L.CheckString(1);
 		CheckFontString(font);
-		int id = 0;
+		shok::FontId id = shok::FontId::Invalid;
 		EGUIX::FontManager::LoadFont(&id, font);
 		auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 		L.Push(f->Size);
@@ -590,7 +590,7 @@ namespace CppLogic::UI {
 		luaext::EState L{ ls };
 		const char* font = L.CheckString(1);
 		CheckFontString(font);
-		int id = 0;
+		shok::FontId id = shok::FontId::Invalid;
 		EGUIX::FontManager::LoadFont(&id, font);
 		auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 		if (L.IsNumber(2))
@@ -602,12 +602,13 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int PreLoadGUITexture(lua::State L) {
+	int PreLoadGUITexture(lua::State ls) {
+		luaext::EState L{ ls };
 		const char* n = L.CheckString(1);
 		if (!BB::CFileSystemMgr::DoesFileExist(n))
 			throw lua::LuaException{ "files does not exist" };
 		auto* m = EGUIX::TextureManager::GlobalObj();
-		int id = m->GetTextureID(n);
+		auto id = m->GetTextureID(n);
 		m->GetTextureByID(id);
 		L.Push(id);
 		return 1;
@@ -866,7 +867,7 @@ namespace CppLogic::UI {
 	int GetWidgetName(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* w = L.CheckWidget(1);
-		L.Push(EGUIX::WidgetManager::GlobalObj()->WidgetNameManager->GetNameByID(w->WidgetID));
+		L.Push(EGUIX::WidgetManager::GlobalObj()->WidgetNameManager->GetNameByID(static_cast<int>(w->WidgetID)));
 		return 1;
 	}
 
@@ -964,7 +965,7 @@ namespace CppLogic::UI {
 		luaext::EState L{ ls };
 		auto* vh = GGUI::CManager::GlobalObj()->C3DViewHandler;
 		vh->StateIdManager->GetIDByNameOrCreate(GUIState_PlaceBuildingEx::Name, GUIState_PlaceBuildingEx::Id); // make sure the state id exists
-		GGUI::SPlaceBuildingStateParameters p{ static_cast<int>(L.CheckInt(1)) };
+		GGUI::SPlaceBuildingStateParameters p{ L.CheckEnum<shok::UpgradeCategoryId>(1) };
 		vh->SetGUIState<CppLogic::UI::GUIState_PlaceBuildingEx>(&p);
 		return 0;
 	}
@@ -984,7 +985,8 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int GetPlaceBuildingUCat(lua::State L) {
+	int GetPlaceBuildingUCat(lua::State ls) {
+		luaext::EState L{ ls };
 		auto s = GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState;
 		if (auto* pb = dynamic_cast<GGUI::CPlaceBuildingState*>(s)) {
 			L.Push(pb->UpgradeCategory);
@@ -1229,7 +1231,7 @@ namespace CppLogic::UI {
 			L.UnRef(RefOnCancel, L.REGISTRYINDEX);
 	}
 
-	unsigned int __stdcall GUIState_LuaSelection::GetClassIdentifier() const
+	shok::ClassId __stdcall GUIState_LuaSelection::GetClassIdentifier() const
 	{
 		return GUIState_LuaSelection::Identifier;
 	}
@@ -1317,7 +1319,7 @@ namespace CppLogic::UI {
 		shok::Free(p);
 	}
 
-	unsigned int __stdcall CppLogic::UI::GUIState_PlaceBuildingEx::GetClassIdentifier() const
+	shok::ClassId __stdcall CppLogic::UI::GUIState_PlaceBuildingEx::GetClassIdentifier() const
 	{
 		return Identifier;
 	}
@@ -1367,12 +1369,12 @@ namespace CppLogic::UI {
 	{
 		auto m = GGUI::CManager::GlobalObj();
 		auto i = m->GUIInterface;
-		int ety = i->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
+		auto ety = i->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 		if (!i->CheckBuildingPlacementAndCost(m->ControlledPlayer, ety, d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())))
 			return false;
 		bool hasserf = false;
 		bool hassector = false;
-		int sector = i->GetSector(&d->TargetPos);
+		auto sector = i->GetSector(&d->TargetPos);
 		for (const auto& e : m->SelectedEntities) {
 			if (i->IsSerf(e.Id)) {
 				hasserf = true;
@@ -1417,9 +1419,9 @@ namespace CppLogic::UI {
 
 	GGUI::CBasicState::TargetData* CppLogic::UI::GUIState_PlaceBuildingEx::GetTargetData(TargetData* d, int x, int y)
 	{
-		if (UpgradeCategory) {
+		if (UpgradeCategory != shok::UpgradeCategoryId::Invalid) {
 			auto m = GGUI::CManager::GlobalObj();
-			int ety = m->GUIInterface->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
+			auto ety = m->GUIInterface->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 			FillPosData(d, x, y);
 			d->TargetPos.FloorToBuildingPlacement();
 			if (static_cast<int>(d->TargetPos.X) == MouseX && static_cast<int>(d->TargetPos.Y) == MouseY) {
@@ -1454,7 +1456,7 @@ namespace CppLogic::UI {
 
 	void CppLogic::UI::GUIState_PlaceBuildingEx::UpdateModel(int x, int y)
 	{
-		if (!UpgradeCategory)
+		if (UpgradeCategory == shok::UpgradeCategoryId::Invalid)
 			return;
 		SetModelToRender();
 		C3DViewHandler->ClumpRenerable->Model->GetFrame()->Rotate(GetRotation(), RWE::RwOpCombineType::Replace);

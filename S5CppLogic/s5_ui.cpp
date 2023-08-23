@@ -65,9 +65,9 @@ void BB::StringTableText::HookGetStringTableText()
 	CppLogic::Hooks::WriteJump(BB::StringTableText::GetStringTableText, &hooksttasm, reinterpret_cast<void*>(0x556D33));
 }
 
-static inline void(__thiscall* const uirender_rtext)(shok::UIRenderer* r, const char* txt, int font, float uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* ccc, float ldf) =
-reinterpret_cast<void(__thiscall*)(shok::UIRenderer*, const char*, int, float, float, float, float, const EGUIX::Color*, shok::UIRenderCustomColorContext*, float)>(0x5577E1);
-void shok::UIRenderer::RenderText(const char* txt, int fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor)
+static inline void(__thiscall* const uirender_rtext)(shok::UIRenderer* r, const char* txt, shok::FontId font, float uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* ccc, float ldf) =
+reinterpret_cast<void(__thiscall*)(shok::UIRenderer*, const char*, shok::FontId, float, float, float, float, const EGUIX::Color*, shok::UIRenderCustomColorContext*, float)>(0x5577E1);
+void shok::UIRenderer::RenderText(const char* txt, shok::FontId fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor)
 {
 	uirender_rtext(this, txt, fontid, 1, x, y, xend, color, nullptr, linedistancefactor);
 }
@@ -726,7 +726,7 @@ public:
 	}
 };
 
-int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, int font, bool uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* customcolordata, float ldf) {
+int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, shok::FontId font, bool uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* customcolordata, float ldf) {
 	if (!r->ShouldRenderText)
 		return 0;
 	if (!txt || *txt == 0)
@@ -817,13 +817,13 @@ void ERwTools::CRpClumpRenderable::SetBuildingRedColor(bool r)
 	SetBuildingRedColorI(r ? 2 : 1);
 }
 
-static inline void(__thiscall*const c3dviewhandler_setguistate)(GGUI::C3DViewHandler* th, unsigned int id, const GGUI::SStateParameters* p) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, unsigned int, const GGUI::SStateParameters*)>(0x52820C);
-void GGUI::C3DViewHandler::SetGUIStateByIdentifier(unsigned int identifier, const GGUI::SStateParameters* p)
+static inline void(__thiscall*const c3dviewhandler_setguistate)(GGUI::C3DViewHandler* th, shok::ClassId id, const GGUI::SStateParameters* p) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, shok::ClassId, const GGUI::SStateParameters*)>(0x52820C);
+void GGUI::C3DViewHandler::SetGUIStateByIdentifier(shok::ClassId identifier, const GGUI::SStateParameters* p)
 {
 	c3dviewhandler_setguistate(this, identifier, p);
 }
-static inline void(__thiscall* const c3dviewhandler_setguistateonupdate)(GGUI::C3DViewHandler* th, unsigned int id) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, unsigned int)>(0x5280DE);
-void GGUI::C3DViewHandler::SetGUIStateByIdentfierOnNextUpdate(unsigned int identifier)
+static inline void(__thiscall* const c3dviewhandler_setguistateonupdate)(GGUI::C3DViewHandler* th, shok::ClassId id) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, shok::ClassId)>(0x5280DE);
+void GGUI::C3DViewHandler::SetGUIStateByIdentfierOnNextUpdate(shok::ClassId identifier)
 {
 	c3dviewhandler_setguistateonupdate(this, identifier);
 }
@@ -834,7 +834,7 @@ void ERwTools::CDefCameraBehaviour::HookEnableZoom(bool ena)
 	*reinterpret_cast<byte*>(0x52212B) = ena ? 0x75 : 0xEB; // jnz : jmp
 }
 
-bool GGL::CGLGUIInterface::GetNearestFreePosForBuildingPlacement(int ety, const shok::Position& inp, shok::Position& outp)
+bool GGL::CGLGUIInterface::GetNearestFreePosForBuildingPlacement(shok::EntityTypeId ety, const shok::Position& inp, shok::Position& outp)
 {
 	return GetNearestFreePosForBuildingPlacement(ety, inp.X, inp.Y, &outp.X, &outp.Y, -1);
 }
@@ -858,19 +858,19 @@ void GGL::CGLGUIInterface::HookFillDataHealth()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4BDED8), &hookgetmaxhpui, reinterpret_cast<void*>(0x4BDEE0));
 }
 
-static inline void(__thiscall* const guimng_setpl)(GGUI::CManager* th, int p) = reinterpret_cast<void(__thiscall*)(GGUI::CManager*, int)>(0x52371C);
-void GGUI::CManager::SetControlledPlayer(int pl)
+static inline void(__thiscall* const guimng_setpl)(GGUI::CManager* th, shok::PlayerId p) = reinterpret_cast<void(__thiscall*)(GGUI::CManager*, shok::PlayerId)>(0x52371C);
+void GGUI::CManager::SetControlledPlayer(shok::PlayerId pl)
 {
 	guimng_setpl(this, pl);
 }
 
-inline bool(__thiscall* const guimng_sel_isselected)(const shok::Vector<GGUI::CManager::SelectionData>* th, int id) = reinterpret_cast<bool(__thiscall*)(const shok::Vector<GGUI::CManager::SelectionData>*, int)>(0x721E7B);
-bool GGUI::CManager::IsEntitySelected(int id) const
+inline bool(__thiscall* const guimng_sel_isselected)(const shok::Vector<GGUI::CManager::SelectionData>* th, shok::EntityId id) = reinterpret_cast<bool(__thiscall*)(const shok::Vector<GGUI::CManager::SelectionData>*, shok::EntityId)>(0x721E7B);
+bool GGUI::CManager::IsEntitySelected(shok::EntityId id) const
 {
 	return guimng_sel_isselected(&SelectedEntities, id);
 }
-inline bool(__thiscall* const guimng_selectent)(GGUI::CManager* th, int id) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, int)>(0x525828);
-bool GGUI::CManager::SelectEntity(int id)
+inline bool(__thiscall* const guimng_selectent)(GGUI::CManager* th, shok::EntityId id) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, shok::EntityId)>(0x525828);
+bool GGUI::CManager::SelectEntity(shok::EntityId id)
 {
 	return guimng_selectent(this, id);
 }
@@ -879,8 +879,8 @@ void GGUI::CManager::OnSelectionChanged()
 {
 	guimng_selectionchanged(this, 0); // TODO check what that param is, only call with 1 is from event handler of FEEDBACK_EVENT_ENTITIES_EXCHANGED via 0x5235D4
 }
-inline bool(__thiscall* const guimng_deselect)(GGUI::CManager* th, int id) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, int)>(0x524A98);
-bool GGUI::CManager::DeselectEntity(int id)
+inline bool(__thiscall* const guimng_deselect)(GGUI::CManager* th, shok::EntityId id) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, shok::EntityId)>(0x524A98);
+bool GGUI::CManager::DeselectEntity(shok::EntityId id)
 {
 	return guimng_deselect(this, id);
 }
@@ -889,13 +889,13 @@ bool GGUI::CManager::ClearSelection()
 {
 	return guimng_clearsel(this);
 }
-inline bool(__thiscall* const guimng_isstatevalid)(GGUI::CManager* th, GGUI::CManager::StateIdData* s, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, GGUI::CManager::StateIdData*, int, GGUI::CBasicState::TargetData*, GGUI::CBasicState::ExecuteData*)>(0x5237A2);
-bool GGUI::CManager::IsCommandStateValid(StateIdData* s, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata)
+inline bool(__thiscall* const guimng_isstatevalid)(GGUI::CManager* th, GGUI::CManager::StateIdData* s, shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata) = reinterpret_cast<bool(__thiscall*)(GGUI::CManager*, GGUI::CManager::StateIdData*, shok::EntityId, GGUI::CBasicState::TargetData*, GGUI::CBasicState::ExecuteData*)>(0x5237A2);
+bool GGUI::CManager::IsCommandStateValid(StateIdData* s, shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata)
 {
 	return guimng_isstatevalid(this, s, entity, tdata, edata);
 }
-inline GGUI::CBasicState* (__thiscall* const guimng_getcmdstate)(GGUI::CManager* th, int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata) = reinterpret_cast<GGUI::CBasicState * (__thiscall*)(GGUI::CManager*, int, GGUI::CBasicState::TargetData*, GGUI::CBasicState::ExecuteData*)>(0x523FEC);
-GGUI::CBasicState* GGUI::CManager::GetCommandStateFor(int entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata)
+inline GGUI::CBasicState* (__thiscall* const guimng_getcmdstate)(GGUI::CManager* th, shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata) = reinterpret_cast<GGUI::CBasicState * (__thiscall*)(GGUI::CManager*, shok::EntityId, GGUI::CBasicState::TargetData*, GGUI::CBasicState::ExecuteData*)>(0x523FEC);
+GGUI::CBasicState* GGUI::CManager::GetCommandStateFor(shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata)
 {
 	return guimng_getcmdstate(this, entity, tdata, edata);
 }

@@ -382,4 +382,49 @@ namespace shok {
 		Multiplayer = 2,
 		User = 3, // s5x and folder, sp and mp
 	};
+
+	enum class PlayerId : int {
+		Invalid = -1,
+		P0 = 0,
+		P1 = 1,
+	};
+	enum class EntityId : int {
+		Invalid = 0,
+	};
+	enum class ModelId : int {
+		Invalid = 0,
+	};
+	enum class SectorId : int {
+		Invalid = 0, // in most cases => blocked
+	};
+	enum class TechnologyId : int {
+		Invalid = 0,
+	};
+	enum class TaskListId : int {
+		Invalid = 0,
+	};
+	enum class AnimationId : int {
+		Invalid = 0,
+	};
+	enum class WidgetId : int {
+		Invalid = 0,
+	};
+	enum class WidgetGroupId : int {
+		Invalid = 0,
+	};
+	enum class FontId : int {
+		Invalid = 0,
+	};
+	enum class UpgradeCategoryId : int {
+		Invalid = 0,
+	};
+	enum class ClassId : unsigned int {
+		Invalid = 0xEEFFFFFF, // guranteed to not appear in shok
+	};
+	enum class GUITextureId : int {
+		Invalid = 0,
+	};
+	enum class EntityTypeId : int {
+		Invalid = 0,
+	};
 }

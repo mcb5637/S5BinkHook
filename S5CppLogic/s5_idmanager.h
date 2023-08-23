@@ -62,7 +62,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const PrincipalTaskManager = reinterpret_cast<BB::CIDManagerEx**>(0x89820C);
 		static inline BB::CIDManagerEx** const AnimCategoryManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C82C);
 		static inline BB::CIDManagerEx** const AnimSetManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C830);
-		static inline BB::CIDManagerEx** const EffectTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0CC7C); // A0C83C ?
+		static inline BB::CIDManagerEx** const EffectTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0CC7C);
 		static inline BB::CIDManagerEx** const TaskListManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C848);
 		static inline BB::CIDManagerEx** const BlessCategoryManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C858);
 		static inline BB::CIDManagerEx** const WeatherEffectTextureManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0CC80); // lightning and snow
@@ -70,6 +70,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const TerrainTextureManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0D5D0);
 		static inline BB::CIDManagerEx** const WaterTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0D9C8);
 		static inline BB::CIDManagerEx** const ShorewaveTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA19F34);
+		static inline BB::CIDManagerEx** const ModelManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C83C);
 	};
 	static_assert(sizeof(BB::CIDManagerEx) == 6 * 4);
 
@@ -126,32 +127,128 @@ namespace CppLogic {
 	struct IdManagerMapping {
 	};
 	template<>
+	struct IdManagerMapping<shok::AnimationId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AnimManager;
+	};
+	template<>
 	struct IdManagerMapping<shok::EntityTypeId> {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::EntityTypeManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::FeedbackStateId> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::FeedbackStateManager;
+	struct IdManagerMapping<shok::UpgradeCategoryId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::UpgradeCategoryManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::SoundId> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::SoundsManager;
+	struct IdManagerMapping<shok::EntityCategory> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::EntityCategoryManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::AbilityId> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AbilityManager;
+	struct IdManagerMapping<shok::DamageClassId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::DamageClassManager;
 	};
 	template<>
 	struct IdManagerMapping<shok::TechnologyId> {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TechnologiesManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::UpgradeCategoryId> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::UpgradeCategoryManager;
+	struct IdManagerMapping<shok::TechnologyCategoryId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TechnologyCategoryManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::AbilityId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AbilityManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::Goods> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::GoodsManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::ArmorClassId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::ArmorClassManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::AttachmentType> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AttachmentTypesManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::FeedbackEventIds> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::FeedBackEventManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::SoundId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::SoundsManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::AmbientSoundId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AmbientSoundsManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::ResourceType> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::ResourceTypeManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::FeedbackStateId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::FeedbackStateManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::Task> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TaskManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::PrincipalTaskId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::PrincipalTaskManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::AnimationCategoryId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AnimCategoryManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::AnimSetId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AnimSetManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::EffectTypeId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::EffectTypeManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::TaskListId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TaskListManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::BlessCategoryId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::BlessCategoryManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::WeatherEffectTextureId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::WeatherEffectTextureManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::TerrainTypeId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TerrainTypeManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::TerrainTextureId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TerrainTextureManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::WaterTypeId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::WaterTypeManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::ShorewaveTypeId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::ShorewaveTypeManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::ModelId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::ModelManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::WidgetId> {
+		static inline BB::CIDManager** const Manager = BB::CIDManager::WidgetIDManager;
 	};
 
 	template<class En>
-	requires std::is_enum_v<En> && std::is_same_v<int, std::underlying_type_t<En>> && requires {IdManagerMapping<En>::Manager; }
+	requires std::is_enum_v<En>// && std::is_same_v<int, std::underlying_type_t<En>> && requires {IdManagerMapping<En>::Manager; }
 	inline EnumIdManager<En> GetIdManager() {
 		auto mng = *IdManagerMapping<En>::Manager;
 		if (mng == nullptr)

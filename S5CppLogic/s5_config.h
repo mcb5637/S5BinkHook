@@ -9,7 +9,7 @@ namespace EGL {
 		bool IsWalkOrRun = false;
 
 		static inline constexpr int vtp = 0x788D7C;
-		static inline constexpr unsigned int Identifier = 0x12FC4F78;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x12FC4F78);
 
 		CGLEAnimProps();
 		CGLEAnimProps(const CGLEAnimProps& o);
@@ -18,7 +18,7 @@ namespace EGL {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual unsigned int __stdcall GetClassIdentifier() const override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	private:
 		void SetVT(int vt);
 	};
@@ -28,7 +28,7 @@ namespace GGL {
 	class CDamageClassProps : public BB::IObject {
 		float BonusVsArmorClass[7]; // remember to access with ArmorClass - 1
 	public:
-		float& GetBonusVsArmorClass(int ac);
+		float& GetBonusVsArmorClass(shok::ArmorClassId ac);
 
 		static inline constexpr int vtp = 0x788978;
 	};
@@ -37,30 +37,34 @@ namespace GGL {
 		BB::CIDManagerEx* DamageClassManager;
 		shok::Vector<GGL::CDamageClassProps*> DamageClassList; // there is a damageclass 0, probably not working at all
 
+		GGL::CDamageClassProps* TryGet(shok::DamageClassId id);
+
 		static inline GGL::DamageClassesHolder** const GlobalObj = reinterpret_cast<GGL::DamageClassesHolder**>(0x85A3DC);
 	};
 
 	class CLogicProperties : public BB::IObject {
 	public:
 		struct SBuildingUpgradeCategory {
-			int Category, FirstBuilding;
+			shok::UpgradeCategoryId Category;
+			shok::EntityTypeId FirstBuilding;
 			int NumScholars;
 
 			static inline constexpr int vtp = 0x76EF10;
-			static inline constexpr unsigned int Identifier = 0x9498E0E7;
-			virtual unsigned int GetClassIdentifier() const;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9498E0E7);
+			virtual shok::ClassId GetClassIdentifier() const;
 
-			SBuildingUpgradeCategory(int car, int first);
+			SBuildingUpgradeCategory(shok::UpgradeCategoryId car, shok::EntityTypeId first);
 			SBuildingUpgradeCategory(SBuildingUpgradeCategory&& o) noexcept;
 		};
 		struct SSettlerUpgradeCategory {
-			int Category, FirstSettler;
+			shok::UpgradeCategoryId Category;
+			shok::EntityTypeId FirstSettler;
 
 			static inline constexpr int vtp = 0x76EF18;
-			static inline constexpr unsigned int Identifier = 0x8DC75427;
-			virtual unsigned int GetClassIdentifier() const;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8DC75427);
+			virtual shok::ClassId GetClassIdentifier() const;
 
-			SSettlerUpgradeCategory(int cat, int first);
+			SSettlerUpgradeCategory(shok::UpgradeCategoryId cat, shok::EntityTypeId first);
 			SSettlerUpgradeCategory(SSettlerUpgradeCategory&& o) noexcept;
 		};
 		struct STaxationLevel {
@@ -68,19 +72,19 @@ namespace GGL {
 			float MotivationChange;
 
 			static inline constexpr int vtp = 0x76EF20;
-			virtual unsigned int GetClassIdentifier() const = 0;
+			virtual shok::ClassId GetClassIdentifier() const = 0;
 		};
 		struct STradeResource {
-			int ResourceType;
+			shok::ResourceType ResourceType;
 			float BasePrice, MinPrice, MaxPrice, Inflation, Deflation, WorkAmount;
 
 			static inline constexpr int vtp = 0x76EF28;
-			virtual unsigned int GetClassIdentifier() const = 0;
+			virtual shok::ClassId GetClassIdentifier() const = 0;
 		};
 		struct SBlessCategory {
-			int Name;
+			shok::BlessCategoryId Name;
 			float RequiredFaith;
-			shok::Vector<int> EntityTypes;
+			shok::Vector<shok::EntityTypeId> EntityTypes;
 
 			static inline constexpr int vtp = 0x76EFC4;
 			virtual unsigned int GetClassIdentifier() const = 0;
@@ -126,11 +130,12 @@ namespace GGL {
 		float HeroResurrectionRadius, HeroResurrectionHealthFactor, HeroResurrectionActionPointFactor;
 		int HeroComatoseExploration;
 		int BattleSerfMaxSeconds;
-		int ExpelEffectID, DefenderMSPerShot; // fi 89
+		shok::EffectTypeId ExpelEffectID; // 89
+		int DefenderMSPerShot; // 90
 		float DefenderMaxRange;
-		int DefenderProjectileEffectType;
+		shok::EffectTypeId DefenderProjectileEffectType;
 		int DefenderProjectileDamage;
-		int DefenderProjectileDamageClass;
+		shok::DamageClassId DefenderProjectileDamageClass;
 		int DefenderMissChance; // 95
 		float WorkerFlightDistance;
 		int MaxExperiencePoints;
@@ -145,7 +150,7 @@ namespace GGL {
 		float GuardMaxDistanceOther;
 		float GuardMoveDistanceOther;
 		float NPCInteractionDistance;
-		int WeatherTowerAnim;
+		shok::AnimationId WeatherTowerAnim;
 		int LeaderNudgeCount;
 		float LeaderApproachRange;
 		int AlarmRechargeTime;
@@ -239,7 +244,7 @@ namespace ED {
 		float AuraRadius;
 		float AuraHeight;
 		shok::String AuraTexture;
-		int CommandAcknowledgementModel;
+		shok::ModelId CommandAcknowledgementModel;
 		int CommandAcknowledgementDuration;
 		PADDINGI(1);
 
@@ -256,7 +261,7 @@ namespace GGUI {
 		float ShortMessageDisplayTime, ShortMessageHistoryTime;
 
 		static constexpr int vtp = 0x77BCA8;
-		static constexpr unsigned int Identifier = 0x700839B6;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x700839B6);
 
 		static inline CGuiProperties* (__cdecl* const GlobalObj)() = reinterpret_cast<CGuiProperties * (__cdecl*)()>(0x52EBC6);
 	};

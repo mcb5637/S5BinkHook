@@ -33,22 +33,16 @@
 namespace CppLogic::Logic {
 	int GetDamageFactor(lua::State ls) {
 		luaext::EState L{ ls };
-		int dmgclass = L.CheckInt(1);
-		int size = static_cast<int>((*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size());
-		if (dmgclass <= 0 || dmgclass >= size)
-			throw lua::LuaException("invalid damagecass");
-		int amclass = L.CheckInt(2);
-		L.Push((*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[dmgclass]->GetBonusVsArmorClass(amclass));
+		auto dmgclass = L.CheckEnum<shok::DamageClassId>(1);
+		auto amclass = L.CheckEnum<shok::ArmorClassId>(2);
+		L.Push((*GGL::DamageClassesHolder::GlobalObj)->TryGet(dmgclass)->GetBonusVsArmorClass(amclass));
 		return 1;
 	}
 	int SetDamageFactor(lua::State ls) {
 		luaext::EState L{ ls };
-		int dmgclass = L.CheckInt(1);
-		int size = static_cast<int>((*GGL::DamageClassesHolder::GlobalObj)->DamageClassList.size());
-		if (dmgclass <= 0 || dmgclass >= size)
-			throw lua::LuaException("invalid damagecass");
-		int amclass = L.CheckInt(2);
-		(*GGL::DamageClassesHolder::GlobalObj)->DamageClassList[dmgclass]->GetBonusVsArmorClass(amclass) = L.CheckFloat(3);
+		auto dmgclass = L.CheckEnum<shok::DamageClassId>(1);
+		auto amclass = L.CheckEnum<shok::ArmorClassId>(2);
+		(*GGL::DamageClassesHolder::GlobalObj)->TryGet(dmgclass)->GetBonusVsArmorClass(amclass) = L.CheckFloat(3);
 		return 0;
 	}
 
@@ -69,9 +63,7 @@ namespace CppLogic::Logic {
 
 	int PlayerGetPaydayStartetTick(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (p->PlayerAttractionHandler->PaydayActive)
 			L.Push(p->PlayerAttractionHandler->PaydayFirstOccuraceGameTurn);
@@ -81,9 +73,7 @@ namespace CppLogic::Logic {
 	}
 	int PlayerSetPaydayStartetTick(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		int st = L.CheckInt(2);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (st < 0) {
@@ -176,9 +166,7 @@ namespace CppLogic::Logic {
 
 	int PlayerGetKillStatistics(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		L.Push(p->Statistics.NumberOfUnitsKilled);
 		L.Push(p->Statistics.NumberOfUnitsDied);
@@ -189,18 +177,18 @@ namespace CppLogic::Logic {
 
 	int CanPlaceBuildingAt(lua::State ls) {
 		luaext::EState L{ ls };
-		int ty = L.CheckInt(1);
+		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
 		GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ty);
 		if (!ety)
 			throw lua::LuaException("no entitytype");
 		if (!ety->IsBuildingType())
 			throw lua::LuaException("not a building");
-		int pl = L.CheckInt(2);
+		auto pl = L.CheckPlayerId(2);
 		shok::Position p = L.CheckPos(3);
 		p.FloorToBuildingPlacement();
 		float r = CppLogic::DegreesToRadians(L.CheckFloat(4));
 		if (L.IsNumber(5))
-			L.Push(GGL::CPlayerStatus::CanPlaceBuilding(ty, pl, &p, r, L.CheckInt(5)));
+			L.Push(GGL::CPlayerStatus::CanPlaceBuilding(ty, pl, &p, r, L.OptEntityId(5)));
 		else
 			L.Push(GGL::CPlayerStatus::CanPlaceBuildingAtPos(ty, pl, &p, r));
 		return 1;
@@ -208,9 +196,7 @@ namespace CppLogic::Logic {
 
 	int PlayerActivateAlarm(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (p->WorkerAlarmMode)
 			throw lua::LuaException("alarm active");
@@ -221,9 +207,7 @@ namespace CppLogic::Logic {
 	}
 	int PlayerDeactivateAlarm(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (!p->WorkerAlarmMode)
 			throw lua::LuaException("alarm not active");
@@ -233,10 +217,8 @@ namespace CppLogic::Logic {
 
 	int PlayerUpgradeSettlerCategory(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
-		int ucat = L.CheckInt(2);
+		auto i = L.CheckPlayerId(1, false);
+		auto ucat = L.CheckEnum<shok::UpgradeCategoryId>(2);
 		auto u = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.find(ucat);
 		if (u == (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.end())
 			throw lua::LuaException("invalid ucat");
@@ -246,9 +228,7 @@ namespace CppLogic::Logic {
 
 	int PlayerSetTaxLevel(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		int tl = L.CheckInt(2);
 		if (tl < 0 || tl >= 5)
 			throw lua::LuaException("invalid taxlevel");
@@ -258,9 +238,7 @@ namespace CppLogic::Logic {
 
 	int PlayerActivateWeatherMachine(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
+		auto i = L.CheckPlayerId(1, false);
 		int w = L.CheckInt(2);
 		if (w < 1 || w >= 4)
 			throw lua::LuaException("invalid weathertype");
@@ -268,16 +246,14 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("weather currently changing");
 		if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->CurrentResources.WeatherEnergy < (*GGL::CLogicProperties::GlobalObj)->EnergyRequiredForWeatherChange)
 			throw lua::LuaException("not enough weather energy");
-		(*GGL::CGLGameLogic::GlobalObj)->PlayerActivateWeathermachine(i, w);
+		(*GGL::CGLGameLogic::GlobalObj)->PlayerActivateWeathermachine(i, static_cast<shok::WeatherState>(w));
 		return 0;
 	}
 
 	int PlayerBlessSettlers(lua::State ls) {
 		luaext::EState L{ ls };
-		int i = L.CheckInt(1);
-		if (i <= 0 || i >= 9)
-			throw lua::LuaException("invalid player");
-		int b = L.CheckInt(2);
+		auto i = L.CheckPlayerId(1, false);
+		auto b = L.CheckEnum<shok::BlessCategoryId>(2);
 		float faithneeded = -1;
 		for (GGL::CLogicProperties::SBlessCategory& bcat : (*GGL::CLogicProperties::GlobalObj)->BlessCategories) {
 			if (bcat.Name == b) {
@@ -306,7 +282,7 @@ namespace CppLogic::Logic {
 		int s = L.CheckInt(2);
 		float r = L.CheckFloat(3);
 		shok::Position po;
-		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetNearestPositionInSector(&p, r, s, &po))
+		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetNearestPositionInSector(&p, r, static_cast<shok::SectorId>(s), &po))
 			L.PushPos(po);
 		else
 			L.Push();
@@ -556,7 +532,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	bool CanPlaceBuildingCb(int entitytype, int player, shok::Position* pos, float rotation, int buildOnId) {
+	bool CanPlaceBuildingCb(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId) {
 		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 		bool r = true;
@@ -622,7 +598,7 @@ namespace CppLogic::Logic {
 	}
 
 	int SnipeDamageCb(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) {
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
@@ -665,7 +641,8 @@ namespace CppLogic::Logic {
 		L.Push(state);
 		return 1;
 	}
-	int GetWeatherQueue(lua:: State L) {
+	int GetWeatherQueue(lua::State ls) {
+		luaext::EState L{ ls };
 		GGL::CWeatherHandler* wh = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler;
 		L.NewTable();
 		for (const auto& kae : wh->Elements) {
@@ -710,10 +687,10 @@ namespace CppLogic::Logic {
 		if (trans <= fore || trans > 200)
 			throw lua::LuaException("transition too small or too big");
 		if (wh->Elements.size == 0) {
-			wh->AddWeatherElement(state, dur, true, fore, gfx, trans);
+			wh->AddWeatherElement(static_cast<shok::WeatherState>(state), dur, true, fore, static_cast<shok::WeatherGFXSet>(gfx), trans);
 		}
 		else {
-			wh->ClearQueue(static_cast<shok::WeatherState>(state), dur, fore, gfx, trans);
+			wh->ClearQueue(static_cast<shok::WeatherState>(state), dur, fore, static_cast<shok::WeatherGFXSet>(gfx), trans);
 		}
 		return 0;
 	}
@@ -737,9 +714,10 @@ namespace CppLogic::Logic {
 			d->e->CurrentState = shok::TaskState::Move_NonCancelable;
 		return 0;
 	}
-	int SetLuaTaskListFunc_SetTl(lua::State L) {
+	int SetLuaTaskListFunc_SetTl(lua::State ls) {
+		luaext::EState L{ ls };
 		SetLuaTaskListFunc_Info* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.Upvalueindex(1)));
-		int tid = L.CheckInt(1);
+		auto tid = L.CheckEnum<shok::TaskListId>(1);
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(tid);
 		if (!tl)
 			throw lua::LuaException("no tasklist");
@@ -749,7 +727,7 @@ namespace CppLogic::Logic {
 	}
 	shok::TaskExecutionResult SetLuaTaskListFunc_Func(EGL::CGLEEntity* e, int val)
 	{
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 
 		SetLuaTaskListFunc_Info d{ e, false, false, false };
@@ -802,15 +780,15 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int TaskListMakeWaitForAnimsUnCancelable(lua::State L) {
+	int TaskListMakeWaitForAnimsUnCancelable(lua::State ls) {
+		luaext::EState L{ ls };
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
 
-		int i = L.CheckInt(1);
-		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
-		i = L.OptInteger(2, -1);
+		int i = L.OptInteger(2, -1);
 		if (i < 0) {
 			for (EGL::CGLETaskArgs* p : tl->Task) {
 				if (p->TaskType == shok::Task::TASK_WAIT_FOR_ANIM)
@@ -826,15 +804,15 @@ namespace CppLogic::Logic {
 		}
 		return 0;
 	}
-	int TaskListMakeWaitForAnimsCancelable(lua::State L) {
+	int TaskListMakeWaitForAnimsCancelable(lua::State ls) {
+		luaext::EState L{ ls };
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
 
-		int i = L.CheckInt(1);
-		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
-		i = L.OptInteger(2, -1);
+		int i = L.OptInteger(2, -1);
 		if (i < 0) {
 			for (EGL::CGLETaskArgs* p : tl->Task) {
 				if (p->TaskType == shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE)
@@ -859,12 +837,12 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int TaskListInsertWaitForLatestAttack(lua::State L) {
-		int i = L.CheckInt(1);
-		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+	int TaskListInsertWaitForLatestAttack(lua::State ls) {
+		luaext::EState L{ ls };
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
-		i = L.CheckInt(2);
+		int i = L.CheckInt(2);
 		if (i < 0 || i > static_cast<int>(tl->Task.size()))
 			throw lua::LuaException("invalid task");
 		EGL::CGLETaskArgs* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
@@ -873,12 +851,12 @@ namespace CppLogic::Logic {
 		vec.Vector.insert(vec.Vector.begin() + i, t);
 		return 0;
 	}
-	int TaskListInsertSetLatestAttack(lua::State L) {
-		int i = L.CheckInt(1);
-		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+	int TaskListInsertSetLatestAttack(lua::State ls) {
+		luaext::EState L{ ls };
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
-		i = L.CheckInt(2);
+		int i = L.CheckInt(2);
 		if (i < 0 || i > static_cast<int>(tl->Task.size()))
 			throw lua::LuaException("invalid task");
 		EGL::CGLETaskArgs* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
@@ -887,9 +865,9 @@ namespace CppLogic::Logic {
 		vec.Vector.insert(vec.Vector.begin() + i, t);
 		return 0;
 	}
-	int TaskListRemoveLatestAttack(lua::State L) {
-		int i = L.CheckInt(1);
-		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(i);
+	int TaskListRemoveLatestAttack(lua::State ls) {
+		luaext::EState L{ ls };
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
 		auto vec = tl->Task.SaveVector();
@@ -916,7 +894,7 @@ namespace CppLogic::Logic {
 		luaext::EState L{ ls };
 		if (!L.CheckEntityType(1)->IsBuildingType())
 			throw lua::LuaException("no building type");
-		int ty = L.CheckInt(1);
+		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
 		shok::PositionRot pin = L.CheckPosRot(2);
 		float range = L.OptFloat(3, 0);
 		if (range <= 0)
@@ -938,10 +916,9 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int GetAnimationDuration(lua::State L) {
-		int id = L.CheckInt(1);
-		if ((*BB::CIDManagerEx::AnimManager)->GetNameByID(id) == nullptr)
-			throw lua::LuaException{ "not an animation" };
+	int GetAnimationDuration(lua::State ls) {
+		luaext::EState L{ ls };
+		auto id = L.CheckEnum<shok::AnimationId>(1);
 		L.Push((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimationDuration(id));
 		return 1;
 	}
@@ -1020,9 +997,7 @@ namespace CppLogic::Logic {
 
 	int IsPositionExplored(lua::State l) {
 		luaext::EState L{ l };
-		int pl = L.CheckInt(1);
-		if (pl <= 0 || pl > 8)
-			throw lua::LuaException{ "invalid player" };
+		auto pl = L.CheckPlayerId(1, false);
 		auto pos = L.CheckPos(2);
 		EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 		auto* ex = p->GetExplorationHandlerByPlayer(pl);
@@ -1036,9 +1011,7 @@ namespace CppLogic::Logic {
 
 	int SetPositionExploration(lua::State l) {
 		luaext::EState L{ l };
-		int pl = L.CheckInt(1);
-		if (pl <= 0 || pl > 8)
-			throw lua::LuaException{ "invalid player" };
+		auto pl = L.CheckPlayerId(1, false);
 		auto rect = shok::AARect{ L.CheckPos(2), L.CheckPos(3) }.Sort();
 		EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 		auto* ex = p->GetExplorationHandlerByPlayer(pl);
@@ -1060,7 +1033,8 @@ namespace CppLogic::Logic {
 		return static_cast<RWE::RwOpCombineType>(i);
 	}
 	struct LogicModel {
-		int ModelId = 0, AnimId = 0;
+		shok::ModelId ModelId = {};
+		shok::AnimationId AnimId = {};
 		RWE::RpClump* Model = nullptr;
 		RWE::Anim::RpHAnimHierarchy* AnimHandler = nullptr;
 		float StartTime = 0;
@@ -1076,8 +1050,8 @@ namespace CppLogic::Logic {
 				m->Model = nullptr;
 				m->AnimHandler = nullptr;
 			}
-			m->ModelId = 0;
-			m->AnimId = 0;
+			m->ModelId = shok::ModelId::Invalid;
+			m->AnimId = shok::AnimationId::Invalid;
 			m->PlayerColor = -1;
 			m->NoShadow = false;
 			m->NoParticleEffects = false;
@@ -1085,11 +1059,10 @@ namespace CppLogic::Logic {
 			m->Modulate = shok::Color{ 255,255,255,255 };
 			return 0;
 		}
-		static int SetModel(lua::State L) {
+		static int SetModel(lua::State ls) {
+			luaext::EState L{ ls };
 			LogicModel* m = L.GetUserData<LogicModel>(1);
-			int mid = L.CheckInt(2);
-			if (!(*ED::CGlobalsBaseEx::GlobalObj)->ModelManager->GetNameByID(mid))
-				throw lua::LuaException("invalid model");
+			auto mid = L.CheckEnum<shok::ModelId>(2);
 			if (m->Model) {
 				m->Model->Destroy();
 				m->Model = nullptr;
@@ -1099,7 +1072,7 @@ namespace CppLogic::Logic {
 			m->Model = mdata->Instanciate();
 			m->Model->AddToDefaultWorld();
 			m->ModelId = mid;
-			m->AnimId = 0;
+			m->AnimId = shok::AnimationId::Invalid;
 			m->PlayerColor = -1;
 			m->NoShadow = false;
 			m->NoParticleEffects = false;
@@ -1107,13 +1080,12 @@ namespace CppLogic::Logic {
 			m->Modulate = shok::Color{ 255,255,255,255 };
 			return 0;
 		}
-		static int SetAnim(lua::State L) {
+		static int SetAnim(lua::State ls) {
+			luaext::EState L{ ls };
 			LogicModel* m = L.GetUserData<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
-			int anim = L.CheckInt(2);
-			if ((*BB::CIDManagerEx::AnimManager)->GetNameByID(anim) == nullptr)
-				throw lua::LuaException{ "not an animation" };
+			auto anim = L.CheckEnum<shok::AnimationId>(2);
 			m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
 			if (!m->AnimHandler)
 				throw lua::LuaException{ "no animhandler?" };
@@ -1231,7 +1203,8 @@ namespace CppLogic::Logic {
 			m->Model->SetColorModulate(m->Modulate);
 			return 0;
 		}
-		static int Serialize(lua::State L) {
+		static int Serialize(lua::State ls) {
+			luaext::EState L{ ls };
 			LogicModel* m = L.GetUserData<LogicModel>(1);
 			L.Push(typename_details::type_name<LogicModel>());
 			L.NewTable();
@@ -1294,16 +1267,17 @@ namespace CppLogic::Logic {
 
 			return 2;
 		}
-		static int Deserialize(lua::State L) {
+		static int Deserialize(lua::State ls) {
+			luaext::EState L{ ls };
 			auto* m = L.NewUserData<LogicModel>();
 			L.Push("Model");
 			L.GetTableRaw(1);
-			m->ModelId = L.CheckInt(-1);
+			m->ModelId = L.CheckEnum<shok::ModelId>(-1);
 			L.Pop(1);
 
 			L.Push("Anim");
 			L.GetTableRaw(1);
-			m->AnimId = L.CheckInt(-1);
+			m->AnimId = L.CheckEnum<shok::AnimationId>(-1);
 			L.Pop(1);
 
 			L.Push("StartTime");
@@ -1356,11 +1330,11 @@ namespace CppLogic::Logic {
 			m->Modulate.A = static_cast<byte>(L.CheckInt(-1));
 			L.Pop(1);
 
-			if (m->ModelId) {
+			if (m->ModelId != shok::ModelId::Invalid) {
 				auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(m->ModelId);
 				m->Model = mdata->Instanciate();
 				m->Model->AddToDefaultWorld();
-				if (m->AnimId) {
+				if (m->AnimId != shok::AnimationId::Invalid) {
 					m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
 					if (!m->AnimHandler)
 						throw lua::LuaException{ "no animhandler?" };

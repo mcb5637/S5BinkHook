@@ -38,10 +38,10 @@ EGL::CGLEEffectCreator::CGLEEffectCreator()
 void EGL::CGLEEffectCreator::SetVT(int vt) {
 	*reinterpret_cast<int*>(this) = vt;
 }
-unsigned int __stdcall EGL::CGLEEffectCreator::GetClassIdentifier() const {
-	return 0;
+shok::ClassId __stdcall EGL::CGLEEffectCreator::GetClassIdentifier() const {
+	return Identifier;
 }
-void* __stdcall EGL::CGLEEffectCreator::CastToIdentifier(unsigned int id) {
+void* __stdcall EGL::CGLEEffectCreator::CastToIdentifier(shok::ClassId id) {
 	return nullptr;
 }
 
@@ -59,18 +59,23 @@ void __stdcall EGL::CFlyingEffectSlot::FillSlot(SSlotArgsFlyingEffect* data)
 {
 	reinterpret_cast<void(__stdcall*)(CFlyingEffectSlot*, SSlotArgsFlyingEffect*)>(0x589338)(this, data);
 }
-unsigned int __stdcall EGL::CFlyingEffectSlot::GetClassIdentifier() const
+shok::ClassId EGL::CFlyingEffectSlot::GetClassIdentifier() const
 {
 	return Identifier;
 }
-void* __stdcall EGL::CFlyingEffectSlot::CastToIdentifier(unsigned int id)
+void* __stdcall EGL::CFlyingEffectSlot::CastToIdentifier(shok::ClassId id)
 {
 	return nullptr;
 }
 
+EGL::CGLEEffectProps* EGL::CEffect::LogicProps() const
+{
+	return (*EGL::CGLEEffectsProps::GlobalObj)->GetLogic(this->EffectType);
+}
+
 void EGL::CFlyingEffect::FixOnLoad()
 {
-	auto* pr = (*EGL::CGLEEffectsProps::GlobalObj)->EffectTypes[this->EffectType];
+	auto* pr = this->LogicProps();
 	this->FlyingEffectProps = dynamic_cast<EGL::CFlyingEffectProps*>(pr);
 	this->FlyingEffectSlot.Speed = this->FlyingEffectProps->Speed; // probably gets reset to 0 somewhere, cause it should get serialized
 	this->FlyingEffectSlot.TargetPosition = this->TargetPosition;
@@ -108,7 +113,7 @@ void __fastcall hookcannonfromcreator(GGL::CCannonBallEffect* th, CProjectileEff
 	if (GGL::CCannonBallEffect::FixDamageClass) {
 		th->DamageClass = cr->DamageClass;
 		if (GGL::CCannonBallEffect::AddDamageSourceOverride)
-			th->DamageClass |= static_cast<int>(cr->AdvancedDamageSourceOverride) << 24;
+			th->DamageClass = static_cast<shok::DamageClassId>(static_cast<int>(th->DamageClass) | (static_cast<int>(cr->AdvancedDamageSourceOverride) << 24));
 	}
 }
 void __declspec(naked) hookcannonfromcreatorasm() {
@@ -252,7 +257,7 @@ void EGL::CFlyingEffect::HookOnHit()
 	*reinterpret_cast<void**>(0x7776B4) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CCannonBallEffect::OnHitHooked, 0);
 }
 
-ED::IEffect* ED::CDEVisibleEffectManager::GetDisplayForEffectID(int id)
+ED::IEffect* ED::CDEVisibleEffectManager::GetDisplayForEffectID(shok::EffectId id)
 {
 	for (auto& e : Effects) {
 		if (e.ID == id)
@@ -261,7 +266,7 @@ ED::IEffect* ED::CDEVisibleEffectManager::GetDisplayForEffectID(int id)
 	return nullptr;
 }
 
-void ED::CDEVisibleEffectManager::DestroyDisplayForEffect(int id)
+void ED::CDEVisibleEffectManager::DestroyDisplayForEffect(shok::EffectId id)
 {
 	struct data {
 		data* p;

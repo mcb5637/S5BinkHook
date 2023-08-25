@@ -25,7 +25,7 @@
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
 	Log(L, "Initializing ModLoader");
-	
+
 	Log(L, mappath);
 	if (!BB::CFileSystemMgr::DoesFileExist(mappath)) {
 		Log(L, "no ModLoader.lua, aborting");
@@ -96,6 +96,9 @@ void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
 	L.Push("ModLoader");
 	L.NewTable();
 
+	for (auto l : Loaders)
+		l->RegisterFuncs(L);
+
 	L.RegisterFuncs(LuaFuncs, -3);
 
 	L.SetTableRaw(-3);
@@ -122,11 +125,116 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 	L.Pop(1);
 }
 
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::Load(shok::EntityTypeId id) {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+	if (static_cast<int>(id) < static_cast<int>(mng->CGLEEntitiesProps.EntityTypesLogicProps.size())) {
+		mng->FreeEntityType(id);
+	}
+	mng->LoadEntityTypeByID(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::TableName() {
+	return "Entities";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::FuncName() {
+	return "EntityType";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::SanityCheck() {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+	if (mng->EntityTypes.size() != mng->EntityTypeManager->size())
+		throw lua::LuaException{"not all entitytypes loaded"};
+	for (int id = 1; id < static_cast<int>(mng->EntityTypes.size()); ++id) {
+		auto n = mng->EntityTypeManager->GetNameByID(id);
+		if (n == nullptr || *n == '\0')
+			continue;
+		if (mng->EntityTypes[id].LogicProps == nullptr)
+			throw lua::LuaException{std::format("entitytype {}={} missing LogicProps", n, id)};
+		if (mng->EntityTypes[id].DisplayProps == nullptr)
+			throw lua::LuaException{std::format("entitytype {}={} missing DisplayProps", n, id)};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::UnLoad(shok::EntityTypeId id) {
+	(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->PopEntityType(id);
+	(*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->RemoveID(static_cast<int>(id));
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj{};
+
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTypeId>::Load(shok::EffectTypeId id) {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
+	if (static_cast<int>(id) < static_cast<int>(mng->EffectsProps.Effects.size()))
+		mng->FreeEffectType(id);
+	mng->LoadEffectTypeFromExtraFile(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTypeId>::TableName() {
+	return "GGL_Effects";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTypeId>::FuncName() {
+	return "EffectType";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::SanityCheck() {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
+	if (mng->EffectsProps.Effects.size() != mng->EffectTypeManager->size())
+		throw lua::LuaException{"not all effect types loaded"};
+	for (int id = 1; id < static_cast<int>(mng->EffectsProps.Effects.size()); ++id) {
+		auto n = mng->EffectTypeManager->GetNameByID(id);
+		if (n == nullptr || *n == '\0')
+			continue;
+		if (mng->EffectsProps.Effects[id].Logic == nullptr)
+			throw lua::LuaException{std::format("effecttype {}={} missing Logic", n, id)};
+		if (mng->EffectsProps.Effects[id].Display == nullptr)
+			throw lua::LuaException{std::format("effecttype {}={} missing Display", n, id)};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Reset() {
+	if (NeedsReload)
+		(*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager->ReloadAllEffectTypes();
+	NeedsReload = false;
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj{};
+
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::Load(shok::TaskListId id) {
+	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
+	if (static_cast<int>(id) < static_cast<int>(m->TaskLists.size()))
+		m->FreeTaskList(id);
+	m->LoadTaskList(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::TableName() {
+	return "TaskLists";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::FuncName() {
+	return "TaskList";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::SanityCheck() {
+	auto* mng = *EGL::CGLETaskListMgr::GlobalObj;
+	if (mng->TaskLists.size() != mng->TaskListManager->size())
+		throw lua::LuaException{"not all effect types loaded"};
+	for (int id = 1; id < static_cast<int>(mng->TaskLists.size()); ++id) {
+		auto n = mng->TaskListManager->GetNameByID(id);
+		if (n == nullptr || *n == '\0')
+			continue;
+		if (mng->TaskLists[id] == nullptr)
+			throw lua::LuaException{std::format("tasklist {}={} missing", n, id)};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::OnIdLoaded(shok::TaskListId id) {
+	// make sure ToReload stays empty
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::UnLoad(shok::TaskListId id) {
+	if (*EGL::CGLETaskListMgr::GlobalObj)
+		(*EGL::CGLETaskListMgr::GlobalObj)->RemoveTaskList(id);
+	else
+		CppLogic::GetIdManager<shok::TaskListId>().RemoveID(id);
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::Obj{};
+
+
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 3> CppLogic::ModLoader::ModLoader::Loaders{{
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::Obj,
+	}};
+
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::EntityTypesToRemove{};
-std::vector<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::EntityTypesToReload{};
-bool CppLogic::ModLoader::ModLoader::ReloadEffectTypes = false;
-std::vector<shok::TaskListId> CppLogic::ModLoader::ModLoader::TaskListsToRemove{};
 std::vector<shok::TechnologyId> CppLogic::ModLoader::ModLoader::TechsToRemove{};
 std::vector<shok::ModelId> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
 bool CppLogic::ModLoader::ModLoader::ReloadModels = false;
@@ -149,138 +257,11 @@ std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToRemove{};
 std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToReload{};
 std::vector<int> CppLogic::ModLoader::ModLoader::DirectXEffectsToFree{};
 
-int CppLogic::ModLoader::ModLoader::PreLoadEntityType(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	if ((*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIdByName(t))
-		throw lua::LuaException{ "entitytype already exists" };
-	int id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::AddEntityType(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	int id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIdByName(t);
-	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-	if (id != 0 && id < static_cast<int>(mng->EntityTypes.size()))
-		throw lua::LuaException{ "entitytype already exists" };
-	id = (*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->GetIDByNameOrCreate(t);
-	mng->LoadEntityTypeByID(static_cast<shok::EntityTypeId>(id));
-	EntityTypesToRemove.push_back(static_cast<shok::EntityTypeId>(id));
-	L.Push("Entities");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadEntityType(lua::State L)
-{
-	int id = L.CheckInt(1);
-	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-	if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size()))
-		throw lua::LuaException("invalid id");
-	m->FreeEntityType(static_cast<shok::EntityTypeId>(id));
-	m->LoadEntityTypeByID(static_cast<shok::EntityTypeId>(id));
-	EntityTypesToReload.push_back(static_cast<shok::EntityTypeId>(id));
-	return 0;
-}
-
 int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 {
-	int id = L.CheckInt(1);
-	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-	if (id <= 0 || id >= static_cast<int>(m->EntityTypes.size()))
-		throw lua::LuaException("invalid id");
-	EntityTypesToReload.push_back(static_cast<shok::EntityTypeId>(id));
+	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
+	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
 	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::PreLoadEffectType(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
-	if (m->EffectTypeManager->GetIdByName(t))
-		throw lua::LuaException{ "effecttype already exists" };
-	int id = m->EffectTypeManager->GetIDByNameOrCreate(t);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadEffectType(lua::State L)
-{
-	int id = L.CheckInt(1);
-	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
-	if (id <= 0 || id >= static_cast<int>(m->EffectsProps.Effects.size()))
-		throw lua::LuaException("invalid id");
-	m->FreeEffectType(static_cast<shok::EffectTypeId>(id));
-	m->LoadEffectTypeFromExtraFile(static_cast<shok::EffectTypeId>(id));
-	ReloadEffectTypes = true;
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddEffectType(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
-	int id = m->EffectTypeManager->GetIdByName(t);
-	if (id != 0 && id < static_cast<int>(m->EffectsProps.Effects.size()))
-		throw lua::LuaException{ "effecttype already exists" };
-	id = m->EffectTypeManager->GetIDByNameOrCreate(t);
-	m->LoadEffectTypeFromExtraFile(static_cast<shok::EffectTypeId>(id));
-	L.Push("GGL_Effects");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	ReloadEffectTypes = true;
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::PreLoadTaskList(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
-	if (m->TaskListManager->GetIdByName(t))
-		throw lua::LuaException{ "tasklist already exists" };
-	int id = m->TaskListManager->GetIDByNameOrCreate(t);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadTaskList(lua::State L)
-{
-	int id = L.CheckInt(1);
-	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
-	if (id <= 0 || id >= static_cast<int>(m->TaskLists.size()))
-		throw lua::LuaException("invalid id");
-	m->FreeTaskList(static_cast<shok::TaskListId>(id));
-	m->LoadTaskList(static_cast<shok::TaskListId>(id));
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddTaskList(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
-	int id = m->TaskListManager->GetIdByName(t);
-	if (id != 0 && id < static_cast<int>(m->TaskLists.size()))
-		throw lua::LuaException{ "tasklist already exists" };
-	id = m->TaskListManager->GetIDByNameOrCreate(t);
-	m->LoadTaskList(static_cast<shok::TaskListId>(id));
-	TaskListsToRemove.push_back(static_cast<shok::TaskListId>(id));
-	L.Push("TaskLists");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	L.Push(id);
-	return 1;
 }
 
 int CppLogic::ModLoader::ModLoader::PreLoadTechnology(lua::State L)
@@ -762,6 +743,14 @@ int CppLogic::ModLoader::ModLoader::RefreshEntityCategoryCache(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::SanityCheck(lua::State L)
+{
+	for (auto* l : Loaders) {
+		l->SanityCheck();
+	}
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -837,34 +826,8 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			}
 		}
 
-
-		while (EntityTypesToRemove.size() != 0) {
-			auto id = EntityTypesToRemove.back();
-			EntityTypesToRemove.pop_back();
-			(*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager->PopEntityType(id);
-			(*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->RemoveID(static_cast<int>(id));
-		}
-
-		for (auto id : EntityTypesToReload) {
-			auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-			if (static_cast<int>(id) <= 0 || static_cast<int>(id) >= static_cast<int>(m->EntityTypes.size())) // might got popped above
-				continue;
-			m->FreeEntityType(id);
-			m->LoadEntityTypeByID(id);
-		}
-		EntityTypesToReload.clear();
-
-		if (ReloadEffectTypes)
-			(*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager->ReloadAllEffectTypes();
-		ReloadEffectTypes = false;
-
-		while (TaskListsToRemove.size() != 0) {
-			auto id = TaskListsToRemove.back();
-			TaskListsToRemove.pop_back();
-			if (*EGL::CGLETaskListMgr::GlobalObj)
-				(*EGL::CGLETaskListMgr::GlobalObj)->RemoveTaskList(id);
-			else
-				(*BB::CIDManagerEx::TaskListManager)->RemoveID(static_cast<int>(id));
+		for (auto* l : Loaders) {
+			l->Reset();
 		}
 
 		while (TechsToRemove.size() != 0) {
@@ -1041,5 +1004,5 @@ bool CppLogic::ModLoader::ModLoader::IsInitialized()
 
 void CppLogic::ModLoader::ModLoader::AddTaskListToRemove(shok::TaskListId id)
 {
-	TaskListsToRemove.push_back(id);
+	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::Obj.OnIdAllocated(id);
 }

@@ -293,8 +293,6 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	//EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
-	//L.Push((int)&p->ExplorationUpdate);
 	auto id = L.CheckEnum<shok::SoundId>(1);
 	L.Push(id);
 	L.Push(CppLogic::GetIdManager<shok::SoundId>().GetNameByID(id));

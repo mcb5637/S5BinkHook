@@ -248,8 +248,9 @@ namespace CppLogic {
 	};
 
 	template<class En>
-	requires std::is_enum_v<En>// && std::is_same_v<int, std::underlying_type_t<En>> && requires {IdManagerMapping<En>::Manager; }
-	inline EnumIdManager<En> GetIdManager() {
+	requires std::is_enum_v<En>
+	EnumIdManager<En> GetIdManager() {
+		static_assert(std::is_same_v<int, std::underlying_type_t<En>> && requires { IdManagerMapping<En>::Manager; }, "needs explicit specialization");
 		auto mng = *IdManagerMapping<En>::Manager;
 		if (mng == nullptr)
 			throw std::runtime_error{std::format("{} manager not yet initialized", typename_details::type_name<En>())};

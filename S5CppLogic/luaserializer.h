@@ -23,7 +23,7 @@ namespace CppLogic::Serializer {
 		static void Serialize(lua::State L, BB::IObject* o);
 
 		// if o nullptr, gets created, if id 0, gets read from lua, in this case also checks seri for 0
-		static void Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id = shok::ClassId::Invalid);
+		static void* Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id = shok::ClassId::Invalid);
 		static void Deserialize(lua::State L, BB::IObject* o);
 
 		static void DumpClassSerializationData(lua::State L, const BB::SerializationData* seri);

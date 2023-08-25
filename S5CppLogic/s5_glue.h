@@ -3,6 +3,7 @@
 #include "s5_baseDefs.h"
 #include "s5_entitytype.h"
 #include "s5_effecttype.h"
+#include "s5_config.h"
 
 namespace GGlue {
 	class IAnimsPropsMgr {
@@ -100,12 +101,28 @@ namespace GGlue {
 	};
 
 	class IDamageClassPropsMgr {
-
+	public:
+		virtual void __stdcall Destroy() = 0;
+		virtual BB::CIDManagerEx* __stdcall GetIdManager() = 0;
+		virtual GGL::DamageClassesHolder __stdcall GetLogic() = 0;
+		virtual void __stdcall Load(const char* file) = 0;
+		virtual ~IDamageClassPropsMgr() = default;
+		virtual void __stdcall Save(const char* file) = 0; // probably not working?
 	};
 	class CDamageClassesPropsMgr : public IDamageClassPropsMgr { // size 11, vtable 6
 	public:
+		BB::CIDManagerEx* DamageClassManager;
+		GGL::DamageClassesHolder Logic; // then copied into here, only these are used, contains same objects (except if there are holes in the ids)
+		shok::Vector<GGL::CDamageClassProps*> DamageClass; // loaded into here
+
 		static inline constexpr int vtp = 0x788A54;
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D228);
+
+		void AddDamageClass(shok::DamageClassId id, GGL::CDamageClassProps* c);
+		void ResetDamageClasses();
 	};
+	static_assert(sizeof(CDamageClassesPropsMgr) == 11 * 4);
+	static_assert(offsetof(CDamageClassesPropsMgr, Logic) == 2 * 4);
 
 	class IHeadsPropsMgr {
 

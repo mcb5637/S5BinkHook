@@ -284,7 +284,7 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA061F0));
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x53C49B)());
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x70295D23);
 	/*auto e = L.CheckEntity(1);
@@ -293,10 +293,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto id = L.CheckEnum<shok::SoundId>(1);
-	L.Push(id);
-	L.Push(CppLogic::GetIdManager<shok::SoundId>().GetNameByID(id));
-	return 2;
+	return 1;
 }
 
 int GetOptions(lua::State L) {

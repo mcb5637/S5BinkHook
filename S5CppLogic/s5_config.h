@@ -31,6 +31,7 @@ namespace GGL {
 		float& GetBonusVsArmorClass(shok::ArmorClassId ac);
 
 		static inline constexpr int vtp = 0x788978;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x520829DD);
 	};
 	class DamageClassesHolder {
 	public:

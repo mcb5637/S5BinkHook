@@ -158,6 +158,38 @@ void GGlue::CEntitiesPropsMgr::RefreshDisplayFlags()
 	(*ED::CGlobalsBaseEx::GlobalObj)->EntityTypeFlags = new ED::CEntitiesTypeFlags((*ED::CGlobalsBaseEx::GlobalObj)->EntityTypeDisplays);
 }
 
+void GGlue::CDamageClassesPropsMgr::AddDamageClass(shok::DamageClassId id, GGL::CDamageClassProps* c)
+{
+	auto v = Logic.DamageClassList.SaveVector();
+	if (v.Vector.size() == static_cast<int>(id))
+		v.Vector.push_back(c);
+	else if (static_cast<int>(v.Vector.size()) < static_cast<int>(id))
+		v.Vector[static_cast<int>(id)] = c;
+	else
+		throw std::invalid_argument{"invalid damageclass id"};
+}
+void GGlue::CDamageClassesPropsMgr::ResetDamageClasses()
+{
+	auto v = Logic.DamageClassList.SaveVector();
+	for (int id = v.Vector.size()-1; id >= static_cast<int>(DamageClass.size()); --id) {
+		DamageClassManager->RemoveID(id);
+		delete v.Vector[id];
+		v.Vector.pop_back();
+	}
+	for (int id = 1; id < static_cast<int>(DamageClass.size()); ++id) {
+		if (DamageClass[id] != v.Vector[id]) {
+			if (DamageClass[id] == nullptr) {
+				delete v.Vector[id];
+				v.Vector[id] = (*BB::CClassFactory::GlobalObj)->CreateObject<GGL::CDamageClassProps>();
+			}
+			else {
+				delete v.Vector[id];
+				v.Vector[id] = DamageClass[id];
+			}
+		}
+	}
+}
+
 void GGlue::CTerrainPropsMgr::ReloadTerrainTypes()
 {
 	auto lv = Logic.LogicProps.SaveVector();

@@ -39,7 +39,7 @@ namespace CppLogic::ModLoader {
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
 				return nullptr;
 			}
-			static void Load(En id) {
+			static void Load(En id, luaext::EState L) { // L is nullptr on reload
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
 			}
 
@@ -79,7 +79,7 @@ namespace CppLogic::ModLoader {
 			}
 			int Load(luaext::EState L) {
 				En id = GetId(L, 1);
-				Load(id);
+				Load(id, L);
 				L.Push(id);
 				OnIdLoaded(id);
 				return 1;
@@ -97,7 +97,7 @@ namespace CppLogic::ModLoader {
 					UnLoad(id);
 				}
 				for (En id : ToReload) {
-					DataTypeLoaderCommon<En>::Load(id);
+					DataTypeLoaderCommon<En>::Load(id, luaext::EState{nullptr});
 				}
 				ToReload.clear();
 			}
@@ -192,7 +192,7 @@ namespace CppLogic::ModLoader {
 			static DataTypeLoaderReload Obj;
 		};
 
-		static std::array<DataTypeLoader*, 3> Loaders;
+		static std::array<DataTypeLoader*, 4> Loaders;
 
 		static bool Initialized;
 		static std::vector<shok::TechnologyId> TechsToRemove;

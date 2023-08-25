@@ -208,7 +208,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeList(lua::State L, 
 	L.Pop(1);
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id)
+void* CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id)
 {
 	if (o == nullptr) {
 		if (id == shok::ClassId::Invalid) {
@@ -235,6 +235,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, void
 		}
 	}
 	DeserializeFields(L, o, seri);
+	return o;
 }
 void CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, BB::IObject* o)
 {

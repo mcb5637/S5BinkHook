@@ -312,6 +312,12 @@ const BB::FieldSerilaizer::ExtendedInfo& BB::FieldSerilaizer::GetExtendedInfo() 
     return InfoUnknown;
 }
 
+inline const char* (__stdcall* const serilistctx_get)(const BB::SerializationListOptions::Context* c, const char* a) = reinterpret_cast<const char* (__stdcall*)(const BB::SerializationListOptions::Context*, const char*)>(0x554600);
+const char* BB::SerializationListOptions::Context::GetAttribute(const char* a) const
+{
+    return serilistctx_get(this, a);
+}
+
 const BB::SerializationData* BB::SerializationData::GetSerializationData(shok::ClassId id)
 {
     return (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);

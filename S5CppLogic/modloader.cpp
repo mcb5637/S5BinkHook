@@ -21,6 +21,7 @@
 #include "entityiterator.h"
 #include "luaext.h"
 #include "dump_guitextures.h"
+#include "luaserializer.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
@@ -125,7 +126,7 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 	L.Pop(1);
 }
 
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::Load(shok::EntityTypeId id) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::Load(shok::EntityTypeId id, luaext::EState L) {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	if (static_cast<int>(id) < static_cast<int>(mng->CGLEEntitiesProps.EntityTypesLogicProps.size())) {
 		mng->FreeEntityType(id);
@@ -158,7 +159,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>:
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj{};
 
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTypeId>::Load(shok::EffectTypeId id) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTypeId>::Load(shok::EffectTypeId id, luaext::EState L) {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
 	if (static_cast<int>(id) < static_cast<int>(mng->EffectsProps.Effects.size()))
 		mng->FreeEffectType(id);
@@ -191,7 +192,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::R
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj{};
 
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::Load(shok::TaskListId id) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::Load(shok::TaskListId id, luaext::EState L) {
 	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
 	if (static_cast<int>(id) < static_cast<int>(m->TaskLists.size()))
 		m->FreeTaskList(id);
@@ -228,10 +229,43 @@ CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId> CppLogi
 
 
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 3> CppLogic::ModLoader::ModLoader::Loaders{{
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::Load(shok::DamageClassId id, luaext::EState L) {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager;
+	L.PushValue(2);
+	void* o = CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, nullptr, nullptr);
+	mng->AddDamageClass(id, static_cast<GGL::CDamageClassProps*>(o));
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::TableName() {
+	return "DamageClasses";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::FuncName() {
+	return "DamageClass";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::SanityCheck() {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager;
+	if (mng->Logic.DamageClassList.size() != mng->DamageClassManager->size())
+		throw lua::LuaException{"not all effect types loaded"};
+	for (int id = 1; id < static_cast<int>(mng->Logic.DamageClassList.size()); ++id) {
+		auto n = mng->DamageClassManager->GetNameByID(id);
+		if (n == nullptr || *n == '\0')
+			continue;
+		if (mng->Logic.DamageClassList[id] == nullptr)
+			throw lua::LuaException{std::format("damageclass {}={} is missing", n, id)};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Reset() {
+	if (NeedsReload)
+		(*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager->ResetDamageClasses();
+	NeedsReload = false;
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj{};
+
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 4> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
 	}};
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;

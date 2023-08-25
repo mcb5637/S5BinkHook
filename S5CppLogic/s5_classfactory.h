@@ -121,14 +121,18 @@ namespace BB {
 	struct SerializationListOptions {
 		struct Iter {
 		};
+		struct Context {
+			const char* GetAttribute(const char* a) const;
+		};
 
+		// use either AddToList or AddToListIdManaged
 		void* (__stdcall* AddToList)(void* List) = nullptr; // gets list, allocates, then returns p to new object
-		int z = 0;
+		void* (__stdcall* AddToListIdManaged)(void* List, Context* context) = nullptr; // gets id from attribute, allocates, returns p to new object
 		Iter* (__stdcall* AllocIter)(void* List) = nullptr;
 		bool(__stdcall* IterNext)(Iter* i) = nullptr;
 		void* (__stdcall* IterCurrent)(Iter* i) = nullptr;
 		void(__stdcall* FreeIter)(Iter* i) = nullptr;
-		void(__stdcall* FinalizeAddToList)(void* List) = nullptr;
+		void(__stdcall* FinalizeAddToList)(void* List) = nullptr; // used with AddToList, AddToListIdManaged unknown
 		size_t(__stdcall* GetSize)(void* List) = nullptr;
 	};
 

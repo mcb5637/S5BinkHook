@@ -285,6 +285,9 @@
     <ClInclude Include="ModUI.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="ModConfig.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -450,6 +453,9 @@
       <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="ModUI.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ModConfig.cpp">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include "s5_config.h"
 #include "s5_defines.h"
 #include "s5_classfactory.h"
+#include "ModConfig.h"
 
 EGL::CGLEAnimProps::CGLEAnimProps()
 {
@@ -42,10 +43,17 @@ void EGL::CGLEAnimProps::SetVT(int vt)
 float& GGL::CDamageClassProps::GetBonusVsArmorClass(shok::ArmorClassId ac)
 {
     int i = static_cast<int>(ac);
+    if (i > 8) {
+        if (auto ex = BB::IdentifierCast<CppLogic::Mod::Config::DamageClassExt>(this)) {
+            auto f = ex->ExtraArmorClasses.find(ac);
+            if (f != ex->ExtraArmorClasses.end())
+                return f->second;
+        }
+    }
     --i;
     if (i < 0 || i > 7)
         throw std::out_of_range{ "invalid armorclass" };
-    return BonusVsArmorClass[i];
+    return (&ArmorClassNoneFactor)[i];
 }
 
 GGL::CDamageClassProps* GGL::DamageClassesHolder::TryGet(shok::DamageClassId id)

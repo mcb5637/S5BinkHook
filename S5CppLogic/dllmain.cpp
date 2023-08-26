@@ -49,6 +49,7 @@
 #include "EntityAddonData.h"
 #include "ModBehavior.h"
 #include "ModUI.h"
+#include "ModConfig.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -284,8 +285,8 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x53C49B)());
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x5BB494)());
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, 0x70295D23);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -361,6 +362,7 @@ void InitGame() {
 	CppLogic::EntityAddon::EntityAddonData::Init();
 	CppLogic::Mod::RegisterClasses();
 	CppLogic::Mod::UI::RegisterClasses();
+	CppLogic::Mod::Config::RegisterClasses();
 	EGUIX::CTextButtonWidget::HookFixTextRender();
 	if (!Options.DisableMapListFix)
 		Framework::CampagnInfo::HookLoad();

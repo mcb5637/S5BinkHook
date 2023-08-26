@@ -202,13 +202,14 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeList(lua::State L, 
 		for (int k : L.IPairs(-1)) {
 			void* d = s->ListOptions->AddToList(o);
 			DeserializeField(L, d, s, true);
+			s->ListOptions->FinalizeAddToList(o);
 		}
 	}
 
 	L.Pop(1);
 }
 
-void* CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id)
+void* CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id, std::initializer_list<shok::ClassId> whitelisted_ids)
 {
 	if (o == nullptr) {
 		if (id == shok::ClassId::Invalid) {
@@ -227,6 +228,10 @@ void* CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, voi
 		}
 		if (id == shok::ClassId::Invalid)
 			throw std::invalid_argument{ "no object and no id provided" };
+		if (whitelisted_ids.size() > 0) {
+			if (std::find(whitelisted_ids.begin(), whitelisted_ids.end(), id) == whitelisted_ids.end())
+				throw std::invalid_argument{std::format("class id {} not allowed", static_cast<int>(id))};
+		}
 		o = (*BB::CClassFactory::GlobalObj)->CreateObject(id);
 		if (o == nullptr)
 			throw std::invalid_argument{ "invalid id provided" };

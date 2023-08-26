@@ -3,6 +3,7 @@
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
 #include "s5_entity.h"
+#include "s5_idmanager.h"
 
 static inline BB::CXmlSerializer*(__stdcall* const xmlserializer_new)(int d) = reinterpret_cast<BB::CXmlSerializer*(__stdcall* const)(int)>(0x550731);
 BB::CXmlSerializer* BB::CXmlSerializer::Create()
@@ -68,27 +69,34 @@ void CheckInt(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) 
     *static_cast<int*>(data) = L.CheckInt(idx);
 }
 BB::FieldSerilaizer::ExtendedInfo InfoInt{ "Int", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoTasklist{ "shok::TaskListID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoEntityType{ "shok::EntityTypeID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoModel{ "shok::ModelID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoAnim{ "shok::AnimID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoDamageClass{ "shok::DamageClass", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoEffectType{ "shok::EffectType", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategory", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTexture", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategoryID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::EntityAccessCategoryID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoAnimCategory{ "shok::AnimCategoryID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoWidgetID{ "shok::WidgetID", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventId", & PushInt, & CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", & PushInt, & CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", & PushInt, & CheckInt };
+
+template<class En>
+void CheckEnum(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+    *static_cast<En*>(data) = luaext::EState{ L }.CheckEnum<En>(idx, true);
+}
+
+BB::FieldSerilaizer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId> };
+BB::FieldSerilaizer::ExtendedInfo InfoEntityType{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId> };
+BB::FieldSerilaizer::ExtendedInfo InfoModel{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId> };
+BB::FieldSerilaizer::ExtendedInfo InfoAnim{ "shok::AnimationId", &PushInt, &CheckEnum<shok::AnimationId> };
+BB::FieldSerilaizer::ExtendedInfo InfoDamageClass{ "shok::DamageClassId", &PushInt, &CheckEnum<shok::DamageClassId> };
+BB::FieldSerilaizer::ExtendedInfo InfoEffectType{ "shok::EffectTypeId", &PushInt, &CheckEnum<shok::EffectTypeId> };
+BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckEnum<shok::ResourceType> };
+BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategoryId", &PushInt, &CheckEnum<shok::UpgradeCategoryId> };
+BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyId", &PushInt, &CheckEnum<shok::TechnologyId> };
+BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundId", &PushInt, &CheckEnum<shok::SoundId> };
+BB::FieldSerilaizer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundId", &PushInt, &CheckEnum<shok::AmbientSoundId> };
+BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureId", &PushInt, &CheckEnum<shok::WeatherEffectTextureId> };
+BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTextureId", &PushInt, &CheckEnum<shok::TerrainTextureId> };
+BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategory", &PushInt, &CheckEnum<shok::EntityCategory> };
+BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoAnimCategory{ "shok::AnimationCategoryId", &PushInt, &CheckEnum<shok::AnimationCategoryId> };
+BB::FieldSerilaizer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckEnum<shok::Goods> };
+BB::FieldSerilaizer::ExtendedInfo InfoWidgetID{ "shok::WidgetId", &PushInt, &CheckEnum<shok::WidgetId> };
+BB::FieldSerilaizer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventIds", &PushInt, &CheckEnum<shok::FeedbackEventIds> };
+BB::FieldSerilaizer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", &PushInt, &CheckEnum<shok::FeedbackStateId> };
+BB::FieldSerilaizer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", &PushInt, &CheckEnum<shok::AbilityId> };
+BB::FieldSerilaizer::ExtendedInfo InfoArmorClassId{ "shok::ArmorClassId", &PushInt, &CheckEnum<shok::ArmorClassId> };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -222,6 +230,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     { 0x880494, &InfoFeedbackEventId },
     { 0x8804B8, &InfoFeedbackStateId },
     { 0x883088, &InfoAbilityId },
+    { 0x85D5CC, &InfoArmorClassId },
 
     {0x810D18, &InfoAccessCategory},
 
@@ -261,6 +270,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x82D62C, &InfoFloat},
     { 0x82D328, &InfoFloat },
     { 0x82CAC8, &InfoFloat },
+    { 0x83CBFC, &InfoFloat },
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},

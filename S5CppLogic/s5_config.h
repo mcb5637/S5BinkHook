@@ -26,13 +26,20 @@ namespace EGL {
 
 namespace GGL {
 	class CDamageClassProps : public BB::IObject {
-		float BonusVsArmorClass[7]; // remember to access with ArmorClass - 1
 	public:
+		//float BonusVsArmorClass[7]; // remember to access with ArmorClass - 1
+		float ArmorClassNoneFactor, ArmorClassJerkinFactor, ArmorClassLeatherFactor;
+		float ArmorClassIronFactor, ArmorClassFortificationFactor, ArmorClassHeroFactor, ArmorClassFurFactor;
+		shok::UpgradeCategoryId SoldierCategory, LeaderCategory; // unused
+		
 		float& GetBonusVsArmorClass(shok::ArmorClassId ac);
 
 		static inline constexpr int vtp = 0x788978;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x520829DD);
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA0D068);
 	};
+	static_assert(sizeof(CDamageClassProps) == 10 * 4);
+	static_assert(offsetof(CDamageClassProps, LeaderCategory) == 9 * 4);
 	class DamageClassesHolder {
 	public:
 		BB::CIDManagerEx* DamageClassManager;

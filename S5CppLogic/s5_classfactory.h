@@ -86,6 +86,7 @@ namespace BB {
 		static inline BB::FieldSerilaizer* const TypeDamageClass = reinterpret_cast<BB::FieldSerilaizer*>(0x860558);
 		static inline BB::FieldSerilaizer* const TypeEffectType = reinterpret_cast<BB::FieldSerilaizer*>(0x8605A0);
 		static inline BB::FieldSerilaizer* const TypeWidgetID = reinterpret_cast<BB::FieldSerilaizer*>(0x894708);
+		static inline BB::FieldSerilaizer* const TypeArmorClassId = reinterpret_cast<BB::FieldSerilaizer*>(0x85D5CC);
 
 		template<class T>
 		static constexpr BB::FieldSerilaizer* GetSerilalizer() = delete;

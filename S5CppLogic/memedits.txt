@@ -118,5 +118,6 @@ list of used identifiers
 0x100A CppLogic::Mod::OnScreenInfoDisplayBehavior
 0x100B CppLogic::Mod::ResourceTrackerBehavior
 0x100C CppLogic::Mod::AutoScrollCustomWidget
+0x100D CppLogic::Mod::Config::DamageClassExt
 0x1010 CppLogic::Mod::FormationSpacedBehavior
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

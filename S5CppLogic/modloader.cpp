@@ -22,6 +22,7 @@
 #include "luaext.h"
 #include "dump_guitextures.h"
 #include "luaserializer.h"
+#include "ModConfig.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
@@ -232,7 +233,10 @@ CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId> CppLogi
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::Load(shok::DamageClassId id, luaext::EState L) {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager;
 	L.PushValue(2);
-	void* o = CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, nullptr, nullptr);
+	void* o = CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, nullptr, nullptr, shok::ClassId::Invalid, {
+		GGL::CDamageClassProps::Identifier,
+		CppLogic::Mod::Config::DamageClassExt::Identifier,
+		});
 	mng->AddDamageClass(id, static_cast<GGL::CDamageClassProps*>(o));
 }
 const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::TableName() {

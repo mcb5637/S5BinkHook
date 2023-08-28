@@ -147,6 +147,68 @@ namespace CppLogic::ModLoader {
 			static DataTypeLoaderTracking Obj;
 		};
 		template<class En>
+		class DataTypeLoaderHalf : public DataTypeLoaderCommon<En> {
+			std::vector<En> ToRemove;
+			bool NeedsReload = false;
+
+		public:
+			virtual void Reset() override {
+				while (!ToRemove.empty()) {
+					En id = ToRemove.back();
+					ToRemove.pop_back();
+					UnLoad(id);
+				}
+				if (NeedsReload)
+					Reload();
+				NeedsReload = false;
+			}
+			virtual void SanityCheck() override {
+				static_assert(sizeof(DataTypeLoaderHalf<En>) != sizeof(DataTypeLoaderHalf<En>));
+			}
+			virtual void OnIdAllocated(En id) override {
+				if (std::find(ToRemove.begin(), ToRemove.end(), id) == ToRemove.end())
+					ToRemove.push_back(id);
+			}
+			virtual void OnIdLoaded(En id) override {
+				if (std::find(ToRemove.begin(), ToRemove.end(), id) != ToRemove.end())
+					return;
+				NeedsReload = true;
+			}
+			static void UnLoad(En id) {
+				static_assert(sizeof(DataTypeLoaderHalf<En>) != sizeof(DataTypeLoaderHalf<En>));
+			}
+			void Reload() {
+				static_assert(sizeof(DataTypeLoaderHalf<En>) != sizeof(DataTypeLoaderHalf<En>));
+			}
+
+			static int Prel(lua::State L) {
+				return Obj.Preload(luaext::EState{L});
+			}
+			static int Lo(lua::State L) {
+				return Obj.Load(luaext::EState{L});
+			}
+
+			virtual void RegisterFuncs(luaext::EState L) override {
+				L.Push("PreLoad");
+				L.Push(DataTypeLoaderCommon<En>::FuncName());
+				L.Concat(2);
+				L.Push<Prel>();
+				L.SetTableRaw(-3);
+				L.Push("Add");
+				L.Push(DataTypeLoaderCommon<En>::FuncName());
+				L.Concat(2);
+				L.Push<Lo>();
+				L.SetTableRaw(-3);
+				L.Push("Reload");
+				L.Push(DataTypeLoaderCommon<En>::FuncName());
+				L.Concat(2);
+				L.Push<Lo>();
+				L.SetTableRaw(-3);
+			}
+
+			static DataTypeLoaderHalf Obj;
+		};
+		template<class En>
 		class DataTypeLoaderReload : public DataTypeLoaderCommon<En> {
 			bool NeedsReload = false;
 		public:
@@ -192,7 +254,7 @@ namespace CppLogic::ModLoader {
 			static DataTypeLoaderReload Obj;
 		};
 
-		static std::array<DataTypeLoader*, 4> Loaders;
+		static std::array<DataTypeLoader*, 5> Loaders;
 
 		static bool Initialized;
 		static std::vector<shok::TechnologyId> TechsToRemove;

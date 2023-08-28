@@ -152,3 +152,32 @@ path: data/graphics/effects/ename.fx and data/graphics/effects/ffp/ename.fx (the
 example: as originals
 Note: DirectX Effects are 2 shaders (with some other data) bundled together. you can find old mircosoft docs about them, but they are deprecated in modern DirectX.
 Note2: Yes, confusingly BB created their EGL::CEffect, while ID3DXEffect gets encapsulated into a BBRw::CEffect.
+
+ArmorClasses:
+path: lua only
+example: -
+Note: ArmorClasses are id only, modifying them requires adding them to every DamageClass.
+
+DamageClass:
+path: lua only
+example:
+	DC_OP = {
+		ObjectClassName = "CppLogic::Mod::Config::DamageClassExt",--"GGL::CDamageClassProps",
+		ArmorClassNoneFactor = 100,
+		ArmorClassJerkinFactor = 100,
+		ArmorClassLeatherFactor = 100,
+		ArmorClassIronFactor = 100,
+		ArmorClassFortificationFactor = 100,
+		ArmorClassHeroFactor = 100,
+		ArmorClassFurFactor = 100,
+		ExtraArmorClass = {{
+			ArmorClass = "AC_ReallyBad",
+			Factor = 1000,
+		},
+		{
+			ArmorClass = "AC_EvenWorse",
+			Factor = 2000,
+		}},
+	},
+Note: ExtraArmorClass is only defined for CppLogic::Mod::Config::DamageClassExt.
+	Using CppLogic::Mod::Config::DamageClassExt requires activating CppLogic.Combat.EnableAoEProjectileFix and CppLogic.Logic.EnableAllHurtEntityTrigger.

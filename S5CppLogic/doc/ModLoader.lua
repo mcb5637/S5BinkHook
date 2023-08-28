@@ -91,7 +91,13 @@ ModLoader = {
 		--- DirectX Effects to load. no difference between load and reload.
 		DirectXEffects = {
 
-		}
+		},
+		ArmorClasses = { -- ArmorClasses to add. (Factors are defined in DamageClasses)
+			
+		},
+		DamageClasses = { -- DamageClasses to add/override. 
+			
+		},
 	},
 }
 
@@ -123,10 +129,14 @@ end
 
 --- applying everything in Manifest
 function ModLoader.ApplyManifest()
+	ModLoader.PreloadManifestType(ModLoader.Manifest.ArmorClasses, CppLogic.ModLoader.PreLoadArmorClass, ArmorClasses)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.EffectTypes, CppLogic.ModLoader.PreLoadEffectType, GGL_Effects)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.PreLoadTaskList, TaskLists)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.PreLoadEntityType, Entities)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.PreLoadTechnology, Technologies)
+	for dc, cfg in pairs(ModLoader.Manifest.DamageClasses) do
+		CppLogic.ModLoader.AddDamageClass(dc, cfg)
+	end
 	for uc, et in pairs(ModLoader.Manifest.SettlerUpgradeCategory) do
 		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
 	end

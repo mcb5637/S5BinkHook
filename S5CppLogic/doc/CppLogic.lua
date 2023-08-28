@@ -3009,6 +3009,15 @@ function CppLogic.ModLoader.ReloadAnimSet(id) end
 --- @param ename string
 function CppLogic.ModLoader.LoadDirectXEffect(ename) end
 
+--- creates a ArmorClass to use in damageclasses and entitytypes.
+--- @param ac string
+function CppLogic.ModLoader.PreLoadArmorClass(ac) end
+
+--- creates or replaces a DamageClass with a serialized lua table. (see data_notes.txt for format)
+--- @param dc string
+--- @param cfg table
+function CppLogic.ModLoader.AddDamageClass(dc, cfg) end
+
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.
 function CppLogic_ResetGlobal() end

@@ -205,7 +205,7 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListI
 const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::FuncName() {
 	return "TaskList";
 }
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::SanityCheck() {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::SanityCheck() {
 	auto* mng = *EGL::CGLETaskListMgr::GlobalObj;
 	if (mng->TaskLists.size() != mng->TaskListManager->size())
 		throw lua::LuaException{"not all effect types loaded"};
@@ -217,17 +217,36 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::S
 			throw lua::LuaException{std::format("tasklist {}={} missing", n, id)};
 	}
 }
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::OnIdLoaded(shok::TaskListId id) {
-	// make sure ToReload stays empty
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Reload() {
+	
 }
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::UnLoad(shok::TaskListId id) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::UnLoad(shok::TaskListId id) {
 	if (*EGL::CGLETaskListMgr::GlobalObj)
 		(*EGL::CGLETaskListMgr::GlobalObj)->RemoveTaskList(id);
 	else
 		CppLogic::GetIdManager<shok::TaskListId>().RemoveID(id);
 }
-CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::Obj{};
+CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj{};
 
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClassId>::Load(shok::ArmorClassId id, luaext::EState L) {
+	
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClassId>::TableName() {
+	return "ArmorClasses";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClassId>::FuncName() {
+	return "ArmorClass";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::SanityCheck() {
+	
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Reload() {
+
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::UnLoad(shok::ArmorClassId id) {
+	CppLogic::GetIdManager<shok::ArmorClassId>().RemoveID(id);
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj{};
 
 
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::Load(shok::DamageClassId id, luaext::EState L) {
@@ -265,10 +284,11 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj{};
 
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 4> CppLogic::ModLoader::ModLoader::Loaders{{
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 5> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
 	}};
 
@@ -1042,5 +1062,5 @@ bool CppLogic::ModLoader::ModLoader::IsInitialized()
 
 void CppLogic::ModLoader::ModLoader::AddTaskListToRemove(shok::TaskListId id)
 {
-	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TaskListId>::Obj.OnIdAllocated(id);
+	CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj.OnIdAllocated(id);
 }

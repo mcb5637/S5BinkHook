@@ -51,7 +51,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const TechnologyCategoryManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3C0); // 864854 same
 		static inline BB::CIDManagerEx** const AbilityManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3CC);
 		static inline BB::CIDManagerEx** const GoodsManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3B4); // i dont think they are actually used somewhere..., A0D348 same
-		static inline BB::CIDManagerEx** const ArmorClassManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3C8); // you probably cannot add anything here, cause fixed array, A0C850 same
+		static inline BB::CIDManagerEx** const ArmorClassManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C850); // you probably cannot add anything here, cause fixed array, 85A3C8 same
 		static inline BB::CIDManagerEx** const AttachmentTypesManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3D0); // 85A3D4 too
 		static inline BB::CIDManagerEx** const FeedBackEventManager = reinterpret_cast<BB::CIDManagerEx**>(0x880BA0); // ids are not correct here
 		static inline BB::CIDManagerEx** const SoundsManager = reinterpret_cast<BB::CIDManagerEx**>(0x859F14); // 8979C8 same

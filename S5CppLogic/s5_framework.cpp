@@ -24,6 +24,11 @@ bool Framework::SKeys::Check(const SKeys& map) const
 {
     return skeys_checknorm(this, &map);
 }
+inline bool(__thiscall* skeys_checksp)(const Framework::SKeys* th, const Framework::SKeys* map) = reinterpret_cast<bool(__thiscall*)(const Framework::SKeys*, const Framework::SKeys*)>(0x51BA3C);
+bool Framework::SKeys::CheckSP(const SKeys& map) const
+{
+    return skeys_checksp(this, &map);
+}
 
 inline GS3DTools::CMapData* (__thiscall* const mapdata_assign)(GS3DTools::CMapData* th, const GS3DTools::CMapData* o) = reinterpret_cast<GS3DTools::CMapData * (__thiscall*)(GS3DTools::CMapData*, const GS3DTools::CMapData*)>(0x4029B8);
 GS3DTools::CMapData& GS3DTools::CMapData::operator=(const GS3DTools::CMapData& o)
@@ -102,8 +107,14 @@ void __thiscall Framework::CampagnInfo::LoadOverride(const char* path, const SKe
             }
             inf.IsExternalmap = false;
         }
-        if (keys->Check(inf.Keys))
-            v.Vector.push_back(inf);
+        if (isSp) {
+            if (keys->CheckSP(inf.Keys))
+                v.Vector.push_back(inf);
+        }
+        else {
+            if (keys->Check(inf.Keys))
+                v.Vector.push_back(inf);
+        }
     }
 }
 

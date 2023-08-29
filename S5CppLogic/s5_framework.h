@@ -72,8 +72,8 @@ namespace Framework {
 		shok::Vector<int> Keys;
 
 		bool Check(const SKeys& map) const;
+		bool CheckSP(const SKeys& map) const;
 		// set to extra num 51BA6A __thiscall
-		// check sp 51BA3C __thiscall(shok::vector<int>*) for some reason also checks if vectors sizes match
 	};
 
 	struct MapInfo {

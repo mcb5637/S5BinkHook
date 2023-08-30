@@ -94,7 +94,7 @@ void __thiscall Framework::CampagnInfo::LoadOverride(const char* path, const SKe
             inf.IsExternalmap = true;
         }
         else {
-            auto infoxml = std::format("{}\\{}", abspath[0] ? abspath : inf.MapFilePath.c_str(), "Info.xml");
+            auto infoxml = std::format("{}\\{}", inf.MapFilePath.c_str(), "Info.xml");
             BB::CFileStreamEx file{};
             try {
                 file.OpenFile(infoxml.c_str(), BB::IStream::Flags::DefaultRead);

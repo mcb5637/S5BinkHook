@@ -56,7 +56,7 @@ namespace CppLogic::ModLoader {
 				else if (t == lua::LType::String) {
 					const char* s = L.ToString(idx);
 					En id = mng.GetIdByName(s);
-					if (id == static_cast<En>(0)) {
+					if (id == static_cast<En>(0) && TableName()) {
 						id = mng.GetIDByNameOrCreate(s);
 						OnIdAllocated(id);
 						L.Push(TableName());
@@ -254,14 +254,10 @@ namespace CppLogic::ModLoader {
 			static DataTypeLoaderReload Obj;
 		};
 
-		static std::array<DataTypeLoader*, 5> Loaders;
+		static std::array<DataTypeLoader*, 8> Loaders;
+		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
-		static std::vector<shok::TechnologyId> TechsToRemove;
-		static std::vector<shok::ModelId> ModelsToRemove;
-		static bool ReloadModels;
-		static std::vector<shok::GUITextureId> TexturesToRemove;
-		static std::vector<shok::GUITextureId> TexturesToReload;
 		static std::vector<shok::AnimationId> AnimsToRemove;
 		static std::vector<shok::AnimationId> AnimsToReload;
 		static std::vector<shok::UpgradeCategoryId> SettlerUCatsToRemove;
@@ -280,13 +276,6 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> DirectXEffectsToFree;
 
 		static int SetEntityTypeToReload(lua::State L);
-		static int PreLoadTechnology(lua::State L);
-		static int ReloadTechnology(lua::State L);
-		static int AddTechnology(lua::State L);
-		static int AddModel(lua::State L);
-		static int ReloadModel(lua::State L);
-		static int AddGUITexture(lua::State L);
-		static int ReloadGUITexture(lua::State L);
 		static int AddAnimation(lua::State L);
 		static int ReloadAnimation(lua::State L);
 		static int PreLoadUpgradeCategory(lua::State L);
@@ -309,15 +298,8 @@ namespace CppLogic::ModLoader {
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 29> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 22> LuaFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<PreLoadTechnology>("PreLoadTechnology"),
-				lua::FuncReference::GetRef<ReloadTechnology>("ReloadTechnology"),
-				lua::FuncReference::GetRef<AddTechnology>("AddTechnology"),
-				lua::FuncReference::GetRef<AddModel>("AddModel"),
-				lua::FuncReference::GetRef<ReloadModel>("ReloadModel"),
-				lua::FuncReference::GetRef<AddGUITexture>("AddGUITexture"),
-				lua::FuncReference::GetRef<ReloadGUITexture>("ReloadGUITexture"),
 				lua::FuncReference::GetRef<AddAnimation>("AddAnimation"),
 				lua::FuncReference::GetRef<ReloadAnimation>("ReloadAnimation"),
 				lua::FuncReference::GetRef<PreLoadUpgradeCategory>("PreLoadUpgradeCategory"),
@@ -341,10 +323,8 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<SanityCheck>("SanityCheck"),
 		} };
 
-		static constexpr std::array<lua::FuncReference, 4> NoLoaderFuncs{ {
+		static constexpr std::array<lua::FuncReference, 2> NoLoaderFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<AddGUITexture>("AddGUITexture"),
-				lua::FuncReference::GetRef<ReloadGUITexture>("ReloadGUITexture"),
 				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 		} };
 

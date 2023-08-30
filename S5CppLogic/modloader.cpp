@@ -121,6 +121,10 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 	L.Push("ModLoader");
 	L.NewTable();
 
+
+	for (auto l : LoadersIngame)
+		l->RegisterFuncs(L);
+
 	L.RegisterFuncs(NoLoaderFuncs, -3);
 
 	L.SetTableRaw(-3);
@@ -208,7 +212,7 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListI
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::SanityCheck() {
 	auto* mng = *EGL::CGLETaskListMgr::GlobalObj;
 	if (mng->TaskLists.size() != mng->TaskListManager->size())
-		throw lua::LuaException{"not all effect types loaded"};
+		throw lua::LuaException{"not all task lists loaded"};
 	for (int id = 1; id < static_cast<int>(mng->TaskLists.size()); ++id) {
 		auto n = mng->TaskListManager->GetNameByID(id);
 		if (n == nullptr || *n == '\0')
@@ -267,13 +271,19 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageCla
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::SanityCheck() {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager;
 	if (mng->Logic.DamageClassList.size() != mng->DamageClassManager->size())
-		throw lua::LuaException{"not all effect types loaded"};
+		throw lua::LuaException{"not all damage classes loaded"};
+	auto* acmng = *BB::CIDManagerEx::ArmorClassManager;
 	for (int id = 1; id < static_cast<int>(mng->Logic.DamageClassList.size()); ++id) {
 		auto n = mng->DamageClassManager->GetNameByID(id);
 		if (n == nullptr || *n == '\0')
 			continue;
-		if (mng->Logic.DamageClassList[id] == nullptr)
+		auto* dc = mng->Logic.DamageClassList[id];
+		if (dc == nullptr)
 			throw lua::LuaException{std::format("damageclass {}={} is missing", n, id)};
+		for (int ac = 1; ac < static_cast<int>(acmng->size()); ++ac) {
+			if (dc->GetBonusVsArmorClass(static_cast<shok::ArmorClassId>(ac)) <= 0)
+				throw lua::LuaException{std::format("damageclass {}={} has invalid factor {}", n, id, ac)};
+		}
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Reset() {
@@ -283,21 +293,107 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj{};
 
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TechnologyId>::Load(shok::TechnologyId id, luaext::EState L) {
+	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
+	if (static_cast<int>(id) < static_cast<int>(m->Techs.size()))
+		m->FreeTech(id);
+	m->LoadTech(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TechnologyId>::TableName() {
+	return "Technologies";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TechnologyId>::FuncName() {
+	return "Technology";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::SanityCheck() {
+	auto* mng = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
+	if (mng->Techs.size() != (*BB::CIDManagerEx::TechnologiesManager)->size())
+		throw lua::LuaException{"not all task lists loaded"};
+	for (int id = 1; id < static_cast<int>(mng->Techs.size()); ++id) {
+		auto n = (*BB::CIDManagerEx::TechnologiesManager)->GetNameByID(id);
+		if (n == nullptr || *n == '\0')
+			continue;
+		if (mng->Techs[id] == nullptr)
+			throw lua::LuaException{std::format("tech {}={} missing", n, id)};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Reload() {
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 5> CppLogic::ModLoader::ModLoader::Loaders{{
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::UnLoad(shok::TechnologyId id) {
+	if (*GGL::CGLGameLogic::GlobalObj)
+		(*GGL::CGLGameLogic::GlobalObj)->TechManager->PopTech(id);
+	if ((*BB::CIDManagerEx::TechnologiesManager))
+		(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(static_cast<int>(id));
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj{};
+
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ModelId>::Load(shok::ModelId id, luaext::EState L) {
+	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->LoadModelDataFromExtraFile(id);
+	if (static_cast<int>(id) < static_cast<int>(m->ModelManager.Models.size()))
+		m->FreeModel(id);
+	m->LoadModel(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ModelId>::TableName() {
+	return "Models";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ModelId>::FuncName() {
+	return "Model";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::SanityCheck() {
+	
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Reload() {
+	for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
+		(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(static_cast<shok::ModelId>(id));
+	}
+	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ReloadAllModels();
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::UnLoad(shok::ModelId id) {
+	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->PopModel(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->PopModel(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager->RemoveID(static_cast<int>(id));
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj{};
+
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::GUITextureId>::Load(shok::GUITextureId id, luaext::EState L) {
+	auto* mng = EGUIX::TextureManager::GlobalObj();
+	mng->ReloadTexture(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::GUITextureId>::TableName() {
+	return nullptr;
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::GUITextureId>::FuncName() {
+	return "GUITexture";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::SanityCheck() {
+	
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::UnLoad(shok::GUITextureId id) {
+	EGUIX::TextureManager::GlobalObj()->FreeTexture(id);
+	EGUIX::TextureManager::GlobalObj()->IdManager->RemoveID(static_cast<int>(id));
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj{};
+
+
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 8> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj,
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj,
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
+	}};
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{{
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
 	}};
 
+
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<shok::TechnologyId> CppLogic::ModLoader::ModLoader::TechsToRemove{};
-std::vector<shok::ModelId> CppLogic::ModLoader::ModLoader::ModelsToRemove{};
-bool CppLogic::ModLoader::ModLoader::ReloadModels = false;
-std::vector<shok::GUITextureId> CppLogic::ModLoader::ModLoader::TexturesToRemove{};
-std::vector<shok::GUITextureId> CppLogic::ModLoader::ModLoader::TexturesToReload{};
 std::vector<shok::AnimationId> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
 std::vector<shok::AnimationId> CppLogic::ModLoader::ModLoader::AnimsToReload{};
 std::vector<shok::UpgradeCategoryId> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
@@ -319,119 +415,6 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 {
 	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::PreLoadTechnology(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
-	if ((*BB::CIDManagerEx::TechnologiesManager)->GetIdByName(t))
-		throw lua::LuaException{ "tasklist already exists" };
-	int id = (*BB::CIDManagerEx::TechnologiesManager)->GetIDByNameOrCreate(t);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadTechnology(lua::State L)
-{
-	int id = L.CheckInt(1);
-	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
-	if (id <= 0 || id >= static_cast<int>(m->Techs.size()))
-		throw lua::LuaException("invalid id");
-	m->FreeTech(static_cast<shok::TechnologyId>(id));
-	m->LoadTech(static_cast<shok::TechnologyId>(id));
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddTechnology(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
-	int id = (*BB::CIDManagerEx::TechnologiesManager)->GetIdByName(t);
-	if (id != 0 && id < static_cast<int>(m->Techs.size()))
-		throw lua::LuaException{ "tasklist already exists" };
-	id = (*BB::CIDManagerEx::TechnologiesManager)->GetIDByNameOrCreate(t);
-	m->LoadTech(static_cast<shok::TechnologyId>(id));
-	TechsToRemove.push_back(static_cast<shok::TechnologyId>(id));
-	L.Push("Technologies");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::AddModel(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* mp = (*ED::CGlobalsBaseEx::GlobalObj)->ModelProps;
-	if (mp->ModelIdManager->GetIdByName(t))
-		throw lua::LuaException{ "model already exists" };
-	int id = mp->ModelIdManager->GetIDByNameOrCreate(t);
-	try {
-		mp->LoadModelDataFromExtraFile(static_cast<shok::ModelId>(id));
-		(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->LoadModel(static_cast<shok::ModelId>(id));
-	}
-	catch (const BB::CException& e) {
-		char buff[201];
-		e.CopyMessage(buff, 200);
-		throw lua::LuaException{ buff };
-	}
-	ModelsToRemove.push_back(static_cast<shok::ModelId>(id));
-	L.Push("Models");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadModel(lua::State L)
-{
-	int id = L.CheckInt(1);
-	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
-	if (!m->ModelManager.ModelIDManager->GetNameByID(id))
-		throw lua::LuaException{ "invalid id" };
-	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->LoadModelDataFromExtraFile(static_cast<shok::ModelId>(id));
-	m->FreeModel(static_cast<shok::ModelId>(id));
-	m->LoadModel(static_cast<shok::ModelId>(id));
-	ReloadModels = true;
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddGUITexture(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = EGUIX::TextureManager::GlobalObj();
-	if (m->GetTextureIDNoAdd(t) != shok::GUITextureId::Invalid)
-		throw lua::LuaException{ "texture already exists" };
-	auto id = m->GetTextureID(t);
-	m->GetTextureByID(id);
-	TexturesToRemove.push_back(id);
-	L.Push(static_cast<int>(id));
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadGUITexture(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = EGUIX::TextureManager::GlobalObj();
-	auto id = m->GetTextureIDNoAdd(t);
-	if (id == shok::GUITextureId::Invalid) {
-		for (const char* tex : dump::GUITextures) {
-			if (std::strcmp(tex, t) == 0) {
-				id = m->GetTextureID(t);
-				break;
-			}
-		}
-		if (id == shok::GUITextureId::Invalid)
-			throw lua::LuaException{ "texture does not exist" };
-	}
-	m->ReloadTexture(id);
-	TexturesToReload.push_back(id);
 	return 0;
 }
 
@@ -887,44 +870,6 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		for (auto* l : Loaders) {
 			l->Reset();
 		}
-
-		while (TechsToRemove.size() != 0) {
-			auto id = TechsToRemove.back();
-			TechsToRemove.pop_back();
-			if (*GGL::CGLGameLogic::GlobalObj)
-				(*GGL::CGLGameLogic::GlobalObj)->TechManager->PopTech(id);
-			if ((*BB::CIDManagerEx::TechnologiesManager))
-				(*BB::CIDManagerEx::TechnologiesManager)->RemoveID(static_cast<int>(id));
-		}
-
-		while (ModelsToRemove.size() != 0) {
-			auto id = ModelsToRemove.back();
-			ModelsToRemove.pop_back();
-			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->PopModel(id);
-			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->PopModel(id);
-			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ModelIdManager->RemoveID(static_cast<int>(id));
-		}
-		if (ReloadModels) {
-			for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
-				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(static_cast<shok::ModelId>(id));
-				//(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(id);
-				// gets reloaded on next use anyway
-			}
-			(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->ReloadAllModels();
-		}
-		ReloadModels = false;
-
-		while (TexturesToRemove.size() != 0) {
-			auto id = TexturesToRemove.back();
-			TexturesToRemove.pop_back();
-			EGUIX::TextureManager::GlobalObj()->FreeTexture(id);
-			EGUIX::TextureManager::GlobalObj()->IdManager->RemoveID(static_cast<int>(id));
-		}
-		for (auto id : TexturesToReload) {
-			if (static_cast<unsigned int>(id) < EGUIX::TextureManager::GlobalObj()->Textures.size())
-				EGUIX::TextureManager::GlobalObj()->ReloadTexture(id);
-		}
-		TexturesToReload.clear();
 
 		while (AnimsToRemove.size() != 0) {
 			auto id = AnimsToRemove.back();

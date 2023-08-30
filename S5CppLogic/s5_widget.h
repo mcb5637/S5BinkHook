@@ -1039,8 +1039,44 @@ namespace EGUIX {
 	static_assert(offsetof(CEventManager, CurrentModifiers) == 7 * 4);
 }
 
+namespace CppLogic {
+	class TextureIdManager {
+		EGUIX::TextureManager* Manager;
+
+	public:
+		inline TextureIdManager(EGUIX::TextureManager* mng) : Manager(mng) {
+
+		}
+
+		// does not add
+		inline shok::GUITextureId GetIdByName(const char* name) {
+			return Manager->GetTextureIDNoAdd(name);
+		}
+		inline const char* GetNameByID(shok::GUITextureId id) {
+			return Manager->IdManager->GetNameByID(static_cast<int>(id));
+		}
+		// throws if id invalid
+		inline shok::GUITextureId GetIDByNameOrCreate(const char* name) {
+			return Manager->GetTextureID(name);
+		}
+		// remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
+		inline void RemoveID(shok::GUITextureId id) {
+			Manager->IdManager->RemoveID(static_cast<int>(id));
+		}
+		inline void DumpManagerToLuaGlobal(lua_State* L, const char* global) {
+			Manager->IdManager->DumpManagerToLuaGlobal(L, global);
+		}
+		inline size_t size() {
+			return Manager->IdManager->size();
+		}
+		inline void clear() {
+			Manager->IdManager->clear();
+		}
+	};
+}
+
 template<>
-inline CppLogic::EnumIdManager<shok::GUITextureId> CppLogic::GetIdManager<shok::GUITextureId>() {
-	auto mng = EGUIX::TextureManager::GlobalObj()->IdManager;
-	return EnumIdManager<shok::GUITextureId>{mng};
+inline auto CppLogic::GetIdManager<shok::GUITextureId>() {
+	auto mng = EGUIX::TextureManager::GlobalObj();
+	return CppLogic::TextureIdManager{mng};
 }

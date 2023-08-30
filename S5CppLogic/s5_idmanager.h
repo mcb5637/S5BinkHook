@@ -249,7 +249,7 @@ namespace CppLogic {
 
 	template<class En>
 	requires std::is_enum_v<En>
-	EnumIdManager<En> GetIdManager() {
+	auto GetIdManager() {
 		static_assert(std::is_same_v<int, std::underlying_type_t<En>> && requires { IdManagerMapping<En>::Manager; }, "needs explicit specialization");
 		auto mng = *IdManagerMapping<En>::Manager;
 		if (mng == nullptr)

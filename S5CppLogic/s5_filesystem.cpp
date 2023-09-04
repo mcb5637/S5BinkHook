@@ -12,6 +12,25 @@ bool BB::CDirectoryFileSystem::FilterData::IsAllowed(const char* filename)
 	return dirfilesys_filter_allowed(this, filename);
 }
 
+inline BB::CBBArchiveFile::DirectoryEntry* (__thiscall* const archivefile_searchbyhash)(BB::CBBArchiveFile* th, const char* fn) = reinterpret_cast<BB::CBBArchiveFile::DirectoryEntry* (__thiscall*)(BB::CBBArchiveFile*, const char*)>(0x5512E9);
+BB::CBBArchiveFile::DirectoryEntry* BB::CBBArchiveFile::SearchByHash(const char* filename)
+{
+	return archivefile_searchbyhash(this, filename);
+}
+BB::CBBArchiveFile::DirectoryEntry* BB::CBBArchiveFile::GetByOffset(size_t offset)
+{
+	DirectoryEntry* r = nullptr;
+	void* d = DirectoryData;
+	size_t o = offset;
+	__asm {
+		mov eax, d;
+		add eax, o;
+		add eax, 4;
+		mov r, eax;
+	};
+	return r;
+}
+
 static inline void(__cdecl* const filesystem_addfolder)(const char* p, char* d) = reinterpret_cast<void(__cdecl*)(const char*, char*)>(0x546514);
 void BB::CFileSystemMgr::AddFolder(const char* path)
 {

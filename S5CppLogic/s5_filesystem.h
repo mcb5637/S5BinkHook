@@ -144,14 +144,46 @@ namespace BB {
 	};
 	class CBBArchiveFile : public IArchiveFile { // uses CBBArchiveFileStream for compressed files, CMemoryStream for compressed files
 	public:
-		BB::CFileStream ArchiveFile;
+		enum class FileType : int {
+			FileUncompressed = 0,
+			Directory = 1,
+			FileCompressed = 2,
+		};
+		struct DirectoryEntry {
+			FileType FType;
+			size_t OwnOffset;
+			size_t Size;
+			uint16_t FilenameSize;
+			uint16_t DirectoryPartSize;
+			size_t FirstChildOffset;
+			size_t NextSiblingOffset;
+			uint64_t Timestamp;
+			char Name[1];
+		};
+		struct HashTableEntry {
+			uint32_t Hash;
+			size_t DirOffset;
+		};
 
+		BB::CFileStream ArchiveFile;
+		void* DirectoryData; // size, then DirectoryEntrys
+		struct {
+			size_t TableSize;
+			HashTableEntry Entries[1];
+		}* HashTable;
 
 		static inline constexpr int vtp = 0x77FABC;
 
+		DirectoryEntry* SearchByHash(const char* filename);
+		DirectoryEntry* GetByOffset(size_t offset);
+
 		static inline CBBArchiveFile* (__stdcall* const Create)() = reinterpret_cast<CBBArchiveFile * (__stdcall*)()>(0x551701);
 		static std::unique_ptr<CBBArchiveFile, CppLogic::DestroyCaller<CBBArchiveFile>> CreateUnique();
+
+		// len -1 for infinite (stops at \0)
+		static inline uint32_t(__cdecl* const HashString)(const char* data, int len) = reinterpret_cast<uint32_t(__cdecl*)(const char*, int)>(0x547D90);
 	};
+	static_assert(sizeof(CBBArchiveFile) == 6 * 4);
 
 	class IFileSystemMgr : public IFileSystem {
 	protected:

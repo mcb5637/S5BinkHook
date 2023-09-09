@@ -222,7 +222,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Sanit
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Reload() {
-	
+
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::UnLoad(shok::TaskListId id) {
 	if (*EGL::CGLETaskListMgr::GlobalObj)
@@ -233,7 +233,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::UnLoa
 CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj{};
 
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClassId>::Load(shok::ArmorClassId id, luaext::EState L) {
-	
+
 }
 const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClassId>::TableName() {
 	return "ArmorClasses";
@@ -242,7 +242,7 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClas
 	return "ArmorClass";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::SanityCheck() {
-	
+
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Reload() {
 
@@ -342,7 +342,7 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ModelId>:
 	return "Model";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::SanityCheck() {
-	
+
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Reload() {
 	for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
@@ -368,7 +368,7 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::GUITextur
 	return "GUITexture";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::SanityCheck() {
-	
+
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::UnLoad(shok::GUITextureId id) {
 	EGUIX::TextureManager::GlobalObj()->FreeTexture(id);
@@ -376,17 +376,186 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>:
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj{};
 
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimationId>::Load(shok::AnimationId id, luaext::EState L) {
+	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+	if (m->AnimManager.Map.find(static_cast<int>(id)) != m->AnimManager.Map.end())
+		m->FreeAnim(id);
+	shok::String s{ CppLogic::GetIdManager<shok::AnimationId>().GetNameByID(id) };
+	m->AnimManager.Load(static_cast<int>(id), &s);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(static_cast<shok::AnimationId>(id));
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimationId>::TableName() {
+	return "Animations";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimationId>::FuncName() {
+	return "Animation";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::SanityCheck() {
+	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
+	if (m->AnimManager.Map.size != (*BB::CIDManagerEx::AnimManager)->size())
+		throw lua::LuaException{"not all animation loaded"};
+	for (int id = 1; id < static_cast<int>((*BB::CIDManagerEx::AnimManager)->size()); ++id) {
+		auto n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(id);
+		if (n == nullptr || *n == '\0')
+			continue;
+		if (m->AnimManager.Map.find(static_cast<int>(id)) == m->AnimManager.Map.end())
+			throw lua::LuaException{std::format("anim {}={} missing", n, id)};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::UnLoad(shok::AnimationId id) {
+	(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeAnim(id);
+	CppLogic::GetIdManager<shok::AnimationId>().RemoveID(id);
+	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->PopAnimPops(id);
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj{};
+
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::UpgradeCategoryId>::Load(shok::UpgradeCategoryId id, luaext::EState L) {
+	
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::UpgradeCategoryId>::TableName() {
+	return "UpgradeCategories";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::UpgradeCategoryId>::FuncName() {
+	return nullptr;
+}
+void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Reset()
+{
+	{
+		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
+		while (ToRemoveSettler.size() != 0) {
+			auto id = ToRemoveSettler.back();
+			ToRemoveSettler.pop_back();
+			if (v.Vector.back().Category == id) {
+				v.Vector.pop_back();
+			}
+			CppLogic::GetIdManager<shok::UpgradeCategoryId>().RemoveID(id);
+		}
+	}
+	{
+		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
+		while (ToRemoveBuilding.size() != 0) {
+			auto id = ToRemoveBuilding.back();
+			ToRemoveBuilding.pop_back();
+			if (v.Vector.back().Category == id) {
+				v.Vector.pop_back();
+			}
+			CppLogic::GetIdManager<shok::UpgradeCategoryId>().RemoveID(id);
+		}
+	}
+}
+void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::SanityCheck()
+{
+	auto find = [](const auto& v, shok::UpgradeCategoryId id) -> bool {
+		for (const auto& u : v)
+			if (u.Category == id)
+				return true;
+		return false;
+	};
+	auto* m = *GGL::CLogicProperties::GlobalObj;
+	for (int id = 1; id < static_cast<int>((*BB::CIDManagerEx::UpgradeCategoryManager)->size()); ++id) {
+		auto n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(id);
+		if (n == nullptr || *n == '\0')
+			continue;
+		if (!find(m->BuildingUpgrades, static_cast<shok::UpgradeCategoryId>(id)) && !find(m->SettlerUpgrades, static_cast<shok::UpgradeCategoryId>(id)))
+			throw lua::LuaException{std::format("upgrade category {}={} missing", n, id)};
+	}
+}
+void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::RegisterFuncs(luaext::EState L)
+{
+	L.Push("PreLoadUpgradeCategory");
+	L.Push<Prel>();
+	L.SetTableRaw(-3);
+	L.Push("AddSettlerUpgradeCategory");
+	L.Push<AddSettlerUpgradeCategory>();
+	L.SetTableRaw(-3);
+	L.Push("AddBuildingUpgradeCategory");
+	L.Push<AddBuildingUpgradeCategory>();
+	L.SetTableRaw(-3);
+}
+void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::OnIdAllocated(shok::UpgradeCategoryId id)
+{
+}
+void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::OnIdLoaded(shok::UpgradeCategoryId id)
+{
+}
+int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Prel(lua::State L)
+{
+	return Obj.Preload(luaext::EState{L});
+}
+int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCategory(lua::State l)
+{
+	luaext::EState L{ l };
+	shok::UpgradeCategoryId id = Obj.GetId(L, 1);
+	auto* sty = L.CheckEntityType(2);
+	if (!sty->IsSettlerType())
+		throw lua::LuaException{ "not a settler type" };
+	auto first = L.CheckEnum<shok::EntityTypeId>(2);
+	{
+		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
+		for (const auto& u : v.Vector) {
+			if (u.Category == id)
+				throw lua::LuaException{"upgrade category already exists"};
+		}
+		v.Vector.emplace_back(id, first);
+	}
+	auto ctype = first;
+	while (ctype != shok::EntityTypeId::Invalid) {
+		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
+		auto* sty = dynamic_cast<GGL::CGLSettlerProps*>(cty->LogicProps);
+		if (sty == nullptr)
+			throw lua::LuaException{ "non settler type in settler ucat" };
+		sty->Upgrade.Category = id;
+		ctype = sty->Upgrade.Type;
+	}
+	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
+	Obj.ToRemoveSettler.push_back(id);
+	L.Push(id);
+	return 1;
+}
+int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddBuildingUpgradeCategory(lua::State l)
+{
+	luaext::EState L{ l };
+	shok::UpgradeCategoryId id = Obj.GetId(L, 1);
+	auto* sty = L.CheckEntityType(2);
+	if (!sty->IsBuildingType())
+		throw lua::LuaException{ "not a building type" };
+	auto first = L.CheckEnum<shok::EntityTypeId>(2);
+	{
+		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
+		for (const auto& u : v.Vector) {
+			if (u.Category == id)
+				throw lua::LuaException{"upgrade category already exists"};
+		}
+		v.Vector.emplace_back(id, first);
+	}
+	auto ctype = first;
+	while (ctype != shok::EntityTypeId::Invalid) {
+		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
+		auto* bty = dynamic_cast<GGL::CGLBuildingProps*>(cty->LogicProps);
+		if (bty == nullptr)
+			throw lua::LuaException{ "non building type in building ucat" };
+		bty->Upgrade.Category = id;
+		ctype = bty->Upgrade.Type;
+	}
+	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
+	Obj.ToRemoveBuilding.push_back(id);
+	L.Push(id);
+	return 1;
+}
+CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj{};
 
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 8> CppLogic::ModLoader::ModLoader::Loaders{{
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 10> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj,
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj,
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj,
+			& CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj,
 	}};
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
@@ -394,10 +563,6 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoad
 
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<shok::AnimationId> CppLogic::ModLoader::ModLoader::AnimsToRemove{};
-std::vector<shok::AnimationId> CppLogic::ModLoader::ModLoader::AnimsToReload{};
-std::vector<shok::UpgradeCategoryId> CppLogic::ModLoader::ModLoader::SettlerUCatsToRemove{};
-std::vector<shok::UpgradeCategoryId> CppLogic::ModLoader::ModLoader::BuildingUCatsToRemove{};
 bool CppLogic::ModLoader::ModLoader::ReloadWaterTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToReload{};
@@ -416,125 +581,6 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
 	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddAnimation(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
-	if ((*BB::CIDManagerEx::AnimManager)->GetIdByName(t))
-		throw lua::LuaException{ "animation already exists" };
-	int id = (*BB::CIDManagerEx::AnimManager)->GetIDByNameOrCreate(t);
-	shok::String s{ t };
-	m->AnimManager.Load(id, &s);
-	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(static_cast<shok::AnimationId>(id));
-	AnimsToRemove.push_back(static_cast<shok::AnimationId>(id));
-	L.Push("Animations");
-	L.GetGlobal();
-	if (L.IsTable(-1)) {
-		L.PushValue(1);
-		L.Push(id);
-		L.SetTableRaw(-3);
-	}
-	// func exit cleans stack anyway, so no need to pop
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadAnimation(lua::State L)
-{
-	int id = L.CheckInt(1);
-	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
-	const char* n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(id);
-	if (!n)
-		throw lua::LuaException{ "invalid animation" };
-	m->FreeAnim(static_cast<shok::AnimationId>(id));
-	shok::String s{ n };
-	m->AnimManager.Load(id, &s);
-	(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(static_cast<shok::AnimationId>(id));
-	AnimsToReload.push_back(static_cast<shok::AnimationId>(id));
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::PreLoadUpgradeCategory(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	if ((*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t))
-		throw lua::LuaException{ "upgradecategory already exists" };
-	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
-	L.Push(id);
-	return 1;
-}
-int CppLogic::ModLoader::ModLoader::AddSettlerUpgradeCategory(lua::State l)
-{
-	luaext::EState L{ l };
-	const char* t = L.CheckString(1);
-	auto* sty = L.CheckEntityType(2);
-	if (!sty->IsSettlerType())
-		throw lua::LuaException{ "not a settler type" };
-	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t);
-	if (id != 0 && id < static_cast<int>((*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.size()))
-		throw lua::LuaException{ "upgrade categoty already exists" };
-	id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
-	auto first = L.CheckEnum<shok::EntityTypeId>(2);
-	{
-		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
-		v.Vector.emplace_back(static_cast<shok::UpgradeCategoryId>(id), first);
-	}
-	auto ctype = first;
-	while (ctype != shok::EntityTypeId::Invalid) {
-		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
-		auto* sty = dynamic_cast<GGL::CGLSettlerProps*>(cty->LogicProps);
-		if (sty == nullptr)
-			throw lua::LuaException{ "non settler type in settler ucat" };
-		sty->Upgrade.Category = static_cast<shok::UpgradeCategoryId>(id);
-		ctype = sty->Upgrade.Type;
-	}
-	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
-	SettlerUCatsToRemove.push_back(static_cast<shok::UpgradeCategoryId>(id));
-	L.Push("UpgradeCategories");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::AddBuildingUpgradeCategory(lua::State l)
-{
-	luaext::EState L{ l };
-	const char* t = L.CheckString(1);
-	auto* sty = L.CheckEntityType(2);
-	if (!sty->IsBuildingType())
-		throw lua::LuaException{ "not a building type" };
-	int id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIdByName(t);
-	if (id != 0 && id < static_cast<int>((*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.size()))
-		throw lua::LuaException{ "upgrade categoty already exists" };
-	id = (*BB::CIDManagerEx::UpgradeCategoryManager)->GetIDByNameOrCreate(t);
-	auto first = L.CheckEnum<shok::EntityTypeId>(2);
-	{
-		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
-		v.Vector.emplace_back(static_cast<shok::UpgradeCategoryId>(id), first);
-	}
-	auto ctype = first;
-	while (ctype != shok::EntityTypeId::Invalid) {
-		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
-		auto* bty = dynamic_cast<GGL::CGLBuildingProps*>(cty->LogicProps);
-		if (bty == nullptr)
-			throw lua::LuaException{ "non building type in building ucat" };
-		bty->Upgrade.Category = static_cast<shok::UpgradeCategoryId>(id);
-		ctype = bty->Upgrade.Type;
-	}
-	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
-	BuildingUCatsToRemove.push_back(static_cast<shok::UpgradeCategoryId>(id));
-	L.Push("UpgradeCategories");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	L.Push(id);
-	return 1;
 }
 
 int CppLogic::ModLoader::ModLoader::AddWaterType(lua::State L)
@@ -869,48 +915,6 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		for (auto* l : Loaders) {
 			l->Reset();
-		}
-
-		while (AnimsToRemove.size() != 0) {
-			auto id = AnimsToRemove.back();
-			AnimsToRemove.pop_back();
-			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeAnim(id);
-			(*BB::CIDManagerEx::AnimManager)->RemoveID(static_cast<int>(id));
-			(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->PopAnimPops(id);
-		}
-		for (auto id : AnimsToReload) {
-			auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
-			const char* n = (*BB::CIDManagerEx::AnimManager)->GetNameByID(static_cast<int>(id));
-			if (n) {
-				m->FreeAnim(id);
-				shok::String s{ n };
-				m->AnimManager.Load(static_cast<int>(id), &s);
-				(*Framework::CMain::GlobalObj)->GluePropsManager->AnimPropsManager->CreateAnimProps(id);
-			}
-		}
-		AnimsToReload.clear();
-
-		{
-			auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
-			while (SettlerUCatsToRemove.size() != 0) {
-				auto id = SettlerUCatsToRemove.back();
-				SettlerUCatsToRemove.pop_back();
-				if (v.Vector.back().Category == id) {
-					v.Vector.pop_back();
-				}
-				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(static_cast<int>(id));
-			}
-		}
-		{
-			auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
-			while (BuildingUCatsToRemove.size() != 0) {
-				auto id = BuildingUCatsToRemove.back();
-				BuildingUCatsToRemove.pop_back();
-				if (v.Vector.back().Category == id) {
-					v.Vector.pop_back();
-				}
-				(*BB::CIDManagerEx::UpgradeCategoryManager)->RemoveID(static_cast<int>(id));
-			}
 		}
 
 		if (ReloadWaterTypes) {

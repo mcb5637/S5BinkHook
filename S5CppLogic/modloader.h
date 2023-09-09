@@ -253,15 +253,26 @@ namespace CppLogic::ModLoader {
 
 			static DataTypeLoaderReload Obj;
 		};
+		class UpgradeCategoriesLoader : public DataTypeLoaderCommon<shok::UpgradeCategoryId> {
+			std::vector<shok::UpgradeCategoryId> ToRemoveSettler, ToRemoveBuilding;
+		public:
+			virtual void Reset();
+			virtual void SanityCheck();
+			virtual void RegisterFuncs(luaext::EState L);
+			virtual void OnIdAllocated(shok::UpgradeCategoryId id);
+			virtual void OnIdLoaded(shok::UpgradeCategoryId id);
 
-		static std::array<DataTypeLoader*, 8> Loaders;
+			static int Prel(lua::State L);
+			static int AddSettlerUpgradeCategory(lua::State L);
+			static int AddBuildingUpgradeCategory(lua::State L);
+
+			static UpgradeCategoriesLoader Obj;
+		};
+
+		static std::array<DataTypeLoader*, 10> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
-		static std::vector<shok::AnimationId> AnimsToRemove;
-		static std::vector<shok::AnimationId> AnimsToReload;
-		static std::vector<shok::UpgradeCategoryId> SettlerUCatsToRemove;
-		static std::vector<shok::UpgradeCategoryId> BuildingUCatsToRemove;
 		static bool ReloadWaterTypes;
 		static std::vector<int> SelectionTexturesToRemove;
 		static std::vector<int> SelectionTexturesToReload;
@@ -276,11 +287,6 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> DirectXEffectsToFree;
 
 		static int SetEntityTypeToReload(lua::State L);
-		static int AddAnimation(lua::State L);
-		static int ReloadAnimation(lua::State L);
-		static int PreLoadUpgradeCategory(lua::State L);
-		static int AddSettlerUpgradeCategory(lua::State L);
-		static int AddBuildingUpgradeCategory(lua::State L);
 		static int AddWaterType(lua::State L);
 		static int ReloadWaterType(lua::State L);
 		static int AddSelectionTexture(lua::State L);
@@ -298,13 +304,8 @@ namespace CppLogic::ModLoader {
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 22> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 17> LuaFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<AddAnimation>("AddAnimation"),
-				lua::FuncReference::GetRef<ReloadAnimation>("ReloadAnimation"),
-				lua::FuncReference::GetRef<PreLoadUpgradeCategory>("PreLoadUpgradeCategory"),
-				lua::FuncReference::GetRef<AddSettlerUpgradeCategory>("AddSettlerUpgradeCategory"),
-				lua::FuncReference::GetRef<AddBuildingUpgradeCategory>("AddBuildingUpgradeCategory"),
 				lua::FuncReference::GetRef<AddWaterType>("AddWaterType"),
 				lua::FuncReference::GetRef<ReloadWaterType>("ReloadWaterType"),
 				lua::FuncReference::GetRef<AddSelectionTexture>("AddSelectionTexture"),

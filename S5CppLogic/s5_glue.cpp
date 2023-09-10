@@ -98,6 +98,11 @@ void GGlue::CEffectsPropsMgr::ReloadAllEffectTypes()
 	LoadData("Data\\Config\\Effects.xml");
 }
 
+EGL::EffectsProps::EffectData* GGlue::CEffectsPropsMgr::Get(shok::EffectTypeId id)
+{
+	return &EffectsProps.Effects.at(static_cast<int>(id));
+}
+
 static inline void(__thiscall* const epropsmng_loadentitytypebyid)(GGlue::CEntitiesPropsMgr* th, int id) = reinterpret_cast<void(__thiscall*)(GGlue::CEntitiesPropsMgr*, int)>(0x5B931B);
 void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(shok::EntityTypeId i)
 {

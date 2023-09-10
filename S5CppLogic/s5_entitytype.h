@@ -367,7 +367,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x788834;
 
-		GGlue::CGlueEntityProps* GetEntityType(shok::EntityTypeId i);
+		static GGlue::CGlueEntityProps* GetEntityType(shok::EntityTypeId i);
 
 		static inline EGL::CGLEEntitiesProps** const GlobalObj = reinterpret_cast<EGL::CGLEEntitiesProps**>(0x895DB0);
 

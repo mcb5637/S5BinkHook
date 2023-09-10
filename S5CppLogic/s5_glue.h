@@ -48,6 +48,7 @@ namespace GGlue {
 		// remember to also free in idmanager, free last id first
 		void FreeEffectType(shok::EffectTypeId id);
 		void ReloadAllEffectTypes();
+		EGL::EffectsProps::EffectData* Get(shok::EffectTypeId id);
 	};
 	//constexpr int i = offsetof(CEffectsPropsMgr, EffectsDisplayProps) / 4;
 

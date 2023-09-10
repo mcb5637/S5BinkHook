@@ -148,14 +148,13 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>:
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	if (mng->EntityTypes.size() != mng->EntityTypeManager->size())
 		throw lua::LuaException{"not all entitytypes loaded"};
-	for (int id = 1; id < static_cast<int>(mng->EntityTypes.size()); ++id) {
-		auto n = mng->EntityTypeManager->GetNameByID(id);
-		if (n == nullptr || *n == '\0')
-			continue;
-		if (mng->EntityTypes[id].LogicProps == nullptr)
-			throw lua::LuaException{std::format("entitytype {}={} missing LogicProps", n, id)};
-		if (mng->EntityTypes[id].DisplayProps == nullptr)
-			throw lua::LuaException{std::format("entitytype {}={} missing DisplayProps", n, id)};
+	auto idm = CppLogic::GetIdManager<shok::EntityTypeId>();
+	for (auto id : idm) {
+		auto n = idm.GetNameByID(id);
+		if (EGL::CGLEEntitiesProps::GetEntityType(id)->LogicProps == nullptr)
+			throw lua::LuaException{std::format("entitytype {}={} missing LogicProps", n, static_cast<int>(id))};
+		if (EGL::CGLEEntitiesProps::GetEntityType(id)->DisplayProps == nullptr)
+			throw lua::LuaException{std::format("entitytype {}={} missing DisplayProps", n, static_cast<int>(id))};
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::UnLoad(shok::EntityTypeId id) {
@@ -180,14 +179,13 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::S
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
 	if (mng->EffectsProps.Effects.size() != mng->EffectTypeManager->size())
 		throw lua::LuaException{"not all effect types loaded"};
-	for (int id = 1; id < static_cast<int>(mng->EffectsProps.Effects.size()); ++id) {
-		auto n = mng->EffectTypeManager->GetNameByID(id);
-		if (n == nullptr || *n == '\0')
-			continue;
-		if (mng->EffectsProps.Effects[id].Logic == nullptr)
-			throw lua::LuaException{std::format("effecttype {}={} missing Logic", n, id)};
-		if (mng->EffectsProps.Effects[id].Display == nullptr)
-			throw lua::LuaException{std::format("effecttype {}={} missing Display", n, id)};
+	auto idm = CppLogic::GetIdManager<shok::EffectTypeId>();
+	for (auto id : idm) {
+		auto n = idm.GetNameByID(id);
+		if (mng->Get(id)->Logic == nullptr)
+			throw lua::LuaException{std::format("effecttype {}={} missing Logic", n, static_cast<int>(id))};
+		if (mng->Get(id)->Display == nullptr)
+			throw lua::LuaException{std::format("effecttype {}={} missing Display", n, static_cast<int>(id))};
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Reset() {
@@ -213,12 +211,11 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Sanit
 	auto* mng = *EGL::CGLETaskListMgr::GlobalObj;
 	if (mng->TaskLists.size() != mng->TaskListManager->size())
 		throw lua::LuaException{"not all task lists loaded"};
-	for (int id = 1; id < static_cast<int>(mng->TaskLists.size()); ++id) {
-		auto n = mng->TaskListManager->GetNameByID(id);
-		if (n == nullptr || *n == '\0')
-			continue;
-		if (mng->TaskLists[id] == nullptr)
-			throw lua::LuaException{std::format("tasklist {}={} missing", n, id)};
+	auto idm = CppLogic::GetIdManager<shok::TaskListId>();
+	for (auto id : idm) {
+		auto n = idm.GetNameByID(id);
+		if (mng->TaskLists.at(static_cast<int>(id)) == nullptr)
+			throw lua::LuaException{std::format("tasklist {}={} missing", n, static_cast<int>(id))};
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Reload() {
@@ -272,17 +269,16 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager;
 	if (mng->Logic.DamageClassList.size() != mng->DamageClassManager->size())
 		throw lua::LuaException{"not all damage classes loaded"};
-	auto* acmng = *BB::CIDManagerEx::ArmorClassManager;
-	for (int id = 1; id < static_cast<int>(mng->Logic.DamageClassList.size()); ++id) {
-		auto n = mng->DamageClassManager->GetNameByID(id);
-		if (n == nullptr || *n == '\0')
-			continue;
-		auto* dc = mng->Logic.DamageClassList[id];
+	auto idm = CppLogic::GetIdManager<shok::DamageClassId>();
+	auto acmng = CppLogic::GetIdManager<shok::ArmorClassId>();
+	for (auto id : idm) {
+		auto n = idm.GetNameByID(id);
+		auto* dc = mng->Logic.TryGet(id);
 		if (dc == nullptr)
-			throw lua::LuaException{std::format("damageclass {}={} is missing", n, id)};
-		for (int ac = 1; ac < static_cast<int>(acmng->size()); ++ac) {
-			if (dc->GetBonusVsArmorClass(static_cast<shok::ArmorClassId>(ac)) <= 0)
-				throw lua::LuaException{std::format("damageclass {}={} has invalid factor {}", n, id, ac)};
+			throw lua::LuaException{std::format("damageclass {}={} is missing", n, static_cast<int>(id))};
+		for (auto ac : acmng) {
+			if (dc->GetBonusVsArmorClass(ac) <= 0)
+				throw lua::LuaException{std::format("damageclass {}={} has invalid factor {}", n, static_cast<int>(id), static_cast<int>(ac))};
 		}
 	}
 }

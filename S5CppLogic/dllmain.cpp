@@ -294,8 +294,14 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto& h = (*Framework::CMain::GlobalObj)->CampagnInfoHandler;
-	return 0;
+	L.NewTable();
+	auto mng = CppLogic::GetIdManager<shok::WidgetId>();
+	for (shok::WidgetId id : mng) {
+		L.Push(id);
+		L.Push(mng.GetNameByID(id));
+		L.SetTableRaw(-3);
+	}
+	return 1;
 }
 
 int GetOptions(lua::State L) {

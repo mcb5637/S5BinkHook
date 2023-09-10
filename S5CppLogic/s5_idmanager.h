@@ -20,14 +20,31 @@ namespace BB {
 		shok::Vector<IDData> TypeNames;
 
 		// does not add
-		int GetIdByName(const char* name);
-		const char* GetNameByID(int id);
+		int GetIdByName(const char* name) const;
+		const char* GetNameByID(int id) const;
 		int GetIDByNameOrCreate(const char* name); // throws if id invalid
 		int GetIDByNameOrCreate(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
 		void RemoveID(int id); // remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
 		void DumpManagerToLuaGlobal(lua_State* L, const char* global);
 		size_t size();
 		void clear();
+
+		struct Iter {
+		protected:
+			friend class IIDManager;
+			const IIDManager* Mng;
+			int Id;
+
+			Iter(const IIDManager* mng, int id);
+
+		public:
+			auto operator<=>(const Iter&) const noexcept = default;
+			int operator*() const noexcept;
+			Iter& operator++();
+			Iter operator++(int);
+		};
+		Iter begin() const;
+		Iter end() const;
 	};
 
 	class IIDManagerEx : public IIDManager {
@@ -90,7 +107,6 @@ namespace CppLogic {
 
 	public:
 		EnumIdManager(BB::IIDManager* mng) : Manager(mng) {
-
 		}
 
 		// does not add
@@ -120,6 +136,35 @@ namespace CppLogic {
 		}
 		void clear() {
 			Manager->clear();
+		}
+
+		struct Iter {
+		protected:
+			friend class EnumIdManager;
+			BB::IIDManager::Iter I;
+
+			Iter(BB::IIDManager::Iter i) : I(i) {}
+
+		public:
+			auto operator<=>(const Iter&) const noexcept = default;
+			En operator*() const noexcept {
+				return static_cast<En>(*I);
+			}
+			Iter& operator++() {
+				++I;
+				return *this;
+			}
+			Iter operator++(int) {
+				Iter r = *this;
+				++(*this);
+				return r;
+			}
+		};
+		Iter begin() const {
+			return Iter{ Manager->begin() };
+		}
+		Iter end() const {
+			return Iter{ Manager->end() };
 		}
 	};
 

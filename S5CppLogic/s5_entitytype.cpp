@@ -63,7 +63,7 @@ GGlue::CGlueEntityProps* EGL::CGLEEntitiesProps::GetEntityType(shok::EntityTypeI
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	if (i <= 0 || i >= static_cast<int>(m->EntityTypes.size()))
 		return nullptr;
-	return m->EntityTypes.data() + i;
+	return &m->EntityTypes[i];
 }
 
 const char* (__stdcall* const getentitydisplayname)(shok::EntityTypeId i) = reinterpret_cast<const char* (__stdcall* const)(shok::EntityTypeId i)>(0x52EFCF);

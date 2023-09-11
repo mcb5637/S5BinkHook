@@ -78,6 +78,11 @@ void shok::TechManager::PopTech(shok::TechnologyId i)
 	v.Vector.pop_back();
 }
 
+shok::Technology* shok::TechManager::Get(shok::TechnologyId id)
+{
+	return Techs.at(static_cast<int>(id) - 1);
+}
+
 float shok::AdditionalTechModifier::ModifyValue(float i) const
 {
 	switch (Operator) {

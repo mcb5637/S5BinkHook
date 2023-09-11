@@ -86,6 +86,7 @@ namespace shok {
 		void FreeTech(shok::TechnologyId id);
 		void LoadTech(shok::TechnologyId id);
 		void PopTech(shok::TechnologyId id);
+		shok::Technology* Get(shok::TechnologyId id);
 	};
 
 	class TechCategoryManager {

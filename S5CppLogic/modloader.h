@@ -269,11 +269,10 @@ namespace CppLogic::ModLoader {
 			static UpgradeCategoriesLoader Obj;
 		};
 
-		static std::array<DataTypeLoader*, 10> Loaders;
+		static std::array<DataTypeLoader*, 11> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
-		static bool ReloadWaterTypes;
 		static std::vector<int> SelectionTexturesToRemove;
 		static std::vector<int> SelectionTexturesToReload;
 		static std::vector<shok::TerrainTextureId> TerrainTexturesToRemove;
@@ -287,8 +286,6 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> DirectXEffectsToFree;
 
 		static int SetEntityTypeToReload(lua::State L);
-		static int AddWaterType(lua::State L);
-		static int ReloadWaterType(lua::State L);
 		static int AddSelectionTexture(lua::State L);
 		static int ReloadSelectionTexture(lua::State L);
 		static int AddTerrainTexture(lua::State L);
@@ -304,10 +301,8 @@ namespace CppLogic::ModLoader {
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 17> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 15> LuaFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<AddWaterType>("AddWaterType"),
-				lua::FuncReference::GetRef<ReloadWaterType>("ReloadWaterType"),
 				lua::FuncReference::GetRef<AddSelectionTexture>("AddSelectionTexture"),
 				lua::FuncReference::GetRef<ReloadSelectionTexture>("ReloadSelectionTexture"),
 				lua::FuncReference::GetRef<AddTerrainTexture>("AddTerrainTexture"),

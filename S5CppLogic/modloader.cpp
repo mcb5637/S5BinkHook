@@ -534,8 +534,33 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddBuildingUpgradeC
 }
 CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj{};
 
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::WaterTypeId>::Load(shok::WaterTypeId id, luaext::EState L) {
+	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::WaterTypeId>::TableName() {
+	return "WaterTypes";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::WaterTypeId>::FuncName() {
+	return "WaterType";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::SanityCheck() {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager;
+	auto idm = CppLogic::GetIdManager<shok::WaterTypeId>();
+	for (auto id : idm) {
+		auto n = idm.GetNameByID(id);
+		if (static_cast<int>(mng->WaterType.size()) >= static_cast<int>(id))
+			throw lua::LuaException{std::format("watertype {}={} missing", n, static_cast<int>(id))};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Reset() {
+	if (NeedsReload)
+		(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->ReloadWaterTypes();
+	NeedsReload = false;
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj{};
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 10> CppLogic::ModLoader::ModLoader::Loaders{{
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 11> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
@@ -546,6 +571,7 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 10> CppLogic::ModLoa
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj,
 			& CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj,
 	}};
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
@@ -553,7 +579,6 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoad
 
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-bool CppLogic::ModLoader::ModLoader::ReloadWaterTypes = false;
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToRemove{};
 std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToReload{};
 std::vector<shok::TerrainTextureId> CppLogic::ModLoader::ModLoader::TerrainTexturesToRemove{};
@@ -570,44 +595,6 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 {
 	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddWaterType(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	int id = L.OptInteger(2, 0);
-	if ((*BB::CIDManagerEx::WaterTypeManager)->GetIdByName(t) != 0)
-		throw lua::LuaException{ "water type already exists" };
-	try {
-		id = (*BB::CIDManagerEx::WaterTypeManager)->GetIDByNameOrCreate(t, id);
-	}
-	catch (const BB::CInvalidIDException& e) {
-		char buff[201]{};
-		e.CopyMessage(buff, 200);
-		throw lua::LuaException{ buff };
-	}
-	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(static_cast<shok::WaterTypeId>(id));
-	ReloadWaterTypes = true;
-	L.Push("WaterTypes");
-	L.GetGlobal();
-	if (L.IsTable(-1)) {
-		L.PushValue(1);
-		L.Push(id);
-		L.SetTableRaw(-3);
-	}
-	// func exit cleans stack anyway, so no need to pop
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadWaterType(lua::State L)
-{
-	int id = L.CheckInt(1);
-	if ((*BB::CIDManagerEx::WaterTypeManager)->GetNameByID(id) == nullptr)
-		throw lua::LuaException{ "water type does not exists" };
-	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(static_cast<shok::WaterTypeId>(id));
-	ReloadWaterTypes = true;
 	return 0;
 }
 
@@ -905,11 +892,6 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		for (auto* l : Loaders) {
 			l->Reset();
-		}
-
-		if (ReloadWaterTypes) {
-			(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->ReloadWaterTypes();
-			ReloadWaterTypes = false;
 		}
 
 		while (SelectionTexturesToRemove.size() != 0) {

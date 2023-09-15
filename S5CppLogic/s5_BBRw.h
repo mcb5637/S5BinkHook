@@ -4,6 +4,7 @@
 #include "s5_baseDefs.h"
 #include "s5_RWEngine.h"
 #include "directx.h"
+#include "s5_idmanager.h"
 
 namespace BBRw {
 	class CEffect {
@@ -136,4 +137,10 @@ namespace BBRw {
 
 		static inline CEngine** const GlobalObj = reinterpret_cast<CEngine**>(0x8595E8); // technically IEngine, but CEngine is the only thing that ever ends up here
 	};
+}
+
+template<>
+inline auto CppLogic::GetIdManager<shok::SelectionTextureId>() {
+	auto mng = (*BBRw::CEngine::GlobalObj)->SelectionTextures->IdManager;
+	return CppLogic::EnumIdManager<shok::SelectionTextureId>{mng};
 }

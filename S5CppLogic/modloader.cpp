@@ -548,7 +548,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Sa
 	auto idm = CppLogic::GetIdManager<shok::WaterTypeId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		if (static_cast<int>(mng->WaterType.size()) >= static_cast<int>(id))
+		if (static_cast<int>(mng->Logic.WaterLogic.size()) <= static_cast<int>(id))
 			throw lua::LuaException{std::format("watertype {}={} missing", n, static_cast<int>(id))};
 	}
 }
@@ -559,8 +559,76 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Re
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj{};
 
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::SelectionTextureId>::Load(shok::SelectionTextureId id, luaext::EState L) {
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
+	const char* n = CppLogic::GetIdManager<shok::SelectionTextureId>().GetNameByID(id);
+	auto d = mng->Get(n);
+	d->FreeCache(); // nop if empty
+	d->Get();
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::SelectionTextureId>::TableName() {
+	return nullptr;
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::SelectionTextureId>::FuncName() {
+	return "SelectionTexture";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::SanityCheck() {
+	
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::UnLoad(shok::SelectionTextureId id) {
+	(*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures->PopId(static_cast<int>(id));
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj{};
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 11> CppLogic::ModLoader::ModLoader::Loaders{{
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTextureId>::Load(shok::TerrainTextureId id, luaext::EState L) {
+	auto idm = CppLogic::GetIdManager<shok::TerrainTextureId>();
+	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->LoadTexture(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTextureId>::TableName() {
+	return nullptr;
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTextureId>::FuncName() {
+	return "TerrainTexture";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::SanityCheck() {
+
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::UnLoad(shok::TerrainTextureId id) {
+	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->PopTexture(id);
+	CppLogic::GetIdManager<shok::TerrainTextureId>().RemoveID(id);
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj{};
+
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTypeId>::Load(shok::TerrainTypeId id, luaext::EState L) {
+	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(id);
+	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTypeId>::TableName() {
+	return "TerrainTypes";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTypeId>::FuncName() {
+	return "TerrainType";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::SanityCheck() {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager;
+	auto idm = CppLogic::GetIdManager<shok::TerrainTypeId>();
+	for (auto id : idm) {
+		auto n = idm.GetNameByID(id);
+		if (static_cast<int>(mng->Logic.LogicProps.size()) <= static_cast<int>(id))
+			throw lua::LuaException{std::format("terraintype {}={} missing", n, static_cast<int>(id))};
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Reset() {
+	if (NeedsReload) {
+		(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->ReloadTerrainTypes();
+		(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyAllTerrainTypes();
+	}
+	NeedsReload = false;
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj{};
+
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 14> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
@@ -572,6 +640,9 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 11> CppLogic::ModLoa
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj,
 			& CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj,
 	}};
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
@@ -579,11 +650,6 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoad
 
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToRemove{};
-std::vector<int> CppLogic::ModLoader::ModLoader::SelectionTexturesToReload{};
-std::vector<shok::TerrainTextureId> CppLogic::ModLoader::ModLoader::TerrainTexturesToRemove{};
-std::vector<shok::TerrainTextureId> CppLogic::ModLoader::ModLoader::TerrainTexturesToReload{};
-bool CppLogic::ModLoader::ModLoader::ReloadTerrainTypes = false;
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToRemove{};
 std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToReload{};
 std::vector<shok::SoundId> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
@@ -595,95 +661,6 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 {
 	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddSelectionTexture(lua::State L)
-{
-	const char* n = L.CheckString(1);
-	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
-	if (mng->IdManager->GetIdByName(n) != 0)
-		throw lua::LuaException{ "selection texture already exists" };
-	auto d = mng->Get(n);
-	SelectionTexturesToRemove.push_back(d->Id);
-	d->Get();
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadSelectionTexture(lua::State L)
-{
-	const char* n = L.CheckString(1);
-	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
-	if (mng->IdManager->GetIdByName(n) == 0)
-		throw lua::LuaException{ "selection texture does not exist" };
-	auto d = mng->Get(n);
-	SelectionTexturesToReload.push_back(d->Id);
-	d->FreeCache();
-	d->Get();
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddTerrainTexture(lua::State L)
-{
-	const char* n = L.CheckString(1);
-	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager;
-	if (mng->DisplayProps->TerrainTextureManager->GetIdByName(n) != 0)
-		throw lua::LuaException{ "terrain texture already exists" };
-	int id = mng->DisplayProps->TerrainTextureManager->GetIDByNameOrCreate(n);
-	mng->LoadTexture(static_cast<shok::TerrainTextureId>(id));
-	TerrainTexturesToRemove.push_back(static_cast<shok::TerrainTextureId>(id));
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadTerrainTexture(lua::State L)
-{
-	const char* n = L.CheckString(1);
-	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager;
-	int id = mng->DisplayProps->TerrainTextureManager->GetIdByName(n);
-	if (id == 0)
-		throw lua::LuaException{ "terrain texture does not exists" };
-	mng->LoadTexture(static_cast<shok::TerrainTextureId>(id));
-	TerrainTexturesToReload.push_back(static_cast<shok::TerrainTextureId>(id));
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddTerrainType(lua::State L)
-{
-	const char* t = L.CheckString(1);
-	int id = L.OptInteger(2, 0);
-	if ((*BB::CIDManagerEx::TerrainTypeManager)->GetIdByName(t) != 0)
-		throw lua::LuaException{ "terrain type already exists" };
-	try {
-		id = (*BB::CIDManagerEx::TerrainTypeManager)->GetIDByNameOrCreate(t, id);
-	}
-	catch (const BB::CInvalidIDException& e) {
-		char buff[201]{};
-		e.CopyMessage(buff, 200);
-		throw lua::LuaException{ buff };
-	}
-	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(static_cast<shok::TerrainTypeId>(id));
-	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(static_cast<shok::TerrainTypeId>(id));
-	ReloadTerrainTypes = true;
-	L.Push("TerrainTypes");
-	L.GetGlobal();
-	if (L.IsTable(-1)) {
-		L.PushValue(1);
-		L.Push(id);
-		L.SetTableRaw(-3);
-	}
-	// func exit cleans stack anyway, so no need to pop
-	L.Push(id);
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadTerrainType(lua::State L)
-{
-	int id = L.CheckInt(1);
-	if ((*BB::CIDManagerEx::TerrainTypeManager)->GetNameByID(id) == nullptr)
-		throw lua::LuaException{ "terrain type does not exists" };
-	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(static_cast<shok::TerrainTypeId>(id));
-	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(static_cast<shok::TerrainTypeId>(id));
-	ReloadTerrainTypes = true;
 	return 0;
 }
 
@@ -892,37 +869,6 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		for (auto* l : Loaders) {
 			l->Reset();
-		}
-
-		while (SelectionTexturesToRemove.size() != 0) {
-			int id = SelectionTexturesToRemove.back();
-			SelectionTexturesToRemove.pop_back();
-			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
-			mng->PopId(id);
-		}
-		for (int id : SelectionTexturesToReload) {
-			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
-			auto* d = mng->Get(id);
-			d->FreeCache();
-			d->Get();
-		}
-		SelectionTexturesToReload.clear();
-
-		while (TerrainTexturesToRemove.size() != 0) {
-			auto id = TerrainTexturesToRemove.back();
-			TerrainTexturesToRemove.pop_back();
-			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->PopTexture(id);
-			(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->TerrainTextureManager->RemoveID(static_cast<int>(id));
-		}
-		for (auto id : TerrainTexturesToReload) {
-			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->LoadTexture(id);
-		}
-		TerrainTexturesToReload.clear();
-
-		if (ReloadTerrainTypes) {
-			(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->ReloadTerrainTypes();
-			(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyAllTerrainTypes();
-			ReloadTerrainTypes = false;
 		}
 
 		while (ExperienceClassesToRemove.size() != 0) {

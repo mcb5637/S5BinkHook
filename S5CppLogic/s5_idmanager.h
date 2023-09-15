@@ -272,10 +272,6 @@ namespace CppLogic {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TerrainTypeManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::TerrainTextureId> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::TerrainTextureManager;
-	};
-	template<>
 	struct IdManagerMapping<shok::WaterTypeId> {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::WaterTypeManager;
 	};

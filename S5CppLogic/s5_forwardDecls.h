@@ -75,6 +75,7 @@ namespace shok {
 	enum class GUITextureId : int;
 	enum class WidgetGroupId : int;
 	enum class TriggerId : unsigned int;
+	enum class SelectionTextureId : int;
 	// these definitely change at runtime
 	enum class EffectId : int;
 	enum class EntityId : int;

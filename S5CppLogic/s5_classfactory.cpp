@@ -4,6 +4,7 @@
 #include "s5_filesystem.h"
 #include "s5_entity.h"
 #include "s5_idmanager.h"
+#include "s5_mapdisplay.h"
 
 static inline BB::CXmlSerializer*(__stdcall* const xmlserializer_new)(int d) = reinterpret_cast<BB::CXmlSerializer*(__stdcall* const)(int)>(0x550731);
 BB::CXmlSerializer* BB::CXmlSerializer::Create()

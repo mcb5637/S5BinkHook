@@ -4,6 +4,8 @@
 #include "s5_baseDefs.h"
 #include "s5_maplogic.h"
 #include "s5_BBRw.h"
+#include "s5_idmanager.h"
+#include "s5_glue.h"
 
 namespace ED {
 	class ILandscape {
@@ -557,4 +559,10 @@ namespace GD {
 	static_assert(offsetof(CDDisplay, GlobalEfects) == 22 * 4);
 	static_assert(sizeof(CDDisplay) == 23 * 4);
 	//constexpr int i = offsetof(CDDisplay, GlobalEfects) / 4;
+}
+
+template<>
+inline auto CppLogic::GetIdManager<shok::TerrainTextureId>() {
+	auto mng = (*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->DisplayProps->TerrainTextureManager;
+	return CppLogic::EnumIdManager<shok::TerrainTextureId>{mng};
 }

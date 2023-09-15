@@ -3,6 +3,7 @@
 #include "s5_baseDefs.h"
 #include "s5_defines.h"
 #include "s5_framework.h"
+#include "s5_mapdisplay.h"
 #include "luaext.h"
 
 
@@ -56,15 +57,17 @@ namespace CppLogic::ModLoader {
 				else if (t == lua::LType::String) {
 					const char* s = L.ToString(idx);
 					En id = mng.GetIdByName(s);
-					if (id == static_cast<En>(0) && TableName()) {
+					if (id == static_cast<En>(0)) {
 						id = mng.GetIDByNameOrCreate(s);
 						OnIdAllocated(id);
-						L.Push(TableName());
-						L.GetGlobal();
-						L.PushValue(1);
-						L.Push(id);
-						L.SetTableRaw(-3);
-						L.Pop(1);
+						if (TableName()) {
+							L.Push(TableName());
+							L.GetGlobal();
+							L.PushValue(1);
+							L.Push(id);
+							L.SetTableRaw(-3);
+							L.Pop(1);
+						}
 					}
 					return id;
 				}
@@ -269,15 +272,10 @@ namespace CppLogic::ModLoader {
 			static UpgradeCategoriesLoader Obj;
 		};
 
-		static std::array<DataTypeLoader*, 11> Loaders;
+		static std::array<DataTypeLoader*, 14> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
-		static std::vector<int> SelectionTexturesToRemove;
-		static std::vector<int> SelectionTexturesToReload;
-		static std::vector<shok::TerrainTextureId> TerrainTexturesToRemove;
-		static std::vector<shok::TerrainTextureId> TerrainTexturesToReload;
-		static bool ReloadTerrainTypes;
 		static std::vector<shok::ExperienceClass> ExperienceClassesToRemove;
 		static std::vector<shok::ExperienceClass> ExperienceClassesToReload;
 		static std::vector<shok::SoundId> SoundGroupsToRemove;
@@ -286,12 +284,6 @@ namespace CppLogic::ModLoader {
 		static std::vector<int> DirectXEffectsToFree;
 
 		static int SetEntityTypeToReload(lua::State L);
-		static int AddSelectionTexture(lua::State L);
-		static int ReloadSelectionTexture(lua::State L);
-		static int AddTerrainTexture(lua::State L);
-		static int ReloadTerrainTexture(lua::State L);
-		static int AddTerrainType(lua::State L);
-		static int ReloadTerrainType(lua::State L);
 		static int AddExperienceClass(lua::State L);
 		static int ReloadExperienceClass(lua::State L);
 		static int AddSounds(lua::State L);
@@ -301,14 +293,8 @@ namespace CppLogic::ModLoader {
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 15> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 9> LuaFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<AddSelectionTexture>("AddSelectionTexture"),
-				lua::FuncReference::GetRef<ReloadSelectionTexture>("ReloadSelectionTexture"),
-				lua::FuncReference::GetRef<AddTerrainTexture>("AddTerrainTexture"),
-				lua::FuncReference::GetRef<ReloadTerrainTexture>("ReloadTerrainTexture"),
-				lua::FuncReference::GetRef<AddTerrainType>("AddTerrainType"),
-				lua::FuncReference::GetRef<ReloadTerrainType>("ReloadTerrainType"),
 				lua::FuncReference::GetRef<AddExperienceClass>("AddExperienceClass"),
 				lua::FuncReference::GetRef<ReloadExperienceClass>("ReloadExperienceClass"),
 				lua::FuncReference::GetRef<AddSounds>("AddSounds"),

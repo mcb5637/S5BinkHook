@@ -2,6 +2,7 @@
 #include <memory>
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_idmanager.h"
 #include "Luapp/constexprTypename.h"
 #include "luaext.h"
 
@@ -185,26 +186,51 @@ namespace BB {
 #define MemberSerializationFieldData(T,M) MemberSerializationSizeAndOffset(T, M), BB::FieldSerilaizer::GetSerilalizer<decltype(T::M)>()
 #define MemberSerializationEmbeddedData(T,M) MemberSerializationSizeAndOffset(T, M), BB::SerializationData::GetSerializationData<decltype(T::M)>()
 
+	class CDefaultRuntimeClass : public BB::IObjectCreator, public BB::IObject {
+	public:
+		shok::ClassId Id; // 2
+		shok::String Name;
+		BB::IObject* (__stdcall* NewObj)(); // 10
+
+		static constexpr int vtp = 0x77F738;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x74FECF20);
+
+		// ctor 0x54CFA8
+	};
+	static_assert(offsetof(CDefaultRuntimeClass, Id) == 2 * 4);
+	static_assert(offsetof(CDefaultRuntimeClass, NewObj) == 10 * 4);
+
+	class CRuntimeClassEnumerator;
+
 	class IClassFactory {
 	public:
 		virtual ~IClassFactory() = default;
 	private:
 		virtual void unknown0() = 0;
-		virtual void unknown1() = 0;
-		virtual void unknown2() = 0;
+		virtual BB::IObject* __stdcall GetInfoObj(shok::ClassId id) = 0;
 	public:
+		virtual CRuntimeClassEnumerator* __stdcall GetEnumerator() = 0;
 		virtual BB::IObject* __stdcall CreateObject(shok::ClassId id) = 0;
 		virtual shok::ClassId __stdcall GetIdentifierByName(const char* name) = 0; // 5
 		virtual const char* __stdcall GetClassDemangledName(shok::ClassId id) = 0;
 		virtual const BB::SerializationData* __stdcall GetSerializationDataForClass(shok::ClassId id) = 0; // returns a 0-terminated array
-	private:
-		virtual void unknown3() = 0;
-	public:
+		virtual void __stdcall AddClassManuallIObjectCreator(shok::ClassId id, BB::IObject* creator, const BB::SerializationData* data) = 0; // creator bust be CastToIdentifier able to BB::IObjectCreator, id may be 0 gets queried from BB::IObjectCreator
 		virtual void __stdcall AddClassToFactory(shok::ClassId id, const char* name, BB::IObject* (__stdcall* NewObj)(), const BB::SerializationData* data) = 0;
 	};
 
 	class CClassFactory : public IClassFactory {
 	public:
+		struct ClassInfo {
+			BB::IObject* InfoObj;
+			PADDINGI(1); //bool true?
+			BB::IObjectCreator* Creator;
+			const BB::SerializationData* SData;
+		};
+
+		shok::Map<shok::ClassId, ClassInfo> Info;
+		shok::Map<shok::String, shok::ClassId> NameToId;
+		PADDINGI(1); //0
+
 		static inline constexpr int vtp = 0x77F74C;
 		static inline constexpr int TypeDesc = 0x830C80;
 
@@ -256,6 +282,7 @@ namespace BB {
 
 		static inline BB::CClassFactory** const GlobalObj = reinterpret_cast<BB::CClassFactory**>(0x88F044);
 	};
+	static_assert(sizeof(CClassFactory) == 8 * 4);
 }
 
 namespace CppLogic {
@@ -415,4 +442,60 @@ namespace CppLogic {
 		StringSerializer();
 		static StringSerializer GlobalObj;
 	};
+
+	class ClassIdManager {
+		BB::CClassFactory* Manager;
+
+	public:
+		inline ClassIdManager(BB::CClassFactory* mng) : Manager(mng) {
+		}
+
+		// does not add
+		inline shok::ClassId GetIdByName(const char* name) const {
+			return Manager->GetIdentifierByName(name);
+		}
+		inline const char* GetNameByID(shok::ClassId id) const {
+			return Manager->GetClassDemangledName(id);
+		}
+		inline size_t size() const {
+			return Manager->Info.size;
+		}
+
+		struct Iter {
+		protected:
+			friend class ClassIdManager;
+			shok::Map<shok::ClassId, BB::CClassFactory::ClassInfo>::Iter I;
+
+			inline Iter(shok::Map<shok::ClassId, BB::CClassFactory::ClassInfo>::Iter i) : I(i) {}
+
+		public:
+			auto operator<=>(const Iter&) const noexcept = default;
+			inline shok::ClassId operator*() const noexcept {
+				return I->first;
+			}
+			inline Iter& operator++() {
+				++I;
+				return *this;
+			}
+			inline Iter operator++(int) {
+				Iter r = *this;
+				++(*this);
+				return r;
+			}
+		};
+		inline Iter begin() const {
+			return Iter{ Manager->Info.begin() };
+		}
+		inline Iter end() const {
+			return Iter{ Manager->Info.end() };
+		}
+	};
+	// iterates only over ids registered in BB::CClassFactory::GlobalObj
+	template<>
+	inline auto GetIdManager<shok::ClassId>() {
+		auto mng = *BB::CClassFactory::GlobalObj;
+		if (mng == nullptr)
+			throw std::runtime_error{"shok::ClassId manager not yet initialized"};
+		return ClassIdManager{mng};
+	}
 }

@@ -26,7 +26,7 @@ namespace BB {
 		int GetIDByNameOrCreate(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
 		void RemoveID(int id); // remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
 		void DumpManagerToLuaGlobal(lua_State* L, const char* global);
-		size_t size();
+		size_t size() const;
 		void clear();
 
 		struct Iter {
@@ -110,10 +110,10 @@ namespace CppLogic {
 		}
 
 		// does not add
-		En GetIdByName(const char* name) {
+		En GetIdByName(const char* name) const {
 			return static_cast<En>(Manager->GetIdByName(name));
 		}
-		const char* GetNameByID(En id) {
+		const char* GetNameByID(En id) const {
 			return Manager->GetNameByID(static_cast<int>(id));
 		}
 		// throws if id invalid
@@ -131,7 +131,7 @@ namespace CppLogic {
 		void DumpManagerToLuaGlobal(lua_State* L, const char* global) {
 			Manager->DumpManagerToLuaGlobal(L, global);
 		}
-		size_t size() {
+		size_t size() const {
 			return Manager->size();
 		}
 		void clear() {

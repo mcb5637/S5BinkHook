@@ -159,6 +159,16 @@ namespace BB {
 		return static_cast<CastTo*>(f->CastToIdentifier(CastTo::Identifier));
 	}
 
+	class IObjectCreator {
+	public:
+		virtual ~IObjectCreator() = default;
+		virtual shok::ClassId __stdcall GetIdOfCreated() = 0;
+		virtual const char* __stdcall GetNameOfCreated() = 0;
+		virtual BB::IObject* __stdcall Create() = 0;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x456C66DD);
+	};
+
 	class IPostEvent {
 	public:
 		virtual void __stdcall PostEvent(BB::CEvent* ev) = 0;

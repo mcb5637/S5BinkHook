@@ -244,6 +244,8 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Rel
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::UnLoad(shok::ArmorClassId id) {
 	CppLogic::GetIdManager<shok::ArmorClassId>().RemoveID(id);
 }
+template<>
+constexpr bool CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::RegisterFuncLoad = false;
 CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj{};
 
 
@@ -627,8 +629,30 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj{};
 
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityCategory>::Load(shok::EntityCategory id, luaext::EState L) {
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 14> CppLogic::ModLoader::ModLoader::Loaders{{
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityCategory>::TableName() {
+	return "EntityCategories";
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityCategory>::FuncName() {
+	return "EntityCategory";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::SanityCheck() {
+
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Reload() {
+
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::UnLoad(shok::EntityCategory id) {
+	CppLogic::GetIdManager<shok::EntityCategory>().RemoveID(id);
+}
+template<>
+constexpr bool CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::RegisterFuncLoad = false;
+CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj{};
+
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 15> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
@@ -643,6 +667,7 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 14> CppLogic::ModLoa
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj,
+			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj,
 	}};
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,

@@ -129,22 +129,28 @@ namespace CppLogic::ModLoader {
 				return Obj.Load(luaext::EState{L});
 			}
 
+			static constexpr bool RegisterFuncPreLoad = true;
+			static constexpr bool RegisterFuncLoad = true;
 			virtual void RegisterFuncs(luaext::EState L) override {
-				L.Push("PreLoad");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Prel>();
-				L.SetTableRaw(-3);
-				L.Push("Add");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Lo>();
-				L.SetTableRaw(-3);
-				L.Push("Reload");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Lo>();
-				L.SetTableRaw(-3);
+				if constexpr (RegisterFuncPreLoad) {
+					L.Push("PreLoad");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Prel>();
+					L.SetTableRaw(-3);
+				}
+				if constexpr (RegisterFuncLoad) {
+					L.Push("Add");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Lo>();
+					L.SetTableRaw(-3);
+					L.Push("Reload");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Lo>();
+					L.SetTableRaw(-3);
+				}
 			}
 
 			static DataTypeLoaderTracking Obj;
@@ -191,22 +197,28 @@ namespace CppLogic::ModLoader {
 				return Obj.Load(luaext::EState{L});
 			}
 
+			static constexpr bool RegisterFuncPreLoad = true;
+			static constexpr bool RegisterFuncLoad = true;
 			virtual void RegisterFuncs(luaext::EState L) override {
-				L.Push("PreLoad");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Prel>();
-				L.SetTableRaw(-3);
-				L.Push("Add");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Lo>();
-				L.SetTableRaw(-3);
-				L.Push("Reload");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Lo>();
-				L.SetTableRaw(-3);
+				if constexpr (RegisterFuncPreLoad) {
+					L.Push("PreLoad");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Prel>();
+					L.SetTableRaw(-3);
+				}
+				if constexpr (RegisterFuncLoad) {
+					L.Push("Add");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Lo>();
+					L.SetTableRaw(-3);
+					L.Push("Reload");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Lo>();
+					L.SetTableRaw(-3);
+				}
 			}
 
 			static DataTypeLoaderHalf Obj;
@@ -236,22 +248,28 @@ namespace CppLogic::ModLoader {
 				return Obj.Load(luaext::EState{L});
 			}
 
+			static constexpr bool RegisterFuncPreLoad = true;
+			static constexpr bool RegisterFuncLoad = true;
 			virtual void RegisterFuncs(luaext::EState L) override {
-				L.Push("PreLoad");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Prel>();
-				L.SetTableRaw(-3);
-				L.Push("Add");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Lo>();
-				L.SetTableRaw(-3);
-				L.Push("Reload");
-				L.Push(DataTypeLoaderCommon<En>::FuncName());
-				L.Concat(2);
-				L.Push<Lo>();
-				L.SetTableRaw(-3);
+				if constexpr (RegisterFuncPreLoad) {
+					L.Push("PreLoad");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Prel>();
+					L.SetTableRaw(-3);
+				}
+				if constexpr (RegisterFuncLoad) {
+					L.Push("Add");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Lo>();
+					L.SetTableRaw(-3);
+					L.Push("Reload");
+					L.Push(DataTypeLoaderCommon<En>::FuncName());
+					L.Concat(2);
+					L.Push<Lo>();
+					L.SetTableRaw(-3);
+				}
 			}
 
 			static DataTypeLoaderReload Obj;
@@ -272,7 +290,7 @@ namespace CppLogic::ModLoader {
 			static UpgradeCategoriesLoader Obj;
 		};
 
-		static std::array<DataTypeLoader*, 14> Loaders;
+		static std::array<DataTypeLoader*, 15> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;

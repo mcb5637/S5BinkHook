@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_idmanager.h"
 
 namespace EGL {
 	class CGLEAnimProps : public BB::IObject {
@@ -273,4 +274,63 @@ namespace GGUI {
 
 		static inline CGuiProperties* (__cdecl* const GlobalObj)() = reinterpret_cast<CGuiProperties * (__cdecl*)()>(0x52EBC6);
 	};
+}
+
+namespace CppLogic {
+	class ExperienceClassManager {
+		GGL::ExperienceClassHolder* Manager;
+
+	public:
+		inline ExperienceClassManager(GGL::ExperienceClassHolder* mng) : Manager(mng) {
+		}
+
+		// does not add
+		inline shok::ExperienceClass GetIdByName(const char* name) const {
+			for (int i = 0; i < static_cast<int>(Manager->Classes.size()); ++i) {
+				if (Manager->Classes[i]->Table == name)
+					return static_cast<shok::ExperienceClass>(i);
+			}
+			return shok::ExperienceClass::Invalid;
+		}
+		inline const char* GetNameByID(shok::ExperienceClass id) const {
+			return Manager->Classes.at(static_cast<int>(id))->Table.c_str();
+		}
+		inline size_t size() const {
+			return Manager->Classes.size();
+		}
+
+		struct Iter {
+		protected:
+			friend class ExperienceClassManager;
+			int I;
+
+			inline Iter(int i) : I(i) {}
+
+		public:
+			auto operator<=>(const Iter&) const noexcept = default;
+			inline shok::ExperienceClass operator*() const noexcept {
+				return static_cast<shok::ExperienceClass>(I);
+			}
+			inline Iter& operator++() {
+				++I;
+				return *this;
+			}
+			inline Iter operator++(int) {
+				Iter r = *this;
+				++(*this);
+				return r;
+			}
+		};
+		inline Iter begin() const {
+			return Iter{ 0 };
+		}
+		inline Iter end() const {
+			return Iter{ static_cast<int>(Manager->Classes.size()) };
+		}
+	};
+}
+template<>
+inline auto CppLogic::GetIdManager<shok::ExperienceClass>() {
+	auto mng = GGL::ExperienceClassHolder::GlobalObj();
+	return ExperienceClassManager{mng};
 }

@@ -289,21 +289,28 @@ namespace CppLogic::ModLoader {
 
 			static UpgradeCategoriesLoader Obj;
 		};
+		class ExperienceClassesLoader : public DataTypeLoader {
+			std::vector<shok::ExperienceClass> ToRemove, ToReload;
+		public:
+			virtual void Reset() override;
+			virtual void SanityCheck() override;
+			virtual void RegisterFuncs(luaext::EState L) override;
 
-		static std::array<DataTypeLoader*, 15> Loaders;
+			static int Add(lua::State L);
+
+			static ExperienceClassesLoader Obj;
+		};
+
+		static std::array<DataTypeLoader*, 16> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
-		static std::vector<shok::ExperienceClass> ExperienceClassesToRemove;
-		static std::vector<shok::ExperienceClass> ExperienceClassesToReload;
 		static std::vector<shok::SoundId> SoundGroupsToRemove;
 		static std::vector<shok::AnimSetId> AnimSetsToRemove;
 		static std::vector<shok::AnimSetId> AnimSetsToReload;
 		static std::vector<int> DirectXEffectsToFree;
 
 		static int SetEntityTypeToReload(lua::State L);
-		static int AddExperienceClass(lua::State L);
-		static int ReloadExperienceClass(lua::State L);
 		static int AddSounds(lua::State L);
 		static int AddAnimSet(lua::State L);
 		static int ReloadAnimSet(lua::State L);
@@ -311,10 +318,8 @@ namespace CppLogic::ModLoader {
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 9> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 7> LuaFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<AddExperienceClass>("AddExperienceClass"),
-				lua::FuncReference::GetRef<ReloadExperienceClass>("ReloadExperienceClass"),
 				lua::FuncReference::GetRef<AddSounds>("AddSounds"),
 				lua::FuncReference::GetRef<AddAnimSet>("AddAnimSet"),
 				lua::FuncReference::GetRef<ReloadAnimSet>("ReloadAnimSet"),

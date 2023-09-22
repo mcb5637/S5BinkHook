@@ -651,8 +651,58 @@ template<>
 constexpr bool CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::RegisterFuncLoad = false;
 CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj{};
 
+void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Reset()
+{
+	while (ToRemove.size() != 0) {
+		shok::ExperienceClass id = ToRemove.back();
+		ToRemove.pop_back();
+		GGL::ExperienceClassHolder::GlobalObj()->PopExpeienceClass(id);
+	}
+	for (shok::ExperienceClass id : ToReload) {
+		GGL::ExperienceClassHolder::GlobalObj()->LoadExperienceClass(id);
+	}
+	ToReload.clear();
+	GGL::CEntityProfile::HookExperienceClassAssignment(false);
+}
+void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::SanityCheck()
+{
+}
+void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::RegisterFuncs(luaext::EState L)
+{
+	L.RegisterFunc<Add>("AddExperienceClass", -3);
+	L.RegisterFunc<Add>("ReloadExperienceClass", -3);
+}
+int CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Add(lua::State L)
+{
+	GGL::CEntityProfile::HookExperienceClassAssignment(true);
+	const char* n = L.CheckString(1);
+	auto* mng = GGL::ExperienceClassHolder::GlobalObj();
+	shok::ExperienceClass id = CppLogic::GetIdManager<shok::ExperienceClass>().GetIdByName(n);
+	if (id != shok::ExperienceClass::Invalid) {
+		if (std::find(Obj.ToRemove.begin(), Obj.ToRemove.end(), id) == Obj.ToRemove.end() && std::find(Obj.ToReload.begin(), Obj.ToReload.end(), id) == Obj.ToReload.end())
+			Obj.ToReload.push_back(id);
+		mng->LoadExperienceClass(id);
+		L.Push(static_cast<int>(id));
+		return 1;
+	}
+	shok::EntityCategory cat = L.IsNumber(2) ? static_cast<shok::EntityCategory>(L.CheckInt(2)) : luaext::EState{ L }.CheckEnum<shok::EntityCategory>(2);
+	id = mng->AddExperienceClass(n, cat);
+	Obj.ToRemove.push_back(id);
+	L.Push("ExperienceClasses");
+	L.GetGlobal();
+	if (L.IsTable(-1)) {
+		L.PushValue(1);
+		L.Push(static_cast<int>(id));
+		L.SetTableRaw(-3);
+	}
+	// func exit cleans stack anyway, so no need to pop
+	L.Push(static_cast<int>(id));
+	return 1;
+}
+CppLogic::ModLoader::ModLoader::ExperienceClassesLoader CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj{};
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 15> CppLogic::ModLoader::ModLoader::Loaders{{
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 16> CppLogic::ModLoader::ModLoader::Loaders{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
@@ -668,6 +718,7 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 15> CppLogic::ModLoa
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj,
 			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj,
+			& CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj,
 	}};
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{{
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
@@ -675,8 +726,6 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoad
 
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToRemove{};
-std::vector<shok::ExperienceClass> CppLogic::ModLoader::ModLoader::ExperienceClassesToReload{};
 std::vector<shok::SoundId> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
 std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToRemove{};
 std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToReload{};
@@ -686,41 +735,6 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 {
 	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::AddExperienceClass(lua::State L)
-{
-	GGL::CEntityProfile::HookExperienceClassAssignment(true);
-	const char* n = L.CheckString(1);
-	shok::EntityCategory cat = static_cast<shok::EntityCategory>(L.CheckInt(2));
-	auto* mng = GGL::ExperienceClassHolder::GlobalObj();
-	for (auto* cl : mng->Classes) {
-		if (std::strcmp(cl->Table.c_str(), n) == 0)
-			throw lua::LuaException{ "already exists" };
-	}
-	shok::ExperienceClass id = mng->AddExperienceClass(n, cat);
-	ExperienceClassesToRemove.push_back(id);
-	L.Push("ExperienceClasses");
-	L.GetGlobal();
-	if (L.IsTable(-1)) {
-		L.PushValue(1);
-		L.Push(static_cast<int>(id));
-		L.SetTableRaw(-3);
-	}
-	// func exit cleans stack anyway, so no need to pop
-	L.Push(static_cast<int>(id));
-	return 1;
-}
-
-int CppLogic::ModLoader::ModLoader::ReloadExperienceClass(lua::State L)
-{
-	int id = L.CheckInt(1);
-	auto* mng = GGL::ExperienceClassHolder::GlobalObj();
-	if (id <= 0 || id >= static_cast<int>(mng->Classes.size()))
-		throw lua::LuaException{ "invalid experienceclass" };
-	mng->LoadExperienceClass(static_cast<shok::ExperienceClass>(id));
-	ExperienceClassesToReload.push_back(static_cast<shok::ExperienceClass>(id));
 	return 0;
 }
 
@@ -895,17 +909,6 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		for (auto* l : Loaders) {
 			l->Reset();
 		}
-
-		while (ExperienceClassesToRemove.size() != 0) {
-			shok::ExperienceClass id = ExperienceClassesToRemove.back();
-			ExperienceClassesToRemove.pop_back();
-			GGL::ExperienceClassHolder::GlobalObj()->PopExpeienceClass(id);
-		}
-		for (shok::ExperienceClass id : ExperienceClassesToReload) {
-			GGL::ExperienceClassHolder::GlobalObj()->LoadExperienceClass(id);
-		}
-		ExperienceClassesToReload.clear();
-		GGL::CEntityProfile::HookExperienceClassAssignment(false);
 
 		while (SoundGroupsToRemove.size() != 0) {
 			auto id = SoundGroupsToRemove.back();

@@ -22,13 +22,6 @@ struct shok_vtable_ED_CEntity : BB::IObject::_vtableS {
     PADDINGI(1); // return some float
 };
 
-BB::SerializationData* ED::CBehaviorProps::SerializationData = reinterpret_cast<BB::SerializationData*>(0x8586E8);
-
-int __stdcall ED::IBehavior::UnknownFuncRet100()
-{
-    return 100;
-}
-
 void ED::CEntity::ResetPositionData()
 {
     EGL::IEntityDisplay::posdata d = Entity->GetPosData();

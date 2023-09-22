@@ -1,22 +1,9 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_baseprops.h"
 
 namespace EGL {
-	class CGLEBehaviorProps : public BB::IObject, public ECore::ICheckData {
-	public:
-		int BehaviorIndex = 0;
-		shok::ClassId BehaviorClass = {};
-
-		static inline constexpr int vtp = 0x772A2C;
-		static inline constexpr int TypeDesc = 0x813728;
-		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x29B5CF4D);
-
-		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x86A768);
-	};
-	static_assert(offsetof(EGL::CGLEBehaviorProps, BehaviorIndex) == 2 * 4);
-
-
 	class CMovementBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
 		float MovementSpeed, TurningSpeed;

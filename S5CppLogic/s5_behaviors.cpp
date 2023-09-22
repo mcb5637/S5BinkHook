@@ -17,13 +17,6 @@
 #include "savegame_extra.h"
 #include "mod.h"
 
-void EGL::CGLEBehavior::OnEntityUpgrade(EGL::CGLEEntity* e)
-{
-}
-void EGL::CGLEBehavior::OnEntityDestroy(bool uk)
-{
-}
-
 inline void(__thiscall* const path_waypoint_removelast)(EGL::CCoarsePath::WaypointData* th) = reinterpret_cast<void(__thiscall*)(EGL::CCoarsePath::WaypointData*)>(0x508988);
 void EGL::CCoarsePath::WaypointData::RemoveLastWaypoint()
 {

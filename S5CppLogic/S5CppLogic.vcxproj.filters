@@ -288,6 +288,9 @@
     <ClInclude Include="ModConfig.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_baseprops.h">
+      <Filter>shok\entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -457,6 +460,9 @@
     </ClCompile>
     <ClCompile Include="ModConfig.cpp">
       <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_baseprops.cpp">
+      <Filter>shok\entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

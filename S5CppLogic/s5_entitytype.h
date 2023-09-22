@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_baseprops.h"
 
 namespace EGL {
 	class CGLEEntityProps : public BB::IObject {

@@ -3,6 +3,7 @@
 
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_baseprops.h"
 #include "s5_tech.h"
 #include "s5_behaviors.h"
 #include "s5_config.h"

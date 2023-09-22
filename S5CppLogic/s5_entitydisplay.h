@@ -1,46 +1,10 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_baseprops.h"
 #include "s5_entity.h"
 
 namespace ED {
-	class CBehaviorProps : public BB::IObject {
-	public:
-		shok::ClassId Class = static_cast<shok::ClassId>(0);
-		int Index = 0;
-		int Unknown = 100; // 100?? 3
-
-		static inline constexpr int vtp = 0x76AB0C;
-		static inline constexpr int TypeDesc = 0x80AC10;
-		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1F78996D);
-
-		static BB::SerializationData* SerializationData;
-	};
-
-
-
-
-	class IBehavior : public BB::IObject {
-	public:
-		//ED::CEntity* EntityDisplay = nullptr;
-		//ED::CBehaviorProps* Props = nullptr; does seem to be only in subclasses
-
-	protected:
-		virtual void __stdcall OnAdd(ED::CEntity* edispl, ED::CBehaviorProps* props, int uk) = 0; // called before ED::CEntity init
-		virtual void __stdcall Initialize(ED::CEntity* edispl, ED::CBehaviorProps* props) = 0; // called before ED::CEntity init
-	public:
-		virtual void __stdcall UpdateRenderNoTick(int count, float uk) = 0;
-		virtual void __stdcall UpdateRenderOneTick(int count, float uk) = 0;
-		virtual void __stdcall UpdateRenderManyTick(int count, float uk) = 0;
-	private:
-		virtual int __stdcall UnknownFuncRet100();
-
-	public:
-		static inline constexpr int vtp = 0x76A9E4;
-		static inline constexpr int TypeDesc = 0x80AA54;
-		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
-	};
-
 	class CUVAnimBehavior : public ED::IBehavior {
 	public:
 

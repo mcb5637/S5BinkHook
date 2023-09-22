@@ -1,28 +1,10 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_baseprops.h"
 #include "s5_player.h"
 
 namespace EGL {
-	class CGLEBehavior : public BB::IObject { // no vtable
-	public:
-		int SlotIndex = 0;
-		shok::EntityId EntityId = static_cast<shok::EntityId>(0);
-		EGL::CGLEBehaviorProps* PropPointer = nullptr; // 3, warning this may not be set
-
-	protected:
-		virtual void __thiscall AddHandlers(shok::EntityId id) = 0; // 3
-		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
-		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
-		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old); // on movement seems to copy a lot of data, maybe change behavior?
-		virtual void __thiscall OnEntityDestroy(bool ev); // 7 usually empty, ev is false when destroyed normally, entity is still valid when called (not the case in dtor)
-
-	public:
-		static inline constexpr int TypeDesc = 0x813778;
-		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x86A828);
-		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
-	};
-
 	class CCoarsePath {
 	public:
 		virtual ~CCoarsePath() = default;

@@ -151,11 +151,11 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>:
 		auto n = idm.GetNameByID(id);
 		auto et = EGL::CGLEEntitiesProps::GetEntityType(id);
 		if (et == nullptr)
-			throw lua::LuaException{std::format("entitytype {}={} missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("entitytype {}={} missing", n, static_cast<int>(id)) };
 		if (et->LogicProps == nullptr)
-			throw lua::LuaException{std::format("entitytype {}={} missing LogicProps", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("entitytype {}={} missing LogicProps", n, static_cast<int>(id)) };
 		if (et->DisplayProps == nullptr)
-			throw lua::LuaException{std::format("entitytype {}={} missing DisplayProps", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("entitytype {}={} missing DisplayProps", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::UnLoad(shok::EntityTypeId id) {
@@ -182,9 +182,9 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::S
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
 		if (mng->Get(id)->Logic == nullptr)
-			throw lua::LuaException{std::format("effecttype {}={} missing Logic", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("effecttype {}={} missing Logic", n, static_cast<int>(id)) };
 		if (mng->Get(id)->Display == nullptr)
-			throw lua::LuaException{std::format("effecttype {}={} missing Display", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("effecttype {}={} missing Display", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Reset() {
@@ -212,7 +212,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Sanit
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
 		if (mng->TaskLists.at(static_cast<int>(id)) == nullptr)
-			throw lua::LuaException{std::format("tasklist {}={} missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("tasklist {}={} missing", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Reload() {
@@ -272,10 +272,10 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::
 		auto n = idm.GetNameByID(id);
 		auto* dc = mng->Logic.TryGet(id);
 		if (dc == nullptr)
-			throw lua::LuaException{std::format("damageclass {}={} is missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("damageclass {}={} is missing", n, static_cast<int>(id)) };
 		for (auto ac : acmng) {
 			if (dc->GetBonusVsArmorClass(ac) < 0)
-				throw lua::LuaException{std::format("damageclass {}={} has invalid factor {}", n, static_cast<int>(id), static_cast<int>(ac))};
+				throw lua::LuaException{ std::format("damageclass {}={} has invalid factor {}", n, static_cast<int>(id), static_cast<int>(ac)) };
 		}
 	}
 }
@@ -304,7 +304,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::San
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
 		if (mng->Get(id) == nullptr)
-			throw lua::LuaException{std::format("tech {}={} missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("tech {}={} missing", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Reload() {
@@ -332,7 +332,7 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ModelId>:
 	return "Model";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::SanityCheck() {
-	
+
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Reload() {
 	for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
@@ -386,7 +386,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
 		if (m->AnimManager.Map.find(static_cast<int>(id)) == m->AnimManager.Map.end())
-			throw lua::LuaException{std::format("anim {}={} missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("anim {}={} missing", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::UnLoad(shok::AnimationId id) {
@@ -397,7 +397,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj{};
 
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::UpgradeCategoryId>::Load(shok::UpgradeCategoryId id, luaext::EState L) {
-	
+
 }
 const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::UpgradeCategoryId>::TableName() {
 	return "UpgradeCategories";
@@ -437,7 +437,7 @@ void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::SanityCheck()
 			if (u.Category == id)
 				return true;
 		return false;
-	};
+		};
 	auto* m = *GGL::CLogicProperties::GlobalObj;
 	auto idm = CppLogic::GetIdManager<shok::UpgradeCategoryId>();
 	std::array<std::string_view, 2> toignore{
@@ -449,7 +449,7 @@ void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::SanityCheck()
 		if (std::find(toignore.begin(), toignore.end(), n) != toignore.end())
 			continue;
 		if (!find(m->BuildingUpgrades, id) && !find(m->SettlerUpgrades, id))
-			throw lua::LuaException{std::format("upgrade category {}={} missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("upgrade category {}={} missing", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::RegisterFuncs(luaext::EState L)
@@ -472,7 +472,7 @@ void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::OnIdLoaded(shok::U
 }
 int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Prel(lua::State L)
 {
-	return Obj.Preload(luaext::EState{L});
+	return Obj.Preload(luaext::EState{ L });
 }
 int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCategory(lua::State l)
 {
@@ -486,7 +486,7 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCa
 		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
 		for (const auto& u : v.Vector) {
 			if (u.Category == id)
-				throw lua::LuaException{"upgrade category already exists"};
+				throw lua::LuaException{ "upgrade category already exists" };
 		}
 		v.Vector.emplace_back(id, first);
 	}
@@ -516,7 +516,7 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddBuildingUpgradeC
 		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
 		for (const auto& u : v.Vector) {
 			if (u.Category == id)
-				throw lua::LuaException{"upgrade category already exists"};
+				throw lua::LuaException{ "upgrade category already exists" };
 		}
 		v.Vector.emplace_back(id, first);
 	}
@@ -551,7 +551,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Sa
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
 		if (static_cast<int>(mng->Logic.WaterLogic.size()) <= static_cast<int>(id))
-			throw lua::LuaException{std::format("watertype {}={} missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("watertype {}={} missing", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Reset() {
@@ -575,7 +575,7 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::Selection
 	return "SelectionTexture";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::SanityCheck() {
-	
+
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::UnLoad(shok::SelectionTextureId id) {
 	(*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures->PopId(static_cast<int>(id));
@@ -617,7 +617,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
 		if (static_cast<int>(mng->Logic.LogicProps.size()) <= static_cast<int>(id))
-			throw lua::LuaException{std::format("terraintype {}={} missing", n, static_cast<int>(id))};
+			throw lua::LuaException{ std::format("terraintype {}={} missing", n, static_cast<int>(id)) };
 	}
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Reset() {
@@ -701,45 +701,33 @@ int CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Add(lua::State L)
 }
 CppLogic::ModLoader::ModLoader::ExperienceClassesLoader CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj{};
 
-
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 16> CppLogic::ModLoader::ModLoader::Loaders{{
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj,
-			& CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj,
-			& CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj,
-			& CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj,
-	}};
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{{
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
-	}};
-
-
-bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<shok::SoundId> CppLogic::ModLoader::ModLoader::SoundGroupsToRemove{};
-std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToRemove{};
-std::vector<shok::AnimSetId> CppLogic::ModLoader::ModLoader::AnimSetsToReload{};
-std::vector<int> CppLogic::ModLoader::ModLoader::DirectXEffectsToFree{};
-
-int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
+void CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Reset()
 {
-	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
-	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
-	return 0;
+	while (ToRemove.size() != 0) {
+		auto id = ToRemove.back();
+		ToRemove.pop_back();
+		(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(id);
+	}
 }
-
-int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
+void CppLogic::ModLoader::ModLoader::SoundGroupsLoader::SanityCheck()
 {
+	/*auto im = CppLogic::GetIdManager<shok::SoundId>();
+	auto* mng = *ESnd::CSoESound::GlobalObj;
+	for (auto i : im) {
+		auto s = std::format("data\\sounds\\{}.wav", im.GetNameByID(i));
+		BB::IFileSystem::FileInfo info{};
+		(*BB::CFileSystemMgr::GlobalObj)->GetFileInfo(&info, s.c_str());
+		if (!info.Found)
+			throw lua::LuaException{ std::format("sound {}={} does nox exist", im.GetNameByID(i), static_cast<int>(i)) };
+	}*/
+}
+void CppLogic::ModLoader::ModLoader::SoundGroupsLoader::RegisterFuncs(luaext::EState L)
+{
+	L.RegisterFunc<Add>("AddSounds", -3);
+}
+int CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Add(lua::State l)
+{
+	luaext::EState L{ l };
 	int num = L.GetTop();
 	for (int i = 1; i <= num; ++i) {
 		const char* n = L.CheckString(i);
@@ -749,7 +737,7 @@ int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
 	auto* mng = *ESnd::CSoESound::GlobalObj;
 	L.Push("Sounds");
 	L.GetGlobal();
-	int firstid;
+	shok::SoundId firstid;
 	{
 		const char* n = L.CheckString(1);
 		firstid = mng->AddSoundToNewGroup(n);
@@ -761,7 +749,7 @@ int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
 	}
 	for (int i = 2; i <= num; ++i) {
 		const char* n = L.CheckString(i);
-		int id = mng->AddSoundToLastGroup(n);
+		shok::SoundId id = mng->AddSoundToLastGroup(n);
 		std::string s{ n };
 		std::replace(s.begin(), s.end(), '\\', '_');
 		L.Push(s);
@@ -769,38 +757,69 @@ int CppLogic::ModLoader::ModLoader::AddSounds(lua::State L)
 		L.SetTableRaw(-3);
 	}
 	L.Push(firstid);
-	SoundGroupsToRemove.push_back(static_cast<shok::SoundId>(firstid));
+	Obj.ToRemove.push_back(static_cast<shok::SoundId>(firstid));
 	return 1;
 }
+CppLogic::ModLoader::ModLoader::SoundGroupsLoader CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Obj{};
 
-int CppLogic::ModLoader::ModLoader::AddAnimSet(lua::State L)
-{
-	const char* name = L.CheckString(1);
-	auto* idm = *BB::CIDManagerEx::AnimSetManager;
-	if (idm->GetIdByName(name))
-		throw lua::LuaException{ "animset already exists" };
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimSetId>::Load(shok::AnimSetId id, luaext::EState L) {
 	auto* mng = *EGL::AnimSetManager::GlobalObj;
-	int id = idm->GetIDByNameOrCreate(name);
-	mng->LoadAnimSet(static_cast<shok::AnimSetId>(id));
-	AnimSetsToRemove.push_back(static_cast<shok::AnimSetId>(id));
-	L.Push("AnimSets");
-	L.GetGlobal();
-	L.PushValue(1);
-	L.Push(id);
-	L.SetTableRaw(-3);
-	L.Push(id);
-	return 1;
+	if (static_cast<int>(id) < static_cast<int>(mng->AnimSets.size()))
+		mng->FreeAnimSet(id);
+	mng->LoadAnimSet(id);
 }
-int CppLogic::ModLoader::ModLoader::ReloadAnimSet(lua::State L)
-{
-	int id = L.CheckInt(1);
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimSetId>::TableName() {
+	return nullptr;
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimSetId>::FuncName() {
+	return "AnimSet";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::SanityCheck() {
 	auto* mng = *EGL::AnimSetManager::GlobalObj;
-	auto* idm = *BB::CIDManagerEx::AnimSetManager;
-	if (idm->GetNameByID(id) == nullptr)
-		throw lua::LuaException{ "anim set does not exists" };
-	mng->FreeAnimSet(static_cast<shok::AnimSetId>(id));
-	mng->LoadAnimSet(static_cast<shok::AnimSetId>(id));
-	AnimSetsToReload.push_back(static_cast<shok::AnimSetId>(id));
+	auto idm = CppLogic::GetIdManager<shok::AnimSetId>();
+	for (auto id : idm) {
+		if (static_cast<int>(id) > static_cast<int>(mng->AnimSets.size()) || mng->GetAnimSet(id) == nullptr)
+			throw lua::LuaException{ std::format("animset {}={} does not exist", idm.GetNameByID(id), static_cast<int>(id)) };
+	}
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::UnLoad(shok::AnimSetId id) {
+	(*EGL::AnimSetManager::GlobalObj)->PopAnimSet(id);
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj{};
+
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 18> CppLogic::ModLoader::ModLoader::Loaders{ {
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj,
+			&CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj,
+			&CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj,
+			&CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj,
+	} };
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{ {
+		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
+	} };
+
+
+bool CppLogic::ModLoader::ModLoader::Initialized = false;
+std::vector<int> CppLogic::ModLoader::ModLoader::DirectXEffectsToFree{};
+
+int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
+{
+	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
+	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
 	return 0;
 }
 
@@ -909,25 +928,6 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		for (auto* l : Loaders) {
 			l->Reset();
 		}
-
-		while (SoundGroupsToRemove.size() != 0) {
-			auto id = SoundGroupsToRemove.back();
-			SoundGroupsToRemove.pop_back();
-			(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(static_cast<int>(id));
-		}
-
-		while (AnimSetsToRemove.size() != 0) {
-			auto id = AnimSetsToRemove.back();
-			AnimSetsToRemove.pop_back();
-			(*EGL::AnimSetManager::GlobalObj)->PopAnimSet(id);
-			(*BB::CIDManagerEx::AnimSetManager)->RemoveID(static_cast<int>(id));
-		}
-		for (auto id : AnimSetsToReload) {
-			auto* mng = *EGL::AnimSetManager::GlobalObj;
-			mng->FreeAnimSet(id);
-			mng->LoadAnimSet(id);
-		}
-		AnimSetsToReload.clear();
 
 		if (DirectXEffectsToFree.size() > 0) {
 			for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {

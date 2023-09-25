@@ -84,8 +84,8 @@ void ESnd::CSoEMusic::HookStartMusicFilesystem()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x496677), &startmusic_patchasm, reinterpret_cast<void*>(0x49669E));
 }
 
-static inline void(__thiscall* const sound_play2d)(ESnd::CSoESound* th, int* id, int sound, int vol, bool looped, float x, float y, float z) = reinterpret_cast<void(__thiscall*)(ESnd::CSoESound*, int*, int, int, bool, float, float, float)>(0x494B5B);
-int ESnd::CSoESound::Play2DSound(int sound, int vol, bool looped)
+static inline void(__thiscall* const sound_play2d)(ESnd::CSoESound* th, int* id, shok::SoundId sound, int vol, bool looped, float x, float y, float z) = reinterpret_cast<void(__thiscall*)(ESnd::CSoESound*, int*, shok::SoundId, int, bool, float, float, float)>(0x494B5B);
+int ESnd::CSoESound::Play2DSound(shok::SoundId sound, int vol, bool looped)
 {
 	int id;
 	sound_play2d(this, &id, sound, vol, looped, 0, 0, 0);
@@ -104,7 +104,7 @@ void ESnd::CSoESound::Pause3d(bool pause)
 	sound_pause3d(this, pause);
 }
 
-int ESnd::CSoESound::AddSoundToNewGroup(const char* name)
+shok::SoundId ESnd::CSoESound::AddSoundToNewGroup(const char* name)
 {
 	int id = (*BB::CIDManagerEx::SoundsManager)->GetIDByNameOrCreate(name);
 	{
@@ -113,12 +113,12 @@ int ESnd::CSoESound::AddSoundToNewGroup(const char* name)
 	}
 	{
 		auto v = RandomData.SaveVector();
-		IdRandomData d{reinterpret_cast<void*>(0x19F1B4), id, id};
+		IdRandomData d{reinterpret_cast<void*>(0x19F1B4), static_cast<shok::SoundId>(id), static_cast<shok::SoundId>(id)};
 		v.Vector.push_back(d);
 	}
-	return id;
+	return static_cast<shok::SoundId>(id);
 }
-int ESnd::CSoESound::AddSoundToLastGroup(const char* name)
+shok::SoundId ESnd::CSoESound::AddSoundToLastGroup(const char* name)
 {
 	int id = (*BB::CIDManagerEx::SoundsManager)->GetIDByNameOrCreate(name);
 	{
@@ -127,18 +127,18 @@ int ESnd::CSoESound::AddSoundToLastGroup(const char* name)
 	}
 	{
 		auto v = RandomData.SaveVector();
-		v.Vector.back().MaxRan = id;
+		v.Vector.back().MaxRan = static_cast<shok::SoundId>(id);
 	}
-	return id;
+	return static_cast<shok::SoundId>(id);
 }
-void ESnd::CSoESound::PopSoundGroup(int firstsound)
+void ESnd::CSoESound::PopSoundGroup(shok::SoundId firstsound)
 {
 	auto rdv = RandomData.SaveVector();
 	auto& rd = rdv.Vector.back();
 	if (rd.MinRan > firstsound || rd.MaxRan < firstsound)
 		throw std::out_of_range{ "id not in last group" };
 	auto ukv = UnknownVector.SaveVector();
-	for (int i = rd.MaxRan; i >= rd.MinRan; --i) {
+	for (int i = static_cast<int>(rd.MaxRan);i >= static_cast<int>(rd.MinRan); --i) {
 		ukv.Vector.pop_back();
 		(*BB::CIDManagerEx::SoundsManager)->RemoveID(i);
 	}

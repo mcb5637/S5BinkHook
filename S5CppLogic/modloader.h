@@ -300,29 +300,31 @@ namespace CppLogic::ModLoader {
 
 			static ExperienceClassesLoader Obj;
 		};
+		class SoundGroupsLoader : public DataTypeLoader {
+			std::vector<shok::SoundId> ToRemove;
+		public:
+			virtual void Reset() override;
+			virtual void SanityCheck() override;
+			virtual void RegisterFuncs(luaext::EState L) override;
 
-		static std::array<DataTypeLoader*, 16> Loaders;
+			static int Add(lua::State L);
+
+			static SoundGroupsLoader Obj;
+		};
+
+		static std::array<DataTypeLoader*, 18> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
-		static std::vector<shok::SoundId> SoundGroupsToRemove;
-		static std::vector<shok::AnimSetId> AnimSetsToRemove;
-		static std::vector<shok::AnimSetId> AnimSetsToReload;
 		static std::vector<int> DirectXEffectsToFree;
 
 		static int SetEntityTypeToReload(lua::State L);
-		static int AddSounds(lua::State L);
-		static int AddAnimSet(lua::State L);
-		static int ReloadAnimSet(lua::State L);
 		static int LoadDirectXEffect(lua::State L);
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 7> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 4> LuaFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<AddSounds>("AddSounds"),
-				lua::FuncReference::GetRef<AddAnimSet>("AddAnimSet"),
-				lua::FuncReference::GetRef<ReloadAnimSet>("ReloadAnimSet"),
 				lua::FuncReference::GetRef<LoadDirectXEffect>("LoadDirectXEffect"),
 				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 				lua::FuncReference::GetRef<SanityCheck>("SanityCheck"),

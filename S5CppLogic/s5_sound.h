@@ -100,8 +100,8 @@ namespace ESnd {
 
 		struct IdRandomData {
 			void* Str; // points to stack, not useable
-			int MinRan;
-			int MaxRan;
+			shok::SoundId MinRan;
+			shok::SoundId MaxRan;
 		};
 
 		PADDINGI(32);
@@ -113,13 +113,13 @@ namespace ESnd {
 		PADDINGI(7);
 		AmbientSoundManager AmbientSound; // 75
 
-		int Play2DSound(int sound, int vol, bool looped);
+		int Play2DSound(shok::SoundId sound, int vol, bool looped);
 		void PauseAll(bool pause);
 		void Pause3d(bool pause);
 
-		int AddSoundToNewGroup(const char* name);
-		int AddSoundToLastGroup(const char* name);
-		void PopSoundGroup(int firstsound);
+		shok::SoundId AddSoundToNewGroup(const char* name);
+		shok::SoundId AddSoundToLastGroup(const char* name);
+		void PopSoundGroup(shok::SoundId firstsound);
 	};
 	static_assert(offsetof(CSoESound, UnknownVector) == 34 * 4);
 	static_assert(offsetof(CSoESound, AmbientSound) == 75 * 4);

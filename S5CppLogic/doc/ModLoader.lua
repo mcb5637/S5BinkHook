@@ -11,20 +11,22 @@ ModLoader = {
 	KeepArchive = false,
 	--- anything in Manifest gest applied by calling ModLoader.ApplyManifest() from ModLoader.Initialize()
 	--- order in which items appear in here do not matter, ModLoader.ApplyManifest() does take care of preloading.
+	--- unless otherwise specified, using id or name is supported (obviously only name for adding).
+	--- ModLoader now automatically figures out what needs to be added or reloaded.
 	Manifest = {
-		--- EntityTypes to load or reload. put in a string to load, and a number to reload (Entities.Typename).
+		--- EntityTypes to load or reload.
 		EntityTypes = {
 
 		},
-		--- EffectTypes to load or reload. put in a string to load, and a number to reload (GGL_Effects.Typename).
+		--- EffectTypes to load or reload.
 		EffectTypes = {
 
 		},
-		--- TaskLists to load or reload. put in a string to load, and a number to reload (TaskLists.Typename).
+		--- TaskLists to load or reload.
 		TaskLists = {
 
 		},
-		--- Technologies to load or reload. put in a string to load, and a number to reload (Technologies.Typename).
+		--- Technologies to load or reload.
 		Technologies = {
 
 		},
@@ -32,34 +34,30 @@ ModLoader = {
 		ExperienceClasses = {
 
 		},
-		--- Models to load or reload. put in a string to load, and a number to reload (Models.Typename).
+		--- Models to load or reload.
 		Models = {
 
 		},
-		--- Animations to load or reload. put in a string to load, and a number to reload (Animations.Typename).
+		--- Animations to load or reload.
 		Animations = {
 
 		},
-		--- AnimSets to load or reload. put in a string to load, and a number to reload (AnimSets.Typename).
+		--- AnimSets to load or reload.
 		AnimSets = {
 
 		},
-		--- Selection Textures to add.
+		--- Selection Textures to add or reload.
 		SelectionTextures_Add = {
 
 		},
-		--- Selection Textures to reload.
-		SelectionTextures_Reload = {
-
-		},
-		--- GUI Textures to add.
+		--- deprecated
+		SelectionTextures_Reload = {},
+		--- GUI Textures to add or reload.
 		GUITextures_Add = {
 
 		},
-		--- GUI Textures to reload.
-		GUITextures_Reload = {
-
-		},
+		--- deprecated
+		GUITextures_Reload = {},
 		--- Settler Upgradde Categories to add. use in [nameUCat]=nameFirstEntity.
 		SettlerUpgradeCategory = {
 
@@ -68,19 +66,17 @@ ModLoader = {
 		BuildingUpgradeCategory = {
 
 		},
-		--- Terrain Textures to add.
+		--- Terrain Textures to add or reload.
 		TerrainTextures_Add = {
 
 		},
-		--- Terrain Textures to reload.
-		TerrainTextures_Reload = {
-
-		},
-		--- Water Types to load or reload. put in a string to load, and a number to reload (WaterTypes.Typename).
+		--- deprecated
+		TerrainTextures_Reload = {},
+		--- Water Types to load or reload.
 		WaterTypes = {
 
 		},
-		--- Terrain Types to load or reload. put in a string to load, and a number to reload (TerrainTypes.Typename).
+		--- Terrain Types to load or reload.
 		TerrainTypes = {
 
 		},
@@ -92,11 +88,17 @@ ModLoader = {
 		DirectXEffects = {
 
 		},
-		ArmorClasses = { -- ArmorClasses to add. (Factors are defined in DamageClasses)
-			
+		-- ArmorClasses to add. (Factors are defined in DamageClasses) (PreLoad only)
+		ArmorClasses = {
+
 		},
-		DamageClasses = { -- DamageClasses to add/override. 
-			
+		-- DamageClasses to add/override.
+		DamageClasses = {
+
+		},
+		--- EntityCategories to add. (PreLoad only)
+		EntityCategories = {
+
 		},
 	},
 }
@@ -115,16 +117,17 @@ function ModLoader.Initialize()
 
 	--- refresh caches
 	CppLogic.ModLoader.RefreshEntityCategoryCache()
+	CppLogic.ModLoader.SanityCheck()
 end
 
 --- this function gets called after Initialize, only if the map starts fresh.
-function  ModLoader.MapStart()
-	
+function ModLoader.MapStart()
+
 end
 
 --- this function gets called after Initialize, only if a savegame gets loaded.
 function ModLoader.LoadSave()
-	
+
 end
 
 --- applying everything in Manifest
@@ -134,6 +137,8 @@ function ModLoader.ApplyManifest()
 	ModLoader.PreloadManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.PreLoadTaskList, TaskLists)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.PreLoadEntityType, Entities)
 	ModLoader.PreloadManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.PreLoadTechnology, Technologies)
+	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityCategories, CppLogic.ModLoader.PreLoadEntityCategory,
+		EntityCategories)
 	for dc, cfg in pairs(ModLoader.Manifest.DamageClasses) do
 		CppLogic.ModLoader.AddDamageClass(dc, cfg)
 	end
@@ -144,35 +149,35 @@ function ModLoader.ApplyManifest()
 		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
 	end
 
-	for _,n in ipairs(ModLoader.Manifest.DirectXEffects) do
+	for _, n in ipairs(ModLoader.Manifest.DirectXEffects) do
 		CppLogic.ModLoader.LoadDirectXEffect(n)
 	end
-	for _,n in ipairs(ModLoader.Manifest.TerrainTextures_Add) do
+	for _, n in ipairs(ModLoader.Manifest.TerrainTextures_Add) do
 		CppLogic.ModLoader.AddTerrainTexture(n)
 	end
-	for _,n in ipairs(ModLoader.Manifest.TerrainTextures_Reload) do
-		CppLogic.ModLoader.ReloadTerrainTexture(n)
+	for _, n in ipairs(ModLoader.Manifest.TerrainTextures_Reload) do
+		CppLogic.ModLoader.AddTerrainTexture(n)
 	end
-	ModLoader.HandleManifestType(ModLoader.Manifest.WaterTypes, CppLogic.ModLoader.AddWaterType, CppLogic.ModLoader.ReloadWaterType, WaterTypes)
-	ModLoader.HandleManifestType(ModLoader.Manifest.TerrainTypes, CppLogic.ModLoader.AddTerrainType, CppLogic.ModLoader.ReloadTerrainType, TerrainTypes)
-	for _,n in ipairs(ModLoader.Manifest.SelectionTextures_Add) do
+	ModLoader.HandleManifestType(ModLoader.Manifest.WaterTypes, CppLogic.ModLoader.AddWaterType)
+	ModLoader.HandleManifestType(ModLoader.Manifest.TerrainTypes, CppLogic.ModLoader.AddTerrainType)
+	for _, n in ipairs(ModLoader.Manifest.SelectionTextures_Add) do
 		CppLogic.ModLoader.AddSelectionTexture(n)
 	end
-	for _,n in ipairs(ModLoader.Manifest.SelectionTextures_Reload) do
-		CppLogic.ModLoader.ReloadSelectionTexture(n)
+	for _, n in ipairs(ModLoader.Manifest.SelectionTextures_Reload) do
+		CppLogic.ModLoader.AddSelectionTexture(n)
 	end
-	ModLoader.HandleManifestType(ModLoader.Manifest.Animations, CppLogic.ModLoader.AddAnimation, CppLogic.ModLoader.ReloadAnimation, Animations)
-	ModLoader.HandleManifestType(ModLoader.Manifest.AnimSets, CppLogic.ModLoader.AddAnimSet, CppLogic.ModLoader.ReloadAnimSet, AnimSets)
-	ModLoader.HandleManifestType(ModLoader.Manifest.Models, CppLogic.ModLoader.AddModel, CppLogic.ModLoader.ReloadModel, Models)
-	ModLoader.HandleManifestType(ModLoader.Manifest.EffectTypes, CppLogic.ModLoader.AddEffectType, CppLogic.ModLoader.ReloadEffectType, GGL_Effects)
-	ModLoader.HandleManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.AddTaskList, CppLogic.ModLoader.ReloadTaskList, TaskLists)
-	ModLoader.HandleManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.AddEntityType, CppLogic.ModLoader.ReloadEntityType, Entities)
-	ModLoader.HandleManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.AddTechnology, CppLogic.ModLoader.ReloadTechnology, Technologies)
-	for _,n in ipairs(ModLoader.Manifest.GUITextures_Add) do
+	ModLoader.HandleManifestType(ModLoader.Manifest.Animations, CppLogic.ModLoader.AddAnimation)
+	ModLoader.HandleManifestType(ModLoader.Manifest.AnimSets, CppLogic.ModLoader.AddAnimSet)
+	ModLoader.HandleManifestType(ModLoader.Manifest.Models, CppLogic.ModLoader.AddModel)
+	ModLoader.HandleManifestType(ModLoader.Manifest.EffectTypes, CppLogic.ModLoader.AddEffectType)
+	ModLoader.HandleManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.AddTaskList)
+	ModLoader.HandleManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.AddEntityType)
+	ModLoader.HandleManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.AddTechnology)
+	for _, n in ipairs(ModLoader.Manifest.GUITextures_Add) do
 		CppLogic.ModLoader.AddGUITexture(n)
 	end
-	for _,n in ipairs(ModLoader.Manifest.GUITextures_Reload) do
-		CppLogic.ModLoader.ReloadGUITexture(n)
+	for _, n in ipairs(ModLoader.Manifest.GUITextures_Reload) do
+		CppLogic.ModLoader.AddGUITexture(n)
 	end
 	for uc, et in pairs(ModLoader.Manifest.SettlerUpgradeCategory) do
 		CppLogic.ModLoader.AddSettlerUpgradeCategory(uc, Entities[et])
@@ -183,10 +188,11 @@ function ModLoader.ApplyManifest()
 	for xp, ec in pairs(ModLoader.Manifest.ExperienceClasses) do
 		CppLogic.ModLoader.AddExperienceClass(xp, ec)
 	end
-	for _,a in ipairs(ModLoader.Manifest.SoundGroups) do
+	for _, a in ipairs(ModLoader.Manifest.SoundGroups) do
 		CppLogic.ModLoader.AddSounds(unpack(a))
 	end
 end
+
 function ModLoader.PreloadManifestType(en, preload, data)
 	for _, k in ipairs(en) do
 		if type(k) == "string" and not data[k] then
@@ -194,13 +200,10 @@ function ModLoader.PreloadManifestType(en, preload, data)
 		end
 	end
 end
-function ModLoader.HandleManifestType(en, add, reload, data)
+
+function ModLoader.HandleManifestType(en, add)
 	for _, k in ipairs(en) do
-		if type(k) == "string" and not data[k] then
-			add(k)
-		else
-			reload(k)
-		end
+		add(k)
 	end
 end
 
@@ -211,5 +214,5 @@ end
 -- ModLoader functions automatically mark data for cleanup, but you might have to do some manual cleanup if you use some other CppLogic functions.
 -- after the automatic cleanup, ModLoader assumes all data to be back in the original state it was loaded from the games bbas.
 function ModLoader.Cleanup()
-	
+
 end

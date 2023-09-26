@@ -364,6 +364,8 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>:
 	EGUIX::TextureManager::GlobalObj()->FreeTexture(id);
 	EGUIX::TextureManager::GlobalObj()->IdManager->RemoveID(static_cast<int>(id));
 }
+template<>
+constexpr bool CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::RegisterFuncPreLoad = false;
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj{};
 
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimationId>::Load(shok::AnimationId id, luaext::EState L) {
@@ -787,8 +789,47 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Un
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj{};
 
+void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Reset()
+{
+	if (ToRemove.size() > 0) {
+		for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
+			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(static_cast<shok::ModelId>(id));
+			// gets reloaded on next use anyway
+		}
+		auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
+		while (ToRemove.size() > 0) {
+			int id = ToRemove.back();
+			ToRemove.pop_back();
+			mng->Data[id]->FreeCache();
+			if (id + 1 == static_cast<int>(mng->Data.size()))
+				mng->PopId(id);
+			else
+				mng->IdManager->RemoveID(id);
+		}
+	}
+}
+void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::SanityCheck()
+{
+}
+void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::RegisterFuncs(luaext::EState L)
+{
+	L.RegisterFunc<Add>("LoadDirectXEffect", -3);
+}
+int CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Add(lua::State L)
+{
+	const char* name = L.CheckString(1);
+	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
+	if (!mng->IdManager->GetIdByName(name))
+		mng->IdManager->GetIDByNameOrCreate(name);
+	auto* s = mng->Get(name);
+	s->FreeCache();
+	s->Get();
+	Obj.ToRemove.push_back(s->Id);
+	return 0;
+}
+CppLogic::ModLoader::ModLoader::DirectXEffectLoader CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj{};
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 18> CppLogic::ModLoader::ModLoader::Loaders{ {
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 19> CppLogic::ModLoader::ModLoader::Loaders{ {
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
@@ -807,6 +848,7 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 18> CppLogic::ModLoa
 			&CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj,
 			&CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj,
+			&CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj,
 	} };
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{ {
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
@@ -814,25 +856,11 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoad
 
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
-std::vector<int> CppLogic::ModLoader::ModLoader::DirectXEffectsToFree{};
 
 int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 {
 	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
-	return 0;
-}
-
-int CppLogic::ModLoader::ModLoader::LoadDirectXEffect(lua::State L)
-{
-	const char* name = L.CheckString(1);
-	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
-	if (!mng->IdManager->GetIdByName(name))
-		mng->IdManager->GetIDByNameOrCreate(name);
-	auto* s = mng->Get(name);
-	s->FreeCache();
-	s->Get();
-	DirectXEffectsToFree.push_back(s->Id);
 	return 0;
 }
 
@@ -927,23 +955,6 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		for (auto* l : Loaders) {
 			l->Reset();
-		}
-
-		if (DirectXEffectsToFree.size() > 0) {
-			for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
-				(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(static_cast<shok::ModelId>(id));
-				// gets reloaded on next use anyway
-			}
-			auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
-			while (DirectXEffectsToFree.size() > 0) {
-				int id = DirectXEffectsToFree.back();
-				DirectXEffectsToFree.pop_back();
-				mng->Data[id]->FreeCache();
-				if (id + 1 == static_cast<int>(mng->Data.size()))
-					mng->PopId(id);
-				else
-					mng->IdManager->RemoveID(id);
-			}
 		}
 
 		Log(L, "Done");

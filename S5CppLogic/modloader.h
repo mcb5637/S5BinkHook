@@ -311,21 +311,29 @@ namespace CppLogic::ModLoader {
 
 			static SoundGroupsLoader Obj;
 		};
+		class DirectXEffectLoader : public DataTypeLoader {
+			std::vector<int> ToRemove;
+		public:
+			virtual void Reset() override;
+			virtual void SanityCheck() override;
+			virtual void RegisterFuncs(luaext::EState L) override;
 
-		static std::array<DataTypeLoader*, 18> Loaders;
+			static int Add(lua::State L);
+
+			static DirectXEffectLoader Obj;
+		};
+
+		static std::array<DataTypeLoader*, 19> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
-		static std::vector<int> DirectXEffectsToFree;
 
 		static int SetEntityTypeToReload(lua::State L);
-		static int LoadDirectXEffect(lua::State L);
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 4> LuaFuncs{ {
+		static constexpr std::array<lua::FuncReference, 3> LuaFuncs{ {
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<LoadDirectXEffect>("LoadDirectXEffect"),
 				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 				lua::FuncReference::GetRef<SanityCheck>("SanityCheck"),
 		} };

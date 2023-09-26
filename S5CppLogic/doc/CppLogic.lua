@@ -2782,17 +2782,13 @@ function CppLogic.UI.AutoScrollCustomWidgetModOffset(id, off) end
 function CppLogic.UI.AutoScrollCustomWidgetSetOffset(id, off) end
 
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
---- the entitytype gets automatically removed on leaving the map.
+--- the entitytype gets automatically removed/reloaded on leaving the map.
 --- load any additional models you want to use first.
---- @param typename string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param typename string|number
 --- @return number type_id
 function CppLogic.ModLoader.AddEntityType(typename) end
-
---- reloads an entitytype from a xml file (data/config/entities/typename.xml).
---- the entitytype gets automatically reloaded on leaving the map (after s5x archives got removed).
---- load any additional models you want to use first.
---- @param tid number
-function CppLogic.ModLoader.ReloadEntityType(tid) end
+CppLogic.ModLoader.ReloadEntityType = CppLogic.ModLoader.AddEntityType
 
 --- assigns an id in the EntityType IdManager. A call to AddEntityType is required before leaving ModLoader.
 --- @param typename string
@@ -2806,17 +2802,13 @@ function CppLogic.ModLoader.PreLoadEntityType(typename) end
 function CppLogic.ModLoader.SetEntityTypeToReload(tid) end
 
 --- loads an effecttype from a xml file (data/config/effects/typename.xml) (not default location).
---- the effecttype gets automatically removed on leaving the map.
+--- the effecttype gets automatically removed/reloaded on leaving the map.
 --- load any additional models you want to use first.
---- @param typename string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param typename string|number
 --- @return number type_id
 function CppLogic.ModLoader.AddEffectType(typename) end
-
---- reloads an effecttype from a xml file (data/config/effects/typename.xml).
---- if you use it, all effect types get reloaded on leaving the map (after s5x archives got removed).
---- load any additional models you want to use first.
---- @param tid number
-function CppLogic.ModLoader.ReloadEffectType(tid) end
+CppLogic.ModLoader.ReloadEffectType = CppLogic.ModLoader.AddEffectType
 
 --- assigns an id in the EffectType IdManager. A call to AddEffectType is required before leaving ModLoader.
 --- @param typename string
@@ -2825,14 +2817,11 @@ function CppLogic.ModLoader.PreLoadEffectType(typename) end
 
 --- loads a task list from a xml file (data/config/tasklists/tlname.xml).
 --- the task list gets automatically removed on leaving the map.
---- @param tlname string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param tlname string|number
 --- @return number type_id
 function CppLogic.ModLoader.AddTaskList(tlname) end
-
---- reloads an task list from a xml file (data/config/tasklists/tlname.xml).
---- all tasklists get reloaded in any case on starting a new map.
---- @param tid number
-function CppLogic.ModLoader.ReloadTaskList(tid) end
+CppLogic.ModLoader.ReloadTaskList = CppLogic.ModLoader.AddTaskList
 
 --- assigns an id in the TaskList IdManager. A call to AddTaskList is required before leaving ModLoader.
 --- @param typename string
@@ -2841,14 +2830,11 @@ function CppLogic.ModLoader.PreLoadTaskList(typename) end
 
 --- loads a technology from a xml file (data/config/technologies/tname.xml).
 --- the tech gets automatically removed on leaving the map.
---- @param tname string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param tname string|number
 --- @return number type_id
 function CppLogic.ModLoader.AddTechnology(tname) end
-
---- reloads a technology from a xml file (data/config/technologies/tname.xml).
---- all technologies get reloaded in any case on starting a new map.
---- @param tid number
-function CppLogic.ModLoader.ReloadTechnology(tid) end
+CppLogic.ModLoader.ReloadTechnology = CppLogic.ModLoader.AddTechnology
 
 --- assigns an id in the Technologies IdManager. A call to AddTechnology is required before leaving ModLoader.
 --- @param typename string
@@ -2859,114 +2845,119 @@ function CppLogic.ModLoader.PreLoadTechnology(typename) end
 --- the xml contains the data from Models.xml, the dff is the actual model.
 --- also loads all required textures (remember to put the 3 thexture sizes into the correct folders).
 --- the model gets automatically removed on leaving the map.
---- @param mname string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param mname string|number
 --- @return number type_id
 function CppLogic.ModLoader.AddModel(mname) end
+CppLogic.ModLoader.ReloadModel = CppLogic.ModLoader.AddModel
 
---- reloads a model from a xml and dff file (data/config/models/mname.xml and data/graphics/models/mname.dff).
---- the xml contains the data from Models.xml, the dff is the actual model.
---- also loads all required textures (remember to put the 3 thexture sizes into the correct folders).
---- the model gets automatically reloaded on leaving the map (after s5x archives got removed).
---- @param mid number
-function CppLogic.ModLoader.ReloadModel(mid) end
+--- assigns an id in the Models IdManager. A call to AddModel is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadModel(typename) end
 
 --- loads a gui texture from a png file (data/graphics/textures/gui/tname.png).
 --- the texture gets automatically removed on leaving the map.
+--- (different to other reload funcs in ModLoader, this one takes the name (full path) of the texture instead of its id as parameter).
 --- note: this is similar to CppLogic.UI.PreLoadGUITexture, just that the texture gets cleaned up.
 --- this function is available after ModLoader finishes.
 --- @param tname string full path to texture
 --- @return number type_id
 function CppLogic.ModLoader.AddGUITexture(tname) end
-
---- reloads a gui texture from a png file (data/graphics/textures/gui/tname.png).
---- the texture gets automatically reloaded on leaving the map (after s5x archives got removed).
---- (different to other reload funcs in ModLoader, this one takes the name (full path) of the texture instead of its id as parameter).
---- this function is available after ModLoader finishes.
---- @param tname string full path to texture
-function CppLogic.ModLoader.ReloadGUITexture(tname) end
+CppLogic.ModLoader.ReloadGUITexture = CppLogic.ModLoader.AddGUITexture
 
 --- loads an animation from an anm file (data/graphics/animations/aname.anm).
 --- the animation gets automatically removed on leaving the map.
 --- only writes the id to Animations if it exists.
---- @param aname string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param aname string|number
 --- @return number type_id
 function CppLogic.ModLoader.AddAnimation(aname) end
+CppLogic.ModLoader.ReloadAnimation = CppLogic.ModLoader.AddAnimation
 
---- reloads an animation from an anm file (data/graphics/animations/aname.anm).
---- the animation gets automatically reloaded on leaving the map (after s5x archives got removed).
---- use CppLogic.API.CreateExtraDataTables to get the Animations table with all ids.
---- @param aid number
-function CppLogic.ModLoader.ReloadAnimation(aid) end
+--- assigns an id in the Animations IdManager. A call to AddAnimation is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadAnimation(typename) end
 
 --- adds a settler upgradecategory. to create a upgradecategory, fill in the Upgrade xml entry in the entities, but leave out Category.
 --- then call this function with the upgradecategory and the first entitytype. (this will fill in the missing Category).
 --- @param ucatname string
---- @param firstid number
+--- @param firstid number|string
 --- @return number type_id
 function CppLogic.ModLoader.AddSettlerUpgradeCategory(ucatname, firstid) end
 
 --- adds a building upgradecategory. to create a upgradecategory, fill in the Upgrade xml entry in the entities, but leave out Category.
 --- then call this function with the upgradecategory and the first entitytype. (this will fill in the missing Category).
 --- @param ucatname string
---- @param firstid number
+--- @param firstid number|string
 --- @return number type_id
 function CppLogic.ModLoader.AddBuildingUpgradeCategory(ucatname, firstid) end
+
+--- assigns an id in the UpgradeCategory IdManager. A call to AddSettlerUpgradeCategory or AddBuildingUpgradeCategory is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadUpgradeCategory(typename) end
 
 --- loads a selection texture file (data/graphics/textures/tname.dds).
 --- the texture name is referenced in the additional model data.
 --- remember to put the 3 texture sizes into the correct folders.
 --- the texture gets removed on leaving the map.
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
 --- @param tname string
 function CppLogic.ModLoader.AddSelectionTexture(tname) end
+CppLogic.ModLoader.ReloadSelectionTexture = CppLogic.ModLoader.AddSelectionTexture
 
---- reloads a selection texture file (data/graphics/textures/tname.dds).
---- remember to put the 3 texture sizes into the correct folders.
---- the texture gets reloaded on leaving the map.
---- @param tname string
-function CppLogic.ModLoader.ReloadSelectionTexture(tname) end
+--- assigns an id in the SelectionTextures IdManager. A call to AddSelectionTexture is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadSelectionTexture(typename) end
 
 --- loads a water type from a xml file (data/config/watertypes/wname.xml).
 --- all water types get reloaded on exiting the map, after using this function.
 --- you may request a specific id, or get one automatically by passing 0.
 --- if you request a specific id and it does already exist, throws.
 --- only writes the id to WaterTypes if it exists.
---- @param wname string
---- @param id number|nil optional id, default == 0
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param wname string|number
 --- @return number type_id
-function CppLogic.ModLoader.AddWaterType(wname, id) end
+function CppLogic.ModLoader.AddWaterType(wname) end
+CppLogic.ModLoader.ReloadWaterType = CppLogic.ModLoader.AddWaterType
 
---- reloads a water type from a xml file (data/config/watertypes/wname.xml).
---- all water types get reloaded on exiting the map, after using this function.
---- @param id number
-function CppLogic.ModLoader.ReloadWaterType(id) end
+--- assigns an id in the WaterType IdManager. A call to AddWaterType is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadWaterType(typename) end
 
 --- loads a terrain texture file (data/graphics/textures/tname.xml).
 --- the texture name is referenced in water and terrain types.
 --- remember to put the 3 texture sizes into the correct folders.
 --- the texture gets removed on leaving the map.
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
 --- @param tname string
 function CppLogic.ModLoader.AddTerrainTexture(tname) end
+CppLogic.ModLoader.ReloadTerrainTexture = CppLogic.ModLoader.AddTerrainTexture
 
---- reloads a terrain texture file (data/graphics/textures/tname.xml).
---- remember to put the 3 texture sizes into the correct folders.
---- the texture gets reloaded on leaving the map.
---- @param tname string
-function CppLogic.ModLoader.ReloadTerrainTexture(tname) end
+--- assigns an id in the TerrainTexture IdManager. A call to AddTerrainTexture is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadTerrainTexture(typename) end
 
 --- loads a terrain type from a xml file (data/config/terraintypes/tname.xml).
 --- all terrain types get reloaded on exiting the map, after using this function.
 --- you may request a specific id, or get one automatically by passing 0.
 --- if you request a specific id and it does already exist, throws.
 --- only writes the id to TerrainTypes if it exists.
---- @param tname string
---- @param id number|nil optional id, default == 0
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param tname string|number
 --- @return number type_id
-function CppLogic.ModLoader.AddTerrainType(tname, id) end
+function CppLogic.ModLoader.AddTerrainType(tname) end
+CppLogic.ModLoader.ReloadTerrainType = CppLogic.ModLoader.AddTerrainType
 
---- reloads a terrain type from a xml file (data/config/terraintypes/tname.xml).
---- all terrain types get reloaded on exiting the map, after using this function.
---- @param id number
-function CppLogic.ModLoader.ReloadTerrainType(id) end
+--- assigns an id in the TerrainType IdManager. A call to AddTerrainType is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadTerrainType(typename) end
 
 --- loads an ExperienceClass from a xml file (data/config/experiencexpclassname.xml).
 --- assigns this experienceclass to every entity that has the category ecategory.
@@ -2974,14 +2965,10 @@ function CppLogic.ModLoader.ReloadTerrainType(id) end
 --- (ecategory may be a random int that can get attached to entitytypes via CppLogic.EntityType.AddEntityCategory, just remember to remove it again).
 --- only writes the id to ExperienceClasses if it exists.
 --- @param xpclassname string
---- @param ecategory number
+--- @param ecategory number|string
 --- @return number type_id
 function CppLogic.ModLoader.AddExperienceClass(xpclassname, ecategory) end
-
---- reloads an ExperienceClass from a xml file (data/config/experiencexpclassname.xml).
---- the ExperienceClass is reloaded on exiting the map.
---- @param id number
-function CppLogic.ModLoader.ReloadExperienceClass(id) end
+CppLogic.ModLoader.ReloadExperienceClass = CppLogic.ModLoader.AddExperienceClass
 
 --- loads multiple sounds from multiple files (data/sounds/soundname.wav).
 --- the sounds get reloaded any time they get started, so you have to keep the archive loaded.
@@ -2994,14 +2981,16 @@ function CppLogic.ModLoader.AddSounds(soundname, ...) end
 
 --- loads an AnimSet from a xml file (data/config/animsets/setname.xml).
 --- the AnimSet gets automatically removed when exiting the map.
---- @param setname string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param setname string|number
 --- @return number type_id
 function CppLogic.ModLoader.AddAnimSet(setname) end
+CppLogic.ModLoader.ReloadAnimSet = CppLogic.ModLoader.AddAnimSet
 
---- reloads an AnimSet from a xml file (data/config/animsets/setname.xml).
---- the AnimSet is reloaded on exiting the map.
---- @param id number
-function CppLogic.ModLoader.ReloadAnimSet(id) end
+--- assigns an id in the AnimationSets IdManager. A call to AddAnimSet is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadAnimSet(typename) end
 
 --- loads or reloads a DirectX effect (shader pair) from a fx file (data/graphics/effects/ename.fx and data/graphics/effects/ffp/ename.fx).
 --- the effect gets automatically removed when exiting the map.
@@ -3014,9 +3003,27 @@ function CppLogic.ModLoader.LoadDirectXEffect(ename) end
 function CppLogic.ModLoader.PreLoadArmorClass(ac) end
 
 --- creates or replaces a DamageClass with a serialized lua table. (see data_notes.txt for format)
---- @param dc string
+--- for existing ids you may use the id or the name, for new ones you need to use the name.
+--- @param dc string|number
 --- @param cfg table
 function CppLogic.ModLoader.AddDamageClass(dc, cfg) end
+CppLogic.ModLoader.ReloadDamageClass = CppLogic.ModLoader.AddDamageClass
+
+--- assigns an id in the DamageClasses IdManager. A call to AddDamageClass is required before leaving ModLoader.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadDamageClass(typename) end
+
+--- assigns an id in the EntityCategory IdManager.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadEntityCategory(typename) end
+
+--- refreshes the entitycategory->entitytype cache.
+function CppLogic.ModLoader.RefreshEntityCategoryCache() end
+
+--- does some checks for the most common usage errors (as far as reasonable).
+function CppLogic.ModLoader.SanityCheck() end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

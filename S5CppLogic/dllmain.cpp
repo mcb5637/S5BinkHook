@@ -295,9 +295,9 @@ int Test(lua::State Ls) {
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	L.NewTable();
-	auto mng = CppLogic::GetIdManager<shok::ClassId>();
+	auto mng = CppLogic::GetIdManager<shok::PrincipalTaskId>();
 	for (auto id : mng) {
-		L.Push(static_cast<int>(static_cast<unsigned int>(id)));
+		L.Push(id);
 		L.Push(mng.GetNameByID(id));
 		L.SetTableRaw(-3);
 	}

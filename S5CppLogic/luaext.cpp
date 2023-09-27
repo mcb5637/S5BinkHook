@@ -30,7 +30,7 @@ EGL::CGLEEntity* luaext::EState::OptEntity(int i)
 	else if (IsNumber(i)) {
 		id = static_cast<shok::EntityId>(ToInteger(i));
 	}
-	if (id == static_cast<shok::EntityId>(0))
+	if (id == shok::EntityId::Invalid)
 		return nullptr;
 	return EGL::CGLEEntity::GetEntityByID(id);
 }

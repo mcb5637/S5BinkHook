@@ -19,7 +19,7 @@ namespace EGL {
 	class CGLEBehavior : public BB::IObject { // no vtable
 	public:
 		int SlotIndex = 0;
-		shok::EntityId EntityId = static_cast<shok::EntityId>(0);
+		shok::EntityId EntityId = shok::EntityId::Invalid;
 		EGL::CGLEBehaviorProps* PropPointer = nullptr; // 3, warning this may not be set
 
 	protected:

@@ -208,7 +208,7 @@ void __thiscall GGL::CRangedEffectAbility::AdvHealAffected()
 			if (!toheal)
 				return;
 			float heal = toheal->GetMaxHealth() * hpfact;
-			if (ecr.EffectType != static_cast<shok::EffectTypeId>(0)) {
+			if (ecr.EffectType != shok::EffectTypeId::Invalid) {
 				ecr.StartPos.X = toheal->Position.X;
 				ecr.StartPos.Y = toheal->Position.Y;
 				(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ecr);
@@ -354,7 +354,7 @@ int __thiscall GGL::CSniperAbility::TaskOverrideSnipe(EGL::CGLETaskArgs* a)
 	cr.TargetID = tar->EntityId;
 	cr.Damage = dmg;
 	cr.DamageRadius = -1;
-	cr.DamageClass = static_cast<shok::DamageClassId>(0);
+	cr.DamageClass = shok::DamageClassId::Invalid;
 	cr.SourcePlayer = thent->PlayerId;
 	cr.AdvancedDamageSourceOverride = static_cast<byte>(shok::AdvancedDealDamageSource::AbilitySnipe);
 	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
@@ -724,7 +724,7 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	{
-		if (shok::EntityId id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING); id != static_cast<shok::EntityId>(0)) {
+		if (shok::EntityId id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING); id != shok::EntityId::Invalid) {
 			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
 				if (GGL::CBuilding* b = dynamic_cast<GGL::CBuilding*>(t)) {
 					int dmg;
@@ -743,7 +743,7 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 		}
 	}
 	{
-		if (shok::EntityId id = e->GetFirstAttachedToMe(shok::AttachmentType::DISARMING_THIEF_KEG); id != static_cast<shok::EntityId>(0)) {
+		if (shok::EntityId id = e->GetFirstAttachedToMe(shok::AttachmentType::DISARMING_THIEF_KEG); id != shok::EntityId::Invalid) {
 			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
 				if (t->Position.IsInRange(e->Position, 3)) {
 					t->AdvancedHurtEntityBy(e, t->Health, shok::PlayerId::P0, true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
@@ -940,7 +940,7 @@ int __thiscall GGL::CWorkerBehavior::DoWorkEvents(GGL::CBuilding* b, EGL::CGLETa
 		return 0;
 	}
 	shok::TechnologyId tech = b->GetTechnologyInResearch();
-	if (tech != static_cast<shok::TechnologyId>(0)) {
+	if (tech != shok::TechnologyId::Invalid) {
 		(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId)->TechnologyStates.AddTechProgressWorker(tech, BehaviorProps2->AmountResearched);
 	}
 	else {
@@ -1110,7 +1110,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 	if (tar == nullptr)
 		return 0;
 	auto* p = ACProps;
-	if (p->CannonBallEffectType != static_cast<shok::EffectTypeId>(0)) {
+	if (p->CannonBallEffectType != shok::EffectTypeId::Invalid) {
 		CProjectileEffectCreator ct{};
 		ct.EffectType = p->CannonBallEffectType;
 		ct.PlayerID = e->PlayerId;
@@ -1138,7 +1138,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 	}
 	else {
 		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, p->DamageRange, GetDamage(), e->PlayerId, p->DamageClass, true, true, true, shok::AdvancedDealDamageSource::Cannonball);
-		if (p->ImpactEffectType != static_cast<shok::EffectTypeId>(0)) {
+		if (p->ImpactEffectType != shok::EffectTypeId::Invalid) {
 			EGL::CGLEEffectCreator ct{};
 			ct.EffectType = p->ImpactEffectType;
 			ct.StartPos = e->Position;
@@ -1151,7 +1151,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 		if (ShotsLeft == 0) {
 			e->Hurt(e->Health);
 			e->EntityState = static_cast<shok::EntityStaus>(0x10003);
-			if (p->SelfDestructTaskList != static_cast<shok::TaskListId>(0)) {
+			if (p->SelfDestructTaskList != shok::TaskListId::Invalid) {
 				e->SetTaskList(p->SelfDestructTaskList);
 				return 2;
 			}

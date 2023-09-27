@@ -48,16 +48,16 @@ namespace EGL {
 	public:
 
 		struct modeldata {
-			shok::EntityId EntityID = static_cast<shok::EntityId>(0);
-			shok::EntityTypeId EntityType = static_cast<shok::EntityTypeId>(0);
-			shok::ModelId ModelOverride = static_cast<shok::ModelId>(0);
+			shok::EntityId EntityID = shok::EntityId::Invalid;
+			shok::EntityTypeId EntityType = shok::EntityTypeId::Invalid;
+			shok::ModelId ModelOverride = shok::ModelId::Invalid;
 			shok::Position Pos{};
 		};
 		struct playermodeldata {
-			shok::EntityTypeId EntityType = static_cast<shok::EntityTypeId>(0);
-			shok::EntityId EntityID = static_cast<shok::EntityId>(0);
-			shok::PlayerId Player = static_cast<shok::PlayerId>(0);
-			shok::ModelId ModelOverride = static_cast<shok::ModelId>(0);
+			shok::EntityTypeId EntityType = shok::EntityTypeId::Invalid;
+			shok::EntityId EntityID = shok::EntityId::Invalid;
+			shok::PlayerId Player = shok::PlayerId::Invalid;
+			shok::ModelId ModelOverride = shok::ModelId::Invalid;
 		};
 		struct posdata {
 			shok::PositionRot Pos{};
@@ -715,14 +715,14 @@ namespace GGL {
 namespace EGL {
 	class CGLEEntityCreator : public BB::IObject {
 	public:
-		shok::EntityTypeId EntityType = static_cast<shok::EntityTypeId>(0);
+		shok::EntityTypeId EntityType = shok::EntityTypeId::Invalid;
 		shok::PositionRot Pos = { 0,0,0 };
 		int Flags = 0; // 5
-		shok::PlayerId PlayerId = static_cast<shok::PlayerId>(0);
+		shok::PlayerId PlayerId = shok::PlayerId::Invalid;
 		int Health = 0; // 7
 		char* ScriptName = nullptr; // use shok::Malloc, gets freed by destructor
 		char* ScriptCommandLine = nullptr; // use shok::Malloc, gets freed by destructor
-		shok::AmbientSoundId AmbientSoundType = static_cast<shok::AmbientSoundId>(0);
+		shok::AmbientSoundId AmbientSoundType = shok::AmbientSoundId::Invalid;
 		float Scale = 0; // 11
 
 		static inline constexpr int vtp = 0x766B50;
@@ -744,7 +744,7 @@ namespace EGL {
 namespace GGL {
 	class CGLConstructionSiteCreator : public EGL::CGLEEntityCreator {
 	public:
-		shok::EntityTypeId BuildingType = static_cast<shok::EntityTypeId>(0); // set EntityType to construction site type (from building props) and BuildingType to the building youactually want to construct
+		shok::EntityTypeId BuildingType = shok::EntityTypeId::Invalid; // set EntityType to construction site type (from building props) and BuildingType to the building you actually want to construct
 
 		static inline constexpr int vtp = 0x770114;
 		static inline constexpr int TypeDesc = 0x811A80;

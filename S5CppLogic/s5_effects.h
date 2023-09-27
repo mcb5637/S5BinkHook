@@ -6,8 +6,8 @@ namespace EGL {
 	class IEffectDisplay {
 	public:
 		struct TypeAndID {
-			shok::EffectTypeId EffectType = static_cast<shok::EffectTypeId>(0);
-			shok::EffectId EffectID = static_cast<shok::EffectId>(0);
+			shok::EffectTypeId EffectType = shok::EffectTypeId::Invalid;
+			shok::EffectId EffectID = shok::EffectId::Invalid;
 		};
 		struct TurnDurationAndPos {
 			int StartTurn = 0;
@@ -160,20 +160,20 @@ namespace GGL {
 namespace EGL {
 	class CGLEEffectCreator : public BB::IObject {
 	public:
-		shok::EffectTypeId EffectType = static_cast<shok::EffectTypeId>(0);
+		shok::EffectTypeId EffectType = shok::EffectTypeId::Invalid;
 	private:
 		int Zero1 = 0;
 	public:
-		shok::PlayerId PlayerID = static_cast<shok::PlayerId>(0);
+		shok::PlayerId PlayerID = shok::PlayerId::Invalid;
 		shok::Position StartPos = { 0,0 }, CurrentPos = { 0,0 }, TargetPos = { 0,0 };
 	private:
 		int Zero2 = 0; // height offset unused
 	public:
-		shok::EntityId AttackerID = static_cast<shok::EntityId>(0), TargetID = static_cast<shok::EntityId>(0);
+		shok::EntityId AttackerID = shok::EntityId::Invalid, TargetID = shok::EntityId::Invalid;
 		int Damage = 0; // 13
 		float DamageRadius = 0;
-		shok::DamageClassId DamageClass = static_cast<shok::DamageClassId>(0); // unused
-		shok::PlayerId SourcePlayer = static_cast<shok::PlayerId>(0); // 16
+		shok::DamageClassId DamageClass = shok::DamageClassId::Invalid; // unused
+		shok::PlayerId SourcePlayer = shok::PlayerId::Invalid; // 16
 		bool Misses = false; // 17
 	private:
 		bool Zero5[2] = { false, false };

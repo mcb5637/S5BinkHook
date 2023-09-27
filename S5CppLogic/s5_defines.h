@@ -387,6 +387,13 @@ namespace shok {
 		Invalid = -1,
 		P0 = 0,
 		P1 = 1,
+		P2 = 2,
+		P3 = 3,
+		P4 = 4,
+		P5 = 5,
+		P6 = 6,
+		P7 = 7,
+		P8 = 8,
 	};
 	enum class EntityId : int {
 		Invalid = 0,
@@ -425,6 +432,105 @@ namespace shok {
 		Invalid = 0,
 	};
 	enum class EntityTypeId : int {
+		Invalid = 0,
+	};
+	enum class ArmorClassId : int {
+		Invalid = 0,
+		ArmorClassNone = 1,
+		ArmorClassJerkin = 2,
+		ArmorClassLeather = 3,
+		ArmorClassIron = 4,
+		ArmorClassFortification = 5,
+		ArmorClassHero = 6,
+		ArmorClassFur = 7,
+	};
+	enum class DamageClassId : int {
+		Invalid = 0,
+		DC_Strike = 1,
+		DC_Pierce = 2,
+		DC_Chaos = 3,
+		DC_Siege = 4,
+		DC_Hero = 5,
+		DC_Evil = 6,
+		DC_Bullet = 7,
+	};
+	enum class TechnologyCategoryId : int {
+		Invalid = 0,
+	};
+	enum class AbilityId : int {
+		Invalid = 0,
+		AbilitySendHawk = 1,
+		AbilityPlaceBomb = 2,
+		AbilityBuildCannon = 3,
+		AbilitySummon = 4,
+		AbilityCamouflage = 5,
+		AbilityRangedEffect = 6,
+		AbilityCircularAttack = 7,
+		AbilityInflictFear = 8,
+		AbilityConvertBuildings = 9,
+		AbilityConvertSettlers = 10,
+		AbilityScoutTorches = 12,
+		AbilityScoutBinoculars = 11,
+		AbilityScoutFindResources = 13,
+		AbilitySniper = 14,
+		AbilityShuriken = 15,
+		AbilityPlaceKeg = 16,
+		AbilityMotivateWorkers = 17,
+	};
+	enum class SoundId : int {
+		Invalid = 0,
+	};
+	enum class AmbientSoundId : int {
+		Invalid = 0,
+	};
+	enum class FeedbackStateId : int {
+		Invalid = 0,
+	};
+	enum class PrincipalTaskId : int {
+		Invalid = 0,
+		Work = 1,
+		Idle = 2,
+		Eat = 3,
+		Rest = 4,
+		Leave = 5,
+	};
+	enum class AnimationCategoryId : int {
+		Invalid = 0,
+	};
+	enum class AnimSetId : int {
+		Invalid = 0,
+	};
+	enum class EffectTypeId : int {
+		Invalid = 0,
+	};
+	enum class BlessCategoryId : int {
+		Invalid = 0,
+	};
+	enum class WeatherEffectTextureId : int {
+		Invalid = 0,
+	};
+	enum class TerrainTypeId : int {
+		Invalid = 0,
+	};
+	enum class TerrainTextureId : int {
+		Invalid = 0,
+	};
+	enum class WaterTypeId : int {
+		Invalid = 0,
+	};
+	enum class ShorewaveTypeId : int {
+		Invalid = 0,
+	};
+	enum class WeatherGFXSet : int {
+		Invalid = 0,
+	};
+	enum class TriggerId : unsigned int {
+		Invalid = 0,
+	};
+	enum class SelectionTextureId : int {
+		Invalid = 0,
+	};
+	enum class EffectId : int {
 		Invalid = 0,
 	};
 }

@@ -35,7 +35,7 @@ EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetCurrentBase(const 
 CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p)
 	: ManagedIterator<EGL::CGLEEntity>(p)
 {
-	static constexpr auto ip = static_cast<shok::PlayerId>(-1);
+	static constexpr auto ip = shok::PlayerId::Invalid;
 	Players = { ip,ip,ip ,ip ,ip ,ip ,ip ,ip ,ip };
 }
 CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<shok::PlayerId> pls)
@@ -50,7 +50,7 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(Enti
 	int base;
 	int pl;
 	if (c.EntityIndex == -1) {
-		if (Players[0] <= static_cast<shok::PlayerId>(0))
+		if (Players[0] <= shok::PlayerId::P0)
 			return nullptr;
 		base = 0;
 		pl = 0;
@@ -65,7 +65,7 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(Enti
 			++pl;
 			if (pl >= 9)
 				return nullptr;
-			if (Players[pl] >= static_cast<shok::PlayerId>(0)) {
+			if (Players[pl] >= shok::PlayerId::P0) {
 				ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(Players[pl])->PlayerAttractionHandler;
 				if (ah->EntityInSystem.size() > 0)
 					break;
@@ -255,7 +255,7 @@ bool CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite::Matche
 bool CppLogic::Iterator::EntityPredicateIsCombatRelevant::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	const auto id = e->GetClassIdentifier();
-	return e->PlayerId != static_cast<shok::PlayerId>(0)
+	return e->PlayerId != shok::PlayerId::P0
 		&& (id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier || id == GGL::CConstructionSite::Identifier || id == GGL::CSettler::Identifier);
 }
 bool CppLogic::Iterator::EntityPredicateIsNotSoldier::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
@@ -275,12 +275,12 @@ bool CppLogic::Iterator::EntityPredicateIsAlive::Matches(const EGL::CGLEEntity* 
 }
 bool CppLogic::Iterator::EntityPredicateIsNotInBuilding::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	return e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) == static_cast<shok::EntityId>(0) && e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE) == static_cast<shok::EntityId>(0);
+	return e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) == shok::EntityId::Invalid && e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE) == shok::EntityId::Invalid;
 }
 
 CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer()
 {
-	static constexpr auto ip = static_cast<shok::PlayerId>(-1);
+	static constexpr auto ip = shok::PlayerId::Invalid;
 	players = { ip,ip,ip ,ip ,ip ,ip ,ip ,ip ,ip };
 }
 CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer(std::initializer_list<shok::PlayerId> pl) : EntityPredicateOfAnyPlayer()

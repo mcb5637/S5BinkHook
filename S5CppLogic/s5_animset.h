@@ -16,7 +16,7 @@ namespace EGL {
 
 	class CGLEAnimSet : public BB::IObject {
 	public:
-		shok::AnimSetId Id = static_cast<shok::AnimSetId>(0);
+		shok::AnimSetId Id = shok::AnimSetId::Invalid;
 		shok::Vector<CGLEAnimCategory*> Anims;
 
 

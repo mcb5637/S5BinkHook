@@ -110,7 +110,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 	auto* mng = EGUIX::WidgetManager::GlobalObj();
 	if (Widgets.empty()) {
 		auto id = mng->GetIdByName(StringUserVariable[1].c_str());
-		if (id == static_cast<shok::WidgetId>(0))
+		if (id == shok::WidgetId::Invalid)
 			return;
 		auto* w = mng->GetWidgetByID(id);
 		if (w == nullptr)
@@ -127,7 +127,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 		}
 
 		id = mng->GetIdByName(StringUserVariable[0].c_str());
-		if (id == static_cast<shok::WidgetId>(0)) {
+		if (id == shok::WidgetId::Invalid) {
 			Slider = mng->GetWidgetByID(id);
 			if (Slider) {
 				SliderTravel = mng->GetWidgetByID(Slider->MotherWidgetID);

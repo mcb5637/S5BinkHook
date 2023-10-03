@@ -323,6 +323,16 @@ namespace EGL {
 		static inline constexpr int vtp = 0x7743CC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x89C73967);
 	};
+
+	class CEventIndexAndEffectType : public BB::CEvent {
+	public:
+		int Index;
+		shok::EffectTypeId EffectType = shok::EffectTypeId::Invalid;
+
+
+		static inline constexpr int vtp = 0x78554C;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x929AD507);
+	};
 }
 
 namespace GGL {
@@ -482,7 +492,6 @@ namespace GGL {
 // EGUIX::CEventUpdateTime
 // EGUIX::CGroupEvent
 // EGL::CEvent1Effect
-// EGL::CEventIndexAndEffectType
 
 // GGL::CEventEntityAttachment
 // GGL::CEventAttachmentType

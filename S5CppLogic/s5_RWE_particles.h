@@ -437,6 +437,9 @@ namespace RWE::Particles {
 		RpPrtStdEmitterPrtMatrix* GetMatrix();
 		Ex_CircularEmitter* GetCircularEmitter();
 		Ex_FogEmitter* GetFogEmitter();
+
+		static inline const RpPrtStdEmitterCallBack* DisableAll = reinterpret_cast<RpPrtStdEmitterCallBack*>(0x720028);
+		static inline const RpPrtStdEmitterCallBack* EnableAll = reinterpret_cast<RpPrtStdEmitterCallBack*>(0x72001F);
 	private:
 		void* GetDataById(RpPrtStdPropertyTable::Properties p);
 	};

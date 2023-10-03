@@ -113,6 +113,7 @@ namespace RWE {
 	typedef RpClump* (*RpClumpCallBack)(RpClump* clump, void* data);
 	typedef RpAtomic* (*RpAtomicCallBack)(RpAtomic* atomic, void* data);
 	typedef RwFrame* (*RwFrameCallBack)(RwFrame* frame, void* data);
+	typedef RwObject* (*RwObjectCallBack)(RwObject* object, void* data);
 
 	struct RwFrame {
 		RwObject object;
@@ -124,7 +125,7 @@ namespace RWE {
 		RwMatrix ltm;
 	public:
 
-		RwLinkList objectList;
+		RwLinkList objectList; // 36
 
 		RwFrame* child;
 		RwFrame* next;
@@ -144,12 +145,15 @@ namespace RWE {
 		RwFrame* Translate(const RwV3d* translation, RwOpCombineType combineOp);
 		// returns this
 		RwFrame* ForAllChildren(RwFrameCallBack callBack, void* data);
+		// returns this
+		RwFrame* ForAllObjects(RwObjectCallBack callBack, void* data);
+		RpAtomic* GetFirstAtomic();
 		RWE::Anim::RpHAnimHierarchy* GetAnimFrameHandler();
 		RwMatrix* GetLTM();
 		static inline RwFrame* (__cdecl* const Create)() = reinterpret_cast<RwFrame * (__cdecl*)()>(0x413F10);
 		void Destroy();
 	};
-	//constexpr int i = offsetof(RwFrame, root)/4;
+	//constexpr int i = offsetof(RwFrame, objectList)/4;
 
 	struct RwObjectHasFrame {
 		RwObject object;

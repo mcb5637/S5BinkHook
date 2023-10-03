@@ -390,7 +390,7 @@ namespace RWE::Anim {
 		RwMatrix* pMatrixArray;   /**< Pointer to node matrices*/
 		void* pMatrixArrayUnaligned; /**< Pointer to memory used for node matrices
 													* from which the aligned pMatrixArray is allocated */
-		RpHAnimNodeInfo* pNodeInfo;     /**< Array of node information (push/pop flags etc) */
+		RpHAnimNodeInfo* pNodeInfo;     /**< 4 Array of node information (push/pop flags etc) */
 		RwFrame* parentFrame;    /**< Pointer to the Root RwFrame of the hierarchy this
 											   * RpHAnimHierarchy represents */
 		RpHAnimHierarchy* parentHierarchy;                       /**< Internal use */
@@ -402,9 +402,12 @@ namespace RWE::Anim {
 		RpHAnimHierarchy* Clone();
 		void Destroy();
 		void UpdateMatrices();
+		int IDGetIndex(int id) const;
+		RwFrame* GetFromIndex(int idx);
 
 		void SetupForModel(RWE::RpClump* c);
 	};
 	template<>
 	class ::enum_is_flags<RpHAnimHierarchy::RpHAnimHierarchyFlag> : public std::true_type {};
+	//constexpr int i = offsetof(RpHAnimHierarchy, pNodeInfo) / 4;
 }

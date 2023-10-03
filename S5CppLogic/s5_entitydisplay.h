@@ -21,21 +21,47 @@ namespace ED {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x162356CD);
 	};
 
+	class CEffectParticleSystem;
 	class CParticleEffectAttachmentBehavior : public ED::IBehavior {
 	public:
+		struct SAttach {
+			shok::ModelId Model;
+			int FrameId; // hardcoded 500 to 502
+			PADDING(1); // bool?
+			PADDING(3);
+			ED::CEffectParticleSystem* Attached;
+
+			// clear 0x719F35 __thiscall()
+			// attach 0x4881A0 __thiscall(ED::CEntity*, shok::ModelId, int frameid)
+		} Attach[3];
+		ED::CEntity* EntityDisplay = nullptr;
+		EGL::TSlot<EGL::SSlotArgsParticleEffectAttachment, -803571449>* Slot; //14
 
 		static inline constexpr int vtp = 0x7AE93C;
 		static inline constexpr int TypeDesc = 0x84D01C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2DB43D17);
 	};
+	static_assert(sizeof(CParticleEffectAttachmentBehavior::SAttach) == 16);
+	static_assert(offsetof(CParticleEffectAttachmentBehavior, EntityDisplay) == 13 * 4);
+	static_assert(sizeof(CParticleEffectAttachmentBehavior) == 15 * 4);
 
 	class CParticleEffectSwitchBehavior : public ED::IBehavior {
 	public:
+		unsigned int PrevOnOffBits;
+		ED::CEntity* EntityDisplay = nullptr; // 2
+		EGL::TSlot<EGL::SSlotArgsParticleEffectSwitch, 591789671>* Slot;
 
 		static inline constexpr int vtp = 0x7AE964;
 		static inline constexpr int TypeDesc = 0x84D050;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD6E2E097);
+
+		// uses frames [100,131] (if existing)
+		// getAtomicEmitterOfFrame 0x720031 __thiscall(int frameid)
+		// disable 0x7200DE __thiscall(int frameid)
+		// enable 0x7200C2 __thiscall(int frameid)
 	};
+	static_assert(offsetof(CParticleEffectSwitchBehavior, EntityDisplay) == 2 * 4);
+	static_assert(sizeof(CParticleEffectSwitchBehavior) == 4 * 4);
 
 	class CDisplayBehaviorWaterfallAnimation : public ED::IBehavior {
 	public:
@@ -117,13 +143,13 @@ namespace ED {
 	public:
 		virtual void __stdcall OnRenderUpdate(int tick, float seconds) = 0; // tick seems to be logic ticks, seconds in gametime (ticks/10)
 	private:
-		virtual void UnknownEDisplayFunc1() = 0; // maybe update something
+		virtual void UnknownEDisplayFunc1() = 0; // 5 maybe update something
 		virtual bool UnknownEDisplayFunc2(void*) = 0; // get some data to pointer, return bool?
 		virtual void UnknownEDisplayFunc3() = 0;
 		virtual void UnknownEDisplayFunc4() = 0;
 		virtual void UnknownEDisplayFunc5(float) = 0; // stdcall? set some float?
-		virtual int UnknownEDisplayFunc6() = 0; // empty func, ret 0
 	public:
+		virtual RWE::Anim::RpHAnimHierarchy* GetAnimHierarchy() = 0; // 10
 		virtual void __stdcall SetPositionData(EGL::IEntityDisplay::posdata* data) = 0;
 	private:
 		virtual float UnknownEDisplayFunc7() = 0; // return some float

@@ -61,6 +61,15 @@ void RWE::Anim::RpHAnimHierarchy::UpdateMatrices()
 {
     animhier_updatemat(this);
 }
+static inline int(__cdecl* const animhier_idgetindex)(const RWE::Anim::RpHAnimHierarchy* th, int id) = reinterpret_cast<int(__cdecl*)(const RWE::Anim::RpHAnimHierarchy*, int)>(0x6EBC00);
+int RWE::Anim::RpHAnimHierarchy::IDGetIndex(int id) const
+{
+    return animhier_idgetindex(this, id);
+}
+RWE::RwFrame* RWE::Anim::RpHAnimHierarchy::GetFromIndex(int idx)
+{
+    return pNodeInfo[idx].pFrame;
+}
 
 
 

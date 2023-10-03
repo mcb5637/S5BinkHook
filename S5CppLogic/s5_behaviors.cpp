@@ -57,6 +57,18 @@ void __stdcall EGL::CSlotUVAnims::FillSlot(SSlotArgsUVAnims* data)
 	slotuvanims_fill(this, data);
 }
 
+inline void(__stdcall* const slotparticleeffatt_fill)(EGL::CSlotParticleEffectAttachment* th, EGL::SSlotArgsParticleEffectAttachment* data) = reinterpret_cast<void(__stdcall*) (EGL::CSlotParticleEffectAttachment*, EGL::SSlotArgsParticleEffectAttachment*)> (0x59084B);
+void __stdcall EGL::CSlotParticleEffectAttachment::FillSlot(SSlotArgsParticleEffectAttachment* data)
+{
+	slotparticleeffatt_fill(this, data);
+}
+
+inline void(__stdcall* const slotpeffswitch_fill)(EGL::CSlotParticleEffectSwitch* th, EGL::SSlotArgsParticleEffectSwitch* data) = reinterpret_cast<void(__stdcall*) (EGL::CSlotParticleEffectSwitch*, EGL::SSlotArgsParticleEffectSwitch*)> (0x5170E0);
+void __stdcall EGL::CSlotParticleEffectSwitch::FillSlot(SSlotArgsParticleEffectSwitch* data)
+{
+	slotpeffswitch_fill(this, data);
+}
+
 static inline void(__thiscall* const heroability_addhandlers)(GGL::CHeroAbility* th, shok::EntityId id) = reinterpret_cast<void(__thiscall*)(GGL::CHeroAbility*, shok::EntityId)>(0x4F4982);
 void GGL::CHeroAbility::AddHandlers(shok::EntityId id)
 {

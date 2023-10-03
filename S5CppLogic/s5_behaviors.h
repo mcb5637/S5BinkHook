@@ -124,6 +124,54 @@ namespace EGL {
 
 		// defined events: UVAnim_SetStatus
 	};
+
+	struct SSlotArgsParticleEffectAttachment {
+		struct SAttachedEffect {
+			int StartTurn;
+			shok::EffectTypeId EffectType;
+			int Duration;
+		};
+
+		SAttachedEffect AttachedEffect[3];
+		PADDINGI(1); // 0
+	};
+	static_assert(sizeof(SSlotArgsParticleEffectAttachment) == 10 * 4);
+	class CSlotParticleEffectAttachment : public EGL::TSlot<EGL::SSlotArgsParticleEffectAttachment, -803571449> {
+	public:
+		virtual void __stdcall FillSlot(SSlotArgsParticleEffectAttachment* data) override;
+
+		SSlotArgsParticleEffectAttachment ParticleEffectAttachmentArgs;
+	};
+	class CParticleEffectAttachmentBehavior : public CGLEBehavior {
+	public:
+		CSlotParticleEffectAttachment Slot;
+
+		static inline constexpr int vtp = 0x7855C0;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xAAC20EB7);
+
+		// defined tasks: TASK_SPAWN_PARTICLE_EFFECT
+		// defined events: ParticleEffectAttachment_CreateEffect
+	};
+	static_assert(sizeof(CParticleEffectAttachmentBehavior) == 15 * 4);
+
+	struct SSlotArgsParticleEffectSwitch {
+		unsigned int OnOffBits;
+	};
+	class CSlotParticleEffectSwitch : public EGL::TSlot<EGL::SSlotArgsParticleEffectSwitch, 591789671> {
+	public:
+		virtual void __stdcall FillSlot(SSlotArgsParticleEffectSwitch* data) override;
+
+		SSlotArgsParticleEffectSwitch ParticleEffectSwitchArgs;
+	};
+	class CParticleEffectSwitchBehavior : public CGLEBehavior {
+	public:
+		CSlotParticleEffectSwitch Slot;
+
+		static inline constexpr int vtp = 0x78558C;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3EC808D7);
+
+		// defined events: ParticleEffectSwitch_XXX
+	};
 }
 
 namespace GGL {
@@ -1396,5 +1444,3 @@ namespace GGL {
 //GGL::CStaticCamouflageSlot unused
 //GGL::CAlphaBlendingBehavior blendingfog todo
 //EGL::CUVAnimBehavior
-//EGL::CParticleEffectSwitchBehavior
-//EGL::CParticleEffectAttachmentBehavior

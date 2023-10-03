@@ -83,6 +83,16 @@ RWE::RwFrame* RWE::RwFrame::ForAllChildren(RwFrameCallBack callBack, void* data)
 {
     return frame_forallchildren(this, callBack, data);
 }
+inline RWE::RwFrame* (__cdecl* const frame_forallobj)(RWE::RwFrame* f, RWE::RwObjectCallBack cb, void* d) = reinterpret_cast<RWE::RwFrame * (__cdecl*)(RWE::RwFrame*, RWE::RwObjectCallBack, void*)>(0x414270);
+RWE::RwFrame* RWE::RwFrame::ForAllObjects(RwObjectCallBack callBack, void* data)
+{
+    return frame_forallobj(this, callBack, data);
+}
+inline RWE::RpAtomic* (__cdecl* const frame_getfirstatomic)(RWE::RwFrame* f) = reinterpret_cast<RWE::RpAtomic * (__cdecl*)(RWE::RwFrame*)>(0x49305C);
+RWE::RpAtomic* RWE::RwFrame::GetFirstAtomic()
+{
+    return frame_getfirstatomic(this);
+}
 static inline RWE::RwFrameCallBack frame_getanimhandler = reinterpret_cast<RWE::RwFrameCallBack>(0x720440);
 RWE::Anim::RpHAnimHierarchy* RWE::RwFrame::GetAnimFrameHandler()
 {

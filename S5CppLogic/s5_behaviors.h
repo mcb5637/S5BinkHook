@@ -273,6 +273,15 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x51D6A267);
 	};
 
+	class CStaticCamouflageSlot : public EGL::CGLEBehavior, public EGL::TSlot<GGL::SSlotArgsCamouflage, 983570077> {
+	public:
+		// use with EGL::CGLEBehaviorProps and GD::CCamouflageBehaviorProps+GD::CCamouflageBehavior
+		// always sets alt model, if of local player or not friendly player
+
+		static inline constexpr int vtp = 0x778CA4;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3E2178AD);
+	};
+
 	class CHeroHawkBehavior : public GGL::CHeroAbility {
 	public:
 		// defined events: HeroHawk_XXX, Die, HeroAbility_StandUpOrInit
@@ -1404,6 +1413,20 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD26CD737);
 	};
 
+	struct SSlotArgsAlphaBlending {
+		int StartAlpha, TargetAlpha;
+		float BlendingTime, StartTimeStamp;
+	};
+	class CAlphaBlendingBehavior : public EGL::CGLEBehavior, public EGL::TSlot<GGL::SSlotArgsAlphaBlending, 765384995> {
+	public:
+		int StartAlpha, TargetAlpha;
+		float BlendingTime, StartTimeStamp;
+
+		static inline constexpr int vtp = 0x779124;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5251FC33);
+	};
+	static_assert(offsetof(CAlphaBlendingBehavior, StartAlpha) == 20);
+
 
 	// these belong to serf behavior
 	class CPositionAtResourceFinder {
@@ -1441,6 +1464,4 @@ namespace GGL {
 // GGL::CEvadeBehaviorBase
 //GGL::CEvadeExecutionBehavior
 //GGL::CBehaviorFieldDoodad unused
-//GGL::CStaticCamouflageSlot unused
-//GGL::CAlphaBlendingBehavior blendingfog todo
 //EGL::CUVAnimBehavior

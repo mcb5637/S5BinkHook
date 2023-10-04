@@ -276,6 +276,9 @@ namespace GD {
 
 	class CAlphaBlendingBehavior : public ED::IBehavior {
 	public:
+		ED::CEntity* EntityDisplay = nullptr; // 1
+		EGL::TSlot<GGL::SSlotArgsAlphaBlending, 765384995>* Slot;
+		int uk;
 
 		static inline constexpr int vtp = 0x76AA0C;
 		static inline constexpr int TypeDesc = 0x80AA70;

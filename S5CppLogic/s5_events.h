@@ -463,6 +463,15 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x8117E0;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x992A8BCD);
 	};
+
+	class CEventStartAlphaBlending : public BB::CEvent {
+	public:
+		int Alpha;
+		float BlendingTime;
+
+		static inline constexpr int vtp = 0x773594;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x199C7D73);
+	};
 }
 
 // GGL::CEventHeroAbilityInteger -> valueint
@@ -483,7 +492,6 @@ namespace GGL {
 // EGL::CEventEntityGetBool
 // EGL::CEventPlayerGetBool
 // GGL::CEventTributePaid
-// GGL::CEventStartAlphaBlending
 // GGL::CEventOfferBase
 // GGL::CEventMercenaryOffer GGL::CEventGetMercenaryOffer
 // GGL::CEventTechOffer GGL::CEventGetTechOffer
@@ -959,6 +967,8 @@ namespace shok {
 		LogicEvent_HurtEntity = 0x1C007, // original EGL::CEvent2Entities, now CppLogic::Events::AdvHurtEvent (subclass)
 
 		Animal_FleeFrom = 0x1E002, // EGL::CEventPosition
+
+		AlphaBlending_Start = 0x1D003, // GGL::CEventStartAlphaBlending
 
 		Movement_TaskMoveToApproachPosOf = 0x20001, //EGL::CEvent1Entity
 		Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity

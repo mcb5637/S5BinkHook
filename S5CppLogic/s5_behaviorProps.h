@@ -238,6 +238,7 @@ namespace GGL {
 	};
 	class CTorchBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
+		float Duration;
 
 		static inline constexpr int vtp = 0x773880;
 		static inline constexpr int TypeDesc = 0x817148;

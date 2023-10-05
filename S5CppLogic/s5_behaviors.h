@@ -1464,4 +1464,3 @@ namespace GGL {
 // GGL::CEvadeBehaviorBase
 //GGL::CEvadeExecutionBehavior
 //GGL::CBehaviorFieldDoodad unused
-//EGL::CUVAnimBehavior

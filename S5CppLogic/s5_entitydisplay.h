@@ -139,7 +139,7 @@ namespace ED {
 		PADDINGI(1); // -1, color? // 14
 
 	protected:
-		virtual void __thiscall Initialize(int* m) = 0; // m might be p to model id?
+		virtual void __thiscall Initialize(shok::ModelId* modelOverride) = 0;
 	public:
 		virtual void __stdcall OnRenderUpdate(int tick, float seconds) = 0; // tick seems to be logic ticks, seconds in gametime (ticks/10)
 	private:

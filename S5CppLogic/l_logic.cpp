@@ -185,7 +185,8 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("not a building");
 		auto pl = L.CheckPlayerId(2);
 		shok::Position p = L.CheckPos(3);
-		p.FloorToBuildingPlacement();
+		if (static_cast<GGL::CGLBuildingProps*>(ety->LogicProps)->BuildOn.size() == 0)
+			p.FloorToBuildingPlacement();
 		float r = CppLogic::DegreesToRadians(L.CheckFloat(4));
 		if (L.IsNumber(5))
 			L.Push(GGL::CPlayerStatus::CanPlaceBuilding(ty, pl, &p, r, L.OptEntityId(5)));

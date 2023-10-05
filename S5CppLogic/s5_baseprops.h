@@ -56,8 +56,8 @@ namespace ED {
 		//ED::CBehaviorProps* Props = nullptr; does seem to be only in subclasses
 
 	protected:
-		virtual void __stdcall OnAdd(ED::CEntity* edispl, ED::CBehaviorProps* props, int uk) = 0; // called before ED::CEntity init
-		virtual void __stdcall Initialize(ED::CEntity* edispl, ED::CBehaviorProps* props) = 0; // called before ED::CEntity init
+		virtual void __stdcall OnAdd(ED::CEntity* edispl, ED::CBehaviorProps* props, shok::ModelId* modelOverride) = 0; // called before ED::CEntity init
+		virtual void __stdcall Initialize(ED::CEntity* edispl, ED::CBehaviorProps* props) = 0; // called after ED::CEntity init
 	public:
 		virtual void __stdcall UpdateRenderNoTick(int count, float uk) = 0;
 		virtual void __stdcall UpdateRenderOneTick(int count, float uk) = 0;

@@ -130,3 +130,18 @@ Combat:
 	GGL::CSniperAbility:
 		- calculate Damage as Target->MaxHealth * Attacker->HPFactor
 		- Bug: Damage is dealt immediately, not with a Arrow (fixed by CppLogic.Logic.FixSnipeDamage)
+
+Bridge Lifecycle:
+	XD_NeutralBridgeX:
+		- gets progressed by Architects
+		- needs to have Category NeutralBridge (and GGL::CNeutralBridgeBehavior) to get targeted by Architects
+		- destroys itself if progress reaches 100
+		- GGL::CReplaceableEntityBehavior -> XD_BridgeX
+	XD_BridgeX:
+		- can be build on by serfs
+		- GGL::CReplaceableEntityBehavior -> XD_NeutralBridgeX
+	PB_BridgeX:
+		- (always built on XD_BridgeX)
+		- can be walked on
+		- can be sabotaged (GGL::CBridgeEntity hardcoded increases damage to current HP)
+		- if it gets destroyed, automatically destroys the first attached BUILDING_BASE entity (the XD_BridgeX)

@@ -9,16 +9,6 @@
 #include "hooks.h"
 #include <stdlib.h>
 
-struct shok_vtable_BB_IPostEvent {
-	void(__stdcall* PostEvent)(BB::IPostEvent* th, BB::CEvent* ev);
-};
-
-struct shok_vtable_GGL_CGLGUIInterface {
-	void(__thiscall* dtor)(GGL::CGLGUIInterface* th, bool free);
-	PADDINGI(3);
-	bool(__thiscall* GetNearestFreeBuildingPos)(GGL::CGLGUIInterface* th, int ety, float inx, float iny, float* outx, float* outy, float range);
-};
-
 static inline void(__thiscall* const textset_load)(BB::CTextSet* th) = reinterpret_cast<void(__thiscall*)(BB::CTextSet*)>(0x723647);
 void BB::CTextSet::Load()
 {
@@ -900,25 +890,29 @@ GGUI::CBasicState* GGUI::CManager::GetCommandStateFor(shok::EntityId entity, GGU
 	return guimng_getcmdstate(this, entity, tdata, edata);
 }
 
-void(__stdcall* PostEventOrig)(BB::IPostEvent* th, BB::CEvent* ev) = nullptr;
-shok_vtable_BB_IPostEvent* BB_IPostEvent_vtableHooked = nullptr;
 bool(*GGUI::CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;
-void __stdcall PostEventHook(BB::IPostEvent* th, BB::CEvent* ev) {
-	if (GGUI::CManager::PostEventCallback)
-		if (GGUI::CManager::PostEventCallback(ev))
-			return;
-	PostEventOrig(th, ev);
-}
+bool(*GGUI::CManager::PostEventCallback2)(BB::CEvent* ev) = nullptr;
+struct PostEventHook_GUIManager : public BB::IPostEvent {
+	BB::IPostEvent* Base = nullptr;
+
+	virtual void __stdcall PostEvent(BB::CEvent* ev) override {
+		if (GGUI::CManager::PostEventCallback)
+			if (GGUI::CManager::PostEventCallback(ev))
+				return;
+		if (GGUI::CManager::PostEventCallback2)
+			if (GGUI::CManager::PostEventCallback2(ev))
+				return;
+		if (Base)
+			Base->PostEvent(ev);
+	}
+};
+PostEventHook_GUIManager PostEventHook_GUIManagerObj{};
 void GGUI::CManager::HackPostEvent()
 {
-	if (PostEventOrig) {
-		CppLogic::Hooks::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
-		BB_IPostEvent_vtableHooked->PostEvent = PostEventOrig;
-	}
-	BB_IPostEvent_vtableHooked = reinterpret_cast<shok_vtable_BB_IPostEvent*>(CppLogic::GetVTable(PostGUIEvent));
-	CppLogic::Hooks::SaveVirtualProtect vp{ BB_IPostEvent_vtableHooked, 3 * 4 };
-	PostEventOrig = BB_IPostEvent_vtableHooked->PostEvent;
-	BB_IPostEvent_vtableHooked->PostEvent = reinterpret_cast<void(__stdcall*)(BB::IPostEvent * th, BB::CEvent * ev)>(&PostEventHook);
+	if (PostGUIEvent == &PostEventHook_GUIManagerObj)
+		return;
+	PostEventHook_GUIManagerObj.Base = PostGUIEvent;
+	PostGUIEvent = &PostEventHook_GUIManagerObj;
 }
 
 bool GGUI::CManager::IsModifierPressed(shok::Keys modif)

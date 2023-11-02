@@ -26,6 +26,7 @@ namespace BB {
 		static inline constexpr int vtp = 0x762114;
 		static inline constexpr int TypeDesc = 0x7FFE24;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84EE58);
 
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;

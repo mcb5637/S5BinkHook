@@ -329,6 +329,24 @@ void __stdcall Framework::CMultiPlayerMode::CNetworkEvent::PostEvent(BB::CEvent*
     throw 0;
 }
 
+void (*Framework::CSinglePlayerMode::PreUpdate)() = nullptr;
+bool HookSPMUpdate_Hooked = false;
+void Framework::CSinglePlayerMode::HookUpdate()
+{
+    if (HookSPMUpdate_Hooked)
+        return;
+    HookSPMUpdate_Hooked = true;
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x7632D0), 4 };
+    *reinterpret_cast<void**>(0x7632D0) = CppLogic::Hooks::MemberFuncPointerToVoid(&CSinglePlayerMode::UpdateOverride, 0);
+}
+inline int(__thiscall* const framework_spmode_update)(Framework::CSinglePlayerMode* th, int u) = reinterpret_cast<int(__thiscall*)(Framework::CSinglePlayerMode*, int)>(0x40FA13);
+int __thiscall Framework::CSinglePlayerMode::UpdateOverride(int u)
+{
+    if (PreUpdate)
+        PreUpdate();
+    return framework_spmode_update(this, u);
+}
+
 Framework::CampagnInfo* Framework::CMain::CIH::GetCampagnInfo(shok::MapType i, const char* n)
 {
     int i2 = static_cast<int>(i);
@@ -366,6 +384,7 @@ ED::CGUICamera* Framework::CMain::GetCamera()
 
 void (*Framework::CMain::OnModeChange)(NextMode mode) = nullptr;
 void (*Framework::CMain::OnSaveLoaded)() = nullptr;
+void (*Framework::CMain::MainmenuUpdate)() = nullptr;
 inline void(__thiscall* const cmain_startmapsp)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40A916);
 inline void(__thiscall* const cmain_gotomainmenu)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA1B);
 inline void(__thiscall* const cmain_loadsave)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA76);
@@ -398,6 +417,10 @@ void __thiscall Framework::CMain::CheckToDoOverride()
     case Framework::CMain::NextMode::LeaveGame:
         PostQuitMessage(0);
         break;
+    case Framework::CMain::NextMode::NoChange:
+        if (CurrentMode == Framework::CMain::Mode::MainMenu && MainmenuUpdate)
+            MainmenuUpdate();
+        return;
     }
     ToDo = Framework::CMain::NextMode::NoChange;
 }

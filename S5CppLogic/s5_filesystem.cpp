@@ -124,6 +124,11 @@ bool BB::CFileStream::OpenFile(const char* name, Flags mode)
 	return filestream_open(this, name, mode);
 }
 
+inline void(__thiscall* const memstream_dtor)(BB::CMemoryStream* th) = reinterpret_cast<void(__thiscall*)(BB::CMemoryStream*)>(0x54EEB0);
+BB::CMemoryStream::~CMemoryStream()
+{
+	memstream_dtor(this);
+}
 BB::CMemoryStream::CMemoryStream()
 {
 	*reinterpret_cast<int*>(this) = vtp;

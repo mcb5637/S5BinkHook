@@ -310,6 +310,11 @@ namespace Framework {
 		CNetworkEvent NetworkEvent; //1428
 
 		static inline constexpr int vtp = 0x7632C8;
+
+		static void (*PreUpdate)();
+		static void HookUpdate();
+	private:
+		int __thiscall UpdateOverride(int u);
 	};
 	static_assert(sizeof(CSinglePlayerMode) == 1438 * 4);
 	static_assert(offsetof(CSinglePlayerMode, NetworkEvent) == 1428 * 4);
@@ -436,6 +441,7 @@ namespace Framework {
 		static void HookModeChange();
 		static void (*OnModeChange)(NextMode mode);
 		static void (*OnSaveLoaded)();
+		static void (*MainmenuUpdate)();
 
 	private:
 		void __thiscall CheckToDoOverride();

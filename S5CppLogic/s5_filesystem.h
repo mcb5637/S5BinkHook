@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string_view>
 #include "enumflags.h"
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
@@ -76,11 +77,17 @@ namespace BB {
 		PADDINGI(1); // 5, flags, 1 readonly?
 	public:
 		static constexpr int vtp = 0x77F7CC;
+		virtual ~CMemoryStream() override;
 
 		CMemoryStream();
 		void CopyToStream(IStream& to) const;
 		void CopyFromStream(IStream& from);
+		inline std::string_view GetData() {
+			return std::string_view{ static_cast<char*>(Data), static_cast<size_t>(Size) };
+		}
 	};
+	static_assert(sizeof(CMemoryStream) == 0x18);
+
 
 
 

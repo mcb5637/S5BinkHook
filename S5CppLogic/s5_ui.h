@@ -688,6 +688,7 @@ namespace GGUI {
 
 		static inline GGUI::CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<GGUI::CManager * (__cdecl*)()>(0x525622);
 		static bool(*PostEventCallback)(BB::CEvent* ev);
+		static bool(*PostEventCallback2)(BB::CEvent* ev);
 
 		static inline void(__cdecl* const PostEventFromUI)(BB::CEvent* ev) = reinterpret_cast<void(__cdecl*)(BB::CEvent*)>(0x525D77);
 

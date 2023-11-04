@@ -35,7 +35,7 @@ namespace EGUIX {
 
 	class CFontIDHandler : public BB::IObject { // size 2
 	public:
-		shok::FontId FontID;
+		shok::FontId FontID = shok::FontId::Invalid;
 
 		static inline constexpr int vtp = 0x780B0C;
 		static inline constexpr int TypeDesc = 0x833B40;
@@ -1023,6 +1023,8 @@ namespace EGUIX {
 
 		// update tome event 0x556489 __thiscall(float)
 		// render all 0x556409 __thiscall()
+
+		static inline void(__cdecl* const KeyStrokeLuaCallback)() = reinterpret_cast<void(__cdecl*)()>(0x55C445);
 	};
 
 	class CEventManager : public IWidgetRegistrationCallback {

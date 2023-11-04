@@ -562,6 +562,9 @@ namespace BB {
 		CKeyEvent& operator=(CKeyEvent&&) = default;
 		CKeyEvent& operator=(const CKeyEvent&) = default;
 
+		bool IsKey(shok::Keys key);
+		bool IsModifier(shok::Keys mod);
+
 		static inline constexpr int TypeDesc = 0x7FFE5C;
 		static inline constexpr int vtp = 0x762134;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6FC080E0);
@@ -1043,5 +1046,7 @@ namespace shok {
 		UnHighlightGroup = 0x50005, // EGUIX::CGroupEvent
 		WidgetShow = 0x50006,
 		WidgetHide = 0x50007,
+
+		ClearFocus = 0x42000, // BB::CEvent, only used by CppLogic::Mod::UI::InputFocusWidget
 	};
 }

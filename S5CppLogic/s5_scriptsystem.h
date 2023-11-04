@@ -9,6 +9,9 @@ namespace shok {
 }
 
 namespace EScr {
+	// ingame state if exists, mainmenu otherwise
+	inline lua_State** (__cdecl* const GetCurrentLuaState)() = reinterpret_cast<lua_State** (__cdecl*)()>(0x55ADE0);
+
 	class IScriptTriggerSystem : public BB::IObject, public BB::IPostEvent {
 	public:
 		virtual void __stdcall Destroy() = 0;

@@ -2,14 +2,17 @@
 #include "ModUI.h"
 
 #include <format>
+#include <locale>
 
 #include "s5_classfactory.h"
 #include "s5_events.h"
 #include "s5_idmanager.h"
+#include "s5_scriptsystem.h"
 
 void CppLogic::Mod::UI::RegisterClasses()
 {
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<AutoScrollCustomWidget>();
+	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<TextInputCustomWidget>();
 }
 
 shok::ClassId CppLogic::Mod::UI::AutoScrollCustomWidget::GetClassIdentifier() const
@@ -213,4 +216,201 @@ float CppLogic::Mod::UI::AutoScrollCustomWidget::UIOffset() const
 	if (m == 0.0f)
 		return 0.0f;
 	return 1.0f - m;
+}
+
+bool CppLogic::Mod::UI::InputFocusWidget::CheckFocusEvent(BB::CEvent* ev)
+{
+	if (ev->IsEvent(shok::InputEventIds::ClearFocus)) {
+		Active = false;
+		return true;
+	}
+	return false;
+}
+void CppLogic::Mod::UI::InputFocusWidget::GetFocus()
+{
+	BB::CEvent ev{ shok::InputEventIds::ClearFocus };
+	EGUIX::WidgetLoader::GlobalObj()->RootWid->HandleEvent(&ev, &ev);
+	Active = true;
+}
+void CppLogic::Mod::UI::InputFocusWidget::ClearFocus()
+{
+	Active = false;
+}
+bool CppLogic::Mod::UI::InputFocusWidget::HasFocus()
+{
+	return Active;
+}
+
+
+shok::ClassId __stdcall CppLogic::Mod::UI::TextInputCustomWidget::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* __stdcall CppLogic::Mod::UI::TextInputCustomWidget::CastToIdentifier(shok::ClassId id)
+{
+	if (id == EGUIX::ICustomWidget::Identifier)
+		return static_cast<EGUIX::ICustomWidget*>(this);
+	return nullptr;
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::Initialize()
+{
+	Font.LoadFont("Data\\Menu\\Fonts\\standard10.met");
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::Destroy()
+{
+	delete this;
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
+{
+	auto rend = shok::UIRenderer::GlobalObj();
+	EGUIX::Color col{};
+	rend->RenderText(CurrentTextDisplay.c_str(), Font.FontID, screenCoords->X, screenCoords->Y, screenCoords->X + screenCoords->W, &col, 1);
+	if (!HasFocus())
+		return;
+	if (!(static_cast<int>(shok::GetCurrentTimeFloat() * 3.0f) & 1)) {
+		col.Red = 100;
+		col.Green = 100;
+		col.Blue = 100;
+	}
+	char back = CurrentTextDisplay[CurrentPos];
+	CurrentTextDisplay[CurrentPos] = '\0';
+	float textw = rend->GetTextWidth(CurrentTextDisplay.c_str(), Font.FontID);
+	CurrentTextDisplay[CurrentPos] = back;
+	float x = screenCoords->X + textw * 768.0f;
+	float y = screenCoords->Y;
+	rend->RenderLine(&col, true, x, y, x, y + rend->GetTextHeight(Font.FontID) * 768.0f);
+}
+
+bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain)
+{
+	if (CheckFocusEvent(ev))
+		return false;
+	if (ev->IsEvent(shok::InputEventIds::MouseButtonUp)) {
+		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
+			if (me->IsKey(shok::Keys::MouseLButton)) {
+				GetFocus();
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				return true;
+			}
+		}
+	}
+	else if (!HasFocus()) {
+		return false;
+	}
+	else if (ev->IsEvent(shok::InputEventIds::KeyDown)) {
+		if (auto* me = BB::IdentifierCast<BB::CKeyEvent>(ev)) {
+			if (me->IsKey(shok::Keys::Back)) {
+				auto s = CurrentTextRaw.size();
+				if (s > 0 && CurrentPos > 0) {
+					CurrentTextRaw.erase(CurrentPos-1, 1);
+					--CurrentPos;
+					RefreshDisplayText();
+					EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				}
+			}
+			else if (me->IsKey(shok::Keys::Escape)) {
+				ClearFocus();
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				CallFunc(StringUserVariable[1]);
+			}
+			else if (me->IsKey(shok::Keys::Left)) {
+				if (CurrentPos > 0)
+					--CurrentPos;
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+			}
+			else if (me->IsKey(shok::Keys::Right)) {
+				if (CurrentPos < CurrentTextRaw.size())
+					++CurrentPos;
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+			}
+			else if (me->IsKey(shok::Keys::Enter)) {
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				CallFunc(StringUserVariable[0]);
+			}
+		}
+		return true;
+	}
+	else if (ev->IsEvent(shok::InputEventIds::KeyUp)) {
+		return true;
+	}
+	else if (ev->IsEvent(shok::InputEventIds::KeyPressed)) {
+		if (IgnoreNextChar) {
+			IgnoreNextChar = false;
+			return true;
+		}
+		if (auto* me = BB::IdentifierCast<BB::CKeyPressEvent>(ev)) {
+			char c = static_cast<char>(me->KeyChar);
+			if (CharValid(c)) {
+				CurrentTextRaw.insert(CurrentPos, 1, c);
+				++CurrentPos;
+				RefreshDisplayText();
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+void* CppLogic::Mod::UI::TextInputCustomWidget::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+bool CppLogic::Mod::UI::TextInputCustomWidget::CharValid(char c) const
+{
+	if (c == '@')
+		return false;
+	static std::string_view valids{ reinterpret_cast<const char*>(0x780A84) };
+	static std::locale l("C");
+	return std::isalnum(c, l)
+		|| valids.find(c) != std::string::npos;
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::RefreshDisplayText()
+{
+	CurrentTextDisplay.clear();
+	if (IntegerUserVariable0 == 1) {
+		CurrentTextDisplay.append(CurrentTextRaw.length(), '*');
+		return;
+	}
+	CurrentTextDisplay = ClearTextOutput();
+}
+
+std::string CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput() const
+{
+	std::string r{}; for (char cr : CurrentTextRaw) {
+		auto c = static_cast<unsigned char>(cr);
+		if (c > 0x7F) {
+			r.append(1, static_cast<char>((c >> 6) | 0xC0));
+			c = static_cast<char>(c & 0x3F | 0x80);
+		}
+		r.append(1, c);
+	}
+	return r;
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcname)
+{
+	if (funcname.empty())
+		return;
+	lua::State L{ *EScr::GetCurrentLuaState() };
+	int t = L.GetTop();
+	std::string s = std::format("return {}", funcname);
+	L.DoString(s, "TextInputCustomWidget::CallFunc");
+	if (L.IsFunction(-1)) {
+		L.Push(ClearTextOutput());
+		L.Push(static_cast<int>(WidgetId));
+		L.PCall(2, 0);
+	}
+	L.SetTop(t);
 }

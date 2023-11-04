@@ -1176,6 +1176,55 @@ namespace CppLogic::UI {
 		sc->PartialWidget.Color.Alpha = L.CheckInt(10);
 		return 0;
 	}
+	int TextInputCustomWidgetGetText(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		L.Push(t->ClearTextOutput());
+		return 1;
+	}
+	int TextInputCustomWidgetSetText(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		t->CurrentTextRaw = L.CheckStringView(2);
+		t->RefreshDisplayText();
+		return 0;
+	}
+	int TextInputCustomWidgetSetIgnoreNextChar(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		t->IgnoreNextChar = L.CheckBool(2);
+		return 0;
+	}
+	int TextInputCustomWidgetHasFocus(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		L.Push(t->HasFocus());
+		return 1;
+	}
+	int TextInputCustomWidgetSetFocus(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		if (L.CheckBool(2))
+			t->GetFocus();
+		else
+			t->ClearFocus();
+		return 0;
+	}
 
 	int DumpVideoModes(lua::State L) {
 		L.NewTable();
@@ -1528,7 +1577,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 77> UI{ {
+	constexpr std::array<lua::FuncReference, 82> UI{ {
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1605,6 +1654,11 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<AutoScrollCustomWidgetModOffset>("AutoScrollCustomWidgetModOffset"),
 		lua::FuncReference::GetRef<AutoScrollCustomWidgetSetOffset>("AutoScrollCustomWidgetSetOffset"),
 		lua::FuncReference::GetRef<AutoScrollCustomWidgetSetMaterial>("AutoScrollCustomWidgetSetMaterial"),
+		lua::FuncReference::GetRef<TextInputCustomWidgetGetText>("TextInputCustomWidgetGetText"),
+		lua::FuncReference::GetRef<TextInputCustomWidgetSetText>("TextInputCustomWidgetSetText"),
+		lua::FuncReference::GetRef<TextInputCustomWidgetSetIgnoreNextChar>("TextInputCustomWidgetSetIgnoreNextChar"),
+		lua::FuncReference::GetRef<TextInputCustomWidgetHasFocus>("TextInputCustomWidgetHasFocus"),
+		lua::FuncReference::GetRef<TextInputCustomWidgetSetFocus>("TextInputCustomWidgetSetFocus"),
 		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
 	} };
 
@@ -1623,25 +1677,30 @@ namespace CppLogic::UI {
 	}
 }
 
-// CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")
-// CppLogic.UI.WidgetGetAddress("AutoAddSerfJobs")
-// StartMenu00_VersionNumber
-// StartMenu00_EndGame
-// StartMenu00
-// GoldTooltipController
-// CppLogic.UI.ButtonOverrideActionFunc("StartMenu00_EndGame", function() LuaDebugger.Log(XGUIEng.GetCurrentWidgetID()) end)
-// CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("StartMenu00", "test", "StartMenu00_EndGame"); XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png"); CppLogic.UI.WidgetSetPositionAndSize("test", 783, 500, 32, 32); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetMaterialColor("test", 0, 0,0,0,0); XGUIEng.SetTextColor("test",255,255,255,255); CppLogic.UI.WidgetSetFont("test", "data\\menu\\fonts\\standardinvert10.met"); XGUIEng.SetText("test","tst"); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); CppLogic.UI.WidgetSetTooltipData("test", "StartMenu_TooltipText", true, true); CppLogic.UI.WidgetSetTooltipString("test", "tst"); CppLogic.UI.WidgetOverrideTooltipFunc("test", function() LuaDebugger.Log(1) end); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetText("test","tst"); CppLogic.UI.WidgetSetFont("test", "data\\menu\\fonts\\standardinvert10.met"); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 100, 100); XGUIEng.ShowWidget("test", 1);
-// CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\medium11bold.met") --"data\\menu\\fonts\\mainmenularge.met"
-// CppLogic.UI.FontGetConfig("data\\menu\\fonts\\standard10.met")
-// XGUIEng.SetText("StartMenu00_EndGame", "@center @color:0,255,0 test")
-// XGUIEng.SetText("StartMenu00_EndGame", "test@icon:graphics\\textures\\gui\\i_refine_iron|test")
-// XGUIEng.SetText("StartMenu00_EndGame", "test@icon:data\\graphics\\textures\\gui\\b_units_heroes.png,2.500000e-001,0.000000e+000,2.500000e-001,6.250000e-002|test") XGUIEng.SetText("StartMenu00_StartSinglePlayer", "test@icon:data\\graphics\\textures\\gui\\b_units_heroes.png,2.500000e-001,0.000000e+000,2.500000e-001,6.250000e-002|test")
-// CppLogic.UI.RemoveWidget("StartMenu00_VersionNumber")
-// CppLogic.UI.SetGUIStateLuaSelection(function(x, y) LuaDebugger.Log(x.."/"..y) end)
-// CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test", "EGUIX::CVideoPlaybackCustomWidget"); XGUIEng.ShowWidget("test", 1); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 250, 250); XGUIEng.StartVideoPlayback("test", "data\\graphics\\videos\\pu_farmer.bik", 1);
+/*
+ CppLogic.UI.WidgetGetAddress("StartMenu00_EndGame")
+ CppLogic.UI.WidgetGetAddress("AutoAddSerfJobs")
+ StartMenu00_VersionNumber
+ StartMenu00_EndGame
+ StartMenu00
+ GoldTooltipController
+ CppLogic.UI.ButtonOverrideActionFunc("StartMenu00_EndGame", function() LuaDebugger.Log(XGUIEng.GetCurrentWidgetID()) end)
+ CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("StartMenu00", "test", "StartMenu00_EndGame"); XGUIEng.SetMaterialTexture("test", 0, "data\\graphics\\textures\\gui\\hero_sel_dario.png"); CppLogic.UI.WidgetSetPositionAndSize("test", 783, 500, 32, 32); XGUIEng.ShowWidget("test", 1);
+ CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetMaterialColor("test", 0, 0,0,0,0); XGUIEng.SetTextColor("test",255,255,255,255); CppLogic.UI.WidgetSetFont("test", "data\\menu\\fonts\\standardinvert10.met"); XGUIEng.SetText("test","tst"); XGUIEng.ShowWidget("test", 1);
+ CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); CppLogic.UI.WidgetSetTooltipData("test", "StartMenu_TooltipText", true, true); CppLogic.UI.WidgetSetTooltipString("test", "tst"); CppLogic.UI.WidgetOverrideTooltipFunc("test", function() LuaDebugger.Log(1) end); XGUIEng.ShowWidget("test", 1);
+ CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
+ CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.SetText("test","tst"); CppLogic.UI.WidgetSetFont("test", "data\\menu\\fonts\\standardinvert10.met"); XGUIEng.ShowWidget("test", 1);
+ CppLogic.UI.ContainerWidgetCreateProgressBarWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 32, 32); XGUIEng.ShowWidget("test", 1);
+ CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("StartMenu00", "test"); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 100, 100); XGUIEng.ShowWidget("test", 1);
+ CppLogic.UI.WidgetSetFont("StartMenu00_EndGame", "data\\menu\\fonts\\medium11bold.met") --"data\\menu\\fonts\\mainmenularge.met"
+ CppLogic.UI.FontGetConfig("data\\menu\\fonts\\standard10.met")
+ XGUIEng.SetText("StartMenu00_EndGame", "@center @color:0,255,0 test")
+ XGUIEng.SetText("StartMenu00_EndGame", "test@icon:graphics\\textures\\gui\\i_refine_iron|test")
+ XGUIEng.SetText("StartMenu00_EndGame", "test@icon:data\\graphics\\textures\\gui\\b_units_heroes.png,2.500000e-001,0.000000e+000,2.500000e-001,6.250000e-002|test") XGUIEng.SetText("StartMenu00_StartSinglePlayer", "test@icon:data\\graphics\\textures\\gui\\b_units_heroes.png,2.500000e-001,0.000000e+000,2.500000e-001,6.250000e-002|test")
+ CppLogic.UI.RemoveWidget("StartMenu00_VersionNumber")
+ CppLogic.UI.SetGUIStateLuaSelection(function(x, y) LuaDebugger.Log(x.."/"..y) end)
+ CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test", "EGUIX::CVideoPlaybackCustomWidget"); XGUIEng.ShowWidget("test", 1); CppLogic.UI.WidgetSetPositionAndSize("test", 0, 0, 250, 250); XGUIEng.StartVideoPlayback("test", "data\\graphics\\videos\\pu_farmer.bik", 1);
+ CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test1", "CppLogic::Mod::UI::TextInputCustomWidget", nil, 0, 0, 0, 0, 0, 0, "LuaDebugger.Log", "LuaDebugger.Log"); XGUIEng.ShowWidget("test1", 1); CppLogic.UI.WidgetSetPositionAndSize("test1", 0, 0, 250, 250);
+ CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test2", "CppLogic::Mod::UI::TextInputCustomWidget", nil, 1, 0, 0, 0, 0, 0, "LuaDebugger.Log", "LuaDebugger.Log"); XGUIEng.ShowWidget("test2", 1); CppLogic.UI.WidgetSetPositionAndSize("test2", 250, 0, 250, 250);
+ CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("StartMenu00", "test3", "CppLogic::Mod::UI::TextInputCustomWidget", nil, 0, 0, 0, 0, 0, 0, "LuaDebugger.Log", "LuaDebugger.Log"); XGUIEng.ShowWidget("test3", 1); CppLogic.UI.WidgetSetPositionAndSize("test3", 500, 0, 250, 250);
+ */

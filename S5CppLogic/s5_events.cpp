@@ -252,6 +252,14 @@ BB::CKeyEvent::CKeyEvent(shok::InputEventIds id, shok::Keys keydata) : BB::CInpu
 	SetVT(BB::CKeyEvent::vtp);
 	KeyData = keydata;
 }
+bool BB::CKeyEvent::IsKey(shok::Keys key)
+{
+	return (KeyData & shok::Keys::MaskCode) == key;
+}
+bool BB::CKeyEvent::IsModifier(shok::Keys mod)
+{
+	return (KeyData & shok::Keys::MaskModifiers) == mod;
+}
 
 BB::CKeyPressEvent::CKeyPressEvent(shok::InputEventIds id, int keychar, shok::Keys keymodif) : BB::CInputEvent(id)
 {

@@ -76,6 +76,15 @@ void shok::UIRenderer::RenderLine(const EGUIX::Color* c, bool scale, float x1, f
 {
 	uirender_rline(this, c, scale, x1, y1, x2, y2);
 }
+inline float(__thiscall* const uirender_textwidth)(shok::UIRenderer* r, const char* t, shok::FontId f) = reinterpret_cast<float(__thiscall*)(shok::UIRenderer*, const char*, shok::FontId)>(0x556FFF);
+float shok::UIRenderer::GetTextWidth(const char* text, shok::FontId font)
+{
+	return uirender_textwidth(this, text, font);
+}
+float shok::UIRenderer::GetTextHeight(shok::FontId font)
+{
+	return EGUIX::FontManager::GlobalObj()->GetFontObj(font)->GetHeight();
+}
 
 static inline const EGUIX::Color* (__thiscall* const uircustomcolorcont_getcol)(shok::UIRenderCustomColorContext* th, int i) = reinterpret_cast<const EGUIX::Color * (__thiscall*)(shok::UIRenderCustomColorContext*, int)>(0x5577B6);
 const EGUIX::Color* shok::UIRenderCustomColorContext::GetColorByInt(int i)

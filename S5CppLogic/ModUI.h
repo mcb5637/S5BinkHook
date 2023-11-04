@@ -53,4 +53,57 @@ namespace CppLogic::Mod::UI {
 		bool ClickedOnSlider(int x, int y);
 		float UIOffset() const;
 	};
+
+	class InputFocusWidget {
+		bool Active = false;
+	protected:
+
+		bool CheckFocusEvent(BB::CEvent* ev);
+
+	public:
+		void GetFocus();
+		void ClearFocus();
+		bool HasFocus();
+	};
+
+	// differences to EGUIX::CStringInputCustomWidget:
+	// - no buffer limit
+	// - does not autohide
+	// - click to focus (multiple input widgets in one screen work together)
+	// - no auto close
+	// - no cdkey mode
+	// - ignore next key manually set from lua
+	// - executes "return funcname" in lua to get the confirm/esc func
+	// int user var 0: mode 0->normal, 1->password, 2->int (todo), 3->double (todo)
+	// string user var 0: confirm func (text, widgetid)
+	// string user var 1: esc func (text, widgetid)
+	class TextInputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
+	public:
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
+
+		virtual void Initialize() override;
+		virtual void Destroy() override;
+		virtual void Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords) override;
+		virtual bool HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain) override;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100E);
+		static constexpr BB::SerializationData* SerializationData = nullptr;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		std::string CurrentTextRaw;
+		std::string CurrentTextDisplay;
+		EGUIX::CFontIDHandler Font;
+		size_t CurrentPos = 0;
+		bool IgnoreNextChar = false;
+
+		std::string ClearTextOutput() const;
+		void RefreshDisplayText();
+
+	private:
+		bool CharValid(char c) const;
+		void CallFunc(std::string_view funcname);
+	};
 }

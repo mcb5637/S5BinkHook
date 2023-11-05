@@ -1120,6 +1120,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		if (sc == nullptr)
+			throw lua::LuaException{ "not a AutoScrollCustomWidget" };
 		sc->ElementCount = L.CheckInt(2);
 		sc->ReInit();
 		L.Push(sc->ElementCount);
@@ -1132,6 +1134,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		if (sc == nullptr)
+			throw lua::LuaException{ "not a AutoScrollCustomWidget" };
 		L.Push(sc->Offset);
 		L.Push(sc->WidgetCount);
 		L.Push(sc->ElementCount);
@@ -1143,6 +1147,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		if (sc == nullptr)
+			throw lua::LuaException{ "not a AutoScrollCustomWidget" };
 		sc->Offset += L.CheckFloat(2);
 		sc->Clamp();
 		sc->Update();
@@ -1154,6 +1160,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		if (sc == nullptr)
+			throw lua::LuaException{ "not a AutoScrollCustomWidget" };
 		sc->Offset = L.CheckFloat(2);
 		sc->Clamp();
 		sc->Update();
@@ -1165,6 +1173,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+		if (sc == nullptr)
+			throw lua::LuaException{ "not a AutoScrollCustomWidget" };
 		sc->PartialWidget.SetTexture(L.CheckString(2));
 		sc->PartialWidget.TextureCoordinates.X = L.CheckFloat(3);
 		sc->PartialWidget.TextureCoordinates.Y = L.CheckFloat(4);
@@ -1182,6 +1192,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		if (t == nullptr)
+			throw lua::LuaException{ "not a TextInputCustomWidget" };
 		L.Push(t->ClearTextOutput());
 		return 1;
 	}
@@ -1191,6 +1203,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		if (t == nullptr)
+			throw lua::LuaException{ "not a TextInputCustomWidget" };
 		t->CurrentTextRaw = L.CheckStringView(2);
 		t->RefreshDisplayText();
 		return 0;
@@ -1201,6 +1215,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		if (t == nullptr)
+			throw lua::LuaException{ "not a TextInputCustomWidget" };
 		t->IgnoreNextChar = L.CheckBool(2);
 		return 0;
 	}
@@ -1210,6 +1226,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		if (t == nullptr)
+			throw lua::LuaException{ "not a TextInputCustomWidget" };
 		L.Push(t->HasFocus());
 		return 1;
 	}
@@ -1219,6 +1237,8 @@ namespace CppLogic::UI {
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
 		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		if (t == nullptr)
+			throw lua::LuaException{ "not a TextInputCustomWidget" };
 		if (L.CheckBool(2))
 			t->GetFocus();
 		else

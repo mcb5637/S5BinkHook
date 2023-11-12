@@ -44,6 +44,8 @@ namespace shok {
 		auto operator<=>(const Position& o) const = default;
 
 		static BB::SerializationData* SerializationData;
+
+		// 0x503B1E low res from hi res thiscall(const hi*) (modifies this)
 	};
 	struct PositionRot : Position {
 		float r = 0;

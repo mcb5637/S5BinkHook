@@ -38,6 +38,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x7837B0;
 
+		// is valid 0x58E0EE thiscall(pos*)
 		static void ToTerrainCoord(const shok::Position& p, int* out);
 		bool IsCoordValid(int* out);
 		bool IsCoordValid(int x, int y);
@@ -107,6 +108,8 @@ namespace EGL {
 		virtual bool GetSomeGlobal() = 0; // 14
 	public:
 		static inline constexpr int vtp = 0x783BAC;
+
+		// is node on map 0x58E113 cdecl(x,y) (no this)
 	};
 
 	class IRegionInfo {
@@ -189,6 +192,10 @@ namespace EGL {
 		void AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
 		bool IsAreaUnblockedInMode(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode mode, bool AddOne);
 		bool IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne);
+
+		bool IsPosUnderwater(const shok::Position& p);
+
+		static inline CGLELandscape** const GlobalObj = reinterpret_cast<EGL::CGLELandscape**>(0x898B84);
 	private:
 		void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 	};

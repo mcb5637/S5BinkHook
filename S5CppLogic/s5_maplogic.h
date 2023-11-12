@@ -194,8 +194,10 @@ namespace EGL {
 		bool IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne);
 
 		bool IsPosUnderwater(const shok::Position& p);
+		bool IsWaterAtPosFreezable(const shok::Position& p);
 
 		static inline CGLELandscape** const GlobalObj = reinterpret_cast<EGL::CGLELandscape**>(0x898B84);
+		// 0x58E8B0 is blocked by water cdecl(int) as y*mapsize+x
 	private:
 		void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 	};
@@ -363,7 +365,7 @@ namespace EGL {
 	class CGLEGameLogic : public IGLEGameLogic {
 		PADDINGI(6);
 		LogicGameTime* InGameTime; // 7
-		PADDINGI(1);
+		GGlue::WaterPropsLogic* WaterPropsLogic;
 		EGL::CGLELandscape* Landscape; // 9
 		RegionDataEntity RegionDataEntityObj; // 10
 		PADDINGI(5);

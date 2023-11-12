@@ -165,6 +165,7 @@ namespace GGUI {
 namespace GGlue {
 	class CGlueEntityProps;
 	class TerrainPropsDisplay;
+	class WaterPropsLogic;
 }
 namespace EGUIX {
 	class CBaseWidget;

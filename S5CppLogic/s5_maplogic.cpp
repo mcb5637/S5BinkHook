@@ -528,6 +528,12 @@ bool EGL::CGLELandscape::IsPosUnderwater(const shok::Position& p)
 	return landscape_isposunderwater(this, &p);
 }
 
+bool(__thiscall* const landscape_iswaterposfreezable)(EGL::CGLELandscape* th, const shok::Position* p) = reinterpret_cast<bool(__thiscall*)(EGL::CGLELandscape*, const shok::Position*)>(0x578FA1);
+bool EGL::CGLELandscape::IsWaterAtPosFreezable(const shok::Position& p)
+{
+	return landscape_iswaterposfreezable(this, &p);
+}
+
 void(__thiscall* const buildblock_gethigh)(const GGL::CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const GGL::CGLBuildingProps * t, shok::Position*, float)>(0x4C7B8B);
 void(__thiscall* const buildblock_getlow)(const GGL::CGLBuildingProps* t, shok::Position* out, float r) = reinterpret_cast<void(__thiscall*)(const GGL::CGLBuildingProps * t, shok::Position*, float)>(0x4C7B1E);
 struct shok_GGL_CFreeBuildingPosPredicate {

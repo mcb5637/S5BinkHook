@@ -198,6 +198,7 @@ namespace EGL {
 
 		static inline CGLELandscape** const GlobalObj = reinterpret_cast<EGL::CGLELandscape**>(0x898B84);
 		// 0x58E8B0 is blocked by water cdecl(int) as y*mapsize+x
+		// 0x58E830 get water blocked cdecl(int) ->0x20000000 if blocked else 0x10000000
 	private:
 		void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
 	};
@@ -214,6 +215,8 @@ namespace EGL {
 		bool IsCoordValid(int x, int y);
 		shok::Position GetFreeBuildingPlacementPos(const GGL::CGLBuildingProps* bprops, const shok::PositionRot& pos, float range);
 		inline EGL::CGLELandscape::BlockingMode GetBlockingData(int x, int y);
+
+		// 0x898B80 global to data
 	};
 
 	class CPlayerExplorationHandler : public BB::IObject {

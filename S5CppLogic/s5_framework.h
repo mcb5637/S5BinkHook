@@ -153,6 +153,7 @@ namespace Framework {
 		static inline Framework::SavegameSystem* (* const GlobalObj)() = reinterpret_cast<Framework::SavegameSystem * (* const)()>(0x403158);
 
 		static void (*OnGameSavedTo)(const char* folder, const char* savename);
+		static void (*OnGameSavedTo2)(const char* folder, const char* savename);
 		static void HookSaveGame();
 	};
 }

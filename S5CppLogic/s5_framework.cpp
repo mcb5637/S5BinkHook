@@ -131,6 +131,7 @@ void Framework::SavegameSystem::SaveGame(const char* slot, GS3DTools::CMapData* 
 }
 
 void (*Framework::SavegameSystem::OnGameSavedTo)(const char* folder, const char* savename) = nullptr;
+void (*Framework::SavegameSystem::OnGameSavedTo2)(const char* folder, const char* savename) = nullptr;
 inline void(__thiscall* const savedata_save)(Framework::SaveData* th, const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name) = reinterpret_cast<void(__thiscall*)(Framework::SaveData*, const char*, GGL::CGLGameLogic*, GS3DTools::CMapData*, const char*)>(0x402DAD);
 
 void __thiscall Framework::SaveData::SaveGameOverride(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name)
@@ -138,6 +139,8 @@ void __thiscall Framework::SaveData::SaveGameOverride(const char* path, GGL::CGL
     savedata_save(this, path, gl, mapdata, name);
     if (Framework::SavegameSystem::OnGameSavedTo)
         Framework::SavegameSystem::OnGameSavedTo(path, name);
+    if (Framework::SavegameSystem::OnGameSavedTo2)
+        Framework::SavegameSystem::OnGameSavedTo2(path, name);
 }
 void Framework::SavegameSystem::HookSaveGame()
 {

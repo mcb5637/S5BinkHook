@@ -120,10 +120,12 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiRegionEntityIterator::GetNextBase(Enti
 	while (true) {
 		++c.EntityIndex;
 		auto* ent = reg.GetEntry(c.X, c.Y);
-		if (c.EntityIndex < static_cast<int>(ent->GetByAccessCategory(c.ac).size()))
-			return ent->GetByAccessCategory(c.ac)[c.EntityIndex];
-		if (NextAccessCategory(c))
-			continue;
+		if (ent != nullptr) {
+			if (c.EntityIndex < static_cast<int>(ent->GetByAccessCategory(c.ac).size()))
+				return ent->GetByAccessCategory(c.ac)[c.EntityIndex];
+			if (NextAccessCategory(c))
+				continue;
+		}
 		if (NextRegion(c))
 			continue;
 		return nullptr;

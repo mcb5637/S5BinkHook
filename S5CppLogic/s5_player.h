@@ -80,6 +80,8 @@ namespace GGL {
 
 		// on entity created 0x4C38FE __thiscall(id)
 
+		// attraction of vector 0x4C2335 __thiscall(shok::Vector<shok::EntityId>*)
+
 	private:
 		void __thiscall CheckPaydayHook();
 	};

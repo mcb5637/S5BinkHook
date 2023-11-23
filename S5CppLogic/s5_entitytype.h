@@ -36,9 +36,9 @@ namespace EGL {
 		shok::ModelId Models[5];
 	public:
 		float Exploration;
-		int ExperiencePoints;
+		int ExperiencePoints; //20
 		shok::AccessCategory AccessCategory;
-		int NumBlockedPoints; //20
+		int NumBlockedPoints;
 		float SnapTolerance; //23 seems to be a max change in every coordinate on entity placement
 		bool DeleteWhenBuiltOn, DividesTwoSectors;
 		PADDING(2);
@@ -104,6 +104,7 @@ namespace EGL {
 	};
 	static_assert(offsetof(EGL::CGLEEntityProps, ApproachPos) == 4 * 7);
 	static_assert(offsetof(EGL::CGLEEntityProps, BlockingArea) == 4 * 34);
+	static_assert(offsetof(EGL::CGLEEntityProps, ExperiencePoints) == 4 * 20);
 }
 
 namespace GGL {
@@ -194,8 +195,8 @@ namespace GGL {
 		struct WorkTL {
 			shok::TaskListId Start, Work;
 		};
-		int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers;
-		shok::EntityTypeId Worker; // 42
+		int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers; // 42
+		shok::EntityTypeId Worker;
 		shok::Position DoorPos, LeavePos;
 		ConstructionInfo ConstructionInfo;
 		shok::Vector<shok::EntityTypeId> BuildOn; // 75
@@ -219,6 +220,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x811210;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3A4D8B20);
 	};
+	static_assert(offsetof(CGLBuildingProps, MaxWorkers) == 42 * 4);
 
 	class CBridgeProperties : public GGL::CGLBuildingProps {
 	public:

@@ -80,8 +80,8 @@ namespace GGlue {
 		void* CIDGroupsEx; // BB::CIDGroupsEx buildingbanner stuff
 	public:
 		EGL::CGLEEntitiesProps CGLEEntitiesProps; // 16 (Logic from Entities.xml ? )
-		ED::EntityTypeDisplayProps DisplayProps;
-		shok::Vector<GGlue::CGlueEntityProps> EntityTypes; // 15
+		ED::EntityTypeDisplayProps DisplayProps; // 26
+		shok::Vector<GGlue::CGlueEntityProps> EntityTypes; // 31
 		// Entities.xml Display ?
 
 		static inline constexpr int vtp = 0x7887B4;
@@ -93,6 +93,9 @@ namespace GGlue {
 		void FreeEntityType(shok::EntityTypeId id);
 		void RefreshDisplayFlags();
 	};
+	static_assert(offsetof(CEntitiesPropsMgr, CGLEEntitiesProps) == 16 * 4);
+	static_assert(offsetof(CEntitiesPropsMgr, DisplayProps) == 26 * 4);
+	static_assert(offsetof(CEntitiesPropsMgr, EntityTypes) == 31 * 4);
 
 	class IGoodsPropsMgr {
 

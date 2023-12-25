@@ -65,7 +65,7 @@ GUITexture:
 path: data/graphics/textures/gui/tname.png (full path as id used)
 example: as originals
 Note: GUI textures are used only for widgets. referenced by the gui xml and loaded from there without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
-Note2: The full path to the texture is used as id, and having data in front can make the difference between overriding an existing function and loading a new one. have a look at data/menu/projects/ingame.xml to see what path is used.
+Note2: The full path to the texture is used as id, and having data in front can make the difference between overriding an existing texture and loading a new one. have a look at data/menu/projects/ingame.xml to see what path is used.
 Note3: a few GUI textures are only getting added via lua later on, namely worker icons, motivation icons and the payday clock. these can be changed by Replace as well.
 
 Animation:
@@ -142,6 +142,8 @@ Note2: with CppLogic.EntityType.AddEntityCategory you can add random ints as Ent
 Sound:
 path data/sounds/soundname.wav (note that sounds get only loaded when played, so you have to keep the archive loaded)
 example: as originals
+Encoding: sounds to be played positionally (Sound.PlaySoundPos or EGL::CGLETaskArgsSound) need to be encoded as IMA ADPCM 44100Hz Mono, or they will not be played (other similar encodings might also work, not much testing done).
+			sounds to be played globally (Sound.PlayGUISound and similar) do not have this requirement, most encodings should work (although you might run into problems, if someone wants to play it positionally).
 Note: sounds get categorized into groups by comparing the name before `_rnd_`. when you try to play one sound, one of its group gets randomly played.
 		the AddSounds function does not compare file names, instead all sounds added in one call form a group (which can be of size 1, to always play that one sound).
 Note2: there is no replace for sounds, as they are loaded every time they get used. just replace the file and the modifed sound will get used.

@@ -963,10 +963,7 @@ void __declspec(naked) uiinput_asm() {
         ret;
 
     cont:
-        push - 21;
-        push[ebp + 8];
-
-        push 0x407456;
+        push 0x407451;
         ret;
     };
 }
@@ -977,7 +974,7 @@ void EGUIX::HookUIInput()
         return;
     HookUIInput_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40744B), 10 };
-    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm, reinterpret_cast<void*>(0x407456));
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40744B), &uiinput_asm, reinterpret_cast<void*>(0x407451));
 }
 
 void(__thiscall* const shok_feedbackEventHandler_fireevent)(EGUIX::FeedbackEventHandler* th, BB::CEvent* e) = reinterpret_cast<void(__thiscall*)(EGUIX::FeedbackEventHandler*, BB::CEvent*)>(0x582EB2);

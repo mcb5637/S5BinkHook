@@ -67,6 +67,7 @@ namespace BB {
 		static constexpr int vtp = 0x761C98;
 
 		CFileStream();
+		~CFileStream();
 		bool OpenFile(const char* name, Flags mode);
 	};
 	class CMemoryStream : public IStream { // read from archives
@@ -238,6 +239,7 @@ namespace BB {
 		static constexpr int vtp = 0x761C60;
 
 		CFileStreamEx();
+		~CFileStreamEx();
 		bool OpenFile(const char* filename, Flags mode);
 		void Close();
 	};

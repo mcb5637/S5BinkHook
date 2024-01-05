@@ -118,6 +118,11 @@ BB::CFileStream::CFileStream()
 {
 	*reinterpret_cast<int*>(this) = vtp;
 }
+inline void(__thiscall* const filestream_dtor)(BB::CFileStream* f) = reinterpret_cast<void(__thiscall*)(BB::CFileStream*)>(0x548DBB);
+BB::CFileStream::~CFileStream()
+{
+	filestream_dtor(this);
+}
 static inline bool(__thiscall* const filestream_open)(BB::CFileStream* th, const char* n, BB::IStream::Flags f) = reinterpret_cast<bool(__thiscall*)(BB::CFileStream*, const char*, BB::IStream::Flags)>(0x548DEE);
 bool BB::CFileStream::OpenFile(const char* name, Flags mode)
 {
@@ -154,6 +159,11 @@ static inline void(__thiscall* const shok_BB_CFileStreamEx_Close)(BB::CFileStrea
 BB::CFileStreamEx::CFileStreamEx()
 {
 	*reinterpret_cast<int*>(this) = BB::CFileStreamEx::vtp;
+}
+inline void(__thiscall* const filestreamex_dtor)(BB::CFileStreamEx* f) = reinterpret_cast<void(__thiscall*)(BB::CFileStreamEx*)>(0x549215);
+BB::CFileStreamEx::~CFileStreamEx()
+{
+	filestreamex_dtor(this);
 }
 bool BB::CFileStreamEx::OpenFile(const char* filename, Flags mode)
 {

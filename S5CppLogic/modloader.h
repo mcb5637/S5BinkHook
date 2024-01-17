@@ -48,7 +48,7 @@ namespace CppLogic::ModLoader {
 				auto mng = IdManager();
 				auto t = L.Type(idx);
 				if (t == lua::LType::Number) {
-					En id = static_cast<En>(L.ToInteger(idx));
+					En id = static_cast<En>(L.CheckInt(idx));
 					if (mng.GetNameByID(id) == nullptr) {
 						throw lua::LuaException{std::format("invalid {} at {}: {} does not exist", typename_details::type_name<En>(), idx, static_cast<int>(id))};
 					}

@@ -954,28 +954,28 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::AddLeader(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->AddLeader(luaext::EState{ L }.CheckSettler(2));
 		return 0;
 	}
 
 	int UnlimitedArmy::GetPos(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->CalculatePos();
 		luaext::EState{ L }.PushPos(a->LastPos);
 		return 1;
 	}
 	int UnlimitedArmy::Tick(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Tick();
 		return 0;
 	}
 
 	int UA_Iterate_Next(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = L.CheckInt(2);
 		i++;
 		if (i >= static_cast<int>(a->Leaders.size())) {
@@ -990,7 +990,7 @@ namespace CppLogic::UA {
 	}
 	int UnlimitedArmy::Iterate(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push<UA_Iterate_Next>();
 		L.PushValue(1);
 		L.Push(-1);
@@ -999,7 +999,7 @@ namespace CppLogic::UA {
 
 	int UA_IterateTransit_Next(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = L.CheckInt(2);
 		i++;
 		if (i >= static_cast<int>(a->LeaderInTransit.size())) {
@@ -1014,7 +1014,7 @@ namespace CppLogic::UA {
 	}
 	int UnlimitedArmy::IterateTransit(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push<UA_IterateTransit_Next>();
 		L.PushValue(1);
 		L.Push(-1);
@@ -1023,7 +1023,7 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::OnIdChanged(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int old = L.CheckInt(2);
 		int ne = L.CheckInt(3);
 		a->OnIdChanged(static_cast<shok::EntityId>(old), static_cast<shok::EntityId>(ne));
@@ -1032,7 +1032,7 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::GetSize(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = a->GetSize(L.ToBoolean(2), L.ToBoolean(3));
 		L.Push(i);
 		return 1;
@@ -1040,33 +1040,33 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::RemoveLeader(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->RemoveLeader(luaext::EState{ L }.CheckEntity(2));
 		return 0;
 	}
 
 	int UnlimitedArmy::IsIdle(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push(a->IsIdle());
 		return 1;
 	}
 	int UnlimitedArmy::GetStatus(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push(static_cast<int>(a->Status));
 		return 1;
 	}
 
 	int UnlimitedArmy::SetArea(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Area = L.CheckFloat(2);
 		return 0;
 	}
 	int UnlimitedArmy::SetTarget(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Target = luaext::EState{ L }.CheckPos(2);
 		return 0;
 	}
@@ -1074,7 +1074,7 @@ namespace CppLogic::UA {
 	int UnlimitedArmy::DumpTable(lua::State Ls)
 	{
 		luaext::EState L{ Ls };
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 
 		L.Push(typename_details::type_name<UnlimitedArmy>());
 
@@ -1094,7 +1094,7 @@ namespace CppLogic::UA {
 	}
 	int UnlimitedArmy::ReadTable(lua::State L)
 	{
-		UnlimitedArmy* a = L.NewUserData<UnlimitedArmy>(shok::PlayerId::P0); // player gets deserialized later
+		UnlimitedArmy* a = L.NewUserClass<UnlimitedArmy>(shok::PlayerId::P0); // player gets deserialized later
 
 		L.PushValue(1);
 		CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, a, UnlimitedArmy::SerializationData);
@@ -1116,26 +1116,26 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::SetStatus(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Status = static_cast<UAStatus>(L.CheckInt(2));
 		return 0;
 	}
 	int UnlimitedArmy::SetReMove(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->ReMove = L.ToBoolean(2);
 		return 0;
 	}
 	int UnlimitedArmy::SetCurrentBattleTarget(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->CurrentBattleTarget = luaext::EState{ L }.CheckEntity(2)->EntityId;
 		return 0;
 	}
 
 	int UnlimitedArmy::GetRangedMelee(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.NewTable();
 		L.NewTable();
 		L.NewTable();
@@ -1161,20 +1161,20 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::SetIgnoreFleeing(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->IgnoreFleeing = L.OptBool(2, false);
 		return 0;
 	}
 	int UnlimitedArmy::SetAutoRotateFormation(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->AutoRotateFormation = L.CheckFloat(2);
 		return 0;
 	}
 
 	int UnlimitedArmy::GetFirstDeadHero(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		if (a->DeadHeroes.size() > 0)
 			L.Push(a->DeadHeroes[0]);
 		else
@@ -1184,19 +1184,19 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::SetPrepDefense(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->PrepDefense = L.OptBool(2, false);
 		return 0;
 	}
 	int UnlimitedArmy::SetSabotageBridges(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->SabotageBridges = L.OptBool(2, false);
 		return 0;
 	}
 	int CppLogic::UA::UnlimitedArmy::SetDoNotNormalizeSpeed(lua::State L)
 	{
-		UnlimitedArmy* a = L.GetUserData<UnlimitedArmy>(1);
+		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->DoNotNormalizeSpeed = L.OptBool(2, false);
 		a->NormalizeSpeed(a->Status == UAStatus::Moving || a->Status == UAStatus::MovingNoBattle, true);
 		return 0;
@@ -1208,7 +1208,7 @@ namespace CppLogic::UA {
 		L.CheckType(2, lua::LType::Function);
 		L.CheckType(3, lua::LType::Function);
 		L.CheckType(4, lua::LType::Function);
-		UnlimitedArmy* a = L.NewUserData<UnlimitedArmy>(pl);
+		UnlimitedArmy* a = L.NewUserClass<UnlimitedArmy>(pl);
 		a->L = L;
 		L.PushValue(2);
 		a->Formation = L.Ref(L.REGISTRYINDEX);
@@ -1251,8 +1251,8 @@ namespace CppLogic::UA {
 
 	void CppLogic::UA::UnlimitedArmy::RegisterUDType(lua::State L)
 	{
-		L.PrepareUserDataType<UnlimitedArmy>();
-		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[typename_details::type_name<UnlimitedArmy>()] = &lua::CppToCFunction<ReadTable>;
+		L.PrepareUserClassType<UnlimitedArmy>();
+		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<UnlimitedArmy>() }] = &lua::State::CppToCFunction<ReadTable>;
 	}
 
 	constexpr std::array<lua::FuncReference, 4> UA{ {

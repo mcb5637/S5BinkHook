@@ -145,7 +145,7 @@ void PushSString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckSString(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
     static_cast<shok::String*>(data)->assign(L.CheckString(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoString{ typename_details::type_name<shok::String>(), &PushSString, &CheckSString };
+BB::FieldSerilaizer::ExtendedInfo InfoString{ typename_details::type_name<shok::String>(), &PushSString, &CheckSString};
 
 void PushCharBuff(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(*static_cast<const char**>(data));
@@ -308,7 +308,7 @@ std::string BB::FieldSerilaizer::GetTypeDescName() const
 
     auto it = KnownSerializers.find(p);
     if (it != KnownSerializers.end()) {
-        return it->second->Name;
+        return std::string{ it->second->Name };
     }
 
     char b[50]{};

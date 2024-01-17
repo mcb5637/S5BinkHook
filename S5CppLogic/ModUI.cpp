@@ -406,11 +406,14 @@ void CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcnam
 	lua::State L{ *EScr::GetCurrentLuaState() };
 	int t = L.GetTop();
 	std::string s = std::format("return {}", funcname);
-	L.DoString(s, "TextInputCustomWidget::CallFunc");
-	if (L.IsFunction(-1)) {
-		L.Push(ClearTextOutput());
-		L.Push(static_cast<int>(WidgetId));
-		L.PCall(2, 0);
+	try {
+		L.DoStringT(s, "TextInputCustomWidget::CallFunc");
+		if (L.IsFunction(-1)) {
+			L.Push(ClearTextOutput());
+			L.Push(static_cast<int>(WidgetId));
+			L.PCall(2, 0);
+		}
 	}
+	catch (const lua::LuaException&) {}
 	L.SetTop(t);
 }

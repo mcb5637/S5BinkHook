@@ -561,12 +561,12 @@ namespace CppLogic::UI {
 		EGUIX::CCustomWidget* ne = (*BB::CClassFactory::GlobalObj)->CreateObject<EGUIX::CCustomWidget>();
 		c->AddWidget(ne, name, bef);
 		ne->CustomClassName.assign(customname);
-		ne->IntegerUserVariable0DefaultValue = L.OptInteger(5, 0);
-		ne->IntegerUserVariable1DefaultValue = L.OptInteger(6, 0);
-		ne->IntegerUserVariable2DefaultValue = L.OptInteger(7, 0);
-		ne->IntegerUserVariable3DefaultValue = L.OptInteger(8, 0);
-		ne->IntegerUserVariable4DefaultValue = L.OptInteger(9, 0);
-		ne->IntegerUserVariable5DefaultValue = L.OptInteger(10, 0);
+		ne->IntegerUserVariable0DefaultValue = L.OptInt(5, 0);
+		ne->IntegerUserVariable1DefaultValue = L.OptInt(6, 0);
+		ne->IntegerUserVariable2DefaultValue = L.OptInt(7, 0);
+		ne->IntegerUserVariable3DefaultValue = L.OptInt(8, 0);
+		ne->IntegerUserVariable4DefaultValue = L.OptInt(9, 0);
+		ne->IntegerUserVariable5DefaultValue = L.OptInt(10, 0);
 		ne->StringUserVariable0DefaultValue.assign(L.OptString(11, ""));
 		ne->StringUserVariable1DefaultValue.assign(L.OptString(12, ""));
 		ne->InitializeCustomWidget();

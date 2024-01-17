@@ -18,7 +18,7 @@ EGL::CGLEEntity* luaext::EState::CheckEntity(int i)
 {
 	EGL::CGLEEntity* d = OptEntity(i);
 	if (!d)
-		ThrowLuaFormatted("no entity at argument %d", i);
+		throw lua::LuaException{ std::format("no entity at argument {}", i) };
 	return d;
 }
 EGL::CGLEEntity* luaext::EState::OptEntity(int i)
@@ -28,7 +28,7 @@ EGL::CGLEEntity* luaext::EState::OptEntity(int i)
 		id = EGL::CGLEEntity::GetEntityIDByScriptName(ToString(i));
 	}
 	else if (IsNumber(i)) {
-		id = static_cast<shok::EntityId>(ToInteger(i));
+		id = static_cast<shok::EntityId>(CheckInt(i));
 	}
 	if (id == shok::EntityId::Invalid)
 		return nullptr;
@@ -39,7 +39,7 @@ GGL::CSettler* luaext::EState::CheckSettler(int i)
 {
 	GGL::CSettler* s = OptSettler(i);
 	if (!s)
-		ThrowLuaFormatted("no settler at argument %d", i);
+		throw lua::LuaException{ std::format("no settler at argument {}", i) };
 	return s;
 }
 GGL::CSettler* luaext::EState::OptSettler(int i)
@@ -51,7 +51,7 @@ GGL::CBuilding* luaext::EState::CheckBuilding(int i)
 {
 	GGL::CBuilding* b = OptBuilding(i);
 	if (!b)
-		ThrowLuaFormatted("no building at argument %d", i);
+		throw lua::LuaException{ std::format("no building at argument {}", i) };
 	return b;
 }
 GGL::CBuilding* luaext::EState::OptBuilding(int i)
@@ -63,7 +63,7 @@ GGL::CResourceDoodad* luaext::EState::CheckResourceDoodad(int i)
 {
 	GGL::CResourceDoodad* d = OptResourceDoodad(i);
 	if (!d)
-		ThrowLuaFormatted("no resource entity at argument %d", i);
+		throw lua::LuaException{ std::format("no resource entity at argument {}", i) };
 	return d;
 }
 GGL::CResourceDoodad* luaext::EState::OptResourceDoodad(int i)
@@ -73,7 +73,7 @@ GGL::CResourceDoodad* luaext::EState::OptResourceDoodad(int i)
 
 EGL::CEffect* luaext::EState::OptEffect(int i)
 {
-	int id = OptInteger(i, 0);
+	int id = OptInt(i, 0);
 	if (id == 0)
 		return nullptr;
 	return (*EGL::CGLEEffectManager::GlobalObj)->GetById(static_cast<shok::EffectId>(id));
@@ -82,7 +82,7 @@ EGL::CEffect* luaext::EState::CheckEffect(int i)
 {
 	EGL::CEffect* d = OptEffect(i);
 	if (!d)
-		ThrowLuaFormatted("no effect at argument %d", i);
+		throw lua::LuaException{ std::format("no effect at argument %d", i) };
 	return d;
 }
 
@@ -228,7 +228,7 @@ GGlue::CGlueEntityProps* luaext::EState::CheckEntityType(int idx)
 {
 	GGlue::CGlueEntityProps* t = OptEntityType(idx);
 	if (t == nullptr)
-		ThrowLuaFormatted("no entitytype at %d", idx);
+		throw lua::LuaException{ std::format("no entitytype at {}", idx) };
 	return t;
 }
 
@@ -248,16 +248,16 @@ shok::Technology* luaext::EState::CheckTech(int idx)
 	auto tid = CheckEnum<shok::TechnologyId>(idx);
 	shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tid);
 	if (!tech)
-		ThrowLuaFormatted("no tech at %d", idx);
+		throw lua::LuaException{ std::format("no tech at {}", idx) };
 	return tech;
 }
 shok::PlayerId luaext::EState::CheckPlayerId(int idx, bool allowZero)
 {
 	int p = CheckInt(idx);
 	if (!allowZero && p == 0)
-		ThrowLuaFormatted("player 0 invalid at %d", idx);
+		throw lua::LuaException{ std::format("player 0 invalid at {}", idx) };
 	if (p < 0 || p > 8)
-		ThrowLuaFormatted("player %d invalid at %d", p, idx);
+		throw lua::LuaException{ std::format("player {} invalid at {}", p, idx) };
 	return static_cast<shok::PlayerId>(p);
 }
 shok::PlayerId luaext::EState::OptPlayerId(int idx, shok::PlayerId def, bool allowZero)
@@ -277,7 +277,7 @@ EGUIX::CBaseWidget* luaext::EState::CheckWidget(int idx)
 		id = static_cast<shok::WidgetId>(CheckInt(idx));
 	EGUIX::CBaseWidget* r = wm->GetWidgetByID(id);
 	if (!r)
-		ThrowLuaFormatted("no widget at %i", idx);
+		throw lua::LuaException{ std::format("no widget at {}", idx) };
 	return r;
 }
 

@@ -470,7 +470,7 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("not supported with SCELoader");
 		int i = L.CheckInt(1);
 		int r = L.CheckInt(2), g = L.CheckInt(3), b = L.CheckInt(4);
-		int a = L.OptInteger(5, 255);
+		int a = L.OptInt(5, 255);
 		(*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors->SetColorByIndex(i, shok::Color(r, g, b, a));
 		(*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors->RefreshPlayerColors();
 		return 0;
@@ -789,7 +789,7 @@ namespace CppLogic::Logic {
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
-		int i = L.OptInteger(2, -1);
+		int i = L.OptInt(2, -1);
 		if (i < 0) {
 			for (EGL::CGLETaskArgs* p : tl->Task) {
 				if (p->TaskType == shok::Task::TASK_WAIT_FOR_ANIM)
@@ -813,7 +813,7 @@ namespace CppLogic::Logic {
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
-		int i = L.OptInteger(2, -1);
+		int i = L.OptInt(2, -1);
 		if (i < 0) {
 			for (EGL::CGLETaskArgs* p : tl->Task) {
 				if (p->TaskType == shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE)
@@ -1028,7 +1028,7 @@ namespace CppLogic::Logic {
 	}
 
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
-		int i = L.OptInteger(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
+		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
 			throw lua::LuaException("invalid transform operation");
 		return static_cast<RWE::RwOpCombineType>(i);
@@ -1045,7 +1045,7 @@ namespace CppLogic::Logic {
 		shok::Color Modulate = shok::Color{ 255,255,255,255 };
 
 		static int Clear(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (m->Model) {
 				m->Model->Destroy();
 				m->Model = nullptr;
@@ -1062,7 +1062,7 @@ namespace CppLogic::Logic {
 		}
 		static int SetModel(lua::State ls) {
 			luaext::EState L{ ls };
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			auto mid = L.CheckEnum<shok::ModelId>(2);
 			if (m->Model) {
 				m->Model->Destroy();
@@ -1083,7 +1083,7 @@ namespace CppLogic::Logic {
 		}
 		static int SetAnim(lua::State ls) {
 			luaext::EState L{ ls };
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			auto anim = L.CheckEnum<shok::AnimationId>(2);
@@ -1101,7 +1101,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int SetTimeOfAnim(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			if (!m->AnimHandler)
@@ -1115,7 +1115,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int Translate(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			shok::Position p = luaext::EState{ L }.CheckPos(2);
@@ -1135,7 +1135,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int Rotate(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			float r = L.CheckFloat(2);
@@ -1143,7 +1143,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int Scale(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			float s = L.CheckFloat(2);
@@ -1151,14 +1151,14 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int ResetTransform(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->GetFrame()->Rotate(0, RWE::RwOpCombineType::Replace);
 			return 0;
 		}
 		static int SetColorByPlayer(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			int p = L.CheckInt(2);
@@ -1169,7 +1169,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int DisableShadow(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableShadow();
@@ -1177,7 +1177,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int DisableParticleEffects(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableParticleEffects();
@@ -1185,7 +1185,7 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int DisableTerrainDecal(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableTerrainDecal();
@@ -1193,20 +1193,20 @@ namespace CppLogic::Logic {
 			return 0;
 		}
 		static int SetColorModulate(lua::State L) {
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			int r = L.CheckInt(2);
 			int g = L.CheckInt(3);
 			int b = L.CheckInt(4);
-			int a = L.OptInteger(5, 255);
+			int a = L.OptInt(5, 255);
 			m->Modulate = shok::Color{ r, g, b, a };
 			m->Model->SetColorModulate(m->Modulate);
 			return 0;
 		}
 		static int Serialize(lua::State ls) {
 			luaext::EState L{ ls };
-			LogicModel* m = L.GetUserData<LogicModel>(1);
+			LogicModel* m = L.CheckUserClass<LogicModel>(1);
 			L.Push(typename_details::type_name<LogicModel>());
 			L.NewTable();
 
@@ -1270,7 +1270,7 @@ namespace CppLogic::Logic {
 		}
 		static int Deserialize(lua::State ls) {
 			luaext::EState L{ ls };
-			auto* m = L.NewUserData<LogicModel>();
+			auto* m = L.NewUserClass<LogicModel>();
 			L.Push("Model");
 			L.GetTableRaw(1);
 			m->ModelId = L.CheckEnum<shok::ModelId>(-1);
@@ -1394,7 +1394,7 @@ namespace CppLogic::Logic {
 		};
 	};
 	int CreateFreeModel(lua::State L) {
-		L.NewUserData<LogicModel>();
+		L.NewUserClass<LogicModel>();
 		return 1;
 	}
 
@@ -1514,8 +1514,8 @@ namespace CppLogic::Logic {
 		L.SetTableRaw(-3);
 
 		if (L.GetState() != shok::LuaStateMainmenu) {
-			L.PrepareUserDataType<LogicModel>();
-			CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[typename_details::type_name<LogicModel>()] = &lua::CppToCFunction<LogicModel::Deserialize>;
+			L.PrepareUserClassType<LogicModel>();
+			CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<LogicModel>() }] = &lua::State::CppToCFunction<LogicModel::Deserialize>;
 
 			L.GetSubTable("Events");
 			L.Push("CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY");

@@ -26,14 +26,14 @@ namespace CppLogic::Entity {
 	int PredicateOfType(lua::State ls) {
 		luaext::EState L{ ls };
 		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
-		L.NewUserData<CppLogic::Iterator::EntityPredicateOfType>(ty);
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfType>(ty);
 		return 1;
 	}
 
 	int PredicateOfPlayer(lua::State ls) {
 		luaext::EState L{ ls };
 		auto pl = L.CheckPlayerId(1);
-		L.NewUserData<CppLogic::Iterator::EntityPredicateOfPlayer>(pl);
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfPlayer>(pl);
 		return 1;
 	}
 
@@ -41,7 +41,7 @@ namespace CppLogic::Entity {
 		float x = L.CheckFloat(1);
 		float y = L.CheckFloat(2);
 		float r = L.CheckFloat(3);
-		L.NewUserData<CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity>>(shok::Position{ x,y }, r * r);
+		L.NewUserClass<CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity>>(shok::Position{ x,y }, r * r);
 		return 1;
 	}
 
@@ -50,7 +50,7 @@ namespace CppLogic::Entity {
 		int num = L.GetTop();
 		if (num > 9)
 			throw lua::LuaException("too many players to check");
-		auto* p = L.NewUserData<CppLogic::Iterator::EntityPredicateOfAnyPlayer>();
+		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyPlayer>();
 		for (int i = 0; i < num; ++i) {
 			p->players[i] = L.CheckPlayerId(i);
 		}
@@ -60,7 +60,7 @@ namespace CppLogic::Entity {
 	int PredicateOfAnyEntityType(lua::State l) {
 		luaext::EState L{ l };
 		int num = L.GetTop();
-		auto* p = L.NewUserData<CppLogic::Iterator::EntityPredicateOfAnyType>();
+		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyType>();
 		p->entityTypes.reserve(num);
 		for (int i = 1; i <= num; ++i)
 			p->entityTypes.push_back(L.CheckEnum<shok::EntityTypeId>(i));
@@ -69,11 +69,11 @@ namespace CppLogic::Entity {
 
 	int PredicateAnd(lua::State L) {
 		const int num = L.GetTop();
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicAnd<EGL::CGLEEntity>>();
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicAnd<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
 		L.NewTable();
 		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
-			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
+			p->preds.push_back(L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
 			L.PushValue(i);
 			L.SetTableRaw(-2, i);
 		}
@@ -89,11 +89,11 @@ namespace CppLogic::Entity {
 
 	int PredicateOr(lua::State L) {
 		const int num = L.GetTop();
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicOr<EGL::CGLEEntity>>();
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicOr<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
 		L.NewTable();
 		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
-			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
+			p->preds.push_back(L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(i));
 			L.PushValue(i);
 			L.SetTableRaw(-2, i);
 		}
@@ -103,8 +103,8 @@ namespace CppLogic::Entity {
 	}
 
 	int PredicateNot(lua::State L) {
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicateNot<EGL::CGLEEntity>>(pred);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateNot<EGL::CGLEEntity>>(pred);
 		L.PushValue(1);// keep predicate, so they dont get gced
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
@@ -112,9 +112,9 @@ namespace CppLogic::Entity {
 	}
 
 	int PredicateSetPriority(lua::State L) {
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		int pri = L.CheckInt(2);
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity>>(pred, pri);
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity>>(pred, pri);
 		L.PushValue(1);// keep predicate, so they dont get gced
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
@@ -122,40 +122,40 @@ namespace CppLogic::Entity {
 	}
 
 	int PredicateIsSettler(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsSettler>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsSettler>();
 		return 1;
 	}
 
 	int PredicateIsBuilding(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite>();
 		return 1;
 	}
 
 	int PredicateIsBuildingOrConstructionSite(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsBuilding>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsBuilding>();
 		return 1;
 	}
 
 	int PredicateIsCombatRelevant(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsCombatRelevant>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsCombatRelevant>();
 		return 1;
 	}
 	int PredicateIsNotSoldier(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsNotSoldier>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsNotSoldier>();
 		return 1;
 	}
 
 	int PredicateOfEntityCategory(lua::State ls) {
 		luaext::EState L{ ls };
 		auto c = L.CheckEnum<shok::EntityCategory>(1);
-		L.NewUserData<CppLogic::Iterator::EntityPredicateOfEntityCategory>(c);
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfEntityCategory>(c);
 		return 1;
 	}
 
 	int PredicateProvidesResource(lua::State ls) {
 		luaext::EState L{ ls };
 		auto ty = L.CheckEnum<shok::ResourceType>(1);
-		L.NewUserData<CppLogic::Iterator::EntityPredicateProvidesResource>(ty);
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateProvidesResource>(ty);
 		return 1;
 	}
 
@@ -164,29 +164,29 @@ namespace CppLogic::Entity {
 		float y1 = L.CheckFloat(2);
 		float x2 = L.CheckFloat(3);
 		float y2 = L.CheckFloat(4);
-		L.NewUserData<CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity>>(x1, y1, x2, y2);
+		L.NewUserClass<CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity>>(x1, y1, x2, y2);
 		return 1;
 	}
 
 	int PredicateIsVisible(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsVisible>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsVisible>();
 		return 1;
 	}
 
 	int PredicateOfUpgradeCategory(lua::State ls) {
 		luaext::EState L{ ls };
 		auto ty = L.CheckEnum<shok::UpgradeCategoryId>(1);
-		L.NewUserData<CppLogic::Iterator::EntityPredicateOfUpgradeCategory>(ty);
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfUpgradeCategory>(ty);
 		return 1;
 	}
 
 	int PredicateIsAlive(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsAlive>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsAlive>();
 		return 1;
 	}
 
 	int PredicateIsNotInBuilding(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EntityPredicateIsNotInBuilding>();
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsNotInBuilding>();
 		return 1;
 	}
 
@@ -195,7 +195,7 @@ namespace CppLogic::Entity {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		int index = 1;
 		L.NewTable();
 		CppLogic::Iterator::GlobalEntityIterator it{ pred };
@@ -211,7 +211,7 @@ namespace CppLogic::Entity {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		int count = 0;
 		CppLogic::Iterator::GlobalEntityIterator it{ pred };
 		for (EGL::CGLEEntity* e : it) {
@@ -225,7 +225,7 @@ namespace CppLogic::Entity {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		CppLogic::Iterator::GlobalEntityIterator it{ pred };
 		float maxR = -1;
 		EGL::CGLEEntity* e = it.GetNearest(&maxR);
@@ -260,9 +260,9 @@ namespace CppLogic::Entity {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 
-		L.NewUserData<CppLogic::Iterator::GlobalEntityIterator>(pred); // upvalue of func
+		L.NewUserClass<CppLogic::Iterator::GlobalEntityIterator>(pred); // upvalue of func
 		L.Push<EntityIteratorNext>(1); // func
 		L.Push(); // state
 		L.Push(); // initial value
@@ -271,16 +271,16 @@ namespace CppLogic::Entity {
 
 	int PlayerEntityIterator(lua::State l) {
 		luaext::EState L{ l };
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		if (L.GetTop() == 2) {
 			auto pl = L.CheckPlayerId(2);
-			L.NewUserData<CppLogic::Iterator::PlayerEntityIterator>(pl, pred); // upvalue of func
+			L.NewUserClass<CppLogic::Iterator::PlayerEntityIterator>(pl, pred); // upvalue of func
 		}
 		else {
 			int num = L.GetTop() - 1;
 			if (num > 8)
 				throw lua::LuaException("too many players");
-			auto* it = L.NewUserData<CppLogic::Iterator::MultiPlayerEntityIterator>(pred); // upvalue of func
+			auto* it = L.NewUserClass<CppLogic::Iterator::MultiPlayerEntityIterator>(pred); // upvalue of func
 			for (int i = 0; i < num; ++i) {
 				it->Players[i] = L.CheckPlayerId(i + 2, false);
 			}
@@ -297,15 +297,15 @@ namespace CppLogic::Entity {
 		shok::AccessCategoryFlags acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
 		L.Remove(3);
 		L.Remove(2);
-		L.NewUserData<CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity>>(area);
+		L.NewUserClass<CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity>>(area);
 		if (L.GetTop() > 1) { // auto create an and predicate
 			L.Replace(1);
 			PredicateAndAutoCreate(L);
 		}
 
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 
-		L.NewUserData<CppLogic::Iterator::MultiRegionEntityIterator>(area, acf, pred); // upvalue of func
+		L.NewUserClass<CppLogic::Iterator::MultiRegionEntityIterator>(area, acf, pred); // upvalue of func
 		L.Push<EntityIteratorNext>(1); // func
 		L.Push(); // state
 		L.Push(); // initial value
@@ -318,15 +318,15 @@ namespace CppLogic::Entity {
 		shok::AccessCategoryFlags acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
 		L.Remove(3);
 		L.Remove(2);
-		L.NewUserData<CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity>>(p, r * r);
+		L.NewUserClass<CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity>>(p, r * r);
 		if (L.GetTop() > 1) { // auto create an and predicate
 			L.Replace(1);
 			PredicateAndAutoCreate(L);
 		}
 
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 
-		L.NewUserData<CppLogic::Iterator::MultiRegionEntityIterator>(p, r, acf, pred); // upvalue of func
+		L.NewUserClass<CppLogic::Iterator::MultiRegionEntityIterator>(p, r, acf, pred); // upvalue of func
 		L.Push<EntityIteratorNext>(1); // func
 		L.Push(); // state
 		L.Push(); // initial value
@@ -336,7 +336,7 @@ namespace CppLogic::Entity {
 	int CheckPredicate(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* s = L.CheckEntity(1);
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		float r = -1;
 		int pr = -1;
 		L.Push(pred->Matches(s, &r, &pr));
@@ -410,7 +410,7 @@ namespace CppLogic::Entity {
 		if (L.IsNumber(2))
 			b->MovementSpeed = L.CheckFloat(2);
 		if (L.IsNumber(3))
-			b->TurningSpeed = static_cast<float>(CppLogic::DegreesToRadians(L.ToNumber(3)));
+			b->TurningSpeed = static_cast<float>(CppLogic::DegreesToRadians(*L.ToNumber(3)));
 		return 0;
 	}
 
@@ -492,7 +492,7 @@ namespace CppLogic::Entity {
 		L.Push("r");
 		L.GetTableRaw(2);
 		if (L.IsNumber(-1)) {
-			m->SetTargetRotation(static_cast<float>(CppLogic::DegreesToRadians(L.ToNumber(-1))));
+			m->SetTargetRotation(static_cast<float>(CppLogic::DegreesToRadians(*L.ToNumber(-1))));
 			EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
 			m->FireEvent(&ev);
 		}
@@ -1181,7 +1181,7 @@ namespace CppLogic::Entity {
 		}
 		e->Move(p);
 		if (L.IsNumber(3)) {
-			e->SetTargetRotation(static_cast<float>(CppLogic::DegreesToRadians(L.ToNumber(3))));
+			e->SetTargetRotation(static_cast<float>(CppLogic::DegreesToRadians(*L.ToNumber(3))));
 			EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
 			e->FireEvent(&ev);
 		}

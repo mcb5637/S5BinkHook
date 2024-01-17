@@ -58,7 +58,7 @@ namespace luaext {
 		En CheckEnum(int idx, bool allowZero = false) {
 			auto t = Type(idx);
 			if (t == lua::LType::Number) {
-				En id = static_cast<En>(ToInteger(idx));
+				En id = static_cast<En>(CheckInt(idx));
 				if (allowZero && id == static_cast<En>(0))
 					return id;
 				auto mng = CppLogic::GetIdManager<En>();

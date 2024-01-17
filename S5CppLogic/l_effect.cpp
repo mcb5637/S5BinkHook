@@ -46,7 +46,7 @@ namespace CppLogic::Effect {
 		data.CurrentPos.Y = data.StartPos.Y = static_cast<float>(L.CheckNumber(3));
 		data.TargetPos.X = static_cast<float>(L.CheckNumber(4));
 		data.TargetPos.Y = static_cast<float>(L.CheckNumber(5));
-		data.Damage = L.OptInteger(6, 0);
+		data.Damage = L.OptInt(6, 0);
 		data.DamageRadius = static_cast<float>(L.OptNumber(7, -1));
 		data.TargetID = L.OptEntityId(8);
 		data.AttackerID = L.OptEntityId(9);
@@ -55,7 +55,7 @@ namespace CppLogic::Effect {
 		data.SourcePlayer = player;
 		auto dmgclass = L.OptEnum<shok::DamageClassId>(11);
 		data.DamageClass = dmgclass;
-		data.AdvancedDamageSourceOverride = L.OptInteger(13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
+		data.AdvancedDamageSourceOverride = L.OptInt(13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
 		EGL::CGLEGameLogic* gl = *EGL::CGLEGameLogic::GlobalObj;
 		auto id = gl->CreateEffect(&data);
 		EGL::CEffect* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
@@ -191,7 +191,7 @@ namespace CppLogic::Effect {
 		luaext::EState L{ ls };
 		auto p = L.CheckPos(1);
 		float r = L.CheckFloat(2);
-		L.NewUserData<CppLogic::Iterator::PredicateInCircle<EGL::CEffect>>(p, r * r);
+		L.NewUserClass<CppLogic::Iterator::PredicateInCircle<EGL::CEffect>>(p, r * r);
 		return 1;
 	}
 
@@ -200,44 +200,44 @@ namespace CppLogic::Effect {
 		float y1 = L.CheckFloat(2);
 		float x2 = L.CheckFloat(3);
 		float y2 = L.CheckFloat(4);
-		L.NewUserData<CppLogic::Iterator::PredicateInRect<EGL::CEffect>>(x1, y1, x2, y2);
+		L.NewUserClass<CppLogic::Iterator::PredicateInRect<EGL::CEffect>>(x1, y1, x2, y2);
 		return 1;
 	}
 
 	int PredicateOfType(lua::State ls) {
 		luaext::EState L{ ls };
-		L.NewUserData<CppLogic::Iterator::EffectPredicateOfType>(L.CheckEnum<shok::EffectTypeId>(1));
+		L.NewUserClass<CppLogic::Iterator::EffectPredicateOfType>(L.CheckEnum<shok::EffectTypeId>(1));
 		return 1;
 	}
 
 	int PredicateOfPlayer(lua::State ls) {
 		luaext::EState L{ ls };
-		L.NewUserData<CppLogic::Iterator::EffectPredicateOfPlayer>(L.CheckPlayerId(1));
+		L.NewUserClass<CppLogic::Iterator::EffectPredicateOfPlayer>(L.CheckPlayerId(1));
 		return 1;
 	}
 
 	int PredicateIsArrow(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EffectPredicateIsArrow>();
+		L.NewUserClass<CppLogic::Iterator::EffectPredicateIsArrow>();
 		return 1;
 	}
 
 	int PredicateIsCannonBall(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EffectPredicateIsCannonBall>();
+		L.NewUserClass<CppLogic::Iterator::EffectPredicateIsCannonBall>();
 		return 1;
 	}
 
 	int PredicateIsArrowOrCannonBall(lua::State L) {
-		L.NewUserData<CppLogic::Iterator::EffectPredicateIsArrowOrCannonBall>();
+		L.NewUserClass<CppLogic::Iterator::EffectPredicateIsArrowOrCannonBall>();
 		return 1;
 	}
 
 	int PredicateAnd(lua::State L) {
 		const int num = L.GetTop();
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicAnd<EGL::CEffect>>();
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicAnd<EGL::CEffect>>();
 		p->preds.reserve(num);
 		L.NewTable();
 		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
-			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(i));
+			p->preds.push_back(L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(i));
 			L.PushValue(i);
 			L.SetTableRaw(-2, i);
 		}
@@ -253,11 +253,11 @@ namespace CppLogic::Effect {
 
 	int PredicateOr(lua::State L) {
 		const int num = L.GetTop();
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicateDynamicOr<EGL::CEffect>>();
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicOr<EGL::CEffect>>();
 		p->preds.reserve(num);
 		L.NewTable();
 		for (int i = 1; i <= num; ++i) { // keep predicates, so they dont get gced
-			p->preds.push_back(L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(i));
+			p->preds.push_back(L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(i));
 			L.PushValue(i);
 			L.SetTableRaw(-2, i);
 		}
@@ -267,8 +267,8 @@ namespace CppLogic::Effect {
 	}
 
 	int PredicateNot(lua::State L) {
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicateNot<EGL::CEffect>>(pred);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateNot<EGL::CEffect>>(pred);
 		L.PushValue(1);// keep predicate, so they dont get gced
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
@@ -276,9 +276,9 @@ namespace CppLogic::Effect {
 	}
 
 	int PredicateSetPriority(lua::State L) {
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
 		int pri = L.CheckInt(2);
-		auto* p = L.NewUserData<CppLogic::Iterator::PredicatePriority<EGL::CEffect>>(pred, pri);
+		auto* p = L.NewUserClass<CppLogic::Iterator::PredicatePriority<EGL::CEffect>>(pred, pri);
 		L.PushValue(1);// keep predicate, so they dont get gced
 		p->L = L.GetState();
 		p->r = L.Ref(L.REGISTRYINDEX);
@@ -311,8 +311,8 @@ namespace CppLogic::Effect {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
-		L.NewUserData<CppLogic::Iterator::GlobalEffectIterator>(pred); // upvalue of func
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+		L.NewUserClass<CppLogic::Iterator::GlobalEffectIterator>(pred); // upvalue of func
 		L.Push<IteratorNext>(1); // func
 		L.Push(); // state
 		L.Push(); // initial value
@@ -323,7 +323,7 @@ namespace CppLogic::Effect {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
-		auto* pred = L.GetUserData<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
 		int index = 1;
 		L.NewTable();
 		CppLogic::Iterator::GlobalEffectIterator it{ pred };

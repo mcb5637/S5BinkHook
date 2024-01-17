@@ -291,6 +291,18 @@
     <ClInclude Include="s5_baseprops.h">
       <Filter>shok\entity</Filter>
     </ClInclude>
+    <ClInclude Include="Luapp\luapp_common.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Luapp\luapp_decorator.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Luapp\luapp_userdata.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Luapp\luapp50_d.h">
+      <Filter>lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

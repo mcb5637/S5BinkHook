@@ -349,7 +349,7 @@ void OnSaveDone(const char* path, const char* savename) {
 }
 
 void InitGame() {
-	lua::ExceptionConverter = &BBExceptionConverter;
+	lua::v50::ExceptionConverter = &BBExceptionConverter;
 	Framework::CMain::HookModeChange();
 	Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
 	Framework::CMain::OnSaveLoaded = &OnSaveLoaded;

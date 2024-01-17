@@ -22,7 +22,7 @@
 namespace CppLogic::API {
 	void CheckEvalEnabled(lua::State L) {
 		if (CppLogic::HasSCELoader())
-			L.Error("Loading lua code disabled for Kimichura");
+			throw lua::LuaException{ "Loading lua code disabled for Kimichura" };
 	}
 
 	bool IsExternalmap(const char* s) {
@@ -46,7 +46,7 @@ namespace CppLogic::API {
 	}
 
 	int StackTrace(lua::State L) {
-		L.Push(L.GenerateStackTrace(L.OptInteger(1, 0), L.OptInteger(2, -1), L.OptBool(3, false), L.OptBool(4, false)));
+		L.Push(L.GenerateStackTrace(L.OptInt(1, 0), L.OptInt(2, -1), L.OptBool(3, false), L.OptBool(4, false)));
 		return 1;
 	}
 
@@ -193,7 +193,7 @@ namespace CppLogic::API {
 		if (!(ty == lua::LType::Number || ty == lua::LType::String || ty == lua::LType::Nil))
 			throw lua::LuaException("not saveable");
 		if (ty == lua::LType::Number)
-			di = L.ToNumber(2);
+			di = *L.ToNumber(2);
 		else if (ty == lua::LType::String)
 			ds = L.ToString(2);
 		GetRuntimeStore();
@@ -221,7 +221,7 @@ namespace CppLogic::API {
 		const char* ds = nullptr;
 		lua::Number di = 0;
 		if (ty == lua::LType::Number)
-			di = mm.ToNumber(-1);
+			di = *mm.ToNumber(-1);
 		else if (ty == lua::LType::String)
 			ds = mm.ToString(-1);
 
@@ -365,7 +365,7 @@ namespace CppLogic::API {
 
 	int RNG::Int(lua::State L)
 	{
-		RNG* th = L.GetUserData<RNG>(1);
+		RNG* th = L.CheckUserClass<RNG>(1);
 		int min = L.CheckInt(2);
 		int max;
 		if (L.IsNoneOrNil(3)) {
@@ -381,7 +381,7 @@ namespace CppLogic::API {
 
 	int RNG::Number(lua::State L)
 	{
-		RNG* th = L.GetUserData<RNG>(1);
+		RNG* th = L.CheckUserClass<RNG>(1);
 		double min;
 		double max;
 		if (L.IsNoneOrNil(1)) {
@@ -403,7 +403,7 @@ namespace CppLogic::API {
 
 	int RNG::Serialize(lua::State L)
 	{
-		RNG* th = L.GetUserData<RNG>(1);
+		RNG* th = L.CheckUserClass<RNG>(1);
 		L.Push(typename_details::type_name<RNG>());
 		static_assert(sizeof(RNG) == 1 * 4);
 		L.PushFString("%d", *reinterpret_cast<int*>(th));
@@ -423,22 +423,22 @@ namespace CppLogic::API {
 	int RNG::Deserialize(lua::State L)
 	{
 		const char* s = L.CheckString(1);
-		auto* ud = L.NewUserData<RNG>();
+		auto* ud = L.NewUserClass<RNG>();
 		*reinterpret_cast<int*>(ud) = std::atol(s);
 		return 1;
 	}
 
 	void RNG::Register(lua::State L)
 	{
-		L.PrepareUserDataType<RNG>();
-		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[typename_details::type_name<RNG>()] = &lua::CppToCFunction<RNG::Deserialize>;
+		L.PrepareUserClassType<RNG>();
+		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<RNG>() }] = &lua::State::CppToCFunction<RNG::Deserialize>;
 	}
 
 	int CreateRNG(lua::State L) {
 		if (L.IsNoneOrNil(1))
-			L.NewUserData<RNG>();
+			L.NewUserClass<RNG>();
 		else
-			L.NewUserData<RNG>(L.CheckInt(1));
+			L.NewUserClass<RNG>(L.CheckInt(1));
 		return 1;
 	}
 

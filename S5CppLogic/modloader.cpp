@@ -786,6 +786,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Sa
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::UnLoad(shok::AnimSetId id) {
 	(*EGL::AnimSetManager::GlobalObj)->PopAnimSet(id);
+	CppLogic::GetIdManager<shok::AnimSetId>().RemoveID(id);
 }
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj{};
 

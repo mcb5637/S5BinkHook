@@ -24,6 +24,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(lua::State L, v
 		break;
 	case 6:
 		o = *static_cast<void**>(o);
+		[[fallthrough]];
 	case 5:
 		{
 			if (!keypushed)
@@ -142,6 +143,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(lua::State L,
 		break;
 	case 6:
 		o = *static_cast<void**>(o);
+		[[fallthrough]];
 	case 5:
 	{
 		if (!valuepushed) {
@@ -374,7 +376,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeBool()
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeNumber(int idx)
 {
 	SerializeType(lua::LType::Number);
-	double n = L.ToNumber(idx);
+	double n = *L.ToNumber(idx);
 	WritePrimitive(n);
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeNumber()

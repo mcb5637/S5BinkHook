@@ -110,7 +110,7 @@ namespace BB {
 		}
 
 		struct ExtendedInfo {
-			const char* Name;
+			std::string_view Name;
 			void (* const Push)(lua::State L, void* data, const FieldSerilaizer* fs);
 			void (* const Check)(lua::State L, void* data, int idx, const FieldSerilaizer* fs);
 		};
@@ -276,7 +276,7 @@ namespace BB {
 		void AddClassToFactory() {
 			if (GetClassDemangledName(T::Identifier))
 				throw std::invalid_argument("identifier already used");
-			AddClassToFactory(T::Identifier, typename_details::type_name<T>(), &FactObjCreator<T>, T::SerializationData);
+			AddClassToFactory(T::Identifier, typename_details::type_name<T>().data(), &FactObjCreator<T>, T::SerializationData);
 		}
 
 

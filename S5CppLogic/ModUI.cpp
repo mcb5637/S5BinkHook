@@ -344,6 +344,8 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 		}
 		if (auto* me = BB::IdentifierCast<BB::CKeyPressEvent>(ev)) {
 			char c = static_cast<char>(me->KeyChar);
+			if (IntegerUserVariable0 == 3 && c == ',')
+				c = '.';
 			if (CharValid(c)) {
 				CurrentTextRaw.insert(CurrentPos, 1, c);
 				++CurrentPos;
@@ -368,10 +370,16 @@ void CppLogic::Mod::UI::TextInputCustomWidget::operator delete(void* p)
 
 bool CppLogic::Mod::UI::TextInputCustomWidget::CharValid(char c) const
 {
+	static std::locale l("C");
+	if (IntegerUserVariable0 == 2) {
+		return std::isdigit(c, l);
+	}
+	if (IntegerUserVariable0 == 3) {
+		return std::isdigit(c, l) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
+	}
 	if (c == '@')
 		return false;
 	static std::string_view valids{ reinterpret_cast<const char*>(0x780A84) };
-	static std::locale l("C");
 	return std::isalnum(c, l)
 		|| valids.find(c) != std::string::npos;
 }
@@ -388,7 +396,8 @@ void CppLogic::Mod::UI::TextInputCustomWidget::RefreshDisplayText()
 
 std::string CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput() const
 {
-	std::string r{}; for (char cr : CurrentTextRaw) {
+	std::string r{};
+	for (char cr : CurrentTextRaw) {
 		auto c = static_cast<unsigned char>(cr);
 		if (c > 0x7F) {
 			r.append(1, static_cast<char>((c >> 6) | 0xC0));

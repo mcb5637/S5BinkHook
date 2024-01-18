@@ -74,7 +74,7 @@ namespace CppLogic::Mod::UI {
 	// - no cdkey mode
 	// - ignore next key manually set from lua
 	// - executes "return funcname" in lua to get the confirm/esc func
-	// int user var 0: mode 0->normal, 1->password, 2->int (todo), 3->double (todo)
+	// int user var 0: mode 0->normal, 1->password, 2->int, 3->double
 	// string user var 0: confirm func (text, widgetid)
 	// string user var 1: esc func (text, widgetid)
 	class TextInputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {

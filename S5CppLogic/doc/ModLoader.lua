@@ -101,6 +101,8 @@ ModLoader = {
 
 		},
 	},
+	--- the names of all ModPacks requied by this map. a call to ModLoader.RequireModList() in Initialize will then try to load them.
+	RequiredMods = {},
 }
 
 --- this function gets called after ModLoader loads this file.
@@ -109,15 +111,19 @@ ModLoader = {
 -- so even changing behaviors completely works without problems.
 -- it is recommended, that you edit data required by others first. so as an example, first add a model, and after that the entitytytpe requiring it (Manifest does that for you).
 function ModLoader.Initialize()
+	--- search and apply any modpacks requested
+	ModLoader.RequireModList()
 	--- applying everything in Manifest
 	ModLoader.ApplyManifest()
 
 	--- manual code should go here
 
-
+	
 	--- refresh caches
 	CppLogic.ModLoader.RefreshEntityCategoryCache()
 	CppLogic.ModLoader.SanityCheck()
+	--- cleanup modpacks
+	ModLoader.CleanupMods(ModLoader.ModList)
 end
 
 --- this function gets called after Initialize, only if the map starts fresh.
@@ -130,83 +136,6 @@ function ModLoader.LoadSave()
 
 end
 
---- applying everything in Manifest
-function ModLoader.ApplyManifest()
-	ModLoader.PreloadManifestType(ModLoader.Manifest.ArmorClasses, CppLogic.ModLoader.PreLoadArmorClass, ArmorClasses)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.EffectTypes, CppLogic.ModLoader.PreLoadEffectType, GGL_Effects)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.PreLoadTaskList, TaskLists)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.PreLoadEntityType, Entities)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.PreLoadTechnology, Technologies)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityCategories, CppLogic.ModLoader.PreLoadEntityCategory,
-		EntityCategories)
-	for dc, cfg in pairs(ModLoader.Manifest.DamageClasses) do
-		CppLogic.ModLoader.AddDamageClass(dc, cfg)
-	end
-	for uc, et in pairs(ModLoader.Manifest.SettlerUpgradeCategory) do
-		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
-	end
-	for uc, et in pairs(ModLoader.Manifest.BuildingUpgradeCategory) do
-		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
-	end
-
-	for _, n in ipairs(ModLoader.Manifest.DirectXEffects) do
-		CppLogic.ModLoader.LoadDirectXEffect(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.TerrainTextures_Add) do
-		CppLogic.ModLoader.AddTerrainTexture(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.TerrainTextures_Reload) do
-		CppLogic.ModLoader.AddTerrainTexture(n)
-	end
-	ModLoader.HandleManifestType(ModLoader.Manifest.WaterTypes, CppLogic.ModLoader.AddWaterType)
-	ModLoader.HandleManifestType(ModLoader.Manifest.TerrainTypes, CppLogic.ModLoader.AddTerrainType)
-	for _, n in ipairs(ModLoader.Manifest.SelectionTextures_Add) do
-		CppLogic.ModLoader.AddSelectionTexture(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.SelectionTextures_Reload) do
-		CppLogic.ModLoader.AddSelectionTexture(n)
-	end
-	ModLoader.HandleManifestType(ModLoader.Manifest.Animations, CppLogic.ModLoader.AddAnimation)
-	ModLoader.HandleManifestType(ModLoader.Manifest.AnimSets, CppLogic.ModLoader.AddAnimSet)
-	ModLoader.HandleManifestType(ModLoader.Manifest.Models, CppLogic.ModLoader.AddModel)
-	ModLoader.HandleManifestType(ModLoader.Manifest.EffectTypes, CppLogic.ModLoader.AddEffectType)
-	ModLoader.HandleManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.AddTaskList)
-	ModLoader.HandleManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.AddEntityType)
-	ModLoader.HandleManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.AddTechnology)
-	for _, n in ipairs(ModLoader.Manifest.GUITextures_Add) do
-		CppLogic.ModLoader.AddGUITexture(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.GUITextures_Reload) do
-		CppLogic.ModLoader.AddGUITexture(n)
-	end
-	for uc, et in pairs(ModLoader.Manifest.SettlerUpgradeCategory) do
-		CppLogic.ModLoader.AddSettlerUpgradeCategory(uc, Entities[et])
-	end
-	for uc, et in pairs(ModLoader.Manifest.BuildingUpgradeCategory) do
-		CppLogic.ModLoader.AddBuildingUpgradeCategory(uc, Entities[et])
-	end
-	for xp, ec in pairs(ModLoader.Manifest.ExperienceClasses) do
-		CppLogic.ModLoader.AddExperienceClass(xp, ec)
-	end
-	for _, a in ipairs(ModLoader.Manifest.SoundGroups) do
-		CppLogic.ModLoader.AddSounds(unpack(a))
-	end
-end
-
-function ModLoader.PreloadManifestType(en, preload, data)
-	for _, k in ipairs(en) do
-		if type(k) == "string" and not data[k] then
-			preload(k)
-		end
-	end
-end
-
-function ModLoader.HandleManifestType(en, add)
-	for _, k in ipairs(en) do
-		add(k)
-	end
-end
-
 --- this function gets called when someone leaves a map for any reason.
 -- cleanup code should go here.
 -- after this method got executed, any extra archives get removed from the filesystem.
@@ -216,3 +145,6 @@ end
 function ModLoader.Cleanup()
 
 end
+
+--- load CppLogic funcs
+Script.Load("Data\\Script\\ModLoader\\ModLoader.lua")

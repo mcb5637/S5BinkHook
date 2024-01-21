@@ -248,4 +248,15 @@ namespace BB {
 	public:
 		static constexpr int vtp = 0x77FA80;
 	};
+
+	class IOSFileSystem : public IFileSystem {
+
+	};
+
+	class COSFileSystem : public IOSFileSystem {
+	public:
+		static inline constexpr int vtp = 0x77FA50;
+		static inline BB::COSFileSystem** const GlobalObj = reinterpret_cast<BB::COSFileSystem**>(0x8937DC);
+	};
+	static_assert(sizeof(COSFileSystem) == 4);
 }

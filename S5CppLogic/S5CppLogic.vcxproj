@@ -102,7 +102,8 @@
     <PostBuildEvent>
       <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\LuaDebugger.dll"
 copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"</Command>
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"
+C:\Users\Marc\source\repos\s5\bbaToolS5\bbaToolS5\bin\x86\Release\net6.0\bbaToolS5.exe -err "$(SolutionDir)\CppLogicBBA" "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +130,8 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <PostBuildEvent>
       <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\LuaDebugger.dll"
 copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"</Command>
+copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"
+C:\Users\Marc\source\repos\s5\bbaToolS5\bbaToolS5\bin\x86\Release\net6.0\bbaToolS5.exe -err "$(SolutionDir)\CppLogicBBA" "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

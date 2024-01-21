@@ -42,20 +42,26 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, con
 	if (L.IsTable(-1)) {
 		L.Push("Initialize");
 		L.GetTableRaw(-2);
-		if (L.IsFunction(-1))
-			L.PCall(0, 0);
-		else
+		if (L.IsFunction(-1)) {
+			if (L.PCall(0, 0) != lua::ErrorCode::Success)
+				L.Pop(1);
+		}
+		else {
 			L.Pop(1);
+		}
 		L.Push("KeepArchive");
 		L.GetTableRaw(-2);
 		keeparchive = L.ToBoolean(-1);
 		L.Pop(1);
 		L.Push(func);
 		L.GetTableRaw(-2);
-		if (L.IsFunction(-1))
-			L.PCall(0, 0);
-		else
+		if (L.IsFunction(-1)) {
+			if (L.PCall(0, 0) != lua::ErrorCode::Success)
+				L.Pop(1);
+		}
+		else {
 			L.Pop(1);
+		}
 	}
 	Framework::AGameModeBase::DoNotRemoveNextArchive = keeparchive;
 	RemoveLib(L);
@@ -95,7 +101,7 @@ void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
 {
 	L.Push("CppLogic");
 	L.GetGlobal();
-	L.Push("ModLoader");
+	L.Push(ModLoaderLib);
 	L.NewTable();
 
 	for (auto l : Loaders)
@@ -118,7 +124,7 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 {
 	L.Push("CppLogic");
 	L.GetGlobal();
-	L.Push("ModLoader");
+	L.Push(ModLoaderLib);
 	L.NewTable();
 
 
@@ -879,6 +885,54 @@ int CppLogic::ModLoader::ModLoader::SanityCheck(lua::State L)
 	return 0;
 }
 
+
+int CppLogic::ModLoader::ModLoader::GetModpackInfo(lua::State L)
+{
+	ModpackDesc d{};
+	d.Name = L.CheckStringView(1);
+	d.BBAPath = GetModPackPath(d.Name);
+	try {
+		auto ar = BB::CBBArchiveFile::CreateUnique();
+		ar->OpenArchive(d.BBAPath.c_str());
+		auto fil = std::format("ModPack\\{}\\ModPack.xml", d.Name);
+		auto file = ar->OpenFileStreamUnique(fil.c_str(), BB::IStream::Flags::DefaultRead);
+		auto seri = BB::CXmlSerializer::CreateUnique();
+		seri->DeserializeByData(file.get(), &d, ModpackDesc::SerializationData);
+		Serializer::ObjectToLuaSerializer::Serialize(L, &d, ModpackDesc::SerializationDataEx);
+	}
+	catch (const BB::CFileException& e) {
+		char buff[200]{};
+		e.CopyMessage(buff, 200);
+		L.Push(buff);
+	}
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::LoadModpackBBA(lua::State L)
+{
+	auto p = GetModPackPath(L.CheckStringView(1));
+	auto* mng = *BB::CFileSystemMgr::GlobalObj;
+	mng->AddArchive(p.c_str());
+	if (mng->LoadOrder.size() >= 2) {
+		if (auto* ar = dynamic_cast<BB::CBBArchiveFile*>(mng->LoadOrder[1])) {
+			if (std::string_view{ ar->ArchiveFile.Filename }.ends_with(".s5x")) {
+				mng->LoadOrder[1] = mng->LoadOrder[0];
+				mng->LoadOrder[0] = ar;
+			}
+		}
+	}
+	L.NewUserClass<ArchivePopHelper>(p);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::InvalidModPackPanic(lua::State L)
+{
+	auto m = L.CheckStringView(1);
+	MessageBoxA(0, m.data(), "ModLoader failure", MB_OK);
+	std::exit(0);
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -903,6 +957,7 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	Framework::AGameModeBase::HookRemoveArchive();
 	Framework::AGameModeBase::HookLoadSave();
 	Framework::AGameModeBase::PreLoadSave = &PreSaveLoad;
+	(*BB::CFileSystemMgr::GlobalObj)->AddArchive("ModPacks\\CppLogic.bba");
 	Initialized = true;
 }
 
@@ -919,10 +974,13 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 		if (L.IsTable(-1)) {
 			L.Push("Cleanup");
 			L.GetTableRaw(-2);
-			if (L.IsFunction(-1))
-				L.PCall(0, 0);
-			else
+			if (L.IsFunction(-1)) {
+				if (L.PCall(0, 0) != lua::ErrorCode::Success)
+					L.Pop(1);
+			}
+			else {
 				L.Pop(1);
+			}
 		}
 		// no need to remove lib, state gets destroyed anyway
 		L.SetTop(t);
@@ -962,6 +1020,14 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 	}
 }
 
+void CppLogic::ModLoader::ModLoader::InitMainmenu(lua::State L)
+{
+	L.Push(ModLoaderLib);
+	L.NewTable();
+	L.RegisterFuncs(Mainmenu, -3);
+	L.SetTableRaw(-3);
+}
+
 bool CppLogic::ModLoader::ModLoader::IsInitialized()
 {
 	return Initialized;
@@ -970,4 +1036,65 @@ bool CppLogic::ModLoader::ModLoader::IsInitialized()
 void CppLogic::ModLoader::ModLoader::AddTaskListToRemove(shok::TaskListId id)
 {
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj.OnIdAllocated(id);
+}
+
+std::string CppLogic::ModLoader::ModLoader::GetModPackPath(std::string_view n)
+{
+	return std::format("{}\\{}.bba", ModpackFolder, n);
+}
+
+CppLogic::SerializationListOptions_ForVector<std::string> stringvect{};
+const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[]{
+	BB::SerializationData::FieldData("LoaderPath", MemberSerializationSizeAndOffset(ModpackDesc, LoaderPath), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::FieldData("ScriptPath", MemberSerializationSizeAndOffset(ModpackDesc, ScriptPath), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::FieldData("Required", MemberSerializationSizeAndOffset(ModpackDesc, Required), &CppLogic::StringSerializer::GlobalObj, &stringvect),
+	BB::SerializationData::FieldData("Incompatible", MemberSerializationSizeAndOffset(ModpackDesc, Incompatible), &CppLogic::StringSerializer::GlobalObj, &stringvect),
+	BB::SerializationData::FieldData("Override", MemberSerializationSizeAndOffset(ModpackDesc, Override), &CppLogic::StringSerializer::GlobalObj, &stringvect),
+	BB::SerializationData::FieldData("DataMod", MemberSerializationFieldData(ModpackDesc, DataMod)),
+	BB::SerializationData::FieldData("ScriptMod", MemberSerializationFieldData(ModpackDesc, ScriptMod)),
+	BB::SerializationData::FieldData("MainmenuMod", MemberSerializationFieldData(ModpackDesc, MainmenuMod)),
+	BB::SerializationData::FieldData("KeepArchive", MemberSerializationFieldData(ModpackDesc, KeepArchive)),
+	BB::SerializationData::GuardData(),
+};
+const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationDataEx[]{
+	BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(ModpackDesc), SerializationData),
+	BB::SerializationData::FieldData("Name", MemberSerializationSizeAndOffset(ModpackDesc, Name), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::FieldData("BBAPath", MemberSerializationSizeAndOffset(ModpackDesc, BBAPath), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::GuardData(),
+};
+
+int CppLogic::ModLoader::ArchivePopHelper::Remove(lua::State L)
+{
+	auto t = L.CheckUserClass<ArchivePopHelper>(1);
+	auto* mng = *BB::CFileSystemMgr::GlobalObj;
+	auto v = mng->LoadOrder.SaveVector();
+	auto it = v.Vector.begin();
+	while (it != v.Vector.end()) {
+		if (auto* a = dynamic_cast<BB::CBBArchiveFile*>(*it)) {
+			if (a->ArchiveFile.Filename == t->Archive) {
+				a->Destroy();
+				v.Vector.erase(it);
+				L.Push(true);
+				return 1;
+			}
+		}
+	}
+	L.Push(false);
+	return 1;
+}
+
+int CppLogic::ModLoader::ArchivePopHelper::IsLoaded(lua::State L)
+{
+	auto t = L.CheckUserClass<ArchivePopHelper>(1);
+	auto* mng = *BB::CFileSystemMgr::GlobalObj;
+	for (const auto* f : mng->LoadOrder) {
+		if (const auto* a = dynamic_cast<const BB::CBBArchiveFile*>(f)) {
+			if (a->ArchiveFile.Filename == t->Archive) {
+				L.Push(true);
+				return 1;
+			}
+		}
+	}
+	L.Push(false);
+	return 1;
 }

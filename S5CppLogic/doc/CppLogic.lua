@@ -3031,6 +3031,40 @@ function CppLogic.ModLoader.RefreshEntityCategoryCache() end
 --- does some checks for the most common usage errors (as far as reasonable).
 function CppLogic.ModLoader.SanityCheck() end
 
+---@class ArchivePopHelper
+local ArchivePopHelper = {
+	---@return boolean wasLoaded
+	Remove = function() end,
+	---@return boolean isLoaded
+	IsLoaded = function() end,
+}
+---@class ModpackDesc
+local ModpackDesc = {
+	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "",
+	---@type string[]
+	Required = {},
+	---@type string[]
+	Incompatible = {},
+	---@type string[]
+	Override = {},
+	DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false,
+	Archive = nil|ArchivePopHelper
+}
+
+--- gets info for a ModPack (mostly from its ModPack.xml).
+---@param name string
+---@return ModpackDesc
+function CppLogic.ModLoader.GetModpackInfo(name) end
+
+--- loads the bba of a ModPack.
+---@param name string
+---@return ArchivePopHelper
+function CppLogic.ModLoader.LoadModpackBBA(name) end
+
+--- shows a MessageBox with the message, then exits the game.
+---@param msg string
+function CppLogic.ModLoader.InvalidModPackPanic(msg) end
+
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.
 function CppLogic_ResetGlobal() end

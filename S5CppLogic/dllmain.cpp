@@ -287,7 +287,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x5BB494)());
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
@@ -301,7 +301,10 @@ int Test(lua::State Ls) {
 		L.Push(mng.GetNameByID(id));
 		L.SetTableRaw(-3);
 	}*/
-	return 1;
+	auto& sup = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades;
+	auto& pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(shok::PlayerId::P1)->SettlerUpgradeManager;
+
+	return 0;
 }
 
 int GetOptions(lua::State L) {
@@ -469,6 +472,10 @@ void Install(lua::State L) {
 	L.NewTable();
 	CppLogic::UA::Init(L);
 	L.SetTableRaw(-3);
+
+	if (L.GetState() == shok::LuaStateMainmenu) {
+		CppLogic::ModLoader::ModLoader::InitMainmenu(L);
+	}
 
 	L.SetGlobal();
 

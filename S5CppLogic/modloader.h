@@ -4,6 +4,7 @@
 #include "s5_defines.h"
 #include "s5_framework.h"
 #include "s5_mapdisplay.h"
+#include "s5_classfactory.h"
 #include "luaext.h"
 
 
@@ -15,6 +16,10 @@ namespace CppLogic::ModLoader {
 		static void Log(lua::State L, const char* log);
 		static void AddLib(lua::State L);
 		static void RemoveLib(lua::State L);
+
+		static constexpr std::string_view ModLoaderLib = "ModLoader";
+
+		static constexpr std::string_view ModpackFolder = "ModPacks";
 
 		class DataTypeLoader {
 		public:
@@ -331,23 +336,62 @@ namespace CppLogic::ModLoader {
 		static int SetEntityTypeToReload(lua::State L);
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
+		static int GetModpackInfo(lua::State L);
+		static int LoadModpackBBA(lua::State L);
+		static int InvalidModPackPanic(lua::State L);
 
-		static constexpr std::array<lua::FuncReference, 3> LuaFuncs{ {
+		static constexpr std::array LuaFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
 				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 				lua::FuncReference::GetRef<SanityCheck>("SanityCheck"),
-		} };
+				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
+				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+				lua::FuncReference::GetRef<InvalidModPackPanic>("InvalidModPackPanic"),
+		};
 
-		static constexpr std::array<lua::FuncReference, 2> NoLoaderFuncs{ {
+		static constexpr std::array NoLoaderFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
 				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
-		} };
+				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
+				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+		};
+
+		static constexpr std::array Mainmenu{
+				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
+				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+		};
 
 	public:
 		static void Initialize();
 		static void Cleanup(Framework::CMain::NextMode n);
+		static void InitMainmenu(lua::State L);
 
 		static bool IsInitialized();
 		static void AddTaskListToRemove(shok::TaskListId id);
+
+		static std::string GetModPackPath(std::string_view n);
+	};
+
+	struct ModpackDesc {
+		std::string Name, BBAPath, LoaderPath, ScriptPath;
+		std::vector<std::string> Required, Incompatible, Override;
+		bool DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false;
+
+		static const BB::SerializationData SerializationData[];
+		static const BB::SerializationData SerializationDataEx[];
+	};
+
+	class ArchivePopHelper {
+		std::string Archive;
+
+		static int Remove(lua::State L);
+		static int IsLoaded(lua::State L);
+	public:
+		inline ArchivePopHelper(std::string_view a) : Archive(a) {}
+
+		static constexpr const std::array LuaMethods = {
+			lua::FuncReference::GetRef<Remove>("Remove"),
+			lua::FuncReference::GetRef<IsLoaded>("IsLoaded"),
+		};
 	};
 }

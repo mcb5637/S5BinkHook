@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!-- ModPack descriptor file, put it as ModPack\\YourModName\\ModPack.xml -->
+<root>
+	<!-- path to the modloader lua (loaded before starting the map) -->
+	<LoaderPath>Data/ModPack/YourModName/ModPackLoader.lua</LoaderPath>
+	<!-- path to the ingame scipt loader (loaded by a call to ModLoader.LoadModScripts() after map start -->
+	<ScriptPath>Data/ModPack/YourModName/ScriptLoader.lua</ScriptPath>
+	<!-- states, that your ModPack only works, if a ModPack of this name is present (does not change load order, may be used multiple times) -->
+	<Required>SomeOtherCoolMod</Required>
+	<!-- your modPack will not get loaded, if a ModPack with this name is present (may be used multiple times) -->
+	<Incompatible>SomeUncoolMod</Incompatible>
+	<!-- puts your ModPack over all ModPacks with this name, if they are present (may be used multiple times, beware cirular Overrides!) -->
+	<Override>SomeOtherCoolMod</Override>
+	<!-- ModPack contains data (ie anything that gets loaded by ModLoader)-->
+	<DataMod>true</DataMod>
+	<!-- ModPack contains runtime scripts intended for ModLoader.LoadModScripts() -->
+	<ScriptMod>true</ScriptMod>
+	<!-- ModPack contains scripts intended for the main menu (WIP) -->
+	<MainmenuMod>false</MainmenuMod>
+	<!-- ModPack requires the archive to stay loaded during the map -->
+	<KeepArchive>true</KeepArchive>
+</root>

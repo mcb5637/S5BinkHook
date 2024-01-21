@@ -310,8 +310,8 @@ namespace GGL {
 		shok::TaskListId BattleTaskList;
 		shok::AnimationId NormalAttackAnim1, NormalAttackAnim2, CounterAttackAnim, FinishingMoveAnim, MissAttackAnim, BattleIdleAnim, BattleWalkAnim; // 4
 		shok::AnimationId HitAnim;
-		shok::DamageClassId DamageClass;
-		int DamageAmount, MaxDamageRandomBonus; // 12
+		shok::DamageClassId DamageClass; // 13
+		int DamageAmount, MaxDamageRandomBonus;
 		float DamageRange;
 		shok::EffectTypeId ProjectileEffectID;
 		float ProjectileOffsetFront, ProjectileOffsetRight, ProjectileOffsetHeight;
@@ -322,7 +322,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x815F68;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x866ADB5D);
 	};
-	//constexpr int i = offsetof(CBattleBehaviorProps, MinRange) / 4;
+	//constexpr int i = offsetof(CBattleBehaviorProps, BattleWaitUntil) / 4;
 
 	class CLeaderBehaviorProps : public GGL::CBattleBehaviorProps {
 	public:

@@ -488,6 +488,9 @@
     <None Include="doc\ModLoader.lua">
       <Filter>doc</Filter>
     </None>
+    <None Include="doc\ModPackLoader.lua">
+      <Filter>doc</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua50\S5Lua5.lib" />
@@ -507,5 +510,10 @@
     <Text Include="doc\gamemechanics_documentation.txt">
       <Filter>doc</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="doc\ModPack.xml">
+      <Filter>doc</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

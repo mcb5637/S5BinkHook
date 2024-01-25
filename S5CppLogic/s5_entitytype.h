@@ -221,6 +221,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3A4D8B20);
 	};
 	static_assert(offsetof(CGLBuildingProps, MaxWorkers) == 42 * 4);
+	static_assert(offsetof(CGLBuildingProps, Upgrade.Category) == 100 * 4);
 
 	class CBridgeProperties : public GGL::CGLBuildingProps {
 	public:

@@ -475,7 +475,7 @@ namespace GGL {
 		virtual bool CanPlaceEntityAtPos(shok::EntityTypeId ety, float x, float y, float r) = 0; // checks buildblock+block of entity blocking
 		virtual bool IsBuildOnBuilding(shok::EntityTypeId ety) = 0;
 		virtual bool GetNearestFreePosForBuildingPlacement(shok::EntityTypeId ety, float x, float y, float* xout, float* yout, float range) = 0;
-		virtual bool DoesBuildOnTypeMatches(shok::EntityTypeId ety, shok::EntityId eid) = 0;
+		virtual bool DoesBuildOnTypeMatches(shok::EntityTypeId ety, shok::EntityId eid) = 0; // 5
 		virtual bool CheckBuildingPlacementAndCost(shok::PlayerId pl, shok::EntityTypeId ety, float x, float y, float r) = 0;
 		virtual shok::EntityTypeId GetSettlerTypeByUCat(shok::PlayerId pl, shok::UpgradeCategoryId ucat) = 0;
 		virtual bool IsWall(shok::EntityTypeId ety) = 0;
@@ -485,13 +485,11 @@ namespace GGL {
 		virtual void FillMerchantData(MerchantData* d) = 0;
 		virtual void FillMineData(MineData* d) = 0; // works with mine building or resentity
 		virtual void FillMotivationData(MotivationData* d) = 0;
-		virtual void FillRefinerData(RefinerData* d) = 0;
+		virtual void FillRefinerData(RefinerData* d) = 0; // 15
 		virtual void FillUIData(shok::PlayerId player, UIData* d) = 0;
-	private:
-		virtual void unknown1() = 0; // get workplace string???
-		virtual void unknown2() = 0; // get residence string???
-		virtual void unknown3() = 0; // get farm string???
-	public:
+		virtual void FillWorkersOfWorkplace(shok::EntityId bid, shok::Vector<shok::EntityId>* workers) = 0;
+		virtual void FillSleepersOfResidence(shok::EntityId bid, shok::Vector<shok::EntityId>* sleepers) = 0;
+		virtual void FillEatersOfFarm(shok::EntityId bid, shok::Vector<shok::EntityId>* eaters) = 0;
 		virtual shok::ModelId GetModelOverride(shok::EntityId eid) = 0; // 20
 		virtual int GetCurrentResourceAmount(shok::EntityId eid) = 0;
 		virtual bool DoesSetTaskListDepthMatch(shok::EntityId eid, int tlde) = 0;
@@ -504,15 +502,11 @@ namespace GGL {
 		virtual bool IsHero(shok::EntityId eid) = 0;
 		virtual bool IsNPCMarkerOn(shok::EntityId eid) = 0; // 30
 		virtual bool IsSerf(shok::EntityId eid) = 0;
-	private:
-		virtual void unknown4() = 0; // maybe player related
-	public:
+		virtual void IsEntityInCategory(shok::EntityId eid, shok::EntityCategory cat) = 0;
 		virtual bool IsBuilding(shok::EntityId eid) = 0;
 		virtual bool IsConstructionSite(shok::EntityId eid) = 0;
 		virtual bool IsBuildingSellable(shok::EntityId eid, shok::PlayerId player) = 0;
-	private:
-		virtual void unknown5() = 0; // something buildingupgrademanager
-	public:
+		virtual bool CanPlayerUpgradeBuilding(shok::EntityId e, shok::PlayerId p) = 0; // used by deprecated guistate, checks not in hq ecat?
 		virtual bool IsConvertible(shok::EntityId eid, shok::PlayerId player) = 0;
 		virtual bool IsAnimal(shok::EntityId eid) = 0;
 		virtual bool IsMercenaryFree(shok::EntityId eid, shok::PlayerId player) = 0;
@@ -531,14 +525,14 @@ namespace GGL {
 		virtual bool SerfCanPathToNearestResourceEntity(shok::EntityId serfId, shok::ResourceType rt, float x, float y) = 0; // 50
 		virtual bool SerfCanPathToResourceEntity(shok::EntityId serfId, shok::EntityId resourceId) = 0;
 		virtual EGL::CGLEEntity* GetEntity(shok::EntityId id) = 0;
+		virtual bool IsBarracksofPlayer(shok::EntityId e, shok::PlayerId pl) = 0;
 	private:
-		virtual void unknown9() = 0; // get something building related
 		virtual void unknown10() = 0; // building get military info 4
 	public:
 		virtual void RoundPosToBuildingPlacement(float x, float y, float* xout, float* yout) = 0; //55
 		virtual void FillSoldiersOfLeader(shok::EntityId id, shok::Vector<shok::EntityId>* soldiers) = 0;
 	private:
-		virtual void unknown12() = 0;
+		virtual void unknown12() = 0; // these 2 have something to do with debug mode?
 		virtual void unknown13() = 0;
 	public:
 		virtual bool IsBuildingType(shok::EntityTypeId id) = 0;
@@ -549,25 +543,23 @@ namespace GGL {
 	private:
 		virtual shok::ResourceType GetResourceTypeProvidedBy2(shok::EntityId eid) = 0; // same func as above
 		virtual void unknown14() = 0; //65
-		virtual void unknown15() = 0;
-		virtual void unknown16() = 0;
+	public:
+		virtual GGL::CWeatherHandler* GetWeatherHandler() = 0;
+	private:
+		virtual void unknown16() = 0; // something building & vc?
 	public:
 		virtual shok::SectorId GetSector(shok::EntityId entityid) = 0;
 		virtual shok::SectorId GetSector(const shok::Position* p) = 0;
 		virtual bool IsEntityInSector(shok::EntityId eid, shok::SectorId secor) = 0; //70
 		virtual bool GetTechUsedForStatistics(shok::TechnologyId techid) = 0;
-	private:
-		virtual void unknown17() = 0; //search some pos?
-	public:
+		virtual shok::Position* GetNextUnblockedPosInEntitiesSector(shok::Position* outpos, shok::Position* inpos, shok::EntityId eid) = 0; // used for scout torches, something else?
 		virtual bool IsPositionExploredByPlayer(shok::PlayerId pid, const shok::Position* p) = 0;
 		virtual int GetWorkCycleId(const char* name) = 0;
 		virtual shok::PrincipalTaskId GetPrincipalTask(shok::TaskListId tid) = 0; //75
 		virtual bool IsThief(shok::EntityId id) = 0;
 		virtual bool IsThiefCarryingSomething(shok::EntityId id) = 0;
-	private:
-		virtual void unknown18() = 0;
-		virtual void unknown19() = 0;
-	public:
+		virtual bool IsValidThiefStealTarget(shok::EntityId id) = 0;
+		virtual bool IsValidThiefSecureTarget(shok::EntityId id) = 0;
 		virtual bool IsBridge(shok::EntityId id) = 0; //80
 		virtual bool IsBridgeTargetedBySabotage(shok::EntityId id) = 0;
 		virtual bool CanKegGetDisarmed(shok::EntityId id) = 0;

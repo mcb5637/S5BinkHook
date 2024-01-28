@@ -23,10 +23,8 @@ namespace CppLogic::UI {
 		virtual ~GUIState_LuaSelection() override;
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual bool OnMouseEvent(BB::CEvent* ev) override;
-		virtual void SetStateParameters(GGUI::SStateParameters* p) override;
 		virtual bool Cancel() override;
 		virtual const char* GetName() override;
-		virtual int OnSelectionChanged(int z) override;
 
 		static void Initialize();
 		void Cancel(bool calllua);

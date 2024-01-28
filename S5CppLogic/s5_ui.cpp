@@ -768,7 +768,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, sh
 		anchor.y = 1.0f - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
 		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
 	}
-	
+
 	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureRaster(nullptr);
 	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureFilterMode(RWE::RwTextureFilterMode::rwFILTERLINEAR);
 
@@ -794,7 +794,7 @@ void shok::HookTextPrinting()
 	if (HookTextPrinting_Hooked)
 		return;
 	HookTextPrinting_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {reinterpret_cast<void*>(0x5577E1), 
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {reinterpret_cast<void*>(0x5577E1),
 		reinterpret_cast<void*>(0x708F00),
 	} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5577E1), &printstr_override, reinterpret_cast<void*>(0x5577EB));
@@ -816,7 +816,7 @@ void ERwTools::CRpClumpRenderable::SetBuildingRedColor(bool r)
 	SetBuildingRedColorI(r ? 2 : 1);
 }
 
-static inline void(__thiscall*const c3dviewhandler_setguistate)(GGUI::C3DViewHandler* th, shok::ClassId id, const GGUI::SStateParameters* p) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, shok::ClassId, const GGUI::SStateParameters*)>(0x52820C);
+static inline void(__thiscall* const c3dviewhandler_setguistate)(GGUI::C3DViewHandler* th, shok::ClassId id, const GGUI::SStateParameters* p) = reinterpret_cast<void(__thiscall*)(GGUI::C3DViewHandler*, shok::ClassId, const GGUI::SStateParameters*)>(0x52820C);
 void GGUI::C3DViewHandler::SetGUIStateByIdentifier(shok::ClassId identifier, const GGUI::SStateParameters* p)
 {
 	c3dviewhandler_setguistate(this, identifier, p);
@@ -897,6 +897,11 @@ inline GGUI::CBasicState* (__thiscall* const guimng_getcmdstate)(GGUI::CManager*
 GGUI::CBasicState* GGUI::CManager::GetCommandStateFor(shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata)
 {
 	return guimng_getcmdstate(this, entity, tdata, edata);
+}
+inline shok::EntityId(__thiscall* const guimng_lastselnonsol)(const shok::Vector<GGUI::CManager::SelectionData>* th) = reinterpret_cast<shok::EntityId(__thiscall*)(const shok::Vector<GGUI::CManager::SelectionData>*)>(0x721D9C);
+shok::EntityId GGUI::CManager::GetLastSelectedNonSoldier() const
+{
+	return guimng_lastselnonsol(&SelectedEntities);
 }
 
 bool(*GGUI::CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;

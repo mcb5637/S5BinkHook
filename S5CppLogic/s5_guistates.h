@@ -33,10 +33,10 @@ namespace GGUI {
 		static inline constexpr int TypeDesc = 0x82CC10;
 
 		virtual bool OnMouseEvent(BB::CEvent* ev) = 0; // return event handled?
-		virtual void SetStateParameters(SStateParameters* p) = 0;
+		virtual void SetStateParameters(SStateParameters* p);
 		virtual bool Cancel() = 0; // no idea what the return actually is for, seems to return always 1
 		virtual const char* GetName() = 0;
-		virtual int OnSelectionChanged(int z) = 0; //on selection changed call with 0 -> cancel state
+		virtual void OnSelectionChanged(int z); //on selection changed call with 0 -> cancel state
 	};
 
 	class CBasicState : public GGUI::CState { // no vtable
@@ -64,7 +64,7 @@ namespace GGUI {
 		virtual bool CheckCommandValid(TargetData* d, int z) = 0;
 		virtual void ExecuteCommand(TargetData* d, ExecuteData* selectedID) = 0; // check if that id is actually the parameter, might also be 0?
 		virtual TargetData* GetTargetData(TargetData* d, int x, int y) = 0; // write data into d, then return d
-		virtual void OnMouseMove(int x, int y) = 0;
+		virtual void OnMouseMove(int x, int y);
 		virtual bool OnCancel() = 0; // Cancel redirects here, no idea why we need a 2nd method for that...
 
 		void FillPosData(TargetData* d, int x, int y);
@@ -82,6 +82,9 @@ namespace GGUI {
 	class CPositionCommandState : public GGUI::CCommandState { // no vtable
 	public:
 		static inline constexpr int TypeDesc = 0x82CDFC;
+
+		virtual TargetData* GetTargetData(TargetData* d, int x, int y) override;
+
 		virtual void ExecuteForPosAndEntity(int id, float x, float y, float r) = 0;
 	};
 	class CWalkCommandState : public GGUI::CPositionCommandState {
@@ -130,6 +133,8 @@ namespace GGUI {
 	class CEntityCommandState : public GGUI::CCommandState { // no vtable
 	public:
 		static inline constexpr int TypeDesc = 0x82CCAC;
+
+		virtual TargetData* GetTargetData(TargetData* d, int x, int y) override;
 	};
 	class CStealGoodsState : public GGUI::CEntityCommandState {
 	public:
@@ -287,7 +292,7 @@ namespace GGUI {
 		CPlaceBuildingState();
 		virtual ~CPlaceBuildingState() override;
 		virtual void SetStateParameters(SStateParameters* p) override;
-		virtual int OnSelectionChanged(int z) override;
+		virtual void OnSelectionChanged(int z) override;
 		virtual bool CheckCommandValid(TargetData* d, int z) override;
 		virtual void ExecuteCommand(TargetData* d, ExecuteData* selectedID) override;
 		virtual TargetData* GetTargetData(TargetData* d, int x, int y) override;

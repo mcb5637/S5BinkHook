@@ -420,7 +420,7 @@ namespace CppLogic::UI {
 		const char* s = L.CheckString(2);
 		EGUIX::CWidgetGroupManager* wgm = EGUIX::CWidgetGroupManager::GlobalObj();
 		auto g = wgm->GetGroupId(s);
-		if (g==shok::WidgetGroupId::Invalid)
+		if (g == shok::WidgetGroupId::Invalid)
 			g = wgm->CreateGroup(s);
 		wid->Group = g;
 		return 0;
@@ -836,7 +836,7 @@ namespace CppLogic::UI {
 
 				L.SetTop(t);
 				return r;
-			};
+				};
 		}
 		return 0;
 	}
@@ -1073,7 +1073,7 @@ namespace CppLogic::UI {
 			L.SetTableRaw(-3);
 			L.SetTableRaw(-2, i);
 			++i;
-		};
+			};
 
 		L.NewTable();
 		for (const auto* m : mes->StandardMessage.Messages) {
@@ -1104,7 +1104,7 @@ namespace CppLogic::UI {
 		}
 		mes->StandardMessage.Add(static_cast<GGUI::CShortMessagesWindowControllerCustomWidget::MessageType>(L.CheckInt(1)),
 			nullptr, L.CheckFloat(2), p, L.CheckString(3)
-			);
+		);
 		return 0;
 	}
 
@@ -1333,11 +1333,6 @@ namespace CppLogic::UI {
 		return false;
 	}
 
-	void GUIState_LuaSelection::SetStateParameters(GGUI::SStateParameters* p)
-	{
-
-	}
-
 	bool GUIState_LuaSelection::Cancel()
 	{
 		Cancel(true);
@@ -1347,13 +1342,6 @@ namespace CppLogic::UI {
 	const char* GUIState_LuaSelection::GetName()
 	{
 		return Name;
-	}
-
-	int GUIState_LuaSelection::OnSelectionChanged(int z)
-	{
-		if (!z)
-			Cancel();
-		return 1;
 	}
 
 
@@ -1467,7 +1455,7 @@ namespace CppLogic::UI {
 		if (selectedID->CurrentID == selectedID->FirstID) {
 			if (CheckCommandValid(d, 0)) {
 				auto m = GGUI::CManager::GlobalObj();
-				GGL::CNetEventBuildingCreator ev{ shok::NetEventIds::CommandPlaceBuilding, m->ControlledPlayer, UpgradeCategory, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())}};
+				GGL::CNetEventBuildingCreator ev{ shok::NetEventIds::CommandPlaceBuilding, m->ControlledPlayer, UpgradeCategory, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())} };
 				{
 					auto v = ev.Serf.SaveVector();
 					for (const auto& se : m->SelectedEntities) {
@@ -1686,7 +1674,7 @@ namespace CppLogic::UI {
 	{
 		L.RegisterFuncs(UI, -3);
 #ifdef _DEBUG
-		L.RegisterFunc<WidgetGetAddress>("WidgetGetAddress" -3);
+		L.RegisterFunc<WidgetGetAddress>("WidgetGetAddress", -3);
 #endif
 
 		if (L.GetState() == shok::LuaStateMainmenu) {

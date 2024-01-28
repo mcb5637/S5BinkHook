@@ -21,14 +21,37 @@ void GGUI::CBasicState::TargetData::FillPosWithZFromPos()
 	tdata_fillxyz(this);
 }
 
-inline bool (__thiscall* const basicstate_mouseevent)(GGUI::CBasicState* th, BB::CEvent* ev) = reinterpret_cast<bool (__thiscall*)(GGUI::CBasicState*, BB::CEvent*)>(0x526BFE);
+inline bool(__thiscall* const basicstate_mouseevent)(GGUI::CBasicState* th, BB::CEvent* ev) = reinterpret_cast<bool(__thiscall*)(GGUI::CBasicState*, BB::CEvent*)>(0x526BFE);
 bool GGUI::CBasicState::OnMouseEvent(BB::CEvent* ev)
 {
 	return basicstate_mouseevent(this, ev);
 }
+void GGUI::CState::SetStateParameters(SStateParameters* p)
+{
+}
 bool GGUI::CBasicState::Cancel()
 {
 	return OnCancel();
+}
+void GGUI::CState::OnSelectionChanged(int z)
+{
+	if (z == 0)
+		Cancel();
+}
+
+void GGUI::CBasicState::OnMouseMove(int x, int y)
+{
+}
+
+inline GGUI::CBasicState::TargetData* (__thiscall* const poscmdstate_gettar)(GGUI::CPositionCommandState* th, GGUI::CBasicState::TargetData* d, int x, int y) = reinterpret_cast<GGUI::CBasicState::TargetData * (__thiscall*)(GGUI::CPositionCommandState*, GGUI::CBasicState::TargetData*, int, int)>(0x526CB8);
+GGUI::CBasicState::TargetData* GGUI::CPositionCommandState::GetTargetData(TargetData* d, int x, int y)
+{
+	return poscmdstate_gettar(this, d, x, y);
+}
+inline GGUI::CBasicState::TargetData* (__thiscall* const entcmdstate_gettar)(GGUI::CEntityCommandState* th, GGUI::CBasicState::TargetData* d, int x, int y) = reinterpret_cast<GGUI::CBasicState::TargetData * (__thiscall*)(GGUI::CEntityCommandState*, GGUI::CBasicState::TargetData*, int, int)>(0x526C9E);
+GGUI::CBasicState::TargetData* GGUI::CEntityCommandState::GetTargetData(TargetData* d, int x, int y)
+{
+	return entcmdstate_gettar(this, d, x, y);
 }
 
 inline void(__thiscall* const basicstate_fillpos)(GGUI::CBasicState* th, GGUI::CBasicState::TargetData* d, int x, int y) = reinterpret_cast<void(__thiscall*)(GGUI::CBasicState*, GGUI::CBasicState::TargetData*, int, int)>(0x526B46);
@@ -73,10 +96,10 @@ void GGUI::CPlaceBuildingState::SetStateParameters(SStateParameters* p)
 {
 	placebuild_setparams(this, p);
 }
-inline int(__thiscall* const placebuld_onselchanged)(GGUI::CPlaceBuildingState* th, int z) = reinterpret_cast<int(__thiscall*)(GGUI::CPlaceBuildingState*, int)>(0x538971);
-int GGUI::CPlaceBuildingState::OnSelectionChanged(int z)
+inline void(__thiscall* const placebuld_onselchanged)(GGUI::CPlaceBuildingState* th, int z) = reinterpret_cast<void(__thiscall*)(GGUI::CPlaceBuildingState*, int)>(0x538971);
+void GGUI::CPlaceBuildingState::OnSelectionChanged(int z)
 {
-	return placebuld_onselchanged(this, z);
+	placebuld_onselchanged(this, z);
 }
 inline bool(__thiscall* const placebuild_checkcmd)(GGUI::CPlaceBuildingState* th, GGUI::CBasicState::TargetData* d, int z) = reinterpret_cast<bool(__thiscall*)(GGUI::CPlaceBuildingState*, GGUI::CBasicState::TargetData*, int)>(0x5389BD);
 bool GGUI::CPlaceBuildingState::CheckCommandValid(TargetData* d, int z)
@@ -88,7 +111,7 @@ void GGUI::CPlaceBuildingState::ExecuteCommand(TargetData* d, ExecuteData* selec
 {
 	placebuild_exec(this, d, selectedID);
 }
-inline GGUI::CBasicState::TargetData* (__thiscall* const placebuild_getdata)(GGUI::CPlaceBuildingState* th, GGUI::CBasicState::TargetData* d, int x, int y) = reinterpret_cast<GGUI::CBasicState::TargetData* (__thiscall*)(GGUI::CPlaceBuildingState*, GGUI::CBasicState::TargetData*, int, int)>(0x538B11);
+inline GGUI::CBasicState::TargetData* (__thiscall* const placebuild_getdata)(GGUI::CPlaceBuildingState* th, GGUI::CBasicState::TargetData* d, int x, int y) = reinterpret_cast<GGUI::CBasicState::TargetData * (__thiscall*)(GGUI::CPlaceBuildingState*, GGUI::CBasicState::TargetData*, int, int)>(0x538B11);
 GGUI::CBasicState::TargetData* GGUI::CPlaceBuildingState::GetTargetData(TargetData* d, int x, int y)
 {
 	return placebuild_getdata(this, d, x, y);

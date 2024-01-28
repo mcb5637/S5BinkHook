@@ -357,7 +357,7 @@ namespace ERwTools {
 		static inline float* const CutsceneFarClipPlaneMax = reinterpret_cast<float*>(0x77A7E8);
 		static inline float* const CutsceneFarClipPlaneMin = reinterpret_cast<float*>(0x77A7F0);
 	};
-	static_assert(sizeof(CRwCameraHandler) == 92*4);
+	static_assert(sizeof(CRwCameraHandler) == 92 * 4);
 	constexpr int i = offsetof(CRwCameraHandler, CameraInfo.LookAtZ) / 4;
 
 	class ICameraBehaviour : public EToolsManager::IInputDriven {
@@ -593,13 +593,13 @@ namespace GGUI {
 
 		void SetGUIStateByIdentifier(shok::ClassId identifier, const GGUI::SStateParameters* p = nullptr);
 		template<class T>
-		requires std::derived_from<T, GGUI::CState>
+			requires std::derived_from<T, GGUI::CState>
 		void SetGUIState(const GGUI::SStateParameters* p = nullptr) {
 			SetGUIStateByIdentifier(T::Identifier, p);
 		}
 		void SetGUIStateByIdentfierOnNextUpdate(shok::ClassId identifier);
 		template<class T>
-		requires std::derived_from<T, GGUI::CState>
+			requires std::derived_from<T, GGUI::CState>
 		void SetGUIStateByIdentfierOnNextUpdate() {
 			SetGUIStateByIdentfierOnNextUpdate(T::Identifier);
 		}
@@ -632,6 +632,14 @@ namespace GGUI {
 		struct StateIdData {
 			shok::EntityCategory ApplyTo;
 			GGUI::CBasicState* State;
+
+
+			inline void* operator new(size_t s) {
+				return shok::Malloc(s);
+			}
+			inline void operator delete(void* p) {
+				shok::Free(p);
+			}
 		};
 		struct SelectionData {
 			shok::EntityId Id;
@@ -677,6 +685,7 @@ namespace GGUI {
 		bool IsCommandStateValid(StateIdData* s, shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
 		// goes through CommandStates and returns the first valid one
 		GGUI::CBasicState* GetCommandStateFor(shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
+		shok::EntityId GetLastSelectedNonSoldier() const;
 
 		void HackPostEvent();
 

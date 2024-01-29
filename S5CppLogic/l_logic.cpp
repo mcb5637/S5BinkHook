@@ -28,6 +28,7 @@
 #include "hooks.h"
 #include "luaserializer.h"
 #include "savegame_extra.h"
+#include "luaserializer.h"
 #include "l_ui.h"
 
 namespace CppLogic::Logic {
@@ -1027,6 +1028,13 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int DumpTaskList(lua::State l) {
+		luaext::EState L{ l };
+		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, tl);
+		return 1;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1430,7 +1438,7 @@ namespace CppLogic::Logic {
 		GGL::CWorkerBehavior::RefinerFix = false;
 	}
 
-	constexpr std::array<lua::FuncReference, 63> Logic{ {
+	constexpr std::array Logic{
 			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
 			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
 			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
@@ -1494,7 +1502,8 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<EnableResourceTriggers>("EnableResourceTriggers"),
 			lua::FuncReference::GetRef<IsPositionExplored>("IsPositionExplored"),
 			lua::FuncReference::GetRef<SetPositionExploration>("SetPositionExploration"),
-		} };
+			lua::FuncReference::GetRef<DumpTaskList>("DumpTaskList"),
+		};
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {
 			lua::FuncReference::GetRef<NetEventSetHook>("SetCallback"),

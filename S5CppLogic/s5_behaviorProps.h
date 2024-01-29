@@ -307,8 +307,10 @@ namespace GGL {
 
 	class CBattleBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId BattleTaskList;
-		shok::AnimationId NormalAttackAnim1, NormalAttackAnim2, CounterAttackAnim, FinishingMoveAnim, MissAttackAnim, BattleIdleAnim, BattleWalkAnim; // 4
+		shok::TaskListId BattleTaskList; // 4
+		shok::AnimationId NormalAttackAnim1, NormalAttackAnim2, // 5 randomly selected if damage factor <= 1
+			CounterAttackAnim, FinishingMoveAnim, // 7 counterattack if damage factor > 1, finishing seems unused
+			MissAttackAnim, BattleIdleAnim, BattleWalkAnim; // 9
 		shok::AnimationId HitAnim;
 		shok::DamageClassId DamageClass; // 13
 		int DamageAmount, MaxDamageRandomBonus;

@@ -626,6 +626,11 @@ function CppLogic.Logic.IsPositionExplored(player, pos) end
 ---@param explored boolean
 function CppLogic.Logic.SetPositionExploration(player, pos1, pos2, explored) end
 
+--- dumps a task list for dev purposes
+---@param tl number|string
+---@return table
+function CppLogic.Logic.DumpTaskList(tl) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -2169,6 +2174,12 @@ function CppLogic.EntityType.Settler.LeaderTypeGetMaxNumberOfSoldiers(ty) end
 --- @param ty number entitytype
 --- @return number ucat
 function CppLogic.EntityType.Settler.GetUpgradeCategory(ty) end
+
+--- dumps the entity types GGL::CBattleBehaviorProps to lua
+--- likely slow, only intended for development putposes
+---@param et number|string
+---@return table
+function CppLogic.EntityType.Settler.DumpBattleBehavior(et) end
 
 --- number of settlers this building (villagecenter) supports.
 --- @param ty number entitytype

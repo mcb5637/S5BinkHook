@@ -9,6 +9,7 @@
 #include "s5_player.h"
 #include "luaext.h"
 #include "hooks.h"
+#include "luaserializer.h"
 
 namespace CppLogic::EntityType {
 	int LeaderTypeGetSoldierType(lua::State ls) {
@@ -870,6 +871,17 @@ namespace CppLogic::EntityType {
 		return 1;
 	}
 
+	int DumpBattleBehavior(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		auto b = t->GetBehaviorPropsDynamic<GGL::CBattleBehaviorProps>();
+		if (b == nullptr)
+			L.Push();
+		else
+			CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, b);
+		return 1;
+	}
+
 	int GetDeleteWhenBuildOn(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
@@ -923,7 +935,7 @@ namespace CppLogic::EntityType {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 35> EntityType{ {
+	constexpr std::array EntityType{
 			lua::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
 			lua::FuncReference::GetRef<SetLimitedLifespanDuration>("SetLimitedLifespanDuration"),
 			lua::FuncReference::GetRef<GetMaxHealth>("GetMaxHealth"),
@@ -959,9 +971,9 @@ namespace CppLogic::EntityType {
 			lua::FuncReference::GetRef<IsSettlerType>("IsSettlerType"),
 			lua::FuncReference::GetRef<IsLeaderType>("IsLeaderType"),
 			lua::FuncReference::GetRef<IsSoldierType>("IsSoldierType"),
-		} };
+		};
 
-	constexpr std::array<lua::FuncReference, 29> Settler{ {
+	constexpr std::array Settler{
 			lua::FuncReference::GetRef<LeaderTypeGetSoldierType>("LeaderTypeGetSoldierType"),
 			lua::FuncReference::GetRef<LeaderTypeSetSoldierType>("LeaderTypeSetSoldierType"),
 			lua::FuncReference::GetRef<LeaderTypeGetUpkeep>("LeaderTypeGetUpkeep"),
@@ -991,9 +1003,10 @@ namespace CppLogic::EntityType {
 			lua::FuncReference::GetRef<GetSpeedModifierTechs>("GetSpeedModifierTechs"),
 			lua::FuncReference::GetRef<LeaderTypeGetMaxNumberOfSoldiers>("LeaderTypeGetMaxNumberOfSoldiers"),
 			lua::FuncReference::GetRef<GetUpgradeCategory>("GetUpgradeCategory"),
-		} };
+			lua::FuncReference::GetRef<DumpBattleBehavior>("DumpBattleBehavior"),
+		};
 
-	constexpr std::array<lua::FuncReference, 10> Building{ {
+	constexpr std::array Building{
 			lua::FuncReference::GetRef<GetSabotageFactor>("GetSabotageFactor"),
 			lua::FuncReference::GetRef<SetSabotageFactor>("SetSabotageFactor"),
 			lua::FuncReference::GetRef<GetVCAttractionSlotsProvided>("GetVCAttractionSlotsProvided"),
@@ -1004,7 +1017,7 @@ namespace CppLogic::EntityType {
 			lua::FuncReference::GetRef<SetUpgradeCost>("SetUpgradeCost"),
 			lua::FuncReference::GetRef<AddHPTechMod>("AddHPTechMod"),
 			lua::FuncReference::GetRef<GetBuildOnTypes>("GetBuildOnTypes"),
-		} };
+		};
 
 	void Init(lua::State L)
 	{

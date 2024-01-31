@@ -5,6 +5,9 @@
 #include "s5_player.h"
 
 namespace EGL {
+	struct SSlotArgsMovingEntity {
+		shok::PositionRot Pos;
+	};
 	class CCoarsePath {
 	public:
 		virtual ~CCoarsePath() = default;
@@ -31,13 +34,22 @@ namespace EGL {
 	static_assert(sizeof(CCoarsePath) == 40 * 4);
 	class CMovementBehavior : public EGL::CGLEBehavior {
 	public:
+		class CSlotMovingEntity : public EGL::TSlot<EGL::SSlotArgsMovingEntity, 1383452519> {
+			CMovementBehavior* Beh;
+
+			inline virtual void __stdcall FillSlot(EGL::SSlotArgsMovingEntity* data) override {
+				data->Pos = Beh->LastTurnPos;
+			}
+		};
+
+
 		int CurrentTurn; // 4
 		float MovementSpeed, TurningSpeed, SpeedFactor; // la7
 		PADDINGI(1);
 		shok::PositionRot NextWayPoint, LastTurnPos; // 9, 12
 		bool IsPathingUsed, IsMoveFinished; // 15
 		PADDING(2);
-		PADDINGI(1); // p to EGL::CMovementBehavior::CSlotMovingEntity
+		EGL::CMovementBehavior::CSlotMovingEntity* Slot;
 		shok::ModelId ResumeModelID; // 17
 		bool PauseMode, WasMoving, IsObstructed;
 		PADDING(1);

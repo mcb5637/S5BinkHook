@@ -23,12 +23,14 @@
 #include "dump_guitextures.h"
 #include "luaserializer.h"
 #include "ModConfig.h"
+#include "StringUtility.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
 {
 	Log(L, "Initializing ModLoader");
 
-	Log(L, mappath);
+	auto logpath = StringUtil::ANSIToUTF8(mappath);
+	Log(L, logpath.c_str());
 	if (!BB::CFileSystemMgr::DoesFileExist(mappath)) {
 		Log(L, "no ModLoader.lua, aborting");
 		return;

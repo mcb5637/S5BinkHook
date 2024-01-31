@@ -71,13 +71,17 @@ namespace ED {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x29B4B323);
 	};
 
+	class CDisplayStaticEntity;
 	class CDisplayBehaviorMovement : public ED::IBehavior {
 	public:
+		ED::CDisplayStaticEntity* Entity;
+		EGL::TSlot<EGL::SSlotArgsMovingEntity, 1383452519>* Slot;
 
 		static inline constexpr int vtp = 0x7AEAA4;
 		static inline constexpr int TypeDesc = 0x84D3E8;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x166A8A03);
 	};
+	static_assert(offsetof(CDisplayBehaviorMovement, Entity) == 4 * 1);
 
 	class CDisplayBehaviorBuildingAnimation : public ED::IBehavior {
 	public:

@@ -358,6 +358,7 @@ void InitGame() {
 	Framework::CMain::OnSaveLoaded = &OnSaveLoaded;
 	Framework::SavegameSystem::HookSaveGame();
 	Framework::SavegameSystem::OnGameSavedTo = &OnSaveDone;
+	BB::CBBArchiveFile::HookFixDoubleFree();
 	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Initialize();
 	if (!Options.DisableAdvStringPrinting)

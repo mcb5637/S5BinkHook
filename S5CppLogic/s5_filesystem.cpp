@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "s5_filesystem.h"
 
+#include "hooks.h"
+
 static inline bool(__thiscall* const dirfilesys_filter_allowedI)(BB::CDirectoryFileSystem::FilterData* th, const char* f) = reinterpret_cast<bool(__thiscall*)(BB::CDirectoryFileSystem::FilterData*, const char*)>(0x5532C4);
 bool BB::CDirectoryFileSystem::FilterData::IsAllowedCaseInsensitive(const char* filename)
 {
@@ -29,6 +31,34 @@ BB::CBBArchiveFile::DirectoryEntry* BB::CBBArchiveFile::GetByOffset(size_t offse
 		mov r, eax;
 	};
 	return r;
+}
+
+void __declspec(naked) archivefile_doublefreeasm() {
+	__asm {
+		push[esi + 0x10];
+		mov eax, 0x5C2E2D;
+		call eax;
+		mov eax, 0;
+		mov[esi + 0x10], eax;
+
+		push[esi + 0x14];
+		mov eax, 0x5C2E2D;
+		call eax;
+		mov eax, 0;
+		mov[esi + 0x14], eax;
+
+		push 0x55116C;
+		ret;
+	}
+}
+bool HookFixDoubleFree_Hooked = false;
+void BB::CBBArchiveFile::HookFixDoubleFree()
+{
+	if (HookFixDoubleFree_Hooked)
+		return;
+	HookFixDoubleFree_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55115C), 0x55116C - 0x55115C };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55115C), &archivefile_doublefreeasm, reinterpret_cast<void*>(0x55116C));
 }
 
 static inline void(__cdecl* const filesystem_addfolder)(const char* p, char* d) = reinterpret_cast<void(__cdecl*)(const char*, char*)>(0x546514);

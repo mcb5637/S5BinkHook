@@ -190,6 +190,8 @@ namespace BB {
 
 		// len -1 for infinite (stops at \0)
 		static inline uint32_t(__cdecl* const HashString)(const char* data, int len) = reinterpret_cast<uint32_t(__cdecl*)(const char*, int)>(0x547D90);
+
+		static void HookFixDoubleFree();
 	};
 	static_assert(sizeof(CBBArchiveFile) == 6 * 4);
 

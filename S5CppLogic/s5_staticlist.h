@@ -1,7 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
-
+#include "magic_enum.hpp"
 
 namespace EGL {
 	class CStaticEntry {
@@ -31,9 +31,9 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x766B44;
 
-		static inline CStaticListEx*(__cdecl* const GlobalHeroAbilities)() = reinterpret_cast<CStaticListEx*(__cdecl*)()>(0x498312);
+		static inline CStaticListEx* (__cdecl* const GlobalHeroAbilities)() = reinterpret_cast<CStaticListEx * (__cdecl*)()>(0x498312);
 		// every category is in there multiple times ([26, 29] times). somebody probably put the initialization into a header xD
-		static inline CStaticListEx*(__cdecl* const GlobalEntityCategories)() = reinterpret_cast<CStaticListEx*(__cdecl*)()>(0x449D04);
+		static inline CStaticListEx* (__cdecl* const GlobalEntityCategories)() = reinterpret_cast<CStaticListEx * (__cdecl*)()>(0x449D04);
 	};
 
 
@@ -63,6 +63,12 @@ namespace GGL {
 
 		// creates and adds it to the GlobalHeroAbilities list
 		CStaticHeroAbilityID(const char* name, shok::AbilityId id);
+
+		template<shok::AbilityId Id>
+		static CStaticHeroAbilityID Create() {
+			static_assert(!magic_enum::enum_name(Id).empty());
+			return CStaticHeroAbilityID{ magic_enum::enum_name(Id).data(), Id };
+		}
 	};
 
 	class CStaticArmorClassID : public EGL::CStaticEntry {

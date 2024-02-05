@@ -405,4 +405,29 @@ namespace CppLogic {
 			o->Destroy();
 		}
 	};
+
+
+	template<int HandlerID, class EventBase, class HandlerEvent, class ReturnType>
+	class StaticHandler : public EGL::IGLEHandler<EventBase, ReturnType> {
+	public:
+		typedef ReturnType(*HandlerType)(HandlerEvent* ev);
+
+		HandlerType HandlerFunc;
+
+		virtual ReturnType Handle(EventBase* ev) override {
+			return HandlerFunc(static_cast<HandlerEvent*>(ev));
+		}
+
+		explicit StaticHandler(HandlerType h) {
+			HandlerFunc = h;
+		}
+
+		void* operator new(size_t s)
+		{
+			return shok::Malloc(s);
+		}
+		void operator delete(void* p) {
+			shok::Free(p);
+		}
+	};
 }

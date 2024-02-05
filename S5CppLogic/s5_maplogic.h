@@ -305,7 +305,7 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC375BEA3);
 	};
 	static_assert(offsetof(CPlayerFeedbackHandler, SettlerFeedbackList) == 16);
-	static_assert(sizeof(CPlayerFeedbackHandler::SettlerFeedbackList) == 12*7);
+	static_assert(sizeof(CPlayerFeedbackHandler::SettlerFeedbackList) == 12 * 7);
 	static_assert(offsetof(CPlayerFeedbackHandler, SettlerEntityTypeArrival) == 104);
 	static_assert(offsetof(CPlayerFeedbackHandler, GenericMessageData) == 120);
 
@@ -497,11 +497,13 @@ namespace GGL {
 		virtual void unknown4(int, int) = 0;
 		virtual void unknown5() = 0;
 	public:
-		virtual void AddNetEventHandler(EGL::IGLEHandler<BB::CEvent, void>* h) = 0;
+		virtual void AddNetEventHandler(shok::NetEventIds id, EGL::IGLEHandler<BB::CEvent, void>* h) = 0;
 		virtual void HandleNetEvent(BB::CEvent* ev) = 0;
 	};
 	class CGLGameLogic : public IGLGameLogic, public BB::IPostEvent {
-		PADDINGI(8);
+		PADDINGI(2);
+		shok::Map<shok::NetEventIds, EGL::IGLEHandler<BB::CEvent, void>*> NetEventHandlers;
+		PADDINGI(3);
 	public:
 		GGL::CPlayerStatus** players; // 10
 		GGL::CWeatherHandler* WeatherHandler;
@@ -522,6 +524,17 @@ namespace GGL {
 		void PlayerBlessSettlers(shok::PlayerId player, shok::BlessCategoryId blessCat);
 		void SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState state);
 
+		template<shok::NetEventIds id, class EventType, class ObjectType>
+		void CreateNetEventHandler(ObjectType* ob, void (ObjectType::* handler)(EventType*)) {
+			using hty = EGL::THandler<static_cast<int>(id), BB::CEvent, EventType, ObjectType, void>;
+			AddNetEventHandler(id, new hty(ob, handler));
+		}
+		template<shok::NetEventIds id, class EventType>
+		void CreateNetEventHandler(void (*handler)(EventType*)) {
+			using hty = CppLogic::StaticHandler<static_cast<int>(id), BB::CEvent, EventType, void>;
+			AddNetEventHandler(id, new hty(handler));
+		}
+
 		static inline GGL::CGLGameLogic** const GlobalObj = reinterpret_cast<GGL::CGLGameLogic**>(0x85A3A0);
 		// create net event handlers thiscall 0x49FD49()
 		static inline BB::SerializationData* (__stdcall* const SerializationDataPlayerArray)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
@@ -530,4 +543,6 @@ namespace GGL {
 
 		// on tech researched event void __stdcall(this, const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&) 0x49A75F, put into GGL::PlayerTechManager
 	};
+	static_assert(offsetof(CGLGameLogic, NetEventHandlers) == 4 * 4);
+	static_assert(offsetof(CGLGameLogic, players) == 10 * 4);
 }

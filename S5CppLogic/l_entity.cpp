@@ -930,11 +930,10 @@ namespace CppLogic::Entity {
 		luaext::EState L{ l };
 		GGL::CSettler* e = L.CheckSettler(1);
 		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CSummonBehavior* b = e->GetBehavior<GGL::CSummonBehavior>();
+		GGL::CSummonBehavior* b = e->GetBehaviorDynamic<GGL::CSummonBehavior>();
 		if (!b)
 			throw lua::LuaException("no matching ability at 1");
-		GGL::CSummonBehaviorProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CSummonBehaviorProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
+		if (!b->CanUseAbility())
 			throw lua::LuaException("ability not ready at 1");
 		e->HeroAbilitySummon();
 		int summoned = 0;

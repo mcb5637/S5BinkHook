@@ -989,7 +989,6 @@ namespace shok {
 		Movement_TaskMoveToPosAndSetState = 0x2000F,
 		Movement_RotateTo = 0x20010, // EGL::CEventValue<float,1278362727>
 		Movement_GetMovementBehavior = 0x20012, //EGL::CEventGetValue<EGL::CMovementBehavior *,212523703>
-		Movement_GetSpeedFactor = 0x20022, //EGL::CEventGetValue<float,1468983543>
 
 		Animation_GetAnim = 0x20013, //EGL::CEventGetValue<int,1211121895>
 		Animation_UnSuspend = 0x20014, //EGL::CEventValue<int,-27574121> argument is ticks spent suspended
@@ -1003,6 +1002,10 @@ namespace shok {
 		ParticleEffectAttachment_CreateEffect = 0x2001C, //EGL::CEventIndexAndEffectType
 		Animation_SetAnim = 0x2001D, //EGL::CEventAnimation
 		Animation_ResetTaskType = 0x2001E, //BB::CEvent
+		// 0x2001F BB::CEvent, movement cancel?
+		// 0x20020 BB::CEvent, movement resume?
+		Movement_GetSpeedFactor = 0x20022, //EGL::CEventGetValue<float,1468983543>
+		Movement_IsPathingUsed = 0x20023, //EGL::CEventGetValue<bool,1709081367>
 		//EGL::CEventValue<int,-27574121> settler only?, only works for specific circumstances, gets called by GetSector methods
 		InternalGetSectorIfSomething = 0x20024,
 		ReplaceableEntity_Disable = 0x20025, //BB::CEvent

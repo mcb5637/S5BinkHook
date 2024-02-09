@@ -605,6 +605,7 @@ namespace GGL {
 
 		// defined tasks: TASK_WANDER, TASK_SET_TASK_LIST, TASK_BACK_TO_DEFAULT_TASKLIST, TASK_FLEE
 		// defined events: Animal_XXX, Die, Leader_SetTerritory
+		// tick checks flee from each second (on a tick depending on entityid)
 	};
 
 	class CResourceDoodad : public EGL::CGLEEntity {

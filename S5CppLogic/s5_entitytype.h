@@ -152,7 +152,7 @@ namespace GGL {
 
 	class CGLAnimalProps : public EGL::CGLEEntityProps {
 	public:
-		shok::TaskListId DefaultTaskList;
+		shok::TaskListId DefaultTaskList; //38
 		float TerritoryRadius, WanderRangeMin, WanderRangeMax, ShyRange, MaxBuildingPollution;
 		shok::TaskListId FleeTaskList;
 
@@ -160,6 +160,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x828DD0;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x21487A57);
 	};
+	//constexpr int i = offsetof(CGLAnimalProps, DefaultTaskList) / 4;
 
 	class CBuildBlockProperties : public EGL::CGLEEntityProps {
 	public:

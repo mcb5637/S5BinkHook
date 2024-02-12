@@ -223,6 +223,11 @@ GGL::CEventChangeMotivation::CEventChangeMotivation(shok::EventIDs e, float d, s
 	Reason = r;
 }
 
+GGL::CEventHeroAbilityInteger::CEventHeroAbilityInteger(shok::EventIDs id, shok::AbilityId ab) : EGL::CEventGetValue_Int(id), Ability(ab)
+{
+	SetVT(vtp);
+}
+
 BB::CInputEvent::CInputEvent(shok::InputEventIds id) : BB::CEvent(id)
 {
 	SetVT(BB::CInputEvent::vtp);

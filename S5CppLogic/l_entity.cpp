@@ -21,6 +21,7 @@
 #include "savegame_extra.h"
 #include "EntityAddonData.h"
 #include "ModBehavior.h"
+#include "LuaEventInterface.h"
 
 namespace CppLogic::Entity {
 	int PredicateOfType(lua::State ls) {
@@ -817,21 +818,6 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int SettlerCommandSendHawk(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CHeroHawkBehavior* b = e->GetBehavior<GGL::CHeroHawkBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CHeroHawkBehaviorProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CHeroHawkBehaviorProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		shok::Position p = L.CheckPos(2);
-		e->HeroAbilitySendHawk(p);
-		return 0;
-	}
-
 	int SettlerGetHawkOfHero(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* e = L.CheckSettler(1);
@@ -842,100 +828,28 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int SettlerCommandInflictFear(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CInflictFearAbility* b = e->GetBehavior<GGL::CInflictFearAbility>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CInflictFearAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CInflictFearAbilityProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		e->HeroAbilityInflictFear();
-		return 0;
-	}
-
-	int SettlerCommandPlaceBomb(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CBombPlacerBehavior* b = e->GetBehavior<GGL::CBombPlacerBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CHeroAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CHeroAbilityProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		shok::Position p = L.CheckPos(2);
-		e->HeroAbilityPlaceBomb(p);
-		return 0;
-	}
-
-	int SettlerCommandPlaceCannon(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CCannonBuilderBehavior* b = e->GetBehavior<GGL::CCannonBuilderBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CCannonBuilderBehaviorProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CCannonBuilderBehaviorProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		shok::Position p = L.CheckPos(2);
-		p.FloorToBuildingPlacement();
-		auto bottom = L.CheckEnum<shok::EntityTypeId>(3);
+	void CheckPlaceCannonEvent(EGL::CGLEEntity* e, GGL::CEventPositionAnd2EntityTypes& ev) {
+		ev.Position.FloorToBuildingPlacement();
+		auto bottom = ev.Type1;
 		GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
 		if (!ety)
 			throw lua::LuaException("no bottom entitytype");
 		if (!ety->IsBuildingType())
 			throw lua::LuaException("bottom not a building");
-		auto top = L.CheckEnum<shok::EntityTypeId>(4);
+		auto top = ev.Type2;
 		if (!(*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(top))
 			throw lua::LuaException("no top entitytype");
-		if (!GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &p, 0, shok::EntityId::Invalid))
+		if (!GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &ev.Position, 0, shok::EntityId::Invalid))
 			throw lua::LuaException("cannot place foundation at that position");
-		e->HeroAbilityPlaceCannon(p, bottom, top);
-		return 0;
-	}
-
-	int SettlerCommandRangedEffect(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CRangedEffectAbility* b = e->GetBehavior<GGL::CRangedEffectAbility>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CRangedEffectAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		e->HeroAbilityRangedEffect();
-		return 0;
-	}
-
-	int SettlerCommandCircularAttack(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CCircularAttack* b = e->GetBehavior<GGL::CCircularAttack>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CCircularAttackProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CCircularAttackProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		e->HeroAbilityCircularAttack();
-		return 0;
 	}
 
 	int SettlerCommandSummon(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* e = L.CheckSettler(1);
 		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CSummonBehavior* b = e->GetBehaviorDynamic<GGL::CSummonBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		if (!b->CanUseAbility())
-			throw lua::LuaException("ability not ready at 1");
-		e->HeroAbilitySummon();
+		BB::CEvent ev{ shok::EventIDs::Summon_ActivateCommand };
+		LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilitySummon>(e, ev);
+		e->FireEvent(&ev);
 		int summoned = 0;
 		for (const auto& a : e->ObserverEntities) {
 			if (a.first == shok::AttachmentType::SUMMONER_SUMMONED) {
@@ -946,206 +860,43 @@ namespace CppLogic::Entity {
 		return summoned;
 	}
 
-	int SettlerCommandActivateCamoflage(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
+	void CheckCamoEvent(EGL::CGLEEntity* e, BB::CEvent& ev) {
 		GGL::CCamouflageBehavior* b = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
 		if (dynamic_cast<GGL::CThiefCamouflageBehavior*>(b))
 			throw lua::LuaException("thief camo cannot be manually activated");
-		GGL::CCamouflageBehaviorProps* bp = e->GetEntityType()->GetBehaviorPropsDynamic<GGL::CCamouflageBehaviorProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		e->HeroAbilityActivateCamoflage();
-		return 0;
 	}
 
-	int SettlerCommandConvert(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CConvertSettlerAbility* b = e->GetBehavior<GGL::CConvertSettlerAbility>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CConvertSettlerAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CConvertSettlerAbilityProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		GGL::CSettler* t = L.CheckSettler(2);
-		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
-		if (!GGL::CPlayerStatus::ArePlayersHostile(e->PlayerId, t->PlayerId))
-			throw lua::LuaException("entities are not hostile");
-		e->HeroAbilityConvert(t->EntityId);
-		return 0;
-	}
-
-	int SettlerCommandSnipe(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CSniperAbility* b = e->GetBehavior<GGL::CSniperAbility>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
+	void CheckSnipeEvent(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
 		GGL::CSniperAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		GGL::CSettler* t = L.CheckSettler(2);
-		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
-		if (!GGL::CPlayerStatus::ArePlayersHostile(e->PlayerId, t->PlayerId))
-			throw lua::LuaException("entities are not hostile");
-		if (!e->Position.IsInRange(t->Position, bp->Range))
+		if (!e->Position.IsInRange(oth->Position, bp->Range))
 			throw lua::LuaException("target not in range");
-		e->HeroAbilitySnipe(t->EntityId);
-		return 0;
 	}
 
-	int SettlerCommandShuriken(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CShurikenAbility* b = e->GetBehavior<GGL::CShurikenAbility>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
+	void CheckShurikenEvent(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
 		GGL::CShurikenAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		GGL::CSettler* t = L.CheckSettler(2);
-		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
-		if (!GGL::CPlayerStatus::ArePlayersHostile(e->PlayerId, t->PlayerId))
-			throw lua::LuaException("entities are not hostile");
-		if (!e->Position.IsInRange(t->Position, bp->Range))
+		if (!e->Position.IsInRange(oth->Position, bp->Range))
 			throw lua::LuaException("target not in range");
-		e->HeroAbilityShuriken(t->EntityId);
-		return 0;
 	}
 
-	int SettlerCommandMotivateWorkers(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CMotivateWorkersAbility* b = e->GetBehavior<GGL::CMotivateWorkersAbility>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CMotivateWorkersAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CMotivateWorkersAbilityProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		e->HeroAbilityMotivateWorkers();
-		return 0;
+	void CheckSabotageEvent(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		if (!(oth->IsEntityInCategory(shok::EntityCategory::Bridge) || GGL::CPlayerStatus::ArePlayersHostile(e->PlayerId, oth->PlayerId)))
+			throw lua::LuaException("target is not hostile or bridge");
 	}
-
-	int SettlerCommandSabotage(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CKegPlacerBehavior* b = e->GetBehavior<GGL::CKegPlacerBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CKegPlacerBehaviorProperties* bp = e->GetEntityType()->GetBehaviorProps<GGL::CKegPlacerBehaviorProperties>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
+	void CheckThiefNotCarryingEvent(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
 		if (!(e->GetBehavior<GGL::CThiefBehavior>()->ResourceType == shok::ResourceType::None))
 			throw lua::LuaException("is carrying resources");
-		GGL::CBuilding* t = L.CheckBuilding(2);
-		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
-		if (!(t->IsEntityInCategory(shok::EntityCategory::Bridge) || GGL::CPlayerStatus::ArePlayersHostile(e->PlayerId, t->PlayerId)))
-			throw lua::LuaException("entities are not hostile or bridge");
-		e->ThiefSabotage(t->EntityId);
-		return 0;
 	}
-
-	int SettlerCommandDefuse(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CKegPlacerBehavior* b = e->GetBehavior<GGL::CKegPlacerBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		if (!(e->GetBehavior<GGL::CThiefBehavior>()->ResourceType == shok::ResourceType::None))
-			throw lua::LuaException("is carrying resources");
-		EGL::CGLEEntity* t = L.CheckEntity(2);
+	void CheckDefuseEvent(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
 		if (!t->GetBehavior<GGL::CKegBehavior>())
-			throw lua::LuaException("no keg at 2");
-		e->ThiefDefuse(t->EntityId);
-		return 0;
+			throw lua::LuaException("target is no keg");
 	}
-
-	int SettlerCommandBinocular(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CAbilityScoutBinocular* b = e->GetBehavior<GGL::CAbilityScoutBinocular>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CAbilityScoutBinocularProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CAbilityScoutBinocularProps>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		shok::Position p = L.CheckPos(2);
-		e->ScoutBinoculars(p);
-		return 0;
-	}
-
-	int SettlerCommandPlaceTorch(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CTorchPlacerBehavior* b = e->GetBehavior<GGL::CTorchPlacerBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CTorchPlacerBehaviorProperties* bp = e->GetEntityType()->GetBehaviorProps<GGL::CTorchPlacerBehaviorProperties>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		shok::Position p = L.CheckPos(2);
-		e->ScoutPlaceTorch(p);
-		return 0;
-	}
-
-	int SettlerCommandPointToRes(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CPointToResourceBehavior* b = e->GetBehavior<GGL::CPointToResourceBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CPointToResourceBehaviorProperties* bp = e->GetEntityType()->GetBehaviorProps<GGL::CPointToResourceBehaviorProperties>();
-		if (!(b->SecondsCharged >= bp->RechargeTimeSeconds))
-			throw lua::LuaException("ability not ready at 1");
-		e->ScoutFindResource();
-		return 0;
-	}
-
-	int SettlerCommandStealFrom(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CThiefBehavior* b = e->GetBehavior<GGL::CThiefBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		GGL::CBuilding* t = L.CheckBuilding(2);
-		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
-		if (!GGL::CPlayerStatus::ArePlayersHostile(e->PlayerId, t->PlayerId))
-			throw lua::LuaException("entities are not hostile");
-		e->ThiefStealFrom(t->EntityId);
-		return 0;
-	}
-
-	int SettlerCommandSecureGoods(lua::State l) {
-		luaext::EState L{ l };
-		GGL::CSettler* e = L.CheckSettler(1);
-		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
-		GGL::CThiefBehavior* b = e->GetBehavior<GGL::CThiefBehavior>();
-		if (!b)
-			throw lua::LuaException("no matching ability at 1");
-		if (!(b->ResourceType != shok::ResourceType::None))
-			throw lua::LuaException("no resources carried");
-		GGL::CBuilding* t = L.CheckBuilding(2);
-		L.CheckEntityAlive(t->EntityId, "entity dead at 2");
-		if (e->PlayerId != t->PlayerId)
-			throw lua::LuaException("entities are not of same player");
-		if (!t->IsEntityInCategory(shok::EntityCategory::Headquarters))
-			throw lua::LuaException("target not hq");
-		e->ThiefSecureGoods(t->EntityId);
-		return 0;
+	void CheckIsThief(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		if (e->GetBehavior<GGL::CThiefBehavior>() == nullptr)
+			throw lua::LuaException("not a thief");
 	}
 
 	int EnableConversionHook(lua::State L) {
@@ -2060,7 +1811,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 56> Settlers{ {
+	constexpr std::array Settlers {
 			lua::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),
 			lua::FuncReference::GetRef<SettlerGetBaseMovementSpeed>("GetBaseMovementSpeed"),
 			lua::FuncReference::GetRef<SettlerSetBaseMovementSpeed>("SetBaseMovementSpeed"),
@@ -2078,26 +1829,51 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<ThiefSetStolenResourceInfo>("ThiefSetStolenResourceInfo"),
 			lua::FuncReference::GetRef<SettlerIsVisible>("IsVisible"),
 			lua::FuncReference::GetRef<SettlerIsIdle>("IsIdle"),
-			lua::FuncReference::GetRef<SettlerCommandSendHawk>("CommandSendHawk"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::HeroHawk_SendHawk,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilitySendHawk>>>("CommandSendHawk"),
 			lua::FuncReference::GetRef<SettlerGetHawkOfHero>("GetHawkOfHero"),
-			lua::FuncReference::GetRef<SettlerCommandInflictFear>("CommandInflictFear"),
-			lua::FuncReference::GetRef<SettlerCommandPlaceBomb>("CommandPlaceBomb"),
-			lua::FuncReference::GetRef<SettlerCommandPlaceCannon>("CommandPlaceCannon"),
-			lua::FuncReference::GetRef<SettlerCommandRangedEffect>("CommandRangedEffect"),
-			lua::FuncReference::GetRef<SettlerCommandCircularAttack>("CommandCircularAttack"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::InflictFear_Activate,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityInflictFear>>>("CommandInflictFear"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::BombPlacer_CommandPlaceBomb,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>>>("CommandPlaceBomb"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<GGL::CEventPositionAnd2EntityTypes, shok::EventIDs::CannonBuilder_BuildCannonCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBuildCannon>, CheckPlaceCannonEvent>>("CommandPlaceCannon"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::RangedEffect_Activate,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityRangedEffect>>>("CommandRangedEffect"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::CircularAttack_ActivateCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityCircularAttack>>>("CommandCircularAttack"),
 			lua::FuncReference::GetRef<SettlerCommandSummon>("CommandSummon"),
-			lua::FuncReference::GetRef<SettlerCommandActivateCamoflage>("CommandActivateCamoflage"),
-			lua::FuncReference::GetRef<SettlerCommandConvert>("CommandConvert"),
-			lua::FuncReference::GetRef<SettlerCommandSnipe>("CommandSnipe"),
-			lua::FuncReference::GetRef<SettlerCommandShuriken>("CommandShuriken"),
-			lua::FuncReference::GetRef<SettlerCommandMotivateWorkers>("CommandMotivateWorkers"),
-			lua::FuncReference::GetRef<SettlerCommandSabotage>("CommandSabotage"),
-			lua::FuncReference::GetRef<SettlerCommandDefuse>("CommandDefuse"),
-			lua::FuncReference::GetRef<SettlerCommandBinocular>("CommandBinocular"),
-			lua::FuncReference::GetRef<SettlerCommandPlaceTorch>("CommandPlaceTorch"),
-			lua::FuncReference::GetRef<SettlerCommandPointToRes>("CommandPointToRes"),
-			lua::FuncReference::GetRef<SettlerCommandStealFrom>("CommandStealFrom"),
-			lua::FuncReference::GetRef<SettlerCommandSecureGoods>("CommandSecureGoods"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::Camouflage_Activate,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityCamouflage>, CheckCamoEvent>>("CommandActivateCamoflage"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::ConvertSettler_ActivateCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityConvertSettlers>, LuaEventInterface::CheckSettler,
+				LuaEventInterface::CheckConvertible, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("CommandConvert"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Sniper_SnipeCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilitySniper>, LuaEventInterface::CheckSettler,
+				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>, CheckSnipeEvent>>("CommandSnipe"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Shuriken_ActivateCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShuriken>, LuaEventInterface::CheckSettler,
+				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>, CheckShurikenEvent>>("CommandShuriken"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::MotivateVorkers_ActivateCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityMotivateWorkers>>>("CommandMotivateWorkers"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::KegPlacer_SabotageCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceKeg>, LuaEventInterface::CheckBuilding,
+				CheckThiefNotCarryingEvent, CheckSabotageEvent>>("CommandSabotage"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::KegPlacer_DefuseCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceKeg>,
+				CheckThiefNotCarryingEvent, CheckDefuseEvent>>("CommandDefuse"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::Binocular_ExploreCommand,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutBinoculars>>>("CommandBinocular"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::TorchPlacer_PlaceTorch,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutTorches>>>("CommandPlaceTorch"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::PointToResources_Activate,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutFindResources>>>("CommandPointToRes"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Thief_StealFromCommand,
+				CheckIsThief, LuaEventInterface::CheckBuilding,
+				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("CommandStealFrom"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Thief_StealFromCommand,
+				CheckIsThief, LuaEventInterface::CheckBuilding, LuaEventInterface::CheckTargetCategory<shok::EntityCategory::Headquarters>,
+				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("CommandSecureGoods"),
 			lua::FuncReference::GetRef<EnableConversionHook>("EnableConversionHook"),
 			lua::FuncReference::GetRef<DisableConversionHook>("DisableConversionHook"),
 			lua::FuncReference::GetRef<SettlerCommandMove>("CommandMove"),
@@ -2117,7 +1893,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<WorkerGetMotivation>("WorkerGetMotivation"),
 			lua::FuncReference::GetRef<WorkerChangeMotivation>("WorkerChangeMotivation"),
 			lua::FuncReference::GetRef<WorkerGetResourceCarried>("WorkerGetResourceCarried"),
-	} };
+	};
 
 	constexpr std::array<lua::FuncReference, 8> Leader{ {
 			lua::FuncReference::GetRef<LeaderGetExperience>("GetExperience"),

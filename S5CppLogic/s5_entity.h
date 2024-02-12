@@ -247,6 +247,7 @@ namespace EGL {
 		bool EventIsBattleOrAutocannon();
 		bool EventIsSerfOrWorker();
 		bool EventIsSoldier();
+		bool EventIsConvertible();
 		int EventGetWorktime();
 		float EventGetMotivation();
 

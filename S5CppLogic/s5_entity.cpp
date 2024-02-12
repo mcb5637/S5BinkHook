@@ -214,6 +214,12 @@ bool EGL::CGLEEntity::EventIsSoldier()
 	FireEvent(&ev);
 	return ev.Data;
 }
+bool EGL::CGLEEntity::EventIsConvertible()
+{
+	EGL::CEventGetValue_Bool ev{ shok::EventIDs::IsConvertible };
+	FireEvent(&ev);
+	return ev.Data;
+}
 int EGL::CGLEEntity::EventGetWorktime()
 {
 	return EventGetIntById(shok::EventIDs::Worker_GetWorkTimeRemaining);

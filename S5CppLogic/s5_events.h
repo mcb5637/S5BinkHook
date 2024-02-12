@@ -473,6 +473,16 @@ namespace GGL {
 		static inline constexpr int vtp = 0x773594;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x199C7D73);
 	};
+
+	class CEventHeroAbilityInteger : public EGL::CEventGetValue_Int {
+	public:
+		shok::AbilityId Ability;
+
+		CEventHeroAbilityInteger(shok::EventIDs id, shok::AbilityId ab);
+
+		static inline constexpr int vtp = 0x773DF8;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8A68CFDD);
+	};
 }
 
 // GGL::CEventHeroAbilityInteger -> valueint

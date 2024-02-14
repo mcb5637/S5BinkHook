@@ -793,41 +793,41 @@ shok::Technology* GGL::CGLGameLogic::GetTech(shok::TechnologyId id)
 static inline void(__thiscall* const cglgamelogic_enablealarm)(GGL::CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FA14);
 void GGL::CGLGameLogic::EnableAlarmForPlayer(shok::PlayerId pl)
 {
-	EGL::CNetEventPlayerID ev{ shok::NetEventIds::CommandPlayerActivateAlarm, pl };
+	EGL::CNetEventPlayerID ev{ shok::NetEventIds::Player_ActivateAlarm, pl };
 	cglgamelogic_enablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_disablealarm)(GGL::CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FAD7);
 void GGL::CGLGameLogic::DisableAlarmForPlayer(shok::PlayerId pl)
 {
-	EGL::CNetEventPlayerID ev{ shok::NetEventIds::CommandPlayerDeactivateAlarm, pl };
+	EGL::CNetEventPlayerID ev{ shok::NetEventIds::Player_DeactivateAlarm, pl };
 	cglgamelogic_disablealarm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_upgradesettlercat)(GGL::CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x4985C5);
 void GGL::CGLGameLogic::UpgradeSettlerCategory(shok::PlayerId pl, shok::UpgradeCategoryId ucat)
 {
-	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::PlayerUpgradeSettlerCategory, pl, static_cast<int>(ucat) };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::Player_UpgradeSettlerCategory, pl, static_cast<int>(ucat) };
 	cglgamelogic_upgradesettlercat(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_activateweatherm)(GGL::CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x49BF7A);
 void GGL::CGLGameLogic::PlayerActivateWeathermachine(shok::PlayerId player, shok::WeatherState weathertype)
 {
-	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandWeathermachineChangeWeather, player, static_cast<int>(weathertype) };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::Weathermachine_Activate, player, static_cast<int>(weathertype) };
 	cglgamelogic_activateweatherm(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_blesssettlers)(GGL::CGLGameLogic* th, EGL::CNetEventIntegerAndPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventIntegerAndPlayerID*)>(0x49B7E6);
 void GGL::CGLGameLogic::PlayerBlessSettlers(shok::PlayerId player, shok::BlessCategoryId blessCat)
 {
-	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::CommandMonasteryBlessSettlerGroup, player, static_cast<int>(blessCat) };
+	EGL::CNetEventIntegerAndPlayerID ev{ shok::NetEventIds::Player_BlessGroup, player, static_cast<int>(blessCat) };
 	cglgamelogic_blesssettlers(this, &ev);
 }
 
 static inline void(__thiscall* const cglgamelogic_setdiplo)(GGL::CGLGameLogic* th, EGL::CNetEvent2PlayerIDsAndInteger* ev) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEvent2PlayerIDsAndInteger*)>(0x49872D);
 void GGL::CGLGameLogic::SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState state)
 {
-	EGL::CNetEvent2PlayerIDsAndInteger ev{ shok::NetEventIds::SetDiplomacy, p1, p2, static_cast<int>(state) };
+	EGL::CNetEvent2PlayerIDsAndInteger ev{ shok::NetEventIds::Player_SetDiplomacy, p1, p2, static_cast<int>(state) };
 	cglgamelogic_setdiplo(this, &ev);
 }

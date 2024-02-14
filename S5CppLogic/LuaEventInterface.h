@@ -4,6 +4,7 @@
 #include "luaext.h"
 #include "s5_events.h"
 #include "s5_entity.h"
+#include "s5_ui.h"
 #include <magic_enum_all.hpp>
 
 namespace CppLogic::LuaEventInterface {
@@ -95,6 +96,17 @@ namespace CppLogic::LuaEventInterface {
 		auto ev = CheckEvent<Ev>(L, ID, 1);
 		(Checkers(e, ev), ...);
 		e->FireEvent(&ev);
+		return 0;
+	}
+
+	template<class Ev>
+	using NetChecker = void(*)(Ev& ev);
+	template<class Ev, shok::NetEventIds ID, NetChecker<Ev>... Checkers>
+	int NetEvent(lua::State l) {
+		luaext::EState L{ l };
+		auto ev = CheckEvent<Ev>(L, ID, 0);
+		(Checkers(ev), ...);
+		GGUI::CManager::PostEventFromUI(&ev);
 		return 0;
 	}
 }

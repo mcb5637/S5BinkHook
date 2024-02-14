@@ -492,7 +492,7 @@ namespace GGL {
 		virtual void __stdcall Tick() = 0;
 		virtual void Serialize(const char* savename) = 0; // 5
 		virtual void Deserialize(const char* savename) = 0;
-		virtual void unknown3(int) = 0;
+		virtual void unknown3(int) = 0; //calculates some sort of hash?
 		virtual GGL::CWeatherHandler* GetWeatherHandler() = 0;
 		virtual void unknown4(int, int) = 0;
 		virtual void unknown5() = 0;

@@ -2,6 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_events.h"
+#include "EnumIdManagerMagic.h"
 
 namespace EGL {
 	class CNetEvent2Entities : public BB::CEvent {
@@ -369,74 +370,81 @@ namespace Framework {
 
 namespace shok {
 	enum class NetEventIds : int {
-		CommandEntityMove = 0x11002,
-		CommandPlaceBuilding = 0x11003,
-		CommandHQBuySerf = 0x11004,
-		PlayerSellSerf = 0x11005,
-		CommandBuildingSell = 0x11006,
-		CommandBuildingStartUpgrade = 0x11008,
-		PlayerUpgradeBuildingCategory = 0x11009,
-		PlayerUpgradeSettlerCategory = 0x1100A,
-		CommandBarracksBuyLeader = 0x1100B,
-		CommandLeaderBuySoldier = 0x1100C,
-		PlayerLevyTax = 0x1100D,
-		CommandPlayerSetTaxes = 0x1100E,
-		CommandSettlerExpell = 0x1100F,
-		BlessSingleSettler = 0x11010,
-		CommandOvertimesSingleWorker = 0x1300B,
-		CommandEntityAttackEntity = 0x11012,
-		LeaderAttachOneSoldier = 0x11013,
-		LeaderExpellOneSoldier = 0x11014,
-		CommandLeaderSetFormation = 0x11015,
-		CommandSerfConstructBuilding = 0x11017,
-		CommandSerfRepairBuilding = 0x11018,
-		CommandSerfExtractResource = 0x11019,
-		CommandBuildingStartResearch = 0x1101A,
-		CommandBuildingCancelResearch = 0x1101B,
-		CommandMarketStartTrade = 0x1101C,
-		CommandMarketCancelTrade = 0x1101D,
-		CommandBuildingCancelUpgrade = 0x1101E,
-		CommandEntityAttackPos = 0x1101F,
-		CommandEntityGuardEntity = 0x11020,
-		CommandLeaderHoldPosition = 0x11021,
-		CommandLeaderAggressive = 0x11022, // deprecated, leader seems to do the same as defend
-		CommandLeaderDefend = 0x11023,
-		CommandHeroPlaceBombAt = 0x11024,
-		CommandEntityPatrol = 0x11025,
-		CommandPlayerPayTribute = 0x11026,
-		SetDiplomacy = 0x11027, // not sure if this can be used normally
-		CommandBuildingSetCurrentMaxWorkers = 0x11028,
-		PlayerAllSerfsToBattleSerfs = 0x1102A,
-		PlayerAllBattleSerfsToSerfs = 0x1102B,
-		CommandHeroSendHawkToPos = 0x1102C,
-		CommandBattleSerfTurnToSerf = 0x1102D,
-		CommandSerfTurnToBattleSerf = 0x1102E,
-		CommandHeroPlaceCannonAt = 0x1102F,
-		CommandPlayerActivateAlarm = 0x11030,
-		CommandPlayerDeactivateAlarm = 0x11031,
-		CommandHeroActivateCamouflage = 0x11032,
-		CommandBuildingToggleOvertime = 0x11033,
-		CommandFoundryBuildCannon = 0x11034,
-		CommandHeroActivateSummon = 0x11035,
-		CommandWeathermachineChangeWeather = 0x11036,
-		CommandMonasteryBlessSettlerGroup = 0x11037,
-		CommandHeroAffectEntities = 0x11039,
-		CommandHeroCircularAttack = 0x1103A,
-		PlayerSendMPResources = 0x1103B,
-		CommandHeroInflictFear = 0x1103E,
-		CommandHeroConvertSettler = 0x1103F,
-		CommandBarracksRecruitGroups = 0x11040,
-		CommandBarracksRecruitLeaderOnly = 0x11041,
-		CommandThiefStealFrom = 0x11043,
-		CommandThiefCarryStolenStuffToHQ = 0x11044,
-		CommandThiefSabotageBuilding = 0x11045,
-		CommandThiefDefuseKeg = 0x11046,
-		CommandHeroMotivateWorkers = 0x11047,
-		CommandScoutUseBinocularsAt = 0x11048,
-		CommandHeroSnipeSettler = 0x11049,
-		CommandScoutPlaceTorchAtPos = 0x1104A,
-		CommandScoutFindResources = 0x1104B,
-		CommandHeroThrowShurikenAt = 0x1104C,
+		Invalid = 0,
+		Entity_Move = 0x11002, //EGL::CNetEventEntityAndPosArray
+		Player_BuyBuilding = 0x11003, //GGL::CNetEventBuildingCreator
+		HQ_BuySerf = 0x11004, //EGL::CNetEventEntityIDAndPlayerID
+		Player_SellSerf = 0x11005, //EGL::CNetEventPlayerID deprecated? handler seems to do something
+		Building_Sell = 0x11006, //EGL::CNetEventEntityIDAndPlayerID
+		Building_UpgradeImmediately = 0x11007, //EGL::CNetEventEntityIDAndPlayerID deprecated? immediately?
+		Building_StartUpgrade = 0x11008, //EGL::CNetEventEntityID
+		Player_UpgradeBuildingCategory = 0x11009, //EGL::CNetEventIntegerAndPlayerID deprecated?
+		Player_UpgradeSettlerCategory = 0x1100A, //EGL::CNetEventIntegerAndPlayerID
+		Barracks_BuyLeader = 0x1100B, //GGL::CNetEventEntityIDAndUpgradeCategory
+		Leader_BuySoldier = 0x1100C, //EGL::CNetEventEntityID
+		Player_LevyTax = 0x1100D, //EGL::CNetEventPlayerID
+		Player_SetTaxes = 0x1100E, //EGL::CNetEventIntegerAndPlayerID
+		Settler_Expell = 0x1100F, //EGL::CNetEventEntityID
+		Worker_BlessSimgle = 0x11010, //EGL::CNetEventEntityID deprecated?
+		Worker_OvertimeSingle = 0x11011, //EGL::CNetEventEntityID
+		Entity_AttackEntity = 0x11012, //EGL::CNetEvent2Entities
+		Leader_AttachOneSoldier = 0x11013, //EGL::CNetEventEntityID
+		Leader_ExpellOneSoldier = 0x11014, //EGL::CNetEventEntityID deprecated, handler empty
+		Leader_SetFormation = 0x11015, //EGL::CNetEventEntityIDAndInteger
+		Serf_ConstructBuilding = 0x11017, //EGL::CNetEvent2Entities
+		Serf_RepairBuilding = 0x11018, //EGL::CNetEvent2Entities
+		Serf_ExtractResource = 0x11019, //GGL::CNetEventExtractResource
+		Building_StartResearch = 0x1101A, //GGL::CNetEventTechnologyAndEntityID
+		Building_CancelResearch = 0x1101B, //EGL::CNetEventEntityID
+		Market_StartTrade = 0x1101C, //GGL::CNetEventTransaction
+		Market_CancelTrade = 0x1101D, //EGL::CNetEventEntityID
+		Building_CancelUpgrade = 0x1101E, //EGL::CNetEventEntityID
+		Entity_AttackPos = 0x1101F, //EGL::CNetEventEntityAndPos
+		Entity_GuardEntity = 0x11020, //EGL::CNetEvent2Entities
+		Leader_HoldPosition = 0x11021, //EGL::CNetEventEntityID
+		Leader_Aggressive = 0x11022, //EGL::CNetEventEntityID deprecated, leader seems to do the same as defend
+		Leader_Defend = 0x11023, //EGL::CNetEventEntityID
+		BombPlacer_PlaceBombAt = 0x11024, //EGL::CNetEventEntityAndPos
+		Entity_Patrol = 0x11025, //EGL::CNetEventEntityAndPosArray
+		Player_PayTribute = 0x11026, //EGL::CNetEventPlayerIDAndInteger
+		Player_SetDiplomacy = 0x11027, //EGL::CNetEvent2PlayerIDsAndInteger deprecated?
+		Building_SetCurrentMaxWorkers = 0x11028, //EGL::CNetEventEntityIDAndInteger
+		Player_AllSerfsToBattleSerfs = 0x1102A, //EGL::CNetEventPlayerID
+		Player_AllBattleSerfsToSerfs = 0x1102B, //EGL::CNetEventPlayerID
+		HawkOwner_SendHawkToPos = 0x1102C, //EGL::CNetEventEntityAndPos
+		BattleSerf_TurnToSerf = 0x1102D, //EGL::CNetEventEntityID
+		Serf_TurnToBattleSerf = 0x1102E, //EGL::CNetEventEntityID
+		CannonPlacer_HeroPlaceCannonAt = 0x1102F, //GGL::CNetEventCannonCreator
+		Player_ActivateAlarm = 0x11030, //EGL::CNetEventPlayerID
+		Player_DeactivateAlarm = 0x11031, //EGL::CNetEventPlayerID
+		Camouflage_Activate = 0x11032, //EGL::CNetEventEntityID
+		Building_ToggleOvertime = 0x11033, //EGL::CNetEventEntityID
+		Foundry_BuildCannon = 0x11034, //EGL::CNetEventEntityIDAndIntege
+		Summoner_Summon = 0x11035, //EGL::CNetEventEntityID
+		Weathermachine_Activate = 0x11036, //EGL::CNetEventIntegerAndPlayerID
+		Player_BlessGroup = 0x11037, //EGL::CNetEventIntegerAndPlayerID
+		Hero_NPCInteraction = 0x11038, //EGL::CNetEvent2Entities
+		AffectEntities_Activate = 0x11039, //EGL::CNetEventEntityID
+		CircularAttack_Activate = 0x1103A, //EGL::CNetEventEntityID
+		Player_SendMPResources = 0x1103B, //GGL::CNetEventPlayerResourceDonation
+		Player_BuyHero = 0x1103C, //EGL::CNetEventEntityIDAndPlayerIDAndEntityType
+		ConvertBuilding_Convert = 0x1103D, //EGL::CNetEvent2Entities
+		InflictFear_Activate = 0x1103E, //EGL::CNetEventEntityID
+		ConvertSettler_Convert = 0x1103F, //EGL::CNetEvent2Entities
+		Barracks_RecruitGroups = 0x11040, //EGL::CNetEventEntityID
+		Barracks_RecruitLeaderOnly = 0x11041, //EGL::CNetEventEntityID
+		Hero_BuyMerchantOffer = 0x11042, //GGL::CNetEventEntityIDPlayerIDAndInteger
+		Thief_StealFrom = 0x11043, //EGL::CNetEvent2Entities
+		Thief_CarryStolenStuffToHQ = 0x11044, //EGL::CNetEvent2Entities
+		Sabotage_Sabotage = 0x11045, //EGL::CNetEvent2Entities
+		Sabotage_Defuse = 0x11046, //EGL::CNetEvent2Entities
+		MotivateWorkers_Activate = 0x11047, //EGL::CNetEventEntityID
+		Binoculars_Observe = 0x11048, //EGL::CNetEventEntityAndPos
+		Sniper_Snipe = 0x11049, //EGL::CNetEvent2Entities
+		TorchPlacer_Place = 0x1104A, //EGL::CNetEventEntityAndPo
+		ResourceFinder_Find = 0x1104B, //EGL::CNetEventEntityID
+		Shuriken_Activate = 0x1104C, //EGL::CNetEvent2Entities
+		//0x1D002 EGL::CEventGetValue<int,1211121895> calculates some sort of hash?
 		SetGameSpeed = 0x50001,
 	};
 
@@ -477,4 +485,16 @@ namespace shok {
 		FEEDBACK_EVENT_LEADER_CHANGE_FORMATION = 0x25006,
 		FEEDBACK_EVENT_WEATHER_FORECAST = 0x25007,
 	};
+}
+
+template <>
+struct magic_enum::customize::enum_range<shok::NetEventIds> {
+	static constexpr int min = static_cast<int>(shok::NetEventIds::Entity_Move);
+	static constexpr int max = static_cast<int>(shok::NetEventIds::Shuriken_Activate);
+};
+namespace CppLogic {
+	template<>
+	inline auto GetIdManager<shok::NetEventIds>() {
+		return CppLogic::MagicEnum::EnumIdManager<shok::NetEventIds, shok::NetEventIds::Invalid, shok::NetEventIds::SetGameSpeed>{};
+	}
 }

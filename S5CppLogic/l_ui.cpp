@@ -1455,7 +1455,7 @@ namespace CppLogic::UI {
 		if (selectedID->CurrentID == selectedID->FirstID) {
 			if (CheckCommandValid(d, 0)) {
 				auto m = GGUI::CManager::GlobalObj();
-				GGL::CNetEventBuildingCreator ev{ shok::NetEventIds::CommandPlaceBuilding, m->ControlledPlayer, UpgradeCategory, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())} };
+				GGL::CNetEventBuildingCreator ev{ shok::NetEventIds::Player_BuyBuilding, m->ControlledPlayer, UpgradeCategory, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())} };
 				{
 					auto v = ev.Serf.SaveVector();
 					for (const auto& se : m->SelectedEntities) {
@@ -1670,12 +1670,20 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
 	} };
 
+	constexpr std::array Commands{
+		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
+	};
+
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(UI, -3);
 #ifdef _DEBUG
 		L.RegisterFunc<WidgetGetAddress>("WidgetGetAddress", -3);
 #endif
+
+		L.Push("NetEvents");
+		CppLogic::GetIdManager<shok::NetEventIds>().PushToState(L);
+		L.SetTableRaw(-3);
 
 		if (L.GetState() == shok::LuaStateMainmenu) {
 			L.RegisterFunc<SetMouseTriggerMainMenu>("SetMouseTriggerMainMenu", -3);

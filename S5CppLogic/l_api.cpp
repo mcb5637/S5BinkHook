@@ -16,6 +16,7 @@
 #include "s5_config.h"
 #include "s5_exception.h"
 #include "s5_cutscene.h"
+#include "s5_netevents.h"
 #include "hooks.h"
 #include "luaext.h"
 
@@ -261,6 +262,9 @@ namespace CppLogic::API {
 			L.SetGlobal();
 		}
 
+		L.Push("NetEvents");
+		CppLogic::GetIdManager<shok::NetEventIds>().PushToState(L);
+		L.SetGlobal();
 
 		return 0;
 	}

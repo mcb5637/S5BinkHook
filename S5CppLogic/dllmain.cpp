@@ -50,6 +50,7 @@
 #include "ModBehavior.h"
 #include "ModUI.h"
 #include "ModConfig.h"
+#include "ConstexprString.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -301,10 +302,9 @@ int Test(lua::State Ls) {
 		L.Push(mng.GetNameByID(id));
 		L.SetTableRaw(-3);
 	}*/
-	auto& sup = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades;
-	auto& pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(shok::PlayerId::P1)->SettlerUpgradeManager;
-
-	return 0;
+	static constexpr auto d = CppLogic::ConstexprString<4>( "abc" ) + CppLogic::ConstexprString<4>( "def" );
+	L.Push(d);
+	return 1;
 }
 
 int GetOptions(lua::State L) {

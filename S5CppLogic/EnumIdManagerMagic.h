@@ -1,28 +1,14 @@
 #pragma once
-#include <utility>
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_idmanager.h"
 #include "luaext.h"
+#include "ConstexprString.h"
 
 #include <magic_enum.hpp>
 
 namespace CppLogic::MagicEnum {
-	template<size_t N>
-	struct StringHolder {
-		std::array<char, N + 1> Data;
-
-		consteval StringHolder(magic_enum::detail::str_view v) {
-			if (v.size_ != N)
-				throw std::invalid_argument{ "size missmatch" };
-			std::copy_n(v.str_, N, Data.data());
-			Data[N] = 0;
-		}
-		constexpr operator std::string_view() const {
-			return { Data.data(), N };
-		}
-	};
-	template<StringHolder D>
+	template<ConstexprString D>
 	struct Holder {
 		static constexpr auto value = D;
 	};
@@ -33,7 +19,7 @@ namespace CppLogic::MagicEnum {
 		template<En E>
 		static consteval auto ConstructSingle() {
 			constexpr auto d = magic_enum::detail::n<E>();
-			return StringHolder<d.size_>{d};
+			return ConstexprString<d.size_+1>{std::string_view(d.str_, d.size_)};
 		}
 		template<En E>
 		static consteval std::pair<En, std::string_view> ConstructPair() {

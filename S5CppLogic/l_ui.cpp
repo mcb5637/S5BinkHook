@@ -1681,10 +1681,6 @@ namespace CppLogic::UI {
 		L.RegisterFunc<WidgetGetAddress>("WidgetGetAddress", -3);
 #endif
 
-		L.Push("NetEvents");
-		CppLogic::GetIdManager<shok::NetEventIds>().PushToState(L);
-		L.SetTableRaw(-3);
-
 		if (L.GetState() == shok::LuaStateMainmenu) {
 			L.RegisterFunc<SetMouseTriggerMainMenu>("SetMouseTriggerMainMenu", -3);
 			CppLogic::UI::GUIState_LuaSelection::Initialize();

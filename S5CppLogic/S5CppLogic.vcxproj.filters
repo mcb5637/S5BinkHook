@@ -312,6 +312,9 @@
     <ClInclude Include="LuaEventInterface.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="ConstexprString.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

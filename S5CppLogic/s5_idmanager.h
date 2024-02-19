@@ -73,7 +73,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const FeedBackEventManager = reinterpret_cast<BB::CIDManagerEx**>(0x880BA0); // ids are not correct here
 		static inline BB::CIDManagerEx** const SoundsManager = reinterpret_cast<BB::CIDManagerEx**>(0x859F14); // 8979C8 same
 		static inline BB::CIDManagerEx** const AmbientSoundsManager = reinterpret_cast<BB::CIDManagerEx**>(0x8979CC);
-		static inline BB::CIDManagerEx** const ResourceTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0x885EE5C);
+		static inline BB::CIDManagerEx** const ResourceTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0x85EE5C);
 		static inline BB::CIDManagerEx** const FeedbackStateManager = reinterpret_cast<BB::CIDManagerEx**>(0x880C10);
 		static inline BB::CIDManagerEx** const TaskManager = reinterpret_cast<BB::CIDManagerEx**>(0x898208);
 		static inline BB::CIDManagerEx** const PrincipalTaskManager = reinterpret_cast<BB::CIDManagerEx**>(0x89820C);

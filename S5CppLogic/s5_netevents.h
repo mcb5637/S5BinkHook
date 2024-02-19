@@ -374,7 +374,7 @@ namespace shok {
 		Entity_Move = 0x11002, //EGL::CNetEventEntityAndPosArray
 		Player_BuyBuilding = 0x11003, //GGL::CNetEventBuildingCreator
 		HQ_BuySerf = 0x11004, //EGL::CNetEventEntityIDAndPlayerID
-		Player_SellSerf = 0x11005, //EGL::CNetEventPlayerID deprecated? handler seems to do something
+		Player_SellSerf = 0x11005, //EGL::CNetEventPlayerID deprecated? unused, but probably works
 		Building_Sell = 0x11006, //EGL::CNetEventEntityIDAndPlayerID
 		Building_UpgradeImmediately = 0x11007, //EGL::CNetEventEntityIDAndPlayerID deprecated? immediately?
 		Building_StartUpgrade = 0x11008, //EGL::CNetEventEntityID
@@ -441,7 +441,7 @@ namespace shok {
 		MotivateWorkers_Activate = 0x11047, //EGL::CNetEventEntityID
 		Binoculars_Observe = 0x11048, //EGL::CNetEventEntityAndPos
 		Sniper_Snipe = 0x11049, //EGL::CNetEvent2Entities
-		TorchPlacer_Place = 0x1104A, //EGL::CNetEventEntityAndPo
+		TorchPlacer_Place = 0x1104A, //EGL::CNetEventEntityAndPos
 		ResourceFinder_Find = 0x1104B, //EGL::CNetEventEntityID
 		Shuriken_Activate = 0x1104C, //EGL::CNetEvent2Entities
 		//0x1D002 EGL::CEventGetValue<int,1211121895> calculates some sort of hash?

@@ -41,6 +41,7 @@ CppLogic.Effect.Predicates = {}
 CppLogic.Memory = {}
 CppLogic.API = {}
 CppLogic.Combat = {}
+--- commands here are not syncronized, they are executed directly
 CppLogic.Entity = {}
 CppLogic.Entity.Predicates = {}
 CppLogic.Entity.Settler = {}
@@ -53,6 +54,8 @@ CppLogic.Technology = {}
 CppLogic.Logic = {}
 CppLogic.Logic.UICommands = {}
 CppLogic.UI = {}
+--- commands here are send as NetEvent and synchronized
+CppLogic.UI.Commands = {}
 CppLogic.UA = {}
 --- ModLoader is not available, if Kimichuras dlls are loaded.
 --- otherwise the modloader looks for a `ModLoader.lua` file in your map directory. if it is there, this file gets loaded and the ModLoader executes.
@@ -2797,6 +2800,106 @@ function CppLogic.UI.AutoScrollCustomWidgetModOffset(id, off) end
 ---@param id number|string
 ---@param off number set offset to
 function CppLogic.UI.AutoScrollCustomWidgetSetOffset(id, off) end
+
+---gives a construct command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Serf_ConstructBuilding(id, tar) end
+
+---gives a repair command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Serf_RepairBuilding(id, tar) end
+
+---gives a extract command (either with a target entity, or with a resource type + position)
+---@param id number|string
+---@param tar number|string
+---@param pos nil|Position
+function CppLogic.UI.Commands.Serf_ExtractResource(id, tar, pos) end
+
+---gives a attack move command
+---@param id number|string
+---@param tar Position
+function CppLogic.UI.Commands.Entity_AttackPos(id, tar) end
+
+---gives a guard command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Entity_GuardEntity(id, tar) end
+
+---gives a place bomb command
+---@param id number|string
+---@param tar Position
+function CppLogic.UI.Commands.BombPlacer_PlaceBombAt(id, tar) end
+
+---gives a place cannon command
+---@param id number|string
+---@param tar Position
+---@param foundationType number|string
+---@param topType number|string
+function CppLogic.UI.Commands.CannonPlacer_HeroPlaceCannonAt(id, tar, foundationType, topType) end
+
+---gives a npc interaction command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Hero_NPCInteraction(id, tar) end
+
+---gives a convert settler command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.ConvertSettler_Convert(id, tar) end
+
+---gives a steal command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Thief_StealFrom(id, tar) end
+
+---gives a return stolen goods command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Thief_CarryStolenStuffToHQ(id, tar) end
+
+---gives a sabotage command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Sabotage_Sabotage(id, tar) end
+
+---gives a defuse command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Sabotage_Defuse(id, tar) end
+
+---gives a binocular command
+---@param id number|string
+---@param tar Position
+function CppLogic.UI.Commands.Binoculars_Observe(id, tar) end
+
+---gives a snipe command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Sniper_Snipe(id, tar) end
+
+---gives a place torch command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.TorchPlacer_Place(id, tar) end
+
+---gives a shuriken command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Shuriken_Activate(id, tar) end
+
+---gives a move command
+---@param id number|string
+---@param tar number|string
+---@param r number|nil
+function CppLogic.UI.Commands.Entity_Move(id, tar, r) end
+
+---gives a patrol command
+---@param id number|string
+---@param tar Position
+---@param ... Position
+function CppLogic.UI.Commands.Entity_Patrol(id, tar, ...) end
 
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed/reloaded on leaving the map.

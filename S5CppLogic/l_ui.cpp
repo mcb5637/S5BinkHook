@@ -16,6 +16,7 @@
 #include "hooks.h"
 #include "luaserializer.h"
 #include "ModUI.h"
+#include "LuaEventInterface.h"
 
 namespace CppLogic::UI {
 	void StringHandlerSetString(luaext::EState L, EGUIX::CSingleStringHandler& h, int i) {
@@ -1670,8 +1671,161 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
 	} };
 
-	constexpr std::array Commands{
-		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
+	void CheckConstruct(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		if (e->PlayerId != GGUI::CManager::GlobalObj()->ControlledPlayer)
+			throw lua::LuaException{ "player not controlled" };
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		if (!e->IsEntityInCategory(shok::EntityCategory::Serf))
+			throw lua::LuaException{ "not a serf" };
+		if (dynamic_cast<GGL::CBuilding*>(oth) == nullptr)
+			throw lua::LuaException{ "not a building" };
+		if (oth->IsEntityInCategory(shok::EntityCategory::Bridge))
+			return;
+		if (e->PlayerId != oth->PlayerId)
+			throw lua::LuaException{ "not same player" };
+	}
+
+	void CheckRepair(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		if (e->PlayerId != GGUI::CManager::GlobalObj()->ControlledPlayer)
+			throw lua::LuaException{ "player not controlled" };
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		if (!e->IsEntityInCategory(shok::EntityCategory::Serf))
+			throw lua::LuaException{ "not a serf" };
+		if (dynamic_cast<GGL::CBuilding*>(oth) == nullptr)
+			throw lua::LuaException{ "not a building" };
+		if (e->PlayerId != oth->PlayerId)
+			throw lua::LuaException{ "not same player" };
+	}
+
+	void CheckExtract(GGL::CNetEventExtractResource& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.SerfID);
+		if (e->PlayerId != GGUI::CManager::GlobalObj()->ControlledPlayer)
+			throw lua::LuaException{ "player not controlled" };
+		if (!e->IsEntityInCategory(shok::EntityCategory::Serf))
+			throw lua::LuaException{ "not a serf" };
+	}
+
+	void CheckPlaceCannonEvent(GGL::CNetEventCannonCreator& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		ev.Position.FloorToBuildingPlacement();
+		auto bottom = ev.FoundationType;
+		GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
+		if (!ety)
+			throw lua::LuaException("no bottom entitytype");
+		if (!ety->IsBuildingType())
+			throw lua::LuaException("bottom not a building");
+		auto top = ev.CannonType;
+		if (!(*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(top))
+			throw lua::LuaException("no top entitytype");
+		if (!GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &ev.Position, ev.Orientation, shok::EntityId::Invalid))
+			throw lua::LuaException("cannot place foundation at that position");
+	}
+
+	void CheckIsThief(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		if (e->GetBehavior<GGL::CThiefBehavior>() == nullptr)
+			throw lua::LuaException("not a thief");
+	}
+	void CheckSabotageEvent(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		if (!(oth->IsEntityInCategory(shok::EntityCategory::Bridge) || GGL::CPlayerStatus::ArePlayersHostile(e->PlayerId, oth->PlayerId)))
+			throw lua::LuaException("target is not hostile or bridge");
+	}
+	void CheckThiefNotCarryingEvent(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		if (!(e->GetBehavior<GGL::CThiefBehavior>()->ResourceType == shok::ResourceType::None))
+			throw lua::LuaException("is carrying resources");
+	}
+	void CheckDefuseEvent(EGL::CNetEvent2Entities& ev) {
+		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		if (!t->GetBehavior<GGL::CKegBehavior>())
+			throw lua::LuaException("target is no keg");
+	}
+	int CommandMove(lua::State l) {
+		luaext::EState L{ l };
+		auto* s = L.CheckSettler(1);
+		auto p = L.CheckPos(2);
+		float r = L.OptFloat(3, -1);
+		EGL::CNetEventEntityAndPosArray ev{ shok::NetEventIds::Entity_Move, s->EntityId, r };
+		LuaEventInterface::CheckEntityOfLocalPlayer(ev);
+		{
+			auto v = ev.Position.SaveVector();
+			v.Vector.push_back(p);
+		}
+		GGUI::CManager::PostEventFromUI(&ev);
+		return 0;
+	}
+	int CommandPatrol(lua::State l) {
+		luaext::EState L{ l };
+		auto* s = L.CheckSettler(1);
+		EGL::CNetEventEntityAndPosArray ev{ shok::NetEventIds::Entity_Patrol, s->EntityId, -1 };
+		LuaEventInterface::CheckEntityOfLocalPlayer(ev);
+		{
+			auto v = ev.Position.SaveVector();
+			for (int i = 2; i <= L.GetTop(); ++i) {
+			auto p = L.CheckPos(i);
+				v.Vector.push_back(p);
+			}
+		}
+		if (ev.Position.size() == 0)
+			throw lua::LuaException("needs more than one pos");
+		GGUI::CManager::PostEventFromUI(&ev);
+		return 0;
+	}
+
+	constexpr std::array Commands{ // move, patrol
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Entity_AttackEntity,
+			LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Entity_AttackEntity"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Serf_ConstructBuilding,
+			CheckConstruct>>("Serf_ConstructBuilding"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Serf_RepairBuilding,
+			CheckRepair>>("Serf_RepairBuilding"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<GGL::CNetEventExtractResource, shok::NetEventIds::Serf_ExtractResource,
+			CheckExtract>>("Serf_ExtractResource"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::Entity_AttackPos,
+			LuaEventInterface::CheckEntityOfLocalPlayer>>("Entity_AttackPos"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Entity_GuardEntity,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("Entity_GuardEntity"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::BombPlacer_PlaceBombAt,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>>>("BombPlacer_PlaceBombAt"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<GGL::CNetEventCannonCreator, shok::NetEventIds::CannonPlacer_HeroPlaceCannonAt,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBuildCannon>,
+			CheckPlaceCannonEvent>>("CannonPlacer_HeroPlaceCannonAt"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Hero_NPCInteraction,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityActorCategory<shok::EntityCategory::Hero>>>("Hero_NPCInteraction"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::ConvertSettler_Convert,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityConvertSettlers>,
+			LuaEventInterface::CheckConvertible, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>,
+			LuaEventInterface::CheckSettler>>("ConvertSettler_Convert"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Thief_StealFrom,
+			LuaEventInterface::CheckEntityOfLocalPlayer, CheckIsThief,
+			LuaEventInterface::CheckBuilding, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Thief_StealFrom"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Thief_CarryStolenStuffToHQ,
+			LuaEventInterface::CheckEntityOfLocalPlayer, CheckIsThief,
+			LuaEventInterface::CheckBuilding, LuaEventInterface::CheckTargetCategory<shok::EntityCategory::Headquarters>,
+			LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("Thief_CarryStolenStuffToHQ"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sabotage_Sabotage,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityPlaceKeg>,
+			LuaEventInterface::CheckBuilding, CheckThiefNotCarryingEvent,
+			CheckSabotageEvent>>("Sabotage_Sabotage"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sabotage_Defuse,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityPlaceKeg>,
+			CheckThiefNotCarryingEvent, CheckSabotageEvent>>("Sabotage_Defuse"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::Binoculars_Observe,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutBinoculars>>>("Binoculars_Observe"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sniper_Snipe,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilitySniper>,
+			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Sniper_Snipe"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::TorchPlacer_Place,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutTorches>>>("TorchPlacer_Place"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Shuriken_Activate,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityShuriken>,
+			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Shuriken_Activate"),
+		lua::FuncReference::GetRef<CommandMove>("Entity_Move"),
+		lua::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
 	};
 
 	void Init(lua::State L)
@@ -1680,6 +1834,10 @@ namespace CppLogic::UI {
 #ifdef _DEBUG
 		L.RegisterFunc<WidgetGetAddress>("WidgetGetAddress", -3);
 #endif
+		L.Push("Commands");
+		L.NewTable();
+		L.RegisterFuncs(Commands, -3);
+		L.SetTableRaw(-3);
 
 		if (L.GetState() == shok::LuaStateMainmenu) {
 			L.RegisterFunc<SetMouseTriggerMainMenu>("SetMouseTriggerMainMenu", -3);

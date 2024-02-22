@@ -54,7 +54,7 @@ namespace CppLogic::Serializer {
 
 		BB::CFileStreamEx& IO;
 		lua::State L;
-		void* Data = nullptr;
+		std::unique_ptr<byte[]> Data;
 		size_t DataLength = 0;
 		std::map<Reference, int> RefToNumber;
 		std::map<const void*, UpvalueReference> UpRefs;
@@ -78,7 +78,7 @@ namespace CppLogic::Serializer {
 		T ReadPrimitive(const char* ex) {
 			if (ReadPrimitive() != sizeof(T))
 				throw std::format_error{ ex };
-			return *static_cast<T*>(Data);
+			return *reinterpret_cast<T*>(Data.get());
 		}
 
 		void SerializeType(lua::LType t);
@@ -111,7 +111,6 @@ namespace CppLogic::Serializer {
 
 	public:
 		AdvLuaStateSerializer(BB::CFileStreamEx& io, lua_State* l);
-		~AdvLuaStateSerializer();
 
 		void SerializeState();
 		void DeserializeState();

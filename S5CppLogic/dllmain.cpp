@@ -50,7 +50,7 @@
 #include "ModBehavior.h"
 #include "ModUI.h"
 #include "ModConfig.h"
-#include "ConstexprString.h"
+#include "EnumIdManagerMagic.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -283,6 +283,17 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 	}
 }
 
+enum class testen {
+	A=1,
+	B=2,
+};
+namespace CppLogic {
+	template<>
+	inline auto GetIdManager<testen>() {
+		return CppLogic::MagicEnum::EnumIdManager<testen>{};
+	}
+}
+
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
@@ -302,8 +313,7 @@ int Test(lua::State Ls) {
 		L.Push(mng.GetNameByID(id));
 		L.SetTableRaw(-3);
 	}*/
-	static constexpr auto d = CppLogic::ConstexprString<4>( "abc" ) + CppLogic::ConstexprString<4>( "def" );
-	L.Push(d);
+	CppLogic::GetIdManager<testen>().PushToState(L);
 	return 1;
 }
 

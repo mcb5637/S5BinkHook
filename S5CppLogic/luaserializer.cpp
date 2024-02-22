@@ -326,11 +326,6 @@ CppLogic::Serializer::AdvLuaStateSerializer::AdvLuaStateSerializer(BB::CFileStre
 		lua_upvaluejoin = reinterpret_cast<void(__cdecl*)(lua_State*, int, int, int, int)>(GetProcAddress(h, "lua_upvaluejoin"));
 	}
 }
-CppLogic::Serializer::AdvLuaStateSerializer::~AdvLuaStateSerializer()
-{
-	if (Data)
-		delete[] Data;
-}
 
 void CppLogic::Serializer::AdvLuaStateSerializer::WritePrimitive(const void* d, size_t len)
 {
@@ -343,10 +338,10 @@ size_t CppLogic::Serializer::AdvLuaStateSerializer::ReadPrimitive()
 	size_t len = 0;
 	IO.Read(&len, sizeof(size_t));
 	if (len > DataLength) {
-		delete[] Data;
-		Data = new byte[len];
+		Data = std::unique_ptr<byte[]>(new byte[len]);
+		DataLength = len;
 	}
-	IO.Read(Data, len);
+	IO.Read(Data.get(), len);
 	return len;
 }
 
@@ -394,7 +389,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeString(int idx)
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeString()
 {
 	size_t len = ReadPrimitive();
-	L.Push(static_cast<const char*>(Data), len);
+	L.Push(reinterpret_cast<const char*>(Data.get()), len);
 }
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeReference(int ref)
@@ -524,7 +519,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 	L.Load([](lua_State*, void* ud, size_t* len) {
 		AdvLuaStateSerializer* th = static_cast<AdvLuaStateSerializer*>(ud);
 		*len = th->ReadPrimitive();
-		return static_cast<const char*>(th->Data);
+		return reinterpret_cast<const char*>(th->Data.get());
 		}, this, nullptr);
 	L.PushValue(-1);
 	L.SetTableRaw(IndexOfReferenceHolder, ref);
@@ -588,7 +583,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeUserdata()
 	if (DeserializeType() != lua::LType::String)
 		throw std::format_error{ "deserialize udata name error" };
 	size_t len = ReadPrimitive();
-	std::string tname{ static_cast<const char*>(Data), len };
+	std::string tname{ reinterpret_cast<const char*>(Data.get()), len };
 	auto f = UserdataDeserializer.find(tname);
 	if (f == UserdataDeserializer.end())
 		throw std::format_error{ "deserialize udata name not found" };

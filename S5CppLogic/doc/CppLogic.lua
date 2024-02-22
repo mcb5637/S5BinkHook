@@ -293,6 +293,7 @@ function CppLogic.Logic.PlayerGetKillStatistics(p) end
 --- @param pos Position target position
 --- @param rot number rotation
 --- @param bon number|nil BuildOn entity id, or 0, or nil
+--- @return boolean
 function CppLogic.Logic.CanPlaceBuildingAt(ty, pl, pos, rot, bon) end
 
 --- activates alarm mode.

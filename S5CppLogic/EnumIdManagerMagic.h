@@ -27,7 +27,10 @@ namespace CppLogic::MagicEnum {
 			return std::pair(E, static_cast<std::string_view>(h::value));
 		}
 		static consteval auto Build() {
-			return std::array{ ConstructPair<Sparse>()... };
+			if constexpr (sizeof...(Sparse) > 0)
+				return std::array{ ConstructPair<Sparse>()... };
+			else
+				return 1; // placeholder so sparse_entries has some valid type, should never be accessed
 		}
 
 		static constexpr const auto entries = magic_enum::enum_entries<En>();
@@ -36,9 +39,11 @@ namespace CppLogic::MagicEnum {
 		// does not add
 		En GetIdByName(const char* name) const {
 			std::string_view n{ name };
-			for (const auto& [e, en] : sparse_entries) {
-				if (en == n)
-					return e;
+			if constexpr (sizeof...(Sparse) > 0) {
+				for (const auto& [e, en] : sparse_entries) {
+					if (en == n)
+						return e;
+				}
 			}
 			auto v = magic_enum::enum_cast<En>(n);
 			if (!v.has_value())
@@ -46,9 +51,11 @@ namespace CppLogic::MagicEnum {
 			return *v;
 		}
 		const char* GetNameByID(En id) const {
-			for (const auto& [e, en] : sparse_entries) {
-				if (id == e)
-					return en.data();
+			if constexpr (sizeof...(Sparse) > 0) {
+				for (const auto& [e, en] : sparse_entries) {
+					if (id == e)
+						return en.data();
+				}
 			}
 			return magic_enum::enum_name(id).data();
 		}
@@ -60,10 +67,12 @@ namespace CppLogic::MagicEnum {
 				L.Push(static_cast<int>(id));
 				L.SetTableRaw(-3);
 			}
-			for (const auto& [id, name] : sparse_entries) {
-				L.Push(name);
-				L.Push(static_cast<int>(id));
-				L.SetTableRaw(-3);
+			if constexpr (sizeof...(Sparse) > 0) {
+				for (const auto& [id, name] : sparse_entries) {
+					L.Push(name);
+					L.Push(static_cast<int>(id));
+					L.SetTableRaw(-3);
+				}
 			}
 		}
 	};

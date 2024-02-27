@@ -17,6 +17,7 @@
 #include "s5_exception.h"
 #include "s5_cutscene.h"
 #include "s5_netevents.h"
+#include "s5_entity.h"
 #include "hooks.h"
 #include "luaext.h"
 
@@ -264,6 +265,10 @@ namespace CppLogic::API {
 
 		L.Push("NetEvents");
 		CppLogic::GetIdManager<shok::NetEventIds>().PushToState(L);
+		L.SetGlobal();
+
+		L.Push("AdvancedDealDamageSource");
+		CppLogic::GetIdManager<shok::AdvancedDealDamageSource>().PushToState(L);
 		L.SetGlobal();
 
 		return 0;

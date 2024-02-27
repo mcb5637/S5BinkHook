@@ -7,6 +7,7 @@
 #include "s5_tech.h"
 #include "s5_behaviors.h"
 #include "s5_config.h"
+#include "EnumIdManagerMagic.h"
 
 namespace shok {
 	enum class AdvancedDealDamageSource : int {
@@ -40,6 +41,12 @@ namespace shok {
 		//MoveDone = 1, ? rotate?
 		Standing = 2,
 	};
+}
+namespace CppLogic {
+	template<>
+	inline auto GetIdManager<shok::AdvancedDealDamageSource>() {
+		return CppLogic::MagicEnum::EnumIdManager<shok::AdvancedDealDamageSource>{};
+	}
 }
 
 

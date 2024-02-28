@@ -379,6 +379,8 @@ namespace GGL {
 
 		bool HasResourcesFeedback(const shok::CostInfo& c, bool feedback = true);
 
+		// ctor 4B6F6B
+
 		static bool ArePlayersHostile(shok::PlayerId p1, shok::PlayerId p2);
 		static bool ArePlayersFriendly(shok::PlayerId p1, shok::PlayerId p2);
 

@@ -283,22 +283,11 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 	}
 }
 
-enum class testen {
-	A=1,
-	B=2,
-};
-namespace CppLogic {
-	template<>
-	inline auto GetIdManager<testen>() {
-		return CppLogic::MagicEnum::EnumIdManager<testen>{};
-	}
-}
-
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x5BB494)());
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x49BE76)());
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -313,7 +302,7 @@ int Test(lua::State Ls) {
 		L.Push(mng.GetNameByID(id));
 		L.SetTableRaw(-3);
 	}*/
-	CppLogic::GetIdManager<testen>().PushToState(L);
+	
 	return 1;
 }
 

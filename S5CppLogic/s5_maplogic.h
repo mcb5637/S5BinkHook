@@ -236,6 +236,8 @@ namespace EGL {
 
 		bool IsPositionExplored(const shok::Position& p);
 
+		// ctor 58D64D thiscall(pid)
+
 		static inline constexpr int vtp = 0x784E04;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEE20FA93);
 	};
@@ -261,6 +263,8 @@ namespace EGL {
 	class CEntityVectorMap : public BB::IObject {
 	public:
 		shok::Map<shok::EntityTypeId, shok::Vector<EGL::CGLEEntity*>> Items; // EntityType -> EntityVector.Item
+
+		// ctor 575F0D thiscall(pid)
 
 		static inline constexpr int vtp = 0x783B4C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1A5477F7);
@@ -301,6 +305,8 @@ namespace EGL {
 		PADDINGI(1); // part of GenericMessageData?
 		shok::Vector<SingleResOut> ResourceRunningOutMessageData;
 
+		// ctor 58551E thiscall(pid)
+
 		static inline constexpr int vtp = 0x7847A8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC375BEA3);
 	};
@@ -327,10 +333,13 @@ namespace EGL {
 		void ActivateUpdateOfExplorationForAllPlayers();
 		CPlayerExplorationUpdate* GetUpdate(); // creates if nullptr
 
+		// activate player thiscall 575F63(pid)
+		// activate player callback 8973C8
+
 		// seridata of this thing is 0x897508, but it is missing its guard
 	};
-	static_assert(sizeof(PlayerManager::Player) * 9 + 4 == 184);
-	static_assert(offsetof(PlayerManager, ExplorationUpdate) == 46 * 4);
+	static_assert(sizeof(EGL::PlayerManager::Player) * 9 + 4 == 184);
+	static_assert(offsetof(EGL::PlayerManager, ExplorationUpdate) == 46 * 4);
 
 	struct LogicGameTime {
 		int Tick;
@@ -481,6 +490,25 @@ namespace GGL {
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49ECE9);
 	};
 
+	class PlayerManager { // name from the file in savegames
+	public:
+		struct PlayerData {
+			PADDINGI(1);
+			GGL::CPlayerStatus* GameStatus;
+		};
+
+		PlayerData Player[9];
+		PADDINGI(1); // seridata-> belongs to array, 0 wtf???
+
+		GGL::CPlayerStatus* GetPlayer(shok::PlayerId p);
+		// create player 4A9131 thiscall(pid)
+		// on egl player created 4A9218(pid, eglplayer)
+
+		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
+	};
+	static_assert(sizeof(GGL::PlayerManager::Player) == 18 * 4);
+	static_assert(sizeof(GGL::PlayerManager) == 19 * 4);
+
 	class IGLGameLogic {
 	public:
 		virtual void __stdcall Destroy() = 0;
@@ -505,7 +533,7 @@ namespace GGL {
 		shok::Map<shok::NetEventIds, EGL::IGLEHandler<BB::CEvent, void>*> NetEventHandlers;
 		PADDINGI(3);
 	public:
-		GGL::CPlayerStatus** players; // 10
+		GGL::PlayerManager* Players; // 10
 		GGL::CWeatherHandler* WeatherHandler;
 		shok::TechCategoryManager* TechCategoryManager;
 		shok::TechManager* TechManager; // 13
@@ -537,12 +565,11 @@ namespace GGL {
 
 		static inline GGL::CGLGameLogic** const GlobalObj = reinterpret_cast<GGL::CGLGameLogic**>(0x85A3A0);
 		// create net event handlers thiscall 0x49FD49()
-		static inline BB::SerializationData* (__stdcall* const SerializationDataPlayerArray)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
 		// only globalinvul and weathermachineactive
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49AC82);
 
 		// on tech researched event void __stdcall(this, const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&) 0x49A75F, put into GGL::PlayerTechManager
 	};
 	static_assert(offsetof(CGLGameLogic, NetEventHandlers) == 4 * 4);
-	static_assert(offsetof(CGLGameLogic, players) == 10 * 4);
+	static_assert(offsetof(CGLGameLogic, Players) == 10 * 4);
 }

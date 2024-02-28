@@ -775,10 +775,15 @@ void GGL::CWeatherHandler::ClearQueue(shok::WeatherState state, int dur, int for
 	}
 }
 
-static inline GGL::CPlayerStatus* (__thiscall* const gamelogic_getplayer)(GGL::CPlayerStatus** pl, shok::PlayerId p) = reinterpret_cast<GGL::CPlayerStatus * (__thiscall*) (GGL::CPlayerStatus**, shok::PlayerId)>(0x4A91BC);
+static inline GGL::CPlayerStatus* (__thiscall* const gglplayermng_getplayer)(GGL::PlayerManager* pl, shok::PlayerId p) = reinterpret_cast<GGL::CPlayerStatus * (__thiscall*) (GGL::PlayerManager*, shok::PlayerId)>(0x4A91BC);
+GGL::CPlayerStatus* GGL::PlayerManager::GetPlayer(shok::PlayerId p)
+{
+	return gglplayermng_getplayer(this, p);
+}
+
 GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(shok::PlayerId i)
 {
-	return gamelogic_getplayer(this->players, i);
+	return Players->GetPlayer(i);
 }
 
 shok::Technology* GGL::CGLGameLogic::GetTech(shok::TechnologyId id)

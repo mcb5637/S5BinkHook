@@ -50,6 +50,17 @@ namespace shok {
 	struct PositionRot : Position {
 		float r = 0;
 
+		inline PositionRot(float x, float y, float r) : r(r) {
+			X = x;
+			Y = y;
+		}
+		inline explicit PositionRot(const Position& p) : Position(p) {}
+		inline PositionRot& operator=(const Position& p) { // copes X and Y, leaves r
+			Position::operator=(p);
+			return *this;
+		}
+		inline PositionRot() = default;
+
 		// everything in rad, corrects angle diff to [-180,+180]
 		static inline float(__cdecl* const AngleDifference)(float a1, float a2) = reinterpret_cast<float(__cdecl*)(float, float)>(0x57EF7E);
 	};

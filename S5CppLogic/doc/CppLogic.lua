@@ -613,6 +613,31 @@ function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxpric
 --- @param refinerFix boolean|nil (default false)
 function CppLogic.Logic.EnableResourceTriggers(enabled, refinerFix) end
 
+--- enables firing a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER trigger when:
+--- - automatically spawning a worker for some workplace
+--- - GUI.BuyLeader (net event handler)
+--- - Logic.BarracksBuyLeader
+--- - GUI.BuySoldier (net event handler)
+--- - GUI.BuySerf (net event handler)
+function CppLogic.Logic.EnableSettlerBuyTriggers() end
+
+--- gets data of a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER
+--- @return number typeToBuy
+--- @return number targetId workplace or leader or 0
+--- @return boolean hasVCSpace
+--- @return boolean hasCost
+--- @return boolean hasMotivation
+--- @return boolean isNotAlarm
+--- @return boolean hasHQSpace
+function CppLogic.Logic.GetSettlerBuyTriggerData() end
+--- sets data of a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER
+--- @param hasVCSpace boolean
+--- @param hasCost boolean
+--- @param hasMotivation boolean
+--- @param isNotAlarm boolean
+--- @param hasHQSpace boolean
+function CppLogic.Logic.SetSettlerBuyTriggerData(hasVCSpace, hasCost, hasMotivation, isNotAlarm, hasHQSpace) end
+
 --- gets the exploration status of a position.
 --- you may need to use Logic.ActivateUpdateOfExplorationForAllPlayers to use it with AI players.
 ---@param player number
@@ -1718,7 +1743,8 @@ function CppLogic.Entity.Building.FoundryGetCannonTypeInConstruction(id) end
 --- @param bid entity
 --- @param lid entity
 --- @param noChecktype boolean (optional, default false) set to true to skip the check for matching barracks type.
-function CppLogic.Entity.Building.BarracksBuySoldierForLeader(bid, lid, noChecktype) end
+--- @param checkvcandcost boolean (optional, default true) set to false to skip the check for pop and cost.
+function CppLogic.Entity.Building.BarracksBuySoldierForLeader(bid, lid, noChecktype, checkvcandcost) end
 
 --- activates overtime.
 --- checks for cooldown.
@@ -1805,11 +1831,13 @@ function CppLogic.Entity.Building.IsConstructionSite(id) end
 
 --- buys a leader in a barracks by entitytype.
 --- uses resources, asserts if not possible.
+--- does not fire a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER trigger.
 --- @param id entity
 --- @param ety entity type
 --- @param checkType boolean|nil check if leader type can be recruited at this barracks upgradecategory (optional, default false)
+--- @param checkVCAndMoti boolean|nil checks VC space, motivation and alarm (optional, default true)
 --- @return number id
-function CppLogic.Entity.Building.BarracksBuyLeaderByType(id, ety, checkType) end
+function CppLogic.Entity.Building.BarracksBuyLeaderByType(id, ety, checkType, checkVCAndMoti) end
 
 --- gets ApproachPosition, LeavePosition and DoorPos of a building.
 --- @param id entity
@@ -1818,6 +1846,14 @@ function CppLogic.Entity.Building.BarracksBuyLeaderByType(id, ety, checkType) en
 --- @return Position door
 function CppLogic.Entity.Building.GetRelativePositions(id) end
 
+--- spawns a worker in a VC or HQ for a specific building.
+--- does not check if the target building can have another worker, or if it could spawn normally.
+--- also does not check, if spawner is a VC/HQ and of the same player.
+--- does not fire a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER trigger.
+--- @param workplace entity
+--- @param spawner entity
+--- @return number worker
+function CppLogic.Entity.Building.SpawnWorkerFor(workplace, spawner) end
 
 --- entity type max health.
 --- @param ty number entitytype

@@ -1131,22 +1131,24 @@ namespace CppLogic::Entity {
 			if (lp->BarrackUpgradeCategory != ucat)
 				throw lua::LuaException("leader type doesnt match barracks type");
 		}
-		int max = s->LimitedAttachmentGetMaximum(shok::AttachmentType::LEADER_SOLDIER);
-		int curr = 0;
-		for (const auto& a : s->ObservedEntities) {
-			if (a.first == shok::AttachmentType::LEADER_SOLDIER)
-				curr++;
+		if (L.OptBool(4, true)) {
+			int max = s->LimitedAttachmentGetMaximum(shok::AttachmentType::LEADER_SOLDIER);
+			int curr = 0;
+			for (const auto& a : s->ObservedEntities) {
+				if (a.first == shok::AttachmentType::LEADER_SOLDIER)
+					curr++;
+			}
+			if (curr >= max)
+				throw lua::LuaException("no free soldier slot left");
+			GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
+			if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
+				throw lua::LuaException("pop capped");
+			GGL::CGLSettlerProps* sprop = dynamic_cast<GGL::CGLSettlerProps*>(solty->LogicProps);
+			if (!sprop)
+				throw lua::LuaException("error: soldier no settler type");
+			if (!p->CurrentResources.HasResources(&sprop->Cost))
+				throw lua::LuaException("missing res");
 		}
-		if (curr >= max)
-			throw lua::LuaException("no free soldier slot left");
-		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
-		if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
-			throw lua::LuaException("pop capped");
-		GGL::CGLSettlerProps* sprop = dynamic_cast<GGL::CGLSettlerProps*>(solty->LogicProps);
-		if (!sprop)
-			throw lua::LuaException("error: soldier no settler type");
-		if (!p->CurrentResources.HasResources(&sprop->Cost))
-			throw lua::LuaException("missing res");
 		b->CommandRecruitSoldierForLeader(s->EntityId);
 		return 0;
 	}
@@ -1564,25 +1566,31 @@ namespace CppLogic::Entity {
 	int BarracksBuyLeaderByType(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CBuilding* e = L.CheckBuilding(1);
-		if (!e->GetBehavior<GGL::CBarrackBehavior>())
+		auto rax = e->GetBehavior<GGL::CBarrackBehavior>();
+		if (!rax)
 			throw lua::LuaException("no barracks");
 		GGlue::CGlueEntityProps* ety = L.CheckEntityType(2);
 		GGL::CLeaderBehaviorProps* lp = ety->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!lp)
 			throw lua::LuaException("no leader type");
-		if (!e->IsIdle(true))
+		bool check = L.OptBool(4, true);
+		if (!e->IsIdle(true, !check))
 			throw lua::LuaException("building not idle");
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
-		if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
-			throw lua::LuaException("pop capped");
+		if (check) {
+			if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
+				throw lua::LuaException("pop capped");
+			if (p->PlayerAttractionHandler->IsMotivationLocked())
+				throw lua::LuaException("motivation blocked");
+		}
 		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost))
 			throw lua::LuaException("missing res");
-		if (!L.ToBoolean(3)) {
+		if (!L.OptBool(3, false)) {
 			auto ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(e->EntityType);
 			if (lp->BarrackUpgradeCategory != ucat)
 				throw lua::LuaException("leader type doesnt match barracks type");
 		}
-		auto id = e->BuyLeaderByType(L.CheckEnum<shok::EntityTypeId>(2));
+		auto id = rax->BuyLeaderByType(L.CheckEnum<shok::EntityTypeId>(2));
 		L.Push(id);
 		return 1;
 	}
@@ -1735,6 +1743,16 @@ namespace CppLogic::Entity {
 		L.PushPos(b->Position + p->LeavePos);
 		L.PushPos(b->Position + p->DoorPos);
 		return 3;
+	}
+
+	int BuildingSpawnWorkerFor(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* workplace = L.CheckBuilding(1);
+		auto* spawner = L.CheckBuilding(2);
+		auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(workplace->PlayerId);
+		auto w = pl->PlayerAttractionHandler->PerformSpawnWorker(workplace, spawner);
+		L.Push(w);
+		return 1;
 	}
 
 
@@ -1906,7 +1924,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
 	} };
 
-	constexpr std::array<lua::FuncReference, 33> Building{ {
+	constexpr std::array Building{
 			lua::FuncReference::GetRef<BuildingGetBarracksAutoFillActive>("GetBarracksAutoFillActive"),
 			lua::FuncReference::GetRef<BuildingGetHeight>("GetHeight"),
 			lua::FuncReference::GetRef<BuildingSetHeight>("SetHeight"),
@@ -1940,7 +1958,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<ConstructionSiteGetBuilding>("ConstructionSiteGetBuilding"),
 			lua::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
 			lua::FuncReference::GetRef<BuildingGetRelativePositions>("GetRelativePositions"),
-	} };
+			lua::FuncReference::GetRef<BuildingSpawnWorkerFor>("SpawnWorkerFor"),
+	};
 
 	void Init(lua::State L)
 	{

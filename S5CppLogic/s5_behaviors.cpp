@@ -1438,6 +1438,84 @@ void GGL::CResourceRefinerBehavior::HookRefineTrigger()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4E128B), CppLogic::Hooks::MemberFuncPointerToVoid(&CResourceRefinerBehavior::EventRefineOverride, 0), reinterpret_cast<void*>(0x4E1295));
 }
 
+static inline shok::EntityId(__thiscall* const raxbeh_buyleaderandattach)(GGL::CBarrackBehavior* th, shok::EntityTypeId ety) = reinterpret_cast<shok::EntityId(__thiscall*)(GGL::CBarrackBehavior*, shok::EntityTypeId)>(0x50EA18);
+static inline int(__thiscall* const raxbeh_gettrainingtl)(GGL::CBarrackBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CBarrackBehavior*)>(0x50EBCE);
+shok::EntityId GGL::CBarrackBehavior::BuyLeaderByType(shok::EntityTypeId ety)
+{
+	shok::EntityId id = raxbeh_buyleaderandattach(this, ety);
+	if (id != shok::EntityId::Invalid) {
+		EGL::CEventValue_Int ev = { shok::EventIDs::Leader_SetTrainingTL, raxbeh_gettrainingtl(this) };
+		EGL::CGLEEntity::GetEntityByID(id)->FireEvent(&ev);
+	}
+	return id;
+}
+
+bool HookBuyTriggers_Hooked = false;
+void GGL::CBarrackBehavior::HookBuyTriggers()
+{
+	if (HookBuyTriggers_Hooked)
+		return;
+	HookBuyTriggers_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x50F020 - 0x50F016, { reinterpret_cast<void*>(0x50F016), reinterpret_cast<void*>(0x50EE4D) } };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F016), CppLogic::Hooks::MemberFuncPointerToVoid(&CBarrackBehavior::EventBuyLeaderOverride, 0), reinterpret_cast<void*>(0x50F020));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50EE4D), CppLogic::Hooks::MemberFuncPointerToVoid(&CBarrackBehavior::EventBuySoldierOverride, 0), reinterpret_cast<void*>(0x50EE57));
+}
+void GGL::CBarrackBehavior::EventBuyLeaderOverride(EGL::CEventValue_Int* ev)
+{
+	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	if (!b->IsIdle(true, true))
+		return;
+	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
+	auto etyid = pl->SettlerUpgradeManager->GetTypeByUCat(static_cast<shok::UpgradeCategoryId>(ev->Data));
+	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, shok::EntityId::Invalid, etyid,
+		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
+		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
+		!pl->PlayerAttractionHandler->IsMotivationLocked(), !b->WorkerAlarmModeActive };
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&cev);
+	if (cev.Cost && cev.VCPop && cev.Alarm && cev.Motivation)
+		BuyLeaderByType(etyid);
+}
+void GGL::CBarrackBehavior::EventBuySoldierOverride(EGL::CEvent1Entity* ev)
+{
+	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	if (!b->IsConstructionFinished())
+		return;
+	if (b->IsUpgrading)
+		return;
+	if (EGL::CGLEEntity::EntityIDIsDead(ev->EntityID))
+		return;
+	EGL::CGLEEntity* leader = EGL::CGLEEntity::GetEntityByID(ev->EntityID);
+	EGL::CEventGetValue_Int getcurr{ shok::EventIDs::Leader_GetCurrentNumSoldier };
+	leader->FireEvent(&getcurr);
+	EGL::CEventGetValue_Int getmax{ shok::EventIDs::Leader_GetMaxNumSoldier };
+	leader->FireEvent(&getmax);
+	if (getcurr.Data >= getmax.Data)
+		return;
+	EGL::CEventGetValue_Int getsolty{ shok::EventIDs::Leader_GetSoldierType };
+	leader->FireEvent(&getsolty);
+	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
+	auto etyid = static_cast<shok::EntityTypeId>(getsolty.Data);
+	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, ev->EntityID, etyid,
+		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
+		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
+		!pl->PlayerAttractionHandler->IsMotivationLocked(), !b->WorkerAlarmModeActive };
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&cev);
+	if (cev.Cost && cev.VCPop && cev.Alarm && cev.Motivation)
+	{
+		shok::EntityId id = raxbeh_buyleaderandattach(this, etyid);
+		if (id != shok::EntityId::Invalid) {
+			EGL::CEvent1Entity ev = { shok::EventIDs::Leader_AttachSoldier, id };
+			leader->FireEvent(&ev);
+			auto sol = EGL::CGLEEntity::GetEntityByID(id);
+			sol->AttachEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING, EntityId, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
+			static_cast<GGL::CSettler*>(sol)->Vanish();
+			sol->SetTaskList(CppLogic::GetIdManager<shok::TaskListId>().GetIdByName("TL_SOLDIER_LEAVE_BARRACKS"));
+		}
+	}
+}
+
 inline EGL::CGLEEntity* (__thiscall*const defbuild_gettar)(GGL::CDefendableBuildingBehavior* th, const shok::Position* p) = reinterpret_cast<EGL::CGLEEntity * (__thiscall*)(GGL::CDefendableBuildingBehavior*, const shok::Position*)>(0x4FC22F);
 EGL::CGLEEntity* GGL::CDefendableBuildingBehavior::GetAttackTarget(const shok::Position& pos)
 {
@@ -1525,4 +1603,47 @@ void GGL::CMineBehavior::HookMineTrigger()
 	HookMineTrigger_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4E6961), 0x10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4E6961), &minebeh_taskmineaddasm, reinterpret_cast<void*>(0x4E6966));
+}
+
+inline int(__thiscall* const keepheb_maxserfs)(const GGL::CKeepBehavior* th) = reinterpret_cast<int(__thiscall*)(const GGL::CKeepBehavior*)>(0x4F23D2);
+int GGL::CKeepBehavior::GetMaxNumberOfSerfs() const
+{
+	return keepheb_maxserfs(this);
+}
+
+inline GGL::CSettler*(__thiscall* const keepheb_createserf)(GGL::CKeepBehavior* th) = reinterpret_cast<GGL::CSettler * (__thiscall*)(GGL::CKeepBehavior*)>(0x4F24A0);
+void __thiscall GGL::CKeepBehavior::EventBuySerfOverride(BB::CEvent* ev)
+{
+	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	if (!b->IsIdle(false, true))
+		return;
+	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
+	auto etyid = CppLogic::GetIdManager<shok::EntityTypeId>().GetIdByName("PU_Serf");
+	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, shok::EntityId::Invalid, etyid,
+		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
+		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
+		!pl->PlayerAttractionHandler->IsMotivationLocked(), !b->WorkerAlarmModeActive,
+		pl->PlayerAttractionHandler->SerfArray.size() < GetMaxNumberOfSerfs()};
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&cev);
+	if (cev.Cost && cev.VCPop && cev.Alarm && cev.Motivation && cev.HQPop)
+	{
+		auto* serf = keepheb_createserf(this);
+		if (serf != nullptr) {
+			serf->Vanish();
+			serf->AttachEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING, EntityId, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
+			serf->SetTaskList(CppLogic::GetIdManager<shok::TaskListId>().GetIdByName("TL_LEAVE_KEEP"));
+			pl->CurrentResources.SubResources(static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost);
+		}
+	}
+}
+
+bool HookBuySerf_Hooked = false;
+void GGL::CKeepBehavior::HookBuySerf()
+{
+	if (HookBuySerf_Hooked)
+		return;
+	HookBuySerf_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4F2733), 0x4F273C- 0x4F2733 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4F2733), CppLogic::Hooks::MemberFuncPointerToVoid(&CKeepBehavior::EventBuySerfOverride, 0), reinterpret_cast<void*>(0x4F273C));
 }

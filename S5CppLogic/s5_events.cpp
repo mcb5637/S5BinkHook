@@ -339,3 +339,12 @@ shok::ClassId __stdcall CppLogic::Events::AdvHurtByEvent::GetClassIdentifier() c
 {
 	return Identifier;
 }
+
+CppLogic::Events::CanBuySettlerEvent::CanBuySettlerEvent(shok::EventIDs e, shok::EntityId buyat, shok::EntityId target, shok::EntityTypeId tobuy, bool vc, bool cost, bool moti, bool alarm, bool hqpop)
+	: EGL::CEvent1Entity(e, buyat), ToBuy(tobuy), Target(target), VCPop(vc), Cost(cost), Motivation(moti), Alarm(alarm), HQPop(hqpop)
+{
+}
+shok::ClassId __stdcall CppLogic::Events::CanBuySettlerEvent::GetClassIdentifier() const
+{
+	return Identifier;
+}

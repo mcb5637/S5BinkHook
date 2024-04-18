@@ -423,24 +423,19 @@ bool GGL::CBuilding::IsConstructionFinished() const
 	return ConstructionProgress >= 1;
 }
 
-bool GGL::CBuilding::IsIdle()
-{
-	return IsIdle(false);
-}
-
-bool GGL::CBuilding::IsIdle(bool forRecruitemnt)
+bool GGL::CBuilding::IsIdle(bool forRecruitemnt, bool ignoreAlarm)
 {
 	if (!IsConstructionFinished())
 		return false;
 	if (IsUpgrading)
 		return false;
-	if (CurrentState == shok::TaskState::BuildingAlarmDefend) // alarm mode
+	if (!ignoreAlarm && WorkerAlarmModeActive)
 		return false;
-	if (GetTechnologyInResearch() != static_cast<shok::TechnologyId>(0))
+	if (GetTechnologyInResearch() != shok::TechnologyId::Invalid)
 		return false;
 	{
 		GGL::CFoundryBehavior* f = GetBehavior<GGL::CFoundryBehavior>();
-		if (f && (f->CannonType != static_cast<shok::EntityTypeId>(0) || GetCannonProgress() != 100))
+		if (f && (f->CannonType != shok::EntityTypeId::Invalid || GetCannonProgress() != 100))
 			return false;
 	}
 	if (GetBehavior<GGL::CMarketBehavior>() && GetMarketProgress() < 1.0f)
@@ -902,19 +897,6 @@ void GGL::CBuilding::MarketCancelTrade()
 {
 	BB::CEvent e2{ shok::EventIDs::Market_CancelTrade };
 	FireEvent(&e2);
-}
-
-static inline shok::EntityId(__thiscall* const raxbeh_createentityandattach)(GGL::CBarrackBehavior* th, shok::EntityTypeId ety) = reinterpret_cast<shok::EntityId(__thiscall*)(GGL::CBarrackBehavior*, shok::EntityTypeId)>(0x50EA18);
-static inline int(__thiscall* const raxbeh_gettrainingtl)(GGL::CBarrackBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CBarrackBehavior*)>(0x50EBCE);
-shok::EntityId GGL::CBuilding::BuyLeaderByType(shok::EntityTypeId ety)
-{
-	GGL::CBarrackBehavior* rax = GetBehavior<GGL::CBarrackBehavior>();
-	shok::EntityId id = raxbeh_createentityandattach(rax, ety);
-	if (id != static_cast<shok::EntityId>(0)) {
-		EGL::CEventValue_Int ev = { shok::EventIDs::Leader_SetTrainingTL, raxbeh_gettrainingtl(rax) };
-		EGL::CGLEEntity::GetEntityByID(id)->FireEvent(&ev);
-	}
-	return id;
 }
 
 static inline void(__thiscall* const build_getabsapproachpos)(GGL::CBuilding* th, shok::Position* p) = reinterpret_cast<void(__thiscall*)(GGL::CBuilding*, shok::Position*)>(0x4A9F0B);
@@ -1773,6 +1755,16 @@ void GGL::CSettler::Upgrade()
 	settler_upgrade(this);
 }
 
+static inline void(__thiscall* const settler_vanish)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x57A8A4);
+void GGL::CSettler::Vanish()
+{
+	settler_vanish(this);
+}
+static inline void(__thiscall* const settler_appear)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x57A8C2);
+void GGL::CSettler::Appear()
+{
+	settler_appear(this);
+}
 
 void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)
 {

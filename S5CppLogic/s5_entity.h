@@ -590,6 +590,8 @@ namespace GGL {
 		int __thiscall GetBaseArmor();
 
 		void Upgrade();
+		void Vanish();
+		void Appear();
 
 		// defined tasks: TASK_VANISH, TASK_APPEAR, TASK_ENTER_BUILDING, TASK_LEAVE_BUILDING, TASK_LIST_DONE, TASK_SET_TASK_LIST, TASK_WAIT, TASK_LEFT_BUILDING, TASK_WAIT_UNTIL
 		//		TASK_RESOLVE_COLLISION, TASK_GO_TO_FREE_POSITION, TASK_SET_POS (set relative to workplace)
@@ -636,15 +638,32 @@ namespace GGL {
 		bool IsActive, IsRegistered, IsUpgrading, IsOvertimeActive; // 70
 		bool WorkerAlarmModeActive;
 		PADDING(3);
-		int MaxNumWorkers;
+		int MaxNumWorkers; // 72
 		shok::TechnologyId CurrentTechnology;
-		int LatestAttackTurn, MostRecentDepartureTurn; // 72
+		int LatestAttackTurn, MostRecentDepartureTurn; // 76
 		float ConstructionProgress, RepairProgress, UpgradeProgress; //la78
 		PADDINGI(2);// list Slots with NumberOfRepairingSerfs? 79
 		int NumberOfRepairingSerfs;
 		int OvertimeRechargeTime; // 82
 
-		// a lot more v funcs
+		virtual shok::EntityId GetLastAttachedWorker() = 0;// 39
+	private:
+		virtual int UnknownBuildingFunc1() = 0; // 40
+	public:
+		virtual shok::Position* GetBuilderSlotOffset(shok::Position* ret, int num) const = 0;
+		virtual shok::Position* GetBuilderSlotAbs(shok::Position* ret, int num) const = 0;
+		virtual float GetBuilderSlotRotationOff(int num) const = 0;
+		virtual void SetConstructionProgress(float p) = 0;
+		virtual float GetConstructionProgress() const = 0; //45
+		virtual shok::Position* GetDoorPosOff(shok::Position* ret) const = 0;
+		virtual shok::Position* GetDoorPosAbs(shok::Position* ret) const = 0;
+		virtual shok::Position* GetApproachPosAbsFallbackNearbyPos(shok::Position* ret, float fallbackRange) = 0;
+	private:
+		virtual int UnknownBuildingFunc2() = 0; // calculates some pos (Bridge returns its pos)
+	public:
+		virtual bool IsNotPlayer0() const = 0; //50
+		virtual void RegisterToPlayer() = 0; // adds itself to player, then sets IsRegistered=true
+		virtual int GetNumberOfBuilderSlots() const = 0; // 52
 
 		static inline constexpr int vtp = 0x76EB94;
 		static inline constexpr int TypeDesc = 0x807898;
@@ -655,8 +674,7 @@ namespace GGL {
 		int GetNearestFreeConstructionSlotFor(shok::Position* p);
 		int GetNearestFreeRepairSlotFor(shok::Position* p);
 		bool IsConstructionFinished() const;
-		bool IsIdle();
-		bool IsIdle(bool forRecruitemnt);
+		bool IsIdle(bool forRecruitemnt = false, bool ignoreAlarm = false);
 		shok::TechnologyId GetTechnologyInResearch();
 		int GetCannonProgress();
 		float GetMarketProgress();
@@ -678,7 +696,6 @@ namespace GGL {
 		void CancelResearch();
 		void MarketStartTrade(shok::ResourceType ResourceTypeSell, shok::ResourceType ResourceTypeBuy, float BuyAmount);
 		void MarketCancelTrade();
-		shok::EntityId BuyLeaderByType(shok::EntityTypeId ety);
 		shok::Position GetAbsoluteApproachPos();
 		bool IsHealthBurning(int health);
 		bool IsHealthBurning();
@@ -694,6 +711,7 @@ namespace GGL {
 	};
 	static_assert(offsetof(CBuilding, IsActive) == 70 * 4);
 	static_assert(offsetof(CBuilding, UpgradeProgress) == 78 * 4);
+	static_assert(offsetof(CBuilding, ConstructionProgress) == 76 * 4);
 
 	class CConstructionSite : public CBuilding {
 	public:

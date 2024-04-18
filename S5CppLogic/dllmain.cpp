@@ -287,7 +287,7 @@ int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x49BE76)());
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x49BE76)());
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -302,7 +302,9 @@ int Test(lua::State Ls) {
 		L.Push(mng.GetNameByID(id));
 		L.SetTableRaw(-3);
 	}*/
-	
+	auto e = L.CheckEntity(1);
+	auto b = e->GetBehavior<GGL::CBarrackBehavior>();
+	L.Push(reinterpret_cast<bool(__thiscall*)(void*)>(0x50EF9D)(b));
 	return 1;
 }
 

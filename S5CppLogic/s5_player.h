@@ -55,6 +55,7 @@ namespace GGL {
 		int GetNumberOfLeaders();
 		// checks VC capactity and motivation. always true if AIPlayerFlag set.
 		bool IsAttractionsSlotAvailable();
+		bool IsMotivationLocked();
 		int GetNumberOfSettlers();
 		int GetNumberOfMilitaryUnits();
 		// in 1/100 ticks
@@ -73,17 +74,26 @@ namespace GGL {
 
 		void CheckWorkerAttachment(bool forceReAttach);
 		bool AttachWorker(shok::EntityId worker, shok::EntityId building);
+		shok::EntityId PerformSpawnWorker(GGL::CBuilding* workplace, GGL::CBuilding* spawner);
 
 		// checkpayday 4C25FB thiscall
 		static void HookCheckPayday();
 		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);
 
+		static void HookWorkerSpawn();
+
 		// on entity created 0x4C38FE __thiscall(id)
 
 		// attraction of vector 0x4C2335 __thiscall(shok::Vector<shok::EntityId>*)
 
+		// update() 0x4C4A09
+		// checkWorkerSpawn() 0x4C47FB
+		// getWorkplacesToSpawnWorker(shok::List<Data>*) 0x4C46BB
+		// get nearest reachable(shok::Vector<shok::EntityId>*, shok::Position*) 0x4C205C
+
 	private:
 		void __thiscall CheckPaydayHook();
+		void __thiscall CheckWorkerSpawnHook();
 	};
 	constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
 

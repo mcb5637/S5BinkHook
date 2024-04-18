@@ -5,6 +5,7 @@
 #include "s5_maplogic.h"
 #include "s5_events.h"
 #include "s5_scriptsystem.h"
+#include "s5_entity.h"
 #include "hooks.h"
 
 static inline int(__thiscall* const plattracthandlerGetAttLimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C216F);
@@ -43,6 +44,11 @@ bool GGL::CPlayerAttractionHandler::IsAttractionsSlotAvailable()
 {
 	return playerattractionhandler_isslotavail(this);
 }
+static inline bool(__thiscall* const playerattractionhandler_ismotilocked)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C1BEC);
+bool GGL::CPlayerAttractionHandler::IsMotivationLocked()
+{
+	return playerattractionhandler_ismotilocked(this);
+}
 static inline int(__thiscall* const shok_playerattractionhandler_getnumsettlers)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C1B62);
 int GGL::CPlayerAttractionHandler::GetNumberOfSettlers()
 {
@@ -77,7 +83,7 @@ int GGL::CPlayerAttractionHandler::GetFarmPlaceLimit()
 {
 	return shok_playerattractionhandler_getfarmplacelimit(this);
 }
-static inline int(__thiscall* const shok_playerattractionhandler_getfreefarmplaces)(GGL::CPlayerAttractionHandler* th, bool uk) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*,bool)>(0x4C3C4C);
+static inline int(__thiscall* const shok_playerattractionhandler_getfreefarmplaces)(GGL::CPlayerAttractionHandler* th, bool uk) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*, bool)>(0x4C3C4C);
 int GGL::CPlayerAttractionHandler::GetFreeFarmPlace()
 {
 	return shok_playerattractionhandler_getfreefarmplaces(this, true);
@@ -114,13 +120,30 @@ bool GGL::CPlayerAttractionHandler::AttachWorker(shok::EntityId worker, shok::En
 	return playerattractionhand_attachwork(this, worker, building);
 }
 
+shok::EntityId GGL::CPlayerAttractionHandler::PerformSpawnWorker(GGL::CBuilding* workplace, GGL::CBuilding* spawner)
+{
+	shok::Position spawnPos{};
+	spawner->GetDoorPosAbs(&spawnPos);
+	EGL::CGLEEntityCreator ct{};
+	ct.EntityType = workplace->GetWorkerType();
+	ct.Pos = spawnPos;
+	ct.PlayerId = workplace->PlayerId;
+	shok::EntityId worker = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&ct);
+	if (worker == shok::EntityId::Invalid)
+		return shok::EntityId::Invalid;
+	EGL::CGLEEntity::GetEntityByID(worker)->AttachEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING, spawner->EntityId, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
+	if (AttachWorker(worker, workplace->EntityId))
+		return worker;
+	return shok::EntityId::Invalid;
+}
+
 void (*GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th) = nullptr;
 void __thiscall GGL::CPlayerAttractionHandler::CheckPaydayHook()
 {
 	if (GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback(this);
 	GGL::CEventGoodsTraded ev{ shok::EventIDs::CppLogicEvent_OnPayday, shok::ResourceType::Gold, shok::ResourceType::GoldRaw,
-		static_cast<float>(GetWorkerPaydayIncome()), static_cast<shok::EntityId>(static_cast<int>(PlayerID)), static_cast<float>(GetLeaderPaydayCost())};
+		static_cast<float>(GetWorkerPaydayIncome()), static_cast<shok::EntityId>(static_cast<int>(PlayerID)), static_cast<float>(GetLeaderPaydayCost()) };
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
 void __declspec(naked) hookedcheckpayday() {
@@ -144,6 +167,52 @@ void GGL::CPlayerAttractionHandler::HookCheckPayday()
 	HookCheckPayday_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 0x4C275E - 0x4C2754 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C2754), &hookedcheckpayday, reinterpret_cast<void*>(0x4C275E));
+}
+
+inline shok::EntityId(__thiscall* const playerattractionhandl_getnearestreachable)(GGL::CPlayerAttractionHandler* th, shok::Vector<shok::EntityId>* v, shok::Position* p) = reinterpret_cast<shok::EntityId(__thiscall*)(GGL::CPlayerAttractionHandler*, shok::Vector<shok::EntityId>*, shok::Position*)>(0x4C205C);
+void __thiscall GGL::CPlayerAttractionHandler::CheckWorkerSpawnHook()
+{
+	struct Data {
+		shok::EntityTypeId WorkerType;
+		shok::EntityId Workplace;
+		float Weight;
+	};
+
+	EGL::CGLEGameLogic* gl = *EGL::CGLEGameLogic::GlobalObj;
+	if ((gl->GetTick() % (1000 / 100 * (*GGL::CPlayerAttractionProps::GlobalObj)->AttractionFrequency)) != 0) {
+		return;
+	}
+	if (VillageCenterArray.size() == 0 && HeadquarterArray.size() == 0)
+		return;
+	shok::List<Data> data{};
+	reinterpret_cast<void(__thiscall*)(GGL::CPlayerAttractionHandler*, shok::List<Data>*)>(0x4C46BB)(this, &data);
+	for (const auto& d : data) {
+		auto* wp = BB::IdentifierCast<GGL::CBuilding>(EGL::CGLEEntity::GetEntityByID(d.Workplace));
+		shok::Position approachpos = wp->GetAbsoluteApproachPos();
+		shok::EntityId spawner = playerattractionhandl_getnearestreachable(this, &VillageCenterArray, &approachpos);
+		if (spawner == shok::EntityId::Invalid)
+			spawner = playerattractionhandl_getnearestreachable(this, &HeadquarterArray, &approachpos);
+		if (spawner == shok::EntityId::Invalid)
+			continue;
+		auto* sp = BB::IdentifierCast<GGL::CBuilding>(EGL::CGLEEntity::GetEntityByID(spawner));
+		CppLogic::Events::CanBuySettlerEvent ev{ shok::EventIDs::CppLogicEvent_CanBuySettler, spawner, d.Workplace, d.WorkerType,
+			AIPlayerFlag || (GetAttractionUsage() < GetAttractionLimit()), true, !IsMotivationLocked(), !sp->WorkerAlarmModeActive };
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		if (ev.Motivation && ev.VCPop && ev.Alarm)
+			PerformSpawnWorker(wp, sp);
+		return;
+	}
+}
+bool HookWorkerSpawn_Hooked = false;
+void GGL::CPlayerAttractionHandler::HookWorkerSpawn()
+{
+	if (HookWorkerSpawn_Hooked)
+		return;
+	if (CppLogic::HasSCELoader())
+		throw 0;
+	HookWorkerSpawn_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C4AB7), 10 };
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4C4AB7), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CPlayerAttractionHandler::CheckWorkerSpawnHook, 0));
 }
 
 static inline shok::UpgradeCategoryId(__thiscall* const upgrademanager_getucatbybuilding)(GGL::CUpgradeManager* th, shok::EntityTypeId id) = reinterpret_cast<shok::UpgradeCategoryId(__thiscall*)(GGL::CUpgradeManager*, shok::EntityTypeId)>(0x4B3CA6);

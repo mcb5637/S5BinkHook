@@ -996,6 +996,40 @@ namespace CppLogic::Logic {
 		EnableResourceTriggers(L.OptBool(1, true), L.OptBool(2, false));
 		return 0;
 	}
+	int EnableSettlerBuyTriggers(lua::State L) {
+		GGL::CPlayerAttractionHandler::HookWorkerSpawn();
+		GGL::CBarrackBehavior::HookBuyTriggers();
+		GGL::CKeepBehavior::HookBuySerf();
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.SettlerBuyTriggers = true;
+		return 0;
+	}
+
+	int GetSettlerBuyTriggerData(lua::State l) {
+		luaext::EState L{ l };
+		auto* ev = BB::IdentifierCast<CppLogic::Events::CanBuySettlerEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		L.Push(ev->ToBuy);
+		L.Push(ev->Target);
+		L.Push(ev->VCPop);
+		L.Push(ev->Cost);
+		L.Push(ev->Motivation);
+		L.Push(ev->Alarm);
+		L.Push(ev->HQPop);
+		return 7;
+	}
+	int SetSettlerBuyTriggerData(lua::State l) {
+		luaext::EState L{ l };
+		auto* ev = BB::IdentifierCast<CppLogic::Events::CanBuySettlerEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		ev->VCPop = L.CheckBool(1);
+		ev->Cost = L.CheckBool(2);
+		ev->Motivation = L.CheckBool(3);
+		ev->Alarm = L.CheckBool(4);
+		ev->HQPop = L.CheckBool(5);
+		return 0;
+	}
 
 	int IsPositionExplored(lua::State l) {
 		luaext::EState L{ l };
@@ -1500,6 +1534,9 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
 			lua::FuncReference::GetRef<Navigate>("Navigate"),
 			lua::FuncReference::GetRef<EnableResourceTriggers>("EnableResourceTriggers"),
+			lua::FuncReference::GetRef<EnableSettlerBuyTriggers>("EnableSettlerBuyTriggers"),
+			lua::FuncReference::GetRef<GetSettlerBuyTriggerData>("GetSettlerBuyTriggerData"),
+			lua::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),
 			lua::FuncReference::GetRef<IsPositionExplored>("IsPositionExplored"),
 			lua::FuncReference::GetRef<SetPositionExploration>("SetPositionExploration"),
 			lua::FuncReference::GetRef<DumpTaskList>("DumpTaskList"),
@@ -1541,6 +1578,9 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_RESOURCE_MINED");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnResourceMined));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_CAN_BUY_SETTLER");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_CanBuySettler));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
@@ -1606,6 +1646,9 @@ namespace CppLogic::Logic {
 
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers || CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix)
 			EnableResourceTriggers(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers, CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix);
+
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.SettlerBuyTriggers)
+			EnableSettlerBuyTriggers(lua::State{ nullptr });
 
 		L.Pop(1);
 	}

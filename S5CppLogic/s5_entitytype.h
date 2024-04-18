@@ -198,7 +198,7 @@ namespace GGL {
 		};
 		int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers; // 42
 		shok::EntityTypeId Worker;
-		shok::Position DoorPos, LeavePos;
+		shok::Position DoorPos, LeavePos; // 46
 		ConstructionInfo ConstructionInfo;
 		shok::Vector<shok::EntityTypeId> BuildOn; // 75
 		bool HideBase, CanBeSold, IsWall; // 79

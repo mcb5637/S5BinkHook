@@ -660,6 +660,20 @@ namespace CppLogic::Events {
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1007);
 	};
+
+	class CanBuySettlerEvent : public EGL::CEvent1Entity {
+	public:
+		shok::EntityTypeId ToBuy;
+		shok::EntityId Target;
+		bool VCPop, Cost, Motivation, Alarm;
+		bool HQPop;
+
+		CanBuySettlerEvent(shok::EventIDs e, shok::EntityId buyat, shok::EntityId target, shok::EntityTypeId tobuy, bool vc, bool cost, bool moti, bool alarm, bool hqpop=true);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100F);
+	};
 }
 
 namespace shok {
@@ -1041,6 +1055,7 @@ namespace shok {
 		CppLogicEvent_OnResourceRefined = 0x50009, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker, BuyAmount can be changed)
 		CppLogicEvent_OnRefinerSupplyTaken = 0x5000A, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker)
 		CppLogicEvent_OnResourceMined = 0x5000B, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker/serf)
+		CppLogicEvent_CanBuySettler = 0x5000C, // CppLogic::Events::CanBuySettlerEvent
 	};
 
 	enum class InputEventIds : int {

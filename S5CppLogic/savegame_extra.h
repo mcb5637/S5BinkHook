@@ -33,6 +33,7 @@ namespace CppLogic::SavegameExtra {
 		bool EffectTriggers = false;
 		bool ResourceTriggers = false;
 		bool RefinerFix = false;
+		bool SettlerBuyTriggers = false;
 		std::map<const std::string, std::string, StringComparator> StringTableTextOverride;
 
 		void SerializeTo(const char* path, const char* savename);

@@ -3,6 +3,7 @@
 #include "s5_baseDefs.h"
 #include "s5_baseprops.h"
 #include "s5_player.h"
+#include "s5_events.h"
 
 namespace EGL {
 	struct SSlotArgsMovingEntity {
@@ -1151,6 +1152,19 @@ namespace GGL {
 		static inline constexpr int vtp = 0x778A68;
 		static inline constexpr int TypeDesc = 0x8278DC;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0FE724607);
+
+		shok::EntityId BuyLeaderByType(shok::EntityTypeId ety);
+		// buy leader and attach 0x50EA18 thiscall(ety)
+		// get training tl 0x50EBCE __thiscall()
+		// check res, feedback if not 0x50E73C thiscall(ety)
+		// has space for leader 0x50EF9D thiscall() dont use, stupid implementation
+		// check moti & vc space for buy leader 0x50DA8A
+		// is busy with upgrade, constructon, alarm or burning 0x4AA59E
+
+		static void HookBuyTriggers();
+	private:
+		void EventBuyLeaderOverride(EGL::CEventValue_Int* ev);
+		void EventBuySoldierOverride(EGL::CEvent1Entity* ev);
 	};
 
 	class CBuildingMerchantBehavior : public EGL::CGLEBehavior {
@@ -1368,6 +1382,12 @@ namespace GGL {
 		static inline constexpr int vtp = 0x7765C8;
 		static inline constexpr int TypeDesc = 0x81FA60;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x995E7AF7);
+
+		int GetMaxNumberOfSerfs() const;
+
+		static void HookBuySerf();
+	private:
+		void __thiscall EventBuySerfOverride(BB::CEvent* ev);
 	};
 
 	class CFarmBehavior : public EGL::CGLEBehavior {

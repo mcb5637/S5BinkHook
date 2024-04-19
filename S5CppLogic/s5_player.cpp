@@ -137,6 +137,12 @@ shok::EntityId GGL::CPlayerAttractionHandler::PerformSpawnWorker(GGL::CBuilding*
 	return shok::EntityId::Invalid;
 }
 
+inline int(__thiscall* const playerattractionhand_getusageofvect)(const GGL::CPlayerAttractionHandler* th, const shok::Vector<shok::EntityId>* v) = reinterpret_cast<int(__thiscall*)(const GGL::CPlayerAttractionHandler*, const shok::Vector<shok::EntityId>*)>(0x4C2335);
+int GGL::CPlayerAttractionHandler::GetAttractionUsageOfVector(const shok::Vector<shok::EntityId>& v) const
+{
+	return playerattractionhand_getusageofvect(this, &v);
+}
+
 void (*GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th) = nullptr;
 void __thiscall GGL::CPlayerAttractionHandler::CheckPaydayHook()
 {

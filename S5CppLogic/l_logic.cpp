@@ -1069,6 +1069,28 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
+	int PlayerGetWorkerAttraction(lua::State l) {
+		luaext::EState L{ l };
+		auto pid = L.CheckPlayerId(1, false);
+		auto* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid)->PlayerAttractionHandler;
+		L.Push(ah->GetAttractionUsageOfVector(ah->FreeWorkerArray) + ah->GetAttractionUsageOfVector(ah->EmployedWorkerArray));
+		return 1;
+	}
+	int PlayerGetMilitaryAttraction(lua::State l) {
+		luaext::EState L{ l };
+		auto pid = L.CheckPlayerId(1, false);
+		auto* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid)->PlayerAttractionHandler;
+		L.Push(ah->GetAttractionUsageOfVector(ah->LeaderArray) + ah->GetAttractionUsageOfVector(ah->SoldierArray));
+		return 1;
+	}
+	int PlayerGetSerfAttraction(lua::State l) {
+		luaext::EState L{ l };
+		auto pid = L.CheckPlayerId(1, false);
+		auto* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid)->PlayerAttractionHandler;
+		L.Push(ah->GetAttractionUsageOfVector(ah->SerfArray));
+		return 1;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1540,6 +1562,9 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<IsPositionExplored>("IsPositionExplored"),
 			lua::FuncReference::GetRef<SetPositionExploration>("SetPositionExploration"),
 			lua::FuncReference::GetRef<DumpTaskList>("DumpTaskList"),
+			lua::FuncReference::GetRef<PlayerGetWorkerAttraction>("PlayerGetWorkerAttraction"),
+			lua::FuncReference::GetRef<PlayerGetMilitaryAttraction>("PlayerGetMilitaryAttraction"),
+			lua::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
 		};
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {

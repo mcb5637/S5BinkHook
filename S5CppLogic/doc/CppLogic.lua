@@ -660,6 +660,21 @@ function CppLogic.Logic.SetPositionExploration(player, pos1, pos2, explored) end
 ---@return table
 function CppLogic.Logic.DumpTaskList(tl) end
 
+--- queries the attraction usage of all workers of a player
+---@param player number
+---@return number
+function CppLogic.Logic.PlayerGetWorkerAttraction(player) end
+
+--- queries the attraction usage of all leaders and soldiers of a player
+---@param player number
+---@return number
+function CppLogic.Logic.PlayerGetMilitaryAttraction(player) end
+
+--- queries the attraction usage of all serfs of a player
+---@param player number
+---@return number
+function CppLogic.Logic.PlayerGetSerfAttraction(player) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.

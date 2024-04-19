@@ -76,6 +76,8 @@ namespace GGL {
 		bool AttachWorker(shok::EntityId worker, shok::EntityId building);
 		shok::EntityId PerformSpawnWorker(GGL::CBuilding* workplace, GGL::CBuilding* spawner);
 
+		int GetAttractionUsageOfVector(const shok::Vector<shok::EntityId>& v) const;
+
 		// checkpayday 4C25FB thiscall
 		static void HookCheckPayday();
 		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);

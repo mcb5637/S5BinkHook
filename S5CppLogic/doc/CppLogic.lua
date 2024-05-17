@@ -2853,6 +2853,31 @@ function CppLogic.UI.AutoScrollCustomWidgetModOffset(id, off) end
 ---@param off number set offset to
 function CppLogic.UI.AutoScrollCustomWidgetSetOffset(id, off) end
 
+---gets camera data
+---@return number lookAtX
+---@return number lookAtY
+---@return number lookAtZ
+---@return number yawAngle horizontal
+---@return number pitchAngle vertical
+function CppLogic.UI.GetCameraData() end
+
+---sets camera data
+---@param lookAtX number
+---@param lookAtY number
+---@param lookAtZ number
+---@param yawAngle number horizontal
+---@param pitchAngle number vertical
+function CppLogic.UI.SetCameraData(lookAtX, lookAtY, lookAtZ, yawAngle, pitchAngle) end
+
+---gets list of all cutscenes
+---@return string[]
+function CppLogic.UI.ListCutscenes() end
+
+---exports a cutscene to lua
+---@param name string
+---@return table|nil
+function CppLogic.UI.GetCutscene(name) end
+
 ---gives a construct command
 ---@param id number|string
 ---@param tar number|string

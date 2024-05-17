@@ -634,10 +634,10 @@ namespace shok {
 		size_t allocated = 0;
 
 	public:
-		String(const char* s);
-		String(const String& c);
-		String(const std::string& s);
-		String(const std::string_view& s);
+		explicit String(const char* s);
+		explicit String(const String& c);
+		explicit String(const std::string& s);
+		explicit String(const std::string_view& s);
 		void assign(const char* s);
 		void assign(const char* s, size_t len);
 		const char* c_str() const;
@@ -653,10 +653,10 @@ namespace shok {
 		operator std::string_view() const;
 	};
 	static_assert(sizeof(String) == 7 * 4);
-	std::strong_ordering operator<=>(const String& a, const char* b);
-	bool operator==(const String& a, const char* b);
-	std::strong_ordering operator<=>(const char* a, const String& b);
-	bool operator==(const char* a, const String& b);
+	std::strong_ordering operator<=>(const String& a, std::string_view b);
+	bool operator==(const String& a, std::string_view b);
+	std::strong_ordering operator<=>(std::string_view a, const String& b);
+	bool operator==(std::string_view a, const String& b);
 
 	template<class T>
 	struct Vector {

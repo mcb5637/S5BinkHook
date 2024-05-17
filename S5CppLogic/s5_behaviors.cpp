@@ -1624,7 +1624,7 @@ void __thiscall GGL::CKeepBehavior::EventBuySerfOverride(BB::CEvent* ev)
 		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
 		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
 		!pl->PlayerAttractionHandler->IsMotivationLocked(), !b->WorkerAlarmModeActive,
-		pl->PlayerAttractionHandler->SerfArray.size() < GetMaxNumberOfSerfs()};
+		pl->PlayerAttractionHandler->SerfArray.size() < static_cast<size_t>(GetMaxNumberOfSerfs())};
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&cev);
 	if (cev.Cost && cev.VCPop && cev.Alarm && cev.Motivation && cev.HQPop)
 	{

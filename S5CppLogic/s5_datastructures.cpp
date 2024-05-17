@@ -78,19 +78,19 @@ shok::String::operator std::string_view() const
 	return { c_str(), size() };
 }
 
-std::strong_ordering shok::operator<=>(const String& a, const char* b)
+std::strong_ordering shok::operator<=>(const String& a, std::string_view b)
 {
-	return std::string_view{ a.c_str(), a.size() } <=> std::string_view{ b };
+	return std::string_view{ a.c_str(), a.size() } <=> b;
 }
-bool shok::operator==(const String& a, const char* b)
+bool shok::operator==(const String& a, std::string_view b)
 {
 	return (a <=> b) == std::strong_ordering::equal;
 }
-std::strong_ordering shok::operator<=>(const char* a, const String& b)
+std::strong_ordering shok::operator<=>(std::string_view a, const String& b)
 {
-	return std::string_view{ a } <=> std::string_view{ b.c_str(), b.size() };
+	return a <=> std::string_view{ b.c_str(), b.size() };
 }
-bool shok::operator==(const char* a, const String& b)
+bool shok::operator==(std::string_view a, const String& b)
 {
 	return (a <=> b) == std::strong_ordering::equal;
 }

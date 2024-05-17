@@ -13,6 +13,7 @@
 #include "s5_RWE_2d.h"
 #include "s5_ui.h"
 #include "s5_netevents.h"
+#include "s5_cutscene.h"
 #include "hooks.h"
 #include "luaserializer.h"
 #include "ModUI.h"
@@ -1285,6 +1286,52 @@ namespace CppLogic::UI {
 		return 2;
 	}
 
+	int GetCameraData(lua::State L) {
+		auto* cam = dynamic_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj);
+		L.Push(cam->CameraInfo.LookAtX);
+		L.Push(cam->CameraInfo.LookAtY);
+		L.Push(cam->CameraInfo.LookAtZ);
+		L.Push(cam->CameraInfo.Distance);
+		L.Push(cam->HorizontalAngle);
+		L.Push(cam->VerticalAngle);
+		return 6;
+	}
+
+	int SetCameraData(lua::State L) {
+		auto* cam = dynamic_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj);
+		cam->CameraInfo.LookAtX = L.CheckFloat(1);
+		cam->CameraInfo.LookAtY = L.CheckFloat(2);
+		cam->CameraInfo.LookAtZ = L.CheckFloat(3);
+		cam->CameraInfo.Distance = L.CheckFloat(4);
+		cam->HorizontalAngle = L.CheckFloat(5);
+		cam->VerticalAngle = L.CheckFloat(6);
+		return 0;
+	}
+
+	int ListCutscenes(lua::State L) {
+		ECS::CManager* m = **ECS::CManager::GlobalObj;
+		L.NewTable();
+		int i = 1;
+		for (auto& c : m->Cutscenes) {
+			L.Push(c.first);
+			L.SetTableRaw(-2, i);
+			++i;
+		}
+		return 1;
+	}
+
+	int GetCutscene(lua::State L) {
+		ECS::CManager* m = **ECS::CManager::GlobalObj;
+		auto n = L.CheckStringView(1);
+		for (auto& c : m->Cutscenes) {
+			if (c.first == n) {
+				CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, &c.second, c.second.SerializationData);
+				return 1;
+			}
+		}
+		return 0;
+	}
+
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
 		return shok::Malloc(s);
@@ -1586,7 +1633,7 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
-	constexpr std::array<lua::FuncReference, 82> UI{ {
+	constexpr std::array UI{
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
@@ -1669,7 +1716,11 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<TextInputCustomWidgetHasFocus>("TextInputCustomWidgetHasFocus"),
 		lua::FuncReference::GetRef<TextInputCustomWidgetSetFocus>("TextInputCustomWidgetSetFocus"),
 		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
-	} };
+		lua::FuncReference::GetRef<GetCameraData>("GetCameraData"),
+		lua::FuncReference::GetRef<SetCameraData>("SetCameraData"),
+		lua::FuncReference::GetRef<ListCutscenes>("ListCutscenes"),
+		lua::FuncReference::GetRef<GetCutscene>("GetCutscene"),
+	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);

@@ -58,14 +58,14 @@ namespace ECS {
 		PositionFlightList CameraPos; // 7 CameraPos::Flights
 		PositionFlightList CameraLookAt; // CameraLookAt::Flights
 		FuncFlightList LuaFunctions; // LuaFunctions::Flights
-		int Status; // 16, 2->normal?, 1->finished?, 0->paused?
-		float StartTime1;
-		float StartTime2;
-		float Time1Last;
-		float Time1Current; // 20
-		float Time2Last;
-		float Time2Currrent;
-		float Duration; // 23 just a guess
+		int Status = 0; // 16, 2->normal?, 1->finished?, 0->paused?
+		float StartTime1 = 0;
+		float StartTime2 = 0;
+		float Time1Last = 0;
+		float Time1Current = 0; // 20
+		float Time2Last = 0;
+		float Time2Currrent = 0;
+		float Duration = 0; // 23 just a guess
 
 		static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA063C0);
 

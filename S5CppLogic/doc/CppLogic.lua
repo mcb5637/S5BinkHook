@@ -2878,6 +2878,16 @@ function CppLogic.UI.ListCutscenes() end
 ---@return table|nil
 function CppLogic.UI.GetCutscene(name) end
 
+---imports a cutscene from lua
+---@param name string
+---@param cutscene table
+function CppLogic.UI.SetCutscene(name, cutscene) end
+
+---exports all cutscenes currently in memory to xml files.
+---uses a save file dialog to query save location, using path as the default.
+---@param path string|nil 
+function CppLogic.UI.ExportCutscenes(path) end
+
 ---gives a construct command
 ---@param id number|string
 ---@param tar number|string

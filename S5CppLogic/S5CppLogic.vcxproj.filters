@@ -315,6 +315,9 @@
     <ClInclude Include="ConstexprString.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="WinAPIUtil.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -489,6 +492,9 @@
       <Filter>shok\entity</Filter>
     </ClCompile>
     <ClCompile Include="StringUtil.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="WinAPIUtil.cpp">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>

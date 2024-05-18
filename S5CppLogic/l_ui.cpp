@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "l_ui.h"
+#include <filesystem>
 #include <WinUser.h>
 #include "s5_widget.h"
 #include "s5_filesystem.h"
@@ -18,6 +19,7 @@
 #include "luaserializer.h"
 #include "ModUI.h"
 #include "LuaEventInterface.h"
+#include "WinAPIUtil.h"
 
 namespace CppLogic::UI {
 	void StringHandlerSetString(luaext::EState L, EGUIX::CSingleStringHandler& h, int i) {
@@ -1332,6 +1334,44 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int SetCutscene(lua::State L) {
+		ECS::CManager* m = **ECS::CManager::GlobalObj;
+		auto n = L.CheckStringView(1);
+		ECS::Cutscene* cs = nullptr;
+		for (auto& c : m->Cutscenes) {
+			if (c.first == n) {
+				cs = &c.second;
+				cs->CameraLookAt.Element.clear();
+				cs->CameraPos.Element.clear();
+				cs->LuaFunctions.Element.clear();
+			}
+		}
+		if (cs == nullptr) {
+			auto it = m->Cutscenes.emplace(std::piecewise_construct, std::forward_as_tuple(n), std::forward_as_tuple());
+			cs = &it->second;
+			cs->Name = n;
+		}
+		if (cs == nullptr)
+			throw lua::LuaException{ "something went wrong with the map" };
+		L.PushValue(2);
+		CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, cs, cs->SerializationData);
+		return 0;
+	}
+
+	int ExportCutscenes(lua::State L) {
+		CppLogic::WinAPI::FileDialog dlg{};
+		dlg.Filter = "CutsceneNames.xml\0CutsceneNames.xml\0";
+		dlg.Title = "Export Cutscenes to";
+		dlg.SelectedPath = L.OptStringView(1, "");
+		if (dlg.Show()) {
+			std::filesystem::path p(dlg.SelectedPath);
+			p.remove_filename();
+			auto ps = p.string();
+			(**ECS::CManager::GlobalObj)->SaveCutscenesTo(ps.c_str());
+		}
+		return 0;
+	}
+
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
 		return shok::Malloc(s);
@@ -1720,6 +1760,8 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<SetCameraData>("SetCameraData"),
 		lua::FuncReference::GetRef<ListCutscenes>("ListCutscenes"),
 		lua::FuncReference::GetRef<GetCutscene>("GetCutscene"),
+		lua::FuncReference::GetRef<SetCutscene>("SetCutscene"),
+		lua::FuncReference::GetRef<ExportCutscenes>("ExportCutscenes"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

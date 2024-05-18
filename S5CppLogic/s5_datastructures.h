@@ -500,12 +500,12 @@ namespace shok {
 			return SearchRec(c, root->parent);
 		}
 	public:
-		void insert(T&& d) {
-			Emplace(std::forward<T>(d));
+		Iter insert(T&& d) {
+			return { Emplace(std::forward<T>(d)).first, this };
 		}
 		template<class ... Args>
-		void emplace(Args&& ... args) {
-			Emplace(std::forward<Args>(args)...);
+		Iter emplace(Args&& ... args) {
+			return { Emplace(std::forward<Args>(args)...).first, this };
 		}
 		Iter erase(Iter wh) {
 			Iter next = wh;

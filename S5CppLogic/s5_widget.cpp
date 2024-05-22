@@ -282,6 +282,20 @@ EGUIX::CWidgetStringHelper* EGUIX::CBaseWidget::GetStringHelper()
     return nullptr;
 }
 
+EGUIX::Rect EGUIX::CBaseWidget::CalcGlobalPosAndSize()
+{
+    EGUIX::Rect r = PosAndSize;
+    auto* root = WidgetLoader::GlobalObj()->RootWid;
+    auto* m = WidgetManager::GlobalObj();
+    auto* w = this;
+    while (w->WidgetID != root->WidgetID) {
+        w = m->GetWidgetByID(w->MotherWidgetID);
+        r.X += w->PosAndSize.X;
+        r.Y += w->PosAndSize.Y;
+    }
+    return r;
+}
+
 
 static inline void(__thiscall* const minimappulse_ctor)(GGUI::CMiniMapSignalPulse* th, float x, float y, int colorcode, int mode, float time1, float speed2, float time2) = reinterpret_cast<void(__thiscall*)(GGUI::CMiniMapSignalPulse*, float, float, int, int, float, float, float)>(0x53D595);
 GGUI::CMiniMapSignalPulse::CMiniMapSignalPulse(float x, float y, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor)

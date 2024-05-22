@@ -247,7 +247,8 @@ namespace ERwTools {
 		virtual void get46() = 0;
 	public:
 		virtual void InitCameraFlight() = 0;
-		// get something from lookatxelem, then 2 file funcs
+		virtual void StopCameraFlight() = 0;
+		// 2 file funcs
 
 
 

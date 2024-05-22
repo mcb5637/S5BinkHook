@@ -235,6 +235,8 @@ namespace EGUIX {
 		EGUIX::CButtonHelper* GetButtonHelper();
 		EGUIX::CToolTipHelper* GetTooltipHelper();
 		EGUIX::CWidgetStringHelper* GetStringHelper();
+
+		EGUIX::Rect CalcGlobalPosAndSize();
 	};
 	static_assert(sizeof(CBaseWidget) == 14 * 4);
 	//constexpr int i = offsetof(CBaseWidget, PosAndSize.H) / 4;

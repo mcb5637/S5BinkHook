@@ -13,6 +13,7 @@ void CppLogic::Mod::UI::RegisterClasses()
 {
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<AutoScrollCustomWidget>();
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<TextInputCustomWidget>();
+	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<FreeCamCustomWidget>();
 }
 
 shok::ClassId CppLogic::Mod::UI::AutoScrollCustomWidget::GetClassIdentifier() const
@@ -41,9 +42,10 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Render(EGUIX::CCustomWidget* wid
 		EGUIX::Rect texcoords = PartialWidget.TextureCoordinates;
 		float childsiz = Widgets[0]->PosAndSize.H + IntegerUserVariable0;
 		auto rend = shok::UIRenderer::GlobalObj();
+		EGUIX::Rect containerpos = WidgetContainer->CalcGlobalPosAndSize();
 		EGUIX::Rect r = Widgets[0]->PosAndSize;
-		r.X = screenCoords->X + WidgetContainer->PosAndSize.X + Widgets[0]->PosAndSize.X;
-		r.Y = screenCoords->Y + WidgetContainer->PosAndSize.Y + IntegerUserVariable0;
+		r.X = containerpos.X + Widgets[0]->PosAndSize.X;
+		r.Y = containerpos.Y + IntegerUserVariable0;
 		r.H = UIOffset() * childsiz - IntegerUserVariable0;
 		float texoff = (Widgets[0]->PosAndSize.H - r.H) / Widgets[0]->PosAndSize.H * PartialWidget.TextureCoordinates.H;
 		PartialWidget.TextureCoordinates.Y += texoff;
@@ -52,7 +54,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Render(EGUIX::CCustomWidget* wid
 			rend->RenderMaterial(&PartialWidget, true, &r);
 		PartialWidget.TextureCoordinates = texcoords;
 		r.Y += r.H + IntegerUserVariable0;
-		r.H = WidgetContainer->PosAndSize.H - IntegerUserVariable0 * 3 - r.H;
+		r.H = containerpos.H - IntegerUserVariable0 * 3 - r.H;
 		for (const auto w : Widgets) {
 			if (w->IsShown) {
 				r.Y += childsiz;
@@ -256,7 +258,10 @@ void* __stdcall CppLogic::Mod::UI::TextInputCustomWidget::CastToIdentifier(shok:
 
 void CppLogic::Mod::UI::TextInputCustomWidget::Initialize()
 {
-	Font.LoadFont("Data\\Menu\\Fonts\\standard10.met");
+	const char* f = "Data\\Menu\\Fonts\\standard10.met";
+	if (StringUserVariable[1].size() > 0)
+		f = StringUserVariable[1].c_str();
+	Font.LoadFont(f);
 }
 
 void CppLogic::Mod::UI::TextInputCustomWidget::Destroy()
@@ -298,6 +303,9 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			}
 		}
 	}
+	else if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
+		return true;
+	}
 	else if (!HasFocus()) {
 		return false;
 	}
@@ -315,7 +323,8 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			else if (me->IsKey(shok::Keys::Escape)) {
 				ClearFocus();
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
-				CallFunc(StringUserVariable[1]);
+				if (IntegerUserVariable1)
+					CallFunc(StringUserVariable[0], 1);
 			}
 			else if (me->IsKey(shok::Keys::Left)) {
 				if (CurrentPos > 0)
@@ -329,7 +338,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			}
 			else if (me->IsKey(shok::Keys::Enter)) {
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
-				CallFunc(StringUserVariable[0]);
+				CallFunc(StringUserVariable[0], 0);
 			}
 		}
 		return true;
@@ -372,10 +381,10 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::CharValid(char c) const
 {
 	static std::locale l("C");
 	if (IntegerUserVariable0 == 2) {
-		return std::isdigit(c, l);
+		return std::isdigit(c, l) || (c == '-' && CurrentTextRaw.empty());
 	}
 	if (IntegerUserVariable0 == 3) {
-		return std::isdigit(c, l) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
+		return std::isdigit(c, l) || (c == '-' && CurrentTextRaw.empty()) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
 	}
 	if (c == '@')
 		return false;
@@ -408,7 +417,7 @@ std::string CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput() const
 	return r;
 }
 
-void CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcname)
+void CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcname, int ev)
 {
 	if (funcname.empty())
 		return;
@@ -420,9 +429,194 @@ void CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcnam
 		if (L.IsFunction(-1)) {
 			L.Push(ClearTextOutput());
 			L.Push(static_cast<int>(WidgetId));
-			L.PCall(2, 0);
+			L.Push(ev);
+			L.PCall(3, 0);
 		}
 	}
 	catch (const lua::LuaException&) {}
 	L.SetTop(t);
+}
+
+shok::ClassId __stdcall CppLogic::Mod::UI::FreeCamCustomWidget::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* __stdcall CppLogic::Mod::UI::FreeCamCustomWidget::CastToIdentifier(shok::ClassId id)
+{
+	if (id == EGUIX::ICustomWidget::Identifier)
+		return static_cast<EGUIX::ICustomWidget*>(this);
+	return nullptr;
+}
+
+void CppLogic::Mod::UI::FreeCamCustomWidget::Initialize()
+{
+}
+
+void CppLogic::Mod::UI::FreeCamCustomWidget::Destroy()
+{
+	delete this;
+}
+
+void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
+{
+	int tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTimeMS();
+	if (tick > LastTick) {
+		LastTick = tick;
+
+		auto* cam = static_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj);
+		shok::Position p{ cam->CameraInfo.LookAtX, cam->CameraInfo.LookAtY };
+		bool writeback = false;
+
+		if (RotateRight) {
+			cam->HorizontalAngle += static_cast<float>(IntegerUserVariable0);
+		}
+		if (RotateLeft) {
+			cam->HorizontalAngle -= static_cast<float>(IntegerUserVariable0);
+		}
+		shok::Position move{ static_cast<float>(IntegerUserVariable0 * 10), 0.0f };
+
+		if (Forward) {
+			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 90.0f));
+			writeback = true;
+		}
+		if (Backward) {
+			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle - 90.0f));
+			writeback = true;
+		}
+		if (Right) {
+			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle));
+			writeback = true;
+		}
+		if (Left) {
+			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 180.0f));
+			writeback = true;
+		}
+
+		if (Up) {
+			cam->CameraInfo.LookAtZ += move.X;
+		}
+		if (Down) {
+			cam->CameraInfo.LookAtZ -= move.X;
+		}
+
+		if (writeback) {
+			cam->CameraInfo.LookAtX = p.X;
+			cam->CameraInfo.LookAtY = p.Y;
+		}
+	}
+}
+
+bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain)
+{
+	if (CheckFocusEvent(ev))
+		return false;
+	if (ev->IsEvent(shok::InputEventIds::MouseButtonUp)) {
+		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
+			if (me->IsKey(shok::Keys::MouseLButton)) {
+				if (!HasFocus()) {
+					GetFocus();
+					EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				}
+				return true;
+			}
+		}
+	}
+	else if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
+		return true;
+	}
+	else if (!HasFocus()) {
+		Forward = false;
+		Backward = false;
+		Left = false;
+		Right = false;
+		RotateLeft = false;
+		RotateRight = false;
+		Up = false;
+		Down = false;
+		return false;
+	}
+	else if (ev->IsEvent(shok::InputEventIds::KeyDown)) {
+		if (auto* ev2 = BB::IdentifierCast<BB::CKeyEvent>(ev)) {
+			if (ev2->IsKey(shok::Keys::W)) {
+				Forward = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::S)) {
+				Backward = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::A)) {
+				Left = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::D)) {
+				Right = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::Q)) {
+				RotateLeft = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::E)) {
+				RotateRight = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::R)) {
+				Up = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::F)) {
+				Down = true;
+				return true;
+			}
+		}
+	}
+	else if (ev->IsEvent(shok::InputEventIds::KeyUp)) {
+		if (auto* ev2 = BB::IdentifierCast<BB::CKeyEvent>(ev)) {
+			if (ev2->IsKey(shok::Keys::W)) {
+				Forward = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::S)) {
+				Backward = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::A)) {
+				Left = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::D)) {
+				Right = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::Q)) {
+				RotateLeft = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::E)) {
+				RotateRight = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::R)) {
+				Up = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::F)) {
+				Down = false;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void* CppLogic::Mod::UI::FreeCamCustomWidget::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+
+void CppLogic::Mod::UI::FreeCamCustomWidget::operator delete(void* p)
+{
+	shok::Free(p);
 }

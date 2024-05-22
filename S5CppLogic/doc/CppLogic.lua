@@ -2417,7 +2417,7 @@ function CppLogic.UI.WidgetGetTooltipData(wid) end
 --- sets a widgets tooltip data.
 --- target widget can be the text widget or the container.
 --- @param wid widget
---- @param tid widget target widget id
+--- @param tid widget|nil target widget id (nil to disable)
 --- @param controlFlag boolean control target widget state flag
 --- @param enabledFlag boolean tooltip enabled flag
 function CppLogic.UI.WidgetSetTooltipData(wid, tid, controlFlag, enabledFlag) end
@@ -2830,6 +2830,7 @@ function CppLogic.UI.CreateShortMessage(type, duration, tooltip, pos) end
 function CppLogic.UI.RemoveShortMessage(id) end
 
 ---initializes a CppLogic::Mod::UI::AutoScrollCustomWidget.
+---(calculating max scrollables, cloning scrollables, initializing scrollables, initializing partial scroll element texture from scrollable, initialize slider)
 ---@param id number|string
 ---@param numToScroll number number of elements to scroll through
 ---@return number widCount number of widgets active
@@ -2853,10 +2854,51 @@ function CppLogic.UI.AutoScrollCustomWidgetModOffset(id, off) end
 ---@param off number set offset to
 function CppLogic.UI.AutoScrollCustomWidgetSetOffset(id, off) end
 
+---sets the partial scroll element texture of a CppLogic::Mod::UI::AutoScrollCustomWidget.
+---if the scrolled widget has a material itself (button/...) gets initialized by that material.
+---if not, can be set with this function.
+---@param id number|string
+---@param texture string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+function CppLogic.UI.AutoScrollCustomWidgetSetMaterial(id, texture, x, y, w, h, r, g, b, a) end
+
+---gets the text of a CppLogic::Mod::UI::TextInputCustomWidget.
+---@param id number|string
+---@return string
+function CppLogic.UI.TextInputCustomWidgetGetText(id) end
+
+---sets the text of a CppLogic::Mod::UI::TextInputCustomWidget.
+---@param id number|string
+---@param txt string
+function CppLogic.UI.TextInputCustomWidgetSetText(id, txt) end
+
+---sets the ignore next char of a CppLogic::Mod::UI::TextInputCustomWidget.
+---@param id number|string
+---@param ignore boolean
+function CppLogic.UI.TextInputCustomWidgetSetIgnoreNextChar(id, ignore) end
+
+---sets the ignore next char of a CppLogic::Mod::UI::TextInputCustomWidget.
+---@param id number|string
+---@return boolean
+function CppLogic.UI.InputCustomWidgetHasFocus(id) end
+
+---sets the ignore next char of a CppLogic::Mod::UI::TextInputCustomWidget.
+---@param id number|string
+---@param f boolean
+function CppLogic.UI.InputCustomWidgetSetFocus(id, f) end
+
 ---gets camera data
 ---@return number lookAtX
 ---@return number lookAtY
 ---@return number lookAtZ
+---@return number distance
 ---@return number yawAngle horizontal
 ---@return number pitchAngle vertical
 function CppLogic.UI.GetCameraData() end
@@ -2865,9 +2907,10 @@ function CppLogic.UI.GetCameraData() end
 ---@param lookAtX number
 ---@param lookAtY number
 ---@param lookAtZ number
+---@param distance number
 ---@param yawAngle number horizontal
 ---@param pitchAngle number vertical
-function CppLogic.UI.SetCameraData(lookAtX, lookAtY, lookAtZ, yawAngle, pitchAngle) end
+function CppLogic.UI.SetCameraData(lookAtX, lookAtY, lookAtZ, distance, yawAngle, pitchAngle) end
 
 ---gets list of all cutscenes
 ---@return string[]

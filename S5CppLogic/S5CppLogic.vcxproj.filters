@@ -532,6 +532,9 @@
     <Text Include="doc\gamemechanics_documentation.txt">
       <Filter>doc</Filter>
     </Text>
+    <Text Include="doc\customwidgets.txt">
+      <Filter>doc</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="doc\ModPack.xml">

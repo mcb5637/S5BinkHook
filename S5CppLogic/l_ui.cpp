@@ -1210,6 +1210,7 @@ namespace CppLogic::UI {
 		if (t == nullptr)
 			throw lua::LuaException{ "not a TextInputCustomWidget" };
 		t->CurrentTextRaw = L.CheckStringView(2);
+		t->CurrentPos = t->CurrentTextRaw.size();
 		t->RefreshDisplayText();
 		return 0;
 	}
@@ -1224,25 +1225,25 @@ namespace CppLogic::UI {
 		t->IgnoreNextChar = L.CheckBool(2);
 		return 0;
 	}
-	int TextInputCustomWidgetHasFocus(lua::State l) {
+	int InputCustomWidgetHasFocus(lua::State l) {
 		luaext::EState L{ l };
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
-		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		auto* t = dynamic_cast<CppLogic::Mod::UI::InputFocusWidget*>(w->CustomWidget);
 		if (t == nullptr)
-			throw lua::LuaException{ "not a TextInputCustomWidget" };
+			throw lua::LuaException{ "not a InputFocusWidget" };
 		L.Push(t->HasFocus());
 		return 1;
 	}
-	int TextInputCustomWidgetSetFocus(lua::State l) {
+	int InputCustomWidgetSetFocus(lua::State l) {
 		luaext::EState L{ l };
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
-		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
+		auto* t = dynamic_cast<CppLogic::Mod::UI::InputFocusWidget*>(w->CustomWidget);
 		if (t == nullptr)
-			throw lua::LuaException{ "not a TextInputCustomWidget" };
+			throw lua::LuaException{ "not a InputFocusWidget" };
 		if (L.CheckBool(2))
 			t->GetFocus();
 		else
@@ -1753,8 +1754,8 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<TextInputCustomWidgetGetText>("TextInputCustomWidgetGetText"),
 		lua::FuncReference::GetRef<TextInputCustomWidgetSetText>("TextInputCustomWidgetSetText"),
 		lua::FuncReference::GetRef<TextInputCustomWidgetSetIgnoreNextChar>("TextInputCustomWidgetSetIgnoreNextChar"),
-		lua::FuncReference::GetRef<TextInputCustomWidgetHasFocus>("TextInputCustomWidgetHasFocus"),
-		lua::FuncReference::GetRef<TextInputCustomWidgetSetFocus>("TextInputCustomWidgetSetFocus"),
+		lua::FuncReference::GetRef<InputCustomWidgetHasFocus>("InputCustomWidgetHasFocus"),
+		lua::FuncReference::GetRef<InputCustomWidgetSetFocus>("InputCustomWidgetSetFocus"),
 		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
 		lua::FuncReference::GetRef<GetCameraData>("GetCameraData"),
 		lua::FuncReference::GetRef<SetCameraData>("SetCameraData"),

@@ -117,9 +117,10 @@ list of used identifiers
 0x1009 CppLogic::Mod::FormationSpacedBehaviorProps
 0x100A CppLogic::Mod::OnScreenInfoDisplayBehavior
 0x100B CppLogic::Mod::ResourceTrackerBehavior
-0x100C CppLogic::Mod::AutoScrollCustomWidget
+0x100C CppLogic::Mod::UI::AutoScrollCustomWidget
 0x100D CppLogic::Mod::Config::DamageClassExt
-0x100E CppLogic::Mod::TextInputCustomWidget
+0x100E CppLogic::Mod::UI::TextInputCustomWidget
 0x100F CppLogic::Events::CanBuySettlerEvent
 0x1010 CppLogic::Mod::FormationSpacedBehavior
+0x1011 CppLogic::Mod::UI::FreeCamCustomWidget
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

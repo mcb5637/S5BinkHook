@@ -1,0 +1,66 @@
+CppLogic::Mod::UI::AutoScrollCustomWidget:
+	- set up as follows:
+		EGUIX::CContainerWidget
+			EGUIX::CContainerWidget WidgetContainer
+				* Scrollable
+			EGUIX::CGfxButtonWidget x2 Up/Down (optional)
+			CppLogic::Mod::UI::AutoScrollCustomWidget
+			EGUIX::CContainerWidget SliderTravel (optional)
+				EGUIX::CStaticWidget Slider
+			EGUIX::CContainerWidget slider background (optional)
+			* background elements (optional)
+	- user vars:
+		- string 0 Slider widgetname (empty if not needed)
+		- string 1 Scrollable widgetname
+		- int 0 spacing between scrollables
+
+	the area of the AutoScrollCustomWidget needs to cover SliderTravel and is recommended to cover WidgetContainer.
+	in main menus where only one scrollable exists, i recommend to make the AutoScrollCustomWidget cover the entire screen.
+
+	use CppLogic.UI.InitAutoScrollCustomWidget(id, numToScroll) to initialize it (call it again, if numToScroll has changed).
+	initializing the AutoScrollCustomWidget will recursively clone Scrollable to fit the space WidgetContainer gives it.
+	it will return the number of scrollables currently managed, i recommend showing/hiding Up/Down buttons and slider background from it.
+	visibility state and position of all Scrollables and Slider are managed by the AutoScrollCustomWidget.
+
+	the AutoScrollCustomWidget will use mouse scroll events in its area and clicks into the SliderTravel area (if existing) to scroll.
+
+	if you have Up/Down buttons, use CppLogic.UI.AutoScrollCustomWidgetModOffset from the action and CppLogic.UI.GetAutoScrollCustomWidgetOffset from the update to modify the scroll state.
+
+	you can retrieve the scroll index of a Scrollable (clone) by XGUIEng.GetBaseWidgetUserVariable(Scrollable, 0) [0-ElementCount).
+	(i recommend getting Scrollable by calling XGUIEng.GetCurrentWidgetID() from the action/update funcs, potentially with several calls to XGUIEng.GetWidgetsMotherID to navigate up the hierachy).
+
+	if Scrollable has a material attached directly to it, renders parts of that material as partial widgets, to smooth out scrolling.
+	if Scrollable has no direct material (ex: a EGUIX::CContainerWidget), use CppLogic.UI.AutoScrollCustomWidgetSetMaterial to set it (needs to be repeated after each InitAutoScrollCustomWidget).
+
+common input focus:
+	the following customwidgets implement a common input focus.
+	meaning, if you click on one it gains exclusive input focus until it releases it or another widget gains focus.
+
+	use CppLogic.UI.InputCustomWidgetHasFocus and CppLogic.UI.InputCustomWidgetSetFocus to manipulate focus.
+
+CppLogic::Mod::UI::TextInputCustomWidget:
+	- user vars:
+		- int 0: mode 0->normal, 1->password, 2->int, 3->double
+		- int 1: bool fire cancel event
+		- string 0: event func (text, widgetid, event) event: 0->confirm, 1->cancel
+		- string 1: font (Data\Menu\Fonts\standard10.met if empty)
+
+	functions may contain ., will correctly access table elements.
+
+	CppLogic.UI.TextInputCustomWidgetGetText and CppLogic.UI.TextInputCustomWidgetSetText allow accessing the text from lua.
+	CppLogic.UI.TextInputCustomWidgetSetIgnoreNextChar can be used to ignore the next input, if the TextInputCustomWidget gets shown by a hotkey
+
+	differences to EGUIX::CStringInputCustomWidget:
+	- no buffer limit
+	- does not autohide
+	- click to focus (multiple input widgets in one screen work together)
+	- no auto close
+	- no cdkey mode
+	- ignore next key manually set from lua
+	- executes "return funcname" in lua to get the confirm/esc func
+
+CppLogic::Mod::UI::FreeCamCustomWidget:
+	- user vars:
+		- int 0 scroll speed
+
+	allows key based camera movement. see CutsceneEditor for usage.

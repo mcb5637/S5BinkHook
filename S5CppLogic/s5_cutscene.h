@@ -67,7 +67,7 @@ namespace ECS {
 		float Time2Currrent = 0;
 		float Duration = 0; // 23 just a guess
 
-		static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA063C0);
+		static inline const BB::SerializationData* (__stdcall * const SerializationData)() = reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x59A344);
 
 		// start 0x59AC07 (this,float,float)
 		// update timers 0x59AC62 (this,float,float)

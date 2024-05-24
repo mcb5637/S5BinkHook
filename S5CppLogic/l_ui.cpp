@@ -1328,7 +1328,7 @@ namespace CppLogic::UI {
 		auto n = L.CheckStringView(1);
 		for (auto& c : m->Cutscenes) {
 			if (c.first == n) {
-				CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, &c.second, c.second.SerializationData);
+				CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, &c.second, c.second.SerializationData());
 				return 1;
 			}
 		}
@@ -1355,7 +1355,7 @@ namespace CppLogic::UI {
 		if (cs == nullptr)
 			throw lua::LuaException{ "something went wrong with the map" };
 		L.PushValue(2);
-		CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, cs, cs->SerializationData);
+		CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, cs, cs->SerializationData());
 		return 0;
 	}
 

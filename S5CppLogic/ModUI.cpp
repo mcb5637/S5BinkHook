@@ -469,10 +469,10 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 		bool writeback = false;
 
 		if (RotateRight) {
-			cam->HorizontalAngle += static_cast<float>(IntegerUserVariable0);
+			cam->HorizontalAngle -= static_cast<float>(IntegerUserVariable0);
 		}
 		if (RotateLeft) {
-			cam->HorizontalAngle -= static_cast<float>(IntegerUserVariable0);
+			cam->HorizontalAngle += static_cast<float>(IntegerUserVariable0);
 		}
 		shok::Position move{ static_cast<float>(IntegerUserVariable0 * 10), 0.0f };
 

@@ -272,14 +272,27 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Destroy()
 void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
 {
 	auto rend = shok::UIRenderer::GlobalObj();
-	EGUIX::Color col{};
+	EGUIX::Color col{ *reinterpret_cast<shok::Color*>(&IntegerUserVariable4) };
+	if (col.Alpha > 0) {
+		EGUIX::CMaterial m{};
+		m.Color = col;
+		rend->RenderMaterial(&m, true, screenCoords);
+	}
+	col = EGUIX::Color{ *reinterpret_cast<shok::Color*>(&IntegerUserVariable2) };
+	if (col.Alpha == 0) {
+		col = EGUIX::Color{};
+	}
 	rend->RenderText(CurrentTextDisplay.c_str(), Font.FontID, screenCoords->X, screenCoords->Y, screenCoords->X + screenCoords->W, &col, 1);
 	if (!HasFocus())
 		return;
 	if (!(static_cast<int>(shok::GetCurrentTimeFloat() * 3.0f) & 1)) {
-		col.Red = 100;
-		col.Green = 100;
-		col.Blue = 100;
+		col = EGUIX::Color{ *reinterpret_cast<shok::Color*>(&IntegerUserVariable3) };
+		if (col.Alpha == 0) {
+			col.Red = 100;
+			col.Green = 100;
+			col.Blue = 100;
+			col.Alpha = 255;
+		}
 	}
 	char back = CurrentTextDisplay[CurrentPos];
 	CurrentTextDisplay[CurrentPos] = '\0';
@@ -460,50 +473,95 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Destroy()
 
 void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
 {
-	int tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTimeMS();
+	float tick = shok::GetCurrentTimeFloat();
 	if (tick > LastTick) {
-		LastTick = tick;
+		LastTick = tick + 0.05f;
 
 		auto* cam = static_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj);
-		shok::Position p{ cam->CameraInfo.LookAtX, cam->CameraInfo.LookAtY };
-		bool writeback = false;
 
-		if (RotateRight) {
-			cam->HorizontalAngle -= static_cast<float>(IntegerUserVariable0);
-		}
-		if (RotateLeft) {
-			cam->HorizontalAngle += static_cast<float>(IntegerUserVariable0);
-		}
-		shok::Position move{ static_cast<float>(IntegerUserVariable0 * 10), 0.0f };
+		if (Status == MouseStatus::None) {
+			shok::Position p{ cam->CameraInfo.LookAtX, cam->CameraInfo.LookAtY };
+			bool writeback = false;
 
-		if (Forward) {
-			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 90.0f));
-			writeback = true;
-		}
-		if (Backward) {
-			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle - 90.0f));
-			writeback = true;
-		}
-		if (Right) {
-			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle));
-			writeback = true;
-		}
-		if (Left) {
-			p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 180.0f));
-			writeback = true;
-		}
+			if (RotateRight) {
+				cam->HorizontalAngle -= static_cast<float>(IntegerUserVariable0) * 0.25f;
+			}
+			if (RotateLeft) {
+				cam->HorizontalAngle += static_cast<float>(IntegerUserVariable0) * 0.25f;
+			}
+			if (RotateUp) {
+				cam->VerticalAngle -= static_cast<float>(IntegerUserVariable0) * 0.25f;
+			}
+			if (RotateDown) {
+				cam->VerticalAngle += static_cast<float>(IntegerUserVariable0) * 0.25f;
+			}
+			if (cam->VerticalAngle > 90.0f) {
+				cam->VerticalAngle = 90.0f;
+			}
+			if (cam->VerticalAngle < -90.0f) {
+				cam->VerticalAngle = -90.0f;
+			}
+			shok::Position move{ static_cast<float>(IntegerUserVariable0 * 10), 0.0f };
 
-		if (Up) {
-			cam->CameraInfo.LookAtZ += move.X;
-		}
-		if (Down) {
-			cam->CameraInfo.LookAtZ -= move.X;
-		}
+			if (Forward) {
+				p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 90.0f));
+				writeback = true;
+			}
+			if (Backward) {
+				p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle - 90.0f));
+				writeback = true;
+			}
+			if (Right) {
+				p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle));
+				writeback = true;
+			}
+			if (Left) {
+				p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 180.0f));
+				writeback = true;
+			}
 
-		if (writeback) {
-			cam->CameraInfo.LookAtX = p.X;
-			cam->CameraInfo.LookAtY = p.Y;
+			if (Up) {
+				cam->CameraInfo.LookAtZ += move.X;
+			}
+			if (Down) {
+				cam->CameraInfo.LookAtZ -= move.X;
+			}
+
+			if (writeback) {
+				cam->CameraInfo.LookAtX = p.X;
+				cam->CameraInfo.LookAtY = p.Y;
+			}
 		}
+		else {
+			cam->VerticalAngle += std::min(std::max(static_cast<float>(MouseStartY - MouseY) / 20 * 8, -1.0f), 1.0f);
+			cam->HorizontalAngle += std::min(std::max(static_cast<float>(MouseX - MouseStartX) / 20 * 8, -1.0f), 1.0f);
+
+			float d = 0.0f;
+			if (Status == MouseStatus::Forward)
+				d = 1.0f;
+			else if (Status == MouseStatus::Backward)
+				d = -1.0f;
+
+			if (d != 0.0f) {
+				d *= static_cast<float>(IntegerUserVariable0 * 10);
+
+				float pitch = CppLogic::DegreesToRadians(cam->VerticalAngle);
+				float yaw = CppLogic::DegreesToRadians(cam->HorizontalAngle);
+
+				float dz = -(d * std::sin(pitch));
+				float dxy = (d * std::cos(pitch));
+				float dx = -(dxy * std::sin(yaw));
+				float dy = (dxy * std::cos(yaw));
+
+				cam->CameraInfo.LookAtX += dx;
+				cam->CameraInfo.LookAtY += dy;
+				cam->CameraInfo.LookAtZ += dz;
+			}
+		}
+	}
+	if (Status != MouseStatus::None) {
+		EGUIX::Color c{};
+		shok::UIRenderer::GlobalObj()->RenderLine(&c, true, MouseStartX, MouseStartY, MouseX, MouseY);
 	}
 }
 
@@ -513,16 +571,44 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 		return false;
 	if (ev->IsEvent(shok::InputEventIds::MouseButtonUp)) {
 		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
-			if (me->IsKey(shok::Keys::MouseLButton)) {
-				if (!HasFocus()) {
+			if (!HasFocus()) {
+				if (me->IsKey(shok::Keys::MouseLButton)) {
 					GetFocus();
 					EGUIX::WidgetLoader::KeyStrokeLuaCallback();
 				}
-				return true;
 			}
+			else {
+				Status = MouseStatus::None;
+			}
+			return true;
 		}
 	}
 	else if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
+		if (Status == MouseStatus::None && HasFocus()) {
+			if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
+				if (me->IsKey(shok::Keys::MouseLButton)) {
+					Status = MouseStatus::Forward;
+					MouseX = me->X;
+					MouseY = me->Y;
+					MouseStartX = me->X;
+					MouseStartY = me->Y;
+				}
+				else if (me->IsKey(shok::Keys::MouseRButton)) {
+					Status = MouseStatus::Backward;
+					MouseX = me->X;
+					MouseY = me->Y;
+					MouseStartX = me->X;
+					MouseStartY = me->Y;
+				}
+				else if (me->IsKey(shok::Keys::MouseMButton)) {
+					Status = MouseStatus::Rotate;
+					MouseX = me->X;
+					MouseY = me->Y;
+					MouseStartX = me->X;
+					MouseStartY = me->Y;
+				}
+			}
+		}
 		return true;
 	}
 	else if (!HasFocus()) {
@@ -534,7 +620,16 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 		RotateRight = false;
 		Up = false;
 		Down = false;
+		RotateUp = false;
+		RotateDown = false;
+		Status = MouseStatus::None;
 		return false;
+	}
+	else if (ev->IsEvent(shok::InputEventIds::MouseMove) && Status != MouseStatus::None) {
+		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
+			MouseX = me->X;
+			MouseY = me->Y;
+		}
 	}
 	else if (ev->IsEvent(shok::InputEventIds::KeyDown)) {
 		if (auto* ev2 = BB::IdentifierCast<BB::CKeyEvent>(ev)) {
@@ -568,6 +663,14 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 			}
 			else if (ev2->IsKey(shok::Keys::F)) {
 				Down = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::T)) {
+				RotateUp = true;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::G)) {
+				RotateDown = true;
 				return true;
 			}
 		}
@@ -604,6 +707,14 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 			}
 			else if (ev2->IsKey(shok::Keys::F)) {
 				Down = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::T)) {
+				RotateUp = false;
+				return true;
+			}
+			else if (ev2->IsKey(shok::Keys::G)) {
+				RotateDown = false;
 				return true;
 			}
 		}

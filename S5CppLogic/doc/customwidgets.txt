@@ -42,6 +42,9 @@ CppLogic::Mod::UI::TextInputCustomWidget:
 	- user vars:
 		- int 0: mode 0->normal, 1->password, 2->int, 3->double
 		- int 1: bool fire cancel event
+		- int 2: int argb text color (white, if a==0)
+		- int 3: int argb cursor blink color (gray, if a==0)
+		- int 4: int argb background color (none, if a==0)
 		- string 0: event func (text, widgetid, event) event: 0->confirm, 1->cancel
 		- string 1: font (Data\Menu\Fonts\standard10.met if empty)
 

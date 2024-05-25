@@ -14,6 +14,9 @@ namespace EGUIX {
 		int Red = 0xFF, Green = 0xFF, Blue = 0xFF, Alpha = 0xFF; // >=0 && <=0xFF
 
 		shok::Color ToShokColor() const;
+		Color() = default;
+		explicit Color(shok::Color c);
+		Color(int r, int g, int b, int a);
 	};
 
 	class TextureManager { // no vtable, only gui textures in here

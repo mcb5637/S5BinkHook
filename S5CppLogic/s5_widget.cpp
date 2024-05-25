@@ -25,6 +25,12 @@ shok::Color EGUIX::Color::ToShokColor() const
 {
     return shok::Color{ Red, Green, Blue, Alpha };
 }
+EGUIX::Color::Color(shok::Color c) : Red(c.R), Green(c.G), Blue(c.B), Alpha(c.A)
+{
+}
+EGUIX::Color::Color(int r, int g, int b, int a) : Red(r), Green(g), Blue(b), Alpha(a)
+{
+}
 
 static inline shok::GUITextureId(__thiscall* const texman_getid)(EGUIX::TextureManager* th, const char* n) = reinterpret_cast<shok::GUITextureId(__thiscall*)(EGUIX::TextureManager*, const char*)>(0x55664A);
 shok::GUITextureId EGUIX::TextureManager::GetTextureID(const char* name)

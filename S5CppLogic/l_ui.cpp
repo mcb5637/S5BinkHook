@@ -1297,6 +1297,12 @@ namespace CppLogic::UI {
 		L.Push(cam->CameraInfo.Distance);
 		L.Push(cam->HorizontalAngle);
 		L.Push(cam->VerticalAngle);
+		if (cam->VerticalAngle > 90.0f) {
+			cam->VerticalAngle = 90.0f;
+		}
+		if (cam->VerticalAngle < -90.0f) {
+			cam->VerticalAngle = -90.0f;
+		}
 		return 6;
 	}
 

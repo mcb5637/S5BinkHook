@@ -86,6 +86,14 @@ namespace CppLogic::Mod::UI {
 	};
 
 	class FreeCamCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
+		enum class MouseStatus : uint8_t {
+			None,
+			Forward,
+			Backward,
+			Rotate,
+			Focus,
+		};
+
 	public:
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
@@ -101,8 +109,13 @@ namespace CppLogic::Mod::UI {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
+	private:
 		bool Forward = false, Backward = false, Right = false, Left = false;
 		bool RotateLeft = false, RotateRight = false, Up = false, Down = false;
-		int LastTick = 0;
+		bool RotateUp = false, RotateDown = false;
+		MouseStatus Status = MouseStatus::None;
+		float LastTick = 0;
+		int MouseStartX = 0, MouseStartY = 0;
+		int MouseX = 0, MouseY = 0;
 	};
 }

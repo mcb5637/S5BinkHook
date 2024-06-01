@@ -319,6 +319,48 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 	else if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
 		return true;
 	}
+	else if (ev->IsEvent(shok::InputEventIds::MouseWheel) && IntegerUserVariable5 != 0) {
+		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
+			std::string r{};
+			bool changed = false;
+			if (IntegerUserVariable0 == 2 || IntegerUserVariable0 == 4) {
+				int i = 0;
+				std::from_chars(CurrentTextDisplay.data(), CurrentTextDisplay.data() + CurrentTextDisplay.size(), i);
+				i += me->Delta > 0 ? IntegerUserVariable5 : -IntegerUserVariable5;
+				if (IntegerUserVariable0 == 4) {
+					i = std::max(0, i);
+				}
+				r = std::format("{}", i);
+				changed = true;
+			}
+			else if (IntegerUserVariable0 == 3 || IntegerUserVariable0 == 5) {
+				double i = 0;
+				std::from_chars(CurrentTextDisplay.data(), CurrentTextDisplay.data() + CurrentTextDisplay.size(), i);
+				i += me->Delta > 0 ? IntegerUserVariable5 : -IntegerUserVariable5;
+				if (IntegerUserVariable0 == 5) {
+					i = std::max(0.0, i);
+				}
+				r = std::format("{}", i);
+				changed = true;
+			}
+			if (changed) {
+				bool adv = true;
+				if (IntegerUserVariable1 & static_cast<int>(Event::Validate)) {
+					if (!CallFunc(StringUserVariable[0], Event::Validate)) {
+						return true;
+					}
+				}
+				CurrentTextRaw = r;
+				CurrentPos = std::min(CurrentPos, CurrentTextRaw.size());
+				RefreshDisplayText();
+				
+				if (!HasFocus()) {
+					CallFunc(StringUserVariable[0], Event::Confirm);
+				}
+			}
+		}
+		return true;
+	}
 	else if (!HasFocus()) {
 		return false;
 	}
@@ -336,8 +378,8 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			else if (me->IsKey(shok::Keys::Escape)) {
 				ClearFocus();
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
-				if (IntegerUserVariable1)
-					CallFunc(StringUserVariable[0], 1);
+				if (IntegerUserVariable1 & static_cast<int>(Event::Cancel))
+					CallFunc(StringUserVariable[0], Event::Cancel);
 			}
 			else if (me->IsKey(shok::Keys::Left)) {
 				if (CurrentPos > 0)
@@ -351,7 +393,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			}
 			else if (me->IsKey(shok::Keys::Enter)) {
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
-				CallFunc(StringUserVariable[0], 0);
+				CallFunc(StringUserVariable[0], Event::Confirm);
 			}
 		}
 		return true;
@@ -370,9 +412,18 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 				c = '.';
 			if (CharValid(c)) {
 				CurrentTextRaw.insert(CurrentPos, 1, c);
-				++CurrentPos;
-				RefreshDisplayText();
-				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				bool adv = true;
+				if (IntegerUserVariable1 & static_cast<int>(Event::Validate)) {
+					if (!CallFunc(StringUserVariable[0], Event::Validate)) {
+						CurrentTextRaw.erase(CurrentTextRaw.begin() + CurrentPos);
+						adv = false;
+					}
+				}
+				if (adv) {
+					++CurrentPos;
+					RefreshDisplayText();
+					EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				}
 			}
 		}
 		return true;
@@ -394,16 +445,31 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::CharValid(char c) const
 {
 	static std::locale l("C");
 	if (IntegerUserVariable0 == 2) {
-		return std::isdigit(c, l) || (c == '-' && CurrentTextRaw.empty());
+		return std::isdigit(c, l) || (c == '-' && NegativeNumberValid());
+	}
+	if (IntegerUserVariable0 == 4) {
+		return std::isdigit(c, l);
 	}
 	if (IntegerUserVariable0 == 3) {
-		return std::isdigit(c, l) || (c == '-' && CurrentTextRaw.empty()) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
+		return std::isdigit(c, l) || (c == '-' && NegativeNumberValid()) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
+	}
+	if (IntegerUserVariable0 == 5) {
+		return std::isdigit(c, l) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
 	}
 	if (c == '@')
 		return false;
 	static std::string_view valids{ reinterpret_cast<const char*>(0x780A84) };
 	return std::isalnum(c, l)
 		|| valids.find(c) != std::string::npos;
+}
+
+bool CppLogic::Mod::UI::TextInputCustomWidget::NegativeNumberValid() const
+{
+	if (CurrentTextRaw.empty())
+		return true;
+	if (CurrentPos == 0 && CurrentTextRaw[0] != '-')
+		return true;
+	return false;
 }
 
 void CppLogic::Mod::UI::TextInputCustomWidget::RefreshDisplayText()
@@ -430,24 +496,28 @@ std::string CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput() const
 	return r;
 }
 
-void CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcname, int ev)
+bool CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcname, Event ev)
 {
 	if (funcname.empty())
-		return;
+		return true;
 	lua::State L{ *EScr::GetCurrentLuaState() };
 	int t = L.GetTop();
 	std::string s = std::format("return {}", funcname);
+	bool r = false;
 	try {
 		L.DoStringT(s, "TextInputCustomWidget::CallFunc");
 		if (L.IsFunction(-1)) {
 			L.Push(ClearTextOutput());
 			L.Push(static_cast<int>(WidgetId));
-			L.Push(ev);
-			L.PCall(3, 0);
+			L.Push(static_cast<int>(ev));
+			L.PCall(3, 1);
+			r = L.ToBoolean(-1);
+			L.Pop(1);
 		}
 	}
 	catch (const lua::LuaException&) {}
 	L.SetTop(t);
+	return r;
 }
 
 shok::ClassId __stdcall CppLogic::Mod::UI::FreeCamCustomWidget::GetClassIdentifier() const
@@ -484,24 +554,19 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 			bool writeback = false;
 
 			if (RotateRight) {
-				cam->HorizontalAngle -= static_cast<float>(IntegerUserVariable0) * 0.25f;
+				cam->HorizontalAngle -= static_cast<float>(widget->UserVariable[0]) * 0.25f;
 			}
 			if (RotateLeft) {
-				cam->HorizontalAngle += static_cast<float>(IntegerUserVariable0) * 0.25f;
+				cam->HorizontalAngle += static_cast<float>(widget->UserVariable[0]) * 0.25f;
 			}
 			if (RotateUp) {
-				cam->VerticalAngle -= static_cast<float>(IntegerUserVariable0) * 0.25f;
+				cam->VerticalAngle -= static_cast<float>(widget->UserVariable[0]) * 0.25f;
 			}
 			if (RotateDown) {
-				cam->VerticalAngle += static_cast<float>(IntegerUserVariable0) * 0.25f;
+				cam->VerticalAngle += static_cast<float>(widget->UserVariable[0]) * 0.25f;
 			}
-			if (cam->VerticalAngle > 90.0f) {
-				cam->VerticalAngle = 90.0f;
-			}
-			if (cam->VerticalAngle < -90.0f) {
-				cam->VerticalAngle = -90.0f;
-			}
-			shok::Position move{ static_cast<float>(IntegerUserVariable0 * 10), 0.0f };
+			ClampCamera(cam);
+			shok::Position move{ static_cast<float>(widget->UserVariable[0] * 10), 0.0f };
 
 			if (Forward) {
 				p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 90.0f));
@@ -530,11 +595,13 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 			if (writeback) {
 				cam->CameraInfo.LookAtX = p.X;
 				cam->CameraInfo.LookAtY = p.Y;
+				ClampLookAt(cam);
 			}
 		}
 		else {
 			cam->VerticalAngle += std::min(std::max(static_cast<float>(MouseStartY - MouseY) / 20 * 8, -1.0f), 1.0f);
 			cam->HorizontalAngle += std::min(std::max(static_cast<float>(MouseX - MouseStartX) / 20 * 8, -1.0f), 1.0f);
+			ClampCamera(cam);
 
 			float d = 0.0f;
 			if (Status == MouseStatus::Forward)
@@ -543,7 +610,7 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 				d = -1.0f;
 
 			if (d != 0.0f) {
-				d *= static_cast<float>(IntegerUserVariable0 * 10);
+				d *= static_cast<float>(widget->UserVariable[0] * 10);
 
 				float pitch = CppLogic::DegreesToRadians(cam->VerticalAngle);
 				float yaw = CppLogic::DegreesToRadians(cam->HorizontalAngle);
@@ -556,12 +623,13 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 				cam->CameraInfo.LookAtX += dx;
 				cam->CameraInfo.LookAtY += dy;
 				cam->CameraInfo.LookAtZ += dz;
+				ClampLookAt(cam);
 			}
 		}
 	}
 	if (Status != MouseStatus::None) {
 		EGUIX::Color c{};
-		shok::UIRenderer::GlobalObj()->RenderLine(&c, true, MouseStartX, MouseStartY, MouseX, MouseY);
+		shok::UIRenderer::GlobalObj()->RenderLine(&c, true, static_cast<float>(MouseStartX), static_cast<float>(MouseStartY), static_cast<float>(MouseX), static_cast<float>(MouseY));
 	}
 }
 
@@ -569,7 +637,13 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 {
 	if (CheckFocusEvent(ev))
 		return false;
-	if (ev->IsEvent(shok::InputEventIds::MouseButtonUp)) {
+	if (ev->IsEvent(shok::InputEventIds::WidgetShow)) {
+		if (widget->UserVariable[0] == 0) {
+			widget->UserVariable[0] = IntegerUserVariable0;
+		}
+		return false;
+	}
+	else if (ev->IsEvent(shok::InputEventIds::MouseButtonUp)) {
 		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 			if (!HasFocus()) {
 				if (me->IsKey(shok::Keys::MouseLButton)) {
@@ -625,11 +699,18 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 		Status = MouseStatus::None;
 		return false;
 	}
+	else if (ev->IsEvent(shok::InputEventIds::MouseWheel)) {
+		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
+			widget->UserVariable[0] = std::max(0, widget->UserVariable[0] + (me->Delta > 0 ? 5 : -5));
+		}
+		return true;
+	}
 	else if (ev->IsEvent(shok::InputEventIds::MouseMove) && Status != MouseStatus::None) {
 		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 			MouseX = me->X;
 			MouseY = me->Y;
 		}
+		return false;
 	}
 	else if (ev->IsEvent(shok::InputEventIds::KeyDown)) {
 		if (auto* ev2 = BB::IdentifierCast<BB::CKeyEvent>(ev)) {
@@ -730,4 +811,28 @@ void* CppLogic::Mod::UI::FreeCamCustomWidget::operator new(size_t s)
 void CppLogic::Mod::UI::FreeCamCustomWidget::operator delete(void* p)
 {
 	shok::Free(p);
+}
+
+void CppLogic::Mod::UI::FreeCamCustomWidget::ClampCamera(ERwTools::CRwCameraHandler* cam)
+{
+	if (cam->VerticalAngle > 90.0f)
+		cam->VerticalAngle = 90.0f;
+	if (cam->VerticalAngle < -90.0f)
+		cam->VerticalAngle = -90.0f;
+	while (cam->HorizontalAngle < -180.0f)
+		cam->HorizontalAngle += 360.0f;
+	while (cam->HorizontalAngle >= 180.0f)
+		cam->HorizontalAngle -= 360.0f;
+}
+void CppLogic::Mod::UI::FreeCamCustomWidget::ClampLookAt(ERwTools::CRwCameraHandler* cam)
+{
+	if (cam->CameraInfo.LookAtX < 0.0f)
+		cam->CameraInfo.LookAtX = 0.0f;
+	if (cam->CameraInfo.LookAtY < 0.0f)
+		cam->CameraInfo.LookAtY = 0.0f;
+	auto p = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetMapSize();
+	if (cam->CameraInfo.LookAtX > p.X)
+		cam->CameraInfo.LookAtX = p.X;
+	if (cam->CameraInfo.LookAtY > p.Y)
+		cam->CameraInfo.LookAtY = p.Y;
 }

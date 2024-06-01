@@ -56,6 +56,11 @@ namespace CppLogic::Mod::UI {
 	};
 
 	class TextInputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
+		enum class Event : int {
+			Confirm = 0,
+			Cancel = 1,
+			Validate = 2,
+		};
 	public:
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
@@ -82,7 +87,8 @@ namespace CppLogic::Mod::UI {
 
 	private:
 		bool CharValid(char c) const;
-		void CallFunc(std::string_view funcname, int ev);
+		bool NegativeNumberValid() const;
+		bool CallFunc(std::string_view funcname, Event ev);
 	};
 
 	class FreeCamCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
@@ -91,7 +97,6 @@ namespace CppLogic::Mod::UI {
 			Forward,
 			Backward,
 			Rotate,
-			Focus,
 		};
 
 	public:
@@ -117,5 +122,8 @@ namespace CppLogic::Mod::UI {
 		float LastTick = 0;
 		int MouseStartX = 0, MouseStartY = 0;
 		int MouseX = 0, MouseY = 0;
+
+		static void ClampCamera(ERwTools::CRwCameraHandler* cam);
+		static void ClampLookAt(ERwTools::CRwCameraHandler* cam);
 	};
 }

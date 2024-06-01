@@ -40,12 +40,13 @@ common input focus:
 
 CppLogic::Mod::UI::TextInputCustomWidget:
 	- user vars:
-		- int 0: mode 0->normal, 1->password, 2->int, 3->double
-		- int 1: bool fire cancel event
+		- int 0: mode 0->normal, 1->password, 2->int, 3->double, 4->uint, 5->udouble
+		- int 1: flags 1->fire cancel event, 2->fire validate event
 		- int 2: int argb text color (white, if a==0)
 		- int 3: int argb cursor blink color (gray, if a==0)
 		- int 4: int argb background color (none, if a==0)
-		- string 0: event func (text, widgetid, event) event: 0->confirm, 1->cancel
+		- int 5: int scroll delta
+		- string 0: event func (text, widgetid, event) event: 0->confirm, 1->cancel, 2->validate
 		- string 1: font (Data\Menu\Fonts\standard10.met if empty)
 
 	functions may contain ., will correctly access table elements.
@@ -64,6 +65,6 @@ CppLogic::Mod::UI::TextInputCustomWidget:
 
 CppLogic::Mod::UI::FreeCamCustomWidget:
 	- user vars:
-		- int 0 scroll speed
+		- int 0: default scroll speed
 
 	allows key based camera movement. see CutsceneEditor for usage.

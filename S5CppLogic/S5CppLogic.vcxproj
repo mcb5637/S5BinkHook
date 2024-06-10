@@ -265,6 +265,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5_tasklist.h" />
     <ClInclude Include="s5_tech.h" />
     <ClInclude Include="s5_ui.h" />
+    <ClInclude Include="s5_video.h" />
     <ClInclude Include="s5_widget.h" />
     <ClInclude Include="s5_entitydisplay.h" />
     <ClInclude Include="s5_datastructures.h" />

@@ -1379,6 +1379,37 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int VideoCustomWidgetGetVideoSize(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* t = dynamic_cast<EGUIX::CVideoPlaybackCustomWidget*>(w->CustomWidget);
+		if (t == nullptr)
+			throw lua::LuaException{ "not a CVideoPlaybackCustomWidget" };
+		if (t->Collection == nullptr)
+			return 0;
+		int x, y;
+		t->Collection->GetSize(&x, &y);
+		L.Push(x);
+		L.Push(y);
+		return 2;
+	}
+
+	int VideoCustomWidgetSetVideoSize(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto* t = dynamic_cast<EGUIX::CVideoPlaybackCustomWidget*>(w->CustomWidget);
+		if (t == nullptr)
+			throw lua::LuaException{ "not a CVideoPlaybackCustomWidget" };
+		if (t->Collection == nullptr)
+			t->Init(w);
+		t->Collection->Init(L.CheckInt(2), L.CheckInt(3));
+		return 0;
+	}
+
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
 		return shok::Malloc(s);
@@ -1769,6 +1800,8 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<GetCutscene>("GetCutscene"),
 		lua::FuncReference::GetRef<SetCutscene>("SetCutscene"),
 		lua::FuncReference::GetRef<ExportCutscenes>("ExportCutscenes"),
+		lua::FuncReference::GetRef<VideoCustomWidgetGetVideoSize>("VideoCustomWidgetGetVideoSize"),
+		lua::FuncReference::GetRef<VideoCustomWidgetSetVideoSize>("VideoCustomWidgetSetVideoSize"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

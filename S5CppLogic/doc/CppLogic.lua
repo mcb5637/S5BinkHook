@@ -2931,6 +2931,21 @@ function CppLogic.UI.SetCutscene(name, cutscene) end
 ---@param path string|nil 
 function CppLogic.UI.ExportCutscenes(path) end
 
+---gets the video playback size of a EGUIX::CVideoPlaybackCustomWidget.
+---@param wid string|number 
+---@return number|nil x
+---@return number|nil y
+function CppLogic.UI.VideoCustomWidgetGetVideoSize(wid) end
+
+---sets the video playback size of a EGUIX::CVideoPlaybackCustomWidget.
+---this usually gets set to the widget size on the first call to XGUIEng.StartVideoPlayback.
+---needs to match the video files size.
+---note: changes after first initializing is expensive, try to avoid it.
+---@param wid string|number 
+---@param x number
+---@param y number
+function CppLogic.UI.VideoCustomWidgetSetVideoSize(wid, x, y) end
+
 ---gives a construct command
 ---@param id number|string
 ---@param tar number|string

@@ -4,6 +4,7 @@
 #include "s5_ui.h"
 #include "s5_scriptsystem.h"
 #include "s5_idmanager.h"
+#include "s5_video.h"
 
 namespace EGUIX {
 	struct Rect { // size 4
@@ -933,11 +934,91 @@ namespace GGUI {
 	static_assert(offsetof(MiniMapHandler, MiniMapRenderPos) == 2 * 4);
 	static_assert(offsetof(MiniMapHandler, Pulses) == 117 * 4);
 	//constexpr int i = offsetof(MiniMapHandler, Pulses) / 4;
+
+	// renders the minimap
 	class CMiniMapCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
 		static inline constexpr int vtp = 0x77BF54;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x98C68876);
+	};
+
+	// does jump cam to click or move to pos
+	// also renders something?
+	class CMiniMapOverlayCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77CDCC;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6157C1AE);
+	};
+
+	// renders some network info on screen
+	class CNetworkInfoCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77CB14;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6D7F7F36);
+	};
+
+	// on autoupdate, updates NetworkWindowPlayerX and NetworkWindowPlayerXKickButton widgets (by hardcoded names)
+	class CNetworkWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77CC90;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9915CE26);
+	};
+
+	// renders some debug info
+	// what exactly?
+	class C3DOnScreenDebugCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77CEA4;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x20BFE706);
+	};
+
+	// sets some text to (hardcoded) NotesWindowOutput
+	// no way to set the text displayed???
+	class CNotesWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77CF14;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x30118F6);
+	};
+
+	class CDiplomacyWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77D1EC;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x947925C6);
+	};
+
+	class CQuestWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77D250;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEDF05506);
+	};
+
+	class CQuestWindowQuestOutputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77D27C;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7E0B4136);
+	};
+
+	class CTradeWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77D398;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x69246616);
+	};
+
+	class C3DViewCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
+
+	public:
+		static inline constexpr int vtp = 0x77D4A0;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7FA7DB06);
 	};
 }
 
@@ -961,6 +1042,25 @@ namespace EGUIX {
 		void UpdateSlider(int value, bool callback);
 		// set value to mouse pos 0x55CB97 __thiscall(EGUIX::CCustomWidget* wid)
 	};
+
+	// the Collection has its own video size, this needs to match the files size
+	// if set correctly, scales the video
+	// gets initialized to widget size on first video start
+	class CVideoPlaybackCustomWidget : public BB::IObject, public ICustomWidget {
+	public:
+		EVid::CVideo* Video;
+		EVid::CVideoCollectionRW* Collection;
+
+		// stop video 55C4A6 thiscall
+		// open video 55C735 thiscall(const char*)
+		// start video 55C47B thiscall(const char*, bool)
+
+		bool Init(CBaseWidget* wid = nullptr);
+
+		static constexpr int vtp = 0x780A18;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x687793A6);
+	};
+	static_assert(sizeof(CVideoPlaybackCustomWidget) == 39 * 4);
 
 	class WidgetManager { // this thing has no vtable...
 	public:

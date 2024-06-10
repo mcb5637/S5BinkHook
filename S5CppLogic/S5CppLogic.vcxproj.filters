@@ -318,6 +318,9 @@
     <ClInclude Include="WinAPIUtil.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_video.h">
+      <Filter>shok\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

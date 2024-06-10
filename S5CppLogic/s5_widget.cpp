@@ -350,6 +350,14 @@ void EGUIX::CScrollBarButtonCustomWidget::UpdateSlider(int value, bool callback)
     scrollbar_update(this, value, callback, callback ? EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(WidgetId) : nullptr);
 }
 
+inline bool(__thiscall* const videoplaybaccw_init)(EGUIX::CVideoPlaybackCustomWidget* cw, EGUIX::CBaseWidget* w) = reinterpret_cast<bool(__thiscall*)(EGUIX::CVideoPlaybackCustomWidget*, EGUIX::CBaseWidget*)>(0x55C4BF);
+bool EGUIX::CVideoPlaybackCustomWidget::Init(CBaseWidget* wid)
+{
+    if (wid == nullptr)
+        wid = EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(WidgetId);
+    return videoplaybaccw_init(this, wid);
+}
+
 static inline shok::WidgetId(__thiscall* const widman_getidbyname)(EGUIX::WidgetManager* th, const char* n) = reinterpret_cast<shok::WidgetId(__thiscall*)(EGUIX::WidgetManager*, const char*)>(0x5588A0);
 shok::WidgetId EGUIX::WidgetManager::GetIdByName(const char* name)
 {

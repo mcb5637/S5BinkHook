@@ -235,7 +235,7 @@ namespace EGUIX {
 
 		bool* GetUpdateManualFlag();
 		EGUIX::CLuaFunctionHelper* GetUpdateFunc();
-		EGUIX::CMaterial* GetMaterials(int* count);
+		EGUIX::CMaterial* GetMaterial(int m);
 		EGUIX::CButtonHelper* GetButtonHelper();
 		EGUIX::CToolTipHelper* GetTooltipHelper();
 		EGUIX::CWidgetStringHelper* GetStringHelper();
@@ -986,6 +986,9 @@ namespace GGUI {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x30118F6);
 	};
 
+	// updates (hardcoded) DiplomacyWindowPlayerX widgets
+	// player colors, names, diplomacy and mp trade
+	// also sets action/toottip funcs
 	class CDiplomacyWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
@@ -993,6 +996,9 @@ namespace GGUI {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x947925C6);
 	};
 
+	// updates (hardcoded) QuestWindowQuestX widgets
+	// quest title, types
+	// seems to store selected quest in own widget int user var 0
 	class CQuestWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
@@ -1000,6 +1006,8 @@ namespace GGUI {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEDF05506);
 	};
 
+	// renders text from (hardcoded) QuestWindowController
+	// also does something with QuestWindowQuestOutputBG?
 	class CQuestWindowQuestOutputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
@@ -1007,6 +1015,9 @@ namespace GGUI {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7E0B4136);
 	};
 
+	// updates TradeWindowOffer (hardcoded) widgets
+	// text, player and action func
+	// also sets TradeWindowInfoWidget text on show
 	class CTradeWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
@@ -1014,6 +1025,8 @@ namespace GGUI {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x69246616);
 	};
 
+	// forwards events to guistate
+	// renders move hold direction line
 	class C3DViewCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:

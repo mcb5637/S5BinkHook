@@ -123,9 +123,8 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 		w->UserVariable[0] = 0;
 		Widgets.push_back(w);
 		WidgetContainer = static_cast<EGUIX::CContainerWidget*>(mng->GetWidgetByID(w->MotherWidgetID));
-		int matcount = 0;
-		if (auto* m = w->GetMaterials(&matcount)) {
-			PartialWidget = m[0];
+		if (auto* m = w->GetMaterial(0)) {
+			PartialWidget = *m;
 		}
 		else {
 			PartialWidget.Color.Alpha = 0;

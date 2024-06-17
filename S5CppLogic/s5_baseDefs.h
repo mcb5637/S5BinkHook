@@ -159,6 +159,8 @@ namespace BB {
 	template<HasValidIdentifier CastTo, class CastFrom, HasValidIdentifier... AdditionalSubClasses>
 	requires std::derived_from<CastTo, CastFrom> && std::derived_from<CastFrom, IObject> && (std::derived_from<AdditionalSubClasses, CastTo> && ...)
 	CastTo* IdentifierCast(CastFrom* f) {
+		if (f == nullptr)
+			return nullptr;
 		const shok::ClassId id = f->GetClassIdentifier();
 		if (id == CastTo::Identifier)
 			return static_cast<CastTo*>(f);

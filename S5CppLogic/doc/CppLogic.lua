@@ -2501,17 +2501,25 @@ function CppLogic.UI.StaticTextWidgetGetLineDistanceFactor(wid) end
 --- @param df number distance factor
 function CppLogic.UI.StaticTextWidgetSetLineDistanceFactor(wid, df) end
 
---- gets a widget material textures position and size
+--- gets a widget material textures position and size.  
+--- mat:
+--- - EGUIX::CButtonWidget (EGUIX::CGfxButtonWidget & EGUIX::CTextButtonWidget): 0->Normal, 1->MouseOver, 2->Clicked, 3->Disabled, 4->Highlighed
+--- - EGUIX::CGfxButtonWidget: 10->IconMaterial (always rendered on top)
+--- - EGUIX::CStaticWidget (EGUIX::CStaticTextWidget & EGUIX::CProgressBarWidget): ignored (has only one material, set to 0)
 --- @param wid widget
---- @param mat number material index, [0..4] for buttons, 0 for statics.
+--- @param mat number
 --- @return number x
 --- @return number y
 --- @return number w
 --- @return number h
 function CppLogic.UI.WidgetMaterialGetTextureCoordinates(wid, mat) end
---- sets a widget material textures position and size
+--- sets a widget material textures position and size.  
+--- mat:
+--- - EGUIX::CButtonWidget (EGUIX::CGfxButtonWidget & EGUIX::CTextButtonWidget): 0->Normal, 1->MouseOver, 2->Clicked, 3->Disabled, 4->Highlighed
+--- - EGUIX::CGfxButtonWidget: 10->IconMaterial (always rendered on top)
+--- - EGUIX::CStaticWidget (EGUIX::CStaticTextWidget & EGUIX::CProgressBarWidget): ignored (has only one material, set to 0)
 --- @param wid widget
---- @param mat number material index, [0..4] for buttons, 0 for statics.
+--- @param mat number
 --- @param x number|nil (optional, default current)
 --- @param y number|nil (optional, default current)
 --- @param w number|nil (optional, default current)

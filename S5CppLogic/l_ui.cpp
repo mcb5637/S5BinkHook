@@ -173,37 +173,29 @@ namespace CppLogic::UI {
 	int WidgetMaterialGetTextureCoordinates(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		int c = 0;
-		EGUIX::CMaterial* m = wid->GetMaterials(&c);
+		EGUIX::CMaterial* m = wid->GetMaterial(L.CheckInt(2));
 		if (!m)
-			throw lua::LuaException("no known materials");
-		int min = L.CheckInt(2);
-		if (!(min >= 0 && min < c))
-			throw lua::LuaException("invalid index");
-		L.Push(m[min].TextureCoordinates.X);
-		L.Push(m[min].TextureCoordinates.Y);
-		L.Push(m[min].TextureCoordinates.W);
-		L.Push(m[min].TextureCoordinates.H);
+			throw lua::LuaException("no material");
+		L.Push(m->TextureCoordinates.X);
+		L.Push(m->TextureCoordinates.Y);
+		L.Push(m->TextureCoordinates.W);
+		L.Push(m->TextureCoordinates.H);
 		return 4;
 	}
 	int WidgetMaterialSetTextureCoordinates(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		int c = 0;
-		EGUIX::CMaterial* m = wid->GetMaterials(&c);
+		EGUIX::CMaterial* m = wid->GetMaterial(L.CheckInt(2));
 		if (!m)
-			throw lua::LuaException("no known materials");
-		int min = L.CheckInt(2);
-		if (!(min >= 0 && min < c))
-			throw lua::LuaException("invalid index");
+			throw lua::LuaException("no material");
 		if (L.IsNumber(3))
-			m[min].TextureCoordinates.X = L.CheckFloat(3);
+			m->TextureCoordinates.X = L.CheckFloat(3);
 		if (L.IsNumber(4))
-			m[min].TextureCoordinates.Y = L.CheckFloat(4);
+			m->TextureCoordinates.Y = L.CheckFloat(4);
 		if (L.IsNumber(5))
-			m[min].TextureCoordinates.W = L.CheckFloat(5);
+			m->TextureCoordinates.W = L.CheckFloat(5);
 		if (L.IsNumber(6))
-			m[min].TextureCoordinates.H = L.CheckFloat(6);
+			m->TextureCoordinates.H = L.CheckFloat(6);
 		return 0;
 	}
 
@@ -1667,6 +1659,8 @@ namespace CppLogic::UI {
 		GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(false);
 		if (EGUIX::WidgetManager* wm = EGUIX::WidgetManager::GlobalObj()) {
 			for (EGUIX::CBaseWidget* wid : wm->Widgets) {
+				if (wid == nullptr)
+					continue;
 				if (EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper()) {
 					tt->UpdateFunction.FuncRefCommand.Clear();
 				}

@@ -295,17 +295,16 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	/*L.NewTable();
-	auto mng = CppLogic::GetIdManager<shok::PrincipalTaskId>();
-	for (auto id : mng) {
-		L.Push(id);
-		L.Push(mng.GetNameByID(id));
-		L.SetTableRaw(-3);
-	}*/
-	auto e = L.CheckEntity(1);
-	auto b = e->GetBehavior<GGL::CBarrackBehavior>();
-	L.Push(reinterpret_cast<bool(__thiscall*)(void*)>(0x50EF9D)(b));
-	return 1;
+	auto* w = L.CheckWidget(1);
+	L.Push((int)w->GetUpdateManualFlag());
+	L.Push((int)w->GetUpdateFunc());
+	L.Push((int)w->GetButtonHelper());
+	L.Push((int)w->GetTooltipHelper());
+	L.Push((int)w->GetStringHelper());
+	L.Push((int)w->GetMaterial(0));
+	L.Push((int)w->GetMaterial(1));
+	L.Push((int)w->GetMaterial(10));
+	return 8;
 }
 
 int GetOptions(lua::State L) {

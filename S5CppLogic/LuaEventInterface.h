@@ -121,12 +121,12 @@ namespace CppLogic::LuaEventInterface {
 
 	template<shok::AbilityId Ab, class Ev>
 	void CheckEntityAbility(EGL::CGLEEntity* e, Ev& ev) {
-		GGL::CEventHeroAbilityInteger issup{ shok::EventIDs::HeroAbility_IsAbilitySupported, Ab };
+		GGL::CEventHeroAbilityGetInteger issup{ shok::EventIDs::HeroAbility_IsAbilitySupported, Ab };
 		e->FireEvent(&issup);
 		if (issup.Data == 0)
 			throw lua::LuaException{ "ability not supported" };
-		GGL::CEventHeroAbilityInteger max{ shok::EventIDs::HeroAbility_GetChargeCurrent, Ab };
-		GGL::CEventHeroAbilityInteger curr{ shok::EventIDs::HeroAbility_GetChargeMax, Ab };
+		GGL::CEventHeroAbilityGetInteger max{ shok::EventIDs::HeroAbility_GetChargeCurrent, Ab };
+		GGL::CEventHeroAbilityGetInteger curr{ shok::EventIDs::HeroAbility_GetChargeMax, Ab };
 		e->FireEvent(&max);
 		e->FireEvent(&curr);
 		if (max.Data != curr.Data)
@@ -135,12 +135,12 @@ namespace CppLogic::LuaEventInterface {
 	template<shok::AbilityId Ab, class Ev>
 	void CheckEntityAbility(Ev& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
-		GGL::CEventHeroAbilityInteger issup{ shok::EventIDs::HeroAbility_IsAbilitySupported, Ab };
+		GGL::CEventHeroAbilityGetInteger issup{ shok::EventIDs::HeroAbility_IsAbilitySupported, Ab };
 		e->FireEvent(&issup);
 		if (issup.Data == 0)
 			throw lua::LuaException{ "ability not supported" };
-		GGL::CEventHeroAbilityInteger max{ shok::EventIDs::HeroAbility_GetChargeCurrent, Ab };
-		GGL::CEventHeroAbilityInteger curr{ shok::EventIDs::HeroAbility_GetChargeMax, Ab };
+		GGL::CEventHeroAbilityGetInteger max{ shok::EventIDs::HeroAbility_GetChargeCurrent, Ab };
+		GGL::CEventHeroAbilityGetInteger curr{ shok::EventIDs::HeroAbility_GetChargeMax, Ab };
 		e->FireEvent(&max);
 		e->FireEvent(&curr);
 		if (max.Data != curr.Data)
@@ -149,12 +149,12 @@ namespace CppLogic::LuaEventInterface {
 	template<shok::AbilityId Ab>
 	void CheckActorAbility(EGL::CNetEvent2Entities& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
-		GGL::CEventHeroAbilityInteger issup{ shok::EventIDs::HeroAbility_IsAbilitySupported, Ab };
+		GGL::CEventHeroAbilityGetInteger issup{ shok::EventIDs::HeroAbility_IsAbilitySupported, Ab };
 		e->FireEvent(&issup);
 		if (issup.Data == 0)
 			throw lua::LuaException{ "ability not supported" };
-		GGL::CEventHeroAbilityInteger max{ shok::EventIDs::HeroAbility_GetChargeCurrent, Ab };
-		GGL::CEventHeroAbilityInteger curr{ shok::EventIDs::HeroAbility_GetChargeMax, Ab };
+		GGL::CEventHeroAbilityGetInteger max{ shok::EventIDs::HeroAbility_GetChargeCurrent, Ab };
+		GGL::CEventHeroAbilityGetInteger curr{ shok::EventIDs::HeroAbility_GetChargeMax, Ab };
 		e->FireEvent(&max);
 		e->FireEvent(&curr);
 		if (max.Data != curr.Data)

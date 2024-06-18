@@ -155,6 +155,24 @@ EGL::CEventGetPosition::CEventGetPosition(shok::EventIDs e)
 	SetVT(vtp);
 }
 
+EGL::CEventIndexAndEffectType::CEventIndexAndEffectType(shok::EventIDs id, int index, shok::EffectTypeId ety)
+	: BB::CEvent(id), Index(index), EffectType(ety)
+{
+	SetVT(vtp);
+}
+
+EGL::CEventAnimation::CEventAnimation(shok::EventIDs id, shok::AnimationId anim, bool backw, shok::AnimationCategoryId acat) : 
+	BB::CEvent(id), AnimID(anim), PlayBackwards(backw), Category(acat)
+{
+	SetVT(vtp);
+}
+
+EGL::CEventPositionAndEntity::CEventPositionAndEntity(shok::EventIDs id, const shok::Position& p, shok::EntityId e)
+	: BB::CEvent(id), Pos(p), Entity(e)
+{
+	SetVT(vtp);
+}
+
 GGL::CEventAttachmentTypeGetInteger::CEventAttachmentTypeGetInteger(shok::EventIDs e, shok::AttachmentType t) : BB::CEvent(e)
 {
 	SetVT(GGL::CEventAttachmentTypeGetInteger::vtp);
@@ -223,7 +241,59 @@ GGL::CEventChangeMotivation::CEventChangeMotivation(shok::EventIDs e, float d, s
 	Reason = r;
 }
 
-GGL::CEventHeroAbilityInteger::CEventHeroAbilityInteger(shok::EventIDs id, shok::AbilityId ab) : EGL::CEventGetValue_Int(id), Ability(ab)
+GGL::CEventHeroAbilityInteger::CEventHeroAbilityInteger(shok::EventIDs id, int data, shok::AbilityId ab) : EGL::CEventValue_Int(id, data), Ability(ab)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventHeroAbilityGetInteger::CEventHeroAbilityGetInteger(shok::EventIDs id, shok::AbilityId ab) : EGL::CEventGetValue_Int(id), Ability(ab)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventPlayerIDInteger::CEventPlayerIDInteger(shok::EventIDs id, shok::PlayerId pl, int d)
+	: EGL::CEventPlayerID(id, pl), Data(d)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventSourceTargetPlayerID::CEventSourceTargetPlayerID(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t)
+	: BB::CEvent(id), Source(s), Target(t)
+{
+	SetVT(vtp);
+	*reinterpret_cast<int*>(static_cast<EGL::IEventSourcePlayerID*>(this)) = 0x76F8B4;
+	*reinterpret_cast<int*>(static_cast<EGL::IEventTargetPlayerID*>(this)) = 0x76F8AC;
+}
+shok::PlayerId GGL::CEventSourceTargetPlayerID::GetSourcePlayer() const
+{
+	return Source;
+}
+shok::PlayerId GGL::CEventSourceTargetPlayerID::GetTargetPlayer() const
+{
+	return Target;
+}
+
+GGL::CEventDiplomacyChanged::CEventDiplomacyChanged(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t, shok::DiploState n)
+	: CEventSourceTargetPlayerID(id, s, t), NewState(n)
+{
+	SetVT(vtp);
+	*reinterpret_cast<int*>(static_cast<EGL::IEventSourcePlayerID*>(this)) = 0x76F8DC;
+	*reinterpret_cast<int*>(static_cast<EGL::IEventTargetPlayerID*>(this)) = 0x76F8D4;
+	*reinterpret_cast<int*>(static_cast<IEventDiplomacyState*>(this)) = 0x76F8CC;
+}
+shok::DiploState GGL::CEventDiplomacyChanged::GetState() const
+{
+	return NewState;
+}
+
+GGL::CEventWeatherStateChanged::CEventWeatherStateChanged(shok::EventIDs id, shok::WeatherState o, shok::WeatherState n)
+	: BB::CEvent(id), Old(o), New(n)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventBridgeProgress::CEventBridgeProgress(shok::EventIDs id, shok::PlayerId pl, float p)
+	: EGL::CEventPlayerID(id, pl), Progress(p)
 {
 	SetVT(vtp);
 }

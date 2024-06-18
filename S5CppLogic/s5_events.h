@@ -13,10 +13,6 @@ namespace BB {
 		CEvent(shok::NetEventIds eventid);
 		CEvent(shok::FeedbackEventIds eventid);
 		CEvent(shok::InputEventIds eventid);
-		CEvent(BB::CEvent&&) = default;
-		CEvent(const BB::CEvent&) = default;
-		CEvent& operator=(BB::CEvent&&) = default;
-		CEvent& operator=(const BB::CEvent&) = default;
 
 		bool IsEvent(shok::EventIDs id);
 		bool IsEvent(shok::NetEventIds id);
@@ -39,7 +35,7 @@ namespace BB {
 namespace EGL {
 	// input events
 	template<class T, unsigned int id>
-	requires (std::same_as<T, int> && id == 0xFE5B4097) || (std::same_as<T, bool> && id == 0x29EC0467) || (std::same_as<T, float> && id == 0x4C324467)
+		requires (std::same_as<T, int>&& id == 0xFE5B4097) || (std::same_as<T, bool> && id == 0x29EC0467) || (std::same_as<T, float> && id == 0x4C324467)
 	class CEventValue : public BB::CEvent {
 	public:
 		T Data = {};
@@ -77,10 +73,6 @@ namespace EGL {
 			SetVT(vtp());
 			Data = d;
 		}
-		CEventValue(CEventValue&&) = default;
-		CEventValue(const CEventValue&) = default;
-		CEventValue& operator=(CEventValue&&) = default;
-		CEventValue& operator=(const CEventValue&) = default;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(id);
 	};
@@ -90,7 +82,7 @@ namespace EGL {
 
 
 	template<class T, unsigned int id>
-	requires (std::same_as<T, bool> && id == 0x65DE8317) || (std::same_as<T, int> && id == 0x483040E7) || (std::same_as<T, float> && id == 0x578EE8F7)
+		requires (std::same_as<T, bool>&& id == 0x65DE8317) || (std::same_as<T, int> && id == 0x483040E7) || (std::same_as<T, float> && id == 0x578EE8F7)
 	class CEventGetValue : public BB::CEvent {
 	public:
 		T Data = {};
@@ -127,10 +119,6 @@ namespace EGL {
 		CEventGetValue(shok::EventIDs e) : BB::CEvent(e) {
 			SetVT(vtp());
 		}
-		CEventGetValue(CEventGetValue&&) = default;
-		CEventGetValue(const CEventGetValue&) = default;
-		CEventGetValue& operator=(CEventGetValue&&) = default;
-		CEventGetValue& operator=(const CEventGetValue&) = default;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(id);
 	};
@@ -164,10 +152,6 @@ namespace EGL {
 		shok::EntityId EntityID;
 
 		CEvent1Entity(shok::EventIDs e, shok::EntityId ent);
-		CEvent1Entity(CEvent1Entity&&) = default;
-		CEvent1Entity(const CEvent1Entity&) = default;
-		CEvent1Entity& operator=(CEvent1Entity&&) = default;
-		CEvent1Entity& operator=(const CEvent1Entity&) = default;
 
 		virtual shok::EntityId GetEntityID() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
@@ -183,10 +167,6 @@ namespace EGL {
 		shok::Position Position;
 
 		CEventPosition(shok::EventIDs e, const shok::Position& p);
-		CEventPosition(CEventPosition&&) = default;
-		CEventPosition(const CEventPosition&) = default;
-		CEventPosition& operator=(CEventPosition&&) = default;
-		CEventPosition& operator=(const CEventPosition&) = default;
 
 		static inline constexpr int vtp = 0x766C70;
 		static inline constexpr int TypeDesc = 0x8079C8;
@@ -198,10 +178,6 @@ namespace EGL {
 		shok::TaskState State;
 
 		CEventPositionAndTaskState(shok::EventIDs e, const shok::Position& p, shok::TaskState s);
-		CEventPositionAndTaskState(CEventPositionAndTaskState&&) = default;
-		CEventPositionAndTaskState(const CEventPositionAndTaskState&) = default;
-		CEventPositionAndTaskState& operator=(CEventPositionAndTaskState&&) = default;
-		CEventPositionAndTaskState& operator=(const CEventPositionAndTaskState&) = default;
 
 		static inline constexpr int vtp = 0x775F78;
 		static inline constexpr int TypeDesc = 0x81D9C8;
@@ -219,10 +195,6 @@ namespace EGL {
 		shok::PlayerId PlayerID;
 
 		CEventPlayerID(shok::EventIDs e, shok::PlayerId p);
-		CEventPlayerID(CEventPlayerID&&) = default;
-		CEventPlayerID(const CEventPlayerID&) = default;
-		CEventPlayerID& operator=(CEventPlayerID&&) = default;
-		CEventPlayerID& operator=(const CEventPlayerID&) = default;
 
 		virtual shok::PlayerId GetPlayerID() const override;
 
@@ -239,10 +211,6 @@ namespace EGL {
 		bool PlayBackwards, IsLooped;
 
 		CEventSubAnim(shok::EventIDs e, shok::AnimationId an, int subind, bool back, bool loop);
-		CEventSubAnim(CEventSubAnim&&) = default;
-		CEventSubAnim(const CEventSubAnim&) = default;
-		CEventSubAnim& operator=(CEventSubAnim&&) = default;
-		CEventSubAnim& operator=(const CEventSubAnim&) = default;
 
 		static inline constexpr int vtp = 0x76D910;
 		static inline constexpr int TypeDesc = 0x80E09C;
@@ -262,10 +230,6 @@ namespace EGL {
 		shok::EntityId ActorId, TargetId;
 
 		CEvent2Entities(shok::EventIDs e, shok::EntityId aid, shok::EntityId tid);
-		CEvent2Entities(CEvent2Entities&&) = default;
-		CEvent2Entities(const CEvent2Entities&) = default;
-		CEvent2Entities& operator=(CEvent2Entities&&) = default;
-		CEvent2Entities& operator=(const CEvent2Entities&) = default;
 
 		virtual shok::EntityId GetActorID() const override;
 		virtual shok::EntityId GetTargetID() const override;
@@ -283,10 +247,6 @@ namespace EGL {
 		int Data = 0;
 
 		CEventThousandthsGetInteger(shok::EventIDs e, int thousands);
-		CEventThousandthsGetInteger(CEventThousandthsGetInteger&&) = default;
-		CEventThousandthsGetInteger(const CEventThousandthsGetInteger&) = default;
-		CEventThousandthsGetInteger& operator=(CEventThousandthsGetInteger&&) = default;
-		CEventThousandthsGetInteger& operator=(const CEventThousandthsGetInteger&) = default;
 
 		static inline constexpr int vtp = 0x775F68;
 		static inline constexpr int TypeDesc = 0x81D998;
@@ -302,10 +262,6 @@ namespace EGL {
 		bool Looped;
 
 		CEventSoundPositionAndID(shok::EventIDs e, shok::SoundId soundid, bool hasPos, const shok::Position& p, float z, int vol, bool looped);
-		CEventSoundPositionAndID(CEventSoundPositionAndID&&) = default;
-		CEventSoundPositionAndID(const CEventSoundPositionAndID&) = default;
-		CEventSoundPositionAndID& operator=(CEventSoundPositionAndID&&) = default;
-		CEventSoundPositionAndID& operator=(const CEventSoundPositionAndID&) = default;
 
 		static inline constexpr int vtp = 0x76D4B0;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x956FCE37);
@@ -316,10 +272,6 @@ namespace EGL {
 		shok::Position Position;
 
 		CEventGetPosition(shok::EventIDs e);
-		CEventGetPosition(CEventGetPosition&&) = default;
-		CEventGetPosition(const CEventGetPosition&) = default;
-		CEventGetPosition& operator=(CEventGetPosition&&) = default;
-		CEventGetPosition& operator=(const CEventGetPosition&) = default;
 
 		static inline constexpr int vtp = 0x7743CC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x89C73967);
@@ -328,11 +280,45 @@ namespace EGL {
 	class CEventIndexAndEffectType : public BB::CEvent {
 	public:
 		int Index;
-		shok::EffectTypeId EffectType = shok::EffectTypeId::Invalid;
+		shok::EffectTypeId EffectType;
 
+		CEventIndexAndEffectType(shok::EventIDs id, int index, shok::EffectTypeId ety);
 
 		static inline constexpr int vtp = 0x78554C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x929AD507);
+	};
+
+	class CEventAnimation : public BB::CEvent {
+	public:
+		shok::AnimationId AnimID;
+		bool PlayBackwards;
+		PADDING(3);
+		shok::AnimationCategoryId Category;
+
+		CEventAnimation(shok::EventIDs id, shok::AnimationId anim, bool backw, shok::AnimationCategoryId acat = shok::AnimationCategoryId::Invalid);
+
+		static inline constexpr int vtp = 0x78491C;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3369F3D7);
+	};
+
+	class CEventPositionAndEntity : public BB::CEvent {
+	public:
+		shok::Position Pos;
+		shok::EntityId Entity;
+
+		CEventPositionAndEntity(shok::EventIDs id, const shok::Position& p, shok::EntityId e);
+
+		static inline constexpr int vtp = 0x76E150;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3A6455CD);
+	};
+
+	class IEventSourcePlayerID {
+	public:
+		virtual shok::PlayerId GetSourcePlayer() const = 0;
+	};
+	class IEventTargetPlayerID {
+	public:
+		virtual shok::PlayerId GetTargetPlayer() const = 0;
 	};
 }
 
@@ -343,10 +329,6 @@ namespace GGL {
 		int Data = 0;
 
 		CEventAttachmentTypeGetInteger(shok::EventIDs e, shok::AttachmentType t);
-		CEventAttachmentTypeGetInteger(CEventAttachmentTypeGetInteger&&) = default;
-		CEventAttachmentTypeGetInteger(const CEventAttachmentTypeGetInteger&) = default;
-		CEventAttachmentTypeGetInteger& operator=(CEventAttachmentTypeGetInteger&&) = default;
-		CEventAttachmentTypeGetInteger& operator=(const CEventAttachmentTypeGetInteger&) = default;
 
 		static inline constexpr int vtp = 0x766C80;
 		static inline constexpr int TypeDesc = 0x8079EC;
@@ -358,10 +340,6 @@ namespace GGL {
 		int Data = 0;
 
 		CEventAttachmentTypeInteger(shok::EventIDs e, shok::AttachmentType t, int d);
-		CEventAttachmentTypeInteger(CEventAttachmentTypeInteger&&) = default;
-		CEventAttachmentTypeInteger(const CEventAttachmentTypeInteger&) = default;
-		CEventAttachmentTypeInteger& operator=(CEventAttachmentTypeInteger&&) = default;
-		CEventAttachmentTypeInteger& operator=(const CEventAttachmentTypeInteger&) = default;
 
 		// no vtable/identifier/typedesc?
 		static constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
@@ -383,10 +361,6 @@ namespace GGL {
 		int Index;
 
 		CEventEntityIndex(shok::EventIDs e, shok::EntityId eid, int ind);
-		CEventEntityIndex(CEventEntityIndex&&) = default;
-		CEventEntityIndex(const CEventEntityIndex&) = default;
-		CEventEntityIndex& operator=(CEventEntityIndex&&) = default;
-		CEventEntityIndex& operator=(const CEventEntityIndex&) = default;
 
 		static inline constexpr int vtp = 0x766C90;
 		static inline constexpr int TypeDesc = 0x807A20;
@@ -399,10 +373,6 @@ namespace GGL {
 		float BuyAmount; // 4
 
 		CEventTransaction(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm);
-		CEventTransaction(CEventTransaction&&) = default;
-		CEventTransaction(const CEventTransaction&) = default;
-		CEventTransaction& operator=(CEventTransaction&&) = default;
-		CEventTransaction& operator=(const CEventTransaction&) = default;
 
 		static inline constexpr int vtp = 0x76D93C;
 		static inline constexpr int TypeDesc = 0x80E0E0;
@@ -427,10 +397,6 @@ namespace GGL {
 		shok::EntityTypeId Type1, Type2;
 
 		CEventPositionAnd2EntityTypes(shok::EventIDs e, const shok::Position& p, shok::EntityTypeId t1, shok::EntityTypeId t2);
-		CEventPositionAnd2EntityTypes(CEventPositionAnd2EntityTypes&&) = default;
-		CEventPositionAnd2EntityTypes(const CEventPositionAnd2EntityTypes&) = default;
-		CEventPositionAnd2EntityTypes& operator=(CEventPositionAnd2EntityTypes&&) = default;
-		CEventPositionAnd2EntityTypes& operator=(const CEventPositionAnd2EntityTypes&) = default;
 
 		static inline constexpr int vtp = 0x76D94C;
 		static inline constexpr int TypeDesc = 0x80E104;
@@ -444,10 +410,6 @@ namespace GGL {
 		shok::EventIDs DetachEvent;
 
 		CEventEntityAttachment(shok::EventIDs e, shok::AttachmentType ty, shok::EntityId eid, shok::EventIDs detach);
-		CEventEntityAttachment(CEventEntityAttachment&&) = default;
-		CEventEntityAttachment(const CEventEntityAttachment&) = default;
-		CEventEntityAttachment& operator=(CEventEntityAttachment&&) = default;
-		CEventEntityAttachment& operator=(const CEventEntityAttachment&) = default;
 
 		static inline constexpr int vtp = 0x770844;
 		static inline constexpr int TypeDesc = 0x8129E0;
@@ -474,32 +436,86 @@ namespace GGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x199C7D73);
 	};
 
-	class CEventHeroAbilityInteger : public EGL::CEventGetValue_Int {
+	class CEventHeroAbilityInteger : public EGL::CEventValue_Int {
 	public:
 		shok::AbilityId Ability;
 
-		CEventHeroAbilityInteger(shok::EventIDs id, shok::AbilityId ab);
+		CEventHeroAbilityInteger(shok::EventIDs id, int data, shok::AbilityId ab);
+
+		static inline constexpr int vtp = 0x773DE8;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1AF5F87D);
+	};
+
+	class CEventHeroAbilityGetInteger : public EGL::CEventGetValue_Int {
+	public:
+		shok::AbilityId Ability;
+
+		CEventHeroAbilityGetInteger(shok::EventIDs id, shok::AbilityId ab);
 
 		static inline constexpr int vtp = 0x773DF8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8A68CFDD);
 	};
-}
 
-// GGL::CEventHeroAbilityInteger -> valueint
-// GGL::CEventHeroAbilityGetInteger -> getvalueint
+	class CEventPlayerIDInteger : public EGL::CEventPlayerID {
+	public:
+		int Data;
+
+		CEventPlayerIDInteger(shok::EventIDs id, shok::PlayerId pl, int d);
+
+		static inline constexpr int vtp = 0x76D964;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1C477393);
+	};
+
+	class CEventSourceTargetPlayerID : public BB::CEvent, public EGL::IEventSourcePlayerID, public EGL::IEventTargetPlayerID {
+	public:
+		shok::PlayerId Source, Target;
+
+		CEventSourceTargetPlayerID(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t);
+		virtual shok::PlayerId GetSourcePlayer() const override;
+		virtual shok::PlayerId GetTargetPlayer() const override;
+
+		static inline constexpr int vtp = 0x76F8BC;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7EC9E7E3);
+	};
+
+	class IEventDiplomacyState {
+	public:
+		virtual shok::DiploState GetState() const = 0;
+	};
+	class CEventDiplomacyChanged : public CEventSourceTargetPlayerID, public IEventDiplomacyState {
+	public:
+		shok::DiploState NewState;
+
+		CEventDiplomacyChanged(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t, shok::DiploState n);
+		virtual shok::DiploState GetState() const override;
+
+		static inline constexpr int vtp = 0x76F8E4;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8CAF40C3);
+	};
+
+	class CEventWeatherStateChanged : public BB::CEvent {
+	public:
+		shok::WeatherState Old, New;
+
+		CEventWeatherStateChanged(shok::EventIDs id, shok::WeatherState o, shok::WeatherState n);
+
+		static inline constexpr int vtp = 0x770130;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5ACF5113);
+	};
+
+	class CEventBridgeProgress : public EGL::CEventPlayerID {
+	public:
+		float Progress;
+
+		CEventBridgeProgress(shok::EventIDs id, shok::PlayerId pl, float p = 0.0f);
+
+		static inline constexpr int vtp = 0x770494;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x22B0BE17);
+	};
+}
 
 // ENetworkX::CEventBase probably never used, since servers are down
 
-// EGL::CEventSoundPositionAndID
-// EGL::CEventAnimation : BB::CEvent
-
-// GGL::CEventPlayerIDInteger -> EGL::CEventPlayerID 76D964
-// EGL::CEventPositionAndEntity 76E150
-// GGL::CEventSourceTargetPlayerID 76F8BC
-// GGL::CEventDiplomacyChanged -> GGL::CEventSourceTargetPlayerID 76F8E4
-// GGL::CEventChangeMotivation -> EGL::CEventValue<float,1278362727> 76F904
-// GGL::CEventWeatherStateChanged 770130
-// GGL::CEventBridgeProgress -> EGL::CEventPlayerID 770494
 // EGL::CEventEntityGetBool
 // EGL::CEventPlayerGetBool
 // GGL::CEventTributePaid
@@ -521,7 +537,6 @@ namespace GGL {
 // GGL::CEventKegInfo
 // GGL::CEventGetPositionFromID
 // GGL::CEventIndex
-// EGL::CEventAnimation
 // EGL::CEventEntityInRangeOfEntity
 
 
@@ -668,7 +683,7 @@ namespace CppLogic::Events {
 		bool VCPop, Cost, Motivation, Alarm;
 		bool HQPop;
 
-		CanBuySettlerEvent(shok::EventIDs e, shok::EntityId buyat, shok::EntityId target, shok::EntityTypeId tobuy, bool vc, bool cost, bool moti, bool alarm, bool hqpop=true);
+		CanBuySettlerEvent(shok::EventIDs e, shok::EntityId buyat, shok::EntityId target, shok::EntityTypeId tobuy, bool vc, bool cost, bool moti, bool alarm, bool hqpop = true);
 
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
@@ -973,7 +988,7 @@ namespace shok {
 		IsSettlerOrBuilding = 0x18008, //EGL::CEventGetValue<bool, 1709081367>
 		IsSerfOrWorker = 0x18009, //EGL::CEventGetValue<bool, 1709081367>
 		DefendableBuilding_CanAlarmModeBeActivated = 0x1800A, // EGL::CEventGetValue<bool, 1709081367>
-		IsMilitaryBuilding =  0x1800B, //EGL::CEventGetValue<bool,1709081367> building & (ofCategory Military | MilitaryBuilding)
+		IsMilitaryBuilding = 0x1800B, //EGL::CEventGetValue<bool,1709081367> building & (ofCategory Military | MilitaryBuilding)
 		IsRefiner = 0x1800C, //EGL::CEventGetValue<bool, 1709081367>
 		IsThief = 0x1800D, //EGL::CEventGetValue<bool, 1709081367>
 
@@ -987,11 +1002,11 @@ namespace shok {
 		LimitedAttachment_Activate = 0x1A009, //GGL::CEventAttachmentType
 		LimitedAttachment_DeActivate = 0x1A00A, //GGL::CEventAttachmentType
 
-		LogicEvent_DiplomacyChanged = 0x1C002,
+		LogicEvent_DiplomacyChanged = 0x1C002, // GGL::CEventDiplomacyChanged (only fired by netevent)
 		LogicEvent_TributePaid = 0x1C003,
 		LogicEvent_ResearchDone = 0x1C004,
 		LogicEvent_TradeCompleted = 0x1C005,
-		LogicEvent_WeatherChanged = 0x1C006,
+		LogicEvent_WeatherChanged = 0x1C006, // GGL::CEventWeatherStateChanged
 		LogicEvent_HurtEntity = 0x1C007, // original EGL::CEvent2Entities, now CppLogic::Events::AdvHurtEvent (subclass)
 
 		Animal_FleeFrom = 0x1E002, // EGL::CEventPosition

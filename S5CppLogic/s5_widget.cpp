@@ -485,11 +485,64 @@ EGUIX::CTextButtonWidget* EGUIX::CTextButtonWidget::Create()
     r->IsShown = false;
     return r;
 }
+BB::SerializationData textbuttonwid_seridataaddon[] = {
+    BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(EGUIX::CTextButtonWidget), nullptr, nullptr),
+    BB::SerializationData::FieldData("CenterText", MemberSerializationFieldData(EGUIX::CTextButtonWidget, CppLogic_CenterText)),
+    BB::SerializationData::GuardData(),
+};
+void __declspec(naked) textbuttonwid_fixtextrenderasm() {
+    __asm {
+        lea eax, [ebp - 0x20];
+        push eax;
+        lea ecx, [ebx - 14 * 4];
+        call EGUIX::CTextButtonWidget::CenterRenderArea;
+
+        push 0x55F15D;
+        ret;
+    };
+}
+void __declspec(naked) textbuttonwid_ctorasm() {
+    __asm {
+        mov dword ptr[esi], 0x780DB0;
+        mov byte ptr[esi + 190 * 4], 0;
+        mov byte ptr[esi + 190 * 4 + 1], 1;
+
+        push 0x55EFD9;
+        ret;
+    };
+}
+void __declspec(naked) textbuttonwid_cloneasm() {
+    __asm {
+        mov ax, [edi + 190 * 4];
+        mov[esi + 190 * 4], ax;
+
+        push 0x55F5D4;
+        ret;
+    };
+}
 void EGUIX::CTextButtonWidget::HookFixTextRender()
 {
-    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x55F14F), 0x55F17C - 0x55F14F };
-    CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x55F14F), reinterpret_cast<void*>(0x55F15D));
+    CppLogic::Hooks::SaveVirtualProtect vp{ 0x100, {
+        reinterpret_cast<void*>(0x55F14F),
+        reinterpret_cast<void*>(0x55F16A),
+        reinterpret_cast<void*>(0x55EFD3),
+        reinterpret_cast<void*>(0x55F5C8),
+    } };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55F14F), &textbuttonwid_fixtextrenderasm, reinterpret_cast<void*>(0x55F15D));
     CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x55F16A), reinterpret_cast<void*>(0x55F17C));
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55EFD3), &textbuttonwid_ctorasm, reinterpret_cast<void*>(0x55EFD9));
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55F5C8), &textbuttonwid_cloneasm, reinterpret_cast<void*>(0x55F5D4));
+    BB::CClassFactory* f = *BB::CClassFactory::GlobalObj;
+    auto& info = f->Info.at(Identifier);
+    textbuttonwid_seridataaddon[0].SubElementData = info.SData;
+    info.SData = textbuttonwid_seridataaddon;
+}
+void EGUIX::CTextButtonWidget::CenterRenderArea(Rect* render) const
+{
+    if (CppLogic_CenterText) {
+        float y = shok::UIRenderer::GlobalObj()->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y;
+        render->Y += (y - 1.0f) * 8.0f;
+    }
 }
 
 static inline void(__thiscall* const progbarwid_ctor)(EGUIX::CProgressBarWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CProgressBarWidget*)>(0x55E300);

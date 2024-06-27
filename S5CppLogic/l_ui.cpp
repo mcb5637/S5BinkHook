@@ -422,6 +422,15 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int TextButtonSetCenterText(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* b = BB::IdentifierCast<EGUIX::CTextButtonWidget>(L.CheckWidget(1));
+		if (b == nullptr)
+			throw lua::LuaException{ "no textbutton" };
+		b->CppLogic_CenterText = L.CheckBool(2);
+		return 0;
+	}
+
 	int ContainerWidgetCreateStaticWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
@@ -1737,6 +1746,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<ButtonGetShortcutString>("ButtonGetShortcutString"),
 		lua::FuncReference::GetRef<ButtonSetShortcutString>("ButtonSetShortcutString"),
 		lua::FuncReference::GetRef<WidgetSetGroup>("WidgetSetGroup"),
+		lua::FuncReference::GetRef<TextButtonSetCenterText>("TextButtonSetCenterText"),
 		lua::FuncReference::GetRef<FontGetConfig>("FontGetConfig"),
 		lua::FuncReference::GetRef<FontSetConfig>("FontSetConfig"),
 		lua::FuncReference::GetRef<PreLoadGUITexture>("PreLoadGUITexture"),

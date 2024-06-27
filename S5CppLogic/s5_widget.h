@@ -318,8 +318,8 @@ namespace EGUIX {
 	public:
 		EGUIX::CWidgetStringHelper StringHelper; // la 170
 		EGUIX::CLuaFunctionHelper UpdateFunction;
-		bool UpdateManualFlag;
-		PADDING(3);
+		bool UpdateManualFlag, CppLogic_CenterText;
+		PADDING(2);
 
 		static inline constexpr int vtp = 0x780DB0;
 		static inline constexpr int TypeDesc = 0x82DF3C;
@@ -327,7 +327,12 @@ namespace EGUIX {
 
 		static EGUIX::CTextButtonWidget* Create();
 		static void HookFixTextRender();
+	private:
+		void CenterRenderArea(Rect* render) const;
 	};
+	static_assert(offsetof(CTextButtonWidget, StringHelper.StringFrameDistance) == (14+151) * 4);
+	static_assert(offsetof(CTextButtonWidget, UpdateManualFlag) == 190 * 4);
+	static_assert(sizeof(CTextButtonWidget) == 191 * 4);
 
 	class CContainerWidget : public EGUIX::CBaseWidget, public IRender, public IWidgetRegistrationCallback { // irender 15
 	public:

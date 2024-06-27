@@ -428,6 +428,12 @@ namespace shok {
 	enum class ClassId : unsigned int {
 		Invalid = 0xEEFFFFFF, // guranteed to not appear in shok
 	};
+	constexpr std::strong_ordering operator<=>(ClassId a, ClassId b) {
+		return static_cast<int>(static_cast<unsigned int>(a)) <=> static_cast<int>(static_cast<unsigned int>(b));
+	}
+	constexpr bool operator==(ClassId a, ClassId b) {
+		return (a <=> b) == std::strong_ordering::equal;
+	}
 	enum class GUITextureId : int {
 		Invalid = 0,
 	};

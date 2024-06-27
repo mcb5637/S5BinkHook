@@ -288,23 +288,16 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x49BE76)());
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x5DD085A6));
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto* w = L.CheckWidget(1);
-	L.Push((int)w->GetUpdateManualFlag());
-	L.Push((int)w->GetUpdateFunc());
-	L.Push((int)w->GetButtonHelper());
-	L.Push((int)w->GetTooltipHelper());
-	L.Push((int)w->GetStringHelper());
-	L.Push((int)w->GetMaterial(0));
-	L.Push((int)w->GetMaterial(1));
-	L.Push((int)w->GetMaterial(10));
-	return 8;
+	auto* w = static_cast<EGUIX::CTextButtonWidget*>(L.CheckWidget(1));
+	auto* wc = static_cast<EGUIX::CTextButtonWidget*>( w->Clone());
+	return 0;
 }
 
 int GetOptions(lua::State L) {

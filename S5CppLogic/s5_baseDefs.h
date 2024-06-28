@@ -132,7 +132,9 @@ namespace BB {
 	constexpr shok::ClassId InvalidIdentifier = shok::ClassId::Invalid; // guranteed to not appear in shok
 
 	template<class T>
-	concept HasValidIdentifier = std::is_same_v<decltype(T::Identifier), const shok::ClassId> && T::Identifier != BB::InvalidIdentifier;
+	struct IdentifierInvalid : std::false_type {};
+	template<class T>
+	concept HasValidIdentifier = std::is_same_v<decltype(T::Identifier), const shok::ClassId> && T::Identifier != BB::InvalidIdentifier && !IdentifierInvalid<T>::value;
 
 	class IObject {
 	public:

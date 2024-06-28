@@ -57,6 +57,12 @@ EGL::CEventEntityGetBool::CEventEntityGetBool(shok::EventIDs e, shok::EntityId e
 	Entity = eid;
 }
 
+EGL::CEventPlayerGetBool::CEventPlayerGetBool(shok::EventIDs e, shok::PlayerId pid)
+	: CEventGetValue_Bool(e), Player(pid)
+{
+	SetVT(vtp);
+}
+
 shok::EntityId EGL::CEvent1Entity::GetEntityID() const
 {
 	return EntityID;
@@ -129,6 +135,13 @@ void* __stdcall EGL::CEvent2Entities::CastToIdentifier(shok::ClassId id)
 	return nullptr;
 }
 
+EGL::CEventEntityInRangeOfEntity::CEventEntityInRangeOfEntity(shok::EventIDs id, shok::EntityId aid, shok::EntityId tid, float r)
+	: CEvent2Entities(id, aid, tid), Range(r)
+{
+	SetVT(vtp);
+	*reinterpret_cast<int*>(static_cast<EGL::IEvent2Entities*>(this)) = 0x784CE4;
+}
+
 EGL::CEventThousandthsGetInteger::CEventThousandthsGetInteger(shok::EventIDs e, int thousands)
 	: BB::CEvent(e)
 {
@@ -169,6 +182,18 @@ EGL::CEventAnimation::CEventAnimation(shok::EventIDs id, shok::AnimationId anim,
 
 EGL::CEventPositionAndEntity::CEventPositionAndEntity(shok::EventIDs id, const shok::Position& p, shok::EntityId e)
 	: BB::CEvent(id), Pos(p), Entity(e)
+{
+	SetVT(vtp);
+}
+
+EGL::CEvent1Effect::CEvent1Effect(shok::EventIDs id, shok::EffectId e)
+	: BB::CEvent(id), Effect(e)
+{
+	SetVT(vtp);
+}
+
+EGL::CEventUVAnim::CEventUVAnim(shok::EventIDs id, int idx, bool a)
+	: BB::CEvent(id), SlotIndex(idx), Activate(a)
 {
 	SetVT(vtp);
 }
@@ -294,6 +319,76 @@ GGL::CEventWeatherStateChanged::CEventWeatherStateChanged(shok::EventIDs id, sho
 
 GGL::CEventBridgeProgress::CEventBridgeProgress(shok::EventIDs id, shok::PlayerId pl, float p)
 	: EGL::CEventPlayerID(id, pl), Progress(p)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventTributePaid::CEventTributePaid(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t, int tid)
+	: CEventSourceTargetPlayerID(id, s, t), TributeID(tid)
+{
+	SetVT(vtp);
+}
+int GGL::CEventTributePaid::GetTributeID() const
+{
+	return TributeID;
+}
+
+GGL::CEventOfferBase::CEventOfferBase(shok::EventIDs id, const shok::CostInfo& c, int am)
+	: BB::CEvent(id), Cost(c), Amount(am)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventMercenaryOffer::CEventMercenaryOffer(shok::EventIDs id, const shok::CostInfo& c, int am, shok::EntityTypeId t)
+	: CEventOfferBase(id, c, am), LeaderType(t)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventGetMercenaryOffer::CEventGetMercenaryOffer(shok::EventIDs id, int idx)
+	: CEventMercenaryOffer(id, shok::CostInfo{}, 0, shok::EntityTypeId::Invalid), Index(idx)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventTechOffer::CEventTechOffer(shok::EventIDs id, const shok::CostInfo& c, int am, shok::TechnologyId t)
+	: CEventOfferBase(id, c, am), Tech(t)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventGetTechOffer::CEventGetTechOffer(shok::EventIDs id, int idx)
+	: CEventTechOffer(id, shok::CostInfo{}, 0, shok::TechnologyId::Invalid), Index(idx)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventAttachmentType::CEventAttachmentType(shok::EventIDs id, shok::AttachmentType at)
+	: BB::CEvent(id), Attachment(at)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventKegInfo::CEventKegInfo(shok::EventIDs id, shok::EntityId t)
+	: BB::CEvent(id), TargetBuilding(t)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventGetPositionFromID::CEventGetPositionFromID(shok::EventIDs id, int i)
+	: BB::CEvent(id), ID(i)
+{
+	SetVT(vtp);
+}
+
+EGUIX::CEventUpdateTime::CEventUpdateTime(shok::EventIDs id, float t)
+	: BB::CEvent(id), Time(t)
+{
+	SetVT(vtp);
+}
+
+EGUIX::CGroupEvent::CGroupEvent(shok::EventIDs id, shok::WidgetGroupId g)
+	: BB::CEvent(id), Group(g)
 {
 	SetVT(vtp);
 }

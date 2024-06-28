@@ -140,10 +140,20 @@ namespace EGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB5641427);
 	};
 
+	class CEventPlayerGetBool : public CEventGetValue_Bool {
+	public:
+		shok::PlayerId Player;
+
+		CEventPlayerGetBool(shok::EventIDs e, shok::PlayerId pid);
+
+		static inline constexpr int vtp = 0x7704C4;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF0B177D3);
+	};
 
 	class IEventEntityID {
 	public:
 		virtual shok::EntityId GetEntityID() const = 0;
+
 		static inline constexpr int vtp = 0x766B34;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x4E0C8853);
 	};
@@ -187,6 +197,7 @@ namespace EGL {
 	class IEventPlayerID {
 	public:
 		virtual shok::PlayerId GetPlayerID() const = 0;
+
 		static inline constexpr int vtp = 0x76D788;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7B28CFC3);
 	};
@@ -239,6 +250,16 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x80E0BC;
 		static inline constexpr int vtp_IEvent2Entities = 0x76D920;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+	};
+
+	class CEventEntityInRangeOfEntity : public CEvent2Entities {
+	public:
+		float Range;
+
+		CEventEntityInRangeOfEntity(shok::EventIDs id, shok::EntityId aid, shok::EntityId tid, float r);
+
+		static inline constexpr int vtp = 0x784CF0;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEDDB5003);
 	};
 
 	class CEventThousandthsGetInteger : public BB::CEvent {
@@ -315,10 +336,35 @@ namespace EGL {
 	class IEventSourcePlayerID {
 	public:
 		virtual shok::PlayerId GetSourcePlayer() const = 0;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCA98953);
 	};
 	class IEventTargetPlayerID {
 	public:
 		virtual shok::PlayerId GetTargetPlayer() const = 0;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9CCC2873);
+	};
+
+	class CEvent1Effect : public BB::CEvent {
+	public:
+		shok::EffectId Effect;
+
+		CEvent1Effect(shok::EventIDs id, shok::EffectId e);
+
+		static inline constexpr int vtp = 0x784644;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x38FA92DD);
+	};
+
+	class CEventUVAnim : public BB::CEvent {
+	public:
+		int SlotIndex;
+		bool Activate;
+
+		CEventUVAnim(shok::EventIDs id, int idx, bool a);
+
+		static inline constexpr int vtp = 0x772B74;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x396E174D);
 	};
 }
 
@@ -347,7 +393,7 @@ namespace GGL {
 	class CEventAttachmentTypeGetBool : public BB::CEvent {
 	public:
 		shok::AttachmentType AttachmentType;
-		bool Data = 0;
+		bool Data = false;
 
 		CEventAttachmentTypeGetBool(shok::EventIDs e, shok::AttachmentType t);
 
@@ -481,6 +527,8 @@ namespace GGL {
 	class IEventDiplomacyState {
 	public:
 		virtual shok::DiploState GetState() const = 0;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5AEF0063);
 	};
 	class CEventDiplomacyChanged : public CEventSourceTargetPlayerID, public IEventDiplomacyState {
 	public:
@@ -512,32 +560,143 @@ namespace GGL {
 		static inline constexpr int vtp = 0x770494;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x22B0BE17);
 	};
+
+	class IEventTributeUniqueID {
+	public:
+		virtual int GetTributeID() const = 0;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2B171D53);
+	};
+	class CEventTributePaid : public CEventSourceTargetPlayerID, public IEventTributeUniqueID {
+	public:
+		int TributeID;
+
+		CEventTributePaid(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t, int tid);
+		virtual int GetTributeID() const override;
+
+		static inline constexpr int vtp = 0x770534;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6116B233);
+	};
+	static_assert(offsetof(CEventTributePaid, TributeID) == 7 * 4);
+
+	class CEventOfferBase : public BB::CEvent {
+	public:
+		shok::CostInfo Cost;
+		int Amount;
+
+		CEventOfferBase(shok::EventIDs id, const shok::CostInfo& c, int am);
+
+		static inline constexpr int vtp = 0x777970;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+	};
+
+	class CEventMercenaryOffer : public CEventOfferBase {
+	public:
+		shok::EntityTypeId LeaderType;
+
+		CEventMercenaryOffer(shok::EventIDs id, const shok::CostInfo& c, int am, shok::EntityTypeId t);
+
+		static inline constexpr int vtp = 0x777980;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB30ADB63);
+	};
+
+	class CEventGetMercenaryOffer : public CEventMercenaryOffer {
+	public:
+		int Index;
+
+		CEventGetMercenaryOffer(shok::EventIDs id, int idx);
+
+		static inline constexpr int vtp = 0x777990;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x4E0A45E3);
+	};
+
+	class CEventTechOffer : public CEventOfferBase {
+	public:
+		shok::TechnologyId Tech;
+
+		CEventTechOffer(shok::EventIDs id, const shok::CostInfo& c, int am, shok::TechnologyId t);
+
+		static inline constexpr int vtp = 0x7779A0;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x26529723);
+	};
+
+	class CEventGetTechOffer : public CEventTechOffer {
+	public:
+		int Index;
+
+		CEventGetTechOffer(shok::EventIDs id, int idx);
+
+		static inline constexpr int vtp = 0x7779B0;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF237ED73);
+	};
+
+	class CEventAttachmentType : public BB::CEvent {
+	public:
+		shok::AttachmentType Attachment;
+
+		CEventAttachmentType(shok::EventIDs id, shok::AttachmentType at);
+
+		static inline constexpr int vtp = 0x776EE0;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8745CA77);
+	};
+
+	class CEventKegInfo : public BB::CEvent {
+	public:
+		shok::EntityId TargetBuilding;
+
+		CEventKegInfo(shok::EventIDs id, shok::EntityId t);
+
+		static inline constexpr int vtp = 0x776398;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEAF8187);
+	};
+
+	class CEventGetPositionFromID : public BB::CEvent {
+	public:
+		shok::Position Pos;
+		int ID;
+
+		CEventGetPositionFromID(shok::EventIDs id, int i);
+
+		static inline constexpr int vtp = 0x7777B8;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+	};
+}
+
+// for some reason these 2 have the same identifier
+template<>
+struct BB::IdentifierInvalid<GGL::CEventAttachmentType> : std::true_type {};
+template<>
+struct BB::IdentifierInvalid<GGL::CEventAttachmentTypeGetBool> : std::true_type {};
+
+namespace EGUIX {
+	class CEventUpdateTime : public BB::CEvent {
+	public:
+		float Time; // what exactly?
+
+		CEventUpdateTime(shok::EventIDs id, float t);
+
+		static inline constexpr int vtp = 0x780630;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+	};
+
+	class CGroupEvent : public BB::CEvent {
+	public:
+		shok::WidgetGroupId Group;
+
+		CGroupEvent(shok::EventIDs id, shok::WidgetGroupId g);
+
+		static inline constexpr int vtp = 0x781188;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+	};
 }
 
 // ENetworkX::CEventBase probably never used, since servers are down
 
-// EGL::CEventEntityGetBool
-// EGL::CEventPlayerGetBool
-// GGL::CEventTributePaid
-// GGL::CEventOfferBase
-// GGL::CEventMercenaryOffer GGL::CEventGetMercenaryOffer
-// GGL::CEventTechOffer GGL::CEventGetTechOffer
 // EGL::CEventRowColumn GGL::CEventGetRowColumn
 // ECore::CECoreEventInteger
-// EGUIX::CEventUpdateTime
-// EGUIX::CGroupEvent
-// EGL::CEvent1Effect
 
-// GGL::CEventEntityAttachment
-// GGL::CEventAttachmentType
-// GGL::CEventAttachmentTypeGetBool
-// EGL::CEventUVAnim
-// EGL::CEventGetPosition
 // GGL::CEventFollowInfo
-// GGL::CEventKegInfo
-// GGL::CEventGetPositionFromID
-// GGL::CEventIndex
-// EGL::CEventEntityInRangeOfEntity
+// GGL::CEventIndex deprecated, used only by GGL::CBehaviorFieldDoodad
 
 
 namespace BB {
@@ -1084,7 +1243,7 @@ namespace shok {
 
 		MouseEnter = 0x50001,
 		MouseLeave = 0x50002,
-		AutoUpdate = 0x50003,
+		AutoUpdate = 0x50003, // EGUIX::CEventUpdateTime
 		ManualUpdate = 0x50004,
 		UnHighlightGroup = 0x50005, // EGUIX::CGroupEvent
 		WidgetShow = 0x50006,

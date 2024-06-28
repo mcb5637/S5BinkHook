@@ -40,21 +40,21 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Render(EGUIX::CCustomWidget* wid
 		if (Widgets.empty())
 			return;
 		EGUIX::Rect texcoords = PartialWidget.TextureCoordinates;
-		float childsiz = Widgets[0]->PosAndSize.H + IntegerUserVariable0;
+		float childsiz = Widgets[0]->PosAndSize.H + ScollableSpacing();
 		auto rend = shok::UIRenderer::GlobalObj();
 		EGUIX::Rect containerpos = WidgetContainer->CalcGlobalPosAndSize();
 		EGUIX::Rect r = Widgets[0]->PosAndSize;
 		r.X = containerpos.X + Widgets[0]->PosAndSize.X;
-		r.Y = containerpos.Y + IntegerUserVariable0;
-		r.H = UIOffset() * childsiz - IntegerUserVariable0;
+		r.Y = containerpos.Y + ScollableSpacing();
+		r.H = UIOffset() * childsiz - ScollableSpacing();
 		float texoff = (Widgets[0]->PosAndSize.H - r.H) / Widgets[0]->PosAndSize.H * PartialWidget.TextureCoordinates.H;
 		PartialWidget.TextureCoordinates.Y += texoff;
 		PartialWidget.TextureCoordinates.H -= texoff;
 		if (r.H > 1.0f)
 			rend->RenderMaterial(&PartialWidget, true, &r);
 		PartialWidget.TextureCoordinates = texcoords;
-		r.Y += r.H + IntegerUserVariable0;
-		r.H = containerpos.H - IntegerUserVariable0 * 3 - r.H;
+		r.Y += r.H + ScollableSpacing();
+		r.H = containerpos.H - ScollableSpacing() * 3 - r.H;
 		for (const auto w : Widgets) {
 			if (w->IsShown) {
 				r.Y += childsiz;
@@ -114,7 +114,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 {
 	auto* mng = EGUIX::WidgetManager::GlobalObj();
 	if (Widgets.empty()) {
-		auto id = mng->GetIdByName(StringUserVariable[1].c_str());
+		auto id = mng->GetIdByName(ScollableName().c_str());
 		if (id == shok::WidgetId::Invalid)
 			return;
 		auto* w = mng->GetWidgetByID(id);
@@ -130,7 +130,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 			PartialWidget.Color.Alpha = 0;
 		}
 
-		id = mng->GetIdByName(StringUserVariable[0].c_str());
+		id = mng->GetIdByName(SliderName().c_str());
 		if (id == shok::WidgetId::Invalid) {
 			Slider = mng->GetWidgetByID(id);
 			if (Slider) {
@@ -139,7 +139,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 		}
 	}
 	auto* cwid = mng->GetWidgetByID(WidgetId);
-	float childs = Widgets[0]->PosAndSize.H + IntegerUserVariable0;
+	float childs = Widgets[0]->PosAndSize.H + ScollableSpacing();
 	WidgetCount = static_cast<int>(WidgetContainer->PosAndSize.H / childs);
 	for (int o = Widgets.size(); o < std::min(WidgetCount, ElementCount); ++o) {
 		Widgets.push_back(WidgetContainer->CloneAsChild(Widgets[0], [o](const char* n, EGUIX::CBaseWidget* w) {
@@ -153,8 +153,8 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 
 void CppLogic::Mod::UI::AutoScrollCustomWidget::Update()
 {
-	float childsiz = Widgets[0]->PosAndSize.H + IntegerUserVariable0;
-	float cpos = IntegerUserVariable0 + UIOffset() * childsiz;
+	float childsiz = Widgets[0]->PosAndSize.H + ScollableSpacing();
+	float cpos = ScollableSpacing() + UIOffset() * childsiz;
 	int curri = 0;
 	for (auto* w : Widgets) {
 		if (curri < std::min(WidgetCount, ElementCount) && cpos + childsiz <= WidgetContainer->PosAndSize.H) {
@@ -258,8 +258,8 @@ void* __stdcall CppLogic::Mod::UI::TextInputCustomWidget::CastToIdentifier(shok:
 void CppLogic::Mod::UI::TextInputCustomWidget::Initialize()
 {
 	const char* f = "Data\\Menu\\Fonts\\standard10.met";
-	if (StringUserVariable[1].size() > 0)
-		f = StringUserVariable[1].c_str();
+	if (FontName().size() > 0)
+		f = FontName().c_str();
 	Font.LoadFont(f);
 }
 
@@ -271,13 +271,13 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Destroy()
 void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
 {
 	auto rend = shok::UIRenderer::GlobalObj();
-	EGUIX::Color col{ *reinterpret_cast<shok::Color*>(&IntegerUserVariable4) };
+	EGUIX::Color col{ *reinterpret_cast<const shok::Color*>(&BackgroundColor()) };
 	if (col.Alpha > 0) {
 		EGUIX::CMaterial m{};
 		m.Color = col;
 		rend->RenderMaterial(&m, true, screenCoords);
 	}
-	col = EGUIX::Color{ *reinterpret_cast<shok::Color*>(&IntegerUserVariable2) };
+	col = EGUIX::Color{ *reinterpret_cast<const shok::Color*>(&TextColor()) };
 	if (col.Alpha == 0) {
 		col = EGUIX::Color{};
 	}
@@ -285,7 +285,7 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 	if (!HasFocus())
 		return;
 	if (!(static_cast<int>(shok::GetCurrentTimeFloat() * 3.0f) & 1)) {
-		col = EGUIX::Color{ *reinterpret_cast<shok::Color*>(&IntegerUserVariable3) };
+		col = EGUIX::Color{ *reinterpret_cast<const shok::Color*>(&BlinkColor()) };
 		if (col.Alpha == 0) {
 			col.Red = 100;
 			col.Green = 100;
@@ -318,25 +318,25 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 	else if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
 		return true;
 	}
-	else if (ev->IsEvent(shok::InputEventIds::MouseWheel) && IntegerUserVariable5 != 0) {
+	else if (ev->IsEvent(shok::InputEventIds::MouseWheel) && ScrollDelta() != 0) {
 		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 			std::string r{};
 			bool changed = false;
-			if (IntegerUserVariable0 == 2 || IntegerUserVariable0 == 4) {
+			if (Mode() == Modes::Int || Mode() == Modes::UInt) {
 				int i = 0;
 				std::from_chars(CurrentTextDisplay.data(), CurrentTextDisplay.data() + CurrentTextDisplay.size(), i);
-				i += me->Delta > 0 ? IntegerUserVariable5 : -IntegerUserVariable5;
-				if (IntegerUserVariable0 == 4) {
+				i += me->Delta > 0 ? ScrollDelta() : -ScrollDelta();
+				if (Mode() == Modes::UInt) {
 					i = std::max(0, i);
 				}
 				r = std::format("{}", i);
 				changed = true;
 			}
-			else if (IntegerUserVariable0 == 3 || IntegerUserVariable0 == 5) {
+			else if (Mode() == Modes::Double || Mode() == Modes::UDouble) {
 				double i = 0;
 				std::from_chars(CurrentTextDisplay.data(), CurrentTextDisplay.data() + CurrentTextDisplay.size(), i);
-				i += me->Delta > 0 ? IntegerUserVariable5 : -IntegerUserVariable5;
-				if (IntegerUserVariable0 == 5) {
+				i += me->Delta > 0 ? ScrollDelta() : -ScrollDelta();
+				if (Mode() == Modes::UDouble) {
 					i = std::max(0.0, i);
 				}
 				r = std::format("{}", i);
@@ -344,8 +344,8 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			}
 			if (changed) {
 				bool adv = true;
-				if (IntegerUserVariable1 & static_cast<int>(Event::Validate)) {
-					if (!CallFunc(StringUserVariable[0], Event::Validate)) {
+				if (HasFlag(Event::Validate)) {
+					if (!CallFunc(EventFunc(), Event::Validate)) {
 						return true;
 					}
 				}
@@ -354,7 +354,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 				RefreshDisplayText();
 				
 				if (!HasFocus()) {
-					CallFunc(StringUserVariable[0], Event::Confirm);
+					CallFunc(EventFunc(), Event::Confirm);
 				}
 			}
 		}
@@ -377,8 +377,8 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			else if (me->IsKey(shok::Keys::Escape)) {
 				ClearFocus();
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
-				if (IntegerUserVariable1 & static_cast<int>(Event::Cancel))
-					CallFunc(StringUserVariable[0], Event::Cancel);
+				if (HasFlag(Event::Cancel))
+					CallFunc(EventFunc(), Event::Cancel);
 			}
 			else if (me->IsKey(shok::Keys::Left)) {
 				if (CurrentPos > 0)
@@ -392,7 +392,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			}
 			else if (me->IsKey(shok::Keys::Enter)) {
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
-				CallFunc(StringUserVariable[0], Event::Confirm);
+				CallFunc(EventFunc(), Event::Confirm);
 			}
 		}
 		return true;
@@ -407,13 +407,13 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 		}
 		if (auto* me = BB::IdentifierCast<BB::CKeyPressEvent>(ev)) {
 			char c = static_cast<char>(me->KeyChar);
-			if (IntegerUserVariable0 == 3 && c == ',')
+			if ((Mode() == Modes::Double || Mode() == Modes::UDouble) && c == ',')
 				c = '.';
 			if (CharValid(c)) {
 				CurrentTextRaw.insert(CurrentPos, 1, c);
 				bool adv = true;
-				if (IntegerUserVariable1 & static_cast<int>(Event::Validate)) {
-					if (!CallFunc(StringUserVariable[0], Event::Validate)) {
+				if (HasFlag(Event::Validate)) {
+					if (!CallFunc(EventFunc(), Event::Validate)) {
 						CurrentTextRaw.erase(CurrentTextRaw.begin() + CurrentPos);
 						adv = false;
 					}
@@ -443,16 +443,16 @@ void CppLogic::Mod::UI::TextInputCustomWidget::operator delete(void* p)
 bool CppLogic::Mod::UI::TextInputCustomWidget::CharValid(char c) const
 {
 	static std::locale l("C");
-	if (IntegerUserVariable0 == 2) {
+	if (Mode() == Modes::Int) {
 		return std::isdigit(c, l) || (c == '-' && NegativeNumberValid());
 	}
-	if (IntegerUserVariable0 == 4) {
+	if (Mode() == Modes::UInt) {
 		return std::isdigit(c, l);
 	}
-	if (IntegerUserVariable0 == 3) {
+	if (Mode() == Modes::Double) {
 		return std::isdigit(c, l) || (c == '-' && NegativeNumberValid()) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
 	}
-	if (IntegerUserVariable0 == 5) {
+	if (Mode() == Modes::UDouble) {
 		return std::isdigit(c, l) || (c == '.' && CurrentTextRaw.find('.') == std::string::npos);
 	}
 	if (c == '@')
@@ -474,7 +474,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::NegativeNumberValid() const
 void CppLogic::Mod::UI::TextInputCustomWidget::RefreshDisplayText()
 {
 	CurrentTextDisplay.clear();
-	if (IntegerUserVariable0 == 1) {
+	if (Mode() == Modes::Password) {
 		CurrentTextDisplay.append(CurrentTextRaw.length(), '*');
 		return;
 	}
@@ -553,19 +553,19 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 			bool writeback = false;
 
 			if (RotateRight) {
-				cam->HorizontalAngle -= static_cast<float>(widget->UserVariable[0]) * 0.25f;
+				cam->HorizontalAngle -= static_cast<float>(CurrentSensitivity(widget)) * 0.25f;
 			}
 			if (RotateLeft) {
-				cam->HorizontalAngle += static_cast<float>(widget->UserVariable[0]) * 0.25f;
+				cam->HorizontalAngle += static_cast<float>(CurrentSensitivity(widget)) * 0.25f;
 			}
 			if (RotateUp) {
-				cam->VerticalAngle -= static_cast<float>(widget->UserVariable[0]) * 0.25f;
+				cam->VerticalAngle -= static_cast<float>(CurrentSensitivity(widget)) * 0.25f;
 			}
 			if (RotateDown) {
-				cam->VerticalAngle += static_cast<float>(widget->UserVariable[0]) * 0.25f;
+				cam->VerticalAngle += static_cast<float>(CurrentSensitivity(widget)) * 0.25f;
 			}
 			ClampCamera(cam);
-			shok::Position move{ static_cast<float>(widget->UserVariable[0] * 10), 0.0f };
+			shok::Position move{ static_cast<float>(CurrentSensitivity(widget) * 10), 0.0f };
 
 			if (Forward) {
 				p += move.Rotate(CppLogic::DegreesToRadians(cam->HorizontalAngle + 90.0f));
@@ -598,8 +598,8 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 			}
 		}
 		else {
-			cam->VerticalAngle += std::min(std::max(static_cast<float>(MouseStartY - MouseY) / 20 * 8, -1.0f), 1.0f);
-			cam->HorizontalAngle += std::min(std::max(static_cast<float>(MouseX - MouseStartX) / 20 * 8, -1.0f), 1.0f);
+			cam->VerticalAngle += MouseInverted(widget) * std::min(std::max(static_cast<float>(MouseStartY - MouseY) / 20 * 8, -1.0f), 1.0f);
+			cam->HorizontalAngle += MouseInverted(widget) * std::min(std::max(static_cast<float>(MouseX - MouseStartX) / 20 * 8, -1.0f), 1.0f);
 			ClampCamera(cam);
 
 			float d = 0.0f;
@@ -609,7 +609,7 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 				d = -1.0f;
 
 			if (d != 0.0f) {
-				d *= static_cast<float>(widget->UserVariable[0] * 10);
+				d *= static_cast<float>(CurrentSensitivity(widget) * 10);
 
 				float pitch = CppLogic::DegreesToRadians(cam->VerticalAngle);
 				float yaw = CppLogic::DegreesToRadians(cam->HorizontalAngle);
@@ -637,8 +637,8 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 	if (CheckFocusEvent(ev))
 		return false;
 	if (ev->IsEvent(shok::InputEventIds::WidgetShow)) {
-		if (widget->UserVariable[0] == 0) {
-			widget->UserVariable[0] = IntegerUserVariable0;
+		if (CurrentSensitivity(widget) == 0) {
+			CurrentSensitivity(widget) = DefaultScrollSpeed();
 		}
 		return false;
 	}
@@ -700,7 +700,7 @@ bool CppLogic::Mod::UI::FreeCamCustomWidget::HandleEvent(EGUIX::CCustomWidget* w
 	}
 	else if (ev->IsEvent(shok::InputEventIds::MouseWheel)) {
 		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
-			widget->UserVariable[0] = std::max(0, widget->UserVariable[0] + (me->Delta > 0 ? 5 : -5));
+			CurrentSensitivity(widget) = std::max(0, CurrentSensitivity(widget) + (me->Delta > 0 ? 5 : -5));
 		}
 		return true;
 	}

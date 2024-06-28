@@ -2541,6 +2541,12 @@ function CppLogic.UI.ButtonGetShortcutString(wid) end
 --- @param isSTTKey boolean|nil (optional, default false) if true, sets this as string table text key
 function CppLogic.UI.ButtonSetShortcutString(wid, str, isSTTKey) end
 
+--- sets, if text in a text button is centered vertically. true by default, code for this added by CppLogic.
+---@param wid widget
+---@param centered boolean
+---@diagnostic disable-next-line: duplicate-set-field
+function CppLogic.UI.TextButtonSetCenterText(wid, centered) end
+
 --- sets a widgets group.
 --- @param wid widget
 --- @param group string group name

@@ -37,6 +37,16 @@ namespace CppLogic::Mod::UI {
 		void ReInit();
 		void Update();
 		void Clamp();
+
+		inline const shok::String& SliderName() const {
+			return StringUserVariable[0];
+		}
+		inline const shok::String& ScollableName() const {
+			return StringUserVariable[1];
+		}
+		inline int ScollableSpacing() const {
+			return IntegerUserVariable0;
+		}
 	private:
 		void UpdateBySlider(int x, int y);
 		bool ClickedOnSlider(int x, int y);
@@ -56,12 +66,20 @@ namespace CppLogic::Mod::UI {
 	};
 
 	class TextInputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
+	public:
 		enum class Event : int {
 			Confirm = 0,
 			Cancel = 1,
 			Validate = 2,
 		};
-	public:
+		enum class Modes : int {
+			Normal = 0,
+			Password = 1,
+			Int = 2,
+			Double = 3,
+			UInt = 4,
+			UDouble = 5,
+		};
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
@@ -85,11 +103,40 @@ namespace CppLogic::Mod::UI {
 		std::string ClearTextOutput() const;
 		void RefreshDisplayText();
 
+		inline shok::String& EventFunc() {
+			return StringUserVariable[0];
+		}
+		inline const shok::String& FontName() const {
+			return StringUserVariable[1];
+		}
+		inline Modes Mode() const {
+			return static_cast<Modes>(IntegerUserVariable0);
+		}
+		inline Event Flags() const {
+			return static_cast<Event>(IntegerUserVariable1);
+		}
+		inline bool HasFlag(Event f) const {
+			return static_cast<int>(Flags()) & static_cast<int>(f);
+		}
+		inline const int& TextColor() const {
+			return IntegerUserVariable2;
+		}
+		inline const int& BlinkColor() const {
+			return IntegerUserVariable3;
+		}
+		inline const int& BackgroundColor() const {
+			return IntegerUserVariable4;
+		}
+		inline int ScrollDelta() const {
+			return IntegerUserVariable5;
+		}
 	private:
 		bool CharValid(char c) const;
 		bool NegativeNumberValid() const;
 		bool CallFunc(std::string_view funcname, Event ev);
 	};
+	template<>
+	class ::enum_is_flags<TextInputCustomWidget::Event> : public std::true_type {};
 
 	class FreeCamCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
 		enum class MouseStatus : uint8_t {
@@ -122,6 +169,16 @@ namespace CppLogic::Mod::UI {
 		float LastTick = 0;
 		int MouseStartX = 0, MouseStartY = 0;
 		int MouseX = 0, MouseY = 0;
+
+		inline float MouseInverted(const EGUIX::CCustomWidget* cw) const {
+			return cw->UserVariable[1] ? 1.0f : -1.0f;
+		}
+		inline int& CurrentSensitivity(EGUIX::CCustomWidget* cw) {
+			return cw->UserVariable[0];
+		}
+		inline int DefaultScrollSpeed() const {
+			return IntegerUserVariable0;
+		}
 
 		static void ClampCamera(ERwTools::CRwCameraHandler* cam);
 		static void ClampLookAt(ERwTools::CRwCameraHandler* cam);

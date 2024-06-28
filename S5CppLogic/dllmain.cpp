@@ -372,7 +372,7 @@ void InitGame() {
 		Framework::CampagnInfo::HookLoad();
 }
 
-constexpr double Version = 2.0100;
+constexpr double Version = 2.0200;
 
 int ResetCppLogic(lua::State L) {
 	L.Push("CppLogic");

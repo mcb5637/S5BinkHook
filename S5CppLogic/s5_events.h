@@ -366,6 +366,15 @@ namespace EGL {
 		static inline constexpr int vtp = 0x772B74;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x396E174D);
 	};
+
+	class CEventRowColumn : public BB::CEvent {
+	public:
+		int Row;
+		int PositionInRow;
+
+		static inline constexpr int vtp = 0x7784CC;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x14F60517);
+	};
 }
 
 namespace GGL {
@@ -660,6 +669,27 @@ namespace GGL {
 		static inline constexpr int vtp = 0x7777B8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
 	};
+
+	class CEventFollowInfo : public BB::CEvent {
+	public:
+		shok::EntityId Target;
+		float SuccessDistance, FailureDistance;
+		int TimeOutMS;
+
+		CEventFollowInfo(shok::EventIDs id, float sd, float fd, int toms);
+
+		static inline constexpr int vtp = 0x775F88;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF7B40837);
+	};
+
+	class CEventGetRowColumn : public BB::CEvent {
+	public:
+		int Row;
+		int PositionInRow;
+
+		static inline constexpr int vtp = 0x7784DC;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+	};
 }
 
 // for some reason these 2 have the same identifier
@@ -690,12 +720,21 @@ namespace EGUIX {
 	};
 }
 
+namespace ECore {
+	class CECoreEventInteger : public BB::CEvent {
+	public:
+		int Value; // what exactly?
+
+		CECoreEventInteger(shok::EventIDs id, int v);
+
+		static inline constexpr int vtp = 0x77F2F0;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC35CA433);
+	};
+}
+
 // ENetworkX::CEventBase probably never used, since servers are down
 
-// EGL::CEventRowColumn GGL::CEventGetRowColumn
-// ECore::CECoreEventInteger
-
-// GGL::CEventFollowInfo
+// EGL::CEventRowColumn GGL::CEventGetRowColumn, used only by GGL::CBehaviorFieldDoodad
 // GGL::CEventIndex deprecated, used only by GGL::CBehaviorFieldDoodad
 
 
@@ -1160,6 +1199,25 @@ namespace shok {
 		LimitedAttachment_GetFree = 0x1A008, //GGL::CEventAttachmentTypeGetInteger
 		LimitedAttachment_Activate = 0x1A009, //GGL::CEventAttachmentType
 		LimitedAttachment_DeActivate = 0x1A00A, //GGL::CEventAttachmentType
+
+		// 0x1B002 fielddoodad get some index that is sowable?
+		// 0x1B003 fielddoodad get resource doodad
+		CropDoodad_SowingFinished = 0x1B004, //BB::CEvent
+		// 0x1B005 resdoodad EGL::CEventGetValue<bool,1709081367> is valid sowing target? required & !finished & !locked
+		FieldDoodad_OnPlantDetach = 0x1B008, //EGL::CEvent1Entity
+		CropDoodad_SetRowColum = 0x1B00A, //EGL::CEventRowColumn
+		CropDoodad_GetRowColum = 0x1B00B, //GGL::CEventGetRowColumn
+		// 0x1B00C cropdoodad BB::CEvent cropdooad->0x1B010 on field GGL::CEventIndex with row as param
+		FieldDoodad_SowingFinished = 0x1B00D,//GGL::CEventIndex forward to 0x1B004
+		// 0x1B00E cropdoodad onlocked on field GGL::CEventIndex with row as param
+		// 0x1B00E fielddoodad forward to 0x1B00F
+		CropDoodad_Lock = 0x1B00F, //BB::CEvent
+		// 0x1B010 fielddoodad forward to 0x1B011
+		CropDoodad_UnLock = 0x1B011, //BB::CEvent
+		// fielddoodad 0x1B012 some tick?
+		// fielddoodad 0x1B013 also tick?
+		// fielddoodad 0x1B014 get unknown field 5? GGL::CEventGetGoodType
+		// 0x1B015 cropdoodad EGL::CEventGetValue<int,1211121895> some type of tick? returns new id?
 
 		LogicEvent_DiplomacyChanged = 0x1C002, // GGL::CEventDiplomacyChanged (only fired by netevent)
 		LogicEvent_TributePaid = 0x1C003,

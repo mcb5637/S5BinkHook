@@ -381,6 +381,12 @@ GGL::CEventGetPositionFromID::CEventGetPositionFromID(shok::EventIDs id, int i)
 	SetVT(vtp);
 }
 
+GGL::CEventFollowInfo::CEventFollowInfo(shok::EventIDs id, float sd, float fd, int toms)
+	: BB::CEvent(id), SuccessDistance(sd), FailureDistance(fd), TimeOutMS(toms)
+{
+	SetVT(vtp);
+}
+
 EGUIX::CEventUpdateTime::CEventUpdateTime(shok::EventIDs id, float t)
 	: BB::CEvent(id), Time(t)
 {
@@ -389,6 +395,12 @@ EGUIX::CEventUpdateTime::CEventUpdateTime(shok::EventIDs id, float t)
 
 EGUIX::CGroupEvent::CGroupEvent(shok::EventIDs id, shok::WidgetGroupId g)
 	: BB::CEvent(id), Group(g)
+{
+	SetVT(vtp);
+}
+
+ECore::CECoreEventInteger::CECoreEventInteger(shok::EventIDs id, int v)
+	: BB::CEvent(id), Value(v)
 {
 	SetVT(vtp);
 }

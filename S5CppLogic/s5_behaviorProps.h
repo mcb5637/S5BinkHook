@@ -696,4 +696,34 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x8298A4;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD915E0E7);
 	};
+
+	class CGLBehaviorFieldDoodadProps : public EGL::CGLEBehaviorProps {
+	public:
+		shok::EntityTypeId Crop;
+		PADDINGI(1);
+		shok::Goods Good;
+		int NumCropsInRow, NumberOfRows;
+		float CropSpacing, RowSpacing;
+		int NumFlowers;
+		shok::Vector<shok::EntityTypeId> Flower;
+
+		static inline constexpr int vtp = 0x77856C;
+		static inline constexpr int TypeDesc = 0x8259C0;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9819CF67);
+	};
+	static_assert(offsetof(CGLBehaviorFieldDoodadProps, Crop) == 4 * 4);
+	static_assert(offsetof(CGLBehaviorFieldDoodadProps, NumFlowers) == 4 * 11);
+	static_assert(sizeof(CGLBehaviorFieldDoodadProps) == 16 * 4);
+
+	class CGLBehaviorCropDoodadProps : public EGL::CGLEBehaviorProps {
+	public:
+		shok::EntityTypeId NextPhaseCrop;
+		int PhaseTime;
+		bool RequiresSowing;
+
+		static inline constexpr int vtp = 0x778774;
+		static inline constexpr int TypeDesc = 0x826438;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x59979187);
+	};
+	static_assert(sizeof(CGLBehaviorCropDoodadProps) == 7 * 4);
 }

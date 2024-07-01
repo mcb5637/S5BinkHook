@@ -1459,6 +1459,41 @@ namespace GGL {
 	};
 	static_assert(offsetof(CAlphaBlendingBehavior, StartAlpha) == 20);
 
+	class CBehaviorFieldDoodad : public EGL::CGLEBehavior {
+	public:
+		shok::EntityTypeId Crop;
+		PADDINGI(1);
+		shok::Goods Good;
+		int NumCropsInRow, NumberOfRows;
+		float CropSpacing, RowSpacing;
+
+		// 14 vector of entities
+
+		static inline constexpr int vtp = 0x77853C;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x31E2EBD7);
+	};
+	static_assert(offsetof(CBehaviorFieldDoodad, Crop) == 4 * 4);
+	static_assert(offsetof(CBehaviorFieldDoodad, RowSpacing) == 10 * 4);
+
+	class CBehaviorCropDoodad : public EGL::CGLEBehavior {
+	public:
+		int CreationTurn;
+		shok::EntityTypeId NextCropType; // serialized as int
+		int PhaseTime;
+		bool IsSowingRequired, IsSowingFinished;
+		int Row;
+		int PositionInRow;
+		bool IsLocked;
+
+		// defined events: CropDoodad_XXX
+		
+		// FireEventOnField 0x50997F thiscall(BB::CEvent*)
+
+		static inline constexpr int vtp = 0x7786F4;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8BCFE1F7);
+	};
+	static_assert(offsetof(CBehaviorCropDoodad, IsLocked) == 10 * 4);
+	static_assert(sizeof(CBehaviorCropDoodad) == 11 * 4);
 
 	// these belong to serf behavior
 	class CPositionAtResourceFinder {

@@ -77,7 +77,7 @@ void CheckEnum(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs)
 }
 
 BB::FieldSerilaizer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId> };
-BB::FieldSerilaizer::ExtendedInfo InfoEntityType{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId> };
+BB::FieldSerilaizer::ExtendedInfo InfoEntityType{ "shok::EntityTypeId", &PushInt, &CheckEnum<shok::EntityTypeId> };
 BB::FieldSerilaizer::ExtendedInfo InfoModel{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId> };
 BB::FieldSerilaizer::ExtendedInfo InfoAnim{ "shok::AnimationId", &PushInt, &CheckEnum<shok::AnimationId> };
 BB::FieldSerilaizer::ExtendedInfo InfoDamageClass{ "shok::DamageClassId", &PushInt, &CheckEnum<shok::DamageClassId> };
@@ -98,6 +98,7 @@ BB::FieldSerilaizer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventIds",
 BB::FieldSerilaizer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", &PushInt, &CheckEnum<shok::FeedbackStateId> };
 BB::FieldSerilaizer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", &PushInt, &CheckEnum<shok::AbilityId> };
 BB::FieldSerilaizer::ExtendedInfo InfoArmorClassId{ "shok::ArmorClassId", &PushInt, &CheckEnum<shok::ArmorClassId> };
+BB::FieldSerilaizer::ExtendedInfo InfoTerrainTypeId{ "shok::TerrainTypeId", &PushInt, &CheckEnum<shok::TerrainTypeId> };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
     L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -179,6 +180,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x839AB0, &InfoBool},
     {0x83578c, &InfoBool},
     {0x82F6E0, &InfoBool},
+    {0x8267a4, &InfoBool},
 
     {0x810C98, &InfoInt},
     {0x800108, &InfoInt},
@@ -209,9 +211,12 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x82F700, &InfoInt},
     {0x839f30, &InfoInt},
     {0x828fb0, &InfoInt},
+    {0x825e74, &InfoInt},
+    {0x8267e4, &InfoInt},
 
     {0x85D4AC, &InfoTasklist},
     {0x85D4D0, &InfoEntityType},
+    {0x85f258, &InfoEntityType},
     {0x8585C0, &InfoModel},
     {0x86057C, &InfoAnim},
     {0xA0C868, &InfoAnim},
@@ -234,6 +239,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x8804B8, &InfoFeedbackStateId},
     {0x883088, &InfoAbilityId},
     {0x85D5CC, &InfoArmorClassId},
+    {0x8792e0, &InfoTerrainTypeId},
 
     {0x810D18, &InfoAccessCategory},
 
@@ -277,6 +283,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
     {0x83CBFC, &InfoFloat},
     {0x828f90, &InfoFloat},
     {0x8171f0, &InfoFloat},
+    {0x825e54, &InfoFloat},
 
     {0x82BB38, &InfoDouble},
     {0x8000E0, &InfoDouble},

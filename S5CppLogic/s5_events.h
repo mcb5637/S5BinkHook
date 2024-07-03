@@ -372,6 +372,8 @@ namespace EGL {
 		int Row;
 		int PositionInRow;
 
+		CEventRowColumn(shok::EventIDs id, int r, int c);
+
 		static inline constexpr int vtp = 0x7784CC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x14F60517);
 	};
@@ -676,7 +678,7 @@ namespace GGL {
 		float SuccessDistance, FailureDistance;
 		int TimeOutMS;
 
-		CEventFollowInfo(shok::EventIDs id, float sd, float fd, int toms);
+		CEventFollowInfo(shok::EventIDs id, shok::EntityId t, float sd, float fd, int toms);
 
 		static inline constexpr int vtp = 0x775F88;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF7B40837);
@@ -684,10 +686,23 @@ namespace GGL {
 
 	class CEventGetRowColumn : public BB::CEvent {
 	public:
-		int Row;
-		int PositionInRow;
+		int Row = 0;
+		int PositionInRow = 0;
+
+		CEventGetRowColumn(shok::EventIDs id);
 
 		static inline constexpr int vtp = 0x7784DC;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
+	};
+
+	class CEventIndex : public BB::CEvent {
+	public:
+		int Index;
+		int Data = 0;
+
+		CEventIndex(shok::EventIDs id, int idx);
+
+		static inline constexpr int vtp = 0x778718;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
 	};
 }
@@ -734,10 +749,6 @@ namespace ECore {
 
 // ENetworkX::CEventBase probably never used, since servers are down
 
-// EGL::CEventRowColumn GGL::CEventGetRowColumn, used only by GGL::CBehaviorFieldDoodad
-// GGL::CEventIndex deprecated, used only by GGL::CBehaviorFieldDoodad
-
-
 namespace BB {
 	class CInputEvent : public BB::CEvent {
 	public:
@@ -745,10 +756,6 @@ namespace BB {
 		PADDING(3);
 
 		CInputEvent(shok::InputEventIds id);
-		CInputEvent(CInputEvent&&) = default;
-		CInputEvent(const CInputEvent&) = default;
-		CInputEvent& operator=(CInputEvent&&) = default;
-		CInputEvent& operator=(const CInputEvent&) = default;
 
 		static inline constexpr int TypeDesc = 0x7FFE3C;
 		static inline constexpr int vtp = 0x762124;
@@ -762,10 +769,6 @@ namespace BB {
 		int X, Y, Delta; // mousepos, delta is parameter of mousewheel
 
 		BB::CMouseEvent(shok::InputEventIds id, shok::Keys keydata, int clicks, int x, int y, int delta);
-		BB::CMouseEvent(BB::CMouseEvent&&) = default;
-		BB::CMouseEvent(const BB::CMouseEvent&) = default;
-		BB::CMouseEvent& operator=(BB::CMouseEvent&&) = default;
-		BB::CMouseEvent& operator=(const BB::CMouseEvent&) = default;
 
 		bool IsKey(shok::Keys key);
 		bool IsModifier(shok::Keys mod);
@@ -780,10 +783,6 @@ namespace BB {
 		shok::Keys KeyData;
 
 		CKeyEvent(shok::InputEventIds id, shok::Keys keydata);
-		CKeyEvent(CKeyEvent&&) = default;
-		CKeyEvent(const CKeyEvent&) = default;
-		CKeyEvent& operator=(CKeyEvent&&) = default;
-		CKeyEvent& operator=(const CKeyEvent&) = default;
 
 		bool IsKey(shok::Keys key);
 		bool IsModifier(shok::Keys mod);
@@ -799,23 +798,12 @@ namespace BB {
 		shok::Keys KeyModifier;
 
 		CKeyPressEvent(shok::InputEventIds id, int keychar, shok::Keys keymodif);
-		CKeyPressEvent(CKeyPressEvent&&) = default;
-		CKeyPressEvent(const CKeyPressEvent&) = default;
-		CKeyPressEvent& operator=(CKeyPressEvent&&) = default;
-		CKeyPressEvent& operator=(const CKeyPressEvent&) = default;
 
 		static inline constexpr int TypeDesc = 0x7FFE78;
 		static inline constexpr int vtp = 0x762144;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x77699AE0);
 	};
 }
-
-//constexpr int i = offsetof(BB::CMouseEvent, KeyData) / 4;
-
-//struct EGL::EventHandler : shok_object {
-//	void* Object;
-//	void(__thiscall* Func)(void* th, BB::CEvent* ev);
-//};
 
 namespace CppLogic::Events {
 	class AdvHurtEvent : public EGL::CEvent2Entities {

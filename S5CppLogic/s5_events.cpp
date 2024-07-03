@@ -198,6 +198,12 @@ EGL::CEventUVAnim::CEventUVAnim(shok::EventIDs id, int idx, bool a)
 	SetVT(vtp);
 }
 
+EGL::CEventRowColumn::CEventRowColumn(shok::EventIDs id, int r, int c)
+	: BB::CEvent(id), Row(r), PositionInRow(c)
+{
+	SetVT(vtp);
+}
+
 GGL::CEventAttachmentTypeGetInteger::CEventAttachmentTypeGetInteger(shok::EventIDs e, shok::AttachmentType t) : BB::CEvent(e)
 {
 	SetVT(GGL::CEventAttachmentTypeGetInteger::vtp);
@@ -381,8 +387,20 @@ GGL::CEventGetPositionFromID::CEventGetPositionFromID(shok::EventIDs id, int i)
 	SetVT(vtp);
 }
 
-GGL::CEventFollowInfo::CEventFollowInfo(shok::EventIDs id, float sd, float fd, int toms)
-	: BB::CEvent(id), SuccessDistance(sd), FailureDistance(fd), TimeOutMS(toms)
+GGL::CEventFollowInfo::CEventFollowInfo(shok::EventIDs id, shok::EntityId t, float sd, float fd, int toms)
+	: BB::CEvent(id), Target(t), SuccessDistance(sd), FailureDistance(fd), TimeOutMS(toms)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventGetRowColumn::CEventGetRowColumn(shok::EventIDs id)
+	: BB::CEvent(id)
+{
+	SetVT(vtp);
+}
+
+GGL::CEventIndex::CEventIndex(shok::EventIDs id, int idx)
+	: BB::CEvent(id), Index(idx)
 {
 	SetVT(vtp);
 }

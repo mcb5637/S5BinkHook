@@ -97,6 +97,10 @@ namespace BB {
 			return TypeInt;
 		}
 		template<>
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<unsigned int>() {
+			return TypeUInt;
+		}
+		template<>
 		static constexpr BB::FieldSerilaizer* GetSerilalizer<float>() {
 			return TypeFloat;
 		}
@@ -118,6 +122,7 @@ namespace BB {
 		std::string GetTypeDescName() const;
 
 		const ExtendedInfo& GetExtendedInfo() const;
+		const ExtendedInfo* GetOptExtendedInfo() const;
 	};
 
 	struct SerializationListOptions {

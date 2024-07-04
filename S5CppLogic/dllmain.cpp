@@ -51,6 +51,7 @@
 #include "ModUI.h"
 #include "ModConfig.h"
 #include "EnumIdManagerMagic.h"
+#include "SchemaGenerator.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -288,13 +289,14 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x8BCFE1F7));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x8BCFE1F7));
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
+	CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(L);
 	
 	return 1;
 }

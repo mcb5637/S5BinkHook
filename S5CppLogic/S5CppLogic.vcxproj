@@ -284,6 +284,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClInclude Include="s5_netevents.h" />
     <ClInclude Include="s5_scriptsystem.h" />
     <ClInclude Include="savegame_extra.h" />
+    <ClInclude Include="SchemaGenerator.h" />
     <ClInclude Include="StringUtility.h" />
     <ClInclude Include="WinAPIUtil.h" />
   </ItemGroup>
@@ -355,6 +356,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <ClCompile Include="s5_netevents.cpp" />
     <ClCompile Include="s5_scriptsystem.cpp" />
     <ClCompile Include="savegame_extra.cpp" />
+    <ClCompile Include="SchemaGenerator.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="WinAPIUtil.cpp" />
   </ItemGroup>

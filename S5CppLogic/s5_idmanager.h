@@ -88,6 +88,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const WaterTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0D9C8);
 		static inline BB::CIDManagerEx** const ShorewaveTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA19F34);
 		static inline BB::CIDManagerEx** const ModelManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C83C);
+		static inline BB::CIDManagerEx** const BuildingBannerManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C85C);
 	};
 	static_assert(sizeof(BB::CIDManagerEx) == 6 * 4);
 
@@ -96,6 +97,8 @@ namespace BB {
 		static inline constexpr int vtp = 0x76C028;
 
 		static inline BB::CIDManager** const WidgetIDManager = reinterpret_cast<BB::CIDManager**>(0x8945C8);
+		static inline BB::CIDManager** const GUITextureManager = reinterpret_cast<BB::CIDManager**>(0x8944B4);
+		static inline BB::CIDManager** const FontIDManager = reinterpret_cast<BB::CIDManager**>(0x894688);
 	};
 }
 
@@ -286,6 +289,18 @@ namespace CppLogic {
 	template<>
 	struct IdManagerMapping<shok::WidgetId> {
 		static inline BB::CIDManager** const Manager = BB::CIDManager::WidgetIDManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::BuildingBannerId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::BuildingBannerManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::GUITextureId> {
+		static inline BB::CIDManager** const Manager = BB::CIDManager::GUITextureManager;
+	};
+	template<>
+	struct IdManagerMapping<shok::FontId> {
+		static inline BB::CIDManager** const Manager = BB::CIDManager::FontIDManager;
 	};
 
 	template<class En>

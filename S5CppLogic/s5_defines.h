@@ -539,4 +539,7 @@ namespace shok {
 	enum class EffectId : int {
 		Invalid = 0,
 	};
+	enum class BuildingBannerId : int {
+		Invalid = 0,
+	};
 }

@@ -1099,6 +1099,8 @@ namespace EGUIX {
 
 	class CWidgetGroupManager : public IWidgetRegistrationCallback {
 	public:
+		BB::CIDManager* Manager;
+
 		shok::WidgetGroupId GetGroupId(const char* s);
 		shok::WidgetGroupId CreateGroup(const char* s);
 
@@ -1110,6 +1112,8 @@ namespace EGUIX {
 
 	class FontManager { // no vtable either
 	public:
+		BB::CIDManager* Manager;
+
 		static void LoadFont(shok::FontId* outFontID, const char* fontName);
 		RWE::P2D::Rt2dFont* GetFontObj(shok::FontId id);
 
@@ -1204,4 +1208,9 @@ template<>
 inline auto CppLogic::GetIdManager<shok::GUITextureId>() {
 	auto mng = EGUIX::TextureManager::GlobalObj();
 	return CppLogic::TextureIdManager{mng};
+}
+template<>
+inline auto CppLogic::GetIdManager<shok::WidgetGroupId>() {
+	auto mng = EGUIX::CWidgetGroupManager::GlobalObj();
+	return CppLogic::EnumIdManager<shok::WidgetGroupId>{ mng->Manager };
 }

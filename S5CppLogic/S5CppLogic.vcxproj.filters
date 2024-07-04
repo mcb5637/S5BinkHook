@@ -321,6 +321,9 @@
     <ClInclude Include="s5_video.h">
       <Filter>shok\ui</Filter>
     </ClInclude>
+    <ClInclude Include="SchemaGenerator.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -498,6 +501,9 @@
       <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="WinAPIUtil.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="SchemaGenerator.cpp">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>

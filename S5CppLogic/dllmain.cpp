@@ -296,9 +296,11 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(L);
+	BB::CFileStreamEx f{};
+	f.OpenFile("C:\\Users\\Marc\\source\\repos\\s5\\s5schemas\\classes.xsd", BB::IStream::Flags::DefaultWrite);
+	CppLogic::Serializer::SchemaGenerator::WriteRegisteredClassesSchema(f);// , static_cast<shok::ClassId>(0x84A88A7D));
 	
-	return 1;
+	return 0;
 }
 
 int GetOptions(lua::State L) {

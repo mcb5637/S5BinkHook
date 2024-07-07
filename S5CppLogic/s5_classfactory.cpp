@@ -70,45 +70,45 @@ void PushInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckInt(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	*static_cast<int*>(data) = L.CheckInt(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoInt{ "Int", &PushInt, &CheckInt };
+BB::FieldSerilaizer::ExtendedInfo InfoInt{ "Int", &PushInt, &CheckInt, "xs:int" };
 
 template<class En>
 void CheckEnum(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	*static_cast<En*>(data) = luaext::EState{ L }.CheckEnum<En>(idx, true);
 }
 
-BB::FieldSerilaizer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId> };
-BB::FieldSerilaizer::ExtendedInfo InfoTask{ "shok::Task", &PushInt, &CheckEnum<shok::Task> };
-BB::FieldSerilaizer::ExtendedInfo InfoEntityType{ "shok::EntityTypeId", &PushInt, &CheckEnum<shok::EntityTypeId> };
-BB::FieldSerilaizer::ExtendedInfo InfoModel{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId> };
-BB::FieldSerilaizer::ExtendedInfo InfoAnim{ "shok::AnimationId", &PushInt, &CheckEnum<shok::AnimationId> };
-BB::FieldSerilaizer::ExtendedInfo InfoDamageClass{ "shok::DamageClassId", &PushInt, &CheckEnum<shok::DamageClassId> };
-BB::FieldSerilaizer::ExtendedInfo InfoEffectType{ "shok::EffectTypeId", &PushInt, &CheckEnum<shok::EffectTypeId> };
-BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckEnum<shok::ResourceType> };
-BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategoryId", &PushInt, &CheckEnum<shok::UpgradeCategoryId> };
-BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyId", &PushInt, &CheckEnum<shok::TechnologyId> };
-BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundId", &PushInt, &CheckEnum<shok::SoundId> };
-BB::FieldSerilaizer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundId", &PushInt, &CheckEnum<shok::AmbientSoundId> };
-BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureId", &PushInt, &CheckEnum<shok::WeatherEffectTextureId> };
-BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTextureId", &PushInt, &CheckEnum<shok::TerrainTextureId> };
-BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategory", &PushInt, &CheckEnum<shok::EntityCategory> };
-BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &PushInt, &CheckInt };
-BB::FieldSerilaizer::ExtendedInfo InfoAnimCategory{ "shok::AnimationCategoryId", &PushInt, &CheckEnum<shok::AnimationCategoryId> };
-BB::FieldSerilaizer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckEnum<shok::Goods> };
-BB::FieldSerilaizer::ExtendedInfo InfoWidgetID{ "shok::WidgetId", &PushInt, &CheckEnum<shok::WidgetId> };
-BB::FieldSerilaizer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventIds", &PushInt, &CheckEnum<shok::FeedbackEventIds> };
-BB::FieldSerilaizer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", &PushInt, &CheckEnum<shok::FeedbackStateId> };
-BB::FieldSerilaizer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", &PushInt, &CheckEnum<shok::AbilityId> };
-BB::FieldSerilaizer::ExtendedInfo InfoArmorClassId{ "shok::ArmorClassId", &PushInt, &CheckEnum<shok::ArmorClassId> };
-BB::FieldSerilaizer::ExtendedInfo InfoTerrainTypeId{ "shok::TerrainTypeId", &PushInt, &CheckEnum<shok::TerrainTypeId> };
-BB::FieldSerilaizer::ExtendedInfo InfoBuildingBanner{ "shok::BuildingBannerId", &PushInt, &CheckEnum<shok::BuildingBannerId> };
-BB::FieldSerilaizer::ExtendedInfo InfoBlessCategoryId{ "shok::BlessCategoryId", &PushInt, &CheckEnum<shok::BlessCategoryId> };
-BB::FieldSerilaizer::ExtendedInfo InfoAttachmentType{ "shok::AttachmentType", &PushInt, &CheckEnum<shok::AttachmentType> };
-BB::FieldSerilaizer::ExtendedInfo InfoAnimSetId{ "shok::AnimSetId", &PushInt, &CheckEnum<shok::AnimSetId> };
-BB::FieldSerilaizer::ExtendedInfo InfoWidgetGroupId{ "shok::WidgetGroupId", &PushInt, &CheckEnum<shok::WidgetGroupId> };
-BB::FieldSerilaizer::ExtendedInfo InfoGUITextureId{ "shok::GUITextureId", &PushInt, &CheckEnum<shok::GUITextureId> };
-BB::FieldSerilaizer::ExtendedInfo InfoFontId{ "shok::FontId", &PushInt, &CheckEnum<shok::FontId> };
-BB::FieldSerilaizer::ExtendedInfo InfoPrincipalTaskId{ "shok::PrincipalTaskId", &PushInt, &CheckEnum<shok::PrincipalTaskId> };
+BB::FieldSerilaizer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoTask{ "shok::Task", &PushInt, &CheckEnum<shok::Task>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoEntityType{ "shok::EntityTypeId", &PushInt, &CheckEnum<shok::EntityTypeId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoModel{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoAnim{ "shok::AnimationId", &PushInt, &CheckEnum<shok::AnimationId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoDamageClass{ "shok::DamageClassId", &PushInt, &CheckEnum<shok::DamageClassId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoEffectType{ "shok::EffectTypeId", &PushInt, &CheckEnum<shok::EffectTypeId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckEnum<shok::ResourceType>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategoryId", &PushInt, &CheckEnum<shok::UpgradeCategoryId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyId", &PushInt, &CheckEnum<shok::TechnologyId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundId", &PushInt, &CheckEnum<shok::SoundId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundId", &PushInt, &CheckEnum<shok::AmbientSoundId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureId", &PushInt, &CheckEnum<shok::WeatherEffectTextureId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTextureId", &PushInt, &CheckEnum<shok::TerrainTextureId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategory", &PushInt, &CheckEnum<shok::EntityCategory>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &PushInt, &CheckInt, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoAnimCategory{ "shok::AnimationCategoryId", &PushInt, &CheckEnum<shok::AnimationCategoryId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckEnum<shok::Goods>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoWidgetID{ "shok::WidgetId", &PushInt, &CheckEnum<shok::WidgetId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventIds", &PushInt, &CheckEnum<shok::FeedbackEventIds>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", &PushInt, &CheckEnum<shok::FeedbackStateId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", &PushInt, &CheckEnum<shok::AbilityId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoArmorClassId{ "shok::ArmorClassId", &PushInt, &CheckEnum<shok::ArmorClassId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoTerrainTypeId{ "shok::TerrainTypeId", &PushInt, &CheckEnum<shok::TerrainTypeId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoBuildingBanner{ "shok::BuildingBannerId", &PushInt, &CheckEnum<shok::BuildingBannerId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoBlessCategoryId{ "shok::BlessCategoryId", &PushInt, &CheckEnum<shok::BlessCategoryId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoAttachmentType{ "shok::AttachmentType", &PushInt, &CheckEnum<shok::AttachmentType>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoAnimSetId{ "shok::AnimSetId", &PushInt, &CheckEnum<shok::AnimSetId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoWidgetGroupId{ "shok::WidgetGroupId", &PushInt, &CheckEnum<shok::WidgetGroupId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoGUITextureId{ "shok::GUITextureId", &PushInt, &CheckEnum<shok::GUITextureId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoFontId{ "shok::FontId", &PushInt, &CheckEnum<shok::FontId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoPrincipalTaskId{ "shok::PrincipalTaskId", &PushInt, &CheckEnum<shok::PrincipalTaskId>, "xs:string" };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -116,7 +116,7 @@ void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckUInt(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	*static_cast<unsigned int*>(data) = static_cast<unsigned int>(L.CheckNumber(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoUInt{ "unsigned Int", &PushUInt, &CheckUInt };
+BB::FieldSerilaizer::ExtendedInfo InfoUInt{ "unsigned Int", &PushUInt, &CheckUInt, "xs:unsignedInt" };
 
 void PushUByte(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(static_cast<double>(*static_cast<byte*>(data)));
@@ -124,7 +124,7 @@ void PushUByte(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckUByte(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	*static_cast<unsigned int*>(data) = static_cast<byte>(L.CheckNumber(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoUByte{ "unsigned Byte", &PushUByte, &CheckUByte };
+BB::FieldSerilaizer::ExtendedInfo InfoUByte{ "unsigned Byte", &PushUByte, &CheckUByte, "xs:unsignedByte" };
 
 void PushBool(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(*static_cast<bool*>(data));
@@ -132,7 +132,7 @@ void PushBool(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckBool(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	*static_cast<bool*>(data) = L.CheckBool(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoBool{ "Bool", &PushBool, &CheckBool };
+BB::FieldSerilaizer::ExtendedInfo InfoBool{ "Bool", &PushBool, &CheckBool, "xs:boolean" };
 
 void PushFloat(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(*static_cast<float*>(data));
@@ -140,7 +140,7 @@ void PushFloat(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckFloat(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	*static_cast<float*>(data) = L.CheckFloat(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoFloat{ "Float", &PushFloat, &CheckFloat };
+BB::FieldSerilaizer::ExtendedInfo InfoFloat{ "Float", &PushFloat, &CheckFloat, "xs:float" };
 
 void PushDouble(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(*static_cast<double*>(data));
@@ -148,7 +148,7 @@ void PushDouble(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckDouble(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	*static_cast<double*>(data) = L.CheckNumber(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoDouble{ "Double", &PushDouble, &CheckDouble };
+BB::FieldSerilaizer::ExtendedInfo InfoDouble{ "Double", &PushDouble, &CheckDouble, "xs:double" };
 
 void PushSString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(static_cast<shok::String*>(data)->c_str());
@@ -156,12 +156,12 @@ void PushSString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckSString(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	static_cast<shok::String*>(data)->assign(L.CheckString(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoString{ typename_details::type_name<shok::String>(), &PushSString, &CheckSString };
+BB::FieldSerilaizer::ExtendedInfo InfoString{ typename_details::type_name<shok::String>(), &PushSString, &CheckSString, "xs:string" };
 
 void PushCharBuff(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(*static_cast<const char**>(data));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoCharBuff{ "char*" , &PushCharBuff, &CheckUnknownValue }; // let the original xml variant alloc the mem
+BB::FieldSerilaizer::ExtendedInfo InfoCharBuff{ "char*" , &PushCharBuff, &CheckUnknownValue, "xs:string" }; // let the original xml variant alloc the mem
 
 void PushStdString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(static_cast<std::string*>(data)->c_str());
@@ -169,7 +169,7 @@ void PushStdString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 void CheckStdString(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
 	static_cast<std::string*>(data)->assign(L.CheckString(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoStdString{ typename_details::type_name<std::string>(), &PushStdString, &CheckStdString };
+BB::FieldSerilaizer::ExtendedInfo InfoStdString{ typename_details::type_name<std::string>(), &PushStdString, &CheckStdString, "xs:string" };
 
 void PushEntId(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(static_cast<int>((*static_cast<EGL::CGLEEntity**>(data))->EntityId));
@@ -178,9 +178,9 @@ void CheckEntId(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs
 	*static_cast<EGL::CGLEEntity**>(data) = luaext::EState{ L }.CheckEntity(idx);
 }
 // only to be used after entities are loaded
-BB::FieldSerilaizer::ExtendedInfo EntitySerializedById{ "EGL::CGLEEntity (by Id)", &PushEntId, &CheckEntId };
+BB::FieldSerilaizer::ExtendedInfo EntitySerializedById{ "EGL::CGLEEntity (by Id)", &PushEntId, &CheckEntId, "xs:int" };
 
-BB::FieldSerilaizer::ExtendedInfo InfoClassID{ "shok::ClassIdentifier", &PushUnknownValue, &CheckUnknownValue };
+BB::FieldSerilaizer::ExtendedInfo InfoClassID{ "shok::ClassIdentifier", &PushUnknownValue, &CheckUnknownValue, "xs:string" };
 
 BB::FieldSerilaizer::ExtendedInfo InfoLowResTerrainNode{ "EGL::CGLETerrainLowRes::TerrainNode (no binary)", &PushUnknownValue, &CheckUnknownValue };
 BB::FieldSerilaizer::ExtendedInfo InfoHiResTerrainNode{ "EGL::CGLETerrainHiRes::TerrainNode (no binary)", &PushUnknownValue, &CheckUnknownValue };

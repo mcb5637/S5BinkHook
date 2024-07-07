@@ -56,6 +56,15 @@ namespace BB {
 		virtual long __stdcall Read(void* buff, long numBytesToRead); // 10 returns num bytes read
 		virtual void __stdcall Seek(long seek, SeekMode mode);
 		virtual void __stdcall Write(const void* buff, long numBytesToWrite);
+
+		inline void Write(std::string_view data) {
+			Write(data.data(), data.length());
+		}
+		inline void Indent(size_t indent, char c = '\t') {
+			for (size_t i = 0; i < indent; ++i) {
+				Write(&c, 1);
+			}
+		}
 	};
 	template<>
 	class ::enum_is_flags<IStream::Flags> : public std::true_type {};

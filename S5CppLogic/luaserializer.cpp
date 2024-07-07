@@ -7,13 +7,13 @@
 void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(lua::State L, void* o, const BB::SerializationData* s, bool keypushed)
 {
 	switch (s->Type) {
-	case 2:
+	case BB::SerializationData::Ty::Direct:
 		if (!keypushed)
 			L.Push(s->SerializationName);
 		SerializePushField(L, o, s);
 		L.SetTableRaw(-3);
 		break;
-	case 3:
+	case BB::SerializationData::Ty::Embedded:
 		if (!keypushed)
 		L.Push(s->SerializationName);
 		L.NewTable();
@@ -22,10 +22,10 @@ void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(lua::State L, v
 
 		L.SetTableRaw(-3);
 		break;
-	case 6:
+	case BB::SerializationData::Ty::ObjectPointer:
 		o = *static_cast<void**>(o);
 		[[fallthrough]];
-	case 5:
+	case BB::SerializationData::Ty::ObjectEmbedded:
 		{
 			if (!keypushed)
 				L.Push(s->SerializationName);
@@ -117,7 +117,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(lua::State L, BB::IO
 void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(lua::State L, void* o, const BB::SerializationData* s, bool valuepushed)
 {
 	switch (s->Type) {
-	case 2:
+	case BB::SerializationData::Ty::Direct:
 		if (!valuepushed) {
 			L.Push(s->SerializationName);
 			L.GetTableRaw(-2);
@@ -129,7 +129,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(lua::State L,
 		if (!valuepushed)
 			L.Pop(1);
 		break;
-	case 3:
+	case BB::SerializationData::Ty::Embedded:
 		if (!valuepushed) {
 			L.Push(s->SerializationName);
 			L.GetTableRaw(-2);
@@ -141,10 +141,10 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(lua::State L,
 		if (!valuepushed)
 			L.Pop(1);
 		break;
-	case 6:
+	case BB::SerializationData::Ty::ObjectPointer:
 		o = *static_cast<void**>(o);
 		[[fallthrough]];
-	case 5:
+	case BB::SerializationData::Ty::ObjectEmbedded:
 	{
 		if (!valuepushed) {
 			L.Push(s->SerializationName);
@@ -270,7 +270,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua
 		L.Push(static_cast<int>(d->Size));
 		L.SetTableRaw(-3);
 
-		if (d->Type == 2) {
+		if (d->Type == BB::SerializationData::Ty::Direct) {
 			L.Push("DataType");
 			L.Push("Field");
 			L.SetTableRaw(-3);
@@ -278,7 +278,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua
 			L.Push(d->DataConverter->GetTypeDescName());
 			L.SetTableRaw(-3);
 		}
-		else if (d->Type == 3) {
+		else if (d->Type == BB::SerializationData::Ty::Embedded) {
 			L.Push("DataType");
 			L.Push("Embedded Object/Base Class");
 			L.SetTableRaw(-3);
@@ -286,12 +286,12 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua
 			DumpClassSerializationData(L, d->SubElementData);
 			L.SetTableRaw(-3);
 		}
-		else if (d->Type == 5) {
+		else if (d->Type == BB::SerializationData::Ty::ObjectEmbedded) {
 			L.Push("DataType");
 			L.Push("Embedded BB::IObject");
 			L.SetTableRaw(-3);
 		}
-		else if (d->Type == 6) {
+		else if (d->Type == BB::SerializationData::Ty::ObjectPointer) {
 			L.Push("DataType");
 			L.Push("BB::IObject *");
 			L.SetTableRaw(-3);

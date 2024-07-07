@@ -117,6 +117,7 @@ namespace BB {
 			std::string_view Name;
 			void (* const Push)(lua::State L, void* data, const FieldSerilaizer* fs);
 			void (* const Check)(lua::State L, void* data, int idx, const FieldSerilaizer* fs);
+			std::string_view XSDType;
 		};
 
 		std::string GetTypeDescName() const;
@@ -144,7 +145,15 @@ namespace BB {
 	};
 
 	struct SerializationData { // use a 0-terminated array (default constructed is 0)
-		int Type = 0; // 2 direct val (uses dataconverter), 3 embedded (uses subelement), 5 embedded bbobject, 6 p to bbobject (uses getidentifier or subelement)
+		enum class Ty : int {
+			Invalid = 0,
+			Direct = 2, // uses dataconverter
+			Embedded = 3, // uses subelement
+			ObjectEmbedded = 5,
+			ObjectPointer = 6, // uses getidentifier or subelement
+		};
+
+		Ty Type = Ty::Invalid;
 		const char* SerializationName = nullptr; // if not set, automatically follows subelementdata with a position of 0
 		size_t Position = 0;
 		size_t Size = 0;
@@ -159,18 +168,18 @@ namespace BB {
 	public:
 		static constexpr SerializationData FieldData(const char* name, size_t pos, size_t size, const BB::FieldSerilaizer* converter, const BB::SerializationListOptions* list = nullptr)
 		{
-			return SerializationData{ 2, name, pos, size, converter, nullptr, nullptr, list, 0 };
+			return SerializationData{ Ty::Direct, name, pos, size, converter, nullptr, nullptr, list, 0 };
 		}
 		static constexpr SerializationData EmbeddedData(const char* name, size_t pos, size_t size, const SerializationData* subdata, const BB::SerializationListOptions* list = nullptr)
 		{
-			return SerializationData{ 3, name, pos, size, nullptr, subdata, nullptr, list, 0 };
+			return SerializationData{ Ty::Embedded, name, pos, size, nullptr, subdata, nullptr, list, 0 };
 		}
 		static constexpr SerializationData GuardData()
 		{
-			return SerializationData{ 0, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, 0 };
+			return SerializationData{ Ty::Invalid, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, 0 };
 		}
 		static constexpr SerializationData ObjectPointerData(const char* name, size_t pos, size_t size, const BB::SerializationListOptions* list = nullptr) {
-			return SerializationData{ 6, name, pos, size, nullptr, nullptr, &GetBBIdentifier, list, 0 };
+			return SerializationData{ Ty::ObjectPointer, name, pos, size, nullptr, nullptr, &GetBBIdentifier, list, 0 };
 		}
 
 		static const SerializationData* GetSerializationData(shok::ClassId id);

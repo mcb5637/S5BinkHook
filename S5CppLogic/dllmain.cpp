@@ -51,7 +51,6 @@
 #include "ModUI.h"
 #include "ModConfig.h"
 #include "EnumIdManagerMagic.h"
-#include "SchemaGenerator.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -296,9 +295,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	BB::CFileStreamEx f{};
-	f.OpenFile("C:\\Users\\Marc\\source\\repos\\s5\\s5schemas\\classes.xsd", BB::IStream::Flags::DefaultWrite);
-	CppLogic::Serializer::SchemaGenerator::WriteRegisteredClassesSchema(f);// , static_cast<shok::ClassId>(0x84A88A7D));
+	
 	
 	return 0;
 }

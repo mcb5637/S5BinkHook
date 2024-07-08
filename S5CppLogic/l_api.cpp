@@ -20,6 +20,7 @@
 #include "s5_entity.h"
 #include "hooks.h"
 #include "luaext.h"
+#include "SchemaGenerator.h"
 
 namespace CppLogic::API {
 	void CheckEvalEnabled(lua::State L) {
@@ -451,7 +452,21 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 22> API{ {
+#ifdef _DEBUG
+	int GenerateClassSchemas(lua::State L) {
+		BB::CFileStreamEx f{};
+		f.OpenFile(L.CheckString(1), BB::IStream::Flags::DefaultWrite);
+		CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(f);
+		f.Close();
+		return 0;
+	}
+	int DumpUnknownFieldSerializers(lua::State L) {
+		CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(L);
+		return 1;
+	}
+#endif
+
+	constexpr std::array API{
 			lua::FuncReference::GetRef<Eval>("Eval"),
 			lua::FuncReference::GetRef<Log>("Log"),
 			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
@@ -474,7 +489,11 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<HasPersistentMapFile>("HasPersistentMapFile"),
 			lua::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
 			lua::FuncReference::GetRef<GetCurrentCutscene>("GetCurrentCutscene"),
-	} };
+#ifdef _DEBUG
+			lua::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
+			lua::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
+#endif
+	};
 
 	void Init(lua::State L)
 	{

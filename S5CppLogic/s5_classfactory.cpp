@@ -109,6 +109,8 @@ BB::FieldSerilaizer::ExtendedInfo InfoWidgetGroupId{ "shok::WidgetGroupId", &Pus
 BB::FieldSerilaizer::ExtendedInfo InfoGUITextureId{ "shok::GUITextureId", &PushInt, &CheckEnum<shok::GUITextureId>, "xs:string" };
 BB::FieldSerilaizer::ExtendedInfo InfoFontId{ "shok::FontId", &PushInt, &CheckEnum<shok::FontId>, "xs:string" };
 BB::FieldSerilaizer::ExtendedInfo InfoPrincipalTaskId{ "shok::PrincipalTaskId", &PushInt, &CheckEnum<shok::PrincipalTaskId>, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoRaceId{ "shok::RaceId", &PushInt, &CheckInt, "xs:string" };
+BB::FieldSerilaizer::ExtendedInfo InfoTechnologyCategoryId{ "shok::TechnologyCategoryId", &PushInt, &CheckEnum<shok::TechnologyCategoryId>, "xs:string" };
 
 void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
 	L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
@@ -240,6 +242,8 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
 	{0x83ae78, &InfoBool},
 	{0x83c940, &InfoBool},
 	{0x856e90, &InfoBool},
+	{0x82b9a0, &InfoBool},
+	{0x811e8c, &InfoBool},
 
 	{0x810C98, &InfoInt},
 	{0x800108, &InfoInt},
@@ -341,6 +345,8 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
 	{0x855708, &InfoInt},
 	{0x856e70, &InfoInt},
 	{0x857128, &InfoInt},
+	{0x82ba08, &InfoInt},
+	{0x811ecc, &InfoInt},
 
 	{0x85D4AC, &InfoTasklist},
 	{0x86cb50, &InfoTasklist},
@@ -383,6 +389,9 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
 	{0x894b48, &InfoGUITextureId},
 	{0x89518c, &InfoFontId},
 	{0x898214, &InfoPrincipalTaskId},
+	{0x85D518, &InfoRaceId},
+	{0x864128, &InfoTechnologyCategoryId},
+	//0x85d584, 0x85d5a8 something head related
 
 	{0x810D18, &InfoAccessCategory},
 
@@ -513,6 +522,8 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
 	{0x83ae98, &InfoFloat},
 	{0x8556a0, &InfoFloat},
 	{0x8570c0, &InfoFloat},
+	{0x82b9c0, &InfoFloat},
+	{0x811eac, &InfoFloat},
 
 	{0x8987dc, &InfoFloatRad},
 

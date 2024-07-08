@@ -89,6 +89,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const ShorewaveTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA19F34);
 		static inline BB::CIDManagerEx** const ModelManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C83C);
 		static inline BB::CIDManagerEx** const BuildingBannerManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C85C);
+		// A0C844 race
 	};
 	static_assert(sizeof(BB::CIDManagerEx) == 6 * 4);
 

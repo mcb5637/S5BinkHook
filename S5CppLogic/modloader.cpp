@@ -25,7 +25,7 @@
 #include "ModConfig.h"
 #include "StringUtility.h"
 
-void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, const char* func)
+void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func)
 {
 	Log(L, "Initializing ModLoader");
 
@@ -45,8 +45,11 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, con
 		L.Push("Initialize");
 		L.GetTableRaw(-2);
 		if (L.IsFunction(-1)) {
-			if (L.PCall(0, 0) != lua::ErrorCode::Success)
+			if (L.PCall(0, 0) != lua::ErrorCode::Success) {
+				auto s = std::format("Initialize error: {}", L.ToStringView(-1));
+				Log(L, s.c_str());
 				L.Pop(1);
+			}
 		}
 		else {
 			L.Pop(1);
@@ -58,8 +61,11 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, con
 		L.Push(func);
 		L.GetTableRaw(-2);
 		if (L.IsFunction(-1)) {
-			if (L.PCall(0, 0) != lua::ErrorCode::Success)
+			if (L.PCall(0, 0) != lua::ErrorCode::Success) {
+				auto s = std::format("{} error: {}", func, L.ToStringView(-1));
+				Log(L, s.c_str());
 				L.Pop(1);
+			}
 		}
 		else {
 			L.Pop(1);
@@ -946,7 +952,8 @@ void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 		L.GetTableRaw(-2);
 		if (L.IsFunction(-1)) {
 			L.PushFString("ModLoader: %s", log);
-			L.PCall(1, 0);
+			if (L.PCall(1, 0) != lua::ErrorCode::Success)
+				L.Pop(1);
 		}
 	}
 	L.SetTop(t);
@@ -977,8 +984,11 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			L.Push("Cleanup");
 			L.GetTableRaw(-2);
 			if (L.IsFunction(-1)) {
-				if (L.PCall(0, 0) != lua::ErrorCode::Success)
+				if (L.PCall(0, 0) != lua::ErrorCode::Success) {
+					auto s = std::format("Cleanup error: {}", L.ToStringView(-1));
+					Log(L, s.c_str());
 					L.Pop(1);
+				}
 			}
 			else {
 				L.Pop(1);

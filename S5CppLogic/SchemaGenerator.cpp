@@ -3,6 +3,7 @@
 #include "s5_filesystem.h"
 #include "s5_effecttype.h"
 #include "s5_tech.h"
+#include "s5_mapdisplay.h"
 
 template<class T>
 static bool CheckFieldSerializerType(const BB::FieldSerilaizer* f) {
@@ -58,6 +59,8 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::Sta
 		PushUnknownFieldSerializers(L, info.SData);
 	}
 	PushUnknownFieldSerializers(L, shok::Technology::SerializationData);
+	PushUnknownFieldSerializers(L, ED::CModelsProps::SerializationData);
+	PushUnknownFieldSerializers(L, GGL::ExperienceClass::SerializationData);
 }
 
 size_t CppLogic::Serializer::SchemaGenerator::PredictNumberOfFields(const BB::SerializationData* data)
@@ -209,7 +212,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 	}
 }
 
-void CppLogic::Serializer::SchemaGenerator::WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname)
+void CppLogic::Serializer::SchemaGenerator::WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id)
 {
 	f.Write("\t<xs:complexType name=\"");
 	f.Write(EscapeClassname(name));
@@ -224,10 +227,10 @@ void CppLogic::Serializer::SchemaGenerator::WriteSubclassSchema(BB::IStream& f, 
 	f.Write("\t\t\t\t</xs:extension>\n\t\t\t</xs:complexContent>\n\t</xs:complexType>\n");
 
 	if (!skipClassname)
-		WriteClassnameClassSchema(f, name);
+		WriteClassnameClassSchema(f, name, id);
 }
 
-void CppLogic::Serializer::SchemaGenerator::WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata, bool skipClassname)
+void CppLogic::Serializer::SchemaGenerator::WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id)
 {
 	f.Write("\t<xs:complexType name=\"");
 	f.Write(EscapeClassname(name));
@@ -240,10 +243,10 @@ void CppLogic::Serializer::SchemaGenerator::WriteNewClassSchema(BB::IStream& f, 
 	f.Write("\t</xs:complexType>\n");
 
 	if (!skipClassname)
-		WriteClassnameClassSchema(f, name);
+		WriteClassnameClassSchema(f, name, id);
 }
 
-void CppLogic::Serializer::SchemaGenerator::WriteClassnameClassSchema(BB::IStream& f, std::string_view name)
+void CppLogic::Serializer::SchemaGenerator::WriteClassnameClassSchema(BB::IStream& f, std::string_view name, shok::ClassId id)
 {
 	f.Write("\t<xs:complexType name=\"");
 	f.Write(EscapeClassname(name));
@@ -254,6 +257,12 @@ void CppLogic::Serializer::SchemaGenerator::WriteClassnameClassSchema(BB::IStrea
 	f.Write("\t\t\t\t\t<xs:attribute name=\"classname\" fixed=\"");
 	f.Write(EscapeString(name));
 	f.Write("\" use=\"required\"/>\n");
+
+	if (id != shok::ClassId::Invalid) {
+		f.Write("\t\t\t\t\t<xs:attribute name=\"classid\" fixed=\"");
+		f.Write(std::format("{:#x}", static_cast<unsigned int>(id)));
+		f.Write("\" use=\"optional\"/>\n");
+	}
 
 	f.Write("\t\t\t\t</xs:extension>\n\t\t\t</xs:complexContent>\n\t</xs:complexType>\n");
 }
@@ -278,17 +287,17 @@ void CppLogic::Serializer::SchemaGenerator::WriteClassSchema(BB::IStream& f, sho
 		}
 
 		if (basename.empty()) {
-			WriteNewClassSchema(f, name, seridata);
+			WriteNewClassSchema(f, name, seridata, false, id);
 		}
 		else {
-			WriteSubclassSchema(f, name, basename, seridata + 1);
+			WriteSubclassSchema(f, name, basename, seridata + 1, false, id);
 		}
 	}
 	else {
 		if (alwaysInheritBBObject)
-			WriteSubclassSchema(f, name, "BB::IObject", seridata);
+			WriteSubclassSchema(f, name, "BB::IObject", seridata, false, id);
 		else
-			WriteNewClassSchema(f, name, seridata);
+			WriteNewClassSchema(f, name, seridata, false, id);
 	}
 }
 
@@ -320,6 +329,8 @@ void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream
 {
 	WriteChosenClassSchema<EGL::EffectsProps::EffectData>(f);
 	WriteChosenClassSchema<shok::Technology>(f);
+	WriteChosenClassSchema<ED::CModelsProps::ModelData>(f);
+	WriteChosenClassSchema<GGL::ExperienceClass>(f);
 }
 
 void CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(BB::IStream& f)

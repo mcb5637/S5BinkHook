@@ -22,9 +22,9 @@ namespace CppLogic::Serializer {
 		static void WriteClassSchema(BB::IStream& f, shok::ClassId id, bool alwaysInheritBBObject = true);
 		static void WriteRegisteredClassesSchema(BB::IStream& f);
 		static void WriteChosenClassesSchema(BB::IStream& f);
-		static void WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata, bool skipClassname = false);
-		static void WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname = false);
-		static void WriteClassnameClassSchema(BB::IStream& f, std::string_view name);
+		static void WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id = shok::ClassId::Invalid);
+		static void WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id = shok::ClassId::Invalid);
+		static void WriteClassnameClassSchema(BB::IStream& f, std::string_view name, shok::ClassId id);
 		template<class C, class Parent = void, bool hasParentSeridata = true>
 		static void WriteChosenClassSchema(BB::IStream& f, bool skipClassname = true);
 	};

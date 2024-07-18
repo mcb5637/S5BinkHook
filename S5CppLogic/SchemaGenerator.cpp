@@ -102,6 +102,24 @@ std::string CppLogic::Serializer::SchemaGenerator::EscapeClassname(std::string_v
 	return n;
 }
 
+std::string CppLogic::Serializer::SchemaGenerator::EscapeString(std::string_view name)
+{
+	std::string n{ name };
+	auto repl_str = [&n](std::string_view search, std::string_view replace) {
+		size_t pos = 0;
+		while ((pos = n.find(search, pos)) != std::string::npos) {
+			n.replace(pos, search.length(), replace);
+			pos += replace.length();
+		}
+	};
+	repl_str("<", "&lt;");
+	repl_str(">", "&gt;");
+	repl_str("&", "&amp;");
+	repl_str("\"", "&quot;");
+	repl_str("`", "&apos;");
+	return n;
+}
+
 shok::ClassId CppLogic::Serializer::SchemaGenerator::TryFindBaseClass(const BB::SerializationData* data)
 {
 	auto* cf = *BB::CClassFactory::GlobalObj;
@@ -172,7 +190,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 			f.Indent(indent);
 			f.Write("<xs:element name=\"");
 			f.Write(data->SerializationName);
-			f.Write("\" type=\"BB__IObject\"");
+			f.Write("\" type=\"BB__IObject_NoClassname\"");
 
 			if (data->ListOptions != nullptr) {
 				f.Write(" minOccurs=\"0\" maxOccurs=\"unbounded\"");
@@ -191,28 +209,53 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 	}
 }
 
-void CppLogic::Serializer::SchemaGenerator::WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata)
+void CppLogic::Serializer::SchemaGenerator::WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname)
 {
 	f.Write("\t<xs:complexType name=\"");
 	f.Write(EscapeClassname(name));
+	if (!skipClassname)
+		f.Write("_NoClassname");
 	f.Write("\">\n\t\t\t<xs:complexContent>\n\t\t\t\t<xs:extension base=\"");
 	f.Write(EscapeClassname(basename));
-	f.Write("\">\n");
+	f.Write("_NoClassname\">\n");
 
 	WriteSeriData(f, 6, seridata);
 
 	f.Write("\t\t\t\t</xs:extension>\n\t\t\t</xs:complexContent>\n\t</xs:complexType>\n");
+
+	if (!skipClassname)
+		WriteClassnameClassSchema(f, name);
 }
 
-void CppLogic::Serializer::SchemaGenerator::WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata)
+void CppLogic::Serializer::SchemaGenerator::WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata, bool skipClassname)
 {
 	f.Write("\t<xs:complexType name=\"");
 	f.Write(EscapeClassname(name));
+	if (!skipClassname)
+		f.Write("_NoClassname");
 	f.Write("\">\n");
 
 	WriteSeriData(f, 4, seridata);
 
 	f.Write("\t</xs:complexType>\n");
+
+	if (!skipClassname)
+		WriteClassnameClassSchema(f, name);
+}
+
+void CppLogic::Serializer::SchemaGenerator::WriteClassnameClassSchema(BB::IStream& f, std::string_view name)
+{
+	f.Write("\t<xs:complexType name=\"");
+	f.Write(EscapeClassname(name));
+	f.Write("\">\n\t\t\t<xs:complexContent>\n\t\t\t\t<xs:extension base=\"");
+	f.Write(EscapeClassname(name));
+	f.Write("_NoClassname\">\n");
+
+	f.Write("\t\t\t\t\t<xs:attribute name=\"classname\" fixed=\"");
+	f.Write(EscapeString(name));
+	f.Write("\" use=\"required\"/>\n");
+
+	f.Write("\t\t\t\t</xs:extension>\n\t\t\t</xs:complexContent>\n\t</xs:complexType>\n");
 }
 
 void CppLogic::Serializer::SchemaGenerator::WriteClassSchema(BB::IStream& f, shok::ClassId id, bool alwaysInheritBBObject)
@@ -250,16 +293,16 @@ void CppLogic::Serializer::SchemaGenerator::WriteClassSchema(BB::IStream& f, sho
 }
 
 template<class C, class Parent, bool hasParentSeridata>
-inline void CppLogic::Serializer::SchemaGenerator::WriteChosenClassSchema(BB::IStream& f)
+inline void CppLogic::Serializer::SchemaGenerator::WriteChosenClassSchema(BB::IStream& f, bool skipClassname)
 {
 	if constexpr (std::same_as<Parent, void>) {
-		WriteNewClassSchema(f, typename_details::type_name<C>(), C::SerializationData);
+		WriteNewClassSchema(f, typename_details::type_name<C>(), C::SerializationData, skipClassname);
 	}
 	else {
 		const BB::SerializationData* sd = C::SerializationData;
 		if constexpr (hasParentSeridata)
 			++sd;
-		WriteSubclassSchema(f, typename_details::type_name<C>(), typename_details::type_name<Parent>(), sd);
+		WriteSubclassSchema(f, typename_details::type_name<C>(), typename_details::type_name<Parent>(), sd, skipClassname);
 	}
 }
 
@@ -283,7 +326,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(BB::IStream& f
 {
 	f.Write("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"); //  xmlns:vc=\"http://www.w3.org/2007/XMLSchema-versioning\" vc:minVersion=\"1.1\"
 
-	f.Write("\t<xs:complexType name=\"BB__IObject\" abstract=\"true\">\n\t\t<xs:sequence>\n\t\t\</xs:sequence>\n\t\t<xs:attribute name=\"classname\" type=\"xs:string\" use=\"required\"/>\n\t</xs:complexType>\n");
+	f.Write("\t<xs:complexType name=\"BB__IObject_NoClassname\" abstract=\"true\">\n\t\t<xs:sequence>\n\t\t</xs:sequence>\n\t</xs:complexType>\n");
 
 	WriteRegisteredClassesSchema(f);
 	WriteChosenClassesSchema(f);

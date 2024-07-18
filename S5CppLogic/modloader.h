@@ -386,12 +386,15 @@ namespace CppLogic::ModLoader {
 
 		static int Remove(lua::State L);
 		static int IsLoaded(lua::State L);
+		static int ToString(lua::State L);
 	public:
 		inline ArchivePopHelper(std::string_view a) : Archive(a) {}
+		inline ArchivePopHelper(std::string&& a) : Archive(std::move(a)) {}
 
 		static constexpr const std::array LuaMethods = {
 			lua::FuncReference::GetRef<Remove>("Remove"),
 			lua::FuncReference::GetRef<IsLoaded>("IsLoaded"),
+			lua::FuncReference::GetRef<ToString>("ToString"),
 		};
 	};
 }

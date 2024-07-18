@@ -929,7 +929,7 @@ int CppLogic::ModLoader::ModLoader::LoadModpackBBA(lua::State L)
 			}
 		}
 	}
-	L.NewUserClass<ArchivePopHelper>(p);
+	L.NewUserClass<ArchivePopHelper>(std::move(p));
 	return 1;
 }
 
@@ -1090,6 +1090,7 @@ int CppLogic::ModLoader::ArchivePopHelper::Remove(lua::State L)
 				return 1;
 			}
 		}
+		++it;
 	}
 	L.Push(false);
 	return 1;
@@ -1108,5 +1109,12 @@ int CppLogic::ModLoader::ArchivePopHelper::IsLoaded(lua::State L)
 		}
 	}
 	L.Push(false);
+	return 1;
+}
+
+int CppLogic::ModLoader::ArchivePopHelper::ToString(lua::State L)
+{
+	auto t = L.CheckUserClass<ArchivePopHelper>(1);
+	L.Push(t->Archive);
 	return 1;
 }

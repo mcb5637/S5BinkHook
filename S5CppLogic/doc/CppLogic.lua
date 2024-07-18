@@ -421,6 +421,7 @@ function CppLogic.Logic.HurtEntitySetDamage(dmg) end
 function CppLogic.Logic.GetLoadOrder() end
 --- adds a archive on top of your load order.
 --- @param arch string archive, relative to current dir, so "extra2\\shr\\maps\\user\\map.s5x for a map file
+--- @return ArchivePopHelper
 function CppLogic.Logic.AddArchive(arch) end
 --- removes the top archive. may only remove archives that you added yourself.
 function CppLogic.Logic.RemoveTopArchive() end
@@ -3306,11 +3307,13 @@ function CppLogic.ModLoader.SanityCheck() end
 
 ---@class ArchivePopHelper
 local ArchivePopHelper = {
-	---@return boolean wasLoaded
-	Remove = function() end,
-	---@return boolean isLoaded
-	IsLoaded = function() end,
 }
+---@return boolean wasLoaded
+function ArchivePopHelper:Remove() end
+---@return boolean isLoaded
+function ArchivePopHelper:IsLoaded() end
+---@return string archivePath
+function ArchivePopHelper:ToString() end
 ---@class ModpackDesc
 local ModpackDesc = {
 	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "",

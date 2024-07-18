@@ -29,6 +29,7 @@
 #include "luaserializer.h"
 #include "savegame_extra.h"
 #include "luaserializer.h"
+#include "modloader.h"
 #include "l_ui.h"
 
 namespace CppLogic::Logic {
@@ -362,7 +363,8 @@ namespace CppLogic::Logic {
 			e.CopyMessage(buff, 200);
 			throw lua::LuaException(buff);
 		}
-		return 0;
+		L.NewUserClass<CppLogic::ModLoader::ArchivePopHelper>(std::string_view(s));
+		return 1;
 	}
 
 	int RemoveTopArchive(lua::State L) {

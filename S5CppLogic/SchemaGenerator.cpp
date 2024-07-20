@@ -61,6 +61,9 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::Sta
 	PushUnknownFieldSerializers(L, shok::Technology::SerializationData);
 	PushUnknownFieldSerializers(L, ED::CModelsProps::SerializationData);
 	PushUnknownFieldSerializers(L, GGL::ExperienceClass::SerializationData);
+	PushUnknownFieldSerializers(L, ED::CDisplayProps::SerializationData);
+	PushUnknownFieldSerializers(L, GGlue::CTerrainPropsMgr::SerializationData);
+	PushUnknownFieldSerializers(L, GGlue::CGlueWaterPropsMgr::SerializationData);
 }
 
 size_t CppLogic::Serializer::SchemaGenerator::PredictNumberOfFields(const BB::SerializationData* data)
@@ -331,6 +334,9 @@ void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream
 	WriteChosenClassSchema<shok::Technology>(f);
 	WriteChosenClassSchema<ED::CModelsProps::ModelData>(f);
 	WriteChosenClassSchema<GGL::ExperienceClass>(f);
+	WriteChosenClassSchema<ED::CDisplayProps>(f);
+	WriteChosenClassSchema<GGlue::CTerrainPropsMgr>(f);
+	WriteChosenClassSchema<GGlue::CGlueWaterPropsMgr>(f);
 }
 
 void CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(BB::IStream& f)

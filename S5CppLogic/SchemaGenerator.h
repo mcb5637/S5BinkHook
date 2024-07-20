@@ -17,7 +17,7 @@ namespace CppLogic::Serializer {
 		static size_t PredictNumberOfFields(const BB::SerializationData* data);
 		static std::string EscapeClassname(std::string_view name);
 		static std::string EscapeString(std::string_view name);
-		static shok::ClassId TryFindBaseClass(const BB::SerializationData* data);
+		static std::string_view TryFindClassOfSeriData(const BB::SerializationData* data, bool alwaysInheritBBObject);
 		static void WriteSeriData(BB::IStream& f, size_t indent, const BB::SerializationData* data, bool skipas = false);
 		static void WriteClassSchema(BB::IStream& f, shok::ClassId id, bool alwaysInheritBBObject = true);
 		static void WriteRegisteredClassesSchema(BB::IStream& f);
@@ -27,5 +27,6 @@ namespace CppLogic::Serializer {
 		static void WriteClassnameClassSchema(BB::IStream& f, std::string_view name, shok::ClassId id);
 		template<class C, class Parent = void, bool hasParentSeridata = true>
 		static void WriteChosenClassSchema(BB::IStream& f, bool skipClassname = true);
+		static void PreRegisterExtraClasses();
 	};
 }

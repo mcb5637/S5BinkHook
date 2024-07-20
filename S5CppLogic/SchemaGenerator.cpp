@@ -126,14 +126,21 @@ std::string CppLogic::Serializer::SchemaGenerator::EscapeString(std::string_view
 	return n;
 }
 
-shok::ClassId CppLogic::Serializer::SchemaGenerator::TryFindBaseClass(const BB::SerializationData* data)
+std::map<const BB::SerializationData*, std::string_view> ExtraClasses{};
+
+std::string_view CppLogic::Serializer::SchemaGenerator::TryFindClassOfSeriData(const BB::SerializationData* data, bool alwaysInheritBBObject)
 {
 	auto* cf = *BB::CClassFactory::GlobalObj;
 	for (const auto & [id, info] : cf->Info) {
 		if (info.SData == data)
-			return id;
+			return cf->GetClassDemangledName(id);
 	}
-	return shok::ClassId::Invalid;
+	auto e = ExtraClasses.find(data);
+	if (e != ExtraClasses.end())
+		return e->second;
+	if (alwaysInheritBBObject)
+		return "BB::IObject";
+	return "";
 }
 
 void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t indent, const BB::SerializationData* data, bool skipas)
@@ -178,18 +185,27 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 				if (data->ListOptions != nullptr) {
 					f.Write(" minOccurs=\"0\" maxOccurs=\"unbounded\"");
 				}
-				f.Write(">\n");
 
-				f.Indent(indent + 1);
-				f.Write("<xs:complexType>\n");
+				auto ty = TryFindClassOfSeriData(data->SubElementData, false);
+				if (!ty.empty()) {
+					f.Write(" type=\"");
+					f.Write(EscapeClassname(ty));
+					f.Write("\"/>\n");
+				}
+				else {
+					f.Write(">\n");
 
-				WriteSeriData(f, indent + 3, data->SubElementData);
+					f.Indent(indent + 1);
+					f.Write("<xs:complexType>\n");
 
-				f.Indent(indent + 1);
-				f.Write("</xs:complexType>\n");
+					WriteSeriData(f, indent + 3, data->SubElementData);
 
-				f.Indent(indent);
-				f.Write("</xs:element>\n");
+					f.Indent(indent + 1);
+					f.Write("</xs:complexType>\n");
+
+					f.Indent(indent);
+					f.Write("</xs:element>\n");
+				}
 			}
 		}
 		else if (data->Type == BB::SerializationData::Ty::ObjectPointer || data->Type == BB::SerializationData::Ty::ObjectEmbedded) {
@@ -278,16 +294,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteClassSchema(BB::IStream& f, sho
 	auto* seridata = cf->GetSerializationDataForClass(id);
 
 	if (seridata->Type != BB::SerializationData::Ty::Invalid && seridata->SerializationName == nullptr) {
-		auto base = TryFindBaseClass(seridata->SubElementData);
-
-		std::string_view basename = "";
-		if (base == shok::ClassId::Invalid) {
-			if (alwaysInheritBBObject)
-				basename = "BB::IObject";
-		}
-		else {
-			basename = cf->GetClassDemangledName(base);
-		}
+		auto basename = TryFindClassOfSeriData(seridata->SubElementData, alwaysInheritBBObject);
 
 		if (basename.empty()) {
 			WriteNewClassSchema(f, name, seridata, false, id);
@@ -335,12 +342,24 @@ void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream
 	WriteChosenClassSchema<ED::CModelsProps::ModelData>(f);
 	WriteChosenClassSchema<GGL::ExperienceClass>(f);
 	WriteChosenClassSchema<ED::CDisplayProps>(f);
+	WriteChosenClassSchema<GGlue::TerrainTypeData>(f);
+	WriteChosenClassSchema<GGlue::WaterTypeData>(f);
 	WriteChosenClassSchema<GGlue::CTerrainPropsMgr>(f);
 	WriteChosenClassSchema<GGlue::CGlueWaterPropsMgr>(f);
 }
 
+void CppLogic::Serializer::SchemaGenerator::PreRegisterExtraClasses()
+{
+	if (!ExtraClasses.empty())
+		return;
+	ExtraClasses[GGlue::TerrainTypeData::SerializationData] = typename_details::type_name<GGlue::TerrainTypeData>();
+	ExtraClasses[GGlue::WaterTypeData::SerializationData] = typename_details::type_name<GGlue::WaterTypeData>();
+}
+
 void CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(BB::IStream& f)
 {
+	PreRegisterExtraClasses();
+
 	f.Write("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"); //  xmlns:vc=\"http://www.w3.org/2007/XMLSchema-versioning\" vc:minVersion=\"1.1\"
 
 	f.Write("\t<xs:complexType name=\"BB__IObject_NoClassname\" abstract=\"true\">\n\t\t<xs:sequence>\n\t\t</xs:sequence>\n\t</xs:complexType>\n");

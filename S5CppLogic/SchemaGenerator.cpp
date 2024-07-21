@@ -337,6 +337,8 @@ void CppLogic::Serializer::SchemaGenerator::WriteRegisteredClassesSchema(BB::ISt
 
 void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream& f)
 {
+	WriteChosenClassSchema<shok::Position>(f);
+	WriteChosenClassSchema<shok::CostInfo>(f);
 	WriteChosenClassSchema<EGL::EffectsProps::EffectData>(f);
 	WriteChosenClassSchema<shok::Technology>(f);
 	WriteChosenClassSchema<ED::CModelsProps::ModelData>(f);
@@ -354,6 +356,8 @@ void CppLogic::Serializer::SchemaGenerator::PreRegisterExtraClasses()
 		return;
 	ExtraClasses[GGlue::TerrainTypeData::SerializationData] = typename_details::type_name<GGlue::TerrainTypeData>();
 	ExtraClasses[GGlue::WaterTypeData::SerializationData] = typename_details::type_name<GGlue::WaterTypeData>();
+	ExtraClasses[shok::Position::SerializationData] = typename_details::type_name<shok::Position>();
+	ExtraClasses[shok::CostInfo::SerializationData] = typename_details::type_name<shok::CostInfo>();
 }
 
 void CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(BB::IStream& f)

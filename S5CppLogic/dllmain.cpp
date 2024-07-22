@@ -296,7 +296,7 @@ int Test(lua::State Ls) {
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	
-	
+
 	return 0;
 }
 

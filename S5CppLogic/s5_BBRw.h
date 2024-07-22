@@ -102,7 +102,7 @@ namespace BBRw {
 		static inline constexpr int vtp = 0x76BDA0;
 
 		BB::TResourceProxyResMgr<RWE::RwTexture*>* Get(const char* name);
-		BB::TResourceProxyResMgr<RWE::RwTexture*>* Get(int id);
+		BB::TResourceProxyResMgr<RWE::RwTexture*>* Get(shok::SelectionTextureId id);
 	};
 
 	class IEffects : public BB::TResourceManager<BBRw::CEffect*> {

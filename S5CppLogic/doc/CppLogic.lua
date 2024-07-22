@@ -2961,6 +2961,19 @@ function CppLogic.UI.VideoCustomWidgetGetVideoSize(wid) end
 ---@param y number
 function CppLogic.UI.VideoCustomWidgetSetVideoSize(wid, x, y) end
 
+---@class TerrainDecalAccess
+local TerrainDecalAccess = {}
+---destroys (removes from game world)
+function TerrainDecalAccess:Destroy() end
+
+---creates a selection texture decal at a fixed position
+---@param pos Position
+---@param texture string|number
+---@param sizex number
+---@param sizey number
+---@return TerrainDecalAccess
+function CppLogic.UI.CreateSelectionDecal(texture, pos, sizex, sizey) end
+
 ---gives a construct command
 ---@param id number|string
 ---@param tar number|string

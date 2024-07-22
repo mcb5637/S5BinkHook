@@ -6,8 +6,8 @@ BB::TResourceProxyResMgr<RWE::RwTexture*>* BBRw::CRwTextures::Get(const char* na
 {
     return *crwtextures_get(this, name, 0);
 }
-static inline BB::TResourceProxyResMgr<RWE::RwTexture*>** (__stdcall* const crwtextures_getid)(BBRw::CRwTextures* th, int id) = reinterpret_cast<BB::TResourceProxyResMgr<RWE::RwTexture*>**(__stdcall*)(BBRw::CRwTextures*, int)>(0x467D46);
-BB::TResourceProxyResMgr<RWE::RwTexture*>* BBRw::CRwTextures::Get(int id)
+static inline BB::TResourceProxyResMgr<RWE::RwTexture*>** (__stdcall* const crwtextures_getid)(BBRw::CRwTextures* th, shok::SelectionTextureId id) = reinterpret_cast<BB::TResourceProxyResMgr<RWE::RwTexture*>**(__stdcall*)(BBRw::CRwTextures*, shok::SelectionTextureId)>(0x467D46);
+BB::TResourceProxyResMgr<RWE::RwTexture*>* BBRw::CRwTextures::Get(shok::SelectionTextureId id)
 {
     return *crwtextures_getid(this, id);
 }

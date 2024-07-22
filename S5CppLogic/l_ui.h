@@ -72,4 +72,17 @@ namespace CppLogic::UI {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1005);
 		static constexpr BB::SerializationData* SerializationData = nullptr;
 	};
+
+	class TerrainDecalAccess {
+		std::unique_ptr<ED::CTerrainDecalBase, CppLogic::DestroyCaller<ED::CTerrainDecalBase>> Decal;
+
+		static int Destroy(lua::State L);
+
+	public:
+		TerrainDecalAccess(ED::CTerrainDecalBase* d);
+
+		static constexpr const std::array LuaMethods {
+				lua::FuncReference::GetRef<Destroy>("Destroy"),
+			};
+	};
 }

@@ -1411,6 +1411,25 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int CreateSelectionDecal(lua::State l) {
+		luaext::EState L{ l };
+
+		shok::SelectionTextureId t = L.CheckEnum<shok::SelectionTextureId>(1);
+		shok::Position p = L.CheckPos(2);
+
+		ED::CTerrainDecals* dec = (*ED::CGlobalsLogicEx::GlobalObj)->TerrainTecalsManager;
+		BB::TResourceProxyResMgr<RWE::RwTexture*>* texpr = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures->Get(t);
+
+		if (texpr == nullptr)
+			throw lua::LuaException("no textureproxy");
+		auto* tex = texpr->Get();
+		if (tex == nullptr)
+			throw lua::LuaException("failed to load texture");
+
+		L.NewUserClass<TerrainDecalAccess>(dec->CreateTerrainDecal(2, tex->raster, p.X, p.Y, L.CheckFloat(3), L.CheckFloat(4)));
+		return 1;
+	}
+
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
 		return shok::Malloc(s);
@@ -1714,6 +1733,17 @@ namespace CppLogic::UI {
 		L.Pop(1);
 	}
 
+	CppLogic::UI::TerrainDecalAccess::TerrainDecalAccess(ED::CTerrainDecalBase* d)
+		: Decal(d)
+	{
+	}
+
+	int CppLogic::UI::TerrainDecalAccess::Destroy(lua::State L)
+	{
+		L.CheckUserClass<TerrainDecalAccess>(1)->Decal = nullptr;
+		return 0;
+	}
+
 	constexpr std::array UI{
 		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
@@ -1806,6 +1836,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<ExportCutscenes>("ExportCutscenes"),
 		lua::FuncReference::GetRef<VideoCustomWidgetGetVideoSize>("VideoCustomWidgetGetVideoSize"),
 		lua::FuncReference::GetRef<VideoCustomWidgetSetVideoSize>("VideoCustomWidgetSetVideoSize"),
+		lua::FuncReference::GetRef<CreateSelectionDecal>("CreateSelectionDecal"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

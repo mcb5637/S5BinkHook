@@ -71,7 +71,7 @@ namespace ED {
 
 		virtual ~ITerrainDecals() = default;
 		virtual void Destroy() = 0;
-		virtual CTerrainDecal* CreateTerrainDecal(int, int, float, float, float, float) = 0;
+		virtual CTerrainDecal* CreateTerrainDecal(int, RWE::RwRaster*, float, float, float, float) = 0;
 		virtual CTerrainDecalAligned* CreateAlignedDecal(int, const shok::Position* p, void*) = 0;
 		// 6 more funcs
 
@@ -259,7 +259,7 @@ namespace ED {
 		float SelectionOffsetX = 0; // 17
 		float SelectionOffsetY = 0;
 		float SelectionRadius = 0;
-		void* SelectionTexture = nullptr; // texture loaded via RWE?
+		shok::SelectionTextureId SelectionTexture = {};
 		shok::AnimationId DefaultAnimID = {};
 
 

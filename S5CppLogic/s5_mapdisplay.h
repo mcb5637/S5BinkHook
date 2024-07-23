@@ -49,7 +49,8 @@ namespace ED {
 		static inline constexpr int vtp = 0x76A1F4;
 		virtual ~ITerrainDecal() = default;
 		virtual void Destroy() = 0;
-		// 2 more funcs, empty in alignment
+		virtual void SetPos(float x, float y) = 0;
+		// 1 more funcs, empty in alignment
 	};
 	class CTerrainDecalBase : public ITerrainDecal {
 	public:
@@ -71,14 +72,13 @@ namespace ED {
 
 		virtual ~ITerrainDecals() = default;
 		virtual void Destroy() = 0;
-		virtual CTerrainDecal* CreateTerrainDecal(int, RWE::RwRaster*, float, float, float, float) = 0;
+		virtual CTerrainDecal* CreateTerrainDecal(int, RWE::RwRaster* texture, float x, float y, float sx, float ys) = 0;
 		virtual CTerrainDecalAligned* CreateAlignedDecal(int, const shok::Position* p, void*) = 0;
 		// 6 more funcs
 
 	};
 	class CTerrainDecals : public ITerrainDecals {
 	public:
-		static inline constexpr int vtp = 0x76A274;
 		float MapsizeX;
 		float MapsizeY;
 		float MapsizeX2;
@@ -95,8 +95,41 @@ namespace ED {
 		void* DecalSelection;
 		void* DecalDoodad;
 		RWE::RwTexture* XD_Decals;
+
+
+		static inline constexpr int vtp = 0x76A274;
 	};
 	//constexpr int i = offsetof(CTerrainDecals, DecalShadow) / 4;
+
+	class CSelectionList {
+	public:
+		virtual ~CSelectionList() = default;
+
+		shok::Vector<shok::EntityId> Selected;
+
+		static inline constexpr int vtp = 0x76A1C8;
+	};
+	static_assert(sizeof(CSelectionList) == 4 * 5);
+
+	class CSelectionDecalList {
+	public:
+		virtual void __stdcall Destroy() = 0;
+		virtual ~CSelectionDecalList() = default;
+
+		struct Data {
+			bool Toggle;
+			shok::EntityId Entity;
+			ITerrainDecal* Selection;
+		};
+		shok::Map<shok::EntityId, Data*> Selected;
+		bool Toggle;
+
+		// update 4776CB stdcall()
+
+
+		static inline constexpr int vtp = 0x76A1D4;
+	};
+	static_assert(sizeof(CSelectionDecalList) == 4 * 5);
 
 	class CGlobalsLogic {
 	public:
@@ -105,16 +138,20 @@ namespace ED {
 	class CGlobalsLogicEx : public CGlobalsLogic {
 	public:
 		EGL::CGLEGameLogic* GameLogic;
-		PADDINGI(4); // p EGL::CGLEEntitiesDisplay, p EGL::CGLEEffectsDisplay, p EGL::CGLETerrainHiRes, p EGL::CGLETerrainLowRes
+		PADDINGI(2); // p EGL::CGLEEntitiesDisplay, p EGL::CGLEEffectsDisplay, 
+		EGL::CGLETerrainHiRes* TerrainHi;
+		EGL::CGLETerrainLowRes* TerrainLow; // 5
 		EGL::LandscapeBlockingData* Blocking; // 6
-		PADDINGI(2); // p EGL::CGLELandscape, p EGL::CTerrainVertexColors
+		EGL::CGLELandscape* EGL_Landscape;
+		EGL::CTerrainVertexColors* VertexColors;
 		EGL::CRegionInfo* RegionInfo; // 9
-		PADDINGI(1); // p EGL::CPlayerExplorationHandler
+		EGL::CPlayerExplorationHandler* ExplorationHandler; // 10
 		ED::CLandscape* Landscape;
-		// p ED::CLandscapeFogOfWar, 
-		PADDINGI(5);
-		CTerrainDecals* TerrainTecalsManager; // 17
-		PADDINGI(1);
+		PADDINGI(3); // p ED::CLandscapeFogOfWar, p ED::CLandscapeRegions, p ED::CPlayers
+		CSelectionDecalList* SelectionDecals; // 15
+		CSelectionList* SelectionList;
+		CTerrainDecals* TerrainDecalsManager; // 17
+		PADDINGI(1); // unknown obj
 		ED::CVisibleEntityManager* VisibleEntityManager; // 19
 
 		static inline constexpr int vtp = 0x769F74;
@@ -123,9 +160,13 @@ namespace ED {
 		bool IsCoordValid(int* out);
 		EGL::CGLELandscape::BlockingMode GetBlocking(const shok::Position& p);
 
+		// 71AD6D update?
+
 		static inline ED::CGlobalsLogicEx** const GlobalObj = reinterpret_cast<ED::CGlobalsLogicEx**>(0x8581EC);
 	};
 	//constexpr int i = offsetof(CGlobalsLogicEx, TerrainTecalsManager) / 4;
+	static_assert(offsetof(CGlobalsLogicEx, SelectionDecals) == 15 * 4);
+	static_assert(offsetof(CGlobalsLogicEx, TerrainDecalsManager) == 17 * 4);
 
 	class CModelsProps {
 	public:

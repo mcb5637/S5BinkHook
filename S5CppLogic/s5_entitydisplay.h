@@ -142,13 +142,21 @@ namespace ED {
 		PADDINGI(1); // unk p
 		PADDINGI(1); // -1, color? // 14
 
+		struct SelectionData {
+			shok::Position Pos;
+			float Radius;
+			shok::SelectionTextureId Texture;
+		};
+
 	protected:
 		virtual void __thiscall Initialize(shok::ModelId* modelOverride) = 0;
 	public:
 		virtual void __stdcall OnRenderUpdate(int tick, float seconds) = 0; // tick seems to be logic ticks, seconds in gametime (ticks/10)
 	private:
 		virtual void UnknownEDisplayFunc1() = 0; // 5 maybe update something
-		virtual bool UnknownEDisplayFunc2(void*) = 0; // get some data to pointer, return bool?
+	public:
+		virtual bool GetSelectionData(SelectionData* d) = 0;
+	private:
 		virtual void UnknownEDisplayFunc3() = 0;
 		virtual void UnknownEDisplayFunc4() = 0;
 		virtual void UnknownEDisplayFunc5(float) = 0; // stdcall? set some float?

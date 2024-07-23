@@ -1417,14 +1417,14 @@ namespace CppLogic::UI {
 		shok::SelectionTextureId t = L.CheckEnum<shok::SelectionTextureId>(1);
 		shok::Position p = L.CheckPos(2);
 
-		ED::CTerrainDecals* dec = (*ED::CGlobalsLogicEx::GlobalObj)->TerrainTecalsManager;
+		ED::CTerrainDecals* dec = (*ED::CGlobalsLogicEx::GlobalObj)->TerrainDecalsManager;
 		BB::TResourceProxyResMgr<RWE::RwTexture*>* texpr = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures->Get(t);
 
 		if (texpr == nullptr)
-			throw lua::LuaException("no textureproxy");
+			throw lua::LuaException{ "no textureproxy" };
 		auto* tex = texpr->Get();
 		if (tex == nullptr)
-			throw lua::LuaException("failed to load texture");
+			throw lua::LuaException{ "failed to load texture" };
 
 		L.NewUserClass<TerrainDecalAccess>(dec->CreateTerrainDecal(2, tex->raster, p.X, p.Y, L.CheckFloat(3), L.CheckFloat(4)));
 		return 1;
@@ -1741,6 +1741,16 @@ namespace CppLogic::UI {
 	int CppLogic::UI::TerrainDecalAccess::Destroy(lua::State L)
 	{
 		L.CheckUserClass<TerrainDecalAccess>(1)->Decal = nullptr;
+		return 0;
+	}
+
+	int CppLogic::UI::TerrainDecalAccess::SetPos(lua::State L)
+	{
+		auto* th = L.CheckUserClass<TerrainDecalAccess>(1);
+		if (th->Decal == nullptr)
+			throw lua::LuaException{ "already destroyed" };
+		auto p = luaext::EState{ L }.CheckPos(2);
+		th->Decal->SetPos(p.X, p.Y);
 		return 0;
 	}
 

@@ -166,6 +166,7 @@ namespace ED {
 	private:
 		virtual float UnknownEDisplayFunc7() = 0; // return some float
 
+	public:
 		// checks identifier, only returns exact class, no subclasses
 		template<BB::HasValidIdentifier T>
 		requires std::derived_from<T, ED::IBehavior>
@@ -216,6 +217,8 @@ namespace ED {
 		}
 
 		void ResetPositionData();
+
+		ED::ModelData* GetModelData();
 
 		static inline constexpr int vtp = 0x76A494;
 		static inline constexpr int TypeDesc = 0x8099C0;

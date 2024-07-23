@@ -28,6 +28,14 @@ void ED::CEntity::ResetPositionData()
     SetPositionData(&d);
 }
 
+ED::ModelData* ED::CEntity::GetModelData()
+{
+    int m = reinterpret_cast<int>(Model);
+    if (m == 0)
+        return nullptr;
+    return *reinterpret_cast<ED::ModelData**>(m + *reinterpret_cast<int*>(0x858228) + 0xc);
+}
+
 static inline ED::CEntity* (__thiscall* const shok_ED_CVisibleEntityManager_create)(ED::CVisibleEntityManager* th, EGL::IEntityDisplay* e) = reinterpret_cast<ED::CEntity * (__thiscall*)(ED::CVisibleEntityManager*, EGL::IEntityDisplay*)>(0x4762EA);
 ED::CEntity* ED::CVisibleEntityManager::CreateDisplayForEntity(EGL::IEntityDisplay* e)
 {

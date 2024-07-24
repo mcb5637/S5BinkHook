@@ -1700,6 +1700,7 @@ namespace CppLogic::UI {
 				}
 			}
 		}
+		TerrainDecalAccess::Cleanup();
 	}
 
 	void CppLogic::UI::OnSaveLoaded(lua::State L)
@@ -1736,12 +1737,25 @@ namespace CppLogic::UI {
 	CppLogic::UI::TerrainDecalAccess::TerrainDecalAccess(ED::CTerrainDecalBase* d)
 		: Decal(d)
 	{
+		Actives.insert(this);
+	}
+
+	CppLogic::UI::TerrainDecalAccess::~TerrainDecalAccess()
+	{
+		Destroy();
 	}
 
 	int CppLogic::UI::TerrainDecalAccess::Destroy(lua::State L)
 	{
-		L.CheckUserClass<TerrainDecalAccess>(1)->Decal = nullptr;
+		L.CheckUserClass<TerrainDecalAccess>(1)->Destroy();
 		return 0;
+	}
+	void CppLogic::UI::TerrainDecalAccess::Destroy()
+	{
+		Decal = nullptr;
+		auto i = Actives.find(this);
+		if (i != Actives.end())
+			Actives.erase(i);
 	}
 
 	int CppLogic::UI::TerrainDecalAccess::SetPos(lua::State L)
@@ -1752,6 +1766,14 @@ namespace CppLogic::UI {
 		auto p = luaext::EState{ L }.CheckPos(2);
 		th->Decal->SetPos(p.X, p.Y);
 		return 0;
+	}
+
+	std::set<TerrainDecalAccess*> TerrainDecalAccess::Actives{};
+	void TerrainDecalAccess::Cleanup()
+	{
+		for (TerrainDecalAccess* a : Actives)
+			a->Decal = nullptr;
+		Actives.clear();
 	}
 
 	constexpr std::array UI{

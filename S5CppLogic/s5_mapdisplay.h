@@ -54,17 +54,45 @@ namespace ED {
 	};
 	class CTerrainDecalBase : public ITerrainDecal {
 	public:
+		PADDINGI(1); // int enum? 1st param
+		RWE::RwRaster* Texture;
+		PADDINGI(1); // 0
+		PADDINGI(6); // memset 0
+
 		static inline constexpr int vtp = 0x76A238;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5A4A43C1); // from entitydisplay casttoident
+
+		//ctor 47826F thiscall(int, texraster)
 	};
+	#ifdef __INTELLISENSE__
+	#pragma diag_suppress 2784
+	#endif
+	static_assert(sizeof(CTerrainDecalBase) == 10 * 4);
+	#ifdef __INTELLISENSE__
+	#pragma diag_default 2784
+	#endif
 	class CTerrainDecalAligned : public CTerrainDecalBase { // size 10
 	public:
 		static inline constexpr int vtp = 0x76A260;
 	};
 	class CTerrainDecal : public CTerrainDecalBase { // size 14
 	public:
+		shok::Position Pos;
+		shok::Position Size;
+
+
 		static inline constexpr int vtp = 0x76A24C;
+
+		// ctor 4782BC thiscall(int, textraster, x, y, sx, sy)
 	};
+	#ifdef __INTELLISENSE__
+	#pragma diag_suppress 2784
+	#endif
+	static_assert(offsetof(CTerrainDecal, Pos.X) == 10 * 4);
+	static_assert(sizeof(CTerrainDecal) == 14 * 4);
+	#ifdef __INTELLISENSE__
+	#pragma diag_default 2784
+	#endif
 
 	class ITerrainDecals : public BB::CNonCopyable {
 	public:

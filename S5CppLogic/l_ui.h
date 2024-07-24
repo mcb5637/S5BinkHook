@@ -79,12 +79,24 @@ namespace CppLogic::UI {
 		static int Destroy(lua::State L);
 		static int SetPos(lua::State L);
 
+		void Destroy();
+
+		static std::set<TerrainDecalAccess*> Actives;
+
 	public:
 		TerrainDecalAccess(ED::CTerrainDecalBase* d);
+
+		TerrainDecalAccess(const TerrainDecalAccess &) = delete;
+		TerrainDecalAccess(TerrainDecalAccess&&) = delete;
+		void operator=(const TerrainDecalAccess&) = delete;
+		void operator=(TerrainDecalAccess&&) = delete;
+		~TerrainDecalAccess();
 
 		static constexpr const std::array LuaMethods {
 				lua::FuncReference::GetRef<Destroy>("Destroy"),
 				lua::FuncReference::GetRef<SetPos>("SetPos"),
 			};
+
+		static void Cleanup();
 	};
 }

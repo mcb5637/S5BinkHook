@@ -334,6 +334,8 @@ namespace CppLogic::ModLoader {
 		static bool Initialized;
 
 		static int SetEntityTypeToReload(lua::State L);
+		static int SetTaskListToReload(lua::State L);
+		static int SetDamageclassesToReload(lua::State L);
 		static int RefreshEntityCategoryCache(lua::State L);
 		static int SanityCheck(lua::State L);
 		static int GetModpackInfo(lua::State L);
@@ -342,6 +344,8 @@ namespace CppLogic::ModLoader {
 
 		static constexpr std::array LuaFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
+				lua::FuncReference::GetRef<SetTaskListToReload>("SetTaskListToReload"),
+				lua::FuncReference::GetRef<SetDamageclassesToReload>("SetDamageclassesToReload"),
 				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 				lua::FuncReference::GetRef<SanityCheck>("SanityCheck"),
 				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
@@ -351,6 +355,8 @@ namespace CppLogic::ModLoader {
 
 		static constexpr std::array NoLoaderFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
+				lua::FuncReference::GetRef<SetTaskListToReload>("SetTaskListToReload"),
+				lua::FuncReference::GetRef<SetDamageclassesToReload>("SetDamageclassesToReload"),
 				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
 				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
 				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),

@@ -879,6 +879,19 @@ int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::SetTaskListToReload(lua::State L)
+{
+	auto id = luaext::EState{ L }.CheckEnum<shok::TaskListId>(1);
+	CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj.OnIdLoaded(id);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::SetDamageclassesToReload(lua::State L)
+{
+	CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj.OnIdLoaded(shok::DamageClassId::Invalid);
+	return 0;
+}
+
 int CppLogic::ModLoader::ModLoader::RefreshEntityCategoryCache(lua::State L)
 {
 	EGL::EntityCategoryCache::RefreshCache(*EGL::CGLEEntitiesProps::GlobalObj);

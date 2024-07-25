@@ -3124,6 +3124,12 @@ CppLogic.ModLoader.ReloadTaskList = CppLogic.ModLoader.AddTaskList
 --- @return number type_id
 function CppLogic.ModLoader.PreLoadTaskList(typename) end
 
+--- sets a tasklist to get automatically reloaded on leaving the map (after s5x archives got removed).
+--- (for editing it manually via CppLogic).
+--- this function is available after ModLoader finishes.
+--- @param tid number
+function CppLogic.ModLoader.SetTaskListToReload(tid) end
+
 --- loads a technology from a xml file (data/config/technologies/tname.xml).
 --- the tech gets automatically removed on leaving the map.
 --- for existing ids you may use the id or the name, for new ones you need to use the name.
@@ -3309,6 +3315,11 @@ CppLogic.ModLoader.ReloadDamageClass = CppLogic.ModLoader.AddDamageClass
 --- @param typename string
 --- @return number type_id
 function CppLogic.ModLoader.PreLoadDamageClass(typename) end
+
+--- sets all damageclasses to get automatically reloaded on leaving the map (after s5x archives got removed).
+--- (for editing it manually via CppLogic).
+--- this function is available after ModLoader finishes.
+function CppLogic.ModLoader.SetDamageclassesToReload() end
 
 --- assigns an id in the EntityCategory IdManager.
 --- @param typename string

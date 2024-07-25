@@ -4,6 +4,7 @@
 #include "s5_effecttype.h"
 #include "s5_tech.h"
 #include "s5_mapdisplay.h"
+#include "modloader.h"
 
 template<class T>
 static bool CheckFieldSerializerType(const BB::FieldSerilaizer* f) {
@@ -348,6 +349,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream
 	WriteChosenClassSchema<GGlue::WaterTypeData>(f);
 	WriteChosenClassSchema<GGlue::CTerrainPropsMgr>(f);
 	WriteChosenClassSchema<GGlue::CGlueWaterPropsMgr>(f);
+	WriteChosenClassSchema<CppLogic::ModLoader::ModpackDesc>(f);
 }
 
 void CppLogic::Serializer::SchemaGenerator::PreRegisterExtraClasses()

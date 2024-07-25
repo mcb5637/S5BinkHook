@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <!-- ModPack descriptor file, put it as ModPack\\YourModName\\ModPack.xml -->
-<root>
+<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/mcb5637/s5xmlschema/master/modpack.xsd">
 	<!-- path to the modloader lua (loaded before starting the map) -->
 	<LoaderPath>Data/ModPack/YourModName/ModPackLoader.lua</LoaderPath>
-	<!-- path to the ingame scipt loader (loaded by a call to ModLoader.LoadModScripts() after map start -->
+	<!-- path to the ingame scipt loader (loaded by a call to ModLoader.LoadModScripts() after map start) -->
 	<ScriptPath>Data/ModPack/YourModName/ScriptLoader.lua</ScriptPath>
 	<!-- states, that your ModPack only works, if a ModPack of this name is present (does not change load order, may be used multiple times) -->
 	<Required>SomeOtherCoolMod</Required>

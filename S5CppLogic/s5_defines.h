@@ -147,10 +147,11 @@ namespace shok {
 		Workplace = 48,
 		Farm = 49,
 		Residence = 50,
-		TargetFilter_CustomRanged = 102,
-		TargetFilter_NonCombat = 103,
+
 		TargetFilter_TargetType = 100,
 		TargetFilter_TargetTypeLeader = 101,
+		TargetFilter_CustomRanged = 102,
+		TargetFilter_NonCombat = 103,
 	};
 
 	enum class TechState : int {

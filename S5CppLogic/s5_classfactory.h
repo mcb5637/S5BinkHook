@@ -19,7 +19,7 @@ namespace BB {
 		virtual ~IXmlSerializer() = default;
 	public:
 		virtual void __stdcall DeserializeByData(BB::IStream* f, void* ob, const BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::IStream* f, void* ob, const BB::SerializationData* d, const char* xmlrootname) = 0;
+		virtual void __stdcall SerializeByData(BB::IStream* f, void* ob, const BB::SerializationData* d, const char* xmlrootname = nullptr) = 0;
 	};
 	class CXmlSerializer : public IXmlSerializer {
 	public:
@@ -36,8 +36,10 @@ namespace BB {
 		void Deserialize(const char* filename, void* ob, const BB::SerializationData* d);
 		void Serialize(const char* filename, BB::IObject* ob);
 
+		static void HookWriteXSIType();
 	private:
 		BB::CXmlSerializer() = default;
+		static void __stdcall WriteType(BB::IStream* f, const char* cn);
 	};
 	class IBinarySerializer {
 	public:

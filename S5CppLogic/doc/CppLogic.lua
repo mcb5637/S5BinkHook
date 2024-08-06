@@ -3368,6 +3368,12 @@ function CppLogic.ModLoader.LoadModpackBBA(name) end
 ---@param msg string
 function CppLogic.ModLoader.InvalidModPackPanic(msg) end
 
+--- asks for a file to export a entitytype to.
+--- the exported entitytype is mostly compliant with my xml schema (some manual cleanup + adding the schema reference is required).
+---@param ety number|string
+---@param path string|nil hint
+function CppLogic.ModLoader.ReserializeEntityType(ety, path) end
+
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.
 function CppLogic_ResetGlobal() end

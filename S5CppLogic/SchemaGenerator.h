@@ -13,9 +13,9 @@ namespace CppLogic::Serializer {
 
 		static void WriteAllClassesSchema(BB::IStream& f);
 
+		static std::string EscapeClassname(std::string_view name);
 	private:
 		static size_t PredictNumberOfFields(const BB::SerializationData* data);
-		static std::string EscapeClassname(std::string_view name);
 		static std::string EscapeString(std::string_view name);
 		static std::string_view TryFindClassOfSeriData(const BB::SerializationData* data, bool alwaysInheritBBObject);
 		static void WriteSeriData(BB::IStream& f, size_t indent, const BB::SerializationData* data, bool skipas = false);

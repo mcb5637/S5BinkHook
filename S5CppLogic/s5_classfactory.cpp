@@ -6,6 +6,8 @@
 #include "s5_idmanager.h"
 #include "s5_mapdisplay.h"
 #include "s5_widget.h"
+#include "SchemaGenerator.h"
+#include "hooks.h"
 
 static inline BB::CXmlSerializer* (__stdcall* const xmlserializer_new)(int d) = reinterpret_cast<BB::CXmlSerializer * (__stdcall* const)(int)>(0x550731);
 BB::CXmlSerializer* BB::CXmlSerializer::Create()
@@ -44,6 +46,34 @@ void BB::CXmlSerializer::Serialize(const char* filename, BB::IObject* ob)
 
 		filestr.Close();
 	}
+}
+
+void _declspec(naked) writexsitype_asm() {
+	__asm {
+		mov eax, 0x54FA1E;
+		call eax;
+
+		push[ebp + 0x10];
+		push esi;
+		call BB::CXmlSerializer::WriteType;
+
+		push 0x54FC5D;
+		ret;
+	}
+}
+
+void BB::CXmlSerializer::HookWriteXSIType()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x54FC58), 0x54FC5D - 0x54FC58 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x54FC58), &writexsitype_asm, reinterpret_cast<void*>(0x54FC5D));
+}
+
+void __stdcall BB::CXmlSerializer::WriteType(BB::IStream* f, const char* cn)
+{
+	f->Write(" xsi:type=\"");
+	auto c = CppLogic::Serializer::SchemaGenerator::EscapeClassname(cn);
+	f->Write(c);
+	f->Write("\"");
 }
 
 inline BB::CBinarySerializer* (__stdcall* const binaryseri_create)(int z, int uk) = reinterpret_cast<BB::CBinarySerializer * (__stdcall*)(int, int)>(0x54C272);

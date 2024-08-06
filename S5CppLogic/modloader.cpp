@@ -24,10 +24,12 @@
 #include "luaserializer.h"
 #include "ModConfig.h"
 #include "StringUtility.h"
+#include "WinAPIUtil.h"
 
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func)
 {
 	Log(L, "Initializing ModLoader");
+	InitExtraECats();
 
 	auto logpath = StringUtil::ANSIToUTF8(mappath);
 	Log(L, logpath.c_str());
@@ -906,6 +908,16 @@ int CppLogic::ModLoader::ModLoader::SanityCheck(lua::State L)
 	return 0;
 }
 
+void CppLogic::ModLoader::ModLoader::InitExtraECats()
+{
+	auto m = CppLogic::GetIdManager<shok::EntityCategory>();
+	for (shok::EntityCategory ec : {shok::EntityCategory::TargetFilter_TargetType, shok::EntityCategory::TargetFilter_TargetTypeLeader,
+		shok::EntityCategory::TargetFilter_CustomRanged, shok::EntityCategory::TargetFilter_NonCombat}) {
+		m.GetIDByNameOrCreate(magic_enum::enum_name(ec).data(), ec);
+		CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj.OnIdAllocated(ec);
+	}
+}
+
 
 int CppLogic::ModLoader::ModLoader::GetModpackInfo(lua::State L)
 {
@@ -951,6 +963,28 @@ int CppLogic::ModLoader::ModLoader::InvalidModPackPanic(lua::State L)
 	auto m = L.CheckStringView(1);
 	MessageBoxA(0, m.data(), "ModLoader failure", MB_OK);
 	std::exit(0);
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReserializeEntityType(lua::State l)
+{
+	luaext::EState L{ l };
+	CppLogic::WinAPI::FileDialog dlg{};
+	auto etyid = L.CheckEnum<shok::EntityTypeId>(1);
+	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	auto t = std::format("Write {}", CppLogic::GetIdManager<shok::EntityTypeId>().GetNameByID(etyid));
+	dlg.Title = t.c_str();
+	dlg.Filter = "xml\0*.xml\0";
+	dlg.SelectedPath = L.OptStringView(2, "");
+	if (dlg.Show()) {
+		BB::CFileStreamEx f{};
+		if (f.OpenFile(dlg.SelectedPath.c_str(), BB::IStream::Flags::DefaultWrite)) {
+			BB::CXmlSerializer::HookWriteXSIType();
+			auto s = BB::CXmlSerializer::CreateUnique();
+			s->SerializeByData(&f, ety, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(ety->GetClassIdentifier()));
+			f.Close();
+		}
+	}
 	return 0;
 }
 

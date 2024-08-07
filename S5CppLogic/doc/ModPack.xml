@@ -18,5 +18,7 @@
 	<!-- ModPack contains scripts intended for the main menu (WIP) -->
 	<MainmenuMod>false</MainmenuMod>
 	<!-- ModPack requires the archive to stay loaded during the map -->
-	<KeepArchive>true</KeepArchive>
+	<KeepArchive>false</KeepArchive>
+	<!-- ModPack can be requested by the user -->
+	<UserRequestable>true</UserRequestable>
 </root>

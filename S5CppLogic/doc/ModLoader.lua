@@ -109,7 +109,7 @@ ModLoader = {
 -- called on both map start and save load.
 -- this is the place to modify something like EntityTypes, as all entities get created after this method,
 -- so even changing behaviors completely works without problems.
--- it is recommended, that you edit data required by others first. so as an example, first add a model, and after that the entitytytpe requiring it (Manifest does that for you).
+-- remember to call ModLoader.LoadModScripts() from your mapscript.
 function ModLoader.Initialize()
 	--- search and apply any modpacks requested
 	ModLoader.RequireModList()
@@ -134,6 +134,11 @@ end
 --- this function gets called after Initialize, only if a savegame gets loaded.
 function ModLoader.LoadSave()
 
+end
+
+--- this function checks if a user requested mod can be added to the map.
+function ModLoader.CheckUserRequestedMod(modname)
+	return ModLoader.IsUserRequestedModWhitelisted(modname)
 end
 
 --- this function gets called when someone leaves a map for any reason.

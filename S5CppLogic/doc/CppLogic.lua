@@ -3351,6 +3351,7 @@ local ModpackDesc = {
 	---@type string[]
 	Override = {},
 	DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false,
+	UserRequestable = false,
 	Archive = nil|ArchivePopHelper
 }
 
@@ -3373,6 +3374,10 @@ function CppLogic.ModLoader.InvalidModPackPanic(msg) end
 ---@param ety number|string
 ---@param path string|nil hint
 function CppLogic.ModLoader.ReserializeEntityType(ety, path) end
+
+--- returns a list of every bba in ModPacks.
+--- @return string[]
+function CppLogic.ModLoader.GetModpacks() end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

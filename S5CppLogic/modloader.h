@@ -343,6 +343,7 @@ namespace CppLogic::ModLoader {
 		static int GetModpackInfo(lua::State L);
 		static int LoadModpackBBA(lua::State L);
 		static int InvalidModPackPanic(lua::State L);
+		static int GetModpacks(lua::State L);
 		static int ReserializeEntityType(lua::State L);
 
 		static constexpr std::array LuaFuncs{
@@ -370,6 +371,7 @@ namespace CppLogic::ModLoader {
 		static constexpr std::array Mainmenu{
 				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
 				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+				lua::FuncReference::GetRef<GetModpacks>("GetModpacks"),
 		};
 
 	public:
@@ -387,6 +389,7 @@ namespace CppLogic::ModLoader {
 		std::string Name, BBAPath, LoaderPath, ScriptPath;
 		std::vector<std::string> Required, Incompatible, Override;
 		bool DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false;
+		bool UserRequestable = false;
 
 		static const BB::SerializationData SerializationData[];
 		static const BB::SerializationData SerializationDataEx[];

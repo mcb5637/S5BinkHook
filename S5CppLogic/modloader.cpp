@@ -2,6 +2,7 @@
 #include "modloader.h"
 
 #include <regex>
+#include <filesystem>
 
 #include "s5_filesystem.h"
 #include "s5_glue.h"
@@ -966,6 +967,24 @@ int CppLogic::ModLoader::ModLoader::InvalidModPackPanic(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::GetModpacks(lua::State L)
+{
+	L.NewTable();
+	std::filesystem::directory_iterator it{ std::filesystem::path(ModpackFolder) };
+	int k = 1;
+	for (const auto& i : it) {
+		if (i.is_regular_file()) {
+			auto p = i.path();
+			if (p.extension().string() == ".bba") {
+				L.Push(p.stem().string());
+				L.SetTableRaw(-2, k);
+				++k;
+			}
+		}
+	}
+	return 1;
+}
+
 int CppLogic::ModLoader::ModLoader::ReserializeEntityType(lua::State l)
 {
 	luaext::EState L{ l };
@@ -1113,6 +1132,7 @@ const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[
 	BB::SerializationData::FieldData("ScriptMod", MemberSerializationFieldData(ModpackDesc, ScriptMod)),
 	BB::SerializationData::FieldData("MainmenuMod", MemberSerializationFieldData(ModpackDesc, MainmenuMod)),
 	BB::SerializationData::FieldData("KeepArchive", MemberSerializationFieldData(ModpackDesc, KeepArchive)),
+	BB::SerializationData::FieldData("UserRequestable", MemberSerializationFieldData(ModpackDesc, UserRequestable)),
 	BB::SerializationData::GuardData(),
 };
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationDataEx[]{

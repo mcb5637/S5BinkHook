@@ -694,6 +694,34 @@ void EGL::CGLEGameLogic::HookCreateEffect()
 	*reinterpret_cast<void**>(0x783A28) = CppLogic::Hooks::MemberFuncPointerToVoid(&CGLEGameLogic::CreateEffectOverride, 0);
 }
 
+void __declspec(naked) egl_gamelogic_onmapscriptloaded_asm() {
+	__asm {
+		call[ecx + 4];
+		push[ebp - 0x18];
+
+		call EGL::CGLEGameLogic::OnMapscriptLoadedCaller;
+
+		push 0x5736FF;
+		ret;
+	}
+}
+
+void(*EGL::CGLEGameLogic::OnMapscriptLoaded)() = nullptr;
+bool HookOnMapscriptLoadedHooked = false;
+void EGL::CGLEGameLogic::HookOnMapscriptLoaded()
+{
+	if (HookOnMapscriptLoadedHooked)
+		return;
+	HookOnMapscriptLoadedHooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5736F9), 0x5736FF-0x5736F9 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5736F9), &egl_gamelogic_onmapscriptloaded_asm, reinterpret_cast<void*>(0x5736FF));
+}
+void __stdcall EGL::CGLEGameLogic::OnMapscriptLoadedCaller()
+{
+	if (OnMapscriptLoaded)
+		OnMapscriptLoaded();
+}
+
 static inline shok::WeatherState(__thiscall* const weatherdata_getnext)(GGL::CWeatherHandler* th) = reinterpret_cast<shok::WeatherState(__thiscall*)(GGL::CWeatherHandler*)>(0x4B93BD);
 shok::WeatherState GGL::CWeatherHandler::GetNextWeatherState()
 {

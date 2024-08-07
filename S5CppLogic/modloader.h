@@ -12,6 +12,7 @@ namespace CppLogic::ModLoader {
 	class ModLoader {
 		static void Init(lua::State L, const char* mappath, std::string_view func);
 		static void PreMapStart(lua_State* ingame, const char* name, const char* path, bool externalmap);
+		static void PostMapscriptLoaded();
 		static void PreSaveLoad(lua_State* ingame, Framework::GameModeStartMapData* data, bool externalmap);
 		static void Log(lua::State L, const char* log);
 		static void AddLib(lua::State L);

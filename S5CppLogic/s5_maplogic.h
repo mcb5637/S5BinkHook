@@ -384,7 +384,7 @@ namespace EGL {
 		EGL::PlayerManager* PlayerMng; // 19
 		PADDINGI(8);
 		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
-		PADDINGI(2);
+		PADDINGI(2); // 32 *EGL::CGLEScripting
 		RandomNumberGenerator RNG; // 34 pretty sure this is not c++ std originally, but this one does the same as the original.
 
 	private:
@@ -426,11 +426,15 @@ namespace EGL {
 		static void HookCreateEffect();
 		static void(*CreateEffectHookCallback)(shok::EffectId id);
 
+		static void HookOnMapscriptLoaded();
+		static void (*OnMapscriptLoaded)();
+
 		static inline EGL::CGLEGameLogic** const GlobalObj = reinterpret_cast<EGL::CGLEGameLogic**>(0x895DAC); // also 85A3A4
 		static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 
 	private:
 		shok::EffectId CreateEffectOverride(EGL::CGLEEffectCreator* data);
+		static void __stdcall OnMapscriptLoadedCaller();
 	};
 	static_assert(offsetof(CGLEGameLogic, RNG) == 4 * 34);
 	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;

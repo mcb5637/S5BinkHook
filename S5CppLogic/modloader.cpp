@@ -88,6 +88,32 @@ void CppLogic::ModLoader::ModLoader::PreMapStart(lua_State* ingame, const char* 
 	snprintf(mappath, bufflen, "%s\\%s\\ModLoader.lua", externalmap ? "Maps" : path, externalmap ? "ExternalMap" : name);
 	Init(L, mappath, "MapStart");
 }
+void CppLogic::ModLoader::ModLoader::PostMapscriptLoaded()
+{
+	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+	int t = L.GetTop();
+
+	Log(L, "ModLoader on Mapscript loaded");
+	L.Push("ModLoader");
+	L.GetGlobal();
+	if (L.IsTable(-1)) {
+		L.Push("LoadModScripts");
+		L.GetTableRaw(-2);
+		if (L.IsFunction(-1)) {
+			if (L.PCall(0, 0) != lua::ErrorCode::Success) {
+				auto s = std::format("LoadModScripts error: {}", L.ToStringView(-1));
+				Log(L, s.c_str());
+				L.Pop(1);
+			}
+		}
+		else {
+			L.Pop(1);
+		}
+	}
+	Log(L, "Done");
+
+	L.SetTop(t);
+}
 const char* internalmap_getpath(GS3DTools::CMapData* d) {
 	Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(d);
 	if (!ci)
@@ -1032,6 +1058,8 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	Framework::AGameModeBase::HookRemoveArchive();
 	Framework::AGameModeBase::HookLoadSave();
 	Framework::AGameModeBase::PreLoadSave = &PreSaveLoad;
+	EGL::CGLEGameLogic::HookOnMapscriptLoaded();
+	EGL::CGLEGameLogic::OnMapscriptLoaded = &PostMapscriptLoaded;
 	(*BB::CFileSystemMgr::GlobalObj)->AddArchive("ModPacks\\CppLogic.bba");
 	Initialized = true;
 }

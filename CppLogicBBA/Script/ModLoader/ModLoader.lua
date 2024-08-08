@@ -3,66 +3,194 @@ ModLoader = ModLoader or {}
 --- applying everything in Manifest
 function ModLoader.ApplyManifest()
 	ModLoader.FillMissingManifestEntries(ModLoader.Manifest)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.ArmorClasses, CppLogic.ModLoader.PreLoadArmorClass, ArmorClasses)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.EffectTypes, CppLogic.ModLoader.PreLoadEffectType, GGL_Effects)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.PreLoadTaskList, TaskLists)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.PreLoadEntityType, Entities)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.PreLoadTechnology, Technologies)
-	ModLoader.PreloadManifestType(ModLoader.Manifest.EntityCategories, CppLogic.ModLoader.PreLoadEntityCategory, EntityCategories)
-	for dc, cfg in pairs(ModLoader.Manifest.DamageClasses) do
-		CppLogic.ModLoader.AddDamageClass(dc, cfg)
+	local mt = ModLoader.ManifestTypes()
+	for _, m in ipairs(mt) do
+		ModLoader.ManifestType[m.Type or "default"].Preload(m, ModLoader.Manifest)
 	end
-	for uc, et in pairs(ModLoader.Manifest.SettlerUpgradeCategory) do
-		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
-	end
-	for uc, et in pairs(ModLoader.Manifest.BuildingUpgradeCategory) do
-		CppLogic.ModLoader.PreLoadUpgradeCategory(uc)
-	end
-
-	for _, n in ipairs(ModLoader.Manifest.DirectXEffects) do
-		CppLogic.ModLoader.LoadDirectXEffect(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.TerrainTextures_Add) do
-		CppLogic.ModLoader.AddTerrainTexture(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.TerrainTextures_Reload) do
-		CppLogic.ModLoader.AddTerrainTexture(n)
-	end
-	ModLoader.HandleManifestType(ModLoader.Manifest.WaterTypes, CppLogic.ModLoader.AddWaterType)
-	ModLoader.HandleManifestType(ModLoader.Manifest.TerrainTypes, CppLogic.ModLoader.AddTerrainType)
-	for _, n in ipairs(ModLoader.Manifest.SelectionTextures_Add) do
-		CppLogic.ModLoader.AddSelectionTexture(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.SelectionTextures_Reload) do
-		CppLogic.ModLoader.AddSelectionTexture(n)
-	end
-	ModLoader.HandleManifestType(ModLoader.Manifest.Animations, CppLogic.ModLoader.AddAnimation)
-	ModLoader.HandleManifestType(ModLoader.Manifest.AnimSets, CppLogic.ModLoader.AddAnimSet)
-	ModLoader.HandleManifestType(ModLoader.Manifest.Models, CppLogic.ModLoader.AddModel)
-	ModLoader.HandleManifestType(ModLoader.Manifest.EffectTypes, CppLogic.ModLoader.AddEffectType)
-	ModLoader.HandleManifestType(ModLoader.Manifest.TaskLists, CppLogic.ModLoader.AddTaskList)
-	ModLoader.HandleManifestType(ModLoader.Manifest.EntityTypes, CppLogic.ModLoader.AddEntityType)
-	ModLoader.HandleManifestType(ModLoader.Manifest.Technologies, CppLogic.ModLoader.AddTechnology)
-	for _, n in ipairs(ModLoader.Manifest.GUITextures_Add) do
-		CppLogic.ModLoader.AddGUITexture(n)
-	end
-	for _, n in ipairs(ModLoader.Manifest.GUITextures_Reload) do
-		CppLogic.ModLoader.AddGUITexture(n)
-	end
-	for uc, et in pairs(ModLoader.Manifest.SettlerUpgradeCategory) do
-		CppLogic.ModLoader.AddSettlerUpgradeCategory(uc, Entities[et])
-	end
-	for uc, et in pairs(ModLoader.Manifest.BuildingUpgradeCategory) do
-		CppLogic.ModLoader.AddBuildingUpgradeCategory(uc, Entities[et])
-	end
-	for xp, ec in pairs(ModLoader.Manifest.ExperienceClasses) do
-		CppLogic.ModLoader.AddExperienceClass(xp, ec)
-	end
-	for _, a in ipairs(ModLoader.Manifest.SoundGroups) do
-		---@diagnostic disable-next-line: deprecated
-		CppLogic.ModLoader.AddSounds(unpack(a))
+	for _, m in ipairs(mt) do
+		ModLoader.ManifestType[m.Type or "default"].Load(m, ModLoader.Manifest)
 	end
 end
+
+function ModLoader.ManifestTypes()
+	return {
+		{Key="ArmorClasses", Preload=CppLogic.ModLoader.PreLoadArmorClass, Table=ArmorClasses, Load=nil},
+		{Key="EntityCategories", Preload=CppLogic.ModLoader.PreLoadEntityCategory, Table=EntityCategories, Load=nil},
+		{Key="DamageClasses", Preload=nil, Table=DamageClasses, Load=CppLogic.ModLoader.AddDamageClass, Type="kv"},
+		{Key="DirectXEffects", Preload=nil, Table=nil, Load=CppLogic.ModLoader.LoadDirectXEffect},
+		{Key="TerrainTextures_Add", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddTerrainTexture},
+		{Key="TerrainTextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="TerrainTextures_Add"},
+		{Key="WaterTypes", Preload=nil, Table=WaterTypes, Load=CppLogic.ModLoader.AddWaterType},
+		{Key="TerrainTypes", Preload=nil, Table=TerrainTypes, Load=CppLogic.ModLoader.AddTerrainType},
+		{Key="SelectionTextures_Add", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddSelectionTexture},
+		{Key="SelectionTextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="SelectionTextures_Add"},
+		{Key="Animations", Preload=nil, Table=Animations, Load=CppLogic.ModLoader.AddAnimation},
+		{Key="AnimSets", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddAnimSet},
+		{Key="Models", Preload=nil, Table=Models, Load=CppLogic.ModLoader.AddModel},
+		{Key="EffectTypes", Preload=CppLogic.ModLoader.PreLoadEffectType, Table=GGL_Effects, Load=CppLogic.ModLoader.AddEffectType},
+		{Key="TaskLists", Preload=CppLogic.ModLoader.PreLoadTaskList, Table=TaskLists, Load=CppLogic.ModLoader.AddTaskList},
+		{Key="EntityTypes", Preload=CppLogic.ModLoader.PreLoadEntityType, Table=Entities, Load=CppLogic.ModLoader.AddEntityType},
+		{Key="Technologies", Preload=CppLogic.ModLoader.PreLoadTechnology, Table=Technologies, Load=CppLogic.ModLoader.AddTechnology},
+		{Key="GUITextures_Add", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddGUITexture},
+		{Key="GUITextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures_Add"},
+		{Key="SettlerUpgradeCategory", Preload=CppLogic.ModLoader.PreLoadUpgradeCategory, Table=UpgradeCategories, Load=CppLogic.ModLoader.AddSettlerUpgradeCategory, Type="kv"},
+		{Key="BuildingUpgradeCategory", Preload=CppLogic.ModLoader.PreLoadUpgradeCategory, Table=UpgradeCategories, Load=CppLogic.ModLoader.AddBuildingUpgradeCategory, Type="kv"},
+		{Key="ExperienceClasses", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddExperienceClass, Type="kv"},
+		{Key="SoundGroups", Preload=nil, Table=Sounds, Load=CppLogic.ModLoader.AddSounds, Type="sound"},
+	}
+end
+
+ModLoader.ManifestType = {
+	default = {
+		Preload = function(t, manifest)
+			local preload = t.Preload
+			if not preload then
+				return
+			end
+			local entries = manifest[t.Key]
+			for _, k in ipairs(entries) do
+				if type(k) == "string" then
+					preload(k)
+				end
+			end
+		end,
+		Load = function(t, manifest)
+			local add = t.Load
+			if not add then
+				return
+			end
+			local entries = manifest[t.Key]
+			for _, k in ipairs(entries) do
+				add(k)
+			end
+		end,
+		Merge = function(t, into, from)
+			local function contains(t, v)
+				for _, d in ipairs(t) do
+					if d == v then
+						return true
+					end
+				end
+				return false
+			end
+			local at = into[t.Key]
+			for _, d in ipairs(from[t.Key]) do
+				if not contains(at, d) then
+					table.insert(at, d)
+				end
+			end
+		end,
+		Fix = function(t, manifest)
+			local data = t.Table
+			if not data then
+				return
+			end
+			local entries = manifest[t.Key]
+			local function deref(d)
+				for k, v in pairs(data) do
+					if v == d then
+						return k
+					end
+				end
+				return d
+			end
+			for i, e in ipairs(entries) do
+				entries[i] = deref(e)
+			end
+		end,
+	},
+	kv = {
+		Preload = function(t, manifest)
+			local preload = t.Preload
+			if not preload then
+				return
+			end
+			local entries = manifest[t.Key]
+			local data = t.Table
+			for k, _ in pairs(entries) do
+				if type(k) == "string" then
+					preload(k)
+				end
+			end
+		end,
+		Load = function(t, manifest)
+			local add = t.Load
+			if not add then
+				return
+			end
+			local entries = manifest[t.Key]
+			for k, v in pairs(entries) do
+				add(k, v)
+			end
+		end,
+		Merge = function(t, into, from)
+			local at = into[t.Key]
+			for u, v in pairs(from[t.Key]) do
+				if not at[u] then
+					at[u] = v
+				end
+			end
+		end,
+		Fix = function(t, manifest)
+			local data = t.Table
+			if not data then
+				return
+			end
+			local entries = manifest[t.Key]
+			local function deref(d)
+				for k, v in pairs(data) do
+					if v == d then
+						return k
+					end
+				end
+				return d
+			end
+			local change = {}
+			for k, _ in pairs(entries) do
+				local kn = deref(k)
+				if kn ~= k then
+					change[k] = kn
+				end
+			end
+			for k, kn in pairs(change) do
+				entries[kn] = entries[k]
+				entries[k] = nil
+			end
+		end,
+	},
+	sound = {
+		Preload = function(t, manifest)
+		end,
+		Load = function(t, manifest)
+			local add = t.Load
+			if not add then
+				return
+			end
+			local entries = manifest[t.Key]
+			for _, k in ipairs(entries) do
+				---@diagnostic disable-next-line: deprecated
+				add(unpack(k))
+			end
+		end,
+		Merge = function(t, into, from)
+			local at = into[t.Key]
+			for _, sg in ipairs(from[t.Key]) do
+				local c = false
+				for _, s in ipairs(at) do
+					if sg[1] == s[1] then
+						c = true
+					end
+				end
+				if not c then
+					table.insert(at, sg)
+				end
+			end
+		end,
+		Fix = function(t, manifest)
+
+		end,
+	},
+}
 
 function ModLoader.PreloadManifestType(en, preload, data)
 	for _, k in ipairs(en) do
@@ -82,53 +210,9 @@ end
 function ModLoader.MergeManifest(into, from)
 	ModLoader.FillMissingManifestEntries(into)
 	ModLoader.FillMissingManifestEntries(from)
-	local function deref(data, d)
-		for k, v in pairs(data) do
-			if v == d then
-				return k
-			end
-		end
-		return d
-	end
-	local function contains(t, v)
-		for _, d in ipairs(t) do
-			if d == v then
-				return true
-			end
-		end
-		return false
-	end
-	for _, k in ipairs {
-		"EntityTypes", "EffectTypes", "TaskLists", "Technologies", "Models", "Animations", "AnimSets", "SelectionTextures_Add", "SelectionTextures_Reload",
-  "GUITextures_Add", "GUITextures_Reload", "TerrainTextures_Add", "TerrainTextures_Reload", "WaterTypes", "TerrainTypes", "DirectXEffects",
-  "ArmorClasses", "EntityCategories"
-	} do
-		local at = into[k]
-		for _, d in ipairs(from[k]) do
-			if not contains(at, d) then
-				table.insert(at, from)
-			end
-		end
-	end
-	for _, k in ipairs {"SettlerUpgradeCategory", "BuildingUpgradeCategory", "DamageClasses"} do
-		local at = into[k]
-		for u, v in pairs(from[k]) do
-			at[u] = v
-		end
-	end
-	do
-		local at = into.SoundGroups
-		for _, sg in ipairs(from.SoundGroups) do
-			local c = false
-			for _, s in ipairs(at) do
-				if sg[1] == s[1] then
-					c = true
-				end
-			end
-			if not c then
-				table.insert(at, sg)
-			end
-		end
+	local mt = ModLoader.ManifestTypes()
+	for _, m in ipairs(mt) do
+		ModLoader.ManifestType[m.Type or "default"].Merge(m, into, from)
 	end
 end
 
@@ -169,23 +253,25 @@ function ModLoader.DiscoverRequired(req, modlist)
 end
 
 --- checks a modlist and sorts it
+--- ... [2] overrides [1]
 function ModLoader.SortMods(modlist)
 	local function contains(t, v)
 		for _, d in ipairs(t) do
 			if d == v then
-				return true
+				return d
 			end
 		end
-		return false
+		return nil
 	end
 	if modlist.Missing[1] then
 		LuaDebugger.Break()
-		CppLogic.ModLoader.InvalidModPackPanic("missing mod")
+		CppLogic.ModLoader.InvalidModPackPanic("missing mod: "..modlist.Missing[1])
 	end
 	for _, m in ipairs(modlist.Mods) do
-		if contains(modlist.Incompatible, m.Name) then
+		local c = contains(modlist.Incompatible, m.Name)
+		if c then
 			LuaDebugger.Break()
-			CppLogic.ModLoader.InvalidModPackPanic("incompatibility found")
+			CppLogic.ModLoader.InvalidModPackPanic("incompatibility found: "..m.Name.." with "..c)
 		end
 	end
 	table.sort(modlist.Mods, function(a, b)
@@ -193,7 +279,7 @@ function ModLoader.SortMods(modlist)
 		local ba = contains(b.Override, a.Name)
 		if ab and ba then
 			LuaDebugger.Break()
-			CppLogic.ModLoader.InvalidModPackPanic("circular override")
+			CppLogic.ModLoader.InvalidModPackPanic("circular override: "..a.Name.." with "..b.Name)
 		end
 		if ba then
 			return true
@@ -202,27 +288,38 @@ function ModLoader.SortMods(modlist)
 	end)
 end
 
---- loads a ModPack and calls its loader, if present
+--- loads a ModPack bba, if present
 function ModLoader.LoadMod(mod)
 	if type(mod) == "string" then
 		mod = CppLogic.ModLoader.GetModpackInfo(mod)
 		assert(type(mod) == "table")
 	end
 	mod.Archive = CppLogic.ModLoader.LoadModpackBBA(mod.Name)
+	return mod
+end
+
+--- initializes mod (load its loader, then call Init)
+function ModLoader.InitMod(mod)
 	if mod.LoaderPath ~= "" then
 		Script.Load(mod.LoaderPath)
-		ModLoader[mod.Name].Init()
+		xpcall(function()
+			ModLoader[mod.Name].Init()
+		end, function(err)
+			CppLogic.ModLoader.InvalidModPackPanic("failed to initialize "..mod.Name..": "..err)
+		end)
 	end
-	return mod
 end
 
 --- loads a modlst
 function ModLoader.LoadMods(modlist)
-	for _, m in ipairs(modlist.Mods) do
-		ModLoader.LoadMod(m)
-		if m.LoaderPath ~= "" then
-			Script.Load(m.LoaderPath)
-		end
+	-- [n] ... [2] overrides [1]
+	-- always inserted after s5x -> {s5x, n, ..., 2, 1}
+	for i, m in ipairs(modlist.Mods) do
+		modlist.Mods[i] = ModLoader.LoadMod(m)
+	end
+	-- merge ignores items already present -> {s5x, n, ..., 2, 1}
+	for i=table.getn(modlist.Mods),1,-1 do
+		ModLoader.InitMod(modlist.Mods[i])
 	end
 end
 
@@ -269,7 +366,7 @@ end
 
 --- user requested mods allowed by default
 function ModLoader.IsUserRequestedModWhitelisted(modname)
-	return modname == "test"
+	return modname == "test" or modname == "WideScreenMode"
 end
 
 --- parse user requested mods and add them to the mod list
@@ -289,14 +386,26 @@ function ModLoader.FillMissingManifestEntries(manifest)
 	if manifest.MissingFilled then
 		return
 	end
-	for _, k in ipairs {
-		"EntityTypes", "EffectTypes", "TaskLists", "Technologies", "ExperienceClasses", "Models", "Animations", "AnimSets", "SelectionTextures_Add",
-  "SelectionTextures_Reload", "GUITextures_Add", "GUITextures_Reload", "SettlerUpgradeCategory", "BuildingUpgradeCategory", "TerrainTextures_Add",
-  "TerrainTextures_Reload", "WaterTypes", "TerrainTypes", "SoundGroups", "DirectXEffects", "ArmorClasses", "DamageClasses", "EntityCategories"
-	} do
-		if not manifest[k] then
-			manifest[k] = {}
+	local mt = ModLoader.ManifestTypes()
+	local function getdepr(d)
+		for _,m in ipairs(mt) do
+			if m.Key == d then
+				return m
+			end
 		end
+		assert(false)
+	end
+	for _, m in ipairs(mt) do
+		local t = ModLoader.ManifestType[m.Type or "default"]
+		if not manifest[m.Key] then
+			manifest[m.Key] = {}
+		elseif m.Deprecated then
+			local n = getdepr(m.Deprecated)
+			ModLoader.ManifestType[n.Type or "default"].Merge(n, manifest, {
+				[n.Key] = manifest[m.Key],
+			})
+		end
+		t.Fix(m, manifest)
 	end
 	manifest.MissingFilled = true
 end

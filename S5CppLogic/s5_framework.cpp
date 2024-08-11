@@ -6,6 +6,7 @@
 #include "s5_mapdisplay.h"
 #include "s5_classfactory.h"
 #include "s5_exception.h"
+#include "s5_events.h"
 #include "hooks.h"
 
 void ECore::IReplayStreamExtension::unknown0()
@@ -132,11 +133,17 @@ void Framework::SavegameSystem::SaveGame(const char* slot, GS3DTools::CMapData* 
 
 void (*Framework::SavegameSystem::OnGameSavedTo)(const char* folder, const char* savename) = nullptr;
 void (*Framework::SavegameSystem::OnGameSavedTo2)(const char* folder, const char* savename) = nullptr;
+void (*Framework::SavegameSystem::PreGameSavedTo)(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name) = nullptr;
+void (*Framework::SavegameSystem::PostGameSavedTo)(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name) = nullptr;
 inline void(__thiscall* const savedata_save)(Framework::SaveData* th, const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name) = reinterpret_cast<void(__thiscall*)(Framework::SaveData*, const char*, GGL::CGLGameLogic*, GS3DTools::CMapData*, const char*)>(0x402DAD);
 
 void __thiscall Framework::SaveData::SaveGameOverride(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name)
 {
+    if (Framework::SavegameSystem::PreGameSavedTo)
+        Framework::SavegameSystem::PreGameSavedTo(path, gl, mapdata, name);
     savedata_save(this, path, gl, mapdata, name);
+    if (Framework::SavegameSystem::PostGameSavedTo)
+        Framework::SavegameSystem::PostGameSavedTo(path, gl, mapdata, name);
     if (Framework::SavegameSystem::OnGameSavedTo)
         Framework::SavegameSystem::OnGameSavedTo(path, name);
     if (Framework::SavegameSystem::OnGameSavedTo2)
@@ -146,6 +153,19 @@ void Framework::SavegameSystem::HookSaveGame()
 {
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x403235), 0x10 };
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x403235), CppLogic::Hooks::MemberFuncPointerToVoid(&SaveData::SaveGameOverride, 0));
+}
+
+int Framework::SavegameSystem::SavegameValidOverride(lua::State L)
+{
+    auto save = L.CheckStringView(1);
+    L.Push(IsSaveValidOverride(save));
+    return 1;
+}
+bool (*Framework::SavegameSystem::IsSaveValidOverride)(std::string_view savename) = nullptr;
+void Framework::SavegameSystem::HookSavegameValid()
+{
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40D0F0), 0x40D0FA-0x40D0F0 };
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40D0F0), &lua::State::CppToCFunction<SavegameValidOverride>, reinterpret_cast<void*>(0x40D0FA));
 }
 
 bool(__thiscall* const gdb_iskeyvalid)(GDB::CList* th, const char* k) = reinterpret_cast<bool(__thiscall* const)(GDB::CList*, const char*)>(0x40E038);
@@ -249,6 +269,13 @@ bool __thiscall Framework::AGameModeBase::StartMapOverride(const char* name, con
         Framework::AGameModeBase::PreStartMap(IngameLuaState, name, path, IsExternalMap);
     return gamemodebase_startmap(this, name, path);
 }
+inline void(__stdcall* const gamemodebase_callluafunc)(lua_State* L, const char* f) = reinterpret_cast<void(__stdcall*)(lua_State*, const char*)>(0x59B4B4);
+void __stdcall Framework::AGameModeBase::FireMapStartTrigger(lua_State* L, const char* f)
+{
+    gamemodebase_callluafunc(L, f);
+    BB::CEvent ev{ shok::EventIDs::CppLogicEvent_OnMapStarted };
+    (*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+}
 bool HookStartMap_Hooked = false;
 void Framework::AGameModeBase::HookStartMap()
 {
@@ -256,12 +283,16 @@ void Framework::AGameModeBase::HookStartMap()
         return;
     HookStartMap_Hooked = true;
     CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {reinterpret_cast<void*>(0x40F851),
-        reinterpret_cast<void*>(0x40F566)
+        reinterpret_cast<void*>(0x40F8C6),
+        reinterpret_cast<void*>(0x40F566),
+        reinterpret_cast<void*>(0x40F5F0),
     } };
     // sp
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F851), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::StartMapOverride, 0));
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F8C6), &Framework::AGameModeBase::FireMapStartTrigger);
     // mp
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F566), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::StartMapOverride, 0));
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40F5F0), &Framework::AGameModeBase::FireMapStartTrigger);
 }
 
 bool Framework::AGameModeBase::DoNotRemoveNextArchive = false; void __thiscall Framework::AGameModeBase::RemoveArchiveIfExternalmapOverride()
@@ -299,6 +330,12 @@ void __fastcall Framework::AGameModeBase::OnSaveLoadedEx(Framework::GameModeStar
     if (Framework::AGameModeBase::PreLoadSave)
         Framework::AGameModeBase::PreLoadSave(IngameLuaState, d, IsExternalMap);
 }
+void __stdcall Framework::AGameModeBase::FireSaveLoadTrigger(lua_State* L, const char* f)
+{
+    gamemodebase_callluafunc(L, f);
+    CppLogic::Events::SaveLoadedEvent ev{ shok::EventIDs::CppLogicEvent_OnSavegameLoaded, "" };
+    (*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+}
 void __declspec(naked) gamemodebase_onloadsave_asm() {
     __asm {
         mov ecx, esi;
@@ -313,14 +350,33 @@ void __declspec(naked) gamemodebase_onloadsave_asm() {
         ret;
     };
 }
+bool __thiscall Framework::AGameModeBase::LoadSaveAddS5xOverride(GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path)
+{
+    std::string back{ static_cast<std::string_view>(map->MapGUID) };
+    auto l = static_cast<std::string_view>(map->MapGUID).find(';');
+    if (l != std::string_view::npos) {
+        map->MapGUID.resize(l);
+    }
+
+    bool r = AddArchiveIfExternalmap(data, map, path);
+
+    map->MapGUID = back;
+    return r;
+}
 bool HookLoadSave_Hooked = false;
 void Framework::AGameModeBase::HookLoadSave()
 {
     if (HookLoadSave_Hooked)
         return;
     HookLoadSave_Hooked = true;
-    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40FB6E), 0x40FB76 - 0x40FB6E };
+    CppLogic::Hooks::SaveVirtualProtect vp{ std::max(0x40FB76 - 0x40FB6E, 0x10), {
+        reinterpret_cast<void*>(0x40FB6E),
+        reinterpret_cast<void*>(0x40FC61),
+        reinterpret_cast<void*>(0x40FB0B),
+    } };
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40FB6E), &gamemodebase_onloadsave_asm, reinterpret_cast<void*>(0x40FB76));
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40FC61), &FireSaveLoadTrigger);
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40FB0B), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::LoadSaveAddS5xOverride, 0));
 }
 
 void __stdcall Framework::CSinglePlayerMode::CNetworkEvent::PostEvent(BB::CEvent* ev)

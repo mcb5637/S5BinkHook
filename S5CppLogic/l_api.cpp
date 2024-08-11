@@ -111,16 +111,38 @@ namespace CppLogic::API {
 		return L.GetTop() - 2;
 	}
 
-	int MapGetDataPath(lua::State L) {
-		int ty = L.CheckInt(2);
-		const char* cn = L.OptString(3, nullptr); // optional
+	int MapGetDataPath(lua::State l) {
+		luaext::EState L{ l };
 		const char* n = L.CheckString(1);
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(static_cast<shok::MapType>(ty), cn);
-		if (!ci)
-			throw lua::LuaException("invalid map type/campagn");
+		auto ty = L.CheckEnum<shok::MapType>(2);
+		const char* cn = L.OptString(3, nullptr); // optional
+		bool nt = L.OptBool(4, false);
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
+		if (ci == nullptr) {
+			if (nt) {
+				L.Push("");
+				L.Push("");
+				L.NewTable();
+				L.Push("invalid map type/campagn");
+				return 4;
+			}
+			else {
+				throw lua::LuaException("invalid map type/campagn");
+			}
+		}
 		Framework::MapInfo* i = ci->GetMapInfoByName(n);
-		if (!i)
-			throw lua::LuaException("invalid map");
+		if (i == nullptr) {
+			if (nt) {
+				L.Push("");
+				L.Push("");
+				L.NewTable();
+				L.Push("invalid map");
+				return 4;
+			}
+			else {
+				throw lua::LuaException("invalid");
+			}
+		}
 		L.Push(i->MapFilePath.c_str());
 		L.Push(i->GUID.Data.c_str());
 		L.NewTable();
@@ -135,14 +157,27 @@ namespace CppLogic::API {
 
 	int SaveGetMapInfo(lua::State L) {
 		const char* save = L.CheckString(1);
+		bool nt = L.OptBool(2, false);
 		Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
-		if (!sdata->LoadSaveData(save))
-			throw lua::LuaException("save doesnt exist");
+		if (!sdata->LoadSaveData(save)) {
+			if (nt) {
+				L.Push("");
+				L.Push(0);
+				L.Push("");
+				L.Push("");
+				L.Push(false);
+				return 5;
+			}
+			else {
+				throw lua::LuaException("save doesnt exist");
+			}
+		}
 		L.Push(sdata->CurrentSave->MapData.MapName.c_str());
 		L.Push(static_cast<int>(sdata->CurrentSave->MapData.MapType));
 		L.Push(sdata->CurrentSave->MapData.MapCampagnName.c_str());
 		L.Push(sdata->CurrentSave->MapData.MapGUID.c_str());
-		return 4;
+		L.Push(true);
+		return 5;
 	}
 
 	void PushGDBList(lua::State L, const GDB::CList& list) {

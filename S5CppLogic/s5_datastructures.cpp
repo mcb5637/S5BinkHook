@@ -45,6 +45,21 @@ void shok::String::assign(const char* s, size_t len)
 {
 	str_assign_l(this, s, len);
 }
+inline shok::String* (__thiscall* const str_append)(shok::String* th, shok::String* a, size_t p, size_t c) = reinterpret_cast<shok::String * (__thiscall*)(shok::String*, shok::String*, size_t, size_t)>(0x405B62);
+shok::String& shok::String::append(String& toappend, size_t pos, size_t count)
+{
+	return *str_append(this, &toappend, pos, count);
+}
+inline shok::String* (__thiscall* const str_append2)(shok::String* th, shok::String* a) = reinterpret_cast<shok::String * (__thiscall*)(shok::String*, shok::String*)>(0x459310);
+shok::String& shok::String::append(String& toappend)
+{
+	return *str_append2(this, &toappend);
+}
+inline void(__thiscall* const str_resize)(shok::String* th, size_t l, char c) = reinterpret_cast<void(__thiscall*)(shok::String*, size_t, char)>(0x5540BA);
+void shok::String::resize(size_t len, char c)
+{
+	str_resize(this, len, c);
+}
 shok::String::String() : shok::String("")
 {
 }

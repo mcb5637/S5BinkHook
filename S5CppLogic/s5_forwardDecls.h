@@ -114,6 +114,7 @@ namespace EGL {
 	using CEventGetValue_Float = CEventGetValue<float, 0x578EE8F7>;
 
 	class CEventGetPosition;
+	class CGLEScripting;
 }
 namespace GGL {
 	class CBuilding;

@@ -875,6 +875,18 @@ namespace CppLogic::Events {
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100F);
 	};
+
+	class SaveLoadedEvent : public BB::CEvent {
+	public:
+		std::string_view Slot;
+
+		inline SaveLoadedEvent(shok::EventIDs id, std::string_view s) : BB::CEvent(id), Slot(s) {}
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1012);
+		inline virtual shok::ClassId __stdcall GetClassIdentifier() const override {
+			return Identifier;
+		}
+	};
 }
 
 namespace shok {
@@ -1276,6 +1288,8 @@ namespace shok {
 		CppLogicEvent_OnRefinerSupplyTaken = 0x5000A, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker)
 		CppLogicEvent_OnResourceMined = 0x5000B, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker/serf)
 		CppLogicEvent_CanBuySettler = 0x5000C, // CppLogic::Events::CanBuySettlerEvent
+		CppLogicEvent_OnMapStarted = 0x5000D, // BB::CEvent
+		CppLogicEvent_OnSavegameLoaded = 0x5000E, // CppLogic::Events::SaveLoadedEvent
 	};
 
 	enum class InputEventIds : int {

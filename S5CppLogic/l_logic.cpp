@@ -1609,6 +1609,12 @@ namespace CppLogic::Logic {
 			L.Push("CPPLOGIC_EVENT_CAN_BUY_SETTLER");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_CanBuySettler));
 			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_MAP_STARTED");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnMapStarted));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_SAVEGAME_LOADED");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnSavegameLoaded));
+			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
 	}

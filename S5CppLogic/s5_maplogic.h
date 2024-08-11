@@ -384,7 +384,8 @@ namespace EGL {
 		EGL::PlayerManager* PlayerMng; // 19
 		PADDINGI(8);
 		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
-		PADDINGI(2); // 32 *EGL::CGLEScripting
+		EGL::CGLEScripting* Scripting;
+		PADDINGI(1);
 		RandomNumberGenerator RNG; // 34 pretty sure this is not c++ std originally, but this one does the same as the original.
 
 	private:

@@ -27,6 +27,9 @@
 #include "StringUtility.h"
 #include "WinAPIUtil.h"
 
+shok::String CppLogic::ModLoader::ModLoader::ModPackList{};
+size_t CppLogic::ModLoader::ModLoader::GUIDLength = 0;
+
 void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func)
 {
 	Log(L, "Initializing ModLoader");
@@ -35,8 +38,8 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std
 	auto logpath = StringUtil::ANSIToUTF8(mappath);
 	Log(L, logpath.c_str());
 	if (!BB::CFileSystemMgr::DoesFileExist(mappath)) {
-		Log(L, "no ModLoader.lua, aborting");
-		return;
+		Log(L, "no ModLoader.lua, use default instead");
+		mappath = "data/maps/default/ModLoader.lua";
 	}
 	int t = L.GetTop();
 	EScr::CScriptTriggerSystem::LoadFileToLuaState(L.GetState(), mappath);
@@ -172,6 +175,17 @@ void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
 
 	L.SetTableRaw(-3);
 	L.Pop(1);
+}
+void CppLogic::ModLoader::ModLoader::PreSave(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name)
+{
+	GUIDLength = mapdata->MapGUID.size();
+	mapdata->MapGUID.append(ModPackList);
+}
+void CppLogic::ModLoader::ModLoader::PostSave(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name)
+{
+	mapdata->MapGUID.resize(GUIDLength);
+
+
 }
 
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::Load(shok::EntityTypeId id, luaext::EState L) {
@@ -1033,6 +1047,45 @@ int CppLogic::ModLoader::ModLoader::ReserializeEntityType(lua::State l)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::SetModPackList(lua::State L)
+{
+	ModPackList = L.CheckStringView(1);
+	return 0;
+
+}
+
+int CppLogic::ModLoader::ModLoader::GetModPackList(lua::State L)
+{
+	L.Push(ModPackList);
+	return 1;
+}
+
+lua::Reference CppLogic::ModLoader::ModLoader::SavegameValidOverride{};
+int CppLogic::ModLoader::ModLoader::OverrideSavegameValid(lua::State L)
+{
+	if (!L.IsFunction(1))
+		throw lua::LuaException{ "no func at 1" };
+	L.UnRef(SavegameValidOverride);
+	L.PushValue(1);
+	SavegameValidOverride = L.Ref();
+	Framework::SavegameSystem::IsSaveValidOverride = [](std::string_view save) {
+		lua::State L{ shok::LuaStateMainmenu };
+		int t = L.GetTop();
+		bool r = false;
+
+		L.Push(SavegameValidOverride);
+		L.Push(save);
+		if (L.PCall(1, 1) == lua::ErrorCode::Success) {
+			r = L.ToBoolean(-1);
+		}
+
+		L.SetTop(t);
+		return r;
+		};
+	Framework::SavegameSystem::HookSavegameValid();
+	return 0;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -1058,6 +1111,8 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	Framework::AGameModeBase::HookRemoveArchive();
 	Framework::AGameModeBase::HookLoadSave();
 	Framework::AGameModeBase::PreLoadSave = &PreSaveLoad;
+	Framework::SavegameSystem::PreGameSavedTo = &PreSave;
+	Framework::SavegameSystem::PostGameSavedTo = &PostSave;
 	EGL::CGLEGameLogic::HookOnMapscriptLoaded();
 	EGL::CGLEGameLogic::OnMapscriptLoaded = &PostMapscriptLoaded;
 	(*BB::CFileSystemMgr::GlobalObj)->AddArchive("ModPacks\\CppLogic.bba");
@@ -1068,6 +1123,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 {
 	if (((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu)) {
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		ModPackList = "";
 
 		Log(L, "Cleanup");
 		int t = L.GetTop();
@@ -1153,6 +1209,7 @@ CppLogic::SerializationListOptions_ForVector<std::string> stringvect{};
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[]{
 	BB::SerializationData::FieldData("LoaderPath", MemberSerializationSizeAndOffset(ModpackDesc, LoaderPath), &CppLogic::StringSerializer::GlobalObj),
 	BB::SerializationData::FieldData("ScriptPath", MemberSerializationSizeAndOffset(ModpackDesc, ScriptPath), &CppLogic::StringSerializer::GlobalObj),
+	BB::SerializationData::FieldData("Version", MemberSerializationSizeAndOffset(ModpackDesc, Version), &CppLogic::StringSerializer::GlobalObj),
 	BB::SerializationData::FieldData("Required", MemberSerializationSizeAndOffset(ModpackDesc, Required), &CppLogic::StringSerializer::GlobalObj, &stringvect),
 	BB::SerializationData::FieldData("Incompatible", MemberSerializationSizeAndOffset(ModpackDesc, Incompatible), &CppLogic::StringSerializer::GlobalObj, &stringvect),
 	BB::SerializationData::FieldData("Override", MemberSerializationSizeAndOffset(ModpackDesc, Override), &CppLogic::StringSerializer::GlobalObj, &stringvect),

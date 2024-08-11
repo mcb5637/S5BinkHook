@@ -784,22 +784,28 @@ function CppLogic.API.DoesFileExist(file) end
 function CppLogic.API.DoString(code, name) end
 
 --- gets the path to a map. internal data or s5x file.
+--- if nothrow is set, returns dummy variables + error message on invalid map
 --- @param mapname string filename of the map
 --- @param typ number type code
 --- @param campname string campagn name
+--- @param nothrow boolean|nil default false
 --- @return string path
 --- @return string GUID
 --- @return number[] keys
-function CppLogic.API.MapGetDataPath(mapname, typ, campname) end
+--- @return string|nil error
+function CppLogic.API.MapGetDataPath(mapname, typ, campname, nothrow) end
 
 --- returns the map a save is accociated with.
 --- does not check, if the save is still valid, just if it exists.
+--- if nothrow is set, returns dummy variables + false on invalid save
 --- @param save string
+--- @param nothrow boolean|nil default false
 --- @return string mapname
 --- @return number typ
 --- @return string campname
 --- @return string GUID
-function CppLogic.API.SaveGetMapInfo(save) end
+--- @return boolean valid
+function CppLogic.API.SaveGetMapInfo(save, nothrow) end
 
 --- returns the complete GDB as multilayered table.
 --- keys are split at every \, and put into a layered map.
@@ -3343,7 +3349,7 @@ function ArchivePopHelper:IsLoaded() end
 function ArchivePopHelper:ToString() end
 ---@class ModpackDesc
 local ModpackDesc = {
-	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "",
+	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "", Version = "",
 	---@type string[]
 	Required = {},
 	---@type string[]
@@ -3357,7 +3363,7 @@ local ModpackDesc = {
 
 --- gets info for a ModPack (mostly from its ModPack.xml).
 ---@param name string
----@return ModpackDesc
+---@return ModpackDesc|string
 function CppLogic.ModLoader.GetModpackInfo(name) end
 
 --- loads the bba of a ModPack.
@@ -3378,6 +3384,14 @@ function CppLogic.ModLoader.ReserializeEntityType(ety, path) end
 --- returns a list of every bba in ModPacks.
 --- @return string[]
 function CppLogic.ModLoader.GetModpacks() end
+
+--- sets the modpack list for savegames.
+--- @param l string
+function CppLogic.ModLoader.SetModPackList(l) end
+
+--- gets the modpack list for savegames or nil.
+--- @return string|nil
+function CppLogic.ModLoader.GetModPackList() end
 
 --- resets the global CppLogic.
 --- useful if you dont want to use FrameworkWrapper to prevent savegames to override it.

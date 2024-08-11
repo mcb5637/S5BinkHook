@@ -17,10 +17,16 @@ namespace CppLogic::ModLoader {
 		static void Log(lua::State L, const char* log);
 		static void AddLib(lua::State L);
 		static void RemoveLib(lua::State L);
+		static void PreSave(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
+		static void PostSave(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
 
 		static constexpr std::string_view ModLoaderLib = "ModLoader";
 
 		static constexpr std::string_view ModpackFolder = "ModPacks";
+
+		static shok::String ModPackList;
+		static size_t GUIDLength;
+		static lua::Reference SavegameValidOverride;
 
 		class DataTypeLoader {
 		public:
@@ -346,6 +352,9 @@ namespace CppLogic::ModLoader {
 		static int InvalidModPackPanic(lua::State L);
 		static int GetModpacks(lua::State L);
 		static int ReserializeEntityType(lua::State L);
+		static int SetModPackList(lua::State L);
+		static int GetModPackList(lua::State L);
+		static int OverrideSavegameValid(lua::State L);
 
 		static constexpr std::array LuaFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -357,6 +366,8 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
 				lua::FuncReference::GetRef<InvalidModPackPanic>("InvalidModPackPanic"),
 				lua::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
+				lua::FuncReference::GetRef<SetModPackList>("SetModPackList"),
+				lua::FuncReference::GetRef<GetModPackList>("GetModPackList"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{
@@ -373,6 +384,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
 				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
 				lua::FuncReference::GetRef<GetModpacks>("GetModpacks"),
+				lua::FuncReference::GetRef<OverrideSavegameValid>("OverrideSavegameValid"),
 		};
 
 	public:
@@ -387,7 +399,7 @@ namespace CppLogic::ModLoader {
 	};
 
 	struct ModpackDesc {
-		std::string Name, BBAPath, LoaderPath, ScriptPath;
+		std::string Name, BBAPath, LoaderPath, ScriptPath, Version;
 		std::vector<std::string> Required, Incompatible, Override;
 		bool DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false;
 		bool UserRequestable = false;

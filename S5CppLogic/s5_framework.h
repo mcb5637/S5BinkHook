@@ -5,6 +5,7 @@
 #include "s5_glue.h"
 #include "s5_scriptsystem.h"
 #include "s5_filesystem.h"
+#include "EnumIdManagerMagic.h"
 
 namespace ECore {
 	class IReplayStreamExtension {
@@ -31,13 +32,14 @@ namespace GS3DTools {
 		shok::String MapName;
 		shok::MapType MapType;
 		shok::String MapCampagnName;
-		shok::String MapGUID; // theoretically a struct with only a string as member Data
+		shok::String MapGUID; // 16 theoretically a struct with only a string as member Data
 
 		CMapData& operator=(const CMapData& o);
 
 		static inline constexpr int vtp = 0x761D34;
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E7D0);
 	};
+	static_assert(offsetof(CMapData, MapGUID) == 16 * 4);
 
 	class CGUIReplaySystem : public ECore::IReplayStreamExtension, public BB::IPostEvent {
 	public:
@@ -154,7 +156,13 @@ namespace Framework {
 
 		static void (*OnGameSavedTo)(const char* folder, const char* savename);
 		static void (*OnGameSavedTo2)(const char* folder, const char* savename);
+		static void (*PreGameSavedTo)(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
+		static void (*PostGameSavedTo)(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
 		static void HookSaveGame();
+		static bool(*IsSaveValidOverride)(std::string_view save);
+		static void HookSavegameValid();
+	private:
+		static int SavegameValidOverride(lua::State L);
 	};
 }
 
@@ -289,6 +297,9 @@ namespace Framework {
 		bool __thiscall StartMapOverride(const char* name, const char* path);
 		void __thiscall RemoveArchiveIfExternalmapOverride();
 		void __fastcall OnSaveLoadedEx(Framework::GameModeStartMapData* d);
+		static void __stdcall FireMapStartTrigger(lua_State* L, const char* f);
+		static void __stdcall FireSaveLoadTrigger(lua_State* L, const char* f);
+		bool __thiscall LoadSaveAddS5xOverride(GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path);
 	};
 	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);
 	static_assert(offsetof(AGameModeBase, EscapeHandler) == 1423 * 4);
@@ -458,4 +469,11 @@ namespace Framework {
 	static_assert(sizeof(Framework::CMain::SUserPaths) == 133 * 4);
 	//constexpr int i = sizeof(Framework::CMain::SUserPaths) / 4;
 	//constexpr int i = offsetof(Framework::CMain, ReplayToLoad) / 4;
+}
+
+namespace CppLogic {
+	template<>
+	inline auto GetIdManager<shok::MapType>() {
+		return CppLogic::MagicEnum::EnumIdManager<shok::MapType>{};
+	}
 }

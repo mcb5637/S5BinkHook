@@ -13,6 +13,7 @@ ModLoader = {
 	--- order in which items appear in here do not matter, ModLoader.ApplyManifest() does take care of preloading.
 	--- unless otherwise specified, using id or name is supported (obviously only name for adding).
 	--- ModLoader now automatically figures out what needs to be added or reloaded.
+	--- @type Manifest
 	Manifest = {
 		--- EntityTypes to load or reload.
 		EntityTypes = {
@@ -47,17 +48,13 @@ ModLoader = {
 
 		},
 		--- Selection Textures to add or reload.
-		SelectionTextures_Add = {
+		SelectionTextures = {
 
 		},
-		--- deprecated
-		SelectionTextures_Reload = {},
 		--- GUI Textures to add or reload.
-		GUITextures_Add = {
+		GUITextures = {
 
 		},
-		--- deprecated
-		GUITextures_Reload = {},
 		--- Settler Upgradde Categories to add. use in [nameUCat]=nameFirstEntity.
 		SettlerUpgradeCategory = {
 
@@ -67,11 +64,9 @@ ModLoader = {
 
 		},
 		--- Terrain Textures to add or reload.
-		TerrainTextures_Add = {
+		TerrainTextures = {
 
 		},
-		--- deprecated
-		TerrainTextures_Reload = {},
 		--- Water Types to load or reload.
 		WaterTypes = {
 
@@ -102,6 +97,7 @@ ModLoader = {
 		},
 	},
 	--- the names of all ModPacks requied by this map. a call to ModLoader.RequireModList() in Initialize will then try to load them.
+	--- @type string[]
 	RequiredMods = {},
 }
 
@@ -109,7 +105,6 @@ ModLoader = {
 -- called on both map start and save load.
 -- this is the place to modify something like EntityTypes, as all entities get created after this method,
 -- so even changing behaviors completely works without problems.
--- remember to call ModLoader.LoadModScripts() from your mapscript.
 function ModLoader.Initialize()
 	--- search and apply any modpacks requested
 	ModLoader.RequireModList()
@@ -137,6 +132,8 @@ function ModLoader.LoadSave()
 end
 
 --- this function checks if a user requested mod can be added to the map.
+--- @param modname string
+--- @return boolean
 function ModLoader.CheckUserRequestedMod(modname)
 	return ModLoader.IsUserRequestedModWhitelisted(modname)
 end

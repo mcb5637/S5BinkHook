@@ -1,0 +1,22 @@
+what happens on map load:
+- load ingame gui
+- create lua state
+- load Data\\Script\\XGlobalScript.lua
+- load Data\\Script\\XLocalScript.lua
+- call GameCallback_LocalScriptLoadedFirstTime() (XLocalScript.lua)
+- load mapscript
+- call GameCallback_SetDefaultValues() (XGlobalScript.lua, empty)
+- call GameCallback_NewGame() (not existing?)
+- load UserScript.lua
+- call GameCallback_LocalSetDefaultValues() (XLocalScript.lua)
+- call GameCallback_UserSetDefaultValues() (not existing?)
+- call GameCallback_OnGameStart() (maptools/main.lua or mp mapscript)
+- trigger Events.CPPLOGIC_EVENT_ON_MAP_STARTED (ModLoader only)
+
+what happens on save load:
+- load ingame gui
+- create lua state
+- load save
+- load UserScript.lua
+- call GameCallback_LocalRecreateGameLogic() (XLocalScript.lua)
+- trigger Events.CPPLOGIC_EVENT_ON_SAVEGAME_LOADED (ModLoader only)

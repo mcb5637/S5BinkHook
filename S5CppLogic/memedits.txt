@@ -123,4 +123,5 @@ list of used identifiers
 0x100F CppLogic::Events::CanBuySettlerEvent
 0x1010 CppLogic::Mod::FormationSpacedBehavior
 0x1011 CppLogic::Mod::UI::FreeCamCustomWidget
+0x1012 CppLogic::Events::SaveLoadedEvent
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

@@ -1,5 +1,37 @@
 ModLoader = ModLoader or {}
 
+if false then
+	---@class Manifest
+	---@field MissingFilled boolean|nil
+	local Manifest = {}
+	---@class CManifestEntry
+	local CManifestEntry = {
+		Key = "",
+		---@type function|nil
+		Preload = nil,
+		---@type function|nil
+		Load = nil,
+		---@type table|nil
+		Table = nil,
+		---@type string|nil
+		Type = nil,
+		---@type string|nil
+		Deprecated = nil
+	}
+	---@class CManifestType
+	---@field Preload fun(CManifestEntry, Manifest)
+	---@field Load fun(CManifestEntry, Manifest)
+	---@field Merge fun(CManifestEntry, into:Manifest, from:Manifest)
+	---@field Fix fun(CManifestEntry, Manifest)
+	local CManifestType = {
+	}
+	---@class ModList
+	---@field Mods ModpackDesc[]
+	---@field Incompatible string[]
+	local ModList = {
+	}
+end
+
 --- applying everything in Manifest
 function ModLoader.ApplyManifest()
 	ModLoader.FillMissingManifestEntries(ModLoader.Manifest)
@@ -12,18 +44,24 @@ function ModLoader.ApplyManifest()
 	end
 end
 
+---@return CManifestEntry[]
 function ModLoader.ManifestTypes()
 	return {
+		---@diagnostic disable-next-line: undefined-global
 		{Key="ArmorClasses", Preload=CppLogic.ModLoader.PreLoadArmorClass, Table=ArmorClasses, Load=nil},
 		{Key="EntityCategories", Preload=CppLogic.ModLoader.PreLoadEntityCategory, Table=EntityCategories, Load=nil},
 		{Key="DamageClasses", Preload=nil, Table=DamageClasses, Load=CppLogic.ModLoader.AddDamageClass, Type="kv"},
 		{Key="DirectXEffects", Preload=nil, Table=nil, Load=CppLogic.ModLoader.LoadDirectXEffect},
-		{Key="TerrainTextures_Add", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddTerrainTexture},
-		{Key="TerrainTextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="TerrainTextures_Add"},
+		{Key="TerrainTextures", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddTerrainTexture},
+		{Key="TerrainTextures_Add", Preload=nil, Table=nil, Load=nil, Deprecated="TerrainTextures"},
+		{Key="TerrainTextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="TerrainTextures"},
+		---@diagnostic disable-next-line: undefined-global
 		{Key="WaterTypes", Preload=nil, Table=WaterTypes, Load=CppLogic.ModLoader.AddWaterType},
+		---@diagnostic disable-next-line: undefined-global
 		{Key="TerrainTypes", Preload=nil, Table=TerrainTypes, Load=CppLogic.ModLoader.AddTerrainType},
-		{Key="SelectionTextures_Add", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddSelectionTexture},
-		{Key="SelectionTextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="SelectionTextures_Add"},
+		{Key="SelectionTextures", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddSelectionTexture},
+		{Key="SelectionTextures_Add", Preload=nil, Table=nil, Load=nil, Deprecated="SelectionTextures"},
+		{Key="SelectionTextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="SelectionTextures"},
 		{Key="Animations", Preload=nil, Table=Animations, Load=CppLogic.ModLoader.AddAnimation},
 		{Key="AnimSets", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddAnimSet},
 		{Key="Models", Preload=nil, Table=Models, Load=CppLogic.ModLoader.AddModel},
@@ -31,8 +69,9 @@ function ModLoader.ManifestTypes()
 		{Key="TaskLists", Preload=CppLogic.ModLoader.PreLoadTaskList, Table=TaskLists, Load=CppLogic.ModLoader.AddTaskList},
 		{Key="EntityTypes", Preload=CppLogic.ModLoader.PreLoadEntityType, Table=Entities, Load=CppLogic.ModLoader.AddEntityType},
 		{Key="Technologies", Preload=CppLogic.ModLoader.PreLoadTechnology, Table=Technologies, Load=CppLogic.ModLoader.AddTechnology},
-		{Key="GUITextures_Add", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddGUITexture},
-		{Key="GUITextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures_Add"},
+		{Key="GUITextures", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddGUITexture},
+		{Key="GUITextures_Add", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures"},
+		{Key="GUITextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures"},
 		{Key="SettlerUpgradeCategory", Preload=CppLogic.ModLoader.PreLoadUpgradeCategory, Table=UpgradeCategories, Load=CppLogic.ModLoader.AddSettlerUpgradeCategory, Type="kv"},
 		{Key="BuildingUpgradeCategory", Preload=CppLogic.ModLoader.PreLoadUpgradeCategory, Table=UpgradeCategories, Load=CppLogic.ModLoader.AddBuildingUpgradeCategory, Type="kv"},
 		{Key="ExperienceClasses", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddExperienceClass, Type="kv"},
@@ -40,6 +79,7 @@ function ModLoader.ManifestTypes()
 	}
 end
 
+---@type table<string, CManifestType>
 ModLoader.ManifestType = {
 	default = {
 		Preload = function(t, manifest)
@@ -192,21 +232,9 @@ ModLoader.ManifestType = {
 	},
 }
 
-function ModLoader.PreloadManifestType(en, preload, data)
-	for _, k in ipairs(en) do
-		if type(k) == "string" and not data[k] then
-			preload(k)
-		end
-	end
-end
-
-function ModLoader.HandleManifestType(en, add)
-	for _, k in ipairs(en) do
-		add(k)
-	end
-end
-
 --- merges all manifest entries from from into into
+--- @param into Manifest
+--- @param from Manifest
 function ModLoader.MergeManifest(into, from)
 	ModLoader.FillMissingManifestEntries(into)
 	ModLoader.FillMissingManifestEntries(from)
@@ -217,19 +245,32 @@ function ModLoader.MergeManifest(into, from)
 end
 
 --- walks a mod list, discovers and adds all requirements
+--- @param req string[]
+--- @param modlist ModList|nil
+--- @return ModList
 function ModLoader.DiscoverRequired(req, modlist)
 	modlist = modlist or {Mods = {}, Incompatible = {}, Missing = {}}
 	for _, r in ipairs(req) do
+		local name = r
+		local vers = ""
+		local atpos = string.find(name, "@", nil, true)
+		if atpos then
+			vers = string.sub(name, atpos+1)
+			name = string.sub(name, 1, atpos-1)
+		end
 		local found = false
 		for _, m in ipairs(modlist.Mods) do
-			if m.Name == r then
+			if m.Name == name then
 				found = true
 				break
 			end
 		end
 		if not found then
-			local m = CppLogic.ModLoader.GetModpackInfo(r)
+			local m = CppLogic.ModLoader.GetModpackInfo(name)
 			if type(m) == "table" then
+				if vers ~= "" then
+					assert(m.Version == vers, "mod version missmatch: "..m.Name)
+				end
 				table.insert(modlist.Mods, m)
 				for _, i in ipairs(m.Incompatible) do
 					local f = false
@@ -245,7 +286,7 @@ function ModLoader.DiscoverRequired(req, modlist)
 				end
 				ModLoader.DiscoverRequired(m.Required, modlist)
 			else
-				table.insert(modlist.Missing, r)
+				assert(false, "missing mod: "..name)
 			end
 		end
 	end
@@ -254,7 +295,12 @@ end
 
 --- checks a modlist and sorts it
 --- ... [2] overrides [1]
+--- @param modlist ModList
 function ModLoader.SortMods(modlist)
+	---@generic T
+	---@param t T[]
+	---@param v T
+	---@return T|nil
 	local function contains(t, v)
 		for _, d in ipairs(t) do
 			if d == v then
@@ -263,23 +309,17 @@ function ModLoader.SortMods(modlist)
 		end
 		return nil
 	end
-	if modlist.Missing[1] then
-		LuaDebugger.Break()
-		CppLogic.ModLoader.InvalidModPackPanic("missing mod: "..modlist.Missing[1])
-	end
 	for _, m in ipairs(modlist.Mods) do
 		local c = contains(modlist.Incompatible, m.Name)
 		if c then
-			LuaDebugger.Break()
-			CppLogic.ModLoader.InvalidModPackPanic("incompatibility found: "..m.Name.." with "..c)
+			assert(false, "incompatibility found: "..m.Name.." with "..c)
 		end
 	end
 	table.sort(modlist.Mods, function(a, b)
 		local ab = contains(a.Override, b.Name)
 		local ba = contains(b.Override, a.Name)
 		if ab and ba then
-			LuaDebugger.Break()
-			CppLogic.ModLoader.InvalidModPackPanic("circular override: "..a.Name.." with "..b.Name)
+			assert(false, "circular override: "..a.Name.." with "..b.Name)
 		end
 		if ba then
 			return true
@@ -289,6 +329,8 @@ function ModLoader.SortMods(modlist)
 end
 
 --- loads a ModPack bba, if present
+--- @param mod ModpackDesc|string
+--- @return ModpackDesc
 function ModLoader.LoadMod(mod)
 	if type(mod) == "string" then
 		mod = CppLogic.ModLoader.GetModpackInfo(mod)
@@ -299,6 +341,7 @@ function ModLoader.LoadMod(mod)
 end
 
 --- initializes mod (load its loader, then call Init)
+--- @param mod ModpackDesc
 function ModLoader.InitMod(mod)
 	if mod.LoaderPath ~= "" then
 		Script.Load(mod.LoaderPath)
@@ -311,6 +354,7 @@ function ModLoader.InitMod(mod)
 end
 
 --- loads a modlst
+--- @param modlist ModList
 function ModLoader.LoadMods(modlist)
 	-- [n] ... [2] overrides [1]
 	-- always inserted after s5x -> {s5x, n, ..., 2, 1}
@@ -324,6 +368,8 @@ function ModLoader.LoadMods(modlist)
 end
 
 --- removes no longer needed ModPack bbas
+--- @param modlist ModList
+---@param script boolean|nil
 function ModLoader.CleanupMods(modlist, script)
 	for _, m in ipairs(modlist.Mods) do
 		if m.Archive and not m.KeepArchive and (script or m.ScriptPath == "") then
@@ -335,14 +381,48 @@ end
 
 --- discovers mods and loads them
 function ModLoader.RequireModList()
-	ModLoader.DiscoverUserRequested(ModLoader.RequiredMods)
-	ModLoader.ModList = ModLoader.DiscoverRequired(ModLoader.RequiredMods)
-	ModLoader.SortMods(ModLoader.ModList)
-	ModLoader.LoadMods(ModLoader.ModList)
+	xpcall(function()
+		ModLoader.DiscoverUserRequested(ModLoader.RequiredMods)
+		ModLoader.ModList = ModLoader.DiscoverRequired(ModLoader.RequiredMods)
+		ModLoader.SortMods(ModLoader.ModList)
+		ModLoader.LoadMods(ModLoader.ModList)
+		ModLoader.StoreModList(ModLoader.ModList)
+	end, function(msg)
+		CppLogic.ModLoader.InvalidModPackPanic(msg)
+	end)
+end
+
+--- stores modlist for savegames
+---@param ml ModList
+function ModLoader.StoreModList(ml)
+	local s = ""
+	for _,m in ipairs(ml.Mods) do
+		s = s..";"..m.Name.."@"..m.Version
+	end
+	CppLogic.ModLoader.SetModPackList(s)
+end
+
+---loads modlist
+---@param s string|nil
+---@return string[]
+function ModLoader.LoadModList(s)
+	s = s or CppLogic.ModLoader.GetModPackList()
+	if not s then
+		return {}
+	end
+	local r = {}
+	for m in string.gfind(s, "([%w_/\\@]+)") do
+		table.insert(r, m)
+	end
+	return r
 end
 
 --- loads script mods
 function ModLoader.LoadModScripts()
+	if ModLoader.ModScriptsLoaded then
+		return
+	end
+	ModLoader.ModScriptsLoaded = true
 	for _, m in ipairs(ModLoader.ModList.Mods) do
 		if m.ScriptPath ~= "" then
 			Script.Load(m.ScriptPath)
@@ -352,8 +432,11 @@ function ModLoader.LoadModScripts()
 end
 
 --- executes ScriptPath of a ModPack, to be used from your mapscript if no ModLoader is present
+--- @param name string
+--- @return ModpackDesc
 function ModLoader.LoadScriptMod(name)
 	local mod = CppLogic.ModLoader.GetModpackInfo(name)
+	assert(type(mod) ~="string")
 	assert(mod.ScriptMod)
 	assert(not mod.DataMod)
 	mod.Archive = CppLogic.ModLoader.LoadModpackBBA(name)
@@ -365,11 +448,14 @@ function ModLoader.LoadScriptMod(name)
 end
 
 --- user requested mods allowed by default
+--- @param modname string
+--- @return boolean
 function ModLoader.IsUserRequestedModWhitelisted(modname)
 	return modname == "test" or modname == "WideScreenMode"
 end
 
 --- parse user requested mods and add them to the mod list
+--- @param modlist string[]
 function ModLoader.DiscoverUserRequested(modlist)
 	local str = GDB.GetString("CppLogic\\UserRequestedMods")
 	if str and str ~= "" then
@@ -382,6 +468,7 @@ function ModLoader.DiscoverUserRequested(modlist)
 end
 
 --- adds empty tables, for compatibility with old modloaders
+--- @param manifest Manifest
 function ModLoader.FillMissingManifestEntries(manifest)
 	if manifest.MissingFilled then
 		return

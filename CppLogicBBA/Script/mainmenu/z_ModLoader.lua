@@ -1,3 +1,5 @@
+Script.Load("Data\\Script\\ModLoader\\ModLoader.lua")
+
 CppLogicOptions = {}
 
 CppLogicOptions.S00_Start = OptionsMenu.S00_Start
@@ -59,6 +61,31 @@ function CppLogicOptions.ActionMod()
 	mp.Active = not mp.Active
 	CppLogicOptions.StoreModpacks()
 end
+
+function CppLogicOptions.IsSavegameValid(save)
+	local map, t, cn, guid, valid = CppLogic.API.SaveGetMapInfo(save, true)
+	if not valid then
+		return false
+	end
+	local _, mapguid, _, err = CppLogic.API.MapGetDataPath(map, t, cn, true)
+	if err then
+		return false
+	end
+	local len = string.len(mapguid)
+	if string.sub(guid, 1, len) ~= mapguid then
+		return false
+	end
+	local ml = ModLoader.LoadModList(string.sub(guid, len+1))
+	local r = true
+	xpcall(function()
+		local modlist = ModLoader.DiscoverRequired(ml)
+		ModLoader.SortMods(modlist)
+	end, function(msg)
+		r = false
+	end)
+	return r
+end
+CppLogic.ModLoader.OverrideSavegameValid(CppLogicOptions.IsSavegameValid)
 
 function CppLogicOptions.InitUI()
 	if not CppLogic.UI.TextButtonSetCenterText then

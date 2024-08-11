@@ -640,6 +640,9 @@ namespace shok {
 		explicit String(const std::string_view& s);
 		void assign(const char* s);
 		void assign(const char* s, size_t len);
+		String& append(String& toappend, size_t pos, size_t count = std::string::npos);
+		String& append(String& toappend);
+		void resize(size_t len, char c = '\0');
 		const char* c_str() const;
 		size_t size() const;
 		~String();

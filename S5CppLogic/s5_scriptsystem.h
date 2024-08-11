@@ -180,3 +180,29 @@ class CLuaDebuggerPort : public EScr::ILuaDebugger {
 public:
 	static inline constexpr int vtp = 0x76233C;
 };
+
+namespace EGL {
+	class IGLEScripting {
+	public:
+		virtual void __stdcall Destroy() = 0;
+		virtual void __stdcall LoadMapscript(const char* buff) = 0;
+		virtual const char* __stdcall GetMapscript() = 0;
+		virtual void __stdcall CallSetDefaultValues() = 0;
+		virtual void __stdcall CallNewGame() = 0;
+		virtual void __stdcall OnTick() = 0;
+		virtual void __stdcall UpdateTimer() = 0;
+		virtual ~IGLEScripting() = default;
+
+		static inline constexpr int vtp = 0x784534;
+	};
+
+	class CGLEScripting : public IGLEScripting {
+	public:
+		lua_State* Ingame;
+		lua_State* Ingame2;
+		char* Mapscript;
+		int Timer;
+
+		static inline constexpr int vtp = 0x784558;
+	};
+}

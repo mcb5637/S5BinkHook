@@ -12,6 +12,10 @@ namespace CppLogic::MagicEnum {
 	struct Holder {
 		static constexpr auto value = D;
 	};
+	template<class En>
+	concept EnumHasInvalid = requires {
+		{En::Invalid};
+	};
 
 	template<class En, En... Sparse>
 	requires std::is_enum_v<En>
@@ -46,8 +50,14 @@ namespace CppLogic::MagicEnum {
 				}
 			}
 			auto v = magic_enum::enum_cast<En>(n);
-			if (!v.has_value())
-				return En::Invalid;
+			if (!v.has_value()) {
+				if constexpr (EnumHasInvalid<En>) {
+					return En::Invalid;
+				}
+				else {
+					throw std::invalid_argument{ std::format("invalid id for type {}: {}", typename_details::type_name<En>(), n) };
+				}
+			}
 			return *v;
 		}
 		const char* GetNameByID(En id) const {

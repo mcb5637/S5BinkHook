@@ -379,6 +379,7 @@ copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dl
     <Text Include="doc\data_notes.txt" />
     <Text Include="doc\gamemechanics_documentation.txt" />
     <Text Include="doc\mapscript_notes.txt" />
+    <Text Include="doc\mod_anatomy.txt" />
     <Text Include="memedits.txt" />
   </ItemGroup>
   <ItemGroup>

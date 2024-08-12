@@ -300,6 +300,7 @@ namespace Framework {
 		static void __stdcall FireMapStartTrigger(lua_State* L, const char* f);
 		static void __stdcall FireSaveLoadTrigger(lua_State* L, const char* f);
 		bool __thiscall LoadSaveAddS5xOverride(GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path);
+		static bool __fastcall LoadSaveCheckIsSaveValid(GameModeStartMapData* data);
 	};
 	static_assert(offsetof(AGameModeBase, IsExternalMap) == 5704);
 	static_assert(offsetof(AGameModeBase, EscapeHandler) == 1423 * 4);

@@ -363,6 +363,28 @@ bool __thiscall Framework::AGameModeBase::LoadSaveAddS5xOverride(GameModeStartMa
     map->MapGUID = back;
     return r;
 }
+bool __fastcall Framework::AGameModeBase::LoadSaveCheckIsSaveValid(GameModeStartMapData* data)
+{
+    if (SavegameSystem::IsSaveValidOverride) {
+        return SavegameSystem::IsSaveValidOverride(data->Folder);
+    }
+    return true;
+}
+void __declspec(naked) gamemodebase_loadsave_check_asm() {
+    __asm {
+        mov eax, 0x40E764;
+        call eax;
+        test al, al;
+        jz re;
+
+        mov ecx, [ebp + 0x8];
+        call Framework::AGameModeBase::LoadSaveCheckIsSaveValid;
+
+    re:
+        push 0x40FA76;
+        ret;
+    };
+}
 bool HookLoadSave_Hooked = false;
 void Framework::AGameModeBase::HookLoadSave()
 {
@@ -373,10 +395,12 @@ void Framework::AGameModeBase::HookLoadSave()
         reinterpret_cast<void*>(0x40FB6E),
         reinterpret_cast<void*>(0x40FC61),
         reinterpret_cast<void*>(0x40FB0B),
+        reinterpret_cast<void*>(0x40FA71),
     } };
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40FB6E), &gamemodebase_onloadsave_asm, reinterpret_cast<void*>(0x40FB76));
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40FC61), &FireSaveLoadTrigger);
     CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40FB0B), CppLogic::Hooks::MemberFuncPointerToVoid(&AGameModeBase::LoadSaveAddS5xOverride, 0));
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40FA71), &gamemodebase_loadsave_check_asm, reinterpret_cast<void*>(0x40FA76));
 }
 
 void __stdcall Framework::CSinglePlayerMode::CNetworkEvent::PostEvent(BB::CEvent* ev)

@@ -382,7 +382,6 @@ namespace shok {
 		Development = 1,
 		Multiplayer = 2,
 		User = 3, // s5x and folder, sp and mp
-		Invalid = -100,
 	};
 
 	enum class PlayerId : int {

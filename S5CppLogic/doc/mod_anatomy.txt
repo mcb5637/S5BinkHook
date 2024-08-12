@@ -1,0 +1,13 @@
+for a map:
+	- copy ModLoader.lua next to the maps info.xml
+	- add any data you want to add/modify to the map to the s5x
+		(if using a folder map, add it to a bba and load that from ModLoader.lua)
+	- put any data you want to add/modify to the ModLoader.lua manifest
+	- reference any required modpacks into RequiredMods
+
+for a modpack:
+	- create YourModName.bba
+	- copy ModPackLoader.lua and ModPack.xml to ModPack/YourModName/
+	- enter mod information into ModPack.xml
+	- add any data you want to add/modify to the map to the bba
+	- put any data you want to add/modify to the ModPackLoader.lua manifest

@@ -315,11 +315,12 @@ namespace CppLogic::API {
 		p.replace_filename("PersistentMapFiles");
 		return p;
 	}
-	void AppendPersistendMapFileName(lua::State L, std::filesystem::path& p, int indexoff) {
-		int ty = L.CheckInt(2 + indexoff);
-		const char* cn = L.OptString(3 + indexoff, nullptr); // optional
+	void AppendPersistendMapFileName(lua::State l, std::filesystem::path& p, int indexoff) {
+		luaext::EState L{ l };
 		const char* n = L.CheckString(1 + indexoff);
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(static_cast<shok::MapType>(ty), cn);
+		auto ty = L.CheckEnum<shok::MapType>(2 + indexoff);
+		const char* cn = L.OptString(3 + indexoff, nullptr); // optional
+		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
 		if (!ci)
 			throw lua::LuaException("invalid map type/campagn");
 		Framework::MapInfo* i = ci->GetMapInfoByName(n);

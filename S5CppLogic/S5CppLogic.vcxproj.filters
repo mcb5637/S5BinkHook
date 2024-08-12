@@ -547,6 +547,9 @@
     <Text Include="doc\mapscript_notes.txt">
       <Filter>doc</Filter>
     </Text>
+    <Text Include="doc\mod_anatomy.txt">
+      <Filter>doc</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="doc\ModPack.xml">

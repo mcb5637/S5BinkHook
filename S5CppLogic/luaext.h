@@ -71,8 +71,12 @@ namespace luaext {
 				const char* s = ToString(idx);
 				auto mng = CppLogic::GetIdManager<En>();
 				En id = mng.GetIdByName(s);
-				if (id == static_cast<En>(0)) {
-					throw lua::LuaException{std::format("invalid {} at {}: {} does not exist", typename_details::type_name<En>(), idx, s)};
+				if constexpr (requires {
+					{En::Invalid};
+				}) {
+					if (id == En::Invalid) {
+						throw lua::LuaException{std::format("invalid {} at {}: {} does not exist", typename_details::type_name<En>(), idx, s)};
+					}
 				}
 				return id;
 			}

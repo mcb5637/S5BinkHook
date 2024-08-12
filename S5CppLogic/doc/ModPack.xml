@@ -21,4 +21,6 @@
 	<KeepArchive>false</KeepArchive>
 	<!-- ModPack can be requested by the user -->
 	<UserRequestable>true</UserRequestable>
+	<!-- ModPack version, if changed, saves using the old version can no longer be loaded -->
+	<Version>1</Version>
 </root>

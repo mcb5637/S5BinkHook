@@ -251,13 +251,7 @@ end
 function ModLoader.DiscoverRequired(req, modlist)
 	modlist = modlist or {Mods = {}, Incompatible = {}, Missing = {}}
 	for _, r in ipairs(req) do
-		local name = r
-		local vers = ""
-		local atpos = string.find(name, "@", nil, true)
-		if atpos then
-			vers = string.sub(name, atpos+1)
-			name = string.sub(name, 1, atpos-1)
-		end
+		local name, cmp = ModLoader.ParseModString(r)
 		local found = false
 		for _, m in ipairs(modlist.Mods) do
 			if m.Name == name then
@@ -268,9 +262,7 @@ function ModLoader.DiscoverRequired(req, modlist)
 		if not found then
 			local m = CppLogic.ModLoader.GetModpackInfo(name)
 			if type(m) == "table" then
-				if vers ~= "" then
-					assert(m.Version == vers, "mod version missmatch: "..m.Name)
-				end
+				assert(cmp(m.Version), "mod version missmatch: "..m.Name)
 				table.insert(modlist.Mods, m)
 				for _, i in ipairs(m.Incompatible) do
 					local f = false
@@ -411,10 +403,88 @@ function ModLoader.LoadModList(s)
 		return {}
 	end
 	local r = {}
-	for m in string.gfind(s, "([%w_/\\@]+)") do
+	for m in string.gfind(s, "([%w_/\\@<>=%.]+)") do
 		table.insert(r, m)
 	end
 	return r
+end
+
+---parses mod versioned name
+---@param s string
+---@return string name
+---@return fun(v:string):boolean validate
+function ModLoader.ParseModString(s)
+	local f,_, n, op, v = string.find(s, "^([%w_/\\]+)([@<>=]*)([%w_/\\%.]*)$")
+	if not f then
+		assert(false, "mod name is invalid: "..s)
+	end
+	---@param v string
+	---@return number[]
+	local function parsenumbers(v)
+		local t = {}
+		for n in string.gfind(v, "(%d+)") do
+			table.insert(t, tonumber(n))
+		end
+		return t
+	end
+	local cmp = nil
+	if op == "@" then
+		cmp = function(w)
+			return v == w
+		end
+	elseif op == "==" then
+		cmp = function(w)
+			return v == string.sub(w, 1, string.len(v))
+		end
+	elseif op == "<=" then
+		cmp = function(w)
+			local vn = parsenumbers(v)
+			local wn = parsenumbers(w)
+			local i = 1
+			while vn[i] and wn[i] do
+				if vn[i] < wn[i] then
+					return false
+				elseif vn[i] > wn[i] then
+					return true
+				end
+				i = i + 1
+			end
+			if not vn[i] and not wn[i] then
+				return true
+			elseif wn[i] then
+				return false
+			else
+				return true
+			end
+		end
+	elseif op == ">=" then
+		cmp = function(w)
+			local vn = parsenumbers(v)
+			local wn = parsenumbers(w)
+			local i = 1
+			while vn[i] and wn[i] do
+				if vn[i] > wn[i] then
+					return false
+				elseif vn[i] < wn[i] then
+					return true
+				end
+				i = i + 1
+			end
+			if not vn[i] and not wn[i] then
+				return true
+			elseif wn[i] then
+				return true
+			else
+				return false
+			end
+		end
+	elseif op then
+		assert(false, "invalid operator: "..s)
+	end
+	if not cmp then
+		cmp = function() return true end
+	end
+	return n, cmp
 end
 
 --- loads script mods
@@ -458,8 +528,11 @@ end
 --- @param modlist string[]
 function ModLoader.DiscoverUserRequested(modlist)
 	local str = GDB.GetString("CppLogic\\UserRequestedMods")
+	if not ModLoader.CheckUserRequestedMod then
+		return
+	end
 	if str and str ~= "" then
-		for m in string.gfind(str, "([%w_/\\]+)") do
+		for m in ModLoader.LoadModList(str) do
 			if ModLoader.CheckUserRequestedMod(m) then
 				table.insert(modlist, m)
 			end

@@ -1051,7 +1051,6 @@ int CppLogic::ModLoader::ModLoader::SetModPackList(lua::State L)
 {
 	ModPackList = L.CheckStringView(1);
 	return 0;
-
 }
 
 int CppLogic::ModLoader::ModLoader::GetModPackList(lua::State L)

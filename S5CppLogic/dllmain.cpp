@@ -295,7 +295,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	
+
 
 	return 0;
 }
@@ -372,7 +372,8 @@ void InitGame() {
 		Framework::CampagnInfo::HookLoad();
 }
 
-constexpr double Version = 2.0200;
+double Version = 0.0;
+std::string VersionString{ "failed loading version info" };
 
 int ResetCppLogic(lua::State L) {
 	L.Push("CppLogic");
@@ -415,6 +416,10 @@ void Install(lua::State L) {
 	L.RegisterFunc<Nop>("OnLeaveMap", -3);
 	L.Push("Version");
 	L.Push(Version);
+	L.SetTableRaw(-3);
+
+	L.Push("VersionString");
+	L.Push(VersionString);
 	L.SetTableRaw(-3);
 
 	L.Push("Memory");
@@ -569,8 +574,36 @@ double __declspec(dllexport) __stdcall GetCppLogicVersion() {
 	return Version;
 }
 
-
-
+#pragma comment(lib, "version")
+void LoadVersionInfo(HMODULE m) {
+	char path[MAX_PATH + 1]{};
+	if (GetModuleFileName(m, path, MAX_PATH) == 0)
+		return;
+	DWORD handle;
+	size_t s = GetFileVersionInfoSize(path, &handle);
+	if (s == 0)
+		return;
+	std::vector<char> data{};
+	data.resize(s);
+	if (!GetFileVersionInfo(path, 0, data.size(), data.data()))
+		return;
+	void* vinfo = nullptr;
+	size_t vs = 0;
+	if (!VerQueryValue(data.data(), "\\", &vinfo, &vs))
+		return;
+	if (vs == 0)
+		return;
+	auto* vi = static_cast<VS_FIXEDFILEINFO*>(vinfo);
+	if (vi->dwSignature != 0xFEEF04BD)
+		return;
+	int major = HIWORD(vi->dwFileVersionMS);
+	int minor = LOWORD(vi->dwFileVersionMS);
+	int patch = HIWORD(vi->dwFileVersionLS);
+	int rev = LOWORD(vi->dwFileVersionLS);
+	VersionString = std::format("{}.{}.{}.{}", major, minor, patch, rev);
+	auto v = std::format("{}.{:02}", major, minor);
+	std::from_chars(v.data(), v.data() + v.size(), Version);
+}
 
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
@@ -581,6 +614,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		LoadVersionInfo(hModule);
 		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:

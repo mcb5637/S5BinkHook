@@ -113,7 +113,6 @@ function ModLoader.Initialize()
 
 	--- manual code should go here
 
-	
 	--- refresh caches
 	CppLogic.ModLoader.RefreshEntityCategoryCache()
 	CppLogic.ModLoader.SanityCheck()

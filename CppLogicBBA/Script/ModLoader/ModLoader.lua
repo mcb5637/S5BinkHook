@@ -391,6 +391,9 @@ function ModLoader.StoreModList(ml)
 	for _,m in ipairs(ml.Mods) do
 		s = s..";"..m.Name.."@"..m.Version
 	end
+	if s == "" then
+		s = ";"
+	end
 	CppLogic.ModLoader.SetModPackList(s)
 end
 

@@ -174,3 +174,8 @@ namespace CppLogic::UA {
 		} };
 	};
 }
+
+template<>
+static constexpr BB::FieldSerilaizer* BB::FieldSerilaizer::GetSerilalizer<CppLogic::UA::UAStatus>() {
+	return BB::FieldSerilaizer::TypeInt;
+}

@@ -25,8 +25,8 @@ void CppLogic::Mod::FormationSpacedBehaviorProps::operator delete(void* p) {
 }
 
 const BB::SerializationData CppLogic::Mod::FormationSpacedBehaviorProps::SerializationData[]{
-    BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(GGL::CFormationBehaviorProperties), GGL::CFormationBehaviorProperties::SerializationData),
-    BB::SerializationData::FieldData("SpaceFactor", MemberSerializationFieldData(FormationSpacedBehaviorProps, SpaceFactor)),
+    BB::SerializationData::AutoBaseClass<FormationSpacedBehaviorProps, GGL::CFormationBehaviorProperties>(),
+    AutoMemberSerialization(FormationSpacedBehaviorProps, SpaceFactor),
     BB::SerializationData::GuardData(),
 };
 
@@ -59,7 +59,7 @@ CppLogic::Mod::FormationSpacedBehavior::FormationSpacedBehavior()
 }
 
 const BB::SerializationData CppLogic::Mod::FormationSpacedBehavior::SerializationData[] {
-    BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(GGL::CFormationBehavior), GGL::CFormationBehavior::SerializationData),
+    BB::SerializationData::AutoBaseClass<FormationSpacedBehavior, GGL::CFormationBehavior>(),
     BB::SerializationData::GuardData(),
 };
 
@@ -77,9 +77,9 @@ shok::ClassId __stdcall CppLogic::Mod::ResourceTrackerBehavior::GetClassIdentifi
 }
 
 const BB::SerializationData CppLogic::Mod::ResourceTrackerBehavior::SerializationData[]{
-    BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(EGL::CGLEBehavior), EGL::CGLEBehavior::SerializationData),
-    BB::SerializationData::EmbeddedData("Produced", MemberSerializationSizeAndOffset(ResourceTrackerBehavior, Produced), shok::CostInfo::SerializationData),
-    BB::SerializationData::EmbeddedData("Used", MemberSerializationSizeAndOffset(ResourceTrackerBehavior, Used), shok::CostInfo::SerializationData),
+    BB::SerializationData::AutoBaseClass<ResourceTrackerBehavior, EGL::CGLEBehavior>(),
+    AutoMemberSerialization(ResourceTrackerBehavior, Produced),
+    AutoMemberSerialization(ResourceTrackerBehavior, Used),
     BB::SerializationData::GuardData(),
 };
 

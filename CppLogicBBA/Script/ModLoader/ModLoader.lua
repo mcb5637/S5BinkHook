@@ -481,7 +481,7 @@ function ModLoader.ParseModString(s)
 				return false
 			end
 		end
-	elseif op then
+	elseif op and op ~="" then
 		assert(false, "invalid operator: "..s)
 	end
 	if not cmp then
@@ -535,7 +535,7 @@ function ModLoader.DiscoverUserRequested(modlist)
 		return
 	end
 	if str and str ~= "" then
-		for m in ModLoader.LoadModList(str) do
+		for _, m in ModLoader.LoadModList(str) do
 			if ModLoader.CheckUserRequestedMod(m) then
 				table.insert(modlist, m)
 			end

@@ -21,7 +21,7 @@ namespace CppLogic::EntityAddon {
 		void operator =(const EntityAddonData& other);
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1004);
-		static BB::SerializationData SerializationData[];
+		static const BB::SerializationData SerializationData[];
 
 		virtual ~EntityAddonData() override = default;
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;

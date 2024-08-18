@@ -1,10 +1,12 @@
 #pragma once
 #include <memory>
+#include <random>
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_idmanager.h"
 #include "Luapp/constexprTypename.h"
 #include "luaext.h"
+#include "ConstexprString.h"
 
 namespace BB {
 	class IXmlSerializer {
@@ -114,6 +116,22 @@ namespace BB {
 		static constexpr BB::FieldSerilaizer* GetSerilalizer<double>() {
 			return TypeDouble;
 		}
+		template<>
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::ArmorClassId>() {
+			return TypeArmorClassId;
+		}
+		template<>
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::EntityId>() {
+			return TypeInt; // no real serializer, but int should work
+		}
+		template<>
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::EntityTypeId>() {
+			return TypeEntityType;
+		}
+		template<>
+		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::PlayerId>() {
+			return TypeInt; // no real serializer, but int should work
+		}
 
 		struct ExtendedInfo {
 			std::string_view Name;
@@ -184,7 +202,7 @@ namespace BB {
 			return SerializationData{ Ty::ObjectPointer, name, pos, size, nullptr, nullptr, &GetBBIdentifier, list, 0 };
 		}
 
-		static const SerializationData* GetSerializationData(shok::ClassId id);
+		static const SerializationData* GetSerializationDataFromId(shok::ClassId id);
 		template<class T>
 		static const SerializationData* GetSerializationData() = delete;
 		template<class T>
@@ -193,14 +211,48 @@ namespace BB {
 			return T::SerializationData;
 		}
 		template<HasValidIdentifier T>
+		requires (!(requires { T::SerializationData; }))
 		static const SerializationData* GetSerializationData() {
-			return GetSerializationData(T::Identifier);
+			return GetSerializationDataFromId(T::Identifier);
+		}
+
+		template<class T, CppLogic::ConstexprString ValueName = CppLogic::ConstexprString("Value"), CppLogic::ConstexprString KeyName = CppLogic::ConstexprString("Key")>
+		struct AutoDataHolder {
+			static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
+				static_assert(std::same_as<T, void>, "needs specialization");
+				static_assert(!std::same_as<T, void>, "needs specialization");
+				throw 0;
+			}
+		};
+
+		template<class T, class B>
+		requires std::derived_from<T, B>
+		static constexpr SerializationData AutoBaseClass() {
+			return EmbeddedData(nullptr, 0, sizeof(B), GetSerializationData<B>());
 		}
 	};
 	static_assert(sizeof(BB::SerializationData) == 4 * 9);
-#define MemberSerializationSizeAndOffset(T,M) offsetof(T, M), sizeof(decltype(T::M))
-#define MemberSerializationFieldData(T,M) MemberSerializationSizeAndOffset(T, M), BB::FieldSerilaizer::GetSerilalizer<decltype(T::M)>()
-#define MemberSerializationEmbeddedData(T,M) MemberSerializationSizeAndOffset(T, M), BB::SerializationData::GetSerializationData<decltype(T::M)>()
+	#define AutoMemberSerialization(T,M) BB::SerializationData::AutoDataHolder<decltype(T::M)>::AutoData(#M, offsetof(T, M), sizeof(decltype(T::M)))
+	#define AutoMemberSerializationName(T,M,N) BB::SerializationData::AutoDataHolder<decltype(T::M)>::AutoData(N, offsetof(T, M), sizeof(decltype(T::M)))
+	#define AutoMemberSerializationNameKeyVaue(T,M,N,K,V) BB::SerializationData::AutoDataHolder<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)>::AutoData(N, offsetof(T, M), sizeof(decltype(T::M)))
+	template<>
+	static constexpr SerializationData SerializationData::AutoDataHolder<BB::IObject*>::AutoData(const char* name, size_t pos, size_t size) {
+		return SerializationData::ObjectPointerData(name, pos, size);
+	}
+	template<class T>
+	requires requires { SerializationData::GetSerializationData<T>(); }
+	struct SerializationData::AutoDataHolder<T> {
+		static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
+			return SerializationData::EmbeddedData(name, pos, size, SerializationData::GetSerializationData<T>());
+		}
+	};
+	template<class T>
+	requires requires { FieldSerilaizer::GetSerilalizer<T>(); }
+	struct SerializationData::AutoDataHolder<T> {
+		static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
+			return SerializationData::FieldData(name, pos, size, FieldSerilaizer::GetSerilalizer<T>());
+		}
+	};
 
 	class CDefaultRuntimeClass : public BB::IObjectCreator, public BB::IObject {
 	public:
@@ -302,10 +354,10 @@ namespace BB {
 }
 
 namespace CppLogic {
-	template<class T>
+	template<class T, class Alloc = std::allocator<T>>
 	class SerializationListOptions_ForVector : public BB::SerializationListOptions { // do only use with std::vector<T> !
-		using VectT = std::vector<T>;
-		using IterT = std::vector<T>::iterator;
+		using VectT = std::vector<T, Alloc>;
+		using IterT = std::vector<T, Alloc>::iterator;
 		
 		struct IterImpl : Iter {
 			VectT* Vector;
@@ -374,9 +426,9 @@ namespace CppLogic {
 	};
 
 
-	template<class K, class V>
+	template<class K, class V, class Cmp = std::less<K>, class Alloc = std::allocator<std::pair<const K, V>>>
 	class SerializationListOptions_ForMap : public BB::SerializationListOptions { // do only use with std::map<K, V> !
-		using VectT = std::map<K, V>;
+		using VectT = std::map<K, V, Cmp>;
 		using IterT = VectT::iterator;
 
 		struct IterImpl : Iter {
@@ -459,6 +511,38 @@ namespace CppLogic {
 		static StringSerializer GlobalObj;
 	};
 
+	template<class T, CppLogic::ConstexprString ValueName = CppLogic::ConstexprString(""), CppLogic::ConstexprString KeyName = CppLogic::ConstexprString("")>
+	struct SerializationListOptions_Mapping {
+		static constexpr bool Mapped = false;
+
+		static const SerializationListOptions_Mapping GlobalObj;
+	};
+	template<class K, class V, class Cmp, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::ConstexprString KeyName>
+	struct SerializationListOptions_Mapping<std::map<K, V, Cmp, Alloc>, ValueName, KeyName> {
+		static constexpr bool Mapped = true;
+
+		using KeyValue = std::pair<K, V>;
+		static constexpr auto KN = KeyName;
+		static constexpr auto VN = ValueName;
+
+		SerializationListOptions_ForMap<K, V, Cmp, Alloc> ListOptions;
+		const BB::SerializationData Seridata[3] = {
+			AutoMemberSerializationName(KeyValue, first, KeyName.data()),
+			AutoMemberSerializationName(KeyValue, second, ValueName.data()),
+			BB::SerializationData::GuardData(),
+		};
+
+		static const SerializationListOptions_Mapping GlobalObj;
+	};
+	template<class T, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::ConstexprString KeyName>
+	struct SerializationListOptions_Mapping<std::vector<T, Alloc>, ValueName, KeyName> {
+		static constexpr bool Mapped = true;
+
+		SerializationListOptions_ForVector<T, Alloc> ListOptions;
+
+		static const SerializationListOptions_Mapping GlobalObj;
+	};
+
 	class ClassIdManager {
 		BB::CClassFactory* Manager;
 
@@ -515,3 +599,35 @@ namespace CppLogic {
 		return ClassIdManager{mng};
 	}
 }
+
+template<>
+static constexpr BB::FieldSerilaizer* BB::FieldSerilaizer::GetSerilalizer<std::string>() {
+	return &CppLogic::StringSerializer::GlobalObj;
+}
+template<>
+static constexpr BB::FieldSerilaizer* BB::FieldSerilaizer::GetSerilalizer<std::minstd_rand>() {
+	static_assert(sizeof(std::minstd_rand) == sizeof(int));
+	return BB::FieldSerilaizer::TypeInt; // just serialize the state as int
+}
+
+template<class K, class V, class Cmp, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::ConstexprString KeyName>
+requires (CppLogic::SerializationListOptions_Mapping<std::map<K, V, Cmp, Alloc>>::Mapped)
+struct BB::SerializationData::AutoDataHolder<std::map<K, V, Cmp, Alloc>, ValueName, KeyName> {
+	static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
+		auto& mapping = CppLogic::SerializationListOptions_Mapping<std::map<K, V, Cmp, Alloc>, ValueName, KeyName>::GlobalObj;
+		return SerializationData::EmbeddedData(name, pos, size, mapping.Seridata, &mapping.ListOptions);
+	}
+};
+template<class T, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::ConstexprString KeyName>
+requires (CppLogic::SerializationListOptions_Mapping<std::vector<T, Alloc>>::Mapped)
+struct BB::SerializationData::AutoDataHolder<std::vector<T, Alloc>, ValueName, KeyName> {
+	static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
+		auto& mapping = CppLogic::SerializationListOptions_Mapping<std::vector<T, Alloc>, ValueName, KeyName>::GlobalObj;
+		auto d = BB::SerializationData::AutoDataHolder<T>::AutoData(name, pos, size);
+		d.ListOptions = &mapping.ListOptions;
+		return d;
+	}
+};
+
+#define CreateSerializationListForKeyValue(T,M,K,V) const CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)> CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)>::GlobalObj{}
+#define CreateSerializationListFor(T,M) CreateSerializationListForKeyValue(T,M,"Key","Value")

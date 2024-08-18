@@ -638,7 +638,7 @@ const char* BB::SerializationListOptions::Context::GetAttribute(const char* a) c
 	return serilistctx_get(this, a);
 }
 
-const BB::SerializationData* BB::SerializationData::GetSerializationData(shok::ClassId id)
+const BB::SerializationData* BB::SerializationData::GetSerializationDataFromId(shok::ClassId id)
 {
 	return (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
 }

@@ -15,57 +15,58 @@
 #include "luaext.h"
 #include "entityiterator.h"
 
+CreateSerializationListFor(CppLogic::UA::UnlimitedArmy, Leaders);
+CreateSerializationListFor(CppLogic::UA::UnlimitedArmy, Cannons);
+CreateSerializationListFor(CppLogic::UA::UnlimitedArmy, TargetCache);
+CreateSerializationListFor(CppLogic::UA::UnlimitedArmy, PrepDefenseReset);
+
 namespace CppLogic::UA {
 	std::vector<UACannonBuilderAbilityData> UnlimitedArmy::CannonBuilderAbilityData = std::vector<UACannonBuilderAbilityData>();
 
 	const BB::SerializationData UACannonData::SerializationData[]{
-		BB::SerializationData::FieldData("EntityId", MemberSerializationSizeAndOffset(UACannonData, EntityId), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::FieldData("LastUpdated", MemberSerializationFieldData(UACannonData, LastUpdated)),
+		AutoMemberSerialization(UACannonData, EntityId),
+		AutoMemberSerialization(UACannonData, LastUpdated),
 		BB::SerializationData::GuardData(),
 	};
 	const BB::SerializationData UACannonBuilderAbilityData::SerializationData[]{
-		BB::SerializationData::FieldData("HeroType", MemberSerializationSizeAndOffset(UACannonBuilderAbilityData, HeroType), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::FieldData("BottomType", MemberSerializationSizeAndOffset(UACannonBuilderAbilityData, BottomType), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::FieldData("TopType", MemberSerializationSizeAndOffset(UACannonBuilderAbilityData, TopType), BB::FieldSerilaizer::TypeInt),
+		AutoMemberSerialization(UACannonBuilderAbilityData, HeroType),
+		AutoMemberSerialization(UACannonBuilderAbilityData, BottomType),
+		AutoMemberSerialization(UACannonBuilderAbilityData, TopType),
 		BB::SerializationData::GuardData(),
 	};
 	const BB::SerializationData UATargetCache::SerializationData[]{
-		BB::SerializationData::FieldData("EntityId", MemberSerializationSizeAndOffset(UATargetCache, EntityId), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::FieldData("Tick", MemberSerializationFieldData(UATargetCache, Tick)),
-		BB::SerializationData::FieldData("Num", MemberSerializationFieldData(UATargetCache, Num)),
+		AutoMemberSerialization(UATargetCache, EntityId),
+		AutoMemberSerialization(UATargetCache, Tick),
+		AutoMemberSerialization(UATargetCache, Num),
 		BB::SerializationData::GuardData(),
 	};
 	const BB::SerializationData UAReset::SerializationData[]{
-		BB::SerializationData::FieldData("EntityId", MemberSerializationSizeAndOffset(UAReset, EntityId), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::EmbeddedData("Pos", MemberSerializationEmbeddedData(UAReset, Pos)),
+		AutoMemberSerialization(UAReset, EntityId),
+		AutoMemberSerialization(UAReset, Pos),
 		BB::SerializationData::GuardData(),
 	};
-	CppLogic::SerializationListOptions_ForVector<int> ListOptVectInt{};
-	CppLogic::SerializationListOptions_ForVector<UACannonData> ListOptVectCannondata{};
-	CppLogic::SerializationListOptions_ForVector<UATargetCache> ListOptVectTCache{};
-	CppLogic::SerializationListOptions_ForVector<UAReset> ListOptVectReset{};
 	const BB::SerializationData UnlimitedArmy::SerializationData[]{
-		BB::SerializationData::FieldData("Player", MemberSerializationSizeAndOffset(UnlimitedArmy, Player), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::FieldData("Leaders", MemberSerializationSizeAndOffset(UnlimitedArmy, Leaders), BB::FieldSerilaizer::TypeInt, &ListOptVectInt),
-		BB::SerializationData::FieldData("LeaderInTransit", MemberSerializationSizeAndOffset(UnlimitedArmy, LeaderInTransit), BB::FieldSerilaizer::TypeInt, &ListOptVectInt),
-		BB::SerializationData::EmbeddedData("Cannons", MemberSerializationSizeAndOffset(UnlimitedArmy, Cannons), UACannonData::SerializationData, &ListOptVectCannondata),
-		BB::SerializationData::FieldData("DeadHeroes", MemberSerializationSizeAndOffset(UnlimitedArmy, DeadHeroes), BB::FieldSerilaizer::TypeInt, &ListOptVectInt),
-		BB::SerializationData::EmbeddedData("TargetCache", MemberSerializationSizeAndOffset(UnlimitedArmy, TargetCache), UATargetCache::SerializationData, &ListOptVectTCache),
-		BB::SerializationData::EmbeddedData("PrepDefenseReset", MemberSerializationSizeAndOffset(UnlimitedArmy, PrepDefenseReset), UAReset::SerializationData, &ListOptVectReset),
-		BB::SerializationData::EmbeddedData("LastPos", MemberSerializationEmbeddedData(UnlimitedArmy, LastPos)),
-		BB::SerializationData::FieldData("PosLastUpdatedTick", MemberSerializationFieldData(UnlimitedArmy, PosLastUpdatedTick)),
-		BB::SerializationData::FieldData("Status", MemberSerializationSizeAndOffset(UnlimitedArmy, Status), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::FieldData("Area", MemberSerializationFieldData(UnlimitedArmy, Area)),
-		BB::SerializationData::FieldData("CurrentBattleTarget", MemberSerializationSizeAndOffset(UnlimitedArmy, CurrentBattleTarget), BB::FieldSerilaizer::TypeInt),
-		BB::SerializationData::EmbeddedData("Target", MemberSerializationEmbeddedData(UnlimitedArmy, Target)),
-		BB::SerializationData::FieldData("ReMove", MemberSerializationFieldData(UnlimitedArmy, ReMove)),
-		BB::SerializationData::FieldData("IgnoreFleeing", MemberSerializationFieldData(UnlimitedArmy, IgnoreFleeing)),
-		BB::SerializationData::FieldData("PrepDefense", MemberSerializationFieldData(UnlimitedArmy, PrepDefense)),
-		BB::SerializationData::FieldData("SabotageBridges", MemberSerializationFieldData(UnlimitedArmy, SabotageBridges)),
-		BB::SerializationData::FieldData("DoNotNormalizeSpeed", MemberSerializationFieldData(UnlimitedArmy, DoNotNormalizeSpeed)),
-		BB::SerializationData::FieldData("AutoRotateFormation", MemberSerializationFieldData(UnlimitedArmy, AutoRotateFormation)),
-		BB::SerializationData::FieldData("LastRotation", MemberSerializationFieldData(UnlimitedArmy, LastRotation)),
-		BB::SerializationData::FieldData("RNG", MemberSerializationSizeAndOffset(UnlimitedArmy, RNG), BB::FieldSerilaizer::TypeInt),
+		AutoMemberSerialization(UnlimitedArmy, Player),
+		AutoMemberSerialization(UnlimitedArmy, Leaders),
+		AutoMemberSerialization(UnlimitedArmy, LeaderInTransit),
+		AutoMemberSerialization(UnlimitedArmy, Cannons),
+		AutoMemberSerialization(UnlimitedArmy, DeadHeroes),
+		AutoMemberSerialization(UnlimitedArmy, TargetCache),
+		AutoMemberSerialization(UnlimitedArmy, PrepDefenseReset),
+		AutoMemberSerialization(UnlimitedArmy, LastPos),
+		AutoMemberSerialization(UnlimitedArmy, PosLastUpdatedTick),
+		AutoMemberSerialization(UnlimitedArmy, Status),
+		AutoMemberSerialization(UnlimitedArmy, Area),
+		AutoMemberSerialization(UnlimitedArmy, CurrentBattleTarget),
+		AutoMemberSerialization(UnlimitedArmy, Target),
+		AutoMemberSerialization(UnlimitedArmy, ReMove),
+		AutoMemberSerialization(UnlimitedArmy, IgnoreFleeing),
+		AutoMemberSerialization(UnlimitedArmy, PrepDefense),
+		AutoMemberSerialization(UnlimitedArmy, SabotageBridges),
+		AutoMemberSerialization(UnlimitedArmy, DoNotNormalizeSpeed),
+		AutoMemberSerialization(UnlimitedArmy, AutoRotateFormation),
+		AutoMemberSerialization(UnlimitedArmy, LastRotation),
+		AutoMemberSerialization(UnlimitedArmy, RNG),
 		BB::SerializationData::GuardData(),
 	};
 

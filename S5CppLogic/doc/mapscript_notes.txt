@@ -4,6 +4,7 @@ what happens on map load:
 - load Data\\Script\\XGlobalScript.lua
 - load Data\\Script\\XLocalScript.lua
 - call GameCallback_LocalScriptLoadedFirstTime() (XLocalScript.lua)
+- ModLoader
 - load mapscript
 - call GameCallback_SetDefaultValues() (XGlobalScript.lua, empty)
 - call GameCallback_NewGame() (not existing?)
@@ -16,6 +17,7 @@ what happens on map load:
 what happens on save load:
 - load ingame gui
 - create lua state
+- ModLoader
 - load save
 - load UserScript.lua
 - call GameCallback_LocalRecreateGameLogic() (XLocalScript.lua)

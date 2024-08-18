@@ -1,6 +1,8 @@
 // Hint files help the Visual Studio IDE interpret Visual C++ identifiers
 // such as names of functions and macros.
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
-#define MemberSerializationFieldData(T, M) MemberSerializationSizeAndOffset(T, M), BB::FieldSerilaizer::GetSerilalizer<decltype(T::M)>()
-#define MemberSerializationEmbeddedData(T, M) MemberSerializationSizeAndOffset(T, M), BB::SerializationData::GetSerializationData<decltype(T::M)>()
-#define MemberSerializationSizeAndOffset(T, M) offsetof(T, M), sizeof(decltype(T::M))
+#define AutoMemberSerialization(T,M) BB::SerializationData::AutoDataHolder<decltype(T::M)>::AutoData(#M, offsetof(T, M), sizeof(decltype(T::M)))
+#define AutoMemberSerializationName(T,M,N) BB::SerializationData::AutoDataHolder<decltype(T::M)>::AutoData(N, offsetof(T, M), sizeof(decltype(T::M)))
+#define AutoMemberSerializationNameKeyVaue(T,M,N,K,V) BB::SerializationData::AutoDataHolder<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)>::AutoData(N, offsetof(T, M), sizeof(decltype(T::M)))
+#define CreateSerializationListForKeyValue(T,M,K,V) const CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)> CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)>::GlobalObj{}
+#define CreateSerializationListFor(T,M) CreateSerializationListForKeyValue(T,M,"Key","Value")

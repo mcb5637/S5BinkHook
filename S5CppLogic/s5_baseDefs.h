@@ -445,4 +445,10 @@ namespace CppLogic {
 			shok::Free(p);
 		}
 	};
+
+	class CaselessStringComparator {
+	public:
+		bool operator()(const std::string& a, const std::string& b) const noexcept;
+	};
+
 }

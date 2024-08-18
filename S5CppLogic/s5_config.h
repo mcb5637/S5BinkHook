@@ -29,9 +29,9 @@ namespace GGL {
 	class CDamageClassProps : public BB::IObject {
 	public:
 		//float BonusVsArmorClass[7]; // remember to access with ArmorClass - 1
-		float ArmorClassNoneFactor, ArmorClassJerkinFactor, ArmorClassLeatherFactor;
-		float ArmorClassIronFactor, ArmorClassFortificationFactor, ArmorClassHeroFactor, ArmorClassFurFactor;
-		shok::UpgradeCategoryId SoldierCategory, LeaderCategory; // unused
+		float ArmorClassNoneFactor = 0, ArmorClassJerkinFactor = 0, ArmorClassLeatherFactor = 0;
+		float ArmorClassIronFactor = 0, ArmorClassFortificationFactor = 0, ArmorClassHeroFactor = 0, ArmorClassFurFactor = 0;
+		shok::UpgradeCategoryId SoldierCategory = {}, LeaderCategory = {}; // unused
 		
 		float& GetBonusVsArmorClass(shok::ArmorClassId ac);
 

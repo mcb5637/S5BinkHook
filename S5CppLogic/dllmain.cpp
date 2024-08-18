@@ -286,7 +286,7 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, CppLogic::SavegameExtra::SerializedMapdata::SerializationData);// reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x8BCFE1F7));
 	/*auto e = L.CheckEntity(1);
@@ -297,7 +297,7 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
 
-	return 0;
+	return 1;
 }
 
 int GetOptions(lua::State L) {

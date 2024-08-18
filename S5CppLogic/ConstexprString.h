@@ -18,8 +18,17 @@ namespace CppLogic {
 			std::copy_n(v.data(), N - 1, Data.data());
 			Data[N - 1] = 0;
 		}
-		constexpr operator std::string_view() const {
+		constexpr std::string_view view() const noexcept {
 			return { Data.data(), N - 1 };
+		}
+		constexpr operator std::string_view() const noexcept {
+			return view();
+		}
+		constexpr const char* data() const noexcept {
+			return Data.data();
+		}
+		constexpr bool empty() const noexcept {
+			return view().empty();
 		}
 
 		template<size_t M>

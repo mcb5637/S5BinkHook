@@ -27,7 +27,7 @@ function CppLogicOptions.LoadModpacks()
 	end
 	local str = GDB.GetString("CppLogic\\UserRequestedMods")
 	if str and str ~= "" then
-		for m in ModLoader.LoadModList(str) do
+		for _, m in ModLoader.LoadModList(str) do
 			for _, mp in ipairs(CppLogicOptions.ModPacks) do
 				if mp.Name == m then
 					mp.Active = true

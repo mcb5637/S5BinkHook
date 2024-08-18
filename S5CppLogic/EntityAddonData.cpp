@@ -58,16 +58,17 @@ void CppLogic::EntityAddon::EntityAddonData::Init()
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<EntityAddonData>();
 }
 
-BB::SerializationData CppLogic::EntityAddon::EntityAddonData::SerializationData[]{
-	BB::SerializationData::FieldData("HealthOverride", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, HealthOverride)),
-	BB::SerializationData::FieldData("HealthUseBoni", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, HealthUseBoni)),
-	BB::SerializationData::FieldData("DamageOverride", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, DamageOverride)),
-	BB::SerializationData::FieldData("ArmorOverride", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, ArmorOverride)),
-	BB::SerializationData::FieldData("ExplorationOverride", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, ExplorationOverride)),
-	BB::SerializationData::FieldData("RegenHPOverride", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, RegenHPOverride)),
-	BB::SerializationData::FieldData("RegenSecondsOverride", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, RegenSecondsOverride)),
-	BB::SerializationData::FieldData("MaxRangeOverride", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, MaxRangeOverride)),
-	BB::SerializationData::FieldData("NameOverride", MemberSerializationSizeAndOffset(CppLogic::EntityAddon::EntityAddonData, NameOverride), &CppLogic::StringSerializer::GlobalObj),
-	BB::SerializationData::FieldData("FakeTaskValue", MemberSerializationFieldData(CppLogic::EntityAddon::EntityAddonData, FakeTaskValue)),
+const BB::SerializationData CppLogic::EntityAddon::EntityAddonData::SerializationData[]{
+	BB::SerializationData::AutoBaseClass<EntityAddonData, EGL::CGLEBehavior>(),
+	AutoMemberSerialization(EntityAddonData, HealthOverride),
+	AutoMemberSerialization(EntityAddonData, HealthUseBoni),
+	AutoMemberSerialization(EntityAddonData, DamageOverride),
+	AutoMemberSerialization(EntityAddonData, ArmorOverride),
+	AutoMemberSerialization(EntityAddonData, ExplorationOverride),
+	AutoMemberSerialization(EntityAddonData, RegenHPOverride),
+	AutoMemberSerialization(EntityAddonData, RegenSecondsOverride),
+	AutoMemberSerialization(EntityAddonData, MaxRangeOverride),
+	AutoMemberSerialization(EntityAddonData, NameOverride),
+	AutoMemberSerialization(EntityAddonData, FakeTaskValue),
 	BB::SerializationData::GuardData(),
 };

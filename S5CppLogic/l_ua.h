@@ -176,6 +176,6 @@ namespace CppLogic::UA {
 }
 
 template<>
-static constexpr BB::FieldSerilaizer* BB::FieldSerilaizer::GetSerilalizer<CppLogic::UA::UAStatus>() {
-	return BB::FieldSerilaizer::TypeInt;
+static constexpr BB::FieldSerializer* BB::FieldSerializer::GetSerializer<CppLogic::UA::UAStatus>() {
+	return BB::FieldSerializer::TypeInt;
 }

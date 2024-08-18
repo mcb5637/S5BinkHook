@@ -82,144 +82,144 @@ BB::CBinarySerializer* BB::CBinarySerializer::Create(int uk)
 	return binaryseri_create(0, uk);
 }
 
-void PushUnknownValue(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushUnknownValue(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	char buff[201]{};
 	fs->SerializeToString(buff, 200, data);
 	L.Push(buff);
 }
-void CheckUnknownValue(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckUnknownValue(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	const char* s = L.CheckString(idx);
 	fs->DeserializeFromString(data, s);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoUnknown{ "Unknown Type", &PushUnknownValue, &CheckUnknownValue };
+BB::FieldSerializer::ExtendedInfo InfoUnknown{ "Unknown Type", &PushUnknownValue, &CheckUnknownValue };
 
 
-void PushInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushInt(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<int*>(data));
 }
-void CheckInt(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckInt(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<int*>(data) = L.CheckInt(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoInt{ "Int", &PushInt, &CheckInt, "xs:int" };
+BB::FieldSerializer::ExtendedInfo InfoInt{ "Int", &PushInt, &CheckInt, "xs:int" };
 
 template<class En>
-void CheckEnum(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckEnum(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<En*>(data) = luaext::EState{ L }.CheckEnum<En>(idx, true);
 }
 
-BB::FieldSerilaizer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoTask{ "shok::Task", &PushInt, &CheckEnum<shok::Task>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoEntityType{ "shok::EntityTypeId", &PushInt, &CheckEnum<shok::EntityTypeId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoModel{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoAnim{ "shok::AnimationId", &PushInt, &CheckEnum<shok::AnimationId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoDamageClass{ "shok::DamageClassId", &PushInt, &CheckEnum<shok::DamageClassId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoEffectType{ "shok::EffectTypeId", &PushInt, &CheckEnum<shok::EffectTypeId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckEnum<shok::ResourceType>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategoryId", &PushInt, &CheckEnum<shok::UpgradeCategoryId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyId", &PushInt, &CheckEnum<shok::TechnologyId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoSoundID{ "shok::SoundId", &PushInt, &CheckEnum<shok::SoundId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundId", &PushInt, &CheckEnum<shok::AmbientSoundId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureId", &PushInt, &CheckEnum<shok::WeatherEffectTextureId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTextureId", &PushInt, &CheckEnum<shok::TerrainTextureId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategory", &PushInt, &CheckEnum<shok::EntityCategory>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &PushInt, &CheckInt, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoAnimCategory{ "shok::AnimationCategoryId", &PushInt, &CheckEnum<shok::AnimationCategoryId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckEnum<shok::Goods>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoWidgetID{ "shok::WidgetId", &PushInt, &CheckEnum<shok::WidgetId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventIds", &PushInt, &CheckEnum<shok::FeedbackEventIds>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", &PushInt, &CheckEnum<shok::FeedbackStateId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", &PushInt, &CheckEnum<shok::AbilityId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoArmorClassId{ "shok::ArmorClassId", &PushInt, &CheckEnum<shok::ArmorClassId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoTerrainTypeId{ "shok::TerrainTypeId", &PushInt, &CheckEnum<shok::TerrainTypeId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoBuildingBanner{ "shok::BuildingBannerId", &PushInt, &CheckEnum<shok::BuildingBannerId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoBlessCategoryId{ "shok::BlessCategoryId", &PushInt, &CheckEnum<shok::BlessCategoryId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoAttachmentType{ "shok::AttachmentType", &PushInt, &CheckEnum<shok::AttachmentType>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoAnimSetId{ "shok::AnimSetId", &PushInt, &CheckEnum<shok::AnimSetId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoWidgetGroupId{ "shok::WidgetGroupId", &PushInt, &CheckEnum<shok::WidgetGroupId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoGUITextureId{ "shok::GUITextureId", &PushInt, &CheckEnum<shok::GUITextureId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoFontId{ "shok::FontId", &PushInt, &CheckEnum<shok::FontId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoPrincipalTaskId{ "shok::PrincipalTaskId", &PushInt, &CheckEnum<shok::PrincipalTaskId>, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoRaceId{ "shok::RaceId", &PushInt, &CheckInt, "xs:string" };
-BB::FieldSerilaizer::ExtendedInfo InfoTechnologyCategoryId{ "shok::TechnologyCategoryId", &PushInt, &CheckEnum<shok::TechnologyCategoryId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoTask{ "shok::Task", &PushInt, &CheckEnum<shok::Task>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoEntityType{ "shok::EntityTypeId", &PushInt, &CheckEnum<shok::EntityTypeId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoModel{ "shok::ModelId", &PushInt, &CheckEnum<shok::ModelId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAnim{ "shok::AnimationId", &PushInt, &CheckEnum<shok::AnimationId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoDamageClass{ "shok::DamageClassId", &PushInt, &CheckEnum<shok::DamageClassId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoEffectType{ "shok::EffectTypeId", &PushInt, &CheckEnum<shok::EffectTypeId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoResourceType{ "shok::ResourceType", &PushInt, &CheckEnum<shok::ResourceType>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoUpgradeCategory{ "shok::UpgradeCategoryId", &PushInt, &CheckEnum<shok::UpgradeCategoryId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoTechnologyID{ "shok::TechnologyId", &PushInt, &CheckEnum<shok::TechnologyId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoSoundID{ "shok::SoundId", &PushInt, &CheckEnum<shok::SoundId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundId", &PushInt, &CheckEnum<shok::AmbientSoundId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureId", &PushInt, &CheckEnum<shok::WeatherEffectTextureId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTextureId", &PushInt, &CheckEnum<shok::TerrainTextureId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategory", &PushInt, &CheckEnum<shok::EntityCategory>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &PushInt, &CheckInt, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAnimCategory{ "shok::AnimationCategoryId", &PushInt, &CheckEnum<shok::AnimationCategoryId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckEnum<shok::Goods>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoWidgetID{ "shok::WidgetId", &PushInt, &CheckEnum<shok::WidgetId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventIds", &PushInt, &CheckEnum<shok::FeedbackEventIds>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", &PushInt, &CheckEnum<shok::FeedbackStateId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", &PushInt, &CheckEnum<shok::AbilityId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoArmorClassId{ "shok::ArmorClassId", &PushInt, &CheckEnum<shok::ArmorClassId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoTerrainTypeId{ "shok::TerrainTypeId", &PushInt, &CheckEnum<shok::TerrainTypeId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoBuildingBanner{ "shok::BuildingBannerId", &PushInt, &CheckEnum<shok::BuildingBannerId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoBlessCategoryId{ "shok::BlessCategoryId", &PushInt, &CheckEnum<shok::BlessCategoryId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAttachmentType{ "shok::AttachmentType", &PushInt, &CheckEnum<shok::AttachmentType>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAnimSetId{ "shok::AnimSetId", &PushInt, &CheckEnum<shok::AnimSetId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoWidgetGroupId{ "shok::WidgetGroupId", &PushInt, &CheckEnum<shok::WidgetGroupId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoGUITextureId{ "shok::GUITextureId", &PushInt, &CheckEnum<shok::GUITextureId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoFontId{ "shok::FontId", &PushInt, &CheckEnum<shok::FontId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoPrincipalTaskId{ "shok::PrincipalTaskId", &PushInt, &CheckEnum<shok::PrincipalTaskId>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoRaceId{ "shok::RaceId", &PushInt, &CheckInt, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoTechnologyCategoryId{ "shok::TechnologyCategoryId", &PushInt, &CheckEnum<shok::TechnologyCategoryId>, "xs:string" };
 
-void PushUInt(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushUInt(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
 }
-void CheckUInt(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckUInt(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<unsigned int*>(data) = static_cast<unsigned int>(L.CheckNumber(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoUInt{ "unsigned Int", &PushUInt, &CheckUInt, "xs:unsignedInt" };
+BB::FieldSerializer::ExtendedInfo InfoUInt{ "unsigned Int", &PushUInt, &CheckUInt, "xs:unsignedInt" };
 
-void PushUByte(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushUByte(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<double>(*static_cast<byte*>(data)));
 }
-void CheckUByte(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckUByte(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<unsigned int*>(data) = static_cast<byte>(L.CheckNumber(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoUByte{ "unsigned Byte", &PushUByte, &CheckUByte, "xs:unsignedByte" };
+BB::FieldSerializer::ExtendedInfo InfoUByte{ "unsigned Byte", &PushUByte, &CheckUByte, "xs:unsignedByte" };
 
-void PushBool(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushBool(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<bool*>(data));
 }
-void CheckBool(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckBool(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<bool*>(data) = L.CheckBool(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoBool{ "Bool", &PushBool, &CheckBool, "xs:boolean" };
+BB::FieldSerializer::ExtendedInfo InfoBool{ "Bool", &PushBool, &CheckBool, "xs:boolean" };
 
-void PushFloat(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushFloat(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<float*>(data));
 }
-void CheckFloat(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckFloat(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<float*>(data) = L.CheckFloat(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoFloat{ "Float", &PushFloat, &CheckFloat, "xs:float" };
+BB::FieldSerializer::ExtendedInfo InfoFloat{ "Float", &PushFloat, &CheckFloat, "xs:float" };
 
-void PushDouble(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushDouble(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<double*>(data));
 }
-void CheckDouble(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckDouble(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<double*>(data) = L.CheckNumber(idx);
 }
-BB::FieldSerilaizer::ExtendedInfo InfoDouble{ "Double", &PushDouble, &CheckDouble, "xs:double" };
+BB::FieldSerializer::ExtendedInfo InfoDouble{ "Double", &PushDouble, &CheckDouble, "xs:double" };
 
-void PushSString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushSString(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<shok::String*>(data)->c_str());
 }
-void CheckSString(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckSString(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	static_cast<shok::String*>(data)->assign(L.CheckString(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoString{ typename_details::type_name<shok::String>(), &PushSString, &CheckSString, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoString{ typename_details::type_name<shok::String>(), &PushSString, &CheckSString, "xs:string" };
 
-void PushCharBuff(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushCharBuff(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<const char**>(data));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoCharBuff{ "char*" , &PushCharBuff, &CheckUnknownValue, "xs:string" }; // let the original xml variant alloc the mem
+BB::FieldSerializer::ExtendedInfo InfoCharBuff{ "char*" , &PushCharBuff, &CheckUnknownValue, "xs:string" }; // let the original xml variant alloc the mem
 
-void PushStdString(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushStdString(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<std::string*>(data)->c_str());
 }
-void CheckStdString(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckStdString(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	static_cast<std::string*>(data)->assign(L.CheckString(idx));
 }
-BB::FieldSerilaizer::ExtendedInfo InfoStdString{ typename_details::type_name<std::string>(), &PushStdString, &CheckStdString, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoStdString{ typename_details::type_name<std::string>(), &PushStdString, &CheckStdString, "xs:string" };
 
-void PushEntId(lua::State L, void* data, const BB::FieldSerilaizer* fs) {
+void PushEntId(lua::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<int>((*static_cast<EGL::CGLEEntity**>(data))->EntityId));
 }
-void CheckEntId(lua::State L, void* data, int idx, const BB::FieldSerilaizer* fs) {
+void CheckEntId(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<EGL::CGLEEntity**>(data) = luaext::EState{ L }.CheckEntity(idx);
 }
 // only to be used after entities are loaded
-BB::FieldSerilaizer::ExtendedInfo EntitySerializedById{ "EGL::CGLEEntity (by Id)", &PushEntId, &CheckEntId, "xs:int" };
+BB::FieldSerializer::ExtendedInfo EntitySerializedById{ "EGL::CGLEEntity (by Id)", &PushEntId, &CheckEntId, "xs:int" };
 
-BB::FieldSerilaizer::ExtendedInfo InfoClassID{ "shok::ClassIdentifier", &PushUnknownValue, &CheckUnknownValue, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoClassID{ "shok::ClassIdentifier", &PushUnknownValue, &CheckUnknownValue, "xs:string" };
 
-BB::FieldSerilaizer::ExtendedInfo InfoLowResTerrainNode{ "EGL::CGLETerrainLowRes::TerrainNode (no binary)", &PushUnknownValue, &CheckUnknownValue };
-BB::FieldSerilaizer::ExtendedInfo InfoHiResTerrainNode{ "EGL::CGLETerrainHiRes::TerrainNode (no binary)", &PushUnknownValue, &CheckUnknownValue };
-BB::FieldSerilaizer::ExtendedInfo InfoIntVector{ "shok::Vector<int>", &PushUnknownValue, &CheckUnknownValue };
-BB::FieldSerilaizer::ExtendedInfo InfoFloatRad{ "float (rad serialized as deg)", &PushFloat, &CheckFloat };
+BB::FieldSerializer::ExtendedInfo InfoLowResTerrainNode{ "EGL::CGLETerrainLowRes::TerrainNode (no binary)", &PushUnknownValue, &CheckUnknownValue };
+BB::FieldSerializer::ExtendedInfo InfoHiResTerrainNode{ "EGL::CGLETerrainHiRes::TerrainNode (no binary)", &PushUnknownValue, &CheckUnknownValue };
+BB::FieldSerializer::ExtendedInfo InfoIntVector{ "shok::Vector<int>", &PushUnknownValue, &CheckUnknownValue };
+BB::FieldSerializer::ExtendedInfo InfoFloatRad{ "float (rad serialized as deg)", &PushFloat, &CheckFloat };
 
-const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ {
+const std::map<int, const BB::FieldSerializer::ExtendedInfo*> KnownSerializers{ {
 	{0x810C58, &InfoBool},
 	{0x82BAF4, &InfoBool},
 	{0x822334, &InfoBool},
@@ -595,7 +595,7 @@ const std::map<int, const BB::FieldSerilaizer::ExtendedInfo*> KnownSerializers{ 
 	{0x83c9e0, &InfoClassID},
 } };
 
-std::string BB::FieldSerilaizer::GetTypeDescName() const
+std::string BB::FieldSerializer::GetTypeDescName() const
 {
 	int p = reinterpret_cast<int>(this);
 
@@ -609,7 +609,7 @@ std::string BB::FieldSerilaizer::GetTypeDescName() const
 	return b;
 }
 
-const BB::FieldSerilaizer::ExtendedInfo& BB::FieldSerilaizer::GetExtendedInfo() const
+const BB::FieldSerializer::ExtendedInfo& BB::FieldSerializer::GetExtendedInfo() const
 {
 	int p = reinterpret_cast<int>(this);
 
@@ -620,7 +620,7 @@ const BB::FieldSerilaizer::ExtendedInfo& BB::FieldSerilaizer::GetExtendedInfo() 
 
 	return InfoUnknown;
 }
-const BB::FieldSerilaizer::ExtendedInfo* BB::FieldSerilaizer::GetOptExtendedInfo() const
+const BB::FieldSerializer::ExtendedInfo* BB::FieldSerializer::GetOptExtendedInfo() const
 {
 	int p = reinterpret_cast<int>(this);
 

@@ -65,7 +65,7 @@ namespace BB {
 		CBinarySerializer() = default;
 	};
 
-	struct FieldSerilaizer {
+	struct FieldSerializer {
 		void(__stdcall* DeserializeFromString)(void* data, const char* buff) = nullptr;
 		int(__stdcall* SerializeToString)(char* buff, size_t s, const void* data) = nullptr; // returns num chars written if buffer would be sufficient, negative on error
 		void(__stdcall* DeserializeFromStream)(void* data, BB::IStream* str) = nullptr;
@@ -74,69 +74,69 @@ namespace BB {
 		bool IsPrimitive = false;
 		void* Buffer = nullptr; // p to a memory block of the serialized type, usually the buffer is directly after the serializer structure
 
-		static inline BB::FieldSerilaizer* const TypeInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810C98);
-		static inline BB::FieldSerilaizer* const TypeUInt = reinterpret_cast<BB::FieldSerilaizer*>(0x810CD8);
-		static inline BB::FieldSerilaizer* const TypeFloat = reinterpret_cast<BB::FieldSerilaizer*>(0x810C78);
-		static inline BB::FieldSerilaizer* const TypeDouble = reinterpret_cast<BB::FieldSerilaizer*>(0x82BB38);
-		static inline BB::FieldSerilaizer* const TypeBool = reinterpret_cast<BB::FieldSerilaizer*>(0x810C58);
-		static inline BB::FieldSerilaizer* const TypeString = reinterpret_cast<BB::FieldSerilaizer*>(0x8640F0);
-		static inline BB::FieldSerilaizer* const TypeCharBuff = reinterpret_cast<BB::FieldSerilaizer*>(0x810CB8);
-		static inline BB::FieldSerilaizer* const TypeClassIdentifier = reinterpret_cast<BB::FieldSerilaizer*>(0x813978);
-		static inline BB::FieldSerilaizer* const TypeTaskList = reinterpret_cast<BB::FieldSerilaizer*>(0x85D4AC);
+		static inline BB::FieldSerializer* const TypeInt = reinterpret_cast<BB::FieldSerializer*>(0x810C98);
+		static inline BB::FieldSerializer* const TypeUInt = reinterpret_cast<BB::FieldSerializer*>(0x810CD8);
+		static inline BB::FieldSerializer* const TypeFloat = reinterpret_cast<BB::FieldSerializer*>(0x810C78);
+		static inline BB::FieldSerializer* const TypeDouble = reinterpret_cast<BB::FieldSerializer*>(0x82BB38);
+		static inline BB::FieldSerializer* const TypeBool = reinterpret_cast<BB::FieldSerializer*>(0x810C58);
+		static inline BB::FieldSerializer* const TypeString = reinterpret_cast<BB::FieldSerializer*>(0x8640F0);
+		static inline BB::FieldSerializer* const TypeCharBuff = reinterpret_cast<BB::FieldSerializer*>(0x810CB8);
+		static inline BB::FieldSerializer* const TypeClassIdentifier = reinterpret_cast<BB::FieldSerializer*>(0x813978);
+		static inline BB::FieldSerializer* const TypeTaskList = reinterpret_cast<BB::FieldSerializer*>(0x85D4AC);
 		// does not add ids
-		static inline BB::FieldSerilaizer* const TypeEntityType = reinterpret_cast<BB::FieldSerilaizer*>(0x85D4D0);
-		static inline BB::FieldSerilaizer* const TypeModel = reinterpret_cast<BB::FieldSerilaizer*>(0x8585C0);
-		static inline BB::FieldSerilaizer* const TypeAnim = reinterpret_cast<BB::FieldSerilaizer*>(0x86057C);
-		static inline BB::FieldSerilaizer* const TypeAnimCategory = reinterpret_cast<BB::FieldSerilaizer*>(0x875494);
-		static inline BB::FieldSerilaizer* const TypeDamageClass = reinterpret_cast<BB::FieldSerilaizer*>(0x860558);
-		static inline BB::FieldSerilaizer* const TypeEffectType = reinterpret_cast<BB::FieldSerilaizer*>(0x8605A0);
-		static inline BB::FieldSerilaizer* const TypeWidgetID = reinterpret_cast<BB::FieldSerilaizer*>(0x894708);
-		static inline BB::FieldSerilaizer* const TypeArmorClassId = reinterpret_cast<BB::FieldSerilaizer*>(0x85D5CC);
+		static inline BB::FieldSerializer* const TypeEntityType = reinterpret_cast<BB::FieldSerializer*>(0x85D4D0);
+		static inline BB::FieldSerializer* const TypeModel = reinterpret_cast<BB::FieldSerializer*>(0x8585C0);
+		static inline BB::FieldSerializer* const TypeAnim = reinterpret_cast<BB::FieldSerializer*>(0x86057C);
+		static inline BB::FieldSerializer* const TypeAnimCategory = reinterpret_cast<BB::FieldSerializer*>(0x875494);
+		static inline BB::FieldSerializer* const TypeDamageClass = reinterpret_cast<BB::FieldSerializer*>(0x860558);
+		static inline BB::FieldSerializer* const TypeEffectType = reinterpret_cast<BB::FieldSerializer*>(0x8605A0);
+		static inline BB::FieldSerializer* const TypeWidgetID = reinterpret_cast<BB::FieldSerializer*>(0x894708);
+		static inline BB::FieldSerializer* const TypeArmorClassId = reinterpret_cast<BB::FieldSerializer*>(0x85D5CC);
 
 		template<class T>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer() = delete;
+		static constexpr BB::FieldSerializer* GetSerializer() = delete;
 
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<int>() {
+		static constexpr BB::FieldSerializer* GetSerializer<int>() {
 			return TypeInt;
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<unsigned int>() {
+		static constexpr BB::FieldSerializer* GetSerializer<unsigned int>() {
 			return TypeUInt;
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<float>() {
+		static constexpr BB::FieldSerializer* GetSerializer<float>() {
 			return TypeFloat;
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<bool>() {
+		static constexpr BB::FieldSerializer* GetSerializer<bool>() {
 			return TypeBool;
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<double>() {
+		static constexpr BB::FieldSerializer* GetSerializer<double>() {
 			return TypeDouble;
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::ArmorClassId>() {
+		static constexpr BB::FieldSerializer* GetSerializer<shok::ArmorClassId>() {
 			return TypeArmorClassId;
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::EntityId>() {
+		static constexpr BB::FieldSerializer* GetSerializer<shok::EntityId>() {
 			return TypeInt; // no real serializer, but int should work
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::EntityTypeId>() {
+		static constexpr BB::FieldSerializer* GetSerializer<shok::EntityTypeId>() {
 			return TypeEntityType;
 		}
 		template<>
-		static constexpr BB::FieldSerilaizer* GetSerilalizer<shok::PlayerId>() {
+		static constexpr BB::FieldSerializer* GetSerializer<shok::PlayerId>() {
 			return TypeInt; // no real serializer, but int should work
 		}
 
 		struct ExtendedInfo {
 			std::string_view Name;
-			void (* const Push)(lua::State L, void* data, const FieldSerilaizer* fs);
-			void (* const Check)(lua::State L, void* data, int idx, const FieldSerilaizer* fs);
+			void (* const Push)(lua::State L, void* data, const FieldSerializer* fs);
+			void (* const Check)(lua::State L, void* data, int idx, const FieldSerializer* fs);
 			std::string_view XSDType;
 		};
 
@@ -177,7 +177,7 @@ namespace BB {
 		const char* SerializationName = nullptr; // if not set, automatically follows subelementdata with a position of 0
 		size_t Position = 0;
 		size_t Size = 0;
-		const BB::FieldSerilaizer* DataConverter = nullptr;
+		const BB::FieldSerializer* DataConverter = nullptr;
 		const BB::SerializationData* SubElementData = nullptr; //5
 		shok::ClassId (__stdcall* GetIdentifier)(void* data) = nullptr;
 		const BB::SerializationListOptions* ListOptions = nullptr;
@@ -186,7 +186,7 @@ namespace BB {
 	private:
 		static shok::ClassId __stdcall GetBBIdentifier(void* d);
 	public:
-		static constexpr SerializationData FieldData(const char* name, size_t pos, size_t size, const BB::FieldSerilaizer* converter, const BB::SerializationListOptions* list = nullptr)
+		static constexpr SerializationData FieldData(const char* name, size_t pos, size_t size, const BB::FieldSerializer* converter, const BB::SerializationListOptions* list = nullptr)
 		{
 			return SerializationData{ Ty::Direct, name, pos, size, converter, nullptr, nullptr, list, 0 };
 		}
@@ -247,10 +247,10 @@ namespace BB {
 		}
 	};
 	template<class T>
-	requires requires { FieldSerilaizer::GetSerilalizer<T>(); }
+	requires requires { FieldSerializer::GetSerializer<T>(); }
 	struct SerializationData::AutoDataHolder<T> {
 		static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
-			return SerializationData::FieldData(name, pos, size, FieldSerilaizer::GetSerilalizer<T>());
+			return SerializationData::FieldData(name, pos, size, FieldSerializer::GetSerializer<T>());
 		}
 	};
 
@@ -498,7 +498,7 @@ namespace CppLogic {
 		}
 	};
 
-	class StringSerializer : public BB::FieldSerilaizer {
+	class StringSerializer : public BB::FieldSerializer {
 		std::string ActualBuffer;
 
 		static void __stdcall DeserializeFromStringImp(void* data, const char* buff);
@@ -601,13 +601,13 @@ namespace CppLogic {
 }
 
 template<>
-static constexpr BB::FieldSerilaizer* BB::FieldSerilaizer::GetSerilalizer<std::string>() {
+static constexpr BB::FieldSerializer* BB::FieldSerializer::GetSerializer<std::string>() {
 	return &CppLogic::StringSerializer::GlobalObj;
 }
 template<>
-static constexpr BB::FieldSerilaizer* BB::FieldSerilaizer::GetSerilalizer<std::minstd_rand>() {
+static constexpr BB::FieldSerializer* BB::FieldSerializer::GetSerializer<std::minstd_rand>() {
 	static_assert(sizeof(std::minstd_rand) == sizeof(int));
-	return BB::FieldSerilaizer::TypeInt; // just serialize the state as int
+	return BB::FieldSerializer::TypeInt; // just serialize the state as int
 }
 
 template<class K, class V, class Cmp, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::ConstexprString KeyName>

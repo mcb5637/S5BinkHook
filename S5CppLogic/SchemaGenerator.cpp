@@ -7,11 +7,11 @@
 #include "modloader.h"
 
 template<class T>
-static bool CheckFieldSerializerType(const BB::FieldSerilaizer* f) {
-	const BB::FieldSerilaizer* c = BB::FieldSerilaizer::GetSerilalizer<T>();
+static bool CheckFieldSerializerType(const BB::FieldSerializer* f) {
+	const BB::FieldSerializer* c = BB::FieldSerializer::GetSerializer<T>();
 	return c->DeserializeFromString == f->DeserializeFromString && c->SerializeToString == f->SerializeToString;
 }
-static std::string CheckFieldSerializerTypes(const BB::FieldSerilaizer* f) {
+static std::string CheckFieldSerializerTypes(const BB::FieldSerializer* f) {
 	if (CheckFieldSerializerType<int>(f))
 		return std::format("{{{}, &InfoInt}},", reinterpret_cast<const void*>(f));
 	if (CheckFieldSerializerType<unsigned int>(f))

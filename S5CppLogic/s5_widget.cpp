@@ -487,7 +487,7 @@ EGUIX::CTextButtonWidget* EGUIX::CTextButtonWidget::Create()
 }
 BB::SerializationData textbuttonwid_seridataaddon[] = {
     BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(EGUIX::CTextButtonWidget), nullptr, nullptr),
-    BB::SerializationData::FieldData("CenterText", MemberSerializationFieldData(EGUIX::CTextButtonWidget, CppLogic_CenterText)),
+    AutoMemberSerializationName(EGUIX::CTextButtonWidget, CppLogic_CenterText, "CenterText"),
     BB::SerializationData::GuardData(),
 };
 void __declspec(naked) textbuttonwid_fixtextrenderasm() {

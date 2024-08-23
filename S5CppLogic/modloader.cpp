@@ -1204,25 +1204,27 @@ std::string CppLogic::ModLoader::ModLoader::GetModPackPath(std::string_view n)
 	return std::format("{}\\{}.bba", ModpackFolder, n);
 }
 
+CreateSerializationListFor(CppLogic::ModLoader::ModpackDesc, Required);
+
 CppLogic::SerializationListOptions_ForVector<std::string> stringvect{};
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[]{
-	BB::SerializationData::FieldData("LoaderPath", MemberSerializationSizeAndOffset(ModpackDesc, LoaderPath), &CppLogic::StringSerializer::GlobalObj),
-	BB::SerializationData::FieldData("ScriptPath", MemberSerializationSizeAndOffset(ModpackDesc, ScriptPath), &CppLogic::StringSerializer::GlobalObj),
-	BB::SerializationData::FieldData("Version", MemberSerializationSizeAndOffset(ModpackDesc, Version), &CppLogic::StringSerializer::GlobalObj),
-	BB::SerializationData::FieldData("Required", MemberSerializationSizeAndOffset(ModpackDesc, Required), &CppLogic::StringSerializer::GlobalObj, &stringvect),
-	BB::SerializationData::FieldData("Incompatible", MemberSerializationSizeAndOffset(ModpackDesc, Incompatible), &CppLogic::StringSerializer::GlobalObj, &stringvect),
-	BB::SerializationData::FieldData("Override", MemberSerializationSizeAndOffset(ModpackDesc, Override), &CppLogic::StringSerializer::GlobalObj, &stringvect),
-	BB::SerializationData::FieldData("DataMod", MemberSerializationFieldData(ModpackDesc, DataMod)),
-	BB::SerializationData::FieldData("ScriptMod", MemberSerializationFieldData(ModpackDesc, ScriptMod)),
-	BB::SerializationData::FieldData("MainmenuMod", MemberSerializationFieldData(ModpackDesc, MainmenuMod)),
-	BB::SerializationData::FieldData("KeepArchive", MemberSerializationFieldData(ModpackDesc, KeepArchive)),
-	BB::SerializationData::FieldData("UserRequestable", MemberSerializationFieldData(ModpackDesc, UserRequestable)),
+	AutoMemberSerialization(ModpackDesc, LoaderPath),
+	AutoMemberSerialization(ModpackDesc, ScriptPath),
+	AutoMemberSerialization(ModpackDesc, Version),
+	AutoMemberSerialization(ModpackDesc, Required),
+	AutoMemberSerialization(ModpackDesc, Incompatible),
+	AutoMemberSerialization(ModpackDesc, Override),
+	AutoMemberSerialization(ModpackDesc, DataMod),
+	AutoMemberSerialization(ModpackDesc, ScriptMod),
+	AutoMemberSerialization(ModpackDesc, MainmenuMod),
+	AutoMemberSerialization(ModpackDesc, KeepArchive),
+	AutoMemberSerialization(ModpackDesc, UserRequestable),
 	BB::SerializationData::GuardData(),
 };
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationDataEx[]{
 	BB::SerializationData::EmbeddedData(nullptr, 0, sizeof(ModpackDesc), SerializationData),
-	BB::SerializationData::FieldData("Name", MemberSerializationSizeAndOffset(ModpackDesc, Name), &CppLogic::StringSerializer::GlobalObj),
-	BB::SerializationData::FieldData("BBAPath", MemberSerializationSizeAndOffset(ModpackDesc, BBAPath), &CppLogic::StringSerializer::GlobalObj),
+	AutoMemberSerialization(ModpackDesc, Name),
+	AutoMemberSerialization(ModpackDesc, BBAPath),
 	BB::SerializationData::GuardData(),
 };
 

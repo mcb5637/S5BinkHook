@@ -445,7 +445,9 @@ namespace shok {
 		ResourceFinder_Find = 0x1104B, //EGL::CNetEventEntityID
 		Shuriken_Activate = 0x1104C, //EGL::CNetEvent2Entities
 		//0x1D002 EGL::CEventGetValue<int,1211121895> calculates some sort of hash?
-		SetGameSpeed = 0x50001,
+		SetGameSpeed = 0x50001, //Framework::CEventGameSpeed
+		// 0x50002 replay checksum (from error message)
+		Escape = 0x50003, //BB::CEvent
 	};
 
 	enum class FeedbackEventIds : int {
@@ -495,6 +497,6 @@ struct magic_enum::customize::enum_range<shok::NetEventIds> {
 namespace CppLogic {
 	template<>
 	inline auto GetIdManager<shok::NetEventIds>() {
-		return CppLogic::MagicEnum::EnumIdManager<shok::NetEventIds, shok::NetEventIds::Invalid, shok::NetEventIds::SetGameSpeed>{};
+		return CppLogic::MagicEnum::EnumIdManager<shok::NetEventIds, shok::NetEventIds::Invalid, shok::NetEventIds::SetGameSpeed, shok::NetEventIds::Escape>{};
 	}
 }

@@ -544,7 +544,7 @@
     <Text Include="doc\customwidgets.txt">
       <Filter>doc</Filter>
     </Text>
-    <Text Include="doc\mapscript_notes.txt">
+    <Text Include="doc\random_notes.txt">
       <Filter>doc</Filter>
     </Text>
     <Text Include="doc\mod_anatomy.txt">

@@ -3399,10 +3399,13 @@ function CppLogic_ResetGlobal() end
 
 --- @class UACore
 local UACore = {}
+---add leader
+---@param id number
 function UACore:AddLeader(id) end
 ---@return Position
 function UACore:GetPos() end
-function UACore:Tick(self) end
+---@param s UnlimitedArmy
+function UACore:Tick(s) end
 ---@return fun(state:userdata, index:number):number,number
 ---@return userdata
 ---@return number
@@ -3411,28 +3414,46 @@ function UACore:Iterate() end
 ---@return userdata
 ---@return number
 function UACore:IterateTransit() end
+---@param ol number
+---@param ne number
 function UACore:OnIdChanged(ol, ne) end
+---@param trans boolean?
+---@param deadHero boolean?
 ---@return number
 function UACore:GetSize(trans, deadHero) end
+---@param id number
 function UACore:RemoveLeader(id) end
+---@return boolean
 function UACore:IsIdle() end
+---@return UAStatus
 function UACore:GetStatus() end
+---@param a number
 function UACore:SetArea(a) end
+---@param p Position
 function UACore:SetTarget(p) end
 function UACore:DumpTable() end
 function UACore:ReadTable(t) end
+---@param s UAStatus
 function UACore:SetStatus(s) end
+---@param b boolean?
 function UACore:SetReMove(b) end
+---@param id number
 function UACore:SetCurrentBattleTarget(id) end
 ---@return number[]
 ---@return number[]
 ---@return number[]
 function UACore:GetRangedMelee() end
+---@param fl boolean?
 function UACore:SetIgnoreFleeing(fl) end
+---@param ar number
 function UACore:SetAutoRotateFormation(ar) end
+---@return number?
 function UACore:GetFirstDeadHero() end
+---@param p boolean?
 function UACore:SetPrepDefense(p) end
+---@param s boolean?
 function UACore:SetSabotageBridges(s) end
+---@param n boolean?
 function UACore:SetDoNotNormalizeSpeed(n) end
 
 
@@ -3442,8 +3463,23 @@ function UACore:SetDoNotNormalizeSpeed(n) end
 function CppLogic.UA.New(pl, format, commandqueue, spawner, seed) end
 
 --- gets next enemy in area.
+---@param pl number
+---@param pos Position
+---@param area number
+---@param ignoreFleeing boolean?
+---@return number
 function CppLogic.UA.GetNearestEnemyInArea(pl, pos, area, ignoreFleeing) end
 
+--- adds cannon builder her ability types
+--- @param heroTy number|string
+--- @param bottomTy number|string
+--- @param topTy number|string
 function CppLogic.UA.AddCannonBuilderData(heroTy, bottomTy, topTy) end
 
+--- gets number of enemies in area
+---@param pl number
+---@param pos Position
+---@param area number
+---@param ignoreFleeing boolean?
+---@return number
 function CppLogic.UA.CountTargetEntitiesInArea(pl, pos, area, ignoreFleeing) end

@@ -382,10 +382,10 @@ namespace EGL {
 		RegionDataEntity RegionDataEntityObj; // 10
 		PADDINGI(5);
 		EGL::PlayerManager* PlayerMng; // 19
-		PADDINGI(8);
+		PADDINGI(8); // 24 multimap of netevent handlers?, empty
 		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
 		EGL::CGLEScripting* Scripting;
-		PADDINGI(1);
+		BB::IPostEvent* GGL_GameLogic_NeteventHandler;
 		RandomNumberGenerator RNG; // 34 pretty sure this is not c++ std originally, but this one does the same as the original.
 
 	private:
@@ -415,6 +415,10 @@ namespace EGL {
 		virtual shok::EntityId CreateEntity(EGL::CGLEEntityCreator* data, int i) = 0; // 22
 	public:
 		virtual shok::EffectId CreateEffect(EGL::CGLEEffectCreator* data) = 0;
+	private:
+		virtual void unknown29() = 0; // add to multimap? at 24
+		virtual void HandleNetEvent(BB::CEvent* ev) = 0; // 25 uses multimap? at 24
+	public:
 
 		static inline constexpr int vtp = 0x7839CC;
 

@@ -13,17 +13,43 @@ namespace ECore {
 	};
 
 	class CReplayHandler : public BB::IPostEvent {
-		// 7 BB::CBinarySerializer* of CReplayMgr
+	public:
+		struct Storage {
+			BB::CMemoryStream* Stream;
+			BB::CBinarySerializer* Serializer;
+			int Data; // latest ECore::CECoreEventInteger data
+			PADDINGI(1);
+		};
+
+		PADDINGI(1); //0
+		Storage* Store1;
+		Storage* Store2;
+		BB::IPostEvent* CheckSumCalc; //4 Framework::CCheckSumCalculator
+		BB::CMemoryStream* MemoryStream;
+		BB::CFileStream* FileStream;
+		BB::CBinarySerializer* Serializer; //7 of CReplayMgr
+		PADDINGI(3);
+		
+
+		static inline constexpr int vtp = 0x77F2C8;
+		// 5472A7 ctor
 	};
+	static_assert(offsetof(CReplayHandler, Serializer) == 7 * 4);
+	static_assert(sizeof(CReplayHandler) == 11 * 4);
 
 	class IReplayMgr {
 		virtual void unknown0() = 0;
 	};
 	class CReplayMgr : public IReplayMgr {
+	public:
 		CReplayHandler* ReplayHandler; // probably unique ptr
 		PADDINGI(2);
 		BB::CBinarySerializer* Serializer;
+
+		static inline constexpr int vtp = 0x77F2D0;
+		// 5471A4 ctor
 	};
+	static_assert(sizeof(CReplayMgr) == 5 * 4);
 }
 
 namespace GS3DTools {
@@ -243,12 +269,16 @@ namespace Framework {
 		static inline constexpr int vtp = 0x76306C;
 
 		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+
+		BB::IPostEvent* CEscapeEventHandler;
 	};
 	class CEscapeEventHandler : public BB::IPostEvent {
 	public:
 		static inline constexpr int vtp = 0x763074;
 
 		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
+
+		BB::IPostEvent* EGL_Gamelogic;
 	};
 
 	struct GameModeStartMapData {
@@ -273,9 +303,9 @@ namespace Framework {
 		CEventTimeManager TimeManager; // 6, CTimeManager 8
 		PADDINGI(1394);
 		CCheckSumCalculator CheckSumCalc;
-		PADDINGI(4);
+		PADDINGI(3);
 		CEscapeEventHandler EscapeHandler;
-		PADDINGI(2);
+		PADDINGI(1);
 		bool IsExternalMap; // 1426
 		PADDINGI(1);
 

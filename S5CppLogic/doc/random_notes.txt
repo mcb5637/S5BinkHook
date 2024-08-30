@@ -1,0 +1,50 @@
+what happens on map load:
+- load ingame gui
+- create lua state
+- load Data\\Script\\XGlobalScript.lua
+- load Data\\Script\\XLocalScript.lua
+- call GameCallback_LocalScriptLoadedFirstTime() (XLocalScript.lua)
+- ModLoader
+- load mapscript
+- call GameCallback_SetDefaultValues() (XGlobalScript.lua, empty)
+- call GameCallback_NewGame() (not existing?)
+- load UserScript.lua
+- call GameCallback_LocalSetDefaultValues() (XLocalScript.lua)
+- call GameCallback_UserSetDefaultValues() (not existing?)
+- call GameCallback_OnGameStart() (maptools/main.lua or mp mapscript)
+- trigger Events.CPPLOGIC_EVENT_ON_MAP_STARTED (ModLoader only)
+
+what happens on save load:
+- load ingame gui
+- create lua state
+- ModLoader
+- load save
+- load UserScript.lua
+- call GameCallback_LocalRecreateGameLogic() (XLocalScript.lua)
+- trigger Events.CPPLOGIC_EVENT_ON_SAVEGAME_LOADED (ModLoader only)
+
+netevent processing:
+- GGUI::CManager::PostEventFromUI
+- (GGUI::CManager::PostEventCallback)
+- GGUI::CManager::PostGUIEvent -> Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent::PostEvent
+- SP:
+	- SetGameSpeed|Escape to CNetworkEvent::TimeManager1.PostEvent
+	- store to CNetworkEvent::MemoryStream
+	- CNetworkEvent::Update deserialize, then to CNetworkEvent::TimeManager1.PostEvent
+- gold MP:
+	- SetGameSpeed|Escape to 0x455C10
+	- to 0x455B60
+	- ???
+- Framework::CEventTimeManager::PostEvent handles SetGameSpeed, else forward
+- ECore::CReplayHandler::PostEvent
+- ECore::CReplayHandler serialization?
+- Framework::CCheckSumCalculator::PostEvent handles 0x50002, else forward
+- Framework::CEscapeEventHandler::PostEvent handles Escape, else forward
+- EGL::CGLEGameLogic::PostEvent
+	- GGL::CGLGameLogic::PostEvent
+		- GGL::CGLGameLogic::HandleNetEvent
+			- event handler
+	- EGL::CGLEGameLogic::HandleNetEvent
+		- empty multimap of eventhandlers?
+
+Game.Escape skips directly to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent::PostEvent

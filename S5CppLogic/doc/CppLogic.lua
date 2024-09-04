@@ -3381,6 +3381,12 @@ function CppLogic.ModLoader.InvalidModPackPanic(msg) end
 ---@param path string|nil hint
 function CppLogic.ModLoader.ReserializeEntityType(ety, path) end
 
+--- asks for a file to export a tasklist to.
+--- the exported tasklist is mostly compliant with my xml schema (some manual cleanup + adding the schema reference is required).
+---@param ety number|string
+---@param path string|nil hint
+function CppLogic.ModLoader.ReserializeTaskList(ety, path) end
+
 --- returns a list of every bba in ModPacks.
 --- @return string[]
 function CppLogic.ModLoader.GetModpacks() end

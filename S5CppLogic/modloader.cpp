@@ -27,6 +27,10 @@
 #include "StringUtility.h"
 #include "WinAPIUtil.h"
 
+#ifdef _DEBUG
+#define RESERIALIZE_NO_DIALOG
+#endif
+
 shok::String CppLogic::ModLoader::ModLoader::ModPackList{};
 size_t CppLogic::ModLoader::ModLoader::GUIDLength = 0;
 
@@ -1035,14 +1039,42 @@ int CppLogic::ModLoader::ModLoader::ReserializeEntityType(lua::State l)
 	dlg.Title = t.c_str();
 	dlg.Filter = "xml\0*.xml\0";
 	dlg.SelectedPath = L.OptStringView(2, "");
-	if (dlg.Show()) {
-		BB::CFileStreamEx f{};
-		if (f.OpenFile(dlg.SelectedPath.c_str(), BB::IStream::Flags::DefaultWrite)) {
-			BB::CXmlSerializer::HookWriteXSIType();
-			auto s = BB::CXmlSerializer::CreateUnique();
-			s->SerializeByData(&f, ety, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(ety->GetClassIdentifier()));
-			f.Close();
-		}
+#ifndef RESERIALIZE_NO_DIALOG
+	if (!dlg.Show()) {
+		return 0;
+	}
+#endif
+	BB::CFileStreamEx f{};
+	if (f.OpenFile(dlg.SelectedPath.c_str(), BB::IStream::Flags::DefaultWrite)) {
+		BB::CXmlSerializer::HookWriteXSIType();
+		auto s = BB::CXmlSerializer::CreateUnique();
+		s->SerializeByData(&f, ety, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(ety->GetClassIdentifier()));
+		f.Close();
+	}
+	return 0;
+}
+
+int CppLogic::ModLoader::ModLoader::ReserializeTaskList(lua::State l)
+{
+	luaext::EState L{ l };
+	CppLogic::WinAPI::FileDialog dlg{};
+	auto etyid = L.CheckEnum<shok::TaskListId>(1);
+	auto* ety = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(etyid);
+	auto t = std::format("Write {}", CppLogic::GetIdManager<shok::TaskListId>().GetNameByID(etyid));
+	dlg.Title = t.c_str();
+	dlg.Filter = "xml\0*.xml\0";
+	dlg.SelectedPath = L.OptStringView(2, "");
+#ifndef RESERIALIZE_NO_DIALOG
+	if (!dlg.Show()) {
+		return 0;
+	}
+#endif
+	BB::CFileStreamEx f{};
+	if (f.OpenFile(dlg.SelectedPath.c_str(), BB::IStream::Flags::DefaultWrite)) {
+		BB::CXmlSerializer::HookWriteXSIType();
+		auto s = BB::CXmlSerializer::CreateUnique();
+		s->SerializeByData(&f, ety, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(ety->GetClassIdentifier()));
+		f.Close();
 	}
 	return 0;
 }

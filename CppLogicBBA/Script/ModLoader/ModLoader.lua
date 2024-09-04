@@ -338,6 +338,7 @@ function ModLoader.InitMod(mod)
 	if mod.LoaderPath ~= "" then
 		Script.Load(mod.LoaderPath)
 		xpcall(function()
+			---@diagnostic disable-next-line: undefined-field
 			ModLoader[mod.Name].Init()
 		end, function(err)
 			CppLogic.ModLoader.InvalidModPackPanic("failed to initialize "..mod.Name..": "..err)
@@ -524,7 +525,7 @@ end
 --- @param modname string
 --- @return boolean
 function ModLoader.IsUserRequestedModWhitelisted(modname)
-	return modname == "test" or modname == "WideScreenMode"
+	return modname == "test" or modname == "WideScreenMode" or modname == "BugFixes"
 end
 
 --- parse user requested mods and add them to the mod list

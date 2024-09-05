@@ -88,6 +88,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, RefinerFix),
 	AutoMemberSerialization(SerializedMapdata, SettlerBuyTriggers),
 	AutoMemberSerialization(SerializedMapdata, StringTableTextOverride),
+	AutoMemberSerialization(SerializedMapdata, ScriptTriggerEval),
 	BB::SerializationData::GuardData(),
 };
 

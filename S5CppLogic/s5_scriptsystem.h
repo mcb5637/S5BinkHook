@@ -57,12 +57,12 @@ namespace EScr {
 
 	class CLuaFuncRef {
 	public:
-		virtual lua::Reference __stdcall GetRefToFunc() = 0;
+		virtual int __stdcall GetRefToFunc() = 0;
 
-		lua::State L; // check which of the funcs below are also used by CLuaFuncRefGlobal
+		lua::State L;
 		bool NeedsCompile;
 		PADDING(3);
-		lua::Reference Ref; // 3
+		int Ref; // 3
 
 		void Clear();
 		void CreateRef(); // unrefs anything previously refd
@@ -76,7 +76,7 @@ namespace EScr {
 		shok::String LuaCommand; // 4 - 10
 		PADDINGI(1); // 11
 
-		virtual lua::Reference __stdcall GetRefToFunc() override;
+		virtual int __stdcall GetRefToFunc() override;
 		void SetCommandString(const char* c);
 
 		void ReplaceFunc(lua::State L, int idx);
@@ -90,12 +90,16 @@ namespace EScr {
 	public:
 		shok::String FuncName;
 
-		virtual lua::Reference __stdcall GetRefToFunc() override;
+		virtual int __stdcall GetRefToFunc() override;
 		void SetCommandString(const char* c);
 
 		static inline constexpr int vtp = 0x786BD8;
 
 		static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA068B0);
+
+		static void HookFuncAccess(bool active);
+	private:
+		int __stdcall GetRefOverride();
 	};
 	static_assert(sizeof(CLuaFuncRefGlobal) == 11 * 4);
 

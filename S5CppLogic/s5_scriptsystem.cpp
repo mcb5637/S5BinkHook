@@ -105,9 +105,9 @@ void EScr::CScriptTriggerSystem::HookRemoveFuncOverrides()
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x59C012), &overrideluafunc_empty); // pcall
 }
 
-lua::Reference __stdcall EScr::CLuaFuncRefCommand::GetRefToFunc()
+int __stdcall EScr::CLuaFuncRefCommand::GetRefToFunc()
 {
-	return reinterpret_cast<lua::Reference(__stdcall* const)(CLuaFuncRefCommand*)>(0x5A1884)(this);
+	return reinterpret_cast<int(__stdcall* const)(CLuaFuncRefCommand*)>(0x5A1884)(this);
 }
 
 static inline void(__stdcall* const funccmd_set)(EScr::CLuaFuncRefCommand* th, const char* c) = reinterpret_cast<void(__stdcall* const)(EScr::CLuaFuncRefCommand*, const char*)>(0x5A18EB);
@@ -152,19 +152,49 @@ void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
 	SetState(L);
 	L.CheckType(idx, lua::LType::Function);
 	L.PushValue(idx);
-	Ref = L.Ref(L.REGISTRYINDEX);
+	Ref = L.Ref(L.REGISTRYINDEX).Value();
 	NeedsCompile = false;
 }
 
-lua::Reference __stdcall EScr::CLuaFuncRefGlobal::GetRefToFunc()
+int __stdcall EScr::CLuaFuncRefGlobal::GetRefToFunc()
 {
-	return reinterpret_cast<lua::Reference(__stdcall* const)(CLuaFuncRefGlobal*)>(0x5A180C)(this);
+	return (*reinterpret_cast<int(__stdcall** const)(CLuaFuncRefGlobal*)>(0x786BD8))(this);
 }
 
 static inline void(__stdcall* const funcglo_set)(EScr::CLuaFuncRefGlobal* th, const char* c) = reinterpret_cast<void(__stdcall* const)(EScr::CLuaFuncRefGlobal*, const char*)>(0x5A18EB);
 void EScr::CLuaFuncRefGlobal::SetCommandString(const char* c)
 {
 	funcglo_set(this, c);
+}
+
+void EScr::CLuaFuncRefGlobal::HookFuncAccess(bool active)
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x786BD8), 4 };
+	*reinterpret_cast<void**>(0x786BD8) = active ? CppLogic::Hooks::MemberFuncPointerToVoid(&CLuaFuncRefGlobal::GetRefOverride, 0) : reinterpret_cast<void*>(0x5A180C);
+}
+
+int __stdcall EScr::CLuaFuncRefGlobal::GetRefOverride()
+{
+	int t = L.GetTop();
+	lua::Reference r = lua::State::NoRef;
+	if (FuncName.size() == 0)
+		return r.Value();
+	L.Push(FuncName);
+	L.GetGlobal();
+	if (L.IsFunction(-1)) {
+		r = L.Ref(lua::State::REGISTRYINDEX);
+	}
+	else {
+		try {
+			L.DoStringT(std::format("return {};", static_cast<std::string_view>(FuncName)), "EScr::CLuaFuncRefGlobal::GetRefOverride");
+			if (L.IsFunction(-1)) {
+				r = L.Ref(lua::State::REGISTRYINDEX);
+			}
+		}
+		catch (const lua::LuaException&) {}
+	}
+	L.SetTop(t);
+	return r.Value();
 }
 
 static inline int(__thiscall* const scripttrigger_callcond)(EScr::CScriptTrigger* th) = reinterpret_cast<int(__thiscall*)(EScr::CScriptTrigger*)>(0x59EEE4);

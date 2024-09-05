@@ -6,6 +6,8 @@
 
 namespace CppLogic::API {
 	void Init(lua::State L);
+	void OnSaveLoaded(lua::State L);
+	void Cleanup(lua::State L);
 
 	class RNG {
 		std::minstd_rand Core;

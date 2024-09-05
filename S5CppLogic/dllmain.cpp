@@ -315,6 +315,7 @@ int Cleanup(lua::State L) {
 	CppLogic::Logic::Cleanup(L);
 	CppLogic::Tech::Cleanup(L);
 	CppLogic::UI::Cleanup(L);
+	CppLogic::API::Cleanup(L);
 	return 0;
 }
 
@@ -337,6 +338,7 @@ void OnSaveLoaded() {
 	CppLogic::Entity::OnSaveLoaded(L);
 	CppLogic::Logic::OnSaveLoaded(L);
 	CppLogic::UI::OnSaveLoaded(L);
+	CppLogic::API::OnSaveLoaded(L);
 	L.SetTop(t);
 }
 

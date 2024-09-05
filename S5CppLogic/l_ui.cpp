@@ -120,7 +120,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("widget has no known update func");
 		L.Push(fh->LuaCommand.c_str());
 		if (fh->FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(fh->FuncRefCommand.Ref, L.REGISTRYINDEX);
+			L.Push(lua::Reference{ fh->FuncRefCommand.Ref }, L.REGISTRYINDEX);
 		else
 			L.Push("no compiled func found");
 		return 2;
@@ -254,7 +254,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("no known tooltip");
 		L.Push(tt->UpdateFunction.LuaCommand.c_str());
 		if (tt->UpdateFunction.FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(tt->UpdateFunction.FuncRefCommand.Ref, L.REGISTRYINDEX);
+			L.Push(lua::Reference{ tt->UpdateFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
 		else
 			L.Push("no compiled func found");
 		return 2;
@@ -286,7 +286,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("widget has no known action func");
 		L.Push(fh->ActionFunction.LuaCommand.c_str());
 		if (fh->ActionFunction.FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(fh->ActionFunction.FuncRefCommand.Ref, L.REGISTRYINDEX);
+			L.Push(lua::Reference{ fh->ActionFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
 		else
 			L.Push("no compiled func found");
 		return 2;

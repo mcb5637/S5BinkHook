@@ -21,6 +21,7 @@
 #include "hooks.h"
 #include "luaext.h"
 #include "SchemaGenerator.h"
+#include "savegame_extra.h"
 
 namespace CppLogic::API {
 	void CheckEvalEnabled(lua::State L) {
@@ -401,6 +402,13 @@ namespace CppLogic::API {
 		return 1;
 	}
 
+	int EnableScriptTriggerEval(lua::State L) {
+		bool a = L.CheckBool(1);
+		EScr::CLuaFuncRefGlobal::HookFuncAccess(a);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ScriptTriggerEval = a;
+		return 0;
+	}
+
 	int ReloadExternalmaps(lua::State L) {
 		auto* m = *Framework::CMain::GlobalObj;
 		if (m->CurrentMode != Framework::CMain::Mode::MainMenu)
@@ -525,6 +533,7 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<HasPersistentMapFile>("HasPersistentMapFile"),
 			lua::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
 			lua::FuncReference::GetRef<GetCurrentCutscene>("GetCurrentCutscene"),
+			lua::FuncReference::GetRef<EnableScriptTriggerEval>("EnableScriptTriggerEval"),
 #ifdef _DEBUG
 			lua::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
 			lua::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
@@ -539,6 +548,16 @@ namespace CppLogic::API {
 		}
 		MainThreadID = GetCurrentThreadId();
 		RNG::Register(L);
+	}
+
+	void CppLogic::API::OnSaveLoaded(lua::State L)
+	{
+		EScr::CLuaFuncRefGlobal::HookFuncAccess(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ScriptTriggerEval);
+	}
+
+	void CppLogic::API::Cleanup(lua::State L)
+	{
+		EScr::CLuaFuncRefGlobal::HookFuncAccess(false);
 	}
 }
 

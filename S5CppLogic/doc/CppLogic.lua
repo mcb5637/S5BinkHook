@@ -893,6 +893,16 @@ function CppLogic.API.GetCurrentCutscene() end
 --- run LoadMap.Init() to refresh the UI afterwards
 function CppLogic.API.ReloadExternalmaps() end
 
+---enables triggers to access functions in (nested) tables.
+--- for the trigger func x.y checks in this order:
+--- - _G["x.y"]
+--- - eval("return x.y")
+--- 
+---affects both condition and action func.
+---status gets saved into savegames.
+---@param active boolean
+function CppLogic.API.EnableScriptTriggerEval(active) end
+
 ---@class RNG
 local RNG = {}
 

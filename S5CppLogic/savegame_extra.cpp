@@ -89,6 +89,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, SettlerBuyTriggers),
 	AutoMemberSerialization(SerializedMapdata, StringTableTextOverride),
 	AutoMemberSerialization(SerializedMapdata, ScriptTriggerEval),
+	AutoMemberSerialization(SerializedMapdata, CannonInProgressAttraction),
 	BB::SerializationData::GuardData(),
 };
 
@@ -114,5 +115,10 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	HookDisplayName = false;
 	RangedEffectSoldierHeal = false;
 	EffectTriggers = false;
+	ResourceTriggers = false;
+	RefinerFix = false;
+	SettlerBuyTriggers = false;
+	ScriptTriggerEval = false;
+	CannonInProgressAttraction = false;
 	StringTableTextOverride.clear();
 }

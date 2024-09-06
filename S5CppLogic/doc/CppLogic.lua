@@ -676,6 +676,11 @@ function CppLogic.Logic.PlayerGetMilitaryAttraction(player) end
 ---@return number
 function CppLogic.Logic.PlayerGetSerfAttraction(player) end
 
+--- enables foundries constructing a cannon blocking the VC space needed for them.
+--- status gets saved into savegame.
+---@param e boolean
+function CppLogic.Logic.EnableCannonInProgressAttraction(e) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.

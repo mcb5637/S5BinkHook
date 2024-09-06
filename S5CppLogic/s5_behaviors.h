@@ -1248,8 +1248,8 @@ namespace GGL {
 
 	class CFoundryBehavior : public EGL::CGLEBehavior {
 	public:
-		shok::EntityTypeId CannonType;
-		int CannonProgress; //4
+		shok::EntityTypeId CannonType; //4
+		int CannonProgress;
 
 		// defined events: Foundry_XXX
 
@@ -1257,6 +1257,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x827900;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8EB5DC97);
 	};
+	static_assert(offsetof(CFoundryBehavior, CannonProgress) == 5 * 4);
 
 	class CWorkerFleeBehavior : public EGL::CGLEBehavior {
 	public:

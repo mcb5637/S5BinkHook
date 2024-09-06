@@ -83,6 +83,8 @@ namespace GGL {
 		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);
 
 		static void HookWorkerSpawn();
+		static bool AttractionCannonInProgress;
+		static void HookAttractionCannonInProgress();
 
 		// on entity created 0x4C38FE __thiscall(id)
 
@@ -96,6 +98,7 @@ namespace GGL {
 	private:
 		void __thiscall CheckPaydayHook();
 		void __thiscall CheckWorkerSpawnHook();
+		int __thiscall CannonsInProgressAttraction() const;
 	};
 	constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
 

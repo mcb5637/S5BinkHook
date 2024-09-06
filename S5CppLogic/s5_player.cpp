@@ -221,6 +221,47 @@ void GGL::CPlayerAttractionHandler::HookWorkerSpawn()
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4C4AB7), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CPlayerAttractionHandler::CheckWorkerSpawnHook, 0));
 }
 
+int __thiscall GGL::CPlayerAttractionHandler::CannonsInProgressAttraction() const
+{
+	if (!AttractionCannonInProgress)
+		return 0;
+	int i = 0;
+	for (shok::EntityId id : WorkBuildingsArray) {
+		const EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
+		auto* f = e->GetBehavior<GGL::CFoundryBehavior>();
+		if (f->CannonType != shok::EntityTypeId::Invalid) {
+			const auto* et = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(f->CannonType);
+			const auto* sp = BB::IdentifierCast<GGL::CGLSettlerProps>(et->LogicProps);
+			if (sp != nullptr)
+				i += sp->AttractionSlots;
+		}
+	}
+	return i;
+}
+void __declspec(naked) CannonsInProgressAttraction_asm() {
+	__asm {
+		mov eax, 0x4C2335;
+		call eax;
+		add edi, eax;
+		mov ecx, esi;
+		call GGL::CPlayerAttractionHandler::CannonsInProgressAttraction;
+		add eax, edi;
+
+		push 0x4C27DD;
+		ret;
+	};
+}
+bool GGL::CPlayerAttractionHandler::AttractionCannonInProgress = true;
+bool AttractionCannonInProgress_Hooked = false;
+void GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress()
+{
+	if (AttractionCannonInProgress_Hooked)
+		return;
+	AttractionCannonInProgress_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C27D6), 10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C27D6), &CannonsInProgressAttraction_asm, reinterpret_cast<void*>(0x4C27DD));
+}
+
 static inline shok::UpgradeCategoryId(__thiscall* const upgrademanager_getucatbybuilding)(GGL::CUpgradeManager* th, shok::EntityTypeId id) = reinterpret_cast<shok::UpgradeCategoryId(__thiscall*)(GGL::CUpgradeManager*, shok::EntityTypeId)>(0x4B3CA6);
 shok::UpgradeCategoryId GGL::CUpgradeManager::GetUpgradeCategoryOfEntityType(shok::EntityTypeId etype)
 {

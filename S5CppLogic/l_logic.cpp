@@ -1093,6 +1093,13 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
+	int EnableCannonInProgressAttraction(lua::State L) {
+		GGL::CPlayerAttractionHandler::AttractionCannonInProgress = L.CheckBool(1);
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction = GGL::CPlayerAttractionHandler::AttractionCannonInProgress;
+		GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();
+		return 0;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1494,6 +1501,7 @@ namespace CppLogic::Logic {
 		GGL::CEntityProfile::HookExperience(false);
 		GGL::CWorkerBehavior::ResourceTriggers = false;
 		GGL::CWorkerBehavior::RefinerFix = false;
+		GGL::CPlayerAttractionHandler::AttractionCannonInProgress = false;
 	}
 
 	constexpr std::array Logic{
@@ -1567,6 +1575,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<PlayerGetWorkerAttraction>("PlayerGetWorkerAttraction"),
 			lua::FuncReference::GetRef<PlayerGetMilitaryAttraction>("PlayerGetMilitaryAttraction"),
 			lua::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
+			lua::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
 		};
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {
@@ -1682,6 +1691,11 @@ namespace CppLogic::Logic {
 
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.SettlerBuyTriggers)
 			EnableSettlerBuyTriggers(lua::State{ nullptr });
+
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction) {
+			GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();
+			GGL::CPlayerAttractionHandler::AttractionCannonInProgress = true;
+		}
 
 		L.Pop(1);
 	}

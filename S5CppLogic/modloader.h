@@ -353,6 +353,7 @@ namespace CppLogic::ModLoader {
 		static int GetModpacks(lua::State L);
 		static int ReserializeEntityType(lua::State L);
 		static int ReserializeTaskList(lua::State L);
+		static int ReserializeModel(lua::State L);
 		static int SetModPackList(lua::State L);
 		static int GetModPackList(lua::State L);
 		static int OverrideSavegameValid(lua::State L);
@@ -381,6 +382,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
 				lua::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
 				lua::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
+				lua::FuncReference::GetRef<ReserializeModel>("ReserializeModel"),
 		};
 
 		static constexpr std::array Mainmenu{

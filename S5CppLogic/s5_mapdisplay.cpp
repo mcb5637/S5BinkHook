@@ -90,6 +90,11 @@ void ED::CModelsProps::ModelData::operator=(const ModelData& o) noexcept
 		SelectionTexture = shok::CopyString(o.SelectionTexture);
 }
 
+ED::CModelsProps::ModelData& ED::CModelsProps::Get(shok::ModelId id)
+{
+	int i = static_cast<int>(id);
+	return Model.at(i);
+}
 void ED::CModelsProps::LoadModelDataFromExtraFile(shok::ModelId id)
 {
 	int i = static_cast<int>(id);

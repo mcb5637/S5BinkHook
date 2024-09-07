@@ -229,7 +229,7 @@ int __thiscall GGL::CPlayerAttractionHandler::CannonsInProgressAttraction() cons
 	for (shok::EntityId id : WorkBuildingsArray) {
 		const EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
 		auto* f = e->GetBehavior<GGL::CFoundryBehavior>();
-		if (f->CannonType != shok::EntityTypeId::Invalid) {
+		if (f != nullptr && f->CannonType != shok::EntityTypeId::Invalid) {
 			const auto* et = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(f->CannonType);
 			const auto* sp = BB::IdentifierCast<GGL::CGLSettlerProps>(et->LogicProps);
 			if (sp != nullptr)

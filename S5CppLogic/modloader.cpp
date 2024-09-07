@@ -1079,6 +1079,31 @@ int CppLogic::ModLoader::ModLoader::ReserializeTaskList(lua::State l)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::ReserializeModel(lua::State l)
+{
+	luaext::EState L{ l };
+	CppLogic::WinAPI::FileDialog dlg{};
+	auto etyid = L.CheckEnum<shok::ModelId>(1);
+	auto& ety = (*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->Get(etyid);
+	auto t = std::format("Write {}", CppLogic::GetIdManager<shok::ModelId>().GetNameByID(etyid));
+	dlg.Title = t.c_str();
+	dlg.Filter = "xml\0*.xml\0";
+	dlg.SelectedPath = L.OptStringView(2, "");
+#ifndef RESERIALIZE_NO_DIALOG
+	if (!dlg.Show()) {
+		return 0;
+	}
+#endif
+	BB::CFileStreamEx f{};
+	if (f.OpenFile(dlg.SelectedPath.c_str(), BB::IStream::Flags::DefaultWrite)) {
+		BB::CXmlSerializer::HookWriteXSIType();
+		auto s = BB::CXmlSerializer::CreateUnique();
+		s->SerializeByData(&f, &ety, ED::CModelsProps::ModelData::SerializationData);
+		f.Close();
+	}
+	return 0;
+}
+
 int CppLogic::ModLoader::ModLoader::SetModPackList(lua::State L)
 {
 	ModPackList = L.CheckStringView(1);

@@ -234,6 +234,7 @@ namespace ED {
 		// remember to free in idmanager and CResourceManager, free last id first
 		void PopModel(shok::ModelId id);
 		void ReloadAllModels();
+		ModelData& Get(shok::ModelId id);
 	};
 	static_assert(sizeof(CModelsProps::ModelData) == 13 * 4);
 

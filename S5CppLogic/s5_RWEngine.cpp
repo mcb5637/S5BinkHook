@@ -16,6 +16,18 @@ RWE::RwV3d RWE::RwV3d::TransformPoint(const RwMatrix* matrix) const
     vec3d_transformPoint(&r, this, matrix);
     return r;
 }
+inline void(__cdecl* const vec3d_normalize)(RWE::RwV3d* ou, const RWE::RwV3d* i) = reinterpret_cast<void(__cdecl*)(RWE::RwV3d*, const RWE::RwV3d*)>(0x41C920);
+RWE::RwV3d RWE::RwV3d::Normalize() const
+{
+    RWE::RwV3d o{};
+    vec3d_normalize(&o, this);
+    return o;
+}
+inline float(__cdecl* const vec3d_len)(const RWE::RwV3d* i) = reinterpret_cast<float(__cdecl*)(const RWE::RwV3d*)>(0x41CA30);
+float RWE::RwV3d::Length() const
+{
+    return vec3d_len(this);
+}
 
 static inline RWE::RwMatrix* (__cdecl* const matrix_optimize)(RWE::RwMatrix* m, const void* tolerance) = reinterpret_cast<RWE::RwMatrix* (__cdecl*)(RWE::RwMatrix*, const void*)>(0x41B2A0);
 RWE::RwMatrix* RWE::RwMatrix::Optimize()
@@ -291,6 +303,22 @@ bool RWE::RwCamera::ShowRaster(HWND window, bool vsync)
     return camera_show(this, window, vsync ? 1 : 0);
 }
 
+inline void(__cdecl* const light_destroy)(RWE::RpLight* l) = reinterpret_cast<void(__cdecl*)(RWE::RpLight*)>(0x6277B0);
+void RWE::RpLight::Destroy()
+{
+    light_destroy(this);
+}
+inline void(__cdecl* const light_setcolor)(RWE::RpLight* l, const RWE::RwRGBAReal* color) = reinterpret_cast<void(__cdecl*)(RWE::RpLight*, const RWE::RwRGBAReal*)>(0x6274C0);
+void RWE::RpLight::SetColor(const RwRGBAReal& color)
+{
+    light_setcolor(this, &color);
+}
+inline float(__cdecl* const light_getconeangle)(const RWE::RpLight* l) = reinterpret_cast<float(__cdecl*)(const RWE::RpLight*)>(0x627520);
+float RWE::RpLight::GetConeAngle() const
+{
+    return light_getconeangle(this);
+}
+
 static inline RWE::RpWorld* (__cdecl* const world_addclump)(RWE::RpWorld* w, RWE::RpClump* c) = reinterpret_cast<RWE::RpWorld * (__cdecl*)(RWE::RpWorld*, RWE::RpClump*)>(0x627130);
 RWE::RpWorld* RWE::RpWorld::AddClump(RpClump* clump)
 {
@@ -310,6 +338,16 @@ inline void(__cdecl* const world_remcam)(RWE::RpWorld* w, RWE::RwCamera* c) = re
 void RWE::RpWorld::RemoveCamera(RwCamera* cam)
 {
     world_remcam(this, cam);
+}
+inline void(__cdecl* const world_addlight)(RWE::RpWorld* w, RWE::RpLight* c) = reinterpret_cast<void(__cdecl*)(RWE::RpWorld*, RWE::RpLight*)>(0x626E10);
+void RWE::RpWorld::AddLight(RpLight* light)
+{
+    world_addlight(this, light);
+}
+inline void(__cdecl* const world_remlight)(RWE::RpWorld* w, RWE::RpLight* c) = reinterpret_cast<void(__cdecl*)(RWE::RpWorld*, RWE::RpLight*)>(0x626E60);
+void RWE::RpWorld::RemoveLight(RpLight* light)
+{
+    world_remlight(this, light);
 }
 
 inline RWE::RwImage* (__cdecl* const image_allocpix)(RWE::RwImage* th) = reinterpret_cast<RWE::RwImage* (__cdecl*)(RWE::RwImage*)>(0x414D20);

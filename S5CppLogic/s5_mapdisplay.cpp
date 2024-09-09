@@ -387,6 +387,17 @@ void ED::CEntitiesTypeFlags::operator delete(void* p) {
 	shok::Free(p);
 }
 
+inline void(__thiscall* const light_gfxdata_interpolate)(ED::CLight::GFXDataHandler* th, ED::CGfxSetTransitionStatus* status, ED::CLight::LightData* output) = reinterpret_cast<void(__thiscall*)(ED::CLight::GFXDataHandler*, ED::CGfxSetTransitionStatus*, ED::CLight::LightData*)>(0x46D9B6);
+void ED::CLight::GFXDataHandler::Interpolate(CGfxSetTransitionStatus* status, LightData* output)
+{
+	light_gfxdata_interpolate(this, status, output);
+}
+
+inline void(__thiscall* const light_update)(ED::CLight* th) = reinterpret_cast<void(__thiscall*)(ED::CLight*)>(0x46D685);
+void ED::CLight::Update()
+{
+	light_update(this);
+}
 
 shok::ClassId __stdcall GD::CBuildingEffectsProps::GetClassIdentifier() const
 {

@@ -66,7 +66,7 @@ namespace GGL {
 
 	class CGLEffectLightningProps : public EGL::CGLEEffectProps {
 	public:
-		int IgniteDelay;
+		int IgniteDelay; // 9
 		int DestructionDelay;
 		float SpawnRadius;
 

@@ -72,6 +72,8 @@ namespace RWE {
 
 		RwV3d Transform(const RwMatrix* matrix) const;
 		RwV3d TransformPoint(const RwMatrix* matrix) const;
+		RwV3d Normalize() const;
+		float Length() const;
 	};
 	struct RwV2d {
 		float x = 0, y = 0;
@@ -391,6 +393,23 @@ namespace RWE {
 	};
 	//constexpr int i = offsetof(RwCamera, farPlane) / 4;
 
+	struct RpLight {
+		RwObjectHasFrame object; /**< object */
+		float radius; /**< radius */
+		RwRGBAReal color; /**< color */  /* Light color */ // 6
+		float minusCosAngle; /**< minusCosAngle */
+		RwLinkList WorldSectorsInLight; /**< WorldSectorsInLight */
+		RwLinkList::RwLLLink inWorld; /**< inWorld */
+		uint16_t lightFrame; /**< lightFrame */
+		uint16_t pad;
+
+		static inline RpLight* (__cdecl* const Create)(RpLightType type) = reinterpret_cast<RpLight * (__cdecl* const)(RpLightType)>(0x6277F0);
+		void Destroy();
+		void SetColor(const RwRGBAReal& color);
+		float GetConeAngle() const;
+	};
+	static_assert(offsetof(RpLight, color) == 6 * 4);
+
 	struct RpMaterialList {
 		RpMaterial** materials;
 		int numMaterials;
@@ -442,6 +461,8 @@ namespace RWE {
 		RpWorld* RemoveClump(RpClump* clump);
 		void AddCamera(RwCamera* cam);
 		void RemoveCamera(RwCamera* cam);
+		void AddLight(RpLight* light);
+		void RemoveLight(RpLight* light);
 		static inline RpWorld* (__cdecl* const Create)(RwBBox* boundingBox) = reinterpret_cast<RpWorld * (__cdecl*)(RwBBox*)>(0x628370);
 	};
 

@@ -6,6 +6,7 @@
 #include "s5_BBRw.h"
 #include "s5_idmanager.h"
 #include "s5_glue.h"
+#include "s5_RWEngine.h"
 
 namespace ED {
 	class ILandscape {
@@ -504,6 +505,64 @@ namespace ED {
 	};
 	static_assert(sizeof(CAuras) == 4 * 7);
 
+	struct CGfxSetTransitionStatus {
+		int To;
+		int From;
+		float Progress;
+	};
+
+	class ILight {
+	public:
+		virtual ~ILight() = default;
+		virtual void Destroy() = 0;
+		virtual void SetSunDir(float x, float y, float z) = 0;
+		virtual void SetAmbientColor(int r, int g, int b) = 0;
+		virtual void SetDiffuseColor(int r, int g, int b) = 0;
+
+		PADDINGI(1); // counter, starts at 1?
+		RWE::RwV3d SunDir; // 2
+		RWE::RwV3d NormalizedSunDir; // 5
+		RWE::RwRGBAReal AmbientColor; // 8
+		RWE::RwRGBAReal DiffuseColor; // 12
+		PADDINGI(1); // 16 float 1
+		RWE::RpLight* AmbientLight;
+		RWE::RpLight* DiffuseLight;
+		PADDINGI(1); // 19 float 0
+
+		static inline constexpr int vtp = 0x769964;
+		// ctor 46D3A7()
+	};
+	class CLight : public ILight {
+	public:
+		struct LightData {
+			RWE::RwV3d SunDir; // pos or direction?
+			RWE::RwRGBAReal AmbientColor, DiffuseColor;
+
+			// ctor 46D624()
+		};
+		struct GFXSetLight {
+			float TransitionStart;
+			float TransitionEnd;
+			LightData Data;
+		};
+
+		struct GFXDataHandler {
+			shok::Vector<GFXSetLight> Data; // indexed directy by id, 0 is likely placeholder
+
+			void Interpolate(CGfxSetTransitionStatus* status, LightData* output);
+		} GFX; // 20
+
+		void Update();
+
+		static inline constexpr int vtp = 0x76999C;
+		// ctor 46E1F4()
+		// handle transtion status 46DA60 stdcall(ts)
+	};
+	static_assert(sizeof(CLight::GFXSetLight) == 52);
+	static_assert(offsetof(CLight, GFX) == 20 * 4);
+	static_assert(offsetof(CLight, AmbientLight) == 17 * 4);
+	static_assert(offsetof(CLight, DiffuseColor) == 12 * 4);
+
 	class CGlobalsBase {
 	public:
 		virtual ~CGlobalsBase() = default;
@@ -527,7 +586,7 @@ namespace ED {
 		ED::CEntitiesTypeFlags* EntityTypeFlags; // 15
 		ED::CGUIScene* Scene;
 		PADDINGI(1); // unknown
-		PADDINGI(1); // p to ED::CLight
+		ED::CLight* Light; // 18
 		PADDINGI(1); // unknown
 		PADDINGI(1); // p to ED::COcclusionEffect
 		PADDINGI(1); // p to ED::COrnamentalItems

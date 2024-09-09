@@ -133,6 +133,7 @@ namespace GGL {
 	class CGLGameLogic;
 	class CNetEventEventTechnologyPlayerIDAndEntityID;
 	class CEventGoodsTraded;
+	class CGLEffectLightningProps;
 }
 namespace ED {
 	class CBehaviorProps;

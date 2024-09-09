@@ -405,4 +405,18 @@ namespace RWE {
 	};
 	template<>
 	class ::enum_is_flags<RwVideoModeFlag> : public std::true_type {};
+
+	enum class RpLightType : int
+	{
+		rpNALIGHTTYPE = 0,
+
+		/* These don't take part in the tie mechanism (no position) */
+		rpLIGHTDIRECTIONAL, /**<Directional Light */
+		rpLIGHTAMBIENT, /**<Ambient Light */
+
+		/* These do take part in the tie mechanism (do have position) */
+		rpLIGHTPOINT = 0x80, /**<Point Light */
+		rpLIGHTSPOT, /**<Spot Light */
+		rpLIGHTSPOTSOFT, /**<Soft Spot Light */
+	};
 }

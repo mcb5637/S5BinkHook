@@ -1,6 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
+#include "s5_RWEngine.h"
 
 namespace EGL {
 	class IEffectDisplay {
@@ -284,11 +285,13 @@ namespace GD {
 		PADDINGI(1);
 		PADDINGI(3); // allocated pointers?
 		ED::CEffectProps* Props;
+		RWE::RwRGBAReal AmbientColorBackup, DiffuseColorBackup;
 
 		static inline constexpr int vtp = 0x76AE08;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x72C52353);
 	};
 	static_assert(offsetof(CDisplayEffectLightning, Props) == 6 * 4);
+	static_assert(sizeof(CDisplayEffectLightning) == 15 * 4);
 }
 
 namespace ED {

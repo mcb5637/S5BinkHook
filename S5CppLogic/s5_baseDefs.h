@@ -229,6 +229,65 @@ namespace BB {
 			shok::Free(p);
 		}
 	};
+	class ISlot0 : public CSlotBase {
+	public:
+		virtual void __stdcall Handle() = 0;
+	};
+	template<class ObjectType>
+	class TSlotEx0 : public ISlot0 {
+	public:
+		typedef void(__stdcall ObjectType::* HandlerType)();
+
+		ObjectType* Object;
+		HandlerType Handler;
+
+		virtual void __stdcall Handle() override {
+			std::invoke(Handler, Object);
+		}
+
+		TSlotEx0(ObjectType* o, HandlerType h) {
+			Object = o;
+			Handler = h;
+		}
+
+		void* operator new(size_t s)
+		{
+			return shok::Malloc(s);
+		}
+		void operator delete(void* p) {
+			shok::Free(p);
+		}
+	};
+	template<class ToHandle1, class ToHandle2>
+	class TSlot2 : public CSlotBase {
+	public:
+		virtual void __stdcall Handle(ToHandle1 th1, ToHandle2 th2) = 0;
+	};
+	template<class ObjectType, class ToHandle1, class ToHandle2>
+	class TSlotEx2 : public TSlot2<ToHandle1, ToHandle2> {
+	public:
+		typedef void(__stdcall ObjectType::* HandlerType)(ToHandle1 i, ToHandle2 j);
+
+		ObjectType* Object;
+		HandlerType Handler;
+
+		virtual void __stdcall Handle(ToHandle1 th1, ToHandle2 th2) override {
+			std::invoke(Handler, Object, th1, th2);
+		}
+
+		TSlotEx2(ObjectType* o, HandlerType h) {
+			Object = o;
+			Handler = h;
+		}
+
+		void* operator new(size_t s)
+		{
+			return shok::Malloc(s);
+		}
+		void operator delete(void* p) {
+			shok::Free(p);
+		}
+	};
 }
 
 namespace ECore {

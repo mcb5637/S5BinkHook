@@ -506,8 +506,8 @@ namespace ED {
 	static_assert(sizeof(CAuras) == 4 * 7);
 
 	struct CGfxSetTransitionStatus {
-		int To;
-		int From;
+		shok::WeatherGFXSet To;
+		shok::WeatherGFXSet From;
 		float Progress;
 	};
 
@@ -563,6 +563,96 @@ namespace ED {
 	static_assert(offsetof(CLight, AmbientLight) == 17 * 4);
 	static_assert(offsetof(CLight, DiffuseColor) == 12 * 4);
 
+	class CRenderSettings {
+	public:
+		virtual ~CRenderSettings() = default;
+		virtual void Destroy() = 0;
+
+		enum class RenderFlags : int {
+			RenderDecals = 0x1,
+			RenderDecalsAtomics = 0x2,
+			RenderDecalsDoodads = 0x4,
+			RenderDecalShadows = 0x8,
+
+			RenderDecalsSelections = 0x10,
+			RenderEffects = 0x20,
+			RenderFogOfWar = 0x40,
+
+			RenderLandscape = 0x80,
+			RenderLandscapeFogofWar = 0x100,
+			RenderLandscapeTerrain = 0x200,
+			RenderLandscapeTerrainLayer1 = 0x400,
+			RenderLandscapeTerrainLayer2 = 0x800,
+
+			RenderLandscapeTerrainLayer3 = 0x1000,
+			RenderLandscapeWater = 0x2000,
+
+			RenderObjects = 0x10000,
+			RenderObjectsAlphaBlendPass = 0x20000,
+			RenderObjectsAlphaTestPass = 0x40000,
+			RenderObjectsNonAlpha = 0x80000,
+
+			RenderParticles = 0x400000,
+			RenderSky = 0x800000,
+
+			RenderFog = 0x1000000,
+			RenderInvisibleObjects = 0x2000000,
+			RenderLandscapeDebugInfo = 0x4000000,
+			UseGFXSet = 0x8000000,
+
+			RenderUseOrnamentalItemsSystem = 0x10000000,
+			RenderUpdateMorphAnim = 0x20000000,
+			RenderUpdateParticles = 0x40000000,
+		};
+
+		RenderFlags Flags = RenderFlags::RenderUseOrnamentalItemsSystem; // 1
+		PADDINGI(1); // int 1
+		shok::List<BB::ISlot0*> UnknownCallbacks; // 2
+		float FarClipPlaneMin = 0, FarClipPlaneMax = 1000000.0f; // 6,7
+		RWE::RwRGBA FogColor = { 0,0,0,0 };
+		float FogStart = 5000.0f, FogEnd = 10000.0f; // 9,10
+		float IceStatus = 0, IceStatusClamped = 0; // 11,12
+		float IceStatusCoeffA = 1, IceStatusCoeffB = 0; // IceStatus=IceStatusCoeffA*SnowStatus+IceStatusCoeffB 13,14
+		bool IceStatusFromSnowStatus = true; // 15
+		float SnowStatus = 0, SnowStatusClamped = 0; // 16,17
+		float SkyBoxOffset = 2000.0f; // 18
+		shok::List<BB::TSlot2<unsigned int, unsigned int>*> UnknownCallbacks2;
+		shok::List<BB::TSlot1<ED::CGfxSetTransitionStatus const&>*> TransitionCallbacks; // 22
+		PADDINGI(1); // 25 f 0.5
+
+		static inline constexpr int vtp = 0x769A10;
+	};
+	static_assert(offsetof(CRenderSettings, FarClipPlaneMin) == 6 * 4);
+	static_assert(offsetof(CRenderSettings, SkyBoxOffset) == 18 * 4);
+	template<>
+	class ::enum_is_flags<CRenderSettings::RenderFlags> : public std::true_type {};
+	class CRenderSettingsEx : public CRenderSettings {
+	public:
+		struct GFXSetFog {
+			float TransitionStart;
+			float TransitionEnd;
+			bool FogActive; // ?
+			RWE::RwRGBAReal FogColor;
+			float FogStart, FogEnd;
+		};
+		struct GFXSetSnowStatus {
+			float TransitionStart;
+			float TransitionEnd;
+			float Status; // alpha or just a fancy bool?
+		};
+
+		PADDINGI(5);
+		shok::Vector<GFXSetSnowStatus> SnowData; // indexed by id directly, 0 likely placeholder
+		shok::Vector<GFXSetFog> FogData; // indexed by id directly, 0 likely placeholder
+
+		static inline constexpr int vtp = 0x769A24;
+
+		// gets from ED::CGlobalsBaseEx
+		static inline CRenderSettingsEx* (__stdcall* const GlobalObj)() = reinterpret_cast<CRenderSettingsEx * (__stdcall*)()>(0x46E4EC);
+	};
+	static_assert(sizeof(CRenderSettingsEx) == 39 * 4);
+	static_assert(offsetof(CRenderSettingsEx, FogData) == 35 * 4);
+
 	class CGlobalsBase {
 	public:
 		virtual ~CGlobalsBase() = default;
@@ -587,11 +677,13 @@ namespace ED {
 		ED::CGUIScene* Scene;
 		PADDINGI(1); // unknown
 		ED::CLight* Light; // 18
-		PADDINGI(1); // unknown
+		shok::List<BB::TSlot1<bool>*>* SomeCallback; // some reset callback?
 		PADDINGI(1); // p to ED::COcclusionEffect
 		PADDINGI(1); // p to ED::COrnamentalItems
 		ED::CPlayerColors* PlayerColors; // 22
-		PADDINGI(3); // 25 p ED::CRenderSettingsEx
+		PADDINGI(1);
+		PADDINGI(1);
+		ED::CRenderSettingsEx* RenderSettings; // 25
 		ED::CResourceManager* ResManager; // 26
 		PADDINGI(3);
 		TerrainDisplay* TerrainManager; // 30
@@ -604,6 +696,7 @@ namespace ED {
 	};
 	//constexpr int i = offsetof(ED::CGlobalsBaseEx, TerrainTextureManager) / 4;
 	static_assert(sizeof(CGlobalsBaseEx) == 35 * 4);
+	static_assert(offsetof(CGlobalsBaseEx, RenderSettings) == 25 * 4);
 
 	class IDisplayBase {
 	public:

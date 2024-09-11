@@ -68,7 +68,7 @@ Combat:
 		- Building->Armor gets calculated based of their Props->ArmorAmount modified by Technologies
 		- Settler->RandomDamage calculates its maximum off Props->MaxDamageRandomBonus modified by Technologies and ExperienceLevels, then randomly rolled between [0,max)
 		- Settler->MissChance gets calculated based off their Props->MissChance modified by ExperienceLevels
-		- Settler->DodgeChance gets calculated based off their Props->MissChance modified by Technologies and ExperienceLevels
+		- Settler->DodgeChance gets calculated based off their Props->DodgeChance modified by Technologies and ExperienceLevels
 		- Bug: Experience level 1 does not give any boni, MissChance cannot be reduced by any ExperienceLevel (fixed by CppLogic.Logic.EnableExperienceClassFix)
 		- Bug: Soldiers do not have a Armorclass and a Armor value of 0 (can be fixed with CppLogic.EntityType.SetArmor)
 		- UI shows Damage = Settler->Damage * RangedEffectsFactor and Armor = Entity->Armor * (Settler ? RangedEffectsFactor : 1.0)
@@ -91,14 +91,14 @@ Combat:
 	AoE Damage:
 		- input Player, Damage, AoERange, Position, DamageClass
 		- calculates RangeFactor against every Target by 1 - (Distance(Affected->Position, Position) / AoERange)^2
-		- calculates Damage agaist every Target as Damage * RangeFactor * (DamageClass ? Damageclass[Target->Props->Armorclass] : 1.0) - Target->Armor * Target->RangedEffectsFactor
+		- calculates Damage agaist every Target as max(1, Damage * RangeFactor * (DamageClass ? Damageclass[Target->Props->Armorclass] : 1.0) - Target->Armor * Target->RangedEffectsFactor)
 		- deals Damage to every (Player ? hostile : any diplomacy) Entity in AoERange
 	Settler Melee:
-		- Damage gets calculated as (AttackerSettler->Damage + AttackerSettler->RandomDamage) * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] * Attacker->RangedEffectsFactor - Target->Armor * Target->RangedEffectsFactor
+		- Damage gets calculated as max(1, (AttackerSettler->Damage + AttackerSettler->RandomDamage) * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] * Attacker->RangedEffectsFactor - Target->Armor * Target->RangedEffectsFactor)
 		- if Target->DodgeChance fails its random check, nothing more happens
 		- otherwise Targe takes the calculated amount of damage immediately
 	Settler Arrow:
-		- Damage gets calculated as (AttackerSettler->Damage + AttackerSettler->RandomDamage) * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] * Attacker->RangedEffectsFactor - Target->Armor * Target->RangedEffectsFactor
+		- Damage gets calculated as max(1, (AttackerSettler->Damage + AttackerSettler->RandomDamage) * AttackerSettler->Props->Damageclass[Target->Props->Armorclass] * Attacker->RangedEffectsFactor - Target->Armor * Target->RangedEffectsFactor)
 		- if Attacker->MissChance fails its random check, the Arrow will still get fired, it just does no damage
 		- otherwise the Arrow will get fired, and the Target will take the calculated amount of damage as soon as the Arrow lands (if the Target moves, does not matter)
 		- if a Arrow gets fired at a Soldier and the Soldier dies during the Arrows travel, no damage is dealt

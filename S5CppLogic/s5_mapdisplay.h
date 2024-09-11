@@ -508,6 +508,8 @@ namespace ED {
 	struct CGfxSetTransitionStatus {
 		shok::WeatherGFXSet To;
 		shok::WeatherGFXSet From;
+		int TransitionStart;
+		int TransitionDuration;
 		float Progress;
 	};
 
@@ -567,6 +569,8 @@ namespace ED {
 	public:
 		virtual ~CRenderSettings() = default;
 		virtual void Destroy() = 0;
+		virtual void SetWeatherStatus(shok::WeatherGFXSet to, shok::WeatherGFXSet from, int startTurn, int duration) = 0;
+		virtual void Tick(float time, int uk) = 0;
 
 		enum class RenderFlags : int {
 			RenderDecals = 0x1,
@@ -641,7 +645,7 @@ namespace ED {
 			float Status; // alpha or just a fancy bool?
 		};
 
-		PADDINGI(5);
+		CGfxSetTransitionStatus WeatherStatus; // 26 progress is not set here
 		shok::Vector<GFXSetSnowStatus> SnowData; // indexed by id directly, 0 likely placeholder
 		shok::Vector<GFXSetFog> FogData; // indexed by id directly, 0 likely placeholder
 

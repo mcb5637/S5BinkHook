@@ -298,7 +298,7 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
 	const char* p = nullptr;
-	auto* l = (*ED::CGlobalsBaseEx::GlobalObj);
+	auto* l = (*ED::CGlobalsBaseEx::GlobalObj)->RenderSettings;
 	
 
 	return 0;

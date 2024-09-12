@@ -2,6 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_RWEngine.h"
+#include "s5_RWE_3d.h"
 
 namespace EGL {
 	class IEffectDisplay {
@@ -282,13 +283,19 @@ namespace GD {
 
 	class CDisplayEffectLightning : public ED::IEffect {
 	public:
-		PADDINGI(1);
-		PADDINGI(3); // allocated pointers?
+		size_t NumElements; // 2
+		RWE::I3D::RwIm3DVertex* Vertex; // 4 per element?
+		RWE::I3D::RwImVertexIndex* Indexes; // advanced by 12?
+		RWE::RwRaster** Textures; // 5
 		ED::CEffectProps* Props;
 		RWE::RwRGBAReal AmbientColorBackup, DiffuseColorBackup;
 
 		static inline constexpr int vtp = 0x76AE08;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x72C52353);
+
+		// add element 0x487265 thiscaall(shok::Position*, shok::Position*, RwMatrix* ltm, RWE::RwRaster*)
+
+		static void HookColorOverride(bool active);
 	};
 	static_assert(offsetof(CDisplayEffectLightning, Props) == 6 * 4);
 	static_assert(sizeof(CDisplayEffectLightning) == 15 * 4);

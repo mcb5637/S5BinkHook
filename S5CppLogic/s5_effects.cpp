@@ -257,6 +257,30 @@ void EGL::CFlyingEffect::HookOnHit()
 	*reinterpret_cast<void**>(0x7776B4) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CCannonBallEffect::OnHitHooked, 0);
 }
 
+RWE::RpLight* __cdecl setcolor_nop(RWE::RpLight* l, void* color) {
+	return l;
+}
+void __stdcall displayeff_light_updategametime(int, float) {
+
+}
+void GD::CDisplayEffectLightning::HookColorOverride(bool active)
+{
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 5, {
+			reinterpret_cast<void*>(0x4875FB),
+		} };
+		void* target = active ? &setcolor_nop : reinterpret_cast<void*>(0x6274C0);
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4875FB), target);
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 5, {
+			reinterpret_cast<void*>(0x76AE18),
+		} };
+		void* target = active ? &displayeff_light_updategametime : reinterpret_cast<void*>(0x4874BB);
+		*reinterpret_cast<void**>(0x76AE18) = &displayeff_light_updategametime;
+	}
+}
+
 ED::IEffect* ED::CDEVisibleEffectManager::GetDisplayForEffectID(shok::EffectId id)
 {
 	for (auto& e : Effects) {

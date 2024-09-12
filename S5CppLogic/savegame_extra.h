@@ -32,6 +32,7 @@ namespace CppLogic::SavegameExtra {
 		bool SettlerBuyTriggers = false;
 		bool ScriptTriggerEval = false;
 		bool CannonInProgressAttraction = false;
+		bool LightningEffectFix = false;
 
 		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;
 

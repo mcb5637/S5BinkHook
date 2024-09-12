@@ -419,4 +419,22 @@ namespace RWE {
 		rpLIGHTSPOT, /**<Spot Light */
 		rpLIGHTSPOTSOFT, /**<Soft Spot Light */
 	};
+	/**
+	 * \ingroup rwim3d
+	 * RwIm3DTransformFlags
+	 *  The bit-field type  RwIm3DTransformFlags
+	 * specifies options available for controlling execution of the 3D immediate
+	 * mode pipeline (see API function \ref RwIm3DTransform):*/
+	enum class RwIm3DTransformFlags : int
+	{
+		rwIM3D_VERTEXUV = 1,   /**<Texture coordinates in source vertices should be used */
+		rwIM3D_ALLOPAQUE = 2,   /**<All source vertices are opaque (alpha is 255) */
+		rwIM3D_NOCLIP = 4,   /**<No clipping should be performed on the geometry (the
+									 * app may know it is all onscreen or within the guard band clipping
+									 * region for the current hardware, so clipping can be skipped) */
+		rwIM3D_VERTEXXYZ = 8,   /**<Vertex positions */
+		rwIM3D_VERTEXRGBA = 16,  /**<Vertex color */
+	};
+	template<>
+	class ::enum_is_flags<RwIm3DTransformFlags> : public std::true_type {};
 }

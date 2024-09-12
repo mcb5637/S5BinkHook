@@ -160,6 +160,12 @@ function CppLogic.Effect.EnableEffectTriggers(enable) end
 --- @return number effectId id
 function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source) end
 
+--- enables FXLightning effect to display properly.
+--- - no longer changes global lighting conditions
+--- - always displayed with full white color (not partially transparent)
+---@param enabled boolean
+function CppLogic.Effect.EnableLightningFix(enabled) end
+
 ---@class EffectPredicate
 local EffectPredicate = {}
 

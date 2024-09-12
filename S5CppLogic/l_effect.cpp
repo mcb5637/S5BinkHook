@@ -187,6 +187,12 @@ namespace CppLogic::Effect {
 		return 0;
 	}
 
+	int EnableLightningFix(lua::State L) {
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LightningEffectFix = L.CheckBool(1);
+		GD::CDisplayEffectLightning::HookColorOverride(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LightningEffectFix);
+		return 0;
+	}
+
 	int PredicateInCircle(lua::State ls) {
 		luaext::EState L{ ls };
 		auto p = L.CheckPos(1);
@@ -335,7 +341,7 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 14> Effect{ {
+	constexpr std::array Effect{
 			lua::FuncReference::GetRef<CreateProjectile>("CreateProjectile"),
 			lua::FuncReference::GetRef<IsValidEffect>("IsValidEffect"),
 			lua::FuncReference::GetRef<GetProjectileCallbacks>("GetProjectileCallbacks"),
@@ -350,8 +356,9 @@ namespace CppLogic::Effect {
 			lua::FuncReference::GetRef<IsCannonBall>("IsCannonBall"),
 			lua::FuncReference::GetRef<EffectIterator>("EffectIterator"),
 			lua::FuncReference::GetRef<EffectIteratorTableize>("EffectIteratorTableize"),
-	} };
-	constexpr std::array<lua::FuncReference, 11> Predicates{ {
+			lua::FuncReference::GetRef<EnableLightningFix>("EnableLightningFix"),
+	};
+	constexpr std::array Predicates{
 			lua::FuncReference::GetRef<PredicateInCircle>("InCircle"),
 			lua::FuncReference::GetRef<PredicateInRect>("InRect"),
 			lua::FuncReference::GetRef<PredicateOfType>("OfType"),
@@ -363,7 +370,7 @@ namespace CppLogic::Effect {
 			lua::FuncReference::GetRef<PredicateOr>("Or"),
 			lua::FuncReference::GetRef<PredicateNot>("Not"),
 			lua::FuncReference::GetRef<PredicateSetPriority>("SetPriority"),
-	} };
+	};
 
 	void Init(lua::State L)
 	{
@@ -398,6 +405,7 @@ namespace CppLogic::Effect {
 		EGL::CGLEGameLogic::CreateEffectHookCallback = nullptr;
 		EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
 		EGL::CEffect::OnDestroyCb = nullptr;
+		GD::CDisplayEffectLightning::HookColorOverride(false);
 	}
 
 	void CppLogic::Effect::OnSaveLoaded(lua::State L)
@@ -416,6 +424,8 @@ namespace CppLogic::Effect {
 		L.SetTop(t);
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EffectTriggers)
 			SetupEffectTriggers(true);
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LightningEffectFix)
+			GD::CDisplayEffectLightning::HookColorOverride(true);
 	}
 }
 

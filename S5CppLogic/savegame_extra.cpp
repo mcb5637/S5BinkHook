@@ -90,6 +90,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, StringTableTextOverride),
 	AutoMemberSerialization(SerializedMapdata, ScriptTriggerEval),
 	AutoMemberSerialization(SerializedMapdata, CannonInProgressAttraction),
+	AutoMemberSerialization(SerializedMapdata, LightningEffectFix),
 	BB::SerializationData::GuardData(),
 };
 
@@ -120,5 +121,6 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	SettlerBuyTriggers = false;
 	ScriptTriggerEval = false;
 	CannonInProgressAttraction = false;
+	LightningEffectFix = false;
 	StringTableTextOverride.clear();
 }

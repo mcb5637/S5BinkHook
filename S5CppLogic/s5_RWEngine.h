@@ -71,8 +71,44 @@ namespace RWE {
 		static const inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA05D50);
 
 		RwV3d Transform(const RwMatrix* matrix) const;
+		/*
+		 * \ref RwV3dTransformPoint uses the given matrix describing a
+		 * transformation and applies it to the specified point.  The
+		 * result is placed in another point (which may be the same point as
+		 * the source).
+		 *
+		 * \param pointOut  A pointer to an RwV3d that is to receive the results of
+		 *                  the point transformation
+		 * \param pointIn   A pointer to an RwV3d that is to supply the point to be
+		 *                   transformed
+		 * \param matrix    A pointer to the matrix supplying the transformation
+		 *
+		 * \return Returns a pointer to the transformed point if successful or NULL
+		 *        if there is an error
+		 */
 		RwV3d TransformPoint(const RwMatrix* matrix) const;
 		RwV3d Normalize() const;
+		/*
+		 * \ref RwV3dTransformPoints uses the given matrix describing a
+		 * transformation and applies it to the specified array of points. The
+		 * results are then placed in another array (which may be the same array as
+		 * the source).
+		 *
+		 * \note The source and destination array may be separate or coincident, but
+		 * the result is not defined if the source and destination overlap in any
+		 * other way (i.e. if they are offset from one another but still overlap).
+		 *
+		 * \param pointsOut  A pointer to an array of RwV3ds that are to
+		 * receive the results of the point transformation
+		 * \param pointsIn   A pointer to an array of RwV3ds that are to supply
+		 * to points to be transformed
+		 * \param numPoints  A number of points to transform
+		 * \param matrix     A pointer to the matrix supplying the transformation
+		 *
+		 * \return Returns a pointer to the transformed point array if successful or NULL
+		 *        if there is an error
+		 */
+		static inline RwV3d* (__cdecl* const RwV3dTransformPoints)(RwV3d* pointsOut, const RwV3d* pointsIn, int numPoints, const RwMatrix* matrix) = reinterpret_cast<RwV3d* (__cdecl*)(RwV3d*, const RwV3d*, int, const RwMatrix*)>(0x41C740);
 		float Length() const;
 	};
 	struct RwV2d {

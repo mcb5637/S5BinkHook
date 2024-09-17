@@ -30,7 +30,7 @@ namespace CppLogic::UI {
 		void Cancel(bool calllua);
 
 		static constexpr const char* Name = "LuaSelectionState";
-		static constexpr int Id = 27;
+		static constexpr int Id = 28;
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
@@ -64,7 +64,7 @@ namespace CppLogic::UI {
 		void SetRotation(float deg);
 
 		static constexpr const char* Name = "PlaceBuildingStateEx";
-		static constexpr int Id = 28;
+		static constexpr int Id = 29;
 
 		void* operator new(size_t s);
 		void operator delete(void* p);

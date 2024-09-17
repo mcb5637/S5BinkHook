@@ -56,7 +56,7 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std
 		L.GetTableRaw(-2);
 		if (L.IsFunction(-1)) {
 			if (L.PCall(0, 0) != lua::ErrorCode::Success) {
-				auto s = std::format("Initialize error: {}", L.ToStringView(-1));
+				auto s = std::format("Initialize error: {}", L.ToDebugString(-1));
 				Log(L, s.c_str());
 				L.Pop(1);
 			}
@@ -72,7 +72,7 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std
 		L.GetTableRaw(-2);
 		if (L.IsFunction(-1)) {
 			if (L.PCall(0, 0) != lua::ErrorCode::Success) {
-				auto s = std::format("{} error: {}", func, L.ToStringView(-1));
+				auto s = std::format("{} error: {}", func, L.ToDebugString(-1));
 				Log(L, s.c_str());
 				L.Pop(1);
 			}
@@ -108,7 +108,7 @@ void CppLogic::ModLoader::ModLoader::PostMapscriptLoaded()
 		L.GetTableRaw(-2);
 		if (L.IsFunction(-1)) {
 			if (L.PCall(0, 0) != lua::ErrorCode::Success) {
-				auto s = std::format("LoadModScripts error: {}", L.ToStringView(-1));
+				auto s = std::format("LoadModScripts error: {}", L.ToDebugString(-1));
 				Log(L, s.c_str());
 				L.Pop(1);
 			}

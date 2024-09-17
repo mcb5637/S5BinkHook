@@ -448,6 +448,8 @@ namespace shok {
 		SetGameSpeed = 0x50001, //Framework::CEventGameSpeed
 		// 0x50002 replay checksum (from error message)
 		Escape = 0x50003, //BB::CEvent
+
+		CppL_LightningStrike_Activate = 0x11100, //EGL::CNetEventEntityAndPos
 	};
 
 	enum class FeedbackEventIds : int {

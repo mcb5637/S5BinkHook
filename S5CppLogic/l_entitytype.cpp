@@ -10,6 +10,7 @@
 #include "luaext.h"
 #include "hooks.h"
 #include "luaserializer.h"
+#include "ModBehavior.h"
 
 namespace CppLogic::EntityType {
 	int LeaderTypeGetSoldierType(lua::State ls) {
@@ -935,6 +936,22 @@ namespace CppLogic::EntityType {
 		return 1;
 	}
 
+	int GetLightningStrikeData(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		auto* p = t->GetBehaviorProps<CppLogic::Mod::LightningStrikeAbilityProps>();
+		if (p == nullptr)
+			throw lua::LuaException{ "no lightning strike ability" };
+		L.Push(p->Range);
+		L.Push(p->WeatherEnergyCost);
+		L.Push(p->Damage);
+		L.Push(p->DamageClass);
+		L.Push(p->DamageRange);
+		L.Push(p->Effect);
+		L.Push(p->RechargeTimeSeconds);
+		return 7;
+	}
+
 	constexpr std::array EntityType{
 			lua::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
 			lua::FuncReference::GetRef<SetLimitedLifespanDuration>("SetLimitedLifespanDuration"),
@@ -1004,6 +1021,7 @@ namespace CppLogic::EntityType {
 			lua::FuncReference::GetRef<LeaderTypeGetMaxNumberOfSoldiers>("LeaderTypeGetMaxNumberOfSoldiers"),
 			lua::FuncReference::GetRef<GetUpgradeCategory>("GetUpgradeCategory"),
 			lua::FuncReference::GetRef<DumpBattleBehavior>("DumpBattleBehavior"),
+			lua::FuncReference::GetRef<GetLightningStrikeData>("GetLightningStrikeData"),
 		};
 
 	constexpr std::array Building{

@@ -124,4 +124,8 @@ list of used identifiers
 0x1010 CppLogic::Mod::FormationSpacedBehavior
 0x1011 CppLogic::Mod::UI::FreeCamCustomWidget
 0x1012 CppLogic::Events::SaveLoadedEvent
+0x1013 CppLogic::Mod::LightningStrikeAbilityProps
+0x1014 CppLogic::Mod::LightningStrikeAbility
+0x1015 CppLogic::Mod::HawkCircleBehavior
+0x1016 CppLogic::Mod::HawkOwnerAbility
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

@@ -20,6 +20,7 @@
 #include "ModUI.h"
 #include "LuaEventInterface.h"
 #include "WinAPIUtil.h"
+#include "ModBehavior.h"
 
 namespace CppLogic::UI {
 	void StringHandlerSetString(luaext::EState L, EGUIX::CSingleStringHandler& h, int i) {
@@ -1430,6 +1431,12 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
+	int InitNetHandlers(lua::State L) {
+		auto* gl = *GGL::CGLGameLogic::GlobalObj;
+		gl->CreateNetEventHandler<shok::NetEventIds::CppL_LightningStrike_Activate>(Mod::LightningStrikeAbility::NetEventLightningStrike);
+		return 0;
+	}
+
 	void* GUIState_LuaSelection::operator new(size_t s)
 	{
 		return shok::Malloc(s);
@@ -1869,6 +1876,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<VideoCustomWidgetGetVideoSize>("VideoCustomWidgetGetVideoSize"),
 		lua::FuncReference::GetRef<VideoCustomWidgetSetVideoSize>("VideoCustomWidgetSetVideoSize"),
 		lua::FuncReference::GetRef<CreateSelectionDecal>("CreateSelectionDecal"),
+		lua::FuncReference::GetRef<InitNetHandlers>("InitNetHandlers"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {
@@ -2024,6 +2032,8 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Shuriken_Activate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityShuriken>,
 			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Shuriken_Activate"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_LightningStrike_Activate,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>>>("LightningStrike_Activate"),
 		lua::FuncReference::GetRef<CommandMove>("Entity_Move"),
 		lua::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
 	};

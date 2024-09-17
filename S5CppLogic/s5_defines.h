@@ -483,6 +483,7 @@ namespace shok {
 		AbilityShuriken = 15,
 		AbilityPlaceKeg = 16,
 		AbilityMotivateWorkers = 17,
+		AbilityLightningStrike,
 	};
 	enum class SoundId : int {
 		Invalid = 0,

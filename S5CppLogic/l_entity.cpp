@@ -1892,6 +1892,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Thief_StealFromCommand,
 				CheckIsThief, LuaEventInterface::CheckBuilding, LuaEventInterface::CheckTargetCategory<shok::EntityCategory::Headquarters>,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("CommandSecureGoods"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_LightningStrike_Activate,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>>>("CommandLightningStrike"),
 			lua::FuncReference::GetRef<EnableConversionHook>("EnableConversionHook"),
 			lua::FuncReference::GetRef<DisableConversionHook>("DisableConversionHook"),
 			lua::FuncReference::GetRef<SettlerCommandMove>("CommandMove"),

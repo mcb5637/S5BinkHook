@@ -592,6 +592,8 @@ namespace shok {
 
         LuaFunc = 500,
         WaitForAnimNonCancelable = 501,
+        HawkExplore = 502,
+        HawkCheckHero = 503,
     };
 
     extern std::map<TaskState, std::string_view> TaskStateToName;

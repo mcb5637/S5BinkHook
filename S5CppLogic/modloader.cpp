@@ -26,6 +26,7 @@
 #include "ModConfig.h"
 #include "StringUtility.h"
 #include "WinAPIUtil.h"
+#include "savegame_extra.h"
 
 #ifdef _DEBUG
 #define RESERIALIZE_NO_DIALOG
@@ -1142,6 +1143,30 @@ int CppLogic::ModLoader::ModLoader::OverrideSavegameValid(lua::State L)
 	return 0;
 }
 
+int CppLogic::ModLoader::ModLoader::LoadStringTableTextOverrides(lua::State L)
+{
+	std::string_view file = L.CheckStringView(1);
+	std::string_view lang = L.CheckStringView(2);
+	auto f = std::format("data/text/{}/override/{}.xml", lang, file);
+	try {
+		auto seri = BB::CXmlSerializer::CreateUnique();
+		BB::CFileStreamEx fs{};
+		CppLogic::SavegameExtra::StringTableTextOverride o{};
+		if (fs.OpenFile(f.data(), BB::IStream::Flags::DefaultRead)) {
+			seri->DeserializeByData(&fs, &o, CppLogic::SavegameExtra::StringTableTextOverride::SerializationData);
+			o.Merge(L.OptStringView(3, file));
+			L.Push(static_cast<int>(o.StringTableTextOverride.size()));
+		}
+		else {
+			L.Push(-1);
+		}
+	}
+	catch (const BB::CFileException&) {
+		L.Push(-1);
+	}
+	return 1;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -1263,7 +1288,6 @@ std::string CppLogic::ModLoader::ModLoader::GetModPackPath(std::string_view n)
 
 CreateSerializationListFor(CppLogic::ModLoader::ModpackDesc, Required);
 
-CppLogic::SerializationListOptions_ForVector<std::string> stringvect{};
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[]{
 	AutoMemberSerialization(ModpackDesc, LoaderPath),
 	AutoMemberSerialization(ModpackDesc, ScriptPath),

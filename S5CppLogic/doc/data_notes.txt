@@ -183,3 +183,9 @@ example:
 	},
 Note: ExtraArmorClass is only defined for CppLogic::Mod::Config::DamageClassExt.
 	Using CppLogic::Mod::Config::DamageClassExt requires activating CppLogic.Combat.EnableAoEProjectileFix and CppLogic.Logic.EnableAllHurtEntityTrigger.
+
+StringTableTexts:
+path: data/text/lang/override/prefixname.xml (usually data/text/lang/ingame/prefixname.xml)
+example: as originals
+Note: lang is the 2 letter language code. from manifest, searches XNetworkUbiCom.Tool_GetCurrentLanguageShortName(), "en", "de" (in this order)
+	and load the first found. it is optionally possible to load overrides for a specific prefix from a different file.

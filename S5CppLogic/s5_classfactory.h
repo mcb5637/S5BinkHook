@@ -362,11 +362,13 @@ namespace BB {
 }
 
 namespace CppLogic {
-	template<class T, class Alloc = std::allocator<T>>
+	template<class T, class Alloc>
 	class SerializationListOptions_ForVector : public BB::SerializationListOptions { // do only use with std::vector<T> !
+	public:
 		using VectT = std::vector<T, Alloc>;
 		using IterT = std::vector<T, Alloc>::iterator;
 		
+	private:
 		struct IterImpl : Iter {
 			VectT* Vector;
 			IterT It;
@@ -434,11 +436,13 @@ namespace CppLogic {
 	};
 
 
-	template<class K, class V, class Cmp = std::less<K>, class Alloc = std::allocator<std::pair<const K, V>>>
+	template<class K, class V, class Cmp, class Alloc>
 	class SerializationListOptions_ForMap : public BB::SerializationListOptions { // do only use with std::map<K, V> !
-		using VectT = std::map<K, V, Cmp>;
+	public:
+		using VectT = std::map<K, V, Cmp, Alloc>;
 		using IterT = VectT::iterator;
 
+	private:
 		struct IterImpl : Iter {
 			VectT* Vector;
 			IterT It;
@@ -506,6 +510,28 @@ namespace CppLogic {
 		}
 	};
 
+	template<class K, class V, ConstexprString A, class Cmp, class Alloc>
+	class SerializationListOptions_ForMap_KeyAttribute : public BB::SerializationListOptions { // do only use with std::map<K, V> !
+	public:
+		using VectT = std::map<K, V, Cmp, Alloc>;
+
+	private:
+		static void* __stdcall AddToListIdManagedImpl(void* l, BB::SerializationListOptions::Context* context) {
+			const char* id = context->GetAttribute(A.data());
+			if (id == nullptr)
+				return nullptr;
+			VectT* map = static_cast<VectT*>(l);
+			auto [it, s] = map->emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple());
+			return &it->second;
+		}
+
+	public:
+		SerializationListOptions_ForMap_KeyAttribute()
+		{
+			AddToListIdManaged = &AddToListIdManagedImpl;
+		}
+	};
+
 	class StringSerializer : public BB::FieldSerializer {
 		std::string ActualBuffer;
 
@@ -522,6 +548,7 @@ namespace CppLogic {
 	template<class T, CppLogic::ConstexprString ValueName = CppLogic::ConstexprString(""), CppLogic::ConstexprString KeyName = CppLogic::ConstexprString("")>
 	struct SerializationListOptions_Mapping {
 		static constexpr bool Mapped = false;
+		using VectT = void;
 
 		static const SerializationListOptions_Mapping GlobalObj;
 	};
@@ -533,7 +560,10 @@ namespace CppLogic {
 		static constexpr auto KN = KeyName;
 		static constexpr auto VN = ValueName;
 
-		SerializationListOptions_ForMap<K, V, Cmp, Alloc> ListOptions;
+		using ListOpt = SerializationListOptions_ForMap<K, V, Cmp, Alloc>;
+		using VectT = typename ListOpt::VectT;
+
+		ListOpt ListOptions;
 		const BB::SerializationData Seridata[3] = {
 			AutoMemberSerializationName(KeyValue, first, KeyName.data()),
 			AutoMemberSerializationName(KeyValue, second, ValueName.data()),
@@ -546,10 +576,43 @@ namespace CppLogic {
 	struct SerializationListOptions_Mapping<std::vector<T, Alloc>, ValueName, KeyName> {
 		static constexpr bool Mapped = true;
 
-		SerializationListOptions_ForVector<T, Alloc> ListOptions;
+		using ListOpt = SerializationListOptions_ForVector<T, Alloc>;
+		using VectT = typename ListOpt::VectT;
+
+		ListOpt ListOptions;
 
 		static const SerializationListOptions_Mapping GlobalObj;
 	};
+	template<class T, CppLogic::ConstexprString A = CppLogic::ConstexprString("")>
+	struct SerializationListOptions_Mapping_KeyAttrib {
+		static constexpr bool Mapped = false;
+		using VectT = void;
+
+		static const SerializationListOptions_Mapping_KeyAttrib GlobalObj;
+	};
+	template<class K, class V, ConstexprString A, class Cmp, class Alloc>
+	struct SerializationListOptions_Mapping_KeyAttrib<std::map<K, V, Cmp, Alloc>, A> {
+		static constexpr bool Mapped = true;
+
+		using ListOpt = SerializationListOptions_ForMap_KeyAttribute<K, V, A, Cmp, Alloc>;
+		using VectT = typename ListOpt::VectT;
+
+		ListOpt ListOptions;
+
+		static const SerializationListOptions_Mapping_KeyAttrib GlobalObj;
+	};
+
+
+	template<class K, class V, ConstexprString A, class Cmp, class Alloc>
+	constexpr BB::SerializationData AutoData_KeyAttrib(const char* name, size_t pos, size_t size, const SerializationListOptions_Mapping_KeyAttrib<std::map<K, V, Cmp, Alloc>, A>&) {
+		using M = SerializationListOptions_Mapping_KeyAttrib<std::map<K, V, Cmp, Alloc>, A>;
+		static_assert(std::same_as<typename M::VectT, std::map<K, V, Cmp, Alloc>>);
+		auto& mapping = M::GlobalObj;
+		auto d = BB::SerializationData::AutoDataHolder<V>::AutoData(name, pos, size);
+		d.ListOptions = &mapping.ListOptions;
+		return d;
+	};
+
 
 	class ClassIdManager {
 		BB::CClassFactory* Manager;
@@ -622,7 +685,9 @@ template<class K, class V, class Cmp, class Alloc, CppLogic::ConstexprString Val
 requires (CppLogic::SerializationListOptions_Mapping<std::map<K, V, Cmp, Alloc>>::Mapped)
 struct BB::SerializationData::AutoDataHolder<std::map<K, V, Cmp, Alloc>, ValueName, KeyName> {
 	static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
-		auto& mapping = CppLogic::SerializationListOptions_Mapping<std::map<K, V, Cmp, Alloc>, ValueName, KeyName>::GlobalObj;
+		using M = CppLogic::SerializationListOptions_Mapping<std::map<K, V, Cmp, Alloc>, ValueName, KeyName>;
+		static_assert(std::same_as<M::VectT, std::map<K, V, Cmp, Alloc>>);
+		auto& mapping = M::GlobalObj;
 		return SerializationData::EmbeddedData(name, pos, size, mapping.Seridata, &mapping.ListOptions);
 	}
 };
@@ -630,7 +695,9 @@ template<class T, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::Co
 requires (CppLogic::SerializationListOptions_Mapping<std::vector<T, Alloc>>::Mapped)
 struct BB::SerializationData::AutoDataHolder<std::vector<T, Alloc>, ValueName, KeyName> {
 	static constexpr SerializationData AutoData(const char* name, size_t pos, size_t size) {
-		auto& mapping = CppLogic::SerializationListOptions_Mapping<std::vector<T, Alloc>, ValueName, KeyName>::GlobalObj;
+		using M = CppLogic::SerializationListOptions_Mapping<std::vector<T, Alloc>, ValueName, KeyName>;
+		static_assert(std::same_as<M::VectT, std::vector<T, Alloc>>);
+		auto& mapping = M::GlobalObj;
 		auto d = BB::SerializationData::AutoDataHolder<T>::AutoData(name, pos, size);
 		d.ListOptions = &mapping.ListOptions;
 		return d;
@@ -639,3 +706,5 @@ struct BB::SerializationData::AutoDataHolder<std::vector<T, Alloc>, ValueName, K
 
 #define CreateSerializationListForKeyValue(T,M,K,V) const CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)> CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)>::GlobalObj{}
 #define CreateSerializationListFor(T,M) CreateSerializationListForKeyValue(T,M,"Key","Value")
+#define CreateSerializationListForKeyAttrib(T,M,N) const  CppLogic::SerializationListOptions_Mapping_KeyAttrib<decltype(T::M), CppLogic::ConstexprString(N)>  CppLogic::SerializationListOptions_Mapping_KeyAttrib<decltype(T::M), CppLogic::ConstexprString(N)>::GlobalObj{};
+#define AutoMemberSerializationNameKeyAttrib(T,M,N,K) CppLogic::AutoData_KeyAttrib(N, offsetof(T, M), sizeof(decltype(T::M)), CppLogic::SerializationListOptions_Mapping_KeyAttrib<decltype(T::M), CppLogic::ConstexprString(K)>::GlobalObj)

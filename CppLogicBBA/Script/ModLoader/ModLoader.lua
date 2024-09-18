@@ -76,6 +76,7 @@ function ModLoader.ManifestTypes()
 		{Key="BuildingUpgradeCategory", Preload=CppLogic.ModLoader.PreLoadUpgradeCategory, Table=UpgradeCategories, Load=CppLogic.ModLoader.AddBuildingUpgradeCategory, Type="kv"},
 		{Key="ExperienceClasses", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddExperienceClass, Type="kv"},
 		{Key="SoundGroups", Preload=nil, Table=Sounds, Load=CppLogic.ModLoader.AddSounds, Type="sound"},
+		{Key="StringTableTexts", Preload=nil, Table=nil, Load=ModLoader.LoadSTTOverride, Type="kv"}
 	}
 end
 
@@ -572,4 +573,19 @@ function ModLoader.FillMissingManifestEntries(manifest)
 		t.Fix(m, manifest)
 	end
 	manifest.MissingFilled = true
+end
+
+---@param name string
+---@param into string|boolean|nil
+function ModLoader.LoadSTTOverride(name, into)
+	if type(into)~="string" then
+		into = nil
+	end
+	local langs = ModLoader.LanguageOrder or {XNetworkUbiCom.Tool_GetCurrentLanguageShortName(), "en", "de"}
+	for _, l in ipairs(langs) do
+		if CppLogic.ModLoader.LoadStringTableTextOverrides(name, l, into) >= 0 then
+			return
+		end
+	end
+	assert(false, "cannot find STT override file "..name)
 end

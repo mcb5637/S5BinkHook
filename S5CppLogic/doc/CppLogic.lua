@@ -3343,6 +3343,13 @@ CppLogic.ModLoader.ReloadDamageClass = CppLogic.ModLoader.AddDamageClass
 --- @return number type_id
 function CppLogic.ModLoader.PreLoadDamageClass(typename) end
 
+--- loads a stringtabletxt override file.
+--- @param filename string
+--- @param language string
+--- @param prefixOverride string|nil
+--- @return number numLoaded -1 if not found
+function CppLogic.ModLoader.LoadStringTableTextOverrides(filename, language, prefixOverride) end
+
 --- sets all damageclasses to get automatically reloaded on leaving the map (after s5x archives got removed).
 --- (for editing it manually via CppLogic).
 --- this function is available after ModLoader finishes.

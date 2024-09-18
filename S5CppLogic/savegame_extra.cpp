@@ -124,3 +124,18 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	LightningEffectFix = false;
 	StringTableTextOverride.clear();
 }
+
+CreateSerializationListForKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverride, "id");
+
+BB::SerializationData CppLogic::SavegameExtra::StringTableTextOverride::SerializationData[]{
+	AutoMemberSerializationNameKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverride, "string", "id"),
+	BB::SerializationData::GuardData(),
+};
+
+void CppLogic::SavegameExtra::StringTableTextOverride::Merge(std::string_view prefix) const
+{
+	auto& target = SerializedMapdata::GlobalObj.StringTableTextOverride;
+	for (const auto& [k, v] : StringTableTextOverride) {
+		target[std::format("{}/{}", prefix, k)] = v;
+	}
+}

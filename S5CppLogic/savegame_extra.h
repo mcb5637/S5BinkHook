@@ -43,4 +43,13 @@ namespace CppLogic::SavegameExtra {
 		static SerializedMapdata GlobalObj;
 		static BB::SerializationData SerializationData[];
 	};
+
+	struct StringTableTextOverride {
+
+		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;
+
+		void Merge(std::string_view prefix) const;
+
+		static BB::SerializationData SerializationData[];
+	};
 }

@@ -6,3 +6,4 @@
 #define AutoMemberSerializationNameKeyVaue(T,M,N,K,V) BB::SerializationData::AutoDataHolder<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)>::AutoData(N, offsetof(T, M), sizeof(decltype(T::M)))
 #define CreateSerializationListForKeyValue(T,M,K,V) const CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)> CppLogic::SerializationListOptions_Mapping<decltype(T::M), CppLogic::ConstexprString(V), CppLogic::ConstexprString(K)>::GlobalObj{}
 #define CreateSerializationListFor(T,M) CreateSerializationListForKeyValue(T,M,"Key","Value")
+#define AutoMemberSerializationNameKeyAttrib(T, M, N, K) CppLogic::AutoData_KeyAttrib(N, offsetof(T, M), sizeof(decltype(T::M)), CppLogic::SerializationListOptions_Mapping_KeyAttrib<decltype(T::M), CppLogic::ConstexprString(K)>::GlobalObj)

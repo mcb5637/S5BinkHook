@@ -357,6 +357,7 @@ namespace CppLogic::ModLoader {
 		static int SetModPackList(lua::State L);
 		static int GetModPackList(lua::State L);
 		static int OverrideSavegameValid(lua::State L);
+		static int LoadStringTableTextOverrides(lua::State L);
 
 		static constexpr std::array LuaFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -371,6 +372,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
 				lua::FuncReference::GetRef<SetModPackList>("SetModPackList"),
 				lua::FuncReference::GetRef<GetModPackList>("GetModPackList"),
+				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{
@@ -383,6 +385,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
 				lua::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
 				lua::FuncReference::GetRef<ReserializeModel>("ReserializeModel"),
+				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
 		};
 
 		static constexpr std::array Mainmenu{

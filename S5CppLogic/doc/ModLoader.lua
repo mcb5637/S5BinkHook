@@ -95,6 +95,10 @@ ModLoader = {
 		EntityCategories = {
 
 		},
+		--- StringTableTexts to add/override. enter the file name as key, value is the STT prefix, true->same as file
+		StringTableTexts = {
+
+		},
 	},
 	--- the names of all ModPacks requied by this map. a call to ModLoader.RequireModList() in Initialize will then try to load them.
 	--- @type string[]

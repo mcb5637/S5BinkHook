@@ -56,6 +56,7 @@ namespace BB {
 	class IText {
 	public:
 		static inline constexpr int vtp = 0x7AECD0;
+
 		virtual ~IText() = default;
 		virtual void __stdcall Destroy() = 0;
 		virtual void __stdcall SetLanguage(const char* l) = 0; // 2 letters code

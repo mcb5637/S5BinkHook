@@ -30,6 +30,7 @@
 #include "s5_events.h"
 #include "s5_behaviorProps.h"
 #include "s5_RWE_2d.h"
+#include "s5_ai.h"
 #include "modloader.h"
 #include "entityiterator.h"
 #include "hooks.h"
@@ -297,9 +298,8 @@ int Test(lua::State Ls) {
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
-	const char* p = nullptr;
-	auto* l = (*ED::CGlobalsBaseEx::GlobalObj)->RenderSettings;
 	
+	auto* p = GAI::AIHolder::GlobalObj()->GetPlayer(shok::PlayerId::P3);
 
 	return 0;
 }

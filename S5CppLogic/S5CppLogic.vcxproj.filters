@@ -324,6 +324,9 @@
     <ClInclude Include="SchemaGenerator.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_ai.h">
+      <Filter>shok\player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -505,6 +508,9 @@
     </ClCompile>
     <ClCompile Include="SchemaGenerator.cpp">
       <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="s5_ai.cpp">
+      <Filter>shok\player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

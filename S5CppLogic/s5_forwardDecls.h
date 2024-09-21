@@ -1,9 +1,24 @@
 #pragma once
 
+namespace shok::detail {
+	union padding {
+		int i;
+		float f;
+
+		constexpr auto operator<=>(const padding& o) const {
+			return i <=> o.i;
+		}
+		constexpr bool operator==(const padding& o) const {
+			return i == o.i;
+		}
+	};
+	static_assert(sizeof(padding) == 4);
+}
+
 #define TOKENPASTE(x, y) x ## y
 #define TOKENPASTE2(x, y) TOKENPASTE(x, y)
 #define PADDING(size) private: char TOKENPASTE2(padding_, __LINE__) [size]={}; public:
-#define PADDINGI(size) PADDING(size*4)
+#define PADDINGI(size) private: shok::detail::padding TOKENPASTE2(padding_, __LINE__) [size]={}; public:
 
 #define DEBUGGER_BREAK _asm int 3
 
@@ -41,6 +56,7 @@ namespace shok {
 	enum class AccessCategoryFlags : int;
 	enum class Goods : int;
 	enum class MapType : int;
+	enum class ArmyId : int;
 
 	// only forward decl of these, most may change at runtime
 	enum class AnimationId : int;

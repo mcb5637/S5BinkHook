@@ -299,7 +299,7 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
 	
-	auto* p = GAI::AIHolder::GlobalObj();// ->GetPlayer(shok::PlayerId::P3);
+	auto* p = GAI::AIHolder::GlobalObj()->GetPlayer(shok::PlayerId::P3);
 	
 	return 0;
 }

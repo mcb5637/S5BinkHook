@@ -174,11 +174,13 @@ namespace GAI {
 
 	class CArmy : public CObject {
 	public:
+		virtual void OnTick();
+
 		bool AlwaysAggressive; //4
-		PADDINGI(3); // vec?
+		PADDINGI(3);
 		struct {
 			CArmy* Army;
-			PADDINGI(3); // vec?
+			PADDINGI(3);
 			struct {
 				shok::Position CurrentPos; // /100
 				PADDINGI(3);
@@ -198,7 +200,7 @@ namespace GAI {
 			PADDINGI(6);
 			PADDINGI(1);
 			int ArmySize;
-		} U1;
+		} U1; // 8
 		struct {
 			void* SomeArmySubObj; // CArmy+12*4
 			float RodeLength; // /100
@@ -225,6 +227,7 @@ namespace GAI {
 
 		// ctor 44FDAE
 	};
+	static_assert(sizeof(CArmyFighting) == 84 * 4);
 
 	class CPlayer : public CObject {
 	public:
@@ -232,7 +235,7 @@ namespace GAI {
 		shok::PlayerId Player; //5
 		PADDINGI(1);
 		CVillage Village; // 7
-		CArmy Armies[10];
+		CArmyFighting Armies[10];
 
 		// 1947 vector of CEntityDynamic* serfs
 		// 1951 vector of CEntityDynamic* not serfs
@@ -251,7 +254,7 @@ namespace GAI {
 
 	class CEntity : public CObject {
 	public:
-		virtual void Init(shok::EntityId id, CPlayer* player); // 5
+		virtual void Init(shok::EntityId id, CPlayer* player) = 0; // 5
 
 		enum class Category : int {
 			Invalid = -1, // not entity or settler
@@ -278,13 +281,18 @@ namespace GAI {
 		PADDINGI(6);
 		PADDINGI(10);
 		PADDINGI(2);
-		PADDINGI(9);
+		struct {
+			PADDINGI(3);
+			int MaxSoldiers;
+			PADDINGI(5);
+		} U2; //27
 		struct {
 			CEntityDynamic* E;
 			bool IsSerf;
 			PADDINGI(3);
 		} U1;
-		PADDINGI(4);
+		PADDINGI(3);
+		shok::ArmyId Army; // 44
 
 		static inline constexpr int vtp = 0x766A70;
 
@@ -314,5 +322,8 @@ namespace GAI {
 
 		static inline AIHolder* (__stdcall* GlobalObj)() = reinterpret_cast<AIHolder* (__stdcall*)()>(0x4023D3);
 		CPlayer* GetPlayer(shok::PlayerId i);
+		// searches static and dynamic
+		CEntity* GetEntity(shok::EntityId id);
+		// getentity dynamic 447258
 	};
 }

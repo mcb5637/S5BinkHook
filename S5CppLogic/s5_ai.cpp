@@ -6,3 +6,9 @@ GAI::CPlayer* GAI::AIHolder::GetPlayer(shok::PlayerId i)
 {
 	return aiholder_getplayer(this, i);
 }
+
+inline GAI::CEntity* (__thiscall* const aiholder_getentity)(GAI::AIHolder* th, shok::EntityId i) = reinterpret_cast<GAI::CEntity * (__thiscall*)(GAI::AIHolder*, shok::EntityId)>(0x444D32);
+GAI::CEntity* GAI::AIHolder::GetEntity(shok::EntityId id)
+{
+	return aiholder_getentity(this, id);
+}

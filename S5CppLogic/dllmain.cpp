@@ -522,6 +522,10 @@ struct DebuggerOrig {
 			Hide = reinterpret_cast<void(__stdcall*)()>(GetProcAddress(debugger, "_Hide@0"));
 			Break = reinterpret_cast<void(__stdcall*)(lua_State*)>(GetProcAddress(debugger, "_Break@4"));
 			ShowExecuteLine = reinterpret_cast<void(__stdcall*)()>(GetProcAddress(debugger, "_ShowExecuteLine@0"));
+			auto getsa = reinterpret_cast<bool(__stdcall*)()>(GetProcAddress(debugger, "?DebuggerSupportsSourceArchive@@YG_NXZ"));
+			if (getsa != nullptr) {
+				EScr::CScriptTriggerSystem::FileLoadAddArchive = getsa();
+			}
 		}
 	}
 };

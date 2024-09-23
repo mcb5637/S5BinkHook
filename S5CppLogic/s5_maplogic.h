@@ -440,6 +440,7 @@ namespace EGL {
 	private:
 		shok::EffectId CreateEffectOverride(EGL::CGLEEffectCreator* data);
 		static void __stdcall OnMapscriptLoadedCaller();
+		void __thiscall LoadMapscriptOverride(const char* path);
 	};
 	static_assert(offsetof(CGLEGameLogic, RNG) == 4 * 34);
 	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;

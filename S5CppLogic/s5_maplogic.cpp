@@ -8,6 +8,7 @@
 #include "s5_mem.h"
 #include "s5_defines.h"
 #include "s5_netevents.h"
+#include "s5_scriptsystem.h"
 #include "entityiterator.h"
 #include "hooks.h"
 
@@ -696,12 +697,12 @@ void EGL::CGLEGameLogic::HookCreateEffect()
 
 void __declspec(naked) egl_gamelogic_onmapscriptloaded_asm() {
 	__asm {
-		call[ecx + 4];
-		push[ebp - 0x18];
+		mov ecx, esi;
+		lea eax, [ebp - 0x264];
+		push eax;
+		call EGL::CGLEGameLogic::LoadMapscriptOverride;
 
-		call EGL::CGLEGameLogic::OnMapscriptLoadedCaller;
-
-		push 0x5736FF;
+		push 0x573705;
 		ret;
 	}
 }
@@ -713,13 +714,21 @@ void EGL::CGLEGameLogic::HookOnMapscriptLoaded()
 	if (HookOnMapscriptLoadedHooked)
 		return;
 	HookOnMapscriptLoadedHooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x5736F9), 0x5736FF-0x5736F9 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5736F9), &egl_gamelogic_onmapscriptloaded_asm, reinterpret_cast<void*>(0x5736FF));
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x57368B), 0x573697-0x57368B };
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57368B), &egl_gamelogic_onmapscriptloaded_asm, reinterpret_cast<void*>(0x573697));
+	}
+	EScr::CScriptTriggerSystem::HookLoadFileToLuaState();
 }
 void __stdcall EGL::CGLEGameLogic::OnMapscriptLoadedCaller()
 {
 	if (OnMapscriptLoaded)
 		OnMapscriptLoaded();
+}
+void __thiscall EGL::CGLEGameLogic::LoadMapscriptOverride(const char* path)
+{
+	EScr::CScriptTriggerSystem::LoadFileToLuaState(Scripting->Ingame, path);
+	EGL::CGLEGameLogic::OnMapscriptLoadedCaller();
 }
 
 static inline shok::WeatherState(__thiscall* const weatherdata_getnext)(GGL::CWeatherHandler* th) = reinterpret_cast<shok::WeatherState(__thiscall*)(GGL::CWeatherHandler*)>(0x4B93BD);

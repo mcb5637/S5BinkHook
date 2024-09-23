@@ -30,6 +30,8 @@ namespace BB {
 			RandomAccess = 0x2000,
 			SequentialScan = 0x4000,
 
+			NoThrow = 0x10000,
+
 			// premade
 			DefaultRead = 0x113,
 			DefaultWrite = 0x121,
@@ -230,6 +232,7 @@ namespace BB {
 		// remove data/ before usage, this func does not do that by itself.
 		bool OpenFileAsHandle(const char* path, int& handle, size_t& size);
 		static bool CloseHandle(int handle);
+		std::pair<std::string_view, std::unique_ptr<BB::IStream>> OpenFileStreamWithSource(const char* path, BB::IStream::Flags f);
 
 		static inline BB::CFileSystemMgr** const GlobalObj = reinterpret_cast<BB::CFileSystemMgr**>(0x88F088);
 		static inline const char* (__cdecl* const PathGetExtension)(const char* path) = reinterpret_cast<const char* (__cdecl*)(const char*)>(0x40BAB3);

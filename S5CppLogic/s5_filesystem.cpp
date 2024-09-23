@@ -95,6 +95,28 @@ bool BB::CFileSystemMgr::CloseHandle(int handle)
 	return file_closehandle(handle);
 }
 
+std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::OpenFileStreamWithSource(const char* path, BB::IStream::Flags f)
+{
+	if (Override == nullptr) {
+		BB::IStream::Flags fnoex = f | BB::IStream::Flags::NoThrow;
+		std::string_view p{ path };
+		if (RemoveData && (p.starts_with("Data") || p.starts_with("data")) && (p[4] == '\\' || p[4] == '/')) {
+			p = p.substr(5);
+		}
+		for (auto* fs : LoadOrder) {
+			auto s = fs->OpenFileStreamUnique(p.data(), fnoex);
+			if (s != nullptr) {
+				std::string_view an = "";
+				if (auto* as = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
+					an = as->ArchiveFile.Filename;
+				}
+				return { an, std::move(s) };
+			}
+		}
+	}
+	return { "", OpenFileStreamUnique(path, f) };
+}
+
 bool __stdcall BB::IStream::rettrue()
 {
 	return true;

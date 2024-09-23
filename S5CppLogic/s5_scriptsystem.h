@@ -52,6 +52,10 @@ namespace EScr {
 
 		static void HookFireEvent();
 		static void HookRemoveFuncOverrides();
+		static void HookLoadFileToLuaState();
+		static bool FileLoadAddArchive;
+	private:
+		static void __stdcall LoadFileToLuaStateOverride(lua_State* L, const char* name);
 	};
 	//constexpr int i = offsetof(CScriptTriggerSystem, ActiveTrigger) / 4;
 

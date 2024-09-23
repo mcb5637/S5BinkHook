@@ -3,6 +3,7 @@
 #include <format>
 #include "s5_exception.h"
 #include "s5_events.h"
+#include "s5_filesystem.h"
 #include "hooks.h"
 #include "luaserializer.h"
 
@@ -103,6 +104,29 @@ void EScr::CScriptTriggerSystem::HookRemoveFuncOverrides()
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x59BFD6), 0x59C012 - 0x59BFD6 + 10 };
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x59BFD6), &overrideluafunc_empty); // error
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x59C012), &overrideluafunc_empty); // pcall
+}
+
+void EScr::CScriptTriggerSystem::HookLoadFileToLuaState()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x59C04D), 20 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x59C04D), &LoadFileToLuaStateOverride, reinterpret_cast<void*>(0x59C052));
+}
+bool EScr::CScriptTriggerSystem::FileLoadAddArchive = false;
+void __stdcall EScr::CScriptTriggerSystem::LoadFileToLuaStateOverride(lua_State* L, const char* name)
+{
+	auto [arch, s] = (*BB::CFileSystemMgr::GlobalObj)->OpenFileStreamWithSource(name, BB::IStream::Flags::DefaultRead);
+	std::string fmt{};
+
+	if (!arch.empty() && FileLoadAddArchive) {
+		fmt = std::format("{}@{}", name, arch);
+	}
+
+	std::string data{};
+	data.resize(s->GetSize());
+	s->Read(data.data(), data.size());
+	while (data.size() > 0 && data.back() == '\0')
+		data.pop_back();
+	reinterpret_cast<void(__stdcall* const)(lua_State*, const char*, size_t, const char*)>(0x59BE57)(L, data.data(), data.size(), fmt.empty() ? name : fmt.c_str());
 }
 
 int __stdcall EScr::CLuaFuncRefCommand::GetRefToFunc()

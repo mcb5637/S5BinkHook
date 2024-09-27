@@ -251,3 +251,33 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPos(shok::Entity
 	else
 		return GetNearestPlacementPosBuildOn(ety, p, range);
 }
+
+void __stdcall selectionstate_getwindowsize(int* o) {
+	RECT r;
+	if (GetClientRect(*shok::MainWindowHandle, &r)) {
+		CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+			reinterpret_cast<void*>(0x528DFF),
+		} };
+		o[0] = r.right;
+		o[1] = r.bottom;
+	}
+}
+void __declspec(naked) selectionstate_getwindowsize_asm() {
+	__asm {
+		push 0x300;
+		push 0x400;
+
+		push esp;
+		call selectionstate_getwindowsize;
+
+		push 0x528E09;
+		ret;
+	};
+}
+void GGUI::CSelectionState::HookFixDoubleClickSelection()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x528DFF),
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x528DFF), &selectionstate_getwindowsize_asm, reinterpret_cast<void*>(0x528E09));
+}

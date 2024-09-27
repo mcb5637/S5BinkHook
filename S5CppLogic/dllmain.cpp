@@ -299,9 +299,12 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
 	
-	auto* p = GAI::AIHolder::GlobalObj()->GetPlayer(shok::PlayerId::P3);
-	
-	return 0;
+	ERwTools::ICameraHandle* m = *ERwTools::CRwCameraHandler::GlobalObj;
+	float x, y;
+	m->GetScreenCoord(L.CheckFloat(1), L.CheckFloat(2), L.CheckFloat(3), &x, &y);
+	L.Push(x);
+	L.Push(y);
+	return 2;
 }
 
 int GetOptions(lua::State L) {
@@ -376,6 +379,7 @@ void InitGame() {
 	EGUIX::CTextButtonWidget::HookFixTextRender();
 	if (!Options.DisableMapListFix)
 		Framework::CampagnInfo::HookLoad();
+	GGUI::CSelectionState::HookFixDoubleClickSelection();
 }
 
 double Version = 0.0;

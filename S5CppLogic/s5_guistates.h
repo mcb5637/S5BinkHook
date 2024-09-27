@@ -319,6 +319,8 @@ namespace GGUI {
 		static inline constexpr int TypeDesc = 0x82D03C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD3F98EE7);
 		// 1 extra (empty) func in vtable
+
+		static void HookFixDoubleClickSelection();
 	};
 	class CCutsceneState : public GGUI::CState {
 	public:

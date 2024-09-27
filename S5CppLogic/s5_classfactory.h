@@ -290,8 +290,8 @@ namespace BB {
 	class IClassFactory {
 	public:
 		virtual ~IClassFactory() = default;
+		virtual void __stdcall RemoveCToolRuntimeClass(BB::IObject* creator) = 0;
 	private:
-		virtual void unknown0() = 0;
 		virtual BB::IObject* __stdcall GetInfoObj(shok::ClassId id) = 0;
 	public:
 		virtual CRuntimeClassEnumerator* __stdcall GetEnumerator() = 0;
@@ -368,6 +368,59 @@ namespace BB {
 		static inline BB::CClassFactory** const GlobalObj = reinterpret_cast<BB::CClassFactory**>(0x88F044);
 	};
 	static_assert(sizeof(CClassFactory) == 8 * 4);
+}
+
+namespace EToolsManager {
+	class IClassInfo {
+	public:
+		virtual bool CheckSomething(int) = 0;
+		virtual int* GetSomething() = 0;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x425513F0);
+	};
+
+	// this is some kind of fancy singleton
+	template<BB::HasValidIdentifier T>
+	class CToolRuntimeClass : public BB::IObject, public BB::IObjectCreator, public IClassInfo {
+	public:
+		PADDINGI(1); // looks to be a nullptr
+		std::unique_ptr<T> Singleton; // not a unique_ptr, but it makes stuff easier
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x42543653); // looks like all use the same
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override{
+			return Identifier;
+		}
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override {
+			if (id == IClassInfo::Identifier)
+				return static_cast<IClassInfo*>(this);
+			else if (id == BB::IObjectCreator::Identifier)
+				return static_cast<BB::IObjectCreator*>(this);
+			else
+				return nullptr;
+		}
+
+		virtual shok::ClassId __stdcall GetIdOfCreated() override {
+			return T::Identifier;
+		}
+		virtual const char* __stdcall GetNameOfCreated() override {
+			return typeid(T).name();
+		}
+		virtual BB::IObject* __stdcall Create() override {
+			if (Singleton == nullptr) {
+				Singleton = new T();
+			}
+			// if casttoident to 0x151861E7 == 0, set to 0
+			return Singleton.get();
+		}
+
+		virtual bool CheckSomething(int) override {
+			return 0;
+		}
+		virtual int* GetSomething() override {
+			return nullptr;
+		}
+	};
 }
 
 namespace CppLogic {

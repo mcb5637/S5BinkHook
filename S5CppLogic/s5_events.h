@@ -1278,6 +1278,7 @@ namespace shok {
 		CppL_AffectedExperienceGained = 0x50003, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker
 
 		CppL_LightningStrike_Activate = 0x50004, // EGL::CEventPosition
+		CppL_ResDoodadRefill_Activate = 0x50005, // EGL::CEvent1Entity
 
 		// script events
 		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent

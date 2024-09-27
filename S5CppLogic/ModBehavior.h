@@ -91,7 +91,6 @@ namespace CppLogic::Mod {
 		int TaskCheckHeroPos(EGL::CGLETaskArgs* a);
 		shok::TaskStateExecutionResult StateCheckHeroPos(int t);
 	};
-
 	class HawkOwnerAbility : public GGL::CHeroAbility {
 	public:
 
@@ -132,7 +131,6 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 	};
-
 	class LightningStrikeAbility : public GGL::CHeroAbility {
 	public:
 		
@@ -152,6 +150,45 @@ namespace CppLogic::Mod {
 		static void NetEventLightningStrike(EGL::CNetEventEntityAndPos* ev);
 	private:
 		void EventLightningStrike(EGL::CEventPosition* p);
+	};
+
+	class ResDoodadRefillBehaviorProps : public GGL::CHeroAbilityProps {
+	public:
+		int RefillAmount = 0;
+		shok::EffectTypeId Effect = {};
+		shok::EntityCategory AffectedTypes = {};
+		shok::TaskListId TaskList = {};
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1017);
+		static const BB::SerializationData SerializationData[];
+
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+	};
+	class ResDoodadRefillBehavior : public GGL::CHeroAbility {
+	public:
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1018);
+		static const BB::SerializationData SerializationData[];
+		static inline constexpr shok::AbilityId AbilityId = shok::AbilityId::AbiltyResourceDoodadRefill;
+		static GGL::CStaticHeroAbilityID AbilityStatic;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual ~ResDoodadRefillBehavior() override = default;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual bool IsAbility(shok::AbilityId ability) override;
+
+		static void NetEventRefillResDoodad(EGL::CNetEvent2Entities* ev);
+	private:
+		int TaskGoToResource(EGL::CGLETaskArgs* a);
+		int TaskExtractRes(EGL::CGLETaskArgs* a);
+		void EventActivate(EGL::CEvent1Entity* ev);
 	};
 
 }

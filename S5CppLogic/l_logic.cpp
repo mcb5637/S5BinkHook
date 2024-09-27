@@ -1100,6 +1100,14 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int EnableRefillabeMineNoAutoDestroy(lua::State l) {
+		luaext::EState L{ l };
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory = L.IsNoneOrNil(1) ? shok::EntityCategory::Invalid : L.CheckEnum<shok::EntityCategory>(1);
+		GGL::CResourceDoodad::HookAutoDestroyIfEmpty();
+		GGL::CResourceDoodad::RefillableCategory = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory;
+		return 0;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1576,6 +1584,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<PlayerGetMilitaryAttraction>("PlayerGetMilitaryAttraction"),
 			lua::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
 			lua::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
+			lua::FuncReference::GetRef<EnableRefillabeMineNoAutoDestroy>("EnableRefillabeMineNoAutoDestroy"),
 		};
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {
@@ -1695,6 +1704,11 @@ namespace CppLogic::Logic {
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction) {
 			GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();
 			GGL::CPlayerAttractionHandler::AttractionCannonInProgress = true;
+		}
+
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory != shok::EntityCategory::Invalid) {
+			GGL::CResourceDoodad::HookAutoDestroyIfEmpty();
+			GGL::CResourceDoodad::RefillableCategory = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory;
 		}
 
 		L.Pop(1);

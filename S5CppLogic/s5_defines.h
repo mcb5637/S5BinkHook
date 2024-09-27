@@ -97,6 +97,7 @@ namespace shok {
 	};
 
 	enum class EntityCategory : int {
+		Invalid = 0,
 		CavalryHeavy = 1,
 		CavalryLight = 2,
 		Spear = 3,
@@ -484,6 +485,7 @@ namespace shok {
 		AbilityPlaceKeg = 16,
 		AbilityMotivateWorkers = 17,
 		AbilityLightningStrike,
+		AbiltyResourceDoodadRefill,
 	};
 	enum class SoundId : int {
 		Invalid = 0,

@@ -1372,7 +1372,7 @@ namespace GGL {
 
 		static void HookMineTrigger();
 	private:
-		void __thiscall TaskMineAdd(int* am, GGL::CResourceDoodad* d, BB::CEvent* ev);
+		int __thiscall TaskMineAdd(int* am, GGL::CResourceDoodad* d, BB::CEvent* ev);
 	};
 
 	class CKeepBehavior : public EGL::CGLEBehavior {

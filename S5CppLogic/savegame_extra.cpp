@@ -91,6 +91,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, ScriptTriggerEval),
 	AutoMemberSerialization(SerializedMapdata, CannonInProgressAttraction),
 	AutoMemberSerialization(SerializedMapdata, LightningEffectFix),
+	AutoMemberSerialization(SerializedMapdata, ResDoodad_RefillableCategory),
 	BB::SerializationData::GuardData(),
 };
 
@@ -122,6 +123,7 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	ScriptTriggerEval = false;
 	CannonInProgressAttraction = false;
 	LightningEffectFix = false;
+	ResDoodad_RefillableCategory = {};
 	StringTableTextOverride.clear();
 }
 

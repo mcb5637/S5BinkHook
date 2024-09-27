@@ -630,6 +630,11 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x8118AC;
 		static inline constexpr int vtp_IEntityDisplay = 0x76FE88;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB0778F47);
+
+		static shok::EntityCategory RefillableCategory;
+		static void HookAutoDestroyIfEmpty();
+	private:
+		void __thiscall OnEmptyDestroy();
 	};
 
 	class CBuilding : public EGL::CGLEEntity {

@@ -396,6 +396,27 @@ void GGL::CResourceDoodad::SetCurrentResourceAmount(int am)
 	shok_GGL_CResourceDoodad_setresam(this, am);
 }
 
+void __declspec(naked) resdoodad_onemptydestroyasm() {
+	__asm {
+		call GGL::CResourceDoodad::OnEmptyDestroy;
+
+		push 0x4B8668;
+		ret;
+	};
+}
+shok::EntityCategory GGL::CResourceDoodad::RefillableCategory = {};
+void GGL::CResourceDoodad::HookAutoDestroyIfEmpty()
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8662), 0x10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8662), &resdoodad_onemptydestroyasm, reinterpret_cast<void*>(0x4B8668));
+}
+void __thiscall GGL::CResourceDoodad::OnEmptyDestroy()
+{
+	if (IsEntityInCategory(RefillableCategory))
+		return;
+	Destroy();
+}
+
 shok::EntityId GGL::CBuilding::GetConstructionSite() const
 {
 	return GetFirstAttachedToMe(shok::AttachmentType::CONSTRUCTION_SITE_BUILDING);

@@ -687,6 +687,12 @@ function CppLogic.Logic.PlayerGetSerfAttraction(player) end
 ---@param e boolean
 function CppLogic.Logic.EnableCannonInProgressAttraction(e) end
 
+--- resource doodads wit this category do not get autodestroyed if empty.
+--- set to nil to disable.
+--- status gets saved into savegame.
+---@param e number|string|nil
+function CppLogic.Logic.EnableRefillabeMineNoAutoDestroy(e) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -1615,6 +1621,16 @@ function CppLogic.Entity.Settler.CommandTurnSerfToBattleSerf(id) end
 --- command to turn a battleserf back to a serf.
 --- @param id entity
 function CppLogic.Entity.Settler.CommandTurnBattleSerfToSerf(id) end
+
+--- lighning strike command
+--- @param id entity
+--- @param t Position
+function CppLogic.Entity.Settler.CommandLightningStrike(id, t) end
+
+--- refill mines command
+--- @param id entity
+--- @param tid entity
+function CppLogic.Entity.Settler.CommandRefillResourceDoodad(id, tid) end
 
 --- teleports a settler to a position. does not change id.
 --- @param id entity
@@ -3103,6 +3119,16 @@ function CppLogic.UI.Commands.Entity_Move(id, tar, r) end
 ---@param tar Position
 ---@param ... Position
 function CppLogic.UI.Commands.Entity_Patrol(id, tar, ...) end
+
+---gives a lighning strike command
+---@param id number|string
+---@param tar Position
+function CppLogic.UI.Commands.LightningStrike_Activate(id, tar) end
+
+---gives a refill mine command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.ResDoodadRefill_Activate(id, tar, ...) end
 
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed/reloaded on leaving the map.

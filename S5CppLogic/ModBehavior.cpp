@@ -15,6 +15,8 @@ void CppLogic::Mod::RegisterClasses()
 	f->AddClassToFactory<HawkOwnerAbility>();
     f->AddClassToFactory<LightningStrikeAbilityProps>();
     f->AddClassToFactory<LightningStrikeAbility>();
+	f->AddClassToFactory<ResDoodadRefillBehaviorProps>();
+	f->AddClassToFactory<ResDoodadRefillBehavior>();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
@@ -435,4 +437,121 @@ void CppLogic::Mod::LightningStrikeAbility::NetEventLightningStrike(EGL::CNetEve
     auto* e = EGL::CGLEEntity::GetEntityByID(ev->EntityID);
     EGL::CEventPosition ev2{ shok::EventIDs::CppL_LightningStrike_Activate, {ev->X, ev->Y} };
     e->FireEvent(&ev2);
+}
+
+CreateSerializationListFor(CppLogic::Mod::ResDoodadRefillBehaviorProps, AffectedTypes);
+const BB::SerializationData CppLogic::Mod::ResDoodadRefillBehaviorProps::SerializationData[]{
+	BB::SerializationData::AutoBaseClass<ResDoodadRefillBehaviorProps, GGL::CHeroAbilityProps>(),
+	AutoMemberSerialization(ResDoodadRefillBehaviorProps, RefillAmount),
+	AutoMemberSerialization(ResDoodadRefillBehaviorProps, Effect),
+	AutoMemberSerialization(ResDoodadRefillBehaviorProps, AffectedTypes),
+	AutoMemberSerialization(ResDoodadRefillBehaviorProps, TaskList),
+	BB::SerializationData::GuardData(),
+};
+
+shok::ClassId __stdcall CppLogic::Mod::ResDoodadRefillBehaviorProps::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* CppLogic::Mod::ResDoodadRefillBehaviorProps::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void CppLogic::Mod::ResDoodadRefillBehaviorProps::operator delete(void* p) {
+	shok::Free(p);
+}
+
+const BB::SerializationData CppLogic::Mod::ResDoodadRefillBehavior::SerializationData[]{
+	BB::SerializationData::AutoBaseClass<ResDoodadRefillBehavior, GGL::CHeroAbility>(),
+	BB::SerializationData::GuardData(),
+};
+
+GGL::CStaticHeroAbilityID CppLogic::Mod::ResDoodadRefillBehavior::AbilityStatic = GGL::CStaticHeroAbilityID::Create<ResDoodadRefillBehavior::AbilityId>();
+
+shok::ClassId __stdcall CppLogic::Mod::ResDoodadRefillBehavior::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* CppLogic::Mod::ResDoodadRefillBehavior::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void CppLogic::Mod::ResDoodadRefillBehavior::operator delete(void* p) {
+	shok::Free(p);
+}
+
+void CppLogic::Mod::ResDoodadRefillBehavior::AddHandlers(shok::EntityId id)
+{
+	GGL::CHeroAbility::AddHandlers(id);
+	auto* e = EGL::CGLEEntity::GetEntityByID(id);
+	e->CreateTaskHandler<shok::Task::TASK_GO_TO_RESOURCE>(this, &ResDoodadRefillBehavior::TaskGoToResource);
+	e->CreateTaskHandler<shok::Task::TASK_EXTRACT_RESOURCE>(this, &ResDoodadRefillBehavior::TaskExtractRes);
+	e->CreateEventHandler<shok::EventIDs::CppL_ResDoodadRefill_Activate>(this, &ResDoodadRefillBehavior::EventActivate);
+}
+
+bool CppLogic::Mod::ResDoodadRefillBehavior::IsAbility(shok::AbilityId ability)
+{
+	return ability == AbilityId;
+}
+
+int CppLogic::Mod::ResDoodadRefillBehavior::TaskGoToResource(EGL::CGLETaskArgs* a)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto eid = e->GetFirstAttachedEntity(shok::AttachmentType::SERF_RESOURCE);
+	EGL::CEvent1Entity ev{ shok::EventIDs::Settler_MoveToBuildingApproachPos, eid };
+	e->FireEvent(&ev);
+	return 0;
+}
+
+int CppLogic::Mod::ResDoodadRefillBehavior::TaskExtractRes(EGL::CGLETaskArgs* a)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SERF_RESOURCE));
+	auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
+	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps);
+	if (auto* rese = BB::IdentifierCast<GGL::CResourceDoodad>(res)) {
+		rese->SetCurrentResourceAmount(std::min(rese->ResourceAmount + pr->RefillAmount, rese->ResourceAmountAdd));
+	}
+	if (pr->Effect != shok::EffectTypeId::Invalid) {
+		EGL::CGLEEffectCreator c{};
+		c.EffectType = pr->Effect;
+		c.PlayerID = e->PlayerId;
+		c.StartPos = t->Position;
+		(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&c);
+	}
+	return 0;
+}
+
+void CppLogic::Mod::ResDoodadRefillBehavior::EventActivate(EGL::CEvent1Entity* ev)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* t = EGL::CGLEEntity::GetEntityByID(ev->EntityID);
+	if (t == nullptr || EGL::CGLEEntity::EntityIDIsDead(ev->EntityID))
+		return;
+	if (t->PlayerId != e->PlayerId)
+		return;
+	auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
+	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps);
+	if (!res->IsEntityInCategory(pr->AffectedTypes))
+		return;
+	if (!CheckAndResetCooldown())
+		return;
+	while (true) {
+		auto id = e->GetFirstAttachedEntity(shok::AttachmentType::SERF_RESOURCE);
+		if (id == shok::EntityId::Invalid)
+			break;
+		e->DetachObservedEntity(shok::AttachmentType::SERF_RESOURCE, id, false);
+	}
+	e->AttachEntity(shok::AttachmentType::SERF_RESOURCE, ev->EntityID, shok::EventIDs::Leader_OnAttackCommandTargetDetach, shok::EventIDs::NoDetachEvent);
+	e->SetTaskList(pr->TaskList);
+	e->GetBehaviorDynamic<GGL::CBattleBehavior>()->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
+}
+
+void CppLogic::Mod::ResDoodadRefillBehavior::NetEventRefillResDoodad(EGL::CNetEvent2Entities* ev)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(ev->EntityID1);
+	EGL::CEvent1Entity ev2{ shok::EventIDs::CppL_ResDoodadRefill_Activate, ev->EntityID2 };
+	e->FireEvent(&ev2);
 }

@@ -33,6 +33,7 @@ namespace CppLogic::SavegameExtra {
 		bool ScriptTriggerEval = false;
 		bool CannonInProgressAttraction = false;
 		bool LightningEffectFix = false;
+		shok::EntityCategory ResDoodad_RefillableCategory = {};
 
 		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;
 

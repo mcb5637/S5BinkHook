@@ -1434,6 +1434,7 @@ namespace CppLogic::UI {
 	int InitNetHandlers(lua::State L) {
 		auto* gl = *GGL::CGLGameLogic::GlobalObj;
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_LightningStrike_Activate>(Mod::LightningStrikeAbility::NetEventLightningStrike);
+		gl->CreateNetEventHandler<shok::NetEventIds::CppL_ResDoodadRefill_Activate>(Mod::ResDoodadRefillBehavior::NetEventRefillResDoodad);
 		return 0;
 	}
 
@@ -2034,6 +2035,8 @@ namespace CppLogic::UI {
 			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Shuriken_Activate"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_LightningStrike_Activate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>>>("LightningStrike_Activate"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_ResDoodadRefill_Activate,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckBuilding, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbiltyResourceDoodadRefill>>>("ResDoodadRefill_Activate"),
 		lua::FuncReference::GetRef<CommandMove>("Entity_Move"),
 		lua::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
 	};

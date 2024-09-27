@@ -1565,17 +1565,18 @@ GGL::CResourceDoodad* GGL::CMineBehavior::GetResDoodad()
 	return minebeh_getresdoodad(this);
 }
 
-void __thiscall GGL::CMineBehavior::TaskMineAdd(int* am, GGL::CResourceDoodad* d, BB::CEvent* ev)
+int __thiscall GGL::CMineBehavior::TaskMineAdd(int* am, GGL::CResourceDoodad* d, BB::CEvent* ev)
 {
 	if (d->ResourceAmount < *am)
 		*am = d->ResourceAmount;
 	auto* ev2 = BB::IdentifierCast<EGL::CEvent1Entity>(ev);
-	if (GGL::CWorkerBehavior::ResourceTriggers && ev2) {
+	if (GGL::CWorkerBehavior::ResourceTriggers && ev2 && d->ResourceAmount > 0) {
 		GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceMined, shok::ResourceType::None, d->ResourceType, static_cast<float>(*am), ev2->EntityID, 0.0f};
 		EGL::CGLEEntity::GetEntityByID(ev2->EntityID)->FireEvent(&ev3);
 		EGL::CGLEEntity::GetEntityByID(EntityId)->FireEvent(&ev3);
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
 	}
+	return d->ResourceAmount;
 }
 void __declspec(naked) minebeh_taskmineaddasm() {
 	__asm {
@@ -1587,10 +1588,16 @@ void __declspec(naked) minebeh_taskmineaddasm() {
 		push eax;
 		mov ecx, esi;
 		call GGL::CMineBehavior::TaskMineAdd;
+		cmp eax, 0;
+		je skip;
 
 		mov ecx, [ebp - 0x14];
 
 		push 0x4E6966;
+		ret;
+
+	skip:
+		push 0x4E6B24;
 		ret;
 	};
 }

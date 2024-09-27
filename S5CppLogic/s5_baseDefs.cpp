@@ -63,6 +63,11 @@ shok::Position shok::Position::Normalize() const
 	pos_normalize(this, &r);
 	return r;
 }
+shok::Position shok::Position::ClampToWorld(float border) const
+{
+	float size = static_cast<float>(*reinterpret_cast<int*>(0x898B74) * 100 - 100) - border;
+	return { std::clamp(X, border, size), std::clamp(Y, border, size) };
+}
 
 shok::Position shok::Position::operator+(const shok::Position& other) const
 {

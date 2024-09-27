@@ -33,6 +33,7 @@ namespace shok {
 		// requires rad
 		Position RotateAround(float r, const Position& center) const;
 		Position Normalize() const;
+		Position ClampToWorld(float border = 0.0f) const;
 
 		Position operator+(const Position& other) const;
 		Position& operator+=(const Position& other);

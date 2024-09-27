@@ -175,7 +175,7 @@ shok::Position CppLogic::Mod::HawkCircleBehavior::GetNextCirclePosition(const sh
 	float a = center.GetAngleBetween(e->Position);
 	float range = static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance;
 	a -= 10;
-	return center + shok::Position{ range,0 }.Rotate(CppLogic::DegreesToRadians(a));
+	return (center + shok::Position{ range,0 }.Rotate(CppLogic::DegreesToRadians(a))).ClampToWorld();
 }
 
 void CppLogic::Mod::HawkCircleBehavior::EventOnHeroDetach(BB::CEvent* e)
@@ -186,7 +186,7 @@ void CppLogic::Mod::HawkCircleBehavior::EventOnHeroDetach(BB::CEvent* e)
 
 void CppLogic::Mod::HawkCircleBehavior::EventSendHawk(EGL::CEventPosition* e)
 {
-	ExploreTarget = e->Position;
+	ExploreTarget = e->Position.ClampToWorld(static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance);
 	EGL::CGLEEntity::GetEntityByID(EntityId)->SetTaskList(static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->ExploreTaskList);
 }
 
@@ -219,7 +219,8 @@ shok::TaskStateExecutionResult CppLogic::Mod::HawkCircleBehavior::StateExplore(i
 		return shok::TaskStateExecutionResult::Finished;
 	}
 	float r = hero->GetEntityType()->GetBehaviorProps<GGL::CHeroHawkBehaviorProps>()->HawkMaxRange;
-	if (hero->Health <= 0 || !en->Position.IsInRange(hero->Position, r)) {
+	if (hero->Health <= 0 || !en->Position.IsInRange(hero->Position, r)
+		|| ExploreTarget.IsInRange(hero->Position, static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance)) {
 		en->SetTaskList(static_cast<GGL::CGLAnimalProps*>(en->GetEntityType()->LogicProps)->DefaultTaskList);
 		return shok::TaskStateExecutionResult::Finished;
 	}
@@ -434,6 +435,8 @@ void CppLogic::Mod::LightningStrikeAbility::EventLightningStrike(EGL::CEventPosi
 
 void CppLogic::Mod::LightningStrikeAbility::NetEventLightningStrike(EGL::CNetEventEntityAndPos* ev)
 {
+	if (EGL::CGLEEntity::EntityIDIsDead(ev->EntityID))
+		return;
     auto* e = EGL::CGLEEntity::GetEntityByID(ev->EntityID);
     EGL::CEventPosition ev2{ shok::EventIDs::CppL_LightningStrike_Activate, {ev->X, ev->Y} };
     e->FireEvent(&ev2);
@@ -509,7 +512,11 @@ int CppLogic::Mod::ResDoodadRefillBehavior::TaskExtractRes(EGL::CGLETaskArgs* a)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SERF_RESOURCE));
+	if (t == nullptr)
+		return 0;
 	auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
+	if (res == nullptr)
+		return 0;
 	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps);
 	if (auto* rese = BB::IdentifierCast<GGL::CResourceDoodad>(res)) {
 		rese->SetCurrentResourceAmount(std::min(rese->ResourceAmount + pr->RefillAmount, rese->ResourceAmountAdd));
@@ -533,6 +540,8 @@ void CppLogic::Mod::ResDoodadRefillBehavior::EventActivate(EGL::CEvent1Entity* e
 	if (t->PlayerId != e->PlayerId)
 		return;
 	auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
+	if (res == nullptr)
+		return;
 	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps);
 	if (!res->IsEntityInCategory(pr->AffectedTypes))
 		return;
@@ -544,13 +553,15 @@ void CppLogic::Mod::ResDoodadRefillBehavior::EventActivate(EGL::CEvent1Entity* e
 			break;
 		e->DetachObservedEntity(shok::AttachmentType::SERF_RESOURCE, id, false);
 	}
-	e->AttachEntity(shok::AttachmentType::SERF_RESOURCE, ev->EntityID, shok::EventIDs::Leader_OnAttackCommandTargetDetach, shok::EventIDs::NoDetachEvent);
+	e->AttachEntity(shok::AttachmentType::SERF_RESOURCE, ev->EntityID, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
 	e->SetTaskList(pr->TaskList);
 	e->GetBehaviorDynamic<GGL::CBattleBehavior>()->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
 }
 
 void CppLogic::Mod::ResDoodadRefillBehavior::NetEventRefillResDoodad(EGL::CNetEvent2Entities* ev)
 {
+	if (EGL::CGLEEntity::EntityIDIsDead(ev->EntityID1))
+		return;
 	auto* e = EGL::CGLEEntity::GetEntityByID(ev->EntityID1);
 	EGL::CEvent1Entity ev2{ shok::EventIDs::CppL_ResDoodadRefill_Activate, ev->EntityID2 };
 	e->FireEvent(&ev2);

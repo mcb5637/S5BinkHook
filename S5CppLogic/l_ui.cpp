@@ -979,8 +979,10 @@ namespace CppLogic::UI {
 	int SetPlaceBuildingRotation(lua::State L) {
 		//GGUI::CPlaceBuildingState::HookPlacementRotation();
 		auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
-		if (s)
+		if (s) {
 			s->SetRotation(L.CheckFloat(1));
+			s->OnRotationChanged();
+		}
 		return 0;
 	}
 	int GetPlaceBuildingRotation(lua::State L) {
@@ -1564,8 +1566,7 @@ namespace CppLogic::UI {
 						while (CurrentStep < 0)
 							CurrentStep += NumSteps;
 					}
-					MouseX = -1;
-					MouseY = -1;
+					PosToBuild = {};
 					UpdateModel(e->X, e->Y);
 					e->EventHandeled = true;
 					return true;
@@ -1635,12 +1636,10 @@ namespace CppLogic::UI {
 			auto ety = m->GUIInterface->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 			FillPosData(d, x, y);
 			d->TargetPos.FloorToBuildingPlacement();
-			if (static_cast<int>(d->TargetPos.X) == MouseX && static_cast<int>(d->TargetPos.Y) == MouseY) {
+			if (static_cast<int>(d->TargetPos.X) == PosToBuild.X && static_cast<int>(d->TargetPos.Y) == PosToBuild.X) {
 				d->TargetPos = PosToBuild;
 			}
 			else {
-				MouseX = static_cast<int>(d->TargetPos.X);
-				MouseY = static_cast<int>(d->TargetPos.Y);
 				shok::PositionRot p = GetNearestPlacementPos(ety, shok::PositionRot{ d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation()) }, (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
 				if (p.X >= 0) {
 					d->TargetPos.X = p.X;
@@ -1656,6 +1655,8 @@ namespace CppLogic::UI {
 
 	void CppLogic::UI::GUIState_PlaceBuildingEx::OnMouseMove(int x, int y)
 	{
+		MouseX = x;
+		MouseY = y;
 		UpdateModel(x, y);
 	}
 
@@ -1670,9 +1671,9 @@ namespace CppLogic::UI {
 		if (UpgradeCategory == shok::UpgradeCategoryId::Invalid)
 			return;
 		SetModelToRender();
-		C3DViewHandler->ClumpRenerable->Model->GetFrame()->Rotate(GetRotation(), RWE::RwOpCombineType::Replace);
 		TargetData d{};
 		GetTargetData(&d, x, y);
+		C3DViewHandler->ClumpRenerable->Model->GetFrame()->Rotate(GetRotation(), RWE::RwOpCombineType::Replace);
 		C3DViewHandler->ClumpRenerable->SetBuildingRedColor(!CheckCommandValid(&d, 0));
 		C3DViewHandler->ClumpRenerable->SetPosition(d.TargetPos, d.TargetPosWithZ.r);
 	}
@@ -1685,6 +1686,12 @@ namespace CppLogic::UI {
 	void CppLogic::UI::GUIState_PlaceBuildingEx::SetRotation(float deg)
 	{
 		CurrentStep = static_cast<int>(std::roundf(deg / StepToDegrees));
+	}
+
+	void CppLogic::UI::GUIState_PlaceBuildingEx::OnRotationChanged()
+	{
+		PosToBuild = {};
+		UpdateModel(MouseX, MouseY);
 	}
 
 	void Cleanup(lua::State L) {

@@ -62,6 +62,7 @@ namespace CppLogic::UI {
 		void UpdateModel(int x, int y);
 		float GetRotation();
 		void SetRotation(float deg);
+		void OnRotationChanged();
 
 		static constexpr const char* Name = "PlaceBuildingStateEx";
 		static constexpr int Id = 29;

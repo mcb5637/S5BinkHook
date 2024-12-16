@@ -107,6 +107,10 @@ namespace EGL {
 		static EGL::CFlyingEffect* CurrentHittingEffect;
 	};
 	//constexpr int i = offsetof(CFlyingEffect, FlyingEffectSlot.Speed) / 4;
+
+	struct SSlotArgsStartTurn {
+		int StartTurn;
+	};
 }
 
 namespace GGL {
@@ -168,6 +172,22 @@ namespace GGL {
 	};
 	static_assert(sizeof(CEffectLightning) == 30 * 4);
 	static_assert(offsetof(CEffectLightning, HasSpawnedFire) == 28*4);
+
+	class CEffectRain : public EGL::CEffect {
+	public:
+		class CSlotStartTurn : public EGL::TSlot<EGL::SSlotArgsStartTurn, 268588221> {
+			int StartTurn;
+
+			virtual void __stdcall FillSlot(EGL::SSlotArgsStartTurn* data) override;
+		};
+
+		CSlotStartTurn StartTurnSlot;
+
+		// ctor 51711F
+
+		static inline constexpr int vtp = 0x779C74;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x817186ED);
+	};
 }
 
 namespace EGL {

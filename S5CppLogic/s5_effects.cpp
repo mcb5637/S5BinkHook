@@ -257,6 +257,12 @@ void EGL::CFlyingEffect::HookOnHit()
 	*reinterpret_cast<void**>(0x7776B4) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CCannonBallEffect::OnHitHooked, 0);
 }
 
+static inline void(__stdcall* const rain_slot_fill)(GGL::CEffectRain::CSlotStartTurn* th, EGL::SSlotArgsStartTurn* d) = reinterpret_cast<void(__stdcall*)(GGL::CEffectRain::CSlotStartTurn*, EGL::SSlotArgsStartTurn*)>(0x5170E0);
+void __stdcall GGL::CEffectRain::CSlotStartTurn::FillSlot(EGL::SSlotArgsStartTurn* data)
+{
+	return rain_slot_fill(this, data);
+}
+
 RWE::RpLight* __cdecl setcolor_nop(RWE::RpLight* l, void* color) {
 	return l;
 }

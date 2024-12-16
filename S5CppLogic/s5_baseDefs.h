@@ -26,6 +26,8 @@ namespace shok {
 		void RoundToBuildingPlacement();
 		float GetDistanceSquaredTo(const Position& p) const;
 		bool IsInRange(const Position& p, float range) const;
+		// returns rad
+		float GetAngle() const;
 		// returns deg, this is a hok specific angle, useful for a look at by settlers
 		float GetAngleBetween(const Position& p) const;
 		// requires rad

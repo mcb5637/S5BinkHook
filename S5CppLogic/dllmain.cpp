@@ -299,12 +299,7 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
 	
-	ERwTools::ICameraHandle* m = *ERwTools::CRwCameraHandler::GlobalObj;
-	float x, y;
-	m->GetScreenCoord(L.CheckFloat(1), L.CheckFloat(2), L.CheckFloat(3), &x, &y);
-	L.Push(x);
-	L.Push(y);
-	return 2;
+	return 0;
 }
 
 int GetOptions(lua::State L) {

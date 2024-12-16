@@ -26,23 +26,16 @@ bool shok::Position::IsInRange(const shok::Position& p, float range) const
 	return GetDistanceSquaredTo(p) <= (range * range);
 }
 
+static inline float(__thiscall* const pos_getangle)(const shok::Position* p) = reinterpret_cast<float(__thiscall*)(const shok::Position*)>(0x57D8F1);
+float shok::Position::GetAngle() const
+{
+	return pos_getangle(this);
+}
+
+static inline float(__thiscall* const pos_getanglebetwe)(const shok::Position* p, const shok::Position* p2) = reinterpret_cast<float(__thiscall*)(const shok::Position*, const shok::Position*)>(0x57D98C);
 float shok::Position::GetAngleBetween(const shok::Position& p) const
 {
-	float dx = X - p.X;
-	float dy = Y - p.Y;
-	if (dx == 0 && dy == 0)
-		return 0;
-	float a = std::asinf(std::fabsf(dx) / (std::sqrtf(dx * dx + dy * dy)));
-	a = CppLogic::RadiansToDegrees<float>(a);
-	if (dx >= 0 && dy > 0)
-		a = 270 - a;
-	else if (dx < 0 && dy > 0)
-		a = 270 + a;
-	else if (dx < 0 && dy <= 0)
-		a = 90 - a;
-	else if (dx >= 0 && dy <= 0)
-		a = 90 + a;
-	return a;
+	return CppLogic::RadiansToDegrees(pos_getanglebetwe(this, &p));
 }
 shok::Position shok::Position::Rotate(float r) const
 {

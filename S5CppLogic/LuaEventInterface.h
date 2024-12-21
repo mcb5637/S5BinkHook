@@ -50,7 +50,7 @@ namespace CppLogic::LuaEventInterface {
 	template<>
 	inline EGL::CEvent1Entity CheckEvent<EGL::CEvent1Entity>(luaext::EState L, shok::EventIDs id, int off) {
 		auto e = L.CheckEntity(off + 1);
-		if (e->IsDead())
+		if (id != shok::EventIDs::CppL_Resurrect_Activate && e->IsDead())
 			throw lua::LuaException{ "target is dead" };
 		return { id, e->EntityId };
 	}
@@ -84,7 +84,7 @@ namespace CppLogic::LuaEventInterface {
 		auto t = L.CheckEntity(off + 2);
 		if (e->IsDead())
 			throw lua::LuaException{ "entity is dead" };
-		if (t->IsDead())
+		if (id != shok::NetEventIds::CppL_Resurrect_Activate && t->IsDead())
 			throw lua::LuaException{ "target is dead" };
 		return { id, e->EntityId, t->EntityId };
 	}
@@ -173,6 +173,11 @@ namespace CppLogic::LuaEventInterface {
 			throw lua::LuaException{ "no player status???" };
 		if (ps->GetDiploStateTo(oth->PlayerId) != D)
 			throw lua::LuaException{ std::format("target is not {}", magic_enum::enum_name(D)) };
+	}
+	inline void CheckEntitySamePlayer(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		if (e->PlayerId != oth->PlayerId)
+			throw lua::LuaException{ "target is not of same player" };
 	}
 
 	inline void CheckConvertible(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {

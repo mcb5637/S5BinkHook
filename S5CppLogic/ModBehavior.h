@@ -191,4 +191,94 @@ namespace CppLogic::Mod {
 		void EventActivate(EGL::CEvent1Entity* ev);
 	};
 
+
+	class ShieldCoverAbilityProps : public GGL::CHeroAbilityProps {
+	public:
+		float Range = 0;
+		int Duration = 0;
+		shok::TaskListId TaskList = shok::TaskListId::Invalid;
+
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1019);
+		static BB::SerializationData SerializationData[];
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	};
+	class ShieldCoverAbility : public GGL::CHeroAbility {
+	public:
+		int DurationLeft = 0;
+
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x101A);
+		static BB::SerializationData SerializationData[];
+		static inline constexpr shok::AbilityId AbilityId = shok::AbilityId::AbilityShieldCover;
+		static GGL::CStaticHeroAbilityID AbilityStatic;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual bool IsAbility(shok::AbilityId ability) override;
+
+		void Activate();
+		void ClearProjectiles();
+		static void NetEventShieldCover(EGL::CNetEventEntityID* ev);
+	private:
+		int TaskShieldCover(EGL::CGLETaskArgs* a);
+		shok::TaskStateExecutionResult StateShieldCover(int);
+		void EventTick(BB::CEvent* ev);
+		void EventActivate(BB::CEvent* ev);
+	};
+
+	class ResurrectAbilityProps : public GGL::CHeroAbilityProps {
+	public:
+		float Range = 0;
+		int ProgressPerTick = 0;
+		shok::TaskListId TaskList = shok::TaskListId::Invalid;
+		int RechargeAbilitiesBy = 0;
+
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x101B);
+		static BB::SerializationData SerializationData[];
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	};
+	class ResurrectAbility : public GGL::CHeroAbility {
+	public:
+		shok::EntityId Target = {};
+		bool SelfCasting = false;
+
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x101C);
+		static BB::SerializationData SerializationData[];
+		static inline constexpr shok::AbilityId AbilityId = shok::AbilityId::AbilityResurrect;
+		static GGL::CStaticHeroAbilityID AbilityStatic;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual bool IsAbility(shok::AbilityId ability) override;
+
+		static void NetEventResurrect(EGL::CNetEvent2Entities* ev);
+	private:
+		void EventActivate(EGL::CEvent1Entity* ev);
+		void EventDie(BB::CEvent* ev);
+		void EventTick(BB::CEvent* ev);
+		int TaskResurrect(EGL::CGLETaskArgs* a);
+		int TaskTurnTo(EGL::CGLETaskArgs* a);
+		shok::TaskStateExecutionResult StateResurrect(int time);
+		shok::TaskStateExecutionResult StateSelfResurrect(int time);
+		void ChargeAbilitiesFor(EGL::CGLEEntity* e);
+	};
+
+
 }

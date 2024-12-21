@@ -3,6 +3,7 @@
 #include "s5_idmanager.h"
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
+#include <magic_enum.hpp>
 
 struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
     int(__thiscall* ExecuteTask)(EGL::TaskHandler* th, EGL::CGLETaskArgs* args);
@@ -296,26 +297,27 @@ void EGL::CGLETaskListMgr::LoadTaskList(shok::TaskListId id)
 }
 
 
-const char* TaskLuaFunc = "TASK_LUA_FUNC";
-const char* TaskWaitForAnimNonCancel = "TASK_WAIT_FOR_ANIM_NON_CANCELABLE";
-const char* TaskSkipSupplier = "TASK_SKIP_SUPPLIER_IF_RESEARCHING";
-const char* TaskResetCarriedRes = "TASK_REFINER_RESET_CARRIED_RESOURES";
-const char* TaskRefinerCheck = "TASK_REFINER_CHECK_NEEDS_RESOURCES";
+template<shok::Task Ev, shok::ClassId Id>
+void AddTaskData(auto& v) {
+    v.Vector.push_back(EGL::TaskData{ magic_enum::enum_name<Ev>().data(), Id, Ev});
+}
 void EGL::TaskData::AddExtraTasks()
 {
     auto v = (*EGL::TaskData::GlobalVector)->SaveVector();
-    v.Vector.push_back(EGL::TaskData{ TaskLuaFunc, EGL::CTaskArgsInteger::Identifier, shok::Task::TASK_LUA_FUNC });
-    v.Vector.push_back(EGL::TaskData{ TaskWaitForAnimNonCancel, EGL::CGLETaskArgsThousandths::Identifier, shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE });
-    v.Vector.push_back(EGL::TaskData{ TaskSkipSupplier, EGL::CTaskArgsInteger::Identifier, shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING });
-    v.Vector.push_back(EGL::TaskData{ TaskResetCarriedRes, EGL::CTaskArgsInteger::Identifier, shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES });
-    v.Vector.push_back(EGL::TaskData{ TaskRefinerCheck, EGL::CTaskArgsInteger::Identifier, shok::Task::TASK_REFINER_CHECK_NEEDS_RESOURCES });
+    AddTaskData<shok::Task::TASK_LUA_FUNC, EGL::CTaskArgsInteger::Identifier>(v);
+    AddTaskData<shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, EGL::CGLETaskArgsThousandths::Identifier>(v);
+    AddTaskData<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING, EGL::CTaskArgsInteger::Identifier>(v);
+    AddTaskData<shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES, EGL::CTaskArgsInteger::Identifier>(v);
+    AddTaskData<shok::Task::TASK_REFINER_CHECK_NEEDS_RESOURCES, EGL::CTaskArgsInteger::Identifier>(v);
+    AddTaskData<shok::Task::TASK_SHIELD_COVER, EGL::CGLETaskArgs::Identifier>(v);
+    AddTaskData<shok::Task::TASK_RESURRECT, EGL::CGLETaskArgs::Identifier>(v);
+    AddTaskData<shok::Task::TASK_TURN_TO_RESURRECT, EGL::CGLETaskArgs::Identifier>(v);
 }
 void EGL::TaskData::RemoveExtraTasks()
 {
     auto v = (*EGL::TaskData::GlobalVector)->SaveVector();
     v.Vector.erase(std::remove_if(v.Vector.begin(), v.Vector.end(), [](EGL::TaskData& a) {
-        return a.TaskName == TaskLuaFunc || a.TaskName == TaskWaitForAnimNonCancel || a.TaskName == TaskSkipSupplier || a.TaskName == TaskResetCarriedRes
-            || a.TaskName == TaskRefinerCheck;
+        return a.ID >= shok::Task::TASK_LUA_FUNC;
         }), v.Vector.end());
 }
 

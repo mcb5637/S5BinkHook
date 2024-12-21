@@ -486,6 +486,8 @@ namespace shok {
 		AbilityMotivateWorkers = 17,
 		AbilityLightningStrike,
 		AbiltyResourceDoodadRefill,
+		AbilityShieldCover,
+		AbilityResurrect,
 	};
 	enum class SoundId : int {
 		Invalid = 0,

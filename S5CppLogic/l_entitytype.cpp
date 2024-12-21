@@ -583,6 +583,18 @@ namespace CppLogic::EntityType {
 		return 0;
 	}
 
+	int GetAbilityDataResurrect(lua::State ls) {
+		luaext::EState L{ ls };
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		auto* p = t->GetBehaviorProps<CppLogic::Mod::ResurrectAbilityProps>();
+		if (!p)
+			throw lua::LuaException("no resurrect entity at 1");
+		L.Push(p->Range);
+		L.Push(p->ProgressPerTick);
+		L.Push(p->RechargeTimeSeconds);
+		return 3;
+	}
+
 	int ResourceTreeTypeHasData(lua::State ls) {
 		luaext::EState L{ ls };
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
@@ -1011,6 +1023,7 @@ namespace CppLogic::EntityType {
 			lua::FuncReference::GetRef<SetAbilityDataSniper>("SetAbilityDataSniper"),
 			lua::FuncReference::GetRef<GetAbilityDataRangedEffect>("GetAbilityDataRangedEffect"),
 			lua::FuncReference::GetRef<SetAbilityDataRangedEffect>("SetAbilityDataRangedEffect"),
+			lua::FuncReference::GetRef<GetAbilityDataResurrect>("GetAbilityDataResurrect"),
 			lua::FuncReference::GetRef<GetFearless>("GetFearless"),
 			lua::FuncReference::GetRef<SetFearless>("SetFearless"),
 			lua::FuncReference::GetRef<SettlerGetCost>("GetCost"),

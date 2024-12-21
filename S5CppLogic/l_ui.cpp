@@ -1437,6 +1437,8 @@ namespace CppLogic::UI {
 		auto* gl = *GGL::CGLGameLogic::GlobalObj;
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_LightningStrike_Activate>(Mod::LightningStrikeAbility::NetEventLightningStrike);
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_ResDoodadRefill_Activate>(Mod::ResDoodadRefillBehavior::NetEventRefillResDoodad);
+		gl->CreateNetEventHandler<shok::NetEventIds::CppL_ShieldCover_Activate>(Mod::ShieldCoverAbility::NetEventShieldCover);
+		gl->CreateNetEventHandler<shok::NetEventIds::CppL_Resurrect_Activate>(Mod::ResurrectAbility::NetEventResurrect);
 		return 0;
 	}
 
@@ -1960,6 +1962,13 @@ namespace CppLogic::UI {
 		if (!t->GetBehavior<GGL::CKegBehavior>())
 			throw lua::LuaException("target is no keg");
 	}
+	void CheckResurrectEvent(EGL::CNetEvent2Entities& ev) {
+		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		if (t->GetBehavior<GGL::CHeroBehavior>() == nullptr)
+			throw lua::LuaException("not a hero");
+		if (!t->IsDead())
+			throw lua::LuaException("is alive");
+	}
 	int CommandMove(lua::State l) {
 		luaext::EState L{ l };
 		auto* s = L.CheckSettler(1);
@@ -2043,7 +2052,13 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_LightningStrike_Activate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>>>("LightningStrike_Activate"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_ResDoodadRefill_Activate,
-			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckBuilding, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbiltyResourceDoodadRefill>>>("ResDoodadRefill_Activate"),
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckBuilding,
+			LuaEventInterface::CheckActorAbility<shok::AbilityId::AbiltyResourceDoodadRefill>>>("ResDoodadRefill_Activate"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityID, shok::NetEventIds::CppL_ShieldCover_Activate,
+			LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShieldCover>>>("ShieldCover_Activate"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_Resurrect_Activate,
+			LuaEventInterface::CheckEntityOfLocalPlayer, CheckResurrectEvent,
+			LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityResurrect>>>("Resurrect_Activate"),
 		lua::FuncReference::GetRef<CommandMove>("Entity_Move"),
 		lua::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
 	};

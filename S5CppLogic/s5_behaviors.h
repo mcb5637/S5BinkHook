@@ -1091,6 +1091,9 @@ namespace GGL {
 		static inline constexpr int vtp = 0x77677C;
 		static inline constexpr int TypeDesc = 0x820070;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0FCB04BAD);
+
+		void Resurrect();
+		bool AdvanceProgress(int d);
 	};
 
 	class CResourceRefinerBehavior : public EGL::CGLEBehavior {

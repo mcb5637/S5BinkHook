@@ -1018,7 +1018,7 @@ EGL::CGLEEntity* EGL::CGLEEntity::AdvChangePlayer(shok::PlayerId player)
 	EGL::CGLEEntity* ne = EGL::CGLEEntity::GetEntityByID(nid);
 
 	if (GGL::CLeaderBehavior* lb = GetBehaviorDynamic<GGL::CLeaderBehavior>()) {
-		std::vector<shok::EntityId> sol {};
+		std::vector<shok::EntityId> sol{};
 		for (const auto& a : ObservedEntities) {
 			if (a.first == shok::AttachmentType::LEADER_SOLDIER)
 				sol.push_back(a.second.EntityId);
@@ -1119,7 +1119,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 		return;
 	if (!EventIsSettlerOrBuilding() && !dynamic_cast<GGL::CBridgeEntity*>(this))
 		return;
-	if (GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING)!=static_cast<shok::EntityId>(0) || GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE) != static_cast<shok::EntityId>(0))
+	if (GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) != static_cast<shok::EntityId>(0) || GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE) != static_cast<shok::EntityId>(0))
 		return;
 	shok::PlayerId attackerplayer = attacker ? attacker->PlayerId : attackerFallback;
 	if (attacker || EGL::CGLEEntity::HurtEntityCallWithNoAttacker) {
@@ -1316,7 +1316,7 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 
 			curr->AdvancedHurtEntityBy(attacker, static_cast<int>(dmg), pl, uiFeedback, xp, addStat, sourceInfo);
 		}
-	};
+		};
 
 	static constexpr auto acflags = shok::AccessCategoryFlags::AccessCategorySettler
 		| shok::AccessCategoryFlags::AccessCategoryAnimal | shok::AccessCategoryFlags::AccessCategoryBuilding
@@ -1565,7 +1565,7 @@ void __declspec(naked) cancancelstate_check_asm() {
 		ret;
 	};
 }
-std::vector<shok::TaskState> EGL::CGLEEntity::AdditionalCancelableStates{};
+std::vector<shok::TaskState> EGL::CGLEEntity::AdditionalCancelableStates{ shok::TaskState::ShieldCover };
 bool HookCanCancelState_Hooked = false;
 void EGL::CGLEEntity::HookCanCancelState()
 {

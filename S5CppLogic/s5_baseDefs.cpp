@@ -33,9 +33,13 @@ float shok::Position::GetAngle() const
 }
 
 static inline float(__thiscall* const pos_getanglebetwe)(const shok::Position* p, const shok::Position* p2) = reinterpret_cast<float(__thiscall*)(const shok::Position*, const shok::Position*)>(0x57D98C);
+float shok::Position::GetAngleBetweenR(const Position& p) const
+{
+	return pos_getanglebetwe(this, &p);
+}
 float shok::Position::GetAngleBetween(const shok::Position& p) const
 {
-	return CppLogic::RadiansToDegrees(pos_getanglebetwe(this, &p));
+	return CppLogic::RadiansToDegrees(GetAngleBetweenR(p));
 }
 shok::Position shok::Position::Rotate(float r) const
 {

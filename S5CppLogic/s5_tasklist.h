@@ -554,6 +554,10 @@ namespace shok {
         TASK_SKIP_SUPPLIER_IF_RESEARCHING = 1502, //EGL::CTaskArgsInteger (GGL::CWorkerBehavior::HookSupplierSkip)
         TASK_REFINER_RESET_CARRIED_RESOURES = 1503, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
         TASK_REFINER_CHECK_NEEDS_RESOURCES = 1504, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
+
+        TASK_SHIELD_COVER, //EGL::CGLETaskArgs (CppLogic::Mod::ShieldCoverAbility)
+        TASK_RESURRECT, //EGL::CGLETaskArgs (CppLogic::Mod::ResurrectAbility)
+        TASK_TURN_TO_RESURRECT, //EGL::CGLETaskArgs (CppLogic::Mod::ResurrectAbility)
     };
 
     enum class TaskState : int {
@@ -591,9 +595,12 @@ namespace shok {
 
 
         LuaFunc = 500,
-        WaitForAnimNonCancelable = 501,
-        HawkExplore = 502,
-        HawkCheckHero = 503,
+        WaitForAnimNonCancelable,
+        HawkExplore,
+        HawkCheckHero,
+        ShieldCover,
+        Resurrect,
+        SelfResurrect,
     };
 
     extern std::map<TaskState, std::string_view> TaskStateToName;

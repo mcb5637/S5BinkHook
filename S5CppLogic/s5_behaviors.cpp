@@ -1356,6 +1356,35 @@ void GGL::CFormationBehavior::HookGetPosExtI()
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4F89D1), tocall);
 }
 
+void GGL::CHeroBehavior::Resurrect()
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	ResurrectionTimePassed = 0;
+	e->SetHealth(static_cast<int>(e->GetMaxHealth() * (*GGL::CLogicProperties::GlobalObj)->HeroResurrectionHealthFactor));
+	for (auto at : { shok::AttachmentType::ATTACKER_TARGET, shok::AttachmentType::ATTACKER_COMMAND_TARGET }) {
+		while (true) {
+			auto t = e->GetFirstAttachedEntity(at);
+			if (t == shok::EntityId::Invalid)
+				break;
+			e->DetachObservedEntity(at, t, false);
+		}
+	}
+	e->EntityState = static_cast<shok::EntityStaus>(0x10000);
+	BB::CEvent ev{ shok::EventIDs::HeroAbility_StandUp };
+	e->FireEvent(&ev);
+	e->CurrentState = shok::TaskState::Default;
+}
+
+bool GGL::CHeroBehavior::AdvanceProgress(int d)
+{
+	ResurrectionTimePassed += d;
+	if (ResurrectionTimePassed >= (*GGL::CLogicProperties::GlobalObj)->HeroResurrectionTime) {
+		Resurrect();
+		return true;
+	}
+	return false;
+}
+
 static inline GGL::CPositionAtResourceFinder* (__cdecl* const shok_GGL_CPositionAtResourceFinder_greatebyent)(shok::EntityId id) = reinterpret_cast<GGL::CPositionAtResourceFinder * (__cdecl*)(shok::EntityId)>(0x4CB1C1);
 GGL::CPositionAtResourceFinder* GGL::CPositionAtResourceFinder::CreateByEntity(shok::EntityId entityid)
 {

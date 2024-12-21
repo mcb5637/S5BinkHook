@@ -898,6 +898,13 @@ namespace CppLogic::Entity {
 		if (e->GetBehavior<GGL::CThiefBehavior>() == nullptr)
 			throw lua::LuaException("not a thief");
 	}
+	void CheckResurrect(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		if (t->GetBehavior<GGL::CHeroBehavior>() == nullptr)
+			throw lua::LuaException("not a hero");
+		if (!t->IsDead())
+			throw lua::LuaException("is alive");
+	}
 
 	int EnableConversionHook(lua::State L) {
 		GGL::CConvertSettlerAbility::HookConvertEvent();
@@ -1897,6 +1904,11 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_ResDoodadRefill_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbiltyResourceDoodadRefill>, LuaEventInterface::CheckBuilding,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("CommandRefillResourceDoodad"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::CppL_ShieldCoverActivate,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShieldCover>>>("CommandShieldCover"),
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_Resurrect_Activate,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityResurrect>, CheckResurrect,
+				LuaEventInterface::CheckEntitySamePlayer>>("CommandResurrect"),
 			lua::FuncReference::GetRef<EnableConversionHook>("EnableConversionHook"),
 			lua::FuncReference::GetRef<DisableConversionHook>("DisableConversionHook"),
 			lua::FuncReference::GetRef<SettlerCommandMove>("CommandMove"),

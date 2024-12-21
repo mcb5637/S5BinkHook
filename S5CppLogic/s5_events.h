@@ -1272,13 +1272,14 @@ namespace shok {
 		Sound_Stop = 0x22002, // EGL::CEventSoundPositionAndID
 
 		// entity events
-		CppL_OnEntityDestroy = 0x50000, // BB::CEvent deprectated
-		CppL_OnEntityKilled = 0x50001, // GGL::CEventEntityIndex index is attacker player
-		CppL_OnDamageDealt = 0x50002, // GGL::CEventEntityIndex entity is damaged, index is damage
-		CppL_AffectedExperienceGained = 0x50003, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker
-
-		CppL_LightningStrike_Activate = 0x50004, // EGL::CEventPosition
-		CppL_ResDoodadRefill_Activate = 0x50005, // EGL::CEvent1Entity
+		CppL_OnEntityDestroy = 0x51000, // BB::CEvent deprectated
+		CppL_OnEntityKilled = 0x51001, // GGL::CEventEntityIndex index is attacker player
+		CppL_OnDamageDealt = 0x51002, // GGL::CEventEntityIndex entity is damaged, index is damage
+		CppL_AffectedExperienceGained = 0x51003, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker
+		CppL_LightningStrike_Activate = 0x51004, // EGL::CEventPosition
+		CppL_ResDoodadRefill_Activate = 0x51005, // EGL::CEvent1Entity
+		CppL_ShieldCoverActivate = 0x51006, // BB::CEvent
+		CppL_Resurrect_Activate = 0x51007, // EGL::CEvent1Entity
 
 		// script events
 		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent

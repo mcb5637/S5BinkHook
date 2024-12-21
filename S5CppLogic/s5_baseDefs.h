@@ -28,6 +28,8 @@ namespace shok {
 		bool IsInRange(const Position& p, float range) const;
 		// returns rad
 		float GetAngle() const;
+		// returns rad, this is a hok specific angle, useful for a look at by settlers
+		float GetAngleBetweenR(const Position& p) const;
 		// returns deg, this is a hok specific angle, useful for a look at by settlers
 		float GetAngleBetween(const Position& p) const;
 		// requires rad

@@ -450,7 +450,9 @@ namespace shok {
 		Escape = 0x50003, //BB::CEvent
 
 		CppL_LightningStrike_Activate = 0x11100, //EGL::CNetEventEntityAndPos
-		CppL_ResDoodadRefill_Activate = 0x11101, //EGL::CNetEvent2Entities
+		CppL_ResDoodadRefill_Activate, //EGL::CNetEvent2Entities
+		CppL_ShieldCover_Activate, //EGL::CNetEventEntityID
+		CppL_Resurrect_Activate, //EGL::CNetEvent2Entities
 	};
 
 	enum class FeedbackEventIds : int {

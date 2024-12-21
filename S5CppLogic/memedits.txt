@@ -130,4 +130,8 @@ list of used identifiers
 0x1016 CppLogic::Mod::HawkOwnerAbility
 0x1017 CppLogic::Mod::ResDoodadRefillBehabiorProps
 0x1018 CppLogic::Mod::ResDoodadRefillBehabior
+0x1019 CppLogic::Mod::ShieldCoverAbilityProps
+0x101A CppLogic::Mod::ShieldCoverAbility
+0x101B CppLogic::Mod::ResurrectAbilityProps
+0x101C CppLogic::Mod::ResurrectAbility
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

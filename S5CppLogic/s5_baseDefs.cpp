@@ -190,7 +190,7 @@ bool shok::CostInfo::SubResources(const CostInfo& tosub)
 	return costinfo_subci(this, &tosub);
 }
 
-bool CppLogic::CaselessStringComparator::operator()(const std::string& a, const std::string& b) const noexcept
+bool CppLogic::CaselessStringComparator::operator()(std::string_view a, std::string_view b) const noexcept
 {
-	return _stricmp(a.c_str(), b.c_str()) < 0;
+	return std::ranges::lexicographical_compare(a, b, [](char x, char y) { return std::tolower(x) < std::tolower(y); });
 }

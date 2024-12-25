@@ -992,6 +992,7 @@ int CppLogic::ModLoader::ModLoader::LoadModpackBBA(lua::State L)
 	auto p = GetModPackPath(L.CheckStringView(1));
 	auto* mng = *BB::CFileSystemMgr::GlobalObj;
 	mng->AddArchive(p.c_str());
+	auto* a = mng->LoadOrder[0];
 	if (mng->LoadOrder.size() >= 2) {
 		if (auto* ar = dynamic_cast<BB::CBBArchiveFile*>(mng->LoadOrder[1])) {
 			if (std::string_view{ ar->ArchiveFile.Filename }.ends_with(".s5x")) {
@@ -1000,7 +1001,24 @@ int CppLogic::ModLoader::ModLoader::LoadModpackBBA(lua::State L)
 			}
 		}
 	}
-	L.NewUserClass<ArchivePopHelper>(std::move(p));
+	L.NewUserClass<ArchivePopHelper>(std::move(p), a);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::CreateModpackRedirectLayer(lua::State L)
+{
+	auto p = std::format("{} redirect layer", L.CheckStringView(1));
+	auto* mng = *BB::CFileSystemMgr::GlobalObj;
+	auto* r = CppLogic::Mod::FileSystem::RedirectFileSystem::CreateRedirectLayer(p);
+	if (mng->LoadOrder.size() >= 2) {
+		if (auto* ar = dynamic_cast<BB::CBBArchiveFile*>(mng->LoadOrder[1])) {
+			if (std::string_view{ ar->ArchiveFile.Filename }.ends_with(".s5x")) {
+				mng->LoadOrder[1] = mng->LoadOrder[0];
+				mng->LoadOrder[0] = ar;
+			}
+		}
+	}
+	L.NewUserClass<ArchiveRedirectHelper>(std::move(p), r);
 	return 1;
 }
 
@@ -1316,13 +1334,12 @@ int CppLogic::ModLoader::ArchivePopHelper::Remove(lua::State L)
 	auto v = mng->LoadOrder.SaveVector();
 	auto it = v.Vector.begin();
 	while (it != v.Vector.end()) {
-		if (auto* a = dynamic_cast<BB::CBBArchiveFile*>(*it)) {
-			if (a->ArchiveFile.Filename == t->Archive) {
-				a->Destroy();
-				v.Vector.erase(it);
-				L.Push(true);
-				return 1;
-			}
+		if (*it == t->FS) {
+			(*it)->Destroy();
+			t->FS = nullptr;
+			v.Vector.erase(it);
+			L.Push(true);
+			return 1;
 		}
 		++it;
 	}
@@ -1335,11 +1352,9 @@ int CppLogic::ModLoader::ArchivePopHelper::IsLoaded(lua::State L)
 	auto t = L.CheckUserClass<ArchivePopHelper>(1);
 	auto* mng = *BB::CFileSystemMgr::GlobalObj;
 	for (const auto* f : mng->LoadOrder) {
-		if (const auto* a = dynamic_cast<const BB::CBBArchiveFile*>(f)) {
-			if (a->ArchiveFile.Filename == t->Archive) {
-				L.Push(true);
-				return 1;
-			}
+		if (f == t->FS) {
+			L.Push(true);
+			return 1;
 		}
 	}
 	L.Push(false);
@@ -1350,5 +1365,66 @@ int CppLogic::ModLoader::ArchivePopHelper::ToString(lua::State L)
 {
 	auto t = L.CheckUserClass<ArchivePopHelper>(1);
 	L.Push(t->Archive);
+	if (t->FS == nullptr) {
+		L.Push();
+	}
+	else if (auto* ar = dynamic_cast<BB::CBBArchiveFile*>(t->FS)) {
+		L.Push(ar->ArchiveFile.Filename);
+	}
+	else if (auto* fs = dynamic_cast<BB::CDirectoryFileSystem*>(t->FS)) {
+		L.Push(fs->Path);
+	}
+	else if (auto* rd = dynamic_cast<CppLogic::Mod::FileSystem::RedirectFileSystem*>(t->FS)) {
+		L.Push(rd->Name);
+	}
+	else {
+		L.Push(typeid(*t->FS).name());
+	}
+	return 2;
+}
+
+CppLogic::Mod::FileSystem::RedirectFileSystem* CppLogic::ModLoader::ArchiveRedirectHelper::CheckStillValid()
+{
+	auto* mng = *BB::CFileSystemMgr::GlobalObj;
+	for (const auto* f : mng->LoadOrder) {
+		if (f == FS) {
+			if (auto* r = dynamic_cast<CppLogic::Mod::FileSystem::RedirectFileSystem*>(FS))
+				return r;
+		}
+	}
+	throw lua::LuaException{ "not in loadorder" };
+}
+
+int CppLogic::ModLoader::ArchiveRedirectHelper::Get(lua::State L)
+{
+	auto t = L.CheckUserClass<ArchiveRedirectHelper>(1);
+	auto* r = t->CheckStillValid();
+	L.NewTable();
+	for (const auto& [n, re] : r->Redirects) {
+		L.Push(n);
+		L.Push(re);
+		L.SetTableRaw(-3);
+	}
 	return 1;
+}
+
+int CppLogic::ModLoader::ArchiveRedirectHelper::Set(lua::State L)
+{
+	auto t = L.CheckUserClass<ArchiveRedirectHelper>(1);
+	auto* r = t->CheckStillValid();
+	std::string_view n = L.CheckStringView(2);
+	auto it = r->Redirects.find(n);
+	if (L.IsNoneOrNil(3)) {
+		if (it != r->Redirects.end())
+			r->Redirects.erase(it);
+		return 0;
+	}
+	std::string_view re = L.CheckStringView(3);
+	if (it == r->Redirects.end()) {
+		r->Redirects.emplace(std::piecewise_construct, std::forward_as_tuple(n), std::forward_as_tuple(re));
+	}
+	else {
+		it->second = re;
+	}
+	return 0;
 }

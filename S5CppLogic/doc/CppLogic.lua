@@ -3403,6 +3403,16 @@ function ArchivePopHelper:Remove() end
 function ArchivePopHelper:IsLoaded() end
 ---@return string archivePath
 function ArchivePopHelper:ToString() end
+
+---@class RedirectLayerPopHelper : ArchivePopHelper
+local RedirectLayerPopHelper = {
+}
+---@return table<string,string>
+function RedirectLayerPopHelper:Get() end
+---@param n string
+---@param r string|nil
+function RedirectLayerPopHelper:Set(n, r) end
+
 ---@class ModpackDesc
 local ModpackDesc = {
 	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "", Version = "",
@@ -3414,7 +3424,8 @@ local ModpackDesc = {
 	Override = {},
 	DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false,
 	UserRequestable = false,
-	Archive = nil|ArchivePopHelper
+	Archive = nil|ArchivePopHelper,
+	RedirectLayer = nil|RedirectLayerPopHelper
 }
 
 --- gets info for a ModPack (mostly from its ModPack.xml).
@@ -3426,6 +3437,11 @@ function CppLogic.ModLoader.GetModpackInfo(name) end
 ---@param name string
 ---@return ArchivePopHelper
 function CppLogic.ModLoader.LoadModpackBBA(name) end
+
+--- creates a redirect layer for a modpack.
+---@param name string
+---@return RedirectLayerPopHelper
+function CppLogic.ModLoader.CreateModpackRedirectLayer(name) end
 
 --- shows a MessageBox with the message, then exits the game.
 ---@param msg string

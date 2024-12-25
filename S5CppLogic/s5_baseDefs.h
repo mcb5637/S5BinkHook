@@ -512,7 +512,8 @@ namespace CppLogic {
 
 	class CaselessStringComparator {
 	public:
-		bool operator()(const std::string& a, const std::string& b) const noexcept;
+		using is_transparent = void;
+		bool operator()(std::string_view a, std::string_view b) const noexcept;
 	};
 
 }

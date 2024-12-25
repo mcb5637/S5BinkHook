@@ -97,6 +97,19 @@ namespace CppLogic::API {
 		return 1;
 	}
 
+	int GetFilesInDirectory(lua::State L) {
+		shok::Set<shok::String> m{};
+		(*BB::CFileSystemMgr::GlobalObj)->FillFilesInDirectory(&m, L.CheckString(1), BB::IFileSystem::SearchOptions::SkipDirectories);
+		L.NewTable();
+		int i = 1;
+		for (const auto& f : m) {
+			L.Push(f);
+			L.SetTableRaw(-2, i);
+			++i;
+		}
+		return 1;
+	}
+
 	int LDoesFileExist(lua::State L) {
 		const char* s = L.CheckString(1);
 		L.Push(BB::CFileSystemMgr::DoesFileExist(s));
@@ -515,6 +528,9 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<Log>("Log"),
 			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
 			lua::FuncReference::GetRef<ReadFileAsString>("ReadFileAsString"),
+#ifdef _DEBUG
+			lua::FuncReference::GetRef<GetFilesInDirectory>("GetFilesInDirectory"),
+#endif
 			lua::FuncReference::GetRef<LDoesFileExist>("DoesFileExist"),
 			lua::FuncReference::GetRef<DoString>("DoString"),
 			lua::FuncReference::GetRef<MapGetDataPath>("MapGetDataPath"),

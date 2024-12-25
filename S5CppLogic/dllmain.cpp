@@ -52,6 +52,7 @@
 #include "ModUI.h"
 #include "ModConfig.h"
 #include "EnumIdManagerMagic.h"
+#include "ModFilesystem.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -298,6 +299,10 @@ int Test(lua::State Ls) {
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
+	auto sv = (*BB::CFileSystemMgr::GlobalObj)->LoadOrder.SaveVector();
+	auto* r = new CppLogic::Mod::FileSystem::RedirectFileSystem("redir");
+	r->Redirects["config\\feedbackstates\\test.xml"] = "config\\buildingbanners.xml";
+	sv.Vector.push_back(r);
 	
 	return 0;
 }

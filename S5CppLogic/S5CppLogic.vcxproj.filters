@@ -327,6 +327,9 @@
     <ClInclude Include="s5_ai.h">
       <Filter>shok\player</Filter>
     </ClInclude>
+    <ClInclude Include="ModFilesystem.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -511,6 +514,9 @@
     </ClCompile>
     <ClCompile Include="s5_ai.cpp">
       <Filter>shok\player</Filter>
+    </ClCompile>
+    <ClCompile Include="ModFilesystem.cpp">
+      <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 #include "s5_mapdisplay.h"
 #include "s5_classfactory.h"
 #include "luaext.h"
+#include "ModFilesystem.h"
 
 
 namespace CppLogic::ModLoader {
@@ -349,6 +350,7 @@ namespace CppLogic::ModLoader {
 		static int SanityCheck(lua::State L);
 		static int GetModpackInfo(lua::State L);
 		static int LoadModpackBBA(lua::State L);
+		static int CreateModpackRedirectLayer(lua::State L);
 		static int InvalidModPackPanic(lua::State L);
 		static int GetModpacks(lua::State L);
 		static int ReserializeEntityType(lua::State L);
@@ -367,6 +369,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<SanityCheck>("SanityCheck"),
 				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
 				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+				lua::FuncReference::GetRef<CreateModpackRedirectLayer>("CreateModpackRedirectLayer"),
 				lua::FuncReference::GetRef<InvalidModPackPanic>("InvalidModPackPanic"),
 				lua::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
 				lua::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
@@ -418,18 +421,44 @@ namespace CppLogic::ModLoader {
 
 	class ArchivePopHelper {
 		std::string Archive;
+	protected:
+		BB::IFileSystem* FS; // not owning, may be already deleted!
 
 		static int Remove(lua::State L);
 		static int IsLoaded(lua::State L);
 		static int ToString(lua::State L);
 	public:
-		inline ArchivePopHelper(std::string_view a) : Archive(a) {}
-		inline ArchivePopHelper(std::string&& a) : Archive(std::move(a)) {}
+		virtual ~ArchivePopHelper() = default;
+
+		inline ArchivePopHelper(std::string_view a, BB::IFileSystem* fs) : Archive(a), FS(fs) {}
+		inline ArchivePopHelper(std::string&& a, BB::IFileSystem* fs) : Archive(std::move(a)), FS(fs) {}
 
 		static constexpr const std::array LuaMethods = {
 			lua::FuncReference::GetRef<Remove>("Remove"),
 			lua::FuncReference::GetRef<IsLoaded>("IsLoaded"),
 			lua::FuncReference::GetRef<ToString>("ToString"),
+		};
+
+		using BaseClass = ArchivePopHelper;
+	};
+
+	class ArchiveRedirectHelper : public ArchivePopHelper {
+
+		CppLogic::Mod::FileSystem::RedirectFileSystem* CheckStillValid();
+
+		static int Get(lua::State L);
+		static int Set(lua::State L);
+	public:
+		inline ArchiveRedirectHelper(std::string_view a, CppLogic::Mod::FileSystem::RedirectFileSystem* fs) : ArchivePopHelper(a, fs) {}
+		inline ArchiveRedirectHelper(std::string&& a, CppLogic::Mod::FileSystem::RedirectFileSystem* fs) : ArchivePopHelper(std::move(a), fs) {}
+
+
+		static constexpr const std::array LuaMethods = {
+			lua::FuncReference::GetRef<Remove>("Remove"),
+			lua::FuncReference::GetRef<IsLoaded>("IsLoaded"),
+			lua::FuncReference::GetRef<ToString>("ToString"),
+			lua::FuncReference::GetRef<Get>("Get"),
+			lua::FuncReference::GetRef<Set>("Set"),
 		};
 	};
 }

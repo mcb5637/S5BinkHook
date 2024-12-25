@@ -123,7 +123,7 @@ namespace BB {
 		virtual ~IFileSystem() = default;
 		virtual void Destroy() = 0;
 		virtual void FillFilesInDirectory(shok::Set<shok::String>* files, const char* directoryName, SearchOptions opt) = 0;
-		virtual void GetFileInfo(FileInfo* out, const char* file, int zero = 0, char* absPath = nullptr) = 0;
+		virtual FileInfo* GetFileInfo(FileInfo* out, const char* file, int zero = 0, char* absPath = nullptr) = 0;
 		virtual IStream* OpenFileStream(const char* path, BB::IStream::Flags mode) = 0;
 		virtual bool OpenFileHandle(const char* path, int* pHandle, size_t* psize) = 0; // 5
 

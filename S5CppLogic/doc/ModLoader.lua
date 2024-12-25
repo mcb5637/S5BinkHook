@@ -1,8 +1,9 @@
 CppLogic.API.CreateExtraDataTables()
 
---- ModLoader tries to load the file ModLoader.lua in your map folder.
--- this happens on starting a new map as well as loading a savegame.
--- make sure, nothing breaks, if this file gets loaded again.
+---ModLoader tries to load the file ModLoader.lua in your map folder.
+---this happens on starting a new map as well as loading a savegame.
+---make sure, nothing breaks, if this file gets loaded again.
+---@type ModLoader
 ModLoader = {
 	--- if this flag is set, then the s5x archive is kept in the internal filesystem, after the map is loaded.
 	--- this is not required for most ModLoader functionality, but you might want to load something out of it at a later time.

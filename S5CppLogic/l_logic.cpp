@@ -31,6 +31,7 @@
 #include "luaserializer.h"
 #include "modloader.h"
 #include "l_ui.h"
+#include "ModFilesystem.h"
 
 namespace CppLogic::Logic {
 	int GetDamageFactor(lua::State ls) {
@@ -342,6 +343,11 @@ namespace CppLogic::Logic {
 				L.SetTableRaw(-2, r);
 				r++;
 			}
+			else if (auto* a2 = dynamic_cast<CppLogic::Mod::FileSystem::RedirectFileSystem*>(a)) {
+				L.Push(a2->Name);
+				L.SetTableRaw(-2, r);
+				r++;
+			}
 			else {
 				L.Push(typeid(*a).name());
 				L.SetTableRaw(-2, r);
@@ -352,18 +358,18 @@ namespace CppLogic::Logic {
 	}
 
 	int AddArchive(lua::State L) {
-		const char* s = L.CheckString(1);
+		auto s = L.CheckStringView(1);
 		if (!std::filesystem::exists(s))
 			throw lua::LuaException("file doesnt exist");
 		try {
-			(*BB::CFileSystemMgr::GlobalObj)->AddArchive(s);
+			(*BB::CFileSystemMgr::GlobalObj)->AddArchive(s.data());
 		}
 		catch (const BB::CFileException& e) {
 			char buff[201]{};
 			e.CopyMessage(buff, 200);
 			throw lua::LuaException(buff);
 		}
-		L.NewUserClass<CppLogic::ModLoader::ArchivePopHelper>(std::string_view(s));
+		L.NewUserClass<CppLogic::ModLoader::ArchivePopHelper>(s, (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0]);
 		return 1;
 	}
 
@@ -377,9 +383,17 @@ namespace CppLogic::Logic {
 	}
 
 	int AddFolder(lua::State L) {
-		const char* s = L.CheckString(1);
-		(*BB::CFileSystemMgr::GlobalObj)->AddFolder(s);
-		return 0;
+		auto s = L.CheckStringView(1);
+		(*BB::CFileSystemMgr::GlobalObj)->AddFolder(s.data());
+		L.NewUserClass<CppLogic::ModLoader::ArchivePopHelper>(s, (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0]);
+		return 1;
+	}
+
+	int AddRedirectLayer(lua::State L) {
+		auto s = L.CheckStringView(1);
+		auto* r = CppLogic::Mod::FileSystem::RedirectFileSystem::CreateRedirectLayer(s);
+		L.NewUserClass<CppLogic::ModLoader::ArchiveRedirectHelper>(s, r);
+		return 1;
 	}
 
 	int GetArchiveOfFile(lua::State L) {
@@ -1585,6 +1599,10 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
 			lua::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
 			lua::FuncReference::GetRef<EnableRefillabeMineNoAutoDestroy>("EnableRefillabeMineNoAutoDestroy"),
+#ifdef _DEBUG
+			lua::FuncReference::GetRef<AddRedirectLayer>("AddRedirectLayer"),
+			lua::FuncReference::GetRef<AddFolder>("AddFolder"),
+#endif
 		};
 
 	constexpr std::array<lua::FuncReference, 2> UICmd{ {
@@ -1595,9 +1613,6 @@ namespace CppLogic::Logic {
 	void Init(lua::State L)
 	{
 		L.RegisterFuncs(Logic, -3);
-	#ifdef _DEBUG
-		L.RegisterFunc<AddFolder>("AddFolder", -3);
-	#endif
 
 		L.Push( "UICommands");
 		L.NewTable();

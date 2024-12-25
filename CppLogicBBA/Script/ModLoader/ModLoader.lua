@@ -1,8 +1,47 @@
+---@diagnostic disable: inject-field
 ModLoader = ModLoader or {}
 
 if false then
+	---@class CArmorDamageMapping
+	---@field ArmorClass string
+	---@field Factor number
+	local CArmorDamageMapping = {
+	}
+	---@class CDamageClass
+	---@field ObjectClassName "CppLogic::Mod::Config::DamageClassExt"|"GGL::CDamageClassProps"
+	---@field ArmorClassNoneFactor number
+	---@field ArmorClassJerkinFactor number
+	---@field ArmorClassLeatherFactor number
+	---@field ArmorClassIronFactor number
+	---@field ArmorClassFortificationFactor number
+	---@field ArmorClassHeroFactor number
+	---@field ArmorClassFurFactor number
+	---@field ExtraArmorClass CArmorDamageMapping[]|nil
+	local DamageClass = {
+	}
 	---@class Manifest
 	---@field MissingFilled boolean|nil
+	---@field ArmorClasses string[]|nil
+	---@field EntityCategories string[]|nil
+	---@field DamageClasses table<string,CDamageClass>|nil
+	---@field DirectXEffects string[]|nil
+	---@field TerrainTextures string[]|nil
+	---@field WaterTypes (string|number)[]|nil
+	---@field TerrainTypes (string|number)[]|nil
+	---@field SelectionTextures string[]|nil
+	---@field Animations (string|number)[]|nil
+	---@field AnimSets (string|number)[]|nil
+	---@field Models (string|number)[]|nil
+	---@field EffectTypes (string|number)[]|nil
+	---@field TaskLists (string|number)[]|nil
+	---@field EntityTypes (string|number)[]|nil
+	---@field Technologies (string|number)[]|nil
+	---@field GUITextures string[]|nil
+	---@field SettlerUpgradeCategory table<string,string|number>|nil
+	---@field BuildingUpgradeCategory table<string,string|number>|nil
+	---@field ExperienceClasses table<string,string|number>|nil
+	---@field SoundGroups (string|number)[][]|nil
+	---@field StringTableTexts table<string,string|true>|nil
 	local Manifest = {}
 	---@class CManifestEntry
 	local CManifestEntry = {
@@ -29,6 +68,23 @@ if false then
 	---@field Mods ModpackDesc[]
 	---@field Incompatible string[]
 	local ModList = {
+	}
+	---@class ModPack
+	---@field Manifest Manifest
+	---@field Init fun(ModpackDesc)|nil
+	local ModPack = {
+	}
+	---@class ModLoader
+	---@field KeepArchive boolean|nil
+	---@field Manifest Manifest
+	---@field RequiredMods string[]
+	---@field Initialize fun()|nil
+	---@field MapStart fun()|nil
+	---@field LoadSave fun()|nil
+	---@field CheckUserRequestedMod nil|fun(string):boolean
+	---@field Cleanup fun()|nil
+	---@field LanguageOrder string[]|nil
+	local ModLoader = {
 	}
 end
 
@@ -340,7 +396,7 @@ function ModLoader.InitMod(mod)
 		Script.Load(mod.LoaderPath)
 		xpcall(function()
 			---@diagnostic disable-next-line: undefined-field
-			ModLoader[mod.Name].Init()
+			ModLoader[mod.Name].Init(mod)
 		end, function(err)
 			CppLogic.ModLoader.InvalidModPackPanic("failed to initialize "..mod.Name..": "..err)
 		end)
@@ -369,6 +425,10 @@ function ModLoader.CleanupMods(modlist, script)
 		if m.Archive and not m.KeepArchive and (script or m.ScriptPath == "") then
 			m.Archive:Remove()
 			m.Archive = nil
+			if m.RedirectLayer then
+				m.RedirectLayer:Remove()
+				m.RedirectLayer = nil
+			end
 		end
 	end
 end

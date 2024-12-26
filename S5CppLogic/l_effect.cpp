@@ -55,7 +55,7 @@ namespace CppLogic::Effect {
 		data.SourcePlayer = player;
 		auto dmgclass = L.OptEnum<shok::DamageClassId>(11);
 		data.DamageClass = dmgclass;
-		data.AdvancedDamageSourceOverride = L.OptInt(13, static_cast<int>(shok::AdvancedDealDamageSource::Script));
+		data.AdvancedDamageSourceOverride = L.OptEnum<shok::AdvancedDealDamageSource>(13, shok::AdvancedDealDamageSource::Script);
 		EGL::CGLEGameLogic* gl = *EGL::CGLEGameLogic::GlobalObj;
 		auto id = gl->CreateEffect(&data);
 		EGL::CEffect* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
@@ -142,7 +142,7 @@ namespace CppLogic::Effect {
 		L.Push(eff->AttackerID);
 		L.Push(eff->DamageAmount);
 		L.Push(eff->AoERange);
-		L.Push(eff->DamageClass);
+		L.Push(static_cast<shok::DamageClassId>(eff->DamageClass));
 		L.Push(eff->SourcePlayer);
 		L.PushPos(eff->FlyingEffectSlot.TargetPosition);
 		return 6;

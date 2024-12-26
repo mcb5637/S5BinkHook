@@ -122,7 +122,7 @@ namespace GGL {
 		int DamageAmount;
 		bool Misses; // 50
 		PADDING(2);
-		byte AdvancedDamageSourceOverride;
+		shok::AdvancedDealDamageSource AdvancedDamageSourceOverride;
 		GGL::CArrowEffectProps* ArrowEffectProps;
 
 	protected:
@@ -140,16 +140,33 @@ namespace GGL {
 	class CCannonBallEffect : public EGL::CFlyingEffect {
 		friend class EGL::CFlyingEffect;
 	public:
+		struct CompactedDamageClass {
+		private:
+			uint16_t Data;
+		public:
+			constexpr CompactedDamageClass(shok::DamageClassId d) : Data(static_cast<uint16_t>(static_cast<int>(d))) {}
+			constexpr operator shok::DamageClassId() const {
+				return static_cast<shok::DamageClassId>(static_cast<int>(Data));
+			}
+		};
+
+
 		shok::EffectId AttackerID; // 47
 		shok::PlayerId SourcePlayer; // 48
 		GGL::CCannonBallEffectProps* CannonBallEffectProps;
 		int DamageAmount; // 50
 		float AoERange;
-		shok::DamageClassId DamageClass; // 52
+		CompactedDamageClass DamageClass; // 52 originally full damageclass, but i need storage ;)
+	private:
+		byte DamageClassPadding = 0;
+	public:
+		shok::AdvancedDealDamageSource AdvancedDamageSourceOverride; // originally part of damageclass
 
 	protected:
 		void FixOnLoad();
 		void OnHitHooked();
+
+		static void __fastcall CannonFromCreatorAdd(GGL::CCannonBallEffect* th, CProjectileEffectCreator* cr);
 
 	public:
 		static bool FixDamageClass;
@@ -161,6 +178,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x82365C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDF09D9FD);
 	};
+	static_assert(sizeof(CCannonBallEffect) == 4 * 53);
 
 	class CEffectLightning : public EGL::CEffect {
 	public:
@@ -211,7 +229,7 @@ namespace EGL {
 	private:
 		bool Zero5[2] = { false, false };
 	public:
-		byte AdvancedDamageSourceOverride = 0;
+		shok::AdvancedDealDamageSource AdvancedDamageSourceOverride = shok::AdvancedDealDamageSource::Unknown;
 
 
 	public:

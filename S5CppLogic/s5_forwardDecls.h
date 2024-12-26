@@ -49,7 +49,7 @@ namespace shok {
 	enum class TechModifierType : int;
 	enum class TaskStateExecutionResult : int;
 	enum class TaskExecutionResult : int;
-	enum class AdvancedDealDamageSource : int;
+	enum class AdvancedDealDamageSource : byte;
 	enum class AccessCategory : int;
 	enum class WeatherState : int;
 	enum class WorkerReason : int;
@@ -223,3 +223,4 @@ namespace CppLogic::EntityAddon {
 namespace BBRw {
 	class CEngine;
 }
+class CProjectileEffectCreator;

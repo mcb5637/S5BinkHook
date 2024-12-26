@@ -13,7 +13,7 @@ namespace CppLogic::Combat {
 		EGL::CGLEEntity* targ = L.CheckEntity(1);
 		int dmg = L.CheckInt(2);
 		EGL::CGLEEntity* att = L.OptEntity(3);
-		shok::AdvancedDealDamageSource sou = static_cast<shok::AdvancedDealDamageSource>(L.OptInteger(8, static_cast<int>(shok::AdvancedDealDamageSource::Script)));
+		auto sou = L.OptEnum<shok::AdvancedDealDamageSource>(8, shok::AdvancedDealDamageSource::Script);
 		targ->AdvancedHurtEntityBy(att, dmg, L.OptPlayerId(4, shok::PlayerId::P0), L.OptBool(5, true), L.OptBool(6, true), L.OptBool(7, true), sou);
 		return 0;
 	}
@@ -28,7 +28,7 @@ namespace CppLogic::Combat {
 		int dmg = L.CheckInt(5);
 		auto player = L.OptPlayerId(4, shok::PlayerId::P0);
 		auto dmgclass = L.OptEnum<shok::DamageClassId>(7);
-		shok::AdvancedDealDamageSource sou = static_cast<shok::AdvancedDealDamageSource>(L.OptInteger(11, static_cast<int>(shok::AdvancedDealDamageSource::Script)));
+		auto sou = L.OptEnum<shok::AdvancedDealDamageSource>(11, shok::AdvancedDealDamageSource::Script);
 		EGL::CGLEEntity::AdvancedDealAoEDamage(source, pos, range, dmg, player, dmgclass, L.OptBool(8, true), L.OptBool(9, true), L.OptBool(10, true), sou);
 		return 0;
 	}

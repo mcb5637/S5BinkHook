@@ -86,12 +86,12 @@ namespace luaext {
 		}
 		template<class En>
 		requires std::is_enum_v<En>
-		En OptEnum(int idx) {
+		En OptEnum(int idx, En d = static_cast<En>(0)) {
 			auto t = Type(idx);
 			if (t == lua::LType::Number || t == lua::LType::String) {
 				return CheckEnum<En>(idx);
 			}
-			return static_cast<En>(0);
+			return d;
 		}
 	};
 }

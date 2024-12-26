@@ -109,11 +109,18 @@ void EGL::CFlyingEffect::HookOnLoadFix()
 
 bool GGL::CCannonBallEffect::FixDamageClass = false;
 bool GGL::CCannonBallEffect::AddDamageSourceOverride = false;
-void __fastcall hookcannonfromcreator(GGL::CCannonBallEffect* th, CProjectileEffectCreator* cr) {
+void __fastcall GGL::CCannonBallEffect::CannonFromCreatorAdd(GGL::CCannonBallEffect* th, CProjectileEffectCreator* cr)
+{
 	if (GGL::CCannonBallEffect::FixDamageClass) {
 		th->DamageClass = cr->DamageClass;
+		th->DamageClassPadding = 0;
 		if (GGL::CCannonBallEffect::AddDamageSourceOverride)
-			th->DamageClass = static_cast<shok::DamageClassId>(static_cast<int>(th->DamageClass) | (static_cast<int>(cr->AdvancedDamageSourceOverride) << 24));
+			th->AdvancedDamageSourceOverride = cr->AdvancedDamageSourceOverride;
+	}
+	else {
+		th->DamageClass = shok::DamageClassId::Invalid;
+		th->DamageClassPadding = 0;
+		th->AdvancedDamageSourceOverride = shok::AdvancedDealDamageSource::Unknown;
 	}
 }
 void __declspec(naked) hookcannonfromcreatorasm() {
@@ -124,7 +131,7 @@ void __declspec(naked) hookcannonfromcreatorasm() {
 
 		mov ecx, esi;
 		mov edx, edi;
-		call hookcannonfromcreator;
+		call GGL::CCannonBallEffect::CannonFromCreatorAdd;
 
 		push 0x4FF951;
 		ret;
@@ -196,7 +203,7 @@ void __declspec(naked) cannonballhit_damage() {
 		push 1;
 		push 1;
 		mov eax, [esi + 52 * 4];
-		and eax, 0xFFFFFF;
+		and eax, 0xFFFF;
 		push eax;
 		push[esi + 48 * 4];
 		push edx;

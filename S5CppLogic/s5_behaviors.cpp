@@ -368,7 +368,7 @@ int __thiscall GGL::CSniperAbility::TaskOverrideSnipe(EGL::CGLETaskArgs* a)
 	cr.DamageRadius = -1;
 	cr.DamageClass = shok::DamageClassId::Invalid;
 	cr.SourcePlayer = thent->PlayerId;
-	cr.AdvancedDamageSourceOverride = static_cast<byte>(shok::AdvancedDealDamageSource::AbilitySnipe);
+	cr.AdvancedDamageSourceOverride = shok::AdvancedDealDamageSource::AbilitySnipe;
 	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
 	return 0;
 }

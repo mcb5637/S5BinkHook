@@ -560,4 +560,36 @@ namespace shok {
 		A8,
 		A9,
 	};
+
+	enum class AdvancedDealDamageSource : byte {
+		Unknown = 0,
+		Melee = 1,
+		Arrow = 2,
+		Cannonball = 3,
+		DefenderArrow = 4,
+
+		AbilitySnipe = 10,
+		AbilityCircularAttack = 11,
+		AbilityBomb = 12,
+		AbilitySabotageSingleTarget = 13,
+		AbilitySabotageBlast = 14,
+		AbilityShuriken = 15,
+
+		Script = 25,
+	};
+	enum class TaskExecutionResult : int {
+		NextTask = 0,
+		StateChanged = 1,
+		TaskListChanged = 2,
+		LuaTaskState = 3,
+	};
+	enum class TaskStateExecutionResult : int {
+		NotFinished = -1,
+		Finished = -2,
+	};
+	enum class MovementState : int {
+		Moving = 0,
+		//MoveDone = 1, ? rotate?
+		Standing = 2,
+	};
 }

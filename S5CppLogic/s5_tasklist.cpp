@@ -320,34 +320,3 @@ void EGL::TaskData::RemoveExtraTasks()
         return a.ID >= shok::Task::TASK_LUA_FUNC;
         }), v.Vector.end());
 }
-
-
-std::map<shok::TaskState, std::string_view> shok::TaskStateToName{
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Default, "Default"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::WaitForAnim, "WaitForAnim"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Move, "Move"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Follow, "Follow"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Wait, "Wait"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Rotate, "Rotate"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::SetNextTaskList, "SetNextTaskList"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Move_NonCancelable, "Move_NonCancelable"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::IdleInFormation, "IdleInFormation"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::AssumePositionInFormation, "AssumePositionInFormation"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::SerfSearchResource, "SerfSearchResource"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Train, "Train"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::HeroComatose, "HeroComatose"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::BuildingAlarmDefend, "BuildingAlarmDefend"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::BattleWait, "BattleWait"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::LeaderGetCloseTotarget, "LeaderGetCloseTotarget"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::MoveToTarget, "MoveToTarget"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::HeroGoToNPC, "HeroGoToNPC"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::ConvertBuilding, "ConvertBuilding"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::ConvertSettler, "ConvertSettler"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::Merchant_WaitForHero, "Merchant_WaitForHero"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::ThiefStealGoods, "ThiefStealGoods"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::ThiefSabotage, "ThiefSabotage"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::ThiefDisarm, "ThiefDisarm"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::ScoutPointToRes, "ScoutPointToRes"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::LuaFunc, "LuaFunc"},
-    std::pair<const shok::TaskState, std::string_view>{shok::TaskState::WaitForAnimNonCancelable, "WaitForAnimNonCancelable"},
-};

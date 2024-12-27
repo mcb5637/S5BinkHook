@@ -2,6 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_defines.h"
+#include "EnumIdManagerMagic.h"
 
 namespace EGL {
     class CGLETaskArgs : public BB::IObject {
@@ -594,7 +595,7 @@ namespace shok {
         ScoutPointToRes = 33, // maybe unused?
 
 
-        LuaFunc = 500,
+        LuaFunc = 100,
         WaitForAnimNonCancelable,
         HawkExplore,
         HawkCheckHero,
@@ -602,6 +603,11 @@ namespace shok {
         Resurrect,
         SelfResurrect,
     };
+}
 
-    extern std::map<TaskState, std::string_view> TaskStateToName;
+namespace CppLogic {
+    template<>
+    inline auto GetIdManager<shok::TaskState>() {
+        return CppLogic::MagicEnum::EnumIdManager<shok::TaskState>{};
+    }
 }

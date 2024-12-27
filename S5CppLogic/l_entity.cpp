@@ -606,12 +606,12 @@ namespace CppLogic::Entity {
 		if (tl == nullptr)
 			return 1;
 		// CurrentTaskIndex gets increased after task exec, no matter if we go into state or not, so correct that
-		L.Push((*BB::CIDManagerEx::TaskManager)->GetNameByID(static_cast<int>(tl->GetTask(e->CurrentTaskIndex - 1)->TaskType)));
-		auto s = shok::TaskStateToName.find(e->CurrentState);
-		if (s == shok::TaskStateToName.end())
-			L.Push(static_cast<int>(e->CurrentState));
+		L.Push(CppLogic::GetIdManager<shok::Task>().GetNameByID(tl->GetTask(e->CurrentTaskIndex - 1)->TaskType));
+		const char* n = CppLogic::GetIdManager<shok::TaskState>().GetNameByID(e->CurrentState);
+		if (n != nullptr)
+			L.Push(n);
 		else
-			L.Push(s->second.data());
+			L.Push(static_cast<int>(e->CurrentState));
 		return 3;
 	}
 

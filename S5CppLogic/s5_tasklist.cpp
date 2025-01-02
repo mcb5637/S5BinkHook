@@ -306,9 +306,10 @@ void EGL::TaskData::AddExtraTasks()
     auto v = (*EGL::TaskData::GlobalVector)->SaveVector();
     AddTaskData<shok::Task::TASK_LUA_FUNC, EGL::CTaskArgsInteger::Identifier>(v);
     AddTaskData<shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE, EGL::CGLETaskArgsThousandths::Identifier>(v);
-    AddTaskData<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING, EGL::CTaskArgsInteger::Identifier>(v);
-    AddTaskData<shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES, EGL::CTaskArgsInteger::Identifier>(v);
-    AddTaskData<shok::Task::TASK_REFINER_CHECK_NEEDS_RESOURCES, EGL::CTaskArgsInteger::Identifier>(v);
+    AddTaskData<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING, EGL::CGLETaskArgs::Identifier>(v);
+    AddTaskData<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING_TARGET, EGL::CGLETaskArgs::Identifier>(v);
+    AddTaskData<shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES, EGL::CGLETaskArgs::Identifier>(v);
+    AddTaskData<shok::Task::TASK_REFINER_CHECK_NEEDS_RESOURCES, EGL::CGLETaskArgs::Identifier>(v);
     AddTaskData<shok::Task::TASK_SHIELD_COVER, EGL::CGLETaskArgs::Identifier>(v);
     AddTaskData<shok::Task::TASK_RESURRECT, EGL::CGLETaskArgs::Identifier>(v);
     AddTaskData<shok::Task::TASK_TURN_TO_RESURRECT, EGL::CGLETaskArgs::Identifier>(v);

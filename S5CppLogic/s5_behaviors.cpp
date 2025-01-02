@@ -1035,12 +1035,25 @@ void GGL::CWorkerBehavior::HookWorkEvents()
 bool GGL::CWorkerBehavior::ResourceTriggers = false;
 bool GGL::CWorkerBehavior::RefinerFix = false;
 
-int GGL::CWorkerBehavior::TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg)
+int GGL::CWorkerBehavior::TaskSkipSupplierIfResearching(EGL::CGLETaskArgs* arg)
 {
 	if (IsResearchingSomething()) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-		e->CurrentTaskIndex = arg->Value - 1;
+		auto* tl = e->GetCurrentTaskList();
+		int i = 0;
+		for (const auto* t : tl->Task) {
+			if (t->TaskType == shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING_TARGET) {
+				e->CurrentTaskIndex = i;
+				return 0;
+			}
+			++i;
+		}
 	}
+	return 0;
+}
+
+int GGL::CWorkerBehavior::TaskSkipSupplierIfResearchingTarget(EGL::CGLETaskArgs* arg)
+{
 	return 0;
 }
 
@@ -1080,6 +1093,7 @@ void __thiscall GGL::CWorkerBehavior::AddSupplierSkip()
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	e->CreateTaskHandler<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING>(this, &CWorkerBehavior::TaskSkipSupplierIfResearching);
+	e->CreateTaskHandler<shok::Task::TASK_SKIP_SUPPLIER_IF_RESEARCHING_TARGET>(this, &CWorkerBehavior::TaskSkipSupplierIfResearchingTarget);
 	e->CreateTaskHandler<shok::Task::TASK_REFINER_RESET_CARRIED_RESOURES>(this, &CWorkerBehavior::TaskResetCarriedResources);
 	e->CreateTaskHandler<shok::Task::TASK_REFINER_CHECK_NEEDS_RESOURCES>(this, &CWorkerBehavior::TaskCheckNeedsRes);
 }

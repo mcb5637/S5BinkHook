@@ -551,10 +551,11 @@ namespace shok {
         TASK_TURN_TO_SHURIKEN_TARGET = 210, //EGL::CGLETaskArgs (GGL::CShurikenAbility)
 
         TASK_LUA_FUNC = 1500, //EGL::CTaskArgsInteger (EGL::CGLEEntity::HookLuaTaskList)
-        TASK_WAIT_FOR_ANIM_NON_CANCELABLE = 1501, //EGL::CGLETaskArgsThousandths (GGL::CGLBehaviorAnimationEx::HookNonCancelableAnim)
-        TASK_SKIP_SUPPLIER_IF_RESEARCHING = 1502, //EGL::CTaskArgsInteger (GGL::CWorkerBehavior::HookSupplierSkip)
-        TASK_REFINER_RESET_CARRIED_RESOURES = 1503, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
-        TASK_REFINER_CHECK_NEEDS_RESOURCES = 1504, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
+        TASK_WAIT_FOR_ANIM_NON_CANCELABLE, //EGL::CGLETaskArgsThousandths (GGL::CGLBehaviorAnimationEx::HookNonCancelableAnim)
+        TASK_SKIP_SUPPLIER_IF_RESEARCHING, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
+        TASK_SKIP_SUPPLIER_IF_RESEARCHING_TARGET, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
+        TASK_REFINER_RESET_CARRIED_RESOURES, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
+        TASK_REFINER_CHECK_NEEDS_RESOURCES, //EGL::CGLETaskArgs (GGL::CWorkerBehavior::HookSupplierSkip)
 
         TASK_SHIELD_COVER, //EGL::CGLETaskArgs (CppLogic::Mod::ShieldCoverAbility)
         TASK_RESURRECT, //EGL::CGLETaskArgs (CppLogic::Mod::ResurrectAbility)

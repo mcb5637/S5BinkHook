@@ -752,7 +752,8 @@ namespace GGL {
 		static bool ResourceTriggers;
 		static bool RefinerFix;
 	private:
-		int TaskSkipSupplierIfResearching(EGL::CTaskArgsInteger* arg);
+		int TaskSkipSupplierIfResearching(EGL::CGLETaskArgs* arg);
+		int TaskSkipSupplierIfResearchingTarget(EGL::CGLETaskArgs* arg);
 		int TaskResetCarriedResources(EGL::CGLETaskArgs* arg);
 		int TaskCheckNeedsRes(EGL::CGLETaskArgs* arg);
 		void __thiscall AddSupplierSkip();

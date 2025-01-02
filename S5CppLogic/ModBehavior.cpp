@@ -447,7 +447,6 @@ void CppLogic::Mod::LightningStrikeAbility::NetEventLightningStrike(EGL::CNetEve
 	e->FireEvent(&ev2);
 }
 
-CreateSerializationListFor(CppLogic::Mod::ResDoodadRefillBehaviorProps, AffectedTypes);
 const BB::SerializationData CppLogic::Mod::ResDoodadRefillBehaviorProps::SerializationData[]{
 	BB::SerializationData::AutoBaseClass<ResDoodadRefillBehaviorProps, GGL::CHeroAbilityProps>(),
 	AutoMemberSerialization(ResDoodadRefillBehaviorProps, RefillAmount),

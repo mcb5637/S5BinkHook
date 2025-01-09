@@ -69,6 +69,7 @@ Combat:
 		- Settler->RandomDamage calculates its maximum off Props->MaxDamageRandomBonus modified by Technologies and ExperienceLevels, then randomly rolled between [0,max)
 		- Settler->MissChance gets calculated based off their Props->MissChance modified by ExperienceLevels
 		- Settler->DodgeChance gets calculated based off their Props->DodgeChance modified by Technologies and ExperienceLevels
+		- Settler->MovementSpeed gets calculated as modTechs(modExp(Props->MovementSpeed * WeatherSpeedFactor) * WeatherSpeedFactor) * 0.1 * Settler->SpeedFactor
 		- Bug: Experience level 1 does not give any boni, MissChance cannot be reduced by any ExperienceLevel (fixed by CppLogic.Logic.EnableExperienceClassFix)
 		- Bug: Soldiers do not have a Armorclass and a Armor value of 0 (can be fixed with CppLogic.EntityType.SetArmor)
 		- UI shows Damage = Settler->Damage * RangedEffectsFactor and Armor = Entity->Armor * (Settler ? RangedEffectsFactor : 1.0)

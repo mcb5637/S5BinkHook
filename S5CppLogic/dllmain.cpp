@@ -299,12 +299,9 @@ int Test(lua::State Ls) {
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
-	auto sv = (*BB::CFileSystemMgr::GlobalObj)->LoadOrder.SaveVector();
-	auto* r = new CppLogic::Mod::FileSystem::RedirectFileSystem("redir");
-	r->Redirects["config\\feedbackstates\\test.xml"] = "config\\buildingbanners.xml";
-	sv.Vector.push_back(r);
-	
-	return 0;
+	L.Push((*EGL::CGLEGameLogic::GlobalObj)->InGameTime->CurrentWeatherSpeedFactor);
+	L.Push(*reinterpret_cast<float*>(0x8795F0));
+	return 2;
 }
 
 int GetOptions(lua::State L) {

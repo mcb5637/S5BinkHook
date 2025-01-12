@@ -275,8 +275,16 @@ namespace ED {
 	};
 	class CPlayerColors : public IPlayerColors {
 	public:
-		PADDINGI(63);
-		shok::Color Colors[17]; // 8 player
+		struct StrangeColor { // double check this before usage, it looks really strange
+			byte B, G, R, A;
+		};
+
+		StrangeColor CurrentPlayerColors[8];
+		PADDINGI(46);
+		shok::Color CurrentPlayerMiniMapColors[8];
+
+		PADDINGI(1);
+		shok::Color Colors[17]; // 64 8 player
 
 		static inline constexpr int vtp = 0x76964C;
 
@@ -284,6 +292,9 @@ namespace ED {
 		void SetColorByIndex(int i, shok::Color c);
 		void RefreshPlayerColors();
 	};
+	static_assert(offsetof(CPlayerColors, CurrentPlayerColors) == 1 * 4);
+	static_assert(offsetof(CPlayerColors, CurrentPlayerMiniMapColors) == 55 * 4);
+	static_assert(offsetof(CPlayerColors, Colors) == 64 * 4);
 
 	class ICommandAcknowledgements {
 	public:

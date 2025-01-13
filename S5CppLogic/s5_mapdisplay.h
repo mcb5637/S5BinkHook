@@ -272,19 +272,24 @@ namespace ED {
 	class IPlayerColors {
 	public:
 		virtual ~IPlayerColors() = default;
+		virtual void Destroy() = 0;
+		virtual void Init() = 0;
+		virtual void SetPlayerColorMapping(shok::PlayerId pid, int col) = 0;
 	};
 	class CPlayerColors : public IPlayerColors {
 	public:
-		struct StrangeColor { // double check this before usage, it looks really strange
+		struct PlayerUIColor {
 			byte B, G, R, A;
 		};
 
-		StrangeColor CurrentPlayerColors[8];
-		PADDINGI(46);
-		shok::Color CurrentPlayerMiniMapColors[8];
+		PlayerUIColor CurrentPlayerUIColors[9];
+		shok::Color UnknownColors[9]; // probably unused
+		RWE::RwRGBAReal CurrentPlayerModelColors[9];
 
-		PADDINGI(1);
-		shok::Color Colors[17]; // 64 8 player
+		shok::Color CurrentPlayerMiniMapColors[9];
+
+		shok::Color ConfigColors[17]; // 64 8 player
+		int PlayerColorMapping[9]; // 81
 
 		static inline constexpr int vtp = 0x76964C;
 
@@ -292,9 +297,12 @@ namespace ED {
 		void SetColorByIndex(int i, shok::Color c);
 		void RefreshPlayerColors();
 	};
-	static_assert(offsetof(CPlayerColors, CurrentPlayerColors) == 1 * 4);
+	static_assert(offsetof(CPlayerColors, CurrentPlayerUIColors) == 1 * 4);
+	static_assert(offsetof(CPlayerColors, CurrentPlayerModelColors) == 19 * 4);
 	static_assert(offsetof(CPlayerColors, CurrentPlayerMiniMapColors) == 55 * 4);
-	static_assert(offsetof(CPlayerColors, Colors) == 64 * 4);
+	static_assert(offsetof(CPlayerColors, ConfigColors) == 64 * 4);
+	static_assert(offsetof(CPlayerColors, PlayerColorMapping) == 81 * 4);
+	static_assert(sizeof(CPlayerColors) == 90 * 4);
 
 	class ICommandAcknowledgements {
 	public:

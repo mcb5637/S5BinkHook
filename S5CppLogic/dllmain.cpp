@@ -299,9 +299,8 @@ int Test(lua::State Ls) {
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 
-	L.Push((*EGL::CGLEGameLogic::GlobalObj)->InGameTime->CurrentWeatherSpeedFactor);
-	L.Push(*reinterpret_cast<float*>(0x8795F0));
-	return 2;
+	ED::CPlayerColors* pc = (*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors;
+	return 0;
 }
 
 int GetOptions(lua::State L) {

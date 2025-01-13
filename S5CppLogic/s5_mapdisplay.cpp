@@ -159,13 +159,13 @@ shok::Color ED::CPlayerColors::GetColorByIndex(int i)
 {
 	if (i < 0 || i > 16)
 		return { 0,0,0,0 };
-	return Colors[i];
+	return ConfigColors[i];
 }
 void ED::CPlayerColors::SetColorByIndex(int i, shok::Color c)
 {
 	if (i < 0 || i > 16)
 		throw std::out_of_range("invalid color index");
-	Colors[i] = c;
+	ConfigColors[i] = c;
 	(*ED::CGlobalsBaseEx::GlobalObj)->DisplayProps->MiniMapColor.data()[i] = c;
 }
 static inline void(__thiscall* const playercolors_refresh)(ED::CPlayerColors* th) = reinterpret_cast<void(__thiscall*)(ED::CPlayerColors*)>(0x4699B9);

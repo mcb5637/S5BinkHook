@@ -125,12 +125,55 @@ namespace BBRw {
 		virtual void GetWindowSize(int* width, int* height, int* bitDepth) = 0;
 	};
 
+	class IDynTexRef {
+	public:
+		virtual ~IDynTexRef() = default;
+		virtual void Destroy() = 0;
+		// not sure what type does
+		virtual void CreateRaster(int x, int y, bool type = true) = 0;
+		// destroys raster and clears all vars
+		virtual void Reset() = 0;
+		// locks with write & nofetch
+		virtual byte* Lock() = 0;
+		virtual void Unlock() = 0;
+
+		RWE::RwRaster* Raster;
+		RWE::RwTexture* Texture;
+		int Stride;
+		int Width, Height;
+		bool Empty, Type;
+
+		// ctor 49261E()
+		// clear 4926B4()
+	};
+	class CDynTexRef : public IDynTexRef { // size 13
+	public:
+
+		PADDINGI(5); // 10 D3DFORMAT
+		uint8_t* Data; // needs confirmation
+
+		// ctor 49267A()
+	};
+	static_assert(sizeof(CDynTexRef) == 13 * 4);
+
+	class IDynTexMgr {
+	public:
+		virtual ~IDynTexMgr() = default;
+		virtual void Destroy() = 0;
+		virtual CDynTexRef* Create() = 0;
+	};
+	class CDynTexMgr : public IDynTexMgr { // size 2
+	public:
+		PADDINGI(1); // int 0
+		// new 492882
+	};
+
 	class CEngine : public IEngine {
 	public:
 		static inline constexpr int vtp = 0x76B534;
 		HWND MainWindow;
 		IEffects* Effects;
-		PADDINGI(1);
+		CDynTexMgr* DynTexManager;
 		CRwTextures* SelectionTextures; // also shorewave
 
 		// init 0x48C77B

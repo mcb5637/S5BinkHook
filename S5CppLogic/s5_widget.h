@@ -889,7 +889,7 @@ namespace GGUI {
 	class CMiniMapSignal {
 	public:
 		virtual ~CMiniMapSignal() = default;
-		// update
+		virtual bool Update() = 0;
 
 		float StartTime = 0; // ret of 548B64, float 126?
 		float X = 0, Y = 0;
@@ -899,6 +899,7 @@ namespace GGUI {
 		PADDINGI(1); // int 4 // 10
 
 		static inline constexpr int vtp = 0x77BA00;
+		// ctor 53D45F(int, float x, float y)
 	};
 	class CMiniMapSignalPulse : public CMiniMapSignal {
 	public:
@@ -910,24 +911,127 @@ namespace GGUI {
 	public:
 		static inline constexpr int vtp = 0x77BA3C;
 		CMiniMapSignalPulse(float x, float y, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor);
+
+		virtual bool Update() override;
 	};
 	class CMiniMapSignalDefault : public CMiniMapSignal {
 	public:
 		float Time = 0;
 		static inline constexpr int vtp = 0x77BA0C;
 		CMiniMapSignalDefault(float x, float y, int r, int g, int b, float scaleFactor);
+
+		virtual bool Update() override;
+	};
+	class CMiniMapSignalBattleShort : public CMiniMapSignal {
+	public:
+
+		static inline constexpr int vtp = 0x77BA30;
+		CMiniMapSignalBattleShort(float x, float y);
+
+		virtual bool Update() override;
+	};
+	class CMiniMapSignalBattleDetail : public CMiniMapSignal {
+	public:
+		float Time = 0;
+
+		static inline constexpr int vtp = 0x77BA24;
+		CMiniMapSignalBattleDetail(float x, float y, int colorCode);
+
+		virtual bool Update() override;
+	};
+	class CMiniMapSignalBattleRough : public CMiniMapSignal {
+	public:
+		float Time = 0;
+
+		static inline constexpr int vtp = 0x77BA18;
+		CMiniMapSignalBattleRough(float x, float y, float t);
+
+		virtual bool Update() override;
 	};
 
 	class MiniMapHandler { // size 251
 	public:
+		enum class Mode : int {
+			Normal = 0,
+			Tactical = 1,
+			Resource = 2,
+		};
+
+		struct SomeStrangePos {
+			EGUIX::Rect SomePos;
+			PADDINGI(1);
+
+			// ctor 53D0C5
+		};
+		struct MiniMapTexture {
+			RWE::RwRaster* Raster;
+			RWE::RwTexture* Texture;
+			BBRw::CDynTexRef* Dyn;
+			PADDINGI(1);
+
+			// ctor 53D7BC (shok::string*)
+			// ctor 53D75A (x, y)
+			// dtor 53D79F
+			void SetToRender();
+		};
+
+
 		// no vtable
-		PADDINGI(2);
+		PADDING(1);
+		bool RenderFoW;
+		bool BattleMarkersEnabled;
+		Mode CurrentMode; // 1
 		EGUIX::Rect MiniMapRenderPos;
-		PADDINGI(82);
-		PADDINGI(13);
-		shok::Vector<CMiniMapSignalDefault> Defaults;
-		PADDINGI(12);
-		shok::Vector<CMiniMapSignalPulse> Pulses;
+		struct TerrainHandler {
+			bool TerrainDone;
+			Mode CurrentMode;
+			EGUIX::Rect* RenderPos;
+			SomeStrangePos Sp;
+			MiniMapTexture NormalTexture, TacticalResourceModeTexture;
+
+			// setcurrentmode 5269CB
+		} Terrain; // 6
+		struct {
+			EGUIX::Rect* RenderPos;
+			SomeStrangePos Sp;
+
+			MiniMapTexture minimap_sphere, minimap_quad;
+			int IsResourceMode;
+			bool RenderIgnoreFoW;
+		} Uk2; // 22
+		struct FoWTerrainHiderHandler {
+			EGUIX::Rect* RenderPos;
+			SomeStrangePos Sp;
+
+			MiniMapTexture ExplorationOverlay;
+
+			float LastUpdateTime;
+			PADDINGI(1);
+		} FoWTerrainHider; // 38 just renders black over existing terrain
+		struct {
+			EGUIX::Rect* RenderPos;
+			SomeStrangePos Sp;
+			PADDINGI(32);
+		} Uk4; // 50
+		struct MarkerHandler {
+			SomeStrangePos Sp;
+			MiniMapTexture minimap_signal_0, minimap_signal_1; // 5 (dashed circle), 9 (rotating squares)
+
+			shok::Vector<CMiniMapSignalDefault> Defaults; // 13 renders minimap_signal_1
+			shok::Vector<CMiniMapSignalBattleRough> BattleRoughs; // 17 renders minimap_signal_0
+			shok::Vector<CMiniMapSignalBattleDetail> BattleDetails; // 21 renders minimap_signal_1
+			shok::Vector<CMiniMapSignalBattleShort> ShortBattles; // 25 renders minimap_signal_0
+			shok::Vector<CMiniMapSignalPulse> Pulses; // 29 renders minimap_signal_0
+			EGUIX::Rect* RenderPos; // 33
+
+			// render signal with active texture 5294C4(CMiniMapSignal*)
+			// render 52A015()
+			// add battle markers 52B237(x, y, int allied) (pos modified see CreateMarker)
+		} Markers; // 88
+		struct DebugTextHandler {
+			bool Active;
+			char Text[128 * 4];
+		} DebugText; // 112
 
 		void CreateMarker(const shok::Position& p, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor);
 		void CreateSignalDefault(const shok::Position& p, int r, int g, int b, float scaleFactor);
@@ -935,10 +1039,28 @@ namespace GGUI {
 		static inline MiniMapHandler* (__cdecl* const GlobalObj)() = reinterpret_cast<MiniMapHandler * (__cdecl*)()>(0x52FE1C); // ret 0x882AB8
 		// ctor 0x52FDBB
 		// set render rect 0x53D9E0 __thiscall(EGUIX::Rect*)
+		// set render fow 53D8BC(bool)
+		// set minimap mode 53D8E6(Mode)
+		// render minimap 53DD07()
+		// render overlay 53E496()
+		// on battle event 53DA5D(x, y, bool allied) same 52FE22 
 	};
 	static_assert(offsetof(MiniMapHandler, MiniMapRenderPos) == 2 * 4);
-	static_assert(offsetof(MiniMapHandler, Pulses) == 117 * 4);
-	//constexpr int i = offsetof(MiniMapHandler, Pulses) / 4;
+	static_assert(offsetof(MiniMapHandler, Terrain) == 6 * 4);
+	static_assert(offsetof(MiniMapHandler, Terrain.Sp) == (6 + 3) * 4);
+	static_assert(offsetof(MiniMapHandler, Terrain.NormalTexture) == (6 + 8) * 4);
+	static_assert(offsetof(MiniMapHandler, Uk2) == 22 * 4);
+	static_assert(offsetof(MiniMapHandler, Uk2.minimap_quad) == (22 + 10) * 4);
+	static_assert(offsetof(MiniMapHandler, Uk2.RenderIgnoreFoW) == (22 + 15) * 4);
+	static_assert(offsetof(MiniMapHandler, FoWTerrainHider) == 38 * 4);
+	static_assert(offsetof(MiniMapHandler, FoWTerrainHider.LastUpdateTime) == (38 + 10) * 4);
+	static_assert(offsetof(MiniMapHandler, Uk4) == 50 * 4);
+	static_assert(offsetof(MiniMapHandler, Markers) == 88 * 4);
+	static_assert(offsetof(MiniMapHandler, Markers.minimap_signal_1) == (88 + 9) * 4);
+	static_assert(offsetof(MiniMapHandler, Markers.Pulses) == 117 * 4);
+	static_assert(offsetof(MiniMapHandler, DebugText) == 122 * 4);
+	static_assert(sizeof(MiniMapHandler) == 251 * 4);
+	//constexpr int i = offsetof(MiniMapHandler, Uk1.Uk) / 4;
 
 	// renders the minimap
 	class CMiniMapCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {

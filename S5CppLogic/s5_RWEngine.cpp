@@ -154,6 +154,31 @@ bool RWE::RwRaster::ShowRaster(HWND window, bool vsync)
 {
     return raster_show(this, window, vsync ? 1 : 0);
 }
+static inline byte* (__cdecl* const raster_lock)(RWE::RwRaster* raster, byte level, RWE::RwRasterLockMode lockMode) = reinterpret_cast<byte * (__cdecl*)(RWE::RwRaster*, byte, RWE::RwRasterLockMode)>(0x418C40);
+byte* RWE::RwRaster::Lock(byte level, RwRasterLockMode lockMode)
+{
+    return raster_lock(this, level, lockMode);
+}
+static inline byte* (__cdecl* const raster_lockpa)(RWE::RwRaster* raster, RWE::RwRasterLockMode lockMode) = reinterpret_cast<byte * (__cdecl*)(RWE::RwRaster*, RWE::RwRasterLockMode)>(0x418B00);
+byte* RWE::RwRaster::LockPalette(RwRasterLockMode lockMode)
+{
+    return raster_lockpa(this, lockMode);
+}
+static inline RWE::RwRaster* (__cdecl* const raster_unlock)(RWE::RwRaster* raster) = reinterpret_cast<RWE::RwRaster* (__cdecl*)(RWE::RwRaster*)>(0x418A50);
+void RWE::RwRaster::Unlock()
+{
+    raster_unlock(this);
+}
+static inline RWE::RwRaster* (__cdecl* const raster_unlockpal)(RWE::RwRaster* raster) = reinterpret_cast<RWE::RwRaster * (__cdecl*)(RWE::RwRaster*)>(0x418A70);
+void RWE::RwRaster::UnlockPalette()
+{
+    raster_unlockpal(this);
+}
+static inline int (__cdecl* const raster_getmiplev)(RWE::RwRaster* raster) = reinterpret_cast<int (__cdecl*)(RWE::RwRaster*)>(0x418B30);
+int RWE::RwRaster::GetMipLevels()
+{
+    return raster_getmiplev(this);
+}
 
 static inline int(__cdecl* const atomic_isparticleemitter)(RWE::RpAtomic* a) = reinterpret_cast<int(__cdecl*)(RWE::RpAtomic*)>(0x5D9210);
 bool RWE::RpAtomic::IsParticleEmitter()

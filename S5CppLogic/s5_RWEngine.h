@@ -264,8 +264,13 @@ namespace RWE {
 		// destroys, no ref counting here
 		// destroy parent? (docu)
 		void Destroy();
-		static inline RwRaster* (__cdecl* const Create)(int width, int height, int depth, int flags) = reinterpret_cast<RwRaster * (__cdecl*)(int, int, int, int)>(0x418BA0);
+		static inline RwRaster* (__cdecl* const Create)(int width, int height, int depth, RwRasterCreateFlags flags) = reinterpret_cast<RwRaster * (__cdecl*)(int, int, int, RwRasterCreateFlags)>(0x418BA0);
 		bool ShowRaster(HWND window, bool vsync);
+		byte* Lock(byte level, RwRasterLockMode lockMode);
+		byte* LockPalette(RwRasterLockMode lockMode);
+		void Unlock();
+		void UnlockPalette();
+		int GetMipLevels();
 	};
 
 	struct RpInterpolator {
@@ -609,6 +614,7 @@ namespace RWE {
 	};
 	struct RwMetrics;
 
+	enum class RwStandardFunc : int;
 	struct RwGlobals {
 		enum class RwEngineStatus : int {
 			rwENGINESTATUSIDLE = 0,
@@ -626,6 +632,7 @@ namespace RWE {
 
 		RwDevice dOpenDevice; // 4
 
+		// lookup func in RwStandardFunc
 		int(__cdecl* stdFunc[29])(void* pout, void* pinout, int inint); // 18
 
 		RwLinkList dirtyFrameList;

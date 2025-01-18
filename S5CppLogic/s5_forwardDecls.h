@@ -199,6 +199,7 @@ namespace RWE {
 	using RwTexture = ::RwTexture;
 	struct RpWorld;
 	struct RwCamera;
+	struct RwRaster;
 }
 namespace RWE::Particles {
 	struct RpPrtStdEmitter;
@@ -222,5 +223,6 @@ namespace CppLogic::EntityAddon {
 }
 namespace BBRw {
 	class CEngine;
+	class CDynTexRef;
 }
 class CProjectileEffectCreator;

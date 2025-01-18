@@ -306,6 +306,10 @@ GGUI::CMiniMapSignalPulse::CMiniMapSignalPulse(float x, float y, bool pulsing, i
     G = g;
     B = b;
 }
+bool GGUI::CMiniMapSignalPulse::Update()
+{
+    return false;
+}
 
 static inline void(__thiscall* const minimapsignaldefault_ctor)(GGUI::CMiniMapSignalDefault* th, float x, float y, int colorcode) = reinterpret_cast<void(__thiscall*)(GGUI::CMiniMapSignalDefault*, float, float, int)>(0x53D688);
 GGUI::CMiniMapSignalDefault::CMiniMapSignalDefault(float x, float y, int r, int g, int b, float scaleFactor)
@@ -316,6 +320,40 @@ GGUI::CMiniMapSignalDefault::CMiniMapSignalDefault(float x, float y, int r, int 
     B = b;
     Scale *= scaleFactor;
 }
+bool GGUI::CMiniMapSignalDefault::Update()
+{
+    return false;
+}
+
+static inline void(__thiscall* const minimapattleshort_ctor)(GGUI::CMiniMapSignalBattleShort* th, float x, float y) = reinterpret_cast<void(__thiscall*)(GGUI::CMiniMapSignalBattleShort*, float, float)>(0x53D63B);
+GGUI::CMiniMapSignalBattleShort::CMiniMapSignalBattleShort(float x, float y)
+{
+    minimapattleshort_ctor(this, x, y);
+}
+bool GGUI::CMiniMapSignalBattleShort::Update()
+{
+    return false;
+}
+
+static inline void(__thiscall* const minimapattledet_ctor)(GGUI::CMiniMapSignalBattleDetail* th, float x, float y, int c) = reinterpret_cast<void(__thiscall*)(GGUI::CMiniMapSignalBattleDetail*, float, float, int)>(0x53D5E0);
+GGUI::CMiniMapSignalBattleDetail::CMiniMapSignalBattleDetail(float x, float y, int colorCode)
+{
+    minimapattledet_ctor(this, x, y, colorCode);
+}
+bool GGUI::CMiniMapSignalBattleDetail::Update()
+{
+    return false;
+}
+
+static inline void(__thiscall* const minimapattlerou_ctor)(GGUI::CMiniMapSignalBattleRough* th, float x, float y, float c) = reinterpret_cast<void(__thiscall*)(GGUI::CMiniMapSignalBattleRough*, float, float, float)>(0x53D55C);
+GGUI::CMiniMapSignalBattleRough::CMiniMapSignalBattleRough(float x, float y, float u)
+{
+    minimapattlerou_ctor(this, x, y, u);
+}
+bool GGUI::CMiniMapSignalBattleRough::Update()
+{
+    return false;
+}
 
 static inline void(__thiscall* const minimapmarkerhandler_addpulse)(shok::Vector<GGUI::CMiniMapSignalPulse>* th, GGUI::CMiniMapSignalPulse* p) = reinterpret_cast<void(__thiscall*)(shok::Vector<GGUI::CMiniMapSignalPulse>*, GGUI::CMiniMapSignalPulse*)>(0x52AFA5);
 void GGUI::MiniMapHandler::CreateMarker(const shok::Position& p, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor)
@@ -325,7 +363,7 @@ void GGUI::MiniMapHandler::CreateMarker(const shok::Position& p, bool pulsing, i
     float x = p.X * scale / hire->MaxSizeX;
     float y = p.Y * scale / hire->MaxSizeY;
     GGUI::CMiniMapSignalPulse pul{ x, y, pulsing, r, g, b, timeFactor, scaleFactor };
-    minimapmarkerhandler_addpulse(&Pulses, &pul);
+    minimapmarkerhandler_addpulse(&Markers.Pulses, &pul);
 }
 
 static inline void(__thiscall* const minimapmarkerhandler_adddefault)(shok::Vector<GGUI::CMiniMapSignalDefault>* th, GGUI::CMiniMapSignalDefault* p) = reinterpret_cast<void(__thiscall*)(shok::Vector<GGUI::CMiniMapSignalDefault>*, GGUI::CMiniMapSignalDefault*)>(0x52AEA5);
@@ -336,7 +374,13 @@ void GGUI::MiniMapHandler::CreateSignalDefault(const shok::Position& p, int r, i
     float x = p.X * scale / hire->MaxSizeX;
     float y = p.Y * scale / hire->MaxSizeY;
     GGUI::CMiniMapSignalDefault def{ x, y, r, g, b, scaleFactor };
-    minimapmarkerhandler_adddefault(&Defaults, &def);
+    minimapmarkerhandler_adddefault(&Markers.Defaults, &def);
+}
+
+static inline void(__thiscall* const minimaptextu_settorend)(GGUI::MiniMapHandler::MiniMapTexture*) = reinterpret_cast<void(__thiscall*)(GGUI::MiniMapHandler::MiniMapTexture*)>(0x53D6F3);
+void GGUI::MiniMapHandler::MiniMapTexture::SetToRender()
+{
+    minimaptextu_settorend(this);
 }
 
 inline void(__thiscall* const scrollbar_update)(EGUIX::CScrollBarButtonCustomWidget* th, int val, bool cb, EGUIX::CBaseWidget* wid) = reinterpret_cast<void(__thiscall*)(EGUIX::CScrollBarButtonCustomWidget*, int, bool, EGUIX::CBaseWidget*)>(0x55CB11);

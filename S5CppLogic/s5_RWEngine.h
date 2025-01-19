@@ -562,7 +562,7 @@ namespace RWE {
 		void* fpIm2DRenderLine; // 10
 		void* fpIm2DRenderTriangle;
 		int(__cdecl* fpIm2DRenderPrimitive)(RwPrimitiveType primType, RwIm2DVertex* vertices, int numVertices);// 12
-		void* fpIm2DRenderIndexedPrimitive;
+		int(__cdecl* fpIm2DRenderIndexedPrimitive)(RwPrimitiveType primType, RwIm2DVertex* vertices, int numVertices, uint16_t* indices, int numIndices);
 
 		void* fpIm3DRenderLine;
 		void* fpIm3DRenderTriangle;

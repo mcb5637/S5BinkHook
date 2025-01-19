@@ -5,6 +5,8 @@
 #include "s5_scriptsystem.h"
 #include "s5_idmanager.h"
 #include "s5_video.h"
+#include "s5_RWEngine.h"
+#include <span>
 
 namespace EGUIX {
 	struct Rect { // size 4
@@ -957,11 +959,20 @@ namespace GGUI {
 			Resource = 2,
 		};
 
-		struct SomeStrangePos {
+		struct MiniMapRenderer {
 			EGUIX::Rect SomePos;
-			PADDINGI(1);
+			int NumVerticies;
 
 			// ctor 53D0C5
+			// there are 100 rects that can be rendered at once
+			// set color 53CDD0(EGUIX::Color*, rectind), 53CE0B(shok::Color, rectind)
+			// set render rect 53CFE1(EGUIX::Rect*, rectind)
+			// set render rect vert pos 53CE5D(vertind, f x, f y, rectind)
+			// render current raster 53D143()
+			// reset verticies to render 53CDCB()
+			
+			static inline std::span<RWE::RwIm2DVertex, 400> VerticiesToRender{ reinterpret_cast<RWE::RwIm2DVertex*>(0x883C40), 400 };
+			static inline std::span<uint16_t, 100> VertexIndices{ reinterpret_cast<uint16_t*>(0x883790), 100 };
 		};
 		struct MiniMapTexture {
 			RWE::RwRaster* Raster;
@@ -986,22 +997,24 @@ namespace GGUI {
 			bool TerrainDone;
 			Mode CurrentMode;
 			EGUIX::Rect* RenderPos;
-			SomeStrangePos Sp;
+			MiniMapRenderer Render;
 			MiniMapTexture NormalTexture, TacticalResourceModeTexture;
 
 			// setcurrentmode 5269CB
 		} Terrain; // 6
-		struct {
+		struct EntitiesHandler {
 			EGUIX::Rect* RenderPos;
-			SomeStrangePos Sp;
+			MiniMapRenderer Render;
 
 			MiniMapTexture minimap_sphere, minimap_quad;
 			int IsResourceMode;
 			bool RenderIgnoreFoW;
-		} Uk2; // 22
+
+			// set render entity 543D19(f x, f y, f sx, f sy, shok::Color c, rectind)
+		} Entities; // 22
 		struct FoWTerrainHiderHandler {
 			EGUIX::Rect* RenderPos;
-			SomeStrangePos Sp;
+			MiniMapRenderer Render;
 
 			MiniMapTexture ExplorationOverlay;
 
@@ -1010,11 +1023,11 @@ namespace GGUI {
 		} FoWTerrainHider; // 38 just renders black over existing terrain
 		struct {
 			EGUIX::Rect* RenderPos;
-			SomeStrangePos Sp;
+			MiniMapRenderer Render;
 			PADDINGI(32);
 		} Uk4; // 50
 		struct MarkerHandler {
-			SomeStrangePos Sp;
+			MiniMapRenderer Render;
 			MiniMapTexture minimap_signal_0, minimap_signal_1; // 5 (dashed circle), 9 (rotating squares)
 
 			shok::Vector<CMiniMapSignalDefault> Defaults; // 13 renders minimap_signal_1
@@ -1047,11 +1060,11 @@ namespace GGUI {
 	};
 	static_assert(offsetof(MiniMapHandler, MiniMapRenderPos) == 2 * 4);
 	static_assert(offsetof(MiniMapHandler, Terrain) == 6 * 4);
-	static_assert(offsetof(MiniMapHandler, Terrain.Sp) == (6 + 3) * 4);
+	static_assert(offsetof(MiniMapHandler, Terrain.Render) == (6 + 3) * 4);
 	static_assert(offsetof(MiniMapHandler, Terrain.NormalTexture) == (6 + 8) * 4);
-	static_assert(offsetof(MiniMapHandler, Uk2) == 22 * 4);
-	static_assert(offsetof(MiniMapHandler, Uk2.minimap_quad) == (22 + 10) * 4);
-	static_assert(offsetof(MiniMapHandler, Uk2.RenderIgnoreFoW) == (22 + 15) * 4);
+	static_assert(offsetof(MiniMapHandler, Entities) == 22 * 4);
+	static_assert(offsetof(MiniMapHandler, Entities.minimap_quad) == (22 + 10) * 4);
+	static_assert(offsetof(MiniMapHandler, Entities.RenderIgnoreFoW) == (22 + 15) * 4);
 	static_assert(offsetof(MiniMapHandler, FoWTerrainHider) == 38 * 4);
 	static_assert(offsetof(MiniMapHandler, FoWTerrainHider.LastUpdateTime) == (38 + 10) * 4);
 	static_assert(offsetof(MiniMapHandler, Uk4) == 50 * 4);

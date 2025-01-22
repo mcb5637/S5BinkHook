@@ -39,7 +39,7 @@ namespace GGL {
 		shok::Vector<shok::EntityId> EmployedWorkerArray; // 39
 		shok::Vector<shok::EntityId> SoldierArray; // 43
 		shok::Vector<shok::EntityId> LeaderArray; // 47
-		shok::Vector<shok::EntityId> HeroArray;
+		shok::Vector<shok::EntityId> HeroArray; // 51
 		shok::Vector<shok::EntityId> SerfArray; // 55
 		shok::Map<shok::EntityTypeId, int> EntityTypeCountMap; // 59 EntityType->Count
 		shok::List<TypeThatLeftData> EntityTypeThatLeft; // 62

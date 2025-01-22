@@ -980,8 +980,9 @@ namespace GGUI {
 			BBRw::CDynTexRef* Dyn;
 			PADDINGI(1);
 
-			// ctor 53D7BC (shok::string*)
-			// ctor 53D75A (x, y)
+			// ctor texture 53D7BC (shok::string*)
+			// ctor CDynTexRef 53D75A (x, y)
+			// ctor empty 53D6E3()
 			// dtor 53D79F
 			void SetToRender();
 		};
@@ -994,13 +995,15 @@ namespace GGUI {
 		Mode CurrentMode; // 1
 		EGUIX::Rect MiniMapRenderPos;
 		struct TerrainHandler {
-			bool TerrainDone;
+			bool TerrainRasterDone;
 			Mode CurrentMode;
 			EGUIX::Rect* RenderPos;
 			MiniMapRenderer Render;
 			MiniMapTexture NormalTexture, TacticalResourceModeTexture;
 
 			// setcurrentmode 5269CB
+			// render 543C54()
+			// build terrain raster 5434D8()
 		} Terrain; // 6
 		struct EntitiesHandler {
 			EGUIX::Rect* RenderPos;
@@ -1011,6 +1014,13 @@ namespace GGUI {
 			bool RenderIgnoreFoW;
 
 			// set render entity 543D19(f x, f y, f sx, f sy, shok::Color c, rectind)
+			// render entities of accesscat 543E22(f scale, AccessCategoryFlags f)
+			// render heroes 54414F(f scale)
+			// render selected entities 54402C(f scale)
+			// render VCs 544467(f scale)
+			// render HQs 5442DB(f scale)
+			// render debug stuff 5446AF()
+			// render 544951()
 		} Entities; // 22
 		struct FoWTerrainHiderHandler {
 			EGUIX::Rect* RenderPos;
@@ -1020,12 +1030,23 @@ namespace GGUI {
 
 			float LastUpdateTime;
 			PADDINGI(1);
+
+			// build fow raster 53E54A(bool =false)
+			// render 53E77B()
 		} FoWTerrainHider; // 38 just renders black over existing terrain
-		struct {
+		struct CameraHandler {
 			EGUIX::Rect* RenderPos;
-			MiniMapRenderer Render;
-			PADDINGI(32);
-		} Uk4; // 50
+			struct {
+				MiniMapRenderer Render;
+				std::array<RWE::RwIm2DVertex, 4> VertToRender;
+				MiniMapTexture Empty;
+
+				// store vert 54521F()
+				// render stored 545180()
+			} CamRenderer;
+
+			// render 544A8E(bool prepare)
+		} Camera; // 50
 		struct MarkerHandler {
 			MiniMapRenderer Render;
 			MiniMapTexture minimap_signal_0, minimap_signal_1; // 5 (dashed circle), 9 (rotating squares)
@@ -1044,6 +1065,8 @@ namespace GGUI {
 		struct DebugTextHandler {
 			bool Active;
 			char Text[128 * 4];
+
+			// render 543316()
 		} DebugText; // 112
 
 		void CreateMarker(const shok::Position& p, bool pulsing, int r, int g, int b, float timeFactor, float scaleFactor);
@@ -1051,6 +1074,7 @@ namespace GGUI {
 
 		static inline MiniMapHandler* (__cdecl* const GlobalObj)() = reinterpret_cast<MiniMapHandler * (__cdecl*)()>(0x52FE1C); // ret 0x882AB8
 		// ctor 0x52FDBB
+		// dtor 52FDCD
 		// set render rect 0x53D9E0 __thiscall(EGUIX::Rect*)
 		// set render fow 53D8BC(bool)
 		// set minimap mode 53D8E6(Mode)
@@ -1067,7 +1091,8 @@ namespace GGUI {
 	static_assert(offsetof(MiniMapHandler, Entities.RenderIgnoreFoW) == (22 + 15) * 4);
 	static_assert(offsetof(MiniMapHandler, FoWTerrainHider) == 38 * 4);
 	static_assert(offsetof(MiniMapHandler, FoWTerrainHider.LastUpdateTime) == (38 + 10) * 4);
-	static_assert(offsetof(MiniMapHandler, Uk4) == 50 * 4);
+	static_assert(offsetof(MiniMapHandler, Camera) == 50 * 4);
+	static_assert(offsetof(MiniMapHandler, Camera.CamRenderer.Empty) == (50+34) * 4);
 	static_assert(offsetof(MiniMapHandler, Markers) == 88 * 4);
 	static_assert(offsetof(MiniMapHandler, Markers.minimap_signal_1) == (88 + 9) * 4);
 	static_assert(offsetof(MiniMapHandler, Markers.Pulses) == 117 * 4);

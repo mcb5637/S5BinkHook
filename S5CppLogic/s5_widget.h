@@ -168,6 +168,7 @@ namespace EGUIX {
 	class IOnEvent {
 	public:
 		virtual ~IOnEvent() = default;
+		// evLocalCoords uses coordinates of mother container, evUnmodified uses global coordinates
 		virtual int HandleEvent(BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) = 0; // return id of wid that handeled event or 0?
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF284ED96);
@@ -398,6 +399,7 @@ namespace EGUIX {
 		virtual void Initialize() = 0;
 		virtual void Destroy() = 0;
 		virtual void Render(CCustomWidget* widget, const Rect* screenCoords) = 0;
+		// evLocalCoords uses coordinates of mother container, evUnmodified uses global coordinates
 		virtual bool HandleEvent(CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) = 0;
 	private:
 		virtual int uk3(); // 5
@@ -1108,13 +1110,18 @@ namespace GGUI {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x98C68876);
 	};
 
-	// does jump cam to click or move to pos
-	// also renders something?
+	// mouse up: nop
+	// mouse down:
+	//	mouse l -> if GGUI::CPositionCommandState, execute at clicked pos, else jump to clicked pos
+	//	mouse r -> if shift, something MP, elseif GGUI::CSelectionState, execute at clicked pos, else nop 
+	// also renders signals (and something more if in minimap debug mode...)
 	class CMiniMapOverlayCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
 		static inline constexpr int vtp = 0x77CDCC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6157C1AE);
+
+		// calculate map pos under mouse event bool valid 5335F4(CCustomWidget* wid, BB::CEvent* evlocal, float* x, float* y) buggy? calculates global pos and compares to local event?
 	};
 
 	// renders some network info on screen

@@ -689,6 +689,9 @@ namespace GGUI {
 		GGUI::CBasicState* GetCommandStateFor(shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
 		shok::EntityId GetLastSelectedNonSoldier() const;
 
+		// on minimap MouseL clicked 525A9A(x, y)
+		// scroll to pos (minimap click) cdecl 523D2D(shok::position*)
+
 		void HackPostEvent();
 
 		static inline GGUI::CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<GGUI::CManager * (__cdecl*)()>(0x525622);

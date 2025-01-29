@@ -285,6 +285,7 @@ EGUIX::CWidgetStringHelper* EGUIX::CBaseWidget::GetStringHelper()
 
 EGUIX::Rect EGUIX::CBaseWidget::CalcGlobalPosAndSize()
 {
+    // 559BC9(rect* out) does the same
     EGUIX::Rect r = PosAndSize;
     auto* root = WidgetLoader::GlobalObj()->RootWid;
     auto* m = WidgetManager::GlobalObj();

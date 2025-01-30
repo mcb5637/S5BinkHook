@@ -403,7 +403,7 @@ namespace shok {
 	enum class ModelId : int {
 		Invalid = 0,
 	};
-	enum class SectorId : int {
+	enum class SectorId : int { // max 0x7FFF
 		Invalid = 0, // in most cases => blocked
 	};
 	enum class TechnologyId : int {

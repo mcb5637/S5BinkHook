@@ -336,6 +336,8 @@ namespace EGL {
 
 		// defined tasks: TASK_RESET_TASK_LIST_TIMER, TASK_SET_MODEL, TASK_PLAY_SOUND, TASK_STOP_SOUND
 		// defined states: SetNextTaskList
+
+		// add to idmanager 57B1E6()
 	};
 #ifdef __INTELLISENSE__
 #pragma diag_suppress 2784

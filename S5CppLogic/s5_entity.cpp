@@ -20,46 +20,6 @@
 #include "savegame_extra.h"
 #include "EntityAddonData.h"
 
-struct shok_vtable_EGL_CGLEEntity : BB::IObject::_vtableS {
-	void(__thiscall* Destroy)(EGL::CGLEEntity* th, int i); // 3
-	PADDINGI(1);
-	void(__thiscall* CopyDataFromCreator)(EGL::CGLEEntity* th, EGL::CGLEEntityCreator* cr); // 5
-	PADDINGI(1);
-	void(__thiscall* InitializeEntity)(EGL::CGLEEntity* th); // dont use outside of createentity
-	void(__thiscall* InitializeAfterSaveLoad)(EGL::CGLEEntity* th); // dont use outside of save load
-	void(__thiscall* FireOnCreatedTriggers)(EGL::CGLEEntity* th); // 9, script trigger + scriptcommandline
-	void(__thiscall* SetPosition)(EGL::CGLEEntity* th, shok::Position* p); // 10 works for settlers, check if it does for other stuff to, called every tick
-	void(__thiscall* SetRotation)(EGL::CGLEEntity* th, float r);
-	int(__thiscall* GetSector)(EGL::CGLEEntity* th); // 12
-	bool(__thiscall* IsInSector)(EGL::CGLEEntity* th, int sector);
-	PADDINGI(1); // maybe execute task?/ontick?, settler update auras
-	void(__thiscall* ExecuteTask)(EGL::CGLEEntity* th, EGL::CGLETaskArgs* t); // 15 return values: 2->same task, next tick, 1->next task, next tick, 0->next task, immediately
-	void(__thiscall* FireEvent)(EGL::CGLEEntity* th, BB::CEvent* d); // 16
-	void(__thiscall* AddBehavior)(EGL::CGLEEntity* th, EGL::CGLEBehavior* bh); // 17 probably not usable outside of createentity
-	PADDINGI(1); // add behavior slot
-	void(__thiscall* AddTaskHandler)(EGL::CGLEEntity* th, shok::Task task, EGL::TaskHandler* taskhandler); // 19
-	void(__thiscall* AddEventHandler)(EGL::CGLEEntity* th, shok::EventIDs eventid, EGL::EventHandler* eventhandler); // 20
-	void(__thiscall* AddStateHandler)(EGL::CGLEEntity* th, shok::TaskState state, EGL::IGLEStateHandler* statehandler); // 21
-	void(__thiscall* GetApproachPos)(EGL::CGLEEntity* th, shok::Position* outpos);
-	float(__thiscall* GetApproachRot)(EGL::CGLEEntity* th);
-	void(__thiscall* SetTaskState)(EGL::CGLEEntity* th, shok::TaskState state); // 24
-	PADDINGI(3);
-	float(__thiscall* GetExploration)(EGL::CGLEEntity* e); // 28
-	PADDINGI(5); // get flags as float, then jmp to 33
-	bool(__thiscall* CanCancelCurrentState)(EGL::CGLEEntity* e); // 34
-};
-//constexpr int i = offsetof(shok_vtable_EGL_CGLEEntity, CanCancelCurrentState) / 4;
-
-
-struct shok_vtable_EGL_IEntityDisplay {
-	void(__thiscall* dtor)(EGL::IEntityDisplay* th);
-	void* (__thiscall* GetSlotByIndex)(EGL::IEntityDisplay* th, int i);
-	void(__thiscall* GetModelData)(const EGL::IEntityDisplay* th, EGL::IEntityDisplay::modeldata* d);
-	void(__thiscall* GetPlayerModelData)(const EGL::IEntityDisplay* th, EGL::IEntityDisplay::playermodeldata* d);
-	void(__thiscall* GetPosData)(const EGL::IEntityDisplay* th, EGL::IEntityDisplay::posdata* d);
-	PADDINGI(1); // ret zero, 1 arg
-};
-
 EGL::IEntityDisplay::modeldata EGL::IEntityDisplay::GetModelData() const
 {
 	modeldata r;

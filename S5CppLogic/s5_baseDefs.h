@@ -151,12 +151,6 @@ namespace BB {
 		static constexpr int vtp = 0x7620F0;
 		static constexpr shok::ClassId Identifier = InvalidIdentifier;
 
-		struct _vtableS {
-			void(__thiscall* dtor)(BB::IObject* th, bool free);
-			shok::ClassId(__stdcall* GetClassIdentifier)(const BB::IObject* th);
-			void* (__stdcall* CastToIdentifier)(BB::IObject* th, shok::ClassId id);
-		};
-
 		template<HasValidIdentifier To>
 		To* CastToIdentifier() {
 			return static_cast<To*>(CastToIdentifier(To::Identifier));

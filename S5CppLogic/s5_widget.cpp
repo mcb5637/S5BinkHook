@@ -11,16 +11,6 @@
 #include "mod.h"
 #include "EntityAddonData.h"
 
-struct shok_vtable_EGUIX_CBaseWidget : BB::IObject::_vtableS {
-    PADDINGI(4);
-    int(__thiscall* SetSizeAndPos)(EGUIX::CBaseWidget* th, float x, float y, float w, float h); // 7
-    PADDINGI(4);
-};
-struct shok_vtable_EGUIX_CContainerWidget : shok_vtable_EGUIX_CBaseWidget {
-    void(__thiscall* AddChild)(EGUIX::CContainerWidget* th, EGUIX::CBaseWidget* ch); // 12
-};
-//constexpr int i = offsetof(shok_vtable_EGUIX_CContainerWidget, AddChild) / 4;
-
 shok::Color EGUIX::Color::ToShokColor() const
 {
     return shok::Color{ Red, Green, Blue, Alpha };

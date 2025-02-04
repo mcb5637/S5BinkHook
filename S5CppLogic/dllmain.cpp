@@ -298,8 +298,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-
-	ED::CPlayerColors* pc = (*ED::CGlobalsBaseEx::GlobalObj)->PlayerColors;
+	
 	return 0;
 }
 

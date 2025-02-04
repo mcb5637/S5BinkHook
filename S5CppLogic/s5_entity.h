@@ -83,10 +83,11 @@ namespace EGL {
 		shok::TaskListId CurrentTaskListID;
 		int CurrentTaskIndex; // 37
 		shok::Map<shok::TaskState, EGL::IGLEStateHandler*> StateHandlers; // 38
-		shok::Map<shok::Task, EGL::TaskHandler*> TaskHandlers; // 41
-		PADDINGI(1);
-		shok::Map<shok::EventIDs, EGL::EventHandler*> EventHandlers; //45
-		PADDINGI(1);
+		struct TaskHandlerList {
+			shok::Map<shok::Task, EGL::TaskHandler*> Handlers;
+			bool AllowAdd;
+		} TaskHandlers; // 41
+		EventHandlerList EventHandlers; //45
 		EGL::ISlot* Slots; // same size as behavioProps vector of type, initialized on create
 		int Health; // 50
 		char* ScriptName; // "Name" in loader

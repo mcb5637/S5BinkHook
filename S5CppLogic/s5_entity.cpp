@@ -502,7 +502,7 @@ EGL::CGLETaskList* EGL::CGLEEntity::GetCurrentTaskList()
 {
 	return shok_entity_GetCurrentTaskList(this);
 }
-static inline EGL::TaskHandler* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(shok::Map<shok::Task, EGL::TaskHandler*>* th, shok::Task id) = reinterpret_cast<EGL::TaskHandler * (__thiscall* const)(shok::Map<shok::Task, EGL::TaskHandler*>*, shok::Task)>(0x57BDD3);
+static inline EGL::TaskHandler* (__thiscall* const shok_entitytaskhandler_gettaskhandler)(EGL::CGLEEntity::TaskHandlerList* th, shok::Task id) = reinterpret_cast<EGL::TaskHandler * (__thiscall* const)(EGL::CGLEEntity::TaskHandlerList*, shok::Task)>(0x57BDD3);
 EGL::TaskHandler* EGL::CGLEEntity::GetTaskHandler(shok::Task task)
 {
 	return shok_entitytaskhandler_gettaskhandler(&TaskHandlers, task);

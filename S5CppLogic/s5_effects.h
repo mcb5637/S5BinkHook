@@ -35,7 +35,7 @@ namespace EGL {
 		int EffectFlags; // 1->has duration
 		shok::PlayerId PlayerID;
 		shok::EffectId EffectID; // 23
-		PADDINGI(4); // set of eventhandlers? then bool?
+		EventHandlerList EventHandlers;
 
 		static inline constexpr int vtp = 0x784B28;
 		static inline constexpr int TypeDesc = 0x822284;

@@ -190,6 +190,12 @@ bool shok::CostInfo::SubResources(const CostInfo& tosub)
 	return costinfo_subci(this, &tosub);
 }
 
+inline void(__thiscall* const eventhandlerlist_addhandlers)(EGL::EventHandlerList* th, shok::EventIDs id, EGL::EventHandler* h) = reinterpret_cast<void(__thiscall*)(EGL::EventHandlerList*, shok::EventIDs, EGL::EventHandler*)>(0x49E6A1);
+void EGL::EventHandlerList::AddHandler(shok::EventIDs id, EGL::EventHandler* h)
+{
+	eventhandlerlist_addhandlers(this, id, h);
+}
+
 bool CppLogic::CaselessStringComparator::operator()(std::string_view a, std::string_view b) const noexcept
 {
 	return std::ranges::lexicographical_compare(a, b, [](char x, char y) { return std::tolower(x) < std::tolower(y); });

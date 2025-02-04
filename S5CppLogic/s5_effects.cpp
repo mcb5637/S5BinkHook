@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "s5_effects.h"
 #include "s5_effecttype.h"
+#include "s5_classfactory.h"
 #include "hooks.h"
 #include "entityiterator.h"
 
@@ -175,17 +176,26 @@ void __declspec(naked) arrowonhit_damage() {
 }
 void GGL::CArrowEffect::HookDealDamage()
 {
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
-		reinterpret_cast<void*>(0x5113C2),
-		reinterpret_cast<byte*>(0x4DBA20),
-		reinterpret_cast<byte*>(0x511637),
-	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage, reinterpret_cast<void*>(0x5113CF));
-	// projectile creator bigger zero for AdvancedDamageSourceOverride
-	*reinterpret_cast<byte*>(0x4DBA20) = 0x89; // mov [esi+0x44], al -> mov [esi+0x44], eax
-	// arrow projcetile AdvancedDamageSourceOverride
-	*reinterpret_cast<byte*>(0x511634) = 0x8B; // mov al, [edi+0x44] -> mov eax, [edi+0x44]
-	*reinterpret_cast<byte*>(0x511637) = 0x89; // mov [esi+0xC8], al -> mov [esi+0xC8], eax
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+			reinterpret_cast<void*>(0x5113C2),
+			reinterpret_cast<byte*>(0x4DBA20),
+			reinterpret_cast<byte*>(0x511637),
+		} };
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5113C2), &arrowonhit_damage, reinterpret_cast<void*>(0x5113CF));
+		// projectile creator bigger zero for AdvancedDamageSourceOverride
+		*reinterpret_cast<byte*>(0x4DBA20) = 0x89; // mov [esi+0x44], al -> mov [esi+0x44], eax
+		// arrow projcetile AdvancedDamageSourceOverride
+		*reinterpret_cast<byte*>(0x511634) = 0x8B; // mov al, [edi+0x44] -> mov eax, [edi+0x44]
+		*reinterpret_cast<byte*>(0x511637) = 0x89; // mov [esi+0xC8], al -> mov [esi+0xC8], eax
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x87BC20), sizeof(BB::SerializationData) };
+		auto* d = reinterpret_cast<BB::SerializationData*>(0x87BC20);
+		assert(d->SerializationName == std::string_view{ "Misses" });
+		d->DataConverter = BB::FieldSerializer::TypeInt;
+		d->Size = sizeof(int);
+	}
 }
 
 void __declspec(naked) cannonballhit_damage() {

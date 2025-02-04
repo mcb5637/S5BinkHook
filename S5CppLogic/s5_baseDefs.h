@@ -398,6 +398,14 @@ namespace EGL {
 		}
 	};
 
+	class EventHandlerList {
+	public:
+		shok::MultiMap<shok::EventIDs, EGL::EventHandler*> Handlers;
+		bool AllowAdd;
+
+		// dtor 49EB85
+		void AddHandler(shok::EventIDs id, EGL::EventHandler* h);
+	};
 
 	class ISlot {
 	public:

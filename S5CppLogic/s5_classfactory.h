@@ -93,6 +93,7 @@ namespace BB {
 		static inline BB::FieldSerializer* const TypeWidgetID = reinterpret_cast<BB::FieldSerializer*>(0x894708);
 		static inline BB::FieldSerializer* const TypeArmorClassId = reinterpret_cast<BB::FieldSerializer*>(0x85D5CC);
 		static inline BB::FieldSerializer* const TypeEntityCategory = reinterpret_cast<BB::FieldSerializer*>(0x85D4F4);
+		static inline BB::FieldSerializer* const TypeAttachmentType = reinterpret_cast<BB::FieldSerializer*>(0x868408);
 
 		template<class T>
 		static constexpr BB::FieldSerializer* GetSerializer() = delete;
@@ -148,6 +149,14 @@ namespace BB {
 		template<>
 		static constexpr BB::FieldSerializer* GetSerializer<shok::EntityCategory>() {
 			return TypeEntityCategory;
+		}
+		template<>
+		static constexpr BB::FieldSerializer* GetSerializer<shok::EventIDs>() {
+			return TypeInt; // no real serializer, but int should work
+		}
+		template<>
+		static constexpr BB::FieldSerializer* GetSerializer<shok::AttachmentType>() {
+			return TypeAttachmentType;
 		}
 
 		struct ExtendedInfo {

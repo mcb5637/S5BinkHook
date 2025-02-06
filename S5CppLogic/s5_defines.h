@@ -22,6 +22,7 @@ namespace shok {
 	};
 
 	enum class AttachmentType : int {
+		INVALID = 0,
 		SETTLER_SOURCE_PILE = 2,
 		SETTLER_DESTINATION_PILE = 3,
 		SETTLER_COLLECT_GOOD_RESOURCE = 4,

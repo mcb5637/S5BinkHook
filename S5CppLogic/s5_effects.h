@@ -22,7 +22,7 @@ namespace EGL {
 		virtual shok::EffectTypeId __stdcall GetEffectType() const = 0;
 		virtual void __stdcall FillTypeAndID(TypeAndID* d) const = 0;
 		virtual void __stdcall FillTurnDurationAndPos(TurnDurationAndPos* d) const = 0;
-		virtual void __stdcall GetPlayerID() const = 0;
+		virtual shok::PlayerId __stdcall GetPlayerID() const = 0;
 		virtual EGL::ISlot* __stdcall GetFlyingEffectSlot() = 0;
 	};
 
@@ -41,15 +41,35 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x822284;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF8536CED);
 
-		virtual void FromCreator(EGL::CGLEEffectCreator* ct) = 0; // 3
-		virtual void OnCreated() = 0;
-		virtual void OnLoaded() = 0; // 5
-		virtual void OnTick() = 0;
-		virtual void FireEvent(BB::CEvent* ev) = 0;
+		virtual ~CEffect() override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void FromCreator(EGL::CGLEEffectCreator* ct); // 3
+		virtual void OnCreated();
+		virtual void OnLoaded(); // 5
+		virtual void OnTick();
+		virtual void FireEvent(BB::CEvent* ev);
 	private:
-		virtual void emptyfunc2() = 0; // 8
+		virtual void __stdcall emptyfunc2(); // 8
 
 	public:
+
+		virtual shok::EffectTypeId __stdcall GetEffectType() const override;
+		virtual void __stdcall FillTypeAndID(TypeAndID* d) const override;
+		virtual void __stdcall FillTurnDurationAndPos(TurnDurationAndPos* d) const override;
+		virtual shok::PlayerId __stdcall GetPlayerID() const override;
+		virtual EGL::ISlot* __stdcall GetFlyingEffectSlot() override;
+	protected:
+		virtual void OnOtherEntityAttachToMe_vt(shok::AttachmentType ty, shok::EntityId otherId, shok::EventIDs onThisDetachEvent) override; // other -> this
+		virtual void OnOtherEffectAttachToMe_vt(shok::AttachmentType ty, shok::EffectId otherId, shok::EventIDs onThisDetachEvent) override; // other -> this
+		virtual void OnOtherEntityDetachFromMe_vt(shok::AttachmentType ty, shok::EntityId otherId) override; // other -> this
+		virtual void OnOtherEffectDetachFromMe_vt(shok::AttachmentType ty, shok::EffectId otherId) override; // other -> this
+		virtual void DetachObservedEntity_vt(shok::AttachmentType ty, shok::EntityId otherId) override; // this -> other 5
+		virtual void DetachObservedEffect_vt(shok::AttachmentType ty, shok::EffectId otherId) override; // this -> other
+	public:
+		virtual bool IsAttachedToEntity(shok::AttachmentType ty, shok::EntityId otherId) override; // this -> other
+		virtual bool IsAttachedToEffect(shok::AttachmentType ty, shok::EffectId otherId) override; // this -> other
+
+		CEffect();
 
 		CGLEEffectProps* LogicProps() const;
 
@@ -93,8 +113,19 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x8235EC;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8B5120CD);
 
-		virtual void OnHit() = 0;
-		virtual void CalculateGravityStuff() = 0;
+
+		virtual ~CFlyingEffect() override;
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void FromCreator(EGL::CGLEEffectCreator* ct) override;
+		virtual void OnCreated() override;
+		virtual void OnTick() override;
+
+		virtual EGL::ISlot* __stdcall GetFlyingEffectSlot() override;
+
+		virtual void OnHit();
+		virtual void CalculateGravityStuff();
+
+		CFlyingEffect();
 
 	protected:
 		void FixOnLoad();

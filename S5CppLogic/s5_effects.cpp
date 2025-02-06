@@ -5,6 +5,82 @@
 #include "hooks.h"
 #include "entityiterator.h"
 
+shok::ClassId EGL::CEffect::GetClassIdentifier() const
+{
+	return Identifier;
+}
+void EGL::CEffect::FromCreator(EGL::CGLEEffectCreator* ct)
+{
+	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CEffect*, EGL::CGLEEffectCreator*)>(0x588BE6);
+	p(this, ct);
+}
+void EGL::CEffect::OnCreated()
+{
+	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CEffect*)>(0x588D9C);
+	p(this);
+}
+void EGL::CEffect::OnLoaded()
+{
+}
+void EGL::CEffect::OnTick()
+{
+}
+void EGL::CEffect::FireEvent(BB::CEvent* ev)
+{
+	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CEffect*, BB::CEvent*)>(0x588EFA);
+	p(this, ev);
+}
+void __stdcall EGL::CEffect::emptyfunc2()
+{
+}
+
+shok::EffectTypeId __stdcall EGL::CEffect::GetEffectType() const
+{
+	return EffectType;
+}
+shok::PlayerId __stdcall EGL::CEffect::GetPlayerID() const
+{
+	return PlayerID;
+}
+EGL::ISlot* __stdcall EGL::CEffect::GetFlyingEffectSlot()
+{
+	return nullptr;
+}
+
+
+shok::ClassId __stdcall EGL::CFlyingEffect::GetClassIdentifier() const
+{
+	return Identifier;
+}
+void EGL::CFlyingEffect::FromCreator(EGL::CGLEEffectCreator* ct)
+{
+	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CFlyingEffect*, EGL::CGLEEffectCreator*)>(0x589697);
+	p(this, ct);
+}
+void EGL::CFlyingEffect::OnCreated()
+{
+	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CFlyingEffect*)>(0x589687);
+	p(this);
+}
+void EGL::CFlyingEffect::OnTick()
+{
+	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CFlyingEffect*)>(0x589477);
+	p(this);
+}
+EGL::ISlot* __stdcall EGL::CFlyingEffect::GetFlyingEffectSlot()
+{
+	return &FlyingEffectSlot;
+}
+void EGL::CFlyingEffect::OnHit()
+{
+	delete this;
+}
+void EGL::CFlyingEffect::CalculateGravityStuff()
+{
+	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CFlyingEffect*)>(0x589787);
+	p(this);
+}
+
 void(__stdcall*EGL::CEffect::OnDestroyCb)(EGL::CEffect* th) = nullptr;
 void __declspec(naked) effect_ondestroyhookasm() {
 	__asm {

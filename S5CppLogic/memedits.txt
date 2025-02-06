@@ -134,4 +134,5 @@ list of used identifiers
 0x101A CppLogic::Mod::ShieldCoverAbility
 0x101B CppLogic::Mod::ResurrectAbilityProps
 0x101C CppLogic::Mod::ResurrectAbility
+0x101D CppLogic::Mod::Effect::EntityPlacerEffect
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

@@ -330,6 +330,9 @@
     <ClInclude Include="ModFilesystem.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="ModEffect.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -518,6 +521,9 @@
     <ClCompile Include="ModFilesystem.cpp">
       <Filter>utility</Filter>
     </ClCompile>
+    <ClCompile Include="ModEffect.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">
@@ -567,5 +573,10 @@
     <Xml Include="doc\ModPack.xml">
       <Filter>doc</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="manualfiles.asm">
+      <Filter>shok</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

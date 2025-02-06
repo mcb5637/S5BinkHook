@@ -53,6 +53,7 @@
 #include "ModConfig.h"
 #include "EnumIdManagerMagic.h"
 #include "ModFilesystem.h"
+#include "ModEffect.h"
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -298,7 +299,8 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	
+
+	new EGL::CFlyingEffect();
 	return 0;
 }
 
@@ -371,6 +373,7 @@ void InitGame() {
 	CppLogic::Mod::RegisterClasses();
 	CppLogic::Mod::UI::RegisterClasses();
 	CppLogic::Mod::Config::RegisterClasses();
+	CppLogic::Mod::Effect::RegisterClasses();
 	EGUIX::CTextButtonWidget::HookFixTextRender();
 	if (!Options.DisableMapListFix)
 		Framework::CampagnInfo::HookLoad();

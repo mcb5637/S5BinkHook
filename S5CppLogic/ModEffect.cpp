@@ -32,17 +32,36 @@ BB::SerializationData CppLogic::Mod::Effect::EntityPlacerEffect::SerializationDa
 	BB::SerializationData::GuardData(),
 };
 
+void CppLogic::Mod::Effect::EntityPlacerEffect::FromCreator(EGL::CGLEEffectCreator* ct)
+{
+	EGL::CFlyingEffect::FromCreator(ct);
+
+	if (auto* c = BB::IdentifierCast<CProjectileEffectCreator>(ct)) {
+		Attacker = c->AttackerID;
+		AttackerPlayer = c->SourcePlayer;
+	}
+}
+
+void CppLogic::Mod::Effect::EntityPlacerEffect::OnLoaded()
+{
+	EGL::CFlyingEffect::FixOnLoad();
+}
+
 void CppLogic::Mod::Effect::EntityPlacerEffect::OnHit()
 {
-	EGL::CGLEEntityCreator cr{};
-	cr.Pos = TargetPosition;
-	cr.EntityType = ToCreate;
-	cr.PlayerId = AttackerPlayer;
-	auto eid = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&cr);
+	
+	if (ToCreate != shok::EntityTypeId::Invalid)
+	{
+		EGL::CGLEEntityCreator cr{};
+		cr.Pos = TargetPosition;
+		cr.EntityType = ToCreate;
+		cr.PlayerId = AttackerPlayer;
+		auto eid = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&cr);
 
-	if (EGL::CGLEEntity* a = EGL::CGLEEntity::GetEntityByID(Attacker)) {
-		if (AttachCreated != shok::AttachmentType::INVALID) {
-			a->AttachEntity(AttachCreated, eid, OnDetachAttacker, OnDetachCreated);
+		if (EGL::CGLEEntity* a = EGL::CGLEEntity::GetEntityByID(Attacker)) {
+			if (AttachCreated != shok::AttachmentType::INVALID) {
+				a->AttachEntity(AttachCreated, eid, OnDetachAttacker, OnDetachCreated);
+			}
 		}
 	}
 

@@ -575,8 +575,8 @@
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="manualfiles.asm">
-      <Filter>shok</Filter>
+    <MASM Include="s5_effects_manual.asm">
+      <Filter>shok\effect</Filter>
     </MASM>
   </ItemGroup>
 </Project>

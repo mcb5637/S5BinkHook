@@ -14,14 +14,16 @@ namespace CppLogic::Mod::Effect {
 
 	class EntityPlacerEffect : public EGL::CFlyingEffect {
 	public:
-		shok::EntityId Attacker;
-		shok::EntityTypeId ToCreate;
-		shok::PlayerId AttackerPlayer;
-		shok::AttachmentType AttachCreated;
-		shok::EventIDs OnDetachAttacker, OnDetachCreated;
+		shok::EntityId Attacker = shok::EntityId::Invalid;
+		shok::EntityTypeId ToCreate = shok::EntityTypeId::Invalid;
+		shok::PlayerId AttackerPlayer = shok::PlayerId::P0;
+		shok::AttachmentType AttachCreated = shok::AttachmentType::INVALID;
+		shok::EventIDs OnDetachAttacker = shok::EventIDs::NoDetachEvent, OnDetachCreated = shok::EventIDs::NoDetachEvent;
 
 
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void FromCreator(EGL::CGLEEffectCreator* ct) override;
+		virtual void OnLoaded() override;
 		virtual void OnHit() override;
 
 		void* operator new(size_t s);

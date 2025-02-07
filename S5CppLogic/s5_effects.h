@@ -281,6 +281,7 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x774688;
 		static inline constexpr int TypeDesc = 0x819334;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3EA0B0BD);
 
 		CFlyingEffectCreator();
 	};
@@ -291,6 +292,7 @@ public:
 
 	static inline constexpr int vtp = 0x774698;
 	static inline constexpr int TypeDesc = 0x81935C;
+	static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9E562D7D);
 
 	CProjectileEffectCreator();
 };

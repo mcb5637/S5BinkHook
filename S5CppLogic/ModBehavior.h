@@ -281,4 +281,46 @@ namespace CppLogic::Mod {
 	};
 
 
+	class BombardmentAbilityProps : public GGL::CHeroAbilityProps {
+	public:
+		shok::EffectTypeId EffectType = shok::EffectTypeId::Invalid;
+		float AttackRange = 0;
+		float DamageRange = 0;
+		int Damage = 0;
+		shok::DamageClassId DamageClass = shok::DamageClassId::Invalid;
+		shok::TaskListId TaskList = shok::TaskListId::Invalid;
+		float DistanceOverride = -1;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x101E);
+		static BB::SerializationData SerializationData[];
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	};
+	class BombardmentAbility : public GGL::CHeroAbility {
+	public:
+		shok::Position Target;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x101F);
+		static BB::SerializationData SerializationData[];
+		static inline constexpr shok::AbilityId AbilityId = shok::AbilityId::AbilityBombardment;
+		static GGL::CStaticHeroAbilityID AbilityStatic;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual bool IsAbility(shok::AbilityId ability) override;
+
+		void Activate(const shok::Position& tar);
+		static void NetEventBombard(EGL::CNetEventEntityAndPos* ev);
+	private:
+		int TaskBombard(EGL::CGLETaskArgs* a);
+		int TaskTurnToBombardTarget(EGL::CGLETaskArgs* a);
+		void EventActivate(EGL::CEventPosition* p);
+	};
+
 }

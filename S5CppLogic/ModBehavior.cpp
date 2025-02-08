@@ -22,6 +22,8 @@ void CppLogic::Mod::RegisterClasses()
 	f->AddClassToFactory<ShieldCoverAbility>();
 	f->AddClassToFactory<ResurrectAbilityProps>();
 	f->AddClassToFactory<ResurrectAbility>();
+	f->AddClassToFactory<BombardmentAbilityProps>();
+	f->AddClassToFactory<BombardmentAbility>();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
@@ -878,4 +880,134 @@ void CppLogic::Mod::ResurrectAbility::ChargeAbilitiesFor(EGL::CGLEEntity* e)
 			ab->SecondsCharged = std::min(ab->AbilityProps->RechargeTimeSeconds, pr->RechargeAbilitiesBy);
 		}
 	}
+}
+
+void* CppLogic::Mod::BombardmentAbilityProps::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void CppLogic::Mod::BombardmentAbilityProps::operator delete(void* p) {
+	shok::Free(p);
+}
+
+shok::ClassId __stdcall CppLogic::Mod::BombardmentAbilityProps::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+BB::SerializationData CppLogic::Mod::BombardmentAbilityProps::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<BombardmentAbilityProps, GGL::CHeroAbilityProps>(),
+	AutoMemberSerialization(BombardmentAbilityProps, EffectType),
+	AutoMemberSerialization(BombardmentAbilityProps, AttackRange),
+	AutoMemberSerialization(BombardmentAbilityProps, DamageRange),
+	AutoMemberSerialization(BombardmentAbilityProps, Damage),
+	AutoMemberSerialization(BombardmentAbilityProps, DamageClass),
+	AutoMemberSerialization(BombardmentAbilityProps, TaskList),
+	AutoMemberSerialization(BombardmentAbilityProps, DistanceOverride),
+	BB::SerializationData::GuardData(),
+};
+
+
+void* CppLogic::Mod::BombardmentAbility::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void CppLogic::Mod::BombardmentAbility::operator delete(void* p) {
+	shok::Free(p);
+}
+
+shok::ClassId __stdcall CppLogic::Mod::BombardmentAbility::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+BB::SerializationData CppLogic::Mod::BombardmentAbility::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<BombardmentAbility, GGL::CHeroAbility>(),
+	AutoMemberSerialization(BombardmentAbility, Target),
+	BB::SerializationData::GuardData(),
+};
+
+GGL::CStaticHeroAbilityID CppLogic::Mod::BombardmentAbility::AbilityStatic = GGL::CStaticHeroAbilityID::Create<BombardmentAbility::AbilityId>();
+
+void CppLogic::Mod::BombardmentAbility::AddHandlers(shok::EntityId id)
+{
+	GGL::CHeroAbility::AddHandlers(id);
+	auto* en = EGL::CGLEEntity::GetEntityByID(id);
+	en->CreateTaskHandler<shok::Task::TASK_BOMBARD_TARGET_AREA, EGL::CGLETaskArgs>(this, &BombardmentAbility::TaskBombard);
+	en->CreateTaskHandler<shok::Task::TASK_TURN_TO_BOMBARD_TARGET, EGL::CGLETaskArgs>(this, &BombardmentAbility::TaskTurnToBombardTarget);
+	en->CreateEventHandler<shok::EventIDs::CppL_Bombardment_Activate, EGL::CEventPosition>(this, &BombardmentAbility::EventActivate);
+}
+
+bool CppLogic::Mod::BombardmentAbility::IsAbility(shok::AbilityId ability)
+{
+	return ability == AbilityId;
+}
+
+void CppLogic::Mod::BombardmentAbility::Activate(const shok::Position& tar)
+{
+	if (!CheckAndResetCooldown())
+		return;
+	Target = tar;
+	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* pr = static_cast<BombardmentAbilityProps*>(AbilityProps);
+	en->SetTaskList(pr->TaskList);
+	en->GetBehaviorDynamic<GGL::CLeaderBehavior>()->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
+}
+
+void CppLogic::Mod::BombardmentAbility::NetEventBombard(EGL::CNetEventEntityAndPos* ev)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(ev->EntityID);
+	if (e->IsDead())
+		return;
+	auto* ab = e->GetBehavior<CppLogic::Mod::BombardmentAbility>();
+	if (!ab)
+		return;
+	shok::Position p{ ev->X, ev->Y };
+	if (!ab->CanUseAbility())
+		return;
+	auto* pr = static_cast<CppLogic::Mod::BombardmentAbilityProps*>(ab->AbilityProps);
+	if (p.GetDistanceSquaredTo(e->Position) > pr->AttackRange * pr->AttackRange)
+		return;
+	ab->Activate(p);
+}
+
+int CppLogic::Mod::BombardmentAbility::TaskBombard(EGL::CGLETaskArgs* a)
+{
+	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* pr = static_cast<BombardmentAbilityProps*>(AbilityProps);
+	if (pr->DistanceOverride > 0) {
+		shok::Position dir = Target - en->Position;
+		Target = en->Position + dir.Normalize() * pr->DistanceOverride;
+	}
+
+	CProjectileEffectCreator cr{};
+	cr.EffectType = pr->EffectType;
+	cr.PlayerID = en->PlayerId;
+	cr.StartPos = cr.CurrentPos = en->Position;
+	cr.TargetPos = Target;
+	cr.AttackerID = en->EntityId;
+	cr.Damage = pr->Damage;
+	cr.DamageRadius = pr->DamageRange;
+	cr.DamageClass = pr->DamageClass;
+	cr.SourcePlayer = en->PlayerId;
+	cr.AdvancedDamageSourceOverride = shok::AdvancedDealDamageSource::AbilityBombardment;
+	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
+	return -2;
+}
+
+int CppLogic::Mod::BombardmentAbility::TaskTurnToBombardTarget(EGL::CGLETaskArgs* a)
+{
+	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
+	float rot = en->Position.GetAngleBetween(Target);
+	rot = CppLogic::DegreesToRadians(rot);
+	static_cast<EGL::CMovingEntity*>(en)->SetTargetRotation(rot);
+	EGL::CGLETaskArgs t{};
+	t.TaskType = shok::Task::TASK_TURN_TO_TARGET_ORIENTATION;
+	en->ExecuteTask(&t);
+	return 0;
+}
+
+void CppLogic::Mod::BombardmentAbility::EventActivate(EGL::CEventPosition* p)
+{
+	Activate(p->Position);
 }

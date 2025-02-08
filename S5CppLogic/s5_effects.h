@@ -129,6 +129,8 @@ namespace EGL {
 
 	protected:
 		void FixOnLoad();
+
+		bool OnTickMove();
 	public:
 		static void HookOnLoadFix();
 
@@ -182,7 +184,7 @@ namespace GGL {
 		};
 
 
-		shok::EffectId AttackerID; // 47
+		shok::EntityId AttackerID; // 47
 		shok::PlayerId SourcePlayer; // 48
 		GGL::CCannonBallEffectProps* CannonBallEffectProps;
 		int DamageAmount; // 50

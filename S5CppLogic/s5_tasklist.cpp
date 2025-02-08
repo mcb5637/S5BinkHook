@@ -313,6 +313,8 @@ void EGL::TaskData::AddExtraTasks()
     AddTaskData<shok::Task::TASK_SHIELD_COVER, EGL::CGLETaskArgs::Identifier>(v);
     AddTaskData<shok::Task::TASK_RESURRECT, EGL::CGLETaskArgs::Identifier>(v);
     AddTaskData<shok::Task::TASK_TURN_TO_RESURRECT, EGL::CGLETaskArgs::Identifier>(v);
+    AddTaskData<shok::Task::TASK_BOMBARD_TARGET_AREA, EGL::CGLETaskArgs::Identifier>(v);
+    AddTaskData<shok::Task::TASK_TURN_TO_BOMBARD_TARGET, EGL::CGLETaskArgs::Identifier>(v);
 }
 void EGL::TaskData::RemoveExtraTasks()
 {

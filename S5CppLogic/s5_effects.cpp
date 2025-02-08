@@ -80,6 +80,11 @@ void EGL::CFlyingEffect::CalculateGravityStuff()
 	auto p = reinterpret_cast<void(__thiscall* const)(EGL::CFlyingEffect*)>(0x589787);
 	p(this);
 }
+bool EGL::CFlyingEffect::OnTickMove()
+{
+	auto p = reinterpret_cast<bool(__thiscall* const)(EGL::CFlyingEffect*)>(0x58937E);
+	return p(this);
+}
 
 void(__stdcall*EGL::CEffect::OnDestroyCb)(EGL::CEffect* th) = nullptr;
 void __declspec(naked) effect_ondestroyhookasm() {

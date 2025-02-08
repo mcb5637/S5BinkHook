@@ -33,4 +33,31 @@ namespace CppLogic::Mod::Effect {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x101D);
 		static BB::SerializationData SerializationData[];
 	};
+
+
+	class PiercingShotEffect : public EGL::CFlyingEffect {
+	public:
+		shok::EntityId AttackerID = shok::EntityId::Invalid;
+		shok::PlayerId SourcePlayer = shok::PlayerId::Invalid;
+		int DamageAmount = 0;
+		float AoERange = -1;
+		shok::DamageClassId DamageClass = shok::DamageClassId::Invalid;
+		shok::AdvancedDealDamageSource AdvancedDamageSourceOverride = shok::AdvancedDealDamageSource::Cannonball;
+		std::vector<shok::EntityId> AlreadyAffectedEntities;
+
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void FromCreator(EGL::CGLEEffectCreator* ct) override;
+		virtual void OnLoaded() override;
+		virtual void OnTick() override;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1020);
+		static BB::SerializationData SerializationData[];
+
+		virtual void CheckForDamage();
+	};
 }

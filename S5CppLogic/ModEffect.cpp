@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "ModEffect.h"
 #include "s5_classfactory.h"
+#include "entityiterator.h"
 
 void CppLogic::Mod::Effect::RegisterClasses()
 {
 	BB::CClassFactory* f = *BB::CClassFactory::GlobalObj;
 	f->AddClassToFactory<EntityPlacerEffect>();
+	f->AddClassToFactory<PiercingShotEffect>();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::Effect::EntityPlacerEffect::GetClassIdentifier() const
@@ -66,4 +68,105 @@ void CppLogic::Mod::Effect::EntityPlacerEffect::OnHit()
 	}
 
 	EGL::CFlyingEffect::OnHit();
+}
+
+shok::ClassId __stdcall CppLogic::Mod::Effect::PiercingShotEffect::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* CppLogic::Mod::Effect::PiercingShotEffect::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void CppLogic::Mod::Effect::PiercingShotEffect::operator delete(void* p) {
+	shok::Free(p);
+}
+
+BB::SerializationData CppLogic::Mod::Effect::PiercingShotEffect::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<PiercingShotEffect, EGL::CFlyingEffect>(),
+	AutoMemberSerialization(PiercingShotEffect, AttackerID),
+	AutoMemberSerialization(PiercingShotEffect, SourcePlayer),
+	AutoMemberSerialization(PiercingShotEffect, DamageAmount),
+	AutoMemberSerialization(PiercingShotEffect, AoERange),
+	AutoMemberSerialization(PiercingShotEffect, DamageClass),
+	AutoMemberSerialization(PiercingShotEffect, AdvancedDamageSourceOverride),
+	AutoMemberSerialization(PiercingShotEffect, AlreadyAffectedEntities),
+	BB::SerializationData::GuardData(),
+};
+
+void CppLogic::Mod::Effect::PiercingShotEffect::FromCreator(EGL::CGLEEffectCreator* ct)
+{
+	EGL::CFlyingEffect::FromCreator(ct);
+
+	if (auto* c = BB::IdentifierCast<CProjectileEffectCreator>(ct)) {
+		AttackerID = c->AttackerID;
+		SourcePlayer = c->SourcePlayer;
+		DamageAmount = c->Damage;
+		AoERange = c->DamageRadius;
+		DamageClass = c->DamageClass;
+		AdvancedDamageSourceOverride = c->AdvancedDamageSourceOverride;
+	}
+}
+
+void CppLogic::Mod::Effect::PiercingShotEffect::OnLoaded()
+{
+	EGL::CFlyingEffect::FixOnLoad();
+}
+
+void CppLogic::Mod::Effect::PiercingShotEffect::OnTick()
+{
+	FlyingEffectSlot.LastPosition = FlyingEffectSlot.Position;
+	bool hit = OnTickMove();
+	CheckForDamage();
+	if (hit)
+		OnHit();
+}
+
+void CppLogic::Mod::Effect::PiercingShotEffect::CheckForDamage()
+{
+	if ((*GGL::CGLGameLogic::GlobalObj)->GlobalInvulnerability)
+		return;
+	if (AoERange <= 0 || DamageAmount <= 0)
+		return;
+	EGL::CGLEEntity* attacker = EGL::CGLEEntity::GetEntityByID(AttackerID);
+
+	auto pl = attacker ? attacker->PlayerId : SourcePlayer;
+	CppLogic::Iterator::EntityPredicateIsCombatRelevant irel{};
+	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> icircl{ Position, AoERange * AoERange };
+	CppLogic::Iterator::EntityPredicateIsAlive iali{};
+
+	auto lam = [this, attacker, pl](EGL::CGLEEntity* curr, float cr) {
+		if (std::find(AlreadyAffectedEntities.begin(), AlreadyAffectedEntities.end(), curr->EntityId) != AlreadyAffectedEntities.end())
+			return;
+
+			float dmg = curr->CalculateDamageAgainstMe(DamageAmount, DamageClass, 1.0f);
+
+			if (dmg < 1)
+				dmg = 1;
+
+			curr->AdvancedHurtEntityBy(attacker, static_cast<int>(dmg), pl, true, true, true, this->AdvancedDamageSourceOverride);
+			AlreadyAffectedEntities.push_back(curr->EntityId);
+		};
+
+	static constexpr auto acflags = shok::AccessCategoryFlags::AccessCategorySettler
+		| shok::AccessCategoryFlags::AccessCategoryAnimal | shok::AccessCategoryFlags::AccessCategoryBuilding
+		| shok::AccessCategoryFlags::AccessCategoryResourceDoodad | shok::AccessCategoryFlags::AccessCategoryStatic
+		| shok::AccessCategoryFlags::AccessCategoryOrnamental;
+	if (pl != static_cast<shok::PlayerId>(0)) {
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer ipl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(ipl.players, pl);
+		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> p{ &irel, &iali, &ipl, &icircl };
+		CppLogic::Iterator::MultiRegionEntityIterator it{ Position, AoERange, acflags, &p };
+		for (auto& ei : it.ExtendedIterate()) {
+			lam(ei.Object, ei.Range);
+		}
+	}
+	else {
+		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 3> p{ &irel, &icircl, &iali };
+		CppLogic::Iterator::MultiRegionEntityIterator it{ Position, AoERange, acflags, &p };
+		for (auto& ei : it.ExtendedIterate()) {
+			lam(ei.Object, ei.Range);
+		}
+	}
 }

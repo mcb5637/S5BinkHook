@@ -83,6 +83,7 @@ namespace BB {
 		static inline BB::FieldSerializer* const TypeCharBuff = reinterpret_cast<BB::FieldSerializer*>(0x810CB8);
 		static inline BB::FieldSerializer* const TypeClassIdentifier = reinterpret_cast<BB::FieldSerializer*>(0x813978);
 		static inline BB::FieldSerializer* const TypeTaskList = reinterpret_cast<BB::FieldSerializer*>(0x85D4AC);
+		static inline BB::FieldSerializer* const TypeUByte = reinterpret_cast<BB::FieldSerializer*>(0x80C380);
 		// does not add ids
 		static inline BB::FieldSerializer* const TypeEntityType = reinterpret_cast<BB::FieldSerializer*>(0x85D4D0);
 		static inline BB::FieldSerializer* const TypeModel = reinterpret_cast<BB::FieldSerializer*>(0x8585C0);
@@ -157,6 +158,10 @@ namespace BB {
 		template<>
 		static constexpr BB::FieldSerializer* GetSerializer<shok::AttachmentType>() {
 			return TypeAttachmentType;
+		}
+		template<>
+		static constexpr BB::FieldSerializer* GetSerializer<shok::AdvancedDealDamageSource>() {
+			return TypeUByte; // no real serializer, but int should work
 		}
 
 		struct ExtendedInfo {

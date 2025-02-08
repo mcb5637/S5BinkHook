@@ -135,4 +135,7 @@ list of used identifiers
 0x101B CppLogic::Mod::ResurrectAbilityProps
 0x101C CppLogic::Mod::ResurrectAbility
 0x101D CppLogic::Mod::Effect::EntityPlacerEffect
+0x101E CppLogic::Mod::BombardmentAbilityProps
+0x101F CppLogic::Mod::BombardmentAbility
+0x1020 CppLogic::Mod::Effect::PiercingShotEffect
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

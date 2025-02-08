@@ -489,6 +489,7 @@ namespace shok {
 		AbiltyResourceDoodadRefill,
 		AbilityShieldCover,
 		AbilityResurrect,
+		AbilityBombardment,
 	};
 	enum class SoundId : int {
 		Invalid = 0,
@@ -575,6 +576,7 @@ namespace shok {
 		AbilitySabotageSingleTarget = 13,
 		AbilitySabotageBlast = 14,
 		AbilityShuriken = 15,
+		AbilityBombardment = 16,
 
 		Script = 25,
 	};

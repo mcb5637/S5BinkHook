@@ -1280,6 +1280,7 @@ namespace shok {
 		CppL_ResDoodadRefill_Activate = 0x51005, // EGL::CEvent1Entity
 		CppL_ShieldCoverActivate = 0x51006, // BB::CEvent
 		CppL_Resurrect_Activate = 0x51007, // EGL::CEvent1Entity
+		CppL_Bombardment_Activate = 0x51008, // EGL::CEventPosition
 
 		// script events
 		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent

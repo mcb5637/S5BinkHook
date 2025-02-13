@@ -420,14 +420,8 @@ int GGL::CBattleBehavior::GetDamage() const
 		base = static_cast<float>(d->DamageOverride);
 	else
 		base = static_cast<float>(BattleProps->DamageAmount);
-	base = ModifierEntityDatabase::GlobalObj->GetModifiedStat(EntityId, GGL::CEntityProfile::ModifierType::Damage, base);
-	float fact = 1.0f;
-	for (const auto& af : e->ObserverEntities.ForKeys(shok::AttachmentType::HERO_AFFECTED)) {
-		auto* h = EGL::CGLEEntity::GetEntityByID(af.second.EntityId);
-		EGL::CEventGetValue_Float ev{ shok::EventIDs::RangedEffect_GetDamageFactor };
-		h->FireEvent(&ev);
-		fact += ev.Data - 1.0f;
-	}
+	base = e->ModifyDamage(base);
+	float fact = e->GetTotalAffectedDamageModifier();
 	return static_cast<int>(base * fact);
 }
 

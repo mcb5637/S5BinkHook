@@ -299,8 +299,7 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-
-	new EGL::CFlyingEffect();
+	
 	return 0;
 }
 

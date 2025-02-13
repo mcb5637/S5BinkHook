@@ -133,10 +133,11 @@ void CppLogic::Mod::Effect::PiercingShotEffect::CheckForDamage()
 
 	auto pl = attacker ? attacker->PlayerId : SourcePlayer;
 	CppLogic::Iterator::EntityPredicateIsCombatRelevant irel{};
-	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> icircl{ Position, AoERange * AoERange };
+	CppLogic::Rect rect{ FlyingEffectSlot.Position, FlyingEffectSlot.LastPosition, AoERange };
+	CppLogic::Iterator::PredicateInArbitrayRect<EGL::CGLEEntity> icircl{ rect };
 	CppLogic::Iterator::EntityPredicateIsAlive iali{};
 
-	auto lam = [this, attacker, pl](EGL::CGLEEntity* curr, float cr) {
+	auto lam = [this, attacker, pl](EGL::CGLEEntity* curr) {
 		if (std::find(AlreadyAffectedEntities.begin(), AlreadyAffectedEntities.end(), curr->EntityId) != AlreadyAffectedEntities.end())
 			return;
 
@@ -153,20 +154,20 @@ void CppLogic::Mod::Effect::PiercingShotEffect::CheckForDamage()
 		| shok::AccessCategoryFlags::AccessCategoryAnimal | shok::AccessCategoryFlags::AccessCategoryBuilding
 		| shok::AccessCategoryFlags::AccessCategoryResourceDoodad | shok::AccessCategoryFlags::AccessCategoryStatic
 		| shok::AccessCategoryFlags::AccessCategoryOrnamental;
-	if (pl != static_cast<shok::PlayerId>(0)) {
+	if (pl != shok::PlayerId::P0) {
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer ipl{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(ipl.players, pl);
 		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> p{ &irel, &iali, &ipl, &icircl };
-		CppLogic::Iterator::MultiRegionEntityIterator it{ Position, AoERange, acflags, &p };
-		for (auto& ei : it.ExtendedIterate()) {
-			lam(ei.Object, ei.Range);
+		CppLogic::Iterator::MultiRegionEntityIterator it{ rect.BoundingBox(), acflags, &p};
+		for (auto* ei : it) {
+			lam(ei);
 		}
 	}
 	else {
 		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 3> p{ &irel, &icircl, &iali };
-		CppLogic::Iterator::MultiRegionEntityIterator it{ Position, AoERange, acflags, &p };
-		for (auto& ei : it.ExtendedIterate()) {
-			lam(ei.Object, ei.Range);
+		CppLogic::Iterator::MultiRegionEntityIterator it{ rect.BoundingBox(), acflags, &p };
+		for (auto* ei : it) {
+			lam(ei);
 		}
 	}
 }

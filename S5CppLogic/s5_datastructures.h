@@ -6,6 +6,7 @@
 #include <deque>
 #include <functional>
 #include <type_traits>
+#include <ranges>
 
 #include "s5_forwardDecls.h"
 #include "s5_mem.h"
@@ -122,6 +123,14 @@ namespace shok {
 			}
 
 		public:
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = T;
+			using difference_type = std::ptrdiff_t;
+			using pointer = T*;
+			using reference = T&;
+
+			constexpr Iter() : node(nullptr), set(nullptr) {}
+
 			T& operator*() const {
 				return node->data;
 			}
@@ -597,27 +606,12 @@ namespace shok {
 			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::insert(std::move(i));
 		}
 
-		class IterateOverValues {
-			friend class MultiMap;
-			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter b, e;
-			IterateOverValues(Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter begin,
-				Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter end) : 
-				b(std::move(begin)),
-				e(std::move(end))
-			{
-			}
-		public:
-			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter begin() {
-				return b;
-			}
-			Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter end() {
-				return e;
-			}
-		};
-
-		IterateOverValues ForKeys(const K& k)
+		auto ForKeys(const K& k)
 		{
-			return IterateOverValues{ Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::lower_bound(k), Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::upper_bound(k) };
+			using iter = Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::Iter;
+			iter be = Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::lower_bound(k);
+			iter en = Tree<std::pair<K, V>, K, Map_DefaultExtractKey, Comparator, true>::upper_bound(k);
+			return std::ranges::subrange<iter, iter, std::ranges::subrange_kind::unsized>(be, en);
 		}
 	};
 	static_assert(sizeof(MultiMap<int, int>) == 3 * 4);

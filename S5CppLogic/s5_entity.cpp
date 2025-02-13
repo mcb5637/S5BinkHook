@@ -1070,6 +1070,28 @@ float EGL::CGLEEntity::CalculateDamageAgainstMe(int damage, shok::DamageClassId 
 	return dmg;
 }
 
+float EGL::CGLEEntity::ModifyDamage(int baseDamage) const
+{
+	return ModifyDamage(static_cast<float>(baseDamage));
+}
+float EGL::CGLEEntity::ModifyDamage(float baseDamage) const
+{
+	return GGL::ModifierEntityDatabase::GlobalObj->GetModifiedStat(EntityId, GGL::CEntityProfile::ModifierType::Damage, baseDamage);
+}
+
+float EGL::CGLEEntity::GetTotalAffectedDamageModifier()
+{
+	float r = 1.0f;
+	EGL::CEventGetValue_Float ev{ shok::EventIDs::RangedEffect_GetDamageFactor };
+	for (const auto& [_, attach] : ObserverEntities.ForKeys(shok::AttachmentType::HERO_AFFECTED)) {
+		ev.Data = 0.0f;
+		if (auto* e = GetEntityByID(attach.EntityId))
+			e->FireEvent(&ev);
+		r = r - 1.0f + ev.Data;
+	}
+	return r;
+}
+
 bool EGL::CGLEEntity::AdvHurtEntity_CheckOverHeal = false;
 void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, shok::PlayerId attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
 {

@@ -262,6 +262,9 @@ namespace EGL {
 
 		static bool AdvHurtEntity_CheckOverHeal;
 		float CalculateDamageAgainstMe(int damage, shok::DamageClassId damageclass, float aoeFactor = 1.0f);
+		float ModifyDamage(int baseDamage) const;
+		float ModifyDamage(float baseDamage) const;
+		float GetTotalAffectedDamageModifier();
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, shok::PlayerId attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, shok::PlayerId player, shok::DamageClassId damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		CGLEEntity* AdvChangePlayer(shok::PlayerId player); // destroys entity, returns new one

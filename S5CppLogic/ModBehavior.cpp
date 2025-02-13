@@ -437,7 +437,8 @@ void CppLogic::Mod::LightningStrikeAbility::EventLightningStrike(EGL::CEventPosi
 	c.StartPos = p->Position;
 	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&c);
 
-	EGL::CGLEEntity::AdvancedDealAoEDamage(e, p->Position, prop->DamageRange, prop->Damage, e->PlayerId, prop->DamageClass, true, true, true, shok::AdvancedDealDamageSource::AbilityCircularAttack);
+	int dmg = static_cast<int>(e->ModifyDamage(prop->Damage) * e->GetTotalAffectedDamageModifier());
+	EGL::CGLEEntity::AdvancedDealAoEDamage(e, p->Position, prop->DamageRange, dmg, e->PlayerId, prop->DamageClass, true, true, true, shok::AdvancedDealDamageSource::AbilityCircularAttack);
 }
 
 void CppLogic::Mod::LightningStrikeAbility::NetEventLightningStrike(EGL::CNetEventEntityAndPos* ev)
@@ -986,7 +987,7 @@ int CppLogic::Mod::BombardmentAbility::TaskBombard(EGL::CGLETaskArgs* a)
 	cr.StartPos = cr.CurrentPos = en->Position;
 	cr.TargetPos = Target;
 	cr.AttackerID = en->EntityId;
-	cr.Damage = pr->Damage;
+	cr.Damage = static_cast<int>(en->ModifyDamage(pr->Damage) * en->GetTotalAffectedDamageModifier());
 	cr.DamageRadius = pr->DamageRange;
 	cr.DamageClass = pr->DamageClass;
 	cr.SourcePlayer = en->PlayerId;

@@ -46,6 +46,8 @@ namespace shok {
 		Position operator*(float f) const;
 		Position& operator*=(float f);
 		float Dot(const Position& o) const;
+		float DotSquare() const;
+		Position Abs() const noexcept;
 		auto operator<=>(const Position& o) const = default;
 
 		static BB::SerializationData* SerializationData;
@@ -518,4 +520,14 @@ namespace CppLogic {
 		bool operator()(std::string_view a, std::string_view b) const noexcept;
 	};
 
+	class Rect {
+		shok::Position A, B, C;
+	public:
+
+		inline Rect(const shok::Position& a, const shok::Position& b, const shok::Position& c) : A(a), B(b), C(c) {}
+		Rect(const shok::Position& start, const shok::Position& end, float width);
+
+		bool IsPosInRect(const shok::Position& p) const noexcept;
+		shok::AARect BoundingBox() const noexcept;
+	};
 }

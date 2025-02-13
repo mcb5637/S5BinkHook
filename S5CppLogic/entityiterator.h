@@ -459,6 +459,16 @@ namespace CppLogic::Iterator {
 		}
 	};
 	template<class T>
+	class PredicateInArbitrayRect : public Predicate<T> {
+		const CppLogic::Rect rect;
+	public:
+		PredicateInArbitrayRect(const CppLogic::Rect& r) : rect{r } {
+		}
+		virtual bool Matches(const T* e, float* rangeOut, int* prio) const override {
+			return rect.IsPosInRect(e->Position);
+		}
+	};
+	template<class T>
 	class PredicateFunc : public Predicate<T> {
 		const std::function<bool(const T*, float*, int*)> func;
 	public:

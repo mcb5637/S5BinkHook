@@ -58,6 +58,7 @@ namespace CppLogic::Mod::Effect {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1020);
 		static BB::SerializationData SerializationData[];
 
-		virtual void CheckForDamage();
+	private:
+		void CheckForDamage();
 	};
 }

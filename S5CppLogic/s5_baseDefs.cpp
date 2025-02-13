@@ -43,9 +43,9 @@ float shok::Position::GetAngleBetween(const shok::Position& p) const
 }
 shok::Position shok::Position::Rotate(float r) const
 {
-	float s = std::sinf(r);
-	float c = std::cosf(r);
-	return { X * c + Y * s, X * s + Y * c };
+	float s = std::sin(r);
+	float c = std::cos(r);
+	return { X * c - Y * s, X * s + Y * c };
 }
 shok::Position shok::Position::RotateAround(float r, const shok::Position& center) const
 {
@@ -105,6 +105,14 @@ shok::Position& shok::Position::operator*=(float f)
 float shok::Position::Dot(const shok::Position& o) const
 {
 	return this->X * o.X + this->Y * o.Y;
+}
+float shok::Position::DotSquare() const
+{
+	return Dot(*this);
+}
+shok::Position shok::Position::Abs() const noexcept
+{
+	return { std::abs(X), std::abs(Y) };
 }
 BB::SerializationData* shok::Position::SerializationData = reinterpret_cast<BB::SerializationData*>(0x85D9B0);
 
@@ -199,4 +207,36 @@ void EGL::EventHandlerList::AddHandler(shok::EventIDs id, EGL::EventHandler* h)
 bool CppLogic::CaselessStringComparator::operator()(std::string_view a, std::string_view b) const noexcept
 {
 	return std::ranges::lexicographical_compare(a, b, [](char x, char y) { return std::tolower(x) < std::tolower(y); });
+}
+
+CppLogic::Rect::Rect(const shok::Position& start, const shok::Position& end, float width)
+{
+	float l = width;
+	auto dir = (end - start);
+	auto r = dir.Normalize().Rotate(DegreesToRadians(90.0f)) * l;
+	A = start - r;
+	B = start + r;
+	C = end + r;
+}
+
+bool CppLogic::Rect::IsPosInRect(const shok::Position& p) const noexcept
+{
+	auto ab = B - A;
+	auto bc = C - B;
+	auto f = ab.Dot(p - A);
+	auto g = bc.Dot(p - B);
+	return 0 <= f && f <= ab.DotSquare() && 0 <= g && g <= bc.DotSquare();
+}
+
+shok::AARect CppLogic::Rect::BoundingBox() const noexcept
+{
+	auto d = C + (A - B);
+	return { shok::Position{
+			std::min(std::min(A.X, B.X), std::min(C.X, d.X)),
+			std::min(std::min(A.Y, B.Y), std::min(C.Y, d.Y)),
+		}, shok::Position {
+			std::max(std::max(A.X, B.X), std::max(C.X, d.X)),
+			std::max(std::max(A.Y, B.Y), std::max(C.Y, d.Y)),
+		}
+	};
 }

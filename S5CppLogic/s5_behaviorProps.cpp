@@ -27,3 +27,8 @@ shok::TaskListId GGL::CFoundryBehaviorProperties::GetTaskList(shok::EntityTypeId
 {
 	return foundryprops_gettl(this, cannonType);
 }
+
+float GGL::CServiceBuildingBehaviorProperties::GetProgressAmount(shok::PlayerId p) const
+{
+	return reinterpret_cast<float(__thiscall*)(const CServiceBuildingBehaviorProperties*, shok::PlayerId)>(0x4DD186)(this, p);
+}

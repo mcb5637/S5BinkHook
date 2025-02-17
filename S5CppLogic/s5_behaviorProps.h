@@ -607,6 +607,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x774830;
 		static inline constexpr int TypeDesc = 0x816C3C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xAF007567);
+
+		float GetProgressAmount(shok::PlayerId p) const;
 	};
 
 	class CWorkerFleeBehaviorProps : public EGL::CGLEBehaviorProps {

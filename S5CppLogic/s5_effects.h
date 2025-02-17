@@ -75,10 +75,20 @@ namespace EGL {
 
 		static void(__stdcall*OnDestroyCb)(CEffect* th);
 		static void HookOnDestroy();
+
+		// set pos 588BB0 thiscall(pos*)
 	};
 	static_assert(offsetof(CEffect, StartTurn) == 18 * 4);
 
-	class SSlotArgsFlyingEffect {
+	struct SSlotArgsFlyingEffect {
+		int StartTurn;
+		shok::Position StartPosition;
+		shok::Position TargetPosition;
+		float GravityFactor;
+		float b; // current height?
+		float HeightStart;
+		float Speed;
+		float x; // angle rad, flight direction?
 	};
 	class CFlyingEffectSlot : public EGL::TSlot<EGL::SSlotArgsFlyingEffect, 1944101197>, public BB::IObject {
 	public:
@@ -90,7 +100,7 @@ namespace EGL {
 		shok::Position TargetPosition; // in effect, 36
 		shok::Position Position; // in effect, 38
 		shok::Position LastPosition; // in effect, 40
-		float x; // angle rad, flight direction?
+		float FlightDirection; // rad, "x" in seridata
 		float Speed; // in effect 43
 
 		// dtor empty
@@ -122,8 +132,8 @@ namespace EGL {
 
 		virtual EGL::ISlot* __stdcall GetFlyingEffectSlot() override;
 
-		virtual void OnHit();
-		virtual void CalculateGravityStuff();
+		virtual void OnHit(); // 9
+		virtual void CalculateGravityStuff(); // 10
 
 		CFlyingEffect();
 
@@ -220,6 +230,8 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x779CE0;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x284C6B9D);
+
+		// bug: no OnLoaded override to reset Props!
 	};
 	static_assert(sizeof(CEffectLightning) == 30 * 4);
 	static_assert(offsetof(CEffectLightning, HasSpawnedFire) == 28*4);
@@ -238,6 +250,20 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x779C74;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x817186ED);
+	};
+
+	class CEffectFire : public EGL::CEffect {
+	public:
+		int LastSpreadTime;
+		bool HasSpread;
+		GGL::CGLEffectFireProps* FireProps;
+
+		virtual void BurnEntity(shok::EntityId id) = 0;
+
+		static inline constexpr int vtp = 0x7770D4;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3448BED);
+
+		// bug: no OnLoaded override to reset FireProps!
 	};
 }
 

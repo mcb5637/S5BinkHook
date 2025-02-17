@@ -361,7 +361,7 @@ namespace GGL {
 
 	class CCannonBuilderBehavior : public GGL::CHeroAbility {
 	public:
-		PADDINGI(1);
+		GGL::CCannonBuilderBehaviorProps* CannonBuilderProps; // 6
 		shok::Position StartPosition;
 		shok::EntityTypeId CannonType, FoundationType;
 		bool PlacedCannon; // 11

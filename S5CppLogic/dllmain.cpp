@@ -291,7 +291,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x72C52353));
+	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x3448BED));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -300,7 +300,7 @@ int Test(lua::State Ls) {
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	
-	return 0;
+	return 1;
 }
 
 int GetOptions(lua::State L) {

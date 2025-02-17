@@ -150,6 +150,8 @@ namespace GGL {
 	class CNetEventEventTechnologyPlayerIDAndEntityID;
 	class CEventGoodsTraded;
 	class CGLEffectLightningProps;
+	class CCannonBuilderBehaviorProps;
+	class CGLEffectFireProps;
 }
 namespace ED {
 	class CBehaviorProps;

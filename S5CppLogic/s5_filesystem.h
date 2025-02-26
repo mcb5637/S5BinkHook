@@ -7,6 +7,7 @@
 
 namespace BB {
 	class IStream {
+		friend class BB::CFileStreamEx;
 	public:
 		enum class Flags : int {
 			None = 0,
@@ -45,19 +46,21 @@ namespace BB {
 
 		virtual ~IStream() = default;
 	private:
-		virtual bool __stdcall rettrue();
-		virtual bool __stdcall rettrue1();
-		virtual bool __stdcall rettrue2();
+		virtual bool __stdcall rettrue() = 0;
+		virtual bool __stdcall rettrue1() = 0;
+		virtual bool __stdcall rettrue2() = 0;
 	public:
-		virtual const char* __stdcall GetFileName();
-		virtual int64_t __stdcall GetLastWriteTime(); // 5 returns in eax and edx, but that should be fine, 0 on memorystream
-		virtual size_t __stdcall GetSize();
-		virtual void __stdcall SetFileSize(long size); // moves file pointer to eof
-		virtual long __stdcall GetFilePointer();
-		virtual void __stdcall SetFilePointer(long fp);
-		virtual long __stdcall Read(void* buff, long numBytesToRead); // 10 returns num bytes read
-		virtual void __stdcall Seek(long seek, SeekMode mode);
-		virtual void __stdcall Write(const void* buff, long numBytesToWrite);
+		virtual const char* __stdcall GetFileName() = 0;
+		virtual int64_t __stdcall GetLastWriteTime() = 0; // 5 returns in eax and edx, but that should be fine, 0 on memorystream
+		virtual size_t __stdcall GetSize() = 0;
+		virtual void __stdcall SetFileSize(long size) = 0; // moves file pointer to eof
+		virtual long __stdcall GetFilePointer() = 0;
+		virtual void __stdcall SetFilePointer(long fp) = 0;
+		virtual long __stdcall Read(void* buff, long numBytesToRead) = 0; // 10 returns num bytes read
+		virtual int __stdcall Seek(long seek, SeekMode mode) = 0;
+		virtual void __stdcall Write(const void* buff, long numBytesToWrite) = 0;
+
+		static constexpr int vtp = 0x761C28;
 
 		inline void Write(std::string_view data) {
 			Write(data.data(), data.length());
@@ -77,8 +80,24 @@ namespace BB {
 		char* Filename = nullptr;
 		static constexpr int vtp = 0x761C98;
 
+
+		virtual ~CFileStream() override;
+	private:
+		virtual bool __stdcall rettrue() override;
+		virtual bool __stdcall rettrue1() override;
+		virtual bool __stdcall rettrue2() override;
+	public:
+		virtual const char* __stdcall GetFileName() override;
+		virtual int64_t __stdcall GetLastWriteTime() override;
+		virtual size_t __stdcall GetSize() override;
+		virtual void __stdcall SetFileSize(long size) override;
+		virtual long __stdcall GetFilePointer() override;
+		virtual void __stdcall SetFilePointer(long fp) override;
+		virtual long __stdcall Read(void* buff, long numBytesToRead) override;
+		virtual int __stdcall Seek(long seek, SeekMode mode) override;
+		virtual void __stdcall Write(const void* buff, long numBytesToWrite) override;
+
 		CFileStream();
-		~CFileStream();
 		bool OpenFile(const char* name, Flags mode);
 	};
 	class CMemoryStream : public IStream { // read from archives
@@ -89,7 +108,23 @@ namespace BB {
 		PADDINGI(1); // 5, flags, 1 readonly?
 	public:
 		static constexpr int vtp = 0x77F7CC;
+
+
 		virtual ~CMemoryStream() override;
+	private:
+		virtual bool __stdcall rettrue() override;
+		virtual bool __stdcall rettrue1() override;
+		virtual bool __stdcall rettrue2() override;
+	public:
+		virtual const char* __stdcall GetFileName() override;
+		virtual int64_t __stdcall GetLastWriteTime() override;
+		virtual size_t __stdcall GetSize() override;
+		virtual void __stdcall SetFileSize(long size) override;
+		virtual long __stdcall GetFilePointer() override;
+		virtual void __stdcall SetFilePointer(long fp) override;
+		virtual long __stdcall Read(void* buff, long numBytesToRead) override;
+		virtual int __stdcall Seek(long seek, SeekMode mode) override;
+		virtual void __stdcall Write(const void* buff, long numBytesToWrite) override;
 
 		CMemoryStream();
 		void CopyToStream(IStream& to) const;
@@ -252,8 +287,23 @@ namespace BB {
 	public:
 		static constexpr int vtp = 0x761C60;
 
+		virtual ~CFileStreamEx() override;
+	protected:
+		virtual bool __stdcall rettrue() override;
+		virtual bool __stdcall rettrue1() override;
+		virtual bool __stdcall rettrue2() override;
+	public:
+		virtual const char* __stdcall GetFileName() override;
+		virtual int64_t __stdcall GetLastWriteTime() override;
+		virtual size_t __stdcall GetSize() override;
+		virtual void __stdcall SetFileSize(long size) override;
+		virtual long __stdcall GetFilePointer() override;
+		virtual void __stdcall SetFilePointer(long fp) override;
+		virtual long __stdcall Read(void* buff, long numBytesToRead) override;
+		virtual int __stdcall Seek(long seek, SeekMode mode) override;
+		virtual void __stdcall Write(const void* buff, long numBytesToWrite) override;
+
 		CFileStreamEx();
-		~CFileStreamEx();
 		bool OpenFile(const char* filename, Flags mode);
 		void Close();
 	};

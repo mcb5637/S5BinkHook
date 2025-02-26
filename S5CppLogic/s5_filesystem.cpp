@@ -117,79 +117,120 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 	return { "", OpenFileStreamUnique(path, f) };
 }
 
-bool __stdcall BB::IStream::rettrue()
+bool __stdcall BB::CFileStream::rettrue()
 {
 	return true;
 }
-bool __stdcall BB::IStream::rettrue1()
+bool __stdcall BB::CFileStream::rettrue1()
 {
 	return true;
 }
-bool __stdcall BB::IStream::rettrue2()
+bool __stdcall BB::CFileStream::rettrue2()
 {
 	return true;
 }
-const char* __stdcall BB::IStream::GetFileName()
+const char* __stdcall BB::CFileStream::GetFileName()
 {
-	return (*reinterpret_cast<const char* (__stdcall***)(BB::IStream*)>(this))[4](this);
+	return Filename;
 }
-int64_t __stdcall BB::IStream::GetLastWriteTime()
+int64_t __stdcall BB::CFileStream::GetLastWriteTime()
 {
-	return (*reinterpret_cast<int64_t(__stdcall***)(BB::IStream*)>(this))[5](this);
+	return reinterpret_cast<int64_t(__stdcall*)(BB::CFileStream*)>(0x548C6F)(this);
 }
-size_t __stdcall BB::IStream::GetSize()
+size_t __stdcall BB::CFileStream::GetSize()
 {
-	return (*reinterpret_cast<size_t(__stdcall***)(BB::IStream*)>(this))[6](this);
+	return reinterpret_cast<size_t(__stdcall*)(BB::CFileStream*)>(0x548EE9)(this);
 }
-void __stdcall BB::IStream::SetFileSize(long size)
+void __stdcall BB::CFileStream::SetFileSize(long size)
 {
-	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, long)>(this))[7](this, size);
+	reinterpret_cast<void(__stdcall*)(BB::CFileStream*, long)>(0x548F17)(this, size);
 }
-long __stdcall BB::IStream::GetFilePointer()
+long __stdcall BB::CFileStream::GetFilePointer()
 {
-	return (*reinterpret_cast<long(__stdcall***)(BB::IStream*)>(this))[8](this);
+	return reinterpret_cast<long(__stdcall*)(BB::CFileStream*)>(0x548F57)(this);
 }
-void __stdcall BB::IStream::SetFilePointer(long fp)
+void __stdcall BB::CFileStream::SetFilePointer(long fp)
 {
-	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, long)>(this))[9](this, fp);
+	reinterpret_cast<void(__stdcall*)(BB::CFileStream*, long)>(0x548F89)(this, fp);
 }
-long __stdcall BB::IStream::Read(void* buff, long numBytesToRead)
+long __stdcall BB::CFileStream::Read(void* buff, long numBytesToRead)
 {
-	return (*reinterpret_cast<long(__stdcall***)(BB::IStream*, void*, long)>(this))[10](this, buff, numBytesToRead);
+	return reinterpret_cast<long(__stdcall*)(BB::CFileStream*, void*, long)>(0x548FBC)(this, buff, numBytesToRead);
 }
-void __stdcall BB::IStream::Seek(long seek, SeekMode mode)
+int __stdcall BB::CFileStream::Seek(long seek, SeekMode mode)
 {
-	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, long, SeekMode)>(this))[11](this, seek, mode);
+	return reinterpret_cast<int(__stdcall*)(BB::CFileStream*, long, SeekMode)>(0x54900A)(this, seek, mode);
 }
-void __stdcall BB::IStream::Write(const void* buff, long numBytesToWrite)
+void __stdcall BB::CFileStream::Write(const void* buff, long numBytesToWrite)
 {
-	return (*reinterpret_cast<void(__stdcall***)(BB::IStream*, const void*, long)>(this))[12](this, buff, numBytesToWrite);
+	reinterpret_cast<void(__stdcall*)(BB::CFileStream*, const void*, long)>(0x54905A)(this, buff, numBytesToWrite);
 }
 
 BB::CFileStream::CFileStream()
 {
 	*reinterpret_cast<int*>(this) = vtp;
 }
-inline void(__thiscall* const filestream_dtor)(BB::CFileStream* f) = reinterpret_cast<void(__thiscall*)(BB::CFileStream*)>(0x548DBB);
-BB::CFileStream::~CFileStream()
-{
-	filestream_dtor(this);
-}
+
 static inline bool(__thiscall* const filestream_open)(BB::CFileStream* th, const char* n, BB::IStream::Flags f) = reinterpret_cast<bool(__thiscall*)(BB::CFileStream*, const char*, BB::IStream::Flags)>(0x548DEE);
 bool BB::CFileStream::OpenFile(const char* name, Flags mode)
 {
 	return filestream_open(this, name, mode);
 }
 
-inline void(__thiscall* const memstream_dtor)(BB::CMemoryStream* th) = reinterpret_cast<void(__thiscall*)(BB::CMemoryStream*)>(0x54EEB0);
-BB::CMemoryStream::~CMemoryStream()
-{
-	memstream_dtor(this);
-}
 BB::CMemoryStream::CMemoryStream()
 {
 	*reinterpret_cast<int*>(this) = vtp;
 }
+
+bool __stdcall BB::CMemoryStream::rettrue()
+{
+	return true;
+}
+bool __stdcall BB::CMemoryStream::rettrue1()
+{
+	return true;
+}
+bool __stdcall BB::CMemoryStream::rettrue2()
+{
+	return reinterpret_cast<bool(__stdcall*)(BB::CMemoryStream*)>(0x54EBF9)(this);
+}
+const char* __stdcall BB::CMemoryStream::GetFileName()
+{
+	return nullptr;
+}
+int64_t __stdcall BB::CMemoryStream::GetLastWriteTime()
+{
+	return 0;
+}
+size_t __stdcall BB::CMemoryStream::GetSize()
+{
+	return Size;
+}
+void __stdcall BB::CMemoryStream::SetFileSize(long size)
+{
+	reinterpret_cast<void(__stdcall*)(BB::CMemoryStream*, long)>(0x54EEE3)(this, size);
+}
+long __stdcall BB::CMemoryStream::GetFilePointer()
+{
+	return FilePointer;
+}
+void __stdcall BB::CMemoryStream::SetFilePointer(long fp)
+{
+	reinterpret_cast<void(__stdcall*)(BB::CMemoryStream*, long)>(0x54EC23)(this, fp);
+}
+long __stdcall BB::CMemoryStream::Read(void* buff, long numBytesToRead)
+{
+	return reinterpret_cast<long(__stdcall*)(BB::CMemoryStream*, void*, long)>(0x54EC3A)(this, buff, numBytesToRead);
+}
+int __stdcall BB::CMemoryStream::Seek(long seek, SeekMode mode)
+{
+	return reinterpret_cast<int(__stdcall*)(BB::CMemoryStream*, long, SeekMode)>(0x54EC86)(this, seek, mode);
+}
+void __stdcall BB::CMemoryStream::Write(const void* buff, long numBytesToWrite)
+{
+	reinterpret_cast<void(__stdcall*)(BB::CMemoryStream*, const void*, long)>(0x54EDF3)(this, buff, numBytesToWrite);
+}
+
 inline void(__thiscall* const memstream_copyto)(const BB::CMemoryStream* th, BB::IStream* to) = reinterpret_cast<void(__thiscall*)(const BB::CMemoryStream*, BB::IStream*)>(0x5A19D1);
 void BB::CMemoryStream::CopyToStream(IStream& to) const
 {
@@ -206,16 +247,92 @@ std::unique_ptr<BB::IStream> BB::IFileSystem::OpenFileStreamUnique(const char* p
 	return std::unique_ptr<IStream>(OpenFileStream(path, mode));
 }
 
+
+
+bool __stdcall BB::CFileStreamEx::rettrue()
+{
+	if (RealStream)
+		return RealStream->rettrue();
+	else
+		return false;
+}
+bool __stdcall BB::CFileStreamEx::rettrue1()
+{
+	if (RealStream)
+		return RealStream->rettrue1();
+	else
+		return false;
+}
+bool __stdcall BB::CFileStreamEx::rettrue2()
+{
+	if (RealStream)
+		return RealStream->rettrue1();
+	else
+		return false;
+}
+const char* __stdcall BB::CFileStreamEx::GetFileName()
+{
+	if (RealStream)
+		return RealStream->GetFileName();
+	else
+		return nullptr;
+}
+int64_t __stdcall BB::CFileStreamEx::GetLastWriteTime()
+{
+	if (RealStream)
+		return RealStream->GetLastWriteTime();
+	else
+		return 0;
+}
+size_t __stdcall BB::CFileStreamEx::GetSize()
+{
+	if (RealStream)
+		return RealStream->GetSize();
+	else
+		return 0;
+}
+void __stdcall BB::CFileStreamEx::SetFileSize(long size)
+{
+	if (RealStream)
+		return RealStream->SetFileSize(size);
+}
+long __stdcall BB::CFileStreamEx::GetFilePointer()
+{
+	if (RealStream)
+		return RealStream->GetFilePointer();
+	else
+		return 0;
+}
+void __stdcall BB::CFileStreamEx::SetFilePointer(long fp)
+{
+	if (RealStream)
+		return RealStream->SetFilePointer(fp);
+}
+long __stdcall BB::CFileStreamEx::Read(void* buff, long numBytesToRead)
+{
+	if (RealStream)
+		return RealStream->Read(buff, numBytesToRead);
+	else
+		return 0;
+}
+int __stdcall BB::CFileStreamEx::Seek(long seek, SeekMode mode)
+{
+	if (RealStream)
+		return RealStream->Seek(seek, mode);
+	else
+		return 0;
+}
+void __stdcall BB::CFileStreamEx::Write(const void* buff, long numBytesToWrite)
+{
+	if (RealStream)
+		return RealStream->Write(buff, numBytesToWrite);
+}
+
 static inline bool(__thiscall* const shok_BB_CFileStreamEx_OpenFile)(BB::CFileStreamEx* th, const char* name, BB::CFileStreamEx::Flags m) = reinterpret_cast<bool(__thiscall*)(BB::CFileStreamEx*, const char*, BB::CFileStreamEx::Flags)>(0x54924D);
 static inline void(__thiscall* const shok_BB_CFileStreamEx_Close)(BB::CFileStreamEx* th) = reinterpret_cast<void(__thiscall*)(BB::CFileStreamEx*)>(0x54920A);
 BB::CFileStreamEx::CFileStreamEx()
 {
 	*reinterpret_cast<int*>(this) = BB::CFileStreamEx::vtp;
-}
-inline void(__thiscall* const filestreamex_dtor)(BB::CFileStreamEx* f) = reinterpret_cast<void(__thiscall*)(BB::CFileStreamEx*)>(0x549215);
-BB::CFileStreamEx::~CFileStreamEx()
-{
-	filestreamex_dtor(this);
 }
 bool BB::CFileStreamEx::OpenFile(const char* filename, Flags mode)
 {

@@ -578,5 +578,8 @@
     <MASM Include="s5_effects_manual.asm">
       <Filter>shok\effect</Filter>
     </MASM>
+    <MASM Include="s5_filesystem_maual.asm">
+      <Filter>shok\globals</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

@@ -350,6 +350,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream
 	WriteChosenClassSchema<GGlue::CTerrainPropsMgr>(f);
 	WriteChosenClassSchema<GGlue::CGlueWaterPropsMgr>(f);
 	WriteChosenClassSchema<CppLogic::ModLoader::ModpackDesc>(f);
+	WriteChosenClassSchema<Framework::MapInfo>(f);
 }
 
 void CppLogic::Serializer::SchemaGenerator::PreRegisterExtraClasses()

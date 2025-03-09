@@ -59,11 +59,16 @@ namespace EGL {
 
 	class CGLEEntityManager : public EGL::TGLEItemManager<EGL::CGLEEntity, 65535> {
 	public:
-		// map/list ScriptName of Name, EntityID
+		shok::Map<shok::String, shok::EntityId> ScriptName;
 		static inline BB::SerializationData* (__cdecl* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__cdecl*)()>(0x574083);
 
 		static inline constexpr int vtp = 0x783B70;
 
 		static inline EGL::CGLEEntityManager** const GlobalObj = reinterpret_cast<EGL::CGLEEntityManager**>(0x897558);
+
+		// only removes if id matches
+		static inline void(__cdecl* const RemoveScriptName)(const char* name, shok::EntityId id) = reinterpret_cast<void(__cdecl*)(const char*, shok::EntityId)>(0x576C84);
+		// overrides existing name
+		static inline void(__cdecl* const SetScriptName)(const char* name, shok::EntityId id) = reinterpret_cast<void(__cdecl*)(const char*, shok::EntityId)>(0x576EA6);
 	};
 }

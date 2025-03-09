@@ -481,6 +481,11 @@ void EGL::CGLEEntity::SetHealth(int h)
 {
 	entitysethealth(this, h);
 }
+void EGL::CGLEEntity::SetScriptName(const char* n)
+{
+	void(__thiscall* const entitysetscriptname)(EGL::CGLEEntity * th, const char* n) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, const char*)>(0x57A728);
+	entitysetscriptname(this, n);
+}
 static inline void(__thiscall* const entityhurt)(EGL::CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, int)>(0x57AD47);
 void EGL::CGLEEntity::Hurt(int dmg)
 {

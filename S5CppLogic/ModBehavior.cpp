@@ -421,7 +421,7 @@ void CppLogic::Mod::LightningStrikeAbility::EventLightningStrike(EGL::CEventPosi
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	const auto* prop = static_cast<LightningStrikeAbilityProps*>(AbilityProps);
 
-	if (p->Position.GetDistanceSquaredTo(e->Position) > prop->Range * prop->Range)
+	if (!p->Position.IsInRange(e->Position, prop->Range))
 		return;
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
 	if (pl->CurrentResources.WeatherEnergy < prop->WeatherEnergyCost)
@@ -948,9 +948,11 @@ void CppLogic::Mod::BombardmentAbility::Activate(const shok::Position& tar)
 {
 	if (!CheckAndResetCooldown())
 		return;
-	Target = tar;
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto* pr = static_cast<BombardmentAbilityProps*>(AbilityProps);
+	if (!en->Position.IsInRange(tar, pr->AttackRange))
+		return;
+	Target = tar;
 	en->SetTaskList(pr->TaskList);
 	en->GetBehaviorDynamic<GGL::CLeaderBehavior>()->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
 }
@@ -967,7 +969,7 @@ void CppLogic::Mod::BombardmentAbility::NetEventBombard(EGL::CNetEventEntityAndP
 	if (!ab->CanUseAbility())
 		return;
 	auto* pr = static_cast<CppLogic::Mod::BombardmentAbilityProps*>(ab->AbilityProps);
-	if (p.GetDistanceSquaredTo(e->Position) > pr->AttackRange * pr->AttackRange)
+	if (!p.IsInRange(e->Position, pr->AttackRange))
 		return;
 	ab->Activate(p);
 }

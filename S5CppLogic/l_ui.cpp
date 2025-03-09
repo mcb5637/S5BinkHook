@@ -1970,6 +1970,48 @@ namespace CppLogic::UI {
 		if (!t->IsDead())
 			throw lua::LuaException("is alive");
 	}
+	void CheckSnipeEvent(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		GGL::CSniperAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
+		if (!e->Position.IsInRange(oth->Position, bp->Range))
+			throw lua::LuaException("target not in range");
+	}
+	void CheckShurikenEvent(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		GGL::CShurikenAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
+		if (!e->Position.IsInRange(oth->Position, bp->Range))
+			throw lua::LuaException("target not in range");
+	}
+	void CheckLightingStrike(EGL::CNetEventEntityAndPos& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		auto* b = e->GetBehavior<CppLogic::Mod::LightningStrikeAbility>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::LightningStrikeAbilityProps>();
+		if (!e->Position.IsInRange(shok::Position{ ev.X, ev.Y }, bp->Range))
+			throw lua::LuaException("not in range");
+		if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->CurrentResources.WeatherEnergy < bp->WeatherEnergyCost)
+			throw lua::LuaException("not enough weather energy");
+	}
+	void CheckResourceRefill(EGL::CNetEvent2Entities& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
+		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
+		auto* b = e->GetBehavior<CppLogic::Mod::ResDoodadRefillBehavior>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::ResDoodadRefillBehaviorProps>();
+		auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
+		if (res == nullptr)
+			throw lua::LuaException("no mine");
+		if (!res->IsEntityInCategory(bp->AffectedTypes))
+			throw lua::LuaException("not affectable");
+	}
+	void CheckBombardment(EGL::CNetEventEntityAndPos& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		auto* b = e->GetBehavior<CppLogic::Mod::BombardmentAbility>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::BombardmentAbilityProps>();
+		if (!e->Position.IsInRange(shok::Position{ ev.X, ev.Y }, bp->AttackRange))
+			throw lua::LuaException("not in range");
+	}
+
 	int CommandMove(lua::State l) {
 		luaext::EState L{ l };
 		auto* s = L.CheckSettler(1);
@@ -1992,7 +2034,7 @@ namespace CppLogic::UI {
 		{
 			auto v = ev.Position.SaveVector();
 			for (int i = 2; i <= L.GetTop(); ++i) {
-			auto p = L.CheckPos(i);
+				auto p = L.CheckPos(i);
 				v.Vector.push_back(p);
 			}
 		}
@@ -2043,17 +2085,17 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::Binoculars_Observe,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutBinoculars>>>("Binoculars_Observe"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sniper_Snipe,
-			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilitySniper>,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilitySniper>, CheckSnipeEvent,
 			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Sniper_Snipe"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::TorchPlacer_Place,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutTorches>>>("TorchPlacer_Place"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Shuriken_Activate,
-			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityShuriken>,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityShuriken>, CheckShurikenEvent,
 			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Shuriken_Activate"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_LightningStrike_Activate,
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_LightningStrike_Activate, CheckLightingStrike,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>>>("LightningStrike_Activate"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_ResDoodadRefill_Activate,
-			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckBuilding,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckBuilding, CheckResourceRefill,
 			LuaEventInterface::CheckActorAbility<shok::AbilityId::AbiltyResourceDoodadRefill>>>("ResDoodadRefill_Activate"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityID, shok::NetEventIds::CppL_ShieldCover_Activate,
 			LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShieldCover>>>("ShieldCover_Activate"),

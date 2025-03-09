@@ -291,7 +291,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x3448BED));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x3448BED));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -299,7 +299,14 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	
+	auto& m = (*EGL::CGLEEntityManager::GlobalObj)->ScriptName;
+	L.NewTable();
+	int i = 1;
+	for (auto& [str, id] : m) {
+		L.Push(str);
+		L.SetTableRaw(-2, i);
+		++i;
+	}
 	return 1;
 }
 

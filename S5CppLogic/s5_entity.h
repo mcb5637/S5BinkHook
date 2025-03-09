@@ -227,6 +227,10 @@ namespace EGL {
 		float EventGetMotivation();
 
 		void SetHealth(int h);
+		// nullptr to remove
+		// overrides name->id mapping, if already exists
+		// but does not remove id->name mapping
+		void SetScriptName(const char* n);
 		void Hurt(int dmg);
 		void SetTaskList(shok::TaskListId tl);
 		void SetTaskList(EGL::CGLETaskList* tl);

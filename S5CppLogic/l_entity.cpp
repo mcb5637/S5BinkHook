@@ -626,6 +626,18 @@ namespace CppLogic::Entity {
 		return 2;
 	}
 
+	int GetAllScriptNameMappings(lua::State l) {
+		luaext::EState L{ l };
+		auto& m = (*EGL::CGLEEntityManager::GlobalObj)->ScriptName;
+		L.NewTable();
+		for (auto& [str, id] : m) {
+			L.Push(str);
+			L.Push(id);
+			L.SetTableRaw(-3);
+		}
+		return 1;
+	}
+
 	int MovingEntityGetSpeedFactor(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
@@ -898,12 +910,36 @@ namespace CppLogic::Entity {
 		if (e->GetBehavior<GGL::CThiefBehavior>() == nullptr)
 			throw lua::LuaException("not a thief");
 	}
+	void CheckLightingStrike(EGL::CGLEEntity* e, EGL::CEventPosition& ev) {
+		auto* b = e->GetBehavior<CppLogic::Mod::LightningStrikeAbility>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::LightningStrikeAbilityProps>();
+		if (!e->Position.IsInRange(ev.Position, bp->Range))
+			throw lua::LuaException("not in range");
+		if ((*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->CurrentResources.WeatherEnergy < bp->WeatherEnergyCost)
+			throw lua::LuaException("not enough weather energy");
+	}
+	void CheckResourceRefill(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
+		auto* b = e->GetBehavior<CppLogic::Mod::ResDoodadRefillBehavior>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::ResDoodadRefillBehaviorProps>();
+		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
+		if (res == nullptr)
+			throw lua::LuaException("no mine");
+		if (!res->IsEntityInCategory(bp->AffectedTypes))
+			throw lua::LuaException("not affectable");
+	}
 	void CheckResurrect(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
 		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
 		if (t->GetBehavior<GGL::CHeroBehavior>() == nullptr)
 			throw lua::LuaException("not a hero");
 		if (!t->IsDead())
 			throw lua::LuaException("is alive");
+	}
+	void CheckBombardment(EGL::CGLEEntity* e, EGL::CEventPosition& ev) {
+		auto* b = e->GetBehavior<CppLogic::Mod::BombardmentAbility>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::BombardmentAbilityProps>();
+		if (!e->Position.IsInRange(ev.Position, bp->AttackRange))
+			throw lua::LuaException("not in range");
 	}
 
 	int EnableConversionHook(lua::State L) {
@@ -1771,7 +1807,7 @@ namespace CppLogic::Entity {
 		SettlerCleanupAnimTask(L);
 	}
 
-	constexpr std::array<lua::FuncReference, 38> Entity{ {
+	constexpr std::array Entity{
 			lua::FuncReference::GetRef<GetScale>("GetScale"),
 			lua::FuncReference::GetRef<SetScale>("SetScale"),
 			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
@@ -1810,7 +1846,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
 			lua::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
 			lua::FuncReference::GetRef<GetTrackedResources>("GetTrackedResources"),
-	} };
+			lua::FuncReference::GetRef<GetAllScriptNameMappings>("GetAllScriptNameMappings"),
+	};
 
 	constexpr std::array<lua::FuncReference, 21> Predicates{ {
 			lua::FuncReference::GetRef<PredicateAnd>("And"),
@@ -1900,16 +1937,16 @@ namespace CppLogic::Entity {
 				CheckIsThief, LuaEventInterface::CheckBuilding, LuaEventInterface::CheckTargetCategory<shok::EntityCategory::Headquarters>,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("CommandSecureGoods"),
 			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_LightningStrike_Activate,
-				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>>>("CommandLightningStrike"),
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>, CheckLightingStrike>>("CommandLightningStrike"),
 			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_ResDoodadRefill_Activate,
-				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbiltyResourceDoodadRefill>, LuaEventInterface::CheckBuilding,
+				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbiltyResourceDoodadRefill>, LuaEventInterface::CheckBuilding, CheckResourceRefill,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("CommandRefillResourceDoodad"),
 			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::CppL_ShieldCoverActivate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShieldCover>>>("CommandShieldCover"),
 			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_Resurrect_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityResurrect>, CheckResurrect,
 				LuaEventInterface::CheckEntitySamePlayer>>("CommandResurrect"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_Bombardment_Activate,
+			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_Bombardment_Activate, CheckBombardment,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBombardment>>>("CommandBombardment"),
 			lua::FuncReference::GetRef<EnableConversionHook>("EnableConversionHook"),
 			lua::FuncReference::GetRef<DisableConversionHook>("DisableConversionHook"),

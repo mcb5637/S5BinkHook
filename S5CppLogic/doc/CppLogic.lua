@@ -1358,6 +1358,10 @@ function CppLogic.Entity.GetAttackCommandTarget(id) end
 --- @return CostInfo|nil used
 function CppLogic.Entity.GetTrackedResources(id) end
 
+--- returns the full entityname->id mapping
+--- @return table<string, number>
+function CppLogic.Entity.GetAllScriptNameMappings() end
+
 --- gets the leader of a soldier.
 --- @param id entity
 --- @return number id
@@ -1633,6 +1637,20 @@ function CppLogic.Entity.Settler.CommandLightningStrike(id, t) end
 --- @param id entity
 --- @param tid entity
 function CppLogic.Entity.Settler.CommandRefillResourceDoodad(id, tid) end
+
+--- shield cover command
+--- @param id entity
+function CppLogic.Entity.Settler.CommandShieldCover(id) end
+
+--- resurrect command
+--- @param id entity
+--- @param tid entity
+function CppLogic.Entity.Settler.CommandResurrect(id, tid) end
+
+--- bombardment command
+--- @param id entity
+--- @param p Position
+function CppLogic.Entity.Settler.CommandBombardment(id, p) end
 
 --- teleports a settler to a position. does not change id.
 --- @param id entity
@@ -2231,6 +2249,36 @@ function CppLogic.EntityType.Settler.GetAbilityDataRangedEffect(ty) end
 --- @param ran number range
 --- @param rech number recharge time
 function CppLogic.EntityType.Settler.SetAbilityDataRangedEffect(ty, dmgfac, armfac, hpfac, ran, rech) end
+
+--- entitytytpe resurrect ability data.
+--- @param ty number entitytype
+--- @return number range
+--- @return number progressPerTick
+--- @return number rechargeTimeSeconds
+function CppLogic.EntityType.Settler.GetAbilityDataResurrect(ty) end
+
+--- entitytytpe lightning strike data.
+--- @param ty number entitytype
+--- @return number range
+--- @return number weatherEnergyCost
+--- @return number damage
+--- @return number damageClass
+--- @return number damageRange
+--- @return number effectType
+--- @return number rechargeTimeSeconds
+function CppLogic.EntityType.Settler.GetAbilityLightningStrikeData(ty) end
+
+--- entitytytpe bombardment data.
+--- @param ty number entitytype
+--- @return number range
+--- @return number effectType
+--- @return number damageRange
+--- @return number damage
+--- @return number damageClass
+--- @return number taskList
+--- @return number rangeOverride
+--- @return number rechargeTimeSeconds
+function CppLogic.EntityType.Settler.GetAbilityBombardmentData(ty) end
 
 --- settler type fearless.
 --- @param ty number entitytype
@@ -3130,7 +3178,21 @@ function CppLogic.UI.Commands.LightningStrike_Activate(id, tar) end
 ---gives a refill mine command
 ---@param id number|string
 ---@param tar number|string
-function CppLogic.UI.Commands.ResDoodadRefill_Activate(id, tar, ...) end
+function CppLogic.UI.Commands.ResDoodadRefill_Activate(id, tar) end
+
+---gives a shield cover command
+---@param id number|string
+function CppLogic.UI.Commands.ShieldCover_Activate(id) end
+
+---gives a resurrect command
+---@param id number|string
+---@param tar number|string
+function CppLogic.UI.Commands.Resurrect_Activate(id, tar) end
+
+---gives a bombardment command
+---@param id number|string
+---@param p Position
+function CppLogic.UI.Commands.Bombardment_Activate(id, p) end
 
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed/reloaded on leaving the map.

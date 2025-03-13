@@ -343,6 +343,78 @@ float GGL::ModifierEntityDatabase::GetModifiedStat(shok::EntityId id, CEntityPro
 {
 	return modentitydb_getmod(this, id, ty, initial);
 }
+float GGL::ModifierEntityDatabase::GetModifiedStatNoCache(shok::EntityId id, CEntityProfile::ModifierType ty, float initial)
+{
+	auto iter = Profiles.find(id);
+	if (iter == Profiles.end())
+		return initial;
+	auto* pr = iter->second;
+	auto clr = [pr, ty]() {
+		CEntityProfile::ModifyableValue* val = nullptr;
+		switch (ty)
+		{
+		case EGL::IProfileModifierSetObserver::ModifierType::MovingSpeed:
+			val = &pr->MovingSpeed;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::HealthBar:
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::MaxHealth:
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::Exploration:
+			val = &pr->Exploration;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::Damage:
+			val = &pr->Damage;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::DamageBonus:
+			val = &pr->DamageBonus;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::MaxAttackRange:
+			val = &pr->MaxAttackRange;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::MinAttackRange:
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::Experience:
+			val = &pr->ExperiencePoints;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::ExperienceLevels:
+			val = &pr->ExperienceLevel;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::Armor:
+			val = &pr->Armor;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::Motivation:
+			val = &pr->Motivation;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::CurrentSoldierAmount:
+			val = &pr->CurrentAmountSoldiers;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::MaxSoldierAmount:
+			val = &pr->MaxAmountSoldiers;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::Dodge:
+			val = &pr->Dodge;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::AutoAttackRange:
+			val = &pr->AutoAttackRange;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::HealingPoints:
+			val = &pr->HealingPoints;
+			break;
+		case EGL::IProfileModifierSetObserver::ModifierType::MissChance:
+			val = &pr->MissChance;
+			break;
+		default:
+			break;
+		}
+		if (val != nullptr)
+			val->NeedsRefresh = true;
+	};
+	clr();
+	float r = pr->GetModifiedValue(ty, initial);
+	clr();
+	return r;
+}
 
 bool GGL::CSettler::IsIdle()
 {
@@ -1081,7 +1153,7 @@ float EGL::CGLEEntity::ModifyDamage(int baseDamage) const
 }
 float EGL::CGLEEntity::ModifyDamage(float baseDamage) const
 {
-	return GGL::ModifierEntityDatabase::GlobalObj->GetModifiedStat(EntityId, GGL::CEntityProfile::ModifierType::Damage, baseDamage);
+	return GGL::ModifierEntityDatabase::GlobalObj->GetModifiedStatNoCache(EntityId, GGL::CEntityProfile::ModifierType::Damage, baseDamage);
 }
 
 float EGL::CGLEEntity::GetTotalAffectedDamageModifier()

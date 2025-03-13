@@ -528,11 +528,12 @@ namespace GGL {
 	};
 	static_assert(sizeof(CEntityProfile) == 56 * 4);
 	struct ModifierEntityDatabase {
-		PADDINGI(3); // map?
+		shok::Map<shok::EntityId, CEntityProfile*> Profiles;
 
 		static inline ModifierEntityDatabase* const GlobalObj = reinterpret_cast<ModifierEntityDatabase*>(0x895E5C);
 
 		float GetModifiedStat(shok::EntityId id, CEntityProfile::ModifierType ty, float initial);
+		float GetModifiedStatNoCache(shok::EntityId id, CEntityProfile::ModifierType ty, float initial);
 	};
 
 	class CEvadingEntity : public EGL::CMovingEntity {

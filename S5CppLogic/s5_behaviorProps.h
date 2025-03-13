@@ -486,7 +486,7 @@ namespace GGL {
 	class CAutoCannonBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
 		int NumberOfShots; //4
-		float RotationSpeed;
+		float RotationSpeed; // rad, string seri as deg
 		shok::EffectTypeId CannonBallEffectType; // 6
 		float ProjectileOffsetFront, ProjectileOffsetRight;
 		shok::EffectTypeId ImpactEffectType; // 9

@@ -299,15 +299,8 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	auto& m = (*EGL::CGLEEntityManager::GlobalObj)->ScriptName;
-	L.NewTable();
-	int i = 1;
-	for (auto& [str, id] : m) {
-		L.Push(str);
-		L.SetTableRaw(-2, i);
-		++i;
-	}
-	return 1;
+	
+	return 0;
 }
 
 int GetOptions(lua::State L) {

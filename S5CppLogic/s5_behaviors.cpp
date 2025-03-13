@@ -1188,20 +1188,37 @@ void __thiscall GGL::CAutoCannonBehavior::EventGetDamageOverride(EGL::CEventGetV
 	ev->Data = GetDamage();
 }
 
+constexpr std::array autocannon_rotate_data{
+	byte{0x51}, // push ecx
+	byte{0x51}, // push ecx
+	byte{0xDD}, byte{0x1C}, byte{0x24}, // fstp qword ptr ss:[esp],st(0)
+	byte{0xE8}, byte{0x70}, byte{0x40}, byte{0x0B}, byte{0x00}, // call <settlershok.sub_5C4D2B>
+	byte{0x59}, // pop ecx
+	byte{0x59}, // pop ecx
+	byte{0xD8}, byte{0x1D}, byte{0xEC}, byte{0x8B}, byte{0x77}, byte{0x00}, // fcomp st(0),dword ptr ds:[778BEC]
+	byte{0xDF}, byte{0xE0}, // fnstsw ax
+	byte{0xF6}, byte{0xC4}, byte{0x05}, // test ah,5
+	byte{0x7B}, byte{0x33}, // jnp settlershok.510CFD
+	byte{0xEB}, byte{0x21} // jmp settlershok.510CED
+};
+
 bool AutoCannonHookDamageMod_Hooked = false;
 void GGL::CAutoCannonBehavior::HookDamageOverride()
 {
 	if (AutoCannonHookDamageMod_Hooked)
 		return;
 	AutoCannonHookDamageMod_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x510CED - 0x510CB1, {
 		reinterpret_cast<void*>(0x510638),
 		reinterpret_cast<void*>(0x50F5ED),
+		reinterpret_cast<void*>(0x510CB1)
 	} };
 	// get damage event
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F5ED), CppLogic::Hooks::MemberFuncPointerToVoid(&EventGetDamageOverride, 0), reinterpret_cast<void*>(0x50F5F3));
 	// fire projectile (also used by trap)
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x510638), CppLogic::Hooks::MemberFuncPointerToVoid(&TaskFireProjectileOverride, 0), reinterpret_cast<void*>(0x510647));
+	*reinterpret_cast<std::remove_const_t<decltype(autocannon_rotate_data)>*>(0x510CB1) = autocannon_rotate_data;
+	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x510CCC), reinterpret_cast<void*>(0x510CED));
 }
 
 

@@ -973,6 +973,7 @@ function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclas
 
 --- enables AoE projectile fix.
 --- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
+--- (also fixes autocannon rotation)
 --- status of this gets saved into a savegame.
 function CppLogic.Combat.EnableAoEProjectileFix() end
 --- disables AoE projectile fix.

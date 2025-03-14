@@ -638,6 +638,25 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int GetLimitedAmmo(lua::State ls) {
+		luaext::EState L{ ls };
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		auto* b = e->GetBehavior<CppLogic::Mod::LimitedAmmoBehavior>();
+		if (b == nullptr)
+			throw lua::LuaException{ "no limited ammo" };
+		L.Push(b->RemainingAmmo);
+		return 1;
+	};
+	int SetLimitedAmmo(lua::State ls) {
+		luaext::EState L{ ls };
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		auto* b = e->GetBehavior<CppLogic::Mod::LimitedAmmoBehavior>();
+		if (b == nullptr)
+			throw lua::LuaException{ "no limited ammo" };
+		b->RemainingAmmo = L.CheckInt(2);
+		return 0;
+	};
+
 	int MovingEntityGetSpeedFactor(lua::State l) {
 		luaext::EState L{ l };
 		EGL::CGLEEntity* e = L.CheckEntity(1);
@@ -1847,6 +1866,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
 			lua::FuncReference::GetRef<GetTrackedResources>("GetTrackedResources"),
 			lua::FuncReference::GetRef<GetAllScriptNameMappings>("GetAllScriptNameMappings"),
+			lua::FuncReference::GetRef<GetLimitedAmmo>("GetLimitedAmmo"),
+			lua::FuncReference::GetRef<SetLimitedAmmo>("SetLimitedAmmo"),
 	};
 
 	constexpr std::array<lua::FuncReference, 21> Predicates{ {

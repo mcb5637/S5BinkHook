@@ -562,6 +562,9 @@ namespace shok {
         TASK_TURN_TO_RESURRECT, //EGL::CGLETaskArgs (CppLogic::Mod::ResurrectAbility)
         TASK_BOMBARD_TARGET_AREA, //EGL::CGLETaskArgs (CppLogic::Mod::BombardmentAbility)
         TASK_TURN_TO_BOMBARD_TARGET, //EGL::CGLETaskArgs (CppLogic::Mod::BombardmentAbility)
+
+        TASK_DECREMENT_AMMO, //EGL::CGLETaskArgs (CppLogic::Mod::LimitedAmmoBehavior)
+        TASK_CHECK_AMMO, //EGL::CGLETaskArgs (CppLogic::Mod::LimitedAmmoBehavior)
     };
 
     enum class TaskState : int {
@@ -605,6 +608,7 @@ namespace shok {
         ShieldCover,
         Resurrect,
         SelfResurrect,
+        CheckAmmo,
     };
 }
 

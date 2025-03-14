@@ -323,4 +323,26 @@ namespace CppLogic::Mod {
 		void EventActivate(EGL::CEventPosition* p);
 	};
 
+	class LimitedAmmoBehavior : public EGL::CGLEBehavior {
+	public:
+		int RemainingAmmo = 0;
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1021);
+		static BB::SerializationData SerializationData[];
+
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+	private:
+		int TaskDecrementAmmo(EGL::CGLETaskArgs* a);
+		int TaskCheckAmmo(EGL::CGLETaskArgs* a);
+		shok::TaskStateExecutionResult StateCheckAmmo(int time);
+	};
 }

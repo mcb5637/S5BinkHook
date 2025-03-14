@@ -24,6 +24,7 @@ void CppLogic::Mod::RegisterClasses()
 	f->AddClassToFactory<ResurrectAbility>();
 	f->AddClassToFactory<BombardmentAbilityProps>();
 	f->AddClassToFactory<BombardmentAbility>();
+	f->AddClassToFactory<LimitedAmmoBehavior>();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
@@ -1013,4 +1014,66 @@ int CppLogic::Mod::BombardmentAbility::TaskTurnToBombardTarget(EGL::CGLETaskArgs
 void CppLogic::Mod::BombardmentAbility::EventActivate(EGL::CEventPosition* p)
 {
 	Activate(p->Position);
+}
+
+shok::ClassId __stdcall CppLogic::Mod::LimitedAmmoBehavior::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void CppLogic::Mod::LimitedAmmoBehavior::AddHandlers(shok::EntityId id)
+{
+	EntityId = id;
+	auto* e = EGL::CGLEEntity::GetEntityByID(id);
+	e->CreateTaskHandler<shok::Task::TASK_DECREMENT_AMMO>(this, &LimitedAmmoBehavior::TaskDecrementAmmo);
+	e->CreateTaskHandler<shok::Task::TASK_CHECK_AMMO>(this, &LimitedAmmoBehavior::TaskCheckAmmo);
+	e->CreateStateHandler<shok::TaskState::CheckAmmo>(this, &LimitedAmmoBehavior::StateCheckAmmo);
+}
+
+void CppLogic::Mod::LimitedAmmoBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+
+void CppLogic::Mod::LimitedAmmoBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+
+BB::SerializationData CppLogic::Mod::LimitedAmmoBehavior::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<LimitedAmmoBehavior, EGL::CGLEBehavior>(),
+	AutoMemberSerialization(LimitedAmmoBehavior, RemainingAmmo),
+	BB::SerializationData::GuardData(),
+};
+
+void* CppLogic::Mod::LimitedAmmoBehavior::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::LimitedAmmoBehavior::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+int CppLogic::Mod::LimitedAmmoBehavior::TaskDecrementAmmo(EGL::CGLETaskArgs* a)
+{
+	--RemainingAmmo;
+	return 0;
+}
+
+int CppLogic::Mod::LimitedAmmoBehavior::TaskCheckAmmo(EGL::CGLETaskArgs* a)
+{
+	if (RemainingAmmo <= 0) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+		e->SetTaskState(shok::TaskState::CheckAmmo);
+	}
+	return 0;
+}
+
+shok::TaskStateExecutionResult CppLogic::Mod::LimitedAmmoBehavior::StateCheckAmmo(int time)
+{
+	if (RemainingAmmo > 0)
+		return shok::TaskStateExecutionResult::Finished;
+	return shok::TaskStateExecutionResult::NotFinished;
 }

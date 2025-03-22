@@ -325,7 +325,7 @@ namespace CppLogic::Mod {
 
 	class LimitedAmmoBehavior : public EGL::CGLEBehavior {
 	public:
-		int RemainingAmmo = 0;
+		int RemainingAmmo = 0, MaxAmmo = 0;
 
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
@@ -340,9 +340,62 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
+		void ReloadToMax(int max);
 	private:
 		int TaskDecrementAmmo(EGL::CGLETaskArgs* a);
 		int TaskCheckAmmo(EGL::CGLETaskArgs* a);
 		shok::TaskStateExecutionResult StateCheckAmmo(int time);
+	};
+
+	class ReloadableCannonBuilderAbilityProps : public GGL::CCannonBuilderBehaviorProps {
+	public:
+		int Reloads = 0;
+		float ReloadRange = 0;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1022);
+		static BB::SerializationData SerializationData[];
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+	};
+
+	class ReloadableCannonBuilderAbility : public GGL::CCannonBuilderBehavior {
+	public:
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1023);
+		static BB::SerializationData SerializationData[];
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+	protected:
+		int TaskBuildCannon(EGL::CGLETaskArgs* a);
+		void EventTick(BB::CEvent* ev);
+	};
+
+	class LimitedAmmoUIDisplayBehavior : public CppLogic::Mod::OnScreenInfoDisplayBehavior {
+	public:
+		ED::CEntity* Entity = nullptr;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1024);
+		static constexpr inline const BB::SerializationData* const SerializationData = nullptr;
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
+		virtual void __stdcall OnAdd(ED::CEntity* edispl, ED::CBehaviorProps* props, shok::ModelId* modelOverride) override;
+		virtual void __stdcall Initialize(ED::CEntity* edispl, ED::CBehaviorProps* props) override;
+		virtual void __stdcall UpdateRenderNoTick(int count, float uk) override;
+		virtual void __stdcall UpdateRenderOneTick(int count, float uk) override;
+		virtual void __stdcall UpdateRenderManyTick(int count, float uk) override;
+		virtual bool RenderUI(GGUI::OnScreenInfoRenderer* renderer, shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active) override;
+
+		LimitedAmmoUIDisplayBehavior();
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
 	};
 }

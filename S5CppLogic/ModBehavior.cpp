@@ -25,6 +25,9 @@ void CppLogic::Mod::RegisterClasses()
 	f->AddClassToFactory<BombardmentAbilityProps>();
 	f->AddClassToFactory<BombardmentAbility>();
 	f->AddClassToFactory<LimitedAmmoBehavior>();
+	f->AddClassToFactory<ReloadableCannonBuilderAbilityProps>();
+	f->AddClassToFactory<ReloadableCannonBuilderAbility>();
+	f->AddClassToFactory<LimitedAmmoUIDisplayBehavior>();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
@@ -1043,6 +1046,7 @@ void CppLogic::Mod::LimitedAmmoBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
 BB::SerializationData CppLogic::Mod::LimitedAmmoBehavior::SerializationData[] = {
 	BB::SerializationData::AutoBaseClass<LimitedAmmoBehavior, EGL::CGLEBehavior>(),
 	AutoMemberSerialization(LimitedAmmoBehavior, RemainingAmmo),
+	AutoMemberSerialization(LimitedAmmoBehavior, MaxAmmo),
 	BB::SerializationData::GuardData(),
 };
 
@@ -1062,6 +1066,12 @@ int CppLogic::Mod::LimitedAmmoBehavior::TaskDecrementAmmo(EGL::CGLETaskArgs* a)
 	return 0;
 }
 
+void CppLogic::Mod::LimitedAmmoBehavior::ReloadToMax(int max)
+{
+	RemainingAmmo = std::max(RemainingAmmo, max);
+	MaxAmmo = std::max(MaxAmmo, max);
+}
+
 int CppLogic::Mod::LimitedAmmoBehavior::TaskCheckAmmo(EGL::CGLETaskArgs* a)
 {
 	if (RemainingAmmo <= 0) {
@@ -1076,4 +1086,155 @@ shok::TaskStateExecutionResult CppLogic::Mod::LimitedAmmoBehavior::StateCheckAmm
 	if (RemainingAmmo > 0)
 		return shok::TaskStateExecutionResult::Finished;
 	return shok::TaskStateExecutionResult::NotFinished;
+}
+
+
+BB::SerializationData CppLogic::Mod::ReloadableCannonBuilderAbilityProps::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<ReloadableCannonBuilderAbilityProps, GGL::CCannonBuilderBehaviorProps>(),
+	AutoMemberSerialization(ReloadableCannonBuilderAbilityProps, Reloads),
+	AutoMemberSerialization(ReloadableCannonBuilderAbilityProps, ReloadRange),
+	BB::SerializationData::GuardData(),
+};
+
+shok::ClassId __stdcall CppLogic::Mod::ReloadableCannonBuilderAbilityProps::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* CppLogic::Mod::ReloadableCannonBuilderAbilityProps::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::ReloadableCannonBuilderAbilityProps::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+BB::SerializationData CppLogic::Mod::ReloadableCannonBuilderAbility::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<ReloadableCannonBuilderAbility, GGL::CCannonBuilderBehavior>(),
+	BB::SerializationData::GuardData(),
+};
+
+shok::ClassId __stdcall CppLogic::Mod::ReloadableCannonBuilderAbility::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* CppLogic::Mod::ReloadableCannonBuilderAbility::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::ReloadableCannonBuilderAbility::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+void CppLogic::Mod::ReloadableCannonBuilderAbility::AddHandlers(shok::EntityId id)
+{
+	GGL::CHeroAbility::AddHandlers(id);
+	auto* e = EGL::CGLEEntity::GetEntityByID(id);
+	auto* cb = static_cast<GGL::CCannonBuilderBehavior*>(this);
+	e->CreateTaskHandler<shok::Task::TASK_GO_TO_CANNON_POSITION>(cb, &ReloadableCannonBuilderAbility::TaskGoToCannonPos);
+	e->CreateTaskHandler<shok::Task::TASK_BUILD_CANNON>(this, &ReloadableCannonBuilderAbility::TaskBuildCannon);
+	e->CreateEventHandler<shok::EventIDs::CannonBuilder_BuildCannonCommand>(cb, &ReloadableCannonBuilderAbility::EventActivate);
+	e->CreateEventHandler<shok::EventIDs::HeroAbility_Cancel>(cb, &ReloadableCannonBuilderAbility::EventCancel);
+	e->CreateEventHandler<shok::EventIDs::Die>(cb, &ReloadableCannonBuilderAbility::EventCancel);
+	e->CreateEventHandler<shok::EventIDs::AutoCannon_OnFoundationDetach>(cb, &ReloadableCannonBuilderAbility::EventOnFoundationDetach);
+	e->CreateEventHandler<shok::EventIDs::Behavior_Tick>(this, &ReloadableCannonBuilderAbility::EventTick);
+}
+
+int CppLogic::Mod::ReloadableCannonBuilderAbility::TaskBuildCannon(EGL::CGLETaskArgs* a)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	while (auto* t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED))) {
+		t->Destroy();
+	}
+	auto fid = e->GetFirstAttachedEntity(shok::AttachmentType::BUILDER_FOUNDATION);
+	int r = GGL::CCannonBuilderBehavior::TaskBuildCannon(a);
+	if (auto* f = EGL::CGLEEntity::GetEntityByID(fid)) {
+		auto tid = f->GetFirstAttachedEntity(shok::AttachmentType::FOUNDATION_TOP_ENTITY);
+		if (auto* t = EGL::CGLEEntity::GetEntityByID(tid)) {
+			auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps);
+			e->AttachEntity(shok::AttachmentType::SUMMONER_SUMMONED, tid, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
+			if (auto* lab = t->GetBehavior<LimitedAmmoBehavior>())
+				lab->ReloadToMax(pr->Reloads);
+		}
+	}
+	return r;
+}
+
+void CppLogic::Mod::ReloadableCannonBuilderAbility::EventTick(BB::CEvent* ev)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto tid = e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED);
+	if (auto* t = EGL::CGLEEntity::GetEntityByID(tid)) {
+		auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps);
+		if (e->Position.IsInRange(t->Position, pr->ReloadRange)) {
+			if (auto* lab = t->GetBehavior<LimitedAmmoBehavior>())
+				lab->ReloadToMax(pr->Reloads);
+		}
+	}
+}
+
+shok::ClassId __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::CastToIdentifier(shok::ClassId id)
+{
+	if (id == CppLogic::Mod::OnScreenInfoDisplayBehavior::Identifier)
+		return static_cast<CppLogic::Mod::OnScreenInfoDisplayBehavior*>(this);
+	return nullptr;
+}
+
+void __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::OnAdd(ED::CEntity* edispl, ED::CBehaviorProps* props, shok::ModelId* modelOverride)
+{
+	Entity = edispl;
+}
+
+void __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::Initialize(ED::CEntity* edispl, ED::CBehaviorProps* props)
+{
+}
+
+void __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::UpdateRenderNoTick(int count, float uk)
+{
+}
+
+void __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::UpdateRenderOneTick(int count, float uk)
+{
+}
+
+void __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::UpdateRenderManyTick(int count, float uk)
+{
+}
+
+bool CppLogic::Mod::LimitedAmmoUIDisplayBehavior::RenderUI(GGUI::OnScreenInfoRenderer* renderer, shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active)
+{
+	if (auto* f = dynamic_cast<EGL::CGLEEntity*>(Entity->Entity)) {
+		if (auto* t = EGL::CGLEEntity::GetEntityByID(f->GetFirstAttachedEntity(shok::AttachmentType::FOUNDATION_TOP_ENTITY))) {
+			if (auto* la = t->GetBehavior<LimitedAmmoBehavior>()) {
+				if (la->MaxAmmo > 0)
+					data->LimitedLifespanBar = std::max(static_cast<float>(la->RemainingAmmo) / la->MaxAmmo, 0.00001f);
+			}
+		}
+	}
+	return false;
+}
+
+void* CppLogic::Mod::LimitedAmmoUIDisplayBehavior::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::LimitedAmmoUIDisplayBehavior::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+CppLogic::Mod::LimitedAmmoUIDisplayBehavior::LimitedAmmoUIDisplayBehavior()
+{
+	GGUI::C3DOnScreenInformationCustomWidget::HookOnScreenInfoDisplayBehavior();
 }

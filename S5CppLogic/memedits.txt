@@ -139,4 +139,7 @@ list of used identifiers
 0x101F CppLogic::Mod::BombardmentAbility
 0x1020 CppLogic::Mod::Effect::PiercingShotEffect
 0x1021 CppLogic::Mod::LimitedAmmoBehavior
+0x1022 CppLogic::Mod::ReloadableCannonBuilderAbilityProps
+0x1023 CppLogic::Mod::ReloadableCannonBuilderAbility
+0x1024 CppLogic::Mod::LimitedAmmoUIDisplayBehavior
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

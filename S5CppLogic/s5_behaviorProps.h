@@ -82,7 +82,7 @@ namespace GGL {
 
 	class CCannonBuilderBehaviorProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId TaskList;
+		shok::TaskListId TaskList = {};
 
 		static inline constexpr int vtp = 0x777510;
 		static inline constexpr int TypeDesc = 0x823224;

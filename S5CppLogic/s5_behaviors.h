@@ -361,18 +361,44 @@ namespace GGL {
 
 	class CCannonBuilderBehavior : public GGL::CHeroAbility {
 	public:
-		GGL::CCannonBuilderBehaviorProps* CannonBuilderProps; // 6
+		GGL::CCannonBuilderBehaviorProps* CannonBuilderProps = nullptr; // 6
 		shok::Position StartPosition;
-		shok::EntityTypeId CannonType, FoundationType;
-		bool PlacedCannon; // 11
-		PADDING(3);
+		shok::EntityTypeId CannonType = {}, FoundationType = {};
+		bool PlacedCannon = false; // 11
 
 		// defined events: CannonBuilder_XXX, HeroAbility_Cancel, Die, 1600B some form of stop?->12002
 		// defined tasks: TASK_GO_TO_CANNON_POSITION, TASK_BUILD_CANNON
 
+		// attachment lifecycle:
+		// command place cannon:
+		//   - creates foundation
+		//   - BUILDER_FOUNDATION hero -> foundation (OnBuilderDetaches on this (hero) detach)
+		//   - FOUNDATION_BUILDER foundation -> hero (AutoCannon_OnFoundationDetach on this (foundation) detach)
+		// go to task
+		//   - no change
+		// task build
+		//   - detach BUILDER_FOUNDATION
+		//   - create autocannon
+		//   - TOP_ENTITY_FOUNDATION autocannon -> foundation (Foundation_OnAutoCannonDetach on this (autocannon) detach)
+		//   - detach FOUNDATION_BUILDER
+		//   - FOUNDATION_TOP_ENTITY foundation -> autocannon (AutoCannon_OnFoundationDetach on this (foundation) detach)
+		//
+
 		static inline constexpr int vtp = 0x7774D4;
 		static inline constexpr int TypeDesc = 0x823254;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x259E7B1D);
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+		virtual bool IsAbility(shok::AbilityId ability) override;
+	protected:
+		int TaskGoToCannonPos(EGL::CGLETaskArgs* a);
+		int TaskBuildCannon(EGL::CGLETaskArgs* a);
+		void EventActivate(GGL::CEventPositionAnd2EntityTypes* e);
+		void EventCancel(BB::CEvent* e);
+		void EventOnFoundationDetach(EGL::CEvent1Entity* e);
 	};
 
 	class CRangedEffectAbility : public GGL::CHeroAbility {

@@ -204,6 +204,56 @@ void GGL::CBombBehavior::HookDealDamage()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x506B28), &bombexplode_damage, reinterpret_cast<void*>(0x506B3F));
 }
 
+shok::ClassId GGL::CCannonBuilderBehavior::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void GGL::CCannonBuilderBehavior::AddHandlers(shok::EntityId id)
+{
+	reinterpret_cast<void(__thiscall*)(CCannonBuilderBehavior*, shok::EntityId)>(0x4FF053)(this, id);
+}
+
+void GGL::CCannonBuilderBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+	reinterpret_cast<void(__thiscall*)(CCannonBuilderBehavior*, EGL::CGLEBehaviorProps*)>(0x4FE8C9)(this, p);
+}
+
+void GGL::CCannonBuilderBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+	reinterpret_cast<void(__thiscall*)(CCannonBuilderBehavior*, EGL::CGLEBehaviorProps*)>(0x4FE8E6)(this, p);
+}
+
+bool GGL::CCannonBuilderBehavior::IsAbility(shok::AbilityId ability)
+{
+	return ability == shok::AbilityId::AbilityBuildCannon;
+}
+
+int GGL::CCannonBuilderBehavior::TaskGoToCannonPos(EGL::CGLETaskArgs* a)
+{
+	return reinterpret_cast<int(__thiscall*)(CCannonBuilderBehavior*, EGL::CGLETaskArgs*)>(0x4FECB3)(this, a);
+}
+
+int GGL::CCannonBuilderBehavior::TaskBuildCannon(EGL::CGLETaskArgs* a)
+{
+	return reinterpret_cast<int(__thiscall*)(CCannonBuilderBehavior*, EGL::CGLETaskArgs*)>(0x4FEE04)(this, a);
+}
+
+void GGL::CCannonBuilderBehavior::EventActivate(GGL::CEventPositionAnd2EntityTypes* e)
+{
+	return reinterpret_cast<void(__thiscall*)(CCannonBuilderBehavior*, GGL::CEventPositionAnd2EntityTypes*)>(0x4FEF27)(this, e);
+}
+
+void GGL::CCannonBuilderBehavior::EventCancel(BB::CEvent* e)
+{
+	return reinterpret_cast<void(__thiscall*)(CCannonBuilderBehavior*, BB::CEvent*)>(0x4FED34)(this, e);
+}
+
+void GGL::CCannonBuilderBehavior::EventOnFoundationDetach(EGL::CEvent1Entity* e)
+{
+	return reinterpret_cast<void(__thiscall*)(CCannonBuilderBehavior*, EGL::CEvent1Entity*)>(0x4FEDA5)(this, e);
+}
+
 void __thiscall GGL::CRangedEffectAbility::AdvHealAffected()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);

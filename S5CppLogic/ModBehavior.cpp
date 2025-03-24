@@ -1066,10 +1066,10 @@ shok::TaskStateExecutionResult CppLogic::Mod::BombardmentAbility::StateTurnToBom
 	else
 		newrot = en->Position.r + (rdiff > 0.0f ? rotspeed : -rotspeed);
 
-	while (newrot < CppLogic::RadiansToDegrees(0.0f))
-		newrot += CppLogic::RadiansToDegrees(360.0f);
-	while (newrot > CppLogic::RadiansToDegrees(360.0f))
-		newrot -= CppLogic::RadiansToDegrees(360.0f);
+	while (newrot < CppLogic::DegreesToRadians(0.0f))
+		newrot += CppLogic::DegreesToRadians(360.0f);
+	while (newrot > CppLogic::DegreesToRadians(360.0f))
+		newrot -= CppLogic::DegreesToRadians(360.0f);
 
 	acb->LastTurnOrientation = en->Position.r;
 	en->SetRotation(newrot);

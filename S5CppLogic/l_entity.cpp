@@ -721,6 +721,19 @@ namespace CppLogic::Entity {
 		return 2;
 	}
 
+	int SettlerGetSummoned(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* e = L.CheckSettler(1);
+		L.NewTable();
+		int i = 1;
+		for (const auto& [at, attach] : e->ObservedEntities.ForKeys(shok::AttachmentType::SUMMONER_SUMMONED)) {
+			L.Push(attach.EntityId);
+			L.SetTableRaw(-2, i);
+			++i;
+		}
+		return 1;
+	}
+
 	int BuildingMarketGetCurrentTradeData(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CBuilding* b = L.CheckBuilding(1);
@@ -1988,6 +2001,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<WorkerGetMotivation>("WorkerGetMotivation"),
 			lua::FuncReference::GetRef<WorkerChangeMotivation>("WorkerChangeMotivation"),
 			lua::FuncReference::GetRef<WorkerGetResourceCarried>("WorkerGetResourceCarried"),
+			lua::FuncReference::GetRef<SettlerGetSummoned>("SettlerGetSummoned"),
 	};
 
 	constexpr std::array<lua::FuncReference, 8> Leader{ {

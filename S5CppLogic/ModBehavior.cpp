@@ -5,6 +5,7 @@
 #include "s5_effects.h"
 #include "s5_tasklist.h"
 #include "entityiterator.h"
+#include "ModEffect.h"
 
 void CppLogic::Mod::RegisterClasses()
 {
@@ -909,6 +910,7 @@ BB::SerializationData CppLogic::Mod::BombardmentAbilityProps::SerializationData[
 	AutoMemberSerialization(BombardmentAbilityProps, DamageClass),
 	AutoMemberSerialization(BombardmentAbilityProps, TaskList),
 	AutoMemberSerialization(BombardmentAbilityProps, DistanceOverride),
+	AutoMemberSerialization(BombardmentAbilityProps, EntityToCreate),
 	BB::SerializationData::GuardData(),
 };
 
@@ -938,9 +940,16 @@ void CppLogic::Mod::BombardmentAbility::AddHandlers(shok::EntityId id)
 {
 	GGL::CHeroAbility::AddHandlers(id);
 	auto* en = EGL::CGLEEntity::GetEntityByID(id);
-	en->CreateTaskHandler<shok::Task::TASK_BOMBARD_TARGET_AREA, EGL::CGLETaskArgs>(this, &BombardmentAbility::TaskBombard);
-	en->CreateTaskHandler<shok::Task::TASK_TURN_TO_BOMBARD_TARGET, EGL::CGLETaskArgs>(this, &BombardmentAbility::TaskTurnToBombardTarget);
-	en->CreateEventHandler<shok::EventIDs::CppL_Bombardment_Activate, EGL::CEventPosition>(this, &BombardmentAbility::EventActivate);
+	en->CreateEventHandler<shok::EventIDs::CppL_Bombardment_Activate>(this, &BombardmentAbility::EventActivate);
+	en->CreateTaskHandler<shok::Task::TASK_BOMBARD_TARGET_AREA>(this, &BombardmentAbility::TaskBombard);
+	if (dynamic_cast<EGL::CMovingEntity*>(en) != nullptr) {
+		en->CreateTaskHandler<shok::Task::TASK_TURN_TO_BOMBARD_TARGET>(this, &BombardmentAbility::TaskTurnToBombardTargetSettler);
+	}
+	else { // autocannon
+		en->CreateTaskHandler<shok::Task::TASK_TURN_TO_BOMBARD_TARGET>(this, &BombardmentAbility::TaskTurnToBombardTargetAutocannon);
+		en->CreateTaskHandler<shok::Task::TASK_BACK_TO_DEFAULT_TASKLIST>(this, &BombardmentAbility::TaskBackToDefaultTL);
+		en->CreateStateHandler<shok::TaskState::TurnToBombardTarget>(this, &BombardmentAbility::StateTurnToBombardTargetAutocannon);
+	}
 }
 
 bool CppLogic::Mod::BombardmentAbility::IsAbility(shok::AbilityId ability)
@@ -958,7 +967,8 @@ void CppLogic::Mod::BombardmentAbility::Activate(const shok::Position& tar)
 		return;
 	Target = tar;
 	en->SetTaskList(pr->TaskList);
-	en->GetBehaviorDynamic<GGL::CLeaderBehavior>()->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
+	if (auto* lb = en->GetBehaviorDynamic<GGL::CLeaderBehavior>())
+		lb->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
 }
 
 void CppLogic::Mod::BombardmentAbility::NetEventBombard(EGL::CNetEventEntityAndPos* ev)
@@ -987,22 +997,32 @@ int CppLogic::Mod::BombardmentAbility::TaskBombard(EGL::CGLETaskArgs* a)
 		Target = en->Position + dir.Normalize() * pr->DistanceOverride;
 	}
 
+	auto eid = en->GetFirstAttachedToMe(shok::AttachmentType::SUMMONER_SUMMONED);
+	if (eid == shok::EntityId::Invalid)
+		eid = EntityId;
+
 	CProjectileEffectCreator cr{};
 	cr.EffectType = pr->EffectType;
 	cr.PlayerID = en->PlayerId;
 	cr.StartPos = cr.CurrentPos = en->Position;
 	cr.TargetPos = Target;
-	cr.AttackerID = en->EntityId;
+	cr.AttackerID = eid;
 	cr.Damage = static_cast<int>(en->ModifyDamage(pr->Damage) * en->GetTotalAffectedDamageModifier());
 	cr.DamageRadius = pr->DamageRange;
 	cr.DamageClass = pr->DamageClass;
 	cr.SourcePlayer = en->PlayerId;
 	cr.AdvancedDamageSourceOverride = shok::AdvancedDealDamageSource::AbilityBombardment;
-	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
+	auto eff = (*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
+	if (EGL::CEffect* e = (*EGL::CGLEEffectManager::GlobalObj)->GetById(eff)) {
+		if (auto* epe = dynamic_cast<Effect::EntityPlacerEffect*>(e)) {
+			epe->ToCreate = pr->EntityToCreate;
+			epe->AttachCreated = shok::AttachmentType::BOMBER_BOMB;
+		}
+	}
 	return -2;
 }
 
-int CppLogic::Mod::BombardmentAbility::TaskTurnToBombardTarget(EGL::CGLETaskArgs* a)
+int CppLogic::Mod::BombardmentAbility::TaskTurnToBombardTargetSettler(EGL::CGLETaskArgs* a)
 {
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	float rot = en->Position.GetAngleBetween(Target);
@@ -1014,9 +1034,52 @@ int CppLogic::Mod::BombardmentAbility::TaskTurnToBombardTarget(EGL::CGLETaskArgs
 	return 0;
 }
 
+int CppLogic::Mod::BombardmentAbility::TaskTurnToBombardTargetAutocannon(EGL::CGLETaskArgs* a)
+{
+	EGL::CGLEEntity::GetEntityByID(EntityId)->SetTaskState(shok::TaskState::TurnToBombardTarget);
+	return 0;
+}
+
+int CppLogic::Mod::BombardmentAbility::TaskBackToDefaultTL(EGL::CGLETaskArgs* a)
+{
+	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
+	en->SetTaskState(shok::TaskState::Default);
+	return 0;
+}
+
 void CppLogic::Mod::BombardmentAbility::EventActivate(EGL::CEventPosition* p)
 {
 	Activate(p->Position);
+}
+
+shok::TaskStateExecutionResult CppLogic::Mod::BombardmentAbility::StateTurnToBombardTargetAutocannon(int time)
+{
+	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* acb = en->GetBehavior<GGL::CAutoCannonBehavior>();
+	float rotspeed = acb->ACProps->RotationSpeed;
+
+	float trot = CppLogic::DegreesToRadians(en->Position.GetAngleBetween(Target));
+	float rdiff = shok::PositionRot::AngleDifference(en->Position.r, trot);
+	float newrot;
+	if (std::abs(rdiff) < rotspeed)
+		newrot = trot;
+	else
+		newrot = en->Position.r + (rdiff > 0.0f ? rotspeed : -rotspeed);
+
+	while (newrot < CppLogic::RadiansToDegrees(0.0f))
+		newrot += CppLogic::RadiansToDegrees(360.0f);
+	while (newrot > CppLogic::RadiansToDegrees(360.0f))
+		newrot -= CppLogic::RadiansToDegrees(360.0f);
+
+	acb->LastTurnOrientation = en->Position.r;
+	en->SetRotation(newrot);
+
+	if (std::abs(trot - newrot) <= 1.0e-10f) {
+		acb->LastTurnOrientation = newrot;
+		return shok::TaskStateExecutionResult::Finished;
+	}
+
+	return shok::TaskStateExecutionResult::NotFinished;
 }
 
 shok::ClassId __stdcall CppLogic::Mod::LimitedAmmoBehavior::GetClassIdentifier() const

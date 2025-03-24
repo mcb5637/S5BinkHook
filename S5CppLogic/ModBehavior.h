@@ -290,6 +290,7 @@ namespace CppLogic::Mod {
 		shok::DamageClassId DamageClass = shok::DamageClassId::Invalid;
 		shok::TaskListId TaskList = shok::TaskListId::Invalid;
 		float DistanceOverride = -1;
+		shok::EntityTypeId EntityToCreate = {};
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x101E);
 		static BB::SerializationData SerializationData[];
@@ -319,8 +320,11 @@ namespace CppLogic::Mod {
 		static void NetEventBombard(EGL::CNetEventEntityAndPos* ev);
 	private:
 		int TaskBombard(EGL::CGLETaskArgs* a);
-		int TaskTurnToBombardTarget(EGL::CGLETaskArgs* a);
+		int TaskTurnToBombardTargetSettler(EGL::CGLETaskArgs* a);
+		int TaskTurnToBombardTargetAutocannon(EGL::CGLETaskArgs* a);
+		int TaskBackToDefaultTL(EGL::CGLETaskArgs* a);
 		void EventActivate(EGL::CEventPosition* p);
+		shok::TaskStateExecutionResult StateTurnToBombardTargetAutocannon(int time);
 	};
 
 	class LimitedAmmoBehavior : public EGL::CGLEBehavior {

@@ -609,6 +609,7 @@ namespace shok {
         Resurrect,
         SelfResurrect,
         CheckAmmo,
+        TurnToBombardTarget,
     };
 }
 

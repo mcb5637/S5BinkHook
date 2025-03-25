@@ -1206,6 +1206,24 @@ void CppLogic::Mod::ReloadableCannonBuilderAbility::AddHandlers(shok::EntityId i
 	e->CreateEventHandler<shok::EventIDs::Die>(cb, &ReloadableCannonBuilderAbility::EventCancel);
 	e->CreateEventHandler<shok::EventIDs::AutoCannon_OnFoundationDetach>(cb, &ReloadableCannonBuilderAbility::EventOnFoundationDetach);
 	e->CreateEventHandler<shok::EventIDs::Behavior_Tick>(this, &ReloadableCannonBuilderAbility::EventTick);
+	e->CreateEventHandler<shok::EventIDs::CppL_BombComboCannon_Activate>(this, &ReloadableCannonBuilderAbility::EventBombComboCannonActivate);
+}
+
+void CppLogic::Mod::ReloadableCannonBuilderAbility::NetEventBombComboCannon(EGL::CNetEventEntityAndPos* ev)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(ev->EntityID);
+	if (e->IsDead())
+		return;
+	auto* abc = e->GetBehavior<CppLogic::Mod::ReloadableCannonBuilderAbility>();
+	if (!abc)
+		return;
+	auto* ab = e->GetBehavior<GGL::CBombPlacerBehavior>();
+	if (!ab)
+		return;
+	if (!ab->CanUseAbility())
+		return;
+	EGL::CEventPosition ev2{ shok::EventIDs::CppL_BombComboCannon_Activate, { ev->X, ev->Y } };
+	e->FireEvent(&ev2);
 }
 
 int CppLogic::Mod::ReloadableCannonBuilderAbility::TaskBuildCannon(EGL::CGLETaskArgs* a)
@@ -1231,14 +1249,33 @@ int CppLogic::Mod::ReloadableCannonBuilderAbility::TaskBuildCannon(EGL::CGLETask
 void CppLogic::Mod::ReloadableCannonBuilderAbility::EventTick(BB::CEvent* ev)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	auto tid = e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED);
-	if (auto* t = EGL::CGLEEntity::GetEntityByID(tid)) {
+	if (auto* t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED))) {
 		auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps);
 		if (e->Position.IsInRange(t->Position, pr->ReloadRange)) {
 			if (auto* lab = t->GetBehavior<LimitedAmmoBehavior>())
 				lab->ReloadToMax(pr->Reloads);
 		}
 	}
+}
+
+void CppLogic::Mod::ReloadableCannonBuilderAbility::EventBombComboCannonActivate(EGL::CEventPosition* ev)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	if (auto* t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED))) {
+		auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps);
+		if (e->Position.IsInRange(t->Position, pr->ReloadRange)) {
+			if (auto* ba = t->GetBehavior<BombardmentAbility>()) {
+				if (t->Position.IsInRange(ev->Position, static_cast<BombardmentAbilityProps*>(ba->AbilityProps)->AttackRange)) {
+					ba->Activate(ev->Position);
+					GGL::CEventHeroAbilityInteger ev2{ shok::EventIDs::HeroAbility_SetChargeCurrent, 0, shok::AbilityId::AbilityPlaceBomb };
+					e->FireEvent(&ev2);
+					return;
+				}
+			}
+		}
+	}
+	EGL::CEventPosition ev2{ shok::EventIDs::BombPlacer_CommandPlaceBomb, ev->Position };
+	e->FireEvent(&ev2);
 }
 
 shok::ClassId __stdcall CppLogic::Mod::LimitedAmmoUIDisplayBehavior::GetClassIdentifier() const

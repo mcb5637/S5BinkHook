@@ -161,6 +161,18 @@ namespace CppLogic::LuaEventInterface {
 			throw lua::LuaException{ "ability not ready" };
 	}
 
+	template<class Bh, class Ev>
+	void CheckEntityBehavior(EGL::CGLEEntity* e, Ev& ev) {
+		if (e->GetBehavior<Bh>() == nullptr)
+			throw lua::LuaException{ std::format("has no {} behavior", typename_details::type_name<Bh>()) };
+	}
+	template<class Bh, class Ev>
+	void CheckEntityBehavior(Ev& ev) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+		if (e->GetBehavior<Bh>() == nullptr)
+			throw lua::LuaException{ std::format("has no {} behavior", typename_details::type_name<Bh>()) };
+	}
+
 	template<shok::DiploState D>
 	void CheckEntityDiploState(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
 		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);

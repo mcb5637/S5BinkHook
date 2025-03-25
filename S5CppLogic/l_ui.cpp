@@ -1440,6 +1440,7 @@ namespace CppLogic::UI {
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_ShieldCover_Activate>(Mod::ShieldCoverAbility::NetEventShieldCover);
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_Resurrect_Activate>(Mod::ResurrectAbility::NetEventResurrect);
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_BombardmentActivate>(Mod::BombardmentAbility::NetEventBombard);
+		gl->CreateNetEventHandler<shok::NetEventIds::CppL_BombComboCannonActivate>(Mod::ReloadableCannonBuilderAbility::NetEventBombComboCannon);
 		return 0;
 	}
 
@@ -2104,6 +2105,9 @@ namespace CppLogic::UI {
 			LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityResurrect>>>("Resurrect_Activate"),
 		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_BombardmentActivate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBombardment>>>("Bombardment_Activate"),
+		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_BombComboCannonActivate,
+			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>,
+			LuaEventInterface::CheckEntityBehavior<CppLogic::Mod::ReloadableCannonBuilderAbility>>>("BombCannonCombo_Activate"),
 		lua::FuncReference::GetRef<CommandMove>("Entity_Move"),
 		lua::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
 	};

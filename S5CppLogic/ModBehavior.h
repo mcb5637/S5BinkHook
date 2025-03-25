@@ -376,9 +376,12 @@ namespace CppLogic::Mod {
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
+
+		static void NetEventBombComboCannon(EGL::CNetEventEntityAndPos* ev);
 	protected:
 		int TaskBuildCannon(EGL::CGLETaskArgs* a);
 		void EventTick(BB::CEvent* ev);
+		void EventBombComboCannonActivate(EGL::CEventPosition* ev);
 	};
 
 	class LimitedAmmoUIDisplayBehavior : public CppLogic::Mod::OnScreenInfoDisplayBehavior {

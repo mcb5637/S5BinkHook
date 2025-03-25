@@ -454,6 +454,7 @@ namespace shok {
 		CppL_ShieldCover_Activate, //EGL::CNetEventEntityID
 		CppL_Resurrect_Activate, //EGL::CNetEvent2Entities
 		CppL_BombardmentActivate, //EGL::CNetEventEntityAndPos
+		CppL_BombComboCannonActivate, //EGL::CNetEventEntityAndPos
 	};
 
 	enum class FeedbackEventIds : int {

@@ -1280,9 +1280,15 @@ namespace EGUIX {
 	class FontManager { // no vtable either
 	public:
 		BB::CIDManager* Manager;
+		shok::Vector<RWE::P2D::Rt2dFont*> Fonts;
 
 		static void LoadFont(shok::FontId* outFontID, const char* fontName);
 		RWE::P2D::Rt2dFont* GetFontObj(shok::FontId id);
+
+		// removes from vector
+		void ClearFont(shok::FontId id);
+		// removes, then pops id
+		void PopFont(shok::FontId id);
 
 		static inline EGUIX::FontManager* (* const GlobalObj)() = reinterpret_cast<EGUIX::FontManager * (*)()>(0x5593AD);
 	};

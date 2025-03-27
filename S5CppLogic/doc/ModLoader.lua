@@ -100,6 +100,10 @@ ModLoader = {
 		StringTableTexts = {
 
 		},
+		--- Fonts to add/override.
+		Fonts = {
+			
+		},
 	},
 	--- the names of all ModPacks requied by this map. a call to ModLoader.RequireModList() in Initialize will then try to load them.
 	--- @type string[]

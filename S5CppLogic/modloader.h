@@ -336,7 +336,7 @@ namespace CppLogic::ModLoader {
 			static DirectXEffectLoader Obj;
 		};
 
-		static std::array<DataTypeLoader*, 19> Loaders;
+		static std::array<DataTypeLoader*, 20> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;

@@ -42,6 +42,7 @@ if false then
 	---@field ExperienceClasses table<string,string|number>|nil
 	---@field SoundGroups (string|number)[][]|nil
 	---@field StringTableTexts table<string,string|true>|nil
+	---@field Fonts string[]|nil
 	local Manifest = {}
 	---@class CManifestEntry
 	local CManifestEntry = {
@@ -132,7 +133,8 @@ function ModLoader.ManifestTypes()
 		{Key="BuildingUpgradeCategory", Preload=CppLogic.ModLoader.PreLoadUpgradeCategory, Table=UpgradeCategories, Load=CppLogic.ModLoader.AddBuildingUpgradeCategory, Type="kv"},
 		{Key="ExperienceClasses", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddExperienceClass, Type="kv"},
 		{Key="SoundGroups", Preload=nil, Table=Sounds, Load=CppLogic.ModLoader.AddSounds, Type="sound"},
-		{Key="StringTableTexts", Preload=nil, Table=nil, Load=ModLoader.LoadSTTOverride, Type="kv"}
+		{Key="StringTableTexts", Preload=nil, Table=nil, Load=ModLoader.LoadSTTOverride, Type="kv"},
+		{Key="Fonts", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddFont},
 	}
 end
 

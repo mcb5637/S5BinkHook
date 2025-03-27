@@ -892,7 +892,27 @@ int CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Add(lua::State L)
 }
 CppLogic::ModLoader::ModLoader::DirectXEffectLoader CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj{};
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 19> CppLogic::ModLoader::ModLoader::Loaders{ {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::FontId>::Load(shok::FontId id, luaext::EState L) {
+	auto* mng = EGUIX::FontManager::GlobalObj();
+	mng->ClearFont(id);
+	mng->GetFontObj(id);
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::FontId>::TableName() {
+	return nullptr;
+}
+const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::FontId>::FuncName() {
+	return "Font";
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::SanityCheck() {
+	
+}
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::UnLoad(shok::FontId id) {
+	auto* mng = EGUIX::FontManager::GlobalObj();
+	mng->PopFont(id);
+}
+CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::Obj{};
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 20> CppLogic::ModLoader::ModLoader::Loaders{ {
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
@@ -912,6 +932,7 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 19> CppLogic::ModLoa
 			&CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj,
+			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::Obj,
 	} };
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{ {
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,

@@ -189,3 +189,8 @@ path: data/text/lang/override/prefixname.xml (usually data/text/lang/ingame/pref
 example: as originals
 Note: lang is the 2 letter language code. from manifest, searches XNetworkUbiCom.Tool_GetCurrentLanguageShortName(), "en", "de" (in this order)
 	and load the first found. it is optionally possible to load overrides for a specific prefix from a different file.
+
+Font:
+path: data/menu/fonts/fname.met & data/menu/fonts/fname.png|.dds
+example: as originals
+Note: font object gets loaded automatically on first use, but can be forced to load via ModLoader

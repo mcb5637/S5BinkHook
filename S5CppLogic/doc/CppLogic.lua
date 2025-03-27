@@ -3456,6 +3456,17 @@ function CppLogic.ModLoader.SetDamageclassesToReload() end
 --- @return number type_id
 function CppLogic.ModLoader.PreLoadEntityCategory(typename) end
 
+--- loads a font from a met file (data/menu/fonts/fname.xml).
+--- @param fname string|number
+--- @return number type_id
+function CppLogic.ModLoader.AddFont(fname) end
+CppLogic.ModLoader.ReloadFont = CppLogic.ModLoader.AddFont
+
+--- assigns an id in the Font IdManager. will get loaded automatically on first use, but using AddFont is neccessary, if the archive is supposed to get popped.
+--- @param typename string
+--- @return number type_id
+function CppLogic.ModLoader.PreLoadFont(typename) end
+
 --- refreshes the entitycategory->entitytype cache.
 function CppLogic.ModLoader.RefreshEntityCategoryCache() end
 

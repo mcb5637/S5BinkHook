@@ -10,6 +10,7 @@
 #include "hooks.h"
 #include "mod.h"
 #include "EntityAddonData.h"
+#include "s5_RWE_2d.h"
 
 shok::Color EGUIX::Color::ToShokColor() const
 {
@@ -1028,6 +1029,21 @@ static inline RWE::P2D::Rt2dFont* (__thiscall* const fontmng_getfont)(EGUIX::Fon
 RWE::P2D::Rt2dFont* EGUIX::FontManager::GetFontObj(shok::FontId id)
 {
     return fontmng_getfont(this, id);
+}
+
+void EGUIX::FontManager::ClearFont(shok::FontId id)
+{
+    if (static_cast<int>(id) >= static_cast<int>(Fonts.size()))
+        return;
+    auto* f = Fonts.at(static_cast<int>(id));
+    f->Destroy();
+    Fonts[static_cast<int>(id)] = nullptr;
+}
+
+void EGUIX::FontManager::PopFont(shok::FontId id)
+{
+    ClearFont(id);
+    Manager->RemoveID(static_cast<int>(id));
 }
 
 bool (*EGUIX::UIInput_Char_Callback)(int c) = nullptr;

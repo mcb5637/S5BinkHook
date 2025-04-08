@@ -856,7 +856,7 @@ namespace CppLogic::UI {
 	int ShowAdvancedFloatie(lua::State ls) {
 		luaext::EState L{ ls };
 		GGUI::C3DOnScreenInformationCustomWidget::HookAdditionalFloaties();
-		GGUI::AdvancedFloatieManager::GlobalObj.AddFloatie(L.CheckPos(1), L.CheckString(2));
+		GGUI::AdvancedFloatieManager::GlobalObj.AddFloatie(L.CheckPos(1), L.CheckStringView(2));
 		return 0;
 	}
 

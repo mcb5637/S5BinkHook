@@ -1830,6 +1830,28 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int MarketPredictPrice(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* e = L.CheckEntity(1);
+		auto* b = e->GetBehavior<CppLogic::Mod::AdvancedMarketBehavior>();
+		if (b == nullptr)
+			throw lua::LuaException{ "no adv market" };
+		L.Push(b->PredictPriceFor(L.CheckEnum<shok::ResourceType>(2), L.CheckFloat(3)));
+		return 1;
+	}
+
+	int MarketGetSellResources(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* e = L.CheckEntity(1);
+		auto* b = e->GetBehavior<CppLogic::Mod::AdvancedMarketBehavior>();
+		if (b == nullptr)
+			throw lua::LuaException{ "no adv market" };
+		auto rt = L.CheckEnum<shok::ResourceType>(2);
+		L.Push(b->SellResources.ByResT(rt));
+		L.Push(b->MinResources.ByResT(rt));
+		return 2;
+	}
+
 
 	void Cleanup(lua::State L) {
 		DisableConversionHook(L);
@@ -2053,6 +2075,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
 			lua::FuncReference::GetRef<BuildingGetRelativePositions>("GetRelativePositions"),
 			lua::FuncReference::GetRef<BuildingSpawnWorkerFor>("SpawnWorkerFor"),
+			lua::FuncReference::GetRef<MarketPredictPrice>("MarketPredictPrice"),
+			lua::FuncReference::GetRef<MarketGetSellResources>("MarketGetSellResources"),
 	};
 
 	void Init(lua::State L)

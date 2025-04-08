@@ -609,6 +609,11 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xAF007567);
 
 		float GetProgressAmount(shok::PlayerId p) const;
+
+		virtual ~CServiceBuildingBehaviorProperties() override;
+		CServiceBuildingBehaviorProperties();
+
+		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x86F2D8);
 	};
 
 	class CWorkerFleeBehaviorProps : public EGL::CGLEBehaviorProps {

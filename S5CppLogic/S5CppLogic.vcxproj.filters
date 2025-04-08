@@ -581,5 +581,11 @@
     <MASM Include="s5_filesystem_maual.asm">
       <Filter>shok\globals</Filter>
     </MASM>
+    <MASM Include="s5_behaviorProps_manual.asm">
+      <Filter>shok\entitytype</Filter>
+    </MASM>
+    <MASM Include="s5_asm_macros.asm">
+      <Filter>shok</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

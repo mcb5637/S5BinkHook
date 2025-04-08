@@ -342,6 +342,11 @@ GGL::CTradeManager::ResData* GGL::CTradeManager::GetResource(shok::ResourceType 
 	return trademng_getres(this, rt);
 }
 
+float GGL::CTradeManager::GetRelativePrice(shok::ResourceType buy, shok::ResourceType sell)
+{
+	return reinterpret_cast<float(__thiscall*)(GGL::CTradeManager*, shok::ResourceType, shok::ResourceType)>(0x4C89C5)(this, buy, sell);
+}
+
 GGL::CTechConditionPredicate::CTechConditionPredicate()
 {
 	*reinterpret_cast<int*>(this) = vtp;

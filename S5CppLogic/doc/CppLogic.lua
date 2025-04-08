@@ -1653,6 +1653,11 @@ function CppLogic.Entity.Settler.CommandResurrect(id, tid) end
 --- @param p Position
 function CppLogic.Entity.Settler.CommandBombardment(id, p) end
 
+--- bomb cannon combo command
+--- @param id entity
+--- @param p Position
+function CppLogic.Entity.Settler.CommandBombCannonCombo(id, p) end
+
 --- teleports a settler to a position. does not change id.
 --- @param id entity
 --- @param p Position pos
@@ -3199,6 +3204,11 @@ function CppLogic.UI.Commands.Resurrect_Activate(id, tar) end
 ---@param id number|string
 ---@param p Position
 function CppLogic.UI.Commands.Bombardment_Activate(id, p) end
+
+---gives a bomb cannon combo ability command
+---@param id number|string
+---@param p Position
+function CppLogic.UI.Commands.BombCannonCombo_Activate(id, p) end
 
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed/reloaded on leaving the map.

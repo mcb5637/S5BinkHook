@@ -283,6 +283,10 @@ copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
     <ClCompile Include="WinAPIUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="s5_asm_macros.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </MASM>
     <MASM Include="s5_filesystem_maual.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -312,6 +316,11 @@ copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
     <Text Include="doc\random_notes.txt" />
     <Text Include="doc\mod_anatomy.txt" />
     <Text Include="memedits.txt" />
+    <MASM Include="s5_behaviorProps_manual.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>Text</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="doc\ModPack.xml" />

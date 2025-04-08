@@ -169,9 +169,9 @@ namespace GGL {
 		static inline constexpr int vtp = 0x772860;
 
 		struct TradeOrder {
-			shok::PlayerId Player;
-			shok::ResourceType SellResourceType, BuyResourceType;
-			float BuyAmount, SellAmount, ProgressAmount; // prog max is buyam * workamount + sellam * workamount
+			shok::PlayerId Player = {};
+			shok::ResourceType SellResourceType = {}, BuyResourceType = {};
+			float BuyAmount = 0.0f, SellAmount = 0.0f, ProgressAmount = 0.0f; // prog max is buyam * workamount + sellam * workamount
 
 			// calculates price
 			void SetData(shok::PlayerId player, shok::ResourceType sellTy, shok::ResourceType buyTy, float buyAm);
@@ -188,6 +188,8 @@ namespace GGL {
 
 		void ApplyPriceChangesOfTrade(const TradeOrder* o);
 		ResData* GetResource(shok::ResourceType rt);
+		// 0x4C8942 float __thiscall GetPrice(rty)
+		float GetRelativePrice(shok::ResourceType buy, shok::ResourceType sell);
 	};
 
 	struct PlayerTechManager;

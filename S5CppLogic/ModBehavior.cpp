@@ -29,6 +29,8 @@ void CppLogic::Mod::RegisterClasses()
 	f->AddClassToFactory<ReloadableCannonBuilderAbilityProps>();
 	f->AddClassToFactory<ReloadableCannonBuilderAbility>();
 	f->AddClassToFactory<LimitedAmmoUIDisplayBehavior>();
+	f->AddClassToFactory<AdvancedMarketBehaviorProps>();
+	f->AddClassToFactory<AdvancedMarketBehavior>();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
@@ -1337,4 +1339,335 @@ void CppLogic::Mod::LimitedAmmoUIDisplayBehavior::operator delete(void* p)
 CppLogic::Mod::LimitedAmmoUIDisplayBehavior::LimitedAmmoUIDisplayBehavior()
 {
 	GGUI::C3DOnScreenInformationCustomWidget::HookOnScreenInfoDisplayBehavior();
+}
+
+shok::ClassId __stdcall CppLogic::Mod::AdvancedMarketBehaviorProps::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+BB::SerializationData CppLogic::Mod::AdvancedMarketBehaviorProps::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<AdvancedMarketBehaviorProps, GGL::CServiceBuildingBehaviorProperties>(),
+	AutoMemberSerialization(AdvancedMarketBehaviorProps, WorkStepsNeededForTrade),
+	BB::SerializationData::GuardData(),
+};
+
+void* CppLogic::Mod::AdvancedMarketBehaviorProps::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::AdvancedMarketBehaviorProps::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+float& CppLogic::Mod::AdvancedMarketBehavior::ResourceData::ByResT(shok::ResourceType t)
+{
+	switch (t) {
+	case shok::ResourceType::Gold:
+	case shok::ResourceType::GoldRaw:
+		return Gold;
+	case shok::ResourceType::Wood:
+	case shok::ResourceType::WoodRaw:
+		return Wood;
+	case shok::ResourceType::Clay:
+	case shok::ResourceType::ClayRaw:
+		return Clay;
+	case shok::ResourceType::Stone:
+	case shok::ResourceType::StoneRaw:
+		return Stone;
+	case shok::ResourceType::Iron:
+	case shok::ResourceType::IronRaw:
+		return Iron;
+	case shok::ResourceType::Sulfur:
+	case shok::ResourceType::SulfurRaw:
+		return Sulfur;
+	default:
+		throw std::invalid_argument{ "invalid resource type" };
+	}
+}
+
+BB::SerializationData CppLogic::Mod::AdvancedMarketBehavior::ResourceData::SerializationData[] = {
+	AutoMemberSerialization(ResourceData, Gold),
+	AutoMemberSerialization(ResourceData, Wood),
+	AutoMemberSerialization(ResourceData, Clay),
+	AutoMemberSerialization(ResourceData, Stone),
+	AutoMemberSerialization(ResourceData, Iron),
+	AutoMemberSerialization(ResourceData, Sulfur),
+	BB::SerializationData::GuardData(),
+};
+
+shok::ClassId __stdcall CppLogic::Mod::AdvancedMarketBehavior::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::AddHandlers(shok::EntityId id)
+{
+	EntityId = id;
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	e->CreateEventHandler<shok::EventIDs::Market_WorkStep>(this, &AdvancedMarketBehavior::EventWork);
+	e->CreateEventHandler<shok::EventIDs::Market_StartTrade>(this, &AdvancedMarketBehavior::EventStartTrade);
+	e->CreateEventHandler<shok::EventIDs::Market_CancelTrade>(this, &AdvancedMarketBehavior::EventCancel);
+	e->CreateEventHandler<shok::EventIDs::Market_GetProgress>(this, &AdvancedMarketBehavior::EventGetProgress);
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+
+CppLogic::Mod::AdvancedMarketBehavior::AdvancedMarketBehavior()
+{
+	GGUI::C3DOnScreenInformationCustomWidget::HookAdditionalFloaties();
+}
+
+void* CppLogic::Mod::AdvancedMarketBehavior::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+BB::SerializationData CppLogic::Mod::AdvancedMarketBehavior::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<AdvancedMarketBehavior, EGL::CGLEBehavior>(),
+	AutoMemberSerialization(AdvancedMarketBehavior, SellResources),
+	AutoMemberSerialization(AdvancedMarketBehavior, MinResources),
+	AutoMemberSerialization(AdvancedMarketBehavior, WorkSteps),
+	BB::SerializationData::GuardData(),
+};
+
+float CppLogic::Mod::AdvancedMarketBehavior::PredictPriceFor(shok::ResourceType rt, float am)
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* m = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->TradeManager;
+	float tradestep = TradeStepSize();
+
+	auto golddata = *m->GetResource(shok::ResourceType::Gold);
+	auto resdata = *m->GetResource(rt);
+
+	float r = 0.0f;
+
+	if (am > 0.0f) {
+		while (am > 0.0f) {
+			float t = std::min(tradestep, am);
+			float p = std::ceil(t * resdata.CurrentPrice / golddata.CurrentPrice);
+			resdata.AdjustPrice(t, true);
+			golddata.AdjustPrice(p, false);
+			r += p;
+			am -= t;
+		}
+	}
+	else {
+		while (am < 0.0f) {
+			float t = std::min(tradestep, -am);
+			float p = std::ceil(t * golddata.CurrentPrice / resdata.CurrentPrice);
+			resdata.AdjustPrice(p, false);
+			golddata.AdjustPrice(t, true);
+			r -= p;
+			am += t;
+		}
+	}
+
+	return r;
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::FillCurrentTrade()
+{
+	float tradestep = TradeStepSize();
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	CurrentTrade.Player = e->PlayerId;
+
+	float amount = 0;
+	shok::ResourceType resty = shok::ResourceType::None;
+	bool isMin = false;
+
+	for (auto currentres : ResTradeOrder) {
+		float currentam = SellResources.ByResT(currentres);
+		if (std::abs(currentam) > std::abs(amount)) {
+			FillCurrentTrade(currentres, currentam, tradestep);
+			if (!CurrentTrade.IsTradeValid())
+				continue;
+			amount = currentam;
+			resty = currentres;
+		}
+	}
+
+	if (resty == shok::ResourceType::None) {
+		auto* m = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(CurrentTrade.Player);
+
+		{
+			float bank = m->CurrentResources.GetResourceAmountFromType(shok::ResourceType::Gold, true);
+			float currentam = MinResources.ByResT(shok::ResourceType::Gold);
+			if (bank < currentam) {
+				for (auto currentres : ResTradeOrder) {
+					float currentam = MinResources.ByResT(currentres);
+					float bank = m->CurrentResources.GetResourceAmountFromType(currentres, true);
+					if (currentam + tradestep > bank)
+						continue;
+					currentam = currentam - bank;
+					if (std::abs(currentam) > std::abs(amount)) {
+						FillCurrentTrade(currentres, currentam, tradestep);
+						if (!CurrentTrade.IsTradeValid())
+							continue;
+						amount = currentam;
+						resty = currentres;
+						isMin = true;
+					}
+				}
+			}
+		}
+
+		if (resty == shok::ResourceType::None) {
+			for (auto currentres : ResTradeOrder) {
+				float currentam = MinResources.ByResT(currentres);
+				float bank = m->CurrentResources.GetResourceAmountFromType(currentres, true);
+				if (currentam < bank)
+					continue;
+				currentam = currentam - bank;
+				if (std::abs(currentam) > std::abs(amount)) {
+					FillCurrentTrade(currentres, currentam, tradestep);
+					if (!CurrentTrade.IsTradeValid())
+						continue;
+					amount = currentam;
+					resty = currentres;
+					isMin = true;
+				}
+			}
+		}
+	}
+
+	if (resty != shok::ResourceType::None) {
+		FillCurrentTrade(resty, amount, tradestep);
+		if (isMin)
+			CurrentTrade.ProgressAmount = 1.0f;
+	}
+	else {
+		CurrentTrade = GGL::CTradeManager::TradeOrder{};
+	}
+}
+
+float CppLogic::Mod::AdvancedMarketBehavior::TradeStepSize()
+{
+	auto pl = EGL::CGLEEntity::GetEntityByID(EntityId)->PlayerId;
+	auto* p = static_cast<GGL::CServiceBuildingBehaviorProperties*>(PropPointer);
+	return p->GetProgressAmount(pl);
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::FillCurrentTrade(shok::ResourceType res, float amount, float tradestep)
+{
+	CurrentTrade.ProgressAmount = 0.0f;
+	auto* m = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(CurrentTrade.Player)->TradeManager;
+	if (amount > 0) {
+		CurrentTrade.BuyResourceType = res;
+		CurrentTrade.SellResourceType = shok::ResourceType::Gold;
+		CurrentTrade.BuyAmount = std::min(tradestep, amount);
+		CurrentTrade.SellAmount = std::ceil(CurrentTrade.BuyAmount * m->GetRelativePrice(res, shok::ResourceType::Gold));
+	}
+	else {
+		CurrentTrade.BuyResourceType = shok::ResourceType::Gold;
+		CurrentTrade.SellResourceType = res;
+		CurrentTrade.SellAmount = std::min(tradestep, -amount);
+		CurrentTrade.BuyAmount = std::ceil(CurrentTrade.SellAmount * m->GetRelativePrice(shok::ResourceType::Gold, res));
+	}
+}
+
+std::string_view CppLogic::Mod::AdvancedMarketBehavior::GetResIcon(shok::ResourceType t)
+{
+	switch (t) {
+	case shok::ResourceType::Gold:
+	case shok::ResourceType::GoldRaw:
+		return "@icon:graphics\\textures\\gui\\i_res_gold_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+	case shok::ResourceType::Wood:
+	case shok::ResourceType::WoodRaw:
+		return "@icon:graphics\\textures\\gui\\i_res_wood_large,0.0625,0,0.875,0.875,2,2,255,255,255,a|";
+	case shok::ResourceType::Clay:
+	case shok::ResourceType::ClayRaw:
+		return "@icon:graphics\\textures\\gui\\i_res_mud_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+	case shok::ResourceType::Stone:
+	case shok::ResourceType::StoneRaw:
+		return "@icon:graphics\\textures\\gui\\i_res_stone_large,0.0625,0,0.875,0.8125,2,2,255,255,255,a|";
+	case shok::ResourceType::Iron:
+	case shok::ResourceType::IronRaw:
+		return "@icon:graphics\\textures\\gui\\i_res_iron_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+	case shok::ResourceType::Sulfur:
+	case shok::ResourceType::SulfurRaw:
+		return "@icon:graphics\\textures\\gui\\i_res_sulfur_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+	default:
+		throw std::invalid_argument{ "invalid resource type" };
+	}
+}
+
+std::string_view CppLogic::Mod::AdvancedMarketBehavior::ResPrefix(float r)
+{
+	if (r < 0)
+		return "@defaultcolor|";
+	else
+		return "@color:0,255,0,a|+";
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::PerformTradeStep()
+{
+	FillCurrentTrade();
+	if (!CurrentTrade.IsTradeValid())
+		return;
+	CurrentTrade.Complete(true);
+
+	if (CurrentTrade.ProgressAmount <= 0.0f) {
+		if (CurrentTrade.BuyResourceType == shok::ResourceType::Gold) {
+			SellResources.ByResT(CurrentTrade.SellResourceType) += CurrentTrade.SellAmount;
+		}
+		else {
+			SellResources.ByResT(CurrentTrade.BuyResourceType) -= CurrentTrade.BuyAmount;
+		}
+	}
+	
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	// a is whitespace in s5extended onscreennumberssmall, cause space breaks other stuff...
+	auto txt = std::format("@skipWhitespace:off|{}{}{}aa{}{}{}",
+		GetResIcon(CurrentTrade.SellResourceType),
+		ResPrefix(-CurrentTrade.SellAmount),
+		-CurrentTrade.SellAmount,
+		GetResIcon(CurrentTrade.BuyResourceType),
+		ResPrefix(CurrentTrade.BuyAmount),
+		CurrentTrade.BuyAmount
+	);
+	GGUI::AdvancedFloatieManager::GlobalObj.AddFloatie(e->Position, std::move(txt));
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::EventWork(BB::CEvent* ev)
+{
+	auto* p = static_cast<AdvancedMarketBehaviorProps*>(PropPointer);
+	++WorkSteps;
+	if (WorkSteps >= p->WorkStepsNeededForTrade) {
+		PerformTradeStep();
+		WorkSteps = 0;
+	}
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::EventStartTrade(GGL::CEventTransaction* ev)
+{
+	if (ev->SellType == shok::ResourceType::Gold)
+		SellResources.ByResT(ev->BuyType) = ev->BuyAmount;
+	else
+		MinResources.ByResT(ev->BuyType) = std::max(0.0f, ev->BuyAmount);
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::EventCancel(BB::CEvent* ev)
+{
+	SellResources = ResourceData{};
+}
+
+void CppLogic::Mod::AdvancedMarketBehavior::EventGetProgress(EGL::CEventGetValue_Float* ev)
+{
+	ev->Data = 1.0f;
 }

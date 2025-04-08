@@ -757,8 +757,10 @@ namespace GGUI {
 		std::vector<Floatie> Floaties;
 
 		void RenderFloaties();
-		void AddFloatie(const shok::Position& pos, const char* txt);
-		void AddFloatie(const shok::Position& pos, float height, const char* txt);
+		void AddFloatie(const shok::Position& pos, std::string_view txt);
+		void AddFloatie(const shok::Position& pos, float height, std::string_view txt);
+		void AddFloatie(const shok::Position& pos, std::string&& txt);
+		void AddFloatie(const shok::Position& pos, float height, std::string&& txt);
 
 		static AdvancedFloatieManager GlobalObj;
 	};

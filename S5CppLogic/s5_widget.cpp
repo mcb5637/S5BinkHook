@@ -959,14 +959,23 @@ void GGUI::AdvancedFloatieManager::RenderFloaties()
         ++f;
     }
 }
-void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, float height, const char* txt)
+void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, float height, std::string_view txt)
 {
-    Floaties.emplace_back(pos, height, shok::GetCurrentTimeFloat(), txt);
+    AddFloatie(pos, height, std::string(txt));
 }
-void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, const char* txt)
+void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, std::string_view txt)
 {
     float h = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(pos);
     AddFloatie(pos, h, txt);
+}
+void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, float height, std::string&& txt)
+{
+    Floaties.emplace_back(pos, height, shok::GetCurrentTimeFloat(), std::move(txt));
+}
+void GGUI::AdvancedFloatieManager::AddFloatie(const shok::Position& pos, std::string&& txt)
+{
+    float h = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(pos);
+    AddFloatie(pos, h, std::move(txt));
 }
 
 inline void(__thiscall* const shortmsg_entr_add)(GGUI::CShortMessagesWindowControllerCustomWidget::Entries* th, GGUI::CShortMessagesWindowControllerCustomWidget::MessageType type, BB::CEvent* ev, float duration, const shok::Position* pos, const char* tooltip)

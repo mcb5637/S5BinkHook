@@ -142,4 +142,6 @@ list of used identifiers
 0x1022 CppLogic::Mod::ReloadableCannonBuilderAbilityProps
 0x1023 CppLogic::Mod::ReloadableCannonBuilderAbility
 0x1024 CppLogic::Mod::LimitedAmmoUIDisplayBehavior
+0x1025 CppLogic::Mod::AdvancedMarketBehavior
+0x1026 CppLogic::Mod::AdvancedMarketBehaviorProps
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

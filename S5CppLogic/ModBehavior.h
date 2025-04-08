@@ -405,4 +405,71 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 	};
+
+	class AdvancedMarketBehaviorProps : public GGL::CServiceBuildingBehaviorProperties {
+	public:
+		int WorkStepsNeededForTrade = 0;
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1026);
+		static BB::SerializationData SerializationData[];
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+	};
+
+	class AdvancedMarketBehavior : public EGL::CGLEBehavior {
+	public:
+		struct ResourceData {
+			float Gold = 0;
+			float Wood = 0;
+			float Clay = 0;
+			float Stone = 0;
+			float Iron = 0;
+			float Sulfur = 0;
+
+			float& ByResT(shok::ResourceType t);
+
+			static BB::SerializationData SerializationData[];
+		} SellResources, MinResources;
+		GGL::CTradeManager::TradeOrder CurrentTrade; // not serialized
+		int WorkSteps = 0;
+
+		static constexpr std::array ResTradeOrder{
+			shok::ResourceType::Wood,
+			shok::ResourceType::Clay,
+			shok::ResourceType::Stone,
+			shok::ResourceType::Iron,
+			shok::ResourceType::Sulfur,
+		};
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1025);
+		static BB::SerializationData SerializationData[];
+
+		AdvancedMarketBehavior();
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		float PredictPriceFor(shok::ResourceType rt, float am);
+	private:
+		void FillCurrentTrade();
+		float TradeStepSize();
+		void FillCurrentTrade(shok::ResourceType res, float amount, float tradestep);
+		std::string_view GetResIcon(shok::ResourceType t);
+		std::string_view ResPrefix(float r);
+		void PerformTradeStep();
+
+		void EventWork(BB::CEvent* ev);
+		void EventStartTrade(GGL::CEventTransaction* ev);
+		void EventCancel(BB::CEvent* ev);
+		void EventGetProgress(EGL::CEventGetValue_Float* ev);
+	};
 }

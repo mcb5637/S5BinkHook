@@ -122,6 +122,11 @@ void RWE::RwFrame::Destroy()
 {
     frame_destroy(this);
 }
+bool RWE::RwFrame::Dirty() const
+{
+    int(__cdecl* const f)(const RWE::RwFrame * f) = reinterpret_cast<int(__cdecl*)(const RWE::RwFrame*)>(0x413E40);
+    return f(this);
+}
 
 static inline int(__cdecl* const stream_close)(RWE::RwStream* s, void* d) = reinterpret_cast<int(__cdecl*)(RWE::RwStream*, void*)>(0x41A810);
 bool RWE::RwStream::Close(void* data)
@@ -180,6 +185,18 @@ int RWE::RwRaster::GetMipLevels()
     return raster_getmiplev(this);
 }
 
+void RWE::RpGeometry::AddRef()
+{
+    RWE::RpGeometry*(__cdecl* const f)(RWE::RpGeometry * raster) = reinterpret_cast<RWE::RpGeometry*(__cdecl*)(RWE::RpGeometry*)>(0x62ED80);
+    f(this);
+}
+
+void RWE::RpGeometry::Destroy()
+{
+    bool (__cdecl* const f)(RWE::RpGeometry * raster) = reinterpret_cast<bool (__cdecl*)(RWE::RpGeometry*)>(0x62EE60);
+    f(this);
+}
+
 static inline int(__cdecl* const atomic_isparticleemitter)(RWE::RpAtomic* a) = reinterpret_cast<int(__cdecl*)(RWE::RpAtomic*)>(0x5D9210);
 bool RWE::RpAtomic::IsParticleEmitter()
 {
@@ -199,6 +216,16 @@ static inline RWE::RpAtomic* (__cdecl* const atomic_addemitter)(RWE::RpAtomic* t
 void RWE::RpAtomic::AddEmitter(RWE::Particles::RpPrtStdEmitter* em)
 {
     atomic_addemitter(this, em);
+}
+RWE::RpWorld* RWE::RpAtomic::GetWorld() const
+{
+    RWE::RpWorld* (__cdecl* const f)(const RWE::RpAtomic * th) = reinterpret_cast<RWE::RpWorld * (__cdecl*)(const RWE::RpAtomic*)>(0x626DA0);
+    return f(this);
+}
+void RWE::RpAtomic::SetGeometry(RpGeometry* geometry, bool assumeSameBoundingSphere)
+{
+    RWE::RpAtomic* (__cdecl* const f)(RWE::RpAtomic* th, RpGeometry * g, uint32_t flags) = reinterpret_cast<RWE::RpAtomic * (__cdecl*)(RWE::RpAtomic*, RpGeometry * g, uint32_t flags)>(0x628F10);
+    f(this, geometry, assumeSameBoundingSphere ? 1 : 0);
 }
 
 static inline RWE::RpClump* (__cdecl* const clump_forallatomics)(RWE::RpClump* m, RWE::RpAtomicCallBack, void* data) = reinterpret_cast<RWE::RpClump* (__cdecl*)(RWE::RpClump*, RWE::RpAtomicCallBack, void*)>(0x628E30);

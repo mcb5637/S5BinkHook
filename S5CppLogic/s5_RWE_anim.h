@@ -330,6 +330,8 @@ namespace RWE::Anim {
 		void SubTime(float t);
 		void SetCurrentTime(float t);
 		void Blend(RtAnimInterpolator* in1, RtAnimInterpolator* in2, float alpha);
+
+		// 6EADA0 RtAnimInterpolatorCreate
 	};
 
 	/**
@@ -344,9 +346,16 @@ namespace RWE::Anim {
 	 */
 	struct RpHAnimNodeInfo
 	{
+		enum class Flags : int
+		{
+			Deformable = 0,
+			NubBone = 1,
+			Rigid = 3,
+		};
+
 		int nodeID;     /**< User defined ID for this node  */
 		int nodeIndex;  /**< Array index of node  */
-		int flags;      /**< Matrix push/pop flags  */
+		Flags flags;      /**< Matrix push/pop flags  */
 		RwFrame* pFrame;     /**< Pointer to an attached RwFrame (see \ref RpHAnimHierarchyAttach) */
 	};
 
@@ -410,4 +419,6 @@ namespace RWE::Anim {
 	template<>
 	class ::enum_is_flags<RpHAnimHierarchy::RpHAnimHierarchyFlag> : public std::true_type {};
 	//constexpr int i = offsetof(RpHAnimHierarchy, pNodeInfo) / 4;
+
+	// 6EC770 RpHAnimPluginAttach
 }

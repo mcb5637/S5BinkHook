@@ -333,6 +333,9 @@
     <ClInclude Include="ModEffect.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="s5_RWE_plugin.h">
+      <Filter>shok\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

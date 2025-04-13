@@ -59,6 +59,8 @@ namespace RWE {
 		COLLTREE = 0x2C,
 		ENVIRONMENT = 0x2D,
 
+		HAnim = 286,
+		UserData = 287,
 		PrtStd = 304,
 	};
 	enum class RwOpCombineType : int {
@@ -581,4 +583,28 @@ namespace RWE {
 	};
 	template<>
 	class ::enum_is_flags<RwRasterLockMode> : public std::true_type {};
+
+	/**
+	 * \ingroup rwcamera
+	 * RwCameraProjection
+	 * This type represents the options available for
+	 * setting the camera projection model, either perspective projection or
+	* parallel projection (see API function \ref RwCameraSetProjection)*/
+	enum class RwCameraProjection : int
+	{
+		rwNACAMERAPROJECTION = 0,   /**<Invalid projection */
+		rwPERSPECTIVE = 1,          /**<Perspective projection */
+		rwPARALLEL = 2,             /**<Parallel projection */
+	};
+	/**
+	 * \ingroup rpuserdata
+	 *  User data formats
+	 */
+	enum RpUserDataFormat : int
+	{
+		rpNAUSERDATAFORMAT = 0,
+		rpINTUSERDATA,          /**< 32 bit int data */
+		rpREALUSERDATA,         /**< 32 bit float data */
+		rpSTRINGUSERDATA,       /**< unsigned byte pointer data */
+	};
 }

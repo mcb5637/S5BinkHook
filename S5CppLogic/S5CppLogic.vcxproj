@@ -187,6 +187,7 @@ copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
     <ClInclude Include="s5_RWE_enums.h" />
     <ClInclude Include="s5_RWE_io.h" />
     <ClInclude Include="s5_RWE_particles.h" />
+    <ClInclude Include="s5_RWE_plugin.h" />
     <ClInclude Include="s5_sound.h" />
     <ClInclude Include="s5_staticlist.h" />
     <ClInclude Include="s5_tasklist.h" />

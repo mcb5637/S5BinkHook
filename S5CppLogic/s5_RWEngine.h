@@ -17,16 +17,21 @@ namespace RWE {
 	struct RwFrame;
 	using RwTexture = ::RwTexture;
 	using RtAnimAnimation = ::RtAnimAnimation;
-
-	// not done
+	struct RwMatrix;
 	struct RwResEntry;
 	struct RpGeometry;
 	struct RpMaterial;
+	struct RpMaterialList;
+
+	// not done
 	struct RpSector;
 	struct RxPipeline;
 	struct RpWorldSector;
 	struct RwTexDictionary;
-	struct RwMatrix;
+
+	static constexpr int rwMAXTEXTURECOORDS = 8;
+	static constexpr int rwLIBRARYCURRENTVERSION = 0x37002;
+	static constexpr int rwLIBRARYBASEVERSION = 0x35000;
 
 	struct RwLinkList {
 		struct RwLLLink {
@@ -190,6 +195,15 @@ namespace RWE {
 		RwMatrix* GetLTM();
 		static inline RwFrame* (__cdecl* const Create)() = reinterpret_cast<RwFrame * (__cdecl*)()>(0x413F10);
 		void Destroy();
+		bool Dirty() const;
+
+		// 413F50 rwFrameDestroyRecurse
+		// 4142B0 RwFrameRegisterPlugin
+		// 4142E0 rwFrameCloneRecurse
+		// 729830 RwFrameRegisterPluginStream
+
+		// 717D90 RwFrameGetUserDataArray
+		// 717D60 RwFrameGetUserDataArrayCount
 	};
 	//constexpr int i = offsetof(RwFrame, objectList)/4;
 
@@ -280,6 +294,100 @@ namespace RWE {
 	};
 	static_assert(sizeof(RpInterpolator) == 20);
 
+	struct RpTriangle
+	{
+		uint16_t            vertIndex[3];   /**< vertex indices */
+		uint16_t            matIndex;       /**< Index into material list */
+	};
+
+	struct RpMeshHeader
+	{
+		uint32_t            flags;    /**< \see RpMeshHeaderFlags */
+		uint16_t            numMeshes; /**< Number of meshes in object */
+		uint16_t            serialNum; /**< Determine if mesh has changed
+										* since last instance */
+		uint32_t            totalIndicesInMesh; /**< Total triangle index
+												 * count in all meshes
+												 */
+		uint32_t            firstMeshOffset; /**< Offset in bytes from end this
+											  * structure RpMeshHeader
+											  * to the first mesh
+											  */
+	};
+
+	struct RpMorphTarget
+	{
+		RpGeometry* parentGeom;
+		RwSphere   boundingSphere;
+		RwV3d* verts;
+		RwV3d* normals;
+	};
+
+	struct RpMaterialList {
+		RpMaterial** materials;
+		int numMaterials;
+		int space;
+	};
+
+	struct RpGeometry
+	{
+		RwObject            object;     /* Generic type */
+
+		uint32_t            flags;      /* Geometry flags */
+
+		uint16_t            lockedSinceLastInst; /* What has been locked since we last instanced - for re-instancing */
+		int16_t             refCount;   /* Reference count (for keeping track of atomics referencing geometry) */
+
+		int32_t             numTriangles; /* Quantity of various things (polys, verts and morph targets) */
+		int32_t             numVertices;
+		int32_t             numMorphTargets;
+		int32_t             numTexCoordSets;
+
+		RpMaterialList      matList;
+
+		RpTriangle* triangles;  /* The triangles */
+
+		RwRGBA* preLitLum;  /* The pre-lighting values */
+
+		RwTexCoords* texCoords[rwMAXTEXTURECOORDS]; /* Texture coordinates */
+
+		RpMeshHeader* mesh;   /* The mesh - groups polys of the same material */
+
+		RwResEntry* repEntry;       /* Information for an instance */
+
+		RpMorphTarget* morphTarget;    /* The Morph Target */
+
+		void AddRef();
+		void Destroy();
+	};
+
+	typedef void        (*RwResEntryDestroyNotify) (RwResEntry* resEntry);
+	struct RwResEntry
+	{
+		RwLinkList::RwLLLink            link;   /* Node in the list of resource elements */
+		int32_t             size;   /* Size of this node */
+		void* owner;  /* Owner of this node */
+		RwResEntry** ownerRef; /* Pointer to pointer to this (enables de-alloc) */
+		RwResEntryDestroyNotify destroyNotify; /* This is called right before destruction */
+	};
+
+	struct RwSurfaceProperties
+	{
+		float ambient;   /**< ambient reflection coefficient */
+		float specular;  /**< specular reflection coefficient */
+		float diffuse;   /**< reflection coefficient */
+	};
+
+	struct RpMaterial
+	{
+		RwTexture* texture; /**< texture */
+		RwRGBA              color; /**< color */
+		RxPipeline* pipeline; /**< pipeline */
+		RwSurfaceProperties surfaceProps; /**< surfaceProps */
+		int16_t             refCount;          /* C.f. rwsdk/world/bageomet.h:RpGeometry */
+		int16_t             pad;
+	};
+
 	struct RpAtomic {
 		RwObjectHasFrame object;
 		RwResEntry* repEntry;
@@ -307,6 +415,10 @@ namespace RWE {
 		void Destroy();
 		void ForAllEmitters(RWE::Particles::RpPrtStdEmitterCallBack cb, void* data);
 		void AddEmitter(RWE::Particles::RpPrtStdEmitter* em);
+		RpWorld* GetWorld() const;
+		void SetGeometry(RpGeometry* geometry, bool assumeSameBoundingSphere);
+
+		// RpAtomicGetWorldBoundingSphere 628B90
 
 		static inline const RpAtomicCallBack SetPlayerColorCb = reinterpret_cast<RpAtomicCallBack>(0x48F361);
 		static inline const RpAtomicCallBack DisableShadowCb = reinterpret_cast<RpAtomicCallBack>(0x721FD8);
@@ -315,6 +427,15 @@ namespace RWE {
 		static inline const RpAtomicCallBack SetColorModulateCb = reinterpret_cast<RpAtomicCallBack>(0x47B6E3);
 	};
 	//constexpr int i = offsetof(RpAtomic, clump) / 4;
+
+	struct rwFrameList
+	{
+		RwFrame** frames;
+		int32_t numFrames;
+
+		// 729890 _rwFrameListStreamRead
+		// 729860 _rwFrameListDeinitialize
+	};
 
 	struct RpClump {
 
@@ -326,6 +447,10 @@ namespace RWE {
 
 		// returns this
 		RpClump* ForAllAtomics(RpAtomicCallBack callback, void* pData);
+		// RpClumpForAllLights 628EC0
+		// RpClumpForAllCameras 628E70
+		// RpClumpRender 628DE0
+		// RpClumpAddLight 6290F0
 
 		RpWorld* GetWorld() const;
 
@@ -348,18 +473,6 @@ namespace RWE {
 		static inline RpClump* (__cdecl* const Read)(RwStream* s) = reinterpret_cast<RpClump * (__cdecl*)(RwStream*)>(0x629990);
 	};
 
-	/**
-	 * \ingroup rwcamera
-	 * RwCameraProjection
-	 * This type represents the options available for
-	 * setting the camera projection model, either perspective projection or
-	* parallel projection (see API function \ref RwCameraSetProjection)*/
-	enum class RwCameraProjection : int
-	{
-		rwNACAMERAPROJECTION = 0,   /**<Invalid projection */
-		rwPERSPECTIVE = 1,          /**<Perspective projection */
-		rwPARALLEL = 2,             /**<Parallel projection */
-	};
 	/*
 	 * This type represents a plane
 	 */
@@ -450,12 +563,6 @@ namespace RWE {
 		float GetConeAngle() const;
 	};
 	static_assert(offsetof(RpLight, color) == 6 * 4);
-
-	struct RpMaterialList {
-		RpMaterial** materials;
-		int numMaterials;
-		int space;
-	};
 
 	struct RpWorld {
 		enum class RpWorldRenderOrder : int {
@@ -676,6 +783,32 @@ namespace RWE {
 		static inline int(__cdecl* const SetVideoMode)(int mode) = reinterpret_cast<int(__cdecl*)(int mode)>(0x40FF70);
 		static inline int(__cdecl* const GetVideoMode)() = reinterpret_cast<int(__cdecl*)()>(0x40FF20);
 	};
+
+	struct RpUserDataArray
+	{
+		char* name;          /**< Identifier for this data array */
+		RpUserDataFormat    format;         /**< Data format of this array */
+		int32_t             numElements;    /**< Number of elements in this array */
+		void* data;          /**< Pointer to the array data */
+
+		// 717DC0 RpUserDataArrayGetName
+		// 717DD0 RpUserDataArrayGetFormat
+		// 717DE0 RpUserDataArrayGetNumElements
+		// 717DF0 RpUserDataArrayGetInt
+	};
+	struct UserDataObject // this is whats stored in the frame/...
+	{
+		int NumUserDatas;
+		RpUserDataArray* UDs;
+
+		// 717CC0 UserDataObjectConstruct
+		// 717CE0 UserDataObjectDestruct
+		// 717FC0 UserDataObjectCopy
+		// 717D00 UserDataObjectStreamRead
+		// 717D20 UserDataObjectStreamWrite
+		// 717D40 UserDataObjectGetSize
+	};
+	// 717FE0 RpUserDataPluginAttach
 }
 
 struct RwTexture {

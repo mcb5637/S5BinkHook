@@ -30,6 +30,7 @@
 #include "s5_events.h"
 #include "s5_behaviorProps.h"
 #include "s5_RWE_2d.h"
+#include "s5_RWE_plugin.h"
 #include "s5_ai.h"
 #include "modloader.h"
 #include "entityiterator.h"

@@ -319,7 +319,7 @@ namespace RWE {
 	{
 		RpGeometry* parentGeom;
 		RwSphere   boundingSphere;
-		RwV3d* verts;
+		RwV3d* verts; // 5
 		RwV3d* normals;
 	};
 
@@ -327,27 +327,32 @@ namespace RWE {
 		RpMaterial** materials;
 		int numMaterials;
 		int space;
+
+		// 637CD0 _rpMaterialListStreamRead
+		// 637AD0 _rpMaterialListDeinitialize
+		// 637B50 _rpMaterialListSetSize
+		// 637BE0 _rpMaterialListAppendMaterial
 	};
 
 	struct RpGeometry
 	{
 		RwObject            object;     /* Generic type */
 
-		uint32_t            flags;      /* Geometry flags */
+		RpGeometryFlag            flags;      /* Geometry flags */
 
 		uint16_t            lockedSinceLastInst; /* What has been locked since we last instanced - for re-instancing */
 		int16_t             refCount;   /* Reference count (for keeping track of atomics referencing geometry) */
 
-		int32_t             numTriangles; /* Quantity of various things (polys, verts and morph targets) */
+		int32_t             numTriangles; /* 4 Quantity of various things (polys, verts and morph targets) */
 		int32_t             numVertices;
 		int32_t             numMorphTargets;
-		int32_t             numTexCoordSets;
+		int32_t             numTexCoordSets; // 7
 
 		RpMaterialList      matList;
 
 		RpTriangle* triangles;  /* The triangles */
 
-		RwRGBA* preLitLum;  /* The pre-lighting values */
+		RwRGBA* preLitLum;  /* 12 The pre-lighting values */
 
 		RwTexCoords* texCoords[rwMAXTEXTURECOORDS]; /* Texture coordinates */
 
@@ -355,10 +360,14 @@ namespace RWE {
 
 		RwResEntry* repEntry;       /* Information for an instance */
 
-		RpMorphTarget* morphTarget;    /* The Morph Target */
+		RpMorphTarget* morphTarget;    /* 23 The Morph Target */
 
 		void AddRef();
 		void Destroy();
+
+		// 62EEA0 RpGeometryStreamRead
+		// 62EB60 RpGeometryCreate
+		// 62E6B0 RpGeometryAddMorphTargets
 	};
 
 	typedef void        (*RwResEntryDestroyNotify) (RwResEntry* resEntry);
@@ -386,6 +395,10 @@ namespace RWE {
 		RwSurfaceProperties surfaceProps; /**< surfaceProps */
 		int16_t             refCount;          /* C.f. rwsdk/world/bageomet.h:RpGeometry */
 		int16_t             pad;
+
+		// 62A000 RpMaterialDestroy
+		// 62A060 RpMaterialStreamRead
+		// 629EE0 RpMaterialCreate
 	};
 
 	struct RpAtomic {
@@ -823,6 +836,8 @@ struct RwTexture {
 	static RwTexture* Read(const char* name, const char* mask);
 	// destroys if no reference left
 	void Destroy();
+
+	// 625880 RwTextureStreamRead
 };
 
 // misc renderware funcs:

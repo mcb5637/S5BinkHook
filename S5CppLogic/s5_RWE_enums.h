@@ -12,6 +12,22 @@ namespace RWE {
 		GEOMETRY = 8,
 		WorldSector = 0xFF, // not a true type?
 	};
+	enum class RwPluginVendor : int
+	{
+		rwVENDORID_CORE = 0x000000L,
+		rwVENDORID_CRITERIONTK = 0x000001L,
+		rwVENDORID_REDLINERACER = 0x000002L,
+		rwVENDORID_CSLRD = 0x000003L,
+		rwVENDORID_CRITERIONINT = 0x000004L,
+		rwVENDORID_CRITERIONWORLD = 0x000005L,
+		rwVENDORID_BETA = 0x000006L,
+		rwVENDORID_CRITERIONRM = 0x000007L,
+		rwVENDORID_CRITERIONRWA = 0x000008L, /* RenderWare Audio */
+		rwVENDORID_CRITERIONRWP = 0x000009L, /* RenderWare Physics */
+	};
+	constexpr int MAKECHUNKID(RwPluginVendor vendorID, int chunkID) {
+		return (((static_cast<int>(vendorID) & 0xFFFFFF) << 8) | (chunkID & 0xFF));
+	}
 	enum class RwCorePluginID : int {
 		NAOBJECT = 0,
 		STRUCT = 1,
@@ -59,10 +75,46 @@ namespace RWE {
 		COLLTREE = 0x2C,
 		ENVIRONMENT = 0x2D,
 
-		HAnim = 286,
-		UserData = 287,
-		MaterialFX = 288,
-		PrtStd = 304,
+		// these are defines for some reason, making copying a lot harder
+		// lots more...
+		HANIMPLUGIN = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONTK, 0x1e),
+		USERDATAPLUGIN = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONTK, 0x1f),
+		MATERIALEFFECTSPLUGIN = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONTK, 0x20),
+		PRTSTDPLUGIN = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONTK, 0x30),
+
+		/**< RpMaterial pluginID */
+		MATERIALMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x01),
+		/**< RpMesh pluginID */
+		MESHMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x02),
+		/**< RpGeometry pluginID */
+		GEOMETRYMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x03),
+		/**< RpClump pluginID */
+		CLUMPMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x04),
+		/**< RpLight pluginID */
+		LIGHTMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x05),
+		/* Not used */
+		COLLISIONMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x06),
+		/**< RpWorld pluginID */
+		WORLDMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x07),
+		/* Not used */
+		RANDOMMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x08),
+		/**< PluginID for RpWorld's objects */
+		WORLDOBJMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x09),
+		/**< RpWorldSector pluginID */
+		SECTORMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x0A),
+		/**< Binary RpWorld pluginID */
+		BINWORLDMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x0B),
+		/**< RpWorld pipeline pluginID */
+		WORLDPIPEMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x0D),
+		/**< Binary RpMesh pluginID */
+		BINMESHPLUGIN = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x0E),
+		/**< RpWorld device pluginID */
+		RXWORLDDEVICEMODULE = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x0F),
+		/**< PluginID for platform specific serialization data */
+		NATIVEDATAPLUGIN = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x10),
+		/**< \if xbox Vertex format pluginID \endif */
+		/**< \if gcn  Vertex format pluginID \endif */
+		VERTEXFMTPLUGIN = MAKECHUNKID(RwPluginVendor::rwVENDORID_CRITERIONWORLD, 0x11),
 	};
 	enum class RwOpCombineType : int {
 		Replace = 0, // completely replaces the old matrix
@@ -697,5 +749,28 @@ namespace RWE {
 		rwBLENDDESTCOLOR,       /**<(Rd,   Gd,   Bd,   Ad  ) */
 		rwBLENDINVDESTCOLOR,    /**<(1-Rd, 1-Gd, 1-Bd, 1-Ad) */
 		rwBLENDSRCALPHASAT,     /**<(f,    f,    f,    1   )  f = min (As, 1-Ad) */
+	};
+
+	enum class RpMeshHeaderFlags : int
+	{
+		/* NOTE: trilists are denoted by absence of any other
+		 *       primtype flags, so be careful that you test:
+		 *        (triListFlag == (flags&triListFlag))
+		 *       or:
+		 *        (0 == (flags&rpMESHHEADERPRIMMASK))
+		 *       and not:
+		 *        (flags&triListFlag)
+		 */
+		rpMESHHEADERTRISTRIP = 0x0001, /**< Render as tristrips */
+		rpMESHHEADERTRIFAN = 0x0002, /**< On PlayStation 2 these will be converted to trilists */
+		rpMESHHEADERLINELIST = 0x0004, /**< Render as linelists */
+		rpMESHHEADERPOLYLINE = 0x0008, /**< On PlayStation 2 these will be converted to linelists */
+		rpMESHHEADERPOINTLIST = 0x0010, /**< Pointlists are supported only if rendered by
+										 *   custom pipelines; there is no default RenderWare
+										 *   way to render pointlists. */
+
+		rpMESHHEADERPRIMMASK = 0x00FF, /**< All bits reserved for specifying primitive type */
+		rpMESHHEADERUNINDEXED = 0x0100, /**< Topology is defined implicitly by vertex
+										 *   order, ergo the mesh contains no indices */
 	};
 }

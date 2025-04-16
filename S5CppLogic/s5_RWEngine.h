@@ -28,6 +28,7 @@ namespace RWE {
 	struct RxPipeline;
 	struct RpWorldSector;
 	struct RwTexDictionary;
+	struct RxVertexIndex; //?? typedef int?
 
 	static constexpr int rwMAXTEXTURECOORDS = 8;
 	static constexpr int rwLIBRARYCURRENTVERSION = 0x37002;
@@ -302,9 +303,33 @@ namespace RWE {
 		uint16_t            matIndex;       /**< Index into material list */
 	};
 
+	/**
+	 * \ingroup rpmesh
+	 * \struct RpMesh
+	 * This type represents a single polygon mesh.
+	 * A mesh is defined as a collection of triangles derived from an RpGeometry
+	 * or RpWorldSector which have a common material.
+	 *
+	 * See API functions \see RpGeometryForAllMeshes and
+	 * \see RpWorldSectorForAllMeshes and
+	 * the corresponding function callback types:
+	 */
+	struct RpMesh
+	{
+		RxVertexIndex* indices;    /**< vertex indices defining the mesh */
+		uint32_t            numIndices; /**< number of vertices in mesh */
+		RpMaterial* material;   /**< pointer to material used to
+										 *   render the mesh. */
+	};
+
+	/**
+	 * \ingroup rpmesh
+	 * \struct RpMeshHeader
+	 * Header for all meshes that constitute a single RpGeometry or RpWorldSector
+	 */
 	struct RpMeshHeader
 	{
-		uint32_t            flags;    /**< \see RpMeshHeaderFlags */
+		RpMeshHeaderFlags            flags;    /**< \see RpMeshHeaderFlags */
 		uint16_t            numMeshes; /**< Number of meshes in object */
 		uint16_t            serialNum; /**< Determine if mesh has changed
 										* since last instance */
@@ -315,6 +340,8 @@ namespace RWE {
 											  * structure RpMeshHeader
 											  * to the first mesh
 											  */
+
+		// 634BB0 _rpMeshRead
 	};
 
 	struct RpMorphTarget

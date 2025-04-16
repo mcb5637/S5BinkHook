@@ -61,6 +61,7 @@ namespace RWE {
 
 		HAnim = 286,
 		UserData = 287,
+		MaterialFX = 288,
 		PrtStd = 304,
 	};
 	enum class RwOpCombineType : int {
@@ -644,4 +645,57 @@ namespace RWE {
 	};
 	template<>
 	class ::enum_is_flags<RpGeometryFlag> : public std::true_type {};
+
+	/**
+	 * \ingroup rpmatfx
+	 * RpMatFXMaterialFlags, this type represents the different types of
+	 * material effects that can be used on a material. The effects are
+	 * initialized with \ref RpMatFXMaterialSetEffects:
+	 */
+	enum class RpMatFXMaterialFlags : int
+	{
+		rpMATFXEFFECTNULL = 0, /**<No material effect.           */
+		rpMATFXEFFECTBUMPMAP = 1, /**<Bump mapping                  */
+		rpMATFXEFFECTENVMAP = 2, /**<Environment mapping           */
+		rpMATFXEFFECTBUMPENVMAP = 3, /**<Bump and environment mapping  */
+		rpMATFXEFFECTDUAL = 4, /**<Dual pass                     */
+		rpMATFXEFFECTUVTRANSFORM = 5, /**<Base UV transform             */
+		rpMATFXEFFECTDUALUVTRANSFORM = 6, /**<Dual UV transform (2 pass)    */
+
+		rpMATFXEFFECTMAX,
+		rpMATFXNUMEFFECTS = rpMATFXEFFECTMAX - 1,
+	};
+
+	/**
+	 * \ingroup rwrenderstate
+	 * RwBlendFunction represents the options available when changing the
+	 * \ref RwRenderState setting for \ref rwRENDERSTATESRCBLEND and
+	 * \ref rwRENDERSTATEDESTBLEND. The values are factors used to modulate
+	 * either the source or destination pixel color when blending to
+	 * the frame buffer. Note the some  combinations are not allowed on
+	 * certain platforms (see platform specific restrictions).
+	 *
+	 * In the following list, the factors applied to each color component are
+	 * listed explicitly. A subscript s refers to a source value while a subscript
+	 * d refers to a destination value. Note that blending in the alpha channel is
+	 * only applicable when the frame buffer actually contains alpha, and that
+	 * the precise operation is platform specific. For instance, the
+	 * source alpha value might simply be written to the alpha channel with
+	 * no blending.
+	 */
+	enum RwBlendFunction
+	{
+		rwBLENDNABLEND = 0,
+		rwBLENDZERO,            /**<(0,    0,    0,    0   ) */
+		rwBLENDONE,             /**<(1,    1,    1,    1   ) */
+		rwBLENDSRCCOLOR,        /**<(Rs,   Gs,   Bs,   As  ) */
+		rwBLENDINVSRCCOLOR,     /**<(1-Rs, 1-Gs, 1-Bs, 1-As) */
+		rwBLENDSRCALPHA,        /**<(As,   As,   As,   As  ) */
+		rwBLENDINVSRCALPHA,     /**<(1-As, 1-As, 1-As, 1-As) */
+		rwBLENDDESTALPHA,       /**<(Ad,   Ad,   Ad,   Ad  ) */
+		rwBLENDINVDESTALPHA,    /**<(1-Ad, 1-Ad, 1-Ad, 1-Ad) */
+		rwBLENDDESTCOLOR,       /**<(Rd,   Gd,   Bd,   Ad  ) */
+		rwBLENDINVDESTCOLOR,    /**<(1-Rd, 1-Gd, 1-Bd, 1-Ad) */
+		rwBLENDSRCALPHASAT,     /**<(f,    f,    f,    1   )  f = min (As, 1-Ad) */
+	};
 }

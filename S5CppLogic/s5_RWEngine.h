@@ -211,6 +211,8 @@ namespace RWE {
 		RwObject object;
 		RwLinkList::RwLLLink lFrame;
 		RwObjectHasFrame* (*sync)(RwObjectHasFrame* object);
+
+		// 629210 _rwObjectHasFrameSetFrame
 	};
 
 	struct RwStreamMemory
@@ -399,6 +401,18 @@ namespace RWE {
 		// 62A000 RpMaterialDestroy
 		// 62A060 RpMaterialStreamRead
 		// 629EE0 RpMaterialCreate
+
+		// 629FA0 RpMaterialRegisterPlugin
+		// 629FD0 RpMaterialRegisterPluginStream
+
+		// 7138F0 RpMatFXMaterialSetEffects
+		// 713310 RpMatFXMaterialSetBumpMapCoefficient
+		// 713140 RpMatFXMaterialSetBumpMapTexture
+		// 7133E0 RpMatFXMaterialSetEnvMapTexture
+		// 7134D0 RpMatFXMaterialSetEnvMapCoefficient
+		// 713480 RpMatFXMaterialSetEnvMapFrameBufferAlpha
+		// 713620 RpMatFXMaterialSetDualTexture
+		// 713690 RpMatFXMaterialSetDualBlendModes
 	};
 
 	struct RpAtomic {
@@ -432,6 +446,8 @@ namespace RWE {
 		void SetGeometry(RpGeometry* geometry, bool assumeSameBoundingSphere);
 
 		// RpAtomicGetWorldBoundingSphere 628B90
+
+		// 629320 RpAtomicCreate
 
 		static inline const RpAtomicCallBack SetPlayerColorCb = reinterpret_cast<RpAtomicCallBack>(0x48F361);
 		static inline const RpAtomicCallBack DisableShadowCb = reinterpret_cast<RpAtomicCallBack>(0x721FD8);
@@ -822,6 +838,48 @@ namespace RWE {
 		// 717D40 UserDataObjectGetSize
 	};
 	// 717FE0 RpUserDataPluginAttach
+
+
+	struct RpMatFXMaterial { // material stores p to this
+		enum class DataType : int {
+			BumpMap = 1,
+			EnvMap = 2,
+			DualTexture = 4,
+			UVTransformMat = 5,
+		};
+		struct Data {
+			union {
+				struct {
+					RwFrame* Frame;
+					RwTexture* Texture;
+					RwTexture* SourceTexture;
+					float Coefficient;
+					PADDINGI(1);
+				} BumpMap;
+				struct {
+					RwFrame* Frame;
+					RwTexture* Texture;
+					float Coefficient;
+					int UseFrameBufferAlpha;
+					PADDINGI(1);
+				} EnvMap;
+				struct {
+					RwTexture* Texture;
+					RwBlendFunction SrcBlendMode;
+					RwBlendFunction DstBlendMode;
+				} DualTexture;
+				struct {
+					RwMatrix* BaseTransform;
+					RwMatrix* DualTransform;
+				} UVTransform;
+			} Source;
+			DataType Type;
+		};
+
+		Data D[2];
+		RpMatFXMaterialFlags Flags;
+	};
+	// 713E60 RpMatFXPluginAttach
 }
 
 struct RwTexture {

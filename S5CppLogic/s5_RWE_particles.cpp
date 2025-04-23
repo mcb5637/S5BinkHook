@@ -8,9 +8,13 @@ void RWE::Particles::RpPrtStdPropertyTable::Destroy()
 }
 
 static inline int(__cdecl* const proptab_getpoff)(RWE::Particles::RpPrtStdPropertyTable* th, int id) = reinterpret_cast<int(__cdecl*)(RWE::Particles::RpPrtStdPropertyTable*, int)>(0x5D97F0);
-int RWE::Particles::RpPrtStdPropertyTable::GetPropOffset(Properties id)
+int RWE::Particles::RpPrtStdPropertyTable::GetPropOffset(EmitterProperties id)
 {
     return proptab_getpoff(this, static_cast<int>(id));
+}
+int RWE::Particles::RpPrtStdPropertyTable::GetPropOffset(ParticleProperties id)
+{
+    return GetPropOffset(static_cast<EmitterProperties>(static_cast<int>(id)));
 }
 
 static inline void(__cdecl* const eclass_destroy)(RWE::Particles::RpPrtStdEmitterClass* th) = reinterpret_cast<void(__cdecl*)(RWE::Particles::RpPrtStdEmitterClass*)>(0x5DA340);
@@ -57,50 +61,55 @@ void RWE::Particles::RpPrtStdEmitter::AddEmitter(RpPrtStdEmitter* em)
 
 RWE::Particles::RpPrtStdEmitterStandard* RWE::Particles::RpPrtStdEmitter::GetStandard()
 {
-    return static_cast<RpPrtStdEmitterStandard*>(GetDataById(RpPrtStdPropertyTable::Properties::STANDARD));
+    return static_cast<RpPrtStdEmitterStandard*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::STANDARD));
 }
 
 RWE::Particles::RpPrtStdEmitterPrtColor* RWE::Particles::RpPrtStdEmitter::GetColor()
 {
-    return static_cast<RpPrtStdEmitterPrtColor*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTCOLOR));
+    return static_cast<RpPrtStdEmitterPrtColor*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::PRTCOLOR));
 }
 
 RWE::Particles::RpPrtStdEmitterPrtTexCoords* RWE::Particles::RpPrtStdEmitter::GetTexCoords()
 {
-    return static_cast<RpPrtStdEmitterPrtTexCoords*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTTEXCOORDS));
+    return static_cast<RpPrtStdEmitterPrtTexCoords*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::PRTTEXCOORDS));
 }
 
 RWE::Particles::RpPrtStdEmitterPrt2DRotate* RWE::Particles::RpPrtStdEmitter::GetRotate()
 {
-    return static_cast<RpPrtStdEmitterPrt2DRotate*>(GetDataById(RpPrtStdPropertyTable::Properties::PRT2DROTATE));
+    return static_cast<RpPrtStdEmitterPrt2DRotate*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::PRT2DROTATE));
 }
 
 RWE::Particles::RpPrtStdEmitterPrtSize* RWE::Particles::RpPrtStdEmitter::GetSize()
 {
-    return static_cast<RpPrtStdEmitterPrtSize*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTSIZE));
+    return static_cast<RpPrtStdEmitterPrtSize*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::PRTSIZE));
 }
 
 RWE::Particles::RpPrtStdEmitterPTank* RWE::Particles::RpPrtStdEmitter::GetTank()
 {
-    return static_cast<RpPrtStdEmitterPTank*>(GetDataById(RpPrtStdPropertyTable::Properties::PTANK));
+    return static_cast<RpPrtStdEmitterPTank*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::PTANK));
 }
 
 RWE::Particles::RpPrtStdEmitterPrtMatrix* RWE::Particles::RpPrtStdEmitter::GetMatrix()
 {
-    return static_cast<RpPrtStdEmitterPrtMatrix*>(GetDataById(RpPrtStdPropertyTable::Properties::PRTMATRIX));
+    return static_cast<RpPrtStdEmitterPrtMatrix*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::PRTMATRIX));
 }
 
-RWE::Particles::Ex_CircularEmitter* RWE::Particles::RpPrtStdEmitter::GetCircularEmitter()
+RWE::Particles::RpPrtAdvEmtPrtEmt* RWE::Particles::RpPrtStdEmitter::GetAdvParticleEmitter()
 {
-    return static_cast<Ex_CircularEmitter*>(GetDataById(RpPrtStdPropertyTable::Properties::Ex_CircularEmitter));
+    return static_cast<RpPrtAdvEmtPrtEmt*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::ADVPROPERTYCODEEMITTERPRTEMITTER));
 }
 
-RWE::Particles::Ex_FogEmitter* RWE::Particles::RpPrtStdEmitter::GetFogEmitter()
+RWE::Particles::RpPrtAdvEmtCircle* RWE::Particles::RpPrtStdEmitter::GetAdvCircleEmitter()
 {
-    return static_cast<Ex_FogEmitter*>(GetDataById(RpPrtStdPropertyTable::Properties::Ex_FogEmitter));
+    return static_cast<RpPrtAdvEmtCircle*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::ADVPROPERTYCODEEMITTERCIRCLE));
 }
 
-void* RWE::Particles::RpPrtStdEmitter::GetDataById(RpPrtStdPropertyTable::Properties p)
+RWE::Particles::RpPrtAdvEmtPointList* RWE::Particles::RpPrtStdEmitter::GetAdvPointListEmitter()
+{
+    return static_cast<RpPrtAdvEmtPointList*>(GetDataById(RpPrtStdPropertyTable::EmitterProperties::ADVPROPERTYCODEEMITTERPOINTLIST));
+}
+
+void* RWE::Particles::RpPrtStdEmitter::GetDataById(RpPrtStdPropertyTable::EmitterProperties p)
 {
     int off = emtClass->propTab->GetPropOffset(p);
     if (off == 0)

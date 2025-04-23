@@ -16,7 +16,7 @@ namespace RWE::Particles {
 	 */
 	struct RpPrtStdPropertyTable
 	{
-		enum class Properties : int {
+		enum class EmitterProperties : int {
 			EMITTER = 0,
 			STANDARD = 1,
 			PRTCOLOR = 2,
@@ -27,8 +27,32 @@ namespace RWE::Particles {
 			PRTVELOCITY = 7,
 			PRTMATRIX = 8,
 
-			Ex_FogEmitter = 0x1000006,
-			Ex_CircularEmitter = 0x1000007,
+			ADVPROPERTYCODEEMITTERPRTCHAIN = 0x1000000,
+			ADVPROPERTYCODEEMITTERPRTEMITTER = 0x1000001,
+			ADVPROPERTYCODEEMITTERPRTMULTICOLOR = 0x1000002,
+			ADVPROPERTYCODEEMITTERPRTMULTITEXCOORDS = 0x1000003,
+			ADVPROPERTYCODEEMITTERPRTMULTITEXCOORDSSTEP = 0x1000004,
+			ADVPROPERTYCODEEMITTERPRTMULTISIZE = 0x1000005,
+			ADVPROPERTYCODEEMITTERPOINTLIST = 0x1000006,
+			ADVPROPERTYCODEEMITTERCIRCLE = 0x1000007,
+			ADVPROPERTYCODEEMITTERSPHERE = 0x1000008,
+		};
+		enum class ParticleProperties : int {
+			STANDARD = 0,
+			POSITION = 1,
+			COLOR = 2,
+			TEXCOORDS = 3,
+			PRT2DROTATE = 4,
+			SIZE = 5,
+			VELOCITY = 6,
+			MATRIX = 7,
+
+			ADVPROPERTYCODEPARTICLECHAIN = 0x1000000,
+			ADVPROPERTYCODEPARTICLEEMITTER = 0x1000001,
+			ADVPROPERTYCODEPARTICLEMULTICOLOR = 0x1000002,
+			ADVPROPERTYCODEPARTICLEMULTITEXCOORDS = 0x1000003,
+			ADVPROPERTYCODEPARTICLEMULTITEXCOORDSSTEP = 0x1000004,
+			ADVPROPERTYCODEPARTICLEMULTISIZE = 0x1000005,
 		};
 
 
@@ -45,7 +69,8 @@ namespace RWE::Particles {
 
 		static inline RpPrtStdPropertyTable* (__cdecl* const Get)(int id) = reinterpret_cast<RpPrtStdPropertyTable * (__cdecl*)(int)>(0x5D9820);
 		void Destroy(); // decrements refcount, destroys when unused
-		int GetPropOffset(Properties id);
+		int GetPropOffset(EmitterProperties id);
+		int GetPropOffset(ParticleProperties id);
 	};
 	
 	/**
@@ -68,6 +93,44 @@ namespace RWE::Particles {
 		PRTSTDEMITTERCALLBACKSTREAMGETSIZE,            /**< Emitter stream get size callback */
 		PRTSTDEMITTERCALLBACKCLONE,                    /**< Emitter clone  callback */
 	};
+
+	enum class EmitterClassId : int {
+		STANDARD = 0x00000001,
+		PRTCOLOR = 0x00000002,
+		PRTTEXCOORDS = 0x00000004,
+		PRT2DROTATE = 0x00000008,
+		PRTSIZE = 0x00000010,
+		PTANK = 0x00000020,
+		PRTMATRIX = 0x00000040,
+		ADVPRTEMITTER = 0x00000100,
+		ADVMULTICOLOR = 0x00000200,
+		ADVMULTITEXCOORDS = 0x00000400,
+		ADVMULTITEXCOORDSSTEP = 0x00000800,
+		ADVMULTISIZE = 0x00001000,
+		ADVPOINTLIST = 0x00010000,
+		ADVCIRCLE = 0x00020000,
+		ADVSPHERE = 0x00030000,
+	};
+	template<>
+	class ::enum_is_flags<EmitterClassId> : public std::true_type {};
+	enum class ParticleClassId : int {
+		STANDARD = 0x00000001,
+		POSITION = 0x00000002,
+		COLOR = 0x00000004,
+		TEXCOORDS = 0x00000008,
+		PRT2DROTATE = 0x00000010,
+		SIZE = 0x00000020,
+		VELOCITY = 0x00000040,
+		MATRIX = 0x00000080,
+
+		ADVPRTEMITTER = 0x00000100,
+		ADVMULTICOLOR = 0x00000200,
+		ADVMULTITEXCOORDS = 0x00000400,
+		ADVMULTITEXCOORDSSTEP = 0x00000800,
+		ADVMULTISIZE = 0x00001000,
+	};
+	template<>
+	class ::enum_is_flags<ParticleClassId> : public std::true_type {};
 
 	/**
 	 * \ingroup rpprtstd
@@ -206,6 +269,23 @@ namespace RWE::Particles {
 		RwMatrix* ltm; /**< LTM to transform particle coordinates from local space to world space */
 	};
 	//constexpr int i = offsetof(RpPrtStdEmitterStandard, prtDelta2DRotate) / 4;
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdParticleStandard
+	 * A structure represent the set of properties for a basic particle. This structure is mandatory
+	 * for all particles.
+	 * The structure contain the life duration of the particle. The particle will be removed when the current
+	 * time is greater than the end time. The particle timer always starts at zero.
+	 *
+	 * The inverted end time is for interpolating optional particle properties.
+	 */
+	struct RpPrtStdParticleStandard
+	{
+		int                     flag;                               /**< Particle's property flag */
+		float                      currTime,                           /**< Particle's curr time  */
+			endTime,                            /**< Particle's end time */
+			invEndTime;                         /**< Particle's inv end for interpolation */
+	};
 
 	/**
 	 * \ingroup rpprtstd
@@ -222,6 +302,17 @@ namespace RWE::Particles {
 			prtStartColBias; /**< Particle start color bias */
 		RwRGBAReal prtEndCol, /**< Particle end color */
 			prtEndColBias; /**< Particle end color bias */
+	};
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdParticleColor
+	 * A structure representing the change in a particle's color during its life time. The structure is optional
+	 * and should not be used if particles have a constant color.
+	 */
+	struct RpPrtStdParticleColor
+	{
+		RwRGBAReal                  startCol,                           /**< Particle's end size bias */
+			deltaCol;                           /**< Particle's color rate of change */
 	};
 
 	/**
@@ -247,6 +338,19 @@ namespace RWE::Particles {
 		RwTexCoords prtEndUV1, /**< Particle end bottom right texcoords */
 			prtEndUV1Bias; /**< Particle end bottom right texcoords bias */
 	};
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdParticleTexCoords
+	 * A structure representing the change in a particle's texcoords during its life time. The structure is optional
+	 * and should not be used if particles have a constant texcoords.
+	 */
+	struct RpPrtStdParticleTexCoords
+	{
+		RwTexCoords                 startUV0,                           /**< Particle's starting top left texcoords */
+			startUV1;                           /**< Particle's starting bottom right texcoords */
+		RwTexCoords                 deltaUV0,                           /**< Particle's top left texcoords rate of change */
+			deltaUV1;                           /**< Particle's bottom right texcoords rate of change */
+	};
 
 	/**
 	 * \ingroup rpprtstd
@@ -267,6 +371,17 @@ namespace RWE::Particles {
 		float prtEnd2DRotate, /**< Particle end 2D rotate */
 			prtEnd2DRotateBias; /**< Particle end 2D rotate bias */
 	};
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdParticle2DRotate
+	 * A structure representing the changed in the 2D rotation of a particle during its life time. The structure is optional
+	 * and should not be used if particles does not rotate or uses a matrix.
+	 */
+	struct RpPrtStdParticle2DRotate
+	{
+		float                      start2DRotate,                      /**< Particle's starting 2D rotation */
+			delta2DRotate;                      /**< Particle's 2D rotation rate of change */
+	};
 
 	/**
 	 * \ingroup rpprtstd
@@ -283,6 +398,19 @@ namespace RWE::Particles {
 			prtStartSizeBias; /**< Particle start size bias */
 		RwV2d prtEndSize, /**< Particle end size */
 			prtEndSizeBias; /**< Particle end size bias */
+	};
+	/**
+	 * \ingroup rpprtstd
+	 * \struct RpPrtStdParticleSize
+	 * A structure representing the change in a particle's size during its life time. The structure is optional
+	 * and should not be used if particles have a constant size.
+	 */
+	struct RpPrtStdParticleSize
+	{
+		RwV2d                       startSize,                          /**< Particle's starting size */
+			deltaSize;                          /**< Particle's size rate of change */
+		RwV2d                       currSize,                           /**< Particle's current size. Internal use only */
+			invCurrSize;                        /**< Particle's inverse current size. Internal use only */
 	};
 
 	/**
@@ -393,17 +521,277 @@ namespace RWE::Particles {
 		int flags; /**< Particle matrix flag. See \ref RpPrtStdEmitterPrtMatrixFlags */
 	};
 
-	struct Ex_CircularEmitter {
-		float Radius, InPlaneRandomness, HeightRandomness;
-		int IsHorizontal;
-		float Angle; // rad
+	/**
+	 * \ingroup prtadvprtemitter
+	 * \struct RpPrtAdvEmtPrtEmt
+	 *
+	 * Properties for the PrtEmitter emitter type, that allow each particle to
+	 * control a sub-emitter.
+	 */
+	struct RpPrtAdvEmtPrtEmt
+	{
+		float                              time;       /**<Time before first
+														 * emission of the
+														 * sub-emitter.*/
+		float                              timeBias;   /**<Time bias.*/
+		float                              timeGap;    /**<Time gap between each
+														 * emission of the
+														 * sub-emitter.*/
+		float                              timeGapBias;/**<Time gap bias.*/
+		RpPrtStdEmitter* emitter;   /**<Pointer to the
+														 * sub-emitter.*/
+	};
+	/**
+	 * \ingroup prtadvprtemitter
+	 * \struct RpPrtAdvPrtEmitter
+	 *
+	 * Properties for the PrtEmitter particle type, that allow each particle to
+	 * control a sub-emitter.
+	 */
+	struct RpPrtAdvPrtEmitter
+	{
+		float                              emtEmitTime;        /**<Time before
+																 * next emission of
+																 * the sub-emitter.*/
+		float                              emtEmitTimeGap;     /**<Time gap between
+																 *  each emission of
+																 *  the sub-emitter.*/
 	};
 
-	struct Ex_FogEmitter {
-		int Size;
-		int Bool1, Bool2;
-		RwV3d* SpawnOffsets;
-		RwV3d* Data;
+	/**
+	 * \ingroup prtadvmultiprop
+	 * \struct RpPrtAdvEmtPrtMultiColor
+	 *
+	 * Properties for the MultiColor emitter type, that allow particles' colors to
+	 * be interpolated through several colors.
+	 *
+	 */
+	struct RpPrtAdvEmtPrtMultiColor
+	{
+		/**
+		 * \ingroup prtadvmultiprop
+		 * \struct RpPrtAdvEmtPrtColorItem
+		 *
+		 * Used to store each color keyframe when using the MultiColors particles.
+		 */
+		struct RpPrtAdvEmtPrtColorItem
+		{
+			float                              time;       /**<Time.*/
+			float                              timeBias;   /**<Time bias.*/
+			RwRGBAReal                          midCol;     /**<Color.*/
+			RwRGBAReal                          midColBias; /**<Color bias.*/
+		};
+
+		uint32_t                            numCol; /**<Number of steps.*/
+		RpPrtAdvEmtPrtColorItem* list;  /**<Pointer to the
+													 * \ref RpPrtAdvEmtPrtColorItem
+													 * describing the different step
+													 *  of the color animation.*/
+
+		uint32_t                            offsetTime;         /**< Internal usage */
+		uint32_t                            offsetStartCol;     /**< Internal usage */
+		uint32_t                            offsetDeltaCol;     /**< Internal usage */
+	};
+	/**
+	 * \ingroup prtadvmultiprop
+	 * \struct RpPrtAdvPrtMultiColor
+	 *
+	 * Properties for the MultiColor particle type, that allow particle's colors to
+	 * be interpolated through several colors.
+	 * These properties are generated by the MultiColor emitter.
+	 */
+	struct RpPrtAdvPrtMultiColor
+	{
+		uint32_t                            currIndex;  /**<Current position in the animation.*/
+	};
+
+	/**
+	 * \ingroup prtadvmultiprop
+	 * \struct RpPrtAdvEmtPrtMultiTexCoords
+	 *
+	 * Properties for the MultiTexCoords emitter type, that allow particles' texture
+	 * coordinates to be interpolated through several texture coordinates.
+	 */
+	struct RpPrtAdvEmtPrtMultiTexCoords
+	{
+		/**
+		 * \ingroup prtadvmultiprop
+		 * \struct RpPrtAdvEmtPrtTexCoordsItem
+		 *
+		 * Used to store each Texture Coordinates keyframe when using the MultiTexCoords
+		 * particles.
+		 */
+		struct RpPrtAdvEmtPrtTexCoordsItem
+		{
+			float                              time;       /**<Time.*/
+			float                              timeBias;   /**<Time bias.*/
+			RwTexCoords                         midUV0;     /**<Top-Left UV set.*/
+			RwTexCoords                         midUV0Bias; /**<Top-Left UV set bias.*/
+			RwTexCoords                         midUV1;     /**<Bottom-Right UV set.*/
+			RwTexCoords                         midUV1Bias; /**<Bottom-Right UV set
+															 * bias.*/
+		};
+
+
+		uint32_t                            numTex; /**<Number of steps.*/
+		RpPrtAdvEmtPrtTexCoordsItem* list;  /**<Pointer to the
+													 * \ref RpPrtAdvEmtPrtTexCoordsItem
+													 * describing the different step
+													 *  of the texture coordinates
+													 * animation.*/
+
+		uint32_t                            offsetTime;         /**< Internal usage */
+		uint32_t                            offsetStartUV0;     /**< Internal usage */
+		uint32_t                            offsetDeltaUV0;     /**< Internal usage */
+		uint32_t                            offsetStartUV1;     /**< Internal usage */
+		uint32_t                            offsetDeltaUV1;     /**< Internal usage */
+	};
+	/**
+	 * \ingroup prtadvmultiprop
+	 * \struct RpPrtAdvPrtMultiTexCoords
+	 *
+	 * Properties for the MultiTexCoords particle type, that allow particle's
+	 * texture coordinates to be interpolated through several texture coordinates.
+	 * These properties are generated by the MultiTexCoords emitter.
+	 */
+	struct RpPrtAdvPrtMultiTexCoords
+	{
+		uint32_t                            currIndex;  /**<Current position in the animation.*/
+	};
+	/**
+	 * \ingroup prtadvtexstep
+	 * \struct RpPrtAdvPrtTexStep
+	 *
+	 * Properties for the MultiTexCoordsStep particle type, that allow particle's
+	 * texture coordinates to be set one by one.
+	 * These properties are generated by the MultiTexCoordsStep emitter.
+	 */
+	struct RpPrtAdvPrtTexStep
+	{
+		uint32_t                            currIndex;  /**<Current position in the animation.*/
+	};
+
+	/**
+	 * \ingroup prtadvmultiprop
+	 * \struct RpPrtAdvEmtPrtMultiSize
+	 *
+	 * Properties for the MultiSize emitter type, that allow particles' size to be
+	 * interpolated through several sizes.
+	 */
+	struct RpPrtAdvEmtPrtMultiSize
+	{
+		/**
+		 * \ingroup prtadvmultiprop
+		 * \struct RpPrtAdvEmtPrtSizeItem
+		 *
+		 * Used to store each size keyframe when using the MultiSize particles.
+		 */
+		struct RpPrtAdvEmtPrtSizeItem
+		{
+			float                              time;           /**<Time.*/
+			float                              timeBias;       /**<Time bias.*/
+			RwV2d                               midSize;        /**<Size.*/
+			RwV2d                               midSizeBias;    /**<Size bias.*/
+		};
+
+
+		uint32_t                            numSize;    /**<Number of steps.*/
+		RpPrtAdvEmtPrtSizeItem* list;      /**<Pointer to the
+														 * \ref RpPrtAdvEmtPrtSizeItem
+														 * describing the different
+														 * step of the size
+														 * animation.*/
+
+		uint32_t                            offsetTime;         /**< Internal usage */
+		uint32_t                            offsetStartSize;    /**< Internal usage */
+		uint32_t                            offsetDeltaSize;    /**< Internal usage */
+	};
+	/**
+	 * \ingroup prtadvmultiprop
+	 * \struct RpPrtAdvPrtMultiSize
+	 *
+	 * Properties for the MultiSize particle type, that allow particle's sizes to be
+	 * interpolated through several sizes.
+	 * These properties are generated by the MultiSize emitter.
+	 */
+	struct RpPrtAdvPrtMultiSize
+	{
+		uint32_t                            currIndex;  /**<Current position in the animation.*/
+	};
+
+	/**
+	 * \ingroup prtadvcircle
+	 * \struct RpPrtAdvEmtCircle
+	 *
+	 * Properties for the circular emitter type, that allow to use a circular, disc or
+	 * cylindrical shaped emitter.
+	 */
+	struct RpPrtAdvEmtCircle {
+		float                              radius;             /**<Radius.*/
+		float                              radiusGap;          /**<Width of the
+																 * disc.*/
+		float                              height;             /**<Height of the
+																 * shape.*/
+
+		int                              useCircleEmission;  /**<Set to generate
+																 * the particle
+																 * initial velocity
+																 * using it's
+																 * position on the
+																 * shape.*/
+		// rad
+		float                              dirRotation;        /**<Rotate the
+																 * initial velocity
+																 * around the circle
+																 *  (used when
+																 * \ref useCircleEmission
+																 * is set to TRUE).*/
+	};
+
+	/**
+	 * \ingroup prtadvpointlist
+	 * \struct RpPrtAdvEmtPointList
+	 *
+	 * Properties for the PointList emitter type, that allow to use a list of point
+	 * (and an optional direction) to vary the particle's position
+	 * (and optionally it's initial velocity).
+	 */
+	struct RpPrtAdvEmtPointList {
+		uint32_t                            numPoint;       /**<Number of points
+													 * in the list.*/
+		uint32_t                            lastPoint;      /**<Index of the
+															 * last point used to
+															 * emit particles.*/
+		int                              useDirection;   /**<Use or not the
+															 * direction list to
+															 * generate the initial
+															 * velocity of the
+															 * particles.*/
+		int                              random;         /**<Set if the points
+															 * are to be used
+															 * randomly.*/
+		RwV3d* pointList;     /**<Pointer to the
+															 * list of point.*/
+		RwV3d* directionList; /**<Pointer to the
+															 * list of directions.*/
+	};
+
+	/**
+	 * \ingroup prtadvsphere
+	 * \struct RpPrtAdvEmtSphere
+	 *
+	 * Properties for the spherical emitter type, that allow to use a spherical shaped emitter.
+	 */
+	struct RpPrtAdvEmtSphere
+	{
+		float                              radius;             /**<Radius.*/
+		float                              radiusGap;          /**<Width of the sphere.*/
+
+		int                              useSphereEmission;  /**<Set to set the
+																 * particle initial
+																 * velocity using
+																 * it's position on
+																 * the shape.*/
 	};
 
 	struct RpPrtStdEmitter {
@@ -435,13 +823,14 @@ namespace RWE::Particles {
 		RpPrtStdEmitterPrtSize* GetSize();
 		RpPrtStdEmitterPTank* GetTank();
 		RpPrtStdEmitterPrtMatrix* GetMatrix();
-		Ex_CircularEmitter* GetCircularEmitter();
-		Ex_FogEmitter* GetFogEmitter();
+		RpPrtAdvEmtPrtEmt* GetAdvParticleEmitter();
+		RpPrtAdvEmtCircle* GetAdvCircleEmitter();
+		RpPrtAdvEmtPointList* GetAdvPointListEmitter();
 
 		static inline const RpPrtStdEmitterCallBack* DisableAll = reinterpret_cast<RpPrtStdEmitterCallBack*>(0x720028);
 		static inline const RpPrtStdEmitterCallBack* EnableAll = reinterpret_cast<RpPrtStdEmitterCallBack*>(0x72001F);
 	private:
-		void* GetDataById(RpPrtStdPropertyTable::Properties p);
+		void* GetDataById(RpPrtStdPropertyTable::EmitterProperties p);
 	};
 
 }

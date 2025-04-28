@@ -397,6 +397,9 @@ namespace RWE {
 		// 62EEA0 RpGeometryStreamRead
 		// 62EB60 RpGeometryCreate
 		// 62E6B0 RpGeometryAddMorphTargets
+
+		// 6ED580 RpSkinGeometryGetSkin
+		// 6ED590 RpSkinGeometrySetSkin
 	};
 
 	typedef void        (*RwResEntryDestroyNotify) (RwResEntry* resEntry);
@@ -475,6 +478,9 @@ namespace RWE {
 		// RpAtomicGetWorldBoundingSphere 628B90
 
 		// 629320 RpAtomicCreate
+
+		// 6ED550 RpSkinAtomicSetHAnimHierarchy
+		// 6ED570 RpSkinAtomicGetHAnimHierarchy
 
 		static inline const RpAtomicCallBack SetPlayerColorCb = reinterpret_cast<RpAtomicCallBack>(0x48F361);
 		static inline const RpAtomicCallBack DisableShadowCb = reinterpret_cast<RpAtomicCallBack>(0x721FD8);

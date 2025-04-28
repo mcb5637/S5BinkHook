@@ -478,7 +478,7 @@ namespace GGL {
 			float Value;
 		};
 
-		PADDINGI(4); // vector?
+		shok::Vector<ModifyableValue*> OnTickReset;
 		shok::EntityId EntityId;
 		ModifyableValue ExperiencePoints; // 6, 84 in settler
 		ModifyableValue ExperienceLevel;
@@ -499,7 +499,7 @@ namespace GGL {
 		float HealthBar; //37
 		float HealthMax; // 38
 		PADDINGI(1); // 39
-		PADDINGI(7); // 40 string?
+		shok::String CurrentTaskList; // 40 where does this get updated?
 		struct EntityRef {
 			friend class CEntityProfile;
 			EGL::CGLEEntity* Self; // 125 in settler

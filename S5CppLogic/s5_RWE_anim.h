@@ -186,6 +186,9 @@ namespace RWE::Anim {
 		 * the keyframes for a given animation. */
 		int customDataSize;
 		/**< Amount of custom data required per animation. */
+
+		// 6EAB60 RtAnimGetInterpolatorInfo
+		// 6EAAC0 RtAnimRegisterInterpolationScheme
 	};
 }
 
@@ -249,6 +252,10 @@ struct RtAnimAnimation
 
 	static RtAnimAnimation* Read(const char* name);
 	void Destroy();
+	// 6EABD0 RtAnimAnimationCreate
+	// 6EAD50 RtAnimAnimationStreamGetSize
+	// 6EAD70 RtAnimAnimationGetNumNodes
+	// 6EB1D0 RtAnimAnimationStreamWrite
 };
 
 
@@ -332,6 +339,8 @@ namespace RWE::Anim {
 		void Blend(RtAnimInterpolator* in1, RtAnimInterpolator* in2, float alpha);
 
 		// 6EADA0 RtAnimInterpolatorCreate
+		// 6EAEE0 RtAnimInterpolatorCopy
+		// 6EB140 RtAnimInterpolatorAddTogether
 	};
 
 	/**
@@ -420,5 +429,96 @@ namespace RWE::Anim {
 	class ::enum_is_flags<RpHAnimHierarchy::RpHAnimHierarchyFlag> : public std::true_type {};
 	//constexpr int i = offsetof(RpHAnimHierarchy, pNodeInfo) / 4;
 
+	/**
+	 * \ingroup rtcmpkey
+	 * \struct RtCompressedKeyFrame
+	 * A structure representing data for a compressed keyframe. Sequences of
+	 * such keyframes in an \ref RtAnimAnimation defines the animation of each
+	 * node in a hierarchy.
+	 *
+	 * Based on \ref RtAnimKeyFrameHeader.
+	 */
+	struct RtCompressedKeyFrame
+	{
+		RtCompressedKeyFrame* prevFrame;    /**< Pointer to the previous keyframe */
+		float              time;           /**< Time at keyframe */
+		uint16_t            qx;             /**< Compressed rotation quat.imag.x at keyframe */
+		uint16_t            qy;             /**< Compressed rotation quat.imag.y at keyframe */
+		uint16_t            qz;             /**< Compressed rotation quat.imag.z at keyframe */
+		uint16_t            qr;             /**< Compressed rotation quat.real at keyframe */
+		uint16_t            tx;             /**< Compressed translation x at keyframe */
+		uint16_t            ty;             /**< Compressed translation y at keyframe */
+		uint16_t            tz;             /**< Compressed translation z at keyframe */
+	};
+
+	/**
+	 * \ingroup rtcmpkey
+	 * \struct RtCompressedKeyFrameCustomData
+	 * A structure representing additional custom data for a compressed animation.
+	 * This data represents offsets and scalars to decompress translation values.
+	 *
+	 */
+	struct RtCompressedKeyFrameCustomData
+	{
+		RwV3d   offset; /**< Offset to center all translation values around 0,0 */
+		RwV3d   scalar; /**< Scalar to normalize translation values */
+		/* Note: This structure is used for streaming; please take care while
+				 modifying */
+	};
+
+	/**
+	 * \ingroup rpskin
+	 * \struct RwMatrixWeights
+	 * A structure for defining up to four matrix weights per vertex.
+	 * Not all entries need to be used.
+	 *
+	 * \note
+	 * Values should be sorted, such that any zero 0.0f entries appear
+	 * after the valid weights. Any weights that appear after a zero
+	 * entry will be ignored.
+	 *
+	 * \see RpSkinCreate
+	 */
+	struct RwMatrixWeights
+	{
+		float w0; /**< The first matrix weight.  */
+		float w1; /**< The second matrix weight. */
+		float w2; /**< The third matrix weight.  */
+		float w3; /**< The fourth matrix weight. */
+	};
+
+	// not in headers ...
+	struct RpSkin {
+		uint32_t NumBones;
+		uint32_t NumUsedBones;
+		uint32_t* UsedBonesData;
+		RwMatrix* SkinToBoneMatrices; // 3
+		int MaxWeight; // max index of used (!=0) weight
+		uint32_t* VertexBoneIndices; // 5
+		RwMatrixWeights* VertexBoneWeights;
+		PADDINGI(2);
+		struct Split {
+			uint32_t BoneLimit;
+			uint32_t NumMeshes;
+			uint32_t NumRLE;
+			uint8_t* MeshBoneRemapIndices;
+			uint8_t* MeshBoneRLECount;
+			uint8_t* MeshBoneRLE;
+		} SplitData;
+		void* AllocatedBuffer; // 15
+
+		// 6ED600 RpSkinGetSkinToBoneMatrices
+		// 6ED5F0 RpSkinGetVertexBoneIndices
+		// 6ED5E0 RpSkinGetVertexBoneWeights
+		// 6ED610 RpSkinAtomicGetType
+	};
+	static_assert(offsetof(RpSkin, SkinToBoneMatrices) == 3 * 4);
+
+	//sizeof(RpSkin) == 64? (from freelist)
+	// stored in atomic/geometry: some pointer
+
 	// 6EC770 RpHAnimPluginAttach
+	// 6EAA90 RtAnimInitialize
+	// 5E5AC0 RtCompressedKeyFrameRegister
+	// 6ED970 RpSkinPluginAttach
 }

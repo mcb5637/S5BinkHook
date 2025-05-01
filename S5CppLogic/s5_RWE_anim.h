@@ -517,8 +517,121 @@ namespace RWE::Anim {
 	//sizeof(RpSkin) == 64? (from freelist)
 	// stored in atomic/geometry: some pointer
 
+	/**
+	 * \ingroup rpuvanim
+	 * \def RP_UVANIM_MAXSLOTS is the maximum number of separate UV animations
+	 * that can be applied to a single material
+	 */
+	constexpr int RP_UVANIM_MAXSLOTS = 8;
+	/**
+	 * \ingroup rpuvanim
+	 * \def RP_UVANIM_MAXNAME is the maximum number of chars stored in a UV
+	 * animation name, including the terminating NULL
+	 */
+	constexpr int RP_UVANIM_MAXNAME = 32;
+
+	struct _rpUVAnimCustomData   /* Warning - streaming depends on layout */
+	{
+		char name[RP_UVANIM_MAXNAME];
+		uint32_t nodeToUVChannelMap[RP_UVANIM_MAXSLOTS];
+		uint32_t refCount;
+	};
+
+	/**
+	 * \ingroup rpuvanim
+	 * \struct RpUVAnimLinearKeyFrameData
+	 * A structure representing linear keyframe data.
+	 */
+	struct RpUVAnimLinearKeyFrameData
+	{
+		float              uv[6];
+		/**< UV matrix at keyframe  */
+		/**<   (matrix) | uv[0] uv[1] - | (right) */
+		/**<            | uv[2] uv[3] - | (up) */
+		/**<            |  -     -    - | (at) */
+		/**<            | uv[4] uv[5] - | (pos) */
+		/**<The transformed UV texture coordinates will be: */
+		/**<   u' = rx * u + ux * v + px */
+		/**<   v' = ry * u + uy * v + py */
+	};
+	/**
+	 * \ingroup rpuvanim
+	 * \struct RpUVAnimParamKeyFrameData
+	 * A structure representing paramaterized keyframe data.
+	 */
+	struct RpUVAnimParamKeyFrameData
+	{
+		float              theta;  /**< Angle of rotation at keyframe  */
+		float              s0;     /**< x-scaling at keyframe  */
+		float              s1;     /**< y-scaling at keyframe  */
+		float              skew;   /**< skew at keyframe       */
+		float              x;      /**< x-position at keyframe */
+		float              y;      /**< y-position at keyframe */
+	};
+	/**
+	 * \ingroup rpuvanim
+	 * \struct RpUVAnimKeyFrameData
+	 * A union representing linear or paramaterized keyframe data.
+	 */
+	union RpUVAnimKeyFrameData
+	{
+		RpUVAnimLinearKeyFrameData linear; /**< Linear format keyframe */
+		RpUVAnimParamKeyFrameData param;   /**< Parameterized format keyframe */
+	};
+	/**
+	 * \ingroup rpuvanim
+	 * \struct RpUVAnimKeyFrame
+	 * A structure representing the standard keyframe data. Sequences of
+	 * such keyframes in an \ref RtAnimAnimation define the entire UV animation.
+	 */
+	struct RpUVAnimKeyFrame
+	{
+		RpUVAnimKeyFrame* prevFrame; /**< Pointer to the previous keyframe */
+		float               time;       /**< Time at keyframe */
+		RpUVAnimKeyFrameData data;       /**< Linear or parameterized keyframe data */
+	};
+
+	/**
+	 * \ingroup rpuvanim
+	 * \ref RpUVAnim
+	 * typedef for struct RpUVAnim
+	 */
+	struct RpUVAnim : public RtAnimAnimation {
+		// 5E2940 RpUVAnimCreate 
+		// 5E2820 _rpUVAnimCreateConsistantMatrices
+		// 5E29A0 RpUVAnimDestroy
+		// 5E29E0 RpUVAnimAddRef
+
+		constexpr _rpUVAnimCustomData* GetCustomData() {
+			return static_cast<_rpUVAnimCustomData*>(customData);
+		}
+		constexpr RpUVAnimKeyFrame* GetKeyFrames() {
+			return static_cast<RpUVAnimKeyFrame*>(pFrames);
+		}
+
+		static inline RWE::dict::RtDictSchema* _rpUVAnimDictSchema = reinterpret_cast<RWE::dict::RtDictSchema*>(0x83E384);
+	};
+
+
+	/**
+	 * \ingroup rpmorph
+	 * \struct RpMorphInterpolator
+	 * structure describing morph interpolator
+	 */
+	struct RpMorphInterpolator
+	{
+		int32_t  flags; /**< flags */
+		int16_t  startMorphTarget; /**< startMorphTarget */
+		int16_t  endMorphTarget; /**< endMorphTarget */
+		float   time; /**< time */
+		float   recipTime; /**< recipTime */
+		RpMorphInterpolator* next; /**< next */
+	};
+
 	// 6EC770 RpHAnimPluginAttach
 	// 6EAA90 RtAnimInitialize
 	// 5E5AC0 RtCompressedKeyFrameRegister
 	// 6ED970 RpSkinPluginAttach
+	// 5E32A0 RpUVAnimPluginAttach
+	// 5D8FE0 RpMorphPluginAttach
 }

@@ -149,7 +149,7 @@ namespace RWE::Anim {
 	 */
 	struct RtAnimInterpolatorInfo
 	{
-		int typeID;
+		AnimType typeID;
 		/**< The ID of the interpolation scheme. */
 		int interpKeyFrameSize;
 		/**< Size, in bytes, of the interpolated keyframe structure. */
@@ -369,6 +369,44 @@ namespace RWE::Anim {
 	};
 
 	/**
+	 * \ingroup rtquat
+	 * \struct RtQuat
+	 * A structure describing a Quaternion
+	 *
+	*/
+	struct RtQuat
+	{
+		RwV3d               imag;   /**< The imaginary part(s) */
+		float              real;   /**< The real part */
+	};
+
+	/**
+	 * \ingroup rphanim
+	 * \struct RpHAnimKeyFrame
+	 * A structure representing the standard keyframe data. Sequences of
+	 * such keyframes in an \ref RtAnimAnimation defines the animation of each
+	 * node in a hierarchy.
+	 */
+	struct RpHAnimKeyFrame
+	{
+		RpHAnimKeyFrame* prevFrame;  /**< Pointer to the previous keyframe */
+		float              time;       /**< Time at keyframe */
+		RtQuat              q;          /**< Quaternion rotation at keyframe  */
+		RwV3d               t;          /**< Translation at keyframe  */
+	};
+
+
+	struct RpHierarchicalAnim : RtAnimAnimation
+	{
+
+
+		void* GetCustomData() = delete;
+		constexpr RpHAnimKeyFrame* GetKeyFrames() {
+			return static_cast<RpHAnimKeyFrame*>(pFrames);
+		}
+	};
+
+	/**
 	 * \ingroup rphanim
 	 * \struct RpHAnimHierarchy
 	 * An RpHAnimHierarchy is used to "play back" an animation.
@@ -464,6 +502,18 @@ namespace RWE::Anim {
 		RwV3d   scalar; /**< Scalar to normalize translation values */
 		/* Note: This structure is used for streaming; please take care while
 				 modifying */
+	};
+
+	struct RtCompressedAnim : RtAnimAnimation
+	{
+
+
+		constexpr RtCompressedKeyFrameCustomData* GetCustomData() {
+			return static_cast<RtCompressedKeyFrameCustomData*>(customData);
+		}
+		constexpr RtCompressedKeyFrame* GetKeyFrames() {
+			return static_cast<RtCompressedKeyFrame*>(pFrames);
+		}
 	};
 
 	/**

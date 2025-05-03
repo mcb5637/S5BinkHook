@@ -777,4 +777,12 @@ namespace RWE {
 		rpMESHHEADERUNINDEXED = 0x0100, /**< Topology is defined implicitly by vertex
 										 *   order, ergo the mesh contains no indices */
 	};
+
+	enum class AnimType : int
+	{
+		HierarchicalAnim = 1,
+		CompressedAnim = 2,
+		UVAnimLinear = 0x1C0,
+		UVAnimParam = 0x1C1,
+	};
 }

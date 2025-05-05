@@ -274,8 +274,10 @@ namespace BB {
 
 		static BB::IFileSystem* LoadorderTop;
 
-		static const char* ReadFileToString(const char* name, size_t* size);
+		static std::string ReadFileToString(const char* name);
 		static bool DoesFileExist(const char* name);
+
+		// init filesystem 5466E1(const char* lang, int extraNum, 0, bool noBba)
 	};
 	//constexpr int i = offsetof(CFileSystemMgr, Override) / 4;
 

@@ -408,6 +408,7 @@ namespace RWE {
 		// 62EEA0 RpGeometryStreamRead
 		// 62EB60 RpGeometryCreate
 		// 62E6B0 RpGeometryAddMorphTargets
+		// 62E890 RpGeometryForAllMaterials
 
 		// 6ED580 RpSkinGeometryGetSkin
 		// 6ED590 RpSkinGeometrySetSkin
@@ -502,6 +503,8 @@ namespace RWE {
 
 		// 6ED550 RpSkinAtomicSetHAnimHierarchy
 		// 6ED570 RpSkinAtomicGetHAnimHierarchy
+
+		// 492184 BB get "3dsmax User Properties" userdata of frame (ret RpUserDataArray*)
 
 		static inline const RpAtomicCallBack SetPlayerColorCb = reinterpret_cast<RpAtomicCallBack>(0x48F361);
 		static inline const RpAtomicCallBack DisableShadowCb = reinterpret_cast<RpAtomicCallBack>(0x721FD8);
@@ -878,6 +881,8 @@ namespace RWE {
 		// 717DD0 RpUserDataArrayGetFormat
 		// 717DE0 RpUserDataArrayGetNumElements
 		// 717DF0 RpUserDataArrayGetInt
+
+		// 4921F3 BB getStringPropertyStaringWith(const char*)
 	};
 	struct UserDataObject // this is whats stored in the frame/...
 	{

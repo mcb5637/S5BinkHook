@@ -345,31 +345,19 @@ void BB::CFileStreamEx::Close()
 
 BB::IFileSystem* BB::CFileSystemMgr::LoadorderTop = nullptr;
 
-const char* BB::CFileSystemMgr::ReadFileToString(const char* name, size_t* size)
+std::string BB::CFileSystemMgr::ReadFileToString(const char* name)
 {
-	char* buff = nullptr;
-	try
-	{
-		BB::CFileStreamEx filestr{};
-		if (filestr.OpenFile(name, BB::CFileStreamEx::Flags::DefaultRead)) {
-			size_t s = filestr.GetSize();
-			if (size)
-				*size = s;
-			if (s > 0) {
-				buff = new char[s + 1];
-				memset(buff, 0, s + 1);
-				filestr.Read(buff, s);
-			}
-			filestr.Close();
+	std::string r{};
+	BB::CFileStreamEx filestr{};
+	if (filestr.OpenFile(name, BB::CFileStreamEx::Flags::DefaultRead)) {
+		size_t s = filestr.GetSize();
+		if (s > 0) {
+			r.resize(s);
+			filestr.Read(r.data(), s);
 		}
+		filestr.Close();
 	}
-	catch (...)
-	{
-		if (buff)
-			delete[] buff;
-		return nullptr;
-	}
-	return buff;
+	return r;
 }
 
 bool BB::CFileSystemMgr::DoesFileExist(const char* name)

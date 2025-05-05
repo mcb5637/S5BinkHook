@@ -325,9 +325,9 @@ namespace ED {
 	struct ModelData {
 		enum class ModelFlags : unsigned int {
 			None = 0,
-			HasUnknownAddon = 1,
+			HasParticleEffect = 1,
 			ShareShadowRaster = 2,
-			HasAnotherUnknownAddon = 4,
+			HasSkin = 4,
 			CastShadow = 8,
 			UseAlphaBlending = 0x10,
 			UseAlphaBlending_1 = 0x20,
@@ -340,12 +340,12 @@ namespace ED {
 		RWE::RpClump* Clump = nullptr;
 		PADDINGI(4);
 		ModelFlags Flags;
-		void* UVAnim = nullptr; // 6
+		RWE::RtDict* UVAnim = nullptr; // 6
 		float OnePassAlphaBlendingDistanceSquared = 0;
 		PADDINGI(1);
 		char* ModelName = nullptr; // 9
 		PADDINGI(6);
-		void* TerrainDecal = nullptr;
+		void* TerrainDecal = nullptr; // atomic?
 		float SelectionOffsetX = 0; // 17
 		float SelectionOffsetY = 0;
 		float SelectionRadius = 0;

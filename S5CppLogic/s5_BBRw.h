@@ -180,6 +180,20 @@ namespace BBRw {
 
 		static inline CEngine** const GlobalObj = reinterpret_cast<CEngine**>(0x8595E8); // technically IEngine, but CEngine is the only thing that ever ends up here
 	};
+
+	// size 4*4, id 0x44574D02, 48F466 attach
+	struct UnnamedAtomicPlugin {
+		PADDINGI(2);
+		byte SrcBlend, DestBlend; // RwBlendFunction truncated to byte
+		PADDING(1);
+		byte Flags; // 0x8 has skin, 0x20 has terraindecal?
+	};
+
+	// size 7*4, id 0x44574D01, 473344 attach
+	struct UnnamedClumpPlugin {
+		PADDINGI(3);
+		ED::ModelData* ModelData;
+	};
 }
 
 template<>

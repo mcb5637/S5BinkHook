@@ -202,6 +202,7 @@ namespace RWE {
 	struct RpWorld;
 	struct RwCamera;
 	struct RwRaster;
+	struct RtDict;
 }
 namespace RWE::Particles {
 	struct RpPrtStdEmitter;

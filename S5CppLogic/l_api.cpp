@@ -89,11 +89,8 @@ namespace CppLogic::API {
 		if (!IsExternalmap(s))
 			throw lua::LuaException{ "not a map file" };
 #endif
-		const char* data = BB::CFileSystemMgr::ReadFileToString(s, &strlen);
-		if (!data)
-			return 0;
-		L.Push(data, strlen);
-		delete[] data;
+		auto data = BB::CFileSystemMgr::ReadFileToString(s);
+		L.Push(data);
 		return 1;
 	}
 

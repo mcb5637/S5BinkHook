@@ -739,7 +739,7 @@ namespace RWE {
 	 * source alpha value might simply be written to the alpha channel with
 	 * no blending.
 	 */
-	enum RwBlendFunction
+	enum RwBlendFunction : int
 	{
 		rwBLENDNABLEND = 0,
 		rwBLENDZERO,            /**<(0,    0,    0,    0   ) */

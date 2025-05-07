@@ -21,7 +21,7 @@ namespace EGL {
 		static inline constexpr int vtp = 0x7841F8;
 
 		void ToTerrainCoord(shok::Position& p, int* out);
-		bool IsCoordValid(int* out);
+		bool IsCoordValid(int* out) const;
 		int GetTerrainVertexColor(shok::Position& p);
 		void SetTerrainVertexColor(shok::Position& p, int col); // a,r,g,b each int8
 	};

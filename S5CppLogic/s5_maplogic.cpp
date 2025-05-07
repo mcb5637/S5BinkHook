@@ -17,7 +17,7 @@ void EGL::CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
 }
-bool EGL::CTerrainVertexColors::IsCoordValid(int* out)
+bool EGL::CTerrainVertexColors::IsCoordValid(int* out) const
 {
 	return out[0] >= 0 && out[1] >= 0 && (out[0] + 1) < ArraySizeX && (out[1] + 1) < ArraySizeY;
 }

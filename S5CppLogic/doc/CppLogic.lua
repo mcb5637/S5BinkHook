@@ -369,6 +369,10 @@ function CppLogic.Logic.LandscapeGetTerrainHeight(p) end
 --- height resolution (pos/100), input full pos.
 --- @param p Position
 --- @return number terrainVertexColor
+--- @return number alpha
+--- @return number red
+--- @return number green
+--- @return number blue
 function CppLogic.Logic.LandscapeGetTerrainVertexColor(p) end
 --- gets the blocking of a position.
 --- height resolution (pos/100), input full pos.

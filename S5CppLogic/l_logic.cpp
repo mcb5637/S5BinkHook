@@ -455,8 +455,13 @@ namespace CppLogic::Logic {
 	int LandscapeGetTerrainVertexColor(lua::State ls) {
 		luaext::EState L{ ls };
 		shok::Position p = L.CheckPos(1);
-		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->VertexColors->GetTerrainVertexColor(p));
-		return 1;
+		int c = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->VertexColors->GetTerrainVertexColor(p);
+		L.Push(c);
+		L.Push((c >> 24) & 0xFF);
+		L.Push((c >> 16) & 0xFF);
+		L.Push((c >> 8) & 0xFF);
+		L.Push(c & 0xFF);
+		return 5;
 	}
 	int LandscapeGetBlocking(lua::State ls) {
 		luaext::EState L{ ls };

@@ -338,7 +338,8 @@ namespace ED {
 		};
 
 		RWE::RpClump* Clump = nullptr;
-		PADDINGI(4);
+		RWE::RpAtomic* FirstAtomic = nullptr;
+		PADDINGI(3);
 		ModelFlags Flags;
 		RWE::RtDict* UVAnim = nullptr; // 6
 		float OnePassAlphaBlendingDistanceSquared = 0;
@@ -786,6 +787,17 @@ namespace GD {
 		// 14 more methods, // 7 anim get duration (jmp resmanager getduration)
 	};
 
+	class CGlobalsBase {
+	public:
+		virtual ~CGlobalsBase() = 0;
+
+
+		BB::CIDGroupsEx* BuildingBanners;
+
+		static inline constexpr int vtp = 0x76A9DC;
+		static inline CGlobalsBase** const GlobalObj = reinterpret_cast<CGlobalsBase**>(0x8586A8);
+	};
+
 	class CDDisplay : public IDDisplay, public ED::IDisplayRenderCallbacks {
 	public:
 		PADDINGI(2); // bool int?
@@ -810,4 +822,10 @@ template<>
 inline auto CppLogic::GetIdManager<shok::TerrainTextureId>() {
 	auto mng = (*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->DisplayProps->TerrainTextureManager;
 	return CppLogic::EnumIdManager<shok::TerrainTextureId>{mng};
+}
+
+template<>
+inline auto CppLogic::GetIdManager<shok::BuildingBannerStatus>() {
+	auto mng = (*GD::CGlobalsBase::GlobalObj)->BuildingBanners->IndexIds;
+	return CppLogic::EnumIdManager<shok::BuildingBannerStatus>{mng};
 }

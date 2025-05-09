@@ -221,6 +221,7 @@ namespace RWE::Plugin {
 		// 414A40 _rwPluginRegistryDeInitObject
 		// 414A70 _rwPluginRegistryCopyObject
 		// 625DE0 _rwPluginRegistryAddPluginStream
+		// 4147A0 _rwPluginRegistryGetPluginOffset
 	};
 
 }

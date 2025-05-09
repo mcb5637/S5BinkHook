@@ -169,6 +169,7 @@ namespace RWE {
 	typedef RpAtomic* (*RpAtomicCallBack)(RpAtomic* atomic, void* data);
 	typedef RwFrame* (*RwFrameCallBack)(RwFrame* frame, void* data);
 	typedef RwObject* (*RwObjectCallBack)(RwObject* object, void* data);
+	typedef RpMaterial* (*RpMaterialCallBack)(RpMaterial* material, void* data);
 
 	struct RwFrame {
 		RwObject object;
@@ -404,11 +405,11 @@ namespace RWE {
 
 		void AddRef();
 		void Destroy();
+		void ForAllMaterials(RpMaterialCallBack fpCallBack, void* pData);
 
 		// 62EEA0 RpGeometryStreamRead
 		// 62EB60 RpGeometryCreate
 		// 62E6B0 RpGeometryAddMorphTargets
-		// 62E890 RpGeometryForAllMaterials
 
 		// 6ED580 RpSkinGeometryGetSkin
 		// 6ED590 RpSkinGeometrySetSkin
@@ -500,6 +501,7 @@ namespace RWE {
 		// RpAtomicGetWorldBoundingSphere 628B90
 
 		// 629320 RpAtomicCreate
+		// 6293F0 RpAtomicClone
 
 		// 6ED550 RpSkinAtomicSetHAnimHierarchy
 		// 6ED570 RpSkinAtomicGetHAnimHierarchy
@@ -630,6 +632,9 @@ namespace RWE {
 		bool BeginUpdate();
 		bool EndUpdate();
 		bool ShowRaster(HWND window, bool vsync);
+
+
+		// 626D20 RwCameraGetWorld
 	};
 	//constexpr int i = offsetof(RwCamera, farPlane) / 4;
 
@@ -698,6 +703,9 @@ namespace RWE {
 		void AddLight(RpLight* light);
 		void RemoveLight(RpLight* light);
 		static inline RpWorld* (__cdecl* const Create)(RwBBox* boundingBox) = reinterpret_cast<RpWorld * (__cdecl*)(RwBBox*)>(0x628370);
+
+		// 626D30 RpWorldAddAtomic
+		// 626D60 RpWorldRemoveAtomic
 	};
 
 	/**

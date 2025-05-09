@@ -270,7 +270,8 @@ namespace GD {
 
 	class CBuildingBehaviorProps : public ED::CBehaviorProps {
 	public:
-		int Banner, NumDamageEffects, NumDestroyEffects;
+		shok::BuildingBannerGroupId Banner;
+		int NumDamageEffects, NumDestroyEffects;
 
 		static inline constexpr int vtp = 0x76AF1C;
 		static inline constexpr int TypeDesc = 0x80B1C0;
@@ -322,8 +323,26 @@ namespace GD {
 	};
 	static_assert(sizeof(CCamouflageBehavior) == 5 * 4);
 
-	class CBuildingBehavior : public ED::IBehavior {
+	class CBuildingBehavior : public ED::IBehavior { // size 28
 	public:
+		ED::CEntity* EntityDisplay = nullptr;
+		GD::CBuildingBehaviorProps* Props;
+		EGL::TSlot<GGL::SSlotArgsBuilding, 119076711>* Slot;
+		struct BannerManager {
+			shok::ModelId BannerID;
+			int BoneID;
+			RWE::RpAtomic* AttachedBanner;
+
+			// 484B76 thiscall update(ED::CEntity*, modelid, boneid) checks, updates if not already set
+			// 7198CF thiscall set(ED::CEntity*, modelid, boneid)
+		} Banner; // 4
+		float ConstructonProgress, LastConstructionProgress; // 7,8
+		shok::Vector<ED::CParticleEffectAttachmentBehavior::SAttach*> Fires;
+		shok::Vector<ED::CParticleEffectAttachmentBehavior::SAttach*> DustCloud; // construction || collapsing, Props->NumDestroyEffects
+		shok::Position Pos;
+		float UnknownFloat;
+
+		// 4884C3 get num of fires thiscall(GGL::SSlotArgsBuilding*)
 
 		static inline constexpr int vtp = 0x76AF54;
 		static inline constexpr int TypeDesc = 0x80B1E8;

@@ -623,8 +623,8 @@ namespace GGL {
 		PADDING(3);
 		int MaxNumWorkers; // 72
 		shok::TechnologyId CurrentTechnology;
-		int LatestAttackTurn, MostRecentDepartureTurn; // 76
-		float ConstructionProgress, RepairProgress, UpgradeProgress; //la78
+		int LatestAttackTurn, MostRecentDepartureTurn;
+		float ConstructionProgress, RepairProgress, UpgradeProgress; // 76 la78
 		PADDINGI(2);// list Slots with NumberOfRepairingSerfs? 79
 		int NumberOfRepairingSerfs;
 		int OvertimeRechargeTime; // 82

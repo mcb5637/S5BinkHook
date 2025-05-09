@@ -185,7 +185,7 @@ namespace BBRw {
 	struct UnnamedAtomicPlugin {
 		PADDINGI(2);
 		byte SrcBlend, DestBlend; // RwBlendFunction truncated to byte
-		PADDING(1);
+		byte PlayerColor;
 		byte Flags; // 0x8 has skin, 0x20 has terraindecal?
 	};
 

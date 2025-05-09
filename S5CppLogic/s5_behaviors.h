@@ -1441,8 +1441,23 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E69FE40);
 	};
 
+	struct SSlotArgsBuilding {
+		float ConstructionProgress;
+		int NumWorkers;
+		int MaxWorkers;
+		float HealthBar;
+		bool IsCollapsing;
+		bool IsAnySerfAttached;
+	};
 	class CBuildingBehavior : public EGL::CGLEBehavior {
 	public:
+		class CSlotBuilding : public EGL::TSlot<GGL::SSlotArgsBuilding, 119076711> {
+			GGL::CBuilding* Building;
+		};
+		PADDINGI(1);
+		CSlotBuilding* Slot;
+
+
 		// 5 p to GGL::CBuildingBehavior::CSlotBuilding ?
 
 		// defined states: Default, ?

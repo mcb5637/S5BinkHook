@@ -576,7 +576,8 @@ namespace shok {
         Wait = 5, // confusingly gets resused by autocannon wait until
         Rotate = 6,
         SetNextTaskList = 7,
-        // 9 & 10 building behavior
+        // 9 building behavior
+        BuildingCollapse = 10,
         Move_NonCancelable = 12,
         WorkerJoinSettlement = 13,
         IdleInFormation = 14,

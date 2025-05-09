@@ -88,7 +88,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const WaterTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0D9C8);
 		static inline BB::CIDManagerEx** const ShorewaveTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0xA19F34);
 		static inline BB::CIDManagerEx** const ModelManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C83C);
-		static inline BB::CIDManagerEx** const BuildingBannerManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C85C);
+		static inline BB::CIDManagerEx** const BuildingBannerGroupManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C85C);
 		// A0C844 race
 	};
 	static_assert(sizeof(BB::CIDManagerEx) == 6 * 4);
@@ -100,6 +100,25 @@ namespace BB {
 		static inline BB::CIDManager** const WidgetIDManager = reinterpret_cast<BB::CIDManager**>(0x8945C8);
 		static inline BB::CIDManager** const GUITextureManager = reinterpret_cast<BB::CIDManager**>(0x8944B4);
 		static inline BB::CIDManager** const FontIDManager = reinterpret_cast<BB::CIDManager**>(0x894688);
+	};
+
+	class IIDGroups {
+	public:
+		virtual ~IIDGroups() = 0;
+		virtual void __stdcall Destroy() = 0;
+	};
+	class IIDGroupsEx : public IIDGroups {
+
+	};
+	class CIDGroupsEx : public IIDGroupsEx {
+	public:
+		BB::CIDManagerEx* GroupIds;
+		BB::CIDManagerEx* IndexIds;
+		BB::CIDManagerEx* Unknown;
+		int GroupSize;
+		shok::Vector<int> IdMap;
+
+		// 484D8D GetID thiscall(groupid, indexid)
 	};
 }
 
@@ -292,8 +311,8 @@ namespace CppLogic {
 		static inline BB::CIDManager** const Manager = BB::CIDManager::WidgetIDManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::BuildingBannerId> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::BuildingBannerManager;
+	struct IdManagerMapping<shok::BuildingBannerGroupId> {
+		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::BuildingBannerGroupManager;
 	};
 	template<>
 	struct IdManagerMapping<shok::GUITextureId> {

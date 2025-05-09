@@ -547,7 +547,13 @@ namespace shok {
 	enum class EffectId : int {
 		Invalid = 0,
 	};
-	enum class BuildingBannerId : int {
+	enum class BuildingBannerStatus : int {
+		Invalid = 0,
+		BuildingBannerStatusEmpty = 1,
+		BuildingBannerStatusOccupied = 2,
+		BuildingBannerStatusFull = 3,
+	};
+	enum class BuildingBannerGroupId : int {
 		Invalid = 0,
 	};
 	enum class ArmyId : int {

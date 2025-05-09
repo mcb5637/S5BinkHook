@@ -196,6 +196,11 @@ void RWE::RpGeometry::Destroy()
     bool (__cdecl* const f)(RWE::RpGeometry * raster) = reinterpret_cast<bool (__cdecl*)(RWE::RpGeometry*)>(0x62EE60);
     f(this);
 }
+void RWE::RpGeometry::ForAllMaterials(RpMaterialCallBack fpCallBack, void* pData)
+{
+    RpGeometry* (__cdecl* const f)(RpGeometry * th, RpMaterialCallBack fpCallBack, void* pData) = reinterpret_cast<RpGeometry * (__cdecl*)(RpGeometry*, RpMaterialCallBack, void*)>(0x62E890);
+    f(this, fpCallBack, pData);
+}
 
 static inline int(__cdecl* const atomic_isparticleemitter)(RWE::RpAtomic* a) = reinterpret_cast<int(__cdecl*)(RWE::RpAtomic*)>(0x5D9210);
 bool RWE::RpAtomic::IsParticleEmitter()

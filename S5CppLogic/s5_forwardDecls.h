@@ -57,6 +57,7 @@ namespace shok {
 	enum class Goods : int;
 	enum class MapType : int;
 	enum class ArmyId : int;
+	enum class BuildingBannerStatus : int;
 
 	// only forward decl of these, most may change at runtime
 	enum class AnimationId : int;
@@ -152,6 +153,7 @@ namespace GGL {
 	class CGLEffectLightningProps;
 	class CCannonBuilderBehaviorProps;
 	class CGLEffectFireProps;
+	struct SSlotArgsBuilding;
 }
 namespace ED {
 	class CBehaviorProps;

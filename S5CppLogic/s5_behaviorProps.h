@@ -87,6 +87,7 @@ namespace GGL {
 		static inline constexpr int vtp = 0x777510;
 		static inline constexpr int TypeDesc = 0x823224;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x512F3EED);
+		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x876E98);
 	};
 
 	class CRangedEffectAbilityProps : public GGL::CHeroAbilityProps {

@@ -387,6 +387,7 @@ namespace GGL {
 		static inline constexpr int vtp = 0x7774D4;
 		static inline constexpr int TypeDesc = 0x823254;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x259E7B1D);
+		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x876F08);
 
 		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;

@@ -357,9 +357,13 @@ namespace RWE::Anim {
 	{
 		enum class Flags : int
 		{
+			// from rwanalyze
 			Deformable = 0,
 			NubBone = 1,
 			Rigid = 3,
+			// from header
+			rpHANIMPOPPARENTMATRIX = 0x01,
+			rpHANIMPUSHPARENTMATRIX = 0x02,
 		};
 
 		int nodeID;     /**< User defined ID for this node  */

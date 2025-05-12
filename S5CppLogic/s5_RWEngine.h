@@ -126,7 +126,7 @@ namespace RWE {
 	};
 	struct RwMatrix {
 		RwV3d right;
-		unsigned int flags;
+		RwMatrixType flags;
 		RwV3d up;
 		unsigned int pad1;
 		RwV3d at;
@@ -909,6 +909,7 @@ namespace RWE {
 
 	struct RpMatFXMaterial { // material stores p to this
 		enum class DataType : int {
+			None = 0,
 			BumpMap = 1,
 			EnvMap = 2,
 			DualTexture = 4,

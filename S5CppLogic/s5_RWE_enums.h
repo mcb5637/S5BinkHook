@@ -739,7 +739,7 @@ namespace RWE {
 	 * source alpha value might simply be written to the alpha channel with
 	 * no blending.
 	 */
-	enum RwBlendFunction : int
+	enum class RwBlendFunction : int
 	{
 		rwBLENDNABLEND = 0,
 		rwBLENDZERO,            /**<(0,    0,    0,    0   ) */
@@ -785,4 +785,17 @@ namespace RWE {
 		UVAnimLinear = 0x1C0,
 		UVAnimParam = 0x1C1,
 	};
+
+	// also RwMatrixFlag and RwMatrixOptimizations
+	enum class RwMatrixType : int
+	{
+		rwMATRIXTYPENORMAL = 0x00000001,
+		rwMATRIXTYPEORTHOGONAL = 0x00000002,
+		rwMATRIXTYPEORTHONORMAL = 0x00000003,
+		rwMATRIXTYPEMASK = 0x00000003,
+		rwMATRIXINTERNALIDENTITY = 0x00020000,
+		rwMATRIXOPTIMIZE_IDENTITY = 0x00020000,
+	};
+	template<>
+	class ::enum_is_flags<RwMatrixType> : public std::true_type {};
 }

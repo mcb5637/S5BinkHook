@@ -217,6 +217,9 @@ namespace RWE {
 
 		// 717D90 RwFrameGetUserDataArray
 		// 717D60 RwFrameGetUserDataArrayCount
+
+		// 6EBBF0 RpHAnimFrameGetID
+		// 6EBBE0 RpHAnimFrameGetHierarchy
 	};
 	//constexpr int i = offsetof(RwFrame, objectList)/4;
 

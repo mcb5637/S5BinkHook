@@ -355,15 +355,20 @@ namespace RWE::Anim {
 	 */
 	struct RpHAnimNodeInfo
 	{
+		// encodes hierarchy
+		// hierarchy traversed with depth first, pus/pop flags encode it
+		// push = !last sibling
+		// pop = !has children
+		// has children | is last sibling	| flags
+		// 0			| 0					| Pop | Push
+		// 0			| 1					| Pop
+		// 1			| 0					| Push
+		// 1			| 1					| None
 		enum class Flags : int
 		{
-			// from rwanalyze
-			Deformable = 0,
-			NubBone = 1,
-			Rigid = 3,
-			// from header
-			rpHANIMPOPPARENTMATRIX = 0x01,
-			rpHANIMPUSHPARENTMATRIX = 0x02,
+			None = 0,
+			Pop = 0x01,
+			Push = 0x02,
 		};
 
 		int nodeID;     /**< User defined ID for this node  */

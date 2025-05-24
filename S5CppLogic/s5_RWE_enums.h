@@ -326,6 +326,22 @@ namespace RWE {
 	};
 	/**
 	 * \ingroup rwrenderstate
+	 * RwTextureAddressMode represents the addressing modes available
+	 * when mapping textures to polygons using UV texture coordinates.
+	 * This may be set in immediate mode via the \ref RwRenderState
+	 * \ref rwRENDERSTATETEXTUREADDRESS, or via \ref RwTextureSetAddressing
+	 * for an \ref RwTexture object.
+	 */
+	enum class RwTextureAddressMode : int
+	{
+		rwTEXTUREADDRESSNATEXTUREADDRESS = 0,
+		rwTEXTUREADDRESSWRAP,      /**<UV wraps (tiles) */
+		rwTEXTUREADDRESSMIRROR,    /**<Alternate UV is flipped */
+		rwTEXTUREADDRESSCLAMP,     /**<UV is clamped to 0-1 */
+		rwTEXTUREADDRESSBORDER,    /**<Border color takes effect outside of 0-1 */
+	};
+	/**
+	 * \ingroup rwrenderstate
 	 * RwCullMode represents the options available for culling polygons
 	 * during rendering. The cull mode may be set via the \ref RwRenderState
 	 * setting \ref rwRENDERSTATECULLMODE.

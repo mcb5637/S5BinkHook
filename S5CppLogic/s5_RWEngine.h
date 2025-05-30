@@ -22,6 +22,7 @@ namespace RWE {
 	struct RpGeometry;
 	struct RpMaterial;
 	struct RpMaterialList;
+	struct RpLight;
 	namespace dict {
 		struct RtDictSchema;
 		struct RtDict;
@@ -170,6 +171,7 @@ namespace RWE {
 	typedef RwFrame* (*RwFrameCallBack)(RwFrame* frame, void* data);
 	typedef RwObject* (*RwObjectCallBack)(RwObject* object, void* data);
 	typedef RpMaterial* (*RpMaterialCallBack)(RpMaterial* material, void* data);
+	typedef RpLight* (*RpLightCallBack) (RpLight* light, void* data);
 
 	struct RwFrame {
 		RwObject object;
@@ -538,7 +540,7 @@ namespace RWE {
 
 		// returns this
 		RpClump* ForAllAtomics(RpAtomicCallBack callback, void* pData);
-		// RpClumpForAllLights 628EC0
+		RpClump* ForAllLights(RpLightCallBack callback, void* pData);
 		// RpClumpForAllCameras 628E70
 		// RpClumpRender 628DE0
 		// RpClumpAddLight 6290F0
@@ -655,6 +657,9 @@ namespace RWE {
 		void Destroy();
 		void SetColor(const RwRGBAReal& color);
 		float GetConeAngle() const;
+		void SetFrame(RwFrame* frame);
+		RwFrame* GetFrame() const;
+		// 627920 RpLightStreamRead
 	};
 	static_assert(offsetof(RpLight, color) == 6 * 4);
 

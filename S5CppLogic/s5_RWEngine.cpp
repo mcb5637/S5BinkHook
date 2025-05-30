@@ -238,6 +238,11 @@ RWE::RpClump* RWE::RpClump::ForAllAtomics(RpAtomicCallBack callback, void* pData
 {
     return clump_forallatomics(this, callback, pData);
 }
+RWE::RpClump* RWE::RpClump::ForAllLights(RpLightCallBack callback, void* pData)
+{
+    RWE::RpClump* (__cdecl* const clump_foralllights)(RWE::RpClump* m, RWE::RpLightCallBack, void* data) = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpLightCallBack, void*)>(0x628EC0);
+    return clump_foralllights(this, callback, pData);
+}
 static inline RWE::RpWorld* (__cdecl* const clump_getworld)(const RWE::RpClump* c) = reinterpret_cast<RWE::RpWorld* (__cdecl*)(const RWE::RpClump*)>(0x626E00);
 RWE::RpWorld* RWE::RpClump::GetWorld() const
 {
@@ -374,6 +379,15 @@ inline float(__cdecl* const light_getconeangle)(const RWE::RpLight* l) = reinter
 float RWE::RpLight::GetConeAngle() const
 {
     return light_getconeangle(this);
+}
+void RWE::RpLight::SetFrame(RwFrame* frame)
+{
+    RpLight* (__cdecl* const RpLightSetFrame)(RpLight * light, RwFrame * frame) = reinterpret_cast<RpLight* (__cdecl*)(RpLight*, RwFrame*)>(0x42C290);
+    RpLightSetFrame(this, frame);
+}
+RWE::RwFrame* RWE::RpLight::GetFrame() const
+{
+    return static_cast<RWE::RwFrame*>(object.object.parent);
 }
 
 static inline RWE::RpWorld* (__cdecl* const world_addclump)(RWE::RpWorld* w, RWE::RpClump* c) = reinterpret_cast<RWE::RpWorld * (__cdecl*)(RWE::RpWorld*, RWE::RpClump*)>(0x627130);

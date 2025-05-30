@@ -300,7 +300,8 @@ int Test(lua::State Ls) {
 		cf->AddClassToFactory<BreakOnCmdBehavior>();
 	}
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
-	
+	/*auto* e = L.CheckEntity(1);
+	ED::CEntity* ed = (*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(e->EntityId);*/
 	return 0;
 }
 

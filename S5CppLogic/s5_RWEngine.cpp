@@ -304,6 +304,11 @@ void RWE::RpClump::RemoveAtomic(RpAtomic* atomic)
 {
     clump_remAtomic(this, atomic);
 }
+void RWE::RpClump::AddLight(RWE::RpLight* a)
+{
+    RWE::RpClump* (__cdecl* const clump_addLight)(RWE::RpClump * t, RWE::RpLight * a) = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpLight*)>(0x6290F0);
+    clump_addLight(this, a);
+}
 
 inline void(__cdecl* const camera_setframe)(RWE::RwCamera* cam, RWE::RwFrame* f) = reinterpret_cast<void(__cdecl*)(RWE::RwCamera*, RWE::RwFrame*)>(0x42C290);
 void RWE::RwCamera::SetFrame(RwFrame* f)

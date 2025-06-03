@@ -543,7 +543,6 @@ namespace RWE {
 		RpClump* ForAllLights(RpLightCallBack callback, void* pData);
 		// RpClumpForAllCameras 628E70
 		// RpClumpRender 628DE0
-		// RpClumpAddLight 6290F0
 
 		RpWorld* GetWorld() const;
 
@@ -562,6 +561,7 @@ namespace RWE {
 		void SetColorModulate(shok::Color argb);
 		void AddAtomic(RpAtomic* atomic);
 		void RemoveAtomic(RpAtomic* atomic);
+		void AddLight(RpLight* light);
 
 		static inline RpClump* (__cdecl* const Read)(RwStream* s) = reinterpret_cast<RpClump * (__cdecl*)(RwStream*)>(0x629990);
 	};

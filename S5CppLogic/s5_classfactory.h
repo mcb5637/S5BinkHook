@@ -163,6 +163,14 @@ namespace BB {
 		static constexpr BB::FieldSerializer* GetSerializer<shok::AdvancedDealDamageSource>() {
 			return TypeUByte; // no real serializer, but int should work
 		}
+		template<>
+		static constexpr BB::FieldSerializer* GetSerializer<shok::ModelId>() {
+			return TypeModel;
+		}
+		template<>
+		static constexpr BB::FieldSerializer* GetSerializer<shok::AnimationId>() {
+			return TypeAnim;
+		}
 
 		struct ExtendedInfo {
 			std::string_view Name;

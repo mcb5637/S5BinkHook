@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "s5_filesystem.h"
+#include "s5_exception.h"
 
 #include "hooks.h"
 
@@ -97,20 +98,24 @@ bool BB::CFileSystemMgr::CloseHandle(int handle)
 
 std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::OpenFileStreamWithSource(const char* path, BB::IStream::Flags f)
 {
-	if (Override == nullptr) {
+	if (Override == nullptr && !PathIsAbsolute(path)) { // override seems unused by shok
 		BB::IStream::Flags fnoex = f | BB::IStream::Flags::NoThrow;
 		std::string_view p{ path };
 		if (RemoveData && (p.starts_with("Data") || p.starts_with("data")) && (p[4] == '\\' || p[4] == '/')) {
 			p = p.substr(5);
 		}
 		for (auto* fs : LoadOrder) {
-			auto s = fs->OpenFileStreamUnique(p.data(), fnoex);
-			if (s != nullptr) {
-				std::string_view an = "";
-				if (auto* as = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
-					an = as->ArchiveFile.Filename;
+			try {
+				auto s = fs->OpenFileStreamUnique(p.data(), fnoex);
+				if (s != nullptr) {
+					std::string_view an = "";
+					if (auto* as = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
+						an = as->ArchiveFile.Filename;
+					}
+					return { an, std::move(s) };
 				}
-				return { an, std::move(s) };
+			}
+			catch (const BB::CFileException&) { // directory filesystem does still throw even with nothrow
 			}
 		}
 	}

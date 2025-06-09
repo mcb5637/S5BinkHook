@@ -271,6 +271,7 @@ namespace BB {
 
 		static inline BB::CFileSystemMgr** const GlobalObj = reinterpret_cast<BB::CFileSystemMgr**>(0x88F088);
 		static inline const char* (__cdecl* const PathGetExtension)(const char* path) = reinterpret_cast<const char* (__cdecl*)(const char*)>(0x40BAB3);
+		static inline bool(__cdecl* const PathIsAbsolute)(const char* path) = reinterpret_cast<bool(__cdecl*)(const char*)>(0x54DE1C);
 
 		static BB::IFileSystem* LoadorderTop;
 

@@ -599,7 +599,7 @@ function ModLoader.DiscoverUserRequested(modlist)
 		return
 	end
 	if str and str ~= "" then
-		for _, m in ModLoader.LoadModList(str) do
+		for _, m in ipairs(ModLoader.LoadModList(str)) do
 			if ModLoader.CheckUserRequestedMod(m) then
 				table.insert(modlist, m)
 			end

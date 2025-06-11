@@ -49,9 +49,7 @@ namespace RWE {
 
 	struct RwObject {
 		RwObjectType type;
-	private:
 		byte subType, flags, privateFlags;
-	public:
 		void* parent;
 	};
 	static_assert(sizeof(RwObject) == 8);
@@ -502,6 +500,12 @@ namespace RWE {
 		void AddEmitter(RWE::Particles::RpPrtStdEmitter* em);
 		RpWorld* GetWorld() const;
 		void SetGeometry(RpGeometry* geometry, bool assumeSameBoundingSphere);
+		inline Flags GetFlags() const {
+			return static_cast<Flags>(object.object.flags);
+		}
+		inline void SetFlags(Flags f) {
+			object.object.flags = static_cast<byte>(f);
+		}
 
 		// RpAtomicGetWorldBoundingSphere 628B90
 
@@ -519,6 +523,8 @@ namespace RWE {
 		static inline const RpAtomicCallBack DisableTerrainDecalCb = reinterpret_cast<RpAtomicCallBack>(0x721FB2);
 		static inline const RpAtomicCallBack SetColorModulateCb = reinterpret_cast<RpAtomicCallBack>(0x47B6E3);
 	};
+	template<>
+	class ::enum_is_flags<RpAtomic::Flags> : public std::true_type {};
 	//constexpr int i = offsetof(RpAtomic, clump) / 4;
 
 	struct rwFrameList
@@ -546,7 +552,7 @@ namespace RWE {
 
 		RpWorld* GetWorld() const;
 
-		// destroys atomics, loghts, cameras and frames in the clump
+		// destroys atomics, lights, cameras and frames in the clump
 		// destroys geometry if not used elsewhere
 		// detaches from world, if exists
 		void Destroy();

@@ -794,12 +794,25 @@ namespace RWE::Particles {
 																 * the shape.*/
 	};
 
+	enum class RpPrtStdEmitterFlags : unsigned int {
+		rpPRTSTDEMITTERFLAGALIVE = 0x00000001, /**< The emitter is alive and should not be removed */
+		rpPRTSTDEMITTERFLAGACTIVE = 0x00000002, /**< This indicates the emitter is active or idle */
+		rpPRTSTDEMITTERFLAGPTANK = 0x00000004, /**< The emitter uses the \ref rpptank */
+		rpPRTSTDEMITTERFLAGEMIT = 0x00000008, /**< This indicates the emitter can emit new particles */
+		rpPRTSTDEMITTERFLAGUPDATE = 0x00000010, /**< This indicates if the emitter is to be updated. */
+		rpPRTSTDEMITTERFLAGUPDATEPARTICLE = 0x00000020, /**< This indicated if the emitter's particles are updated. */
+		rpPRTSTDEMITTERFLAGRENDER = 0x00000040, /**< This indicates if the emitter is rendered. */
+		rpPRTSTDEMITTERFLAGRENDERPARTICLE = 0x00000080, /**< This indicates if the emitter's particles are rendered. */
+		rpPRTSTDEMITTERFLAGNOBUFFERSWAP = 0x00000100, /**< Internal usage */
+		rpPRTSTDEMITTERFLAGSTREAMREAD = 0x00000200, /**< Internal usage */
+	};
+
 	struct RpPrtStdEmitter {
 
 
 		RpPrtStdEmitter* next; /**< Pointer to the next emitter */
 
-		unsigned int flag; /**< Emitter's property flag */
+		RpPrtStdEmitterFlags flag; /**< Emitter's property flag */
 
 		RpAtomic* atomic; /**< Pointer to emitter's parent atomic */
 
@@ -829,6 +842,7 @@ namespace RWE::Particles {
 
 		static inline const RpPrtStdEmitterCallBack* DisableAll = reinterpret_cast<RpPrtStdEmitterCallBack*>(0x720028);
 		static inline const RpPrtStdEmitterCallBack* EnableAll = reinterpret_cast<RpPrtStdEmitterCallBack*>(0x72001F);
+		static inline const RpPrtStdEmitterCallBack* InitSeed = reinterpret_cast<RpPrtStdEmitterCallBack*>(0x48F053);
 	private:
 		void* GetDataById(RpPrtStdPropertyTable::EmitterProperties p);
 	};

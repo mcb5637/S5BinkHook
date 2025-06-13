@@ -128,6 +128,27 @@ bool RWE::RwFrame::Dirty() const
     return f(this);
 }
 
+int RWE::RwFrame::GetUserDataArrayCount() const
+{
+    int(__cdecl* const f)(const RWE::RwFrame * f) = reinterpret_cast<int(__cdecl*)(const RWE::RwFrame*)>(0x717D60);
+    return f(this);
+}
+RWE::RpUserDataArray* RWE::RwFrame::GetUserDataArray(int data)
+{
+    RpUserDataArray*(__cdecl* const f)(RWE::RwFrame * f, int d) = reinterpret_cast<RpUserDataArray*(__cdecl*)(RWE::RwFrame*, int)>(0x717D90);
+    return f(this, data);
+}
+RWE::RpUserDataArray* RWE::RwFrame::GetUserDataArray(std::string_view name, RpUserDataFormat fmt)
+{
+    int n = GetUserDataArrayCount();
+    for (int i = 0; i < n; ++i) {
+        auto* a = GetUserDataArray(i);
+        if (a && a->format == fmt && a->name == name)
+            return a;
+    }
+    return nullptr;
+}
+
 static inline int(__cdecl* const stream_close)(RWE::RwStream* s, void* d) = reinterpret_cast<int(__cdecl*)(RWE::RwStream*, void*)>(0x41A810);
 bool RWE::RwStream::Close(void* data)
 {

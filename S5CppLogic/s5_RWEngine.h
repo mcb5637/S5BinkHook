@@ -3,6 +3,8 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_RWE_enums.h"
+#include <span>
+#include <optional>
 
 // a lot of info about renderware comes from here: https://github.com/DK22Pac/vice-37
 // this is c code, i just c++ified it to clean up my global namespace
@@ -23,6 +25,7 @@ namespace RWE {
 	struct RpMaterial;
 	struct RpMaterialList;
 	struct RpLight;
+	struct RpUserDataArray;
 	namespace dict {
 		struct RtDictSchema;
 		struct RtDict;
@@ -210,13 +213,36 @@ namespace RWE {
 		void Destroy();
 		bool Dirty() const;
 
+		int GetUserDataArrayCount() const;
+		RpUserDataArray* GetUserDataArray(int data);
+		RpUserDataArray* GetUserDataArray(std::string_view name, RpUserDataFormat fmt);
+		template<RpUserDataFormat F>
+		auto GetUserDataArray(std::string_view name) {
+			RpUserDataArray* a = GetUserDataArray(name, F);
+			if constexpr (F == RpUserDataFormat::rpINTUSERDATA) {
+				if (a == nullptr)
+					return std::optional<std::span<int>>(std::nullopt);
+				return std::make_optional(std::span<int>{static_cast<int*>(a->data), static_cast<size_t>(a->numElements)});
+			}
+			else if constexpr (F == RpUserDataFormat::rpREALUSERDATA) {
+				if (a == nullptr)
+					return std::optional<std::span<float>>(std::nullopt);
+				return std::make_optional(std::span<float>{static_cast<float*>(a->data), static_cast<size_t>(a->numElements)});
+			}
+			else if constexpr (F == RpUserDataFormat::rpSTRINGUSERDATA) {
+				if (a == nullptr)
+					return std::optional<std::span<char*>>(std::nullopt);
+				return std::make_optional(std::span<char*>{static_cast<char**>(a->data), static_cast<size_t>(a->numElements)});
+			}
+			else {
+				return a;
+			}
+		}
+
 		// 413F50 rwFrameDestroyRecurse
 		// 4142B0 RwFrameRegisterPlugin
 		// 4142E0 rwFrameCloneRecurse
 		// 729830 RwFrameRegisterPluginStream
-
-		// 717D90 RwFrameGetUserDataArray
-		// 717D60 RwFrameGetUserDataArrayCount
 
 		// 6EBBF0 RpHAnimFrameGetID
 		// 6EBBE0 RpHAnimFrameGetHierarchy
@@ -505,6 +531,9 @@ namespace RWE {
 		}
 		inline void SetFlags(Flags f) {
 			object.object.flags = static_cast<byte>(f);
+		}
+		inline RwFrame* GetFrame() {
+			return static_cast<RwFrame*>(object.object.parent);
 		}
 
 		// RpAtomicGetWorldBoundingSphere 628B90
@@ -919,7 +948,6 @@ namespace RWE {
 		// 717D40 UserDataObjectGetSize
 	};
 	// 717FE0 RpUserDataPluginAttach
-
 
 	struct RpMatFXMaterial { // material stores p to this
 		enum class DataType : int {

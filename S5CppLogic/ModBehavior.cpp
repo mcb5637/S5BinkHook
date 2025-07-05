@@ -31,6 +31,8 @@ void CppLogic::Mod::RegisterClasses()
 	f->AddClassToFactory<LimitedAmmoUIDisplayBehavior>();
 	f->AddClassToFactory<AdvancedMarketBehaviorProps>();
 	f->AddClassToFactory<AdvancedMarketBehavior>();
+	f->AddClassToFactory<AdvancedFoundationBehaviorProps>();
+	f->AddClassToFactory<AdvancedFoundationBehavior>();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::FormationSpacedBehaviorProps::GetClassIdentifier() const
@@ -1670,4 +1672,195 @@ void CppLogic::Mod::AdvancedMarketBehavior::EventCancel(BB::CEvent* ev)
 void CppLogic::Mod::AdvancedMarketBehavior::EventGetProgress(EGL::CEventGetValue_Float* ev)
 {
 	ev->Data = 1.0f;
+}
+
+shok::ClassId __stdcall CppLogic::Mod::AdvancedFoundationBehaviorProps::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+CreateSerializationListFor(CppLogic::Mod::AdvancedFoundationBehaviorProps, Turret);
+BB::SerializationData CppLogic::Mod::AdvancedFoundationBehaviorProps::TurretData::SerializationData[] = {
+	AutoMemberSerialization(TurretData, Turret),
+	AutoMemberSerialization(TurretData, Offset),
+	AutoMemberSerialization(TurretData, BuyCost),
+	BB::SerializationData::GuardData(),
+};
+BB::SerializationData CppLogic::Mod::AdvancedFoundationBehaviorProps::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<AdvancedFoundationBehaviorProps, EGL::CGLEBehaviorProps>(),
+	AutoMemberSerialization(AdvancedFoundationBehaviorProps, Turret),
+	BB::SerializationData::GuardData(),
+};
+
+void* CppLogic::Mod::AdvancedFoundationBehaviorProps::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::AdvancedFoundationBehaviorProps::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+shok::ClassId __stdcall CppLogic::Mod::AdvancedFoundationBehavior::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+CreateSerializationListFor(CppLogic::Mod::AdvancedFoundationBehavior, Turret);
+BB::SerializationData CppLogic::Mod::AdvancedFoundationBehavior::TurretData::SerializationData[] = {
+	AutoMemberSerialization(TurretData, Turret),
+	AutoMemberSerialization(TurretData, Active),
+	BB::SerializationData::GuardData(),
+};
+BB::SerializationData CppLogic::Mod::AdvancedFoundationBehavior::SerializationData[] = {
+	BB::SerializationData::AutoBaseClass<AdvancedFoundationBehavior, EGL::CGLEBehavior>(),
+	AutoMemberSerialization(AdvancedFoundationBehavior, Turret),
+	BB::SerializationData::GuardData(),
+};
+
+void* CppLogic::Mod::AdvancedFoundationBehavior::operator new(size_t s)
+{
+	return shok::New(s);
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::AddHandlers(shok::EntityId id)
+{
+	EntityId = id;
+	auto* e = EGL::CGLEEntity::GetEntityByID(id);
+	e->CreateEventHandler<shok::EventIDs::Building_OnConstructionComplete>(this, &AdvancedFoundationBehavior::EventComplete);
+	e->CreateEventHandler<shok::EventIDs::Building_OnUpgradeCancel>(this, &AdvancedFoundationBehavior::EventComplete);
+	e->CreateEventHandler<shok::EventIDs::Building_OnUpgradeStart>(this, &AdvancedFoundationBehavior::EventStartUpgrade);
+	e->CreateEventHandler<shok::EventIDs::Foundation_OnAutoCannonDetach>(this, &AdvancedFoundationBehavior::EventTurretDetach);
+	e->CreateEventHandler<shok::EventIDs::Leader_AttackEntity>(this, &AdvancedFoundationBehavior::EventAttack);
+	e->CreateEventHandler<shok::EventIDs::CppL_AdvancedFoundation_BuyTurret>(this, &AdvancedFoundationBehavior::EventBuyTurret);
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::OnEntityLoad(EGL::CGLEBehaviorProps* p)
+{
+	PropPointer = p;
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::OnEntityUpgrade(EGL::CGLEEntity* old)
+{
+	auto* o = old->GetBehavior<AdvancedFoundationBehavior>();
+	if (o == nullptr)
+		return;
+	InitData();
+	for (unsigned int i = 0; i < std::min(o->Turret.size(), Turret.size()); ++i)
+		Turret[i].Active = o->Turret[i].Active;
+	CreateMissingTurrets();
+}
+
+bool CppLogic::Mod::AdvancedFoundationBehavior::CanBuyTurret(int i) const
+{
+	if (i < 0 || static_cast<size_t>(i) >= Turret.size())
+		return false;
+	if (Turret[i].Active)
+		return false;
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto& r = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->CurrentResources;
+	return r.HasResources(&static_cast<AdvancedFoundationBehaviorProps*>(PropPointer)->Turret[i].BuyCost);
+}
+
+bool CppLogic::Mod::AdvancedFoundationBehavior::IsTurretActive(int i) const
+{
+	if (i < 0 || static_cast<size_t>(i) >= Turret.size())
+		return false;
+	return Turret[i].Active;
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::InitData()
+{
+	auto* p = static_cast<AdvancedFoundationBehaviorProps*>(PropPointer);
+	while (Turret.size() > p->Turret.size()) {
+		ClearTurret(Turret.back());
+		Turret.pop_back();
+	}
+	if (Turret.size() != p->Turret.size())
+		Turret.resize(p->Turret.size());
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::CreateMissingTurrets()
+{
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* p = static_cast<AdvancedFoundationBehaviorProps*>(PropPointer);
+	InitData();
+	for (unsigned int i = 0; i < Turret.size(); ++i) {
+		if (!Turret[i].Active && p->Turret[i].BuyCost.Gold < 0.0f)
+			Turret[i].Active = true;
+		if (Turret[i].Active && EGL::CGLEEntity::EntityIDIsDead(Turret[i].Turret)) {
+			EGL::CGLEEntityCreator c{};
+			c.PlayerId = e->PlayerId;
+			c.EntityType = p->Turret[i].Turret;
+			c.Pos = e->Position + p->Turret[i].Offset;
+			Turret[i].Turret = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&c);
+			auto* t = EGL::CGLEEntity::GetEntityByID(Turret[i].Turret);
+			e->AttachEntity(shok::AttachmentType::FOUNDATION_TOP_ENTITY, Turret[i].Turret, shok::EventIDs::Foundation_OnAutoCannonDetach, shok::EventIDs::NoDetachEvent);
+			t->AttachEntity(shok::AttachmentType::TOP_ENTITY_FOUNDATION, EntityId, shok::EventIDs::AutoCannon_OnFoundationDetach, shok::EventIDs::NoDetachEvent);
+		}
+	}
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::ClearTurret(TurretData& t)
+{
+	if (!EGL::CGLEEntity::EntityIDIsDead(t.Turret)) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+		e->DetachObservedEntity(shok::AttachmentType::FOUNDATION_TOP_ENTITY, t.Turret, false);
+		e->DetachObserverEntity(shok::AttachmentType::TOP_ENTITY_FOUNDATION, t.Turret, false);
+		EGL::CGLEEntity::GetEntityByID(t.Turret)->Destroy();
+	}
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::EventComplete(BB::CEvent* ev)
+{
+	CreateMissingTurrets();
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::EventStartUpgrade(BB::CEvent* ev)
+{
+	for (auto& t : Turret)
+		ClearTurret(t);
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::EventTurretDetach(EGL::CEvent1Entity* ev)
+{
+	for (auto& t : Turret) {
+		if (t.Turret == ev->EntityID)
+			t.Turret = {};
+	}
+	CreateMissingTurrets();
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::EventAttack(EGL::CEvent1Entity* ev)
+{
+	for (auto& t : Turret) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(t.Turret);
+		if (e == nullptr)
+			continue;
+		e->FireEvent(ev);
+	}
+}
+
+void CppLogic::Mod::AdvancedFoundationBehavior::EventBuyTurret(EGL::CEventValue_Int* ev)
+{
+	if (!CanBuyTurret(ev->Data))
+		return;
+
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto& r = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->CurrentResources;
+	r.SubResources(static_cast<AdvancedFoundationBehaviorProps*>(PropPointer)->Turret[ev->Data].BuyCost);
+
+	Turret[ev->Data].Active = true;
+	CreateMissingTurrets();
 }

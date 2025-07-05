@@ -472,4 +472,59 @@ namespace CppLogic::Mod {
 		void EventCancel(BB::CEvent* ev);
 		void EventGetProgress(EGL::CEventGetValue_Float* ev);
 	};
+
+	class AdvancedFoundationBehaviorProps : public EGL::CGLEBehaviorProps {
+	public:
+		struct TurretData {
+			shok::EntityTypeId Turret = {};
+			shok::Position Offset;
+			shok::CostInfo BuyCost;
+
+			static BB::SerializationData SerializationData[];
+		};
+		std::vector<TurretData> Turret;
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1027);
+		static BB::SerializationData SerializationData[];
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+	};
+
+	class AdvancedFoundationBehavior : public EGL::CGLEBehavior {
+	public:
+		struct TurretData {
+			shok::EntityId Turret = {};
+			bool Active = false;
+
+			static BB::SerializationData SerializationData[];
+		};
+		std::vector<TurretData> Turret;
+
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void AddHandlers(shok::EntityId id) override;
+		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+		virtual void OnEntityUpgrade(EGL::CGLEEntity* old) override;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1028);
+		static BB::SerializationData SerializationData[];
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		bool CanBuyTurret(int i) const;
+		bool IsTurretActive(int i) const;
+	private:
+		void InitData();
+		void CreateMissingTurrets();
+		void ClearTurret(TurretData& t);
+		void EventComplete(BB::CEvent* ev);
+		void EventStartUpgrade(BB::CEvent* ev);
+		void EventTurretDetach(EGL::CEvent1Entity* ev);
+		void EventAttack(EGL::CEvent1Entity* ev);
+		void EventBuyTurret(EGL::CEventValue_Int* ev);
+	};
 }

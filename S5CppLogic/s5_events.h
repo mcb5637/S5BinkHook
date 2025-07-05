@@ -1273,29 +1273,30 @@ namespace shok {
 
 		// entity events
 		CppL_OnEntityDestroy = 0x51000, // BB::CEvent deprectated
-		CppL_OnEntityKilled = 0x51001, // GGL::CEventEntityIndex index is attacker player
-		CppL_OnDamageDealt = 0x51002, // GGL::CEventEntityIndex entity is damaged, index is damage
-		CppL_AffectedExperienceGained = 0x51003, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker
-		CppL_LightningStrike_Activate = 0x51004, // EGL::CEventPosition
-		CppL_ResDoodadRefill_Activate = 0x51005, // EGL::CEvent1Entity
-		CppL_ShieldCoverActivate = 0x51006, // BB::CEvent
-		CppL_Resurrect_Activate = 0x51007, // EGL::CEvent1Entity
-		CppL_Bombardment_Activate = 0x51008, // EGL::CEventPosition
-		CppL_BombComboCannon_Activate = 0x51009, // EGL::CEventPosition
+		CppL_OnEntityKilled, // GGL::CEventEntityIndex index is attacker player
+		CppL_OnDamageDealt, // GGL::CEventEntityIndex entity is damaged, index is damage
+		CppL_AffectedExperienceGained, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker
+		CppL_LightningStrike_Activate, // EGL::CEventPosition
+		CppL_ResDoodadRefill_Activate, // EGL::CEvent1Entity
+		CppL_ShieldCoverActivate, // BB::CEvent
+		CppL_Resurrect_Activate, // EGL::CEvent1Entity
+		CppL_Bombardment_Activate, // EGL::CEventPosition
+		CppL_BombComboCannon_Activate, // EGL::CEventPosition
+		CppL_AdvancedFoundation_BuyTurret, // EGL::CEventValue_Int
 
 		// script events
 		CppLogicEvent_OnEntityKilled = 0x50003, // CppLogic::Events::AdvHurtEvent
-		CppLogicEvent_OnPayday = 0x50004, // GGL::CEventGoodsTraded
-		CppLogicEvent_OnConvert = 0x50005, // CppLogic::Events::ConversionEvent
-		CppLogicEvent_OnEffectCreated = 0x50006, // EGL::CEvent1Entity
-		CppLogicEvent_OnFlyingEffectHit = 0x50007, // EGL::CEvent1Entity
-		CppLogicEvent_OnEffectDestroyed = 0x50008, // EGL::CEvent1Entity
-		CppLogicEvent_OnResourceRefined = 0x50009, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker, BuyAmount can be changed)
-		CppLogicEvent_OnRefinerSupplyTaken = 0x5000A, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker)
-		CppLogicEvent_OnResourceMined = 0x5000B, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker/serf)
-		CppLogicEvent_CanBuySettler = 0x5000C, // CppLogic::Events::CanBuySettlerEvent
-		CppLogicEvent_OnMapStarted = 0x5000D, // BB::CEvent
-		CppLogicEvent_OnSavegameLoaded = 0x5000E, // CppLogic::Events::SaveLoadedEvent
+		CppLogicEvent_OnPayday, // GGL::CEventGoodsTraded
+		CppLogicEvent_OnConvert, // CppLogic::Events::ConversionEvent
+		CppLogicEvent_OnEffectCreated, // EGL::CEvent1Entity
+		CppLogicEvent_OnFlyingEffectHit, // EGL::CEvent1Entity
+		CppLogicEvent_OnEffectDestroyed, // EGL::CEvent1Entity
+		CppLogicEvent_OnResourceRefined, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker, BuyAmount can be changed)
+		CppLogicEvent_OnRefinerSupplyTaken, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker)
+		CppLogicEvent_OnResourceMined, // GGL::CEventGoodsTraded (also fired on entities worker and workplace, entity is worker/serf)
+		CppLogicEvent_CanBuySettler, // CppLogic::Events::CanBuySettlerEvent
+		CppLogicEvent_OnMapStarted, // BB::CEvent
+		CppLogicEvent_OnSavegameLoaded, // CppLogic::Events::SaveLoadedEvent
 	};
 
 	enum class InputEventIds : int {

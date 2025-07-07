@@ -1341,6 +1341,16 @@ namespace EGUIX {
 		// fire event on widget 558C2E __thiscall(CProjectWidget*, BB::CEvent*)
 	};
 	static_assert(offsetof(CEventManager, CurrentModifiers) == 7 * 4);
+
+	// no vtable
+	class WidgetFuncManager {
+	public:
+		lua_State* ActiveState;
+		shok::WidgetId CurrentWidget;
+
+		static inline WidgetFuncManager* (__cdecl* const GlobalObj)() = reinterpret_cast<WidgetFuncManager* (__cdecl*)()>(0x55ADE0);
+		// ctor 55AE9D
+	};
 }
 
 namespace CppLogic {

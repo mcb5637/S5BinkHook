@@ -3508,7 +3508,7 @@ function RedirectLayerPopHelper:Set(n, r) end
 
 ---@class ModpackDesc
 local ModpackDesc = {
-	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "", Version = "",
+	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "", MainmenuPath = "", Version = "",
 	---@type string[]
 	Required = {},
 	---@type string[]
@@ -3516,7 +3516,7 @@ local ModpackDesc = {
 	---@type string[]
 	Override = {},
 	DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false,
-	UserRequestable = false,
+	UserRequestable = false, ScriptLib = false,
 	Archive = nil|ArchivePopHelper,
 	RedirectLayer = nil|RedirectLayerPopHelper
 }

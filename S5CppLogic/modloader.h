@@ -11,7 +11,7 @@
 
 namespace CppLogic::ModLoader {
 	class ModLoader {
-		static void Init(lua::State L, const char* mappath, std::string_view func);
+		static void Init(lua::State L, const char* mappath, std::string_view func, std::function<void(lua::State)> pushMapInfo);
 		static void PreMapStart(lua_State* ingame, const char* name, const char* path, bool externalmap);
 		static void PostMapscriptLoaded();
 		static void PreSaveLoad(lua_State* ingame, Framework::GameModeStartMapData* data, bool externalmap);
@@ -410,10 +410,10 @@ namespace CppLogic::ModLoader {
 	};
 
 	struct ModpackDesc {
-		std::string Name, BBAPath, LoaderPath, ScriptPath, Version;
+		std::string Name, BBAPath, LoaderPath, ScriptPath, MainmenuPath, Version;
 		std::vector<std::string> Required, Incompatible, Override;
 		bool DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false;
-		bool UserRequestable = false;
+		bool UserRequestable = false, ScriptLib = false;
 
 		static const BB::SerializationData SerializationData[];
 		static const BB::SerializationData SerializationDataEx[];

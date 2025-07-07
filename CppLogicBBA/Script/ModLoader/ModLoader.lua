@@ -86,6 +86,15 @@ if false then
 	---@field Cleanup fun()|nil
 	---@field LanguageOrder string[]|nil
 	local ModLoader = {
+		MapInfo = {
+			MapName = "",
+			MapType = 0,
+			MapCampagnName = "",
+			MapGUID = "",
+			IsSavegame = false,
+			---@type string|nil
+			SaveLoading = "",
+		}
 	}
 end
 
@@ -306,8 +315,9 @@ end
 --- walks a mod list, discovers and adds all requirements
 --- @param req string[]
 --- @param modlist ModList|nil
+--- @param checkUserRequested boolean|nil
 --- @return ModList
-function ModLoader.DiscoverRequired(req, modlist)
+function ModLoader.DiscoverRequired(req, modlist, checkUserRequested)
 	modlist = modlist or {Mods = {}, Incompatible = {}, Missing = {}}
 	for _, r in ipairs(req) do
 		local name, cmp = ModLoader.ParseModString(r)
@@ -322,20 +332,29 @@ function ModLoader.DiscoverRequired(req, modlist)
 			local m = CppLogic.ModLoader.GetModpackInfo(name)
 			if type(m) == "table" then
 				assert(cmp(m.Version), "mod version missmatch: "..m.Name)
-				table.insert(modlist.Mods, m)
-				for _, i in ipairs(m.Incompatible) do
-					local f = false
-					for _, i2 in ipairs(modlist.Incompatible) do
-						if i == i2 then
-							f = true
-							break
-						end
-					end
-					if not f then
-						table.insert(modlist.Incompatible, i)
+				local good = true
+				if checkUserRequested then
+					assert(m.UserRequestable or m.MainmenuMod, name.." is user requested, but not marked as user requestable or mainmenu")
+					if not m.UserRequestable then
+						good = false
 					end
 				end
-				ModLoader.DiscoverRequired(m.Required, modlist)
+				if good then
+					table.insert(modlist.Mods, m)
+					for _, i in ipairs(m.Incompatible) do
+						local f = false
+						for _, i2 in ipairs(modlist.Incompatible) do
+							if i == i2 then
+								f = true
+								break
+							end
+						end
+						if not f then
+							table.insert(modlist.Incompatible, i)
+						end
+					end
+					ModLoader.DiscoverRequired(m.Required, modlist)
+				end
 			else
 				assert(false, "missing mod: "..name)
 			end
@@ -394,7 +413,7 @@ end
 --- initializes mod (load its loader, then call Init)
 --- @param mod ModpackDesc
 function ModLoader.InitMod(mod)
-	if mod.LoaderPath ~= "" then
+	if mod.DataMod and mod.LoaderPath ~= "" then
 		Script.Load(mod.LoaderPath)
 		xpcall(function()
 			---@diagnostic disable-next-line: undefined-field
@@ -405,14 +424,20 @@ function ModLoader.InitMod(mod)
 	end
 end
 
---- loads a modlst
 --- @param modlist ModList
-function ModLoader.LoadMods(modlist)
+function ModLoader.LoadArchives(modlist)
 	-- [n] ... [2] overrides [1]
 	-- always inserted after s5x -> {s5x, n, ..., 2, 1}
 	for i, m in ipairs(modlist.Mods) do
 		modlist.Mods[i] = ModLoader.LoadMod(m)
 	end
+end
+
+--- loads a modlst
+--- @param modlist ModList
+function ModLoader.LoadMods(modlist)
+	-- [n] ... [2] overrides [1]
+	ModLoader.LoadArchives(modlist)
 	-- merge ignores items already present -> {s5x, n, ..., 2, 1}
 	for i=table.getn(modlist.Mods),1,-1 do
 		ModLoader.InitMod(modlist.Mods[i])
@@ -421,15 +446,19 @@ end
 
 --- removes no longer needed ModPack bbas
 --- @param modlist ModList
----@param script boolean|nil
-function ModLoader.CleanupMods(modlist, script)
+--- @param script boolean|nil
+--- @param lib boolean|nil
+--- @param force boolean|nil
+function ModLoader.CleanupMods(modlist, script, lib, force)
 	for _, m in ipairs(modlist.Mods) do
-		if m.Archive and not m.KeepArchive and (script or m.ScriptPath == "") then
-			m.Archive:Remove()
-			m.Archive = nil
-			if m.RedirectLayer then
-				m.RedirectLayer:Remove()
-				m.RedirectLayer = nil
+		if m.Archive then
+			if force or (not m.KeepArchive and (script or m.ScriptPath == "") and (lib or not m.ScriptLib)) then
+				m.Archive:Remove()
+				m.Archive = nil
+				if m.RedirectLayer then
+					m.RedirectLayer:Remove()
+					m.RedirectLayer = nil
+				end
 			end
 		end
 	end
@@ -438,8 +467,16 @@ end
 --- discovers mods and loads them
 function ModLoader.RequireModList()
 	xpcall(function()
-		ModLoader.DiscoverUserRequested(ModLoader.RequiredMods)
+		if ModLoader.MapInfo.IsSavegame then
+			local _, ml = ModLoader.ParseSaveGUID(ModLoader.MapInfo.MapGUID, ModLoader.MapInfo.MapName,
+				ModLoader.MapInfo.MapType, ModLoader.MapInfo.MapCampagnName
+			)
+			ModLoader.RequiredMods = ml
+		end
 		ModLoader.ModList = ModLoader.DiscoverRequired(ModLoader.RequiredMods)
+		if not ModLoader.MapInfo.IsSavegame then
+			ModLoader.DiscoverUserRequested(ModLoader.ModList)
+		end
 		ModLoader.SortMods(ModLoader.ModList)
 		ModLoader.LoadMods(ModLoader.ModList)
 		ModLoader.StoreModList(ModLoader.ModList)
@@ -561,7 +598,7 @@ function ModLoader.LoadModScripts()
 	end
 	ModLoader.ModScriptsLoaded = true
 	for _, m in ipairs(ModLoader.ModList.Mods) do
-		if m.ScriptPath ~= "" then
+		if m.ScriptMod and m.ScriptPath ~= "" then
 			Script.Load(m.ScriptPath)
 		end
 	end
@@ -569,6 +606,7 @@ function ModLoader.LoadModScripts()
 end
 
 --- executes ScriptPath of a ModPack, to be used from your mapscript if no ModLoader is present
+--- does not handle modpack dependencies
 --- @param name string
 --- @return ModpackDesc
 function ModLoader.LoadScriptMod(name)
@@ -592,18 +630,14 @@ function ModLoader.IsUserRequestedModWhitelisted(modname)
 end
 
 --- parse user requested mods and add them to the mod list
---- @param modlist string[]
+--- @param modlist ModList
 function ModLoader.DiscoverUserRequested(modlist)
 	local str = GDB.GetString("CppLogic\\UserRequestedMods")
 	if not ModLoader.CheckUserRequestedMod then
 		return
 	end
 	if str and str ~= "" then
-		for _, m in ipairs(ModLoader.LoadModList(str)) do
-			if ModLoader.CheckUserRequestedMod(m) then
-				table.insert(modlist, m)
-			end
-		end
+		ModLoader.DiscoverRequired(ModLoader.LoadModList(str), modlist, true)
 	end
 end
 
@@ -650,4 +684,31 @@ function ModLoader.LoadSTTOverride(name, into)
 		end
 	end
 	assert(false, "cannot find STT override file "..name)
+end
+
+---parses a savegame guid into map guid and mod list
+---returns nil, if map could not be found
+---@param guid string
+---@param mapname string
+---@param maptype number
+---@param cname string
+---@return string|nil mapguid
+---@return string[]|nil modlist
+function ModLoader.ParseSaveGUID(guid, mapname, maptype, cname)
+	local _, mapguid, _, err = CppLogic.API.MapGetDataPath(mapname, maptype, cname, true)
+	if err then
+		return nil, nil
+	end
+	local len = string.len(mapguid)
+	local g = string.sub(guid, 1, len)
+	if g ~= mapguid then
+		return nil, nil
+	end
+	local ml = ModLoader.LoadModList(string.sub(guid, len+1))
+	return g, ml
+end
+
+---	unloads all script lib bbas
+function ModLoader.UnloadScriptLibs()
+	ModLoader.CleanupMods(ModLoader.ModList, true, true)
 end

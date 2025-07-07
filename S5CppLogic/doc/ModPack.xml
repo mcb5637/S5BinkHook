@@ -3,8 +3,10 @@
 <root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/mcb5637/s5xmlschema/master/modpack.xsd">
 	<!-- path to the modloader lua (loaded before starting the map) -->
 	<LoaderPath>Data/ModPack/YourModName/ModPackLoader.lua</LoaderPath>
-	<!-- path to the ingame scipt loader (loaded by a call to ModLoader.LoadModScripts() after map start) -->
+	<!-- path to the ingame scipt loader (loaded automatically after map script) -->
 	<ScriptPath>Data/ModPack/YourModName/ScriptLoader.lua</ScriptPath>
+	<!-- path to the mainmenu script (loaded into maimenu, to modify UI, register a callback in ModLoaderMainmenu.InitUICallbacks (may be called multiple times))-->
+	<MainmenuPath>Data/ModPack/YourModName/MainmenuLoader.lua</MainmenuPath>
 	<!-- states, that your ModPack only works, if a ModPack of this name is present (does not change load order, may be used multiple times) -->
 	<Required>SomeOtherCoolMod</Required>
 	<!-- your modPack will not get loaded, if a ModPack with this name is present (may be used multiple times) -->
@@ -15,8 +17,10 @@
 	<DataMod>true</DataMod>
 	<!-- ModPack contains runtime scripts intended for ModLoader.LoadModScripts() -->
 	<ScriptMod>true</ScriptMod>
-	<!-- ModPack contains scripts intended for the main menu (WIP) -->
+	<!-- ModPack contains scripts intended for the main menu -->
 	<MainmenuMod>false</MainmenuMod>
+	<!-- ModPack contains a script library to be referenced by a mapscript. the archive will only be removed on a call to ModLoader.UnloadScriptLibs() -->
+	<ScriptLib>false</ScriptLib>
 	<!-- ModPack requires the archive to stay loaded during the map -->
 	<KeepArchive>false</KeepArchive>
 	<!-- ModPack can be requested by the user -->

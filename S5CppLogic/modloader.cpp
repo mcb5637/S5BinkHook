@@ -35,7 +35,7 @@
 shok::String CppLogic::ModLoader::ModLoader::ModPackList{};
 size_t CppLogic::ModLoader::ModLoader::GUIDLength = 0;
 
-void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func)
+void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func, std::function<void(lua::State)> pushMapInfo)
 {
 	Log(L, "Initializing ModLoader");
 	InitExtraECats();
@@ -53,6 +53,9 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std
 	L.Push("ModLoader");
 	L.GetGlobal();
 	if (L.IsTable(-1)) {
+		L.Push("MapInfo");
+		pushMapInfo(L);
+		L.SetTableRaw(-3);
 		L.Push("Initialize");
 		L.GetTableRaw(-2);
 		if (L.IsFunction(-1)) {
@@ -91,10 +94,26 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std
 void CppLogic::ModLoader::ModLoader::PreMapStart(lua_State* ingame, const char* name, const char* path, bool externalmap)
 {
 	lua::State L{ ingame };
-	static constexpr size_t bufflen = 0x3FF;
-	char mappath[bufflen];
-	snprintf(mappath, bufflen, "%s\\%s\\ModLoader.lua", externalmap ? "Maps" : path, externalmap ? "ExternalMap" : name);
-	Init(L, mappath, "MapStart");
+	auto mappath = std::format("{}\\{}\\ModLoader.lua", externalmap ? "Maps" : path, externalmap ? "ExternalMap" : name);
+	Init(L, mappath.c_str(), "MapStart", [](lua::State L) {
+		const GS3DTools::CMapData& m = (*Framework::CMain::GlobalObj)->CurrentMap;
+		L.NewTable();
+		L.Push("MapName");
+		L.Push(m.MapName);
+		L.SetTableRaw(-3);
+		L.Push("MapType");
+		L.Push(static_cast<int>(m.MapType));
+		L.SetTableRaw(-3);
+		L.Push("MapCampagnName");
+		L.Push(m.MapCampagnName);
+		L.SetTableRaw(-3);
+		L.Push("MapGUID");
+		L.Push(m.MapGUID);
+		L.SetTableRaw(-3);
+		L.Push("IsSavegame");
+		L.Push(false);
+		L.SetTableRaw(-3);
+	});
 }
 void CppLogic::ModLoader::ModLoader::PostMapscriptLoaded()
 {
@@ -137,10 +156,29 @@ void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::G
 	if (!sdata->LoadSaveData(data->Folder))
 		throw 0;
 	lua::State L{ ingame };
-	static constexpr size_t bufflen = 0x3FF;
-	char mappath[bufflen];
-	snprintf(mappath, bufflen, "%s\\ModLoader.lua", externalmap ? "Maps\\ExternalMap" : internalmap_getpath(&sdata->CurrentSave->MapData));
-	Init(L, mappath, "LoadSave");
+	auto mappath = std::format("{}\\ModLoader.lua", externalmap ? "Maps\\ExternalMap" : internalmap_getpath(&sdata->CurrentSave->MapData));
+	Init(L, mappath.c_str(), "LoadSave", [&](lua::State L) {
+		L.NewTable();
+		const GS3DTools::CMapData& m = sdata->CurrentSave->MapData;
+		L.Push("MapName");
+		L.Push(m.MapName);
+		L.SetTableRaw(-3);
+		L.Push("MapType");
+		L.Push(static_cast<int>(m.MapType));
+		L.SetTableRaw(-3);
+		L.Push("MapCampagnName");
+		L.Push(m.MapCampagnName);
+		L.SetTableRaw(-3);
+		L.Push("MapGUID");
+		L.Push(m.MapGUID);
+		L.SetTableRaw(-3);
+		L.Push("IsSavegame");
+		L.Push(true);
+		L.SetTableRaw(-3);
+		L.Push("SaveLoading");
+		L.Push(data->Folder);
+		L.SetTableRaw(-3);
+	});
 }
 void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
 {
@@ -1330,6 +1368,7 @@ CreateSerializationListFor(CppLogic::ModLoader::ModpackDesc, Required);
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[]{
 	AutoMemberSerialization(ModpackDesc, LoaderPath),
 	AutoMemberSerialization(ModpackDesc, ScriptPath),
+	AutoMemberSerialization(ModpackDesc, MainmenuPath),
 	AutoMemberSerialization(ModpackDesc, Version),
 	AutoMemberSerialization(ModpackDesc, Required),
 	AutoMemberSerialization(ModpackDesc, Incompatible),
@@ -1339,6 +1378,7 @@ const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[
 	AutoMemberSerialization(ModpackDesc, MainmenuMod),
 	AutoMemberSerialization(ModpackDesc, KeepArchive),
 	AutoMemberSerialization(ModpackDesc, UserRequestable),
+	AutoMemberSerialization(ModpackDesc, ScriptLib),
 	BB::SerializationData::GuardData(),
 };
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationDataEx[]{

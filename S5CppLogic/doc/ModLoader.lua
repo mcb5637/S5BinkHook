@@ -106,6 +106,9 @@ ModLoader = {
 		},
 	},
 	--- the names of all ModPacks requied by this map. a call to ModLoader.RequireModList() in Initialize will then try to load them.
+	--- after adding user requested modpacks and dependencies, this will get saved into the savegame.
+	--- when loading a savegame, overrides this variable with info stored in the savegame.
+	--- note that this mechanism bakes the exact version of each modpack into the savegame.
 	--- @type string[]
 	RequiredMods = {},
 }

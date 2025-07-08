@@ -483,6 +483,7 @@ function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
 --- sets a stringtabletexts accosiated text. automatically resets on leaving the game.
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
+--- if called from mainmenu, only affects mainmenu, not ingame.
 --- @param key string key to replace
 --- @param text string replacement string or nil to restore default
 function CppLogic.Logic.SetStringTableText(key, text) end
@@ -3454,6 +3455,7 @@ CppLogic.ModLoader.ReloadDamageClass = CppLogic.ModLoader.AddDamageClass
 function CppLogic.ModLoader.PreLoadDamageClass(typename) end
 
 --- loads a stringtabletxt override file.
+--- if called from mainmenu, loads it as mainmenu overrides, not affecting ingame.
 --- @param filename string
 --- @param language string
 --- @param prefixOverride string|nil
@@ -3509,6 +3511,7 @@ function RedirectLayerPopHelper:Set(n, r) end
 ---@class ModpackDesc
 local ModpackDesc = {
 	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "", MainmenuPath = "", Version = "",
+	Description = "",
 	---@type string[]
 	Required = {},
 	---@type string[]

@@ -515,43 +515,26 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	const char* SetStringTableText_GetText(const char* s)
-	{
-		if (!s)
-			return s;
-		
-		std::string sfor{ s };
-		auto f = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.find(sfor);
-
-		if (f != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.end())
-			return f->second.c_str();
-		else
-			return nullptr;
-	}
 	int SetStringTableText(lua::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
-		if (L.GetState() != *EScr::CScriptTriggerSystem::GameState)
-			throw lua::LuaException("does only work ingame");
-		if (!BB::StringTableText::GetStringTableTextOverride) {
-			BB::StringTableText::HookGetStringTableText();
-			BB::StringTableText::GetStringTableTextOverride = &SetStringTableText_GetText;
-		}
-
+		
 		if (!L.IsString(1))
 			throw lua::LuaException("key not string");
 		if (!L.IsString(2) && !L.IsNil(2))
 			throw lua::LuaException("replacement not string or nil");
 
-		L.PushValue(1);
-		//luaext::EState{ L }.StringToLower();
+		auto& map = CppLogic::SavegameExtra::SerializedMapdata::GetActiveOverrides(L.GetState());
+
 		if (L.IsNil(2)) {
-			auto r = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.find(L.CheckStdString(-1));
-			if (r != CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.end())
-				CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.erase(r);
+			auto r = map.find(L.CheckStringView(1));
+			if (r != map.end())
+				map.erase(r);
 			return 0;
 		}
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride[L.CheckStdString(-1)] = L.CheckStdString(2);
+		map[L.CheckStdString(1)] = L.CheckStdString(2);
+
+		CppLogic::SavegameExtra::SerializedMapdata::STTHasChanged(L.GetState());
 		return 0;
 	}
 
@@ -1516,7 +1499,7 @@ namespace CppLogic::Logic {
 		NetEventUnSetHook(L);
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
 		GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = false;
-		BB::StringTableText::GetStringTableTextOverride = nullptr;
+		CppLogic::SavegameExtra::SerializedMapdata::STTToMainmenu();
 		GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
 		GGUI::CPlaceBuildingState::PlacementRotation = 0.0f;
 		EGL::CGLEEntity::UseMaxHPTechBoni = false;
@@ -1695,10 +1678,7 @@ namespace CppLogic::Logic {
 			if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ChangeTaskListCheckUncancelable)
 				EGL::CGLEEntity::HookSetTaskListNonCancelable(true);
 
-			if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride.size() > 0) {
-				BB::StringTableText::HookGetStringTableText();
-				BB::StringTableText::GetStringTableTextOverride = &SetStringTableText_GetText;
-			}
+			CppLogic::SavegameExtra::SerializedMapdata::STTToIngame();
 		}
 		L.Push(SnipeDamageOverrideRegKey);
 		L.GetTableRaw(-2);

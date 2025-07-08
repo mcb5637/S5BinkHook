@@ -4,6 +4,8 @@
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
 #include "s5_exception.h"
+#include "s5_ui.h"
+#include "s5_scriptsystem.h"
 
 void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, const char* savename)
 {
@@ -59,7 +61,65 @@ void CppLogic::SavegameExtra::SerializedMapdata::DeserializeFrom(const char* pat
 	}
 }
 
+const char* SetStringTableText_GetText(const char* s, const std::map<std::string, std::string, CppLogic::CaselessStringComparator>& map)
+{
+	if (!s)
+		return s;
+
+	std::string_view sfor{ s };
+	auto f = map.find(sfor);
+
+	if (f != map.end())
+		return f->second.c_str();
+	else
+		return nullptr;
+}
+const char* SetStringTableText_GetTextIngame(const char* s) {
+	return SetStringTableText_GetText(s, CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.StringTableTextOverride);
+}
+const char* SetStringTableText_GetTextMainmenu(const char* s) {
+	return SetStringTableText_GetText(s, CppLogic::SavegameExtra::SerializedMapdata::StringTableTextOverrideMainmenu);
+}
+void stt_remove() {
+
+}
+void stt_enable(const char* (*f)(const char*)) {
+	BB::StringTableText::HookGetStringTableText();
+	BB::StringTableText::GetStringTableTextOverride = f;
+}
+void CppLogic::SavegameExtra::SerializedMapdata::STTToMainmenu()
+{
+	if (StringTableTextOverrideMainmenu.empty())
+		stt_remove();
+	else
+		stt_enable(SetStringTableText_GetTextMainmenu);
+}
+
+void CppLogic::SavegameExtra::SerializedMapdata::STTToIngame()
+{
+	if (GlobalObj.StringTableTextOverride.empty())
+		stt_remove();
+	else
+		stt_enable(SetStringTableText_GetTextIngame);
+}
+
+std::map<std::string, std::string, CppLogic::CaselessStringComparator>& CppLogic::SavegameExtra::SerializedMapdata::GetActiveOverrides(lua_State* s)
+{
+	if (s == *EScr::CScriptTriggerSystem::GameState)
+		return GlobalObj.StringTableTextOverride;
+	else
+		return StringTableTextOverrideMainmenu;
+}
+void CppLogic::SavegameExtra::SerializedMapdata::STTHasChanged(lua_State* s)
+{
+	if (s == *EScr::CScriptTriggerSystem::GameState)
+		return STTToIngame();
+	else
+		return STTToMainmenu();
+}
+
 CppLogic::SavegameExtra::SerializedMapdata CppLogic::SavegameExtra::SerializedMapdata::GlobalObj{};
+std::map<std::string, std::string, CppLogic::CaselessStringComparator>  CppLogic::SavegameExtra::SerializedMapdata::StringTableTextOverrideMainmenu{};
 
 CreateSerializationListFor(CppLogic::SavegameExtra::SerializedMapdata, StringTableTextOverride);
 
@@ -134,10 +194,11 @@ BB::SerializationData CppLogic::SavegameExtra::StringTableTextOverride::Serializ
 	BB::SerializationData::GuardData(),
 };
 
-void CppLogic::SavegameExtra::StringTableTextOverride::Merge(std::string_view prefix) const
+void CppLogic::SavegameExtra::StringTableTextOverride::Merge(std::string_view prefix, lua_State* s) const
 {
-	auto& target = SerializedMapdata::GlobalObj.StringTableTextOverride;
+	auto& target = SerializedMapdata::GetActiveOverrides(s);
 	for (const auto& [k, v] : StringTableTextOverride) {
 		target[std::format("{}/{}", prefix, k)] = v;
 	}
+	SerializedMapdata::STTHasChanged(s);
 }

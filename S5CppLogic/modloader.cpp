@@ -1231,7 +1231,7 @@ int CppLogic::ModLoader::ModLoader::LoadStringTableTextOverrides(lua::State L)
 		CppLogic::SavegameExtra::StringTableTextOverride o{};
 		if (fs.OpenFile(f.data(), BB::IStream::Flags::DefaultRead)) {
 			seri->DeserializeByData(&fs, &o, CppLogic::SavegameExtra::StringTableTextOverride::SerializationData);
-			o.Merge(L.OptStringView(3, file));
+			o.Merge(L.OptStringView(3, file), L.GetState());
 			L.Push(static_cast<int>(o.StringTableTextOverride.size()));
 		}
 		else {
@@ -1370,6 +1370,7 @@ const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[
 	AutoMemberSerialization(ModpackDesc, ScriptPath),
 	AutoMemberSerialization(ModpackDesc, MainmenuPath),
 	AutoMemberSerialization(ModpackDesc, Version),
+	AutoMemberSerialization(ModpackDesc, Description),
 	AutoMemberSerialization(ModpackDesc, Required),
 	AutoMemberSerialization(ModpackDesc, Incompatible),
 	AutoMemberSerialization(ModpackDesc, Override),

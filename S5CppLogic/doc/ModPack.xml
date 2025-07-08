@@ -7,6 +7,8 @@
 	<ScriptPath>Data/ModPack/YourModName/ScriptLoader.lua</ScriptPath>
 	<!-- path to the mainmenu script (loaded into maimenu, to modify UI, register a callback in ModLoaderMainmenu.InitUICallbacks (may be called multiple times))-->
 	<MainmenuPath>Data/ModPack/YourModName/MainmenuLoader.lua</MainmenuPath>
+	<!-- description of the mod (currently only shown in the mainmenu for user requestable or mainmenu mods) -->
+	<Description>descriptive text</Description>
 	<!-- states, that your ModPack only works, if a ModPack of this name is present (does not change load order, may be used multiple times) -->
 	<Required>SomeOtherCoolMod</Required>
 	<!-- your modPack will not get loaded, if a ModPack with this name is present (may be used multiple times) -->

@@ -36,10 +36,16 @@ namespace CppLogic::SavegameExtra {
 		shok::EntityCategory ResDoodad_RefillableCategory = {};
 
 		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;
+		static std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverrideMainmenu;
 
 		void SerializeTo(const char* path, const char* savename);
 		void DeserializeFrom(const char* path, const char* savename);
 		void Clear();
+
+		static void STTToMainmenu();
+		static void STTToIngame();
+		static std::map<std::string, std::string, CppLogic::CaselessStringComparator>& GetActiveOverrides(lua_State* s);
+		static void STTHasChanged(lua_State* s);
 
 		static SerializedMapdata GlobalObj;
 		static BB::SerializationData SerializationData[];
@@ -49,7 +55,7 @@ namespace CppLogic::SavegameExtra {
 
 		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;
 
-		void Merge(std::string_view prefix) const;
+		void Merge(std::string_view prefix, lua_State* s) const;
 
 		static BB::SerializationData SerializationData[];
 	};

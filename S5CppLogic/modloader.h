@@ -396,6 +396,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
 				lua::FuncReference::GetRef<GetModpacks>("GetModpacks"),
 				lua::FuncReference::GetRef<OverrideSavegameValid>("OverrideSavegameValid"),
+				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
 		};
 
 	public:
@@ -410,7 +411,7 @@ namespace CppLogic::ModLoader {
 	};
 
 	struct ModpackDesc {
-		std::string Name, BBAPath, LoaderPath, ScriptPath, MainmenuPath, Version;
+		std::string Name, BBAPath, LoaderPath, ScriptPath, MainmenuPath, Version, Description;
 		std::vector<std::string> Required, Incompatible, Override;
 		bool DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false;
 		bool UserRequestable = false, ScriptLib = false;

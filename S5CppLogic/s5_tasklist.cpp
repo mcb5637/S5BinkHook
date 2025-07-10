@@ -3,7 +3,7 @@
 #include "s5_idmanager.h"
 #include "s5_classfactory.h"
 #include "s5_filesystem.h"
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
     int(__thiscall* ExecuteTask)(EGL::TaskHandler* th, EGL::CGLETaskArgs* args);

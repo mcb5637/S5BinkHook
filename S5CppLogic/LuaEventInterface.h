@@ -6,7 +6,7 @@
 #include "s5_netevents.h"
 #include "s5_entity.h"
 #include "s5_ui.h"
-#include <magic_enum_all.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace CppLogic::LuaEventInterface {
 	template<class Ev>

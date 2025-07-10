@@ -1,7 +1,7 @@
 #pragma once
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
-#include "magic_enum.hpp"
+#include <magic_enum/magic_enum.hpp>
 
 namespace EGL {
 	class CStaticEntry {

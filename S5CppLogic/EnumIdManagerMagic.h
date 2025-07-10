@@ -5,7 +5,7 @@
 #include "luaext.h"
 #include "ConstexprString.h"
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace CppLogic::MagicEnum {
 	template<ConstexprString D>

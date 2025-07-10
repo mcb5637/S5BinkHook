@@ -16,7 +16,7 @@
     <DisabledFlag>False</DisabledFlag>
     <HighLightedFlag>False</HighLightedFlag>
     <ActionFunction>
-      <LuaCommand>CppLogicOptions.Show()</LuaCommand>
+      <LuaCommand>ModLoaderMainmenu.Show()</LuaCommand>
     </ActionFunction>
     <ShortCutString>
       <StringTableKey></StringTableKey>
@@ -101,7 +101,7 @@
   <ToolTipHelper>
     <ToolTipEnabledFlag>True</ToolTipEnabledFlag>
     <ToolTipString>
-      <StringTableKey>MainMenuTooltips/OptionsMenu00_ToNetwork</StringTableKey>
+      <StringTableKey>CppLogic_Mainmenu/ModPacksTT</StringTableKey>
       <RawString></RawString>
     </ToolTipString>
     <TargetWidget>StartMenu_TooltipText</TargetWidget>
@@ -119,8 +119,8 @@
       <FontName>data\menu\fonts\mainmenularge.met</FontName>
     </Font>
     <String>
-      <StringTableKey></StringTableKey>
-      <RawString>@center «ModPacks»</RawString>
+      <StringTableKey>CppLogic_Mainmenu/ModPacksBTN</StringTableKey>
+      <RawString></RawString>
     </String>
     <StringFrameDistance>3</StringFrameDistance>
     <Color>
@@ -1056,7 +1056,7 @@
       <ToolTipHelper>
         <ToolTipEnabledFlag>True</ToolTipEnabledFlag>
         <ToolTipString>
-          <StringTableKey>MainMenuTooltips/OptionsMenu00_ToNetwork</StringTableKey>
+          <StringTableKey>CppLogic_Mainmenu/ModPacksTT</StringTableKey>
           <RawString></RawString>
         </ToolTipString>
         <TargetWidget>StartMenu_TooltipText</TargetWidget>
@@ -1074,8 +1074,8 @@
           <FontName>data\menu\fonts\mainmenularge.met</FontName>
         </Font>
         <String>
-          <StringTableKey></StringTableKey>
-          <RawString>@center «ModPacks»</RawString>
+          <StringTableKey>CppLogic_Mainmenu/ModPacksBTN</StringTableKey>
+          <RawString></RawString>
         </String>
         <StringFrameDistance>3</StringFrameDistance>
         <Color>
@@ -1137,11 +1137,11 @@
           <Rectangle>
             <X>33</X>
             <Y>23</Y>
-            <W>300</W>
+            <W>200</W>
             <H>22</H>
           </Rectangle>
           <IsShown>True</IsShown>
-          <ZPriority>1</ZPriority>
+          <ZPriority>0</ZPriority>
           <MotherID>OptionsMenuCppLogic_MainContainer</MotherID>
           <Group></Group>
           <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
@@ -1166,8 +1166,61 @@
               <FontName>data\menu\fonts\medium11bold.met</FontName>
             </Font>
             <String>
-              <StringTableKey></StringTableKey>
-              <RawString>selected modpacks:</RawString>
+              <StringTableKey>CppLogic_Mainmenu/ModPacksHead</StringTableKey>
+              <RawString></RawString>
+            </String>
+            <StringFrameDistance>0</StringFrameDistance>
+            <Color>
+              <Red>255</Red>
+              <Green>255</Green>
+              <Blue>255</Blue>
+              <Alpha>255</Alpha>
+            </Color>
+          </StringHelper>
+          <UpdateFunction>
+            <LuaCommand></LuaCommand>
+          </UpdateFunction>
+          <UpdateManualFlag>True</UpdateManualFlag>
+          <FirstLineToPrint>0</FirstLineToPrint>
+          <NumberOfLinesToPrint>0</NumberOfLinesToPrint>
+          <LineDistanceFactor>0</LineDistanceFactor>
+        </WidgetList>
+        <WidgetList classname="EGUIX::CStaticTextWidget" classid="0x86e3bc06">
+          <Name>OptionsMenuCppLogic_SettingsHeadline</Name>
+          <Rectangle>
+            <X>300</X>
+            <Y>32</Y>
+            <W>300</W>
+            <H>22</H>
+          </Rectangle>
+          <IsShown>True</IsShown>
+          <ZPriority>0</ZPriority>
+          <MotherID>OptionsMenuCppLogic_MainContainer</MotherID>
+          <Group></Group>
+          <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+          <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+          <BackgroundMaterial>
+            <Texture></Texture>
+            <TextureCoordinates>
+              <X>0</X>
+              <Y>0</Y>
+              <W>1</W>
+              <H>1</H>
+            </TextureCoordinates>
+            <Color>
+              <Red>0</Red>
+              <Green>0</Green>
+              <Blue>0</Blue>
+              <Alpha>0</Alpha>
+            </Color>
+          </BackgroundMaterial>
+          <StringHelper>
+            <Font>
+              <FontName>data\menu\fonts\medium11bold.met</FontName>
+            </Font>
+            <String>
+              <StringTableKey>CppLogic_Mainmenu/Settings</StringTableKey>
+              <RawString></RawString>
             </String>
             <StringFrameDistance>0</StringFrameDistance>
             <Color>
@@ -1233,7 +1286,7 @@
                     <DisabledFlag>False</DisabledFlag>
                     <HighLightedFlag>False</HighLightedFlag>
                     <ActionFunction>
-                      <LuaCommand>CppLogicOptions.ActionMod()</LuaCommand>
+                      <LuaCommand>ModLoaderMainmenu.ActionMod()</LuaCommand>
                     </ActionFunction>
                     <ShortCutString>
                       <StringTableKey></StringTableKey>
@@ -1328,7 +1381,7 @@
                     </UpdateFunction>
                   </ToolTipHelper>
                   <UpdateFunction>
-                    <LuaCommand>CppLogicOptions.UpdateMod()</LuaCommand>
+                    <LuaCommand>ModLoaderMainmenu.UpdateMod()</LuaCommand>
                   </UpdateFunction>
                   <UpdateManualFlag>False</UpdateManualFlag>
                   <StringHelper>
@@ -1374,6 +1427,478 @@
               <IntegerUserVariable5DefaultValue>0</IntegerUserVariable5DefaultValue>
               <StringUserVariable0DefaultValue></StringUserVariable0DefaultValue>
               <StringUserVariable1DefaultValue>OptionsMenuCppLogic_ModListSelect</StringUserVariable1DefaultValue>
+            </WidgetList>
+          </SubWidgets>
+        </WidgetList>
+        <WidgetList classname="EGUIX::CContainerWidget" classid="0x55f9d1f6">
+          <Name>OptionsMenuCppLogic_Settings</Name>
+          <Rectangle>
+            <X>277</X>
+            <Y>65</Y>
+            <W>400</W>
+            <H>400</H>
+          </Rectangle>
+          <IsShown>True</IsShown>
+          <ZPriority>0</ZPriority>
+          <MotherID>OptionsMenuCppLogic_MainContainer</MotherID>
+          <Group></Group>
+          <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+          <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+          <SubWidgets>
+            <WidgetList classname="EGUIX::CTextButtonWidget" classid="0x5dd085a6">
+              <Name>OptionsMenuCppLogic_Settings_On</Name>
+              <Rectangle>
+                <X>273</X>
+                <Y>13</Y>
+                <W>100</W>
+                <H>47</H>
+              </Rectangle>
+              <IsShown>True</IsShown>
+              <ZPriority>0</ZPriority>
+              <MotherID>OptionsMenuCppLogic_Settings</MotherID>
+              <Group></Group>
+              <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+              <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+              <ButtonHelper>
+                <DisabledFlag>False</DisabledFlag>
+                <HighLightedFlag>False</HighLightedFlag>
+                <ActionFunction>
+                  <LuaCommand>ModLoaderMainmenu.ActionActive()</LuaCommand>
+                </ActionFunction>
+                <ShortCutString>
+                  <StringTableKey></StringTableKey>
+                  <RawString></RawString>
+                </ShortCutString>
+              </ButtonHelper>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_hi.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_sel.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_in.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_akt.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <ToolTipHelper>
+                <ToolTipEnabledFlag>True</ToolTipEnabledFlag>
+                <ToolTipString>
+                  <StringTableKey>CppLogic_Mainmenu/OnTT</StringTableKey>
+                  <RawString></RawString>
+                </ToolTipString>
+                <TargetWidget>StartMenu_TooltipText</TargetWidget>
+                <ControlTargetWidgetDisplayState>True</ControlTargetWidgetDisplayState>
+                <UpdateFunction>
+                  <LuaCommand></LuaCommand>
+                </UpdateFunction>
+              </ToolTipHelper>
+              <UpdateFunction>
+                <LuaCommand></LuaCommand>
+              </UpdateFunction>
+              <UpdateManualFlag>False</UpdateManualFlag>
+              <StringHelper>
+                <Font>
+                  <FontName>data\menu\fonts\mainmenularge.met</FontName>
+                </Font>
+                <String>
+                  <StringTableKey>CppLogic_Mainmenu/On</StringTableKey>
+                  <RawString></RawString>
+                </String>
+                <StringFrameDistance>3</StringFrameDistance>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </StringHelper>
+              <CenterText>True</CenterText>
+            </WidgetList>
+            <WidgetList classname="EGUIX::CStaticTextWidget" classid="0x86e3bc06">
+              <Name>OptionsMenuCppLogic_Settings_Desc</Name>
+              <Rectangle>
+                <X>16</X>
+                <Y>11</Y>
+                <W>246</W>
+                <H>377</H>
+              </Rectangle>
+              <IsShown>True</IsShown>
+              <ZPriority>0</ZPriority>
+              <MotherID>OptionsMenuCppLogic_Settings</MotherID>
+              <Group></Group>
+              <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+              <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+              <BackgroundMaterial>
+                <Texture></Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>0</Red>
+                  <Green>0</Green>
+                  <Blue>0</Blue>
+                  <Alpha>128</Alpha>
+                </Color>
+              </BackgroundMaterial>
+              <StringHelper>
+                <Font>
+                  <FontName>data\menu\fonts\standard10.met</FontName>
+                </Font>
+                <String>
+                  <StringTableKey></StringTableKey>
+                  <RawString></RawString>
+                </String>
+                <StringFrameDistance>0</StringFrameDistance>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </StringHelper>
+              <UpdateFunction>
+                <LuaCommand>ModLoaderMainmenu.UpdateActive()</LuaCommand>
+              </UpdateFunction>
+              <UpdateManualFlag>False</UpdateManualFlag>
+              <FirstLineToPrint>0</FirstLineToPrint>
+              <NumberOfLinesToPrint>0</NumberOfLinesToPrint>
+              <LineDistanceFactor>0</LineDistanceFactor>
+            </WidgetList>
+            <WidgetList classname="EGUIX::CTextButtonWidget" classid="0x5dd085a6">
+              <Name>OptionsMenuCppLogic_Settings_IG</Name>
+              <Rectangle>
+                <X>273</X>
+                <Y>63</Y>
+                <W>100</W>
+                <H>47</H>
+              </Rectangle>
+              <IsShown>True</IsShown>
+              <ZPriority>0</ZPriority>
+              <MotherID>OptionsMenuCppLogic_Settings</MotherID>
+              <Group></Group>
+              <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+              <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+              <ButtonHelper>
+                <DisabledFlag>False</DisabledFlag>
+                <HighLightedFlag>False</HighLightedFlag>
+                <ActionFunction>
+                  <LuaCommand></LuaCommand>
+                </ActionFunction>
+                <ShortCutString>
+                  <StringTableKey></StringTableKey>
+                  <RawString></RawString>
+                </ShortCutString>
+              </ButtonHelper>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_hi.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_sel.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_in.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_akt.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <ToolTipHelper>
+                <ToolTipEnabledFlag>True</ToolTipEnabledFlag>
+                <ToolTipString>
+                  <StringTableKey>CppLogic_Mainmenu/IngameTT</StringTableKey>
+                  <RawString></RawString>
+                </ToolTipString>
+                <TargetWidget>StartMenu_TooltipText</TargetWidget>
+                <ControlTargetWidgetDisplayState>True</ControlTargetWidgetDisplayState>
+                <UpdateFunction>
+                  <LuaCommand></LuaCommand>
+                </UpdateFunction>
+              </ToolTipHelper>
+              <UpdateFunction>
+                <LuaCommand></LuaCommand>
+              </UpdateFunction>
+              <UpdateManualFlag>False</UpdateManualFlag>
+              <StringHelper>
+                <Font>
+                  <FontName>data\menu\fonts\mainmenularge.met</FontName>
+                </Font>
+                <String>
+                  <StringTableKey>CppLogic_Mainmenu/Ingame</StringTableKey>
+                  <RawString></RawString>
+                </String>
+                <StringFrameDistance>3</StringFrameDistance>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </StringHelper>
+              <CenterText>True</CenterText>
+            </WidgetList>
+            <WidgetList classname="EGUIX::CTextButtonWidget" classid="0x5dd085a6">
+              <Name>OptionsMenuCppLogic_Settings_MM</Name>
+              <Rectangle>
+                <X>273</X>
+                <Y>113</Y>
+                <W>100</W>
+                <H>47</H>
+              </Rectangle>
+              <IsShown>True</IsShown>
+              <ZPriority>0</ZPriority>
+              <MotherID>OptionsMenuCppLogic_Settings</MotherID>
+              <Group></Group>
+              <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+              <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+              <ButtonHelper>
+                <DisabledFlag>False</DisabledFlag>
+                <HighLightedFlag>False</HighLightedFlag>
+                <ActionFunction>
+                  <LuaCommand></LuaCommand>
+                </ActionFunction>
+                <ShortCutString>
+                  <StringTableKey></StringTableKey>
+                  <RawString></RawString>
+                </ShortCutString>
+              </ButtonHelper>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_hi.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_sel.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_in.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <Materials>
+                <Texture>data\graphics\textures\gui\mainmenu\sub_akt.png</Texture>
+                <TextureCoordinates>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <W>1</W>
+                  <H>1</H>
+                </TextureCoordinates>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </Materials>
+              <ToolTipHelper>
+                <ToolTipEnabledFlag>True</ToolTipEnabledFlag>
+                <ToolTipString>
+                  <StringTableKey>CppLogic_Mainmenu/MainmenuTT</StringTableKey>
+                  <RawString></RawString>
+                </ToolTipString>
+                <TargetWidget>StartMenu_TooltipText</TargetWidget>
+                <ControlTargetWidgetDisplayState>True</ControlTargetWidgetDisplayState>
+                <UpdateFunction>
+                  <LuaCommand></LuaCommand>
+                </UpdateFunction>
+              </ToolTipHelper>
+              <UpdateFunction>
+                <LuaCommand></LuaCommand>
+              </UpdateFunction>
+              <UpdateManualFlag>False</UpdateManualFlag>
+              <StringHelper>
+                <Font>
+                  <FontName>data\menu\fonts\mainmenularge.met</FontName>
+                </Font>
+                <String>
+                  <StringTableKey>CppLogic_Mainmenu/Mainmenu</StringTableKey>
+                  <RawString></RawString>
+                </String>
+                <StringFrameDistance>3</StringFrameDistance>
+                <Color>
+                  <Red>255</Red>
+                  <Green>255</Green>
+                  <Blue>255</Blue>
+                  <Alpha>255</Alpha>
+                </Color>
+              </StringHelper>
+              <CenterText>True</CenterText>
             </WidgetList>
           </SubWidgets>
         </WidgetList>

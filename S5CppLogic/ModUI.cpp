@@ -131,7 +131,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 		}
 
 		id = mng->GetIdByName(SliderName().c_str());
-		if (id == shok::WidgetId::Invalid) {
+		if (id != shok::WidgetId::Invalid) {
 			Slider = mng->GetWidgetByID(id);
 			if (Slider) {
 				SliderTravel = mng->GetWidgetByID(Slider->MotherWidgetID);

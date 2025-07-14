@@ -59,7 +59,8 @@ namespace BB {
 
 		static inline constexpr int vtp = 0x77F5A4;
 
-		static CBinarySerializer* Create(int uk);
+		static CBinarySerializer* Create(int uk, int uk2);
+		static std::unique_ptr<CBinarySerializer, CppLogic::DestroyCaller<CBinarySerializer>> CreateUnique(int uk = 0, int uk2 = 2);
 
 	private:
 		CBinarySerializer() = default;

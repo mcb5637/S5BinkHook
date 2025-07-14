@@ -77,9 +77,13 @@ void __stdcall BB::CXmlSerializer::WriteType(BB::IStream* f, const char* cn)
 }
 
 inline BB::CBinarySerializer* (__stdcall* const binaryseri_create)(int z, int uk) = reinterpret_cast<BB::CBinarySerializer * (__stdcall*)(int, int)>(0x54C272);
-BB::CBinarySerializer* BB::CBinarySerializer::Create(int uk)
+BB::CBinarySerializer* BB::CBinarySerializer::Create(int uk, int uk2)
 {
-	return binaryseri_create(0, uk);
+	return binaryseri_create(uk, uk2);
+}
+std::unique_ptr<BB::CBinarySerializer, CppLogic::DestroyCaller<BB::CBinarySerializer>> BB::CBinarySerializer::CreateUnique(int uk, int uk2)
+{
+	return std::unique_ptr<CBinarySerializer, CppLogic::DestroyCaller<CBinarySerializer>>(Create(uk, uk2));
 }
 
 void PushUnknownValue(lua::State L, void* data, const BB::FieldSerializer* fs) {

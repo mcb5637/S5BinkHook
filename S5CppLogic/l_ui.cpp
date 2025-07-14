@@ -1889,6 +1889,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<VideoCustomWidgetSetVideoSize>("VideoCustomWidgetSetVideoSize"),
 		lua::FuncReference::GetRef<CreateSelectionDecal>("CreateSelectionDecal"),
 		lua::FuncReference::GetRef<InitNetHandlers>("InitNetHandlers"),
+		lua::FuncReference::GetRef<RemoveWidget>("RemoveWidget"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

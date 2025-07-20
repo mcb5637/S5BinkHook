@@ -444,7 +444,7 @@ namespace shok {
 		TorchPlacer_Place = 0x1104A, //EGL::CNetEventEntityAndPos
 		ResourceFinder_Find = 0x1104B, //EGL::CNetEventEntityID
 		Shuriken_Activate = 0x1104C, //EGL::CNetEvent2Entities
-		//0x1D002 EGL::CEventGetValue<int,1211121895> calculates some sort of hash?
+		CalculateHash = 0x1D002, //EGL::CEventGetValue<int,1211121895>
 		SetGameSpeed = 0x50001, //Framework::CEventGameSpeed
 		// 0x50002 replay checksum (from error message)
 		Escape = 0x50003, //BB::CEvent

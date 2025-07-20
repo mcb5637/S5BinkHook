@@ -411,7 +411,7 @@ namespace EGL {
 		virtual void unknown16() = 0;
 		virtual void unknown17() = 0;
 		virtual void unknown18() = 0; // 20
-		virtual void unknown19() = 0;
+		virtual void CalcHash(int* h) = 0; // max entity slot used, entityids, num entities, max effect slot used, RNG, time
 		virtual shok::EntityId CreateEntity(EGL::CGLEEntityCreator* data, int i) = 0; // 22
 	public:
 		virtual shok::EffectId CreateEffect(EGL::CGLEEffectCreator* data) = 0;
@@ -530,7 +530,7 @@ namespace GGL {
 		virtual void __stdcall Tick() = 0;
 		virtual void Serialize(const char* savename) = 0; // 5
 		virtual void Deserialize(const char* savename) = 0;
-		virtual void unknown3(int) = 0; //calculates some sort of hash?
+		virtual void CalculateHash(int* h) = 0; // EGL::CGLEGameLogic hash, player res, techs
 		virtual GGL::CWeatherHandler* GetWeatherHandler() = 0;
 		virtual void unknown4(int, int) = 0;
 		virtual void unknown5() = 0;

@@ -371,3 +371,82 @@ bool BB::CFileSystemMgr::DoesFileExist(const char* name)
 	(*GlobalObj)->GetFileInfo(&i, name, 0);
 	return i.Found && !i.IsDirectory;
 }
+
+bool __stdcall CppLogic::IO::StringViewReadStream::rettrue()
+{
+	return true;
+}
+bool __stdcall CppLogic::IO::StringViewReadStream::rettrue1()
+{
+	return true;
+}
+bool __stdcall CppLogic::IO::StringViewReadStream::rettrue2()
+{
+	return true;
+}
+const char* __stdcall CppLogic::IO::StringViewReadStream::GetFileName()
+{
+	return nullptr;
+}
+int64_t __stdcall CppLogic::IO::StringViewReadStream::GetLastWriteTime()
+{
+	return 0;
+}
+size_t __stdcall CppLogic::IO::StringViewReadStream::GetSize()
+{
+	return Buffer.size();
+}
+void __stdcall CppLogic::IO::StringViewReadStream::SetFileSize(long size)
+{
+	throw std::logic_error{ "read only" };
+}
+long __stdcall CppLogic::IO::StringViewReadStream::GetFilePointer()
+{
+	return CurrentPos;
+}
+void __stdcall CppLogic::IO::StringViewReadStream::SetFilePointer(long fp)
+{
+	if (fp < 0 || static_cast<size_t>(fp) >= Buffer.length())
+		throw std::logic_error{ "out of bounds" };
+	CurrentPos = static_cast<size_t>(fp);
+}
+
+long __stdcall CppLogic::IO::StringViewReadStream::Read(void* buff, long numBytesToRead)
+{
+	if (CurrentPos >= Buffer.length())
+		throw std::logic_error{ "out of bounds" };
+	auto sub = Buffer.substr(CurrentPos);
+	auto toread = std::min(static_cast<size_t>(numBytesToRead), sub.length());
+	std::memcpy(buff, sub.data(), toread);
+	CurrentPos += toread;
+	return toread;
+}
+
+int __stdcall CppLogic::IO::StringViewReadStream::Seek(long seek, SeekMode mode)
+{
+	size_t origin;
+	switch (mode) {
+	case SeekMode::Begin:
+		origin = 0;
+		break;
+	case SeekMode::Current:
+		origin = CurrentPos;
+		break;
+	case SeekMode::End:
+		origin = Buffer.size();
+		break;
+	default:
+		throw std::logic_error{ "invalid mode" };
+	}
+	SetFilePointer(origin + seek);
+	return GetFilePointer();
+}
+
+void __stdcall CppLogic::IO::StringViewReadStream::Write(const void* buff, long numBytesToWrite)
+{
+	throw std::logic_error{ "read only" };
+}
+
+CppLogic::IO::StringViewReadStream::StringViewReadStream(std::string_view data, size_t current) : Buffer(data), CurrentPos(current)
+{
+}

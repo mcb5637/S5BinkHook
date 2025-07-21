@@ -196,7 +196,7 @@ namespace BB {
 		virtual void OpenArchive(const char* filename) = 0; // 6
 		virtual void CloseArchive() = 0;
 	};
-	class CBBArchiveFile : public IArchiveFile { // uses CBBArchiveFileStream for compressed files, CMemoryStream for compressed files
+	class CBBArchiveFile : public IArchiveFile { // uses CBBArchiveFileStream for uncompressed files, CMemoryStream for compressed files
 	public:
 		enum class FileType : int {
 			FileUncompressed = 0,
@@ -326,4 +326,28 @@ namespace BB {
 		static inline BB::COSFileSystem** const GlobalObj = reinterpret_cast<BB::COSFileSystem**>(0x8937DC);
 	};
 	static_assert(sizeof(COSFileSystem) == 4);
+}
+
+namespace CppLogic::IO {
+	class StringViewReadStream : public BB::IStream {
+	private:
+		virtual bool __stdcall rettrue() override;
+		virtual bool __stdcall rettrue1() override;
+		virtual bool __stdcall rettrue2() override;
+	public:
+		virtual const char* __stdcall GetFileName() override;
+		virtual int64_t __stdcall GetLastWriteTime() override;
+		virtual size_t __stdcall GetSize() override;
+		virtual void __stdcall SetFileSize(long size) override;
+		virtual long __stdcall GetFilePointer() override;
+		virtual void __stdcall SetFilePointer(long fp) override;
+		virtual long __stdcall Read(void* buff, long numBytesToRead) override;
+		virtual int __stdcall Seek(long seek, SeekMode mode) override;
+		virtual void __stdcall Write(const void* buff, long numBytesToWrite) override;
+
+		std::string_view Buffer;
+		size_t CurrentPos;
+
+		explicit StringViewReadStream(std::string_view data, size_t current = 0);
+	};
 }

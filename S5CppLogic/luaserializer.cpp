@@ -317,7 +317,159 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua
 	DumpClassSerializationData(L, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id));
 }
 
-CppLogic::Serializer::AdvLuaStateSerializer::AdvLuaStateSerializer(BB::CFileStreamEx& io, lua_State* l)
+
+
+void CppLogic::Serializer::FastBinarySerializer::SerializeField(BB::IStream& s, void* o, const BB::SerializationData* seri)
+{
+	switch (seri->Type) {
+	case BB::SerializationData::Ty::Direct:
+		seri->DataConverter->SerializeToStream(&s, o);
+		break;
+	case BB::SerializationData::Ty::Embedded:
+		SerializeFields(s, o, seri->SubElementData);
+		break;
+	case BB::SerializationData::Ty::ObjectPointer:
+		o = *static_cast<void**>(o);
+		[[fallthrough]];
+	case BB::SerializationData::Ty::ObjectEmbedded:
+		if (seri->GetIdentifier)
+			Serialize(s, static_cast<BB::IObject*>(o), seri->GetIdentifier(o));
+		else
+			SerializeFields(s, o, seri->SubElementData);
+		break;
+	default:
+		break;
+	}
+}
+
+void CppLogic::Serializer::FastBinarySerializer::SerializeFields(BB::IStream& s, void* o, const BB::SerializationData* seri)
+{
+	while (seri->Size) {
+		if (seri->SerializationName) {
+			void* data = reinterpret_cast<void*>(reinterpret_cast<int>(o) + static_cast<int>(seri->Position));
+			if (seri->ListOptions)
+				SerializeList(s, data, seri);
+			else
+				SerializeField(s, data, seri);
+		}
+		else if (seri->SubElementData) {
+			SerializeFields(s, o, seri->SubElementData);
+		}
+		seri++;
+	}
+}
+
+void CppLogic::Serializer::FastBinarySerializer::SerializeList(BB::IStream& s, void* o, const BB::SerializationData* seri)
+{
+	auto* it = seri->ListOptions->AllocIter(o);
+
+	size_t size = seri->ListOptions->GetSize(o);
+	s.Write(&size, sizeof(size));
+	while (seri->ListOptions->IterNext(it)) {
+		SerializeField(s, seri->ListOptions->IterCurrent(it), seri);
+	}
+
+	seri->ListOptions->FreeIter(it);
+}
+
+void CppLogic::Serializer::FastBinarySerializer::Serialize(BB::IStream& s, void* o, const BB::SerializationData* seri)
+{
+	SerializeFields(s, o, seri);
+}
+
+void CppLogic::Serializer::FastBinarySerializer::Serialize(BB::IStream& s, BB::IObject* o, shok::ClassId id)
+{
+	if (id == shok::ClassId::Invalid)
+		id = o->GetClassIdentifier();
+	auto* seri = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+	s.Write(&id, sizeof(id));
+	Serialize(s, o, seri);
+}
+
+void CppLogic::Serializer::FastBinarySerializer::DeserializeField(BB::IStream& s, void* o, const BB::SerializationData* seri)
+{
+
+	switch (seri->Type) {
+	case BB::SerializationData::Ty::Direct:
+		seri->DataConverter->DeserializeFromStream(o, &s);
+		break;
+	case BB::SerializationData::Ty::Embedded:
+		DeserializeFields(s, o, seri->SubElementData);
+		break;
+	case BB::SerializationData::Ty::ObjectPointer:
+		o = *static_cast<void**>(o);
+		[[fallthrough]];
+	case BB::SerializationData::Ty::ObjectEmbedded:
+		if (seri->GetIdentifier)
+			Deserialize(s, static_cast<BB::IObject*>(o), nullptr, shok::ClassId::Invalid);
+		else
+			DeserializeFields(s, o, seri->SubElementData);
+		break;
+	default:
+		break;
+	}
+}
+
+void CppLogic::Serializer::FastBinarySerializer::DeserializeFields(BB::IStream& s, void* o, const BB::SerializationData* seri)
+{
+	while (seri->Size) {
+		if (seri->SerializationName) {
+			void* data = reinterpret_cast<void*>(reinterpret_cast<int>(o) + static_cast<int>(seri->Position));
+			if (seri->ListOptions)
+				DeserializeList(s, data, seri);
+			else
+				DeserializeField(s, data, seri);
+		}
+		else if (seri->SubElementData) {
+			DeserializeFields(s, o, seri->SubElementData);
+		}
+		seri++;
+	}
+}
+
+void CppLogic::Serializer::FastBinarySerializer::DeserializeList(BB::IStream& s, void* o, const BB::SerializationData* seri)
+{
+	size_t size = 0;
+	s.Read(&size, sizeof(size));
+	for (size_t k = 0; k < size; ++k) {
+		void* d = seri->ListOptions->AddToList(o);
+		DeserializeField(s, d, seri);
+		seri->ListOptions->FinalizeAddToList(o);
+	}
+}
+
+void* CppLogic::Serializer::FastBinarySerializer::Deserialize(BB::IStream& s, void* o, const BB::SerializationData* seri, shok::ClassId id, std::initializer_list<shok::ClassId> whitelisted_ids)
+{
+	if (o == nullptr) {
+		if (id == shok::ClassId::Invalid) {
+			s.Read(&id, sizeof(id));
+		}
+		if (id == shok::ClassId::Invalid)
+			throw std::invalid_argument{ "no object and no id provided" };
+		if (whitelisted_ids.size() > 0) {
+			if (std::find(whitelisted_ids.begin(), whitelisted_ids.end(), id) == whitelisted_ids.end())
+				throw std::invalid_argument{ std::format("class id {} not allowed", static_cast<int>(id)) };
+		}
+		o = (*BB::CClassFactory::GlobalObj)->CreateObject(id);
+		if (o == nullptr)
+			throw std::invalid_argument{ "invalid id provided" };
+		if (seri == nullptr) {
+			seri = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+		}
+	}
+	DeserializeFields(s, o, seri);
+	return o;
+}
+
+void CppLogic::Serializer::FastBinarySerializer::Deserialize(BB::IStream& s, BB::IObject* o)
+{
+	shok::ClassId id = o->GetClassIdentifier();
+	Deserialize(s, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
+}
+
+
+
+CppLogic::Serializer::AdvLuaStateSerializer::AdvLuaStateSerializer(BB::IStream& io, lua_State* l)
 	: IO{ io }, L{ l }
 {
 	HMODULE h = GetModuleHandle("S5Lua5.dll"); // get the already loaded dll, and then the (possibly existing) funcs

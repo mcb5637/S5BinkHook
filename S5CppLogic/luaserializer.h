@@ -30,6 +30,24 @@ namespace CppLogic::Serializer {
 		static void DumpClassSerializationData(lua::State L, shok::ClassId id);
 	};
 
+	class FastBinarySerializer {
+		static void SerializeField(BB::IStream& s, void* o, const BB::SerializationData* seri);
+		static void SerializeFields(BB::IStream& s, void* o, const BB::SerializationData* seri);
+		static void SerializeList(BB::IStream& s, void* o, const BB::SerializationData* seri);
+
+		static void DeserializeField(BB::IStream& s, void* o, const BB::SerializationData* seri);
+		static void DeserializeFields(BB::IStream& s, void* o, const BB::SerializationData* seri);
+		static void DeserializeList(BB::IStream& s, void* o, const BB::SerializationData* seri);
+
+	public:
+		static void Serialize(BB::IStream& s, void* o, const BB::SerializationData* seri);
+		static void Serialize(BB::IStream& s, BB::IObject* o, shok::ClassId id = shok::ClassId::Invalid);
+
+		// if o nullptr, gets created, if id 0, gets read from lua, in this case also checks seri for 0
+		static void* Deserialize(BB::IStream& s, void* o, const BB::SerializationData* seri, shok::ClassId id = shok::ClassId::Invalid, std::initializer_list<shok::ClassId> whitelisted_ids = {});
+		static void Deserialize(BB::IStream& s, BB::IObject* o);
+	};
+
 	/// <summary>
 	/// better serialization of lua states.
 	/// serialize writes the type (so it can write a reference instead).
@@ -52,7 +70,7 @@ namespace CppLogic::Serializer {
 		};
 
 
-		BB::CFileStreamEx& IO;
+		BB::IStream& IO;
 		lua::State L;
 		std::unique_ptr<byte[]> Data;
 		size_t DataLength = 0;
@@ -110,7 +128,7 @@ namespace CppLogic::Serializer {
 		void CleanupDeserialize(bool ret);
 
 	public:
-		AdvLuaStateSerializer(BB::CFileStreamEx& io, lua_State* l);
+		AdvLuaStateSerializer(BB::IStream& io, lua_State* l);
 
 		void SerializeState();
 		void DeserializeState();

@@ -343,12 +343,13 @@ namespace CppLogic::API {
 	int SavePersistentMapFile(lua::State L) {
 		std::filesystem::path p = GetPersistentMapFilesDir();
 		AppendPersistendMapFileName(L, p, 1);
+		auto path = p.string();
 
 		try {
 			BB::CFileStreamEx fs{};
-			if (!fs.OpenFile(p.string().c_str(), BB::IStream::Flags::DefaultWrite))
+			if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultWrite))
 				throw lua::LuaException{ "cannot open file" };
-			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState() };
+			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState(), L.OptBool(5, false) };
 			seri.SerializeVariable(1);
 			fs.Close();
 		}
@@ -358,18 +359,19 @@ namespace CppLogic::API {
 			throw lua::LuaException{ buff };
 		}
 
-		L.Push(p.string().c_str());
+		L.Push(path);
 		return 1;
 	}
 	int LoadPersistentMapFile(lua::State L) {
 		std::filesystem::path p = GetPersistentMapFilesDir();
 		AppendPersistendMapFileName(L, p, 0);
+		auto path = p.string();
 
 		try {
 			BB::CFileStreamEx fs{};
-			if (!fs.OpenFile(p.string().c_str(), BB::IStream::Flags::DefaultRead))
+			if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultRead))
 				throw lua::LuaException{ "cannot open file" };
-			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState() };
+			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState(),  L.OptBool(4, false) };
 			seri.DeserializeVariable();
 			fs.Close();
 		}

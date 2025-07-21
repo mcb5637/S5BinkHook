@@ -870,15 +870,17 @@ function CppLogic.API.CreateExtraDataTables() end
 ---@param mapname string name of map
 ---@param maptype number map type
 ---@param cname string|nil campagn name
+---@param dataOnly boolean|nil if true, asserts on trying to serialize any function or userdata
 ---@return string file path to the saved file
-function CppLogic.API.SavePersistentMapFile(var, mapname, maptype, cname) end
+function CppLogic.API.SavePersistentMapFile(var, mapname, maptype, cname, dataOnly) end
 --- loads a previously saved persistent map file.
 --- throws if file does not exist.
 ---@param mapname string name of map
 ---@param maptype number map type
 ---@param cname string|nil campagn name
+---@param dataOnly boolean|nil if true, asserts on trying to deserialize any function or userdata
 ---@return any var loaded data
-function CppLogic.API.LoadPersistentMapFile(mapname, maptype, cname) end
+function CppLogic.API.LoadPersistentMapFile(mapname, maptype, cname, dataOnly) end
 --- checks if a persistent map file exists.
 --- also checks if the persistent map file system is enabled in this particular user.
 ---@param mapname string name of map

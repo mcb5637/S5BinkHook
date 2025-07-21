@@ -80,6 +80,7 @@ namespace CppLogic::Serializer {
 		int IndexOfReferenceHolder = 0;
 		void* (__cdecl*lua_upvalueid)(lua_State* L, int funcindex, int n) = nullptr;
 		void(__cdecl* lua_upvaluejoin)(lua_State* L, int funcindex1, int n1, int funcindex2, int n2) = nullptr;
+		bool DataOnly;
 
 		// a reference to something already serialized/deserialized
 		static constexpr lua::LType ReferenceType = static_cast<lua::LType>(-2);
@@ -128,13 +129,16 @@ namespace CppLogic::Serializer {
 		void CleanupDeserialize(bool ret);
 
 	public:
-		AdvLuaStateSerializer(BB::IStream& io, lua_State* l);
+		AdvLuaStateSerializer(BB::IStream& io, lua_State* l, bool dataOnly = false);
 
 		void SerializeState();
 		void DeserializeState();
 
 		void SerializeVariable(int i);
 		void DeserializeVariable();
+
+		void SerializeStack(int n = -1);
+		void DeserializeStack();
 
 		// pushes a registry subtable that will get serialized in savegames. (creates one if it does not exist)
 		static void PushSerializedRegistry(lua::State L);

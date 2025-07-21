@@ -469,8 +469,8 @@ void CppLogic::Serializer::FastBinarySerializer::Deserialize(BB::IStream& s, BB:
 
 
 
-CppLogic::Serializer::AdvLuaStateSerializer::AdvLuaStateSerializer(BB::IStream& io, lua_State* l)
-	: IO{ io }, L{ l }
+CppLogic::Serializer::AdvLuaStateSerializer::AdvLuaStateSerializer(BB::IStream& io, lua_State* l, bool dataOnly)
+	: IO{ io }, L{ l }, DataOnly(dataOnly)
 {
 	HMODULE h = GetModuleHandle("S5Lua5.dll"); // get the already loaded dll, and then the (possibly existing) funcs
 	if (h) {
@@ -621,6 +621,8 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeTable(bool create)
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 {
+	if (DataOnly)
+		throw std::format_error{ "functions not allowed" };
 	L.PushValue(idx);
 	lua::DebugInfo i = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Upvalues);
 	if (!(lua_upvalueid && lua_upvaluejoin)) {
@@ -636,11 +638,13 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 		RefToNumber.insert(std::make_pair(r, refnum));
 		SerializeType(lua::LType::Function);
 		SerializeReference(refnum);
+		L.PushValue(idx);
 		L.Dump([](lua_State*, const void* d, size_t len, void* ud) {
 			AdvLuaStateSerializer* th = static_cast<AdvLuaStateSerializer*>(ud);
 			th->WritePrimitive(d, len);
 			return 0;
 			}, this);
+		L.Pop(1);
 		WritePrimitive(i.NumUpvalues);
 		if (lua_upvalueid && lua_upvaluejoin) {
 			for (int n = 1; n <= i.NumUpvalues; ++n) {
@@ -667,6 +671,8 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 {
+	if (DataOnly)
+		throw std::format_error{ "functions not allowed" };
 	int ref = DeserializeReference();
 	L.Load([](lua_State*, void* ud, size_t* len) {
 		AdvLuaStateSerializer* th = static_cast<AdvLuaStateSerializer*>(ud);
@@ -696,12 +702,14 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 	}
 	else {
 		if (nups > 0)
-			throw std::format_error{ "attempting to deserialize func with upvalues when upvalue serilaization is not available" };
+			throw std::format_error{ "attempting to deserialize func with upvalues when upvalue serialization is not available" };
 	}
 }
 
 void CppLogic::Serializer::AdvLuaStateSerializer::SerializeUserdata(int idx)
 {
+	if (DataOnly)
+		throw std::format_error{ "functions not allowed" };
 	Reference r{ lua::LType::Userdata, L.ToPointer(idx) };
 	auto refn = RefToNumber.find(r);
 	if (refn == RefToNumber.end()) {
@@ -730,6 +738,8 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeUserdata(int idx)
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeUserdata()
 {
+	if (DataOnly)
+		throw std::format_error{ "functions not allowed" };
 	int ref = DeserializeReference();
 
 	if (DeserializeType() != lua::LType::String)
@@ -891,10 +901,8 @@ void CppLogic::Serializer::AdvLuaStateSerializer::PrepareDeserialize()
 }
 void CppLogic::Serializer::AdvLuaStateSerializer::CleanupDeserialize(bool ret)
 {
-	int t = L.GetTop();
 	if (ret) {
-		L.Insert(IndexOfReferenceHolder);
-		L.SetTop(IndexOfReferenceHolder);
+		L.Remove(IndexOfReferenceHolder);
 	}
 	else {
 		L.SetTop(IndexOfReferenceHolder - 1);
@@ -944,6 +952,35 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeVariable()
 	PrepareDeserialize();
 
 	DeserializeAnything();
+
+	CleanupDeserialize(true);
+}
+
+void CppLogic::Serializer::AdvLuaStateSerializer::SerializeStack(int n)
+{
+	if (n < 0)
+		n = L.GetTop();
+
+	PrepareSerialize();
+
+	WritePrimitive(n);
+
+	for (int i = 1; i <= n; ++i)
+		SerializeAnything(i);
+
+	CleanupSerialize();
+}
+void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeStack()
+{
+	PrepareDeserialize();
+
+	int n = ReadPrimitive<int>("number of elements size missmatch");
+	int t = L.GetTop();
+
+	for (int i = 1; i <= n; ++i) {
+		DeserializeAnything();
+		t = L.GetTop();
+	}
 
 	CleanupDeserialize(true);
 }

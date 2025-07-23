@@ -281,7 +281,13 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 	if (col.Alpha == 0) {
 		col = EGUIX::Color{};
 	}
-	rend->RenderText(CurrentTextDisplay.c_str(), Font.FontID, screenCoords->X, screenCoords->Y, screenCoords->X + screenCoords->W, &col, 1);
+	{
+		// no idea why this needs to be scaled, shok does not scale it and it works
+		float x = screenCoords->X * rend->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+		float y = screenCoords->Y * rend->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y;
+		float end = (screenCoords->X + screenCoords->W) * rend->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+		rend->RenderText(CurrentTextDisplay.c_str(), Font.FontID, x, y, end, &col, 1);
+	}
 	if (!HasFocus())
 		return;
 	if (!(static_cast<int>(shok::GetCurrentTimeFloat() * 3.0f) & 1)) {
@@ -297,9 +303,10 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 	CurrentTextDisplay[CurrentPos] = '\0';
 	float textw = rend->GetTextWidth(CurrentTextDisplay.c_str(), Font.FontID);
 	CurrentTextDisplay[CurrentPos] = back;
-	float x = screenCoords->X + textw * 768.0f;
+	// why? this looks so wrong, but it works...
+	float x = screenCoords->X + textw * shok::UIRenderer::ScaledScreenSize.Y * shok::UIRenderer::ScaledScreenSize.Y / rend->RenderSizeY + 1.0f;
 	float y = screenCoords->Y;
-	rend->RenderLine(&col, true, x, y, x, y + rend->GetTextHeight(Font.FontID) * 768.0f);
+	rend->RenderLine(&col, true, x, y, x, y + rend->GetTextHeight(Font.FontID) * shok::UIRenderer::ScaledScreenSize.Y);
 }
 
 bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain)

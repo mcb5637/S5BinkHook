@@ -66,6 +66,7 @@
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>./binkw32.def</ModuleDefinitionFile>
       <AdditionalDependencies>binkw32_orig.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -91,6 +92,7 @@
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>./binkw32.def</ModuleDefinitionFile>
       <AdditionalDependencies>binkw32_orig.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>

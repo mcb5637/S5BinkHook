@@ -271,13 +271,13 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Destroy()
 void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
 {
 	auto rend = shok::UIRenderer::GlobalObj();
-	EGUIX::Color col{ *reinterpret_cast<const shok::Color*>(&BackgroundColor()) };
+	EGUIX::Color col{ BackgroundColor() };
 	if (col.Alpha > 0) {
 		EGUIX::CMaterial m{};
 		m.Color = col;
 		rend->RenderMaterial(&m, true, screenCoords);
 	}
-	col = EGUIX::Color{ *reinterpret_cast<const shok::Color*>(&TextColor()) };
+	col = EGUIX::Color{ TextColor() };
 	if (col.Alpha == 0) {
 		col = EGUIX::Color{};
 	}
@@ -291,7 +291,7 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 	if (!HasFocus())
 		return;
 	if (!(static_cast<int>(shok::GetCurrentTimeFloat() * 3.0f) & 1)) {
-		col = EGUIX::Color{ *reinterpret_cast<const shok::Color*>(&BlinkColor()) };
+		col = EGUIX::Color{ BlinkColor() };
 		if (col.Alpha == 0) {
 			col.Red = 100;
 			col.Green = 100;

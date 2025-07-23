@@ -118,14 +118,14 @@ namespace CppLogic::Mod::UI {
 		inline bool HasFlag(Event f) const {
 			return static_cast<int>(Flags()) & static_cast<int>(f);
 		}
-		inline const int& TextColor() const {
-			return IntegerUserVariable2;
+		inline shok::Color TextColor() const {
+			return std::bit_cast<shok::Color>(IntegerUserVariable2);
 		}
-		inline const int& BlinkColor() const {
-			return IntegerUserVariable3;
+		inline shok::Color BlinkColor() const {
+			return std::bit_cast<shok::Color>(IntegerUserVariable3);
 		}
-		inline const int& BackgroundColor() const {
-			return IntegerUserVariable4;
+		inline shok::Color BackgroundColor() const {
+			return std::bit_cast<shok::Color>(IntegerUserVariable4);
 		}
 		inline int ScrollDelta() const {
 			return IntegerUserVariable5;

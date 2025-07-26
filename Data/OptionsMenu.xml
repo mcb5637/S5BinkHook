@@ -1286,7 +1286,7 @@
                     <DisabledFlag>False</DisabledFlag>
                     <HighLightedFlag>False</HighLightedFlag>
                     <ActionFunction>
-                      <LuaCommand>ModLoaderMainmenu.ActionMod()</LuaCommand>
+                      <LuaCommand>ModLoaderMainmenu.Scroll:GUIAction_DefaultSelect()</LuaCommand>
                     </ActionFunction>
                     <ShortCutString>
                       <StringTableKey></StringTableKey>

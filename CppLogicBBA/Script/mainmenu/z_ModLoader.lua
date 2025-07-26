@@ -1,14 +1,23 @@
 Script.Load("Data\\Script\\ModLoader\\ModLoader.lua")
+Script.Load("Data\\Script\\InterfaceTools\\AutoScroll.lua")
+
+if false then
+	---@class CPPLMMMod
+	---@field Active boolean
+	local t = {Name = "", Description = "", MainmenuMod = true, UserRequestable = true}
+end
 
 ModLoaderMainmenu = {
 	InitUICallbacks = {
 		function()
 			if XGUIEng.GetWidgetID("OptionsMenuCppLogic") == 0 then
 				ModLoaderMainmenu.InitUI()
+				ModLoaderMainmenu.Scroll:Setup()
 			end
 		end,
 	},
-	SelectedMod = nil,
+	---@type CPPLAutoScroll<CPPLMMMod>
+	Scroll = AutoScroll.Init("OptionsMenuCppLogic_ModListScroll"),
 }
 
 ModLoaderMainmenu.Start = StartMenu.Start
@@ -36,10 +45,11 @@ end
 function ModLoaderMainmenu.Show()
 	XGUIEng.ShowAllSubWidgets("Screens", 0)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic", 1)
-	CppLogic.UI.InitAutoScrollCustomWidget("OptionsMenuCppLogic_ModListScroll", table.getn(ModLoaderMainmenu.ModPacks))
+	ModLoaderMainmenu.Scroll:SetDataToScrollOver(ModLoaderMainmenu.ModPacks)
 end
 
 function ModLoaderMainmenu.LoadModpacks()
+	---@type CPPLMMMod[]
 	ModLoaderMainmenu.ModPacks = {}
 	for _, m in ipairs(CppLogic.ModLoader.GetModpacks()) do
 		local mp = CppLogic.ModLoader.GetModpackInfo(m)
@@ -76,26 +86,20 @@ function ModLoaderMainmenu.StoreUserRequestedModpacks()
 end
 
 function ModLoaderMainmenu.UpdateMod()
-	local i = XGUIEng.GetBaseWidgetUserVariable(XGUIEng.GetCurrentWidgetID(), 0) + 1
-	local mp = ModLoaderMainmenu.ModPacks[i]
-	XGUIEng.SetText(XGUIEng.GetCurrentWidgetID(), "@center " .. mp.Name)
-	local h = (mp == ModLoaderMainmenu.SelectedMod) and 255 or 200
-	XGUIEng.SetMaterialColor(XGUIEng.GetCurrentWidgetID(), 4, h, h, h, 255)
-	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), (mp.Active or mp == ModLoaderMainmenu.SelectedMod) and 1 or 0)
-end
-
-function ModLoaderMainmenu.ActionMod()
-	local i = XGUIEng.GetBaseWidgetUserVariable(XGUIEng.GetCurrentWidgetID(), 0) + 1
-	local mp = ModLoaderMainmenu.ModPacks[i]
-	if mp == ModLoaderMainmenu.SelectedMod then
-		ModLoaderMainmenu.SelectedMod = nil
-	else
-		ModLoaderMainmenu.SelectedMod = mp
+	---@type CPPLMMMod?
+	local mp = ModLoaderMainmenu.Scroll:GetElementOf(XGUIEng.GetCurrentWidgetID())
+	if not mp then
+		return
 	end
+	XGUIEng.SetText(XGUIEng.GetCurrentWidgetID(), "@center " .. mp.Name)
+	local h = (mp == ModLoaderMainmenu.Scroll:GetSelected()) and 255 or 200
+	XGUIEng.SetMaterialColor(XGUIEng.GetCurrentWidgetID(), 4, h, h, h, 255)
+	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), (mp.Active or mp == ModLoaderMainmenu.Scroll:GetSelected()) and 1 or 0)
 end
 
 function ModLoaderMainmenu.ActionActive()
-	local mp = ModLoaderMainmenu.SelectedMod
+	---@type CPPLMMMod?
+	local mp = ModLoaderMainmenu.Scroll:GetSelected()
 	if not mp then
 		return
 	end
@@ -104,7 +108,8 @@ function ModLoaderMainmenu.ActionActive()
 end
 
 function ModLoaderMainmenu.UpdateActive()
-	local mp = ModLoaderMainmenu.SelectedMod
+	---@type CPPLMMMod?
+	local mp = ModLoaderMainmenu.Scroll:GetSelected()
 	if not mp then
 		XGUIEng.SetText("OptionsMenuCppLogic_Settings_Desc", "")
 		XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_On", 0)
@@ -676,7 +681,7 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.DisableButton("OptionsMenuCppLogic_ModListSelect", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_ModListSelect", 0)
 	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ModListSelect", function()
-		ModLoaderMainmenu.ActionMod()
+		ModLoaderMainmenu.Scroll:GUIAction_DefaultSelect()
 	end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ModListSelect", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ModListSelect", 0, 100, 100, 100, 131)

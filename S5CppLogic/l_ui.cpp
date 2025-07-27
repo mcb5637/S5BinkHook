@@ -870,6 +870,23 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int GetMousePosDirect(lua::State L) {
+		RECT r;
+		if (!GetClientRect(*shok::MainWindowHandle, &r))
+			return 0;
+		POINT p;
+		if (GetCursorPos(&p)) {
+			if (ScreenToClient(*shok::MainWindowHandle, &p)) {
+				if (p.x < 0 || p.y < 0 || p.x > r.right || p.y > r.bottom)
+					return 0;
+				L.Push(static_cast<double>(p.x));
+				L.Push(static_cast<double>(p.y));
+				return 2;
+			}
+		}
+		return 0;
+	}
+
 	int GetWidgetName(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* w = L.CheckWidget(1);
@@ -1845,6 +1862,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<ShowResourceFloatieOnEntity>("ShowResourceFloatieOnEntity"),
 		lua::FuncReference::GetRef<ShowAdvancedFloatie>("ShowAdvancedFloatie"),
 		lua::FuncReference::GetRef<GetClientSize>("GetClientSize"),
+		lua::FuncReference::GetRef<GetMousePosDirect>("GetMousePosDirect"),
 		lua::FuncReference::GetRef<IsContainerWidget>("IsContainerWidget"),
 		lua::FuncReference::GetRef<GetWidgetName>("GetWidgetName"),
 		lua::FuncReference::GetRef<SetGUIStateLuaSelection>("SetGUIStateLuaSelection"),

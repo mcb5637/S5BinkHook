@@ -40,8 +40,7 @@ end
 ---@param over T[]
 function AutoScroll:SetDataToScrollOver(over)
 	self.Over = over
-	local n = table.getn(self.Over)
-	local w = CppLogic.UI.InitAutoScrollCustomWidget(self.CustomWidget, n)
+	local n, w = CppLogic.UI.InitAutoScrollCustomWidget(self.CustomWidget, table.getn(self.Over))
 	local sliderUsed = n > w and 1 or 0
 	if self.UpButton then
 		XGUIEng.ShowWidget(self.UpButton, sliderUsed)

@@ -13,11 +13,14 @@ ModLoaderMainmenu = {
 			if XGUIEng.GetWidgetID("OptionsMenuCppLogic") == 0 then
 				ModLoaderMainmenu.InitUI()
 				ModLoaderMainmenu.Scroll:Setup()
+				ModLoaderMainmenu.MonitorScroll:Setup()
 			end
 		end,
 	},
 	---@type CPPLAutoScroll<CPPLMMMod>
-	Scroll = AutoScroll.Init("OptionsMenuCppLogic_ModListScroll"),
+	Scroll = AutoScroll.Init("OptionsMenuCppLogic_ModListScroll", nil, nil, nil, true),
+	---@type CPPLAutoScroll<CPPLMonitorInfo>
+	MonitorScroll = AutoScroll.Init("OptionsMenu30_ResExtraScroll", "OptionsMenu30_ResExtraUp", "OptionsMenu30_ResExtraDown", "OptionsMenu30_ResExtraSliderBG", true),
 }
 
 ModLoaderMainmenu.Start = StartMenu.Start
@@ -169,6 +172,55 @@ function ModLoaderMainmenu.LoadMainmenuModPacks()
 		end
 	end
 	ModLoader.CleanupMods(ml, false, false, true)
+end
+
+function ModLoaderMainmenu.UpdateMonitor()
+	---@type CPPLMonitorInfo?
+	local m = ModLoaderMainmenu.MonitorScroll:GetElementOf(XGUIEng.GetCurrentWidgetID())
+	if not m then
+		return
+	end
+	local t
+	if m.Name == "" then
+		t = XGUIEng.GetStringTableText("CppLogic_Mainmenu/Off")
+	else
+		t = string.format("%s (%d x %d)", m.Name, m.W, m.H)
+	end
+	XGUIEng.SetText(XGUIEng.GetCurrentWidgetID(), t)
+	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), m.Name == GDB.GetString("CppLogic\\BordelessFullscreenOn") and 1 or 0)
+end
+
+function ModLoaderMainmenu.ActionMonitor()
+	---@type CPPLMonitorInfo?
+	local m = ModLoaderMainmenu.MonitorScroll:GetElementOf(XGUIEng.GetCurrentWidgetID())
+	if not m then
+		return
+	end
+	GDB.SetString("CppLogic\\BordelessFullscreenOn", m.Name)
+end
+
+function ModLoaderMainmenu.UpdateMonitorSelect()
+	if not ModLoaderMainmenu.MonitorScroll.Over[1] then
+		local on = GDB.GetString("CppLogic\\BordelessFullscreenOn") ~= ""
+		XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), on and 1 or 0)
+		XGUIEng.ShowWidget("OptionsMenu30_ResExtraList", on and 1 or 0)
+		XGUIEng.ShowWidget("OptionsMenu30_ResolutionList", on and 0 or 1)
+
+		local m = CppLogic.API.GetMonitors()
+		table.insert(m, 1, {
+			Name = "",
+			H = 0,
+			W = 0,
+		})
+		ModLoaderMainmenu.MonitorScroll:SetDataToScrollOver(m)
+	end
+end
+
+function ModLoaderMainmenu.ActionMonitorSelect()
+	local on = XGUIEng.IsButtonHighLighted(XGUIEng.GetCurrentWidgetID()) == 0
+	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), on and 1 or 0)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraList", on and 1 or 0)
+	XGUIEng.ShowWidget("OptionsMenu30_ResolutionList", on and 0 or 1)
 end
 
 function ModLoaderMainmenu.InitUI()
@@ -853,5 +905,173 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_BGTop", 0, false, true)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_BGTop", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_BGTop", 0, 255, 255, 255, 255)
+
+
+
+
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_Resolution", 22, 277, 710, 247)
+
+
+	if not CppLogic.UI.TextButtonSetCenterText then
+		function CppLogic.UI.TextButtonSetCenterText() end
+	end
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtra")==0, "OptionsMenu30_ResExtra already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraList")==0, "OptionsMenu30_ResExtraList already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollableContainer")==0, "OptionsMenu30_ResExtraScrollableContainer already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollable")==0, "OptionsMenu30_ResExtraScrollable already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraUp")==0, "OptionsMenu30_ResExtraUp already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraDown")==0, "OptionsMenu30_ResExtraDown already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraSliderBG")==0, "OptionsMenu30_ResExtraSliderBG already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScroll")==0, "OptionsMenu30_ResExtraScroll already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollBar")==0, "OptionsMenu30_ResExtraScrollBar already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraSliderGfx")==0, "OptionsMenu30_ResExtraSliderGfx already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtra_BG")==0, "OptionsMenu30_ResExtra_BG already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraToggle")==0, "OptionsMenu30_ResExtraToggle already exists")
+	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenu30_Resolution", "OptionsMenu30_ResExtra", "OptionsMenu30_Resolution_Headline")
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtra", 0, 0, 710, 247)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtra", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtra", 0, false, false)
+	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenu30_ResExtra", "OptionsMenu30_ResExtraList", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraList", 0, 20, 502, 207)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraList", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraList", 10, false, false)
+	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraScrollableContainer", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraScrollableContainer", 6, 40, 491, 135)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraScrollableContainer", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraScrollableContainer", 0, false, false)
+	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenu30_ResExtraScrollableContainer", "OptionsMenu30_ResExtraScrollable", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraScrollable", 5, 46, 444, 20)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraScrollable", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraScrollable", 0, false, false)
+	XGUIEng.DisableButton("OptionsMenu30_ResExtraScrollable", 0)
+	XGUIEng.HighLightButton("OptionsMenu30_ResExtraScrollable", 0)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenu30_ResExtraScrollable", function() ModLoaderMainmenu.ActionMonitor() end)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraScrollable", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraScrollable", 0, 151, 150, 151, 68)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraScrollable", 1, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraScrollable", 1, 250, 214, 121, 128)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraScrollable", 2, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraScrollable", 2, 150, 100, 50, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraScrollable", 3, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraScrollable", 3, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraScrollable", 4, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraScrollable", 4, 220, 170, 120, 255)
+	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraScrollable", nil, false, false)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResExtraScrollable", false)
+	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenu30_ResExtraScrollable", function() ModLoaderMainmenu.UpdateMonitor() end)
+	CppLogic.UI.WidgetSetFont("OptionsMenu30_ResExtraScrollable", "data\\menu\\fonts\\standard10.met")
+	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenu30_ResExtraScrollable", 0)
+	XGUIEng.SetText("OptionsMenu30_ResExtraScrollable", "", 1)
+	XGUIEng.SetTextColor("OptionsMenu30_ResExtraScrollable", 255, 255, 255, 255)
+	CppLogic.UI.TextButtonSetCenterText("OptionsMenu30_ResExtraScrollable", true)
+	CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraUp", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraUp", 468, 49, 31, 42)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraUp", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraUp", 0, false, false)
+	XGUIEng.DisableButton("OptionsMenu30_ResExtraUp", 0)
+	XGUIEng.HighLightButton("OptionsMenu30_ResExtraUp", 0)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraUp", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraUp", 0, "data\\graphics\\textures\\gui\\mainmenu\\scroll_up.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraUp", 0, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraUp", 1, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraUp", 1, "data\\graphics\\textures\\gui\\mainmenu\\scroll_up_hi.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraUp", 1, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraUp", 2, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraUp", 2, "data\\graphics\\textures\\gui\\mainmenu\\scroll_up_sel.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraUp", 2, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraUp", 3, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraUp", 3, "data\\graphics\\textures\\gui\\mainmenu\\scroll_up.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraUp", 3, 128, 128, 128, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraUp", 4, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraUp", 4, "data\\graphics\\textures\\gui\\mainmenu\\scroll_up.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraUp", 4, 255, 255, 255, 255)
+	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraUp", nil, false, true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResExtraUp", false)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraUp", 10, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraUp", 10, 255, 255, 255, 0)
+	CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraDown", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraDown", 468, 128, 31, 45)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraDown", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraDown", 0, false, false)
+	XGUIEng.DisableButton("OptionsMenu30_ResExtraDown", 0)
+	XGUIEng.HighLightButton("OptionsMenu30_ResExtraDown", 0)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraDown", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraDown", 0, "data\\graphics\\textures\\gui\\mainmenu\\scroll_down.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraDown", 0, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraDown", 1, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraDown", 1, "data\\graphics\\textures\\gui\\mainmenu\\scroll_down_hi.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraDown", 1, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraDown", 2, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraDown", 2, "data\\graphics\\textures\\gui\\mainmenu\\scroll_down_sel.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraDown", 2, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraDown", 3, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraDown", 3, "data\\graphics\\textures\\gui\\mainmenu\\scroll_down.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraDown", 3, 128, 128, 128, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraDown", 4, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraDown", 4, "data\\graphics\\textures\\gui\\mainmenu\\scroll_down.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraDown", 4, 255, 255, 255, 255)
+	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraDown", nil, false, true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResExtraDown", false)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraDown", 10, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraDown", 10, 255, 255, 255, 0)
+	CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraSliderBG", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraSliderBG", 464, 46, 31, 123)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraSliderBG", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraSliderBG", 0, false, true)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraSliderBG", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraSliderBG", 0, "data\\graphics\\textures\\gui\\mainmenu\\center_scroll_bg.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraSliderBG", 0, 255, 255, 255, 255)
+	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraScroll", "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 4, 0, 0, 0, 0, 0, "OptionsMenu30_ResExtraSliderGfx", "OptionsMenu30_ResExtraScrollable")
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraScroll", 0, 0, 502, 207)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraScroll", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraScroll", 0, false, false)
+	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraScrollBar", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraScrollBar", 464, 84, 38, 44)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraScrollBar", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraScrollBar", 0, false, false)
+	CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("OptionsMenu30_ResExtraScrollBar", "OptionsMenu30_ResExtraSliderGfx", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraSliderGfx", 4, 41, 23, 23)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraSliderGfx", 0)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraSliderGfx", 20, false, true)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraSliderGfx", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraSliderGfx", 0, "data\\graphics\\textures\\gui\\mainmenu\\scroll_handle.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraSliderGfx", 0, 255, 255, 255, 255)
+	CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtra_BG", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtra_BG", 6, 40, 491, 135)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtra_BG", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtra_BG", 0, false, true)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtra_BG", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtra_BG", 0, 0, 7, 12, 96)
+	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenu30_ResExtra", "OptionsMenu30_ResExtraToggle", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraToggle", 540, 64, 130, 47)
+	XGUIEng.ShowWidget("OptionsMenu30_ResExtraToggle", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraToggle", 0, false, false)
+	XGUIEng.DisableButton("OptionsMenu30_ResExtraToggle", 0)
+	XGUIEng.HighLightButton("OptionsMenu30_ResExtraToggle", 0)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenu30_ResExtraToggle", function() ModLoaderMainmenu.ActionMonitorSelect() end)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraToggle", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraToggle", 0, "data\\graphics\\textures\\gui\\mainmenu\\sub.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraToggle", 0, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraToggle", 1, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraToggle", 1, "data\\graphics\\textures\\gui\\mainmenu\\sub_hi.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraToggle", 1, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraToggle", 2, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraToggle", 2, "data\\graphics\\textures\\gui\\mainmenu\\sub_sel.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraToggle", 2, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraToggle", 3, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraToggle", 3, "data\\graphics\\textures\\gui\\mainmenu\\sub_in.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraToggle", 3, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraToggle", 4, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraToggle", 4, "data\\graphics\\textures\\gui\\mainmenu\\sub_akt.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraToggle", 4, 255, 255, 255, 255)
+	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraToggle", "StartMenu_TooltipText", true, true)
+	CppLogic.UI.WidgetSetTooltipString("OptionsMenu30_ResExtraToggle", "CppLogic_Mainmenu/BorderlessTT", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResExtraToggle", false)
+	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenu30_ResExtraToggle", function() ModLoaderMainmenu.UpdateMonitorSelect() end)
+	CppLogic.UI.WidgetSetFont("OptionsMenu30_ResExtraToggle", "data\\menu\\fonts\\mainmenularge.met")
+	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenu30_ResExtraToggle", 3)
+	XGUIEng.SetTextKeyName("OptionsMenu30_ResExtraToggle", "CppLogic_Mainmenu/Borderless")
+	XGUIEng.SetTextColor("OptionsMenu30_ResExtraToggle", 255, 255, 255, 255)
+	CppLogic.UI.TextButtonSetCenterText("OptionsMenu30_ResExtraToggle", true)
 
 end

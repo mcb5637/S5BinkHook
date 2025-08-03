@@ -16,8 +16,9 @@ AutoScroll = {}
 ---@param down string?
 ---@param up string?
 ---@param bg string?
+---@param noSetup boolean?
 ---@return CPPLAutoScroll<T>
-function AutoScroll.Init(cw, up, down, bg)
+function AutoScroll.Init(cw, up, down, bg, noSetup)
 	---@type CPPLAutoScroll
 	local r = {
 		Over = {},
@@ -30,7 +31,9 @@ function AutoScroll.Init(cw, up, down, bg)
 		r[k] = v
 	end
 
-	r:Setup()
+	if not noSetup then
+		r:Setup()
+	end
 
 	return r
 end

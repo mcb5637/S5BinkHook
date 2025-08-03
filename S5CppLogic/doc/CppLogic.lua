@@ -929,6 +929,16 @@ function CppLogic.API.ReloadExternalmaps() end
 ---@param active boolean
 function CppLogic.API.EnableScriptTriggerEval(active) end
 
+---@class CPPLMonitorInfo
+---@field Name string
+---@field H number
+---@field W number
+local CPPLMonitorInfo = {}
+
+---returns info on all available monitors
+---@return CPPLMonitorInfo[]
+function CppLogic.API.GetMonitors() end
+
 ---@class RNG
 local RNG = {}
 

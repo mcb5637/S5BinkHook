@@ -113,6 +113,8 @@ namespace shok {
 		static inline size_t(__cdecl* const MultibyteToWString)(const char* in, wchar_t* out, size_t len) = reinterpret_cast<size_t(__cdecl*)(const char*, wchar_t*, size_t)>(0x55B73C);
 
 		static inline UIRenderer* (__cdecl* const GlobalObj)() = reinterpret_cast<UIRenderer * (__cdecl*)()>(0x556F5B);
+
+		// ctor 556E9A (camera)
 	};
 	class UIRenderCustomColorContext {
 	public:

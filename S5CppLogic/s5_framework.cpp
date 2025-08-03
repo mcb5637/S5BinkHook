@@ -518,3 +518,75 @@ void Framework::CMain::HookModeChange()
     CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40B3BE), 0x40B3C7 - 0x40B3BE };
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x40B3BE), CppLogic::Hooks::MemberFuncPointerToVoid(&CMain::CheckToDoOverride, 0), reinterpret_cast<void*>(0x40B3C7));
 }
+
+void (*Framework::CMain::ResizeWindow)(Framework::CMain::SWindowData* wd) = nullptr;
+
+BBRw::CEngine* __cdecl initrw_override(Framework::CMain::SWindowData* wd) {
+    if (Framework::CMain::ResizeWindow)
+        Framework::CMain::ResizeWindow(wd);
+    auto f = reinterpret_cast<BBRw::CEngine * (__cdecl*)(Framework::CMain::SWindowData * wd)>(0x48C77B);
+    return f(wd);
+}
+
+bool HookOverrideWindowInit_Hooked = false;
+void Framework::CMain::HookOverrideWindowInit()
+{
+    if (HookOverrideWindowInit_Hooked)
+        return;
+    HookOverrideWindowInit_Hooked = true;
+    CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x40B31A), 0x10 };
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40B31A), &initrw_override);
+}
+
+void Framework::CMain::SWindowData::OverrideSizeWindowed(int x, int y, int w, int h, bool borderless)
+{
+    int ww = w;
+    int wh = h;
+    if (borderless) {
+        SetWindowLong(MainWindow, -16, 0);
+    }
+    else {
+        RECT re{};
+        GetWindowRect(MainWindow, &re);
+        ww += re.right - re.left - Width;
+        wh += re.bottom - re.top - Height;
+    }
+    SetWindowPos(MainWindow, 0, x, y, ww, wh, 0);
+    Width = w;
+    Height = h;
+    Fullscreen = false;
+}
+
+void Framework::CMain::SWindowData::OverrideSizeBorderlessFullscreen(std::string_view screen)
+{
+    struct D {
+        std::string_view N;
+        std::optional<RECT> First = std::nullopt;
+        std::optional<RECT> Selected = std::nullopt;
+    };
+    D d{ screen };
+
+    EnumDisplayMonitors(nullptr, nullptr, [](HMONITOR m, HDC, LPRECT r, LPARAM vd) -> BOOL {
+        D* d = reinterpret_cast<D*>(vd);
+        if (!d->First.has_value()) {
+            d->First = *r;
+        }
+        MONITORINFOEX mi{};
+        mi.cbSize = sizeof(MONITORINFOEX);
+        if (GetMonitorInfo(m, &mi)) {
+            if (d->N == mi.szDevice) {
+                d->Selected = *r;
+            }
+        }
+        return true;
+    }, reinterpret_cast<LPARAM>(&d));
+
+    if (d.Selected.has_value()) {
+        OverrideSizeWindowed(*d.Selected, true);
+        return;
+    }
+    if (d.First.has_value()) {
+        OverrideSizeWindowed(*d.First, true);
+        return;
+    }
+}

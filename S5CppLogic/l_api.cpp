@@ -429,6 +429,41 @@ namespace CppLogic::API {
 		return 0;
 	}
 
+	int GetMonitors(lua::State L) {
+		L.NewTable();
+		struct D {
+			lua::State L;
+			int i = 1;
+		};
+		D d{ L };
+
+		EnumDisplayMonitors(nullptr, nullptr, [](HMONITOR m, HDC, LPRECT r, LPARAM vd) -> BOOL {
+			D* d = reinterpret_cast<D*>(vd);
+			MONITORINFOEX mi{};
+			mi.cbSize = sizeof(MONITORINFOEX);
+			if (GetMonitorInfo(m, &mi)) {
+				d->L.NewTable();
+
+				d->L.Push("Name");
+				d->L.Push(mi.szDevice);
+				d->L.SetTableRaw(-3);
+				d->L.Push("H");
+				d->L.Push(static_cast<int>(r->bottom - r->top));
+				d->L.SetTableRaw(-3);
+				d->L.Push("W");
+				d->L.Push(static_cast<int>(r->right - r->left));
+				d->L.SetTableRaw(-3);
+
+
+				d->L.SetTableRaw(-2, d->i);
+				++d->i;
+			}
+			return true;
+		}, reinterpret_cast<LPARAM>(&d));
+
+		return 1;
+	}
+
 	int RNG::Int(lua::State L)
 	{
 		RNG* th = L.CheckUserClass<RNG>(1);
@@ -522,6 +557,18 @@ namespace CppLogic::API {
 	}
 #endif
 
+	void ResizeWindow(Framework::CMain::SWindowData* wd) {
+		Framework::CMain* f = *Framework::CMain::GlobalObj;
+		static constexpr const char* key = "CppLogic\\BordelessFullscreenOn";
+		if (!f->GDB.IsKeyValid(key))
+			return;
+		std::string_view n{ f->GDB.GetString(key) };
+		if (n.empty())
+			return;
+
+		wd->OverrideSizeBorderlessFullscreen(n);
+	}
+
 	constexpr std::array API{
 			lua::FuncReference::GetRef<Eval>("Eval"),
 			lua::FuncReference::GetRef<Log>("Log"),
@@ -549,6 +596,7 @@ namespace CppLogic::API {
 			lua::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
 			lua::FuncReference::GetRef<GetCurrentCutscene>("GetCurrentCutscene"),
 			lua::FuncReference::GetRef<EnableScriptTriggerEval>("EnableScriptTriggerEval"),
+			lua::FuncReference::GetRef<GetMonitors>("GetMonitors"),
 #ifdef _DEBUG
 			lua::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
 			lua::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
@@ -560,6 +608,9 @@ namespace CppLogic::API {
 		L.RegisterFuncs(API, -3);
 		if (L.GetState() == shok::LuaStateMainmenu) {
 			L.RegisterFunc<ReloadExternalmaps>("ReloadExternalmaps", -3);
+
+			Framework::CMain::ResizeWindow = &ResizeWindow;
+			Framework::CMain::HookOverrideWindowInit();
 		}
 		MainThreadID = GetCurrentThreadId();
 		RNG::Register(L);

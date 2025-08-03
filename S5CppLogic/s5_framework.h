@@ -431,12 +431,18 @@ namespace Framework {
 			HWND MainWindow;
 			void* someFunc;
 			PADDINGI(1);
-			bool Windowed;
+			bool Fullscreen;
 			int Width;
 			int Height;
 			int ColorDepth;
 			PADDINGI(1); // some bool that never seems to be able to be true
 			int TextureResolution;
+
+			void OverrideSizeWindowed(int x, int y, int w, int h, bool borderless);
+			inline void OverrideSizeWindowed(const RECT& r, bool borderless) {
+				OverrideSizeWindowed(r.left, r.top, r.right - r.left, r.bottom - r.top, borderless);
+			}
+			void OverrideSizeBorderlessFullscreen(std::string_view screen);
 		} WindowData; // 160
 		AGameModeBase* GameModeBase; // 169
 		PADDINGI(1);
@@ -485,6 +491,9 @@ namespace Framework {
 		static void (*OnModeChange)(NextMode mode);
 		static void (*OnSaveLoaded)();
 		static void (*MainmenuUpdate)();
+
+		static void HookOverrideWindowInit();
+		static void (*ResizeWindow)(Framework::CMain::SWindowData* wd);
 
 	private:
 		void __thiscall CheckToDoOverride();

@@ -318,7 +318,7 @@ end
 --- @param checkUserRequested boolean|nil
 --- @return ModList
 function ModLoader.DiscoverRequired(req, modlist, checkUserRequested)
-	modlist = modlist or {Mods = {}, Incompatible = {}, Missing = {}}
+	modlist = modlist or {Mods = {}, Incompatible = {}}
 	for _, r in ipairs(req) do
 		local name, cmp = ModLoader.ParseModString(r)
 		local found = false
@@ -467,13 +467,27 @@ end
 --- discovers mods and loads them
 function ModLoader.RequireModList()
 	xpcall(function()
+		---@type ModList
+		ModLoader.ModList = {Mods = {}, Incompatible = {}}
 		if ModLoader.MapInfo.IsSavegame then
 			local _, ml = ModLoader.ParseSaveGUID(ModLoader.MapInfo.MapGUID, ModLoader.MapInfo.MapName,
 				ModLoader.MapInfo.MapType, ModLoader.MapInfo.MapCampagnName
 			)
 			ModLoader.RequiredMods = ml
+		else
+			local r, i = CppLogic.ModLoader.MapGetModPacks(Framework.GetCurrentMapName(), Framework.GetCurrentMapTypeAndCampaignName())
+			if r[1] then
+				if not ModLoader.RequiredMods[1] then
+					ModLoader.RequiredMods = r
+				else
+					for _,m in ipairs(r) do
+						table.insert(ModLoader.RequiredMods, m)
+					end
+				end
+			end
+			ModLoader.ModList.Incompatible = i
 		end
-		ModLoader.ModList = ModLoader.DiscoverRequired(ModLoader.RequiredMods)
+		ModLoader.DiscoverRequired(ModLoader.RequiredMods, ModLoader.ModList)
 		if not ModLoader.MapInfo.IsSavegame then
 			ModLoader.DiscoverUserRequested(ModLoader.ModList)
 		end

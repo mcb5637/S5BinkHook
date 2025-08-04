@@ -1244,6 +1244,56 @@ int CppLogic::ModLoader::ModLoader::LoadStringTableTextOverrides(lua::State L)
 	return 1;
 }
 
+int CppLogic::ModLoader::ModLoader::MapGetModPacks(lua::State l)
+{
+	luaext::EState L{ l };
+	const char* n = L.CheckString(1);
+	auto ty = L.CheckEnum<shok::MapType>(2);
+	const char* cn = L.OptString(3, nullptr); // optional
+	Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
+	if (ci == nullptr)
+		throw lua::LuaException("invalid map type/campagn");
+	Framework::MapInfo* i = ci->GetMapInfoByName(n);
+	if (i == nullptr)
+		throw lua::LuaException("invalid");
+
+	ExtendedMapInfo inf{};
+	auto seri = BB::CXmlSerializer::CreateUnique();
+
+	if (i->IsExternalmap) {
+		auto ar = BB::CBBArchiveFile::CreateUnique();
+		ar->OpenArchive(i->MapFilePath.c_str());
+		auto file = ar->OpenFileStreamUnique("Maps\\ExternalMap\\Info.xml", BB::IStream::Flags::DefaultRead);
+		seri->DeserializeByData(file.get(), &inf, ExtendedMapInfo::SerializationData);
+		ar->CloseArchive();
+	}
+	else {
+		auto infoxml = std::format("{}\\{}", i->MapFilePath.c_str(), "Info.xml");
+		BB::CFileStreamEx file{};
+		file.OpenFile(infoxml.c_str(), BB::IStream::Flags::DefaultRead);
+		seri->DeserializeByData(&file, &inf, ExtendedMapInfo::SerializationData);
+		file.Close();
+	}
+
+	L.NewTable();
+	int j = 1;
+	for (const auto& s : inf.ModPacks.Required) {
+		L.Push(s);
+		L.SetTableRaw(-2, j);
+		++j;
+	}
+
+	L.NewTable();
+	j = 1;
+	for (const auto& s : inf.ModPacks.Incompatible) {
+		L.Push(s);
+		L.SetTableRaw(-2, j);
+		++j;
+	}
+
+	return 2;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
@@ -1388,6 +1438,19 @@ const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationDataE
 	AutoMemberSerialization(ModpackDesc, BBAPath),
 	BB::SerializationData::GuardData(),
 };
+
+const BB::SerializationData CppLogic::ModLoader::ExtendedMapInfo::SModPacks::SerializationData[]{
+	AutoMemberSerialization(ExtendedMapInfo::SModPacks, Required),
+	AutoMemberSerialization(ExtendedMapInfo::SModPacks, Incompatible),
+	BB::SerializationData::GuardData(),
+};
+
+const BB::SerializationData CppLogic::ModLoader::ExtendedMapInfo::SerializationData[]{
+	BB::SerializationData::AutoBaseClass<ExtendedMapInfo, Framework::MapInfo>(),
+	AutoMemberSerialization(ExtendedMapInfo, ModPacks),
+	BB::SerializationData::GuardData(),
+};
+
 
 int CppLogic::ModLoader::ArchivePopHelper::Remove(lua::State L)
 {

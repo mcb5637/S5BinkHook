@@ -3542,6 +3542,14 @@ local ModpackDesc = {
 ---@return ModpackDesc|string
 function CppLogic.ModLoader.GetModpackInfo(name) end
 
+--- gets map modpack info from its extended info.xml
+---@param name string
+---@param type number
+---@param cname string?
+---@return string[] required
+---@return string[] incompatible
+function CppLogic.ModLoader.MapGetModPacks(name, type, cname) end
+
 --- loads the bba of a ModPack.
 ---@param name string
 ---@return ArchivePopHelper

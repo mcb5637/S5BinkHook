@@ -360,6 +360,7 @@ namespace CppLogic::ModLoader {
 		static int GetModPackList(lua::State L);
 		static int OverrideSavegameValid(lua::State L);
 		static int LoadStringTableTextOverrides(lua::State L);
+		static int MapGetModPacks(lua::State L);
 
 		static constexpr std::array LuaFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -376,6 +377,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<SetModPackList>("SetModPackList"),
 				lua::FuncReference::GetRef<GetModPackList>("GetModPackList"),
 				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
+				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{
@@ -389,6 +391,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
 				lua::FuncReference::GetRef<ReserializeModel>("ReserializeModel"),
 				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
+				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
 		};
 
 		static constexpr std::array Mainmenu{
@@ -397,6 +400,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<GetModpacks>("GetModpacks"),
 				lua::FuncReference::GetRef<OverrideSavegameValid>("OverrideSavegameValid"),
 				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
+				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
 		};
 
 	public:
@@ -418,6 +422,16 @@ namespace CppLogic::ModLoader {
 
 		static const BB::SerializationData SerializationData[];
 		static const BB::SerializationData SerializationDataEx[];
+	};
+
+	struct ExtendedMapInfo : Framework::MapInfo {
+		struct SModPacks {
+			std::vector<std::string> Required, Incompatible;
+
+			static const BB::SerializationData SerializationData[];
+		} ModPacks;
+
+		static const BB::SerializationData SerializationData[];
 	};
 
 	class ArchivePopHelper {

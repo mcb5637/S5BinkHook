@@ -250,6 +250,12 @@ bool EGL::CMovingEntity::IsFleeingFrom(const shok::Position& center, float range
 {
 	if (GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED) != static_cast<shok::EntityId>(0))
 		return true;
+	
+	auto aEnt = std::atan2(center.Y - Position.Y, center.X - Position.X);
+	auto aTarget = std::atan2(center.Y - TargetPosition.Y, center.X - TargetPosition.X);
+	if (std::abs(aEnt - aTarget) >= std::numbers::pi / 2.0)
+		return false;
+
 	float posrsq = Position.GetDistanceSquaredTo(center);
 	float tprsq = TargetPosition.GetDistanceSquaredTo(center);
 	return std::sqrtf(posrsq) + range < std::sqrtf(tprsq);

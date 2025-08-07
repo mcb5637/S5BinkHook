@@ -505,6 +505,17 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
+	int MovingEntityIsFleeingFrom(lua::State l) {
+		luaext::EState L{ l };
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e);
+		if (!m)
+			throw lua::LuaException("no moving entity at 1");
+		auto p = L.CheckPos(2);
+		L.Push(m->IsFleeingFrom(p, L.OptFloat(3, 500.0f)));
+		return 1;
+	}
+
 	int HeroGetCamouflageDurationLeft(lua::State l) {
 		luaext::EState L{ l };
 		GGL::CSettler* s = L.CheckSettler(1);
@@ -858,7 +869,7 @@ namespace CppLogic::Entity {
 			L.Push(c->InvisibilityRemaining <= 0);
 			return 1;
 		}
-		L.Push(false);
+		L.Push(true);
 		return 1;
 	}
 
@@ -1866,6 +1877,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<SetScale>("SetScale"),
 			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
 			lua::FuncReference::GetRef<MovingEntitySetTargetPos>("MovingEntitySetTargetPos"),
+			lua::FuncReference::GetRef<MovingEntityIsFleeingFrom>("MovingEntityIsFleeingFrom"),
 			lua::FuncReference::GetRef<GetLimitedLifespanRemaining>("GetLimitedLifespanRemaining"),
 			lua::FuncReference::GetRef<SetLimitedLifespanRemaining>("SetLimitedLifespanRemaining"),
 			lua::FuncReference::GetRef<GetTaskListIndex>("GetTaskListIndex"),

@@ -1253,6 +1253,12 @@ function CppLogic.Entity.MovingEntityGetTargetPos(id) end
 --- @param p Position|PositionR position table, with optional rotation
 function CppLogic.Entity.MovingEntitySetTargetPos(id, p) end
 
+--- checks if a moving entity is fleing from a position
+--- @param id entity
+--- @param p Position
+--- @return number
+function CppLogic.Entity.MovingEntityIsFleeingFrom(id, p) end
+
 --- entity exploration.
 --- @param id entity
 --- @return number exploration

@@ -174,6 +174,25 @@ function ModLoaderMainmenu.LoadMainmenuModPacks()
 	ModLoader.CleanupMods(ml, false, false, true)
 end
 
+---@diagnostic disable-next-line: duplicate-set-field
+ModLoader.CheckUserRequestedMod = ModLoader.IsUserRequestedModWhitelisted
+
+---@param map string
+---@param type number
+---@param cname string?
+---@return ModList
+function ModLoaderMainmenu.PredictMapModPacks(map, type, cname)
+	local r, i, ur = CppLogic.ModLoader.MapGetModPacks(map, type, cname)
+	---@diagnostic disable-next-line: inject-field
+	ModLoader.UserRequestedModWhitelisted = ur
+	---@type ModList
+	local modlist = {Mods = {}, Incompatible = i, Failed = {}}
+	ModLoader.DiscoverRequired(r, modlist, nil, true)
+	ModLoader.DiscoverUserRequested(modlist, true)
+	ModLoader.SortMods(modlist, true)
+	return modlist
+end
+
 function ModLoaderMainmenu.UpdateMonitor()
 	---@type CPPLMonitorInfo?
 	local m = ModLoaderMainmenu.MonitorScroll:GetElementOf(XGUIEng.GetCurrentWidgetID())

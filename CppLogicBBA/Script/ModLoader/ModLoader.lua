@@ -68,6 +68,7 @@ if false then
 	---@class ModList
 	---@field Mods ModpackDesc[]
 	---@field Incompatible string[]
+	---@field Failed string[]
 	local ModList = {
 	}
 	---@class ModPack
@@ -316,9 +317,21 @@ end
 --- @param req string[]
 --- @param modlist ModList|nil
 --- @param checkUserRequested boolean|nil
+--- @param failuresToList boolean?
 --- @return ModList
-function ModLoader.DiscoverRequired(req, modlist, checkUserRequested)
-	modlist = modlist or {Mods = {}, Incompatible = {}}
+function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresToList)
+	modlist = modlist or {Mods = {}, Incompatible = {}, Failed = {}}
+	local function checkfail(cond, msg)
+		if failuresToList then
+			if not cond then
+				table.insert(modlist.Failed, msg)
+				return false
+			end
+		else
+			assert(cond, msg)
+		end
+		return true
+	end
 	for _, r in ipairs(req) do
 		local name, cmp = ModLoader.ParseModString(r)
 		local found = false
@@ -331,12 +344,15 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested)
 		if not found then
 			local m = CppLogic.ModLoader.GetModpackInfo(name)
 			if type(m) == "table" then
-				assert(cmp(m.Version), "mod version missmatch: "..m.Name)
-				local good = true
+				local good = checkfail(cmp(m.Version), "mod version missmatch: requested"..r.." has "..m.Name.."@"..m.Version)
 				if checkUserRequested then
-					assert(m.UserRequestable or m.MainmenuMod, name.." is user requested, but not marked as user requestable or mainmenu")
+					good = checkfail(m.UserRequestable or m.MainmenuMod, name.." is user requested, but not marked as user requestable or mainmenu")
 					if not m.UserRequestable then
 						good = false
+					else
+						if not ModLoader.CheckUserRequestedMod(m.Name) then
+							good = false
+						end
 					end
 				end
 				if good then
@@ -356,7 +372,7 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested)
 					ModLoader.DiscoverRequired(m.Required, modlist)
 				end
 			else
-				assert(false, "missing mod: "..name)
+				checkfail(false, "missing mod: "..name)
 			end
 		end
 	end
@@ -366,7 +382,8 @@ end
 --- checks a modlist and sorts it
 --- ... [2] overrides [1]
 --- @param modlist ModList
-function ModLoader.SortMods(modlist)
+--- @param failuresToList boolean?
+function ModLoader.SortMods(modlist, failuresToList)
 	---@generic T
 	---@param t T[]
 	---@param v T
@@ -379,17 +396,34 @@ function ModLoader.SortMods(modlist)
 		end
 		return nil
 	end
+	local function checkfail(cond, msg)
+		if failuresToList then
+			if not cond then
+				table.insert(modlist.Failed, msg)
+			end
+		else
+			assert(cond, msg)
+		end
+	end
 	for _, m in ipairs(modlist.Mods) do
 		local c = contains(modlist.Incompatible, m.Name)
 		if c then
-			assert(false, "incompatibility found: "..m.Name.." with "..c)
+			local with = "Map"
+			for _,mp in ipairs(modlist.Mods) do
+				if contains(mp.Incompatible, m.Name) then
+					with = mp.Name
+					break
+				end
+			end
+			checkfail(false, "incompatibility found: "..m.Name.." with "..with)
 		end
 	end
 	table.sort(modlist.Mods, function(a, b)
 		local ab = contains(a.Override, b.Name)
 		local ba = contains(b.Override, a.Name)
 		if ab and ba then
-			assert(false, "circular override: "..a.Name.." with "..b.Name)
+			checkfail(false, "circular override: "..a.Name.." with "..b.Name)
+			return false
 		end
 		if ba then
 			return true
@@ -468,7 +502,7 @@ end
 function ModLoader.RequireModList()
 	xpcall(function()
 		---@type ModList
-		ModLoader.ModList = {Mods = {}, Incompatible = {}}
+		ModLoader.ModList = {Mods = {}, Incompatible = {}, Failed = {}}
 		if ModLoader.MapInfo.IsSavegame then
 			local _, ml = ModLoader.ParseSaveGUID(ModLoader.MapInfo.MapGUID, ModLoader.MapInfo.MapName,
 				ModLoader.MapInfo.MapType, ModLoader.MapInfo.MapCampagnName
@@ -640,18 +674,31 @@ end
 --- @param modname string
 --- @return boolean
 function ModLoader.IsUserRequestedModWhitelisted(modname)
-	return modname == "test" or modname == "WideScreenMode" or modname == "BugFixes"
+	if modname == "test" or modname == "WideScreenMode" or modname == "BugFixes" then
+		return true
+	end
+	if not ModLoader.UserRequestedModWhitelisted then
+		local _, _, ur = CppLogic.ModLoader.MapGetModPacks(Framework.GetCurrentMapName(), Framework.GetCurrentMapTypeAndCampaignName())
+		ModLoader.UserRequestedModWhitelisted = ur
+	end
+	for _,s in ipairs(ModLoader.UserRequestedModWhitelisted) do
+		if s == modname then
+			return true
+		end
+	end
+	return false
 end
 
 --- parse user requested mods and add them to the mod list
 --- @param modlist ModList
-function ModLoader.DiscoverUserRequested(modlist)
+--- @param failuresToList boolean?
+function ModLoader.DiscoverUserRequested(modlist, failuresToList)
 	local str = GDB.GetString("CppLogic\\UserRequestedMods")
 	if not ModLoader.CheckUserRequestedMod then
 		return
 	end
 	if str and str ~= "" then
-		ModLoader.DiscoverRequired(ModLoader.LoadModList(str), modlist, true)
+		ModLoader.DiscoverRequired(ModLoader.LoadModList(str), modlist, true, failuresToList)
 	end
 end
 

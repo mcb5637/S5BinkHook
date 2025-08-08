@@ -1291,7 +1291,15 @@ int CppLogic::ModLoader::ModLoader::MapGetModPacks(lua::State l)
 		++j;
 	}
 
-	return 2;
+	L.NewTable();
+	j = 1;
+	for (const auto& s : inf.ModPacks.UserRequestable) {
+		L.Push(s);
+		L.SetTableRaw(-2, j);
+		++j;
+	}
+
+	return 3;
 }
 
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
@@ -1442,6 +1450,7 @@ const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationDataE
 const BB::SerializationData CppLogic::ModLoader::ExtendedMapInfo::SModPacks::SerializationData[]{
 	AutoMemberSerialization(ExtendedMapInfo::SModPacks, Required),
 	AutoMemberSerialization(ExtendedMapInfo::SModPacks, Incompatible),
+	AutoMemberSerialization(ExtendedMapInfo::SModPacks, UserRequestable),
 	BB::SerializationData::GuardData(),
 };
 

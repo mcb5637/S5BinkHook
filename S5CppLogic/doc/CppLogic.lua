@@ -3554,6 +3554,7 @@ function CppLogic.ModLoader.GetModpackInfo(name) end
 ---@param cname string?
 ---@return string[] required
 ---@return string[] incompatible
+---@return string[] userRequestable
 function CppLogic.ModLoader.MapGetModPacks(name, type, cname) end
 
 --- loads the bba of a ModPack.

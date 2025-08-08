@@ -426,7 +426,7 @@ namespace CppLogic::ModLoader {
 
 	struct ExtendedMapInfo : Framework::MapInfo {
 		struct SModPacks {
-			std::vector<std::string> Required, Incompatible;
+			std::vector<std::string> Required, Incompatible, UserRequestable;
 
 			static const BB::SerializationData SerializationData[];
 		} ModPacks;

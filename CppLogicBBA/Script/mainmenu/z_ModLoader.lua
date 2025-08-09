@@ -180,15 +180,20 @@ ModLoader.CheckUserRequestedMod = ModLoader.IsUserRequestedModWhitelisted
 ---@param map string
 ---@param type number
 ---@param cname string?
+---@param userRequested string[]?
 ---@return ModList
-function ModLoaderMainmenu.PredictMapModPacks(map, type, cname)
+function ModLoaderMainmenu.PredictMapModPacks(map, type, cname, userRequested)
 	local r, i, ur = CppLogic.ModLoader.MapGetModPacks(map, type, cname)
 	---@diagnostic disable-next-line: inject-field
 	ModLoader.UserRequestedModWhitelisted = ur
 	---@type ModList
 	local modlist = {Mods = {}, Incompatible = i, Failed = {}}
 	ModLoader.DiscoverRequired(r, modlist, nil, true)
-	ModLoader.DiscoverUserRequested(modlist, true)
+	if userRequested then
+		ModLoader.DiscoverRequired(userRequested, modlist, true, true)
+	else
+		ModLoader.DiscoverUserRequested(modlist, true)
+	end
 	ModLoader.SortMods(modlist, true)
 	return modlist
 end

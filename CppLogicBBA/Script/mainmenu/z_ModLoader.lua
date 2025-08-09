@@ -189,11 +189,7 @@ function ModLoaderMainmenu.PredictMapModPacks(map, type, cname, userRequested)
 	---@type ModList
 	local modlist = {Mods = {}, Incompatible = i, Failed = {}}
 	ModLoader.DiscoverRequired(r, modlist, nil, true)
-	if userRequested then
-		ModLoader.DiscoverRequired(userRequested, modlist, true, true)
-	else
-		ModLoader.DiscoverUserRequested(modlist, true)
-	end
+	ModLoader.DiscoverUserRequested(modlist, userRequested, true)
 	ModLoader.SortMods(modlist, true)
 	return modlist
 end

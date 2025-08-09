@@ -691,15 +691,23 @@ end
 
 --- parse user requested mods and add them to the mod list
 --- @param modlist ModList
+--- @param requested string|string[]|nil
 --- @param failuresToList boolean?
-function ModLoader.DiscoverUserRequested(modlist, failuresToList)
-	local str = GDB.GetString("CppLogic\\UserRequestedMods")
+function ModLoader.DiscoverUserRequested(modlist, requested, failuresToList)
+	if not requested then
+		requested = GDB.GetString("CppLogic\\UserRequestedMods")
+	end
+	---@type string[]
+	local l
+	if type(requested)=="string" then
+		l = ModLoader.LoadModList(requested)
+	else
+		l = requested
+	end
 	if not ModLoader.CheckUserRequestedMod then
 		return
 	end
-	if str and str ~= "" then
-		ModLoader.DiscoverRequired(ModLoader.LoadModList(str), modlist, true, failuresToList)
-	end
+	ModLoader.DiscoverRequired(l, modlist, true, failuresToList)
 end
 
 --- adds empty tables, for compatibility with old modloaders

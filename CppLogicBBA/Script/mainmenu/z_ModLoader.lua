@@ -181,15 +181,31 @@ ModLoader.CheckUserRequestedMod = ModLoader.IsUserRequestedModWhitelisted
 ---@param type number
 ---@param cname string?
 ---@param userRequested string[]?
+---@param saveGUID string?
 ---@return ModList
-function ModLoaderMainmenu.PredictMapModPacks(map, type, cname, userRequested)
+function ModLoaderMainmenu.PredictMapModPacks(map, type, cname, userRequested, saveGUID)
+	---@type string[]?
+	local saveMl = nil
+	if saveGUID then
+		local _, ml = ModLoader.ParseSaveGUID(saveGUID, map, type, cname or "")
+		if ml then
+			saveMl = ml
+		else
+			return {Mods = {}, Incompatible = {}, Failed = {"save does not contain modlist"}}
+		end
+	end
 	local r, i, ur = CppLogic.ModLoader.MapGetModPacks(map, type, cname)
+	if saveMl then
+		r = saveMl
+	end
 	---@diagnostic disable-next-line: inject-field
 	ModLoader.UserRequestedModWhitelisted = ur
 	---@type ModList
 	local modlist = {Mods = {}, Incompatible = i, Failed = {}}
 	ModLoader.DiscoverRequired(r, modlist, nil, true)
-	ModLoader.DiscoverUserRequested(modlist, userRequested, true)
+	if not saveMl then
+		ModLoader.DiscoverUserRequested(modlist, userRequested, true)
+	end
 	ModLoader.SortMods(modlist, true)
 	return modlist
 end

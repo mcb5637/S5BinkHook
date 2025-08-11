@@ -338,13 +338,14 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresTo
 		for _, m in ipairs(modlist.Mods) do
 			if m.Name == name then
 				found = true
+				checkfail(cmp(m.Version), "mod version missmatch: requested "..r.." has "..m.Name.."@"..m.Version.." already loading")
 				break
 			end
 		end
 		if not found then
 			local m = CppLogic.ModLoader.GetModpackInfo(name)
 			if type(m) == "table" then
-				local good = checkfail(cmp(m.Version), "mod version missmatch: requested"..r.." has "..m.Name.."@"..m.Version)
+				local good = checkfail(cmp(m.Version), "mod version missmatch: requested "..r.." has "..m.Name.."@"..m.Version)
 				if checkUserRequested then
 					good = checkfail(m.UserRequestable or m.MainmenuMod, name.." is user requested, but not marked as user requestable or mainmenu")
 					if not m.UserRequestable then

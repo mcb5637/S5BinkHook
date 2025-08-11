@@ -413,6 +413,8 @@ void __stdcall CppLogic::IO::StringViewReadStream::SetFilePointer(long fp)
 
 long __stdcall CppLogic::IO::StringViewReadStream::Read(void* buff, long numBytesToRead)
 {
+	if (numBytesToRead == 0)
+		return 0;
 	if (CurrentPos >= Buffer.length())
 		throw std::logic_error{ "out of bounds" };
 	auto sub = Buffer.substr(CurrentPos);

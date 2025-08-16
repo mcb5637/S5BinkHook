@@ -1571,7 +1571,7 @@ void GGL::CBarrackBehavior::EventBuyLeaderOverride(EGL::CEventValue_Int* ev)
 		return;
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	auto etyid = pl->SettlerUpgradeManager->GetTypeByUCat(static_cast<shok::UpgradeCategoryId>(ev->Data));
-	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	auto* ety = CppLogic::GetEntityType(etyid);
 	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, shok::EntityId::Invalid, etyid,
 		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
 		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
@@ -1600,7 +1600,7 @@ void GGL::CBarrackBehavior::EventBuySoldierOverride(EGL::CEvent1Entity* ev)
 	leader->FireEvent(&getsolty);
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	auto etyid = static_cast<shok::EntityTypeId>(getsolty.Data);
-	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	auto* ety = CppLogic::GetEntityType(etyid);
 	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, ev->EntityID, etyid,
 		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
 		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
@@ -1730,7 +1730,7 @@ void __thiscall GGL::CKeepBehavior::EventBuySerfOverride(BB::CEvent* ev)
 		return;
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 	auto etyid = CppLogic::GetIdManager<shok::EntityTypeId>().GetIdByName("PU_Serf");
-	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	auto* ety = CppLogic::GetEntityType(etyid);
 	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, shok::EntityId::Invalid, etyid,
 		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
 		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),

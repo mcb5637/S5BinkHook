@@ -176,16 +176,17 @@ namespace EGL {
 		BB::CIDManagerEx* EffectTypeManager;
 		shok::Vector<ED::CEffectProps*> EffectTypes;
 	};
+	struct EffectType {
+		PADDINGI(1);
+		CGLEEffectProps* Logic = nullptr;
+		ED::CEffectProps* Display = nullptr;
+
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0CCD8);
+	};
 	class EffectsProps {
 	public:
-		struct EffectData {
-			PADDINGI(1);
-			CGLEEffectProps* Logic = nullptr;
-			ED::CEffectProps* Display = nullptr;
-
-
-			static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0CCD8);
-		};
-		shok::Vector<EffectData> Effects;
+		using EffectType = EffectType;
+		shok::Vector<EffectType> Effects;
 	};
 }

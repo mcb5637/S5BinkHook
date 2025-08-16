@@ -46,7 +46,7 @@ namespace GGL {
 		BB::CIDManagerEx* DamageClassManager;
 		shok::Vector<GGL::CDamageClassProps*> DamageClassList; // there is a damageclass 0, probably not working at all
 
-		GGL::CDamageClassProps* TryGet(shok::DamageClassId id);
+		GGL::CDamageClassProps* Get(shok::DamageClassId id);
 
 		static inline GGL::DamageClassesHolder** const GlobalObj = reinterpret_cast<GGL::DamageClassesHolder**>(0x85A3DC);
 	};

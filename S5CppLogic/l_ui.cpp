@@ -1950,13 +1950,13 @@ namespace CppLogic::UI {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
 		ev.Position.FloorToBuildingPlacement();
 		auto bottom = ev.FoundationType;
-		GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
+		GGlue::CGlueEntityProps* ety = CppLogic::GetEntityType(bottom);
 		if (!ety)
 			throw lua::LuaException("no bottom entitytype");
 		if (!ety->IsBuildingType())
 			throw lua::LuaException("bottom not a building");
 		auto top = ev.CannonType;
-		if (!(*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(top))
+		if (!CppLogic::GetEntityType(top))
 			throw lua::LuaException("no top entitytype");
 		if (!GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &ev.Position, ev.Orientation, shok::EntityId::Invalid))
 			throw lua::LuaException("cannot place foundation at that position");

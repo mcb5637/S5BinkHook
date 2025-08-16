@@ -2,6 +2,7 @@
 #include "s5_tech.h"
 #include "s5_classfactory.h"
 #include "s5_idmanager.h"
+#include "s5_maplogic.h"
 
 float shok::Technology::Modifier::ModifyValue(float i) const
 {
@@ -80,7 +81,15 @@ void shok::TechManager::PopTech(shok::TechnologyId i)
 
 shok::Technology* shok::TechManager::Get(shok::TechnologyId id)
 {
-	return Techs.at(static_cast<int>(id) - 1);
+	int i = static_cast<int>(id) - 1;
+	if (i >= 0 && i < static_cast<int>(Techs.size()))
+		return Techs[i];
+	return nullptr;
+}
+
+shok::Technology* CppLogic::GetTechnology(shok::TechnologyId id)
+{
+	return (*GGL::CGLGameLogic::GlobalObj)->TechManager->Get(id);
 }
 
 float shok::AdditionalTechModifier::ModifyValue(float i) const

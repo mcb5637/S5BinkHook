@@ -56,7 +56,7 @@ float& GGL::CDamageClassProps::GetBonusVsArmorClass(shok::ArmorClassId ac)
     return (&ArmorClassNoneFactor)[i];
 }
 
-GGL::CDamageClassProps* GGL::DamageClassesHolder::TryGet(shok::DamageClassId id)
+GGL::CDamageClassProps* GGL::DamageClassesHolder::Get(shok::DamageClassId id)
 {
     int i = static_cast<int>(id);
     if ( i > 0 && i < static_cast<int>(DamageClassList.size()))

@@ -872,7 +872,7 @@ namespace CppLogic::EntityType {
 		if (!t->IsBuildingType())
 			throw lua::LuaException("no building type at 1");
 		auto tech = L.CheckEnum<shok::TechnologyId>(2);
-		shok::Technology* techo = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tech);
+		shok::Technology* techo = CppLogic::GetTechnology(tech);
 		if (!techo)
 			throw lua::LuaException("no tech at 2");
 		EGL::CGLEEntity::BuildingMaxHpTechBoni.emplace(L.CheckEnum<shok::EntityTypeId>(1), tech);

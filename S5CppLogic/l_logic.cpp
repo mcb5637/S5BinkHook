@@ -38,14 +38,14 @@ namespace CppLogic::Logic {
 		luaext::EState L{ ls };
 		auto dmgclass = L.CheckEnum<shok::DamageClassId>(1);
 		auto amclass = L.CheckEnum<shok::ArmorClassId>(2);
-		L.Push((*GGL::DamageClassesHolder::GlobalObj)->TryGet(dmgclass)->GetBonusVsArmorClass(amclass));
+		L.Push(CppLogic::GetDamageClass(dmgclass)->GetBonusVsArmorClass(amclass));
 		return 1;
 	}
 	int SetDamageFactor(lua::State ls) {
 		luaext::EState L{ ls };
 		auto dmgclass = L.CheckEnum<shok::DamageClassId>(1);
 		auto amclass = L.CheckEnum<shok::ArmorClassId>(2);
-		(*GGL::DamageClassesHolder::GlobalObj)->TryGet(dmgclass)->GetBonusVsArmorClass(amclass) = L.CheckFloat(3);
+		CppLogic::GetDamageClass(dmgclass)->GetBonusVsArmorClass(amclass) = L.CheckFloat(3);
 		return 0;
 	}
 
@@ -181,7 +181,7 @@ namespace CppLogic::Logic {
 	int CanPlaceBuildingAt(lua::State ls) {
 		luaext::EState L{ ls };
 		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
-		GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ty);
+		GGlue::CGlueEntityProps* ety = CppLogic::GetEntityType(ty);
 		if (!ety)
 			throw lua::LuaException("no entitytype");
 		if (!ety->IsBuildingType())

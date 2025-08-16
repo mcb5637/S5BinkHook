@@ -222,7 +222,7 @@ GGlue::CGlueEntityProps* luaext::EState::OptEntityType(int idx)
 	if (!IsNumber(idx) && !IsString(idx))
 		return nullptr;
 	auto t = CheckEnum<shok::EntityTypeId>(idx);
-	return (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(t);
+	return CppLogic::GetEntityType(t);
 }
 GGlue::CGlueEntityProps* luaext::EState::CheckEntityType(int idx)
 {
@@ -246,7 +246,7 @@ void luaext::EState::StringToLower()
 shok::Technology* luaext::EState::CheckTech(int idx)
 {
 	auto tid = CheckEnum<shok::TechnologyId>(idx);
-	shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tid);
+	shok::Technology* tech = CppLogic::GetTechnology(tid);
 	if (!tech)
 		throw lua::LuaException{ std::format("no tech at {}", idx) };
 	return tech;

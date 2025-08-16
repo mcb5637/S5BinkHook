@@ -87,7 +87,7 @@ shok::ResourceType EGL::CGLEEntity::GetResourceProvided() const
 
 GGlue::CGlueEntityProps* EGL::CGLEEntity::GetEntityType() const
 {
-	return (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(EntityType);
+	return CppLogic::GetEntityType(EntityType);
 }
 
 int EGL::CGLEEntity::EventGetIntById(shok::EventIDs id)
@@ -998,8 +998,8 @@ shok::EntityTypeId GGL::CBuilding::GetWorkerType() const
 
 std::vector<shok::AdditionalTechModifier> GGL::CBuilding::ConstructionSpeedModifiers{};
 float __fastcall constructionsite_getprogresspertick_hook(GGL::CConstructionSite* th) { // param is constructionsite, just not done yet ;)
-	GGL::CGLSettlerProps* serf = static_cast<GGL::CGLSettlerProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf)->LogicProps);
-	GGL::CGLBuildingProps* bty = static_cast<GGL::CGLBuildingProps*>((*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(th->BuildingType)->LogicProps);
+	GGL::CGLSettlerProps* serf = static_cast<GGL::CGLSettlerProps*>(CppLogic::GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf)->LogicProps);
+	GGL::CGLBuildingProps* bty = static_cast<GGL::CGLBuildingProps*>(CppLogic::GetEntityType(th->BuildingType)->LogicProps);
 	float constructionfactor = serf->BuildFactor;
 	GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerId);
 	for (const shok::AdditionalTechModifier& tmod : GGL::CBuilding::ConstructionSpeedModifiers) {
@@ -1147,7 +1147,7 @@ float EGL::CGLEEntity::CalculateDamageAgainstMe(int damage, shok::DamageClassId 
 	EGL::CEventGetValue_Int geta{ shok::EventIDs::GetArmor };
 	FireEvent(&geta);
 
-	if (auto dco = (*GGL::DamageClassesHolder::GlobalObj)->TryGet(damageclass))
+	if (auto dco = CppLogic::GetDamageClass(damageclass))
 		dmg *= dco->GetBonusVsArmorClass(static_cast<shok::ArmorClassId>(getac.Data));
 	dmg -= geta.Data;
 	return dmg;
@@ -1427,7 +1427,7 @@ int __thiscall EGL::CGLEEntity::GetMaxHPOverride()
 			for (auto t : static_cast<GGL::CGLSettlerProps*>(et->LogicProps)->ModifyHitpoints.TechList) {
 				if (player->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
-				shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(t);
+				shok::Technology* tech = CppLogic::GetTechnology(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}
@@ -1437,7 +1437,7 @@ int __thiscall EGL::CGLEEntity::GetMaxHPOverride()
 				auto t = i->second;
 				if (player->GetTechStatus(t) != shok::TechState::Researched)
 					continue;
-				shok::Technology* tech = (*GGL::CGLGameLogic::GlobalObj)->GetTech(t);
+				shok::Technology* tech = CppLogic::GetTechnology(t);
 				hp = tech->HitpointModifier.ModifyValue(hp);
 			}
 		}

@@ -216,7 +216,7 @@ void GGUI::CPlaceBuildingState::HookPlacementRotation()
 
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(shok::EntityTypeId ety, const shok::Position& p, float range)
 {
-	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const GGlue::CGlueEntityProps* e = CppLogic::GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 
 	CppLogic::Iterator::EntityPredicateOfPlayer pl{ static_cast<shok::PlayerId>(0) };
@@ -236,7 +236,7 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(shok:
 }
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(shok::EntityTypeId ety, const shok::PositionRot& p, float range)
 {
-	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const GGlue::CGlueEntityProps* e = CppLogic::GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 
 	shok::Position r = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
@@ -244,7 +244,7 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(shok::En
 }
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPos(shok::EntityTypeId ety, const shok::PositionRot& p, float range)
 {
-	const GGlue::CGlueEntityProps* e = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ety);
+	const GGlue::CGlueEntityProps* e = CppLogic::GetEntityType(ety);
 	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
 	if (bp->BuildOn.size() == 0)
 		return GetNearestPlacementPosFree(ety, p, range);

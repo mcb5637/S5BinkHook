@@ -554,7 +554,6 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76E018;
 
 		GGL::CPlayerStatus* GetPlayer(shok::PlayerId i);
-		shok::Technology* GetTech(shok::TechnologyId i);
 		void EnableAlarmForPlayer(shok::PlayerId pl);
 		void DisableAlarmForPlayer(shok::PlayerId pl);
 		void UpgradeSettlerCategory(shok::PlayerId pl, shok::UpgradeCategoryId ucat);

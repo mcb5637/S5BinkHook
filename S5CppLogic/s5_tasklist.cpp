@@ -325,3 +325,8 @@ void EGL::TaskData::RemoveExtraTasks()
         return a.ID >= shok::Task::TASK_LUA_FUNC;
         }), v.Vector.end());
 }
+
+EGL::CGLETaskList* CppLogic::GetTaskList(shok::TaskListId id)
+{
+    return (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(id);
+}

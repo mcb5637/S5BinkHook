@@ -245,11 +245,10 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTyp
 	return "EntityType";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::SanityCheck() {
-	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	auto idm = CppLogic::GetIdManager<shok::EntityTypeId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		auto et = EGL::CGLEEntitiesProps::GetEntityType(id);
+		auto et = CppLogic::GetEntityType(id);
 		if (et == nullptr)
 			throw lua::LuaException{ std::format("entitytype {}={} missing", n, static_cast<int>(id)) };
 		if (et->LogicProps == nullptr)
@@ -277,13 +276,12 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTyp
 	return "EffectType";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::SanityCheck() {
-	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
 	auto idm = CppLogic::GetIdManager<shok::EffectTypeId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		if (mng->Get(id)->Logic == nullptr)
+		if (CppLogic::GetEffectType(id)->Logic == nullptr)
 			throw lua::LuaException{ std::format("effecttype {}={} missing Logic", n, static_cast<int>(id)) };
-		if (mng->Get(id)->Display == nullptr)
+		if (CppLogic::GetEffectType(id)->Display == nullptr)
 			throw lua::LuaException{ std::format("effecttype {}={} missing Display", n, static_cast<int>(id)) };
 	}
 }
@@ -307,11 +305,10 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListI
 	return "TaskList";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::SanityCheck() {
-	auto* mng = *EGL::CGLETaskListMgr::GlobalObj;
 	auto idm = CppLogic::GetIdManager<shok::TaskListId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		if (mng->TaskLists.at(static_cast<int>(id)) == nullptr)
+		if (CppLogic::GetTaskList(id) == nullptr)
 			throw lua::LuaException{ std::format("tasklist {}={} missing", n, static_cast<int>(id)) };
 	}
 }
@@ -365,12 +362,11 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageCla
 	return "DamageClass";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::SanityCheck() {
-	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager;
 	auto idm = CppLogic::GetIdManager<shok::DamageClassId>();
 	auto acmng = CppLogic::GetIdManager<shok::ArmorClassId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		auto* dc = mng->Logic.TryGet(id);
+		auto* dc = CppLogic::GetDamageClass(id);
 		if (dc == nullptr)
 			throw lua::LuaException{ std::format("damageclass {}={} is missing", n, static_cast<int>(id)) };
 		for (auto ac : acmng) {
@@ -399,11 +395,10 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::Technolog
 	return "Technology";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::SanityCheck() {
-	auto* mng = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
 	auto idm = CppLogic::GetIdManager<shok::TechnologyId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		if (mng->Get(id) == nullptr)
+		if (CppLogic::GetTechnology(id) == nullptr)
 			throw lua::LuaException{ std::format("tech {}={} missing", n, static_cast<int>(id)) };
 	}
 }
@@ -594,7 +589,7 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCa
 	}
 	auto ctype = first;
 	while (ctype != shok::EntityTypeId::Invalid) {
-		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
+		auto* cty = CppLogic::GetEntityType(ctype);
 		auto* sty = dynamic_cast<GGL::CGLSettlerProps*>(cty->LogicProps);
 		if (sty == nullptr)
 			throw lua::LuaException{ "non settler type in settler ucat" };
@@ -624,7 +619,7 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddBuildingUpgradeC
 	}
 	auto ctype = first;
 	while (ctype != shok::EntityTypeId::Invalid) {
-		auto* cty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(ctype);
+		auto* cty = CppLogic::GetEntityType(ctype);
 		auto* bty = dynamic_cast<GGL::CGLBuildingProps*>(cty->LogicProps);
 		if (bty == nullptr)
 			throw lua::LuaException{ "non building type in building ucat" };
@@ -648,11 +643,11 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::WaterType
 	return "WaterType";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::SanityCheck() {
-	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager;
 	auto idm = CppLogic::GetIdManager<shok::WaterTypeId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		if (static_cast<int>(mng->Logic.WaterLogic.size()) <= static_cast<int>(id))
+		auto [l, d] = CppLogic::GetWaterType(id);
+		if (l == nullptr)
 			throw lua::LuaException{ std::format("watertype {}={} missing", n, static_cast<int>(id)) };
 	}
 }
@@ -714,11 +709,11 @@ const char* CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTy
 	return "TerrainType";
 }
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::SanityCheck() {
-	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager;
 	auto idm = CppLogic::GetIdManager<shok::TerrainTypeId>();
 	for (auto id : idm) {
 		auto n = idm.GetNameByID(id);
-		if (static_cast<int>(mng->Logic.LogicProps.size()) <= static_cast<int>(id))
+		auto [l, d] = CppLogic::GetTerrainType(id);
+		if (l == nullptr)
 			throw lua::LuaException{ std::format("terraintype {}={} missing", n, static_cast<int>(id)) };
 	}
 }
@@ -1112,7 +1107,7 @@ int CppLogic::ModLoader::ModLoader::ReserializeEntityType(lua::State l)
 	luaext::EState L{ l };
 	CppLogic::WinAPI::FileDialog dlg{};
 	auto etyid = L.CheckEnum<shok::EntityTypeId>(1);
-	auto* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(etyid);
+	auto* ety = CppLogic::GetEntityType(etyid);
 	auto t = std::format("Write {}", CppLogic::GetIdManager<shok::EntityTypeId>().GetNameByID(etyid));
 	dlg.Title = t.c_str();
 	dlg.Filter = "xml\0*.xml\0";

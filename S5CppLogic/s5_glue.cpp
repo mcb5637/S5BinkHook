@@ -9,6 +9,7 @@
 #include "s5_filesystem.h"
 #include "s5_mapdisplay.h"
 #include "s5_animset.h"
+#include "s5_framework.h"
 
 void GGlue::CGlueAnimsPropsMgr::CreateAnimProps(shok::AnimationId i)
 {
@@ -98,9 +99,18 @@ void GGlue::CEffectsPropsMgr::ReloadAllEffectTypes()
 	LoadData("Data\\Config\\Effects.xml");
 }
 
-EGL::EffectsProps::EffectData* GGlue::CEffectsPropsMgr::Get(shok::EffectTypeId id)
+EGL::EffectsProps::EffectType* GGlue::CEffectsPropsMgr::Get(shok::EffectTypeId id)
 {
-	return &EffectsProps.Effects.at(static_cast<int>(id));
+	int i = static_cast<int>(id);
+	if (i > 0 && i <= static_cast<int>(EffectsProps.Effects.size()))
+		return &EffectsProps.Effects[i];
+	return nullptr;
+}
+
+EGL::EffectType* CppLogic::GetEffectType(shok::EffectTypeId id)
+{
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
+	return mng->Get(id);
 }
 
 static inline void(__thiscall* const epropsmng_loadentitytypebyid)(GGlue::CEntitiesPropsMgr* th, int id) = reinterpret_cast<void(__thiscall*)(GGlue::CEntitiesPropsMgr*, int)>(0x5B931B);
@@ -117,7 +127,7 @@ void GGlue::CEntitiesPropsMgr::LoadEntityTypeByID(shok::EntityTypeId i)
 		dis.Vector.push_back(nullptr);
 	}
 	epropsmng_loadentitytypebyid(this, id);
-	auto* ty = CGLEEntitiesProps.GetEntityType(i);
+	auto* ty = CppLogic::GetEntityType(i);
 	ty->LogicProps->InitializeBlocking();
 	RefreshDisplayFlags();
 }
@@ -195,6 +205,11 @@ void GGlue::CDamageClassesPropsMgr::ResetDamageClasses()
 	}
 }
 
+GGL::CDamageClassProps* CppLogic::GetDamageClass(shok::DamageClassId id)
+{
+	return (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager->Logic.Get(id);
+}
+
 void GGlue::CTerrainPropsMgr::ReloadTerrainTypes()
 {
 	auto lv = Logic.LogicProps.SaveVector();
@@ -241,6 +256,15 @@ void GGlue::CTerrainPropsMgr::LoadTerrainTypeFromExtraFile(shok::TerrainTypeId i
 
 	lv.Vector.at(id) = d.Logic;
 	dv.Vector.at(id) = d.Display;
+}
+
+std::pair<GGlue::TerrainTypeLogicData*, GGlue::TerrainTypeDisplayData*> CppLogic::GetTerrainType(shok::TerrainTypeId id)
+{
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager;
+	int i = static_cast<int>(id);
+	if (i > 0 && i <= static_cast<int>(mng->Logic.LogicProps.size()) && i <= static_cast<int>(mng->Display.DisplayProps.size()))
+		return { &mng->Logic.LogicProps[i], &mng->Display.DisplayProps[i] };
+	return { nullptr, nullptr };
 }
 
 static inline void(__thiscall* const watertype_display_init)(GGlue::WaterTypeData::DisplayData* th) = reinterpret_cast<void(__thiscall*)(GGlue::WaterTypeData::DisplayData*)>(0x5BE750);
@@ -293,10 +317,23 @@ void GGlue::CGlueWaterPropsMgr::LoadWaterTypeFromExtraFile(shok::WaterTypeId i)
 	dv.Vector.at(id) = d.Display;
 }
 
+std::pair<GGlue::WaterTypeLogicData*, GGlue::WaterTypeDisplayData*> CppLogic::GetWaterType(shok::WaterTypeId id)
+{
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager;
+	int i = static_cast<int>(id);
+	if (i > 0 && i <= static_cast<int>(mng->Logic.WaterLogic.size()) && i <= static_cast<int>(mng->Display.WaterDisplay.size()))
+		return { &mng->Logic.WaterLogic[i], &mng->Display.WaterDisplay[i] };
+	return { nullptr, nullptr };
+}
+
 inline EGL::CGLEAnimSet* (__thiscall* const animsetmng_get)(EGL::AnimSetManager* th, shok::AnimSetId id) = reinterpret_cast<EGL::CGLEAnimSet * (__thiscall*)(EGL::AnimSetManager*, shok::AnimSetId)>(0x588487);
 EGL::CGLEAnimSet* EGL::AnimSetManager::GetAnimSet(shok::AnimSetId id)
 {
 	return animsetmng_get(this, id);
+}
+
+EGL::CGLEAnimSet* CppLogic::GetAnimSet(shok::AnimSetId id) {
+	return (*EGL::AnimSetManager::GlobalObj)->GetAnimSet(id);
 }
 
 void EGL::AnimSetManager::FreeAnimSet(shok::AnimSetId i)

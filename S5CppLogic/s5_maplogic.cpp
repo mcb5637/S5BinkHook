@@ -823,15 +823,6 @@ GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(shok::PlayerId i)
 	return Players->GetPlayer(i);
 }
 
-shok::Technology* GGL::CGLGameLogic::GetTech(shok::TechnologyId id)
-{
-	int i = static_cast<int>(id);
-	--i;
-	if (i >= static_cast<int>(TechManager->Techs.size()))
-		return nullptr;
-	return TechManager->Techs[i];
-}
-
 static inline void(__thiscall* const cglgamelogic_enablealarm)(GGL::CGLGameLogic* th, EGL::CNetEventPlayerID* d) = reinterpret_cast<void(__thiscall*)(GGL::CGLGameLogic*, EGL::CNetEventPlayerID*)>(0x49FA14);
 void GGL::CGLGameLogic::EnableAlarmForPlayer(shok::PlayerId pl)
 {

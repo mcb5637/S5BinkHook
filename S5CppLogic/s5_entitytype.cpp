@@ -57,11 +57,13 @@ shok::ClassId __stdcall GGlue::CGlueEntityProps::GetClassIdentifier() const {
 	return Identifier;
 }
 
-GGlue::CGlueEntityProps* EGL::CGLEEntitiesProps::GetEntityType(shok::EntityTypeId id)
+GGlue::CGlueEntityProps* CppLogic::GetEntityType(shok::EntityTypeId id)
 {
 	int i = static_cast<int>(id);
 	auto* m = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
-	return &m->EntityTypes.at(i);
+	if (i > 0 && i <= static_cast<int>(m->EntityTypes.size()))
+		return &m->EntityTypes[i];
+	return nullptr;
 }
 
 const char* (__stdcall* const getentitydisplayname)(shok::EntityTypeId i) = reinterpret_cast<const char* (__stdcall* const)(shok::EntityTypeId i)>(0x52EFCF);

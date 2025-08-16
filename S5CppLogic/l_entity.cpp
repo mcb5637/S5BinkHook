@@ -886,13 +886,13 @@ namespace CppLogic::Entity {
 	void CheckPlaceCannonEvent(EGL::CGLEEntity* e, GGL::CEventPositionAnd2EntityTypes& ev) {
 		ev.Position.FloorToBuildingPlacement();
 		auto bottom = ev.Type1;
-		GGlue::CGlueEntityProps* ety = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(bottom);
+		GGlue::CGlueEntityProps* ety = CppLogic::GetEntityType(bottom);
 		if (!ety)
 			throw lua::LuaException("no bottom entitytype");
 		if (!ety->IsBuildingType())
 			throw lua::LuaException("bottom not a building");
 		auto top = ev.Type2;
-		if (!(*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(top))
+		if (!CppLogic::GetEntityType(top))
 			throw lua::LuaException("no top entitytype");
 		if (!GGL::CPlayerStatus::CanPlaceBuilding(bottom, e->PlayerId, &ev.Position, 0, shok::EntityId::Invalid))
 			throw lua::LuaException("cannot place foundation at that position");
@@ -1209,7 +1209,7 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("no leader");
 		if (b->PlayerId != s->PlayerId)
 			throw lua::LuaException("different players");
-		GGlue::CGlueEntityProps* solty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(lp->SoldierType);
+		GGlue::CGlueEntityProps* solty = CppLogic::GetEntityType(lp->SoldierType);
 		if (!solty)
 			throw lua::LuaException("no soldier type set");
 		if (!L.ToBoolean(3)) {
@@ -1333,7 +1333,7 @@ namespace CppLogic::Entity {
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
 		if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
 			throw lua::LuaException("pop capped");
-		GGlue::CGlueEntityProps* solty = (*EGL::CGLEEntitiesProps::GlobalObj)->GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
+		GGlue::CGlueEntityProps* solty = CppLogic::GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
 		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(solty->LogicProps)->Cost))
 			throw lua::LuaException("missing res");
 		b->HQBuySerf();
@@ -1355,7 +1355,7 @@ namespace CppLogic::Entity {
 		if (!b->IsIdle())
 			throw lua::LuaException("building not idle");
 		auto tech = L.CheckEnum<shok::TechnologyId>(2);
-		shok::Technology* techo = (*GGL::CGLGameLogic::GlobalObj)->GetTech(tech);
+		shok::Technology* techo = CppLogic::GetTechnology(tech);
 		if (!techo)
 			throw lua::LuaException("no tech at 2");
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);

@@ -340,7 +340,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream
 {
 	WriteChosenClassSchema<shok::Position>(f);
 	WriteChosenClassSchema<shok::CostInfo>(f);
-	WriteChosenClassSchema<EGL::EffectsProps::EffectData>(f);
+	WriteChosenClassSchema<EGL::EffectsProps::EffectType>(f);
 	WriteChosenClassSchema<shok::Technology>(f);
 	WriteChosenClassSchema<ED::CModelsProps::ModelData>(f);
 	WriteChosenClassSchema<GGL::ExperienceClass>(f);

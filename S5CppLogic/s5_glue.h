@@ -48,7 +48,7 @@ namespace GGlue {
 		// remember to also free in idmanager, free last id first
 		void FreeEffectType(shok::EffectTypeId id);
 		void ReloadAllEffectTypes();
-		EGL::EffectsProps::EffectData* Get(shok::EffectTypeId id);
+		EGL::EffectsProps::EffectType* Get(shok::EffectTypeId id);
 	};
 	//constexpr int i = offsetof(CEffectsPropsMgr, EffectsDisplayProps) / 4;
 
@@ -135,21 +135,26 @@ namespace GGlue {
 
 	};
 
+	struct TerrainTypeLogicData {
+		bool Blocked = false, BuildBlocked = false;
+		float WalkModifier = 1.0f;
+	};
+	struct TerrainTypeDisplayData {
+		int Priority = 0;
+		shok::TerrainTextureId BaseTexture = {};
+		shok::TerrainTextureId TransitionsTexture = {};
+		shok::TerrainTextureId SnowTexture = {};
+		int Quads = 0;
+		shok::Color Color{ 0xFF, 0, 0, 0 };
+		shok::String ReplacementTerrainType{};
+		bool TransitionsColorModulate = false;
+	};
 	struct TerrainTypeData {
-		struct LogicData {
-			bool Blocked = false, BuildBlocked = false;
-			float WalkModifier = 1.0f;
-		} Logic;
-		struct DisplayData {
-			int Priority = 0;
-			shok::TerrainTextureId BaseTexture = {};
-			shok::TerrainTextureId TransitionsTexture = {};
-			shok::TerrainTextureId SnowTexture = {};
-			int Quads = 0;
-			shok::Color Color{ 0xFF, 0, 0, 0 };
-			shok::String ReplacementTerrainType{};
-			bool TransitionsColorModulate = false;
-		} Display;
+		using LogicData = TerrainTypeLogicData;
+		using DisplayData = TerrainTypeDisplayData;
+
+		LogicData Logic;
+		DisplayData Display;
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D958);
 	};
@@ -196,29 +201,34 @@ namespace GGlue {
 	};
 	//constexpr int i = offsetof(CTerrainPropsMgr, TerrainType) / 4;
 
-	struct WaterTypeData { // size 13
-		struct LogicData {
-			bool Freezes = true;
-		} Logic;
-		struct DisplayData {
-			shok::Color Color; // i think this is B,G,R,A?, a always set to 0
-			float TransparencyFactor = 0.01f;
-			float TransparencyOffset = 0;
-			float TransparencyMin = 0.25f;
-			float TransparencyMax = 0.75f; // 4
-			bool DrawShoreWave = false;
-			bool Freezes = false;
-			PADDING(2);
-			int IceBaseTexture = 0;
-			int IceDetailTexture = 0; // 7
-			// after this, gets calculated by initialize
-			float TransparencyFactorTimes255 = 0;
-			float TransparencyOffsetTimes255 = 0;
-			float TransparencyMinTimes255 = 0;
-			float TransparencyMaxTimes255 = 0;
+	struct WaterTypeLogicData {
+		bool Freezes = true;
+	};
+	struct WaterTypeDisplayData {
+		shok::Color Color; // i think this is B,G,R,A?, a always set to 0
+		float TransparencyFactor = 0.01f;
+		float TransparencyOffset = 0;
+		float TransparencyMin = 0.25f;
+		float TransparencyMax = 0.75f; // 4
+		bool DrawShoreWave = false;
+		bool Freezes = false;
+		PADDING(2);
+		int IceBaseTexture = 0;
+		int IceDetailTexture = 0; // 7
+		// after this, gets calculated by initialize
+		float TransparencyFactorTimes255 = 0;
+		float TransparencyOffsetTimes255 = 0;
+		float TransparencyMinTimes255 = 0;
+		float TransparencyMaxTimes255 = 0;
 
-			void Initialize();
-		} Display;
+		void Initialize();
+	};
+	struct WaterTypeData { // size 13
+		using LogicData = WaterTypeLogicData;
+		using DisplayData = WaterTypeDisplayData;
+
+		LogicData Logic;
+		DisplayData Display;
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0DF38);
 	};

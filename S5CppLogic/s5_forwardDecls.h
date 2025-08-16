@@ -1,4 +1,5 @@
 #pragma once
+#include <utility>
 
 namespace shok::detail {
 	union padding {
@@ -132,6 +133,7 @@ namespace EGL {
 
 	class CEventGetPosition;
 	class CGLEScripting;
+	struct EffectType;
 }
 namespace GGL {
 	class CBuilding;
@@ -154,6 +156,7 @@ namespace GGL {
 	class CCannonBuilderBehaviorProps;
 	class CGLEffectFireProps;
 	struct SSlotArgsBuilding;
+	class CDamageClassProps;
 }
 namespace ED {
 	class CBehaviorProps;
@@ -188,6 +191,10 @@ namespace GGlue {
 	class CGlueEntityProps;
 	class TerrainPropsDisplay;
 	class WaterPropsLogic;
+	struct WaterTypeLogicData;
+	struct WaterTypeDisplayData;
+	struct TerrainTypeLogicData;
+	struct TerrainTypeDisplayData;
 }
 namespace EGUIX {
 	class CBaseWidget;
@@ -231,3 +238,14 @@ namespace BBRw {
 	class CDynTexRef;
 }
 class CProjectileEffectCreator;
+
+namespace CppLogic {
+	GGlue::CGlueEntityProps* GetEntityType(shok::EntityTypeId i);
+	EGL::EffectType* GetEffectType(shok::EffectTypeId id);
+	EGL::CGLETaskList* GetTaskList(shok::TaskListId id);
+	GGL::CDamageClassProps* GetDamageClass(shok::DamageClassId id);
+	shok::Technology* GetTechnology(shok::TechnologyId id);
+	std::pair<GGlue::WaterTypeLogicData*, GGlue::WaterTypeDisplayData*> GetWaterType(shok::WaterTypeId id);
+	std::pair<GGlue::TerrainTypeLogicData*, GGlue::TerrainTypeDisplayData*> GetTerrainType(shok::TerrainTypeId id);
+	EGL::CGLEAnimSet* GetAnimSet(shok::AnimSetId id);
+}

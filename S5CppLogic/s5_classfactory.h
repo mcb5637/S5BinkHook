@@ -96,6 +96,7 @@ namespace BB {
 		static inline BB::FieldSerializer* const TypeArmorClassId = reinterpret_cast<BB::FieldSerializer*>(0x85D5CC);
 		static inline BB::FieldSerializer* const TypeEntityCategory = reinterpret_cast<BB::FieldSerializer*>(0x85D4F4);
 		static inline BB::FieldSerializer* const TypeAttachmentType = reinterpret_cast<BB::FieldSerializer*>(0x868408);
+		static inline BB::FieldSerializer* const TypeAccessCategories = reinterpret_cast<BB::FieldSerializer*>(0x810D18);
 
 		template<class T>
 		static constexpr BB::FieldSerializer* GetSerializer() = delete;

@@ -323,8 +323,15 @@ void CppLogic::Serializer::FastBinarySerializer::SerializeField(BB::IStream& s, 
 {
 	switch (seri->Type) {
 	case BB::SerializationData::Ty::Direct:
-		seri->DataConverter->SerializeToStream(&s, o);
+	{
+		const BB::FieldSerializer* fs = seri->DataConverter;
+		if (fs == BB::FieldSerializer::TypeAccessCategories)
+			fs = BB::FieldSerializer::TypeInt;
+		if (fs->SerializeToStream == nullptr)
+			throw std::logic_error{ "SerializeToStream missing" };
+		fs->SerializeToStream(&s, o);
 		break;
+	}
 	case BB::SerializationData::Ty::Embedded:
 		SerializeFields(s, o, seri->SubElementData);
 		break;
@@ -332,10 +339,16 @@ void CppLogic::Serializer::FastBinarySerializer::SerializeField(BB::IStream& s, 
 		o = *static_cast<void**>(o);
 		[[fallthrough]];
 	case BB::SerializationData::Ty::ObjectEmbedded:
-		if (seri->GetIdentifier)
-			Serialize(s, static_cast<BB::IObject*>(o), seri->GetIdentifier(o));
-		else
-			SerializeFields(s, o, seri->SubElementData);
+		if (o == nullptr) {
+			s.Write("0");
+		}
+		else {
+			s.Write("1");
+			if (seri->GetIdentifier)
+				Serialize(s, static_cast<BB::IObject*>(o), seri->GetIdentifier(o));
+			else
+				SerializeFields(s, o, seri->SubElementData);
+		}
 		break;
 	default:
 		break;
@@ -391,8 +404,15 @@ void CppLogic::Serializer::FastBinarySerializer::DeserializeField(BB::IStream& s
 
 	switch (seri->Type) {
 	case BB::SerializationData::Ty::Direct:
-		seri->DataConverter->DeserializeFromStream(o, &s);
+	{
+		const BB::FieldSerializer* fs = seri->DataConverter;
+		if (fs == BB::FieldSerializer::TypeAccessCategories)
+			fs = BB::FieldSerializer::TypeInt;
+		if (fs->DeserializeFromStream == nullptr)
+			throw std::logic_error{ "DeserializeFromStream missing" };
+		fs->DeserializeFromStream(o, &s);
 		break;
+	}
 	case BB::SerializationData::Ty::Embedded:
 		DeserializeFields(s, o, seri->SubElementData);
 		break;
@@ -400,11 +420,20 @@ void CppLogic::Serializer::FastBinarySerializer::DeserializeField(BB::IStream& s
 		o = *static_cast<void**>(o);
 		[[fallthrough]];
 	case BB::SerializationData::Ty::ObjectEmbedded:
-		if (seri->GetIdentifier)
-			Deserialize(s, static_cast<BB::IObject*>(o), nullptr, shok::ClassId::Invalid);
-		else
-			DeserializeFields(s, o, seri->SubElementData);
+	{
+		char c = '\0';
+		s.Read(&c, sizeof(c));
+		if (c != '\0') {
+			if (seri->GetIdentifier)
+				Deserialize(s, static_cast<BB::IObject*>(o), nullptr, shok::ClassId::Invalid);
+			else
+				DeserializeFields(s, o, seri->SubElementData);
+		}
+		else {
+			*static_cast<void**>(o) = nullptr;
+		}
 		break;
+	}
 	default:
 		break;
 	}

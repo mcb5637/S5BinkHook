@@ -138,6 +138,8 @@ namespace GGlue {
 	struct TerrainTypeLogicData {
 		bool Blocked = false, BuildBlocked = false;
 		float WalkModifier = 1.0f;
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D6C8);
 	};
 	struct TerrainTypeDisplayData {
 		int Priority = 0;
@@ -148,6 +150,8 @@ namespace GGlue {
 		shok::Color Color{ 0xFF, 0, 0, 0 };
 		shok::String ReplacementTerrainType{};
 		bool TransitionsColorModulate = false;
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0D760);
 	};
 	struct TerrainTypeData {
 		using LogicData = TerrainTypeLogicData;
@@ -203,6 +207,8 @@ namespace GGlue {
 
 	struct WaterTypeLogicData {
 		bool Freezes = true;
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0DA30);
 	};
 	struct WaterTypeDisplayData {
 		shok::Color Color; // i think this is B,G,R,A?, a always set to 0
@@ -222,6 +228,8 @@ namespace GGlue {
 		float TransparencyMaxTimes255 = 0;
 
 		void Initialize();
+
+		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA0DB18);
 	};
 	struct WaterTypeData { // size 13
 		using LogicData = WaterTypeLogicData;

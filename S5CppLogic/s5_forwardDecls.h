@@ -157,6 +157,7 @@ namespace GGL {
 	class CGLEffectFireProps;
 	struct SSlotArgsBuilding;
 	class CDamageClassProps;
+	class ExperienceClass;
 }
 namespace ED {
 	class CBehaviorProps;
@@ -248,4 +249,5 @@ namespace CppLogic {
 	std::pair<GGlue::WaterTypeLogicData*, GGlue::WaterTypeDisplayData*> GetWaterType(shok::WaterTypeId id);
 	std::pair<GGlue::TerrainTypeLogicData*, GGlue::TerrainTypeDisplayData*> GetTerrainType(shok::TerrainTypeId id);
 	EGL::CGLEAnimSet* GetAnimSet(shok::AnimSetId id);
+	GGL::ExperienceClass* GetExperienceClass(shok::ExperienceClass id);
 }

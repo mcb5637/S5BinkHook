@@ -118,6 +118,11 @@ GGL::ExperienceClass* GGL::ExperienceClassHolder::GetClass(shok::ExperienceClass
     return xpclassholder_getclass(this, cl);
 }
 
+GGL::ExperienceClass* CppLogic::GetExperienceClass(shok::ExperienceClass id)
+{
+    return GGL::ExperienceClassHolder::GlobalObj()->GetClass(id);
+}
+
 void* GGL::ExperienceClass::operator new(size_t s)
 {
     return shok::Malloc(s);

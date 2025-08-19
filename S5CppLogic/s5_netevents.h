@@ -349,6 +349,18 @@ namespace GGL {
 		static inline constexpr int vtp = 0x76DD80;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3F0173);
 	};
+
+	class CNetEventPlayerResourceDonation : public EGL::CNetEvent2PlayerIDs {
+	public:
+		shok::ResourceType ResourceType;
+		int ResourceAmount;
+
+		CNetEventPlayerResourceDonation(shok::NetEventIds id, shok::PlayerId p1, shok::PlayerId p2, shok::ResourceType rt, int am);
+
+		static inline constexpr int TypeDesc = 0x812580;
+		static inline constexpr int vtp = 0x77063C;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x531EF206);
+	};
 }
 
 namespace Framework {

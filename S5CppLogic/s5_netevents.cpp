@@ -175,6 +175,14 @@ GGL::CNetEventEventTechnologyPlayerIDAndEntityID::CNetEventEventTechnologyPlayer
 	TechId = t;
 }
 
+GGL::CNetEventPlayerResourceDonation::CNetEventPlayerResourceDonation(shok::NetEventIds id, shok::PlayerId p1, shok::PlayerId p2, shok::ResourceType rt, int am)
+	: EGL::CNetEvent2PlayerIDs(id, p1, p2)
+{
+	SetVT(GGL::CNetEventPlayerResourceDonation::vtp);
+	ResourceType = rt;
+	ResourceAmount = am;
+}
+
 
 Framework::CEventGameSpeed::CEventGameSpeed(shok::NetEventIds id, double speed) : BB::CEvent(id)
 {

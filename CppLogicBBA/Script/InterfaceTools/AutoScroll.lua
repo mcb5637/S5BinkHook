@@ -3,10 +3,10 @@
 ---@class CPPLAutoScroll
 ---@field Over T[]
 ---@field Selected T?
----@field CustomWidget string
----@field UpButton string?
----@field DownButton string?
----@field SliderBackground string?
+---@field private CustomWidget string
+---@field private UpButton string?
+---@field private DownButton string?
+---@field private SliderBackground string?
 ---@field OnSelectedChanged fun(old:T?, new:T?)?
 ---@field StringExtract nil|fun(t:T):string
 AutoScroll = {}
@@ -59,18 +59,11 @@ end
 ---@generic T
 ---@param self CPPLAutoScroll<T>
 ---@param up number?
-function AutoScroll:GUIAction_DefaultSelect(up)
+---@param deselect boolean?
+function AutoScroll:GUIAction_DefaultSelect(up, deselect)
 	local wid = XGUIEng.GetCurrentWidgetID()
 	local o = self:GetElementOf(wid, up)
-	local old = self.Selected
-	if o == self.Selected then
-		self.Selected = nil
-	else
-		self.Selected = o
-	end
-	if self.OnSelectedChanged then
-		self.OnSelectedChanged(old, self.Selected)
-	end
+	self:SetSelected(o, false, deselect)
 end
 
 ---@generic T
@@ -111,6 +104,42 @@ end
 ---@return T?
 function AutoScroll:GetSelected()
 	return self.Selected
+end
+
+---@generic T
+---@param self CPPLAutoScroll<T>
+---@param new T?
+---@param scrollTo boolean?
+---@param deselect boolean?
+function AutoScroll:SetSelected(new, scrollTo, deselect)
+	local old = self.Selected
+	if deselect and new == self.Selected then
+		new = nil
+	end
+	self.Selected = new
+	if self.OnSelectedChanged then
+		self.OnSelectedChanged(old, new)
+	end
+	if scrollTo and new then
+		self:ScrollToCenter(new)
+	end
+end
+
+---@generic T
+---@param self CPPLAutoScroll<T>
+---@param o T
+function AutoScroll:ScrollToCenter(o)
+	local i = 0
+	for j,e in ipairs(self.Over) do
+		if e == o then
+			i = j
+			break
+		end
+	end
+	if i > 0 then
+		local _, widc = CppLogic.UI.GetAutoScrollCustomWidgetOffset(self.CustomWidget)
+		CppLogic.UI.AutoScrollCustomWidgetSetOffset(self.CustomWidget, i - 1 - (widc / 2))
+	end
 end
 
 ---@param d number

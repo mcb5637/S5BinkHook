@@ -41,7 +41,9 @@ end
 ---@generic T
 ---@param self CPPLAutoScroll<T>
 ---@param over T[]
-function AutoScroll:SetDataToScrollOver(over)
+---@param reselect boolean|nil|fun(a:T, a:T):boolean
+---@param scrollTo boolean?
+function AutoScroll:SetDataToScrollOver(over, reselect, scrollTo)
 	self.Over = over
 	local n, w = CppLogic.UI.InitAutoScrollCustomWidget(self.CustomWidget, table.getn(self.Over))
 	local sliderUsed = n > w and 1 or 0
@@ -53,6 +55,23 @@ function AutoScroll:SetDataToScrollOver(over)
 	end
 	if self.SliderBackground then
 		XGUIEng.ShowWidget(self.SliderBackground, sliderUsed)
+	end
+	if reselect and self.Selected then
+		if type(reselect)~="function" then
+			reselect = function(a, b)
+				return a == b
+			end
+		end
+		for i, o in ipairs(self.Over) do
+			if reselect(o, self.Selected) then
+				self:SetSelected(o)
+				if scrollTo then
+					self:ScrollToCenterIndex(i)
+				end
+				return
+			end
+		end
+		self:SetSelected(nil)
 	end
 end
 
@@ -136,6 +155,13 @@ function AutoScroll:ScrollToCenter(o)
 			break
 		end
 	end
+	self:ScrollToCenterIndex(i)
+end
+
+---@generic T
+---@param self CPPLAutoScroll<T>
+---@param i number
+function AutoScroll:ScrollToCenterIndex(i)
 	if i > 0 then
 		local _, widc = CppLogic.UI.GetAutoScrollCustomWidgetOffset(self.CustomWidget)
 		CppLogic.UI.AutoScrollCustomWidgetSetOffset(self.CustomWidget, i - 1 - (widc / 2))

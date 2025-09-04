@@ -171,6 +171,7 @@ void EScr::CLuaFuncRef::SetState(lua::State L)
 
 void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
 {
+	StateAddon::HookSetAllRecompile();
 	CheckRef();
 	Clear();
 	SetState(L);
@@ -178,6 +179,7 @@ void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
 	L.PushValue(idx);
 	Ref = L.Ref(L.REGISTRYINDEX).Value();
 	NeedsCompile = false;
+	LuaCommand = std::string_view("");
 }
 
 int __stdcall EScr::CLuaFuncRefGlobal::GetRefToFunc()
@@ -368,4 +370,31 @@ void EScr::LuaStateSerializer::HookSerializationOverride()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5750ED), &luastateseri_hookserializeasm, reinterpret_cast<void*>(0x5750F3));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575311), &lusstateseri_hookdeseriasm, reinterpret_cast<void*>(0x57531A));
 	CppLogic::Hooks::WriteJump(AddGlobalToNotSerialize, &AddGlobalNoSaveOverride, reinterpret_cast<void*>(0x5A1E16));
+}
+
+void __fastcall EScr::StateAddon::SetAllLuaFuncsRecompileOverride(lua_State* L)
+{
+	auto* state = Get(L);
+	if (state) {
+		for (auto* ref : state->RegisteredRefs) {
+			auto* cmd = dynamic_cast<CLuaFuncRefCommand*>(ref);
+			if (cmd != nullptr && cmd->LuaCommand.size() == 0)
+				continue;
+			if (ref == nullptr)
+				continue;
+			ref->NeedsCompile = true;
+		}
+	}
+}
+
+bool StateAddon_HookSetAllRecompileHooked = false;
+void EScr::StateAddon::HookSetAllRecompile()
+{
+	if (StateAddon_HookSetAllRecompileHooked)
+		return;
+	StateAddon_HookSetAllRecompileHooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+		reinterpret_cast<void*>(0x59B1C7),
+		} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x59B1C7), &EScr::StateAddon::SetAllLuaFuncsRecompileOverride, reinterpret_cast<void*>(0x59B1CD));
 }

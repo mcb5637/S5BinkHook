@@ -174,12 +174,16 @@ namespace EScr {
 		shok::Map<shok::String, const char*> Docs;
 		ILuaDebugger* LuaDebugger;
 		bool DebugScript;
-		shok::List<CLuaFuncRef*> RefsToClose;
+		shok::List<CLuaFuncRef*> RegisteredRefs;
 
 		// ctor 0x5A282C, dtor 0x59D39F
 
 		static inline StateAddon* (__stdcall* const Get)(lua_State* L) = reinterpret_cast<StateAddon* (__stdcall*)(lua_State*)>(0x59B1A3);
 		static inline void(__stdcall* const Set)(lua_State* L, StateAddon* a) = reinterpret_cast<void(__stdcall*)(lua_State*, StateAddon*)>(0x5A21FC);
+		static inline void(__fastcall* const SetAllLuaFuncsRecompile)(lua_State* L) = reinterpret_cast<void(__fastcall*)(lua_State*)>(0x59B1C7);
+
+		static void HookSetAllRecompile();
+		static void __fastcall SetAllLuaFuncsRecompileOverride(lua_State* L);
 	};
 	static_assert(sizeof(StateAddon) == 8 * 4);
 }

@@ -134,6 +134,9 @@ namespace CppLogic::Mod::UI {
 		bool CharValid(char c) const;
 		bool NegativeNumberValid() const;
 		bool CallFunc(std::string_view funcname, Event ev);
+		void TryPaste();
+		bool Validate();
+		void TryCopy() const;
 	};
 	template<>
 	class ::enum_is_flags<TextInputCustomWidget::Event> : public std::true_type {};

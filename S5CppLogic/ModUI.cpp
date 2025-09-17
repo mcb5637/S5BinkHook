@@ -8,6 +8,7 @@
 #include "s5_events.h"
 #include "s5_idmanager.h"
 #include "s5_scriptsystem.h"
+#include "WinAPIUtil.h"
 
 void CppLogic::Mod::UI::RegisterClasses()
 {
@@ -401,6 +402,20 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
 				CallFunc(EventFunc(), Event::Confirm);
 			}
+			else if (me->KeyData == (shok::Keys::V | shok::Keys::ModifierControl)) {
+				TryPaste();
+			}
+			else if (me->KeyData == (shok::Keys::C | shok::Keys::ModifierControl)) {
+				TryCopy();
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+			}
+			else if (me->KeyData == (shok::Keys::X | shok::Keys::ModifierControl)) {
+				TryCopy();
+				CurrentTextRaw = "";
+				CurrentPos = 0;
+				RefreshDisplayText();
+				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+			}
 		}
 		return true;
 	}
@@ -418,17 +433,13 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 				c = '.';
 			if (CharValid(c)) {
 				CurrentTextRaw.insert(CurrentPos, 1, c);
-				bool adv = true;
-				if (HasFlag(Event::Validate)) {
-					if (!CallFunc(EventFunc(), Event::Validate)) {
-						CurrentTextRaw.erase(CurrentTextRaw.begin() + CurrentPos);
-						adv = false;
-					}
-				}
-				if (adv) {
+				if (Validate()) {
 					++CurrentPos;
 					RefreshDisplayText();
 					EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+				}
+				else {
+					CurrentTextRaw.erase(CurrentTextRaw.begin() + CurrentPos);
 				}
 			}
 		}
@@ -524,6 +535,95 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcnam
 	catch (const lua::LuaException&) {}
 	L.SetTop(t);
 	return r;
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::TryPaste()
+{
+	if (!IsClipboardFormatAvailable(CF_TEXT))
+		return;
+	if (!OpenClipboard(*shok::MainWindowHandle))
+		return;
+	WinAPI::OnScopeExit ex{ CloseClipboard };
+	auto hglb = GetClipboardData(CF_TEXT);
+	if (hglb != nullptr) {
+		auto lptstr = GlobalLock(hglb);
+		WinAPI::OnScopeExit ex2{ GlobalUnlock, hglb };
+		if (lptstr == nullptr)
+			return;
+		std::string_view ins{ reinterpret_cast<const char*>(lptstr) };
+		if (ins.empty())
+			return;
+		for (char c : ins) {
+			if (!CharValid(c))
+				return;
+		}
+		std::string old = std::move(CurrentTextRaw);
+		CurrentTextRaw = "";
+		CurrentTextRaw.reserve(old.length() + ins.length());
+		CurrentTextRaw = std::string_view(old).substr(0, CurrentPos);
+		CurrentTextRaw.append(ins);
+		CurrentTextRaw.append(std::string_view(old).substr(CurrentPos));
+		if (Validate()) {
+			CurrentPos += ins.length();
+			RefreshDisplayText();
+			EGUIX::WidgetLoader::KeyStrokeLuaCallback();
+		}
+		else {
+			CurrentTextRaw = std::move(old);
+		}
+	}
+}
+
+bool CppLogic::Mod::UI::TextInputCustomWidget::Validate()
+{
+	auto parse = [](std::string_view v, auto& o) {
+		std::from_chars_result r = std::from_chars(v.data(), v.data() + v.size(), o);
+		return r.ec == std::errc() && r.ptr == v.data() + v.size();
+	};
+	if (Mode() == Modes::Int) {
+		int32_t out;
+		if (!parse(CurrentTextRaw, out))
+			return false;
+	}
+	else if (Mode() == Modes::UInt) {
+		uint32_t out;
+		if (!parse(CurrentTextRaw, out))
+			return false;
+	}
+	else if (Mode() == Modes::Double || Mode() == Modes::UDouble) {
+		double out;
+		if (!parse(CurrentTextRaw, out))
+			return false;
+		if (std::isinf(out) || std::isnan(out))
+			return false;
+		if (Mode() == Modes::UDouble && out < 0.0)
+			return false;
+	}
+	if (HasFlag(Event::Validate)) {
+		if (!CallFunc(EventFunc(), Event::Validate)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void CppLogic::Mod::UI::TextInputCustomWidget::TryCopy() const
+{
+	if (!OpenClipboard(*shok::MainWindowHandle))
+		return;
+	WinAPI::OnScopeExit ex{ CloseClipboard };
+	EmptyClipboard();
+	auto mem = GlobalAlloc(GMEM_MOVEABLE, (CurrentTextRaw.size() + 1) * sizeof(char));
+	if (mem == nullptr)
+		return;
+	{
+		void* p = GlobalLock(mem);
+		WinAPI::OnScopeExit ex2{ GlobalUnlock, mem };
+		if (p == nullptr)
+			return;
+		memcpy(p, CurrentTextRaw.c_str(), CurrentTextRaw.size() + 1);
+	}
+	SetClipboardData(CF_TEXT, mem);
 }
 
 shok::ClassId __stdcall CppLogic::Mod::UI::FreeCamCustomWidget::GetClassIdentifier() const

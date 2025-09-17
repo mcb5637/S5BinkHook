@@ -11,4 +11,23 @@ namespace CppLogic::WinAPI {
 
 		bool Show();
 	};
+
+	template<class C, class ... A>
+	class OnScopeExit {
+		C Call;
+		std::tuple<A...> Args;
+
+	public:
+		explicit OnScopeExit(C c, A ... args) : Call(c), Args(args...) {
+		}
+
+		OnScopeExit(const OnScopeExit&) = delete;
+		OnScopeExit(OnScopeExit&&) = delete;
+		OnScopeExit& operator=(const OnScopeExit&) = delete;
+		OnScopeExit& operator=(OnScopeExit&&) = delete;
+
+		~OnScopeExit() {
+			std::apply(Call, Args);
+		}
+	};
 }

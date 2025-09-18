@@ -158,6 +158,7 @@ copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
     <ClInclude Include="ModFilesystem.h" />
     <ClInclude Include="modloader.h" />
     <ClInclude Include="ModUI.h" />
+    <ClInclude Include="OnScopeExit.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="s5_ai.h" />

@@ -336,6 +336,9 @@
     <ClInclude Include="s5_RWE_plugin.h">
       <Filter>shok\engine</Filter>
     </ClInclude>
+    <ClInclude Include="OnScopeExit.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -9,7 +9,7 @@
 #include "s5_events.h"
 #include "s5_idmanager.h"
 #include "s5_scriptsystem.h"
-#include "WinAPIUtil.h"
+#include "OnScopeExit.h"
 
 void CppLogic::Mod::UI::RegisterClasses()
 {
@@ -559,11 +559,11 @@ void CppLogic::Mod::UI::TextInputCustomWidget::TryPaste()
 		return;
 	if (!OpenClipboard(*shok::MainWindowHandle))
 		return;
-	WinAPI::OnScopeExit ex{ CloseClipboard };
+	OnScopeExit ex{ CloseClipboard };
 	auto hglb = GetClipboardData(CF_TEXT);
 	if (hglb != nullptr) {
 		auto lptstr = GlobalLock(hglb);
-		WinAPI::OnScopeExit ex2{ GlobalUnlock, hglb };
+		OnScopeExit ex2{ GlobalUnlock, hglb };
 		if (lptstr == nullptr)
 			return;
 		std::string_view ins{ reinterpret_cast<const char*>(lptstr) };
@@ -627,19 +627,21 @@ void CppLogic::Mod::UI::TextInputCustomWidget::TryCopy() const
 {
 	if (!OpenClipboard(*shok::MainWindowHandle))
 		return;
-	WinAPI::OnScopeExit ex{ CloseClipboard };
+	OnScopeExit ex{ CloseClipboard };
 	EmptyClipboard();
 	auto mem = GlobalAlloc(GMEM_MOVEABLE, (CurrentTextRaw.size() + 1) * sizeof(char));
 	if (mem == nullptr)
 		return;
+	OnScopeExit ex3{ GlobalFree, mem };
 	{
 		void* p = GlobalLock(mem);
-		WinAPI::OnScopeExit ex2{ GlobalUnlock, mem };
+		OnScopeExit ex2{ GlobalUnlock, mem };
 		if (p == nullptr)
 			return;
 		memcpy(p, CurrentTextRaw.c_str(), CurrentTextRaw.size() + 1);
 	}
-	SetClipboardData(CF_TEXT, mem);
+	if (SetClipboardData(CF_TEXT, mem) == mem)
+		ex3.Defuse(); // clipbord has taken ownership, will free it when no longer in use
 }
 
 shok::ClassId __stdcall CppLogic::Mod::UI::FreeCamCustomWidget::GetClassIdentifier() const

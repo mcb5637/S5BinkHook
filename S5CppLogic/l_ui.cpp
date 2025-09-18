@@ -631,6 +631,22 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int ReorderWidgets(lua::State ls) {
+		luaext::EState L{ ls };
+		EGUIX::CBaseWidget* tomove = L.CheckWidget(1);
+		EGUIX::CBaseWidget* before = L.IsNoneOrNil(2) ? nullptr : L.CheckWidget(2);
+		if (before != nullptr && tomove->MotherWidgetID != before->MotherWidgetID)
+			throw lua::LuaException{ "not same mother widget" };
+		auto* mother = dynamic_cast<EGUIX::CContainerWidget*>(EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(tomove->MotherWidgetID));
+		if (mother == nullptr)
+			throw lua::LuaException{ "no mother widget???" };
+		auto sl = mother->WidgetListHandler.SubWidgets.SaveList();
+		auto m = std::find(sl.List.begin(), sl.List.end(), tomove);
+		auto b = std::find(sl.List.begin(), sl.List.end(), before);
+		sl.List.splice(b, sl.List, m);
+		return 0;
+	}
+
 	int ReloadGUI(lua::State L) {
 		const char* str = L.OptString(1, "Data\\Menu\\Projects\\Ingame.xml");
 		if (!BB::CFileSystemMgr::DoesFileExist(str))
@@ -1909,6 +1925,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<CreateSelectionDecal>("CreateSelectionDecal"),
 		lua::FuncReference::GetRef<InitNetHandlers>("InitNetHandlers"),
 		lua::FuncReference::GetRef<RemoveWidget>("RemoveWidget"),
+		lua::FuncReference::GetRef<ReorderWidgets>("ReorderWidgets"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

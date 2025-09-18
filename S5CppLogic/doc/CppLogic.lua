@@ -2684,6 +2684,12 @@ function CppLogic.UI.WidgetSetGroup(wid, group) end
 --- @param wid widget
 function CppLogic.UI.RemoveWidget(wid) end
 
+--- moves a widget. after the move, tomove is placed directly before target (at the end, if target is nil).
+--- does nothing, if tomove == target, or tomove is directly in front of target.
+--- @param tomove widget
+--- @param target widget?
+function CppLogic.UI.ReorderWidgets(tomove, target) end
+
 --- gets a widgets name.
 --- @param wid widget
 --- @return string name

@@ -98,9 +98,10 @@ namespace CppLogic::Mod::UI {
 		std::string CurrentTextDisplay;
 		EGUIX::CFontIDHandler Font;
 		size_t CurrentPos = 0;
+		size_t CurrentPosInDisplay = 0;
 		bool IgnoreNextChar = false;
 
-		std::string ClearTextOutput() const;
+		std::pair<std::string, size_t> ClearTextOutput() const;
 		void RefreshDisplayText();
 
 		inline shok::String& EventFunc() {

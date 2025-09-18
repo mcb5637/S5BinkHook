@@ -55,11 +55,11 @@ void BB::StringTableText::HookGetStringTableText()
 	CppLogic::Hooks::WriteJump(BB::StringTableText::GetStringTableText, &hooksttasm, reinterpret_cast<void*>(0x556D33));
 }
 
-static inline void(__thiscall* const uirender_rtext)(shok::UIRenderer* r, const char* txt, shok::FontId font, float uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* ccc, float ldf) =
-reinterpret_cast<void(__thiscall*)(shok::UIRenderer*, const char*, shok::FontId, float, float, float, float, const EGUIX::Color*, shok::UIRenderCustomColorContext*, float)>(0x5577E1);
-void shok::UIRenderer::RenderText(const char* txt, shok::FontId fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor)
+static inline void(__thiscall* const uirender_rtext)(shok::UIRenderer* r, const char* txt, shok::FontId font, bool scale, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* ccc, float ldf) =
+reinterpret_cast<void(__thiscall*)(shok::UIRenderer*, const char*, shok::FontId, bool, float, float, float, const EGUIX::Color*, shok::UIRenderCustomColorContext*, float)>(0x5577E1);
+void shok::UIRenderer::RenderText(const char* txt, shok::FontId fontid, bool scale, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor)
 {
-	uirender_rtext(this, txt, fontid, 1, x, y, xend, color, nullptr, linedistancefactor);
+	uirender_rtext(this, txt, fontid, scale, x, y, xend, color, nullptr, linedistancefactor);
 }
 void shok::UIRenderer::SetTextRenderColor(shok::Color c)
 {

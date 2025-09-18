@@ -101,7 +101,7 @@ namespace shok {
 		int UpscaledFlag;
 		RWE::P2D::Rt2dBrush* Brush;
 
-		void RenderText(const char* txt, shok::FontId fontid, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
+		void RenderText(const char* txt, shok::FontId fontid, bool scale, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
 		void SetTextRenderColor(shok::Color c);
 		void RenderMaterial(const EGUIX::CMaterial* mat, bool scale, const EGUIX::Rect* pos);
 		void RenderLine(const EGUIX::Color* c, bool scale, float x1, float y1, float x2, float y2);

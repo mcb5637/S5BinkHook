@@ -3,6 +3,7 @@
 
 #include <format>
 #include <locale>
+#include <ranges>
 
 #include "s5_classfactory.h"
 #include "s5_events.h"
@@ -283,11 +284,10 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 		col = EGUIX::Color{};
 	}
 	{
-		// no idea why this needs to be scaled, shok does not scale it and it works
-		float x = screenCoords->X * rend->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
-		float y = screenCoords->Y * rend->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y;
-		float end = (screenCoords->X + screenCoords->W) * rend->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
-		rend->RenderText(CurrentTextDisplay.c_str(), Font.FontID, x, y, end, &col, 1);
+		float x = screenCoords->X;
+		float y = screenCoords->Y;
+		float end = screenCoords->X + screenCoords->W;
+		rend->RenderText(CurrentTextDisplay.c_str(), Font.FontID, true, x, y, end, &col, 1);
 	}
 	if (!HasFocus())
 		return;
@@ -300,14 +300,19 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 			col.Alpha = 255;
 		}
 	}
-	char back = CurrentTextDisplay[CurrentPos];
-	CurrentTextDisplay[CurrentPos] = '\0';
+	char back = CurrentTextDisplay[CurrentPosInDisplay];
+	CurrentTextDisplay[CurrentPosInDisplay] = '\0';
 	float textw = rend->GetTextWidth(CurrentTextDisplay.c_str(), Font.FontID);
-	CurrentTextDisplay[CurrentPos] = back;
-	// why? this looks so wrong, but it works...
-	float x = screenCoords->X + textw * shok::UIRenderer::ScaledScreenSize.Y * shok::UIRenderer::ScaledScreenSize.Y / rend->RenderSizeY + 1.0f;
+	CurrentTextDisplay[CurrentPosInDisplay] = back;
+	float x = screenCoords->X;
 	float y = screenCoords->Y;
-	rend->RenderLine(&col, true, x, y, x, y + rend->GetTextHeight(Font.FontID) * shok::UIRenderer::ScaledScreenSize.Y);
+	if (rend->SomeTextBool) {
+		x = x / shok::UIRenderer::ScaledScreenSize.X * rend->RenderSizeX;
+		y = y / shok::UIRenderer::ScaledScreenSize.Y * rend->RenderSizeY;
+	}
+	x += textw * rend->RenderSizeY + 1.0f;
+	float h = rend->GetTextHeight(Font.FontID) * rend->RenderSizeY;
+	rend->RenderLine(&col, false, x, y, x, y + h);
 }
 
 bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain)
@@ -494,23 +499,33 @@ void CppLogic::Mod::UI::TextInputCustomWidget::RefreshDisplayText()
 	CurrentTextDisplay.clear();
 	if (Mode() == Modes::Password) {
 		CurrentTextDisplay.append(CurrentTextRaw.length(), '*');
+		CurrentPosInDisplay = CurrentPos;
 		return;
 	}
-	CurrentTextDisplay = ClearTextOutput();
+	std::tie(CurrentTextDisplay, CurrentPosInDisplay) = ClearTextOutput();
 }
 
-std::string CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput() const
+std::pair<std::string, size_t> CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput() const
 {
 	std::string r{};
+	size_t i = 0, j = 0;
+	std::optional<size_t> pos = std::nullopt;
 	for (char cr : CurrentTextRaw) {
 		auto c = static_cast<unsigned char>(cr);
 		if (c > 0x7F) {
 			r.append(1, static_cast<char>((c >> 6) | 0xC0));
 			c = static_cast<char>(c & 0x3F | 0x80);
+			++j;
 		}
 		r.append(1, c);
+		++i;
+		++j;
+		if (i == CurrentPos)
+			pos = j;
 	}
-	return r;
+	if (!pos.has_value())
+		pos = i;
+	return { r, *pos };
 }
 
 bool CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcname, Event ev)
@@ -524,7 +539,8 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcnam
 	try {
 		L.DoStringT(s, "TextInputCustomWidget::CallFunc");
 		if (L.IsFunction(-1)) {
-			L.Push(ClearTextOutput());
+			const auto& [str, _] = ClearTextOutput();
+			L.Push(str);
 			L.Push(static_cast<int>(WidgetId));
 			L.Push(static_cast<int>(ev));
 			L.PCall(3, 1);

@@ -1219,7 +1219,8 @@ namespace CppLogic::UI {
 		auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
 		if (t == nullptr)
 			throw lua::LuaException{ "not a TextInputCustomWidget" };
-		L.Push(t->ClearTextOutput());
+		const auto& [str, _] = t->ClearTextOutput();
+		L.Push(str);
 		return 1;
 	}
 	int TextInputCustomWidgetSetText(lua::State l) {

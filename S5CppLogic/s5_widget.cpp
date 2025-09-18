@@ -954,7 +954,7 @@ void GGUI::AdvancedFloatieManager::RenderFloaties()
             y -= t * 40;
             EGUIX::Color c{ 255, 255, 0, t > 1.5f ? static_cast<int>(255.0f - (t - 1.5f) * 170.0f) : 255};
             shok::UIRenderer::GlobalObj()->RenderText(f->Text.c_str(), (*GGUI::C3DOnScreenInformationCustomWidget::GlobalObj)->Renderer.TextureData.FontID_OnscreenNumbersSmall
-                , x, y, 0, &c, 0);
+                , false, x, y, 0, &c, 0);
         }
         ++f;
     }

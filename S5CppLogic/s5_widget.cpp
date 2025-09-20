@@ -432,6 +432,9 @@ void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* n
     EGUIX::WidgetManager* m = EGUIX::WidgetManager::GlobalObj();
     shok::WidgetId newId = m->RegisterName(name);
     if (newId != static_cast<shok::WidgetId>(0)) {
+        for (auto* w : WidgetListHandler.SubWidgets)
+            w->ZPriority = 0;
+        toAdd->ZPriority = 0;
         toAdd->WidgetID = newId;
         m->AddWidget(toAdd, newId);
         AddChild(toAdd);

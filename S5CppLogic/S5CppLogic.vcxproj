@@ -81,9 +81,8 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\LuaDebugger.dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
+xcopy /Y "$(TargetDir)*.dll" "C:\games\dedk\dedk_mp\bin\"
 C:\Users\Marc\source\repos\s5\bbaToolS5\publish\win32\bbaToolS5.exe -err -override "$(SolutionDir)\CppLogicBBA" "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba"
 copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
 </Command>
@@ -112,9 +111,8 @@ copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk\bin\LuaDebugger.dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
-copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\S5CppLogic.dll"
+      <Command>copy /Y "$(TargetDir)$(TargetName).dll" "C:\games\dedk\dedk_mp\bin\LuaDebugger.dll"
+xcopy /Y "$(TargetDir)*.dll" "C:\games\dedk\dedk_mp\bin\"
 C:\Users\Marc\source\repos\s5\bbaToolS5\publish\win32\bbaToolS5.exe -err -override "$(SolutionDir)\CppLogicBBA" "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba"
 copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
 </Command>

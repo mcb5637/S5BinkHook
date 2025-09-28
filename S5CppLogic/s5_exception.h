@@ -17,6 +17,10 @@ namespace BB {
 
 	class CFileException : public CException {
 	public:
+		PADDINGI(2);
+		int Reason;
+		char* File;
+
 		static inline constexpr int vtp = 0x77F46C;
 	};
 }

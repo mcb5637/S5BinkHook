@@ -8,6 +8,7 @@
 #include "s5_maplogic.h"
 #include "s5_entityandeffectmanager.h"
 #include "s5_events.h"
+#include "s5_effecttype.h"
 #include "luaext.h"
 #include "luaserializer.h"
 #include "savegame_extra.h"
@@ -193,6 +194,14 @@ namespace CppLogic::Effect {
 		return 0;
 	}
 
+	int DumpEffectType(lua::State l) {
+		luaext::EState L{ l };
+		auto et = L.CheckEnum<shok::EffectTypeId>(1);
+		auto* t = GetEffectType(et);
+		Serializer::ObjectToLuaSerializer::Serialize(l, t, EGL::EffectType::SerializationData);
+		return 1;
+	}
+
 	int PredicateInCircle(lua::State ls) {
 		luaext::EState L{ ls };
 		auto p = L.CheckPos(1);
@@ -357,6 +366,7 @@ namespace CppLogic::Effect {
 			lua::FuncReference::GetRef<EffectIterator>("EffectIterator"),
 			lua::FuncReference::GetRef<EffectIteratorTableize>("EffectIteratorTableize"),
 			lua::FuncReference::GetRef<EnableLightningFix>("EnableLightningFix"),
+			lua::FuncReference::GetRef<DumpEffectType>("DumpEffectType"),
 	};
 	constexpr std::array Predicates{
 			lua::FuncReference::GetRef<PredicateInCircle>("InCircle"),

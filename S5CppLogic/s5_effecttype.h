@@ -42,6 +42,8 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x77713C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8BA99D0);
+
+		static void HookFixCtor();
 	};
 
 	class CCannonBallEffectProps : public EGL::CFlyingEffectProps {

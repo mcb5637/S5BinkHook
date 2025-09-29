@@ -254,6 +254,7 @@ copy /Y "C:\games\dedk\dedk_mp\ModPacks\CppLogic.bba" "$(TargetDir)CppLogic.bba"
     <ClCompile Include="s5_classfactory.cpp" />
     <ClCompile Include="s5_effects.cpp" />
     <ClCompile Include="s5_config.cpp" />
+    <ClCompile Include="s5_effecttype.cpp" />
     <ClCompile Include="s5_entity.cpp" />
     <ClCompile Include="s5_entitydisplay.cpp" />
     <ClCompile Include="s5_entitytype.cpp" />

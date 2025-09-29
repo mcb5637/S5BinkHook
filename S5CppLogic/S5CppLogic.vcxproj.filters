@@ -530,6 +530,9 @@
     <ClCompile Include="ModEffect.cpp">
       <Filter>utility</Filter>
     </ClCompile>
+    <ClCompile Include="s5_effecttype.cpp">
+      <Filter>shok\effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">

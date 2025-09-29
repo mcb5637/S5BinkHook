@@ -37,6 +37,7 @@ assert(false, "do not load this file, this is documentation only!")
 --- - s5x maps are no longer blocked while SHoK is running
 --- - the mapscript now gets loaded via the same function as all other scripts. (yes, it can be precompiled now)
 --- - double click to select all units of a type now works on the entire screen regardless of screen size
+--- - GGL::CGLEffectFireProps no longer has a uninitialized member (SoundIDAgain)
 CppLogic = {}
 CppLogic.Effect = {}
 CppLogic.Effect.Predicates = {}
@@ -167,6 +168,11 @@ function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary
 --- - always displayed with full white color (not partially transparent)
 ---@param enabled boolean
 function CppLogic.Effect.EnableLightningFix(enabled) end
+
+--- dumps an effect type to lua. debug only, slow!
+--- @param effect number|string
+--- @return table
+function CppLogic.Effect.DumpEffectType(effect) end
 
 ---@class EffectPredicate
 local EffectPredicate = {}

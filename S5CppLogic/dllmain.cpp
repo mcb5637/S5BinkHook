@@ -379,6 +379,7 @@ void InitGame() {
 	if (!Options.DisableMapListFix)
 		Framework::CampagnInfo::HookLoad();
 	GGUI::CSelectionState::HookFixDoubleClickSelection();
+	GGL::CGLEffectFireProps::HookFixCtor();
 }
 
 double Version = 0.0;

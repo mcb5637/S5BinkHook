@@ -601,4 +601,21 @@ namespace shok {
 		//MoveDone = 1, ? rotate?
 		Standing = 2,
 	};
+	enum class MPFlags : int {
+		None = 0,
+		FreeAlliances = 1, // can choose teams
+		DeathMatch = 2,
+		TechRace = 4,
+		TimeGame = 8,
+		PeaceTimeSelectable = 16,
+		FastGame = 32,
+	};
+	template<>
+	class ::enum_is_flags<MPFlags> : public std::true_type {};
+	enum class MPGameModes : int {
+		None = 0,
+		DeathMatch = 1,
+		TechRace = 2,
+		TimeGame = 3,
+	};
 }

@@ -59,6 +59,8 @@ namespace shok {
 	enum class MapType : int;
 	enum class ArmyId : int;
 	enum class BuildingBannerStatus : int;
+	enum class MPFlags : int;
+	enum class MPGameModes : int;
 
 	// only forward decl of these, most may change at runtime
 	enum class AnimationId : int;

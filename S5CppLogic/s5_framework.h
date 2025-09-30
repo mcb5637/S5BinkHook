@@ -110,7 +110,7 @@ namespace Framework {
 		bool MPFlag = false; // 30
 		PADDING(3);
 		int MPPlayerCount = 0;
-		int MPGameOptionFlagSet = 0;
+		shok::MPFlags MPGameOptionFlagSet = shok::MPFlags::None; // serialized as int
 		shok::String MiniMapTextureName;
 		bool IsExternalmap = false; // ? 40
 		PADDING(3);

@@ -706,6 +706,12 @@ function CppLogic.Logic.EnableCannonInProgressAttraction(e) end
 ---@param e number|string|nil
 function CppLogic.Logic.EnableRefillabeMineNoAutoDestroy(e) end
 
+--- gets the player name
+---@param pid number
+---@return string
+---@return boolean isSTTKey
+function CppLogic.Logic.GetPlayerName(pid) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -3038,6 +3044,13 @@ function CppLogic.UI.TextInputCustomWidgetSetText(id, txt) end
 ---@param id number|string
 ---@param ignore boolean
 function CppLogic.UI.TextInputCustomWidgetSetIgnoreNextChar(id, ignore) end
+
+---@enum CPLTextInputCustomWidgetEvent
+CppLogic.UI.TextInputCustomWidgetEvent = {
+	Confirm = 0,
+	Cancel = 1,
+	Validate = 2,
+}
 
 ---sets the ignore next char of a CppLogic::Mod::UI::TextInputCustomWidget.
 ---@param id number|string

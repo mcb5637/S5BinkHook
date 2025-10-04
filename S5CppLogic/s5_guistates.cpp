@@ -225,9 +225,9 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(shok:
 	pety.entityTypes.reserve(bp->BuildOn.size());
 	for (auto t : bp->BuildOn)
 		pety.entityTypes.push_back(t);
-	CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [](const EGL::CGLEEntity* e, float*, int*) {
+	auto fun = CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity>([](const EGL::CGLEEntity* e, float*, int*) {
 		return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == static_cast<shok::EntityId>(0);
-	} };
+	});
 	CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> pr{ &pl, &pety, &cir, &fun };
 	CppLogic::Iterator::GlobalEntityIterator it{ &pr };
 	if (auto* ent = it.GetNearest(nullptr))

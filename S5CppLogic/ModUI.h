@@ -2,6 +2,7 @@
 #include "s5_forwardDecls.h"
 #include "s5_baseDefs.h"
 #include "s5_widget.h"
+#include "EnumIdManagerMagic.h"
 
 #include "mod.h"
 
@@ -187,4 +188,9 @@ namespace CppLogic::Mod::UI {
 		static void ClampCamera(ERwTools::CRwCameraHandler* cam);
 		static void ClampLookAt(ERwTools::CRwCameraHandler* cam);
 	};
+}
+
+template<>
+inline auto CppLogic::GetIdManager<CppLogic::Mod::UI::TextInputCustomWidget::Event>() {
+	return CppLogic::MagicEnum::EnumIdManager<CppLogic::Mod::UI::TextInputCustomWidget::Event>();
 }

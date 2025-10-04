@@ -468,16 +468,22 @@ namespace CppLogic::Iterator {
 			return rect.IsPosInRect(e->Position);
 		}
 	};
-	template<class T>
-	class PredicateFunc : public Predicate<T> {
-		const std::function<bool(const T*, float*, int*)> func;
+	template<class T, class F>
+	requires std::invocable<F, const T*, float*, int*>
+	class PredicateFuncT : public Predicate<T> {
+		F Func;
 	public:
-		PredicateFunc(const std::function<bool(const T*, float*, int*)>& f) : func(f) {
+		PredicateFuncT(F f) : Func(std::move(f)) {
 		}
 		virtual bool Matches(const T* e, float* rangeOut, int* prio) const override {
-			return std::invoke(func, e, rangeOut, prio);
+			return std::invoke(Func, e, rangeOut, prio);
 		}
 	};
+	template<class T, class F>
+	requires std::invocable<F, const T*, float*, int*>
+	PredicateFuncT<T, F> PredicateFunc(F f) {
+		return { std::move(f) };
+	}
 
 	class EntityPredicateIsSettler : public Predicate<EGL::CGLEEntity> {
 	public:

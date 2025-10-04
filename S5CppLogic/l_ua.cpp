@@ -323,9 +323,9 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
-		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
+		auto fun = CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity>([this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
-		} };
+		});
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };
 			CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 9> a{
@@ -378,9 +378,9 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateIsAlive ali{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
-		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
+		auto fun = CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity>([this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 2);
-		} };
+		});
 		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 7> a{
 			&relev, &buil, &ali, &vis, &pl, &cir, &fun,
 		};
@@ -392,9 +392,9 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite buil{};
 		CppLogic::Iterator::EntityPredicateOfEntityCategory cat{ shok::EntityCategory::Bridge };
 		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, ran*ran };
-		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
+		auto fun = CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity>([this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
-		} };
+		});
 		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 5> a{
 			&pl, &buil, &cat, &cir, &fun,
 		};
@@ -412,9 +412,9 @@ namespace CppLogic::UA {
 		CppLogic::Iterator::EntityPredicateIsNotInBuilding notinbuild{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer pl{};
 		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(pl.players, player);
-		CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> fun{ [this](const EGL::CGLEEntity* e, float*, int*) {
+		auto fun = CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity>([this](const EGL::CGLEEntity* e, float*, int*) {
 			return this->CheckTargetCache(e->EntityId, 1);
-		} };
+		});
 		CppLogic::Iterator::PredicateStaticOr<EGL::CGLEEntity, 2> cat{ &catHe, &catCan };
 		if (notFleeing) {
 			CppLogic::Iterator::EntityPredicateIsNotFleeingFrom nflee{ p, 500 };

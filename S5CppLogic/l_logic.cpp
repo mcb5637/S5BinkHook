@@ -1110,6 +1110,23 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int GetPlayerName(lua::State l) {
+		luaext::EState L{ l };
+		auto pid = L.CheckPlayerId(1);
+		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid);
+		if (p->PlayerNameStringRaw.size() > 0)
+		{
+			L.Push(p->PlayerNameStringRaw);
+			L.Push(false);
+		}
+		else
+		{
+			L.Push(p->PlayerNameStringTableKey);
+			L.Push(true);
+		}
+		return 2;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1587,6 +1604,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
 			lua::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
 			lua::FuncReference::GetRef<EnableRefillabeMineNoAutoDestroy>("EnableRefillabeMineNoAutoDestroy"),
+			lua::FuncReference::GetRef<GetPlayerName>("GetPlayerName"),
 #ifdef _DEBUG
 			lua::FuncReference::GetRef<AddRedirectLayer>("AddRedirectLayer"),
 			lua::FuncReference::GetRef<AddFolder>("AddFolder"),

@@ -1367,7 +1367,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 
 		// make sure there is no entity/effect left that can access a type we are deleting
 		if (*EGL::CGLEEntityManager::GlobalObj) {
-			CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity> p{ [](const EGL::CGLEEntity*, float*, int*) { return true; } };
+			auto p = CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity>([](const EGL::CGLEEntity*, float*, int*) { return true; });
 			CppLogic::Iterator::GlobalEntityIterator it{ &p };
 			auto* man = (*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager;
 			for (EGL::CGLEEntity* a : it) {
@@ -1378,7 +1378,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			(*EGL::CGLEGameLogic::GlobalObj)->ClearToDestroy();
 		}
 		if (*EGL::CGLEEffectManager::GlobalObj) {
-			CppLogic::Iterator::PredicateFunc<EGL::CEffect> p{ [](const EGL::CEffect*, float*, int*) { return true; } };
+			auto p = CppLogic::Iterator::PredicateFunc<EGL::CEffect>([](const EGL::CEffect*, float*, int*) { return true; });
 			CppLogic::Iterator::GlobalEffectIterator it{ &p };
 			for (EGL::CEffect* a : it) {
 				delete a;

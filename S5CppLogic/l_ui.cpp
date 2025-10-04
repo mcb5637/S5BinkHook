@@ -2160,6 +2160,10 @@ namespace CppLogic::UI {
 		L.RegisterFuncs(Commands, -3);
 		L.SetTableRaw(-3);
 
+		L.Push("TextInputCustomWidgetEvent");
+		GetIdManager<Mod::UI::TextInputCustomWidget::Event>().PushToState(L);
+		L.SetTableRaw(-3);
+
 		if (L.GetState() == shok::LuaStateMainmenu) {
 			L.RegisterFunc<SetMouseTriggerMainMenu>("SetMouseTriggerMainMenu", -3);
 			CppLogic::UI::GUIState_LuaSelection::Initialize();

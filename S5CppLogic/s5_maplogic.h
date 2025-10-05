@@ -337,6 +337,8 @@ namespace EGL {
 		// activate player callback 8973C8
 
 		// seridata of this thing is 0x897508, but it is missing its guard
+		// fixed here
+		static const BB::SerializationData SerializationData[];
 	};
 	static_assert(sizeof(EGL::PlayerManager::Player) * 9 + 4 == 184);
 	static_assert(offsetof(EGL::PlayerManager, ExplorationUpdate) == 46 * 4);
@@ -345,6 +347,8 @@ namespace EGL {
 		int Tick;
 		int TicksPerMS;
 		float CurrentWeatherSpeedFactor;
+
+		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x571DF8);
 	};
 
 	struct RegionDataEntity { // not sure if it has anything to do with region

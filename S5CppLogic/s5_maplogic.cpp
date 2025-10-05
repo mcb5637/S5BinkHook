@@ -9,6 +9,7 @@
 #include "s5_defines.h"
 #include "s5_netevents.h"
 #include "s5_scriptsystem.h"
+#include "s5_classfactory.h"
 #include "entityiterator.h"
 #include "hooks.h"
 
@@ -609,6 +610,12 @@ EGL::CPlayerExplorationUpdate* EGL::PlayerManager::GetUpdate()
 {
 	return playermng_getupdate(this);
 }
+
+const BB::SerializationData EGL::PlayerManager::SerializationData[3] {
+	reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x575B2B)()[0],
+	reinterpret_cast<const BB::SerializationData* (__stdcall*)()>(0x575B2B)()[1],
+	BB::SerializationData::GuardData(),
+};
 
 shok::Vector<EGL::CGLEEntity*>& EGL::RegionDataEntity::Entry::GetByAccessCategory(shok::AccessCategory ac)
 {

@@ -22,6 +22,7 @@
 #include "EntityAddonData.h"
 #include "ModBehavior.h"
 #include "LuaEventInterface.h"
+#include "luaserializer.h"
 
 namespace CppLogic::Entity {
 	int PredicateOfType(lua::State ls) {
@@ -667,6 +668,13 @@ namespace CppLogic::Entity {
 		b->RemainingAmmo = L.CheckInt(2);
 		return 0;
 	};
+
+	int DumpEntity(lua::State l) {
+		luaext::EState L{ l };
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, e);
+		return 1;
+	}
 
 	int MovingEntityGetSpeedFactor(lua::State l) {
 		luaext::EState L{ l };
@@ -1915,6 +1923,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<GetAllScriptNameMappings>("GetAllScriptNameMappings"),
 			lua::FuncReference::GetRef<GetLimitedAmmo>("GetLimitedAmmo"),
 			lua::FuncReference::GetRef<SetLimitedAmmo>("SetLimitedAmmo"),
+			lua::FuncReference::GetRef<DumpEntity>("DumpEntity"),
 	};
 
 	constexpr std::array<lua::FuncReference, 21> Predicates{ {

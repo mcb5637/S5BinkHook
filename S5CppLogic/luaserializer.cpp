@@ -29,20 +29,26 @@ void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(lua::State L, v
 		{
 			if (!keypushed)
 				L.Push(s->SerializationName);
-			const BB::SerializationData* os = nullptr;
-			shok::ClassId id = BB::InvalidIdentifier;
-			if (s->GetIdentifier) {
-				id = s->GetIdentifier(o);
-				os = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+
+			if (o == nullptr) {
+				L.Push();
 			}
 			else {
-				os = s->SubElementData;
-			}
+				const BB::SerializationData* os = nullptr;
+				shok::ClassId id = BB::InvalidIdentifier;
+				if (s->GetIdentifier) {
+					id = s->GetIdentifier(o);
+					os = (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);
+				}
+				else {
+					os = s->SubElementData;
+				}
 
-			if (os)
-				Serialize(L, o, os, id);
-			else
-				L.Push("unknown object");
+				if (os)
+					Serialize(L, o, os, id);
+				else
+					L.Push("unknown object");
+			}
 
 			L.SetTableRaw(-3);
 		}

@@ -1127,6 +1127,24 @@ namespace CppLogic::Logic {
 		return 2;
 	}
 
+	int DumpGameLogic(lua::State L) {
+		L.NewTable();
+		L.Push("GGL");
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, *GGL::CGLGameLogic::GlobalObj, GGL::CGLGameLogic::SerializationData());
+		L.SetTableRaw(-3);
+
+		auto* l = *EGL::CGLEGameLogic::GlobalObj;
+		L.Push("EGL::LogicGameTime");
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, l->InGameTime, EGL::LogicGameTime::SerializationData());
+		L.SetTableRaw(-3);
+
+		L.Push("EGL::PlayerManager");
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, l->PlayerMng, EGL::PlayerManager::SerializationData);
+		L.SetTableRaw(-3);
+
+		return 1;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1605,6 +1623,7 @@ namespace CppLogic::Logic {
 			lua::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
 			lua::FuncReference::GetRef<EnableRefillabeMineNoAutoDestroy>("EnableRefillabeMineNoAutoDestroy"),
 			lua::FuncReference::GetRef<GetPlayerName>("GetPlayerName"),
+			lua::FuncReference::GetRef<DumpGameLogic>("DumpGameLogic"),
 #ifdef _DEBUG
 			lua::FuncReference::GetRef<AddRedirectLayer>("AddRedirectLayer"),
 			lua::FuncReference::GetRef<AddFolder>("AddFolder"),

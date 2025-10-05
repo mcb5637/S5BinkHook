@@ -174,6 +174,12 @@ function CppLogic.Effect.EnableLightningFix(enabled) end
 --- @return table
 function CppLogic.Effect.DumpEffectType(effect) end
 
+--- dumps effect to lua
+--- dev only, slow!
+---@param e number|string
+---@return table
+function CppLogic.Effect.DumpEffect(e) end
+
 ---@class EffectPredicate
 local EffectPredicate = {}
 
@@ -712,6 +718,11 @@ function CppLogic.Logic.EnableRefillabeMineNoAutoDestroy(e) end
 ---@return boolean isSTTKey
 function CppLogic.Logic.GetPlayerName(pid) end
 
+--- dumps game logic
+--- dev only, slow!
+---@return table
+function CppLogic.Logic.DumpGameLogic() end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -1220,6 +1231,12 @@ function CppLogic.Entity.Predicates.IsAlive() end
 function CppLogic.Entity.Predicates.IsNotInBuilding() end
 
 ---@alias entity number|string
+
+--- dumps entity to lua
+--- dev only, slow!
+---@param e entity
+---@return table
+function CppLogic.Entity.DumpEntity(e) end
 
 --- entity task list index.
 --- @param id entity

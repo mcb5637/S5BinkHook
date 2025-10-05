@@ -202,6 +202,13 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
+	int DumpEffect(lua::State l) {
+		luaext::EState L{ l };
+		auto e = L.CheckEffect(1);
+		Serializer::ObjectToLuaSerializer::Serialize(l, e);
+		return 1;
+	}
+
 	int PredicateInCircle(lua::State ls) {
 		luaext::EState L{ ls };
 		auto p = L.CheckPos(1);
@@ -367,6 +374,7 @@ namespace CppLogic::Effect {
 			lua::FuncReference::GetRef<EffectIteratorTableize>("EffectIteratorTableize"),
 			lua::FuncReference::GetRef<EnableLightningFix>("EnableLightningFix"),
 			lua::FuncReference::GetRef<DumpEffectType>("DumpEffectType"),
+			lua::FuncReference::GetRef<DumpEffect>("DumpEffect"),
 	};
 	constexpr std::array Predicates{
 			lua::FuncReference::GetRef<PredicateInCircle>("InCircle"),

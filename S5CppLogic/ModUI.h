@@ -188,6 +188,23 @@ namespace CppLogic::Mod::UI {
 		static void ClampCamera(ERwTools::CRwCameraHandler* cam);
 		static void ClampLookAt(ERwTools::CRwCameraHandler* cam);
 	};
+
+	class MiniMapOverlayWithCallbackCustomWidget : public GGUI::CMiniMapOverlayCustomWidget {
+	public:
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+
+		virtual bool HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) override;
+
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1029);
+		static constexpr BB::SerializationData* SerializationData = nullptr;
+
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		inline std::string_view FuncName() const {
+			return StringUserVariable[0];
+		}
+	};
 }
 
 template<>

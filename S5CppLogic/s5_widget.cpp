@@ -274,7 +274,7 @@ EGUIX::CWidgetStringHelper* EGUIX::CBaseWidget::GetStringHelper()
     return nullptr;
 }
 
-EGUIX::Rect EGUIX::CBaseWidget::CalcGlobalPosAndSize()
+EGUIX::Rect EGUIX::CBaseWidget::CalcGlobalPosAndSize() const
 {
     // 559BC9(rect* out) does the same
     EGUIX::Rect r = PosAndSize;
@@ -373,6 +373,47 @@ static inline void(__thiscall* const minimaptextu_settorend)(GGUI::MiniMapHandle
 void GGUI::MiniMapHandler::MiniMapTexture::SetToRender()
 {
     minimaptextu_settorend(this);
+}
+
+shok::ClassId __stdcall GGUI::CMiniMapOverlayCustomWidget::GetClassIdentifier() const
+{
+    return Identifier;
+}
+
+void* __stdcall GGUI::CMiniMapOverlayCustomWidget::CastToIdentifier(shok::ClassId id)
+{
+    return reinterpret_cast<void*(__stdcall*const)(GGUI::CMiniMapOverlayCustomWidget*, shok::ClassId)>(0x532A3E)(this, id);
+}
+
+void GGUI::CMiniMapOverlayCustomWidget::Initialize()
+{
+    // 444C62 empty func
+}
+
+void GGUI::CMiniMapOverlayCustomWidget::Destroy()
+{
+    delete this; // 52FDAA
+}
+
+void GGUI::CMiniMapOverlayCustomWidget::Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords)
+{
+    auto f = reinterpret_cast<void(__thiscall* const)(CMiniMapOverlayCustomWidget*, EGUIX::CCustomWidget*, const EGUIX::Rect*)>(0x5335E3);
+    f(this, widget, screenCoords);
+}
+
+bool GGUI::CMiniMapOverlayCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified)
+{
+    auto f = reinterpret_cast<bool(__thiscall* const)(CMiniMapOverlayCustomWidget*, EGUIX::CCustomWidget*, BB::CEvent*, BB::CEvent*)>(0x533784);
+    return f(this, widget, evLocalCoords, evUnmodified);
+}
+
+std::optional<shok::Position> GGUI::CMiniMapOverlayCustomWidget::MapPosFromMouseEvent(const EGUIX::CBaseWidget* wid, const BB::CEvent* ev) const
+{
+    shok::Position r{};
+    auto f = reinterpret_cast<bool(__thiscall* const)(const CMiniMapOverlayCustomWidget*, const EGUIX::CBaseWidget*, const BB::CEvent*, float*, float*)>(0x5335F4);
+    if (f(this, wid, ev, &r.X, &r.Y))
+        return r;
+    return std::nullopt;
 }
 
 inline void(__thiscall* const scrollbar_update)(EGUIX::CScrollBarButtonCustomWidget* th, int val, bool cb, EGUIX::CBaseWidget* wid) = reinterpret_cast<void(__thiscall*)(EGUIX::CScrollBarButtonCustomWidget*, int, bool, EGUIX::CBaseWidget*)>(0x55CB11);

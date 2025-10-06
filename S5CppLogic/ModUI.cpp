@@ -16,6 +16,7 @@ void CppLogic::Mod::UI::RegisterClasses()
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<AutoScrollCustomWidget>();
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<TextInputCustomWidget>();
 	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<FreeCamCustomWidget>();
+	(*BB::CClassFactory::GlobalObj)->AddClassToFactory<MiniMapOverlayWithCallbackCustomWidget>();
 }
 
 shok::ClassId CppLogic::Mod::UI::AutoScrollCustomWidget::GetClassIdentifier() const
@@ -959,4 +960,56 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::ClampLookAt(ERwTools::CRwCameraHand
 		cam->CameraInfo.LookAtX = p.X;
 	if (cam->CameraInfo.LookAtY > p.Y)
 		cam->CameraInfo.LookAtY = p.Y;
+}
+
+shok::ClassId __stdcall CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::GetClassIdentifier() const
+{
+	return Identifier;
+}
+
+void* CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+
+void CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::operator delete(void* p)
+{
+	shok::Free(p);
+}
+
+bool CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified)
+{
+	if (auto* mev = BB::IdentifierCast<BB::CMouseEvent>(evLocalCoords))
+	{
+		if (!FuncName().empty() && mev->IsEvent(shok::InputEventIds::MouseButtonDown))
+		{
+			auto pos = MapPosFromMouseEvent(widget, evLocalCoords);
+			if (pos.has_value())
+			{
+				luaext::EState L{ *EScr::GetCurrentLuaState() };
+				int t = L.GetTop();
+				std::string s = std::format("return {}", FuncName());
+				bool r = false;
+				try {
+					L.DoStringT(s, "MiniMapOverlayWithCallbackCustomWidget::HandleEvent");
+					if (L.IsFunction(-1)) {
+						L.Push(widget->WidgetID);
+						L.PushPos(*pos);
+						L.Push(mev->KeyData & shok::Keys::MaskCode);
+						L.Push((mev->KeyData & shok::Keys::ModifierShift) != shok::Keys::None);
+						L.Push((mev->KeyData & shok::Keys::ModifierControl) != shok::Keys::None);
+						L.Push((mev->KeyData & shok::Keys::ModifierAlt) != shok::Keys::None);
+						L.PCall(6, 1);
+						r = L.ToBoolean(-1);
+						L.Pop(1);
+					}
+				}
+				catch (const lua::LuaException&) {}
+				L.SetTop(t);
+				if (r)
+					return true;
+			}
+		}
+	}
+	return GGUI::CMiniMapOverlayCustomWidget::HandleEvent(widget, evLocalCoords, evUnmodified);
 }

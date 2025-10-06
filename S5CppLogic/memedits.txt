@@ -146,4 +146,5 @@ list of used identifiers
 0x1026 CppLogic::Mod::AdvancedMarketBehaviorProps
 0x1027 CppLogic::Mod::AdvFoundationBehaviorProps
 0x1028 CppLogic::Mod::AdvFoundationBehavior
+0x1029 CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

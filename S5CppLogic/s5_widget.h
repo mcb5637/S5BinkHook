@@ -7,6 +7,7 @@
 #include "s5_video.h"
 #include "s5_RWEngine.h"
 #include <span>
+#include <optional>
 
 namespace EGUIX {
 	struct Rect { // size 4
@@ -243,7 +244,7 @@ namespace EGUIX {
 		EGUIX::CToolTipHelper* GetTooltipHelper();
 		EGUIX::CWidgetStringHelper* GetStringHelper();
 
-		EGUIX::Rect CalcGlobalPosAndSize();
+		EGUIX::Rect CalcGlobalPosAndSize() const;
 	};
 	static_assert(sizeof(CBaseWidget) == 14 * 4);
 	//constexpr int i = offsetof(CBaseWidget, PosAndSize.H) / 4;
@@ -1123,8 +1124,18 @@ namespace GGUI {
 		static inline constexpr int vtp = 0x77CDCC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6157C1AE);
 
+		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
+
+		virtual void Initialize() override;
+		virtual void Destroy() override;
+		virtual void Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords) override;
+		virtual bool HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) override;
+
 		// calculate map pos under mouse event bool valid 5335F4(CCustomWidget* wid, BB::CEvent* evlocal, float* x, float* y) buggy? calculates global pos and compares to local event?
+		std::optional<shok::Position> MapPosFromMouseEvent(const EGUIX::CBaseWidget* wid, const BB::CEvent*) const;
 	};
+	static_assert(sizeof(CMiniMapOverlayCustomWidget) == 0x94);
 
 	// renders some network info on screen
 	class CNetworkInfoCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {

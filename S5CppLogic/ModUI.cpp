@@ -981,14 +981,14 @@ bool CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::HandleEvent(EGUI
 {
 	if (auto* mev = BB::IdentifierCast<BB::CMouseEvent>(evLocalCoords))
 	{
-		if (!FuncName().empty() && mev->IsEvent(shok::InputEventIds::MouseButtonDown))
+		if (FuncName().size() > 0 && mev->IsEvent(shok::InputEventIds::MouseButtonDown))
 		{
 			auto pos = MapPosFromMouseEvent(widget, evLocalCoords);
 			if (pos.has_value())
 			{
 				luaext::EState L{ *EScr::GetCurrentLuaState() };
 				int t = L.GetTop();
-				std::string s = std::format("return {}", FuncName());
+				std::string s = std::format("return {}", static_cast<std::string_view>(FuncName()));
 				bool r = false;
 				try {
 					L.DoStringT(s, "MiniMapOverlayWithCallbackCustomWidget::HandleEvent");

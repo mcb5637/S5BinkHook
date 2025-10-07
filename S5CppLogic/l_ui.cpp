@@ -1448,6 +1448,25 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int MiniMapOverlaySetCallbackFuncName(lua::State l) {
+		luaext::EState L{ l };
+		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
+		if (w == nullptr)
+			throw lua::LuaException{ "not a customwidget" };
+		auto f = L.CheckString(2);
+		if (auto* ovl = dynamic_cast<GGUI::CMiniMapOverlayCustomWidget*>(w->CustomWidget)) {
+			ovl->Destroy();
+			w->CustomWidget = nullptr;
+			w->CustomClassName = "CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget";
+			w->InitializeCustomWidget();
+		}
+		auto* ovl = dynamic_cast<CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget*>(w->CustomWidget);
+		if (ovl == nullptr)
+			throw lua::LuaException{ "not a MiniMapOverlayWithCallbackCustomWidget" };
+		ovl->FuncName() = f;
+		return 0;
+	}
+
 	int CreateSelectionDecal(lua::State l) {
 		luaext::EState L{ l };
 
@@ -1926,6 +1945,7 @@ namespace CppLogic::UI {
 		lua::FuncReference::GetRef<InitNetHandlers>("InitNetHandlers"),
 		lua::FuncReference::GetRef<RemoveWidget>("RemoveWidget"),
 		lua::FuncReference::GetRef<ReorderWidgets>("ReorderWidgets"),
+		lua::FuncReference::GetRef<MiniMapOverlaySetCallbackFuncName>("MiniMapOverlaySetCallbackFuncName"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

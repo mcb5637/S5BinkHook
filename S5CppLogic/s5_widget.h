@@ -1132,7 +1132,8 @@ namespace GGUI {
 		virtual void Render(EGUIX::CCustomWidget* widget, const EGUIX::Rect* screenCoords) override;
 		virtual bool HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) override;
 
-		// calculate map pos under mouse event bool valid 5335F4(CCustomWidget* wid, BB::CEvent* evlocal, float* x, float* y) buggy? calculates global pos and compares to local event?
+		// buggy? calculates global pos and compares to local event?
+		// seems to work fine, at least with the current setup
 		std::optional<shok::Position> MapPosFromMouseEvent(const EGUIX::CBaseWidget* wid, const BB::CEvent*) const;
 	};
 	static_assert(sizeof(CMiniMapOverlayCustomWidget) == 0x94);

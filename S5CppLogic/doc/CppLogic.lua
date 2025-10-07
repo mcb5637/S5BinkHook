@@ -3131,6 +3131,15 @@ function CppLogic.UI.VideoCustomWidgetGetVideoSize(wid) end
 ---@param y number
 function CppLogic.UI.VideoCustomWidgetSetVideoSize(wid, x, y) end
 
+---sets a callback function for clicks on a minimap overlay.
+---funcname is the name of the func to be called, queried via evaulating return.
+---(so contained . are possible).
+---calling this function will replace a GGUI::CMiniMapOverlayCustomWidget with a CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget.
+---any other customwidget will lead to an assertion.
+---@param wid string|number
+---@param funcname string
+function CppLogic.UI.MiniMapOverlaySetCallbackFuncName(wid, funcname) end
+
 ---@class TerrainDecalAccess
 local TerrainDecalAccess = {}
 ---destroys (removes from game world)

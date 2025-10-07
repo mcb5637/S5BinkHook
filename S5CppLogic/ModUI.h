@@ -201,7 +201,7 @@ namespace CppLogic::Mod::UI {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		inline std::string_view FuncName() const {
+		inline shok::String& FuncName() {
 			return StringUserVariable[0];
 		}
 	};

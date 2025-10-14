@@ -695,6 +695,7 @@ namespace GGUI {
 		// scroll to pos (minimap click) cdecl 523D2D(shok::position*)
 
 		void HackPostEvent();
+		static void DisableSelectionLimit(bool disable);
 
 		static inline GGUI::CManager* (__cdecl* const GlobalObj)() = reinterpret_cast<GGUI::CManager * (__cdecl*)()>(0x525622);
 		static bool(*PostEventCallback)(BB::CEvent* ev);

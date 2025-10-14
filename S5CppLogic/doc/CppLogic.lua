@@ -38,6 +38,7 @@ assert(false, "do not load this file, this is documentation only!")
 --- - the mapscript now gets loaded via the same function as all other scripts. (yes, it can be precompiled now)
 --- - double click to select all units of a type now works on the entire screen regardless of screen size
 --- - GGL::CGLEffectFireProps no longer has a uninitialized member (SoundIDAgain)
+--- - more than 24 (non soldier) entities can be selected at the same time
 CppLogic = {}
 CppLogic.Effect = {}
 CppLogic.Effect.Predicates = {}

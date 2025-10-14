@@ -380,6 +380,7 @@ void InitGame() {
 		Framework::CampagnInfo::HookLoad();
 	GGUI::CSelectionState::HookFixDoubleClickSelection();
 	GGL::CGLEffectFireProps::HookFixCtor();
+	GGUI::CManager::DisableSelectionLimit(true);
 }
 
 double Version = 0.0;

@@ -929,6 +929,12 @@ void GGUI::CManager::HackPostEvent()
 	PostGUIEvent = &PostEventHook_GUIManagerObj;
 }
 
+void GGUI::CManager::DisableSelectionLimit(bool disable)
+{
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x525959), 4 };
+	*reinterpret_cast<byte*>(0x525959) = disable ? 0xEB : 0x7E; // jmp : jle
+}
+
 bool GGUI::CManager::IsModifierPressed(shok::Keys modif)
 {
 	return EGUIX::CEventManager::GlobalObj()->IsModifierPressed(modif);

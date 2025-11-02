@@ -203,6 +203,8 @@ namespace BB {
 		void(__stdcall* FreeIter)(Iter* i) = nullptr;
 		void(__stdcall* FinalizeAddToList)(void* List) = nullptr; // used with AddToList, AddToListIdManaged unknown
 		size_t(__stdcall* GetSize)(void* List) = nullptr;
+
+		std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::SerializationListOptions::Iter* i)> UniqueIter(void* list) const;
 	};
 
 	struct SerializationData { // use a 0-terminated array (default constructed is 0)

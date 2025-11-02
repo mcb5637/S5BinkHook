@@ -642,6 +642,11 @@ const char* BB::SerializationListOptions::Context::GetAttribute(const char* a) c
 	return serilistctx_get(this, a);
 }
 
+std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::SerializationListOptions::Iter* i)> BB::SerializationListOptions::UniqueIter(void* list) const
+{
+	return std::unique_ptr<Iter, void(__stdcall*)(BB::SerializationListOptions::Iter * i)>(AllocIter(list), FreeIter);
+}
+
 const BB::SerializationData* BB::SerializationData::GetSerializationDataFromId(shok::ClassId id)
 {
 	return (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id);

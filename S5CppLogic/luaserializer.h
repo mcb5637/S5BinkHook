@@ -6,6 +6,7 @@
 #include "s5_defines.h"
 #include "s5_classfactory.h"
 #include "luaext.h"
+#include "EnumIdManagerMagic.h"
 
 namespace CppLogic::Serializer {
 	class ObjectToLuaSerializer {
@@ -148,4 +149,152 @@ namespace CppLogic::Serializer {
 		static constexpr int FileVersion = 2;
 		static constexpr const char* RegistrySerializeKeys = "CppLogic::Serializer::AdvLuaStateSerializer_SerlializedRegistry";
 	};
+
+	class ObjectAccess {
+	public:
+		virtual ~ObjectAccess() = default;
+
+		enum class Type : int {
+			Field,
+			Struct,
+			BBObject,
+			List,
+		};
+
+		ObjectAccess(std::string_view name, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id));
+
+		using BaseClass = ObjectAccess;
+
+		std::string_view SDName;
+		const BB::SerializationData* SeriData;
+		void* Object;
+		int Id;
+		void(*OnWrite)(int id);
+
+		static int Name(lua::State L);
+
+	protected:
+		static void PushSD(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr, bool listElement = false);
+	public:
+		static void PushObject(lua::State L, std::string_view n, BB::IObject* obj, int id = 0, void(*onWrite)(int id) = nullptr, shok::ClassId c = shok::ClassId::Invalid, void** owner = nullptr);
+		static void PushObject(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr);
+	};
+
+	class FieldAccess : public ObjectAccess {
+	public:
+		static int GetType(lua::State L);
+		static int DataType(lua::State L);
+		static int Get(lua::State L);
+		static int Set(lua::State L);
+
+		using ObjectAccess::ObjectAccess;
+
+		static constexpr std::array LuaMethods{
+			lua::FuncReference::GetRef<Name>("Name"),
+			lua::FuncReference::GetRef<GetType>("GetType"),
+			lua::FuncReference::GetRef<DataType>("DataType"),
+			lua::FuncReference::GetRef<Get>("Get"),
+			lua::FuncReference::GetRef<Set>("Set"),
+		};
+	};
+
+	class StructAccess : public ObjectAccess {
+	public:
+		static int GetType(lua::State L);
+		static int Fields(lua::State L);
+
+		static int FieldsNext(lua::State L);
+
+		static int Index(lua::State L);
+
+		using ObjectAccess::ObjectAccess;
+
+		static constexpr std::array LuaMethods{
+			lua::FuncReference::GetRef<Name>("Name"),
+			lua::FuncReference::GetRef<GetType>("GetType"),
+			lua::FuncReference::GetRef<Fields>("Fields"),
+			lua::FuncReference::GetRef<Index>("Get"),
+		};
+
+		struct Iter {
+			void* Obj;
+			const BB::SerializationData* SeriData;
+			const BB::SerializationData* CurrentSubObject;
+			const BB::SerializationData* Root;
+			bool First = true;
+
+			Iter(void* o, const BB::SerializationData* sd);
+
+			bool operator==(std::default_sentinel_t);
+			inline Iter begin() const {
+				return *this;
+			}
+			inline auto end() const {
+				return std::default_sentinel;
+			}
+
+			std::pair<void*, const BB::SerializationData*> operator*() const;
+			Iter& operator++();
+			inline Iter operator++(int) {
+				Iter r = *this;
+				++(*this);
+				return r;
+			}
+		};
+	};
+
+	class BBObjectAccess : public StructAccess {
+		void** Owner;
+	public:
+		static int GetType(lua::State L);
+		static int ObjectType(lua::State L);
+		static int New(lua::State L);
+		static int IsNullptr(lua::State L);
+
+		BBObjectAccess(std::string_view name, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id), void** owner = nullptr);
+
+		static constexpr std::array LuaMethods{
+			lua::FuncReference::GetRef<Name>("Name"),
+			lua::FuncReference::GetRef<GetType>("GetType"),
+			lua::FuncReference::GetRef<Fields>("Fields"),
+			lua::FuncReference::GetRef<Index>("Get"),
+			lua::FuncReference::GetRef<ObjectType>("ObjectType"),
+			lua::FuncReference::GetRef<New>("New"),
+			lua::FuncReference::GetRef<IsNullptr>("IsNullptr"),
+		};
+	};
+
+	class ListAccess : public ObjectAccess {
+	public:
+		static int GetType(lua::State L);
+		static int Elements(lua::State L);
+		static int Size(lua::State L);
+		static int First(lua::State L);
+		static int Insert(lua::State L);
+
+		static int ElementsNext(lua::State L);
+
+		using ObjectAccess::ObjectAccess;
+
+		static constexpr std::array LuaMethods{
+			lua::FuncReference::GetRef<Name>("Name"),
+			lua::FuncReference::GetRef<GetType>("GetType"),
+			lua::FuncReference::GetRef<Elements>("Elements"),
+			lua::FuncReference::GetRef<Size>("Size"),
+			lua::FuncReference::GetRef<First>("First"),
+			lua::FuncReference::GetRef<Insert>("Insert"),
+		};
+
+	private:
+		struct ElementIter {
+			std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::SerializationListOptions::Iter* i)> Iter;
+		};
+	};
+}
+
+namespace CppLogic {
+	template<>
+	inline auto GetIdManager<Serializer::ObjectAccess::Type>() {
+		return CppLogic::MagicEnum::EnumIdManager<Serializer::ObjectAccess::Type>{};
+	}
 }

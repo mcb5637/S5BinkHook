@@ -263,6 +263,118 @@ function CppLogic.Effect.Predicates.IsArrowOrCannonBall() end
 --- sets high precision FPU (gets reset on every API call, so call id directly before your calculations)
 function CppLogic.Memory.SetFPU() end
 
+---@enum CppObjectAccessType
+CppLogic.Memory.ObjectAccessType = {
+	Field = 0,
+	Struct = 1,
+	BBObject = 2,
+	List = 3,
+}
+
+---@class CppObjectAccess
+CppObjectAccess = {}
+--- gets the name of the current seridata
+---@return string
+function CppObjectAccess:Name()end
+--- type of this access object
+---@return CppObjectAccessType
+function CppObjectAccess:GetType()end
+
+---@class CppFieldAccess : CppObjectAccess
+CppFieldAccess = {}
+---a description of the datatype of this field
+---@return string
+function CppFieldAccess:DataType()end
+---returns the value of this field
+---@return any
+function CppFieldAccess:Get()end
+---sets the value of this fileld, including type check, but no semantic check (you can for example set the entity health to -500, but not to "foo")
+---@param val any
+function CppFieldAccess:Set(val)end
+--- type of this access object
+---@return `CppLogic.Memory.ObjectAccessType.Field`
+function CppFieldAccess:GetType()end
+
+---@class CppStructAccess : CppObjectAccess
+---@field [string] CppStructAccess? searches for a field with name and returns it (will return registered functions, if they exist, see Get)
+CppStructAccess = {}
+--- type of this access object
+---@return `CppLogic.Memory.ObjectAccessType.Struct`
+function CppStructAccess:GetType()end
+---iterates over all fields
+---@return fun():CppObjectAccess?
+function CppStructAccess:Fields()end
+---searches for a field with name and returns it
+---@param name string
+---@return CppStructAccess?
+function CppStructAccess:Get(name)end
+
+---@class CppBBObjectAccess : CppStructAccess
+CppBBObjectAccess = {}
+--- type of this access object
+---@return `CppLogic.Memory.ObjectAccessType.BBObject`
+function CppBBObjectAccess:GetType()end
+---resturns the type of the pointed to object
+---@return string?
+function CppBBObjectAccess:ObjectType()end
+---allocates a new object and replaces the old one with it
+---@param classname string? nil->nullptr
+---@param free boolean? nil->true
+function CppBBObjectAccess:New(classname, free)end
+---checks if the pointer is a nullptr
+---@return boolean
+function CppBBObjectAccess:IsNullptr()end
+
+---@class CppListAccess : CppObjectAccess
+CppListAccess = {}
+--- type of this access object
+---@return `CppLogic.Memory.ObjectAccessType.List`
+function CppListAccess:GetType()end
+---iterate over all elements in a list
+---@return fun():CppObjectAccess?
+function CppListAccess:Elements()end
+---number of elements in the list
+---@return number
+function CppListAccess:Size()end
+---finds the first element that matches a predicate
+---@param pred fun(element:CppObjectAccess):boolean
+---@return CppObjectAccess?
+function CppListAccess:First(pred)end
+---inserts a new element into the list
+---for map-type lists, the writer needs to at least write the key
+---@param writer fun(toinsert:CppObjectAccess)
+function CppListAccess:Insert(writer)end
+
+---accesses an entitytypes memory
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@param ety string|number
+---@return CppBBObjectAccess
+function CppLogic.Memory.EntityType(ety)end
+
+---accesses an entities memory
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@param id string|number
+---@return CppBBObjectAccess
+function CppLogic.Memory.Entity(id)end
+
+---accesses an effecttypes memory
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@param ety string|number
+---@return CppStructAccess
+function CppLogic.Memory.EffectType(ety)end
+
+---accesses an effects memory
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@param id string|number
+---@return CppBBObjectAccess
+function CppLogic.Memory.Effect(id)end
+
+---accesses a players memory
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@param pid string|number
+---@return CppBBObjectAccess
+function CppLogic.Memory.Player(pid)end
+
 --- reloads cutscenes from the specified path
 --- @param path string|nil optional, default "Maps\\ExternalMap"
 function CppLogic.Logic.ReloadCutscene(path) end

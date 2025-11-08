@@ -271,8 +271,12 @@ namespace CppLogic::Serializer {
 		static int Size(lua::State L);
 		static int First(lua::State L);
 		static int Insert(lua::State L);
+		static int Remove(lua::State L);
+		static int ListType(lua::State L);
 
 		static int ElementsNext(lua::State L);
+
+		static int Index(lua::State L);
 
 		using ObjectAccess::ObjectAccess;
 
@@ -283,6 +287,8 @@ namespace CppLogic::Serializer {
 			lua::FuncReference::GetRef<Size>("Size"),
 			lua::FuncReference::GetRef<First>("First"),
 			lua::FuncReference::GetRef<Insert>("Insert"),
+			lua::FuncReference::GetRef<Remove>("Remove"),
+			lua::FuncReference::GetRef<ListType>("ListType"),
 		};
 
 	private:

@@ -64,6 +64,10 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L,
 			++d;
 			continue;
 		}
+		if (d->ListOptions->TryGetExtendedInfo() != nullptr) {
+			++d;
+			continue;
+		}
 		L.Push(std::format("{}", reinterpret_cast<const void*>(d->ListOptions)));
 		if (d->Type == BB::SerializationData::Ty::Direct) {
 			auto* fieldseri = d->DataConverter;

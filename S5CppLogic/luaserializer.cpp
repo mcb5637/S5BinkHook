@@ -1332,3 +1332,57 @@ int CppLogic::Serializer::ListAccess::Insert(lua::State L)
 	L.TCall(1, 0);
 	return 0;
 }
+
+int CppLogic::Serializer::ListAccess::Remove(lua::State L)
+{
+	auto* th = L.CheckUserClass<ListAccess>(1);
+	const auto& inf = th->SeriData->ListOptions->GetExtendedInfo();
+	if (inf.RemoveIf == nullptr)
+		throw lua::LuaException{ "no remove available" };
+	struct Data {
+		lua::State L;
+		ListAccess* A;
+	} d{ L, th };
+	inf.RemoveIf(th->Object, [](void* uv, const BB::SerializationData* sd, void* el) {
+		Data* d = static_cast<Data*>(uv);
+		int t = d->L.GetTop();
+		d->L.PushValue(2);
+		PushSD(d->L, sd->SerializationName, el, sd, d->A->Id, d->A->OnWrite, true);
+		bool r = false;
+		if (d->L.PCall(1, 1) == lua::State::ErrorCode::Success)
+			r = d->L.ToBoolean(-1);
+		d->L.SetTop(t);
+		return r;
+		}, &d, th->SeriData);
+	return 0;
+}
+
+int CppLogic::Serializer::ListAccess::ListType(lua::State L)
+{
+	auto* th = L.CheckUserClass<ListAccess>(1);
+	const auto* inf = th->SeriData->ListOptions->TryGetExtendedInfo();
+	if (inf == nullptr) {
+		L.Push(static_cast<int>(BB::SerializationListOptions::ExtendedInfo::Ty::Unknown));
+		L.Push("?");
+	}
+	else {
+		L.Push(static_cast<int>(inf->Type));
+		L.Push(inf->Name);
+	}
+	return 2;
+}
+
+int CppLogic::Serializer::ListAccess::Index(lua::State L)
+{
+	auto* th = L.CheckUserClass<ListAccess>(1);
+	const auto& inf = th->SeriData->ListOptions->GetExtendedInfo();
+	if (inf.IndexNumeric != nullptr) {
+		int i = L.CheckInt(2);
+		void* obj = inf.IndexNumeric(th->Object, static_cast<size_t>(i));
+		if (obj == nullptr)
+			throw lua::LuaException{ "invalid index" };
+		PushSD(L, th->SeriData->SerializationName, obj, th->SeriData, th->Id, th->OnWrite, true);
+		return 1;
+	}
+	throw lua::LuaException{ "no index available" };
+}

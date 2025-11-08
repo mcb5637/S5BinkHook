@@ -205,6 +205,22 @@ namespace BB {
 		size_t(__stdcall* GetSize)(void* List) = nullptr;
 
 		std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::SerializationListOptions::Iter* i)> UniqueIter(void* list) const;
+
+		struct ExtendedInfo {
+			enum class Ty : int {
+				Unknown,
+				Vector,
+				Map,
+			};
+
+			Ty Type;
+			std::string_view Name;
+			void* (*IndexNumeric)(void* List, size_t index);
+			void (*RemoveIf)(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd);
+		};
+
+		const ExtendedInfo& GetExtendedInfo() const;
+		const ExtendedInfo* TryGetExtendedInfo() const;
 	};
 
 	struct SerializationData { // use a 0-terminated array (default constructed is 0)

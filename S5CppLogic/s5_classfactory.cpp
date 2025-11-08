@@ -636,7 +636,7 @@ const BB::FieldSerializer::ExtendedInfo* BB::FieldSerializer::GetOptExtendedInfo
 		return it->second;
 	}
 
-	return nullptr;;
+	return nullptr;
 }
 
 inline const char* (__stdcall* const serilistctx_get)(const BB::SerializationListOptions::Context* c, const char* a) = reinterpret_cast<const char* (__stdcall*)(const BB::SerializationListOptions::Context*, const char*)>(0x554600);
@@ -648,6 +648,58 @@ const char* BB::SerializationListOptions::Context::GetAttribute(const char* a) c
 std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::SerializationListOptions::Iter* i)> BB::SerializationListOptions::UniqueIter(void* list) const
 {
 	return std::unique_ptr<Iter, void(__stdcall*)(BB::SerializationListOptions::Iter * i)>(AllocIter(list), FreeIter);
+}
+
+template<class T>
+void* LOE_Vec_Index(void* List, size_t index) {
+	auto* v = reinterpret_cast<shok::Vector<int>*>(List);
+	T* r = nullptr;
+	if (index >= 0 && index < v->size())
+		r = &(*v)[index];
+	return r;
+}
+template<class T>
+void LOE_Vec_RemoveIf(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
+	auto* v = reinterpret_cast<shok::Vector<int>*>(List);
+	auto sv = v->SaveVector();
+	auto e = std::remove_if(sv.Vector.begin(), sv.Vector.end(), [&](T& v) {
+		return cond(uv, sd, &v);
+	});
+	sv.Vector.erase(e, sv.Vector.end());
+}
+
+BB::SerializationListOptions::ExtendedInfo LOE_VecInt{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Vector,
+	"shok::Vector<int>",
+	LOE_Vec_Index<int>,
+	LOE_Vec_RemoveIf<int>,
+};
+
+
+
+std::map<int, const BB::SerializationListOptions::ExtendedInfo*> KnownListInfos{
+	{0x84e8f8, &LOE_VecInt},
+};
+
+
+const BB::SerializationListOptions::ExtendedInfo* BB::SerializationListOptions::TryGetExtendedInfo() const
+{
+	int k = reinterpret_cast<int>(this);
+
+	auto it = KnownListInfos.find(k);
+	if (it != KnownListInfos.end()) {
+		return it->second;
+	}
+
+	return nullptr;
+}
+
+const BB::SerializationListOptions::ExtendedInfo& BB::SerializationListOptions::GetExtendedInfo() const
+{
+	auto* inf = TryGetExtendedInfo();
+	if (inf == nullptr)
+		throw std::invalid_argument{ "no extended list info known" };
+	return *inf;
 }
 
 const BB::SerializationData* BB::SerializationData::GetSerializationDataFromId(shok::ClassId id)

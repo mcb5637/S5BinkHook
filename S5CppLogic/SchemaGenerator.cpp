@@ -33,10 +33,10 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::Sta
 			if (fieldseri) {
 				auto* ext = fieldseri->GetOptExtendedInfo();
 				if (ext == nullptr) {
-					L.Push(std::format("{}", reinterpret_cast<const void*>(fieldseri)));
+					L.Push(std::format("{}:{}", reinterpret_cast<const void*>(fieldseri), d->SerializationName == nullptr ? "subclass" : d->SerializationName));
 					auto s = CheckFieldSerializerTypes(fieldseri);
 					if (s.empty())
-						L.PushValue(-1);
+						L.Push(std::format("{}", reinterpret_cast<const void*>(fieldseri)));
 					else
 						L.Push(s);
 					L.SetTableRaw(-3);
@@ -50,6 +50,67 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::Sta
 	}
 }
 
+void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializersSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, lua::State L)
+{
+	PushUnknownFieldSerializers(L, cl);
+}
+
+void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L, const BB::SerializationData* d)
+{
+	if (d == nullptr)
+		return;
+	while (d->Type != BB::SerializationData::Ty::Invalid) {
+		if (d->ListOptions == nullptr) {
+			++d;
+			continue;
+		}
+		L.Push(std::format("{}", reinterpret_cast<const void*>(d->ListOptions)));
+		if (d->Type == BB::SerializationData::Ty::Direct) {
+			auto* fieldseri = d->DataConverter;
+			if (fieldseri) {
+				auto* ext = fieldseri->GetOptExtendedInfo();
+				if (ext == nullptr) {
+					auto s = CheckFieldSerializerTypes(fieldseri);
+					if (s.empty())
+						L.Push(std::format("{}", reinterpret_cast<const void*>(fieldseri)));
+					else
+						L.Push(s);
+				}
+				else {
+					L.Push(std::format("field seri {}", ext->Name));
+				}
+			}
+			else {
+				L.Push("empty field seri???");
+			}
+			L.SetTableRaw(-3);
+		}
+		else if (d->SerializationName != nullptr || d->Type == BB::SerializationData::Ty::Embedded) {
+			auto ty = TryFindClassOfSeriData(d->SubElementData, false);
+			if (!ty.empty())
+				L.Push(std::format("subobject {} {}", ty, d->SerializationName));
+			else
+				L.Push(std::format("subobject {}", d->SerializationName));
+			L.SetTableRaw(-3);
+			PushUnknownFieldSerializers(L, d->SubElementData);
+		}
+		else if (d->Type == BB::SerializationData::Ty::ObjectPointer) {
+			L.Push("BB::IObject*");
+			L.SetTableRaw(-3);
+		}
+		else {
+			L.Push("???");
+			L.SetTableRaw(-3);
+		}
+		++d;
+	}
+}
+
+void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptionsSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, lua::State L)
+{
+	PushUnknownListOptions(L, cl);
+}
+
 void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::State L)
 {
 	L.NewTable();
@@ -59,12 +120,19 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::Sta
 			continue;
 		PushUnknownFieldSerializers(L, info.SData);
 	}
-	PushUnknownFieldSerializers(L, shok::Technology::SerializationData);
-	PushUnknownFieldSerializers(L, ED::CModelsProps::SerializationData);
-	PushUnknownFieldSerializers(L, GGL::ExperienceClass::SerializationData);
-	PushUnknownFieldSerializers(L, ED::CDisplayProps::SerializationData);
-	PushUnknownFieldSerializers(L, GGlue::CTerrainPropsMgr::SerializationData);
-	PushUnknownFieldSerializers(L, GGlue::CGlueWaterPropsMgr::SerializationData);
+	ForAllChoosesClasses<PushUnknownFieldSerializersSpecific>(L);
+}
+
+void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L)
+{
+	L.NewTable();
+	auto* f = *BB::CClassFactory::GlobalObj;
+	for (const auto& [id, info] : f->Info) {
+		if (info.SData == nullptr)
+			continue;
+		PushUnknownListOptions(L, info.SData);
+	}
+	ForAllChoosesClasses<PushUnknownListOptionsSpecific>(L);
 }
 
 size_t CppLogic::Serializer::SchemaGenerator::PredictNumberOfFields(const BB::SerializationData* data)
@@ -312,17 +380,16 @@ void CppLogic::Serializer::SchemaGenerator::WriteClassSchema(BB::IStream& f, sho
 	}
 }
 
-template<class C, class Parent, bool hasParentSeridata>
-inline void CppLogic::Serializer::SchemaGenerator::WriteChosenClassSchema(BB::IStream& f, bool skipClassname)
+inline void CppLogic::Serializer::SchemaGenerator::WriteChosenClassSchema(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name,bool hasParentSeridata, bool skipClassname, BB::IStream& f)
 {
-	if constexpr (std::same_as<Parent, void>) {
-		WriteNewClassSchema(f, typename_details::type_name<C>(), C::SerializationData, skipClassname);
+	if (parent_name.empty()) {
+		WriteNewClassSchema(f, name, cl, skipClassname);
 	}
 	else {
-		const BB::SerializationData* sd = C::SerializationData;
-		if constexpr (hasParentSeridata)
+		const BB::SerializationData* sd = cl;
+		if (hasParentSeridata)
 			++sd;
-		WriteSubclassSchema(f, typename_details::type_name<C>(), typename_details::type_name<Parent>(), sd, skipClassname);
+		WriteSubclassSchema(f, name, parent_name, sd, skipClassname);
 	}
 }
 
@@ -336,21 +403,32 @@ void CppLogic::Serializer::SchemaGenerator::WriteRegisteredClassesSchema(BB::ISt
 	}
 }
 
+template<auto F, class... Arg>
+void CppLogic::Serializer::SchemaGenerator::ForAllChoosesClasses(Arg&... arg) {
+	ForSimpleChoosenClass<F, shok::Position>(arg...);
+	ForSimpleChoosenClass<F, shok::CostInfo>(arg...);
+	ForSimpleChoosenClass<F, EGL::EffectsProps::EffectType>(arg...);
+	ForSimpleChoosenClass<F, shok::Technology>(arg...);
+	ForSimpleChoosenClass<F, ED::CModelsProps::ModelData>(arg...);
+	ForSimpleChoosenClass<F, GGL::ExperienceClass>(arg...);
+	ForSimpleChoosenClass<F, ED::CDisplayProps>(arg...);
+	ForSimpleChoosenClass<F, GGlue::TerrainTypeData>(arg...);
+	ForSimpleChoosenClass<F, GGlue::WaterTypeData>(arg...);
+	ForSimpleChoosenClass<F, GGlue::CTerrainPropsMgr>(arg...);
+	ForSimpleChoosenClass<F, GGlue::CGlueWaterPropsMgr>(arg...);
+	ForSimpleChoosenClass<F, CppLogic::ModLoader::ModpackDesc>(arg...);
+	ForSimpleChoosenClass<F, Framework::MapInfo>(arg...);
+}
+
+template<auto F, class C, class ...Arg>
+void CppLogic::Serializer::SchemaGenerator::ForSimpleChoosenClass(Arg& ...arg)
+{
+	F(typename_details::type_name<C>(), C::SerializationData, "", false, true, arg...);
+}
+
 void CppLogic::Serializer::SchemaGenerator::WriteChosenClassesSchema(BB::IStream& f)
 {
-	WriteChosenClassSchema<shok::Position>(f);
-	WriteChosenClassSchema<shok::CostInfo>(f);
-	WriteChosenClassSchema<EGL::EffectsProps::EffectType>(f);
-	WriteChosenClassSchema<shok::Technology>(f);
-	WriteChosenClassSchema<ED::CModelsProps::ModelData>(f);
-	WriteChosenClassSchema<GGL::ExperienceClass>(f);
-	WriteChosenClassSchema<ED::CDisplayProps>(f);
-	WriteChosenClassSchema<GGlue::TerrainTypeData>(f);
-	WriteChosenClassSchema<GGlue::WaterTypeData>(f);
-	WriteChosenClassSchema<GGlue::CTerrainPropsMgr>(f);
-	WriteChosenClassSchema<GGlue::CGlueWaterPropsMgr>(f);
-	WriteChosenClassSchema<CppLogic::ModLoader::ModpackDesc>(f);
-	WriteChosenClassSchema<Framework::MapInfo>(f);
+	ForAllChoosesClasses<WriteChosenClassSchema>(f);
 }
 
 void CppLogic::Serializer::SchemaGenerator::PreRegisterExtraClasses()

@@ -555,6 +555,10 @@ namespace CppLogic::API {
 		CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(L);
 		return 1;
 	}
+	int DumpUnknownListOptions(lua::State L) {
+		CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(L);
+		return 1;
+	}
 #endif
 
 	void ResizeWindow(Framework::CMain::SWindowData* wd) {
@@ -600,6 +604,7 @@ namespace CppLogic::API {
 #ifdef _DEBUG
 			lua::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
 			lua::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
+			lua::FuncReference::GetRef<DumpUnknownListOptions>("DumpUnknownListOptions"),
 #endif
 	};
 

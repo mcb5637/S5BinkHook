@@ -99,7 +99,7 @@ namespace EGL {
 		bool InvulnerabilityFlag, Suspended; // 57
 		PADDING(2);
 		int SuspensionTurn;
-		int ScriptingValue[4]; // 59
+		shok::Array<int, 3> ScriptingValue; // 59
 		int StateChangeCounter; // 63
 		int TaskListChangeCounter;
 		int NumberOfAuras; // 65

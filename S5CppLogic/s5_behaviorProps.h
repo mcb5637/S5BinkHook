@@ -365,7 +365,7 @@ namespace GGL {
 
 	class CSerfBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		class ExtractionInfo {
+		class ExtractionInfoData {
 		public:
 			shok::EntityTypeId ResourceEntityType;
 			float Delay;
@@ -374,7 +374,7 @@ namespace GGL {
 
 		int ResourceSearchRadius;
 		shok::TaskListId ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList; //4
-		shok::Vector<ExtractionInfo> ExtractionInfo;
+		shok::Vector<ExtractionInfoData> ExtractionInfo;
 
 		static inline constexpr int vtp = 0x774A14;
 		static inline constexpr int TypeDesc = 0x819B1C;
@@ -551,10 +551,7 @@ namespace GGL {
 
 	class CBarrackBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId TrainingTaskList1, TrainingTaskList2, TrainingTaskList3; //4
-	private:
-		int MaxTrainingNumber;
-	public:
+		shok::Array<shok::TaskListId, 3> TrainingTaskList; //4
 		shok::TaskListId LeaveTaskList;
 		float TrainingTime; //9
 
@@ -698,7 +695,7 @@ namespace GGL {
 
 	class CNeutralBridgeBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		//shok_constructionInfo ConstructionInfo;
+		shok::ConstructionInfo ConstructionInfo;
 
 		static inline constexpr int vtp = 0x779B9C;
 		static inline constexpr int TypeDesc = 0x8298A4;

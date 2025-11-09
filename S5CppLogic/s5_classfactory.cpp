@@ -6,6 +6,7 @@
 #include "s5_idmanager.h"
 #include "s5_mapdisplay.h"
 #include "s5_widget.h"
+#include "s5_behaviorProps.h"
 #include "SchemaGenerator.h"
 #include "hooks.h"
 
@@ -651,34 +652,150 @@ std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::Seriali
 }
 
 template<class T>
-void* LOE_Vec_Index(void* List, size_t index) {
-	auto* v = reinterpret_cast<shok::Vector<int>*>(List);
-	T* r = nullptr;
-	if (index >= 0 && index < v->size())
-		r = &(*v)[index];
-	return r;
+BB::SerializationListOptions::ExtendedInfo MakeLOEVec() {
+	return BB::SerializationListOptions::ExtendedInfo{
+		BB::SerializationListOptions::ExtendedInfo::Ty::Vector,
+		typename_details::type_name<shok::Vector<T>>(),
+		[](void* List, size_t index) -> void* {
+			auto* v = reinterpret_cast<shok::Vector<T>*>(List);
+			T* r = nullptr;
+			if (index >= 0 && index < v->size())
+				r = &(*v)[index];
+			return r;
+		},
+		[](void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
+			auto* v = reinterpret_cast<shok::Vector<T>*>(List);
+			auto sv = v->SaveVector();
+			auto e = std::remove_if(sv.Vector.begin(), sv.Vector.end(), [&](T& v) {
+				return cond(uv, sd, &v);
+			});
+			sv.Vector.erase(e, sv.Vector.end());
+		},
+	};
 }
-template<class T>
-void LOE_Vec_RemoveIf(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
-	auto* v = reinterpret_cast<shok::Vector<int>*>(List);
-	auto sv = v->SaveVector();
-	auto e = std::remove_if(sv.Vector.begin(), sv.Vector.end(), [&](T& v) {
-		return cond(uv, sd, &v);
-	});
-	sv.Vector.erase(e, sv.Vector.end());
+template<class K, class V>
+BB::SerializationListOptions::ExtendedInfo MakeLOEMap() {
+	return BB::SerializationListOptions::ExtendedInfo{
+		BB::SerializationListOptions::ExtendedInfo::Ty::Map,
+		typename_details::type_name<shok::Map<K, V>>(),
+		nullptr,
+		[](void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
+			auto* v = reinterpret_cast<shok::Map<K, V>*>(List);
+			auto i = v->begin();
+			while (i != v->end()) {
+				if (cond(uv, sd, &*i))
+					i = v->erase(i);
+				else
+					++i;
+			}
+		},
+	};
 }
 
-BB::SerializationListOptions::ExtendedInfo LOE_VecInt{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Vector,
-	"shok::Vector<int>",
-	LOE_Vec_Index<int>,
-	LOE_Vec_RemoveIf<int>,
+BB::SerializationListOptions::ExtendedInfo LOE_VecInt = MakeLOEVec<int>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecBBObj = MakeLOEVec<BB::IObject*>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecAARect = MakeLOEVec<shok::AARect>();
+//BB::SerializationListOptions::ExtendedInfo LOE_VecBuildingUp = MakeLOEVec<GGL::CLogicProperties::SBuildingUpgradeCategory>();
+//BB::SerializationListOptions::ExtendedInfo LOE_VecSettlerUp = MakeLOEVec<GGL::CLogicProperties::SSettlerUpgradeCategory>();
+//BB::SerializationListOptions::ExtendedInfo LOE_VecTaxLvl = MakeLOEVec<GGL::CLogicProperties::STaxationLevel>();
+//BB::SerializationListOptions::ExtendedInfo LOE_VecTradeRes = MakeLOEVec<GGL::CLogicProperties::STradeResource>();
+//BB::SerializationListOptions::ExtendedInfo LOE_VecBlessCat = MakeLOEVec<GGL::CLogicProperties::SBlessCategory>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecPos = MakeLOEVec<shok::Position>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecTradeResData = MakeLOEVec<GGL::CTradeManager::ResData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecWorkModifier = MakeLOEVec<GGL::CServiceBuildingBehaviorProperties::WorkModifier>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecSerfExtract = MakeLOEVec<GGL::CSerfBehaviorProps::ExtractionInfoData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecRefinerEff = MakeLOEVec<GGL::CResourceRefinerBehaviorProperties::EfficencyUpgrade>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecResDepBuilding = MakeLOEVec<GGL::CResourceDependentBuildingBehaviorProperties::TypeData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecLimitedAttachment = MakeLOEVec<GGL::CLimitedAttachmentBehaviorProperties::LimitedAttachmentProps>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecIdleAnim = MakeLOEVec<GGL::CFormationBehaviorProperties::IdleAnimProps>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecCannonInfo = MakeLOEVec<GGL::CFoundryBehaviorProperties::CannonInfoData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecXPLevel = MakeLOEVec<GGL::ExperienceClass::LevelData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecETyArrival = MakeLOEVec<EGL::CPlayerFeedbackHandler::SingleArrival>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecResOut = MakeLOEVec<EGL::CPlayerFeedbackHandler::SingleResOut>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecExploCircle = MakeLOEVec<EGL::CPlayerExplorationHandler::ExCircle>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecTriggerParam = MakeLOEVec<EScr::CScriptTrigger::Parameter>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecBehProps = MakeLOEVec<GGlue::CGlueEntityProps::BehaviorData>();
+
+BB::SerializationListOptions::ExtendedInfo LOE_MapIntInt = MakeLOEMap<int, int>();
+BB::SerializationListOptions::ExtendedInfo LOE_MapBuildingUp = MakeLOEMap<shok::UpgradeCategoryId, GGL::CBuildingUpgradeManager::ScholarInfo>();
+BB::SerializationListOptions::ExtendedInfo LOE_MapLimitedAttachment = MakeLOEMap<shok::AttachmentType, GGL::CLimitedAttachmentBehavior::AttachmentInfo>();
+BB::SerializationListOptions::ExtendedInfo LOE_MapTrigger = MakeLOEMap<shok::TriggerId, BB::IObject*>();
+
+BB::SerializationListOptions::ExtendedInfo LOE_ArrInt{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+	typename_details::type_name<shok::Array<int, 3>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ArrFloat{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+	typename_details::type_name<shok::Array<float, 8>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ArrMaterial{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+	typename_details::type_name<shok::Array<EGUIX::CMaterial, 5>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ArrSettlerFeedback{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+	typename_details::type_name<shok::Array<shok::Set<EGL::CPlayerFeedbackHandler::SingleFeedack>, 7>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ArrGenMessage{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+	typename_details::type_name<shok::Array<EGL::CPlayerFeedbackHandler::GenMessageData, 4>>(),
+	nullptr, // TODO?
+	nullptr,
 };
 
 
+auto& KnownListInfos() {
+	static std::map<int, const BB::SerializationListOptions::ExtendedInfo*> i{
+		{0x84e8f8, &LOE_VecInt},
+		{0x85e214, &LOE_VecBBObj},
+		{0x878b88, &LOE_VecBBObj},
+		{0x88363c, &LOE_VecBBObj},
+		{0x898240, &LOE_VecBBObj},
+		{0x8989d4, &LOE_VecBBObj},
+		{0x85dcc8, &LOE_VecAARect},
+		/*{0x860868, &LOE_VecBuildingUp}, needs copy operators
+		{0x86088c, &LOE_VecSettlerUp},
+		{0x8608b0, &LOE_VecTaxLvl},
+		{0x8608d4, &LOE_VecTradeRes},
+		{0x86098c, &LOE_VecBlessCat},*/
+		{0x865fc8, &LOE_VecPos},
+		{0x869100, &LOE_VecTradeResData},
+		{0x86f2b0, &LOE_VecWorkModifier},
+		{0x86fd50, &LOE_VecSerfExtract},
+		{0x8701a4, &LOE_VecRefinerEff},
+		{0x87060c, &LOE_VecResDepBuilding},
+		{0x8732b8, &LOE_VecLimitedAttachment},
+		//{0x8755c0, &}, vec animset GoodDependentAnim
+		{0x875a1c, &LOE_VecIdleAnim},
+		{0x87ade8, &LOE_VecCannonInfo},
+		{0x87ce64, &LOE_VecXPLevel},
+		{0x89866c, &LOE_VecETyArrival},
+		{0x898690, &LOE_VecResOut},
+		{0x8b17dc, &LOE_VecExploCircle},
+		{0xa06b14, &LOE_VecTriggerParam},
+		{0xa0c9e8, &LOE_VecBehProps},
 
-std::map<int, const BB::SerializationListOptions::ExtendedInfo*> KnownListInfos{
-	{0x84e8f8, &LOE_VecInt},
+		{0x85f484, &LOE_MapIntInt},
+		{0x86a5c8, &LOE_MapBuildingUp},
+		{0x873220, &LOE_MapLimitedAttachment},
+		{0xa06a58, &LOE_MapTrigger},
+
+		{0x85dbc0, &LOE_ArrInt},
+		{0x87cff0, &LOE_ArrFloat},
+		{0x89559c, &LOE_ArrMaterial},
+		{0x8985b4, &LOE_ArrSettlerFeedback},
+		{0x8985d8, &LOE_ArrGenMessage},
+	};
+	return i;
 };
 
 
@@ -686,8 +803,9 @@ const BB::SerializationListOptions::ExtendedInfo* BB::SerializationListOptions::
 {
 	int k = reinterpret_cast<int>(this);
 
-	auto it = KnownListInfos.find(k);
-	if (it != KnownListInfos.end()) {
+	auto& i = KnownListInfos();
+	auto it = i.find(k);
+	if (it != i.end()) {
 		return it->second;
 	}
 
@@ -700,6 +818,11 @@ const BB::SerializationListOptions::ExtendedInfo& BB::SerializationListOptions::
 	if (inf == nullptr)
 		throw std::invalid_argument{ "no extended list info known" };
 	return *inf;
+}
+
+void BB::SerializationListOptions::RegisterExtended(const ExtendedInfo& e) const
+{
+	KnownListInfos()[reinterpret_cast<int>(this)] = &e;
 }
 
 const BB::SerializationData* BB::SerializationData::GetSerializationDataFromId(shok::ClassId id)

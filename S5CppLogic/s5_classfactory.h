@@ -211,6 +211,7 @@ namespace BB {
 				Unknown,
 				Vector,
 				Map,
+				Array,
 			};
 
 			Ty Type;
@@ -221,6 +222,8 @@ namespace BB {
 
 		const ExtendedInfo& GetExtendedInfo() const;
 		const ExtendedInfo* TryGetExtendedInfo() const;
+	protected:
+		void RegisterExtended(const ExtendedInfo& e) const;
 	};
 
 	struct SerializationData { // use a 0-terminated array (default constructed is 0)
@@ -525,6 +528,23 @@ namespace CppLogic {
 		{
 
 		}
+		static void* Index(void* List, size_t index) {
+			auto* v = reinterpret_cast<VectT*>(List);
+			T* r = nullptr;
+			if (index >= 0 && index < v->size())
+				r = &(*v)[index];
+			return r;
+		}
+		static void RemoveIf(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
+			auto* v = reinterpret_cast<VectT*>(List);
+			auto e = std::remove_if(v->begin(), v->end(), [&](T& v) {
+				return cond(uv, sd, &v);
+				});
+			v->erase(e, v->end());
+		}
+
+
+		ExtendedInfo Extended;
 		
 	public:
 		SerializationListOptions_ForVector()
@@ -536,6 +556,11 @@ namespace CppLogic {
 			FreeIter = &FreeIterImp;
 			FinalizeAddToList = &FinalizeAddToListImp;
 			GetSize = &GetSizeImp;
+			Extended.Type = ExtendedInfo::Ty::Vector;
+			Extended.Name = typename_details::type_name<VectT>();
+			Extended.IndexNumeric = &Index;
+			Extended.RemoveIf = &RemoveIf;
+			RegisterExtended(Extended);
 		}
 	};
 
@@ -601,6 +626,20 @@ namespace CppLogic {
 			v->insert(CurrentlyAdding);
 		}
 
+		static void RemoveIf(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
+			auto* v = reinterpret_cast<VectT*>(List);
+			auto i = v->begin();
+			while (i != v->end()) {
+				if (cond(uv, sd, &*i))
+					i = v->erase(i);
+				else
+					++i;
+			}
+		}
+
+
+		ExtendedInfo Extended;
+
 	public:
 		SerializationListOptions_ForMap()
 		{
@@ -611,6 +650,11 @@ namespace CppLogic {
 			FreeIter = &FreeIterImp;
 			FinalizeAddToList = &FinalizeAddToListImp;
 			GetSize = &GetSizeImp;
+			Extended.Type = ExtendedInfo::Ty::Map;
+			Extended.Name = typename_details::type_name<VectT>();
+			Extended.IndexNumeric = nullptr;
+			Extended.RemoveIf = &RemoveIf;
+			RegisterExtended(Extended);
 		}
 	};
 

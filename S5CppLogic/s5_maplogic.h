@@ -289,20 +289,17 @@ namespace EGL {
 			shok::Position MapPosition;
 			int GameTurn;
 		};
+		struct GenMessageData {
+			int LastGameTurn;
+			shok::EntityTypeId EntityID;
+		};
 
 		shok::PlayerId PlayerID;
 		int UpdateFeedbackFrequency;
 		int TimeFeedbackStaysInSystem;
-		struct {
-			shok::Set<SingleFeedack> SettlerFeedBack;
-		} SettlerFeedbackList[7];
-		PADDINGI(1); // part of SettlerFeedbackList?
+		shok::Array<shok::Set<SingleFeedack>, 7> SettlerFeedbackList; // members SettlerFeedBack
 		shok::Vector<SingleArrival> SettlerEntityTypeArrival;
-		struct {
-			int LastGameTurn;
-			shok::EntityTypeId EntityID;
-		} GenericMessageData[4];
-		PADDINGI(1); // part of GenericMessageData?
+		shok::Array<GenMessageData, 4> GenericMessageData;
 		shok::Vector<SingleResOut> ResourceRunningOutMessageData;
 
 		// ctor 58551E thiscall(pid)
@@ -311,7 +308,7 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC375BEA3);
 	};
 	static_assert(offsetof(CPlayerFeedbackHandler, SettlerFeedbackList) == 16);
-	static_assert(sizeof(CPlayerFeedbackHandler::SettlerFeedbackList) == 12 * 7);
+	static_assert(sizeof(CPlayerFeedbackHandler::SettlerFeedbackList) == 12 * 7 + 4);
 	static_assert(offsetof(CPlayerFeedbackHandler, SettlerEntityTypeArrival) == 104);
 	static_assert(offsetof(CPlayerFeedbackHandler, GenericMessageData) == 120);
 

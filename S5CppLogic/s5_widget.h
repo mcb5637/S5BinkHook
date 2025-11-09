@@ -292,8 +292,7 @@ namespace EGUIX {
 	class CButtonWidget : public EGUIX::CBaseWidget, public IRender, public IMaterialAccess { // irender 14
 	public:
 		EGUIX::CButtonHelper ButtonHelper; // 16 la 54
-		EGUIX::CMaterial Materials[5];
-		int NumMaterials; // ? why after materials
+		shok::Array<EGUIX::CMaterial, 5> Materials;
 		EGUIX::CToolTipHelper ToolTipHelper; // 105 la 146
 
 		static inline constexpr int vtp = 0x780E5C;

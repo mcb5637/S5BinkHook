@@ -1481,7 +1481,7 @@ namespace GGL {
 
 	class CNeutralBridgeBehavior : public EGL::CGLEBehavior {
 	public:
-		float Progress[9]; // per player
+		shok::Array<float, 8> Progress; // per player
 		shok::Map<int, int> SlotShoreA; //Index ->BuilderID
 		shok::Map<int, int> SlotShoreB; //Index ->BuilderID
 
@@ -1491,6 +1491,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x829AA8;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD26CD737);
 	};
+	static_assert(sizeof(CNeutralBridgeBehavior) == 76);
 
 	struct SSlotArgsAlphaBlending {
 		int StartAlpha, TargetAlpha;

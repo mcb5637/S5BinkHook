@@ -4,6 +4,7 @@
 #include <list>
 #include <set>
 #include <deque>
+#include <array>
 #include <functional>
 #include <type_traits>
 #include <ranges>
@@ -866,4 +867,11 @@ namespace shok {
 		// standard iterators dont seem to work
 	};
 	static_assert(sizeof(Deque<int>) == 4 * 5);
+
+	template<class T, size_t S>
+	struct Array {
+		std::array<T, S> Data = {};
+		size_t NextToDeserialize = 0;
+	};
+	static_assert(sizeof(Array<int, 4>) == 5 * 4);
 }

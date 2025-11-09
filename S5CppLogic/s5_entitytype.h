@@ -185,21 +185,13 @@ namespace GGL {
 
 	class CGLBuildingProps : public GGL::CBuildBlockProperties {
 	public:
-		class ConstructionInfo {
-		public:
-			PADDINGI(1);
-			shok::Vector<shok::PositionRot> BuilderSlot;
-			int Time;
-			shok::CostInfo Cost;
-			shok::EntityTypeId ConstructionSite;
-		};
 		struct WorkTL {
 			shok::TaskListId Start, Work;
 		};
 		int MaxWorkers, InitialMaxWorkers, NumberOfAttractableSettlers; // 42
 		shok::EntityTypeId Worker;
 		shok::Position DoorPos, LeavePos; // 46
-		ConstructionInfo ConstructionInfo;
+		shok::ConstructionInfo ConstructionInfo;
 		shok::Vector<shok::EntityTypeId> BuildOn; // 75
 		bool HideBase, CanBeSold, IsWall; // 79
 		PADDING(1);

@@ -129,6 +129,16 @@ namespace shok {
 	};
 	static_assert(sizeof(shok::Color) == 1 * 4);
 
+	class ConstructionInfo {
+	public:
+		PADDINGI(1);
+		shok::Vector<shok::PositionRot> BuilderSlot;
+		int Time;
+		shok::CostInfo Cost;
+		shok::EntityTypeId ConstructionSite;
+	};
+	static_assert(sizeof(ConstructionInfo) == 100);
+
 	static inline char* (__cdecl* const CopyString)(const char* s) = reinterpret_cast<char* (__cdecl*)(const char*)>(0x547BD5);
 	static inline void(__cdecl* const StringToLowerCase)(char* s) = reinterpret_cast<void(__cdecl*)(char* s)>(0x547C81);
 

@@ -469,10 +469,10 @@ void GGL::CGameStatistics::OnResMined(shok::ResourceType rt, float am)
 	gamestatistics_resmined(this, rt, am);
 }
 
-static inline shok::DiploState(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(int* d, shok::PlayerId p) = reinterpret_cast<shok::DiploState(__thiscall*)(int* d, shok::PlayerId p)>(0x4B4D5B);
+static inline shok::DiploState(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(GGL::PlayerDiplomacyManager* d, shok::PlayerId p) = reinterpret_cast<shok::DiploState(__thiscall*)(GGL::PlayerDiplomacyManager * d, shok::PlayerId p)>(0x4B4D5B);
 shok::DiploState GGL::CPlayerStatus::GetDiploStateTo(shok::PlayerId p)
 {
-	return shok_GGL_CPlayerStatus_getDiploState(DiplomacyData, p);
+	return shok_GGL_CPlayerStatus_getDiploState(&DiplomacyData, p);
 }
 
 static inline shok::TechState(__thiscall* const playerstatus_gettechstatus)(GGL::PlayerTechManager* th, shok::TechnologyId tech) = reinterpret_cast<shok::TechState(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId)>(0x4A2A8D);

@@ -59,6 +59,7 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L,
 {
 	if (d == nullptr)
 		return;
+	const void* orig = d;
 	while (d->Type != BB::SerializationData::Ty::Invalid) {
 		if (d->ListOptions == nullptr) {
 			++d;
@@ -84,7 +85,7 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L,
 						L.Push(s);
 				}
 				else {
-					L.Push(std::format("field seri {}", ext->Name));
+					L.Push(std::format("field seri {} (orig {})", ext->Name, orig));
 				}
 			}
 			else {
@@ -93,16 +94,16 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L,
 			L.SetTableRaw(-3);
 		}
 		else if (d->Type == BB::SerializationData::Ty::ObjectPointer) {
-			L.Push("BB::IObject*");
+			L.Push(std::format("BB::IObject* (orig {})", orig));
 			L.SetTableRaw(-3);
 		}
 		else if (d->SerializationName == nullptr || d->Type == BB::SerializationData::Ty::Embedded) {
 			if (d->SerializationName != nullptr) {
 				auto ty = TryFindClassOfSeriData(d->SubElementData, false);
 				if (!ty.empty())
-					L.Push(std::format("subobject {} {}", ty, d->SerializationName));
+					L.Push(std::format("subobject {} {} (orig {})", ty, d->SerializationName, orig));
 				else
-					L.Push(std::format("subobject {}", d->SerializationName));
+					L.Push(std::format("subobject {} (orig {})", d->SerializationName, orig));
 				L.SetTableRaw(-3);
 			}
 			else {

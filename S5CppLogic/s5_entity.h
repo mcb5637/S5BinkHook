@@ -538,7 +538,12 @@ namespace GGL {
 
 	class CEvadingEntity : public EGL::CMovingEntity {
 	public:
-		PADDINGI(4);
+		struct EvaderWaitData {
+			int Turns;
+			shok::EntityId EvaderID;
+		};
+
+		shok::Vector<EvaderWaitData> EvaderWaitObject;
 
 		static inline constexpr int vtp = 0x770A7C;
 		static inline constexpr int TypeDesc = 0x810C34;

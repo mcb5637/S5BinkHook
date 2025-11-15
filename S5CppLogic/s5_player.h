@@ -271,7 +271,7 @@ namespace GGL {
 			QuestStatus QuestType;
 			shok::String QuestNameStringTableKey, QuestDescriptionStringTableKey;
 			shok::Position Pos; // not serialized
-			bool SubQuestDoneFlagArray[20]; // not sure about the size and the full layout
+			shok::Array<bool, 20> SubQuestDoneFlagArray; // not sure about the size and the full layout
 		};
 
 
@@ -286,7 +286,7 @@ namespace GGL {
 		// returns if it was there
 		bool RemoveQuest(int questId, bool info);
 	};
-	static_assert(sizeof(PlayerQuestManager::Quest) == 23 * 4);
+	static_assert(sizeof(PlayerQuestManager::Quest) == 24 * 4);
 	//constexpr int i = offsetof(PlayerQuestManager::Quest, SubQuestDoneFlagArray) / 4;
 
 	struct GameStatisticsTimeline {
@@ -341,6 +341,11 @@ namespace GGL {
 	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
 	//constexpr int i = offsetof(CGameStatistics, MotivationTimeLine) / 4;
 
+	class PlayerDiplomacyManager {
+		shok::PlayerId PlayerID;
+		shok::Array<shok::DiploState, 9> DiplomacyState;
+	};
+
 	class CPlayerStatus : public BB::IObject {
 	public:
 		enum class PlayerStatus : int {
@@ -368,7 +373,7 @@ namespace GGL {
 		bool WorkerAlarmMode;
 		PADDING(3);
 		int AlarmRechargeTime;
-		int DiplomacyData[11]; // 48
+		PlayerDiplomacyManager DiplomacyData; // 48
 		GGL::PlayerTechManager TechnologyStates; // 59
 		GGL::PlayerTributesManager Tributes; // 71
 		GGL::PlayerQuestManager Quests; // 76
@@ -411,6 +416,7 @@ namespace GGL {
 		static int __stdcall CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
 
 	};
+	static_assert(sizeof(CPlayerStatus) == 804);
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;
 
 }

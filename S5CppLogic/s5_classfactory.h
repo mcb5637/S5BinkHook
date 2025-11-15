@@ -212,6 +212,7 @@ namespace BB {
 				Vector,
 				Map,
 				Array,
+				List,
 			};
 
 			Ty Type;

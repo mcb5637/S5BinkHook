@@ -701,6 +701,7 @@ BB::SerializationListOptions::ExtendedInfo LOE_VecAARect = MakeLOEVec<shok::AARe
 //BB::SerializationListOptions::ExtendedInfo LOE_VecTradeRes = MakeLOEVec<GGL::CLogicProperties::STradeResource>();
 //BB::SerializationListOptions::ExtendedInfo LOE_VecBlessCat = MakeLOEVec<GGL::CLogicProperties::SBlessCategory>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecPos = MakeLOEVec<shok::Position>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecPosR = MakeLOEVec<shok::PositionRot>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecTradeResData = MakeLOEVec<GGL::CTradeManager::ResData>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecWorkModifier = MakeLOEVec<GGL::CServiceBuildingBehaviorProperties::WorkModifier>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecSerfExtract = MakeLOEVec<GGL::CSerfBehaviorProps::ExtractionInfoData>();
@@ -715,11 +716,26 @@ BB::SerializationListOptions::ExtendedInfo LOE_VecResOut = MakeLOEVec<EGL::CPlay
 BB::SerializationListOptions::ExtendedInfo LOE_VecExploCircle = MakeLOEVec<EGL::CPlayerExplorationHandler::ExCircle>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecTriggerParam = MakeLOEVec<EScr::CScriptTrigger::Parameter>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecBehProps = MakeLOEVec<GGlue::CGlueEntityProps::BehaviorData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecShorewave = MakeLOEVec<GGlue::WaterPropsDisplay::ShoreWaveData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecShorewaveKF = MakeLOEVec<GGlue::WaterPropsDisplay::ShoreWaveKeyFrameData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecEvaderWait = MakeLOEVec<GGL::CEvadingEntity::EvaderWaitData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecWorkTL = MakeLOEVec<GGL::CGLBuildingProps::WorkTL>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecStatTech = MakeLOEVec<GGL::CGameStatistics::TechResearchData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecStatUp = MakeLOEVec<GGL::CGameStatistics::BuildingUpgradedData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecTechState = MakeLOEVec<GGL::PlayerTechManager::Tech>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecTribute = MakeLOEVec<GGL::PlayerTributesManager::Tribute>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecResStat = MakeLOEVec<GGL::CResourceStatistics::ResData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecTechReq = MakeLOEVec<shok::Technology::TechReq>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecECatReq = MakeLOEVec<shok::Technology::ECatReq>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecETypeReq = MakeLOEVec<shok::Technology::ETypeReq>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecUCatReq = MakeLOEVec<shok::Technology::UCatReq>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecEInSystem = MakeLOEVec<GGL::CPlayerAttractionHandler::EntityInSystemData>();
 
 BB::SerializationListOptions::ExtendedInfo LOE_MapIntInt = MakeLOEMap<int, int>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapBuildingUp = MakeLOEMap<shok::UpgradeCategoryId, GGL::CBuildingUpgradeManager::ScholarInfo>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapLimitedAttachment = MakeLOEMap<shok::AttachmentType, GGL::CLimitedAttachmentBehavior::AttachmentInfo>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapTrigger = MakeLOEMap<shok::TriggerId, BB::IObject*>();
+BB::SerializationListOptions::ExtendedInfo LOE_MapGDBList = MakeLOEMap<shok::String, BB::IObject*>();
 
 BB::SerializationListOptions::ExtendedInfo LOE_ArrInt{
 	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
@@ -748,6 +764,37 @@ BB::SerializationListOptions::ExtendedInfo LOE_ArrSettlerFeedback{
 BB::SerializationListOptions::ExtendedInfo LOE_ArrGenMessage{
 	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
 	typename_details::type_name<shok::Array<EGL::CPlayerFeedbackHandler::GenMessageData, 4>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ArrBool{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+	typename_details::type_name<shok::Array<bool, 20>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ArrDiplo{
+	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+	typename_details::type_name<shok::Array<shok::DiploState, 9>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+
+BB::SerializationListOptions::ExtendedInfo LOE_ListQuest{
+	BB::SerializationListOptions::ExtendedInfo::Ty::List,
+	typename_details::type_name<shok::List<GGL::PlayerQuestManager::Quest>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ListEtyLeft{
+	BB::SerializationListOptions::ExtendedInfo::Ty::List,
+	typename_details::type_name<shok::List<GGL::CPlayerAttractionHandler::TypeThatLeftData>>(),
+	nullptr, // TODO?
+	nullptr,
+};
+BB::SerializationListOptions::ExtendedInfo LOE_ListBBObj{
+	BB::SerializationListOptions::ExtendedInfo::Ty::List,
+	typename_details::type_name<shok::List<BB::IObject*>>(),
 	nullptr, // TODO?
 	nullptr,
 };
@@ -783,17 +830,39 @@ auto& KnownListInfos() {
 		{0x8b17dc, &LOE_VecExploCircle},
 		{0xa06b14, &LOE_VecTriggerParam},
 		{0xa0c9e8, &LOE_VecBehProps},
+		{0x84cb28, &LOE_VecShorewave},
+		{0xa0dc84, &LOE_VecShorewaveKF},
+		{0x85e238, &LOE_VecEvaderWait},
+		{0x85f4a8, &LOE_VecPosR},
+		{0x85f4cc, &LOE_VecWorkTL},
+		{0x8622f0, &LOE_VecStatTech},
+		{0x862314, &LOE_VecStatUp},
+		{0x862338, &LOE_VecTechState},
+		{0x862488, &LOE_VecTribute},
+		{0x862520, &LOE_VecResStat},
+		{0x8643f0, &LOE_VecTechReq},
+		{0x864414, &LOE_VecETypeReq},
+		{0x864438, &LOE_VecECatReq},
+		{0x86445c, &LOE_VecUCatReq},
+		{0x867494, &LOE_VecEInSystem},
 
 		{0x85f484, &LOE_MapIntInt},
 		{0x86a5c8, &LOE_MapBuildingUp},
 		{0x873220, &LOE_MapLimitedAttachment},
 		{0xa06a58, &LOE_MapTrigger},
+		{0x84fce8, &LOE_MapGDBList},
 
 		{0x85dbc0, &LOE_ArrInt},
 		{0x87cff0, &LOE_ArrFloat},
 		{0x89559c, &LOE_ArrMaterial},
 		{0x8985b4, &LOE_ArrSettlerFeedback},
 		{0x8985d8, &LOE_ArrGenMessage},
+		{0x861fe0, &LOE_ArrBool},
+		{0x862004, &LOE_ArrDiplo},
+
+		{0x8623f4, &LOE_ListQuest},
+		{0x867470, &LOE_ListEtyLeft},
+		{0x894d4c, &LOE_ListBBObj},
 	};
 	return i;
 };

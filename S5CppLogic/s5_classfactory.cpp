@@ -730,12 +730,15 @@ BB::SerializationListOptions::ExtendedInfo LOE_VecECatReq = MakeLOEVec<shok::Tec
 BB::SerializationListOptions::ExtendedInfo LOE_VecETypeReq = MakeLOEVec<shok::Technology::ETypeReq>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecUCatReq = MakeLOEVec<shok::Technology::UCatReq>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecEInSystem = MakeLOEVec<GGL::CPlayerAttractionHandler::EntityInSystemData>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecEntityP = MakeLOEVec<EGL::CGLEEntity*>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecUInt = MakeLOEVec<unsigned int>();
 
 BB::SerializationListOptions::ExtendedInfo LOE_MapIntInt = MakeLOEMap<int, int>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapBuildingUp = MakeLOEMap<shok::UpgradeCategoryId, GGL::CBuildingUpgradeManager::ScholarInfo>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapLimitedAttachment = MakeLOEMap<shok::AttachmentType, GGL::CLimitedAttachmentBehavior::AttachmentInfo>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapTrigger = MakeLOEMap<shok::TriggerId, BB::IObject*>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapGDBList = MakeLOEMap<shok::String, BB::IObject*>();
+BB::SerializationListOptions::ExtendedInfo LOE_MapEtypeVector = MakeLOEMap<shok::EntityTypeId, shok::Vector<EGL::CGLEEntity*>>();
 
 BB::SerializationListOptions::ExtendedInfo LOE_ArrInt{
 	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
@@ -845,12 +848,15 @@ auto& KnownListInfos() {
 		{0x864438, &LOE_VecECatReq},
 		{0x86445c, &LOE_VecUCatReq},
 		{0x867494, &LOE_VecEInSystem},
+		{0x8970d0, &LOE_VecEntityP},
+		{0x862178, &LOE_VecUInt},
 
 		{0x85f484, &LOE_MapIntInt},
 		{0x86a5c8, &LOE_MapBuildingUp},
 		{0x873220, &LOE_MapLimitedAttachment},
 		{0xa06a58, &LOE_MapTrigger},
 		{0x84fce8, &LOE_MapGDBList},
+		{0x8b21b8, &LOE_MapEtypeVector},
 
 		{0x85dbc0, &LOE_ArrInt},
 		{0x87cff0, &LOE_ArrFloat},

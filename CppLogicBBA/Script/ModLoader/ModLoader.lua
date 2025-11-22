@@ -1,103 +1,88 @@
 ---@diagnostic disable: inject-field
 ModLoader = ModLoader or {}
 
-if false then
-	---@class CArmorDamageMapping
-	---@field ArmorClass string
-	---@field Factor number
-	local CArmorDamageMapping = {
-	}
-	---@class CDamageClass
-	---@field ObjectClassName "CppLogic::Mod::Config::DamageClassExt"|"GGL::CDamageClassProps"
-	---@field ArmorClassNoneFactor number
-	---@field ArmorClassJerkinFactor number
-	---@field ArmorClassLeatherFactor number
-	---@field ArmorClassIronFactor number
-	---@field ArmorClassFortificationFactor number
-	---@field ArmorClassHeroFactor number
-	---@field ArmorClassFurFactor number
-	---@field ExtraArmorClass CArmorDamageMapping[]|nil
-	local DamageClass = {
-	}
-	---@class Manifest
-	---@field MissingFilled boolean|nil
-	---@field ArmorClasses string[]|nil
-	---@field EntityCategories string[]|nil
-	---@field DamageClasses table<string,CDamageClass>|nil
-	---@field DirectXEffects string[]|nil
-	---@field TerrainTextures string[]|nil
-	---@field WaterTypes (string|number)[]|nil
-	---@field TerrainTypes (string|number)[]|nil
-	---@field SelectionTextures string[]|nil
-	---@field Animations (string|number)[]|nil
-	---@field AnimSets (string|number)[]|nil
-	---@field Models (string|number)[]|nil
-	---@field EffectTypes (string|number)[]|nil
-	---@field TaskLists (string|number)[]|nil
-	---@field EntityTypes (string|number)[]|nil
-	---@field Technologies (string|number)[]|nil
-	---@field GUITextures string[]|nil
-	---@field SettlerUpgradeCategory table<string,string|number>|nil
-	---@field BuildingUpgradeCategory table<string,string|number>|nil
-	---@field ExperienceClasses table<string,string|number>|nil
-	---@field SoundGroups (string|number)[][]|nil
-	---@field StringTableTexts table<string,string|true>|nil
-	---@field Fonts string[]|nil
-	local Manifest = {}
-	---@class CManifestEntry
-	local CManifestEntry = {
-		Key = "",
-		---@type function|nil
-		Preload = nil,
-		---@type function|nil
-		Load = nil,
-		---@type table|nil
-		Table = nil,
-		---@type string|nil
-		Type = nil,
-		---@type string|nil
-		Deprecated = nil
-	}
-	---@class CManifestType
-	---@field Preload fun(CManifestEntry, Manifest)
-	---@field Load fun(CManifestEntry, Manifest)
-	---@field Merge fun(CManifestEntry, into:Manifest, from:Manifest)
-	---@field Fix fun(CManifestEntry, Manifest)
-	local CManifestType = {
-	}
-	---@class ModList
-	---@field Mods ModpackDesc[]
-	---@field Incompatible string[]
-	---@field Failed string[]
-	local ModList = {
-	}
-	---@class ModPack
-	---@field Manifest Manifest
-	---@field Init fun(ModpackDesc)|nil
-	local ModPack = {
-	}
-	---@class ModLoader
-	---@field KeepArchive boolean|nil
-	---@field Manifest Manifest
-	---@field RequiredMods string[]
-	---@field Initialize fun()|nil
-	---@field MapStart fun()|nil
-	---@field LoadSave fun()|nil
-	---@field CheckUserRequestedMod nil|fun(string):boolean
-	---@field Cleanup fun()|nil
-	---@field LanguageOrder string[]|nil
-	local ModLoader = {
-		MapInfo = {
-			MapName = "",
-			MapType = 0,
-			MapCampagnName = "",
-			MapGUID = "",
-			IsSavegame = false,
-			---@type string|nil
-			SaveLoading = "",
-		}
-	}
-end
+---@class CArmorDamageMapping
+---@field ArmorClass string
+---@field Factor number
+
+---@class CDamageClass
+---@field ObjectClassName "CppLogic::Mod::Config::DamageClassExt"|"GGL::CDamageClassProps"
+---@field ArmorClassNoneFactor number
+---@field ArmorClassJerkinFactor number
+---@field ArmorClassLeatherFactor number
+---@field ArmorClassIronFactor number
+---@field ArmorClassFortificationFactor number
+---@field ArmorClassHeroFactor number
+---@field ArmorClassFurFactor number
+---@field ExtraArmorClass CArmorDamageMapping[]|nil
+
+---@class Manifest
+---@field MissingFilled boolean|nil
+---@field ArmorClasses string[]|nil
+---@field EntityCategories string[]|nil
+---@field DamageClasses table<string,CDamageClass>|nil
+---@field DirectXEffects string[]|nil
+---@field TerrainTextures string[]|nil
+---@field WaterTypes (string|number)[]|nil
+---@field TerrainTypes (string|number)[]|nil
+---@field SelectionTextures string[]|nil
+---@field Animations (string|number)[]|nil
+---@field AnimSets (string|number)[]|nil
+---@field Models (string|number)[]|nil
+---@field EffectTypes (string|number)[]|nil
+---@field TaskLists (string|number)[]|nil
+---@field EntityTypes (string|number)[]|nil
+---@field Technologies (string|number)[]|nil
+---@field GUITextures string[]|nil
+---@field SettlerUpgradeCategory table<string,string|number>|nil
+---@field BuildingUpgradeCategory table<string,string|number>|nil
+---@field ExperienceClasses table<string,string|number>|nil
+---@field SoundGroups (string|number)[][]|nil
+---@field StringTableTexts table<string,string|true>|nil
+---@field Fonts string[]|nil
+
+---@class CManifestEntry
+---@field package Key string
+---@field package Preload nil|fun(s:string):number
+---@field package Load nil|fun(s:string|number):number
+---@field package Table table<string,number>?
+---@field package Type nil|"kv"|"sound"
+---@field package Deprecated string?
+
+---@class CManifestType
+---@field Preload fun(e:CManifestEntry, m:Manifest)
+---@field Load fun(e:CManifestEntry, m:Manifest)
+---@field Merge fun(e:CManifestEntry, into:Manifest, from:Manifest)
+---@field Fix fun(e:CManifestEntry, m:Manifest)
+
+---@class ModList
+---@field Mods ModpackDesc[]
+---@field Incompatible string[]
+---@field Failed string[]
+
+---@class ModPack
+---@field Manifest Manifest
+---@field Init fun(ModpackDesc)|nil
+
+---@class MLMapInfo
+---@field MapName string
+---@field MapType number
+---@field MapCampagnName string
+---@field MapGUID string
+---@field IsSavegame boolean
+---@field SaveLoading string?
+
+---@class ModLoader
+---@field KeepArchive boolean|nil
+---@field Manifest Manifest
+---@field RequiredMods string[]
+---@field Initialize fun()|nil
+---@field MapStart fun()|nil
+---@field LoadSave fun()|nil
+---@field CheckUserRequestedMod nil|fun(string):boolean
+---@field Cleanup fun()|nil
+---@field LanguageOrder string[]|nil
+---@field MapInfo MLMapInfo
 
 --- applying everything in Manifest
 function ModLoader.ApplyManifest()
@@ -113,7 +98,8 @@ end
 
 ---@return CManifestEntry[]
 function ModLoader.ManifestTypes()
-	return {
+	---@type CManifestEntry[]
+	local r = {
 		---@diagnostic disable-next-line: undefined-global
 		{Key="ArmorClasses", Preload=CppLogic.ModLoader.PreLoadArmorClass, Table=ArmorClasses, Load=nil},
 		{Key="EntityCategories", Preload=CppLogic.ModLoader.PreLoadEntityCategory, Table=EntityCategories, Load=nil},
@@ -146,6 +132,7 @@ function ModLoader.ManifestTypes()
 		{Key="StringTableTexts", Preload=nil, Table=nil, Load=ModLoader.LoadSTTOverride, Type="kv"},
 		{Key="Fonts", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddFont},
 	}
+	return r
 end
 
 ---@type table<string, CManifestType>

@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "luaext.h"
-#include "s5_entitytype.h"
-#include "s5_entity.h"
-#include "s5_maplogic.h"
-#include "s5_widget.h"
-#include "s5_effects.h"
-#include "s5_entityandeffectmanager.h"
+#include <luaext.h>
+#include <shok/entitytype/s5_entitytype.h>
+#include <shok/entity/s5_entity.h>
+#include <shok/globals/s5_maplogic.h>
+#include <shok/ui/s5_widget.h>
+#include <shok/effect/s5_effects.h>
+#include <shok/globals/s5_entityandeffectmanager.h>
 
 luaext::EState::EState(lua::State L) : lua::State(L.GetState())
 {

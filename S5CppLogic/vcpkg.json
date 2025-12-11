@@ -1,9 +1,0 @@
-{
-  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-  "name": "s5-cpplogic",
-  "version": "0.0.1",
-  "dependencies": [
-    "magic-enum"
-  ],
-  "builtin-baseline": "8ebda5cd30c3c88e62671b5f1a07889008c0863b"
-}

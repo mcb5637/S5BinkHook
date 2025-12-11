@@ -8,53 +8,53 @@
 #include <iostream>
 #include <fstream>
 #include <string_view>
-#include "luaext.h"
-#include "s5_forwardDecls.h"
-#include "s5_baseDefs.h"
-#include "s5_classfactory.h"
-#include "s5_entity.h"
-#include "s5_scriptsystem.h"
-#include "s5_sound.h"
-#include "s5_ui.h"
-#include "s5_maplogic.h"
-#include "s5_filesystem.h"
-#include "s5_exception.h"
-#include "s5_widget.h"
-#include "s5_framework.h"
-#include "s5_tasklist.h"
-#include "s5_mapdisplay.h"
-#include "s5_idmanager.h"
-#include "s5_effects.h"
-#include "s5_staticlist.h"
-#include "s5_entitydisplay.h"
-#include "s5_events.h"
-#include "s5_behaviorProps.h"
-#include "s5_RWE_2d.h"
-#include "s5_RWE_plugin.h"
-#include "s5_ai.h"
-#include "modloader.h"
-#include "entityiterator.h"
-#include "hooks.h"
-#include "luaext.h"
-#include "l_mem.h"
-#include "l_api.h"
-#include "l_effect.h"
-#include "l_combat.h"
-#include "l_entity.h"
-#include "l_entitytype.h"
-#include "l_logic.h"
-#include "l_tech.h"
-#include "l_ua.h"
-#include "l_ui.h"
-#include "luaserializer.h"
-#include "savegame_extra.h"
-#include "EntityAddonData.h"
-#include "ModBehavior.h"
-#include "ModUI.h"
-#include "ModConfig.h"
-#include "EnumIdManagerMagic.h"
-#include "ModFilesystem.h"
-#include "ModEffect.h"
+#include <luaext.h>
+#include <shok/s5_forwardDecls.h>
+#include <shok/s5_baseDefs.h>
+#include <shok/globals/s5_classfactory.h>
+#include <shok/entity/s5_entity.h>
+#include <shok/s5_scriptsystem.h>
+#include <shok/sound/s5_sound.h>
+#include <shok/ui/s5_ui.h>
+#include <shok/globals/s5_maplogic.h>
+#include <shok/globals/s5_filesystem.h>
+#include <shok/s5_exception.h>
+#include <shok/ui/s5_widget.h>
+#include <shok/globals/s5_framework.h>
+#include <shok/entity/s5_tasklist.h>
+#include <shok/globals/s5_mapdisplay.h>
+#include <shok/globals/s5_idmanager.h>
+#include <shok/effect/s5_effects.h>
+#include <shok/globals/s5_staticlist.h>
+#include <shok/entity/s5_entitydisplay.h>
+#include <shok/events/s5_events.h>
+#include <shok/entitytype/s5_behaviorProps.h>
+#include <shok/engine/s5_RWE_2d.h>
+#include <shok/engine/s5_RWE_plugin.h>
+#include <shok/player/s5_ai.h>
+#include <utility/modloader.h>
+#include <utility/entityiterator.h>
+#include <utility/hooks.h>
+#include <luaext.h>
+#include <luafuncs/l_mem.h>
+#include <luafuncs/l_api.h>
+#include <luafuncs/l_effect.h>
+#include <luafuncs/l_combat.h>
+#include <luafuncs/l_entity.h>
+#include <luafuncs/l_entitytype.h>
+#include <luafuncs/l_logic.h>
+#include <luafuncs/l_tech.h>
+#include <luafuncs/l_ua.h>
+#include <luafuncs/l_ui.h>
+#include <utility/luaserializer.h>
+#include <utility/savegame_extra.h>
+#include <utility/EntityAddonData.h>
+#include <utility/ModBehavior.h>
+#include <utility/ModUI.h>
+#include <utility/ModConfig.h>
+#include <utility/EnumIdManagerMagic.h>
+#include <utility/ModFilesystem.h>
+#include <utility/ModEffect.h>
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -267,7 +267,7 @@ public:
 		shok::Free(p);
 	}
 	static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1006);
-	virtual shok::ClassId __stdcall GetClassIdentifier() const {
+	virtual shok::ClassId __stdcall GetClassIdentifier() const override {
 		return Identifier;
 	}
 };
@@ -292,7 +292,7 @@ int Test(lua::State Ls) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
-	CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -302,6 +302,14 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	/*auto* e = L.CheckEntity(1);
 	ED::CEntity* ed = (*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(e->EntityId);*/
+	shok::Set<shok::String> f{};
+	(*BB::CFileSystemMgr::GlobalObj)->FillFilesInDirectory(&f, L.ToString(1), BB::IFileSystem::SearchOptions::None);
+	L.NewTable();
+	int i = 1;
+	for (const auto& e : f) {
+		L.Push(e);
+		L.SetTableRaw(-2, i++);
+	}
 	return 1;
 }
 
@@ -411,7 +419,7 @@ void Install(lua::State L) {
 
 	EScr::LuaStateSerializer::AddGlobalToNotSerialize(CppLogic);
 
-#ifdef _DEBUG
+#ifdef DEBUG_FUNCS
 	L.RegisterFunc<Test>("test");
 #endif
 

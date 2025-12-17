@@ -178,7 +178,7 @@ void GGlue::CDamageClassesPropsMgr::AddDamageClass(shok::DamageClassId id, GGL::
 	auto v = Logic.DamageClassList.SaveVector();
 	if (v.Vector.size() == static_cast<int>(id))
 		v.Vector.push_back(c);
-	else if (static_cast<int>(v.Vector.size()) < static_cast<int>(id))
+	else if (static_cast<int>(v.Vector.size()) > static_cast<int>(id))
 		v.Vector[static_cast<int>(id)] = c;
 	else
 		throw std::invalid_argument{"invalid damageclass id"};

@@ -32,3 +32,7 @@ float GGL::CServiceBuildingBehaviorProperties::GetProgressAmount(shok::PlayerId 
 {
 	return reinterpret_cast<float(__thiscall*)(const CServiceBuildingBehaviorProperties*, shok::PlayerId)>(0x4DD186)(this, p);
 }
+
+shok::ClassId __stdcall GGL::CGLResourceProps::GetClassIdentifier() const {
+	return Identifier;
+}

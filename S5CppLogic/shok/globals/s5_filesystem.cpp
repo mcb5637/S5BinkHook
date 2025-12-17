@@ -20,18 +20,9 @@ BB::CBBArchiveFile::DirectoryEntry* BB::CBBArchiveFile::SearchByHash(const char*
 {
 	return archivefile_searchbyhash(this, filename);
 }
-BB::CBBArchiveFile::DirectoryEntry* BB::CBBArchiveFile::GetByOffset(size_t offset)
+BB::CBBArchiveFile::DirectoryEntry* BB::CBBArchiveFile::GetByOffset(size_t offset) const
 {
-	DirectoryEntry* r = nullptr;
-	void* d = DirectoryData;
-	size_t o = offset;
-	__asm {
-		mov eax, d;
-		add eax, o;
-		add eax, 4;
-		mov r, eax;
-	};
-	return r;
+	return reinterpret_cast<DirectoryEntry*>(reinterpret_cast<size_t>(DirectoryData) + offset + 4);
 }
 
 void __declspec(naked) archivefile_doublefreeasm() {
@@ -69,7 +60,7 @@ void BB::CFileSystemMgr::AddFolder(const char* path)
 	auto v = LoadOrder.SaveVector();
 	size_t l = v.Vector.size();
 	BB::IFileSystem* last = v.Vector[l - 1];
-	for (int i = l - 1; i > 0; i--) {
+	for (size_t i = l - 1; i > 0; i--) {
 		v.Vector[i] = v.Vector[i - 1];
 	}
 	v.Vector[0] = last;
@@ -108,7 +99,7 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 			try {
 				auto s = fs->OpenFileStreamUnique(p.data(), fnoex);
 				if (s != nullptr) {
-					std::string_view an = "";
+					std::string_view an{};
 					if (auto* as = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
 						an = as->ArchiveFile.Filename;
 					}
@@ -358,7 +349,7 @@ std::string BB::CFileSystemMgr::ReadFileToString(const char* name)
 		size_t s = filestr.GetSize();
 		if (s > 0) {
 			r.resize(s);
-			filestr.Read(r.data(), s);
+			filestr.Read(r.data(), static_cast<long>(s));
 		}
 		filestr.Close();
 	}
@@ -402,7 +393,7 @@ void __stdcall CppLogic::IO::StringViewReadStream::SetFileSize(long size)
 }
 long __stdcall CppLogic::IO::StringViewReadStream::GetFilePointer()
 {
-	return CurrentPos;
+	return static_cast<long>(CurrentPos);
 }
 void __stdcall CppLogic::IO::StringViewReadStream::SetFilePointer(long fp)
 {
@@ -421,7 +412,7 @@ long __stdcall CppLogic::IO::StringViewReadStream::Read(void* buff, long numByte
 	auto toread = std::min(static_cast<size_t>(numBytesToRead), sub.length());
 	std::memcpy(buff, sub.data(), toread);
 	CurrentPos += toread;
-	return toread;
+	return static_cast<long>(toread);
 }
 
 int __stdcall CppLogic::IO::StringViewReadStream::Seek(long seek, SeekMode mode)
@@ -440,7 +431,7 @@ int __stdcall CppLogic::IO::StringViewReadStream::Seek(long seek, SeekMode mode)
 	default:
 		throw std::logic_error{ "invalid mode" };
 	}
-	SetFilePointer(origin + seek);
+	SetFilePointer(static_cast<long>(origin) + seek);
 	return GetFilePointer();
 }
 

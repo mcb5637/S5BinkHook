@@ -15,7 +15,7 @@ namespace CppLogic::Mod {
 	public:
 		float SpaceFactor = 0;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1009);
 		static const BB::SerializationData SerializationData[];
@@ -26,7 +26,7 @@ namespace CppLogic::Mod {
 	class FormationSpacedBehavior : public GGL::CFormationBehavior, public IFormationBehaviorExtProvider {
 	public:
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		virtual shok::Position GetPosExt(EGL::CGLEEntity* leader) override;
@@ -44,7 +44,7 @@ namespace CppLogic::Mod {
 	public:
 		shok::CostInfo Produced, Used;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void __thiscall AddHandlers(shok::EntityId id) override;
 		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
@@ -67,7 +67,7 @@ namespace CppLogic::Mod {
 	public:
 		shok::Position ExploreTarget;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
@@ -80,7 +80,7 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		shok::Position GetNextCirclePosition(const shok::Position& center);
+		[[nodiscard]] shok::Position GetNextCirclePosition(const shok::Position& center) const;
 
 	private:
 		void EventOnHeroDetach(BB::CEvent* e);
@@ -101,7 +101,7 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual bool IsAbility(shok::AbilityId ability) override;
@@ -126,7 +126,7 @@ namespace CppLogic::Mod {
 		static const BB::SerializationData SerializationData[];
 
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
@@ -143,7 +143,7 @@ namespace CppLogic::Mod {
 		void operator delete(void* p);
 
 		virtual ~LightningStrikeAbility() override = default;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual bool IsAbility(shok::AbilityId ability) override;
 
@@ -163,7 +163,7 @@ namespace CppLogic::Mod {
 		static const BB::SerializationData SerializationData[];
 
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
@@ -180,7 +180,7 @@ namespace CppLogic::Mod {
 		void operator delete(void* p);
 
 		virtual ~ResDoodadRefillBehavior() override = default;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual bool IsAbility(shok::AbilityId ability) override;
 
@@ -205,7 +205,7 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	};
 	class ShieldCoverAbility : public GGL::CHeroAbility {
 	public:
@@ -220,12 +220,12 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual bool IsAbility(shok::AbilityId ability) override;
 
 		void Activate();
-		void ClearProjectiles();
+		void ClearProjectiles() const;
 		static void NetEventShieldCover(EGL::CNetEventEntityID* ev);
 	private:
 		int TaskShieldCover(EGL::CGLETaskArgs* a);
@@ -248,7 +248,7 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	};
 	class ResurrectAbility : public GGL::CHeroAbility {
 	public:
@@ -264,7 +264,7 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual bool IsAbility(shok::AbilityId ability) override;
 
@@ -298,7 +298,7 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	};
 	class BombardmentAbility : public GGL::CHeroAbility {
 	public:
@@ -312,7 +312,7 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual bool IsAbility(shok::AbilityId ability) override;
 
@@ -331,7 +331,7 @@ namespace CppLogic::Mod {
 	public:
 		int RemainingAmmo = 0, MaxAmmo = 0;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
@@ -359,7 +359,7 @@ namespace CppLogic::Mod {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1022);
 		static BB::SerializationData SerializationData[];
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		void* operator new(size_t s);
 		void operator delete(void* p);
@@ -371,7 +371,7 @@ namespace CppLogic::Mod {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1023);
 		static BB::SerializationData SerializationData[];
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 
 		void* operator new(size_t s);
@@ -379,7 +379,7 @@ namespace CppLogic::Mod {
 
 		static void NetEventBombComboCannon(EGL::CNetEventEntityAndPos* ev);
 	protected:
-		int TaskBuildCannon(EGL::CGLETaskArgs* a);
+		int TaskBuildCannonA(EGL::CGLETaskArgs* a);
 		void EventTick(BB::CEvent* ev);
 		void EventBombComboCannonActivate(EGL::CEventPosition* ev);
 	};
@@ -391,7 +391,7 @@ namespace CppLogic::Mod {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1024);
 		static constexpr inline const BB::SerializationData* const SerializationData = nullptr;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 		virtual void __stdcall OnAdd(ED::CEntity* edispl, ED::CBehaviorProps* props, shok::ModelId* modelOverride) override;
 		virtual void __stdcall Initialize(ED::CEntity* edispl, ED::CBehaviorProps* props) override;
@@ -410,7 +410,7 @@ namespace CppLogic::Mod {
 	public:
 		int WorkStepsNeededForTrade = 0;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1026);
 		static BB::SerializationData SerializationData[];
@@ -444,7 +444,7 @@ namespace CppLogic::Mod {
 			shok::ResourceType::Sulfur,
 		};
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
@@ -464,7 +464,7 @@ namespace CppLogic::Mod {
 		float TradeStepSize();
 		void FillCurrentTrade(shok::ResourceType res, float amount, float tradestep);
 		std::string_view GetResIcon(shok::ResourceType t);
-		std::string_view ResPrefix(float r);
+		static std::string_view ResPrefix(float r);
 		void PerformTradeStep();
 
 		void EventWork(BB::CEvent* ev);
@@ -484,7 +484,7 @@ namespace CppLogic::Mod {
 		};
 		std::vector<TurretData> Turret;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1027);
 		static BB::SerializationData SerializationData[];
@@ -503,7 +503,7 @@ namespace CppLogic::Mod {
 		};
 		std::vector<TurretData> Turret;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
@@ -515,8 +515,8 @@ namespace CppLogic::Mod {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		bool CanBuyTurret(int i) const;
-		bool IsTurretActive(int i) const;
+		[[nodiscard]] bool CanBuyTurret(int i) const;
+		[[nodiscard]] bool IsTurretActive(int i) const;
 	private:
 		void InitData();
 		void CreateMissingTurrets();

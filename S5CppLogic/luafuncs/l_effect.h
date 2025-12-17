@@ -6,5 +6,5 @@ namespace CppLogic::Effect {
 	void Cleanup(lua::State L);
 	void OnSaveLoaded(lua::State L);
 
-	constexpr const char* EffectOnHitKey = "CppLogic::Effect_OnHit";
+	constexpr std::string_view EffectOnHitKey = "CppLogic::Effect_OnHit";
 }

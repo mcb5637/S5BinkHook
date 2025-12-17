@@ -153,12 +153,12 @@ namespace shok {
 		};
 		friend class Tree<T, K, KeyExtractor, Comparator, Multi>::Iter;
 
-		Iter begin() const {
+		[[nodiscard]] Iter begin() const {
 			if (root->left == root)
 				return end();
 			return { root->left, this };
 		}
-		Iter end() const {
+		[[nodiscard]] Iter end() const {
 			return { nullptr, this };
 		}
 
@@ -332,7 +332,7 @@ namespace shok {
 
 		template<class ... Args>
 		std::pair<TreeNode*, bool> Emplace(Args&& ... args) {
-			TreeNode* toinsert = new TreeNode(std::forward<Args>(args)...);
+			auto* toinsert = new TreeNode(std::forward<Args>(args)...);
 			toinsert->right = root;
 			toinsert->parent = root;
 			toinsert->left = root;
@@ -641,16 +641,16 @@ namespace shok {
 		String& append(String& toappend, size_t pos, size_t count = std::string::npos);
 		String& append(String& toappend);
 		void resize(size_t len, char c = '\0');
-		const char* c_str() const;
-		size_t size() const;
+		[[nodiscard]] const char* c_str() const;
+		[[nodiscard]] size_t size() const;
 		~String();
 		String();
 		std::strong_ordering operator<=>(const String& r) const;
 		bool operator==(const String& r) const;
-		void operator=(const String& s);
-		void operator=(const std::string& s);
-		void operator=(const std::string_view& s);
-		void operator=(const char* s);
+		String& operator=(const String& s);
+		String& operator=(const std::string& s);
+		String& operator=(const std::string_view& s);
+		String& operator=(const char* s);
 		operator std::string_view() const;
 	};
 	static_assert(sizeof(String) == 7 * 4);
@@ -671,26 +671,26 @@ namespace shok {
 		auto begin() noexcept {
 			return Internal.begin();
 		}
-		const auto begin() const noexcept {
+		[[nodiscard]] auto begin() const noexcept {
 			return Internal.begin();
 		}
 		auto end() noexcept {
 			return Internal.end();
 		}
-		const auto end() const noexcept {
+		[[nodiscard]] auto end() const noexcept {
 			return Internal.end();
 		}
 		// these get used by vs for some reason over the official begin/end in for loops
-		auto _Unchecked_begin() noexcept {
+		auto _Unchecked_begin() noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_begin();
 		}
-		auto _Unchecked_begin() const noexcept {
+		[[nodiscard]] auto _Unchecked_begin() const noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_begin();
 		}
-		auto _Unchecked_end() noexcept {
+		auto _Unchecked_end() noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_end();
 		}
-		auto _Unchecked_end() const noexcept {
+		[[nodiscard]] auto _Unchecked_end() const noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_end();
 		}
 		auto& operator[](size_t p) {
@@ -699,10 +699,10 @@ namespace shok {
 		const auto& operator[](size_t p) const {
 			return Internal[p];
 		}
-		size_t size() const noexcept {
+		[[nodiscard]] size_t size() const noexcept {
 			return Internal.size();
 		}
-		const T* data() const noexcept {
+		[[nodiscard]] const T* data() const noexcept {
 			return Internal.data();
 		}
 		T* data() noexcept {
@@ -711,7 +711,7 @@ namespace shok {
 		T& at(size_t p) {
 			return Internal.at(p);
 		}
-		const T& at(size_t p) const {
+		[[nodiscard]] const T& at(size_t p) const {
 			return Internal.at(p);
 		}
 
@@ -797,29 +797,29 @@ namespace shok {
 		auto begin() noexcept {
 			return Internal.begin();
 		}
-		const auto begin() const noexcept {
+		[[nodiscard]] auto begin() const noexcept {
 			return Internal.begin();
 		}
 		auto end() noexcept {
 			return Internal.end();
 		}
-		const auto end() const noexcept {
+		[[nodiscard]] auto end() const noexcept {
 			return Internal.end();
 		}
 		// these get used by vs for some reason over the official begin/end in for loops
-		auto _Unchecked_begin() noexcept {
+		auto _Unchecked_begin() noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_begin();
 		}
-		auto _Unchecked_begin() const noexcept {
+		[[nodiscard]] auto _Unchecked_begin() const noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_begin();
 		}
-		auto _Unchecked_end() noexcept {
+		auto _Unchecked_end() noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_end();
 		}
-		auto _Unchecked_end() const noexcept {
+		[[nodiscard]] auto _Unchecked_end() const noexcept { // NOLINT(*-reserved-identifier)
 			return Internal._Unchecked_end();
 		}
-		size_t size() const noexcept {
+		[[nodiscard]] size_t size() const noexcept {
 			return Internal.size();
 		}
 

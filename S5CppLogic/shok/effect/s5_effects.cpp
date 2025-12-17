@@ -382,7 +382,7 @@ void GD::CDisplayEffectLightning::HookColorOverride(bool active)
 			reinterpret_cast<void*>(0x76AE18),
 		} };
 		void* target = active ? static_cast<void*>(&displayeff_light_updategametime) : reinterpret_cast<void*>(0x4874BB);
-		*reinterpret_cast<void**>(0x76AE18) = &displayeff_light_updategametime;
+		*reinterpret_cast<void**>(0x76AE18) = target;
 	}
 }
 
@@ -397,7 +397,7 @@ ED::IEffect* ED::CDEVisibleEffectManager::GetDisplayForEffectID(shok::EffectId i
 
 void ED::CDEVisibleEffectManager::DestroyDisplayForEffect(shok::EffectId id)
 {
-	struct data {
+	struct data { // NOLINT(*-pro-type-member-init)
 		data* p;
 		data* n;
 		VisEffect e;

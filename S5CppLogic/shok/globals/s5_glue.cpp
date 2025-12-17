@@ -6,7 +6,6 @@
 #include <shok/effect/s5_effecttype.h>
 #include <shok/globals/s5_idmanager.h>
 #include <shok/globals/s5_classfactory.h>
-#include <shok/globals/s5_filesystem.h>
 #include <shok/globals/s5_mapdisplay.h>
 #include <shok/entity/s5_animset.h>
 #include <shok/globals/s5_framework.h>
@@ -85,7 +84,7 @@ void GGlue::CEffectsPropsMgr::ReloadAllEffectTypes()
 {
 	for (unsigned int i = EffectsProps.Effects.size() - 1; i > 0; --i) {
 		FreeEffectType(static_cast<shok::EffectTypeId>(i));
-		EffectTypeManager->RemoveID(i);
+		EffectTypeManager->RemoveID(static_cast<int>(i));
 	}
 	FreeEffectType(static_cast<shok::EffectTypeId>(0)); // there is no effect 0, just a placeholder. not sure if i need to remove it
 	{
@@ -186,7 +185,7 @@ void GGlue::CDamageClassesPropsMgr::AddDamageClass(shok::DamageClassId id, GGL::
 void GGlue::CDamageClassesPropsMgr::ResetDamageClasses()
 {
 	auto v = Logic.DamageClassList.SaveVector();
-	for (int id = v.Vector.size()-1; id >= static_cast<int>(DamageClass.size()); --id) {
+	for (int id = static_cast<int>(v.Vector.size())-1; id >= static_cast<int>(DamageClass.size()); --id) {
 		DamageClassManager->RemoveID(id);
 		delete v.Vector[id];
 		v.Vector.pop_back();
@@ -350,9 +349,9 @@ void EGL::AnimSetManager::LoadAnimSet(shok::AnimSetId i)
 	if (off > static_cast<int>(AnimSets.size()))
 		throw std::logic_error{ "somehow the id is too big" };
 
-	CGLEAnimSet* set = new CGLEAnimSet();
+	auto* set = new CGLEAnimSet();
 	set->Id = i;
-	std::string file{ "Data\\Config\\AnimSets\\" };
+	std::string file{ R"(Data\Config\AnimSets\)" };
 	file.append((*BB::CIDManagerEx::AnimSetManager)->GetNameByID(id));
 	file.append(".xml");
 	(*BB::CClassFactory::GlobalObj)->LoadObject(set, file.c_str());

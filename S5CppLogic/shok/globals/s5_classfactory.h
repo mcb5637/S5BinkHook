@@ -102,74 +102,110 @@ namespace BB {
 		template<class T>
 		static constexpr BB::FieldSerializer* GetSerializer() = delete;
 
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<int>() {
 			return TypeInt;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<unsigned int>() {
 			return TypeUInt;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<float>() {
 			return TypeFloat;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<bool>() {
 			return TypeBool;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<double>() {
 			return TypeDouble;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::ArmorClassId>() {
 			return TypeArmorClassId;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::EntityId>() {
 			return TypeInt; // no real serializer, but int should work
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::EntityTypeId>() {
 			return TypeEntityType;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::PlayerId>() {
 			return TypeInt; // no real serializer, but int should work
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::EffectTypeId>() {
 			return TypeEffectType;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::DamageClassId>() {
 			return TypeDamageClass;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::TaskListId>() {
 			return TypeTaskList;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::EntityCategory>() {
 			return TypeEntityCategory;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::EventIDs>() {
 			return TypeInt; // no real serializer, but int should work
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::AttachmentType>() {
 			return TypeAttachmentType;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::AdvancedDealDamageSource>() {
 			return TypeUByte; // no real serializer, but int should work
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::ModelId>() {
 			return TypeModel;
 		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::AnimationId>() {
 			return TypeAnim;
@@ -182,10 +218,10 @@ namespace BB {
 			std::string_view XSDType;
 		};
 
-		std::string GetTypeDescName() const;
+		[[nodiscard]] std::string GetTypeDescName() const;
 
-		const ExtendedInfo& GetExtendedInfo() const;
-		const ExtendedInfo* GetOptExtendedInfo() const;
+		[[nodiscard]] const ExtendedInfo& GetExtendedInfo() const;
+		[[nodiscard]] const ExtendedInfo* GetOptExtendedInfo() const;
 	};
 
 	struct SerializationListOptions {
@@ -222,8 +258,8 @@ namespace BB {
 			void (*RemoveIf)(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd);
 		};
 
-		const ExtendedInfo& GetExtendedInfo() const;
-		const ExtendedInfo* TryGetExtendedInfo() const;
+		[[nodiscard]] const ExtendedInfo& GetExtendedInfo() const;
+		[[nodiscard]] const ExtendedInfo* TryGetExtendedInfo() const;
 	protected:
 		void RegisterExtended(const ExtendedInfo& e) const;
 	};
@@ -373,7 +409,7 @@ namespace BB {
 			return dynamic_cast<T*>(CreateObject(T::Identifier));
 		}
 
-		void LoadObject(BB::IObject* ob, const char* filename);
+		static void LoadObject(BB::IObject* ob, const char* filename);
 		template<HasValidIdentifier T>
 		T* LoadObject(const char* filename)
 		{
@@ -383,7 +419,7 @@ namespace BB {
 			LoadObject(ob, filename);
 			return ob;
 		}
-		void LoadObject(void* ob, const char* filename, const BB::SerializationData* seri);
+		static void LoadObject(void* ob, const char* filename, const BB::SerializationData* seri);
 
 		using IClassFactory::GetSerializationDataForClass;
 		template<HasValidIdentifier T>
@@ -418,6 +454,7 @@ namespace BB {
 }
 
 namespace EToolsManager {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IClassInfo {
 	public:
 		virtual bool CheckSomething(int) = 0;
@@ -435,7 +472,7 @@ namespace EToolsManager {
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x42543653); // looks like all use the same
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override{
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override{
 			return Identifier;
 		}
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override {
@@ -462,7 +499,7 @@ namespace EToolsManager {
 		}
 
 		virtual bool CheckSomething(int) override {
-			return 0;
+			return false;
 		}
 		virtual int* GetSomething() override {
 			return nullptr;
@@ -501,7 +538,7 @@ namespace CppLogic {
 		}
 		static bool __stdcall IterNextImp(Iter* i)
 		{
-			IterImpl* it = static_cast<IterImpl*>(i);
+			auto* it = static_cast<IterImpl*>(i);
 			if (it->First) {
 				it->It = it->Vector->begin();
 				it->First = false;
@@ -513,12 +550,12 @@ namespace CppLogic {
 		}
 		static void* __stdcall IterCurrentImp(Iter* i)
 		{
-			IterImpl* it = static_cast<IterImpl*>(i);
+			auto* it = static_cast<IterImpl*>(i);
 			return &*it->It;
 		}
 		static void __stdcall FreeIterImp(Iter* i)
 		{
-			IterImpl* it = static_cast<IterImpl*>(i);
+			auto* it = static_cast<IterImpl*>(i);
 			delete it;
 		}
 		static size_t __stdcall GetSizeImp(void* l)
@@ -531,16 +568,16 @@ namespace CppLogic {
 
 		}
 		static void* Index(void* List, size_t index) {
-			auto* v = reinterpret_cast<VectT*>(List);
+			auto* v = static_cast<VectT*>(List);
 			T* r = nullptr;
-			if (index >= 0 && index < v->size())
+			if (index < v->size())
 				r = &(*v)[index];
 			return r;
 		}
 		static void RemoveIf(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
-			auto* v = reinterpret_cast<VectT*>(List);
-			auto e = std::remove_if(v->begin(), v->end(), [&](T& v) {
-				return cond(uv, sd, &v);
+			auto* v = static_cast<VectT*>(List);
+			auto e = std::remove_if(v->begin(), v->end(), [&](T& val) {
+				return cond(uv, sd, &val);
 				});
 			v->erase(e, v->end());
 		}
@@ -597,7 +634,7 @@ namespace CppLogic {
 		}
 		static bool __stdcall IterNextImp(Iter* i)
 		{
-			IterImpl* it = static_cast<IterImpl*>(i);
+			auto* it = static_cast<IterImpl*>(i);
 			if (it->First) {
 				it->It = it->Vector->begin();
 				it->First = false;
@@ -609,12 +646,12 @@ namespace CppLogic {
 		}
 		static void* __stdcall IterCurrentImp(Iter* i)
 		{
-			IterImpl* it = static_cast<IterImpl*>(i);
+			auto* it = static_cast<IterImpl*>(i);
 			return &*it->It;
 		}
 		static void __stdcall FreeIterImp(Iter* i)
 		{
-			IterImpl* it = static_cast<IterImpl*>(i);
+			auto* it = static_cast<IterImpl*>(i);
 			delete it;
 		}
 		static size_t __stdcall GetSizeImp(void* l)
@@ -670,7 +707,7 @@ namespace CppLogic {
 			const char* id = context->GetAttribute(A.data());
 			if (id == nullptr)
 				return nullptr;
-			VectT* map = static_cast<VectT*>(l);
+			auto* map = static_cast<VectT*>(l);
 			auto [it, s] = map->emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple());
 			return &it->second;
 		}
@@ -711,7 +748,7 @@ namespace CppLogic {
 		static constexpr auto VN = ValueName;
 
 		using ListOpt = SerializationListOptions_ForMap<K, V, Cmp, Alloc>;
-		using VectT = typename ListOpt::VectT;
+		using VectT = ListOpt::VectT;
 
 		ListOpt ListOptions;
 		const BB::SerializationData Seridata[3] = {
@@ -727,7 +764,7 @@ namespace CppLogic {
 		static constexpr bool Mapped = true;
 
 		using ListOpt = SerializationListOptions_ForVector<T, Alloc>;
-		using VectT = typename ListOpt::VectT;
+		using VectT = ListOpt::VectT;
 
 		ListOpt ListOptions;
 
@@ -745,7 +782,7 @@ namespace CppLogic {
 		static constexpr bool Mapped = true;
 
 		using ListOpt = SerializationListOptions_ForMap_KeyAttribute<K, V, A, Cmp, Alloc>;
-		using VectT = typename ListOpt::VectT;
+		using VectT = ListOpt::VectT;
 
 		ListOpt ListOptions;
 
@@ -775,10 +812,10 @@ namespace CppLogic {
 		inline shok::ClassId GetIdByName(const char* name) const {
 			return Manager->GetIdentifierByName(name);
 		}
-		inline const char* GetNameByID(shok::ClassId id) const {
+		[[nodiscard]] inline const char* GetNameByID(shok::ClassId id) const {
 			return Manager->GetClassDemangledName(id);
 		}
-		inline size_t size() const {
+		[[nodiscard]] inline size_t size() const {
 			return Manager->Info.size;
 		}
 
@@ -804,10 +841,10 @@ namespace CppLogic {
 				return r;
 			}
 		};
-		inline Iter begin() const {
+		[[nodiscard]] inline Iter begin() const {
 			return Iter{ Manager->Info.begin() };
 		}
-		inline Iter end() const {
+		[[nodiscard]] inline Iter end() const {
 			return Iter{ Manager->Info.end() };
 		}
 	};
@@ -826,6 +863,7 @@ inline BB::FieldSerializer* BB::FieldSerializer::GetSerializer<std::string>() {
 	return &CppLogic::StringSerializer::GlobalObj;
 }
 template<>
+// ReSharper disable once CppDFAConstantFunctionResult
 inline BB::FieldSerializer* BB::FieldSerializer::GetSerializer<std::minstd_rand>() {
 	static_assert(sizeof(std::minstd_rand) == sizeof(int));
 	return BB::FieldSerializer::TypeInt; // just serialize the state as int

@@ -66,7 +66,7 @@ int RWE::Anim::RpHAnimHierarchy::IDGetIndex(int id) const
 {
     return animhier_idgetindex(this, id);
 }
-RWE::RwFrame* RWE::Anim::RpHAnimHierarchy::GetFromIndex(int idx)
+RWE::RwFrame* RWE::Anim::RpHAnimHierarchy::GetFromIndex(int idx) const
 {
     return pNodeInfo[idx].pFrame;
 }
@@ -76,17 +76,17 @@ RWE::RwFrame* RWE::Anim::RpHAnimHierarchy::GetFromIndex(int idx)
 
 void RWE::Anim::RpHAnimHierarchy::SetupForModel(RWE::RpClump* c)
 {
-    struct data {
+    struct data { // NOLINT(*-pro-type-member-init)
         RWE::Anim::RpHAnimHierarchy* th;
         bool found = false;
     };
     data d{ this };
     c->ForAllAtomics(reinterpret_cast<RWE::RpAtomicCallBack>(0x487D1A), &d);
-    struct unknownclumpaddon {
+    struct unknownclumpaddon { // NOLINT(*-pro-type-member-init)
         PADDINGI(3);
         ED::ModelData* ModelData;
     };
-    unknownclumpaddon* a = reinterpret_cast<unknownclumpaddon*>(reinterpret_cast<int>(c) + *reinterpret_cast<int*>(0x858228));
+    auto* a = reinterpret_cast<unknownclumpaddon*>(reinterpret_cast<int>(c) + *reinterpret_cast<int*>(0x858228));
     ED::ModelData::ModelFlags f = ED::ModelData::ModelFlags::None;
     if (a->ModelData) {
         f = a->ModelData->Flags;

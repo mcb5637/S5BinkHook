@@ -21,12 +21,12 @@ namespace BB {
 
 		// does not add
 		int GetIdByName(const char* name) const;
-		const char* GetNameByID(int id) const;
+		[[nodiscard]] const char* GetNameByID(int id) const;
 		int GetIDByNameOrCreate(const char* name); // throws if id invalid
 		int GetIDByNameOrCreate(const char* name, int newid); // sets id id >0, throws otherwise or if id does not match or already used
 		void RemoveID(int id); // remove highest id first, cause that way the vector gets shrunk. ids get reused, use this only for cleanup
 		void DumpManagerToLuaGlobal(lua_State* L, const char* global);
-		size_t size() const;
+		[[nodiscard]] size_t size() const;
 		void clear();
 
 		struct Iter {
@@ -43,8 +43,8 @@ namespace BB {
 			Iter& operator++();
 			Iter operator++(int);
 		};
-		Iter begin() const;
-		Iter end() const;
+		[[nodiscard]] Iter begin() const;
+		[[nodiscard]] Iter end() const;
 	};
 
 	class IIDManagerEx : public IIDManager {
@@ -112,10 +112,10 @@ namespace BB {
 	};
 	class CIDGroupsEx : public IIDGroupsEx {
 	public:
-		BB::CIDManagerEx* GroupIds;
-		BB::CIDManagerEx* IndexIds;
-		BB::CIDManagerEx* Unknown;
-		int GroupSize;
+		BB::CIDManagerEx* GroupIds = nullptr;
+		BB::CIDManagerEx* IndexIds = nullptr;
+		BB::CIDManagerEx* Unknown = nullptr;
+		int GroupSize = 0;
 		shok::Vector<int> IdMap;
 
 		// 484D8D GetID thiscall(groupid, indexid)
@@ -129,7 +129,7 @@ namespace CppLogic {
 		BB::IIDManager* Manager;
 
 	public:
-		EnumIdManager(BB::IIDManager* mng) : Manager(mng) {
+		explicit EnumIdManager(BB::IIDManager* mng) : Manager(mng) {
 		}
 
 		// does not add
@@ -154,7 +154,7 @@ namespace CppLogic {
 		void DumpManagerToLuaGlobal(lua_State* L, const char* global) {
 			Manager->DumpManagerToLuaGlobal(L, global);
 		}
-		size_t size() const {
+		[[nodiscard]] size_t size() const {
 			return Manager->size();
 		}
 		void clear() {

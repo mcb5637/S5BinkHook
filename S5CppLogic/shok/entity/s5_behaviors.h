@@ -24,7 +24,7 @@ namespace EGL {
 			PADDING(3);
 
 			void RemoveLastWaypoint();
-			shok::Position GetWaypoint(int i);
+			[[nodiscard]] shok::Position GetWaypoint(int i) const;
 		} WayPoints;
 
 		static inline constexpr int vtp = 0x7786A4;
@@ -35,7 +35,9 @@ namespace EGL {
 	static_assert(sizeof(CCoarsePath) == 40 * 4);
 	class CMovementBehavior : public EGL::CGLEBehavior {
 	public:
-		class CSlotMovingEntity : public EGL::TSlot<EGL::SSlotArgsMovingEntity, 1383452519> {
+		// ReSharper disable once CppClassNeedsConstructorBecauseOfUninitializedMember
+		class CSlotMovingEntity : public EGL::TSlot<EGL::SSlotArgsMovingEntity, 1383452519> { // NOLINT(*-pro-type-member-init)
+			// ReSharper disable once CppUninitializedNonStaticDataMember
 			CMovementBehavior* Beh;
 
 			inline virtual void __stdcall FillSlot(EGL::SSlotArgsMovingEntity* data) override {
@@ -73,11 +75,11 @@ namespace EGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xAC0E3657);
 	};
 
-	class GLEBehaviorMultiSubAnims : public EGL::CGLEBehavior {
+	class GLEBehaviorMultiSubAnims : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int LastUpdateTurn;
-		struct {
+		struct { // NOLINT(*-pro-type-member-init)
 			bool Active, PlayBackwards, IsLooped;
 			PADDING(1);
 			shok::AnimationId AnimID;
@@ -93,7 +95,7 @@ namespace EGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFCFC0D);
 	};
 
-	struct SSlotArgsAnimation {
+	struct SSlotArgsAnimation { // NOLINT(*-pro-type-member-init)
 		PADDING(1);
 		bool PlayBackwards;
 		shok::AnimationId AnimId;
@@ -103,7 +105,7 @@ namespace EGL {
 	};
 	class CBehaviorAnimation : public CGLEBehavior {
 	public:
-		class CSlotAnimation : public EGL::TSlot<EGL::SSlotArgsAnimation, 796165920> {
+		class CSlotAnimation : public EGL::TSlot<EGL::SSlotArgsAnimation, 796165920> { // NOLINT(*-pro-type-member-init)
 		public:
 			CBehaviorAnimation* Behavior;
 
@@ -121,7 +123,7 @@ namespace EGL {
 	struct SSlotArgsUVAnims {
 		bool Active0, Active1, Active2, Active3;
 	};
-	class CSlotUVAnims : public EGL::TSlot<EGL::SSlotArgsUVAnims, 429242765> {
+	class CSlotUVAnims : public EGL::TSlot<EGL::SSlotArgsUVAnims, 429242765> { // NOLINT(*-pro-type-member-init)
 	public:
 		virtual void __stdcall FillSlot(SSlotArgsUVAnims* data) override;
 
@@ -138,7 +140,7 @@ namespace EGL {
 		// defined events: UVAnim_SetStatus
 	};
 
-	struct SSlotArgsParticleEffectAttachment {
+	struct SSlotArgsParticleEffectAttachment { // NOLINT(*-pro-type-member-init)
 		struct SAttachedEffect {
 			int StartTurn;
 			shok::EffectTypeId EffectType;
@@ -170,7 +172,7 @@ namespace EGL {
 	struct SSlotArgsParticleEffectSwitch {
 		unsigned int OnOffBits;
 	};
-	class CSlotParticleEffectSwitch : public EGL::TSlot<EGL::SSlotArgsParticleEffectSwitch, 591789671> {
+	class CSlotParticleEffectSwitch : public EGL::TSlot<EGL::SSlotArgsParticleEffectSwitch, 591789671> { // NOLINT(*-pro-type-member-init)
 	public:
 		virtual void __stdcall FillSlot(SSlotArgsParticleEffectSwitch* data) override;
 
@@ -253,7 +255,7 @@ namespace GGL {
 		shok::PlayerId LocalPlayer;
 		bool IsLocalPlayer, IsNotAlliedToLocalPlayer;
 	};
-	class CCamouflageBehavior : public GGL::CHeroAbility, public EGL::TSlot<GGL::SSlotArgsCamouflage, 0x3AA0169D> {
+	class CCamouflageBehavior : public GGL::CHeroAbility, public EGL::TSlot<GGL::SSlotArgsCamouflage, 0x3AA0169D> { // NOLINT(*-pro-type-member-init)
 	public:
 		GGL::CCamouflageBehaviorProps* CamoProps;
 		int InvisibilityRemaining; // 8
@@ -275,7 +277,7 @@ namespace GGL {
 	};
 	static_assert(offsetof(CCamouflageBehavior, InvisibilityRemaining) == 8 * 4);
 
-	class CThiefCamouflageBehavior : public GGL::CCamouflageBehavior {
+	class CThiefCamouflageBehavior : public GGL::CCamouflageBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		int TimeToInvisibility;
 
@@ -303,7 +305,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x81FE84;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFE5FCD9D);
 	};
-	class CHawkBehavior : public EGL::CGLEBehavior {
+	class CHawkBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		shok::Position ExplorePosition;
@@ -318,7 +320,7 @@ namespace GGL {
 	};
 
 
-	class CInflictFearAbility : public GGL::CHeroAbility {
+	class CInflictFearAbility : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int SecondsFearRemaining; // 7
@@ -331,7 +333,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x400E6C6D);
 	};
 
-	class CBombPlacerBehavior : public GGL::CHeroAbility {
+	class CBombPlacerBehavior : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::Position StartPosition, TargetPosition;
 		bool PlacedBomb; // 10
@@ -346,7 +348,7 @@ namespace GGL {
 
 		static void HookFixBombAttachment();
 	};
-	class CBombBehavior : public EGL::CGLEBehavior {
+	class CBombBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		int TimeToExplode; //4
 
@@ -389,7 +391,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x259E7B1D);
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x876F08);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
@@ -402,7 +404,7 @@ namespace GGL {
 		void EventOnFoundationDetach(EGL::CEvent1Entity* e);
 	};
 
-	class CRangedEffectAbility : public GGL::CHeroAbility {
+	class CRangedEffectAbility : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int SecondsRemaining; // 7
@@ -413,12 +415,12 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x81B7AC;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0F622BC1D);
 
-		void __thiscall AdvHealAffected(); // heals all attached with HERO_AFFECTED
+		void __thiscall AdvHealAffected() const; // heals all attached with HERO_AFFECTED
 
 		static void HookHealAffected(bool active);
 	};
 
-	class CCircularAttack : public GGL::CHeroAbility {
+	class CCircularAttack : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		GGL::CCircularAttackProps* CAProps;
 
@@ -464,7 +466,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x83CAFB3D);
 	};
 
-	class CConvertSettlerAbility : public GGL::CHeroAbility {
+	class CConvertSettlerAbility : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int TimeToConvert;
@@ -478,11 +480,11 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E8276B7D);
 
 		static void HookConvertEvent();
-		void __thiscall PerformConversion();
+		void __thiscall PerformConversion() const;
 		static void __fastcall PerformConversionStatic(CConvertSettlerAbility* th);
 	};
 
-	class CConvertBuildingAbility : public GGL::CHeroAbility {
+	class CConvertBuildingAbility : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int TimeToConvert;
@@ -496,7 +498,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0FF68C96D);
 	};
 
-	class CSniperAbility : public GGL::CHeroAbility {
+	class CSniperAbility : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		shok::EntityId TargetId; // 7
@@ -511,7 +513,7 @@ namespace GGL {
 		static void OverrideSnipeTask();
 		static int (*SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg);
 	private:
-		int __thiscall TaskOverrideSnipe(EGL::CGLETaskArgs* a);
+		int __thiscall TaskOverrideSnipe(EGL::CGLETaskArgs* a) const;
 	};
 
 	class CMotivateWorkersAbility : public GGL::CHeroAbility {
@@ -525,7 +527,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x33A2FBFD);
 	};
 
-	class CShurikenAbility : public GGL::CHeroAbility {
+	class CShurikenAbility : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		shok::EntityId TargetId;
@@ -540,7 +542,7 @@ namespace GGL {
 		static void HookDealDamage();
 	};
 
-	class CKegPlacerBehavior : public GGL::CHeroAbility {
+	class CKegPlacerBehavior : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::Position StartPosition, TargetPosition;
 		bool PlacedKeg; // 10
@@ -555,7 +557,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x81F084;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0BF115057);
 	};
-	class CKegBehavior : public EGL::CGLEBehavior {
+	class CKegBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		bool IsArmed;
 		PADDING(3);
@@ -568,12 +570,12 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x81F6BC;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x14A85A47);
 
-		void AdvancedDealDamage();
+		void AdvancedDealDamage() const;
 
 		static void HookDealDamage();
 	};
 
-	class CAbilityScoutBinocular : public GGL::CHeroAbility {
+	class CAbilityScoutBinocular : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		bool Active; // 7
@@ -588,7 +590,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0E7661C1D);
 	};
 
-	class CTorchPlacerBehavior : public GGL::CHeroAbility {
+	class CTorchPlacerBehavior : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::Position StartPosition, TargetPosition; // 5
 		bool PlacedTorch;
@@ -601,7 +603,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x816E4C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0A5AB3F17);
 	};
-	class CTorchBehavior : public EGL::CGLEBehavior {
+	class CTorchBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		int RemainingTurns, TotalTurns, InitialExplorationRange; //4
 
@@ -624,7 +626,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0EC055D7);
 	};
 
-	class CThiefBehavior : public EGL::CGLEBehavior {
+	class CThiefBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		int Amount;
 		shok::ResourceType ResourceType;
@@ -641,7 +643,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7AE64E17);
 	};
 
-	class CSentinelBehavior : public EGL::CGLEBehavior {
+	class CSentinelBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int Urgency; // 5 (fake bool, one enemy in range)
@@ -653,7 +655,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5F1FFAD);
 	};
 
-	class CGLBehaviorAnimationEx : public EGL::CBehaviorAnimation {
+	class CGLBehaviorAnimationEx : public EGL::CBehaviorAnimation { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::AnimationId Animation;
 		shok::AnimationCategoryId AnimCategory;
@@ -665,7 +667,7 @@ namespace GGL {
 		float SpeedModifier; // 11
 		PADDINGI(1); // 12 p to EGL::CBehaviorAnimation::CSlotAnimation
 		PADDINGI(1); // p to props
-		struct {
+		struct { // NOLINT(*-pro-type-member-init)
 			PADDINGI(1);
 			shok::Task TaskType; // 15
 			shok::AnimationId AnimID;
@@ -705,7 +707,7 @@ namespace GGL {
 	};
 
 	class CWorkerBehaviorProps;
-	class CWorkerBehavior : public EGL::CGLEBehavior {
+	class CWorkerBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		enum class Cycle : int {
 			Work = 0,
@@ -800,7 +802,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDBF96E77);
 	};
 
-	class CBattleBehavior : public GGL::CBehaviorFollow {
+	class CBattleBehavior : public GGL::CBehaviorFollow { // NOLINT(*-pro-type-member-init)
 	public:
 		float SuccessDistance, FailureDistance; // 4
 		int TimeOutTime, StartTurn;
@@ -841,31 +843,31 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x815EEC;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC4F1C42D);
 
-		float GetMaxRange() const;
-		int GetDamage() const;
-		int GetMaxRandomDamage() const;
-		int GetRandomDamage(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
-		int __thiscall GetDamageAgainst(EGL::CGLEEntity* target);
-		EGL::CGLEEntity* GetTarget() const;
-		float GetMissChance() const;
-		bool CheckMiss(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
-		float __thiscall GetMaxRangeBase() const;
+		[[nodiscard]] float GetMaxRange() const;
+		[[nodiscard]] int GetDamage() const;
+		[[nodiscard]] int GetMaxRandomDamage() const;
+		[[nodiscard]] int GetRandomDamage() const; // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
+		int __thiscall GetDamageAgainst(EGL::CGLEEntity* target) const;
+		[[nodiscard]] EGL::CGLEEntity* GetTarget() const;
+		[[nodiscard]] float GetMissChance() const;
+		[[nodiscard]] bool CheckMiss() const; // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
+		[[nodiscard]] float __thiscall GetMaxRangeBase() const;
 		static float __thiscall GetMaxRangeBaseStatic(const CBattleBehavior* th);
 		bool CanAutoAttack(); // checks feared, leadercommand (not heroability,move,guard) and event Battle_DisableAutoAttack
 		float GetDamageClassFactorAgainst(EGL::CGLEEntity* target);
 		int GetRandomAttackAnim(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
-		float GetMinRange() const; // only value from props
+		[[nodiscard]] float GetMinRange() const; // only value from props
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();
 		static void HookDealDamage();
 	private:
-		void __thiscall EventOverrideGetDamage(EGL::CEventGetValue_Int* ev);
-		int __thiscall TaskOverrideFireProjctile(EGL::CGLETaskArgs* a);
+		void __thiscall EventOverrideGetDamage(EGL::CEventGetValue_Int* ev) const;
+		int __thiscall TaskOverrideFireProjectile(EGL::CGLETaskArgs* a) const;
 	};
 
 	class CLeaderBehaviorProps;
-	class CLeaderBehavior : public GGL::CBattleBehavior {
+	class CLeaderBehavior : public GGL::CBattleBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		GGL::CLeaderBehaviorProps* LeaderBehProps; // 26
@@ -901,11 +903,11 @@ namespace GGL {
 
 		int GetTroopHealth();
 		int GetTroopHealthPerSoldier();
-		float GetAutoAttackRange() const; // for some reason modified by config->WeatherExplorationBuildingRainFactor/config->WeatherExplorationBuildingSnowFactor
-		float GetAutoAttackRangeVsOther() const; // config for attackmove, max for defend, GetAutoAttackRange otherwise
-		float GetAutoAttackRangeVsBuildings() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryBuildingAutoAttackRangeFactor otherwise
-		float GetAutoAttackRangeVsCivillians() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryCivilianAutoAttackRangeFactor otherwise
-		bool HasMeleeCategory() const; // Melee, Sword or Spear
+		[[nodiscard]] float GetAutoAttackRange() const; // for some reason modified by config->WeatherExplorationBuildingRainFactor/config->WeatherExplorationBuildingSnowFactor
+		[[nodiscard]] float GetAutoAttackRangeVsOther() const; // config for attackmove, max for defend, GetAutoAttackRange otherwise
+		[[nodiscard]] float GetAutoAttackRangeVsBuildings() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryBuildingAutoAttackRangeFactor otherwise
+		[[nodiscard]] float GetAutoAttackRangeVsCivillians() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryCivilianAutoAttackRangeFactor otherwise
+		[[nodiscard]] bool HasMeleeCategory() const; // Melee, Sword or Spear
 		int SearchAutoAttackTarget();
 
 		void PerformRegeneration();
@@ -931,7 +933,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0B1DACA7D);
 	};
 
-	class CBattleSerfBehavior : public GGL::CLeaderBehavior {
+	class CBattleSerfBehavior : public GGL::CLeaderBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1); // 47 p to props
 		int JobMemoryResourceID, TimeBeforeChangeback;
@@ -959,7 +961,7 @@ namespace GGL {
 	};
 	// GGL::CWorkerBattleBehavior unused
 
-	class CAutoCannonBehavior : public EGL::CGLEBehavior {
+	class CAutoCannonBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1); //4
 		GGL::CAutoCannonBehaviorProps* ACProps;
@@ -973,9 +975,9 @@ namespace GGL {
 		// defined events: Leader_AttackEntity, Leader_OnAttackTargetDetached, Battle_GetDamageClass, Battle_GetLatestAttackerID, Battle_GetLatestHitTurn, GetDamage, OnAttackedBy,
 		//		AutoCannon_XXX
 
-		float GetMaxRange() const;
-		int GetDamage() const;
-		float __thiscall GetMaxRangeBase() const;
+		[[nodiscard]] float GetMaxRange() const;
+		[[nodiscard]] int GetDamage() const;
+		[[nodiscard]] float __thiscall GetMaxRangeBase() const;
 		static float __thiscall GetMaxRangeBaseStatic(const CAutoCannonBehavior* th);
 
 		static inline constexpr int vtp = 0x778CF0;
@@ -986,7 +988,7 @@ namespace GGL {
 		static void HookRangeOverride();
 	private:
 		int __thiscall TaskFireProjectileOverride(EGL::CGLETaskArgs* a);
-		void __thiscall EventGetDamageOverride(EGL::CEventGetValue_Int* ev);
+		void __thiscall EventGetDamageOverride(EGL::CEventGetValue_Int* ev) const;
 	};
 	class CFoundationBehavior : public EGL::CGLEBehavior {
 	public:
@@ -998,7 +1000,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0B68167D);
 	};
 
-	class CSerfBehavior : public EGL::CGLEBehavior {
+	class CSerfBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		int ConstructionSiteSlotIndex; //4
 		int ExtractionDelayCounter; //float?
@@ -1091,7 +1093,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1ADA8097);
 	};
 	class CCampBehaviorProperties;
-	class CCampBehavior : public EGL::CGLEBehavior {
+	class CCampBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		GGL::CCampBehaviorProperties* CampProps;
 		shok::Vector<int> Slot; // 5 attached entity ids
@@ -1115,7 +1117,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0C035C4ED);
 	};
 
-	class CHeroBehavior : public EGL::CGLEBehavior {
+	class CHeroBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int ResurrectionTimePassed, SpawnTurn; // 5
@@ -1153,7 +1155,7 @@ namespace GGL {
 	};
 
 	class CAffectMotivationBehaviorProps;
-	class CAffectMotivationBehavior : public EGL::CGLEBehavior {
+	class CAffectMotivationBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		CAffectMotivationBehaviorProps* Props; //p to props
 		shok::PlayerId PlayerID; //5
@@ -1171,7 +1173,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6280C00D);
 	};
 
-	class CLimitedLifespanBehavior : public EGL::CGLEBehavior {
+	class CLimitedLifespanBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1);
 		int RemainingLifespanSeconds;
@@ -1183,7 +1185,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x66243B3D);
 	};
 
-	class CBarrackBehavior : public EGL::CGLEBehavior {
+	class CBarrackBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		bool AutoFillActive; //4
 		PADDING(3);
@@ -1208,7 +1210,7 @@ namespace GGL {
 		void EventBuySoldierOverride(EGL::CEvent1Entity* ev);
 	};
 
-	class CBuildingMerchantBehavior : public EGL::CGLEBehavior {
+	class CBuildingMerchantBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		class COffer : public BB::IObject {
 		public:
@@ -1232,7 +1234,7 @@ namespace GGL {
 	};
 	class CBuildingMercenaryBehavior : public GGL::CBuildingMerchantBehavior {
 	public:
-		class CTechOffer : public GGL::CBuildingMerchantBehavior::COffer {
+		class CTechOffer : public GGL::CBuildingMerchantBehavior::COffer { // NOLINT(*-pro-type-member-init)
 		public:
 			shok::TechnologyId OfferedTechnologyType;
 
@@ -1249,7 +1251,7 @@ namespace GGL {
 	};
 	class CBuildingTechTraderBehavior : public GGL::CBuildingMerchantBehavior {
 	public:
-		class CMercenaryOffer : public GGL::CBuildingMerchantBehavior::COffer {
+		class CMercenaryOffer : public GGL::CBuildingMerchantBehavior::COffer { // NOLINT(*-pro-type-member-init)
 		public:
 			shok::EntityTypeId OfferedEntityType;
 
@@ -1287,7 +1289,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x90A53E97);
 	};
 
-	class CFoundryBehavior : public EGL::CGLEBehavior {
+	class CFoundryBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::EntityTypeId CannonType; //4
 		int CannonProgress;
@@ -1324,7 +1326,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8076034D);
 	};
 
-	class CDefendableBuildingBehavior : public EGL::CGLEBehavior { // on the building
+	class CDefendableBuildingBehavior : public EGL::CGLEBehavior { // on the building // NOLINT(*-pro-type-member-init)
 	public:
 		int RemainderMS;
 		shok::TaskState OldState;
@@ -1365,7 +1367,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x707CD967);
 	};
 
-	class CTreeBehavior : public EGL::CGLEBehavior {
+	class CTreeBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::EntityTypeId OriginalEntityType; // 4
 		shok::Position Position;
@@ -1388,7 +1390,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x4267D337);
 	};
 
-	class CReplaceableEntityBehavior : public EGL::CGLEBehavior {
+	class CReplaceableEntityBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		bool IsReplacementActive; // 4
 		PADDING(3);
@@ -1426,7 +1428,7 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x81FA60;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x995E7AF7);
 
-		int GetMaxNumberOfSerfs() const;
+		[[nodiscard]] int GetMaxNumberOfSerfs() const;
 
 		static void HookBuySerf();
 	private:
@@ -1461,9 +1463,11 @@ namespace GGL {
 		bool IsCollapsing;
 		bool IsAnySerfAttached;
 	};
-	class CBuildingBehavior : public EGL::CGLEBehavior {
+	class CBuildingBehavior : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
-		class CSlotBuilding : public EGL::TSlot<GGL::SSlotArgsBuilding, 119076711> {
+		// ReSharper disable once CppClassNeedsConstructorBecauseOfUninitializedMember
+		class CSlotBuilding : public EGL::TSlot<GGL::SSlotArgsBuilding, 119076711> { // NOLINT(*-pro-type-member-init)
+			// ReSharper disable once CppUninitializedNonStaticDataMember
 			GGL::CBuilding* Building;
 		};
 		PADDINGI(1);
@@ -1508,7 +1512,7 @@ namespace GGL {
 		int StartAlpha, TargetAlpha;
 		float BlendingTime, StartTimeStamp;
 	};
-	class CAlphaBlendingBehavior : public EGL::CGLEBehavior, public EGL::TSlot<GGL::SSlotArgsAlphaBlending, 765384995> {
+	class CAlphaBlendingBehavior : public EGL::CGLEBehavior, public EGL::TSlot<GGL::SSlotArgsAlphaBlending, 765384995> { // NOLINT(*-pro-type-member-init)
 	public:
 		int StartAlpha, TargetAlpha;
 		float BlendingTime, StartTimeStamp;
@@ -1518,7 +1522,7 @@ namespace GGL {
 	};
 	static_assert(offsetof(CAlphaBlendingBehavior, StartAlpha) == 20);
 
-	class CBehaviorFieldDoodad : public EGL::CGLEBehavior {
+	class CBehaviorFieldDoodad : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::EntityTypeId Crop;
 		PADDINGI(1);
@@ -1534,7 +1538,7 @@ namespace GGL {
 	static_assert(offsetof(CBehaviorFieldDoodad, Crop) == 4 * 4);
 	static_assert(offsetof(CBehaviorFieldDoodad, RowSpacing) == 10 * 4);
 
-	class CBehaviorCropDoodad : public EGL::CGLEBehavior {
+	class CBehaviorCropDoodad : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		int CreationTurn;
 		shok::EntityTypeId NextCropType; // serialized as int

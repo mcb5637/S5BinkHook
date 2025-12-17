@@ -5,9 +5,8 @@
 
 bool CppLogic::WinAPI::FileDialog::Show()
 {
-    OPENFILENAME op;
+    OPENFILENAME op = {};
 
-    std::memset(&op, 0, sizeof(OPENFILENAME));
     op.lStructSize = sizeof(OPENFILENAME);
     SelectedPath.resize(MAX_PATH);
     op.lpstrFile = SelectedPath.data();

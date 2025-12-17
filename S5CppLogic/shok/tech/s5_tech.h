@@ -22,7 +22,7 @@ namespace shok {
 			float Value = 0;
 			shok::String Operator;
 
-			float ModifyValue(float i) const;
+			[[nodiscard]] float ModifyValue(float i) const;
 			Modifier();
 		};
 		struct TechReq {
@@ -91,7 +91,7 @@ namespace shok {
 
 	class TechCategoryManager {
 	public:
-		BB::CIDManagerEx* TechCategoryManager;
+		BB::CIDManagerEx* TechCategoryIDManager = nullptr;
 		shok::Vector<int*> TechnologyCategoryToFirstTechnologyType; // type?
 		// gets loaded from Data\\Config\\TechnologyCategories.xml into temp vector, then creates this vector out of it
 	};
@@ -101,6 +101,6 @@ namespace shok {
 		float Value;
 		char Operator;
 
-		float ModifyValue(float i) const;
+		[[nodiscard]] float ModifyValue(float i) const;
 	};
 }

@@ -23,8 +23,7 @@ float ED::CLandscape::GetWaterHeightAtPos(const shok::Position& p)
 	return GetWaterHeightAtPosF(p.X, p.Y);
 }
 
-float __thiscall ED::CLandscape::GetWaterHeightAtPosOverride(float x, float y)
-{ // this func breaks its arguments, so i have to rewrite it instead of patching a few instructions
+float __thiscall ED::CLandscape::GetWaterHeightAtPosOverride(float x, float y) const { // this func breaks its arguments, so i have to rewrite it instead of patching a few instructions
 	shok::Position p{ std::min(std::max(0.0f, x), WorldSizeX),std::min(std::max(0.0f, y), WorldSizeY) };
 	if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&p, EGL::CGLELandscape::BlockingMode::BridgeArea)) {
 		return static_cast<float>(TerrainLowRes->GetBridgeHeight(p));
@@ -39,61 +38,17 @@ void ED::CGlobalsLogicEx::ToTerrainCoord(const shok::Position& p, int* out)
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
 }
-bool ED::CGlobalsLogicEx::IsCoordValid(int* out)
+bool ED::CGlobalsLogicEx::IsCoordValid(const int* out) const
 {
 	return out[0] >= 0 && out[1] >= 0 && out[0] < Blocking->ArraySizeXY && out[1] < Blocking->ArraySizeXY;
 }
-EGL::CGLELandscape::BlockingMode ED::CGlobalsLogicEx::GetBlocking(const shok::Position& p)
+EGL::CGLELandscape::BlockingMode ED::CGlobalsLogicEx::GetBlocking(const shok::Position& p) const
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
 	if (!IsCoordValid(qp))
 		DEBUGGER_BREAK;
 	return static_cast<EGL::CGLELandscape::BlockingMode>(Blocking->data[qp[1] * Blocking->ArraySizeXY + qp[0]]);
-}
-
-ED::CModelsProps::ModelData::ModelData(ModelData&& o) noexcept
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnontrivial-memcall"
-	std::memcpy(this, &o, sizeof(ModelData));
-	std::memset(&o, 0, sizeof(ModelData));
-#pragma clang diagnostic pop
-}
-ED::CModelsProps::ModelData::~ModelData()
-{
-	// originally 0x719647, but this is easier
-	if (Effect)
-		shok::Free(Effect);
-	Effect = nullptr;
-	if (OrnamentalItemEffect)
-		shok::Free(OrnamentalItemEffect);
-	OrnamentalItemEffect = nullptr;
-	if (SelectionTexture)
-		shok::Free(SelectionTexture);
-	SelectionTexture = nullptr;
-}
-void ED::CModelsProps::ModelData::operator=(const ModelData& o) noexcept
-{
-	// ged rid of previous strings
-	if (Effect)
-		shok::Free(Effect);
-	if (OrnamentalItemEffect)
-		shok::Free(OrnamentalItemEffect);
-	if (SelectionTexture)
-		shok::Free(SelectionTexture);
-	// copy everything
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnontrivial-memcall"
-	std::memcpy(this, &o, sizeof(ModelData));
-#pragma clang diagnostic pop
-	// fix the strings again
-	if (o.Effect)
-		Effect = shok::CopyString(o.Effect);
-	if (o.OrnamentalItemEffect)
-		OrnamentalItemEffect = shok::CopyString(o.OrnamentalItemEffect);
-	if (o.SelectionTexture)
-		SelectionTexture = shok::CopyString(o.SelectionTexture);
 }
 
 ED::CModelsProps::ModelData& ED::CModelsProps::Get(shok::ModelId id)
@@ -133,7 +88,7 @@ void ED::CModelsProps::ReloadAllModels()
 		v.Vector.clear();
 		v.Vector.resize(ModelIdManager->size());
 	}
-	BB::CIDManagerEx** m = reinterpret_cast<BB::CIDManagerEx**>(0xA19F8C);
+	auto** m = reinterpret_cast<BB::CIDManagerEx**>(0xA19F8C);
 	*m = ModelIdManager;
 	(*BB::CClassFactory::GlobalObj)->LoadObject(this, "Data\\Config\\Models.xml", SerializationData);
 	*m = nullptr;
@@ -194,14 +149,6 @@ static inline void(__thiscall* const modeldata_dtor)(ED::ModelData* d) = reinter
 ED::ModelData::~ModelData()
 {
 	modeldata_dtor(this);
-}
-ED::ModelData::ModelData(ModelData&& o) noexcept
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnontrivial-memcall"
-	std::memcpy(this, &o, sizeof(ModelData));
-	std::memset(&o, 0, sizeof(ModelData));
-#pragma clang diagnostic pop
 }
 void* ED::ModelData::operator new(size_t s)
 {
@@ -295,13 +242,13 @@ void ED::TerrainTextureManager::ReApplyTerrainType(shok::TerrainTypeId id)
 	std::map<int, int> PriorityToTerrainid{};
 	for (unsigned int id2 = 0; id2 < DisplayProps->TerrainTypeManager->size(); ++id2) {
 		int prio = DisplayProps->DisplayProps[id2].Priority;
-		if (id2 != i && DisplayProps->TerrainTypeManager->GetNameByID(id2) != nullptr) {
-			while (PriorityToTerrainid.find(prio) != PriorityToTerrainid.end())
+		if (id2 != i && DisplayProps->TerrainTypeManager->GetNameByID(static_cast<int>(id2)) != nullptr) {
+			while (PriorityToTerrainid.contains(prio))
 				++prio;
-			PriorityToTerrainid[prio] = id2;
+			PriorityToTerrainid[prio] = static_cast<int>(id2);
 		}
 	}
-	while (PriorityToTerrainid.find(t.Priority) != PriorityToTerrainid.end())
+	while (PriorityToTerrainid.contains(t.Priority))
 		++t.Priority;
 	PriorityToTerrainid[t.Priority] = static_cast<int>(t.Id);
 	{
@@ -321,7 +268,7 @@ void ED::TerrainTextureManager::ReApplyTerrainType(shok::TerrainTypeId id)
 		tidsord.Vector.clear();
 		tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(0));
 		for (const auto& kv : PriorityToTerrainid) {
-			int s = tidsord.Vector.size();
+			int s = static_cast<int>(tidsord.Vector.size());
 			tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(kv.second));
 			ttv.Vector[kv.second].Priority = s;
 			ottv.Vector[kv.second].Priority = s;
@@ -344,8 +291,8 @@ void ED::TerrainTextureManager::ReApplyAllTerrainTypes()
 		std::map<int, int> PriorityToTerrainid{};
 		for (unsigned int id = 0; id < DisplayProps->TerrainTypeManager->size(); ++id) {
 			TerrainType t = CreateTerrainType(static_cast<shok::TerrainTypeId>(id));
-			if (DisplayProps->TerrainTypeManager->GetNameByID(id) != nullptr) {
-				while (PriorityToTerrainid.find(t.Priority) != PriorityToTerrainid.end())
+			if (DisplayProps->TerrainTypeManager->GetNameByID(static_cast<int>(id)) != nullptr) {
+				while (PriorityToTerrainid.contains(t.Priority))
 					++t.Priority;
 				PriorityToTerrainid[t.Priority] = static_cast<int>(t.Id);
 			}
@@ -354,7 +301,7 @@ void ED::TerrainTextureManager::ReApplyAllTerrainTypes()
 		}
 		tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(0));
 		for (const auto& kv : PriorityToTerrainid) {
-			int s = tidsord.Vector.size();
+			int s = static_cast<int>(tidsord.Vector.size());
 			tidsord.Vector.push_back(static_cast<shok::TerrainTypeId>(kv.second));
 			ttv.Vector[kv.second].Priority = s;
 			ottv.Vector[kv.second].Priority = s;
@@ -365,7 +312,7 @@ void ED::TerrainTextureManager::ReApplyAllTerrainTypes()
 	ApplyTextureQuality();
 	--TextureQualityOptionChangedCounter;
 }
-ED::TerrainTextureManager::TerrainType ED::TerrainTextureManager::CreateTerrainType(shok::TerrainTypeId id)
+ED::TerrainTextureManager::TerrainType ED::TerrainTextureManager::CreateTerrainType(shok::TerrainTypeId id) const
 {
 	int i = static_cast<int>(id);
 	TerrainType t{};
@@ -375,7 +322,7 @@ ED::TerrainTextureManager::TerrainType ED::TerrainTextureManager::CreateTerrainT
 	t.BaseTextureId = dis.BaseTexture;
 	t.SnowTextureId = dis.SnowTexture;
 	t.TransitionTextureId = dis.TransitionsTexture;
-	t.OneDiv4TimesQuads = 1.0f / (4 * (dis.Quads <= 0 ? 4 : dis.Quads));
+	t.OneDiv4TimesQuads = 1.0f / static_cast<float>(4 * (dis.Quads <= 0 ? 4 : dis.Quads));
 	t.ReplacementTerrainType = static_cast<shok::TerrainTypeId>(DisplayProps->TerrainTypeManager->GetIdByName(dis.ReplacementTerrainType.c_str()));
 	t.TransitionsColorModulate = dis.TransitionsColorModulate;
 	t.TransitionTextureIs_Transitions01 = t.TransitionTextureId == Transitions01Id;

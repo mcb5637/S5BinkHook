@@ -2,7 +2,6 @@
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/entity/s5_behaviors.h>
-#include <shok/entitytype/s5_behaviorProps.h>
 #include <shok/globals/s5_config.h>
 
 #include <utility/mod.h>

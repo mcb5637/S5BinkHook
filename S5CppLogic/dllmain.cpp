@@ -1,4 +1,4 @@
-// dllmain.cpp : Defines the entry point for the DLL application.
+// ReSharper disable CppUnusedIncludeDirective
 #include "pch.h"
 #include <string>
 #include <map>
@@ -101,7 +101,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 	static constexpr bool Int3Dbg = false;
 	// note no serf, heroability, building cmds
 
-	void EventMove(EGL::CEventPosition* ev) {
+	void EventMove(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -110,7 +110,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventAttack(EGL::CEvent1Entity* ev) {
+	void EventAttack(EGL::CEvent1Entity* ev) { // NOLINT(*-convert-member-functions-to-static)
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -119,7 +119,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventAMove(EGL::CEventPosition* ev) {
+	void EventAMove(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -128,7 +128,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventHoldPos(BB::CEvent* ev) {
+	void EventHoldPos(BB::CEvent* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -137,7 +137,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventDefend(BB::CEvent* ev) {
+	void EventDefend(BB::CEvent* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -146,7 +146,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventGuard(EGL::CEvent1Entity* ev) {
+	void EventGuard(EGL::CEvent1Entity* ev) { // NOLINT(*-convert-member-functions-to-static)
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -155,7 +155,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventPatrol(EGL::CEventPosition* ev) {
+	void EventPatrol(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -165,7 +165,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto _ = s.c_str();
 	}
 
-	void EventStealGoods(EGL::CEvent1Entity* ev) {
+	void EventStealGoods(EGL::CEvent1Entity* ev) { // NOLINT(*-convert-member-functions-to-static)
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -174,7 +174,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventSecureGoods(EGL::CEvent1Entity* ev) {
+	void EventSecureGoods(EGL::CEvent1Entity* ev) { // NOLINT(*-convert-member-functions-to-static)
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -183,7 +183,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventSabotage(EGL::CEvent1Entity* ev) {
+	void EventSabotage(EGL::CEvent1Entity* ev) { // NOLINT(*-convert-member-functions-to-static)
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -192,7 +192,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventDisarm(EGL::CEvent1Entity* ev) {
+	void EventDisarm(EGL::CEvent1Entity* ev) { // NOLINT(*-convert-member-functions-to-static)
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -201,7 +201,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventBinoc(EGL::CEventPosition* ev) {
+	void EventBinoc(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -210,7 +210,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventTorch(EGL::CEventPosition* ev) {
+	void EventTorch(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -219,7 +219,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
-	void EventPointRes(BB::CEvent* ev) {
+	void EventPointRes(BB::CEvent* ev) { // NOLINT(*-convert-member-functions-to-static)
 		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
@@ -267,7 +267,7 @@ public:
 		shok::Free(p);
 	}
 	static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1006);
-	virtual shok::ClassId __stdcall GetClassIdentifier() const override {
+	[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override {
 		return Identifier;
 	}
 };
@@ -290,9 +290,9 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 int Test(lua::State Ls) {
 	luaext::EState L{ Ls };
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA0D228));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A320));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0xD915E0E7));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x3A4D8B20));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
@@ -302,14 +302,8 @@ int Test(lua::State Ls) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	/*auto* e = L.CheckEntity(1);
 	ED::CEntity* ed = (*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(e->EntityId);*/
-	shok::Set<shok::String> f{};
-	(*BB::CFileSystemMgr::GlobalObj)->FillFilesInDirectory(&f, L.ToString(1), BB::IFileSystem::SearchOptions::None);
-	L.NewTable();
-	int i = 1;
-	for (const auto& e : f) {
-		L.Push(e);
-		L.SetTableRaw(-2, i++);
-	}
+	auto* p = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(shok::MapType::Campagn, "Main");
+	L.Push(reinterpret_cast<int>(p));
 	return 1;
 }
 
@@ -633,7 +627,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	LPVOID lpReserved
 )
 {
-	DWORD vp = 0;
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
@@ -641,8 +634,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
-		break;
 	case DLL_PROCESS_DETACH:
+	default:
 		break;
 	}
 	return true;

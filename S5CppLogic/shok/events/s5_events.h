@@ -8,23 +8,23 @@ namespace BB {
 	public:
 		int EventTypeId;
 
-		CEvent(int eventid);
-		CEvent(shok::EventIDs eventid);
-		CEvent(shok::NetEventIds eventid);
-		CEvent(shok::FeedbackEventIds eventid);
-		CEvent(shok::InputEventIds eventid);
+		explicit CEvent(int eventid);
+		explicit CEvent(shok::EventIDs eventid);
+		explicit CEvent(shok::NetEventIds eventid);
+		explicit CEvent(shok::FeedbackEventIds eventid);
+		explicit CEvent(shok::InputEventIds eventid);
 
-		bool IsEvent(shok::EventIDs id);
-		bool IsEvent(shok::NetEventIds id);
-		bool IsEvent(shok::FeedbackEventIds id);
-		bool IsEvent(shok::InputEventIds id);
+		[[nodiscard]] bool IsEvent(shok::EventIDs id) const;
+		[[nodiscard]] bool IsEvent(shok::NetEventIds id) const;
+		[[nodiscard]] bool IsEvent(shok::FeedbackEventIds id) const;
+		[[nodiscard]] bool IsEvent(shok::InputEventIds id) const;
 
 		static inline constexpr int vtp = 0x762114;
 		static inline constexpr int TypeDesc = 0x7FFE24;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x472E2780);
 		static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84EE58);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 	protected:
@@ -51,7 +51,7 @@ namespace EGL {
 				return 0x76F8F4;
 			}
 			else {
-				//static_assert(false, "template initialization faled for CEventValue");
+				throw std::logic_error{"template initialization failed for CEventValue"};
 			}
 		}
 		static constexpr int TypeDesc() {
@@ -65,7 +65,7 @@ namespace EGL {
 				return 0x8117B0;
 			}
 			else {
-				//static_assert(false, "template initialization faled for CEventValue");
+				throw std::logic_error{"template initialization failed for CEventValue"};
 			}
 		}
 
@@ -98,7 +98,7 @@ namespace EGL {
 				return 0x76E210;
 			}
 			else {
-				//static_assert(false, "template initialization faled for CEventGetValue");
+				throw std::logic_error{"template initialization failed for CEventGetValue"};
 			}
 		}
 		static constexpr int TypeDesc() {
@@ -112,7 +112,7 @@ namespace EGL {
 				return 0x810AAC;
 			}
 			else {
-				//static_assert(false, "template initialization faled for CEventGetValue");
+				throw std::logic_error{"template initialization failed for CEventGetValue"};
 			}
 		}
 
@@ -150,9 +150,10 @@ namespace EGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF0B177D3);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IEventEntityID {
 	public:
-		virtual shok::EntityId GetEntityID() const = 0;
+		[[nodiscard]] virtual shok::EntityId GetEntityID() const = 0;
 
 		static inline constexpr int vtp = 0x766B34;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x4E0C8853);
@@ -163,7 +164,7 @@ namespace EGL {
 
 		CEvent1Entity(shok::EventIDs e, shok::EntityId ent);
 
-		virtual shok::EntityId GetEntityID() const override;
+		[[nodiscard]] virtual shok::EntityId GetEntityID() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		static inline constexpr int vtp = 0x766C60;
@@ -194,9 +195,10 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5ADDA397);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IEventPlayerID {
 	public:
-		virtual shok::PlayerId GetPlayerID() const = 0;
+		[[nodiscard]] virtual shok::PlayerId GetPlayerID() const = 0;
 
 		static inline constexpr int vtp = 0x76D788;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7B28CFC3);
@@ -207,7 +209,7 @@ namespace EGL {
 
 		CEventPlayerID(shok::EventIDs e, shok::PlayerId p);
 
-		virtual shok::PlayerId GetPlayerID() const override;
+		[[nodiscard]] virtual shok::PlayerId GetPlayerID() const override;
 
 		static inline constexpr int vtp = 0x76D900;
 		static inline constexpr int TypeDesc = 0x80E078;
@@ -228,10 +230,11 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x175247D);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IEvent2Entities {
 	public:
-		virtual shok::EntityId GetActorID() const = 0;
-		virtual shok::EntityId GetTargetID() const = 0;
+		[[nodiscard]] virtual shok::EntityId GetActorID() const = 0;
+		[[nodiscard]] virtual shok::EntityId GetTargetID() const = 0;
 
 		static inline constexpr int vtp = 0x76D790;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x84682AC3);
@@ -242,8 +245,8 @@ namespace EGL {
 
 		CEvent2Entities(shok::EventIDs e, shok::EntityId aid, shok::EntityId tid);
 
-		virtual shok::EntityId GetActorID() const override;
-		virtual shok::EntityId GetTargetID() const override;
+		[[nodiscard]] virtual shok::EntityId GetActorID() const override;
+		[[nodiscard]] virtual shok::EntityId GetTargetID() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		static inline constexpr int vtp = 0x76D92C;
@@ -292,7 +295,7 @@ namespace EGL {
 	public:
 		shok::Position Position;
 
-		CEventGetPosition(shok::EventIDs e);
+		explicit CEventGetPosition(shok::EventIDs e);
 
 		static inline constexpr int vtp = 0x7743CC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x89C73967);
@@ -333,15 +336,17 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3A6455CD);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IEventSourcePlayerID {
 	public:
-		virtual shok::PlayerId GetSourcePlayer() const = 0;
+		[[nodiscard]] virtual shok::PlayerId GetSourcePlayer() const = 0;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCA98953);
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IEventTargetPlayerID {
 	public:
-		virtual shok::PlayerId GetTargetPlayer() const = 0;
+		[[nodiscard]] virtual shok::PlayerId GetTargetPlayer() const = 0;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9CCC2873);
 	};
@@ -442,7 +447,7 @@ namespace GGL {
 		float SellAmount; //7
 
 		CEventGoodsTraded(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm, shok::EntityId en, float sellam);
-		virtual shok::EntityId GetEntityID() const override;
+		[[nodiscard]] virtual shok::EntityId GetEntityID() const override;
 
 		static inline constexpr int vtp = 0x775CF8;
 		static inline constexpr int vtp_IEventEntityID = 0x775CF0;
@@ -489,6 +494,8 @@ namespace GGL {
 		int Alpha;
 		float BlendingTime;
 
+		CEventStartAlphaBlending(shok::EventIDs e, int a, float t);
+
 		static inline constexpr int vtp = 0x773594;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x199C7D73);
 	};
@@ -528,16 +535,17 @@ namespace GGL {
 		shok::PlayerId Source, Target;
 
 		CEventSourceTargetPlayerID(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t);
-		virtual shok::PlayerId GetSourcePlayer() const override;
-		virtual shok::PlayerId GetTargetPlayer() const override;
+		[[nodiscard]] virtual shok::PlayerId GetSourcePlayer() const override;
+		[[nodiscard]] virtual shok::PlayerId GetTargetPlayer() const override;
 
 		static inline constexpr int vtp = 0x76F8BC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7EC9E7E3);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IEventDiplomacyState {
 	public:
-		virtual shok::DiploState GetState() const = 0;
+		[[nodiscard]] virtual shok::DiploState GetState() const = 0;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5AEF0063);
 	};
@@ -546,7 +554,7 @@ namespace GGL {
 		shok::DiploState NewState;
 
 		CEventDiplomacyChanged(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t, shok::DiploState n);
-		virtual shok::DiploState GetState() const override;
+		[[nodiscard]] virtual shok::DiploState GetState() const override;
 
 		static inline constexpr int vtp = 0x76F8E4;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8CAF40C3);
@@ -572,9 +580,10 @@ namespace GGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x22B0BE17);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IEventTributeUniqueID {
 	public:
-		virtual int GetTributeID() const = 0;
+		[[nodiscard]] virtual int GetTributeID() const = 0;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2B171D53);
 	};
@@ -583,7 +592,7 @@ namespace GGL {
 		int TributeID;
 
 		CEventTributePaid(shok::EventIDs id, shok::PlayerId s, shok::PlayerId t, int tid);
-		virtual int GetTributeID() const override;
+		[[nodiscard]] virtual int GetTributeID() const override;
 
 		static inline constexpr int vtp = 0x770534;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6116B233);
@@ -770,8 +779,8 @@ namespace BB {
 
 		CMouseEvent(shok::InputEventIds id, shok::Keys keydata, int clicks, int x, int y, int delta);
 
-		bool IsKey(shok::Keys key);
-		bool IsModifier(shok::Keys mod);
+		[[nodiscard]] bool IsKey(shok::Keys key) const;
+		[[nodiscard]] bool IsModifier(shok::Keys mod) const;
 
 		static inline constexpr int TypeDesc = 0x7FFE98;
 		static inline constexpr int vtp = 0x762154;
@@ -784,8 +793,8 @@ namespace BB {
 
 		CKeyEvent(shok::InputEventIds id, shok::Keys keydata);
 
-		bool IsKey(shok::Keys key);
-		bool IsModifier(shok::Keys mod);
+		[[nodiscard]] bool IsKey(shok::Keys key) const;
+		[[nodiscard]] bool IsModifier(shok::Keys mod) const;
 
 		static inline constexpr int TypeDesc = 0x7FFE5C;
 		static inline constexpr int vtp = 0x762134;
@@ -814,7 +823,7 @@ namespace CppLogic::Events {
 
 		AdvHurtEvent(shok::EventIDs e, shok::EntityId aid, shok::EntityId tid, int dmg, shok::AdvancedDealDamageSource sou, shok::PlayerId attpl);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1001);
 	};
@@ -826,7 +835,7 @@ namespace CppLogic::Events {
 
 		ResourceEvent(shok::EventIDs e, shok::EntityId id, shok::ResourceType rt, int am);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1002);
 	};
@@ -838,13 +847,13 @@ namespace CppLogic::Events {
 
 		ConversionEvent(shok::EventIDs e, shok::EntityId id, shok::EntityId told, shok::EntityId tnew);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
-		virtual shok::EntityId GetEntityID() const override;
+		[[nodiscard]] virtual shok::EntityId GetEntityID() const override;
 
-		virtual shok::EntityId GetActorID() const override;
-		virtual shok::EntityId GetTargetID() const override;
+		[[nodiscard]] virtual shok::EntityId GetActorID() const override;
+		[[nodiscard]] virtual shok::EntityId GetTargetID() const override;
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1003);
 	};
@@ -857,7 +866,7 @@ namespace CppLogic::Events {
 
 		AdvHurtByEvent(shok::EventIDs e, shok::EntityId aid, int dmg, shok::AdvancedDealDamageSource sou, shok::PlayerId attpl);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1007);
 	};
@@ -871,7 +880,7 @@ namespace CppLogic::Events {
 
 		CanBuySettlerEvent(shok::EventIDs e, shok::EntityId buyat, shok::EntityId target, shok::EntityTypeId tobuy, bool vc, bool cost, bool moti, bool alarm, bool hqpop = true);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100F);
 	};
@@ -883,7 +892,7 @@ namespace CppLogic::Events {
 		inline SaveLoadedEvent(shok::EventIDs id, std::string_view s) : BB::CEvent(id), Slot(s) {}
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1012);
-		inline virtual shok::ClassId __stdcall GetClassIdentifier() const override {
+		[[nodiscard]] inline virtual shok::ClassId __stdcall GetClassIdentifier() const override {
 			return Identifier;
 		}
 	};

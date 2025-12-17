@@ -31,7 +31,7 @@ namespace luaext {
 		shok::PositionRot CheckPosRot(int idx, bool rad = false);
 		void PushPosRot(const shok::PositionRot& p, bool rad = false);
 
-		void CheckEntityAlive(shok::EntityId id, const char* msg);
+		static void CheckEntityAlive(shok::EntityId id, const char* msg);
 
 		void ReadCostInfo(int idx, shok::CostInfo& c, bool ignorezeroes);
 		void PushCostInfo(const shok::CostInfo& c);

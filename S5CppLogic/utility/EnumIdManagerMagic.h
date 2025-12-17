@@ -1,7 +1,4 @@
 #pragma once
-#include <shok/s5_forwardDecls.h>
-#include <shok/s5_baseDefs.h>
-#include <shok/globals/s5_idmanager.h>
 #include <luaext.h>
 #include <utility/ConstexprString.h>
 

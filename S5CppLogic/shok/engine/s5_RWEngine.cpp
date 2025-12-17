@@ -124,18 +124,18 @@ void RWE::RwFrame::Destroy()
 }
 bool RWE::RwFrame::Dirty() const
 {
-    int(__cdecl* const f)(const RWE::RwFrame * f) = reinterpret_cast<int(__cdecl*)(const RWE::RwFrame*)>(0x413E40);
+    const auto f = reinterpret_cast<int(__cdecl*)(const RWE::RwFrame*)>(0x413E40);
     return f(this);
 }
 
 int RWE::RwFrame::GetUserDataArrayCount() const
 {
-    int(__cdecl* const f)(const RWE::RwFrame * f) = reinterpret_cast<int(__cdecl*)(const RWE::RwFrame*)>(0x717D60);
+    const auto f = reinterpret_cast<int(__cdecl*)(const RWE::RwFrame*)>(0x717D60);
     return f(this);
 }
 RWE::RpUserDataArray* RWE::RwFrame::GetUserDataArray(int data)
 {
-    RpUserDataArray*(__cdecl* const f)(RWE::RwFrame * f, int d) = reinterpret_cast<RpUserDataArray*(__cdecl*)(RWE::RwFrame*, int)>(0x717D90);
+    const auto f = reinterpret_cast<RpUserDataArray*(__cdecl*)(RWE::RwFrame*, int)>(0x717D90);
     return f(this, data);
 }
 RWE::RpUserDataArray* RWE::RwFrame::GetUserDataArray(std::string_view name, RpUserDataFormat fmt)
@@ -208,18 +208,18 @@ int RWE::RwRaster::GetMipLevels()
 
 void RWE::RpGeometry::AddRef()
 {
-    RWE::RpGeometry*(__cdecl* const f)(RWE::RpGeometry * raster) = reinterpret_cast<RWE::RpGeometry*(__cdecl*)(RWE::RpGeometry*)>(0x62ED80);
+    const auto f = reinterpret_cast<RWE::RpGeometry*(__cdecl*)(RWE::RpGeometry*)>(0x62ED80);
     f(this);
 }
 
 void RWE::RpGeometry::Destroy()
 {
-    bool (__cdecl* const f)(RWE::RpGeometry * raster) = reinterpret_cast<bool (__cdecl*)(RWE::RpGeometry*)>(0x62EE60);
+    const auto f = reinterpret_cast<bool (__cdecl*)(RWE::RpGeometry*)>(0x62EE60);
     f(this);
 }
 void RWE::RpGeometry::ForAllMaterials(RpMaterialCallBack fpCallBack, void* pData)
 {
-    RpGeometry* (__cdecl* const f)(RpGeometry * th, RpMaterialCallBack fpCallBack, void* pData) = reinterpret_cast<RpGeometry * (__cdecl*)(RpGeometry*, RpMaterialCallBack, void*)>(0x62E890);
+    const auto f = reinterpret_cast<RpGeometry * (__cdecl*)(RpGeometry*, RpMaterialCallBack, void*)>(0x62E890);
     f(this, fpCallBack, pData);
 }
 
@@ -245,24 +245,24 @@ void RWE::RpAtomic::AddEmitter(RWE::Particles::RpPrtStdEmitter* em)
 }
 RWE::RpWorld* RWE::RpAtomic::GetWorld() const
 {
-    RWE::RpWorld* (__cdecl* const f)(const RWE::RpAtomic * th) = reinterpret_cast<RWE::RpWorld * (__cdecl*)(const RWE::RpAtomic*)>(0x626DA0);
+    const auto f = reinterpret_cast<RWE::RpWorld * (__cdecl*)(const RWE::RpAtomic*)>(0x626DA0);
     return f(this);
 }
-void RWE::RpAtomic::SetGeometry(RpGeometry* geometry, bool assumeSameBoundingSphere)
+void RWE::RpAtomic::SetGeometry(RpGeometry* geom, bool assumeSameBoundingSphere)
 {
-    RWE::RpAtomic* (__cdecl* const f)(RWE::RpAtomic* th, RpGeometry * g, uint32_t flags) = reinterpret_cast<RWE::RpAtomic * (__cdecl*)(RWE::RpAtomic*, RpGeometry * g, uint32_t flags)>(0x628F10);
-    f(this, geometry, assumeSameBoundingSphere ? 1 : 0);
+    const auto f = reinterpret_cast<RWE::RpAtomic * (__cdecl*)(RWE::RpAtomic*, RpGeometry * g, uint32_t flags)>(0x628F10);
+    f(this, geom, assumeSameBoundingSphere ? 1 : 0);
 }
 
 static inline RWE::RpClump* (__cdecl* const clump_forallatomics)(RWE::RpClump* m, RWE::RpAtomicCallBack, void* data) = reinterpret_cast<RWE::RpClump* (__cdecl*)(RWE::RpClump*, RWE::RpAtomicCallBack, void*)>(0x628E30);
-RWE::RpClump* RWE::RpClump::ForAllAtomics(RpAtomicCallBack callback, void* pData)
+RWE::RpClump* RWE::RpClump::ForAllAtomics(RpAtomicCallBack cb, void* pData)
 {
-    return clump_forallatomics(this, callback, pData);
+    return clump_forallatomics(this, cb, pData);
 }
-RWE::RpClump* RWE::RpClump::ForAllLights(RpLightCallBack callback, void* pData)
+RWE::RpClump* RWE::RpClump::ForAllLights(RpLightCallBack cb, void* pData)
 {
-    RWE::RpClump* (__cdecl* const clump_foralllights)(RWE::RpClump* m, RWE::RpLightCallBack, void* data) = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpLightCallBack, void*)>(0x628EC0);
-    return clump_foralllights(this, callback, pData);
+    const auto clump_foralllights = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpLightCallBack, void*)>(0x628EC0);
+    return clump_foralllights(this, cb, pData);
 }
 static inline RWE::RpWorld* (__cdecl* const clump_getworld)(const RWE::RpClump* c) = reinterpret_cast<RWE::RpWorld* (__cdecl*)(const RWE::RpClump*)>(0x626E00);
 RWE::RpWorld* RWE::RpClump::GetWorld() const
@@ -327,7 +327,7 @@ void RWE::RpClump::RemoveAtomic(RpAtomic* atomic)
 }
 void RWE::RpClump::AddLight(RWE::RpLight* a)
 {
-    RWE::RpClump* (__cdecl* const clump_addLight)(RWE::RpClump * t, RWE::RpLight * a) = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpLight*)>(0x6290F0);
+    const auto clump_addLight = reinterpret_cast<RWE::RpClump * (__cdecl*)(RWE::RpClump*, RWE::RpLight*)>(0x6290F0);
     clump_addLight(this, a);
 }
 
@@ -397,9 +397,9 @@ void RWE::RpLight::Destroy()
     light_destroy(this);
 }
 inline void(__cdecl* const light_setcolor)(RWE::RpLight* l, const RWE::RwRGBAReal* color) = reinterpret_cast<void(__cdecl*)(RWE::RpLight*, const RWE::RwRGBAReal*)>(0x6274C0);
-void RWE::RpLight::SetColor(const RwRGBAReal& color)
+void RWE::RpLight::SetColor(const RwRGBAReal& c)
 {
-    light_setcolor(this, &color);
+    light_setcolor(this, &c);
 }
 inline float(__cdecl* const light_getconeangle)(const RWE::RpLight* l) = reinterpret_cast<float(__cdecl*)(const RWE::RpLight*)>(0x627520);
 float RWE::RpLight::GetConeAngle() const
@@ -408,7 +408,7 @@ float RWE::RpLight::GetConeAngle() const
 }
 void RWE::RpLight::SetFrame(RwFrame* frame)
 {
-    RpLight* (__cdecl* const RpLightSetFrame)(RpLight * light, RwFrame * frame) = reinterpret_cast<RpLight* (__cdecl*)(RpLight*, RwFrame*)>(0x42C290);
+    const auto RpLightSetFrame = reinterpret_cast<RpLight* (__cdecl*)(RpLight*, RwFrame*)>(0x42C290);
     RpLightSetFrame(this, frame);
 }
 RWE::RwFrame* RWE::RpLight::GetFrame() const
@@ -463,22 +463,20 @@ int RWE::RwImage::Destroy()
     return image_destroy(this);
 }
 
-int RWE::RwDevice::SetTextureFilterMode(RwTextureFilterMode m)
+int RWE::RwDevice::SetTextureFilterMode(RwTextureFilterMode m) const
 {
     return fpRenderStateSet(RwRenderState::rwRENDERSTATETEXTUREFILTER, reinterpret_cast<void*>(static_cast<int>(m)));
 }
-int RWE::RwDevice::SetCullMode(RwCullMode m)
+int RWE::RwDevice::SetCullMode(RwCullMode m) const
 {
     return fpRenderStateSet(RwRenderState::rwRENDERSTATECULLMODE, reinterpret_cast<void*>(static_cast<int>(m)));
 }
-RWE::RwCullMode RWE::RwDevice::GetCullMode()
-{
+RWE::RwCullMode RWE::RwDevice::GetCullMode() const {
     RwCullMode m;
     fpRenderStateGet(RwRenderState::rwRENDERSTATECULLMODE, &m);
     return m;
 }
-int RWE::RwDevice::SetTextureRaster(RWE::RwRaster* r)
-{
+int RWE::RwDevice::SetTextureRaster(RWE::RwRaster* r) const {
     return fpRenderStateSet(RwRenderState::rwRENDERSTATETEXTURERASTER, r);
 }
 

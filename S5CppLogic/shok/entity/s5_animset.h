@@ -1,7 +1,5 @@
 #pragma once
-#include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
-#include <shok/player/s5_player.h>
 
 namespace EGL {
 	class CGLEAnimCategory : public BB::IObject {
@@ -33,7 +31,7 @@ namespace EGL {
 		void operator delete(void* p);
 
 		virtual ~CGLEAnimSet() override;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	private:
 		void SetVT();
 	};
@@ -41,7 +39,8 @@ namespace EGL {
 }
 
 namespace GGL {
-	class CGLGoodDependentAnim {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
+	class CGLGoodDependentAnim { // NOLINT(*-pro-type-member-init)
 	public:
 		shok::Goods GoodType;
 		shok::AnimationId Animation;
@@ -49,7 +48,7 @@ namespace GGL {
 		static inline constexpr int vtp = 0x776C64;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB240C758);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const;
 	};
 	static_assert(sizeof(CGLGoodDependentAnim) == 4 * 3);
 	class CGLAnimCategory : public EGL::CGLEAnimCategory {

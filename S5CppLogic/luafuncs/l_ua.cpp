@@ -10,7 +10,6 @@
 #include <shok/entitytype/s5_behaviorProps.h>
 #include <shok/entity/s5_behaviors.h>
 #include <shok/entitytype/s5_entitytype.h>
-#include <shok/player/s5_player.h>
 #include <shok/ui/s5_ui.h>
 #include <utility/entityiterator.h>
 
@@ -75,9 +74,8 @@ namespace CppLogic::UA {
 		L.UnRef(CommandQueue, L.REGISTRYINDEX);
 		L.UnRef(Spawner, L.REGISTRYINDEX);
 	}
-	UnlimitedArmy::UnlimitedArmy(shok::PlayerId p)
+	UnlimitedArmy::UnlimitedArmy(shok::PlayerId p) : Player(p), RNG(std::random_device{}())
 	{
-		Player = p;
 	}
 	void UnlimitedArmy::CalculatePos()
 	{
@@ -107,8 +105,8 @@ namespace CppLogic::UA {
 			LastPos.Y = -1;
 		}
 		else {
-			LastPos.X = x / num;
-			LastPos.Y = y / num;
+			LastPos.X = x / static_cast<float>(num);
+			LastPos.Y = y / static_cast<float>(num);
 		}
 		PosLastUpdatedTick = tick;
 	}
@@ -148,7 +146,7 @@ namespace CppLogic::UA {
 		CalculatePos();
 		CheckTransit();
 		CallSpawner();
-		if (Leaders.size() == 0) {
+		if (Leaders.empty()) {
 			CallCommandQueue();
 			CleanDead();
 			return;
@@ -207,11 +205,12 @@ namespace CppLogic::UA {
 	void UnlimitedArmy::AddLeader(EGL::CGLEEntity* e)
 	{
 		CalculatePos();
-		if (Leaders.size() == 0 || LastPos.IsInRange(e->Position, Area)) {
+		if (Leaders.empty() || LastPos.IsInRange(e->Position, Area)) {
 			Leaders.push_back(e->EntityId);
 			PosLastUpdatedTick = -1;
 			if (Target.X == -1) {
-				Target = e->Position;
+				// ReSharper disable once CppPossiblyUnintendedObjectSlicing
+				Target = e->Position; // NOLINT(*-slicing)
 			}
 			NeedFormat();
 			if (Status == UAStatus::Moving || Status == UAStatus::MovingNoBattle)
@@ -224,26 +223,26 @@ namespace CppLogic::UA {
 	}
 	void UnlimitedArmy::OnIdChanged(shok::EntityId old, shok::EntityId ne)
 	{
-		for (int i = 0; i < static_cast<int>(Leaders.size()); i++) {
-			if (Leaders[i] == old)
-				Leaders[i] = ne;
+		for (auto & l : Leaders) {
+			if (l == old)
+				l = ne;
 		}
-		for (int i = 0; i < static_cast<int>(LeaderInTransit.size()); i++) {
-			if (LeaderInTransit[i] == old)
-				LeaderInTransit[i] = ne;
+		for (auto & i : LeaderInTransit) {
+			if (i == old)
+				i = ne;
 		}
-		for (int i = 0; i < static_cast<int>(DeadHeroes.size()); i++) {
-			if (DeadHeroes[i] == old)
-				DeadHeroes[i] = ne;
+		for (auto & h : DeadHeroes) {
+			if (h == old)
+				h = ne;
 		}
-		for (int i = 0; i < static_cast<int>(Cannons.size()); i++) {
-			if (Cannons[i].EntityId == old)
-				Cannons[i].EntityId = ne;
+		for (auto & c : Cannons) {
+			if (c.EntityId == old)
+				c.EntityId = ne;
 		}
 	}
 	void UnlimitedArmy::CheckTransit()
 	{
-		if (Leaders.size() == 0 && LeaderInTransit.size() > 0) {
+		if (Leaders.empty() && !LeaderInTransit.empty()) {
 			Leaders.push_back(LeaderInTransit[0]);
 			if (EGL::CGLEEntity::GetEntityByID(LeaderInTransit[0])->IsEntityInCategory(shok::EntityCategory::Cannon))
 				Cannons.push_back({ LeaderInTransit[0], -1 });
@@ -265,20 +264,20 @@ namespace CppLogic::UA {
 			});
 		LeaderInTransit.erase(e, LeaderInTransit.end());
 		for (shok::EntityId id : LeaderInTransit) {
-			EGL::CMovingEntity* e = ((EGL::CMovingEntity*)EGL::CGLEEntity::GetEntityByID(id));
-			if (!LeaderIsMoving(e)) {
-				e->Move(LastPos);
+			auto* movingent = static_cast<EGL::CMovingEntity *>(EGL::CGLEEntity::GetEntityByID(id)); // NOLINT(*-pro-type-static-cast-downcast)
+			if (!LeaderIsMoving(movingent)) {
+				movingent->Move(LastPos);
 			}
 		}
 	}
-	int UnlimitedArmy::GetSize(bool transit, bool hero)
+	int UnlimitedArmy::GetSize(bool transit, bool hero) const
 	{
-		int r = Leaders.size();
+		size_t r = Leaders.size();
 		if (transit)
 			r += LeaderInTransit.size();
 		if (hero)
 			r += DeadHeroes.size();
-		return r;
+		return static_cast<int>(r);
 	}
 	EGL::CGLEEntity* UnlimitedArmy::GetNearestTargetInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing)
 	{
@@ -431,20 +430,20 @@ namespace CppLogic::UA {
 			return it.GetNearest(nullptr);
 		}
 	}
-	bool UnlimitedArmy::IsTargetValid(shok::EntityId id)
+	bool UnlimitedArmy::IsTargetValid(shok::EntityId id) const
 	{
 		if (EGL::CGLEEntity::EntityIDIsDead(id))
 			return false;
 		EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
 		if (!LastPos.IsInRange(e->Position, Area))
 			return false;
-		GGL::CCamouflageBehavior* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
+		auto* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (c != nullptr) {
 			return c->InvisibilityRemaining <= 0;
 		}
 		if (!IgnoreFleeing)
 			return true;
-		if (EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e)) {
+		if (auto* m = dynamic_cast<EGL::CMovingEntity*>(e)) {
 			return !m->IsFleeingFrom(LastPos, 500);
 		}
 		return true;
@@ -463,7 +462,7 @@ namespace CppLogic::UA {
 	}
 	bool UnlimitedArmy::LeaderIsIdle(EGL::CGLEEntity* e)
 	{
-		return static_cast<GGL::CSettler*>(e)->IsIdle();
+		return static_cast<GGL::CSettler*>(e)->IsIdle(); // NOLINT(*-pro-type-static-cast-downcast)
 	}
 	bool UnlimitedArmy::LeaderIsInBattle(EGL::CGLEEntity* e)
 	{
@@ -480,7 +479,7 @@ namespace CppLogic::UA {
 	}
 	void UnlimitedArmy::BattleCommand()
 	{
-		shok::Position p = EGL::CGLEEntity::GetEntityByID(CurrentBattleTarget)->Position;
+		shok::Position p = EGL::CGLEEntity::GetEntityByID(CurrentBattleTarget)->Position; // NOLINT(*-slicing)
 		EGL::CGLELandscape* ls = (*EGL::CGLEGameLogic::GlobalObj)->Landscape;
 		if (ls->GetSector(&p) == shok::SectorId::Invalid) {
 			shok::Position pou;
@@ -492,7 +491,7 @@ namespace CppLogic::UA {
 			NormalizeSpeed(false, false);
 		}
 		for (shok::EntityId id : Leaders) {
-			EGL::CMovingEntity* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id));
+			auto* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id)); // NOLINT(*-pro-type-static-cast-downcast)
 			if (e->IsEntityInCategory(shok::EntityCategory::Hero) || IsNonCombat(e)) {
 				if (ExecuteHeroAbility(e))
 					continue;
@@ -508,7 +507,7 @@ namespace CppLogic::UA {
 		}
 		int tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
 		for (UACannonData cd : Cannons) {
-			EGL::CMovingEntity* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(cd.EntityId));
+			auto* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(cd.EntityId)); // NOLINT(*-pro-type-static-cast-downcast)
 			if (ReMove || !LeaderIsInBattle(e) || cd.LastUpdated == -1) {
 				if (cd.LastUpdated < 0 || cd.LastUpdated < tick) {
 					e->AttackEntity(CurrentBattleTarget);
@@ -537,7 +536,7 @@ namespace CppLogic::UA {
 		}
 		if (Status == UAStatus::MovingNoBattle) {
 			for (shok::EntityId id : Leaders) {
-				EGL::CMovingEntity* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id));
+				auto* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id)); // NOLINT(*-pro-type-static-cast-downcast)
 				if (ReMove || !LeaderIsMoving(e)) {
 					e->Move(p);
 				}
@@ -545,7 +544,7 @@ namespace CppLogic::UA {
 		}
 		else {
 			for (shok::EntityId id : Leaders) {
-				EGL::CMovingEntity* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id));
+				auto* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id)); // NOLINT(*-pro-type-static-cast-downcast)
 				if (ReMove || LeaderIsIdle(e)) {
 					e->AttackMove(p);
 				}
@@ -562,7 +561,7 @@ namespace CppLogic::UA {
 		}
 		else if (PrepDefense && IsIdle()) {
 			for (shok::EntityId id : Leaders) {
-				EGL::CMovingEntity* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id));
+				auto* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(id)); // NOLINT(*-pro-type-static-cast-downcast)
 				if ((e->IsEntityInCategory(shok::EntityCategory::Hero) || IsNonCombat(e)) && e->EventLeaderGetCurrentCommand() != shok::LeaderCommand::HeroAbility) {
 					if (ExecutePrepDefense(e)) {
 						UAReset r;
@@ -572,16 +571,15 @@ namespace CppLogic::UA {
 					}
 				}
 			}
-			PrepDefenseReset.erase(std::remove_if(PrepDefenseReset.begin(), PrepDefenseReset.end(), [this](UAReset& r) {
+			PrepDefenseReset.erase(std::remove_if(PrepDefenseReset.begin(), PrepDefenseReset.end(), [](UAReset& r) {
 				if (EGL::CGLEEntity::EntityIDIsDead(r.EntityId))
 					return true;
-				EGL::CMovingEntity* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(r.EntityId));
+				auto* e = static_cast<EGL::CMovingEntity*>(EGL::CGLEEntity::GetEntityByID(r.EntityId)); // NOLINT(*-pro-type-static-cast-downcast)
 				if (e->EventLeaderGetCurrentCommand() != shok::LeaderCommand::HeroAbility) {
-					EGL::CMovingEntity* m = static_cast<EGL::CMovingEntity*>(e);
-					m->Move(r.Pos);
-					m->SetTargetRotation(r.Pos.r);
+					e->Move(r.Pos);
+					e->SetTargetRotation(r.Pos.r);
 					EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, true };
-					m->FireEvent(&ev);
+					e->FireEvent(&ev);
 					return true;
 				}
 				return false;
@@ -607,7 +605,7 @@ namespace CppLogic::UA {
 			return true;
 		if (Status != UAStatus::Idle)
 			return false;
-		if (LeaderInTransit.size() > 0)
+		if (!LeaderInTransit.empty())
 			return false;
 		CalculatePos();
 		if (!LastPos.IsInRange(Target, 1000))
@@ -686,8 +684,8 @@ namespace CppLogic::UA {
 				float s = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>()->GetMovementSpeed();
 				ev.Data = lowest / s;
 				e->FireEvent(&ev);
-				for (const auto& s : e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER)) {
-					EGL::CGLEEntity* es = EGL::CGLEEntity::GetEntityByID(s.second.EntityId);
+				for (const auto& attach : e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER)) {
+					EGL::CGLEEntity* es = EGL::CGLEEntity::GetEntityByID(attach.second.EntityId);
 					if (es && !es->IsDead())
 						es->FireEvent(&ev);
 				}
@@ -711,41 +709,41 @@ namespace CppLogic::UA {
 	{
 		// first instant abilities
 		{
-			GGL::CRangedEffectAbility* a = e->GetBehavior<GGL::CRangedEffectAbility>();
+			auto* a = e->GetBehavior<GGL::CRangedEffectAbility>();
 			if (a != nullptr) {
-				GGL::CRangedEffectAbilityProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					float r = 1000;
 					if (p->AffectsLongRangeOnly)
 						r = 3000;
 					if (p->IsAggressive()) {
-						if (!static_cast<GGL::CSettler*>(e)->IsMoving() && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 10) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityRangedEffect();
+						if (!static_cast<GGL::CSettler*>(e)->IsMoving() && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 10) { // NOLINT(*-pro-type-static-cast-downcast)
+							static_cast<GGL::CSettler*>(e)->HeroAbilityRangedEffect(); // NOLINT(*-pro-type-static-cast-downcast)
 						}
 					}
 					else if (p->IsDefensive()) {
 						if (CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 10) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityRangedEffect();
+							static_cast<GGL::CSettler*>(e)->HeroAbilityRangedEffect(); // NOLINT(*-pro-type-static-cast-downcast)
 						}
 					}
 					else if (p->IsHeal()) {
 						if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, r, IgnoreFleeing) >= 2) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityRangedEffect();
+							static_cast<GGL::CSettler*>(e)->HeroAbilityRangedEffect(); // NOLINT(*-pro-type-static-cast-downcast)
 						}
 					}
 				}
 			}
 		}
 		{
-			GGL::CSummonBehavior* a = e->GetBehavior<GGL::CSummonBehavior>();
+			auto* a = e->GetBehavior<GGL::CSummonBehavior>();
 			if (a != nullptr) {
-				GGL::CSummonBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CSummonBehaviorProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CSummonBehaviorProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 10) {
-						static_cast<GGL::CSettler*>(e)->HeroAbilitySummon();
-						for (const auto& a : e->ObservedEntities) {
-							if (a.first == shok::AttachmentType::SUMMONER_SUMMONED)
-								AddLeader(EGL::CGLEEntity::GetEntityByID(a.second.EntityId));
+						static_cast<GGL::CSettler*>(e)->HeroAbilitySummon(); // NOLINT(*-pro-type-static-cast-downcast)
+						for (const auto& attach : e->ObservedEntities) {
+							if (attach.first == shok::AttachmentType::SUMMONER_SUMMONED)
+								AddLeader(EGL::CGLEEntity::GetEntityByID(attach.second.EntityId));
 						}
 					}
 				}
@@ -754,44 +752,44 @@ namespace CppLogic::UA {
 
 		// then noninstant
 		{
-			GGL::CCircularAttack* a = e->GetBehavior<GGL::CCircularAttack>();
+			auto* a = e->GetBehavior<GGL::CCircularAttack>();
 			if (a != nullptr) {
-				GGL::CCircularAttackProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CCircularAttackProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CCircularAttackProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
-						static_cast<GGL::CSettler*>(e)->HeroAbilityCircularAttack();
+						static_cast<GGL::CSettler*>(e)->HeroAbilityCircularAttack(); // NOLINT(*-pro-type-static-cast-downcast)
 						return true;
 					}
 				}
 			}
 		}
 		{
-			GGL::CBombPlacerBehavior* a = e->GetBehavior<GGL::CBombPlacerBehavior>();
+			auto* a = e->GetBehavior<GGL::CBombPlacerBehavior>();
 			if (a != nullptr) {
-				GGL::CHeroAbilityProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CHeroAbilityProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CHeroAbilityProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (CountTargetsInArea(Player, e->Position, 500, IgnoreFleeing) >= 10) {
-						static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceBomb(e->Position);
+						static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceBomb(e->Position); // NOLINT(*-pro-type-static-cast-downcast)
 						return true;
 					}
 				}
 			}
 		}
 		{
-			GGL::CCannonBuilderBehavior* a = e->GetBehavior<GGL::CCannonBuilderBehavior>();
+			auto* a = e->GetBehavior<GGL::CCannonBuilderBehavior>();
 			if (a != nullptr) {
-				GGL::CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CCannonBuilderBehaviorProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CCannonBuilderBehaviorProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					shok::EntityTypeId ety = e->EntityType;
 					auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
 					if (d != CannonBuilderAbilityData.end() && CountTargetsInArea(Player, e->Position, 2000, IgnoreFleeing) >= 10) {
-						shok::Position p = e->Position;
-						p.X += distr(RNG) * 100;
-						p.Y += distr(RNG) * 100;
+						shok::Position pos = e->Position; // NOLINT(*-slicing)
+						pos.X += static_cast<float>(distr(RNG) * 100);
+						pos.Y += static_cast<float>(distr(RNG) * 100);
 						shok::Position out;
-						p.FloorToBuildingPlacement();
-						if (GGUI::CManager::GlobalObj()->GUIInterface->GetNearestFreePosForBuildingPlacement(d->BottomType, p, out)) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(out, d->BottomType, d->TopType);
+						pos.FloorToBuildingPlacement();
+						if (GGUI::CManager::GlobalObj()->GUIInterface->GetNearestFreePosForBuildingPlacement(d->BottomType, pos, out)) {
+							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(out, d->BottomType, d->TopType); // NOLINT(*-pro-type-static-cast-downcast)
 							return true;
 						}
 					}
@@ -799,14 +797,14 @@ namespace CppLogic::UA {
 			}
 		}
 		{
-			GGL::CShurikenAbility* a = e->GetBehavior<GGL::CShurikenAbility>();
+			auto* a = e->GetBehavior<GGL::CShurikenAbility>();
 			if (a != nullptr) {
-				GGL::CShurikenAbilityProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (CountTargetsInArea(Player, e->Position, p->Range, IgnoreFleeing) >= 10) {
 						EGL::CGLEEntity* tar = GetNearestSettlerInArea(Player, e->Position, p->Range, IgnoreFleeing);
 						if (tar != nullptr) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityShuriken(tar->EntityId);
+							static_cast<GGL::CSettler*>(e)->HeroAbilityShuriken(tar->EntityId); // NOLINT(*-pro-type-static-cast-downcast)
 							return true;
 						}
 					}
@@ -814,14 +812,14 @@ namespace CppLogic::UA {
 			}
 		}
 		{
-			GGL::CConvertSettlerAbility* a = e->GetBehavior<GGL::CConvertSettlerAbility>();
+			auto* a = e->GetBehavior<GGL::CConvertSettlerAbility>();
 			if (a != nullptr) {
-				GGL::CConvertSettlerAbilityProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CConvertSettlerAbilityProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CConvertSettlerAbilityProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (CountTargetsInArea(Player, e->Position, p->ConversionMaxRange, IgnoreFleeing) >= 10) {
 						EGL::CGLEEntity* tar = GetFurthestConversionTargetInArea(Player, e->Position, p->ConversionStartRange, IgnoreFleeing);
 						if (tar != nullptr) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityConvert(tar->EntityId);
+							static_cast<GGL::CSettler*>(e)->HeroAbilityConvert(tar->EntityId); // NOLINT(*-pro-type-static-cast-downcast)
 							UpdateTargetCache(tar->EntityId, 600);
 							return true;
 						}
@@ -830,13 +828,13 @@ namespace CppLogic::UA {
 			}
 		}
 		{
-			GGL::CSniperAbility* a = e->GetBehavior<GGL::CSniperAbility>();
+			auto* a = e->GetBehavior<GGL::CSniperAbility>();
 			if (a != nullptr) {
-				GGL::CSniperAbilityProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					EGL::CGLEEntity* tar = GetNearestSnipeTargetInArea(Player, e->Position, p->Range, IgnoreFleeing);
 					if (tar != nullptr) {
-						static_cast<GGL::CSettler*>(e)->HeroAbilitySnipe(tar->EntityId);
+						static_cast<GGL::CSettler*>(e)->HeroAbilitySnipe(tar->EntityId); // NOLINT(*-pro-type-static-cast-downcast)
 						UpdateTargetCache(tar->EntityId, 600);
 						return true;
 					}
@@ -844,27 +842,27 @@ namespace CppLogic::UA {
 			}
 		}
 		{
-			GGL::CInflictFearAbility* a = e->GetBehavior<GGL::CInflictFearAbility>();
+			auto* a = e->GetBehavior<GGL::CInflictFearAbility>();
 			if (a != nullptr) {
-				GGL::CInflictFearAbilityProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CInflictFearAbilityProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CInflictFearAbilityProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (CountTargetsInArea(Player, e->Position, p->Range / 2, IgnoreFleeing) >= 10) {
-						static_cast<GGL::CSettler*>(e)->HeroAbilityInflictFear();
+						static_cast<GGL::CSettler*>(e)->HeroAbilityInflictFear(); // NOLINT(*-pro-type-static-cast-downcast)
 						return true;
 					}
 				}
 			}
 		}
 		{
-			GGL::CKegPlacerBehavior* a = e->GetBehavior<GGL::CKegPlacerBehavior>();
+			auto* a = e->GetBehavior<GGL::CKegPlacerBehavior>();
 			if (a != nullptr) {
-				GGL::CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetBehaviorProps<GGL::CKegPlacerBehaviorProperties>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CKegPlacerBehaviorProperties>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					EGL::CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, Area);
 					if (tar == nullptr && SabotageBridges)
 						tar = GetNearestBridgeInArea(e->Position, 6000);
 					if (tar != nullptr) {
-						static_cast<GGL::CSettler*>(e)->ThiefSabotage(tar->EntityId);
+						static_cast<GGL::CSettler*>(e)->ThiefSabotage(tar->EntityId); // NOLINT(*-pro-type-static-cast-downcast)
 						UpdateTargetCache(tar->EntityId, 500);
 						return true;
 					}
@@ -872,12 +870,12 @@ namespace CppLogic::UA {
 			}
 		}
 		if (GGL::CCamouflageBehavior::CamoActivateCb) { // if camo fix is active, use camo to get rid of attackers
-			GGL::CCamouflageBehavior* a = e->GetBehavior<GGL::CCamouflageBehavior>();
+			auto* a = e->GetBehavior<GGL::CCamouflageBehavior>();
 			if (a != nullptr) {
-				GGL::CCamouflageBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CCamouflageBehaviorProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					if (e->Health <= e->GetMaxHealth() / 2 && CountTargetsInArea(Player, e->Position, Area, IgnoreFleeing) >= 5) {
-						static_cast<GGL::CSettler*>(e)->HeroAbilityActivateCamoflage();
+						static_cast<GGL::CSettler*>(e)->HeroAbilityActivateCamoflage(); // NOLINT(*-pro-type-static-cast-downcast)
 						return true;
 					}
 				}
@@ -889,20 +887,20 @@ namespace CppLogic::UA {
 	bool UnlimitedArmy::ExecutePrepDefense(EGL::CGLEEntity* e)
 	{
 		{
-			GGL::CCannonBuilderBehavior* a = e->GetBehavior<GGL::CCannonBuilderBehavior>();
+			auto* a = e->GetBehavior<GGL::CCannonBuilderBehavior>();
 			if (a != nullptr) {
-				GGL::CCannonBuilderBehaviorProps* p = e->GetEntityType()->GetBehaviorProps<GGL::CCannonBuilderBehaviorProps>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CCannonBuilderBehaviorProps>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					shok::EntityTypeId ety = e->EntityType;
 					auto d = std::find_if(CannonBuilderAbilityData.begin(), CannonBuilderAbilityData.end(), [ety](UACannonBuilderAbilityData& d) {return d.HeroType == ety; });
 					if (d != CannonBuilderAbilityData.end()) {
-						shok::Position p = e->Position;
-						p.X += distr(RNG) * 100;
-						p.Y += distr(RNG) * 100;
+						shok::Position pos = e->Position; // NOLINT(*-slicing)
+						pos.X += static_cast<float>(distr(RNG) * 100);
+						pos.Y += static_cast<float>(distr(RNG) * 100);
 						shok::Position out;
-						p.FloorToBuildingPlacement();
-						if (GGUI::CManager::GlobalObj()->GUIInterface->GetNearestFreePosForBuildingPlacement(d->BottomType, p, out)) {
-							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(out, d->BottomType, d->TopType);
+						pos.FloorToBuildingPlacement();
+						if (GGUI::CManager::GlobalObj()->GUIInterface->GetNearestFreePosForBuildingPlacement(d->BottomType, pos, out)) {
+							static_cast<GGL::CSettler*>(e)->HeroAbilityPlaceCannon(out, d->BottomType, d->TopType); // NOLINT(*-pro-type-static-cast-downcast)
 							return true;
 						}
 					}
@@ -910,15 +908,15 @@ namespace CppLogic::UA {
 			}
 		}
 		{
-			GGL::CKegPlacerBehavior* a = e->GetBehavior<GGL::CKegPlacerBehavior>();
+			auto* a = e->GetBehavior<GGL::CKegPlacerBehavior>();
 			if (a != nullptr) {
-				GGL::CKegPlacerBehaviorProperties* p = e->GetEntityType()->GetBehaviorProps<GGL::CKegPlacerBehaviorProperties>();
+				auto* p = e->GetEntityType()->GetBehaviorProps<GGL::CKegPlacerBehaviorProperties>();
 				if (a->SecondsCharged >= p->RechargeTimeSeconds) {
 					EGL::CGLEEntity* tar = GetNearestBuildingInArea(Player, e->Position, Area);
 					if (tar == nullptr && SabotageBridges)
 						tar = GetNearestBridgeInArea(e->Position, Area);
 					if (tar != nullptr) {
-						static_cast<GGL::CSettler*>(e)->ThiefSabotage(tar->EntityId);
+						static_cast<GGL::CSettler*>(e)->ThiefSabotage(tar->EntityId); // NOLINT(*-pro-type-static-cast-downcast)
 						UpdateTargetCache(tar->EntityId, 500);
 						return true;
 					}
@@ -954,28 +952,28 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::AddLeader(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->AddLeader(luaext::EState{ L }.CheckSettler(2));
 		return 0;
 	}
 
 	int UnlimitedArmy::GetPos(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->CalculatePos();
 		luaext::EState{ L }.PushPos(a->LastPos);
 		return 1;
 	}
 	int UnlimitedArmy::Tick(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Tick();
 		return 0;
 	}
 
 	int UA_Iterate_Next(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = L.CheckInt(2);
 		i++;
 		if (i >= static_cast<int>(a->Leaders.size())) {
@@ -990,7 +988,7 @@ namespace CppLogic::UA {
 	}
 	int UnlimitedArmy::Iterate(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push<UA_Iterate_Next>();
 		L.PushValue(1);
 		L.Push(-1);
@@ -999,7 +997,7 @@ namespace CppLogic::UA {
 
 	int UA_IterateTransit_Next(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = L.CheckInt(2);
 		i++;
 		if (i >= static_cast<int>(a->LeaderInTransit.size())) {
@@ -1014,7 +1012,7 @@ namespace CppLogic::UA {
 	}
 	int UnlimitedArmy::IterateTransit(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push<UA_IterateTransit_Next>();
 		L.PushValue(1);
 		L.Push(-1);
@@ -1023,7 +1021,7 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::OnIdChanged(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int old = L.CheckInt(2);
 		int ne = L.CheckInt(3);
 		a->OnIdChanged(static_cast<shok::EntityId>(old), static_cast<shok::EntityId>(ne));
@@ -1032,7 +1030,7 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::GetSize(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = a->GetSize(L.ToBoolean(2), L.ToBoolean(3));
 		L.Push(i);
 		return 1;
@@ -1040,33 +1038,33 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::RemoveLeader(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->RemoveLeader(luaext::EState{ L }.CheckEntity(2));
 		return 0;
 	}
 
 	int UnlimitedArmy::IsIdle(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push(a->IsIdle());
 		return 1;
 	}
 	int UnlimitedArmy::GetStatus(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push(static_cast<int>(a->Status));
 		return 1;
 	}
 
 	int UnlimitedArmy::SetArea(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Area = L.CheckFloat(2);
 		return 0;
 	}
 	int UnlimitedArmy::SetTarget(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Target = luaext::EState{ L }.CheckPos(2);
 		return 0;
 	}
@@ -1074,7 +1072,7 @@ namespace CppLogic::UA {
 	int UnlimitedArmy::DumpTable(lua::State Ls)
 	{
 		luaext::EState L{ Ls };
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 
 		L.Push(typename_details::type_name<UnlimitedArmy>());
 
@@ -1094,7 +1092,7 @@ namespace CppLogic::UA {
 	}
 	int UnlimitedArmy::ReadTable(lua::State L)
 	{
-		UnlimitedArmy* a = L.NewUserClass<UnlimitedArmy>(shok::PlayerId::P0); // player gets deserialized later
+		auto* a = L.NewUserClass<UnlimitedArmy>(shok::PlayerId::P0); // player gets deserialized later
 
 		L.PushValue(1);
 		CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, a, UnlimitedArmy::SerializationData);
@@ -1116,26 +1114,26 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::SetStatus(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Status = static_cast<UAStatus>(L.CheckInt(2));
 		return 0;
 	}
 	int UnlimitedArmy::SetReMove(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->ReMove = L.ToBoolean(2);
 		return 0;
 	}
 	int UnlimitedArmy::SetCurrentBattleTarget(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->CurrentBattleTarget = luaext::EState{ L }.CheckEntity(2)->EntityId;
 		return 0;
 	}
 
 	int UnlimitedArmy::GetRangedMelee(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.NewTable();
 		L.NewTable();
 		L.NewTable();
@@ -1161,21 +1159,21 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::SetIgnoreFleeing(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->IgnoreFleeing = L.OptBool(2, false);
 		return 0;
 	}
 	int UnlimitedArmy::SetAutoRotateFormation(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->AutoRotateFormation = L.CheckFloat(2);
 		return 0;
 	}
 
 	int UnlimitedArmy::GetFirstDeadHero(lua::State ls) {
 		luaext::EState L{ ls };
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
-		if (a->DeadHeroes.size() > 0)
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
+		if (!a->DeadHeroes.empty())
 			L.Push(a->DeadHeroes[0]);
 		else
 			L.Push();
@@ -1184,19 +1182,19 @@ namespace CppLogic::UA {
 
 	int UnlimitedArmy::SetPrepDefense(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->PrepDefense = L.OptBool(2, false);
 		return 0;
 	}
 	int UnlimitedArmy::SetSabotageBridges(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->SabotageBridges = L.OptBool(2, false);
 		return 0;
 	}
 	int CppLogic::UA::UnlimitedArmy::SetDoNotNormalizeSpeed(lua::State L)
 	{
-		UnlimitedArmy* a = L.CheckUserClass<UnlimitedArmy>(1);
+		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->DoNotNormalizeSpeed = L.OptBool(2, false);
 		a->NormalizeSpeed(a->Status == UAStatus::Moving || a->Status == UAStatus::MovingNoBattle, true);
 		return 0;
@@ -1208,7 +1206,7 @@ namespace CppLogic::UA {
 		L.CheckType(2, lua::LType::Function);
 		L.CheckType(3, lua::LType::Function);
 		L.CheckType(4, lua::LType::Function);
-		UnlimitedArmy* a = L.NewUserClass<UnlimitedArmy>(pl);
+		auto* a = L.NewUserClass<UnlimitedArmy>(pl);
 		a->L = L;
 		L.PushValue(2);
 		a->Formation = L.Ref(L.REGISTRYINDEX);

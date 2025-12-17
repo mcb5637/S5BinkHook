@@ -22,9 +22,9 @@ namespace ED {
 	};
 
 	class CEffectParticleSystem;
-	class CParticleEffectAttachmentBehavior : public ED::IBehavior {
+	class CParticleEffectAttachmentBehavior : public ED::IBehavior { // NOLINT(*-pro-type-member-init)
 	public:
-		struct SAttach {
+		struct SAttach { // NOLINT(*-pro-type-member-init)
 			shok::ModelId Model;
 			int FrameId; // hardcoded 500 to 502
 			PADDING(1); // bool?
@@ -45,7 +45,7 @@ namespace ED {
 	static_assert(offsetof(CParticleEffectAttachmentBehavior, EntityDisplay) == 13 * 4);
 	static_assert(sizeof(CParticleEffectAttachmentBehavior) == 15 * 4);
 
-	class CParticleEffectSwitchBehavior : public ED::IBehavior {
+	class CParticleEffectSwitchBehavior : public ED::IBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		unsigned int PrevOnOffBits;
 		ED::CEntity* EntityDisplay = nullptr; // 2
@@ -72,7 +72,7 @@ namespace ED {
 	};
 
 	class CDisplayStaticEntity;
-	class CDisplayBehaviorMovement : public ED::IBehavior {
+	class CDisplayBehaviorMovement : public ED::IBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		ED::CDisplayStaticEntity* Entity;
 		EGL::TSlot<EGL::SSlotArgsMovingEntity, 1383452519>* Slot;
@@ -83,7 +83,7 @@ namespace ED {
 	};
 	static_assert(offsetof(CDisplayBehaviorMovement, Entity) == 4 * 1);
 
-	class CDisplayBehaviorBuildingAnimation : public ED::IBehavior {
+	class CDisplayBehaviorBuildingAnimation : public ED::IBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		ED::CEntity* EntityDisplay = nullptr;
 		EGL::CBehaviorAnimation::CSlotAnimation* Slot;
@@ -96,7 +96,7 @@ namespace ED {
 	static_assert(offsetof(CDisplayBehaviorBuildingAnimation, Slot) == 2 * 4);
 
 	class CDisplayStaticWithHierarchy;
-	class CDisplayBehaviorAnimationNoBlending : public ED::IBehavior { // size 9
+	class CDisplayBehaviorAnimationNoBlending : public ED::IBehavior { // size 9 // NOLINT(*-pro-type-member-init)
 	public:
 		ED::CDisplayStaticWithHierarchy* EntityDisplay = nullptr;
 		EGL::TSlot<EGL::SSlotArgsAnimation, 796165920>* Slot = nullptr; // 2
@@ -114,7 +114,7 @@ namespace ED {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1304C08D);
 	};
 
-	class CDisplayBehaviorAnimation : public CDisplayBehaviorAnimationNoBlending { // size 15
+	class CDisplayBehaviorAnimation : public CDisplayBehaviorAnimationNoBlending { // size 15 // NOLINT(*-pro-type-member-init)
 	public:
 		RWE::Anim::RpHAnimHierarchy* AnimHandlerData2; // 9
 
@@ -142,7 +142,7 @@ namespace ED {
 		PADDINGI(1); // unk p
 		PADDINGI(1); // -1, color? // 14
 
-		struct SelectionData {
+		struct SelectionData { // NOLINT(*-pro-type-member-init)
 			shok::Position Pos;
 			float Radius;
 			shok::SelectionTextureId Texture;
@@ -218,7 +218,7 @@ namespace ED {
 
 		void ResetPositionData();
 
-		ED::ModelData* GetModelData();
+		[[nodiscard]] ED::ModelData* GetModelData() const;
 
 		static inline constexpr int vtp = 0x76A494;
 		static inline constexpr int TypeDesc = 0x8099C0;
@@ -226,7 +226,7 @@ namespace ED {
 	};
 	static_assert(sizeof(ED::CEntity) == 4 * 15);
 
-	class CDisplayStaticEntity : public ED::CEntity {
+	class CDisplayStaticEntity : public ED::CEntity { // NOLINT(*-pro-type-member-init)
 	public:
 		ED::CTerrainDecalBase* TerrainDecal; // 15 (maybe only aligned)
 		PADDINGI(1); // 0
@@ -237,7 +237,7 @@ namespace ED {
 	};
 	static_assert(sizeof(CDisplayStaticEntity) == 4 * 17);
 
-	class CDisplayStaticWithHierarchy : public CDisplayStaticEntity {
+	class CDisplayStaticWithHierarchy : public CDisplayStaticEntity { // NOLINT(*-pro-type-member-init)
 	public:
 		RWE::Anim::RpHAnimHierarchy* Handler; // 17
 
@@ -251,7 +251,7 @@ namespace ED {
 namespace GD {
 	class CLimitedAttachmentBannerBehaviorProps : public ED::CBehaviorProps { // residence
 	public:
-		int Banner, Node;
+		int Banner = 0, Node = 0;
 
 		static inline constexpr int vtp = 0x76AB1C;
 		static inline constexpr int TypeDesc = 0x80AC30;
@@ -260,8 +260,8 @@ namespace GD {
 
 	class CCamouflageBehaviorProps : public ED::CBehaviorProps {
 	public:
-		shok::ModelId CamouflageModelID; //4
-		int CamouflageAlpha;
+		shok::ModelId CamouflageModelID{}; //4
+		int CamouflageAlpha = 0; // not initialized by ctor
 
 		static inline constexpr int vtp = 0x76AEA0;
 		static inline constexpr int TypeDesc = 0x80B048;
@@ -270,8 +270,8 @@ namespace GD {
 
 	class CBuildingBehaviorProps : public ED::CBehaviorProps {
 	public:
-		shok::BuildingBannerGroupId Banner;
-		int NumDamageEffects, NumDestroyEffects;
+		shok::BuildingBannerGroupId Banner{};
+		int NumDamageEffects = 0, NumDestroyEffects = 0;
 
 		static inline constexpr int vtp = 0x76AF1C;
 		static inline constexpr int TypeDesc = 0x80B1C0;
@@ -280,7 +280,7 @@ namespace GD {
 
 	class CWaterfallAnimationBehaviorProps : public ED::CBehaviorProps { // seems to be unused
 	public:
-		int Layer01Speed, Layer02Speed, Layer03Speed;
+		int Layer01Speed = 1000, Layer02Speed = 1000, Layer03Speed = 1000;
 
 		static inline constexpr int vtp = 0x7AEA34;
 		static inline constexpr int TypeDesc = 0x84D320;
@@ -290,7 +290,7 @@ namespace GD {
 
 
 
-	class CAlphaBlendingBehavior : public ED::IBehavior {
+	class CAlphaBlendingBehavior : public ED::IBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		ED::CEntity* EntityDisplay = nullptr; // 1
 		EGL::TSlot<GGL::SSlotArgsAlphaBlending, 765384995>* Slot;
@@ -309,7 +309,7 @@ namespace GD {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1DE7EFFD);
 	};
 
-	class CCamouflageBehavior : public ED::IBehavior {
+	class CCamouflageBehavior : public ED::IBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		ED::CEntity* EntityDisplay = nullptr;
 		ED::CBehaviorProps* Props = nullptr;
@@ -323,7 +323,7 @@ namespace GD {
 	};
 	static_assert(sizeof(CCamouflageBehavior) == 5 * 4);
 
-	class CBuildingBehavior : public ED::IBehavior { // size 28
+	class CBuildingBehavior : public ED::IBehavior { // size 28 // NOLINT(*-pro-type-member-init)
 	public:
 		ED::CEntity* EntityDisplay = nullptr;
 		GD::CBuildingBehaviorProps* Props;
@@ -353,6 +353,7 @@ namespace GD {
 
 
 namespace ED {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IVisibleEntityManager {
 	public:
 		virtual void Destroy() = 0;
@@ -369,7 +370,8 @@ namespace ED {
 
 	// creates ED::CEntity objects as the corresponding entity appears on screen, and deletes them when they go off screen.
 	// (a entity hidden by FoW counts as offscreen in this case).
-	class CVisibleEntityManager : public IVisibleEntityManager {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
+	class CVisibleEntityManager : public IVisibleEntityManager { // NOLINT(*-pro-type-member-init)
 	public:
 		PADDINGI(1); // p EGL::CGLEEntitiesDisplay
 		PADDINGI(1); // p to ?

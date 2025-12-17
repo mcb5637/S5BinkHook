@@ -19,6 +19,8 @@ float shok::Technology::Modifier::ModifyValue(float i) const
 	case '/':
 		i /= Value;
 		break;
+	default:
+		break;
 	}
     return i;
 }
@@ -61,8 +63,8 @@ void shok::TechManager::LoadTech(shok::TechnologyId i)
 		auto v = Techs.SaveVector();
 		v.Vector.push_back(nullptr);
 	}
-	Technology* t = new Technology{};
-	std::string filename = "Data\\Config\\Technologies\\";
+	auto* t = new Technology{};
+	std::string filename = R"(Data\Config\Technologies\)";
 	filename.append((*BB::CIDManagerEx::TechnologiesManager)->GetNameByID(id + 1));
 	filename.append(".xml");
 	(*BB::CClassFactory::GlobalObj)->LoadObject(t, filename.c_str(), t->SerializationData);
@@ -106,6 +108,8 @@ float shok::AdditionalTechModifier::ModifyValue(float i) const
 		break;
 	case '/':
 		i /= Value;
+		break;
+	default:
 		break;
 	}
 	return i;

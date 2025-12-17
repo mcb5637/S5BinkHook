@@ -9,8 +9,8 @@ namespace EVid {
 
 		static constexpr int vtp = 0x788650;
 
-		void* RenderObject;
-		int SizeX, SizeY;
+		void* RenderObject = nullptr;
+		int SizeX = 0, SizeY = 0;
 		PADDINGI(1);
 
 	};
@@ -44,10 +44,10 @@ namespace EVid {
 		static constexpr int vtp = 0x7885BC;
 
 
-		BB::CIDManagerEx* IdManager;
+		BB::CIDManagerEx* IdManager = nullptr;
 		shok::Vector<int> Buffer; // what exactly is in here?
-		int CurrentPlaying; // 6
-		CVideoTextureRW* Texture;
+		int CurrentPlaying = 0; // 6
+		CVideoTextureRW* Texture = nullptr;
 	};
 	static_assert(offsetof(CVideoCollectionRW, CurrentPlaying) == 6 * 4);
 	static_assert(sizeof(CVideoCollectionRW) == 8*4);

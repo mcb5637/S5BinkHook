@@ -8,6 +8,11 @@ void EGL::CGLEEntityProps::InitializeBlocking() {
 }
 
 static inline float(__thiscall* const modeprops_mod)(EGL::CGLEEntityProps::ModifyEntityProps* th, int p, float i) = reinterpret_cast<float(__thiscall*)(EGL::CGLEEntityProps::ModifyEntityProps*, int, float)>(0x4C797D);
+
+shok::ClassId __stdcall EGL::CGLEModelSet::GetClassIdentifier() const {
+	return Identifier;
+}
+
 float EGL::CGLEEntityProps::ModifyEntityProps::ModifyValue(int player, float initial) {
 	return modeprops_mod(this, player, initial);
 }

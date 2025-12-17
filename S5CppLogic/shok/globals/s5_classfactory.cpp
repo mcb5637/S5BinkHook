@@ -3,7 +3,6 @@
 #include "s5_classfactory.h"
 #include <shok/globals/s5_filesystem.h>
 #include <shok/entity/s5_entity.h>
-#include <shok/globals/s5_idmanager.h>
 #include <shok/globals/s5_mapdisplay.h>
 #include <shok/ui/s5_widget.h>
 #include <shok/entitytype/s5_behaviorProps.h>
@@ -41,9 +40,7 @@ void BB::CXmlSerializer::Serialize(const char* filename, BB::IObject* ob)
 {
 	BB::CFileStreamEx filestr{};
 	if (filestr.OpenFile(filename, BB::CFileStreamEx::Flags::DefaultWrite)) {
-		auto s = BB::CXmlSerializer::CreateUnique();
-
-		s->Serialize(&filestr, ob);
+		Serialize(&filestr, ob);
 
 		filestr.Close();
 	}
@@ -223,6 +220,8 @@ BB::FieldSerializer::ExtendedInfo InfoLowResTerrainNode{ "EGL::CGLETerrainLowRes
 BB::FieldSerializer::ExtendedInfo InfoHiResTerrainNode{ "EGL::CGLETerrainHiRes::TerrainNode (no binary)", &PushUnknownValue, &CheckUnknownValue };
 BB::FieldSerializer::ExtendedInfo InfoIntVector{ "shok::Vector<int>", &PushUnknownValue, &CheckUnknownValue };
 BB::FieldSerializer::ExtendedInfo InfoFloatRad{ "float (rad serialized as deg)", &PushFloat, &CheckFloat };
+
+CppLogic::StringSerializer CppLogic::StringSerializer::GlobalObj{};
 
 const std::map<int, const BB::FieldSerializer::ExtendedInfo*> KnownSerializers{ {
 	{0x810C58, &InfoBool},
@@ -648,7 +647,7 @@ const char* BB::SerializationListOptions::Context::GetAttribute(const char* a) c
 
 std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::SerializationListOptions::Iter* i)> BB::SerializationListOptions::UniqueIter(void* list) const
 {
-	return std::unique_ptr<Iter, void(__stdcall*)(BB::SerializationListOptions::Iter * i)>(AllocIter(list), FreeIter);
+	return {AllocIter(list), FreeIter};
 }
 
 template<class T>
@@ -657,17 +656,17 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEVec() {
 		BB::SerializationListOptions::ExtendedInfo::Ty::Vector,
 		typename_details::type_name<shok::Vector<T>>(),
 		[](void* List, size_t index) -> void* {
-			auto* v = reinterpret_cast<shok::Vector<T>*>(List);
+			auto* v = static_cast<shok::Vector<T>*>(List);
 			T* r = nullptr;
-			if (index >= 0 && index < v->size())
+			if (index < v->size())
 				r = &(*v)[index];
 			return r;
 		},
 		[](void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
-			auto* v = reinterpret_cast<shok::Vector<T>*>(List);
+			auto* v = static_cast<shok::Vector<T>*>(List);
 			auto sv = v->SaveVector();
-			auto e = std::remove_if(sv.Vector.begin(), sv.Vector.end(), [&](T& v) {
-				return cond(uv, sd, &v);
+			auto e = std::remove_if(sv.Vector.begin(), sv.Vector.end(), [&](T& val) {
+				return cond(uv, sd, &val);
 			});
 			sv.Vector.erase(e, sv.Vector.end());
 		},
@@ -705,7 +704,7 @@ BB::SerializationListOptions::ExtendedInfo LOE_VecPosR = MakeLOEVec<shok::Positi
 BB::SerializationListOptions::ExtendedInfo LOE_VecTradeResData = MakeLOEVec<GGL::CTradeManager::ResData>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecWorkModifier = MakeLOEVec<GGL::CServiceBuildingBehaviorProperties::WorkModifier>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecSerfExtract = MakeLOEVec<GGL::CSerfBehaviorProps::ExtractionInfoData>();
-BB::SerializationListOptions::ExtendedInfo LOE_VecRefinerEff = MakeLOEVec<GGL::CResourceRefinerBehaviorProperties::EfficencyUpgrade>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecRefinerEff = MakeLOEVec<GGL::CResourceRefinerBehaviorProperties::EfficiencyUpgrade>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecResDepBuilding = MakeLOEVec<GGL::CResourceDependentBuildingBehaviorProperties::TypeData>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecLimitedAttachment = MakeLOEVec<GGL::CLimitedAttachmentBehaviorProperties::LimitedAttachmentProps>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecIdleAnim = MakeLOEVec<GGL::CFormationBehaviorProperties::IdleAnimProps>();
@@ -931,7 +930,7 @@ int __stdcall CppLogic::StringSerializer::SerializeToStringImp(char* buff, size_
 {
 	const auto* d = static_cast<const std::string*>(data);
 	std::memcpy(buff, d->c_str(), std::min(s, d->size()));
-	return d->size();
+	return static_cast<int>(d->size());
 }
 
 void __stdcall CppLogic::StringSerializer::DeserializeFromStreamImp(void* data, BB::IStream* str)
@@ -939,10 +938,10 @@ void __stdcall CppLogic::StringSerializer::DeserializeFromStreamImp(void* data, 
 	auto* d = static_cast<std::string*>(data);
 	size_t s = 0;
 	str->Read(&s, sizeof(s));
-	char* buff = new char[s];
-	str->Read(buff, s);
-	d->assign(buff, s);
-	delete[] buff;
+	std::vector<char> buff{};
+	buff.resize(s);
+	str->Read(buff.data(), static_cast<long>(buff.size()));
+	d->assign(buff.data(), buff.data());
 }
 
 void __stdcall CppLogic::StringSerializer::SerializeToStreamImp(BB::IStream* str, const void* data)
@@ -950,7 +949,7 @@ void __stdcall CppLogic::StringSerializer::SerializeToStreamImp(BB::IStream* str
 	const auto* d = static_cast<const std::string*>(data);
 	size_t s = d->size();
 	str->Write(&s, sizeof(s));
-	str->Write(d->c_str(), s);
+	str->Write(d->c_str(), static_cast<long>(s));
 }
 
 CppLogic::StringSerializer::StringSerializer()
@@ -961,5 +960,3 @@ CppLogic::StringSerializer::StringSerializer()
 	SerializeToStream = &SerializeToStreamImp;
 	Buffer = &ActualBuffer;
 }
-
-CppLogic::StringSerializer CppLogic::StringSerializer::GlobalObj{};

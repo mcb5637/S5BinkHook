@@ -141,7 +141,6 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 			}
 		}
 	}
-	auto* cwid = mng->GetWidgetByID(WidgetId);
 	float childs = Widgets[0]->PosAndSize.H + ScollableSpacing();
 	WidgetCount = static_cast<int>(WidgetContainer->PosAndSize.H / childs);
 	for (int o = Widgets.size(); o < std::min(WidgetCount, ElementCount); ++o) {
@@ -357,7 +356,6 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 				changed = true;
 			}
 			if (changed) {
-				bool adv = true;
 				if (HasFlag(Event::Validate)) {
 					if (!CallFunc(EventFunc(), Event::Validate)) {
 						return true;

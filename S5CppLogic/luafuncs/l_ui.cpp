@@ -41,7 +41,7 @@ namespace CppLogic::UI {
 		if (!str_ends_with(font, ".met"))
 			throw lua::LuaException("wrong file extension");
 		std::string_view str{ font };
-		if ((str.rfind("data\\maps\\externalmap\\", 0) == std::string::npos) && (str.rfind("data\\menu\\fonts\\", 0) == std::string::npos))
+		if ((str.rfind(R"(data\maps\externalmap\)", 0) == std::string::npos) && (str.rfind(R"(data\menu\fonts\)", 0) == std::string::npos))
 			throw lua::LuaException("incorrect folder");
 	}
 
@@ -148,7 +148,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetGetAllChildren(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		L.NewTable();
@@ -375,7 +375,7 @@ namespace CppLogic::UI {
 	int StaticTextWidgetGetLineDistanceFactor(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CStaticTextWidget* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
+		auto* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
 		if (!tw)
 			throw lua::LuaException("no static text widget");
 		L.Push(tw->LineDistanceFactor);
@@ -384,7 +384,7 @@ namespace CppLogic::UI {
 	int StaticTextWidgetSetLineDistanceFactor(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CStaticTextWidget* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
+		auto* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
 		if (!tw)
 			throw lua::LuaException("no static text widget");
 		tw->LineDistanceFactor = L.CheckFloat(2);
@@ -435,7 +435,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreateStaticWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -452,7 +452,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreateStaticTextWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -469,7 +469,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreatePureTooltipWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -486,7 +486,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreateGFXButtonWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -503,7 +503,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreateTextButtonWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -520,7 +520,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreateProgressBarWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -537,7 +537,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreateContainerWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -554,7 +554,7 @@ namespace CppLogic::UI {
 	int ContainerWidgetCreateCustomWidgetChild(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
 			throw lua::LuaException("no container widget");
 		const char* name = L.CheckString(2);
@@ -564,7 +564,7 @@ namespace CppLogic::UI {
 		const char* customname = L.CheckString(3);
 		if (!L.IsNoneOrNil(4))
 			bef = L.CheckWidget(4);
-		EGUIX::CCustomWidget* ne = (*BB::CClassFactory::GlobalObj)->CreateObject<EGUIX::CCustomWidget>();
+		auto* ne = (*BB::CClassFactory::GlobalObj)->CreateObject<EGUIX::CCustomWidget>();
 		c->AddWidget(ne, name, bef);
 		ne->CustomClassName.assign(customname);
 		ne->IntegerUserVariable0DefaultValue = L.OptInt(5, 0);
@@ -623,7 +623,7 @@ namespace CppLogic::UI {
 	int RemoveWidget(lua::State ls) {
 		luaext::EState L{ ls };
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
-		EGUIX::CContainerWidget* cw = dynamic_cast<EGUIX::CContainerWidget*>(wid);
+		auto* cw = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (cw)
 			if (cw->WidgetListHandler.SubWidgets.size() != 0)
 				throw lua::LuaException("container widget has to be empty");
@@ -648,7 +648,7 @@ namespace CppLogic::UI {
 	}
 
 	int ReloadGUI(lua::State L) {
-		const char* str = L.OptString(1, "Data\\Menu\\Projects\\Ingame.xml");
+		const char* str = L.OptString(1, R"(Data\Menu\Projects\Ingame.xml)");
 		if (!BB::CFileSystemMgr::DoesFileExist(str))
 			throw lua::LuaException{ "files does not exist" };
 		EGUIX::WidgetLoader::GlobalObj()->LoadGUI(str);
@@ -989,7 +989,7 @@ namespace CppLogic::UI {
 		auto* vh = GGUI::CManager::GlobalObj()->C3DViewHandler;
 		vh->StateIdManager->GetIDByNameOrCreate(GUIState_LuaSelection::Name, GUIState_LuaSelection::Id); // make sure the state id exists
 		vh->SetGUIState<CppLogic::UI::GUIState_LuaSelection>();
-		CppLogic::UI::GUIState_LuaSelection* s = dynamic_cast<CppLogic::UI::GUIState_LuaSelection*>(vh->CurrentState);
+		auto* s = dynamic_cast<CppLogic::UI::GUIState_LuaSelection*>(vh->CurrentState);
 		L.PushValue(1);
 		s->RefOnKlick = L.Ref(L.REGISTRYINDEX);
 		if (!L.IsNoneOrNil(2)) {
@@ -1470,7 +1470,7 @@ namespace CppLogic::UI {
 	int CreateSelectionDecal(lua::State l) {
 		luaext::EState L{ l };
 
-		shok::SelectionTextureId t = L.CheckEnum<shok::SelectionTextureId>(1);
+		auto t = L.CheckEnum<shok::SelectionTextureId>(1);
 		shok::Position p = L.CheckPos(2);
 
 		ED::CTerrainDecals* dec = (*ED::CGlobalsLogicEx::GlobalObj)->TerrainDecalsManager;
@@ -1519,7 +1519,7 @@ namespace CppLogic::UI {
 	}
 
 	bool GUIState_LuaSelection::OnMouseEvent(BB::CEvent* ev) {
-		BB::CMouseEvent* mev = BB::IdentifierCast<BB::CMouseEvent>(ev);
+		auto* mev = BB::IdentifierCast<BB::CMouseEvent>(ev);
 		if (mev && mev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
 			if (mev->IsKey(shok::Keys::MouseLButton)) {
 				bool r = true;
@@ -1693,7 +1693,7 @@ namespace CppLogic::UI {
 			auto ety = m->GUIInterface->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 			FillPosData(d, x, y);
 			d->TargetPos.FloorToBuildingPlacement();
-			if (static_cast<int>(d->TargetPos.X) == PosToBuild.X && static_cast<int>(d->TargetPos.Y) == PosToBuild.X) {
+			if (static_cast<int>(d->TargetPos.X) == static_cast<int>(PosToBuild.X) && static_cast<int>(d->TargetPos.Y) == static_cast<int>(PosToBuild.X)) {
 				d->TargetPos = PosToBuild;
 			}
 			else {
@@ -1735,9 +1735,9 @@ namespace CppLogic::UI {
 		C3DViewHandler->ClumpRenerable->SetPosition(d.TargetPos, d.TargetPosWithZ.r);
 	}
 
-	float CppLogic::UI::GUIState_PlaceBuildingEx::GetRotation()
+	float CppLogic::UI::GUIState_PlaceBuildingEx::GetRotation() const
 	{
-		return StepToDegrees * CurrentStep;
+		return StepToDegrees * static_cast<float>(CurrentStep);
 	}
 
 	void CppLogic::UI::GUIState_PlaceBuildingEx::SetRotation(float deg)
@@ -2031,20 +2031,19 @@ namespace CppLogic::UI {
 	void CheckSnipeEvent(EGL::CNetEvent2Entities& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
 		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
-		GGL::CSniperAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
 		if (!e->Position.IsInRange(oth->Position, bp->Range))
 			throw lua::LuaException("target not in range");
 	}
 	void CheckShurikenEvent(EGL::CNetEvent2Entities& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
 		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
-		GGL::CShurikenAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
 		if (!e->Position.IsInRange(oth->Position, bp->Range))
 			throw lua::LuaException("target not in range");
 	}
 	void CheckLightingStrike(EGL::CNetEventEntityAndPos& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
-		auto* b = e->GetBehavior<CppLogic::Mod::LightningStrikeAbility>();
 		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::LightningStrikeAbilityProps>();
 		if (!e->Position.IsInRange(shok::Position{ ev.X, ev.Y }, bp->Range))
 			throw lua::LuaException("not in range");
@@ -2054,7 +2053,6 @@ namespace CppLogic::UI {
 	void CheckResourceRefill(EGL::CNetEvent2Entities& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID1);
 		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID2);
-		auto* b = e->GetBehavior<CppLogic::Mod::ResDoodadRefillBehavior>();
 		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::ResDoodadRefillBehaviorProps>();
 		auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
 		if (res == nullptr)
@@ -2064,7 +2062,6 @@ namespace CppLogic::UI {
 	}
 	void CheckBombardment(EGL::CNetEventEntityAndPos& ev) {
 		auto* e = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
-		auto* b = e->GetBehavior<CppLogic::Mod::BombardmentAbility>();
 		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::BombardmentAbilityProps>();
 		if (!e->Position.IsInRange(shok::Position{ ev.X, ev.Y }, bp->AttackRange))
 			throw lua::LuaException("not in range");

@@ -7,7 +7,7 @@
 #include <shok/engine/s5_RWE_2d.h>
 #include <utility/entityiterator.h>
 #include <utility/hooks.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 static inline void(__thiscall* const textset_load)(BB::CTextSet* th) = reinterpret_cast<void(__thiscall*)(BB::CTextSet*)>(0x723647);
 void BB::CTextSet::Load()
@@ -62,7 +62,7 @@ void shok::UIRenderer::RenderText(const char* txt, shok::FontId fontid, bool sca
 {
 	uirender_rtext(this, txt, fontid, scale, x, y, xend, color, nullptr, linedistancefactor);
 }
-void shok::UIRenderer::SetTextRenderColor(shok::Color c)
+void shok::UIRenderer::SetTextRenderColor(shok::Color c) const
 {
 	RWE::RwRGBA co{ c.R, c.G, c.B, c.A };
 	Brush->SetRGBA(&co, &co, &co, &co);
@@ -122,7 +122,7 @@ float __cdecl printstr_getlength_override(RWE::P2D::Rt2dFont* f, const char* str
 			c = static_cast<unsigned int>(static_cast<unsigned char>(str[0])) | (static_cast<unsigned int>(static_cast<unsigned char>(mask & static_cast<unsigned char>(str[off]))) << 8);
 			continue;
 		}
-		else if (!addlen && c == '@' && lastat) {
+		else if (!addlen && c == '@' && lastat) { // NOLINT(*-branch-clone)
 			addlen = true;
 		}
 		else if (!addlen && c == ' ') {
@@ -751,7 +751,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, sh
 	}
 
 	const float fontsize = f->GetHeight(); //0.036
-	const float linedistance = fontsize * (ldf == 0.0f ? 1.0f : ldf);
+	//const float linedistance = fontsize * (ldf == 0.0f ? 1.0f : ldf);
 
 	RWE::RwV2d stepx;
 	RWE::RwV2d stepy;
@@ -771,6 +771,7 @@ int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, sh
 	}
 
 	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureRaster(nullptr);
+	// ReSharper disable once CppExpressionWithoutSideEffects
 	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureFilterMode(RWE::RwTextureFilterMode::rwFILTERLINEAR);
 
 	// i dont think this was a template when BB did this, but this is way nicer as one
@@ -908,6 +909,7 @@ shok::EntityId GGUI::CManager::GetLastSelectedNonSoldier() const
 
 bool(*GGUI::CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;
 bool(*GGUI::CManager::PostEventCallback2)(BB::CEvent* ev) = nullptr;
+// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 struct PostEventHook_GUIManager : public BB::IPostEvent {
 	BB::IPostEvent* Base = nullptr;
 

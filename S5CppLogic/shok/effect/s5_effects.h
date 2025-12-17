@@ -19,10 +19,10 @@ namespace EGL {
 
 
 		virtual ~IEffectDisplay() = default;
-		virtual shok::EffectTypeId __stdcall GetEffectType() const = 0;
+		[[nodiscard]] virtual shok::EffectTypeId __stdcall GetEffectType() const = 0;
 		virtual void __stdcall FillTypeAndID(TypeAndID* d) const = 0;
 		virtual void __stdcall FillTurnDurationAndPos(TurnDurationAndPos* d) const = 0;
-		virtual shok::PlayerId __stdcall GetPlayerID() const = 0;
+		[[nodiscard]] virtual shok::PlayerId __stdcall GetPlayerID() const = 0;
 		virtual EGL::ISlot* __stdcall GetFlyingEffectSlot() = 0;
 	};
 
@@ -42,7 +42,7 @@ namespace EGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF8536CED);
 
 		virtual ~CEffect() override;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void FromCreator(EGL::CGLEEffectCreator* ct); // 3
 		virtual void OnCreated();
 		virtual void OnLoaded(); // 5
@@ -53,10 +53,10 @@ namespace EGL {
 
 	public:
 
-		virtual shok::EffectTypeId __stdcall GetEffectType() const override;
+		[[nodiscard]] virtual shok::EffectTypeId __stdcall GetEffectType() const override;
 		virtual void __stdcall FillTypeAndID(TypeAndID* d) const override;
 		virtual void __stdcall FillTurnDurationAndPos(TurnDurationAndPos* d) const override;
-		virtual shok::PlayerId __stdcall GetPlayerID() const override;
+		[[nodiscard]] virtual shok::PlayerId __stdcall GetPlayerID() const override;
 		virtual EGL::ISlot* __stdcall GetFlyingEffectSlot() override;
 	protected:
 		virtual void OnOtherEntityAttachToMe_vt(shok::AttachmentType ty, shok::EntityId otherId, shok::EventIDs onThisDetachEvent) override; // other -> this
@@ -71,7 +71,7 @@ namespace EGL {
 
 		CEffect();
 
-		CGLEEffectProps* LogicProps() const;
+		[[nodiscard]] CGLEEffectProps* LogicProps() const;
 
 		static void(__stdcall*OnDestroyCb)(CEffect* th);
 		static void HookOnDestroy();
@@ -80,7 +80,7 @@ namespace EGL {
 	};
 	static_assert(offsetof(CEffect, StartTurn) == 18 * 4);
 
-	struct SSlotArgsFlyingEffect {
+	struct SSlotArgsFlyingEffect { // NOLINT(*-pro-type-member-init)
 		int StartTurn;
 		shok::Position StartPosition;
 		shok::Position TargetPosition;
@@ -105,7 +105,7 @@ namespace EGL {
 
 		// dtor empty
 		virtual void __stdcall FillSlot(SSlotArgsFlyingEffect* data) override;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		static inline constexpr int vtp = 0x777640;
@@ -125,7 +125,7 @@ namespace EGL {
 
 
 		virtual ~CFlyingEffect() override;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void FromCreator(EGL::CGLEEffectCreator* ct) override;
 		virtual void OnCreated() override;
 		virtual void OnTick() override;
@@ -138,6 +138,7 @@ namespace EGL {
 		CFlyingEffect();
 
 	protected:
+		// ReSharper disable once CppHiddenFunction
 		void FixOnLoad();
 
 		bool OnTickMove();
@@ -169,6 +170,7 @@ namespace GGL {
 		GGL::CArrowEffectProps* ArrowEffectProps;
 
 	protected:
+		// ReSharper disable once CppHidingFunction
 		void FixOnLoad();
 		void OnHitHooked();
 
@@ -187,6 +189,7 @@ namespace GGL {
 		private:
 			uint16_t Data;
 		public:
+			// ReSharper disable once CppDFAConstantParameter
 			constexpr CompactedDamageClass(shok::DamageClassId d) : Data(static_cast<uint16_t>(static_cast<int>(d))) {}
 			constexpr operator shok::DamageClassId() const {
 				return static_cast<shok::DamageClassId>(static_cast<int>(Data));
@@ -199,13 +202,14 @@ namespace GGL {
 		GGL::CCannonBallEffectProps* CannonBallEffectProps;
 		int DamageAmount; // 50
 		float AoERange;
-		CompactedDamageClass DamageClass; // 52 originally full damageclass, but i need storage ;)
+		CompactedDamageClass DamageClass{shok::DamageClassId{}}; // 52 originally full damageclass, but i need storage ;)
 	private:
 		byte DamageClassPadding = 0;
 	public:
 		shok::AdvancedDealDamageSource AdvancedDamageSourceOverride; // originally part of damageclass
 
 	protected:
+		// ReSharper disable once CppHidingFunction
 		void FixOnLoad();
 		void OnHitHooked();
 
@@ -240,7 +244,7 @@ namespace GGL {
 	class CEffectRain : public EGL::CEffect {
 	public:
 		class CSlotStartTurn : public EGL::TSlot<EGL::SSlotArgsStartTurn, 268588221> {
-			int StartTurn;
+			int StartTurn = 0;
 
 			virtual void __stdcall FillSlot(EGL::SSlotArgsStartTurn* data) override;
 		};
@@ -299,7 +303,7 @@ namespace EGL {
 		CGLEEffectCreator();
 
 		// dtor empty
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 	protected:
 		void SetVT(int vt);
@@ -339,7 +343,7 @@ namespace ED {
 
 	class CEffectParticleSystem : public IEffect {
 	public:
-		RWE::RpClump* Clump;
+		RWE::RpClump* Clump = nullptr;
 
 		static inline constexpr int vtp = 0x7AE790;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x22C757DD);
@@ -347,9 +351,9 @@ namespace ED {
 
 	class CHAnimEffect : public IEffect {
 	public:
-		RWE::RpClump* Clump; // 2
-		RWE::Anim::RtAnimAnimation* Anim;
-		RWE::Anim::RpHAnimHierarchy* AnimHandler; // 4
+		RWE::RpClump* Clump = nullptr; // 2
+		RWE::Anim::RtAnimAnimation* Anim = nullptr;
+		RWE::Anim::RpHAnimHierarchy* AnimHandler = nullptr; // 4
 
 	public:
 		static inline constexpr int vtp = 0x7AE98C;
@@ -359,7 +363,7 @@ namespace ED {
 
 	class CFlyingEffect : public IEffect {
 	public:
-		RWE::RpClump* Clump;
+		RWE::RpClump* Clump = nullptr;
 
 		static inline constexpr int vtp = 0x7AE9D0;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFCD5C1E7);
@@ -381,7 +385,7 @@ namespace GD {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8D16CD43);
 	};
 
-	class CDisplayEffectLightning : public ED::IEffect {
+	class CDisplayEffectLightning : public ED::IEffect { // NOLINT(*-pro-type-member-init)
 	public:
 		size_t NumElements; // 2
 		RWE::I3D::RwIm3DVertex* Vertex; // 4 per element?
@@ -410,16 +414,16 @@ namespace ED {
 	};
 
 	class CDEVisibleEffectManager : public IDEVisibleEffectManager {
-		bool unknown;
+		bool unknown = false;
 
 	public:
 		struct VisEffect {
-			shok::EffectId ID;
+			shok::EffectId ID{};
 		private:
-			bool unknown;
-			shok::EffectId ID2;
+			bool unknown = false;
+			shok::EffectId ID2{};
 		public:
-			ED::IEffect* Effect;
+			ED::IEffect* Effect = nullptr;
 		};
 
 		PADDINGI(1);

@@ -2,7 +2,6 @@
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/s5_defines.h>
-#include <shok/globals/s5_classfactory.h>
 #include <luaext.h>
 
 namespace CppLogic::Serializer {

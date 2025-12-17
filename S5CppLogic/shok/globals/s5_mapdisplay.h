@@ -41,7 +41,7 @@ namespace ED {
 	private:
 		virtual float retzero(int, int) = 0;
 
-		float __thiscall GetWaterHeightAtPosOverride(float x, float y);
+		[[nodiscard]] float __thiscall GetWaterHeightAtPosOverride(float x, float y) const;
 	};
 	static_assert(sizeof(ED::CLandscape) == 10 * 4);
 
@@ -151,7 +151,7 @@ namespace ED {
 			ITerrainDecal* Selection;
 		};
 		shok::Map<shok::EntityId, Data*> Selected;
-		bool Toggle;
+		bool Toggle = false;
 
 		// update 4776CB stdcall()
 
@@ -185,9 +185,9 @@ namespace ED {
 
 		static inline constexpr int vtp = 0x769F74;
 
-		void ToTerrainCoord(const shok::Position& p, int* out);
-		bool IsCoordValid(int* out);
-		EGL::CGLELandscape::BlockingMode GetBlocking(const shok::Position& p);
+		static void ToTerrainCoord(const shok::Position& p, int* out);
+		bool IsCoordValid(const int* out) const;
+		[[nodiscard]] EGL::CGLELandscape::BlockingMode GetBlocking(const shok::Position& p) const;
 
 		// 71AD6D update?
 
@@ -202,9 +202,10 @@ namespace ED {
 		virtual ~CModelsProps() = default;
 
 		struct ModelData {
-			char* Effect = nullptr;
-			char* OrnamentalItemEffect = nullptr;
-			char* SelectionTexture = nullptr;
+			// probably raw pointers by default, but this makes things a lot easier
+			std::unique_ptr<char[], shok::FreeCaller> Effect = nullptr;
+			std::unique_ptr<char[], shok::FreeCaller> OrnamentalItemEffect = nullptr;
+			std::unique_ptr<char[], shok::FreeCaller> SelectionTexture = nullptr;
 			float OnePassAlphaBlendingDistance = 0;
 			float TerrainLightColorPortion = 0;
 			float TerrainVertexColorPortion = 0;
@@ -216,16 +217,11 @@ namespace ED {
 			bool UseSurfaceHeight = false, TwoPassAlphaBlending = false, AlphaBlendHighQualityOnly = false; PADDING(1); // 11
 			shok::AnimationId DefaultAnimID = {}; // 12
 
-			ModelData() = default;
-			ModelData(ModelData&& o) noexcept;
-			~ModelData();
-			void operator=(const ModelData&) noexcept;
-
 			static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA19F90);
 		};
 
 		shok::Vector<ModelData> Model;
-		BB::CIDManagerEx* ModelIdManager;
+		BB::CIDManagerEx* ModelIdManager = nullptr;
 
 		static inline const BB::SerializationData* const SerializationData = reinterpret_cast<const BB::SerializationData*>(0xA1A2B0);
 
@@ -340,7 +336,7 @@ namespace ED {
 		RWE::RpClump* Clump = nullptr;
 		RWE::RpAtomic* FirstAtomic = nullptr;
 		PADDINGI(3);
-		ModelFlags Flags;
+		ModelFlags Flags = ModelFlags::None;
 		RWE::RtDict* UVAnim = nullptr; // 6
 		float OnePassAlphaBlendingDistanceSquared = 0;
 		PADDINGI(1);
@@ -354,10 +350,13 @@ namespace ED {
 		shok::AnimationId DefaultAnimID = {};
 
 
-		RWE::RpClump* Instanciate() const;
+		[[nodiscard]] RWE::RpClump* Instanciate() const;
 
 		ModelData() = default;
-		ModelData(ModelData&& o) noexcept;
+		ModelData(ModelData&& o) = delete;
+		ModelData(const ModelData& o) = delete;
+		ModelData& operator=(const ModelData& o) = delete;
+		ModelData& operator=(ModelData&& o) = delete;
 		~ModelData();
 
 		void* operator new(size_t s);
@@ -367,6 +366,7 @@ namespace ED {
 	static_assert(sizeof(ModelData) == 22 * 4);
 
 	template<class T>
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CDEResourceList {
 	public:
 		shok::Map<int, T*> Map;
@@ -422,7 +422,7 @@ namespace ED {
 
 
 	private:
-		ModelData* LoadModel(const char* name);
+		static ModelData* LoadModel(const char* name);
 	};
 
 	class IWorld {
@@ -450,16 +450,16 @@ namespace ED {
 			bool TransitionTextureIs_Transitions01 = false;
 		};
 
-		GGlue::TerrainPropsDisplay* DisplayProps;
+		GGlue::TerrainPropsDisplay* DisplayProps = nullptr;
 		shok::Vector<TerrainType> TerrainTypes; // 1 modified if lower graphics settings
 		shok::Vector<TerrainType> OriginalTerrainTypes; // 5 stays as it is
 		shok::Vector<RWE::RwTexture*> Textures; // 9, lazily loaded
 		shok::Vector<shok::TerrainTypeId> TextureIdsOrderedByPriority; // 13
-		shok::TerrainTypeId BlackInternalUseOnlyId; // 17 terrainid
-		shok::TerrainTextureId Transitions01Id; // 18 textureid
+		shok::TerrainTypeId BlackInternalUseOnlyId{}; // 17 terrainid
+		shok::TerrainTextureId Transitions01Id{}; // 18 textureid
 		shok::Vector<int> TextureReplacement; // 19 terrainindex->terrainindex
-		int TextureQualityOption;
-		int TextureQualityOptionChangedCounter; // ?
+		int TextureQualityOption = 0;
+		int TextureQualityOptionChangedCounter = 0; // ?
 
 		void ReloadAllTextures();
 		void ApplyTextureQuality();
@@ -469,14 +469,14 @@ namespace ED {
 		void ReApplyTerrainType(shok::TerrainTypeId id);
 		void ReApplyAllTerrainTypes();
 	private:
-		TerrainType CreateTerrainType(shok::TerrainTypeId id);
+		[[nodiscard]] TerrainType CreateTerrainType(shok::TerrainTypeId id) const;
 	};
 	static_assert(sizeof(TerrainTextureManager::TerrainType) == 8 * 4);
 	static_assert(sizeof(TerrainTextureManager) == 25 * 4);
 	class TerrainDisplay { // size 9
 	public:
 		PADDINGI(2);
-		TerrainTextureManager* TextureManager;
+		TerrainTextureManager* TextureManager = nullptr;
 	};
 
 	class CEntitiesTypeFlags {
@@ -506,7 +506,7 @@ namespace ED {
 		static inline constexpr int vtp = 0x7695EC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x17F36327); // iauras and cauras ?
 
-		virtual unsigned int __stdcall GetClassIdentifier() const = 0;
+		[[nodiscard]] virtual unsigned int __stdcall GetClassIdentifier() const = 0;
 		virtual ~IAuras() = default;
 		virtual void Destroy() = 0;
 		virtual void ClearAuras() = 0;
@@ -561,8 +561,8 @@ namespace ED {
 			// ctor 46D624()
 		};
 		struct GFXSetLight {
-			float TransitionStart;
-			float TransitionEnd;
+			float TransitionStart = 0.0f;
+			float TransitionEnd = 0.0f;
 			LightData Data;
 		};
 
@@ -649,11 +649,11 @@ namespace ED {
 	class CRenderSettingsEx : public CRenderSettings {
 	public:
 		struct GFXSetFog {
-			float TransitionStart;
-			float TransitionEnd;
-			bool FogActive; // ?
+			float TransitionStart = 0.0f;
+			float TransitionEnd = 0.0f;
+			bool FogActive = false; // ?
 			RWE::RwRGBAReal FogColor;
-			float FogStart, FogEnd;
+			float FogStart = 0.0f, FogEnd = 0.0f;
 		};
 		struct GFXSetSnowStatus {
 			float TransitionStart;
@@ -736,6 +736,7 @@ namespace ED {
 	};
 	static_assert(sizeof(CDisplayBase) == 5 * 4);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IDisplayRenderCallbacks {
 		virtual void __stdcall unknown(float a) = 0;
 	};
@@ -750,7 +751,7 @@ namespace GD {
 		shok::Vector<shok::ModelId> DestroyEffect;
 		PADDINGI(1);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr int vtp = 0x76A810;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFC5B7F67);
@@ -762,7 +763,7 @@ namespace GD {
 		virtual ~CGlobalEffect() = default;
 
 		PADDINGI(3); // this+2 == ED::CEffectDisplay ??
-		shok::EffectTypeId EffectID; // 3
+		shok::EffectTypeId EffectID{}; // 3
 
 		static inline constexpr int vtp = 0x76AFA4;
 	};
@@ -771,8 +772,8 @@ namespace GD {
 	class CGlobalEffects {
 	public:
 		virtual ~CGlobalEffects() = default;
-		CGlobalEffect* RainEfect;
-		CGlobalEffect* SnowEffect;
+		CGlobalEffect* RainEffect = nullptr;
+		CGlobalEffect* SnowEffect = nullptr;
 
 		static inline constexpr int vtp = 0x76A984;
 	};
@@ -788,7 +789,7 @@ namespace GD {
 		virtual ~CGlobalsBase() = 0;
 
 
-		BB::CIDGroupsEx* BuildingBanners;
+		BB::CIDGroupsEx* BuildingBanners = nullptr;
 
 		static inline constexpr int vtp = 0x76A9DC;
 		static inline CGlobalsBase** const GlobalObj = reinterpret_cast<CGlobalsBase**>(0x8586A8);

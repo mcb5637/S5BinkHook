@@ -170,10 +170,10 @@ void GGL::ExperienceClassHolder::LoadExperienceClass(shok::ExperienceClass c)
 
 shok::ExperienceClass GGL::ExperienceClassHolder::AddExperienceClass(const char* name, shok::EntityCategory cat)
 {
-    shok::ExperienceClass id = static_cast<shok::ExperienceClass>(Classes.size());
+    auto id = static_cast<shok::ExperienceClass>(Classes.size());
     {
         auto v = Classes.SaveVector();
-        ExperienceClass* c = new ExperienceClass{};
+        auto* c = new ExperienceClass{};
         c->Table.assign(name);
         v.Vector.push_back(c);
     }

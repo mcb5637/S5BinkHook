@@ -19,19 +19,17 @@ BB::CEvent::CEvent(shok::InputEventIds eventid) : BB::CEvent(static_cast<int>(ev
 {
 }
 
-bool BB::CEvent::IsEvent(shok::EventIDs id)
+bool BB::CEvent::IsEvent(shok::EventIDs id) const {
+	return EventTypeId == static_cast<int>(id);
+}
+bool BB::CEvent::IsEvent(shok::NetEventIds id) const {
+	return EventTypeId == static_cast<int>(id);
+}
+bool BB::CEvent::IsEvent(shok::FeedbackEventIds id) const
 {
 	return EventTypeId == static_cast<int>(id);
 }
-bool BB::CEvent::IsEvent(shok::NetEventIds id)
-{
-	return EventTypeId == static_cast<int>(id);
-}
-bool BB::CEvent::IsEvent(shok::FeedbackEventIds id)
-{
-	return EventTypeId == static_cast<int>(id);
-}
-bool BB::CEvent::IsEvent(shok::InputEventIds id)
+bool BB::CEvent::IsEvent(shok::InputEventIds id) const
 {
 	return EventTypeId == static_cast<int>(id);
 }
@@ -271,6 +269,10 @@ GGL::CEventChangeMotivation::CEventChangeMotivation(shok::EventIDs e, float d, s
 	Reason = r;
 }
 
+GGL::CEventStartAlphaBlending::CEventStartAlphaBlending(shok::EventIDs e, int a, float t) : BB::CEvent(e), Alpha(a), BlendingTime(t) {
+	SetVT(vtp);
+}
+
 GGL::CEventHeroAbilityInteger::CEventHeroAbilityInteger(shok::EventIDs id, int data, shok::AbilityId ab) : EGL::CEventValue_Int(id, data), Ability(ab)
 {
 	SetVT(vtp);
@@ -437,11 +439,11 @@ BB::CMouseEvent::CMouseEvent(shok::InputEventIds id, shok::Keys keydata, int cli
 	Y = y;
 	Delta = delta;
 }
-bool BB::CMouseEvent::IsKey(shok::Keys key)
+bool BB::CMouseEvent::IsKey(shok::Keys key) const
 {
 	return (KeyData & shok::Keys::MaskCode) == key;
 }
-bool BB::CMouseEvent::IsModifier(shok::Keys mod)
+bool BB::CMouseEvent::IsModifier(shok::Keys mod) const
 {
 	return (KeyData & shok::Keys::MaskModifiers) == mod;
 }
@@ -451,11 +453,11 @@ BB::CKeyEvent::CKeyEvent(shok::InputEventIds id, shok::Keys keydata) : BB::CInpu
 	SetVT(BB::CKeyEvent::vtp);
 	KeyData = keydata;
 }
-bool BB::CKeyEvent::IsKey(shok::Keys key)
+bool BB::CKeyEvent::IsKey(shok::Keys key) const
 {
 	return (KeyData & shok::Keys::MaskCode) == key;
 }
-bool BB::CKeyEvent::IsModifier(shok::Keys mod)
+bool BB::CKeyEvent::IsModifier(shok::Keys mod) const
 {
 	return (KeyData & shok::Keys::MaskModifiers) == mod;
 }

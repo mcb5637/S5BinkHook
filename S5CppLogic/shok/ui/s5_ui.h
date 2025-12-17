@@ -92,22 +92,22 @@ namespace shok {
 
 	class UIRenderer {
 	public:
-		RWE::RwCamera* Camera;
-		bool ShouldRenderText;
+		RWE::RwCamera* Camera = nullptr;
+		bool ShouldRenderText = false;
 		PADDING(3);
-		float DistanceBetweenRenderPlanesX100;
-		float RenderSizeX, RenderSizeY; // 3
-		bool SomeTextBool;
+		float DistanceBetweenRenderPlanesX100 = 0.0f;
+		float RenderSizeX = 0.0f, RenderSizeY = 0.0f; // 3
+		bool SomeTextBool = false;
 		PADDING(3);
-		int UpscaledFlag;
-		RWE::P2D::Rt2dBrush* Brush;
+		int UpscaledFlag = 0;
+		RWE::P2D::Rt2dBrush* Brush = nullptr;
 
 		void RenderText(const char* txt, shok::FontId fontid, bool scale, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
-		void SetTextRenderColor(shok::Color c);
+		void SetTextRenderColor(shok::Color c) const;
 		void RenderMaterial(const EGUIX::CMaterial* mat, bool scale, const EGUIX::Rect* pos);
 		void RenderLine(const EGUIX::Color* c, bool scale, float x1, float y1, float x2, float y2);
 		float GetTextWidth(const char* text, shok::FontId font);
-		float GetTextHeight(shok::FontId font);
+		static float GetTextHeight(shok::FontId font);
 
 		static constexpr shok::Position ScaledScreenSize{ 1024.0f, 768.0f };
 
@@ -128,11 +128,12 @@ namespace shok {
 }
 
 namespace EToolsManager {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CSimpleTool {
-		virtual void getsecmemb() = delete;
+		virtual void getsecmemb() = delete; // NOLINT(*-use-equals-delete)
 
-		void* Data; // GS3DTools::CAppCamera
-		unsigned int Ident; // 0xCA334412
+		void* Data = nullptr; // GS3DTools::CAppCamera
+		unsigned int Ident = 0; // 0xCA334412
 	public:
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x425576F4); // from CRwCameraHandler casttoident
 		static inline constexpr int vtp = 0x78061C;
@@ -148,6 +149,7 @@ namespace EToolsManager {
 }
 
 namespace ERwTools {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IRenderable {
 	protected:
 		virtual void SetBuildingRedColorI(int r) = 0;
@@ -162,11 +164,12 @@ namespace ERwTools {
 	protected:
 		virtual void SetModelData(RWE::RpClump* model, float rot) = 0;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CRpClumpRenderable : public IRenderable {
 	public:
-		int RenderMode; // red color?
-		RWE::RpClump* Model;
-		void* RenderObj; // from ED::CWorld
+		int RenderMode = 0; // red color?
+		RWE::RpClump* Model = nullptr;
+		void* RenderObj = nullptr; // from ED::CWorld
 
 		static inline constexpr int vtp = 0x7AEBF8;
 
@@ -182,6 +185,7 @@ namespace ERwTools {
 		float LookAtX, LookAtY, LookAtZ;
 		float Distance;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ICameraHandle {
 	public:
 		virtual void SetDirty() = 0;
@@ -258,12 +262,14 @@ namespace ERwTools {
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCB15D84);
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ICameraMovement {
 	private:
 		virtual void uk2() = 0;
 	public:
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3D8FC4E4);
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ICameraSettings {
 	public:
 		virtual void CS_SetVerticalAngle(float a) = 0;
@@ -412,23 +418,23 @@ namespace GGL {
 	class IGLGUIInterface {
 	public:
 		struct MerchantData {
-			shok::EntityId Entity;
-			bool HasOffers = 0;
+			shok::EntityId Entity{};
+			bool HasOffers = false;
 			PADDING(3);
 			shok::PlayerId BlockingPlayer = {};
 			PADDINGI(2); // unknown entries of beh props, strings?
 		};
 		struct MineData {
-			shok::EntityId Entity;
+			shok::EntityId Entity{};
 			int ResAmount = 0;
 			shok::ResourceType ResType = {};
 		};
 		struct MotivationData {
-			shok::EntityId Entity;
-			float Max, ThresholdSad, ThresholdAngry, ThresholdLeave, VCLockedThreshold, ThresholdHappy;
+			shok::EntityId Entity{};
+			float Max = 0.0f, ThresholdSad = 0.0f, ThresholdAngry = 0.0f, ThresholdLeave = 0.0f, VCLockedThreshold = 0.0f, ThresholdHappy = 0.0f;
 		};
 		struct RefinerData {
-			shok::EntityId Entity;
+			shok::EntityId Entity{};
 			shok::ResourceType ResType = shok::ResourceType::None;
 			float ResAmount = 0, RawAmount = 0;
 		};
@@ -614,24 +620,29 @@ namespace GGUI {
 		static inline constexpr int vtp = 0x77B8E0;
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IMouseEffect : public BB::IPostEvent {
 
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CMouseEffect : public IMouseEffect {
 	public:
 		static inline constexpr int vtp = 0x77BEE0;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IMouseCursorAppearance {
 		virtual void unknown() = 0;
 	};
 }
 
+// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 class CMouseCursorManager : public GGUI::IMouseCursorAppearance {
 public:
 	static inline constexpr int vtp = 0x761BBC;
 };
 
 namespace GGUI {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CManager { // size 26*4
 	public:
 		virtual void __stdcall PostEvent(BB::CEvent* ev) = 0; // for gui events, forward to MouseEffect
@@ -654,20 +665,20 @@ namespace GGUI {
 		};
 
 		PADDINGI(5);
-		GGUI::C3DViewHandler* C3DViewHandler; // 6
-		EGL::CGLEGUIInterface* EGUIInterface;
-		GGL::CGLGUIInterface* GUIInterface; // 8
-		EGL::CGLETerrainHiRes* TerrainHiRes;
+		GGUI::C3DViewHandler* C3DViewHandler = nullptr; // 6
+		EGL::CGLEGUIInterface* EGUIInterface = nullptr;
+		GGL::CGLGUIInterface* GUIInterface = nullptr; // 8
+		EGL::CGLETerrainHiRes* TerrainHiRes = nullptr;
 	private:
-		BB::IPostEvent* PostGUIEvent; // for GUI events, p to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent
+		BB::IPostEvent* PostGUIEvent = nullptr; // for GUI events, p to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent
 	public:
 		shok::Vector<SelectionData> SelectedEntities; //11
-		shok::PlayerId ControlledPlayer; // 15
-		bool CanSelectEntitiesOfPlayer[9];
+		shok::PlayerId ControlledPlayer{}; // 15
+		bool CanSelectEntitiesOfPlayer[9]{};
 		shok::Vector<StateIdData*> CommandStates; // 19
-		CMouseEffect* MouseEffect;
-		lua_State* GameState; // 24
-		CMouseCursorManager* MouseCursorManager;
+		CMouseEffect* MouseEffect = nullptr;
+		lua_State* GameState = nullptr; // 24
+		CMouseCursorManager* MouseCursorManager = nullptr;
 
 	public:
 		static inline constexpr int vtp = 0x77B2F8;
@@ -683,7 +694,7 @@ namespace GGUI {
 		//  GGUI::CShortMessagesWindowControllerCustomWidget::HandleFeedbackEvent
 
 		void SetControlledPlayer(shok::PlayerId pl);
-		bool IsEntitySelected(shok::EntityId id) const;
+		[[nodiscard]] bool IsEntitySelected(shok::EntityId id) const;
 		bool SelectEntity(shok::EntityId id); // returns successful
 		bool DeselectEntity(shok::EntityId id); // returns successful
 		bool ClearSelection(); // returns successful
@@ -692,7 +703,7 @@ namespace GGUI {
 		bool IsCommandStateValid(StateIdData* s, shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
 		// goes through CommandStates and returns the first valid one
 		GGUI::CBasicState* GetCommandStateFor(shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
-		shok::EntityId GetLastSelectedNonSoldier() const;
+		[[nodiscard]] shok::EntityId GetLastSelectedNonSoldier() const;
 
 		// on minimap MouseL clicked 525A9A(x, y)
 		// scroll to pos (minimap click) cdecl 523D2D(shok::position*)
@@ -713,44 +724,45 @@ namespace GGUI {
 	};
 	//constexpr int i = offsetof(CManager, CommandStates) / 4;
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class SoundFeedback { // another no vtable, size 24
 	public:
 		class AData : public BB::IObject {
 		public:
-			bool Warn, StopOnValid; // needs confirm
+			bool Warn = false, StopOnValid = false; // needs confirm
 
 			virtual shok::SoundId GetSoundIdIfApplies(void*) const = 0;
 		};
 		class AValueSound : public BB::IObject {
 		public:
-			shok::SoundId SoundID;
+			shok::SoundId SoundID{};
 
-			virtual int GetValue() const = 0;
+			[[nodiscard]] virtual int GetValue() const = 0;
 		};
 
 		class CSingleSound : public AData { // always returns that one sound
 		public:
-			shok::SoundId SoundID;
+			shok::SoundId SoundID{};
 
 			static inline constexpr int vtp = 0x77E36C;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xD8C12453);
 		};
 		class CParamValueSound : public AData { // returns Data->GetSoundIdIfApplies(...) if parameter matches ParameterValue
 		public:
-			AData* Data;
-			int ParameterIndex;
-			int ParameterValue;
-			bool CanBeIgnored;
+			AData* Data = nullptr;
+			int ParameterIndex = 0;
+			int ParameterValue = 0;
+			bool CanBeIgnored = false;
 
 			static inline constexpr int vtp = 0x77E380;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x90C03583);
 		};
 		class CParamValueExSound : public AData { // returns Data->GetSoundIdIfApplies(...) if parameter matches ParameterValue->GetValue()
 		public:
-			AData* Data;
-			int ParameterIndex;
-			AValueSound* ParameterValue;
-			bool CanBeIgnored;
+			AData* Data = nullptr;
+			int ParameterIndex = 0;
+			AValueSound* ParameterValue = nullptr;
+			bool CanBeIgnored = false;
 
 			static inline constexpr int vtp = 0x77E394;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x49C94153);
@@ -758,7 +770,7 @@ namespace GGUI {
 		class CData : public AData { // returns ValueSound[i]->SoundId where ValueSound[i]->GetValue() matches parameter
 		public:
 			shok::Vector<AValueSound*> ValueSound;
-			int ParameterIndex;
+			int ParameterIndex = 0;
 
 			static inline constexpr int vtp = 0x77E3F8;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x85435E63);
@@ -766,42 +778,42 @@ namespace GGUI {
 
 		class CAbilityType : public AValueSound {
 		public:
-			shok::AbilityId AbilityType;
+			shok::AbilityId AbilityType{};
 
 			static inline constexpr int vtp = 0x77E2F4;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3FF3BAC3);
 		};
 		class CEntityType : public AValueSound {
 		public:
-			shok::EntityTypeId EntityType;
+			shok::EntityTypeId EntityType{};
 
 			static inline constexpr int vtp = 0x77E308;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x34AECF3);
 		};
 		class CGoodType : public AValueSound {
 		public:
-			shok::ResourceType GoodType;
+			shok::ResourceType GoodType{};
 
 			static inline constexpr int vtp = 0x77E31C;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x67C6B5C3);
 		};
 		class CTechnologyType : public AValueSound {
 		public:
-			shok::TechnologyId TechnologyType;
+			shok::TechnologyId TechnologyType{};
 
 			static inline constexpr int vtp = 0x77E330;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x451B5863);
 		};
 		class CUpgradeCategory : public AValueSound {
 		public:
-			shok::UpgradeCategoryId UpgradeCategory;
+			shok::UpgradeCategoryId UpgradeCategory{};
 
 			static inline constexpr int vtp = 0x77E344;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCD0D0AC3);
 		};
 		class CNormalValue : public AValueSound {
 		public:
-			int Value;
+			int Value = 0;
 
 			static inline constexpr int vtp = 0x77E358;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x70295D23);
@@ -810,8 +822,8 @@ namespace GGUI {
 		struct FeedbackState {
 			struct SFilter {
 				struct SEvent {
-					shok::FeedbackEventIds EventType;
-					int Parameter1, Parameter2, Parameter3; // negative value means, all of this type (comment)
+					shok::FeedbackEventIds EventType{};
+					int Parameter1 = 0, Parameter2 = 0, Parameter3 = 0; // negative value means, all of this type (comment)
 					PADDINGI(1);
 
 					auto operator<=>(const SEvent&) const noexcept = default; // pretty sure this is something different, but this will be enough for now 52B485
@@ -819,15 +831,15 @@ namespace GGUI {
 				struct SData {
 					struct SIgnore {
 						SEvent Event;
-						float Time;
+						float Time = 0.0f;
 						// Empty Event.EventType means ignore own event
 						// Event.Parameter:
 						//   -1 means, all of this type
 						//   <= -2 means same as input parameter..warning use only with events that has same parameter value
 					};
 
-					float LifeTime; // Time this event is hold in to be played memory
-					int Priority; // Priority of sound, lower priority is better
+					float LifeTime = 0.0f; // Time this event is hold in to be played memory
+					int Priority = 0; // Priority of sound, lower priority is better
 					shok::Vector<SIgnore> Ignore; // Ignore Events for time
 				};
 
@@ -835,16 +847,16 @@ namespace GGUI {
 			};
 			struct STransition {
 				struct SData {
-					int NumberOfEvents;
-					float Duration;
+					int NumberOfEvents = 0;
+					float Duration = 0.0f;
 				};
 
 				shok::Map<shok::FeedbackEventIds, SData> EventDataMapElement;
-				shok::FeedbackStateId TargetState;
+				shok::FeedbackStateId TargetState{};
 			};
 
 
-			float LifeTime; // zero means endless lifetime
+			float LifeTime = 0.0f; // zero means endless lifetime
 			SFilter Filter;
 			shok::Vector<STransition> Transition;
 			shok::Map<shok::FeedbackEventIds, float> EventIncreaseLifeTimeMapElement; // EventType->IncreasingTime
@@ -861,7 +873,7 @@ namespace GGUI {
 
 		PADDINGI(6); // 2 maps, queued, cooldown????
 		PADDINGI(1); // 0
-		EGL::CPlayerEntityIterator* Iterator;
+		EGL::CPlayerEntityIterator* Iterator = nullptr;
 		PADDINGI(2); // 2 floats, counters?
 		PADDINGI(3); // 10 map
 		struct FeedbackStates {
@@ -875,7 +887,7 @@ namespace GGUI {
 			// load 53C51A
 		} SD; // 17
 		PADDINGI(3); // map?
-		bool PlaySounds; // 23
+		bool PlaySounds = false; // 23
 
 		// ctor 5278ED
 		// HandleFeedbackEvent thiscall 0x5279DE (event*)

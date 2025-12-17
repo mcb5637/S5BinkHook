@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "l_logic.h"
-#include <assert.h>
 #include <filesystem>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
@@ -332,18 +331,18 @@ namespace CppLogic::Logic {
 		L.NewTable();
 		int r = 1;
 		for (BB::IFileSystem* a : (*BB::CFileSystemMgr::GlobalObj)->LoadOrder) {
-			if (BB::CDirectoryFileSystem* a2 = dynamic_cast<BB::CDirectoryFileSystem*>(a)) {
-				L.Push(a2->Path);
+			if (BB::CDirectoryFileSystem* dir = dynamic_cast<BB::CDirectoryFileSystem*>(a)) {
+				L.Push(dir->Path);
 				L.SetTableRaw(-2, r);
 				r++;
 			}
-			else if (BB::CBBArchiveFile* a2 = dynamic_cast<BB::CBBArchiveFile*>(a)) {
-				L.Push(a2->ArchiveFile.Filename);
+			else if (BB::CBBArchiveFile* arch = dynamic_cast<BB::CBBArchiveFile*>(a)) {
+				L.Push(arch->ArchiveFile.Filename);
 				L.SetTableRaw(-2, r);
 				r++;
 			}
-			else if (auto* a2 = dynamic_cast<CppLogic::Mod::FileSystem::RedirectFileSystem*>(a)) {
-				L.Push(a2->Name);
+			else if (auto* redir = dynamic_cast<CppLogic::Mod::FileSystem::RedirectFileSystem*>(a)) {
+				L.Push(redir->Name);
 				L.SetTableRaw(-2, r);
 				r++;
 			}
@@ -403,11 +402,11 @@ namespace CppLogic::Logic {
 			auto fs = mng->LoadOrder[i];
 			fs->GetFileInfo(&info, s);
 			if (info.Found) {
-				if (auto* a2 = dynamic_cast<BB::CDirectoryFileSystem*>(fs)) {
-					L.Push(a2->Path);
+				if (auto* dir = dynamic_cast<BB::CDirectoryFileSystem*>(fs)) {
+					L.Push(dir->Path);
 				}
-				else if (auto* a2 = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
-					L.Push(a2->ArchiveFile.Filename);
+				else if (auto* arch = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
+					L.Push(arch->ArchiveFile.Filename);
 				}
 				else {
 					L.Push(typeid(*fs).name());

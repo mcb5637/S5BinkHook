@@ -7,7 +7,7 @@ namespace RWE::I3D {
 	 * \struct RxObjSpace3DVertex
 	 * Structure representing object space vertex.
 	 */
-	struct RxObjSpace3DVertex
+	struct RxObjSpace3DVertex // NOLINT(*-pro-type-member-init)
 	{
 		RwV3d objVertex; /**< position */
 		RwV3d objNormal; /**< normal */

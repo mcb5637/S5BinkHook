@@ -53,7 +53,7 @@ int __stdcall startmusic_patch(const char* path, int th) {
 	}
 	char tmp[255] = {};
 	// this string tells openstream the handle and filesize
-	snprintf(tmp, 254, "\\\\\\\\%i,%i%s", handle, s, BB::CFileSystemMgr::PathGetExtension(path));
+	snprintf(tmp, 254, R"(\\\\%i,%i%s)", handle, s, BB::CFileSystemMgr::PathGetExtension(path));
 	int h = (*AIL_openstream)(th, tmp, 0); // first param is some string, maybe output format?
 	if (!h) {
 		BB::CFileSystemMgr::CloseHandle(handle);

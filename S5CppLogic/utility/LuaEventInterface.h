@@ -23,25 +23,25 @@ namespace CppLogic::LuaEventInterface {
 	template<class Ev>
 	requires HasEventType<Ev>
 	struct EventType<Ev> {
-		using T = typename Ev::EventType;
+		using T = Ev::EventType;
 	};
 
 	template<class Ev>
-	typename EventType<Ev>::T CheckEvent(luaext::EState L, shok::EventIDs id, int off) {
+	EventType<Ev>::T CheckEvent(luaext::EState L, shok::EventIDs id, int off) {
 		throw std::logic_error("not implemented");
 	}
 	template<class Ev>
-	typename EventType<Ev>::T CheckEvent(luaext::EState L, shok::NetEventIds id, int off) {
+	EventType<Ev>::T CheckEvent(luaext::EState L, shok::NetEventIds id, int off) {
 		throw std::logic_error("not implemented");
 	}
 
 	template<>
 	inline EGL::CEventPosition CheckEvent<EGL::CEventPosition>(luaext::EState L, shok::EventIDs id, int off) {
-		return { id, L.CheckPos(off+1) };
+		return EGL::CEventPosition{ id, L.CheckPos(off+1) };
 	}
 	template<>
 	inline BB::CEvent CheckEvent<BB::CEvent>(luaext::EState L, shok::EventIDs id, int off) {
-		return { id };
+		return BB::CEvent{ id };
 	}
 	template<>
 	inline GGL::CEventPositionAnd2EntityTypes CheckEvent<GGL::CEventPositionAnd2EntityTypes>(luaext::EState L, shok::EventIDs id, int off) {
@@ -96,7 +96,7 @@ namespace CppLogic::LuaEventInterface {
 		if (auto* r = dynamic_cast<GGL::CResourceDoodad*>(t))
 			return { id, e->EntityId, r->ResourceType, t->Position };
 		if (t != nullptr) {
-			if (auto* r = static_cast<GGL::CEntityProperties*>(t->GetEntityType()->LogicProps))
+			if (dynamic_cast<GGL::CEntityProperties*>(t->GetEntityType()->LogicProps) != nullptr)
 				return { id, e->EntityId, shok::ResourceType::WoodRaw, t->Position };
 		}
 		return { id, e->EntityId, L.CheckEnum<shok::ResourceType>(off + 2), L.CheckPos(off + 3) };
@@ -163,7 +163,7 @@ namespace CppLogic::LuaEventInterface {
 
 	template<class Bh, class Ev>
 	void CheckEntityBehavior(EGL::CGLEEntity* e, Ev& ev) {
-		if (e->template GetBehavior<Bh>() == nullptr)
+		if (e->GetBehavior<Bh>() == nullptr)
 			throw lua::LuaException{ std::format("has no {} behavior", typename_details::type_name<Bh>()) };
 	}
 	template<class Bh, class Ev>

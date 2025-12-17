@@ -214,12 +214,8 @@ namespace CppLogic::Entity {
 			PredicateAndAutoCreate(L);
 		}
 		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
-		int count = 0;
 		CppLogic::Iterator::GlobalEntityIterator it{ pred };
-		for (EGL::CGLEEntity* e : it) {
-			++count;
-		}
-		L.Push(count);
+		L.Push(it.Count());
 		return 1;
 	}
 
@@ -962,7 +958,6 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("not a thief");
 	}
 	void CheckLightingStrike(EGL::CGLEEntity* e, EGL::CEventPosition& ev) {
-		auto* b = e->GetBehavior<CppLogic::Mod::LightningStrikeAbility>();
 		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::LightningStrikeAbilityProps>();
 		if (!e->Position.IsInRange(ev.Position, bp->Range))
 			throw lua::LuaException("not in range");
@@ -970,7 +965,6 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("not enough weather energy");
 	}
 	void CheckResourceRefill(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
-		auto* b = e->GetBehavior<CppLogic::Mod::ResDoodadRefillBehavior>();
 		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::ResDoodadRefillBehaviorProps>();
 		auto* t = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
 		auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
@@ -987,7 +981,6 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("is alive");
 	}
 	void CheckBombardment(EGL::CGLEEntity* e, EGL::CEventPosition& ev) {
-		auto* b = e->GetBehavior<CppLogic::Mod::BombardmentAbility>();
 		auto* bp = e->GetEntityType()->GetBehaviorProps<CppLogic::Mod::BombardmentAbilityProps>();
 		if (!e->Position.IsInRange(ev.Position, bp->AttackRange))
 			throw lua::LuaException("not in range");

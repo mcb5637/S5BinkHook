@@ -11,7 +11,7 @@
 
 namespace CppLogic::ModLoader {
 	class ModLoader {
-		static void Init(lua::State L, const char* mappath, std::string_view func, std::function<void(lua::State)> pushMapInfo);
+		static void Init(lua::State L, const char* mappath, std::string_view func, const std::function<void(lua::State)>& pushMapInfo);
 		static void PreMapStart(lua_State* ingame, const char* name, const char* path, bool externalmap);
 		static void PostMapscriptLoaded();
 		static void PreSaveLoad(lua_State* ingame, Framework::GameModeStartMapData* data, bool externalmap);
@@ -47,11 +47,11 @@ namespace CppLogic::ModLoader {
 			}
 			static const char* TableName() {
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
-				return nullptr;
+				return "";
 			}
 			static const char* FuncName() {
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
-				return nullptr;
+				return "";
 			}
 			static void Load(En id, luaext::EState L) { // L is nullptr on reload
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
@@ -73,6 +73,7 @@ namespace CppLogic::ModLoader {
 					if (id == static_cast<En>(0)) {
 						id = mng.GetIDByNameOrCreate(s);
 						OnIdAllocated(id);
+						// ReSharper disable once CppDFAConstantConditions
 						if (TableName()) {
 							L.Push(TableName());
 							L.GetGlobal();

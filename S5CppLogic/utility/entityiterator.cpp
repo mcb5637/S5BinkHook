@@ -91,7 +91,7 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetCurrentBase(c
 
 CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories,
 	const Predicate<EGL::CGLEEntity>* const p)
-	: ManagedIterator<EGL::CGLEEntity>(p), ac(accessCategories),
+	: ManagedIterator<EGL::CGLEEntity>(p), AccessCat(accessCategories),
 	BaseX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(x1, x2))),
 	BaseY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(y1, y2))),
 	EndX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(x1, x2))),
@@ -121,8 +121,8 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiRegionEntityIterator::GetNextBase(Enti
 		++c.EntityIndex;
 		auto* ent = reg.GetEntry(c.X, c.Y);
 		if (ent != nullptr) {
-			if (c.EntityIndex < static_cast<int>(ent->GetByAccessCategory(c.ac).size()))
-				return ent->GetByAccessCategory(c.ac)[c.EntityIndex];
+			if (c.EntityIndex < static_cast<int>(ent->GetByAccessCategory(c.AccessCat).size()))
+				return ent->GetByAccessCategory(c.AccessCat)[c.EntityIndex];
 			if (NextAccessCategory(c))
 				continue;
 		}
@@ -138,19 +138,19 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiRegionEntityIterator::GetCurrentBase(c
 		return nullptr;
 	EGL::RegionDataEntity& reg = (*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj;
 	auto* ent = reg.GetEntry(c.X, c.Y);
-	return ent->GetByAccessCategory(c.ac)[c.EntityIndex];
+	return ent->GetByAccessCategory(c.AccessCat)[c.EntityIndex];
 }
 bool CppLogic::Iterator::MultiRegionEntityIterator::NextAccessCategory(EntityIteratorStatus& c) const {
-	int ac = static_cast<int>(c.ac);
+	int ac = static_cast<int>(c.AccessCat);
 	c.EntityIndex = -1;
 	while (true) {
 		++ac;
 		if (ac > static_cast<int>(shok::AccessCategory::AccessCategoryOrnamental)) {
-			c.ac = shok::AccessCategory::AccessCategoryNone;
+			c.AccessCat = shok::AccessCategory::AccessCategoryNone;
 			return false;
 		}
-		if ((1 << ac) & static_cast<int>(this->ac)) {
-			c.ac = static_cast<shok::AccessCategory>(ac);
+		if ((1 << ac) & static_cast<int>(this->AccessCat)) {
+			c.AccessCat = static_cast<shok::AccessCategory>(ac);
 			return true;
 		}
 	}
@@ -170,7 +170,7 @@ bool CppLogic::Iterator::MultiRegionEntityIterator::NextRegion(EntityIteratorSta
 			continue;
 		if (c.Y < 0 || c.Y > s)
 			continue;
-		c.ac = shok::AccessCategory::AccessCategoryNone;
+		c.AccessCat = shok::AccessCategory::AccessCategoryNone;
 		NextAccessCategory(c);
 		return true;
 	}
@@ -221,9 +221,9 @@ CppLogic::Iterator::EntityPredicateOfUpgradeCategory::EntityPredicateOfUpgradeCa
 bool CppLogic::Iterator::EntityPredicateOfUpgradeCategory::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	const GGlue::CGlueEntityProps* t = e->GetEntityType();
-	if (const GGL::CGLSettlerProps* s = BB::IdentifierCast<const GGL::CGLSettlerProps>(t->LogicProps))
+	if (const auto* s = BB::IdentifierCast<const GGL::CGLSettlerProps>(t->LogicProps))
 		return s->Upgrade.Category == ucat;
-	if (const GGL::CGLBuildingProps* s = BB::IdentifierCast<const GGL::CGLBuildingProps, EGL::CGLEEntityProps, GGL::CBridgeProperties>(t->LogicProps))
+	if (const auto* s = BB::IdentifierCast<const GGL::CGLBuildingProps, EGL::CGLEEntityProps, GGL::CBridgeProperties>(t->LogicProps))
 		return s->Upgrade.Category == ucat;
 	return false;
 }
@@ -234,7 +234,7 @@ CppLogic::Iterator::EntityPredicateIsNotFleeingFrom::EntityPredicateIsNotFleeing
 }
 bool CppLogic::Iterator::EntityPredicateIsNotFleeingFrom::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	if (const EGL::CMovingEntity* m = dynamic_cast<const EGL::CMovingEntity*>(e))
+	if (const auto* m = dynamic_cast<const EGL::CMovingEntity*>(e))
 		return !m->IsFleeingFrom(pos, range);
 	return true;
 }
@@ -266,7 +266,7 @@ bool CppLogic::Iterator::EntityPredicateIsNotSoldier::Matches(const EGL::CGLEEnt
 }
 bool CppLogic::Iterator::EntityPredicateIsVisible::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
-	if (const GGL::CCamouflageBehavior* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>()) {
+	if (const auto* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>()) {
 		return c->InvisibilityRemaining <= 0;
 	}
 	return true;

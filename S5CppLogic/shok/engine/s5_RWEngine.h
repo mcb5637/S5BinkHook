@@ -59,17 +59,17 @@ namespace RWE {
 
 	struct RwRGBA
 	{
-		byte red;
-		byte green;
-		byte blue;
-		byte alpha;
+		byte red = 0;
+		byte green = 0;
+		byte blue = 0;
+		byte alpha = 0;
 	};
 	struct RwRGBAReal
 	{
-		float red;
-		float green;
-		float blue;
-		float alpha;
+		float red = 0.0f;
+		float green = 0.0f;
+		float blue = 0.0f;
+		float alpha = 0.0f;
 	};
 	struct RwTexCoords
 	{
@@ -99,7 +99,7 @@ namespace RWE {
 		 *        if there is an error
 		 */
 		RwV3d TransformPoint(const RwMatrix* matrix) const;
-		RwV3d Normalize() const;
+		[[nodiscard]] RwV3d Normalize() const;
 		/*
 		 * \ref RwV3dTransformPoints uses the given matrix describing a
 		 * transformation and applies it to the specified array of points. The
@@ -121,12 +121,12 @@ namespace RWE {
 		 *        if there is an error
 		 */
 		static inline RwV3d* (__cdecl* const RwV3dTransformPoints)(RwV3d* pointsOut, const RwV3d* pointsIn, int numPoints, const RwMatrix* matrix) = reinterpret_cast<RwV3d* (__cdecl*)(RwV3d*, const RwV3d*, int, const RwMatrix*)>(0x41C740);
-		float Length() const;
+		[[nodiscard]] float Length() const;
 	};
 	struct RwV2d {
 		float x = 0, y = 0;
 	};
-	struct RwMatrix {
+	struct RwMatrix { // NOLINT(*-pro-type-member-init)
 		RwV3d right;
 		RwMatrixType flags;
 		RwV3d up;
@@ -158,7 +158,7 @@ namespace RWE {
 		// 41A940 MatrixMultiply
 		// 41B3E0 RwMatrixOrthoNormalize
 	};
-	struct RwSphere {
+	struct RwSphere { // NOLINT(*-pro-type-member-init)
 		RwV3d center;
 		float radius;
 	};
@@ -174,13 +174,15 @@ namespace RWE {
 	typedef RpMaterial* (*RpMaterialCallBack)(RpMaterial* material, void* data);
 	typedef RpLight* (*RpLightCallBack) (RpLight* light, void* data);
 
-	struct RwFrame {
+	// ReSharper disable once CppClassNeedsConstructorBecauseOfUninitializedMember
+	struct RwFrame { // NOLINT(*-pro-type-member-init)
 		RwObject object;
 
 		RwLinkList::RwLLLink inDirtyListLink;
 
 		RwMatrix modelling;
 	private:
+		// ReSharper disable once CppUninitializedNonStaticDataMember
 		RwMatrix ltm;
 	public:
 
@@ -211,9 +213,9 @@ namespace RWE {
 		RwMatrix* GetLTM();
 		static inline RwFrame* (__cdecl* const Create)() = reinterpret_cast<RwFrame * (__cdecl*)()>(0x413F10);
 		void Destroy();
-		bool Dirty() const;
+		[[nodiscard]] bool Dirty() const;
 
-		int GetUserDataArrayCount() const;
+		[[nodiscard]] int GetUserDataArrayCount() const;
 		RpUserDataArray* GetUserDataArray(int data);
 		RpUserDataArray* GetUserDataArray(std::string_view name, RpUserDataFormat fmt);
 		template<RpUserDataFormat F>
@@ -365,7 +367,7 @@ namespace RWE {
 		// 634BB0 _rpMeshRead
 	};
 
-	struct RpMorphTarget
+	struct RpMorphTarget // NOLINT(*-pro-type-member-init)
 	{
 		RpGeometry* parentGeom;
 		RwSphere   boundingSphere;
@@ -477,7 +479,7 @@ namespace RWE {
 		// 5D8DB0 RpMorphAtomicAddTime
 	};
 
-	struct RpAtomic {
+	struct RpAtomic { // NOLINT(*-pro-type-member-init)
 		RwObjectHasFrame object;
 		RwResEntry* repEntry;
 		RpGeometry* geometry;
@@ -504,15 +506,15 @@ namespace RWE {
 		void Destroy();
 		void ForAllEmitters(RWE::Particles::RpPrtStdEmitterCallBack cb, void* data);
 		void AddEmitter(RWE::Particles::RpPrtStdEmitter* em);
-		RpWorld* GetWorld() const;
-		void SetGeometry(RpGeometry* geometry, bool assumeSameBoundingSphere);
-		inline Flags GetFlags() const {
+		[[nodiscard]] RpWorld* GetWorld() const;
+		void SetGeometry(RpGeometry* geom, bool assumeSameBoundingSphere);
+		[[nodiscard]] inline Flags GetFlags() const {
 			return static_cast<Flags>(object.object.flags);
 		}
 		inline void SetFlags(Flags f) {
 			object.object.flags = static_cast<byte>(f);
 		}
-		inline RwFrame* GetFrame() {
+		[[nodiscard]] inline RwFrame* GetFrame() const {
 			return static_cast<RwFrame*>(object.object.parent);
 		}
 
@@ -552,12 +554,12 @@ namespace RWE {
 		RpClumpCallBack callback; // 0x6EF940?
 
 		// returns this
-		RpClump* ForAllAtomics(RpAtomicCallBack callback, void* pData);
-		RpClump* ForAllLights(RpLightCallBack callback, void* pData);
+		RpClump* ForAllAtomics(RpAtomicCallBack cb, void* pData);
+		RpClump* ForAllLights(RpLightCallBack cb, void* pData);
 		// RpClumpForAllCameras 628E70
 		// RpClumpRender 628DE0
 
-		RpWorld* GetWorld() const;
+		[[nodiscard]] RpWorld* GetWorld() const;
 
 		// destroys atomics, lights, cameras and frames in the clump
 		// destroys geometry if not used elsewhere
@@ -565,8 +567,8 @@ namespace RWE {
 		void Destroy();
 		void AddToDefaultWorld();
 		static RpClump* Create();
-		RpClump* Clone() const;
-		RwFrame* GetFrame() const;
+		[[nodiscard]] RpClump* Clone() const;
+		[[nodiscard]] RwFrame* GetFrame() const;
 		void SetPlayerColor(int pl);
 		void DisableShadow();
 		void DisableParticleEffects();
@@ -582,7 +584,7 @@ namespace RWE {
 	/*
 	 * This type represents a plane
 	 */
-	struct RwPlane
+	struct RwPlane // NOLINT(*-pro-type-member-init)
 	{
 		RwV3d normal;    /**< Normal to the plane */
 		float distance; /**< Distance to plane from origin in normal direction*/
@@ -590,7 +592,7 @@ namespace RWE {
 	/*
 	 * Structure describing a frustrum plane.
 	 */
-	struct RwFrustumPlane
+	struct RwFrustumPlane // NOLINT(*-pro-type-member-init)
 	{
 		RwPlane             plane;
 		uint8_t             closestX;
@@ -598,7 +600,7 @@ namespace RWE {
 		uint8_t             closestZ;
 		uint8_t             pad;
 	};
-	struct RwCamera
+	struct RwCamera // NOLINT(*-pro-type-member-init)
 	{
 		RwObjectHasFrame    object;
 
@@ -645,7 +647,7 @@ namespace RWE {
 		void SetFarClipPlane(float fa);
 		bool SetProjection(RwCameraProjection pro);
 		void SetViewWindow(RwV2d* viewWind);
-		RwFrame* GetFrame() const;
+		[[nodiscard]] RwFrame* GetFrame() const;
 		bool Clear(RwRGBA color, RwCameraClearMode clearMode); // clears camera to color, needs to be outside of update
 		bool BeginUpdate();
 		bool EndUpdate();
@@ -668,15 +670,15 @@ namespace RWE {
 
 		static inline RpLight* (__cdecl* const Create)(RpLightType type) = reinterpret_cast<RpLight * (__cdecl* const)(RpLightType)>(0x6277F0);
 		void Destroy();
-		void SetColor(const RwRGBAReal& color);
-		float GetConeAngle() const;
+		void SetColor(const RwRGBAReal& c);
+		[[nodiscard]] float GetConeAngle() const;
 		void SetFrame(RwFrame* frame);
-		RwFrame* GetFrame() const;
+		[[nodiscard]] RwFrame* GetFrame() const;
 		// 627920 RpLightStreamRead
 	};
 	static_assert(offsetof(RpLight, color) == 6 * 4);
 
-	struct RpWorld {
+	struct RpWorld { // NOLINT(*-pro-type-member-init)
 		enum class RpWorldRenderOrder : int {
 			rpWORLDRENDERNARENDERORDER = 0,
 			rpWORLDRENDERFRONT2BACK,
@@ -758,7 +760,6 @@ namespace RWE {
 
 	/**
 	 * \ingroup rwcoredriverd3d9
-	 * \struct RwD3D9Vertex
 	 * D3D9 vertex structure definition for 2D geometry
 	 */
 	struct RwIm2DVertex
@@ -791,10 +792,10 @@ namespace RWE {
 		void* fpIm3DRenderPrimitive;
 		void* fpIm3DRenderIndexedPrimitive;
 
-		int SetTextureFilterMode(RwTextureFilterMode m);
-		int SetCullMode(RwCullMode m);
-		RwCullMode GetCullMode();
-		int SetTextureRaster(RWE::RwRaster* r);
+		int SetTextureFilterMode(RwTextureFilterMode m) const; // NOLINT(*-use-nodiscard)
+		int SetCullMode(RwCullMode m) const; // NOLINT(*-use-nodiscard)
+		[[nodiscard]] RwCullMode GetCullMode() const;
+		int SetTextureRaster(RWE::RwRaster* r) const;
 	};
 	static_assert(sizeof(RwDevice) == 56);
 
@@ -927,7 +928,7 @@ namespace RWE {
 	};
 	// 717FE0 RpUserDataPluginAttach
 
-	struct RpMatFXMaterial { // material stores p to this
+	struct RpMatFXMaterial { // material stores p to this // NOLINT(*-pro-type-member-init)
 		enum class DataType : int {
 			None = 0,
 			BumpMap = 1,
@@ -935,8 +936,8 @@ namespace RWE {
 			DualTexture = 4,
 			UVTransformMat = 5,
 		};
-		struct Data {
-			union {
+		struct Data { // NOLINT(*-pro-type-member-init)
+			union { // NOLINT(*-pro-type-member-init)
 				struct {
 					RwFrame* Frame;
 					RwTexture* Texture;
@@ -988,7 +989,7 @@ namespace RWE {
 		 * defines a callback function for registering that the caller has a
 		 * reference to a particular entry.
 		 *
-		 * \param Entry the entry of which to increment the reference count
+		 * \param entry the entry of which to increment the reference count
 		 *
 		 * \return The entry
 		 */
@@ -1012,7 +1013,7 @@ namespace RWE {
 		 * defines a callback function to get the name of an entry in the
 		 * dictionary.
 		 *
-		 * \param Entry The entry
+		 * \param entry The entry
 		 *
 		 * \return A pointer to the name
 		 */

@@ -26,13 +26,16 @@ const char* shok::String::c_str() const
 	else
 		return data.alloc;
 }
+// ReSharper disable once CppDFAConstantFunctionResult
 size_t shok::String::size() const
 {
 	return size_v;
 }
 shok::String::~String()
 {
+	// ReSharper disable once CppDFAConstantConditions
 	if (allocated >= 16)
+		// ReSharper disable once CppDFAUnreachableCode
 		shok::Free(data.alloc);
 }
 static inline void(__thiscall* const str_assign)(shok::String* th, const char* c) = reinterpret_cast<void(__thiscall*)(shok::String*, const char*)>(0x40182E);
@@ -72,21 +75,25 @@ bool shok::String::operator==(const String& r) const
 {
 	return (*this <=> r) == std::strong_ordering::equal;
 }
-void shok::String::operator=(const String& s)
+shok::String& shok::String::operator=(const String& s)
 {
 	assign(s.c_str(), s.size());
+	return *this;
 }
-void shok::String::operator=(const std::string& s)
+shok::String& shok::String::operator=(const std::string& s)
 {
 	assign(s.c_str(), s.size());
+	return *this;
 }
-void shok::String::operator=(const std::string_view& s)
+shok::String& shok::String::operator=(const std::string_view& s)
 {
 	assign(s.data(), s.size());
+	return *this;
 }
-void shok::String::operator=(const char* s)
+shok::String& shok::String::operator=(const char* s)
 {
 	assign(s);
+	return *this;
 }
 shok::String::operator std::string_view() const
 {

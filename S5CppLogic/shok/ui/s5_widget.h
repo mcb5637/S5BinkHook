@@ -17,7 +17,7 @@ namespace EGUIX {
 	struct Color { // size 4
 		int Red = 0xFF, Green = 0xFF, Blue = 0xFF, Alpha = 0xFF; // >=0 && <=0xFF
 
-		shok::Color ToShokColor() const;
+		[[nodiscard]] shok::Color ToShokColor() const;
 		Color() = default;
 		explicit Color(shok::Color c);
 		Color(int r, int g, int b, int a);
@@ -25,7 +25,7 @@ namespace EGUIX {
 
 	class TextureManager { // no vtable, only gui textures in here
 	public:
-		BB::CIDManager* IdManager;
+		BB::CIDManager* IdManager = nullptr;
 		shok::Vector<RWE::RwTexture*> Textures; // loads texture lazily, vector seems to be bigger than number of ids
 
 		shok::GUITextureId GetTextureID(const char* name);
@@ -48,7 +48,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x833B40;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x34D5D406);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		void LoadFont(const char* name);
 	};
@@ -65,7 +65,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x833530;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1B070026);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	};
 	static_assert(sizeof(EGUIX::CSingleStringHandler) == 15 * 4);
 
@@ -80,7 +80,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x834FDC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x53185D06);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	};
 	static_assert(sizeof(EGUIX::CWidgetStringHelper) == 23 * 4);
 
@@ -98,9 +98,9 @@ namespace EGUIX {
 		CMaterial();
 		void SetTexture(const char* name);
 		shok::Position GetSize();
-		RWE::RwTexture* GetTexture();
+		[[nodiscard]] RWE::RwTexture* GetTexture() const;
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	};
 	static_assert(sizeof(EGUIX::CMaterial) == 10 * 4);
 
@@ -113,7 +113,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x8333B8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCBC5B326);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		void Call(shok::WidgetId widgetID);
 	};
@@ -136,10 +136,11 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x832918;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x813DE3B6);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	};
 	static_assert(sizeof(EGUIX::CButtonHelper) == 38 * 4);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IWidgetRegistrationCallback {
 	public:
 		virtual void OnRegistrationChanged(shok::WidgetId id, int mode) = 0; // mode ==2 sem to be unregister
@@ -161,7 +162,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x833CB8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102E66C6);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void OnRegistrationChanged(shok::WidgetId id, int mode) override;
 	};
 	static_assert(sizeof(EGUIX::CToolTipHelper) == 41 * 4);
@@ -244,7 +245,7 @@ namespace EGUIX {
 		EGUIX::CToolTipHelper* GetTooltipHelper();
 		EGUIX::CWidgetStringHelper* GetStringHelper();
 
-		EGUIX::Rect CalcGlobalPosAndSize() const;
+		[[nodiscard]] EGUIX::Rect CalcGlobalPosAndSize() const;
 	};
 	static_assert(sizeof(CBaseWidget) == 14 * 4);
 	//constexpr int i = offsetof(CBaseWidget, PosAndSize.H) / 4;
@@ -307,7 +308,7 @@ namespace EGUIX {
 	public:
 		EGUIX::CMaterial IconMaterial;
 		EGUIX::CLuaFunctionHelper UpdateFunction;
-		bool UpdateManualFlag;
+		bool UpdateManualFlag = false;
 		PADDING(3);
 
 		static inline constexpr int vtp = 0x780CD0;
@@ -352,14 +353,14 @@ namespace EGUIX {
 
 	public:
 		void AddWidget(EGUIX::CBaseWidget* toAdd, const char* name, const EGUIX::CBaseWidget* before);
-		EGUIX::CBaseWidget* CloneAsChild(EGUIX::CBaseWidget* toClone, std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)> nameGen, EGUIX::CBaseWidget* before = nullptr);
+		EGUIX::CBaseWidget* CloneAsChild(EGUIX::CBaseWidget* toClone, const std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)>& nameGen, EGUIX::CBaseWidget* before = nullptr);
 		static EGUIX::CContainerWidget* Create();
 	};
 	static_assert(sizeof(CContainerWidget) == 20 * 4);
 
 	class CProjectWidget : public CContainerWidget {
 	public:
-		shok::WidgetId CurrentRootWidget;
+		shok::WidgetId CurrentRootWidget{};
 
 		static inline constexpr int vtp = 0x780910;
 		static inline constexpr int TypeDesc = 0x832DFC;
@@ -383,8 +384,8 @@ namespace EGUIX {
 	class CProgressBarWidget : public EGUIX::CStaticWidget {
 	public:
 		EGUIX::CLuaFunctionHelper UpdateFunction;
-		bool UpdateManualFlag;
-		float ProgressBarValue, ProgressBarLimit;
+		bool UpdateManualFlag = false;
+		float ProgressBarValue = 0.0f, ProgressBarLimit = 0.0f;
 
 		static inline constexpr int vtp = 0x780C20;
 		static inline constexpr int TypeDesc = 0x833FCC;
@@ -448,7 +449,7 @@ namespace EGUIX {
 		int BufferSize = 0;
 		bool IgnoreNextChar = false;
 		struct Buffer { // 48
-			bool Allocated = 0;
+			bool Allocated = false;
 			PADDING(3);
 			size_t BuffSize = 0;
 			size_t CurrentEditPos = 0;
@@ -888,8 +889,8 @@ namespace GGUI {
 		static constexpr int vtp = 0x77C3D0;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9A90FE66);
 
-		shok::PlayerId GetPlayer() const;
-		bool IsHumanPlayer(shok::PlayerId pl) const;
+		[[nodiscard]] shok::PlayerId GetPlayer() const;
+		[[nodiscard]] bool IsHumanPlayer(shok::PlayerId pl) const;
 		GGL::CGameStatistics* GetStatistics(shok::PlayerId player);
 	};
 	static_assert(offsetof(CStatisticsRendererCustomWidget, IsMainMenu) == 37 * 4);
@@ -968,7 +969,7 @@ namespace GGUI {
 
 		struct MiniMapRenderer {
 			EGUIX::Rect SomePos;
-			int NumVerticies;
+			int NumVerticies = 0;
 
 			// ctor 53D0C5
 			// there are 100 rects that can be rendered at once
@@ -982,9 +983,9 @@ namespace GGUI {
 			static inline std::span<uint16_t, 100> VertexIndices{ reinterpret_cast<uint16_t*>(0x883790), 100 };
 		};
 		struct MiniMapTexture {
-			RWE::RwRaster* Raster;
-			RWE::RwTexture* Texture;
-			BBRw::CDynTexRef* Dyn;
+			RWE::RwRaster* Raster = nullptr;
+			RWE::RwTexture* Texture = nullptr;
+			BBRw::CDynTexRef* Dyn = nullptr;
 			PADDINGI(1);
 
 			// ctor texture 53D7BC (shok::string*)
@@ -997,14 +998,14 @@ namespace GGUI {
 
 		// no vtable
 		PADDING(1);
-		bool RenderFoW;
-		bool BattleMarkersEnabled;
-		Mode CurrentMode; // 1
+		bool RenderFoW = false;
+		bool BattleMarkersEnabled = false;
+		Mode CurrentMode{}; // 1
 		EGUIX::Rect MiniMapRenderPos;
 		struct TerrainHandler {
-			bool TerrainRasterDone;
-			Mode CurrentMode;
-			EGUIX::Rect* RenderPos;
+			bool TerrainRasterDone = false;
+			Mode CurrentMode{};
+			EGUIX::Rect* RenderPos = nullptr;
 			MiniMapRenderer Render;
 			MiniMapTexture NormalTexture, TacticalResourceModeTexture;
 
@@ -1013,12 +1014,12 @@ namespace GGUI {
 			// build terrain raster 5434D8()
 		} Terrain; // 6
 		struct EntitiesHandler {
-			EGUIX::Rect* RenderPos;
+			EGUIX::Rect* RenderPos = nullptr;
 			MiniMapRenderer Render;
 
 			MiniMapTexture minimap_sphere, minimap_quad;
-			int IsResourceMode;
-			bool RenderIgnoreFoW;
+			int IsResourceMode = 0;
+			bool RenderIgnoreFoW = false;
 
 			// set render entity 543D19(f x, f y, f sx, f sy, shok::Color c, rectind)
 			// render entities of accesscat 543E22(f scale, AccessCategoryFlags f)
@@ -1030,22 +1031,22 @@ namespace GGUI {
 			// render 544951()
 		} Entities; // 22
 		struct FoWTerrainHiderHandler {
-			EGUIX::Rect* RenderPos;
+			EGUIX::Rect* RenderPos = nullptr;
 			MiniMapRenderer Render;
 
 			MiniMapTexture ExplorationOverlay;
 
-			float LastUpdateTime;
+			float LastUpdateTime = 0.0f;
 			PADDINGI(1);
 
 			// build fow raster 53E54A(bool =false)
 			// render 53E77B()
 		} FoWTerrainHider; // 38 just renders black over existing terrain
 		struct CameraHandler {
-			EGUIX::Rect* RenderPos;
+			EGUIX::Rect* RenderPos = nullptr;
 			struct {
 				MiniMapRenderer Render;
-				std::array<RWE::RwIm2DVertex, 4> VertToRender;
+				std::array<RWE::RwIm2DVertex, 4> VertToRender{};
 				MiniMapTexture Empty;
 
 				// store vert 54521F()
@@ -1063,15 +1064,15 @@ namespace GGUI {
 			shok::Vector<CMiniMapSignalBattleDetail> BattleDetails; // 21 renders minimap_signal_1
 			shok::Vector<CMiniMapSignalBattleShort> ShortBattles; // 25 renders minimap_signal_0
 			shok::Vector<CMiniMapSignalPulse> Pulses; // 29 renders minimap_signal_0
-			EGUIX::Rect* RenderPos; // 33
+			EGUIX::Rect* RenderPos = nullptr; // 33
 
 			// render signal with active texture 5294C4(CMiniMapSignal*)
 			// render 52A015()
 			// add battle markers 52B237(x, y, int allied) (pos modified see CreateMarker)
 		} Markers; // 88
 		struct DebugTextHandler {
-			bool Active;
-			char Text[128 * 4];
+			bool Active = false;
+			char Text[128 * 4]{};
 
 			// render 543316()
 		} DebugText; // 112
@@ -1126,7 +1127,7 @@ namespace GGUI {
 		static inline constexpr int vtp = 0x77CDCC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x6157C1AE);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		virtual void Initialize() override;
@@ -1265,7 +1266,7 @@ namespace EGUIX {
 
 	class WidgetManager { // this thing has no vtable...
 	public:
-		BB::CIDManagerEx* WidgetNameManager;
+		BB::CIDManagerEx* WidgetNameManager = nullptr;
 		shok::Vector<EGUIX::CBaseWidget*> Widgets;
 
 		shok::WidgetId GetIdByName(const char* name);
@@ -1280,9 +1281,10 @@ namespace EGUIX {
 		shok::WidgetId RegisterName(const char* name);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CWidgetGroupManager : public IWidgetRegistrationCallback {
 	public:
-		BB::CIDManager* Manager;
+		BB::CIDManager* Manager = nullptr;
 
 		shok::WidgetGroupId GetGroupId(const char* s);
 		shok::WidgetGroupId CreateGroup(const char* s);
@@ -1295,7 +1297,7 @@ namespace EGUIX {
 
 	class FontManager { // no vtable either
 	public:
-		BB::CIDManager* Manager;
+		BB::CIDManager* Manager = nullptr;
 		shok::Vector<RWE::P2D::Rt2dFont*> Fonts;
 
 		static void LoadFont(shok::FontId* outFontID, const char* fontName);
@@ -1343,11 +1345,12 @@ namespace EGUIX {
 		static inline void(__cdecl* const KeyStrokeLuaCallback)() = reinterpret_cast<void(__cdecl*)()>(0x55C445);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CEventManager : public IWidgetRegistrationCallback {
 	public:
 		shok::Position CurrentMousePos;
 		PADDINGI(4);
-		shok::Keys CurrentModifiers; // 7
+		shok::Keys CurrentModifiers{}; // 7
 
 		static inline CEventManager* (__cdecl* const GlobalObj)() = reinterpret_cast<CEventManager * (__cdecl*)()>(0x558C16);
 

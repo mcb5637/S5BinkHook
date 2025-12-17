@@ -29,7 +29,7 @@ namespace BB {
 class exception {
 public:
 	virtual ~exception() = default;
-	virtual const char* what() const = 0;
+	[[nodiscard]] virtual const char* what() const = 0;
 
 	static inline constexpr int vtp = 0x788EF8;
 };

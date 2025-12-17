@@ -19,7 +19,8 @@ namespace CppLogic::API {
 
 	public:
 		RNG();
-		RNG(unsigned int seed);
+
+		explicit RNG(unsigned int seed);
 
 		static constexpr std::array<lua::FuncReference, 2> LuaMethods{ {
 				lua::FuncReference::GetRef<Int>("Int"),

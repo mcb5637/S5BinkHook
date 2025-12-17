@@ -73,7 +73,7 @@ shok::Position CppLogic::Mod::FormationSpacedBehavior::GetPosExt(EGL::CGLEEntity
 	EGL::CEventGetPosition ev{ shok::EventIDs::Movement_GetNextFineWaypoint };
 	leader->FireEvent(&ev);
 	shok::Position diff = n - ev.Position;
-	diff *= static_cast<FormationSpacedBehaviorProps*>(PropPointer)->SpaceFactor;
+	diff *= static_cast<FormationSpacedBehaviorProps*>(PropPointer)->SpaceFactor; // NOLINT(*-pro-type-static-cast-downcast)
 	return ev.Position + diff;
 }
 
@@ -185,15 +185,15 @@ void CppLogic::Mod::HawkCircleBehavior::AddHandlers(shok::EntityId id)
 	e->CreateStateHandler<shok::TaskState::HawkCheckHero>(this, &HawkCircleBehavior::StateCheckHeroPos);
 }
 
-shok::Position CppLogic::Mod::HawkCircleBehavior::GetNextCirclePosition(const shok::Position& center)
-{
+shok::Position CppLogic::Mod::HawkCircleBehavior::GetNextCirclePosition(const shok::Position& center) const {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	float a = center.GetAngleBetween(e->Position);
-	float range = static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance;
+	float range = static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance; // NOLINT(*-pro-type-static-cast-downcast)
 	a -= 10;
 	return (center + shok::Position{ range,0 }.Rotate(CppLogic::DegreesToRadians(a))).ClampToWorld();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void CppLogic::Mod::HawkCircleBehavior::EventOnHeroDetach(BB::CEvent* e)
 {
 	EGL::CGLEEntity* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -202,10 +202,11 @@ void CppLogic::Mod::HawkCircleBehavior::EventOnHeroDetach(BB::CEvent* e)
 
 void CppLogic::Mod::HawkCircleBehavior::EventSendHawk(EGL::CEventPosition* e)
 {
-	ExploreTarget = e->Position.ClampToWorld(static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance);
-	EGL::CGLEEntity::GetEntityByID(EntityId)->SetTaskList(static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->ExploreTaskList);
+	ExploreTarget = e->Position.ClampToWorld(static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance); // NOLINT(*-pro-type-static-cast-downcast)
+	EGL::CGLEEntity::GetEntityByID(EntityId)->SetTaskList(static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->ExploreTaskList); // NOLINT(*-pro-type-static-cast-downcast)
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 int CppLogic::Mod::HawkCircleBehavior::TaskExplore(EGL::CGLETaskArgs* a)
 {
 	EGL::CGLEEntity* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -216,7 +217,7 @@ int CppLogic::Mod::HawkCircleBehavior::TaskExplore(EGL::CGLETaskArgs* a)
 	}
 	float r = hero->GetEntityType()->GetBehaviorProps<GGL::CHeroHawkBehaviorProps>()->HawkMaxRange;
 	if (!en->Position.IsInRange(hero->Position, r)) {
-		en->SetTaskList(static_cast<GGL::CGLAnimalProps*>(en->GetEntityType()->LogicProps)->DefaultTaskList);
+		en->SetTaskList(static_cast<GGL::CGLAnimalProps*>(en->GetEntityType()->LogicProps)->DefaultTaskList); // NOLINT(*-pro-type-static-cast-downcast)
 		return 2;
 	}
 	shok::Position t = GetNextCirclePosition(ExploreTarget);
@@ -226,6 +227,7 @@ int CppLogic::Mod::HawkCircleBehavior::TaskExplore(EGL::CGLETaskArgs* a)
 	return 1;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 shok::TaskStateExecutionResult CppLogic::Mod::HawkCircleBehavior::StateExplore(int t)
 {
 	EGL::CGLEEntity* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -236,8 +238,8 @@ shok::TaskStateExecutionResult CppLogic::Mod::HawkCircleBehavior::StateExplore(i
 	}
 	float r = hero->GetEntityType()->GetBehaviorProps<GGL::CHeroHawkBehaviorProps>()->HawkMaxRange;
 	if (hero->Health <= 0 || !en->Position.IsInRange(hero->Position, r)
-		|| ExploreTarget.IsInRange(hero->Position, static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance)) {
-		en->SetTaskList(static_cast<GGL::CGLAnimalProps*>(en->GetEntityType()->LogicProps)->DefaultTaskList);
+		|| ExploreTarget.IsInRange(hero->Position, static_cast<GGL::CHawkBehaviorProps*>(PropPointer)->MaxCirclingDistance)) { // NOLINT(*-pro-type-static-cast-downcast)
+		en->SetTaskList(static_cast<GGL::CGLAnimalProps*>(en->GetEntityType()->LogicProps)->DefaultTaskList); // NOLINT(*-pro-type-static-cast-downcast)
 		return shok::TaskStateExecutionResult::Finished;
 	}
 
@@ -252,6 +254,7 @@ shok::TaskStateExecutionResult CppLogic::Mod::HawkCircleBehavior::StateExplore(i
 	return static_cast<shok::TaskStateExecutionResult>(ev2.Data);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 int CppLogic::Mod::HawkCircleBehavior::TaskCheckHeroPos(EGL::CGLETaskArgs* a)
 {
 	EGL::CGLEEntity* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -267,6 +270,7 @@ int CppLogic::Mod::HawkCircleBehavior::TaskCheckHeroPos(EGL::CGLETaskArgs* a)
 	return 1;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 shok::TaskStateExecutionResult CppLogic::Mod::HawkCircleBehavior::StateCheckHeroPos(int t)
 {
 	EGL::CGLEEntity* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -328,13 +332,14 @@ void CppLogic::Mod::HawkOwnerAbility::AddHandlers(shok::EntityId id)
 	e->CreateEventHandler<shok::EventIDs::Die, BB::CEvent>(this, &HawkOwnerAbility::EventDie);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void CppLogic::Mod::HawkOwnerAbility::EventCreateHawk(BB::CEvent* e)
 {
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	shok::EntityId hawkid = en->GetFirstAttachedEntity(shok::AttachmentType::HERO_HAWK);
 	if (hawkid == shok::EntityId::Invalid) {
 		EGL::CGLEEntityCreator cr{};
-		cr.EntityType = static_cast<GGL::CHeroHawkBehaviorProps*>(AbilityProps)->HawkType;
+		cr.EntityType = static_cast<GGL::CHeroHawkBehaviorProps*>(AbilityProps)->HawkType; // NOLINT(*-pro-type-static-cast-downcast)
 		cr.Pos = en->Position;
 		cr.PlayerId = en->PlayerId;
 		hawkid = (*EGL::CGLEGameLogic::GlobalObj)->CreateEntity(&cr);
@@ -344,6 +349,7 @@ void CppLogic::Mod::HawkOwnerAbility::EventCreateHawk(BB::CEvent* e)
 	hen->Exploration = hen->GetEntityType()->LogicProps->Exploration;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void CppLogic::Mod::HawkOwnerAbility::EventSendHawk(EGL::CEventPosition* ev)
 {
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -354,6 +360,7 @@ void CppLogic::Mod::HawkOwnerAbility::EventSendHawk(EGL::CEventPosition* ev)
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void CppLogic::Mod::HawkOwnerAbility::EventDie(BB::CEvent* e)
 {
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -428,7 +435,7 @@ bool CppLogic::Mod::LightningStrikeAbility::IsAbility(shok::AbilityId ability)
 void CppLogic::Mod::LightningStrikeAbility::EventLightningStrike(EGL::CEventPosition* p)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	const auto* prop = static_cast<LightningStrikeAbilityProps*>(AbilityProps);
+	const auto* prop = static_cast<LightningStrikeAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 
 	if (!p->Position.IsInRange(e->Position, prop->Range))
 		return;
@@ -515,6 +522,7 @@ bool CppLogic::Mod::ResDoodadRefillBehavior::IsAbility(shok::AbilityId ability)
 	return ability == AbilityId;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 int CppLogic::Mod::ResDoodadRefillBehavior::TaskGoToResource(EGL::CGLETaskArgs* a)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -524,6 +532,7 @@ int CppLogic::Mod::ResDoodadRefillBehavior::TaskGoToResource(EGL::CGLETaskArgs* 
 	return 0;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 int CppLogic::Mod::ResDoodadRefillBehavior::TaskExtractRes(EGL::CGLETaskArgs* a)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -533,7 +542,7 @@ int CppLogic::Mod::ResDoodadRefillBehavior::TaskExtractRes(EGL::CGLETaskArgs* a)
 	auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
 	if (res == nullptr)
 		return 0;
-	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps);
+	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (auto* rese = BB::IdentifierCast<GGL::CResourceDoodad>(res)) {
 		rese->SetCurrentResourceAmount(std::min(rese->ResourceAmount + pr->RefillAmount, rese->ResourceAmountAdd));
 	}
@@ -541,7 +550,8 @@ int CppLogic::Mod::ResDoodadRefillBehavior::TaskExtractRes(EGL::CGLETaskArgs* a)
 		EGL::CGLEEffectCreator c{};
 		c.EffectType = pr->Effect;
 		c.PlayerID = e->PlayerId;
-		c.StartPos = t->Position;
+		// ReSharper disable once CppPossiblyUnintendedObjectSlicing
+		c.StartPos = t->Position; // NOLINT(*-slicing)
 		(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&c);
 	}
 	return 0;
@@ -558,7 +568,7 @@ void CppLogic::Mod::ResDoodadRefillBehavior::EventActivate(EGL::CEvent1Entity* e
 	auto* res = EGL::CGLEEntity::GetEntityByID(t->GetFirstAttachedEntity(shok::AttachmentType::MINE_RESOURCE));
 	if (res == nullptr)
 		return;
-	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps);
+	auto* pr = static_cast<ResDoodadRefillBehaviorProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (!res->IsEntityInCategory(pr->AffectedTypes))
 		return;
 	if (!CheckAndResetCooldown())
@@ -652,7 +662,7 @@ int CppLogic::Mod::ShieldCoverAbility::TaskShieldCover(EGL::CGLETaskArgs* a)
 	return 1;
 }
 
-shok::TaskStateExecutionResult CppLogic::Mod::ShieldCoverAbility::StateShieldCover(int)
+shok::TaskStateExecutionResult CppLogic::Mod::ShieldCoverAbility::StateShieldCover(int) // NOLINT(*-make-member-function-const)
 {
 	if (!DurationLeft)
 		return shok::TaskStateExecutionResult::Finished;
@@ -670,7 +680,7 @@ void CppLogic::Mod::ShieldCoverAbility::Activate()
 {
 	if (!CheckAndResetCooldown())
 		return;
-	auto* pr = static_cast<ShieldCoverAbilityProps*>(AbilityProps);
+	auto* pr = static_cast<ShieldCoverAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	DurationLeft = pr->Duration;
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	en->SetTaskList(pr->TaskList);
@@ -681,9 +691,8 @@ void CppLogic::Mod::ShieldCoverAbility::EventActivate(BB::CEvent* ev)
 	Activate();
 }
 
-void CppLogic::Mod::ShieldCoverAbility::ClearProjectiles()
-{
-	auto* pr = static_cast<ShieldCoverAbilityProps*>(AbilityProps);
+void CppLogic::Mod::ShieldCoverAbility::ClearProjectiles() const {
+	auto* pr = static_cast<ShieldCoverAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	CppLogic::Iterator::PredicateInCircle<EGL::CEffect> ic{ en->Position, pr->Range * pr->Range };
 	CppLogic::Iterator::GlobalEffectIterator it{ &ic };
@@ -785,7 +794,7 @@ void CppLogic::Mod::ResurrectAbility::EventActivate(EGL::CEvent1Entity* ev)
 		return;
 	if (t->GetBehavior<GGL::CHeroBehavior>() == nullptr)
 		return;
-	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps);
+	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (!e->Position.IsInRange(t->Position, pr->Range))
 		return;
 	if (!CheckAndResetCooldown())
@@ -797,7 +806,7 @@ void CppLogic::Mod::ResurrectAbility::EventActivate(EGL::CEvent1Entity* ev)
 
 void CppLogic::Mod::ResurrectAbility::EventDie(BB::CEvent* ev)
 {
-	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps);
+	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (SecondsCharged >= pr->RechargeTimeSeconds)
 		SelfCasting = true;
 	SecondsCharged = 0;
@@ -834,7 +843,7 @@ int CppLogic::Mod::ResurrectAbility::TaskTurnTo(EGL::CGLETaskArgs* a)
 	auto* t = EGL::CGLEEntity::GetEntityByID(Target);
 	if (t == nullptr || !t->IsDead())
 		return 0;
-	static_cast<EGL::CMovingEntity*>(e)->SetTargetRotation(e->Position.GetAngleBetweenR(t->Position));
+	static_cast<EGL::CMovingEntity*>(e)->SetTargetRotation(e->Position.GetAngleBetweenR(t->Position)); // NOLINT(*-pro-type-static-cast-downcast)
 	EGL::CGLETaskArgs ta{};
 	ta.TaskType = shok::Task::TASK_TURN_TO_TARGET_ORIENTATION;
 	return static_cast<int>(e->ExecuteTask(&ta));
@@ -842,15 +851,14 @@ int CppLogic::Mod::ResurrectAbility::TaskTurnTo(EGL::CGLETaskArgs* a)
 
 shok::TaskStateExecutionResult CppLogic::Mod::ResurrectAbility::StateResurrect(int time)
 {
-	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto* t = EGL::CGLEEntity::GetEntityByID(Target);
 	if (t == nullptr || !t->IsDead())
 		return shok::TaskStateExecutionResult::Finished;
 	auto* b = t->GetBehavior<GGL::CHeroBehavior>();
 	if (b == nullptr)
 		return shok::TaskStateExecutionResult::Finished;
-	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps);
-	if (b->AdvanceProgress(static_cast<int>(pr->ProgressPerTick * time * *reinterpret_cast<const float*>(0x874970)))) {
+	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
+	if (b->AdvanceProgress(static_cast<int>(static_cast<float>(pr->ProgressPerTick) * static_cast<float>(time) * *reinterpret_cast<const float*>(0x874970)))) {
 		ChargeAbilitiesFor(t);
 		return shok::TaskStateExecutionResult::Finished;
 	}
@@ -872,8 +880,8 @@ shok::TaskStateExecutionResult CppLogic::Mod::ResurrectAbility::StateSelfResurre
 	if (!e->IsDead())
 		return shok::TaskStateExecutionResult::Finished;
 	auto* b = e->GetBehavior<GGL::CHeroBehavior>();
-	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps);
-	if (b->AdvanceProgress(static_cast<int>(pr->ProgressPerTick * time * *reinterpret_cast<const float*>(0x874970)))) {
+	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
+	if (b->AdvanceProgress(static_cast<int>(static_cast<float>(pr->ProgressPerTick) * static_cast<float>(time) * *reinterpret_cast<const float*>(0x874970)))) {
 		ChargeAbilitiesFor(e);
 		return shok::TaskStateExecutionResult::Finished;
 	}
@@ -882,7 +890,7 @@ shok::TaskStateExecutionResult CppLogic::Mod::ResurrectAbility::StateSelfResurre
 
 void CppLogic::Mod::ResurrectAbility::ChargeAbilitiesFor(EGL::CGLEEntity* e)
 {
-	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps);
+	auto* pr = static_cast<ResurrectAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	for (auto* a : e->Behaviours) {
 		if (auto* ab = dynamic_cast<GGL::CHeroAbility*>(a)) {
 			if (ab->IsAbility(shok::AbilityId::AbilityResurrect))
@@ -966,7 +974,7 @@ void CppLogic::Mod::BombardmentAbility::Activate(const shok::Position& tar)
 	if (!CheckAndResetCooldown())
 		return;
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
-	auto* pr = static_cast<BombardmentAbilityProps*>(AbilityProps);
+	auto* pr = static_cast<BombardmentAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (!en->Position.IsInRange(tar, pr->AttackRange))
 		return;
 	Target = tar;
@@ -986,7 +994,7 @@ void CppLogic::Mod::BombardmentAbility::NetEventBombard(EGL::CNetEventEntityAndP
 	shok::Position p{ ev->X, ev->Y };
 	if (!ab->CanUseAbility())
 		return;
-	auto* pr = static_cast<CppLogic::Mod::BombardmentAbilityProps*>(ab->AbilityProps);
+	auto* pr = static_cast<CppLogic::Mod::BombardmentAbilityProps*>(ab->AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (!p.IsInRange(e->Position, pr->AttackRange))
 		return;
 	ab->Activate(p);
@@ -995,7 +1003,7 @@ void CppLogic::Mod::BombardmentAbility::NetEventBombard(EGL::CNetEventEntityAndP
 int CppLogic::Mod::BombardmentAbility::TaskBombard(EGL::CGLETaskArgs* a)
 {
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
-	auto* pr = static_cast<BombardmentAbilityProps*>(AbilityProps);
+	auto* pr = static_cast<BombardmentAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (pr->DistanceOverride > 0) {
 		shok::Position dir = Target - en->Position;
 		Target = en->Position + dir.Normalize() * pr->DistanceOverride;
@@ -1008,6 +1016,7 @@ int CppLogic::Mod::BombardmentAbility::TaskBombard(EGL::CGLETaskArgs* a)
 	CProjectileEffectCreator cr{};
 	cr.EffectType = pr->EffectType;
 	cr.PlayerID = en->PlayerId;
+	// ReSharper disable once CppPossiblyUnintendedObjectSlicing
 	cr.StartPos = cr.CurrentPos = en->Position;
 	cr.TargetPos = Target;
 	cr.AttackerID = eid;
@@ -1031,7 +1040,7 @@ int CppLogic::Mod::BombardmentAbility::TaskTurnToBombardTargetSettler(EGL::CGLET
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	float rot = en->Position.GetAngleBetween(Target);
 	rot = CppLogic::DegreesToRadians(rot);
-	static_cast<EGL::CMovingEntity*>(en)->SetTargetRotation(rot);
+	static_cast<EGL::CMovingEntity*>(en)->SetTargetRotation(rot); // NOLINT(*-pro-type-static-cast-downcast)
 	EGL::CGLETaskArgs t{};
 	t.TaskType = shok::Task::TASK_TURN_TO_TARGET_ORIENTATION;
 	en->ExecuteTask(&t);
@@ -1200,11 +1209,11 @@ void CppLogic::Mod::ReloadableCannonBuilderAbility::operator delete(void* p)
 
 void CppLogic::Mod::ReloadableCannonBuilderAbility::AddHandlers(shok::EntityId id)
 {
-	GGL::CHeroAbility::AddHandlers(id);
+	GGL::CHeroAbility::AddHandlers(id); // NOLINT(*-parent-virtual-call)
 	auto* e = EGL::CGLEEntity::GetEntityByID(id);
 	auto* cb = static_cast<GGL::CCannonBuilderBehavior*>(this);
 	e->CreateTaskHandler<shok::Task::TASK_GO_TO_CANNON_POSITION>(cb, &ReloadableCannonBuilderAbility::TaskGoToCannonPos);
-	e->CreateTaskHandler<shok::Task::TASK_BUILD_CANNON>(this, &ReloadableCannonBuilderAbility::TaskBuildCannon);
+	e->CreateTaskHandler<shok::Task::TASK_BUILD_CANNON>(this, &ReloadableCannonBuilderAbility::TaskBuildCannonA);
 	e->CreateEventHandler<shok::EventIDs::CannonBuilder_BuildCannonCommand>(cb, &ReloadableCannonBuilderAbility::EventActivate);
 	e->CreateEventHandler<shok::EventIDs::HeroAbility_Cancel>(cb, &ReloadableCannonBuilderAbility::EventCancel);
 	e->CreateEventHandler<shok::EventIDs::Die>(cb, &ReloadableCannonBuilderAbility::EventCancel);
@@ -1230,7 +1239,7 @@ void CppLogic::Mod::ReloadableCannonBuilderAbility::NetEventBombComboCannon(EGL:
 	e->FireEvent(&ev2);
 }
 
-int CppLogic::Mod::ReloadableCannonBuilderAbility::TaskBuildCannon(EGL::CGLETaskArgs* a)
+int CppLogic::Mod::ReloadableCannonBuilderAbility::TaskBuildCannonA(EGL::CGLETaskArgs* a)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	while (auto* t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED))) {
@@ -1241,7 +1250,7 @@ int CppLogic::Mod::ReloadableCannonBuilderAbility::TaskBuildCannon(EGL::CGLETask
 	if (auto* f = EGL::CGLEEntity::GetEntityByID(fid)) {
 		auto tid = f->GetFirstAttachedEntity(shok::AttachmentType::FOUNDATION_TOP_ENTITY);
 		if (auto* t = EGL::CGLEEntity::GetEntityByID(tid)) {
-			auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps);
+			auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 			e->AttachEntity(shok::AttachmentType::SUMMONER_SUMMONED, tid, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
 			if (auto* lab = t->GetBehavior<LimitedAmmoBehavior>())
 				lab->ReloadToMax(pr->Reloads);
@@ -1254,7 +1263,7 @@ void CppLogic::Mod::ReloadableCannonBuilderAbility::EventTick(BB::CEvent* ev)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	if (auto* t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED))) {
-		auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps);
+		auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 		if (e->Position.IsInRange(t->Position, pr->ReloadRange)) {
 			if (auto* lab = t->GetBehavior<LimitedAmmoBehavior>())
 				lab->ReloadToMax(pr->Reloads);
@@ -1266,10 +1275,10 @@ void CppLogic::Mod::ReloadableCannonBuilderAbility::EventBombComboCannonActivate
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	if (auto* t = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::SUMMONER_SUMMONED))) {
-		auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps);
+		auto* pr = static_cast<ReloadableCannonBuilderAbilityProps*>(AbilityProps); // NOLINT(*-pro-type-static-cast-downcast)
 		if (e->Position.IsInRange(t->Position, pr->ReloadRange)) {
 			if (auto* ba = t->GetBehavior<BombardmentAbility>()) {
-				if (t->Position.IsInRange(ev->Position, static_cast<BombardmentAbilityProps*>(ba->AbilityProps)->AttackRange)) {
+				if (t->Position.IsInRange(ev->Position, static_cast<BombardmentAbilityProps*>(ba->AbilityProps)->AttackRange)) { // NOLINT(*-pro-type-static-cast-downcast)
 					ba->Activate(ev->Position);
 					GGL::CEventHeroAbilityInteger ev2{ shok::EventIDs::HeroAbility_SetChargeCurrent, 0, shok::AbilityId::AbilityPlaceBomb };
 					e->FireEvent(&ev2);
@@ -1321,7 +1330,7 @@ bool CppLogic::Mod::LimitedAmmoUIDisplayBehavior::RenderUI(GGUI::OnScreenInfoRen
 		if (auto* t = EGL::CGLEEntity::GetEntityByID(f->GetFirstAttachedEntity(shok::AttachmentType::FOUNDATION_TOP_ENTITY))) {
 			if (auto* la = t->GetBehavior<LimitedAmmoBehavior>()) {
 				if (la->MaxAmmo > 0)
-					data->LimitedLifespanBar = std::max(static_cast<float>(la->RemainingAmmo) / la->MaxAmmo, 0.00001f);
+					data->LimitedLifespanBar = std::max(static_cast<float>(la->RemainingAmmo) / static_cast<float>(la->MaxAmmo), 0.00001f);
 			}
 		}
 	}
@@ -1512,16 +1521,16 @@ void CppLogic::Mod::AdvancedMarketBehavior::FillCurrentTrade()
 			float currentam = MinResources.ByResT(shok::ResourceType::Gold);
 			if (bank < currentam) {
 				for (auto currentres : ResTradeOrder) {
-					float currentam = MinResources.ByResT(currentres);
-					float bank = m->CurrentResources.GetResourceAmountFromType(currentres, true);
-					if (currentam + tradestep > bank)
+					float currentam_l = MinResources.ByResT(currentres);
+					float bank_l = m->CurrentResources.GetResourceAmountFromType(currentres, true);
+					if (currentam_l + tradestep > bank_l)
 						continue;
-					currentam = currentam - bank;
-					if (std::abs(currentam) > std::abs(amount)) {
-						FillCurrentTrade(currentres, currentam, tradestep);
+					currentam_l = currentam_l - bank_l;
+					if (std::abs(currentam_l) > std::abs(amount)) {
+						FillCurrentTrade(currentres, currentam_l, tradestep);
 						if (!CurrentTrade.IsTradeValid())
 							continue;
-						amount = currentam;
+						amount = currentam_l;
 						resty = currentres;
 						isMin = true;
 					}
@@ -1561,7 +1570,7 @@ void CppLogic::Mod::AdvancedMarketBehavior::FillCurrentTrade()
 float CppLogic::Mod::AdvancedMarketBehavior::TradeStepSize()
 {
 	auto pl = EGL::CGLEEntity::GetEntityByID(EntityId)->PlayerId;
-	auto* p = static_cast<GGL::CServiceBuildingBehaviorProperties*>(PropPointer);
+	auto* p = static_cast<GGL::CServiceBuildingBehaviorProperties*>(PropPointer); // NOLINT(*-pro-type-static-cast-downcast)
 	return p->GetProgressAmount(pl);
 }
 
@@ -1588,22 +1597,22 @@ std::string_view CppLogic::Mod::AdvancedMarketBehavior::GetResIcon(shok::Resourc
 	switch (t) {
 	case shok::ResourceType::Gold:
 	case shok::ResourceType::GoldRaw:
-		return "@icon:graphics\\textures\\gui\\i_res_gold_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+		return R"(@icon:graphics\textures\gui\i_res_gold_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|)";
 	case shok::ResourceType::Wood:
 	case shok::ResourceType::WoodRaw:
-		return "@icon:graphics\\textures\\gui\\i_res_wood_large,0.0625,0,0.875,0.875,2,2,255,255,255,a|";
+		return R"(@icon:graphics\textures\gui\i_res_wood_large,0.0625,0,0.875,0.875,2,2,255,255,255,a|)";
 	case shok::ResourceType::Clay:
 	case shok::ResourceType::ClayRaw:
-		return "@icon:graphics\\textures\\gui\\i_res_mud_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+		return R"(@icon:graphics\textures\gui\i_res_mud_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|)";
 	case shok::ResourceType::Stone:
 	case shok::ResourceType::StoneRaw:
-		return "@icon:graphics\\textures\\gui\\i_res_stone_large,0.0625,0,0.875,0.8125,2,2,255,255,255,a|";
+		return R"(@icon:graphics\textures\gui\i_res_stone_large,0.0625,0,0.875,0.8125,2,2,255,255,255,a|)";
 	case shok::ResourceType::Iron:
 	case shok::ResourceType::IronRaw:
-		return "@icon:graphics\\textures\\gui\\i_res_iron_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+		return R"(@icon:graphics\textures\gui\i_res_iron_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|)";
 	case shok::ResourceType::Sulfur:
 	case shok::ResourceType::SulfurRaw:
-		return "@icon:graphics\\textures\\gui\\i_res_sulfur_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|";
+		return R"(@icon:graphics\textures\gui\i_res_sulfur_large,0.0625,0,0.875,0.71875,2,2,255,255,255,a|)";
 	default:
 		throw std::invalid_argument{ "invalid resource type" };
 	}
@@ -1648,7 +1657,7 @@ void CppLogic::Mod::AdvancedMarketBehavior::PerformTradeStep()
 
 void CppLogic::Mod::AdvancedMarketBehavior::EventWork(BB::CEvent* ev)
 {
-	auto* p = static_cast<AdvancedMarketBehaviorProps*>(PropPointer);
+	auto* p = static_cast<AdvancedMarketBehaviorProps*>(PropPointer); // NOLINT(*-pro-type-static-cast-downcast)
 	++WorkSteps;
 	if (WorkSteps >= p->WorkStepsNeededForTrade) {
 		PerformTradeStep();
@@ -1770,7 +1779,7 @@ bool CppLogic::Mod::AdvancedFoundationBehavior::CanBuyTurret(int i) const
 		return false;
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto& r = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->CurrentResources;
-	return r.HasResources(&static_cast<AdvancedFoundationBehaviorProps*>(PropPointer)->Turret[i].BuyCost);
+	return r.HasResources(&static_cast<AdvancedFoundationBehaviorProps*>(PropPointer)->Turret[i].BuyCost); // NOLINT(*-pro-type-static-cast-downcast)
 }
 
 bool CppLogic::Mod::AdvancedFoundationBehavior::IsTurretActive(int i) const
@@ -1782,7 +1791,7 @@ bool CppLogic::Mod::AdvancedFoundationBehavior::IsTurretActive(int i) const
 
 void CppLogic::Mod::AdvancedFoundationBehavior::InitData()
 {
-	auto* p = static_cast<AdvancedFoundationBehaviorProps*>(PropPointer);
+	auto* p = static_cast<AdvancedFoundationBehaviorProps*>(PropPointer); // NOLINT(*-pro-type-static-cast-downcast)
 	while (Turret.size() > p->Turret.size()) {
 		ClearTurret(Turret.back());
 		Turret.pop_back();
@@ -1794,7 +1803,7 @@ void CppLogic::Mod::AdvancedFoundationBehavior::InitData()
 void CppLogic::Mod::AdvancedFoundationBehavior::CreateMissingTurrets()
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	auto* p = static_cast<AdvancedFoundationBehaviorProps*>(PropPointer);
+	auto* p = static_cast<AdvancedFoundationBehaviorProps*>(PropPointer); // NOLINT(*-pro-type-static-cast-downcast)
 	InitData();
 	for (unsigned int i = 0; i < Turret.size(); ++i) {
 		if (!Turret[i].Active && p->Turret[i].BuyCost.Gold < 0.0f)
@@ -1859,7 +1868,7 @@ void CppLogic::Mod::AdvancedFoundationBehavior::EventBuyTurret(EGL::CEventValue_
 
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto& r = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId)->CurrentResources;
-	r.SubResources(static_cast<AdvancedFoundationBehaviorProps*>(PropPointer)->Turret[ev->Data].BuyCost);
+	r.SubResources(static_cast<AdvancedFoundationBehaviorProps*>(PropPointer)->Turret[ev->Data].BuyCost); // NOLINT(*-pro-type-static-cast-downcast)
 
 	Turret[ev->Data].Active = true;
 	CreateMissingTurrets();

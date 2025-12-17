@@ -10,9 +10,9 @@ namespace CppLogic::UI {
 	void OnSaveLoaded(lua::State L);
 
 
-	constexpr const char* CharTriggerRegKey = "CppLogic::UI::CharTrigger";
-	constexpr const char* KeyTriggerRegKey = "CppLogic::UI::KeyTrigger";
-	constexpr const char* MouseTriggerRegKey = "CppLogic::UI::MouseTrigger";
+	constexpr std::string_view CharTriggerRegKey = "CppLogic::UI::CharTrigger";
+	constexpr std::string_view KeyTriggerRegKey = "CppLogic::UI::KeyTrigger";
+	constexpr std::string_view MouseTriggerRegKey = "CppLogic::UI::MouseTrigger";
 
 	class GUIState_LuaSelection : public GGUI::CState {
 	public:
@@ -21,7 +21,7 @@ namespace CppLogic::UI {
 		lua::Reference RefOnCancel = lua::State::NoRef;
 
 		virtual ~GUIState_LuaSelection() override;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual bool OnMouseEvent(BB::CEvent* ev) override;
 		virtual bool Cancel() override;
 		virtual const char* GetName() override;
@@ -44,11 +44,11 @@ namespace CppLogic::UI {
 		int CurrentStep = 0;
 
 		static constexpr int NumSteps = 4;
-		static constexpr float StepToDegrees = 360 / NumSteps;
+		static constexpr float StepToDegrees = 360.0f / NumSteps;
 
 		static void Initialize();
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual const char* GetName() override;
 
 		virtual void SetStateParameters(GGUI::SStateParameters* p) override;
@@ -60,7 +60,7 @@ namespace CppLogic::UI {
 		virtual bool OnCancel() override;
 
 		void UpdateModel(int x, int y);
-		float GetRotation();
+		float GetRotation() const;
 		void SetRotation(float deg);
 		void OnRotationChanged();
 

@@ -383,7 +383,7 @@ namespace RWE::Anim {
 	 * A structure describing a Quaternion
 	 *
 	*/
-	struct RtQuat
+	struct RtQuat // NOLINT(*-pro-type-member-init)
 	{
 		RwV3d               imag;   /**< The imaginary part(s) */
 		float              real;   /**< The real part */
@@ -396,7 +396,7 @@ namespace RWE::Anim {
 	 * such keyframes in an \ref RtAnimAnimation defines the animation of each
 	 * node in a hierarchy.
 	 */
-	struct RpHAnimKeyFrame
+	struct RpHAnimKeyFrame // NOLINT(*-pro-type-member-init)
 	{
 		RpHAnimKeyFrame* prevFrame;  /**< Pointer to the previous keyframe */
 		float              time;       /**< Time at keyframe */
@@ -410,7 +410,7 @@ namespace RWE::Anim {
 
 
 		void* GetCustomData() = delete;
-		constexpr RpHAnimKeyFrame* GetKeyFrames() {
+		[[nodiscard]] constexpr RpHAnimKeyFrame* GetKeyFrames() const {
 			return static_cast<RpHAnimKeyFrame*>(pFrames);
 		}
 	};
@@ -467,8 +467,8 @@ namespace RWE::Anim {
 		RpHAnimHierarchy* Clone();
 		void Destroy();
 		void UpdateMatrices();
-		int IDGetIndex(int id) const;
-		RwFrame* GetFromIndex(int idx);
+		[[nodiscard]] int IDGetIndex(int id) const;
+		[[nodiscard]] RwFrame* GetFromIndex(int idx) const;
 
 		void SetupForModel(RWE::RpClump* c);
 	};
@@ -515,10 +515,10 @@ namespace RWE::Anim {
 	{
 
 
-		constexpr RtCompressedKeyFrameCustomData* GetCustomData() {
+		[[nodiscard]] constexpr RtCompressedKeyFrameCustomData* GetCustomData() const {
 			return static_cast<RtCompressedKeyFrameCustomData*>(customData);
 		}
-		constexpr RtCompressedKeyFrame* GetKeyFrames() {
+		[[nodiscard]] constexpr RtCompressedKeyFrame* GetKeyFrames() const {
 			return static_cast<RtCompressedKeyFrame*>(pFrames);
 		}
 	};
@@ -545,7 +545,7 @@ namespace RWE::Anim {
 	};
 
 	// not in headers ...
-	struct RpSkin {
+	struct RpSkin { // NOLINT(*-pro-type-member-init)
 		uint32_t NumBones;
 		uint32_t NumUsedBones;
 		uint32_t* UsedBonesData;
@@ -659,10 +659,10 @@ namespace RWE::Anim {
 		// 5E29A0 RpUVAnimDestroy
 		// 5E29E0 RpUVAnimAddRef
 
-		constexpr _rpUVAnimCustomData* GetCustomData() {
+		[[nodiscard]] constexpr _rpUVAnimCustomData* GetCustomData() const {
 			return static_cast<_rpUVAnimCustomData*>(customData);
 		}
-		constexpr RpUVAnimKeyFrame* GetKeyFrames() {
+		[[nodiscard]] constexpr RpUVAnimKeyFrame* GetKeyFrames() const {
 			return static_cast<RpUVAnimKeyFrame*>(pFrames);
 		}
 

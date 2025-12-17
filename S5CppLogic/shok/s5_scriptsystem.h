@@ -27,9 +27,9 @@ namespace EScr {
 	public:
 		shok::Map<shok::TriggerId, CScriptTrigger*> Trigger; // 2 UniqueID -> Data
 		shok::Map<shok::EventIDs, shok::Vector<CScriptTrigger*>> ActiveTrigger; // 5
-		shok::TriggerId UniqueTriggerID; // next trigger id 8
-		bool TriggerSystemDisabled;
-		lua_State* State;
+		shok::TriggerId UniqueTriggerID = static_cast<shok::TriggerId>(1); // next trigger id 8
+		bool TriggerSystemDisabled = false;
+		lua_State* State = nullptr;
 
 
 		static inline constexpr int vtp = 0x78667C;
@@ -59,22 +59,24 @@ namespace EScr {
 	};
 	//constexpr int i = offsetof(CScriptTriggerSystem, ActiveTrigger) / 4;
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CLuaFuncRef {
 	public:
 		virtual int __stdcall GetRefToFunc() = 0;
 
-		lua::State L;
-		bool NeedsCompile;
+		lua::State L = nullptr;
+		bool NeedsCompile = true;
 		PADDING(3);
-		int Ref; // 3
+		int Ref = lua::State::NoRef.Value(); // 3
 
 		void Clear();
 		void CreateRef(); // unrefs anything previously refd
 		bool CheckRef(); // creates if not already done, then return if the ref is valid
 		bool Call(int nargs, int nres); // uses shok error handling, so you get a popup on errors
-		void SetState(lua::State L); // removes from prev StateAddon and adds to new one (both with null check)
+		void SetState(lua::State l); // removes from prev StateAddon and adds to new one (both with null check)
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CLuaFuncRefCommand : public CLuaFuncRef {
 	public:
 		shok::String LuaCommand; // 4 - 10
@@ -90,6 +92,7 @@ namespace EScr {
 	};
 	static_assert(sizeof(EScr::CLuaFuncRefCommand) == 12 * 4);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CLuaFuncRefGlobal : public CLuaFuncRef {
 	public:
 		shok::String FuncName;
@@ -135,6 +138,7 @@ namespace EScr {
 	static_assert(offsetof(CScriptTrigger, ActionFunc) == 14 * 4);
 	static_assert(sizeof(CScriptTrigger) == 35 * 4);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ILuaDebugger {
 		// no vtable
 	public:
@@ -154,7 +158,7 @@ namespace EScr {
 		// serialize table kv pair 5A1E50 (this, L) primitive type, value, primitive key string, return success, if false, have to remove type from stream wtf?
 		// serialize primitive 5A19AB (this, data*, len) writes len, data
 		// deserialize primitive 5A1AA6 (this, len*) reads len, then data, fixed size buffer 0xA06C98! end 0xA0AB18?
-		// deseraialize primitive, throw away size 5A1B6D (this)
+		// deserialize primitive, throw away size 5A1B6D (this)
 		// deserialize table 5A1BB0 (this, L, index)
 		void SerializeState(lua_State* L);
 		void DeserializeState(lua_State* L);
@@ -174,8 +178,8 @@ namespace EScr {
 
 	struct StateAddon {
 		shok::Map<shok::String, const char*> Docs;
-		ILuaDebugger* LuaDebugger;
-		bool DebugScript;
+		ILuaDebugger* LuaDebugger = nullptr;
+		bool DebugScript = false;
 		shok::List<CLuaFuncRef*> RegisteredRefs;
 
 		// ctor 0x5A282C, dtor 0x59D39F
@@ -190,6 +194,7 @@ namespace EScr {
 	static_assert(sizeof(StateAddon) == 8 * 4);
 }
 
+// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 class CLuaDebuggerPort : public EScr::ILuaDebugger {
 public:
 	static inline constexpr int vtp = 0x76233C;

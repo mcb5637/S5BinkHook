@@ -16,7 +16,7 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 	try {
 		BB::CFileStreamEx f{};
 		if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultWrite)) {
-			s->SerializeByData(&f, this, SerializationData, 0);
+			s->SerializeByData(&f, this, SerializationData, nullptr);
 		}
 		f.Close();
 	}
@@ -187,17 +187,17 @@ void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 	StringTableTextOverride.clear();
 }
 
-CreateSerializationListForKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverride, "id");
+CreateSerializationListForKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverrideData, "id");
 
 BB::SerializationData CppLogic::SavegameExtra::StringTableTextOverride::SerializationData[]{
-	AutoMemberSerializationNameKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverride, "string", "id"),
+	AutoMemberSerializationNameKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverrideData, "string", "id"),
 	BB::SerializationData::GuardData(),
 };
 
 void CppLogic::SavegameExtra::StringTableTextOverride::Merge(std::string_view prefix, lua_State* s) const
 {
 	auto& target = SerializedMapdata::GetActiveOverrides(s);
-	for (const auto& [k, v] : StringTableTextOverride) {
+	for (const auto& [k, v] : StringTableTextOverrideData) {
 		target[std::format("{}/{}", prefix, k)] = v;
 	}
 	SerializedMapdata::STTHasChanged(s);

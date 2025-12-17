@@ -7,7 +7,7 @@ void ED::CEntity::ResetPositionData()
     SetPositionData(&d);
 }
 
-ED::ModelData* ED::CEntity::GetModelData()
+ED::ModelData* ED::CEntity::GetModelData() const
 {
     int m = reinterpret_cast<int>(Model);
     if (m == 0)

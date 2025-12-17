@@ -3,7 +3,7 @@
 #include <shok/globals/s5_classfactory.h>
 #include <shok/entity/s5_entity.h>
 
-void CppLogic::EntityAddon::EntityAddonData::operator=(const EntityAddonData& other)
+CppLogic::EntityAddon::EntityAddonData& CppLogic::EntityAddon::EntityAddonData::operator=(const EntityAddonData& other)
 {
 	EntityId = other.EntityId;
 	HealthOverride = other.HealthOverride;
@@ -16,6 +16,7 @@ void CppLogic::EntityAddon::EntityAddonData::operator=(const EntityAddonData& ot
 	MaxRangeOverride = other.MaxRangeOverride;
 	NameOverride = other.NameOverride;
 	FakeTaskValue = other.FakeTaskValue;
+	return *this;
 }
 
 shok::ClassId __stdcall CppLogic::EntityAddon::EntityAddonData::GetClassIdentifier() const

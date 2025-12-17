@@ -113,7 +113,7 @@ shok::Position luaext::EState::CheckPos(int idx)
 	GetTableRaw(i);
 	float y = CheckFloat(-1);
 	Pop(2);
-	int size = *EGL::CGLEGameLogic::MapSize * 100;
+	auto size = static_cast<float>(*EGL::CGLEGameLogic::MapSize * 100);
 	if (!(x >= 0 && y >= 0 && x < size && y < size))
 		throw lua::LuaException("position outside of map");
 	return shok::Position(x, y);
@@ -133,8 +133,8 @@ shok::PositionRot luaext::EState::CheckPosRot(int i, bool rad)
 	if (rad)
 		r = CppLogic::DegreesToRadians(r);
 	Pop(3);
-	int size = *EGL::CGLEGameLogic::MapSize * 100;
-	if (!(x >= 0 && y >= 0 && x < size&& y < size))
+	auto size = static_cast<float>(*EGL::CGLEGameLogic::MapSize * 100);
+	if (!(x >= 0 && y >= 0 && x < size && y < size))
 		throw lua::LuaException("position outside of map");
 	return { x,y,r };
 }
@@ -283,7 +283,7 @@ EGUIX::CBaseWidget* luaext::EState::CheckWidget(int idx)
 
 int str_ends_with(const char* str, const char* suffix) {
 
-	if (str == NULL || suffix == NULL)
+	if (str == nullptr || suffix == nullptr)
 		return 0;
 
 	size_t str_len = strlen(str);

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "l_tech.h"
-#include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/tech/s5_tech.h>
 #include <shok/entity/s5_entity.h>
@@ -92,7 +91,6 @@ namespace CppLogic::Tech {
 	int TechAddConstructionSpeedModifier(lua::State ls) {
 		luaext::EState L{ ls };
 		GGL::CBuilding::EnableConstructionSpeedTechs();
-		shok::Technology* tech = L.CheckTech(1);
 		char op = L.CheckString(3)[0];
 		GGL::CBuilding::ConstructionSpeedModifiers.push_back({ L.CheckEnum<shok::TechnologyId>(1), L.CheckFloat(2), op });
 		return 0;

@@ -2,7 +2,7 @@
 #include <string>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
-#include <shok/entity/s5_behaviors.h>
+#include <shok/entity/s5_baseprops.h>
 
 namespace CppLogic::EntityAddon {
 	class EntityAddonData : public EGL::CGLEBehavior {
@@ -15,16 +15,16 @@ namespace CppLogic::EntityAddon {
 		int RegenHPOverride = -1;
 		int RegenSecondsOverride = -1;
 		float MaxRangeOverride = -1.0f;
-		std::string NameOverride = "";
+		std::string NameOverride;
 		int FakeTaskValue = 0;
 
-		void operator =(const EntityAddonData& other);
+		EntityAddonData& operator =(const EntityAddonData& other);
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1004);
 		static const BB::SerializationData SerializationData[];
 
 		virtual ~EntityAddonData() override = default;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;

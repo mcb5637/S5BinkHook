@@ -19,7 +19,7 @@ namespace EGL {
 		void* operator new(size_t s);
 		void operator delete(void* p);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 	private:
 		void SetVT(int vt);
 	};
@@ -43,7 +43,7 @@ namespace GGL {
 	static_assert(offsetof(CDamageClassProps, LeaderCategory) == 9 * 4);
 	class DamageClassesHolder {
 	public:
-		BB::CIDManagerEx* DamageClassManager;
+		BB::CIDManagerEx* DamageClassManager = nullptr;
 		shok::Vector<GGL::CDamageClassProps*> DamageClassList; // there is a damageclass 0, probably not working at all
 
 		GGL::CDamageClassProps* Get(shok::DamageClassId id);
@@ -53,50 +53,55 @@ namespace GGL {
 
 	class CLogicProperties : public BB::IObject { // noted here are default values, loading logic.xml might override stuff
 	public:
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct SBuildingUpgradeCategory {
-			shok::UpgradeCategoryId Category;
-			shok::EntityTypeId FirstBuilding;
-			int NumScholars;
+			shok::UpgradeCategoryId Category{};
+			shok::EntityTypeId FirstBuilding{};
+			int NumScholars = 1;
 
 			static inline constexpr int vtp = 0x76EF10;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9498E0E7);
-			virtual shok::ClassId GetClassIdentifier() const;
+			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const;
 
 			SBuildingUpgradeCategory(shok::UpgradeCategoryId car, shok::EntityTypeId first);
 			SBuildingUpgradeCategory(SBuildingUpgradeCategory&& o) noexcept;
 		};
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct SSettlerUpgradeCategory {
-			shok::UpgradeCategoryId Category;
-			shok::EntityTypeId FirstSettler;
+			shok::UpgradeCategoryId Category{};
+			shok::EntityTypeId FirstSettler{};
 
 			static inline constexpr int vtp = 0x76EF18;
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8DC75427);
-			virtual shok::ClassId GetClassIdentifier() const;
+			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const;
 
 			SSettlerUpgradeCategory(shok::UpgradeCategoryId cat, shok::EntityTypeId first);
 			SSettlerUpgradeCategory(SSettlerUpgradeCategory&& o) noexcept;
 		};
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct STaxationLevel {
-			int RegularTax;
-			float MotivationChange;
+			int RegularTax = 0;
+			float MotivationChange = 0.0f;
 
 			static inline constexpr int vtp = 0x76EF20;
-			virtual shok::ClassId GetClassIdentifier() const = 0;
+			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const = 0;
 		};
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct STradeResource {
-			shok::ResourceType ResourceType;
-			float BasePrice, MinPrice, MaxPrice, Inflation, Deflation, WorkAmount;
+			shok::ResourceType ResourceType{};
+			float BasePrice = 0.0f, MinPrice = 0.0f, MaxPrice = 0.0f, Inflation = 0.0f, Deflation = 0.0f, WorkAmount = 0.0f;
 
 			static inline constexpr int vtp = 0x76EF28;
-			virtual shok::ClassId GetClassIdentifier() const = 0;
+			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const = 0;
 		};
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct SBlessCategory {
-			shok::BlessCategoryId Name;
-			float RequiredFaith;
+			shok::BlessCategoryId Name{};
+			float RequiredFaith = 0.0f;
 			shok::Vector<shok::EntityTypeId> EntityTypes;
 
 			static inline constexpr int vtp = 0x76EFC4;
-			virtual unsigned int GetClassIdentifier() const = 0;
+			[[nodiscard]] virtual unsigned int GetClassIdentifier() const = 0;
 		};
 
 		int CompensationOnBuildingSale = 100;
@@ -177,8 +182,8 @@ namespace GGL {
 
 	class CPlayerAttractionProps : public BB::IObject {
 	public:
-		int AttractionFrequency, PaydayFrequency, EntityTypeBanTime, ReAttachWorkerFrequency, PlayerMoneyDispo;
-		float MaximumDistanceWorkerToFarm, MaximumDistanceWorkerToResidence;
+		int AttractionFrequency = 10, PaydayFrequency = 120, EntityTypeBanTime = 30, ReAttachWorkerFrequency = 10, PlayerMoneyDispo = 0;
+		float MaximumDistanceWorkerToFarm = 0.0f, MaximumDistanceWorkerToResidence = 0.0f;
 
 		static inline constexpr int vtp = 0x770834;
 
@@ -190,15 +195,15 @@ namespace GGL {
 		shok::String Table;
 
 		struct LevelData { // size 9
-			float DamageAmount;
-			float DamageBonus;
-			float HealingPoints;
-			float DodgeChance;
-			float AutoAttackRange;
-			float MaxRange;
-			float Speed;
-			float Exploration;
-			float MissChance; // without GGL::CEntityProfile::HookExperience only positive modifiers apply
+			float DamageAmount = 0.0f;
+			float DamageBonus = 0.0f;
+			float HealingPoints = 0.0f;
+			float DodgeChance = 0.0f;
+			float AutoAttackRange = 0.0f;
+			float MaxRange = 0.0f;
+			float Speed = 0.0f;
+			float Exploration = 0.0f;
+			float MissChance = 0.0f; // without GGL::CEntityProfile::HookExperience only positive modifiers apply
 			// all of them get used by profile modification
 		};
 
@@ -216,7 +221,7 @@ namespace GGL {
 	class ExperienceClassHolder {
 	public:
 		shok::Vector<ExperienceClass*> Classes;
-		bool Loaded;
+		bool Loaded = false;
 
 		ExperienceClass* GetClass(shok::ExperienceClass cl);
 
@@ -239,22 +244,22 @@ namespace ED {
 	public:
 		virtual ~CDisplayProps() = default;
 
-		bool ShadowBlur;
+		bool ShadowBlur = false;
 		PADDING(3);
-		unsigned int ShadowRasterSize;
-		float ShadowStrength;
-		shok::Color InvalidPositionColorModulate;
-		shok::Color InvalidPositionColorEmissive;
+		unsigned int ShadowRasterSize = 64;
+		float ShadowStrength = 0.0f;
+		shok::Color InvalidPositionColorModulate{0x68, 0xcd, 0x84, 0};
+		shok::Color InvalidPositionColorEmissive{0x6c, 0xcd, 0x84, 0};
 		shok::Vector<shok::Color> PlayerColor;
 		shok::Vector<shok::Color> MiniMapColor;
-		float SelectionRadiusScaleForModelsWithDecal;
-		int FogOfWarNeverSeenLuminance;
-		int FogOfWarSeenLuminance;
-		float AuraRadius;
-		float AuraHeight;
+		float SelectionRadiusScaleForModelsWithDecal = 1.0f;
+		int FogOfWarNeverSeenLuminance = 32;
+		int FogOfWarSeenLuminance = 128;
+		float AuraRadius = 100.0f;
+		float AuraHeight = 20.0f;
 		shok::String AuraTexture;
-		shok::ModelId CommandAcknowledgementModel;
-		int CommandAcknowledgementDuration;
+		shok::ModelId CommandAcknowledgementModel{};
+		float CommandAcknowledgementDuration = 2.0f;
 		PADDINGI(1);
 
 		static inline constexpr int vtp = 0x7AE630;
@@ -267,7 +272,7 @@ namespace ED {
 namespace GGUI {
 	class CGuiProperties : public BB::IObject {
 	public:
-		float ShortMessageDisplayTime, ShortMessageHistoryTime;
+		float ShortMessageDisplayTime = 30.0f, ShortMessageHistoryTime = 60.0f;
 
 		static constexpr int vtp = 0x77BCA8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x700839B6);
@@ -292,10 +297,10 @@ namespace CppLogic {
 			}
 			return shok::ExperienceClass::Invalid;
 		}
-		inline const char* GetNameByID(shok::ExperienceClass id) const {
+		[[nodiscard]] inline const char* GetNameByID(shok::ExperienceClass id) const {
 			return Manager->Classes.at(static_cast<int>(id))->Table.c_str();
 		}
-		inline size_t size() const {
+		[[nodiscard]] inline size_t size() const {
 			return Manager->Classes.size();
 		}
 
@@ -321,10 +326,11 @@ namespace CppLogic {
 				return r;
 			}
 		};
-		inline Iter begin() const {
+		// ReSharper disable once CppMemberFunctionMayBeStatic
+		[[nodiscard]] inline Iter begin() const { // NOLINT(*-convert-member-functions-to-static)
 			return Iter{ 0 };
 		}
-		inline Iter end() const {
+		[[nodiscard]] inline Iter end() const {
 			return Iter{ static_cast<int>(Manager->Classes.size()) };
 		}
 	};

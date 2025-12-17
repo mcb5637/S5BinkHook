@@ -9,7 +9,7 @@ namespace EGL {
 	class ITerrainVertexColors {
 	public:
 		virtual ~ITerrainVertexColors() = default;
-		// more funcs for serualization
+		// more funcs for serialization
 
 		static inline constexpr int vtp = 0x7841DC;
 	};
@@ -20,9 +20,9 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x7841F8;
 
-		void ToTerrainCoord(shok::Position& p, int* out);
-		bool IsCoordValid(int* out) const;
-		int GetTerrainVertexColor(shok::Position& p);
+		static void ToTerrainCoord(shok::Position& p, int* out);
+		bool IsCoordValid(const int* out) const;
+		int GetTerrainVertexColor(shok::Position& p) const;
 		void SetTerrainVertexColor(shok::Position& p, int col); // a,r,g,b each int8
 	};
 
@@ -33,15 +33,15 @@ namespace EGL {
 	public:
 		friend class EGL::CGLELandscape;
 		shok::Vector<int16_t> TerrainHeights;
-		int MaxSizeX, MaxSizeY; // 5
-		int ArraySizeX, ArraySizeY; // 7
+		int MaxSizeX = 0, MaxSizeY = 0; // 5
+		int ArraySizeX = 0, ArraySizeY = 0; // 7
 
 		static inline constexpr int vtp = 0x7837B0;
 
 		// is valid 0x58E0EE thiscall(pos*)
 		static void ToTerrainCoord(const shok::Position& p, int* out);
-		bool IsCoordValid(int* out);
-		bool IsCoordValid(int x, int y);
+		[[nodiscard]] bool IsCoordValid(const int* out) const;
+		[[nodiscard]] bool IsCoordValid(int x, int y) const;
 		int GetTerrainHeight(const shok::Position& p);
 		void SetTerrainHeight(const shok::Position& p, int h); // int16
 	private:
@@ -56,15 +56,15 @@ namespace EGL {
 		friend class EGL::CGLELandscape;
 		shok::Vector<int> Data; // terrain type &0xFF, water type &0x3F00 >>8, water height &0x3FFFC000 >>14
 		shok::Vector<int> BridgeHeights;
-		int MaxSizeX, MaxSizeY; // 9
-		int ArraySizeX, ArraySizeY; // 11
+		int MaxSizeX = 0, MaxSizeY = 0; // 9
+		int ArraySizeX = 0, ArraySizeY = 0; // 11
 
 		static inline constexpr int vtp = 0x7837C0;
 
 		static void ToQuadCoord(const shok::Position& p, int* out);
-		bool IsCoordValid(const int* out);
-		bool IsCoordValid(int x, int y);
-		bool IsBridgeHeightCoordValid(int x, int y);
+		[[nodiscard]] bool IsCoordValid(const int* out) const;
+		[[nodiscard]] bool IsCoordValid(int x, int y) const;
+		[[nodiscard]] bool IsBridgeHeightCoordValid(int x, int y) const;
 		int GetTerrainTypeAt(const shok::Position& p);
 		void SetTerrainTypeAt(const shok::Position& p, int tty); // byte (int8)
 		int GetWaterTypeAt(const shok::Position& p);
@@ -88,6 +88,7 @@ namespace EGL {
 		float GetBridgeHeightFloat(float x, float y);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CTiling { // this thing has some strange inheritance going on...
 		virtual void unknown0() = 0;
 		virtual void unknown1() = 0;
@@ -121,9 +122,11 @@ namespace EGL {
 		static inline constexpr int vtp = 0x783878;
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CLandscapeBase {
 		virtual void unknown() = 0;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CGLELandscape : public CLandscapeBase {
 	public:
 		enum class BlockingMode : byte {
@@ -134,14 +137,14 @@ namespace EGL {
 			TerrainSlope = 0x8,
 		};
 
-		EGL::LandscapeBlockingData* BlockingData;
+		EGL::LandscapeBlockingData* BlockingData = nullptr;
 		PADDINGI(1); //  0 array?
-		EGL::CTiling* Tiling;
+		EGL::CTiling* Tiling = nullptr;
 		PADDINGI(3); // set/list of BB::TSlotEx1<EGL::CGLEGameLogic,EGL::C2DVector const &>
-		EGL::CGLETerrainHiRes* HiRes;
-		EGL::CGLETerrainLowRes* LowRes;
-		EGL::CTerrainVertexColors* VertexColors; // 9
-		bool IsNotWinter;
+		EGL::CGLETerrainHiRes* HiRes = nullptr;
+		EGL::CGLETerrainLowRes* LowRes = nullptr;
+		EGL::CTerrainVertexColors* VertexColors = nullptr; // 9
+		bool IsNotWinter = false;
 
 		static inline constexpr int vtp = 0x783C38;
 
@@ -167,10 +170,10 @@ namespace EGL {
 
 			AdvancedAARectIterator(const shok::Position& p, const shok::AARect& area, float rot, bool LowRes, bool AddOne);
 			AdvancedAARectIterator(const shok::Position& p, const shok::AARect& area, float rot, bool LowRes);
-			bool HasNext(const Coord& Curr) const;
+			[[nodiscard]] bool HasNext(const Coord& Curr) const;
 			void ToNext(Coord& Curr) const;
-			Iter begin() const;
-			Iter end() const;
+			[[nodiscard]] Iter begin() const;
+			[[nodiscard]] Iter end() const;
 		};
 
 		shok::SectorId GetSector(const shok::Position* p);
@@ -179,7 +182,7 @@ namespace EGL {
 		bool IsValidPos(shok::Position* p);
 		shok::Position GetMapSize();
 		bool IsPosBlockedInMode(const shok::Position* p, BlockingMode mode);
-		BlockingMode GetBlocking(const shok::Position& p);
+		[[nodiscard]] BlockingMode GetBlocking(const shok::Position& p) const;
 		void FlattenPosForBuilding(const shok::Position& p, const shok::AARect& area, float rot);
 		// block for vector of aarect: thiscall 577B07 (this, pos*, vector<aarect>*, float, byte*)
 		// unblock for vector of aarect: thiscall 577C12 (this, pos*, vector<aarect>*, float, byte*)
@@ -190,9 +193,9 @@ namespace EGL {
 		void WeatherChangeBlockingUpdate();
 		void AdvancedRemoveBridgeHeight(const shok::Position& p, const shok::AARect& area, float rot);
 		void AdvancedApplyBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
-		void AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode);
-		bool IsAreaUnblockedInMode(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode mode, bool AddOne);
-		bool IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne);
+		void AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode) const;
+		[[nodiscard]] bool IsAreaUnblockedInMode(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode mode, bool AddOne) const;
+		[[nodiscard]] bool IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne) const;
 
 		bool IsPosUnderwater(const shok::Position& p);
 		bool IsWaterAtPosFreezable(const shok::Position& p);
@@ -201,7 +204,7 @@ namespace EGL {
 		// 0x58E8B0 is blocked by water cdecl(int) as y*mapsize+x
 		// 0x58E830 get water blocked cdecl(int) ->0x20000000 if blocked else 0x10000000
 	private:
-		void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode); // this probably got inlined by the compiler originally...
+		void RemoveSingleBlockingPoint(int x, int y, BlockingMode mode) const; // this probably got inlined by the compiler originally...
 	};
 	//constexpr int i = offsetof(CGLELandscape, CurrentWeather) / 4;
 }
@@ -217,9 +220,9 @@ namespace EGL {
 		int ArraySizeXY;
 		byte* data;
 
-		bool IsCoordValid(int x, int y);
-		shok::Position GetFreeBuildingPlacementPos(const GGL::CGLBuildingProps* bprops, const shok::PositionRot& pos, float range);
-		inline EGL::CGLELandscape::BlockingMode GetBlockingData(int x, int y);
+		[[nodiscard]] bool IsCoordValid(int x, int y) const;
+		shok::Position GetFreeBuildingPlacementPos(const GGL::CGLBuildingProps* bprops, const shok::PositionRot& pos, float range) const;
+		[[nodiscard]] EGL::CGLELandscape::BlockingMode GetBlockingData(int x, int y) const;
 
 		// 0x898B80 global to data
 	};
@@ -290,9 +293,9 @@ namespace EGL {
 			int GameTurn;
 		};
 		struct SingleResOut {
-			shok::Goods GoodType;
+			shok::Goods GoodType{};
 			shok::Position MapPosition;
-			int GameTurn;
+			int GameTurn = 0;
 		};
 		struct GenMessageData {
 			int LastGameTurn;
@@ -320,15 +323,15 @@ namespace EGL {
 	class PlayerManager { // name from the file in savegames
 	public:
 		struct Player {
-			bool PlayerInGame;
-			BB::IObject* PlayerData; // nullptr mp related?
-			CPlayerExplorationHandler* ExplorationHandler;
-			CPlayerFeedbackHandler* FeedbackHandler;
-			CEntityVectorMap* EntityVectorMap;
+			bool PlayerInGame = false;
+			BB::IObject* PlayerData = nullptr; // nullptr mp related?
+			CPlayerExplorationHandler* ExplorationHandler = nullptr;
+			CPlayerFeedbackHandler* FeedbackHandler = nullptr;
+			CEntityVectorMap* EntityVectorMap = nullptr;
 		};
-		Player Players[9];
+		Player Players[9]{};
 		PADDINGI(1); // seridata-> belongs to array, 0 wtf???
-		CPlayerExplorationUpdate* ExplorationUpdate; //46
+		CPlayerExplorationUpdate* ExplorationUpdate = nullptr; //46
 
 		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(shok::PlayerId pl);
 		void SetShareExplorationFlag(shok::PlayerId pl1, shok::PlayerId pl2, bool share);
@@ -365,7 +368,7 @@ namespace EGL {
 		Entry* GetEntry(const shok::Position& p);
 		void GetEntryComponents(const shok::Position& p, int& x, int& y);
 		Entry* GetEntry(int x, int y);
-		int GetSingleEntryComponent(float x);
+		static int GetSingleEntryComponent(float x);
 	private:
 		size_t GetEntryIdByComponents(int x, int y);
 		size_t GetEntryId(const shok::Position& p);
@@ -375,6 +378,7 @@ namespace EGL {
 	};
 	static_assert(sizeof(RegionDataEntity::Entry) == 120);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IGLEGameLogic : public BB::IPostEvent {
 
 	};
@@ -382,16 +386,16 @@ namespace EGL {
 	static_assert(sizeof(RandomNumberGenerator) == 4);
 	class CGLEGameLogic : public IGLEGameLogic {
 		PADDINGI(6);
-		LogicGameTime* InGameTime; // 7
-		GGlue::WaterPropsLogic* WaterPropsLogic;
-		EGL::CGLELandscape* Landscape; // 9
+		LogicGameTime* InGameTime = nullptr; // 7
+		GGlue::WaterPropsLogic* WaterPropsLogic = nullptr;
+		EGL::CGLELandscape* Landscape = nullptr; // 9
 		RegionDataEntity RegionDataEntityObj; // 10
 		PADDINGI(5);
-		EGL::PlayerManager* PlayerMng; // 19
+		EGL::PlayerManager* PlayerMng = nullptr; // 19
 		PADDINGI(8); // 24 multimap of netevent handlers?, empty
 		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
-		EGL::CGLEScripting* Scripting;
-		BB::IPostEvent* GGL_GameLogic_NeteventHandler;
+		EGL::CGLEScripting* Scripting = nullptr;
+		BB::IPostEvent* GGL_GameLogic_NeteventHandler = nullptr;
 		RandomNumberGenerator RNG; // 34 pretty sure this is not c++ std originally, but this one does the same as the original.
 
 	private:
@@ -429,9 +433,9 @@ namespace EGL {
 		static inline constexpr int vtp = 0x7839CC;
 
 		shok::EntityId CreateEntity(EGL::CGLEEntityCreator* cr);
-		int GetTimeMS();
-		int GetTick();
-		float GetTimeSeconds();
+		[[nodiscard]] int GetTimeMS() const;
+		[[nodiscard]] int GetTick() const;
+		[[nodiscard]] float GetTimeSeconds() const;
 		void ClearToDestroy();
 
 		static void HookCreateEffect();
@@ -457,6 +461,7 @@ namespace GGL {
 	class IWeatherSystem {
 		// no vtable
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CWeatherHandler : public IWeatherSystem {
 		virtual void GetStateChangingProgress(void*) = 0;
 	public:
@@ -474,24 +479,24 @@ namespace GGL {
 			int Transition = 0;
 		};
 
-		shok::WeatherState CurrentWeatherState;
-		int CurrentWeatherIndex;
+		shok::WeatherState CurrentWeatherState{};
+		int CurrentWeatherIndex = 0;
 		PADDINGI(1);// 3 next nonperiodic weather?
-		int NextWeatherIndex;
-		int CurrentWeatherOffset; // 5
+		int NextWeatherIndex = 0;
+		int CurrentWeatherOffset = 0; // 5
 		shok::Map<int, WeatherElementData> Elements;
-		int NextPeriodicWeatherStartTimeOffset;
+		int NextPeriodicWeatherStartTimeOffset = 0;
 		struct { // 10
-			int CurrentWeatherGFXState; //0
-			shok::WeatherGFXSet FromGFXState;
-			int StartedTimeOffset;
-			shok::WeatherGFXSet ToGFXState; //3 0 if no chnage
-			int TransitionLength;
-			shok::WeatherState StateToChangeFrom;
-			shok::WeatherState StateToChangeTo;
-			int WeatherStateChangeTimeOffset; //7
-			int WIndexToChangeTo;
-			int State; // 1 changing, 2 fix
+			int CurrentWeatherGFXState = 0; //0
+			shok::WeatherGFXSet FromGFXState{};
+			int StartedTimeOffset = 0;
+			shok::WeatherGFXSet ToGFXState{}; //3 0 if no chnage
+			int TransitionLength = 0;
+			shok::WeatherState StateToChangeFrom{};
+			shok::WeatherState StateToChangeTo{};
+			int WeatherStateChangeTimeOffset = 0; //7
+			int WIndexToChangeTo = 0;
+			int State = 0; // 1 changing, 2 fix
 		} WeatherChange;
 
 
@@ -511,10 +516,10 @@ namespace GGL {
 	public:
 		struct PlayerData {
 			PADDINGI(1);
-			GGL::CPlayerStatus* GameStatus;
+			GGL::CPlayerStatus* GameStatus = nullptr;
 		};
 
-		PlayerData Player[9];
+		PlayerData Player[9]{};
 		PADDINGI(1); // seridata-> belongs to array, 0 wtf???
 
 		GGL::CPlayerStatus* GetPlayer(shok::PlayerId p);
@@ -560,7 +565,7 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76E018;
 
-		GGL::CPlayerStatus* GetPlayer(shok::PlayerId i);
+		[[nodiscard]] GGL::CPlayerStatus* GetPlayer(shok::PlayerId i) const;
 		void EnableAlarmForPlayer(shok::PlayerId pl);
 		void DisableAlarmForPlayer(shok::PlayerId pl);
 		void UpgradeSettlerCategory(shok::PlayerId pl, shok::UpgradeCategoryId ucat);

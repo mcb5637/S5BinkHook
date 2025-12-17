@@ -1,5 +1,4 @@
 #include "pch.h"
-#include <cmath>
 #include "s5_player.h"
 #include <shok/s5_defines.h>
 #include <shok/globals/s5_maplogic.h>

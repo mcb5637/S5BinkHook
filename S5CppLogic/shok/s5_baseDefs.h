@@ -1,5 +1,7 @@
 #pragma once
+// ReSharper disable once CppUnusedIncludeDirective
 #include <cstdint>
+// ReSharper disable once CppUnusedIncludeDirective
 #include <compare>
 #include <numbers>
 
@@ -24,20 +26,20 @@ namespace shok {
 
 		void FloorToBuildingPlacement();
 		void RoundToBuildingPlacement();
-		float GetDistanceSquaredTo(const Position& p) const;
-		bool IsInRange(const Position& p, float range) const;
+		[[nodiscard]] float GetDistanceSquaredTo(const Position& p) const;
+		[[nodiscard]] bool IsInRange(const Position& p, float range) const;
 		// returns rad
-		float GetAngle() const;
+		[[nodiscard]] float GetAngle() const;
 		// returns rad, this is a hok specific angle, useful for a look at by settlers
-		float GetAngleBetweenR(const Position& p) const;
+		[[nodiscard]] float GetAngleBetweenR(const Position& p) const;
 		// returns deg, this is a hok specific angle, useful for a look at by settlers
-		float GetAngleBetween(const Position& p) const;
+		[[nodiscard]] float GetAngleBetween(const Position& p) const;
 		// requires rad
-		Position Rotate(float r) const;
+		[[nodiscard]] Position Rotate(float r) const;
 		// requires rad
-		Position RotateAround(float r, const Position& center) const;
-		Position Normalize() const;
-		Position ClampToWorld(float border = 0.0f) const;
+		[[nodiscard]] Position RotateAround(float r, const Position& center) const;
+		[[nodiscard]] Position Normalize() const;
+		[[nodiscard]] Position ClampToWorld(float border = 0.0f) const;
 
 		Position operator+(const Position& other) const;
 		Position& operator+=(const Position& other);
@@ -45,9 +47,9 @@ namespace shok {
 		Position& operator-=(const Position& other);
 		Position operator*(float f) const;
 		Position& operator*=(float f);
-		float Dot(const Position& o) const;
-		float DotSquare() const;
-		Position Abs() const noexcept;
+		[[nodiscard]] float Dot(const Position& o) const;
+		[[nodiscard]] float DotSquare() const;
+		[[nodiscard]] Position Abs() const noexcept;
 		auto operator<=>(const Position& o) const = default;
 
 		static BB::SerializationData* SerializationData;
@@ -82,8 +84,8 @@ namespace shok {
 		AARect& operator-=(const AARect& other);
 
 		// requires rad
-		AARect Rotate(float r) const;
-		AARect Sort() const;
+		[[nodiscard]] AARect Rotate(float r) const;
+		[[nodiscard]] AARect Sort() const;
 
 		// uses Blocked1 and Blocked2 for the 2 members
 		static BB::SerializationData* SerializationData;
@@ -100,7 +102,7 @@ namespace shok {
 		float Wood = 0, WoodRaw = 0;
 		float WeatherEnergy = 0, Knowledge = 0, Faith = 0;
 
-		float GetResourceAmountFromType(shok::ResourceType ty, bool addRaw) const;
+		[[nodiscard]] float GetResourceAmountFromType(shok::ResourceType ty, bool addRaw) const;
 		void AddToType(shok::ResourceType ty, float toadd);
 		void SubFromType(shok::ResourceType ty, float tosub);
 		bool HasResources(const CostInfo* has) const;
@@ -129,16 +131,6 @@ namespace shok {
 	};
 	static_assert(sizeof(shok::Color) == 1 * 4);
 
-	class ConstructionInfo {
-	public:
-		PADDINGI(1);
-		shok::Vector<shok::PositionRot> BuilderSlot;
-		int Time;
-		shok::CostInfo Cost;
-		shok::EntityTypeId ConstructionSite;
-	};
-	static_assert(sizeof(ConstructionInfo) == 100);
-
 	static inline char* (__cdecl* const CopyString)(const char* s) = reinterpret_cast<char* (__cdecl*)(const char*)>(0x547BD5);
 	static inline void(__cdecl* const StringToLowerCase)(char* s) = reinterpret_cast<void(__cdecl*)(char* s)>(0x547C81);
 
@@ -156,7 +148,7 @@ namespace BB {
 	class IObject {
 	public:
 		virtual ~IObject() = default;
-		virtual shok::ClassId __stdcall GetClassIdentifier() const = 0;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const = 0;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id);
 
 		static constexpr int TypeDesc = 0x7FFE08;
@@ -197,6 +189,7 @@ namespace BB {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x456C66DD);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IPostEvent {
 	public:
 		virtual void __stdcall PostEvent(BB::CEvent* ev) = 0;
@@ -328,7 +321,7 @@ namespace EGL {
 		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObserverEffects; // 11 other -> this
 		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEntities; // 14 this -> other
 		shok::MultiMap<shok::AttachmentType, shok::Attachment> ObservedEffects; // 17 this -> other
-		bool SendEvent; // 20
+		bool SendEvent = true; // 20
 		PADDING(3);
 
 		static constexpr int vtp = 0x783D18;
@@ -347,11 +340,13 @@ namespace EGL {
 
 
 	template<class EventType, class ReturnType>
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IGLEHandler {
 	public:
 		virtual ReturnType Handle(EventType* t) = 0;
 	};
 	template<int HandlerID, class EventBase, class HandlerEvent, class ObjectType, class ReturnType>
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class THandler : public IGLEHandler<EventBase, ReturnType> {
 	public:
 		typedef ReturnType(ObjectType::* HandlerType)(HandlerEvent* ev);
@@ -380,10 +375,12 @@ namespace EGL {
 	using EventHandler = EGL::IGLEHandler<BB::CEvent, void>;
 	using TaskHandler = EGL::IGLEHandler<EGL::CGLETaskArgs, int>;
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IGLEStateHandler {
 		virtual shok::TaskStateExecutionResult Handle(int i) = 0;
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	template<class ObjectType>
 	class TStateHandler : public IGLEStateHandler {
 	public:
@@ -413,7 +410,7 @@ namespace EGL {
 	class EventHandlerList {
 	public:
 		shok::MultiMap<shok::EventIDs, EGL::EventHandler*> Handlers;
-		bool AllowAdd;
+		bool AllowAdd = true;
 
 		// dtor 49EB85
 		void AddHandler(shok::EventIDs id, EGL::EventHandler* h);
@@ -434,9 +431,9 @@ namespace EGL {
 	requires (NumBits == 1)
 	class C2DBitArray : public BB::IObject {
 	public:
-		int SizeX, SizeY;
-		int SizeXEx; // y coord multiplyer, (SizeX + 31) & 0xFFFFFFE0
-		unsigned int BufferSize; // in bytes, 4 * ((SizeY * SizeXEx >> 5) + 1) & 0xFFFFFFFE
+		int SizeX = 0, SizeY = 0;
+		int SizeXEx = 0; // y coord multiplyer, (SizeX + 31) & 0xFFFFFFE0
+		unsigned int BufferSize = 0; // in bytes, 4 * ((SizeY * SizeXEx >> 5) + 1) & 0xFFFFFFFE
 		shok::Vector<unsigned int> ValueArray; // likely binary data, just gets serialized as uints, rets reserved as BufferSize/4
 
 		// NumBits==1 vtp 0x784EC0
@@ -464,6 +461,21 @@ namespace EGL {
 		static constexpr int vtp = 0x784ED0;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEE435293);
 	};
+}
+
+namespace GGL {
+	class CGLBuildingConstructionProps {
+	public:
+		virtual ~CGLBuildingConstructionProps() = default;
+
+		shok::Vector<shok::PositionRot> BuilderSlot;
+		int Time = 0;
+		shok::CostInfo Cost;
+		shok::EntityTypeId ConstructionSite = {};
+
+		static constexpr int vtp = 0x76eb48;
+	};
+	static_assert(sizeof(CGLBuildingConstructionProps) == 100);
 }
 
 namespace CppLogic {
@@ -501,6 +513,7 @@ namespace CppLogic {
 
 
 	template<int HandlerID, class EventBase, class HandlerEvent, class ReturnType>
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class StaticHandler : public EGL::IGLEHandler<EventBase, ReturnType> {
 	public:
 		typedef ReturnType(*HandlerType)(HandlerEvent* ev);
@@ -537,7 +550,7 @@ namespace CppLogic {
 		inline Rect(const shok::Position& a, const shok::Position& b, const shok::Position& c) : A(a), B(b), C(c) {}
 		Rect(const shok::Position& start, const shok::Position& end, float width);
 
-		bool IsPosInRect(const shok::Position& p) const noexcept;
-		shok::AARect BoundingBox() const noexcept;
+		[[nodiscard]] bool IsPosInRect(const shok::Position& p) const noexcept;
+		[[nodiscard]] shok::AARect BoundingBox() const noexcept;
 	};
 }

@@ -76,7 +76,7 @@ namespace GGL {
 		bool AttachWorker(shok::EntityId worker, shok::EntityId building);
 		shok::EntityId PerformSpawnWorker(GGL::CBuilding* workplace, GGL::CBuilding* spawner);
 
-		int GetAttractionUsageOfVector(const shok::Vector<shok::EntityId>& v) const;
+		[[nodiscard]] int GetAttractionUsageOfVector(const shok::Vector<shok::EntityId>& v) const;
 
 		// checkpayday 4C25FB thiscall
 		static void HookCheckPayday();
@@ -102,7 +102,7 @@ namespace GGL {
 		static int __thiscall CannonsInProgressAttraction(const CPlayerAttractionHandler* th);
 		static void __attribute((naked)) CannonsInProgressAttractionASM();
 	};
-	constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
+	//constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
 
 	class CUpgradeManager : public BB::IObject {
 	public:
@@ -196,6 +196,7 @@ namespace GGL {
 
 	struct PlayerTechManager;
 	// checks for TechState::Researched (4)
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CTechConditionPredicate {
 	public:
 		virtual bool CheckTech(PlayerTechManager* mng, shok::Technology techId) const = 0;
@@ -205,6 +206,7 @@ namespace GGL {
 		static constexpr int vtp = 0x766B3C;
 	};
 	// checks if all own requirements fulfill CTechConditionPredicate
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CPreConditionPredicate : public CTechConditionPredicate {
 	public:
 		CPreConditionPredicate();
@@ -296,22 +298,24 @@ namespace GGL {
 		shok::PlayerId PlayerID;
 		int LastGatherTurn;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CResourceStatistics {
 	public:
 		struct ResData {
-			shok::ResourceType ResourceType;
-			int AmountMined;
-			int AmountRefined;
+			shok::ResourceType ResourceType{};
+			int AmountMined = 0;
+			int AmountRefined = 0;
 			GGL::GameStatisticsTimeline TimeLine;
 		};
 
 		shok::Vector<ResData> Data;
 		PADDINGI(1);
 
-		virtual unsigned int __stdcall GetClassIdentifier() const;
+		[[nodiscard]] virtual unsigned int __stdcall GetClassIdentifier() const;
 
 		static inline constexpr int vtp = 0x76E0D8;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CGameStatistics {
 	public:
 		struct TechResearchData {
@@ -332,7 +336,7 @@ namespace GGL {
 		shok::Vector<TechResearchData> ResearchedTechnologies;
 		shok::Vector<BuildingUpgradedData> UpgradedBuildings;
 
-		virtual unsigned int __stdcall GetClassIdentifier() const;
+		[[nodiscard]] virtual unsigned int __stdcall GetClassIdentifier() const;
 
 		static inline constexpr int vtp = 0x76E0E0;
 
@@ -344,7 +348,7 @@ namespace GGL {
 	//constexpr int i = offsetof(CGameStatistics, MotivationTimeLine) / 4;
 
 	class PlayerDiplomacyManager {
-		shok::PlayerId PlayerID;
+		shok::PlayerId PlayerID{};
 		shok::Array<shok::DiploState, 9> DiplomacyState;
 	};
 

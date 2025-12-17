@@ -208,7 +208,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeList(lua::State L, 
 	L.GetTableRaw(-2);
 
 	if (L.IsTable(-1)) {
-		for (int k : L.IPairs(-1)) {
+		for ([[maybe_unused]] int _ : L.IPairs(-1)) {
 			void* d = s->ListOptions->AddToList(o);
 			DeserializeField(L, d, s, true);
 			s->ListOptions->FinalizeAddToList(o);
@@ -518,7 +518,7 @@ CppLogic::Serializer::AdvLuaStateSerializer::AdvLuaStateSerializer(BB::IStream& 
 void CppLogic::Serializer::AdvLuaStateSerializer::WritePrimitive(const void* d, size_t len)
 {
 	IO.Write(&len, sizeof(size_t));
-	IO.Write(d, len);
+	IO.Write(d, static_cast<long>(len));
 }
 
 size_t CppLogic::Serializer::AdvLuaStateSerializer::ReadPrimitive()
@@ -529,7 +529,7 @@ size_t CppLogic::Serializer::AdvLuaStateSerializer::ReadPrimitive()
 		Data = std::unique_ptr<byte[]>(new byte[len]);
 		DataLength = len;
 	}
-	IO.Read(Data.get(), len);
+	IO.Read(Data.get(), static_cast<long>(len));
 	return len;
 }
 
@@ -539,7 +539,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeType(lua::LType t)
 }
 lua::LType CppLogic::Serializer::AdvLuaStateSerializer::DeserializeType()
 {
-	lua::LType r = ReadPrimitive<lua::LType>("error reading lua type, size mismatch");
+	auto r = ReadPrimitive<lua::LType>("error reading lua type, size mismatch");
 	if ((static_cast<int>(r) < static_cast<int>(lua::LType::Nil) || static_cast<int>(r) > static_cast<int>(lua::LType::Thread)) && r != ReferenceType && r != UpvalueReferenceType)
 		throw std::format_error{ "error reading lua type, not a valid type" };
 	return r;
@@ -608,7 +608,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeTable(int idx, bool i
 		SerializeType(lua::LType::Table);
 		SerializeReference(refnum);
 		idx = L.ToAbsoluteIndex(idx);
-		for (auto kv : L.Pairs(idx)) {
+		for ([[maybe_unused]] auto _ : L.Pairs(idx)) {
 			if (CanSerialize(-1) && CanSerialize(-2)) {
 				if (isglobal && L.IsString(-2) && IsGlobalSkipped(L.ToString(-2)))
 					continue;
@@ -629,11 +629,15 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeTable(int idx, bool i
 		SerializeReference(refn->second);
 	}
 }
+// ReSharper disable once CppDFAConstantParameter
 void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeTable(bool create)
 {
 	int ref = DeserializeReference();
-	if (create)
+	// ReSharper disable once CppDFAConstantConditions
+	if (create) {
+		// ReSharper disable once CppDFAUnreachableCode
 		L.NewTable();
+	}
 
 	L.PushValue(-1);
 	L.SetTableRaw(IndexOfReferenceHolder, ref);
@@ -676,7 +680,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::SerializeFunction(int idx)
 		SerializeReference(refnum);
 		L.PushValue(idx);
 		L.Dump([](lua_State*, const void* d, size_t len, void* ud) {
-			AdvLuaStateSerializer* th = static_cast<AdvLuaStateSerializer*>(ud);
+			auto* th = static_cast<AdvLuaStateSerializer*>(ud);
 			th->WritePrimitive(d, len);
 			return 0;
 			}, this);
@@ -711,7 +715,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeFunction()
 		throw std::format_error{ "functions not allowed" };
 	int ref = DeserializeReference();
 	L.Load([](lua_State*, void* ud, size_t* len) {
-		AdvLuaStateSerializer* th = static_cast<AdvLuaStateSerializer*>(ud);
+		auto* th = static_cast<AdvLuaStateSerializer*>(ud);
 		*len = th->ReadPrimitive();
 		return reinterpret_cast<const char*>(th->Data.get());
 		}, this, nullptr);
@@ -898,8 +902,8 @@ bool CppLogic::Serializer::AdvLuaStateSerializer::IsGlobalSkipped(const char* n)
 {
 	auto* nse = EScr::LuaStateSerializer::DoNotSerializeGlobals();
 	std::string_view glob{ n };
-	for (const auto& n : *nse) {
-		std::string_view c{ n.c_str(), n.size() };
+	for (const auto& i : *nse) {
+		std::string_view c{ i.c_str(), i.size() };
 		if (glob == c)
 			return true;
 	}
@@ -925,7 +929,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::PrepareDeserialize()
 		// try to load anyway, will crash on invalid version
 	}
 	else if (v == FileVersion) {
-		double luaver = ReadPrimitive<double>("luaversion invalid size");
+		auto luaver = ReadPrimitive<double>("luaversion invalid size");
 		if (L.Version() != luaver)
 			throw std::format_error{ "file version missmatch" };
 	}
@@ -1011,11 +1015,9 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeStack()
 	PrepareDeserialize();
 
 	int n = ReadPrimitive<int>("number of elements size missmatch");
-	int t = L.GetTop();
 
 	for (int i = 1; i <= n; ++i) {
 		DeserializeAnything();
-		t = L.GetTop();
 	}
 
 	CleanupDeserialize(true);
@@ -1040,7 +1042,7 @@ int CppLogic::Serializer::ObjectAccess::Name(lua::State L)
 
 void CppLogic::Serializer::ObjectAccess::PushSD(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id), bool listElement)
 {
-	if (sd->Size == 0) {
+	if (sd->Size == 0) { // NOLINT(*-branch-clone)
 		L.Push();
 	}
 	else if (sd->ListOptions != nullptr && !listElement) {
@@ -1141,7 +1143,7 @@ int CppLogic::Serializer::StructAccess::Fields(lua::State L)
 	auto* th = L.CheckUserClass<StructAccess>(1);
 	if (th->Object == nullptr)
 		throw lua::LuaException("object null");
-	auto* i = L.NewUserClass<Iter>(th->Object, th->SeriData);
+	L.NewUserClass<Iter>(th->Object, th->SeriData);
 	L.PushValue(1);
 	L.Push<FieldsNext>(2);
 	return 1;
@@ -1167,7 +1169,7 @@ int CppLogic::Serializer::StructAccess::FieldsNext(lua::State L)
 	}
 }
 
-bool CppLogic::Serializer::StructAccess::Iter::operator==(std::default_sentinel_t)
+bool CppLogic::Serializer::StructAccess::Iter::operator==(std::default_sentinel_t) const
 {
 	return SeriData->Size == 0;
 }
@@ -1274,7 +1276,7 @@ int CppLogic::Serializer::ListAccess::GetType(lua::State L)
 int CppLogic::Serializer::ListAccess::Elements(lua::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
-	auto* i = L.NewUserClass<ElementIter>(th->SeriData->ListOptions->UniqueIter(th->Object));
+	L.NewUserClass<ElementIter>(th->SeriData->ListOptions->UniqueIter(th->Object));
 	L.PushValue(1);
 	L.Push<ElementsNext>(2);
 	return 1;
@@ -1341,7 +1343,7 @@ int CppLogic::Serializer::ListAccess::Remove(lua::State L)
 		throw lua::LuaException{ "no remove available" };
 	struct Data {
 		lua::State L;
-		ListAccess* A;
+		ListAccess* A = nullptr;
 	} d{ L, th };
 	inf.RemoveIf(th->Object, [](void* uv, const BB::SerializationData* sd, void* el) {
 		Data* d = static_cast<Data*>(uv);

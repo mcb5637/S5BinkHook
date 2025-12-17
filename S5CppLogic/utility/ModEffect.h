@@ -21,7 +21,7 @@ namespace CppLogic::Mod::Effect {
 		shok::EventIDs OnDetachAttacker = shok::EventIDs::NoDetachEvent, OnDetachCreated = shok::EventIDs::NoDetachEvent;
 
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void FromCreator(EGL::CGLEEffectCreator* ct) override;
 		virtual void OnLoaded() override;
 		virtual void OnHit() override;
@@ -46,7 +46,7 @@ namespace CppLogic::Mod::Effect {
 		std::vector<shok::EntityId> AlreadyAffectedEntities;
 
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void FromCreator(EGL::CGLEEffectCreator* ct) override;
 		virtual void OnLoaded() override;
 		virtual void OnTick() override;

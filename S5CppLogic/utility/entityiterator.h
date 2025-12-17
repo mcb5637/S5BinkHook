@@ -18,30 +18,32 @@ namespace CppLogic::Iterator {
 	class Predicate {
 	public:
 		virtual bool Matches(const T* e, float* rangeOut, int* prio) const = 0;
+		virtual ~Predicate() = default;
 
 		using BaseClass = Predicate<T>;
 	};
 
 	struct EntityIteratorStatus {
 		int EntityIndex = -1, X = -1, Y = -1;
-		shok::AccessCategory ac = shok::AccessCategory::AccessCategoryNone;
+		shok::AccessCategory AccessCat = shok::AccessCategory::AccessCategoryNone;
 
 		auto operator<=>(const EntityIteratorStatus&) const = default;
 	};
 	template<class T>
 	class ManagedIterator {
-	public:
-	private:
 		EntityIteratorStatus current;
 	public:
 		const Predicate<T>* const Pred;
-		ManagedIterator(const Predicate<T>* const p) : Pred(p) {
+
+		explicit ManagedIterator(const Predicate<T>* const p) : Pred(p) {
 		}
 	protected:
 		// return nullptr on end
 		virtual T* GetNextBase(EntityIteratorStatus& c) const = 0;
-		virtual T* GetCurrentBase(const EntityIteratorStatus& c) const = 0;
+		[[nodiscard]] virtual T* GetCurrentBase(const EntityIteratorStatus& c) const = 0;
 	public:
+		virtual ~ManagedIterator() = default;
+
 		void Reset() {
 			current = EntityIteratorStatus{};
 		}
@@ -139,7 +141,7 @@ namespace CppLogic::Iterator {
 		class EIterCreator {
 			friend class ManagedIterator<T>;
 			ManagedIterator& it;
-			EIterCreator(ManagedIterator& i) : it(i) {};
+			explicit EIterCreator(ManagedIterator& i) : it(i) {};
 		public:
 			EIter begin() {
 				return it.Ebegin();
@@ -149,7 +151,7 @@ namespace CppLogic::Iterator {
 			}
 		};
 		EIterCreator ExtendedIterate() {
-			return { *this };
+			return EIterCreator{ *this };
 		}
 
 		T* GetNearest(float* rangeOut) {
@@ -184,7 +186,7 @@ namespace CppLogic::Iterator {
 		}
 		int Count() {
 			int i = 0;
-			for (T* e : *this) {
+			for (T* _ : *this) {
 				++i;
 			}
 			return i;
@@ -210,7 +212,7 @@ namespace CppLogic::Iterator {
 					return r;
 			}
 		}
-		virtual T* GetCurrentBase(const EntityIteratorStatus& c) const override {
+		[[nodiscard]] virtual T* GetCurrentBase(const EntityIteratorStatus& c) const override {
 			return manager->GetInSlot(c.EntityIndex);
 		}
 	};
@@ -218,13 +220,13 @@ namespace CppLogic::Iterator {
 	// you may create/destroy entities while iterating, even the current one (just dont try to get the current one from the iterator after destroying)
 	class GlobalEntityIterator : public GlobalManagedIterator<EGL::CGLEEntity> {
 	public:
-		GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
+		explicit GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* p);
 	};
 
 	// you may create/destroy effects while iterating, even the current one (just dont try to get the current one from the iterator after destroying)
 	class GlobalEffectIterator : public GlobalManagedIterator<EGL::CEffect> {
 	public:
-		GlobalEffectIterator(const Predicate<EGL::CEffect>* const p);
+		explicit GlobalEffectIterator(const Predicate<EGL::CEffect>* p);
 	};
 
 	// you may not create/destroy entities while iterating
@@ -232,20 +234,20 @@ namespace CppLogic::Iterator {
 		const GGL::CPlayerAttractionHandler& ah;
 	protected:
 		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
-		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
+		[[nodiscard]] virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
-		PlayerEntityIterator(shok::PlayerId player, const Predicate<EGL::CGLEEntity>* const p);
+		PlayerEntityIterator(shok::PlayerId player, const Predicate<EGL::CGLEEntity>* p);
 	};
 	// you may not create/destroy entities while iterating
 	class MultiPlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 	public:
-		std::array<shok::PlayerId, 9> Players;
+		std::array<shok::PlayerId, 9> Players{};
 	protected:
 		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
-		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
+		[[nodiscard]] virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
-		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p);
-		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<shok::PlayerId> pls);
+		explicit MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* p);
+		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* p, std::initializer_list<shok::PlayerId> pls);
 	};
 	// you may not create/destroy entities while iterating
 	// area defines only the regions to search, you need a predicate for an exact area check
@@ -253,17 +255,17 @@ namespace CppLogic::Iterator {
 	class MultiRegionEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 		const int BaseX, BaseY;
 		const int EndX, EndY;
-		const shok::AccessCategoryFlags ac;
+		const shok::AccessCategoryFlags AccessCat;
 
 		bool NextAccessCategory(EntityIteratorStatus& c) const;
 		bool NextRegion(EntityIteratorStatus& c) const;
 	protected:
 		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
-		virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
+		[[nodiscard]] virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
-		MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* const p);
-		MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* const p);
-		MultiRegionEntityIterator(const shok::Position& center, float range, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* const p);
+		MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* p);
+		MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* p);
+		MultiRegionEntityIterator(const shok::Position& center, float range, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* p);
 	};
 
 	template<class T, size_t s>
@@ -290,7 +292,7 @@ namespace CppLogic::Iterator {
 		lua_State* L = nullptr;
 		lua::Reference r = lua::State::NoRef;
 
-		PredicateDynamicAnd() {}
+		PredicateDynamicAnd() = default;
 		PredicateDynamicAnd(std::initializer_list<const Predicate<T>*> l) {
 			preds.resize(l.size());
 			std::copy(l.begin(), l.end(), preds.begin());
@@ -302,7 +304,7 @@ namespace CppLogic::Iterator {
 			}
 			return true;
 		}
-		~PredicateDynamicAnd() {
+		virtual ~PredicateDynamicAnd() override {
 			if (r != lua::State::NoRef)
 				lua::State(L).UnRef(r);
 		}
@@ -333,7 +335,7 @@ namespace CppLogic::Iterator {
 		lua::Reference r = lua::State::NoRef;
 
 
-		PredicateDynamicOr() {}
+		PredicateDynamicOr() = default;
 		PredicateDynamicOr(std::initializer_list<const Predicate<T>*> l) {
 			preds.resize(l.size());
 			std::copy(l.begin(), l.end(), preds.begin());
@@ -345,7 +347,7 @@ namespace CppLogic::Iterator {
 			}
 			return false;
 		}
-		~PredicateDynamicOr() {
+		virtual ~PredicateDynamicOr() override {
 			if (r != lua::State::NoRef)
 				lua::State(L).UnRef(r);
 		}
@@ -359,13 +361,14 @@ namespace CppLogic::Iterator {
 		lua::Reference r = lua::State::NoRef;
 
 
-		PredicateNot(const Predicate<T>* p) {
+		explicit PredicateNot(const Predicate<T>* p) {
 			pred = p;
 		}
 		virtual bool Matches(const T* e, float* rangeOut, int* prio) const override {
 			return !pred->Matches(e, rangeOut, prio);
 		}
-		~PredicateNot() {
+
+		virtual ~PredicateNot() override {
 			if (r != lua::State::NoRef)
 				lua::State(L).UnRef(r);
 		}
@@ -387,7 +390,7 @@ namespace CppLogic::Iterator {
 				*prio = priori;
 			return true;
 		}
-		~PredicatePriority() {
+		virtual ~PredicatePriority() override {
 			if (r != lua::State::NoRef)
 				lua::State(L).UnRef(r);
 		}
@@ -520,7 +523,7 @@ namespace CppLogic::Iterator {
 
 	class EntityPredicateOfAnyPlayer : public Predicate<EGL::CGLEEntity> {
 	public:
-		std::array<shok::PlayerId, 9> players;
+		std::array<shok::PlayerId, 9> players{};
 		EntityPredicateOfAnyPlayer();
 		EntityPredicateOfAnyPlayer(std::initializer_list<shok::PlayerId> pl);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;

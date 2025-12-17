@@ -1,7 +1,6 @@
 #pragma once
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
-#include <shok/entity/s5_entity.h>
 
 namespace CppLogic::SavegameExtra {
 	class SerializedMapdata {
@@ -53,7 +52,7 @@ namespace CppLogic::SavegameExtra {
 
 	struct StringTableTextOverride {
 
-		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;
+		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverrideData;
 
 		void Merge(std::string_view prefix, lua_State* s) const;
 

@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "s5_guistates.h"
 #include <shok/globals/s5_config.h>
-#include <shok/globals/s5_mapdisplay.h>
 #include <shok/ui/s5_ui.h>
 #include <shok/entitytype/s5_entitytype.h>
 #include <shok/s5_defines.h>
@@ -217,7 +216,7 @@ void GGUI::CPlaceBuildingState::HookPlacementRotation()
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(shok::EntityTypeId ety, const shok::Position& p, float range)
 {
 	const GGlue::CGlueEntityProps* e = CppLogic::GetEntityType(ety);
-	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
+	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
 
 	CppLogic::Iterator::EntityPredicateOfPlayer pl{ static_cast<shok::PlayerId>(0) };
 	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, range * range };
@@ -237,7 +236,7 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(shok:
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(shok::EntityTypeId ety, const shok::PositionRot& p, float range)
 {
 	const GGlue::CGlueEntityProps* e = CppLogic::GetEntityType(ety);
-	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
+	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
 
 	shok::Position r = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->BlockingData->GetFreeBuildingPlacementPos(bp, p, range);
 	return { r.X, r.Y, p.r };
@@ -245,7 +244,7 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosFree(shok::En
 shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPos(shok::EntityTypeId ety, const shok::PositionRot& p, float range)
 {
 	const GGlue::CGlueEntityProps* e = CppLogic::GetEntityType(ety);
-	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps);
+	const GGL::CGLBuildingProps* bp = static_cast<GGL::CGLBuildingProps*>(e->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
 	if (bp->BuildOn.size() == 0)
 		return GetNearestPlacementPosFree(ety, p, range);
 	else

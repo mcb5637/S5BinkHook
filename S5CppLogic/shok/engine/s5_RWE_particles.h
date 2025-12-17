@@ -229,7 +229,7 @@ namespace RWE::Particles {
 	 * Most properties have a bias value to vary the property's value. This uses the seed field
 	 * to give a degreee of randomness.
 	 */
-	struct RpPrtStdEmitterStandard
+	struct RpPrtStdEmitterStandard // NOLINT(*-pro-type-member-init)
 	{
 		int seed; /**< Seed for random number generator */
 		int maxPrt; /**< Maximum number of active particles */
@@ -503,7 +503,7 @@ namespace RWE::Particles {
 	 * If this structure is not present, then it assumes the  particles will have just a position
 	 * property.
 	 */
-	struct RpPrtStdEmitterPrtMatrix
+	struct RpPrtStdEmitterPrtMatrix // NOLINT(*-pro-type-member-init)
 	{
 		RwMatrix prtCnsMtx; /**< Transformation matrix to be applied to each particle */
 
@@ -680,7 +680,7 @@ namespace RWE::Particles {
 		 *
 		 * Used to store each size keyframe when using the MultiSize particles.
 		 */
-		struct RpPrtAdvEmtPrtSizeItem
+		struct RpPrtAdvEmtPrtSizeItem // NOLINT(*-pro-type-member-init)
 		{
 			float                              time;           /**<Time.*/
 			float                              timeBias;       /**<Time bias.*/

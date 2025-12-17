@@ -1,9 +1,9 @@
 #pragma once
-#include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <magic_enum/magic_enum.hpp>
 
 namespace EGL {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticEntry {
 	public:
 		virtual void Apply() const = 0;
@@ -14,14 +14,9 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x766CDC;
 	};
-#ifdef __INTELLISENSE__
-#pragma diag_suppress 2784
-#endif
 	static_assert(offsetof(CStaticEntry, Prev) == 4 * 9);
-#ifdef __INTELLISENSE__
-#pragma diag_default 2784
-#endif
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticListEx {
 	public:
 		virtual void Add(CStaticEntry* e) = 0;
@@ -38,16 +33,19 @@ namespace EGL {
 
 
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticEntityTypeID : public EGL::CStaticEntry {
 	public:
 		static inline constexpr int vtp = 0x766CEC;
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticEffectTypeID : public EGL::CStaticEntry {
 	public:
 		static inline constexpr int vtp = 0x76EB20;
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticTaskListID : public EGL::CStaticEntry {
 	public:
 		static inline constexpr int vtp = 0x76FF54;
@@ -55,6 +53,7 @@ namespace EGL {
 }
 
 namespace GGL {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticHeroAbilityID : public EGL::CStaticEntry {
 	public:
 		virtual void Apply() const override;
@@ -71,11 +70,13 @@ namespace GGL {
 		}
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticArmorClassID : public EGL::CStaticEntry {
 	public:
 		static inline constexpr int vtp = 0x778E6C;
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticCategoryID : public EGL::CStaticEntry {
 	public:
 		virtual void Apply() const override;
@@ -86,6 +87,7 @@ namespace GGL {
 		CStaticCategoryID(const char* name);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CStaticAttachmentTypeID : public EGL::CStaticEntry {
 	public:
 		static inline constexpr int vtp = 0x770B20;

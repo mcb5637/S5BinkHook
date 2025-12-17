@@ -6,9 +6,9 @@
 namespace EGL {
 	class CMovementBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		float MovementSpeed, TurningSpeed;
-		shok::TaskListId MoveTaskList;
-		int MoveIdleAnim;
+		float MovementSpeed = 0.0f, TurningSpeed = 0.0f;
+		shok::TaskListId MoveTaskList{};
+		shok::AnimationId MoveIdleAnim{};
 
 		static inline constexpr int vtp = 0x784938;
 		static inline constexpr int TypeDesc = 0x8373E4;
@@ -18,6 +18,7 @@ namespace EGL {
 
 	class CAnimationBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
+		shok::AnimationId SuspensionAnimation{};
 
 		static inline constexpr int vtp = 0x776BB4;
 		static inline constexpr int TypeDesc = 0x820DBC;
@@ -41,8 +42,8 @@ namespace GGL {
 
 	class CCamouflageBehaviorProps : public GGL::CHeroAbilityProps {
 	public:
-		int DurationSeconds; // 5
-		float DiscoveryRange;
+		int DurationSeconds = 0; // 5
+		float DiscoveryRange = 0.0f;
 
 		static inline constexpr int vtp = 0x7778D8;
 		static inline constexpr int TypeDesc = 0x823D28;
@@ -51,8 +52,8 @@ namespace GGL {
 
 	class CHeroHawkBehaviorProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::EntityTypeId HawkType;
-		float HawkMaxRange;
+		shok::EntityTypeId HawkType{};
+		float HawkMaxRange = 0.0f;
 
 		static inline constexpr int vtp = 0x77672C;
 		static inline constexpr int TypeDesc = 0x81FE58;
@@ -60,8 +61,8 @@ namespace GGL {
 	};
 	class CHawkBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId ExploreTaskList; //4
-		float MaxCirclingDistance;
+		shok::TaskListId ExploreTaskList{}; //4
+		float MaxCirclingDistance = 0.0f;
 
 		static inline constexpr int vtp = 0x776A7C;
 		static inline constexpr int TypeDesc = 0x82079C;
@@ -70,10 +71,10 @@ namespace GGL {
 
 	class CInflictFearAbilityProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId TaskList;
-		shok::AnimationId Animation;
-		int FlightDuration;
-		float Range, FlightRange;
+		shok::TaskListId TaskList{};
+		shok::AnimationId Animation{};
+		int FlightDuration = 0;
+		float Range = 0.0f, FlightRange = 0.0f;
 
 		static inline constexpr int vtp = 0x776674;
 		static inline constexpr int TypeDesc = 0x81FBAC;
@@ -92,30 +93,30 @@ namespace GGL {
 
 	class CRangedEffectAbilityProps : public GGL::CHeroAbilityProps {
 	public:
-		bool AffectsOwn, AffectsFriends, AffectsNeutrals, AffectsHostiles, AffectsMilitaryOnly, AffectsLongRangeOnly;
+		bool AffectsOwn = false, AffectsFriends = false, AffectsNeutrals = false, AffectsHostiles = false, AffectsMilitaryOnly = false, AffectsLongRangeOnly = false;
 		PADDING(2);
-		float Range;
-		int DurationSeconds; // 8
-		float DamageFactor, ArmorFactor, HealthRecoveryFactor;
-		shok::EffectTypeId Effect, HealEffect;
+		float Range = 0.0f;
+		int DurationSeconds = 0; // 8
+		float DamageFactor = 1.0f, ArmorFactor = 1.0f, HealthRecoveryFactor = 0.0f;
+		shok::EffectTypeId Effect{}, HealEffect{};
 
 		static inline constexpr int vtp = 0x774E9C;
 		static inline constexpr int TypeDesc = 0x81B780;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC025B92D);
 
-		bool IsDefensive() const;
-		bool IsAggressive() const;
-		bool IsHeal() const;
+		[[nodiscard]] bool IsDefensive() const;
+		[[nodiscard]] bool IsAggressive() const;
+		[[nodiscard]] bool IsHeal() const;
 	};
 	static_assert(offsetof(GGL::CRangedEffectAbilityProps, DurationSeconds) == 8 * 4);
 
 	class CCircularAttackProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId TaskList;
-		shok::AnimationId Animation;
-		shok::DamageClassId DamageClass;
-		int Damage;
-		float Range;
+		shok::TaskListId TaskList{};
+		shok::AnimationId Animation{};
+		shok::DamageClassId DamageClass{};
+		int Damage = 0;
+		float Range = 0.0f;
 
 		static inline constexpr int vtp = 0x7774A0;
 		static inline constexpr int TypeDesc = 0x82305C;
@@ -145,8 +146,8 @@ namespace GGL {
 
 	class CConvertSettlerAbilityProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId ConversionTaskList;
-		float HPToMSFactor, ConversionStartRange, ConversionMaxRange;
+		shok::TaskListId ConversionTaskList{};
+		float HPToMSFactor = 0.0f, ConversionStartRange = 0.0f, ConversionMaxRange = 0.0f;
 
 		static inline constexpr int vtp = 0x7772D0;
 		static inline constexpr int TypeDesc = 0x8227A8;
@@ -155,8 +156,8 @@ namespace GGL {
 
 	class CConvertBuildingAbilityProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId ConversionTaskList;
-		float HPToMSFactor;
+		shok::TaskListId ConversionTaskList{};
+		float HPToMSFactor = 0.0f;
 
 		static inline constexpr int vtp = 0x7773D8;
 		static inline constexpr int TypeDesc = 0x822B68;
@@ -165,9 +166,9 @@ namespace GGL {
 
 	class CSniperAbilityProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId TaskList;
-		shok::AnimationId Animation;
-		float Range, DamageFactor; // 7
+		shok::TaskListId TaskList{};
+		shok::AnimationId Animation{};
+		float Range = 0.0f, DamageFactor = 0.0f; // 7
 
 		static inline constexpr int vtp = 0x7745E8;
 		static inline constexpr int TypeDesc = 0x81901C;
@@ -176,11 +177,11 @@ namespace GGL {
 
 	class CMotivateWorkersAbilityProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId TaskList;
-		shok::AnimationId Animation;
-		float Range; // 7
-		int WorkTimeBonus;
-		shok::EffectTypeId Effect;
+		shok::TaskListId TaskList{};
+		shok::AnimationId Animation{};
+		float Range = 0.0f; // 7
+		int WorkTimeBonus = 0;
+		shok::EffectTypeId Effect{};
 
 		static inline constexpr int vtp = 0x775788;
 		static inline constexpr int TypeDesc = 0x81C3D8;
@@ -189,14 +190,14 @@ namespace GGL {
 
 	class CShurikenAbilityProps : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId TaskList;
-		shok::AnimationId Animation;
-		float Range, MaxArcDegree; // 7
-		int NumberShuriken;
-		shok::EffectTypeId ProjectileType;
-		float ProjectileOffsetHeight, ProjectileOffsetFront, ProjectileOffsetRight;
-		shok::DamageClassId DamageClass;
-		int DamageAmount;
+		shok::TaskListId TaskList{};
+		shok::AnimationId Animation{};
+		float Range = 0.0f, MaxArcDegree = 0.0f; // 7
+		int NumberShuriken = 0;
+		shok::EffectTypeId ProjectileType{};
+		float ProjectileOffsetHeight = 0.0f, ProjectileOffsetFront = 0.0f, ProjectileOffsetRight = 0.0f;
+		shok::DamageClassId DamageClass{};
+		int DamageAmount = 0;
 
 		static inline constexpr int vtp = 0x7746B4;
 		static inline constexpr int TypeDesc = 0x8192E8;
@@ -205,10 +206,10 @@ namespace GGL {
 
 	class CKegPlacerBehaviorProperties : public GGL::CHeroAbilityProps {
 	public:
-		int SecondsNeededToArm; // 5
-		int SecondsNeededToDisarm;
-		shok::TaskListId PlaceKegTaskList, DisarmKegTaskList;
-		shok::EntityTypeId KegEntityType;
+		float SecondsNeededToArm = 5.0f; // 5
+		float SecondsNeededToDisarm = 5.0f;
+		shok::TaskListId PlaceKegTaskList{}, DisarmKegTaskList{};
+		shok::EntityTypeId KegEntityType{};
 
 		static inline constexpr int vtp = 0x7763B4;
 		static inline constexpr int TypeDesc = 0x81F0AC;
@@ -217,11 +218,11 @@ namespace GGL {
 
 	class CAbilityScoutBinocularProps : public GGL::CHeroAbilityProps {
 	public:
-		int NumberOfExplorationEntities; // 5
-		float SpacingOfExplorationEntities; // int/float?
-		int ExplorationRangeOfExplorationEntities; // int/float?
-		shok::EntityTypeId ExplorationEntityType;
-		shok::TaskListId ExplorationTaskList;
+		int NumberOfExplorationEntities = 1; // 5
+		float SpacingOfExplorationEntities = 1.0f; // int/float?
+		float ExplorationRangeOfExplorationEntities = 1.0f; // int/float?
+		shok::EntityTypeId ExplorationEntityType{};
+		shok::TaskListId ExplorationTaskList{};
 
 		static inline constexpr int vtp = 0x779254;
 		static inline constexpr int TypeDesc = 0x829218;
@@ -230,8 +231,8 @@ namespace GGL {
 
 	class CTorchPlacerBehaviorProperties : public GGL::CHeroAbilityProps {
 	public:
-		shok::EntityTypeId TorchEntity; // 5
-		shok::TaskListId TaskList;
+		shok::EntityTypeId TorchEntity{}; // 5
+		shok::TaskListId TaskList{};
 
 		static inline constexpr int vtp = 0x773790;
 		static inline constexpr int TypeDesc = 0x816E74;
@@ -239,7 +240,7 @@ namespace GGL {
 	};
 	class CTorchBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		float Duration;
+		float Duration = 0.0f;
 
 		static inline constexpr int vtp = 0x773880;
 		static inline constexpr int TypeDesc = 0x817148;
@@ -248,8 +249,8 @@ namespace GGL {
 
 	class CPointToResourceBehaviorProperties : public GGL::CHeroAbilityProps {
 	public:
-		shok::TaskListId TaskList; // 5
-		float SearchRadius;
+		shok::TaskListId TaskList{}; // 5
+		float SearchRadius = 0.0f; // not initialized by ctor?
 
 		static inline constexpr int vtp = 0x774FEC;
 		static inline constexpr int TypeDesc = 0x81BBB0;
@@ -258,7 +259,7 @@ namespace GGL {
 
 	class CSentinelBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		float Range;
+		float Range = 0.0f;
 
 		static inline constexpr int vtp = 0x774BAC;
 		static inline constexpr int TypeDesc = 0x81AB94;
@@ -267,9 +268,8 @@ namespace GGL {
 
 	class CGLAnimationBehaviorExProps : public EGL::CAnimationBehaviorProps {
 	public:
-		shok::AnimationId SuspensionAnimation;
-		shok::AnimSetId AnimSet; // 4 todo what belongs to ggl, and what to egl
-		// list/set of {int Model, AnimSet; } ExtraSet
+		shok::AnimSetId AnimSet{};
+		shok::Map<shok::ModelId, shok::AnimSetId> ExtraSet; // Model -> AnimSet
 
 		static inline constexpr int vtp = 0x776C48;
 		static inline constexpr int TypeDesc = 0x820B90;
@@ -281,25 +281,25 @@ namespace GGL {
 
 	class CWorkerBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId WorkTaskList, WorkIdleTaskList; // 4
-		shok::TaskListId WorkLeaveTaskList;
-		int WorkWaitUntil;
-		shok::TaskListId EatTaskList, EatIdleTaskList;
-		int EatWait;
-		shok::TaskListId RestTaskList, RestIdleTaskList;
-		int RestWait;
-		shok::TaskListId IdleTaskList;
-		shok::TaskListId LeaveTaskList; // 15
-		float AmountResearched;
-		float WorkTimeChangeWork;
-		float WorkTimeChangeFarm, WorkTimeChangeResidence, WorkTimeChangeCamp; // la20
-		int WorkTimeMaxCangeFarm, WorkTimeMaxChangeResidence;
-		float ExhaustedWorkMotivationMalus;
-		int TransportAmount;
-		shok::ModelId TransportModel;
-		shok::AnimationId TransportAnim;
-		shok::ResourceType ResourceToRefine;
-		float BridgeProgress, MaximumDistanceToBridge; // la 29
+		shok::TaskListId WorkTaskList{}, WorkIdleTaskList{}; // 4
+		shok::TaskListId WorkLeaveTaskList{};
+		int WorkWaitUntil = 0;
+		shok::TaskListId EatTaskList{}, EatIdleTaskList{};
+		int EatWait = 0;
+		shok::TaskListId RestTaskList{}, RestIdleTaskList{};
+		int RestWait = 0;
+		shok::TaskListId IdleTaskList{};
+		shok::TaskListId LeaveTaskList{}; // 15
+		float AmountResearched = 1.0f;
+		float WorkTimeChangeWork = 0.0f;
+		float WorkTimeChangeFarm = 0.1f, WorkTimeChangeResidence = 0.1f, WorkTimeChangeCamp = 0.1f; // la20
+		int WorkTimeMaxCangeFarm = 0, WorkTimeMaxChangeResidence = 0;
+		float ExhaustedWorkMotivationMalus = 0.0f;
+		int TransportAmount = 1;
+		shok::ModelId TransportModel{}; //25
+		shok::AnimationId TransportAnim{};
+		shok::ResourceType ResourceToRefine{};
+		float BridgeProgress = 0.1f, MaximumDistanceToBridge = 10000.0f; // la 29
 
 		static inline constexpr int vtp = 0x772B90;
 		static inline constexpr int TypeDesc = 0x813B40;
@@ -308,18 +308,18 @@ namespace GGL {
 
 	class CBattleBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId BattleTaskList; // 4
-		shok::AnimationId NormalAttackAnim1, NormalAttackAnim2, // 5 randomly selected if damage factor <= 1
-			CounterAttackAnim, FinishingMoveAnim, // 7 counterattack if damage factor > 1, finishing seems unused
-			MissAttackAnim, BattleIdleAnim, BattleWalkAnim; // 9
-		shok::AnimationId HitAnim;
-		shok::DamageClassId DamageClass; // 13
-		int DamageAmount, MaxDamageRandomBonus;
-		float DamageRange;
-		shok::EffectTypeId ProjectileEffectID;
-		float ProjectileOffsetFront, ProjectileOffsetRight, ProjectileOffsetHeight;
-		int BattleWaitUntil, MissChance; // 21
-		float MaxRange, MinRange;
+		shok::TaskListId BattleTaskList{}; // 4
+		shok::AnimationId NormalAttackAnim1{}, NormalAttackAnim2{}, // 5 randomly selected if damage factor <= 1
+			CounterAttackAnim{}, FinishingMoveAnim{}, // 7 counterattack if damage factor > 1, finishing seems unused
+			MissAttackAnim{}, BattleIdleAnim{}, BattleWalkAnim{}; // 9
+		shok::AnimationId HitAnim{};
+		shok::DamageClassId DamageClass{}; // 13
+		int DamageAmount = 0, MaxDamageRandomBonus = 0;
+		float DamageRange = -1.0f;
+		shok::EffectTypeId ProjectileEffectID{};
+		float ProjectileOffsetFront = 0.0f, ProjectileOffsetRight = 0.0f, ProjectileOffsetHeight = 0.0f;
+		int BattleWaitUntil = 0, MissChance = 0; // 21
+		float MaxRange = 1.5f, MinRange = 0.0f;
 
 		static inline constexpr int vtp = 0x7731C0;
 		static inline constexpr int TypeDesc = 0x815F68;
@@ -329,11 +329,11 @@ namespace GGL {
 
 	class CLeaderBehaviorProps : public GGL::CBattleBehaviorProps {
 	public:
-		shok::EntityTypeId SoldierType;
-		shok::UpgradeCategoryId BarrackUpgradeCategory;
-		float HomeRadius;
-		int HealingPoints, HealingSeconds; // 28
-		float AutoAttackRange, UpkeepCosts;
+		shok::EntityTypeId SoldierType{};
+		shok::UpgradeCategoryId BarrackUpgradeCategory{};
+		float HomeRadius = 3000.0f;
+		int HealingPoints = 0, HealingSeconds = 0; // 28
+		float AutoAttackRange = -1.0f, UpkeepCosts = 0.0f;
 
 		static inline constexpr int vtp = 0x775FA4;
 		static inline constexpr int TypeDesc = 0x81D970;
@@ -356,7 +356,7 @@ namespace GGL {
 
 	class CBattleSerfBehaviorProps : public GGL::CLeaderBehaviorProps {
 	public:
-		shok::TaskListId TurnIntoSerfTaskList; //32
+		shok::TaskListId TurnIntoSerfTaskList{}; //32 not initialized by ctor
 
 		static inline constexpr int vtp = 0x77889C;
 		static inline constexpr int TypeDesc = 0x8268F0;
@@ -372,8 +372,8 @@ namespace GGL {
 			int Amount;
 		};
 
-		int ResourceSearchRadius;
-		shok::TaskListId ApproachConbstructionSiteTaskList, TurnIntoBattleSerfTaskList; //4
+		int ResourceSearchRadius = 0;
+		shok::TaskListId ApproachConstructionSiteTaskList{}, TurnIntoBattleSerfTaskList{}; //4
 		shok::Vector<ExtractionInfoData> ExtractionInfo;
 
 		static inline constexpr int vtp = 0x774A14;
@@ -386,8 +386,8 @@ namespace GGL {
 		class LimitedAttachmentProps {
 		public:
 			shok::String Type;
-			int Limit;
-			bool IsActive;
+			int Limit = 0;
+			bool IsActive = true;
 			PADDING(3);
 		};
 		shok::Vector<LimitedAttachmentProps> Attachments;
@@ -400,8 +400,8 @@ namespace GGL {
 	class CFormationBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
 		struct IdleAnimProps {
-			shok::AnimationId AnimID;
-			int Frequency;
+			shok::AnimationId AnimID{};
+			int Frequency = 0;
 		};
 		shok::Vector<IdleAnimProps> IdleAnims;
 
@@ -415,7 +415,7 @@ namespace GGL {
 
 	class CCamperBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		float Range;
+		float Range = 50000.0f;
 
 		static inline constexpr int vtp = 0x7777D4;
 		static inline constexpr int TypeDesc = 0x8237CC;
@@ -424,7 +424,7 @@ namespace GGL {
 	class CCampBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
 		shok::Vector<shok::Position> Slot;
-		int RemoveDelay;
+		int RemoveDelay = 5.0f;
 
 		static inline constexpr int vtp = 0x777854;
 		static inline constexpr int TypeDesc = 0x823770;
@@ -433,7 +433,7 @@ namespace GGL {
 
 	class CGLBehaviorPropsDying : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId DyingTaskList;
+		shok::TaskListId DyingTaskList{};
 
 		static inline constexpr int vtp = 0x778634;
 		static inline constexpr int TypeDesc = 0x825F38;
@@ -449,9 +449,9 @@ namespace GGL {
 
 	class CBombBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		float Radius, Delay;
-		int Damage;
-		shok::EffectTypeId ExplosionEffectID;
+		float Radius = 0.0f, Delay = 0.0f;
+		int Damage = 100;
+		shok::EffectTypeId ExplosionEffectID{};
 		shok::Vector<int> AffectedEntityTypes;
 
 		static inline constexpr int vtp = 0x7784A0;
@@ -462,11 +462,11 @@ namespace GGL {
 
 	class CKegBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		float Radius; //4
-		int Damage;
-		float Delay;
-		int DamagePercent;
-		shok::EffectTypeId ExplosionEffectID;
+		float Radius = 0.0f; //4
+		int Damage = 0;
+		float Delay = 0.0f;
+		int DamagePercent = 50;
+		shok::EffectTypeId ExplosionEffectID{};
 
 		static inline constexpr int vtp = 0x776558;
 		static inline constexpr int TypeDesc = 0x81F6DC;
@@ -475,9 +475,9 @@ namespace GGL {
 
 	class CThiefBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		int SecondsNeededToSteal, MinimumAmountToSteal, MaximumAmountToSteal;
-		shok::ModelId CarryingModelID;
-		shok::TaskListId StealGoodsTaskList, SecureGoodsTaskList;
+		int SecondsNeededToSteal = 5, MinimumAmountToSteal = 1, MaximumAmountToSteal = 1;
+		shok::ModelId CarryingModelID{};
+		shok::TaskListId StealGoodsTaskList{}, SecureGoodsTaskList{};
 
 		static inline constexpr int vtp = 0x7739E0;
 		static inline constexpr int TypeDesc = 0x817400;
@@ -486,17 +486,17 @@ namespace GGL {
 
 	class CAutoCannonBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		int NumberOfShots; //4
-		float RotationSpeed; // rad, string seri as deg
-		shok::EffectTypeId CannonBallEffectType; // 6
-		float ProjectileOffsetFront, ProjectileOffsetRight;
-		shok::EffectTypeId ImpactEffectType; // 9
-		int ReloadTime;
-		float MaxAttackRange, MinRange;
-		shok::DamageClassId DamageClass;
-		int DamageAmount;
-		float DamageRange;
-		shok::TaskListId BattleTaskList, SelfDestructTaskList; // 16
+		int NumberOfShots = 0; //4
+		float RotationSpeed = 0.0f; // rad, string seri as deg
+		shok::EffectTypeId CannonBallEffectType{}; // 6
+		float ProjectileOffsetFront = 0.0f, ProjectileOffsetRight = 0.0f;
+		shok::EffectTypeId ImpactEffectType{}; // 9
+		int ReloadTime = 0;
+		float MaxAttackRange = 0.0f, MinRange = 0.0f;
+		shok::DamageClassId DamageClass{};
+		int DamageAmount = 0;
+		float DamageRange = -1.0f;
+		shok::TaskListId BattleTaskList{}, SelfDestructTaskList{}; // 16
 
 
 		static inline constexpr int vtp = 0x778CD4;
@@ -506,8 +506,8 @@ namespace GGL {
 
 	class CFoundationBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::EntityTypeId TopEntityType; //4
-		float XOffset, YOffset; //int?
+		shok::EntityTypeId TopEntityType{}; //4
+		float XOffset = 0.0f, YOffset = 0.0f; //int?
 
 		static inline constexpr int vtp = 0x776D08;
 		static inline constexpr int TypeDesc = 0x820F18;
@@ -516,15 +516,15 @@ namespace GGL {
 
 	class CResourceRefinerBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		class EfficencyUpgrade {
+		class EfficiencyUpgrade {
 		public:
-			shok::TechnologyId Technology;
-			float Factor;
+			shok::TechnologyId Technology{};
+			float Factor = 2.0f;
 		};
-		shok::ResourceType ResourceType; // 4
-		float InitialFactor;
-		shok::Vector<EfficencyUpgrade> Efficiency;
-		shok::EntityCategory SupplierCategory;
+		shok::ResourceType ResourceType{}; // 4
+		float InitialFactor = 1.0f;
+		shok::Vector<EfficiencyUpgrade> Efficiency;
+		shok::EntityCategory SupplierCategory{};
 
 		static inline constexpr int vtp = 0x774C24;
 		static inline constexpr int TypeDesc = 0x81AD48;
@@ -533,7 +533,7 @@ namespace GGL {
 
 	class CAffectMotivationBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		float MotivationEffect; //4
+		float MotivationEffect = 0.0f; //4
 
 		static inline constexpr int vtp = 0x7791D4;
 		static inline constexpr int TypeDesc = 0x828FF0;
@@ -542,7 +542,7 @@ namespace GGL {
 
 	class CLimitedLifespanBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		int LifespanSeconds;
+		int LifespanSeconds = 0;
 
 		static inline constexpr int vtp = 0x775DE4;
 		static inline constexpr int TypeDesc = 0x81D080;
@@ -552,8 +552,8 @@ namespace GGL {
 	class CBarrackBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
 		shok::Array<shok::TaskListId, 3> TrainingTaskList; //4
-		shok::TaskListId LeaveTaskList;
-		float TrainingTime; //9
+		shok::TaskListId LeaveTaskList{};
+		float TrainingTime = 1.0f; //9
 
 		static inline constexpr int vtp = 0x778B34;
 		static inline constexpr int TypeDesc = 0x827F48;
@@ -564,8 +564,8 @@ namespace GGL {
 	public:
 		class CannonInfoData {
 		public:
-			shok::EntityTypeId Cannon;
-			shok::TaskListId TaskList;
+			shok::EntityTypeId Cannon{};
+			shok::TaskListId TaskList{};
 		};
 		shok::Vector<CannonInfoData> CannonInfo;
 
@@ -585,7 +585,7 @@ namespace GGL {
 
 	class CSettlerMerchantBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId InitTaskList, MoveOutTaskList, MoveInTaskList; //4
+		shok::TaskListId InitTaskList{}, MoveOutTaskList{}, MoveInTaskList{}; //4
 
 		static inline constexpr int vtp = 0x7747DC;
 		static inline constexpr int TypeDesc = 0x8196E0;
@@ -596,17 +596,17 @@ namespace GGL {
 	public:
 		class WorkModifier {
 		public:
-			shok::TechnologyId Technology;
-			float WorkAmount;
+			shok::TechnologyId Technology{};
+			float WorkAmount = 1.0f;
 		};
-		float InitialWorkAmount; // int?
+		float InitialWorkAmount = 0.0f;
 		shok::Vector<WorkModifier> Work;
 
 		static inline constexpr int vtp = 0x774830;
 		static inline constexpr int TypeDesc = 0x816C3C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xAF007567);
 
-		float GetProgressAmount(shok::PlayerId p) const;
+		[[nodiscard]] float GetProgressAmount(shok::PlayerId p) const;
 
 		virtual ~CServiceBuildingBehaviorProperties() override;
 		CServiceBuildingBehaviorProperties();
@@ -616,7 +616,7 @@ namespace GGL {
 
 	class CWorkerFleeBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId FlightTaskList; //4
+		shok::TaskListId FlightTaskList{}; //4
 
 		static inline constexpr int vtp = 0x772A60;
 		static inline constexpr int TypeDesc = 0x81374C;
@@ -625,7 +625,7 @@ namespace GGL {
 
 	class CWorkerAlarmModeBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::TaskListId GoToDefendableBuildingTaskList; //4
+		shok::TaskListId GoToDefendableBuildingTaskList{}; //4
 
 		static inline constexpr int vtp = 0x773544;
 		static inline constexpr int TypeDesc = 0x8164B4;
@@ -640,13 +640,19 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9D1FA07D);
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
+	class CGLResourceProps {
+	public:
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const;
+
+		int Amount = 0;
+		shok::ResourceType Good = shok::ResourceType::Gold;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9a4d90d7);
+	};
 	class CGLResourceDoodadBehaviorProps : public EGL::CGLEBehaviorProps {
 	public:
-		struct {
-			PADDINGI(1); // vtable?
-			int Amount; //float?
-			shok::ResourceType Good;
-		} Resource; // if im unlucky this is a list or set or something similar stupid
+		CGLResourceProps Resource;
 
 		static inline constexpr int vtp = 0x774D40;
 		static inline constexpr int TypeDesc = 0x81B170;
@@ -657,7 +663,7 @@ namespace GGL {
 	public:
 		class TypeData {
 		public:
-			shok::EntityTypeId Resource, Type;
+			shok::EntityTypeId Resource{}, Type{};
 		};
 		shok::Vector<TypeData> Building;
 
@@ -668,7 +674,7 @@ namespace GGL {
 
 	class CReplaceableEntityBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		shok::EntityTypeId EntityType;
+		shok::EntityTypeId EntityType{};
 
 		static inline constexpr int vtp = 0x774E24;
 		static inline constexpr int TypeDesc = 0x81B6A8;
@@ -677,7 +683,7 @@ namespace GGL {
 
 	class CMineBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		int AmountToMine;
+		int AmountToMine = 1;
 
 		static inline constexpr int vtp = 0x77581C;
 		static inline constexpr int TypeDesc = 0x81C77C;
@@ -686,7 +692,7 @@ namespace GGL {
 
 	class CKeepBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		int NumSerfs; // used anywhere?
+		int NumSerfs = 0; // used anywhere?
 
 		static inline constexpr int vtp = 0x776600;
 		static inline constexpr int TypeDesc = 0x81FA34;
@@ -695,7 +701,7 @@ namespace GGL {
 
 	class CNeutralBridgeBehaviorProperties : public EGL::CGLEBehaviorProps {
 	public:
-		shok::ConstructionInfo ConstructionInfo;
+		CGLBuildingConstructionProps ConstructionInfo;
 
 		static inline constexpr int vtp = 0x779B9C;
 		static inline constexpr int TypeDesc = 0x8298A4;
@@ -704,12 +710,12 @@ namespace GGL {
 
 	class CGLBehaviorFieldDoodadProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::EntityTypeId Crop;
+		shok::EntityTypeId Crop{};
 		PADDINGI(1);
-		shok::Goods Good;
-		int NumCropsInRow, NumberOfRows;
-		float CropSpacing, RowSpacing;
-		int NumFlowers;
+		shok::Goods Good{};
+		int NumCropsInRow = 0, NumberOfRows = 0;
+		float CropSpacing = 0.0f, RowSpacing = 0.0f;
+		int NumFlowers = 0;
 		shok::Vector<shok::EntityTypeId> Flower;
 
 		static inline constexpr int vtp = 0x77856C;
@@ -722,9 +728,9 @@ namespace GGL {
 
 	class CGLBehaviorCropDoodadProps : public EGL::CGLEBehaviorProps {
 	public:
-		shok::EntityTypeId NextPhaseCrop;
-		int PhaseTime;
-		bool RequiresSowing;
+		shok::EntityTypeId NextPhaseCrop{};
+		int PhaseTime = 0;
+		bool RequiresSowing = false;
 
 		static inline constexpr int vtp = 0x778774;
 		static inline constexpr int TypeDesc = 0x826438;

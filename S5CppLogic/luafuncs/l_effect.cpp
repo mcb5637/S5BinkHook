@@ -4,7 +4,6 @@
 #include <shok/s5_baseDefs.h>
 #include <shok/effect/s5_effects.h>
 #include <shok/s5_scriptsystem.h>
-#include <shok/entity/s5_entity.h>
 #include <shok/globals/s5_maplogic.h>
 #include <shok/globals/s5_entityandeffectmanager.h>
 #include <shok/events/s5_events.h>

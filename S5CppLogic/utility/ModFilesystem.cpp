@@ -61,7 +61,7 @@ CppLogic::Mod::FileSystem::RedirectFileSystem* CppLogic::Mod::FileSystem::Redire
 	auto sv = mng->LoadOrder.SaveVector();
 	auto* r = new CppLogic::Mod::FileSystem::RedirectFileSystem(s);
 	sv.Vector.push_back(r);
-	for (int i = sv.Vector.size() - 1; i > 0; i--) {
+	for (size_t i = sv.Vector.size() - 1; i > 0; i--) {
 		sv.Vector[i] = sv.Vector[i - 1];
 	}
 	sv.Vector[0] = r;

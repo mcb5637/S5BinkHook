@@ -47,7 +47,7 @@ void EScr::CScriptTriggerSystem::DisableTrigger(shok::TriggerId id)
 }
 
 void __stdcall ScriptTriggerSys_FireEventHooked(BB::IPostEvent* th, BB::CEvent* ev) {
-	auto* t = static_cast<EScr::CScriptTriggerSystem*>(th);
+	auto* t = static_cast<EScr::CScriptTriggerSystem*>(th); // NOLINT(*-pro-type-static-cast-downcast)
 	BB::CEvent* oldget = *EScr::CScriptTriggerSystem::CurrentRunningEventGet;
 	BB::CEvent* oldset = *EScr::CScriptTriggerSystem::CurrentRunningEventSet;
 
@@ -123,8 +123,8 @@ void __stdcall EScr::CScriptTriggerSystem::LoadFileToLuaStateOverride(lua_State*
 
 	std::string data{};
 	data.resize(s->GetSize());
-	s->Read(data.data(), data.size());
-	while (data.size() > 0 && data.back() == '\0')
+	s->Read(data.data(), static_cast<long>(data.size()));
+	while (!data.empty() && data.back() == '\0')
 		data.pop_back();
 	reinterpret_cast<void(__stdcall* const)(lua_State*, const char*, size_t, const char*)>(0x59BE57)(L, data.data(), data.size(), fmt.empty() ? name : fmt.c_str());
 }
@@ -164,9 +164,9 @@ bool EScr::CLuaFuncRef::Call(int nargs, int nres)
 	return funcref_call(this, nargs, nres);
 }
 inline void(__stdcall* const funcref_setstate)(EScr::CLuaFuncRef* th, lua::State L) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRef*, lua::State)>(0x5A1617);
-void EScr::CLuaFuncRef::SetState(lua::State L)
+void EScr::CLuaFuncRef::SetState(lua::State l)
 {
-	funcref_setstate(this, L);
+	funcref_setstate(this, l);
 }
 
 void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
@@ -263,7 +263,7 @@ void __stdcall EScr::LuaStateSerializer::SerializeOverride(BB::CFileStreamEx* f,
 	catch (const std::format_error& fe) {
 		std::string errmnsg{ "AdvLuaStateSerializer: serialize std::format_error: " };
 		errmnsg.append(fe.what());
-		MessageBox(0, errmnsg.c_str(), "", 0);
+		MessageBox(nullptr, errmnsg.c_str(), "", 0);
 		shok::LogString("%s\n", errmnsg.c_str());
 		throw;
 	}
@@ -272,7 +272,7 @@ void __stdcall EScr::LuaStateSerializer::SerializeOverride(BB::CFileStreamEx* f,
 		be.CopyMessage(buff, 200);
 		std::string errmnsg{ "AdvLuaStateSerializer: serialize BB::CException: " };
 		errmnsg.append(buff);
-		MessageBox(0, errmnsg.c_str(), "", 0);
+		MessageBox(nullptr, errmnsg.c_str(), "", 0);
 		shok::LogString("%s\n", errmnsg.c_str());
 		throw;
 	}
@@ -307,7 +307,7 @@ void __stdcall EScr::LuaStateSerializer::DeserializeOverride(BB::CFileStreamEx* 
 		catch (const std::format_error& fe) {
 			std::string errmnsg{ "AdvLuaStateSerializer: deserialize std::format_error: " };
 			errmnsg.append(fe.what());
-			MessageBox(0, errmnsg.c_str(), "", 0);
+			MessageBox(nullptr, errmnsg.c_str(), "", 0);
 			shok::LogString("%s\n", errmnsg.c_str());
 			throw;
 		}
@@ -316,7 +316,7 @@ void __stdcall EScr::LuaStateSerializer::DeserializeOverride(BB::CFileStreamEx* 
 			be.CopyMessage(buff, 200);
 			std::string errmnsg{ "AdvLuaStateSerializer: deserialize BB::CException: " };
 			errmnsg.append(buff);
-			MessageBox(0, errmnsg.c_str(), "", 0);
+			MessageBox(nullptr, errmnsg.c_str(), "", 0);
 			shok::LogString("%s\n", errmnsg.c_str());
 			throw;
 		}

@@ -139,8 +139,8 @@ void CppLogic::Mod::Effect::PiercingShotEffect::CheckForDamage()
 	CppLogic::Iterator::EntityPredicateIsAlive iali{};
 
 	auto lam = [this, attacker, pl](EGL::CGLEEntity* curr) {
-		if (std::find(AlreadyAffectedEntities.begin(), AlreadyAffectedEntities.end(), curr->EntityId) != AlreadyAffectedEntities.end())
-			return;
+			if (std::find(AlreadyAffectedEntities.begin(), AlreadyAffectedEntities.end(), curr->EntityId) != AlreadyAffectedEntities.end())
+				return;
 
 			float dmg = curr->CalculateDamageAgainstMe(DamageAmount, DamageClass, 1.0f);
 

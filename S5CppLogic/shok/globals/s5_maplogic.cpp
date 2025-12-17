@@ -17,11 +17,11 @@ void EGL::CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
 }
-bool EGL::CTerrainVertexColors::IsCoordValid(int* out) const
+bool EGL::CTerrainVertexColors::IsCoordValid(const int* out) const
 {
 	return out[0] >= 0 && out[1] >= 0 && (out[0] + 1) < ArraySizeX && (out[1] + 1) < ArraySizeY;
 }
-int EGL::CTerrainVertexColors::GetTerrainVertexColor(shok::Position& p)
+int EGL::CTerrainVertexColors::GetTerrainVertexColor(shok::Position& p) const
 {
 	int qp[2] = { 0,0 };
 	ToTerrainCoord(p, qp);
@@ -44,12 +44,11 @@ void EGL::CGLETerrainHiRes::ToTerrainCoord(const shok::Position& p, int* out)
 	out[0] = static_cast<int>(std::lroundf(p.X / 100));
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100));
 }
-bool EGL::CGLETerrainHiRes::IsCoordValid(int x, int y)
+bool EGL::CGLETerrainHiRes::IsCoordValid(int x, int y) const
 {
 	return x >= 0 && y >= 0 && x < MaxSizeX&& y < MaxSizeY;
 }
-bool EGL::CGLETerrainHiRes::IsCoordValid(int* out)
-{
+bool EGL::CGLETerrainHiRes::IsCoordValid(const int* out) const {
 	return IsCoordValid(out[0], out[1]);
 }
 int EGL::CGLETerrainHiRes::GetTerrainHeight(const shok::Position& p)
@@ -67,7 +66,7 @@ void EGL::CGLETerrainHiRes::SetTerrainHeight(const shok::Position& p, int h)
 	ToTerrainCoord(p, qp);
 	if (!IsCoordValid(qp))
 		throw std::out_of_range{ "SetTerrainHeight out of range" };
-	terrhires_setheight(this, qp, h);
+	terrhires_setheight(this, qp, static_cast<int16_t>(h));
 }
 int EGL::CGLETerrainHiRes::GetTerrainHeight(int x, int y) {
 	return TerrainHeights[(y + 1) * ArraySizeY + (x + 1)];
@@ -78,15 +77,14 @@ void EGL::CGLETerrainLowRes::ToQuadCoord(const shok::Position& p, int* out)
 	out[0] = static_cast<int>(std::lroundf(p.X / 100) / 4);
 	out[1] = static_cast<int>(std::lroundf(p.Y / 100) / 4);
 }
-bool EGL::CGLETerrainLowRes::IsCoordValid(int x, int y)
+bool EGL::CGLETerrainLowRes::IsCoordValid(int x, int y) const
 {
 	return x >= 0 && y >= 0 && x < MaxSizeX&& y < MaxSizeY;
 }
-bool EGL::CGLETerrainLowRes::IsCoordValid(const int* out)
-{
+bool EGL::CGLETerrainLowRes::IsCoordValid(const int* out) const {
 	return IsCoordValid(out[0], out[1]);
 }
-bool EGL::CGLETerrainLowRes::IsBridgeHeightCoordValid(int x, int y)
+bool EGL::CGLETerrainLowRes::IsBridgeHeightCoordValid(int x, int y) const
 {
 	if (HiResBridgeHeightEnabled) {
 		return x >= 0 && y >= 0 && x < (MaxSizeX * 4) && y < (MaxSizeY * 4);
@@ -312,11 +310,11 @@ void EGL::CGLELandscape::AdvancedAARectIterator::ToNext(Coord& Curr) const
 EGL::CGLELandscape::AdvancedAARectIterator::Iter EGL::CGLELandscape::AdvancedAARectIterator::begin() const {
 	if (High.x == Low.x || High.y == Low.y)
 		return end();
-	return EGL::CGLELandscape::AdvancedAARectIterator::Iter(*this, Low);
+	return {*this, Low};
 }
 EGL::CGLELandscape::AdvancedAARectIterator::Iter EGL::CGLELandscape::AdvancedAARectIterator::end() const
 {
-	return EGL::CGLELandscape::AdvancedAARectIterator::Iter(*this, { Low.x, High.y }); // {x-1, y-1}.next()
+	return {*this, { Low.x, High.y }};
 }
 const EGL::CGLELandscape::AdvancedAARectIterator::Coord& EGL::CGLELandscape::AdvancedAARectIterator::Iter::operator*() const
 {
@@ -389,7 +387,7 @@ bool EGL::CGLELandscape::IsPosBlockedInMode(const shok::Position* p, BlockingMod
 {
 	return shok_EGL_CGLELandscape_isposblockedinmode(this, p, &mode);
 }
-EGL::CGLELandscape::BlockingMode EGL::CGLELandscape::GetBlocking(const shok::Position& p)
+EGL::CGLELandscape::BlockingMode EGL::CGLELandscape::GetBlocking(const shok::Position& p) const
 {
 	int i[] = { 0,0 };
 	HiRes->ToTerrainCoord(p, i);
@@ -438,10 +436,10 @@ void EGL::CGLELandscape::AdvancedRemoveBridgeHeight(const shok::Position& p, con
 	CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity> rec{ p.X + ar.low.X, p.Y + ar.low.Y, p.X + ar.high.X - 100, p.Y + ar.high.Y - 100 };
 	CppLogic::Iterator::GlobalEntityIterator it{ &rec };
 	for (auto* ent : it) {
-		if (GGL::CSettler* s = dynamic_cast<GGL::CSettler*>(ent)) {
+		if (auto* s = dynamic_cast<GGL::CSettler*>(ent)) {
 			s->KillSettlerByEnvironment();
 		}
-		else if (GGL::CAnimal* a = dynamic_cast<GGL::CAnimal*>(ent)) {
+		else if (auto* a = dynamic_cast<GGL::CAnimal*>(ent)) {
 			if (a->GetFirstAttachedToMe(shok::AttachmentType::HERO_HAWK) != static_cast<shok::EntityId>(0))
 				a->Destroy();
 		}
@@ -460,8 +458,7 @@ void EGL::CGLELandscape::AdvancedApplyBlocking(const shok::Position& p, const sh
 	}
 }
 static inline void(__thiscall* const lsblocking_remvoveblockingpoint)(EGL::LandscapeBlockingData* th, int x, int y, EGL::CGLELandscape::BlockingMode* m) = reinterpret_cast<void(__thiscall*)(EGL::LandscapeBlockingData*, int, int, EGL::CGLELandscape::BlockingMode*)>(0x57EEE1);
-void EGL::CGLELandscape::AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode)
-{
+void EGL::CGLELandscape::AdvancedRemoveBlocking(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode blockingmode) const {
 	AdvancedAARectIterator iter{ p, area, rot, false };
 	for (auto& curr : iter) {
 		if (!HiRes->IsCoordValid(curr.x, curr.y))
@@ -469,7 +466,7 @@ void EGL::CGLELandscape::AdvancedRemoveBlocking(const shok::Position& p, const s
 		RemoveSingleBlockingPoint(curr.x, curr.y, blockingmode);
 	}
 }
-void EGL::CGLELandscape::RemoveSingleBlockingPoint(int x, int y, BlockingMode mode)
+void EGL::CGLELandscape::RemoveSingleBlockingPoint(int x, int y, BlockingMode mode) const
 {
 	if (static_cast<int>(mode) & static_cast<int>(BlockingMode::Blocked) && Tiling->GetSomeGlobal())
 		Tiling->OnPreBlockingMode1Removed(x, y);
@@ -505,7 +502,7 @@ void EGL::CGLELandscape::AdvancedApplyBridgeHeight(const shok::Position& p, cons
 		}
 	}
 }
-bool EGL::CGLELandscape::IsAreaUnblockedInMode(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode mode, bool AddOne)
+bool EGL::CGLELandscape::IsAreaUnblockedInMode(const shok::Position& p, const shok::AARect& area, float rot, BlockingMode mode, bool AddOne) const
 {
 	AdvancedAARectIterator iter{ p, area, rot, false, AddOne };
 	for (auto& curr : iter) {
@@ -516,7 +513,7 @@ bool EGL::CGLELandscape::IsAreaUnblockedInMode(const shok::Position& p, const sh
 	}
 	return true;
 }
-bool EGL::CGLELandscape::IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne)
+bool EGL::CGLELandscape::IsAreaNotUnderWater(const shok::Position& p, const shok::AARect& area, float rot, bool AddOne) const
 {
 	AdvancedAARectIterator iter{ p, area, rot, false, AddOne };
 	for (auto& curr : iter) {
@@ -548,7 +545,7 @@ struct shok_GGL_CFreeBuildingPosPredicate {
 void(__thiscall* const freebuildpred_ctor)(shok_GGL_CFreeBuildingPosPredicate* p, shok::Position* lo, shok::Position* hi, int uk, float r) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*, shok::Position*, shok::Position*, int, float)>(0x4C7E84);
 void(__thiscall* const freebuildpred_calc)(EGL::LandscapeBlockingData* bl, int x, int y, int* xo, int* yo, int ra, shok_GGL_CFreeBuildingPosPredicate* pred) = reinterpret_cast<void(__thiscall*)(EGL::LandscapeBlockingData*, int, int, int*, int*, int, shok_GGL_CFreeBuildingPosPredicate*)>(0x57F726);
 void(__thiscall* const freebuildpred_dtor)(shok_GGL_CFreeBuildingPosPredicate* p) = reinterpret_cast<void(__thiscall*)(shok_GGL_CFreeBuildingPosPredicate*)>(0x4C7E07);
-shok::Position EGL::LandscapeBlockingData::GetFreeBuildingPlacementPos(const GGL::CGLBuildingProps* bprops, const shok::PositionRot& pos, float range)
+shok::Position EGL::LandscapeBlockingData::GetFreeBuildingPlacementPos(const GGL::CGLBuildingProps* bprops, const shok::PositionRot& pos, float range) const
 {
 	int x = 0, y = 0;
 	shok::Position hi, lo;
@@ -564,13 +561,13 @@ shok::Position EGL::LandscapeBlockingData::GetFreeBuildingPlacementPos(const GGL
 
 	return { -1,-1 };
 }
-EGL::CGLELandscape::BlockingMode EGL::LandscapeBlockingData::GetBlockingData(int x, int y)
+EGL::CGLELandscape::BlockingMode EGL::LandscapeBlockingData::GetBlockingData(int x, int y) const
 {
 	return static_cast<EGL::CGLELandscape::BlockingMode>(data[x + y * *EGL::CGLEGameLogic::MapSize]);
 }
 
 
-bool EGL::LandscapeBlockingData::IsCoordValid(int x, int y)
+bool EGL::LandscapeBlockingData::IsCoordValid(int x, int y) const
 {
 	return x >= 0 && x < ArraySizeXY&& y >= 0 && y < ArraySizeXY;
 }
@@ -666,19 +663,18 @@ shok::EntityId EGL::CGLEGameLogic::CreateEntity(EGL::CGLEEntityCreator* cr)
 	return CreateEntity(cr, 1);
 }
 
-int EGL::CGLEGameLogic::GetTimeMS()
+int EGL::CGLEGameLogic::GetTimeMS() const
 {
 	return InGameTime->Tick * InGameTime->TicksPerMS;
 }
 
-int EGL::CGLEGameLogic::GetTick()
+int EGL::CGLEGameLogic::GetTick() const
 {
 	return InGameTime->Tick;
 }
 
-float EGL::CGLEGameLogic::GetTimeSeconds()
-{
-	return GetTimeMS() / 1000.0f;
+float EGL::CGLEGameLogic::GetTimeSeconds() const {
+	return static_cast<float>(GetTimeMS()) / 1000.0f;
 }
 
 inline void(__thiscall* const egl_gamelogic_cleardest)(EGL::CGLEGameLogic* th) = reinterpret_cast<void(__thiscall*)(EGL::CGLEGameLogic*)>(0x5720FE);
@@ -829,7 +825,7 @@ GGL::CPlayerStatus* GGL::PlayerManager::GetPlayer(shok::PlayerId p)
 	return gglplayermng_getplayer(this, p);
 }
 
-GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(shok::PlayerId i)
+GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(shok::PlayerId i) const
 {
 	return Players->GetPlayer(i);
 }

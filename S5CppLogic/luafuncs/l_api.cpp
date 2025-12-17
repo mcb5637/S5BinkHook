@@ -1,6 +1,4 @@
 #include "pch.h"
-#include <libloaderapi.h>
-#include <sstream>
 #include <string_view>
 #include <array>
 #include <processthreadsapi.h>
@@ -83,7 +81,6 @@ namespace CppLogic::API {
 	}
 
 	int ReadFileAsString(lua::State L) {
-		size_t strlen = 0;
 		const char* s = L.CheckString(1);
 #ifndef DEBUG_FUNCS
 		if (!IsExternalmap(s))

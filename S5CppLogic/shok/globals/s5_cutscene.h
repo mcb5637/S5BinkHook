@@ -4,6 +4,7 @@
 #include <shok/engine/s5_RWEngine.h>
 
 namespace ECS {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ICallbacks {
 	public:
 		virtual void OnStart(const char* cutsceneName) = 0;

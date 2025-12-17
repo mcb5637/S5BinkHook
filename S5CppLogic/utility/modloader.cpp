@@ -34,7 +34,7 @@
 shok::String CppLogic::ModLoader::ModLoader::ModPackList{};
 size_t CppLogic::ModLoader::ModLoader::GUIDLength = 0;
 
-void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func, std::function<void(lua::State)> pushMapInfo)
+void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func, const std::function<void(lua::State)>& pushMapInfo)
 {
 	Log(L, "Initializing ModLoader");
 	InitExtraECats();
@@ -94,24 +94,24 @@ void CppLogic::ModLoader::ModLoader::PreMapStart(lua_State* ingame, const char* 
 {
 	lua::State L{ ingame };
 	auto mappath = std::format("{}\\{}\\ModLoader.lua", externalmap ? "Maps" : path, externalmap ? "ExternalMap" : name);
-	Init(L, mappath.c_str(), "MapStart", [](lua::State L) {
+	Init(L, mappath.c_str(), "MapStart", [](lua::State l) {
 		const GS3DTools::CMapData& m = (*Framework::CMain::GlobalObj)->CurrentMap;
-		L.NewTable();
-		L.Push("MapName");
-		L.Push(m.MapName);
-		L.SetTableRaw(-3);
-		L.Push("MapType");
-		L.Push(static_cast<int>(m.MapType));
-		L.SetTableRaw(-3);
-		L.Push("MapCampagnName");
-		L.Push(m.MapCampagnName);
-		L.SetTableRaw(-3);
-		L.Push("MapGUID");
-		L.Push(m.MapGUID);
-		L.SetTableRaw(-3);
-		L.Push("IsSavegame");
-		L.Push(false);
-		L.SetTableRaw(-3);
+		l.NewTable();
+		l.Push("MapName");
+		l.Push(m.MapName);
+		l.SetTableRaw(-3);
+		l.Push("MapType");
+		l.Push(static_cast<int>(m.MapType));
+		l.SetTableRaw(-3);
+		l.Push("MapCampagnName");
+		l.Push(m.MapCampagnName);
+		l.SetTableRaw(-3);
+		l.Push("MapGUID");
+		l.Push(m.MapGUID);
+		l.SetTableRaw(-3);
+		l.Push("IsSavegame");
+		l.Push(false);
+		l.SetTableRaw(-3);
 	});
 }
 void CppLogic::ModLoader::ModLoader::PostMapscriptLoaded()
@@ -156,27 +156,27 @@ void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::G
 		throw std::logic_error("no save???");
 	lua::State L{ ingame };
 	auto mappath = std::format("{}\\ModLoader.lua", externalmap ? "Maps\\ExternalMap" : internalmap_getpath(&sdata->CurrentSave->MapData));
-	Init(L, mappath.c_str(), "LoadSave", [&](lua::State L) {
-		L.NewTable();
+	Init(L, mappath.c_str(), "LoadSave", [&](lua::State l) {
+		l.NewTable();
 		const GS3DTools::CMapData& m = sdata->CurrentSave->MapData;
-		L.Push("MapName");
-		L.Push(m.MapName);
-		L.SetTableRaw(-3);
-		L.Push("MapType");
-		L.Push(static_cast<int>(m.MapType));
-		L.SetTableRaw(-3);
-		L.Push("MapCampagnName");
-		L.Push(m.MapCampagnName);
-		L.SetTableRaw(-3);
-		L.Push("MapGUID");
-		L.Push(m.MapGUID);
-		L.SetTableRaw(-3);
-		L.Push("IsSavegame");
-		L.Push(true);
-		L.SetTableRaw(-3);
-		L.Push("SaveLoading");
-		L.Push(data->Folder);
-		L.SetTableRaw(-3);
+		l.Push("MapName");
+		l.Push(m.MapName);
+		l.SetTableRaw(-3);
+		l.Push("MapType");
+		l.Push(static_cast<int>(m.MapType));
+		l.SetTableRaw(-3);
+		l.Push("MapCampagnName");
+		l.Push(m.MapCampagnName);
+		l.SetTableRaw(-3);
+		l.Push("MapGUID");
+		l.Push(m.MapGUID);
+		l.SetTableRaw(-3);
+		l.Push("IsSavegame");
+		l.Push(true);
+		l.SetTableRaw(-3);
+		l.Push("SaveLoading");
+		l.Push(data->Folder);
+		l.SetTableRaw(-3);
 	});
 }
 void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
@@ -566,7 +566,7 @@ void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Reset()
 {
 	{
 		auto v = (*GGL::CLogicProperties::GlobalObj)->SettlerUpgrades.SaveVector();
-		while (ToRemoveSettler.size() != 0) {
+		while (!ToRemoveSettler.empty()) {
 			auto id = ToRemoveSettler.back();
 			ToRemoveSettler.pop_back();
 			if (v.Vector.back().Category == id) {
@@ -577,7 +577,7 @@ void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Reset()
 	}
 	{
 		auto v = (*GGL::CLogicProperties::GlobalObj)->BuildingUpgrades.SaveVector();
-		while (ToRemoveBuilding.size() != 0) {
+		while (!ToRemoveBuilding.empty()) {
 			auto id = ToRemoveBuilding.back();
 			ToRemoveBuilding.pop_back();
 			if (v.Vector.back().Category == id) {
@@ -650,11 +650,11 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCa
 	auto ctype = first;
 	while (ctype != shok::EntityTypeId::Invalid) {
 		auto* cty = CppLogic::GetEntityType(ctype);
-		auto* sty = dynamic_cast<GGL::CGLSettlerProps*>(cty->LogicProps);
-		if (sty == nullptr)
+		auto* sprops = dynamic_cast<GGL::CGLSettlerProps*>(cty->LogicProps);
+		if (sprops == nullptr)
 			throw lua::LuaException{ "non settler type in settler ucat" };
-		sty->Upgrade.Category = id;
-		ctype = sty->Upgrade.Type;
+		sprops->Upgrade.Category = id;
+		ctype = sprops->Upgrade.Type;
 	}
 	// players are not created yet, so the upgrademanagers in there read the correct data from GGL::CLogicProperties::GlobalObj
 	Obj.ToRemoveSettler.push_back(id);
@@ -753,7 +753,6 @@ CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>
 
 template<>
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTextureId>::Load(shok::TerrainTextureId id, luaext::EState L) {
-	auto idm = CppLogic::GetIdManager<shok::TerrainTextureId>();
 	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->LoadTexture(id);
 }
 template<>
@@ -841,7 +840,7 @@ CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory> CppLogi
 
 void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Reset()
 {
-	while (ToRemove.size() != 0) {
+	while (!ToRemove.empty()) {
 		shok::ExperienceClass id = ToRemove.back();
 		ToRemove.pop_back();
 		GGL::ExperienceClassHolder::GlobalObj()->PopExpeienceClass(id);
@@ -891,7 +890,7 @@ CppLogic::ModLoader::ModLoader::ExperienceClassesLoader CppLogic::ModLoader::Mod
 
 void CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Reset()
 {
-	while (ToRemove.size() != 0) {
+	while (!ToRemove.empty()) {
 		auto id = ToRemove.back();
 		ToRemove.pop_back();
 		(*ESnd::CSoESound::GlobalObj)->PopSoundGroup(id);
@@ -984,13 +983,13 @@ CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId> CppLogic
 
 void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Reset()
 {
-	if (ToRemove.size() > 0) {
+	if (!ToRemove.empty()) {
 		for (int id = 1; id < static_cast<int>((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->ModelManager.ModelIDManager->size()); ++id) {
 			(*ED::CGlobalsBaseEx::GlobalObj)->ResManager->FreeModel(static_cast<shok::ModelId>(id));
 			// gets reloaded on next use anyway
 		}
 		auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
-		while (ToRemove.size() > 0) {
+		while (!ToRemove.empty()) {
 			int id = ToRemove.back();
 			ToRemove.pop_back();
 			mng->Data[id]->FreeCache();
@@ -1182,7 +1181,7 @@ int CppLogic::ModLoader::ModLoader::CreateModpackRedirectLayer(lua::State L)
 int CppLogic::ModLoader::ModLoader::InvalidModPackPanic(lua::State L)
 {
 	auto m = L.CheckStringView(1);
-	MessageBoxA(0, m.data(), "ModLoader failure", MB_OK);
+	MessageBoxA(nullptr, m.data(), "ModLoader failure", MB_OK);
 	std::exit(0);
 	return 0;
 }
@@ -1194,7 +1193,7 @@ int CppLogic::ModLoader::ModLoader::GetModpacks(lua::State L)
 	int k = 1;
 	for (const auto& i : it) {
 		if (i.is_regular_file()) {
-			auto p = i.path();
+			const auto& p = i.path();
 			if (p.extension().string() == ".bba") {
 				L.Push(p.stem().string());
 				L.SetTableRaw(-2, k);
@@ -1330,7 +1329,7 @@ int CppLogic::ModLoader::ModLoader::LoadStringTableTextOverrides(lua::State L)
 		if (fs.OpenFile(f.data(), BB::IStream::Flags::DefaultRead)) {
 			seri->DeserializeByData(&fs, &o, CppLogic::SavegameExtra::StringTableTextOverride::SerializationData);
 			o.Merge(L.OptStringView(3, file), L.GetState());
-			L.Push(static_cast<int>(o.StringTableTextOverride.size()));
+			L.Push(static_cast<int>(o.StringTableTextOverrideData.size()));
 		}
 		else {
 			L.Push(-1);

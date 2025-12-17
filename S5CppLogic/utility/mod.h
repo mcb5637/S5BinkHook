@@ -15,6 +15,7 @@ namespace CppLogic::Mod {
 	};
 
 	// note that you need to override CastToIdentifier for this
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IFormationBehaviorExtProvider {
 	public:
 		virtual shok::Position GetPosExt(EGL::CGLEEntity* leader) = 0;

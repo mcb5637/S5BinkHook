@@ -122,7 +122,7 @@ namespace CppLogic::Serializer {
 		void DeserializeAnything();
 		void DeserializeAnything(lua::LType t);
 		bool CanSerialize(int idx);
-		bool IsGlobalSkipped(const char* n);
+		static bool IsGlobalSkipped(const char* n);
 
 		void PrepareSerialize();
 		void CleanupSerialize();
@@ -225,17 +225,17 @@ namespace CppLogic::Serializer {
 
 			Iter(void* o, const BB::SerializationData* sd);
 
-			bool operator==(std::default_sentinel_t);
-			inline Iter begin() const {
+			bool operator==(std::default_sentinel_t) const;
+			[[nodiscard]] Iter begin() const {
 				return *this;
 			}
-			inline auto end() const {
+			[[nodiscard]] static auto end() {
 				return std::default_sentinel;
 			}
 
 			std::pair<void*, const BB::SerializationData*> operator*() const;
 			Iter& operator++();
-			inline Iter operator++(int) {
+			Iter operator++(int) {
 				Iter r = *this;
 				++(*this);
 				return r;

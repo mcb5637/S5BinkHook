@@ -8,26 +8,28 @@
 #include <utility/EnumIdManagerMagic.h>
 
 namespace ECore {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IReplayStreamExtension {
 		virtual void unknown0();
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CReplayHandler : public BB::IPostEvent {
 	public:
 		struct Storage {
-			BB::CMemoryStream* Stream;
-			BB::CBinarySerializer* Serializer;
-			int Data; // latest ECore::CECoreEventInteger data
+			BB::CMemoryStream* Stream = nullptr;
+			BB::CBinarySerializer* Serializer = nullptr;
+			int Data = 0; // latest ECore::CECoreEventInteger data
 			PADDINGI(1);
 		};
 
 		PADDINGI(1); //0
-		Storage* Store1;
-		Storage* Store2;
-		BB::IPostEvent* CheckSumCalc; //4 Framework::CCheckSumCalculator
-		BB::CMemoryStream* MemoryStream;
-		BB::CFileStream* FileStream;
-		BB::CBinarySerializer* Serializer; //7 of CReplayMgr
+		Storage* Store1 = nullptr;
+		Storage* Store2 = nullptr;
+		BB::IPostEvent* CheckSumCalc = nullptr; //4 Framework::CCheckSumCalculator
+		BB::CMemoryStream* MemoryStream = nullptr;
+		BB::CFileStream* FileStream = nullptr;
+		BB::CBinarySerializer* Serializer = nullptr; //7 of CReplayMgr
 		PADDINGI(3);
 		
 
@@ -37,14 +39,16 @@ namespace ECore {
 	static_assert(offsetof(CReplayHandler, Serializer) == 7 * 4);
 	static_assert(sizeof(CReplayHandler) == 11 * 4);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IReplayMgr {
 		virtual void unknown0() = 0;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CReplayMgr : public IReplayMgr {
 	public:
-		CReplayHandler* ReplayHandler; // probably unique ptr
+		CReplayHandler* ReplayHandler = nullptr; // probably unique ptr
 		PADDINGI(2);
-		BB::CBinarySerializer* Serializer;
+		BB::CBinarySerializer* Serializer = nullptr;
 
 		static inline constexpr int vtp = 0x77F2D0;
 		// 5471A4 ctor
@@ -53,10 +57,11 @@ namespace ECore {
 }
 
 namespace GS3DTools {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CMapData : public ECore::IReplayStreamExtension {
 	public:
 		shok::String MapName;
-		shok::MapType MapType;
+		shok::MapType MapType{};
 		shok::String MapCampagnName;
 		shok::String MapGUID; // 16 theoretically a struct with only a string as member Data
 
@@ -67,10 +72,12 @@ namespace GS3DTools {
 	};
 	static_assert(offsetof(CMapData, MapGUID) == 16 * 4);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CGUIReplaySystem : public ECore::IReplayStreamExtension, public BB::IPostEvent {
 	public:
 		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
 
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		class CPlayingReplay : public BB::IPostEvent {
 			virtual void __stdcall PostEvent(BB::CEvent* ev) override;
 		};
@@ -99,8 +106,8 @@ namespace Framework {
 	struct SKeys {
 		shok::Vector<int> Keys;
 
-		bool Check(const SKeys& map) const;
-		bool CheckSP(const SKeys& map) const;
+		[[nodiscard]] bool Check(const SKeys& map) const;
+		[[nodiscard]] bool CheckSP(const SKeys& map) const;
 		// set to extra num 51BA6A __thiscall
 	};
 
@@ -219,7 +226,7 @@ namespace GDB {
 		float GetValue(const char* key);
 		void SetValue(const char* key, float value);
 
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		static inline constexpr int vtp = 0x76289C;
 		static inline constexpr int TypeDesc = 0x80040C;
@@ -247,12 +254,14 @@ public:
 };
 
 namespace Framework {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IGameCallBacks {
 		virtual void unknown0() = 0;
 	};
 	class CEventTimeManager_UnknownInt {
 		PADDINGI(1);
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CEventTimeManager : public BB::IPostEvent, private CEventTimeManager_UnknownInt, public CTimeManager {
 	public:
 		BB::IPostEvent* ReplayHandler; // ECore::CReplayHandler
@@ -264,6 +273,7 @@ namespace Framework {
 	};
 	static_assert(sizeof(CEventTimeManager) == 4 * 18);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CCheckSumCalculator : public BB::IPostEvent {
 	public:
 		static inline constexpr int vtp = 0x76306C;
@@ -272,6 +282,7 @@ namespace Framework {
 
 		BB::IPostEvent* CEscapeEventHandler;
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CEscapeEventHandler : public BB::IPostEvent {
 	public:
 		static inline constexpr int vtp = 0x763074;
@@ -340,10 +351,11 @@ namespace Framework {
 	//constexpr int i = offsetof(AGameModeBase, TimeManager.RealTimeMS)/4;
 	class CSinglePlayerMode : public AGameModeBase {
 	public:
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		class CNetworkEvent : public BB::IPostEvent {
-			CEventTimeManager* TimeManager1;
-			CEventTimeManager* TimeManager2; // same pointer
-			BB::CBinarySerializer* BinarySerializer;
+			CEventTimeManager* TimeManager1 = nullptr;
+			CEventTimeManager* TimeManager2 = nullptr; // same pointer
+			BB::CBinarySerializer* BinarySerializer = nullptr;
 			BB::CMemoryStream MemoryStream; // stores GUI events between recieving and executing, then goes to TimeManager2
 
 			static inline constexpr int vtp = 0x7632C0;
@@ -365,8 +377,9 @@ namespace Framework {
 	static_assert(offsetof(CSinglePlayerMode, NetworkEvent) == 1428 * 4);
 	class CMultiPlayerMode : public AGameModeBase {
 	public:
+		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		class CNetworkEvent : public BB::IPostEvent {
-			CEventTimeManager* TimeManager;
+			CEventTimeManager* TimeManager = nullptr;
 
 			static inline constexpr int vtp = 0x7631B4;
 
@@ -379,6 +392,7 @@ namespace Framework {
 	static_assert(sizeof(CMultiPlayerMode) == 1430 * 4);
 
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CMain : public BB::IPostEvent, public IGameCallBacks, public ESnd::IAmbientSoundInfo {
 	public:
 		enum class Mode : int {
@@ -425,7 +439,7 @@ namespace Framework {
 		ED::CGUIScene* GUIScene;
 		ESnd::CSoESound* Sound;
 	private:
-		int one; // some update value?
+		int one = 1; // some update value?
 	public:
 		GGlue::CGluePropsMgr* GluePropsManager; // 150
 		PADDINGI(9);

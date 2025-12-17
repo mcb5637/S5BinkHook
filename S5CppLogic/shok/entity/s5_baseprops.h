@@ -40,7 +40,7 @@ namespace ED {
 	class CBehaviorProps : public BB::IObject {
 	public:
 		shok::ClassId Class = static_cast<shok::ClassId>(0);
-		int Index = 0;
+		int Index = -1;
 		int Unknown = 100; // 100?? 3
 
 		static inline constexpr int vtp = 0x76AB0C;

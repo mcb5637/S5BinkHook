@@ -9,6 +9,7 @@ namespace GGlue {
 	class IAnimsPropsMgr {
 		// no vtable
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CGlueAnimsPropsMgr : public IAnimsPropsMgr {
 	public:
 		virtual void __stdcall Destroy() = 0;
@@ -36,8 +37,8 @@ namespace GGlue {
 	public:
 		virtual void __stdcall LoadData(const char* filepath) = 0;
 
-		BB::CIDManagerEx* EffectTypeManager;
-		BB::CIDManagerEx* WeatherEffectTextureManager;
+		BB::CIDManagerEx* EffectTypeManager = nullptr;
+		BB::CIDManagerEx* WeatherEffectTextureManager = nullptr;
 		EGL::CGLEEffectsProps EffectsLogicProps;
 		EGL::EffectsDisplayProps EffectsDisplayProps;
 		EGL::EffectsProps EffectsProps;
@@ -55,29 +56,30 @@ namespace GGlue {
 	class IEntitiesPropsMgr : public ECore::ICheckData {
 		// no vtable
 	};
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CEntitiesPropsMgr : public IEntitiesPropsMgr {
 	public:
 		virtual void __stdcall LoadNameLists() = 0; // loads EntityTypeManager, TaskListManager, AnimSetManager, RaceManager from list xml (not the actual objects)
 		virtual void __stdcall LoadEntitytypes() = 0;
 
-		BB::CIDManagerEx* AnimCategoryManager;
-		BB::CIDManagerEx* AnimSetManager;
-		BB::CIDManagerEx* EntityCategoryManager;
-		BB::CIDManagerEx* EntityTypeManager;
-		BB::CIDManagerEx* AnimManager; // 5
-		BB::CIDManagerEx* EffectTypeManager;
+		BB::CIDManagerEx* AnimCategoryManager = nullptr;
+		BB::CIDManagerEx* AnimSetManager = nullptr;
+		BB::CIDManagerEx* EntityCategoryManager = nullptr;
+		BB::CIDManagerEx* EntityTypeManager = nullptr;
+		BB::CIDManagerEx* AnimManager = nullptr; // 5
+		BB::CIDManagerEx* EffectTypeManager = nullptr;
 	private:
-		BB::CIDManagerEx* unknown1;
+		BB::CIDManagerEx* unknown1 = nullptr;
 	public:
-		BB::CIDManagerEx* RaceManager; // unused?
-		BB::CIDManagerEx* TaskListManager;
-		BB::CIDManagerEx* UpgradeCategoryManager; // 10
-		BB::CIDManagerEx* BlessCategoryManager;
-		BB::CIDManagerEx* BuildingBannerStatusManager;
+		BB::CIDManagerEx* RaceManager = nullptr; // unused?
+		BB::CIDManagerEx* TaskListManager = nullptr;
+		BB::CIDManagerEx* UpgradeCategoryManager = nullptr; // 10
+		BB::CIDManagerEx* BlessCategoryManager = nullptr;
+		BB::CIDManagerEx* BuildingBannerStatusManager = nullptr;
 	private:
-		BB::CIDManagerEx* unknown2;
-		BB::CIDManagerEx* unknown3;
-		void* CIDGroupsEx; // BB::CIDGroupsEx buildingbanner stuff
+		BB::CIDManagerEx* unknown2 = nullptr;
+		BB::CIDManagerEx* unknown3 = nullptr;
+		void* CIDGroupsEx = nullptr; // BB::CIDGroupsEx buildingbanner stuff
 	public:
 		EGL::CGLEEntitiesProps CGLEEntitiesProps; // 16 (Logic from Entities.xml ? )
 		ED::EntityTypeDisplayProps DisplayProps; // 26
@@ -91,7 +93,7 @@ namespace GGlue {
 		void PopEntityType(shok::EntityTypeId id);
 		// remember to also free in idmanager, free last id first
 		void FreeEntityType(shok::EntityTypeId id);
-		void RefreshDisplayFlags();
+		static void RefreshDisplayFlags();
 	};
 	static_assert(offsetof(CEntitiesPropsMgr, CGLEEntitiesProps) == 16 * 4);
 	static_assert(offsetof(CEntitiesPropsMgr, DisplayProps) == 26 * 4);
@@ -115,7 +117,7 @@ namespace GGlue {
 	};
 	class CDamageClassesPropsMgr : public IDamageClassPropsMgr { // size 11, vtable 6
 	public:
-		BB::CIDManagerEx* DamageClassManager;
+		BB::CIDManagerEx* DamageClassManager = nullptr;
 		GGL::DamageClassesHolder Logic; // then copied into here, only these are used, contains same objects (except if there are holes in the ids)
 		shok::Vector<GGL::CDamageClassProps*> DamageClass; // loaded into here
 
@@ -306,14 +308,14 @@ namespace GGlue {
 	public:
 		virtual ~CGluePropsMgr() = default;
 
-		CGlueAnimsPropsMgr* AnimPropsManager;
-		CEffectsPropsMgr* EffectPropsManager;
-		CEntitiesPropsMgr* EntitiesPropsManager;
-		CGoodsPropsMgr* GoodsPropsManager;
-		CDamageClassesPropsMgr* DamageClassesPropsManager;
-		CGlueHeadsPropsMgr* HeadsPropsManager;
-		CTerrainPropsMgr* TerrainPropsManager;
-		CGlueWaterPropsMgr* WaterPropsManager;
+		CGlueAnimsPropsMgr* AnimPropsManager = nullptr;
+		CEffectsPropsMgr* EffectPropsManager = nullptr;
+		CEntitiesPropsMgr* EntitiesPropsManager = nullptr;
+		CGoodsPropsMgr* GoodsPropsManager = nullptr;
+		CDamageClassesPropsMgr* DamageClassesPropsManager = nullptr;
+		CGlueHeadsPropsMgr* HeadsPropsManager = nullptr;
+		CTerrainPropsMgr* TerrainPropsManager = nullptr;
+		CGlueWaterPropsMgr* WaterPropsManager = nullptr;
 
 		static inline constexpr int vtp = 0x788720;
 	};

@@ -74,7 +74,7 @@ namespace GGUI {
 
 	class CCommandState : public GGUI::CBasicState { // no vtable
 	public:
-		shok::EntityId ExclusiveRecipientId;
+		shok::EntityId ExclusiveRecipientId{};
 
 		static inline constexpr int TypeDesc = 0x82CC88;
 	};
@@ -272,8 +272,8 @@ namespace GGUI {
 	class CPlaceCannonState : public GGUI::CCommandState {
 	public:
 		PADDINGI(2);
-		shok::EntityTypeId TopType; // 5
-		shok::EntityTypeId FoundationType;
+		shok::EntityTypeId TopType{}; // 5
+		shok::EntityTypeId FoundationType{};
 
 		static inline constexpr int vtp = 0x77DC0C;
 		static inline constexpr int TypeDesc = 0x82EBD8;

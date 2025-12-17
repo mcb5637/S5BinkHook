@@ -152,7 +152,7 @@ size_t CppLogic::Serializer::SchemaGenerator::PredictNumberOfFields(const BB::Se
 {
 	size_t r = 0;
 	while (data->Type != BB::SerializationData::Ty::Invalid) {
-		if (data->Type == BB::SerializationData::Ty::Direct) {
+		if (data->Type == BB::SerializationData::Ty::Direct) { // NOLINT(*-branch-clone)
 			++r;
 		}
 		else if (data->Type == BB::SerializationData::Ty::Embedded) {
@@ -239,18 +239,18 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 	while (data->Type != BB::SerializationData::Ty::Invalid) {
 		if (data->Type == BB::SerializationData::Ty::Direct) {
 			f.Indent(indent);
-			f.Write("<xs:element name=\"");
+			f.Write(R"(<xs:element name=")");
 			f.Write(data->SerializationName);
-			f.Write("\"");
+			f.Write(R"(")");
 
 			auto* ext = data->DataConverter->GetOptExtendedInfo();
 			if (ext != nullptr && !ext->XSDType.empty()) {
-				f.Write(" type=\"");
+				f.Write(R"( type=")");
 				f.Write(ext->XSDType);
 				f.Write("\"");
 			}
 			if (data->ListOptions != nullptr) {
-				f.Write(" minOccurs=\"0\" maxOccurs=\"unbounded\"");
+				f.Write(R"( minOccurs="0" maxOccurs="unbounded")");
 			}
 			f.Write("/>\n");
 		}
@@ -265,7 +265,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 				f.Write("\"");
 
 				if (data->ListOptions != nullptr) {
-					f.Write(" minOccurs=\"0\" maxOccurs=\"unbounded\"");
+					f.Write(R"( minOccurs="0" maxOccurs="unbounded")");
 				}
 
 				auto ty = TryFindClassOfSeriData(data->SubElementData, false);
@@ -294,10 +294,10 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 			f.Indent(indent);
 			f.Write("<xs:element name=\"");
 			f.Write(data->SerializationName);
-			f.Write("\" type=\"BB__IObject_NoClassname\"");
+			f.Write(R"(" type="BB__IObject_NoClassname")");
 
 			if (data->ListOptions != nullptr) {
-				f.Write(" minOccurs=\"0\" maxOccurs=\"unbounded\"");
+				f.Write(R"( minOccurs="0" maxOccurs="unbounded")");
 			}
 			f.Write("/>\n");
 		}
@@ -313,10 +313,12 @@ void CppLogic::Serializer::SchemaGenerator::WriteSeriData(BB::IStream& f, size_t
 	}
 }
 
+// ReSharper disable once CppDFAConstantParameter
 void CppLogic::Serializer::SchemaGenerator::WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id)
 {
 	f.Write("\t<xs:complexType name=\"");
 	f.Write(EscapeClassname(name));
+	// ReSharper disable once CppDFAConstantConditions
 	if (!skipClassname)
 		f.Write("_NoClassname");
 	f.Write("\">\n\t\t\t<xs:complexContent>\n\t\t\t\t<xs:extension base=\"");
@@ -327,14 +329,17 @@ void CppLogic::Serializer::SchemaGenerator::WriteSubclassSchema(BB::IStream& f, 
 
 	f.Write("\t\t\t\t</xs:extension>\n\t\t\t</xs:complexContent>\n\t</xs:complexType>\n");
 
+	// ReSharper disable once CppDFAConstantConditions
 	if (!skipClassname)
 		WriteClassnameClassSchema(f, name, id);
 }
 
+// ReSharper disable once CppDFAConstantParameter
 void CppLogic::Serializer::SchemaGenerator::WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id)
 {
 	f.Write("\t<xs:complexType name=\"");
 	f.Write(EscapeClassname(name));
+	// ReSharper disable once CppDFAConstantConditions
 	if (!skipClassname)
 		f.Write("_NoClassname");
 	f.Write("\">\n");
@@ -343,6 +348,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteNewClassSchema(BB::IStream& f, 
 
 	f.Write("\t</xs:complexType>\n");
 
+	// ReSharper disable once CppDFAConstantConditions
 	if (!skipClassname)
 		WriteClassnameClassSchema(f, name, id);
 }
@@ -368,6 +374,7 @@ void CppLogic::Serializer::SchemaGenerator::WriteClassnameClassSchema(BB::IStrea
 	f.Write("\t\t\t\t</xs:extension>\n\t\t\t</xs:complexContent>\n\t</xs:complexType>\n");
 }
 
+// ReSharper disable once CppDFAConstantParameter
 void CppLogic::Serializer::SchemaGenerator::WriteClassSchema(BB::IStream& f, shok::ClassId id, bool alwaysInheritBBObject)
 {
 	auto* cf = *BB::CClassFactory::GlobalObj;
@@ -386,9 +393,11 @@ void CppLogic::Serializer::SchemaGenerator::WriteClassSchema(BB::IStream& f, sho
 		}
 	}
 	else {
+		// ReSharper disable once CppDFAConstantConditions
 		if (alwaysInheritBBObject)
 			WriteSubclassSchema(f, name, "BB::IObject", seridata, false, id);
 		else
+			// ReSharper disable once CppDFAUnreachableCode
 			WriteNewClassSchema(f, name, seridata, false, id);
 	}
 }

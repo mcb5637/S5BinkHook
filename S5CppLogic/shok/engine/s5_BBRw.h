@@ -1,9 +1,7 @@
 #pragma once
-#include <utility/enumflags.h>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/engine/s5_RWEngine.h>
-#include <shok/engine/directx.h>
 #include <shok/globals/s5_idmanager.h>
 
 namespace BBRw {
@@ -35,7 +33,7 @@ namespace BB {
 		T Cache;
 		PADDINGI(1); // refCounter?
 		TResourceManager<T>* Manager; // 3
-		int Id;
+		int Id = 0;
 
 		T Get() { // 0x46CFAD
 			if (!Cache) {
@@ -78,7 +76,7 @@ namespace BB {
 		virtual void __stdcall DestroyManaged(T) = 0;
 
 
-		BB::CIDManagerEx* IdManager;
+		BB::CIDManagerEx* IdManager = nullptr;
 		shok::Vector<TResourceProxyResMgr<T>*> Data; // 2
 
 		void PopId(int id) {
@@ -130,7 +128,7 @@ namespace BBRw {
 		virtual ~IDynTexRef() = default;
 		virtual void Destroy() = 0;
 		// not sure what type does
-		virtual void CreateRaster(int x, int y, bool type = true) = 0;
+		virtual void CreateRaster(int x, int y, bool type = true) = 0; // NOLINT(*-default-arguments)
 		// destroys raster and clears all vars
 		virtual void Reset() = 0;
 		// locks with write & nofetch
@@ -182,7 +180,7 @@ namespace BBRw {
 	};
 
 	// size 4*4, id 0x44574D02, 48F466 attach
-	struct UnnamedAtomicPlugin {
+	struct UnnamedAtomicPlugin { // NOLINT(*-pro-type-member-init)
 		PADDINGI(2);
 		byte SrcBlend, DestBlend; // RwBlendFunction truncated to byte
 		byte PlayerColor;
@@ -190,7 +188,7 @@ namespace BBRw {
 	};
 
 	// size 7*4, id 0x44574D01, 473344 attach
-	struct UnnamedClumpPlugin {
+	struct UnnamedClumpPlugin { // NOLINT(*-pro-type-member-init)
 		PADDINGI(3);
 		ED::ModelData* ModelData;
 	};

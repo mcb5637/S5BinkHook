@@ -72,17 +72,17 @@ namespace CppLogic::UA {
 		// not serialized references, lua state
 		static const BB::SerializationData SerializationData[];
 
-		UnlimitedArmy(shok::PlayerId p);
+		explicit UnlimitedArmy(shok::PlayerId p);
 		~UnlimitedArmy();
 		void CalculatePos();
 		void Tick();
 		void AddLeader(EGL::CGLEEntity* e);
 		void OnIdChanged(shok::EntityId ol, shok::EntityId ne);
-		int GetSize(bool transit, bool hero);
+		[[nodiscard]] int GetSize(bool transit, bool hero) const;
 		void RemoveLeader(EGL::CGLEEntity* e);
 		bool IsIdle();
-		bool IsRanged(EGL::CGLEEntity* e);
-		bool IsNonCombat(EGL::CGLEEntity* e);
+		static bool IsRanged(EGL::CGLEEntity* e);
+		static bool IsNonCombat(EGL::CGLEEntity* e);
 
 		static EGL::CGLEEntity* GetNearestTargetInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
 		static EGL::CGLEEntity* GetNearestSettlerInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
@@ -99,11 +99,12 @@ namespace CppLogic::UA {
 		void CleanDead();
 		inline void NeedFormat();
 		void CheckTransit();
-		bool IsTargetValid(shok::EntityId id);
+		[[nodiscard]] bool IsTargetValid(shok::EntityId id) const;
 		void CheckStatus(UAStatus status);
-		bool LeaderIsMoving(EGL::CGLEEntity* e);
-		bool LeaderIsIdle(EGL::CGLEEntity* e);
-		bool LeaderIsInBattle(EGL::CGLEEntity* e);
+		static bool LeaderIsMoving(EGL::CGLEEntity* e);
+		static bool LeaderIsIdle(EGL::CGLEEntity* e);
+
+		static bool LeaderIsInBattle(EGL::CGLEEntity* e);
 		void BattleCommand();
 		void MoveCommand();
 		void FormationCommand();
@@ -176,6 +177,7 @@ namespace CppLogic::UA {
 }
 
 template<>
+// ReSharper disable once CppDFAConstantFunctionResult
 inline BB::FieldSerializer* BB::FieldSerializer::GetSerializer<CppLogic::UA::UAStatus>() {
 	return BB::FieldSerializer::TypeInt;
 }

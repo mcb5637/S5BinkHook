@@ -10,11 +10,11 @@ namespace EGL {
         shok::Task TaskType = static_cast<shok::Task>(0);
 
         CGLETaskArgs();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
     protected:
         virtual bool RetZero(); // on CGLETaskArgsSubAnim returns anim==0
-        void SetVT(int vtp);
+        void SetVT(int v);
 
     public:
         static inline constexpr int vtp = 0x76E10C;
@@ -27,7 +27,7 @@ namespace EGL {
         int Thousandths = 0;
 
         CGLETaskArgsThousandths();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x76E120;
         static inline constexpr int TypeDesc = 0x810208;
@@ -39,7 +39,7 @@ namespace EGL {
         shok::Position Position{};
 
         CGLETaskArgsPosition();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x7713F4;
         static inline constexpr int TypeDesc = 0x812DA4;
@@ -51,7 +51,7 @@ namespace EGL {
         float Orientation = 0;
 
         CGLETaskArgsPosAndOrientation();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x784228;
         static inline constexpr int TypeDesc = 0x8368D4;
@@ -66,7 +66,7 @@ namespace EGL {
         shok::AnimationCategoryId Category = static_cast<shok::AnimationCategoryId>(0);
 
         CGLETaskArgsAnimation();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x772AE8;
         static inline constexpr int TypeDesc = 0x813A88;
@@ -80,7 +80,7 @@ namespace EGL {
         int SubAnimIdx = 0;
 
         CGLETaskArgsSubAnim();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x78423C;
         static inline constexpr int TypeDesc = 0x836904;
@@ -92,7 +92,7 @@ namespace EGL {
         int EffectIndex = 0;
 
         CTaskArgsParticleEffectIndex();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x784250;
         static inline constexpr int TypeDesc = 0x83692C;
@@ -104,7 +104,7 @@ namespace EGL {
         shok::EffectTypeId EffectType = static_cast<shok::EffectTypeId>(0);
 
         CTaskArgsParticleEffectIndexAndType();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x784264;
         static inline constexpr int TypeDesc = 0x83695C;
@@ -116,7 +116,7 @@ namespace EGL {
         shok::EffectTypeId EffectType = static_cast<shok::EffectTypeId>(0);
 
         CTaskArgsEffectType();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x784278;
         static inline constexpr int TypeDesc = 0x836994;
@@ -128,7 +128,7 @@ namespace EGL {
         shok::TaskListId TaskList = {};
 
         CGLETaskArgsTaskListID();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x78428C;
         static inline constexpr int TypeDesc = 0x8369BC;
@@ -140,7 +140,7 @@ namespace EGL {
         int LowerBound = 0, UpperBound = 0;
 
         CTaskArgsRandomWaitForAnim();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x7842A0;
         static inline constexpr int TypeDesc = 0x8369E8;
@@ -155,7 +155,7 @@ namespace EGL {
         PADDING(3);
 
         CGLETaskArgsSound();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x7842B4;
         static inline constexpr int TypeDesc = 0x836A18;
@@ -167,7 +167,7 @@ namespace EGL {
         shok::EntityTypeId EntityType = {};
 
         CGLETaskArgsEntityType();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x7842C8;
         static inline constexpr int TypeDesc = 0x836A3C;
@@ -179,7 +179,7 @@ namespace EGL {
         shok::Position Position{};
 
         CGLETaskArgsEntityTypeAndPos();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x7842DC;
         static inline constexpr int TypeDesc = 0x836A68;
@@ -191,7 +191,7 @@ namespace EGL {
         shok::ModelId Model = {};
 
         CTaskArgsModelID();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x7842F0;
         static inline constexpr int TypeDesc = 0x836A98;
@@ -205,7 +205,7 @@ namespace EGL {
         PADDING(3);
 
         CTaskArgsUVAnim();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x784304;
         static inline constexpr int TypeDesc = 0x836ABC;
@@ -217,7 +217,7 @@ namespace EGL {
         int Value = 0;
 
         CTaskArgsInteger();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x772AFC;
         static inline constexpr int TypeDesc = 0x813AB0;
@@ -229,7 +229,7 @@ namespace EGL {
         float Value = 0;
 
         CTaskArgsFloat();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x772B10;
         static inline constexpr int TypeDesc = 0x813AD4;
@@ -243,7 +243,7 @@ namespace GGL {
         //shok::AttachmentType TargetType; probably, unused
 
         CGLTaskArgsPositionAndTarget();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x771430;
         static inline constexpr int TypeDesc = 0x812E1C;
@@ -255,7 +255,7 @@ namespace GGL {
         shok::AttachmentType TargetType = shok::AttachmentType::APPROACHING_BUILDER_BRIDGE;
 
         CGLTaskArgsTargetType();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x77141C;
         static inline constexpr int TypeDesc = 0x812DF4;
@@ -266,7 +266,7 @@ namespace GGL {
     public:
 
         CGLTaskArgsGoodType();
-        virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+        [[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
         static inline constexpr int vtp = 0x771408;
         static inline constexpr int TypeDesc = 0x812DCC;
@@ -289,7 +289,7 @@ namespace EGL {
         PrincipalTasks PrincipalTask;
         char* Script;
 
-        int GetNumberOfTasks();
+        [[nodiscard]] size_t GetNumberOfTasks() const;
         EGL::CGLETaskArgs* GetTask(int i);
 
         static inline constexpr int vtp = 0x7845FC;

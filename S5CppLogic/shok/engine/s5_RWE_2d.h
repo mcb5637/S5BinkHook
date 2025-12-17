@@ -1,6 +1,5 @@
 #pragma once
 #include <shok/s5_forwardDecls.h>
-#include <shok/s5_baseDefs.h>
 #include <shok/engine/s5_RWEngine.h>
 
 namespace RWE::P2D {
@@ -28,13 +27,13 @@ namespace RWE::P2D {
 
 	};
 
-	struct rt2dShadeParameters
+	struct rt2dShadeParameters // NOLINT(*-pro-type-member-init)
 	{
 		RwRGBAReal col;
 		RwV2d uv;
 	};
 
-	struct Rt2dBrush {
+	struct Rt2dBrush { // NOLINT(*-pro-type-member-init)
 		rt2dShadeParameters top;
 		rt2dShadeParameters dtop;
 		rt2dShadeParameters bottom;
@@ -46,7 +45,7 @@ namespace RWE::P2D {
 		float halfwidth;
 		int refCount;
 
-		Rt2dBrush* SetTexture(RwTexture* texture);
+		Rt2dBrush* SetTexture(RwTexture* t);
 		Rt2dBrush* SetUV(RwV2d* uv0, RwV2d* uv1, RwV2d* uv2, RwV2d* uv3);
 		Rt2dBrush* SetRGBA(RwRGBA* col0, RwRGBA* col1, RwRGBA* col2, RwRGBA* col3);
 		int Destroy();
@@ -56,7 +55,7 @@ namespace RWE::P2D {
 		// close 0x707620
 	};
 
-	struct Rt2dFont {
+	struct Rt2dFont { // NOLINT(*-pro-type-member-init)
 	public:
 		int IsOutline;
 		float Size, Offset, Spacing;
@@ -77,7 +76,7 @@ namespace RWE::P2D {
 		float GetStringWidth(const wchar_t* s, float height);
 		void RenderText(const wchar_t* s, float height, RWE::RwV2d* anchor, Rt2dBrush* brush);
 		void RenderText(const char* s, float height, RWE::RwV2d* anchor, Rt2dBrush* brush);
-		bool IsWchar();
+		[[nodiscard]] bool IsWchar() const;
 
 		void Destroy();
 

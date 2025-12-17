@@ -6,7 +6,6 @@
 #include <shok/effect/s5_effects.h>
 #include <shok/globals/s5_maplogic.h>
 #include <shok/s5_defines.h>
-#include <shok/globals/s5_entityandeffectmanager.h>
 #include <shok/events/s5_events.h>
 #include <shok/entity/s5_tasklist.h>
 #include <shok/effect/s5_effecttype.h>
@@ -22,8 +21,7 @@ void EGL::CCoarsePath::WaypointData::RemoveLastWaypoint()
 {
 	path_waypoint_removelast(this);
 }
-shok::Position EGL::CCoarsePath::WaypointData::GetWaypoint(int i)
-{
+shok::Position EGL::CCoarsePath::WaypointData::GetWaypoint(int i) const {
 	if (i < 0 || i > CacheCount)
 		throw std::out_of_range{ "invalid waypoint" };
 	int c = CacheItem[i];
@@ -124,10 +122,10 @@ static inline int(__thiscall* const activateCamoOrig)(GGL::CCamouflageBehavior* 
 void (*GGL::CCamouflageBehavior::CamoActivateCb)(GGL::CCamouflageBehavior* th);
 int __thiscall GGL::CCamouflageBehavior::ActivateCamoOverride()
 {
-	int i = activateCamoOrig(this);
+	int r = activateCamoOrig(this);
 	if (GGL::CCamouflageBehavior::CamoActivateCb)
 		GGL::CCamouflageBehavior::CamoActivateCb(this);
-	return i;
+	return r;
 }
 bool HookCamoActivate_Hooked = false;
 void GGL::CCamouflageBehavior::HookActivate()
@@ -254,10 +252,9 @@ void GGL::CCannonBuilderBehavior::EventOnFoundationDetach(EGL::CEvent1Entity* e)
 	return reinterpret_cast<void(__thiscall*)(CCannonBuilderBehavior*, EGL::CEvent1Entity*)>(0x4FEDA5)(this, e);
 }
 
-void __thiscall GGL::CRangedEffectAbility::AdvHealAffected()
-{
+void __thiscall GGL::CRangedEffectAbility::AdvHealAffected() const {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	GGL::CRangedEffectAbilityProps* pr = e->GetEntityType()->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
+	auto* pr = e->GetEntityType()->GetBehaviorProps<GGL::CRangedEffectAbilityProps>();
 	float hpfact = pr->HealthRecoveryFactor;
 	if (hpfact <= 0)
 		return;
@@ -269,7 +266,7 @@ void __thiscall GGL::CRangedEffectAbility::AdvHealAffected()
 			EGL::CGLEEntity* toheal = EGL::CGLEEntity::GetEntityByID(a.second.EntityId);
 			if (!toheal)
 				return;
-			float heal = toheal->GetMaxHealth() * hpfact;
+			float heal = static_cast<float>(toheal->GetMaxHealth()) * hpfact;
 			if (ecr.EffectType != shok::EffectTypeId::Invalid) {
 				ecr.StartPos.X = toheal->Position.X;
 				ecr.StartPos.Y = toheal->Position.Y;
@@ -336,8 +333,7 @@ int GGL::CSummonBehavior::TaskSummon(EGL::CGLETaskArgs* a)
 	return summonbeh_tasksummon(this, a);
 }
 
-void __thiscall GGL::CConvertSettlerAbility::PerformConversion()
-{
+void __thiscall GGL::CConvertSettlerAbility::PerformConversion() const {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto tid = e->GetFirstAttachedEntity(shok::AttachmentType::CONVERTER_SETTLER);
 	auto* t = EGL::CGLEEntity::GetEntityByID(tid);
@@ -398,25 +394,24 @@ bool GGL::CSummonBehavior::IsAbility(shok::AbilityId ability)
 }
 
 int (*GGL::CSniperAbility::SnipeDamageOverride)(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) = nullptr;
-int __thiscall GGL::CSniperAbility::TaskOverrideSnipe(EGL::CGLETaskArgs* a)
-{
+int __thiscall GGL::CSniperAbility::TaskOverrideSnipe(EGL::CGLETaskArgs* a) const {
 	EGL::CGLEEntity* thent = EGL::CGLEEntity::GetEntityByID(EntityId);
 	EGL::CGLEEntity* tar = EGL::CGLEEntity::GetEntityByID(TargetId);
 	if (!tar || tar->Health <= 0)
 		return 0;
-	GGL::CSniperAbilityProps* pr = thent->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
+	auto* pr = thent->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
 	if (thent->Position.GetDistanceSquaredTo(tar->Position) >= pr->Range * pr->Range)
 		return 0;
-	int dmg = static_cast<int>(tar->GetMaxHealth() * pr->DamageFactor);
+	int dmg = static_cast<int>(static_cast<float>(tar->GetMaxHealth()) * pr->DamageFactor);
 	if (GGL::CSniperAbility::SnipeDamageOverride)
 		dmg = GGL::CSniperAbility::SnipeDamageOverride(thent, tar, dmg);
-	GGL::CBattleBehaviorProps* bpr = thent->GetEntityType()->GetBehaviorPropsDynamic< GGL::CBattleBehaviorProps>();
+	auto* bpr = thent->GetEntityType()->GetBehaviorPropsDynamic< GGL::CBattleBehaviorProps>();
 	CProjectileEffectCreator cr{};
 	cr.EffectType = bpr->ProjectileEffectID;
 	cr.PlayerID = thent->PlayerId;
-	cr.StartPos = thent->Position;
-	cr.CurrentPos = thent->Position;
-	cr.TargetPos = tar->Position;
+	cr.StartPos = static_cast<shok::Position>(thent->Position); // NOLINT(*-slicing)
+	cr.CurrentPos = static_cast<shok::Position>(thent->Position); // NOLINT(*-slicing)
+	cr.TargetPos = static_cast<shok::Position>(tar->Position); // NOLINT(*-slicing)
 	cr.AttackerID = thent->EntityId;
 	cr.TargetID = tar->EntityId;
 	cr.Damage = dmg;
@@ -484,7 +479,7 @@ int GGL::CBattleBehavior::GetMaxRandomDamage() const
 {
 	return static_cast<int>(ModifierEntityDatabase::GlobalObj->GetModifiedStat(EntityId, GGL::CEntityProfile::ModifierType::DamageBonus, static_cast<float>(BattleProps->MaxDamageRandomBonus)));
 }
-int GGL::CBattleBehavior::GetRandomDamage()
+int GGL::CBattleBehavior::GetRandomDamage() const
 {
 	int r = GetMaxRandomDamage();
 	if (r > 0) {
@@ -497,8 +492,7 @@ int GGL::CBattleBehavior::GetRandomDamage()
 	return r;
 }
 
-int __thiscall GGL::CBattleBehavior::GetDamageAgainst(EGL::CGLEEntity* target)
-{
+int __thiscall GGL::CBattleBehavior::GetDamageAgainst(EGL::CGLEEntity* target) const {
 	return static_cast<int>(target->CalculateDamageAgainstMe(GetDamage() + GetRandomDamage(), BattleProps->DamageClass));
 }
 
@@ -514,10 +508,10 @@ float GGL::CBattleBehavior::GetMissChance() const
 	shok::WeatherState weather = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->GetCurrentWeatherState();
 	switch (weather) {
 	case shok::WeatherState::Winter:
-		c += (*GGL::CLogicProperties::GlobalObj)->WeatherMissChanceChangeSnow;
+		c += static_cast<float>((*GGL::CLogicProperties::GlobalObj)->WeatherMissChanceChangeSnow);
 		break;
 	case shok::WeatherState::Rain:
-		c += (*GGL::CLogicProperties::GlobalObj)->WeatherMissChanceChangeRain;
+		c += static_cast<float>((*GGL::CLogicProperties::GlobalObj)->WeatherMissChanceChangeRain);
 		break;
 	default:
 		break;
@@ -525,13 +519,13 @@ float GGL::CBattleBehavior::GetMissChance() const
 	return c;
 }
 
-bool GGL::CBattleBehavior::CheckMiss()
+bool GGL::CBattleBehavior::CheckMiss() const
 {
 	float c = GetMissChance();
 	if (c <= 0)
 		return false;
 	std::uniform_int_distribution dist{ 0, 100 };
-	return c > dist((*EGL::CGLEGameLogic::GlobalObj)->RNG);
+	return c > static_cast<float>(dist((*EGL::CGLEGameLogic::GlobalObj)->RNG));
 }
 
 inline bool(__thiscall* const battlebeh_canattack)(GGL::CBattleBehavior* th) = reinterpret_cast<bool(__thiscall*)(GGL::CBattleBehavior*)>(0x50B8A0);
@@ -572,12 +566,10 @@ float __thiscall GGL::CBattleBehavior::GetMaxRangeBaseStatic(const CBattleBehavi
 	return th->GetMaxRangeBase();
 }
 
-void __thiscall GGL::CBattleBehavior::EventOverrideGetDamage(EGL::CEventGetValue_Int* ev)
-{
+void __thiscall GGL::CBattleBehavior::EventOverrideGetDamage(EGL::CEventGetValue_Int* ev) const {
 	ev->Data = static_cast<int>(GetDamage());
 }
-int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjctile(EGL::CGLETaskArgs* a)
-{
+int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjectile(EGL::CGLETaskArgs* a) const {
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto* tar = GetTarget();
 	if (tar == nullptr) {
@@ -595,8 +587,8 @@ int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjctile(EGL::CGLETaskArgs
 	CProjectileEffectCreator ct{};
 	ct.EffectType = BattleProps->ProjectileEffectID;
 	ct.PlayerID = en->PlayerId;
-	ct.CurrentPos = ct.StartPos = en->Position;
-	ct.TargetPos = tar->Position;
+	ct.CurrentPos = ct.StartPos = static_cast<shok::Position>(en->Position); // NOLINT(*-slicing)
+	ct.TargetPos = static_cast<shok::Position>(tar->Position); // NOLINT(*-slicing)
 	ct.AttackerID = en->EntityId;
 	ct.TargetID = tar->EntityId;
 	ct.SourcePlayer = en->PlayerId;
@@ -641,7 +633,7 @@ void GGL::CBattleBehavior::HookDamageOverride()
 	// task hurt
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C1CD), CppLogic::Hooks::MemberFuncPointerToVoid(&CBattleBehavior::GetDamageAgainst, 0), reinterpret_cast<void*>(0x50C1DC));
 	// task fire projectile
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C33C), CppLogic::Hooks::MemberFuncPointerToVoid(&CBattleBehavior::TaskOverrideFireProjctile, 0), reinterpret_cast<void*>(0x50C34A));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C33C), CppLogic::Hooks::MemberFuncPointerToVoid(&CBattleBehavior::TaskOverrideFireProjectile, 0), reinterpret_cast<void*>(0x50C34A));
 }
 
 void __declspec(naked) battlemaxrangeasm() {
@@ -752,7 +744,7 @@ void GGL::CLeaderBehavior::PerformRegeneration()
 	int hp = e->Health;
 	if (hp <= 0)
 		return;
-	int r = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealth();
+	int r = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealth(); // NOLINT(*-pro-type-static-cast-downcast)
 	e->PerformHeal(r, GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers);
 }
 
@@ -760,7 +752,7 @@ bool GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = false;
 void __thiscall GGL::CLeaderBehavior::CheckRegen()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	int max = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealthSeconds();
+	int max = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealthSeconds(); // NOLINT(*-pro-type-static-cast-downcast)
 	SecondsSinceHPRefresh++;
 	if (SecondsSinceHPRefresh >= max)
 		PerformRegeneration();
@@ -790,22 +782,21 @@ void GGL::CLeaderBehavior::HookLeaderRegen()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EFC29), &CheckRegenASM, reinterpret_cast<void*>(0x4EFC42));
 }
 
-void GGL::CKegBehavior::AdvancedDealDamage()
-{
+void GGL::CKegBehavior::AdvancedDealDamage() const {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	{
 		if (shok::EntityId id = e->GetFirstAttachedEntity(shok::AttachmentType::KEG_TARGET_BUILDING); id != shok::EntityId::Invalid) {
 			if (EGL::CGLEEntity* t = EGL::CGLEEntity::GetEntityByID(id)) {
-				if (GGL::CBuilding* b = dynamic_cast<GGL::CBuilding*>(t)) {
+				if (auto* b = dynamic_cast<GGL::CBuilding*>(t)) {
 					int dmg;
 					if (dynamic_cast<GGL::CBridgeEntity*>(b)) {
 						dmg = b->Health;
 					}
 					else {
-						float kegeff = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps)->KegEffectFactor;
-						int dmgperc = static_cast<GGL::CKegBehaviorProperties*>(PropPointer)->DamagePercent;
+						float kegeff = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps)->KegEffectFactor; // NOLINT(*-pro-type-static-cast-downcast)
+						int dmgperc = static_cast<GGL::CKegBehaviorProperties*>(PropPointer)->DamagePercent; // NOLINT(*-pro-type-static-cast-downcast)
 						int mhp = b->GetMaxHealth();
-						dmg = static_cast<int>(kegeff * dmgperc * mhp / 100);
+						dmg = static_cast<int>(kegeff * static_cast<float>(dmgperc) * static_cast<float>(mhp) / 100.0f);
 					}
 					b->AdvancedHurtEntityBy(e, dmg, shok::PlayerId::P0, false, false, true, shok::AdvancedDealDamageSource::AbilitySabotageSingleTarget);
 				}
@@ -822,7 +813,7 @@ void GGL::CKegBehavior::AdvancedDealDamage()
 		}
 	}
 	{
-		GGL::CKegBehaviorProperties* pr = static_cast<GGL::CKegBehaviorProperties*>(PropPointer);
+		auto* pr = static_cast<GGL::CKegBehaviorProperties*>(PropPointer); // NOLINT(*-pro-type-static-cast-downcast)
 		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, pr->Radius, pr->Damage, e->PlayerId, static_cast<shok::DamageClassId>(0), true, false, true, shok::AdvancedDealDamageSource::AbilitySabotageBlast);
 	}
 }
@@ -1114,7 +1105,8 @@ int GGL::CWorkerBehavior::TaskSkipSupplierIfResearching(EGL::CGLETaskArgs* arg)
 	return 0;
 }
 
-int GGL::CWorkerBehavior::TaskSkipSupplierIfResearchingTarget(EGL::CGLETaskArgs* arg)
+// ReSharper disable once CppMemberFunctionMayBeStatic
+int GGL::CWorkerBehavior::TaskSkipSupplierIfResearchingTarget(EGL::CGLETaskArgs* arg) // NOLINT(*-convert-member-functions-to-static)
 {
 	return 0;
 }
@@ -1133,7 +1125,7 @@ int GGL::CWorkerBehavior::TaskCheckNeedsRes(EGL::CGLETaskArgs* arg)
 		GoRestIgnoreWorktime();
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	auto* b = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::WORKER_WORKPLACE));
-	for (const auto& wt : static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps)->WorkTaskList) {
+	for (const auto& wt : static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps)->WorkTaskList) { // NOLINT(*-pro-type-static-cast-downcast)
 		if (wt.Work == e->CurrentTaskListID) {
 			e->SetTaskList(wt.Start);
 			return 0;
@@ -1205,8 +1197,8 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 		CProjectileEffectCreator ct{};
 		ct.EffectType = p->CannonBallEffectType;
 		ct.PlayerID = e->PlayerId;
-		ct.CurrentPos = ct.StartPos = e->Position;
-		ct.TargetPos = tar->Position;
+		ct.CurrentPos = ct.StartPos = static_cast<shok::Position>(e->Position); // NOLINT(*-slicing)
+		ct.TargetPos = static_cast<shok::Position>(tar->Position); // NOLINT(*-slicing)
 		ct.AttackerID = e->EntityId;
 		ct.TargetID = tar->EntityId;
 
@@ -1232,7 +1224,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 		if (p->ImpactEffectType != shok::EffectTypeId::Invalid) {
 			EGL::CGLEEffectCreator ct{};
 			ct.EffectType = p->ImpactEffectType;
-			ct.StartPos = e->Position;
+			ct.StartPos = static_cast<shok::Position>(e->Position); // NOLINT(*-slicing)
 			ct.PlayerID = e->PlayerId;
 			(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&ct);
 		}
@@ -1254,8 +1246,7 @@ int __thiscall GGL::CAutoCannonBehavior::TaskFireProjectileOverride(EGL::CGLETas
 	return 0;
 }
 
-void __thiscall GGL::CAutoCannonBehavior::EventGetDamageOverride(EGL::CEventGetValue_Int* ev)
-{
+void __thiscall GGL::CAutoCannonBehavior::EventGetDamageOverride(EGL::CEventGetValue_Int* ev) const {
 	ev->Data = GetDamage();
 }
 
@@ -1457,7 +1448,7 @@ void GGL::CHeroBehavior::Resurrect()
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	ResurrectionTimePassed = 0;
-	e->SetHealth(static_cast<int>(e->GetMaxHealth() * (*GGL::CLogicProperties::GlobalObj)->HeroResurrectionHealthFactor));
+	e->SetHealth(static_cast<int>(static_cast<float>(e->GetMaxHealth()) * (*GGL::CLogicProperties::GlobalObj)->HeroResurrectionHealthFactor));
 	for (auto at : { shok::AttachmentType::ATTACKER_TARGET, shok::AttachmentType::ATTACKER_COMMAND_TARGET }) {
 		while (true) {
 			auto t = e->GetFirstAttachedEntity(at);
@@ -1588,7 +1579,7 @@ void GGL::CBarrackBehavior::HookBuyTriggers()
 }
 void GGL::CBarrackBehavior::EventBuyLeaderOverride(EGL::CEventValue_Int* ev)
 {
-	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId)); // NOLINT(*-pro-type-static-cast-downcast)
 	if (!b->IsIdle(true, true))
 		return;
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
@@ -1596,7 +1587,7 @@ void GGL::CBarrackBehavior::EventBuyLeaderOverride(EGL::CEventValue_Int* ev)
 	auto* ety = CppLogic::GetEntityType(etyid);
 	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, shok::EntityId::Invalid, etyid,
 		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
-		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
+		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost), // NOLINT(*-pro-type-static-cast-downcast)
 		!pl->PlayerAttractionHandler->IsMotivationLocked(), !b->WorkerAlarmModeActive };
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&cev);
 	if (cev.Cost && cev.VCPop && cev.Alarm && cev.Motivation)
@@ -1604,7 +1595,7 @@ void GGL::CBarrackBehavior::EventBuyLeaderOverride(EGL::CEventValue_Int* ev)
 }
 void GGL::CBarrackBehavior::EventBuySoldierOverride(EGL::CEvent1Entity* ev)
 {
-	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId)); // NOLINT(*-pro-type-static-cast-downcast)
 	if (!b->IsConstructionFinished())
 		return;
 	if (b->IsUpgrading)
@@ -1625,18 +1616,18 @@ void GGL::CBarrackBehavior::EventBuySoldierOverride(EGL::CEvent1Entity* ev)
 	auto* ety = CppLogic::GetEntityType(etyid);
 	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, ev->EntityID, etyid,
 		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
-		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
+		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost), // NOLINT(*-pro-type-static-cast-downcast)
 		!pl->PlayerAttractionHandler->IsMotivationLocked(), !b->WorkerAlarmModeActive };
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&cev);
 	if (cev.Cost && cev.VCPop && cev.Alarm && cev.Motivation)
 	{
 		shok::EntityId id = raxbeh_buyleaderandattach(this, etyid);
 		if (id != shok::EntityId::Invalid) {
-			EGL::CEvent1Entity ev = { shok::EventIDs::Leader_AttachSoldier, id };
-			leader->FireEvent(&ev);
+			EGL::CEvent1Entity ev_attach = { shok::EventIDs::Leader_AttachSoldier, id };
+			leader->FireEvent(&ev_attach);
 			auto sol = EGL::CGLEEntity::GetEntityByID(id);
 			sol->AttachEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING, EntityId, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
-			static_cast<GGL::CSettler*>(sol)->Vanish();
+			static_cast<GGL::CSettler*>(sol)->Vanish(); // NOLINT(*-pro-type-static-cast-downcast)
 			sol->SetTaskList(CppLogic::GetIdManager<shok::TaskListId>().GetIdByName("TL_SOLDIER_LEAVE_BARRACKS"));
 		}
 	}
@@ -1748,7 +1739,7 @@ int GGL::CKeepBehavior::GetMaxNumberOfSerfs() const
 inline GGL::CSettler*(__thiscall* const keepheb_createserf)(GGL::CKeepBehavior* th) = reinterpret_cast<GGL::CSettler * (__thiscall*)(GGL::CKeepBehavior*)>(0x4F24A0);
 void __thiscall GGL::CKeepBehavior::EventBuySerfOverride(BB::CEvent* ev)
 {
-	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	auto* b = static_cast<GGL::CBuilding*>(EGL::CGLEEntity::GetEntityByID(EntityId)); // NOLINT(*-pro-type-static-cast-downcast)
 	if (!b->IsIdle(false, true))
 		return;
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
@@ -1756,7 +1747,7 @@ void __thiscall GGL::CKeepBehavior::EventBuySerfOverride(BB::CEvent* ev)
 	auto* ety = CppLogic::GetEntityType(etyid);
 	CppLogic::Events::CanBuySettlerEvent cev{ shok::EventIDs::CppLogicEvent_CanBuySettler, EntityId, shok::EntityId::Invalid, etyid,
 		pl->PlayerAttractionHandler->AIPlayerFlag || (pl->PlayerAttractionHandler->GetAttractionUsage() < pl->PlayerAttractionHandler->GetAttractionLimit()),
-		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost),
+		pl->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost), // NOLINT(*-pro-type-static-cast-downcast)
 		!pl->PlayerAttractionHandler->IsMotivationLocked(), !b->WorkerAlarmModeActive,
 		pl->PlayerAttractionHandler->SerfArray.size() < static_cast<size_t>(GetMaxNumberOfSerfs())};
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&cev);
@@ -1767,7 +1758,7 @@ void __thiscall GGL::CKeepBehavior::EventBuySerfOverride(BB::CEvent* ev)
 			serf->Vanish();
 			serf->AttachEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING, EntityId, shok::EventIDs::NoDetachEvent, shok::EventIDs::NoDetachEvent);
 			serf->SetTaskList(CppLogic::GetIdManager<shok::TaskListId>().GetIdByName("TL_LEAVE_KEEP"));
-			pl->CurrentResources.SubResources(static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost);
+			pl->CurrentResources.SubResources(static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost); // NOLINT(*-pro-type-static-cast-downcast)
 		}
 	}
 }

@@ -9,9 +9,9 @@ struct shok_vtable_EGL_IGLEHandler_EGL_CGLETaskArgs_int {
     int(__thiscall* ExecuteTask)(EGL::TaskHandler* th, EGL::CGLETaskArgs* args);
 };
 
-void EGL::CGLETaskArgs::SetVT(int vtp)
+void EGL::CGLETaskArgs::SetVT(int v)
 {
-    *reinterpret_cast<int*>(this) = vtp;
+    *reinterpret_cast<int*>(this) = v;
 }
 EGL::CGLETaskArgs::CGLETaskArgs()
 {
@@ -207,7 +207,7 @@ shok::ClassId __stdcall GGL::CGLTaskArgsGoodType::GetClassIdentifier() const
 }
 
 
-int EGL::CGLETaskList::GetNumberOfTasks()
+size_t EGL::CGLETaskList::GetNumberOfTasks() const
 {
     return this->Task.size();
 }
@@ -282,10 +282,10 @@ void EGL::CGLETaskListMgr::LoadTaskList(shok::TaskListId id)
     const char* n = TaskListManager->GetNameByID(i);
     if (!n)
         throw std::logic_error{ "invalid tasklist id" };
-    std::string filename = "Data\\Config\\TaskLists\\";
+    std::string filename = R"(Data\Config\TaskLists\)";
     filename.append(n);
     filename.append(".xml");
-    EGL::CGLETaskList* tl = (*BB::CClassFactory::GlobalObj)->LoadObject<EGL::CGLETaskList>(filename.c_str());
+    auto* tl = (*BB::CClassFactory::GlobalObj)->LoadObject<EGL::CGLETaskList>(filename.c_str());
     tl->TaskListID = id;
     if (i == static_cast<int>(TaskLists.size())) {
         auto v = TaskLists.SaveVector();

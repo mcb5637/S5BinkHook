@@ -2,7 +2,6 @@
 #include "s5_widget.h"
 #include <shok/s5_defines.h>
 #include <shok/events/s5_events.h>
-#include <shok/s5_mem.h>
 #include <shok/engine/s5_RWEngine.h>
 #include <shok/globals/s5_idmanager.h>
 #include <shok/globals/s5_mapdisplay.h>
@@ -102,8 +101,7 @@ shok::Position EGUIX::CMaterial::GetSize()
     return r;
 }
 
-RWE::RwTexture* EGUIX::CMaterial::GetTexture()
-{
+RWE::RwTexture* EGUIX::CMaterial::GetTexture() const {
     return TextureManager::GlobalObj()->GetTextureByID(Texture);
 }
 
@@ -174,7 +172,7 @@ bool __stdcall buttohelp_shortcutcomparison(EGUIX::CButtonHelper* th, BB::CEvent
     if (th->CurrentState == 4 && !mayscin4)
         return false;
 
-    BB::CKeyEvent* kev = dynamic_cast<BB::CKeyEvent*>(ev);
+    auto* kev = dynamic_cast<BB::CKeyEvent*>(ev);
     if (!kev)
         return false;
 
@@ -348,8 +346,8 @@ void GGUI::MiniMapHandler::CreateMarker(const shok::Position& p, bool pulsing, i
 {
     static constexpr float scale = 1.0f / 100.0f;
     EGL::CGLETerrainHiRes* hire = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes;
-    float x = p.X * scale / hire->MaxSizeX;
-    float y = p.Y * scale / hire->MaxSizeY;
+    float x = p.X * scale / static_cast<float>(hire->MaxSizeX);
+    float y = p.Y * scale / static_cast<float>(hire->MaxSizeY);
     GGUI::CMiniMapSignalPulse pul{ x, y, pulsing, r, g, b, timeFactor, scaleFactor };
     minimapmarkerhandler_addpulse(&Markers.Pulses, &pul);
 }
@@ -359,8 +357,8 @@ void GGUI::MiniMapHandler::CreateSignalDefault(const shok::Position& p, int r, i
 {
     static constexpr float scale = 1.0f / 100.0f;
     EGL::CGLETerrainHiRes* hire = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes;
-    float x = p.X * scale / hire->MaxSizeX;
-    float y = p.Y * scale / hire->MaxSizeY;
+    float x = p.X * scale / static_cast<float>(hire->MaxSizeX);
+    float y = p.Y * scale / static_cast<float>(hire->MaxSizeY);
     GGUI::CMiniMapSignalDefault def{ x, y, r, g, b, scaleFactor };
     minimapmarkerhandler_adddefault(&Markers.Defaults, &def);
 }
@@ -459,7 +457,8 @@ shok::WidgetGroupId EGUIX::CWidgetGroupManager::GetGroupId(const char* s)
     return widgroupman_getgroupid(this, s);
 }
 static inline shok::WidgetGroupId(__thiscall* const widgroupman_creategroup)(int man, const char* s, int z) = reinterpret_cast<shok::WidgetGroupId(__thiscall*)(int, const char*, int)>(0x54F656);
-shok::WidgetGroupId EGUIX::CWidgetGroupManager::CreateGroup(const char* s)
+// ReSharper disable once CppMemberFunctionMayBeStatic
+shok::WidgetGroupId EGUIX::CWidgetGroupManager::CreateGroup(const char* s) // NOLINT(*-convert-member-functions-to-static)
 {
     return widgroupman_creategroup(*reinterpret_cast<int*>(0x894EA4), s, 0);
 }
@@ -488,7 +487,7 @@ void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* n
     }
 }
 
-EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* toClone, std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)> nameGen, EGUIX::CBaseWidget* before)
+EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* toClone, const std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)>& nameGen, EGUIX::CBaseWidget* before)
 {
     auto* mng = EGUIX::WidgetManager::GlobalObj();
     EGUIX::CBaseWidget* w;
@@ -509,7 +508,7 @@ EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* to
         w = toClone->Clone();
     }
     if (auto* stxtw = BB::IdentifierCast<EGUIX::CStaticTextWidget>(toClone)) {
-        auto* cotxt = static_cast<EGUIX::CStaticTextWidget*>(w);
+        auto* cotxt = static_cast<EGUIX::CStaticTextWidget*>(w); // NOLINT(*-pro-type-static-cast-downcast)
         cotxt->FirstLineToPrint = stxtw->FirstLineToPrint;
         cotxt->NumberOfLinesToPrint = stxtw->NumberOfLinesToPrint;
     }
@@ -523,41 +522,35 @@ EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* to
 }
 
 void(__thiscall* const shok_EGUIX_CLuaFunctionHelper_ctor)(EGUIX::CLuaFunctionHelper* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CLuaFunctionHelper * th)>(0x55BEA2);
-static inline void(__thiscall* const widlisthandler_ctor)(EGUIX::CWidgetListHandler* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CWidgetListHandler*)>(0x55BB26);
 
-static inline void(__thiscall* const statwid_ctor)(EGUIX::CStaticWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CStaticWidget*)>(0x5603F1);
 EGUIX::CStaticWidget* EGUIX::CStaticWidget::Create()
 {
-    EGUIX::CStaticWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CStaticWidget>();
+    auto* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CStaticWidget>();
     r->IsShown = false;
     return r;
 }
-static inline void(__thiscall* const stattextwid_ctor)(EGUIX::CStaticTextWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CStaticTextWidget*)>(0x55FBB1);
 EGUIX::CStaticTextWidget* EGUIX::CStaticTextWidget::Create()
 {
-    EGUIX::CStaticTextWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CStaticTextWidget>();
+    auto* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CStaticTextWidget>();
     r->IsShown = false;
     return r;
 }
-static inline void(__thiscall* const purettwid_ctor)(EGUIX::CPureTooltipWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CPureTooltipWidget*)>(0x55DF3E);
 EGUIX::CPureTooltipWidget* EGUIX::CPureTooltipWidget::Create()
 {
-    EGUIX::CPureTooltipWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CPureTooltipWidget>();
+    auto* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CPureTooltipWidget>();
     r->IsShown = false;
     return r;
 }
-static inline void(__thiscall* const gfxbutwid_ctor)(EGUIX::CGfxButtonWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CGfxButtonWidget*)>(0x55E917);
 EGUIX::CGfxButtonWidget* EGUIX::CGfxButtonWidget::Create()
 {
-    EGUIX::CGfxButtonWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CGfxButtonWidget>();
+    auto* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CGfxButtonWidget>();
     r->IsShown = false;
     r->IconMaterial.Color.Alpha = 0;
     return r;
 }
-static inline void(__thiscall* const txtbutwid_ctor)(EGUIX::CTextButtonWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CTextButtonWidget*)>(0x55EFA3);
 EGUIX::CTextButtonWidget* EGUIX::CTextButtonWidget::Create()
 {
-    EGUIX::CTextButtonWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CTextButtonWidget>();
+    auto* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CTextButtonWidget>();
     r->IsShown = false;
     return r;
 }
@@ -622,17 +615,15 @@ void EGUIX::CTextButtonWidget::CenterRenderArea(const CTextButtonWidget* th, Rec
     }
 }
 
-static inline void(__thiscall* const progbarwid_ctor)(EGUIX::CProgressBarWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CProgressBarWidget*)>(0x55E300);
 EGUIX::CProgressBarWidget* EGUIX::CProgressBarWidget::Create()
 {
-    EGUIX::CProgressBarWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CProgressBarWidget>();
+    auto* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CProgressBarWidget>();
     r->IsShown = false;
     return r;
 }
-static inline void(__thiscall* const contwid_ctor)(EGUIX::CContainerWidget* th) = reinterpret_cast<void(__thiscall*)(EGUIX::CContainerWidget*)>(0x560DAD);
 EGUIX::CContainerWidget* EGUIX::CContainerWidget::Create()
 {
-    EGUIX::CContainerWidget* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CContainerWidget>();
+    auto* r = (*BB::CClassFactory::GlobalObj)->CreateObject<CContainerWidget>();
     r->IsShown = false;
     return r;
 }
@@ -751,12 +742,12 @@ const char* __stdcall GGUI::COnScreenElementType::GetDisplayName(const GGL::IGLG
 {
     EGL::CGLEEntity* e = data->BuildingToDisplay;
     if (!e) {
-        e = static_cast<EGL::CGLEEntity*>(data->Entity->Entity);
+        e = static_cast<EGL::CGLEEntity*>(data->Entity->Entity); // NOLINT(*-pro-type-static-cast-downcast)
     }
     if (!e)
         return "";
     auto* d = e->GetAdditionalData(false);
-    if (d && d->NameOverride.size() > 0) {
+    if (d && !d->NameOverride.empty()) {
         return d->NameOverride.c_str();
     }
     return EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(e->EntityType);

@@ -36,7 +36,7 @@ GS3DTools::CMapData& GS3DTools::CMapData::operator=(const GS3DTools::CMapData& o
 {
     if (this == &o)
         return *this;
-    return *mapdata_assign(this, &o);
+    return *mapdata_assign(this, &o); // NOLINT(*-unconventional-assign-operator)
 }
 
 int(__thiscall* const cinfo_getindex)(Framework::CampagnInfo* th, const char* s) = reinterpret_cast<int(__thiscall* const)(Framework::CampagnInfo*, const char*)>(0x51A23B);
@@ -437,24 +437,24 @@ int __thiscall Framework::CSinglePlayerMode::UpdateOverride(int u)
         PreUpdate();
     return framework_spmode_update(this, u);
 }
-
+static Framework::CampagnInfo* __attribute((naked)) __fastcall getcinfo(void* th, int i, const char* n) {
+    __asm {
+        // ecx already correct
+        mov eax, [esp + 4];
+        push eax;
+        mov eax, edx
+        mov edx, 0x40BB16; // this thing has first param in eax, no known calling convention, so i have to improvise
+        call edx;
+        pop edx;
+        ret 4;
+    }
+}
 Framework::CampagnInfo* Framework::CMain::CIH::GetCampagnInfo(shok::MapType i, const char* n)
 {
     int i2 = static_cast<int>(i);
     if (i2 < -1 || i2 >= 4)
         return nullptr;
-    Framework::CampagnInfo* r = nullptr;
-    auto* th = this;
-    __asm {
-        push n;
-        mov ecx, th;
-        mov eax, i2;
-        mov edx, 0x40BB16; // this thing has first param in eax, no known calling convention, so i have to improvise
-        call edx;
-        pop edx;
-        mov r, eax;
-    }
-    return r;
+    return getcinfo(this, i2, n);
 }
 Framework::CampagnInfo*(__thiscall* const framew_getcinfo)(void* th, const GS3DTools::CMapData* s) = reinterpret_cast<Framework::CampagnInfo*(__thiscall* const)(void*, const GS3DTools::CMapData*)>(0x5190D5);
 Framework::CampagnInfo* Framework::CMain::CIH::GetCampagnInfo(GS3DTools::CMapData* d)
@@ -559,7 +559,7 @@ void Framework::CMain::SWindowData::OverrideSizeWindowed(int x, int y, int w, in
         ww += re.right - re.left - Width;
         wh += re.bottom - re.top - Height;
     }
-    SetWindowPos(MainWindow, 0, x, y, ww, wh, 0);
+    SetWindowPos(MainWindow, nullptr, x, y, ww, wh, 0);
     Width = w;
     Height = h;
     Fullscreen = false;

@@ -3,10 +3,12 @@
 #include <shok/s5_baseDefs.h>
 
 namespace ESnd {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IAmbientSoundInfo {
 		virtual void unknowno() = 0;
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ISoEMusic {
 	public:
 		virtual void StartMusic(const char* path, int vol, bool loop);
@@ -14,9 +16,10 @@ namespace ESnd {
 		// 2 more vfuncs
 	};
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CSoEMusic : public ISoEMusic {
 		PADDINGI(18);
-		float VolumeAdjustment; // 19
+		float VolumeAdjustment = false; // 19
 		PADDINGI(1); // a bool?
 
 
@@ -36,25 +39,26 @@ namespace ESnd {
 	class AmbientSoundManager {
 	public:
 		struct AmbientSoundData {
-			int AmbientSoundType;
+			int AmbientSoundType = 0;
 			struct {
-				int SoundNormalName;
-				int SoundRainName;
-				int SoundSnowName;
-				bool Looped;
+				int SoundNormalName = 0;
+				int SoundRainName = 0;
+				int SoundSnowName = 0;
+				bool Looped = false;
 				PADDING(3);
-				int Probability;
-				int MaxVolume;
-				float FallOffDistance;
+				int Probability = 0;
+				int MaxVolume = 0;
+				float FallOffDistance = 0.0f;
 			} PropertyData;
 		};
 
 
-		BB::CIDManagerEx* AmbientSoundIdManager;
+		BB::CIDManagerEx* AmbientSoundIdManager = nullptr;
 		shok::Vector<AmbientSoundData> AmbientSound;
 	};
 	static_assert(sizeof(AmbientSoundManager::AmbientSoundData) == 8 * 4);
 
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ISoESoundPlayBack {
 	public:
 		virtual BB::CIDManagerEx* __stdcall GetSoundManager() = 0;
@@ -108,7 +112,7 @@ namespace ESnd {
 		shok::Vector<int> UnknownVector; // 34
 		shok::Vector<IdRandomData> RandomData; // 38
 		PADDINGI(4); // another vector?
-		int RandomSeed; // 46
+		int RandomSeed = 0; // 46
 		CSoEMusic Music; // 47
 		PADDINGI(7);
 		AmbientSoundManager AmbientSound; // 75

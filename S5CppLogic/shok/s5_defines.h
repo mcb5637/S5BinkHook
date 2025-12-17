@@ -309,19 +309,19 @@ namespace shok {
 		Z = 90,
 	};
 	constexpr shok::Keys operator&(shok::Keys a, shok::Keys b) {
-		using under = std::underlying_type<shok::Keys>::type;
+		using under = std::underlying_type_t<shok::Keys>;
 		return static_cast<shok::Keys>(static_cast<under>(a) & static_cast<under>(b));
 	}
 	constexpr shok::Keys operator|(shok::Keys a, shok::Keys b) {
-		using under = std::underlying_type<shok::Keys>::type;
+		using under = std::underlying_type_t<shok::Keys>;
 		return static_cast<shok::Keys>(static_cast<under>(a) | static_cast<under>(b));
 	}
 	constexpr shok::Keys operator^(shok::Keys a, shok::Keys b) {
-		using under = std::underlying_type<shok::Keys>::type;
+		using under = std::underlying_type_t<shok::Keys>;
 		return static_cast<shok::Keys>(static_cast<under>(a) ^ static_cast<under>(b));
 	}
 	constexpr shok::Keys operator~(shok::Keys a) {
-		using under = std::underlying_type<shok::Keys>::type;
+		using under = std::underlying_type_t<shok::Keys>;
 		return static_cast<shok::Keys>(~static_cast<under>(a));
 	}
 
@@ -427,8 +427,9 @@ namespace shok {
 		Invalid = 0,
 	};
 	enum class ClassId : unsigned int {
-		Invalid = 0xEEFFFFFF, // guranteed to not appear in shok
+		Invalid = 0xEEFFFFFF, // guaranteed to not appear in shok
 	};
+	// ReSharper disable once CppDFAUnreachableFunctionCall
 	constexpr std::strong_ordering operator<=>(ClassId a, ClassId b) {
 		return static_cast<int>(static_cast<unsigned int>(a)) <=> static_cast<int>(static_cast<unsigned int>(b));
 	}

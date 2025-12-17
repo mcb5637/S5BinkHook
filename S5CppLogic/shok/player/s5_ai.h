@@ -283,16 +283,16 @@ namespace GAI {
 		PADDINGI(2);
 		struct {
 			PADDINGI(3);
-			int MaxSoldiers;
+			int MaxSoldiers = 0;
 			PADDINGI(5);
 		} U2; //27
 		struct {
-			CEntityDynamic* E;
-			bool IsSerf;
+			CEntityDynamic* E = nullptr;
+			bool IsSerf = false;
 			PADDINGI(3);
 		} U1;
 		PADDINGI(3);
-		shok::ArmyId Army; // 44
+		shok::ArmyId Army{}; // 44
 
 		static inline constexpr int vtp = 0x766A70;
 
@@ -315,7 +315,7 @@ namespace GAI {
 			shok::Vector<CPlayer> Players;
 			shok::Vector<CEntityDynamic*> Dynamic;
 			shok::Vector<CEntityStatic*> Static;
-		}* Data;
+		}* Data = nullptr;
 
 		// ctor 444C58
 		// tick 444C9C

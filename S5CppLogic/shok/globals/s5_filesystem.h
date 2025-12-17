@@ -63,7 +63,7 @@ namespace BB {
 		static constexpr int vtp = 0x761C28;
 
 		inline void Write(std::string_view data) {
-			Write(data.data(), data.length());
+			Write(data.data(), static_cast<long>(data.length()));
 		}
 		inline void Indent(size_t indent, char c = '\t') {
 			for (size_t i = 0; i < indent; ++i) {
@@ -73,7 +73,7 @@ namespace BB {
 	};
 
 	class CFileStream : public IStream { // used to read files directly
-		HANDLE Handle = 0;
+		HANDLE Handle = nullptr;
 	public:
 		char* Filename = nullptr;
 		static constexpr int vtp = 0x761C98;
@@ -171,12 +171,12 @@ namespace BB {
 	};
 	class CDirectoryFileSystem : public CDirectoryFileSystemSpecialOpenFileOnly {
 	public:
-		char* Path;
-		size_t PathLen;
+		char* Path = nullptr;
+		size_t PathLen = 0;
 		struct FilterData {
 			struct {
-				size_t Length;
-				char Data[28];
+				size_t Length = 0;
+				char Data[28]{};
 			} Filters[5]; // not sure what these are good for
 
 			bool IsAllowedCaseInsensitive(const char* path);
@@ -225,7 +225,7 @@ namespace BB {
 		static inline constexpr int vtp = 0x77FABC;
 
 		DirectoryEntry* SearchByHash(const char* filename);
-		DirectoryEntry* GetByOffset(size_t offset);
+		[[nodiscard]] DirectoryEntry* GetByOffset(size_t offset) const;
 
 		static inline CBBArchiveFile* (__stdcall* const Create)() = reinterpret_cast<CBBArchiveFile * (__stdcall*)()>(0x551701);
 		static std::unique_ptr<CBBArchiveFile, CppLogic::DestroyCaller<CBBArchiveFile>> CreateUnique();
@@ -251,8 +251,8 @@ namespace BB {
 	class CFileSystemMgr : public IFileSystemMgr {
 	public:
 		shok::Vector<BB::IFileSystem*> LoadOrder;
-		BB::IFileSystem* Override; // 5
-		bool RemoveData;
+		BB::IFileSystem* Override = nullptr; // 5
+		bool RemoveData = false;
 		
 		static inline constexpr int vtp = 0x77F794;
 

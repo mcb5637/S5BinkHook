@@ -1,6 +1,6 @@
 #pragma once
-#include <utility>
 #include <string_view>
+#include <array>
 
 namespace CppLogic {
 	template<size_t N>

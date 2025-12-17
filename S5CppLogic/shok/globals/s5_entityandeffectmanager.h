@@ -7,28 +7,28 @@ namespace EGL {
 	requires (MaxNum == 65535) // funcs only defined for this size
 	class TGLEItemManager {
 	public:
-		int HighestUsedSlot;
-		int FreeSlot;
-		int NumberOfItems;
+		int HighestUsedSlot = 0;
+		int FreeSlot = 1;
+		int NumberOfItems = 0;
 	private:
 		struct {
 			int ID;
 			ToManage* Item;
 		} Data[MaxNum + 1];
-		int UnknownInt;
-		bool Unknown;
+		int UnknownInt = 0;
+		bool Unknown = false;
 
 		// lower half of id ( & 0xFFFF) is position in Data array (offset 1?)
 		// upper half of id ( & 0x3FFF0000) is counter (how many times this slot was used) (starts at 1, increases by 1 on each reuse via register)
 		// last 2 bits unknown
 		
 	public:
-		bool IsIdValid(int id) const {
-			bool(__thiscall* const f)(const TGLEItemManager<ToManage, MaxNum>*, int) = reinterpret_cast<bool(__thiscall*)(const TGLEItemManager<ToManage, MaxNum>*, int)>(0x4FAABD);
+		[[nodiscard]] bool IsIdValid(int id) const {
+			auto f = reinterpret_cast<bool(__thiscall*)(const TGLEItemManager<ToManage, MaxNum>*, int)>(0x4FAABD);
 			return f(this, id);
 		}
 		ToManage* GetById(int id) {
-			ToManage* (__thiscall* const f)(TGLEItemManager<ToManage, MaxNum>*, int) = reinterpret_cast<ToManage * (__thiscall*)(TGLEItemManager<ToManage, MaxNum>*, int)>(0x4FAAE3);
+			auto f = reinterpret_cast<ToManage * (__thiscall*)(TGLEItemManager<ToManage, MaxNum>*, int)>(0x4FAAE3);
 			return f(this, id);
 		}
 		ToManage* GetInSlot(int id) {
@@ -47,7 +47,7 @@ namespace EGL {
 	public:
 		static inline constexpr int vtp = 0x784528;
 
-		bool IsIdValid(shok::EffectId id) const {
+		[[nodiscard]] bool IsIdValid(shok::EffectId id) const {
 			return EGL::TGLEItemManager<EGL::CEffect, 65535>::IsIdValid(static_cast<int>(id));
 		}
 		EGL::CEffect* GetById(shok::EffectId id) {

@@ -154,6 +154,24 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int PredicateOfAnyEntityCategory(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyEntityCategory>();
+		for (int i = 1; i < L.GetTop(); ++i) {
+			p->Categories.push_back(L.CheckEnum<shok::EntityCategory>(i));
+		}
+		return 1;
+	}
+
+	int PredicateOfAnyClass(lua::State ls) {
+		luaext::EState L{ ls };
+		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyClass>();
+		for (int i = 1; i < L.GetTop(); ++i) {
+			p->Classes.push_back(L.CheckEnum<shok::ClassId>(i));
+		}
+		return 1;
+	}
+
 	int PredicateProvidesResource(lua::State ls) {
 		luaext::EState L{ ls };
 		auto ty = L.CheckEnum<shok::ResourceType>(1);
@@ -1919,7 +1937,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<DumpEntity>("DumpEntity"),
 	};
 
-	constexpr std::array<lua::FuncReference, 21> Predicates{ {
+	constexpr std::array Predicates{
 			lua::FuncReference::GetRef<PredicateAnd>("And"),
 			lua::FuncReference::GetRef<PredicateOr>("Or"),
 			lua::FuncReference::GetRef<PredicateNot>("Not"),
@@ -1934,6 +1952,8 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateOfAnyEntityType>("OfAnyEntityType"),
 			lua::FuncReference::GetRef<PredicateIsNotSoldier>("IsNotSoldier"),
 			lua::FuncReference::GetRef<PredicateOfEntityCategory>("OfEntityCategory"),
+			lua::FuncReference::GetRef<PredicateOfAnyEntityCategory>("PredicateOfAnyEntityCategory"),
+			lua::FuncReference::GetRef<PredicateOfAnyClass>("PredicateOfAnyClass"),
 			lua::FuncReference::GetRef<PredicateProvidesResource>("ProvidesResource"),
 			lua::FuncReference::GetRef<PredicateInRect>("InRect"),
 			lua::FuncReference::GetRef<PredicateIsVisible>("IsVisible"),
@@ -1941,7 +1961,7 @@ namespace CppLogic::Entity {
 			lua::FuncReference::GetRef<PredicateIsAlive>("IsAlive"),
 			lua::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
 			lua::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
-	} };
+	};
 
 	constexpr std::array Settlers {
 			lua::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),

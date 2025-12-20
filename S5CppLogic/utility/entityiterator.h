@@ -415,6 +415,16 @@ namespace CppLogic::Iterator {
 		EntityPredicateOfEntityCategory(shok::EntityCategory category);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 	};
+	class EntityPredicateOfAnyEntityCategory : public Predicate<EGL::CGLEEntity> {
+	public:
+		std::vector<shok::EntityCategory> Categories;
+		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
+	};
+	class EntityPredicateOfAnyClass : public Predicate<EGL::CGLEEntity> {
+	public:
+		std::vector<shok::ClassId> Classes;
+		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
+	};
 	class EntityPredicateProvidesResource : public Predicate<EGL::CGLEEntity> {
 		shok::ResourceType res;
 	public:

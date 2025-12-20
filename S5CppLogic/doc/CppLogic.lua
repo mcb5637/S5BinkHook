@@ -1301,6 +1301,16 @@ function CppLogic.Entity.Predicates.IsNotSoldier() end
 --- @return Predicate
 function CppLogic.Entity.Predicates.OfEntityCategory(ecat) end
 
+--- creates a predicate that checks for any entitycategory.
+--- @param ecat number EntityCategory to check against
+--- @return Predicate
+function CppLogic.Entity.Predicates.PredicateOfAnyEntityCategory(ecat, ...) end
+
+--- creates a predicate that checks for any class.
+--- @param classid number ClassID to check against
+--- @return Predicate
+function CppLogic.Entity.Predicates.PredicateOfAnyClass(classid, ...) end
+
 --- creates a predicate that checks for a provided resource.
 --- @param rty number ResourceType to check against
 --- @return Predicate

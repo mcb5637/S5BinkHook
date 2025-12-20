@@ -205,6 +205,24 @@ bool CppLogic::Iterator::EntityPredicateOfEntityCategory::Matches(const EGL::CGL
 	return e->IsEntityInCategory(ecat);
 }
 
+bool CppLogic::Iterator::EntityPredicateOfAnyEntityCategory::Matches(const EGL::CGLEEntity *e, float *rangeOut,
+	int *prio) const {
+	for (auto ec : Categories) {
+		if (e->IsEntityInCategory(ec))
+			return true;
+	}
+	return false;
+}
+
+bool CppLogic::Iterator::EntityPredicateOfAnyClass::Matches(const EGL::CGLEEntity *e, float *rangeOut, int *prio) const {
+	auto id = e->GetClassIdentifier();
+	for (auto c : Classes) {
+		if (id == c)
+			return true;
+	}
+	return false;
+}
+
 CppLogic::Iterator::EntityPredicateProvidesResource::EntityPredicateProvidesResource(shok::ResourceType resType)
 {
 	res = resType;

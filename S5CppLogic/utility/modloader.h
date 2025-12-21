@@ -362,6 +362,7 @@ namespace CppLogic::ModLoader {
 		static int OverrideSavegameValid(lua::State L);
 		static int LoadStringTableTextOverrides(lua::State L);
 		static int MapGetModPacks(lua::State L);
+		static int GetEntityTypeMem(lua::State L);
 
 		static constexpr std::array LuaFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -379,6 +380,7 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<GetModPackList>("GetModPackList"),
 				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
 				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
+				lua::FuncReference::GetRef<GetEntityTypeMem>("GetEntityTypeMem"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{

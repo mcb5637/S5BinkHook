@@ -3428,6 +3428,13 @@ function CppLogic.ModLoader.PreLoadEntityType(typename) end
 --- @param tid number
 function CppLogic.ModLoader.SetEntityTypeToReload(tid) end
 
+--- accesses an entitytypes memory
+--- warning: has no semantic checks, it is easy to crash your game by modifying memory!
+--- automatically marks the entitytype for reload on writing
+--- @param tid number
+--- @return CppBBObjectAccess
+function CppLogic.ModLoader.GetEntityTypeMem(tid) end
+
 --- loads an effecttype from a xml file (data/config/effects/typename.xml) (not default location).
 --- the effecttype gets automatically removed/reloaded on leaving the map.
 --- load any additional models you want to use first.

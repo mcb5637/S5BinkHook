@@ -16,6 +16,11 @@ ModLoader = ModLoader or {}
 ---@field ArmorClassFurFactor number
 ---@field ExtraArmorClass CArmorDamageMapping[]|nil
 
+---@class ManifestMergeOperation
+---@field MergeFunc fun(obj:CppBBObjectAccess, type:number)
+---@field AppliesTo (number|string)[]
+---@field DoNotRemoveOnOverride boolean?
+
 ---@class Manifest
 ---@field MissingFilled boolean|nil
 ---@field ArmorClasses string[]|nil
@@ -40,6 +45,7 @@ ModLoader = ModLoader or {}
 ---@field SoundGroups (string|number)[][]|nil
 ---@field StringTableTexts table<string,string|true>|nil
 ---@field Fonts string[]|nil
+---@field EntityTypeMerges ManifestMergeOperation[]|nil
 
 ---@class CManifestEntry
 ---@field package Key string
@@ -48,12 +54,15 @@ ModLoader = ModLoader or {}
 ---@field package Table table<string,number>?
 ---@field package Type nil|"kv"|"sound"
 ---@field package Deprecated string?
+---@field package ObjectMerge string?
+---@field package ObjectMergeFunc nil|fun(is:string|number):CppBBObjectAccess
 
 ---@class CManifestType
 ---@field Preload fun(e:CManifestEntry, m:Manifest)
 ---@field Load fun(e:CManifestEntry, m:Manifest)
 ---@field Merge fun(e:CManifestEntry, into:Manifest, from:Manifest)
 ---@field Fix fun(e:CManifestEntry, m:Manifest)
+---@field PerformObjectMerge fun(e:CManifestEntry, m:Manifest)?
 
 ---@class ModList
 ---@field Mods ModpackDesc[]
@@ -94,6 +103,12 @@ function ModLoader.ApplyManifest()
 	for _, m in ipairs(mt) do
 		ModLoader.ManifestType[m.Type or "default"].Load(m, ModLoader.Manifest)
 	end
+	for _, m in ipairs(mt) do
+		local t = ModLoader.ManifestType[m.Type or "default"]
+		if m.ObjectMerge then
+			t.PerformObjectMerge(m, ModLoader.Manifest)
+		end
+	end
 end
 
 ---@return CManifestEntry[]
@@ -120,7 +135,7 @@ function ModLoader.ManifestTypes()
 		{Key="Models", Preload=nil, Table=Models, Load=CppLogic.ModLoader.AddModel},
 		{Key="EffectTypes", Preload=CppLogic.ModLoader.PreLoadEffectType, Table=GGL_Effects, Load=CppLogic.ModLoader.AddEffectType},
 		{Key="TaskLists", Preload=CppLogic.ModLoader.PreLoadTaskList, Table=TaskLists, Load=CppLogic.ModLoader.AddTaskList},
-		{Key="EntityTypes", Preload=CppLogic.ModLoader.PreLoadEntityType, Table=Entities, Load=CppLogic.ModLoader.AddEntityType},
+		{Key="EntityTypes", Preload=CppLogic.ModLoader.PreLoadEntityType, Table=Entities, Load=CppLogic.ModLoader.AddEntityType, ObjectMerge="EntityTypeMerges", ObjectMergeFunc=CppLogic.ModLoader.GetEntityTypeMem},
 		{Key="Technologies", Preload=CppLogic.ModLoader.PreLoadTechnology, Table=Technologies, Load=CppLogic.ModLoader.AddTechnology},
 		{Key="GUITextures", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddGUITexture},
 		{Key="GUITextures_Add", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures"},
@@ -175,6 +190,32 @@ ModLoader.ManifestType = {
 					table.insert(at, d)
 				end
 			end
+			if t.ObjectMerge then
+				---@type ManifestMergeOperation[]
+				local merges = into[t.ObjectMerge]
+				for _, id in from[t.Key] do
+					for _, merge in ipairs(merges) do
+						if not merge.DoNotRemoveOnOverride then
+							for i=table.getn(merge.AppliesTo),1,-1 do
+								local id2 = merge.AppliesTo[i]
+								if id2 == id then
+									table.remove(merge.AppliesTo, i)
+								end
+							end
+						end
+					end
+				end
+				for i=table.getn(merges),1,-1 do
+					if table.getn(merges[i].AppliesTo) == 0 then
+						table.remove(merges, i)
+					end
+				end
+				---@type ManifestMergeOperation[]
+				local merges_from = from[t.ObjectMerge]
+				for _,m in ipairs(merges_from) do
+					table.insert(merges, m)
+				end
+			end
 		end,
 		Fix = function(t, manifest)
 			local data = t.Table
@@ -193,7 +234,39 @@ ModLoader.ManifestType = {
 			for i, e in ipairs(entries) do
 				entries[i] = deref(e)
 			end
+			if t.ObjectMerge then
+				---@type ManifestMergeOperation[]
+				local merges = manifest[t.ObjectMerge]
+				for _, merge in ipairs(merges) do
+					for i, m in ipairs(merge.AppliesTo) do
+						merge.AppliesTo[i] = deref(m)
+					end
+				end
+			end
 		end,
+		PerformObjectMerge = function(t, manifest)
+			LuaDebugger.Break()
+			if not t.ObjectMerge or not t.ObjectMergeFunc then
+				return
+			end
+			---@type ManifestMergeOperation[]
+			local merges = manifest[t.ObjectMerge]
+			if not merges then
+				return
+			end
+			for _,merge in ipairs(merges) do
+				for _,id in ipairs(merge.AppliesTo) do
+					xpcall(function()
+						local i = id
+						if type(id)=="string" then
+							i = t.Table[i]
+						end
+						---@cast i number
+						merge.MergeFunc(t.ObjectMergeFunc(id), i)
+					end, LuaDebugger.Log)
+				end
+			end
+		end
 	},
 	kv = {
 		Preload = function(t, manifest)
@@ -723,6 +796,11 @@ function ModLoader.FillMissingManifestEntries(manifest)
 			ModLoader.ManifestType[n.Type or "default"].Merge(n, manifest, {
 				[n.Key] = manifest[m.Key],
 			})
+		end
+		if m.ObjectMerge then
+			if not manifest[m.ObjectMerge] then
+				manifest[m.ObjectMerge] = {}
+			end
 		end
 		t.Fix(m, manifest)
 	end

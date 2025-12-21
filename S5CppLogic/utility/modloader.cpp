@@ -1399,6 +1399,15 @@ int CppLogic::ModLoader::ModLoader::MapGetModPacks(lua::State l)
 	return 3;
 }
 
+int CppLogic::ModLoader::ModLoader::GetEntityTypeMem(lua::State l) {
+	luaext::EState L{ l };
+	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetEntityTypeMem", L.CheckEntityType(1),
+		static_cast<int>(L.CheckEnum<shok::EntityTypeId>(1)), [](int id) {
+			DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(static_cast<shok::EntityTypeId>(id));
+		});
+	return 1;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);

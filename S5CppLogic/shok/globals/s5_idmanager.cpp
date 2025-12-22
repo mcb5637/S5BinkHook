@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "s5_idmanager.h"
 #include <shok/s5_mem.h>
+#include <shok/ui/s5_ui.h>
 
 static inline int(__thiscall* const shok_getAnimIdByName)(const BB::IIDManager* th, const char* name) = reinterpret_cast<int(__thiscall*)(const BB::IIDManager * th, const char* name)>(0x54F19E);
 static inline int(__thiscall* const shok_BB_CIDManager_getidbyname)(void* th, const char* name, int nid) = reinterpret_cast<int(__thiscall*)(void*, const char*, int)>(0x54F656);
@@ -84,4 +85,9 @@ BB::IIDManager::Iter BB::IIDManager::begin() const
 BB::IIDManager::Iter BB::IIDManager::end() const
 {
 	return Iter{ this, static_cast<int>(TypeNames.size())};
+}
+
+BB::CIDManagerEx * BB::CIDManagerEx::ShortenedFeedBackEventManager() {
+	GGUI::SoundFeedback::GlobalObj(); // create it, if it does not exist
+	return *reinterpret_cast<BB::CIDManagerEx**>(0x880BA0);
 }

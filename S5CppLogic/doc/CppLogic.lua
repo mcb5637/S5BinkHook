@@ -344,6 +344,14 @@ function CppListAccess:First(pred)end
 ---for map-type lists, the writer needs to at least write the key
 ---@param writer fun(toinsert:CppObjectAccess)
 function CppListAccess:Insert(writer)end
+---removes elements, if the predicate returs true
+---(not supported by all list types)
+---@param fun fun(elem:CppObjectAccess):boolean
+function CppListAccess:Remove(fun)end
+---gets the list type, if known
+---@return number
+---@return string
+function CppListAccess:ListType()end
 
 ---accesses an entitytypes memory
 ---warning: has no semantic checks, it is easy to crash your game by modifying memory!
@@ -3428,12 +3436,44 @@ function CppLogic.ModLoader.PreLoadEntityType(typename) end
 --- @param tid number
 function CppLogic.ModLoader.SetEntityTypeToReload(tid) end
 
+--- reloads a feedback event sound data.
+--- @param tid number|string
+function CppLogic.ModLoader.LoadFeedbackEventSoundData(tid) end
+
 --- accesses an entitytypes memory
 --- warning: has no semantic checks, it is easy to crash your game by modifying memory!
 --- automatically marks the entitytype for reload on writing
 --- @param tid number
 --- @return CppBBObjectAccess
 function CppLogic.ModLoader.GetEntityTypeMem(tid) end
+
+--- accesses a task lists memory
+--- warning: has no semantic checks, it is easy to crash your game by modifying memory!
+--- automatically marks the tasklist for reload on writing
+--- @param tid number
+--- @return CppBBObjectAccess
+function CppLogic.ModLoader.GetTaskListMem(tid) end
+
+--- accesses a techs memory
+--- warning: has no semantic checks, it is easy to crash your game by modifying memory!
+--- automatically marks the tech for reload on writing
+--- @param tid number
+--- @return CppStructAccess
+function CppLogic.ModLoader.GetTechnologyMem(tid) end
+
+--- accesses an effecttype memory
+--- warning: has no semantic checks, it is easy to crash your game by modifying memory!
+--- automatically marks the effecttype for reload on writing
+--- @param tid number
+--- @return CppStructAccess
+function CppLogic.ModLoader.GetEffectTypeMem(tid) end
+
+--- accesses a feedback event sound data memory
+--- warning: has no semantic checks, it is easy to crash your game by modifying memory!
+--- gets reloaded by shok automatically
+--- @param tid number
+--- @return CppStructAccess
+function CppLogic.ModLoader.GetFeedbackEventMem(tid) end
 
 --- loads an effecttype from a xml file (data/config/effects/typename.xml) (not default location).
 --- the effecttype gets automatically removed/reloaded on leaving the map.

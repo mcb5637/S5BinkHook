@@ -17,12 +17,12 @@ ModLoader = ModLoader or {}
 ---@field ExtraArmorClass CArmorDamageMapping[]|nil
 
 ---@class ManifestMergeOperation
----@field MergeFunc fun(obj:CppBBObjectAccess, type:number)
+---@field MergeFunc fun(obj:CppStructAccess, type:number|string)
 ---@field AppliesTo (number|string)[]
 ---@field DoNotRemoveOnOverride boolean?
 
 ---@class Manifest
----@field MissingFilled boolean|nil
+---@field package MissingFilled boolean|nil
 ---@field ArmorClasses string[]|nil
 ---@field EntityCategories string[]|nil
 ---@field DamageClasses table<string,CDamageClass>|nil
@@ -45,7 +45,12 @@ ModLoader = ModLoader or {}
 ---@field SoundGroups (string|number)[][]|nil
 ---@field StringTableTexts table<string,string|true>|nil
 ---@field Fonts string[]|nil
+---@field FeedbackEventSoundData string[]|nil
 ---@field EntityTypeMerges ManifestMergeOperation[]|nil
+---@field TaskListMerges ManifestMergeOperation[]|nil
+---@field TechnologyMerges ManifestMergeOperation[]|nil
+---@field EffectTypeMerges ManifestMergeOperation[]|nil
+---@field FeedbackEventSoundDataMerges ManifestMergeOperation[]|nil
 
 ---@class CManifestEntry
 ---@field package Key string
@@ -55,7 +60,7 @@ ModLoader = ModLoader or {}
 ---@field package Type nil|"kv"|"sound"
 ---@field package Deprecated string?
 ---@field package ObjectMerge string?
----@field package ObjectMergeFunc nil|fun(is:string|number):CppBBObjectAccess
+---@field package ObjectMergeFunc nil|fun(is:string|number):CppStructAccess
 
 ---@class CManifestType
 ---@field Preload fun(e:CManifestEntry, m:Manifest)
@@ -133,10 +138,10 @@ function ModLoader.ManifestTypes()
 		{Key="Animations", Preload=nil, Table=Animations, Load=CppLogic.ModLoader.AddAnimation},
 		{Key="AnimSets", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddAnimSet},
 		{Key="Models", Preload=nil, Table=Models, Load=CppLogic.ModLoader.AddModel},
-		{Key="EffectTypes", Preload=CppLogic.ModLoader.PreLoadEffectType, Table=GGL_Effects, Load=CppLogic.ModLoader.AddEffectType},
-		{Key="TaskLists", Preload=CppLogic.ModLoader.PreLoadTaskList, Table=TaskLists, Load=CppLogic.ModLoader.AddTaskList},
+		{Key="EffectTypes", Preload=CppLogic.ModLoader.PreLoadEffectType, Table=GGL_Effects, Load=CppLogic.ModLoader.AddEffectType, ObjectMerge="EffectTypeMerges", ObjectMergeFunc=CppLogic.ModLoader.GetEffectTypeMem},
+		{Key="TaskLists", Preload=CppLogic.ModLoader.PreLoadTaskList, Table=TaskLists, Load=CppLogic.ModLoader.AddTaskList, ObjectMerge="TaskListMerges", ObjectMergeFunc=CppLogic.ModLoader.GetTaskListMem},
 		{Key="EntityTypes", Preload=CppLogic.ModLoader.PreLoadEntityType, Table=Entities, Load=CppLogic.ModLoader.AddEntityType, ObjectMerge="EntityTypeMerges", ObjectMergeFunc=CppLogic.ModLoader.GetEntityTypeMem},
-		{Key="Technologies", Preload=CppLogic.ModLoader.PreLoadTechnology, Table=Technologies, Load=CppLogic.ModLoader.AddTechnology},
+		{Key="Technologies", Preload=CppLogic.ModLoader.PreLoadTechnology, Table=Technologies, Load=CppLogic.ModLoader.AddTechnology, ObjectMerge="TechnologyMerges", ObjectMergeFunc=CppLogic.ModLoader.GetTechnologyMem},
 		{Key="GUITextures", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddGUITexture},
 		{Key="GUITextures_Add", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures"},
 		{Key="GUITextures_Reload", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures"},
@@ -146,6 +151,7 @@ function ModLoader.ManifestTypes()
 		{Key="SoundGroups", Preload=nil, Table=Sounds, Load=CppLogic.ModLoader.AddSounds, Type="sound"},
 		{Key="StringTableTexts", Preload=nil, Table=nil, Load=ModLoader.LoadSTTOverride, Type="kv"},
 		{Key="Fonts", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddFont},
+		{Key="FeedbackEventSoundData", Load=CppLogic.ModLoader.LoadFeedbackEventSoundData, ObjectMerge="FeedbackEventSoundDataMerges", ObjectMergeFunc=CppLogic.ModLoader.GetFeedbackEventMem},
 	}
 	return r
 end
@@ -245,7 +251,6 @@ ModLoader.ManifestType = {
 			end
 		end,
 		PerformObjectMerge = function(t, manifest)
-			LuaDebugger.Break()
 			if not t.ObjectMerge or not t.ObjectMergeFunc then
 				return
 			end
@@ -257,12 +262,7 @@ ModLoader.ManifestType = {
 			for _,merge in ipairs(merges) do
 				for _,id in ipairs(merge.AppliesTo) do
 					xpcall(function()
-						local i = id
-						if type(id)=="string" then
-							i = t.Table[i]
-						end
-						---@cast i number
-						merge.MergeFunc(t.ObjectMergeFunc(id), i)
+						merge.MergeFunc(t.ObjectMergeFunc(id), id)
 					end, LuaDebugger.Log)
 				end
 			end

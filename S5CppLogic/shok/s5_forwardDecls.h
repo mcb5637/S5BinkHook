@@ -100,6 +100,7 @@ namespace shok {
 	enum class EffectId : int;
 	enum class EntityId : int;
 	enum class SectorId : int;
+	enum class FeedbackEventShortenedId : int;
 
 	class Technology;
 	class TechCategoryManager;

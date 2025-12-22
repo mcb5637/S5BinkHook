@@ -833,7 +833,7 @@ namespace GGUI {
 	};
 	static_assert(sizeof(CShortMessagesWindowControllerCustomWidget::Message) == 14 * 4);
 	static_assert(sizeof(CShortMessagesWindowControllerCustomWidget) == 91 * 4);
-	constexpr int i = offsetof(CShortMessagesWindowControllerCustomWidget, Buttons) / 4;
+	//constexpr int i = offsetof(CShortMessagesWindowControllerCustomWidget, Buttons) / 4;
 
 	// IntegerUserVariable0 bool is mainmenu
 	class CStatisticsRendererCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {

@@ -8,6 +8,9 @@
 #include <utility/entityiterator.h>
 #include <utility/hooks.h>
 #include <cstdlib>
+#include <shok/entity/s5_tasklist.h>
+#include <shok/globals/s5_classfactory.h>
+#include <shok/events/s5_netevents.h>
 
 static inline void(__thiscall* const textset_load)(BB::CTextSet* th) = reinterpret_cast<void(__thiscall*)(BB::CTextSet*)>(0x723647);
 void BB::CTextSet::Load()
@@ -942,4 +945,20 @@ void GGUI::CManager::DisableSelectionLimit(bool disable)
 bool GGUI::CManager::IsModifierPressed(shok::Keys modif)
 {
 	return EGUIX::CEventManager::GlobalObj()->IsModifierPressed(modif);
+}
+
+void GGUI::SoundFeedback::SoundDatas::ReloadData(shok::FeedbackEventShortenedId id) {
+	auto i = SoundData.find(id);
+	if (i == SoundData.end())
+		throw std::invalid_argument("SoundData not found");
+	auto* data = i->second;
+	for (auto* v : data->Sound)
+		delete v;
+	{
+		auto v = data->Sound.SaveVector();
+		v.Vector.clear();
+	}
+	auto file = std::format(R"(Data\Config\FeedbackEventSoundData\{}.xml)", CppLogic::GetIdManager<shok::FeedbackEventShortenedId>().GetNameByID(id));
+	auto seri = BB::CXmlSerializer::CreateUnique();
+	seri->Deserialize(file.c_str(), data, FeedbackEventSoundData::SerializationData);
 }

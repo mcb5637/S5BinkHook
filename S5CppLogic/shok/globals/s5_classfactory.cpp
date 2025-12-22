@@ -6,6 +6,7 @@
 #include <shok/globals/s5_mapdisplay.h>
 #include <shok/ui/s5_widget.h>
 #include <shok/entitytype/s5_behaviorProps.h>
+#include <shok/events/s5_netevents.h>
 #include <utility/SchemaGenerator.h>
 #include <utility/hooks.h>
 
@@ -128,7 +129,7 @@ BB::FieldSerializer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &P
 BB::FieldSerializer::ExtendedInfo InfoAnimCategory{ "shok::AnimationCategoryId", &PushInt, &CheckEnum<shok::AnimationCategoryId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckEnum<shok::Goods>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoWidgetID{ "shok::WidgetId", &PushInt, &CheckEnum<shok::WidgetId>, "xs:string" };
-BB::FieldSerializer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventIds", &PushInt, &CheckEnum<shok::FeedbackEventIds>, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoFeedbackEventId{ "shok::FeedbackEventShortenedId", &PushInt, &CheckEnum<shok::FeedbackEventShortenedId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoFeedbackStateId{ "shok::FeedbackStateId", &PushInt, &CheckEnum<shok::FeedbackStateId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoAbilityId{ "shok::AbilityId", &PushInt, &CheckEnum<shok::AbilityId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoArmorClassId{ "shok::ArmorClassId", &PushInt, &CheckEnum<shok::ArmorClassId>, "xs:string" };

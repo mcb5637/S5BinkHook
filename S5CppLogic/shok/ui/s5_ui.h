@@ -882,9 +882,11 @@ namespace GGUI {
 			// load 52DE51
 		} FS; // 13
 		struct SoundDatas {
-			shok::Map<shok::FeedbackEventIds, FeedbackEventSoundData*> SoundData;
+			shok::Map<shok::FeedbackEventShortenedId, FeedbackEventSoundData*> SoundData;
 
 			// load 53C51A
+
+			void ReloadData(shok::FeedbackEventShortenedId id);
 		} SD; // 17
 		PADDINGI(3); // map?
 		bool PlaySounds = false; // 23
@@ -895,6 +897,15 @@ namespace GGUI {
 
 
 		static inline GGUI::SoundFeedback* (* const GlobalObj)() = reinterpret_cast<GGUI::SoundFeedback * (*)()>(0x52799B);
+
+		struct FeedbackEventIdShortener {
+			shok::Map<shok::FeedbackEventIds, shok::FeedbackEventShortenedId> Mapping; // not completely sure
+
+			// getshortenedid 527334 thiscall(full_id)
+
+			static inline FeedbackEventIdShortener*(*const GlobalObj)() = reinterpret_cast<FeedbackEventIdShortener*(*)()>(0x527530);
+			static inline shok::FeedbackEventShortenedId (__cdecl* const ShortenID)(shok::FeedbackEventIds id) = reinterpret_cast<shok::FeedbackEventShortenedId (__cdecl*)(shok::FeedbackEventIds)>(0x52757c);
+		};
 	};
 	static_assert(sizeof(SoundFeedback) == 24 * 4);
 	static_assert(offsetof(SoundFeedback, FS) == 13 * 4);

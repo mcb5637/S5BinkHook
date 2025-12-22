@@ -336,8 +336,19 @@ namespace CppLogic::ModLoader {
 
 			static DirectXEffectLoader Obj;
 		};
+		class FeedbackEventSoundDataLoader : public DataTypeLoader {
+			// does not need to get reset, automatically reloaded anyway
+		public:
+			virtual void Reset() override;
+			virtual void SanityCheck() override;
+			virtual void RegisterFuncs(luaext::EState L) override;
 
-		static std::array<DataTypeLoader*, 20> Loaders;
+			static int Add(lua::State L);
+
+			static FeedbackEventSoundDataLoader Obj;
+		};
+
+		static std::array<DataTypeLoader*, 21> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;
@@ -363,6 +374,10 @@ namespace CppLogic::ModLoader {
 		static int LoadStringTableTextOverrides(lua::State L);
 		static int MapGetModPacks(lua::State L);
 		static int GetEntityTypeMem(lua::State L);
+		static int GetTaskListMem(lua::State l);
+		static int GetTechnologyMem(lua::State l);
+		static int GetEffectTypeMem(lua::State l);
+		static int GetFeedbackEventMem(lua::State l);
 
 		static constexpr std::array LuaFuncs{
 				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -381,6 +396,10 @@ namespace CppLogic::ModLoader {
 				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
 				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
 				lua::FuncReference::GetRef<GetEntityTypeMem>("GetEntityTypeMem"),
+				lua::FuncReference::GetRef<GetTaskListMem>("GetTaskListMem"),
+				lua::FuncReference::GetRef<GetTechnologyMem>("GetTechnologyMem"),
+				lua::FuncReference::GetRef<GetEffectTypeMem>("GetEffectTypeMem"),
+				lua::FuncReference::GetRef<GetFeedbackEventMem>("GetFeedbackEventMem"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{

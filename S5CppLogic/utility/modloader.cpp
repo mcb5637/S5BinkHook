@@ -18,6 +18,7 @@
 #include <shok/globals/s5_config.h>
 #include <shok/s5_exception.h>
 #include <shok/sound/s5_sound.h>
+#include <shok/events/s5_netevents.h>
 #include <utility/entityiterator.h>
 #include <luaext.h>
 #include <utility/dump_guitextures.h>
@@ -1021,6 +1022,26 @@ int CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Add(lua::State L)
 }
 CppLogic::ModLoader::ModLoader::DirectXEffectLoader CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj{};
 
+void CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Reset() {
+}
+
+void CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::SanityCheck() {
+}
+
+void CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::RegisterFuncs(luaext::EState L) {
+	L.RegisterFunc<Add>("LoadFeedbackEventSoundData", -3);
+}
+
+int CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Add(lua::State l) {
+	luaext::EState L{l};
+	auto* m = GGUI::SoundFeedback::GlobalObj();
+	auto id = L.CheckEnum<shok::FeedbackEventShortenedId>(1);
+	m->SD.ReloadData(id);
+	return 0;
+}
+
+CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Obj{};
+
 template<>
 void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::FontId>::Load(shok::FontId id, luaext::EState L) {
 	auto* mng = EGUIX::FontManager::GlobalObj();
@@ -1047,7 +1068,7 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::UnLoa
 template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::Obj{};
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 20> CppLogic::ModLoader::ModLoader::Loaders{ {
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 21> CppLogic::ModLoader::ModLoader::Loaders{ {
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
@@ -1068,6 +1089,7 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 20> CppLogic::ModLoa
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj,
 			&CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj,
 			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::Obj,
+			&FeedbackEventSoundDataLoader::Obj,
 	} };
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{ {
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
@@ -1405,6 +1427,48 @@ int CppLogic::ModLoader::ModLoader::GetEntityTypeMem(lua::State l) {
 		static_cast<int>(L.CheckEnum<shok::EntityTypeId>(1)), [](int id) {
 			DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(static_cast<shok::EntityTypeId>(id));
 		});
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::GetTaskListMem(lua::State l) {
+	luaext::EState L{ l };
+	auto id = L.CheckEnum<shok::TaskListId>(1);
+	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetTaskListMem", GetTaskList(id),
+		static_cast<int>(id), [](int id) {
+			DataTypeLoaderHalf<shok::TaskListId>::Obj.OnIdLoaded(static_cast<shok::TaskListId>(id));
+		});
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::GetTechnologyMem(lua::State l) {
+	luaext::EState L{ l };
+	auto id = L.CheckEnum<shok::TechnologyId>(1);
+	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetTechnologyMem", GetTechnology(id), shok::Technology::SerializationData,
+		static_cast<int>(id), [](int id) {
+			DataTypeLoaderHalf<shok::TechnologyId>::Obj.OnIdLoaded(static_cast<shok::TechnologyId>(id));
+		});
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::GetEffectTypeMem(lua::State l) {
+	luaext::EState L{ l };
+	auto id = L.CheckEnum<shok::EffectTypeId>(1);
+	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetEffectTypeMem", GetEffectType(id), EGL::EffectType::SerializationData,
+		static_cast<int>(id), [](int id) {
+			DataTypeLoaderReload<shok::EffectTypeId>::Obj.OnIdLoaded(static_cast<shok::EffectTypeId>(id));
+		});
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::GetFeedbackEventMem(lua::State l) {
+	luaext::EState L{ l };
+	auto& sd = GGUI::SoundFeedback::GlobalObj()->SD;
+	auto id = L.CheckEnum<shok::FeedbackEventShortenedId>(1);
+	auto ev = sd.SoundData.find(id);
+	if (ev == sd.SoundData.end())
+		throw lua::LuaException{"could not find SoundData"};
+	auto* e = ev->second;
+	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetFeedbackEventMem", e, GGUI::SoundFeedback::FeedbackEventSoundData::SerializationData);
 	return 1;
 }
 

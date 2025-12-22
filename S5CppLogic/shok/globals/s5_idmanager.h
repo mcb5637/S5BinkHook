@@ -70,7 +70,6 @@ namespace BB {
 		static inline BB::CIDManagerEx** const GoodsManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3B4); // i dont think they are actually used somewhere..., A0D348 same
 		static inline BB::CIDManagerEx** const ArmorClassManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C850); // you probably cannot add anything here, cause fixed array, 85A3C8 same
 		static inline BB::CIDManagerEx** const AttachmentTypesManager = reinterpret_cast<BB::CIDManagerEx**>(0x85A3D0); // 85A3D4 too
-		static inline BB::CIDManagerEx** const FeedBackEventManager = reinterpret_cast<BB::CIDManagerEx**>(0x880BA0); // ids are not correct here
 		static inline BB::CIDManagerEx** const SoundsManager = reinterpret_cast<BB::CIDManagerEx**>(0x859F14); // 8979C8 same
 		static inline BB::CIDManagerEx** const AmbientSoundsManager = reinterpret_cast<BB::CIDManagerEx**>(0x8979CC);
 		static inline BB::CIDManagerEx** const ResourceTypeManager = reinterpret_cast<BB::CIDManagerEx**>(0x85EE5C);
@@ -90,6 +89,7 @@ namespace BB {
 		static inline BB::CIDManagerEx** const ModelManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C83C);
 		static inline BB::CIDManagerEx** const BuildingBannerGroupManager = reinterpret_cast<BB::CIDManagerEx**>(0xA0C85C);
 		// A0C844 race
+		static BB::CIDManagerEx* ShortenedFeedBackEventManager();
 	};
 	static_assert(sizeof(BB::CIDManagerEx) == 6 * 4);
 
@@ -239,10 +239,6 @@ namespace CppLogic {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AttachmentTypesManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::FeedbackEventIds> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::FeedBackEventManager;
-	};
-	template<>
 	struct IdManagerMapping<shok::SoundId> {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::SoundsManager;
 	};
@@ -331,5 +327,10 @@ namespace CppLogic {
 		if (mng == nullptr)
 			throw std::runtime_error{std::format("{} manager not yet initialized", typename_details::type_name<En>())};
 		return EnumIdManager<En>{mng};
+	}
+
+	template<>
+	inline auto GetIdManager<shok::FeedbackEventShortenedId>() {
+		return EnumIdManager<shok::FeedbackEventShortenedId>{BB::CIDManagerEx::ShortenedFeedBackEventManager()};
 	}
 }

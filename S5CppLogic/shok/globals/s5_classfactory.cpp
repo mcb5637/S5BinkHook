@@ -653,6 +653,35 @@ std::unique_ptr<BB::SerializationListOptions::Iter, void(__stdcall*)(BB::Seriali
 
 template<class T>
 BB::SerializationListOptions::ExtendedInfo MakeLOEVec() {
+	decltype(BB::SerializationListOptions::ExtendedInfo::InsertAt) ins = nullptr;
+	if constexpr (std::is_default_constructible_v<T>) {
+		ins = [](void* list, std::variant<size_t, bool(*)(void* uv, const BB::SerializationData* sd, void* elem)> cond, void(*write)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
+			auto* v = static_cast<shok::Vector<T>*>(list);
+			auto sv = v->SaveVector();
+			auto it = sv.Vector.begin();
+			std::visit([&]<class C>(const C& co) {
+				if constexpr (std::same_as<C, size_t>) {
+					if (co > sv.Vector.size())
+						throw std::invalid_argument{"trying to insert past the end"};
+					std::advance(it, co);
+				}
+				else {
+					while (it != sv.Vector.end()) {
+					auto& elem = *it;
+					if (co(uv, sd, &elem)) {
+						break;
+					}
+					++it;
+				}
+				}
+			}, cond);
+			bool last = it == sv.Vector.end();
+			T data{};
+			write(uv, sd, &data);
+			sv.Vector.insert(it, std::move(data));
+			return last;
+		};
+	}
 	return BB::SerializationListOptions::ExtendedInfo{
 		BB::SerializationListOptions::ExtendedInfo::Ty::Vector,
 		typename_details::type_name<shok::Vector<T>>(),
@@ -671,6 +700,7 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEVec() {
 			});
 			sv.Vector.erase(e, sv.Vector.end());
 		},
+		ins,
 	};
 }
 template<class K, class V>
@@ -689,6 +719,24 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEMap() {
 					++i;
 			}
 		},
+	};
+}
+template<class K, size_t S>
+BB::SerializationListOptions::ExtendedInfo MakeLOEArray() {
+	return BB::SerializationListOptions::ExtendedInfo{
+		BB::SerializationListOptions::ExtendedInfo::Ty::Array,
+		typename_details::type_name<shok::Array<K, S>>(),
+		nullptr,
+		nullptr, // TODO
+	};
+}
+template<class K>
+BB::SerializationListOptions::ExtendedInfo MakeLOEList() {
+	return BB::SerializationListOptions::ExtendedInfo{
+		BB::SerializationListOptions::ExtendedInfo::Ty::List,
+		typename_details::type_name<shok::List<K>>(),
+		nullptr,
+		nullptr, // TODO
 	};
 }
 
@@ -740,68 +788,17 @@ BB::SerializationListOptions::ExtendedInfo LOE_MapTrigger = MakeLOEMap<shok::Tri
 BB::SerializationListOptions::ExtendedInfo LOE_MapGDBList = MakeLOEMap<shok::String, BB::IObject*>();
 BB::SerializationListOptions::ExtendedInfo LOE_MapEtypeVector = MakeLOEMap<shok::EntityTypeId, shok::Vector<EGL::CGLEEntity*>>();
 
-BB::SerializationListOptions::ExtendedInfo LOE_ArrInt{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
-	typename_details::type_name<shok::Array<int, 3>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ArrFloat{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
-	typename_details::type_name<shok::Array<float, 8>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ArrMaterial{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
-	typename_details::type_name<shok::Array<EGUIX::CMaterial, 5>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ArrSettlerFeedback{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
-	typename_details::type_name<shok::Array<shok::Set<EGL::CPlayerFeedbackHandler::SingleFeedack>, 7>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ArrGenMessage{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
-	typename_details::type_name<shok::Array<EGL::CPlayerFeedbackHandler::GenMessageData, 4>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ArrBool{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
-	typename_details::type_name<shok::Array<bool, 20>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ArrDiplo{
-	BB::SerializationListOptions::ExtendedInfo::Ty::Array,
-	typename_details::type_name<shok::Array<shok::DiploState, 9>>(),
-	nullptr, // TODO?
-	nullptr,
-};
+BB::SerializationListOptions::ExtendedInfo LOE_ArrInt = MakeLOEArray<int, 3>();
+BB::SerializationListOptions::ExtendedInfo LOE_ArrFloat = MakeLOEArray<float, 8>();
+BB::SerializationListOptions::ExtendedInfo LOE_ArrMaterial = MakeLOEArray<EGUIX::CMaterial, 5>();
+BB::SerializationListOptions::ExtendedInfo LOE_ArrSettlerFeedback = MakeLOEArray<shok::Set<EGL::CPlayerFeedbackHandler::SingleFeedack>, 7>();
+BB::SerializationListOptions::ExtendedInfo LOE_ArrGenMessage = MakeLOEArray<EGL::CPlayerFeedbackHandler::GenMessageData, 4>();
+BB::SerializationListOptions::ExtendedInfo LOE_ArrBool = MakeLOEArray<bool, 20>();
+BB::SerializationListOptions::ExtendedInfo LOE_ArrDiplo = MakeLOEArray<shok::DiploState, 9>();
 
-BB::SerializationListOptions::ExtendedInfo LOE_ListQuest{
-	BB::SerializationListOptions::ExtendedInfo::Ty::List,
-	typename_details::type_name<shok::List<GGL::PlayerQuestManager::Quest>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ListEtyLeft{
-	BB::SerializationListOptions::ExtendedInfo::Ty::List,
-	typename_details::type_name<shok::List<GGL::CPlayerAttractionHandler::TypeThatLeftData>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-BB::SerializationListOptions::ExtendedInfo LOE_ListBBObj{
-	BB::SerializationListOptions::ExtendedInfo::Ty::List,
-	typename_details::type_name<shok::List<BB::IObject*>>(),
-	nullptr, // TODO?
-	nullptr,
-};
-
+BB::SerializationListOptions::ExtendedInfo LOE_ListQuest = MakeLOEList<GGL::PlayerQuestManager::Quest>();
+BB::SerializationListOptions::ExtendedInfo LOE_ListEtyLeft = MakeLOEList<GGL::CPlayerAttractionHandler::TypeThatLeftData>();
+BB::SerializationListOptions::ExtendedInfo LOE_ListBBObj = MakeLOEList<BB::IObject*>();
 
 auto& KnownListInfos() {
 	static std::map<int, const BB::SerializationListOptions::ExtendedInfo*> i{

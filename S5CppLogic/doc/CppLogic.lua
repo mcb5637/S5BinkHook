@@ -352,6 +352,10 @@ function CppListAccess:Remove(fun)end
 ---@return number
 ---@return string
 function CppListAccess:ListType()end
+---inserts a new element into the list at a specific position
+---@param writer fun(toinsert:CppObjectAccess)
+---@param inFrontOf number|fun(elem:CppObjectAccess):boolean
+function CppListAccess:InsertAt(inFrontOf, writer)end
 
 ---accesses an entitytypes memory
 ---warning: has no semantic checks, it is easy to crash your game by modifying memory!

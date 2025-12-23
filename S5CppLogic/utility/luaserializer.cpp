@@ -1374,6 +1374,43 @@ int CppLogic::Serializer::ListAccess::ListType(lua::State L)
 	return 2;
 }
 
+int CppLogic::Serializer::ListAccess::InsertAt(lua::State L) {
+	auto* th = L.CheckUserClass<ListAccess>(1);
+	const auto& inf = th->SeriData->ListOptions->GetExtendedInfo();
+	if (inf.InsertAt == nullptr)
+		throw lua::LuaException{ "no insert at available" };
+	struct Data {
+		lua::State L;
+		ListAccess* A = nullptr;
+	} d{ L, th };
+	auto write = [](void* uv, const BB::SerializationData* sd, void* elem) {
+		Data* d = static_cast<Data*>(uv);
+		auto r = d->L.AutoCleanStack();
+		d->L.PushValue(3);
+		PushSD(d->L, sd->SerializationName, elem, sd, d->A->Id, d->A->OnWrite, true);
+		d->L.TCall(1, 0);
+	};
+	bool l;
+	if (L.IsNumber(2)) {
+		l = inf.InsertAt(th->Object, L.Check<size_t>(2), write, &d, th->SeriData);
+	}
+	else {
+		l = inf.InsertAt(th->Object, [](void* uv, const BB::SerializationData* sd, void* el) {
+			Data* d = static_cast<Data*>(uv);
+			int t = d->L.GetTop();
+			d->L.PushValue(2);
+			PushSD(d->L, sd->SerializationName, el, sd, d->A->Id, d->A->OnWrite, true);
+			bool r = false;
+			if (d->L.PCall(1, 1) == lua::State::ErrorCode::Success)
+				r = d->L.ToBoolean(-1);
+			d->L.SetTop(t);
+			return r;
+		}, write, &d, th->SeriData);
+	}
+	L.Push(l);
+	return 1;
+}
+
 int CppLogic::Serializer::ListAccess::Index(lua::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);

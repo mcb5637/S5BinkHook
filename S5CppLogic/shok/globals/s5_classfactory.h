@@ -6,6 +6,7 @@
 #include <shok/globals/s5_idmanager.h>
 #include <Luapp/constexprTypename.h>
 #include <luaext.h>
+#include <variant>
 #include <utility/ConstexprString.h>
 
 namespace BB {
@@ -256,6 +257,7 @@ namespace BB {
 			std::string_view Name;
 			void* (*IndexNumeric)(void* List, size_t index);
 			void (*RemoveIf)(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd);
+			bool (*InsertAt)(void* list, std::variant<size_t, bool(*)(void* uv, const BB::SerializationData* sd, void* elem)> cond, void(*write)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) = nullptr;
 		};
 
 		[[nodiscard]] const ExtendedInfo& GetExtendedInfo() const;
@@ -581,6 +583,31 @@ namespace CppLogic {
 				});
 			v->erase(e, v->end());
 		}
+		static bool InsertAt(void* list, std::variant<size_t, bool(*)(void* uv, const BB::SerializationData* sd, void* elem)> cond, void(*write)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
+			auto* v = static_cast<VectT*>(list);
+			auto it = v->begin();
+			std::visit([&]<class C>(const C& co) {
+				if constexpr (std::same_as<C, size_t>) {
+					if (co > v->size())
+						throw std::invalid_argument{"trying to insert past the end"};
+					std::advance(it, co);
+				}
+				else {
+					while (it != v->end()) {
+					auto& elem = *it;
+					if (co(uv, sd, &elem)) {
+						break;
+					}
+					++it;
+				}
+				}
+			}, cond);
+			bool last = it == v->end();
+			T data{};
+			write(uv, sd, &data);
+			v->insert(it, std::move(data));
+			return last;
+		}
 
 
 		ExtendedInfo Extended;
@@ -599,6 +626,7 @@ namespace CppLogic {
 			Extended.Name = typename_details::type_name<VectT>();
 			Extended.IndexNumeric = &Index;
 			Extended.RemoveIf = &RemoveIf;
+			Extended.InsertAt = &InsertAt;
 			RegisterExtended(Extended);
 		}
 	};

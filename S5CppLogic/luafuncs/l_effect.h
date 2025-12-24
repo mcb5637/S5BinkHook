@@ -2,9 +2,9 @@
 #include <luaext.h>
 
 namespace CppLogic::Effect {
-	void Init(lua::State L);
-	void Cleanup(lua::State L);
-	void OnSaveLoaded(lua::State L);
+	void Init(luaext::State L);
+	void Cleanup(luaext::State L);
+	void OnSaveLoaded(luaext::State L);
 
 	constexpr std::string_view EffectOnHitKey = "CppLogic::Effect_OnHit";
 }

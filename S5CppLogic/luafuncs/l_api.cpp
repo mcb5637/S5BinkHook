@@ -22,17 +22,17 @@
 #include <utility/savegame_extra.h>
 
 namespace CppLogic::API {
-	void CheckEvalEnabled(lua::State L) {
+	void CheckEvalEnabled(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException{ "Loading lua code disabled for Kimichura" };
 	}
 
 	bool IsExternalmap(const char* s) {
 		std::string_view str{ s };
-		return str.rfind("data\\maps\\externalmap\\", 0) != std::string_view::npos;
+		return str.rfind(R"(data\maps\externalmap\)", 0) != std::string_view::npos;
 	}
 
-	int Eval(lua::State L) {
+	int Eval(luaext::State L) {
 		CheckEvalEnabled(L);
 		size_t strlen = 0;
 		const char* s = L.CheckString(1, &strlen);
@@ -41,18 +41,18 @@ namespace CppLogic::API {
 		return 2;
 	}
 
-	int Log(lua::State L) {
+	int Log(luaext::State L) {
 		const char* s = L.CheckString(1);
 		shok::LogString("%s\n", s);
 		return 0;
 	}
 
-	int StackTrace(lua::State L) {
+	int StackTrace(luaext::State L) {
 		L.Push(L.GenerateStackTrace(L.OptInt(1, 0), L.OptInt(2, -1), L.OptBool(3, false), L.OptBool(4, false)));
 		return 1;
 	}
 
-	int GetFuncDebug(lua::State L) {
+	int GetFuncDebug(luaext::State L) {
 		if (!L.IsFunction(1))
 			throw lua::LuaException("no func");
 		L.PushValue(1);
@@ -80,7 +80,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int ReadFileAsString(lua::State L) {
+	int ReadFileAsString(luaext::State L) {
 		const char* s = L.CheckString(1);
 #ifndef DEBUG_FUNCS
 		if (!IsExternalmap(s))
@@ -91,7 +91,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int GetFilesInDirectory(lua::State L) {
+	int GetFilesInDirectory(luaext::State L) {
 		shok::Set<shok::String> m{};
 		(*BB::CFileSystemMgr::GlobalObj)->FillFilesInDirectory(&m, L.CheckString(1), BB::IFileSystem::SearchOptions::SkipDirectories);
 		L.NewTable();
@@ -104,13 +104,13 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int LDoesFileExist(lua::State L) {
+	int LDoesFileExist(luaext::State L) {
 		const char* s = L.CheckString(1);
 		L.Push(BB::CFileSystemMgr::DoesFileExist(s));
 		return 1;
 	}
 
-	int DoString(lua::State L) {
+	int DoString(luaext::State L) {
 		CheckEvalEnabled(L);
 		size_t strlen = 0;
 		const char* s = L.CheckString(1, &strlen);
@@ -119,8 +119,7 @@ namespace CppLogic::API {
 		return L.GetTop() - 2;
 	}
 
-	int MapGetDataPath(lua::State l) {
-		luaext::EState L{ l };
+	int MapGetDataPath(luaext::State L) {
 		const char* n = L.CheckString(1);
 		auto ty = L.CheckEnum<shok::MapType>(2);
 		const char* cn = L.OptString(3, nullptr); // optional
@@ -163,7 +162,7 @@ namespace CppLogic::API {
 		return 3;
 	}
 
-	int SaveGetMapInfo(lua::State L) {
+	int SaveGetMapInfo(luaext::State L) {
 		const char* save = L.CheckString(1);
 		bool nt = L.OptBool(2, false);
 		Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
@@ -188,15 +187,15 @@ namespace CppLogic::API {
 		return 5;
 	}
 
-	void PushGDBList(lua::State L, const GDB::CList& list) {
+	void PushGDBList(luaext::State L, const GDB::CList& list) {
 		L.NewTable();
 		for (const auto& e : list.Entries) {
 			L.Push(e.first.c_str());
-			if (const GDB::CString* s = dynamic_cast<const GDB::CString*>(e.second))
+			if (const auto* s = dynamic_cast<const GDB::CString*>(e.second))
 				L.Push(s->Data.c_str());
-			else if (const GDB::CValue* v = dynamic_cast<const GDB::CValue*>(e.second))
+			else if (const auto* v = dynamic_cast<const GDB::CValue*>(e.second))
 				L.Push(v->Data);
-			else if (const GDB::CList* l = dynamic_cast<const GDB::CList*>(e.second)) {
+			else if (const auto* l = dynamic_cast<const GDB::CList*>(e.second)) {
 				L.CheckStack(4, "stackoverflow");
 				PushGDBList(L, *l);
 			}
@@ -206,19 +205,19 @@ namespace CppLogic::API {
 		}
 	}
 
-	int GetGDB(lua::State L) {
+	int GetGDB(luaext::State L) {
 		PushGDBList(L, (*Framework::CMain::GlobalObj)->GDB);
 		return 1;
 	}
 
-	int RemoveGDBKey(lua::State L) {
+	int RemoveGDBKey(luaext::State L) {
 		std::string k = L.CheckStdString(1);
 		(*Framework::CMain::GlobalObj)->GDB.RemoveKey(k);
 		return 0;
 	}
 
 	void GetRuntimeStore() {
-		lua::State mm{ shok::LuaStateMainmenu };
+		luaext::State mm{ shok::LuaStateMainmenu };
 		mm.PushLightUserdata(&GetRuntimeStore);
 		mm.GetTableRaw(mm.REGISTRYINDEX);
 		if (mm.IsNil(-1)) {
@@ -228,8 +227,8 @@ namespace CppLogic::API {
 			mm.SetTableRaw(mm.REGISTRYINDEX);
 		}
 	}
-	int RuntimeStoreSet(lua::State L) {
-		lua::State mm{ shok::LuaStateMainmenu };
+	int RuntimeStoreSet(luaext::State L) {
+		luaext::State mm{ shok::LuaStateMainmenu };
 		int t = mm.GetTop();
 
 		const char* s = L.CheckString(1);
@@ -255,8 +254,8 @@ namespace CppLogic::API {
 		mm.SetTop(t);
 		return 0;
 	}
-	int RuntimeStoreGet(lua::State L) {
-		lua::State mm{ shok::LuaStateMainmenu };
+	int RuntimeStoreGet(luaext::State L) {
+		luaext::State mm{ shok::LuaStateMainmenu };
 		int t = mm.GetTop();
 
 		const char* s = L.CheckString(1);
@@ -283,7 +282,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int CreateExtraDataTables(lua::State L) {
+	int CreateExtraDataTables(luaext::State L) {
 		(*BB::CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L.GetState(), "Animations");
 		(*BB::CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "TerrainTypes");
 		(*BB::CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "WaterTypes");
@@ -323,8 +322,7 @@ namespace CppLogic::API {
 		p.replace_filename("PersistentMapFiles");
 		return p;
 	}
-	void AppendPersistendMapFileName(lua::State l, std::filesystem::path& p, int indexoff) {
-		luaext::EState L{ l };
+	void AppendPersistendMapFileName(luaext::State L, std::filesystem::path& p, int indexoff) {
 		const char* n = L.CheckString(1 + indexoff);
 		auto ty = L.CheckEnum<shok::MapType>(2 + indexoff);
 		const char* cn = L.OptString(3 + indexoff, nullptr); // optional
@@ -337,7 +335,7 @@ namespace CppLogic::API {
 		p.append(i->GUID.Data.c_str()).replace_extension("bin");
 	}
 
-	int SavePersistentMapFile(lua::State L) {
+	int SavePersistentMapFile(luaext::State L) {
 		std::filesystem::path p = GetPersistentMapFilesDir();
 		AppendPersistendMapFileName(L, p, 1);
 		auto path = p.string();
@@ -359,7 +357,7 @@ namespace CppLogic::API {
 		L.Push(path);
 		return 1;
 	}
-	int LoadPersistentMapFile(lua::State L) {
+	int LoadPersistentMapFile(luaext::State L) {
 		std::filesystem::path p = GetPersistentMapFilesDir();
 		AppendPersistendMapFileName(L, p, 0);
 		auto path = p.string();
@@ -380,7 +378,7 @@ namespace CppLogic::API {
 
 		return 1;
 	}
-	int HasPersistentMapFile(lua::State L) {
+	int HasPersistentMapFile(luaext::State L) {
 		std::filesystem::path p = GetPersistentMapFilesDir();
 		AppendPersistendMapFileName(L, p, 0);
 
@@ -391,34 +389,34 @@ namespace CppLogic::API {
 		return 2;
 	}
 
-	int MainThreadID = 0;
-	int GetMainThreadID(lua::State L) {
+	DWORD MainThreadID = 0;
+	int GetMainThreadID(luaext::State L) {
 		L.Push(MainThreadID);
 		return 1;
 	}
-	int GetCurrentThreadID(lua::State L) {
+	int GetCurrentThreadID(luaext::State L) {
 		L.Push(static_cast<int>(GetCurrentThreadId()));
 		return 1;
 	}
 
-	int LGetCurrentTime(lua::State L) {
+	int LGetCurrentTime(luaext::State L) {
 		L.Push(static_cast<double>(std::time(nullptr)));
 		return 1;
 	}
 
-	int GetCurrentCutscene(lua::State L) {
+	int GetCurrentCutscene(luaext::State L) {
 		L.Push((**ECS::CManager::GlobalObj)->ActiveCutscene.c_str());
 		return 1;
 	}
 
-	int EnableScriptTriggerEval(lua::State L) {
+	int EnableScriptTriggerEval(luaext::State L) {
 		bool a = L.CheckBool(1);
 		EScr::CLuaFuncRefGlobal::HookFuncAccess(a);
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ScriptTriggerEval = a;
 		return 0;
 	}
 
-	int ReloadExternalmaps(lua::State L) {
+	int ReloadExternalmaps(luaext::State L) {
 		auto* m = *Framework::CMain::GlobalObj;
 		if (m->CurrentMode != Framework::CMain::Mode::MainMenu)
 			throw lua::LuaException{"not in mainmenu"};
@@ -426,10 +424,10 @@ namespace CppLogic::API {
 		return 0;
 	}
 
-	int GetMonitors(lua::State L) {
+	int GetMonitors(luaext::State L) {
 		L.NewTable();
 		struct D {
-			lua::State L;
+			luaext::State L;
 			int i = 1;
 		};
 		D d{ L };
@@ -461,7 +459,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int RNG::Int(lua::State L)
+	int RNG::Int(luaext::State L)
 	{
 		RNG* th = L.CheckUserClass<RNG>(1);
 		int min = L.CheckInt(2);
@@ -477,7 +475,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int RNG::Number(lua::State L)
+	int RNG::Number(luaext::State L)
 	{
 		RNG* th = L.CheckUserClass<RNG>(1);
 		double min;
@@ -499,7 +497,7 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	int RNG::Serialize(lua::State L)
+	int RNG::Serialize(luaext::State L)
 	{
 		RNG* th = L.CheckUserClass<RNG>(1);
 		L.Push(typename_details::type_name<RNG>());
@@ -509,7 +507,7 @@ namespace CppLogic::API {
 	}
 
 	RNG::RNG()
-		: Core(static_cast<unsigned int>(std::time(nullptr)))
+		: Core(std::random_device{}())
 	{
 	}
 
@@ -518,7 +516,7 @@ namespace CppLogic::API {
 	{
 	}
 
-	int RNG::Deserialize(lua::State L)
+	int RNG::Deserialize(luaext::State L)
 	{
 		const char* s = L.CheckString(1);
 		auto* ud = L.NewUserClass<RNG>();
@@ -526,13 +524,13 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	void RNG::Register(lua::State L)
+	void RNG::Register(luaext::State L)
 	{
 		L.PrepareUserClassType<RNG>();
-		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<RNG>() }] = &lua::State::CppToCFunction<RNG::Deserialize>;
+		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<RNG>() }] = &luaext::State::CppToCFunction<RNG::Deserialize>;
 	}
 
-	int CreateRNG(lua::State L) {
+	int CreateRNG(luaext::State L) {
 		if (L.IsNoneOrNil(1))
 			L.NewUserClass<RNG>();
 		else
@@ -541,18 +539,18 @@ namespace CppLogic::API {
 	}
 
 #ifdef DEBUG_FUNCS
-	int GenerateClassSchemas(lua::State L) {
+	int GenerateClassSchemas(luaext::State L) {
 		BB::CFileStreamEx f{};
 		f.OpenFile(L.CheckString(1), BB::IStream::Flags::DefaultWrite);
 		CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(f);
 		f.Close();
 		return 0;
 	}
-	int DumpUnknownFieldSerializers(lua::State L) {
+	int DumpUnknownFieldSerializers(luaext::State L) {
 		CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(L);
 		return 1;
 	}
-	int DumpUnknownListOptions(lua::State L) {
+	int DumpUnknownListOptions(luaext::State L) {
 		CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(L);
 		return 1;
 	}
@@ -571,41 +569,41 @@ namespace CppLogic::API {
 	}
 
 	constexpr std::array API{
-			lua::FuncReference::GetRef<Eval>("Eval"),
-			lua::FuncReference::GetRef<Log>("Log"),
-			lua::FuncReference::GetRef<StackTrace>("StackTrace"),
-			lua::FuncReference::GetRef<ReadFileAsString>("ReadFileAsString"),
+			luaext::FuncReference::GetRef<Eval>("Eval"),
+			luaext::FuncReference::GetRef<Log>("Log"),
+			luaext::FuncReference::GetRef<StackTrace>("StackTrace"),
+			luaext::FuncReference::GetRef<ReadFileAsString>("ReadFileAsString"),
 #ifdef DEBUG_FUNCS
-			lua::FuncReference::GetRef<GetFilesInDirectory>("GetFilesInDirectory"),
+			luaext::FuncReference::GetRef<GetFilesInDirectory>("GetFilesInDirectory"),
 #endif
-			lua::FuncReference::GetRef<LDoesFileExist>("DoesFileExist"),
-			lua::FuncReference::GetRef<DoString>("DoString"),
-			lua::FuncReference::GetRef<MapGetDataPath>("MapGetDataPath"),
-			lua::FuncReference::GetRef<SaveGetMapInfo>("SaveGetMapInfo"),
-			lua::FuncReference::GetRef<GetGDB>("GetGDB"),
-			lua::FuncReference::GetRef<RuntimeStoreSet>("RuntimeStoreSet"),
-			lua::FuncReference::GetRef<RuntimeStoreGet>("RuntimeStoreGet"),
-			lua::FuncReference::GetRef<CreateExtraDataTables>("CreateExtraDataTables"),
-			lua::FuncReference::GetRef<GetFuncDebug>("GetFuncDebug"),
-			lua::FuncReference::GetRef<GetMainThreadID>("GetMainThreadID"),
-			lua::FuncReference::GetRef<GetCurrentThreadID>("GetCurrentThreadID"),
-			lua::FuncReference::GetRef<LGetCurrentTime>("GetCurrentTime"),
-			lua::FuncReference::GetRef<RemoveGDBKey>("RemoveGDBKey"),
-			lua::FuncReference::GetRef<SavePersistentMapFile>("SavePersistentMapFile"),
-			lua::FuncReference::GetRef<LoadPersistentMapFile>("LoadPersistentMapFile"),
-			lua::FuncReference::GetRef<HasPersistentMapFile>("HasPersistentMapFile"),
-			lua::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
-			lua::FuncReference::GetRef<GetCurrentCutscene>("GetCurrentCutscene"),
-			lua::FuncReference::GetRef<EnableScriptTriggerEval>("EnableScriptTriggerEval"),
-			lua::FuncReference::GetRef<GetMonitors>("GetMonitors"),
+			luaext::FuncReference::GetRef<LDoesFileExist>("DoesFileExist"),
+			luaext::FuncReference::GetRef<DoString>("DoString"),
+			luaext::FuncReference::GetRef<MapGetDataPath>("MapGetDataPath"),
+			luaext::FuncReference::GetRef<SaveGetMapInfo>("SaveGetMapInfo"),
+			luaext::FuncReference::GetRef<GetGDB>("GetGDB"),
+			luaext::FuncReference::GetRef<RuntimeStoreSet>("RuntimeStoreSet"),
+			luaext::FuncReference::GetRef<RuntimeStoreGet>("RuntimeStoreGet"),
+			luaext::FuncReference::GetRef<CreateExtraDataTables>("CreateExtraDataTables"),
+			luaext::FuncReference::GetRef<GetFuncDebug>("GetFuncDebug"),
+			luaext::FuncReference::GetRef<GetMainThreadID>("GetMainThreadID"),
+			luaext::FuncReference::GetRef<GetCurrentThreadID>("GetCurrentThreadID"),
+			luaext::FuncReference::GetRef<LGetCurrentTime>("GetCurrentTime"),
+			luaext::FuncReference::GetRef<RemoveGDBKey>("RemoveGDBKey"),
+			luaext::FuncReference::GetRef<SavePersistentMapFile>("SavePersistentMapFile"),
+			luaext::FuncReference::GetRef<LoadPersistentMapFile>("LoadPersistentMapFile"),
+			luaext::FuncReference::GetRef<HasPersistentMapFile>("HasPersistentMapFile"),
+			luaext::FuncReference::GetRef<CreateRNG>("CreateRandomNumberGenerator"),
+			luaext::FuncReference::GetRef<GetCurrentCutscene>("GetCurrentCutscene"),
+			luaext::FuncReference::GetRef<EnableScriptTriggerEval>("EnableScriptTriggerEval"),
+			luaext::FuncReference::GetRef<GetMonitors>("GetMonitors"),
 #ifdef DEBUG_FUNCS
-			lua::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
-			lua::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
-			lua::FuncReference::GetRef<DumpUnknownListOptions>("DumpUnknownListOptions"),
+			luaext::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
+			luaext::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
+			luaext::FuncReference::GetRef<DumpUnknownListOptions>("DumpUnknownListOptions"),
 #endif
 	};
 
-	void Init(lua::State L)
+	void Init(luaext::State L)
 	{
 		L.RegisterFuncs(API, -3);
 		if (L.GetState() == shok::LuaStateMainmenu) {
@@ -618,12 +616,12 @@ namespace CppLogic::API {
 		RNG::Register(L);
 	}
 
-	void OnSaveLoaded(lua::State L)
+	void OnSaveLoaded(luaext::State L)
 	{
 		EScr::CLuaFuncRefGlobal::HookFuncAccess(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ScriptTriggerEval);
 	}
 
-	void Cleanup(lua::State L)
+	void Cleanup(luaext::State L)
 	{
 		EScr::CLuaFuncRefGlobal::HookFuncAccess(false);
 	}

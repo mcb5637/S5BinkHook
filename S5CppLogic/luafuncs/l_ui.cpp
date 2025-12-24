@@ -23,7 +23,7 @@
 #include <utility/ModBehavior.h>
 
 namespace CppLogic::UI {
-	void StringHandlerSetString(luaext::EState L, EGUIX::CSingleStringHandler& h, int i) {
+	void StringHandlerSetString(luaext::State L, EGUIX::CSingleStringHandler& h, int i) {
 		const char* s = L.CheckString(i);
 		if (L.ToBoolean(i + 1)) {
 			h.StringTableKey.assign(s);
@@ -45,20 +45,13 @@ namespace CppLogic::UI {
 			throw lua::LuaException("incorrect folder");
 	}
 
-	int WidgetGetAddress(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetAddress(luaext::State L) {
 		EGUIX::CBaseWidget* w = L.CheckWidget(1);
 		L.Push(reinterpret_cast<int>(w));
-		EGUIX::CLuaFunctionHelper* bh = w->GetUpdateFunc();
-		if (bh) {
-			L.Push((int)bh);
-			return 2;
-		}
 		return 1;
 	}
 
-	int WidgetGetPositionAndSize(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetPositionAndSize(luaext::State L) {
 		EGUIX::CBaseWidget* w = L.CheckWidget(1);
 		L.Push(w->PosAndSize.X);
 		L.Push(w->PosAndSize.Y);
@@ -67,8 +60,7 @@ namespace CppLogic::UI {
 		return 4;
 	}
 
-	int WidgetSetPositionAndSize(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetPositionAndSize(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		float x, y, w, h;
 		if (L.IsNumber(2))
@@ -91,8 +83,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetGetUpdateManualFlag(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetUpdateManualFlag(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		bool* f = wid->GetUpdateManualFlag();
 		if (f) {
@@ -101,8 +92,7 @@ namespace CppLogic::UI {
 		}
 		throw lua::LuaException("widget has no known updatemanual flag");
 	}
-	int WidgetSetUpdateManualFlag(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetUpdateManualFlag(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		bool flg = L.ToBoolean(2);
 		bool* f = wid->GetUpdateManualFlag();
@@ -113,21 +103,19 @@ namespace CppLogic::UI {
 		throw lua::LuaException("widget has no known updatemanual flag");
 	}
 
-	int WidgetGetUpdateFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetUpdateFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CLuaFunctionHelper* fh = wid->GetUpdateFunc();
 		if (!fh)
 			throw lua::LuaException("widget has no known update func");
 		L.Push(fh->LuaCommand.c_str());
 		if (fh->FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(lua::Reference{ fh->FuncRefCommand.Ref }, L.REGISTRYINDEX);
+			L.Push(luaext::Reference{ fh->FuncRefCommand.Ref }, L.REGISTRYINDEX);
 		else
 			L.Push("no compiled func found");
 		return 2;
 	}
-	int WidgetCallUpdateFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetCallUpdateFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CLuaFunctionHelper* fh = wid->GetUpdateFunc();
 		if (!fh)
@@ -135,18 +123,16 @@ namespace CppLogic::UI {
 		fh->Call(wid->WidgetID);
 		return 0;
 	}
-	int WidgetOverrideUpdateFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetOverrideUpdateFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CLuaFunctionHelper* fh = wid->GetUpdateFunc();
 		if (!fh)
 			throw lua::LuaException("widget has no known update func");
-		fh->FuncRefCommand.ReplaceFunc(ls, 2);
+		fh->FuncRefCommand.ReplaceFunc(L, 2);
 		return 0;
 	}
 
-	int ContainerWidgetGetAllChildren(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetGetAllChildren(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -161,8 +147,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int IsContainerWidget(lua::State ls) {
-		luaext::EState L{ ls };
+	int IsContainerWidget(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		if (dynamic_cast<EGUIX::CContainerWidget*>(wid))
 			L.Push(true);
@@ -171,8 +156,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int WidgetMaterialGetTextureCoordinates(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetMaterialGetTextureCoordinates(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CMaterial* m = wid->GetMaterial(L.CheckInt(2));
 		if (!m)
@@ -183,8 +167,7 @@ namespace CppLogic::UI {
 		L.Push(m->TextureCoordinates.H);
 		return 4;
 	}
-	int WidgetMaterialSetTextureCoordinates(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetMaterialSetTextureCoordinates(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CMaterial* m = wid->GetMaterial(L.CheckInt(2));
 		if (!m)
@@ -200,8 +183,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetGetTooltipData(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetTooltipData(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
@@ -211,8 +193,7 @@ namespace CppLogic::UI {
 		L.Push(tt->ToolTipEnabledFlag);
 		return 3;
 	}
-	int WidgetSetTooltipData(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetTooltipData(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
@@ -227,8 +208,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetGetTooltipString(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetTooltipString(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
@@ -237,8 +217,7 @@ namespace CppLogic::UI {
 		L.Push(tt->ToolTipString.StringTableKey.c_str());
 		return 2;
 	}
-	int WidgetSetTooltipString(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetTooltipString(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
@@ -247,21 +226,19 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetGetTooltipFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetTooltipFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
 			throw lua::LuaException("no known tooltip");
 		L.Push(tt->UpdateFunction.LuaCommand.c_str());
 		if (tt->UpdateFunction.FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(lua::Reference{ tt->UpdateFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
+			L.Push(luaext::Reference{ tt->UpdateFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
 		else
 			L.Push("no compiled func found");
 		return 2;
 	}
-	int WidgetCallTooltipFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetCallTooltipFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
@@ -269,8 +246,7 @@ namespace CppLogic::UI {
 		tt->UpdateFunction.Call(wid->WidgetID);
 		return 0;
 	}
-	int WidgetOverrideTooltipFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetOverrideTooltipFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
@@ -279,21 +255,19 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ButtonGetActionFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int ButtonGetActionFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CButtonHelper* fh = wid->GetButtonHelper();
 		if (!fh)
 			throw lua::LuaException("widget has no known action func");
 		L.Push(fh->ActionFunction.LuaCommand.c_str());
 		if (fh->ActionFunction.FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(lua::Reference{ fh->ActionFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
+			L.Push(luaext::Reference{ fh->ActionFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
 		else
 			L.Push("no compiled func found");
 		return 2;
 	}
-	int ButtonCallActionFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int ButtonCallActionFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CButtonHelper* fh = wid->GetButtonHelper();
 		if (!fh)
@@ -301,8 +275,7 @@ namespace CppLogic::UI {
 		fh->ActionFunction.Call(wid->WidgetID);
 		return 0;
 	}
-	int ButtonOverrideActionFunc(lua::State ls) {
-		luaext::EState L{ ls };
+	int ButtonOverrideActionFunc(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CButtonHelper* fh = wid->GetButtonHelper();
 		if (!fh)
@@ -311,8 +284,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetIsTooltipShown(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetIsTooltipShown(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CToolTipHelper* tt = wid->GetTooltipHelper();
 		if (!tt)
@@ -321,8 +293,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int WidgetSetFont(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetFont(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CWidgetStringHelper* s = wid->GetStringHelper();
 		if (!s)
@@ -333,16 +304,14 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetGetBaseData(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetBaseData(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		L.Push(wid->ZPriority);
 		L.Push(wid->ForceToHandleMouseEventsFlag);
 		L.Push(wid->ForceToNeverBeFoundFlag);
 		return 3;
 	}
-	int WidgetSetBaseData(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetBaseData(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		if (L.IsNumber(2))
 			wid->ZPriority = L.CheckFloat(2);
@@ -353,8 +322,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetGetStringFrameDistance(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetGetStringFrameDistance(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CWidgetStringHelper* s = wid->GetStringHelper();
 		if (!s)
@@ -362,8 +330,7 @@ namespace CppLogic::UI {
 		L.Push(s->StringFrameDistance);
 		return 1;
 	}
-	int WidgetSetStringFrameDistance(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetStringFrameDistance(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CWidgetStringHelper* s = wid->GetStringHelper();
 		if (!s)
@@ -372,8 +339,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int StaticTextWidgetGetLineDistanceFactor(lua::State ls) {
-		luaext::EState L{ ls };
+	int StaticTextWidgetGetLineDistanceFactor(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
 		if (!tw)
@@ -381,8 +347,7 @@ namespace CppLogic::UI {
 		L.Push(tw->LineDistanceFactor);
 		return 1;
 	}
-	int StaticTextWidgetSetLineDistanceFactor(lua::State ls) {
-		luaext::EState L{ ls };
+	int StaticTextWidgetSetLineDistanceFactor(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* tw = dynamic_cast<EGUIX::CStaticTextWidget*>(wid);
 		if (!tw)
@@ -391,8 +356,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ButtonGetShortcutString(lua::State ls) {
-		luaext::EState L{ ls };
+	int ButtonGetShortcutString(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CButtonHelper* b = wid->GetButtonHelper();
 		if (!b)
@@ -401,8 +365,7 @@ namespace CppLogic::UI {
 		L.Push(b->ShortCutString.StringTableKey.c_str());
 		return 2;
 	}
-	int ButtonSetShortcutString(lua::State ls) {
-		luaext::EState L{ ls };
+	int ButtonSetShortcutString(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		EGUIX::CButtonHelper* b = wid->GetButtonHelper();
 		if (!b)
@@ -411,8 +374,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int WidgetSetGroup(lua::State ls) {
-		luaext::EState L{ ls };
+	int WidgetSetGroup(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		const char* s = L.CheckString(2);
 		EGUIX::CWidgetGroupManager* wgm = EGUIX::CWidgetGroupManager::GlobalObj();
@@ -423,8 +385,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int TextButtonSetCenterText(lua::State ls) {
-		luaext::EState L{ ls };
+	int TextButtonSetCenterText(luaext::State L) {
 		auto* b = BB::IdentifierCast<EGUIX::CTextButtonWidget>(L.CheckWidget(1));
 		if (b == nullptr)
 			throw lua::LuaException{ "no textbutton" };
@@ -432,8 +393,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ContainerWidgetCreateStaticWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreateStaticWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -449,8 +409,7 @@ namespace CppLogic::UI {
 		L.Push(c->WidgetID);
 		return 1;
 	}
-	int ContainerWidgetCreateStaticTextWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreateStaticTextWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -466,8 +425,7 @@ namespace CppLogic::UI {
 		L.Push(c->WidgetID);
 		return 1;
 	}
-	int ContainerWidgetCreatePureTooltipWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreatePureTooltipWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -483,8 +441,7 @@ namespace CppLogic::UI {
 		L.Push(c->WidgetID);
 		return 1;
 	}
-	int ContainerWidgetCreateGFXButtonWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreateGFXButtonWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -500,8 +457,7 @@ namespace CppLogic::UI {
 		L.Push(c->WidgetID);
 		return 1;
 	}
-	int ContainerWidgetCreateTextButtonWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreateTextButtonWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -517,8 +473,7 @@ namespace CppLogic::UI {
 		L.Push(c->WidgetID);
 		return 1;
 	}
-	int ContainerWidgetCreateProgressBarWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreateProgressBarWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -534,8 +489,7 @@ namespace CppLogic::UI {
 		L.Push(c->WidgetID);
 		return 1;
 	}
-	int ContainerWidgetCreateContainerWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreateContainerWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -551,8 +505,7 @@ namespace CppLogic::UI {
 		L.Push(c->WidgetID);
 		return 1;
 	}
-	int ContainerWidgetCreateCustomWidgetChild(lua::State ls) {
-		luaext::EState L{ ls };
+	int ContainerWidgetCreateCustomWidgetChild(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (!c)
@@ -580,8 +533,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int FontGetConfig(lua::State ls) {
-		luaext::EState L{ ls };
+	int FontGetConfig(luaext::State L) {
 		const char* font = L.CheckString(1);
 		CheckFontString(font);
 		shok::FontId id = shok::FontId::Invalid;
@@ -592,8 +544,7 @@ namespace CppLogic::UI {
 		L.Push(f->Spacing);
 		return 3;
 	}
-	int FontSetConfig(lua::State ls) {
-		luaext::EState L{ ls };
+	int FontSetConfig(luaext::State L) {
 		const char* font = L.CheckString(1);
 		CheckFontString(font);
 		shok::FontId id = shok::FontId::Invalid;
@@ -608,8 +559,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int PreLoadGUITexture(lua::State ls) {
-		luaext::EState L{ ls };
+	int PreLoadGUITexture(luaext::State L) {
 		const char* n = L.CheckString(1);
 		if (!BB::CFileSystemMgr::DoesFileExist(n))
 			throw lua::LuaException{ "files does not exist" };
@@ -620,8 +570,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int RemoveWidget(lua::State ls) {
-		luaext::EState L{ ls };
+	int RemoveWidget(luaext::State L) {
 		EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 		auto* cw = dynamic_cast<EGUIX::CContainerWidget*>(wid);
 		if (cw)
@@ -631,8 +580,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ReorderWidgets(lua::State ls) {
-		luaext::EState L{ ls };
+	int ReorderWidgets(luaext::State L) {
 		EGUIX::CBaseWidget* tomove = L.CheckWidget(1);
 		EGUIX::CBaseWidget* before = L.IsNoneOrNil(2) ? nullptr : L.CheckWidget(2);
 		if (before != nullptr && tomove->MotherWidgetID != before->MotherWidgetID)
@@ -647,7 +595,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ReloadGUI(lua::State L) {
+	int ReloadGUI(luaext::State L) {
 		const char* str = L.OptString(1, R"(Data\Menu\Projects\Ingame.xml)");
 		if (!BB::CFileSystemMgr::DoesFileExist(str))
 			throw lua::LuaException{ "files does not exist" };
@@ -655,7 +603,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int SetShowWoodInUI(lua::State L) {
+	int SetShowWoodInUI(luaext::State L) {
 		bool s = L.CheckBool(1);
 		GGUI::C3DOnScreenInformationCustomWidget::HookResourceFloatieShowWood(s);
 		GGUI::C3DOnScreenInformationCustomWidget::HookResourceElementWood(s);
@@ -663,7 +611,7 @@ namespace CppLogic::UI {
 	}
 
 	bool SetCharTrigger_CB(int c) {
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 		bool r = false;
 
@@ -678,8 +626,7 @@ namespace CppLogic::UI {
 		L.SetTop(t);
 		return r;
 	}
-	int SetCharTrigger(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetCharTrigger(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
@@ -704,7 +651,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 	bool SetKeyTrigger_CB(int c, win_mouseEvents id) {
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 		bool r = false;
 
@@ -720,8 +667,7 @@ namespace CppLogic::UI {
 		L.SetTop(t);
 		return r;
 	}
-	int SetKeyTrigger(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetKeyTrigger(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
@@ -749,7 +695,7 @@ namespace CppLogic::UI {
 		if (id == win_mouseEvents::MouseMove)
 			return false;
 
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 		bool r = false;
 
@@ -779,8 +725,7 @@ namespace CppLogic::UI {
 		L.SetTop(t);
 		return r;
 	}
-	int SetMouseTrigger(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetMouseTrigger(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
@@ -804,8 +749,7 @@ namespace CppLogic::UI {
 		}
 		return 0;
 	}
-	int SetMouseTriggerMainMenu(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetMouseTriggerMainMenu(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
@@ -830,7 +774,7 @@ namespace CppLogic::UI {
 				if ((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu)
 					return false;
 
-				lua::State L{ shok::LuaStateMainmenu };
+				luaext::State L{ shok::LuaStateMainmenu };
 				int t = L.GetTop();
 				bool r = false;
 
@@ -863,20 +807,18 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ShowResourceFloatieOnEntity(lua::State ls) {
-		luaext::EState L{ ls };
+	int ShowResourceFloatieOnEntity(luaext::State L) {
 		(*GGUI::C3DOnScreenInformationCustomWidget::GlobalObj)->ShowResourceFloatieOnEntity(L.CheckEntity(1)->EntityId, L.CheckInt(2));
 		return 0;
 	}
 
-	int ShowAdvancedFloatie(lua::State ls) {
-		luaext::EState L{ ls };
+	int ShowAdvancedFloatie(luaext::State L) {
 		GGUI::C3DOnScreenInformationCustomWidget::HookAdditionalFloaties();
 		GGUI::AdvancedFloatieManager::GlobalObj.AddFloatie(L.CheckPos(1), L.CheckStringView(2));
 		return 0;
 	}
 
-	int GetClientSize(lua::State L) {
+	int GetClientSize(luaext::State L) {
 		RECT r;
 		if (GetClientRect(*shok::MainWindowHandle, &r)) {
 			L.Push(static_cast<double>(r.right));
@@ -886,7 +828,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int GetMousePosDirect(lua::State L) {
+	int GetMousePosDirect(luaext::State L) {
 		RECT r;
 		if (!GetClientRect(*shok::MainWindowHandle, &r))
 			return 0;
@@ -903,35 +845,31 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int GetWidgetName(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetWidgetName(luaext::State L) {
 		EGUIX::CBaseWidget* w = L.CheckWidget(1);
 		L.Push(EGUIX::WidgetManager::GlobalObj()->WidgetNameManager->GetNameByID(static_cast<int>(w->WidgetID)));
 		return 1;
 	}
 
-	int GetLandscapePosAtScreenPos(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetLandscapePosAtScreenPos(luaext::State L) {
 		int x = L.CheckInt(1);
 		int y = L.CheckInt(2);
 		shok::PositionRot p;
 		if ((*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainPosAtScreenCoords(p, x, y)) {
-			L.PushPos(p);
+			L.Push(p);
 			L.Push(p.r);
 			return 2;
 		}
 		return 0;
 	}
 
-	int ShowCommandAcknowledgementAtPosition(lua::State ls) {
-		luaext::EState L{ ls };
+	int ShowCommandAcknowledgementAtPosition(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		(*ED::CGlobalsBaseEx::GlobalObj)->CommandAcks->ShowAck(p);
 		return 0;
 	}
 
-	int CreateMiniMapMarker(lua::State ls) {
-		luaext::EState L{ ls };
+	int CreateMiniMapMarker(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		bool pulsing = L.CheckBool(2);
 		int r = L.CheckInt(3);
@@ -949,8 +887,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int CreateMiniMapScriptSignal(lua::State ls) {
-		luaext::EState L{ ls };
+	int CreateMiniMapScriptSignal(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		int r = L.CheckInt(2);
 		if (r < 0 || r > 255)
@@ -966,12 +903,12 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int GetCutsceneFarClipPlaneMinAndMax(lua::State L) {
+	int GetCutsceneFarClipPlaneMinAndMax(luaext::State L) {
 		L.Push(*ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMax);
 		L.Push(*ERwTools::CRwCameraHandler::CutsceneFarClipPlaneMin);
 		return 2;
 	}
-	int SetCutsceneFarClipPlaneMinAndMax(lua::State L) {
+	int SetCutsceneFarClipPlaneMinAndMax(luaext::State L) {
 		float max = L.CheckFloat(1);
 		float min = L.CheckFloat(2);
 		if (max < min)
@@ -983,8 +920,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int SetGUIStateLuaSelection(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetGUIStateLuaSelection(luaext::State L) {
 		L.CheckType(1, lua::LType::Function);
 		auto* vh = GGUI::CManager::GlobalObj()->C3DViewHandler;
 		vh->StateIdManager->GetIDByNameOrCreate(GUIState_LuaSelection::Name, GUIState_LuaSelection::Id); // make sure the state id exists
@@ -1000,8 +936,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int SetGUIStatePlaceBuildingEx(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetGUIStatePlaceBuildingEx(luaext::State L) {
 		auto* vh = GGUI::CManager::GlobalObj()->C3DViewHandler;
 		vh->StateIdManager->GetIDByNameOrCreate(GUIState_PlaceBuildingEx::Name, GUIState_PlaceBuildingEx::Id); // make sure the state id exists
 		GGUI::SPlaceBuildingStateParameters p{ L.CheckEnum<shok::UpgradeCategoryId>(1) };
@@ -1009,7 +944,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int SetPlaceBuildingRotation(lua::State L) {
+	int SetPlaceBuildingRotation(luaext::State L) {
 		//GGUI::CPlaceBuildingState::HookPlacementRotation();
 		auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
 		if (s) {
@@ -1018,7 +953,7 @@ namespace CppLogic::UI {
 		}
 		return 0;
 	}
-	int GetPlaceBuildingRotation(lua::State L) {
+	int GetPlaceBuildingRotation(luaext::State L) {
 		auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
 		if (!s)
 			return 0;
@@ -1026,8 +961,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int GetPlaceBuildingUCat(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetPlaceBuildingUCat(luaext::State L) {
 		auto s = GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState;
 		if (auto* pb = dynamic_cast<GGUI::CPlaceBuildingState*>(s)) {
 			L.Push(pb->UpgradeCategory);
@@ -1041,16 +975,14 @@ namespace CppLogic::UI {
 		throw lua::LuaException{ "invalid gui state" };
 	}
 
-	int GetWidgetAtPosition(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetWidgetAtPosition(luaext::State L) {
 		float p[2]{ L.CheckFloat(2), L.CheckFloat(3) };
 		auto* rel = L.CheckWidget(1);
 		L.Push(rel->GetMouseOverWidget(p, true, false));
 		return 1;
 	}
 
-	int StringInputWidgetGetIgnoreNextChar(lua::State ls) {
-		luaext::EState L{ ls };
+	int StringInputWidgetGetIgnoreNextChar(luaext::State L) {
 		auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "no customwidget" };
@@ -1060,8 +992,7 @@ namespace CppLogic::UI {
 		L.Push(cw->IgnoreNextChar);
 		return 1;
 	}
-	int StringInputWidgetSetIgnoreNextChar(lua::State ls) {
-		luaext::EState L{ ls };
+	int StringInputWidgetSetIgnoreNextChar(luaext::State L) {
 		auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "no customwidget" };
@@ -1072,8 +1003,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int StringInputWidgetSetBufferSize(lua::State ls) {
-		luaext::EState L{ ls };
+	int StringInputWidgetSetBufferSize(luaext::State L) {
 		auto* w = dynamic_cast<EGUIX::CCustomWidget*>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "no customwidget" };
@@ -1088,8 +1018,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int GetShortMessages(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetShortMessages(luaext::State L) {
 		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
 		int i = 1;
 		auto dump = [&L, &i](const GGUI::CShortMessagesWindowControllerCustomWidget::Message& m) {
@@ -1110,7 +1039,7 @@ namespace CppLogic::UI {
 			L.Push(m.Tooltip.c_str());
 			L.SetTableRaw(-3);
 			L.Push("Pos");
-			L.PushPos(m.Pos);
+			L.Push(m.Pos);
 			L.SetTableRaw(-3);
 			L.SetTableRaw(-2, i);
 			++i;
@@ -1128,14 +1057,13 @@ namespace CppLogic::UI {
 		return 2;
 	}
 
-	int ReInitShortMessagesSize(lua::State L) {
+	int ReInitShortMessagesSize(luaext::State L) {
 		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
 		mes->Initialize();
 		return 0;
 	}
 
-	int CreateShortMessage(lua::State ls) {
-		luaext::EState L{ ls };
+	int CreateShortMessage(luaext::State L) {
 		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
 		shok::Position po{};
 		shok::Position* p = nullptr;
@@ -1149,14 +1077,13 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int RemoveShortMessage(lua::State L) {
+	int RemoveShortMessage(luaext::State L) {
 		auto* mes = *GGUI::CShortMessagesWindowControllerCustomWidget::GlobalObj;
 		mes->StandardMessage.RemoveMessage(L.CheckInt(1));
 		return 0;
 	}
 
-	int InitAutoScrollCustomWidget(lua::State l) {
-		luaext::EState L{ l };
+	int InitAutoScrollCustomWidget(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1169,8 +1096,7 @@ namespace CppLogic::UI {
 		L.Push(sc->WidgetCount);
 		return 2;
 	}
-	int GetAutoScrollCustomWidgetOffset(lua::State l) {
-		luaext::EState L{ l };
+	int GetAutoScrollCustomWidgetOffset(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1182,8 +1108,7 @@ namespace CppLogic::UI {
 		L.Push(sc->ElementCount);
 		return 3;
 	}
-	int AutoScrollCustomWidgetModOffset(lua::State l) {
-		luaext::EState L{ l };
+	int AutoScrollCustomWidgetModOffset(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1195,8 +1120,7 @@ namespace CppLogic::UI {
 		sc->Update();
 		return 0;
 	}
-	int AutoScrollCustomWidgetSetOffset(lua::State l) {
-		luaext::EState L{ l };
+	int AutoScrollCustomWidgetSetOffset(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1208,8 +1132,7 @@ namespace CppLogic::UI {
 		sc->Update();
 		return 0;
 	}
-	int AutoScrollCustomWidgetSetMaterial(lua::State l) {
-		luaext::EState L{ l };
+	int AutoScrollCustomWidgetSetMaterial(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1227,8 +1150,7 @@ namespace CppLogic::UI {
 		sc->PartialWidget.Color.Alpha = L.CheckInt(10);
 		return 0;
 	}
-	int TextInputCustomWidgetGetText(lua::State l) {
-		luaext::EState L{ l };
+	int TextInputCustomWidgetGetText(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1239,8 +1161,7 @@ namespace CppLogic::UI {
 		L.Push(str);
 		return 1;
 	}
-	int TextInputCustomWidgetSetText(lua::State l) {
-		luaext::EState L{ l };
+	int TextInputCustomWidgetSetText(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1252,8 +1173,7 @@ namespace CppLogic::UI {
 		t->RefreshDisplayText();
 		return 0;
 	}
-	int TextInputCustomWidgetSetIgnoreNextChar(lua::State l) {
-		luaext::EState L{ l };
+	int TextInputCustomWidgetSetIgnoreNextChar(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1263,8 +1183,7 @@ namespace CppLogic::UI {
 		t->IgnoreNextChar = L.CheckBool(2);
 		return 0;
 	}
-	int InputCustomWidgetHasFocus(lua::State l) {
-		luaext::EState L{ l };
+	int InputCustomWidgetHasFocus(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1274,8 +1193,7 @@ namespace CppLogic::UI {
 		L.Push(t->HasFocus());
 		return 1;
 	}
-	int InputCustomWidgetSetFocus(lua::State l) {
-		luaext::EState L{ l };
+	int InputCustomWidgetSetFocus(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1289,7 +1207,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int DumpVideoModes(lua::State L) {
+	int DumpVideoModes(luaext::State L) {
 		L.NewTable();
 		RWE::RwVideoMode m{};
 		int ma = RWE::RwVideoMode::GetNumVideoModes();
@@ -1327,7 +1245,7 @@ namespace CppLogic::UI {
 		return 2;
 	}
 
-	int GetCameraData(lua::State L) {
+	int GetCameraData(luaext::State L) {
 		auto* cam = dynamic_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj);
 		L.Push(cam->CameraInfo.LookAtX);
 		L.Push(cam->CameraInfo.LookAtY);
@@ -1344,7 +1262,7 @@ namespace CppLogic::UI {
 		return 6;
 	}
 
-	int SetCameraData(lua::State L) {
+	int SetCameraData(luaext::State L) {
 		auto* cam = dynamic_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj);
 		cam->CameraInfo.LookAtX = L.CheckFloat(1);
 		cam->CameraInfo.LookAtY = L.CheckFloat(2);
@@ -1355,7 +1273,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ListCutscenes(lua::State L) {
+	int ListCutscenes(luaext::State L) {
 		ECS::CManager* m = **ECS::CManager::GlobalObj;
 		L.NewTable();
 		int i = 1;
@@ -1367,7 +1285,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int GetCutscene(lua::State L) {
+	int GetCutscene(luaext::State L) {
 		ECS::CManager* m = **ECS::CManager::GlobalObj;
 		auto n = L.CheckStringView(1);
 		for (auto& c : m->Cutscenes) {
@@ -1379,7 +1297,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int SetCutscene(lua::State L) {
+	int SetCutscene(luaext::State L) {
 		ECS::CManager* m = **ECS::CManager::GlobalObj;
 		auto n = L.CheckStringView(1);
 		ECS::Cutscene* cs = nullptr;
@@ -1403,7 +1321,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int ExportCutscenes(lua::State L) {
+	int ExportCutscenes(luaext::State L) {
 		CppLogic::WinAPI::FileDialog dlg{};
 		dlg.Filter = "CutsceneNames.xml\0CutsceneNames.xml\0";
 		dlg.Title = "Export Cutscenes to";
@@ -1417,8 +1335,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int VideoCustomWidgetGetVideoSize(lua::State l) {
-		luaext::EState L{ l };
+	int VideoCustomWidgetGetVideoSize(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1434,8 +1351,7 @@ namespace CppLogic::UI {
 		return 2;
 	}
 
-	int VideoCustomWidgetSetVideoSize(lua::State l) {
-		luaext::EState L{ l };
+	int VideoCustomWidgetSetVideoSize(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1448,8 +1364,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int MiniMapOverlaySetCallbackFuncName(lua::State l) {
-		luaext::EState L{ l };
+	int MiniMapOverlaySetCallbackFuncName(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
 		if (w == nullptr)
 			throw lua::LuaException{ "not a customwidget" };
@@ -1467,8 +1382,7 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
-	int CreateSelectionDecal(lua::State l) {
-		luaext::EState L{ l };
+	int CreateSelectionDecal(luaext::State L) {
 
 		auto t = L.CheckEnum<shok::SelectionTextureId>(1);
 		shok::Position p = L.CheckPos(2);
@@ -1486,7 +1400,7 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
-	int InitNetHandlers(lua::State L) {
+	int InitNetHandlers(luaext::State L) {
 		auto* gl = *GGL::CGLGameLogic::GlobalObj;
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_LightningStrike_Activate>(Mod::LightningStrikeAbility::NetEventLightningStrike);
 		gl->CreateNetEventHandler<shok::NetEventIds::CppL_ResDoodadRefill_Activate>(Mod::ResDoodadRefillBehavior::NetEventRefillResDoodad);
@@ -1506,10 +1420,10 @@ namespace CppLogic::UI {
 	}
 
 	GUIState_LuaSelection::~GUIState_LuaSelection() {
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
-		if (RefOnKlick != lua::State::NoRef)
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if (RefOnKlick != luaext::State::NoRef)
 			L.UnRef(RefOnKlick, L.REGISTRYINDEX);
-		if (RefOnCancel != lua::State::NoRef)
+		if (RefOnCancel != luaext::State::NoRef)
 			L.UnRef(RefOnCancel, L.REGISTRYINDEX);
 	}
 
@@ -1523,8 +1437,8 @@ namespace CppLogic::UI {
 		if (mev && mev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
 			if (mev->IsKey(shok::Keys::MouseLButton)) {
 				bool r = true;
-				if (RefOnKlick != lua::State::NoRef) {
-					lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+				if (RefOnKlick != luaext::State::NoRef) {
+					luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 					int i = L.GetTop();
 					L.Push(RefOnKlick, L.REGISTRYINDEX);
 					L.Push(mev->X);
@@ -1565,8 +1479,8 @@ namespace CppLogic::UI {
 
 	void GUIState_LuaSelection::Cancel(bool calllua)
 	{
-		if (calllua && RefOnCancel != lua::State::NoRef) {
-			lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		if (calllua && RefOnCancel != luaext::State::NoRef) {
+			luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 			int i = L.GetTop();
 			L.Push(RefOnCancel, L.REGISTRYINDEX);
 			L.PCall(0, 0, 0);
@@ -1676,7 +1590,7 @@ namespace CppLogic::UI {
 					}
 				}
 				GGUI::CManager::PostEventFromUI(&ev);
-				lua::State L{ m->GameState };
+				luaext::State L{ m->GameState };
 				int top = L.GetTop();
 				L.GetGlobal("GameCallback_GUI_AfterBuildingPlacement");
 				L.PCall(0, 0);
@@ -1751,7 +1665,7 @@ namespace CppLogic::UI {
 		UpdateModel(MouseX, MouseY);
 	}
 
-	void Cleanup(lua::State L) {
+	void Cleanup(luaext::State L) {
 		EGUIX::UIInput_Char_Callback = nullptr;
 		EGUIX::UIInput_Key_Callback = nullptr;
 		EGUIX::UIInput_Mouse_Callback = nullptr;
@@ -1775,7 +1689,7 @@ namespace CppLogic::UI {
 		TerrainDecalAccess::Cleanup();
 	}
 
-	void OnSaveLoaded(lua::State L)
+	void OnSaveLoaded(luaext::State L)
 	{
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
 
@@ -1817,7 +1731,7 @@ namespace CppLogic::UI {
 		Destroy();
 	}
 
-	int CppLogic::UI::TerrainDecalAccess::Destroy(lua::State L)
+	int CppLogic::UI::TerrainDecalAccess::Destroy(luaext::State L)
 	{
 		L.CheckUserClass<TerrainDecalAccess>(1)->Destroy();
 		return 0;
@@ -1830,12 +1744,12 @@ namespace CppLogic::UI {
 			Actives.erase(i);
 	}
 
-	int CppLogic::UI::TerrainDecalAccess::SetPos(lua::State L)
+	int CppLogic::UI::TerrainDecalAccess::SetPos(luaext::State L)
 	{
 		auto* th = L.CheckUserClass<TerrainDecalAccess>(1);
 		if (th->Decal == nullptr)
 			throw lua::LuaException{ "already destroyed" };
-		auto p = luaext::EState{ L }.CheckPos(2);
+		auto p = L.CheckPos(2);
 		th->Decal->SetPos(p.X, p.Y);
 		return 0;
 	}
@@ -1849,103 +1763,103 @@ namespace CppLogic::UI {
 	}
 
 	constexpr std::array UI{
-		lua::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
-		lua::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
-		lua::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
-		lua::FuncReference::GetRef<WidgetSetUpdateManualFlag>("WidgetSetUpdateManualFlag"),
-		lua::FuncReference::GetRef<WidgetGetUpdateFunc>("WidgetGetUpdateFunc"),
-		lua::FuncReference::GetRef<WidgetCallUpdateFunc>("WidgetCallUpdateFunc"),
-		lua::FuncReference::GetRef<WidgetOverrideUpdateFunc>("WidgetOverrideUpdateFunc"),
-		lua::FuncReference::GetRef<ContainerWidgetGetAllChildren>("ContainerWidgetGetAllChildren"),
-		lua::FuncReference::GetRef<WidgetMaterialGetTextureCoordinates>("WidgetMaterialGetTextureCoordinates"),
-		lua::FuncReference::GetRef<WidgetMaterialSetTextureCoordinates>("WidgetMaterialSetTextureCoordinates"),
-		lua::FuncReference::GetRef<ButtonGetActionFunc>("ButtonGetActionFunc"),
-		lua::FuncReference::GetRef<ButtonCallActionFunc>("ButtonCallActionFunc"),
-		lua::FuncReference::GetRef<ButtonOverrideActionFunc>("ButtonOverrideActionFunc"),
-		lua::FuncReference::GetRef<WidgetGetTooltipData>("WidgetGetTooltipData"),
-		lua::FuncReference::GetRef<WidgetSetTooltipData>("WidgetSetTooltipData"),
-		lua::FuncReference::GetRef<WidgetGetTooltipString>("WidgetGetTooltipString"),
-		lua::FuncReference::GetRef<WidgetSetTooltipString>("WidgetSetTooltipString"),
-		lua::FuncReference::GetRef<WidgetGetTooltipFunc>("WidgetGetTooltipFunc"),
-		lua::FuncReference::GetRef<WidgetCallTooltipFunc>("WidgetCallTooltipFunc"),
-		lua::FuncReference::GetRef<WidgetOverrideTooltipFunc>("WidgetOverrideTooltipFunc"),
-		lua::FuncReference::GetRef<WidgetIsTooltipShown>("WidgetIsTooltipShown"),
-		lua::FuncReference::GetRef<WidgetSetFont>("WidgetSetFont"),
-		lua::FuncReference::GetRef<WidgetGetBaseData>("WidgetGetBaseData"),
-		lua::FuncReference::GetRef<WidgetSetBaseData>("WidgetSetBaseData"),
-		lua::FuncReference::GetRef<WidgetGetStringFrameDistance>("WidgetGetStringFrameDistance"),
-		lua::FuncReference::GetRef<WidgetSetStringFrameDistance>("WidgetSetStringFrameDistance"),
-		lua::FuncReference::GetRef<StaticTextWidgetGetLineDistanceFactor>("StaticTextWidgetGetLineDistanceFactor"),
-		lua::FuncReference::GetRef<StaticTextWidgetSetLineDistanceFactor>("StaticTextWidgetSetLineDistanceFactor"),
-		lua::FuncReference::GetRef<ButtonGetShortcutString>("ButtonGetShortcutString"),
-		lua::FuncReference::GetRef<ButtonSetShortcutString>("ButtonSetShortcutString"),
-		lua::FuncReference::GetRef<WidgetSetGroup>("WidgetSetGroup"),
-		lua::FuncReference::GetRef<TextButtonSetCenterText>("TextButtonSetCenterText"),
-		lua::FuncReference::GetRef<FontGetConfig>("FontGetConfig"),
-		lua::FuncReference::GetRef<FontSetConfig>("FontSetConfig"),
-		lua::FuncReference::GetRef<PreLoadGUITexture>("PreLoadGUITexture"),
-		lua::FuncReference::GetRef<ContainerWidgetCreateStaticWidgetChild>("ContainerWidgetCreateStaticWidgetChild"),
-		lua::FuncReference::GetRef<ContainerWidgetCreateStaticTextWidgetChild>("ContainerWidgetCreateStaticTextWidgetChild"),
-		lua::FuncReference::GetRef<ContainerWidgetCreatePureTooltipWidgetChild>("ContainerWidgetCreatePureTooltipWidgetChild"),
-		lua::FuncReference::GetRef<ContainerWidgetCreateGFXButtonWidgetChild>("ContainerWidgetCreateGFXButtonWidgetChild"),
-		lua::FuncReference::GetRef<ContainerWidgetCreateTextButtonWidgetChild>("ContainerWidgetCreateTextButtonWidgetChild"),
-		lua::FuncReference::GetRef<ContainerWidgetCreateProgressBarWidgetChild>("ContainerWidgetCreateProgressBarWidgetChild"),
-		lua::FuncReference::GetRef<ContainerWidgetCreateContainerWidgetChild>("ContainerWidgetCreateContainerWidgetChild"),
-		lua::FuncReference::GetRef<ContainerWidgetCreateCustomWidgetChild>("ContainerWidgetCreateCustomWidgetChild"),
-		lua::FuncReference::GetRef<SetCharTrigger>("SetCharTrigger"),
-		lua::FuncReference::GetRef<SetKeyTrigger>("SetKeyTrigger"),
-		lua::FuncReference::GetRef<SetMouseTrigger>("SetMouseTrigger"),
-		lua::FuncReference::GetRef<ShowResourceFloatieOnEntity>("ShowResourceFloatieOnEntity"),
-		lua::FuncReference::GetRef<ShowAdvancedFloatie>("ShowAdvancedFloatie"),
-		lua::FuncReference::GetRef<GetClientSize>("GetClientSize"),
-		lua::FuncReference::GetRef<GetMousePosDirect>("GetMousePosDirect"),
-		lua::FuncReference::GetRef<IsContainerWidget>("IsContainerWidget"),
-		lua::FuncReference::GetRef<GetWidgetName>("GetWidgetName"),
-		lua::FuncReference::GetRef<SetGUIStateLuaSelection>("SetGUIStateLuaSelection"),
-		lua::FuncReference::GetRef<GetLandscapePosAtScreenPos>("GetLandscapePosAtScreenPos"),
-		lua::FuncReference::GetRef<ShowCommandAcknowledgementAtPosition>("ShowCommandAcknowledgementAtPosition"),
-		lua::FuncReference::GetRef<CreateMiniMapMarker>("CreateMiniMapMarker"),
-		lua::FuncReference::GetRef<CreateMiniMapScriptSignal>("CreateMiniMapScriptSignal"),
-		lua::FuncReference::GetRef<GetCutsceneFarClipPlaneMinAndMax>("GetCutsceneFarClipPlaneMinAndMax"),
-		lua::FuncReference::GetRef<SetCutsceneFarClipPlaneMinAndMax>("SetCutsceneFarClipPlaneMinAndMax"),
-		lua::FuncReference::GetRef<ReloadGUI>("ReloadGUI"),
-		lua::FuncReference::GetRef<SetShowWoodInUI>("SetShowWoodInUI"),
-		lua::FuncReference::GetRef<SetGUIStatePlaceBuildingEx>("SetGUIStatePlaceBuildingEx"),
-		lua::FuncReference::GetRef<SetPlaceBuildingRotation>("SetPlaceBuildingRotation"),
-		lua::FuncReference::GetRef<GetPlaceBuildingRotation>("GetPlaceBuildingRotation"),
-		lua::FuncReference::GetRef<GetPlaceBuildingUCat>("GetPlaceBuildingUCat"),
-		lua::FuncReference::GetRef<GetWidgetAtPosition>("GetWidgetAtPosition"),
-		lua::FuncReference::GetRef<StringInputWidgetGetIgnoreNextChar>("StringInputWidgetGetIgnoreNextChar"),
-		lua::FuncReference::GetRef<StringInputWidgetSetIgnoreNextChar>("StringInputWidgetSetIgnoreNextChar"),
-		lua::FuncReference::GetRef<StringInputWidgetSetBufferSize>("StringInputWidgetSetBufferSize"),
-		lua::FuncReference::GetRef<GetShortMessages>("GetShortMessages"),
-		lua::FuncReference::GetRef<ReInitShortMessagesSize>("ReInitShortMessagesSize"),
-		lua::FuncReference::GetRef<CreateShortMessage>("CreateShortMessage"),
-		lua::FuncReference::GetRef<RemoveShortMessage>("RemoveShortMessage"),
-		lua::FuncReference::GetRef<InitAutoScrollCustomWidget>("InitAutoScrollCustomWidget"),
-		lua::FuncReference::GetRef<GetAutoScrollCustomWidgetOffset>("GetAutoScrollCustomWidgetOffset"),
-		lua::FuncReference::GetRef<AutoScrollCustomWidgetModOffset>("AutoScrollCustomWidgetModOffset"),
-		lua::FuncReference::GetRef<AutoScrollCustomWidgetSetOffset>("AutoScrollCustomWidgetSetOffset"),
-		lua::FuncReference::GetRef<AutoScrollCustomWidgetSetMaterial>("AutoScrollCustomWidgetSetMaterial"),
-		lua::FuncReference::GetRef<TextInputCustomWidgetGetText>("TextInputCustomWidgetGetText"),
-		lua::FuncReference::GetRef<TextInputCustomWidgetSetText>("TextInputCustomWidgetSetText"),
-		lua::FuncReference::GetRef<TextInputCustomWidgetSetIgnoreNextChar>("TextInputCustomWidgetSetIgnoreNextChar"),
-		lua::FuncReference::GetRef<InputCustomWidgetHasFocus>("InputCustomWidgetHasFocus"),
-		lua::FuncReference::GetRef<InputCustomWidgetSetFocus>("InputCustomWidgetSetFocus"),
-		lua::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
-		lua::FuncReference::GetRef<GetCameraData>("GetCameraData"),
-		lua::FuncReference::GetRef<SetCameraData>("SetCameraData"),
-		lua::FuncReference::GetRef<ListCutscenes>("ListCutscenes"),
-		lua::FuncReference::GetRef<GetCutscene>("GetCutscene"),
-		lua::FuncReference::GetRef<SetCutscene>("SetCutscene"),
-		lua::FuncReference::GetRef<ExportCutscenes>("ExportCutscenes"),
-		lua::FuncReference::GetRef<VideoCustomWidgetGetVideoSize>("VideoCustomWidgetGetVideoSize"),
-		lua::FuncReference::GetRef<VideoCustomWidgetSetVideoSize>("VideoCustomWidgetSetVideoSize"),
-		lua::FuncReference::GetRef<CreateSelectionDecal>("CreateSelectionDecal"),
-		lua::FuncReference::GetRef<InitNetHandlers>("InitNetHandlers"),
-		lua::FuncReference::GetRef<RemoveWidget>("RemoveWidget"),
-		lua::FuncReference::GetRef<ReorderWidgets>("ReorderWidgets"),
-		lua::FuncReference::GetRef<MiniMapOverlaySetCallbackFuncName>("MiniMapOverlaySetCallbackFuncName"),
+		luaext::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
+		luaext::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
+		luaext::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
+		luaext::FuncReference::GetRef<WidgetSetUpdateManualFlag>("WidgetSetUpdateManualFlag"),
+		luaext::FuncReference::GetRef<WidgetGetUpdateFunc>("WidgetGetUpdateFunc"),
+		luaext::FuncReference::GetRef<WidgetCallUpdateFunc>("WidgetCallUpdateFunc"),
+		luaext::FuncReference::GetRef<WidgetOverrideUpdateFunc>("WidgetOverrideUpdateFunc"),
+		luaext::FuncReference::GetRef<ContainerWidgetGetAllChildren>("ContainerWidgetGetAllChildren"),
+		luaext::FuncReference::GetRef<WidgetMaterialGetTextureCoordinates>("WidgetMaterialGetTextureCoordinates"),
+		luaext::FuncReference::GetRef<WidgetMaterialSetTextureCoordinates>("WidgetMaterialSetTextureCoordinates"),
+		luaext::FuncReference::GetRef<ButtonGetActionFunc>("ButtonGetActionFunc"),
+		luaext::FuncReference::GetRef<ButtonCallActionFunc>("ButtonCallActionFunc"),
+		luaext::FuncReference::GetRef<ButtonOverrideActionFunc>("ButtonOverrideActionFunc"),
+		luaext::FuncReference::GetRef<WidgetGetTooltipData>("WidgetGetTooltipData"),
+		luaext::FuncReference::GetRef<WidgetSetTooltipData>("WidgetSetTooltipData"),
+		luaext::FuncReference::GetRef<WidgetGetTooltipString>("WidgetGetTooltipString"),
+		luaext::FuncReference::GetRef<WidgetSetTooltipString>("WidgetSetTooltipString"),
+		luaext::FuncReference::GetRef<WidgetGetTooltipFunc>("WidgetGetTooltipFunc"),
+		luaext::FuncReference::GetRef<WidgetCallTooltipFunc>("WidgetCallTooltipFunc"),
+		luaext::FuncReference::GetRef<WidgetOverrideTooltipFunc>("WidgetOverrideTooltipFunc"),
+		luaext::FuncReference::GetRef<WidgetIsTooltipShown>("WidgetIsTooltipShown"),
+		luaext::FuncReference::GetRef<WidgetSetFont>("WidgetSetFont"),
+		luaext::FuncReference::GetRef<WidgetGetBaseData>("WidgetGetBaseData"),
+		luaext::FuncReference::GetRef<WidgetSetBaseData>("WidgetSetBaseData"),
+		luaext::FuncReference::GetRef<WidgetGetStringFrameDistance>("WidgetGetStringFrameDistance"),
+		luaext::FuncReference::GetRef<WidgetSetStringFrameDistance>("WidgetSetStringFrameDistance"),
+		luaext::FuncReference::GetRef<StaticTextWidgetGetLineDistanceFactor>("StaticTextWidgetGetLineDistanceFactor"),
+		luaext::FuncReference::GetRef<StaticTextWidgetSetLineDistanceFactor>("StaticTextWidgetSetLineDistanceFactor"),
+		luaext::FuncReference::GetRef<ButtonGetShortcutString>("ButtonGetShortcutString"),
+		luaext::FuncReference::GetRef<ButtonSetShortcutString>("ButtonSetShortcutString"),
+		luaext::FuncReference::GetRef<WidgetSetGroup>("WidgetSetGroup"),
+		luaext::FuncReference::GetRef<TextButtonSetCenterText>("TextButtonSetCenterText"),
+		luaext::FuncReference::GetRef<FontGetConfig>("FontGetConfig"),
+		luaext::FuncReference::GetRef<FontSetConfig>("FontSetConfig"),
+		luaext::FuncReference::GetRef<PreLoadGUITexture>("PreLoadGUITexture"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreateStaticWidgetChild>("ContainerWidgetCreateStaticWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreateStaticTextWidgetChild>("ContainerWidgetCreateStaticTextWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreatePureTooltipWidgetChild>("ContainerWidgetCreatePureTooltipWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreateGFXButtonWidgetChild>("ContainerWidgetCreateGFXButtonWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreateTextButtonWidgetChild>("ContainerWidgetCreateTextButtonWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreateProgressBarWidgetChild>("ContainerWidgetCreateProgressBarWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreateContainerWidgetChild>("ContainerWidgetCreateContainerWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetCreateCustomWidgetChild>("ContainerWidgetCreateCustomWidgetChild"),
+		luaext::FuncReference::GetRef<SetCharTrigger>("SetCharTrigger"),
+		luaext::FuncReference::GetRef<SetKeyTrigger>("SetKeyTrigger"),
+		luaext::FuncReference::GetRef<SetMouseTrigger>("SetMouseTrigger"),
+		luaext::FuncReference::GetRef<ShowResourceFloatieOnEntity>("ShowResourceFloatieOnEntity"),
+		luaext::FuncReference::GetRef<ShowAdvancedFloatie>("ShowAdvancedFloatie"),
+		luaext::FuncReference::GetRef<GetClientSize>("GetClientSize"),
+		luaext::FuncReference::GetRef<GetMousePosDirect>("GetMousePosDirect"),
+		luaext::FuncReference::GetRef<IsContainerWidget>("IsContainerWidget"),
+		luaext::FuncReference::GetRef<GetWidgetName>("GetWidgetName"),
+		luaext::FuncReference::GetRef<SetGUIStateLuaSelection>("SetGUIStateLuaSelection"),
+		luaext::FuncReference::GetRef<GetLandscapePosAtScreenPos>("GetLandscapePosAtScreenPos"),
+		luaext::FuncReference::GetRef<ShowCommandAcknowledgementAtPosition>("ShowCommandAcknowledgementAtPosition"),
+		luaext::FuncReference::GetRef<CreateMiniMapMarker>("CreateMiniMapMarker"),
+		luaext::FuncReference::GetRef<CreateMiniMapScriptSignal>("CreateMiniMapScriptSignal"),
+		luaext::FuncReference::GetRef<GetCutsceneFarClipPlaneMinAndMax>("GetCutsceneFarClipPlaneMinAndMax"),
+		luaext::FuncReference::GetRef<SetCutsceneFarClipPlaneMinAndMax>("SetCutsceneFarClipPlaneMinAndMax"),
+		luaext::FuncReference::GetRef<ReloadGUI>("ReloadGUI"),
+		luaext::FuncReference::GetRef<SetShowWoodInUI>("SetShowWoodInUI"),
+		luaext::FuncReference::GetRef<SetGUIStatePlaceBuildingEx>("SetGUIStatePlaceBuildingEx"),
+		luaext::FuncReference::GetRef<SetPlaceBuildingRotation>("SetPlaceBuildingRotation"),
+		luaext::FuncReference::GetRef<GetPlaceBuildingRotation>("GetPlaceBuildingRotation"),
+		luaext::FuncReference::GetRef<GetPlaceBuildingUCat>("GetPlaceBuildingUCat"),
+		luaext::FuncReference::GetRef<GetWidgetAtPosition>("GetWidgetAtPosition"),
+		luaext::FuncReference::GetRef<StringInputWidgetGetIgnoreNextChar>("StringInputWidgetGetIgnoreNextChar"),
+		luaext::FuncReference::GetRef<StringInputWidgetSetIgnoreNextChar>("StringInputWidgetSetIgnoreNextChar"),
+		luaext::FuncReference::GetRef<StringInputWidgetSetBufferSize>("StringInputWidgetSetBufferSize"),
+		luaext::FuncReference::GetRef<GetShortMessages>("GetShortMessages"),
+		luaext::FuncReference::GetRef<ReInitShortMessagesSize>("ReInitShortMessagesSize"),
+		luaext::FuncReference::GetRef<CreateShortMessage>("CreateShortMessage"),
+		luaext::FuncReference::GetRef<RemoveShortMessage>("RemoveShortMessage"),
+		luaext::FuncReference::GetRef<InitAutoScrollCustomWidget>("InitAutoScrollCustomWidget"),
+		luaext::FuncReference::GetRef<GetAutoScrollCustomWidgetOffset>("GetAutoScrollCustomWidgetOffset"),
+		luaext::FuncReference::GetRef<AutoScrollCustomWidgetModOffset>("AutoScrollCustomWidgetModOffset"),
+		luaext::FuncReference::GetRef<AutoScrollCustomWidgetSetOffset>("AutoScrollCustomWidgetSetOffset"),
+		luaext::FuncReference::GetRef<AutoScrollCustomWidgetSetMaterial>("AutoScrollCustomWidgetSetMaterial"),
+		luaext::FuncReference::GetRef<TextInputCustomWidgetGetText>("TextInputCustomWidgetGetText"),
+		luaext::FuncReference::GetRef<TextInputCustomWidgetSetText>("TextInputCustomWidgetSetText"),
+		luaext::FuncReference::GetRef<TextInputCustomWidgetSetIgnoreNextChar>("TextInputCustomWidgetSetIgnoreNextChar"),
+		luaext::FuncReference::GetRef<InputCustomWidgetHasFocus>("InputCustomWidgetHasFocus"),
+		luaext::FuncReference::GetRef<InputCustomWidgetSetFocus>("InputCustomWidgetSetFocus"),
+		luaext::FuncReference::GetRef<DumpVideoModes>("DumpVideoModes"),
+		luaext::FuncReference::GetRef<GetCameraData>("GetCameraData"),
+		luaext::FuncReference::GetRef<SetCameraData>("SetCameraData"),
+		luaext::FuncReference::GetRef<ListCutscenes>("ListCutscenes"),
+		luaext::FuncReference::GetRef<GetCutscene>("GetCutscene"),
+		luaext::FuncReference::GetRef<SetCutscene>("SetCutscene"),
+		luaext::FuncReference::GetRef<ExportCutscenes>("ExportCutscenes"),
+		luaext::FuncReference::GetRef<VideoCustomWidgetGetVideoSize>("VideoCustomWidgetGetVideoSize"),
+		luaext::FuncReference::GetRef<VideoCustomWidgetSetVideoSize>("VideoCustomWidgetSetVideoSize"),
+		luaext::FuncReference::GetRef<CreateSelectionDecal>("CreateSelectionDecal"),
+		luaext::FuncReference::GetRef<InitNetHandlers>("InitNetHandlers"),
+		luaext::FuncReference::GetRef<RemoveWidget>("RemoveWidget"),
+		luaext::FuncReference::GetRef<ReorderWidgets>("ReorderWidgets"),
+		luaext::FuncReference::GetRef<MiniMapOverlaySetCallbackFuncName>("MiniMapOverlaySetCallbackFuncName"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {
@@ -2067,8 +1981,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("not in range");
 	}
 
-	int CommandMove(lua::State l) {
-		luaext::EState L{ l };
+	int CommandMove(luaext::State L) {
 		auto* s = L.CheckSettler(1);
 		auto p = L.CheckPos(2);
 		float r = L.OptFloat(3, -1);
@@ -2081,8 +1994,7 @@ namespace CppLogic::UI {
 		GGUI::CManager::PostEventFromUI(&ev);
 		return 0;
 	}
-	int CommandPatrol(lua::State l) {
-		luaext::EState L{ l };
+	int CommandPatrol(luaext::State L) {
 		auto* s = L.CheckSettler(1);
 		EGL::CNetEventEntityAndPosArray ev{ shok::NetEventIds::Entity_Patrol, s->EntityId, -1 };
 		LuaEventInterface::CheckEntityOfLocalPlayer(ev);
@@ -2100,73 +2012,73 @@ namespace CppLogic::UI {
 	}
 
 	constexpr std::array Commands{ // move, patrol
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Entity_AttackEntity,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Entity_AttackEntity,
 			LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Entity_AttackEntity"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Serf_ConstructBuilding,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Serf_ConstructBuilding,
 			CheckConstruct>>("Serf_ConstructBuilding"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Serf_RepairBuilding,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Serf_RepairBuilding,
 			CheckRepair>>("Serf_RepairBuilding"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<GGL::CNetEventExtractResource, shok::NetEventIds::Serf_ExtractResource,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<GGL::CNetEventExtractResource, shok::NetEventIds::Serf_ExtractResource,
 			CheckExtract>>("Serf_ExtractResource"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::Entity_AttackPos,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::Entity_AttackPos,
 			LuaEventInterface::CheckEntityOfLocalPlayer>>("Entity_AttackPos"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Entity_GuardEntity,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Entity_GuardEntity,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("Entity_GuardEntity"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::BombPlacer_PlaceBombAt,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::BombPlacer_PlaceBombAt,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>>>("BombPlacer_PlaceBombAt"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<GGL::CNetEventCannonCreator, shok::NetEventIds::CannonPlacer_HeroPlaceCannonAt,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<GGL::CNetEventCannonCreator, shok::NetEventIds::CannonPlacer_HeroPlaceCannonAt,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBuildCannon>,
 			CheckPlaceCannonEvent>>("CannonPlacer_HeroPlaceCannonAt"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Hero_NPCInteraction,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Hero_NPCInteraction,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityActorCategory<shok::EntityCategory::Hero>>>("Hero_NPCInteraction"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::ConvertSettler_Convert,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::ConvertSettler_Convert,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityConvertSettlers>,
 			LuaEventInterface::CheckConvertible, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>,
 			LuaEventInterface::CheckSettler>>("ConvertSettler_Convert"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Thief_StealFrom,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Thief_StealFrom,
 			LuaEventInterface::CheckEntityOfLocalPlayer, CheckIsThief,
 			LuaEventInterface::CheckBuilding, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Thief_StealFrom"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Thief_CarryStolenStuffToHQ,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Thief_CarryStolenStuffToHQ,
 			LuaEventInterface::CheckEntityOfLocalPlayer, CheckIsThief,
 			LuaEventInterface::CheckBuilding, LuaEventInterface::CheckTargetCategory<shok::EntityCategory::Headquarters>,
 			LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("Thief_CarryStolenStuffToHQ"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sabotage_Sabotage,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sabotage_Sabotage,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityPlaceKeg>,
 			LuaEventInterface::CheckBuilding, CheckThiefNotCarryingEvent,
 			CheckSabotageEvent>>("Sabotage_Sabotage"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sabotage_Defuse,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sabotage_Defuse,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityPlaceKeg>,
 			CheckThiefNotCarryingEvent, CheckSabotageEvent>>("Sabotage_Defuse"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::Binoculars_Observe,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::Binoculars_Observe,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutBinoculars>>>("Binoculars_Observe"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sniper_Snipe,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Sniper_Snipe,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilitySniper>, CheckSnipeEvent,
 			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Sniper_Snipe"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::TorchPlacer_Place,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::TorchPlacer_Place,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutTorches>>>("TorchPlacer_Place"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Shuriken_Activate,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Shuriken_Activate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityShuriken>, CheckShurikenEvent,
 			LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Shuriken_Activate"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_LightningStrike_Activate, CheckLightingStrike,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_LightningStrike_Activate, CheckLightingStrike,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>>>("LightningStrike_Activate"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_ResDoodadRefill_Activate,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_ResDoodadRefill_Activate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckBuilding, CheckResourceRefill,
 			LuaEventInterface::CheckActorAbility<shok::AbilityId::AbiltyResourceDoodadRefill>>>("ResDoodadRefill_Activate"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityID, shok::NetEventIds::CppL_ShieldCover_Activate,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityID, shok::NetEventIds::CppL_ShieldCover_Activate,
 			LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShieldCover>>>("ShieldCover_Activate"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_Resurrect_Activate,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::CppL_Resurrect_Activate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, CheckResurrectEvent,
 			LuaEventInterface::CheckActorAbility<shok::AbilityId::AbilityResurrect>>>("Resurrect_Activate"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_BombardmentActivate,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_BombardmentActivate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBombardment>>>("Bombardment_Activate"),
-		lua::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_BombComboCannonActivate,
+		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEventEntityAndPos, shok::NetEventIds::CppL_BombComboCannonActivate,
 			LuaEventInterface::CheckEntityOfLocalPlayer, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>,
 			LuaEventInterface::CheckEntityBehavior<CppLogic::Mod::ReloadableCannonBuilderAbility>>>("BombCannonCombo_Activate"),
-		lua::FuncReference::GetRef<CommandMove>("Entity_Move"),
-		lua::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
+		luaext::FuncReference::GetRef<CommandMove>("Entity_Move"),
+		luaext::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
 	};
 
-	void Init(lua::State L)
+	void Init(luaext::State L)
 	{
 		L.RegisterFuncs(UI, -3);
 #ifdef DEBUG_FUNCS

@@ -11,13 +11,13 @@
 
 namespace CppLogic::ModLoader {
 	class ModLoader {
-		static void Init(lua::State L, const char* mappath, std::string_view func, const std::function<void(lua::State)>& pushMapInfo);
+		static void Init(luaext::State L, const char* mappath, std::string_view func, const std::function<void(luaext::State)>& pushMapInfo);
 		static void PreMapStart(lua_State* ingame, const char* name, const char* path, bool externalmap);
 		static void PostMapscriptLoaded();
 		static void PreSaveLoad(lua_State* ingame, Framework::GameModeStartMapData* data, bool externalmap);
-		static void Log(lua::State L, const char* log);
-		static void AddLib(lua::State L);
-		static void RemoveLib(lua::State L);
+		static void Log(luaext::State L, const char* log);
+		static void AddLib(luaext::State L);
+		static void RemoveLib(luaext::State L);
 		static void PreSave(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
 		static void PostSave(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
 
@@ -27,14 +27,14 @@ namespace CppLogic::ModLoader {
 
 		static shok::String ModPackList;
 		static size_t GUIDLength;
-		static lua::Reference SavegameValidOverride;
+		static luaext::Reference SavegameValidOverride;
 
 		class DataTypeLoader {
 		public:
 			virtual ~DataTypeLoader() = default;
 			virtual void Reset() = 0;
 			virtual void SanityCheck() = 0;
-			virtual void RegisterFuncs(luaext::EState L) = 0;
+			virtual void RegisterFuncs(luaext::State L) = 0;
 		};
 		template<class En>
 		class DataTypeLoaderCommon : public DataTypeLoader {
@@ -53,11 +53,11 @@ namespace CppLogic::ModLoader {
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
 				return "";
 			}
-			static void Load(En id, luaext::EState L) { // L is nullptr on reload
+			static void Load(En id, luaext::State L) { // L is nullptr on reload
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
 			}
 
-			En GetId(luaext::EState L, int idx) {
+			En GetId(luaext::State L, int idx) {
 				auto mng = IdManager();
 				auto t = L.Type(idx);
 				if (t == lua::LType::Number) {
@@ -89,12 +89,12 @@ namespace CppLogic::ModLoader {
 					throw lua::LuaException{std::format("invalid {} at {}: invalid type", typename_details::type_name<En>(), idx)};
 				}
 			}
-			int Preload(luaext::EState L) {
+			int Preload(luaext::State L) {
 				En id = GetId(L, 1);
 				L.Push(id);
 				return 1;
 			}
-			int Load(luaext::EState L) {
+			int Load(luaext::State L) {
 				En id = GetId(L, 1);
 				Load(id, L);
 				L.Push(id);
@@ -114,7 +114,7 @@ namespace CppLogic::ModLoader {
 					UnLoad(id);
 				}
 				for (En id : ToReload) {
-					DataTypeLoaderCommon<En>::Load(id, luaext::EState{nullptr});
+					DataTypeLoaderCommon<En>::Load(id, luaext::State{nullptr});
 				}
 				ToReload.clear();
 			}
@@ -136,16 +136,16 @@ namespace CppLogic::ModLoader {
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
 			}
 
-			static int Prel(lua::State L) {
-				return Obj.Preload(luaext::EState{L});
+			static int Prel(luaext::State L) {
+				return Obj.Preload(luaext::State{L});
 			}
-			static int Lo(lua::State L) {
-				return Obj.Load(luaext::EState{L});
+			static int Lo(luaext::State L) {
+				return Obj.Load(luaext::State{L});
 			}
 
 			static constexpr bool RegisterFuncPreLoad = true;
 			static constexpr bool RegisterFuncLoad = true;
-			virtual void RegisterFuncs(luaext::EState L) override {
+			virtual void RegisterFuncs(luaext::State L) override {
 				if constexpr (RegisterFuncPreLoad) {
 					L.Push("PreLoad");
 					L.Push(DataTypeLoaderCommon<En>::FuncName());
@@ -204,16 +204,16 @@ namespace CppLogic::ModLoader {
 				static_assert(sizeof(DataTypeLoaderHalf<En>) != sizeof(DataTypeLoaderHalf<En>));
 			}
 
-			static int Prel(lua::State L) {
-				return Obj.Preload(luaext::EState{L});
+			static int Prel(luaext::State L) {
+				return Obj.Preload(luaext::State{L});
 			}
-			static int Lo(lua::State L) {
-				return Obj.Load(luaext::EState{L});
+			static int Lo(luaext::State L) {
+				return Obj.Load(luaext::State{L});
 			}
 
 			static constexpr bool RegisterFuncPreLoad = true;
 			static constexpr bool RegisterFuncLoad = true;
-			virtual void RegisterFuncs(luaext::EState L) override {
+			virtual void RegisterFuncs(luaext::State L) override {
 				if constexpr (RegisterFuncPreLoad) {
 					L.Push("PreLoad");
 					L.Push(DataTypeLoaderCommon<En>::FuncName());
@@ -255,16 +255,16 @@ namespace CppLogic::ModLoader {
 				NeedsReload = true;
 			}
 
-			static int Prel(lua::State L) {
-				return Obj.Preload(luaext::EState{L});
+			static int Prel(luaext::State L) {
+				return Obj.Preload(luaext::State{L});
 			}
-			static int Lo(lua::State L) {
-				return Obj.Load(luaext::EState{L});
+			static int Lo(luaext::State L) {
+				return Obj.Load(luaext::State{L});
 			}
 
 			static constexpr bool RegisterFuncPreLoad = true;
 			static constexpr bool RegisterFuncLoad = true;
-			virtual void RegisterFuncs(luaext::EState L) override {
+			virtual void RegisterFuncs(luaext::State L) override {
 				if constexpr (RegisterFuncPreLoad) {
 					L.Push("PreLoad");
 					L.Push(DataTypeLoaderCommon<En>::FuncName());
@@ -293,13 +293,13 @@ namespace CppLogic::ModLoader {
 		public:
 			virtual void Reset();
 			virtual void SanityCheck();
-			virtual void RegisterFuncs(luaext::EState L);
+			virtual void RegisterFuncs(luaext::State L);
 			virtual void OnIdAllocated(shok::UpgradeCategoryId id);
 			virtual void OnIdLoaded(shok::UpgradeCategoryId id);
 
-			static int Prel(lua::State L);
-			static int AddSettlerUpgradeCategory(lua::State L);
-			static int AddBuildingUpgradeCategory(lua::State L);
+			static int Prel(luaext::State L);
+			static int AddSettlerUpgradeCategory(luaext::State L);
+			static int AddBuildingUpgradeCategory(luaext::State L);
 
 			static UpgradeCategoriesLoader Obj;
 		};
@@ -308,9 +308,9 @@ namespace CppLogic::ModLoader {
 		public:
 			virtual void Reset() override;
 			virtual void SanityCheck() override;
-			virtual void RegisterFuncs(luaext::EState L) override;
+			virtual void RegisterFuncs(luaext::State L) override;
 
-			static int Add(lua::State L);
+			static int Add(luaext::State L);
 
 			static ExperienceClassesLoader Obj;
 		};
@@ -319,9 +319,9 @@ namespace CppLogic::ModLoader {
 		public:
 			virtual void Reset() override;
 			virtual void SanityCheck() override;
-			virtual void RegisterFuncs(luaext::EState L) override;
+			virtual void RegisterFuncs(luaext::State L) override;
 
-			static int Add(lua::State L);
+			static int Add(luaext::State L);
 
 			static SoundGroupsLoader Obj;
 		};
@@ -330,9 +330,9 @@ namespace CppLogic::ModLoader {
 		public:
 			virtual void Reset() override;
 			virtual void SanityCheck() override;
-			virtual void RegisterFuncs(luaext::EState L) override;
+			virtual void RegisterFuncs(luaext::State L) override;
 
-			static int Add(lua::State L);
+			static int Add(luaext::State L);
 
 			static DirectXEffectLoader Obj;
 		};
@@ -341,9 +341,9 @@ namespace CppLogic::ModLoader {
 		public:
 			virtual void Reset() override;
 			virtual void SanityCheck() override;
-			virtual void RegisterFuncs(luaext::EState L) override;
+			virtual void RegisterFuncs(luaext::State L) override;
 
-			static int Add(lua::State L);
+			static int Add(luaext::State L);
 
 			static FeedbackEventSoundDataLoader Obj;
 		};
@@ -355,80 +355,80 @@ namespace CppLogic::ModLoader {
 
 		static void InitExtraECats();
 
-		static int SetEntityTypeToReload(lua::State L);
-		static int SetTaskListToReload(lua::State L);
-		static int SetDamageclassesToReload(lua::State L);
-		static int RefreshEntityCategoryCache(lua::State L);
-		static int SanityCheck(lua::State L);
-		static int GetModpackInfo(lua::State L);
-		static int LoadModpackBBA(lua::State L);
-		static int CreateModpackRedirectLayer(lua::State L);
-		static int InvalidModPackPanic(lua::State L);
-		static int GetModpacks(lua::State L);
-		static int ReserializeEntityType(lua::State L);
-		static int ReserializeTaskList(lua::State L);
-		static int ReserializeModel(lua::State L);
-		static int SetModPackList(lua::State L);
-		static int GetModPackList(lua::State L);
-		static int OverrideSavegameValid(lua::State L);
-		static int LoadStringTableTextOverrides(lua::State L);
-		static int MapGetModPacks(lua::State L);
-		static int GetEntityTypeMem(lua::State L);
-		static int GetTaskListMem(lua::State l);
-		static int GetTechnologyMem(lua::State l);
-		static int GetEffectTypeMem(lua::State l);
-		static int GetFeedbackEventMem(lua::State l);
+		static int SetEntityTypeToReload(luaext::State L);
+		static int SetTaskListToReload(luaext::State L);
+		static int SetDamageclassesToReload(luaext::State L);
+		static int RefreshEntityCategoryCache(luaext::State L);
+		static int SanityCheck(luaext::State L);
+		static int GetModpackInfo(luaext::State L);
+		static int LoadModpackBBA(luaext::State L);
+		static int CreateModpackRedirectLayer(luaext::State L);
+		static int InvalidModPackPanic(luaext::State L);
+		static int GetModpacks(luaext::State L);
+		static int ReserializeEntityType(luaext::State L);
+		static int ReserializeTaskList(luaext::State L);
+		static int ReserializeModel(luaext::State L);
+		static int SetModPackList(luaext::State L);
+		static int GetModPackList(luaext::State L);
+		static int OverrideSavegameValid(luaext::State L);
+		static int LoadStringTableTextOverrides(luaext::State L);
+		static int MapGetModPacks(luaext::State L);
+		static int GetEntityTypeMem(luaext::State L);
+		static int GetTaskListMem(luaext::State l);
+		static int GetTechnologyMem(luaext::State l);
+		static int GetEffectTypeMem(luaext::State l);
+		static int GetFeedbackEventMem(luaext::State l);
 
 		static constexpr std::array LuaFuncs{
-				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<SetTaskListToReload>("SetTaskListToReload"),
-				lua::FuncReference::GetRef<SetDamageclassesToReload>("SetDamageclassesToReload"),
-				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
-				lua::FuncReference::GetRef<SanityCheck>("SanityCheck"),
-				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
-				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
-				lua::FuncReference::GetRef<CreateModpackRedirectLayer>("CreateModpackRedirectLayer"),
-				lua::FuncReference::GetRef<InvalidModPackPanic>("InvalidModPackPanic"),
-				lua::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
-				lua::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
-				lua::FuncReference::GetRef<SetModPackList>("SetModPackList"),
-				lua::FuncReference::GetRef<GetModPackList>("GetModPackList"),
-				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
-				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
-				lua::FuncReference::GetRef<GetEntityTypeMem>("GetEntityTypeMem"),
-				lua::FuncReference::GetRef<GetTaskListMem>("GetTaskListMem"),
-				lua::FuncReference::GetRef<GetTechnologyMem>("GetTechnologyMem"),
-				lua::FuncReference::GetRef<GetEffectTypeMem>("GetEffectTypeMem"),
-				lua::FuncReference::GetRef<GetFeedbackEventMem>("GetFeedbackEventMem"),
+				luaext::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
+				luaext::FuncReference::GetRef<SetTaskListToReload>("SetTaskListToReload"),
+				luaext::FuncReference::GetRef<SetDamageclassesToReload>("SetDamageclassesToReload"),
+				luaext::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
+				luaext::FuncReference::GetRef<SanityCheck>("SanityCheck"),
+				luaext::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
+				luaext::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+				luaext::FuncReference::GetRef<CreateModpackRedirectLayer>("CreateModpackRedirectLayer"),
+				luaext::FuncReference::GetRef<InvalidModPackPanic>("InvalidModPackPanic"),
+				luaext::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
+				luaext::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
+				luaext::FuncReference::GetRef<SetModPackList>("SetModPackList"),
+				luaext::FuncReference::GetRef<GetModPackList>("GetModPackList"),
+				luaext::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
+				luaext::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
+				luaext::FuncReference::GetRef<GetEntityTypeMem>("GetEntityTypeMem"),
+				luaext::FuncReference::GetRef<GetTaskListMem>("GetTaskListMem"),
+				luaext::FuncReference::GetRef<GetTechnologyMem>("GetTechnologyMem"),
+				luaext::FuncReference::GetRef<GetEffectTypeMem>("GetEffectTypeMem"),
+				luaext::FuncReference::GetRef<GetFeedbackEventMem>("GetFeedbackEventMem"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{
-				lua::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
-				lua::FuncReference::GetRef<SetTaskListToReload>("SetTaskListToReload"),
-				lua::FuncReference::GetRef<SetDamageclassesToReload>("SetDamageclassesToReload"),
-				lua::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
-				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
-				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
-				lua::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
-				lua::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
-				lua::FuncReference::GetRef<ReserializeModel>("ReserializeModel"),
-				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
-				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
+				luaext::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
+				luaext::FuncReference::GetRef<SetTaskListToReload>("SetTaskListToReload"),
+				luaext::FuncReference::GetRef<SetDamageclassesToReload>("SetDamageclassesToReload"),
+				luaext::FuncReference::GetRef<RefreshEntityCategoryCache>("RefreshEntityCategoryCache"),
+				luaext::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
+				luaext::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+				luaext::FuncReference::GetRef<ReserializeEntityType>("ReserializeEntityType"),
+				luaext::FuncReference::GetRef<ReserializeTaskList>("ReserializeTaskList"),
+				luaext::FuncReference::GetRef<ReserializeModel>("ReserializeModel"),
+				luaext::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
+				luaext::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
 		};
 
 		static constexpr std::array Mainmenu{
-				lua::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
-				lua::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
-				lua::FuncReference::GetRef<GetModpacks>("GetModpacks"),
-				lua::FuncReference::GetRef<OverrideSavegameValid>("OverrideSavegameValid"),
-				lua::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
-				lua::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
+				luaext::FuncReference::GetRef<GetModpackInfo>("GetModpackInfo"),
+				luaext::FuncReference::GetRef<LoadModpackBBA>("LoadModpackBBA"),
+				luaext::FuncReference::GetRef<GetModpacks>("GetModpacks"),
+				luaext::FuncReference::GetRef<OverrideSavegameValid>("OverrideSavegameValid"),
+				luaext::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
+				luaext::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
 		};
 
 	public:
 		static void Initialize();
 		static void Cleanup(Framework::CMain::NextMode n);
-		static void InitMainmenu(lua::State L);
+		static void InitMainmenu(luaext::State L);
 
 		static bool IsInitialized();
 		static void AddTaskListToRemove(shok::TaskListId id);
@@ -461,9 +461,9 @@ namespace CppLogic::ModLoader {
 	protected:
 		BB::IFileSystem* FS; // not owning, may be already deleted!
 
-		static int Remove(lua::State L);
-		static int IsLoaded(lua::State L);
-		static int ToString(lua::State L);
+		static int Remove(luaext::State L);
+		static int IsLoaded(luaext::State L);
+		static int ToString(luaext::State L);
 	public:
 		virtual ~ArchivePopHelper() = default;
 
@@ -471,9 +471,9 @@ namespace CppLogic::ModLoader {
 		inline ArchivePopHelper(std::string&& a, BB::IFileSystem* fs) : Archive(std::move(a)), FS(fs) {}
 
 		static constexpr const std::array LuaMethods = {
-			lua::FuncReference::GetRef<Remove>("Remove"),
-			lua::FuncReference::GetRef<IsLoaded>("IsLoaded"),
-			lua::FuncReference::GetRef<ToString>("ToString"),
+			luaext::FuncReference::GetRef<Remove>("Remove"),
+			luaext::FuncReference::GetRef<IsLoaded>("IsLoaded"),
+			luaext::FuncReference::GetRef<ToString>("ToString"),
 		};
 
 		using BaseClass = ArchivePopHelper;
@@ -483,19 +483,19 @@ namespace CppLogic::ModLoader {
 
 		CppLogic::Mod::FileSystem::RedirectFileSystem* CheckStillValid();
 
-		static int Get(lua::State L);
-		static int Set(lua::State L);
+		static int Get(luaext::State L);
+		static int Set(luaext::State L);
 	public:
 		inline ArchiveRedirectHelper(std::string_view a, CppLogic::Mod::FileSystem::RedirectFileSystem* fs) : ArchivePopHelper(a, fs) {}
 		inline ArchiveRedirectHelper(std::string&& a, CppLogic::Mod::FileSystem::RedirectFileSystem* fs) : ArchivePopHelper(std::move(a), fs) {}
 
 
 		static constexpr const std::array LuaMethods = {
-			lua::FuncReference::GetRef<Remove>("Remove"),
-			lua::FuncReference::GetRef<IsLoaded>("IsLoaded"),
-			lua::FuncReference::GetRef<ToString>("ToString"),
-			lua::FuncReference::GetRef<Get>("Get"),
-			lua::FuncReference::GetRef<Set>("Set"),
+			luaext::FuncReference::GetRef<Remove>("Remove"),
+			luaext::FuncReference::GetRef<IsLoaded>("IsLoaded"),
+			luaext::FuncReference::GetRef<ToString>("ToString"),
+			luaext::FuncReference::GetRef<Get>("Get"),
+			luaext::FuncReference::GetRef<Set>("Set"),
 		};
 	};
 }

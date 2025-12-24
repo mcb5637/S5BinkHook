@@ -85,29 +85,29 @@ std::unique_ptr<BB::CBinarySerializer, CppLogic::DestroyCaller<BB::CBinarySerial
 	return std::unique_ptr<CBinarySerializer, CppLogic::DestroyCaller<CBinarySerializer>>(Create(uk, uk2));
 }
 
-void PushUnknownValue(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushUnknownValue(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	char buff[201]{};
 	fs->SerializeToString(buff, 200, data);
 	L.Push(buff);
 }
-void CheckUnknownValue(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckUnknownValue(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	const char* s = L.CheckString(idx);
 	fs->DeserializeFromString(data, s);
 }
 BB::FieldSerializer::ExtendedInfo InfoUnknown{ "Unknown Type", &PushUnknownValue, &CheckUnknownValue };
 
 
-void PushInt(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushInt(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<int*>(data));
 }
-void CheckInt(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckInt(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<int*>(data) = L.CheckInt(idx);
 }
 BB::FieldSerializer::ExtendedInfo InfoInt{ "Int", &PushInt, &CheckInt, "xs:int" };
 
 template<class En>
-void CheckEnum(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
-	*static_cast<En*>(data) = luaext::EState{ L }.CheckEnum<En>(idx, true);
+void CheckEnum(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+	*static_cast<En*>(data) = luaext::State{ L }.CheckEnum<En>(idx, true);
 }
 
 BB::FieldSerializer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId>, "xs:string" };
@@ -145,72 +145,72 @@ BB::FieldSerializer::ExtendedInfo InfoPrincipalTaskId{ "shok::PrincipalTaskId", 
 BB::FieldSerializer::ExtendedInfo InfoRaceId{ "shok::RaceId", &PushInt, &CheckInt, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoTechnologyCategoryId{ "shok::TechnologyCategoryId", &PushInt, &CheckEnum<shok::TechnologyCategoryId>, "xs:string" };
 
-void PushUInt(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushUInt(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<double>(*static_cast<unsigned int*>(data)));
 }
-void CheckUInt(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckUInt(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<unsigned int*>(data) = static_cast<unsigned int>(L.CheckNumber(idx));
 }
 BB::FieldSerializer::ExtendedInfo InfoUInt{ "unsigned Int", &PushUInt, &CheckUInt, "xs:unsignedInt" };
 
-void PushUByte(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushUByte(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<double>(*static_cast<byte*>(data)));
 }
-void CheckUByte(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckUByte(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<unsigned int*>(data) = static_cast<byte>(L.CheckNumber(idx));
 }
 BB::FieldSerializer::ExtendedInfo InfoUByte{ "unsigned Byte", &PushUByte, &CheckUByte, "xs:unsignedByte" };
 
-void PushBool(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushBool(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<bool*>(data));
 }
-void CheckBool(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckBool(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<bool*>(data) = L.CheckBool(idx);
 }
 BB::FieldSerializer::ExtendedInfo InfoBool{ "Bool", &PushBool, &CheckBool, "xs:boolean" };
 
-void PushFloat(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushFloat(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<float*>(data));
 }
-void CheckFloat(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckFloat(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<float*>(data) = L.CheckFloat(idx);
 }
 BB::FieldSerializer::ExtendedInfo InfoFloat{ "Float", &PushFloat, &CheckFloat, "xs:float" };
 
-void PushDouble(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushDouble(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<double*>(data));
 }
-void CheckDouble(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckDouble(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	*static_cast<double*>(data) = L.CheckNumber(idx);
 }
 BB::FieldSerializer::ExtendedInfo InfoDouble{ "Double", &PushDouble, &CheckDouble, "xs:double" };
 
-void PushSString(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushSString(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<shok::String*>(data)->c_str());
 }
-void CheckSString(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckSString(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	static_cast<shok::String*>(data)->assign(L.CheckString(idx));
 }
 BB::FieldSerializer::ExtendedInfo InfoString{ typename_details::type_name<shok::String>(), &PushSString, &CheckSString, "xs:string" };
 
-void PushCharBuff(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushCharBuff(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(*static_cast<const char**>(data));
 }
 BB::FieldSerializer::ExtendedInfo InfoCharBuff{ "char*" , &PushCharBuff, &CheckUnknownValue, "xs:string" }; // let the original xml variant alloc the mem
 
-void PushStdString(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushStdString(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<std::string*>(data)->c_str());
 }
-void CheckStdString(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+void CheckStdString(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
 	static_cast<std::string*>(data)->assign(L.CheckString(idx));
 }
 BB::FieldSerializer::ExtendedInfo InfoStdString{ typename_details::type_name<std::string>(), &PushStdString, &CheckStdString, "xs:string" };
 
-void PushEntId(lua::State L, void* data, const BB::FieldSerializer* fs) {
+void PushEntId(luaext::State L, void* data, const BB::FieldSerializer* fs) {
 	L.Push(static_cast<int>((*static_cast<EGL::CGLEEntity**>(data))->EntityId));
 }
-void CheckEntId(lua::State L, void* data, int idx, const BB::FieldSerializer* fs) {
-	*static_cast<EGL::CGLEEntity**>(data) = luaext::EState{ L }.CheckEntity(idx);
+void CheckEntId(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+	*static_cast<EGL::CGLEEntity**>(data) = L.CheckEntity(idx);
 }
 // only to be used after entities are loaded
 BB::FieldSerializer::ExtendedInfo EntitySerializedById{ "EGL::CGLEEntity (by Id)", &PushEntId, &CheckEntId, "xs:int" };

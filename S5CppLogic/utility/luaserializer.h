@@ -10,25 +10,25 @@
 
 namespace CppLogic::Serializer {
 	class ObjectToLuaSerializer {
-		static void SerializeField(lua::State L, void* o, const BB::SerializationData* s, bool keypushed = false);
-		static void SerializeFields(lua::State L, void* o, const BB::SerializationData* s);
-		static void SerializePushField(lua::State L, void* o, const BB::SerializationData* s);
-		static void SerializeList(lua::State L, void* o, const BB::SerializationData* s);
+		static void SerializeField(luaext::State L, void* o, const BB::SerializationData* s, bool keypushed = false);
+		static void SerializeFields(luaext::State L, void* o, const BB::SerializationData* s);
+		static void SerializePushField(luaext::State L, void* o, const BB::SerializationData* s);
+		static void SerializeList(luaext::State L, void* o, const BB::SerializationData* s);
 
-		static void DeserializeField(lua::State L, void* o, const BB::SerializationData* s, bool valuepushed = false);
-		static void DeserializeCheckField(lua::State L, void* o, const BB::SerializationData* s);
-		static void DeserializeFields(lua::State L, void* o, const BB::SerializationData* s);
-		static void DeserializeList(lua::State L, void* o, const BB::SerializationData* s);
+		static void DeserializeField(luaext::State L, void* o, const BB::SerializationData* s, bool valuepushed = false);
+		static void DeserializeCheckField(luaext::State L, void* o, const BB::SerializationData* s);
+		static void DeserializeFields(luaext::State L, void* o, const BB::SerializationData* s);
+		static void DeserializeList(luaext::State L, void* o, const BB::SerializationData* s);
 	public:
-		static void Serialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id = shok::ClassId::Invalid);
-		static void Serialize(lua::State L, BB::IObject* o);
+		static void Serialize(luaext::State L, void* o, const BB::SerializationData* seri, shok::ClassId id = shok::ClassId::Invalid);
+		static void Serialize(luaext::State L, BB::IObject* o);
 
 		// if o nullptr, gets created, if id 0, gets read from lua, in this case also checks seri for 0
-		static void* Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id = shok::ClassId::Invalid, std::initializer_list<shok::ClassId> whitelisted_ids = {});
-		static void Deserialize(lua::State L, BB::IObject* o);
+		static void* Deserialize(luaext::State L, void* o, const BB::SerializationData* seri, shok::ClassId id = shok::ClassId::Invalid, std::initializer_list<shok::ClassId> whitelisted_ids = {});
+		static void Deserialize(luaext::State L, BB::IObject* o);
 
-		static void DumpClassSerializationData(lua::State L, const BB::SerializationData* seri);
-		static void DumpClassSerializationData(lua::State L, shok::ClassId id);
+		static void DumpClassSerializationData(luaext::State L, const BB::SerializationData* seri);
+		static void DumpClassSerializationData(luaext::State L, shok::ClassId id);
 	};
 
 	class FastBinarySerializer {
@@ -72,7 +72,7 @@ namespace CppLogic::Serializer {
 
 
 		BB::IStream& IO;
-		lua::State L;
+		luaext::State L;
 		std::unique_ptr<byte[]> Data;
 		size_t DataLength = 0;
 		std::map<Reference, int> RefToNumber;
@@ -142,7 +142,7 @@ namespace CppLogic::Serializer {
 		void DeserializeStack();
 
 		// pushes a registry subtable that will get serialized in savegames. (creates one if it does not exist)
-		static void PushSerializedRegistry(lua::State L);
+		static void PushSerializedRegistry(luaext::State L);
 
 		static constexpr const char* UserdataSerializerMetaEvent = "__serialize";
 		static std::map<std::string, lua::CFunction> UserdataDeserializer;
@@ -171,19 +171,19 @@ namespace CppLogic::Serializer {
 		int Id;
 		void(*OnWrite)(int id);
 
-		static int Name(lua::State L);
+		static int Name(luaext::State L);
 		template<class T>
-		static int AsSubClass(lua::State L) {
+		static int AsSubClass(luaext::State L) {
 			L.CheckUserClass<T>(1);
 			L.SetTop(1);
 			return 1;
 		}
 
 	protected:
-		static void PushSD(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr, bool listElement = false);
+		static void PushSD(luaext::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr, bool listElement = false);
 	public:
-		static void PushObject(lua::State L, std::string_view n, BB::IObject* obj, int id = 0, void(*onWrite)(int id) = nullptr, shok::ClassId c = shok::ClassId::Invalid, void** owner = nullptr);
-		static void PushObject(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr);
+		static void PushObject(luaext::State L, std::string_view n, BB::IObject* obj, int id = 0, void(*onWrite)(int id) = nullptr, shok::ClassId c = shok::ClassId::Invalid, void** owner = nullptr);
+		static void PushObject(luaext::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr);
 	};
 
 	class StructAccess;
@@ -191,46 +191,46 @@ namespace CppLogic::Serializer {
 	class ListAccess;
 	class FieldAccess : public ObjectAccess {
 	public:
-		static int GetType(lua::State L);
-		static int DataType(lua::State L);
-		static int Get(lua::State L);
-		static int Set(lua::State L);
+		static int GetType(luaext::State L);
+		static int DataType(luaext::State L);
+		static int Get(luaext::State L);
+		static int Set(luaext::State L);
 
 		using ObjectAccess::ObjectAccess;
 
 		static constexpr std::array LuaMethods{
-			lua::FuncReference::GetRef<Name>("Name"),
-			lua::FuncReference::GetRef<GetType>("GetType"),
-			lua::FuncReference::GetRef<DataType>("DataType"),
-			lua::FuncReference::GetRef<Get>("Get"),
-			lua::FuncReference::GetRef<Set>("Set"),
-			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
+			luaext::FuncReference::GetRef<Name>("Name"),
+			luaext::FuncReference::GetRef<GetType>("GetType"),
+			luaext::FuncReference::GetRef<DataType>("DataType"),
+			luaext::FuncReference::GetRef<Get>("Get"),
+			luaext::FuncReference::GetRef<Set>("Set"),
+			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 	};
 
 	class StructAccess : public ObjectAccess {
 	public:
-		static int GetType(lua::State L);
-		static int Fields(lua::State L);
+		static int GetType(luaext::State L);
+		static int Fields(luaext::State L);
 
-		static int FieldsNext(lua::State L);
+		static int FieldsNext(luaext::State L);
 
-		static int Index(lua::State L);
+		static int Index(luaext::State L);
 
 		using ObjectAccess::ObjectAccess;
 
 		static constexpr std::array LuaMethods{
-			lua::FuncReference::GetRef<Name>("Name"),
-			lua::FuncReference::GetRef<GetType>("GetType"),
-			lua::FuncReference::GetRef<Fields>("Fields"),
-			lua::FuncReference::GetRef<Index>("Get"),
-			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
+			luaext::FuncReference::GetRef<Name>("Name"),
+			luaext::FuncReference::GetRef<GetType>("GetType"),
+			luaext::FuncReference::GetRef<Fields>("Fields"),
+			luaext::FuncReference::GetRef<Index>("Get"),
+			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 
 		struct Iter {
@@ -263,59 +263,59 @@ namespace CppLogic::Serializer {
 	class BBObjectAccess : public StructAccess {
 		void** Owner;
 	public:
-		static int GetType(lua::State L);
-		static int ObjectType(lua::State L);
-		static int New(lua::State L);
-		static int IsNullptr(lua::State L);
+		static int GetType(luaext::State L);
+		static int ObjectType(luaext::State L);
+		static int New(luaext::State L);
+		static int IsNullptr(luaext::State L);
 
 		BBObjectAccess(std::string_view name, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id), void** owner = nullptr);
 
 		static constexpr std::array LuaMethods{
-			lua::FuncReference::GetRef<Name>("Name"),
-			lua::FuncReference::GetRef<GetType>("GetType"),
-			lua::FuncReference::GetRef<Fields>("Fields"),
-			lua::FuncReference::GetRef<Index>("Get"),
-			lua::FuncReference::GetRef<ObjectType>("ObjectType"),
-			lua::FuncReference::GetRef<New>("New"),
-			lua::FuncReference::GetRef<IsNullptr>("IsNullptr"),
-			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
+			luaext::FuncReference::GetRef<Name>("Name"),
+			luaext::FuncReference::GetRef<GetType>("GetType"),
+			luaext::FuncReference::GetRef<Fields>("Fields"),
+			luaext::FuncReference::GetRef<Index>("Get"),
+			luaext::FuncReference::GetRef<ObjectType>("ObjectType"),
+			luaext::FuncReference::GetRef<New>("New"),
+			luaext::FuncReference::GetRef<IsNullptr>("IsNullptr"),
+			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 	};
 
 	class ListAccess : public ObjectAccess {
 	public:
-		static int GetType(lua::State L);
-		static int Elements(lua::State L);
-		static int Size(lua::State L);
-		static int First(lua::State L);
-		static int Insert(lua::State L);
-		static int Remove(lua::State L);
-		static int ListType(lua::State L);
-		static int InsertAt(lua::State L);
+		static int GetType(luaext::State L);
+		static int Elements(luaext::State L);
+		static int Size(luaext::State L);
+		static int First(luaext::State L);
+		static int Insert(luaext::State L);
+		static int Remove(luaext::State L);
+		static int ListType(luaext::State L);
+		static int InsertAt(luaext::State L);
 
-		static int ElementsNext(lua::State L);
+		static int ElementsNext(luaext::State L);
 
-		static int Index(lua::State L);
+		static int Index(luaext::State L);
 
 		using ObjectAccess::ObjectAccess;
 
 		static constexpr std::array LuaMethods{
-			lua::FuncReference::GetRef<Name>("Name"),
-			lua::FuncReference::GetRef<GetType>("GetType"),
-			lua::FuncReference::GetRef<Elements>("Elements"),
-			lua::FuncReference::GetRef<Size>("Size"),
-			lua::FuncReference::GetRef<First>("First"),
-			lua::FuncReference::GetRef<Insert>("Insert"),
-			lua::FuncReference::GetRef<Remove>("Remove"),
-			lua::FuncReference::GetRef<ListType>("ListType"),
-			lua::FuncReference::GetRef<InsertAt>("InsertAt"),
-			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
+			luaext::FuncReference::GetRef<Name>("Name"),
+			luaext::FuncReference::GetRef<GetType>("GetType"),
+			luaext::FuncReference::GetRef<Elements>("Elements"),
+			luaext::FuncReference::GetRef<Size>("Size"),
+			luaext::FuncReference::GetRef<First>("First"),
+			luaext::FuncReference::GetRef<Insert>("Insert"),
+			luaext::FuncReference::GetRef<Remove>("Remove"),
+			luaext::FuncReference::GetRef<ListType>("ListType"),
+			luaext::FuncReference::GetRef<InsertAt>("InsertAt"),
+			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 
 	private:

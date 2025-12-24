@@ -214,8 +214,8 @@ namespace BB {
 
 		struct ExtendedInfo {
 			std::string_view Name;
-			void (* const Push)(lua::State L, void* data, const FieldSerializer* fs);
-			void (* const Check)(lua::State L, void* data, int idx, const FieldSerializer* fs);
+			void (* const Push)(luaext::State L, void* data, const FieldSerializer* fs);
+			void (* const Check)(luaext::State L, void* data, int idx, const FieldSerializer* fs);
 			std::string_view XSDType;
 		};
 

@@ -102,7 +102,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 	// note no serf, heroability, building cmds
 
 	void EventMove(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -115,12 +115,12 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventAMove(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -129,7 +129,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto _ = s.c_str();
 	}
 	void EventHoldPos(BB::CEvent* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -138,7 +138,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto _ = s.c_str();
 	}
 	void EventDefend(BB::CEvent* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -151,12 +151,12 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventPatrol(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -170,7 +170,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
@@ -179,7 +179,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
@@ -188,7 +188,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
@@ -197,12 +197,12 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 			__debugbreak();
 		else if constexpr (Int3Dbg)
 			DEBUGGER_BREAK;
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		auto s = L.GenerateStackTrace();
 		auto _ = s.c_str();
 	}
 	void EventBinoc(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -211,7 +211,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto _ = s.c_str();
 	}
 	void EventTorch(EGL::CEventPosition* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -220,7 +220,7 @@ class BreakOnCmdBehavior : public EGL::CGLEBehavior {
 		auto _ = s.c_str();
 	}
 	void EventPointRes(BB::CEvent* ev) { // NOLINT(*-convert-member-functions-to-static)
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if constexpr (VsDbg)
 			__debugbreak();
 		else if constexpr (Int3Dbg)
@@ -287,8 +287,7 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 	}
 }
 
-int Test(lua::State Ls) {
-	luaext::EState L{ Ls };
+int Test(luaext::State L) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A320));
 	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
@@ -307,7 +306,7 @@ int Test(lua::State Ls) {
 	return 1;
 }
 
-int GetOptions(lua::State L) {
+int GetOptions(luaext::State L) {
 	L.Push(Options.DisableAdvStringPrinting);
 	L.Push(Options.DisableAdvLuaSerializer);
 	L.Push(Options.DisableModLoader);
@@ -315,7 +314,7 @@ int GetOptions(lua::State L) {
 	return 4;
 }
 
-int Cleanup(lua::State L) {
+int Cleanup(luaext::State L) {
 	CppLogic::Effect::Cleanup(L);
 	CppLogic::Combat::Cleanup(L);
 	CppLogic::Entity::Cleanup(L);
@@ -330,7 +329,7 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Cleanup(n);
 	if ((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu) {
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		Cleanup(L);
 	}
 }
@@ -338,7 +337,7 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 void OnSaveLoaded() {
 	auto* s = Framework::SavegameSystem::GlobalObj()->CurrentSave;
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.DeserializeFrom(s->SavePath.c_str(), s->AdditionalInfo.c_str());
-	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+	luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 	int t = L.GetTop();
 	CppLogic::Effect::OnSaveLoaded(L);
 	CppLogic::Combat::OnSaveLoaded(L);
@@ -388,7 +387,7 @@ void InitGame() {
 double Version = 0.0;
 std::string VersionString{ "failed loading version info" };
 
-int ResetCppLogic(lua::State L) {
+int ResetCppLogic(luaext::State L) {
 	L.Push("CppLogic");
 	L.PushLightUserdata(&ResetCppLogic);
 	L.GetTableRaw(L.REGISTRYINDEX);
@@ -396,11 +395,11 @@ int ResetCppLogic(lua::State L) {
 	return 0;
 }
 
-int Nop(lua::State L) {
+int Nop(luaext::State L) {
 	return 0;
 }
 
-void Install(lua::State L) {
+void Install(luaext::State L) {
 	if (!shok::LuaStateMainmenu) {
 		shok::LuaStateMainmenu = L.GetState();
 		InitGame();
@@ -543,7 +542,7 @@ extern "C" {
 	void __declspec(dllexport) __stdcall AddLuaState(lua_State* L) {
 		Options.LoadFromFile(".\\bin\\CppLogicOptions.txt");
 		if (!Options.DoNotLoad)
-			Install(lua::State{ L });
+			Install(luaext::State{ L });
 		dbg.Load();
 		if (dbg.AddLuaState)
 			dbg.AddLuaState(L);

@@ -27,28 +27,28 @@ namespace CppLogic::LuaEventInterface {
 	};
 
 	template<class Ev>
-	EventType<Ev>::T CheckEvent(luaext::EState L, shok::EventIDs id, int off) {
+	EventType<Ev>::T CheckEvent(luaext::State L, shok::EventIDs id, int off) {
 		throw std::logic_error("not implemented");
 	}
 	template<class Ev>
-	EventType<Ev>::T CheckEvent(luaext::EState L, shok::NetEventIds id, int off) {
+	EventType<Ev>::T CheckEvent(luaext::State L, shok::NetEventIds id, int off) {
 		throw std::logic_error("not implemented");
 	}
 
 	template<>
-	inline EGL::CEventPosition CheckEvent<EGL::CEventPosition>(luaext::EState L, shok::EventIDs id, int off) {
+	inline EGL::CEventPosition CheckEvent<EGL::CEventPosition>(luaext::State L, shok::EventIDs id, int off) {
 		return EGL::CEventPosition{ id, L.CheckPos(off+1) };
 	}
 	template<>
-	inline BB::CEvent CheckEvent<BB::CEvent>(luaext::EState L, shok::EventIDs id, int off) {
+	inline BB::CEvent CheckEvent<BB::CEvent>(luaext::State L, shok::EventIDs id, int off) {
 		return BB::CEvent{ id };
 	}
 	template<>
-	inline GGL::CEventPositionAnd2EntityTypes CheckEvent<GGL::CEventPositionAnd2EntityTypes>(luaext::EState L, shok::EventIDs id, int off) {
+	inline GGL::CEventPositionAnd2EntityTypes CheckEvent<GGL::CEventPositionAnd2EntityTypes>(luaext::State L, shok::EventIDs id, int off) {
 		return { id, L.CheckPos(off + 1), L.CheckEnum<shok::EntityTypeId>(off + 2), L.CheckEnum<shok::EntityTypeId>(off + 3) };
 	}
 	template<>
-	inline EGL::CEvent1Entity CheckEvent<EGL::CEvent1Entity>(luaext::EState L, shok::EventIDs id, int off) {
+	inline EGL::CEvent1Entity CheckEvent<EGL::CEvent1Entity>(luaext::State L, shok::EventIDs id, int off) {
 		auto e = L.CheckEntity(off + 1);
 		if (id != shok::EventIDs::CppL_Resurrect_Activate && e->IsDead())
 			throw lua::LuaException{ "target is dead" };
@@ -59,7 +59,7 @@ namespace CppLogic::LuaEventInterface {
 		using EventType = EGL::CNetEventEntityIDAndPlayerID;
 	};
 	template<>
-	inline EGL::CNetEventEntityIDAndPlayerID CheckEvent<CNetEventEntityIDAndPlayerID_AutoPlayer>(luaext::EState L, shok::NetEventIds id, int off) {
+	inline EGL::CNetEventEntityIDAndPlayerID CheckEvent<CNetEventEntityIDAndPlayerID_AutoPlayer>(luaext::State L, shok::NetEventIds id, int off) {
 		auto e = L.CheckEntity(off + 1);
 		if (e->IsDead())
 			throw lua::LuaException{ "target is dead" };
@@ -71,7 +71,7 @@ namespace CppLogic::LuaEventInterface {
 	static_assert(std::same_as<EventType<EGL::CNetEventEntityIDAndPlayerID>::T, EGL::CNetEventEntityIDAndPlayerID>);
 
 	template<>
-	inline EGL::CNetEventEntityID CheckEvent<EGL::CNetEventEntityID>(luaext::EState L, shok::NetEventIds id, int off) {
+	inline EGL::CNetEventEntityID CheckEvent<EGL::CNetEventEntityID>(luaext::State L, shok::NetEventIds id, int off) {
 		auto e = L.CheckEntity(off + 1);
 		if (e->IsDead())
 			throw lua::LuaException{ "target is dead" };
@@ -79,7 +79,7 @@ namespace CppLogic::LuaEventInterface {
 	}
 
 	template<>
-	inline EGL::CNetEvent2Entities CheckEvent<EGL::CNetEvent2Entities>(luaext::EState L, shok::NetEventIds id, int off) {
+	inline EGL::CNetEvent2Entities CheckEvent<EGL::CNetEvent2Entities>(luaext::State L, shok::NetEventIds id, int off) {
 		auto e = L.CheckEntity(off + 1);
 		auto t = L.CheckEntity(off + 2);
 		if (e->IsDead())
@@ -90,7 +90,7 @@ namespace CppLogic::LuaEventInterface {
 	}
 
 	template<>
-	inline GGL::CNetEventExtractResource CheckEvent<GGL::CNetEventExtractResource>(luaext::EState L, shok::NetEventIds id, int off) {
+	inline GGL::CNetEventExtractResource CheckEvent<GGL::CNetEventExtractResource>(luaext::State L, shok::NetEventIds id, int off) {
 		auto e = L.CheckEntity(off + 1);
 		auto t = L.OptEntity(off + 2);
 		if (auto* r = dynamic_cast<GGL::CResourceDoodad*>(t))
@@ -103,7 +103,7 @@ namespace CppLogic::LuaEventInterface {
 	}
 
 	template<>
-	inline EGL::CNetEventEntityAndPos CheckEvent<EGL::CNetEventEntityAndPos>(luaext::EState L, shok::NetEventIds id, int off) {
+	inline EGL::CNetEventEntityAndPos CheckEvent<EGL::CNetEventEntityAndPos>(luaext::State L, shok::NetEventIds id, int off) {
 		auto e = L.CheckEntity(off + 1);
 		if (e->IsDead())
 			throw lua::LuaException{ "entity is dead" };
@@ -111,7 +111,7 @@ namespace CppLogic::LuaEventInterface {
 	}
 
 	template<>
-	inline GGL::CNetEventCannonCreator CheckEvent<GGL::CNetEventCannonCreator>(luaext::EState L, shok::NetEventIds id, int off) {
+	inline GGL::CNetEventCannonCreator CheckEvent<GGL::CNetEventCannonCreator>(luaext::State L, shok::NetEventIds id, int off) {
 		auto e = L.CheckEntity(off + 1);
 		if (e->IsDead())
 			throw lua::LuaException{ "entity is dead" };
@@ -302,8 +302,7 @@ namespace CppLogic::LuaEventInterface {
 	template<class Ev>
 	using EntityChecker = void(*)(EGL::CGLEEntity* e, Ev& ev);
 	template<class Ev, shok::EventIDs ID, EntityChecker<typename EventType<Ev>::T>... Checkers>
-	int EntityCommandEvent(lua::State l) {
-		luaext::EState L{ l };
+	int EntityCommandEvent(luaext::State L) {
 		auto* e = L.CheckEntity(1);
 		if (e->IsDead())
 			throw lua::LuaException{ "entity is dead" };
@@ -316,8 +315,7 @@ namespace CppLogic::LuaEventInterface {
 	template<class Ev>
 	using NetChecker = void(*)(Ev& ev);
 	template<class Ev, shok::NetEventIds ID, NetChecker<typename EventType<Ev>::T>... Checkers>
-	int NetEvent(lua::State l) {
-		luaext::EState L{ l };
+	int NetEvent(luaext::State L) {
 		typename EventType<Ev>::T ev = CheckEvent<Ev>(L, ID, 0);
 		(Checkers(ev), ...);
 		GGUI::CManager::PostEventFromUI(&ev);

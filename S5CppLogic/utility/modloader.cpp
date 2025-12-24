@@ -35,7 +35,7 @@
 shok::String CppLogic::ModLoader::ModLoader::ModPackList{};
 size_t CppLogic::ModLoader::ModLoader::GUIDLength = 0;
 
-void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std::string_view func, const std::function<void(lua::State)>& pushMapInfo)
+void CppLogic::ModLoader::ModLoader::Init(luaext::State L, const char* mappath, std::string_view func, const std::function<void(luaext::State)>& pushMapInfo)
 {
 	Log(L, "Initializing ModLoader");
 	InitExtraECats();
@@ -93,9 +93,9 @@ void CppLogic::ModLoader::ModLoader::Init(lua::State L, const char* mappath, std
 
 void CppLogic::ModLoader::ModLoader::PreMapStart(lua_State* ingame, const char* name, const char* path, bool externalmap)
 {
-	lua::State L{ ingame };
+	luaext::State L{ ingame };
 	auto mappath = std::format("{}\\{}\\ModLoader.lua", externalmap ? "Maps" : path, externalmap ? "ExternalMap" : name);
-	Init(L, mappath.c_str(), "MapStart", [](lua::State l) {
+	Init(L, mappath.c_str(), "MapStart", [](luaext::State l) {
 		const GS3DTools::CMapData& m = (*Framework::CMain::GlobalObj)->CurrentMap;
 		l.NewTable();
 		l.Push("MapName");
@@ -117,7 +117,7 @@ void CppLogic::ModLoader::ModLoader::PreMapStart(lua_State* ingame, const char* 
 }
 void CppLogic::ModLoader::ModLoader::PostMapscriptLoaded()
 {
-	lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+	luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 	int t = L.GetTop();
 
 	Log(L, "ModLoader on Mapscript loaded");
@@ -155,9 +155,9 @@ void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::G
 	Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
 	if (!sdata->LoadSaveData(data->Folder))
 		throw std::logic_error("no save???");
-	lua::State L{ ingame };
+	luaext::State L{ ingame };
 	auto mappath = std::format("{}\\ModLoader.lua", externalmap ? "Maps\\ExternalMap" : internalmap_getpath(&sdata->CurrentSave->MapData));
-	Init(L, mappath.c_str(), "LoadSave", [&](lua::State l) {
+	Init(L, mappath.c_str(), "LoadSave", [&](luaext::State l) {
 		l.NewTable();
 		const GS3DTools::CMapData& m = sdata->CurrentSave->MapData;
 		l.Push("MapName");
@@ -180,7 +180,7 @@ void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::G
 		l.SetTableRaw(-3);
 	});
 }
-void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
+void CppLogic::ModLoader::ModLoader::AddLib(luaext::State L)
 {
 	L.Push("CppLogic");
 	L.GetGlobal();
@@ -203,7 +203,7 @@ void CppLogic::ModLoader::ModLoader::AddLib(lua::State L)
 	mng->Get("Selection_Soldier");
 	mng->Get("Selection_Building");
 }
-void CppLogic::ModLoader::ModLoader::RemoveLib(lua::State L)
+void CppLogic::ModLoader::ModLoader::RemoveLib(luaext::State L)
 {
 	L.Push("CppLogic");
 	L.GetGlobal();
@@ -232,7 +232,7 @@ void CppLogic::ModLoader::ModLoader::PostSave(const char* path, GGL::CGLGameLogi
 }
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::Load(shok::EntityTypeId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityTypeId>::Load(shok::EntityTypeId id, luaext::State L) {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	if (static_cast<int>(id) < static_cast<int>(mng->CGLEEntitiesProps.EntityTypesLogicProps.size())) {
 		mng->FreeEntityType(id);
@@ -270,7 +270,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTypeId>::Load(shok::EffectTypeId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EffectTypeId>::Load(shok::EffectTypeId id, luaext::State L) {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EffectPropsManager;
 	if (static_cast<int>(id) < static_cast<int>(mng->EffectsProps.Effects.size()))
 		mng->FreeEffectType(id);
@@ -305,7 +305,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::Load(shok::TaskListId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TaskListId>::Load(shok::TaskListId id, luaext::State L) {
 	auto* m = *EGL::CGLETaskListMgr::GlobalObj;
 	if (static_cast<int>(id) < static_cast<int>(m->TaskLists.size()))
 		m->FreeTaskList(id);
@@ -343,7 +343,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClassId>::Load(shok::ArmorClassId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ArmorClassId>::Load(shok::ArmorClassId id, luaext::State L) {
 
 }
 template<>
@@ -373,7 +373,7 @@ CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId> CppLogic:
 
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::Load(shok::DamageClassId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::DamageClassId>::Load(shok::DamageClassId id, luaext::State L) {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->DamageClassesPropsManager;
 	L.PushValue(2);
 	void* o = CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(L, nullptr, nullptr, shok::ClassId::Invalid, {
@@ -415,7 +415,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TechnologyId>::Load(shok::TechnologyId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TechnologyId>::Load(shok::TechnologyId id, luaext::State L) {
 	auto* m = (*GGL::CGLGameLogic::GlobalObj)->TechManager;
 	if (static_cast<int>(id) < static_cast<int>(m->Techs.size()))
 		m->FreeTech(id);
@@ -453,7 +453,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ModelId>::Load(shok::ModelId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::ModelId>::Load(shok::ModelId id, luaext::State L) {
 	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
 	(*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->LoadModelDataFromExtraFile(id);
 	if (static_cast<int>(id) < static_cast<int>(m->ModelManager.Models.size()))
@@ -489,7 +489,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId> CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::GUITextureId>::Load(shok::GUITextureId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::GUITextureId>::Load(shok::GUITextureId id, luaext::State L) {
 	auto* mng = EGUIX::TextureManager::GlobalObj();
 	mng->ReloadTexture(id);
 }
@@ -516,7 +516,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimationId>::Load(shok::AnimationId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimationId>::Load(shok::AnimationId id, luaext::State L) {
 	auto* m = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager;
 	if (m->AnimManager.Map.find(static_cast<int>(id)) != m->AnimManager.Map.end())
 		m->FreeAnim(id);
@@ -552,7 +552,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::UpgradeCategoryId>::Load(shok::UpgradeCategoryId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::UpgradeCategoryId>::Load(shok::UpgradeCategoryId id, luaext::State L) {
 
 }
 template<>
@@ -610,7 +610,7 @@ void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::SanityCheck()
 			throw lua::LuaException{ std::format("upgrade category {}={} missing", n, static_cast<int>(id)) };
 	}
 }
-void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::RegisterFuncs(luaext::EState L)
+void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::RegisterFuncs(luaext::State L)
 {
 	L.Push("PreLoadUpgradeCategory");
 	L.Push<Prel>();
@@ -628,13 +628,13 @@ void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::OnIdAllocated(shok
 void CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::OnIdLoaded(shok::UpgradeCategoryId id)
 {
 }
-int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Prel(lua::State L)
+int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Prel(luaext::State L)
 {
-	return Obj.Preload(luaext::EState{ L });
+	return Obj.Preload(luaext::State{ L });
 }
-int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCategory(lua::State l)
+int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCategory(luaext::State l)
 {
-	luaext::EState L{ l };
+	luaext::State L{ l };
 	shok::UpgradeCategoryId id = Obj.GetId(L, 1);
 	auto* sty = L.CheckEntityType(2);
 	if (!sty->IsSettlerType())
@@ -662,9 +662,9 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddSettlerUpgradeCa
 	L.Push(id);
 	return 1;
 }
-int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddBuildingUpgradeCategory(lua::State l)
+int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddBuildingUpgradeCategory(luaext::State l)
 {
-	luaext::EState L{ l };
+	luaext::State L{ l };
 	shok::UpgradeCategoryId id = Obj.GetId(L, 1);
 	auto* sty = L.CheckEntityType(2);
 	if (!sty->IsBuildingType())
@@ -695,7 +695,7 @@ int CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::AddBuildingUpgradeC
 CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::WaterTypeId>::Load(shok::WaterTypeId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::WaterTypeId>::Load(shok::WaterTypeId id, luaext::State L) {
 	(*Framework::CMain::GlobalObj)->GluePropsManager->WaterPropsManager->LoadWaterTypeFromExtraFile(id);
 }
 template<>
@@ -726,7 +726,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::SelectionTextureId>::Load(shok::SelectionTextureId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::SelectionTextureId>::Load(shok::SelectionTextureId id, luaext::State L) {
 	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->SelectionTextures;
 	const char* n = CppLogic::GetIdManager<shok::SelectionTextureId>().GetNameByID(id);
 	auto d = mng->Get(n);
@@ -753,7 +753,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTextureId>::Load(shok::TerrainTextureId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTextureId>::Load(shok::TerrainTextureId id, luaext::State L) {
 	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->LoadTexture(id);
 }
 template<>
@@ -777,7 +777,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTypeId>::Load(shok::TerrainTypeId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::TerrainTypeId>::Load(shok::TerrainTypeId id, luaext::State L) {
 	(*Framework::CMain::GlobalObj)->GluePropsManager->TerrainPropsManager->LoadTerrainTypeFromExtraFile(id);
 	(*ED::CGlobalsBaseEx::GlobalObj)->TerrainManager->TextureManager->ReApplyTerrainType(id);
 }
@@ -811,7 +811,7 @@ template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityCategory>::Load(shok::EntityCategory id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::EntityCategory>::Load(shok::EntityCategory id, luaext::State L) {
 
 }
 template<>
@@ -855,12 +855,12 @@ void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Reset()
 void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::SanityCheck()
 {
 }
-void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::RegisterFuncs(luaext::EState L)
+void CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::RegisterFuncs(luaext::State L)
 {
 	L.RegisterFunc<Add>("AddExperienceClass", -3);
 	L.RegisterFunc<Add>("ReloadExperienceClass", -3);
 }
-int CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Add(lua::State L)
+int CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Add(luaext::State L)
 {
 	GGL::CEntityProfile::HookExperienceClassAssignment(true);
 	const char* n = L.CheckString(1);
@@ -873,7 +873,7 @@ int CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Add(lua::State L)
 		L.Push(static_cast<int>(id));
 		return 1;
 	}
-	shok::EntityCategory cat = L.IsNumber(2) ? static_cast<shok::EntityCategory>(L.CheckInt(2)) : luaext::EState{ L }.CheckEnum<shok::EntityCategory>(2);
+	shok::EntityCategory cat = L.IsNumber(2) ? static_cast<shok::EntityCategory>(L.CheckInt(2)) : luaext::State{ L }.CheckEnum<shok::EntityCategory>(2);
 	id = mng->AddExperienceClass(n, cat);
 	Obj.ToRemove.push_back(id);
 	L.Push("ExperienceClasses");
@@ -909,13 +909,13 @@ void CppLogic::ModLoader::ModLoader::SoundGroupsLoader::SanityCheck()
 			throw lua::LuaException{ std::format("sound {}={} does nox exist", im.GetNameByID(i), static_cast<int>(i)) };
 	}*/
 }
-void CppLogic::ModLoader::ModLoader::SoundGroupsLoader::RegisterFuncs(luaext::EState L)
+void CppLogic::ModLoader::ModLoader::SoundGroupsLoader::RegisterFuncs(luaext::State L)
 {
 	L.RegisterFunc<Add>("AddSounds", -3);
 }
-int CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Add(lua::State l)
+int CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Add(luaext::State l)
 {
-	luaext::EState L{ l };
+	luaext::State L{ l };
 	int num = L.GetTop();
 	for (int i = 1; i <= num; ++i) {
 		const char* n = L.CheckString(i);
@@ -951,7 +951,7 @@ int CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Add(lua::State l)
 CppLogic::ModLoader::ModLoader::SoundGroupsLoader CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimSetId>::Load(shok::AnimSetId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::AnimSetId>::Load(shok::AnimSetId id, luaext::State L) {
 	auto* mng = *EGL::AnimSetManager::GlobalObj;
 	if (static_cast<int>(id) < static_cast<int>(mng->AnimSets.size()))
 		mng->FreeAnimSet(id);
@@ -1004,11 +1004,11 @@ void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Reset()
 void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::SanityCheck()
 {
 }
-void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::RegisterFuncs(luaext::EState L)
+void CppLogic::ModLoader::ModLoader::DirectXEffectLoader::RegisterFuncs(luaext::State L)
 {
 	L.RegisterFunc<Add>("LoadDirectXEffect", -3);
 }
-int CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Add(lua::State L)
+int CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Add(luaext::State L)
 {
 	const char* name = L.CheckString(1);
 	auto* mng = (*ED::CGlobalsBaseEx::GlobalObj)->RWEngine->Effects;
@@ -1028,12 +1028,12 @@ void CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Reset() {
 void CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::SanityCheck() {
 }
 
-void CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::RegisterFuncs(luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::RegisterFuncs(luaext::State L) {
 	L.RegisterFunc<Add>("LoadFeedbackEventSoundData", -3);
 }
 
-int CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Add(lua::State l) {
-	luaext::EState L{l};
+int CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Add(luaext::State l) {
+	luaext::State L{l};
 	auto* m = GGUI::SoundFeedback::GlobalObj();
 	auto id = L.CheckEnum<shok::FeedbackEventShortenedId>(1);
 	m->SD.ReloadData(id);
@@ -1043,7 +1043,7 @@ int CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Add(lua::State
 CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Obj{};
 
 template<>
-void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::FontId>::Load(shok::FontId id, luaext::EState L) {
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderCommon<shok::FontId>::Load(shok::FontId id, luaext::State L) {
 	auto* mng = EGUIX::FontManager::GlobalObj();
 	mng->ClearFont(id);
 	mng->GetFontObj(id);
@@ -1098,33 +1098,33 @@ std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoad
 
 bool CppLogic::ModLoader::ModLoader::Initialized = false;
 
-int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(lua::State L)
+int CppLogic::ModLoader::ModLoader::SetEntityTypeToReload(luaext::State L)
 {
-	auto id = luaext::EState{ L }.CheckEnum<shok::EntityTypeId>(1);
+	auto id = luaext::State{ L }.CheckEnum<shok::EntityTypeId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(id);
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::SetTaskListToReload(lua::State L)
+int CppLogic::ModLoader::ModLoader::SetTaskListToReload(luaext::State L)
 {
-	auto id = luaext::EState{ L }.CheckEnum<shok::TaskListId>(1);
+	auto id = luaext::State{ L }.CheckEnum<shok::TaskListId>(1);
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj.OnIdLoaded(id);
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::SetDamageclassesToReload(lua::State L)
+int CppLogic::ModLoader::ModLoader::SetDamageclassesToReload(luaext::State L)
 {
 	CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj.OnIdLoaded(shok::DamageClassId::Invalid);
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::RefreshEntityCategoryCache(lua::State L)
+int CppLogic::ModLoader::ModLoader::RefreshEntityCategoryCache(luaext::State L)
 {
 	EGL::EntityCategoryCache::RefreshCache(*EGL::CGLEEntitiesProps::GlobalObj);
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::SanityCheck(lua::State L)
+int CppLogic::ModLoader::ModLoader::SanityCheck(luaext::State L)
 {
 	for (auto* l : Loaders) {
 		l->SanityCheck();
@@ -1143,7 +1143,7 @@ void CppLogic::ModLoader::ModLoader::InitExtraECats()
 }
 
 
-int CppLogic::ModLoader::ModLoader::GetModpackInfo(lua::State L)
+int CppLogic::ModLoader::ModLoader::GetModpackInfo(luaext::State L)
 {
 	ModpackDesc d{};
 	d.Name = L.CheckStringView(1);
@@ -1165,7 +1165,7 @@ int CppLogic::ModLoader::ModLoader::GetModpackInfo(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::LoadModpackBBA(lua::State L)
+int CppLogic::ModLoader::ModLoader::LoadModpackBBA(luaext::State L)
 {
 	auto p = GetModPackPath(L.CheckStringView(1));
 	auto* mng = *BB::CFileSystemMgr::GlobalObj;
@@ -1183,7 +1183,7 @@ int CppLogic::ModLoader::ModLoader::LoadModpackBBA(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::CreateModpackRedirectLayer(lua::State L)
+int CppLogic::ModLoader::ModLoader::CreateModpackRedirectLayer(luaext::State L)
 {
 	auto p = std::format("{} redirect layer", L.CheckStringView(1));
 	auto* mng = *BB::CFileSystemMgr::GlobalObj;
@@ -1200,7 +1200,7 @@ int CppLogic::ModLoader::ModLoader::CreateModpackRedirectLayer(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::InvalidModPackPanic(lua::State L)
+int CppLogic::ModLoader::ModLoader::InvalidModPackPanic(luaext::State L)
 {
 	auto m = L.CheckStringView(1);
 	MessageBoxA(nullptr, m.data(), "ModLoader failure", MB_OK);
@@ -1208,7 +1208,7 @@ int CppLogic::ModLoader::ModLoader::InvalidModPackPanic(lua::State L)
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::GetModpacks(lua::State L)
+int CppLogic::ModLoader::ModLoader::GetModpacks(luaext::State L)
 {
 	L.NewTable();
 	std::filesystem::directory_iterator it{ std::filesystem::path(ModpackFolder) };
@@ -1226,9 +1226,9 @@ int CppLogic::ModLoader::ModLoader::GetModpacks(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::ReserializeEntityType(lua::State l)
+int CppLogic::ModLoader::ModLoader::ReserializeEntityType(luaext::State l)
 {
-	luaext::EState L{ l };
+	luaext::State L{ l };
 	CppLogic::WinAPI::FileDialog dlg{};
 	auto etyid = L.CheckEnum<shok::EntityTypeId>(1);
 	auto* ety = CppLogic::GetEntityType(etyid);
@@ -1251,9 +1251,9 @@ int CppLogic::ModLoader::ModLoader::ReserializeEntityType(lua::State l)
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::ReserializeTaskList(lua::State l)
+int CppLogic::ModLoader::ModLoader::ReserializeTaskList(luaext::State l)
 {
-	luaext::EState L{ l };
+	luaext::State L{ l };
 	CppLogic::WinAPI::FileDialog dlg{};
 	auto etyid = L.CheckEnum<shok::TaskListId>(1);
 	auto* ety = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(etyid);
@@ -1276,9 +1276,9 @@ int CppLogic::ModLoader::ModLoader::ReserializeTaskList(lua::State l)
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::ReserializeModel(lua::State l)
+int CppLogic::ModLoader::ModLoader::ReserializeModel(luaext::State l)
 {
-	luaext::EState L{ l };
+	luaext::State L{ l };
 	CppLogic::WinAPI::FileDialog dlg{};
 	auto etyid = L.CheckEnum<shok::ModelId>(1);
 	auto& ety = (*ED::CGlobalsBaseEx::GlobalObj)->ModelProps->Get(etyid);
@@ -1301,20 +1301,20 @@ int CppLogic::ModLoader::ModLoader::ReserializeModel(lua::State l)
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::SetModPackList(lua::State L)
+int CppLogic::ModLoader::ModLoader::SetModPackList(luaext::State L)
 {
 	ModPackList = L.CheckStringView(1);
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::GetModPackList(lua::State L)
+int CppLogic::ModLoader::ModLoader::GetModPackList(luaext::State L)
 {
 	L.Push(ModPackList);
 	return 1;
 }
 
-lua::Reference CppLogic::ModLoader::ModLoader::SavegameValidOverride{};
-int CppLogic::ModLoader::ModLoader::OverrideSavegameValid(lua::State L)
+luaext::Reference CppLogic::ModLoader::ModLoader::SavegameValidOverride{};
+int CppLogic::ModLoader::ModLoader::OverrideSavegameValid(luaext::State L)
 {
 	if (!L.IsFunction(1))
 		throw lua::LuaException{ "no func at 1" };
@@ -1322,7 +1322,7 @@ int CppLogic::ModLoader::ModLoader::OverrideSavegameValid(lua::State L)
 	L.PushValue(1);
 	SavegameValidOverride = L.Ref();
 	Framework::SavegameSystem::IsSaveValidOverride = [](std::string_view save) {
-		lua::State L{ shok::LuaStateMainmenu };
+		luaext::State L{ shok::LuaStateMainmenu };
 		int t = L.GetTop();
 		bool r = false;
 
@@ -1339,7 +1339,7 @@ int CppLogic::ModLoader::ModLoader::OverrideSavegameValid(lua::State L)
 	return 0;
 }
 
-int CppLogic::ModLoader::ModLoader::LoadStringTableTextOverrides(lua::State L)
+int CppLogic::ModLoader::ModLoader::LoadStringTableTextOverrides(luaext::State L)
 {
 	std::string_view file = L.CheckStringView(1);
 	std::string_view lang = L.CheckStringView(2);
@@ -1363,9 +1363,9 @@ int CppLogic::ModLoader::ModLoader::LoadStringTableTextOverrides(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::MapGetModPacks(lua::State l)
+int CppLogic::ModLoader::ModLoader::MapGetModPacks(luaext::State l)
 {
-	luaext::EState L{ l };
+	luaext::State L{ l };
 	const char* n = L.CheckString(1);
 	auto ty = L.CheckEnum<shok::MapType>(2);
 	const char* cn = L.OptString(3, nullptr); // optional
@@ -1421,8 +1421,8 @@ int CppLogic::ModLoader::ModLoader::MapGetModPacks(lua::State l)
 	return 3;
 }
 
-int CppLogic::ModLoader::ModLoader::GetEntityTypeMem(lua::State l) {
-	luaext::EState L{ l };
+int CppLogic::ModLoader::ModLoader::GetEntityTypeMem(luaext::State l) {
+	luaext::State L{ l };
 	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetEntityTypeMem", L.CheckEntityType(1),
 		static_cast<int>(L.CheckEnum<shok::EntityTypeId>(1)), [](int id) {
 			DataTypeLoaderTracking<shok::EntityTypeId>::Obj.OnIdLoaded(static_cast<shok::EntityTypeId>(id));
@@ -1430,8 +1430,8 @@ int CppLogic::ModLoader::ModLoader::GetEntityTypeMem(lua::State l) {
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::GetTaskListMem(lua::State l) {
-	luaext::EState L{ l };
+int CppLogic::ModLoader::ModLoader::GetTaskListMem(luaext::State l) {
+	luaext::State L{ l };
 	auto id = L.CheckEnum<shok::TaskListId>(1);
 	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetTaskListMem", GetTaskList(id),
 		static_cast<int>(id), [](int id) {
@@ -1440,8 +1440,8 @@ int CppLogic::ModLoader::ModLoader::GetTaskListMem(lua::State l) {
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::GetTechnologyMem(lua::State l) {
-	luaext::EState L{ l };
+int CppLogic::ModLoader::ModLoader::GetTechnologyMem(luaext::State l) {
+	luaext::State L{ l };
 	auto id = L.CheckEnum<shok::TechnologyId>(1);
 	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetTechnologyMem", GetTechnology(id), shok::Technology::SerializationData,
 		static_cast<int>(id), [](int id) {
@@ -1450,8 +1450,8 @@ int CppLogic::ModLoader::ModLoader::GetTechnologyMem(lua::State l) {
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::GetEffectTypeMem(lua::State l) {
-	luaext::EState L{ l };
+int CppLogic::ModLoader::ModLoader::GetEffectTypeMem(luaext::State l) {
+	luaext::State L{ l };
 	auto id = L.CheckEnum<shok::EffectTypeId>(1);
 	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetEffectTypeMem", GetEffectType(id), EGL::EffectType::SerializationData,
 		static_cast<int>(id), [](int id) {
@@ -1460,8 +1460,8 @@ int CppLogic::ModLoader::ModLoader::GetEffectTypeMem(lua::State l) {
 	return 1;
 }
 
-int CppLogic::ModLoader::ModLoader::GetFeedbackEventMem(lua::State l) {
-	luaext::EState L{ l };
+int CppLogic::ModLoader::ModLoader::GetFeedbackEventMem(luaext::State l) {
+	luaext::State L{ l };
 	auto& sd = GGUI::SoundFeedback::GlobalObj()->SD;
 	auto id = L.CheckEnum<shok::FeedbackEventShortenedId>(1);
 	auto ev = sd.SoundData.find(id);
@@ -1472,7 +1472,7 @@ int CppLogic::ModLoader::ModLoader::GetFeedbackEventMem(lua::State l) {
 	return 1;
 }
 
-void CppLogic::ModLoader::ModLoader::Log(lua::State L, const char* log)
+void CppLogic::ModLoader::ModLoader::Log(luaext::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);
 	int t = L.GetTop();
@@ -1508,7 +1508,7 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 {
 	if (((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu)) {
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		ModPackList = "";
 
 		Log(L, "Cleanup");
@@ -1568,7 +1568,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 	}
 }
 
-void CppLogic::ModLoader::ModLoader::InitMainmenu(lua::State L)
+void CppLogic::ModLoader::ModLoader::InitMainmenu(luaext::State L)
 {
 	L.Push(ModLoaderLib);
 	L.NewTable();
@@ -1631,7 +1631,7 @@ const BB::SerializationData CppLogic::ModLoader::ExtendedMapInfo::SerializationD
 };
 
 
-int CppLogic::ModLoader::ArchivePopHelper::Remove(lua::State L)
+int CppLogic::ModLoader::ArchivePopHelper::Remove(luaext::State L)
 {
 	auto t = L.CheckUserClass<ArchivePopHelper>(1);
 	auto* mng = *BB::CFileSystemMgr::GlobalObj;
@@ -1651,7 +1651,7 @@ int CppLogic::ModLoader::ArchivePopHelper::Remove(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ArchivePopHelper::IsLoaded(lua::State L)
+int CppLogic::ModLoader::ArchivePopHelper::IsLoaded(luaext::State L)
 {
 	auto t = L.CheckUserClass<ArchivePopHelper>(1);
 	auto* mng = *BB::CFileSystemMgr::GlobalObj;
@@ -1665,7 +1665,7 @@ int CppLogic::ModLoader::ArchivePopHelper::IsLoaded(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ArchivePopHelper::ToString(lua::State L)
+int CppLogic::ModLoader::ArchivePopHelper::ToString(luaext::State L)
 {
 	auto t = L.CheckUserClass<ArchivePopHelper>(1);
 	L.Push(t->Archive);
@@ -1699,7 +1699,7 @@ CppLogic::Mod::FileSystem::RedirectFileSystem* CppLogic::ModLoader::ArchiveRedir
 	throw lua::LuaException{ "not in loadorder" };
 }
 
-int CppLogic::ModLoader::ArchiveRedirectHelper::Get(lua::State L)
+int CppLogic::ModLoader::ArchiveRedirectHelper::Get(luaext::State L)
 {
 	auto t = L.CheckUserClass<ArchiveRedirectHelper>(1);
 	auto* r = t->CheckStillValid();
@@ -1712,7 +1712,7 @@ int CppLogic::ModLoader::ArchiveRedirectHelper::Get(lua::State L)
 	return 1;
 }
 
-int CppLogic::ModLoader::ArchiveRedirectHelper::Set(lua::State L)
+int CppLogic::ModLoader::ArchiveRedirectHelper::Set(luaext::State L)
 {
 	auto t = L.CheckUserClass<ArchiveRedirectHelper>(1);
 	auto* r = t->CheckStillValid();

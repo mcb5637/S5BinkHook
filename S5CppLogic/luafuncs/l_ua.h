@@ -8,7 +8,7 @@
 #include <utility/luaserializer.h>
 
 namespace CppLogic::UA {
-	void Init(lua::State L);
+	void Init(luaext::State L);
 
 	enum class UAStatus : int {
 		Idle = 1,
@@ -60,8 +60,8 @@ namespace CppLogic::UA {
 		shok::Position Target = { -1,-1 };
 		bool ReMove = false, IgnoreFleeing = false, PrepDefense = false, SabotageBridges = false;
 		bool DoNotNormalizeSpeed = false;
-		lua::State L = nullptr;
-		lua::Reference Formation = lua::State::NoRef, CommandQueue = lua::State::NoRef, Spawner = lua::State::NoRef;
+		luaext::State L = nullptr;
+		luaext::Reference Formation = luaext::State::NoRef, CommandQueue = luaext::State::NoRef, Spawner = luaext::State::NoRef;
 		float AutoRotateFormation = -1;
 		float LastRotation = 0;
 
@@ -92,7 +92,7 @@ namespace CppLogic::UA {
 		EGL::CGLEEntity* GetFurthestConversionTargetInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
 		static int CountTargetsInArea(shok::PlayerId player, shok::Position& p, float ran, bool notFleeing);
 
-		static void RegisterUDType(lua::State L);
+		static void RegisterUDType(luaext::State L);
 
 
 	private:
@@ -117,61 +117,61 @@ namespace CppLogic::UA {
 		bool CheckTargetCache(shok::EntityId id, int count);
 		void UpdateTargetCache(shok::EntityId id, int time);
 
-		static int AddLeader(lua::State L);
-		static int GetPos(lua::State L);
-		static int Tick(lua::State L);
-		static int Iterate(lua::State L);
-		static int IterateTransit(lua::State L);
-		static int OnIdChanged(lua::State L);
-		static int GetSize(lua::State L);
-		static int RemoveLeader(lua::State L);
-		static int IsIdle(lua::State L);
-		static int GetStatus(lua::State L);
-		static int SetArea(lua::State L);
-		static int SetTarget(lua::State L);
-		static int DumpTable(lua::State L);
-		static int ReadTable(lua::State L);
-		static int SetStatus(lua::State L);
-		static int SetReMove(lua::State L);
-		static int SetCurrentBattleTarget(lua::State L);
-		static int GetRangedMelee(lua::State L);
-		static int SetIgnoreFleeing(lua::State L);
-		static int SetAutoRotateFormation(lua::State L);
-		static int GetFirstDeadHero(lua::State L);
-		static int SetPrepDefense(lua::State L);
-		static int SetSabotageBridges(lua::State L);
-		static int SetDoNotNormalizeSpeed(lua::State L);
+		static int AddLeader(luaext::State L);
+		static int GetPos(luaext::State L);
+		static int Tick(luaext::State L);
+		static int Iterate(luaext::State L);
+		static int IterateTransit(luaext::State L);
+		static int OnIdChanged(luaext::State L);
+		static int GetSize(luaext::State L);
+		static int RemoveLeader(luaext::State L);
+		static int IsIdle(luaext::State L);
+		static int GetStatus(luaext::State L);
+		static int SetArea(luaext::State L);
+		static int SetTarget(luaext::State L);
+		static int DumpTable(luaext::State L);
+		static int ReadTable(luaext::State L);
+		static int SetStatus(luaext::State L);
+		static int SetReMove(luaext::State L);
+		static int SetCurrentBattleTarget(luaext::State L);
+		static int GetRangedMelee(luaext::State L);
+		static int SetIgnoreFleeing(luaext::State L);
+		static int SetAutoRotateFormation(luaext::State L);
+		static int GetFirstDeadHero(luaext::State L);
+		static int SetPrepDefense(luaext::State L);
+		static int SetSabotageBridges(luaext::State L);
+		static int SetDoNotNormalizeSpeed(luaext::State L);
 
 	public:
-		static constexpr const std::array<lua::FuncReference, 22> LuaMethods = { {
-				lua::FuncReference::GetRef<AddLeader>("AddLeader"),
-				lua::FuncReference::GetRef<GetPos>("GetPos"),
-				lua::FuncReference::GetRef<Tick>("Tick"),
-				lua::FuncReference::GetRef<Iterate>("Iterate"),
-				lua::FuncReference::GetRef<IterateTransit>("IterateTransit"),
-				lua::FuncReference::GetRef<OnIdChanged>("OnIdChanged"),
-				lua::FuncReference::GetRef<GetSize>("GetSize"),
-				lua::FuncReference::GetRef<RemoveLeader>("RemoveLeader"),
-				lua::FuncReference::GetRef<IsIdle>("IsIdle"),
-				lua::FuncReference::GetRef<GetStatus>("GetStatus"),
-				lua::FuncReference::GetRef<SetArea>("SetArea"),
-				lua::FuncReference::GetRef<SetTarget>("SetTarget"),
-				//lua::FuncReference::GetRef<DumpTable>("DumpTable"),
-				//lua::FuncReference::GetRef<ReadTable>("ReadTable"),
-				lua::FuncReference::GetRef<SetStatus>("SetStatus"),
-				lua::FuncReference::GetRef<SetReMove>("SetReMove"),
-				lua::FuncReference::GetRef<SetCurrentBattleTarget>("SetCurrentBattleTarget"),
-				lua::FuncReference::GetRef<GetRangedMelee>("GetRangedMelee"),
-				lua::FuncReference::GetRef<SetIgnoreFleeing>("SetIgnoreFleeing"),
-				lua::FuncReference::GetRef<SetAutoRotateFormation>("SetAutoRotateFormation"),
-				lua::FuncReference::GetRef<GetFirstDeadHero>("GetFirstDeadHero"),
-				lua::FuncReference::GetRef<SetPrepDefense>("SetPrepDefense"),
-				lua::FuncReference::GetRef<SetSabotageBridges>("SetSabotageBridges"),
-				lua::FuncReference::GetRef<SetDoNotNormalizeSpeed>("SetDoNotNormalizeSpeed"),
+		static constexpr const std::array<luaext::FuncReference, 22> LuaMethods = { {
+				luaext::FuncReference::GetRef<AddLeader>("AddLeader"),
+				luaext::FuncReference::GetRef<GetPos>("GetPos"),
+				luaext::FuncReference::GetRef<Tick>("Tick"),
+				luaext::FuncReference::GetRef<Iterate>("Iterate"),
+				luaext::FuncReference::GetRef<IterateTransit>("IterateTransit"),
+				luaext::FuncReference::GetRef<OnIdChanged>("OnIdChanged"),
+				luaext::FuncReference::GetRef<GetSize>("GetSize"),
+				luaext::FuncReference::GetRef<RemoveLeader>("RemoveLeader"),
+				luaext::FuncReference::GetRef<IsIdle>("IsIdle"),
+				luaext::FuncReference::GetRef<GetStatus>("GetStatus"),
+				luaext::FuncReference::GetRef<SetArea>("SetArea"),
+				luaext::FuncReference::GetRef<SetTarget>("SetTarget"),
+				//luaext::FuncReference::GetRef<DumpTable>("DumpTable"),
+				//luaext::FuncReference::GetRef<ReadTable>("ReadTable"),
+				luaext::FuncReference::GetRef<SetStatus>("SetStatus"),
+				luaext::FuncReference::GetRef<SetReMove>("SetReMove"),
+				luaext::FuncReference::GetRef<SetCurrentBattleTarget>("SetCurrentBattleTarget"),
+				luaext::FuncReference::GetRef<GetRangedMelee>("GetRangedMelee"),
+				luaext::FuncReference::GetRef<SetIgnoreFleeing>("SetIgnoreFleeing"),
+				luaext::FuncReference::GetRef<SetAutoRotateFormation>("SetAutoRotateFormation"),
+				luaext::FuncReference::GetRef<GetFirstDeadHero>("GetFirstDeadHero"),
+				luaext::FuncReference::GetRef<SetPrepDefense>("SetPrepDefense"),
+				luaext::FuncReference::GetRef<SetSabotageBridges>("SetSabotageBridges"),
+				luaext::FuncReference::GetRef<SetDoNotNormalizeSpeed>("SetDoNotNormalizeSpeed"),
 		} };
 
-		static constexpr const std::array<lua::FuncReference, 1> LuaMetaMethods{ {
-				lua::FuncReference::GetRef<DumpTable>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
+		static constexpr const std::array<luaext::FuncReference, 1> LuaMetaMethods{ {
+				luaext::FuncReference::GetRef<DumpTable>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
 		} };
 	};
 }

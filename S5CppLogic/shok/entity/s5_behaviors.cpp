@@ -1529,7 +1529,7 @@ void __thiscall GGL::CResourceRefinerBehavior::EventRefineOverride(BB::CEvent* e
 
 		pl->CurrentResources.AddToType(rt, am);
 		{
-			luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
+			luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 			int t = L.GetTop();
 			L.GetGlobal("GameCallback_GainedResources");
 			L.Push(e->PlayerId);

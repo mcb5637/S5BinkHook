@@ -1346,7 +1346,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage
 	}
 	if (attackerplayer != static_cast<shok::PlayerId>(0) || EGL::CGLEEntity::HurtEntityCallWithNoAttacker) {
 
-		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 		L.Push(callback);
 		L.GetGlobal();

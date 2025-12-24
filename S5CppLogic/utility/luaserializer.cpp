@@ -5,7 +5,7 @@
 #include <shok/s5_scriptsystem.h>
 #include <utility/OnScopeExit.h>
 
-void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(lua::State L, void* o, const BB::SerializationData* s, bool keypushed)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(luaext::State L, void* o, const BB::SerializationData* s, bool keypushed)
 {
 	switch (s->Type) {
 	case BB::SerializationData::Ty::Direct:
@@ -61,7 +61,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::SerializeField(lua::State L, v
 	}
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::SerializeFields(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializeFields(luaext::State L, void* o, const BB::SerializationData* s)
 {
 	while (s->Size) {
 		if (s->SerializationName) {
@@ -78,12 +78,12 @@ void CppLogic::Serializer::ObjectToLuaSerializer::SerializeFields(lua::State L, 
 	}
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::SerializePushField(lua::State L, void* data, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializePushField(luaext::State L, void* data, const BB::SerializationData* s)
 {
 	s->DataConverter->GetExtendedInfo().Push(L, data, s->DataConverter);
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::SerializeList(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::SerializeList(luaext::State L, void* o, const BB::SerializationData* s)
 {
 	L.Push(s->SerializationName);
 	L.NewTable();
@@ -102,7 +102,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::SerializeList(lua::State L, vo
 	L.SetTableRaw(-3);
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id)
+void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(luaext::State L, void* o, const BB::SerializationData* seri, shok::ClassId id)
 {
 	L.NewTable();
 	if (id != shok::ClassId::Invalid) {
@@ -115,13 +115,13 @@ void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(lua::State L, void* 
 	}
 	SerializeFields(L, o, seri);
 }
-void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(lua::State L, BB::IObject* o)
+void CppLogic::Serializer::ObjectToLuaSerializer::Serialize(luaext::State L, BB::IObject* o)
 {
 	shok::ClassId id = o->GetClassIdentifier();
 	Serialize(L, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(lua::State L, void* o, const BB::SerializationData* s, bool valuepushed)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(luaext::State L, void* o, const BB::SerializationData* s, bool valuepushed)
 {
 	switch (s->Type) {
 	case BB::SerializationData::Ty::Direct:
@@ -180,12 +180,12 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeField(lua::State L,
 	}
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeCheckField(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeCheckField(luaext::State L, void* o, const BB::SerializationData* s)
 {
 	s->DataConverter->GetExtendedInfo().Check(L, o, -1, s->DataConverter);
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeFields(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeFields(luaext::State L, void* o, const BB::SerializationData* s)
 {
 	while (s->Size) {
 		if (s->SerializationName) {
@@ -202,7 +202,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeFields(lua::State L
 	}
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeList(lua::State L, void* o, const BB::SerializationData* s)
+void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeList(luaext::State L, void* o, const BB::SerializationData* s)
 {
 	L.Push(s->SerializationName);
 	L.GetTableRaw(-2);
@@ -218,7 +218,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DeserializeList(lua::State L, 
 	L.Pop(1);
 }
 
-void* CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, void* o, const BB::SerializationData* seri, shok::ClassId id, std::initializer_list<shok::ClassId> whitelisted_ids)
+void* CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(luaext::State L, void* o, const BB::SerializationData* seri, shok::ClassId id, std::initializer_list<shok::ClassId> whitelisted_ids)
 {
 	if (o == nullptr) {
 		if (id == shok::ClassId::Invalid) {
@@ -251,13 +251,13 @@ void* CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, voi
 	DeserializeFields(L, o, seri);
 	return o;
 }
-void CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(lua::State L, BB::IObject* o)
+void CppLogic::Serializer::ObjectToLuaSerializer::Deserialize(luaext::State L, BB::IObject* o)
 {
 	shok::ClassId id = o->GetClassIdentifier();
 	Deserialize(L, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
 }
 
-void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua::State L, const BB::SerializationData* d)
+void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(luaext::State L, const BB::SerializationData* d)
 {
 	if (!d) {
 		L.Push("nullptr");
@@ -319,7 +319,7 @@ void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua
 		d++;
 	}
 }
-void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(lua::State L, shok::ClassId id)
+void CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(luaext::State L, shok::ClassId id)
 {
 	DumpClassSerializationData(L, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id));
 }
@@ -1023,7 +1023,7 @@ void CppLogic::Serializer::AdvLuaStateSerializer::DeserializeStack()
 	CleanupDeserialize(true);
 }
 
-void CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(lua::State L)
+void CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(luaext::State L)
 {
 	L.GetSubTable(RegistrySerializeKeys, L.REGISTRYINDEX);
 }
@@ -1033,14 +1033,14 @@ CppLogic::Serializer::ObjectAccess::ObjectAccess(std::string_view name, void* ob
 {
 }
 
-int CppLogic::Serializer::ObjectAccess::Name(lua::State L)
+int CppLogic::Serializer::ObjectAccess::Name(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ObjectAccess>(1);
 	L.Push(th->SDName);
 	return 1;
 }
 
-void CppLogic::Serializer::ObjectAccess::PushSD(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id), bool listElement)
+void CppLogic::Serializer::ObjectAccess::PushSD(luaext::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id), bool listElement)
 {
 	if (sd->Size == 0) { // NOLINT(*-branch-clone)
 		L.Push();
@@ -1076,39 +1076,39 @@ void CppLogic::Serializer::ObjectAccess::PushSD(lua::State L, std::string_view n
 	}
 }
 
-void CppLogic::Serializer::ObjectAccess::PushObject(lua::State L, std::string_view n, BB::IObject* obj, int id, void(*onWrite)(int id), shok::ClassId c, void** owner)
+void CppLogic::Serializer::ObjectAccess::PushObject(luaext::State L, std::string_view n, BB::IObject* obj, int id, void(*onWrite)(int id), shok::ClassId c, void** owner)
 {
 	if (c == shok::ClassId::Invalid)
 		c = obj->GetClassIdentifier();
 	L.NewUserClass<BBObjectAccess>(n, obj, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(c), id, onWrite, owner);
 }
 
-void CppLogic::Serializer::ObjectAccess::PushObject(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id))
+void CppLogic::Serializer::ObjectAccess::PushObject(luaext::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id))
 {
 	L.NewUserClass<StructAccess>(n, obj, sd, id, onWrite);
 }
 
-int CppLogic::Serializer::FieldAccess::GetType(lua::State L)
+int CppLogic::Serializer::FieldAccess::GetType(luaext::State L)
 {
-	luaext::EState{ L }.Push(Type::Field);
+	L.Push(Type::Field);
 	return 1;
 }
 
-int CppLogic::Serializer::FieldAccess::DataType(lua::State L)
+int CppLogic::Serializer::FieldAccess::DataType(luaext::State L)
 {
 	auto* th = L.CheckUserClass<FieldAccess>(1);
 	L.Push(th->SeriData->DataConverter->GetTypeDescName());
 	return 1;
 }
 
-int CppLogic::Serializer::FieldAccess::Get(lua::State L)
+int CppLogic::Serializer::FieldAccess::Get(luaext::State L)
 {
 	auto* th = L.CheckUserClass<FieldAccess>(1);
 	th->SeriData->DataConverter->GetExtendedInfo().Push(L, th->Object, th->SeriData->DataConverter);
 	return 1;
 }
 
-int CppLogic::Serializer::FieldAccess::Set(lua::State L)
+int CppLogic::Serializer::FieldAccess::Set(luaext::State L)
 {
 	auto* th = L.CheckUserClass<FieldAccess>(1);
 	th->OnWrite(th->Id);
@@ -1116,13 +1116,13 @@ int CppLogic::Serializer::FieldAccess::Set(lua::State L)
 	return 0;
 }
 
-int CppLogic::Serializer::StructAccess::GetType(lua::State L)
+int CppLogic::Serializer::StructAccess::GetType(luaext::State L)
 {
-	luaext::EState{ L }.Push(Type::Struct);
+	L.Push(Type::Struct);
 	return 1;
 }
 
-int CppLogic::Serializer::StructAccess::Index(lua::State L)
+int CppLogic::Serializer::StructAccess::Index(luaext::State L)
 {
 	auto* th = L.CheckUserClass<StructAccess>(1);
 	if (th->Object == nullptr)
@@ -1138,7 +1138,7 @@ int CppLogic::Serializer::StructAccess::Index(lua::State L)
 	return 0;
 }
 
-int CppLogic::Serializer::StructAccess::Fields(lua::State L)
+int CppLogic::Serializer::StructAccess::Fields(luaext::State L)
 {
 	auto* th = L.CheckUserClass<StructAccess>(1);
 	if (th->Object == nullptr)
@@ -1149,7 +1149,7 @@ int CppLogic::Serializer::StructAccess::Fields(lua::State L)
 	return 1;
 }
 
-int CppLogic::Serializer::StructAccess::FieldsNext(lua::State L)
+int CppLogic::Serializer::StructAccess::FieldsNext(luaext::State L)
 {
 	auto* i = L.CheckUserClass<Iter>(L.Upvalueindex(1));
 	auto* th = L.CheckUserClass<StructAccess>(L.Upvalueindex(2));
@@ -1206,13 +1206,13 @@ CppLogic::Serializer::BBObjectAccess::BBObjectAccess(std::string_view name, void
 {
 }
 
-int CppLogic::Serializer::BBObjectAccess::GetType(lua::State L)
+int CppLogic::Serializer::BBObjectAccess::GetType(luaext::State L)
 {
-	luaext::EState{ L }.Push(Type::BBObject);
+	L.Push(Type::BBObject);
 	return 1;
 }
 
-int CppLogic::Serializer::BBObjectAccess::ObjectType(lua::State L)
+int CppLogic::Serializer::BBObjectAccess::ObjectType(luaext::State L)
 {
 	auto* th = L.CheckUserClass<BBObjectAccess>(1);
 	if (th->Object == nullptr) {
@@ -1230,7 +1230,7 @@ int CppLogic::Serializer::BBObjectAccess::ObjectType(lua::State L)
 	return 2;
 }
 
-int CppLogic::Serializer::BBObjectAccess::New(lua::State L)
+int CppLogic::Serializer::BBObjectAccess::New(luaext::State L)
 {
 	auto* th = L.CheckUserClass<BBObjectAccess>(1);
 	if (th->Owner == nullptr) {
@@ -1240,7 +1240,7 @@ int CppLogic::Serializer::BBObjectAccess::New(lua::State L)
 	if (L.IsNoneOrNil(2))
 		id = shok::ClassId::Invalid;
 	else
-		id = luaext::EState{ L }.CheckEnum<shok::ClassId>(2);
+		id = L.CheckEnum<shok::ClassId>(2);
 	bool free = L.OptBool(3, true);
 	th->OnWrite(th->Id);
 	if (free && th->Object != nullptr) {
@@ -1259,7 +1259,7 @@ int CppLogic::Serializer::BBObjectAccess::New(lua::State L)
 	return 1;
 }
 
-int CppLogic::Serializer::BBObjectAccess::IsNullptr(lua::State L)
+int CppLogic::Serializer::BBObjectAccess::IsNullptr(luaext::State L)
 {
 	auto* th = L.CheckUserClass<BBObjectAccess>(1);
 	L.Push(th->Object == nullptr);
@@ -1267,13 +1267,13 @@ int CppLogic::Serializer::BBObjectAccess::IsNullptr(lua::State L)
 	return 2;
 }
 
-int CppLogic::Serializer::ListAccess::GetType(lua::State L)
+int CppLogic::Serializer::ListAccess::GetType(luaext::State L)
 {
-	luaext::EState{ L }.Push(Type::List);
+	L.Push(Type::List);
 	return 1;
 }
 
-int CppLogic::Serializer::ListAccess::Elements(lua::State L)
+int CppLogic::Serializer::ListAccess::Elements(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	L.NewUserClass<ElementIter>(th->SeriData->ListOptions->UniqueIter(th->Object));
@@ -1282,7 +1282,7 @@ int CppLogic::Serializer::ListAccess::Elements(lua::State L)
 	return 1;
 }
 
-int CppLogic::Serializer::ListAccess::ElementsNext(lua::State L)
+int CppLogic::Serializer::ListAccess::ElementsNext(luaext::State L)
 {
 	auto* i = L.CheckUserClass<ElementIter>(L.Upvalueindex(1));
 	auto* th = L.CheckUserClass<ListAccess>(L.Upvalueindex(2));
@@ -1294,14 +1294,14 @@ int CppLogic::Serializer::ListAccess::ElementsNext(lua::State L)
 	return 0;
 }
 
-int CppLogic::Serializer::ListAccess::Size(lua::State L)
+int CppLogic::Serializer::ListAccess::Size(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	L.Push(static_cast<double>(th->SeriData->ListOptions->GetSize(th->Object)));
 	return 1;
 }
 
-int CppLogic::Serializer::ListAccess::First(lua::State L)
+int CppLogic::Serializer::ListAccess::First(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	auto i = th->SeriData->ListOptions->UniqueIter(th->Object);
@@ -1321,7 +1321,7 @@ int CppLogic::Serializer::ListAccess::First(lua::State L)
 	return 0;
 }
 
-int CppLogic::Serializer::ListAccess::Insert(lua::State L)
+int CppLogic::Serializer::ListAccess::Insert(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	th->OnWrite(th->Id);
@@ -1335,14 +1335,14 @@ int CppLogic::Serializer::ListAccess::Insert(lua::State L)
 	return 0;
 }
 
-int CppLogic::Serializer::ListAccess::Remove(lua::State L)
+int CppLogic::Serializer::ListAccess::Remove(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	const auto& inf = th->SeriData->ListOptions->GetExtendedInfo();
 	if (inf.RemoveIf == nullptr)
 		throw lua::LuaException{ "no remove available" };
 	struct Data {
-		lua::State L;
+		luaext::State L;
 		ListAccess* A = nullptr;
 	} d{ L, th };
 	inf.RemoveIf(th->Object, [](void* uv, const BB::SerializationData* sd, void* el) {
@@ -1351,7 +1351,7 @@ int CppLogic::Serializer::ListAccess::Remove(lua::State L)
 		d->L.PushValue(2);
 		PushSD(d->L, sd->SerializationName, el, sd, d->A->Id, d->A->OnWrite, true);
 		bool r = false;
-		if (d->L.PCall(1, 1) == lua::State::ErrorCode::Success)
+		if (d->L.PCall(1, 1) == luaext::State::ErrorCode::Success)
 			r = d->L.ToBoolean(-1);
 		d->L.SetTop(t);
 		return r;
@@ -1359,7 +1359,7 @@ int CppLogic::Serializer::ListAccess::Remove(lua::State L)
 	return 0;
 }
 
-int CppLogic::Serializer::ListAccess::ListType(lua::State L)
+int CppLogic::Serializer::ListAccess::ListType(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	const auto* inf = th->SeriData->ListOptions->TryGetExtendedInfo();
@@ -1374,13 +1374,13 @@ int CppLogic::Serializer::ListAccess::ListType(lua::State L)
 	return 2;
 }
 
-int CppLogic::Serializer::ListAccess::InsertAt(lua::State L) {
+int CppLogic::Serializer::ListAccess::InsertAt(luaext::State L) {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	const auto& inf = th->SeriData->ListOptions->GetExtendedInfo();
 	if (inf.InsertAt == nullptr)
 		throw lua::LuaException{ "no insert at available" };
 	struct Data {
-		lua::State L;
+		luaext::State L;
 		ListAccess* A = nullptr;
 	} d{ L, th };
 	auto write = [](void* uv, const BB::SerializationData* sd, void* elem) {
@@ -1401,7 +1401,7 @@ int CppLogic::Serializer::ListAccess::InsertAt(lua::State L) {
 			d->L.PushValue(2);
 			PushSD(d->L, sd->SerializationName, el, sd, d->A->Id, d->A->OnWrite, true);
 			bool r = false;
-			if (d->L.PCall(1, 1) == lua::State::ErrorCode::Success)
+			if (d->L.PCall(1, 1) == luaext::State::ErrorCode::Success)
 				r = d->L.ToBoolean(-1);
 			d->L.SetTop(t);
 			return r;
@@ -1411,7 +1411,7 @@ int CppLogic::Serializer::ListAccess::InsertAt(lua::State L) {
 	return 1;
 }
 
-int CppLogic::Serializer::ListAccess::Index(lua::State L)
+int CppLogic::Serializer::ListAccess::Index(luaext::State L)
 {
 	auto* th = L.CheckUserClass<ListAccess>(1);
 	const auto& inf = th->SeriData->ListOptions->GetExtendedInfo();

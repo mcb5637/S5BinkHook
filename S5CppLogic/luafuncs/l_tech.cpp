@@ -6,15 +6,13 @@
 #include <shok/globals/s5_maplogic.h>
 
 namespace CppLogic::Tech {
-	int GetResearchInfo(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetResearchInfo(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		L.Push(tech->TimeToResearch);
-		L.PushCostInfo(tech->ResourceCosts);
+		L.Push(tech->ResourceCosts);
 		return 2;
 	}
-	int SetResearchInfo(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetResearchInfo(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		if (L.IsNumber(2))
 			tech->TimeToResearch = L.CheckFloat(2);
@@ -24,8 +22,7 @@ namespace CppLogic::Tech {
 		return 0;
 	}
 
-	int GetRequirements(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetRequirements(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		L.Push(tech->RequiredEntityConditions);
 		L.NewTable();
@@ -52,52 +49,45 @@ namespace CppLogic::Tech {
 		return 6;
 	}
 
-	void inline TechPushMod(luaext::EState L, shok::Technology::Modifier& mod) {
+	void inline TechPushMod(luaext::State L, shok::Technology::Modifier& mod) {
 		L.Push(mod.Operator.c_str()[0]);
 		L.Push(mod.Value);
 	}
 
-	int GetExplorationModifier(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetExplorationModifier(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		TechPushMod(L, tech->ExplorationModifier);
 		return 2;
 	}
-	int GetArmorModifier(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetArmorModifier(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		TechPushMod(L, tech->ArmorModifier);
 		return 2;
 	}
-	int GetDamageModifier(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetDamageModifier(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		TechPushMod(L, tech->DamageModifier);
 		return 2;
 	}
-	int GetRangeModifier(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetRangeModifier(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		TechPushMod(L, tech->RangeModifier);
 		return 2;
 	}
-	int GetSpeedModifier(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetSpeedModifier(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		TechPushMod(L, tech->SpeedModifier);
 		return 2;
 	}
 
-	int TechAddConstructionSpeedModifier(lua::State ls) {
-		luaext::EState L{ ls };
+	int TechAddConstructionSpeedModifier(luaext::State L) {
 		GGL::CBuilding::EnableConstructionSpeedTechs();
 		char op = L.CheckString(3)[0];
 		GGL::CBuilding::ConstructionSpeedModifiers.push_back({ L.CheckEnum<shok::TechnologyId>(1), L.CheckFloat(2), op });
 		return 0;
 	}
 
-	int ResearchTechnologyNoFeedback(lua::State ls) {
-		luaext::EState L{ ls };
+	int ResearchTechnologyNoFeedback(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		L.CheckTech(2);
@@ -105,8 +95,7 @@ namespace CppLogic::Tech {
 		return 0;
 	}
 
-	int GetResearchedTechs(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetResearchedTechs(luaext::State L) {
 		auto pid = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid);
 		L.NewTable();
@@ -125,25 +114,25 @@ namespace CppLogic::Tech {
 		return 1;
 	}
 
-	constexpr std::array<lua::FuncReference, 11> Techs{ {
-			lua::FuncReference::GetRef<GetResearchInfo>("GetResearchInfo"),
-			lua::FuncReference::GetRef<SetResearchInfo>("SetResearchInfo"),
-			lua::FuncReference::GetRef<GetRequirements>("GetRequirements"),
-			lua::FuncReference::GetRef<GetExplorationModifier>("GetExplorationModifier"),
-			lua::FuncReference::GetRef<GetArmorModifier>("GetArmorModifier"),
-			lua::FuncReference::GetRef<GetDamageModifier>("GetDamageModifier"),
-			lua::FuncReference::GetRef<GetRangeModifier>("GetRangeModifier"),
-			lua::FuncReference::GetRef<GetSpeedModifier>("GetSpeedModifier"),
-			lua::FuncReference::GetRef<TechAddConstructionSpeedModifier>("TechAddConstructionSpeedModifier"),
-			lua::FuncReference::GetRef<ResearchTechnologyNoFeedback>("ResearchTechnologyNoFeedback"),
-			lua::FuncReference::GetRef<GetResearchedTechs>("GetResearchedTechs"),
-	} };
+	constexpr std::array Techs{
+			luaext::FuncReference::GetRef<GetResearchInfo>("GetResearchInfo"),
+			luaext::FuncReference::GetRef<SetResearchInfo>("SetResearchInfo"),
+			luaext::FuncReference::GetRef<GetRequirements>("GetRequirements"),
+			luaext::FuncReference::GetRef<GetExplorationModifier>("GetExplorationModifier"),
+			luaext::FuncReference::GetRef<GetArmorModifier>("GetArmorModifier"),
+			luaext::FuncReference::GetRef<GetDamageModifier>("GetDamageModifier"),
+			luaext::FuncReference::GetRef<GetRangeModifier>("GetRangeModifier"),
+			luaext::FuncReference::GetRef<GetSpeedModifier>("GetSpeedModifier"),
+			luaext::FuncReference::GetRef<TechAddConstructionSpeedModifier>("TechAddConstructionSpeedModifier"),
+			luaext::FuncReference::GetRef<ResearchTechnologyNoFeedback>("ResearchTechnologyNoFeedback"),
+			luaext::FuncReference::GetRef<GetResearchedTechs>("GetResearchedTechs"),
+	};
 
-	void Cleanup(lua::State L) {
+	void Cleanup(luaext::State L) {
 		GGL::CBuilding::ConstructionSpeedModifiers.clear();
 	}
 
-	void Init(lua::State L)
+	void Init(luaext::State L)
 	{
 		L.RegisterFuncs(Techs, -3);
 	}

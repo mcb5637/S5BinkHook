@@ -14,15 +14,15 @@
 #include <utility/entityiterator.h>
 
 namespace CppLogic::Effect {
-	void PushToHitCallbackReg(lua::State L) {
+	void PushToHitCallbackReg(luaext::State L) {
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
 		L.GetSubTable(EffectOnHitKey, -1);
 		L.Remove(-2);
 	}
 
-	void FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
+	static void FlyingEffectOnHitCallback(EGL::CFlyingEffect* eff) {
 		int id = static_cast<int>(eff->EffectID);
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int top = L.GetTop();
 		if (!L.CheckStack(5))
 			return;
@@ -38,8 +38,7 @@ namespace CppLogic::Effect {
 		L.SetTop(top);
 	}
 
-	int CreateProjectile(lua::State l) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source)
-		luaext::EState L{ l };
+	int CreateProjectile(luaext::State L) { // (effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source)
 		CProjectileEffectCreator data = CProjectileEffectCreator();
 		data.EffectType = L.CheckEnum<shok::EffectTypeId>(1);
 		data.CurrentPos.X = data.StartPos.X = static_cast<float>(L.CheckNumber(2));
@@ -60,7 +59,7 @@ namespace CppLogic::Effect {
 		auto id = gl->CreateEffect(&data);
 		EGL::CEffect* ef = (*EGL::CGLEEffectManager::GlobalObj)->GetById(id);
 		if (!GGL::CCannonBallEffect::FixDamageClass)
-			if (GGL::CCannonBallEffect* cbeff = dynamic_cast<GGL::CCannonBallEffect*>(ef))
+			if (auto* cbeff = dynamic_cast<GGL::CCannonBallEffect*>(ef))
 				cbeff->DamageClass = dmgclass;
 		if (L.IsFunction(12)) {
 			EGL::CFlyingEffect::HookOnHit();
@@ -73,57 +72,50 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
-	int IsValidEffect(lua::State L) {
+	int IsValidEffect(luaext::State L) {
 		int id = L.CheckInt(1);
 		bool r = (*EGL::CGLEEffectManager::GlobalObj)->IsIdValid(static_cast<shok::EffectId>(id));
 		L.Push(r);
 		return 1;
 	}
 
-	int GetType(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetType(luaext::State L) {
 		auto* eff = L.CheckEffect(1);
 		L.Push(eff->EffectType);
 		return 1;
 	}
-	int GetPosition(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetPosition(luaext::State L) {
 		auto* eff = L.CheckEffect(1);
-		L.PushPos(eff->Position);
+		L.Push(eff->Position);
 		return 1;
 	}
-	int GetPlayer(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetPlayer(luaext::State L) {
 		auto* eff = L.CheckEffect(1);
 		L.Push(eff->PlayerID);
 		return 1;
 	}
 
-	int IsArrow(lua::State ls) {
-		luaext::EState L{ ls };
+	int IsArrow(luaext::State L) {
 		auto* eff = L.CheckEffect(1);
 		L.Push(eff->GetClassIdentifier() == GGL::CArrowEffect::Identifier);
 		return 1;
 	}
-	int IsCannonBall(lua::State ls) {
-		luaext::EState L{ ls };
+	int IsCannonBall(luaext::State L) {
 		auto* eff = L.CheckEffect(1);
 		L.Push(eff->GetClassIdentifier() == GGL::CCannonBallEffect::Identifier);
 		return 1;
 	}
 
-	int GetFlyingEffectStartEnd(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetFlyingEffectStartEnd(luaext::State L) {
 		auto* eff = dynamic_cast<EGL::CFlyingEffect*>(L.CheckEffect(1));
 		if (eff == nullptr)
 			throw lua::LuaException{ "no fyling effect at 1" };
-		L.PushPos(eff->FlyingEffectSlot.StartPosition);
-		L.PushPos(eff->FlyingEffectSlot.TargetPosition);
+		L.Push(eff->FlyingEffectSlot.StartPosition);
+		L.Push(eff->FlyingEffectSlot.TargetPosition);
 		return 2;
 	}
 	
-	int GetArrowEffectData(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetArrowEffectData(luaext::State L) {
 		auto* eff = dynamic_cast<GGL::CArrowEffect*>(L.CheckEffect(1));
 		if (eff == nullptr)
 			throw lua::LuaException{ "no arrow effect at 1" };
@@ -134,8 +126,7 @@ namespace CppLogic::Effect {
 		return 4;
 	}
 
-	int GetCannonBallEffectData(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetCannonBallEffectData(luaext::State L) {
 		auto* eff = dynamic_cast<GGL::CCannonBallEffect*>(L.CheckEffect(1));
 		if (eff == nullptr)
 			throw lua::LuaException{ "no cannonball effect at 1" };
@@ -144,11 +135,11 @@ namespace CppLogic::Effect {
 		L.Push(eff->AoERange);
 		L.Push(static_cast<shok::DamageClassId>(eff->DamageClass));
 		L.Push(eff->SourcePlayer);
-		L.PushPos(eff->FlyingEffectSlot.TargetPosition);
+		L.Push(eff->FlyingEffectSlot.TargetPosition);
 		return 6;
 	}
 
-	int GetProjectileCallbacks(lua::State L) {
+	int GetProjectileCallbacks(luaext::State L) {
 		PushToHitCallbackReg(L);
 		return 1;
 	}
@@ -182,41 +173,38 @@ namespace CppLogic::Effect {
 			CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.EffectTriggers = false;
 		}
 	}
-	int EnableEffectTriggers(lua::State L) {
+	int EnableEffectTriggers(luaext::State L) {
 		SetupEffectTriggers(L.OptBool(1, true));
 		return 0;
 	}
 
-	int EnableLightningFix(lua::State L) {
+	int EnableLightningFix(luaext::State L) {
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LightningEffectFix = L.CheckBool(1);
 		GD::CDisplayEffectLightning::HookColorOverride(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LightningEffectFix);
 		return 0;
 	}
 
-	int DumpEffectType(lua::State l) {
-		luaext::EState L{ l };
+	int DumpEffectType(luaext::State L) {
 		auto et = L.CheckEnum<shok::EffectTypeId>(1);
 		auto* t = GetEffectType(et);
-		Serializer::ObjectToLuaSerializer::Serialize(l, t, EGL::EffectType::SerializationData);
+		Serializer::ObjectToLuaSerializer::Serialize(L, t, EGL::EffectType::SerializationData);
 		return 1;
 	}
 
-	int DumpEffect(lua::State l) {
-		luaext::EState L{ l };
+	int DumpEffect(luaext::State L) {
 		auto e = L.CheckEffect(1);
-		Serializer::ObjectToLuaSerializer::Serialize(l, e);
+		Serializer::ObjectToLuaSerializer::Serialize(L, e);
 		return 1;
 	}
 
-	int PredicateInCircle(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateInCircle(luaext::State L) {
 		auto p = L.CheckPos(1);
 		float r = L.CheckFloat(2);
 		L.NewUserClass<CppLogic::Iterator::PredicateInCircle<EGL::CEffect>>(p, r * r);
 		return 1;
 	}
 
-	int PredicateInRect(lua::State L) {
+	int PredicateInRect(luaext::State L) {
 		float x1 = L.CheckFloat(1);
 		float y1 = L.CheckFloat(2);
 		float x2 = L.CheckFloat(3);
@@ -225,34 +213,32 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
-	int PredicateOfType(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfType(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EffectPredicateOfType>(L.CheckEnum<shok::EffectTypeId>(1));
 		return 1;
 	}
 
-	int PredicateOfPlayer(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfPlayer(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EffectPredicateOfPlayer>(L.CheckPlayerId(1));
 		return 1;
 	}
 
-	int PredicateIsArrow(lua::State L) {
+	int PredicateIsArrow(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EffectPredicateIsArrow>();
 		return 1;
 	}
 
-	int PredicateIsCannonBall(lua::State L) {
+	int PredicateIsCannonBall(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EffectPredicateIsCannonBall>();
 		return 1;
 	}
 
-	int PredicateIsArrowOrCannonBall(lua::State L) {
+	int PredicateIsArrowOrCannonBall(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EffectPredicateIsArrowOrCannonBall>();
 		return 1;
 	}
 
-	int PredicateAnd(lua::State L) {
+	int PredicateAnd(luaext::State L) {
 		const int num = L.GetTop();
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicAnd<EGL::CEffect>>();
 		p->preds.reserve(num);
@@ -266,13 +252,13 @@ namespace CppLogic::Effect {
 		p->r = L.Ref(L.REGISTRYINDEX);
 		return 1;
 	}
-	void PredicateAndAutoCreate(lua::State L) { // clear stack after creating and predicate
+	void PredicateAndAutoCreate(luaext::State L) { // clear stack after creating and predicate
 		PredicateAnd(L);
 		L.Insert(1);
 		L.SetTop(1);
 	}
 
-	int PredicateOr(lua::State L) {
+	int PredicateOr(luaext::State L) {
 		const int num = L.GetTop();
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicOr<EGL::CEffect>>();
 		p->preds.reserve(num);
@@ -287,7 +273,7 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
-	int PredicateNot(lua::State L) {
+	int PredicateNot(luaext::State L) {
 		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateNot<EGL::CEffect>>(pred);
 		L.PushValue(1);// keep predicate, so they dont get gced
@@ -296,7 +282,7 @@ namespace CppLogic::Effect {
 		return 1;
 	}
 
-	int PredicateSetPriority(lua::State L) {
+	int PredicateSetPriority(luaext::State L) {
 		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
 		int pri = L.CheckInt(2);
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicatePriority<EGL::CEffect>>(pred, pri);
@@ -307,7 +293,7 @@ namespace CppLogic::Effect {
 	}
 
 
-	int IteratorNext(lua::State L) { // (state nil, last value) -> next value
+	int IteratorNext(luaext::State L) { // (state nil, last value) -> next value
 		// no error checking here, cause that would cost speed
 		// just expect no other c/c++ code will change the funcs upvalue
 		// make sure ManagedIterator is the first class inherited from the actual iterator and we do not use luapp inheritance here
@@ -328,7 +314,7 @@ namespace CppLogic::Effect {
 		}
 		return 3;
 	}
-	int EffectIterator(lua::State L) {
+	int EffectIterator(luaext::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
@@ -340,7 +326,7 @@ namespace CppLogic::Effect {
 		return 3;
 	}
 
-	int EffectIteratorTableize(lua::State L) {
+	int EffectIteratorTableize(luaext::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
@@ -357,39 +343,39 @@ namespace CppLogic::Effect {
 	}
 
 	constexpr std::array Effect{
-			lua::FuncReference::GetRef<CreateProjectile>("CreateProjectile"),
-			lua::FuncReference::GetRef<IsValidEffect>("IsValidEffect"),
-			lua::FuncReference::GetRef<GetProjectileCallbacks>("GetProjectileCallbacks"),
-			lua::FuncReference::GetRef<EnableEffectTriggers>("EnableEffectTriggers"),
-			lua::FuncReference::GetRef<GetType>("GetType"),
-			lua::FuncReference::GetRef<GetPosition>("GetPosition"),
-			lua::FuncReference::GetRef<GetPlayer>("GetPlayer"),
-			lua::FuncReference::GetRef<GetFlyingEffectStartEnd>("GetFlyingEffectStartEnd"),
-			lua::FuncReference::GetRef<GetArrowEffectData>("GetArrowEffectData"),
-			lua::FuncReference::GetRef<GetCannonBallEffectData>("GetCannonBallEffectData"),
-			lua::FuncReference::GetRef<IsArrow>("IsArrow"),
-			lua::FuncReference::GetRef<IsCannonBall>("IsCannonBall"),
-			lua::FuncReference::GetRef<EffectIterator>("EffectIterator"),
-			lua::FuncReference::GetRef<EffectIteratorTableize>("EffectIteratorTableize"),
-			lua::FuncReference::GetRef<EnableLightningFix>("EnableLightningFix"),
-			lua::FuncReference::GetRef<DumpEffectType>("DumpEffectType"),
-			lua::FuncReference::GetRef<DumpEffect>("DumpEffect"),
+			luaext::FuncReference::GetRef<CreateProjectile>("CreateProjectile"),
+			luaext::FuncReference::GetRef<IsValidEffect>("IsValidEffect"),
+			luaext::FuncReference::GetRef<GetProjectileCallbacks>("GetProjectileCallbacks"),
+			luaext::FuncReference::GetRef<EnableEffectTriggers>("EnableEffectTriggers"),
+			luaext::FuncReference::GetRef<GetType>("GetType"),
+			luaext::FuncReference::GetRef<GetPosition>("GetPosition"),
+			luaext::FuncReference::GetRef<GetPlayer>("GetPlayer"),
+			luaext::FuncReference::GetRef<GetFlyingEffectStartEnd>("GetFlyingEffectStartEnd"),
+			luaext::FuncReference::GetRef<GetArrowEffectData>("GetArrowEffectData"),
+			luaext::FuncReference::GetRef<GetCannonBallEffectData>("GetCannonBallEffectData"),
+			luaext::FuncReference::GetRef<IsArrow>("IsArrow"),
+			luaext::FuncReference::GetRef<IsCannonBall>("IsCannonBall"),
+			luaext::FuncReference::GetRef<EffectIterator>("EffectIterator"),
+			luaext::FuncReference::GetRef<EffectIteratorTableize>("EffectIteratorTableize"),
+			luaext::FuncReference::GetRef<EnableLightningFix>("EnableLightningFix"),
+			luaext::FuncReference::GetRef<DumpEffectType>("DumpEffectType"),
+			luaext::FuncReference::GetRef<DumpEffect>("DumpEffect"),
 	};
 	constexpr std::array Predicates{
-			lua::FuncReference::GetRef<PredicateInCircle>("InCircle"),
-			lua::FuncReference::GetRef<PredicateInRect>("InRect"),
-			lua::FuncReference::GetRef<PredicateOfType>("OfType"),
-			lua::FuncReference::GetRef<PredicateOfPlayer>("OfPlayer"),
-			lua::FuncReference::GetRef<PredicateIsArrow>("IsArrow"),
-			lua::FuncReference::GetRef<PredicateIsCannonBall>("IsCannonBall"),
-			lua::FuncReference::GetRef<PredicateIsArrowOrCannonBall>("IsArrowOrCannonBall"),
-			lua::FuncReference::GetRef<PredicateAnd>("And"),
-			lua::FuncReference::GetRef<PredicateOr>("Or"),
-			lua::FuncReference::GetRef<PredicateNot>("Not"),
-			lua::FuncReference::GetRef<PredicateSetPriority>("SetPriority"),
+			luaext::FuncReference::GetRef<PredicateInCircle>("InCircle"),
+			luaext::FuncReference::GetRef<PredicateInRect>("InRect"),
+			luaext::FuncReference::GetRef<PredicateOfType>("OfType"),
+			luaext::FuncReference::GetRef<PredicateOfPlayer>("OfPlayer"),
+			luaext::FuncReference::GetRef<PredicateIsArrow>("IsArrow"),
+			luaext::FuncReference::GetRef<PredicateIsCannonBall>("IsCannonBall"),
+			luaext::FuncReference::GetRef<PredicateIsArrowOrCannonBall>("IsArrowOrCannonBall"),
+			luaext::FuncReference::GetRef<PredicateAnd>("And"),
+			luaext::FuncReference::GetRef<PredicateOr>("Or"),
+			luaext::FuncReference::GetRef<PredicateNot>("Not"),
+			luaext::FuncReference::GetRef<PredicateSetPriority>("SetPriority"),
 	};
 
-	void Init(lua::State L)
+	void Init(luaext::State L)
 	{
 		L.RegisterFuncs(Effect, -3);
 
@@ -417,7 +403,7 @@ namespace CppLogic::Effect {
 		}
 	}
 
-	void Cleanup(lua::State L) {
+	void Cleanup(luaext::State L) {
 		EGL::CFlyingEffect::FlyingEffectOnHitCallback = nullptr;
 		EGL::CGLEGameLogic::CreateEffectHookCallback = nullptr;
 		EGL::CFlyingEffect::FlyingEffectOnHitCallback2 = nullptr;
@@ -425,7 +411,7 @@ namespace CppLogic::Effect {
 		GD::CDisplayEffectLightning::HookColorOverride(false);
 	}
 
-	void OnSaveLoaded(lua::State L)
+	void OnSaveLoaded(luaext::State L)
 	{
 		int t = L.GetTop();
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);

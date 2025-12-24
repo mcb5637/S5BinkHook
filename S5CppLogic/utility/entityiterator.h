@@ -290,7 +290,7 @@ namespace CppLogic::Iterator {
 	public:
 		std::vector<const Predicate<T>*> preds;
 		lua_State* L = nullptr;
-		lua::Reference r = lua::State::NoRef;
+		luaext::Reference r = luaext::State::NoRef;
 
 		PredicateDynamicAnd() = default;
 		PredicateDynamicAnd(std::initializer_list<const Predicate<T>*> l) {
@@ -305,8 +305,8 @@ namespace CppLogic::Iterator {
 			return true;
 		}
 		virtual ~PredicateDynamicAnd() override {
-			if (r != lua::State::NoRef)
-				lua::State(L).UnRef(r);
+			if (r != luaext::State::NoRef)
+				luaext::State(L).UnRef(r);
 		}
 	};
 
@@ -332,7 +332,7 @@ namespace CppLogic::Iterator {
 	public:
 		std::vector<const Predicate<T>*> preds;
 		lua_State* L = nullptr;
-		lua::Reference r = lua::State::NoRef;
+		luaext::Reference r = luaext::State::NoRef;
 
 
 		PredicateDynamicOr() = default;
@@ -348,8 +348,8 @@ namespace CppLogic::Iterator {
 			return false;
 		}
 		virtual ~PredicateDynamicOr() override {
-			if (r != lua::State::NoRef)
-				lua::State(L).UnRef(r);
+			if (r != luaext::State::NoRef)
+				luaext::State(L).UnRef(r);
 		}
 	};
 
@@ -358,7 +358,7 @@ namespace CppLogic::Iterator {
 		const Predicate<T>* pred;
 	public:
 		lua_State* L = nullptr;
-		lua::Reference r = lua::State::NoRef;
+		luaext::Reference r = luaext::State::NoRef;
 
 
 		explicit PredicateNot(const Predicate<T>* p) {
@@ -369,8 +369,8 @@ namespace CppLogic::Iterator {
 		}
 
 		virtual ~PredicateNot() override {
-			if (r != lua::State::NoRef)
-				lua::State(L).UnRef(r);
+			if (r != luaext::State::NoRef)
+				luaext::State(L).UnRef(r);
 		}
 	};
 
@@ -380,7 +380,7 @@ namespace CppLogic::Iterator {
 		const int priori;
 	public:
 		lua_State* L = nullptr;
-		lua::Reference r = lua::State::NoRef;
+		luaext::Reference r = luaext::State::NoRef;
 
 
 		PredicatePriority(const Predicate<T>* predicate, int priority) : pred(predicate), priori(priority) {
@@ -391,8 +391,8 @@ namespace CppLogic::Iterator {
 			return true;
 		}
 		virtual ~PredicatePriority() override {
-			if (r != lua::State::NoRef)
-				lua::State(L).UnRef(r);
+			if (r != luaext::State::NoRef)
+				luaext::State(L).UnRef(r);
 		}
 	};
 

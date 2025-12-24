@@ -950,29 +950,28 @@ namespace CppLogic::UA {
 		TargetCache.push_back({ id, tick + time, 1 });
 	}
 
-	int UnlimitedArmy::AddLeader(lua::State L)
+	int UnlimitedArmy::AddLeader(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		a->AddLeader(luaext::EState{ L }.CheckSettler(2));
+		a->AddLeader(L.CheckSettler(2));
 		return 0;
 	}
 
-	int UnlimitedArmy::GetPos(lua::State L)
+	int UnlimitedArmy::GetPos(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->CalculatePos();
-		luaext::EState{ L }.PushPos(a->LastPos);
+		L.Push(a->LastPos);
 		return 1;
 	}
-	int UnlimitedArmy::Tick(lua::State L)
+	int UnlimitedArmy::Tick(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Tick();
 		return 0;
 	}
 
-	int UA_Iterate_Next(lua::State ls) {
-		luaext::EState L{ ls };
+	int UA_Iterate_Next(luaext::State L) {
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = L.CheckInt(2);
 		i++;
@@ -986,7 +985,7 @@ namespace CppLogic::UA {
 		}
 		return 2;
 	}
-	int UnlimitedArmy::Iterate(lua::State L)
+	int UnlimitedArmy::Iterate(luaext::State L)
 	{
 		L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push<UA_Iterate_Next>();
@@ -995,8 +994,7 @@ namespace CppLogic::UA {
 		return 3;
 	}
 
-	int UA_IterateTransit_Next(lua::State ls) {
-		luaext::EState L{ ls };
+	int UA_IterateTransit_Next(luaext::State L) {
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = L.CheckInt(2);
 		i++;
@@ -1010,7 +1008,7 @@ namespace CppLogic::UA {
 		}
 		return 2;
 	}
-	int UnlimitedArmy::IterateTransit(lua::State L)
+	int UnlimitedArmy::IterateTransit(luaext::State L)
 	{
 		L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push<UA_IterateTransit_Next>();
@@ -1019,7 +1017,7 @@ namespace CppLogic::UA {
 		return 3;
 	}
 
-	int UnlimitedArmy::OnIdChanged(lua::State L)
+	int UnlimitedArmy::OnIdChanged(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int old = L.CheckInt(2);
@@ -1028,7 +1026,7 @@ namespace CppLogic::UA {
 		return 0;
 	}
 
-	int UnlimitedArmy::GetSize(lua::State L)
+	int UnlimitedArmy::GetSize(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = a->GetSize(L.ToBoolean(2), L.ToBoolean(3));
@@ -1036,47 +1034,46 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int UnlimitedArmy::RemoveLeader(lua::State L)
+	int UnlimitedArmy::RemoveLeader(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		a->RemoveLeader(luaext::EState{ L }.CheckEntity(2));
+		a->RemoveLeader(L.CheckEntity(2));
 		return 0;
 	}
 
-	int UnlimitedArmy::IsIdle(lua::State L)
+	int UnlimitedArmy::IsIdle(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push(a->IsIdle());
 		return 1;
 	}
-	int UnlimitedArmy::GetStatus(lua::State L)
+	int UnlimitedArmy::GetStatus(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.Push(static_cast<int>(a->Status));
 		return 1;
 	}
 
-	int UnlimitedArmy::SetArea(lua::State L)
+	int UnlimitedArmy::SetArea(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Area = L.CheckFloat(2);
 		return 0;
 	}
-	int UnlimitedArmy::SetTarget(lua::State L)
+	int UnlimitedArmy::SetTarget(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		a->Target = luaext::EState{ L }.CheckPos(2);
+		a->Target = L.CheckPos(2);
 		return 0;
 	}
 
-	int UnlimitedArmy::DumpTable(lua::State Ls)
+	int UnlimitedArmy::DumpTable(luaext::State L)
 	{
-		luaext::EState L{ Ls };
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 
 		L.Push(typename_details::type_name<UnlimitedArmy>());
 
-		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, a, UnlimitedArmy::SerializationData);
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, a, UnlimitedArmy::SerializationData);
 
 		L.Push("Formation");
 		L.Push(a->Formation);
@@ -1090,7 +1087,7 @@ namespace CppLogic::UA {
 
 		return 2;
 	}
-	int UnlimitedArmy::ReadTable(lua::State L)
+	int UnlimitedArmy::ReadTable(luaext::State L)
 	{
 		auto* a = L.NewUserClass<UnlimitedArmy>(shok::PlayerId::P0); // player gets deserialized later
 
@@ -1112,27 +1109,26 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int UnlimitedArmy::SetStatus(lua::State L)
+	int UnlimitedArmy::SetStatus(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->Status = static_cast<UAStatus>(L.CheckInt(2));
 		return 0;
 	}
-	int UnlimitedArmy::SetReMove(lua::State L)
+	int UnlimitedArmy::SetReMove(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->ReMove = L.ToBoolean(2);
 		return 0;
 	}
-	int UnlimitedArmy::SetCurrentBattleTarget(lua::State L)
+	int UnlimitedArmy::SetCurrentBattleTarget(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		a->CurrentBattleTarget = luaext::EState{ L }.CheckEntity(2)->EntityId;
+		a->CurrentBattleTarget = L.CheckEntity(2)->EntityId;
 		return 0;
 	}
 
-	int UnlimitedArmy::GetRangedMelee(lua::State ls) {
-		luaext::EState L{ ls };
+	int UnlimitedArmy::GetRangedMelee(luaext::State L) {
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		L.NewTable();
 		L.NewTable();
@@ -1157,21 +1153,20 @@ namespace CppLogic::UA {
 		return 3;
 	}
 
-	int UnlimitedArmy::SetIgnoreFleeing(lua::State L)
+	int UnlimitedArmy::SetIgnoreFleeing(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->IgnoreFleeing = L.OptBool(2, false);
 		return 0;
 	}
-	int UnlimitedArmy::SetAutoRotateFormation(lua::State L)
+	int UnlimitedArmy::SetAutoRotateFormation(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->AutoRotateFormation = L.CheckFloat(2);
 		return 0;
 	}
 
-	int UnlimitedArmy::GetFirstDeadHero(lua::State ls) {
-		luaext::EState L{ ls };
+	int UnlimitedArmy::GetFirstDeadHero(luaext::State L) {
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		if (!a->DeadHeroes.empty())
 			L.Push(a->DeadHeroes[0]);
@@ -1180,19 +1175,19 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int UnlimitedArmy::SetPrepDefense(lua::State L)
+	int UnlimitedArmy::SetPrepDefense(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->PrepDefense = L.OptBool(2, false);
 		return 0;
 	}
-	int UnlimitedArmy::SetSabotageBridges(lua::State L)
+	int UnlimitedArmy::SetSabotageBridges(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->SabotageBridges = L.OptBool(2, false);
 		return 0;
 	}
-	int CppLogic::UA::UnlimitedArmy::SetDoNotNormalizeSpeed(lua::State L)
+	int CppLogic::UA::UnlimitedArmy::SetDoNotNormalizeSpeed(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->DoNotNormalizeSpeed = L.OptBool(2, false);
@@ -1200,8 +1195,7 @@ namespace CppLogic::UA {
 		return 0;
 	}
 
-	int New(lua::State ls) {
-		luaext::EState L{ ls };
+	int New(luaext::State L) {
 		auto pl = L.CheckPlayerId(1);
 		L.CheckType(2, lua::LType::Function);
 		L.CheckType(3, lua::LType::Function);
@@ -1218,8 +1212,7 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int GetNearestEnemyInArea(lua::State Ls) {
-		luaext::EState L{ Ls };
+	int GetNearestEnemyInArea(luaext::State L) {
 		auto pl = L.CheckPlayerId(1);
 		shok::Position p = L.CheckPos(2);
 		float r = L.CheckFloat(3);
@@ -1231,8 +1224,7 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int CountTargetEntitiesInArea(lua::State Ls) {
-		luaext::EState L{ Ls };
+	int CountTargetEntitiesInArea(luaext::State L) {
 		auto pl = L.CheckPlayerId(1);
 		shok::Position p = L.CheckPos(2);
 		float r = L.CheckFloat(3);
@@ -1240,27 +1232,26 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int AddCannonBuilderData(lua::State ls) {
-		luaext::EState L{ ls };
+	int AddCannonBuilderData(luaext::State L) {
 		UACannonBuilderAbilityData d = { L.CheckEnum<shok::EntityTypeId>(1), L.CheckEnum<shok::EntityTypeId>(2), L.CheckEnum<shok::EntityTypeId>(3) };
 		UnlimitedArmy::CannonBuilderAbilityData.emplace_back(d);
 		return 0;
 	}
 
-	void CppLogic::UA::UnlimitedArmy::RegisterUDType(lua::State L)
+	void CppLogic::UA::UnlimitedArmy::RegisterUDType(luaext::State L)
 	{
 		L.PrepareUserClassType<UnlimitedArmy>();
-		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<UnlimitedArmy>() }] = &lua::State::CppToCFunction<ReadTable>;
+		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<UnlimitedArmy>() }] = &luaext::State::CppToCFunction<ReadTable>;
 	}
 
-	constexpr std::array<lua::FuncReference, 4> UA{ {
-			lua::FuncReference::GetRef<New>("New"),
-			lua::FuncReference::GetRef<GetNearestEnemyInArea>("GetNearestEnemyInArea"),
-			lua::FuncReference::GetRef<CountTargetEntitiesInArea>("CountTargetEntitiesInArea"),
-			lua::FuncReference::GetRef<AddCannonBuilderData>("AddCannonBuilderData"),
-	} };
+	constexpr std::array UA{
+			luaext::FuncReference::GetRef<New>("New"),
+			luaext::FuncReference::GetRef<GetNearestEnemyInArea>("GetNearestEnemyInArea"),
+			luaext::FuncReference::GetRef<CountTargetEntitiesInArea>("CountTargetEntitiesInArea"),
+			luaext::FuncReference::GetRef<AddCannonBuilderData>("AddCannonBuilderData"),
+	};
 
-	void Init(lua::State L)
+	void Init(luaext::State L)
 	{
 		L.RegisterFuncs(UA, -3);
 

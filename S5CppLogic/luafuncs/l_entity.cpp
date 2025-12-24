@@ -25,21 +25,19 @@
 #include <utility/luaserializer.h>
 
 namespace CppLogic::Entity {
-	int PredicateOfType(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfType(luaext::State L) {
 		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfType>(ty);
 		return 1;
 	}
 
-	int PredicateOfPlayer(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfPlayer(luaext::State L) {
 		auto pl = L.CheckPlayerId(1);
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfPlayer>(pl);
 		return 1;
 	}
 
-	int PredicateInCircle(lua::State L) {
+	int PredicateInCircle(luaext::State L) {
 		float x = L.CheckFloat(1);
 		float y = L.CheckFloat(2);
 		float r = L.CheckFloat(3);
@@ -47,8 +45,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateOfAnyPlayer(lua::State l) {
-		luaext::EState L{ l };
+	int PredicateOfAnyPlayer(luaext::State L) {
 		int num = L.GetTop();
 		if (num > 9)
 			throw lua::LuaException("too many players to check");
@@ -59,8 +56,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateOfAnyEntityType(lua::State l) {
-		luaext::EState L{ l };
+	int PredicateOfAnyEntityType(luaext::State L) {
 		int num = L.GetTop();
 		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyType>();
 		p->entityTypes.reserve(num);
@@ -69,7 +65,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateAnd(lua::State L) {
+	int PredicateAnd(luaext::State L) {
 		const int num = L.GetTop();
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicAnd<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
@@ -83,13 +79,13 @@ namespace CppLogic::Entity {
 		p->r = L.Ref(L.REGISTRYINDEX);
 		return 1;
 	}
-	void PredicateAndAutoCreate(lua::State L) { // clear stack after creating and predicate
+	void PredicateAndAutoCreate(luaext::State L) { // clear stack after creating and predicate
 		PredicateAnd(L);
 		L.Insert(1);
 		L.SetTop(1);
 	}
 
-	int PredicateOr(lua::State L) {
+	int PredicateOr(luaext::State L) {
 		const int num = L.GetTop();
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateDynamicOr<EGL::CGLEEntity>>();
 		p->preds.reserve(num);
@@ -104,7 +100,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateNot(lua::State L) {
+	int PredicateNot(luaext::State L) {
 		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateNot<EGL::CGLEEntity>>(pred);
 		L.PushValue(1);// keep predicate, so they dont get gced
@@ -113,7 +109,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateSetPriority(lua::State L) {
+	int PredicateSetPriority(luaext::State L) {
 		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		int pri = L.CheckInt(2);
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity>>(pred, pri);
@@ -123,39 +119,37 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateIsSettler(lua::State L) {
+	int PredicateIsSettler(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsSettler>();
 		return 1;
 	}
 
-	int PredicateIsBuilding(lua::State L) {
+	int PredicateIsBuilding(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite>();
 		return 1;
 	}
 
-	int PredicateIsBuildingOrConstructionSite(lua::State L) {
+	int PredicateIsBuildingOrConstructionSite(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsBuilding>();
 		return 1;
 	}
 
-	int PredicateIsCombatRelevant(lua::State L) {
+	int PredicateIsCombatRelevant(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsCombatRelevant>();
 		return 1;
 	}
-	int PredicateIsNotSoldier(lua::State L) {
+	int PredicateIsNotSoldier(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsNotSoldier>();
 		return 1;
 	}
 
-	int PredicateOfEntityCategory(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfEntityCategory(luaext::State L) {
 		auto c = L.CheckEnum<shok::EntityCategory>(1);
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfEntityCategory>(c);
 		return 1;
 	}
 
-	int PredicateOfAnyEntityCategory(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfAnyEntityCategory(luaext::State L) {
 		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyEntityCategory>();
 		for (int i = 1; i < L.GetTop(); ++i) {
 			p->Categories.push_back(L.CheckEnum<shok::EntityCategory>(i));
@@ -163,8 +157,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateOfAnyClass(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfAnyClass(luaext::State L) {
 		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyClass>();
 		for (int i = 1; i < L.GetTop(); ++i) {
 			p->Classes.push_back(L.CheckEnum<shok::ClassId>(i));
@@ -172,14 +165,13 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateProvidesResource(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateProvidesResource(luaext::State L) {
 		auto ty = L.CheckEnum<shok::ResourceType>(1);
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateProvidesResource>(ty);
 		return 1;
 	}
 
-	int PredicateInRect(lua::State L) {
+	int PredicateInRect(luaext::State L) {
 		float x1 = L.CheckFloat(1);
 		float y1 = L.CheckFloat(2);
 		float x2 = L.CheckFloat(3);
@@ -188,30 +180,28 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int PredicateIsVisible(lua::State L) {
+	int PredicateIsVisible(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsVisible>();
 		return 1;
 	}
 
-	int PredicateOfUpgradeCategory(lua::State ls) {
-		luaext::EState L{ ls };
+	int PredicateOfUpgradeCategory(luaext::State L) {
 		auto ty = L.CheckEnum<shok::UpgradeCategoryId>(1);
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateOfUpgradeCategory>(ty);
 		return 1;
 	}
 
-	int PredicateIsAlive(lua::State L) {
+	int PredicateIsAlive(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsAlive>();
 		return 1;
 	}
 
-	int PredicateIsNotInBuilding(lua::State L) {
+	int PredicateIsNotInBuilding(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsNotInBuilding>();
 		return 1;
 	}
 
-	int EntityIteratorTableize(lua::State l) {
-		luaext::EState L{ l };
+	int EntityIteratorTableize(luaext::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
@@ -227,7 +217,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int EntityIteratorCount(lua::State L) {
+	int EntityIteratorCount(luaext::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
@@ -237,7 +227,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int EntityIteratorGetNearest(lua::State L) {
+	int EntityIteratorGetNearest(luaext::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
@@ -250,8 +240,7 @@ namespace CppLogic::Entity {
 		return 2;
 	}
 
-	int EntityIteratorNext(lua::State l) { // (state nil, last value) -> next value
-		luaext::EState L{ l };
+	int EntityIteratorNext(luaext::State L) { // (state nil, last value) -> next value
 		// no error checking here, cause that would cost speed
 		// just expect no other c/c++ code will change the funcs upvalue
 		// make sure ManagedIterator is the first class inherited from the actual iterator and we do not use luapp inheritance here
@@ -272,7 +261,7 @@ namespace CppLogic::Entity {
 		}
 		return 3;
 	}
-	int LEntityIterator(lua::State L) {
+	int LEntityIterator(luaext::State L) {
 		if (L.GetTop() > 1) { // auto create an and predicate
 			PredicateAndAutoCreate(L);
 		}
@@ -285,8 +274,7 @@ namespace CppLogic::Entity {
 		return 3;
 	}
 
-	int PlayerEntityIterator(lua::State l) {
-		luaext::EState L{ l };
+	int PlayerEntityIterator(luaext::State L) {
 		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		if (L.GetTop() == 2) {
 			auto pl = L.CheckPlayerId(2);
@@ -307,10 +295,9 @@ namespace CppLogic::Entity {
 		return 3;
 	}
 
-	int RegionEntityIteratorRect(lua::State Ls) {
-		luaext::EState L{ Ls };
+	int RegionEntityIteratorRect(luaext::State L) {
 		shok::AARect area{ L.CheckPos(1), L.CheckPos(2) };
-		shok::AccessCategoryFlags acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
+		auto acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
 		L.Remove(3);
 		L.Remove(2);
 		L.NewUserClass<CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity>>(area);
@@ -327,11 +314,10 @@ namespace CppLogic::Entity {
 		L.Push(); // initial value
 		return 3;
 	}
-	int RegionEntityIteratorCircle(lua::State Ls) {
-		luaext::EState L{ Ls };
+	int RegionEntityIteratorCircle(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		float r = L.CheckFloat(2);
-		shok::AccessCategoryFlags acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
+		auto acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
 		L.Remove(3);
 		L.Remove(2);
 		L.NewUserClass<CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity>>(p, r * r);
@@ -349,8 +335,7 @@ namespace CppLogic::Entity {
 		return 3;
 	}
 
-	int CheckPredicate(lua::State l) {
-		luaext::EState L{ l };
+	int CheckPredicate(luaext::State L) {
 		EGL::CGLEEntity* s = L.CheckEntity(1);
 		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 		float r = -1;
@@ -361,66 +346,59 @@ namespace CppLogic::Entity {
 		return 3;
 	}
 
-	int SettlerGetLeaderOfSoldier(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerGetLeaderOfSoldier(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		L.Push(s->GetFirstAttachedToMe(shok::AttachmentType::LEADER_SOLDIER));
 		return 1;
 	}
 
-	int LeaderGetExperience(lua::State l) {
-		luaext::EState L{ l };
+	int LeaderGetExperience(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
+		auto* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		L.Push(b->Experience);
 		return 1;
 	}
-	int LeaderSetExperience(lua::State l) {
-		luaext::EState L{ l };
+	int LeaderSetExperience(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
+		auto* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		b->Experience = L.CheckInt(2);
 		return 0;
 	}
 
-	int LeaderGetTroopHealth(lua::State l) {
-		luaext::EState L{ l };
+	int LeaderGetTroopHealth(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
+		auto* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		L.Push(b->GetTroopHealth());
 		L.Push(b->GetTroopHealthPerSoldier());
 		return 2;
 	}
-	int LeaderSetTroopHealth(lua::State l) {
-		luaext::EState L{ l };
+	int LeaderSetTroopHealth(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLeaderBehavior* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
+		auto* b = s->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!b)
 			throw lua::LuaException("no leader at 1");
 		b->TroopHealthCurrent = L.CheckInt(2);
 		return 0;
 	}
 
-	int SettlerGetBaseMovementSpeed(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerGetBaseMovementSpeed(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CBehaviorDefaultMovement* b = s->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
+		auto* b = s->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!b)
 			throw lua::LuaException("no moving entity at 1");
 		L.Push(b->MovementSpeed);
 		L.Push(CppLogic::RadiansToDegrees(b->TurningSpeed));
 		return 2;
 	}
-	int SettlerSetBaseMovementSpeed(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerSetBaseMovementSpeed(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CBehaviorDefaultMovement* b = s->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
+		auto* b = s->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!b)
 			throw lua::LuaException("no moving entity at 1");
 		if (L.IsNumber(2))
@@ -430,51 +408,44 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BuildingGetBarracksAutoFillActive(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingGetBarracksAutoFillActive(luaext::State L) {
 		GGL::CBuilding* e = L.CheckBuilding(1);
-		GGL::CBarrackBehavior* b = e->GetBehavior<GGL::CBarrackBehavior>();
+		auto* b = e->GetBehavior<GGL::CBarrackBehavior>();
 		if (!b)
 			throw lua::LuaException("no barracks at 1");
 		L.Push(b->AutoFillActive);
 		return 1;
 	}
 
-	int GetScale(lua::State l) {
-		luaext::EState L{ l };
+	int GetScale(luaext::State L) {
 		EGL::CGLEEntity* s = L.CheckEntity(1);
 		L.Push(s->Scale);
 		return 1;
 	}
-	int SetScale(lua::State l) {
-		luaext::EState L{ l };
+	int SetScale(luaext::State L) {
 		EGL::CGLEEntity* s = L.CheckEntity(1);
 		s->Scale = L.CheckFloat(2);
 		return 0;
 	}
 
-	int BuildingGetHeight(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingGetHeight(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		L.Push(b->ConstructionProgress);
 		return 1;
 	}
-	int BuildingSetHeight(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingSetHeight(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		b->ConstructionProgress = L.CheckFloat(2);
 		return 0;
 	}
 
-	int SettlerGetOverheadWidget(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerGetOverheadWidget(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		s->ModifierProfile.EntityReference.CheckInit();
 		L.Push(s->ModifierProfile.EntityReference.OverheadWidget);
 		return 1;
 	}
-	int SettlerSetOverheadWidget(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerSetOverheadWidget(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		int ov = L.CheckInt(2);
 		if (!(ov >= 0 && ov <= 4))
@@ -484,13 +455,12 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int MovingEntityGetTargetPos(lua::State l) {
-		luaext::EState L{ l };
+	int MovingEntityGetTargetPos(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e);
+		auto* m = dynamic_cast<EGL::CMovingEntity*>(e);
 		if (!m)
 			throw lua::LuaException("no moving entity at 1");
-		L.PushPos(m->TargetPosition);
+		L.Push(m->TargetPosition);
 		if (m->TargetRotationValid) {
 			L.Push("r");
 			L.Push(CppLogic::RadiansToDegrees(m->TargetRotation));
@@ -498,10 +468,9 @@ namespace CppLogic::Entity {
 		}
 		return 1;
 	}
-	int MovingEntitySetTargetPos(lua::State l) {
-		luaext::EState L{ l };
+	int MovingEntitySetTargetPos(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e);
+		auto* m = dynamic_cast<EGL::CMovingEntity*>(e);
 		if (!m)
 			throw lua::LuaException("no moving entity at 1");
 		m->TargetPosition = L.CheckPos(2);
@@ -513,17 +482,16 @@ namespace CppLogic::Entity {
 			m->FireEvent(&ev);
 		}
 		else {
-			m->TargetRotationValid = 0;
+			m->TargetRotationValid = false;
 			EGL::CEventValue_Bool ev{ shok::EventIDs::Leader_SetIsUsingTargetOrientation, false };
 			m->FireEvent(&ev);
 		}
 		return 0;
 	}
 
-	int MovingEntityIsFleeingFrom(lua::State l) {
-		luaext::EState L{ l };
+	int MovingEntityIsFleeingFrom(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		EGL::CMovingEntity* m = dynamic_cast<EGL::CMovingEntity*>(e);
+		auto* m = dynamic_cast<EGL::CMovingEntity*>(e);
 		if (!m)
 			throw lua::LuaException("no moving entity at 1");
 		auto p = L.CheckPos(2);
@@ -531,19 +499,17 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int HeroGetCamouflageDurationLeft(lua::State l) {
-		luaext::EState L{ l };
+	int HeroGetCamouflageDurationLeft(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CCamouflageBehavior* c = s->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
+		auto* c = s->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (!c)
 			throw lua::LuaException("no camo hero at 1");
 		L.Push(c->InvisibilityRemaining);
 		return 1;
 	}
-	int HeroSetCamouflageDurationLeft(lua::State l) {
-		luaext::EState L{ l };
+	int HeroSetCamouflageDurationLeft(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CCamouflageBehavior* c = s->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
+		auto* c = s->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (!c)
 			throw lua::LuaException("no camo hero at 1");
 		if (dynamic_cast<GGL::CThiefCamouflageBehavior*>(c))
@@ -552,19 +518,17 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int ThiefGetCamouflageTimeTo(lua::State l) {
-		luaext::EState L{ l };
+	int ThiefGetCamouflageTimeTo(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CThiefCamouflageBehavior* c = s->GetBehavior<GGL::CThiefCamouflageBehavior>();
+		auto* c = s->GetBehavior<GGL::CThiefCamouflageBehavior>();
 		if (!c)
 			throw lua::LuaException("no thief at 1");
 		L.Push(c->TimeToInvisibility);
 		return 1;
 	}
-	int ThiefSetCamouflageTimeTo(lua::State l) {
-		luaext::EState L{ l };
+	int ThiefSetCamouflageTimeTo(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CThiefCamouflageBehavior* c = s->GetBehavior<GGL::CThiefCamouflageBehavior>();
+		auto* c = s->GetBehavior<GGL::CThiefCamouflageBehavior>();
 		if (!c)
 			throw lua::LuaException("no thief at 1");
 		int i = L.CheckInt(2);
@@ -573,59 +537,52 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int HeroGetResurrectionTime(lua::State l) {
-		luaext::EState L{ l };
+	int HeroGetResurrectionTime(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CHeroBehavior* h = s->GetBehavior<GGL::CHeroBehavior>();
+		auto* h = s->GetBehavior<GGL::CHeroBehavior>();
 		if (!h)
 			throw lua::LuaException("no hero at 1");
 		L.Push(h->ResurrectionTimePassed);
 		return 1;
 	}
-	int HeroSetResurrectionTime(lua::State l) {
-		luaext::EState L{ l };
+	int HeroSetResurrectionTime(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CHeroBehavior* h = s->GetBehavior<GGL::CHeroBehavior>();
+		auto* h = s->GetBehavior<GGL::CHeroBehavior>();
 		if (!h)
 			throw lua::LuaException("no hero at 1");
 		h->ResurrectionTimePassed = L.CheckInt(2);
 		return 0;
 	}
 
-	int GetLimitedLifespanRemaining(lua::State l) {
-		luaext::EState L{ l };
+	int GetLimitedLifespanRemaining(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CLimitedLifespanBehavior* b = e->GetBehavior<GGL::CLimitedLifespanBehavior>();
+		auto* b = e->GetBehavior<GGL::CLimitedLifespanBehavior>();
 		if (!b)
 			throw lua::LuaException("no limited lifespan at 1");
 		L.Push(b->RemainingLifespanSeconds);
 		return 1;
 	}
-	int SetLimitedLifespanRemaining(lua::State l) {
-		luaext::EState L{ l };
+	int SetLimitedLifespanRemaining(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CLimitedLifespanBehavior* b = e->GetBehavior<GGL::CLimitedLifespanBehavior>();
+		auto* b = e->GetBehavior<GGL::CLimitedLifespanBehavior>();
 		if (!b)
 			throw lua::LuaException("no limited lifespan at 1");
 		b->RemainingLifespanSeconds = L.CheckInt(2);
 		return 0;
 	}
 
-	int GetTaskListIndex(lua::State l) {
-		luaext::EState L{ l };
+	int GetTaskListIndex(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		L.Push(e->CurrentTaskIndex);
 		return 1;
 	}
-	int SetTaskListIndex(lua::State l) {
-		luaext::EState L{ l };
+	int SetTaskListIndex(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		e->CurrentTaskIndex = L.CheckInt(2);
 		return 0;
 	}
 
-	int Debug_GetTaskInfo(lua::State l) {
-		luaext::EState L{ l };
+	int Debug_GetTaskInfo(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		L.Push(CppLogic::GetIdManager<shok::TaskListId>().GetNameByID(e->CurrentTaskListID));
 		auto* tl = e->GetCurrentTaskList();
@@ -641,19 +598,17 @@ namespace CppLogic::Entity {
 		return 3;
 	}
 
-	int GetTrackedResources(lua::State l) {
-		luaext::EState L{ l };
+	int GetTrackedResources(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		auto* b = e->GetBehavior<CppLogic::Mod::ResourceTrackerBehavior>();
 		if (!b)
 			return 0;
-		L.PushCostInfo(b->Produced);
-		L.PushCostInfo(b->Used);
+		L.Push(b->Produced);
+		L.Push(b->Used);
 		return 2;
 	}
 
-	int GetAllScriptNameMappings(lua::State l) {
-		luaext::EState L{ l };
+	int GetAllScriptNameMappings(luaext::State L) {
 		auto& m = (*EGL::CGLEEntityManager::GlobalObj)->ScriptName;
 		L.NewTable();
 		for (auto& [str, id] : m) {
@@ -664,8 +619,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int GetLimitedAmmo(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetLimitedAmmo(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		auto* b = e->GetBehavior<CppLogic::Mod::LimitedAmmoBehavior>();
 		if (b == nullptr)
@@ -673,8 +627,7 @@ namespace CppLogic::Entity {
 		L.Push(b->RemainingAmmo);
 		return 1;
 	};
-	int SetLimitedAmmo(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetLimitedAmmo(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		auto* b = e->GetBehavior<CppLogic::Mod::LimitedAmmoBehavior>();
 		if (b == nullptr)
@@ -683,56 +636,50 @@ namespace CppLogic::Entity {
 		return 0;
 	};
 
-	int DumpEntity(lua::State l) {
-		luaext::EState L{ l };
+	int DumpEntity(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, e);
 		return 1;
 	}
 
-	int MovingEntityGetSpeedFactor(lua::State l) {
-		luaext::EState L{ l };
+	int MovingEntityGetSpeedFactor(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CBehaviorDefaultMovement* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
+		auto* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!m)
 			throw lua::LuaException("no moving entity at 1");
 		L.Push(m->SpeedFactor);
 		return 1;
 	}
 
-	int WorkerGetCurrentWorkTime(lua::State l) {
-		luaext::EState L{ l };
+	int WorkerGetCurrentWorkTime(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CWorkerBehavior* w = s->GetBehavior<GGL::CWorkerBehavior>();
+		auto* w = s->GetBehavior<GGL::CWorkerBehavior>();
 		if (!w)
 			throw lua::LuaException("no worker at 1");
 		L.Push(w->WorkTimeRemaining);
 		L.Push(s->EventGetMaxWorktime());
 		return 2;
 	}
-	int WorkerSetCurrentWorkTime(lua::State l) {
-		luaext::EState L{ l };
+	int WorkerSetCurrentWorkTime(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CWorkerBehavior* w = s->GetBehavior<GGL::CWorkerBehavior>();
+		auto* w = s->GetBehavior<GGL::CWorkerBehavior>();
 		if (!w)
 			throw lua::LuaException("no worker at 1");
 		w->WorkTimeRemaining = L.CheckInt(2);
 		return 0;
 	}
 
-	int WorkerGetMotivation(lua::State l) {
-		luaext::EState L{ l };
+	int WorkerGetMotivation(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CWorkerBehavior* w = s->GetBehavior<GGL::CWorkerBehavior>();
+		auto* w = s->GetBehavior<GGL::CWorkerBehavior>();
 		if (!w)
 			throw lua::LuaException("no worker at 1");
 		L.Push(s->EventGetMotivation());
 		return 1;
 	}
-	int WorkerChangeMotivation(lua::State l) {
-		luaext::EState L{ l };
+	int WorkerChangeMotivation(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CWorkerBehavior* w = s->GetBehavior<GGL::CWorkerBehavior>();
+		auto* w = s->GetBehavior<GGL::CWorkerBehavior>();
 		if (!w)
 			throw lua::LuaException("no worker at 1");
 		int r = L.CheckInt(3);
@@ -743,8 +690,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int WorkerGetResourceCarried(lua::State ls) {
-		luaext::EState L{ ls };
+	int WorkerGetResourceCarried(luaext::State L) {
 		auto* e = L.CheckSettler(1);
 		auto* b = e->GetBehavior<GGL::CWorkerBehavior>();
 		if (!b)
@@ -754,8 +700,7 @@ namespace CppLogic::Entity {
 		return 2;
 	}
 
-	int SettlerGetSummoned(lua::State ls) {
-		luaext::EState L{ ls };
+	int SettlerGetSummoned(luaext::State L) {
 		auto* e = L.CheckSettler(1);
 		L.NewTable();
 		int i = 1;
@@ -767,10 +712,9 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int BuildingMarketGetCurrentTradeData(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingMarketGetCurrentTradeData(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CMarketBehavior* m = b->GetBehavior<GGL::CMarketBehavior>();
+		auto* m = b->GetBehavior<GGL::CMarketBehavior>();
 		if (!m)
 			throw lua::LuaException("no market at 1");
 		L.Push(static_cast<int>(m->CurrentTrade.BuyResourceType));
@@ -780,10 +724,9 @@ namespace CppLogic::Entity {
 		L.Push(m->CurrentTrade.ProgressAmount);
 		return 5;
 	}
-	int BuildingMarketSetCurrentTradeData(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingMarketSetCurrentTradeData(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CMarketBehavior* m = b->GetBehavior<GGL::CMarketBehavior>();
+		auto* m = b->GetBehavior<GGL::CMarketBehavior>();
 		if (!m)
 			throw lua::LuaException("no market at 1");
 		if (L.IsNumber(2))
@@ -799,32 +742,29 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int IsSoldier(lua::State l) {
-		luaext::EState L{ l };
+	int IsSoldier(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		L.Push(e->GetBehavior<GGL::CSoldierBehavior>() != nullptr);
 		return 1;
 	}
 
-	int HeroResurrect(lua::State l) {
-		luaext::EState L{ l };
+	int HeroResurrect(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CHeroBehavior* h = e->GetBehavior<GGL::CHeroBehavior>();
+		auto* h = e->GetBehavior<GGL::CHeroBehavior>();
 		if (!h)
 			throw lua::LuaException("no hero at 1");
 		h->ResurrectionTimePassed = 20000;
-		h->EnemyNear = 0;
-		h->FriendNear = 1;
+		h->EnemyNear = false;
+		h->FriendNear = true;
 		return 0;
 	}
 
-	int ThiefSetStolenResourceInfo(lua::State l) {
-		luaext::EState L{ l };
+	int ThiefSetStolenResourceInfo(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CThiefBehavior* t = e->GetBehavior<GGL::CThiefBehavior>();
+		auto* t = e->GetBehavior<GGL::CThiefBehavior>();
 		if (!t)
 			throw lua::LuaException("no thief at 1");
-		shok::ResourceType ty = L.CheckEnum<shok::ResourceType>(2, true);
+		auto ty = L.CheckEnum<shok::ResourceType>(2, true);
 		int am;
 		if (ty == shok::ResourceType::None)
 			am = 0;
@@ -839,15 +779,14 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int GetAutoAttackMaxRange(lua::State l) {
-		luaext::EState L{ l };
+	int GetAutoAttackMaxRange(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CBattleBehavior* b = e->GetBehaviorDynamic<GGL::CBattleBehavior>();
+		auto* b = e->GetBehaviorDynamic<GGL::CBattleBehavior>();
 		if (b) {
 			L.Push(b->GetMaxRange());
 			return 1;
 		}
-		GGL::CAutoCannonBehavior* a = e->GetBehavior<GGL::CAutoCannonBehavior>();
+		auto* a = e->GetBehavior<GGL::CAutoCannonBehavior>();
 		if (a) {
 			L.Push(a->GetMaxRange());
 			return 1;
@@ -855,8 +794,7 @@ namespace CppLogic::Entity {
 		throw lua::LuaException("no battle entity or autocannon at 1");
 	}
 
-	int GetModel(lua::State l) {
-		luaext::EState L{ l };
+	int GetModel(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		auto m = e->ModelOverride;
 		if (m == shok::ModelId::Invalid) {
@@ -866,27 +804,24 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int GetExploration(lua::State l) {
-		luaext::EState L{ l };
+	int GetExploration(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		L.Push(e->GetExploration());
 		return 1;
 	}
 
-	int GetSpeed(lua::State l) {
-		luaext::EState L{ l };
+	int GetSpeed(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CBehaviorDefaultMovement* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
+		auto* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
 		if (!m)
 			throw lua::LuaException("no moving entity at 1");
 		L.Push(m->GetMovementSpeed() * 10.0);
 		return 1;
 	}
 
-	int SettlerIsVisible(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerIsVisible(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
-		GGL::CCamouflageBehavior* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
+		auto* c = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (c != nullptr) {
 			L.Push(c->InvisibilityRemaining <= 0);
 			return 1;
@@ -895,10 +830,9 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int SettlerGetHawkOfHero(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerGetHawkOfHero(luaext::State L) {
 		GGL::CSettler* e = L.CheckSettler(1);
-		GGL::CHeroHawkBehavior* b = e->GetBehavior<GGL::CHeroHawkBehavior>();
+		auto* b = e->GetBehavior<GGL::CHeroHawkBehavior>();
 		if (!b)
 			throw lua::LuaException("no matching ability at 1");
 		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::HERO_HAWK));
@@ -920,8 +854,7 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("cannot place foundation at that position");
 	}
 
-	int SettlerCommandSummon(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandSummon(luaext::State L) {
 		GGL::CSettler* e = L.CheckSettler(1);
 		L.CheckEntityAlive(e->EntityId, "entity dead at 1");
 		BB::CEvent ev{ shok::EventIDs::Summon_ActivateCommand };
@@ -938,21 +871,21 @@ namespace CppLogic::Entity {
 	}
 
 	void CheckCamoEvent(EGL::CGLEEntity* e, BB::CEvent& ev) {
-		GGL::CCamouflageBehavior* b = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
+		auto* b = e->GetBehaviorDynamic<GGL::CCamouflageBehavior>();
 		if (dynamic_cast<GGL::CThiefCamouflageBehavior*>(b))
 			throw lua::LuaException("thief camo cannot be manually activated");
 	}
 
 	void CheckSnipeEvent(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
 		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
-		GGL::CSniperAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<GGL::CSniperAbilityProps>();
 		if (!e->Position.IsInRange(oth->Position, bp->Range))
 			throw lua::LuaException("target not in range");
 	}
 
 	void CheckShurikenEvent(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
 		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
-		GGL::CShurikenAbilityProps* bp = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
+		auto* bp = e->GetEntityType()->GetBehaviorProps<GGL::CShurikenAbilityProps>();
 		if (!e->Position.IsInRange(oth->Position, bp->Range))
 			throw lua::LuaException("target not in range");
 	}
@@ -1004,17 +937,16 @@ namespace CppLogic::Entity {
 			throw lua::LuaException("not in range");
 	}
 
-	int EnableConversionHook(lua::State L) {
+	int EnableConversionHook(luaext::State L) {
 		GGL::CConvertSettlerAbility::HookConvertEvent();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConversionTrigger = true;
 		return 0;
 	}
-	int DisableConversionHook(lua::State L) {
+	int DisableConversionHook(luaext::State L) {
 		return 0;
 	}
 
-	int IsFeared(lua::State l) {
-		luaext::EState L{ l };
+	int IsFeared(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		auto id = e->GetFirstAttachedToMe(shok::AttachmentType::INFLICTOR_TERRORIZED);
 		if (id == shok::EntityId::Invalid)
@@ -1024,8 +956,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int SettlerCommandMove(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandMove(luaext::State L) {
 		GGL::CSettler* e = L.CheckSettler(1);
 		shok::Position p = L.CheckPos(2);
 		EGL::CGLELandscape* ls = (*EGL::CGLEGameLogic::GlobalObj)->Landscape;
@@ -1048,15 +979,13 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int ClearAttackers(lua::State l) {
-		luaext::EState L{ l };
+	int ClearAttackers(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		e->ClearAttackers();
 		return 0;
 	}
 
-	int BuildingCommandFoundryBuildCannon(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingCommandFoundryBuildCannon(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->GetBehavior<GGL::CFoundryBehavior>())
 			throw lua::LuaException("no foundry at 1");
@@ -1072,7 +1001,7 @@ namespace CppLogic::Entity {
 		if (!found)
 			throw lua::LuaException("foundry cannot build entitytype");
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId);
-		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(t->LogicProps)->Cost))
+		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(t->LogicProps)->Cost)) // NOLINT(*-pro-type-static-cast-downcast)
 			throw lua::LuaException("missing res");
 		if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
 			throw lua::LuaException("pop capped");
@@ -1080,23 +1009,20 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int SettlerIsIdle(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerIsIdle(luaext::State L) {
 		GGL::CSettler* e = L.CheckSettler(1);
 		L.Push(e->IsIdle());
 		return 1;
 	}
 
-	int BuildingGetNearestFreeConstructionSlotFor(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingGetNearestFreeConstructionSlotFor(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		shok::Position p = L.CheckPos(2);
 		L.Push(b->GetNearestFreeConstructionSlotFor(&p));
 		return 1;
 	}
 
-	int SettlerCommandSerfConstructBuilding(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandSerfConstructBuilding(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		GGL::CBuilding* b = L.CheckBuilding(2);
 		if (!s->GetBehavior<GGL::CSerfBehavior>())
@@ -1108,16 +1034,14 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int BuildingGetNearestFreeRepairSlotFor(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingGetNearestFreeRepairSlotFor(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		shok::Position p = L.CheckPos(2);
 		L.Push(b->GetNearestFreeRepairSlotFor(&p));
 		return 1;
 	}
 
-	int SettlerCommandSerfRepairBuilding(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandSerfRepairBuilding(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		GGL::CBuilding* b = L.CheckBuilding(2);
 		if (!s->GetBehavior<GGL::CSerfBehavior>())
@@ -1131,8 +1055,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int ReplaceWithResourceEntity(lua::State l) {
-		luaext::EState L{ l };
+	int ReplaceWithResourceEntity(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		e = EGL::CGLEEntity::ReplaceEntityWithResourceEntity(e);
 		if (e)
@@ -1142,8 +1065,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int SettlerCommandSerfExtract(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandSerfExtract(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		EGL::CGLEEntity* b = L.CheckEntity(2);
 		if (!s->GetBehavior<GGL::CSerfBehavior>())
@@ -1157,8 +1079,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int BuildingStartUpgrade(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingStartUpgrade(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->IsIdle())
 			throw lua::LuaException("is not idle");
@@ -1166,8 +1087,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BuildingCancelUpgrade(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingCancelUpgrade(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->IsUpgrading)
 			throw lua::LuaException("not upgrading");
@@ -1175,15 +1095,13 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BuildingIsIdle(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingIsIdle(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		L.Push(b->IsIdle());
 		return 1;
 	}
 
-	int BarracksGetLeadersTrainingAt(lua::State l) {
-		luaext::EState L{ l };
+	int BarracksGetLeadersTrainingAt(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->GetBehavior<GGL::CBarrackBehavior>())
 			throw lua::LuaException("no barracks");
@@ -1197,33 +1115,30 @@ namespace CppLogic::Entity {
 		return i;
 	}
 
-	int FoundryGetCannonTypeInConstruction(lua::State l) {
-		luaext::EState L{ l };
+	int FoundryGetCannonTypeInConstruction(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CFoundryBehavior* f = b->GetBehavior<GGL::CFoundryBehavior>();
+		auto* f = b->GetBehavior<GGL::CFoundryBehavior>();
 		if (!f)
 			throw lua::LuaException("no foundry");
 		L.Push(f->CannonType);
 		return 1;
 	}
 
-	int SettlerCommandExpell(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandExpell(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		s->SettlerExpell();
 		return 0;
 	}
 
-	int BarracksBuySoldierForLeader(lua::State ls) {
-		luaext::EState L{ ls };
+	int BarracksBuySoldierForLeader(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		GGL::CSettler* s = L.CheckSettler(2);
 		if (!b->GetBehavior<GGL::CBarrackBehavior>())
 			throw lua::LuaException("no barracks");
 		if (!(b->IsConstructionFinished() && !b->IsUpgrading))
 			throw lua::LuaException("barracks is upgrading or under construction");
-		GGL::CLeaderBehavior* l = s->GetBehavior<GGL::CLeaderBehavior>();
-		GGL::CLeaderBehaviorProps* lp = s->GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
+		auto* l = s->GetBehavior<GGL::CLeaderBehavior>();
+		auto* lp = s->GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!l)
 			throw lua::LuaException("no leader");
 		if (b->PlayerId != s->PlayerId)
@@ -1248,7 +1163,7 @@ namespace CppLogic::Entity {
 			GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(s->PlayerId);
 			if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
 				throw lua::LuaException("pop capped");
-			GGL::CGLSettlerProps* sprop = dynamic_cast<GGL::CGLSettlerProps*>(solty->LogicProps);
+			auto* sprop = dynamic_cast<GGL::CGLSettlerProps*>(solty->LogicProps);
 			if (!sprop)
 				throw lua::LuaException("error: soldier no settler type");
 			if (!p->CurrentResources.HasResources(&sprop->Cost))
@@ -1258,11 +1173,10 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int LeaderAttachSoldier(lua::State ls) {
-		luaext::EState L{ ls };
+	int LeaderAttachSoldier(luaext::State L) {
 		GGL::CSettler* l = L.CheckSettler(1);
 		GGL::CSettler* s = L.CheckSettler(2);
-		GGL::CLeaderBehavior* lb = l->GetBehaviorDynamic<GGL::CLeaderBehavior>();
+		auto* lb = l->GetBehaviorDynamic<GGL::CLeaderBehavior>();
 		if (!lb)
 			throw lua::LuaException("no leader");
 		if (!s->GetBehavior<GGL::CSoldierBehavior>())
@@ -1273,8 +1187,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int SettlerCommandTurnSerfToBattleSerf(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandTurnSerfToBattleSerf(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		if (!s->GetBehavior<GGL::CSerfBehavior>())
 			throw lua::LuaException("no serf");
@@ -1282,8 +1195,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int SettlerCommandTurnBattleSerfToSerf(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerCommandTurnBattleSerfToSerf(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		if (!s->GetBehavior<GGL::CBattleSerfBehavior>())
 			throw lua::LuaException("no battleserf");
@@ -1291,8 +1203,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BuildingActivateOvertime(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingActivateOvertime(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (b->IsOvertimeActive)
 			throw lua::LuaException("overtime already active");
@@ -1304,8 +1215,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BuildingDeactivateOvertime(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingDeactivateOvertime(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->IsOvertimeActive)
 			throw lua::LuaException("overtime not active");
@@ -1315,10 +1225,9 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BarracksRecruitLeaders(lua::State l) {
-		luaext::EState L{ l };
+	int BarracksRecruitLeaders(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CBarrackBehavior* r = b->GetBehavior<GGL::CBarrackBehavior>();
+		auto* r = b->GetBehavior<GGL::CBarrackBehavior>();
 		if (!r)
 			throw lua::LuaException("no barracks");
 		if (!(b->IsConstructionFinished() && !b->IsUpgrading))
@@ -1328,10 +1237,9 @@ namespace CppLogic::Entity {
 		b->BarracksRecruitLeaders();
 		return 0;
 	}
-	int BarracksRecruitGroups(lua::State l) {
-		luaext::EState L{ l };
+	int BarracksRecruitGroups(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CBarrackBehavior* r = b->GetBehavior<GGL::CBarrackBehavior>();
+		auto* r = b->GetBehavior<GGL::CBarrackBehavior>();
 		if (!r)
 			throw lua::LuaException("no barracks");
 		if (!(b->IsConstructionFinished() && !b->IsUpgrading))
@@ -1342,8 +1250,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int HQBuySerf(lua::State l) {
-		luaext::EState L{ l };
+	int HQBuySerf(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->IsEntityInCategory(shok::EntityCategory::Headquarters))
 			throw lua::LuaException("no hq");
@@ -1353,23 +1260,21 @@ namespace CppLogic::Entity {
 		if (p->PlayerAttractionHandler->GetAttractionUsage() >= p->PlayerAttractionHandler->GetAttractionLimit())
 			throw lua::LuaException("pop capped");
 		GGlue::CGlueEntityProps* solty = CppLogic::GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf);
-		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(solty->LogicProps)->Cost))
+		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(solty->LogicProps)->Cost)) // NOLINT(*-pro-type-static-cast-downcast)
 			throw lua::LuaException("missing res");
 		b->HQBuySerf();
 		return 0;
 	}
 
-	int SellBuilding(lua::State l) {
-		luaext::EState L{ l };
+	int SellBuilding(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		if (!((GGL::CGLBuildingProps*)b->GetEntityType()->LogicProps)->CanBeSold)
+		if (!static_cast<GGL::CGLBuildingProps *>(b->GetEntityType()->LogicProps)->CanBeSold) // NOLINT(*-pro-type-static-cast-downcast)
 			throw lua::LuaException("cannot be sold");
 		b->SellBuilding();
 		return 0;
 	}
 
-	int BuildingStartResearch(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingStartResearch(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->IsIdle())
 			throw lua::LuaException("building not idle");
@@ -1387,8 +1292,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BuildingCancelResearch(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingCancelResearch(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (b->GetTechnologyInResearch() != shok::TechnologyId::Invalid)
 			throw lua::LuaException("no tech in research");
@@ -1400,15 +1304,14 @@ namespace CppLogic::Entity {
 		return rty == shok::ResourceType::Clay || rty == shok::ResourceType::Gold || rty == shok::ResourceType::Iron || rty == shok::ResourceType::Stone || rty == shok::ResourceType::Sulfur || rty == shok::ResourceType::Wood;
 	}
 
-	int MarketStartTrade(lua::State l) {
-		luaext::EState L{ l };
+	int MarketStartTrade(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->GetBehavior<GGL::CMarketBehavior>())
 			throw lua::LuaException("no market at 1");
 		if (!b->IsIdle())
 			throw lua::LuaException("building not idle");
-		shok::ResourceType sellty = static_cast<shok::ResourceType>(L.CheckInt(2));
-		shok::ResourceType buyty = static_cast<shok::ResourceType>(L.CheckInt(3));
+		auto sellty = static_cast<shok::ResourceType>(L.CheckInt(2));
+		auto buyty = static_cast<shok::ResourceType>(L.CheckInt(3));
 		float am = L.CheckFloat(4);
 		if (!MarketIsRes(sellty))
 			throw lua::LuaException("sell type is invalid");
@@ -1420,8 +1323,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int MarketCancelTrade(lua::State l) {
-		luaext::EState L{ l };
+	int MarketCancelTrade(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		if (!b->GetBehavior<GGL::CMarketBehavior>())
 			throw lua::LuaException("no market at 1");
@@ -1431,8 +1333,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int SettlerSetPosition(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerSetPosition(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		shok::Position p = L.CheckPos(2);
 		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p) == shok::SectorId::Invalid)
@@ -1441,10 +1342,9 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int LeaderSetSoldierLimit(lua::State ls) {
-		luaext::EState L{ ls };
+	int LeaderSetSoldierLimit(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CLimitedAttachmentBehavior* l = s->GetBehavior<GGL::CLimitedAttachmentBehavior>();
+		auto* l = s->GetBehavior<GGL::CLimitedAttachmentBehavior>();
 		if (!l)
 			throw lua::LuaException("no limited attachment");
 		int limit = L.CheckInt(2);
@@ -1460,10 +1360,9 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int MercenaryRemoveLastOffer(lua::State ls) {
-		luaext::EState L{ ls };
+	int MercenaryRemoveLastOffer(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CBuildingMerchantBehavior* m = b->GetBehaviorDynamic<GGL::CBuildingMerchantBehavior>();
+		auto* m = b->GetBehaviorDynamic<GGL::CBuildingMerchantBehavior>();
 		if (!m)
 			throw lua::LuaException("no merchant");
 		if (m->Offer.size() == 0)
@@ -1473,10 +1372,9 @@ namespace CppLogic::Entity {
 		v.Vector.pop_back();
 		return 0;
 	}
-	int MercenarySetOfferData(lua::State ls) {
-		luaext::EState L{ ls };
+	int MercenarySetOfferData(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
-		GGL::CBuildingMerchantBehavior* m = b->GetBehaviorDynamic<GGL::CBuildingMerchantBehavior>();
+		auto* m = b->GetBehaviorDynamic<GGL::CBuildingMerchantBehavior>();
 		int i = L.CheckInt(2);
 		if (!m)
 			throw lua::LuaException("no merchant");
@@ -1492,10 +1390,9 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int SetMaxHP(lua::State l) {
+	int SetMaxHP(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookMaxHP();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxHP = true;
@@ -1508,8 +1405,7 @@ namespace CppLogic::Entity {
 		}
 		return 0;
 	};
-	int CloneOverrideData(lua::State l) {
-		luaext::EState L{ l };
+	int CloneOverrideData(luaext::State L) {
 		EGL::CGLEEntity* fro = L.OptEntity(1);
 		EGL::CGLEEntity* to = L.CheckEntity(2);
 		if (fro) {
@@ -1521,10 +1417,9 @@ namespace CppLogic::Entity {
 			to->CloneAdditionalDataFrom(EGL::CGLEEntity::LastRemovedEntityAddonData);
 		return 0;
 	}
-	int SetDamage(lua::State l) {
+	int SetDamage(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookDamageMod();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDamage = true;
@@ -1532,10 +1427,9 @@ namespace CppLogic::Entity {
 		d->DamageOverride = L.CheckInt(2);
 		return 0;
 	}
-	int SetArmor(lua::State l) {
+	int SetArmor(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookArmorMod();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookArmor = true;
@@ -1543,10 +1437,9 @@ namespace CppLogic::Entity {
 		d->ArmorOverride = L.CheckInt(2);
 		return 0;
 	}
-	int SetExploration(lua::State l) {
+	int SetExploration(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookExplorationMod();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookExploration = true;
@@ -1554,10 +1447,9 @@ namespace CppLogic::Entity {
 		d->ExplorationOverride = L.CheckFloat(2);
 		return 0;
 	}
-	int LeaderSetRegeneration(lua::State l) {
+	int LeaderSetRegeneration(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		luaext::EState L{ l };
 		GGL::CSettler* b = L.CheckSettler(1);
 		if (!b->GetBehaviorDynamic<GGL::CLeaderBehavior>())
 			throw lua::LuaException("no leader");
@@ -1570,10 +1462,9 @@ namespace CppLogic::Entity {
 			d->RegenSecondsOverride = L.CheckInt(3);
 		return 0;
 	}
-	int SetAutoAttackMaxRange(lua::State l) {
+	int SetAutoAttackMaxRange(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookMaxRange();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxRange = true;
@@ -1581,10 +1472,9 @@ namespace CppLogic::Entity {
 		d->MaxRangeOverride = L.CheckFloat(2);
 		return 0;
 	}
-	int SetDisplayName(lua::State l) {
+	int SetDisplayName(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
-		luaext::EState L{ l };
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		EGL::CGLEEntity::HookDisplayName();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDisplayName = true;
@@ -1592,8 +1482,7 @@ namespace CppLogic::Entity {
 		d->NameOverride = L.CheckString(2);
 		return 0;
 	}
-	int GetDisplayName(lua::State l) {
-		luaext::EState L{ l };
+	int GetDisplayName(luaext::State L) {
 		EGL::CGLEEntity* b = L.CheckEntity(1);
 		auto* d = b->GetAdditionalData(false);
 		if (d && !d->NameOverride.empty())
@@ -1603,8 +1492,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int LeaderGetRegeneration(lua::State l) {
-		luaext::EState L{ l };
+	int LeaderGetRegeneration(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		GGL::CSettler* b = L.CheckSettler(1);
@@ -1615,8 +1503,7 @@ namespace CppLogic::Entity {
 		return 2;
 	}
 
-	int EnableRangedEffectSoldierHeal(lua::State l) {
-		luaext::EState L{ l };
+	int EnableRangedEffectSoldierHeal(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		bool a = L.ToBoolean(1);
@@ -1625,8 +1512,7 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int PerformHeal(lua::State l) {
-		luaext::EState L{ l };
+	int PerformHeal(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		int h = L.CheckInt(2);
 		if (h <= 0)
@@ -1635,47 +1521,41 @@ namespace CppLogic::Entity {
 		return 0;
 	}
 
-	int BuildingGetBuildOnEntity(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingGetBuildOnEntity(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckBuilding(1);
 		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::BUILDING_BASE));
 		return 1;
 	}
-	int BuildOnEntityGetBuilding(lua::State l) {
-		luaext::EState L{ l };
+	int BuildOnEntityGetBuilding(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		L.Push(e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE));
 		return 1;
 	}
 
-	int BuildingGetConstructionSite(lua::State l) {
-		luaext::EState L{ l };
+	int BuildingGetConstructionSite(luaext::State L) {
 		GGL::CBuilding* e = L.CheckBuilding(1);
 		L.Push(e->GetConstructionSite());
 		return 1;
 	}
-	int ConstructionSiteGetBuilding(lua::State l) {
-		luaext::EState L{ l };
+	int ConstructionSiteGetBuilding(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::CONSTRUCTION_SITE_BUILDING));
 		return 1;
 	}
 
-	int IsConstructionSite(lua::State l) {
-		luaext::EState L{ l };
+	int IsConstructionSite(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		L.Push(e->GetClassIdentifier() == GGL::CConstructionSite::Identifier);
 		return 1;
 	}
 
-	int BarracksBuyLeaderByType(lua::State l) {
-		luaext::EState L{ l };
+	int BarracksBuyLeaderByType(luaext::State L) {
 		GGL::CBuilding* e = L.CheckBuilding(1);
 		auto rax = e->GetBehavior<GGL::CBarrackBehavior>();
 		if (!rax)
 			throw lua::LuaException("no barracks");
 		GGlue::CGlueEntityProps* ety = L.CheckEntityType(2);
-		GGL::CLeaderBehaviorProps* lp = ety->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
+		auto* lp = ety->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
 		if (!lp)
 			throw lua::LuaException("no leader type");
 		bool check = L.OptBool(4, true);
@@ -1688,7 +1568,7 @@ namespace CppLogic::Entity {
 			if (p->PlayerAttractionHandler->IsMotivationLocked())
 				throw lua::LuaException("motivation blocked");
 		}
-		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost))
+		if (!p->CurrentResources.HasResources(&static_cast<GGL::CGLSettlerProps*>(ety->LogicProps)->Cost)) // NOLINT(*-pro-type-static-cast-downcast)
 			throw lua::LuaException("missing res");
 		if (!L.OptBool(3, false)) {
 			auto ucat = p->BuildingUpgradeManager->GetUpgradeCategoryOfEntityType(e->EntityType);
@@ -1700,27 +1580,24 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int SettlerShurikenGetTarget(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerShurikenGetTarget(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CShurikenAbility* beh = s->GetBehavior<GGL::CShurikenAbility>();
+		auto* beh = s->GetBehavior<GGL::CShurikenAbility>();
 		if (!beh)
 			throw lua::LuaException("no shuriken ability");
 		L.Push(beh->TargetId);
 		return 1;
 	}
-	int SettlerSniperGetTarget(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerSniperGetTarget(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
-		GGL::CSniperAbility* beh = s->GetBehavior<GGL::CSniperAbility>();
+		auto* beh = s->GetBehavior<GGL::CSniperAbility>();
 		if (!beh)
 			throw lua::LuaException("no snipe ability");
 		L.Push(beh->TargetId);
 		return 1;
 	}
 
-	int SettlerGetEnteredBuilding(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerGetEnteredBuilding(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		L.Push(s->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING));
 		L.Push(s->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE));
@@ -1728,39 +1605,38 @@ namespace CppLogic::Entity {
 	}
 
 	const char* AnimTaskList = "TL_SCRIPT_ANIMATION";
-	void SettlerCreateAnimTaskList(lua::State l) {
-		luaext::EState L{ l };
+	void SettlerCreateAnimTaskList(luaext::State L) {
 		EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
 		auto tid = CppLogic::GetIdManager<shok::TaskListId>().GetIdByName(AnimTaskList);
 		if (tid == shok::TaskListId::Invalid) {
 			BB::CClassFactory* fact = *BB::CClassFactory::GlobalObj;
-			EGL::CGLETaskList* tl = fact->CreateObject<EGL::CGLETaskList>();
+			auto* tl = fact->CreateObject<EGL::CGLETaskList>();
 
 			{
 				auto v = tl->Task.SaveVector();
 				{
-					EGL::CGLETaskArgsThousandths* t = fact->CreateObject<EGL::CGLETaskArgsThousandths>();
+					auto* t = fact->CreateObject<EGL::CGLETaskArgsThousandths>();
 					t->TaskType = shok::Task::TASK_WAIT_FOR_ANIM_NON_CANCELABLE;
 					t->Thousandths = 1000;
 					v.Vector.push_back(t);
 				}
 				{
-					EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+					auto* t = fact->CreateObject<EGL::CGLETaskArgs>();
 					t->TaskType = shok::Task::TASK_SET_BATTLE_IDLE_ANIM;
 					v.Vector.push_back(t);
 				}
 				{
-					EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+					auto* t = fact->CreateObject<EGL::CGLETaskArgs>();
 					t->TaskType = shok::Task::TASK_BATTLE_WAIT_UNTIL;
 					v.Vector.push_back(t);
 				}
 				{
-					EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+					auto* t = fact->CreateObject<EGL::CGLETaskArgs>();
 					t->TaskType = shok::Task::TASK_SET_DEFAULT_REACTION_TYPE;
 					v.Vector.push_back(t);
 				}
 				{
-					EGL::CGLETaskArgs* t = fact->CreateObject<EGL::CGLETaskArgs>();
+					auto* t = fact->CreateObject<EGL::CGLETaskArgs>();
 					t->TaskType = shok::Task::TASK_LIST_DONE;
 					v.Vector.push_back(t);
 				}
@@ -1780,7 +1656,7 @@ namespace CppLogic::Entity {
 				CppLogic::ModLoader::ModLoader::AddTaskListToRemove(tid);
 		}
 	}
-	void SettlerCleanupAnimTask(lua::State L) {
+	void SettlerCleanupAnimTask(luaext::State L) {
 		if (CppLogic::ModLoader::ModLoader::IsInitialized()) // modloader will take care of cleanup
 			return;
 		EGL::CGLETaskListMgr* tmng = *EGL::CGLETaskListMgr::GlobalObj;
@@ -1791,11 +1667,10 @@ namespace CppLogic::Entity {
 			tmng->RemoveTaskList(tid);
 		}
 	}
-	int SettlerPlayScriptAnimation(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerPlayScriptAnimation(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
-		SettlerCreateAnimTaskList(l);
+		SettlerCreateAnimTaskList(L);
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		EGL::CGLETaskArgsAnimation setanim{};
 		setanim.TaskType = shok::Task::TASK_SET_ANIM;
@@ -1807,51 +1682,46 @@ namespace CppLogic::Entity {
 		reset.TaskType = shok::Task::TASK_RESET_TASK_LIST_TIMER;
 		e->ExecuteTask(reset);
 		e->ExecuteTask(setanim);
-		GGL::CGLBehaviorAnimationEx* animbeh = e->GetBehaviorDynamic<GGL::CGLBehaviorAnimationEx>();
+		auto* animbeh = e->GetBehaviorDynamic<GGL::CGLBehaviorAnimationEx>();
 		animbeh->SpeedModifier = L.OptFloat(4, 1);
-		animbeh->Duration = static_cast<int>(animbeh->Duration / animbeh->SpeedModifier);
-		GGL::CBattleBehavior* batt = e->GetBehaviorDynamic<GGL::CBattleBehavior>();
+		animbeh->Duration = static_cast<int>(static_cast<float>(animbeh->Duration) / animbeh->SpeedModifier);
+		auto* batt = e->GetBehaviorDynamic<GGL::CBattleBehavior>();
 		if (batt)
 			batt->SetCurrentCommand(shok::LeaderCommand::HeroAbility);
 		e->SetTaskList(CppLogic::GetIdManager<shok::TaskListId>().GetIdByName(AnimTaskList));
 		return 0;
 	}
 
-	int SettlerGetExperienceClass(lua::State l) {
-		luaext::EState L{ l };
+	int SettlerGetExperienceClass(luaext::State L) {
 		auto* s = L.CheckSettler(1);
 		s->ModifierProfile.EntityReference.CheckInit();
 		L.Push(static_cast<int>(s->ModifierProfile.EntityReference.ExperienceClass));
 		return 1;
 	}
 
-	int GetBattleTarget(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetBattleTarget(luaext::State L) {
 		auto* e = L.CheckEntity(1);
 		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_TARGET));
 		return 1;
 	}
-	int GetAttackCommandTarget(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetAttackCommandTarget(luaext::State L) {
 		auto* e = L.CheckEntity(1);
 		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::LEADER_TARGET));
 		return 1;
 	}
 
-	int BuildingGetRelativePositions(lua::State ls) {
-		luaext::EState L{ ls };
+	int BuildingGetRelativePositions(luaext::State L) {
 		auto* b = L.CheckBuilding(1);
-		auto* p = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps);
+		auto* p = static_cast<GGL::CGLBuildingProps*>(b->GetEntityType()->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
 		shok::Position approach;
 		b->GetApproachPos(&approach);
-		L.PushPos(b->Position + approach);
-		L.PushPos(b->Position + p->LeavePos);
-		L.PushPos(b->Position + p->DoorPos);
+		L.Push(b->Position + approach);
+		L.Push(b->Position + p->LeavePos);
+		L.Push(b->Position + p->DoorPos);
 		return 3;
 	}
 
-	int BuildingSpawnWorkerFor(lua::State ls) {
-		luaext::EState L{ ls };
+	int BuildingSpawnWorkerFor(luaext::State L) {
 		auto* workplace = L.CheckBuilding(1);
 		auto* spawner = L.CheckBuilding(2);
 		auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(workplace->PlayerId);
@@ -1860,8 +1730,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int MarketPredictPrice(lua::State ls) {
-		luaext::EState L{ ls };
+	int MarketPredictPrice(luaext::State L) {
 		auto* e = L.CheckEntity(1);
 		auto* b = e->GetBehavior<CppLogic::Mod::AdvancedMarketBehavior>();
 		if (b == nullptr)
@@ -1870,8 +1739,7 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
-	int MarketGetSellResources(lua::State ls) {
-		luaext::EState L{ ls };
+	int MarketGetSellResources(luaext::State L) {
 		auto* e = L.CheckEntity(1);
 		auto* b = e->GetBehavior<CppLogic::Mod::AdvancedMarketBehavior>();
 		if (b == nullptr)
@@ -1883,7 +1751,7 @@ namespace CppLogic::Entity {
 	}
 
 
-	void Cleanup(lua::State L) {
+	void Cleanup(luaext::State L) {
 		DisableConversionHook(L);
 		EGL::CGLEEntity::BuildingMaxHpTechBoni.clear();
 		EGL::CGLEEntity::LastRemovedEntityAddonData.EntityId = shok::EntityId::Invalid;
@@ -1892,228 +1760,228 @@ namespace CppLogic::Entity {
 	}
 
 	constexpr std::array Entity{
-			lua::FuncReference::GetRef<GetScale>("GetScale"),
-			lua::FuncReference::GetRef<SetScale>("SetScale"),
-			lua::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
-			lua::FuncReference::GetRef<MovingEntitySetTargetPos>("MovingEntitySetTargetPos"),
-			lua::FuncReference::GetRef<MovingEntityIsFleeingFrom>("MovingEntityIsFleeingFrom"),
-			lua::FuncReference::GetRef<GetLimitedLifespanRemaining>("GetLimitedLifespanRemaining"),
-			lua::FuncReference::GetRef<SetLimitedLifespanRemaining>("SetLimitedLifespanRemaining"),
-			lua::FuncReference::GetRef<GetTaskListIndex>("GetTaskListIndex"),
-			lua::FuncReference::GetRef<SetTaskListIndex>("SetTaskListIndex"),
-			lua::FuncReference::GetRef<MovingEntityGetSpeedFactor>("MovingEntityGetSpeedFactor"),
-			lua::FuncReference::GetRef<IsSoldier>("IsSoldier"),
-			lua::FuncReference::GetRef<GetAutoAttackMaxRange>("GetAutoAttackMaxRange"),
-			lua::FuncReference::GetRef<GetModel>("GetModel"),
-			lua::FuncReference::GetRef<GetExploration>("GetExploration"),
-			lua::FuncReference::GetRef<GetSpeed>("GetSpeed"),
-			lua::FuncReference::GetRef<IsFeared>("IsFeared"),
-			lua::FuncReference::GetRef<ClearAttackers>("ClearAttackers"),
-			lua::FuncReference::GetRef<ReplaceWithResourceEntity>("ReplaceWithResourceEntity"),
-			lua::FuncReference::GetRef<SetMaxHP>("SetMaxHP"),
-			lua::FuncReference::GetRef<CloneOverrideData>("CloneOverrideData"),
-			lua::FuncReference::GetRef<SetDamage>("SetDamage"),
-			lua::FuncReference::GetRef<SetArmor>("SetArmor"),
-			lua::FuncReference::GetRef<SetExploration>("SetExploration"),
-			lua::FuncReference::GetRef<SetAutoAttackMaxRange>("SetAutoAttackMaxRange"),
-			lua::FuncReference::GetRef<SetDisplayName>("SetDisplayName"),
-			lua::FuncReference::GetRef<GetDisplayName>("GetDisplayName"),
-			lua::FuncReference::GetRef<PerformHeal>("PerformHeal"),
-			lua::FuncReference::GetRef<EntityIteratorTableize>("EntityIteratorTableize"),
-			lua::FuncReference::GetRef<LEntityIterator>("EntityIterator"),
-			lua::FuncReference::GetRef<PlayerEntityIterator>("PlayerEntityIterator"),
-			lua::FuncReference::GetRef<RegionEntityIteratorRect>("RegionEntityIteratorRect"),
-			lua::FuncReference::GetRef<RegionEntityIteratorCircle>("RegionEntityIteratorCircle"),
-			lua::FuncReference::GetRef<EntityIteratorGetNearest>("EntityIteratorGetNearest"),
-			lua::FuncReference::GetRef<EntityIteratorCount>("EntityIteratorCount"),
-			lua::FuncReference::GetRef<CheckPredicate>("CheckPredicate"),
-			lua::FuncReference::GetRef<GetBattleTarget>("GetBattleTarget"),
-			lua::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
-			lua::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
-			lua::FuncReference::GetRef<GetTrackedResources>("GetTrackedResources"),
-			lua::FuncReference::GetRef<GetAllScriptNameMappings>("GetAllScriptNameMappings"),
-			lua::FuncReference::GetRef<GetLimitedAmmo>("GetLimitedAmmo"),
-			lua::FuncReference::GetRef<SetLimitedAmmo>("SetLimitedAmmo"),
-			lua::FuncReference::GetRef<DumpEntity>("DumpEntity"),
+			luaext::FuncReference::GetRef<GetScale>("GetScale"),
+			luaext::FuncReference::GetRef<SetScale>("SetScale"),
+			luaext::FuncReference::GetRef<MovingEntityGetTargetPos>("MovingEntityGetTargetPos"),
+			luaext::FuncReference::GetRef<MovingEntitySetTargetPos>("MovingEntitySetTargetPos"),
+			luaext::FuncReference::GetRef<MovingEntityIsFleeingFrom>("MovingEntityIsFleeingFrom"),
+			luaext::FuncReference::GetRef<GetLimitedLifespanRemaining>("GetLimitedLifespanRemaining"),
+			luaext::FuncReference::GetRef<SetLimitedLifespanRemaining>("SetLimitedLifespanRemaining"),
+			luaext::FuncReference::GetRef<GetTaskListIndex>("GetTaskListIndex"),
+			luaext::FuncReference::GetRef<SetTaskListIndex>("SetTaskListIndex"),
+			luaext::FuncReference::GetRef<MovingEntityGetSpeedFactor>("MovingEntityGetSpeedFactor"),
+			luaext::FuncReference::GetRef<IsSoldier>("IsSoldier"),
+			luaext::FuncReference::GetRef<GetAutoAttackMaxRange>("GetAutoAttackMaxRange"),
+			luaext::FuncReference::GetRef<GetModel>("GetModel"),
+			luaext::FuncReference::GetRef<GetExploration>("GetExploration"),
+			luaext::FuncReference::GetRef<GetSpeed>("GetSpeed"),
+			luaext::FuncReference::GetRef<IsFeared>("IsFeared"),
+			luaext::FuncReference::GetRef<ClearAttackers>("ClearAttackers"),
+			luaext::FuncReference::GetRef<ReplaceWithResourceEntity>("ReplaceWithResourceEntity"),
+			luaext::FuncReference::GetRef<SetMaxHP>("SetMaxHP"),
+			luaext::FuncReference::GetRef<CloneOverrideData>("CloneOverrideData"),
+			luaext::FuncReference::GetRef<SetDamage>("SetDamage"),
+			luaext::FuncReference::GetRef<SetArmor>("SetArmor"),
+			luaext::FuncReference::GetRef<SetExploration>("SetExploration"),
+			luaext::FuncReference::GetRef<SetAutoAttackMaxRange>("SetAutoAttackMaxRange"),
+			luaext::FuncReference::GetRef<SetDisplayName>("SetDisplayName"),
+			luaext::FuncReference::GetRef<GetDisplayName>("GetDisplayName"),
+			luaext::FuncReference::GetRef<PerformHeal>("PerformHeal"),
+			luaext::FuncReference::GetRef<EntityIteratorTableize>("EntityIteratorTableize"),
+			luaext::FuncReference::GetRef<LEntityIterator>("EntityIterator"),
+			luaext::FuncReference::GetRef<PlayerEntityIterator>("PlayerEntityIterator"),
+			luaext::FuncReference::GetRef<RegionEntityIteratorRect>("RegionEntityIteratorRect"),
+			luaext::FuncReference::GetRef<RegionEntityIteratorCircle>("RegionEntityIteratorCircle"),
+			luaext::FuncReference::GetRef<EntityIteratorGetNearest>("EntityIteratorGetNearest"),
+			luaext::FuncReference::GetRef<EntityIteratorCount>("EntityIteratorCount"),
+			luaext::FuncReference::GetRef<CheckPredicate>("CheckPredicate"),
+			luaext::FuncReference::GetRef<GetBattleTarget>("GetBattleTarget"),
+			luaext::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
+			luaext::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
+			luaext::FuncReference::GetRef<GetTrackedResources>("GetTrackedResources"),
+			luaext::FuncReference::GetRef<GetAllScriptNameMappings>("GetAllScriptNameMappings"),
+			luaext::FuncReference::GetRef<GetLimitedAmmo>("GetLimitedAmmo"),
+			luaext::FuncReference::GetRef<SetLimitedAmmo>("SetLimitedAmmo"),
+			luaext::FuncReference::GetRef<DumpEntity>("DumpEntity"),
 	};
 
 	constexpr std::array Predicates{
-			lua::FuncReference::GetRef<PredicateAnd>("And"),
-			lua::FuncReference::GetRef<PredicateOr>("Or"),
-			lua::FuncReference::GetRef<PredicateNot>("Not"),
-			lua::FuncReference::GetRef<PredicateSetPriority>("SetPriority"),
-			lua::FuncReference::GetRef<PredicateOfType>("OfType"),
-			lua::FuncReference::GetRef<PredicateOfPlayer>("OfPlayer"),
-			lua::FuncReference::GetRef<PredicateInCircle>("InCircle"),
-			lua::FuncReference::GetRef<PredicateIsBuilding>("IsBuilding"),
-			lua::FuncReference::GetRef<PredicateIsSettler>("IsSettler"),
-			lua::FuncReference::GetRef<PredicateIsCombatRelevant>("IsCombatRelevant"),
-			lua::FuncReference::GetRef<PredicateOfAnyPlayer>("OfAnyPlayer"),
-			lua::FuncReference::GetRef<PredicateOfAnyEntityType>("OfAnyEntityType"),
-			lua::FuncReference::GetRef<PredicateIsNotSoldier>("IsNotSoldier"),
-			lua::FuncReference::GetRef<PredicateOfEntityCategory>("OfEntityCategory"),
-			lua::FuncReference::GetRef<PredicateOfAnyEntityCategory>("PredicateOfAnyEntityCategory"),
-			lua::FuncReference::GetRef<PredicateOfAnyClass>("PredicateOfAnyClass"),
-			lua::FuncReference::GetRef<PredicateProvidesResource>("ProvidesResource"),
-			lua::FuncReference::GetRef<PredicateInRect>("InRect"),
-			lua::FuncReference::GetRef<PredicateIsVisible>("IsVisible"),
-			lua::FuncReference::GetRef<PredicateOfUpgradeCategory>("OfUpgradeCategory"),
-			lua::FuncReference::GetRef<PredicateIsAlive>("IsAlive"),
-			lua::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
-			lua::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
+			luaext::FuncReference::GetRef<PredicateAnd>("And"),
+			luaext::FuncReference::GetRef<PredicateOr>("Or"),
+			luaext::FuncReference::GetRef<PredicateNot>("Not"),
+			luaext::FuncReference::GetRef<PredicateSetPriority>("SetPriority"),
+			luaext::FuncReference::GetRef<PredicateOfType>("OfType"),
+			luaext::FuncReference::GetRef<PredicateOfPlayer>("OfPlayer"),
+			luaext::FuncReference::GetRef<PredicateInCircle>("InCircle"),
+			luaext::FuncReference::GetRef<PredicateIsBuilding>("IsBuilding"),
+			luaext::FuncReference::GetRef<PredicateIsSettler>("IsSettler"),
+			luaext::FuncReference::GetRef<PredicateIsCombatRelevant>("IsCombatRelevant"),
+			luaext::FuncReference::GetRef<PredicateOfAnyPlayer>("OfAnyPlayer"),
+			luaext::FuncReference::GetRef<PredicateOfAnyEntityType>("OfAnyEntityType"),
+			luaext::FuncReference::GetRef<PredicateIsNotSoldier>("IsNotSoldier"),
+			luaext::FuncReference::GetRef<PredicateOfEntityCategory>("OfEntityCategory"),
+			luaext::FuncReference::GetRef<PredicateOfAnyEntityCategory>("PredicateOfAnyEntityCategory"),
+			luaext::FuncReference::GetRef<PredicateOfAnyClass>("PredicateOfAnyClass"),
+			luaext::FuncReference::GetRef<PredicateProvidesResource>("ProvidesResource"),
+			luaext::FuncReference::GetRef<PredicateInRect>("InRect"),
+			luaext::FuncReference::GetRef<PredicateIsVisible>("IsVisible"),
+			luaext::FuncReference::GetRef<PredicateOfUpgradeCategory>("OfUpgradeCategory"),
+			luaext::FuncReference::GetRef<PredicateIsAlive>("IsAlive"),
+			luaext::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
+			luaext::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
 	};
 
 	constexpr std::array Settlers {
-			lua::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),
-			lua::FuncReference::GetRef<SettlerGetBaseMovementSpeed>("GetBaseMovementSpeed"),
-			lua::FuncReference::GetRef<SettlerSetBaseMovementSpeed>("SetBaseMovementSpeed"),
-			lua::FuncReference::GetRef<SettlerGetOverheadWidget>("GetOverheadWidget"),
-			lua::FuncReference::GetRef<SettlerSetOverheadWidget>("SetOverheadWidget"),
-			lua::FuncReference::GetRef<HeroGetCamouflageDurationLeft>("HeroGetCamouflageDurationLeft"),
-			lua::FuncReference::GetRef<HeroSetCamouflageDurationLeft>("HeroSetCamouflageDurationLeft"),
-			lua::FuncReference::GetRef<ThiefGetCamouflageTimeTo>("ThiefGetCamouflageTimeTo"),
-			lua::FuncReference::GetRef<ThiefSetCamouflageTimeTo>("ThiefSetCamouflageTimeTo"),
-			lua::FuncReference::GetRef<HeroGetResurrectionTime>("HeroGetResurrectionTime"),
-			lua::FuncReference::GetRef<HeroSetResurrectionTime>("HeroSetResurrectionTime"),
-			lua::FuncReference::GetRef<HeroResurrect>("HeroResurrect"),
-			lua::FuncReference::GetRef<WorkerGetCurrentWorkTime>("WorkerGetCurrentWorkTime"),
-			lua::FuncReference::GetRef<WorkerSetCurrentWorkTime>("WorkerSetCurrentWorkTime"),
-			lua::FuncReference::GetRef<ThiefSetStolenResourceInfo>("ThiefSetStolenResourceInfo"),
-			lua::FuncReference::GetRef<SettlerIsVisible>("IsVisible"),
-			lua::FuncReference::GetRef<SettlerIsIdle>("IsIdle"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::HeroHawk_SendHawk,
+			luaext::FuncReference::GetRef<SettlerGetLeaderOfSoldier>("GetLeaderOfSoldier"),
+			luaext::FuncReference::GetRef<SettlerGetBaseMovementSpeed>("GetBaseMovementSpeed"),
+			luaext::FuncReference::GetRef<SettlerSetBaseMovementSpeed>("SetBaseMovementSpeed"),
+			luaext::FuncReference::GetRef<SettlerGetOverheadWidget>("GetOverheadWidget"),
+			luaext::FuncReference::GetRef<SettlerSetOverheadWidget>("SetOverheadWidget"),
+			luaext::FuncReference::GetRef<HeroGetCamouflageDurationLeft>("HeroGetCamouflageDurationLeft"),
+			luaext::FuncReference::GetRef<HeroSetCamouflageDurationLeft>("HeroSetCamouflageDurationLeft"),
+			luaext::FuncReference::GetRef<ThiefGetCamouflageTimeTo>("ThiefGetCamouflageTimeTo"),
+			luaext::FuncReference::GetRef<ThiefSetCamouflageTimeTo>("ThiefSetCamouflageTimeTo"),
+			luaext::FuncReference::GetRef<HeroGetResurrectionTime>("HeroGetResurrectionTime"),
+			luaext::FuncReference::GetRef<HeroSetResurrectionTime>("HeroSetResurrectionTime"),
+			luaext::FuncReference::GetRef<HeroResurrect>("HeroResurrect"),
+			luaext::FuncReference::GetRef<WorkerGetCurrentWorkTime>("WorkerGetCurrentWorkTime"),
+			luaext::FuncReference::GetRef<WorkerSetCurrentWorkTime>("WorkerSetCurrentWorkTime"),
+			luaext::FuncReference::GetRef<ThiefSetStolenResourceInfo>("ThiefSetStolenResourceInfo"),
+			luaext::FuncReference::GetRef<SettlerIsVisible>("IsVisible"),
+			luaext::FuncReference::GetRef<SettlerIsIdle>("IsIdle"),
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::HeroHawk_SendHawk,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilitySendHawk>>>("CommandSendHawk"),
-			lua::FuncReference::GetRef<SettlerGetHawkOfHero>("GetHawkOfHero"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::InflictFear_Activate,
+			luaext::FuncReference::GetRef<SettlerGetHawkOfHero>("GetHawkOfHero"),
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::InflictFear_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityInflictFear>>>("CommandInflictFear"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::BombPlacer_CommandPlaceBomb,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::BombPlacer_CommandPlaceBomb,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>>>("CommandPlaceBomb"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<GGL::CEventPositionAnd2EntityTypes, shok::EventIDs::CannonBuilder_BuildCannonCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<GGL::CEventPositionAnd2EntityTypes, shok::EventIDs::CannonBuilder_BuildCannonCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBuildCannon>, CheckPlaceCannonEvent>>("CommandPlaceCannon"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::RangedEffect_Activate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::RangedEffect_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityRangedEffect>>>("CommandRangedEffect"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::CircularAttack_ActivateCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::CircularAttack_ActivateCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityCircularAttack>>>("CommandCircularAttack"),
-			lua::FuncReference::GetRef<SettlerCommandSummon>("CommandSummon"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::Camouflage_Activate,
+			luaext::FuncReference::GetRef<SettlerCommandSummon>("CommandSummon"),
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::Camouflage_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityCamouflage>, CheckCamoEvent>>("CommandActivateCamoflage"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::ConvertSettler_ActivateCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::ConvertSettler_ActivateCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityConvertSettlers>, LuaEventInterface::CheckSettler,
 				LuaEventInterface::CheckConvertible, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("CommandConvert"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Sniper_SnipeCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Sniper_SnipeCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilitySniper>, LuaEventInterface::CheckSettler,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>, CheckSnipeEvent>>("CommandSnipe"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Shuriken_ActivateCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Shuriken_ActivateCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShuriken>, LuaEventInterface::CheckSettler,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>, CheckShurikenEvent>>("CommandShuriken"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::MotivateVorkers_ActivateCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::MotivateVorkers_ActivateCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityMotivateWorkers>>>("CommandMotivateWorkers"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::KegPlacer_SabotageCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::KegPlacer_SabotageCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceKeg>, LuaEventInterface::CheckBuilding,
 				CheckThiefNotCarryingEvent, CheckSabotageEvent>>("CommandSabotage"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::KegPlacer_DefuseCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::KegPlacer_DefuseCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceKeg>,
 				CheckThiefNotCarryingEvent, CheckDefuseEvent>>("CommandDefuse"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::Binocular_ExploreCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::Binocular_ExploreCommand,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutBinoculars>>>("CommandBinocular"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::TorchPlacer_PlaceTorch,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::TorchPlacer_PlaceTorch,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutTorches>>>("CommandPlaceTorch"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::PointToResources_Activate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::PointToResources_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityScoutFindResources>>>("CommandPointToRes"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Thief_StealFromCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Thief_StealFromCommand,
 				CheckIsThief, LuaEventInterface::CheckBuilding,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("CommandStealFrom"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Thief_StealFromCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::Thief_StealFromCommand,
 				CheckIsThief, LuaEventInterface::CheckBuilding, LuaEventInterface::CheckTargetCategory<shok::EntityCategory::Headquarters>,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("CommandSecureGoods"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_LightningStrike_Activate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_LightningStrike_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityLightningStrike>, CheckLightingStrike>>("CommandLightningStrike"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_ResDoodadRefill_Activate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_ResDoodadRefill_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbiltyResourceDoodadRefill>, LuaEventInterface::CheckBuilding, CheckResourceRefill,
 				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Friendly>>>("CommandRefillResourceDoodad"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::CppL_ShieldCoverActivate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::CppL_ShieldCoverActivate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShieldCover>>>("CommandShieldCover"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_Resurrect_Activate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::CppL_Resurrect_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityResurrect>, CheckResurrect,
 				LuaEventInterface::CheckEntitySamePlayer>>("CommandResurrect"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_Bombardment_Activate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_Bombardment_Activate,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityBombardment>, CheckBombardment>>("CommandBombardment"),
-			lua::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_BombComboCannon_Activate,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_BombComboCannon_Activate,
 				LuaEventInterface::CheckEntityBehavior<CppLogic::Mod::ReloadableCannonBuilderAbility>,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>>>("CommandBombCannonCombo"),
-			lua::FuncReference::GetRef<EnableConversionHook>("EnableConversionHook"),
-			lua::FuncReference::GetRef<DisableConversionHook>("DisableConversionHook"),
-			lua::FuncReference::GetRef<SettlerCommandMove>("CommandMove"),
-			lua::FuncReference::GetRef<SettlerCommandSerfConstructBuilding>("CommandSerfConstructBuilding"),
-			lua::FuncReference::GetRef<SettlerCommandSerfRepairBuilding>("CommandSerfRepairBuilding"),
-			lua::FuncReference::GetRef<SettlerCommandSerfExtract>("CommandSerfExtract"),
-			lua::FuncReference::GetRef<SettlerCommandExpell>("CommandExpell"),
-			lua::FuncReference::GetRef<SettlerCommandTurnSerfToBattleSerf>("CommandTurnSerfToBattleSerf"),
-			lua::FuncReference::GetRef<SettlerCommandTurnBattleSerfToSerf>("CommandTurnBattleSerfToSerf"),
-			lua::FuncReference::GetRef<SettlerSetPosition>("SetPosition"),
-			lua::FuncReference::GetRef<EnableRangedEffectSoldierHeal>("EnableRangedEffectSoldierHeal"),
-			lua::FuncReference::GetRef<SettlerShurikenGetTarget>("ShurikenGetTarget"),
-			lua::FuncReference::GetRef<SettlerSniperGetTarget>("SniperGetTarget"),
-			lua::FuncReference::GetRef<SettlerGetEnteredBuilding>("GetEnteredBuilding"),
-			lua::FuncReference::GetRef<SettlerPlayScriptAnimation>("PlayScriptAnimation"),
-			lua::FuncReference::GetRef<SettlerGetExperienceClass>("GetExperienceClass"),
-			lua::FuncReference::GetRef<WorkerGetMotivation>("WorkerGetMotivation"),
-			lua::FuncReference::GetRef<WorkerChangeMotivation>("WorkerChangeMotivation"),
-			lua::FuncReference::GetRef<WorkerGetResourceCarried>("WorkerGetResourceCarried"),
-			lua::FuncReference::GetRef<SettlerGetSummoned>("SettlerGetSummoned"),
+			luaext::FuncReference::GetRef<EnableConversionHook>("EnableConversionHook"),
+			luaext::FuncReference::GetRef<DisableConversionHook>("DisableConversionHook"),
+			luaext::FuncReference::GetRef<SettlerCommandMove>("CommandMove"),
+			luaext::FuncReference::GetRef<SettlerCommandSerfConstructBuilding>("CommandSerfConstructBuilding"),
+			luaext::FuncReference::GetRef<SettlerCommandSerfRepairBuilding>("CommandSerfRepairBuilding"),
+			luaext::FuncReference::GetRef<SettlerCommandSerfExtract>("CommandSerfExtract"),
+			luaext::FuncReference::GetRef<SettlerCommandExpell>("CommandExpell"),
+			luaext::FuncReference::GetRef<SettlerCommandTurnSerfToBattleSerf>("CommandTurnSerfToBattleSerf"),
+			luaext::FuncReference::GetRef<SettlerCommandTurnBattleSerfToSerf>("CommandTurnBattleSerfToSerf"),
+			luaext::FuncReference::GetRef<SettlerSetPosition>("SetPosition"),
+			luaext::FuncReference::GetRef<EnableRangedEffectSoldierHeal>("EnableRangedEffectSoldierHeal"),
+			luaext::FuncReference::GetRef<SettlerShurikenGetTarget>("ShurikenGetTarget"),
+			luaext::FuncReference::GetRef<SettlerSniperGetTarget>("SniperGetTarget"),
+			luaext::FuncReference::GetRef<SettlerGetEnteredBuilding>("GetEnteredBuilding"),
+			luaext::FuncReference::GetRef<SettlerPlayScriptAnimation>("PlayScriptAnimation"),
+			luaext::FuncReference::GetRef<SettlerGetExperienceClass>("GetExperienceClass"),
+			luaext::FuncReference::GetRef<WorkerGetMotivation>("WorkerGetMotivation"),
+			luaext::FuncReference::GetRef<WorkerChangeMotivation>("WorkerChangeMotivation"),
+			luaext::FuncReference::GetRef<WorkerGetResourceCarried>("WorkerGetResourceCarried"),
+			luaext::FuncReference::GetRef<SettlerGetSummoned>("SettlerGetSummoned"),
 	};
 
-	constexpr std::array<lua::FuncReference, 8> Leader{ {
-			lua::FuncReference::GetRef<LeaderGetExperience>("GetExperience"),
-			lua::FuncReference::GetRef<LeaderSetExperience>("SetExperience"),
-			lua::FuncReference::GetRef<LeaderGetTroopHealth>("GetTroopHealth"),
-			lua::FuncReference::GetRef<LeaderSetTroopHealth>("SetTroopHealth"),
-			lua::FuncReference::GetRef<LeaderAttachSoldier>("AttachSoldier"),
-			lua::FuncReference::GetRef<LeaderSetSoldierLimit>("SetSoldierLimit"),
-			lua::FuncReference::GetRef<LeaderSetRegeneration>("SetRegeneration"),
-			lua::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
-	} };
+	constexpr std::array Leader{
+			luaext::FuncReference::GetRef<LeaderGetExperience>("GetExperience"),
+			luaext::FuncReference::GetRef<LeaderSetExperience>("SetExperience"),
+			luaext::FuncReference::GetRef<LeaderGetTroopHealth>("GetTroopHealth"),
+			luaext::FuncReference::GetRef<LeaderSetTroopHealth>("SetTroopHealth"),
+			luaext::FuncReference::GetRef<LeaderAttachSoldier>("AttachSoldier"),
+			luaext::FuncReference::GetRef<LeaderSetSoldierLimit>("SetSoldierLimit"),
+			luaext::FuncReference::GetRef<LeaderSetRegeneration>("SetRegeneration"),
+			luaext::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
+	};
 
 	constexpr std::array Building{
-			lua::FuncReference::GetRef<BuildingGetBarracksAutoFillActive>("GetBarracksAutoFillActive"),
-			lua::FuncReference::GetRef<BuildingGetHeight>("GetHeight"),
-			lua::FuncReference::GetRef<BuildingSetHeight>("SetHeight"),
-			lua::FuncReference::GetRef<BuildingMarketGetCurrentTradeData>("MarketGetCurrentTradeData"),
-			lua::FuncReference::GetRef<BuildingMarketSetCurrentTradeData>("MarketSetCurrentTradeData"),
-			lua::FuncReference::GetRef<BuildingCommandFoundryBuildCannon>("CommandFoundryBuildCannon"),
-			lua::FuncReference::GetRef<BuildingGetNearestFreeConstructionSlotFor>("GetNearestFreeConstructionSlotFor"),
-			lua::FuncReference::GetRef<BuildingGetNearestFreeRepairSlotFor>("GetNearestFreeRepairSlotFor"),
-			lua::FuncReference::GetRef<BuildingStartUpgrade>("StartUpgrade"),
-			lua::FuncReference::GetRef<BuildingCancelUpgrade>("CancelUpgrade"),
-			lua::FuncReference::GetRef<BuildingIsIdle>("IsIdle"),
-			lua::FuncReference::GetRef<BarracksGetLeadersTrainingAt>("BarracksGetLeadersTrainingAt"),
-			lua::FuncReference::GetRef<FoundryGetCannonTypeInConstruction>("FoundryGetCannonTypeInConstruction"),
-			lua::FuncReference::GetRef<BarracksBuySoldierForLeader>("BarracksBuySoldierForLeader"),
-			lua::FuncReference::GetRef<BuildingActivateOvertime>("ActivateOvertime"),
-			lua::FuncReference::GetRef<BuildingDeactivateOvertime>("DeactivateOvertime"),
-			lua::FuncReference::GetRef<BarracksRecruitGroups>("BarracksRecruitGroups"),
-			lua::FuncReference::GetRef<BarracksRecruitLeaders>("BarracksRecruitLeaders"),
-			lua::FuncReference::GetRef<HQBuySerf>("HQBuySerf"),
-			lua::FuncReference::GetRef<SellBuilding>("SellBuilding"),
-			lua::FuncReference::GetRef<BuildingStartResearch>("StartResearch"),
-			lua::FuncReference::GetRef<BuildingCancelResearch>("CancelResearch"),
-			lua::FuncReference::GetRef<MarketStartTrade>("MarketStartTrade"),
-			lua::FuncReference::GetRef<MarketCancelTrade>("MarketCancelTrade"),
-			lua::FuncReference::GetRef<MercenaryRemoveLastOffer>("MercenaryRemoveLastOffer"),
-			lua::FuncReference::GetRef<MercenarySetOfferData>("MercenarySetOfferData"),
-			lua::FuncReference::GetRef<BuildingGetBuildOnEntity>("GetBuildOnEntity"),
-			lua::FuncReference::GetRef<BuildOnEntityGetBuilding>("BuildOnEntityGetBuilding"),
-			lua::FuncReference::GetRef<BuildingGetConstructionSite>("GetConstructionSite"),
-			lua::FuncReference::GetRef<IsConstructionSite>("IsConstructionSite"),
-			lua::FuncReference::GetRef<ConstructionSiteGetBuilding>("ConstructionSiteGetBuilding"),
-			lua::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
-			lua::FuncReference::GetRef<BuildingGetRelativePositions>("GetRelativePositions"),
-			lua::FuncReference::GetRef<BuildingSpawnWorkerFor>("SpawnWorkerFor"),
-			lua::FuncReference::GetRef<MarketPredictPrice>("MarketPredictPrice"),
-			lua::FuncReference::GetRef<MarketGetSellResources>("MarketGetSellResources"),
+			luaext::FuncReference::GetRef<BuildingGetBarracksAutoFillActive>("GetBarracksAutoFillActive"),
+			luaext::FuncReference::GetRef<BuildingGetHeight>("GetHeight"),
+			luaext::FuncReference::GetRef<BuildingSetHeight>("SetHeight"),
+			luaext::FuncReference::GetRef<BuildingMarketGetCurrentTradeData>("MarketGetCurrentTradeData"),
+			luaext::FuncReference::GetRef<BuildingMarketSetCurrentTradeData>("MarketSetCurrentTradeData"),
+			luaext::FuncReference::GetRef<BuildingCommandFoundryBuildCannon>("CommandFoundryBuildCannon"),
+			luaext::FuncReference::GetRef<BuildingGetNearestFreeConstructionSlotFor>("GetNearestFreeConstructionSlotFor"),
+			luaext::FuncReference::GetRef<BuildingGetNearestFreeRepairSlotFor>("GetNearestFreeRepairSlotFor"),
+			luaext::FuncReference::GetRef<BuildingStartUpgrade>("StartUpgrade"),
+			luaext::FuncReference::GetRef<BuildingCancelUpgrade>("CancelUpgrade"),
+			luaext::FuncReference::GetRef<BuildingIsIdle>("IsIdle"),
+			luaext::FuncReference::GetRef<BarracksGetLeadersTrainingAt>("BarracksGetLeadersTrainingAt"),
+			luaext::FuncReference::GetRef<FoundryGetCannonTypeInConstruction>("FoundryGetCannonTypeInConstruction"),
+			luaext::FuncReference::GetRef<BarracksBuySoldierForLeader>("BarracksBuySoldierForLeader"),
+			luaext::FuncReference::GetRef<BuildingActivateOvertime>("ActivateOvertime"),
+			luaext::FuncReference::GetRef<BuildingDeactivateOvertime>("DeactivateOvertime"),
+			luaext::FuncReference::GetRef<BarracksRecruitGroups>("BarracksRecruitGroups"),
+			luaext::FuncReference::GetRef<BarracksRecruitLeaders>("BarracksRecruitLeaders"),
+			luaext::FuncReference::GetRef<HQBuySerf>("HQBuySerf"),
+			luaext::FuncReference::GetRef<SellBuilding>("SellBuilding"),
+			luaext::FuncReference::GetRef<BuildingStartResearch>("StartResearch"),
+			luaext::FuncReference::GetRef<BuildingCancelResearch>("CancelResearch"),
+			luaext::FuncReference::GetRef<MarketStartTrade>("MarketStartTrade"),
+			luaext::FuncReference::GetRef<MarketCancelTrade>("MarketCancelTrade"),
+			luaext::FuncReference::GetRef<MercenaryRemoveLastOffer>("MercenaryRemoveLastOffer"),
+			luaext::FuncReference::GetRef<MercenarySetOfferData>("MercenarySetOfferData"),
+			luaext::FuncReference::GetRef<BuildingGetBuildOnEntity>("GetBuildOnEntity"),
+			luaext::FuncReference::GetRef<BuildOnEntityGetBuilding>("BuildOnEntityGetBuilding"),
+			luaext::FuncReference::GetRef<BuildingGetConstructionSite>("GetConstructionSite"),
+			luaext::FuncReference::GetRef<IsConstructionSite>("IsConstructionSite"),
+			luaext::FuncReference::GetRef<ConstructionSiteGetBuilding>("ConstructionSiteGetBuilding"),
+			luaext::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
+			luaext::FuncReference::GetRef<BuildingGetRelativePositions>("GetRelativePositions"),
+			luaext::FuncReference::GetRef<BuildingSpawnWorkerFor>("SpawnWorkerFor"),
+			luaext::FuncReference::GetRef<MarketPredictPrice>("MarketPredictPrice"),
+			luaext::FuncReference::GetRef<MarketGetSellResources>("MarketGetSellResources"),
 	};
 
-	void Init(lua::State L)
+	void Init(luaext::State L)
 	{
 		L.RegisterFuncs(Entity, -3);
 
@@ -2147,7 +2015,7 @@ namespace CppLogic::Entity {
 		}
 	}
 
-	void OnSaveLoaded(lua::State L)
+	void OnSaveLoaded(luaext::State L)
 	{
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConversionTrigger)
 			EnableConversionHook(L);

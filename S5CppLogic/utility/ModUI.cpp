@@ -984,7 +984,7 @@ bool CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::HandleEvent(EGUI
 			auto pos = MapPosFromMouseEvent(widget, evLocalCoords);
 			if (pos.has_value())
 			{
-				luaext::EState L{ *EScr::GetCurrentLuaState() };
+				luaext::State L{ *EScr::GetCurrentLuaState() };
 				int t = L.GetTop();
 				std::string s = std::format("return {}", static_cast<std::string_view>(FuncName()));
 				bool r = false;
@@ -992,7 +992,7 @@ bool CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::HandleEvent(EGUI
 					L.DoStringT(s, "MiniMapOverlayWithCallbackCustomWidget::HandleEvent");
 					if (L.IsFunction(-1)) {
 						L.Push(widget->WidgetID);
-						L.PushPos(*pos);
+						L.Push(*pos);
 						L.Push(mev->KeyData & shok::Keys::MaskCode);
 						L.Push((mev->KeyData & shok::Keys::ModifierShift) != shok::Keys::None);
 						L.Push((mev->KeyData & shok::Keys::ModifierControl) != shok::Keys::None);

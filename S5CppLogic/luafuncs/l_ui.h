@@ -5,9 +5,9 @@
 #include <luaext.h>
 
 namespace CppLogic::UI {
-	void Init(lua::State L);
-	void Cleanup(lua::State L);
-	void OnSaveLoaded(lua::State L);
+	void Init(luaext::State L);
+	void Cleanup(luaext::State L);
+	void OnSaveLoaded(luaext::State L);
 
 
 	constexpr std::string_view CharTriggerRegKey = "CppLogic::UI::CharTrigger";
@@ -17,8 +17,8 @@ namespace CppLogic::UI {
 	class GUIState_LuaSelection : public GGUI::CState {
 	public:
 		PADDINGI(2); // not sure how big the base object is;
-		lua::Reference RefOnKlick = lua::State::NoRef;
-		lua::Reference RefOnCancel = lua::State::NoRef;
+		luaext::Reference RefOnKlick = luaext::State::NoRef;
+		luaext::Reference RefOnCancel = luaext::State::NoRef;
 
 		virtual ~GUIState_LuaSelection() override;
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
@@ -60,7 +60,7 @@ namespace CppLogic::UI {
 		virtual bool OnCancel() override;
 
 		void UpdateModel(int x, int y);
-		float GetRotation() const;
+		[[nodiscard]] float GetRotation() const;
 		void SetRotation(float deg);
 		void OnRotationChanged();
 
@@ -77,8 +77,8 @@ namespace CppLogic::UI {
 	class TerrainDecalAccess {
 		std::unique_ptr<ED::CTerrainDecalBase, CppLogic::DestroyCaller<ED::CTerrainDecalBase>> Decal;
 
-		static int Destroy(lua::State L);
-		static int SetPos(lua::State L);
+		static int Destroy(luaext::State L);
+		static int SetPos(luaext::State L);
 
 		void Destroy();
 
@@ -94,8 +94,8 @@ namespace CppLogic::UI {
 		~TerrainDecalAccess();
 
 		static constexpr const std::array LuaMethods {
-				lua::FuncReference::GetRef<Destroy>("Destroy"),
-				lua::FuncReference::GetRef<SetPos>("SetPos"),
+				luaext::FuncReference::GetRef<Destroy>("Destroy"),
+				luaext::FuncReference::GetRef<SetPos>("SetPos"),
 			};
 
 		static void Cleanup();

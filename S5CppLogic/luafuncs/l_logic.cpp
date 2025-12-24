@@ -32,38 +32,33 @@
 #include <utility/ModFilesystem.h>
 
 namespace CppLogic::Logic {
-	int GetDamageFactor(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetDamageFactor(luaext::State L) {
 		auto dmgclass = L.CheckEnum<shok::DamageClassId>(1);
 		auto amclass = L.CheckEnum<shok::ArmorClassId>(2);
 		L.Push(CppLogic::GetDamageClass(dmgclass)->GetBonusVsArmorClass(amclass));
 		return 1;
 	}
-	int SetDamageFactor(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetDamageFactor(luaext::State L) {
 		auto dmgclass = L.CheckEnum<shok::DamageClassId>(1);
 		auto amclass = L.CheckEnum<shok::ArmorClassId>(2);
 		CppLogic::GetDamageClass(dmgclass)->GetBonusVsArmorClass(amclass) = L.CheckFloat(3);
 		return 0;
 	}
 
-	int ReloadCutscene(lua::State ls) {
-		luaext::EState L{ ls };
+	int ReloadCutscene(luaext::State L) {
 		const char* data = L.OptString(1, "Maps\\ExternalMap");
 		(**ECS::CManager::GlobalObj)->ReloadCutscene(data);
 		return 0;
 	}
 
-	int GetAnimIdFromName(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetAnimIdFromName(luaext::State L) {
 		const char* data = L.CheckString(1);
 		int id = (*BB::CIDManagerEx::AnimManager)->GetIdByName(data);
 		L.Push(id);
 		return 1;
 	}
 
-	int PlayerGetPaydayStartetTick(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerGetPaydayStartetTick(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (p->PlayerAttractionHandler->PaydayActive)
@@ -72,22 +67,20 @@ namespace CppLogic::Logic {
 			L.Push(-1);
 		return 1;
 	}
-	int PlayerSetPaydayStartetTick(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerSetPaydayStartetTick(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		int st = L.CheckInt(2);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (st < 0) {
-			p->PlayerAttractionHandler->PaydayActive = 0;
+			p->PlayerAttractionHandler->PaydayActive = false;
 		}
 		else {
-			p->PlayerAttractionHandler->PaydayActive = 1;
+			p->PlayerAttractionHandler->PaydayActive = true;
 			p->PlayerAttractionHandler->PaydayFirstOccuraceGameTurn = st;
 		}
 		return 0;
 	}
-	int SetPaydayFrequency(lua::State ls) {
-		luaext::EState L{ ls };
+	int SetPaydayFrequency(luaext::State L) {
 		int i = L.CheckInt(1);
 		if (i <= 0)
 			throw lua::LuaException("freq has to be > 0");
@@ -96,13 +89,13 @@ namespace CppLogic::Logic {
 	}
 
 
-	int NetEventReadBack(lua::State L) {
-		BB::CEvent* ev = static_cast<BB::CEvent*>(L.ToUserdata(L.Upvalueindex(1)));
+	int NetEventReadBack(luaext::State L) {
+		auto* ev = static_cast<BB::CEvent*>(L.ToUserdata(L.Upvalueindex(1)));
 		L.PushValue(1);
 		L.Push("EventType");
 		L.Push();
 		L.SetTableRaw(-3);
-		if (EGL::CNetEventEntityAndPosArray* e = dynamic_cast<EGL::CNetEventEntityAndPosArray*>(ev)) {
+		if (auto* e = dynamic_cast<EGL::CNetEventEntityAndPosArray*>(ev)) {
 			L.Push("Position");
 			L.GetTableRaw(-2);
 			if (!L.IsNil(-1)) {
@@ -111,7 +104,7 @@ namespace CppLogic::Logic {
 			}
 			L.Pop(1);
 		}
-		if (GGL::CNetEventBuildingCreator* e = dynamic_cast<GGL::CNetEventBuildingCreator*>(ev)) {
+		if (auto* e = dynamic_cast<GGL::CNetEventBuildingCreator*>(ev)) {
 			L.Push("Serf");
 			L.GetTableRaw(-2);
 			if (!L.IsNil(-1)) {
@@ -126,7 +119,7 @@ namespace CppLogic::Logic {
 
 	bool NetEventSetHook_Hook(BB::CEvent* ev) {
 		int id = ev->EventTypeId;
-		lua::State L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int top = L.GetTop();
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
 		L.Push(NetEventSetHookRegKey);
@@ -144,7 +137,7 @@ namespace CppLogic::Logic {
 		L.SetTop(top);
 		return r;
 	};
-	int NetEventSetHook(lua::State L) {
+	int NetEventSetHook(luaext::State L) {
 		if (!L.IsFunction(1))
 			throw lua::LuaException("no func");
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
@@ -155,7 +148,7 @@ namespace CppLogic::Logic {
 		GGUI::CManager::GlobalObj()->HackPostEvent();
 		return 0;
 	}
-	int NetEventUnSetHook(lua::State L) {
+	int NetEventUnSetHook(luaext::State L) {
 		GGUI::CManager::PostEventCallback = nullptr;
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
 		L.Push(NetEventSetHookRegKey);
@@ -165,8 +158,7 @@ namespace CppLogic::Logic {
 	}
 
 
-	int PlayerGetKillStatistics(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerGetKillStatistics(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		L.Push(p->Statistics.NumberOfUnitsKilled);
@@ -176,8 +168,7 @@ namespace CppLogic::Logic {
 		return 4;
 	}
 
-	int CanPlaceBuildingAt(lua::State ls) {
-		luaext::EState L{ ls };
+	int CanPlaceBuildingAt(luaext::State L) {
 		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
 		GGlue::CGlueEntityProps* ety = CppLogic::GetEntityType(ty);
 		if (!ety)
@@ -186,7 +177,7 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("not a building");
 		auto pl = L.CheckPlayerId(2);
 		shok::Position p = L.CheckPos(3);
-		if (static_cast<GGL::CGLBuildingProps*>(ety->LogicProps)->BuildOn.size() == 0)
+		if (static_cast<GGL::CGLBuildingProps*>(ety->LogicProps)->BuildOn.size() == 0) // NOLINT(*-pro-type-static-cast-downcast)
 			p.FloorToBuildingPlacement();
 		float r = CppLogic::DegreesToRadians(L.CheckFloat(4));
 		if (L.IsNumber(5))
@@ -196,8 +187,7 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
-	int PlayerActivateAlarm(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerActivateAlarm(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (p->WorkerAlarmMode)
@@ -207,8 +197,7 @@ namespace CppLogic::Logic {
 		(*GGL::CGLGameLogic::GlobalObj)->EnableAlarmForPlayer(i);
 		return 0;
 	}
-	int PlayerDeactivateAlarm(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerDeactivateAlarm(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i);
 		if (!p->WorkerAlarmMode)
@@ -217,8 +206,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int PlayerUpgradeSettlerCategory(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerUpgradeSettlerCategory(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		auto ucat = L.CheckEnum<shok::UpgradeCategoryId>(2);
 		auto u = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(i)->SettlerUpgradeManager->UpgradeCategories.find(ucat);
@@ -228,8 +216,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int PlayerSetTaxLevel(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerSetTaxLevel(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		int tl = L.CheckInt(2);
 		if (tl < 0 || tl >= 5)
@@ -238,8 +225,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int PlayerActivateWeatherMachine(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerActivateWeatherMachine(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		int w = L.CheckInt(2);
 		if (w < 1 || w >= 4)
@@ -252,8 +238,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int PlayerBlessSettlers(lua::State ls) {
-		luaext::EState L{ ls };
+	int PlayerBlessSettlers(luaext::State L) {
 		auto i = L.CheckPlayerId(1, false);
 		auto b = L.CheckEnum<shok::BlessCategoryId>(2);
 		float faithneeded = -1;
@@ -271,28 +256,25 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int LandscapeGetSector(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetSector(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p));
 		return 1;
 	}
 
-	int LandscapeGetNearestUnblockedPosInSector(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetNearestUnblockedPosInSector(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		int s = L.CheckInt(2);
 		float r = L.CheckFloat(3);
 		shok::Position po;
 		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetNearestPositionInSector(&p, r, static_cast<shok::SectorId>(s), &po))
-			L.PushPos(po);
+			L.Push(po);
 		else
 			L.Push();
 		return 1;
 	}
 
-	int EnableAllHurtEntityTrigger(lua::State ls) {
-		luaext::EState L{ ls };
+	int EnableAllHurtEntityTrigger(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		EGL::CGLEEntity::HookHurtEntity();
@@ -304,8 +286,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int HurtEntityGetDamage(lua::State ls) {
-		luaext::EState L{ ls };
+	int HurtEntityGetDamage(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		auto* ev = dynamic_cast<CppLogic::Events::AdvHurtEvent*>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
@@ -316,8 +297,7 @@ namespace CppLogic::Logic {
 		L.Push(ev->AttackerPlayer);
 		return 3;
 	}
-	int HurtEntitySetDamage(lua::State ls) {
-		luaext::EState L{ ls };
+	int HurtEntitySetDamage(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		auto* ev = dynamic_cast<CppLogic::Events::AdvHurtEvent*>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
@@ -327,16 +307,16 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int GetLoadOrder(lua::State L) {
+	int GetLoadOrder(luaext::State L) {
 		L.NewTable();
 		int r = 1;
 		for (BB::IFileSystem* a : (*BB::CFileSystemMgr::GlobalObj)->LoadOrder) {
-			if (BB::CDirectoryFileSystem* dir = dynamic_cast<BB::CDirectoryFileSystem*>(a)) {
+			if (auto* dir = dynamic_cast<BB::CDirectoryFileSystem*>(a)) {
 				L.Push(dir->Path);
 				L.SetTableRaw(-2, r);
 				r++;
 			}
-			else if (BB::CBBArchiveFile* arch = dynamic_cast<BB::CBBArchiveFile*>(a)) {
+			else if (auto* arch = dynamic_cast<BB::CBBArchiveFile*>(a)) {
 				L.Push(arch->ArchiveFile.Filename);
 				L.SetTableRaw(-2, r);
 				r++;
@@ -355,7 +335,7 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
-	int AddArchive(lua::State L) {
+	int AddArchive(luaext::State L) {
 		auto s = L.CheckStringView(1);
 		if (!std::filesystem::exists(s))
 			throw lua::LuaException("file doesnt exist");
@@ -371,7 +351,7 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
-	int RemoveTopArchive(lua::State L) {
+	int RemoveTopArchive(luaext::State L) {
 		if ((*BB::CFileSystemMgr::GlobalObj)->LoadOrder.size() <= 0)
 			throw lua::LuaException("loadorder empty");
 		if ((*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0] == BB::CFileSystemMgr::LoadorderTop)
@@ -380,21 +360,21 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int AddFolder(lua::State L) {
+	int AddFolder(luaext::State L) {
 		auto s = L.CheckStringView(1);
 		(*BB::CFileSystemMgr::GlobalObj)->AddFolder(s.data());
 		L.NewUserClass<CppLogic::ModLoader::ArchivePopHelper>(s, (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0]);
 		return 1;
 	}
 
-	int AddRedirectLayer(lua::State L) {
+	int AddRedirectLayer(luaext::State L) {
 		auto s = L.CheckStringView(1);
 		auto* r = CppLogic::Mod::FileSystem::RedirectFileSystem::CreateRedirectLayer(s);
 		L.NewUserClass<CppLogic::ModLoader::ArchiveRedirectHelper>(s, r);
 		return 1;
 	}
 
-	int GetArchiveOfFile(lua::State L) {
+	int GetArchiveOfFile(luaext::State L) {
 		const char* s = L.CheckString(1);
 		auto* mng = (*BB::CFileSystemMgr::GlobalObj);
 		BB::IFileSystem::FileInfo info{};
@@ -418,7 +398,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int EnableMaxHPTechMod(lua::State L) {
+	int EnableMaxHPTechMod(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supportet with SCELoader");
 		EGL::CGLEEntity::HookMaxHP();
@@ -427,32 +407,27 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int LandscapeGetTerrainType(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetTerrainType(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetTerrainTypeAt(p));
 		return 1;
 	}
-	int LandscapeGetWaterType(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetWaterType(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterTypeAt(p));
 		return 1;
 	}
-	int LandscapeGetWaterHeight(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetWaterHeight(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetWaterHeightAt(p));
 		return 1;
 	}
-	int LandscapeGetTerrainHeight(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetTerrainHeight(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->HiRes->GetTerrainHeight(p));
 		return 1;
 	}
-	int LandscapeGetTerrainVertexColor(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetTerrainVertexColor(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		int c = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->VertexColors->GetTerrainVertexColor(p);
 		L.Push(c);
@@ -462,20 +437,18 @@ namespace CppLogic::Logic {
 		L.Push(c & 0xFF);
 		return 5;
 	}
-	int LandscapeGetBlocking(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetBlocking(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push(static_cast<int>((*ED::CGlobalsLogicEx::GlobalObj)->GetBlocking(p)));
 		return 1;
 	}
-	int LandscapeGetBridgeHeight(lua::State ls) {
-		luaext::EState L{ ls };
+	int LandscapeGetBridgeHeight(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetBridgeHeight(p));
 		return 1;
 	}
 
-	int GetColorByColorIndex(lua::State L) { // ind -> r,g,b,a
+	int GetColorByColorIndex(luaext::State L) { // ind -> r,g,b,a
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		int i = L.CheckInt(1);
@@ -486,7 +459,7 @@ namespace CppLogic::Logic {
 		L.Push(c.A);
 		return 4;
 	}
-	int SetColorByColorIndex(lua::State L) {
+	int SetColorByColorIndex(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		int i = L.CheckInt(1);
@@ -497,7 +470,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int SetPaydayCallback(lua::State L) {
+	int SetPaydayCallback(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use global GameCallback_PaydayPayed instead");
 		GGL::CPlayerAttractionHandler::HookCheckPayday();
@@ -505,7 +478,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int SetLeadersRegenerateTroopHealth(lua::State L) {
+	int SetLeadersRegenerateTroopHealth(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		GGL::CLeaderBehavior::HookLeaderRegen();
@@ -514,7 +487,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int SetStringTableText(lua::State L) {
+	int SetStringTableText(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		
@@ -538,7 +511,7 @@ namespace CppLogic::Logic {
 	}
 
 	bool CanPlaceBuildingCb(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId) {
-		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 		bool r = true;
 
@@ -547,7 +520,7 @@ namespace CppLogic::Logic {
 		L.GetTableRaw(-2);
 		L.Push(entitytype);
 		L.Push(player);
-		L.PushPos(*pos);
+		L.Push(*pos);
 		L.Push(CppLogic::RadiansToDegrees(rotation));
 		L.Push(buildOnId);
 		L.PCall(5, 1, 0);
@@ -557,7 +530,7 @@ namespace CppLogic::Logic {
 		L.SetTop(t);
 		return r;
 	}
-	int SetPlaceBuildingAdditionalCheck(lua::State L) {
+	int SetPlaceBuildingAdditionalCheck(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
@@ -583,7 +556,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int SetPlaceBuildingRotation(lua::State L) {
+	int SetPlaceBuildingRotation(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		//GGUI::CPlaceBuildingState::HookPlacementRotation();
@@ -592,7 +565,7 @@ namespace CppLogic::Logic {
 			s->SetRotation(L.CheckFloat(1));
 		return 0;
 	}
-	int GetPlaceBuildingRotation(lua::State L) {
+	int GetPlaceBuildingRotation(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
@@ -603,7 +576,7 @@ namespace CppLogic::Logic {
 	}
 
 	int SnipeDamageCb(EGL::CGLEEntity* sniper, EGL::CGLEEntity* tar, int dmg) {
-		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
@@ -619,7 +592,7 @@ namespace CppLogic::Logic {
 		L.SetTop(t);
 		return dmg;
 	}
-	int FixSnipeDamage(lua::State L) {
+	int FixSnipeDamage(luaext::State L) {
 		GGL::CSniperAbility::OverrideSnipeTask();
 		if (L.IsNil(1)) {
 			GGL::CSniperAbility::SnipeDamageOverride = nullptr;
@@ -641,13 +614,12 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int GetCurrentWeatherGFXState(lua::State L) {
+	int GetCurrentWeatherGFXState(luaext::State L) {
 		int state = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->WeatherChange.CurrentWeatherGFXState;
 		L.Push(state);
 		return 1;
 	}
-	int GetWeatherQueue(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetWeatherQueue(luaext::State L) {
 		GGL::CWeatherHandler* wh = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler;
 		L.NewTable();
 		for (const auto& kae : wh->Elements) {
@@ -674,7 +646,7 @@ namespace CppLogic::Logic {
 		L.Push(wh->NextPeriodicWeatherStartTimeOffset);
 		return 3;
 	}
-	int ClearWeatherQueueAndAddInitial(lua::State L) {
+	int ClearWeatherQueueAndAddInitial(luaext::State L) {
 		GGL::CWeatherHandler* wh = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler;
 		int state = L.CheckInt(1);
 		if (state < 1 || state > 3)
@@ -704,9 +676,8 @@ namespace CppLogic::Logic {
 		EGL::CGLEEntity* e;
 		bool HasSetTl, HasMoved, Ret;
 	};
-	int SetLuaTaskListFunc_Move(lua::State ls) {
-		luaext::EState L{ ls };
-		SetLuaTaskListFunc_Info* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.Upvalueindex(1)));
+	int SetLuaTaskListFunc_Move(luaext::State L) {
+		auto* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.Upvalueindex(1)));
 		shok::Position p = L.CheckPos(1);
 		EGL::CEventPosition e{ shok::EventIDs::Movement_TaskMoveToPos, p };
 		d->e->FireEvent(&e);
@@ -719,9 +690,8 @@ namespace CppLogic::Logic {
 			d->e->CurrentState = shok::TaskState::Move_NonCancelable;
 		return 0;
 	}
-	int SetLuaTaskListFunc_SetTl(lua::State ls) {
-		luaext::EState L{ ls };
-		SetLuaTaskListFunc_Info* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.Upvalueindex(1)));
+	int SetLuaTaskListFunc_SetTl(luaext::State L) {
+		auto* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.Upvalueindex(1)));
 		auto tid = L.CheckEnum<shok::TaskListId>(1);
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(tid);
 		if (!tl)
@@ -732,7 +702,7 @@ namespace CppLogic::Logic {
 	}
 	shok::TaskExecutionResult SetLuaTaskListFunc_Func(EGL::CGLEEntity* e, int val)
 	{
-		luaext::EState L{ *EScr::CScriptTriggerSystem::GameState };
+		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 
 		SetLuaTaskListFunc_Info d{ e, false, false, false };
@@ -759,7 +729,7 @@ namespace CppLogic::Logic {
 		else
 			return shok::TaskExecutionResult::NextTask;
 	}
-	int SetLuaTaskListFunc(lua::State L) {
+	int SetLuaTaskListFunc(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
 
@@ -785,8 +755,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int TaskListMakeWaitForAnimsUnCancelable(lua::State ls) {
-		luaext::EState L{ ls };
+	int TaskListMakeWaitForAnimsUnCancelable(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
 
@@ -809,8 +778,7 @@ namespace CppLogic::Logic {
 		}
 		return 0;
 	}
-	int TaskListMakeWaitForAnimsCancelable(lua::State ls) {
-		luaext::EState L{ ls };
+	int TaskListMakeWaitForAnimsCancelable(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
 
@@ -833,7 +801,7 @@ namespace CppLogic::Logic {
 		}
 		return 0;
 	}
-	int TaskListSetChangeTaskListCheckUncancelable(lua::State L) {
+	int TaskListSetChangeTaskListCheckUncancelable(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("does not work with SCELoader");
 		bool b = L.OptBool(1, false);
@@ -842,36 +810,33 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int TaskListInsertWaitForLatestAttack(lua::State ls) {
-		luaext::EState L{ ls };
+	int TaskListInsertWaitForLatestAttack(luaext::State L) {
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
 		int i = L.CheckInt(2);
 		if (i < 0 || i > static_cast<int>(tl->Task.size()))
 			throw lua::LuaException("invalid task");
-		EGL::CGLETaskArgs* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
+		auto* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
 		t->TaskType = shok::Task::TASK_WAIT_FOR_LATEST_ATTACK;
 		auto vec = tl->Task.SaveVector();
 		vec.Vector.insert(vec.Vector.begin() + i, t);
 		return 0;
 	}
-	int TaskListInsertSetLatestAttack(lua::State ls) {
-		luaext::EState L{ ls };
+	int TaskListInsertSetLatestAttack(luaext::State L) {
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
 		int i = L.CheckInt(2);
 		if (i < 0 || i > static_cast<int>(tl->Task.size()))
 			throw lua::LuaException("invalid task");
-		EGL::CGLETaskArgs* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
+		auto* t = (*BB::CClassFactory::GlobalObj)->CreateObject<EGL::CGLETaskArgs>();
 		t->TaskType = shok::Task::TASK_SET_LATEST_ATTACK_TURN;
 		auto vec = tl->Task.SaveVector();
 		vec.Vector.insert(vec.Vector.begin() + i, t);
 		return 0;
 	}
-	int TaskListRemoveLatestAttack(lua::State ls) {
-		luaext::EState L{ ls };
+	int TaskListRemoveLatestAttack(luaext::State L) {
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		if (!tl)
 			throw lua::LuaException("invalid tasklist");
@@ -887,7 +852,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int EnableBuildOnMovementFix(lua::State L) {
+	int EnableBuildOnMovementFix(luaext::State L) {
 		EGL::CGLEEntity::BuildOnSetPosFixMovement = L.ToBoolean(1);
 		if (EGL::CGLEEntity::BuildOnSetPosFixMovement)
 			EGL::CGLEEntity::HookBuildOnSetPos();
@@ -895,8 +860,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int GetNearestFreePosForBuilding(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetNearestFreePosForBuilding(luaext::State L) {
 		if (!L.CheckEntityType(1)->IsBuildingType())
 			throw lua::LuaException("no building type");
 		auto ty = L.CheckEnum<shok::EntityTypeId>(1);
@@ -905,31 +869,30 @@ namespace CppLogic::Logic {
 		if (range <= 0)
 			range = (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance;
 		shok::PositionRot pout = GGUI::CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
-		L.PushPosRot(pout);
+		L.Push(pout);
 		return 1;
 	}
 
-	int BlockingUpdateWeatherChange(lua::State L) {
+	int BlockingUpdateWeatherChange(luaext::State L) {
 		(*EGL::CGLEGameLogic::GlobalObj)->Landscape->WeatherChangeBlockingUpdate();
 		return 0;
 	}
 
-	int EnableExperienceClassFix(lua::State L) {
+	int EnableExperienceClassFix(luaext::State L) {
 		bool b = L.CheckBool(1);
 		GGL::CEntityProfile::HookExperience(b);
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExperienceClassFix = b;
 		return 0;
 	}
 
-	int GetAnimationDuration(lua::State ls) {
-		luaext::EState L{ ls };
+	int GetAnimationDuration(luaext::State L) {
 		auto id = L.CheckEnum<shok::AnimationId>(1);
 		L.Push((*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimationDuration(id));
 		return 1;
 	}
 
-	int GetTradeDataForResource(lua::State L) {
-		shok::ResourceType rt = static_cast<shok::ResourceType>(L.CheckInt(1));
+	int GetTradeDataForResource(luaext::State L) {
+		auto rt = L.Check<shok::ResourceType>(1);
 		if (rt != shok::ResourceType::Gold && rt != shok::ResourceType::Stone && rt != shok::ResourceType::Iron
 			&& rt != shok::ResourceType::Sulfur && rt != shok::ResourceType::Clay && rt != shok::ResourceType::Wood)
 			throw lua::LuaException{ "invalid resource type" };
@@ -942,8 +905,8 @@ namespace CppLogic::Logic {
 		L.Push(t->WorkAmount);
 		return 6;
 	}
-	int SetTradeDataForResource(lua::State L) {
-		shok::ResourceType rt = static_cast<shok::ResourceType>(L.CheckInt(1));
+	int SetTradeDataForResource(luaext::State L) {
+		auto rt = L.Check<shok::ResourceType>(1);
 		if (rt != shok::ResourceType::Gold && rt != shok::ResourceType::Stone && rt != shok::ResourceType::Iron
 			&& rt != shok::ResourceType::Sulfur && rt != shok::ResourceType::Clay && rt != shok::ResourceType::Wood)
 			throw lua::LuaException{ "invalid resource type" };
@@ -963,8 +926,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int Navigate(lua::State Ls) {
-		luaext::EState L{ Ls };
+	int Navigate(luaext::State L) {
 		shok::Position from = L.CheckPos(1);
 		shok::Position to = L.CheckPos(2);
 		if ((*EGL::CGLEGameLogic::GlobalObj)->Landscape->IsPosBlockedInMode(&from, EGL::CGLELandscape::BlockingMode::Blocked))
@@ -976,7 +938,7 @@ namespace CppLogic::Logic {
 			L.NewTable();
 			int i = 1;
 			for (int k = 0; k < p.WayPoints.CacheCount; ++k) {
-				L.PushPos(p.WayPoints.GetWaypoint(k));
+				L.Push(p.WayPoints.GetWaypoint(k));
 				L.SetTableRaw(-2, i);
 				++i;
 			}
@@ -995,11 +957,11 @@ namespace CppLogic::Logic {
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers = e;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix = ref;
 	}
-	int EnableResourceTriggers(lua::State L) {
+	int EnableResourceTriggers(luaext::State L) {
 		EnableResourceTriggers(L.OptBool(1, true), L.OptBool(2, false));
 		return 0;
 	}
-	int EnableSettlerBuyTriggers(lua::State L) {
+	int EnableSettlerBuyTriggers(luaext::State L) {
 		GGL::CPlayerAttractionHandler::HookWorkerSpawn();
 		GGL::CBarrackBehavior::HookBuyTriggers();
 		GGL::CKeepBehavior::HookBuySerf();
@@ -1007,8 +969,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int GetSettlerBuyTriggerData(lua::State l) {
-		luaext::EState L{ l };
+	int GetSettlerBuyTriggerData(luaext::State L) {
 		auto* ev = BB::IdentifierCast<CppLogic::Events::CanBuySettlerEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
 		if (ev == nullptr)
 			throw lua::LuaException{ "invalid event" };
@@ -1021,8 +982,7 @@ namespace CppLogic::Logic {
 		L.Push(ev->HQPop);
 		return 7;
 	}
-	int SetSettlerBuyTriggerData(lua::State l) {
-		luaext::EState L{ l };
+	int SetSettlerBuyTriggerData(luaext::State L) {
 		auto* ev = BB::IdentifierCast<CppLogic::Events::CanBuySettlerEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
 		if (ev == nullptr)
 			throw lua::LuaException{ "invalid event" };
@@ -1034,8 +994,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int IsPositionExplored(lua::State l) {
-		luaext::EState L{ l };
+	int IsPositionExplored(luaext::State L) {
 		auto pl = L.CheckPlayerId(1, false);
 		auto pos = L.CheckPos(2);
 		EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
@@ -1048,8 +1007,7 @@ namespace CppLogic::Logic {
 		return 3;
 	}
 
-	int SetPositionExploration(lua::State l) {
-		luaext::EState L{ l };
+	int SetPositionExploration(luaext::State L) {
 		auto pl = L.CheckPlayerId(1, false);
 		auto rect = shok::AARect{ L.CheckPos(2), L.CheckPos(3) }.Sort();
 		EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
@@ -1065,52 +1023,46 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int DumpTaskList(lua::State l) {
-		luaext::EState L{ l };
+	int DumpTaskList(luaext::State L) {
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, tl);
 		return 1;
 	}
 
-	int PlayerGetWorkerAttraction(lua::State l) {
-		luaext::EState L{ l };
+	int PlayerGetWorkerAttraction(luaext::State L) {
 		auto pid = L.CheckPlayerId(1, false);
 		auto* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid)->PlayerAttractionHandler;
 		L.Push(ah->GetAttractionUsageOfVector(ah->FreeWorkerArray) + ah->GetAttractionUsageOfVector(ah->EmployedWorkerArray));
 		return 1;
 	}
-	int PlayerGetMilitaryAttraction(lua::State l) {
-		luaext::EState L{ l };
+	int PlayerGetMilitaryAttraction(luaext::State L) {
 		auto pid = L.CheckPlayerId(1, false);
 		auto* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid)->PlayerAttractionHandler;
 		L.Push(ah->GetAttractionUsageOfVector(ah->LeaderArray) + ah->GetAttractionUsageOfVector(ah->SoldierArray));
 		return 1;
 	}
-	int PlayerGetSerfAttraction(lua::State l) {
-		luaext::EState L{ l };
+	int PlayerGetSerfAttraction(luaext::State L) {
 		auto pid = L.CheckPlayerId(1, false);
 		auto* ah = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid)->PlayerAttractionHandler;
 		L.Push(ah->GetAttractionUsageOfVector(ah->SerfArray));
 		return 1;
 	}
 
-	int EnableCannonInProgressAttraction(lua::State L) {
+	int EnableCannonInProgressAttraction(luaext::State L) {
 		GGL::CPlayerAttractionHandler::AttractionCannonInProgress = L.CheckBool(1);
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction = GGL::CPlayerAttractionHandler::AttractionCannonInProgress;
 		GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();
 		return 0;
 	}
 
-	int EnableRefillabeMineNoAutoDestroy(lua::State l) {
-		luaext::EState L{ l };
+	int EnableRefillabeMineNoAutoDestroy(luaext::State L) {
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory = L.IsNoneOrNil(1) ? shok::EntityCategory::Invalid : L.CheckEnum<shok::EntityCategory>(1);
 		GGL::CResourceDoodad::HookAutoDestroyIfEmpty();
 		GGL::CResourceDoodad::RefillableCategory = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory;
 		return 0;
 	}
 
-	int GetPlayerName(lua::State l) {
-		luaext::EState L{ l };
+	int GetPlayerName(luaext::State L) {
 		auto pid = L.CheckPlayerId(1);
 		GGL::CPlayerStatus* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid);
 		if (p->PlayerNameStringRaw.size() > 0)
@@ -1126,7 +1078,7 @@ namespace CppLogic::Logic {
 		return 2;
 	}
 
-	int DumpGameLogic(lua::State L) {
+	int DumpGameLogic(luaext::State L) {
 		L.NewTable();
 		L.Push("GGL");
 		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, *GGL::CGLGameLogic::GlobalObj, GGL::CGLGameLogic::SerializationData());
@@ -1144,7 +1096,7 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
-	RWE::RwOpCombineType LogicModel_CheckTO(lua::State L, int idx) {
+	RWE::RwOpCombineType LogicModel_CheckTO(luaext::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
 			throw lua::LuaException("invalid transform operation");
@@ -1161,8 +1113,8 @@ namespace CppLogic::Logic {
 		bool NoShadow = false, NoParticleEffects = false, NoTerrainDecal = false;
 		shok::Color Modulate = shok::Color{ 255,255,255,255 };
 
-		static int Clear(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int Clear(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (m->Model) {
 				m->Model->Destroy();
 				m->Model = nullptr;
@@ -1177,9 +1129,8 @@ namespace CppLogic::Logic {
 			m->Modulate = shok::Color{ 255,255,255,255 };
 			return 0;
 		}
-		static int SetModel(lua::State ls) {
-			luaext::EState L{ ls };
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int SetModel(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			auto mid = L.CheckEnum<shok::ModelId>(2);
 			if (m->Model) {
 				m->Model->Destroy();
@@ -1198,9 +1149,8 @@ namespace CppLogic::Logic {
 			m->Modulate = shok::Color{ 255,255,255,255 };
 			return 0;
 		}
-		static int SetAnim(lua::State ls) {
-			luaext::EState L{ ls };
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int SetAnim(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			auto anim = L.CheckEnum<shok::AnimationId>(2);
@@ -1217,8 +1167,8 @@ namespace CppLogic::Logic {
 			m->CurrentTime = m->StartTime;
 			return 0;
 		}
-		static int SetTimeOfAnim(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int SetTimeOfAnim(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			if (!m->AnimHandler)
@@ -1231,11 +1181,11 @@ namespace CppLogic::Logic {
 			m->AnimHandler->UpdateMatrices();
 			return 0;
 		}
-		static int Translate(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int Translate(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
-			shok::Position p = luaext::EState{ L }.CheckPos(2);
+			shok::Position p = L.CheckPos(2);
 			float h = L.OptFloat(3, 0);
 			if (L.OptBool(5, true)) {
 				float t = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
@@ -1251,31 +1201,31 @@ namespace CppLogic::Logic {
 			m->Model->GetFrame()->Translate(&tr, LogicModel_CheckTO(L, 4));
 			return 0;
 		}
-		static int Rotate(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int Rotate(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			float r = L.CheckFloat(2);
 			m->Model->GetFrame()->Rotate(r, LogicModel_CheckTO(L, 3));
 			return 0;
 		}
-		static int Scale(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int Scale(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			float s = L.CheckFloat(2);
 			m->Model->GetFrame()->Scale(s, LogicModel_CheckTO(L, 3));
 			return 0;
 		}
-		static int ResetTransform(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int ResetTransform(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->GetFrame()->Rotate(0, RWE::RwOpCombineType::Replace);
 			return 0;
 		}
-		static int SetColorByPlayer(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int SetColorByPlayer(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			int p = L.CheckInt(2);
@@ -1285,32 +1235,32 @@ namespace CppLogic::Logic {
 			m->PlayerColor = p;
 			return 0;
 		}
-		static int DisableShadow(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int DisableShadow(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableShadow();
 			m->NoShadow = true;
 			return 0;
 		}
-		static int DisableParticleEffects(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int DisableParticleEffects(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableParticleEffects();
 			m->NoParticleEffects = true;
 			return 0;
 		}
-		static int DisableTerrainDecal(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int DisableTerrainDecal(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			m->Model->DisableTerrainDecal();
 			m->NoTerrainDecal = true;
 			return 0;
 		}
-		static int SetColorModulate(lua::State L) {
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int SetColorModulate(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			if (!m->Model)
 				throw lua::LuaException("set a model first");
 			int r = L.CheckInt(2);
@@ -1321,9 +1271,8 @@ namespace CppLogic::Logic {
 			m->Model->SetColorModulate(m->Modulate);
 			return 0;
 		}
-		static int Serialize(lua::State ls) {
-			luaext::EState L{ ls };
-			LogicModel* m = L.CheckUserClass<LogicModel>(1);
+		static int Serialize(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
 			L.Push(typename_details::type_name<LogicModel>());
 			L.NewTable();
 
@@ -1345,7 +1294,7 @@ namespace CppLogic::Logic {
 
 			if (m->Model) {
 				auto* f = m->Model->GetFrame();
-				float* mat = reinterpret_cast<float*>(f->GetLTM());
+				auto* mat = reinterpret_cast<float*>(f->GetLTM());
 				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
 					L.Push(mat[i]);
 					L.SetTableRaw(-2, i + 1);
@@ -1385,8 +1334,7 @@ namespace CppLogic::Logic {
 
 			return 2;
 		}
-		static int Deserialize(lua::State ls) {
-			luaext::EState L{ ls };
+		static int Deserialize(luaext::State L) {
 			auto* m = L.NewUserClass<LogicModel>();
 			L.Push("Model");
 			L.GetTableRaw(1);
@@ -1463,7 +1411,7 @@ namespace CppLogic::Logic {
 					m->AnimHandler->UpdateMatrices();
 				}
 				auto* f = m->Model->GetFrame();
-				float* mat = reinterpret_cast<float*>(f->GetLTM());
+				auto* mat = reinterpret_cast<float*>(f->GetLTM());
 				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
 					L.GetTableRaw(1, i + 1);
 					if (L.IsNumber(-1))
@@ -1484,24 +1432,24 @@ namespace CppLogic::Logic {
 			return 1;
 		}
 	
-		static constexpr const std::array<lua::FuncReference,13> LuaMethods = {
-			lua::FuncReference::GetRef<Clear>("Clear"),
-			lua::FuncReference::GetRef<SetModel>("SetModel"),
-			lua::FuncReference::GetRef<Translate>("Translate"),
-			lua::FuncReference::GetRef<Rotate>("Rotate"),
-			lua::FuncReference::GetRef<Scale>("Scale"),
-			lua::FuncReference::GetRef<ResetTransform>("ResetTransform"),
-			lua::FuncReference::GetRef<SetColorByPlayer>("SetColorByPlayer"),
-			lua::FuncReference::GetRef<DisableShadow>("DisableShadow"),
-			lua::FuncReference::GetRef<DisableParticleEffects>("DisableParticleEffects"),
-			lua::FuncReference::GetRef<DisableTerrainDecal>("DisableTerrainDecal"),
-			lua::FuncReference::GetRef<SetColorModulate>("SetColorModulate"),
-			lua::FuncReference::GetRef<SetAnim>("SetAnim"),
-			lua::FuncReference::GetRef<SetTimeOfAnim>("SetTimeOfAnim"),
+		static constexpr const std::array LuaMethods = {
+			luaext::FuncReference::GetRef<Clear>("Clear"),
+			luaext::FuncReference::GetRef<SetModel>("SetModel"),
+			luaext::FuncReference::GetRef<Translate>("Translate"),
+			luaext::FuncReference::GetRef<Rotate>("Rotate"),
+			luaext::FuncReference::GetRef<Scale>("Scale"),
+			luaext::FuncReference::GetRef<ResetTransform>("ResetTransform"),
+			luaext::FuncReference::GetRef<SetColorByPlayer>("SetColorByPlayer"),
+			luaext::FuncReference::GetRef<DisableShadow>("DisableShadow"),
+			luaext::FuncReference::GetRef<DisableParticleEffects>("DisableParticleEffects"),
+			luaext::FuncReference::GetRef<DisableTerrainDecal>("DisableTerrainDecal"),
+			luaext::FuncReference::GetRef<SetColorModulate>("SetColorModulate"),
+			luaext::FuncReference::GetRef<SetAnim>("SetAnim"),
+			luaext::FuncReference::GetRef<SetTimeOfAnim>("SetTimeOfAnim"),
 		};
-		static constexpr const std::array<lua::FuncReference, 1> LuaMetaMethods{ {
-				lua::FuncReference::GetRef<Serialize>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
-		} };
+		static constexpr const std::array LuaMetaMethods{
+				luaext::FuncReference::GetRef<Serialize>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
+		};
 
 		~LogicModel() {
 			if (Model) {
@@ -1510,7 +1458,7 @@ namespace CppLogic::Logic {
 			}
 		};
 	};
-	int CreateFreeModel(lua::State L) {
+	int CreateFreeModel(luaext::State L) {
 		L.NewUserClass<LogicModel>();
 		return 1;
 	}
@@ -1529,7 +1477,7 @@ namespace CppLogic::Logic {
 			Loadtasks();
 	}
 
-	void Cleanup(lua::State L) {
+	void Cleanup(luaext::State L) {
 		NetEventUnSetHook(L);
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
 		GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = false;
@@ -1549,92 +1497,92 @@ namespace CppLogic::Logic {
 	}
 
 	constexpr std::array Logic{
-			lua::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
-			lua::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
-			lua::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
-			lua::FuncReference::GetRef<GetAnimIdFromName>("GetAnimIdFromName"),
-			lua::FuncReference::GetRef<PlayerGetPaydayStartetTick>("PlayerGetPaydayStartetTick"),
-			lua::FuncReference::GetRef<PlayerSetPaydayStartetTick>("PlayerSetPaydayStartetTick"),
-			lua::FuncReference::GetRef<SetPaydayFrequency>("SetPaydayFrequency"),
-			lua::FuncReference::GetRef<PlayerGetKillStatistics>("PlayerGetKillStatistics"),
-			lua::FuncReference::GetRef<CanPlaceBuildingAt>("CanPlaceBuildingAt"),
-			lua::FuncReference::GetRef<PlayerActivateAlarm>("PlayerActivateAlarm"),
-			lua::FuncReference::GetRef<PlayerDeactivateAlarm>("PlayerDeactivateAlarm"),
-			lua::FuncReference::GetRef<PlayerUpgradeSettlerCategory>("PlayerUpgradeSettlerCategory"),
-			lua::FuncReference::GetRef<PlayerSetTaxLevel>("PlayerSetTaxLevel"),
-			lua::FuncReference::GetRef<PlayerActivateWeatherMachine>("PlayerActivateWeatherMachine"),
-			lua::FuncReference::GetRef<PlayerBlessSettlers>("PlayerBlessSettlers"),
-			lua::FuncReference::GetRef<LandscapeGetSector>("LandscapeGetSector"),
-			lua::FuncReference::GetRef<LandscapeGetNearestUnblockedPosInSector>("LandscapeGetNearestUnblockedPosInSector"),
-			lua::FuncReference::GetRef<EnableAllHurtEntityTrigger>("EnableAllHurtEntityTrigger"),
-			lua::FuncReference::GetRef<HurtEntityGetDamage>("HurtEntityGetDamage"),
-			lua::FuncReference::GetRef<HurtEntitySetDamage>("HurtEntitySetDamage"),
-			lua::FuncReference::GetRef<GetLoadOrder>("GetLoadOrder"),
-			lua::FuncReference::GetRef<AddArchive>("AddArchive"),
-			lua::FuncReference::GetRef<RemoveTopArchive>("RemoveTopArchive"),
-			lua::FuncReference::GetRef<GetArchiveOfFile>("GetArchiveOfFile"),
-			lua::FuncReference::GetRef<EnableMaxHPTechMod>("EnableMaxHPTechMod"),
-			lua::FuncReference::GetRef<LandscapeGetTerrainType>("LandscapeGetTerrainType"),
-			lua::FuncReference::GetRef<LandscapeGetWaterType>("LandscapeGetWaterType"),
-			lua::FuncReference::GetRef<LandscapeGetWaterHeight>("LandscapeGetWaterHeight"),
-			lua::FuncReference::GetRef<LandscapeGetTerrainHeight>("LandscapeGetTerrainHeight"),
-			lua::FuncReference::GetRef<LandscapeGetTerrainVertexColor>("LandscapeGetTerrainVertexColor"),
-			lua::FuncReference::GetRef<LandscapeGetBlocking>("LandscapeGetBlocking"),
-			lua::FuncReference::GetRef<LandscapeGetBridgeHeight>("LandscapeGetBridgeHeight"),
-			lua::FuncReference::GetRef<GetColorByColorIndex>("GetColorByColorIndex"),
-			lua::FuncReference::GetRef<SetColorByColorIndex>("SetColorByColorIndex"),
-			lua::FuncReference::GetRef<SetPaydayCallback>("SetPaydayCallback"),
-			lua::FuncReference::GetRef<SetLeadersRegenerateTroopHealth>("SetLeadersRegenerateTroopHealth"),
-			lua::FuncReference::GetRef<SetStringTableText>("SetStringTableText"),
-			lua::FuncReference::GetRef<SetPlaceBuildingAdditionalCheck>("SetPlaceBuildingAdditionalCheck"),
-			lua::FuncReference::GetRef<SetPlaceBuildingRotation>("SetPlaceBuildingRotation"),
-			lua::FuncReference::GetRef<GetPlaceBuildingRotation>("GetPlaceBuildingRotation"),
-			lua::FuncReference::GetRef<FixSnipeDamage>("FixSnipeDamage"),
-			lua::FuncReference::GetRef<GetCurrentWeatherGFXState>("GetCurrentWeatherGFXState"),
-			lua::FuncReference::GetRef<GetWeatherQueue>("GetWeatherQueue"),
-			lua::FuncReference::GetRef<ClearWeatherQueueAndAddInitial>("ClearWeatherQueueAndAddInitial"),
-			lua::FuncReference::GetRef<SetLuaTaskListFunc>("SetLuaTaskListFunc"),
-			lua::FuncReference::GetRef<TaskListMakeWaitForAnimsUnCancelable>("TaskListMakeWaitForAnimsUnCancelable"),
-			lua::FuncReference::GetRef<TaskListMakeWaitForAnimsCancelable>("TaskListMakeWaitForAnimsCancelable"),
-			lua::FuncReference::GetRef<TaskListSetChangeTaskListCheckUncancelable>("TaskListSetChangeTaskListCheckUncancelable"),
-			lua::FuncReference::GetRef<EnableBuildOnMovementFix>("EnableBuildOnMovementFix"),
-			lua::FuncReference::GetRef<CreateFreeModel>("CreateFreeModel"),
-			lua::FuncReference::GetRef<GetNearestFreePosForBuilding>("GetNearestFreePosForBuilding"),
-			lua::FuncReference::GetRef<BlockingUpdateWeatherChange>("BlockingUpdateWeatherChange"),
-			lua::FuncReference::GetRef<EnableExperienceClassFix>("EnableExperienceClassFix"),
-			lua::FuncReference::GetRef<GetAnimationDuration>("GetAnimationDuration"),
-			lua::FuncReference::GetRef<GetTradeDataForResource>("GetTradeDataForResource"),
-			lua::FuncReference::GetRef<SetTradeDataForResource>("SetTradeDataForResource"),
-			lua::FuncReference::GetRef<TaskListInsertWaitForLatestAttack>("TaskListInsertWaitForLatestAttack"),
-			lua::FuncReference::GetRef<TaskListInsertSetLatestAttack>("TaskListInsertSetLatestAttack"),
-			lua::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
-			lua::FuncReference::GetRef<Navigate>("Navigate"),
-			lua::FuncReference::GetRef<EnableResourceTriggers>("EnableResourceTriggers"),
-			lua::FuncReference::GetRef<EnableSettlerBuyTriggers>("EnableSettlerBuyTriggers"),
-			lua::FuncReference::GetRef<GetSettlerBuyTriggerData>("GetSettlerBuyTriggerData"),
-			lua::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),
-			lua::FuncReference::GetRef<IsPositionExplored>("IsPositionExplored"),
-			lua::FuncReference::GetRef<SetPositionExploration>("SetPositionExploration"),
-			lua::FuncReference::GetRef<DumpTaskList>("DumpTaskList"),
-			lua::FuncReference::GetRef<PlayerGetWorkerAttraction>("PlayerGetWorkerAttraction"),
-			lua::FuncReference::GetRef<PlayerGetMilitaryAttraction>("PlayerGetMilitaryAttraction"),
-			lua::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
-			lua::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
-			lua::FuncReference::GetRef<EnableRefillabeMineNoAutoDestroy>("EnableRefillabeMineNoAutoDestroy"),
-			lua::FuncReference::GetRef<GetPlayerName>("GetPlayerName"),
-			lua::FuncReference::GetRef<DumpGameLogic>("DumpGameLogic"),
+			luaext::FuncReference::GetRef<GetDamageFactor>("GetDamageFactor"),
+			luaext::FuncReference::GetRef<SetDamageFactor>("SetDamageFactor"),
+			luaext::FuncReference::GetRef<ReloadCutscene>("ReloadCutscene"),
+			luaext::FuncReference::GetRef<GetAnimIdFromName>("GetAnimIdFromName"),
+			luaext::FuncReference::GetRef<PlayerGetPaydayStartetTick>("PlayerGetPaydayStartetTick"),
+			luaext::FuncReference::GetRef<PlayerSetPaydayStartetTick>("PlayerSetPaydayStartetTick"),
+			luaext::FuncReference::GetRef<SetPaydayFrequency>("SetPaydayFrequency"),
+			luaext::FuncReference::GetRef<PlayerGetKillStatistics>("PlayerGetKillStatistics"),
+			luaext::FuncReference::GetRef<CanPlaceBuildingAt>("CanPlaceBuildingAt"),
+			luaext::FuncReference::GetRef<PlayerActivateAlarm>("PlayerActivateAlarm"),
+			luaext::FuncReference::GetRef<PlayerDeactivateAlarm>("PlayerDeactivateAlarm"),
+			luaext::FuncReference::GetRef<PlayerUpgradeSettlerCategory>("PlayerUpgradeSettlerCategory"),
+			luaext::FuncReference::GetRef<PlayerSetTaxLevel>("PlayerSetTaxLevel"),
+			luaext::FuncReference::GetRef<PlayerActivateWeatherMachine>("PlayerActivateWeatherMachine"),
+			luaext::FuncReference::GetRef<PlayerBlessSettlers>("PlayerBlessSettlers"),
+			luaext::FuncReference::GetRef<LandscapeGetSector>("LandscapeGetSector"),
+			luaext::FuncReference::GetRef<LandscapeGetNearestUnblockedPosInSector>("LandscapeGetNearestUnblockedPosInSector"),
+			luaext::FuncReference::GetRef<EnableAllHurtEntityTrigger>("EnableAllHurtEntityTrigger"),
+			luaext::FuncReference::GetRef<HurtEntityGetDamage>("HurtEntityGetDamage"),
+			luaext::FuncReference::GetRef<HurtEntitySetDamage>("HurtEntitySetDamage"),
+			luaext::FuncReference::GetRef<GetLoadOrder>("GetLoadOrder"),
+			luaext::FuncReference::GetRef<AddArchive>("AddArchive"),
+			luaext::FuncReference::GetRef<RemoveTopArchive>("RemoveTopArchive"),
+			luaext::FuncReference::GetRef<GetArchiveOfFile>("GetArchiveOfFile"),
+			luaext::FuncReference::GetRef<EnableMaxHPTechMod>("EnableMaxHPTechMod"),
+			luaext::FuncReference::GetRef<LandscapeGetTerrainType>("LandscapeGetTerrainType"),
+			luaext::FuncReference::GetRef<LandscapeGetWaterType>("LandscapeGetWaterType"),
+			luaext::FuncReference::GetRef<LandscapeGetWaterHeight>("LandscapeGetWaterHeight"),
+			luaext::FuncReference::GetRef<LandscapeGetTerrainHeight>("LandscapeGetTerrainHeight"),
+			luaext::FuncReference::GetRef<LandscapeGetTerrainVertexColor>("LandscapeGetTerrainVertexColor"),
+			luaext::FuncReference::GetRef<LandscapeGetBlocking>("LandscapeGetBlocking"),
+			luaext::FuncReference::GetRef<LandscapeGetBridgeHeight>("LandscapeGetBridgeHeight"),
+			luaext::FuncReference::GetRef<GetColorByColorIndex>("GetColorByColorIndex"),
+			luaext::FuncReference::GetRef<SetColorByColorIndex>("SetColorByColorIndex"),
+			luaext::FuncReference::GetRef<SetPaydayCallback>("SetPaydayCallback"),
+			luaext::FuncReference::GetRef<SetLeadersRegenerateTroopHealth>("SetLeadersRegenerateTroopHealth"),
+			luaext::FuncReference::GetRef<SetStringTableText>("SetStringTableText"),
+			luaext::FuncReference::GetRef<SetPlaceBuildingAdditionalCheck>("SetPlaceBuildingAdditionalCheck"),
+			luaext::FuncReference::GetRef<SetPlaceBuildingRotation>("SetPlaceBuildingRotation"),
+			luaext::FuncReference::GetRef<GetPlaceBuildingRotation>("GetPlaceBuildingRotation"),
+			luaext::FuncReference::GetRef<FixSnipeDamage>("FixSnipeDamage"),
+			luaext::FuncReference::GetRef<GetCurrentWeatherGFXState>("GetCurrentWeatherGFXState"),
+			luaext::FuncReference::GetRef<GetWeatherQueue>("GetWeatherQueue"),
+			luaext::FuncReference::GetRef<ClearWeatherQueueAndAddInitial>("ClearWeatherQueueAndAddInitial"),
+			luaext::FuncReference::GetRef<SetLuaTaskListFunc>("SetLuaTaskListFunc"),
+			luaext::FuncReference::GetRef<TaskListMakeWaitForAnimsUnCancelable>("TaskListMakeWaitForAnimsUnCancelable"),
+			luaext::FuncReference::GetRef<TaskListMakeWaitForAnimsCancelable>("TaskListMakeWaitForAnimsCancelable"),
+			luaext::FuncReference::GetRef<TaskListSetChangeTaskListCheckUncancelable>("TaskListSetChangeTaskListCheckUncancelable"),
+			luaext::FuncReference::GetRef<EnableBuildOnMovementFix>("EnableBuildOnMovementFix"),
+			luaext::FuncReference::GetRef<CreateFreeModel>("CreateFreeModel"),
+			luaext::FuncReference::GetRef<GetNearestFreePosForBuilding>("GetNearestFreePosForBuilding"),
+			luaext::FuncReference::GetRef<BlockingUpdateWeatherChange>("BlockingUpdateWeatherChange"),
+			luaext::FuncReference::GetRef<EnableExperienceClassFix>("EnableExperienceClassFix"),
+			luaext::FuncReference::GetRef<GetAnimationDuration>("GetAnimationDuration"),
+			luaext::FuncReference::GetRef<GetTradeDataForResource>("GetTradeDataForResource"),
+			luaext::FuncReference::GetRef<SetTradeDataForResource>("SetTradeDataForResource"),
+			luaext::FuncReference::GetRef<TaskListInsertWaitForLatestAttack>("TaskListInsertWaitForLatestAttack"),
+			luaext::FuncReference::GetRef<TaskListInsertSetLatestAttack>("TaskListInsertSetLatestAttack"),
+			luaext::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
+			luaext::FuncReference::GetRef<Navigate>("Navigate"),
+			luaext::FuncReference::GetRef<EnableResourceTriggers>("EnableResourceTriggers"),
+			luaext::FuncReference::GetRef<EnableSettlerBuyTriggers>("EnableSettlerBuyTriggers"),
+			luaext::FuncReference::GetRef<GetSettlerBuyTriggerData>("GetSettlerBuyTriggerData"),
+			luaext::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),
+			luaext::FuncReference::GetRef<IsPositionExplored>("IsPositionExplored"),
+			luaext::FuncReference::GetRef<SetPositionExploration>("SetPositionExploration"),
+			luaext::FuncReference::GetRef<DumpTaskList>("DumpTaskList"),
+			luaext::FuncReference::GetRef<PlayerGetWorkerAttraction>("PlayerGetWorkerAttraction"),
+			luaext::FuncReference::GetRef<PlayerGetMilitaryAttraction>("PlayerGetMilitaryAttraction"),
+			luaext::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
+			luaext::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
+			luaext::FuncReference::GetRef<EnableRefillabeMineNoAutoDestroy>("EnableRefillabeMineNoAutoDestroy"),
+			luaext::FuncReference::GetRef<GetPlayerName>("GetPlayerName"),
+			luaext::FuncReference::GetRef<DumpGameLogic>("DumpGameLogic"),
 #ifdef DEBUG_FUNCS
-			lua::FuncReference::GetRef<AddRedirectLayer>("AddRedirectLayer"),
-			lua::FuncReference::GetRef<AddFolder>("AddFolder"),
+			luaext::FuncReference::GetRef<AddRedirectLayer>("AddRedirectLayer"),
+			luaext::FuncReference::GetRef<AddFolder>("AddFolder"),
 #endif
 		};
 
-	constexpr std::array<lua::FuncReference, 2> UICmd{ {
-			lua::FuncReference::GetRef<NetEventSetHook>("SetCallback"),
-			lua::FuncReference::GetRef<NetEventUnSetHook>("UnSetCallback"),
-	} };
+	constexpr std::array UICmd{
+			luaext::FuncReference::GetRef<NetEventSetHook>("SetCallback"),
+			luaext::FuncReference::GetRef<NetEventUnSetHook>("UnSetCallback"),
+	};
 
-	void Init(lua::State L)
+	void Init(luaext::State L)
 	{
 		L.RegisterFuncs(Logic, -3);
 
@@ -1645,7 +1593,7 @@ namespace CppLogic::Logic {
 
 		if (L.GetState() != shok::LuaStateMainmenu) {
 			L.PrepareUserClassType<LogicModel>();
-			CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<LogicModel>() }] = &lua::State::CppToCFunction<LogicModel::Deserialize>;
+			CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<LogicModel>() }] = &luaext::State::CppToCFunction<LogicModel::Deserialize>;
 
 			L.GetSubTable("Events");
 			L.Push("CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY");
@@ -1676,7 +1624,7 @@ namespace CppLogic::Logic {
 		}
 	}
 
-	void OnSaveLoaded(lua::State L)
+	void OnSaveLoaded(luaext::State L)
 	{
 		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
 		if (!CppLogic::HasSCELoader())
@@ -1735,7 +1683,7 @@ namespace CppLogic::Logic {
 			EnableResourceTriggers(CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers, CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix);
 
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.SettlerBuyTriggers)
-			EnableSettlerBuyTriggers(lua::State{ nullptr });
+			EnableSettlerBuyTriggers(luaext::State{ nullptr });
 
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction) {
 			GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();

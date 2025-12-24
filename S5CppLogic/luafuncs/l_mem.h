@@ -3,5 +3,5 @@
 #include <luaext.h>
 
 namespace CppLogic::Mem {
-	void Init(lua::State L);
+	void Init(luaext::State L);
 }

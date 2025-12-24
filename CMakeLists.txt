@@ -15,6 +15,16 @@ if(DEBUG_FUNCS)
     add_compile_options(-DDEBUG_FUNCS)
 endif()
 
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(FATAL_ERROR "needs windows")
+endif()
+if (NOT CMAKE_SIZEOF_VOID_P EQUAL "4")
+    message(FATAL_ERROR "needs 32 bit")
+endif()
+if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "X86")
+    message(FATAL_ERROR "needs x86")
+endif()
+
 add_library(LuaDebugger SHARED
         S5CppLogic/dllmain.cpp
         S5CppLogic/luaext.cpp
@@ -103,4 +113,7 @@ add_library(LuaDebugger SHARED
 
 target_include_directories(LuaDebugger PRIVATE S5CppLogic)
 
-target_link_libraries(LuaDebugger PRIVATE magic_enum::magic_enum "${CMAKE_CURRENT_SOURCE_DIR}/S5CppLogic/lua50/S5Lua5.lib")
+target_link_libraries(LuaDebugger PRIVATE
+        magic_enum::magic_enum
+        "${CMAKE_CURRENT_SOURCE_DIR}/S5CppLogic/lua50/S5Lua5.lib"
+)

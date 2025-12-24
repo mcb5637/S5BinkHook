@@ -279,6 +279,18 @@ function CppObjectAccess:Name()end
 --- type of this access object
 ---@return CppObjectAccessType
 function CppObjectAccess:GetType()end
+--- typecast, throws if not of the specified type
+---@return CppFieldAccess
+function CppObjectAccess:AsFieldAccess()end
+--- typecast, throws if not of the specified type
+---@return CppStructAccess
+function CppObjectAccess:AsStructAccess()end
+--- typecast, throws if not of the specified type
+---@return CppBBObjectAccess
+function CppObjectAccess:AsObjectAccess()end
+--- typecast, throws if not of the specified type
+---@return CppListAccess
+function CppObjectAccess:AsListAccess()end
 
 ---@class CppFieldAccess : CppObjectAccess
 CppFieldAccess = {}
@@ -288,7 +300,7 @@ function CppFieldAccess:DataType()end
 ---returns the value of this field
 ---@return any
 function CppFieldAccess:Get()end
----sets the value of this fileld, including type check, but no semantic check (you can for example set the entity health to -500, but not to "foo")
+---sets the value of this field, including type check, but no semantic check (you can for example set the entity health to -500, but not to "foo")
 ---@param val any
 function CppFieldAccess:Set(val)end
 --- type of this access object

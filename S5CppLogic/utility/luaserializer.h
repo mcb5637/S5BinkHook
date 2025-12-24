@@ -172,6 +172,12 @@ namespace CppLogic::Serializer {
 		void(*OnWrite)(int id);
 
 		static int Name(lua::State L);
+		template<class T>
+		static int AsSubClass(lua::State L) {
+			L.CheckUserClass<T>(1);
+			L.SetTop(1);
+			return 1;
+		}
 
 	protected:
 		static void PushSD(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr, bool listElement = false);
@@ -180,6 +186,9 @@ namespace CppLogic::Serializer {
 		static void PushObject(lua::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr);
 	};
 
+	class StructAccess;
+	class BBObjectAccess;
+	class ListAccess;
 	class FieldAccess : public ObjectAccess {
 	public:
 		static int GetType(lua::State L);
@@ -195,6 +204,10 @@ namespace CppLogic::Serializer {
 			lua::FuncReference::GetRef<DataType>("DataType"),
 			lua::FuncReference::GetRef<Get>("Get"),
 			lua::FuncReference::GetRef<Set>("Set"),
+			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 	};
 
@@ -214,6 +227,10 @@ namespace CppLogic::Serializer {
 			lua::FuncReference::GetRef<GetType>("GetType"),
 			lua::FuncReference::GetRef<Fields>("Fields"),
 			lua::FuncReference::GetRef<Index>("Get"),
+			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 
 		struct Iter {
@@ -261,6 +278,10 @@ namespace CppLogic::Serializer {
 			lua::FuncReference::GetRef<ObjectType>("ObjectType"),
 			lua::FuncReference::GetRef<New>("New"),
 			lua::FuncReference::GetRef<IsNullptr>("IsNullptr"),
+			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 	};
 
@@ -291,6 +312,10 @@ namespace CppLogic::Serializer {
 			lua::FuncReference::GetRef<Remove>("Remove"),
 			lua::FuncReference::GetRef<ListType>("ListType"),
 			lua::FuncReference::GetRef<InsertAt>("InsertAt"),
+			lua::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			lua::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			lua::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			lua::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 
 	private:

@@ -191,6 +191,7 @@ shok::PlayerId luaext::detail::CheckPlayerId(State L, int idx, bool allowZero)
 EGUIX::CBaseWidget* luaext::detail::CheckWidget(State L, int idx)
 {
 	shok::WidgetId id;
+	auto t = L.GetTop();
 	EGUIX::WidgetManager* wm = EGUIX::WidgetManager::GlobalObj();
 	if (L.Type(idx) == lua::LType::String)
 		id = wm->GetIdByName(L.ToString(idx));

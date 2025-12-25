@@ -33,7 +33,7 @@ namespace luaext {template<class S>
 	class StateExtension {
 	public:
 		EGL::CGLEEntity* OptEntity(int i) {
-			return detail::OptEntity(static_cast<S*>(this), i);
+			return detail::OptEntity(*static_cast<S*>(this), i);
 		}
 		EGL::CGLEEntity* CheckEntity(int i) {
 			EGL::CGLEEntity* d = OptEntity(i);
@@ -69,7 +69,7 @@ namespace luaext {template<class S>
 			return d;
 		}
 		EGL::CEffect* OptEffect(int i) {
-			return detail::OptEffect(static_cast<S*>(this), i);
+			return detail::OptEffect(*static_cast<S*>(this), i);
 		}
 		EGL::CEffect* CheckEffect(int i) {
 			EGL::CEffect* d = OptEffect(i);
@@ -79,20 +79,20 @@ namespace luaext {template<class S>
 		}
 
 		shok::EntityId OptEntityId(int i) {
-			return detail::OptEntityId(static_cast<S*>(this), i);
+			return detail::OptEntityId(*static_cast<S*>(this), i);
 		}
 
 		void Push(const shok::Position& p) {
-			return detail::PushPos(static_cast<S*>(this), p);
+			return detail::PushPos(*static_cast<S*>(this), p);
 		}
 		shok::Position CheckPos(int idx) {
-			return detail::CheckPos(static_cast<S*>(this), idx);
+			return detail::CheckPos(*static_cast<S*>(this), idx);
 		}
 		shok::PositionRot CheckPosRot(int idx, bool rad = false) {
-			return detail::CheckPosRot(static_cast<S*>(this), idx, rad);
+			return detail::CheckPosRot(*static_cast<S*>(this), idx, rad);
 		}
 		void Push(const shok::PositionRot& p, bool rad = false) {
-			return detail::PushPosRot(static_cast<S*>(this), p, rad);
+			return detail::PushPosRot(*static_cast<S*>(this), p, rad);
 		}
 
 		static void CheckEntityAlive(shok::EntityId id, const char* msg) {
@@ -100,14 +100,14 @@ namespace luaext {template<class S>
 		}
 
 		void ReadCostInfo(int idx, shok::CostInfo& c, bool ignorezeroes) {
-			return detail::ReadCostInfo(static_cast<S*>(this), idx, c, ignorezeroes);
+			return detail::ReadCostInfo(*static_cast<S*>(this), idx, c, ignorezeroes);
 		}
 		void Push(const shok::CostInfo& c) {
-			return detail::PushCostInfo(static_cast<S*>(this), c);
+			return detail::PushCostInfo(*static_cast<S*>(this), c);
 		}
 
 		GGlue::CGlueEntityProps* OptEntityType(int idx) {
-			return detail::OptEntityType(static_cast<S*>(this), idx);
+			return detail::OptEntityType(*static_cast<S*>(this), idx);
 		}
 		GGlue::CGlueEntityProps* CheckEntityType(int idx) {
 			GGlue::CGlueEntityProps* t = OptEntityType(idx);
@@ -128,10 +128,10 @@ namespace luaext {template<class S>
 		}
 
 		shok::Technology* CheckTech(int idx) {
-			return detail::CheckTech(static_cast<S*>(this), idx);
+			return detail::CheckTech(*static_cast<S*>(this), idx);
 		}
 		shok::PlayerId CheckPlayerId(int idx, bool allowZero = true) {
-			return detail::CheckPlayerId(static_cast<S*>(this), idx, allowZero);
+			return detail::CheckPlayerId(*static_cast<S*>(this), idx, allowZero);
 		}
 		shok::PlayerId OptPlayerId(int idx, shok::PlayerId def, bool allowZero = true) {
 			auto* th = static_cast<S*>(this);
@@ -141,7 +141,7 @@ namespace luaext {template<class S>
 		}
 
 		EGUIX::CBaseWidget* CheckWidget(int idx) {
-			return detail::CheckWidget(static_cast<S*>(this), idx);
+			return detail::CheckWidget(*static_cast<S*>(this), idx);
 		}
 
 		template<class En>

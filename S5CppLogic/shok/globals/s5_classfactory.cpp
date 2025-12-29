@@ -47,7 +47,7 @@ void BB::CXmlSerializer::Serialize(const char* filename, BB::IObject* ob)
 	}
 }
 
-void BB::CXmlSerializer::WriteTypeASM() {
+void NAKED_DEF BB::CXmlSerializer::WriteTypeASM() {
 	__asm {
 		mov eax, 0x54FA1E;
 		call eax;

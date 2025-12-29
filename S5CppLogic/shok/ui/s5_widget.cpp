@@ -560,7 +560,7 @@ BB::SerializationData textbuttonwid_seridataaddon[] = {
     BB::SerializationData::GuardData(),
 };
 
-void EGUIX::CTextButtonWidget::CenterRenderAreaASM() {
+void NAKED_DEF EGUIX::CTextButtonWidget::CenterRenderAreaASM() {
     __asm {
         lea eax, [ebp - 0x20];
         push eax;
@@ -753,7 +753,7 @@ const char* __stdcall GGUI::COnScreenElementType::GetDisplayName(const GGL::IGLG
     return EGL::CGLEEntitiesProps::GetEntityTypeDisplayName(e->EntityType);
 }
 
-void GGUI::COnScreenElementType::GetDisplayNameASM() {
+void NAKED_DEF GGUI::COnScreenElementType::GetDisplayNameASM() {
     __asm {
         xor ebx, ebx;
         push edi;
@@ -930,7 +930,7 @@ void __stdcall GGUI::C3DOnScreenInformationCustomWidget::RenderHooked(C3DOnScree
     }
 }
 
-void GGUI::C3DOnScreenInformationCustomWidget::RenderHookedASM() {
+void NAKED_DEF GGUI::C3DOnScreenInformationCustomWidget::RenderHookedASM() {
     __asm {
         lea eax, [ebp - 0xD];
         push eax;

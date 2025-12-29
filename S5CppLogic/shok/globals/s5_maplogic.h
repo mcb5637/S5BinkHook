@@ -451,7 +451,7 @@ namespace EGL {
 		shok::EffectId CreateEffectOverride(EGL::CGLEEffectCreator* data);
 		static void __stdcall OnMapscriptLoadedCaller();
 		static void __thiscall LoadMapscriptOverride(CGLEGameLogic* th, const char* path);
-		static void __attribute((naked)) LoadMapscriptOverrideASM();
+		static void NAKED_DECL LoadMapscriptOverrideASM();
 	};
 	static_assert(offsetof(CGLEGameLogic, RNG) == 4 * 34);
 	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;

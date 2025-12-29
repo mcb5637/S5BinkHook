@@ -8,11 +8,20 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(magic_enum REQUIRED)
 
 option(DEBUG_FUNCS OFF)
+option(INCLUDE_ENV OFF)
 
-add_compile_options(-Wno-invalid-offsetof -Wno-microsoft-cast -Wno-microsoft-string-literal-from-predefined)
+set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <FLAGS> -o <OBJECT> -c <SOURCE>")
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wno-invalid-offsetof -Wno-microsoft-cast -Wno-microsoft-string-literal-from-predefined)
+    add_compile_definitions($<$<COMPILE_LANGUAGE:CXX>:USE_CLANG_NAKED>)
+endif()
+
+if (INCLUDE_ENV)
+    include_directories(SYSTEM $ENV{INCLUDE})
+endif()
 if(DEBUG_FUNCS)
-    add_compile_options(-DDEBUG_FUNCS)
+    add_compile_definitions($<$<COMPILE_LANGUAGE:CXX>:DEBUG_FUNCS>)
 endif()
 
 if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")

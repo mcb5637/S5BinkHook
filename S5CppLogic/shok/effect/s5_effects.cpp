@@ -206,7 +206,7 @@ void __fastcall GGL::CCannonBallEffect::CannonFromCreatorAdd(GGL::CCannonBallEff
 	}
 }
 
-void GGL::CCannonBallEffect::CannonFromCreatorAddASM() {
+void NAKED_DEF GGL::CCannonBallEffect::CannonFromCreatorAddASM() {
 	__asm {
 		mov[esi + 0x0C8], eax;
 		mov eax, [edi + 0x38];

@@ -552,10 +552,14 @@ namespace shok {
 		Tree() {
 			// not call ctor, to not call data ctor, root does not have actual data
 			root = static_cast<TreeNode*>(shok::Malloc(sizeof(TreeNode)));
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
 			std::memset(root, 0, sizeof(TreeNode));
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
 			root->isnil = true;
 			root->c = Color::Black;
 			root->right = root;

@@ -762,7 +762,7 @@ void __thiscall GGL::CLeaderBehavior::CheckRegenStatic(CLeaderBehavior *th) {
 	th->CheckRegen();
 }
 
-void GGL::CLeaderBehavior::CheckRegenASM() {
+void NAKED_DEF GGL::CLeaderBehavior::CheckRegenASM() {
 	__asm {
 		mov ecx, esi;
 		call GGL::CLeaderBehavior::CheckRegenStatic;
@@ -847,7 +847,7 @@ void __thiscall GGL::CGLBehaviorAnimationEx::AddNonCancelableHandlers(CGLBehavio
 	e->CreateStateHandler<shok::TaskState::WaitForAnimNonCancelable, EGL::CBehaviorAnimation>(th, &CGLBehaviorAnimationEx::StateWaitForAnim);
 }
 
-void GGL::CGLBehaviorAnimationEx::AddNonCancelableHandlersASM() {
+void NAKED_DEF GGL::CGLBehaviorAnimationEx::AddNonCancelableHandlersASM() {
 	__asm {
 		mov ecx, esi;
 		call[eax + 0x48];
@@ -971,7 +971,7 @@ void GGL::CWorkerBehavior::GoRestIgnoreWorktime()
 }
 
 
-void GGL::CWorkerBehavior::AddSupplierSkipASM() {
+void NAKED_DEF GGL::CWorkerBehavior::AddSupplierSkipASM() {
 	__asm {
 		mov ecx, [ebp - 0x10];
 		call GGL::CWorkerBehavior::AddSupplierSkip;
@@ -1026,7 +1026,7 @@ int __thiscall GGL::CWorkerBehavior::DoWorkEvents(CWorkerBehavior* th, GGL::CBui
 	return 0;
 }
 
-void GGL::CWorkerBehavior::DoWorkEventsASM() {
+void NAKED_DEF GGL::CWorkerBehavior::DoWorkEventsASM() {
 	__asm {
 		mov ecx, esi;
 		push[ebp + 8];
@@ -1050,7 +1050,7 @@ void __thiscall GGL::CWorkerBehavior::TaskSupplyAdditional(CWorkerBehavior* th)
 	}
 }
 
-void GGL::CWorkerBehavior::TaskSupplyAdditionalASM() {
+void NAKED_DEF GGL::CWorkerBehavior::TaskSupplyAdditionalASM() {
 	__asm {
 		mov eax, 0x4A963D;
 		call eax;
@@ -1323,7 +1323,7 @@ void GGL::CSerfBehavior::TaskExtractAdditional(CSerfBehavior* th, int am, GGL::C
 		pl->Statistics.OnResMined(rt, static_cast<float>(am));
 }
 
-void GGL::CSerfBehavior::TaskExtractAdditionalASM() {
+void NAKED_DEF GGL::CSerfBehavior::TaskExtractAdditionalASM() {
 	__asm {
 		push ebx; // orig
 		push edi; // add resdoodad
@@ -1696,7 +1696,7 @@ int __thiscall GGL::CMineBehavior::TaskMineAdd(CMineBehavior* th, int* am, GGL::
 	return d->ResourceAmount;
 }
 
-void GGL::CMineBehavior::TaskMineAddASM() {
+void NAKED_DEF GGL::CMineBehavior::TaskMineAddASM() {
 	__asm {
 		mov[ebp - 0x14], eax;
 

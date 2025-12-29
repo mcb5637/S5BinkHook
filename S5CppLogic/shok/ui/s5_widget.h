@@ -333,7 +333,7 @@ namespace EGUIX {
 		static void HookFixTextRender();
 	private:
 		static void __thiscall CenterRenderArea(const CTextButtonWidget* th, Rect* render);
-		static void __attribute((naked)) CenterRenderAreaASM();
+		static void NAKED_DECL CenterRenderAreaASM();
 	};
 	static_assert(offsetof(CTextButtonWidget, StringHelper.StringFrameDistance) == (14+151) * 4);
 	static_assert(offsetof(CTextButtonWidget, UpdateManualFlag) == 190 * 4);
@@ -556,7 +556,7 @@ namespace GGUI {
 		static void HookDisplayName();
 	private:
 		static const char* __stdcall GetDisplayName(const GGL::IGLGUIInterface::UIData* data);
-		static void __attribute((naked)) GetDisplayNameASM();
+		static void NAKED_DECL GetDisplayNameASM();
 	};
 	class COnScreenElementWorktime : public COnScreenElement {
 	public:
@@ -740,7 +740,7 @@ namespace GGUI {
 
 	private:
 		static void __stdcall RenderHooked(C3DOnScreenInformationCustomWidget* th, shok::Position* screenPos, GGL::IGLGUIInterface::UIData* data, bool* active);
-		static void __attribute((naked)) RenderHookedASM();
+		static void NAKED_DECL RenderHookedASM();
 	};
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, ShowAllInformationFlag) == 37 * 4);
 	static_assert(offsetof(C3DOnScreenInformationCustomWidget, Renderer.TextureData) == 46 * 4);

@@ -324,7 +324,7 @@ void __thiscall GGL::CEntityProfile::EntityRef::AssignAdvExperienceClass(EntityR
 	}
 }
 
-void GGL::CEntityProfile::AssignAdvExperienceClassASM() {
+void NAKED_DEF GGL::CEntityProfile::AssignAdvExperienceClassASM() {
 	__asm {
 		mov ecx, esi;
 		call GGL::CEntityProfile::EntityRef::AssignAdvExperienceClass;
@@ -434,7 +434,7 @@ void GGL::CResourceDoodad::SetCurrentResourceAmount(int am)
 	shok_GGL_CResourceDoodad_setresam(this, am);
 }
 
-void GGL::CResourceDoodad::OnEmptyDestroyASM() {
+void NAKED_DEF GGL::CResourceDoodad::OnEmptyDestroyASM() {
 	__asm {
 		call GGL::CResourceDoodad::OnEmptyDestroy;
 
@@ -1477,7 +1477,7 @@ void __thiscall EGL::CGLEEntity::OnCreateFixHP(CGLEEntity* th, const EGL::CGLEEn
 	}
 }
 
-void EGL::CGLEEntity::OnCreateFixHPASM() {
+void NAKED_DEF EGL::CGLEEntity::OnCreateFixHPASM() {
 	__asm {
 		mov ecx, esi;
 		push edi; // param for OnCreateFixHP
@@ -1566,7 +1566,7 @@ void __thiscall EGL::CMovingEntity::BuildOnSetPosFixed(CMovingEntity* th)
 	}
 }
 
-void EGL::CMovingEntity::BuildOnSetPosFixedASM() {
+void NAKED_DEF EGL::CMovingEntity::BuildOnSetPosFixedASM() {
 	__asm {
 		mov ecx, edi;
 		call EGL::CMovingEntity::BuildOnSetPosFixed;
@@ -1635,7 +1635,7 @@ int __stdcall EGL::CGLEEntity::CanCancelStateAdditionalCheck(CGLEEntity* th)
 	return 0;
 }
 
-void EGL::CGLEEntity::CanCancelStateAdditionalCheckASM() {
+void NAKED_DEF EGL::CGLEEntity::CanCancelStateAdditionalCheckASM() {
 	__asm {
 		push ecx;
 		push ecx;

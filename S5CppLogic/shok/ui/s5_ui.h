@@ -82,7 +82,7 @@ namespace BB {
 
 	private:
 		static const char* __stdcall GetSTTOverride(const char* s);
-		static void __attribute((naked)) GetSTTOverrideASM();
+		static void NAKED_DECL GetSTTOverrideASM();
 	};
 }
 
@@ -589,7 +589,7 @@ namespace GGL {
 
 		static void HookFillDataHealth();
 	private:
-		static void __attribute((naked)) GetMaxHPOverrideASM();
+		static void NAKED_DECL GetMaxHPOverrideASM();
 	};
 }
 

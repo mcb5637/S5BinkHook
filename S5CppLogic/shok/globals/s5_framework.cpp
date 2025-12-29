@@ -341,7 +341,7 @@ void __stdcall Framework::AGameModeBase::FireSaveLoadTrigger(lua_State* L, const
     CppLogic::Events::SaveLoadedEvent ev{ shok::EventIDs::CppLogicEvent_OnSavegameLoaded, "" };
     (*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
-void Framework::AGameModeBase::OnSaveLoadedExASM() {
+void NAKED_DEF Framework::AGameModeBase::OnSaveLoadedExASM() {
     __asm {
         mov ecx, esi;
         mov edx, [ebp + 8];
@@ -376,7 +376,7 @@ bool __fastcall Framework::AGameModeBase::LoadSaveCheckIsSaveValid(GameModeStart
     return true;
 }
 
-void Framework::AGameModeBase::LoadSaveCheckIsSaveValidASM() {
+void NAKED_DEF Framework::AGameModeBase::LoadSaveCheckIsSaveValidASM() {
     __asm {
         mov eax, 0x40E764;
         call eax;
@@ -437,7 +437,7 @@ int __thiscall Framework::CSinglePlayerMode::UpdateOverride(int u)
         PreUpdate();
     return framework_spmode_update(this, u);
 }
-static Framework::CampagnInfo* __attribute((naked)) __fastcall getcinfo(void* th, int i, const char* n) {
+static NAKED Framework::CampagnInfo* __fastcall getcinfo(void* th, int i, const char* n) {
     __asm {
         // ecx already correct
         mov eax, [esp + 4];

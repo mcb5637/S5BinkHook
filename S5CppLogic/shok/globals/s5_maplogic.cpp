@@ -702,7 +702,7 @@ void EGL::CGLEGameLogic::HookCreateEffect()
 	*reinterpret_cast<void**>(0x783A28) = CppLogic::Hooks::MemberFuncPointerToVoid(&CGLEGameLogic::CreateEffectOverride, 0);
 }
 
-void EGL::CGLEGameLogic::LoadMapscriptOverrideASM() {
+void NAKED_DEF EGL::CGLEGameLogic::LoadMapscriptOverrideASM() {
 	__asm {
 		mov ecx, esi;
 		lea eax, [ebp - 0x264];

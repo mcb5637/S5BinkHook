@@ -170,9 +170,9 @@ namespace EScr {
 		static void HookSerializationOverride();
 	private:
 		static void __stdcall SerializeOverride(BB::CFileStreamEx* f, lua_State* L, const char* filename);
-		static void __attribute((naked)) SerializeOverrideASM();
+		static void NAKED_DECL SerializeOverrideASM();
 		static void __stdcall DeserializeOverride(BB::CFileStreamEx* f, lua_State* L, const char* filename);
-		static void __attribute((naked)) DeserializeOverrideASM();
+		static void NAKED_DECL DeserializeOverrideASM();
 		static void __cdecl AddGlobalNoSaveOverride(const char* n);
 	};
 

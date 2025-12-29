@@ -278,7 +278,7 @@ void __stdcall EScr::LuaStateSerializer::SerializeOverride(BB::CFileStreamEx* f,
 	}
 }
 
-void EScr::LuaStateSerializer::SerializeOverrideASM() {
+void NAKED_DEF EScr::LuaStateSerializer::SerializeOverrideASM() {
 	__asm {
 		lea eax, [ebp - 0x250];
 		push eax;
@@ -330,7 +330,7 @@ void __stdcall EScr::LuaStateSerializer::DeserializeOverride(BB::CFileStreamEx* 
 	}
 }
 
-void EScr::LuaStateSerializer::DeserializeOverrideASM() {
+void NAKED_DEF EScr::LuaStateSerializer::DeserializeOverrideASM() {
 	__asm {
 		// overridden func call (EScr::LuaStateSerializer ctor, only call it to not have to patch out its inlined dtor)
 		mov eax, 0x572E2A;

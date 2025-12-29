@@ -23,6 +23,16 @@ namespace shok::detail {
 
 #define DEBUGGER_BREAK _asm int 3
 
+#ifdef USE_CLANG_NAKED
+#define NAKED_DECL __attribute((naked))
+#define NAKED_DEF
+#define NAKED __attribute((naked))
+#else
+#define NAKED_DEF __declspec(naked)
+#define NAKED_DECL
+#define NAKED __declspec(naked)
+#endif
+
 constexpr int SHOK_Import_LUA_OPEN = 0x761284;
 constexpr int SHOK_Import_LUA_CLOSE = 0x76126C;
 constexpr int SHOK_SEGMENTSTART = 0x401000;

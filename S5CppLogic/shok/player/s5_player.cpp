@@ -152,7 +152,7 @@ void __thiscall GGL::CPlayerAttractionHandler::CheckPaydayHook(CPlayerAttraction
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
 
-void GGL::CPlayerAttractionHandler::CheckPaydayHookASM() {
+void NAKED_DEF GGL::CPlayerAttractionHandler::CheckPaydayHookASM() {
 	__asm {
 		mov ecx, esi;
 		call GGL::CPlayerAttractionHandler::CheckPaydayHook;
@@ -239,7 +239,7 @@ int __thiscall GGL::CPlayerAttractionHandler::CannonsInProgressAttraction(const 
 	return i;
 }
 
-void GGL::CPlayerAttractionHandler::CannonsInProgressAttractionASM() {
+void NAKED_DEF GGL::CPlayerAttractionHandler::CannonsInProgressAttractionASM() {
 	__asm {
 		mov eax, 0x4C2335;
 		call eax;

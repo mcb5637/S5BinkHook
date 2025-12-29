@@ -214,7 +214,7 @@ namespace GGL {
 		void OnHitHooked();
 
 		static void __fastcall CannonFromCreatorAdd(GGL::CCannonBallEffect* th, CProjectileEffectCreator* cr);
-		static void __attribute((naked)) CannonFromCreatorAddASM();
+		static void NAKED_DECL CannonFromCreatorAddASM();
 
 	public:
 		static bool FixDamageClass;

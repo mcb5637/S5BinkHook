@@ -97,10 +97,10 @@ namespace GGL {
 
 	private:
 		static void __thiscall CheckPaydayHook(CPlayerAttractionHandler* th);
-		static void __attribute((naked)) CheckPaydayHookASM();
+		static void NAKED_DECL CheckPaydayHookASM();
 		void __thiscall CheckWorkerSpawnHook();
 		static int __thiscall CannonsInProgressAttraction(const CPlayerAttractionHandler* th);
-		static void __attribute((naked)) CannonsInProgressAttractionASM();
+		static void NAKED_DECL CannonsInProgressAttractionASM();
 	};
 	//constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
 
@@ -420,7 +420,7 @@ namespace GGL {
 
 	private:
 		static int __stdcall CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
-		static void __attribute((naked)) CanPlaceBuildingHookASM();
+		static void NAKED_DECL CanPlaceBuildingHookASM();
 	};
 	static_assert(sizeof(CPlayerStatus) == 804);
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;

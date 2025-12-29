@@ -43,7 +43,7 @@ namespace BB {
 	private:
 		CXmlSerializer() = default;
 		static void __stdcall WriteType(BB::IStream* f, const char* cn);
-		static void __attribute((naked)) WriteTypeASM();
+		static void NAKED_DECL WriteTypeASM();
 	};
 	class IBinarySerializer {
 	public:

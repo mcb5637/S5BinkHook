@@ -310,12 +310,12 @@ namespace EGL {
 		shok::TaskStateExecutionResult ExecuteLuaTaskState(int i);
 		void __thiscall AddHandlerLuaTask();
 		static int __stdcall CanCancelStateAdditionalCheck(CGLEEntity* th);
-		static void __attribute((naked)) CanCancelStateAdditionalCheckASM();
+		static void NAKED_DECL CanCancelStateAdditionalCheckASM();
 		int __thiscall GetMaxHPOverride();
 		static int __thiscall GetMaxHPOverrideStatic(CGLEEntity* th);
 		friend class GGL::CGLGUIInterface;
 		static void __thiscall OnCreateFixHP(CGLEEntity* th, const EGL::CGLEEntityCreator* c);
-		static void __attribute((naked)) OnCreateFixHPASM();
+		static void NAKED_DECL OnCreateFixHPASM();
 
 	public:
 		static shok::TaskExecutionResult(*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat
@@ -423,7 +423,7 @@ namespace EGL {
 
 	private:
 		static void __thiscall BuildOnSetPosFixed(CMovingEntity* th);
-		static void __attribute((naked)) BuildOnSetPosFixedASM();
+		static void NAKED_DECL BuildOnSetPosFixedASM();
 	};
 	static_assert(sizeof(CMovingEntity) == 71 * 4);
 	static_assert(offsetof(CMovingEntity, MovementState) == 70 * 4);
@@ -536,7 +536,7 @@ namespace GGL {
 		static void HookExperience(bool active);
 		static void HookExperienceClassAssignment(bool active);
 	private:
-		static void __attribute((naked)) AssignAdvExperienceClassASM();
+		static void NAKED_DECL AssignAdvExperienceClassASM();
 	};
 	static_assert(sizeof(CEntityProfile) == 56 * 4);
 	struct ModifierEntityDatabase {
@@ -631,7 +631,7 @@ namespace GGL {
 		static void HookAutoDestroyIfEmpty();
 	private:
 		static void __thiscall OnEmptyDestroy(CResourceDoodad* th);
-		static void __attribute((naked)) OnEmptyDestroyASM();
+		static void NAKED_DECL OnEmptyDestroyASM();
 	};
 
 	class CBuilding : public EGL::CGLEEntity { // NOLINT(*-pro-type-member-init)

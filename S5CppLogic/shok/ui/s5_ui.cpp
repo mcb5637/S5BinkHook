@@ -31,7 +31,7 @@ const char* __stdcall BB::StringTableText::GetSTTOverride(const char* s)
 	return BB::StringTableText::GetStringTableTextOverride(s);
 }
 
-void BB::StringTableText::GetSTTOverrideASM() {
+void NAKED_DEF BB::StringTableText::GetSTTOverrideASM() {
 	__asm {
 		//int 3
 		push[esp + 4];
@@ -844,7 +844,7 @@ bool GGL::CGLGUIInterface::GetNearestFreePosForBuildingPlacement(shok::EntityTyp
 }
 
 
-void GGL::CGLGUIInterface::GetMaxHPOverrideASM() {
+void NAKED_DEF GGL::CGLGUIInterface::GetMaxHPOverrideASM() {
 	__asm {
 		mov ecx, [ebp + 0xC];
 		call EGL::CGLEEntity::GetMaxHPOverrideStatic;

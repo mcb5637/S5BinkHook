@@ -301,8 +301,7 @@ int Test(luaext::State L) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	/*auto* e = L.CheckEntity(1);
 	ED::CEntity* ed = (*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(e->EntityId);*/
-	auto* p = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(shok::MapType::Campagn, "Main");
-	L.Push(reinterpret_cast<int>(p));
+	L.CheckEntity(1);
 	return 1;
 }
 

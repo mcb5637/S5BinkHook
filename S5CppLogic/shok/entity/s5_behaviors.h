@@ -691,7 +691,7 @@ namespace GGL {
 	private:
 		int TaskWaitForAnimNonCancelable(EGL::CGLETaskArgsThousandths* a);
 		static void __thiscall AddNonCancelableHandlers(CGLBehaviorAnimationEx* th);
-		static void __attribute((naked)) AddNonCancelableHandlersASM();
+		static void NAKED_DECL AddNonCancelableHandlersASM();
 	};
 
 	class CBehaviorWalkCommand : public EGL::CGLEBehavior {
@@ -789,11 +789,11 @@ namespace GGL {
 		int TaskCheckNeedsRes(EGL::CGLETaskArgs* arg);
 		static void __thiscall AddSupplierSkip(CWorkerBehavior* th);
 		static int __thiscall DoWorkEvents(CWorkerBehavior* th, GGL::CBuilding* b, EGL::CGLETaskArgs* t);
-		static void __attribute((naked)) DoWorkEventsASM();
+		static void NAKED_DECL DoWorkEventsASM();
 		static void __thiscall TaskSupplyAdditional(CWorkerBehavior* th);
-		static void __attribute((naked)) TaskSupplyAdditionalASM();
+		static void NAKED_DECL TaskSupplyAdditionalASM();
 		bool __thiscall IsResearchingOverride();
-		static void __attribute((naked)) AddSupplierSkipASM();
+		static void NAKED_DECL AddSupplierSkipASM();
 	};
 
 	class CBehaviorFollow : public EGL::CGLEBehavior {
@@ -917,7 +917,7 @@ namespace GGL {
 	private:
 		void __thiscall CheckRegen();
 		static void __thiscall CheckRegenStatic(CLeaderBehavior* th);
-		static void __attribute((naked)) CheckRegenASM();
+		static void NAKED_DECL CheckRegenASM();
 	};
 
 	class CSoldierBehavior : public GGL::CBattleBehavior {
@@ -1022,7 +1022,7 @@ namespace GGL {
 		static void HookMineTrigger();
 	private:
 		static void __thiscall TaskExtractAdditional(CSerfBehavior* th, int am, GGL::CResourceDoodad* d);
-		static void __attribute((naked)) TaskExtractAdditionalASM();
+		static void NAKED_DECL TaskExtractAdditionalASM();
 	};
 
 	struct SSlotArgsLimitedAttachment {
@@ -1416,7 +1416,7 @@ namespace GGL {
 		static void HookMineTrigger();
 	private:
 		static int __thiscall TaskMineAdd(CMineBehavior* th, int* am, GGL::CResourceDoodad* d, BB::CEvent* ev);
-		static void __attribute((naked)) TaskMineAddASM();
+		static void NAKED_DECL TaskMineAddASM();
 	};
 
 	class CKeepBehavior : public EGL::CGLEBehavior {

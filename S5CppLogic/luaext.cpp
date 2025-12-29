@@ -84,7 +84,7 @@ shok::PositionRot luaext::detail::CheckPosRot(State L, int i, bool rad)
 }
 void luaext::detail::PushPosRot(State L, const shok::PositionRot& p, bool rad)
 {
-	L.Push(p);
+	PushPos(L, p);
 	L.Push("r");
 	if (rad)
 		L.Push(CppLogic::RadiansToDegrees(p.r));

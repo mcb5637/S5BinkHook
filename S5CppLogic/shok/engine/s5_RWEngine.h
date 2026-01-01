@@ -5,6 +5,7 @@
 #include <shok/engine/s5_RWE_enums.h>
 #include <span>
 #include <optional>
+#include <Win.h>
 
 // a lot of info about renderware comes from here: https://github.com/DK22Pac/vice-37
 // this is c code, i just c++ified it to clean up my global namespace

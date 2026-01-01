@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_RWE_particles.h"
 
 static inline void(__cdecl* const proptab_destroy)(RWE::Particles::RpPrtStdPropertyTable* th) = reinterpret_cast<void(__cdecl*)(RWE::Particles::RpPrtStdPropertyTable*)>(0x5D96B0);

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_animset.h"
 
 EGL::CGLEAnimSet::CGLEAnimSet()

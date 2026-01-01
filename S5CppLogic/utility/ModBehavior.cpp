@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "ModBehavior.h"
 #include <shok/events/s5_events.h>
 #include <shok/globals/s5_classfactory.h>

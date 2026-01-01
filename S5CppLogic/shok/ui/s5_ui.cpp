@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_ui.h"
 #include <shok/globals/s5_mapdisplay.h>
 #include <shok/ui/s5_guistates.h>

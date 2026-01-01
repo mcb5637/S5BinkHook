@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "l_tech.h"
 #include <shok/s5_baseDefs.h>
 #include <shok/tech/s5_tech.h>

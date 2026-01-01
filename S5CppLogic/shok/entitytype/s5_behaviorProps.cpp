@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_behaviorProps.h"
 
 bool GGL::CRangedEffectAbilityProps::IsDefensive() const

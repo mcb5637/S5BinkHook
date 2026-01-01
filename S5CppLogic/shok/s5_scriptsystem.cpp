@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_scriptsystem.h"
 #include <format>
 #include <shok/s5_exception.h>

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <map>
 #include "s5_classfactory.h"
 #include <shok/globals/s5_filesystem.h>

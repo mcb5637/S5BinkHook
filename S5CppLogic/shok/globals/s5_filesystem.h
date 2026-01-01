@@ -4,6 +4,7 @@
 #include <utility/enumflags.h>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
+#include <Win.h>
 
 namespace BB {
 	class IStream {

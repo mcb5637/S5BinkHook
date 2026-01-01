@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_entitydisplay.h"
 
 void ED::CEntity::ResetPositionData()

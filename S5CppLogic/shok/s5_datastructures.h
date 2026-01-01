@@ -8,6 +8,7 @@
 #include <functional>
 #include <type_traits>
 #include <ranges>
+#include <stdexcept>
 
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_mem.h>

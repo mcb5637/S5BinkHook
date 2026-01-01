@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_widget.h"
 #include <shok/s5_defines.h>
 #include <shok/events/s5_events.h>

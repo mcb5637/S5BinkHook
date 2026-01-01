@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "ModConfig.h"
 #include <shok/globals/s5_classfactory.h>
 

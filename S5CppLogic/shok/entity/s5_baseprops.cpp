@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_baseprops.h"
 
 void EGL::CGLEBehavior::OnEntityUpgrade(EGL::CGLEEntity* e)

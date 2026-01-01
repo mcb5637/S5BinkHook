@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <stdexcept>
 #include <shok/globals/s5_maplogic.h>
 #include <shok/globals/s5_mapdisplay.h>

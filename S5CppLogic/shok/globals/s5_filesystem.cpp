@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_filesystem.h"
 #include <shok/s5_exception.h>
 

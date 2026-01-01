@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "l_logic.h"
 #include <filesystem>
 #include <shok/s5_forwardDecls.h>

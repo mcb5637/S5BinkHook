@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_entitytype.h"
 #include <shok/globals/s5_framework.h>
 

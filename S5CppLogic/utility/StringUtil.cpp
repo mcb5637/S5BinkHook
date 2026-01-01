@@ -1,6 +1,7 @@
-#include "pch.h"
+#include <stdexcept>
 
 #include "StringUtility.h"
+#include <Win.h>
 
 std::wstring To16(std::string_view data) {
 	size_t len = MultiByteToWideChar(CP_ACP, 0, data.data(), static_cast<int>(data.size()), nullptr, 0);

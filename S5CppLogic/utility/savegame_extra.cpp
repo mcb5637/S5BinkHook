@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <filesystem>
 #include "savegame_extra.h"
 #include <shok/globals/s5_classfactory.h>

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_framework.h"
 
 #include <format>

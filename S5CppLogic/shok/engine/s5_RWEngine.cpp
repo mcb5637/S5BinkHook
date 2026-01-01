@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_RWEngine.h"
 #include <shok/globals/s5_mapdisplay.h>
 

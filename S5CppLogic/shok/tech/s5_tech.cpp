@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_tech.h"
 #include <shok/globals/s5_classfactory.h>
 #include <shok/globals/s5_idmanager.h>

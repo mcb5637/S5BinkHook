@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 

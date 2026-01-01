@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_glue.h"
 #include <cstring>
 #include <shok/entitytype/s5_behaviorProps.h>

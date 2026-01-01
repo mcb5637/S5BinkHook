@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "entityiterator.h"
 #include <shok/globals/s5_entityandeffectmanager.h>
 #include <shok/globals/s5_maplogic.h>

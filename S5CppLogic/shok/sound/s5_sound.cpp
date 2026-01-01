@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_sound.h"
 #include <shok/globals/s5_filesystem.h>
 #include <shok/globals/s5_idmanager.h>

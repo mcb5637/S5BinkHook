@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "l_entitytype.h"
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>

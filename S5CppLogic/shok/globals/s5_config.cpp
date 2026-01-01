@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <stdexcept>
 #include "s5_config.h"
 #include <shok/s5_defines.h>

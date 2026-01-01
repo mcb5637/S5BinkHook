@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_datastructures.h"
 
 static inline void(__thiscall* const str_ctor)(shok::String* th, const char* s) = reinterpret_cast<void(__thiscall*)(shok::String*, const char*)>(0x4018C6);

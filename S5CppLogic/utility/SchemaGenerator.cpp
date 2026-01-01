@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "SchemaGenerator.h"
 #include <shok/globals/s5_filesystem.h>
 #include <shok/effect/s5_effecttype.h>

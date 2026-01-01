@@ -1,6 +1,6 @@
-#include "pch.h"
 #include "l_ui.h"
 #include <filesystem>
+#include <Win.h>
 #include <WinUser.h>
 #include <shok/ui/s5_widget.h>
 #include <shok/globals/s5_filesystem.h>

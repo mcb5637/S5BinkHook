@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 #include <shok/s5_forwardDecls.h>
 #include <vector>
 

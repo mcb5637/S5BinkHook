@@ -1,6 +1,8 @@
-#include "pch.h"
 
 #include "s5_baseDefs.h"
+
+#include <algorithm>
+#include <cctype>
 
 
 void shok::Position::FloorToBuildingPlacement()

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_entity.h"
 #include <shok/s5_mem.h>
 #include <shok/entity/s5_behaviors.h>

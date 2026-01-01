@@ -1,5 +1,5 @@
-#include "pch.h"
 #include "WinAPIUtil.h"
+#include <Win.h>
 
 #include <commdlg.h>
 

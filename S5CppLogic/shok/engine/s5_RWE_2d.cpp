@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_RWE_2d.h"
 
 inline RWE::P2D::Rt2dBrush* (__cdecl* const brush_settexture)(RWE::P2D::Rt2dBrush* th, RWE::RwTexture* tex) = reinterpret_cast<RWE::P2D::Rt2dBrush * (__cdecl*)(RWE::P2D::Rt2dBrush*, RWE::RwTexture*)>(0x707A00);

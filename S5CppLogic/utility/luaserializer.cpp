@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "luaserializer.h"
 #include <format>
 #include <shok/globals/s5_filesystem.h>

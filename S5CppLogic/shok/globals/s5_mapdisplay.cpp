@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <stdexcept>
 #include <map>
 #include "s5_mapdisplay.h"

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "EntityAddonData.h"
 #include <shok/globals/s5_classfactory.h>
 #include <shok/entity/s5_entity.h>

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <luaext.h>
 #include <shok/entitytype/s5_entitytype.h>
 #include <shok/entity/s5_entity.h>

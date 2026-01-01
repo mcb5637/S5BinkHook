@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_effecttype.h"
 #include <shok/globals/s5_classfactory.h>
 #include <utility/hooks.h>

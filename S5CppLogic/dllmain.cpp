@@ -1,5 +1,4 @@
 // ReSharper disable CppUnusedIncludeDirective
-#include "pch.h"
 #include <string>
 #include <map>
 #include <set>

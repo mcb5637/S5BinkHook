@@ -1,7 +1,7 @@
-#include "pch.h"
 #include "hooks.h"
 #include <algorithm>
 #include <stdexcept>
+#include <Win.h>
 
 
 CppLogic::Hooks::SaveVirtualProtect::SaveVirtualProtect() : CppLogic::Hooks::SaveVirtualProtect(reinterpret_cast<void*>(SHOK_SEGMENTSTART), SHOK_SEGMENTLENGTH)

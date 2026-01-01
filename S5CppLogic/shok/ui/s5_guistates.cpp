@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "s5_guistates.h"
 #include <shok/globals/s5_config.h>
 #include <shok/ui/s5_ui.h>

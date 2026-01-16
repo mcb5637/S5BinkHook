@@ -5,6 +5,8 @@
 #include <ctime>
 #include <filesystem>
 #include "l_api.h"
+
+#include <fstream>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/globals/s5_filesystem.h>
@@ -230,55 +232,50 @@ namespace CppLogic::API {
 	int RuntimeStoreSet(luaext::State L) {
 		luaext::State mm{ shok::LuaStateMainmenu };
 		int t = mm.GetTop();
+		auto key = L.CheckStringView(1);
 
-		const char* s = L.CheckString(1);
-		const char* ds = nullptr;
-		lua::Number di = 0;
-		lua::LType ty = L.Type(2);
-		if (!(ty == lua::LType::Number || ty == lua::LType::String || ty == lua::LType::Nil))
-			throw lua::LuaException("not saveable");
-		if (ty == lua::LType::Number)
-			di = *L.ToNumber(2);
-		else if (ty == lua::LType::String)
-			ds = L.ToString(2);
 		GetRuntimeStore();
-		mm.Push(s);
-		if (ty == lua::LType::Number)
-			mm.Push(di);
-		else if (ty == lua::LType::String)
-			mm.Push(ds);
-		else
+		mm.Push(key);
+
+		if (L.IsNoneOrNil(2)) {
 			mm.Push();
+		}
+		else {
+			BB::CMemoryStream st{};
+			Serializer::AdvLuaStateSerializer seri{st, L.GetState(), true};
+			seri.SerializeVariable(2);
+
+			mm.Push(st.GetData());
+		}
+
 		mm.SetTableRaw(-3);
 
-		mm.SetTop(t);
+		if (mm.GetState() != L.GetState())
+			mm.SetTop(t);
 		return 0;
 	}
 	int RuntimeStoreGet(luaext::State L) {
 		luaext::State mm{ shok::LuaStateMainmenu };
 		int t = mm.GetTop();
 
-		const char* s = L.CheckString(1);
+		auto s = L.CheckStringView(1);
 		GetRuntimeStore();
 		mm.Push(s);
 		mm.GetTableRaw(-2);
-		lua::LType ty = mm.Type(-1);
-		const char* ds = nullptr;
-		lua::Number di = 0;
-		if (ty == lua::LType::Number)
-			di = *mm.ToNumber(-1);
-		else if (ty == lua::LType::String)
-			ds = mm.ToString(-1);
 
-		mm.SetTop(t);
-
-		if (ty == lua::LType::Number)
-			L.Push(di);
-		else if (ty == lua::LType::String)
-			L.Push(ds);
-		else
+		if (mm.IsNoneOrNil(-1)) {
+			if (mm.GetState() != L.GetState())
+				mm.SetTop(t);
 			L.Push();
+			return 1;
+		}
 
+		IO::StringViewReadStream st {mm.CheckStringView(-1)};
+		Serializer::AdvLuaStateSerializer seri{st, L.GetState(), true};
+		seri.DeserializeVariable();
+
+		if (mm.GetState() != L.GetState())
+			mm.SetTop(t);
 		return 1;
 	}
 
@@ -568,6 +565,48 @@ namespace CppLogic::API {
 		wd->OverrideSizeBorderlessFullscreen(n);
 	}
 
+	int WriteGhidraImport(luaext::State L) {
+		std::ofstream st{"/home/mcb/ghidra_scripts/s5_luafuncs.txt", std::ofstream::out | std::ofstream::trunc};
+		auto w = [&](EScr::StaticFuncList* l, const char* t) {
+			for (auto* e = l->First; e != nullptr; e = e->Next) {
+				const char* ta = t;
+				if (ta == nullptr)
+					ta = e->Table;
+				if (ta == nullptr)
+					continue;
+				if (e->Table != nullptr && t != nullptr && std::string_view(t) != ta)
+					continue;
+				st << reinterpret_cast<int>(e) << "|type|EScr::StaticFuncListEntry\n";
+				st << reinterpret_cast<int>(e->Func) << "|func|lua::" << ta << "::" << e->Name << "\n";
+			}
+		};
+		w(EScr::StaticFuncList::FrameworkList(), "Framework");
+		w(EScr::StaticFuncList::ScriptList(), "Script");
+		w(EScr::StaticFuncList::LuaDebuggerList(), "LuaDebugger");
+		w(EScr::StaticFuncList::MouseList(), "Mouse");
+		w(EScr::StaticFuncList::GameList(), "Game");
+		w(EScr::StaticFuncList::GDBList(), "GDB");
+		w(EScr::StaticFuncList::DisplayOptionsList(), "DisplayOptions");
+		w(EScr::StaticFuncList::SoundOptionsList(), "SoundOptions");
+		w(EScr::StaticFuncList::AIList(), "AI");
+		w(EScr::StaticFuncList::XNetworkList(), "XNetwork");
+		w(EScr::StaticFuncList::DisplayList(), "Display");
+		w(EScr::StaticFuncList::Logic1List(), "Logic");
+		w(EScr::StaticFuncList::Logic2List(), "Logic");
+		w(EScr::StaticFuncList::Logic3List(), "Logic");
+		w(EScr::StaticFuncList::Logic4List(), "Logic");
+		w(EScr::StaticFuncList::CameraList(), "Camera");
+		w(EScr::StaticFuncList::GUIList(), "GUI");
+		w(EScr::StaticFuncList::GUIList2(), "GUI");
+		w(EScr::StaticFuncList::XGUIEngList(), "XGUIEng");
+		w(EScr::StaticFuncList::SoundList(), nullptr);
+		w(EScr::StaticFuncList::MusicList(), "Music");
+		w(EScr::StaticFuncList::CutsceneList(), "Cutscene");
+		w(EScr::StaticFuncList::InputList(), "Input");
+		w(EScr::StaticFuncList::XNetworkUbiComList(), "XNetworkUbiCom");
+		return 0;
+	}
+
 	constexpr std::array API{
 			luaext::FuncReference::GetRef<Eval>("Eval"),
 			luaext::FuncReference::GetRef<Log>("Log"),
@@ -600,6 +639,7 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
 			luaext::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
 			luaext::FuncReference::GetRef<DumpUnknownListOptions>("DumpUnknownListOptions"),
+			luaext::FuncReference::GetRef<WriteGhidraImport>("WriteGhidraImport"),
 #endif
 	};
 

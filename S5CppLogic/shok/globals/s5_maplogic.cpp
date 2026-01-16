@@ -10,6 +10,7 @@
 #include <shok/globals/s5_classfactory.h>
 #include <utility/entityiterator.h>
 #include <utility/hooks.h>
+#include <utility/ModPlayers.h>
 
 void EGL::CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)
 {
@@ -611,11 +612,110 @@ EGL::CPlayerExplorationUpdate* EGL::PlayerManager::GetUpdate()
 	return playermng_getupdate(this);
 }
 
+bool EGL::PlayerManager::IsPlayerIngame(shok::PlayerId pl) {
+	auto f = reinterpret_cast<bool(__thiscall*)(PlayerManager*, shok::PlayerId)>(0x49840a);
+	return f(this, pl);
+}
+
+EGL::CEntityVectorMap* EGL::PlayerManager::GetEntityVectorMapByPlayer(shok::PlayerId pl) {
+	auto f = reinterpret_cast<CEntityVectorMap*(__thiscall*)(PlayerManager*, shok::PlayerId)>(0x5758d9);
+	return f(this, pl);
+}
+
+EGL::CPlayerFeedbackHandler * EGL::PlayerManager::GetFeedbackByPlayer(shok::PlayerId pl) {
+	auto f = reinterpret_cast<CPlayerFeedbackHandler*(__thiscall*)(PlayerManager*, shok::PlayerId)>(0x5758b7);
+	return f(this, pl);
+}
+
 const BB::SerializationData EGL::PlayerManager::SerializationData[3] {
 	reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x575B2B)()[0],
 	reinterpret_cast<const BB::SerializationData* (__stdcall*)()>(0x575B2B)()[1],
 	BB::SerializationData::GuardData(),
 };
+
+EGL::PlayerManager::Player* __stdcall EGL::PlayerManager::GetPlayerExt(shok::PlayerId pl) {
+	return CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().TryGet(pl).first;
+}
+
+EGL::PlayerManager::Player* __stdcall EGL::PlayerManager::GetPlayerExtIngame(shok::PlayerId pl) {
+	auto* p = GetPlayerExt(pl);
+	if (p == nullptr)
+		return nullptr;
+	if (p->PlayerInGame)
+		return p;
+	return nullptr;
+}
+
+bool EGL_HookExtraPlayers = false;
+void EGL::PlayerManager::HookExtraPlayers() {
+	if (EGL_HookExtraPlayers)
+		return;
+	EGL_HookExtraPlayers = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
+		reinterpret_cast<void*>(0x575f72),
+		reinterpret_cast<void*>(0x49840a),
+		reinterpret_cast<void*>(0x5758d9),
+		reinterpret_cast<void*>(0x5758b7),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575f72), &ExtraActivatePlayer, reinterpret_cast<void*>(0x575f9a));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x49840a), &ExtraIsPlayerIngame, reinterpret_cast<void*>(0x498411));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575895), &ExtraGetExplorationHandlerByPlayer, reinterpret_cast<void*>(0x57589a));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758d9), &ExtraGetEntityVectorMapByPlayer, reinterpret_cast<void*>(0x5758de));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758b7), &ExtraGetFeedbackByPlayer, reinterpret_cast<void*>(0x5758bc));
+}
+
+void EGL::PlayerManager::ExtraActivatePlayer() {
+	__asm {
+		mov esi, ecx;
+
+		push edi;
+		call EGL::PlayerManager::ExtraIsPlayerIngame;
+		test al,al;
+		jnz invalid;
+
+		push edi;
+		call EGL::PlayerManager::GetPlayerExt;
+
+		cmp eax, 0;
+		je invalid;
+
+		mov esi, ecx;
+		push 0x575f9a;
+		ret;
+
+	invalid:
+		push 0x57602b;
+		ret;
+	};
+}
+
+bool __stdcall EGL::PlayerManager::ExtraIsPlayerIngame(shok::PlayerId pl) {
+	auto* p = GetPlayerExt(pl);
+	if (p == nullptr)
+		return false;
+	return p->PlayerInGame;
+}
+
+EGL::CPlayerExplorationHandler * __stdcall EGL::PlayerManager::ExtraGetExplorationHandlerByPlayer(shok::PlayerId pl) {
+	auto* p = GetPlayerExtIngame(pl);
+	if (p == nullptr)
+		return nullptr;
+	return p->ExplorationHandler.get();
+}
+
+EGL::CEntityVectorMap* __stdcall EGL::PlayerManager::ExtraGetEntityVectorMapByPlayer(shok::PlayerId pl) {
+	auto* p = GetPlayerExtIngame(pl);
+	if (p == nullptr)
+		return nullptr;
+	return p->EntityVectorMap.get();
+}
+
+EGL::CPlayerFeedbackHandler * __stdcall EGL::PlayerManager::ExtraGetFeedbackByPlayer(shok::PlayerId pl) {
+	auto* p = GetPlayerExtIngame(pl);
+	if (p == nullptr)
+		return nullptr;
+	return p->FeedbackHandler.get();
+}
 
 shok::Vector<EGL::CGLEEntity*>& EGL::RegionDataEntity::Entry::GetByAccessCategory(shok::AccessCategory ac)
 {

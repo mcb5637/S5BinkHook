@@ -40,7 +40,7 @@ namespace EScr {
 		void EnableTrigger(shok::TriggerId id);
 		void DisableTrigger(shok::TriggerId id);
 
-		static inline EScr::CScriptTriggerSystem** const GlobalObj = reinterpret_cast<EScr::CScriptTriggerSystem**>(0x895DEC); // also 0xA06548
+		static inline EScr::CScriptTriggerSystem** const GlobalObj = reinterpret_cast<EScr::CScriptTriggerSystem**>(0x895DEC); // also 0xA06548, 0x895de8
 		static inline lua_State** const GameState = reinterpret_cast<lua_State**>(0x853A9C);
 		static inline BB::CEvent** const CurrentRunningEventSet = reinterpret_cast<BB::CEvent**>(0xA06544); // always nullptr
 		static inline BB::CEvent** const CurrentRunningEventGet = reinterpret_cast<BB::CEvent**>(0xA06540);
@@ -192,6 +192,46 @@ namespace EScr {
 		static void __fastcall SetAllLuaFuncsRecompileOverride(lua_State* L);
 	};
 	static_assert(sizeof(StateAddon) == 8 * 4);
+
+	struct StaticFuncListEntry {
+		StaticFuncListEntry* Next = nullptr;
+		const char* Table = nullptr;
+		const char* Name = nullptr;
+		lua::CFunction* Func = nullptr;
+		const char* Description = nullptr;
+	};
+	struct StaticFuncList {
+		StaticFuncListEntry* First = nullptr;
+
+		// 59d417 add stdcall(StaticFuncListEntry*)
+		// 59b22b register func static stdcall(state, table, name, func, desc)
+		// 59d42c register list stdcall(state, table) (table nullptr, use from entry)
+
+		static inline auto* FrameworkList = reinterpret_cast<StaticFuncList*(*)()>(0x408cbd);
+		static inline auto* ScriptList = reinterpret_cast<StaticFuncList*(*)()>(0x408cda);
+		static inline auto* LuaDebuggerList = reinterpret_cast<StaticFuncList*(*)()>(0x408cf7);
+		static inline auto* MouseList = reinterpret_cast<StaticFuncList*(*)()>(0x408d14);
+		static inline auto* GameList = reinterpret_cast<StaticFuncList*(*)()>(0x408daa);
+		static inline auto* GDBList = reinterpret_cast<StaticFuncList*(*)()>(0x408d31);
+		static inline auto* DisplayOptionsList = reinterpret_cast<StaticFuncList*(*)()>(0x0408d4e);
+		static inline auto* SoundOptionsList = reinterpret_cast<StaticFuncList*(*)()>(0x408d6b);
+		static inline auto* AIList = reinterpret_cast<StaticFuncList*(*)()>(0x446071);
+		static inline auto* XNetworkList = reinterpret_cast<StaticFuncList*(*)()>(0x452860);
+		static inline auto* DisplayList = reinterpret_cast<StaticFuncList*(*)()>(0x467018);
+		static inline auto* Logic1List = reinterpret_cast<StaticFuncList*(*)()>(0x4c0d12);
+		static inline auto* Logic2List = reinterpret_cast<StaticFuncList*(*)()>(0x4c0d2f);
+		static inline auto* Logic3List = reinterpret_cast<StaticFuncList*(*)()>(0x5712f3);
+		static inline auto* Logic4List = reinterpret_cast<StaticFuncList*(*)()>(0x571310);
+		static inline auto* CameraList = reinterpret_cast<StaticFuncList*(*)()>(0x51b22a);
+		static inline auto* GUIList = reinterpret_cast<StaticFuncList*(*)()>(0x52345a);
+		static inline auto* GUIList2 = reinterpret_cast<StaticFuncList*(*)()>(0x523477);
+		static inline auto* XGUIEngList = reinterpret_cast<StaticFuncList*(*)()>(0x55ae45);
+		static inline auto* SoundList = reinterpret_cast<StaticFuncList*(*)()>(0x496c60);
+		static inline auto* MusicList = reinterpret_cast<StaticFuncList*(*)()>(0x4971a5);
+		static inline auto* CutsceneList = reinterpret_cast<StaticFuncList*(*)()>(0x596a90);
+		static inline auto* InputList = reinterpret_cast<StaticFuncList*(*)()>(0x59dc0a);
+		static inline auto* XNetworkUbiComList = reinterpret_cast<StaticFuncList*(*)()>(0x5a56f0);
+	};
 }
 
 // ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor

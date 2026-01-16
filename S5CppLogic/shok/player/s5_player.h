@@ -418,6 +418,8 @@ namespace GGL {
 		static bool (*CanPlaceBuildingCallback)(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
 		static void HookCanPlaceBuilding();
 
+		virtual ~CPlayerStatus() override;
+
 	private:
 		static int __stdcall CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
 		static void NAKED_DECL CanPlaceBuildingHookASM();

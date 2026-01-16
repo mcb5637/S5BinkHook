@@ -253,8 +253,8 @@ namespace EGL {
 	class CPlayerExplorationUpdate : public BB::IObject {
 	public:
 		int State;
-		int FirstPlayerToUpdate;
-		int LastPlayerToUpdate;
+		shok::PlayerId FirstPlayerToUpdate;
+		shok::PlayerId LastPlayerToUpdate;
 		int DrawCirclesCurrentPlayerToUpdate;
 		int DrawCirclesCurrentPlayerDrawCircles;
 		int DrawCirclesCurrentIndex;
@@ -272,7 +272,7 @@ namespace EGL {
 	public:
 		shok::Map<shok::EntityTypeId, shok::Vector<EGL::CGLEEntity*>> Items; // EntityType -> EntityVector.Item
 
-		// ctor 575F0D thiscall(pid)
+		// ctor 575F0D thiscall()
 
 		static inline constexpr int vtp = 0x783B4C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1A5477F7);
@@ -325,25 +325,40 @@ namespace EGL {
 		struct Player {
 			bool PlayerInGame = false;
 			BB::IObject* PlayerData = nullptr; // nullptr mp related?
-			CPlayerExplorationHandler* ExplorationHandler = nullptr;
-			CPlayerFeedbackHandler* FeedbackHandler = nullptr;
-			CEntityVectorMap* EntityVectorMap = nullptr;
+			// probably not unique ptrs originally, but it makes things easier
+			std::unique_ptr<CPlayerExplorationHandler> ExplorationHandler = nullptr;
+			std::unique_ptr<CPlayerFeedbackHandler> FeedbackHandler = nullptr;
+			std::unique_ptr<CEntityVectorMap> EntityVectorMap = nullptr;
 		};
-		Player Players[9]{};
-		PADDINGI(1); // seridata-> belongs to array, 0 wtf???
+		shok::Array<Player, 9> Players{};
 		CPlayerExplorationUpdate* ExplorationUpdate = nullptr; //46
 
 		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(shok::PlayerId pl);
 		void SetShareExplorationFlag(shok::PlayerId pl1, shok::PlayerId pl2, bool share);
 		void ActivateUpdateOfExplorationForAllPlayers();
 		CPlayerExplorationUpdate* GetUpdate(); // creates if nullptr
+		bool IsPlayerIngame(shok::PlayerId pl);
+		CEntityVectorMap* GetEntityVectorMapByPlayer(shok::PlayerId pl);
+		CPlayerFeedbackHandler* GetFeedbackByPlayer(shok::PlayerId pl);
 
 		// activate player thiscall 575F63(pid)
 		// activate player callback 8973C8
+		// ctor 5757bd()
 
 		// seridata of this thing is 0x897508, but it is missing its guard
 		// fixed here
 		static const BB::SerializationData SerializationData[];
+
+		static Player* __stdcall GetPlayerExt(shok::PlayerId pl);
+		static Player* __stdcall GetPlayerExtIngame(shok::PlayerId pl);
+
+		static void HookExtraPlayers();
+	private:
+		static void NAKED_DECL ExtraActivatePlayer();
+		static bool __stdcall ExtraIsPlayerIngame(shok::PlayerId pl);
+		static CPlayerExplorationHandler* __stdcall ExtraGetExplorationHandlerByPlayer(shok::PlayerId pl);
+		static CEntityVectorMap* __stdcall ExtraGetEntityVectorMapByPlayer(shok::PlayerId pl);
+		static CPlayerFeedbackHandler* __stdcall ExtraGetFeedbackByPlayer(shok::PlayerId pl);
 	};
 	static_assert(sizeof(EGL::PlayerManager::Player) * 9 + 4 == 184);
 	static_assert(offsetof(EGL::PlayerManager, ExplorationUpdate) == 46 * 4);
@@ -382,6 +397,15 @@ namespace EGL {
 	class IGLEGameLogic : public BB::IPostEvent {
 
 	};
+
+	class CMapProps : public BB::IObject {
+	public:
+		int NumberOfPlayer;
+
+		static inline constexpr int vtp = 0x783808;
+		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x33ca7b88);
+	};
+
 	using RandomNumberGenerator = std::linear_congruential_engine<uint32_t, 1812433253, 1, 0>;
 	static_assert(sizeof(RandomNumberGenerator) == 4);
 	class CGLEGameLogic : public IGLEGameLogic {
@@ -390,13 +414,15 @@ namespace EGL {
 		GGlue::WaterPropsLogic* WaterPropsLogic = nullptr;
 		EGL::CGLELandscape* Landscape = nullptr; // 9
 		RegionDataEntity RegionDataEntityObj; // 10
-		PADDINGI(5);
+		PADDINGI(4);
+		CMapProps* MapProps = nullptr;
 		EGL::PlayerManager* PlayerMng = nullptr; // 19
 		PADDINGI(8); // 24 multimap of netevent handlers?, empty
 		shok::Vector<EGL::CGLEEntity*> ToDestroy; // 28 not sure of something other that entities ends up here
 		EGL::CGLEScripting* Scripting = nullptr;
 		BB::IPostEvent* GGL_GameLogic_NeteventHandler = nullptr;
 		RandomNumberGenerator RNG; // 34 pretty sure this is not c++ std originally, but this one does the same as the original.
+		// 140 something entity distance check?
 
 	private:
 		virtual void unknown1() = 0;
@@ -420,7 +446,7 @@ namespace EGL {
 		virtual void Deserialize(const char* folder) = 0;
 		virtual void unknown16() = 0;
 		virtual void unknown17() = 0;
-		virtual void unknown18() = 0; // 20
+		virtual CPlayerExplorationHandler* GetExplorationHandlerByPlayer(shok::PlayerId pl) = 0; // 20
 		virtual void CalcHash(int* h) = 0; // max entity slot used, entityids, num entities, max effect slot used, RNG, time
 		virtual shok::EntityId CreateEntity(EGL::CGLEEntityCreator* data, int i) = 0; // 22
 	public:
@@ -444,7 +470,7 @@ namespace EGL {
 		static void HookOnMapscriptLoaded();
 		static void (*OnMapscriptLoaded)();
 
-		static inline EGL::CGLEGameLogic** const GlobalObj = reinterpret_cast<EGL::CGLEGameLogic**>(0x895DAC); // also 85A3A4
+		static inline EGL::CGLEGameLogic** const GlobalObj = reinterpret_cast<EGL::CGLEGameLogic**>(0x895DAC); // also 85A3A4, 85a39c
 		static inline int* const MapSize = reinterpret_cast<int*>(0x898B74);
 
 	private:
@@ -519,8 +545,7 @@ namespace GGL {
 			GGL::CPlayerStatus* GameStatus = nullptr;
 		};
 
-		PlayerData Player[9]{};
-		PADDINGI(1); // seridata-> belongs to array, 0 wtf???
+		shok::Array<PlayerData, 9> Player{};
 
 		GGL::CPlayerStatus* GetPlayer(shok::PlayerId p);
 		// create player 4A9131 thiscall(pid)
@@ -528,7 +553,7 @@ namespace GGL {
 
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
 	};
-	static_assert(sizeof(GGL::PlayerManager::Player) == 18 * 4);
+	static_assert(sizeof(GGL::PlayerManager::Player) == 19 * 4);
 	static_assert(sizeof(GGL::PlayerManager) == 19 * 4);
 
 	class IGLGameLogic {

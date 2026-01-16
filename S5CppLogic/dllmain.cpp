@@ -288,10 +288,10 @@ std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
 
 int Test(luaext::State L) {
 	//CppLogic::Serializer::ObjectToLuaSerializer::Serialize(Ls, L.CheckEntity(1));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*>(0xA1A320));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x54768A)());
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, static_cast<shok::ClassId>(0x3A4D8B20));
-	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(Ls, GGL::CGLSettlerProps::Identifier);
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(L, reinterpret_cast<const BB::SerializationData*>(0xA1A320));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(L, reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x49BE76)());
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(L, static_cast<shok::ClassId>(0x33ca7b88));
+	//CppLogic::Serializer::ObjectToLuaSerializer::DumpClassSerializationData(L, GGL::CGLSettlerProps::Identifier);
 	/*auto e = L.CheckEntity(1);
 	auto cf = *BB::CClassFactory::GlobalObj;
 	if (cf->GetClassDemangledName(BreakOnCmdBehavior::Identifier) == nullptr) {
@@ -300,8 +300,9 @@ int Test(luaext::State L) {
 	e->AddBehavior(cf->CreateObject<BreakOnCmdBehavior>());*/
 	/*auto* e = L.CheckEntity(1);
 	ED::CEntity* ed = (*ED::CGlobalsLogicEx::GlobalObj)->VisibleEntityManager->GetDisplayForEntity(e->EntityId);*/
-	L.CheckEntity(1);
-	return 1;
+
+
+	return 0;
 }
 
 int GetOptions(luaext::State L) {

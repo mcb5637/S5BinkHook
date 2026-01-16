@@ -93,6 +93,7 @@ add_library(LuaDebugger SHARED
 
         S5CppLogic/shok/player/s5_ai.cpp
         S5CppLogic/shok/player/s5_player.cpp
+        S5CppLogic/shok/player/s5_player_manual.asm
 
         S5CppLogic/shok/sound/s5_sound.cpp
 
@@ -110,6 +111,7 @@ add_library(LuaDebugger SHARED
         S5CppLogic/utility/ModConfig.cpp
         S5CppLogic/utility/ModEffect.cpp
         S5CppLogic/utility/ModFilesystem.cpp
+        S5CppLogic/utility/ModPlayers.cpp
         S5CppLogic/utility/modloader.cpp
         S5CppLogic/utility/ModUI.cpp
         S5CppLogic/utility/savegame_extra.cpp

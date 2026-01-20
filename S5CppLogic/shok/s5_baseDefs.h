@@ -10,6 +10,12 @@
 #include "s5_defines.h"
 
 namespace shok {
+	// write log to 551b7b decl(filehandle, buff, size) (resets last error)
+	// log file handle 8937e0
+	// write log from buffer 551903()
+	// log raw string 551993 cdecl(str)
+	// open file 551b18 decl(name)
+	// open log file 551ac3 decl(name)
 	// format i int, f float, x hex int, c char, s const char*
 	static inline void (* const LogString)(const char* format, ...) = reinterpret_cast<void (*)(const char* format, ...)>(0x548268);
 

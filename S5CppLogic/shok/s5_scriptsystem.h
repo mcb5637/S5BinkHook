@@ -74,6 +74,8 @@ namespace EScr {
 		bool CheckRef(); // creates if not already done, then return if the ref is valid
 		bool Call(int nargs, int nres); // uses shok error handling, so you get a popup on errors
 		void SetState(lua::State l); // removes from prev StateAddon and adds to new one (both with null check)
+
+		static inline constexpr int vtp = 0x786bd0;
 	};
 
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
@@ -114,8 +116,10 @@ namespace EScr {
 	public:
 		struct Parameter {
 			double Value;
-			int Type; // 1 double, 2 string, 0 nothing
 			shok::String String;
+			int Type; // 1 double, 2 string, 0 nothing
+
+			// read 59f7f0 stdcall(L, index) -> valid
 		};
 
 		shok::EventIDs EventType; // 1
@@ -128,6 +132,8 @@ namespace EScr {
 		} UniqueID; // 26
 		shok::Vector<Parameter> ConditionParameter;
 		shok::Vector<Parameter> ActionParameter;
+
+		// read params 5a0dc1(L, index)
 
 		static inline constexpr int vtp = 0x786664;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x772113A3);

@@ -607,6 +607,38 @@ namespace CppLogic::API {
 		return 0;
 	}
 
+	int GetTriggers(luaext::State L) {
+		EScr::CScriptTriggerSystem* ts = *EScr::CScriptTriggerSystem::GlobalObj;
+		L.NewTable();
+		for (auto& t : ts->Trigger) {
+			L.Push(t.first);
+			if (t.second == nullptr) {
+				L.Push("nullptr");
+			} else {
+				CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, t.second);
+			}
+			L.SetTableRaw(-3);
+		}
+		return 1;
+	}
+
+	int WriteTriggers(luaext::State L) {
+		EScr::CScriptTriggerSystem* ts = *EScr::CScriptTriggerSystem::GlobalObj;
+		BB::CFileStreamEx f{};
+		f.OpenFile(L.CheckString(1), BB::IStream::Flags::DefaultWrite);
+		auto s = BB::CXmlSerializer::CreateUnique();
+		for (auto& t : ts->Trigger) {
+			if (t.second == nullptr) {
+				auto str = std::format("{} is nullptr!\n", static_cast<int>(t.first));
+				f.Write(str.c_str(), str.size());
+			} else {
+				f.Write("\r\n", 2);
+				s->Serialize(&f, t.second);
+			}
+		}
+		return 0;
+	}
+
 	constexpr std::array API{
 			luaext::FuncReference::GetRef<Eval>("Eval"),
 			luaext::FuncReference::GetRef<Log>("Log"),
@@ -635,7 +667,9 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<GetCurrentCutscene>("GetCurrentCutscene"),
 			luaext::FuncReference::GetRef<EnableScriptTriggerEval>("EnableScriptTriggerEval"),
 			luaext::FuncReference::GetRef<GetMonitors>("GetMonitors"),
+			luaext::FuncReference::GetRef<GetTriggers>("GetTriggers"),
 #ifdef DEBUG_FUNCS
+			luaext::FuncReference::GetRef<WriteTriggers>("WriteTriggers"),
 			luaext::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),
 			luaext::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
 			luaext::FuncReference::GetRef<DumpUnknownListOptions>("DumpUnknownListOptions"),

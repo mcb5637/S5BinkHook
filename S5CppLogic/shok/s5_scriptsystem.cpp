@@ -5,6 +5,7 @@
 #include <shok/globals/s5_filesystem.h>
 #include <utility/hooks.h>
 #include <utility/luaserializer.h>
+#include <utility/OnScopeExit.h>
 
 lua_State* shok::LuaStateMainmenu = nullptr;
 
@@ -45,46 +46,100 @@ void EScr::CScriptTriggerSystem::DisableTrigger(shok::TriggerId id)
 	t->Switch = false;
 }
 
+void ClearMarkedTriggersOfEvent(EScr::CScriptTriggerSystem* th, shok::EventIDs id) {
+	// struct vec_data {
+	// 	int _;
+	// 	EScr::CScriptTrigger** begin;
+	// 	EScr::CScriptTrigger** end;
+	// 	EScr::CScriptTrigger** end_alloc;
+	// };
+
+	auto activeTrigger = th->ActiveTrigger.find(id);
+	if (activeTrigger == th->ActiveTrigger.end())
+		return;
+
+	for (auto*& tr : activeTrigger->second) {
+		if (tr->MarkedForUnrequest) {
+			auto it = th->Trigger.find(tr->UniqueID.UniqueID);
+			if (it != th->Trigger.end())
+				th->Trigger.erase(it);
+			delete tr;
+			tr = nullptr;
+		}
+	}
+	{
+		auto v = activeTrigger->second.SaveVector();
+		std::erase_if(v.Vector, [](auto* tr) { return tr == nullptr; });
+	}
+
+	// auto* triggers = reinterpret_cast<vec_data*>(&activeTrigger->second);
+	// auto** it = triggers->begin;
+	// while (it != triggers->end) {
+	// 	auto* tr = *it;
+	// 	if (tr->MarkedForUnrequest) {
+	// 		auto tid = tr->UniqueID.UniqueID;
+	// 		auto* map = reinterpret_cast<void(__thiscall*)(shok::Map<shok::TriggerId, EScr::CScriptTrigger*>*, shok::TriggerId*)>(0x59fcfd);
+	// 		map(&th->Trigger, &tid);
+	// 		auto* ve = reinterpret_cast<void(__thiscall*)(vec_data*, EScr::CScriptTrigger***, EScr::CScriptTrigger**)>(0x44803a);
+	// 		ve(triggers, &it, it);
+	// 		delete tr;
+	// 	}
+	// 	else {
+	// 		++it;
+	// 	}
+	// }
+}
+
 void __stdcall ScriptTriggerSys_FireEventHooked(BB::IPostEvent* th, BB::CEvent* ev) {
+	static std::vector<shok::EventIDs> eventsToClear{};
+
 	auto* t = static_cast<EScr::CScriptTriggerSystem*>(th); // NOLINT(*-pro-type-static-cast-downcast)
+	if (t->TriggerSystemDisabled)
+		return;
+
 	BB::CEvent* oldget = *EScr::CScriptTriggerSystem::CurrentRunningEventGet;
 	BB::CEvent* oldset = *EScr::CScriptTriggerSystem::CurrentRunningEventSet;
 
-	if (!t->TriggerSystemDisabled) {
-		auto vec = t->ActiveTrigger.find(static_cast<shok::EventIDs>(ev->EventTypeId));
-		if (vec != t->ActiveTrigger.end()) {
-			for (auto* tr : vec->second) {
-				if (!tr->Switch)
-					continue;
-				if (tr->MarkedForUnrequest)
-					continue;
-				*EScr::CScriptTriggerSystem::CurrentRunningEventGet = ev;
-				*EScr::CScriptTriggerSystem::CurrentRunningEventSet = ev;
-				if (!tr->ConditionFunc.CheckRef() || tr->CallCondition()) {
-					*EScr::CScriptTriggerSystem::CurrentRunningEventGet = ev;
-					*EScr::CScriptTriggerSystem::CurrentRunningEventSet = ev;
-					tr->MarkedForUnrequest = tr->CallAction();
-				}
-			}
+	CppLogic::OnScopeExit reset{
+		[&]() {
+			*EScr::CScriptTriggerSystem::CurrentRunningEventGet = oldget;
+			*EScr::CScriptTriggerSystem::CurrentRunningEventSet = oldset;
 
-			auto v = vec->second.SaveVector();
-			auto it = v.Vector.begin();
-			while (it != v.Vector.end()) {
-				auto* tr = *it;
-				if (tr->MarkedForUnrequest) {
-					// i could use BB funcs here, but why bother when this works
-					t->Trigger.erase(t->Trigger.find(tr->UniqueID.UniqueID)); // 0x59FCFD
-					it = v.Vector.erase(it); // 0x44803A
-					delete tr;
-				}
-				else
-					++it;
+			if (oldget != nullptr)
+				return;
+
+			for (auto e : eventsToClear) {
+				ClearMarkedTriggersOfEvent(t, e);
 			}
+			eventsToClear.clear();
+		}
+	};
+
+	auto activeTrigger = t->ActiveTrigger.find(static_cast<shok::EventIDs>(ev->EventTypeId));
+	if (activeTrigger == t->ActiveTrigger.end())
+		return;
+
+	auto& triggers = activeTrigger->second;
+	for (size_t i = 0; i < triggers.size(); ++i) { // NOLINT(*-loop-convert)
+		auto* tr = triggers[i];
+		if (!tr->Switch)
+			continue;
+		if (tr->MarkedForUnrequest)
+			continue;
+		*EScr::CScriptTriggerSystem::CurrentRunningEventGet = ev;
+		*EScr::CScriptTriggerSystem::CurrentRunningEventSet = ev;
+		if (!tr->ConditionFunc.CheckRef() || tr->CallCondition()) {
+			*EScr::CScriptTriggerSystem::CurrentRunningEventGet = ev;
+			*EScr::CScriptTriggerSystem::CurrentRunningEventSet = ev;
+			tr->MarkedForUnrequest = tr->CallAction();
 		}
 	}
 
-	*EScr::CScriptTriggerSystem::CurrentRunningEventGet = oldget;
-	*EScr::CScriptTriggerSystem::CurrentRunningEventSet = oldset;
+	for (auto e : eventsToClear) {
+		if (e == activeTrigger->first)
+			return;
+	}
+	eventsToClear.emplace_back(activeTrigger->first);
 }
 void EScr::CScriptTriggerSystem::HookFireEvent()
 {

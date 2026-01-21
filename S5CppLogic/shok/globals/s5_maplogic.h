@@ -552,6 +552,12 @@ namespace GGL {
 		// on egl player created 4A9218(pid, eglplayer)
 
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
+
+
+		static void HookExtraPlayers();
+	private:
+		static GGL::CPlayerStatus* __stdcall ExtraGetPlayer(shok::PlayerId p);
+		void __thiscall ExtraCreatePlayer(shok::PlayerId p);
 	};
 	static_assert(sizeof(GGL::PlayerManager::Player) == 19 * 4);
 	static_assert(sizeof(GGL::PlayerManager) == 19 * 4);

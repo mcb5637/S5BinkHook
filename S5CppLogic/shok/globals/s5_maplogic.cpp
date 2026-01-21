@@ -924,6 +924,40 @@ GGL::CPlayerStatus* GGL::PlayerManager::GetPlayer(shok::PlayerId p)
 	return gglplayermng_getplayer(this, p);
 }
 
+bool GGL_HookExtraPlayers = false;
+void GGL::PlayerManager::HookExtraPlayers() {
+	if (GGL_HookExtraPlayers)
+		return;
+	GGL_HookExtraPlayers = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
+		reinterpret_cast<void*>(0x4a91bc),
+		reinterpret_cast<void*>(0x4a9171),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4a91bc), &ExtraGetPlayer, reinterpret_cast<void*>(0x4a91c3));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4a9171), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::ExtraCreatePlayer, 0));
+}
+
+GGL::CPlayerStatus * __stdcall GGL::PlayerManager::ExtraGetPlayer(shok::PlayerId p) {
+	if (!(*EGL::CGLEGameLogic::GlobalObj)->PlayerMng->IsPlayerIngame(p))
+		return nullptr;
+	return CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().TryGet(p).second;
+}
+
+void __thiscall GGL::PlayerManager::ExtraCreatePlayer(shok::PlayerId p) {
+	if (p <= shok::PlayerId::P8) {
+		auto* f = reinterpret_cast<void(__thiscall*)(GGL::PlayerManager*, shok::PlayerId)>(0x4a9131);
+		f(this, p);
+	}
+	else {
+		auto& pl = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetExtra(p);
+		if (pl.GPlayer != nullptr)
+			throw std::logic_error("player already exists");
+		void* mem = shok::Malloc(sizeof(GGL::CPlayerStatus));
+		auto* f = reinterpret_cast<CPlayerStatus*(__thiscall*)(void*, shok::PlayerId)>(0x4b6f6b);
+		pl.GPlayer = std::unique_ptr<CPlayerStatus>(f(mem, p));
+	}
+}
+
 GGL::CPlayerStatus* GGL::CGLGameLogic::GetPlayer(shok::PlayerId i) const
 {
 	return Players->GetPlayer(i);

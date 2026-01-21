@@ -419,7 +419,7 @@ namespace shok {
 		BombPlacer_PlaceBombAt = 0x11024, //EGL::CNetEventEntityAndPos
 		Entity_Patrol = 0x11025, //EGL::CNetEventEntityAndPosArray
 		Player_PayTribute = 0x11026, //EGL::CNetEventPlayerIDAndInteger
-		Player_SetDiplomacy = 0x11027, //EGL::CNetEvent2PlayerIDsAndInteger deprecated?
+		Player_SetDiplomacy = 0x11027, //EGL::CNetEvent2PlayerIDsAndInteger
 		Building_SetCurrentMaxWorkers = 0x11028, //EGL::CNetEventEntityIDAndInteger
 		Player_AllSerfsToBattleSerfs = 0x1102A, //EGL::CNetEventPlayerID
 		Player_AllBattleSerfsToSerfs = 0x1102B, //EGL::CNetEventPlayerID

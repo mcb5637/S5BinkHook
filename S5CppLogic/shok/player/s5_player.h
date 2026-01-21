@@ -350,6 +350,8 @@ namespace GGL {
 	class PlayerDiplomacyManager {
 		shok::PlayerId PlayerID{};
 		shok::Array<shok::DiploState, 9> DiplomacyState;
+
+		// setdiplo 4b4d74 thiscall(player, state) oneway, calls trigger
 	};
 
 	class CPlayerStatus : public BB::IObject {

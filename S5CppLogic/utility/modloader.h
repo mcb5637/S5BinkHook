@@ -475,8 +475,6 @@ namespace CppLogic::ModLoader {
 			luaext::FuncReference::GetRef<IsLoaded>("IsLoaded"),
 			luaext::FuncReference::GetRef<ToString>("ToString"),
 		};
-
-		using BaseClass = ArchivePopHelper;
 	};
 
 	class ArchiveRedirectHelper : public ArchivePopHelper {
@@ -490,10 +488,9 @@ namespace CppLogic::ModLoader {
 		inline ArchiveRedirectHelper(std::string&& a, CppLogic::Mod::FileSystem::RedirectFileSystem* fs) : ArchivePopHelper(std::move(a), fs) {}
 
 
+		using InheritsFrom = std::tuple<ArchivePopHelper>;
+
 		static constexpr const std::array LuaMethods = {
-			luaext::FuncReference::GetRef<Remove>("Remove"),
-			luaext::FuncReference::GetRef<IsLoaded>("IsLoaded"),
-			luaext::FuncReference::GetRef<ToString>("ToString"),
 			luaext::FuncReference::GetRef<Get>("Get"),
 			luaext::FuncReference::GetRef<Set>("Set"),
 		};

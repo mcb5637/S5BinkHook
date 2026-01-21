@@ -150,6 +150,10 @@ namespace CppLogic::Serializer {
 		static constexpr const char* RegistrySerializeKeys = "CppLogic::Serializer::AdvLuaStateSerializer_SerlializedRegistry";
 	};
 
+	class StructAccess;
+	class BBObjectAccess;
+	class ListAccess;
+	class FieldAccess;
 	class ObjectAccess {
 	public:
 		virtual ~ObjectAccess() = default;
@@ -162,8 +166,6 @@ namespace CppLogic::Serializer {
 		};
 
 		ObjectAccess(std::string_view name, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id));
-
-		using BaseClass = ObjectAccess;
 
 		std::string_view SDName;
 		const BB::SerializationData* SeriData;
@@ -184,11 +186,16 @@ namespace CppLogic::Serializer {
 	public:
 		static void PushObject(luaext::State L, std::string_view n, BB::IObject* obj, int id = 0, void(*onWrite)(int id) = nullptr, shok::ClassId c = shok::ClassId::Invalid, void** owner = nullptr);
 		static void PushObject(luaext::State L, std::string_view n, void* obj, const BB::SerializationData* sd, int id = 0, void(*onWrite)(int id) = nullptr);
+
+		static constexpr std::array LuaMethods{
+			luaext::FuncReference::GetRef<Name>("Name"),
+			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
+			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
+		};
 	};
 
-	class StructAccess;
-	class BBObjectAccess;
-	class ListAccess;
 	class FieldAccess : public ObjectAccess {
 	public:
 		static int GetType(luaext::State L);
@@ -198,16 +205,13 @@ namespace CppLogic::Serializer {
 
 		using ObjectAccess::ObjectAccess;
 
+		using InheritsFrom = std::tuple<ObjectAccess>;
+
 		static constexpr std::array LuaMethods{
-			luaext::FuncReference::GetRef<Name>("Name"),
 			luaext::FuncReference::GetRef<GetType>("GetType"),
 			luaext::FuncReference::GetRef<DataType>("DataType"),
 			luaext::FuncReference::GetRef<Get>("Get"),
 			luaext::FuncReference::GetRef<Set>("Set"),
-			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 	};
 
@@ -222,15 +226,12 @@ namespace CppLogic::Serializer {
 
 		using ObjectAccess::ObjectAccess;
 
+		using InheritsFrom = std::tuple<ObjectAccess>;
+
 		static constexpr std::array LuaMethods{
-			luaext::FuncReference::GetRef<Name>("Name"),
 			luaext::FuncReference::GetRef<GetType>("GetType"),
 			luaext::FuncReference::GetRef<Fields>("Fields"),
 			luaext::FuncReference::GetRef<Index>("Get"),
-			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 
 		struct Iter {
@@ -268,20 +269,15 @@ namespace CppLogic::Serializer {
 		static int New(luaext::State L);
 		static int IsNullptr(luaext::State L);
 
+		using InheritsFrom = std::tuple<StructAccess>;
+
 		BBObjectAccess(std::string_view name, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id), void** owner = nullptr);
 
 		static constexpr std::array LuaMethods{
-			luaext::FuncReference::GetRef<Name>("Name"),
 			luaext::FuncReference::GetRef<GetType>("GetType"),
-			luaext::FuncReference::GetRef<Fields>("Fields"),
-			luaext::FuncReference::GetRef<Index>("Get"),
 			luaext::FuncReference::GetRef<ObjectType>("ObjectType"),
 			luaext::FuncReference::GetRef<New>("New"),
 			luaext::FuncReference::GetRef<IsNullptr>("IsNullptr"),
-			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 	};
 
@@ -302,8 +298,9 @@ namespace CppLogic::Serializer {
 
 		using ObjectAccess::ObjectAccess;
 
+		using InheritsFrom = std::tuple<ObjectAccess>;
+
 		static constexpr std::array LuaMethods{
-			luaext::FuncReference::GetRef<Name>("Name"),
 			luaext::FuncReference::GetRef<GetType>("GetType"),
 			luaext::FuncReference::GetRef<Elements>("Elements"),
 			luaext::FuncReference::GetRef<Size>("Size"),
@@ -312,10 +309,6 @@ namespace CppLogic::Serializer {
 			luaext::FuncReference::GetRef<Remove>("Remove"),
 			luaext::FuncReference::GetRef<ListType>("ListType"),
 			luaext::FuncReference::GetRef<InsertAt>("InsertAt"),
-			luaext::FuncReference::GetRef<AsSubClass<FieldAccess>>("AsFieldAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<StructAccess>>("AsStructAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
-			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
 
 	private:

@@ -64,16 +64,16 @@ namespace EScr {
 	public:
 		virtual int __stdcall GetRefToFunc() = 0;
 
-		lua::State L = nullptr;
+		luaext::State L{nullptr};
 		bool NeedsCompile = true;
 		PADDING(3);
-		int Ref = lua::State::NoRef.Value(); // 3
+		int Ref = luaext::State::NoRef.Value(); // 3
 
 		void Clear();
 		void CreateRef(); // unrefs anything previously refd
 		bool CheckRef(); // creates if not already done, then return if the ref is valid
 		bool Call(int nargs, int nres); // uses shok error handling, so you get a popup on errors
-		void SetState(lua::State l); // removes from prev StateAddon and adds to new one (both with null check)
+		void SetState(luaext::State l); // removes from prev StateAddon and adds to new one (both with null check)
 
 		static inline constexpr int vtp = 0x786bd0;
 	};
@@ -87,7 +87,7 @@ namespace EScr {
 		virtual int __stdcall GetRefToFunc() override;
 		void SetCommandString(const char* c);
 
-		void ReplaceFunc(lua::State L, int idx);
+		void ReplaceFunc(luaext::State L, int idx);
 
 		static inline constexpr int vtp = 0x786BE0;
 		static inline constexpr int TypeDesc = 0x83B83C;

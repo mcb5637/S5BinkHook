@@ -6,14 +6,14 @@
 
 namespace CppLogic::Serializer {
 	class SchemaGenerator {
-		static void PushUnknownFieldSerializers(lua::State L, const BB::SerializationData* d);
-		static void PushUnknownFieldSerializersSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, lua::State L);
-		static void PushUnknownListOptions(lua::State L, const BB::SerializationData* d);
-		static void PushUnknownListOptionsSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, lua::State L);
+		static void PushUnknownFieldSerializers(luaext::State L, const BB::SerializationData* d);
+		static void PushUnknownFieldSerializersSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, luaext::State L);
+		static void PushUnknownListOptions(luaext::State L, const BB::SerializationData* d);
+		static void PushUnknownListOptionsSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, luaext::State L);
 
 	public:
-		static void PushUnknownFieldSerializers(lua::State L);
-		static void PushUnknownListOptions(lua::State L);
+		static void PushUnknownFieldSerializers(luaext::State L);
+		static void PushUnknownListOptions(luaext::State L);
 
 		static void WriteAllClassesSchema(BB::IStream& f);
 

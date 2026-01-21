@@ -67,7 +67,7 @@ namespace CppLogic::MagicEnum {
 			return magic_enum::enum_name(id).data();
 		}
 
-		void PushToState(lua::State L) const {
+		void PushToState(luaext::State L) const {
 			L.NewTable();
 			for (const auto& [id, name] : entries) {
 				L.Push(name);

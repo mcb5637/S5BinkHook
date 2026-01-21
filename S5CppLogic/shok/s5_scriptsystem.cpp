@@ -217,13 +217,13 @@ bool EScr::CLuaFuncRef::Call(int nargs, int nres)
 {
 	return funcref_call(this, nargs, nres);
 }
-inline void(__stdcall* const funcref_setstate)(EScr::CLuaFuncRef* th, lua::State L) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRef*, lua::State)>(0x5A1617);
-void EScr::CLuaFuncRef::SetState(lua::State l)
+inline void(__stdcall* const funcref_setstate)(EScr::CLuaFuncRef* th, luaext::State L) = reinterpret_cast<void(__stdcall*)(EScr::CLuaFuncRef*, luaext::State)>(0x5A1617);
+void EScr::CLuaFuncRef::SetState(luaext::State l)
 {
 	funcref_setstate(this, l);
 }
 
-void EScr::CLuaFuncRefCommand::ReplaceFunc(lua::State L, int idx)
+void EScr::CLuaFuncRefCommand::ReplaceFunc(luaext::State L, int idx)
 {
 	StateAddon::HookSetAllRecompile();
 	CheckRef();
@@ -256,19 +256,19 @@ void EScr::CLuaFuncRefGlobal::HookFuncAccess(bool active)
 int __stdcall EScr::CLuaFuncRefGlobal::GetRefOverride()
 {
 	int t = L.GetTop();
-	lua::Reference r = lua::State::NoRef;
+	luaext::Reference r = luaext::State::NoRef;
 	if (FuncName.size() == 0)
 		return r.Value();
 	L.Push(FuncName);
 	L.GetGlobal();
 	if (L.IsFunction(-1)) {
-		r = L.Ref(lua::State::REGISTRYINDEX);
+		r = L.Ref(luaext::State::REGISTRYINDEX);
 	}
 	else {
 		try {
 			L.DoStringT(std::format("return {};", static_cast<std::string_view>(FuncName)), "EScr::CLuaFuncRefGlobal::GetRefOverride");
 			if (L.IsFunction(-1)) {
-				r = L.Ref(lua::State::REGISTRYINDEX);
+				r = L.Ref(luaext::State::REGISTRYINDEX);
 			}
 		}
 		catch (const lua::LuaException&) {}

@@ -22,7 +22,7 @@ static std::string CheckFieldSerializerTypes(const BB::FieldSerializer* f) {
 	return "";
 }
 
-void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::State L, const BB::SerializationData* d)
+void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(luaext::State L, const BB::SerializationData* d)
 {
 	if (d == nullptr)
 		return;
@@ -49,12 +49,12 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::Sta
 	}
 }
 
-void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializersSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, lua::State L)
+void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializersSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, luaext::State L)
 {
 	PushUnknownFieldSerializers(L, cl);
 }
 
-void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L, const BB::SerializationData* d)
+void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(luaext::State L, const BB::SerializationData* d)
 {
 	if (d == nullptr)
 		return;
@@ -118,12 +118,12 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L,
 	}
 }
 
-void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptionsSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, lua::State L)
+void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptionsSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, luaext::State L)
 {
 	PushUnknownListOptions(L, cl);
 }
 
-void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::State L)
+void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(luaext::State L)
 {
 	L.NewTable();
 	auto* f = *BB::CClassFactory::GlobalObj;
@@ -135,7 +135,7 @@ void CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(lua::Sta
 	ForAllChoosesClasses<PushUnknownFieldSerializersSpecific>(L);
 }
 
-void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(lua::State L)
+void CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(luaext::State L)
 {
 	L.NewTable();
 	auto* f = *BB::CClassFactory::GlobalObj;

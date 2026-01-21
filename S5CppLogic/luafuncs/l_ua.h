@@ -60,7 +60,7 @@ namespace CppLogic::UA {
 		shok::Position Target = { -1,-1 };
 		bool ReMove = false, IgnoreFleeing = false, PrepDefense = false, SabotageBridges = false;
 		bool DoNotNormalizeSpeed = false;
-		luaext::State L = nullptr;
+		luaext::State L{nullptr};
 		luaext::Reference Formation = luaext::State::NoRef, CommandQueue = luaext::State::NoRef, Spawner = luaext::State::NoRef;
 		float AutoRotateFormation = -1;
 		float LastRotation = 0;

@@ -271,10 +271,10 @@ public:
 	}
 };
 
-std::string BBExceptionConverter(std::exception_ptr ex, const char* funcsig)
+std::string BBExceptionConverter(std::string_view funcsig)
 {
 	try {
-		std::rethrow_exception(ex);
+		throw;
 	}
 	catch (const BB::CException& e) {
 		char buff[200]{};
@@ -352,7 +352,7 @@ void OnSaveDone(const char* path, const char* savename) {
 }
 
 void InitGame() {
-	lua::v50::ExceptionConverter = &BBExceptionConverter;
+	luaext::State::GetExConv() = &BBExceptionConverter;
 	Framework::CMain::HookModeChange();
 	Framework::CMain::OnModeChange = &OnFrameworkChangeMode;
 	Framework::CMain::OnSaveLoaded = &OnSaveLoaded;

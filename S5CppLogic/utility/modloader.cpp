@@ -26,6 +26,7 @@
 #include <utility/StringUtility.h>
 #include <utility/WinAPIUtil.h>
 #include <utility/savegame_extra.h>
+#include <utility/ModPlayers.h>
 
 #ifdef DEBUG_FUNCS
 #define RESERIALIZE_NO_DIALOG
@@ -1468,6 +1469,13 @@ int CppLogic::ModLoader::ModLoader::GetFeedbackEventMem(luaext::State l) {
 		throw lua::LuaException{"could not find SoundData"};
 	auto* e = ev->second;
 	Serializer::ObjectAccess::PushObject(L, "ModLoader.GetFeedbackEventMem", e, GGUI::SoundFeedback::FeedbackEventSoundData::SerializationData);
+	return 1;
+}
+
+int CppLogic::ModLoader::ModLoader::SetMaxPlayers(luaext::State L) {
+	Mod::Player::ExtraPlayerManager::Hook();
+	Mod::Player::ExtraPlayerManager::GlobalObj().SetMaxPlayer(static_cast<shok::PlayerId>(L.CheckInt(1)));
+	L.Push(Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer());
 	return 1;
 }
 

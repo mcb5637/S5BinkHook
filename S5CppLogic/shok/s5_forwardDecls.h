@@ -264,4 +264,8 @@ namespace CppLogic {
 	std::pair<GGlue::TerrainTypeLogicData*, GGlue::TerrainTypeDisplayData*> GetTerrainType(shok::TerrainTypeId id);
 	EGL::CGLEAnimSet* GetAnimSet(shok::AnimSetId id);
 	GGL::ExperienceClass* GetExperienceClass(shok::ExperienceClass id);
+
+	namespace Mod::Player {
+		class ExtraPlayerManager;
+	}
 }

@@ -5,6 +5,7 @@
 #include <shok/s5_scriptsystem.h>
 #include <shok/entity/s5_entity.h>
 #include <utility/hooks.h>
+#include <utility/ModPlayers.h>
 
 static inline int(__thiscall* const plattracthandlerGetAttLimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C216F);
 int GGL::CPlayerAttractionHandler::GetAttractionLimit()
@@ -541,6 +542,20 @@ bool GGL::CPlayerStatus::ArePlayersFriendly(shok::PlayerId p1, shok::PlayerId p2
 }
 
 bool (*GGL::CPlayerStatus::CanPlaceBuildingCallback)(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId) = nullptr;
+
+bool Player_HookExtraPlayers = false;
+void GGL::CPlayerStatus::HookExtraPlayers() {
+	if (Player_HookExtraPlayers)
+		return;
+	Player_HookExtraPlayers = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x100, {
+		reinterpret_cast<void*>(0x4b4d74),
+		reinterpret_cast<void*>(0x4b4d5b),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4b4d74), &SetDiploExtra, reinterpret_cast<void*>(0x4b4d7e));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4b4d5b), &GetDiploExtra, reinterpret_cast<void*>(0x4b4d62));
+}
+
 int __stdcall GGL::CPlayerStatus::CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId)
 {
 	if (GGL::CPlayerStatus::CanPlaceBuildingCallback)
@@ -572,6 +587,15 @@ void GGL::CPlayerStatus::CanPlaceBuildingHookASM() {
 		ret;
 	}
 }
+
+bool __thiscall GGL::CPlayerStatus::SetDiploExtra(PlayerDiplomacyManager *th, shok::PlayerId p, shok::DiploState d) {
+	return CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().SetDiplomacy(th->PlayerID, p, d);
+}
+
+shok::DiploState __thiscall GGL::CPlayerStatus::GetDiploExtra(PlayerDiplomacyManager *th, shok::PlayerId p) {
+	return CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetDiplomacy(th->PlayerID, p);
+}
+
 bool HookCanPlaceBuilding_Hooked = false;
 void GGL::CPlayerStatus::HookCanPlaceBuilding()
 {

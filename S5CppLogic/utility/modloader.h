@@ -378,6 +378,7 @@ namespace CppLogic::ModLoader {
 		static int GetTechnologyMem(luaext::State l);
 		static int GetEffectTypeMem(luaext::State l);
 		static int GetFeedbackEventMem(luaext::State l);
+		static int SetMaxPlayers(luaext::State L);
 
 		static constexpr std::array LuaFuncs{
 				luaext::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -400,6 +401,7 @@ namespace CppLogic::ModLoader {
 				luaext::FuncReference::GetRef<GetTechnologyMem>("GetTechnologyMem"),
 				luaext::FuncReference::GetRef<GetEffectTypeMem>("GetEffectTypeMem"),
 				luaext::FuncReference::GetRef<GetFeedbackEventMem>("GetFeedbackEventMem"),
+				luaext::FuncReference::GetRef<SetMaxPlayers>("SetMaxPlayers"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{

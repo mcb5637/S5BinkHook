@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <memory>
 #include <shok/s5_forwardDecls.h>
 #include <shok/globals/s5_maplogic.h>
@@ -8,8 +9,6 @@
 
 // EGL::CGLEGameLogic::StartMap loads max number of players from mapdata.xml, override
 // then activates EGL players
-
-// search for access 4d6a71
 
 // GGL has a callback that initializes GGL player after EGL one
 
@@ -23,15 +22,23 @@ namespace CppLogic::Mod::Player {
         };
 
         std::vector<ExtraPlayer> ExtraPlayers;
+        std::map<std::pair<shok::PlayerId, shok::PlayerId>, shok::DiploState> Diplomacy;
 
     public:
         static ExtraPlayerManager& GlobalObj();
 
         ExtraPlayer& GetExtra(shok::PlayerId p);
         ExtraPlayer* TryGetExtra(shok::PlayerId p);
-        std::pair<EGL::PlayerManager::Player&, GGL::CPlayerStatus&> Get(shok::PlayerId p);
-        std::pair<EGL::PlayerManager::Player*, GGL::CPlayerStatus*> TryGet(shok::PlayerId p);
+        EGL::PlayerManager::Player& GetEGL(shok::PlayerId p);
+        EGL::PlayerManager::Player* TryGetEGL(shok::PlayerId p);
+        GGL::CPlayerStatus& GetGGL(shok::PlayerId p);
+        GGL::CPlayerStatus* TryGetGGL(shok::PlayerId p);
         void Clear();
         void SetMaxPlayer(shok::PlayerId p);
+        shok::DiploState GetDiplomacy(shok::PlayerId p, shok::PlayerId p2);
+        bool SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState d);
+        [[nodiscard]] shok::PlayerId GetMaxPlayer() const;
+
+        static void Hook();
     };
 }

@@ -348,6 +348,7 @@ namespace GGL {
 	//constexpr int i = offsetof(CGameStatistics, MotivationTimeLine) / 4;
 
 	class PlayerDiplomacyManager {
+	public:
 		shok::PlayerId PlayerID{};
 		shok::Array<shok::DiploState, 9> DiplomacyState;
 
@@ -422,9 +423,13 @@ namespace GGL {
 
 		virtual ~CPlayerStatus() override;
 
+		static void HookExtraPlayers();
+
 	private:
 		static int __stdcall CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
 		static void NAKED_DECL CanPlaceBuildingHookASM();
+		static bool __thiscall SetDiploExtra(PlayerDiplomacyManager* th, shok::PlayerId p, shok::DiploState d);
+		static shok::DiploState __thiscall GetDiploExtra(PlayerDiplomacyManager* th, shok::PlayerId p);
 	};
 	static_assert(sizeof(CPlayerStatus) == 804);
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;

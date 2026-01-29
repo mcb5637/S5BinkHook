@@ -6,6 +6,8 @@
 #include <shok/s5_baseDefs.h>
 
 namespace EGL {
+	class CMapProps;
+
 	class ITerrainVertexColors {
 	public:
 		virtual ~ITerrainVertexColors() = default;
@@ -359,6 +361,8 @@ namespace EGL {
 		static CPlayerExplorationHandler* __stdcall ExtraGetExplorationHandlerByPlayer(shok::PlayerId pl);
 		static CEntityVectorMap* __stdcall ExtraGetEntityVectorMapByPlayer(shok::PlayerId pl);
 		static CPlayerFeedbackHandler* __stdcall ExtraGetFeedbackByPlayer(shok::PlayerId pl);
+		static void NAKED_DECL ExtraLoadPlayerNumberASM();
+		static void __stdcall ExtraLoadPlayerNumber(EGL::CMapProps* p);
 	};
 	static_assert(sizeof(EGL::PlayerManager::Player) * 9 + 4 == 184);
 	static_assert(offsetof(EGL::PlayerManager, ExplorationUpdate) == 46 * 4);
@@ -539,6 +543,7 @@ namespace GGL {
 	};
 
 	class PlayerManager { // name from the file in savegames
+		friend class CppLogic::Mod::Player::ExtraPlayerManager;
 	public:
 		struct PlayerData {
 			PADDINGI(1);
@@ -555,6 +560,7 @@ namespace GGL {
 
 
 		static void HookExtraPlayers();
+		CPlayerStatus* GetPlayerRaw(shok::PlayerId p);
 	private:
 		static GGL::CPlayerStatus* __stdcall ExtraGetPlayer(shok::PlayerId p);
 		void __thiscall ExtraCreatePlayer(shok::PlayerId p);

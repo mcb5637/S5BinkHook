@@ -24,7 +24,7 @@ CppLogic::Mod::Player::ExtraPlayerManager::ExtraPlayer* CppLogic::Mod::Player::E
 EGL::PlayerManager::Player & CppLogic::Mod::Player::ExtraPlayerManager::GetEGL(shok::PlayerId p) {
     if (p <= shok::PlayerId::P8)
         return (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng->Players.Data[static_cast<size_t>(p)];
-    auto&[e, g] = GetExtra(p);
+    auto&[e, g, c] = GetExtra(p);
     return e;
 }
 
@@ -34,7 +34,7 @@ EGL::PlayerManager::Player * CppLogic::Mod::Player::ExtraPlayerManager::TryGetEG
     auto* ex = TryGetExtra(p);
     if (ex == nullptr)
         return nullptr;
-    auto&[e, g] = *ex;
+    auto&[e, g, c] = *ex;
     return &e;
 }
 
@@ -42,7 +42,7 @@ GGL::CPlayerStatus & CppLogic::Mod::Player::ExtraPlayerManager::GetGGL(shok::Pla
     if (p <= shok::PlayerId::P8)
         return
             *(*GGL::CGLGameLogic::GlobalObj)->Players->GetPlayerRaw(p);
-    auto&[e, g] = GetExtra(p);
+    auto&[e, g, c] = GetExtra(p);
     return *g;
 }
 
@@ -52,8 +52,12 @@ GGL::CPlayerStatus * CppLogic::Mod::Player::ExtraPlayerManager::TryGetGGL(shok::
     auto* ex = TryGetExtra(p);
     if (ex == nullptr)
         return nullptr;
-    auto&[e, g] = *ex;
+    auto&[e, g, c] = *ex;
     return g.get();
+}
+
+int & CppLogic::Mod::Player::ExtraPlayerManager::ColorMapping(shok::PlayerId p) {
+    return ExtraPlayers.at(static_cast<size_t>(p) - static_cast<size_t>(shok::PlayerId::P8) - 1).PlayerColorMapping;
 }
 
 void CppLogic::Mod::Player::ExtraPlayerManager::Clear() {
@@ -62,6 +66,9 @@ void CppLogic::Mod::Player::ExtraPlayerManager::Clear() {
 
 void CppLogic::Mod::Player::ExtraPlayerManager::SetMaxPlayer(shok::PlayerId p) {
     ExtraPlayers.resize(static_cast<size_t>(p) - static_cast<size_t>(shok::PlayerId::P8));
+    for (size_t i = 0; i < ExtraPlayers.size(); ++i) {
+        ExtraPlayers[i].PlayerColorMapping = static_cast<int>(i) + 8;
+    }
 }
 
 shok::DiploState CppLogic::Mod::Player::ExtraPlayerManager::GetDiplomacy(shok::PlayerId p, shok::PlayerId p2) {
@@ -88,4 +95,5 @@ shok::PlayerId CppLogic::Mod::Player::ExtraPlayerManager::GetMaxPlayer() const {
 void CppLogic::Mod::Player::ExtraPlayerManager::Hook() {
     EGL::PlayerManager::HookExtraPlayers();
     GGL::PlayerManager::HookExtraPlayers();
+    ED::CPlayerColors::HookExtraPlayers();
 }

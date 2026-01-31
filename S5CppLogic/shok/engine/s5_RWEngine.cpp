@@ -2,6 +2,12 @@
 #include <shok/globals/s5_mapdisplay.h>
 
 inline void(__cdecl* const vec3d_transform)(RWE::RwV3d* ou, const RWE::RwV3d* i, const RWE::RwMatrix* m) = reinterpret_cast<void(__cdecl*)(RWE::RwV3d*, const RWE::RwV3d*, const RWE::RwMatrix*)>(0x41C770);
+
+void RWE::RwRGBAReal::FromShokColor(shok::Color c) {
+    auto f = reinterpret_cast<void(__thiscall*)(RWE::RwRGBAReal*, shok::Color*)>(0x469872);
+    f(this, &c);
+}
+
 RWE::RwV3d RWE::RwV3d::Transform(const RwMatrix* matrix) const
 {
     RwV3d r{};

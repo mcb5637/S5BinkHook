@@ -71,6 +71,8 @@ namespace RWE {
 		float green = 0.0f;
 		float blue = 0.0f;
 		float alpha = 0.0f;
+
+		void FromShokColor(shok::Color c);
 	};
 	struct RwTexCoords
 	{
@@ -526,6 +528,8 @@ namespace RWE {
 
 		// 6ED550 RpSkinAtomicSetHAnimHierarchy
 		// 6ED570 RpSkinAtomicGetHAnimHierarchy
+
+		// 629120 RpAtomicRegisterPlugin
 
 		// 492184 BB get "3dsmax User Properties" userdata of frame (ret RpUserDataArray*)
 

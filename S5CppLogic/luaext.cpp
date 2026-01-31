@@ -5,6 +5,7 @@
 #include <shok/ui/s5_widget.h>
 #include <shok/effect/s5_effects.h>
 #include <shok/globals/s5_entityandeffectmanager.h>
+#include <utility/ModPlayers.h>
 
 EGL::CGLEEntity* luaext::detail::OptEntity(State L, int i)
 {
@@ -182,7 +183,7 @@ shok::PlayerId luaext::detail::CheckPlayerId(State L, int idx, bool allowZero)
 	int p = L.CheckInt(idx);
 	if (!allowZero && p == 0)
 		throw lua::LuaException{ std::format("player 0 invalid at {}", idx) };
-	if (p < 0 || p > 8)
+	if (p < 0 || p > static_cast<int>(CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer()))
 		throw lua::LuaException{ std::format("player {} invalid at {}", p, idx) };
 	return static_cast<shok::PlayerId>(p);
 }

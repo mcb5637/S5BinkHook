@@ -179,12 +179,33 @@ namespace BBRw {
 		static inline CEngine** const GlobalObj = reinterpret_cast<CEngine**>(0x8595E8); // technically IEngine, but CEngine is the only thing that ever ends up here
 	};
 
+	class IEffectPipeline {
+	public:
+		virtual ~IEffectPipeline() = default;
+
+		static inline constexpr int vtp = 0x76D268;
+	};
+
+	class CEffectPipelineBase : public IEffectPipeline {
+	public:
+
+		static inline constexpr int vtp = 0x76d278;
+	};
+
+	class CEffectPipelineVS : public CEffectPipelineBase {
+	public:
+
+		static inline constexpr int vtp = 0x76c2d4;
+	};
+
 	// size 4*4, id 0x44574D02, 48F466 attach
 	struct UnnamedAtomicPlugin { // NOLINT(*-pro-type-member-init)
-		PADDINGI(2);
+		PADDINGI(2); // 0 some sort of shared ptr?
 		byte SrcBlend, DestBlend; // RwBlendFunction truncated to byte
 		byte PlayerColor;
 		byte Flags; // 0x8 has skin, 0x20 has terraindecal?
+
+		// ctor 48f3f4
 	};
 
 	// size 7*4, id 0x44574D01, 473344 attach

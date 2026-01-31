@@ -6,6 +6,8 @@
 #include <shok/globals/s5_classfactory.h>
 #include <shok/globals/s5_glue.h>
 #include <shok/engine/s5_RWE_anim.h>
+#include <utility/hooks.h>
+#include <utility/ModPlayers.h>
 
 
 bool ED::CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)
@@ -132,6 +134,43 @@ static inline void(__thiscall* const playercolors_refresh)(ED::CPlayerColors* th
 void ED::CPlayerColors::RefreshPlayerColors()
 {
 	playercolors_refresh(this);
+}
+
+bool HookExtraPlayers_Hooked = false;
+void ED::CPlayerColors::HookExtraPlayers() {
+	if (HookExtraPlayers_Hooked)
+		return;
+	HookExtraPlayers_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
+		reinterpret_cast<void*>(0x4699b9),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4699b9), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerColors::RefreshPlayerColorsExtra, 0), reinterpret_cast<void*>(0x4699bf));
+}
+
+void ED::CPlayerColors::RefreshPlayerColorsExtra() {
+	static std::vector<RWE::RwRGBAReal> ModelColors{};
+	static std::vector<PlayerUIColor> UIColors{};
+
+	auto& ep = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+	int numPl = static_cast<int>(ep.GetMaxPlayer());
+	ModelColors.resize(numPl + 1);
+	UIColors.resize(numPl + 1);
+
+	for (int i = 0; i < 8 + 1; ++i) {
+		int mapping = PlayerColorMapping[i];
+		const auto& uic = ConfigColors[mapping];
+		UIColors[i] = {.B = uic.B, .G = uic.G, .R = uic.R, .A = uic.A};
+		ModelColors[i].FromShokColor(uic);
+	}
+	for (int i = 9; i < numPl; ++i) {
+		int mapping = ep.ColorMapping(static_cast<shok::PlayerId>(i));
+		const auto& uic = ConfigColors[mapping];
+		UIColors[i] = {.B = uic.B, .G = uic.G, .R = uic.R, .A = uic.A};
+		ModelColors[i].FromShokColor(uic);
+	}
+
+	*GlobalPlayerModelColors = ModelColors.data();
+	*GlobalPlayerUIColors = UIColors.data();
 }
 
 void ED::CCommandAcknowledgements::ShowAck(const shok::Position& pos)

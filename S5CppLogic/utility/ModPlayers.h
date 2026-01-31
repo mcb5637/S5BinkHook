@@ -2,6 +2,7 @@
 #include <map>
 #include <memory>
 #include <shok/s5_forwardDecls.h>
+#include <shok/globals/s5_mapdisplay.h>
 #include <shok/globals/s5_maplogic.h>
 #include <shok/player/s5_player.h>
 
@@ -19,6 +20,7 @@ namespace CppLogic::Mod::Player {
         struct ExtraPlayer {
             EGL::PlayerManager::Player EPlayer;
             std::unique_ptr<GGL::CPlayerStatus> GPlayer;
+            int PlayerColorMapping;
         };
 
         std::vector<ExtraPlayer> ExtraPlayers;
@@ -33,6 +35,7 @@ namespace CppLogic::Mod::Player {
         EGL::PlayerManager::Player* TryGetEGL(shok::PlayerId p);
         GGL::CPlayerStatus& GetGGL(shok::PlayerId p);
         GGL::CPlayerStatus* TryGetGGL(shok::PlayerId p);
+        int& ColorMapping(shok::PlayerId p);
         void Clear();
         void SetMaxPlayer(shok::PlayerId p);
         shok::DiploState GetDiplomacy(shok::PlayerId p, shok::PlayerId p2);

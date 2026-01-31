@@ -271,6 +271,9 @@ namespace ED {
 		virtual void Destroy() = 0;
 		virtual void Init() = 0;
 		virtual void SetPlayerColorMapping(shok::PlayerId pid, int col) = 0;
+
+
+		static inline constexpr int vtp = 0x76962c;
 	};
 	class CPlayerColors : public IPlayerColors {
 	public:
@@ -292,6 +295,13 @@ namespace ED {
 		shok::Color GetColorByIndex(int i);
 		void SetColorByIndex(int i, shok::Color c);
 		void RefreshPlayerColors();
+
+		static inline RWE::RwRGBAReal** const GlobalPlayerModelColors = reinterpret_cast<RWE::RwRGBAReal**>(0x858f98);
+		static inline PlayerUIColor** const GlobalPlayerUIColors = reinterpret_cast<PlayerUIColor**>(0x858f9c);
+
+		static void HookExtraPlayers();
+	private:
+		void RefreshPlayerColorsExtra();
 	};
 	static_assert(offsetof(CPlayerColors, CurrentPlayerUIColors) == 1 * 4);
 	static_assert(offsetof(CPlayerColors, CurrentPlayerModelColors) == 19 * 4);

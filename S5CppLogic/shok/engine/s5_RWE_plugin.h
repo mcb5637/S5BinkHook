@@ -190,6 +190,19 @@ namespace RWE::Plugin {
 		int32_t          staticAlloc;
 		RwPluginRegEntry* firstRegEntry;
 		RwPluginRegEntry* lastRegEntry;
+
+
+		RWE::Plugin::RwPluginRegistry* frameTKList = reinterpret_cast<RWE::Plugin::RwPluginRegistry*>(0x8019A0);
+		RWE::Plugin::RwPluginRegistry* clumpTKList = reinterpret_cast<RWE::Plugin::RwPluginRegistry*>(0x842528);
+		RWE::Plugin::RwPluginRegistry* atomicTKList = reinterpret_cast<RWE::Plugin::RwPluginRegistry*>(0x842510);
+
+		// 4147D0 _rwPluginRegistryAddPlugin
+		// 4149E0 _rwPluginRegistryInitObject
+		// 414A40 _rwPluginRegistryDeInitObject
+		// 414A70 _rwPluginRegistryCopyObject
+		// 625DE0 _rwPluginRegistryAddPluginStream
+		// 4147A0 _rwPluginRegistryGetPluginOffset
+		// 40fce0 RwEngineRegisterPlugin
 	};
 
 	struct RwPluginRegEntry
@@ -209,16 +222,6 @@ namespace RWE::Plugin {
 		RwPluginRegEntry* nextRegEntry;
 		RwPluginRegEntry* prevRegEntry;
 		RwPluginRegistry* parentRegistry;
-
-		RWE::Plugin::RwPluginRegistry* frameTKList = reinterpret_cast<RWE::Plugin::RwPluginRegistry*>(0x8019A0);
-		RWE::Plugin::RwPluginRegistry* clumpTKList = reinterpret_cast<RWE::Plugin::RwPluginRegistry*>(0x842528);
-
-		// 4147D0 _rwPluginRegistryAddPlugin
-		// 4149E0 _rwPluginRegistryInitObject
-		// 414A40 _rwPluginRegistryDeInitObject
-		// 414A70 _rwPluginRegistryCopyObject
-		// 625DE0 _rwPluginRegistryAddPluginStream
-		// 4147A0 _rwPluginRegistryGetPluginOffset
 	};
 
 }

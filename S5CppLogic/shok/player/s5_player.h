@@ -343,6 +343,8 @@ namespace GGL {
 		void AddTechResearched(shok::TechnologyId tech);
 		void OnResRefined(shok::ResourceType rt, float am);
 		void OnResMined(shok::ResourceType rt, float am); // use normal res type, not raw
+
+		// tick 4c1939
 	};
 	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
 	//constexpr int i = offsetof(CGameStatistics, MotivationTimeLine) / 4;
@@ -411,6 +413,7 @@ namespace GGL {
 		bool HasResourcesFeedback(const shok::CostInfo& c, bool feedback = true);
 
 		// ctor 4B6F6B
+		void Tick();
 
 		static bool ArePlayersHostile(shok::PlayerId p1, shok::PlayerId p2);
 		static bool ArePlayersFriendly(shok::PlayerId p1, shok::PlayerId p2);

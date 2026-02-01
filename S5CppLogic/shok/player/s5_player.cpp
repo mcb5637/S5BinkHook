@@ -526,6 +526,11 @@ bool GGL::CPlayerStatus::HasResourcesFeedback(const shok::CostInfo& c, bool feed
 	return playerstatus_hasresfeedback(this, &c, feedback);
 }
 
+void GGL::CPlayerStatus::Tick() {
+	auto f = reinterpret_cast<void(__thiscall*)(GGL::CPlayerStatus*)>(0x4b4bef);
+	f(this);
+}
+
 bool GGL::CPlayerStatus::ArePlayersHostile(shok::PlayerId p1, shok::PlayerId p2)
 {
 	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p1);

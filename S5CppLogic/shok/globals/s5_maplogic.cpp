@@ -951,9 +951,11 @@ void GGL::PlayerManager::HookExtraPlayers() {
 		CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
 			reinterpret_cast<void*>(0x4a91bc),
 			reinterpret_cast<void*>(0x4a9241),
+			reinterpret_cast<void*>(0x49bf45),
 		}};
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4a91bc), &ExtraGetPlayer, reinterpret_cast<void*>(0x4a91c3));
 		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4a9241), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::ExtraCreatePlayer, 0));
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x49bf45), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0));
 	}
 	GGL::CPlayerStatus::HookExtraPlayers();
 }
@@ -985,6 +987,16 @@ void __thiscall GGL::PlayerManager::ExtraCreatePlayer(shok::PlayerId p) {
 		if (pl.GPlayer != nullptr)
 			throw std::logic_error("player already exists");
 		pl.GPlayer = std::unique_ptr<CPlayerStatus>(make(p));
+	}
+}
+
+void GGL::PlayerManager::TickExtra() {
+	auto* egl = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
+	auto maxpl = static_cast<int>(CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer());
+	for (int p = 1; p <= maxpl; ++p) {
+		if (!egl->IsPlayerIngame(static_cast<shok::PlayerId>(p)))
+			continue;
+		GetPlayer(static_cast<shok::PlayerId>(p))->Tick();
 	}
 }
 

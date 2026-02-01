@@ -6,15 +6,6 @@
 #include <shok/globals/s5_maplogic.h>
 #include <shok/player/s5_player.h>
 
-// modloader allocates additional players
-
-// EGL::CGLEGameLogic::StartMap loads max number of players from mapdata.xml, override
-// then activates EGL players
-
-// GGL has a callback that initializes GGL player after EGL one
-
-// anything else?
-
 namespace CppLogic::Mod::Player {
     class ExtraPlayerManager {
         struct ExtraPlayer {

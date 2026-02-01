@@ -267,6 +267,8 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x81E57CD);
 
 		void SetPlayersToUpdate(int first, int last);
+
+		// tick 58cd20 (CPlayerExplorationHandler**)
 	};
 	static_assert(sizeof(CPlayerExplorationUpdate) == 9 * 4);
 
@@ -346,6 +348,8 @@ namespace EGL {
 		// activate player thiscall 575F63(pid)
 		// activate player callback 8973C8
 		// ctor 5757bd()
+
+		// tick 57590d
 
 		// seridata of this thing is 0x897508, but it is missing its guard
 		// fixed here
@@ -555,6 +559,7 @@ namespace GGL {
 		GGL::CPlayerStatus* GetPlayer(shok::PlayerId p);
 		// create player 4A9131 thiscall(pid)
 		// on egl player created 4A9218(pid, eglplayer)
+		// tick 4a91e3
 
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
 
@@ -564,6 +569,7 @@ namespace GGL {
 	private:
 		static GGL::CPlayerStatus* __stdcall ExtraGetPlayer(shok::PlayerId p);
 		void __thiscall ExtraCreatePlayer(shok::PlayerId p);
+		void TickExtra();
 	};
 	static_assert(sizeof(GGL::PlayerManager::Player) == 19 * 4);
 	static_assert(sizeof(GGL::PlayerManager) == 19 * 4);

@@ -136,6 +136,42 @@ void ED::CPlayerColors::RefreshPlayerColors()
 	playercolors_refresh(this);
 }
 
+void NAKED displayhealthbar_getcolorasm() { // player id in eax
+	__asm {
+		mov ecx, 0x858f9c;
+		mov ecx, [ecx];
+		mov ecx, [ecx + eax*4];
+		nop;
+		nop;
+		nop;
+		nop; // 3 should be enough
+		nop;
+		int3;
+	};
+}
+void NAKED displaysoldierboxes_getcolorasm() { // player id in eax
+	__asm {
+		mov ecx, 0x858f9c;
+		mov ecx, [ecx];
+		mov eax, [ecx + eax*4];
+		nop;
+		nop;
+		nop;
+		nop; // 3 should be enough
+		nop;
+		int3;
+	};
+}
+void NAKED displayminimap_getcolorasm() {
+	__asm {
+		mov ecx, ED::CPlayerColors::GlobalPlayerMinimapColor;
+		mov eax, [esi+0x18];
+		lea eax, [ecx + eax*4];
+		push 0x543f3e;
+		ret;
+	};
+}
+
 bool HookExtraPlayers_Hooked = false;
 void ED::CPlayerColors::HookExtraPlayers() {
 	if (HookExtraPlayers_Hooked)
@@ -143,34 +179,52 @@ void ED::CPlayerColors::HookExtraPlayers() {
 	HookExtraPlayers_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
 		reinterpret_cast<void*>(0x4699b9),
+		reinterpret_cast<void*>(0x540315),
+		reinterpret_cast<void*>(0x540581),
+		reinterpret_cast<void*>(0x543f2b),
 	}};
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4699b9), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerColors::RefreshPlayerColorsExtra, 0), reinterpret_cast<void*>(0x4699bf));
+	{
+		byte* repl = reinterpret_cast<byte*>(&displayhealthbar_getcolorasm);
+		for (byte* r = reinterpret_cast<byte*>(0x540315); r < reinterpret_cast<byte*>(0x540322); r++) {
+			*r = *repl;
+			++repl;
+		}
+	}
+	{
+		byte* repl = reinterpret_cast<byte*>(&displaysoldierboxes_getcolorasm);
+		for (byte* r = reinterpret_cast<byte*>(0x540581); r < reinterpret_cast<byte*>(0x54058e); r++) {
+			*r = *repl;
+			++repl;
+		}
+	}
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x543f2b), &displayminimap_getcolorasm, reinterpret_cast<void*>(0x543f3e));
 }
 
+shok::Color* ED::CPlayerColors::GlobalPlayerMinimapColor = nullptr;
 void ED::CPlayerColors::RefreshPlayerColorsExtra() {
 	static std::vector<RWE::RwRGBAReal> ModelColors{};
 	static std::vector<PlayerUIColor> UIColors{};
+	static std::vector<shok::Color> MinimapColor{};
 
 	auto& ep = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
-	int numPl = static_cast<int>(ep.GetMaxPlayer());
-	ModelColors.resize(numPl + 1);
-	UIColors.resize(numPl + 1);
+	auto* dp = (*ED::CGlobalsBaseEx::GlobalObj)->DisplayProps;
+	int maxPl = static_cast<int>(ep.GetMaxPlayer());
+	ModelColors.resize(maxPl + 1);
+	UIColors.resize(maxPl + 1);
+	MinimapColor.resize(maxPl + 1);
 
-	for (int i = 0; i < 8 + 1; ++i) {
-		int mapping = PlayerColorMapping[i];
+	for (int i = 0; i <= maxPl; ++i) {
+		int mapping = i < 9 ? PlayerColorMapping[i] : ep.ColorMapping(static_cast<shok::PlayerId>(i));
 		const auto& uic = ConfigColors[mapping];
 		UIColors[i] = {.B = uic.B, .G = uic.G, .R = uic.R, .A = uic.A};
 		ModelColors[i].FromShokColor(uic);
-	}
-	for (int i = 9; i < numPl; ++i) {
-		int mapping = ep.ColorMapping(static_cast<shok::PlayerId>(i));
-		const auto& uic = ConfigColors[mapping];
-		UIColors[i] = {.B = uic.B, .G = uic.G, .R = uic.R, .A = uic.A};
-		ModelColors[i].FromShokColor(uic);
+		MinimapColor[i] = dp->MiniMapColor.at(mapping);
 	}
 
 	*GlobalPlayerModelColors = ModelColors.data();
 	*GlobalPlayerUIColors = UIColors.data();
+	GlobalPlayerMinimapColor = MinimapColor.data();
 }
 
 void ED::CCommandAcknowledgements::ShowAck(const shok::Position& pos)

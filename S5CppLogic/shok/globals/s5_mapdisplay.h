@@ -298,6 +298,7 @@ namespace ED {
 
 		static inline RWE::RwRGBAReal** const GlobalPlayerModelColors = reinterpret_cast<RWE::RwRGBAReal**>(0x858f98);
 		static inline PlayerUIColor** const GlobalPlayerUIColors = reinterpret_cast<PlayerUIColor**>(0x858f9c);
+		static shok::Color* GlobalPlayerMinimapColor;
 
 		static void HookExtraPlayers();
 	private:

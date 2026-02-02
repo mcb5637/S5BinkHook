@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/mcb5637/s5xmlschema/master/modpack.xsd">
+	<LoaderPath>Data/ModPack/ExtraPlayers/ModPackLoader.lua</LoaderPath>
+	<ScriptPath>Data/ModPack/ExtraPlayers/ScriptLoader.lua</ScriptPath>
+	<MainmenuPath></MainmenuPath>
+	<Version>1.0.0</Version>
+	<Description></Description>
+	<DataMod>false</DataMod>
+	<ScriptMod>true</ScriptMod>
+	<MainmenuMod>false</MainmenuMod>
+	<ScriptLib>false</ScriptLib>
+	<KeepArchive>false</KeepArchive>
+	<UserRequestable>false</UserRequestable>
+</root>

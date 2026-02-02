@@ -1479,6 +1479,11 @@ int CppLogic::ModLoader::ModLoader::SetMaxPlayers(luaext::State L) {
 	return 1;
 }
 
+int CppLogic::ModLoader::ModLoader::GetMaxPlayers(luaext::State L) {
+	L.Push(Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer());
+	return 1;
+}
+
 void CppLogic::ModLoader::ModLoader::Log(luaext::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);

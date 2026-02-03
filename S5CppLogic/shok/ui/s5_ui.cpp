@@ -909,6 +909,11 @@ shok::EntityId GGUI::CManager::GetLastSelectedNonSoldier() const
 	return guimng_lastselnonsol(&SelectedEntities);
 }
 
+bool GGUI::CManager::CanSelectPlayer(shok::PlayerId p) const {
+	auto* f = reinterpret_cast<bool(__thiscall*)(const GGUI::CManager*, shok::PlayerId)>(0x52376b);
+	return f(this, p);
+}
+
 bool(*GGUI::CManager::PostEventCallback)(BB::CEvent* ev) = nullptr;
 bool(*GGUI::CManager::PostEventCallback2)(BB::CEvent* ev) = nullptr;
 // ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
@@ -944,6 +949,25 @@ void GGUI::CManager::DisableSelectionLimit(bool disable)
 bool GGUI::CManager::IsModifierPressed(shok::Keys modif)
 {
 	return EGUIX::CEventManager::GlobalObj()->IsModifierPressed(modif);
+}
+
+bool CManager_HookExtraPlayers = false;
+void GGUI::CManager::HookExtraPlayers() {
+
+	if (CManager_HookExtraPlayers)
+		return;
+	CManager_HookExtraPlayers = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
+		reinterpret_cast<void*>(0x52376b),
+		reinterpret_cast<void*>(0x523721),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x52376b), CppLogic::Hooks::MemberFuncPointerToVoid(&CManager::CanSelectPlayerExtra, 0), reinterpret_cast<void*>(0x523772));
+	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x523721), reinterpret_cast<void*>(0x52372b));
+	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x52372f), reinterpret_cast<void*>(0x52373f));
+}
+
+bool GGUI::CManager::CanSelectPlayerExtra(shok::PlayerId p) const {
+	return p == ControlledPlayer;
 }
 
 void GGUI::SoundFeedback::SoundDatas::ReloadData(shok::FeedbackEventShortenedId id) {

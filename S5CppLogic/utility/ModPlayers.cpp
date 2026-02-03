@@ -3,6 +3,7 @@
 #include <shok/s5_scriptsystem.h>
 #include <shok/events/s5_events.h>
 #include <shok/events/s5_netevents.h>
+#include <shok/ui/s5_ui.h>
 
 
 CppLogic::Mod::Player::ExtraPlayerManager& CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj() {
@@ -67,7 +68,7 @@ void CppLogic::Mod::Player::ExtraPlayerManager::Clear() {
 void CppLogic::Mod::Player::ExtraPlayerManager::SetMaxPlayer(shok::PlayerId p) {
     ExtraPlayers.resize(static_cast<size_t>(p) - static_cast<size_t>(shok::PlayerId::P8));
     for (size_t i = 0; i < ExtraPlayers.size(); ++i) {
-        ExtraPlayers[i].PlayerColorMapping = static_cast<int>(i) + 8;
+        ExtraPlayers[i].PlayerColorMapping = static_cast<int>(i) + 8 + 1;
     }
 }
 
@@ -96,4 +97,5 @@ void CppLogic::Mod::Player::ExtraPlayerManager::Hook() {
     EGL::PlayerManager::HookExtraPlayers();
     GGL::PlayerManager::HookExtraPlayers();
     ED::CPlayerColors::HookExtraPlayers();
+    GGUI::CManager::HookExtraPlayers();
 }

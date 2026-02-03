@@ -81,6 +81,17 @@ void CppLogic::Hooks::WriteNops(void* adr, void* nextvalid)
 		*a = 0x90;
 }
 
+void CppLogic::Hooks::ReplaceOpcodes(void *adr, void *replacement, void *adrEnd) {
+	auto* a = static_cast<byte*>(adr);
+	auto* r = static_cast<byte*>(replacement);
+	for (auto* i = a; i < adrEnd; ++i) {
+		*i = *r;
+		if (*r == 0xcc) // int3
+			throw std::logic_error{"end of replacement reached?"};
+		++r;
+	}
+}
+
 std::vector<void*> CppLogic::Hooks::CheckMemFree::ToFree{};
 void __stdcall CppLogic::Hooks::CheckMemFree::OnFree(void* p)
 {

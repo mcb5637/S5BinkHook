@@ -10,6 +10,7 @@ namespace CppLogic::Hooks {
 	void RestoreJumpBackup(void* adr, byte* backup);
 	void WriteNops(void* adr, int num);
 	void WriteNops(void* adr, void* nextvalid);
+	void ReplaceOpcodes(void* adr, void* replacement, void* adrEnd);
 
 
 	// allows read/write/execute of the memory location pointed to until it goes out of scope.

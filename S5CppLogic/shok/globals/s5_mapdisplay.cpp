@@ -184,20 +184,8 @@ void ED::CPlayerColors::HookExtraPlayers() {
 		reinterpret_cast<void*>(0x543f2b),
 	}};
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4699b9), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerColors::RefreshPlayerColorsExtra, 0), reinterpret_cast<void*>(0x4699bf));
-	{
-		byte* repl = reinterpret_cast<byte*>(&displayhealthbar_getcolorasm);
-		for (byte* r = reinterpret_cast<byte*>(0x540315); r < reinterpret_cast<byte*>(0x540322); r++) {
-			*r = *repl;
-			++repl;
-		}
-	}
-	{
-		byte* repl = reinterpret_cast<byte*>(&displaysoldierboxes_getcolorasm);
-		for (byte* r = reinterpret_cast<byte*>(0x540581); r < reinterpret_cast<byte*>(0x54058e); r++) {
-			*r = *repl;
-			++repl;
-		}
-	}
+	CppLogic::Hooks::ReplaceOpcodes(reinterpret_cast<void*>(0x540315), &displayhealthbar_getcolorasm, reinterpret_cast<void*>(0x540322));
+	CppLogic::Hooks::ReplaceOpcodes(reinterpret_cast<void*>(0x540581), &displaysoldierboxes_getcolorasm, reinterpret_cast<void*>(0x54058e));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x543f2b), &displayminimap_getcolorasm, reinterpret_cast<void*>(0x543f3e));
 }
 

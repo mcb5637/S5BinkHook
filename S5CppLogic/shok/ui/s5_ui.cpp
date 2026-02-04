@@ -951,6 +951,20 @@ bool GGUI::CManager::IsModifierPressed(shok::Keys modif)
 	return EGUIX::CEventManager::GlobalObj()->IsModifierPressed(modif);
 }
 
+void NAKED lua_getguicolor_getcolorasm() {
+	__asm {
+		mov eax, 0x858f9c;
+		mov eax, [eax];
+		lea eax, [eax + esi*4];
+		nop;
+		nop;
+		nop;
+		nop;
+		nop;
+		int3;
+	};
+}
+
 bool CManager_HookExtraPlayers = false;
 void GGUI::CManager::HookExtraPlayers() {
 
@@ -960,10 +974,13 @@ void GGUI::CManager::HookExtraPlayers() {
 	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
 		reinterpret_cast<void*>(0x52376b),
 		reinterpret_cast<void*>(0x523721),
+		reinterpret_cast<void*>(0x52372f),
+		reinterpret_cast<void*>(0x53a7d6),
 	}};
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x52376b), CppLogic::Hooks::MemberFuncPointerToVoid(&CManager::CanSelectPlayerExtra, 0), reinterpret_cast<void*>(0x523772));
 	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x523721), reinterpret_cast<void*>(0x52372b));
 	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x52372f), reinterpret_cast<void*>(0x52373f));
+	CppLogic::Hooks::ReplaceOpcodes(reinterpret_cast<void*>(0x53a7d6), &lua_getguicolor_getcolorasm, reinterpret_cast<void*>(0x53a7e2));
 }
 
 bool GGUI::CManager::CanSelectPlayerExtra(shok::PlayerId p) const {

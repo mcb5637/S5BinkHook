@@ -705,7 +705,7 @@ namespace GGUI {
 		// goes through CommandStates and returns the first valid one
 		GGUI::CBasicState* GetCommandStateFor(shok::EntityId entity, GGUI::CBasicState::TargetData* tdata, GGUI::CBasicState::ExecuteData* edata);
 		[[nodiscard]] shok::EntityId GetLastSelectedNonSoldier() const;
-		bool CanSelectPlayer(shok::PlayerId p) const;
+		[[nodiscard]] bool CanSelectPlayer(shok::PlayerId p) const;
 
 		// on minimap MouseL clicked 525A9A(x, y)
 		// scroll to pos (minimap click) cdecl 523D2D(shok::position*)
@@ -726,7 +726,7 @@ namespace GGUI {
 
 		static void HookExtraPlayers();
 	private:
-		bool CanSelectPlayerExtra(shok::PlayerId p) const;
+		[[nodiscard]] bool CanSelectPlayerExtra(shok::PlayerId p) const;
 	};
 	//constexpr int i = offsetof(CManager, CommandStates) / 4;
 

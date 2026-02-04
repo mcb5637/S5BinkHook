@@ -302,7 +302,8 @@ namespace ED {
 
 		static void HookExtraPlayers();
 	private:
-		void RefreshPlayerColorsExtra();
+		void RefreshPlayerColorsExtra() const;
+		void SetPlayerColorMappingExtra(shok::PlayerId pid, int col);
 	};
 	static_assert(offsetof(CPlayerColors, CurrentPlayerUIColors) == 1 * 4);
 	static_assert(offsetof(CPlayerColors, CurrentPlayerModelColors) == 19 * 4);
@@ -310,6 +311,33 @@ namespace ED {
 	static_assert(offsetof(CPlayerColors, ConfigColors) == 64 * 4);
 	static_assert(offsetof(CPlayerColors, PlayerColorMapping) == 81 * 4);
 	static_assert(sizeof(CPlayerColors) == 90 * 4);
+
+	class IOcclusionEffect {
+	public:
+		virtual ~IOcclusionEffect() = default;
+		virtual void Destroy() = 0;
+		virtual void Update() = 0; // sets color and does something else, called by render?
+
+		// get effect by setting 46cf05
+
+		static inline constexpr int vtp = 0x769880;
+	};
+
+	class COcclusionEffect : public	IOcclusionEffect {
+	public:
+		BB::TResourceProxyResMgr<BBRw::CEffect *>* EffectManager;
+		PADDINGI(2); // probably something effect related
+
+		// 46cea5 ctor
+
+		static inline constexpr int vtp = 0x7698a0;
+	};
+
+	class COcclusionEffectNop : public	IOcclusionEffect {
+	public:
+
+		static inline constexpr int vtp = 0x769890;
+	};
 
 	class ICommandAcknowledgements {
 	public:
@@ -709,7 +737,7 @@ namespace ED {
 		PADDINGI(1); // unknown
 		ED::CLight* Light; // 18
 		shok::List<BB::TSlot1<bool>*>* SomeCallback; // some reset callback?
-		PADDINGI(1); // p to ED::COcclusionEffect
+		COcclusionEffect* OcclusionEffect;
 		PADDINGI(1); // p to ED::COrnamentalItems
 		ED::CPlayerColors* PlayerColors; // 22
 		PADDINGI(1);

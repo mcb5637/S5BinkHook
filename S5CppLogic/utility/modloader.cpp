@@ -1473,7 +1473,7 @@ int CppLogic::ModLoader::ModLoader::GetFeedbackEventMem(luaext::State l) {
 }
 
 int CppLogic::ModLoader::ModLoader::SetMaxPlayers(luaext::State L) {
-	Mod::Player::ExtraPlayerManager::Hook();
+	Mod::Player::ExtraPlayerManager::Hook(&luaext::State::CppToCFunction<GetMaxPlayers>);
 	Mod::Player::ExtraPlayerManager::GlobalObj().SetMaxPlayer(static_cast<shok::PlayerId>(L.CheckInt(1)));
 	L.Push(Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer());
 	return 1;

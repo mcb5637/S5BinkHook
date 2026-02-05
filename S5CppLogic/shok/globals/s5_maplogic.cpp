@@ -943,7 +943,7 @@ GGL::CPlayerStatus* GGL::PlayerManager::GetPlayer(shok::PlayerId p)
 }
 
 bool GGL_HookExtraPlayers = false;
-void GGL::PlayerManager::HookExtraPlayers() {
+void GGL::PlayerManager::HookExtraPlayers(lua::CFunction getnumberofplayers) {
 	{
 		if (GGL_HookExtraPlayers)
 			return;
@@ -952,10 +952,12 @@ void GGL::PlayerManager::HookExtraPlayers() {
 			reinterpret_cast<void*>(0x4a91bc),
 			reinterpret_cast<void*>(0x4a9241),
 			reinterpret_cast<void*>(0x49bf45),
+			reinterpret_cast<void*>(0x4e4b91),
 		}};
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4a91bc), &ExtraGetPlayer, reinterpret_cast<void*>(0x4a91c3));
 		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4a9241), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::ExtraCreatePlayer, 0));
 		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x49bf45), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4e4b91), getnumberofplayers, reinterpret_cast<void*>(0x4e4b98));
 	}
 	GGL::CPlayerStatus::HookExtraPlayers();
 }

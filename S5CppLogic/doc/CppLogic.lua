@@ -860,6 +860,11 @@ function CppLogic.Logic.GetPlayerName(pid) end
 ---@return table
 function CppLogic.Logic.DumpGameLogic() end
 
+--- gets the players display name as shown in the diplomacy menu
+--- @param pid number
+--- @return string?
+function CppLogic.Logic.GetPlayerDisplayName(pid) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.

@@ -33,6 +33,6 @@ namespace CppLogic::Mod::Player {
         bool SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState d);
         [[nodiscard]] shok::PlayerId GetMaxPlayer() const;
 
-        static void Hook();
+        static void Hook(lua::CFunction getnumberofplayers);
     };
 }

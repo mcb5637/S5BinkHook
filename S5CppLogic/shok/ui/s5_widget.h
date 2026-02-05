@@ -415,6 +415,7 @@ namespace EGUIX {
 		void RenderLine(const Rect* screenCoords, const EGUIX::Color* c, float x1, float y1, float x2, float y2); // coordinates relative to widget
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x156D9BF6);
+		static inline constexpr int vtp = 0x77bf1c;
 	};
 	static_assert(sizeof(ICustomWidget)==36*4);
 	static_assert(offsetof(ICustomWidget, WidgetId) == 35 * 4);
@@ -1177,12 +1178,16 @@ namespace GGUI {
 
 	// updates (hardcoded) DiplomacyWindowPlayerX widgets
 	// player colors, names, diplomacy and mp trade
-	// also sets action/toottip funcs
+	// also sets action/tooltip funcs
 	class CDiplomacyWindowControllerCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 
 	public:
 		static inline constexpr int vtp = 0x77D1EC;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x947925C6);
+
+		static inline CDiplomacyWindowControllerCustomWidget** const GlobalObj = reinterpret_cast<CDiplomacyWindowControllerCustomWidget**>(0x882df0);
+
+		static inline auto* GetPlayerName = reinterpret_cast<const char*(__stdcall*)(shok::PlayerId)>(0x52ef18);
 	};
 
 	// updates (hardcoded) QuestWindowQuestX widgets

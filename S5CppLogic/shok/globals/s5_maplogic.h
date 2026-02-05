@@ -4,6 +4,7 @@
 #include <utility/enumflags.h>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
+#include <luaext.h>
 
 namespace EGL {
 	class CMapProps;
@@ -564,7 +565,7 @@ namespace GGL {
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49BE76);
 
 
-		static void HookExtraPlayers();
+		static void HookExtraPlayers(lua::CFunction getnumberofplayers);
 		CPlayerStatus* GetPlayerRaw(shok::PlayerId p);
 	private:
 		static GGL::CPlayerStatus* __stdcall ExtraGetPlayer(shok::PlayerId p);

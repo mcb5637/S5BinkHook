@@ -93,9 +93,9 @@ shok::PlayerId CppLogic::Mod::Player::ExtraPlayerManager::GetMaxPlayer() const {
     return static_cast<shok::PlayerId>(id + static_cast<size_t>(shok::PlayerId::P8));
 }
 
-void CppLogic::Mod::Player::ExtraPlayerManager::Hook() {
+void CppLogic::Mod::Player::ExtraPlayerManager::Hook(lua::CFunction getnumberofplayers) {
     EGL::PlayerManager::HookExtraPlayers();
-    GGL::PlayerManager::HookExtraPlayers();
+    GGL::PlayerManager::HookExtraPlayers(getnumberofplayers);
     ED::CPlayerColors::HookExtraPlayers();
     GGUI::CManager::HookExtraPlayers();
 }

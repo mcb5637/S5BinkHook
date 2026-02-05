@@ -374,6 +374,13 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
+	int SetExplorationUpdateMinMax(luaext::State L) {
+		auto* up = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng->GetUpdate();
+		up->FirstPlayerToUpdate = L.CheckPlayerId(1);
+		up->LastPlayerToUpdate = L.CheckPlayerId(2);
+		return 0;
+	}
+
 	int AddRedirectLayer(luaext::State L) {
 		auto s = L.CheckStringView(1);
 		auto* r = CppLogic::Mod::FileSystem::RedirectFileSystem::CreateRedirectLayer(s);
@@ -1006,6 +1013,8 @@ namespace CppLogic::Logic {
 		auto pos = L.CheckPos(2);
 		EGL::PlayerManager* p = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng;
 		auto* ex = p->GetExplorationHandlerByPlayer(pl);
+		if (ex == nullptr)
+			throw lua::LuaException{ "invalid player" };
 		auto x = static_cast<unsigned int>(pos.X / 100.0f);
 		auto y = static_cast<unsigned int>(pos.Y / 100.0f);
 		L.Push(static_cast<bool>(ex->ExplorationMapCurrent->Get(x, y)));
@@ -1583,6 +1592,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<AddFolder>("AddFolder"),
 #endif
 			luaext::FuncReference::GetRef<GetPlayerDisplayName>("GetPlayerDisplayName"),
+			luaext::FuncReference::GetRef<SetExplorationUpdateMinMax>("SetExplorationUpdateMinMax")
 		};
 
 	constexpr std::array UICmd{

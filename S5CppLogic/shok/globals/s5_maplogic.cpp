@@ -586,12 +586,22 @@ void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(int first, int last)
 	playerexploupdate_setplayers(this, first, last);
 }
 
+void EGL::CPlayerExplorationUpdate::Tick(CPlayerExplorationHandler ** handlers) {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler**)>(0x58cd20);
+	f(this, handlers);
+}
+
+void EGL::CPlayerFeedbackHandler::Tick() {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerFeedbackHandler*)>(0x585066);
+	f(this);
+}
+
 static inline shok::PlayerId(__thiscall* somegamelogicstuff_getexplomin)(EGL::PlayerManager* th) = reinterpret_cast<shok::PlayerId(__thiscall*)(EGL::PlayerManager*)>(0x5758FB);
 static inline shok::PlayerId(__thiscall* somegamelogicstuff_getexplomax)(EGL::PlayerManager* th) = reinterpret_cast<shok::PlayerId(__thiscall*)(EGL::PlayerManager*)>(0x575904);
 static inline EGL::CPlayerExplorationHandler* (__thiscall* somegamelogicstuff_getexplo)(EGL::PlayerManager* th, shok::PlayerId pl) = reinterpret_cast<EGL::CPlayerExplorationHandler * (__thiscall*)(EGL::PlayerManager*, shok::PlayerId)>(0x575895);
 EGL::CPlayerExplorationHandler* EGL::PlayerManager::GetExplorationHandlerByPlayer(shok::PlayerId pl)
 {
-	if (pl >= somegamelogicstuff_getexplomin(this) && pl >= somegamelogicstuff_getexplomax(this)) {
+	if (pl >= somegamelogicstuff_getexplomin(this) && pl <= somegamelogicstuff_getexplomax(this)) {
 		return somegamelogicstuff_getexplo(this, pl);
 	}
 	return nullptr;
@@ -654,8 +664,11 @@ void EGL::PlayerManager::HookExtraPlayers() {
 	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
 		reinterpret_cast<void*>(0x575f72),
 		reinterpret_cast<void*>(0x49840a),
+		reinterpret_cast<void*>(0x575895),
 		reinterpret_cast<void*>(0x5758d9),
 		reinterpret_cast<void*>(0x5758b7),
+		reinterpret_cast<void*>(0x573570),
+		reinterpret_cast<void*>(0x57590d),
 	}};
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575f72), &ExtraActivatePlayer, reinterpret_cast<void*>(0x575f9a));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x49840a), &ExtraIsPlayerIngame, reinterpret_cast<void*>(0x498411));
@@ -663,6 +676,7 @@ void EGL::PlayerManager::HookExtraPlayers() {
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758d9), &ExtraGetEntityVectorMapByPlayer, reinterpret_cast<void*>(0x5758de));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758b7), &ExtraGetFeedbackByPlayer, reinterpret_cast<void*>(0x5758bc));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x573570), &ExtraLoadPlayerNumberASM, reinterpret_cast<void*>(0x573578));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57590d), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0), reinterpret_cast<void*>(0x575917));
 }
 
 void NAKED_DEF EGL::PlayerManager::ExtraActivatePlayer() {
@@ -733,6 +747,25 @@ void NAKED_DEF EGL::PlayerManager::ExtraLoadPlayerNumberASM() {
 
 void __stdcall EGL::PlayerManager::ExtraLoadPlayerNumber(EGL::CMapProps *p) {
 	p->NumberOfPlayer = static_cast<int>(CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer());
+}
+
+void EGL::PlayerManager::TickExtra() {
+	auto& mng = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+	int maxpl = static_cast<int>(mng.GetMaxPlayer());
+	std::vector<CPlayerExplorationHandler*> exploration_handlers{};
+	exploration_handlers.resize(maxpl + 1);
+	exploration_handlers[0] = nullptr;
+	for (int p = 1; p <= maxpl; ++p) {
+		auto& pl = mng.GetEGL(static_cast<shok::PlayerId>(p));
+		if (pl.PlayerInGame) {
+			pl.FeedbackHandler->Tick();
+			exploration_handlers[p] = pl.ExplorationHandler.get();
+		}
+		else {
+			exploration_handlers[p] = nullptr;
+		}
+	}
+	GetUpdate()->Tick(exploration_handlers.data());
 }
 
 shok::Vector<EGL::CGLEEntity*>& EGL::RegionDataEntity::Entry::GetByAccessCategory(shok::AccessCategory ac)

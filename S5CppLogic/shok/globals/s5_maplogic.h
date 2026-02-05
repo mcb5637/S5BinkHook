@@ -249,16 +249,32 @@ namespace EGL {
 
 		// ctor 58D64D thiscall(pid)
 
+		// state 0
+		// clear: 58d1f2 (ExplorationMapWork and ExplorationCircle)
+		// fill circles 58d212
+		// draw some circles into work 58ce3a
+		// swap work & current, then update seen 58ce9d
+
 		static inline constexpr int vtp = 0x784E04;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEE20FA93);
 	};
 
 	class CPlayerExplorationUpdate : public BB::IObject {
 	public:
-		int State;
+		enum class States : int {
+			Init = 0,
+			ClearAll = 1,
+			FillCircles = 2,
+			Reset = 3,
+			DrawCircles = 4,
+			DrawCirclesIdle = 5, // counts down unused draw circle ticks
+			UpdateSeen = 6,
+		};
+
+		States State;
 		shok::PlayerId FirstPlayerToUpdate;
 		shok::PlayerId LastPlayerToUpdate;
-		int DrawCirclesCurrentPlayerToUpdate;
+		shok::PlayerId DrawCirclesCurrentPlayerToUpdate;
 		int DrawCirclesCurrentPlayerDrawCircles;
 		int DrawCirclesCurrentIndex;
 		int DrawCirclesTurnCounter;
@@ -269,7 +285,16 @@ namespace EGL {
 
 		void SetPlayersToUpdate(int first, int last);
 
-		// tick 58cd20 (CPlayerExplorationHandler**)
+		void Tick(CPlayerExplorationHandler** handlers);
+
+		// state 0 58ccf0 to 1
+		// 58c623 clear
+		// fill circles 58cc9c hardcoded 8 player
+		// 58c609 reset
+		// 58c647 incremental draw circles of current player
+		// 58c6bc update seen
+
+		// 58c739 update num circles to draw (hardcoded 8 player limit
 	};
 	static_assert(sizeof(CPlayerExplorationUpdate) == 9 * 4);
 
@@ -319,6 +344,8 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x7847A8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC375BEA3);
+
+		void Tick();
 	};
 	static_assert(offsetof(CPlayerFeedbackHandler, SettlerFeedbackList) == 16);
 	static_assert(sizeof(CPlayerFeedbackHandler::SettlerFeedbackList) == 12 * 7 + 4);
@@ -368,6 +395,7 @@ namespace EGL {
 		static CPlayerFeedbackHandler* __stdcall ExtraGetFeedbackByPlayer(shok::PlayerId pl);
 		static void NAKED_DECL ExtraLoadPlayerNumberASM();
 		static void __stdcall ExtraLoadPlayerNumber(EGL::CMapProps* p);
+		void TickExtra();
 	};
 	static_assert(sizeof(EGL::PlayerManager::Player) * 9 + 4 == 184);
 	static_assert(offsetof(EGL::PlayerManager, ExplorationUpdate) == 46 * 4);

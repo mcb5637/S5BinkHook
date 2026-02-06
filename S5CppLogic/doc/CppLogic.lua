@@ -818,6 +818,11 @@ function CppLogic.Logic.IsPositionExplored(player, pos) end
 ---@param explored boolean
 function CppLogic.Logic.SetPositionExploration(player, pos1, pos2, explored) end
 
+--- sets the minimum and maximum players that have their exploration updated
+---@param min number
+---@param max number
+function CppLogic.Logic.SetExplorationUpdateMinMax(min, max) end
+
 --- dumps a task list for dev purposes
 ---@param tl number|string
 ---@return table

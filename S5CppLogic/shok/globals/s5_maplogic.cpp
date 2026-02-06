@@ -600,10 +600,10 @@ void EGL::CPlayerExplorationHandler::UpdateSeen() {
 	f(this);
 }
 
-inline void(__thiscall* const playerexploupdate_setplayers)(EGL::CPlayerExplorationUpdate* th, int f, int l) = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationUpdate*, int, int)>(0x58C724);
-void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(int first, int last)
+void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(shok::PlayerId first, shok::PlayerId last)
 {
-	playerexploupdate_setplayers(this, first, last);
+	auto* f = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationUpdate*, shok::PlayerId, shok::PlayerId)>(0x58C724);
+	f(this, first, last);
 }
 
 void EGL::CPlayerExplorationUpdate::Tick(CPlayerExplorationHandler ** handlers) {
@@ -801,6 +801,7 @@ void EGL::PlayerManager::HookExtraPlayers() {
 			reinterpret_cast<void*>(0x5758b7),
 			reinterpret_cast<void*>(0x573570),
 			reinterpret_cast<void*>(0x57590d),
+			reinterpret_cast<void*>(0x575884),
 		}};
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575f72), &ExtraActivatePlayer, reinterpret_cast<void*>(0x575f9a));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x49840a), &ExtraIsPlayerIngame, reinterpret_cast<void*>(0x498411));
@@ -809,6 +810,7 @@ void EGL::PlayerManager::HookExtraPlayers() {
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758b7), &ExtraGetFeedbackByPlayer, reinterpret_cast<void*>(0x5758bc));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x573570), &ExtraLoadPlayerNumberASM, reinterpret_cast<void*>(0x573578));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57590d), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0), reinterpret_cast<void*>(0x575917));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575884), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::SetUpdateAllExtra, 0), reinterpret_cast<void*>(0x57588d));
 	}
 	CPlayerExplorationUpdate::HookExtraPlayers();
 }
@@ -885,21 +887,27 @@ void __stdcall EGL::PlayerManager::ExtraLoadPlayerNumber(EGL::CMapProps *p) {
 
 void EGL::PlayerManager::TickExtra() {
 	auto& mng = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
-	int maxpl = static_cast<int>(mng.GetMaxPlayer());
+	auto maxpl = mng.GetMaxPlayer();
 	std::vector<CPlayerExplorationHandler*> exploration_handlers{};
-	exploration_handlers.resize(maxpl + 1);
+	exploration_handlers.resize(static_cast<int>(maxpl) + 1);
 	exploration_handlers[0] = nullptr;
-	for (int p = 1; p <= maxpl; ++p) {
-		auto& pl = mng.GetEGL(static_cast<shok::PlayerId>(p));
+	for (shok::PlayerId p = shok::PlayerId::P1; p <= maxpl; ++p) {
+		auto& pl = mng.GetEGL(p);
 		if (pl.PlayerInGame) {
 			pl.FeedbackHandler->Tick();
-			exploration_handlers[p] = pl.ExplorationHandler.get();
+			exploration_handlers[static_cast<int>(p)] = pl.ExplorationHandler.get();
 		}
 		else {
-			exploration_handlers[p] = nullptr;
+			exploration_handlers[static_cast<int>(p)] = nullptr;
 		}
 	}
 	GetUpdate()->Tick(exploration_handlers.data());
+}
+
+void EGL::PlayerManager::SetUpdateAllExtra() {
+	auto& mng = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+	auto maxpl = mng.GetMaxPlayer();
+	GetUpdate()->SetPlayersToUpdate(shok::PlayerId::P1, maxpl);
 }
 
 shok::Vector<EGL::CGLEEntity*>& EGL::RegionDataEntity::Entry::GetByAccessCategory(shok::AccessCategory ac)

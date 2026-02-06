@@ -284,7 +284,7 @@ namespace EGL {
 		static inline constexpr int vtp = 0x784D1C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x81E57CD);
 
-		void SetPlayersToUpdate(int first, int last);
+		void SetPlayersToUpdate(shok::PlayerId first, shok::PlayerId last);
 
 		void Tick(CPlayerExplorationHandler** handlers);
 
@@ -388,6 +388,7 @@ namespace EGL {
 		// ctor 5757bd()
 
 		// tick 57590d
+		// set exploration update all 575884
 
 		// seridata of this thing is 0x897508, but it is missing its guard
 		// fixed here
@@ -406,6 +407,7 @@ namespace EGL {
 		static void NAKED_DECL ExtraLoadPlayerNumberASM();
 		static void __stdcall ExtraLoadPlayerNumber(EGL::CMapProps* p);
 		void TickExtra();
+		void SetUpdateAllExtra();
 	};
 	static_assert(sizeof(EGL::PlayerManager::Player) * 9 + 4 == 184);
 	static_assert(offsetof(EGL::PlayerManager, ExplorationUpdate) == 46 * 4);

@@ -376,8 +376,7 @@ namespace CppLogic::Logic {
 
 	int SetExplorationUpdateMinMax(luaext::State L) {
 		auto* up = (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng->GetUpdate();
-		up->FirstPlayerToUpdate = L.CheckPlayerId(1);
-		up->LastPlayerToUpdate = L.CheckPlayerId(2);
+		up->SetPlayersToUpdate(L.CheckPlayerId(1), L.CheckPlayerId(2));
 		return 0;
 	}
 

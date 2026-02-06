@@ -396,6 +396,22 @@ namespace shok {
 		P7 = 7,
 		P8 = 8,
 	};
+	constexpr PlayerId operator+(PlayerId a, PlayerId b) {
+		using under = std::underlying_type_t<PlayerId>;
+		return static_cast<PlayerId>(static_cast<under>(a) + static_cast<under>(b));
+	}
+	constexpr PlayerId operator-(PlayerId a, PlayerId b) {
+		using under = std::underlying_type_t<PlayerId>;
+		return static_cast<PlayerId>(static_cast<under>(a) - static_cast<under>(b));
+	}
+	constexpr PlayerId& operator++(PlayerId& a) {
+		a = a + static_cast<PlayerId>(1);
+		return a;
+	}
+	constexpr PlayerId& operator--(PlayerId& a) {
+		a = a - static_cast<PlayerId>(1);
+		return a;
+	}
 	enum class EntityId : int {
 		Invalid = 0,
 	};

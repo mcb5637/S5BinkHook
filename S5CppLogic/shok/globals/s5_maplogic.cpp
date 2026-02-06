@@ -580,6 +580,26 @@ bool EGL::CPlayerExplorationHandler::IsPositionExplored(const shok::Position& p)
 	return explohandler_isexplored(this, i[0], i[1]);
 }
 
+void EGL::CPlayerExplorationHandler::ClearWork() {
+	auto* f = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationHandler*)>(0x58d1f2);
+	f(this);
+}
+
+void EGL::CPlayerExplorationHandler::FillCircles() {
+	auto* f = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationHandler*)>(0x58d212);
+	f(this);
+}
+
+size_t EGL::CPlayerExplorationHandler::DrawNumCirclesIntoWork(const shok::Vector<ExCircle> &from, size_t index, size_t num) {
+	auto* f = reinterpret_cast<size_t(__thiscall*)(EGL::CPlayerExplorationHandler*, const shok::Vector<ExCircle> *, size_t, size_t)>(0x58ce3a);
+	return f(this, &from, index, num);
+}
+
+void EGL::CPlayerExplorationHandler::UpdateSeen() {
+	auto* f = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationHandler*)>(0x58ce9d);
+	f(this);
+}
+
 inline void(__thiscall* const playerexploupdate_setplayers)(EGL::CPlayerExplorationUpdate* th, int f, int l) = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationUpdate*, int, int)>(0x58C724);
 void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(int first, int last)
 {
@@ -589,6 +609,117 @@ void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(int first, int last)
 void EGL::CPlayerExplorationUpdate::Tick(CPlayerExplorationHandler ** handlers) {
 	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler**)>(0x58cd20);
 	f(this, handlers);
+}
+
+void EGL::CPlayerExplorationUpdate::Init(CPlayerExplorationHandler **handlers) {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler **)>(0x58ccf0);
+	f(this, handlers);
+}
+
+void EGL::CPlayerExplorationUpdate::ClearWork(CPlayerExplorationHandler **handlers) {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler **)>(0x58c623);
+	f(this, handlers);
+}
+
+void EGL::CPlayerExplorationUpdate::FillCircles(CPlayerExplorationHandler **handlers) {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler **)>(0x58cc9c);
+	f(this, handlers);
+}
+
+void EGL::CPlayerExplorationUpdate::Reset() {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*)>(0x58c609);
+	f(this);
+}
+
+void EGL::CPlayerExplorationUpdate::UpdateNumCirclesToDraw(CPlayerExplorationHandler **handlers) {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler **)>(0x58c739);
+	f(this, handlers);
+}
+
+bool EGL::CPlayerExplorationUpdate::DrawCirclesIncremental(CPlayerExplorationHandler **handlers) {
+	auto* f = reinterpret_cast<bool(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler **)>(0x58c647);
+	return f(this, handlers);
+}
+
+void EGL::CPlayerExplorationUpdate::UpdateSeen(CPlayerExplorationHandler **handlers) {
+	auto* f = reinterpret_cast<void(__thiscall*)(CPlayerExplorationUpdate*, CPlayerExplorationHandler **)>(0x58c6bc);
+	f(this, handlers);
+}
+
+void EGL::CPlayerExplorationUpdate::FillCirclesExtra(CPlayerExplorationHandler **handlers) const {
+	shok::PlayerId maxPlayer = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+	unsigned int players = 0;
+	for (shok::PlayerId p = FirstPlayerToUpdate; p <= LastPlayerToUpdate; ++p) {
+		if (handlers[static_cast<int>(p)] != nullptr)
+			players |= handlers[static_cast<int>(p)]->ShareExplorationWithPlayersMask;
+	}
+	for (shok::PlayerId p = shok::PlayerId::P1; p <= maxPlayer; ++p) {
+		if (handlers[static_cast<int>(p)] != nullptr) {
+			if (players & (1 << static_cast<int>(p))) {
+				handlers[static_cast<int>(p)]->FillCircles();
+			}
+			else {
+				auto v = handlers[static_cast<int>(p)]->ExplorationCircle.SaveVector();
+				v.Vector.clear();
+			}
+		}
+	}
+}
+
+bool EGL::CPlayerExplorationUpdate::DrawCirclesIncrementalExtra(CPlayerExplorationHandler **handlers) {
+	shok::PlayerId maxPlayer = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+	auto perTurn = DrawCirclesNumCirclesToDrawPerTurn;
+	while (DrawCirclesCurrentPlayerToUpdate <= LastPlayerToUpdate) {
+		auto* currentPlayer = handlers[static_cast<int>(DrawCirclesCurrentPlayerToUpdate)];
+		auto* circlesPlayer = handlers[static_cast<int>(DrawCirclesCurrentPlayerDrawCircles)];
+		auto expectedMask = 1 << static_cast<int>(DrawCirclesCurrentPlayerDrawCircles);
+		if (currentPlayer != nullptr && circlesPlayer != nullptr && currentPlayer->ShareExplorationWithPlayersMask & expectedMask) {
+			auto n = currentPlayer->DrawNumCirclesIntoWork(circlesPlayer->ExplorationCircle, DrawCirclesCurrentIndex, perTurn);
+			DrawCirclesCurrentIndex += n;
+			if (perTurn <= n)
+				return false;
+			perTurn -= n;
+		}
+		DrawCirclesCurrentIndex = 0;
+		++DrawCirclesCurrentPlayerDrawCircles;
+		if (DrawCirclesCurrentPlayerDrawCircles > maxPlayer) {
+			++DrawCirclesCurrentPlayerToUpdate;
+			DrawCirclesCurrentPlayerDrawCircles = shok::PlayerId::P1;
+		}
+	}
+	return true;
+}
+
+void EGL::CPlayerExplorationUpdate::UpdateNumCirclesToDrawExtra(CPlayerExplorationHandler** handlers) {
+	shok::PlayerId maxPlayer = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+	size_t num = 0;
+	for (auto p = FirstPlayerToUpdate; p <= LastPlayerToUpdate; ++p) {
+		auto* pl = handlers[static_cast<int>(p)];
+		if (pl != nullptr) {
+			for (auto p2 = shok::PlayerId::P1; p2 <= maxPlayer; ++p2) {
+				auto* pl2 = handlers[static_cast<int>(p2)];
+				if (pl->ShareExplorationWithPlayersMask & (1 << static_cast<int>(p2)) && pl2 != nullptr) {
+					num += pl2->ExplorationCircle.size();
+				}
+			}
+		}
+	}
+	DrawCirclesNumCirclesToDrawPerTurn = num / 6 + 1;
+}
+
+void EGL::CPlayerExplorationUpdate::HookExtraPlayers() {
+	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
+		reinterpret_cast<void*>(0x58cdab),
+		reinterpret_cast<void*>(0x58cd01),
+		reinterpret_cast<void*>(0x58cd8f),
+		reinterpret_cast<void*>(0x58cd0e),
+		reinterpret_cast<void*>(0x58cd7b),
+	}};
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cdab), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::FillCirclesExtra, 0));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd01), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::FillCirclesExtra, 0));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd8f), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::DrawCirclesIncrementalExtra, 0));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd0e), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::DrawCirclesIncrementalExtra, 0));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd7b), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::UpdateNumCirclesToDrawExtra, 0));
 }
 
 void EGL::CPlayerFeedbackHandler::Tick() {
@@ -661,22 +792,25 @@ void EGL::PlayerManager::HookExtraPlayers() {
 	if (EGL_HookExtraPlayers)
 		return;
 	EGL_HookExtraPlayers = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
-		reinterpret_cast<void*>(0x575f72),
-		reinterpret_cast<void*>(0x49840a),
-		reinterpret_cast<void*>(0x575895),
-		reinterpret_cast<void*>(0x5758d9),
-		reinterpret_cast<void*>(0x5758b7),
-		reinterpret_cast<void*>(0x573570),
-		reinterpret_cast<void*>(0x57590d),
-	}};
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575f72), &ExtraActivatePlayer, reinterpret_cast<void*>(0x575f9a));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x49840a), &ExtraIsPlayerIngame, reinterpret_cast<void*>(0x498411));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575895), &ExtraGetExplorationHandlerByPlayer, reinterpret_cast<void*>(0x57589a));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758d9), &ExtraGetEntityVectorMapByPlayer, reinterpret_cast<void*>(0x5758de));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758b7), &ExtraGetFeedbackByPlayer, reinterpret_cast<void*>(0x5758bc));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x573570), &ExtraLoadPlayerNumberASM, reinterpret_cast<void*>(0x573578));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57590d), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0), reinterpret_cast<void*>(0x575917));
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
+			reinterpret_cast<void*>(0x575f72),
+			reinterpret_cast<void*>(0x49840a),
+			reinterpret_cast<void*>(0x575895),
+			reinterpret_cast<void*>(0x5758d9),
+			reinterpret_cast<void*>(0x5758b7),
+			reinterpret_cast<void*>(0x573570),
+			reinterpret_cast<void*>(0x57590d),
+		}};
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575f72), &ExtraActivatePlayer, reinterpret_cast<void*>(0x575f9a));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x49840a), &ExtraIsPlayerIngame, reinterpret_cast<void*>(0x498411));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575895), &ExtraGetExplorationHandlerByPlayer, reinterpret_cast<void*>(0x57589a));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758d9), &ExtraGetEntityVectorMapByPlayer, reinterpret_cast<void*>(0x5758de));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5758b7), &ExtraGetFeedbackByPlayer, reinterpret_cast<void*>(0x5758bc));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x573570), &ExtraLoadPlayerNumberASM, reinterpret_cast<void*>(0x573578));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57590d), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0), reinterpret_cast<void*>(0x575917));
+	}
+	CPlayerExplorationUpdate::HookExtraPlayers();
 }
 
 void NAKED_DEF EGL::PlayerManager::ExtraActivatePlayer() {

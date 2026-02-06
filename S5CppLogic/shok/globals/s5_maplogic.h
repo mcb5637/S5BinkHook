@@ -237,9 +237,9 @@ namespace EGL {
 		};
 
 		shok::PlayerId PlayerID;
-		int ShareExplorationWithPlayersMask;
+		unsigned int ShareExplorationWithPlayersMask;
 		int SizeX, SizeY; // 3
-		EGL::C2DArray1Bit* ExplorationMapWork; // 5 updating?
+		EGL::C2DArray1Bit* ExplorationMapWork; // 5 currently updating
 		EGL::C2DArray1Bit* ExplorationMapCurrent;
 		EGL::C2DArray1Bit* ExplorationMapSeen;
 		shok::Vector<ExCircle> ExplorationCircle; // 8
@@ -249,14 +249,15 @@ namespace EGL {
 
 		// ctor 58D64D thiscall(pid)
 
-		// state 0
-		// clear: 58d1f2 (ExplorationMapWork and ExplorationCircle)
-		// fill circles 58d212
-		// draw some circles into work 58ce3a
-		// swap work & current, then update seen 58ce9d
-
 		static inline constexpr int vtp = 0x784E04;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEE20FA93);
+
+		// clears ExplorationMapWork and ExplorationCircle
+		void ClearWork();
+		void FillCircles();
+		size_t DrawNumCirclesIntoWork(const shok::Vector<ExCircle>& from, size_t index, size_t num);
+		// swap work & current, then update seen
+		void UpdateSeen();
 	};
 
 	class CPlayerExplorationUpdate : public BB::IObject {
@@ -275,8 +276,8 @@ namespace EGL {
 		shok::PlayerId FirstPlayerToUpdate;
 		shok::PlayerId LastPlayerToUpdate;
 		shok::PlayerId DrawCirclesCurrentPlayerToUpdate;
-		int DrawCirclesCurrentPlayerDrawCircles;
-		int DrawCirclesCurrentIndex;
+		shok::PlayerId DrawCirclesCurrentPlayerDrawCircles;
+		size_t DrawCirclesCurrentIndex;
 		int DrawCirclesTurnCounter;
 		unsigned int DrawCirclesNumCirclesToDrawPerTurn;
 
@@ -287,14 +288,23 @@ namespace EGL {
 
 		void Tick(CPlayerExplorationHandler** handlers);
 
-		// state 0 58ccf0 to 1
-		// 58c623 clear
-		// fill circles 58cc9c hardcoded 8 player
-		// 58c609 reset
-		// 58c647 incremental draw circles of current player
-		// 58c6bc update seen
+		static void HookExtraPlayers();
 
-		// 58c739 update num circles to draw (hardcoded 8 player limit
+	private:
+		void Init(CPlayerExplorationHandler** handlers);
+		void ClearWork(CPlayerExplorationHandler** handlers);
+		void FillCircles(CPlayerExplorationHandler** handlers);
+		void Reset();
+		void UpdateNumCirclesToDraw(CPlayerExplorationHandler** handlers);
+		bool DrawCirclesIncremental(CPlayerExplorationHandler** handlers);
+		void UpdateSeen(CPlayerExplorationHandler** handlers);
+
+		// fill circles 58cc9c hardcoded 8 player
+		// 58c647 incremental draw circles of current player hardcoded 8 player
+		// 58c739 update num circles to draw hardcoded 8 player
+		void FillCirclesExtra(CPlayerExplorationHandler** handlers) const;
+		bool DrawCirclesIncrementalExtra(CPlayerExplorationHandler** handlers);
+		void UpdateNumCirclesToDrawExtra(CPlayerExplorationHandler** handlers);
 	};
 	static_assert(sizeof(CPlayerExplorationUpdate) == 9 * 4);
 

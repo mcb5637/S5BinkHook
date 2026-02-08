@@ -299,9 +299,6 @@ namespace EGL {
 		bool DrawCirclesIncremental(CPlayerExplorationHandler** handlers);
 		void UpdateSeen(CPlayerExplorationHandler** handlers);
 
-		// fill circles 58cc9c hardcoded 8 player
-		// 58c647 incremental draw circles of current player hardcoded 8 player
-		// 58c739 update num circles to draw hardcoded 8 player
 		void FillCirclesExtra(CPlayerExplorationHandler** handlers) const;
 		bool DrawCirclesIncrementalExtra(CPlayerExplorationHandler** handlers);
 		void UpdateNumCirclesToDrawExtra(CPlayerExplorationHandler** handlers);
@@ -410,6 +407,7 @@ namespace EGL {
 		static void __stdcall ExtraLoadPlayerNumber(EGL::CMapProps* p);
 		void TickExtra();
 		void SetUpdateAllExtra();
+		void SetSharedExplorationFlagExtra(shok::PlayerId p1, shok::PlayerId p2, bool b);
 	};
 	static_assert(sizeof(EGL::PlayerManager::Player) * 9 + 4 == 184);
 	static_assert(offsetof(EGL::PlayerManager, ExplorationUpdate) == 46 * 4);

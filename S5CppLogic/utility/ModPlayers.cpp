@@ -21,6 +21,12 @@ const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::PlayerRel
     BB::SerializationData::GuardData(),
 };
 
+const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::PlayerRelation::SerializationData[3] = {
+    AutoMemberSerialization(PlayerRelation, Diplomacy),
+    AutoMemberSerialization(PlayerRelation, ShareExploration),
+    BB::SerializationData::GuardData(),
+};
+
 CreateSerializationListFor(CppLogic::Mod::Player::ExtraPlayerManager, ExtraPlayers);
 CreateSerializationListFor(CppLogic::Mod::Player::ExtraPlayerManager, Diplomacy);
 const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::SerializationData[3] = {
@@ -95,20 +101,33 @@ void CppLogic::Mod::Player::ExtraPlayerManager::SetMaxPlayer(shok::PlayerId p) {
     }
 }
 
-shok::DiploState CppLogic::Mod::Player::ExtraPlayerManager::GetDiplomacy(shok::PlayerId p, shok::PlayerId p2) {
+shok::DiploState CppLogic::Mod::Player::ExtraPlayerManager::GetDiplomacy(shok::PlayerId p, shok::PlayerId p2) const {
     auto i = Diplomacy.find(PlayerRelationKey(p, p2));
     if (i == Diplomacy.end())
         return shok::DiploState::Neutral;
-    return i->second;
+    return i->second.Diplomacy;
 }
 
 bool CppLogic::Mod::Player::ExtraPlayerManager::SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState d) {
     if (GetDiplomacy(p1, p2) == d)
         return false;
-    Diplomacy[PlayerRelationKey(p1, p2)] = d;
+    Diplomacy[PlayerRelationKey(p1, p2)].Diplomacy = d;
     GGL::CEventDiplomacyChanged e{shok::EventIDs::LogicEvent_DiplomacyChanged, p1, p2, d};
     (*EScr::CScriptTriggerSystem::GlobalObj)->PostEvent(&e);
     return true;
+}
+
+bool CppLogic::Mod::Player::ExtraPlayerManager::GetSharedExploration(shok::PlayerId p1, shok::PlayerId p2) const {
+    if (p1 == p2)
+        return true;
+    auto i = Diplomacy.find(PlayerRelationKey(p1, p2));
+    if (i == Diplomacy.end())
+        return false;
+    return i->second.ShareExploration;
+}
+
+void CppLogic::Mod::Player::ExtraPlayerManager::SetSharedExploration(shok::PlayerId p1, shok::PlayerId p2, bool b) {
+    Diplomacy[PlayerRelationKey(p1, p2)].ShareExploration = b;
 }
 
 shok::PlayerId CppLogic::Mod::Player::ExtraPlayerManager::GetMaxPlayer() const {

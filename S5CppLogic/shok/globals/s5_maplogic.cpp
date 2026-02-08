@@ -647,19 +647,27 @@ void EGL::CPlayerExplorationUpdate::UpdateSeen(CPlayerExplorationHandler **handl
 }
 
 void EGL::CPlayerExplorationUpdate::FillCirclesExtra(CPlayerExplorationHandler **handlers) const {
-	shok::PlayerId maxPlayer = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
-	unsigned int players = 0;
+	auto& pm = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+	shok::PlayerId maxPlayer = pm.GetMaxPlayer();
+	std::vector<bool> update{};
+	update.resize(static_cast<int>(maxPlayer) + 1);
 	for (shok::PlayerId p = FirstPlayerToUpdate; p <= LastPlayerToUpdate; ++p) {
-		if (handlers[static_cast<int>(p)] != nullptr)
-			players |= handlers[static_cast<int>(p)]->ShareExplorationWithPlayersMask;
+		if (handlers[static_cast<int>(p)] != nullptr) {
+			for (shok::PlayerId p2 = shok::PlayerId::P1; p2 <= maxPlayer; ++p2) {
+				if (pm.GetSharedExploration(p, p2))
+					update[static_cast<int>(p2)] = true;
+			}
+		}
+
 	}
 	for (shok::PlayerId p = shok::PlayerId::P1; p <= maxPlayer; ++p) {
-		if (handlers[static_cast<int>(p)] != nullptr) {
-			if (players & (1 << static_cast<int>(p))) {
-				handlers[static_cast<int>(p)]->FillCircles();
+		auto* h = handlers[static_cast<int>(p)];
+		if (h != nullptr) {
+			if (update[static_cast<int>(p)]) {
+				h->FillCircles();
 			}
 			else {
-				auto v = handlers[static_cast<int>(p)]->ExplorationCircle.SaveVector();
+				auto v = h->ExplorationCircle.SaveVector();
 				v.Vector.clear();
 			}
 		}
@@ -667,13 +675,13 @@ void EGL::CPlayerExplorationUpdate::FillCirclesExtra(CPlayerExplorationHandler *
 }
 
 bool EGL::CPlayerExplorationUpdate::DrawCirclesIncrementalExtra(CPlayerExplorationHandler **handlers) {
-	shok::PlayerId maxPlayer = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+	auto& pm = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+	shok::PlayerId maxPlayer = pm.GetMaxPlayer();
 	auto perTurn = DrawCirclesNumCirclesToDrawPerTurn;
 	while (DrawCirclesCurrentPlayerToUpdate <= LastPlayerToUpdate) {
 		auto* currentPlayer = handlers[static_cast<int>(DrawCirclesCurrentPlayerToUpdate)];
 		auto* circlesPlayer = handlers[static_cast<int>(DrawCirclesCurrentPlayerDrawCircles)];
-		auto expectedMask = 1 << static_cast<int>(DrawCirclesCurrentPlayerDrawCircles);
-		if (currentPlayer != nullptr && circlesPlayer != nullptr && currentPlayer->ShareExplorationWithPlayersMask & expectedMask) {
+		if (currentPlayer != nullptr && circlesPlayer != nullptr && pm.GetSharedExploration(DrawCirclesCurrentPlayerToUpdate, DrawCirclesCurrentPlayerDrawCircles)) {
 			auto n = currentPlayer->DrawNumCirclesIntoWork(circlesPlayer->ExplorationCircle, DrawCirclesCurrentIndex, perTurn);
 			DrawCirclesCurrentIndex += n;
 			if (perTurn <= n)
@@ -691,14 +699,15 @@ bool EGL::CPlayerExplorationUpdate::DrawCirclesIncrementalExtra(CPlayerExplorati
 }
 
 void EGL::CPlayerExplorationUpdate::UpdateNumCirclesToDrawExtra(CPlayerExplorationHandler** handlers) {
-	shok::PlayerId maxPlayer = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+	auto& pm = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+	shok::PlayerId maxPlayer = pm.GetMaxPlayer();
 	size_t num = 0;
 	for (auto p = FirstPlayerToUpdate; p <= LastPlayerToUpdate; ++p) {
 		auto* pl = handlers[static_cast<int>(p)];
 		if (pl != nullptr) {
 			for (auto p2 = shok::PlayerId::P1; p2 <= maxPlayer; ++p2) {
 				auto* pl2 = handlers[static_cast<int>(p2)];
-				if (pl->ShareExplorationWithPlayersMask & (1 << static_cast<int>(p2)) && pl2 != nullptr) {
+				if (pl2 != nullptr && pm.GetSharedExploration(p, p2)) {
 					num += pl2->ExplorationCircle.size();
 				}
 			}
@@ -802,6 +811,7 @@ void EGL::PlayerManager::HookExtraPlayers() {
 			reinterpret_cast<void*>(0x573570),
 			reinterpret_cast<void*>(0x57590d),
 			reinterpret_cast<void*>(0x575884),
+			reinterpret_cast<void*>(0x57584b),
 		}};
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575f72), &ExtraActivatePlayer, reinterpret_cast<void*>(0x575f9a));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x49840a), &ExtraIsPlayerIngame, reinterpret_cast<void*>(0x498411));
@@ -811,6 +821,7 @@ void EGL::PlayerManager::HookExtraPlayers() {
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x573570), &ExtraLoadPlayerNumberASM, reinterpret_cast<void*>(0x573578));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57590d), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0), reinterpret_cast<void*>(0x575917));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575884), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::SetUpdateAllExtra, 0), reinterpret_cast<void*>(0x57588d));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57584b), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::SetSharedExplorationFlagExtra, 0), reinterpret_cast<void*>(0x575851));
 	}
 	CPlayerExplorationUpdate::HookExtraPlayers();
 }
@@ -908,6 +919,11 @@ void EGL::PlayerManager::SetUpdateAllExtra() {
 	auto& mng = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
 	auto maxpl = mng.GetMaxPlayer();
 	GetUpdate()->SetPlayersToUpdate(shok::PlayerId::P1, maxpl);
+}
+
+void EGL::PlayerManager::SetSharedExplorationFlagExtra(shok::PlayerId p1, shok::PlayerId p2, bool b) {
+	CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().SetSharedExploration(p1, p2, b);
+	GetUpdate()->State = CPlayerExplorationUpdate::States::Init;
 }
 
 shok::Vector<EGL::CGLEEntity*>& EGL::RegionDataEntity::Entry::GetByAccessCategory(shok::AccessCategory ac)

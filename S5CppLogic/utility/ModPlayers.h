@@ -22,10 +22,16 @@ namespace CppLogic::Mod::Player {
 
             constexpr auto operator<=>(const PlayerRelationKey&) const = default;
         };
+        struct PlayerRelation {
+            shok::DiploState Diplomacy = shok::DiploState::Neutral;
+            bool ShareExploration = false;
+
+            static const BB::SerializationData SerializationData[];
+        };
 
         std::string SavegameName;
         std::vector<ExtraPlayer> ExtraPlayers;
-        std::map<PlayerRelationKey, shok::DiploState> Diplomacy;
+        std::map<PlayerRelationKey, PlayerRelation> Diplomacy;
 
         static const BB::SerializationData SerializationData[];
 
@@ -45,8 +51,10 @@ namespace CppLogic::Mod::Player {
         int& ColorMapping(shok::PlayerId p);
         void Clear();
         void SetMaxPlayer(shok::PlayerId p);
-        shok::DiploState GetDiplomacy(shok::PlayerId p, shok::PlayerId p2);
+        [[nodiscard]] shok::DiploState GetDiplomacy(shok::PlayerId p, shok::PlayerId p2) const;
         bool SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState d);
+        [[nodiscard]] bool GetSharedExploration(shok::PlayerId p1, shok::PlayerId p2) const;
+        void SetSharedExploration(shok::PlayerId p1, shok::PlayerId p2, bool b);
         [[nodiscard]] shok::PlayerId GetMaxPlayer() const;
         void Serialize(const char* path, const char* savename);
         void Deserialize(const char* path, const char* savename);

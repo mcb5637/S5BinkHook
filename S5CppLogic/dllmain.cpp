@@ -54,6 +54,7 @@
 #include <utility/EnumIdManagerMagic.h>
 #include <utility/ModFilesystem.h>
 #include <utility/ModEffect.h>
+#include <utility/ModPlayers.h>
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;
@@ -336,6 +337,7 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 void OnSaveLoaded() {
 	auto* s = Framework::SavegameSystem::GlobalObj()->CurrentSave;
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.DeserializeFrom(s->SavePath.c_str(), s->AdditionalInfo.c_str());
+	CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().Deserialize(s->SavePath.c_str(), s->AdditionalInfo.c_str());
 	luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 	int t = L.GetTop();
 	CppLogic::Effect::OnSaveLoaded(L);
@@ -349,6 +351,7 @@ void OnSaveLoaded() {
 
 void OnSaveDone(const char* path, const char* savename) {
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.SerializeTo(path, savename);
+	CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().Serialize(path, savename);
 }
 
 void InitGame() {

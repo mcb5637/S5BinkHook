@@ -12,10 +12,26 @@ namespace CppLogic::Mod::Player {
             EGL::PlayerManager::Player EPlayer;
             std::unique_ptr<GGL::CPlayerStatus> GPlayer;
             int PlayerColorMapping;
+
+            static const BB::SerializationData SerializationData[];
+        };
+        struct PlayerRelationKey {
+            shok::PlayerId From, To;
+
+            static const BB::SerializationData SerializationData[];
+
+            constexpr auto operator<=>(const PlayerRelationKey&) const = default;
         };
 
+        std::string SavegameName;
         std::vector<ExtraPlayer> ExtraPlayers;
-        std::map<std::pair<shok::PlayerId, shok::PlayerId>, shok::DiploState> Diplomacy;
+        std::map<PlayerRelationKey, shok::DiploState> Diplomacy;
+
+        static const BB::SerializationData SerializationData[];
+
+        SerializationListFriend;
+
+        static constexpr std::string_view SaveGameFile = "\\CppLogicExtraPlayers.bin";
 
     public:
         static ExtraPlayerManager& GlobalObj();
@@ -32,6 +48,8 @@ namespace CppLogic::Mod::Player {
         shok::DiploState GetDiplomacy(shok::PlayerId p, shok::PlayerId p2);
         bool SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState d);
         [[nodiscard]] shok::PlayerId GetMaxPlayer() const;
+        void Serialize(const char* path, const char* savename);
+        void Deserialize(const char* path, const char* savename);
 
         static void Hook(lua::CFunction getnumberofplayers);
     };

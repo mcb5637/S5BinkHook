@@ -5,6 +5,7 @@
 
 namespace CppLogic::SavegameExtra {
 	class SerializedMapdata {
+		static constexpr std::string_view SaveGameFile = "\\CppLogic.xml";
 	public:
 
 		std::string SavegameName;

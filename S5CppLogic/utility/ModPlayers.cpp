@@ -1,10 +1,33 @@
 #include "ModPlayers.h"
 
+#include <filesystem>
+#include <shok/s5_exception.h>
 #include <shok/s5_scriptsystem.h>
 #include <shok/events/s5_events.h>
 #include <shok/events/s5_netevents.h>
+#include <shok/globals/s5_classfactory.h>
 #include <shok/ui/s5_ui.h>
 
+const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::ExtraPlayer::SerializationData[4] = {
+    AutoMemberSerialization(ExtraPlayer, EPlayer),
+    BB::SerializationData::ObjectPointerData("GPlayer", offsetof(ExtraPlayer, GPlayer), sizeof(GPlayer)),
+    AutoMemberSerialization(ExtraPlayer, PlayerColorMapping),
+    BB::SerializationData::GuardData(),
+};
+
+const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::PlayerRelationKey::SerializationData[3] = {
+    AutoMemberSerialization(PlayerRelationKey, From),
+    AutoMemberSerialization(PlayerRelationKey, To),
+    BB::SerializationData::GuardData(),
+};
+
+CreateSerializationListFor(CppLogic::Mod::Player::ExtraPlayerManager, ExtraPlayers);
+CreateSerializationListFor(CppLogic::Mod::Player::ExtraPlayerManager, Diplomacy);
+const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::SerializationData[3] = {
+    AutoMemberSerialization(ExtraPlayerManager, ExtraPlayers),
+    AutoMemberSerialization(ExtraPlayerManager, Diplomacy),
+    BB::SerializationData::GuardData(),
+};
 
 CppLogic::Mod::Player::ExtraPlayerManager& CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj() {
     static ExtraPlayerManager m{};
@@ -73,7 +96,7 @@ void CppLogic::Mod::Player::ExtraPlayerManager::SetMaxPlayer(shok::PlayerId p) {
 }
 
 shok::DiploState CppLogic::Mod::Player::ExtraPlayerManager::GetDiplomacy(shok::PlayerId p, shok::PlayerId p2) {
-    auto i = Diplomacy.find(std::pair(p, p2));
+    auto i = Diplomacy.find(PlayerRelationKey(p, p2));
     if (i == Diplomacy.end())
         return shok::DiploState::Neutral;
     return i->second;
@@ -82,7 +105,7 @@ shok::DiploState CppLogic::Mod::Player::ExtraPlayerManager::GetDiplomacy(shok::P
 bool CppLogic::Mod::Player::ExtraPlayerManager::SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState d) {
     if (GetDiplomacy(p1, p2) == d)
         return false;
-    Diplomacy[std::pair(p1, p2)] = d;
+    Diplomacy[PlayerRelationKey(p1, p2)] = d;
     GGL::CEventDiplomacyChanged e{shok::EventIDs::LogicEvent_DiplomacyChanged, p1, p2, d};
     (*EScr::CScriptTriggerSystem::GlobalObj)->PostEvent(&e);
     return true;
@@ -91,6 +114,55 @@ bool CppLogic::Mod::Player::ExtraPlayerManager::SetDiplomacy(shok::PlayerId p1, 
 shok::PlayerId CppLogic::Mod::Player::ExtraPlayerManager::GetMaxPlayer() const {
     int id = static_cast<int>(ExtraPlayers.size());
     return static_cast<shok::PlayerId>(id + static_cast<size_t>(shok::PlayerId::P8));
+}
+
+void CppLogic::Mod::Player::ExtraPlayerManager::Serialize(const char *path, const char *savename) {
+    SavegameName = savename;
+    std::string p{ path };
+    p.append(SaveGameFile);
+    auto s = BB::CBinarySerializer::CreateUnique();
+    try {
+        BB::CFileStreamEx f{};
+        if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultWrite)) {
+            s->SerializeByData(&f, this, SerializationData);
+        }
+        f.Close();
+    }
+    catch (const BB::CFileException& e) {
+        char buff[201]{};
+        e.CopyMessage(buff, 200);
+        shok::LogString(__FUNCSIG__" error: %s\n", buff);
+    }
+}
+
+void CppLogic::Mod::Player::ExtraPlayerManager::Deserialize(const char *path, const char *savename) {
+    Clear();
+    std::string p{ path };
+    p.append(SaveGameFile);
+    auto s = BB::CBinarySerializer::CreateUnique();
+    try {
+        BB::CFileStreamEx f{};
+        if (f.OpenFile(p.c_str(), BB::IStream::Flags::DefaultRead)) {
+            s->DeserializeByData(&f, this, SerializationData);
+        }
+        f.Close();
+    }
+    catch (const BB::CFileException& e) {
+        char buff[201]{};
+        e.CopyMessage(buff, 200);
+        shok::LogString(__FUNCSIG__" error: %s\n", buff);
+    }
+    if (SavegameName != savename)
+    {
+        shok::LogString(__FUNCSIG__" save name does not match, is %s, should be %s\n", SavegameName.c_str(), savename);
+        Clear();
+        return;
+    }
+    auto max = GetMaxPlayer();
+    auto* l = *GGL::CGLGameLogic::GlobalObj;
+    for (auto pid = static_cast<shok::PlayerId>(9); pid < max; ++pid) {
+        l->SetTechResearchedCallback(pid);
+    }
 }
 
 void CppLogic::Mod::Player::ExtraPlayerManager::Hook(lua::CFunction getnumberofplayers) {

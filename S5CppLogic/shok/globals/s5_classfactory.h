@@ -52,7 +52,7 @@ namespace BB {
 		virtual void __stdcall DeserializeById(BB::IStream* f, BB::IObject* b) = 0;
 		virtual void __stdcall SerializeById(BB::IStream* f, BB::IObject* b) = 0;
 		virtual void __stdcall DeserializeByData(BB::IStream* f, void* o, const BB::SerializationData* d) = 0;
-		virtual void __stdcall SerializeByData(BB::IStream* f, void* o, const BB::SerializationData* d, shok::ClassId id) = 0; // id gets ignored
+		virtual void __stdcall SerializeByData(BB::IStream* f, void* o, const BB::SerializationData* d, shok::ClassId id = shok::ClassId::Invalid) = 0; // id gets ignored
 
 		static inline constexpr int vtp = 0x77F4C8;
 	};
@@ -190,6 +190,12 @@ namespace BB {
 		// ReSharper disable once CppDFAConstantFunctionResult
 		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
 		template<>
+		inline BB::FieldSerializer* GetSerializer<shok::DiploState>() {
+			return TypeInt; // no real serializer, but int should work
+		}
+		// ReSharper disable once CppDFAConstantFunctionResult
+		// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
+		template<>
 		inline BB::FieldSerializer* GetSerializer<shok::AttachmentType>() {
 			return TypeAttachmentType;
 		}
@@ -310,7 +316,10 @@ namespace BB {
 		template<class T>
 		requires requires { T::SerializationData; }
 		static const SerializationData* GetSerializationData() {
-			return T::SerializationData;
+			if constexpr (std::convertible_to<decltype(T::SerializationData), const SerializationData*>)
+				return T::SerializationData;
+			else
+				return T::SerializationData();
 		}
 		template<HasValidIdentifier T>
 		requires (!(requires { T::SerializationData; }))
@@ -760,14 +769,14 @@ namespace CppLogic {
 		static StringSerializer GlobalObj;
 	};
 
-	template<class T, CppLogic::ConstexprString ValueName = CppLogic::ConstexprString(""), CppLogic::ConstexprString KeyName = CppLogic::ConstexprString("")>
+	template<class T, ConstexprString ValueName, ConstexprString KeyName>
 	struct SerializationListOptions_Mapping {
 		static constexpr bool Mapped = false;
 		using VectT = void;
 
 		static const SerializationListOptions_Mapping GlobalObj;
 	};
-	template<class K, class V, class Cmp, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::ConstexprString KeyName>
+	template<class K, class V, class Cmp, class Alloc, ConstexprString ValueName, ConstexprString KeyName>
 	struct SerializationListOptions_Mapping<std::map<K, V, Cmp, Alloc>, ValueName, KeyName> {
 		static constexpr bool Mapped = true;
 
@@ -787,7 +796,7 @@ namespace CppLogic {
 
 		static const SerializationListOptions_Mapping GlobalObj;
 	};
-	template<class T, class Alloc, CppLogic::ConstexprString ValueName, CppLogic::ConstexprString KeyName>
+	template<class T, class Alloc, ConstexprString ValueName, ConstexprString KeyName>
 	struct SerializationListOptions_Mapping<std::vector<T, Alloc>, ValueName, KeyName> {
 		static constexpr bool Mapped = true;
 
@@ -930,3 +939,5 @@ template<>\
 const  CppLogic::SerializationListOptions_Mapping_KeyAttrib<decltype(T::M), CppLogic::ConstexprString(N)> \
 	CppLogic::SerializationListOptions_Mapping_KeyAttrib<decltype(T::M), CppLogic::ConstexprString(N)>::GlobalObj{};
 #define AutoMemberSerializationNameKeyAttrib(T,M,N,K) CppLogic::AutoData_KeyAttrib(N, offsetof(T, M), sizeof(decltype(T::M)), CppLogic::SerializationListOptions_Mapping_KeyAttrib<decltype(T::M), CppLogic::ConstexprString(K)>::GlobalObj)
+
+

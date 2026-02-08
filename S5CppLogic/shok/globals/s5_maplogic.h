@@ -371,6 +371,8 @@ namespace EGL {
 			std::unique_ptr<CPlayerExplorationHandler> ExplorationHandler = nullptr;
 			std::unique_ptr<CPlayerFeedbackHandler> FeedbackHandler = nullptr;
 			std::unique_ptr<CEntityVectorMap> EntityVectorMap = nullptr;
+
+			static inline auto* const SerializationData = reinterpret_cast<BB::SerializationData*(__stdcall*)()>(0x575a04);
 		};
 		shok::Array<Player, 9> Players{};
 		CPlayerExplorationUpdate* ExplorationUpdate = nullptr; //46
@@ -674,6 +676,8 @@ namespace GGL {
 		static inline BB::SerializationData* (__stdcall* const SerializationData)() = reinterpret_cast<BB::SerializationData * (__stdcall*)()>(0x49AC82);
 
 		// on tech researched event void __stdcall(this, const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&) 0x49A75F, put into GGL::PlayerTechManager
+
+		void SetTechResearchedCallback(shok::PlayerId p);
 	};
 	static_assert(offsetof(CGLGameLogic, NetEventHandlers) == 4 * 4);
 	static_assert(offsetof(CGLGameLogic, Players) == 10 * 4);

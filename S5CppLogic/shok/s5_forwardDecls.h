@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include <utility/ConstexprString.h>
 
 namespace shok::detail {
 	union padding {
@@ -268,4 +269,9 @@ namespace CppLogic {
 	namespace Mod::Player {
 		class ExtraPlayerManager;
 	}
+
+	template<class T, ConstexprString ValueName = ConstexprString(""), ConstexprString KeyName = ConstexprString("")>
+	struct SerializationListOptions_Mapping;
 }
+
+#define SerializationListFriend template<class T, ConstexprString k, ConstexprString v> friend struct CppLogic::SerializationListOptions_Mapping

@@ -10,7 +10,7 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 {
 	SavegameName = savename;
 	std::string p{ path };
-	p.append("\\CppLogic.xml");
+	p.append(SaveGameFile);
 	auto s = BB::CXmlSerializer::CreateUnique();
 	try {
 		BB::CFileStreamEx f{};
@@ -39,7 +39,7 @@ void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, c
 void CppLogic::SavegameExtra::SerializedMapdata::DeserializeFrom(const char* path, const char* savename)
 {
 	std::string p{ path };
-	p.append("\\CppLogic.xml");
+	p.append(SaveGameFile);
 	auto s = BB::CXmlSerializer::CreateUnique();
 	try {
 		BB::CFileStreamEx f{};

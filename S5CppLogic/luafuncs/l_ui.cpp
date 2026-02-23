@@ -2011,6 +2011,17 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int CommandDonateResources(luaext::State L) {
+		GGL::CNetEventPlayerResourceDonation ev{ shok::NetEventIds::Player_SendMPResources,
+			GGUI::CManager::GlobalObj()->ControlledPlayer,
+			L.CheckPlayerId(1),
+			L.CheckEnum<shok::ResourceType>(2),
+			L.CheckInt(3),
+		};
+		GGUI::CManager::PostEventFromUI(&ev);
+		return 0;
+	}
+
 	constexpr std::array Commands{ // move, patrol
 		luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<EGL::CNetEvent2Entities, shok::NetEventIds::Entity_AttackEntity,
 			LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>>>("Entity_AttackEntity"),
@@ -2076,6 +2087,7 @@ namespace CppLogic::UI {
 			LuaEventInterface::CheckEntityBehavior<CppLogic::Mod::ReloadableCannonBuilderAbility>>>("BombCannonCombo_Activate"),
 		luaext::FuncReference::GetRef<CommandMove>("Entity_Move"),
 		luaext::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
+		luaext::FuncReference::GetRef<CommandDonateResources>("Player_DonateResources"),
 	};
 
 	void Init(luaext::State L)

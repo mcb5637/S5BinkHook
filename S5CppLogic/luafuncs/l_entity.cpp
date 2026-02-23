@@ -46,12 +46,10 @@ namespace CppLogic::Entity {
 
 	int PredicateOfAnyPlayer(luaext::State L) {
 		int num = L.GetTop();
-		if (num > 9)
-			throw lua::LuaException("too many players to check");
 		auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyPlayer>();
-		for (int i = 0; i < num; ++i) {
-			p->players[i] = L.CheckPlayerId(i);
-		}
+		p->players.reserve(num);
+		for (int i = 0; i < num; ++i)
+			p->players.emplace_back(L.CheckPlayerId(i));
 		return 1;
 	}
 

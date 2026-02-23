@@ -38,6 +38,7 @@ size_t CppLogic::ModLoader::ModLoader::GUIDLength = 0;
 void CppLogic::ModLoader::ModLoader::Init(luaext::State L, const char* mappath, std::string_view func, const std::function<void(luaext::State)>& pushMapInfo)
 {
 	Log(L, "Initializing ModLoader");
+	Mod::Player::ExtraPlayerManager::Hook(&luaext::State::CppToCFunction<GetMaxPlayers>);
 	InitExtraECats();
 
 	auto logpath = StringUtil::ANSIToUTF8(mappath);
@@ -1473,7 +1474,6 @@ int CppLogic::ModLoader::ModLoader::GetFeedbackEventMem(luaext::State l) {
 }
 
 int CppLogic::ModLoader::ModLoader::SetMaxPlayers(luaext::State L) {
-	Mod::Player::ExtraPlayerManager::Hook(&luaext::State::CppToCFunction<GetMaxPlayers>);
 	Mod::Player::ExtraPlayerManager::GlobalObj().SetMaxPlayer(static_cast<shok::PlayerId>(L.CheckInt(1)));
 	L.Push(Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer());
 	return 1;

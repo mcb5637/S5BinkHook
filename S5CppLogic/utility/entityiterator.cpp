@@ -4,6 +4,8 @@
 #include <shok/player/s5_player.h>
 #include <shok/entitytype/s5_entitytype.h>
 
+#include "ModPlayers.h"
+
 CppLogic::Iterator::GlobalEntityIterator::GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* const p)
 	: GlobalManagedIterator<EGL::CGLEEntity>(*EGL::CGLEEntityManager::GlobalObj, p) {
 }
@@ -34,15 +36,10 @@ EGL::CGLEEntity* CppLogic::Iterator::PlayerEntityIterator::GetCurrentBase(const 
 CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p)
 	: ManagedIterator<EGL::CGLEEntity>(p)
 {
-	static constexpr auto ip = shok::PlayerId::Invalid;
-	Players = { ip,ip,ip ,ip ,ip ,ip ,ip ,ip ,ip };
 }
 CppLogic::Iterator::MultiPlayerEntityIterator::MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* const p, std::initializer_list<shok::PlayerId> pls)
-	: MultiPlayerEntityIterator(p)
+	: ManagedIterator<EGL::CGLEEntity>(p), Players(pls)
 {
-	if (pls.size() > 9)
-		throw std::out_of_range("too many players");
-	std::copy(pls.begin(), pls.end(), Players.begin());
 }
 EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetNextBase(EntityIteratorStatus& c) const
 {
@@ -90,11 +87,11 @@ EGL::CGLEEntity* CppLogic::Iterator::MultiPlayerEntityIterator::GetCurrentBase(c
 
 CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories,
 	const Predicate<EGL::CGLEEntity>* const p)
-	: ManagedIterator<EGL::CGLEEntity>(p), AccessCat(accessCategories),
-	BaseX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(x1, x2))),
+	: ManagedIterator<EGL::CGLEEntity>(p), BaseX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(x1, x2))),
 	BaseY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::min(y1, y2))),
 	EndX((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(x1, x2))),
-	EndY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(y1, y2)))
+	EndY((*EGL::CGLEGameLogic::GlobalObj)->RegionDataEntityObj.GetSingleEntryComponent(std::max(y1, y2))),
+	AccessCat(accessCategories)
 {
 }
 CppLogic::Iterator::MultiRegionEntityIterator::MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories,
@@ -297,16 +294,9 @@ bool CppLogic::Iterator::EntityPredicateIsNotInBuilding::Matches(const EGL::CGLE
 	return e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) == shok::EntityId::Invalid && e->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE) == shok::EntityId::Invalid;
 }
 
-CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer()
+CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer(std::initializer_list<shok::PlayerId> pl)
+	: players(pl)
 {
-	static constexpr auto ip = shok::PlayerId::Invalid;
-	players = { ip,ip,ip ,ip ,ip ,ip ,ip ,ip ,ip };
-}
-CppLogic::Iterator::EntityPredicateOfAnyPlayer::EntityPredicateOfAnyPlayer(std::initializer_list<shok::PlayerId> pl) : EntityPredicateOfAnyPlayer()
-{
-	if (pl.size() > players.size())
-		throw std::out_of_range("too many players");
-	std::copy(pl.begin(), pl.end(), players.begin());
 }
 bool CppLogic::Iterator::EntityPredicateOfAnyPlayer::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
@@ -315,39 +305,35 @@ bool CppLogic::Iterator::EntityPredicateOfAnyPlayer::Matches(const EGL::CGLEEnti
 			return true;
 	return false;
 }
-int CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl)
+void CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(std::vector<shok::PlayerId>& players, shok::PlayerId pl)
 {
+	players.clear();
 	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pl);
-	int curr = 0;
-	for (int p = 1; p <= 8; p++) {
-		if (ps->GetDiploStateTo(static_cast<shok::PlayerId>(p)) == shok::DiploState::Hostile) {
-			players[curr] = static_cast<shok::PlayerId>(p);
-			++curr;
+	auto max = Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+	for (auto p = shok::PlayerId::P1; p <= max; ++p) {
+		if (ps->GetDiploStateTo(p) == shok::DiploState::Hostile) {
+			players.emplace_back(p);
 		}
 	}
-	return curr;
 }
-int  CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillFriendlyPlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl, bool addSelf)
+void CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillFriendlyPlayers(std::vector<shok::PlayerId>& players, shok::PlayerId pl, bool addSelf)
 {
-	int curr = 0;
+	players.clear();
 	if (addSelf) {
-		players[curr] = pl;
-		++curr;
+		players.emplace_back(pl);
 	}
 	GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pl);
-	for (int p = 1; p <= 8; p++) {
-		if (ps->GetDiploStateTo(static_cast<shok::PlayerId>(p)) == shok::DiploState::Friendly) {
-			players[curr] = static_cast<shok::PlayerId>(p);
-			++curr;
+	auto max = Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+	for (auto p = shok::PlayerId::P1; p <= max; ++p) {
+		if (ps->GetDiploStateTo(p) == shok::DiploState::Friendly) {
+			players.emplace_back(p);
 		}
 	}
-	return curr;
 }
 
 CppLogic::Iterator::EntityPredicateOfAnyType::EntityPredicateOfAnyType(std::initializer_list<shok::EntityTypeId> ety)
+	: entityTypes(ety)
 {
-	entityTypes.resize(ety.size());
-	std::copy(ety.begin(), ety.end(), entityTypes.begin());
 }
 bool CppLogic::Iterator::EntityPredicateOfAnyType::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {

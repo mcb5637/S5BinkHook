@@ -865,11 +865,6 @@ function CppLogic.Logic.GetPlayerName(pid) end
 ---@return table
 function CppLogic.Logic.DumpGameLogic() end
 
---- gets the players display name as shown in the diplomacy menu
---- @param pid number
---- @return string?
-function CppLogic.Logic.GetPlayerDisplayName(pid) end
-
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -3441,6 +3436,12 @@ function CppLogic.UI.Commands.Bombardment_Activate(id, p) end
 ---@param id number|string
 ---@param p Position
 function CppLogic.UI.Commands.BombCannonCombo_Activate(id, p) end
+
+---sends resources to another player
+---@param target_player number
+---@param resType number
+---@param am number
+function CppLogic.UI.Commands.Player_DonateResources(target_player, resType, am) end
 
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed/reloaded on leaving the map.

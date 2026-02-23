@@ -134,7 +134,7 @@ void CppLogic::Mod::Effect::PiercingShotEffect::CheckForDamage()
 	auto pl = attacker ? attacker->PlayerId : SourcePlayer;
 	CppLogic::Iterator::EntityPredicateIsCombatRelevant irel{};
 	CppLogic::Rect rect{ FlyingEffectSlot.Position, FlyingEffectSlot.LastPosition, AoERange };
-	CppLogic::Iterator::PredicateInArbitrayRect<EGL::CGLEEntity> icircl{ rect };
+	CppLogic::Iterator::PredicateInArbitraryRect<EGL::CGLEEntity> icircl{ rect };
 	CppLogic::Iterator::EntityPredicateIsAlive iali{};
 
 	auto lam = [this, attacker, pl](EGL::CGLEEntity* curr) {

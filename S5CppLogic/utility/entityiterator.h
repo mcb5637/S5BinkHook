@@ -239,7 +239,7 @@ namespace CppLogic::Iterator {
 	// you may not create/destroy entities while iterating
 	class MultiPlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
 	public:
-		std::array<shok::PlayerId, 9> Players{};
+		std::vector<shok::PlayerId> Players{};
 	protected:
 		virtual EGL::CGLEEntity* GetNextBase(EntityIteratorStatus& c) const override;
 		[[nodiscard]] virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
@@ -410,7 +410,7 @@ namespace CppLogic::Iterator {
 	class EntityPredicateOfType : public Predicate<EGL::CGLEEntity> {
 		shok::EntityTypeId ety;
 	public:
-		EntityPredicateOfType(shok::EntityTypeId ety);
+		explicit EntityPredicateOfType(shok::EntityTypeId ety);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
@@ -418,7 +418,7 @@ namespace CppLogic::Iterator {
 	class EntityPredicateOfPlayer : public Predicate<EGL::CGLEEntity> {
 		shok::PlayerId player;
 	public:
-		EntityPredicateOfPlayer(shok::PlayerId pl);
+		explicit EntityPredicateOfPlayer(shok::PlayerId pl);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
@@ -426,7 +426,7 @@ namespace CppLogic::Iterator {
 	class EntityPredicateOfEntityCategory : public Predicate<EGL::CGLEEntity> {
 		shok::EntityCategory ecat;
 	public:
-		EntityPredicateOfEntityCategory(shok::EntityCategory category);
+		explicit EntityPredicateOfEntityCategory(shok::EntityCategory category);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
@@ -448,7 +448,7 @@ namespace CppLogic::Iterator {
 	class EntityPredicateProvidesResource : public Predicate<EGL::CGLEEntity> {
 		shok::ResourceType res;
 	public:
-		EntityPredicateProvidesResource(shok::ResourceType resType);
+		explicit EntityPredicateProvidesResource(shok::ResourceType resType);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
@@ -456,7 +456,7 @@ namespace CppLogic::Iterator {
 	class EntityPredicateOfUpgradeCategory : public Predicate<EGL::CGLEEntity> {
 		shok::UpgradeCategoryId ucat;
 	public:
-		EntityPredicateOfUpgradeCategory(shok::UpgradeCategoryId category);
+		explicit EntityPredicateOfUpgradeCategory(shok::UpgradeCategoryId category);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
@@ -491,7 +491,7 @@ namespace CppLogic::Iterator {
 	class PredicateInRect : public Predicate<T> {
 		const shok::AARect rect;
 	public:
-		PredicateInRect(const shok::AARect& r) : rect{ std::min(r.low.X, r.high.X), std::min(r.low.Y, r.high.Y), std::max(r.low.X, r.high.X), std::max(r.low.Y, r.high.Y) } {
+		explicit PredicateInRect(const shok::AARect& r) : rect{ std::min(r.low.X, r.high.X), std::min(r.low.Y, r.high.Y), std::max(r.low.X, r.high.X), std::max(r.low.Y, r.high.Y) } {
 		}
 		PredicateInRect(float x1, float y1, float x2, float y2) : rect{ std::min(x1, x2), std::min(y1, y2), std::max(x1, x2), std::max(y1, y2) } {
 		}
@@ -502,10 +502,10 @@ namespace CppLogic::Iterator {
 		using InheritsFrom = std::tuple<Predicate<T>>;
 	};
 	template<class T>
-	class PredicateInArbitrayRect : public Predicate<T> {
-		const CppLogic::Rect rect;
+	class PredicateInArbitraryRect : public Predicate<T> {
+		const Rect rect;
 	public:
-		PredicateInArbitrayRect(const CppLogic::Rect& r) : rect{r } {
+		explicit PredicateInArbitraryRect(const Rect& r) : rect{r } {
 		}
 		virtual bool Matches(const T* e, float* rangeOut, int* prio) const override {
 			return rect.IsPosInRect(e->Position);
@@ -518,7 +518,7 @@ namespace CppLogic::Iterator {
 	class PredicateFuncT : public Predicate<T> {
 		F Func;
 	public:
-		PredicateFuncT(F f) : Func(std::move(f)) {
+		explicit PredicateFuncT(F f) : Func(std::move(f)) {
 		}
 		virtual bool Matches(const T* e, float* rangeOut, int* prio) const override {
 			return std::invoke(Func, e, rangeOut, prio);
@@ -529,7 +529,7 @@ namespace CppLogic::Iterator {
 	template<class T, class F>
 	requires std::invocable<F, const T*, float*, int*>
 	PredicateFuncT<T, F> PredicateFunc(F f) {
-		return { std::move(f) };
+		return PredicateFuncT<T, F>{ std::move(f) };
 	}
 
 	class EntityPredicateIsSettler : public Predicate<EGL::CGLEEntity> {
@@ -583,12 +583,12 @@ namespace CppLogic::Iterator {
 
 	class EntityPredicateOfAnyPlayer : public Predicate<EGL::CGLEEntity> {
 	public:
-		std::array<shok::PlayerId, 9> players{};
-		EntityPredicateOfAnyPlayer();
+		std::vector<shok::PlayerId> players{};
+		EntityPredicateOfAnyPlayer() = default;
 		EntityPredicateOfAnyPlayer(std::initializer_list<shok::PlayerId> pl);
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
-		static int FillHostilePlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl);
-		static int FillFriendlyPlayers(std::array<shok::PlayerId, 9>& players, shok::PlayerId pl, bool addSelf);
+		static void FillHostilePlayers(std::vector<shok::PlayerId>& players, shok::PlayerId pl);
+		static void FillFriendlyPlayers(std::vector<shok::PlayerId>& players, shok::PlayerId pl, bool addSelf);
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
 	};
@@ -605,7 +605,7 @@ namespace CppLogic::Iterator {
 	class EffectPredicateOfType : public Predicate<EGL::CEffect> {
 		shok::EffectTypeId Type;
 	public:
-		EffectPredicateOfType(shok::EffectTypeId ty);
+		explicit EffectPredicateOfType(shok::EffectTypeId ty);
 		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CEffect>>;
@@ -613,7 +613,7 @@ namespace CppLogic::Iterator {
 	class EffectPredicateOfPlayer : public Predicate<EGL::CEffect> {
 		shok::PlayerId Player;
 	public:
-		EffectPredicateOfPlayer(shok::PlayerId pl);
+		explicit EffectPredicateOfPlayer(shok::PlayerId pl);
 		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CEffect>>;

@@ -28,7 +28,6 @@
 #include <utility/savegame_extra.h>
 #include <utility/modloader.h>
 #include <luafuncs/l_ui.h>
-#include <shok/ui/s5_widget.h>
 #include <utility/ModFilesystem.h>
 
 namespace CppLogic::Logic {
@@ -364,13 +363,6 @@ namespace CppLogic::Logic {
 		auto s = L.CheckStringView(1);
 		(*BB::CFileSystemMgr::GlobalObj)->AddFolder(s.data());
 		L.NewUserClass<CppLogic::ModLoader::ArchivePopHelper>(s, (*BB::CFileSystemMgr::GlobalObj)->LoadOrder[0]);
-		return 1;
-	}
-
-	int GetPlayerDisplayName(luaext::State L) {
-		auto p = L.CheckPlayerId(1);
-		auto* n = GGUI::CDiplomacyWindowControllerCustomWidget::GetPlayerName(p);
-		L.Push(n);
 		return 1;
 	}
 
@@ -1590,7 +1582,6 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<AddRedirectLayer>("AddRedirectLayer"),
 			luaext::FuncReference::GetRef<AddFolder>("AddFolder"),
 #endif
-			luaext::FuncReference::GetRef<GetPlayerDisplayName>("GetPlayerDisplayName"),
 			luaext::FuncReference::GetRef<SetExplorationUpdateMinMax>("SetExplorationUpdateMinMax")
 		};
 

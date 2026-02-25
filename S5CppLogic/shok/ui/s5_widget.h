@@ -94,6 +94,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x832A90;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xF1CAFF46);
 		// ctor that sets data 55A978
+		// copy assign 5315bf
 
 		CMaterial();
 		void SetTexture(const char* name);
@@ -113,6 +114,8 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x8333B8;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCBC5B326);
 
+		// 55a3e9 set command
+
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		void Call(shok::WidgetId widgetID);
@@ -131,6 +134,10 @@ namespace EGUIX {
 
 		static void HookShortcutSignExtend();
 		static void HookShortcutComparison();
+
+		// set action func 55a3e9
+		// update state 55a40d
+		// set highlighted 55a49e
 
 		static inline constexpr int vtp = 0x780818;
 		static inline constexpr int TypeDesc = 0x832918;

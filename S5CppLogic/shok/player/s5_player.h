@@ -237,6 +237,7 @@ namespace GGL {
 		void ForceResearch(shok::TechnologyId tech);
 		// on update 0x4A1B42 __thiscall()
 		// start research 0x4A29DD __thiscall(techId, researcherId) only to be called by building::startResearch
+		// dtor 4b5d0a
 
 		void ForceResearchNoFeedback(shok::TechnologyId tech);
 	};
@@ -258,6 +259,8 @@ namespace GGL {
 		void SetTributeData(int tid, const shok::CostInfo& c, shok::EntityId ownerEntityId, shok::PlayerId offeringPlayerId, const char* text);
 		// returns if it was there
 		bool RemoveTribute(int tid);
+
+		// dtor 4b624c
 	};
 	static_assert(sizeof(PlayerTributesManager) == 5 * 4);
 	//constexpr int i = offsetof(PlayerTributesManager::Tribute, OwnerEntityID) / 4;
@@ -289,6 +292,8 @@ namespace GGL {
 		void SetQuestPosition(int questId, const shok::Position* pos, bool info);
 		// returns if it was there
 		bool RemoveQuest(int questId, bool info);
+
+		// dtor 4b6279
 	};
 	static_assert(sizeof(PlayerQuestManager::Quest) == 24 * 4);
 	//constexpr int i = offsetof(PlayerQuestManager::Quest, SubQuestDoneFlagArray) / 4;
@@ -314,6 +319,8 @@ namespace GGL {
 		[[nodiscard]] virtual unsigned int __stdcall GetClassIdentifier() const;
 
 		static inline constexpr int vtp = 0x76E0D8;
+
+		// 4c1287 get resdata of restype
 	};
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CGameStatistics {
@@ -345,6 +352,11 @@ namespace GGL {
 		void OnResMined(shok::ResourceType rt, float am); // use normal res type, not raw
 
 		// tick 4c1939
+
+		// get res amount at 530c62(type, minute)
+
+		// dtor 4a14b5
+		// copy assign 4c174b
 	};
 	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
 	//constexpr int i = offsetof(CGameStatistics, MotivationTimeLine) / 4;
@@ -437,4 +449,24 @@ namespace GGL {
 	static_assert(sizeof(CPlayerStatus) == 804);
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;
 
+	struct PostGameStatisticsHolder {
+		struct Player {
+			bool Valid = false;
+			bool PlayerIsHumanFlag = false;
+			PADDING(2);
+			int PlayerColorR = 0, PlayerColorG = 0, PlayerColorB = 0;
+			shok::String PlayerNameStringRaw, PlayerNameStringTableKey;
+			int Score_all = 0, Score_resources = 0, Score_buildings = 0, Score_technology = 0, Score_battle = 0;
+			GGL::CGameStatistics* GameStatistics = nullptr;
+		};
+
+		int Valid = 0;
+		Player Players[9];
+
+		// clear/dtor 4a1728
+		// update player data 4a179c
+		// get holder of player 5304b4
+
+		static inline auto* const GlobalObj = reinterpret_cast<PostGameStatisticsHolder*>(0x85c400);
+	};
 }

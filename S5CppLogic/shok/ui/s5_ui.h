@@ -694,6 +694,8 @@ namespace GGUI {
 		//  GGUI::SoundFeedback::GlobalObj()->HandleFeedbackEvent(event)
 		//  GGUI::CShortMessagesWindowControllerCustomWidget::HandleFeedbackEvent
 
+		// static cdecl 5304d3 get player status
+
 		void SetControlledPlayer(shok::PlayerId pl);
 		[[nodiscard]] bool IsEntitySelected(shok::EntityId id) const;
 		bool SelectEntity(shok::EntityId id); // returns successful

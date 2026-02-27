@@ -871,6 +871,8 @@ namespace GGUI {
 			ResourcesStone = 43,
 			ResourcesSulphur = 44,
 			ResourcesWood = 45,
+			Technologies_ = 50,
+			Sores_ = 60,
 		};
 		enum class TimeScale : int {
 			Min60 = 1,
@@ -888,6 +890,9 @@ namespace GGUI {
 			void ToggleTimeScale();
 			int GetMinutes(shok::PlayerId pl, CStatisticsRendererCustomWidget* cw);
 
+			// get type text 53057d
+			// 530b2c get timescale minutes (shok::playerid, GGUI::CStatisticsRendererCustomWidget *)
+
 			static inline StatToRender** const GlobalObj = reinterpret_cast<StatToRender**>(0x882B00);
 		};
 
@@ -900,6 +905,20 @@ namespace GGUI {
 		[[nodiscard]] shok::PlayerId GetPlayer() const;
 		[[nodiscard]] bool IsHumanPlayer(shok::PlayerId pl) const;
 		GGL::CGameStatistics* GetStatistics(shok::PlayerId player);
+
+		// 5306de static cdecl set type text to widget(widname)
+		// 53080a get game statistics of player
+		// 5309f8 get current player
+		// 530840 is player human
+		// 530a30 get player display name
+		// 530d27 get value at (player, minute, &value) -> bool success
+		// 530874 get player color (player, &color) -> bool success
+
+		// render text 5307a0 (rect, text, x, y, color)
+		// render int as text 530947 (rect, val, x, y, bool ra) (ra likely bugged, wrong position)
+
+		static void HookFillPlayersToDisplay();
+		static void(*FillPlayersToDisplay)(CStatisticsRendererCustomWidget* th, shok::Vector<shok::PlayerId>& players, shok::PlayerId local_player);
 	};
 	static_assert(offsetof(CStatisticsRendererCustomWidget, IsMainMenu) == 37 * 4);
 	static_assert(sizeof(CStatisticsRendererCustomWidget) == 38 * 4);

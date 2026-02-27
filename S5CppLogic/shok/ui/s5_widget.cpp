@@ -1062,6 +1062,38 @@ GGL::CGameStatistics* GGUI::CStatisticsRendererCustomWidget::GetStatistics(shok:
     return statrender_getstat(this, player);
 }
 
+void(*GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay)(CStatisticsRendererCustomWidget* th, shok::Vector<shok::PlayerId>& players, shok::PlayerId local_player) = nullptr;
+void __stdcall statrender_fillplayers(GGUI::CStatisticsRendererCustomWidget* th, shok::Vector<shok::PlayerId>* players, shok::PlayerId local_player) {
+    if (GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay != nullptr) {
+        GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay(th, *players, local_player);
+    }
+    else {
+        auto v = players->SaveVector();
+        v.Vector.push_back(local_player);
+        v.Vector.push_back(static_cast<shok::PlayerId>(10));
+    }
+}
+void NAKED statrender_fillplayersasm() {
+    __asm {
+        push [ebp-0x24];
+        lea eax,[ebp-0x58];
+        push eax;
+        push edi;
+        call statrender_fillplayers;
+
+        push 0x530f92;
+        ret;
+    };
+}
+bool HookFillPlayersToDisplay_Hooked = false;
+void GGUI::CStatisticsRendererCustomWidget::HookFillPlayersToDisplay() {
+    if (HookFillPlayersToDisplay_Hooked)
+        return;
+    HookFillPlayersToDisplay_Hooked = true;
+    CppLogic::Hooks::SaveVirtualProtect vp{reinterpret_cast<void*>(0x530f3b), 0x530f92-0x530f3b};
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x530f3b), &statrender_fillplayersasm, reinterpret_cast<void*>(0x530f92));
+}
+
 static inline void(__stdcall* const loadfont)(shok::FontId* out, const char* name) = reinterpret_cast<void(__stdcall*)(shok::FontId*, const char*)>(0x55D99E);
 void EGUIX::FontManager::LoadFont(shok::FontId* outFontID, const char* fontName)
 {

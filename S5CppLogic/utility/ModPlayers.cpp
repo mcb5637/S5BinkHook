@@ -7,6 +7,7 @@
 #include <shok/events/s5_netevents.h>
 #include <shok/globals/s5_classfactory.h>
 #include <shok/ui/s5_ui.h>
+#include <shok/ui/s5_widget.h>
 
 const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::ExtraPlayer::SerializationData[4] = {
     AutoMemberSerialization(ExtraPlayer, EPlayer),
@@ -189,4 +190,5 @@ void CppLogic::Mod::Player::ExtraPlayerManager::Hook(lua::CFunction getnumberofp
     GGL::PlayerManager::HookExtraPlayers(getnumberofplayers);
     ED::CPlayerColors::HookExtraPlayers();
     GGUI::CManager::HookExtraPlayers();
+    GGUI::CStatisticsRendererCustomWidget::HookFillPlayersToDisplay();
 }

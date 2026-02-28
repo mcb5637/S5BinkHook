@@ -9,6 +9,7 @@
 #include <utility/mod.h>
 #include <utility/EntityAddonData.h>
 #include <shok/engine/s5_RWE_2d.h>
+#include <utility/ModPlayers.h>
 
 shok::Color EGUIX::Color::ToShokColor() const
 {
@@ -1062,7 +1063,94 @@ GGL::CGameStatistics* GGUI::CStatisticsRendererCustomWidget::GetStatistics(shok:
     return statrender_getstat(this, player);
 }
 
+const char * GGUI::CStatisticsRendererCustomWidget::GetPlayerDisplayName(shok::PlayerId pl) {
+    auto f = reinterpret_cast<const char*(__thiscall*)(CStatisticsRendererCustomWidget*, shok::PlayerId)>(0x530a30);
+    return f(this, pl);
+}
+
+std::optional<int> GGUI::CStatisticsRendererCustomWidget::GetValueAt(shok::PlayerId pl, int minute) {
+    auto f = reinterpret_cast<bool(__thiscall*)(CStatisticsRendererCustomWidget*, shok::PlayerId, int*)>(0x530d27);
+    int r;
+    if (f(this, pl, &r))
+        return r;
+    return std::nullopt;
+}
+
+std::optional<EGUIX::Color> GGUI::CStatisticsRendererCustomWidget::GetPlayerColor(shok::PlayerId pl) {
+    auto f = reinterpret_cast<bool(__thiscall*)(CStatisticsRendererCustomWidget*, shok::PlayerId, EGUIX::Color*)>(0x530874);
+    EGUIX::Color r;
+    if (f(this, pl, &r))
+        return r;
+    return std::nullopt;
+}
+
+int GGUI::CStatisticsRendererCustomWidget::GetCurrentScore(shok::PlayerId pl, ScoreType t) {
+    auto f = reinterpret_cast<int(__thiscall*)(CStatisticsRendererCustomWidget*, shok::PlayerId, ScoreType)>(0x530509);
+    return f(this, pl, t);
+}
+
+void GGUI::CStatisticsRendererCustomWidget::RenderText(const EGUIX::Rect *rect, const char *txt, float x, float y,
+    const EGUIX::Color *color) {
+    auto f = reinterpret_cast<void(__thiscall*)(CStatisticsRendererCustomWidget*, const EGUIX::Rect*, const char*, float, float, const EGUIX::Color*)>(0x5307a0);
+    f(this, rect, txt, x, y, color);
+}
+
+void GGUI::CStatisticsRendererCustomWidget::RenderIntAsText(const EGUIX::Rect *rect, int val, float x, float y, bool ra) {
+    auto f = reinterpret_cast<void(__thiscall*)(CStatisticsRendererCustomWidget*, const EGUIX::Rect*, int, float, float, bool)>(0x530947);
+    f(this, rect, val, x, y, ra);
+}
+
 void(*GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay)(CStatisticsRendererCustomWidget* th, shok::Vector<shok::PlayerId>& players, shok::PlayerId local_player) = nullptr;
+
+void __stdcall GGUI::CStatisticsRendererCustomWidget::ReplacementRenderScores(CStatisticsRendererCustomWidget* th, const EGUIX::Rect* rect) {
+    static constexpr float XPosStart = 263.5f / 600.0f;
+    static constexpr float XPosStep = 50.0f / 600.0f;
+    static constexpr float YPosStart = 0.2f;
+    static constexpr float YPosStep = 0.1f;
+    static constexpr const char* FontName = "Data\\Menu\\Fonts\\Standard10.met";
+
+    auto max_pl = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+    auto y = YPosStart;
+    for (shok::PlayerId p  = shok::PlayerId::P1; p <= max_pl; ++p) {
+        if (!th->IsHumanPlayer(p))
+            continue;
+        const char* name = th->GetPlayerDisplayName(p);
+        if (name == nullptr)
+            continue;
+        auto color = th->GetPlayerColor(p);
+        if (!color.has_value())
+            color = EGUIX::Color(255, 255, 255, 255);
+        th->RenderText(rect, name, 0.02f, y, &*color);
+
+        float x = XPosStart;
+        for (ScoreType t = ScoreType::All; t <= ScoreType::Battle; ++t) {
+            std::array<char, 52> buff;
+            auto val = th->GetCurrentScore(p, t);
+            std::snprintf(buff.data(), buff.size(), "@ra %d", val);
+            //th->RenderText(rect, buff.data(), x, y, &*color);
+
+            auto f = static_cast<shok::FontId>(EGUIX::FontManager::GlobalObj()->Manager->GetIdByName(FontName));
+            auto tx = x * rect->W + rect->X;
+            shok::UIRenderer::GlobalObj()->RenderText(buff.data(), f, true, tx, y * rect->H + rect->Y, tx, nullptr, 0.0f);
+
+            x += XPosStep;
+        }
+
+        y += YPosStep;
+    }
+}
+
+void NAKED_DEF GGUI::CStatisticsRendererCustomWidget::ReplacementRenderScoresAsm() {
+    __asm {
+        push [ebp + 0xc];
+        push edi;
+        call GGUI::CStatisticsRendererCustomWidget::ReplacementRenderScores;
+
+        push 0x531519;
+        ret;
+    };
+}
+
 void __stdcall statrender_fillplayers(GGUI::CStatisticsRendererCustomWidget* th, shok::Vector<shok::PlayerId>* players, shok::PlayerId local_player) {
     if (GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay != nullptr) {
         GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay(th, *players, local_player);
@@ -1090,8 +1178,9 @@ void GGUI::CStatisticsRendererCustomWidget::HookFillPlayersToDisplay() {
     if (HookFillPlayersToDisplay_Hooked)
         return;
     HookFillPlayersToDisplay_Hooked = true;
-    CppLogic::Hooks::SaveVirtualProtect vp{reinterpret_cast<void*>(0x530f3b), 0x530f92-0x530f3b};
+    CppLogic::Hooks::SaveVirtualProtect vp{reinterpret_cast<void*>(0x530f3b), 0x531519-0x530f3b};
     CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x530f3b), &statrender_fillplayersasm, reinterpret_cast<void*>(0x530f92));
+    CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x531400), &ReplacementRenderScoresAsm, reinterpret_cast<void*>(0x531519));
 }
 
 static inline void(__stdcall* const loadfont)(shok::FontId* out, const char* name) = reinterpret_cast<void(__stdcall*)(shok::FontId*, const char*)>(0x55D99E);

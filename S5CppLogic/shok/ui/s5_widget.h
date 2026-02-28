@@ -881,6 +881,14 @@ namespace GGUI {
 			All = 4,
 			Min30 = 5,
 		};
+		enum class ScoreType : int {
+			All = 0,
+			Resources = 1,
+			Buildings = 2,
+			Technology = 3,
+			Settlers = 4,
+			Battle = 5,
+		};
 
 		struct StatToRender {
 			StatType Selected;
@@ -905,20 +913,22 @@ namespace GGUI {
 		[[nodiscard]] shok::PlayerId GetPlayer() const;
 		[[nodiscard]] bool IsHumanPlayer(shok::PlayerId pl) const;
 		GGL::CGameStatistics* GetStatistics(shok::PlayerId player);
+		const char* GetPlayerDisplayName(shok::PlayerId pl);
+		std::optional<int> GetValueAt(shok::PlayerId pl, int minute);
+		std::optional<EGUIX::Color> GetPlayerColor(shok::PlayerId pl);
+		int GetCurrentScore(shok::PlayerId pl, ScoreType t);
 
-		// 5306de static cdecl set type text to widget(widname)
-		// 53080a get game statistics of player
-		// 5309f8 get current player
-		// 530840 is player human
-		// 530a30 get player display name
-		// 530d27 get value at (player, minute, &value) -> bool success
-		// 530874 get player color (player, &color) -> bool success
+		void RenderText(const EGUIX::Rect* rect, const char* txt, float x, float y, const EGUIX::Color* color);
+		// ra bugged, wrong position
+		void RenderIntAsText(const EGUIX::Rect* rect, int val, float x, float y, bool ra = false);
 
-		// render text 5307a0 (rect, text, x, y, color)
-		// render int as text 530947 (rect, val, x, y, bool ra) (ra likely bugged, wrong position)
+		// 5306de static cdecl set type text to widget(widname) 208.5
 
 		static void HookFillPlayersToDisplay();
 		static void(*FillPlayersToDisplay)(CStatisticsRendererCustomWidget* th, shok::Vector<shok::PlayerId>& players, shok::PlayerId local_player);
+	private:
+		void static __stdcall ReplacementRenderScores(CStatisticsRendererCustomWidget* th, const EGUIX::Rect* rect);
+		static void NAKED_DECL ReplacementRenderScoresAsm();
 	};
 	static_assert(offsetof(CStatisticsRendererCustomWidget, IsMainMenu) == 37 * 4);
 	static_assert(sizeof(CStatisticsRendererCustomWidget) == 38 * 4);
@@ -1447,3 +1457,6 @@ inline auto CppLogic::GetIdManager<shok::WidgetGroupId>() {
 	auto mng = EGUIX::CWidgetGroupManager::GlobalObj();
 	return CppLogic::EnumIdManager<shok::WidgetGroupId>{ mng->Manager };
 }
+
+template<>
+class enum_is_iter<GGUI::CStatisticsRendererCustomWidget::ScoreType> : public std::true_type {};

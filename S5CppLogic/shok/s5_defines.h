@@ -615,6 +615,14 @@ namespace shok {
 		TechRace = 2,
 		TimeGame = 3,
 	};
+	enum class ScoreType : int {
+		All = 0,
+		Resources = 1,
+		Buildings = 2,
+		Technology = 3,
+		Settlers = 4,
+		Battle = 5,
+	};
 }
 
 template<>
@@ -623,3 +631,5 @@ template<>
 class enum_is_flags<shok::MPFlags> : public std::true_type {};
 template<>
 class enum_is_iter<shok::PlayerId> : public std::true_type {};
+template<>
+class enum_is_iter<shok::ScoreType> : public std::true_type {};

@@ -1084,8 +1084,8 @@ std::optional<EGUIX::Color> GGUI::CStatisticsRendererCustomWidget::GetPlayerColo
     return std::nullopt;
 }
 
-int GGUI::CStatisticsRendererCustomWidget::GetCurrentScore(shok::PlayerId pl, ScoreType t) {
-    auto f = reinterpret_cast<int(__thiscall*)(CStatisticsRendererCustomWidget*, shok::PlayerId, ScoreType)>(0x530509);
+int GGUI::CStatisticsRendererCustomWidget::GetCurrentScore(shok::PlayerId pl, shok::ScoreType t) {
+    auto f = reinterpret_cast<int(__thiscall*)(CStatisticsRendererCustomWidget*, shok::PlayerId, shok::ScoreType)>(0x530509);
     return f(this, pl, t);
 }
 
@@ -1103,17 +1103,20 @@ void GGUI::CStatisticsRendererCustomWidget::RenderIntAsText(const EGUIX::Rect *r
 void(*GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay)(CStatisticsRendererCustomWidget* th, shok::Vector<shok::PlayerId>& players, shok::PlayerId local_player) = nullptr;
 
 void __stdcall GGUI::CStatisticsRendererCustomWidget::ReplacementRenderScores(CStatisticsRendererCustomWidget* th, const EGUIX::Rect* rect) {
-    static constexpr float XPosStart = 263.5f / 600.0f;
-    static constexpr float XPosStep = 50.0f / 600.0f;
+    const float XPosStart = th->IsMainMenu ? 269.0f / 620.0f : 263.5f / 600.0f;
+    const float XPosStep = th->IsMainMenu ? 53.0f / 620.0f : 50.0f / 600.0f;
     static constexpr float YPosStart = 0.2f;
-    static constexpr float YPosStep = 0.1f;
-    static constexpr const char* FontName = "Data\\Menu\\Fonts\\Standard10.met";
+    static constexpr float YPosStep = 0.05f;
+    static constexpr const char* FontName = R"(Data\Menu\Fonts\Standard10.met)";
 
-    auto max_pl = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+    auto max_pl = th->IsMainMenu ? CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetPostgameMaxPlayer()
+        : CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
     auto y = YPosStart;
     for (shok::PlayerId p  = shok::PlayerId::P1; p <= max_pl; ++p) {
         if (!th->IsHumanPlayer(p))
             continue;
+        if (y >= 1.0f)
+            break;
         const char* name = th->GetPlayerDisplayName(p);
         if (name == nullptr)
             continue;
@@ -1123,9 +1126,9 @@ void __stdcall GGUI::CStatisticsRendererCustomWidget::ReplacementRenderScores(CS
         th->RenderText(rect, name, 0.02f, y, &*color);
 
         float x = XPosStart;
-        for (ScoreType t = ScoreType::All; t <= ScoreType::Battle; ++t) {
-            std::array<char, 52> buff;
+        for (shok::ScoreType t = shok::ScoreType::All; t <= shok::ScoreType::Battle; ++t) {
             auto val = th->GetCurrentScore(p, t);
+            std::array<char, 10+std::numeric_limits<decltype(val)>::digits10> buff; // NOLINT(*-pro-type-member-init)
             std::snprintf(buff.data(), buff.size(), "@ra %d", val);
             //th->RenderText(rect, buff.data(), x, y, &*color);
 
@@ -1157,8 +1160,18 @@ void __stdcall statrender_fillplayers(GGUI::CStatisticsRendererCustomWidget* th,
     }
     else {
         auto v = players->SaveVector();
-        v.Vector.push_back(local_player);
-        v.Vector.push_back(static_cast<shok::PlayerId>(10));
+        if (th->IsMainMenu) {
+            auto& ex = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+            auto max = ex.GetPostgameMaxPlayer();
+            for (auto p = shok::PlayerId::P1; p <= max; ++p) {
+                auto* pl = ex.TryGetPostgamePlayer(p);
+                if (pl != nullptr && pl->PlayerIsHumanFlag)
+                    v.Vector.push_back(p);
+            }
+        }
+        else {
+            v.Vector.push_back(local_player);
+        }
     }
 }
 void NAKED statrender_fillplayersasm() {

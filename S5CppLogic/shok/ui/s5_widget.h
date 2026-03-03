@@ -881,14 +881,6 @@ namespace GGUI {
 			All = 4,
 			Min30 = 5,
 		};
-		enum class ScoreType : int {
-			All = 0,
-			Resources = 1,
-			Buildings = 2,
-			Technology = 3,
-			Settlers = 4,
-			Battle = 5,
-		};
 
 		struct StatToRender {
 			StatType Selected;
@@ -916,7 +908,7 @@ namespace GGUI {
 		const char* GetPlayerDisplayName(shok::PlayerId pl);
 		std::optional<int> GetValueAt(shok::PlayerId pl, int minute);
 		std::optional<EGUIX::Color> GetPlayerColor(shok::PlayerId pl);
-		int GetCurrentScore(shok::PlayerId pl, ScoreType t);
+		int GetCurrentScore(shok::PlayerId pl, shok::ScoreType t);
 
 		void RenderText(const EGUIX::Rect* rect, const char* txt, float x, float y, const EGUIX::Color* color);
 		// ra bugged, wrong position
@@ -1457,6 +1449,3 @@ inline auto CppLogic::GetIdManager<shok::WidgetGroupId>() {
 	auto mng = EGUIX::CWidgetGroupManager::GlobalObj();
 	return CppLogic::EnumIdManager<shok::WidgetGroupId>{ mng->Manager };
 }
-
-template<>
-class enum_is_iter<GGUI::CStatisticsRendererCustomWidget::ScoreType> : public std::true_type {};

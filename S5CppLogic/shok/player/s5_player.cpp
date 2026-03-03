@@ -470,6 +470,20 @@ void GGL::CGameStatistics::OnResMined(shok::ResourceType rt, float am)
 	gamestatistics_resmined(this, rt, am);
 }
 
+void* GGL::CGameStatistics::operator new(size_t s)
+{
+	return shok::Malloc(s);
+}
+void GGL::CGameStatistics::operator delete(void* p) {
+	shok::Free(p);
+}
+
+GGL::CGameStatistics& GGL::CGameStatistics::operator=(const CGameStatistics &other) {
+	auto f = reinterpret_cast<CGameStatistics*(__thiscall*)(CGameStatistics*, const CGameStatistics*)>(0x4c174b);
+	f(this, &other);
+	return *this;
+}
+
 static inline shok::DiploState(__thiscall* const shok_GGL_CPlayerStatus_getDiploState)(GGL::PlayerDiplomacyManager* d, shok::PlayerId p) = reinterpret_cast<shok::DiploState(__thiscall*)(GGL::PlayerDiplomacyManager * d, shok::PlayerId p)>(0x4B4D5B);
 shok::DiploState GGL::CPlayerStatus::GetDiploStateTo(shok::PlayerId p)
 {
@@ -599,6 +613,74 @@ bool __thiscall GGL::CPlayerStatus::SetDiploExtra(PlayerDiplomacyManager *th, sh
 
 shok::DiploState __thiscall GGL::CPlayerStatus::GetDiploExtra(PlayerDiplomacyManager *th, shok::PlayerId p) {
 	return CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetDiplomacy(th->PlayerID, p);
+}
+
+int GGL::PostGameStatisticsHolder::PlayerScores::GetScore(shok::ScoreType t) {
+	auto f = reinterpret_cast<int(__thiscall*)(PlayerScores*, shok::ScoreType)>(0x53049d);
+	return f(this, t);
+}
+
+void GGL::PostGameStatisticsHolder::PlayerScores::ReadScores(shok::PlayerId p) {
+	auto f = reinterpret_cast<int(__thiscall*)(PlayerScores*, shok::PlayerId)>(0x4a12eb);
+	f(this, p);
+}
+
+GGL::PostGameStatisticsHolder::Player* GGL::PostGameStatisticsHolder::GetPlayerRaw(shok::PlayerId p) {
+	if (p < shok::PlayerId::P1 || p > shok::PlayerId::P8)
+		return nullptr;
+	auto* r = &Players[static_cast<int>(p)];
+	return r;
+}
+
+bool PostGame_HookExtraPlayers_Hooked = false;
+void GGL::PostGameStatisticsHolder::HookExtraPlayers() {
+	if (PostGame_HookExtraPlayers_Hooked)
+		return;
+	PostGame_HookExtraPlayers_Hooked = true;
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{0x10, {
+			reinterpret_cast<void*>(0x5304b4),
+		}};
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5304b4), CppLogic::Hooks::MemberFuncPointerToVoid(&PostGameStatisticsHolder::GetPlayerExtra, 0), reinterpret_cast<void*>(0x5304bb));
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{0x10, {
+			reinterpret_cast<void*>(0x40ca35),
+		}};
+		// replaces call to shok::SetLowPrecFPU in the only lua func that calls update
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x40ca35), &UpdatePlayerExtra);
+	}
+}
+
+GGL::PostGameStatisticsHolder::Player* GGL::PostGameStatisticsHolder::GetPlayerExtra(shok::PlayerId p) {
+	auto* r = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().TryGetPostgamePlayer(p);
+	if (r != nullptr && r->Valid)
+		return r;
+	return nullptr;
+}
+
+void GGL::PostGameStatisticsHolder::UpdatePlayerExtra() {
+	try {
+		auto& ex = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj();
+		auto max = ex.PrepareCopyToPostgame();
+		for (auto p = static_cast<shok::PlayerId>(9); p <= max; ++p) {
+			auto& pl = ex.GetGGL(p);
+			auto& d = *ex.TryGetPostgamePlayer(p);
+			d.Valid = true;
+			d.PlayerIsHumanFlag = pl.PlayerIsHumanFlag;
+			d.PlayerColorR = pl.PlayerColorR;
+			d.PlayerColorG = pl.PlayerColorG;
+			d.PlayerColorB = pl.PlayerColorB;
+			d.PlayerNameStringRaw = pl.PlayerNameStringRaw;
+			d.PlayerNameStringTableKey = pl.PlayerNameStringTableKey;
+			d.Scores.ReadScores(p);
+			d.GameStatistics = std::make_unique<GGL::CGameStatistics>(shok::PlayerId::P0);
+			*d.GameStatistics = pl.Statistics;
+		}
+	}
+	catch (const std::exception& e) {
+		shok::LogString("error copying player postgame statistics: %s\n", e.what());
+	}
 }
 
 bool HookCanPlaceBuilding_Hooked = false;

@@ -73,6 +73,8 @@ namespace shok {
 	enum class MPFlags : int;
 	enum class MPGameModes : int;
 
+	enum class ScoreType : int;
+
 	// only forward decl of these, most may change at runtime
 	enum class AnimationId : int;
 	enum class EntityTypeId : int;

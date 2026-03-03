@@ -363,8 +363,8 @@ namespace EGL {
 	public:
 		struct Player {
 			bool PlayerInGame = false;
-			BB::IObject* PlayerData = nullptr; // nullptr mp related?
 			// probably not unique ptrs originally, but it makes things easier
+			std::unique_ptr<BB::IObject> PlayerData = nullptr; // nullptr mp related?
 			std::unique_ptr<CPlayerExplorationHandler> ExplorationHandler = nullptr;
 			std::unique_ptr<CPlayerFeedbackHandler> FeedbackHandler = nullptr;
 			std::unique_ptr<CEntityVectorMap> EntityVectorMap = nullptr;

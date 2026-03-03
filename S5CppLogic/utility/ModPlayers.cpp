@@ -185,10 +185,32 @@ void CppLogic::Mod::Player::ExtraPlayerManager::Deserialize(const char *path, co
     }
 }
 
+shok::PlayerId CppLogic::Mod::Player::ExtraPlayerManager::GetPostgameMaxPlayer() const {
+    int id = static_cast<int>(PostgamePlayers.size());
+    return static_cast<shok::PlayerId>(id + static_cast<size_t>(shok::PlayerId::P8));
+}
+
+GGL::PostGameStatisticsHolder::Player* CppLogic::Mod::Player::ExtraPlayerManager::TryGetPostgamePlayer(shok::PlayerId p) {
+    if (p <= shok::PlayerId::P8)
+        return GGL::PostGameStatisticsHolder::GlobalObj->GetPlayerRaw(p);
+    const auto id = static_cast<size_t>(p) - static_cast<size_t>(shok::PlayerId::P8) - 1;
+    if (id > PostgamePlayers.size())
+        return nullptr;
+    return &PostgamePlayers[id];
+}
+
+shok::PlayerId CppLogic::Mod::Player::ExtraPlayerManager::PrepareCopyToPostgame() {
+    PostgamePlayers.clear();
+    auto last = GetMaxPlayer();
+    PostgamePlayers.resize(static_cast<size_t>(last) - static_cast<size_t>(shok::PlayerId::P8));
+    return last;
+}
+
 void CppLogic::Mod::Player::ExtraPlayerManager::Hook(lua::CFunction getnumberofplayers) {
     EGL::PlayerManager::HookExtraPlayers();
     GGL::PlayerManager::HookExtraPlayers(getnumberofplayers);
     ED::CPlayerColors::HookExtraPlayers();
     GGUI::CManager::HookExtraPlayers();
     GGUI::CStatisticsRendererCustomWidget::HookFillPlayersToDisplay();
+    GGL::PostGameStatisticsHolder::HookExtraPlayers();
 }

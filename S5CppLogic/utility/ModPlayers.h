@@ -31,6 +31,7 @@ namespace CppLogic::Mod::Player {
 
         std::string SavegameName;
         std::vector<ExtraPlayer> ExtraPlayers;
+        std::vector<GGL::PostGameStatisticsHolder::Player> PostgamePlayers;
         std::map<PlayerRelationKey, PlayerRelation> Diplomacy;
 
         static const BB::SerializationData SerializationData[];
@@ -58,6 +59,10 @@ namespace CppLogic::Mod::Player {
         [[nodiscard]] shok::PlayerId GetMaxPlayer() const;
         void Serialize(const char* path, const char* savename);
         void Deserialize(const char* path, const char* savename);
+
+        [[nodiscard]] shok::PlayerId GetPostgameMaxPlayer() const;
+        GGL::PostGameStatisticsHolder::Player* TryGetPostgamePlayer(shok::PlayerId p);
+        shok::PlayerId PrepareCopyToPostgame();
 
         static void Hook(lua::CFunction getnumberofplayers);
     };

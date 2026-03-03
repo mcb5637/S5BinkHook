@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/entitytype/s5_entitytype.h>
@@ -355,8 +356,17 @@ namespace GGL {
 
 		// get res amount at 530c62(type, minute)
 
-		// dtor 4a14b5
-		// copy assign 4c174b
+		void* operator new(size_t s);
+		void operator delete(void* p);
+
+		CGameStatistics& operator=(const CGameStatistics& other);
+
+		explicit CGameStatistics(shok::PlayerId p);
+		~CGameStatistics();
+
+		CGameStatistics(const CGameStatistics&) = delete;
+		CGameStatistics(CGameStatistics&&) = delete;
+		CGameStatistics& operator=(CGameStatistics&&) = delete;
 	};
 	static_assert(sizeof(GGL::CGameStatistics) == 116 * 4);
 	//constexpr int i = offsetof(CGameStatistics, MotivationTimeLine) / 4;
@@ -450,14 +460,21 @@ namespace GGL {
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;
 
 	struct PostGameStatisticsHolder {
+		struct PlayerScores {
+			int all = 0, resources = 0, buildings = 0, technology = 0, settlers = 0, battle = 0;
+
+			int GetScore(shok::ScoreType t);
+			void ReadScores(shok::PlayerId p);
+		};
+
 		struct Player {
 			bool Valid = false;
 			bool PlayerIsHumanFlag = false;
 			PADDING(2);
 			int PlayerColorR = 0, PlayerColorG = 0, PlayerColorB = 0;
 			shok::String PlayerNameStringRaw, PlayerNameStringTableKey;
-			int Score_all = 0, Score_resources = 0, Score_buildings = 0, Score_technology = 0, Score_battle = 0;
-			GGL::CGameStatistics* GameStatistics = nullptr;
+			PlayerScores Scores;
+			std::unique_ptr<GGL::CGameStatistics> GameStatistics = nullptr; // probably not originally unique_ptr, but makes things easier
 		};
 
 		int Valid = 0;
@@ -465,8 +482,15 @@ namespace GGL {
 
 		// clear/dtor 4a1728
 		// update player data 4a179c
-		// get holder of player 5304b4
+		// get player 5304b4
+
+		Player* GetPlayerRaw(shok::PlayerId p);
 
 		static inline auto* const GlobalObj = reinterpret_cast<PostGameStatisticsHolder*>(0x85c400);
+
+		static void HookExtraPlayers();
+	private:
+		Player* GetPlayerExtra(shok::PlayerId p);
+		static void UpdatePlayerExtra();
 	};
 }

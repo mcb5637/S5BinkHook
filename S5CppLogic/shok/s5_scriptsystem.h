@@ -50,6 +50,8 @@ namespace EScr {
 		// funcName may be nullptr, does nothing on success
 		static inline void(__stdcall* const HandleLuaError)(lua_State* L, lua::ErrorCode e, const char* funcName) = reinterpret_cast<void(__stdcall*)(lua_State*, lua::ErrorCode, const char*)>(0x5A28A7);
 
+		static inline int(__cdecl* const GetPlayerScore)(shok::PlayerId p, shok::ScoreType t)=reinterpret_cast<int(__cdecl*)(shok::PlayerId, shok::ScoreType)>(0x4a12d2);
+
 		static void HookFireEvent();
 		static void HookRemoveFuncOverrides();
 		static void HookLoadFileToLuaState();

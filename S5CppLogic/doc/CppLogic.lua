@@ -3292,6 +3292,13 @@ function CppLogic.UI.VideoCustomWidgetSetVideoSize(wid, x, y) end
 ---@param funcname string
 function CppLogic.UI.MiniMapOverlaySetCallbackFuncName(wid, funcname) end
 
+---overrides the players for which the ingame statistics window shows detailed graphs.
+---score visibility is determined via IsHuman flag.
+---should include the local player, it is not added automatically.
+---does not get stored into any savegame and does not affect postgame statistics.
+---@param ... number
+function CppLogic.UI.StatisticsWidgetOverridePlayersToShowGraphs(...) end
+
 ---@class TerrainDecalAccess
 local TerrainDecalAccess = {}
 ---destroys (removes from game world)

@@ -1382,6 +1382,22 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int StatisticsWidgetOverridePlayersToShowGraphs(luaext::State L) {
+		static std::vector<shok::PlayerId> ids{};
+		ids.clear();
+		auto t = L.GetTop();
+		ids.reserve(t);
+		for (int i = 1; i <= t; ++i)
+			ids.emplace_back(L.CheckPlayerId(i));
+		GGUI::CStatisticsRendererCustomWidget::HookFillPlayersToDisplay();
+		GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay = [](GGUI::CStatisticsRendererCustomWidget*, shok::Vector<shok::PlayerId>& v, shok::PlayerId) {
+			auto s = v.SaveVector();
+			for (auto p : ids)
+				s.Vector.emplace_back(p);
+		};
+		return 0;
+	}
+
 	int CreateSelectionDecal(luaext::State L) {
 
 		auto t = L.CheckEnum<shok::SelectionTextureId>(1);
@@ -1687,6 +1703,7 @@ namespace CppLogic::UI {
 			}
 		}
 		TerrainDecalAccess::Cleanup();
+		GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay = nullptr;
 	}
 
 	void OnSaveLoaded(luaext::State L)
@@ -1860,6 +1877,7 @@ namespace CppLogic::UI {
 		luaext::FuncReference::GetRef<RemoveWidget>("RemoveWidget"),
 		luaext::FuncReference::GetRef<ReorderWidgets>("ReorderWidgets"),
 		luaext::FuncReference::GetRef<MiniMapOverlaySetCallbackFuncName>("MiniMapOverlaySetCallbackFuncName"),
+		luaext::FuncReference::GetRef<StatisticsWidgetOverridePlayersToShowGraphs>("StatisticsWidgetOverridePlayersToShowGraphs"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

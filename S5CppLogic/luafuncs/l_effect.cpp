@@ -14,7 +14,7 @@
 
 namespace CppLogic::Effect {
 	void PushToHitCallbackReg(luaext::State L) {
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.GetSubTable(EffectOnHitKey, -1);
 		L.Remove(-2);
 	}
@@ -413,7 +413,7 @@ namespace CppLogic::Effect {
 	void OnSaveLoaded(luaext::State L)
 	{
 		int t = L.GetTop();
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(EffectOnHitKey);
 		L.GetTableRaw(-2);
 		if (L.IsTable(-1)) {

@@ -1240,7 +1240,7 @@ namespace CppLogic::UA {
 	void CppLogic::UA::UnlimitedArmy::RegisterUDType(luaext::State L)
 	{
 		L.PrepareUserClassType<UnlimitedArmy>();
-		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<UnlimitedArmy>() }] = &luaext::State::CppToCFunction<ReadTable>;
+		CppLogic::Serializer::UserdataDeserializer[std::string{ typename_details::type_name<UnlimitedArmy>() }] = &luaext::State::CppToCFunction<ReadTable>;
 	}
 
 	constexpr std::array UA{

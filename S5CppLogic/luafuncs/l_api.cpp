@@ -242,7 +242,7 @@ namespace CppLogic::API {
 		}
 		else {
 			BB::CMemoryStream st{};
-			Serializer::AdvLuaStateSerializer seri{st, L.GetState(), true};
+			Serializer::AdvLuaStateSerializer<true> seri{st, L.GetState()};
 			seri.SerializeVariable(2);
 
 			mm.Push(st.GetData());
@@ -271,7 +271,7 @@ namespace CppLogic::API {
 		}
 
 		IO::StringViewReadStream st {mm.CheckStringView(-1)};
-		Serializer::AdvLuaStateSerializer seri{st, L.GetState(), true};
+		Serializer::AdvLuaStateSerializer<true> seri{st, L.GetState()};
 		seri.DeserializeVariable();
 
 		if (mm.GetState() != L.GetState())
@@ -341,7 +341,7 @@ namespace CppLogic::API {
 			BB::CFileStreamEx fs{};
 			if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultWrite))
 				throw lua::LuaException{ "cannot open file" };
-			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState(), L.OptBool(5, false) };
+			CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ fs, L.GetState() };
 			seri.SerializeVariable(1);
 			fs.Close();
 		}
@@ -363,7 +363,7 @@ namespace CppLogic::API {
 			BB::CFileStreamEx fs{};
 			if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultRead))
 				throw lua::LuaException{ "cannot open file" };
-			CppLogic::Serializer::AdvLuaStateSerializer seri{ fs, L.GetState(),  L.OptBool(4, false) };
+			CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ fs, L.GetState() };
 			seri.DeserializeVariable();
 			fs.Close();
 		}
@@ -524,7 +524,7 @@ namespace CppLogic::API {
 	void RNG::Register(luaext::State L)
 	{
 		L.PrepareUserClassType<RNG>();
-		CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<RNG>() }] = &luaext::State::CppToCFunction<RNG::Deserialize>;
+		CppLogic::Serializer::UserdataDeserializer[std::string{ typename_details::type_name<RNG>() }] = &luaext::State::CppToCFunction<RNG::Deserialize>;
 	}
 
 	int CreateRNG(luaext::State L) {

@@ -171,7 +171,7 @@ namespace CppLogic::UA {
 		} };
 
 		static constexpr const std::array<luaext::FuncReference, 1> LuaMetaMethods{ {
-				luaext::FuncReference::GetRef<DumpTable>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
+				luaext::FuncReference::GetRef<DumpTable>(luaext::MetaEvent::Serialize),
 		} };
 	};
 }

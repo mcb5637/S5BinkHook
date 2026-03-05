@@ -120,7 +120,7 @@ namespace CppLogic::Logic {
 		int id = ev->EventTypeId;
 		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int top = L.GetTop();
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(NetEventSetHookRegKey);
 		L.GetTableRaw(-2);
 		bool r = false;
@@ -139,7 +139,7 @@ namespace CppLogic::Logic {
 	int NetEventSetHook(luaext::State L) {
 		if (!L.IsFunction(1))
 			throw lua::LuaException("no func");
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(NetEventSetHookRegKey);
 		L.PushValue(1);
 		L.SetTableRaw(-3);
@@ -149,7 +149,7 @@ namespace CppLogic::Logic {
 	}
 	int NetEventUnSetHook(luaext::State L) {
 		GGUI::CManager::PostEventCallback = nullptr;
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(NetEventSetHookRegKey);
 		L.Push();
 		L.SetTableRaw(-3);
@@ -520,7 +520,7 @@ namespace CppLogic::Logic {
 		int t = L.GetTop();
 		bool r = true;
 
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(CanPlaceBuildingCallbackRegKey);
 		L.GetTableRaw(-2);
 		L.Push(entitytype);
@@ -540,7 +540,7 @@ namespace CppLogic::Logic {
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
-			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.PushSerializedRegistry();
 			L.Push(CanPlaceBuildingCallbackRegKey);
 			L.Push();
 			L.SetTableRaw(-3);
@@ -548,7 +548,7 @@ namespace CppLogic::Logic {
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(CanPlaceBuildingCallbackRegKey);
 		L.PushValue(1);
 		L.SetTableRaw(-3);
@@ -584,7 +584,7 @@ namespace CppLogic::Logic {
 		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();
 
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(SnipeDamageOverrideRegKey);
 		L.GetTableRaw(-2);
 		L.Push(sniper->EntityId);
@@ -601,7 +601,7 @@ namespace CppLogic::Logic {
 		GGL::CSniperAbility::OverrideSnipeTask();
 		if (L.IsNil(1)) {
 			GGL::CSniperAbility::SnipeDamageOverride = nullptr;
-			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.PushSerializedRegistry();
 			L.Push(SnipeDamageOverrideRegKey);
 			L.Push(true);
 			L.SetTableRaw(-3);
@@ -609,7 +609,7 @@ namespace CppLogic::Logic {
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(SnipeDamageOverrideRegKey);
 		L.PushValue(1);
 		L.SetTableRaw(-3);
@@ -711,7 +711,7 @@ namespace CppLogic::Logic {
 		int t = L.GetTop();
 
 		SetLuaTaskListFunc_Info d{ e, false, false, false };
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(SetLuaTaskListFuncRegKey);
 		L.GetTableRaw(-2);
 		L.Push(e->EntityId);
@@ -740,7 +740,7 @@ namespace CppLogic::Logic {
 
 		if (L.IsNil(1)) {
 			EGL::CGLEEntity::LuaTaskListCallback = nullptr;
-			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.PushSerializedRegistry();
 			L.Push(SetLuaTaskListFuncRegKey);
 			L.Push();
 			L.SetTableRaw(-3);
@@ -748,7 +748,7 @@ namespace CppLogic::Logic {
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(SetLuaTaskListFuncRegKey);
 		L.PushValue(1);
 		L.SetTableRaw(-3);
@@ -1455,7 +1455,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<SetTimeOfAnim>("SetTimeOfAnim"),
 		};
 		static constexpr const std::array LuaMetaMethods{
-				luaext::FuncReference::GetRef<Serialize>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
+				luaext::FuncReference::GetRef<Serialize>(lua::MetaEvent::Serialize),
 		};
 
 		~LogicModel() {
@@ -1601,7 +1601,7 @@ namespace CppLogic::Logic {
 
 		if (L.GetState() != shok::LuaStateMainmenu) {
 			L.PrepareUserClassType<LogicModel>();
-			CppLogic::Serializer::AdvLuaStateSerializer::UserdataDeserializer[std::string{ typename_details::type_name<LogicModel>() }] = &luaext::State::CppToCFunction<LogicModel::Deserialize>;
+			CppLogic::Serializer::UserdataDeserializer[std::string{ typename_details::type_name<LogicModel>() }] = &luaext::State::CppToCFunction<LogicModel::Deserialize>;
 
 			L.GetSubTable("Events");
 			L.Push("CPPLOGIC_EVENT_ON_ENTITY_KILLS_ENTITY");
@@ -1634,7 +1634,7 @@ namespace CppLogic::Logic {
 
 	void OnSaveLoaded(luaext::State L)
 	{
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		if (!CppLogic::HasSCELoader())
 		{
 			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker;

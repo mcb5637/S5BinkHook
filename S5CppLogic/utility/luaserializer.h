@@ -5,8 +5,11 @@
 #include <shok/s5_baseDefs.h>
 #include <shok/s5_defines.h>
 #include <shok/globals/s5_classfactory.h>
+#include <shok/globals/s5_filesystem.h>
+#include <shok/s5_scriptsystem.h>
 #include <luaext.h>
 #include <utility/EnumIdManagerMagic.h>
+#include <Luapp/luapp_serialization.h>
 
 namespace CppLogic::Serializer {
 	class ObjectToLuaSerializer {
@@ -49,6 +52,24 @@ namespace CppLogic::Serializer {
 		static void Deserialize(BB::IStream& s, BB::IObject* o);
 	};
 
+	struct S5IO {
+		BB::IStream& Stream;
+
+		void Write(std::span<const char> data)
+		{
+			Stream.Write(data.data(), data.size());
+		}
+
+		void Read(std::span<char> data)
+		{
+			auto l = Stream.Read(data.data(), data.size());
+			if (l != data.size())
+				throw std::format_error{ "read error, eof" };
+		}
+	};
+
+
+	static std::map<std::string, lua::CFunction, std::less<>> UserdataDeserializer;
 	/// <summary>
 	/// better serialization of lua states.
 	/// serialize writes the type (so it can write a reference instead).
@@ -58,96 +79,26 @@ namespace CppLogic::Serializer {
 	/// anything can be any serializable lua value, including a table, but may not reference the to-be-serialized userdata (other serializable userdata is allowed).</para>
 	/// <para>you may use CppLogic::Serializer::ObjectToLuaSerializer to turn a C++ object via BB::SerializationData into a table and back.</para>
 	/// </summary>
-	class AdvLuaStateSerializer {
-		struct Reference {
-			lua::LType Type;
-			const void* Id;
-
-			auto operator<=>(const Reference&) const = default;
-		};
-		struct UpvalueReference {
-			int FuncReference;
-			int UpvalueNum;
-		};
-
-
-		BB::IStream& IO;
-		luaext::State L;
-		std::unique_ptr<byte[]> Data;
-		size_t DataLength = 0;
-		std::map<Reference, int> RefToNumber;
-		std::map<const void*, UpvalueReference> UpRefs;
-		int NextRefereceNumber = 1;
-		int IndexOfReferenceHolder = 0;
-		void* (__cdecl*lua_upvalueid)(lua_State* L, int funcindex, int n) = nullptr;
-		void(__cdecl* lua_upvaluejoin)(lua_State* L, int funcindex1, int n1, int funcindex2, int n2) = nullptr;
-		bool DataOnly;
-
-		// a reference to something already serialized/deserialized
-		static constexpr lua::LType ReferenceType = static_cast<lua::LType>(-2);
-		// a reference to a already serilaized/deserialized upvalue
-		static constexpr lua::LType UpvalueReferenceType = static_cast<lua::LType>(-3);
-
-		void WritePrimitive(const void* d, size_t len);
-		size_t ReadPrimitive();
-		template<class T>
-		void WritePrimitive(const T d) {
-			WritePrimitive(&d, sizeof(T));
-		}
-		template<class T>
-		T ReadPrimitive(const char* ex) {
-			if (ReadPrimitive() != sizeof(T))
-				throw std::format_error{ ex };
-			return *reinterpret_cast<T*>(Data.get());
-		}
-
-		void SerializeType(lua::LType t);
-		lua::LType DeserializeType();
-		void SerializeBool(int idx);
-		void DeserializeBool();
-		void SerializeNumber(int idx);
-		void DeserializeNumber();
-		void SerializeString(int idx);
-		void DeserializeString();
-		void SerializeReference(int ref);
-		int DeserializeReference();
-		void DeserializeReferencedValue();
-		void SerializeTable(int idx, bool isglobal = false);
-		void DeserializeTable(bool create);
-		void SerializeFunction(int idx);
-		void DeserializeFunction();
-		void SerializeUserdata(int idx);
-		void DeserializeUserdata();
-		void SerializeAnything(int idx);
-		void DeserializeAnything();
-		void DeserializeAnything(lua::LType t);
-		bool CanSerialize(int idx);
-		static bool IsGlobalSkipped(const char* n);
-
-		void PrepareSerialize();
-		void CleanupSerialize();
-		void PrepareDeserialize();
-		void CleanupDeserialize(bool ret);
-
+	template<bool DataOnly>
+	class AdvLuaStateSerializer : public lua::serialization::LuaSerializer<S5IO, luaext::State, DataOnly> {
 	public:
-		AdvLuaStateSerializer(BB::IStream& io, lua_State* l, bool dataOnly = false);
-
-		void SerializeState();
-		void DeserializeState();
-
-		void SerializeVariable(int i);
-		void DeserializeVariable();
-
-		void SerializeStack(int n = -1);
-		void DeserializeStack();
-
-		// pushes a registry subtable that will get serialized in savegames. (creates one if it does not exist)
-		static void PushSerializedRegistry(luaext::State L);
-
-		static constexpr const char* UserdataSerializerMetaEvent = "__serialize";
-		static std::map<std::string, lua::CFunction> UserdataDeserializer;
-		static constexpr int FileVersion = 2;
-		static constexpr const char* RegistrySerializeKeys = "CppLogic::Serializer::AdvLuaStateSerializer_SerlializedRegistry";
+		AdvLuaStateSerializer(BB::IStream& io, lua_State* l)
+		: lua::serialization::LuaSerializer<S5IO, luaext::State, DataOnly>(S5IO{io}, luaext::State{l}) {
+			this->GetUserdataDeserializer = [](std::string_view k) {
+				auto i = UserdataDeserializer.find(k);
+				if (i == UserdataDeserializer.end())
+					throw std::format_error{ "unknown userclass" };
+				return i->second;
+			};
+			this->IsGlobalSkipped = [](std::string_view v) {
+				auto* nse = EScr::LuaStateSerializer::DoNotSerializeGlobals();
+				for (const auto& i : *nse) {
+					if (v == i)
+						return true;
+				}
+				return false;
+			};
+		}
 	};
 
 	class StructAccess;

@@ -615,7 +615,7 @@ namespace CppLogic::UI {
 		int t = L.GetTop();
 		bool r = false;
 
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(CharTriggerRegKey);
 		L.GetTableRaw(-2);
 		L.Push(c);
@@ -631,7 +631,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			EGUIX::UIInput_Char_Callback = nullptr;
-			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.PushSerializedRegistry();
 			L.Push(CharTriggerRegKey);
 			L.Push();
 			L.SetTableRaw(-3);
@@ -639,7 +639,7 @@ namespace CppLogic::UI {
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(CharTriggerRegKey);
 		L.PushValue(1);
 		L.SetTableRaw(-3);
@@ -655,7 +655,7 @@ namespace CppLogic::UI {
 		int t = L.GetTop();
 		bool r = false;
 
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(KeyTriggerRegKey);
 		L.GetTableRaw(-2);
 		L.Push(c);
@@ -672,7 +672,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			EGUIX::UIInput_Key_Callback = nullptr;
-			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.PushSerializedRegistry();
 			L.Push(KeyTriggerRegKey);
 			L.Push();
 			L.SetTableRaw(-3);
@@ -680,7 +680,7 @@ namespace CppLogic::UI {
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(KeyTriggerRegKey);
 		L.PushValue(1);
 		L.SetTableRaw(-3);
@@ -699,7 +699,7 @@ namespace CppLogic::UI {
 		int t = L.GetTop();
 		bool r = false;
 
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(MouseTriggerRegKey);
 		L.GetTableRaw(-2);
 		L.Push(static_cast<int>(id));
@@ -730,7 +730,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("not supported with SCELoader");
 		if (L.IsNil(1)) {
 			EGUIX::UIInput_Mouse_Callback = nullptr;
-			CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+			L.PushSerializedRegistry();
 			L.Push(MouseTriggerRegKey);
 			L.Push();
 			L.SetTableRaw(-3);
@@ -738,7 +738,7 @@ namespace CppLogic::UI {
 		}
 
 		L.CheckType(1, lua::LType::Function);
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 		L.Push(MouseTriggerRegKey);
 		L.PushValue(1);
 		L.SetTableRaw(-3);
@@ -1708,7 +1708,7 @@ namespace CppLogic::UI {
 
 	void OnSaveLoaded(luaext::State L)
 	{
-		CppLogic::Serializer::AdvLuaStateSerializer::PushSerializedRegistry(L);
+		L.PushSerializedRegistry();
 
 		L.Push(CharTriggerRegKey);
 		L.GetTableRaw(-2);

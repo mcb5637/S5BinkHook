@@ -311,7 +311,7 @@ void __stdcall EScr::LuaStateSerializer::SerializeOverride(BB::CFileStreamEx* f,
 		f->Write(&wr, sizeof(int));
 		wr = 0;
 		f->Write(&wr, sizeof(int));
-		CppLogic::Serializer::AdvLuaStateSerializer seri{ *f, L };
+		CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ *f, L };
 		seri.SerializeState();
 	}
 	catch (const std::format_error& fe) {
@@ -355,7 +355,7 @@ void __stdcall EScr::LuaStateSerializer::DeserializeOverride(BB::CFileStreamEx* 
 	f->Read(&renull, sizeof(int));
 	if (resi == 4 && renull == 0) {
 		try {
-			CppLogic::Serializer::AdvLuaStateSerializer seri{ *f, L };
+			CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ *f, L };
 			seri.DeserializeState();
 		}
 		catch (const std::format_error& fe) {

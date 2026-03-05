@@ -14,7 +14,6 @@ namespace CppLogic::API {
 
 		static int Int(luaext::State L);
 		static int Number(luaext::State L);
-		static int Serialize(luaext::State L);
 		static int Deserialize(luaext::State L);
 
 	public:
@@ -22,12 +21,11 @@ namespace CppLogic::API {
 
 		explicit RNG(unsigned int seed);
 
+		static int Serialize(luaext::State L);
+
 		static constexpr std::array LuaMethods{
 				luaext::FuncReference::GetRef<Int>("Int"),
 				luaext::FuncReference::GetRef<Number>("Number"),
-			};
-		static constexpr std::array LuaMetaMethods{
-				luaext::FuncReference::GetRef<Serialize>(CppLogic::Serializer::AdvLuaStateSerializer::UserdataSerializerMetaEvent),
 			};
 
 		static void Register(luaext::State L);

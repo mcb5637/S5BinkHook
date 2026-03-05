@@ -1,4 +1,4 @@
 #pragma once
 
-#define NOMINMAX
+#define NOMINMAX 1
 #include "framework.h"

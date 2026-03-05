@@ -12,7 +12,7 @@ namespace CppLogic::Mod::UI {
 
 	class AutoScrollCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		virtual void Initialize() override;
@@ -27,6 +27,8 @@ namespace CppLogic::Mod::UI {
 		EGUIX::CBaseWidget* Slider = nullptr, * SliderTravel = nullptr;
 		EGUIX::CContainerWidget* WidgetContainer = nullptr;
 		bool Dragging = false;
+		bool PartialTop = false;
+		bool PartialBottom = false;
 		EGUIX::CMaterial PartialWidget;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100C);
@@ -39,19 +41,19 @@ namespace CppLogic::Mod::UI {
 		void Update();
 		void Clamp();
 
-		inline const shok::String& SliderName() const {
+		[[nodiscard]] inline const shok::String& SliderName() const {
 			return StringUserVariable[0];
 		}
-		inline const shok::String& ScollableName() const {
+		[[nodiscard]] inline const shok::String& ScrollableName() const {
 			return StringUserVariable[1];
 		}
-		inline int ScollableSpacing() const {
-			return IntegerUserVariable0;
+		[[nodiscard]] inline float ScrollableSpacing() const {
+			return static_cast<float>(IntegerUserVariable0);
 		}
 	private:
 		void UpdateBySlider(int x, int y);
-		bool ClickedOnSlider(int x, int y);
-		float UIOffset() const;
+		[[nodiscard]] bool ClickedOnSlider(int x, int y) const;
+		[[nodiscard]] float UIOffset() const;
 	};
 
 	class InputFocusWidget {
@@ -63,7 +65,7 @@ namespace CppLogic::Mod::UI {
 	public:
 		void GetFocus();
 		void ClearFocus();
-		bool HasFocus();
+		[[nodiscard]] bool HasFocus() const;
 	};
 
 	class TextInputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
@@ -81,7 +83,7 @@ namespace CppLogic::Mod::UI {
 			UInt = 4,
 			UDouble = 5,
 		};
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		virtual void Initialize() override;
@@ -102,39 +104,39 @@ namespace CppLogic::Mod::UI {
 		size_t CurrentPosInDisplay = 0;
 		bool IgnoreNextChar = false;
 
-		std::pair<std::string, size_t> ClearTextOutput() const;
+		[[nodiscard]] std::pair<std::string, size_t> ClearTextOutput() const;
 		void RefreshDisplayText();
 
 		inline shok::String& EventFunc() {
 			return StringUserVariable[0];
 		}
-		inline const shok::String& FontName() const {
+		[[nodiscard]] inline const shok::String& FontName() const {
 			return StringUserVariable[1];
 		}
-		inline Modes Mode() const {
+		[[nodiscard]] inline Modes Mode() const {
 			return static_cast<Modes>(IntegerUserVariable0);
 		}
-		inline Event Flags() const {
+		[[nodiscard]] inline Event Flags() const {
 			return static_cast<Event>(IntegerUserVariable1);
 		}
-		inline bool HasFlag(Event f) const {
+		[[nodiscard]] inline bool HasFlag(Event f) const {
 			return static_cast<int>(Flags()) & static_cast<int>(f);
 		}
-		inline shok::Color TextColor() const {
+		[[nodiscard]] inline shok::Color TextColor() const {
 			return std::bit_cast<shok::Color>(IntegerUserVariable2);
 		}
-		inline shok::Color BlinkColor() const {
+		[[nodiscard]] inline shok::Color BlinkColor() const {
 			return std::bit_cast<shok::Color>(IntegerUserVariable3);
 		}
-		inline shok::Color BackgroundColor() const {
+		[[nodiscard]] inline shok::Color BackgroundColor() const {
 			return std::bit_cast<shok::Color>(IntegerUserVariable4);
 		}
-		inline int ScrollDelta() const {
+		[[nodiscard]] inline int ScrollDelta() const {
 			return IntegerUserVariable5;
 		}
 	private:
-		bool CharValid(char c) const;
-		bool NegativeNumberValid() const;
+		[[nodiscard]] bool CharValid(char c) const;
+		[[nodiscard]] bool NegativeNumberValid() const;
 		bool CallFunc(std::string_view funcname, Event ev);
 		void TryPaste();
 		bool Validate();
@@ -150,7 +152,7 @@ namespace CppLogic::Mod::UI {
 		};
 
 	public:
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
 		virtual void Initialize() override;
@@ -173,13 +175,13 @@ namespace CppLogic::Mod::UI {
 		int MouseStartX = 0, MouseStartY = 0;
 		int MouseX = 0, MouseY = 0;
 
-		inline float MouseInverted(const EGUIX::CCustomWidget* cw) const {
+		static inline float MouseInverted(const EGUIX::CCustomWidget* cw) {
 			return cw->UserVariable[1] ? 1.0f : -1.0f;
 		}
-		inline int& CurrentSensitivity(EGUIX::CCustomWidget* cw) {
+		static inline int& CurrentSensitivity(EGUIX::CCustomWidget* cw) {
 			return cw->UserVariable[0];
 		}
-		inline int DefaultScrollSpeed() const {
+		[[nodiscard]] inline int DefaultScrollSpeed() const {
 			return IntegerUserVariable0;
 		}
 
@@ -189,7 +191,7 @@ namespace CppLogic::Mod::UI {
 
 	class MiniMapOverlayWithCallbackCustomWidget : public GGUI::CMiniMapOverlayCustomWidget {
 	public:
-		virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
 		virtual bool HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* evLocalCoords, BB::CEvent* evUnmodified) override;
 

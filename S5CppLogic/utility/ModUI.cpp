@@ -2,11 +2,9 @@
 
 #include <format>
 #include <locale>
-#include <ranges>
 
 #include <shok/globals/s5_classfactory.h>
 #include <shok/events/s5_events.h>
-#include <shok/globals/s5_idmanager.h>
 #include <shok/s5_scriptsystem.h>
 #include <utility/OnScopeExit.h>
 
@@ -42,21 +40,21 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Render(EGUIX::CCustomWidget* wid
 		if (Widgets.empty())
 			return;
 		EGUIX::Rect texcoords = PartialWidget.TextureCoordinates;
-		float childsiz = Widgets[0]->PosAndSize.H + ScollableSpacing();
+		float childsiz = Widgets[0]->PosAndSize.H + ScrollableSpacing();
 		auto rend = shok::UIRenderer::GlobalObj();
 		EGUIX::Rect containerpos = WidgetContainer->CalcGlobalPosAndSize();
 		EGUIX::Rect r = Widgets[0]->PosAndSize;
 		r.X = containerpos.X + Widgets[0]->PosAndSize.X;
-		r.Y = containerpos.Y + ScollableSpacing();
-		r.H = UIOffset() * childsiz - ScollableSpacing();
+		r.Y = containerpos.Y + ScrollableSpacing();
+		r.H = UIOffset() * childsiz - ScrollableSpacing();
 		float texoff = (Widgets[0]->PosAndSize.H - r.H) / Widgets[0]->PosAndSize.H * PartialWidget.TextureCoordinates.H;
 		PartialWidget.TextureCoordinates.Y += texoff;
 		PartialWidget.TextureCoordinates.H -= texoff;
-		if (r.H > 1.0f)
+		if (r.H > 1.0f && PartialTop)
 			rend->RenderMaterial(&PartialWidget, true, &r);
 		PartialWidget.TextureCoordinates = texcoords;
-		r.Y += r.H + ScollableSpacing();
-		r.H = containerpos.H - ScollableSpacing() * 3 - r.H;
+		r.Y += r.H + ScrollableSpacing();
+		r.H = containerpos.H - ScrollableSpacing() * 3 - r.H;
 		for (const auto w : Widgets) {
 			if (w->IsShown) {
 				r.Y += childsiz;
@@ -67,7 +65,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Render(EGUIX::CCustomWidget* wid
 			}
 		}
 		PartialWidget.TextureCoordinates.H *= r.H / Widgets[0]->PosAndSize.H;
-		if (r.H > 1.0f && r.H < Widgets[0]->PosAndSize.H)
+		if (r.H > 1.0f && r.H < Widgets[0]->PosAndSize.H && PartialBottom)
 			rend->RenderMaterial(&PartialWidget, true, &r);
 		PartialWidget.TextureCoordinates = texcoords;
 	}
@@ -81,7 +79,7 @@ bool CppLogic::Mod::UI::AutoScrollCustomWidget::HandleEvent(EGUIX::CCustomWidget
 	}
 	else if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 		if (me->IsEvent(shok::InputEventIds::MouseWheel)) {
-			Offset += -me->Delta / 200.0f;
+			Offset += -static_cast<float>(me->Delta) / 200.0f;
 			Clamp();
 			Update();
 		}
@@ -116,7 +114,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 {
 	auto* mng = EGUIX::WidgetManager::GlobalObj();
 	if (Widgets.empty()) {
-		auto id = mng->GetIdByName(ScollableName().c_str());
+		auto id = mng->GetIdByName(ScrollableName().c_str());
 		if (id == shok::WidgetId::Invalid)
 			return;
 		auto* w = mng->GetWidgetByID(id);
@@ -124,7 +122,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 			return;
 		w->UserVariable[0] = 0;
 		Widgets.push_back(w);
-		WidgetContainer = static_cast<EGUIX::CContainerWidget*>(mng->GetWidgetByID(w->MotherWidgetID));
+		WidgetContainer = static_cast<EGUIX::CContainerWidget*>(mng->GetWidgetByID(w->MotherWidgetID)); // NOLINT(*-pro-type-static-cast-downcast)
 		if (auto* m = w->GetMaterial(0)) {
 			PartialWidget = *m;
 		}
@@ -140,9 +138,9 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 			}
 		}
 	}
-	float childs = Widgets[0]->PosAndSize.H + ScollableSpacing();
-	WidgetCount = static_cast<int>(WidgetContainer->PosAndSize.H / childs);
-	for (int o = Widgets.size(); o < std::min(WidgetCount, ElementCount); ++o) {
+	float childs = Widgets[0]->PosAndSize.H + ScrollableSpacing();
+	WidgetCount = static_cast<int>((WidgetContainer->PosAndSize.H - ScrollableSpacing()) / childs);
+	for (size_t o = Widgets.size(); o < std::min(WidgetCount, ElementCount); ++o) {
 		Widgets.push_back(WidgetContainer->CloneAsChild(Widgets[0], [o](const char* n, EGUIX::CBaseWidget* w) {
 			return std::format("{}_{}", n, o);
 			},
@@ -154,14 +152,18 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 
 void CppLogic::Mod::UI::AutoScrollCustomWidget::Update()
 {
-	float childsiz = Widgets[0]->PosAndSize.H + ScollableSpacing();
-	float cpos = ScollableSpacing() + UIOffset() * childsiz;
+	float childsiz = Widgets[0]->PosAndSize.H + ScrollableSpacing();
+	float cpos = ScrollableSpacing() + UIOffset() * childsiz;
 	int curri = 0;
+	int lastwid = 0;
+	auto off = static_cast<int>(std::ceil(Offset));
+	PartialTop = Offset > 0.0f;
 	for (auto* w : Widgets) {
 		if (curri < std::min(WidgetCount, ElementCount) && cpos + childsiz <= WidgetContainer->PosAndSize.H) {
 			w->PosAndSize.Y = cpos;
-			w->UserVariable[0] = curri + static_cast<int>(std::ceil(Offset));
+			w->UserVariable[0] = curri + off;
 			w->SetVisibility(true);
+			lastwid = curri;
 		}
 		else {
 			w->SetVisibility(false);
@@ -169,11 +171,12 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Update()
 		++curri;
 		cpos += childsiz;
 	}
+	PartialBottom = lastwid + off + 1 < ElementCount;
 	if (Slider) {
 		if (ElementCount > WidgetCount) {
 			Slider->SetVisibility(true);
 			float barlen = SliderTravel->PosAndSize.H - Slider->PosAndSize.H;
-			Slider->PosAndSize.Y = Offset / (ElementCount - WidgetCount) * barlen;
+			Slider->PosAndSize.Y = Offset / static_cast<float>(ElementCount - WidgetCount) * barlen;
 		}
 		else {
 			Slider->SetVisibility(false);
@@ -183,7 +186,7 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Update()
 
 void CppLogic::Mod::UI::AutoScrollCustomWidget::Clamp()
 {
-	if (Offset + WidgetCount > ElementCount)
+	if (Offset + static_cast<float>(WidgetCount) > static_cast<float>(ElementCount))
 		Offset = static_cast<float>(ElementCount - WidgetCount);
 	if (Offset < 0)
 		Offset = 0;
@@ -193,19 +196,21 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::UpdateBySlider(int x, int y)
 {
 	if (Slider && ElementCount > WidgetCount) {
 		float barlen = SliderTravel->PosAndSize.H - Slider->PosAndSize.H;
-		Offset = (y - SliderTravel->PosAndSize.Y - Slider->PosAndSize.H / 2) / barlen * (ElementCount - WidgetCount);
+		Offset = (static_cast<float>(y) - SliderTravel->PosAndSize.Y - Slider->PosAndSize.H / 2) / barlen * static_cast<float>(ElementCount - WidgetCount);
 		Clamp();
 	}
 }
 
-bool CppLogic::Mod::UI::AutoScrollCustomWidget::ClickedOnSlider(int x, int y)
+bool CppLogic::Mod::UI::AutoScrollCustomWidget::ClickedOnSlider(int x, int y) const
 {
 	if (Slider && ElementCount > WidgetCount) {
+		auto fx = static_cast<float>(x);
+		auto fy = static_cast<float>(y);
 		float xl = SliderTravel->PosAndSize.X;
 		float xh = SliderTravel->PosAndSize.X + SliderTravel->PosAndSize.W;
 		float yl = SliderTravel->PosAndSize.Y;
 		float yh = SliderTravel->PosAndSize.Y + SliderTravel->PosAndSize.H;
-		if (xl <= x && x <= xh && yl <= y && y <= yh) {
+		if (xl <= fx && fx <= xh && yl <= fy && fy <= yh) {
 			return true;
 		}
 	}
@@ -238,7 +243,7 @@ void CppLogic::Mod::UI::InputFocusWidget::ClearFocus()
 {
 	Active = false;
 }
-bool CppLogic::Mod::UI::InputFocusWidget::HasFocus()
+bool CppLogic::Mod::UI::InputFocusWidget::HasFocus() const
 {
 	return Active;
 }
@@ -258,7 +263,7 @@ void* __stdcall CppLogic::Mod::UI::TextInputCustomWidget::CastToIdentifier(shok:
 
 void CppLogic::Mod::UI::TextInputCustomWidget::Initialize()
 {
-	const char* f = "Data\\Menu\\Fonts\\standard10.met";
+	const char* f = R"(Data\Menu\Fonts\standard10.met)";
 	if (FontName().size() > 0)
 		f = FontName().c_str();
 	Font.LoadFont(f);
@@ -310,7 +315,7 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 		y = y / shok::UIRenderer::ScaledScreenSize.Y * rend->RenderSizeY;
 	}
 	x += textw * rend->RenderSizeY + 1.0f;
-	float h = rend->GetTextHeight(Font.FontID) * rend->RenderSizeY;
+	float h = shok::UIRenderer::GetTextHeight(Font.FontID) * rend->RenderSizeY;
 	rend->RenderLine(&col, false, x, y, x, y + h);
 }
 
@@ -327,7 +332,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			}
 		}
 	}
-	else if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
+	else if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) { // NOLINT(*-branch-clone)
 		return true;
 	}
 	else if (ev->IsEvent(shok::InputEventIds::MouseWheel) && ScrollDelta() != 0) {
@@ -394,11 +399,13 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			else if (me->IsKey(shok::Keys::Left)) {
 				if (CurrentPos > 0)
 					--CurrentPos;
+				RefreshDisplayText();
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
 			}
 			else if (me->IsKey(shok::Keys::Right)) {
 				if (CurrentPos < CurrentTextRaw.size())
 					++CurrentPos;
+				RefreshDisplayText();
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
 			}
 			else if (me->IsKey(shok::Keys::Enter)) {
@@ -442,7 +449,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 					EGUIX::WidgetLoader::KeyStrokeLuaCallback();
 				}
 				else {
-					CurrentTextRaw.erase(CurrentTextRaw.begin() + CurrentPos);
+					CurrentTextRaw.erase(CurrentTextRaw.begin() + static_cast<int>(CurrentPos));
 				}
 			}
 		}
@@ -515,7 +522,7 @@ std::pair<std::string, size_t> CppLogic::Mod::UI::TextInputCustomWidget::ClearTe
 			c = static_cast<char>(c & 0x3F | 0x80);
 			++j;
 		}
-		r.append(1, c);
+		r.append(1, static_cast<char>(c));
 		++i;
 		++j;
 		if (i == CurrentPos)
@@ -669,7 +676,7 @@ void CppLogic::Mod::UI::FreeCamCustomWidget::Render(EGUIX::CCustomWidget* widget
 	if (tick > LastTick) {
 		LastTick = tick + 0.05f;
 
-		auto* cam = static_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj);
+		auto* cam = static_cast<ERwTools::CRwCameraHandler*>(*ERwTools::CRwCameraHandler::GlobalObj); // NOLINT(*-pro-type-static-cast-downcast)
 
 		if (Status == MouseStatus::None) {
 			shok::Position p{ cam->CameraInfo.LookAtX, cam->CameraInfo.LookAtY };

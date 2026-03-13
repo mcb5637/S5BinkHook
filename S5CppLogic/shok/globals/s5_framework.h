@@ -54,6 +54,15 @@ namespace ECore {
 		// 5471A4 ctor
 	};
 	static_assert(sizeof(CReplayMgr) == 5 * 4);
+
+	class IReplaySystem {};
+
+	class CReplaySystem : public IReplaySystem {
+	public:
+		static inline CReplaySystem** const GlobalObj = reinterpret_cast<CReplaySystem**>(0x886ba4);
+
+		static inline constexpr int vtp = 0x77EEF0;
+	};
 }
 
 namespace GS3DTools {
@@ -269,6 +278,8 @@ namespace Framework {
 
 		static inline constexpr int vtp = 0x7630CC;
 
+		// 40e7cc ctor
+
 		virtual void __stdcall PostEvent(BB::CEvent* ev) override; // handles time event directly, everyting else goes to replayhandler
 	};
 	static_assert(sizeof(CEventTimeManager) == 4 * 18);
@@ -292,15 +303,28 @@ namespace Framework {
 		BB::IPostEvent* EGL_Gamelogic;
 	};
 
-	struct GameModeStartMapData {
-		int zero;
-		CLuaDebuggerPort* LuaDebuggerPort;
-		int* ptoone;
-		GS3DTools::CMapData* MapToLoad;
-		int* ptozero;
-		const char* Folder;
-	};
+	struct GameModeStartMapData;
 
+	struct UnidentifiedGameMode1 {
+		PADDINGI(4);
+		uint64_t CurrentTimestamp; // via RDTSC processor timestamp counter
+
+		// ctor 545da2
+	};
+	struct UnidentifiedGameModeObj {
+		UnidentifiedGameMode1 m1;
+		struct UnidentifiedGameMode2 {
+			PADDINGI(14);
+			uint64_t TimestampDelta;
+		} m2;
+		PADDINGI(16);
+		PADDINGI(1026);
+		PADDINGI(6);
+		char somebuff[1024];
+
+		// ctor 406d23
+		// update timer 545ddd
+	};
 	class AGameModeBase : public BB::IPostEvent { // postevent does ui events (partial), to GGUI::CManager (GGUI::CMouseEffect) and EScr::CInputHandler
 	public:
 		virtual ~AGameModeBase() = default;
@@ -312,7 +336,8 @@ namespace Framework {
 		IGameCallBacks* GameCallbacks;
 		PADDINGI(2); //0,  EGL::CGLEAnimProps
 		CEventTimeManager TimeManager; // 6, CTimeManager 8
-		PADDINGI(1394);
+		UnidentifiedGameModeObj u1;
+		PADDINGI(68);
 		CCheckSumCalculator CheckSumCalc;
 		PADDINGI(3);
 		CEscapeEventHandler EscapeHandler;
@@ -321,6 +346,9 @@ namespace Framework {
 		PADDINGI(1);
 
 		static inline constexpr int vtp = 0x76307C;
+
+		// 40e9d8 update
+		// 40e81f ctor
 
 		bool AddArchiveIfExternalmap(GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path);
 		void RemoveArchiveIfExternalmap();
@@ -367,6 +395,8 @@ namespace Framework {
 		CNetworkEvent NetworkEvent; //1428
 
 		static inline constexpr int vtp = 0x7632C8;
+
+		// ctor 40f6b5
 
 		static void (*PreUpdate)();
 		static void HookUpdate();
@@ -442,7 +472,9 @@ namespace Framework {
 		int one = 1; // some update value?
 	public:
 		GGlue::CGluePropsMgr* GluePropsManager; // 150
-		PADDINGI(9);
+		GD::CDDisplay* Display;
+		void* RWMetrics; // BBRw::CMetrics
+		PADDINGI(7); // CEventDispatcher embedded obj (end?)
 		struct SWindowData {
 			HWND MainWindow;
 			void* someFunc;
@@ -475,6 +507,7 @@ namespace Framework {
 			// load maps 51908F __thiscall
 			// load campagns 51A11A __thiscall(path, shok::Vector<int>* Keys)
 
+			// 51915a fill path to mapfolder (GS3DTools::CMapData*, shok::String*)
 		} CampagnInfoHandler;
 		struct SUserPaths {
 			shok::String SaveGames, // 0
@@ -525,6 +558,17 @@ namespace Framework {
 	static_assert(sizeof(Framework::CMain::SUserPaths) == 133 * 4);
 	//constexpr int i = sizeof(Framework::CMain::SUserPaths) / 4;
 	//constexpr int i = offsetof(Framework::CMain, ReplayToLoad) / 4;
+
+	struct GameModeStartMapData {
+		int zero; // something replay related?
+		CLuaDebuggerPort* LuaDebuggerPort;
+		int* ptoone;
+		GS3DTools::CMapData* MapToLoad;
+		Framework::CMain::CIH * CampagnInfoHandler;
+		const char* Folder;
+
+		// 408855 ctor
+	};
 }
 
 namespace CppLogic {

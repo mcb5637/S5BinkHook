@@ -139,6 +139,7 @@ namespace EGL {
 	class CGLETerrainLowRes;
 	class CPlayerEntityIterator;
 	class CGLEEffectProps;
+	class CGLEEntitiesDisplay;
 
 	template<class T, unsigned int id>
 	requires (std::same_as<T, bool>&& id == 0x65DE8317) || (std::same_as<T, int> && id == 0x483040E7) || (std::same_as<T, float> && id == 0x578EE8F7)
@@ -187,6 +188,7 @@ namespace ED {
 	class CTerrainDecalBase;
 	class CGUIScene;
 	class CGUICamera;
+	class CRenderSettingsEx;
 }
 namespace GD {
 	class CDDisplay;

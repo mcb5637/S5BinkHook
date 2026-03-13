@@ -102,6 +102,7 @@ namespace shok {
 		PADDING(3);
 		int UpscaledFlag = 0;
 		RWE::P2D::Rt2dBrush* Brush = nullptr;
+		shok::FontId FontVerdana10;
 
 		void RenderText(const char* txt, shok::FontId fontid, bool scale, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
 		void SetTextRenderColor(shok::Color c) const;
@@ -117,6 +118,7 @@ namespace shok {
 		static inline UIRenderer* (__cdecl* const GlobalObj)() = reinterpret_cast<UIRenderer * (__cdecl*)()>(0x556F5B);
 
 		// ctor 556E9A (camera)
+		// 55841e render debug text
 	};
 	class UIRenderCustomColorContext {
 	public:
@@ -262,6 +264,8 @@ namespace ERwTools {
 
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCB15D84);
+
+		static inline ICameraHandle** const GlobalObj = reinterpret_cast<ICameraHandle**>(0x87EC68);
 	};
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ICameraMovement {
@@ -365,9 +369,11 @@ namespace ERwTools {
 		static inline constexpr int vtp = 0x77AD98;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x45CAFEB1);
 
-		static inline ICameraHandle** const GlobalObj = reinterpret_cast<ICameraHandle**>(0x87EC68);
+		static inline CRwCameraHandler** const GlobalObj = reinterpret_cast<CRwCameraHandler**>(0x87eeec);
 		static inline float* const CutsceneFarClipPlaneMax = reinterpret_cast<float*>(0x77A7E8);
 		static inline float* const CutsceneFarClipPlaneMin = reinterpret_cast<float*>(0x77A7F0);
+
+		// tick 51eef8
 	};
 	static_assert(sizeof(CRwCameraHandler) == 92 * 4);
 	constexpr int i = offsetof(CRwCameraHandler, CameraInfo.LookAtZ) / 4;

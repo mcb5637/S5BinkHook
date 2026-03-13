@@ -92,6 +92,9 @@ namespace ECS {
 		static inline constexpr int vtp = 0x7860B4;
 
 		static inline ECS::CManager*** const GlobalObj = reinterpret_cast<ECS::CManager***>(0xA0344C);
+
+		// ctor 597dae
+		// 597e5c ctor of holder (just a pointer)
 	};
 	static_assert(sizeof(CManager) == 15 * 4);
 	//constexpr int i = offsetof(CManager, t) / 4;

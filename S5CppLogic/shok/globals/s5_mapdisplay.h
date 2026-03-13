@@ -779,6 +779,29 @@ namespace ED {
 	class IDisplayRenderCallbacks {
 		virtual void __stdcall unknown(float a) = 0;
 	};
+
+	class IDisplayLogic {
+	public:
+		virtual void __stdcall Delete() = 0;
+		virtual void uk1() = 0;
+		virtual void __stdcall Tick(int, float, float) = 0;
+		virtual void uk2() = 0;
+		virtual void uk3() = 0;
+		virtual void uk4() = 0;
+		virtual ~IDisplayLogic() = default;
+
+		ED::CDisplayBase* DisplayBase;
+		static inline constexpr int vtp = 0x7AE378;
+	};
+	class CDisplayLogic : public IDisplayLogic {
+	public:
+		static inline constexpr int vtp = 0x7AE420;
+		ED::CGlobalsLogicEx* GlobalsLogic;
+		PADDINGI(2);
+
+		// ctor 71c7f9
+		// dtor 71b6b5
+	};
 }
 
 namespace GD {
@@ -820,7 +843,12 @@ namespace GD {
 	class IDDisplay {
 	public:
 		virtual ~IDDisplay() = default;
-		// 14 more methods, // 7 anim get duration (jmp resmanager getduration)
+	private:
+		virtual void uk1() = 0;
+		virtual void uk2() = 0;
+	public:
+		virtual void Tick(int, float, double) = 0;
+		// 11 more methods, // 7 anim get duration (jmp resmanager getduration)
 	};
 
 	class CGlobalsBase {
@@ -836,11 +864,12 @@ namespace GD {
 
 	class CDDisplay : public IDDisplay, public ED::IDisplayRenderCallbacks {
 	public:
-		PADDINGI(2); // bool int?
+		PADDINGI(1); // bool int?
+		GGL::CWeatherHandler* WeatherHandler;
 		CBuildingEffectsProps BuildingEffectsProps;
 		PADDINGI(3);
 		ED::CDisplayBase* DisplayBase;
-		PADDINGI(1);
+		ED::CDisplayLogic* DisplayLogic;
 		PADDINGI(1); // p to GD::CGlobalsBase, size 8
 		CGlobalEffects* GlobalEfects;
 

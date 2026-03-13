@@ -46,6 +46,13 @@ namespace EGL {
 		// ctor 579F9A (this, shok::position*, float range)
 	};
 
+	class CDisplayInterfaceFlagsPredicate : public IGLEEntityPredicate {
+	public:
+		bool RenderInvisible;
+
+		static inline constexpr int vtp = 0x7837A4;
+	};
+
 
 	class IGLEEntityIDIterator {
 	public:
@@ -71,7 +78,7 @@ namespace EGL {
 	public:
 		CGLEEntityPredicateArea* Area;
 
-		static inline constexpr int vtp = 0x783C84;
+		static inline constexpr int vtp = 0x7777e4;
 		// ctor 57A086 (this, shok::position*, shok::position*, predicate)
 	};
 
@@ -99,8 +106,10 @@ namespace EGL {
 		virtual ~CRegionEntityIterator() = default;
 
 		EGL::RegionDataEntity::Entry* Region;
-		shok::AccessCategoryFlags flags1, flags2;
-		PADDINGI(3);
+		shok::AccessCategoryFlags CategoriesRequested, CategoriesLeft;
+		shok::AccessCategory CurrentCat;
+		EGL::CGLEEntity** Current;
+		EGL::CGLEEntity** End;
 		IGLEEntityPredicate* Predicate;
 
 		static inline constexpr int vtp = 0x76F834;
@@ -108,6 +117,7 @@ namespace EGL {
 		// go next 57A4D1 -> bool has next
 		// get current 57A3F7
 		// dtor basically empty
+		// 57a3fd skip by predicate
 	};
 
 	class MultiRegionEntityIterator {
@@ -116,6 +126,29 @@ namespace EGL {
 		// get current 583027
 		// dtor 58300C
 	};
+
+	class IEntityDisplayIterator {
+	public:
+		virtual ~IEntityDisplayIterator() = default;
+		virtual EGL::IEntityDisplay* __stdcall GetCurrent() = 0;
+		virtual bool __stdcall GoNext() = 0;
+		virtual void __stdcall Reset() = 0;
+		// deletes predicate, then this
+		virtual void __stdcall Delete() = 0;
+
+		static inline constexpr int vtp = 0x783768;
+	};
+	class CEntityDisplayIterator : public IEntityDisplayIterator {
+	public:
+		CRegionEntityIterator RegionIter;
+		IGLEEntityPredicate* Predicate;
+
+
+		static inline constexpr int vtp = 0x783CC4;
+
+		//ctor 57a426 (x, y, flags, predicate)
+	};
+
 }
 
 namespace GGL {

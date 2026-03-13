@@ -358,7 +358,7 @@ namespace ED {
 	public:
 		virtual void Destroy() = 0;
 	private:
-		virtual void uk1() = 0;
+		virtual void Tick(int, float, void*) = 0; // last param?
 		virtual void uk2() = 0;
 	public:
 		virtual ED::CEntity* GetDisplayForEntity(shok::EntityId eid) = 0;
@@ -373,15 +373,17 @@ namespace ED {
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CVisibleEntityManager : public IVisibleEntityManager { // NOLINT(*-pro-type-member-init)
 	public:
-		PADDINGI(1); // p EGL::CGLEEntitiesDisplay
+		EGL::CGLEEntitiesDisplay* EntitiesDisplay;
 		PADDINGI(1); // p to ?
-		PADDINGI(1); // p to ED::CRenderSettingsEx
-		ED::CEntity* Entities[1]; // indexed by lower half of eid
+		ED::CRenderSettingsEx* RenderSettings;
+		ED::CEntity* Entities[0x10000]; // indexed by lower half of eid
 
 		static inline constexpr int vtp = 0x76A1A4;
 
 		ED::CEntity* CreateDisplayForEntity(EGL::IEntityDisplay* e);
 		void DestroyDisplayForEntity(shok::EntityId eid);
+
+		// 476c8d ctor
 	};
 }
 

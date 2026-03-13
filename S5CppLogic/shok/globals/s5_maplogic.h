@@ -530,15 +530,38 @@ namespace EGL {
 	};
 	static_assert(offsetof(CGLEGameLogic, RNG) == 4 * 34);
 	//constexpr int i = offsetof(CGLEGameLogic, RNG)/4;
+
+	class IEntityDisplayIterator;
+	class CGLEEntityAreaIterator;
+	class IEntitiesDisplay {
+	public:
+		virtual ~IEntitiesDisplay() = default;
+		virtual IEntityDisplayIterator* __stdcall GetEntitiesToRenderIter(int x, int y, shok::AccessCategoryFlags cats, bool render_invisible) = 0;
+		virtual CGLEEntityAreaIterator* __stdcall GetAreaIter(float x1, float y1, float x2, float y2, bool render_invisible) = 0;
+		virtual IEntityDisplay* __stdcall GetDisplayOfEntity(shok::EntityId id) = 0;
+
+		static inline constexpr int vtp = 0x783780;
+	};
+	class CGLEEntitiesDisplay : public IEntitiesDisplay {
+	public:
+
+		static inline constexpr int vtp = 0x783888;
+	};
 }
 
 namespace GGL {
+	struct WeatherTransitionProgress {
+		int ToGFXState;
+		int FromGFXState;
+		int EndTick; // Logic.GetTick() + (StartedTimeOffset - CurrentWeatherOffset)
+		int TransitionLength;
+	};
 	class IWeatherSystem {
 		// no vtable
 	};
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CWeatherHandler : public IWeatherSystem {
-		virtual void GetStateChangingProgress(void*) = 0;
+		virtual void GetStateChangingProgress(WeatherTransitionProgress*) = 0;
 	public:
 		virtual shok::WeatherState GetCurrentWeatherState() = 0;
 		struct WeatherElementData {

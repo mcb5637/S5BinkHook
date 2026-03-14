@@ -183,13 +183,6 @@ void CppLogic::Mod::Player::ExtraPlayerManager::Deserialize(const char *path, co
     auto* l = *GGL::CGLGameLogic::GlobalObj;
     for (auto pid = static_cast<shok::PlayerId>(9); pid <= max; ++pid) {
         l->SetTechResearchedCallback(pid);
-
-        for (auto& [ty, vec] : GetExtra(pid).EPlayer.EntityVectorMap->Items) {
-            for (const auto* e : vec) {
-                if (e == nullptr)
-                    shok::LogString("null entity");
-            }
-        }
     }
 }
 

@@ -667,7 +667,7 @@ namespace ED {
 		};
 
 		RenderFlags Flags = RenderFlags::RenderUseOrnamentalItemsSystem; // 1
-		PADDINGI(1); // int 1
+		shok::PlayerId LocalPlayer;
 		shok::List<BB::ISlot0*> UnknownCallbacks; // 2
 		float FarClipPlaneMin = 0, FarClipPlaneMax = 1000000.0f; // 6,7
 		RWE::RwRGBA FogColor = { 0,0,0,0 };

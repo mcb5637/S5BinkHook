@@ -405,6 +405,8 @@ namespace EGL {
 		static CPlayerFeedbackHandler* __stdcall ExtraGetFeedbackByPlayer(shok::PlayerId pl);
 		static void NAKED_DECL ExtraLoadPlayerNumberASM();
 		static void __stdcall ExtraLoadPlayerNumber(EGL::CMapProps* p);
+		static void NAKED_DECL ExtraDeserializeASM();
+		static const BB::SerializationData* ExtraDeserialize();
 		void TickExtra();
 		void SetUpdateAllExtra();
 		void SetSharedExplorationFlagExtra(shok::PlayerId p1, shok::PlayerId p2, bool b);

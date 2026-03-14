@@ -8,6 +8,7 @@
 #include <shok/events/s5_netevents.h>
 #include <shok/s5_scriptsystem.h>
 #include <shok/globals/s5_classfactory.h>
+#include <shok/globals/s5_framework.h>
 #include <utility/entityiterator.h>
 #include <utility/hooks.h>
 #include <utility/ModPlayers.h>
@@ -812,6 +813,7 @@ void EGL::PlayerManager::HookExtraPlayers() {
 			reinterpret_cast<void*>(0x57590d),
 			reinterpret_cast<void*>(0x575884),
 			reinterpret_cast<void*>(0x57584b),
+			reinterpret_cast<void*>(0x575592),
 		}};
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575f72), &ExtraActivatePlayer, reinterpret_cast<void*>(0x575f9a));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x49840a), &ExtraIsPlayerIngame, reinterpret_cast<void*>(0x498411));
@@ -822,6 +824,7 @@ void EGL::PlayerManager::HookExtraPlayers() {
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57590d), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::TickExtra, 0), reinterpret_cast<void*>(0x575917));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575884), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::SetUpdateAllExtra, 0), reinterpret_cast<void*>(0x57588d));
 		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57584b), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerManager::SetSharedExplorationFlagExtra, 0), reinterpret_cast<void*>(0x575851));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x575592), &ExtraDeserializeASM, reinterpret_cast<void*>(0x575597));
 	}
 	CPlayerExplorationUpdate::HookExtraPlayers();
 }
@@ -894,6 +897,21 @@ void NAKED_DEF EGL::PlayerManager::ExtraLoadPlayerNumberASM() {
 
 void __stdcall EGL::PlayerManager::ExtraLoadPlayerNumber(EGL::CMapProps *p) {
 	p->NumberOfPlayer = static_cast<int>(CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer());
+}
+
+void NAKED_DEF EGL::PlayerManager::ExtraDeserializeASM() {
+	__asm {
+		call EGL::PlayerManager::ExtraDeserialize;
+
+		push 0x575597;
+		ret;
+	}
+}
+
+const BB::SerializationData* EGL::PlayerManager::ExtraDeserialize() {
+	auto* s = Framework::SavegameSystem::GlobalObj();
+	CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().Deserialize(s->CurrentSave->SavePath.c_str(), s->CurrentSave->AdditionalInfo.c_str());
+	return SerializationData;
 }
 
 void EGL::PlayerManager::TickExtra() {

@@ -30,9 +30,10 @@ const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::PlayerRel
 
 CreateSerializationListFor(CppLogic::Mod::Player::ExtraPlayerManager, ExtraPlayers);
 CreateSerializationListFor(CppLogic::Mod::Player::ExtraPlayerManager, Diplomacy);
-const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::SerializationData[3] = {
+const BB::SerializationData CppLogic::Mod::Player::ExtraPlayerManager::SerializationData[4] = {
     AutoMemberSerialization(ExtraPlayerManager, ExtraPlayers),
     AutoMemberSerialization(ExtraPlayerManager, Diplomacy),
+    AutoMemberSerialization(ExtraPlayerManager, SavegameName),
     BB::SerializationData::GuardData(),
 };
 
@@ -180,8 +181,15 @@ void CppLogic::Mod::Player::ExtraPlayerManager::Deserialize(const char *path, co
     }
     auto max = GetMaxPlayer();
     auto* l = *GGL::CGLGameLogic::GlobalObj;
-    for (auto pid = static_cast<shok::PlayerId>(9); pid < max; ++pid) {
+    for (auto pid = static_cast<shok::PlayerId>(9); pid <= max; ++pid) {
         l->SetTechResearchedCallback(pid);
+
+        for (auto& [ty, vec] : GetExtra(pid).EPlayer.EntityVectorMap->Items) {
+            for (const auto* e : vec) {
+                if (e == nullptr)
+                    shok::LogString("null entity");
+            }
+        }
     }
 }
 

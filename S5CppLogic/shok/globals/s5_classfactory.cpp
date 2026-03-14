@@ -938,7 +938,7 @@ void __stdcall CppLogic::StringSerializer::DeserializeFromStreamImp(void* data, 
 	std::vector<char> buff{};
 	buff.resize(s);
 	str->Read(buff.data(), static_cast<long>(buff.size()));
-	d->assign(buff.data(), buff.data());
+	d->assign(buff.data(), buff.size());
 }
 
 void __stdcall CppLogic::StringSerializer::SerializeToStreamImp(BB::IStream* str, const void* data)

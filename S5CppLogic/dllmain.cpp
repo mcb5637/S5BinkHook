@@ -337,7 +337,6 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 void OnSaveLoaded() {
 	auto* s = Framework::SavegameSystem::GlobalObj()->CurrentSave;
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.DeserializeFrom(s->SavePath.c_str(), s->AdditionalInfo.c_str());
-	CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().Deserialize(s->SavePath.c_str(), s->AdditionalInfo.c_str());
 	luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 	int t = L.GetTop();
 	CppLogic::Effect::OnSaveLoaded(L);

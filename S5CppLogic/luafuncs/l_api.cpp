@@ -112,6 +112,14 @@ namespace CppLogic::API {
 		return 1;
 	}
 
+	std::string MakeAbsoluteWithArchive(std::string_view path, std::string_view after, std::string_view before) {
+		return (*BB::CFileSystemMgr::GlobalObj)->MakeAbsoluteWithArchive(path.data(), before, after);
+	}
+
+	std::string_view GetDefaultLoadOrderTop() {
+		return BB::CFileSystemMgr::LoadorderTop->TryGetFSName();
+	}
+
 	int DoString(luaext::State L) {
 		CheckEvalEnabled(L);
 		size_t strlen = 0;
@@ -648,6 +656,8 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<GetFilesInDirectory>("GetFilesInDirectory"),
 #endif
 			luaext::FuncReference::GetRef<LDoesFileExist>("DoesFileExist"),
+			luaext::FuncReference::GetRef<MakeAbsoluteWithArchive>("MakeAbsoluteWithArchive"),
+			luaext::FuncReference::GetRef<GetDefaultLoadOrderTop>("GetDefaultLoadOrderTop"),
 			luaext::FuncReference::GetRef<DoString>("DoString"),
 			luaext::FuncReference::GetRef<MapGetDataPath>("MapGetDataPath"),
 			luaext::FuncReference::GetRef<SaveGetMapInfo>("SaveGetMapInfo"),

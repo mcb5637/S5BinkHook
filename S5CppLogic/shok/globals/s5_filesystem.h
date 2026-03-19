@@ -164,6 +164,8 @@ namespace BB {
 		std::unique_ptr<IStream> OpenFileStreamUnique(const char* path, BB::IStream::Flags mode);
 
 		static inline constexpr int vtp = 0x77F778;
+
+		[[nodiscard]] std::string_view TryGetFSName() const;
 	};
 
 	class CDirectoryFileSystemSpecialOpenFileOnly : public IFileSystem {
@@ -265,6 +267,7 @@ namespace BB {
 		bool OpenFileAsHandle(const char* path, int& handle, size_t& size);
 		static bool CloseHandle(int handle);
 		std::pair<std::string_view, std::unique_ptr<BB::IStream>> OpenFileStreamWithSource(const char* path, BB::IStream::Flags f);
+		std::string MakeAbsoluteWithArchive(const char* path, std::string_view before, std::string_view after);
 
 		static inline BB::CFileSystemMgr** const GlobalObj = reinterpret_cast<BB::CFileSystemMgr**>(0x88F088);
 		static inline const char* (__cdecl* const PathGetExtension)(const char* path) = reinterpret_cast<const char* (__cdecl*)(const char*)>(0x40BAB3);

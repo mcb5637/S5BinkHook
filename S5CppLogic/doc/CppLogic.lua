@@ -965,6 +965,19 @@ function CppLogic.API.ReadFileAsString(file) end
 --- @return boolean
 function CppLogic.API.DoesFileExist(file) end
 
+--- searches for a file in a part of the loadorder and returns a path to it.
+--- Script.Load is able to load a file through this path, even if there is a override in a part of the loadorder that gets ignored by this function.
+--- (the referenced bba still has to be somewhere in the loadorder)
+--- @param file string file to search for
+--- @param after string only concider parts of the loadorder after this entry (empty string to ignore)
+--- @param before string stop at this loadorder entry (empty string to ignore)
+function CppLogic.API.MakeAbsoluteWithArchive(file, after, before) end
+
+--- gets the top of the load order before any changes made by modloader (also without any potential s5x)
+--- (this is currently the cpplogic bba)
+--- @return string
+function CppLogic.API.GetDefaultLoadOrderTop() end
+
 --- compiles a lua chunk and executes it. shows the script in the debugger as file with the defined name.
 --- asserts if kimichuras dlls are detected.
 --- @param code string to compile, sourcecode or binary

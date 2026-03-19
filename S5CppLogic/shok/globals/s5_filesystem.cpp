@@ -1,7 +1,13 @@
 #include "s5_filesystem.h"
 #include <shok/s5_exception.h>
+#include <utility/ModFilesystem.h>
 
 #include <utility/hooks.h>
+
+#include <format>
+#include <filesystem>
+
+#include "s5_framework.h"
 
 static inline bool(__thiscall* const dirfilesys_filter_allowedI)(BB::CDirectoryFileSystem::FilterData* th, const char* f) = reinterpret_cast<bool(__thiscall*)(BB::CDirectoryFileSystem::FilterData*, const char*)>(0x5532C4);
 bool BB::CDirectoryFileSystem::FilterData::IsAllowedCaseInsensitive(const char* filename)
@@ -94,6 +100,21 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 		if (RemoveData && (p.starts_with("Data") || p.starts_with("data")) && (p[4] == '\\' || p[4] == '/')) {
 			p = p.substr(5);
 		}
+		auto i = p.find('@');
+		std::string file{};
+		if (i != std::string_view::npos) {
+			file = p.substr(0, i);
+			auto arch = p.substr(i + 1);
+			for (auto* fs : LoadOrder) {
+				if (fs->TryGetFSName() == arch) {
+					auto s = fs->OpenFileStreamUnique(file.c_str(), fnoex);
+					if (s != nullptr) {
+						return { arch, std::move(s) };
+					}
+				}
+			}
+			p = file;
+		}
 		for (auto* fs : LoadOrder) {
 			try {
 				auto s = fs->OpenFileStreamUnique(p.data(), fnoex);
@@ -110,6 +131,46 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 		}
 	}
 	return { "", OpenFileStreamUnique(path, f) };
+}
+
+std::string BB::CFileSystemMgr::MakeAbsoluteWithArchive(const char* path, std::string_view before, std::string_view after) {
+	if (PathIsAbsolute(path)) {
+		return path;
+	}
+	std::string_view p = path;
+	std::string_view pre = "";
+	if (RemoveData && (p.starts_with("Data") || p.starts_with("data")) && (p[4] == '\\' || p[4] == '/')) {
+		pre = p.substr(0, 5);
+		p = p.substr(5);
+	}
+	std::array<char, MAX_PATH + 1> out_path{};
+	bool active = after.empty();
+	for (auto* fs : LoadOrder) {
+		if (!active) {
+			if (auto* as = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
+				if (as->ArchiveFile.Filename == after)
+					active = true;
+			}
+			continue;
+		}
+		if (auto* as = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
+			if (as->ArchiveFile.Filename == before)
+				break;
+		}
+		FileInfo i{};
+		fs->GetFileInfo(&i, p.data(), 0, out_path.data());
+		if (i.Found) {
+			if (out_path[0] != '\0') {
+				std::filesystem::path cwd = std::filesystem::current_path() / out_path.data();
+				return cwd.string();
+			}
+			auto ar = fs->TryGetFSName();
+			if (ar.empty())
+				return std::string{p};
+			return std::format("{}{}@{}", pre, p, ar);
+		}
+	}
+	return "";
 }
 
 bool __stdcall BB::CFileStream::rettrue()
@@ -242,6 +303,15 @@ std::unique_ptr<BB::IStream> BB::IFileSystem::OpenFileStreamUnique(const char* p
 	return std::unique_ptr<IStream>(OpenFileStream(path, mode));
 }
 
+std::string_view BB::IFileSystem::TryGetFSName() const {
+	if (const auto* ar = dynamic_cast<const BB::CBBArchiveFile*>(this))
+		return ar->ArchiveFile.Filename;
+	if (const auto* d = dynamic_cast<const BB::CDirectoryFileSystem*>(this))
+		return {d->Path, d->PathLen};
+	if (const auto* re = dynamic_cast<const CppLogic::Mod::FileSystem::RedirectFileSystem*>(this))
+		return re->Name;
+	return "";
+}
 
 
 bool __stdcall BB::CFileStreamEx::rettrue()

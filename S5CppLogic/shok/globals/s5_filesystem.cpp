@@ -105,11 +105,28 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 		if (i != std::string_view::npos) {
 			file = p.substr(0, i);
 			auto arch = p.substr(i + 1);
-			for (auto* fs : LoadOrder) {
-				if (fs->TryGetFSName() == arch) {
+			if (arch == "vanilla") {
+				bool active = false;
+				for (auto* fs : LoadOrder) {
+					if (fs == LoadorderTop) {
+						active = true;
+						continue;
+					}
+					if (!active)
+						continue;
 					auto s = fs->OpenFileStreamUnique(file.c_str(), fnoex);
 					if (s != nullptr) {
-						return { arch, std::move(s) };
+						return { fs->TryGetFSName(), std::move(s) };
+					}
+				}
+			}
+			else {
+				for (auto* fs : LoadOrder) {
+					if (fs->TryGetFSName() == arch) {
+						auto s = fs->OpenFileStreamUnique(file.c_str(), fnoex);
+						if (s != nullptr) {
+							return { arch, std::move(s) };
+						}
 					}
 				}
 			}
@@ -119,11 +136,7 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 			try {
 				auto s = fs->OpenFileStreamUnique(p.data(), fnoex);
 				if (s != nullptr) {
-					std::string_view an{};
-					if (auto* as = dynamic_cast<BB::CBBArchiveFile*>(fs)) {
-						an = as->ArchiveFile.Filename;
-					}
-					return { an, std::move(s) };
+					return { fs->TryGetFSName(), std::move(s) };
 				}
 			}
 			catch (const BB::CFileException&) { // directory filesystem does still throw even with nothrow
@@ -138,12 +151,11 @@ std::string BB::CFileSystemMgr::MakeAbsoluteWithArchive(const char* path, std::s
 		return path;
 	}
 	std::string_view p = path;
-	std::string_view pre = "";
+	std::string_view pre{};
 	if (RemoveData && (p.starts_with("Data") || p.starts_with("data")) && (p[4] == '\\' || p[4] == '/')) {
 		pre = p.substr(0, 5);
 		p = p.substr(5);
 	}
-	std::array<char, MAX_PATH + 1> out_path{};
 	bool active = after.empty();
 	for (auto* fs : LoadOrder) {
 		if (!active) {
@@ -158,12 +170,8 @@ std::string BB::CFileSystemMgr::MakeAbsoluteWithArchive(const char* path, std::s
 				break;
 		}
 		FileInfo i{};
-		fs->GetFileInfo(&i, p.data(), 0, out_path.data());
+		fs->GetFileInfo(&i, p.data(), 0, nullptr);
 		if (i.Found) {
-			if (out_path[0] != '\0') {
-				std::filesystem::path cwd = std::filesystem::current_path() / out_path.data();
-				return cwd.string();
-			}
 			auto ar = fs->TryGetFSName();
 			if (ar.empty())
 				return std::string{p};

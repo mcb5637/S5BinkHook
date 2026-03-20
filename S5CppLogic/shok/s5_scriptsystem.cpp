@@ -171,8 +171,12 @@ void __stdcall EScr::CScriptTriggerSystem::LoadFileToLuaStateOverride(lua_State*
 	auto [arch, s] = (*BB::CFileSystemMgr::GlobalObj)->OpenFileStreamWithSource(name, BB::IStream::Flags::DefaultRead);
 	std::string fmt{};
 
-	if (!arch.empty() && FileLoadAddArchive && std::string_view{name}.find('@') == std::string_view::npos) {
-		fmt = std::format("{}@{}", name, arch);
+	if (!arch.empty() && FileLoadAddArchive) {
+		std::string_view n = name;
+		auto i = n.find('@');
+		if (i != std::string_view::npos)
+			n = n.substr(0, i);
+		fmt = std::format("{}@{}", n, arch);
 	}
 
 	std::string data{};

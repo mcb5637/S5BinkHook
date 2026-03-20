@@ -112,8 +112,8 @@ namespace CppLogic::API {
 		return 1;
 	}
 
-	std::string MakeAbsoluteWithArchive(std::string_view path, std::string_view after, std::string_view before) {
-		return (*BB::CFileSystemMgr::GlobalObj)->MakeAbsoluteWithArchive(path.data(), before, after);
+	std::string MakeAbsoluteWithArchive(std::string_view path, std::optional<std::string_view> after, std::optional<std::string_view> before) {
+		return (*BB::CFileSystemMgr::GlobalObj)->MakeAbsoluteWithArchive(path.data(), before.value_or(""), after.value_or(""));
 	}
 
 	std::string_view GetDefaultLoadOrderTop() {

@@ -577,6 +577,20 @@ function CppLogic.Logic.HurtEntityGetDamage() end
 --- @param dmg number
 function CppLogic.Logic.HurtEntitySetDamage(dmg) end
 
+--- gets the data of a Events.CPPLOGIC_EVENT_ON_CLICK_ON_MAP trigger.
+--- requires activated CppLogic.UI.EnableClickOnMapTrigger.
+--- @return Position targetPos
+--- @return number mouseButton
+--- @return boolean alt
+--- @return boolean control
+--- @return boolean shift
+--- @return boolean done
+function CppLogic.Logic.EventGetClickOnMouseData() end
+--- sets the done flag of a Events.CPPLOGIC_EVENT_ON_CLICK_ON_MAP trigger.
+--- if set, the event will not be forwarded to any gui state.
+--- @param done boolean
+function CppLogic.Logic.EventSetClickOnMouseDone(done) end
+
 --- gets all loaded archives and folders.
 --- @return string[] loadorder
 function CppLogic.Logic.GetLoadOrder() end
@@ -3044,6 +3058,10 @@ function CppLogic.UI.SetKeyTrigger(f) end
 function CppLogic.UI.SetMouseTrigger(f) end
 --- same as CppLogic.UI.SetMouseTrigger, just designed for mainmenu
 function CppLogic.UI.SetMouseTriggerMainMenu(f) end
+
+--- enables the Events.CPPLOGIC_EVENT_ON_CLICK_ON_MAP trigger, to fire every time the local player clicks onto the map.
+--- status of this gets saved into a savegame.
+function CppLogic.UI.EnableClickOnMapTrigger() end
 
 --- sets a GUI State which reroutes clicks to lua functions.
 --- onclick gets called on left click and gets x and y coordinates of the mouse cursor and can return a bool to override ending the state (default true).

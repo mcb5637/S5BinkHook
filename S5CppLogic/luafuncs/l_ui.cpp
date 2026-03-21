@@ -21,6 +21,7 @@
 #include <utility/LuaEventInterface.h>
 #include <utility/WinAPIUtil.h>
 #include <utility/ModBehavior.h>
+#include <utility/savegame_extra.h>
 
 namespace CppLogic::UI {
 	void StringHandlerSetString(luaext::State L, EGUIX::CSingleStringHandler& h, int i) {
@@ -805,6 +806,11 @@ namespace CppLogic::UI {
 				};
 		}
 		return 0;
+	}
+
+	void EnableClickOnMapTrigger() {
+		GGUI::C3DViewHandler::HookClickOnMapTrigger();
+		SavegameExtra::SerializedMapdata::GlobalObj.ClickMapTrigger = true;
 	}
 
 	int ShowResourceFloatieOnEntity(luaext::State L) {
@@ -1734,6 +1740,9 @@ namespace CppLogic::UI {
 		}
 		L.Pop(1);
 
+		if (SavegameExtra::SerializedMapdata::GlobalObj.ClickMapTrigger)
+			EnableClickOnMapTrigger();
+
 		L.Pop(1);
 	}
 
@@ -1826,6 +1835,7 @@ namespace CppLogic::UI {
 		luaext::FuncReference::GetRef<SetCharTrigger>("SetCharTrigger"),
 		luaext::FuncReference::GetRef<SetKeyTrigger>("SetKeyTrigger"),
 		luaext::FuncReference::GetRef<SetMouseTrigger>("SetMouseTrigger"),
+		luaext::FuncReference::GetRef<EnableClickOnMapTrigger>("EnableClickOnMapTrigger"),
 		luaext::FuncReference::GetRef<ShowResourceFloatieOnEntity>("ShowResourceFloatieOnEntity"),
 		luaext::FuncReference::GetRef<ShowAdvancedFloatie>("ShowAdvancedFloatie"),
 		luaext::FuncReference::GetRef<GetClientSize>("GetClientSize"),

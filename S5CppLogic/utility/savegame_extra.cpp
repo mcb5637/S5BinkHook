@@ -150,6 +150,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, ScriptTriggerEval),
 	AutoMemberSerialization(SerializedMapdata, CannonInProgressAttraction),
 	AutoMemberSerialization(SerializedMapdata, LightningEffectFix),
+	AutoMemberSerialization(SerializedMapdata, ClickMapTrigger),
 	AutoMemberSerialization(SerializedMapdata, ResDoodad_RefillableCategory),
 	BB::SerializationData::GuardData(),
 };

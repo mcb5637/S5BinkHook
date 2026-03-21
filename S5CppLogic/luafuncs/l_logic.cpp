@@ -305,6 +305,24 @@ namespace CppLogic::Logic {
 		ev->Damage = L.CheckInt(1);
 		return 0;
 	}
+	std::tuple<const shok::Position&, int, bool, bool, bool, bool> EventGetClickOnMouseData() {
+		auto* ev = BB::IdentifierCast<Events::ClickOnMapEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (!ev)
+			throw lua::LuaException("not in trigger");
+		return {ev->Position,
+			static_cast<int>(ev->ModifiedButton & shok::Keys::MaskCode),
+			(ev->ModifiedButton & shok::Keys::ModifierAlt) != shok::Keys::None,
+			(ev->ModifiedButton & shok::Keys::ModifierControl) != shok::Keys::None,
+			(ev->ModifiedButton & shok::Keys::ModifierShift) != shok::Keys::None,
+			ev->Done,
+		};
+	}
+	void EventSetClickOnMouseDone(bool done) {
+		auto* ev = BB::IdentifierCast<Events::ClickOnMapEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (!ev)
+			throw lua::LuaException("not in trigger");
+		ev->Done = true;
+	}
 
 	int GetLoadOrder(luaext::State L) {
 		L.NewTable();
@@ -1524,6 +1542,8 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<EnableAllHurtEntityTrigger>("EnableAllHurtEntityTrigger"),
 			luaext::FuncReference::GetRef<HurtEntityGetDamage>("HurtEntityGetDamage"),
 			luaext::FuncReference::GetRef<HurtEntitySetDamage>("HurtEntitySetDamage"),
+			luaext::FuncReference::GetRef<EventGetClickOnMouseData>("EventGetClickOnMouseData"),
+			luaext::FuncReference::GetRef<EventSetClickOnMouseDone>("EventSetClickOnMouseDone"),
 			luaext::FuncReference::GetRef<GetLoadOrder>("GetLoadOrder"),
 			luaext::FuncReference::GetRef<AddArchive>("AddArchive"),
 			luaext::FuncReference::GetRef<RemoveTopArchive>("RemoveTopArchive"),
@@ -1627,6 +1647,9 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_SAVEGAME_LOADED");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnSavegameLoaded));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_CLICK_ON_MAP");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnClickMap));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}

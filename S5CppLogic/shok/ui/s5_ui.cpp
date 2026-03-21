@@ -831,6 +831,43 @@ void GGUI::C3DViewHandler::SetGUIStateByIdentfierOnNextUpdate(shok::ClassId iden
 	c3dviewhandler_setguistateonupdate(this, identifier);
 }
 
+bool HookClickOnMapTrigger_Hooked = false;
+void GGUI::C3DViewHandler::HookClickOnMapTrigger() {
+	if (HookClickOnMapTrigger_Hooked)
+		return;
+	HookClickOnMapTrigger_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {reinterpret_cast<void*>(0x528507)}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x528507), &OnClickOnMapAsm, reinterpret_cast<void*>(0x52850c));
+}
+
+bool __stdcall GGUI::C3DViewHandler::OnClickOnMap(C3DViewHandler *th, BB::CEvent *ev) {
+	if (ev->IsEvent(shok::InputEventIds::MouseButtonDown)) {
+		if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
+			shok::PositionRot p;
+			if ((*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainPosAtScreenCoords(p, me->X, me->Y)) {
+				CppLogic::Events::ClickOnMapEvent x{shok::EventIDs::CppLogicEvent_OnClickMap, p, me->KeyData};
+				(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&x);
+				if (x.Done)
+					return true;
+			}
+		}
+	}
+	if (th->CurrentState != nullptr)
+		return th->CurrentState->OnMouseEvent(ev);
+	return false;
+}
+
+void NAKED_DEF GGUI::C3DViewHandler::OnClickOnMapAsm() {
+	__asm {
+		push [ebp+8];
+		push esi;
+		call GGUI::C3DViewHandler::OnClickOnMap;
+
+		push 0x52851a;
+		ret;
+	};
+}
+
 void ERwTools::CDefCameraBehaviour::HookEnableZoom(bool ena)
 {
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x52212B), 10 };

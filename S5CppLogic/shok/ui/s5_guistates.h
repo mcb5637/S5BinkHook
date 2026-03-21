@@ -37,6 +37,8 @@ namespace GGUI {
 		virtual bool Cancel() = 0; // no idea what the return actually is for, seems to return always 1
 		virtual const char* GetName() = 0;
 		virtual void OnSelectionChanged(int z); //on selection changed call with 0 -> cancel state
+
+		// 5269cb set 3dview handler
 	};
 
 	class CBasicState : public GGUI::CState { // no vtable
@@ -92,6 +94,9 @@ namespace GGUI {
 		static inline constexpr int vtp = 0x77B300;
 		static inline constexpr int TypeDesc = 0x82CE74;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC6BF8157);
+
+		PADDINGI(4);
+		// ctor 524c4b
 	};
 	class CPlaceTorchState : public GGUI::CWalkCommandState {
 	public:

@@ -608,8 +608,11 @@ namespace GGUI {
 		int* IPicker; // ERwTools::IPicker
 		int* IPlacer; // ERwTools::IPlacer
 		ERwTools::CRpClumpRenderable* ClumpRenerable;
-		PADDINGI(2); // probably pos mouseover
+		shok::ClassId ChangeStateOnNextUpdate;
+		bool ChangeStateOnNextUpdateActive;
 		int MouseX, MouseY;
+
+		virtual void OnMouseEvent(BB::CEvent* ev, int) = 0;
 
 		void SetGUIStateByIdentifier(shok::ClassId identifier, const GGUI::SStateParameters* p = nullptr);
 		template<class T>
@@ -625,6 +628,11 @@ namespace GGUI {
 		}
 
 		static inline constexpr int vtp = 0x77B8E0;
+
+		static void HookClickOnMapTrigger();
+	private:
+		static bool __stdcall OnClickOnMap(C3DViewHandler* th, BB::CEvent* ev);
+		static void NAKED_DECL OnClickOnMapAsm();
 	};
 
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
@@ -665,6 +673,8 @@ namespace GGUI {
 			inline void operator delete(void* p) {
 				shok::Free(p);
 			}
+
+			// ctor 5237d8 (applyto, state, 3dviewhandler)
 		};
 		struct SelectionData {
 			shok::EntityId Id;

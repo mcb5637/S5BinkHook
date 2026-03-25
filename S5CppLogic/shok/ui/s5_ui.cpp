@@ -863,7 +863,8 @@ void NAKED_DEF GGUI::C3DViewHandler::OnClickOnMapAsm() {
 		push esi;
 		call GGUI::C3DViewHandler::OnClickOnMap;
 
-		push 0x52851a;
+		mov edi, [ebp+8];
+		push 0x528517;
 		ret;
 	};
 }
@@ -1015,7 +1016,7 @@ void GGUI::CManager::HookExtraPlayers() {
 		reinterpret_cast<void*>(0x53a7d6),
 	}};
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x52376b), CppLogic::Hooks::MemberFuncPointerToVoid(&CManager::CanSelectPlayerExtra, 0), reinterpret_cast<void*>(0x523772));
-	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x523721), reinterpret_cast<void*>(0x52372b));
+	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x523726), reinterpret_cast<void*>(0x52372b));
 	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x52372f), reinterpret_cast<void*>(0x52373f));
 	CppLogic::Hooks::ReplaceOpcodes(reinterpret_cast<void*>(0x53a7d6), &lua_getguicolor_getcolorasm, reinterpret_cast<void*>(0x53a7e2));
 }

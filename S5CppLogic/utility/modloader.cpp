@@ -1513,7 +1513,13 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	Framework::SavegameSystem::PostGameSavedTo = &PostSave;
 	EGL::CGLEGameLogic::HookOnMapscriptLoaded();
 	EGL::CGLEGameLogic::OnMapscriptLoaded = &PostMapscriptLoaded;
-	(*BB::CFileSystemMgr::GlobalObj)->AddArchive("ModPacks\\CppLogic.bba");
+	auto* m = *BB::CFileSystemMgr::GlobalObj;
+	if (m->Override != nullptr) {
+		auto v = m->LoadOrder.SaveVector();
+		v.Vector.emplace(v.Vector.begin(), m->Override);
+		m->Override = nullptr;
+	}
+	m->AddArchive("ModPacks\\CppLogic.bba");
 	Initialized = true;
 }
 

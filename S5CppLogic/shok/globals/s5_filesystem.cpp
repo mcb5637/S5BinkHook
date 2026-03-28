@@ -94,7 +94,8 @@ bool BB::CFileSystemMgr::CloseHandle(int handle)
 
 std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::OpenFileStreamWithSource(const char* path, BB::IStream::Flags f)
 {
-	if (Override == nullptr && !PathIsAbsolute(path)) { // override seems unused by shok
+	shok::LogString("trying to find file %s override %s abs %s\n", path, Override == nullptr ? "null": Override->TryGetFSName().data(), PathIsAbsolute(path) ? "true" : "false");
+	if (!PathIsAbsolute(path)) { // override seems unused by shok
 		BB::IStream::Flags fnoex = f | BB::IStream::Flags::NoThrow;
 		std::string_view p{ path };
 		if (RemoveData && (p.starts_with("Data") || p.starts_with("data")) && (p[4] == '\\' || p[4] == '/')) {
@@ -105,20 +106,24 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 		if (i != std::string_view::npos) {
 			file = p.substr(0, i);
 			auto arch = p.substr(i + 1);
+			shok::LogString("trying to find vanilla file %s\n", file.c_str());
 			if (arch == "vanilla") {
 				bool active = false;
 				for (auto* fs : LoadOrder) {
 					if (fs == LoadorderTop) {
 						active = true;
+						shok::LogString("activated\n");
 						continue;
 					}
 					if (!active)
 						continue;
 					auto s = fs->OpenFileStreamUnique(file.c_str(), fnoex);
 					if (s != nullptr) {
+						shok::LogString("found in %s\n", fs->TryGetFSName().data());
 						return { fs->TryGetFSName(), std::move(s) };
 					}
 				}
+				shok::LogString("could not find\n");
 			}
 			else {
 				for (auto* fs : LoadOrder) {

@@ -535,6 +535,7 @@ namespace Framework {
 
 		static inline Framework::CMain** const GlobalObj = reinterpret_cast<Framework::CMain**>(0x84EF60);
 		static inline const int* const ExtraNum = reinterpret_cast<int*>(0x886BA8);
+		static inline const bool* const IsDevMode = reinterpret_cast<bool*>(0x88f02c); // 54c66f get
 
 		static void HookModeChange();
 		static void (*OnModeChange)(NextMode mode);

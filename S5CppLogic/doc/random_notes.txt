@@ -48,3 +48,30 @@ netevent processing:
 		- empty multimap of eventhandlers?
 
 Game.Escape skips directly to Framework::(CSinglePlayerMode|CMultiPlayerMode)::CNetworkEvent::PostEvent
+
+build loadorder:
+- if nobba set
+    - add base\\cache.bba as override, if it exists
+    - if has_extra
+        - add extraX\\shr\\
+        - add extraX\\lng\\
+        - if dev mode, add ..\\dataex\\extraX\\lng\\
+    - add base\\lng\\XX
+    - if dev mode, add ..\\dataex\\base\\lng\\XX
+    - add base\\shr
+    - if dev mode, add ..\\dataex\\base\\shr
+- else
+    - if has_extra
+        - add extraX\\shr filter text\\
+        - add extraX\\bba\\patchex.bba
+        - add extraX\\bba\\patche2.bba
+        - add extraX\\bba\\data.bba
+        - add extraX\\bba\\lang.bba
+        - add extraX\\shr filter maps\\user\\;music\\
+    - add base\\shr text\\
+    - add extraX\\bba\\patch.bba (or base\\patch.bba if extra==0)
+    - add base\\lang.bba
+    - add base\\text.bba
+    - add base\\data.bba
+    - add base\\shr filter maps\\user\\;music\\;videos\\
+    - add base\\lng\\XX filter videos\\

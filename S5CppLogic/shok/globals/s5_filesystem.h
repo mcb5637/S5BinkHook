@@ -166,6 +166,8 @@ namespace BB {
 		static inline constexpr int vtp = 0x77F778;
 
 		[[nodiscard]] std::string_view TryGetFSName() const;
+
+		// 54e980 does file exist (path, uint?)
 	};
 
 	class CDirectoryFileSystemSpecialOpenFileOnly : public IFileSystem {
@@ -249,7 +251,7 @@ namespace BB {
 	public:
 		virtual void RemoveTopArchive() = 0; // 10
 		virtual void SetRemoveData() = 0;
-		virtual void MakeAbsolute(char* abs, const char* rel) = 0; // 12 seems only to work with external files, not with files in bba archives
+		virtual bool MakeAbsolute(char* abs, const char* rel) = 0; // 12 seems only to work with external files, not with files in bba archives
 	};
 	class CFileSystemMgr : public IFileSystemMgr {
 	public:
@@ -279,6 +281,8 @@ namespace BB {
 		static bool DoesFileExist(const char* name);
 
 		// init filesystem 5466E1(const char* lang, int extraNum, 0, bool noBba)
+		// static 545ea1 add archive to global (path, no_exception)
+		// 54e4d2 ctor
 	};
 	//constexpr int i = offsetof(CFileSystemMgr, Override) / 4;
 

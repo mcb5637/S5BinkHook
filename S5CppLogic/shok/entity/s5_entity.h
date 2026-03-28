@@ -593,6 +593,8 @@ namespace GGL {
 		//		TASK_RESOLVE_COLLISION, TASK_GO_TO_FREE_POSITION, TASK_SET_POS (set relative to workplace)
 		// defined events: GetArmorClass, GetArmor, Settler_XXX, Worker_Bless (set BlessBuff to 10), IsConvertible
 		// defined states: Wait, Default (set tl to default)
+
+		// get settler props 4a4ab2
 	};
 	static_assert(sizeof(CSettler) == 137 * 4);
 	static_assert(offsetof(CSettler, ModifierProfile.EntityReference.OverheadWidget) == 130 * 4);

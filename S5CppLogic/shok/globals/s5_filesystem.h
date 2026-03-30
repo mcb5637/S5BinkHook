@@ -245,7 +245,7 @@ namespace BB {
 	class IFileSystemMgr : public IFileSystem {
 	protected:
 		virtual void AddArchiveI(const char* path, bool onTop) = 0;
-		virtual void SetOverrideArchive(const char* file) = 0; // better not use it, not sure how well it works
+		virtual void SetCacheArchive(const char* file) = 0;
 		virtual void AddFolderI(const char* path, bool readonly, shok::Set<shok::String>* filters) = 0; // 8
 		virtual void Clear() = 0;
 	public:
@@ -256,7 +256,10 @@ namespace BB {
 	class CFileSystemMgr : public IFileSystemMgr {
 	public:
 		shok::Vector<BB::IFileSystem*> LoadOrder;
-		BB::IFileSystem* Override = nullptr; // 5
+		// used when no_bba is set (converted HE)
+		// files will be loaded from here, if found and size & timestamp match that of the file normally used in the filesystem
+		// (modloader will clear it to simplify code)
+		BB::CBBArchiveFile* Cache = nullptr;
 		bool RemoveData = false;
 		
 		static inline constexpr int vtp = 0x77F794;

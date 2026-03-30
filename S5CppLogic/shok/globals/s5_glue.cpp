@@ -183,24 +183,26 @@ void GGlue::CDamageClassesPropsMgr::AddDamageClass(shok::DamageClassId id, GGL::
 }
 void GGlue::CDamageClassesPropsMgr::ResetDamageClasses()
 {
-	auto v = Logic.DamageClassList.SaveVector();
-	for (int id = static_cast<int>(v.Vector.size())-1; id >= static_cast<int>(DamageClass.size()); --id) {
-		DamageClassManager->RemoveID(id);
-		delete v.Vector[id];
-		v.Vector.pop_back();
-	}
-	for (int id = 1; id < static_cast<int>(DamageClass.size()); ++id) {
-		if (DamageClass[id] != v.Vector[id]) {
-			if (DamageClass[id] == nullptr) {
+	{
+		auto v = Logic.DamageClassList.SaveVector();
+		for (int id = static_cast<int>(v.Vector.size())-1; id >= static_cast<int>(DamageClass.size()); --id) {
+			DamageClassManager->RemoveID(id);
+			delete v.Vector[id];
+			v.Vector.pop_back();
+		}
+		for (int id = 1; id < static_cast<int>(DamageClass.size()); ++id) {
+			if (DamageClass[id] != v.Vector[id]) {
 				delete v.Vector[id];
-				v.Vector[id] = (*BB::CClassFactory::GlobalObj)->CreateObject<GGL::CDamageClassProps>();
-			}
-			else {
-				delete v.Vector[id];
-				v.Vector[id] = DamageClass[id];
 			}
 		}
+		v.Vector.clear();
+		auto v2 = DamageClass.SaveVector();
+		for (auto* c : v2.Vector) {
+			delete c;
+		}
+		v2.Vector.clear();
 	}
+	Load(reinterpret_cast<const char*>(0x7886fc));
 }
 
 GGL::CDamageClassProps* CppLogic::GetDamageClass(shok::DamageClassId id)

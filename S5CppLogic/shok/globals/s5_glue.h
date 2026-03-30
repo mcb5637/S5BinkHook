@@ -110,7 +110,7 @@ namespace GGlue {
 	public:
 		virtual void __stdcall Destroy() = 0;
 		virtual BB::CIDManagerEx* __stdcall GetIdManager() = 0;
-		virtual GGL::DamageClassesHolder __stdcall GetLogic() = 0;
+		virtual GGL::DamageClassesHolder* __stdcall GetLogic() = 0;
 		virtual void __stdcall Load(const char* file) = 0;
 		virtual ~IDamageClassPropsMgr() = default;
 		virtual void __stdcall Save(const char* file) = 0; // probably not working?
@@ -126,6 +126,8 @@ namespace GGlue {
 
 		void AddDamageClass(shok::DamageClassId id, GGL::CDamageClassProps* c);
 		void ResetDamageClasses();
+
+		// ctor 5bbbe4
 	};
 	static_assert(sizeof(CDamageClassesPropsMgr) == 11 * 4);
 	static_assert(offsetof(CDamageClassesPropsMgr, Logic) == 2 * 4);

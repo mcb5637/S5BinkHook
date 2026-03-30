@@ -119,6 +119,9 @@ function ExtraPlayers.GUIUpdate_DiplomacyPlayerName()
 		XGUIEng.ShowWidget(resamountwid, 1)
 		XGUIEng.ShowWidget(resconfwid, 1)
 	end
+
+	XGUIEng.ShowWidget(ExtraPlayers.GetWidgetId(container, "PlayerSelect"), ExtraPlayers.ShowPlayerSelect(sel) and 1 or 0)
+	XGUIEng.ShowWidget("DiplomacyWindowFoW", ExtraPlayers.ShowPlayerSelect(0) and 1 or 0)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -190,6 +193,27 @@ function ExtraPlayers.GUIAction_DiploSendRes()
 	CppLogic.UI.Commands.Player_DonateResources(sel, rt, num)
 end
 
+---@diagnostic disable-next-line: duplicate-set-field
+function ExtraPlayers.ShowPlayerSelect(pid)
+	return false
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function ExtraPlayers.SelectPlayer()
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function ExtraPlayers.UpdateSelectPlayer()
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function ExtraPlayers.UpdateFoW()
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function ExtraPlayers.ToggleFoW()
+end
+
 function ExtraPlayers_InitUI()
 	ExtraPlayers.WidgetIdCache = {}
 
@@ -204,24 +228,26 @@ function ExtraPlayers_InitUI()
 
 
 	for i = 1, 8 do
-		rem("DiplomacyWindowPlayer0" .. i)
+		rem("DiplomacyWindowPlayer0"..i)
 	end
 	rem("DiplomacyWindowController")
 
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayers")==0, "DiplomacyWindowPlayers already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowSelectors")==0, "DiplomacyWindowSelectors already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayer")==0, "DiplomacyWindowPlayer already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerColorFrame")==0, "DiplomacyWindowPlayerColorFrame already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerName")==0, "DiplomacyWindowPlayerName already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerSetAlly")==0, "DiplomacyWindowPlayerSetAlly already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerSetNeutral")==0, "DiplomacyWindowPlayerSetNeutral already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerSetHostile")==0, "DiplomacyWindowPlayerSetHostile already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerMPResourceAmount")==0, "DiplomacyWindowPlayerMPResourceAmount already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerMPResourceName")==0, "DiplomacyWindowPlayerMPResourceName already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerMPResourceSend")==0, "DiplomacyWindowPlayerMPResourceSend already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerColor")==0, "DiplomacyWindowPlayerColor already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerOpponentState")==0, "DiplomacyWindowPlayerOpponentState already exists")
-	assert(XGUIEng.GetWidgetID("DiplomacyWindowScroll")==0, "DiplomacyWindowScroll already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayers") == 0, "DiplomacyWindowPlayers already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowSelectors") == 0, "DiplomacyWindowSelectors already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayer") == 0, "DiplomacyWindowPlayer already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerColorFrame") == 0, "DiplomacyWindowPlayerColorFrame already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerName") == 0, "DiplomacyWindowPlayerName already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerSetAlly") == 0, "DiplomacyWindowPlayerSetAlly already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerSetNeutral") == 0, "DiplomacyWindowPlayerSetNeutral already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerSetHostile") == 0, "DiplomacyWindowPlayerSetHostile already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerSelect") == 0, "DiplomacyWindowPlayerSelect already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerMPResourceAmount") == 0, "DiplomacyWindowPlayerMPResourceAmount already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerMPResourceName") == 0, "DiplomacyWindowPlayerMPResourceName already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerMPResourceSend") == 0, "DiplomacyWindowPlayerMPResourceSend already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerColor") == 0, "DiplomacyWindowPlayerColor already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowPlayerOpponentState") == 0, "DiplomacyWindowPlayerOpponentState already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowScroll") == 0, "DiplomacyWindowScroll already exists")
+	assert(XGUIEng.GetWidgetID("DiplomacyWindowFoW") == 0, "DiplomacyWindowFoW already exists")
 	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("DiplomacyWindow", "DiplomacyWindowPlayers", "DiplomacyStatusFriendly")
 	CppLogic.UI.WidgetSetPositionAndSize("DiplomacyWindowPlayers", 0, 0, 900, 414)
 	XGUIEng.ShowWidget("DiplomacyWindowPlayers", 1)
@@ -316,7 +342,35 @@ function ExtraPlayers_InitUI()
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerSetHostile", 10, 0, 0, 1, 1)
 	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerSetHostile", 10, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetUpdateManualFlag("DiplomacyWindowPlayerSetHostile", true)
-	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("DiplomacyWindowPlayer", "DiplomacyWindowPlayerMPResourceAmount", "CppLogic::Mod::UI::TextInputCustomWidget", nil, 4, 0, 0, 0, -1073741824, 100, "", "")
+	CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("DiplomacyWindowPlayer", "DiplomacyWindowPlayerSelect", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("DiplomacyWindowPlayerSelect", 341, 5, 32, 32)
+	XGUIEng.ShowWidget("DiplomacyWindowPlayerSelect", 0)
+	CppLogic.UI.WidgetSetBaseData("DiplomacyWindowPlayerSelect", 0, false, false)
+	XGUIEng.DisableButton("DiplomacyWindowPlayerSelect", 0)
+	XGUIEng.HighLightButton("DiplomacyWindowPlayerSelect", 0)
+	CppLogic.UI.ButtonOverrideActionFunc("DiplomacyWindowPlayerSelect", function() ExtraPlayers.SelectPlayer() end)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerSelect", 0, 0, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowPlayerSelect", 0, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerSelect", 0, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerSelect", 1, 0.25, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowPlayerSelect", 1, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerSelect", 1, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerSelect", 2, 0.5, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowPlayerSelect", 2, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerSelect", 2, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerSelect", 3, 0, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowPlayerSelect", 3, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerSelect", 3, 128, 128, 128, 128)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerSelect", 4, 0.75, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowPlayerSelect", 4, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerSelect", 4, 255, 255, 255, 255)
+	CppLogic.UI.WidgetSetTooltipData("DiplomacyWindowPlayerSelect", nil, false, true)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerSelect", 10, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerSelect", 10, 255, 255, 255, 0)
+	CppLogic.UI.WidgetSetUpdateManualFlag("DiplomacyWindowPlayerSelect", false)
+	CppLogic.UI.WidgetOverrideUpdateFunc("DiplomacyWindowPlayerSelect", function() ExtraPlayers.UpdateSelectPlayer() end)
+	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("DiplomacyWindowPlayer", "DiplomacyWindowPlayerMPResourceAmount", "CppLogic::Mod::UI::TextInputCustomWidget", nil, 4, 0, 0, 0,
+		-1073741824, 100, "", "")
 	CppLogic.UI.WidgetSetPositionAndSize("DiplomacyWindowPlayerMPResourceAmount", 610, 5, 120, 31)
 	XGUIEng.ShowWidget("DiplomacyWindowPlayerMPResourceAmount", 1)
 	CppLogic.UI.WidgetSetBaseData("DiplomacyWindowPlayerMPResourceAmount", 0, false, false)
@@ -392,10 +446,38 @@ function ExtraPlayers_InitUI()
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowPlayerOpponentState", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("DiplomacyWindowPlayerOpponentState", 0, "graphics\\textures\\gui\\window_status_hostile.png")
 	XGUIEng.SetMaterialColor("DiplomacyWindowPlayerOpponentState", 0, 255, 255, 255, 255)
-	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("DiplomacyWindowPlayers", "DiplomacyWindowScroll", "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 0, 0, 0, 0, 0, 0, "", "DiplomacyWindowPlayer")
+	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("DiplomacyWindowPlayers", "DiplomacyWindowScroll", "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 0, 0, 0, 0, 0, 0, "",
+		"DiplomacyWindowPlayer")
 	CppLogic.UI.WidgetSetPositionAndSize("DiplomacyWindowScroll", 0, 0, 900, 414)
 	XGUIEng.ShowWidget("DiplomacyWindowScroll", 1)
 	CppLogic.UI.WidgetSetBaseData("DiplomacyWindowScroll", 0, false, false)
+	CppLogic.UI.ContainerWidgetCreateGFXButtonWidgetChild("DiplomacyWindow", "DiplomacyWindowFoW", "DiplomacyStatusFriendly")
+	CppLogic.UI.WidgetSetPositionAndSize("DiplomacyWindowFoW", 64, 368, 32, 32)
+	XGUIEng.ShowWidget("DiplomacyWindowFoW", 0)
+	CppLogic.UI.WidgetSetBaseData("DiplomacyWindowFoW", 0, false, false)
+	XGUIEng.DisableButton("DiplomacyWindowFoW", 0)
+	XGUIEng.HighLightButton("DiplomacyWindowFoW", 0)
+	CppLogic.UI.ButtonOverrideActionFunc("DiplomacyWindowFoW", function() ExtraPlayers.ToggleFoW() end)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowFoW", 0, 0, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowFoW", 0, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowFoW", 0, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowFoW", 1, 0.25, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowFoW", 1, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowFoW", 1, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowFoW", 2, 0.5, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowFoW", 2, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowFoW", 2, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowFoW", 3, 0, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowFoW", 3, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowFoW", 3, 128, 128, 128, 128)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowFoW", 4, 0.75, 0.1875, 0.25, 0.0625)
+	XGUIEng.SetMaterialTexture("DiplomacyWindowFoW", 4, "data\\graphics\\textures\\gui\\b_civil_keep.png")
+	XGUIEng.SetMaterialColor("DiplomacyWindowFoW", 4, 255, 255, 255, 255)
+	CppLogic.UI.WidgetSetTooltipData("DiplomacyWindowFoW", nil, false, true)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("DiplomacyWindowFoW", 10, 0, 0, 1, 1)
+	XGUIEng.SetMaterialColor("DiplomacyWindowFoW", 10, 255, 255, 255, 0)
+	CppLogic.UI.WidgetSetUpdateManualFlag("DiplomacyWindowFoW", false)
+	CppLogic.UI.WidgetOverrideUpdateFunc("DiplomacyWindowFoW", function() ExtraPlayers.UpdateFoW() end)
 
 	ExtraPlayers.DiplomacyPlayerScroll:Setup()
 end

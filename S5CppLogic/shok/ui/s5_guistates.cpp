@@ -31,9 +31,9 @@ bool GGUI::CBasicState::Cancel()
 {
 	return OnCancel();
 }
-void GGUI::CState::OnSelectionChanged(int z)
+void GGUI::CState::OnSelectionChanged(bool z)
 {
-	if (z == 0)
+	if (!z)
 		Cancel();
 }
 
@@ -94,8 +94,8 @@ void GGUI::CPlaceBuildingState::SetStateParameters(SStateParameters* p)
 {
 	placebuild_setparams(this, p);
 }
-inline void(__thiscall* const placebuld_onselchanged)(GGUI::CPlaceBuildingState* th, int z) = reinterpret_cast<void(__thiscall*)(GGUI::CPlaceBuildingState*, int)>(0x538971);
-void GGUI::CPlaceBuildingState::OnSelectionChanged(int z)
+inline void(__thiscall* const placebuld_onselchanged)(GGUI::CPlaceBuildingState* th, bool z) = reinterpret_cast<void(__thiscall*)(GGUI::CPlaceBuildingState*, bool)>(0x538971);
+void GGUI::CPlaceBuildingState::OnSelectionChanged(bool z)
 {
 	placebuld_onselchanged(this, z);
 }
@@ -253,9 +253,6 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPos(shok::Entity
 void __stdcall selectionstate_getwindowsize(int* o) {
 	RECT r;
 	if (GetClientRect(*shok::MainWindowHandle, &r)) {
-		CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
-			reinterpret_cast<void*>(0x528DFF),
-		} };
 		o[0] = r.right;
 		o[1] = r.bottom;
 	}

@@ -10,6 +10,7 @@
 #include <shok/entity/s5_tasklist.h>
 #include <shok/globals/s5_classfactory.h>
 #include <shok/events/s5_netevents.h>
+#include <shok/globals/s5_entityiterators.h>
 
 static inline void(__thiscall* const textset_load)(BB::CTextSet* th) = reinterpret_cast<void(__thiscall*)(BB::CTextSet*)>(0x723647);
 void BB::CTextSet::Load()
@@ -1005,24 +1006,71 @@ void NAKED lua_getguicolor_getcolorasm() {
 
 bool CManager_HookExtraPlayers = false;
 void GGUI::CManager::HookExtraPlayers() {
-
 	if (CManager_HookExtraPlayers)
+		return;
+	CManager_HookExtraPlayers = true;
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
+			reinterpret_cast<void*>(0x523721),
+			reinterpret_cast<void*>(0x52372f),
+			reinterpret_cast<void*>(0x53a7d6),
+		}};
+		CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x523726), reinterpret_cast<void*>(0x52372b));
+		CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x52372f), reinterpret_cast<void*>(0x52373f));
+		CppLogic::Hooks::ReplaceOpcodes(reinterpret_cast<void*>(0x53a7d6), &lua_getguicolor_getcolorasm, reinterpret_cast<void*>(0x53a7e2));
+	}
+	HookPlayerSelectable();
+}
+
+bool (*GGUI::CManager::IsPlayerSelectableOverride)(shok::PlayerId p) = nullptr;
+bool CManager_HookPlayerSelectable = false;
+void GGUI::CManager::HookPlayerSelectable()
+{
+	if (CManager_HookPlayerSelectable)
 		return;
 	CManager_HookExtraPlayers = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
 		reinterpret_cast<void*>(0x52376b),
-		reinterpret_cast<void*>(0x523721),
-		reinterpret_cast<void*>(0x52372f),
-		reinterpret_cast<void*>(0x53a7d6),
+		reinterpret_cast<void*>(0x5288b3),
 	}};
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x52376b), CppLogic::Hooks::MemberFuncPointerToVoid(&CManager::CanSelectPlayerExtra, 0), reinterpret_cast<void*>(0x523772));
-	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x523726), reinterpret_cast<void*>(0x52372b));
-	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x52372f), reinterpret_cast<void*>(0x52373f));
-	CppLogic::Hooks::ReplaceOpcodes(reinterpret_cast<void*>(0x53a7d6), &lua_getguicolor_getcolorasm, reinterpret_cast<void*>(0x53a7e2));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5288b3), &InitSelectionIterAsm, reinterpret_cast<void*>(0x5288bd));
 }
 
 bool GGUI::CManager::CanSelectPlayerExtra(shok::PlayerId p) const {
+	if (IsPlayerSelectableOverride != nullptr)
+		return IsPlayerSelectableOverride(p);
 	return p == ControlledPlayer;
+}
+
+namespace CppLogic::UI {
+	class SelectableEntityIter : public EGL::IGLEEntityPredicate {
+	public:
+		virtual bool Check(EGL::CGLEEntity* e) override {
+			return Manager->CanSelectPlayer(e->PlayerId);
+		}
+
+		GGUI::CManager* Manager;
+
+		explicit SelectableEntityIter(GGUI::CManager* m) : Manager(m) {}
+	};
+}
+
+void __stdcall GGUI::CManager::InitSelectionIter(void *p) {
+	new (p) CppLogic::UI::SelectableEntityIter{
+		GlobalObj(),
+	};
+}
+
+void NAKED_DEF GGUI::CManager::InitSelectionIterAsm() {
+	__asm {
+		lea eax, [ebp - 0x24];
+		push eax;
+		call GGUI::CManager::InitSelectionIter;
+
+		push 0x5288bd;
+		ret;
+	};
 }
 
 void GGUI::SoundFeedback::SoundDatas::ReloadData(shok::FeedbackEventShortenedId id) {

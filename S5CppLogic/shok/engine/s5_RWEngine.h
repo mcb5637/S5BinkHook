@@ -533,6 +533,8 @@ namespace RWE {
 
 		// 492184 BB get "3dsmax User Properties" userdata of frame (ret RpUserDataArray*)
 
+		// 528592 is selection relevant cdecl(atomic*, 0?, bool*)->bool
+
 		static inline const RpAtomicCallBack SetPlayerColorCb = reinterpret_cast<RpAtomicCallBack>(0x48F361);
 		static inline const RpAtomicCallBack DisableShadowCb = reinterpret_cast<RpAtomicCallBack>(0x721FD8);
 		static inline const RpAtomicCallBack DisableParticleEffectsCb = reinterpret_cast<RpAtomicCallBack>(0x721F87); // destroys clumps that are IsParticleEmitter
@@ -584,6 +586,10 @@ namespace RWE {
 		void AddLight(RpLight* light);
 
 		static inline RpClump* (__cdecl* const Read)(RwStream* s) = reinterpret_cast<RpClump * (__cdecl*)(RwStream*)>(0x629990);
+
+		// 629150 RpClumpRegisterPlugin
+
+		// 523705 get entity id (via UnnamedClumpPlugin)
 	};
 
 	/*

@@ -761,7 +761,7 @@ namespace ECore {
 namespace BB {
 	class CInputEvent : public BB::CEvent {
 	public:
-		bool EventHandeled; // needs confimration, no seridata
+		bool EventHandled; // needs confimration, no seridata
 		PADDING(3);
 
 		CInputEvent(shok::InputEventIds id);

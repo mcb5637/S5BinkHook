@@ -36,9 +36,12 @@ namespace GGUI {
 		virtual void SetStateParameters(SStateParameters* p);
 		virtual bool Cancel() = 0; // no idea what the return actually is for, seems to return always 1
 		virtual const char* GetName() = 0;
-		virtual void OnSelectionChanged(int z); //on selection changed call with 0 -> cancel state
+		virtual void OnSelectionChanged(bool z); //on selection changed call with 0 -> cancel state
 
 		// 5269cb set 3dview handler
+
+		// 526a9b fill target data thiscall(GGUI::CBasicState::TargetData*, int x, int y, cdecl*(atomic*, 0?, bool*)->bool)
+		// 5269f0 get ipicker
 	};
 
 	class CBasicState : public GGUI::CState { // no vtable
@@ -49,9 +52,11 @@ namespace GGUI {
 			shok::EntityId TargetID = {};
 			shok::Position TargetPos;
 			shok::PositionRot TargetPosWithZ;
-			PADDINGI(2);
+			PADDINGI(2); // bool, int?
 
 			void FillPosWithZFromPos();
+
+			// ctor 52353e
 		};
 		struct ExecuteData {
 			shok::EntityId CurrentID;
@@ -297,7 +302,7 @@ namespace GGUI {
 		CPlaceBuildingState();
 		virtual ~CPlaceBuildingState() override;
 		virtual void SetStateParameters(SStateParameters* p) override;
-		virtual void OnSelectionChanged(int z) override;
+		virtual void OnSelectionChanged(bool z) override;
 		virtual bool CheckCommandValid(TargetData* d, int z) override;
 		virtual void ExecuteCommand(TargetData* d, ExecuteData* selectedID) override;
 		virtual TargetData* GetTargetData(TargetData* d, int x, int y) override;
@@ -326,6 +331,18 @@ namespace GGUI {
 		// 1 extra (empty) func in vtable
 
 		static void HookFixDoubleClickSelection();
+
+		// ctor 5287c8
+
+		bool MouseDragActiveAgain = false;
+		int MouseDragStartX = 0;
+		int MouseDragStartY = 0;
+		bool MouseRDragActiveAgain = false;
+		int MouseRDragStartX = 0;
+		int MouseRDragStartY = 0;
+		bool MouseDragActive = false;
+		bool MouseRDragActive = false;
+		float TimepointOfLastMouseLDown = 0.0f;
 	};
 	class CCutsceneState : public GGUI::CState {
 	public:

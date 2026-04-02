@@ -102,7 +102,7 @@ namespace shok {
 		PADDING(3);
 		int UpscaledFlag = 0;
 		RWE::P2D::Rt2dBrush* Brush = nullptr;
-		shok::FontId FontVerdana10;
+		shok::FontId FontVerdana10{};
 
 		void RenderText(const char* txt, shok::FontId fontid, bool scale, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor);
 		void SetTextRenderColor(shok::Color c) const;
@@ -192,7 +192,7 @@ namespace ERwTools {
 	class ICameraHandle {
 	public:
 		virtual void SetDirty() = 0;
-		virtual int GetUpsdateZMode() = 0;
+		virtual int GetUpdateZMode_() = 0;
 		virtual CameraInfo* GetCameraInfo() = 0;
 		virtual float GetZoomFactor() = 0;
 	private:
@@ -266,6 +266,7 @@ namespace ERwTools {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCB15D84);
 
 		static inline ICameraHandle** const GlobalObj = reinterpret_cast<ICameraHandle**>(0x87EC68);
+		// 51d886 () -> globalobj
 	};
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class ICameraMovement {
@@ -743,8 +744,12 @@ namespace GGUI {
 		static bool IsModifierPressed(shok::Keys modif);
 
 		static void HookExtraPlayers();
+		static void HookPlayerSelectable();
+		static bool (*IsPlayerSelectableOverride)(shok::PlayerId p);
 	private:
 		[[nodiscard]] bool CanSelectPlayerExtra(shok::PlayerId p) const;
+		static void __stdcall InitSelectionIter(void* p);
+		static void NAKED_DECL InitSelectionIterAsm();
 	};
 	//constexpr int i = offsetof(CManager, CommandStates) / 4;
 

@@ -1404,6 +1404,35 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int OverrideSelectablePlayers(luaext::State L) {
+		if (L.IsNoneOrNil(1)) {
+			GGUI::CManager::IsPlayerSelectableOverride = nullptr;
+			L.PushLightUserdata(&OverrideSelectablePlayers);
+			L.Push();
+			L.SetTableRaw(luaext::State::REGISTRYINDEX);
+			return 0;
+		}
+		GGUI::CManager::HookPlayerSelectable();
+		L.PushLightUserdata(&OverrideSelectablePlayers);
+		L.PushValue(1);
+		L.SetTableRaw(luaext::State::REGISTRYINDEX);
+		GGUI::CManager::IsPlayerSelectableOverride = [](shok::PlayerId p) {
+			luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
+			auto t = L.AutoCleanStack();
+			L.PushLightUserdata(&OverrideSelectablePlayers);
+			L.GetTableRaw(luaext::State::REGISTRYINDEX);
+			try {
+				auto [r] = L.TCall<bool>(p);
+				return r;
+			}
+			catch (const lua::LuaException& e) {
+				shok::LogString("OverrideSelectablePlayers lua error: %s\n", e.what());
+				return false;
+			}
+		};
+		return 0;
+	}
+
 	int CreateSelectionDecal(luaext::State L) {
 
 		auto t = L.CheckEnum<shok::SelectionTextureId>(1);
@@ -1547,7 +1576,7 @@ namespace CppLogic::UI {
 			if (e->IsEvent(shok::InputEventIds::MouseWheel)) {
 				if (e->IsModifier(shok::Keys::ModifierControl)) {
 					(*ERwTools::CRwCameraHandler::GlobalObj)->ScrollWheelZoom(e->Delta);
-					e->EventHandeled = true;
+					e->EventHandled = true;
 					return true;
 				}
 				else {
@@ -1561,7 +1590,7 @@ namespace CppLogic::UI {
 					}
 					PosToBuild = {};
 					UpdateModel(e->X, e->Y);
-					e->EventHandeled = true;
+					e->EventHandled = true;
 					return true;
 				}
 			}
@@ -1710,6 +1739,7 @@ namespace CppLogic::UI {
 		}
 		TerrainDecalAccess::Cleanup();
 		GGUI::CStatisticsRendererCustomWidget::FillPlayersToDisplay = nullptr;
+		GGUI::CManager::IsPlayerSelectableOverride = nullptr;
 	}
 
 	void OnSaveLoaded(luaext::State L)
@@ -1888,6 +1918,7 @@ namespace CppLogic::UI {
 		luaext::FuncReference::GetRef<ReorderWidgets>("ReorderWidgets"),
 		luaext::FuncReference::GetRef<MiniMapOverlaySetCallbackFuncName>("MiniMapOverlaySetCallbackFuncName"),
 		luaext::FuncReference::GetRef<StatisticsWidgetOverridePlayersToShowGraphs>("StatisticsWidgetOverridePlayersToShowGraphs"),
+		luaext::FuncReference::GetRef<OverrideSelectablePlayers>("OverrideSelectablePlayers"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

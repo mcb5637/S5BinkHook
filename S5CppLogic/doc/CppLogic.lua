@@ -3328,6 +3328,11 @@ function CppLogic.UI.MiniMapOverlaySetCallbackFuncName(wid, funcname) end
 ---@param ... number
 function CppLogic.UI.StatisticsWidgetOverridePlayersToShowGraphs(...) end
 
+---overrides the palyer check of entity selection, nil to reset.
+---not stored into savegames.
+---@param f nil|fun(pid:number):boolean
+function CppLogic.UI.OverrideSelectablePlayers(f) end
+
 ---@class TerrainDecalAccess
 local TerrainDecalAccess = {}
 ---destroys (removes from game world)

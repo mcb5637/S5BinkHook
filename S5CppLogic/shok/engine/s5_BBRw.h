@@ -208,10 +208,12 @@ namespace BBRw {
 		// ctor 48f3f4
 	};
 
-	// size 7*4, id 0x44574D01, 473344 attach
+	// size 7*4, id 0x44574D01, 473344 attach, offset 858228
 	struct UnnamedClumpPlugin { // NOLINT(*-pro-type-member-init)
-		PADDINGI(3);
+		shok::EntityId Entity;
+		PADDINGI(2);
 		ED::ModelData* ModelData;
+		PADDINGI(3);
 	};
 }
 

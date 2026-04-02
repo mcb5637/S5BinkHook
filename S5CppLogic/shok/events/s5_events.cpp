@@ -426,7 +426,7 @@ ECore::CECoreEventInteger::CECoreEventInteger(shok::EventIDs id, int v)
 BB::CInputEvent::CInputEvent(shok::InputEventIds id) : BB::CEvent(id)
 {
 	SetVT(BB::CInputEvent::vtp);
-	EventHandeled = false;
+	EventHandled = false;
 }
 
 BB::CMouseEvent::CMouseEvent(shok::InputEventIds id, shok::Keys keydata, int clicks, int x, int y, int delta) : BB::CInputEvent(id)

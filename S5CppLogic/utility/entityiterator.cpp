@@ -268,6 +268,15 @@ bool CppLogic::Iterator::EntityPredicateIsBuildingAndNotConstructionSite::Matche
 	const auto id = e->GetClassIdentifier();
 	return id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier;
 }
+
+bool CppLogic::Iterator::EntityPredicateIsConstructionSite::Matches(const EGL::CGLEEntity *e, float *rangeOut,
+int *prio) const {
+	const auto id = e->GetClassIdentifier();
+	if (!(id == GGL::CBuilding::Identifier || id == GGL::CBridgeEntity::Identifier))
+		return false;
+	return !static_cast<const GGL::CBuilding*>(e)->IsConstructionFinished(); // NOLINT(*-pro-type-static-cast-downcast)
+}
+
 bool CppLogic::Iterator::EntityPredicateIsCombatRelevant::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const
 {
 	const auto id = e->GetClassIdentifier();

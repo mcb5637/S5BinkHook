@@ -42,6 +42,7 @@ namespace CppLogic::UI {
 	class GUIState_PlaceBuildingEx : public GGUI::CPlaceBuildingState {
 	public:
 		int CurrentStep = 0;
+		bool Chain = false;
 
 		static constexpr int NumSteps = 4;
 		static constexpr float StepToDegrees = 360.0f / NumSteps;

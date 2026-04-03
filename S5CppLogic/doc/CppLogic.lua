@@ -1407,6 +1407,10 @@ function CppLogic.Entity.Predicates.IsAlive() end
 --- @return Predicate
 function CppLogic.Entity.Predicates.IsNotInBuilding() end
 
+--- creates a predicate that checks for buildings under construction
+--- @return Predicate
+function CppLogic.Entity.Predicates.PredicateIsConstructionSite() end
+
 ---@alias entity number|string
 
 --- dumps entity to lua
@@ -2147,6 +2151,14 @@ function CppLogic.Entity.Building.ConstructionSiteGetBuilding(id) end
 --- @param id entity
 --- @return boolean
 function CppLogic.Entity.Building.IsConstructionSite(id) end
+
+--- resturns all serfs currently constructing/building the specified building.
+--- (if applied to a building under construction, automatically checks the constructionsite instead)
+--- (note: automatic forwarding to constructionsite does not work inside the buildings completed callback)
+---@param id entity
+---@param approaching boolean?
+---@return entity[]
+function CppLogic.Entity.Building.BuildingGetAttachedSerfs(id, approaching) end
 
 --- buys a leader in a barracks by entitytype.
 --- uses resources, asserts if not possible.

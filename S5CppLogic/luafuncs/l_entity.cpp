@@ -131,6 +131,11 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int PredicateIsConstructionSite(luaext::State L) {
+		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsConstructionSite>();
+		return 1;
+	}
+
 	int PredicateIsCombatRelevant(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsCombatRelevant>();
 		return 1;
@@ -1747,6 +1752,29 @@ namespace CppLogic::Entity {
 		return 2;
 	}
 
+	int BuildingGetAttachedSerfs(luaext::State L) {
+		GGL::CBuilding* b = L.CheckBuilding(1);
+		if (!b->IsConstructionFinished()) {
+			if (auto* cs = EGL::CGLEEntity::GetEntityByID(b->GetConstructionSite())) {
+				if (auto* c = BB::IdentifierCast<GGL::CConstructionSite>(cs))
+					b = c;
+			}
+		}
+		L.NewTable();
+		int i = 1;
+		for (auto [_, a] : b->ObserverEntities.ForKeys(shok::AttachmentType::SERF_CONSTRUCTION_SITE)) {
+			L.Push(a.EntityId);
+			L.SetTableRaw(-2, i++);
+		}
+		if (L.OptBool(2, false)) {
+			for (auto [_, a] : b->ObserverEntities.ForKeys(shok::AttachmentType::APPROACHING_SERF_CONSTRUCTION_SITE)) {
+				L.Push(a.EntityId);
+				L.SetTableRaw(-2, i++);
+			}
+		}
+		return 1;
+	}
+
 
 	void Cleanup(luaext::State L) {
 		DisableConversionHook(L);
@@ -1826,6 +1854,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<PredicateIsAlive>("IsAlive"),
 			luaext::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
 			luaext::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
+			luaext::FuncReference::GetRef<PredicateIsConstructionSite>("PredicateIsConstructionSite"),
 	};
 
 	constexpr std::array Settlers {
@@ -1976,6 +2005,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<BuildingSpawnWorkerFor>("SpawnWorkerFor"),
 			luaext::FuncReference::GetRef<MarketPredictPrice>("MarketPredictPrice"),
 			luaext::FuncReference::GetRef<MarketGetSellResources>("MarketGetSellResources"),
+			luaext::FuncReference::GetRef<BuildingGetAttachedSerfs>("BuildingGetAttachedSerfs"),
 	};
 
 	void Init(luaext::State L)

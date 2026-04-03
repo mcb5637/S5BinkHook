@@ -550,6 +550,12 @@ namespace CppLogic::Iterator {
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
 	};
+	class EntityPredicateIsConstructionSite : public Predicate<EGL::CGLEEntity> {
+	public:
+		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
+
+		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
+	};
 	class EntityPredicateIsCombatRelevant : public Predicate<EGL::CGLEEntity> {
 	public:
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;

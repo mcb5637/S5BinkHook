@@ -1594,6 +1594,9 @@ namespace CppLogic::UI {
 					return true;
 				}
 			}
+			else if (e->IsEvent(shok::InputEventIds::MouseButtonDown)) {
+				Chain = e->IsModifier(shok::Keys::ModifierControl);
+			}
 		}
 
 		return GGUI::CPlaceBuildingState::OnMouseEvent(ev);
@@ -1632,15 +1635,36 @@ namespace CppLogic::UI {
 		if (selectedID->CurrentID == selectedID->FirstID) {
 			if (CheckCommandValid(d, 0)) {
 				auto m = GGUI::CManager::GlobalObj();
+				size_t num = std::numeric_limits<size_t>::max();
+				if (Chain) {
+					auto i = m->GUIInterface;
+					auto ety = i->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
+					auto* bt = GetEntityType(ety);
+					if (auto* l = dynamic_cast<GGL::CGLBuildingProps*>(bt->LogicProps)) {
+						num = l->ConstructionInfo.BuilderSlot.size();
+					}
+				}
 				GGL::CNetEventBuildingCreator ev{ shok::NetEventIds::Player_BuyBuilding, m->ControlledPlayer, UpgradeCategory, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())} };
 				{
 					auto v = ev.Serf.SaveVector();
 					for (const auto& se : m->SelectedEntities) {
-						if (m->GUIInterface->IsSerf(se.Id))
+						if (m->GUIInterface->IsSerf(se.Id)) {
 							v.Vector.push_back(se.Id);
+							if (--num == 0)
+								break;
+						}
 					}
 				}
 				GGUI::CManager::PostEventFromUI(&ev);
+				if (Chain) {
+					for (auto s : ev.Serf) {
+						m->DeselectEntity(s);
+					}
+					m->OnSelectionChanged();
+					PosToBuild = {};
+					UpdateModel(MouseX, MouseY);
+					return;
+				}
 				luaext::State L{ m->GameState };
 				int top = L.GetTop();
 				L.GetGlobal("GameCallback_GUI_AfterBuildingPlacement");

@@ -475,7 +475,7 @@ namespace shok {
 		FEEDBACK_EVENT_MINE_RESOURCE_GONE = 0x13003, // GGL::CFeedbackEventResourceRunningOut
 		FEEDBACK_EVENT_ENTITIES_EXCHANGED = 0x13004, // EGL::CNetEvent2Entities
 		FEEDBACK_EVENT_BATTLING = 0x13005, // GGL::CFeedbackEventBattling attackerplayer, attackerid, targetplayer, attackerx, attackery
-		FEEDBACK_EVENT_SETTLER_WALK = 0x13006, // EGL::CNetEventEntityAndPo
+		FEEDBACK_EVENT_SETTLER_WALK = 0x13006, // EGL::CNetEventEntityAndPos
 		FEEDBACK_EVENT_TECHNOLOGY_RESEARCHED = 0x13007, // GGL::CNetEventEventTechnologyPlayerIDAndEntityID
 		FEEDBACK_EVENT_SETTLER_GRIEVANCE = 0x13008, // EGL::CNetEventEntityIDAnd3Integer
 		FEEDBACK_EVENT_SETTLER_LEFT_SETTLEMENT = 0x13009, // EGL::CNetEventEntityIDAndInteger

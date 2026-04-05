@@ -3345,6 +3345,11 @@ function CppLogic.UI.StatisticsWidgetOverridePlayersToShowGraphs(...) end
 ---@param f nil|fun(pid:number):boolean
 function CppLogic.UI.OverrideSelectablePlayers(f) end
 
+---sets feedback event callback, nil to clear. returns handeled (no further processing on true).
+---not stored into savegames.
+---@param f nil|fun(evid:number):boolean
+function CppLogic.UI.SetFeedbackEventCallback(f) end
+
 ---@class TerrainDecalAccess
 local TerrainDecalAccess = {}
 ---destroys (removes from game world)

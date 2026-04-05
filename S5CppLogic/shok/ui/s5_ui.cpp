@@ -1023,6 +1023,43 @@ void GGUI::CManager::HookExtraPlayers() {
 }
 
 bool (*GGUI::CManager::IsPlayerSelectableOverride)(shok::PlayerId p) = nullptr;
+
+void NAKED feedback_event_asm() {
+	__asm {
+		push edi;
+		mov edi, [esp+0xc];
+
+
+		mov eax, [GGUI::CManager::FeedbackEventCb];
+		test eax, eax;
+		jz cont;
+
+		push esi;
+		call eax;
+		test al, al;
+		jz cont;
+
+		push 0x529243;
+		ret;
+
+	cont:
+		push 0x52920a;
+		ret;
+	};
+}
+
+bool (__stdcall*GGUI::CManager::FeedbackEventCb)(BB::CEvent* ev) = nullptr;
+bool CManager_HookFeedbackEvent = false;
+void GGUI::CManager::HookFeedbackEvent() {
+	if (CManager_HookFeedbackEvent)
+		return;
+	CManager_HookFeedbackEvent = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{0x100, {
+		reinterpret_cast<void*>(0x529205),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x529205), &feedback_event_asm, reinterpret_cast<void*>(0x52920a));
+}
+
 bool CManager_HookPlayerSelectable = false;
 void GGUI::CManager::HookPlayerSelectable()
 {

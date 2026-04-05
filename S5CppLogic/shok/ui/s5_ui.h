@@ -702,7 +702,7 @@ namespace GGUI {
 		static inline constexpr int vtp = 0x77B2F8;
 
 		// select entity standard thiscall 0x721EF6(selectedVector*, id)
-		// select entity solier of leader thiscall 0x721F12(selectedVector*, id)
+		// select entity soldier of leader thiscall 0x721F12(selectedVector*, id)
 		// feedback event handler stdcall 0x529200(this, event*) calls in order:
 		//	feedback event handler minimap thiscall 0x528F43(this, event*)
 		//	feedback event handler onscreenRes thiscall 0x52901E(this, event*)
@@ -746,6 +746,8 @@ namespace GGUI {
 		static void HookExtraPlayers();
 		static void HookPlayerSelectable();
 		static bool (*IsPlayerSelectableOverride)(shok::PlayerId p);
+		static void HookFeedbackEvent();
+		static bool (__stdcall*FeedbackEventCb)(BB::CEvent* ev);
 	private:
 		[[nodiscard]] bool CanSelectPlayerExtra(shok::PlayerId p) const;
 		static void __stdcall InitSelectionIter(void* p);

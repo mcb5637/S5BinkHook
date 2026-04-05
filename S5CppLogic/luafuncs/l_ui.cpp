@@ -1433,6 +1433,35 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	int SetFeedbackEventCallback(luaext::State L) {
+		if (L.IsNoneOrNil(1)) {
+			GGUI::CManager::FeedbackEventCb = nullptr;
+			L.PushLightUserdata(&SetFeedbackEventCallback);
+			L.Push();
+			L.SetTableRaw(luaext::State::REGISTRYINDEX);
+			return 0;
+		}
+		GGUI::CManager::HookFeedbackEvent();
+		L.PushLightUserdata(&SetFeedbackEventCallback);
+		L.PushValue(1);
+		L.SetTableRaw(luaext::State::REGISTRYINDEX);
+		GGUI::CManager::FeedbackEventCb = [](BB::CEvent* ev) {
+			luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
+			auto t = L.AutoCleanStack();
+			L.PushLightUserdata(&SetFeedbackEventCallback);
+			L.GetTableRaw(luaext::State::REGISTRYINDEX);
+			try {
+				auto [r] = L.TCall<bool>(ev->EventTypeId);
+				return r;
+			}
+			catch (const lua::LuaException& e) {
+				shok::LogString("HookFeedbackEvent lua error: %s\n", e.what());
+				return false;
+			}
+		};
+		return 0;
+	}
+
 	int CreateSelectionDecal(luaext::State L) {
 
 		auto t = L.CheckEnum<shok::SelectionTextureId>(1);
@@ -1943,6 +1972,7 @@ namespace CppLogic::UI {
 		luaext::FuncReference::GetRef<MiniMapOverlaySetCallbackFuncName>("MiniMapOverlaySetCallbackFuncName"),
 		luaext::FuncReference::GetRef<StatisticsWidgetOverridePlayersToShowGraphs>("StatisticsWidgetOverridePlayersToShowGraphs"),
 		luaext::FuncReference::GetRef<OverrideSelectablePlayers>("OverrideSelectablePlayers"),
+		luaext::FuncReference::GetRef<SetFeedbackEventCallback>("SetFeedbackEventCallback"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

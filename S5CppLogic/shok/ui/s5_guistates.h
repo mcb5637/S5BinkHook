@@ -320,6 +320,8 @@ namespace GGUI {
 		static shok::PositionRot GetNearestPlacementPosBuildOn(shok::EntityTypeId ety, const shok::Position& p, float range);
 		static shok::PositionRot GetNearestPlacementPosFree(shok::EntityTypeId ety, const shok::PositionRot& p, float range);
 		static shok::PositionRot GetNearestPlacementPos(shok::EntityTypeId ety, const shok::PositionRot& p, float range);
+
+		// set display pos & status
 	};
 	static_assert(sizeof(GGUI::CPlaceBuildingState) / 4 == 7);
 

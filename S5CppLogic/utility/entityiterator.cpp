@@ -352,6 +352,16 @@ bool CppLogic::Iterator::EntityPredicateOfAnyType::Matches(const EGL::CGLEEntity
 	return false;
 }
 
+CppLogic::Iterator::EntityPredicateOfAnyTypeSpan::EntityPredicateOfAnyTypeSpan(std::span<const shok::EntityTypeId> s) : entityTypes(s) {
+}
+
+bool CppLogic::Iterator::EntityPredicateOfAnyTypeSpan::Matches(const EGL::CGLEEntity *e, float *rangeOut, int *prio) const {
+	for (shok::EntityTypeId ety : entityTypes)
+		if (e->EntityType == ety)
+			return true;
+	return false;
+}
+
 CppLogic::Iterator::EffectPredicateOfType::EffectPredicateOfType(shok::EffectTypeId ty)
 {
 	Type = ty;

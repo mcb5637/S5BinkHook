@@ -494,9 +494,9 @@ namespace GGL {
 		virtual bool CanPlaceEntityAtPos(shok::EntityTypeId ety, float x, float y, float r) = 0; // checks buildblock+block of entity blocking
 		virtual bool IsBuildOnBuilding(shok::EntityTypeId ety) = 0;
 		virtual bool GetNearestFreePosForBuildingPlacement(shok::EntityTypeId ety, float x, float y, float* xout, float* yout, float range) = 0;
-		virtual bool DoesBuildOnTypeMatches(shok::EntityTypeId ety, shok::EntityId eid) = 0; // 5
+		virtual bool DoesBuildOnTypeMatch(shok::EntityTypeId ety, shok::EntityId eid) = 0; // 5
 		virtual bool CheckBuildingPlacementAndCost(shok::PlayerId pl, shok::EntityTypeId ety, float x, float y, float r) = 0;
-		virtual shok::EntityTypeId GetSettlerTypeByUCat(shok::PlayerId pl, shok::UpgradeCategoryId ucat) = 0;
+		virtual shok::EntityTypeId GetBuildingTypeByUCat(shok::PlayerId pl, shok::UpgradeCategoryId ucat) = 0;
 		virtual bool IsWall(shok::EntityTypeId ety) = 0;
 		virtual bool IsValidPos(float x, float y) = 0;
 		virtual bool IsPosBlocked(float x, float y) = 0; // 10
@@ -509,9 +509,9 @@ namespace GGL {
 		virtual void FillWorkersOfWorkplace(shok::EntityId bid, shok::Vector<shok::EntityId>* workers) = 0;
 		virtual void FillSleepersOfResidence(shok::EntityId bid, shok::Vector<shok::EntityId>* sleepers) = 0;
 		virtual void FillEatersOfFarm(shok::EntityId bid, shok::Vector<shok::EntityId>* eaters) = 0;
-		virtual shok::ModelId GetModelOverride(shok::EntityId eid) = 0; // 20
+		virtual shok::EntityTypeId GetEntityType(shok::EntityId eid) = 0; // 20
 		virtual int GetCurrentResourceAmount(shok::EntityId eid) = 0;
-		virtual bool DoesSetTaskListDepthMatch(shok::EntityId eid, int tlde) = 0;
+		virtual bool IsEntityOfPlayer(shok::EntityId eid, shok::PlayerId p) = 0;
 		virtual bool IsWorker(shok::EntityId eid) = 0;
 		virtual bool IsSettler(shok::EntityId eid) = 0;
 		virtual bool IsSoldier(shok::EntityId eid) = 0;
@@ -544,7 +544,7 @@ namespace GGL {
 		virtual bool SerfCanPathToNearestResourceEntity(shok::EntityId serfId, shok::ResourceType rt, float x, float y) = 0; // 50
 		virtual bool SerfCanPathToResourceEntity(shok::EntityId serfId, shok::EntityId resourceId) = 0;
 		virtual EGL::CGLEEntity* GetEntity(shok::EntityId id) = 0;
-		virtual bool IsBarracksofPlayer(shok::EntityId e, shok::PlayerId pl) = 0;
+		virtual bool IsBarracksOfPlayer(shok::EntityId e, shok::PlayerId pl) = 0;
 	private:
 		virtual void unknown10() = 0; // building get military info 4
 	public:
@@ -557,19 +557,19 @@ namespace GGL {
 		virtual bool IsBuildingType(shok::EntityTypeId id) = 0;
 		virtual GGL::PlayerTributesManager* GetTributeManager(shok::PlayerId player) = 0; //60
 		virtual GGL::PlayerQuestManager* GetQuestManager(shok::PlayerId player) = 0;
-		virtual int* GetDiplomacyData(shok::PlayerId player) = 0;
+		virtual GGL::PlayerDiplomacyManager* GetDiplomacyManager(shok::PlayerId player) = 0;
 		virtual GGL::CPlayerStatus* GetPlayerStatus(shok::PlayerId player) = 0;
 	private:
 		virtual shok::ResourceType GetResourceTypeProvidedBy2(shok::EntityId eid) = 0; // same func as above
 		virtual void unknown14() = 0; //65
 	public:
-		virtual GGL::CWeatherHandler* GetWeatherHandler() = 0;
+		virtual int GetLogicHash() = 0;
 	private:
 		virtual void unknown16() = 0; // something building & vc?
 	public:
 		virtual shok::SectorId GetSector(shok::EntityId entityid) = 0;
 		virtual shok::SectorId GetSector(const shok::Position* p) = 0;
-		virtual bool IsEntityInSector(shok::EntityId eid, shok::SectorId secor) = 0; //70
+		virtual bool IsEntityInSector(shok::EntityId eid, shok::SectorId sector) = 0; //70
 		virtual bool GetTechUsedForStatistics(shok::TechnologyId techid) = 0;
 		virtual shok::Position* GetNextUnblockedPosInEntitiesSector(shok::Position* outpos, shok::Position* inpos, shok::EntityId eid) = 0; // used for scout torches, something else?
 		virtual bool IsPositionExploredByPlayer(shok::PlayerId pid, const shok::Position* p) = 0;

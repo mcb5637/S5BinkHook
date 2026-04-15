@@ -1422,8 +1422,7 @@ namespace CppLogic::UI {
 			L.PushLightUserdata(&OverrideSelectablePlayers);
 			L.GetTableRaw(luaext::State::REGISTRYINDEX);
 			try {
-				auto [r] = L.TCall<bool>(p);
-				return r;
+				return L.TCall<bool>(p);
 			}
 			catch (const lua::LuaException& e) {
 				shok::LogString("OverrideSelectablePlayers lua error: %s\n", e.what());
@@ -1451,8 +1450,7 @@ namespace CppLogic::UI {
 			L.PushLightUserdata(&SetFeedbackEventCallback);
 			L.GetTableRaw(luaext::State::REGISTRYINDEX);
 			try {
-				auto [r] = L.TCall<bool>(ev->EventTypeId);
-				return r;
+				return L.TCall<bool>(ev->EventTypeId);
 			}
 			catch (const lua::LuaException& e) {
 				shok::LogString("HookFeedbackEvent lua error: %s\n", e.what());
@@ -1633,26 +1631,24 @@ namespace CppLogic::UI {
 
 	bool CppLogic::UI::GUIState_PlaceBuildingEx::CheckCommandValid(TargetData* d, int z)
 	{
-		auto m = GGUI::CManager::GlobalObj();
-		auto i = m->GUIInterface;
-		auto ety = i->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
+		if (UpgradeCategory == shok::UpgradeCategoryId::Invalid)
+			return false;
+		auto* m = GGUI::CManager::GlobalObj();
+		auto* i = m->GUIInterface;
+		auto ety = i->GetBuildingTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 		if (!i->CheckBuildingPlacementAndCost(m->ControlledPlayer, ety, d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())))
 			return false;
-		bool hasserf = false;
-		bool hassector = false;
+		bool hasSector = false;
 		auto sector = i->GetSector(&d->TargetPos);
+		if (sector == shok::SectorId::Invalid && d->TargetID != shok::EntityId::Invalid)
+			sector = i->GetSector(d->TargetID);
 		for (const auto& e : m->SelectedEntities) {
-			if (i->IsSerf(e.Id)) {
-				hasserf = true;
-				if (i->GetSector(e.Id) == sector) {
-					hassector = true;
-					break;
-				}
+			if (i->IsSerf(e.Id) && i->GetSector(e.Id) == sector) {
+				hasSector = true;
+				break;
 			}
 		}
-		if (!hasserf)
-			return false;
-		if (!hassector)
+		if (!hasSector)
 			return false;
 		if (!i->IsPositionExploredByPlayer(m->ControlledPlayer, &d->TargetPos))
 			return false;
@@ -1667,7 +1663,7 @@ namespace CppLogic::UI {
 				size_t num = std::numeric_limits<size_t>::max();
 				if (Chain) {
 					auto i = m->GUIInterface;
-					auto ety = i->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
+					auto ety = i->GetBuildingTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 					auto* bt = GetEntityType(ety);
 					if (auto* l = dynamic_cast<GGL::CGLBuildingProps*>(bt->LogicProps)) {
 						num = l->ConstructionInfo.BuilderSlot.size();
@@ -1706,16 +1702,23 @@ namespace CppLogic::UI {
 
 	GGUI::CBasicState::TargetData* CppLogic::UI::GUIState_PlaceBuildingEx::GetTargetData(TargetData* d, int x, int y)
 	{
+		auto m = GGUI::CManager::GlobalObj();
+		FillPosData(d, x, y);
+		{
+			TargetData d2{};
+			FillEntityData(&d2, x, y);
+			d->TargetID = d2.TargetID;
+		}
+		d->TargetPos.FloorToBuildingPlacement();
 		if (UpgradeCategory != shok::UpgradeCategoryId::Invalid) {
-			auto m = GGUI::CManager::GlobalObj();
-			auto ety = m->GUIInterface->GetSettlerTypeByUCat(m->ControlledPlayer, UpgradeCategory);
-			FillPosData(d, x, y);
-			d->TargetPos.FloorToBuildingPlacement();
+			auto ety = m->GUIInterface->GetBuildingTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 			if (static_cast<int>(d->TargetPos.X) == static_cast<int>(PosToBuild.X) && static_cast<int>(d->TargetPos.Y) == static_cast<int>(PosToBuild.X)) {
 				d->TargetPos = PosToBuild;
 			}
 			else {
-				shok::PositionRot p = GetNearestPlacementPos(ety, shok::PositionRot{ d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation()) }, (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance);
+				auto* lp = (*GGL::CLogicProperties::GlobalObj);
+				float snap = lp->BuildingPlacementSnapDistance;
+				shok::PositionRot p = GetNearestPlacementPos(ety, shok::PositionRot{ d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation()) }, snap);
 				if (p.X >= 0) {
 					d->TargetPos.X = p.X;
 					d->TargetPos.Y = p.Y;
@@ -1723,8 +1726,8 @@ namespace CppLogic::UI {
 				}
 				PosToBuild = d->TargetPos;
 			}
-			d->FillPosWithZFromPos();
 		}
+		d->FillPosWithZFromPos();
 		return d;
 	}
 

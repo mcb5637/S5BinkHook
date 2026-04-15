@@ -782,10 +782,17 @@ namespace shok {
 #endif
 		};
 
-		// use this to make anythink more complicated than iterating over the vector.
+		// use this to make anything more complicated than iterating over the vector.
 		// use always as stack variable!
 		SaveVector_Data SaveVector() {
 			return SaveVector_Data{ Internal };
+		}
+
+		operator std::span<T>() noexcept {
+			return std::span<T>(data(), size());
+		}
+		operator std::span<const T>() const noexcept {
+			return std::span<const T>(data(), size());
 		}
 	};
 	static_assert(sizeof(Vector<int>) == 4 * 4);

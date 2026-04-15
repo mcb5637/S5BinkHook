@@ -57,10 +57,10 @@ void GGUI::CBasicState::FillPosData(TargetData* d, int x, int y)
 {
 	basicstate_fillpos(this, d, x, y);
 }
-inline void(__thiscall* const basicstate_fillent)(GGUI::CBasicState* th, GGUI::CBasicState::TargetData* d, int x, int y) = reinterpret_cast<void(__thiscall*)(GGUI::CBasicState*, GGUI::CBasicState::TargetData*, int, int)>(0x526A9B);
+inline void(__thiscall* const basicstate_fillent)(GGUI::CBasicState* th, GGUI::CBasicState::TargetData* d, int x, int y, void*) = reinterpret_cast<void(__thiscall*)(GGUI::CBasicState*, GGUI::CBasicState::TargetData*, int, int, void*)>(0x526A9B);
 void GGUI::CBasicState::FillEntityData(TargetData* d, int x, int y)
 {
-	basicstate_fillent(this, d, x, y);
+	basicstate_fillent(this, d, x, y, nullptr);
 }
 
 inline void(__stdcall* const placebuildingstate_updatemodel)(GGUI::CPlaceBuildingState* th) = reinterpret_cast<void(__stdcall*)(GGUI::CPlaceBuildingState*)>(0x538C46);
@@ -219,15 +219,18 @@ shok::PositionRot GGUI::CPlaceBuildingState::GetNearestPlacementPosBuildOn(shok:
 
 	CppLogic::Iterator::EntityPredicateOfPlayer pl{ static_cast<shok::PlayerId>(0) };
 	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> cir{ p, range * range };
-	CppLogic::Iterator::EntityPredicateOfAnyType pety{};
-	pety.entityTypes.reserve(bp->BuildOn.size());
-	for (auto t : bp->BuildOn)
-		pety.entityTypes.push_back(t);
+	CppLogic::Iterator::EntityPredicateOfAnyTypeSpan pety{bp->BuildOn};
 	auto fun = CppLogic::Iterator::PredicateFunc<EGL::CGLEEntity>([](const EGL::CGLEEntity* e, float*, int*) {
-		return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == static_cast<shok::EntityId>(0);
+		return e->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_BASE) == shok::EntityId::Invalid;
 	});
 	CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> pr{ &pl, &pety, &cir, &fun };
-	CppLogic::Iterator::GlobalEntityIterator it{ &pr };
+	CppLogic::Iterator::MultiRegionEntityIterator it{
+		p,
+		range,
+		shok::AccessCategoryFlags::AccessCategoryResourceDoodad | shok::AccessCategoryFlags::AccessCategoryBuilding
+		| shok::AccessCategoryFlags::AccessCategoryStatic,
+		&pr
+	};
 	if (auto* ent = it.GetNearest(nullptr))
 		return ent->Position;
 	return { -1,-1,0 };

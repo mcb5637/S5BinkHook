@@ -607,6 +607,14 @@ namespace CppLogic::Iterator {
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
 	};
+	class EntityPredicateOfAnyTypeSpan : public Predicate<EGL::CGLEEntity> {
+		std::span<const shok::EntityTypeId> entityTypes;
+	public:
+		explicit EntityPredicateOfAnyTypeSpan(std::span<const shok::EntityTypeId> s);
+		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
+
+		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
+	};
 
 	class EffectPredicateOfType : public Predicate<EGL::CEffect> {
 		shok::EffectTypeId Type;

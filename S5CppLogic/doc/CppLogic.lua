@@ -746,6 +746,7 @@ function CppLogic.Logic.EnableBuildOnMovementFix(f) end
 --- @param p PositionR with rotation
 --- @param range number|nil area (optional, default logic.xml/BuildingPlacementSnapDistance)
 --- @return PositionR pos with rotation
+--- @return entity buildOnTarget may be 0
 function CppLogic.Logic.GetNearestFreePosForBuilding(ety, p, range) end
 
 --- performs the same blocking and sector update that a weather change would have done.

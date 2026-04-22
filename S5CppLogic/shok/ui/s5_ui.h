@@ -567,7 +567,7 @@ namespace GGL {
 	private:
 		virtual void unknown16() = 0; // something building & vc?
 	public:
-		virtual shok::SectorId GetSector(shok::EntityId entityid) = 0;
+		virtual shok::SectorId GetSectorOfEntity(shok::EntityId entityid) = 0;
 		virtual shok::SectorId GetSector(const shok::Position* p) = 0;
 		virtual bool IsEntityInSector(shok::EntityId eid, shok::SectorId sector) = 0; //70
 		virtual bool GetTechUsedForStatistics(shok::TechnologyId techid) = 0;

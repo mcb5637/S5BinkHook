@@ -891,9 +891,10 @@ namespace CppLogic::Logic {
 		float range = L.OptFloat(3, 0);
 		if (range <= 0)
 			range = (*GGL::CLogicProperties::GlobalObj)->BuildingPlacementSnapDistance;
-		shok::PositionRot pout = GGUI::CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
+		auto [pout, id] = GGUI::CPlaceBuildingState::GetNearestPlacementPos(ty, pin, range);
 		L.Push(pout);
-		return 1;
+		L.Push(id);
+		return 2;
 	}
 
 	int BlockingUpdateWeatherChange(luaext::State L) {

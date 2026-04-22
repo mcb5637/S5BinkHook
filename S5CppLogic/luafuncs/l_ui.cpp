@@ -1633,6 +1633,8 @@ namespace CppLogic::UI {
 	{
 		if (UpgradeCategory == shok::UpgradeCategoryId::Invalid)
 			return false;
+		if (d->TargetPos.X <= 0 || d->TargetPos.Y <= 0)
+			return false;
 		auto* m = GGUI::CManager::GlobalObj();
 		auto* i = m->GUIInterface;
 		auto ety = i->GetBuildingTypeByUCat(m->ControlledPlayer, UpgradeCategory);
@@ -1641,9 +1643,9 @@ namespace CppLogic::UI {
 		bool hasSector = false;
 		auto sector = i->GetSector(&d->TargetPos);
 		if (sector == shok::SectorId::Invalid && d->TargetID != shok::EntityId::Invalid)
-			sector = i->GetSector(d->TargetID);
+			sector = i->GetSectorOfEntity(d->TargetID);
 		for (const auto& e : m->SelectedEntities) {
-			if (i->IsSerf(e.Id) && i->GetSector(e.Id) == sector) {
+			if (i->IsSerf(e.Id) && i->GetSectorOfEntity(e.Id) == sector) {
 				hasSector = true;
 				break;
 			}
@@ -1716,13 +1718,15 @@ namespace CppLogic::UI {
 				d->TargetPos = PosToBuild;
 			}
 			else {
-				auto* lp = (*GGL::CLogicProperties::GlobalObj);
+				auto* lp = *GGL::CLogicProperties::GlobalObj;
 				float snap = lp->BuildingPlacementSnapDistance;
-				shok::PositionRot p = GetNearestPlacementPos(ety, shok::PositionRot{ d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation()) }, snap);
+				auto [p, id] = GetNearestPlacementPos(ety, shok::PositionRot{ d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation()) }, snap);
 				if (p.X >= 0) {
 					d->TargetPos.X = p.X;
 					d->TargetPos.Y = p.Y;
 					SetRotation(CppLogic::RadiansToDegrees(p.r));
+					if (id != shok::EntityId::Invalid)
+						d->TargetID = id;
 				}
 				PosToBuild = d->TargetPos;
 			}

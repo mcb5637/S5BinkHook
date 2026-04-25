@@ -1348,6 +1348,7 @@ namespace EGUIX {
 	extern bool (*UIInput_Key_Callback)(int c, win_mouseEvents ev);
 	extern bool (*UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l);
 	extern bool (*UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l);
+	extern bool UIInput_ClipMouse;
 	void HookUIInput();
 
 	class FeedbackEventHandler { // another no vtable

@@ -550,13 +550,18 @@ void Framework::CMain::SWindowData::OverrideSizeWindowed(int x, int y, int w, in
     int ww = w;
     int wh = h;
     if (borderless) {
-        SetWindowLong(MainWindow, -16, 0);
+        SetWindowLong(MainWindow, GWL_STYLE, 0);
     }
     else {
-        RECT re{};
-        GetWindowRect(MainWindow, &re);
-        ww += re.right - re.left - Width;
-        wh += re.bottom - re.top - Height;
+        RECT win{
+            .left = 0,
+            .top = 0,
+            .right = w,
+            .bottom = h,
+        };
+        AdjustWindowRect(&win, GetWindowLong(MainWindow, GWL_STYLE), false);
+        ww = win.right - win.left;
+        wh = win.bottom - win.top;
     }
     SetWindowPos(MainWindow, nullptr, x, y, ww, wh, 0);
     Width = w;

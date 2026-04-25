@@ -1130,6 +1130,9 @@ local CPPLMonitorInfo = {}
 ---@return CPPLMonitorInfo[]
 function CppLogic.API.GetMonitors() end
 
+---updates the clip mouse state from GDB
+function CppLogic.API.UpdateClipMouse() end
+
 ---@class RNG
 local RNG = {}
 

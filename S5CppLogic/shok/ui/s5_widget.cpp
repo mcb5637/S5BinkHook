@@ -1226,8 +1226,14 @@ bool (*EGUIX::UIInput_Char_Callback)(int c) = nullptr;
 bool (*EGUIX::UIInput_Key_Callback)(int c, win_mouseEvents ev) = nullptr;
 bool (*EGUIX::UIInput_Mouse_Callback)(win_mouseEvents id, int w, int l) = nullptr;
 bool (*EGUIX::UIInput_Mouse_CallbackMainMenu)(win_mouseEvents id, int w, int l) = nullptr;
+bool EGUIX::UIInput_ClipMouse = false;
 int __stdcall uiinput_firecbs(win_mouseEvents ev, int w, int l) {
     int r = 0;
+    // RECT clip{};
+    // GetWindowRect(*shok::MainWindowHandle, &clip);
+    // if (!ClipCursor(&clip)) {
+    //     shok::LogString("fail\n");
+    // }
     if (ev == win_mouseEvents::Char) {
         if (EGUIX::UIInput_Char_Callback)
             if (EGUIX::UIInput_Char_Callback(w))
@@ -1237,6 +1243,15 @@ int __stdcall uiinput_firecbs(win_mouseEvents ev, int w, int l) {
         if (EGUIX::UIInput_Key_Callback)
             if (EGUIX::UIInput_Key_Callback(w, ev))
                 r = 1;
+    }
+    else if (ev == win_mouseEvents::MouseMove) {
+        if (EGUIX::UIInput_ClipMouse && GetForegroundWindow() == *shok::MainWindowHandle) {
+            RECT clip{};
+            GetClientRect(*shok::MainWindowHandle, &clip);
+            ClientToScreen(*shok::MainWindowHandle, reinterpret_cast<POINT*>(&clip.left));
+            ClientToScreen(*shok::MainWindowHandle, reinterpret_cast<POINT*>(&clip.right));
+            ClipCursor(&clip);
+        }
     }
     else if (ev > win_mouseEvents::MouseMove && ev <= win_mouseEvents::XButtonDBl) {
         if (EGUIX::UIInput_Mouse_Callback)

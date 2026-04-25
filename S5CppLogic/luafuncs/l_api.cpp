@@ -18,6 +18,7 @@
 #include <shok/globals/s5_cutscene.h>
 #include <shok/events/s5_netevents.h>
 #include <shok/entity/s5_entity.h>
+#include <shok/ui/s5_widget.h>
 #include <utility/hooks.h>
 #include <luaext.h>
 #include <utility/SchemaGenerator.h>
@@ -561,15 +562,36 @@ namespace CppLogic::API {
 	}
 #endif
 
+	void UpdateClipMouse() {
+		static constexpr const char* key = "CppLogic\\ClipMouse";
+		Framework::CMain* f = *Framework::CMain::GlobalObj;
+		if (f->GDB.IsKeyValid(key)) {
+			auto b = f->GDB.GetValue(key) != 0.0f;
+			EGUIX::UIInput_ClipMouse = b;
+			if (b)
+				EGUIX::HookUIInput();
+		}
+	}
+
 	void ResizeWindow(Framework::CMain::SWindowData* wd) {
 		Framework::CMain* f = *Framework::CMain::GlobalObj;
 		static constexpr const char* key = "CppLogic\\BordelessFullscreenOn";
+		static constexpr const char* keyX = "CppLogic\\WindowedX";
+		static constexpr const char* keyY = "CppLogic\\WindowedY";
+		if (f->GDB.IsKeyValid(keyX) && f->GDB.IsKeyValid(keyY)) {
+			auto x = f->GDB.GetValue(keyX);
+			auto y = f->GDB.GetValue(keyY);
+			wd->OverrideSizeWindowed(0, 0, static_cast<int>(x), static_cast<int>(y), false);
+			UpdateClipMouse();
+			return;
+		}
 		if (!f->GDB.IsKeyValid(key))
 			return;
 		std::string_view n{ f->GDB.GetString(key) };
 		if (n.empty())
 			return;
 
+		UpdateClipMouse();
 		wd->OverrideSizeBorderlessFullscreen(n);
 	}
 
@@ -678,6 +700,7 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<EnableScriptTriggerEval>("EnableScriptTriggerEval"),
 			luaext::FuncReference::GetRef<GetMonitors>("GetMonitors"),
 			luaext::FuncReference::GetRef<GetTriggers>("GetTriggers"),
+			luaext::FuncReference::GetRef<UpdateClipMouse>("UpdateClipMouse"),
 #ifdef DEBUG_FUNCS
 			luaext::FuncReference::GetRef<WriteTriggers>("WriteTriggers"),
 			luaext::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),

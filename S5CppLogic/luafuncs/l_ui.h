@@ -78,7 +78,6 @@ namespace CppLogic::UI {
 	class TerrainDecalAccess {
 		std::unique_ptr<ED::CTerrainDecalBase, CppLogic::DestroyCaller<ED::CTerrainDecalBase>> Decal;
 
-		static int Destroy(luaext::State L);
 		static int SetPos(luaext::State L);
 
 		void Destroy();
@@ -95,7 +94,7 @@ namespace CppLogic::UI {
 		~TerrainDecalAccess();
 
 		static constexpr const std::array LuaMethods {
-				luaext::FuncReference::GetRef<Destroy>("Destroy"),
+				luaext::FuncReference::GetUCRef<&TerrainDecalAccess::Destroy>("Destroy"),
 				luaext::FuncReference::GetRef<SetPos>("SetPos"),
 			};
 

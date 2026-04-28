@@ -9,7 +9,7 @@
 #include <shok/s5_scriptsystem.h>
 #include <luaext.h>
 #include <utility/EnumIdManagerMagic.h>
-#include <Luapp/luapp_serialization.h>
+#include <luapp/luapp_serialization.h>
 
 namespace CppLogic::Serializer {
 	class ObjectToLuaSerializer {

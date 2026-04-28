@@ -1847,11 +1847,6 @@ namespace CppLogic::UI {
 		Destroy();
 	}
 
-	int CppLogic::UI::TerrainDecalAccess::Destroy(luaext::State L)
-	{
-		L.CheckUserClass<TerrainDecalAccess>(1)->Destroy();
-		return 0;
-	}
 	void CppLogic::UI::TerrainDecalAccess::Destroy()
 	{
 		Decal = nullptr;

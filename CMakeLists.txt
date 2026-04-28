@@ -7,6 +7,16 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(magic_enum REQUIRED)
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT IPO OUTPUT IPO_Err)
+
+if (IPO)
+    message("IPO on")
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+else()
+    message(WARNING "IPO is not supported: ${IPO_Err}")
+endif()
+
 option(DEBUG_FUNCS OFF)
 option(INCLUDE_ENV OFF)
 
@@ -49,7 +59,7 @@ add_library(LuaDebugger SHARED
         S5CppLogic/luafuncs/l_ua.cpp
         S5CppLogic/luafuncs/l_ui.cpp
 
-        S5CppLogic/Luapp/luapp50.cpp
+        S5CppLogic/Luapp/src50/luapp50.cpp
 
         S5CppLogic/shok/s5_baseDefs.cpp
         S5CppLogic/shok/s5_datastructures.cpp
@@ -122,7 +132,12 @@ add_library(LuaDebugger SHARED
         S5CppLogic/Resource.rc
 )
 
-target_include_directories(LuaDebugger PRIVATE S5CppLogic)
+target_include_directories(LuaDebugger
+        PRIVATE
+        S5CppLogic
+        S5CppLogic/Luapp/include
+        S5CppLogic/lua50
+)
 
 target_link_libraries(LuaDebugger PRIVATE
         magic_enum::magic_enum

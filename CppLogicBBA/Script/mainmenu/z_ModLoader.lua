@@ -223,7 +223,7 @@ function ModLoaderMainmenu.UpdateMonitor()
 		t = string.format("%s (%d x %d)", m.Name, m.W, m.H)
 	end
 	XGUIEng.SetText(XGUIEng.GetCurrentWidgetID(), t)
-	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), m.Name == GDB.GetString("CppLogic\\BordelessFullscreenOn") and 1 or 0)
+	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), m.Name == GDB.GetString("CppLogic\\BorderlessFullscreenOn") and 1 or 0)
 end
 
 function ModLoaderMainmenu.ActionMonitor()
@@ -232,12 +232,12 @@ function ModLoaderMainmenu.ActionMonitor()
 	if not m then
 		return
 	end
-	GDB.SetString("CppLogic\\BordelessFullscreenOn", m.Name)
+	GDB.SetString("CppLogic\\BorderlessFullscreenOn", m.Name)
 end
 
 function ModLoaderMainmenu.UpdateMonitorSelect()
 	if not ModLoaderMainmenu.MonitorScroll.Over[1] then
-		local on = GDB.GetString("CppLogic\\BordelessFullscreenOn") ~= ""
+		local on = GDB.GetString("CppLogic\\BorderlessFullscreenOn") ~= ""
 		XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), on and 1 or 0)
 		XGUIEng.ShowWidget("OptionsMenu30_ResExtraList", on and 1 or 0)
 		XGUIEng.ShowWidget("OptionsMenu30_ResolutionList", on and 0 or 1)

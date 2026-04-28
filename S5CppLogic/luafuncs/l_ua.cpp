@@ -949,25 +949,12 @@ namespace CppLogic::UA {
 		TargetCache.push_back({ id, tick + time, 1 });
 	}
 
-	int UnlimitedArmy::AddLeader(luaext::State L)
-	{
-		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		a->AddLeader(L.CheckSettler(2));
-		return 0;
-	}
-
 	int UnlimitedArmy::GetPos(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		a->CalculatePos();
 		L.Push(a->LastPos);
 		return 1;
-	}
-	int UnlimitedArmy::Tick(luaext::State L)
-	{
-		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		a->Tick();
-		return 0;
 	}
 
 	int UA_Iterate_Next(luaext::State L) {
@@ -1016,7 +1003,7 @@ namespace CppLogic::UA {
 		return 3;
 	}
 
-	int UnlimitedArmy::OnIdChanged(luaext::State L)
+	int UnlimitedArmy::LOnIdChanged(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int old = L.CheckInt(2);
@@ -1025,25 +1012,11 @@ namespace CppLogic::UA {
 		return 0;
 	}
 
-	int UnlimitedArmy::GetSize(luaext::State L)
+	int UnlimitedArmy::LGetSize(luaext::State L)
 	{
 		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
 		int i = a->GetSize(L.ToBoolean(2), L.ToBoolean(3));
 		L.Push(i);
-		return 1;
-	}
-
-	int UnlimitedArmy::RemoveLeader(luaext::State L)
-	{
-		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		a->RemoveLeader(L.CheckEntity(2));
-		return 0;
-	}
-
-	int UnlimitedArmy::IsIdle(luaext::State L)
-	{
-		auto* a = L.CheckUserClass<UnlimitedArmy>(1);
-		L.Push(a->IsIdle());
 		return 1;
 	}
 	int UnlimitedArmy::GetStatus(luaext::State L)

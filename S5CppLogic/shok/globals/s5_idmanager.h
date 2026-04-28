@@ -2,7 +2,7 @@
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <format>
-#include <Luapp/constexprTypename.h>
+#include <luapp/constexprTypename.h>
 
 namespace BB {
 	class IIDManager {

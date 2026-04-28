@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Luapp/luapp50.h>
+#include <luapp/luapp50.h>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/s5_defines.h>
@@ -206,37 +206,37 @@ namespace luaext {template<class S>
 			return th->template CheckEnum<En>(i);
 		}
 		template<class T>
-		requires std::same_as<T, EGL::CGLEEntity>
+		requires std::same_as<T, EGL::CGLEEntity*>
 		T Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckEntity(i);
 		}
 		template<class T>
-		requires std::same_as<T, GGL::CSettler>
+		requires std::same_as<T, GGL::CSettler*>
 		T Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckSettler(i);
 		}
 		template<class T>
-		requires std::same_as<T, GGL::CBuilding>
+		requires std::same_as<T, GGL::CBuilding*>
 		T Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckBuilding(i);
 		}
 		template<class T>
-		requires std::same_as<T, shok::Technology>
+		requires std::same_as<T, shok::Technology*>
 		T Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckTech(i);
 		}
 		template<class T>
-		requires std::same_as<T, GGlue::CGlueEntityProps>
+		requires std::same_as<T, GGlue::CGlueEntityProps*>
 		T Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckEntityType(i);
 		}
 		template<class T>
-		requires std::same_as<T, EGUIX::CBaseWidget>
+		requires std::same_as<T, EGUIX::CBaseWidget*>
 		T Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckWidget(i);
@@ -254,7 +254,7 @@ namespace luaext {template<class S>
 			return th->CheckPosRot(i);
 		}
 		template<class T>
-		requires std::same_as<T, EGL::CEffect>
+		requires std::same_as<T, EGL::CEffect*>
 		T Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckEffect(i);

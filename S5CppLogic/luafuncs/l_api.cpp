@@ -575,7 +575,7 @@ namespace CppLogic::API {
 
 	void ResizeWindow(Framework::CMain::SWindowData* wd) {
 		Framework::CMain* f = *Framework::CMain::GlobalObj;
-		static constexpr const char* key = "CppLogic\\BordelessFullscreenOn";
+		static constexpr const char* key = "CppLogic\\BorderlessFullscreenOn";
 		static constexpr const char* keyX = "CppLogic\\WindowedX";
 		static constexpr const char* keyY = "CppLogic\\WindowedY";
 		if (f->GDB.IsKeyValid(keyX) && f->GDB.IsKeyValid(keyY)) {

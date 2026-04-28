@@ -981,7 +981,7 @@ namespace CppLogic::Logic {
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers = e;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.RefinerFix = ref;
 	}
-	int EnableResourceTriggers(luaext::State L) {
+	int LEnableResourceTriggers(luaext::State L) {
 		EnableResourceTriggers(L.OptBool(1, true), L.OptBool(2, false));
 		return 0;
 	}
@@ -1585,7 +1585,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<TaskListInsertSetLatestAttack>("TaskListInsertSetLatestAttack"),
 			luaext::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
 			luaext::FuncReference::GetRef<Navigate>("Navigate"),
-			luaext::FuncReference::GetRef<EnableResourceTriggers>("EnableResourceTriggers"),
+			luaext::FuncReference::GetRef<LEnableResourceTriggers>("EnableResourceTriggers"),
 			luaext::FuncReference::GetRef<EnableSettlerBuyTriggers>("EnableSettlerBuyTriggers"),
 			luaext::FuncReference::GetRef<GetSettlerBuyTriggerData>("GetSettlerBuyTriggerData"),
 			luaext::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),

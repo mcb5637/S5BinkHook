@@ -117,15 +117,11 @@ namespace CppLogic::UA {
 		bool CheckTargetCache(shok::EntityId id, int count);
 		void UpdateTargetCache(shok::EntityId id, int time);
 
-		static int AddLeader(luaext::State L);
 		static int GetPos(luaext::State L);
-		static int Tick(luaext::State L);
 		static int Iterate(luaext::State L);
 		static int IterateTransit(luaext::State L);
-		static int OnIdChanged(luaext::State L);
-		static int GetSize(luaext::State L);
-		static int RemoveLeader(luaext::State L);
-		static int IsIdle(luaext::State L);
+		static int LOnIdChanged(luaext::State L);
+		static int LGetSize(luaext::State L);
 		static int GetStatus(luaext::State L);
 		static int SetArea(luaext::State L);
 		static int SetTarget(luaext::State L);
@@ -144,20 +140,18 @@ namespace CppLogic::UA {
 
 	public:
 		static constexpr const std::array<luaext::FuncReference, 22> LuaMethods = { {
-				luaext::FuncReference::GetRef<AddLeader>("AddLeader"),
+				luaext::FuncReference::GetUCRef<&UnlimitedArmy::AddLeader>("AddLeader"),
 				luaext::FuncReference::GetRef<GetPos>("GetPos"),
-				luaext::FuncReference::GetRef<Tick>("Tick"),
+				luaext::FuncReference::GetUCRef<&UnlimitedArmy::Tick>("Tick"),
 				luaext::FuncReference::GetRef<Iterate>("Iterate"),
 				luaext::FuncReference::GetRef<IterateTransit>("IterateTransit"),
-				luaext::FuncReference::GetRef<OnIdChanged>("OnIdChanged"),
-				luaext::FuncReference::GetRef<GetSize>("GetSize"),
-				luaext::FuncReference::GetRef<RemoveLeader>("RemoveLeader"),
-				luaext::FuncReference::GetRef<IsIdle>("IsIdle"),
+				luaext::FuncReference::GetRef<LOnIdChanged>("OnIdChanged"),
+				luaext::FuncReference::GetRef<LGetSize>("GetSize"),
+				luaext::FuncReference::GetUCRef<&UnlimitedArmy::RemoveLeader>("RemoveLeader"),
+				luaext::FuncReference::GetUCRef<&UnlimitedArmy::IsIdle>("IsIdle"),
 				luaext::FuncReference::GetRef<GetStatus>("GetStatus"),
 				luaext::FuncReference::GetRef<SetArea>("SetArea"),
 				luaext::FuncReference::GetRef<SetTarget>("SetTarget"),
-				//luaext::FuncReference::GetRef<DumpTable>("DumpTable"),
-				//luaext::FuncReference::GetRef<ReadTable>("ReadTable"),
 				luaext::FuncReference::GetRef<SetStatus>("SetStatus"),
 				luaext::FuncReference::GetRef<SetReMove>("SetReMove"),
 				luaext::FuncReference::GetRef<SetCurrentBattleTarget>("SetCurrentBattleTarget"),

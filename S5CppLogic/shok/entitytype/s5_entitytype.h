@@ -51,7 +51,9 @@ namespace EGL {
 		shok::AccessCategory AccessCategory{};
 		int NumBlockedPoints = 0;
 		float SnapTolerance = 0.0f; //23 seems to be a max change in every coordinate on entity placement
-		bool DeleteWhenBuiltOn = true, DividesTwoSectors = false;
+		bool DeleteWhenBuiltOn = true;
+		// if true, EGL::CGLEEntity::IsInSector checks approach_pos and approach_pos.rotate(90)
+		bool DividesTwoSectors = false;
 		PADDING(2);
 		shok::Vector<EGL::CGLEBehaviorProps*> BehaviorProps; // 25
 		int NumberOfBehaviors = 0; //29

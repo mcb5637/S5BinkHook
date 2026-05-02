@@ -1642,12 +1642,21 @@ namespace CppLogic::UI {
 			return false;
 		bool hasSector = false;
 		auto sector = i->GetSector(&d->TargetPos);
-		if (sector == shok::SectorId::Invalid && d->TargetID != shok::EntityId::Invalid)
-			sector = i->GetSectorOfEntity(d->TargetID);
 		for (const auto& e : m->SelectedEntities) {
-			if (i->IsSerf(e.Id) && i->GetSectorOfEntity(e.Id) == sector) {
-				hasSector = true;
-				break;
+			if (i->IsSerf(e.Id)) {
+				auto serf_sect = i->GetSectorOfEntity(e.Id);
+				if (d->TargetID != shok::EntityId::Invalid) {
+					if (i->IsEntityInSector(d->TargetID, serf_sect)) {
+						hasSector = true;
+						break;
+					}
+				}
+				else {
+					if (sector == serf_sect) {
+						hasSector = true;
+						break;
+					}
+				}
 			}
 		}
 		if (!hasSector)

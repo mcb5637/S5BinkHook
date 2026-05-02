@@ -61,6 +61,9 @@ namespace shok {
 		static BB::SerializationData* SerializationData;
 
 		// 0x503B1E low res from hi res thiscall(const hi*) (modifies this)
+		// 0x4a2afe operator+ cdecl
+		// 0x57d822 rotate thiscall (rad)
+		// 0x57d873 rotate copy
 	};
 	struct PositionRot : Position {
 		float r = 0;
@@ -383,6 +386,7 @@ namespace EGL {
 
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IGLEStateHandler {
+	public:
 		virtual shok::TaskStateExecutionResult Handle(int i) = 0;
 	};
 

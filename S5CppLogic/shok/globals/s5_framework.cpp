@@ -337,6 +337,8 @@ void __fastcall Framework::AGameModeBase::OnSaveLoadedEx(AGameModeBase* th, Fram
 void __stdcall Framework::AGameModeBase::FireSaveLoadTrigger(lua_State* L, const char* f)
 {
     gamemodebase_callluafunc(L, f);
+    if (Framework::CMain::OnSaveLoaded)
+        Framework::CMain::OnSaveLoaded(luaext::State{L});
     CppLogic::Events::SaveLoadedEvent ev{ shok::EventIDs::CppLogicEvent_OnSavegameLoaded, "" };
     (*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
@@ -473,7 +475,7 @@ ED::CGUICamera* Framework::CMain::GetCamera()
 }
 
 void (*Framework::CMain::OnModeChange)(NextMode mode) = nullptr;
-void (*Framework::CMain::OnSaveLoaded)() = nullptr;
+void (*Framework::CMain::OnSaveLoaded)(luaext::State L) = nullptr;
 void (*Framework::CMain::MainmenuUpdate)() = nullptr;
 inline void(__thiscall* const cmain_startmapsp)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40A916);
 inline void(__thiscall* const cmain_gotomainmenu)(Framework::CMain* th) = reinterpret_cast<void(__thiscall*)(Framework::CMain*)>(0x40AA1B);
@@ -494,8 +496,6 @@ void __thiscall Framework::CMain::CheckToDoOverride()
         break;
     case Framework::CMain::NextMode::LoadSaveSP:
         cmain_loadsave(this);
-        if (Framework::CMain::OnSaveLoaded)
-            Framework::CMain::OnSaveLoaded();
         break;
     case Framework::CMain::NextMode::StartMapMP:
         cmain_startmapmp(this);

@@ -539,7 +539,7 @@ namespace Framework {
 
 		static void HookModeChange();
 		static void (*OnModeChange)(NextMode mode);
-		static void (*OnSaveLoaded)();
+		static void (*OnSaveLoaded)(luaext::State L);
 		static void (*MainmenuUpdate)();
 
 		static void HookOverrideWindowInit();

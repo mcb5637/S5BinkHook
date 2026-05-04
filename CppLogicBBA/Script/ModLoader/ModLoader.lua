@@ -736,7 +736,7 @@ end
 --- @return boolean
 function ModLoader.IsUserRequestedModWhitelisted(modname)
 	if modname == "test" or modname == "WideScreenMode" or modname == "BugFixes" or modname == "MPW_Core" or
-	modname == "MPW_CombatPlus" or modname == "MPW_AOE" or modname == "MPW_Territory" or modname == "QoL" then
+	modname == "MPW_CombatPlus" or modname == "MPW_AOE" or modname == "MPW_Territory" or modname == "QoL" or modname == "AdvancedUI" then
 		return true
 	end
 	if not ModLoader.UserRequestedModWhitelisted then

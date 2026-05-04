@@ -1507,7 +1507,6 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	Framework::AGameModeBase::HookStartMap();
 	Framework::AGameModeBase::PreStartMap = &PreMapStart;
 	Framework::AGameModeBase::HookRemoveArchive();
-	Framework::AGameModeBase::HookLoadSave();
 	Framework::AGameModeBase::PreLoadSave = &PreSaveLoad;
 	Framework::SavegameSystem::PreGameSavedTo = &PreSave;
 	Framework::SavegameSystem::PostGameSavedTo = &PostSave;

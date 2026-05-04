@@ -334,18 +334,16 @@ void OnFrameworkChangeMode(Framework::CMain::NextMode n) {
 	}
 }
 
-void OnSaveLoaded() {
+void OnSaveLoaded(luaext::State L) {
 	auto* s = Framework::SavegameSystem::GlobalObj()->CurrentSave;
 	CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.DeserializeFrom(s->SavePath.c_str(), s->AdditionalInfo.c_str());
-	luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
-	int t = L.GetTop();
+	auto t = L.AutoCleanStack();
 	CppLogic::Effect::OnSaveLoaded(L);
 	CppLogic::Combat::OnSaveLoaded(L);
 	CppLogic::Entity::OnSaveLoaded(L);
 	CppLogic::Logic::OnSaveLoaded(L);
 	CppLogic::UI::OnSaveLoaded(L);
 	CppLogic::API::OnSaveLoaded(L);
-	L.SetTop(t);
 }
 
 void OnSaveDone(const char* path, const char* savename) {
@@ -360,6 +358,7 @@ void InitGame() {
 	Framework::CMain::OnSaveLoaded = &OnSaveLoaded;
 	Framework::SavegameSystem::HookSaveGame();
 	Framework::SavegameSystem::OnGameSavedTo = &OnSaveDone;
+	Framework::AGameModeBase::HookLoadSave();
 	BB::CBBArchiveFile::HookFixDoubleFree();
 	if (!CppLogic::HasSCELoader() && !Options.DisableModLoader)
 		CppLogic::ModLoader::ModLoader::Initialize();

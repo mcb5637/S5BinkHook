@@ -22,7 +22,7 @@ namespace CppLogic::Combat {
 		pos.Y = static_cast<float>(L.CheckNumber(3));
 		auto range = static_cast<float>(L.CheckNumber(4));
 		int dmg = L.CheckInt(5);
-		auto player = L.OptPlayerId(4, shok::PlayerId::P0);
+		auto player = L.OptPlayerId(6, shok::PlayerId::P0);
 		auto dmgclass = L.OptEnum<shok::DamageClassId>(7);
 		auto sou = L.OptEnum<shok::AdvancedDealDamageSource>(11, shok::AdvancedDealDamageSource::Script);
 		EGL::CGLEEntity::AdvancedDealAoEDamage(source, pos, range, dmg, player, dmgclass, L.OptBool(8, true), L.OptBool(9, true), L.OptBool(10, true), sou);

@@ -71,7 +71,7 @@ namespace shok {
 		BUILDER_FOUNDATION = 47,
 		DEFENDER_BUILDING = 48,
 		APPROACHING_DEFENDER_BUILDING = 49,
-		//[[ Missing ]]
+		EVADE_MOVE_BLOCKING = 50, // not in the idmanager, but used by evasion behavior
 		LEADER_TARGET = 51, // command to attack (via direct command or autoassigned), might be garbage, check current command
 		WORKER_SUPPLIER = 52,
 		SETTLER_BUILDING_TO_LEAVE = 53,

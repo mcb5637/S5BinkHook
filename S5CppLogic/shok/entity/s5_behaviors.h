@@ -65,7 +65,7 @@ namespace EGL {
 	private:
 		virtual void __thiscall GetNextWaypoint(shok::Position* p) = 0;
 		virtual void __thiscall RotateToStep(float targetRotation) = 0;
-		virtual void __thiscall IsOneCoordinateInRect(shok::Position* p, shok::Position* r1, shok::Position* r2) = 0; // pos in rect?
+		virtual bool __thiscall IsOneCoordinateInRect(shok::Position* p, shok::Position* r1, shok::Position* r2) = 0; // pos in rect?
 		virtual void unknownFuncMove6() = 0; // 14 seems to be always empty
 
 		// move to step __thiscall(this, float movespeed, EGL::CMovingEntity* ent, shok::position* currentpos, bool* posreactedout) 0x5860D5
@@ -192,7 +192,7 @@ namespace EGL {
 namespace GGL {
 	class CBehaviorDefaultMovement : public EGL::CMovementBehavior {
 	public:
-		int FinePath; // 19 p to GGL::CPath/GGL::CLeaderPath
+		void* FinePath; // 19 p to GGL::CPath/GGL::CLeaderPath
 		EGL::CCoarsePath CoarsePath;
 		int FineWayPointIndex; // 60
 		int MovedFineWaypoints;
@@ -1558,6 +1558,37 @@ namespace GGL {
 	static_assert(offsetof(CBehaviorCropDoodad, IsLocked) == 10 * 4);
 	static_assert(sizeof(CBehaviorCropDoodad) == 11 * 4);
 
+	class CEvadeBehaviorBase : public EGL::CGLEBehavior {
+		virtual void unknownEvent1100FHandler(BB::CEvent* ev) = 0;
+	public:
+
+		// defined events: Evade_XXX
+
+		static inline constexpr int vtp = 0;
+		static inline constexpr shok::ClassId Identifier = shok::ClassId::Invalid;
+	};
+
+	class CWorkerEvadeBehavior : public CEvadeBehaviorBase {
+	public:
+
+		static inline constexpr int vtp = 0x772A9C;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xedd275f3);
+	};
+
+	class CSoldierEvadeBehavior : public CEvadeBehaviorBase {
+	public:
+
+		static inline constexpr int vtp = 0x774578;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2a8df753);
+	};
+
+	class CLeaderEvadeBehavior : public CEvadeBehaviorBase {
+	public:
+
+		static inline constexpr int vtp = 0x775F28;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3a76e3e3);
+	};
+
 	// these belong to serf behavior
 	class CPositionAtResourceFinder {
 	public:
@@ -1586,11 +1617,8 @@ namespace GGL {
 		static inline constexpr int vtp = 0x7729CC;
 		static inline constexpr int TypeDesc = 0x813614;
 	};
-
-
 }
 
 
-// GGL::CEvadeBehaviorBase
 //GGL::CEvadeExecutionBehavior
 //GGL::CBehaviorFieldDoodad unused

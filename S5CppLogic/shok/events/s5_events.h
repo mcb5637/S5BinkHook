@@ -962,9 +962,10 @@ namespace shok {
 		Movement_GetNextFineWaypoint = 0x1100E, //EGL::CEventGetPosition
 		Movement_MoveTo = 0x1100D, //EGL::CEventPosition better not use this, use MoveCommand
 		Movement_OnSetMoveTo = 0x11017, //BB::CEvent better not use this, use MoveCommand
+		Evade_IsInEvadeRange = 0x11018, //EGL::CEventEntityGetBool (hardcoded check to range 150)
 		// 0x1100F evade behavior? BB::CEvent
 		Leader_ApproachPos = 0x1101A, //EGL::CEventPosition
-		// 1101B follow semms to return -1, lots of calls
+		// 1101B follow seems to return -1, lots of calls
 		Battle_SetBattleWalkAnim = 0x1101C, //BB::CEvent
 
 		Formation_GetPosInFormation = 0x1101E, //EGL::CEventPosition

@@ -62,8 +62,11 @@ namespace shok {
 
 		// 0x503B1E low res from hi res thiscall(const hi*) (modifies this)
 		// 0x4a2afe operator+ cdecl
+		// 0x4492eb operator- cdecl
 		// 0x57d822 rotate thiscall (rad)
 		// 0x57d873 rotate copy
+		// 0x57d8a5 distance to
+		// 0x57d7b4 dot
 	};
 	struct PositionRot : Position {
 		float r = 0;
@@ -335,6 +338,8 @@ namespace EGL {
 
 		static constexpr int vtp = 0x783D18;
 		static constexpr int TypeDesc = 0x810B98;
+
+		// 44b46d fill ids of attachment thiscall(multimap, attachmenttype, vector<entityid>)
 	};
 	class CEntityAttachmentProxy {
 	};

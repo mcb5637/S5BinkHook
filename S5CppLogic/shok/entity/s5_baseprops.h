@@ -33,6 +33,9 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x813778;
 		static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x86A828);
 		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
+
+		// get entity 585f56
+		// get moving entity 586773
 	};
 }
 

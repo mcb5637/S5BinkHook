@@ -35,6 +35,7 @@ namespace CppLogic::SavegameExtra {
 		bool CannonInProgressAttraction = false;
 		bool LightningEffectFix = false;
 		bool ClickMapTrigger = false;
+		bool BattleWaitCancelable = false;
 		shok::EntityCategory ResDoodad_RefillableCategory = {};
 
 		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;

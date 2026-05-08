@@ -867,7 +867,13 @@ function CppLogic.Logic.EnableCannonInProgressAttraction(e) end
 --- set to nil to disable.
 --- status gets saved into savegame.
 ---@param e number|string|nil
-function CppLogic.Logic.EnableRefillabeMineNoAutoDestroy(e) end
+function CppLogic.Logic.EnableRefillableMineNoAutoDestroy(e) end
+
+--- enables cancelling TASK_BATTLE_WAIT_UNTIL and TASK_WAIT_FOR_LATEST_ATTACK
+--- only recommended, if you add TASK_WAIT_FOR_LATEST_ATTACK to battle tasklists
+--- does get stored into savegames
+---@param e boolean
+function CppLogic.Logic.EnableBattleWaitCancelable(e) end
 
 --- gets the player name
 ---@param pid number

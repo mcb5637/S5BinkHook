@@ -151,6 +151,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, CannonInProgressAttraction),
 	AutoMemberSerialization(SerializedMapdata, LightningEffectFix),
 	AutoMemberSerialization(SerializedMapdata, ClickMapTrigger),
+	AutoMemberSerialization(SerializedMapdata, BattleWaitCancelable),
 	AutoMemberSerialization(SerializedMapdata, ResDoodad_RefillableCategory),
 	BB::SerializationData::GuardData(),
 };

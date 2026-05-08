@@ -1081,11 +1081,20 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
-	int EnableRefillabeMineNoAutoDestroy(luaext::State L) {
+	int EnableRefillableMineNoAutoDestroy(luaext::State L) {
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory = L.IsNoneOrNil(1) ? shok::EntityCategory::Invalid : L.CheckEnum<shok::EntityCategory>(1);
 		GGL::CResourceDoodad::HookAutoDestroyIfEmpty();
 		GGL::CResourceDoodad::RefillableCategory = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory;
 		return 0;
+	}
+
+	void EnableBattleWaitCancelable(bool cancel) {
+		SavegameExtra::SerializedMapdata::GlobalObj.BattleWaitCancelable = cancel;
+		std::erase(EGL::CGLEEntity::AdditionalCancelableStates, shok::TaskState::BattleWait);
+		if (cancel) {
+			EGL::CGLEEntity::HookCanCancelState();
+			EGL::CGLEEntity::AdditionalCancelableStates.emplace_back(shok::TaskState::BattleWait);
+		}
 	}
 
 	int GetPlayerName(luaext::State L) {
@@ -1520,6 +1529,7 @@ namespace CppLogic::Logic {
 		GGL::CWorkerBehavior::ResourceTriggers = false;
 		GGL::CWorkerBehavior::RefinerFix = false;
 		GGL::CPlayerAttractionHandler::AttractionCannonInProgress = false;
+		std::erase(EGL::CGLEEntity::AdditionalCancelableStates, shok::TaskState::BattleWait);
 	}
 
 	constexpr std::array Logic{
@@ -1596,7 +1606,8 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<PlayerGetMilitaryAttraction>("PlayerGetMilitaryAttraction"),
 			luaext::FuncReference::GetRef<PlayerGetSerfAttraction>("PlayerGetSerfAttraction"),
 			luaext::FuncReference::GetRef<EnableCannonInProgressAttraction>("EnableCannonInProgressAttraction"),
-			luaext::FuncReference::GetRef<EnableRefillabeMineNoAutoDestroy>("EnableRefillabeMineNoAutoDestroy"),
+			luaext::FuncReference::GetRef<EnableRefillableMineNoAutoDestroy>("EnableRefillableMineNoAutoDestroy"),
+			luaext::FuncReference::GetRef<EnableBattleWaitCancelable>("EnableBattleWaitCancelable"),
 			luaext::FuncReference::GetRef<GetPlayerName>("GetPlayerName"),
 			luaext::FuncReference::GetRef<DumpGameLogic>("DumpGameLogic"),
 #ifdef DEBUG_FUNCS
@@ -1726,6 +1737,9 @@ namespace CppLogic::Logic {
 			GGL::CResourceDoodad::HookAutoDestroyIfEmpty();
 			GGL::CResourceDoodad::RefillableCategory = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory;
 		}
+
+		if (SavegameExtra::SerializedMapdata::GlobalObj.BattleWaitCancelable)
+			EnableBattleWaitCancelable(true);
 
 		L.Pop(1);
 	}

@@ -569,7 +569,7 @@ namespace shok {
 
     enum class TaskState : int {
         Default = 0,
-        // 1 something leader related (detach attack target, then defend?), also soldier related, also serf (to stop event)
+        InitEntity = 1, // used by leader, soldier, serf on entity created
         WaitForAnim = 2,
         Move = 3,
         Follow = 4,
@@ -588,9 +588,9 @@ namespace shok {
         BuildingAlarmDefend = 19,
         BattleWait = 20,
         DoWorkAtFoundry = 21, // waits for task to appear
-        LeaderGetCloseTotarget = 22,
+        LeaderGetCloseToTarget = 22,
         MoveToTarget = 23,
-        // 24 soldier formation?
+        // 24 soldier seems to be unused
         HeroGoToNPC = 25,
         ConvertBuilding = 26,
         // 27 settler entered building?

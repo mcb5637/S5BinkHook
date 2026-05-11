@@ -965,7 +965,7 @@ namespace shok {
 		Evade_IsInEvadeRange = 0x11018, //EGL::CEventEntityGetBool (hardcoded check to range 150)
 		// 0x1100F evade behavior? BB::CEvent
 		Leader_ApproachPos = 0x1101A, //EGL::CEventPosition
-		// 1101B follow seems to return -1, lots of calls
+		Follow_StatePerformFollowStep = 0x1101B, //EGL::CEventThousandthsGetInteger pass state arg, returns state return
 		Battle_SetBattleWalkAnim = 0x1101C, //BB::CEvent
 
 		Formation_GetPosInFormation = 0x1101E, //EGL::CEventPosition
@@ -1051,7 +1051,7 @@ namespace shok {
 		Formation_SetFormationTaskList = 0x15017, //BB::CEvent
 		Leader_SetFormation = 0x15018, //EGL::CEventValue<int,-27574121>
 		Leader_GetFormation = 0x15019, //EGL::CEventGetValue<int, 1211121895>
-		Soldier_OnSomethingTargetDetaches = 0x1501C, //EGL::CEvent1Entity probably better to not use, seems to conditionaly forward to detach, Battle_InternalEngageTarget, Leader_Defend
+		Soldier_OnSomethingTargetDetaches = 0x1501C, //EGL::CEvent1Entity probably better to not use, seems to conditionally forward to detach, Battle_InternalEngageTarget, Leader_Defend
 		Battle_OnTargetDetached = 0x1501D, //EGL::CEvent1Entity
 		Leader_GetSoldierType = 0x1501E, //EGL::CEventGetValue<int,1211121895>
 		Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
@@ -1079,10 +1079,11 @@ namespace shok {
 		Leader_GetNearbyBarracks = 0x15036, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_BuySoldierForLeader = 0x15037, //EGL::CEvent1Entity
 		Leader_OnCCEnd = 0x15038, //EGL::CEvent1Entity
-		Leader_OnGuardedAttackedBy = 15039, //EGL::CEvent1Entity
+		Leader_OnGuardedAttackedBy = 0x15039, //EGL::CEvent1Entity
 		LeaderPatrolAddPoint = 0x1503A, //EGL::CEventPosition
 		Leader_SetIsUsingTargetOrientation = 0x1503B, //EGL::CEventGetValue<bool,1709081367>
 		SerfBattle_OnTurnToSerfCommand = 0x1503C, //BB::CEvent
+		GetDamage = 0x1503D, //EGL::CEventGetValue<int, 1211121895>
 		GetArmor = 0x1503E, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTaskList = 0x1503F, //EGL::CEventGetValue<int, 1211121895>
 		Barracks_GetTrainingTime = 0x15040, //EGL::CEventGetValue<float, 1468983543>
@@ -1090,15 +1091,13 @@ namespace shok {
 		Leader_SetTrainingTL = 0x15042, //EGL::CEventValue<int,-27574121>
 		Barracks_GetLeaveTaskList = 0x15043, //EGL::CEventGetValue<int, 1211121895>
 		Leader_OnBarracksDetach = 0x15044, //EGL::CEvent1Entity
+		Battle_CheckHelp = 0x15045, //EGL::CEvent1Entity unused, probably not working (does some range checnking, then attacking?)
 		Leader_ExpellSoldier = 0x15046, //EGL::CEventValue<bool,703333479> bool seems to be use effect
 		WorkerAlarmMode_Enable = 0x15047, //BB::CEvent
 		WorkerAlarmMode_Disable = 0x15048, //BB::CEvent
 		Battle_IsInBattleTL = 0x15049, //EGL::CEventGetValue<bool,1709081367>
 		Battle_DisableAutoAttack = 0x1504A, //EGL::CEventGetValue<bool,1709081367> only used by camo
 		Leader_GetUpkeepCost = 0x1504C, //EGL::CEventGetValue<float, 1468983543>
-
-		GetDamage = 0x1503D, //EGL::CEventGetValue<int, 1211121895>
-		Battle_CheckHelp = 0x15045, //EGL::CEvent1Entity unused, probably not working (does some range checnking, then attacking?)
 
 		HeroHawk_SendHawk = 0x16002, //EGL::CEventPosition
 

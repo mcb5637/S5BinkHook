@@ -75,3 +75,6 @@ build loadorder:
     - add base\\data.bba
     - add base\\shr filter maps\\user\\;music\\;videos\\
     - add base\\lng\\XX filter videos\\
+
+
+https://github.com/fmagin/ghidra_scripts/blob/master/ParseDataType.java

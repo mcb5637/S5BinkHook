@@ -67,6 +67,7 @@ namespace shok {
 		// 0x57d873 rotate copy
 		// 0x57d8a5 distance to
 		// 0x57d7b4 dot
+		// 0x57d8c5 get range squared
 	};
 	struct PositionRot : Position {
 		float r = 0;
@@ -340,6 +341,7 @@ namespace EGL {
 		static constexpr int TypeDesc = 0x810B98;
 
 		// 44b46d fill ids of attachment thiscall(multimap, attachmenttype, vector<entityid>)
+		// 44b13d get number of attachment types thiscall(multimap, atype)
 	};
 	class CEntityAttachmentProxy {
 	};

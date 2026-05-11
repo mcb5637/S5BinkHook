@@ -539,8 +539,8 @@ float GGL::CBattleBehavior::GetDamageClassFactorAgainst(EGL::CGLEEntity* target)
 	return battlebeh_getdmgclsfactvs(this, target);
 }
 
-inline int (__thiscall*const battlebeh_getrandomattanim)(GGL::CBattleBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CBattleBehavior*)>(0x50AA39);
-int GGL::CBattleBehavior::GetRandomAttackAnim()
+inline shok::AnimationId (__thiscall*const battlebeh_getrandomattanim)(GGL::CBattleBehavior* th) = reinterpret_cast<shok::AnimationId(__thiscall*)(GGL::CBattleBehavior*)>(0x50AA39);
+shok::AnimationId GGL::CBattleBehavior::GetRandomAttackAnim()
 {
 	return battlebeh_getrandomattanim(this);
 }
@@ -549,6 +549,12 @@ inline float(__thiscall* const battlebeh_getminrange)(const GGL::CBattleBehavior
 float GGL::CBattleBehavior::GetMinRange() const
 {
 	return battlebeh_getminrange(this);
+}
+
+inline bool(__thiscall* const battlebeh_hasmeleecat)(const GGL::CBattleBehavior* th) = reinterpret_cast<bool(__thiscall*)(const GGL::CBattleBehavior*)>(0x50AAB2);
+bool GGL::CBattleBehavior::HasMeleeCategory() const
+{
+	return battlebeh_hasmeleecat(this);
 }
 
 float __thiscall GGL::CBattleBehavior::GetMaxRangeBase() const
@@ -722,12 +728,6 @@ inline float(__thiscall* const leaderbeh_getautoattackrangevsciv)(const GGL::CLe
 float GGL::CLeaderBehavior::GetAutoAttackRangeVsCivillians() const
 {
 	return leaderbeh_getautoattackrangevsciv(this);
-}
-
-inline bool(__thiscall* const leaderbeh_hasmeleecat)(const GGL::CLeaderBehavior* th) = reinterpret_cast<bool(__thiscall*)(const GGL::CLeaderBehavior*)>(0x50AAB2);
-bool GGL::CLeaderBehavior::HasMeleeCategory() const
-{
-	return leaderbeh_hasmeleecat(this);
 }
 
 inline int(__thiscall* const leaderbehsearchautoattacktar)(GGL::CLeaderBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CLeaderBehavior*)>(0x4EC894);

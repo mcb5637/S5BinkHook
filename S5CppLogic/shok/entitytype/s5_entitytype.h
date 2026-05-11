@@ -114,6 +114,9 @@ namespace EGL {
 			}
 			return nullptr;
 		}
+
+		// 584468 is in category
+		// 57b1c9 static is in category cdecl(entitytypeid)
 	};
 	static_assert(offsetof(EGL::CGLEEntityProps, ApproachPos) == 4 * 7);
 	static_assert(offsetof(EGL::CGLEEntityProps, BlockingArea) == 4 * 34);

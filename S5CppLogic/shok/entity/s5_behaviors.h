@@ -796,13 +796,7 @@ namespace GGL {
 		static void NAKED_DECL AddSupplierSkipASM();
 	};
 
-	class CBehaviorFollow : public EGL::CGLEBehavior {
-	public:
-		static inline constexpr int vtp = 0x776E40;
-		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDBF96E77);
-	};
-
-	class CBattleBehavior : public GGL::CBehaviorFollow { // NOLINT(*-pro-type-member-init)
+	class CBehaviorFollow : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
 		float SuccessDistance, FailureDistance; // 4
 		int TimeOutTime, StartTurn;
@@ -810,6 +804,13 @@ namespace GGL {
 		bool StartFollowing, StopFollowing; // 10
 		PADDING(2);
 		int FollowStatus;
+
+		static inline constexpr int vtp = 0x776E40;
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xDBF96E77);
+	};
+
+	class CBattleBehavior : public GGL::CBehaviorFollow { // NOLINT(*-pro-type-member-init)
+	public:
 		GGL::CBattleBehaviorProps* BattleProps; // 12 p to behprops
 		int LatestHitTurn;
 		shok::EntityId LatestAttackerID;
@@ -855,8 +856,12 @@ namespace GGL {
 		static float __thiscall GetMaxRangeBaseStatic(const CBattleBehavior* th);
 		bool CanAutoAttack(); // checks feared, leadercommand (not heroability,move,guard) and event Battle_DisableAutoAttack
 		float GetDamageClassFactorAgainst(EGL::CGLEEntity* target);
-		int GetRandomAttackAnim(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
+		shok::AnimationId GetRandomAttackAnim(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
 		[[nodiscard]] float GetMinRange() const; // only value from props
+		[[nodiscard]] bool HasMeleeCategory() const; // Melee, Sword or Spear
+
+		// 50aafa target has melee category
+		// 4d79e9 get number of melee attackers of
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();
@@ -907,7 +912,6 @@ namespace GGL {
 		[[nodiscard]] float GetAutoAttackRangeVsOther() const; // config for attackmove, max for defend, GetAutoAttackRange otherwise
 		[[nodiscard]] float GetAutoAttackRangeVsBuildings() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryBuildingAutoAttackRangeFactor otherwise
 		[[nodiscard]] float GetAutoAttackRangeVsCivillians() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryCivilianAutoAttackRangeFactor otherwise
-		[[nodiscard]] bool HasMeleeCategory() const; // Melee, Sword or Spear
 		int SearchAutoAttackTarget();
 
 		void PerformRegeneration();
@@ -931,6 +935,9 @@ namespace GGL {
 		static inline constexpr int vtp = 0x773CC8;
 		static inline constexpr int TypeDesc = 0x817FC4;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x0B1DACA7D);
+
+		// 4d7921 get leader entity
+		// 4d749a to formation TL
 	};
 
 	class CBattleSerfBehavior : public GGL::CLeaderBehavior { // NOLINT(*-pro-type-member-init)

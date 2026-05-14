@@ -78,3 +78,26 @@ build loadorder:
 
 
 https://github.com/fmagin/ghidra_scripts/blob/master/ParseDataType.java
+
+how attacking works:
+- attack command event:
+    - if target has TOP_ENTITY_FOUNDATION, refire with that instead
+    - clear any previous LEADER_TARGET & FOLLOWER_FOLLOWED attachment
+    - check range against approach distance
+    - if too far:
+        - attach target as LEADER_TARGET
+        - set tasklist to TL_START_BATTLE (hardcoded)
+            - move closer to target
+            - resend attack command
+        - propagate cmd to soldiers (confusingly sets guard command state for them?)
+    - clear any previous ATTACKER_COMMAND_TARGET
+    - if target is soldier, use leader instead
+    - attach as ATTACKER_COMMAND_TARGET
+    - detach any ATTACKER_TARGET
+    - attach as ATTACKER_TARGET
+    - set battle TL
+    - for all soldiers
+        - detach ATTACKER_TARGET
+        - Soldier_SetAttackTarget sets ATTACKER_TARGET
+
+autoattack fires attack command event, then resets current command

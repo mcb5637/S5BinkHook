@@ -638,10 +638,12 @@ function CppLogic.Logic.SetPaydayCallback() end
 function CppLogic.Logic.SetPlaceBuildingAdditionalCheck(func) end
 
 --- sets if leader regenration regenerates troop hp.
+--- also enables checking for idle soldiers in combat.
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
---- @param b boolean
-function CppLogic.Logic.SetLeadersRegenerateTroopHealth(b) end
+--- @param regen boolean
+--- @param idle boolean?
+function CppLogic.Logic.SetLeadersRegenerateTroopHealth(regen, idle) end
 
 --- sets a stringtabletexts accosiated text. automatically resets on leaving the game.
 --- status of this gets saved into a savegame.
@@ -1586,6 +1588,7 @@ function CppLogic.Entity.PerformHeal(id, heal, healTroopHp) end
 --- (walking towards to engage does not count).
 --- @param id entity
 --- @return number target
+--- @return number command_target
 function CppLogic.Entity.GetBattleTarget(id) end
 
 --- gets target assigned to a leader, by direct command or automatically assigned.

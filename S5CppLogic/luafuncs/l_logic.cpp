@@ -505,8 +505,8 @@ namespace CppLogic::Logic {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supported with SCELoader");
 		GGL::CLeaderBehavior::HookLeaderRegen();
-		GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = L.ToBoolean(1);
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers = GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers;
+		SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers = L.ToBoolean(1);
+		SavegameExtra::SerializedMapdata::GlobalObj.LeaderFixIdleSoldierBattle = L.OptBool(2, false);
 		return 0;
 	}
 
@@ -1515,7 +1515,6 @@ namespace CppLogic::Logic {
 	void Cleanup(luaext::State L) {
 		NetEventUnSetHook(L);
 		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback = nullptr;
-		GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = false;
 		CppLogic::SavegameExtra::SerializedMapdata::STTToMainmenu();
 		GGL::CPlayerStatus::CanPlaceBuildingCallback = nullptr;
 		GGUI::CPlaceBuildingState::PlacementRotation = 0.0f;
@@ -1691,8 +1690,7 @@ namespace CppLogic::Logic {
 			}
 			L.Pop(1);
 
-			GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers;
-			if (GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers)
+			if (SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers || SavegameExtra::SerializedMapdata::GlobalObj.LeaderFixIdleSoldierBattle)
 				GGL::CLeaderBehavior::HookLeaderRegen();
 
 			L.Push(SetLuaTaskListFuncRegKey);

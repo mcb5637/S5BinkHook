@@ -1704,7 +1704,8 @@ namespace CppLogic::Entity {
 	int GetBattleTarget(luaext::State L) {
 		auto* e = L.CheckEntity(1);
 		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_TARGET));
-		return 1;
+		L.Push(e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_COMMAND_TARGET));
+		return 2;
 	}
 	int GetAttackCommandTarget(luaext::State L) {
 		auto* e = L.CheckEntity(1);

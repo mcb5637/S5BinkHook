@@ -730,8 +730,8 @@ float GGL::CLeaderBehavior::GetAutoAttackRangeVsCivillians() const
 	return leaderbeh_getautoattackrangevsciv(this);
 }
 
-inline int(__thiscall* const leaderbehsearchautoattacktar)(GGL::CLeaderBehavior* th) = reinterpret_cast<int(__thiscall*)(GGL::CLeaderBehavior*)>(0x4EC894);
-int GGL::CLeaderBehavior::SearchAutoAttackTarget()
+inline shok::EntityId(__thiscall* const leaderbehsearchautoattacktar)(GGL::CLeaderBehavior* th) = reinterpret_cast<shok::EntityId(__thiscall*)(GGL::CLeaderBehavior*)>(0x4EC894);
+shok::EntityId GGL::CLeaderBehavior::SearchAutoAttackTarget()
 {
 	return leaderbehsearchautoattacktar(this);
 }
@@ -743,18 +743,31 @@ void GGL::CLeaderBehavior::PerformRegeneration()
 	int hp = e->Health;
 	if (hp <= 0)
 		return;
-	int r = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealth(); // NOLINT(*-pro-type-static-cast-downcast)
-	e->PerformHeal(r, GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers);
+	int r = static_cast<CSettler*>(e)->LeaderGetRegenHealth(); // NOLINT(*-pro-type-static-cast-downcast)
+	e->PerformHeal(r, CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers);
 }
 
-bool GGL::CLeaderBehavior::LeaderRegenRegenerateSoldiers = false;
 void __thiscall GGL::CLeaderBehavior::CheckRegen()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	int max = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealthSeconds(); // NOLINT(*-pro-type-static-cast-downcast)
-	SecondsSinceHPRefresh++;
-	if (SecondsSinceHPRefresh >= max)
+	if (++SecondsSinceHPRefresh >= max)
 		PerformRegeneration();
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderFixIdleSoldierBattle) {
+		auto sol = e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER);
+		if (sol.begin() != sol.end()) {
+			auto tar = e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_COMMAND_TARGET);
+			if (tar != shok::EntityId::Invalid) {
+				if (EGL::CGLEEntity::GetEntityByID(sol.begin()->second.EntityId)->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_TARGET) == shok::EntityId::Invalid) {
+					for (const auto &a: sol | std::views::values) {
+						auto* s = EGL::CGLEEntity::GetEntityByID(a.EntityId);
+						auto* f = reinterpret_cast<void(__thiscall*)(CLeaderBehavior*, EGL::CGLEEntity*, shok::EntityId)>(0x4ecf86);
+						f(this, s, tar);
+					}
+				}
+			}
+		}
+	}
 }
 
 void __thiscall GGL::CLeaderBehavior::CheckRegenStatic(CLeaderBehavior *th) {

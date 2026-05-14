@@ -1051,8 +1051,8 @@ namespace shok {
 		Formation_SetFormationTaskList = 0x15017, //BB::CEvent
 		Leader_SetFormation = 0x15018, //EGL::CEventValue<int,-27574121>
 		Leader_GetFormation = 0x15019, //EGL::CEventGetValue<int, 1211121895>
-		Soldier_OnSomethingTargetDetaches = 0x1501C, //EGL::CEvent1Entity probably better to not use, seems to conditionally forward to detach, Battle_InternalEngageTarget, Leader_Defend
-		Battle_OnTargetDetached = 0x1501D, //EGL::CEvent1Entity
+		Soldier_SetAttackTarget = 0x1501C, //EGL::CEvent1Entity
+		Battle_SetBattleTaskList = 0x1501D, //BB::CEvent
 		Leader_GetSoldierType = 0x1501E, //EGL::CEventGetValue<int,1211121895>
 		Leader_GetMaxNumSoldier = 0x1501F, //EGL::CEventGetValue<int, 1211121895>
 		GetArmorClass = 0x15020, //EGL::CEventGetValue<int,1211121895>

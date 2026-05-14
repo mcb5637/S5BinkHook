@@ -836,9 +836,9 @@ namespace GGL {
 		virtual int retzero() = 0;
 		virtual void __stdcall unknownbattle() = 0;
 	public:
-		virtual void GetCurrentDefendPos(shok::Position* out) = 0; // current or defend if leader+defend Command
+		virtual shok::Position* GetCurrentDefendPos(shok::Position* out) = 0; // current or defend if leader+defend Command
 
-		// 5 more virt funcs
+		// 2 more virt funcs
 
 		static inline constexpr int vtp = 0x77313C;
 		static inline constexpr int TypeDesc = 0x815EEC;
@@ -862,6 +862,8 @@ namespace GGL {
 
 		// 50aafa target has melee category
 		// 4d79e9 get number of melee attackers of
+		// is valid attack target 50b979
+		// set battle tasklist 50b81f
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();
@@ -905,6 +907,12 @@ namespace GGL {
 		// check autoattack 0x4ED8D4
 		// exec guard cmd 0x4EF7C4
 		// exec defend/patrol 0x4EF6DA
+		// get approach range against target 4eb079
+		// try to move close to target 4ed995 returns true if moving, uses hardcoded TL_START_BATTLE
+		// propagate attack move close to soldiers 4ee27d
+		// clear follow target 4ed016 (FOLLOWER_FOLLOWED and LEADER_TARGET)
+		// get nearest valid target 4edd3d (checks leader + soldiers)
+		// setup for attack 4eed4f
 
 		int GetTroopHealth();
 		int GetTroopHealthPerSoldier();
@@ -912,11 +920,10 @@ namespace GGL {
 		[[nodiscard]] float GetAutoAttackRangeVsOther() const; // config for attackmove, max for defend, GetAutoAttackRange otherwise
 		[[nodiscard]] float GetAutoAttackRangeVsBuildings() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryBuildingAutoAttackRangeFactor otherwise
 		[[nodiscard]] float GetAutoAttackRangeVsCivillians() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryCivilianAutoAttackRangeFactor otherwise
-		int SearchAutoAttackTarget();
+		shok::EntityId SearchAutoAttackTarget();
 
 		void PerformRegeneration();
 
-		static bool LeaderRegenRegenerateSoldiers;
 		static void HookLeaderRegen();
 	private:
 		void __thiscall CheckRegen();
@@ -938,6 +945,7 @@ namespace GGL {
 
 		// 4d7921 get leader entity
 		// 4d749a to formation TL
+		// is valid attack target ext 4d7a60(targetEnt, range, prevRange or -1.0f, thisIsMelee)
 	};
 
 	class CBattleSerfBehavior : public GGL::CLeaderBehavior { // NOLINT(*-pro-type-member-init)

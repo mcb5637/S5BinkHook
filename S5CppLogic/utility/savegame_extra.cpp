@@ -128,6 +128,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, UseMaxHPTechBoni),
 	AutoMemberSerialization(SerializedMapdata, PaydayTrigger),
 	AutoMemberSerialization(SerializedMapdata, LeaderRegenRegenerateSoldiers),
+	AutoMemberSerialization(SerializedMapdata, LeaderFixIdleSoldierBattle),
 	AutoMemberSerialization(SerializedMapdata, ChangeTaskListCheckUncancelable),
 	AutoMemberSerialization(SerializedMapdata, BuildOnMovementFix),
 	AutoMemberSerialization(SerializedMapdata, ExperienceClassFix),
@@ -158,34 +159,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 
 void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 {
-	SavegameName.clear();
-	HurtEntityCallWithNoAttacker = false;
-	UseMaxHPTechBoni = false;
-	PaydayTrigger = false;
-	LeaderRegenRegenerateSoldiers = false;
-	ChangeTaskListCheckUncancelable = false;
-	BuildOnMovementFix = false;
-	ExperienceClassFix = false;
-	AoEDamageFix = false;
-	CamoFix = false;
-	ConversionTrigger = false;
-	HookMaxHP = false;
-	HookDamage = false;
-	HookArmor = false;
-	HookExploration = false;
-	HookRegen = false;
-	HookMaxRange = false;
-	HookDisplayName = false;
-	RangedEffectSoldierHeal = false;
-	EffectTriggers = false;
-	ResourceTriggers = false;
-	RefinerFix = false;
-	SettlerBuyTriggers = false;
-	ScriptTriggerEval = false;
-	CannonInProgressAttraction = false;
-	LightningEffectFix = false;
-	ResDoodad_RefillableCategory = {};
-	StringTableTextOverride.clear();
+	*this = SerializedMapdata{};
 }
 
 CreateSerializationListForKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverrideData, "id");

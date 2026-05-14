@@ -13,6 +13,7 @@ namespace CppLogic::SavegameExtra {
 		bool UseMaxHPTechBoni = false;
 		bool PaydayTrigger = false;
 		bool LeaderRegenRegenerateSoldiers = false;
+		bool LeaderFixIdleSoldierBattle = false;
 		bool ChangeTaskListCheckUncancelable = false;
 		bool BuildOnMovementFix = false;
 		bool ExperienceClassFix = false;

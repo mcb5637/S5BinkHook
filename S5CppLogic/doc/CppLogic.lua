@@ -840,6 +840,29 @@ function CppLogic.Logic.SetPositionExploration(player, pos1, pos2, explored) end
 ---@param max number
 function CppLogic.Logic.SetExplorationUpdateMinMax(min, max) end
 
+--- gets experience class level data
+---@param ec number|string
+---@param lvl 0|1|2|3|4
+---@return number randomDamageBonus
+---@return number autoAttackRange
+---@return number damage
+---@return number dodge
+---@return number exploration
+---@return number regen
+---@return number maxRange
+---@return number missChance
+---@return number speed
+function CppLogic.Logic.GetExperienceLevelData(ec, lvl)end
+
+--- gets the level for this experience
+--- @param xp number
+--- @return number
+function CppLogic.Logic.GetLevelFromExperience(xp)end
+
+--- calculates the xp borders
+--- @return table<number,number>
+function CppLogic.Logic.CalculateExperienceBorders()end
+
 --- dumps a task list for dev purposes
 ---@param tl number|string
 ---@return table
@@ -1942,6 +1965,11 @@ function CppLogic.Entity.Settler.WorkerGetResourceCarried(id) end
 --- @return number[] entities
 function CppLogic.Entity.Settler.SettlerGetSummoned(id) end
 
+--- the random damage bonus
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetRandomDamageBonus(id)end
+
 --- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
 --- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).
 --- the tasklist TL_SCRIPT_ANIMATION gets created at first use, it may not be there before you call this func.
@@ -1994,6 +2022,12 @@ function CppLogic.Entity.Leader.GetRegeneration(id) end
 --- @param hp number regenerated
 --- @param seconds number between refreshes
 function CppLogic.Entity.Leader.SetRegeneration(id, hp, seconds) end
+
+--- the level dependent damage bonus (nil if it does not exist)
+---@param id entity
+---@return number? damage
+---@return number? damageBonus
+function CppLogic.Entity.Leader.GetLeveledDamageBonus(id)end
 
 --- building height (& construction progress).
 --- @param id entity
@@ -2239,6 +2273,7 @@ function CppLogic.EntityType.SetLimitedLifespanDuration(ty, t) end
 --- @param ty number entitytype
 --- @return number damageAmount
 --- @return number damageclass
+--- @return number randomDamage
 function CppLogic.EntityType.GetAutoAttackDamage(ty) end
 --- damage and damageclass of autoattacks of an entity type.
 --- @param ty number entitytype
@@ -2566,7 +2601,8 @@ function CppLogic.EntityType.Settler.SetCost(ty, c, ignoreZeroes) end
 
 --- settler or building type damage modifier techs.
 --- @param ty number entitytype
---- @return number[]
+--- @return number[] damageTechs
+--- @return number[] randomDamageTechs
 function CppLogic.EntityType.Settler.GetDamageModifierTechs(ty) end
 
 --- settler or building type max range modifier techs.
@@ -2673,6 +2709,11 @@ function CppLogic.Technology.GetArmorModifier(tid) end
 --- @return number operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
 --- @return number value
 function CppLogic.Technology.GetDamageModifier(tid) end
+--- technology random damage bonus modifier.
+--- @param tid number tech id
+--- @return number operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
+--- @return number value
+function CppLogic.Technology.GetDamageBonusModifier(tid) end
 --- technology range modifier.
 --- @param tid number tech id
 --- @return number operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)

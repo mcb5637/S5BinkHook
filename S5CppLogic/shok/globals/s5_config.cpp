@@ -2,6 +2,7 @@
 #include "s5_config.h"
 #include <shok/s5_defines.h>
 #include <shok/globals/s5_classfactory.h>
+#include <utility/hooks.h>
 #include <utility/ModConfig.h>
 
 EGL::CGLEAnimProps::CGLEAnimProps()
@@ -128,6 +129,19 @@ void* GGL::ExperienceClass::operator new(size_t s)
 }
 void GGL::ExperienceClass::operator delete(void* p) {
     shok::Free(p);
+}
+
+static GGL::ExperienceClass::LevelData* __thiscall fake_ctor(GGL::ExperienceClass::LevelData* t) {
+    *t = GGL::ExperienceClass::LevelData{};
+    return t;
+}
+void GGL::ExperienceClass::HookFixSeriData() {
+    static bool Hooked = false;
+    if (Hooked)
+        return;
+    Hooked = true;
+    CppLogic::Hooks::SaveVirtualProtect vp{reinterpret_cast<void*>(0x5153ea), 10};
+    CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x5153ea), &fake_ctor);
 }
 
 std::vector<GGL::ExperienceClassHolder::EntityCategoryToExperienceClassData> GGL::ExperienceClassHolder::EntityCategoryToExperienceClass{ {

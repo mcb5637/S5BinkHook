@@ -382,6 +382,7 @@ void InitGame() {
 	GGUI::CSelectionState::HookFixDoubleClickSelection();
 	GGL::CGLEffectFireProps::HookFixCtor();
 	GGUI::CManager::DisableSelectionLimit(true);
+	GGL::ExperienceClass::HookFixSeriData();
 }
 
 double Version = 0.0;

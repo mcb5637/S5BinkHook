@@ -68,6 +68,11 @@ namespace CppLogic::Tech {
 		TechPushMod(L, tech->DamageModifier);
 		return 2;
 	}
+	int GetDamageBonusModifier(luaext::State L) {
+		shok::Technology* tech = L.CheckTech(1);
+		TechPushMod(L, tech->DamageBonusModifier);
+		return 2;
+	}
 	int GetRangeModifier(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		TechPushMod(L, tech->RangeModifier);
@@ -120,6 +125,7 @@ namespace CppLogic::Tech {
 			luaext::FuncReference::GetRef<GetExplorationModifier>("GetExplorationModifier"),
 			luaext::FuncReference::GetRef<GetArmorModifier>("GetArmorModifier"),
 			luaext::FuncReference::GetRef<GetDamageModifier>("GetDamageModifier"),
+			luaext::FuncReference::GetRef<GetDamageBonusModifier>("GetDamageBonusModifier"),
 			luaext::FuncReference::GetRef<GetRangeModifier>("GetRangeModifier"),
 			luaext::FuncReference::GetRef<GetSpeedModifier>("GetSpeedModifier"),
 			luaext::FuncReference::GetRef<TechAddConstructionSpeedModifier>("TechAddConstructionSpeedModifier"),

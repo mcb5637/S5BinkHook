@@ -390,6 +390,48 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	int GetExperienceLevelData(luaext::State L) {
+		auto ec = L.CheckEnum<shok::ExperienceClass>(1);
+		auto lvl = L.CheckInt(2);
+		auto* c = GetExperienceClass(ec);
+		auto* l = c->GetLevel(lvl);
+		auto p = [&](float v) {
+			if (v <= 0)
+				L.Push(0);
+			else
+				L.Push(v);
+		};
+		p(l->DamageBonus);
+		p(l->AutoAttackRange);
+		p(l->DamageAmount);
+		p(l->DodgeChance);
+		p(l->Exploration);
+		p(l->HealingPoints);
+		p(l->MaxRange);
+		L.Push(l->MissChance);
+		p(l->Speed);
+		return 9;
+	}
+
+	float GetLevelFromExperience(float xp) {
+		return GGL::CLogicProperties::ExperiencePointsToLevels(xp);
+	}
+	int CalculateExperienceBorders(luaext::State L) {
+		int max = (*GGL::CLogicProperties::GlobalObj)->MaxExperiencePoints;
+		L.NewTable();
+		float last = -1.0f;
+		for (int i = 0; i < max; ++i) {
+			auto c = GGL::CLogicProperties::ExperiencePointsToLevels(static_cast<float>(i));
+			if (c > last) {
+				L.Push(c);
+				L.Push(i);
+				L.SetTableRaw(-3);
+				last = c;
+			}
+		}
+		return 1;
+	}
+
 	int AddRedirectLayer(luaext::State L) {
 		auto s = L.CheckStringView(1);
 		auto* r = CppLogic::Mod::FileSystem::RedirectFileSystem::CreateRedirectLayer(s);
@@ -1613,7 +1655,10 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<AddRedirectLayer>("AddRedirectLayer"),
 			luaext::FuncReference::GetRef<AddFolder>("AddFolder"),
 #endif
-			luaext::FuncReference::GetRef<SetExplorationUpdateMinMax>("SetExplorationUpdateMinMax")
+			luaext::FuncReference::GetRef<SetExplorationUpdateMinMax>("SetExplorationUpdateMinMax"),
+			luaext::FuncReference::GetRef<GetExperienceLevelData>("GetExperienceLevelData"),
+			luaext::FuncReference::GetRef<GetLevelFromExperience>("GetLevelFromExperience"),
+			luaext::FuncReference::GetRef<CalculateExperienceBorders>("CalculateExperienceBorders"),
 		};
 
 	constexpr std::array UICmd{

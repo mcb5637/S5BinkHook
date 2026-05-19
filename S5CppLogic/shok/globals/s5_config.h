@@ -205,6 +205,8 @@ namespace GGL {
 			float Exploration = 0.0f;
 			float MissChance = 0.0f; // without GGL::CEntityProfile::HookExperience only positive modifiers apply
 			// all of them get used by profile modification
+
+			// ctor 514012?
 		};
 
 		shok::Vector<LevelData> Level;
@@ -215,6 +217,9 @@ namespace GGL {
 		void operator delete(void* p);
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x87CE88);
+
+		// 515324 ctor
+		static void HookFixSeriData();
 	};
 	static_assert(sizeof(ExperienceClass::LevelData) == 9 * 4);
 	static_assert(sizeof(ExperienceClass) == 11 * 4);
@@ -236,6 +241,8 @@ namespace GGL {
 			shok::ExperienceClass ExperienceClass;
 		};
 		static std::vector<EntityCategoryToExperienceClassData> EntityCategoryToExperienceClass;
+
+		// 514cd1 get file name part of expclass
 	};
 }
 

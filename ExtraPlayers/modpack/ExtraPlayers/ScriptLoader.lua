@@ -2,7 +2,9 @@ if not AutoScroll then
 	Script.Load("Data\\Script\\InterfaceTools\\AutoScroll.lua")
 end
 
-function InitExtraPlayers()
+ExtraPlayers = {}
+
+function ExtraPlayers.Init()
 	local max = CppLogic.ModLoader.GetMaxPlayers()
 	for i = 9, max do
 		Score.Player[i] = {}
@@ -17,10 +19,8 @@ function InitExtraPlayers()
 	ExtraPlayers.GUIUpdate_MinimapInDiplomacyMenuOrig = GUIUpdate_MinimapInDiplomacyMenu
 	GUIUpdate_MinimapInDiplomacyMenu = ExtraPlayers.GUIUpdate_MinimapInDiplomacyMenu
 
-	ExtraPlayers_InitUI()
+	ExtraPlayers.InitUI()
 end
-
-ExtraPlayers = {}
 
 ---@type CPPLAutoScroll<number>
 ExtraPlayers.DiplomacyPlayerScroll = AutoScroll.Init("DiplomacyWindowScroll", nil, nil, nil, true)
@@ -129,6 +129,15 @@ function ExtraPlayers.ShowResDonation(p)
 	return true
 end
 
+ExtraPlayers.ResDonationNextRes = {
+	[ResourceType.Gold] = ResourceType.Clay,
+	[ResourceType.Clay] = ResourceType.Wood,
+	[ResourceType.Wood] = ResourceType.Stone,
+	[ResourceType.Stone] = ResourceType.Iron,
+	[ResourceType.Iron] = ResourceType.Sulfur,
+	[ResourceType.Sulfur] = ResourceType.Gold,
+}
+
 function ExtraPlayers.GUIAction_DiplomacyResType()
 	---@type number?
 	local sel = ExtraPlayers.DiplomacyPlayerScroll:GetElementOf(XGUIEng.GetCurrentWidgetID(), 1)
@@ -136,19 +145,7 @@ function ExtraPlayers.GUIAction_DiplomacyResType()
 		return
 	end
 	local rt = ExtraPlayers.PlayerToResDonationType[sel] or ResourceType.Gold
-	if rt <= ResourceType.Gold then
-		rt = ResourceType.Stone
-	elseif rt <= ResourceType.Stone then
-		rt = ResourceType.Iron
-	elseif rt <= ResourceType.Iron then
-		rt = ResourceType.Sulfur
-	elseif rt <= ResourceType.Sulfur then
-		rt = ResourceType.Clay
-	elseif rt <= ResourceType.Clay then
-		rt = ResourceType.Wood
-	else
-		rt = ResourceType.Gold
-	end
+	rt = ExtraPlayers.ResDonationNextRes[rt] or ResourceType.Gold
 	ExtraPlayers.PlayerToResDonationType[sel] = rt
 end
 
@@ -214,7 +211,7 @@ end
 function ExtraPlayers.ToggleFoW()
 end
 
-function ExtraPlayers_InitUI()
+function ExtraPlayers.InitUI()
 	ExtraPlayers.WidgetIdCache = {}
 
 	local function rem(w)
@@ -482,5 +479,6 @@ function ExtraPlayers_InitUI()
 	ExtraPlayers.DiplomacyPlayerScroll:Setup()
 end
 
-Trigger.RequestTrigger(Events.CPPLOGIC_EVENT_ON_MAP_STARTED, nil, "InitExtraPlayers", 1)
-Trigger.RequestTrigger(Events.CPPLOGIC_EVENT_ON_SAVEGAME_LOADED, nil, "ExtraPlayers_InitUI", 1)
+CppLogic.API.EnableScriptTriggerEval(true)
+Trigger.RequestTrigger(Events.CPPLOGIC_EVENT_ON_MAP_STARTED, nil, "ExtraPlayers.Init", 1)
+Trigger.RequestTrigger(Events.CPPLOGIC_EVENT_ON_SAVEGAME_LOADED, nil, "ExtraPlayers.InitUI", 1)

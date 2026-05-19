@@ -25,6 +25,8 @@ namespace shok {
 
 	static inline float(__stdcall* const GetCurrentTimeFloat)() = reinterpret_cast<float(__stdcall*)()>(0x548B64);
 
+	// std::exp 0x5c5060
+
 	// generic structs
 	struct Position {
 		float X = -1;

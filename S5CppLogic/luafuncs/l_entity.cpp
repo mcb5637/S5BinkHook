@@ -714,6 +714,21 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int SettlerGetRandomDamageBonus(GGL::CSettler* s) {
+		return s->GetBehaviorDynamic<GGL::CBattleBehavior>()->GetMaxRandomDamage();
+	}
+
+	std::pair<std::optional<float>, std::optional<float>> LeaderGetLeveledDamageBonus(GGL::CSettler* s) {
+		if (s->ModifierProfile.EntityReference.ExperienceClass == shok::ExperienceClass::Invalid)
+			return {std::nullopt, std::nullopt};
+		if (s->ModifierProfile.ExperienceLevel.Value <= 0)
+			return {0.0f, 0.0f};
+		auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
+		if (lvl == nullptr)
+			return {0.0f, 0.0f};;
+		return {lvl->DamageAmount, lvl->DamageBonus};
+	}
+
 	int BuildingMarketGetCurrentTradeData(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		auto* m = b->GetBehavior<GGL::CMarketBehavior>();
@@ -1956,6 +1971,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<WorkerChangeMotivation>("WorkerChangeMotivation"),
 			luaext::FuncReference::GetRef<WorkerGetResourceCarried>("WorkerGetResourceCarried"),
 			luaext::FuncReference::GetRef<SettlerGetSummoned>("SettlerGetSummoned"),
+			luaext::FuncReference::GetRef<SettlerGetRandomDamageBonus>("GetRandomDamageBonus"),
 	};
 
 	constexpr std::array Leader{
@@ -1967,6 +1983,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<LeaderSetSoldierLimit>("SetSoldierLimit"),
 			luaext::FuncReference::GetRef<LeaderSetRegeneration>("SetRegeneration"),
 			luaext::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
+			luaext::FuncReference::GetRef<LeaderGetLeveledDamageBonus>("GetLeveledDamageBonus"),
 	};
 
 	constexpr std::array Building{

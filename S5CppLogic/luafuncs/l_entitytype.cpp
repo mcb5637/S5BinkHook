@@ -165,13 +165,15 @@ namespace CppLogic::EntityType {
 		if (b != nullptr) {
 			L.Push(b->DamageAmount);
 			L.Push(b->DamageClass);
-			return 2;
+			L.Push(b->MaxDamageRandomBonus);
+			return 3;
 		}
 		auto* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
 		if (a != nullptr) {
 			L.Push(a->DamageAmount);
 			L.Push(a->DamageClass);
-			return 2;
+			L.Push(0);
+			return 0;
 		}
 		throw lua::LuaException("no battle or autocannon entity type at 1");
 	}
@@ -764,7 +766,14 @@ namespace CppLogic::EntityType {
 			L.SetTableRaw(-2, c);
 			c++;
 		}
-		return 1;
+		L.NewTable();
+		c = 1;
+		for (auto i : s->ModifyDamageBonus.TechList) {
+			L.Push(i);
+			L.SetTableRaw(-2, c);
+			c++;
+		}
+		return 2;
 	}
 
 	int GetMaxRangeModifierTechs(luaext::State L) {

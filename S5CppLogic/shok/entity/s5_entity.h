@@ -453,14 +453,14 @@ namespace EGL {
 		enum class ModifierType : int {
 			MovingSpeed = 0, // gets called, modified by tech, experience and weather
 			HealthBar = 100, // no modification, straight from entity
-			MaxHealth = 101, // no modification, straigt from GetMaxHealth func
+			MaxHealth = 101, // no modification, straight from GetMaxHealth func
 			Exploration = 102, // gets called, modified by tech and experience (returns constant for dead hero)
 			Damage = 103, // gets called, also shuriken, circularattack, modified by tech and experience
 			DamageBonus = 104, // gets called, modified by tech and experience
 			MaxAttackRange = 105, // gets called, battle+autocannon?, modified by tech and experience
 			MinAttackRange = 106, // modified by tech
 			Experience = 107, // no modifier, straight to event Leader_GetXP
-			ExperienceLevels = 108, // no modifier, straigt calculaton from Experience
+			ExperienceLevels = 108, // no modifier, straight calculation from Experience
 			// 109 unknown just passes through initial, called max soldiers?
 			Armor = 110, // gets called, modified by technology
 			Motivation = 111, // no modifier, straight to event Worker_GetMotivation (if not dead)
@@ -471,7 +471,7 @@ namespace EGL {
 			HealingPoints = 116, // gets called, modified by experience
 			MissChance = 117, // gets called, modified by experience
 
-			// note: buindings do not have a IProfileModifierSetObserver, but they have a tech modifier call on the virtual GetExploration and the GetArmor event
+			// note: buildings do not have a IProfileModifierSetObserver, but they have a tech modifier call on the virtual GetExploration and the GetArmor event
 		};
 
 		virtual float GetModifiedValue(ModifierType t, float z);

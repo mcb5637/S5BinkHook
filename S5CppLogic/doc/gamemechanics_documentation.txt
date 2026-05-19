@@ -131,6 +131,10 @@ Combat:
 	GGL::CSniperAbility:
 		- calculate Damage as Target->MaxHealth * Attacker->HPFactor
 		- Bug: Damage is dealt immediately, not with a Arrow (fixed by CppLogic.Logic.FixSnipeDamage)
+    Leader experience
+        - xp to level is this monstrosity: https://www.wolframalpha.com/input?i=plot+-1-round%28%281-e%5E%28%28x%2F1000%2B0.4%29*%28x%2F1000%29*-1.7%29%29*-6%29+from+0+to+1000
+            (1000 is logic.xml->MaxExperiencePoints)
+        - levels are from [-1,4] with xp values 184,328,470,629,846 giving you the next level
 
 Bridge Lifecycle:
 	XD_NeutralBridgeX:

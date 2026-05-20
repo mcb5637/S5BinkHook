@@ -2060,10 +2060,10 @@ function CppLogic.Entity.Building.GetNearestFreeRepairSlotFor(build, p) end
 --- market trade data.
 --- progress is buy amount + sell amount
 --- @param id entity
---- @return number buy type
---- @return number sell type
---- @return number buy amount
---- @return number sell amount
+--- @return number buy_type
+--- @return number sell_type
+--- @return number buy_amount
+--- @return number sell_amount
 --- @return number progress amount
 function CppLogic.Entity.Building.MarketGetCurrentTradeData(id) end
 --- market trade data.

@@ -302,6 +302,7 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x78BD3AED);
 		CGLEEffectCreator();
 
+		// ctor 4a2b7d
 		// dtor empty
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
@@ -317,6 +318,8 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3EA0B0BD);
 
 		CFlyingEffectCreator();
+
+		// ctor 4db9d3
 	};
 }
 

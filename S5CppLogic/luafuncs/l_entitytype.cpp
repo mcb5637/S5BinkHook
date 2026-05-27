@@ -235,12 +235,15 @@ namespace CppLogic::EntityType {
 		if (b != nullptr) {
 			L.Push(b->MaxRange);
 			L.Push(b->MinRange);
-			return 2;
+			L.Push(b->DamageRange);
+			return 3;
 		}
 		auto* a = t->GetBehaviorProps<GGL::CAutoCannonBehaviorProps>();
 		if (a != nullptr) {
 			L.Push(a->MaxAttackRange);
-			return 1;
+			L.Push();
+			L.Push(a->DamageRange);
+			return 3;
 		}
 		throw lua::LuaException("no battle or autocannon entity type at 1");
 	}
@@ -547,6 +550,21 @@ namespace CppLogic::EntityType {
 		L.Push(p->ProgressPerTick);
 		L.Push(p->RechargeTimeSeconds);
 		return 3;
+	}
+
+	std::tuple<float, int, float> GetAbilityDataFear(GGlue::CGlueEntityProps* t) {
+		auto* p = t->GetBehaviorProps<GGL::CInflictFearAbilityProps>();
+		return {p->Range, p->FlightDuration, p->FlightRange};
+	}
+
+	std::tuple<float, float, float> GetAbilityDataConvertSettler(GGlue::CGlueEntityProps* t) {
+		auto* p = t->GetBehaviorProps<GGL::CConvertSettlerAbilityProps>();
+		return {p->ConversionStartRange, p->ConversionMaxRange, p->HPToMSFactor};
+	}
+
+	std::tuple<float, int> GetAbilityDataMotivate(GGlue::CGlueEntityProps* t) {
+		auto* p = t->GetBehaviorProps<GGL::CMotivateWorkersAbilityProps>();
+		return {p->Range, p->WorkTimeBonus};
 	}
 
 	int GetAbilityLightningStrikeData(luaext::State L) {
@@ -910,6 +928,12 @@ namespace CppLogic::EntityType {
 		L.Push(static_cast<bool>(t->GetBehaviorProps<GGL::CSoldierBehaviorProps>()));
 		return 1;
 	}
+	std::tuple<int, float, float> GetBombData(GGlue::CGlueEntityProps* t) {
+		auto* p = t->GetBehaviorProps<GGL::CBombBehaviorProperties>();
+		if (p == nullptr)
+			throw lua::LuaException{"no bomb props"};
+		return {p->Damage, p->Delay, p->Radius};
+	}
 
 	constexpr std::array EntityType{
 			luaext::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
@@ -947,6 +971,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<IsSettlerType>("IsSettlerType"),
 			luaext::FuncReference::GetRef<IsLeaderType>("IsLeaderType"),
 			luaext::FuncReference::GetRef<IsSoldierType>("IsSoldierType"),
+			luaext::FuncReference::GetRef<GetBombData>("GetBombData"),
 		};
 
 	constexpr std::array Settler{
@@ -973,6 +998,9 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<GetAbilityDataResurrect>("GetAbilityDataResurrect"),
 			luaext::FuncReference::GetRef<GetAbilityLightningStrikeData>("GetAbilityLightningStrikeData"),
 			luaext::FuncReference::GetRef<GetAbilityBombardmentData>("GetAbilityBombardmentData"),
+			luaext::FuncReference::GetRef<GetAbilityDataFear>("GetAbilityDataFear"),
+			luaext::FuncReference::GetRef<GetAbilityDataConvertSettler>("GetAbilityDataConvertSettler"),
+			luaext::FuncReference::GetRef<GetAbilityDataMotivate>("GetAbilityDataMotivate"),
 			luaext::FuncReference::GetRef<GetFearless>("GetFearless"),
 			luaext::FuncReference::GetRef<SetFearless>("SetFearless"),
 			luaext::FuncReference::GetRef<SettlerGetCost>("GetCost"),

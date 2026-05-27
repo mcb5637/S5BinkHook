@@ -249,6 +249,8 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x816E2C;
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86CBE8);
 		static inline constexpr shok::ClassId Identifier = BB::InvalidIdentifier;
+
+		// fully charge ability timer 4f47ff
 	};
 
 	struct SSlotArgsCamouflage {
@@ -527,9 +529,10 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x33A2FBFD);
 	};
 
+	class CShurikenAbilityProps;
 	class CShurikenAbility : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)
 	public:
-		PADDINGI(1);
+		GGL::CShurikenAbilityProps* ShurikenProps;
 		shok::EntityId TargetId;
 
 		// defined tasks: TASK_SET_THROW_SHURIKEN_ANIM, TASK_THROW_SHURIKEN, TASK_TURN_TO_SHURIKEN_TARGET
@@ -540,6 +543,14 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3A0D7DAD);
 
 		static void HookDealDamage();
+
+		// is valid target 4dbc48(entity*), 4dbe39(id)
+		// is hostile 4dbaac
+		// is in target cone 4dbaef (angleToMaintarget, entity)
+		// search better target 4dbe57 (probably noop, since target has angle 0 -> will be found again)
+		// calc dmg against 4dc535(ent)
+		// fire single 4dc656(ent)
+		// fill targets 4dc44c(targetId, vector<entity>)
 	};
 
 	class CKegPlacerBehavior : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)

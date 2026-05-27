@@ -104,7 +104,6 @@ namespace ED {
 		virtual CTerrainDecal* CreateTerrainDecal(int, RWE::RwRaster* texture, float x, float y, float sx, float ys) = 0;
 		virtual CTerrainDecalAligned* CreateAlignedDecal(int, const shok::Position* p, void*) = 0;
 		// 6 more funcs
-
 	};
 	class CTerrainDecals : public ITerrainDecals {
 	public:
@@ -127,6 +126,9 @@ namespace ED {
 
 
 		static inline constexpr int vtp = 0x76A274;
+
+		// ctor 478962
+		// has bridge blocking at pos 477a91
 	};
 	//constexpr int i = offsetof(CTerrainDecals, DecalShadow) / 4;
 

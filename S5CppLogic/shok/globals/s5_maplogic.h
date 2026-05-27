@@ -228,6 +228,7 @@ namespace EGL {
 		[[nodiscard]] EGL::CGLELandscape::BlockingMode GetBlockingData(int x, int y) const;
 
 		// 0x898B80 global to data
+		// 57ef15 is blocking at pos set(int x, int y, EGL::CGLELandscape::BlockingMode* mode)
 	};
 
 	class CPlayerExplorationHandler : public BB::IObject {

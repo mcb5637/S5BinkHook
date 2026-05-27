@@ -2306,6 +2306,7 @@ function CppLogic.EntityType.SetAutoAttackMissChance(ty, mc) end
 --- @param ty number entitytype
 --- @return number max range
 --- @return number min range (nil for autocannons)
+--- @return number aoe (<=0 for no aoe)
 function CppLogic.EntityType.GetAutoAttackRange(ty) end
 --- range chance of autoattacks of an entity type.
 --- for autocannons only max range, for anything else max and min range.
@@ -2414,6 +2415,13 @@ function CppLogic.EntityType.IsLeaderType(ty) end
 --- @param ty number entitytype
 --- @return boolean
 function CppLogic.EntityType.IsSoldierType(ty) end
+
+--- gets bomb data
+--- @param ty number|string
+--- @return number damage
+--- @return number delay
+--- @return number range
+function CppLogic.EntityType.GetBombData(ty) end
 
 --- the soldier type of a leader type
 --- @param ty number leader type
@@ -2549,6 +2557,26 @@ function CppLogic.EntityType.Settler.GetAbilityDataRangedEffect(ty) end
 --- @param ran number range
 --- @param rech number recharge time
 function CppLogic.EntityType.Settler.SetAbilityDataRangedEffect(ty, dmgfac, armfac, hpfac, ran, rech) end
+
+--- entitytype fear ability data
+--- @param ty number entitytype
+--- @return number range
+--- @return number duration
+--- @return number flightRange
+function CppLogic.EntityType.Settler.GetAbilityDataFear(ty)end
+
+--- entitytype convert settler ability data
+--- @param ty number entitytype
+--- @return number startRange
+--- @return number maxRange
+--- @return number hpToMsFactor
+function CppLogic.EntityType.Settler.GetAbilityDataConvertSettler(ty)end
+
+--- entitytype motivate workers ability data
+--- @param ty number entitytype
+--- @return number range
+--- @return number workTime
+function CppLogic.EntityType.Settler.GetAbilityDataMotivate(ty)end
 
 --- entitytytpe resurrect ability data.
 --- @param ty number entitytype

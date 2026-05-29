@@ -172,6 +172,7 @@ namespace CppLogic::Serializer {
 	public:
 		static int GetType(luaext::State L);
 		static int Fields(luaext::State L);
+		static int ByOffset(luaext::State L);
 
 		static int FieldsNext(luaext::State L);
 
@@ -185,6 +186,7 @@ namespace CppLogic::Serializer {
 			luaext::FuncReference::GetRef<GetType>("GetType"),
 			luaext::FuncReference::GetRef<Fields>("Fields"),
 			luaext::FuncReference::GetRef<Index>("Get"),
+			luaext::FuncReference::GetRef<ByOffset>("ByOffset"),
 		};
 
 		struct Iter {

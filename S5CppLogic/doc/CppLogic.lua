@@ -314,12 +314,17 @@ CppStructAccess = {}
 ---@return `CppLogic.Memory.ObjectAccessType.Struct`
 function CppStructAccess:GetType()end
 ---iterates over all fields
----@return fun():CppObjectAccess?
+---@return fun():CppObjectAccess?,number?,number?
 function CppStructAccess:Fields()end
 ---searches for a field with name and returns it
 ---@param name string
 ---@return CppStructAccess?
 function CppStructAccess:Get(name)end
+---searches for a field that covers an ofsett and returns it
+---@param off number
+---@return CppStructAccess?
+---@return number? toStart
+function CppStructAccess:ByOffset(off)end
 
 ---@class CppBBObjectAccess : CppStructAccess
 CppBBObjectAccess = {}

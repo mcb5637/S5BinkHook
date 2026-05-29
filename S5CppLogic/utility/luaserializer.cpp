@@ -623,6 +623,22 @@ int CppLogic::Serializer::StructAccess::Fields(luaext::State L)
 	return 1;
 }
 
+int CppLogic::Serializer::StructAccess::ByOffset(luaext::State L) {
+	auto* th = L.CheckUserClass<StructAccess>(1);
+	if (th->Object == nullptr)
+		throw lua::LuaException("object null");
+	auto off = L.Check<size_t>(2);
+	Iter i{ th->Object, th->SeriData };
+	for (const auto& [obj, sd] : i) {
+		if (off >= sd->Position && off < sd->Position + sd->Size) {
+			PushSD(L, sd->SerializationName, obj, sd, th->Id, th->OnWrite);
+			L.Push(off - sd->Position);
+			return 2;
+		}
+	}
+	return 0;
+}
+
 int CppLogic::Serializer::StructAccess::FieldsNext(luaext::State L)
 {
 	auto* i = L.CheckUserClass<Iter>(L.Upvalueindex(1));
@@ -639,7 +655,9 @@ int CppLogic::Serializer::StructAccess::FieldsNext(luaext::State L)
 	else {
 		const auto& [obj, sd] = **i;
 		PushSD(L, sd->SerializationName, obj, sd, th->Id, th->OnWrite);
-		return 1;
+		L.Push(sd->Position);
+		L.Push(sd->Size);
+		return 3;
 	}
 }
 

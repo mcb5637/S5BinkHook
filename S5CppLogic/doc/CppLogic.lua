@@ -314,6 +314,7 @@ CppStructAccess = {}
 ---@return `CppLogic.Memory.ObjectAccessType.Struct`
 function CppStructAccess:GetType()end
 ---iterates over all fields
+---example: for field, position, size in struct:Fields() do
 ---@return fun():CppObjectAccess?,number?,number?
 function CppStructAccess:Fields()end
 ---searches for a field with name and returns it

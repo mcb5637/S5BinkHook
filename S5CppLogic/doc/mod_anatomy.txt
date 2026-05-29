@@ -3,7 +3,7 @@ for a map:
 	- add any data you want to add/modify to the map to the s5x
 		(if using a folder map, add it to a bba and load that from ModLoader.lua)
 	- put any data you want to add/modify to the ModLoader.lua manifest
-	- reference any required modpacks into RequiredMods
+	- reference any required modpacks into info.xml->root->ModPacks->Required
 
 for a modpack:
 	- create YourModName.bba
@@ -11,3 +11,18 @@ for a modpack:
 	- enter mod information into ModPack.xml
 	- add any data you want to add/modify to the map to the bba
 	- put any data you want to add/modify to the ModPackLoader.lua manifest
+
+full syntax of modpack requirement:
+- name(OPversion)?(SETT)*
+- name is the modpack name (same as YourModName in modpack above)
+- OP is the version check operation
+    - @ compare the exact version number (usually used to bake a version number into a savegame)
+    - <=, == >= does understand semantic versioning, splitting both version numbers at . and comparing the pieces (numerically if possible)
+    - examples:
+        - @1.0 accepts only 1.0, no 1.0.1 or 2.0
+        - <=1.1 accepts 1.1, 0.9 and 1.0, but not 2.0 or 1.2
+        - >=1.1 accepts 1.1, 1.2, 1.10, 2.0 but not 1.0 or 0.6
+        - ==1.1 accepts 1.1, 1.1.4, but not 1.0 or 1.2
+- version is the required version to compare with
+- SETT is a setting for that mod, of the form ?setting=val, where setting is the Key of a setting in the ModPack.xml and val one of the Options
+- you can chain multiple settings after each other

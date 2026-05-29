@@ -2,6 +2,7 @@ CppLogic.API.CreateExtraDataTables()
 
 ModLoader = {
 	KeepArchive = false,
+	---@type Manifest
 	Manifest = {
 	},
 	RequiredMods = {},

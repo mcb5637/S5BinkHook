@@ -442,8 +442,18 @@ namespace CppLogic::ModLoader {
 	};
 
 	struct ModpackDesc {
+		struct Setting {
+			std::string Key;
+			std::string Name;
+			std::string Tooltip;
+			std::vector<std::string> Options;
+
+			static const BB::SerializationData SerializationData[];
+		};
+
 		std::string Name, BBAPath, LoaderPath, ScriptPath, MainmenuPath, Version, Description;
 		std::vector<std::string> Required, Incompatible, Override;
+		std::vector<Setting> Settings;
 		bool DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false;
 		bool UserRequestable = false, ScriptLib = false;
 

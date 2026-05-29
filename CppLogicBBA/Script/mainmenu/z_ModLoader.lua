@@ -1,11 +1,16 @@
 Script.Load("Data\\Script\\ModLoader\\ModLoader.lua")
 Script.Load("Data\\Script\\InterfaceTools\\AutoScroll.lua")
 
-if false then
-	---@class CPPLMMMod
-	---@field Active boolean
-	local t = {Name = "", Description = "", MainmenuMod = true, UserRequestable = true}
-end
+---@class CPPLMMMod
+---@field Active boolean
+---@field Name string
+---@field Description string
+---@field MainmenuMod boolean
+---@field UserRequestable boolean
+---@field Settings CPPLMMOption[]
+
+---@class CPPLMMOption : ModpackDescOption
+---@field Type CPPLMMModSettingType
 
 ModLoaderMainmenu = {
 	InitUICallbacks = {
@@ -14,6 +19,8 @@ ModLoaderMainmenu = {
 				ModLoaderMainmenu.InitUI()
 				ModLoaderMainmenu.Scroll:Setup()
 				ModLoaderMainmenu.MonitorScroll:Setup()
+				ModLoaderMainmenu.SettingsScroll:Setup()
+				ModLoaderMainmenu.SettingsScroll:SetDataToScrollOver({})
 			end
 		end,
 	},
@@ -21,6 +28,17 @@ ModLoaderMainmenu = {
 	Scroll = AutoScroll.Init("OptionsMenuCppLogic_ModListScroll", nil, nil, nil, true),
 	---@type CPPLAutoScroll<CPPLMonitorInfo>
 	MonitorScroll = AutoScroll.Init("OptionsMenu30_ResExtraScroll", "OptionsMenu30_ResExtraUp", "OptionsMenu30_ResExtraDown", "OptionsMenu30_ResExtraSliderBG", true),
+	---@type CPPLAutoScroll<CPPLMMOption>
+	SettingsScroll = AutoScroll.Init("OptionsMenuCppLogic_SettingsScroll", nil, nil, nil, true),
+}
+
+---@enum CPPLMMModSettingType
+ModLoaderMainmenu.ModSettingType = {
+	Active = 0,
+	Ingame = 1,
+	MainMenu = 2,
+	Boolean = 3,
+	Dropdown = 4,
 }
 
 ModLoaderMainmenu.Start = StartMenu.Start
@@ -30,10 +48,10 @@ function StartMenu.Start(_StartVideoFlag)
 	ModLoaderMainmenu.Start(_StartVideoFlag)
 	StartMenu.Start = ModLoaderMainmenu.Start
 	xpcall(function()
-		ModLoaderMainmenu.LoadModpacks()
-		ModLoaderMainmenu.LoadMainmenuModPacks()
-		ModLoader.LoadSTTOverride("CppLogic_Mainmenu")
-	end, CppLogic.API.Log)
+			   ModLoader.LoadSTTOverride("CppLogic_Mainmenu")
+			   ModLoaderMainmenu.LoadModpacks()
+			   ModLoaderMainmenu.LoadMainmenuModPacks()
+		   end, CppLogic.API.Log)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -56,21 +74,66 @@ function ModLoaderMainmenu.LoadModpacks()
 	ModLoaderMainmenu.ModPacks = {}
 	for _, m in ipairs(CppLogic.ModLoader.GetModpacks()) do
 		local mp = CppLogic.ModLoader.GetModpackInfo(m)
-		if type(mp) == "table" and (mp.UserRequestable or mp.MainmenuMod) then
-			table.insert(ModLoaderMainmenu.ModPacks, {Name = mp.Name,
+		if type(mp) == "table" then
+			---@type CPPLMMMod
+			local i = {
+				Name = mp.Name,
 				Active = false,
 				Description = mp.Description,
 				MainmenuMod = mp.MainmenuMod,
 				UserRequestable = mp.UserRequestable,
-			})
+				Settings = mp.Settings,
+			}
+			for _, s in ipairs(i.Settings) do
+				local isBool = true
+				for _, o in ipairs(s.Options) do
+					if o ~= "true" and o ~= "false" then
+						isBool = false
+						break
+					end
+				end
+				s.Type = isBool and ModLoaderMainmenu.ModSettingType.Boolean or ModLoaderMainmenu.ModSettingType.Dropdown
+			end
+			---@type CPPLMMOption
+			local o = {
+				Key = "Active",
+				Name = XGUIEng.GetStringTableText("CppLogic_Mainmenu/On"),
+				Tooltip = XGUIEng.GetStringTableText("CppLogic_Mainmenu/OnTT"),
+				Type = ModLoaderMainmenu.ModSettingType.Active,
+				Options = {},
+			}
+			table.insert(i.Settings, 1, o)
+			o = {
+				Key = "",
+				Name = XGUIEng.GetStringTableText("CppLogic_Mainmenu/Ingame"),
+				Tooltip = XGUIEng.GetStringTableText("CppLogic_Mainmenu/IngameTT"),
+				Type = ModLoaderMainmenu.ModSettingType.Ingame,
+				Options = {},
+			}
+			table.insert(i.Settings, 2, o)
+			o = {
+				Key = "",
+				Name = XGUIEng.GetStringTableText("CppLogic_Mainmenu/Mainmenu"),
+				Tooltip = XGUIEng.GetStringTableText("CppLogic_Mainmenu/MainmenuTT"),
+				Type = ModLoaderMainmenu.ModSettingType.MainMenu,
+				Options = {},
+			}
+			table.insert(i.Settings, 3, o)
+			table.insert(ModLoaderMainmenu.ModPacks, i)
 		end
 	end
 	local str = GDB.GetString("CppLogic\\UserRequestedMods")
 	if str and str ~= "" then
 		for _, m in ipairs(ModLoader.LoadModList(str)) do
+			local modName, _, sett = ModLoader.ParseModString(m)
 			for _, mp in ipairs(ModLoaderMainmenu.ModPacks) do
-				if mp.Name == m then
-					mp.Active = true
+				if mp.Name == modName then
+					mp.Active = (sett.Active or "true") == "true"
+					for _,s in pairs(mp.Settings) do
+						if sett[s.Key] then
+							s.Set = sett[s.Key]
+						end
+					end
 				end
 			end
 		end
@@ -79,12 +142,10 @@ function ModLoaderMainmenu.LoadModpacks()
 end
 
 function ModLoaderMainmenu.StoreUserRequestedModpacks()
-	local s = ""
-	for _, mp in ipairs(ModLoaderMainmenu.ModPacks) do
-		if mp.Active then
-			s = s .. mp.Name .. ";"
-		end
-	end
+	local s = ModLoader.SerializeModList(ModLoaderMainmenu.ModPacks, true, function(mp)
+		---@cast mp CPPLMMMod
+		return (mp.MainmenuMod or mp.UserRequestable) and mp.Active
+	end)
 	GDB.SetString("CppLogic\\UserRequestedMods", s)
 end
 
@@ -94,7 +155,7 @@ function ModLoaderMainmenu.UpdateMod()
 	if not mp then
 		return
 	end
-	XGUIEng.SetText(XGUIEng.GetCurrentWidgetID(), "@center " .. mp.Name)
+	XGUIEng.SetText(XGUIEng.GetCurrentWidgetID(), "@center "..mp.Name)
 	local h = (mp == ModLoaderMainmenu.Scroll:GetSelected()) and 255 or 200
 	XGUIEng.SetMaterialColor(XGUIEng.GetCurrentWidgetID(), 4, h, h, h, 255)
 	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), (mp.Active or mp == ModLoaderMainmenu.Scroll:GetSelected()) and 1 or 0)
@@ -110,25 +171,70 @@ function ModLoaderMainmenu.ActionActive()
 	ModLoaderMainmenu.StoreUserRequestedModpacks()
 end
 
-function ModLoaderMainmenu.UpdateActive()
+function ModLoaderMainmenu.ActionSelectMod()
+	ModLoaderMainmenu.Scroll:GUIAction_DefaultSelect()
+	local mp = ModLoaderMainmenu.Scroll:GetSelected()
+	if not mp then
+		ModLoaderMainmenu.SettingsScroll:SetDataToScrollOver({})
+		return
+	end
+	ModLoaderMainmenu.SettingsScroll:SetDataToScrollOver(mp.Settings)
+end
+
+function ModLoaderMainmenu.UpdateDesc()
 	---@type CPPLMMMod?
 	local mp = ModLoaderMainmenu.Scroll:GetSelected()
 	if not mp then
 		XGUIEng.SetText("OptionsMenuCppLogic_Settings_Desc", "")
-		XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_On", 0)
-		XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_IG", 0)
-		XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_MM", 0)
 		return
 	end
 	XGUIEng.SetText("OptionsMenuCppLogic_Settings_Desc", mp.Description or "")
-	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_On", 1)
-	XGUIEng.HighLightButton("OptionsMenuCppLogic_Settings_On", mp.Active and 1 or 0)
-	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_IG", 1)
-	XGUIEng.DisableButton("OptionsMenuCppLogic_Settings_IG", mp.UserRequestable and 0 or 1)
-	XGUIEng.HighLightButton("OptionsMenuCppLogic_Settings_IG", mp.UserRequestable and 1 or 0)
-	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_MM", 1)
-	XGUIEng.DisableButton("OptionsMenuCppLogic_Settings_MM", mp.MainmenuMod and 0 or 1)
-	XGUIEng.HighLightButton("OptionsMenuCppLogic_Settings_MM", mp.MainmenuMod and 1 or 0)
+end
+
+function ModLoaderMainmenu.ActionSetting()
+	local w = XGUIEng.GetCurrentWidgetID()
+	---@type CPPLMMOption?
+	local s = ModLoaderMainmenu.SettingsScroll:GetElementOf(w)
+	if not s then
+		return
+	end
+	local mp = ModLoaderMainmenu.Scroll:GetSelected()
+	if not mp then
+		return
+	end
+	if s.Type == ModLoaderMainmenu.ModSettingType.Active then
+		mp.Active = not mp.Active
+		ModLoaderMainmenu.StoreUserRequestedModpacks()
+	elseif s.Type == ModLoaderMainmenu.ModSettingType.Boolean then
+		s.Set = (s.Set or s.Options[1]) == "true" and "false" or "true"
+		ModLoaderMainmenu.StoreUserRequestedModpacks()
+	end
+end
+
+function ModLoaderMainmenu.UpdateSetting()
+	local w = XGUIEng.GetCurrentWidgetID()
+	---@type CPPLMMOption?
+	local s = ModLoaderMainmenu.SettingsScroll:GetElementOf(w)
+	if not s then
+		return
+	end
+	local mp = ModLoaderMainmenu.Scroll:GetSelected()
+	if not mp then
+		return
+	end
+	XGUIEng.SetText(w, s.Name)
+	CppLogic.UI.WidgetSetTooltipString(w, s.Tooltip, false)
+	local high = false
+	if s.Type == ModLoaderMainmenu.ModSettingType.Active then
+		high = mp.Active
+	elseif s.Type == ModLoaderMainmenu.ModSettingType.Ingame then
+		high = mp.UserRequestable
+	elseif s.Type == ModLoaderMainmenu.ModSettingType.MainMenu then
+		high = mp.MainmenuMod
+	elseif s.Type == ModLoaderMainmenu.ModSettingType.Boolean then
+		high = (s.Set or s.Options[1]) == "true"
+	end
+	XGUIEng.HighLightButton(w, high and 1 or 0)
 end
 
 function ModLoaderMainmenu.IsSavegameValid(save)
@@ -142,13 +248,14 @@ function ModLoaderMainmenu.IsSavegameValid(save)
 	end
 	local r = true
 	xpcall(function()
-		local modlist = ModLoader.DiscoverRequired(ml)
-		ModLoader.SortMods(modlist)
-	end, function(msg)
-		r = false
-	end)
+			   local modlist = ModLoader.DiscoverRequired(ml)
+			   ModLoader.SortMods(modlist)
+		   end, function(msg)
+			   r = false
+		   end)
 	return r
 end
+
 CppLogic.ModLoader.OverrideSavegameValid(ModLoaderMainmenu.IsSavegameValid)
 
 function ModLoaderMainmenu.LoadMainmenuModPacks()
@@ -473,10 +580,6 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetTextColor("OptionsMenu50_ToCppLogic", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenu50_ToCppLogic", true)
 
-	if not CppLogic.UI.TextButtonSetCenterText then
-		function CppLogic.UI.TextButtonSetCenterText()
-		end
-	end
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic") == 0, "OptionsMenuCppLogic already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_Back") == 0, "OptionsMenuCppLogic_Back already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_ToControl") == 0, "OptionsMenuCppLogic_ToControl already exists")
@@ -494,17 +597,16 @@ function ModLoaderMainmenu.InitUI()
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_ModListSelect") == 0, "OptionsMenuCppLogic_ModListSelect already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_ModListScroll") == 0, "OptionsMenuCppLogic_ModListScroll already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_Settings") == 0, "OptionsMenuCppLogic_Settings already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_Settings_On") == 0, "OptionsMenuCppLogic_Settings_On already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_Settings_Scrollable") == 0, "OptionsMenuCppLogic_Settings_Scrollable already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_Settings_Desc") == 0, "OptionsMenuCppLogic_Settings_Desc already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_Settings_IG") == 0, "OptionsMenuCppLogic_Settings_IG already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_Settings_MM") == 0, "OptionsMenuCppLogic_Settings_MM already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_SettingsScroll") == 0, "OptionsMenuCppLogic_SettingsScroll already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_BG") == 0, "OptionsMenuCppLogic_BG already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_BGShade") == 0, "OptionsMenuCppLogic_BGShade already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_BGBottom") == 0, "OptionsMenuCppLogic_BGBottom already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_BGFrameLeft") == 0, "OptionsMenuCppLogic_BGFrameLeft already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_BGFrameRight") == 0, "OptionsMenuCppLogic_BGFrameRight already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenuCppLogic_BGTop") == 0, "OptionsMenuCppLogic_BGTop already exists")
-	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("Screens", "OptionsMenuCppLogic", nil)
+	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("Screens", "OptionsMenuCppLogic", "SPMenu90")
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic", 0, 0, 1024, 768)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic", 0)
 	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic", 0, false, false)
@@ -514,9 +616,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_Back", 5, false, false)
 	XGUIEng.DisableButton("OptionsMenuCppLogic_Back", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_Back", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_Back", function()
-		OptionsMenu.S00_Button_ToStart()
-	end)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_Back", function() OptionsMenu.S00_Button_ToStart() end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Back", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Back", 0, "data\\graphics\\textures\\gui\\mainmenu\\right_button.png")
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Back", 0, 255, 255, 255, 255)
@@ -534,12 +634,12 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Back", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_Back", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_Back", "MainMenuTooltips/OptionsMenu00_Back", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_Back", true)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_Back", "data\\menu\\fonts\\mainmenularge.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_Back", 3)
 	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_Back", "MainMenu/Back")
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_Back", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_Back", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_Back", true)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic", "OptionsMenuCppLogic_ToControl", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ToControl", 709, 220, 278, 47)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ToControl", 1)
@@ -547,9 +647,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetGroup("OptionsMenuCppLogic_ToControl", "OptionGroup")
 	XGUIEng.DisableButton("OptionsMenuCppLogic_ToControl", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_ToControl", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToControl", function()
-		OptionsMenu.S20_Start()
-	end)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToControl", function() OptionsMenu.S20_Start() end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ToControl", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_ToControl", 0, "data\\graphics\\textures\\gui\\mainmenu\\right_button.png")
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToControl", 0, 255, 255, 255, 255)
@@ -567,12 +665,12 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToControl", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_ToControl", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_ToControl", "MainMenuTooltips/OptionsMenu00_ToControl", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToControl", true)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_ToControl", "data\\menu\\fonts\\mainmenularge.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_ToControl", 3)
 	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_ToControl", "MainMenu/Options_Controls")
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_ToControl", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_ToControl", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToControl", true)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic", "OptionsMenuCppLogic_ToGraphics", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ToGraphics", 709, 270, 278, 47)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ToGraphics", 1)
@@ -580,9 +678,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetGroup("OptionsMenuCppLogic_ToGraphics", "OptionGroup")
 	XGUIEng.DisableButton("OptionsMenuCppLogic_ToGraphics", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_ToGraphics", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToGraphics", function()
-		OptionsMenu.S30_Start()
-	end)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToGraphics", function() OptionsMenu.S30_Start() end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ToGraphics", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_ToGraphics", 0, "data\\graphics\\textures\\gui\\mainmenu\\right_button.png")
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToGraphics", 0, 255, 255, 255, 255)
@@ -600,12 +696,12 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToGraphics", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_ToGraphics", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_ToGraphics", "MainMenuTooltips/OptionsMenu00_ToGraphics", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToGraphics", true)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_ToGraphics", "data\\menu\\fonts\\mainmenularge.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_ToGraphics", 3)
 	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_ToGraphics", "MainMenu/Options_Graphics")
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_ToGraphics", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_ToGraphics", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToGraphics", true)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic", "OptionsMenuCppLogic_ToNetwork", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ToNetwork", 709, 370, 278, 47)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ToNetwork", 1)
@@ -613,9 +709,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetGroup("OptionsMenuCppLogic_ToNetwork", "OptionGroup")
 	XGUIEng.DisableButton("OptionsMenuCppLogic_ToNetwork", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_ToNetwork", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToNetwork", function()
-		OptionsMenu.S50_Start()
-	end)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToNetwork", function() OptionsMenu.S50_Start() end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ToNetwork", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_ToNetwork", 0, "data\\graphics\\textures\\gui\\mainmenu\\right_button.png")
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToNetwork", 0, 255, 255, 255, 255)
@@ -633,12 +727,12 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToNetwork", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_ToNetwork", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_ToNetwork", "MainMenuTooltips/OptionsMenu00_ToNetwork", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToNetwork", true)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_ToNetwork", "data\\menu\\fonts\\mainmenularge.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_ToNetwork", 3)
 	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_ToNetwork", "MainMenu/Options_Network")
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_ToNetwork", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_ToNetwork", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToNetwork", true)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic", "OptionsMenuCppLogic_ToSound", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ToSound", 709, 320, 278, 47)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ToSound", 1)
@@ -646,9 +740,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetGroup("OptionsMenuCppLogic_ToSound", "OptionGroup")
 	XGUIEng.DisableButton("OptionsMenuCppLogic_ToSound", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_ToSound", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToSound", function()
-		OptionsMenu.S40_Start()
-	end)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToSound", function() OptionsMenu.S40_Start() end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ToSound", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_ToSound", 0, "data\\graphics\\textures\\gui\\mainmenu\\right_button.png")
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToSound", 0, 255, 255, 255, 255)
@@ -666,12 +758,12 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToSound", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_ToSound", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_ToSound", "MainMenuTooltips/OptionsMenu00_ToSound", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToSound", true)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_ToSound", "data\\menu\\fonts\\mainmenularge.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_ToSound", 3)
 	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_ToSound", "MainMenu/Options_Sound")
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_ToSound", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_ToSound", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToSound", true)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic", "OptionsMenuCppLogic_ToUser", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ToUser", 709, 170, 278, 47)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ToUser", 1)
@@ -679,9 +771,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetGroup("OptionsMenuCppLogic_ToUser", "OptionGroup")
 	XGUIEng.DisableButton("OptionsMenuCppLogic_ToUser", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_ToUser", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToUser", function()
-		OptionsMenu.S10_Start()
-	end)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ToUser", function() OptionsMenu.S10_Start() end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ToUser", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_ToUser", 0, "data\\graphics\\textures\\gui\\mainmenu\\right_button.png")
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToUser", 0, 255, 255, 255, 255)
@@ -699,12 +789,12 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToUser", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_ToUser", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_ToUser", "MainMenuTooltips/OptionsMenu00_ToUser", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToUser", true)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_ToUser", "data\\menu\\fonts\\mainmenularge.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_ToUser", 3)
 	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_ToUser", "MainMenu/Options_User")
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_ToUser", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_ToUser", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToUser", true)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic", "OptionsMenuCppLogic_ToCppLogic", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ToCppLogic", 709, 420, 278, 47)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ToCppLogic", 1)
@@ -729,12 +819,12 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ToCppLogic", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_ToCppLogic", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_ToCppLogic", "CppLogic_Mainmenu/ModPacksTT", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToCppLogic", true)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_ToCppLogic", "data\\menu\\fonts\\mainmenularge.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_ToCppLogic", 3)
 	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_ToCppLogic", "CppLogic_Mainmenu/ModPacksBTN")
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_ToCppLogic", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_ToCppLogic", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ToCppLogic", true)
 	CppLogic.UI.ContainerWidgetCreateStaticWidgetChild("OptionsMenuCppLogic", "OptionsMenuCppLogic_RightBG", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_RightBG", 652, 0, 372, 768)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_RightBG", 1)
@@ -773,7 +863,7 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetLinesToPrint("OptionsMenuCppLogic_SettingsHeadline", 0, 0)
 	CppLogic.UI.StaticTextWidgetSetLineDistanceFactor("OptionsMenuCppLogic_SettingsHeadline", 0)
 	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenuCppLogic_MainContainer", "OptionsMenuCppLogic_ModList", nil)
-	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ModList", 20, 50, 200, 400)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ModList", 20, 50, 200, 425)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ModList", 1)
 	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_ModList", 0, false, false)
 	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenuCppLogic_ModList", "OptionsMenuCppLogic_ModListList", nil)
@@ -786,9 +876,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_ModListSelect", 0, false, false)
 	XGUIEng.DisableButton("OptionsMenuCppLogic_ModListSelect", 0)
 	XGUIEng.HighLightButton("OptionsMenuCppLogic_ModListSelect", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ModListSelect", function()
-		ModLoaderMainmenu.Scroll:GUIAction_DefaultSelect()
-	end)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_ModListSelect", function() ModLoaderMainmenu.ActionSelectMod() end)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ModListSelect", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ModListSelect", 0, 100, 100, 100, 131)
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ModListSelect", 1, 0, 0, 1, 1)
@@ -800,18 +888,15 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_ModListSelect", 4, 0, 0, 1, 1)
 	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_ModListSelect", 4, 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_ModListSelect", nil, false, true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ModListSelect", false)
-	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenuCppLogic_ModListSelect", function()
-		ModLoaderMainmenu.UpdateMod()
-	end)
 	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_ModListSelect", "data\\menu\\fonts\\onscreen10.met")
 	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_ModListSelect", 0)
 	XGUIEng.SetText("OptionsMenuCppLogic_ModListSelect", "@center name", 1)
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_ModListSelect", 255, 255, 255, 255)
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_ModListSelect", true)
-	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("OptionsMenuCppLogic_ModList", "OptionsMenuCppLogic_ModListScroll",
-	                                                   "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 1, 0, 0, 0, 0, 0, "",
-	                                                   "OptionsMenuCppLogic_ModListSelect")
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_ModListSelect", false)
+	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenuCppLogic_ModListSelect", function() ModLoaderMainmenu.UpdateMod() end)
+	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("OptionsMenuCppLogic_ModList", "OptionsMenuCppLogic_ModListScroll", "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 1, 0, 0,
+		0, 0, 0, "", "OptionsMenuCppLogic_ModListSelect")
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_ModListScroll", 0, 25, 200, 400)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_ModListScroll", 1)
 	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_ModListScroll", 0, false, false)
@@ -819,38 +904,36 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_Settings", 277, 65, 400, 400)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings", 1)
 	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_Settings", 0, false, false)
-	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic_Settings", "OptionsMenuCppLogic_Settings_On", nil)
-	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_Settings_On", 273, 13, 100, 47)
-	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_On", 1)
-	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_Settings_On", 0, false, false)
-	XGUIEng.DisableButton("OptionsMenuCppLogic_Settings_On", 0)
-	XGUIEng.HighLightButton("OptionsMenuCppLogic_Settings_On", 0)
-	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_Settings_On", function()
-		ModLoaderMainmenu.ActionActive()
-	end)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_On", 0, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_On", 0, "data\\graphics\\textures\\gui\\mainmenu\\sub.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_On", 0, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_On", 1, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_On", 1, "data\\graphics\\textures\\gui\\mainmenu\\sub_hi.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_On", 1, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_On", 2, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_On", 2, "data\\graphics\\textures\\gui\\mainmenu\\sub_sel.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_On", 2, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_On", 3, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_On", 3, "data\\graphics\\textures\\gui\\mainmenu\\sub_in.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_On", 3, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_On", 4, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_On", 4, "data\\graphics\\textures\\gui\\mainmenu\\sub_akt.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_On", 4, 255, 255, 255, 255)
-	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_Settings_On", "StartMenu_TooltipText", true, true)
-	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_Settings_On", "CppLogic_Mainmenu/OnTT", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_Settings_On", false)
-	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_Settings_On", "data\\menu\\fonts\\mainmenularge.met")
-	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_Settings_On", 3)
-	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_Settings_On", "CppLogic_Mainmenu/On")
-	XGUIEng.SetTextColor("OptionsMenuCppLogic_Settings_On", 255, 255, 255, 255)
-	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_Settings_On", true)
+	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic_Settings", "OptionsMenuCppLogic_Settings_Scrollable", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_Settings_Scrollable", 273, 13, 100, 47)
+	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_Scrollable", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_Settings_Scrollable", 0, false, false)
+	XGUIEng.DisableButton("OptionsMenuCppLogic_Settings_Scrollable", 0)
+	XGUIEng.HighLightButton("OptionsMenuCppLogic_Settings_Scrollable", 0)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenuCppLogic_Settings_Scrollable", function() ModLoaderMainmenu.ActionSetting() end)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_Scrollable", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_Scrollable", 0, "data\\graphics\\textures\\gui\\mainmenu\\sub.png")
+	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_Scrollable", 0, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_Scrollable", 1, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_Scrollable", 1, "data\\graphics\\textures\\gui\\mainmenu\\sub_hi.png")
+	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_Scrollable", 1, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_Scrollable", 2, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_Scrollable", 2, "data\\graphics\\textures\\gui\\mainmenu\\sub_sel.png")
+	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_Scrollable", 2, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_Scrollable", 3, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_Scrollable", 3, "data\\graphics\\textures\\gui\\mainmenu\\sub_in.png")
+	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_Scrollable", 3, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_Scrollable", 4, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_Scrollable", 4, "data\\graphics\\textures\\gui\\mainmenu\\sub_akt.png")
+	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_Scrollable", 4, 255, 255, 255, 255)
+	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_Settings_Scrollable", "StartMenu_TooltipText", true, true)
+	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_Settings_Scrollable", "data\\menu\\fonts\\mainmenularge.met")
+	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_Settings_Scrollable", 3)
+	XGUIEng.SetText("OptionsMenuCppLogic_Settings_Scrollable", "", 1)
+	XGUIEng.SetTextColor("OptionsMenuCppLogic_Settings_Scrollable", 255, 255, 255, 255)
+	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_Settings_Scrollable", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_Settings_Scrollable", false)
+	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenuCppLogic_Settings_Scrollable", function() ModLoaderMainmenu.UpdateSetting() end)
 	CppLogic.UI.ContainerWidgetCreateStaticTextWidgetChild("OptionsMenuCppLogic_Settings", "OptionsMenuCppLogic_Settings_Desc", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_Settings_Desc", 16, 11, 246, 377)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_Desc", 1)
@@ -862,69 +945,14 @@ function ModLoaderMainmenu.InitUI()
 	XGUIEng.SetText("OptionsMenuCppLogic_Settings_Desc", "", 1)
 	XGUIEng.SetTextColor("OptionsMenuCppLogic_Settings_Desc", 255, 255, 255, 255)
 	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_Settings_Desc", false)
-	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenuCppLogic_Settings_Desc", function()
-		ModLoaderMainmenu.UpdateActive()
-	end)
+	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenuCppLogic_Settings_Desc", function() ModLoaderMainmenu.UpdateDesc() end)
 	XGUIEng.SetLinesToPrint("OptionsMenuCppLogic_Settings_Desc", 0, 0)
 	CppLogic.UI.StaticTextWidgetSetLineDistanceFactor("OptionsMenuCppLogic_Settings_Desc", 0)
-	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic_Settings", "OptionsMenuCppLogic_Settings_IG", nil)
-	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_Settings_IG", 273, 63, 100, 47)
-	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_IG", 1)
-	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_Settings_IG", 0, false, false)
-	XGUIEng.DisableButton("OptionsMenuCppLogic_Settings_IG", 0)
-	XGUIEng.HighLightButton("OptionsMenuCppLogic_Settings_IG", 0)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_IG", 0, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_IG", 0, "data\\graphics\\textures\\gui\\mainmenu\\sub.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_IG", 0, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_IG", 1, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_IG", 1, "data\\graphics\\textures\\gui\\mainmenu\\sub_hi.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_IG", 1, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_IG", 2, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_IG", 2, "data\\graphics\\textures\\gui\\mainmenu\\sub_sel.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_IG", 2, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_IG", 3, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_IG", 3, "data\\graphics\\textures\\gui\\mainmenu\\sub_in.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_IG", 3, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_IG", 4, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_IG", 4, "data\\graphics\\textures\\gui\\mainmenu\\sub_akt.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_IG", 4, 255, 255, 255, 255)
-	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_Settings_IG", "StartMenu_TooltipText", true, true)
-	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_Settings_IG", "CppLogic_Mainmenu/IngameTT", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_Settings_IG", false)
-	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_Settings_IG", "data\\menu\\fonts\\mainmenularge.met")
-	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_Settings_IG", 3)
-	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_Settings_IG", "CppLogic_Mainmenu/Ingame")
-	XGUIEng.SetTextColor("OptionsMenuCppLogic_Settings_IG", 255, 255, 255, 255)
-	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_Settings_IG", true)
-	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenuCppLogic_Settings", "OptionsMenuCppLogic_Settings_MM", nil)
-	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_Settings_MM", 273, 113, 100, 47)
-	XGUIEng.ShowWidget("OptionsMenuCppLogic_Settings_MM", 1)
-	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_Settings_MM", 0, false, false)
-	XGUIEng.DisableButton("OptionsMenuCppLogic_Settings_MM", 0)
-	XGUIEng.HighLightButton("OptionsMenuCppLogic_Settings_MM", 0)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_MM", 0, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_MM", 0, "data\\graphics\\textures\\gui\\mainmenu\\sub.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_MM", 0, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_MM", 1, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_MM", 1, "data\\graphics\\textures\\gui\\mainmenu\\sub_hi.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_MM", 1, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_MM", 2, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_MM", 2, "data\\graphics\\textures\\gui\\mainmenu\\sub_sel.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_MM", 2, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_MM", 3, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_MM", 3, "data\\graphics\\textures\\gui\\mainmenu\\sub_in.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_MM", 3, 255, 255, 255, 255)
-	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenuCppLogic_Settings_MM", 4, 0, 0, 1, 1)
-	XGUIEng.SetMaterialTexture("OptionsMenuCppLogic_Settings_MM", 4, "data\\graphics\\textures\\gui\\mainmenu\\sub_akt.png")
-	XGUIEng.SetMaterialColor("OptionsMenuCppLogic_Settings_MM", 4, 255, 255, 255, 255)
-	CppLogic.UI.WidgetSetTooltipData("OptionsMenuCppLogic_Settings_MM", "StartMenu_TooltipText", true, true)
-	CppLogic.UI.WidgetSetTooltipString("OptionsMenuCppLogic_Settings_MM", "CppLogic_Mainmenu/MainmenuTT", true)
-	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenuCppLogic_Settings_MM", false)
-	CppLogic.UI.WidgetSetFont("OptionsMenuCppLogic_Settings_MM", "data\\menu\\fonts\\mainmenularge.met")
-	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenuCppLogic_Settings_MM", 3)
-	XGUIEng.SetTextKeyName("OptionsMenuCppLogic_Settings_MM", "CppLogic_Mainmenu/Mainmenu")
-	XGUIEng.SetTextColor("OptionsMenuCppLogic_Settings_MM", 255, 255, 255, 255)
-	CppLogic.UI.TextButtonSetCenterText("OptionsMenuCppLogic_Settings_MM", true)
+	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("OptionsMenuCppLogic_Settings", "OptionsMenuCppLogic_SettingsScroll", "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 1, 0,
+		0, 0, 0, 0, "", "OptionsMenuCppLogic_Settings_Scrollable")
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_SettingsScroll", 250, 0, 150, 400)
+	XGUIEng.ShowWidget("OptionsMenuCppLogic_SettingsScroll", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenuCppLogic_SettingsScroll", 0, false, false)
 	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenuCppLogic_MainContainer", "OptionsMenuCppLogic_BG", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenuCppLogic_BG", 16, 10, 679, 474)
 	XGUIEng.ShowWidget("OptionsMenuCppLogic_BG", 1)
@@ -963,22 +991,24 @@ function ModLoaderMainmenu.InitUI()
 
 
 
+
+
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_Resolution", 22, 277, 710, 247)
 
 
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtra")==0, "OptionsMenu30_ResExtra already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraList")==0, "OptionsMenu30_ResExtraList already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollableContainer")==0, "OptionsMenu30_ResExtraScrollableContainer already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollable")==0, "OptionsMenu30_ResExtraScrollable already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraUp")==0, "OptionsMenu30_ResExtraUp already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraDown")==0, "OptionsMenu30_ResExtraDown already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraSliderBG")==0, "OptionsMenu30_ResExtraSliderBG already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScroll")==0, "OptionsMenu30_ResExtraScroll already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollBar")==0, "OptionsMenu30_ResExtraScrollBar already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraSliderGfx")==0, "OptionsMenu30_ResExtraSliderGfx already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtra_BG")==0, "OptionsMenu30_ResExtra_BG already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraToggle")==0, "OptionsMenu30_ResExtraToggle already exists")
-	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResClamp")==0, "OptionsMenu30_ResClamp already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtra") == 0, "OptionsMenu30_ResExtra already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraList") == 0, "OptionsMenu30_ResExtraList already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollableContainer") == 0, "OptionsMenu30_ResExtraScrollableContainer already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollable") == 0, "OptionsMenu30_ResExtraScrollable already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraUp") == 0, "OptionsMenu30_ResExtraUp already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraDown") == 0, "OptionsMenu30_ResExtraDown already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraSliderBG") == 0, "OptionsMenu30_ResExtraSliderBG already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScroll") == 0, "OptionsMenu30_ResExtraScroll already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraScrollBar") == 0, "OptionsMenu30_ResExtraScrollBar already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraSliderGfx") == 0, "OptionsMenu30_ResExtraSliderGfx already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtra_BG") == 0, "OptionsMenu30_ResExtra_BG already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraToggle") == 0, "OptionsMenu30_ResExtraToggle already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResClamp") == 0, "OptionsMenu30_ResClamp already exists")
 	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenu30_Resolution", "OptionsMenu30_ResExtra", "OptionsMenu30_Resolution_Headline")
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtra", 0, 0, 710, 247)
 	XGUIEng.ShowWidget("OptionsMenu30_ResExtra", 1)
@@ -1073,7 +1103,8 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtraSliderBG", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialTexture("OptionsMenu30_ResExtraSliderBG", 0, "data\\graphics\\textures\\gui\\mainmenu\\center_scroll_bg.png")
 	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtraSliderBG", 0, 255, 255, 255, 255)
-	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraScroll", "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 4, 0, 0, 0, 0, 0, "OptionsMenu30_ResExtraSliderGfx", "OptionsMenu30_ResExtraScrollable")
+	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraScroll", "CppLogic::Mod::UI::AutoScrollCustomWidget", nil, 4, 0, 0, 0, 0,
+													   0, "OptionsMenu30_ResExtraSliderGfx", "OptionsMenu30_ResExtraScrollable")
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraScroll", 0, 0, 502, 207)
 	XGUIEng.ShowWidget("OptionsMenu30_ResExtraScroll", 1)
 	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraScroll", 0, false, false)
@@ -1156,6 +1187,4 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenu30_ResClamp", true)
 	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResClamp", false)
 	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenu30_ResClamp", function() ModLoaderMainmenu.UpdateClamp() end)
-
-
 end

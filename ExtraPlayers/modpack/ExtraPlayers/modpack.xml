@@ -8,7 +8,7 @@
 	<DataMod>false</DataMod>
 	<ScriptMod>true</ScriptMod>
 	<MainmenuMod>false</MainmenuMod>
-	<ScriptLib>false</ScriptLib>
 	<KeepArchive>false</KeepArchive>
 	<UserRequestable>false</UserRequestable>
+	<ScriptLib>false</ScriptLib>
 </root>

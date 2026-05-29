@@ -77,6 +77,7 @@ ModLoader = ModLoader or {}
 ---@class ModPack
 ---@field Manifest Manifest
 ---@field Init fun(ModpackDesc)|nil
+---@field Settings table<string,string|boolean>
 
 ---@class MLMapInfo
 ---@field MapName string
@@ -289,6 +290,7 @@ ModLoader.ManifestType = {
 			end
 			local entries = manifest[t.Key]
 			for k, v in pairs(entries) do
+				---@diagnostic disable-next-line: redundant-parameter
 				add(k, v)
 			end
 		end,
@@ -393,12 +395,17 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresTo
 		return true
 	end
 	for _, r in ipairs(req) do
-		local name, cmp = ModLoader.ParseModString(r)
+		local name, cmp, sett = ModLoader.ParseModString(r)
 		local found = false
 		for _, m in ipairs(modlist.Mods) do
 			if m.Name == name then
 				found = true
 				checkfail(cmp(m.Version), "mod version missmatch: requested "..r.." has "..m.Name.."@"..m.Version.." already loading")
+				for _,s in ipairs(m.Settings) do
+					if sett[s.Key] then
+						checkfail(sett[s.Key] == s.Set, "mod setting missmatch: requested "..r.." has "..s.Key.."="..s.Set.." already loading")
+					end
+				end
 				break
 			end
 		end
@@ -417,6 +424,11 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresTo
 					end
 				end
 				if good then
+					for _,s in ipairs(m.Settings) do
+						if sett[s.Key] then
+							s.Set = sett[s.Key] or s.Options[1]
+						end
+					end
 					table.insert(modlist.Mods, m)
 					for _, i in ipairs(m.Incompatible) do
 						local f = false
@@ -511,6 +523,19 @@ function ModLoader.InitMod(mod)
 	if mod.DataMod and mod.LoaderPath ~= "" then
 		Script.Load(mod.LoaderPath)
 		xpcall(function()
+			ModLoader[mod.Name].Settings = {}
+			for _,s in ipairs(mod.Settings) do
+				if s.Set == "true" then
+					---@diagnostic disable-next-line: undefined-field
+					ModLoader[mod.Name].Settings[s.Key] = true
+				elseif s.Set == "false" then
+					---@diagnostic disable-next-line: undefined-field
+					ModLoader[mod.Name].Settings[s.Key] = false
+				else
+					---@diagnostic disable-next-line: undefined-field
+					ModLoader[mod.Name].Settings[s.Key] = s.Set
+				end
+			end
 			---@diagnostic disable-next-line: undefined-field
 			ModLoader[mod.Name].Init(mod)
 		end, function(err)
@@ -594,16 +619,40 @@ function ModLoader.RequireModList()
 	end)
 end
 
---- stores modlist for savegames
----@param ml ModList
-function ModLoader.StoreModList(ml)
+--- serializes a modlist to a string
+---@param ml ModpackDesc[]
+---@param noVers boolean
+---@param select nil|fun(mp:ModpackDesc):boolean
+---@param defaultSetting boolean?
+---@return string
+function ModLoader.SerializeModList(ml, noVers, select, defaultSetting)
+	if not select then
+		select = function() return true end
+	end
 	local s = ""
-	for _,m in ipairs(ml.Mods) do
-		s = s..";"..m.Name.."@"..m.Version
+	for _,m in ipairs(ml) do
+		if select(m) then
+			s = s..";"..m.Name
+			if not noVers then
+				s = s.."@"..m.Version
+			end
+			for _,se in ipairs(m.Settings) do
+				if (se.Set or defaultSetting) and se.Key ~= "" then
+					s = s.."?"..se.Key.."="..(se.Set or se.Options[1])
+				end
+			end
+		end
 	end
 	if s == "" then
 		s = ";"
 	end
+	return s
+end
+
+--- stores modlist for savegames
+---@param ml ModList
+function ModLoader.StoreModList(ml)
+	local s = ModLoader.SerializeModList(ml.Mods, false, nil, true)
 	CppLogic.ModLoader.SetModPackList(s)
 end
 
@@ -616,7 +665,7 @@ function ModLoader.LoadModList(s)
 		return {}
 	end
 	local r = {}
-	for m in string.gfind(s, "([%w_/\\@<>=%.]+)") do
+	for m in string.gfind(s, "([%w_/\\@<>=%.\\?]+)") do
 		table.insert(r, m)
 	end
 	return r
@@ -626,8 +675,9 @@ end
 ---@param s string
 ---@return string name
 ---@return fun(v:string):boolean validate
+---@return table<string,string> settings
 function ModLoader.ParseModString(s)
-	local f,_, n, op, v = string.find(s, "^([%w_/\\]+)([@<>=]*)([%w_/\\%.]*)$")
+	local f,_, n, op, v, set = string.find(s, "^([%w_/\\]+)([@<>=]*)([%w_/\\%.]*)([\\?]?[%w\\?=]*)$")
 	if not f then
 		assert(false, "mod name is invalid: "..s)
 	end
@@ -697,7 +747,11 @@ function ModLoader.ParseModString(s)
 	if not cmp then
 		cmp = function() return true end
 	end
-	return n, cmp
+	local settings = {}
+	for k,v in string.gfind(set, "\\?(%w+)=(%w+)") do
+		settings[k] = v
+	end
+	return n, cmp, settings
 end
 
 --- loads script mods
@@ -726,7 +780,7 @@ function ModLoader.LoadScriptMod(name)
 	mod.Archive = CppLogic.ModLoader.LoadModpackBBA(name)
 	Script.Load(mod.ScriptPath)
 	if not mod.KeepArchive then
-		mod.Archive.Remove()
+		mod.Archive:Remove()
 	end
 	return mod
 end
@@ -736,7 +790,8 @@ end
 --- @return boolean
 function ModLoader.IsUserRequestedModWhitelisted(modname)
 	if modname == "test" or modname == "WideScreenMode" or modname == "BugFixes" or modname == "MPW_Core" or
-	modname == "MPW_CombatPlus" or modname == "MPW_AOE" or modname == "MPW_Territory" or modname == "QoL" or modname == "AdvancedUI" then
+	modname == "MPW_CombatPlus" or modname == "MPW_AOE" or modname == "MPW_Territory" or modname == "QoL" or modname == "AdvancedUI" or
+	modname == "ExtraUI" then
 		return true
 	end
 	if not ModLoader.UserRequestedModWhitelisted then

@@ -3915,21 +3915,33 @@ function RedirectLayerPopHelper:Get() end
 ---@param r string|nil
 function RedirectLayerPopHelper:Set(n, r) end
 
+---@class ModpackDescOption
+---@field Key string
+---@field Name string
+---@field Tooltip string
+---@field Options string[]
+---@field Set string?
+
 ---@class ModpackDesc
-local ModpackDesc = {
-	Name = "", BBAPath = "", LoaderPath = "", ScriptPath = "", MainmenuPath = "", Version = "",
-	Description = "",
-	---@type string[]
-	Required = {},
-	---@type string[]
-	Incompatible = {},
-	---@type string[]
-	Override = {},
-	DataMod = false, ScriptMod = false, MainmenuMod = false, KeepArchive = false,
-	UserRequestable = false, ScriptLib = false,
-	Archive = nil|ArchivePopHelper,
-	RedirectLayer = nil|RedirectLayerPopHelper
-}
+---@field Name string
+---@field BBAPath string
+---@field LoaderPath string
+---@field ScriptPath string
+---@field MainmenuPath string
+---@field Version string
+---@field Description string
+---@field Required string[]
+---@field Incompatible string[]
+---@field Override string[]
+---@field Settings ModpackDescOption[]
+---@field DataMod boolean
+---@field ScriptMod boolean
+---@field MainmenuMod boolean
+---@field KeepArchive boolean
+---@field UserRequestable boolean
+---@field ScriptLib boolean
+---@field Archive nil|ArchivePopHelper
+---@field RedirectLayer nil|RedirectLayerPopHelper
 
 --- gets info for a ModPack (mostly from its ModPack.xml).
 ---@param name string

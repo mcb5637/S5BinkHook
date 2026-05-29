@@ -145,6 +145,8 @@ namespace CppLogic::Serializer {
 			luaext::FuncReference::GetRef<AsSubClass<BBObjectAccess>>("AsObjectAccess"),
 			luaext::FuncReference::GetRef<AsSubClass<ListAccess>>("AsListAccess"),
 		};
+
+		static constexpr bool UserClassMetaMethods = true;
 	};
 
 	class FieldAccess : public ObjectAccess {

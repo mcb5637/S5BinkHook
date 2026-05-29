@@ -1608,6 +1608,16 @@ std::string CppLogic::ModLoader::ModLoader::GetModPackPath(std::string_view n)
 }
 
 CreateSerializationListFor(CppLogic::ModLoader::ModpackDesc, Required);
+CreateSerializationListFor(CppLogic::ModLoader::ModpackDesc, Settings);
+
+
+const BB::SerializationData CppLogic::ModLoader::ModpackDesc::Setting::SerializationData[] {
+	AutoMemberSerialization(ModpackDesc::Setting, Key),
+	AutoMemberSerialization(ModpackDesc::Setting, Name),
+	AutoMemberSerialization(ModpackDesc::Setting, Tooltip),
+	AutoMemberSerialization(ModpackDesc::Setting, Options),
+	BB::SerializationData::GuardData(),
+};
 
 const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[]{
 	AutoMemberSerialization(ModpackDesc, LoaderPath),
@@ -1618,6 +1628,7 @@ const BB::SerializationData CppLogic::ModLoader::ModpackDesc::SerializationData[
 	AutoMemberSerialization(ModpackDesc, Required),
 	AutoMemberSerialization(ModpackDesc, Incompatible),
 	AutoMemberSerialization(ModpackDesc, Override),
+	AutoMemberSerialization(ModpackDesc, Settings),
 	AutoMemberSerialization(ModpackDesc, DataMod),
 	AutoMemberSerialization(ModpackDesc, ScriptMod),
 	AutoMemberSerialization(ModpackDesc, MainmenuMod),

@@ -362,6 +362,13 @@ bool CppLogic::Iterator::EntityPredicateOfAnyTypeSpan::Matches(const EGL::CGLEEn
 	return false;
 }
 
+CppLogic::Iterator::EntityPredicateInSector::EntityPredicateInSector(shok::SectorId s) :Sect(s) {
+}
+
+bool CppLogic::Iterator::EntityPredicateInSector::Matches(const EGL::CGLEEntity *e, float *rangeOut, int *prio) const {
+	return e->IsInSector(Sect);
+}
+
 CppLogic::Iterator::EffectPredicateOfType::EffectPredicateOfType(shok::EffectTypeId ty)
 {
 	Type = ty;

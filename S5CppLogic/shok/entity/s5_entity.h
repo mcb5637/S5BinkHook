@@ -120,8 +120,8 @@ namespace EGL {
 	public:
 		virtual void SetPosition(shok::Position* p) = 0; // 10 works for settlers, check if it does for other stuff to, called every tick
 		virtual void SetRotation(float r) = 0;
-		virtual shok::SectorId GetSector() = 0;
-		virtual bool IsInSector(shok::SectorId sec) = 0;
+		[[nodiscard]] virtual shok::SectorId GetSector() const = 0;
+		[[nodiscard]] virtual bool IsInSector(shok::SectorId sec) const = 0;
 	private:
 		virtual void Tick() = 0;
 	public:

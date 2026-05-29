@@ -1377,7 +1377,7 @@ function CppLogic.Entity.Predicates.IsBuilding() end
 --- creates a predicate that checks for building.
 --- matches the GGL::CConstructionSite as well as the GGL::CBuilding under construction.
 --- @return Predicate
-function CppLogic.Entity.Predicates.PredicateIsBuildingOrConstructionSite() end
+function CppLogic.Entity.Predicates.IsBuildingOrConstructionSite() end
 
 --- creates a predicate that checks for settlers.
 --- @return Predicate
@@ -1399,12 +1399,12 @@ function CppLogic.Entity.Predicates.OfEntityCategory(ecat) end
 --- creates a predicate that checks for any entitycategory.
 --- @param ecat number EntityCategory to check against
 --- @return Predicate
-function CppLogic.Entity.Predicates.PredicateOfAnyEntityCategory(ecat, ...) end
+function CppLogic.Entity.Predicates.OfAnyEntityCategory(ecat, ...) end
 
 --- creates a predicate that checks for any class.
 --- @param classid number ClassID to check against
 --- @return Predicate
-function CppLogic.Entity.Predicates.PredicateOfAnyClass(classid, ...) end
+function CppLogic.Entity.Predicates.OfAnyClass(classid, ...) end
 
 --- creates a predicate that checks for a provided resource.
 --- @param rty number ResourceType to check against
@@ -1450,7 +1450,12 @@ function CppLogic.Entity.Predicates.IsNotInBuilding() end
 
 --- creates a predicate that checks for buildings under construction
 --- @return Predicate
-function CppLogic.Entity.Predicates.PredicateIsConstructionSite() end
+function CppLogic.Entity.Predicates.IsConstructionSite() end
+
+--- creates a predicate that checks for sector (checks approach pos for buildings, and both ends for bridges)
+--- @param sec number
+--- @return Predicate
+function CppLogic.Entity.Predicates.IsInSector(sec) end
 
 ---@alias entity number|string
 

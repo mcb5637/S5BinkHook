@@ -136,6 +136,11 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int PredicateIsInSector(luaext::State L) {
+		L.NewUserClass<Iterator::EntityPredicateInSector>(static_cast<shok::SectorId>(L.CheckInt(1)));
+		return 1;
+	}
+
 	int PredicateIsCombatRelevant(luaext::State L) {
 		L.NewUserClass<CppLogic::Iterator::EntityPredicateIsCombatRelevant>();
 		return 1;
@@ -339,7 +344,7 @@ namespace CppLogic::Entity {
 
 	int CheckPredicate(luaext::State L) {
 		EGL::CGLEEntity* s = L.CheckEntity(1);
-		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
+		auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(2);
 		float r = -1;
 		int pr = -1;
 		L.Push(pred->Matches(s, &r, &pr));
@@ -1861,16 +1866,17 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<PredicateOfAnyEntityType>("OfAnyEntityType"),
 			luaext::FuncReference::GetRef<PredicateIsNotSoldier>("IsNotSoldier"),
 			luaext::FuncReference::GetRef<PredicateOfEntityCategory>("OfEntityCategory"),
-			luaext::FuncReference::GetRef<PredicateOfAnyEntityCategory>("PredicateOfAnyEntityCategory"),
-			luaext::FuncReference::GetRef<PredicateOfAnyClass>("PredicateOfAnyClass"),
+			luaext::FuncReference::GetRef<PredicateOfAnyEntityCategory>("OfAnyEntityCategory"),
+			luaext::FuncReference::GetRef<PredicateOfAnyClass>("OfAnyClass"),
 			luaext::FuncReference::GetRef<PredicateProvidesResource>("ProvidesResource"),
 			luaext::FuncReference::GetRef<PredicateInRect>("InRect"),
 			luaext::FuncReference::GetRef<PredicateIsVisible>("IsVisible"),
 			luaext::FuncReference::GetRef<PredicateOfUpgradeCategory>("OfUpgradeCategory"),
 			luaext::FuncReference::GetRef<PredicateIsAlive>("IsAlive"),
 			luaext::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
-			luaext::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("PredicateIsBuildingOrConstructionSite"),
-			luaext::FuncReference::GetRef<PredicateIsConstructionSite>("PredicateIsConstructionSite"),
+			luaext::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("IsBuildingOrConstructionSite"),
+			luaext::FuncReference::GetRef<PredicateIsConstructionSite>("IsConstructionSite"),
+			luaext::FuncReference::GetRef<PredicateIsInSector>("IsInSector"),
 	};
 
 	constexpr std::array Settlers {

@@ -161,16 +161,6 @@ function ModLoaderMainmenu.UpdateMod()
 	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), (mp.Active or mp == ModLoaderMainmenu.Scroll:GetSelected()) and 1 or 0)
 end
 
-function ModLoaderMainmenu.ActionActive()
-	---@type CPPLMMMod?
-	local mp = ModLoaderMainmenu.Scroll:GetSelected()
-	if not mp then
-		return
-	end
-	mp.Active = not mp.Active
-	ModLoaderMainmenu.StoreUserRequestedModpacks()
-end
-
 function ModLoaderMainmenu.ActionSelectMod()
 	ModLoaderMainmenu.Scroll:GUIAction_DefaultSelect()
 	local mp = ModLoaderMainmenu.Scroll:GetSelected()
@@ -191,6 +181,16 @@ function ModLoaderMainmenu.UpdateDesc()
 	XGUIEng.SetText("OptionsMenuCppLogic_Settings_Desc", mp.Description or "")
 end
 
+function ModLoaderMainmenu.SettingToggle(s, mp)
+	if s.Type == ModLoaderMainmenu.ModSettingType.Active then
+		mp.Active = not mp.Active
+		return true
+	elseif s.Type == ModLoaderMainmenu.ModSettingType.Boolean then
+		s.Set = (s.Set or s.Options[1]) == "true" and "false" or "true"
+		return true
+	end
+end
+
 function ModLoaderMainmenu.ActionSetting()
 	local w = XGUIEng.GetCurrentWidgetID()
 	---@type CPPLMMOption?
@@ -202,26 +202,12 @@ function ModLoaderMainmenu.ActionSetting()
 	if not mp then
 		return
 	end
-	if s.Type == ModLoaderMainmenu.ModSettingType.Active then
-		mp.Active = not mp.Active
-		ModLoaderMainmenu.StoreUserRequestedModpacks()
-	elseif s.Type == ModLoaderMainmenu.ModSettingType.Boolean then
-		s.Set = (s.Set or s.Options[1]) == "true" and "false" or "true"
+	if ModLoaderMainmenu.SettingToggle(s, mp) then
 		ModLoaderMainmenu.StoreUserRequestedModpacks()
 	end
 end
 
-function ModLoaderMainmenu.UpdateSetting()
-	local w = XGUIEng.GetCurrentWidgetID()
-	---@type CPPLMMOption?
-	local s = ModLoaderMainmenu.SettingsScroll:GetElementOf(w)
-	if not s then
-		return
-	end
-	local mp = ModLoaderMainmenu.Scroll:GetSelected()
-	if not mp then
-		return
-	end
+function ModLoaderMainmenu.SettingButtonUpdate(w, s, mp)
 	XGUIEng.SetText(w, s.Name)
 	CppLogic.UI.WidgetSetTooltipString(w, s.Tooltip, false)
 	local high = false
@@ -235,6 +221,20 @@ function ModLoaderMainmenu.UpdateSetting()
 		high = (s.Set or s.Options[1]) == "true"
 	end
 	XGUIEng.HighLightButton(w, high and 1 or 0)
+end
+
+function ModLoaderMainmenu.UpdateSetting()
+	local w = XGUIEng.GetCurrentWidgetID()
+	---@type CPPLMMOption?
+	local s = ModLoaderMainmenu.SettingsScroll:GetElementOf(w)
+	if not s then
+		return
+	end
+	local mp = ModLoaderMainmenu.Scroll:GetSelected()
+	if not mp then
+		return
+	end
+	ModLoaderMainmenu.SettingButtonUpdate(w, s, mp)
 end
 
 function ModLoaderMainmenu.IsSavegameValid(save)

@@ -96,7 +96,7 @@ function ModLoaderMainmenu.LoadModpacks()
 			end
 			---@type CPPLMMOption
 			local o = {
-				Key = "Active",
+				Key = "",
 				Name = XGUIEng.GetStringTableText("CppLogic_Mainmenu/On"),
 				Tooltip = XGUIEng.GetStringTableText("CppLogic_Mainmenu/OnTT"),
 				Type = ModLoaderMainmenu.ModSettingType.Active,

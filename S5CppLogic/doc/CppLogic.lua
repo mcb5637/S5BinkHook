@@ -405,6 +405,12 @@ function CppLogic.Memory.Effect(id)end
 ---@return CppBBObjectAccess
 function CppLogic.Memory.Player(pid)end
 
+---accesses a techs memory
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@param tid string|number
+---@return CppBBObjectAccess
+function CppLogic.Memory.Technology(tid)end
+
 --- reloads cutscenes from the specified path
 --- @param path string|nil optional, default "Maps\\ExternalMap"
 function CppLogic.Logic.ReloadCutscene(path) end

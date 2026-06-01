@@ -46,6 +46,12 @@ namespace CppLogic::Mem {
 		return 1;
 	}
 
+	int Technology(luaext::State L) {
+		auto id = L.CheckEnum<shok::TechnologyId>(1);
+		Serializer::ObjectAccess::PushObject(L, "Mem.GetTechnology", GetTechnology(id), shok::Technology::SerializationData);
+		return 1;
+	}
+
 	constexpr std::array Mem = {
 		luaext::FuncReference::GetRef<SetFPU>("SetFPU"),
 		luaext::FuncReference::GetRef<EntityType>("EntityType"),
@@ -53,6 +59,7 @@ namespace CppLogic::Mem {
 		luaext::FuncReference::GetRef<EffectType>("EffectType"),
 		luaext::FuncReference::GetRef<Effect>("Effect"),
 		luaext::FuncReference::GetRef<Player>("Player"),
+		luaext::FuncReference::GetRef<Technology>("Technology"),
 	};
 
 	void Init(luaext::State L)

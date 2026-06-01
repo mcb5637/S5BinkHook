@@ -624,17 +624,31 @@ int CppLogic::Serializer::StructAccess::Fields(luaext::State L)
 }
 
 int CppLogic::Serializer::StructAccess::ByOffset(luaext::State L) {
-	auto* th = L.CheckUserClass<StructAccess>(1);
+	auto *th = L.CheckUserClass<StructAccess>(1);
 	if (th->Object == nullptr)
 		throw lua::LuaException("object null");
 	auto off = L.Check<size_t>(2);
-	Iter i{ th->Object, th->SeriData };
-	for (const auto& [obj, sd] : i) {
-		if (off >= sd->Position && off < sd->Position + sd->Size) {
-			PushSD(L, sd->SerializationName, obj, sd, th->Id, th->OnWrite);
-			L.Push(off - sd->Position);
-			return 2;
+	static constexpr std::optional<std::pair<void *, const BB::SerializationData *> > (*
+				find)(void *, const BB::SerializationData *, size_t) = [](
+		void *object, const BB::SerializationData *seridata,
+		size_t o) -> std::optional<std::pair<void *, const BB::SerializationData *> > {
+		Iter i{object, seridata};
+		for (const auto &[obj, sd]: i) {
+			if (o >= sd->Position && o < sd->Position + sd->Size) {
+				if (sd->Type == BB::SerializationData::Ty::Embedded && sd->ListOptions == nullptr) {
+					return find(obj, sd->SubElementData, o - sd->Position);
+				}
+				return std::pair{obj, sd};
+			}
 		}
+		return std::nullopt;
+	};
+	auto r = find(th->Object, th->SeriData, off);
+	if (r.has_value()) {
+		auto [obj, sd] = *r;
+		PushSD(L, sd->SerializationName, obj, sd, th->Id, th->OnWrite);
+		L.Push(off - sd->Position);
+		return 2;
 	}
 	return 0;
 }

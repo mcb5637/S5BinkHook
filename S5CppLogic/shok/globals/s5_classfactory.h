@@ -8,6 +8,7 @@
 #include <luaext.h>
 #include <variant>
 #include <utility/ConstexprString.h>
+#include <utility/EnumIdManagerMagic.h>
 
 namespace BB {
 	class IXmlSerializer {
@@ -261,6 +262,7 @@ namespace BB {
 
 			Ty Type;
 			std::string_view Name;
+			size_t ElementSize;
 			void* (*IndexNumeric)(void* List, size_t index);
 			void (*RemoveIf)(void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd);
 			bool (*InsertAt)(void* list, std::variant<size_t, bool(*)(void* uv, const BB::SerializationData* sd, void* elem)> cond, void(*write)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) = nullptr;
@@ -633,6 +635,7 @@ namespace CppLogic {
 			GetSize = &GetSizeImp;
 			Extended.Type = ExtendedInfo::Ty::Vector;
 			Extended.Name = typename_details::type_name<VectT>();
+			Extended.ElementSize = sizeof(T);
 			Extended.IndexNumeric = &Index;
 			Extended.RemoveIf = &RemoveIf;
 			Extended.InsertAt = &InsertAt;
@@ -728,6 +731,7 @@ namespace CppLogic {
 			GetSize = &GetSizeImp;
 			Extended.Type = ExtendedInfo::Ty::Map;
 			Extended.Name = typename_details::type_name<VectT>();
+			Extended.ElementSize = sizeof(std::pair<K, V>);
 			Extended.IndexNumeric = nullptr;
 			Extended.RemoveIf = &RemoveIf;
 			RegisterExtended(Extended);
@@ -892,6 +896,10 @@ namespace CppLogic {
 		if (mng == nullptr)
 			throw std::runtime_error{"shok::ClassId manager not yet initialized"};
 		return ClassIdManager{mng};
+	}
+	template<>
+	inline auto GetIdManager<BB::SerializationListOptions::ExtendedInfo::Ty>() {
+		return CppLogic::MagicEnum::EnumIdManager<BB::SerializationListOptions::ExtendedInfo::Ty>{};
 	}
 }
 

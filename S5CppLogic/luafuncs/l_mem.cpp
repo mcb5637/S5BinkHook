@@ -69,5 +69,8 @@ namespace CppLogic::Mem {
 		L.Push("ObjectAccessType");
 		CppLogic::GetIdManager<CppLogic::Serializer::ObjectAccess::Type>().PushToState(L);
 		L.SetTableRaw(-3);
+		L.Push("ListAccessType");
+		CppLogic::GetIdManager<BB::SerializationListOptions::ExtendedInfo::Ty>().PushToState(L);
+		L.SetTableRaw(-3);
 	}
 }

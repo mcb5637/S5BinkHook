@@ -271,6 +271,20 @@ CppLogic.Memory.ObjectAccessType = {
 	List = 3,
 }
 
+---@enum CppListAccessType
+CppLogic.Memory.ListAccessType = {
+	-- supports Elements, Size, First, Insert, ElementSize
+	Unknown = 0,
+	-- supports Elements, Size, First, Insert, ElementSize, [], Remove, conditionally supports InsertAt
+	Vector = 1,
+	-- supports Elements, Size, First, Insert, ElementSize, Remove
+	Map = 2,
+	-- supports Elements, Size, First, Insert, ElementSize
+	Array = 3,
+	-- supports Elements, Size, First, Insert, ElementSize
+	List = 4,
+}
+
 ---@class CppObjectAccess
 CppObjectAccess = {}
 --- gets the name of the current seridata
@@ -332,8 +346,10 @@ CppBBObjectAccess = {}
 --- type of this access object
 ---@return `CppLogic.Memory.ObjectAccessType.BBObject`
 function CppBBObjectAccess:GetType()end
----resturns the type of the pointed to object
----@return string?
+---returns the type of the pointed to object
+---@return string? className
+---@return number? classId
+---@return number? vtp
 function CppBBObjectAccess:ObjectType()end
 ---allocates a new object and replaces the old one with it
 ---@param classname string? nil->nullptr
@@ -344,6 +360,7 @@ function CppBBObjectAccess:New(classname, free)end
 function CppBBObjectAccess:IsNullptr()end
 
 ---@class CppListAccess : CppObjectAccess
+---@field [number] CppStructAccess? gets the element at a specific index
 CppListAccess = {}
 --- type of this access object
 ---@return `CppLogic.Memory.ObjectAccessType.List`
@@ -367,13 +384,19 @@ function CppListAccess:Insert(writer)end
 ---@param fun fun(elem:CppObjectAccess):boolean
 function CppListAccess:Remove(fun)end
 ---gets the list type, if known
----@return number
+---@return CppListAccessType
 ---@return string
 function CppListAccess:ListType()end
 ---inserts a new element into the list at a specific position
+---(not supported by all list types)
 ---@param writer fun(toinsert:CppObjectAccess)
 ---@param inFrontOf number|fun(elem:CppObjectAccess):boolean
 function CppListAccess:InsertAt(inFrontOf, writer)end
+---gets the size of a single element and all of them combined (without maintenance overhead like in a map)
+---(not supported by all list types)
+---@return number singleElementSize
+---@return number listSize
+function CppListAccess:ElementSize()end
 
 ---accesses an entitytypes memory
 ---warning: has no semantic checks, it is easy to crash your game by modifying memory!

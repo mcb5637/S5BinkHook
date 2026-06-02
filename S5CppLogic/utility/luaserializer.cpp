@@ -729,11 +729,12 @@ int CppLogic::Serializer::BBObjectAccess::ObjectType(luaext::State L)
 		id = th->SeriData->GetIdentifier(th->Object);
 	}
 	else {
-		id = (reinterpret_cast<const BB::IObject*>(th->Object))->GetClassIdentifier();
+		id = static_cast<const BB::IObject*>(th->Object)->GetClassIdentifier();
 	}
 	L.Push((*BB::CClassFactory::GlobalObj)->GetClassDemangledName(id));
 	L.Push(static_cast<double>(static_cast<unsigned int>(id)));
-	return 2;
+	L.Push(*static_cast<int*>(th->Object));
+	return 3;
 }
 
 int CppLogic::Serializer::BBObjectAccess::New(luaext::State L)
@@ -915,6 +916,14 @@ int CppLogic::Serializer::ListAccess::InsertAt(luaext::State L) {
 	}
 	L.Push(l);
 	return 1;
+}
+
+int CppLogic::Serializer::ListAccess::ElementSize(luaext::State L) {
+	auto* th = L.CheckUserClass<ListAccess>(1);
+	const auto& inf = th->SeriData->ListOptions->GetExtendedInfo();
+	L.Push(inf.ElementSize);
+	L.Push(th->SeriData->ListOptions->GetSize(th->Object) * inf.ElementSize);
+	return 2;
 }
 
 int CppLogic::Serializer::ListAccess::Index(luaext::State L)

@@ -246,6 +246,7 @@ namespace CppLogic::Serializer {
 		static int Remove(luaext::State L);
 		static int ListType(luaext::State L);
 		static int InsertAt(luaext::State L);
+		static int ElementSize(luaext::State L);
 
 		static int ElementsNext(luaext::State L);
 
@@ -264,6 +265,7 @@ namespace CppLogic::Serializer {
 			luaext::FuncReference::GetRef<Remove>("Remove"),
 			luaext::FuncReference::GetRef<ListType>("ListType"),
 			luaext::FuncReference::GetRef<InsertAt>("InsertAt"),
+			luaext::FuncReference::GetRef<ElementSize>("ElementSize"),
 		};
 
 	private:

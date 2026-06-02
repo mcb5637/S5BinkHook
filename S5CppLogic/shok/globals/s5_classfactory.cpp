@@ -684,6 +684,7 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEVec() {
 	return BB::SerializationListOptions::ExtendedInfo{
 		BB::SerializationListOptions::ExtendedInfo::Ty::Vector,
 		typename_details::type_name<shok::Vector<T>>(),
+		sizeof(T),
 		[](void* List, size_t index) -> void* {
 			auto* v = static_cast<shok::Vector<T>*>(List);
 			T* r = nullptr;
@@ -707,6 +708,7 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEMap() {
 	return BB::SerializationListOptions::ExtendedInfo{
 		BB::SerializationListOptions::ExtendedInfo::Ty::Map,
 		typename_details::type_name<shok::Map<K, V>>(),
+		sizeof(std::pair<K, V>),
 		nullptr,
 		[](void* List, bool(*cond)(void* uv, const BB::SerializationData* sd, void* elem), void* uv, const BB::SerializationData* sd) {
 			auto* v = reinterpret_cast<shok::Map<K, V>*>(List);
@@ -725,6 +727,7 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEArray() {
 	return BB::SerializationListOptions::ExtendedInfo{
 		BB::SerializationListOptions::ExtendedInfo::Ty::Array,
 		typename_details::type_name<shok::Array<K, S>>(),
+		sizeof(K),
 		nullptr,
 		nullptr, // TODO
 	};
@@ -734,6 +737,7 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEList() {
 	return BB::SerializationListOptions::ExtendedInfo{
 		BB::SerializationListOptions::ExtendedInfo::Ty::List,
 		typename_details::type_name<shok::List<K>>(),
+		sizeof(K),
 		nullptr,
 		nullptr, // TODO
 	};

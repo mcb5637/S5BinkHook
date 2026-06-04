@@ -173,7 +173,7 @@ namespace CppLogic::EntityType {
 			L.Push(a->DamageAmount);
 			L.Push(a->DamageClass);
 			L.Push(0);
-			return 0;
+			return 3;
 		}
 		throw lua::LuaException("no battle or autocannon entity type at 1");
 	}
@@ -383,13 +383,15 @@ namespace CppLogic::EntityType {
 			auto* s = static_cast<GGL::CGLSettlerProps *>(t->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
 			L.Push(s->ArmorAmount);
 			L.Push(s->ArmorClass);
-			return 2;
+			L.Push(s->DodgeChance);
+			return 3;
 		}
 		if (t->IsBuildingType()) {
 			auto* s = static_cast<GGL::CGLBuildingProps *>(t->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
 			L.Push(s->ArmorAmount);
 			L.Push(s->ArmorClass);
-			return 2;
+			L.Push(0);
+			return 3;
 		}
 		throw lua::LuaException("no settler or building entity type at 1");
 	}
@@ -824,6 +826,21 @@ namespace CppLogic::EntityType {
 		return 1;
 	}
 
+	int GetDodgeModifierTechs(luaext::State L) {
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		auto* s = dynamic_cast<GGL::CGLSettlerProps*>(t->LogicProps);
+		if (!s)
+			throw lua::LuaException("no settler entity at 1");
+		L.NewTable();
+		int c = 1;
+		for (auto i : s->ModifyDodge.TechList) {
+			L.Push(i);
+			L.SetTableRaw(-2, c);
+			c++;
+		}
+		return 1;
+	}
+
 	int AddHPTechMod(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("not supportet with SCELoader");
@@ -1008,6 +1025,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<GetDamageModifierTechs>("GetDamageModifierTechs"),
 			luaext::FuncReference::GetRef<GetMaxRangeModifierTechs>("GetMaxRangeModifierTechs"),
 			luaext::FuncReference::GetRef<GetSpeedModifierTechs>("GetSpeedModifierTechs"),
+			luaext::FuncReference::GetRef<GetDodgeModifierTechs>("GetDodgeModifierTechs"),
 			luaext::FuncReference::GetRef<LeaderTypeGetMaxNumberOfSoldiers>("LeaderTypeGetMaxNumberOfSoldiers"),
 			luaext::FuncReference::GetRef<GetUpgradeCategory>("GetUpgradeCategory"),
 			luaext::FuncReference::GetRef<DumpBattleBehavior>("DumpBattleBehavior"),

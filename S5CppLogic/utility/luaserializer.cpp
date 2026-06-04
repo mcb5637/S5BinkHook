@@ -628,26 +628,26 @@ int CppLogic::Serializer::StructAccess::ByOffset(luaext::State L) {
 	if (th->Object == nullptr)
 		throw lua::LuaException("object null");
 	auto off = L.Check<size_t>(2);
-	static constexpr std::optional<std::pair<void *, const BB::SerializationData *> > (*
+	static constexpr std::optional<std::tuple<void *, const BB::SerializationData *, size_t> > (*
 				find)(void *, const BB::SerializationData *, size_t) = [](
 		void *object, const BB::SerializationData *seridata,
-		size_t o) -> std::optional<std::pair<void *, const BB::SerializationData *> > {
+		size_t o) -> std::optional<std::tuple<void *, const BB::SerializationData *, size_t> > {
 		Iter i{object, seridata};
 		for (const auto &[obj, sd]: i) {
 			if (o >= sd->Position && o < sd->Position + sd->Size) {
 				if (sd->Type == BB::SerializationData::Ty::Embedded && sd->ListOptions == nullptr) {
 					return find(obj, sd->SubElementData, o - sd->Position);
 				}
-				return std::pair{obj, sd};
+				return std::tuple{obj, sd, o - sd->Position};
 			}
 		}
 		return std::nullopt;
 	};
 	auto r = find(th->Object, th->SeriData, off);
 	if (r.has_value()) {
-		auto [obj, sd] = *r;
+		auto [obj, sd, o] = *r;
 		PushSD(L, sd->SerializationName, obj, sd, th->Id, th->OnWrite);
-		L.Push(off - sd->Position);
+		L.Push(o);
 		return 2;
 	}
 	return 0;

@@ -434,6 +434,11 @@ function CppLogic.Memory.Player(pid)end
 ---@return CppBBObjectAccess
 function CppLogic.Memory.Technology(tid)end
 
+---accesses the GGL::CLogicProperties (aka config/logic.xml)
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@return CppBBObjectAccess
+function CppLogic.Memory.LogicProperties()end
+
 --- reloads cutscenes from the specified path
 --- @param path string|nil optional, default "Maps\\ExternalMap"
 function CppLogic.Logic.ReloadCutscene(path) end
@@ -2010,6 +2015,16 @@ function CppLogic.Entity.Settler.SettlerGetSummoned(id) end
 --- @return number
 function CppLogic.Entity.Settler.GetRandomDamageBonus(id)end
 
+--- dodge chance (to evade melee attacks)
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetDodgeChance(id)end
+
+--- level dependent dodge chance (to evade melee attacks)
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetLeveledDodgeBonus(id)end
+
 --- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
 --- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).
 --- the tasklist TL_SCRIPT_ANIMATION gets created at first use, it may not be there before you call this func.
@@ -2359,6 +2374,7 @@ function CppLogic.EntityType.SetAutoAttackRange(ty, maxrange, minrange) end
 --- @param ty number entitytype
 --- @return number armor
 --- @return number armorclass
+--- @return number dodgeChance
 function CppLogic.EntityType.GetArmor(ty) end
 --- settler or building type armor and armorclass.
 --- @param ty number entitytype
@@ -2667,21 +2683,26 @@ function CppLogic.EntityType.Settler.GetCost(ty) end
 --- @param ignoreZeroes boolean should zeroes get ignored (optional)
 function CppLogic.EntityType.Settler.SetCost(ty, c, ignoreZeroes) end
 
---- settler or building type damage modifier techs.
+--- settler type damage modifier techs.
 --- @param ty number entitytype
 --- @return number[] damageTechs
 --- @return number[] randomDamageTechs
 function CppLogic.EntityType.Settler.GetDamageModifierTechs(ty) end
 
---- settler or building type max range modifier techs.
+--- settler  type max range modifier techs.
 --- @param ty number entitytype
 --- @return number[]
 function CppLogic.EntityType.Settler.GetMaxRangeModifierTechs(ty) end
 
---- settler or building type speed modifier techs.
+--- settler type speed modifier techs.
 --- @param ty number entitytype
 --- @return number[]
 function CppLogic.EntityType.Settler.GetSpeedModifierTechs(ty) end
+
+--- settler type dodge chance modifier techs.
+--- @param ty number entitytype
+--- @return number[]
+function CppLogic.EntityType.Settler.GetDodgeModifierTechs(ty) end
 
 --- leader type initial max number of soldiers.
 --- @param ty number entitytype
@@ -2792,6 +2813,11 @@ function CppLogic.Technology.GetRangeModifier(tid) end
 --- @return number operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
 --- @return number value
 function CppLogic.Technology.GetSpeedModifier(tid) end
+--- technology dodge modifier.
+--- @param tid number tech id
+--- @return number operator ( + -> 43, - -> 45, * -> 42, / -> 47, # (off) -> 35)
+--- @return number value
+function CppLogic.Technology.GetDodgeModifier(tid) end
 
 --- adds a construction time modifier to a technology.
 --- default modifier is 1.0, smaller modifiers lead to faster construction.

@@ -52,6 +52,11 @@ namespace CppLogic::Mem {
 		return 1;
 	}
 
+	int LogicProperties(luaext::State L) {
+		Serializer::ObjectAccess::PushObject(L, "Mem.LogicProperties", *GGL::CLogicProperties::GlobalObj);
+		return 1;
+	}
+
 	constexpr std::array Mem = {
 		luaext::FuncReference::GetRef<SetFPU>("SetFPU"),
 		luaext::FuncReference::GetRef<EntityType>("EntityType"),
@@ -60,6 +65,7 @@ namespace CppLogic::Mem {
 		luaext::FuncReference::GetRef<Effect>("Effect"),
 		luaext::FuncReference::GetRef<Player>("Player"),
 		luaext::FuncReference::GetRef<Technology>("Technology"),
+		luaext::FuncReference::GetRef<LogicProperties>("LogicProperties"),
 	};
 
 	void Init(luaext::State L)

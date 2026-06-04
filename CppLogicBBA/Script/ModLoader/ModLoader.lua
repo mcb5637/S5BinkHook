@@ -525,15 +525,16 @@ function ModLoader.InitMod(mod)
 		xpcall(function()
 			ModLoader[mod.Name].Settings = {}
 			for _,s in ipairs(mod.Settings) do
-				if s.Set == "true" then
+				local o = s.Set or s.Options[1]
+				if o == "true" then
 					---@diagnostic disable-next-line: undefined-field
 					ModLoader[mod.Name].Settings[s.Key] = true
-				elseif s.Set == "false" then
+				elseif o == "false" then
 					---@diagnostic disable-next-line: undefined-field
 					ModLoader[mod.Name].Settings[s.Key] = false
 				else
 					---@diagnostic disable-next-line: undefined-field
-					ModLoader[mod.Name].Settings[s.Key] = s.Set
+					ModLoader[mod.Name].Settings[s.Key] = o
 				end
 			end
 			---@diagnostic disable-next-line: undefined-field

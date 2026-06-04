@@ -734,6 +734,21 @@ namespace CppLogic::Entity {
 		return {lvl->DamageAmount, lvl->DamageBonus};
 	}
 
+	int SettlerGetDodgeChance(GGL::CSettler* s) {
+		return s->GetDodgeChance();
+	}
+
+	std::optional<float> SettlerGetLeveledDodgeBonus(GGL::CSettler* s) {
+		if (s->ModifierProfile.EntityReference.ExperienceClass == shok::ExperienceClass::Invalid)
+			return std::nullopt;
+		if (s->ModifierProfile.ExperienceLevel.Value <= 0)
+			return 0.0f;
+		auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
+		if (lvl == nullptr)
+			return 0.0f;;
+		return lvl->DodgeChance;
+	}
+
 	int BuildingMarketGetCurrentTradeData(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		auto* m = b->GetBehavior<GGL::CMarketBehavior>();
@@ -1978,6 +1993,8 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<WorkerGetResourceCarried>("WorkerGetResourceCarried"),
 			luaext::FuncReference::GetRef<SettlerGetSummoned>("SettlerGetSummoned"),
 			luaext::FuncReference::GetRef<SettlerGetRandomDamageBonus>("GetRandomDamageBonus"),
+			luaext::FuncReference::GetRef<SettlerGetDodgeChance>("GetDodgeChance"),
+			luaext::FuncReference::GetRef<SettlerGetLeveledDodgeBonus>("GetLeveledDodgeBonus"),
 	};
 
 	constexpr std::array Leader{

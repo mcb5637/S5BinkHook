@@ -65,39 +65,123 @@ GGL::CDamageClassProps* GGL::DamageClassesHolder::Get(shok::DamageClassId id)
 }
 
 GGL::CLogicProperties::SSettlerUpgradeCategory::SSettlerUpgradeCategory(shok::UpgradeCategoryId cat, shok::EntityTypeId first)
+    : Category(cat), FirstSettler(first)
 {
     *reinterpret_cast<int*>(this) = vtp;
-    Category = cat;
-    FirstSettler = first;
 }
 GGL::CLogicProperties::SSettlerUpgradeCategory::SSettlerUpgradeCategory(SSettlerUpgradeCategory&& o) noexcept
+    : Category(o.Category), FirstSettler(o.FirstSettler)
 {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
+GGL::CLogicProperties::SSettlerUpgradeCategory & GGL::CLogicProperties::SSettlerUpgradeCategory::operator=(
+    SSettlerUpgradeCategory && o) noexcept {
     *reinterpret_cast<int*>(this) = vtp;
     Category = o.Category;
     FirstSettler = o.FirstSettler;
+    return *this;
 }
+
+shok::ClassId GGL::CLogicProperties::STaxationLevel::GetClassIdentifier() const {
+    return Identifier;
+}
+
+GGL::CLogicProperties::STaxationLevel::STaxationLevel() {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
+GGL::CLogicProperties::STaxationLevel::STaxationLevel(STaxationLevel &&o) noexcept
+    : RegularTax(o.RegularTax), MotivationChange(o.MotivationChange) {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
+GGL::CLogicProperties::STaxationLevel & GGL::CLogicProperties::STaxationLevel::operator=(STaxationLevel && o) noexcept {
+    *reinterpret_cast<int*>(this) = vtp;
+    MotivationChange = o.MotivationChange;
+    RegularTax = o.RegularTax;
+    return *this;
+}
+
+shok::ClassId GGL::CLogicProperties::STradeResource::GetClassIdentifier() const {
+    return Identifier;
+}
+
+GGL::CLogicProperties::STradeResource::STradeResource() {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
+GGL::CLogicProperties::STradeResource::STradeResource(STradeResource &&o) noexcept
+    : ResourceType(o.ResourceType), BasePrice(o.BasePrice), MinPrice(o.MinPrice), MaxPrice(o.MaxPrice),
+    Inflation(o.Inflation), Deflation(o.Deflation), WorkAmount(o.WorkAmount) {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
+GGL::CLogicProperties::STradeResource & GGL::CLogicProperties::STradeResource::operator=(STradeResource &&o) noexcept {
+    *reinterpret_cast<int*>(this) = vtp;
+    ResourceType = o.ResourceType;
+    BasePrice = o.BasePrice;
+    MinPrice = o.MinPrice;
+    MaxPrice = o.MaxPrice;
+    Inflation = o.Inflation;
+    Deflation = o.Deflation;
+    WorkAmount = o.WorkAmount;
+    return *this;
+}
+
+shok::ClassId GGL::CLogicProperties::SBlessCategory::GetClassIdentifier() const {
+	return Identifier;
+}
+GGL::CLogicProperties::SBlessCategory::SBlessCategory() {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+GGL::CLogicProperties::SBlessCategory::SBlessCategory(SBlessCategory&& o) noexcept
+	: Name(o.Name), RequiredFaith(o.RequiredFaith), EntityTypes(std::move(o.EntityTypes)) {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+GGL::CLogicProperties::SBlessCategory& GGL::CLogicProperties::SBlessCategory::operator=(SBlessCategory&& o) noexcept {
+    *reinterpret_cast<int*>(this) = vtp;
+	Name = o.Name;
+	RequiredFaith = o.RequiredFaith;
+	EntityTypes = std::move(o.EntityTypes);
+	return *this;
+}
+
 shok::ClassId GGL::CLogicProperties::SSettlerUpgradeCategory::GetClassIdentifier() const
 {
     return Identifier;
 }
 
+GGL::CLogicProperties::SSettlerUpgradeCategory::SSettlerUpgradeCategory() {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
 GGL::CLogicProperties::SBuildingUpgradeCategory::SBuildingUpgradeCategory(shok::UpgradeCategoryId cat, shok::EntityTypeId first)
+    : Category(cat), FirstBuilding(first)
 {
     *reinterpret_cast<int*>(this) = vtp;
-    Category = cat;
-    FirstBuilding = first;
-    NumScholars = 0;
 }
 GGL::CLogicProperties::SBuildingUpgradeCategory::SBuildingUpgradeCategory(SBuildingUpgradeCategory&& o) noexcept
+    : Category(o.Category), FirstBuilding(o.FirstBuilding), NumScholars(o.NumScholars)
 {
+    *reinterpret_cast<int*>(this) = vtp;
+}
+
+GGL::CLogicProperties::SBuildingUpgradeCategory & GGL::CLogicProperties::SBuildingUpgradeCategory::operator=(SBuildingUpgradeCategory&& o) noexcept {
     *reinterpret_cast<int*>(this) = vtp;
     Category = o.Category;
     FirstBuilding = o.FirstBuilding;
     NumScholars = o.NumScholars;
+    return *this;
 }
+
 shok::ClassId GGL::CLogicProperties::SBuildingUpgradeCategory::GetClassIdentifier() const
 {
     return Identifier;
+}
+
+GGL::CLogicProperties::SBuildingUpgradeCategory::SBuildingUpgradeCategory() {
+    *reinterpret_cast<int*>(this) = vtp;
 }
 
 static inline GGL::CLogicProperties::STradeResource* (__thiscall* const logicprops_gettraderes)(GGL::CLogicProperties* th, shok::ResourceType rt) = reinterpret_cast<GGL::CLogicProperties::STradeResource * (__thiscall*)(GGL::CLogicProperties*, shok::ResourceType)>(0x4B015F);

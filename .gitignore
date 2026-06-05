@@ -341,3 +341,4 @@ healthchecksdb
 /S5CppLogic/vcpkg_installed
 /CMakeUserPresets.json
 /conan_provider.cmake
+/.clang-format

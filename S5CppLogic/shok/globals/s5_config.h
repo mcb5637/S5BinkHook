@@ -63,8 +63,14 @@ namespace GGL {
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x9498E0E7);
 			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const;
 
+			SBuildingUpgradeCategory();
 			SBuildingUpgradeCategory(shok::UpgradeCategoryId car, shok::EntityTypeId first);
-			SBuildingUpgradeCategory(SBuildingUpgradeCategory&& o) noexcept;
+			SBuildingUpgradeCategory(const SBuildingUpgradeCategory& o) = delete;
+			SBuildingUpgradeCategory(SBuildingUpgradeCategory&&) noexcept;
+			SBuildingUpgradeCategory& operator=(const SBuildingUpgradeCategory& o) = delete;
+			SBuildingUpgradeCategory& operator=(SBuildingUpgradeCategory&& o) noexcept;
+
+			~SBuildingUpgradeCategory() = default;
 		};
 		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct SSettlerUpgradeCategory {
@@ -75,8 +81,13 @@ namespace GGL {
 			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x8DC75427);
 			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const;
 
+			SSettlerUpgradeCategory();
 			SSettlerUpgradeCategory(shok::UpgradeCategoryId cat, shok::EntityTypeId first);
 			SSettlerUpgradeCategory(SSettlerUpgradeCategory&& o) noexcept;
+			SSettlerUpgradeCategory(const SSettlerUpgradeCategory&) = delete;
+			SSettlerUpgradeCategory& operator=(const SSettlerUpgradeCategory&) = delete;
+			SSettlerUpgradeCategory& operator=(SSettlerUpgradeCategory&& o) noexcept;
+			~SSettlerUpgradeCategory() = default;
 		};
 		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct STaxationLevel {
@@ -84,7 +95,15 @@ namespace GGL {
 			float MotivationChange = 0.0f;
 
 			static inline constexpr int vtp = 0x76EF20;
-			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const = 0;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x571df1ad);
+			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const;
+
+			STaxationLevel();
+			STaxationLevel(STaxationLevel&& o) noexcept;
+			STaxationLevel(const STaxationLevel&) = delete;
+			STaxationLevel& operator=(const STaxationLevel&) = delete;
+			STaxationLevel& operator=(STaxationLevel&& o) noexcept;
+			~STaxationLevel() = default;
 		};
 		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct STradeResource {
@@ -92,7 +111,15 @@ namespace GGL {
 			float BasePrice = 0.0f, MinPrice = 0.0f, MaxPrice = 0.0f, Inflation = 0.0f, Deflation = 0.0f, WorkAmount = 0.0f;
 
 			static inline constexpr int vtp = 0x76EF28;
-			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const = 0;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x95dfc867);
+			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const;
+
+			STradeResource();
+			STradeResource(STradeResource&& o) noexcept;
+			STradeResource(const STradeResource&) = delete;
+			STradeResource& operator=(const STradeResource&) = delete;
+			STradeResource& operator=(STradeResource&& o) noexcept;
+			~STradeResource() = default;
 		};
 		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		struct SBlessCategory {
@@ -101,7 +128,15 @@ namespace GGL {
 			shok::Vector<shok::EntityTypeId> EntityTypes;
 
 			static inline constexpr int vtp = 0x76EFC4;
-			[[nodiscard]] virtual unsigned int GetClassIdentifier() const = 0;
+			static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x821fe867);
+			[[nodiscard]] virtual shok::ClassId GetClassIdentifier() const;
+
+			SBlessCategory();
+			SBlessCategory(SBlessCategory&& o) noexcept;
+			SBlessCategory(const SBlessCategory&) = delete;
+			SBlessCategory& operator=(const SBlessCategory&) = delete;
+			SBlessCategory& operator=(SBlessCategory&& o) noexcept;
+			~SBlessCategory() = default;
 		};
 
 		int CompensationOnBuildingSale = 100;

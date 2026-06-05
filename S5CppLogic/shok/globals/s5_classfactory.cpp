@@ -746,11 +746,11 @@ BB::SerializationListOptions::ExtendedInfo MakeLOEList() {
 BB::SerializationListOptions::ExtendedInfo LOE_VecInt = MakeLOEVec<int>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecBBObj = MakeLOEVec<BB::IObject*>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecAARect = MakeLOEVec<shok::AARect>();
-//BB::SerializationListOptions::ExtendedInfo LOE_VecBuildingUp = MakeLOEVec<GGL::CLogicProperties::SBuildingUpgradeCategory>();
-//BB::SerializationListOptions::ExtendedInfo LOE_VecSettlerUp = MakeLOEVec<GGL::CLogicProperties::SSettlerUpgradeCategory>();
-//BB::SerializationListOptions::ExtendedInfo LOE_VecTaxLvl = MakeLOEVec<GGL::CLogicProperties::STaxationLevel>();
-//BB::SerializationListOptions::ExtendedInfo LOE_VecTradeRes = MakeLOEVec<GGL::CLogicProperties::STradeResource>();
-//BB::SerializationListOptions::ExtendedInfo LOE_VecBlessCat = MakeLOEVec<GGL::CLogicProperties::SBlessCategory>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecBuildingUp = MakeLOEVec<GGL::CLogicProperties::SBuildingUpgradeCategory>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecSettlerUp = MakeLOEVec<GGL::CLogicProperties::SSettlerUpgradeCategory>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecTaxLvl = MakeLOEVec<GGL::CLogicProperties::STaxationLevel>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecTradeRes = MakeLOEVec<GGL::CLogicProperties::STradeResource>();
+BB::SerializationListOptions::ExtendedInfo LOE_VecBlessCat = MakeLOEVec<GGL::CLogicProperties::SBlessCategory>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecPos = MakeLOEVec<shok::Position>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecPosR = MakeLOEVec<shok::PositionRot>();
 BB::SerializationListOptions::ExtendedInfo LOE_VecTradeResData = MakeLOEVec<GGL::CTradeManager::ResData>();
@@ -812,11 +812,11 @@ auto& KnownListInfos() {
 		{0x898240, &LOE_VecBBObj},
 		{0x8989d4, &LOE_VecBBObj},
 		{0x85dcc8, &LOE_VecAARect},
-		/*{0x860868, &LOE_VecBuildingUp}, needs copy operators
+		{0x860868, &LOE_VecBuildingUp},
 		{0x86088c, &LOE_VecSettlerUp},
 		{0x8608b0, &LOE_VecTaxLvl},
 		{0x8608d4, &LOE_VecTradeRes},
-		{0x86098c, &LOE_VecBlessCat},*/
+		{0x86098c, &LOE_VecBlessCat},
 		{0x865fc8, &LOE_VecPos},
 		{0x869100, &LOE_VecTradeResData},
 		{0x86f2b0, &LOE_VecWorkModifier},

@@ -44,6 +44,11 @@ if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "X86")
     message(FATAL_ERROR "needs x86")
 endif()
 
+file(DOWNLOAD "https://github.com/mcb5637/Luapp/raw/refs/heads/master/.clang-format"
+    "${CMAKE_SOURCE_DIR}/.clang-format"
+    TLS_VERIFY ON
+)
+
 add_library(LuaDebugger SHARED
         S5CppLogic/dllmain.cpp
         S5CppLogic/luaext.cpp

@@ -89,7 +89,7 @@ namespace CppLogic::Logic {
 
 
 	int NetEventReadBack(luaext::State L) {
-		auto* ev = static_cast<BB::CEvent*>(L.ToUserdata(L.Upvalueindex(1)));
+		auto* ev = static_cast<BB::CEvent*>(L.ToUserdata(L.UpvalueIndex(1)));
 		L.PushValue(1);
 		L.Push("EventType");
 		L.Push();
@@ -742,7 +742,7 @@ namespace CppLogic::Logic {
 		bool HasSetTl, HasMoved, Ret;
 	};
 	int SetLuaTaskListFunc_Move(luaext::State L) {
-		auto* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.Upvalueindex(1)));
+		auto* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.UpvalueIndex(1)));
 		shok::Position p = L.CheckPos(1);
 		EGL::CEventPosition e{ shok::EventIDs::Movement_TaskMoveToPos, p };
 		d->e->FireEvent(&e);
@@ -756,7 +756,7 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 	int SetLuaTaskListFunc_SetTl(luaext::State L) {
-		auto* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.Upvalueindex(1)));
+		auto* d = static_cast<SetLuaTaskListFunc_Info*>(L.ToUserdata(L.UpvalueIndex(1)));
 		auto tid = L.CheckEnum<shok::TaskListId>(1);
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(tid);
 		if (!tl)

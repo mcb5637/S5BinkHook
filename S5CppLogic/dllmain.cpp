@@ -391,7 +391,7 @@ std::string VersionString{ "failed loading version info" };
 int ResetCppLogic(luaext::State L) {
 	L.Push("CppLogic");
 	L.PushLightUserdata(&ResetCppLogic);
-	L.GetTableRaw(L.REGISTRYINDEX);
+	L.GetTableRaw(luaext::State::RegistryIndex);
 	L.SetGlobal();
 	return 0;
 }
@@ -424,7 +424,7 @@ void Install(luaext::State L) {
 
 	L.PushLightUserdata(&ResetCppLogic);
 	L.PushValue(-2);
-	L.SetTableRaw(L.REGISTRYINDEX);
+	L.SetTableRaw(luaext::State::RegistryIndex);
 
 	L.RegisterFunc<Nop>("OnLeaveMap", -3);
 	L.Push("Version");

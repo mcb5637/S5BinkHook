@@ -73,7 +73,7 @@ namespace CppLogic::Entity {
 			L.SetTableRaw(-2, i);
 		}
 		p->L = L.GetState();
-		p->r = L.Ref(L.REGISTRYINDEX);
+		p->r = L.Ref(luaext::State::RegistryIndex);
 		return 1;
 	}
 	void PredicateAndAutoCreate(luaext::State L) { // clear stack after creating and predicate
@@ -93,7 +93,7 @@ namespace CppLogic::Entity {
 			L.SetTableRaw(-2, i);
 		}
 		p->L = L.GetState();
-		p->r = L.Ref(L.REGISTRYINDEX);
+		p->r = L.Ref(luaext::State::RegistryIndex);
 		return 1;
 	}
 
@@ -102,7 +102,7 @@ namespace CppLogic::Entity {
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicateNot<EGL::CGLEEntity>>(pred);
 		L.PushValue(1);// keep predicate, so they dont get gced
 		p->L = L.GetState();
-		p->r = L.Ref(L.REGISTRYINDEX);
+		p->r = L.Ref(luaext::State::RegistryIndex);
 		return 1;
 	}
 
@@ -112,7 +112,7 @@ namespace CppLogic::Entity {
 		auto* p = L.NewUserClass<CppLogic::Iterator::PredicatePriority<EGL::CGLEEntity>>(pred, pri);
 		L.PushValue(1);// keep predicate, so they dont get gced
 		p->L = L.GetState();
-		p->r = L.Ref(L.REGISTRYINDEX);
+		p->r = L.Ref(luaext::State::RegistryIndex);
 		return 1;
 	}
 
@@ -252,7 +252,7 @@ namespace CppLogic::Entity {
 		// just expect no other c/c++ code will change the funcs upvalue
 		// make sure ManagedIterator is the first class inherited from the actual iterator and we do not use luapp inheritance here
 		// (both would break this simplified pointer)
-		auto* it = static_cast<CppLogic::Iterator::ManagedIterator<EGL::CGLEEntity>*>(L.ToUserdata(L.Upvalueindex(1)));
+		auto* it = static_cast<CppLogic::Iterator::ManagedIterator<EGL::CGLEEntity>*>(L.ToUserdata(L.UpvalueIndex(1)));
 		float r = -1;
 		int p = -1;
 		EGL::CGLEEntity* e = it->GetNext(&r, &p);

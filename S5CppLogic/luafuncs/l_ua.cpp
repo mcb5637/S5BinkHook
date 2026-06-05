@@ -69,9 +69,9 @@ namespace CppLogic::UA {
 
 	UnlimitedArmy::~UnlimitedArmy()
 	{
-		L.UnRef(Formation, L.REGISTRYINDEX);
-		L.UnRef(CommandQueue, L.REGISTRYINDEX);
-		L.UnRef(Spawner, L.REGISTRYINDEX);
+		L.UnRef(Formation, luaext::State::RegistryIndex);
+		L.UnRef(CommandQueue, luaext::State::RegistryIndex);
+		L.UnRef(Spawner, luaext::State::RegistryIndex);
 	}
 	UnlimitedArmy::UnlimitedArmy(shok::PlayerId p) : Player(p), RNG(std::random_device{}())
 	{
@@ -643,7 +643,7 @@ namespace CppLogic::UA {
 	void UnlimitedArmy::CallFormation()
 	{
 		int t = L.GetTop();
-		L.Push(Formation, L.REGISTRYINDEX);
+		L.Push(Formation, luaext::State::RegistryIndex);
 		L.PushValue(2);
 		L.Push(LastRotation);
 		L.TCall(2, 0);
@@ -652,7 +652,7 @@ namespace CppLogic::UA {
 	void UnlimitedArmy::CallCommandQueue()
 	{
 		int t = L.GetTop();
-		L.Push(CommandQueue, L.REGISTRYINDEX);
+		L.Push(CommandQueue, luaext::State::RegistryIndex);
 		L.PushValue(2);
 		L.TCall(1, 0);
 		L.SetTop(t);
@@ -660,7 +660,7 @@ namespace CppLogic::UA {
 	void UnlimitedArmy::CallSpawner()
 	{
 		int t = L.GetTop();
-		L.Push(Spawner, L.REGISTRYINDEX);
+		L.Push(Spawner, luaext::State::RegistryIndex);
 		L.PushValue(2);
 		L.TCall(1, 0);
 		L.SetTop(t);
@@ -1175,11 +1175,11 @@ namespace CppLogic::UA {
 		auto* a = L.NewUserClass<UnlimitedArmy>(pl);
 		a->L = L;
 		L.PushValue(2);
-		a->Formation = L.Ref(L.REGISTRYINDEX);
+		a->Formation = L.Ref(luaext::State::RegistryIndex);
 		L.PushValue(3);
-		a->CommandQueue = L.Ref(L.REGISTRYINDEX);
+		a->CommandQueue = L.Ref(luaext::State::RegistryIndex);
 		L.PushValue(4);
-		a->Spawner = L.Ref(L.REGISTRYINDEX);
+		a->Spawner = L.Ref(luaext::State::RegistryIndex);
 		a->RNG.seed(L.CheckInt(5));
 		return 1;
 	}

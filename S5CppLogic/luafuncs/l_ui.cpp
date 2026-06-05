@@ -111,7 +111,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("widget has no known update func");
 		L.Push(fh->LuaCommand.c_str());
 		if (fh->FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(luaext::Reference{ fh->FuncRefCommand.Ref }, L.REGISTRYINDEX);
+			L.Push(luaext::Reference{ fh->FuncRefCommand.Ref }, luaext::State::RegistryIndex);
 		else
 			L.Push("no compiled func found");
 		return 2;
@@ -234,7 +234,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("no known tooltip");
 		L.Push(tt->UpdateFunction.LuaCommand.c_str());
 		if (tt->UpdateFunction.FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(luaext::Reference{ tt->UpdateFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
+			L.Push(luaext::Reference{ tt->UpdateFunction.FuncRefCommand.Ref }, luaext::State::RegistryIndex);
 		else
 			L.Push("no compiled func found");
 		return 2;
@@ -263,7 +263,7 @@ namespace CppLogic::UI {
 			throw lua::LuaException("widget has no known action func");
 		L.Push(fh->ActionFunction.LuaCommand.c_str());
 		if (fh->ActionFunction.FuncRefCommand.L.GetState() == L.GetState())
-			L.Push(luaext::Reference{ fh->ActionFunction.FuncRefCommand.Ref }, L.REGISTRYINDEX);
+			L.Push(luaext::Reference{ fh->ActionFunction.FuncRefCommand.Ref }, luaext::State::RegistryIndex);
 		else
 			L.Push("no compiled func found");
 		return 2;
@@ -757,14 +757,14 @@ namespace CppLogic::UI {
 			EGUIX::UIInput_Mouse_CallbackMainMenu = nullptr;
 			L.PushLightUserdata(&SetMouseTriggerMainMenu);
 			L.Push();
-			L.SetTableRaw(L.REGISTRYINDEX);
+			L.SetTableRaw(luaext::State::RegistryIndex);
 			return 0;
 		}
 
 		L.CheckType(1, lua::LType::Function);
 		L.PushLightUserdata(&SetMouseTriggerMainMenu);
 		L.PushValue(1);
-		L.SetTableRaw(L.REGISTRYINDEX);
+		L.SetTableRaw(luaext::State::RegistryIndex);
 
 		if (!EGUIX::UIInput_Mouse_CallbackMainMenu) {
 			EGUIX::HookUIInput();
@@ -780,7 +780,7 @@ namespace CppLogic::UI {
 				bool r = false;
 
 				L.PushLightUserdata(&SetMouseTriggerMainMenu);
-				L.GetTableRaw(L.REGISTRYINDEX);
+				L.GetTableRaw(luaext::State::RegistryIndex);
 				L.Push(static_cast<int>(id));
 				L.Push(l & 0xFFFF);
 				L.Push((l >> 16) & 0xFFFF);
@@ -933,11 +933,11 @@ namespace CppLogic::UI {
 		vh->SetGUIState<CppLogic::UI::GUIState_LuaSelection>();
 		auto* s = dynamic_cast<CppLogic::UI::GUIState_LuaSelection*>(vh->CurrentState);
 		L.PushValue(1);
-		s->RefOnKlick = L.Ref(L.REGISTRYINDEX);
+		s->RefOnKlick = L.Ref(luaext::State::RegistryIndex);
 		if (!L.IsNoneOrNil(2)) {
 			L.CheckType(2, lua::LType::Function);
 			L.PushValue(2);
-			s->RefOnCancel = L.Ref(L.REGISTRYINDEX);
+			s->RefOnCancel = L.Ref(luaext::State::RegistryIndex);
 		}
 		return 0;
 	}
@@ -1409,18 +1409,18 @@ namespace CppLogic::UI {
 			GGUI::CManager::IsPlayerSelectableOverride = nullptr;
 			L.PushLightUserdata(&OverrideSelectablePlayers);
 			L.Push();
-			L.SetTableRaw(luaext::State::REGISTRYINDEX);
+			L.SetTableRaw(luaext::State::RegistryIndex);
 			return 0;
 		}
 		GGUI::CManager::HookPlayerSelectable();
 		L.PushLightUserdata(&OverrideSelectablePlayers);
 		L.PushValue(1);
-		L.SetTableRaw(luaext::State::REGISTRYINDEX);
+		L.SetTableRaw(luaext::State::RegistryIndex);
 		GGUI::CManager::IsPlayerSelectableOverride = [](shok::PlayerId p) {
 			luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 			auto t = L.AutoCleanStack();
 			L.PushLightUserdata(&OverrideSelectablePlayers);
-			L.GetTableRaw(luaext::State::REGISTRYINDEX);
+			L.GetTableRaw(luaext::State::RegistryIndex);
 			try {
 				return L.TCall<bool>(p);
 			}
@@ -1437,18 +1437,18 @@ namespace CppLogic::UI {
 			GGUI::CManager::FeedbackEventCb = nullptr;
 			L.PushLightUserdata(&SetFeedbackEventCallback);
 			L.Push();
-			L.SetTableRaw(luaext::State::REGISTRYINDEX);
+			L.SetTableRaw(luaext::State::RegistryIndex);
 			return 0;
 		}
 		GGUI::CManager::HookFeedbackEvent();
 		L.PushLightUserdata(&SetFeedbackEventCallback);
 		L.PushValue(1);
-		L.SetTableRaw(luaext::State::REGISTRYINDEX);
+		L.SetTableRaw(luaext::State::RegistryIndex);
 		GGUI::CManager::FeedbackEventCb = [](BB::CEvent* ev) {
 			luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 			auto t = L.AutoCleanStack();
 			L.PushLightUserdata(&SetFeedbackEventCallback);
-			L.GetTableRaw(luaext::State::REGISTRYINDEX);
+			L.GetTableRaw(luaext::State::RegistryIndex);
 			try {
 				return L.TCall<bool>(ev->EventTypeId);
 			}
@@ -1500,9 +1500,9 @@ namespace CppLogic::UI {
 	GUIState_LuaSelection::~GUIState_LuaSelection() {
 		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		if (RefOnKlick != luaext::State::NoRef)
-			L.UnRef(RefOnKlick, L.REGISTRYINDEX);
+			L.UnRef(RefOnKlick, luaext::State::RegistryIndex);
 		if (RefOnCancel != luaext::State::NoRef)
-			L.UnRef(RefOnCancel, L.REGISTRYINDEX);
+			L.UnRef(RefOnCancel, luaext::State::RegistryIndex);
 	}
 
 	shok::ClassId __stdcall GUIState_LuaSelection::GetClassIdentifier() const
@@ -1518,7 +1518,7 @@ namespace CppLogic::UI {
 				if (RefOnKlick != luaext::State::NoRef) {
 					luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 					int i = L.GetTop();
-					L.Push(RefOnKlick, L.REGISTRYINDEX);
+					L.Push(RefOnKlick, luaext::State::RegistryIndex);
 					L.Push(mev->X);
 					L.Push(mev->Y);
 					L.PCall(2, 1, 0);
@@ -1560,7 +1560,7 @@ namespace CppLogic::UI {
 		if (calllua && RefOnCancel != luaext::State::NoRef) {
 			luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 			int i = L.GetTop();
-			L.Push(RefOnCancel, L.REGISTRYINDEX);
+			L.Push(RefOnCancel, luaext::State::RegistryIndex);
 			L.PCall(0, 0, 0);
 			L.SetTop(i);
 		}

@@ -655,8 +655,8 @@ int CppLogic::Serializer::StructAccess::ByOffset(luaext::State L) {
 
 int CppLogic::Serializer::StructAccess::FieldsNext(luaext::State L)
 {
-	auto* i = L.CheckUserClass<Iter>(L.Upvalueindex(1));
-	auto* th = L.CheckUserClass<StructAccess>(L.Upvalueindex(2));
+	auto* i = L.CheckUserClass<Iter>(L.UpvalueIndex(1));
+	auto* th = L.CheckUserClass<StructAccess>(L.UpvalueIndex(2));
 	if (i->First) {
 		i->First = false;
 	}
@@ -791,8 +791,8 @@ int CppLogic::Serializer::ListAccess::Elements(luaext::State L)
 
 int CppLogic::Serializer::ListAccess::ElementsNext(luaext::State L)
 {
-	auto* i = L.CheckUserClass<ElementIter>(L.Upvalueindex(1));
-	auto* th = L.CheckUserClass<ListAccess>(L.Upvalueindex(2));
+	auto* i = L.CheckUserClass<ElementIter>(L.UpvalueIndex(1));
+	auto* th = L.CheckUserClass<ListAccess>(L.UpvalueIndex(2));
 	if (th->SeriData->ListOptions->IterNext(i->Iter.get())) {
 		void* obj = th->SeriData->ListOptions->IterCurrent(i->Iter.get());
 		PushSD(L, th->SeriData->SerializationName, obj, th->SeriData, th->Id, th->OnWrite, true);

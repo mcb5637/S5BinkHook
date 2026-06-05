@@ -230,12 +230,12 @@ namespace CppLogic::API {
 	void GetRuntimeStore() {
 		luaext::State mm{ shok::LuaStateMainmenu };
 		mm.PushLightUserdata(&GetRuntimeStore);
-		mm.GetTableRaw(mm.REGISTRYINDEX);
+		mm.GetTableRaw(mm.RegistryIndex);
 		if (mm.IsNil(-1)) {
 			mm.NewTable();
 			mm.PushLightUserdata(&GetRuntimeStore);
 			mm.PushValue(-2);
-			mm.SetTableRaw(mm.REGISTRYINDEX);
+			mm.SetTableRaw(mm.RegistryIndex);
 		}
 	}
 	int RuntimeStoreSet(luaext::State L) {

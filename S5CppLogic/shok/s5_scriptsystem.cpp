@@ -235,7 +235,7 @@ void EScr::CLuaFuncRefCommand::ReplaceFunc(luaext::State L, int idx)
 	SetState(L);
 	L.CheckType(idx, lua::LType::Function);
 	L.PushValue(idx);
-	Ref = L.Ref(L.REGISTRYINDEX).Value();
+	Ref = L.Ref(luaext::State::RegistryIndex).Value();
 	NeedsCompile = false;
 	LuaCommand = std::string_view("");
 }
@@ -266,13 +266,13 @@ int __stdcall EScr::CLuaFuncRefGlobal::GetRefOverride()
 	L.Push(FuncName);
 	L.GetGlobal();
 	if (L.IsFunction(-1)) {
-		r = L.Ref(luaext::State::REGISTRYINDEX);
+		r = L.Ref(luaext::State::RegistryIndex);
 	}
 	else {
 		try {
 			L.DoStringT(std::format("return {};", static_cast<std::string_view>(FuncName)), "EScr::CLuaFuncRefGlobal::GetRefOverride");
 			if (L.IsFunction(-1)) {
-				r = L.Ref(luaext::State::REGISTRYINDEX);
+				r = L.Ref(luaext::State::RegistryIndex);
 			}
 		}
 		catch (const lua::LuaException&) {}

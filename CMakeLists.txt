@@ -64,7 +64,7 @@ add_library(LuaDebugger SHARED
         S5CppLogic/luafuncs/l_ua.cpp
         S5CppLogic/luafuncs/l_ui.cpp
 
-        S5CppLogic/Luapp/src50/luapp50.cpp
+        S5CppLogic/Luapp/src50/luapp50_d.cpp
 
         S5CppLogic/shok/s5_baseDefs.cpp
         S5CppLogic/shok/s5_datastructures.cpp

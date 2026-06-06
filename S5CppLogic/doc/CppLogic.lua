@@ -458,6 +458,7 @@ function CppLogic.Logic.GetAnimIdFromName(anim) end
 --- @param armorclass number armorclass
 --- @return number factor
 function CppLogic.Logic.GetDamageFactor(dmgclass, armorclass) end
+
 --- the damage factor between a damageclass and an armorclass.
 --- @param dmgclass number damageclass
 --- @param armorclass number armorclass
@@ -469,15 +470,21 @@ function CppLogic.Logic.SetDamageFactor(dmgclass, armorclass, fac) end
 --- @param p number player
 --- @return number tick
 function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
+
 --- the tick where this players payday got startet (-1 if inactive).
 --- (you can get the current tick via Logic.GetCurrentTurn() ).
 --- if you disable it (via -1) it gets immediately restarted has a worker or leader on the map.
 --- @param p number player
 --- @param t number tick
 function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
+
 --- sets the time between paydays. (get via Logic).
 --- @param freq number frequency in seconds
 function CppLogic.Logic.SetPaydayFrequency(freq) end
+
+--- sets the time between settlers joining the village out of the village center.
+--- @param freq number frequency in seconds
+function CppLogic.Logic.SetAttractionFrequency(freq) end
 
 --- player kill statistics.
 --- @param p number player

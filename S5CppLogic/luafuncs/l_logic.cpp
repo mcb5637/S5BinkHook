@@ -82,11 +82,17 @@ namespace CppLogic::Logic {
 	int SetPaydayFrequency(luaext::State L) {
 		int i = L.CheckInt(1);
 		if (i <= 0)
-			throw lua::LuaException("freq has to be > 0");
+			throw lua::LuaException("PaydayFrequency has to be > 0");
 		(*GGL::CPlayerAttractionProps::GlobalObj)->PaydayFrequency = i;
 		return 0;
 	}
-
+	int SetAttractionFrequency(luaext::State L) {
+		int i = L.CheckInt(1);
+		if (i <= 0)
+			throw lua::LuaException("AttractionFrequency has to be > 0");
+		(*GGL::CPlayerAttractionProps::GlobalObj)->AttractionFrequency = i;
+		return 0;
+	}
 
 	int NetEventReadBack(luaext::State L) {
 		auto* ev = static_cast<BB::CEvent*>(L.ToUserdata(L.UpvalueIndex(1)));
@@ -1581,6 +1587,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<PlayerGetPaydayStartetTick>("PlayerGetPaydayStartetTick"),
 			luaext::FuncReference::GetRef<PlayerSetPaydayStartetTick>("PlayerSetPaydayStartetTick"),
 			luaext::FuncReference::GetRef<SetPaydayFrequency>("SetPaydayFrequency"),
+			luaext::FuncReference::GetRef<SetAttractionFrequency>("SetAttractionFrequency"),
 			luaext::FuncReference::GetRef<PlayerGetKillStatistics>("PlayerGetKillStatistics"),
 			luaext::FuncReference::GetRef<CanPlaceBuildingAt>("CanPlaceBuildingAt"),
 			luaext::FuncReference::GetRef<PlayerActivateAlarm>("PlayerActivateAlarm"),

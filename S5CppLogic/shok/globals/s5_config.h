@@ -207,7 +207,10 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x76EFCC;
 
+		// ctor 4b17ea
+
 		static inline GGL::CLogicProperties** const GlobalObj = reinterpret_cast<GGL::CLogicProperties**>(0x85A3E0);
+		static inline CLogicProperties* (__stdcall* CreateAndRead)() = reinterpret_cast<CLogicProperties* (__stdcall*)()>(0x4b1a65);
 
 		STradeResource* GetResource(shok::ResourceType rt);
 
@@ -223,6 +226,10 @@ namespace GGL {
 		static inline constexpr int vtp = 0x770834;
 
 		static inline GGL::CPlayerAttractionProps** const GlobalObj = reinterpret_cast<GGL::CPlayerAttractionProps**>(0x866A80);
+
+		void Reload();
+
+		static inline void (__stdcall*CreateAndLoadIfNotSet)() = reinterpret_cast<void (__stdcall*)()>(0x4c1c48);
 	};
 
 	class ExperienceClass {

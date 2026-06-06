@@ -51,13 +51,14 @@ ModLoader = ModLoader or {}
 ---@field TechnologyMerges ManifestMergeOperation[]|nil
 ---@field EffectTypeMerges ManifestMergeOperation[]|nil
 ---@field FeedbackEventSoundDataMerges ManifestMergeOperation[]|nil
+---@field ConfigFileMerges ManifestMergeOperation[]|nil
 
 ---@class CManifestEntry
 ---@field package Key string
 ---@field package Preload nil|fun(s:string):number
 ---@field package Load nil|fun(s:string|number):number
 ---@field package Table table<string,number>?
----@field package Type nil|"kv"|"sound"
+---@field package Type nil|"kv"|"sound"|"config"
 ---@field package Deprecated string?
 ---@field package ObjectMerge string?
 ---@field package ObjectMergeFunc nil|fun(is:string|number):CppStructAccess
@@ -153,6 +154,16 @@ function ModLoader.ManifestTypes()
 		{Key="StringTableTexts", Preload=nil, Table=nil, Load=ModLoader.LoadSTTOverride, Type="kv"},
 		{Key="Fonts", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddFont},
 		{Key="FeedbackEventSoundData", Load=CppLogic.ModLoader.LoadFeedbackEventSoundData, ObjectMerge="FeedbackEventSoundDataMerges", ObjectMergeFunc=CppLogic.ModLoader.GetFeedbackEventMem},
+		{Key="ConfigFileMerges_", ObjectMerge="ConfigFileMerges", Type="config", ObjectMergeFunc=function(t)
+			if t == "LogicProperties" then
+				return CppLogic.ModLoader.GetLogicPropertiesMem()
+			elseif t == "PlayerAttractionProps" then
+				return CppLogic.ModLoader.GetPlayerAttractionPropsMem()
+			else
+				assert(false, "unknown config merge type "..tostring(t))
+				---@diagnostic disable-next-line: missing-return
+			end
+		end},
 	}
 	return r
 end
@@ -360,6 +371,56 @@ ModLoader.ManifestType = {
 		Fix = function(t, manifest)
 
 		end,
+	},
+	config = {
+		Preload = function(t, manifest)
+		end,
+		Load = function(t, manifest)
+		end,
+		Merge = function(t, into, from)
+			local function contains(t, v)
+				for _, d in ipairs(t) do
+					if d == v then
+						return true
+					end
+				end
+				return false
+			end
+			local at = into[t.Key]
+			for _, d in ipairs(from[t.Key]) do
+				if not contains(at, d) then
+					table.insert(at, d)
+				end
+			end
+			if t.ObjectMerge then
+				---@type ManifestMergeOperation[]
+				local merges = into[t.ObjectMerge]
+				---@type ManifestMergeOperation[]
+				local merges_from = from[t.ObjectMerge]
+				for _,m in ipairs(merges_from) do
+					table.insert(merges, m)
+				end
+			end
+		end,
+		Fix = function(t, manifest)
+		end,
+		PerformObjectMerge = function(t, manifest)
+			if not t.ObjectMerge then
+				return
+			end
+			---@type ManifestMergeOperation[]
+			local merges = manifest[t.ObjectMerge]
+			if not merges then
+				return
+			end
+			for _,merge in ipairs(merges) do
+				for _,id in ipairs(merge.AppliesTo) do
+					xpcall(function()
+						merge.MergeFunc(t.ObjectMergeFunc(id), id)
+					end, LuaDebugger.Log)
+				end
+			end
+		end
 	},
 }
 

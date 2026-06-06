@@ -434,7 +434,12 @@ function CppLogic.Memory.Player(pid)end
 ---@return CppBBObjectAccess
 function CppLogic.Memory.Technology(tid)end
 
----accesses the GGL::CLogicProperties (aka config/logic.xml)
+---accesses the GGL::CPlayerAttractionProps (aka Config/PlayerAttraction.xml)
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---@return CppBBObjectAccess
+function CppLogic.Memory.PlayerAttractionProps()end
+
+---accesses the GGL::CLogicProperties (aka Config/Logic.xml)
 ---warning: has no semantic checks, it is easy to crash your game by modifying memory!
 ---@return CppBBObjectAccess
 function CppLogic.Memory.LogicProperties()end
@@ -3707,6 +3712,18 @@ function CppLogic.ModLoader.GetEffectTypeMem(tid) end
 --- @param tid number
 --- @return CppStructAccess
 function CppLogic.ModLoader.GetFeedbackEventMem(tid) end
+
+---accesses the GGL::CLogicProperties (aka Config/Logic.xml)
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---automatically marks for reload on writing
+---@return CppBBObjectAccess
+function CppLogic.ModLoader.GetLogicPropertiesMem()end
+
+---accesses the GGL::CPlayerAttractionProps (aka Config/PlayerAttraction.xml)
+---warning: has no semantic checks, it is easy to crash your game by modifying memory!
+---automatically marks for reload on writing
+---@return CppBBObjectAccess
+function CppLogic.ModLoader.GetPlayerAttractionPropsMem()end
 
 --- loads an effecttype from a xml file (data/config/effects/typename.xml) (not default location).
 --- the effecttype gets automatically removed/reloaded on leaving the map.

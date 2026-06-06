@@ -189,6 +189,10 @@ GGL::CLogicProperties::STradeResource* GGL::CLogicProperties::GetResource(shok::
 {
     return logicprops_gettraderes(this, rt);
 }
+void GGL::CPlayerAttractionProps::Reload() {
+	auto seri = BB::CXmlSerializer::CreateUnique();
+	seri->Deserialize(reinterpret_cast<const char*>(0x77080b), this);
+}
 
 static inline GGL::ExperienceClass::LevelData* (__thiscall* const xpclass_getlevel)(GGL::ExperienceClass* th, int l) = reinterpret_cast<GGL::ExperienceClass::LevelData * (__thiscall*)(GGL::ExperienceClass*, int)>(0x515270);
 GGL::ExperienceClass::LevelData* GGL::ExperienceClass::GetLevel(int lvl)

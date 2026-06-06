@@ -347,8 +347,25 @@ namespace CppLogic::ModLoader {
 
 			static FeedbackEventSoundDataLoader Obj;
 		};
+		template<class C>
+		class ConfigFileLoader : public DataTypeLoader {
+			bool Reload = false;
 
-		static std::array<DataTypeLoader*, 21> Loaders;
+		public:
+			virtual void Reset() override {
+				static_assert(sizeof(ConfigFileLoader<C>) != sizeof(ConfigFileLoader<C>));
+			}
+			virtual void SanityCheck() override {}
+			virtual void RegisterFuncs(luaext::State L) override;
+
+			static int GetMem(luaext::State L);
+			static void PrepareMem() {}
+			static std::string_view Name();
+
+			static ConfigFileLoader Obj;
+		};
+
+		static std::array<DataTypeLoader*, 23> Loaders;
 		static std::array<DataTypeLoader*, 1> LoadersIngame;
 
 		static bool Initialized;

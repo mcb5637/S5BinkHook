@@ -1069,29 +1069,83 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::UnLoa
 template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::Obj{};
 
-std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 21> CppLogic::ModLoader::ModLoader::Loaders{ {
-		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj,
-			&CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj,
-			&CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj,
-			&CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj,
-			&CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj,
-			&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::Obj,
-			&FeedbackEventSoundDataLoader::Obj,
-	} };
+
+template<class C>
+void CppLogic::ModLoader::ModLoader::ConfigFileLoader<C>::RegisterFuncs(luaext::State L) {
+	L.RegisterFunc<GetMem>(Name(), -3);
+}
+template<class C>
+int CppLogic::ModLoader::ModLoader::ConfigFileLoader<C>::GetMem(luaext::State L) {
+	PrepareMem();
+	auto n = std::format("ModLoader.{}", Name());
+	Serializer::ObjectAccess::PushObject(L, n, *C::GlobalObj,
+		0, [](int) {
+			Obj.Reload = true;
+		});
+	return 1;
+}
+
+template<>
+void CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CLogicProperties>::Reset() {
+	delete *GGL::CLogicProperties::GlobalObj;
+	*GGL::CLogicProperties::GlobalObj = GGL::CLogicProperties::CreateAndRead();
+	Reload = false;
+}
+
+template<>
+std::string_view CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CLogicProperties>::Name() {
+	return "GetLogicPropertiesMem";
+}
+
+template<>
+CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CLogicProperties> CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CLogicProperties>::Obj{};
+
+
+template<>
+void CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps>::Reset() {
+	(*GGL::CPlayerAttractionProps::GlobalObj)->Reload();
+	Reload = false;
+}
+
+template<>
+std::string_view CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps>::Name() {
+	return "GetPlayerAttractionPropsMem";
+}
+
+template<>
+void CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps>::PrepareMem() {
+	GGL::CPlayerAttractionProps::CreateAndLoadIfNotSet();
+}
+
+template<>
+CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps> CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps>::Obj{};
+
+
+std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 23> CppLogic::ModLoader::ModLoader::Loaders{{
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::EffectTypeId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TaskListId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ArmorClassId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::DamageClassId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::TechnologyId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::ModelId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimationId>::Obj,
+	&CppLogic::ModLoader::ModLoader::UpgradeCategoriesLoader::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::WaterTypeId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::SelectionTextureId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::TerrainTextureId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderReload<shok::TerrainTypeId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderHalf<shok::EntityCategory>::Obj,
+	&CppLogic::ModLoader::ModLoader::ExperienceClassesLoader::Obj,
+	&CppLogic::ModLoader::ModLoader::SoundGroupsLoader::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::AnimSetId>::Obj,
+	&CppLogic::ModLoader::ModLoader::DirectXEffectLoader::Obj,
+	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::FontId>::Obj,
+	&CppLogic::ModLoader::ModLoader::FeedbackEventSoundDataLoader::Obj,
+	&CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CLogicProperties>::Obj,
+	&CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps>::Obj,
+}};
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 1> CppLogic::ModLoader::ModLoader::LoadersIngame{ {
 		&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::GUITextureId>::Obj,
 	} };

@@ -1087,6 +1087,8 @@ int CppLogic::ModLoader::ModLoader::ConfigFileLoader<C>::GetMem(luaext::State L)
 
 template<>
 void CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CLogicProperties>::Reset() {
+	if (!Reload)
+		return;
 	delete *GGL::CLogicProperties::GlobalObj;
 	*GGL::CLogicProperties::GlobalObj = GGL::CLogicProperties::CreateAndRead();
 	Reload = false;
@@ -1103,6 +1105,8 @@ CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CLogicProperties> CppLogic
 
 template<>
 void CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps>::Reset() {
+	if (!Reload)
+		return;
 	(*GGL::CPlayerAttractionProps::GlobalObj)->Reload();
 	Reload = false;
 }

@@ -191,7 +191,7 @@ GGL::CLogicProperties::STradeResource* GGL::CLogicProperties::GetResource(shok::
 }
 void GGL::CPlayerAttractionProps::Reload() {
 	auto seri = BB::CXmlSerializer::CreateUnique();
-	seri->Deserialize(reinterpret_cast<const char*>(0x77080b), this);
+	seri->Deserialize(reinterpret_cast<const char*>(0x77080c), this);
 }
 
 static inline GGL::ExperienceClass::LevelData* (__thiscall* const xpclass_getlevel)(GGL::ExperienceClass* th, int l) = reinterpret_cast<GGL::ExperienceClass::LevelData * (__thiscall*)(GGL::ExperienceClass*, int)>(0x515270);

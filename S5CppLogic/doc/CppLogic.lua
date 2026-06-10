@@ -1511,6 +1511,25 @@ function CppLogic.Entity.Predicates.IsInSector(sec) end
 ---@return table
 function CppLogic.Entity.DumpEntity(e) end
 
+--- gets all attached entities. this->other
+---@param e entity
+---@param a number|string
+---@return number[]
+function CppLogic.Entity.GetEntityAttachmentsOfType(e, a) end
+--- gets all entities attached to e. other->this
+---@param e entity
+---@param a number|string
+---@return number[]
+function CppLogic.Entity.GetEntitiesAttachedOfType(e, a) end
+--- gets the number of attachments. this->other
+---@param e entity
+---@return number
+function CppLogic.Entity.GetEntityNumberOfAttachments(e) end
+--- gets the number of entities attached to e. other->this
+---@param e entity
+---@return number
+function CppLogic.Entity.GetEntityNumberOfAttachedEntities(e) end
+
 --- entity task list index.
 --- @param id entity
 --- @return number index
@@ -1721,7 +1740,7 @@ function CppLogic.Entity.Settler.WorkerSetCurrentWorkTime(id, wt) end
 --- @param id entity
 --- @return number moti
 function CppLogic.Entity.Settler.WorkerGetMotivation(id) end
---- settler current motivation.
+--- adds to the settlers current motivation.
 --- (if it is higher than the players max motivation, it will quickly be lowered to that)
 --- @param id entity
 --- @param m number change in motivation
@@ -2952,13 +2971,13 @@ function CppLogic.UI.ContainerWidgetGetAllChildren(wid) end
 function CppLogic.UI.WidgetIsTooltipShown(wid) end
 
 --- returns the font config.
---- @param fontName string
+--- @param fontName string|number
 --- @return number size
 --- @return number offset
 --- @return number spacing
 function CppLogic.UI.FontGetConfig(fontName) end
 --- sets the font config.
---- @param fontName string
+--- @param fontName string|number
 --- @param size number
 --- @param offset number
 --- @param spacing number

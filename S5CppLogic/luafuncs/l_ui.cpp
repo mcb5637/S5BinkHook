@@ -535,10 +535,16 @@ namespace CppLogic::UI {
 	}
 
 	int FontGetConfig(luaext::State L) {
-		const char* font = L.CheckString(1);
-		CheckFontString(font);
-		shok::FontId id = shok::FontId::Invalid;
-		EGUIX::FontManager::LoadFont(&id, font);
+		shok::FontId id;
+		if (L.Type(1) == lua::LType::String) {
+			const char* font = L.CheckString(1);
+			CheckFontString(font);
+			id = shok::FontId::Invalid;
+			EGUIX::FontManager::LoadFont(&id, font);
+		}
+		else {
+			id = L.Check<shok::FontId>(1);
+		}
 		auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 		L.Push(f->Size);
 		L.Push(f->Offset);
@@ -546,10 +552,16 @@ namespace CppLogic::UI {
 		return 3;
 	}
 	int FontSetConfig(luaext::State L) {
-		const char* font = L.CheckString(1);
-		CheckFontString(font);
-		shok::FontId id = shok::FontId::Invalid;
-		EGUIX::FontManager::LoadFont(&id, font);
+		shok::FontId id;
+		if (L.Type(1) == lua::LType::String) {
+			const char* font = L.CheckString(1);
+			CheckFontString(font);
+			id = shok::FontId::Invalid;
+			EGUIX::FontManager::LoadFont(&id, font);
+		}
+		else {
+			id = L.Check<shok::FontId>(1);
+		}
 		auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(id);
 		if (L.IsNumber(2))
 			f->Size = L.CheckFloat(2);

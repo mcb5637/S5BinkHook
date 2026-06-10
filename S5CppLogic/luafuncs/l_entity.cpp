@@ -649,6 +649,35 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	int GetEntityAttachmentsOfType(luaext::State L) {
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		auto at = L.Check<shok::AttachmentType>(2);
+		L.NewTable();
+		int i = 1;
+		for (auto [_, a] : e->ObservedEntities.ForKeys(at)) {
+			L.Push(a.EntityId);
+			L.SetTableRaw(-2, i++);
+		}
+		return 1;
+	}
+	int GetEntitiesAttachedOfType(luaext::State L) {
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		auto at = L.Check<shok::AttachmentType>(2);
+		L.NewTable();
+		int i = 1;
+		for (auto [_, a] : e->ObserverEntities.ForKeys(at)) {
+			L.Push(a.EntityId);
+			L.SetTableRaw(-2, i++);
+		}
+		return 1;
+	}
+	size_t GetEntityNumberOfAttachments(EGL::CGLEEntity* e) {
+		return e->ObservedEntities.size;
+	}
+	size_t GetEntityNumberOfAttachedEntities(EGL::CGLEEntity* e) {
+		return e->ObserverEntities.size;
+	}
+
 	int MovingEntityGetSpeedFactor(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		auto* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
@@ -1864,6 +1893,10 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<GetLimitedAmmo>("GetLimitedAmmo"),
 			luaext::FuncReference::GetRef<SetLimitedAmmo>("SetLimitedAmmo"),
 			luaext::FuncReference::GetRef<DumpEntity>("DumpEntity"),
+			luaext::FuncReference::GetRef<GetEntityAttachmentsOfType>("GetEntityAttachmentsOfType"),
+			luaext::FuncReference::GetRef<GetEntitiesAttachedOfType>("GetEntitiesAttachedOfType"),
+			luaext::FuncReference::GetRef<GetEntityNumberOfAttachments>("GetEntityNumberOfAttachments"),
+			luaext::FuncReference::GetRef<GetEntityNumberOfAttachedEntities>("GetEntityNumberOfAttachedEntities"),
 	};
 
 	constexpr std::array Predicates{

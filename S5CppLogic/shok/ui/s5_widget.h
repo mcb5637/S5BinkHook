@@ -1450,3 +1450,8 @@ inline auto CppLogic::GetIdManager<shok::WidgetGroupId>() {
 	auto mng = EGUIX::CWidgetGroupManager::GlobalObj();
 	return CppLogic::EnumIdManager<shok::WidgetGroupId>{ mng->Manager };
 }
+template<>
+inline auto CppLogic::GetIdManager<shok::FontId>() {
+	auto mng = EGUIX::FontManager::GlobalObj();
+	return CppLogic::EnumIdManager<shok::FontId>{ mng->Manager };
+}

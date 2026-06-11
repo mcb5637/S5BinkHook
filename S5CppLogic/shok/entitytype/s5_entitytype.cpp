@@ -6,13 +6,12 @@ void EGL::CGLEEntityProps::InitializeBlocking() {
 	ety_initblock(this);
 }
 
-static inline float(__thiscall* const modeprops_mod)(EGL::CGLEEntityProps::ModifyEntityProps* th, int p, float i) = reinterpret_cast<float(__thiscall*)(EGL::CGLEEntityProps::ModifyEntityProps*, int, float)>(0x4C797D);
-
 shok::ClassId __stdcall EGL::CGLEModelSet::GetClassIdentifier() const {
 	return Identifier;
 }
 
-float EGL::CGLEEntityProps::ModifyEntityProps::ModifyValue(int player, float initial) {
+float EGL::CGLEEntityProps::ModifyEntityProps::ModifyValue(shok::PlayerId player, float initial) const {
+	auto modeprops_mod = reinterpret_cast<float(__thiscall*)(const ModifyEntityProps*, shok::PlayerId, float)>(0x4C797D);
 	return modeprops_mod(this, player, initial);
 }
 

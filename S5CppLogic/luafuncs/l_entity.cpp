@@ -678,6 +678,34 @@ namespace CppLogic::Entity {
 		return e->ObserverEntities.size;
 	}
 
+	int GetEntityNumberOfAttachmentsOfType(EGL::CGLEEntity* e, shok::AttachmentType at) {
+		int num = 0;
+		for (auto _ : e->ObservedEntities.ForKeys(at))
+			++num;
+		return num;
+	}
+	auto GetEntityLimitedAttachmentData(EGL::CGLEEntity* e, shok::AttachmentType at) {
+		auto* la = e->GetBehavior<GGL::CLimitedAttachmentBehavior>();
+		if (la == nullptr)
+			throw lua::LuaException{ "no limited attachment behavior" };
+		auto a = la->AttachmentMap.find(at);
+		if (a == la->AttachmentMap.end())
+			throw lua::LuaException{ "unlimited attachment type" };
+		return std::tuple{a->second.Limit, a->second.IsActive};
+	}
+	void SetEntityLimitedAttachmentData(EGL::CGLEEntity* e, shok::AttachmentType at, std::optional<int> limit, std::optional<bool> active) {
+		auto* la = e->GetBehavior<GGL::CLimitedAttachmentBehavior>();
+		if (la == nullptr)
+			throw lua::LuaException{ "no limited attachment behavior" };
+		auto a = la->AttachmentMap.find(at);
+		if (a == la->AttachmentMap.end())
+			throw lua::LuaException{ "unlimited attachment type" };
+		if (limit.has_value())
+			a->second.Limit = *limit;
+		if (active.has_value())
+			a->second.IsActive = *active;
+	}
+
 	int MovingEntityGetSpeedFactor(luaext::State L) {
 		EGL::CGLEEntity* e = L.CheckEntity(1);
 		auto* m = e->GetBehaviorDynamic<GGL::CBehaviorDefaultMovement>();
@@ -1490,8 +1518,18 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookDamageMod();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookDamage = true;
 		auto* d = b->GetAdditionalData(true);
-		d->DamageOverride = L.CheckInt(2);
+		if (!L.IsNoneOrNil(2))
+			d->DamageOverride = L.CheckInt(2);
+		if (!L.IsNoneOrNil(3))
+			d->DamageUseBoni = L.CheckBool(3);
 		return 0;
+	}
+	std::tuple<int, bool> GetBaseDamage(EGL::CGLEEntity* e) {
+		if (auto* batt = e->GetBehaviorDynamic<GGL::CBattleBehavior>())
+			return batt->GetBaseDamage();
+		if (auto* ac = e->GetBehavior<GGL::CAutoCannonBehavior>())
+			return {ac->GetDamage(), false};
+		throw lua::LuaException("no settler or building");
 	}
 	int SetArmor(luaext::State L) {
 		if (CppLogic::HasSCELoader())
@@ -1500,8 +1538,18 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookArmorMod();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookArmor = true;
 		auto* d = b->GetAdditionalData(true);
-		d->ArmorOverride = L.CheckInt(2);
+		if (!L.IsNoneOrNil(2))
+			d->ArmorOverride = L.CheckInt(2);
+		if (!L.IsNoneOrNil(3))
+			d->ArmorUseBoni = L.CheckBool(3);
 		return 0;
+	}
+	std::tuple<int, bool> GetBaseArmor(EGL::CGLEEntity* e) {
+		if (auto* set = BB::IdentifierCast<GGL::CSettler>(e))
+			return set->GetBaseArmor();
+		if (auto* build = BB::IdentifierCast<GGL::CBuilding, EGL::CGLEEntity, GGL::CBridgeEntity>(e))
+			return build->GetBaseArmor();
+		throw lua::LuaException("no settler or building");
 	}
 	int SetExploration(luaext::State L) {
 		if (CppLogic::HasSCELoader())
@@ -1871,7 +1919,9 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SetMaxHP>("SetMaxHP"),
 			luaext::FuncReference::GetRef<CloneOverrideData>("CloneOverrideData"),
 			luaext::FuncReference::GetRef<SetDamage>("SetDamage"),
+			luaext::FuncReference::GetRef<GetBaseDamage>("GetBaseDamage"),
 			luaext::FuncReference::GetRef<SetArmor>("SetArmor"),
+			luaext::FuncReference::GetRef<GetBaseArmor>("GetBaseArmor"),
 			luaext::FuncReference::GetRef<SetExploration>("SetExploration"),
 			luaext::FuncReference::GetRef<SetAutoAttackMaxRange>("SetAutoAttackMaxRange"),
 			luaext::FuncReference::GetRef<SetDisplayName>("SetDisplayName"),
@@ -1895,8 +1945,11 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<DumpEntity>("DumpEntity"),
 			luaext::FuncReference::GetRef<GetEntityAttachmentsOfType>("GetEntityAttachmentsOfType"),
 			luaext::FuncReference::GetRef<GetEntitiesAttachedOfType>("GetEntitiesAttachedOfType"),
+			luaext::FuncReference::GetRef<GetEntityNumberOfAttachmentsOfType>("GetEntityNumberOfAttachmentsOfType"),
 			luaext::FuncReference::GetRef<GetEntityNumberOfAttachments>("GetEntityNumberOfAttachments"),
 			luaext::FuncReference::GetRef<GetEntityNumberOfAttachedEntities>("GetEntityNumberOfAttachedEntities"),
+			luaext::FuncReference::GetRef<GetEntityLimitedAttachmentData>("GetEntityLimitedAttachmentData"),
+			luaext::FuncReference::GetRef<SetEntityLimitedAttachmentData>("SetEntityLimitedAttachmentData"),
 	};
 
 	constexpr std::array Predicates{

@@ -62,6 +62,8 @@ const BB::SerializationData CppLogic::EntityAddon::EntityAddonData::Serializatio
 	BB::SerializationData::AutoBaseClass<EntityAddonData, EGL::CGLEBehavior>(),
 	AutoMemberSerialization(EntityAddonData, HealthOverride),
 	AutoMemberSerialization(EntityAddonData, HealthUseBoni),
+	AutoMemberSerialization(EntityAddonData, DamageUseBoni),
+	AutoMemberSerialization(EntityAddonData, ArmorUseBoni),
 	AutoMemberSerialization(EntityAddonData, DamageOverride),
 	AutoMemberSerialization(EntityAddonData, ArmorOverride),
 	AutoMemberSerialization(EntityAddonData, ExplorationOverride),

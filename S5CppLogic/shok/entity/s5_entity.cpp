@@ -542,19 +542,25 @@ float GGL::CBuilding::GetRemainingUpgradeTime()
 	return building_getupremainingtime(this);
 }
 
-int __thiscall GGL::CBuilding::GetBaseArmor()
+std::pair<int, bool> __thiscall GGL::CBuilding::GetBaseArmor()
 {
 	auto* d = GetAdditionalData(false);
+	bool b = d == nullptr ? true : d->ArmorUseBoni;
 	if (d && d->ArmorOverride >= 0)
-		return d->ArmorOverride;
+		return {d->ArmorOverride, b};
 	GGlue::CGlueEntityProps* p = GetEntityType();
 	if (const auto* l = dynamic_cast<GGL::CGLBuildingProps*>(p->LogicProps))
-		return l->ArmorAmount;
-	return 0;
+		return {l->ArmorAmount, b};
+	return {0, b};
 }
-
-int __thiscall GGL::CBuilding::GetBaseArmorStatic(CBuilding* th) {
-	return th->GetBaseArmor();
+int GGL::CBuilding::GetArmor() {
+	auto [armor, boni] = GetBaseArmor();
+	if (boni) {
+		GGlue::CGlueEntityProps* p = GetEntityType();
+		if (const auto* l = dynamic_cast<GGL::CGLBuildingProps*>(p->LogicProps))
+		armor = static_cast<int>(l->ModifyArmor.ModifyValue(PlayerId, static_cast<float>(armor)));
+	}
+	return armor;
 }
 
 static inline void(__thiscall* const entitysethealth)(EGL::CGLEEntity* th, int h) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, int)>(0x57A6D9);
@@ -1030,6 +1036,10 @@ void GGL::CBuilding::EnableConstructionSpeedTechs()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook, reinterpret_cast<void*>(0x4B8EB2));
 }
 
+void GGL::CBuilding::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
+	ev->Data = GetArmor();
+}
+
 void __thiscall GGL::CBridgeEntity::ApplyHeightOverride() const {
 	auto* p = static_cast<GGL::CBridgeProperties*>(GetEntityType()->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
 	auto* lr = (*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes;
@@ -1158,19 +1168,32 @@ float EGL::CGLEEntity::CalculateDamageAgainstMe(int damage, shok::DamageClassId 
 	return dmg;
 }
 
-float EGL::CGLEEntity::ModifyDamage(int baseDamage) const
+float EGL::CGLEEntity::ModifyDamage(int baseDamage, bool noCache) const
 {
-	return ModifyDamage(static_cast<float>(baseDamage));
+	return ModifyDamage(static_cast<float>(baseDamage), noCache);
 }
-float EGL::CGLEEntity::ModifyDamage(float baseDamage) const
+float EGL::CGLEEntity::ModifyDamage(float baseDamage, bool noCache) const
 {
-	return GGL::ModifierEntityDatabase::GlobalObj->GetModifiedStatNoCache(EntityId, GGL::CEntityProfile::ModifierType::Damage, baseDamage);
+	if (noCache)
+		return GGL::ModifierEntityDatabase::GlobalObj->GetModifiedStatNoCache(EntityId, GGL::CEntityProfile::ModifierType::Damage, baseDamage);
+	return GGL::ModifierEntityDatabase::GlobalObj->GetModifiedStat(EntityId, GGL::CEntityProfile::ModifierType::Damage, baseDamage);
 }
 
 float EGL::CGLEEntity::GetTotalAffectedDamageModifier()
 {
 	float r = 1.0f;
 	EGL::CEventGetValue_Float ev{ shok::EventIDs::RangedEffect_GetDamageFactor };
+	for (const auto& [_, attach] : ObserverEntities.ForKeys(shok::AttachmentType::HERO_AFFECTED)) {
+		ev.Data = 0.0f;
+		if (auto* e = GetEntityByID(attach.EntityId))
+			e->FireEvent(&ev);
+		r = r - 1.0f + ev.Data;
+	}
+	return r;
+}
+float EGL::CGLEEntity::GetTotalAffectedArmorModifier() {
+	float r = 1.0f;
+	EGL::CEventGetValue_Float ev{ shok::EventIDs::RangedEffect_GetArmorFactor };
 	for (const auto& [_, attach] : ObserverEntities.ForKeys(shok::AttachmentType::HERO_AFFECTED)) {
 		ev.Data = 0.0f;
 		if (auto* e = GetEntityByID(attach.EntityId))
@@ -1734,34 +1757,6 @@ void EGL::CGLEEntity::HookDamageMod()
 	GGL::CAutoCannonBehavior::HookDamageOverride();
 }
 
-void __declspec(naked) entityarmormodsettlerasm() {
-	__asm {
-		mov esi, ecx;
-		push[esi + 0x10];
-
-		call GGL::CSettler::GetBaseArmorStatic;
-
-		push 0x4A6B25;
-		ret;
-	}
-}
-void __declspec(naked) entityarmormodbuildingrasm() {
-	__asm {
-		mov esi, ecx;
-		push[esi + 0x10];
-
-		call GGL::CBuilding::GetBaseArmorStatic;
-		push eax;
-		fild dword ptr [esp];
-		pop eax;
-
-		mov eax, 0x4AAB98;
-		call eax;
-
-		push 0x04AB170;
-		ret;
-	}
-}
 bool HookArmorMod_Hooked = false;
 void EGL::CGLEEntity::HookArmorMod()
 {
@@ -1769,11 +1764,11 @@ void EGL::CGLEEntity::HookArmorMod()
 		return;
 	HookArmorMod_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
-		reinterpret_cast<void*>(0x4A6B15),
-		reinterpret_cast<void*>(0x4AB160)
+		reinterpret_cast<void*>(0x4a6b06),
+		reinterpret_cast<void*>(0x4ab15f)
 	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4A6B15), &entityarmormodsettlerasm, reinterpret_cast<void*>(0x4A6B25));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4AB160), &entityarmormodbuildingrasm, reinterpret_cast<void*>(0x04AB170));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4a6b06), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CSettler::EventGetArmorOverride, 0), reinterpret_cast<void*>(0x4a6b10));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4ab15f), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CBuilding::EventGetArmorOverride, 0), reinterpret_cast<void*>(0x4ab165));
 }
 
 void __declspec(naked) entityexplmodsettasm() {
@@ -1846,19 +1841,25 @@ int GGL::CSettler::GetDodgeChance()
 	return settler_getdodge(this);
 }
 
-int __thiscall GGL::CSettler::GetBaseArmor()
+std::pair<int, bool> __thiscall GGL::CSettler::GetBaseArmor()
 {
 	auto* d = GetAdditionalData(false);
+	bool b = d == nullptr ? true : d->ArmorUseBoni;
 	if (d && d->ArmorOverride >= 0)
-		return d->ArmorOverride;
+		return {d->ArmorOverride, b};
 	GGlue::CGlueEntityProps* p = GetEntityType();
 	if (const auto* l = dynamic_cast<GGL::CGLSettlerProps*>(p->LogicProps))
-		return l->ArmorAmount;
-	return 0;
+		return {l->ArmorAmount, b};
+	return {0, b};
 }
 
-int __thiscall GGL::CSettler::GetBaseArmorStatic(CSettler *th) {
-	return th->GetBaseArmor();
+int GGL::CSettler::GetArmor() {
+	auto [a, boni] = GetBaseArmor();
+	auto armor = static_cast<float>(a);
+	if (boni)
+		armor = ModifierProfile.GetModifiedValue(EGL::IProfileModifierSetObserver::ModifierType::Armor, armor);
+	armor *= GetTotalAffectedArmorModifier();
+	return static_cast<int>(armor);
 }
 
 static inline void(__thiscall* const settler_upgrade)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x4A6C4A);
@@ -1876,6 +1877,19 @@ static inline void(__thiscall* const settler_appear)(GGL::CSettler* th) = reinte
 void GGL::CSettler::Appear()
 {
 	settler_appear(this);
+}
+
+void GGL::CSettler::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
+	if (EventIsSoldier()) {
+		auto* l = GetEntityByID(GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER));
+		if (l == nullptr) {
+			Destroy();
+			return;
+		}
+		l->FireEvent(ev);
+		return;
+	}
+	ev->Data = GetArmor();
 }
 
 void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)

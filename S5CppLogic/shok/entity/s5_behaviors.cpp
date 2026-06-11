@@ -460,18 +460,27 @@ float GGL::CBattleBehavior::GetMaxRange() const
 	return battleBehaviorGetMaxRange(this);
 }
 
+std::tuple<int, bool> GGL::CBattleBehavior::GetBaseDamage() const {
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	const auto* d = e->GetAdditionalData();
+	int base;
+	if (d && d->DamageOverride >= 0)
+		base = d->DamageOverride;
+	else
+		base = BattleProps->DamageAmount;
+	bool m = d == nullptr ? true : d->DamageUseBoni;
+	return {base, m};
+}
+
 int GGL::CBattleBehavior::GetDamage() const
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	const auto* d = e->GetAdditionalData();
-	float base;
-	if (d && d->DamageOverride >= 0)
-		base = static_cast<float>(d->DamageOverride);
-	else
-		base = static_cast<float>(BattleProps->DamageAmount);
-	base = e->ModifyDamage(base);
-	float fact = e->GetTotalAffectedDamageModifier();
-	return static_cast<int>(base * fact);
+	auto [base, m] = GetBaseDamage();
+	auto dmg = static_cast<float>(base);
+	if (m)
+		dmg = e->ModifyDamage(dmg, false);
+	dmg *= e->GetTotalAffectedDamageModifier();
+	return static_cast<int>(dmg);
 }
 
 int GGL::CBattleBehavior::GetMaxRandomDamage() const
@@ -572,7 +581,7 @@ float __thiscall GGL::CBattleBehavior::GetMaxRangeBaseStatic(const CBattleBehavi
 }
 
 void __thiscall GGL::CBattleBehavior::EventOverrideGetDamage(EGL::CEventGetValue_Int* ev) const {
-	ev->Data = static_cast<int>(GetDamage());
+	ev->Data = GetDamage();
 }
 int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjectile(EGL::CGLETaskArgs* a) const {
 	auto* en = EGL::CGLEEntity::GetEntityByID(EntityId);
@@ -598,8 +607,8 @@ int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjectile(EGL::CGLETaskArg
 	ct.TargetID = tar->EntityId;
 	ct.SourcePlayer = en->PlayerId;
 
-	if (!dynamic_cast<GGL::CArrowEffectProps*>((*EGL::CGLEEffectsProps::GlobalObj)->GetLogic(BattleProps->ProjectileEffectID))) {
-		ct.Damage = static_cast<int>(GetDamage()) + GetRandomDamage();
+	if ((*EGL::CGLEEffectsProps::GlobalObj)->GetLogic(BattleProps->ProjectileEffectID)->GetClassIdentifier() != GGL::CArrowEffectProps::Identifier) {
+		ct.Damage = GetDamage() + GetRandomDamage();
 		ct.DamageRadius = BattleProps->DamageRange;
 		ct.DamageClass = BattleProps->DamageClass;
 	}

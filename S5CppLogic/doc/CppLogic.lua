@@ -1529,6 +1529,25 @@ function CppLogic.Entity.GetEntityNumberOfAttachments(e) end
 ---@param e entity
 ---@return number
 function CppLogic.Entity.GetEntityNumberOfAttachedEntities(e) end
+--- gets the number of attachments. this->other
+---@param e entity
+---@param attachmentType number|string
+---@return number
+function CppLogic.Entity.GetEntityNumberOfAttachmentsOfType(e, attachmentType) end
+
+---gets limited attachment data
+---@param id entity
+---@param attachmentType number|string
+---@return number limit
+---@return boolean active
+---@return number current
+function CppLogic.Entity.GetEntityLimitedAttachmentData(id, attachmentType)end
+---sets limited attachment data (if not nil)
+---@param id entity
+---@param attachmentType number|string
+---@param limit number?
+---@param active boolean?
+function CppLogic.Entity.SetEntityLimitedAttachmentData(id, attachmentType, limit, active)end
 
 --- entity task list index.
 --- @param id entity
@@ -1637,14 +1656,26 @@ function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
 --- does not work with SCELoader.
 --- @param id entity
 --- @param dmg number (<0 disable)
-function CppLogic.Entity.SetDamage(id, dmg) end
+--- @param useBoni boolean?
+function CppLogic.Entity.SetDamage(id, dmg, useBoni) end
+--- gets the entity base damage and boni state
+--- @param id entity
+--- @return number damage
+--- @return boolean useBoni (always false for autocannons)
+function CppLogic.Entity.GetBaseDamage(id) end
 
 --- overrides an entities armor.
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
---- @param armor number (<0 disable)
-function CppLogic.Entity.SetArmor(id, armor) end
+--- @param armor number? (<0 disable)
+--- @param useBoni boolean?
+function CppLogic.Entity.SetArmor(id, armor, useBoni) end
+--- gets the entity base armor and boni state
+--- @param id entity
+--- @return number armor
+--- @return boolean useBoni
+function CppLogic.Entity.GetBaseArmor(id) end
 
 --- overrides a settlers/buildings exploration.
 --- use Logic for scriptentities.

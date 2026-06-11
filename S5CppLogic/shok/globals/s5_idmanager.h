@@ -235,10 +235,6 @@ namespace CppLogic {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::ArmorClassManager;
 	};
 	template<>
-	struct IdManagerMapping<shok::AttachmentType> {
-		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::AttachmentTypesManager;
-	};
-	template<>
 	struct IdManagerMapping<shok::SoundId> {
 		static inline BB::CIDManagerEx** const Manager = BB::CIDManagerEx::SoundsManager;
 	};

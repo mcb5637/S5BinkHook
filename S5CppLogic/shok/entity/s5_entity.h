@@ -14,6 +14,10 @@ namespace CppLogic {
 	inline auto GetIdManager<shok::AdvancedDealDamageSource>() {
 		return CppLogic::MagicEnum::EnumIdManager<shok::AdvancedDealDamageSource>{};
 	}
+	template<>
+	inline auto GetIdManager<shok::AttachmentType>() {
+		return CppLogic::MagicEnum::EnumIdManager<shok::AttachmentType>{};
+	}
 }
 
 
@@ -268,9 +272,10 @@ namespace EGL {
 
 		static bool AdvHurtEntity_CheckOverHeal;
 		float CalculateDamageAgainstMe(int damage, shok::DamageClassId damageclass, float aoeFactor = 1.0f);
-		[[nodiscard]] float ModifyDamage(int baseDamage) const;
-		[[nodiscard]] float ModifyDamage(float baseDamage) const;
+		[[nodiscard]] float ModifyDamage(int baseDamage, bool noCache = true) const;
+		[[nodiscard]] float ModifyDamage(float baseDamage, bool noCache = true) const;
 		float GetTotalAffectedDamageModifier();
+		float GetTotalAffectedArmorModifier();
 		void AdvancedHurtEntityBy(EGL::CGLEEntity* attacker, int damage, shok::PlayerId attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __thiscall AdvancedHurtEntityByStatic(EGL::CGLEEntity* th, EGL::CGLEEntity* attacker, int damage, shok::PlayerId attackerFallback, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
 		static void __stdcall AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, shok::PlayerId player, shok::DamageClassId damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo);
@@ -533,6 +538,8 @@ namespace GGL {
 
 		static inline constexpr int vtp = 0x7727A4;
 
+		// ctor 4c77b7(entityid)
+
 		static void HookExperience(bool active);
 		static void HookExperienceClassAssignment(bool active);
 	private:
@@ -582,8 +589,8 @@ namespace GGL {
 		int LeaderGetRegenHealthSeconds();
 		void KillSettlerByEnvironment();
 		int GetDodgeChance(); // used in melee combat, percent
-		int __thiscall GetBaseArmor();
-		static int __thiscall GetBaseArmorStatic(CSettler* th);
+		std::pair<int, bool> __thiscall GetBaseArmor(); // armor, applyModifiers
+		int GetArmor();
 
 		void Upgrade();
 		void Vanish();
@@ -595,6 +602,10 @@ namespace GGL {
 		// defined states: Wait, Default (set tl to default)
 
 		// get settler props 4a4ab2
+	private:
+		void EventGetArmorOverride(EGL::CEventGetValue_Int* ev);
+
+		friend class EGL::CGLEEntity;
 	};
 	static_assert(sizeof(CSettler) == 137 * 4);
 	static_assert(offsetof(CSettler, ModifierProfile.EntityReference.OverheadWidget) == 130 * 4);
@@ -684,8 +695,8 @@ namespace GGL {
 		float GetMarketProgress();
 		// returns max time if not currently upgrading
 		float GetRemainingUpgradeTime();
-		int __thiscall GetBaseArmor();
-		static int __thiscall GetBaseArmorStatic(CBuilding* th);
+		std::pair<int, bool> __thiscall GetBaseArmor(); // armor, applyModifiers
+		int GetArmor();
 
 		void StartUpgrade();
 		void CancelUpgrade();
@@ -713,6 +724,10 @@ namespace GGL {
 
 		static std::vector<shok::AdditionalTechModifier> ConstructionSpeedModifiers;
 		static void EnableConstructionSpeedTechs();
+	private:
+		void EventGetArmorOverride(EGL::CEventGetValue_Int* ev);
+
+		friend class EGL::CGLEEntity;
 	};
 	static_assert(offsetof(CBuilding, IsActive) == 70 * 4);
 	static_assert(offsetof(CBuilding, UpgradeProgress) == 78 * 4);

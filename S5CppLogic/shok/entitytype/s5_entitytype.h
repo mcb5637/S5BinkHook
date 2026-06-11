@@ -22,7 +22,7 @@ namespace EGL {
 			shok::TechModifierType ModifierType;
 			shok::Vector<shok::TechnologyId> TechList{};
 
-			float ModifyValue(int player, float initial);
+			[[nodiscard]] float ModifyValue(shok::PlayerId player, float initial) const;
 
 			explicit inline ModifyEntityProps(shok::TechModifierType t = shok::TechModifierType::SpeedModifier) : ModifierType(t) {}
 		};

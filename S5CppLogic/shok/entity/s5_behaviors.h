@@ -856,6 +856,7 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xC4F1C42D);
 
 		[[nodiscard]] float GetMaxRange() const;
+		[[nodiscard]] std::tuple<int, bool> GetBaseDamage() const; // damage, applyModifiers
 		[[nodiscard]] int GetDamage() const;
 		[[nodiscard]] int GetMaxRandomDamage() const;
 		[[nodiscard]] int GetRandomDamage() const; // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
@@ -875,6 +876,7 @@ namespace GGL {
 		// 4d79e9 get number of melee attackers of
 		// is valid attack target 50b979
 		// set battle tasklist 50b81f
+		// get dmg against 50c1cd (entity*)
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();

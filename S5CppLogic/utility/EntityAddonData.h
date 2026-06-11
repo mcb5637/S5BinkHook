@@ -9,6 +9,8 @@ namespace CppLogic::EntityAddon {
 	public:
 		int HealthOverride = -1;
 		bool HealthUseBoni = true;
+		bool DamageUseBoni = true;
+		bool ArmorUseBoni = true;
 		int DamageOverride = -1;
 		int ArmorOverride = -1;
 		float ExplorationOverride = -1.0f;
@@ -25,11 +27,13 @@ namespace CppLogic::EntityAddon {
 
 		virtual ~EntityAddonData() override = default;
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	protected:
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityDestroy(bool ev) override;
 
+	public:
 		void* operator new(size_t s);
 		void operator delete(void* p);
 

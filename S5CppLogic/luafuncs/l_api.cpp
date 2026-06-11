@@ -320,6 +320,10 @@ namespace CppLogic::API {
 		CppLogic::GetIdManager<shok::AdvancedDealDamageSource>().PushToState(L);
 		L.SetGlobal();
 
+		L.Push("AttachmentTypes");
+		CppLogic::GetIdManager<shok::AttachmentType>().PushToState(L);
+		L.SetGlobal();
+
 		return 0;
 	}
 

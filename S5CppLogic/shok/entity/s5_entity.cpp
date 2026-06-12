@@ -638,16 +638,13 @@ shok::AccessCategory EGL::CGLEEntity::GetAccessCategory() const
 	return entity_getaccesscat(this);
 }
 
-float __thiscall EGL::CGLEEntity::GetBaseExploration()
+std::tuple<float, bool> __thiscall EGL::CGLEEntity::GetBaseExploration()
 {
 	auto* d = GetAdditionalData(false);
+	bool b = d != nullptr ? d->ExplorationUseBoni : true;
 	if (d && d->ExplorationOverride >= 0.0f)
-		return d->ExplorationOverride;
-	return GetEntityType()->LogicProps->Exploration;
-}
-
-float __thiscall EGL::CGLEEntity::GetBaseExplorationStatic(CGLEEntity *th) {
-	return th->GetBaseExploration();
+		return {d->ExplorationOverride, b};
+	return {GetEntityType()->LogicProps->Exploration, b};
 }
 
 void EGL::CGLEEntity::ClearAttackers()
@@ -1038,6 +1035,22 @@ void GGL::CBuilding::EnableConstructionSpeedTechs()
 
 void GGL::CBuilding::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
 	ev->Data = GetArmor();
+}
+float __thiscall GGL::CBuilding::GetExplorationOverride() {
+	auto [ex, b] = GetBaseExploration();
+	if (b)
+		ex = BB::IdentifierCast<GGL::CGLBuildingProps, EGL::CGLEEntityProps, GGL::CBridgeProperties>(GetEntityType()->LogicProps)->ModifyExploration.ModifyValue(PlayerId, ex);
+	if (IsConstructionFinished()) {
+		auto w = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->GetCurrentWeatherState();
+		if (w == shok::WeatherState::Rain)
+			ex *= (*GGL::CLogicProperties::GlobalObj)->WeatherExplorationBuildingRainFactor;
+		if (w == shok::WeatherState::Winter)
+			ex *= (*GGL::CLogicProperties::GlobalObj)->WeatherExplorationBuildingSnowFactor;
+	}
+	else {
+		ex *= (*GGL::CLogicProperties::GlobalObj)->BuildingUnderConstructionExplorationFactor;
+	}
+	return ex;
 }
 
 void __thiscall GGL::CBridgeEntity::ApplyHeightOverride() const {
@@ -1771,33 +1784,6 @@ void EGL::CGLEEntity::HookArmorMod()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4ab15f), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CBuilding::EventGetArmorOverride, 0), reinterpret_cast<void*>(0x4ab165));
 }
 
-void __declspec(naked) entityexplmodsettasm() {
-	__asm {
-		push esi;
-		push[esi + 0x10];
-
-		call EGL::CGLEEntity::GetBaseExplorationStatic;
-
-		push 0x4A4AD4;
-		ret;
-	}
-}
-void __declspec(naked) entityexplmodbuildasm() {
-	__asm {
-		push esi;
-		push[esi + 0x10];
-		mov eax, 0x4AAB98;
-		call eax;
-
-		push eax;
-		mov ecx, esi;
-		call EGL::CGLEEntity::GetBaseExplorationStatic;
-		pop eax;
-
-		push 0x4AB1A4;
-		ret;
-	}
-}
 bool HookExplorationMod_Hooked = false;
 void EGL::CGLEEntity::HookExplorationMod()
 {
@@ -1805,11 +1791,11 @@ void EGL::CGLEEntity::HookExplorationMod()
 		return;
 	HookExplorationMod_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
-		reinterpret_cast<void*>(0x4A4AC3),
-		reinterpret_cast<void*>(0x4AB199)
+		reinterpret_cast<void*>(0x4a4abc),
+		reinterpret_cast<void*>(0x4ab192)
 	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4A4AC3), &entityexplmodsettasm, reinterpret_cast<void*>(0x4A4AD4));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4AB199), &entityexplmodbuildasm, reinterpret_cast<void*>(0x4AB1A4));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4a4abc), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CSettler::GetExplorationOverride, 0), reinterpret_cast<void*>(0x4a4ac3));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4ab192), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CBuilding::GetExplorationOverride, 0), reinterpret_cast<void*>(0x4ab199));
 }
 
 int GGL::CSettler::LeaderGetRegenHealth()
@@ -1890,6 +1876,17 @@ void GGL::CSettler::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
 		return;
 	}
 	ev->Data = GetArmor();
+}
+float __thiscall GGL::CSettler::GetExplorationOverride() {
+	auto [ex, b] = GetBaseExploration();
+	if (b)
+		ex = ModifierProfile.GetModifiedValue(EGL::IProfileModifierSetObserver::ModifierType::Exploration, ex);
+	auto w = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->GetCurrentWeatherState();
+	if (w == shok::WeatherState::Rain)
+		ex *= (*GGL::CLogicProperties::GlobalObj)->WeatherExplorationBuildingRainFactor;
+	if (w == shok::WeatherState::Winter)
+		ex *= (*GGL::CLogicProperties::GlobalObj)->WeatherExplorationBuildingSnowFactor;
+	return ex;
 }
 
 void EGL::CGLEEntity::PerformHeal(int r, bool healSoldiers)

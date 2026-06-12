@@ -566,18 +566,15 @@ bool GGL::CBattleBehavior::HasMeleeCategory() const
 	return battlebeh_hasmeleecat(this);
 }
 
-float __thiscall GGL::CBattleBehavior::GetMaxRangeBase() const
+std::tuple<float, bool> __thiscall GGL::CBattleBehavior::GetMaxRangeBase() const
 {
 	const EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
 	const auto* d = e->GetAdditionalData();
+	bool b = d == nullptr ? true : d->MaxRangeUseBoni;
 	if (d && d->MaxRangeOverride >= 0)
-		return d->MaxRangeOverride;
+		return {d->MaxRangeOverride, b};
 	else
-		return BattleProps->MaxRange;
-}
-
-float __thiscall GGL::CBattleBehavior::GetMaxRangeBaseStatic(const CBattleBehavior *th) {
-	return th->GetMaxRangeBase();
+		return {BattleProps->MaxRange, b};
 }
 
 void __thiscall GGL::CBattleBehavior::EventOverrideGetDamage(EGL::CEventGetValue_Int* ev) const {
@@ -629,6 +626,20 @@ int __thiscall GGL::CBattleBehavior::TaskOverrideFireProjectile(EGL::CGLETaskArg
 
 	return 0;
 }
+float __thiscall GGL::CBattleBehavior::GetMaxRangeOverride() const {
+	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto [r, b] = GetMaxRangeBase();
+	if (b)
+		r = GGL::ModifierEntityDatabase::GlobalObj->GetModifiedStat(EntityId, EGL::IProfileModifierSetObserver::ModifierType::MaxAttackRange, r);
+	if (e->IsEntityInCategory(shok::EntityCategory::Melee)) { // was this intended to be Ranged???
+		auto w = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->GetCurrentWeatherState();
+		if (w == shok::WeatherState::Rain)
+			r *= (*GGL::CLogicProperties::GlobalObj)->WeatherExplorationBuildingRainFactor;
+		if (w == shok::WeatherState::Winter)
+			r *= (*GGL::CLogicProperties::GlobalObj)->WeatherExplorationBuildingSnowFactor;
+	}
+	return r;
+}
 
 bool BattleHookDamageMod_Hooked = false;
 void GGL::CBattleBehavior::HookDamageOverride()
@@ -650,19 +661,6 @@ void GGL::CBattleBehavior::HookDamageOverride()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50C33C), CppLogic::Hooks::MemberFuncPointerToVoid(&CBattleBehavior::TaskOverrideFireProjectile, 0), reinterpret_cast<void*>(0x50C34A));
 }
 
-void __declspec(naked) battlemaxrangeasm() {
-	__asm {
-		mov esi, ecx;
-
-		pushad;
-		call GGL::CBattleBehavior::GetMaxRangeBaseStatic;
-		popad;
-
-		mov eax, [esi + 0x30];
-		push 0x50AB50;
-		ret;
-	}
-}
 bool BattleHookMaxRange_Hooked = false;
 void GGL::CBattleBehavior::HookRangeOverride()
 {
@@ -670,9 +668,9 @@ void GGL::CBattleBehavior::HookRangeOverride()
 		return;
 	BattleHookMaxRange_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
-		reinterpret_cast<void*>(0x50AB48),
+		reinterpret_cast<void*>(0x50ab43),
 	} };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50AB48), &battlemaxrangeasm, reinterpret_cast<void*>(0x50AB50));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50ab43), CppLogic::Hooks::MemberFuncPointerToVoid(&CBattleBehavior::GetMaxRangeOverride, 0), reinterpret_cast<void*>(0x50ab4a));
 }
 
 

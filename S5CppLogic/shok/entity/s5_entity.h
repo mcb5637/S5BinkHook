@@ -249,8 +249,7 @@ namespace EGL {
 		[[nodiscard]] bool IsInBlocking() const;
 		[[nodiscard]] bool IsDead() const;
 		[[nodiscard]] shok::AccessCategory GetAccessCategory() const;
-		float __thiscall GetBaseExploration();
-		static float __thiscall GetBaseExplorationStatic(CGLEEntity* th);
+		std::tuple<float, bool> __thiscall GetBaseExploration();
 
 		void Destroy();
 
@@ -604,6 +603,7 @@ namespace GGL {
 		// get settler props 4a4ab2
 	private:
 		void EventGetArmorOverride(EGL::CEventGetValue_Int* ev);
+		float __thiscall GetExplorationOverride();
 
 		friend class EGL::CGLEEntity;
 	};
@@ -726,6 +726,7 @@ namespace GGL {
 		static void EnableConstructionSpeedTechs();
 	private:
 		void EventGetArmorOverride(EGL::CEventGetValue_Int* ev);
+		float __thiscall GetExplorationOverride();
 
 		friend class EGL::CGLEEntity;
 	};

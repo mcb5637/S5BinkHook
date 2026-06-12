@@ -11,6 +11,7 @@ namespace CppLogic::EntityAddon {
 		bool HealthUseBoni = true;
 		bool DamageUseBoni = true;
 		bool ArmorUseBoni = true;
+		bool ExplorationUseBoni = true;
 		int DamageOverride = -1;
 		int ArmorOverride = -1;
 		float ExplorationOverride = -1.0f;
@@ -19,6 +20,7 @@ namespace CppLogic::EntityAddon {
 		float MaxRangeOverride = -1.0f;
 		std::string NameOverride;
 		int FakeTaskValue = 0;
+		bool MaxRangeUseBoni = true;
 
 		EntityAddonData& operator =(const EntityAddonData& other);
 

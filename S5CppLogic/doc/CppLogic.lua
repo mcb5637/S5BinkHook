@@ -1652,13 +1652,14 @@ function CppLogic.Entity.SetMaxHP(id, hp, useBoni) end
 
 --- overrides an entities damage.
 --- for autocannons (towers, heroabilities...) apply it to the turret (via Logic.GetFoundationTop(id)).
+--- also allows turning tech & level boni off, buffs from heroabilities always apply.
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param dmg number (<0 disable)
 --- @param useBoni boolean?
 function CppLogic.Entity.SetDamage(id, dmg, useBoni) end
---- gets the entity base damage and boni state
+--- gets the entity base damage and boni state.
 --- @param id entity
 --- @return number damage
 --- @return boolean useBoni (always false for autocannons)
@@ -1666,12 +1667,13 @@ function CppLogic.Entity.GetBaseDamage(id) end
 
 --- overrides an entities armor.
 --- status of this gets saved into a savegame.
+--- also allows turning tech & level boni off, buffs from heroabilities always apply.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param armor number? (<0 disable)
 --- @param useBoni boolean?
 function CppLogic.Entity.SetArmor(id, armor, useBoni) end
---- gets the entity base armor and boni state
+--- gets the entity base armor and boni state.
 --- @param id entity
 --- @return number armor
 --- @return boolean useBoni
@@ -1679,18 +1681,20 @@ function CppLogic.Entity.GetBaseArmor(id) end
 
 --- overrides a settlers/buildings exploration.
 --- use Logic for scriptentities.
+--- also allows turning tech & level boni off, weather/constructionsite always applys.
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param ex number (<0 disable)
-function CppLogic.Entity.SetExploration(id, ex) end
+function CppLogic.Entity.SetExploration(id, ex, useBoni) end
 
 --- overrides a settlers/autocannons max attack range.
 --- status of this gets saved into a savegame.
+--- also allows turning tech & level boni off, weather always applys.
 --- does not work with SCELoader.
 --- @param id entity
 --- @param ran number (<0 disable)
-function CppLogic.Entity.SetAutoAttackMaxRange(id, ran) end
+function CppLogic.Entity.SetAutoAttackMaxRange(id, ran, useBoni) end
 
 --- overrides an entities display name.
 --- status of this gets saved into a savegame.

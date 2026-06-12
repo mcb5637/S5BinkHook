@@ -1558,7 +1558,10 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookExplorationMod();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookExploration = true;
 		auto* d = b->GetAdditionalData(true);
-		d->ExplorationOverride = L.CheckFloat(2);
+		if (!L.IsNoneOrNil(2))
+			d->ExplorationOverride = L.CheckFloat(2);
+		if (!L.IsNoneOrNil(3))
+			d->ExplorationUseBoni = L.CheckBool(3);
 		return 0;
 	}
 	int LeaderSetRegeneration(luaext::State L) {
@@ -1570,9 +1573,9 @@ namespace CppLogic::Entity {
 		GGL::CLeaderBehavior::HookLeaderRegen();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookRegen = true;
 		auto* d = b->GetAdditionalData(true);
-		if (L.IsNumber(2))
+		if (!L.IsNoneOrNil(2))
 			d->RegenHPOverride = L.CheckInt(2);
-		if (L.IsNumber(3))
+		if (!L.IsNoneOrNil(2))
 			d->RegenSecondsOverride = L.CheckInt(3);
 		return 0;
 	}
@@ -1583,7 +1586,10 @@ namespace CppLogic::Entity {
 		EGL::CGLEEntity::HookMaxRange();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HookMaxRange = true;
 		auto* d = b->GetAdditionalData(true);
-		d->MaxRangeOverride = L.CheckFloat(2);
+		if (!L.IsNoneOrNil(2))
+			d->MaxRangeOverride = L.CheckFloat(2);
+		if (!L.IsNoneOrNil(2))
+			d->MaxRangeUseBoni = L.CheckBool(3);
 		return 0;
 	}
 	int SetDisplayName(luaext::State L) {

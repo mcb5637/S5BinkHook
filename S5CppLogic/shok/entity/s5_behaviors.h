@@ -864,8 +864,7 @@ namespace GGL {
 		[[nodiscard]] EGL::CGLEEntity* GetTarget() const;
 		[[nodiscard]] float GetMissChance() const;
 		[[nodiscard]] bool CheckMiss() const; // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
-		[[nodiscard]] float __thiscall GetMaxRangeBase() const;
-		static float __thiscall GetMaxRangeBaseStatic(const CBattleBehavior* th);
+		[[nodiscard]] std::tuple<float, bool> __thiscall GetMaxRangeBase() const;
 		bool CanAutoAttack(); // checks feared, leadercommand (not heroability,move,guard) and event Battle_DisableAutoAttack
 		float GetDamageClassFactorAgainst(EGL::CGLEEntity* target);
 		shok::AnimationId GetRandomAttackAnim(); // uses (*EGL::CGLEGameLogic::GlobalObj)->RNG
@@ -884,6 +883,7 @@ namespace GGL {
 	private:
 		void __thiscall EventOverrideGetDamage(EGL::CEventGetValue_Int* ev) const;
 		int __thiscall TaskOverrideFireProjectile(EGL::CGLETaskArgs* a) const;
+		float __thiscall GetMaxRangeOverride() const;
 	};
 
 	class CLeaderBehaviorProps;

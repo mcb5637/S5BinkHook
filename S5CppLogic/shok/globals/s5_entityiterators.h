@@ -94,8 +94,13 @@ namespace EGL {
 	public:
 		virtual ~CPlayerEntityIterator() = default;
 
+		shok::PlayerId Player{};
+		shok::Vector<shok::EntityTypeId> EntityTypes;
+		PADDINGI(4);
+
 		static inline constexpr int vtp = 0x766CD4;
-		// ctor 57E0B2 (this, player, 0, 0)
+		// ctor 57E0B2 (this, player, EntityType or 0, 0)
+		// ctor 57e056 (this, player, vector<EntityType>, 0)
 		// go next 57DF7D -> bool has next
 		// get current 57DF13
 		// dtor sometimes inlined, vector at [2] (dtor 4A1357)

@@ -173,18 +173,27 @@ namespace CppLogic::LuaEventInterface {
 			throw lua::LuaException{ std::format("has no {} behavior", typename_details::type_name<Bh>()) };
 	}
 
-	template<shok::DiploState D>
+	template<shok::DiploState D, bool Not = false>
 	void CheckEntityDiploState(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
-		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
-		if constexpr (D == shok::DiploState::Friendly) {
-			if (e->PlayerId == oth->PlayerId)
-				return;
+		auto state = [&]() {
+			auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);
+			if constexpr (D == shok::DiploState::Friendly) {
+				if (e->PlayerId == oth->PlayerId)
+					return true;
+			}
+			GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
+			if (!ps)
+				throw lua::LuaException{ "no player status???" };
+			return ps->GetDiploStateTo(oth->PlayerId) == D;
+		}();
+		if constexpr (Not) {
+			if (state)
+				throw lua::LuaException{ std::format("target is {}", magic_enum::enum_name(D)) };
 		}
-		GGL::CPlayerStatus* ps = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
-		if (!ps)
-			throw lua::LuaException{ "no player status???" };
-		if (ps->GetDiploStateTo(oth->PlayerId) != D)
-			throw lua::LuaException{ std::format("target is not {}", magic_enum::enum_name(D)) };
+		else {
+			if (!state)
+				throw lua::LuaException{ std::format("target is not {}", magic_enum::enum_name(D)) };
+		}
 	}
 	inline void CheckEntitySamePlayer(EGL::CGLEEntity* e, EGL::CEvent1Entity& ev) {
 		auto* oth = EGL::CGLEEntity::GetEntityByID(ev.EntityID);

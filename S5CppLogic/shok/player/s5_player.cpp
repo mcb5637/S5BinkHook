@@ -422,6 +422,10 @@ bool GGL::PlayerTributesManager::RemoveTribute(int tid)
 {
 	return tributemanager_remove(this, tid);
 }
+bool GGL::PlayerTributesManager::PayTribute(int tid) {
+	auto* f = reinterpret_cast<bool(__thiscall*)(PlayerTributesManager*, int)>(0x4be562);
+	return f(this, tid);
+}
 
 static inline void(__thiscall* const questmanager_setdata)(GGL::PlayerQuestManager* th, int qid, GGL::PlayerQuestManager::QuestStatus qty, const char* name, const char* txt, const shok::Position* p, int info) = reinterpret_cast<void(__thiscall*)(GGL::PlayerQuestManager*, int, GGL::PlayerQuestManager::QuestStatus, const char*, const char*, const shok::Position*, int)>(0x4C8474);
 void GGL::PlayerQuestManager::SetQuestData(int questId, QuestStatus questType, const char* name, const char* text, const shok::Position* pos, bool info)

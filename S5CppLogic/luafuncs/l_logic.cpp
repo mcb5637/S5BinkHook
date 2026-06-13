@@ -261,6 +261,28 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	void PlayerBuyHero(shok::PlayerId pl, shok::EntityTypeId hty, std::optional<EGL::CGLEEntity*> hq) {
+		if (!GetEntityType(hty)->IsOfCategory(shok::EntityCategory::Hero))
+			throw lua::LuaException("not a hero");
+		auto* gl = *GGL::CGLGameLogic::GlobalObj;
+		if (gl->GetPlayer(pl)->NumberOfBuyableHeros <= 0)
+			throw lua::LuaException("limit reached");
+		gl->BuyHero(pl, hty, hq == nullptr ? shok::EntityId::Invalid : (*hq)->EntityId);
+	}
+
+	bool PlayerPayTribute(shok::PlayerId pl, int tid) {
+		auto* p = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pl);
+		auto& trib = p->Tributes;
+		for (const auto& r : trib.Tributes) {
+			if (r.UniqueTributeID == tid) {
+				if (!p->CurrentResources.HasResources(&r.Costs))
+					throw lua::LuaException("not enough resources");
+				return trib.PayTribute(tid);
+			}
+		}
+		throw lua::LuaException("invalid tribute");
+	}
+
 	int LandscapeGetSector(luaext::State L) {
 		shok::Position p = L.CheckPos(1);
 		L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->GetSector(&p));
@@ -1596,6 +1618,8 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<PlayerSetTaxLevel>("PlayerSetTaxLevel"),
 			luaext::FuncReference::GetRef<PlayerActivateWeatherMachine>("PlayerActivateWeatherMachine"),
 			luaext::FuncReference::GetRef<PlayerBlessSettlers>("PlayerBlessSettlers"),
+			luaext::FuncReference::GetRef<PlayerBuyHero>("PlayerBuyHero"),
+			luaext::FuncReference::GetRef<PlayerPayTribute>("PlayerPayTribute"),
 			luaext::FuncReference::GetRef<LandscapeGetSector>("LandscapeGetSector"),
 			luaext::FuncReference::GetRef<LandscapeGetNearestUnblockedPosInSector>("LandscapeGetNearestUnblockedPosInSector"),
 			luaext::FuncReference::GetRef<EnableAllHurtEntityTrigger>("EnableAllHurtEntityTrigger"),

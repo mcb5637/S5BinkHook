@@ -682,6 +682,7 @@ namespace GGL {
 		void PlayerActivateWeathermachine(shok::PlayerId player, shok::WeatherState weathertype);
 		void PlayerBlessSettlers(shok::PlayerId player, shok::BlessCategoryId blessCat);
 		void SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok::DiploState state);
+		void BuyHero(shok::PlayerId pl, shok::EntityTypeId ty, shok::EntityId hq);
 
 		template<shok::NetEventIds id, class EventType, class ObjectType>
 		void CreateNetEventHandler(ObjectType* ob, void (ObjectType::* handler)(EventType*)) {

@@ -195,12 +195,12 @@ namespace luaext {template<class S>
 
 		template<class T>
 		requires std::same_as<T, shok::PlayerId>
-		T Check(int i) {
+		shok::PlayerId Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->CheckPlayerId(i);
 		}
 		template<class En>
-		requires std::is_enum_v<En>
+		requires (std::is_enum_v<En> && !std::same_as<En, shok::PlayerId>)
 		En Check(int i) {
 			auto* th = static_cast<S*>(this);
 			return th->template CheckEnum<En>(i);

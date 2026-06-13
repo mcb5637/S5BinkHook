@@ -1257,6 +1257,11 @@ void GGL::CGLGameLogic::SetDiplomacy(shok::PlayerId p1, shok::PlayerId p2, shok:
 	EGL::CNetEvent2PlayerIDsAndInteger ev{ shok::NetEventIds::Player_SetDiplomacy, p1, p2, static_cast<int>(state) };
 	cglgamelogic_setdiplo(this, &ev);
 }
+void GGL::CGLGameLogic::BuyHero(shok::PlayerId pl, shok::EntityTypeId ty, shok::EntityId hq) {
+	EGL::CNetEventEntityIDAndPlayerIDAndEntityType ev{shok::NetEventIds::Player_BuyHero, pl, hq, ty };
+	auto* f = reinterpret_cast<void(__thiscall*)(CGLGameLogic*, EGL::CNetEventEntityIDAndPlayerIDAndEntityType*)>(0x49b61c);
+	f(this, &ev);
+}
 
 void GGL::CGLGameLogic::SetTechResearchedCallback(shok::PlayerId p) {
 	auto* f = reinterpret_cast<void(__thiscall*)(CGLGameLogic*, shok::PlayerId)>(0x49fcec);

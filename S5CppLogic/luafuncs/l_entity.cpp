@@ -1116,6 +1116,17 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	std::tuple<int, int> BuildingGetNumberOfFreeConstructionSlots(GGL::CBuilding* b) {
+		auto* site = BB::IdentifierCast<GGL::CConstructionSite>(EGL::CGLEEntity::GetEntityByID(b->GetConstructionSite()));
+		if (site == nullptr)
+			throw lua::LuaException("no construction site");
+		int num = site->GetNumberOfBuilderSlots();
+		int total = num;
+		for (auto _ : site->Slots)
+			--num;
+		return {num, total};
+	}
+
 	int SettlerCommandSerfConstructBuilding(luaext::State L) {
 		GGL::CSettler* s = L.CheckSettler(1);
 		GGL::CBuilding* b = L.CheckBuilding(2);
@@ -1133,6 +1144,14 @@ namespace CppLogic::Entity {
 		shok::Position p = L.CheckPos(2);
 		L.Push(b->GetNearestFreeRepairSlotFor(&p));
 		return 1;
+	}
+
+	std::tuple<int, int> BuildingGetNumberOfFreeRepairSlots(GGL::CBuilding* b) {
+		int num = b->GetNumberOfBuilderSlots();
+		int total = num;
+		for (auto _ : b->Slots)
+			--num;
+		return {num, total};
 	}
 
 	int SettlerCommandSerfRepairBuilding(luaext::State L) {
@@ -2064,6 +2083,9 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEventPosition, shok::EventIDs::CppL_BombComboCannon_Activate,
 				LuaEventInterface::CheckEntityBehavior<CppLogic::Mod::ReloadableCannonBuilderAbility>,
 				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityPlaceBomb>>>("CommandBombCannonCombo"),
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::HeroBehavior_CommandNPCInteraction,
+				LuaEventInterface::CheckEntityBehavior<GGL::CHeroBehavior>,
+				LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile, true>>>("CommandNPCInteraction"),
 			luaext::FuncReference::GetRef<EnableConversionHook>("EnableConversionHook"),
 			luaext::FuncReference::GetRef<DisableConversionHook>("DisableConversionHook"),
 			luaext::FuncReference::GetRef<SettlerCommandMove>("CommandMove"),
@@ -2110,6 +2132,8 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<BuildingCommandFoundryBuildCannon>("CommandFoundryBuildCannon"),
 			luaext::FuncReference::GetRef<BuildingGetNearestFreeConstructionSlotFor>("GetNearestFreeConstructionSlotFor"),
 			luaext::FuncReference::GetRef<BuildingGetNearestFreeRepairSlotFor>("GetNearestFreeRepairSlotFor"),
+			luaext::FuncReference::GetRef<BuildingGetNumberOfFreeConstructionSlots>("GetNumberOfFreeConstructionSlots"),
+			luaext::FuncReference::GetRef<BuildingGetNumberOfFreeRepairSlots>("GetNumberOfFreeRepairSlots"),
 			luaext::FuncReference::GetRef<BuildingStartUpgrade>("StartUpgrade"),
 			luaext::FuncReference::GetRef<BuildingCancelUpgrade>("CancelUpgrade"),
 			luaext::FuncReference::GetRef<BuildingIsIdle>("IsIdle"),

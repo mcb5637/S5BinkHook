@@ -657,8 +657,7 @@ namespace GGL {
 		shok::TechnologyId CurrentTechnology;
 		int LatestAttackTurn, MostRecentDepartureTurn;
 		float ConstructionProgress, RepairProgress, UpgradeProgress; // 76 la78
-		PADDINGI(2);// list Slots with NumberOfRepairingSerfs? 79
-		int NumberOfRepairingSerfs;
+		shok::Map<int, shok::EntityId> Slots; // constructing/repairing serfs
 		int OvertimeRechargeTime; // 82
 
 		virtual shok::EntityId GetLastAttachedWorker() = 0;// 39

@@ -260,6 +260,7 @@ namespace GGL {
 		void SetTributeData(int tid, const shok::CostInfo& c, shok::EntityId ownerEntityId, shok::PlayerId offeringPlayerId, const char* text);
 		// returns if it was there
 		bool RemoveTribute(int tid);
+		bool PayTribute(int tid);
 
 		// dtor 4b624c
 	};

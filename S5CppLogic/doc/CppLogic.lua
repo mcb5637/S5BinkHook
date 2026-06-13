@@ -534,6 +534,17 @@ function CppLogic.Logic.PlayerActivateWeatherMachine(pl, wt) end
 --- @param bc number
 function CppLogic.Logic.PlayerBlessSettlers(pl, bc) end
 
+--- buys a hero for a player. if no HQ is specified, automatically chooses the first one.
+--- @param pl number player
+--- @param heroType number|string
+--- @param hq number|string?
+function CppLogic.Logic.PlayerBuyHero(pl, heroType, hq) end
+
+--- pays a tribute.
+--- @param pl number player
+--- @param tid number
+function CppLogic.Logic.PlayerPayTribute(pl, tid) end
+
 --- gets the sector of a position.
 --- @param p Position
 --- @return number sector
@@ -2038,6 +2049,11 @@ function CppLogic.Entity.Settler.CommandBombardment(id, p) end
 --- @param p Position
 function CppLogic.Entity.Settler.CommandBombCannonCombo(id, p) end
 
+--- NPC interaction command
+--- @param id entity
+--- @param tid entity
+function CppLogic.Entity.Settler.CommandNPCInteraction(id, tid) end
+
 --- teleports a settler to a position. does not change id.
 --- @param id entity
 --- @param p Position pos
@@ -2177,6 +2193,18 @@ function CppLogic.Entity.Building.GetNearestFreeConstructionSlotFor(build, p) en
 --- @param p Position to measure from
 --- @return number slotIndex -1 if nothing free
 function CppLogic.Entity.Building.GetNearestFreeRepairSlotFor(build, p) end
+
+--- number of construction slots.
+--- @param build building
+--- @return number free
+--- @return number total
+function CppLogic.Entity.Building.GetNumberOfFreeConstructionSlots(build) end
+
+--- number of repair slots.
+--- @param build building
+--- @return number free
+--- @return number total
+function CppLogic.Entity.Building.GetNumberOfFreeRepairSlots(build) end
 
 --- market trade data.
 --- progress is buy amount + sell amount

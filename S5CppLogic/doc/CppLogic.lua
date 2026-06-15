@@ -3368,7 +3368,7 @@ function CppLogic.UI.CreateMiniMapMarker(p, pulsing, r, g, b, timefactor, scalef
 --- @param g number color 0-255
 --- @param b number color 0-255
 --- @param scalefactor number multiplied with scale (optional, default 1)
-function CppLogic.UI.CreateMiniMapScriptSignal(p, pulsing, r, g, b, timefactor, scalefactor) end
+function CppLogic.UI.CreateMiniMapScriptSignal(p, r, g, b, scalefactor) end
 
 --- gets the far clip plane min and max that are used in cutscenes. similar to Display.SetFarClipPlaneMinAndMax.
 --- @return number max

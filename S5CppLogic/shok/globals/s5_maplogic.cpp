@@ -12,6 +12,7 @@
 #include <utility/entityiterator.h>
 #include <utility/hooks.h>
 #include <utility/ModPlayers.h>
+#include <utility/savegame_extra.h>
 
 void EGL::CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)
 {
@@ -600,6 +601,18 @@ void EGL::CPlayerExplorationHandler::UpdateSeen() {
 	auto* f = reinterpret_cast<void(__thiscall*)(EGL::CPlayerExplorationHandler*)>(0x58ce9d);
 	f(this);
 }
+bool EGL::CPlayerExplorationHandler::IsUpdateSeenEnabled() const {
+	auto* pl = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.GetExtraPlayer(PlayerID, false);
+	if (pl != nullptr)
+		return pl->ExplorationUpdateSeen;
+	return true;
+}
+void EGL::CPlayerExplorationHandler::UpdateSeenExtra() {
+	std::swap(ExplorationMapCurrent, ExplorationMapWork);
+	if (IsUpdateSeenEnabled())
+		*ExplorationMapSeen |= *ExplorationMapCurrent;
+	++UpdateCounter;
+}
 
 void EGL::CPlayerExplorationUpdate::SetPlayersToUpdate(shok::PlayerId first, shok::PlayerId last)
 {
@@ -724,12 +737,14 @@ void EGL::CPlayerExplorationUpdate::HookExtraPlayers() {
 		reinterpret_cast<void*>(0x58cd8f),
 		reinterpret_cast<void*>(0x58cd0e),
 		reinterpret_cast<void*>(0x58cd7b),
+		reinterpret_cast<void*>(0x58c6d0),
 	}};
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cdab), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::FillCirclesExtra, 0));
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd01), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::FillCirclesExtra, 0));
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd8f), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::DrawCirclesIncrementalExtra, 0));
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd0e), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::DrawCirclesIncrementalExtra, 0));
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58cd7b), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationUpdate::UpdateNumCirclesToDrawExtra, 0));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x58c6d0), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerExplorationHandler::UpdateSeenExtra, 0));
 }
 
 void EGL::CPlayerFeedbackHandler::Tick() {

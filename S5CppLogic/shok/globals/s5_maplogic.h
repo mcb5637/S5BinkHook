@@ -231,6 +231,7 @@ namespace EGL {
 		// 57ef15 is blocking at pos set(int x, int y, EGL::CGLELandscape::BlockingMode* mode)
 	};
 
+	class CPlayerExplorationUpdate;
 	class CPlayerExplorationHandler : public BB::IObject {
 	public:
 		struct ExCircle {
@@ -259,6 +260,10 @@ namespace EGL {
 		size_t DrawNumCirclesIntoWork(const shok::Vector<ExCircle>& from, size_t index, size_t num);
 		// swap work & current, then update seen
 		void UpdateSeen();
+		[[nodiscard]] bool IsUpdateSeenEnabled() const;
+	private:
+		void UpdateSeenExtra();
+		friend class CPlayerExplorationUpdate;
 	};
 
 	class CPlayerExplorationUpdate : public BB::IObject {

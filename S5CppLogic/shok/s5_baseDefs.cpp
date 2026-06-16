@@ -205,6 +205,11 @@ void EGL::EventHandlerList::AddHandler(shok::EventIDs id, EGL::EventHandler* h)
 {
 	eventhandlerlist_addhandlers(this, id, h);
 }
+EGL::C2DArray1Bit& EGL::C2DArray1Bit::operator|=(C2DArray1Bit& other) {
+	auto* f = reinterpret_cast<void(__thiscall*)(C2DArray1Bit*, C2DArray1Bit*)>(0x58ce10);
+	f(this, &other);
+	return *this;
+}
 
 bool CppLogic::CaselessStringComparator::operator()(std::string_view a, std::string_view b) const noexcept
 {

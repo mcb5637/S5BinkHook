@@ -479,6 +479,8 @@ namespace EGL {
 
 		static constexpr int vtp = 0x784ED0;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xEE435293);
+
+		C2DArray1Bit& operator|=(C2DArray1Bit& other);
 	};
 }
 

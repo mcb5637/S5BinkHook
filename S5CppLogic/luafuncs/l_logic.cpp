@@ -1142,6 +1142,15 @@ namespace CppLogic::Logic {
 		return 0;
 	}
 
+	void SetPlayerExplorationUpdateSeen(shok::PlayerId p, bool update) {
+		auto* pl = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.GetExtraPlayer(p, true);
+		pl->ExplorationUpdateSeen = update;
+	}
+
+	bool GetPlayerExplorationUpdateSeen(shok::PlayerId p) {
+		return (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng->GetExplorationHandlerByPlayer(p)->IsUpdateSeenEnabled();
+	}
+
 	int DumpTaskList(luaext::State L) {
 		EGL::CGLETaskList* tl = (*EGL::CGLETaskListMgr::GlobalObj)->GetTaskListByID(L.CheckEnum<shok::TaskListId>(1));
 		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, tl);
@@ -1717,6 +1726,8 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),
 			luaext::FuncReference::GetRef<IsPositionExplored>("IsPositionExplored"),
 			luaext::FuncReference::GetRef<SetPositionExploration>("SetPositionExploration"),
+			luaext::FuncReference::GetRef<SetPlayerExplorationUpdateSeen>("SetPlayerExplorationUpdateSeen"),
+			luaext::FuncReference::GetRef<GetPlayerExplorationUpdateSeen>("GetPlayerExplorationUpdateSeen"),
 			luaext::FuncReference::GetRef<DumpTaskList>("DumpTaskList"),
 			luaext::FuncReference::GetRef<PlayerGetWorkerAttraction>("PlayerGetWorkerAttraction"),
 			luaext::FuncReference::GetRef<PlayerGetMilitaryAttraction>("PlayerGetMilitaryAttraction"),

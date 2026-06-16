@@ -9,6 +9,7 @@
 BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::ExtraPlayerData::SerializationData[] {
 	AutoMemberSerialization(ExtraPlayerData, PaydayFrequency),
 	AutoMemberSerialization(ExtraPlayerData, AbsoluteMaxMotivation),
+	AutoMemberSerialization(ExtraPlayerData, ExplorationUpdateSeen),
 	BB::SerializationData::GuardData(),
 };
 

@@ -918,6 +918,17 @@ function CppLogic.Logic.IsPositionExplored(player, pos) end
 ---@param explored boolean
 function CppLogic.Logic.SetPositionExploration(player, pos1, pos2, explored) end
 
+--- sets, if a player updates its was visible map. does not clear already explored areas, to clear the map use CppLogic.Logic.SetPositionExploration.
+--- note that this only applies to players that have exploration updates turned on.
+---@param player number
+---@param update boolean
+function CppLogic.Logic.SetPlayerExplorationUpdateSeen(player, update) end
+
+--- gets, if a player updates its was visible map.
+---@param player number
+---@return boolean
+function CppLogic.Logic.GetPlayerExplorationUpdateSeen(player) end
+
 --- sets the minimum and maximum players that have their exploration updated
 ---@param min number
 ---@param max number

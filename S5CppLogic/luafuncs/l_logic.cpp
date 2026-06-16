@@ -1228,6 +1228,20 @@ namespace CppLogic::Logic {
 		return (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng->GetSharedExplorationFlag(p1, p2);
 	}
 
+	std::tuple<float, float> GetPlayerMaxMotivation(shok::PlayerId p) {
+		auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p);
+		return {pl->GetCurrentMaxMotivation(), pl->GetAbsoluteMaxMotivation()};
+	}
+	void ChangePlayerCurrentMaxMotivation(shok::PlayerId p, float delta) {
+		auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p);
+		pl->ChangeMaxMotivation(delta);
+	}
+	void SetPlayerAbsoluteMaxMotivation(shok::PlayerId p, float moti) {
+		auto* pl = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.GetExtraPlayer(p, true);
+		pl->AbsoluteMaxMotivation = moti;
+		GGL::CPlayerStatus::HookMaxMoti();
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(luaext::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1721,6 +1735,9 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<GetLevelFromExperience>("GetLevelFromExperience"),
 			luaext::FuncReference::GetRef<CalculateExperienceBorders>("CalculateExperienceBorders"),
 			luaext::FuncReference::GetRef<GetSharedExplorationFlag>("GetSharedExplorationFlag"),
+			luaext::FuncReference::GetRef<GetPlayerMaxMotivation>("GetPlayerMaxMotivation"),
+			luaext::FuncReference::GetRef<ChangePlayerCurrentMaxMotivation>("ChangePlayerCurrentMaxMotivation"),
+			luaext::FuncReference::GetRef<SetPlayerAbsoluteMaxMotivation>("SetPlayerAbsoluteMaxMotivation"),
 		};
 
 	constexpr std::array UICmd{
@@ -1792,6 +1809,13 @@ namespace CppLogic::Logic {
 			for (auto& e : CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExtraPlayers) {
 				if (e.PaydayFrequency > 0) {
 					GGL::CPlayerAttractionHandler::HookCheckPayday();
+					break;
+				}
+			}
+
+			for (auto& e : CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExtraPlayers) {
+				if (e.AbsoluteMaxMotivation > 0) {
+					GGL::CPlayerStatus::HookMaxMoti();
 					break;
 				}
 			}

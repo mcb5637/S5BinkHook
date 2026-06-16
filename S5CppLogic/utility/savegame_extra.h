@@ -9,6 +9,7 @@ namespace CppLogic::SavegameExtra {
 	public:
 		struct ExtraPlayerData {
 			int PaydayFrequency = 0;
+			float AbsoluteMaxMotivation = 0.0f;
 
 			static BB::SerializationData SerializationData[];
 		};

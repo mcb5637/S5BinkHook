@@ -116,11 +116,6 @@ int GGL::CPlayerAttractionHandler::GetTimeToNextPayday() const
 	auto* f = reinterpret_cast<int(__thiscall* const)(const GGL::CPlayerAttractionHandler*)>(0x4C1AF4);
 	return f(this);
 }
-static inline float(__thiscall* const shok_playerattractionhandler_getavmoti)(GGL::CPlayerAttractionHandler* th, int z) = reinterpret_cast<float(__thiscall* const)(GGL::CPlayerAttractionHandler*, int)>(0x4B5494);
-float GGL::CPlayerAttractionHandler::GetAverageMotivation()
-{
-	return shok_playerattractionhandler_getavmoti(this, 0);
-}
 
 static inline int(__thiscall* const shok_playerattractionhandler_attachworkers)(GGL::CPlayerAttractionHandler* th, bool force) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*, bool)>(0x4C4302);
 void GGL::CPlayerAttractionHandler::CheckWorkerAttachment(bool forceReAttach)
@@ -582,11 +577,6 @@ int GGL::CPlayerStatus::GetLevyTaxAmount()
 {
 	return playerstatus_getlevytax(this);
 }
-inline float(__thiscall* const playerstatus_getmaxmoti)(GGL::CPlayerStatus* th) = reinterpret_cast<float(__thiscall*)(GGL::CPlayerStatus*)>(0x4B4AE9);
-float GGL::CPlayerStatus::GetMaxMotivation()
-{
-	return playerstatus_getmaxmoti(this);
-}
 inline void(__thiscall* const playerstatus_changemoti)(GGL::CPlayerStatus* th, float delta, shok::WorkerReason reason) = reinterpret_cast<void(__thiscall*)(GGL::CPlayerStatus*, float, shok::WorkerReason)>(0x4B5401);
 void GGL::CPlayerStatus::ChangeMotivationForAllWorkers(float delta, shok::WorkerReason reason)
 {
@@ -596,6 +586,21 @@ inline void(__thiscall* const playerstatus_changemaxmoti)(GGL::CPlayerStatus* th
 void GGL::CPlayerStatus::ChangeMaxMotivation(float delta)
 {
 	playerstatus_changemaxmoti(this, delta);
+}
+float GGL::CPlayerStatus::GetAverageMotivation() const
+{
+	auto* f = reinterpret_cast<float(__thiscall* const)(const GGL::CPlayerStatus*, int)>(0x4B5494);
+	return f(this, 0);
+}
+float GGL::CPlayerStatus::GetCurrentMaxMotivation() const {
+	auto* f = reinterpret_cast<float(__thiscall*)(const GGL::CPlayerStatus*)>(0x4b4ae9);
+	return f(this);
+}
+float GGL::CPlayerStatus::GetAbsoluteMaxMotivation() const {
+	auto* pl = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.GetExtraPlayer(PlayerID, false);
+	if (pl != nullptr && pl->AbsoluteMaxMotivation > 0.0f)
+		return pl->AbsoluteMaxMotivation;
+	return (*GGL::CLogicProperties::GlobalObj)->MotivationAbsoluteMaxMotivation;
 }
 
 static inline bool(__thiscall* const playerstatus_setstatus)(GGL::CPlayerStatus* th, GGL::CPlayerStatus::PlayerStatus s) = reinterpret_cast<bool(__thiscall*)(GGL::CPlayerStatus*, GGL::CPlayerStatus::PlayerStatus)>(0x4B4B38);
@@ -644,6 +649,16 @@ void GGL::CPlayerStatus::HookExtraPlayers() {
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4b4d74), &SetDiploExtra, reinterpret_cast<void*>(0x4b4d7e));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4b4d5b), &GetDiploExtra, reinterpret_cast<void*>(0x4b4d62));
 }
+bool Player_HookMaxMoti = false;
+void GGL::CPlayerStatus::HookMaxMoti() {
+	if (Player_HookMaxMoti)
+		return;
+	Player_HookMaxMoti = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x100, {
+		reinterpret_cast<void*>(0x4b4ae9),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4b4ae9), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerStatus::GetCurrentMaxMotivationOverride, 0), reinterpret_cast<void*>(0x4b4af4));
+}
 
 int __stdcall GGL::CPlayerStatus::CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId)
 {
@@ -683,6 +698,9 @@ bool __thiscall GGL::CPlayerStatus::SetDiploExtra(PlayerDiplomacyManager *th, sh
 
 shok::DiploState __thiscall GGL::CPlayerStatus::GetDiploExtra(PlayerDiplomacyManager *th, shok::PlayerId p) {
 	return CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetDiplomacy(th->PlayerID, p);
+}
+float __thiscall GGL::CPlayerStatus::GetCurrentMaxMotivationOverride() const {
+	return std::min(CurrentMaxMotivation, GetAbsoluteMaxMotivation());
 }
 
 int GGL::PostGameStatisticsHolder::PlayerScores::GetScore(shok::ScoreType t) {

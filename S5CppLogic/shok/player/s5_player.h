@@ -65,7 +65,6 @@ namespace GGL {
 		int GetNumberOfMilitaryUnits();
 		// in 1/100 ticks
 		[[nodiscard]] int GetTimeToNextPayday() const;
-		float GetAverageMotivation();
 
 		int GetSleepPlaceLimit();
 		int GetFreeSleepPlaces();
@@ -434,9 +433,12 @@ namespace GGL {
 		float GetTaxMotivationChange();
 		int GetLevyTaxPerWorker();
 		int GetLevyTaxAmount();
-		float GetMaxMotivation(); // checks MotivationAbsoluteMaxMotivation
 		void ChangeMotivationForAllWorkers(float delta, shok::WorkerReason reason);
 		void ChangeMaxMotivation(float delta); // forwards to ChangeMotivationForAllWorkers with max(delta, 0) and WorkerReason::None
+		// returns current max if no workers
+		[[nodiscard]] float GetAverageMotivation() const;
+		[[nodiscard]] float GetCurrentMaxMotivation() const; // checks MotivationAbsoluteMaxMotivation
+		[[nodiscard]] float GetAbsoluteMaxMotivation() const;
 
 		// returns if successful
 		bool SetState(PlayerStatus s);
@@ -458,12 +460,14 @@ namespace GGL {
 		virtual ~CPlayerStatus() override;
 
 		static void HookExtraPlayers();
+		static void HookMaxMoti();
 
 	private:
 		static int __stdcall CanPlaceBuildingHook(shok::EntityTypeId entitytype, shok::PlayerId player, shok::Position* pos, float rotation, shok::EntityId buildOnId);
 		static void NAKED_DECL CanPlaceBuildingHookASM();
 		static bool __thiscall SetDiploExtra(PlayerDiplomacyManager* th, shok::PlayerId p, shok::DiploState d);
 		static shok::DiploState __thiscall GetDiploExtra(PlayerDiplomacyManager* th, shok::PlayerId p);
+		float __thiscall GetCurrentMaxMotivationOverride() const;
 	};
 	static_assert(sizeof(CPlayerStatus) == 804);
 	//constexpr int i = offsetof(CPlayerStatus, CurrentResources) / 4;

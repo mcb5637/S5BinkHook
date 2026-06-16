@@ -486,7 +486,7 @@ function CppLogic.Logic.SetPaydayFrequency(freq) end
 --- status of this gets saved into savegames.
 --- also activates CPPLOGIC_EVENT_ON_PAYDAY trigger.
 --- @param pl number
---- @param freq number frequency in seconds
+--- @param freq number frequency in seconds (0 to reset to default)
 function CppLogic.Logic.SetPlayerPaydayFrequency(pl, freq) end
 
 --- sets the time between settlers joining the village out of the village center.
@@ -994,6 +994,23 @@ function CppLogic.Logic.GetPlayerName(pid) end
 --- @param p2 number
 --- @return boolean
 function CppLogic.Logic.GetSharedExplorationFlag(p1, p2) end
+
+--- gets a players max motivation. (1 => 100%, 0=>0%).
+--- @param p number
+--- @return number currentMax
+--- @return number absoluteMax
+function CppLogic.Logic.GetPlayerMaxMotivation(p) end
+
+--- changes current max motivation (as if a motivation affecting building had been constructed/destroyed). (1 => 100%, 0=>0%).
+--- while it is possible to lower motivation below 1 (100%), this is not recommended, as motivation decay may then propmt workers to leave without giving a reason in the feedback event.
+--- @param p number
+--- @param delta number
+function CppLogic.Logic.ChangePlayerCurrentMaxMotivation(p, delta)end
+
+--- sets a players absolute max motivation.
+--- @param p number
+--- @param max number (0 to reset to default)
+function CppLogic.Logic.SetPlayerAbsoluteMaxMotivation(p, max) end
 
 --- dumps game logic
 --- dev only, slow!

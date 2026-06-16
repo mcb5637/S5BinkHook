@@ -7,6 +7,11 @@ namespace CppLogic::SavegameExtra {
 	class SerializedMapdata {
 		static constexpr std::string_view SaveGameFile = "\\CppLogic.xml";
 	public:
+		struct ExtraPlayerData {
+			int PaydayFrequency = 0;
+
+			static BB::SerializationData SerializationData[];
+		};
 
 		std::string SavegameName;
 		bool HurtEntityCallWithNoAttacker = false;
@@ -38,6 +43,7 @@ namespace CppLogic::SavegameExtra {
 		bool ClickMapTrigger = false;
 		bool BattleWaitCancelable = false;
 		shok::EntityCategory ResDoodad_RefillableCategory = {};
+		std::vector<ExtraPlayerData> ExtraPlayers;
 
 		std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverride;
 		static std::map<std::string, std::string, CppLogic::CaselessStringComparator> StringTableTextOverrideMainmenu;
@@ -45,6 +51,7 @@ namespace CppLogic::SavegameExtra {
 		void SerializeTo(const char* path, const char* savename);
 		void DeserializeFrom(const char* path, const char* savename);
 		void Clear();
+		ExtraPlayerData* GetExtraPlayer(shok::PlayerId p, bool create);
 
 		static void STTToMainmenu();
 		static void STTToIngame();

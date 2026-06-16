@@ -543,3 +543,23 @@ shok::ClassId __stdcall CppLogic::Events::CanBuySettlerEvent::GetClassIdentifier
 {
 	return Identifier;
 }
+
+CppLogic::Events::PaydayEvent::PaydayEvent(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm, shok::PlayerId pl, float sellam, float moti) :
+	CEventGoodsTraded(e, sell, buy, buyAm, static_cast<shok::EntityId>(static_cast<int>(pl)), sellam), MotivationChange(moti) {
+}
+
+shok::PlayerId CppLogic::Events::PaydayEvent::GetPlayerID() const {
+	return static_cast<shok::PlayerId>(static_cast<int>(Entity));
+}
+
+shok::ClassId __stdcall CppLogic::Events::PaydayEvent::GetClassIdentifier() const {
+	return Identifier;
+}
+
+void* __stdcall CppLogic::Events::PaydayEvent::CastToIdentifier(shok::ClassId id) {
+	if (id == EGL::IEventEntityID::Identifier)
+		return static_cast<EGL::IEventEntityID*>(this);
+	if (id == EGL::IEventPlayerID::Identifier)
+		return static_cast<EGL::IEventPlayerID*>(this);
+	return nullptr;
+}

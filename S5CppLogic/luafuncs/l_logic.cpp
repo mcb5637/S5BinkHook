@@ -86,6 +86,11 @@ namespace CppLogic::Logic {
 		(*GGL::CPlayerAttractionProps::GlobalObj)->PaydayFrequency = i;
 		return 0;
 	}
+	void SetPlayerPaydayFrequency(shok::PlayerId p, int f) {
+		GGL::CPlayerAttractionHandler::HookCheckPayday();
+		auto* ex = SavegameExtra::SerializedMapdata::GlobalObj.GetExtraPlayer(p, true);
+		ex->PaydayFrequency = f;
+	}
 	int SetAttractionFrequency(luaext::State L) {
 		int i = L.CheckInt(1);
 		if (i <= 0)
@@ -569,6 +574,24 @@ namespace CppLogic::Logic {
 		GGL::CPlayerAttractionHandler::HookCheckPayday();
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.PaydayTrigger = true;
 		return 0;
+	}
+
+	std::tuple<shok::PlayerId, float, float, float> GetPaydayTriggerData() {
+		auto* ev = BB::IdentifierCast<CppLogic::Events::PaydayEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		return {ev->GetPlayerID(), ev->SellAmount, ev->BuyAmount, ev->MotivationChange};
+	}
+	void SetPaydayTriggerData(std::optional<float> sell, std::optional<float> buy, std::optional<float> moti) {
+		auto* ev = BB::IdentifierCast<CppLogic::Events::PaydayEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		if (sell.has_value())
+			ev->SellAmount = *sell;
+		if (buy.has_value())
+			ev->BuyAmount = *buy;
+		if (moti.has_value())
+			ev->MotivationChange = *moti;
 	}
 
 	int SetLeadersRegenerateTroopHealth(luaext::State L) {
@@ -1609,6 +1632,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<PlayerGetPaydayStartetTick>("PlayerGetPaydayStartetTick"),
 			luaext::FuncReference::GetRef<PlayerSetPaydayStartetTick>("PlayerSetPaydayStartetTick"),
 			luaext::FuncReference::GetRef<SetPaydayFrequency>("SetPaydayFrequency"),
+			luaext::FuncReference::GetRef<SetPlayerPaydayFrequency>("SetPlayerPaydayFrequency"),
 			luaext::FuncReference::GetRef<SetAttractionFrequency>("SetAttractionFrequency"),
 			luaext::FuncReference::GetRef<PlayerGetKillStatistics>("PlayerGetKillStatistics"),
 			luaext::FuncReference::GetRef<CanPlaceBuildingAt>("CanPlaceBuildingAt"),
@@ -1642,6 +1666,8 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<GetColorByColorIndex>("GetColorByColorIndex"),
 			luaext::FuncReference::GetRef<SetColorByColorIndex>("SetColorByColorIndex"),
 			luaext::FuncReference::GetRef<SetPaydayCallback>("SetPaydayCallback"),
+			luaext::FuncReference::GetRef<GetPaydayTriggerData>("GetPaydayTriggerData"),
+			luaext::FuncReference::GetRef<SetPaydayTriggerData>("SetPaydayTriggerData"),
 			luaext::FuncReference::GetRef<SetLeadersRegenerateTroopHealth>("SetLeadersRegenerateTroopHealth"),
 			luaext::FuncReference::GetRef<SetStringTableText>("SetStringTableText"),
 			luaext::FuncReference::GetRef<SetPlaceBuildingAdditionalCheck>("SetPlaceBuildingAdditionalCheck"),
@@ -1757,6 +1783,13 @@ namespace CppLogic::Logic {
 
 			if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.PaydayTrigger)
 				GGL::CPlayerAttractionHandler::HookCheckPayday();
+
+			for (auto& e : CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ExtraPlayers) {
+				if (e.PaydayFrequency > 0) {
+					GGL::CPlayerAttractionHandler::HookCheckPayday();
+					break;
+				}
+			}
 
 			L.Push(CanPlaceBuildingCallbackRegKey);
 			L.GetTableRaw(-2);

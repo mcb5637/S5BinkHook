@@ -910,6 +910,18 @@ namespace CppLogic::Events {
 			return Identifier;
 		}
 	};
+
+	class PaydayEvent : public GGL::CEventGoodsTraded, public EGL::IEventPlayerID {
+	public:
+		float MotivationChange;
+
+		PaydayEvent(shok::EventIDs e, shok::ResourceType sell, shok::ResourceType buy, float buyAm, shok::PlayerId pl, float sellam, float moti);
+		[[nodiscard]] virtual shok::PlayerId GetPlayerID() const override;
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102B);
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
+	};
 }
 
 namespace shok {

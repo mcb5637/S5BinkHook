@@ -4,8 +4,11 @@
 #include <shok/events/s5_events.h>
 #include <shok/s5_scriptsystem.h>
 #include <shok/entity/s5_entity.h>
+#include <shok/events/s5_netevents.h>
+#include <shok/ui/s5_widget.h>
 #include <utility/hooks.h>
 #include <utility/ModPlayers.h>
+#include <utility/savegame_extra.h>
 
 static inline int(__thiscall* const plattracthandlerGetAttLimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C216F);
 int GGL::CPlayerAttractionHandler::GetAttractionLimit()
@@ -32,6 +35,18 @@ static inline float(__thiscall* const shok_playerattractionhandler_getplayerlead
 float GGL::CPlayerAttractionHandler::GetLeaderPaydayCost()
 {
 	return shok_playerattractionhandler_getplayerleaderpayday(this);
+}
+int GGL::CPlayerAttractionHandler::GetPaydayFrequency() const {
+	auto* extraData = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.GetExtraPlayer(PlayerID, false);
+	auto* attractionProps = *GGL::CPlayerAttractionProps::GlobalObj;
+	return extraData != nullptr && extraData->PaydayFrequency > 0 ? extraData->PaydayFrequency : attractionProps->PaydayFrequency;
+}
+int GGL::CPlayerAttractionHandler::GetTickProgressInPayday() const {
+	if (!PaydayActive)
+		return 0;
+	auto tick = (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
+	auto freq = GetPaydayFrequency() * 10;
+	return (tick - PaydayFirstOccuraceGameTurn) % freq;
 }
 static inline int(__thiscall* const shok_playerattractionhandler_getnumleaders)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C1B28);
 int GGL::CPlayerAttractionHandler::GetNumberOfLeaders()
@@ -96,10 +111,10 @@ int GGL::CPlayerAttractionHandler::GetNumberOfWorkersWithoutFarmPlace()
 {
 	return shok_playerattractionhandler_getnummissingfarmlaces(this);
 }
-static inline int(__thiscall* const shok_playerattractionhandler_gettimetopayday)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*)>(0x4C1AF4);
-int GGL::CPlayerAttractionHandler::GetTimeToNextPayday()
+int GGL::CPlayerAttractionHandler::GetTimeToNextPayday() const
 {
-	return shok_playerattractionhandler_gettimetopayday(this);
+	auto* f = reinterpret_cast<int(__thiscall* const)(const GGL::CPlayerAttractionHandler*)>(0x4C1AF4);
+	return f(this);
 }
 static inline float(__thiscall* const shok_playerattractionhandler_getavmoti)(GGL::CPlayerAttractionHandler* th, int z) = reinterpret_cast<float(__thiscall* const)(GGL::CPlayerAttractionHandler*, int)>(0x4B5494);
 float GGL::CPlayerAttractionHandler::GetAverageMotivation()
@@ -141,28 +156,10 @@ int GGL::CPlayerAttractionHandler::GetAttractionUsageOfVector(const shok::Vector
 {
 	return playerattractionhand_getusageofvect(this, &v);
 }
-
+static GGL::CEventGoodsTraded* __cdecl CastGoodsTradedEvent(BB::CEvent* ev) {
+	return BB::IdentifierCast<GGL::CEventGoodsTraded, BB::CEvent, CppLogic::Events::PaydayEvent>(ev);
+}
 void (*GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th) = nullptr;
-void __thiscall GGL::CPlayerAttractionHandler::CheckPaydayHook(CPlayerAttractionHandler* th)
-{
-	if (GGL::CPlayerAttractionHandler::OnCheckPayDayCallback)
-		GGL::CPlayerAttractionHandler::OnCheckPayDayCallback(th);
-	GGL::CEventGoodsTraded ev{ shok::EventIDs::CppLogicEvent_OnPayday, shok::ResourceType::Gold, shok::ResourceType::GoldRaw,
-		static_cast<float>(th->GetWorkerPaydayIncome()), static_cast<shok::EntityId>(static_cast<int>(th->PlayerID)), static_cast<float>(th->GetLeaderPaydayCost()) };
-	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
-}
-
-void NAKED_DEF GGL::CPlayerAttractionHandler::CheckPaydayHookASM() {
-	__asm {
-		mov ecx, esi;
-		call GGL::CPlayerAttractionHandler::CheckPaydayHook;
-
-		mov esi, [esi + 4];
-		mov dword ptr [ebp + 0x18], 0x1300E;
-		push 0x4C275E;
-		ret;
-	}
-}
 bool HookCheckPayday_Hooked = false;
 void GGL::CPlayerAttractionHandler::HookCheckPayday()
 {
@@ -171,8 +168,22 @@ void GGL::CPlayerAttractionHandler::HookCheckPayday()
 	if (CppLogic::HasSCELoader())
 		throw std::logic_error("HasSCELoader");
 	HookCheckPayday_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C2754), 0x4C275E - 0x4C2754 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C2754), &CheckPaydayHookASM, reinterpret_cast<void*>(0x4C275E));
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4c4abe), 0x4c4ac3 - 0x4c4abe };
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4c4abe), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerAttractionHandler::CheckPaydayOverride, 0));
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x513ddc), 0x20 };
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x513ddc), &CastGoodsTradedEvent, reinterpret_cast<void*>(0x513de1));
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4e5053), 0x10 };
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4e5053), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerAttractionHandler::GetPaydayFrequency100Override, 0));
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4e50a4), 0x10 };
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4e50a4), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerAttractionHandler::GetTimeToNextPaydayOverride, 0));
+	}
 }
 
 inline shok::EntityId(__thiscall* const playerattractionhandl_getnearestreachable)(GGL::CPlayerAttractionHandler* th, shok::Vector<shok::EntityId>* v, shok::Position* p) = reinterpret_cast<shok::EntityId(__thiscall*)(GGL::CPlayerAttractionHandler*, shok::Vector<shok::EntityId>*, shok::Position*)>(0x4C205C);
@@ -252,6 +263,51 @@ void NAKED_DEF GGL::CPlayerAttractionHandler::CannonsInProgressAttractionASM() {
 		ret;
 	};
 }
+
+void GGL::CPlayerAttractionHandler::CheckPaydayOverride() {
+	if (!PaydayActive) {
+		if (GetNumberOfAttractedWorkers() > 0 || (GetNumberOfLeaders() > 0 && PayLeaderFlag)) {
+			PaydayActive = true;
+			PaydayFirstOccuraceGameTurn = (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
+		}
+		return;
+	}
+	auto* attractionProps = *GGL::CPlayerAttractionProps::GlobalObj;
+	if (GetTickProgressInPayday() == 0) {
+		auto* st = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(PlayerID);
+		auto tax = static_cast<float>(st->GetTotalTaxAmount());
+		auto moti = st->GetTaxMotivationChange();
+		float pay = 0.0f;
+		if (PayLeaderFlag)
+			pay = GetLeaderPaydayCost();
+
+		if (OnCheckPayDayCallback)
+			OnCheckPayDayCallback(this);
+		CppLogic::Events::PaydayEvent ev{shok::EventIDs::CppLogicEvent_OnPayday, shok::ResourceType::Gold, shok::ResourceType::GoldRaw,
+			tax, PlayerID, pay, moti
+		};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+
+		st->CurrentResources.AddToType(shok::ResourceType::GoldRaw, ev.BuyAmount);
+		if (ev.MotivationChange != 0.0f)
+			st->ChangeMotivationForAllWorkers(ev.MotivationChange, shok::WorkerReason::Taxes);
+		if (ev.SellAmount > 0.0f) {
+			if (!st->CurrentResources.SubFromType(shok::ResourceType::Gold, ev.SellAmount, static_cast<float>(attractionProps->PlayerMoneyDispo)))
+				st->CurrentResources.SubFromType(shok::ResourceType::Gold, st->CurrentResources.GetResourceAmountFromType(shok::ResourceType::Gold, true), static_cast<float>(attractionProps->PlayerMoneyDispo));
+		}
+
+		EGL::CNetEventPlayerID feedback{shok::FeedbackEventIds::FEEDBACK_EVENT_PAYDAY, PlayerID};
+		EGUIX::FeedbackEventHandler::GlobalObj()->FireEvent(&feedback);
+	}
+}
+
+int GGL::CPlayerAttractionHandler::GetTimeToNextPaydayOverride() const {
+	return (GetPaydayFrequency() * 10 - GetTickProgressInPayday()) * 100;
+}
+int GGL::CPlayerAttractionHandler::GetPaydayFrequency100Override() const {
+	return GetPaydayFrequency() * 1000;
+}
+
 bool GGL::CPlayerAttractionHandler::AttractionCannonInProgress = true;
 bool AttractionCannonInProgress_Hooked = false;
 void GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress()
@@ -504,6 +560,16 @@ static inline int(__thiscall* const playerstatus_gettaxperworker)(GGL::CPlayerSt
 int GGL::CPlayerStatus::GetTaxPerWorker()
 {
 	return playerstatus_gettaxperworker(this);
+}
+
+int GGL::CPlayerStatus::GetTotalTaxAmount() {
+	auto* f = reinterpret_cast<int(__thiscall*)(GGL::CPlayerStatus*)>(0x4b4dd5);
+	return f(this);
+}
+
+float GGL::CPlayerStatus::GetTaxMotivationChange() {
+	auto* f = reinterpret_cast<float(__thiscall*)(GGL::CPlayerStatus*)>(0x4b4ad7);
+	return f(this);
 }
 
 static inline int(__thiscall* const playerstatus_getlevytaxperworker)(GGL::CPlayerStatus* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerStatus*)>(0x4B4A93);

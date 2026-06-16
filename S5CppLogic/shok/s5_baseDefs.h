@@ -119,7 +119,7 @@ namespace shok {
 
 		[[nodiscard]] float GetResourceAmountFromType(shok::ResourceType ty, bool addRaw) const;
 		void AddToType(shok::ResourceType ty, float toadd);
-		void SubFromType(shok::ResourceType ty, float tosub);
+		bool SubFromType(shok::ResourceType ty, float tosub, float dispo = 0.0f);
 		bool HasResources(const CostInfo* has) const;
 		bool SubResources(const CostInfo& tosub); // returns hadRes, does not sub anything if one res type is missing
 

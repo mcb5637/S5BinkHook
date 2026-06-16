@@ -183,10 +183,10 @@ void shok::CostInfo::AddToType(shok::ResourceType ty, float toadd)
 	costinfo_add(this, ty, toadd);
 }
 
-static inline void(__thiscall* const costinfo_sub)(shok::CostInfo* th, shok::ResourceType ty, float a, float b) = reinterpret_cast<void(__thiscall*)(shok::CostInfo*, shok::ResourceType, float, float)>(0x4A963D);
-void shok::CostInfo::SubFromType(shok::ResourceType ty, float tosub)
+static inline bool(__thiscall* const costinfo_sub)(shok::CostInfo* th, shok::ResourceType ty, float a, float b) = reinterpret_cast<bool(__thiscall*)(shok::CostInfo*, shok::ResourceType, float, float)>(0x4A963D);
+bool shok::CostInfo::SubFromType(shok::ResourceType ty, float tosub, float dispo)
 {
-	costinfo_sub(this, ty, tosub, 0.0f);
+	return costinfo_sub(this, ty, tosub, dispo);
 }
 
 static inline bool(__thiscall* const constinfo_hasres)(const shok::CostInfo* th, const shok::CostInfo* has) = reinterpret_cast<bool(__thiscall*)(const shok::CostInfo*, const shok::CostInfo*)>(0x4A96D3);

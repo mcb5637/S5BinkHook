@@ -53,6 +53,10 @@ namespace GGL {
 		int GetWorkerPaydayIncome();
 		int GetNumberOfAttractedWorkers();
 		float GetLeaderPaydayCost();
+		// in seconds
+		[[nodiscard]] int GetPaydayFrequency() const;
+		// in ticks (1/10 seconds)
+		[[nodiscard]] int GetTickProgressInPayday() const;
 		int GetNumberOfLeaders();
 		// checks VC capactity and motivation. always true if AIPlayerFlag set.
 		bool IsAttractionsSlotAvailable();
@@ -60,7 +64,7 @@ namespace GGL {
 		int GetNumberOfSettlers();
 		int GetNumberOfMilitaryUnits();
 		// in 1/100 ticks
-		int GetTimeToNextPayday();
+		[[nodiscard]] int GetTimeToNextPayday() const;
 		float GetAverageMotivation();
 
 		int GetSleepPlaceLimit();
@@ -95,13 +99,15 @@ namespace GGL {
 		// checkWorkerSpawn() 0x4C47FB
 		// getWorkplacesToSpawnWorker(shok::List<Data>*) 0x4C46BB
 		// get nearest reachable(shok::Vector<shok::EntityId>*, shok::Position*) 0x4C205C
+		// get payday frequency 4c1ae5 in 1/100 ticks
 
 	private:
-		static void __thiscall CheckPaydayHook(CPlayerAttractionHandler* th);
-		static void NAKED_DECL CheckPaydayHookASM();
 		void __thiscall CheckWorkerSpawnHook();
 		static int __thiscall CannonsInProgressAttraction(const CPlayerAttractionHandler* th);
 		static void NAKED_DECL CannonsInProgressAttractionASM();
+		void CheckPaydayOverride();
+		[[nodiscard]] int GetTimeToNextPaydayOverride() const;
+		[[nodiscard]] int GetPaydayFrequency100Override() const;
 	};
 	//constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
 
@@ -424,6 +430,8 @@ namespace GGL {
 		shok::TechState GetTechStatus(shok::TechnologyId tech);
 
 		int GetTaxPerWorker();
+		int GetTotalTaxAmount();
+		float GetTaxMotivationChange();
 		int GetLevyTaxPerWorker();
 		int GetLevyTaxAmount();
 		float GetMaxMotivation(); // checks MotivationAbsoluteMaxMotivation

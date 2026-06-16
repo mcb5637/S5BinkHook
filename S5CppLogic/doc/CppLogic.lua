@@ -473,7 +473,7 @@ function CppLogic.Logic.PlayerGetPaydayStartetTick(p) end
 
 --- the tick where this players payday got startet (-1 if inactive).
 --- (you can get the current tick via Logic.GetCurrentTurn() ).
---- if you disable it (via -1) it gets immediately restarted has a worker or leader on the map.
+--- if you disable it (via -1) it gets immediately restarted if p has a worker or leader on the map.
 --- @param p number player
 --- @param t number tick
 function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
@@ -481,6 +481,13 @@ function CppLogic.Logic.PlayerSetPaydayStartetTick(p, t) end
 --- sets the time between paydays. (get via Logic).
 --- @param freq number frequency in seconds
 function CppLogic.Logic.SetPaydayFrequency(freq) end
+
+--- sets the time between paydays per player. (get via Logic).
+--- status of this gets saved into savegames.
+--- also activates CPPLOGIC_EVENT_ON_PAYDAY trigger.
+--- @param pl number
+--- @param freq number frequency in seconds
+function CppLogic.Logic.SetPlayerPaydayFrequency(pl, freq) end
 
 --- sets the time between settlers joining the village out of the village center.
 --- @param freq number frequency in seconds
@@ -691,6 +698,19 @@ function CppLogic.Logic.SetColorByColorIndex(index, r, g, b, a) end
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 function CppLogic.Logic.SetPaydayCallback() end
+
+--- CPPLOGIC_EVENT_ON_PAYDAY data.
+--- @return number player
+--- @return number leaderPay
+--- @return number taxes
+--- @return number motivation
+function CppLogic.Logic.GetPaydayTriggerData() end
+
+--- CPPLOGIC_EVENT_ON_PAYDAY data.
+--- @param leaderPay number?
+---@param taxes number?
+---@param motivation number?
+function CppLogic.Logic.SetPaydayTriggerData(leaderPay, taxes, motivation) end
 
 --- sets a function to be called for building placement checks.
 --- only gets called if all usual conditions for placement are satisfied.
@@ -1703,6 +1723,7 @@ function CppLogic.Entity.SetExploration(id, ex, useBoni) end
 --- status of this gets saved into a savegame.
 --- also allows turning tech & level boni off, weather always applys.
 --- does not work with SCELoader.
+--- (This is not the leaders AutoAttack target search range, it is the attack range of the AutoAttack/BattleBehavior or AutoCannonBehavior).
 --- @param id entity
 --- @param ran number (<0 disable)
 function CppLogic.Entity.SetAutoAttackMaxRange(id, ran, useBoni) end

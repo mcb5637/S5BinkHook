@@ -64,6 +64,7 @@ const BB::SerializationData CppLogic::EntityAddon::EntityAddonData::Serializatio
 	AutoMemberSerialization(EntityAddonData, HealthUseBoni),
 	AutoMemberSerialization(EntityAddonData, DamageUseBoni),
 	AutoMemberSerialization(EntityAddonData, ArmorUseBoni),
+	AutoMemberSerialization(EntityAddonData, ExplorationUseBoni),
 	AutoMemberSerialization(EntityAddonData, DamageOverride),
 	AutoMemberSerialization(EntityAddonData, ArmorOverride),
 	AutoMemberSerialization(EntityAddonData, ExplorationOverride),
@@ -72,5 +73,6 @@ const BB::SerializationData CppLogic::EntityAddon::EntityAddonData::Serializatio
 	AutoMemberSerialization(EntityAddonData, MaxRangeOverride),
 	AutoMemberSerialization(EntityAddonData, NameOverride),
 	AutoMemberSerialization(EntityAddonData, FakeTaskValue),
+	AutoMemberSerialization(EntityAddonData, MaxRangeUseBoni),
 	BB::SerializationData::GuardData(),
 };

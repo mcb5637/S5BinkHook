@@ -6,6 +6,11 @@
 #include <shok/ui/s5_ui.h>
 #include <shok/s5_scriptsystem.h>
 
+BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::ExtraPlayerData::SerializationData[] {
+	AutoMemberSerialization(ExtraPlayerData, PaydayFrequency),
+	BB::SerializationData::GuardData(),
+};
+
 void CppLogic::SavegameExtra::SerializedMapdata::SerializeTo(const char* path, const char* savename)
 {
 	SavegameName = savename;
@@ -121,6 +126,7 @@ CppLogic::SavegameExtra::SerializedMapdata CppLogic::SavegameExtra::SerializedMa
 std::map<std::string, std::string, CppLogic::CaselessStringComparator>  CppLogic::SavegameExtra::SerializedMapdata::StringTableTextOverrideMainmenu{};
 
 CreateSerializationListFor(CppLogic::SavegameExtra::SerializedMapdata, StringTableTextOverride);
+CreateSerializationListFor(CppLogic::SavegameExtra::SerializedMapdata, ExtraPlayers);
 
 BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationData[]{
 	AutoMemberSerialization(SerializedMapdata, SavegameName),
@@ -154,12 +160,23 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, ClickMapTrigger),
 	AutoMemberSerialization(SerializedMapdata, BattleWaitCancelable),
 	AutoMemberSerialization(SerializedMapdata, ResDoodad_RefillableCategory),
+	AutoMemberSerialization(SerializedMapdata, ExtraPlayers),
 	BB::SerializationData::GuardData(),
 };
 
 void CppLogic::SavegameExtra::SerializedMapdata::Clear()
 {
 	*this = SerializedMapdata{};
+}
+
+CppLogic::SavegameExtra::SerializedMapdata::ExtraPlayerData* CppLogic::SavegameExtra::SerializedMapdata::GetExtraPlayer(shok::PlayerId p, bool create) {
+	size_t idx = static_cast<int>(p) - 1;
+	if (idx >= ExtraPlayers.size()) {
+		if (!create)
+			return nullptr;
+		ExtraPlayers.resize(idx + 1);
+	}
+	return &ExtraPlayers.at(idx);
 }
 
 CreateSerializationListForKeyAttrib(CppLogic::SavegameExtra::StringTableTextOverride, StringTableTextOverrideData, "id");

@@ -989,6 +989,12 @@ function CppLogic.Logic.EnableBattleWaitCancelable(e) end
 ---@return boolean isSTTKey
 function CppLogic.Logic.GetPlayerName(pid) end
 
+--- gets the shared exploration flag from p1 to p2.
+--- @param p1 number
+--- @param p2 number
+--- @return boolean
+function CppLogic.Logic.GetSharedExplorationFlag(p1, p2) end
+
 --- dumps game logic
 --- dev only, slow!
 ---@return table

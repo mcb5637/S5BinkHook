@@ -377,6 +377,7 @@ namespace EGL {
 
 		EGL::CPlayerExplorationHandler* GetExplorationHandlerByPlayer(shok::PlayerId pl);
 		void SetShareExplorationFlag(shok::PlayerId pl1, shok::PlayerId pl2, bool share);
+		[[nodiscard]] bool GetSharedExplorationFlag(shok::PlayerId pl1, shok::PlayerId pl2) const;
 		void ActivateUpdateOfExplorationForAllPlayers();
 		CPlayerExplorationUpdate* GetUpdate(); // creates if nullptr
 		bool IsPlayerIngame(shok::PlayerId pl);

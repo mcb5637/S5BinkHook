@@ -1224,6 +1224,10 @@ namespace CppLogic::Logic {
 		return 1;
 	}
 
+	bool GetSharedExplorationFlag(shok::PlayerId p1, shok::PlayerId p2) {
+		return (*EGL::CGLEGameLogic::GlobalObj)->PlayerMng->GetSharedExplorationFlag(p1, p2);
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(luaext::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1716,6 +1720,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<GetExperienceLevelData>("GetExperienceLevelData"),
 			luaext::FuncReference::GetRef<GetLevelFromExperience>("GetLevelFromExperience"),
 			luaext::FuncReference::GetRef<CalculateExperienceBorders>("CalculateExperienceBorders"),
+			luaext::FuncReference::GetRef<GetSharedExplorationFlag>("GetSharedExplorationFlag"),
 		};
 
 	constexpr std::array UICmd{

@@ -752,6 +752,9 @@ void EGL::PlayerManager::SetShareExplorationFlag(shok::PlayerId pl1, shok::Playe
 {
 	gamelogicexplo_setshare(this, pl1, pl2, share);
 }
+bool EGL::PlayerManager::GetSharedExplorationFlag(shok::PlayerId pl1, shok::PlayerId pl2) const {
+	return CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetSharedExploration(pl1, pl2);
+}
 static inline void(__thiscall* const gamelogicexplo_activateexploforall)(EGL::PlayerManager* th) = reinterpret_cast<void(__thiscall*)(EGL::PlayerManager*)>(0x575884);
 void EGL::PlayerManager::ActivateUpdateOfExplorationForAllPlayers()
 {

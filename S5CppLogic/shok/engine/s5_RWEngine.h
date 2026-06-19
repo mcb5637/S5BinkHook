@@ -128,6 +128,9 @@ namespace RWE {
 	};
 	struct RwV2d {
 		float x = 0, y = 0;
+
+
+		RwV2d Normalize() const;
 	};
 	struct RwMatrix { // NOLINT(*-pro-type-member-init)
 		RwV3d right;

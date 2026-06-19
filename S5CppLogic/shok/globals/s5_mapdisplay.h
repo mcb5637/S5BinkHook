@@ -12,9 +12,7 @@ namespace ED {
 	class ILandscape {
 	public:
 		virtual ~ILandscape() = default;
-	private:
-		virtual void unknown() = 0;
-	public:
+		virtual void Destroy() = 0;
 		virtual float GetTerrainHeightAtPosF(float x, float y) = 0;
 		virtual float GetWaterHeightAtPosF(float x, float y) = 0;
 		virtual float GetHigherTerrainOrWaterHeightAtPos(float x, float y) = 0;

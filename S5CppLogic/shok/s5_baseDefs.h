@@ -26,6 +26,7 @@ namespace shok {
 	static inline float(__stdcall* const GetCurrentTimeFloat)() = reinterpret_cast<float(__stdcall*)()>(0x548B64);
 
 	// std::exp 0x5c5060
+	// std::atan 0x7250d0
 
 	// generic structs
 	struct Position {
@@ -70,6 +71,8 @@ namespace shok {
 		// 0x57d8a5 distance to
 		// 0x57d7b4 dot
 		// 0x57d8c5 get range squared
+		// 0x57d7d9 normalize
+		// 0x449322 scalar mult
 	};
 	struct PositionRot : Position {
 		float r = 0;

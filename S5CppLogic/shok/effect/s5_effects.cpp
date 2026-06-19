@@ -1,6 +1,7 @@
 #include "s5_effects.h"
 #include <shok/effect/s5_effecttype.h>
 #include <shok/globals/s5_classfactory.h>
+#include <shok/globals/s5_mapdisplay.h>
 #include <utility/hooks.h>
 #include <utility/entityiterator.h>
 
@@ -83,6 +84,12 @@ bool EGL::CFlyingEffect::OnTickMove()
 {
 	auto p = reinterpret_cast<bool(__thiscall* const)(EGL::CFlyingEffect*)>(0x58937E);
 	return p(this);
+}
+
+void EGL::CFlyingEffect::GetHeightsOverride(float* start, float* target) const {
+	auto* l = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape;
+	*start = l->GetHigherTerrainOrWaterHeightAtPos(FlyingEffectSlot.StartPosition.X, FlyingEffectSlot.StartPosition.Y) + FlyingEffectProps->HeightOffsetStart;
+	*target = l->GetHigherTerrainOrWaterHeightAtPos(FlyingEffectSlot.TargetPosition.X, FlyingEffectSlot.TargetPosition.Y) + FlyingEffectProps->HeightOffsetTarget;
 }
 
 void(__stdcall*EGL::CEffect::OnDestroyCb)(EGL::CEffect* th) = nullptr;
@@ -177,14 +184,22 @@ void GGL::CCannonBallEffect::FixOnLoad()
 
 void EGL::CFlyingEffect::HookOnLoadFix()
 {
-	CppLogic::Hooks::SaveVirtualProtect vp{ 4, {
-		reinterpret_cast<void*>(0x7775F8),
-		reinterpret_cast<void*>(0x778E38),
-		reinterpret_cast<void*>(0x7776A4),
-	} };
-	*reinterpret_cast<void**>(0x7775F8) = CppLogic::Hooks::MemberFuncPointerToVoid(&CFlyingEffect::FixOnLoad, 0);
-	*reinterpret_cast<void**>(0x778E38) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CArrowEffect::FixOnLoad, 0);
-	*reinterpret_cast<void**>(0x7776A4) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CCannonBallEffect::FixOnLoad, 0);
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 4, {
+			reinterpret_cast<void*>(0x7775F8),
+			reinterpret_cast<void*>(0x778E38),
+			reinterpret_cast<void*>(0x7776A4),
+		} };
+		*reinterpret_cast<void**>(0x7775F8) = CppLogic::Hooks::MemberFuncPointerToVoid(&CFlyingEffect::FixOnLoad, 0);
+		*reinterpret_cast<void**>(0x778E38) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CArrowEffect::FixOnLoad, 0);
+		*reinterpret_cast<void**>(0x7776A4) = CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CCannonBallEffect::FixOnLoad, 0);
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 6, {
+			reinterpret_cast<void*>(0x589798),
+		} };
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x589798), CppLogic::Hooks::MemberFuncPointerToVoid(&CFlyingEffect::GetHeightsOverride, 0));
+	}
 }
 
 

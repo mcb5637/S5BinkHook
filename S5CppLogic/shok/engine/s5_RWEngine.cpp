@@ -34,6 +34,13 @@ float RWE::RwV3d::Length() const
     return vec3d_len(this);
 }
 
+RWE::RwV2d RWE::RwV2d::Normalize() const {
+	auto* f = reinterpret_cast<float(__cdecl*)(RwV2d*, RwV2d const*)>(0x41c610);
+	RwV2d r{};
+	f(&r, this);
+	return r;
+}
+
 static inline RWE::RwMatrix* (__cdecl* const matrix_optimize)(RWE::RwMatrix* m, const void* tolerance) = reinterpret_cast<RWE::RwMatrix* (__cdecl*)(RWE::RwMatrix*, const void*)>(0x41B2A0);
 RWE::RwMatrix* RWE::RwMatrix::Optimize()
 {

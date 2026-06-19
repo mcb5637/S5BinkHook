@@ -84,18 +84,20 @@ namespace EGL {
 		int StartTurn;
 		shok::Position StartPosition;
 		shok::Position TargetPosition;
-		float GravityFactor;
-		float b; // current height?
-		float HeightStart;
+		float HeightPolyQuadratic;
+		float HeightPolyLinear;
+		float HeightPolyConst;
 		float Speed;
-		float x; // angle rad, flight direction?
+		float FlightDirection; // angle rad
+
+		// 7208e0 get interpolated height at (float ticks)
 	};
 	class CFlyingEffectSlot : public EGL::TSlot<EGL::SSlotArgsFlyingEffect, 1944101197>, public BB::IObject {
 	public:
 		int StartTurn; // in effect 30
-		float GravityFactor; // gravity factor, "a" in seridata
-		float b; // current height?
-		float HeightStart; // , "c" in seridata
+		float HeightPolyQuadratic; // gravity factor, "a" in seridata
+		float HeightPolyLinear; // "b" in seridata
+		float HeightPolyConst; // "c" in seridata
 		shok::Position StartPosition; // in effect, 34
 		shok::Position TargetPosition; // in effect, 36
 		shok::Position Position; // in effect, 38
@@ -137,11 +139,15 @@ namespace EGL {
 
 		CFlyingEffect();
 
+		// init props 589553
+		// 589593 (float* start, float* target)
+
 	protected:
 		// ReSharper disable once CppHiddenFunction
 		void FixOnLoad();
 
 		bool OnTickMove();
+		void GetHeightsOverride(float* start, float* target) const;
 	public:
 		static void HookOnLoadFix();
 

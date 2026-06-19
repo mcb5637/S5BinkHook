@@ -1913,6 +1913,19 @@ namespace CppLogic::Entity {
 		return 1;
 	}
 
+	void SetBuildingSubAnim(GGL::CBuilding* b, int index, std::optional<shok::AnimationId> anim, std::optional<bool> back, std::optional<bool> loop) {
+		auto* beh = b->GetBehavior<EGL::GLEBehaviorMultiSubAnims>();
+		if (beh == nullptr)
+			throw lua::LuaException{"no subanim behavior"};
+		EGL::CGLETaskArgsSubAnim t{};
+		t.TaskType = shok::Task::TASK_SET_SUB_ANIM;
+		t.AnimID = anim.value_or(shok::AnimationId{});
+		t.PlayBackwards = back.value_or(false);
+		t.IsLooped = loop.value_or(false);
+		t.SubAnimIdx = index;
+		beh->SlotMultiSubAnims.SetSubAnim(&t);
+	}
+
 
 	void Cleanup(luaext::State L) {
 		DisableConversionHook(L);
@@ -2163,6 +2176,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<MarketPredictPrice>("MarketPredictPrice"),
 			luaext::FuncReference::GetRef<MarketGetSellResources>("MarketGetSellResources"),
 			luaext::FuncReference::GetRef<BuildingGetAttachedSerfs>("BuildingGetAttachedSerfs"),
+			luaext::FuncReference::GetRef<SetBuildingSubAnim>("SetBuildingSubAnim"),
 	};
 
 	void Init(luaext::State L)

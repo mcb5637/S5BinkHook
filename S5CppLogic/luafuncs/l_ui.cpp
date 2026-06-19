@@ -1472,6 +1472,12 @@ namespace CppLogic::UI {
 		return 0;
 	}
 
+	std::tuple<std::string_view, shok::ClassId> GetWidgetType(EGUIX::CBaseWidget* w) {
+		auto id = w->GetClassIdentifier();
+		std::string_view n = (*BB::CClassFactory::GlobalObj)->GetClassDemangledName(id);
+		return {n, id};
+	}
+
 	int CreateSelectionDecal(luaext::State L) {
 
 		auto t = L.CheckEnum<shok::SelectionTextureId>(1);
@@ -1996,6 +2002,7 @@ namespace CppLogic::UI {
 		luaext::FuncReference::GetRef<StatisticsWidgetOverridePlayersToShowGraphs>("StatisticsWidgetOverridePlayersToShowGraphs"),
 		luaext::FuncReference::GetRef<OverrideSelectablePlayers>("OverrideSelectablePlayers"),
 		luaext::FuncReference::GetRef<SetFeedbackEventCallback>("SetFeedbackEventCallback"),
+		luaext::FuncReference::GetRef<GetWidgetType>("GetWidgetType"),
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

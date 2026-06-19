@@ -151,6 +151,7 @@ namespace EGL {
 	class CEventGetPosition;
 	class CGLEScripting;
 	struct EffectType;
+	class CGLETaskArgsSubAnim;
 }
 namespace GGL {
 	class CBuilding;

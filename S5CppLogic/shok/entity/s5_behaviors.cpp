@@ -42,6 +42,10 @@ void EGL::CCoarsePath::Clear()
 	path_clear(this);
 }
 
+void EGL::GLEBehaviorMultiSubAnims::SlotMultiSubAnimsData::SetSubAnim(EGL::CGLETaskArgsSubAnim* args) {
+	auto* f = reinterpret_cast<void(__thiscall*)(SlotMultiSubAnimsData*m, CGLETaskArgsSubAnim*)>(0x594791);
+	f(this, args);
+}
 inline shok::TaskStateExecutionResult(__thiscall* const behanim_statehandlerwait)(EGL::CBehaviorAnimation* th, int i) = reinterpret_cast<shok::TaskStateExecutionResult(__thiscall*)(EGL::CBehaviorAnimation*, int)>(0x587E20);
 shok::TaskStateExecutionResult EGL::CBehaviorAnimation::StateWaitForAnim(int i)
 {

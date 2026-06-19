@@ -2411,6 +2411,14 @@ function CppLogic.Entity.Building.IsConstructionSite(id) end
 ---@return entity[]
 function CppLogic.Entity.Building.BuildingGetAttachedSerfs(id, approaching) end
 
+--- sets the building sub anim. more parameters than Logic.SetBuildingSubAnim.
+--- @param id entity
+--- @param index 0|1|2|3
+--- @param anim number|string? nil to deactivate
+--- @param backward boolean?
+--- @param looped boolean?
+function CppLogic.Entity.Building.SetBuildingSubAnim(id, index, anim, backward, looped) end
+
 --- buys a leader in a barracks by entitytype.
 --- uses resources, asserts if not possible.
 --- does not fire a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER trigger.
@@ -3646,6 +3654,12 @@ function CppLogic.UI.OverrideSelectablePlayers(f) end
 ---not stored into savegames.
 ---@param f nil|fun(evid:number):boolean
 function CppLogic.UI.SetFeedbackEventCallback(f) end
+
+---gets the type of a widget
+---@param wid string|number
+---@return string className
+---@return number classId
+function CppLogic.UI.GetWidgetType(wid)end
 
 ---@class TerrainDecalAccess
 local TerrainDecalAccess = {}

@@ -213,7 +213,11 @@ namespace BBRw {
 		shok::EntityId Entity;
 		PADDINGI(2);
 		ED::ModelData* ModelData;
-		PADDINGI(3);
+		PADDINGI(1);
+		float TerrainHeight;
+		PADDING(2);
+		byte SomeFlags;
+		PADDING(1);
 	};
 }
 

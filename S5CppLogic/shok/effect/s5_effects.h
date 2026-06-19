@@ -337,7 +337,7 @@ namespace ED {
 	class IEffect : public BB::IObject {
 	public:
 		// no vtable
-		virtual void Initialze(EGL::IEffectDisplay* eff, ED::CEffectProps* props) = 0;
+		virtual void Initialize(EGL::IEffectDisplay* eff, ED::CEffectProps* props) = 0;
 		virtual void UpdateGameTimeSynced(int ticks, float seconds) = 0;
 		virtual void UpdateRealTimeSynced() = 0;
 

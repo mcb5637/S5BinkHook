@@ -77,15 +77,24 @@ namespace EGL {
 
 	class GLEBehaviorMultiSubAnims : public EGL::CGLEBehavior { // NOLINT(*-pro-type-member-init)
 	public:
-		PADDINGI(1);
-		int LastUpdateTurn;
-		struct { // NOLINT(*-pro-type-member-init)
-			bool Active, PlayBackwards, IsLooped;
+		struct AnimSlotData {
+			bool Active = false, PlayBackwards = false, IsLooped = false;
 			PADDING(1);
-			shok::AnimationId AnimID;
-			int StartTurn, Duration;
-			float Speed;
-		} AnimSlot[4];
+			shok::AnimationId AnimID{};
+			int StartTurn = 0, Duration = 0;
+			float Speed = 0.0f;
+		};
+		struct MultiSubAnimsArgsData {
+			int LastUpdateTurn = 0;
+			shok::Array<AnimSlotData, 4> AnimSlot;
+		};
+		struct SlotMultiSubAnimsData {
+			PADDINGI(1);
+
+			MultiSubAnimsArgsData MultiSubAnimsArgs;
+
+			void SetSubAnim(EGL::CGLETaskArgsSubAnim* args);
+		} SlotMultiSubAnims;
 
 		// defined tasks: TASK_SET_SUB_ANIM
 		// defined events: MultiSubAnim_SetSubAnim

@@ -230,6 +230,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x82D93C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x18736A06);
 		// 5598E3 ctor
+		// 559ddd copy ctor
 
 		virtual CBaseWidget* Clone() = 0; // 3
 		virtual void Initialize() = 0;
@@ -239,7 +240,7 @@ namespace EGUIX {
 		virtual bool SetName(const char* name) = 0; // no idea what return is
 		virtual int SetPosAndSize(float x, float y, float w, float h) = 0;
 		virtual bool SetVisibility(bool vis) = 0; // returns changed
-		virtual int GetMouseOverWidget(float* mousePosrelativeToWidget, bool checkSubwidgets, bool containerWidget) = 0; // 10
+		virtual shok::WidgetId GetMouseOverWidget(float* mousePosrelativeToWidget, bool checkSubwidgets, bool containerWidget) = 0; // 10
 		virtual bool IsWidgetID(shok::WidgetId id) = 0; // not sure what this is exactly about
 	private:
 		virtual bool retzero() = 0; // button & containerwid true, customwid forward
@@ -276,6 +277,8 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x213A8776);
 
 		static EGUIX::CStaticWidget* Create();
+
+		// copy ctor 5605f2
 	};
 	static_assert(offsetof(CStaticWidget, BackgroundMaterial) == 16 * 4);
 
@@ -293,6 +296,8 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x86E3BC06);
 
 		static EGUIX::CStaticTextWidget* Create();
+
+		// copy ctor 56033a
 	};
 	static_assert(offsetof(CStaticTextWidget, StringHelper) == 27 * 4);
 	//constexpr int i = offsetof(CStaticTextWidget, StringHelper.Color) / 4;
@@ -307,6 +312,7 @@ namespace EGUIX {
 		static inline constexpr int TypeDesc = 0x834148;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xFE028496);
 		// 55F782 ctor
+		// copy ctor 55facd
 	};
 	static_assert(sizeof(EGUIX::CButtonWidget) == 146 * 4);
 	static_assert(offsetof(CButtonWidget, ButtonHelper) == 16 * 4);
@@ -323,6 +329,8 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x56DDA656);
 
 		static EGUIX::CGfxButtonWidget* Create();
+
+		// copy ctor 55eeb4
 	};
 
 	class CTextButtonWidget : public EGUIX::CButtonWidget, public ITextAccess { // textacc 147
@@ -338,6 +346,9 @@ namespace EGUIX {
 
 		static EGUIX::CTextButtonWidget* Create();
 		static void HookFixTextRender();
+
+		// copy ctor 55f5db
+
 	private:
 		static void __thiscall CenterRenderArea(const CTextButtonWidget* th, Rect* render);
 		static void NAKED_DECL CenterRenderAreaASM();
@@ -360,8 +371,12 @@ namespace EGUIX {
 
 	public:
 		void AddWidget(EGUIX::CBaseWidget* toAdd, const char* name, const EGUIX::CBaseWidget* before);
+		void AddWidgetExistingName(EGUIX::CBaseWidget* toAdd, const EGUIX::CBaseWidget* before);
 		EGUIX::CBaseWidget* CloneAsChild(EGUIX::CBaseWidget* toClone, const std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)>& nameGen, EGUIX::CBaseWidget* before = nullptr);
 		static EGUIX::CContainerWidget* Create();
+
+		// ctor 560dad()
+		// copy ctor 560fdb
 	};
 	static_assert(sizeof(CContainerWidget) == 20 * 4);
 
@@ -374,6 +389,7 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5CA15E96);
 
 		// render all 0x55B056 __thiscall()
+		// ctor 55aef9()
 	};
 	static_assert(sizeof(CProjectWidget) == 21 * 4);
 
@@ -386,6 +402,8 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x82CC8876);
 
 		static EGUIX::CPureTooltipWidget* Create();
+
+		// copy ctor 55e25d
 	};
 
 	class CProgressBarWidget : public EGUIX::CStaticWidget {
@@ -399,6 +417,8 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x72633416);
 
 		static EGUIX::CProgressBarWidget* Create();
+
+		// copy ctor 55e863
 	};
 
 	class CCustomWidget;
@@ -440,6 +460,8 @@ namespace EGUIX {
 		static inline constexpr int vtp = 0x7810F8;
 		static inline constexpr int TypeDesc = 0x834820;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7656DB56);
+
+		// copy ctor 560d00
 	};
 	static_assert(sizeof(EGUIX::CCustomWidget) == 43 * 4);
 
@@ -1375,6 +1397,8 @@ namespace EGUIX {
 
 		// update tome event 0x556489 __thiscall(float)
 		// render all 0x556409 __thiscall()
+		// clear widget 0x5563f1 thiscall()
+		// load project widget 0x55b15e cdecl(const char*)
 
 		static inline void(__cdecl* const KeyStrokeLuaCallback)() = reinterpret_cast<void(__cdecl*)()>(0x55C445);
 	};

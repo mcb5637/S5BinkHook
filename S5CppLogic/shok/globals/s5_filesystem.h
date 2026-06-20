@@ -298,7 +298,7 @@ namespace BB {
 		static constexpr int vtp = 0x761C60;
 
 		virtual ~CFileStreamEx() override;
-	protected:
+	private:
 		virtual bool __stdcall rettrue() override;
 		virtual bool __stdcall rettrue1() override;
 		virtual bool __stdcall rettrue2() override;

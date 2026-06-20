@@ -3329,6 +3329,15 @@ function CppLogic.UI.ContainerWidgetCreateContainerWidgetChild(wid, name, before
 --- @return number id
 function CppLogic.UI.ContainerWidgetCreateCustomWidgetChild(wid, name, customclass, before, icv0, icv1, icv2, icv3, icv4, icv5, scv0, scv1) end
 
+---deserialize a widget and registers it as its child.
+---expects a full xml, with only a single member named WidgetList which is a BBObjectPointer.
+---does not check if the deserialized object, or any of its subobjects are actually widgets!
+---@param wid widget
+---@param xml string
+---@param before widget?
+---@return number id
+function CppLogic.UI.ContainerWidgetDeserializeChild(wid, xml, before) end
+
 --- shows a resources gained floating number at a specific entity.
 --- entity has to be visible, but settlers or rocks work fine.
 --- if the entity moves, the floatie does move with it.

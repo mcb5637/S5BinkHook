@@ -534,6 +534,33 @@ namespace CppLogic::UI {
 		return 1;
 	}
 
+	struct WidgetLoader {
+		EGUIX::CBaseWidget* WidgetList = nullptr;
+
+		static const BB::SerializationData SerializationData[];
+	};
+
+	BB::SerializationData const WidgetLoader::SerializationData[] = {
+		BB::SerializationData::ObjectPointerData("WidgetList", offsetof(WidgetLoader, WidgetList), sizeof(EGUIX::CBaseWidget*)),
+		BB::SerializationData::GuardData(),
+	};
+
+	shok::WidgetId ContainerWidgetDeserializeChild(EGUIX::CBaseWidget* cont, std::string_view xml, std::optional<EGUIX::CBaseWidget*> before) {
+		auto* c = dynamic_cast<EGUIX::CContainerWidget*>(cont);
+		if (c == nullptr)
+			throw lua::LuaException("no container widget");
+		auto seri = BB::CXmlSerializer::CreateUnique();
+		CppLogic::IO::StringViewReadStream stream{xml};
+		WidgetLoader l{};
+		seri->DeserializeByData(&stream, &l, WidgetLoader::SerializationData);
+		if (l.WidgetList == nullptr)
+			throw lua::LuaException("no widget deserialized");
+		l.WidgetList->Initialize();
+		l.WidgetList->MotherWidgetID = shok::WidgetId::Invalid;
+		c->AddWidgetExistingName(l.WidgetList, before.value_or(nullptr));
+		return l.WidgetList->WidgetID;
+	}
+
 	int FontGetConfig(luaext::State L) {
 		shok::FontId id;
 		if (L.Type(1) == lua::LType::String) {
@@ -1944,6 +1971,7 @@ namespace CppLogic::UI {
 		luaext::FuncReference::GetRef<ContainerWidgetCreateProgressBarWidgetChild>("ContainerWidgetCreateProgressBarWidgetChild"),
 		luaext::FuncReference::GetRef<ContainerWidgetCreateContainerWidgetChild>("ContainerWidgetCreateContainerWidgetChild"),
 		luaext::FuncReference::GetRef<ContainerWidgetCreateCustomWidgetChild>("ContainerWidgetCreateCustomWidgetChild"),
+		luaext::FuncReference::GetRef<ContainerWidgetDeserializeChild>("ContainerWidgetDeserializeChild"),
 		luaext::FuncReference::GetRef<SetCharTrigger>("SetCharTrigger"),
 		luaext::FuncReference::GetRef<SetKeyTrigger>("SetKeyTrigger"),
 		luaext::FuncReference::GetRef<SetMouseTrigger>("SetMouseTrigger"),

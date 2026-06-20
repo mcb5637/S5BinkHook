@@ -468,23 +468,27 @@ void EGUIX::CContainerWidget::AddWidget(EGUIX::CBaseWidget* toAdd, const char* n
     EGUIX::WidgetManager* m = EGUIX::WidgetManager::GlobalObj();
     shok::WidgetId newId = m->RegisterName(name);
     if (newId != static_cast<shok::WidgetId>(0)) {
-        for (auto* w : WidgetListHandler.SubWidgets)
-            w->ZPriority = 0;
-        toAdd->ZPriority = 0;
         toAdd->WidgetID = newId;
         m->AddWidget(toAdd, newId);
-        AddChild(toAdd);
-        if (before) {
-            auto l = WidgetListHandler.SubWidgets.SaveList();
-            auto newit = std::find(l.List.begin(), l.List.end(), toAdd);
-            if (newit == l.List.end()) // wtf, just added it
-                return;
-            auto it = std::find(l.List.begin(), l.List.end(), before);
-            if (it != l.List.end()) {
-                l.List.splice(it, l.List, newit);
-            }
-        }
+    	AddWidgetExistingName(toAdd, before);
     }
+}
+
+void EGUIX::CContainerWidget::AddWidgetExistingName(EGUIX::CBaseWidget* toAdd, const EGUIX::CBaseWidget* before) {
+	for (auto* w : WidgetListHandler.SubWidgets)
+		w->ZPriority = 0;
+	toAdd->ZPriority = 0;
+	AddChild(toAdd);
+	if (before) {
+		auto l = WidgetListHandler.SubWidgets.SaveList();
+		auto newit = std::find(l.List.begin(), l.List.end(), toAdd);
+		if (newit == l.List.end()) // wtf, just added it
+			return;
+		auto it = std::find(l.List.begin(), l.List.end(), before);
+		if (it != l.List.end()) {
+			l.List.splice(it, l.List, newit);
+		}
+	}
 }
 
 EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* toClone, const std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)>& nameGen, EGUIX::CBaseWidget* before)

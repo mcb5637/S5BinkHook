@@ -1078,6 +1078,16 @@ namespace CppLogic::Logic {
 		EnableResourceTriggers(L.OptBool(1, true), L.OptBool(2, false));
 		return 0;
 	}
+	void SetResourceTriggerAmount(std::optional<float> buy, std::optional<float> sell) {
+		auto* ev = BB::IdentifierCast<GGL::CEventGoodsTraded, BB::CEvent, CppLogic::Events::PaydayEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		if (sell.has_value())
+			ev->SellAmount = sell.value();
+		if (buy.has_value())
+			ev->BuyAmount = buy.value();
+	}
+
 	int EnableSettlerBuyTriggers(luaext::State L) {
 		GGL::CPlayerAttractionHandler::HookWorkerSpawn();
 		GGL::CBarrackBehavior::HookBuyTriggers();
@@ -1721,6 +1731,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<TaskListRemoveLatestAttack>("TaskListRemoveLatestAttack"),
 			luaext::FuncReference::GetRef<Navigate>("Navigate"),
 			luaext::FuncReference::GetRef<LEnableResourceTriggers>("EnableResourceTriggers"),
+			luaext::FuncReference::GetRef<SetResourceTriggerAmount>("SetResourceTriggerAmount"),
 			luaext::FuncReference::GetRef<EnableSettlerBuyTriggers>("EnableSettlerBuyTriggers"),
 			luaext::FuncReference::GetRef<GetSettlerBuyTriggerData>("GetSettlerBuyTriggerData"),
 			luaext::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),

@@ -177,6 +177,7 @@ namespace GGL {
 	class CDamageClassProps;
 	class ExperienceClass;
 	class CGLGUIInterface;
+	class CSerfBehaviorProps;
 }
 namespace ED {
 	class CBehaviorProps;

@@ -376,6 +376,9 @@ namespace GGL {
 		shok::TaskListId ApproachConstructionSiteTaskList{}, TurnIntoBattleSerfTaskList{}; //4
 		shok::Vector<ExtractionInfoData> ExtractionInfo;
 
+		// 4ddf0b get extraction info of type
+		// 4de053 get extraction amount of type
+
 		static inline constexpr int vtp = 0x774A14;
 		static inline constexpr int TypeDesc = 0x819B1C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCC7A655D);

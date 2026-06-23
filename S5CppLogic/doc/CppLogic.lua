@@ -876,6 +876,11 @@ function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxpric
 --- @param refinerFix boolean|nil (default false)
 function CppLogic.Logic.EnableResourceTriggers(enabled, refinerFix) end
 
+---sets resource trigger amount for Events.CPPLOGIC_EVENT_ON_RESOURCE_REFINED, Events.CPPLOGIC_EVENT_ON_RESOURCE_MINED and Events.CPPLOGIC_EVENT_ON_REFINER_SUPPLY_TAKEN events.
+---@param buyAmount number?
+---@param sellAmount number?
+function CppLogic.Logic.SetResourceTriggerAmount(buyAmount, sellAmount) end
+
 --- enables firing a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER trigger when:
 --- - automatically spawning a worker for some workplace
 --- - GUI.BuyLeader (net event handler)

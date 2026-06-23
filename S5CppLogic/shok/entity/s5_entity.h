@@ -640,6 +640,9 @@ namespace GGL {
 		static inline constexpr int vtp_IEntityDisplay = 0x76FE88;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xB0778F47);
 
+		// get res type 4b8325
+		// get res amount 4b831e
+
 		static shok::EntityCategory RefillableCategory;
 		static void HookAutoDestroyIfEmpty();
 	private:

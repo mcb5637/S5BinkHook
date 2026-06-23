@@ -1042,8 +1042,8 @@ namespace GGL {
 		int ConstructionSiteSlotIndex; //4
 		int ExtractionDelayCounter; //float?
 		int LastResourceType, JobMemoryResourceID;
-		int ResourceSlot;
-		float ResourceAttachmentOffset; //9
+		GGL::CSerfBehaviorProps* SerfProps;
+		float ResourceSlot; //9
 
 		// defined tasks: TASK_GO_TO_MAIN_HOUSE, TASK_GO_TO_CONSTRUCTION_SITE, TASK_TURN_TO_CONSTRUCTION_SITE, TASK_CHANGE_ATTACHMENT_TO_CONSTRUCTION_SITE,
 		//		TASK_GO_TO_CONSTRUCTION_SITE_SLOT, TASK_LEAVE_SETTLEMENT, TASK_ABANDON_CURRENT_JOB, TASK_GO_TO_RESOURCE, TASK_TURN_TO_RESOURCE, TASK_WAIT_EXTRACTION_DELAY
@@ -1058,7 +1058,7 @@ namespace GGL {
 
 		static void HookMineTrigger();
 	private:
-		static void __thiscall TaskExtractAdditional(CSerfBehavior* th, int am, GGL::CResourceDoodad* d);
+		static int __thiscall TaskExtractAdditional(CSerfBehavior* th, int am, GGL::CResourceDoodad* d);
 		static void NAKED_DECL TaskExtractAdditionalASM();
 	};
 

@@ -1332,18 +1332,20 @@ void GGL::CAutoCannonBehavior::HookRangeOverride()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F50D), &autocannonmaxrangeasm, reinterpret_cast<void*>(0x50F515));
 }
 
-void GGL::CSerfBehavior::TaskExtractAdditional(CSerfBehavior* th, int am, GGL::CResourceDoodad* d)
+int GGL::CSerfBehavior::TaskExtractAdditional(CSerfBehavior* th, int am, GGL::CResourceDoodad* d)
 {
 	auto* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 	if (GGL::CWorkerBehavior::ResourceTriggers) {
 		GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceMined, shok::ResourceType::None, d->ResourceType, static_cast<float>(am), th->EntityId, 0.0f };
-		e->FireEvent(&ev3);
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
+		e->FireEvent(&ev3);
+		am = static_cast<int>(ev3.BuyAmount);
 	}
 	auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(e->PlayerId);
 	auto rt = shok::CostInfo::RawToResourceType(d->ResourceType);
 	if (rt != shok::ResourceType::None)
 		pl->Statistics.OnResMined(rt, static_cast<float>(am));
+	return am;
 }
 
 void NAKED_DEF GGL::CSerfBehavior::TaskExtractAdditionalASM() {
@@ -1352,9 +1354,10 @@ void NAKED_DEF GGL::CSerfBehavior::TaskExtractAdditionalASM() {
 		push edi; // add resdoodad
 		mov ebx, [eax]; // orig
 		push ebx; // add amount
-		mov[ebp - 0x1c], ebx; // orig
 		mov ecx, esi; // add this
 		call GGL::CSerfBehavior::TaskExtractAdditional; // add
+		mov ebx, eax; // write back amount
+		mov[ebp - 0x1c], ebx; // orig
 
 		mov ecx, esi; // orig
 
@@ -1712,11 +1715,12 @@ int __thiscall GGL::CMineBehavior::TaskMineAdd(CMineBehavior* th, int* am, GGL::
 	auto* ev2 = BB::IdentifierCast<EGL::CEvent1Entity>(ev);
 	if (GGL::CWorkerBehavior::ResourceTriggers && ev2 && d->ResourceAmount > 0) {
 		GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceMined, shok::ResourceType::None, d->ResourceType, static_cast<float>(*am), ev2->EntityID, 0.0f};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
 		EGL::CGLEEntity::GetEntityByID(ev2->EntityID)->FireEvent(&ev3);
 		EGL::CGLEEntity::GetEntityByID(th->EntityId)->FireEvent(&ev3);
-		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
+		*am = static_cast<int>(ev3.BuyAmount);
 	}
-	return d->ResourceAmount;
+	return *am;
 }
 
 void NAKED_DEF GGL::CMineBehavior::TaskMineAddASM() {
@@ -1732,6 +1736,7 @@ void NAKED_DEF GGL::CMineBehavior::TaskMineAddASM() {
 		cmp eax, 0;
 		je skip;
 
+		mov ebx, eax;
 		mov ecx, [ebp - 0x14];
 
 		push 0x4E6966;

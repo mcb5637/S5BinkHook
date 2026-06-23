@@ -11,12 +11,41 @@
 #include <utility/EnumIdManagerMagic.h>
 
 namespace BB {
+	class IXmlSimpleHandler {
+	public:
+		virtual ~IXmlSimpleHandler() = default;
+
+		static inline constexpr int vtp = 0x77f8f0;
+	};
+	class CXmlObjectDeserializationHandler : public  IXmlSimpleHandler {
+
+	public:
+		static inline constexpr int vtp = 0x77F92C;
+		//ctor 54f9af
+	};
+
+	class IXmlSimpleParser {
+
+	public:
+		virtual ~IXmlSimpleParser() = default;
+		
+		static inline constexpr int vtp = 0x78052C;
+
+	};
+	class CBBLibXmlSimpleParser : public IXmlSimpleParser {
+
+	public:
+		static inline constexpr int vtp = 0x78053C;
+
+		// ctor 5550ae
+	};
+
 	class IXmlSerializer {
 	public:
 		virtual void __stdcall Destroy() = 0;
 		virtual void __stdcall Deserialize(BB::IStream* f, BB::IObject* ob) = 0; // open file in mode 0x113
 	private:
-		virtual void unknown() = 0;
+		virtual void __stdcall WorkDeserialization(BB::IStream* f, CXmlObjectDeserializationHandler* h) = 0;
 	public:
 		virtual void __stdcall Serialize(BB::IStream* f, BB::IObject* ob) = 0; // open file in mode 0x121
 	protected:
@@ -28,6 +57,8 @@ namespace BB {
 	class CXmlSerializer : public IXmlSerializer {
 	public:
 		PADDINGI(45); // 43 + a bit of extra space
+
+		// ctor 55068e
 
 		static inline constexpr int vtp = 0x77FA2C;
 		static inline constexpr int TypeDesc = 0x8311F0;

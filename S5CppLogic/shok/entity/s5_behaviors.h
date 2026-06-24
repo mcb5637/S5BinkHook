@@ -810,7 +810,7 @@ namespace GGL {
 		static void __thiscall AddSupplierSkip(CWorkerBehavior* th);
 		static int __thiscall DoWorkEvents(CWorkerBehavior* th, GGL::CBuilding* b, EGL::CGLETaskArgs* t);
 		static void NAKED_DECL DoWorkEventsASM();
-		static void __thiscall TaskSupplyAdditional(CWorkerBehavior* th);
+		static void __thiscall TaskSupplyAdditional(CWorkerBehavior* th, float am, shok::CostInfo* playerRes);
 		static void NAKED_DECL TaskSupplyAdditionalASM();
 		bool __thiscall IsResearchingOverride();
 		static void NAKED_DECL AddSupplierSkipASM();

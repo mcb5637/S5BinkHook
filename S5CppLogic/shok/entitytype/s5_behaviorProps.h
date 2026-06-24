@@ -293,7 +293,7 @@ namespace GGL {
 		float AmountResearched = 1.0f;
 		float WorkTimeChangeWork = 0.0f;
 		float WorkTimeChangeFarm = 0.1f, WorkTimeChangeResidence = 0.1f, WorkTimeChangeCamp = 0.1f; // la20
-		int WorkTimeMaxCangeFarm = 0, WorkTimeMaxChangeResidence = 0;
+		int WorkTimeMaxChangeFarm = 0, WorkTimeMaxChangeResidence = 0;
 		float ExhaustedWorkMotivationMalus = 0.0f;
 		int TransportAmount = 1;
 		shok::ModelId TransportModel{}; //25

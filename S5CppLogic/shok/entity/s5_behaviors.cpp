@@ -1060,28 +1060,29 @@ void NAKED_DEF GGL::CWorkerBehavior::DoWorkEventsASM() {
 		ret;
 	};
 }
-void __thiscall GGL::CWorkerBehavior::TaskSupplyAdditional(CWorkerBehavior* th)
+void __thiscall GGL::CWorkerBehavior::TaskSupplyAdditional(CWorkerBehavior* th, float am, shok::CostInfo* playerRes)
 {
 	if (ResourceTriggers) {
-		float am = th->CarriedResourceAmount;
 		auto* e = EGL::CGLEEntity::GetEntityByID(th->EntityId);
 		auto* wp = EGL::CGLEEntity::GetEntityByID(e->GetFirstAttachedEntity(shok::AttachmentType::WORKER_WORKPLACE));
 		GGL::CEventGoodsTraded ev{ shok::EventIDs::CppLogicEvent_OnRefinerSupplyTaken, th->BehaviorProps2->ResourceToRefine, shok::ResourceType::None, 0.0f, th->EntityId, am };
-		e->FireEvent(&ev);
-		wp->FireEvent(&ev);
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		wp->FireEvent(&ev);
+		e->FireEvent(&ev);
+		am = ev.SellAmount;
 	}
+	th->CarriedResourceAmount = am;
+	playerRes->SubFromType(th->BehaviorProps2->ResourceToRefine, am);
 }
 
 void NAKED_DEF GGL::CWorkerBehavior::TaskSupplyAdditionalASM() {
 	__asm {
-		mov eax, 0x4A963D;
-		call eax;
-
-		mov ecx, esi;
+		push edi; // player res
+		push [eax]; // amount (its a float, but who cares ;) )
+		mov ecx, esi; // this
 		call GGL::CWorkerBehavior::TaskSupplyAdditional;
 
-		push 0x4CFB73;
+		push 0x4cfb73;
 		ret;
 	};
 }
@@ -1094,14 +1095,14 @@ void GGL::CWorkerBehavior::HookWorkEvents()
 	HookWorkEvents_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
 		reinterpret_cast<void*>(0x4CE641),
-		reinterpret_cast<void*>(0x4CFB6E),
+		reinterpret_cast<void*>(0x4cfb5b),
 		reinterpret_cast<void*>(0x4CFAD2),
 		reinterpret_cast<void*>(0x4CFB8C),
 		reinterpret_cast<void*>(0x4CFC0D),
 		reinterpret_cast<void*>(0x4D018A),
 	} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4CE641), &DoWorkEventsASM, reinterpret_cast<void*>(0x4CE648));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4CFB6E), &TaskSupplyAdditionalASM, reinterpret_cast<void*>(0x4CFB73));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4cfb5b), &TaskSupplyAdditionalASM, reinterpret_cast<void*>(0x4cfb61));
 	void* over = CppLogic::Hooks::MemberFuncPointerToVoid(&CWorkerBehavior::IsResearchingOverride, 0);
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4CFAD2), over); // take from stock
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4CFB8C), over); // set carry model
@@ -1547,9 +1548,9 @@ void __thiscall GGL::CResourceRefinerBehavior::EventRefineOverride(BB::CEvent* e
 
 		if (GGL::CWorkerBehavior::ResourceTriggers && ev2) {
 			GGL::CEventGoodsTraded ev3{ shok::EventIDs::CppLogicEvent_OnResourceRefined, raw, rt, am, ev2->EntityID, 0 };
+			(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
 			EGL::CGLEEntity::GetEntityByID(ev2->EntityID)->FireEvent(&ev3);
 			e->FireEvent(&ev3);
-			(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev3);
 			am = ev3.BuyAmount;
 		}
 

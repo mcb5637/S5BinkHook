@@ -1088,6 +1088,20 @@ namespace CppLogic::Logic {
 			ev->BuyAmount = buy.value();
 	}
 
+	void EnableResearchTriggers(bool enabled) {
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers = enabled;
+		if (enabled) {
+			GGL::CBuilding::HookResearchTriggers();
+		}
+	}
+
+	shok::TechnologyId GetTriggerTech() {
+		auto* ev = BB::IdentifierCast<CppLogic::Events::EntityAndTechEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		return ev->Technology;
+	}
+
 	int EnableSettlerBuyTriggers(luaext::State L) {
 		GGL::CPlayerAttractionHandler::HookWorkerSpawn();
 		GGL::CBarrackBehavior::HookBuyTriggers();
@@ -1732,6 +1746,8 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<Navigate>("Navigate"),
 			luaext::FuncReference::GetRef<LEnableResourceTriggers>("EnableResourceTriggers"),
 			luaext::FuncReference::GetRef<SetResourceTriggerAmount>("SetResourceTriggerAmount"),
+			luaext::FuncReference::GetRef<EnableResearchTriggers>("EnableResearchTriggers"),
+			luaext::FuncReference::GetRef<GetTriggerTech>("GetTriggerTech"),
 			luaext::FuncReference::GetRef<EnableSettlerBuyTriggers>("EnableSettlerBuyTriggers"),
 			luaext::FuncReference::GetRef<GetSettlerBuyTriggerData>("GetSettlerBuyTriggerData"),
 			luaext::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),
@@ -1807,6 +1823,9 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_CLICK_ON_MAP");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnClickMap));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_RESEARCH_STARTED");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_StartResearch));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
@@ -1898,6 +1917,9 @@ namespace CppLogic::Logic {
 
 		if (SavegameExtra::SerializedMapdata::GlobalObj.BattleWaitCancelable)
 			EnableBattleWaitCancelable(true);
+
+		if (SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers)
+			EnableResearchTriggers(true);
 
 		L.Pop(1);
 	}

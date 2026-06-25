@@ -881,6 +881,15 @@ function CppLogic.Logic.EnableResourceTriggers(enabled, refinerFix) end
 ---@param sellAmount number?
 function CppLogic.Logic.SetResourceTriggerAmount(buyAmount, sellAmount) end
 
+--- enables/disables research triggers (Events.CPPLOGIC_EVENT_ON_RESEARCH_STARTED).
+--- status of this gets saved into a savegame.
+--- @param enabled boolean
+function CppLogic.Logic.EnableResearchTriggers(enabled) end
+
+---gets the tech of a Events.CPPLOGIC_EVENT_ON_RESEARCH_STARTED trigger.
+---@return number tech
+function CppLogic.Logic.GetTriggerTech() end
+
 --- enables firing a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER trigger when:
 --- - automatically spawning a worker for some workplace
 --- - GUI.BuyLeader (net event handler)
@@ -2633,6 +2642,10 @@ function CppLogic.EntityType.IsLeaderType(ty) end
 --- @param ty number entitytype
 --- @return boolean
 function CppLogic.EntityType.IsSoldierType(ty) end
+--- checks for a worker type.
+--- @param ty number entitytype
+--- @return boolean
+function CppLogic.EntityType.IsWorkerType(ty) end
 
 --- gets bomb data
 --- @param ty number|string

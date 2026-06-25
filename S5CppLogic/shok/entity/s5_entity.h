@@ -726,6 +726,7 @@ namespace GGL {
 
 		static std::vector<shok::AdditionalTechModifier> ConstructionSpeedModifiers;
 		static void EnableConstructionSpeedTechs();
+		static void HookResearchTriggers();
 	private:
 		void EventGetArmorOverride(EGL::CEventGetValue_Int* ev);
 		float __thiscall GetExplorationOverride();

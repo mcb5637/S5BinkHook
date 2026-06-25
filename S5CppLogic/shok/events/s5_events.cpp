@@ -563,3 +563,10 @@ void* __stdcall CppLogic::Events::PaydayEvent::CastToIdentifier(shok::ClassId id
 		return static_cast<EGL::IEventPlayerID*>(this);
 	return nullptr;
 }
+
+CppLogic::Events::EntityAndTechEvent::EntityAndTechEvent(shok::EventIDs e, shok::EntityId ent, shok::TechnologyId tech)
+	: EGL::CEvent1Entity(e, ent), Technology(tech) {
+}
+shok::ClassId __stdcall CppLogic::Events::EntityAndTechEvent::GetClassIdentifier() const {
+	return Identifier;
+}

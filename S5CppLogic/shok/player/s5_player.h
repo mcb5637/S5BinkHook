@@ -242,10 +242,14 @@ namespace GGL {
 		shok::TechState GetTechState(shok::TechnologyId tech); // may also return substates of allowed
 		void ForceResearch(shok::TechnologyId tech);
 		// on update 0x4A1B42 __thiscall()
-		// start research 0x4A29DD __thiscall(techId, researcherId) only to be called by building::startResearch
 		// dtor 4b5d0a
 
 		void ForceResearchNoFeedback(shok::TechnologyId tech);
+	private:
+		// only to be called by building::startResearch
+		void StartResearch(shok::TechnologyId tech, shok::EntityId res);
+		void StartResearchWithTrigger(shok::TechnologyId tech, shok::EntityId res);
+		friend GGL::CBuilding;
 	};
 	static_assert(sizeof(PlayerTechManager) == 12 * 4);
 

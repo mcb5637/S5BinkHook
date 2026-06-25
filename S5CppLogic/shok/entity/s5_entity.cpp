@@ -1032,6 +1032,14 @@ void GGL::CBuilding::EnableConstructionSpeedTechs()
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 0x4B8EB2 - 0x4B8EAD };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook, reinterpret_cast<void*>(0x4B8EB2));
 }
+bool HookResearchTriggers_Hooked = false;
+void GGL::CBuilding::HookResearchTriggers() {
+	if (HookResearchTriggers_Hooked)
+		return;
+	HookResearchTriggers_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4aacb7), 0x20 };
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4aacb7), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::PlayerTechManager::StartResearchWithTrigger, 0));
+}
 
 void GGL::CBuilding::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
 	ev->Data = GetArmor();

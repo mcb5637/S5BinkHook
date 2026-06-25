@@ -922,6 +922,16 @@ namespace CppLogic::Events {
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 	};
+
+	class EntityAndTechEvent : public EGL::CEvent1Entity {
+	public:
+		shok::TechnologyId Technology;
+
+		EntityAndTechEvent(shok::EventIDs e, shok::EntityId ent, shok::TechnologyId tech);
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102C);
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	};
 }
 
 namespace shok {
@@ -1332,7 +1342,8 @@ namespace shok {
 		CppLogicEvent_CanBuySettler, // CppLogic::Events::CanBuySettlerEvent
 		CppLogicEvent_OnMapStarted, // BB::CEvent
 		CppLogicEvent_OnSavegameLoaded, // CppLogic::Events::SaveLoadedEvent
-		CppLogicEvent_OnClickMap,
+		CppLogicEvent_OnClickMap, // CppLogic::Events::ClickOnMapEvent
+		CppLogicEvent_StartResearch, // CppLogic::Events::EntityAndTechEvent
 	};
 
 	enum class InputEventIds : int {

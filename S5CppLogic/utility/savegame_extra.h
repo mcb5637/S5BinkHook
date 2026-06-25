@@ -44,6 +44,7 @@ namespace CppLogic::SavegameExtra {
 		bool LightningEffectFix = false;
 		bool ClickMapTrigger = false;
 		bool BattleWaitCancelable = false;
+		bool ResearchTriggers = false;
 		shok::EntityCategory ResDoodad_RefillableCategory = {};
 		std::vector<ExtraPlayerData> ExtraPlayers;
 

@@ -149,4 +149,5 @@ list of used identifiers
 0x1029 CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget
 0x102A CppLogic::Events::ClickOnMapEvent
 0x102B CppLogic::Events::PaydayEvent
+0x102C CppLogic::Events::EntityAndTechEvent
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

@@ -462,6 +462,17 @@ void GGL::PlayerTechManager::ForceResearchNoFeedback(shok::TechnologyId tech)
 
 	(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(PlayerID)->Statistics.AddTechResearched(tech);
 }
+void GGL::PlayerTechManager::StartResearch(shok::TechnologyId tech, shok::EntityId res) {
+	auto* f = reinterpret_cast<void(__thiscall*)(PlayerTechManager*, shok::TechnologyId, shok::EntityId)>(0x4A29DD);
+	f(this, tech, res);
+}
+void GGL::PlayerTechManager::StartResearchWithTrigger(shok::TechnologyId tech, shok::EntityId res) {
+	StartResearch(tech, res);
+	if (!CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers)
+		return;
+	CppLogic::Events::EntityAndTechEvent ev{shok::EventIDs::CppLogicEvent_StartResearch, res, tech};
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+}
 
 static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, shok::EntityId ownerent, shok::PlayerId offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, shok::EntityId, shok::PlayerId, const char*)>(0x4BE63E);
 void GGL::PlayerTributesManager::SetTributeData(int tid, const shok::CostInfo& c, shok::EntityId ownerEntityId, shok::PlayerId offeringPlayerId, const char* text)

@@ -945,6 +945,9 @@ namespace CppLogic::EntityType {
 		L.Push(static_cast<bool>(t->GetBehaviorProps<GGL::CSoldierBehaviorProps>()));
 		return 1;
 	}
+	bool IsWorkerType(GGlue::CGlueEntityProps* e) {
+		return e->GetBehaviorProps<GGL::CWorkerBehaviorProps>() != nullptr;
+	}
 	std::tuple<int, float, float> GetBombData(GGlue::CGlueEntityProps* t) {
 		auto* p = t->GetBehaviorProps<GGL::CBombBehaviorProperties>();
 		if (p == nullptr)
@@ -988,6 +991,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<IsSettlerType>("IsSettlerType"),
 			luaext::FuncReference::GetRef<IsLeaderType>("IsLeaderType"),
 			luaext::FuncReference::GetRef<IsSoldierType>("IsSoldierType"),
+			luaext::FuncReference::GetRef<IsWorkerType>("IsWorkerType"),
 			luaext::FuncReference::GetRef<GetBombData>("GetBombData"),
 		};
 

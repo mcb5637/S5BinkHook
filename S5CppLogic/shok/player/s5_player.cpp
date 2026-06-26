@@ -408,10 +408,10 @@ GGL::CPreConditionPredicate::CPreConditionPredicate()
 	*reinterpret_cast<int*>(this) = vtp;
 }
 
-inline bool(__thiscall* const techmng_addprograw)(GGL::PlayerTechManager* th, shok::TechnologyId t, float a) = reinterpret_cast<bool(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, float)>(0x4A1A29);
-bool GGL::PlayerTechManager::AddTechProgressRaw(shok::TechnologyId techId, float amount)
+bool GGL::PlayerTechManager::Tech::AddTechProgressRaw(shok::TechnologyId techId, float amount)
 {
-	return techmng_addprograw(this, techId, amount);
+	auto* f = reinterpret_cast<bool(__thiscall*)(Tech*, shok::TechnologyId, float)>(0x4A1A29);;
+	return f(this, techId, amount);
 }
 inline void(__thiscall* const techmng_researched)(GGL::PlayerTechManager* th, shok::TechnologyId t, shok::EntityId id) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, shok::EntityId)>(0x4A1C6D);
 void GGL::PlayerTechManager::TechResearched(shok::TechnologyId techId, shok::EntityId researcherId)

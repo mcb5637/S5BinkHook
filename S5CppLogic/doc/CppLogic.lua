@@ -2176,6 +2176,12 @@ function CppLogic.Entity.Settler.GetDodgeChance(id)end
 --- @return number
 function CppLogic.Entity.Settler.GetLeveledDodgeBonus(id)end
 
+--- serf targeted extraction resource.
+--- @param id entity
+--- @return number targetId
+--- @return number slot
+function CppLogic.Entity.Settler.SerfGetExtractionTarget(id)end
+
 --- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
 --- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).
 --- the tasklist TL_SCRIPT_ANIMATION gets created at first use, it may not be there before you call this func.

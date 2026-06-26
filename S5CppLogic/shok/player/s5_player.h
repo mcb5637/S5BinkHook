@@ -226,6 +226,9 @@ namespace GGL {
 			int ResearchProgress;
 			int StartTick;
 			shok::EntityId ResearcherId;
+
+			// just adds progress and sets tech state if done, returns tech done, amount * 1000
+			bool AddTechProgressRaw(shok::TechnologyId techId, float amount);
 		};
 
 		shok::PlayerId PlayerID; // 0
@@ -233,8 +236,6 @@ namespace GGL {
 		shok::Vector<shok::TechnologyId> TechnologyInProgress; // 5 only AutomaticResearch==true
 		shok::List<BB::TSlot1<const GGL::CNetEventEventTechnologyPlayerIDAndEntityID&>> OnResearched; // 9
 
-		// just adds progress and sets tech state if done, returns tech done, amount * 1000
-		bool AddTechProgressRaw(shok::TechnologyId techId, float amount);
 		void TechResearched(shok::TechnologyId techId, shok::EntityId researcherId);
 		void AddTechProgressWorker(shok::TechnologyId techId, float amount);
 		bool CheckTechnologyRequirementsFor(shok::TechnologyId tech, const CTechConditionPredicate& p);

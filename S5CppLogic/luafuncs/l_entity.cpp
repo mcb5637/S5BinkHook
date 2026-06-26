@@ -806,6 +806,16 @@ namespace CppLogic::Entity {
 		return lvl->DodgeChance;
 	}
 
+	std::pair<std::optional<shok::EntityId>, std::optional<float>> SerfGetExtractionTarget(EGL::CGLEEntity* e) {
+		auto* sb = e->GetBehavior<GGL::CSerfBehavior>();
+		if (sb == nullptr)
+			throw lua::LuaException{ "not a serf" };
+		auto tid = e->GetFirstAttachedEntity(shok::AttachmentType::SERF_RESOURCE);
+		if (tid == shok::EntityId::Invalid)
+			return {std::nullopt, std::nullopt};
+		return {tid, sb->ResourceSlot};
+	}
+
 	int BuildingMarketGetCurrentTradeData(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		auto* m = b->GetBehavior<GGL::CMarketBehavior>();
@@ -2122,6 +2132,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SettlerGetRandomDamageBonus>("GetRandomDamageBonus"),
 			luaext::FuncReference::GetRef<SettlerGetDodgeChance>("GetDodgeChance"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledDodgeBonus>("GetLeveledDodgeBonus"),
+			luaext::FuncReference::GetRef<SerfGetExtractionTarget>("SerfGetExtractionTarget"),
 	};
 
 	constexpr std::array Leader{

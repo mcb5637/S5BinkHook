@@ -923,7 +923,7 @@ namespace CppLogic::Events {
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 	};
 
-	class EntityAndTechEvent : public EGL::CEvent1Entity {
+	class EntityAndTechEvent : public EGL::CEvent1Entity, public GGL::IEventTributeUniqueID {
 	public:
 		shok::TechnologyId Technology;
 
@@ -931,6 +931,21 @@ namespace CppLogic::Events {
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102C);
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
+		[[nodiscard]] virtual int GetTributeID() const override;
+	};
+
+	class TechProgressEvent : public EGL::CEvent2Entities, public GGL::IEventTributeUniqueID  {
+	public:
+		shok::TechnologyId Technology;
+		float Progress;
+
+		TechProgressEvent(shok::EventIDs e, shok::EntityId id1, shok::EntityId id2, shok::TechnologyId tech, float progress);
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102D);
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
+		[[nodiscard]] virtual int GetTributeID() const override;
 	};
 }
 
@@ -1344,6 +1359,7 @@ namespace shok {
 		CppLogicEvent_OnSavegameLoaded, // CppLogic::Events::SaveLoadedEvent
 		CppLogicEvent_OnClickMap, // CppLogic::Events::ClickOnMapEvent
 		CppLogicEvent_StartResearch, // CppLogic::Events::EntityAndTechEvent
+		CppLogicEvent_ResearchProgress, // CppLogic::Events::TechProgressEvent
 	};
 
 	enum class InputEventIds : int {

@@ -1393,6 +1393,10 @@ namespace GGL {
 		static inline constexpr int vtp = 0x7736F4;
 		static inline constexpr int TypeDesc = 0x816C74;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5F780A67);
+
+		static void HookResearchTrigger();
+	private:
+		void EventResearchStepOverride(BB::CEvent* ev);
 	};
 
 	class CResourceDoodadBehavior : public EGL::CGLEBehavior {

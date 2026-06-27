@@ -1027,7 +1027,11 @@ int __thiscall GGL::CWorkerBehavior::DoWorkEvents(CWorkerBehavior* th, GGL::CBui
 	}
 	shok::TechnologyId tech = b->GetTechnologyInResearch();
 	if (tech != shok::TechnologyId::Invalid) {
-		(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId)->TechnologyStates.AddTechProgressWorker(tech, th->BehaviorProps2->AmountResearched);
+		(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(b->PlayerId)->TechnologyStates.AddExtendedTechProgress(th->EntityId,
+			b->EntityId,
+			tech,
+			th->BehaviorProps2->AmountResearched
+		);
 	}
 	else {
 		EGL::CEvent1Entity ev{ shok::EventIDs::NoDetachEvent, th->EntityId };
@@ -1701,6 +1705,26 @@ void GGL::CDefendableBuildingBehavior::HookDealDamageSource()
 	HookDealDamageSource_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4FC40C), 0x10 };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FC40C), &defendbuildingbeh_dealdmgsrcasm, reinterpret_cast<void*>(0x4FC412));
+}
+
+bool HookResearchTrigger_Hooked = false;
+void GGL::CUniversityBehavior::HookResearchTrigger() {
+	if (HookResearchTrigger_Hooked)
+		return;
+	HookResearchTrigger_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4d3e98), 0x10 };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4d3e98), CppLogic::Hooks::MemberFuncPointerToVoid(&CUniversityBehavior::EventResearchStepOverride, 0), reinterpret_cast<void*>(0x4d3ea1));
+}
+void GGL::CUniversityBehavior::EventResearchStepOverride(BB::CEvent* ev) {
+	auto* buil = BB::IdentifierCast<GGL::CBuilding>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	auto tech = buil->GetTechnologyInResearch();
+	if (tech != shok::TechnologyId::Invalid) {
+		auto* sb = BB::IdentifierCast<GGL::CServiceBuildingBehaviorProperties>(PropPointer);
+		auto prog = sb->GetProgressAmount(buil->PlayerId);
+		auto* ev2 = BB::IdentifierCast<EGL::CEvent1Entity>(ev);
+		auto worker = ev2 == nullptr ? shok::EntityId::Invalid : ev2->EntityID;
+		(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(buil->PlayerId)->TechnologyStates.AddExtendedTechProgress(worker, EntityId, tech, prog);
+	}
 }
 
 inline GGL::CResourceDoodad* (__thiscall* const minebeh_getresdoodad)(GGL::CMineBehavior* th) = reinterpret_cast<GGL::CResourceDoodad * (__thiscall*)(GGL::CMineBehavior*)>(0x4E68E9);

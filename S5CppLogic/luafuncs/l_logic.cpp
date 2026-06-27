@@ -1092,14 +1092,22 @@ namespace CppLogic::Logic {
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers = enabled;
 		if (enabled) {
 			GGL::CBuilding::HookResearchTriggers();
+			GGL::CWorkerBehavior::HookWorkEvents();
+			GGL::CUniversityBehavior::HookResearchTrigger();
 		}
 	}
 
-	shok::TechnologyId GetTriggerTech() {
-		auto* ev = BB::IdentifierCast<CppLogic::Events::EntityAndTechEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+	float GetResearchTriggerProgress() {
+		auto* ev = BB::IdentifierCast<CppLogic::Events::TechProgressEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
 		if (ev == nullptr)
 			throw lua::LuaException{ "invalid event" };
-		return ev->Technology;
+		return ev->Progress;
+	}
+	void SetResearchTriggerProgress(float prog) {
+		auto* ev = BB::IdentifierCast<CppLogic::Events::TechProgressEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		ev->Progress = prog;
 	}
 
 	int EnableSettlerBuyTriggers(luaext::State L) {
@@ -1747,7 +1755,8 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<LEnableResourceTriggers>("EnableResourceTriggers"),
 			luaext::FuncReference::GetRef<SetResourceTriggerAmount>("SetResourceTriggerAmount"),
 			luaext::FuncReference::GetRef<EnableResearchTriggers>("EnableResearchTriggers"),
-			luaext::FuncReference::GetRef<GetTriggerTech>("GetTriggerTech"),
+			luaext::FuncReference::GetRef<GetResearchTriggerProgress>("GetResearchTriggerProgress"),
+			luaext::FuncReference::GetRef<SetResearchTriggerProgress>("SetResearchTriggerProgress"),
 			luaext::FuncReference::GetRef<EnableSettlerBuyTriggers>("EnableSettlerBuyTriggers"),
 			luaext::FuncReference::GetRef<GetSettlerBuyTriggerData>("GetSettlerBuyTriggerData"),
 			luaext::FuncReference::GetRef<SetSettlerBuyTriggerData>("SetSettlerBuyTriggerData"),
@@ -1826,6 +1835,9 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_RESEARCH_STARTED");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_StartResearch));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_ResearchProgress));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}

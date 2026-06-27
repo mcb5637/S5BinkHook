@@ -570,3 +570,26 @@ CppLogic::Events::EntityAndTechEvent::EntityAndTechEvent(shok::EventIDs e, shok:
 shok::ClassId __stdcall CppLogic::Events::EntityAndTechEvent::GetClassIdentifier() const {
 	return Identifier;
 }
+void* __stdcall CppLogic::Events::EntityAndTechEvent::CastToIdentifier(shok::ClassId id) {
+	if (id == GGL::IEventTributeUniqueID::Identifier)
+		return static_cast<GGL::IEventTributeUniqueID*>(this);
+	return CEvent1Entity::CastToIdentifier(id);
+}
+int CppLogic::Events::EntityAndTechEvent::GetTributeID() const {
+	return static_cast<int>(Technology);
+}
+
+CppLogic::Events::TechProgressEvent::TechProgressEvent(shok::EventIDs e, shok::EntityId id1, shok::EntityId id2, shok::TechnologyId tech, float progress)
+	: EGL::CEvent2Entities(e, id1, id2), Technology(tech), Progress(progress) {
+}
+shok::ClassId __stdcall CppLogic::Events::TechProgressEvent::GetClassIdentifier() const {
+	return Identifier;
+}
+void* __stdcall CppLogic::Events::TechProgressEvent::CastToIdentifier(shok::ClassId id) {
+	if (id == GGL::IEventTributeUniqueID::Identifier)
+		return static_cast<GGL::IEventTributeUniqueID*>(this);
+	return CEvent2Entities::CastToIdentifier(id);
+}
+int CppLogic::Events::TechProgressEvent::GetTributeID() const {
+	return static_cast<int>(Technology);
+}

@@ -242,6 +242,7 @@ namespace GGL {
 		bool CheckAllRequirementsFor(shok::TechnologyId tech, const CTechConditionPredicate& p);
 		shok::TechState GetTechState(shok::TechnologyId tech); // may also return substates of allowed
 		void ForceResearch(shok::TechnologyId tech);
+		void AddExtendedTechProgress(shok::EntityId worker, shok::EntityId build, shok::TechnologyId tech, float amount);
 		// on update 0x4A1B42 __thiscall()
 		// dtor 4b5d0a
 

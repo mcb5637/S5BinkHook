@@ -886,9 +886,13 @@ function CppLogic.Logic.SetResourceTriggerAmount(buyAmount, sellAmount) end
 --- @param enabled boolean
 function CppLogic.Logic.EnableResearchTriggers(enabled) end
 
----gets the tech of a Events.CPPLOGIC_EVENT_ON_RESEARCH_STARTED trigger.
----@return number tech
-function CppLogic.Logic.GetTriggerTech() end
+---gets the progress of a Events.CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS trigger.
+---@return number progress
+function CppLogic.Logic.GetResearchTriggerProgress() end
+
+---sets the progress of a Events.CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS trigger.
+---@param progress number
+function CppLogic.Logic.SetResearchTriggerProgress(progress) end
 
 --- enables firing a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER trigger when:
 --- - automatically spawning a worker for some workplace

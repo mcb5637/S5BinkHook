@@ -444,6 +444,21 @@ void GGL::PlayerTechManager::ForceResearch(shok::TechnologyId tech)
 	return techmng_forceresearch(this, tech);
 }
 
+void GGL::PlayerTechManager::AddExtendedTechProgress(shok::EntityId worker, shok::EntityId build, shok::TechnologyId tech, float amount) {
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers) {
+		CppLogic::Events::TechProgressEvent ev{
+			shok::EventIDs::CppLogicEvent_ResearchProgress,
+			worker,
+			build,
+			tech,
+			amount
+		};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		amount = ev.Progress;
+	}
+	AddTechProgressWorker(tech, amount);
+}
+
 void GGL::PlayerTechManager::ForceResearchNoFeedback(shok::TechnologyId tech)
 {
 	int te = static_cast<int>(tech);

@@ -923,16 +923,18 @@ namespace CppLogic::Events {
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 	};
 
-	class EntityAndTechEvent : public EGL::CEvent1Entity, public GGL::IEventTributeUniqueID {
+	class EntityAndTechEvent : public EGL::CEvent1Entity, public GGL::IEventTributeUniqueID, public EGL::IEventPlayerID {
 	public:
 		shok::TechnologyId Technology;
+		shok::PlayerId Player;
 
-		EntityAndTechEvent(shok::EventIDs e, shok::EntityId ent, shok::TechnologyId tech);
+		EntityAndTechEvent(shok::EventIDs e, shok::EntityId ent, shok::TechnologyId tech, shok::PlayerId pl);
 
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102C);
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 		[[nodiscard]] virtual int GetTributeID() const override;
+		[[nodiscard]] virtual shok::PlayerId GetPlayerID() const override;
 	};
 
 	class TechProgressEvent : public EGL::CEvent2Entities, public GGL::IEventTributeUniqueID  {
@@ -1281,7 +1283,7 @@ namespace shok {
 
 		LogicEvent_DiplomacyChanged = 0x1C002, // GGL::CEventDiplomacyChanged (only fired by netevent)
 		LogicEvent_TributePaid = 0x1C003,
-		LogicEvent_ResearchDone = 0x1C004,
+		LogicEvent_ResearchDone = 0x1C004, // unused by shok, CppLogic::Events::EntityAndTechEvent
 		LogicEvent_TradeCompleted = 0x1C005,
 		LogicEvent_WeatherChanged = 0x1C006, // GGL::CEventWeatherStateChanged
 		LogicEvent_HurtEntity = 0x1C007, // original EGL::CEvent2Entities, now CppLogic::Events::AdvHurtEvent (subclass)

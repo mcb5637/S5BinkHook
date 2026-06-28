@@ -228,7 +228,9 @@ namespace GGL {
 			shok::EntityId ResearcherId;
 
 			// just adds progress and sets tech state if done, returns tech done, amount * 1000
-			bool AddTechProgressRaw(shok::TechnologyId techId, float amount);
+			bool AddTechProgressRaw(shok::TechnologyId techId, int amount);
+
+			static constexpr float ProgressFactor = 1000.0f;
 		};
 
 		shok::PlayerId PlayerID; // 0
@@ -247,10 +249,13 @@ namespace GGL {
 		// dtor 4b5d0a
 
 		void ForceResearchNoFeedback(shok::TechnologyId tech);
+		static void HookResearchTrigger();
 	private:
 		// only to be called by building::startResearch
 		void StartResearch(shok::TechnologyId tech, shok::EntityId res);
 		void StartResearchWithTrigger(shok::TechnologyId tech, shok::EntityId res);
+		void TickOverride();
+		void ResearchedCallbackOverride(GGL::CNetEventEventTechnologyPlayerIDAndEntityID* ev);
 		friend GGL::CBuilding;
 	};
 	static_assert(sizeof(PlayerTechManager) == 12 * 4);

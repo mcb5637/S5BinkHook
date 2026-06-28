@@ -21,6 +21,12 @@ namespace CppLogic::Tech {
 		return 0;
 	}
 
+	float GetCurrentResearchProgress(shok::PlayerId pid, shok::TechnologyId techId) {
+		auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid);
+		auto& t = pl->TechnologyStates.TechnologyState.at(static_cast<int>(techId));
+		return static_cast<float>(t.ResearchProgress) / GGL::PlayerTechManager::Tech::ProgressFactor;
+	}
+
 	int GetRequirements(luaext::State L) {
 		shok::Technology* tech = L.CheckTech(1);
 		L.Push(tech->RequiredEntityConditions);
@@ -126,6 +132,7 @@ namespace CppLogic::Tech {
 	constexpr std::array Techs{
 			luaext::FuncReference::GetRef<GetResearchInfo>("GetResearchInfo"),
 			luaext::FuncReference::GetRef<SetResearchInfo>("SetResearchInfo"),
+			luaext::FuncReference::GetRef<GetCurrentResearchProgress>("GetCurrentResearchProgress"),
 			luaext::FuncReference::GetRef<GetRequirements>("GetRequirements"),
 			luaext::FuncReference::GetRef<GetExplorationModifier>("GetExplorationModifier"),
 			luaext::FuncReference::GetRef<GetArmorModifier>("GetArmorModifier"),

@@ -1094,6 +1094,7 @@ namespace CppLogic::Logic {
 			GGL::CBuilding::HookResearchTriggers();
 			GGL::CWorkerBehavior::HookWorkEvents();
 			GGL::CUniversityBehavior::HookResearchTrigger();
+			GGL::PlayerTechManager::HookResearchTrigger();
 		}
 	}
 

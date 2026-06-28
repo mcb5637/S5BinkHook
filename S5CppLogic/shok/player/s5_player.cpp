@@ -408,9 +408,9 @@ GGL::CPreConditionPredicate::CPreConditionPredicate()
 	*reinterpret_cast<int*>(this) = vtp;
 }
 
-bool GGL::PlayerTechManager::Tech::AddTechProgressRaw(shok::TechnologyId techId, float amount)
+bool GGL::PlayerTechManager::Tech::AddTechProgressRaw(shok::TechnologyId techId, int amount)
 {
-	auto* f = reinterpret_cast<bool(__thiscall*)(Tech*, shok::TechnologyId, float)>(0x4A1A29);;
+	auto* f = reinterpret_cast<bool(__thiscall*)(Tech*, shok::TechnologyId, int)>(0x4A1A29);;
 	return f(this, techId, amount);
 }
 inline void(__thiscall* const techmng_researched)(GGL::PlayerTechManager* th, shok::TechnologyId t, shok::EntityId id) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTechManager*, shok::TechnologyId, shok::EntityId)>(0x4A1C6D);
@@ -477,6 +477,18 @@ void GGL::PlayerTechManager::ForceResearchNoFeedback(shok::TechnologyId tech)
 
 	(*GGL::CGLGameLogic::GlobalObj)->GetPlayer(PlayerID)->Statistics.AddTechResearched(tech);
 }
+void GGL::PlayerTechManager::HookResearchTrigger() {
+	static bool HookResearchTrigger_Hooked = false;
+	if (HookResearchTrigger_Hooked)
+		return;
+	HookResearchTrigger_Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
+		reinterpret_cast<void*>(0x4a1b42),
+		reinterpret_cast<void*>(0x4a1ca5),
+	}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4a1b42), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerTechManager::TickOverride, 0), reinterpret_cast<void*>(0x4a1b47));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4a1ca5), CppLogic::Hooks::MemberFuncPointerToVoid(&PlayerTechManager::ResearchedCallbackOverride, 0));
+}
 void GGL::PlayerTechManager::StartResearch(shok::TechnologyId tech, shok::EntityId res) {
 	auto* f = reinterpret_cast<void(__thiscall*)(PlayerTechManager*, shok::TechnologyId, shok::EntityId)>(0x4A29DD);
 	f(this, tech, res);
@@ -485,8 +497,48 @@ void GGL::PlayerTechManager::StartResearchWithTrigger(shok::TechnologyId tech, s
 	StartResearch(tech, res);
 	if (!CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers)
 		return;
-	CppLogic::Events::EntityAndTechEvent ev{shok::EventIDs::CppLogicEvent_StartResearch, res, tech};
+	CppLogic::Events::EntityAndTechEvent ev{shok::EventIDs::CppLogicEvent_StartResearch, res, tech, PlayerID};
 	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+}
+void GGL::PlayerTechManager::TickOverride() {
+	auto v = TechnologyInProgress.SaveVector();
+	auto prog = (*EGL::CGLEGameLogic::GlobalObj)->InGameTime->TicksPerMS;
+	for (auto it = v.Vector.begin(); it != v.Vector.end();) {
+		auto tid = *it;
+		auto& tech = TechnologyState[static_cast<int>(tid)];
+		auto am = prog;
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers) {
+			CppLogic::Events::TechProgressEvent ev{
+				shok::EventIDs::CppLogicEvent_ResearchProgress,
+				shok::EntityId::Invalid,
+				tech.ResearcherId,
+				tid,
+				static_cast<float>(am) / Tech::ProgressFactor,
+			};
+			(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+			am = static_cast<int>(ev.Progress * Tech::ProgressFactor);
+		}
+		if (tech.AddTechProgressRaw(tid, am)) {
+			TechResearched(tid, tech.ResearcherId);
+			it = v.Vector.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+}
+void GGL::PlayerTechManager::ResearchedCallbackOverride(GGL::CNetEventEventTechnologyPlayerIDAndEntityID* ev) {
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers) {
+		CppLogic::Events::EntityAndTechEvent e{
+			shok::EventIDs::LogicEvent_ResearchDone,
+			ev->EntityID,
+			ev->TechId,
+			ev->PlayerID
+		};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&e);
+	}
+	auto* f = reinterpret_cast<void(__thiscall*)(PlayerTechManager*, CNetEventEventTechnologyPlayerIDAndEntityID*)>(0x4a1ad9);
+	f(this, ev);
 }
 
 static inline void(__thiscall* const tributemanager_setdata)(GGL::PlayerTributesManager* th, int tid, const shok::CostInfo* c, shok::EntityId ownerent, shok::PlayerId offeringpl, const char* txt) = reinterpret_cast<void(__thiscall*)(GGL::PlayerTributesManager*, int, const shok::CostInfo*, shok::EntityId, shok::PlayerId, const char*)>(0x4BE63E);

@@ -881,7 +881,7 @@ function CppLogic.Logic.EnableResourceTriggers(enabled, refinerFix) end
 ---@param sellAmount number?
 function CppLogic.Logic.SetResourceTriggerAmount(buyAmount, sellAmount) end
 
---- enables/disables research triggers (Events.CPPLOGIC_EVENT_ON_RESEARCH_STARTED).
+--- enables/disables research triggers (Events.CPPLOGIC_EVENT_ON_RESEARCH_STARTED, Events.CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS, Events.LOGIC_EVENT_RESEARCH_DONE).
 --- status of this gets saved into a savegame.
 --- @param enabled boolean
 function CppLogic.Logic.EnableResearchTriggers(enabled) end
@@ -2957,6 +2957,12 @@ function CppLogic.Technology.GetResearchInfo(tid) end
 --- @param time number research time needed (optional)
 --- @param cost CostInfo cost info (optional)
 function CppLogic.Technology.SetResearchInfo(tid, time, cost) end
+
+--- current researc progress.
+--- @param player number
+--- @param tid number|string
+--- @return number
+function CppLogic.Technology.GetCurrentResearchProgress(player, tid) end
 
 --- tech requirements.
 --- @param tid number tech id

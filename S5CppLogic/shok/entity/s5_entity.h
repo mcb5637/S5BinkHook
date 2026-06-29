@@ -723,6 +723,7 @@ namespace GGL {
 
 		// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 
+		// 4a9db6 add construction progress(float)
 
 		static std::vector<shok::AdditionalTechModifier> ConstructionSpeedModifiers;
 		static void EnableConstructionSpeedTechs();
@@ -745,6 +746,16 @@ namespace GGL {
 		static inline constexpr int TypeDesc = 0x8078DC;
 		static inline constexpr int vtp_IEntityDisplay = 0x77001C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2B5B9C80);
+
+		// 4b8de2 get building props of building under construction
+		// 4b8f14 get building
+		// 4b8ead get progress per tick()->float
+		// 4b9084 increase progress()
+		// 4b90b7 is complete
+
+	private:
+		[[nodiscard]] float GetProgressPerTickOverride() const;
+		friend class CBuilding;
 	};
 	static_assert(offsetof(CConstructionSite, BuildingType) == 83 * 4);
 	static_assert(sizeof(CConstructionSite) == 84 * 4);

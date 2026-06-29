@@ -162,6 +162,7 @@ BB::SerializationData CppLogic::SavegameExtra::SerializedMapdata::SerializationD
 	AutoMemberSerialization(SerializedMapdata, ClickMapTrigger),
 	AutoMemberSerialization(SerializedMapdata, BattleWaitCancelable),
 	AutoMemberSerialization(SerializedMapdata, ResearchTriggers),
+	AutoMemberSerialization(SerializedMapdata, ConstructionTriggers),
 	AutoMemberSerialization(SerializedMapdata, ResDoodad_RefillableCategory),
 	AutoMemberSerialization(SerializedMapdata, ExtraPlayers),
 	BB::SerializationData::GuardData(),

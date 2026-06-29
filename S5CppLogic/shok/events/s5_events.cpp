@@ -598,3 +598,10 @@ void* __stdcall CppLogic::Events::TechProgressEvent::CastToIdentifier(shok::Clas
 int CppLogic::Events::TechProgressEvent::GetTributeID() const {
 	return static_cast<int>(Technology);
 }
+
+CppLogic::Events::ConstructionProgressEvent::ConstructionProgressEvent(shok::EventIDs id, shok::EntityId ent, float prog)
+	: CEvent1Entity(id, ent), Progress(prog) {
+}
+shok::ClassId __stdcall CppLogic::Events::ConstructionProgressEvent::GetClassIdentifier() const {
+	return Identifier;
+}

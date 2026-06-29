@@ -17,6 +17,7 @@
 #include <luaext.h>
 #include <utility/hooks.h>
 #include <utility/EntityAddonData.h>
+#include <utility/savegame_extra.h>
 
 EGL::IEntityDisplay::modeldata EGL::IEntityDisplay::GetModelData() const
 {
@@ -1007,21 +1008,29 @@ shok::EntityTypeId GGL::CBuilding::GetWorkerType() const
 }
 
 std::vector<shok::AdditionalTechModifier> GGL::CBuilding::ConstructionSpeedModifiers{};
-float __fastcall constructionsite_getprogresspertick_hook(GGL::CConstructionSite* th) { // param is constructionsite, just not done yet ;)
+float GGL::CConstructionSite::GetProgressPerTickOverride() const {
 	auto* serf = static_cast<GGL::CGLSettlerProps*>(CppLogic::GetEntityType(*GGlue::CGlueEntityProps::EntityTypeIDSerf)->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
-	auto* bty = static_cast<GGL::CGLBuildingProps*>(CppLogic::GetEntityType(th->BuildingType)->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
-	float constructionfactor = serf->BuildFactor;
-	GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(th->PlayerId);
+	auto* bty = static_cast<GGL::CGLBuildingProps*>(CppLogic::GetEntityType(BuildingType)->LogicProps); // NOLINT(*-pro-type-static-cast-downcast)
+	float constructionFactor = serf->BuildFactor;
+	GGL::CPlayerStatus* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(PlayerId);
 	for (const shok::AdditionalTechModifier& tmod : GGL::CBuilding::ConstructionSpeedModifiers) {
 		if (pl->GetTechStatus(tmod.TechID) != shok::TechState::Researched)
 			continue;
-		constructionfactor = tmod.ModifyValue(constructionfactor);
+		constructionFactor = tmod.ModifyValue(constructionFactor);
 	}
-	constructionfactor = constructionfactor * static_cast<float>(bty->ConstructionInfo.Time) * 10.0f;
-	if (constructionfactor <= 0.0f)
-		return 0.0f;
+	constructionFactor = constructionFactor * static_cast<float>(bty->ConstructionInfo.Time) * 10.0f;
+	if (constructionFactor <= 0.0f)
+		constructionFactor = 0.0f;
 	else
-		return 1.0f / constructionfactor;
+		constructionFactor = 1.0f / constructionFactor;
+
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConstructionTriggers) {
+		CppLogic::Events::ConstructionProgressEvent ev{shok::EventIDs::CppLogicEvent_ConstructionProgress, EntityId, constructionFactor};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		constructionFactor = ev.Progress;
+	}
+
+	return constructionFactor;
 }
 bool EnableConstructionSpeedTechs_Hooked = false;
 void GGL::CBuilding::EnableConstructionSpeedTechs()
@@ -1030,7 +1039,7 @@ void GGL::CBuilding::EnableConstructionSpeedTechs()
 		return;
 	EnableConstructionSpeedTechs_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4B8EAD), 0x4B8EB2 - 0x4B8EAD };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), &constructionsite_getprogresspertick_hook, reinterpret_cast<void*>(0x4B8EB2));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4B8EAD), CppLogic::Hooks::MemberFuncPointerToVoid(&CConstructionSite::GetProgressPerTickOverride, 0), reinterpret_cast<void*>(0x4B8EB2));
 }
 bool HookResearchTriggers_Hooked = false;
 void GGL::CBuilding::HookResearchTriggers() {

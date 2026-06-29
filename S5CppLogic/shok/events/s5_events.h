@@ -949,6 +949,16 @@ namespace CppLogic::Events {
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 		[[nodiscard]] virtual int GetTributeID() const override;
 	};
+
+	class ConstructionProgressEvent : public EGL::CEvent1Entity {
+	public:
+		float Progress;
+
+		ConstructionProgressEvent(shok::EventIDs id, shok::EntityId ent, float prog);
+
+		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102E);
+		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	};
 }
 
 namespace shok {
@@ -1362,6 +1372,7 @@ namespace shok {
 		CppLogicEvent_OnClickMap, // CppLogic::Events::ClickOnMapEvent
 		CppLogicEvent_StartResearch, // CppLogic::Events::EntityAndTechEvent
 		CppLogicEvent_ResearchProgress, // CppLogic::Events::TechProgressEvent
+		CppLogicEvent_ConstructionProgress, // CppLogic::Events::ConstructionProgressEvent
 	};
 
 	enum class InputEventIds : int {

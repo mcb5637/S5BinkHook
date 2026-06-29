@@ -1041,6 +1041,18 @@ function CppLogic.Logic.ChangePlayerCurrentMaxMotivation(p, delta)end
 --- @param max number (0 to reset to default)
 function CppLogic.Logic.SetPlayerAbsoluteMaxMotivation(p, max) end
 
+--- enables/disables construction triggers (Events.CPPLOGIC_EVENT_ON_CONSTRUCTION_PROGRESS)
+---@param enabled boolean
+function CppLogic.Logic.EnableConstructionTriggers(enabled) end
+
+--- construction progress to be added this tick per serf.
+--- @return number
+function CppLogic.Logic.ConstructionTriggerGetProgress() end
+
+--- construction progress to be added this tick per serf.
+--- @param prog number
+function CppLogic.Logic.ConstructionTriggerSetProgress(prog) end
+
 --- dumps game logic
 --- dev only, slow!
 ---@return table

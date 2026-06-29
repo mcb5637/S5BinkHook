@@ -151,4 +151,5 @@ list of used identifiers
 0x102B CppLogic::Events::PaydayEvent
 0x102C CppLogic::Events::EntityAndTechEvent
 0x102D CppLogic::Events::TechProgressEvent
+0x102E CppLogic::Events::ConstructionProgressEvent
 0xEEFFFFFF InvalidIdentifier (not actually an identifier, used to check for nonexistent identifiers at compiletime)

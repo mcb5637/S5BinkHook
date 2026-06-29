@@ -1284,6 +1284,26 @@ namespace CppLogic::Logic {
 		GGL::CPlayerStatus::HookMaxMoti();
 	}
 
+	void EnableConstructionTriggers(bool enable) {
+		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConstructionTriggers = enable;
+		if (enable) {
+			GGL::CBuilding::EnableConstructionSpeedTechs();
+		}
+	}
+
+	float ConstructionTriggerGetProgress() {
+		auto* ev = BB::IdentifierCast<CppLogic::Events::ConstructionProgressEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		return ev->Progress;
+	}
+	void ConstructionTriggerSetProgress(float prog) {
+		auto* ev = BB::IdentifierCast<CppLogic::Events::ConstructionProgressEvent>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+		if (ev == nullptr)
+			throw lua::LuaException{ "invalid event" };
+		ev->Progress = prog;
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(luaext::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1786,6 +1806,9 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<GetPlayerMaxMotivation>("GetPlayerMaxMotivation"),
 			luaext::FuncReference::GetRef<ChangePlayerCurrentMaxMotivation>("ChangePlayerCurrentMaxMotivation"),
 			luaext::FuncReference::GetRef<SetPlayerAbsoluteMaxMotivation>("SetPlayerAbsoluteMaxMotivation"),
+			luaext::FuncReference::GetRef<EnableConstructionTriggers>("EnableConstructionTriggers"),
+			luaext::FuncReference::GetRef<ConstructionTriggerGetProgress>("ConstructionTriggerGetProgress"),
+			luaext::FuncReference::GetRef<ConstructionTriggerSetProgress>("ConstructionTriggerSetProgress"),
 		};
 
 	constexpr std::array UICmd{
@@ -1839,6 +1862,9 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_ResearchProgress));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_CONSTRUCTION_PROGRESS");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_ConstructionProgress));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
@@ -1933,6 +1959,9 @@ namespace CppLogic::Logic {
 
 		if (SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers)
 			EnableResearchTriggers(true);
+
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConstructionTriggers)
+			EnableConstructionTriggers(true);
 
 		L.Pop(1);
 	}

@@ -868,7 +868,7 @@ function CppLogic.Logic.GetTradeDataForResource(rt) end
 --- @param workamount number|nil
 function CppLogic.Logic.SetTradeDataForResource(rt, baseprice, minprice, maxprice, inflation, deflation, workamount) end
 
---- enables/disables resource triggers (Events.CPPLOGIC_EVENT_ON_RESOURCE_REFINED, Events.CPPLOGIC_EVENT_ON_RESOURCE_MINED and Events.CPPLOGIC_EVENT_ON_REFINER_SUPPLY_TAKEN).
+--- enables/disables resource triggers (Events.CPPLOGIC_EVENT_ON_RESOURCE_REFINED, Events.CPPLOGIC_EVENT_ON_RESOURCE_MINED, Events.CPPLOGIC_EVENT_ON_RESOURCE_CHANGED and Events.CPPLOGIC_EVENT_ON_REFINER_SUPPLY_TAKEN).
 --- also fixes 2 mining bugs: almost empty mines mining not existent resources and serfs not putting their resources into the resource mined statistic.
 --- the optional refinerFix fixes refiner resource consumption, requires external editing of tasklists and enabled.
 --- status of this gets saved into a savegame.
@@ -3444,6 +3444,7 @@ function CppLogic.UI.EnableClickOnMapTrigger() end
 function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
 
 --- sets a GUI State to place a construction site and choose its rotation.
+--- status of this gets saved into savegames.
 --- @param ucat number building upgrade category
 function CppLogic.UI.SetGUIStatePlaceBuildingEx(ucat) end
 --- changes the rotation of a PlaceBuildingEx state.

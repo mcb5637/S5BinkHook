@@ -1373,6 +1373,7 @@ namespace shok {
 		CppLogicEvent_StartResearch, // CppLogic::Events::EntityAndTechEvent
 		CppLogicEvent_ResearchProgress, // CppLogic::Events::TechProgressEvent
 		CppLogicEvent_ConstructionProgress, // CppLogic::Events::ConstructionProgressEvent
+		CppLogicEvent_OnResourceChanged, // CppLogic::Events::PaydayEvent
 	};
 
 	enum class InputEventIds : int {

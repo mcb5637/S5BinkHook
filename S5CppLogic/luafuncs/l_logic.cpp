@@ -1069,6 +1069,7 @@ namespace CppLogic::Logic {
 		GGL::CResourceRefinerBehavior::HookRefineTrigger();
 		GGL::CMineBehavior::HookMineTrigger();
 		GGL::CSerfBehavior::HookMineTrigger();
+		shok::CostInfo::HookResTrigger();
 		GGL::CWorkerBehavior::ResourceTriggers = e;
 		GGL::CWorkerBehavior::RefinerFix = ref;
 		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers = e;
@@ -1865,6 +1866,9 @@ namespace CppLogic::Logic {
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_CONSTRUCTION_PROGRESS");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_ConstructionProgress));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_RESOURCE_CHANGED");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnResourceChanged));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}

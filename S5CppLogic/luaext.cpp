@@ -155,9 +155,9 @@ void luaext::detail::ReadCostInfo(State L, int index, shok::CostInfo& c, bool ig
 void luaext::detail::PushCostInfo(State L, const shok::CostInfo& c)
 {
 	L.NewTable();
-	for (int i = 1; i <= shok::ResourceType_MaxValue; i++) {
-		L.Push(c.GetResourceAmountFromType(static_cast<shok::ResourceType>(i), false));
-		L.SetTableRaw(-2, i);
+	for (shok::ResourceType i = shok::ResourceType_MinValue; i <= shok::ResourceType_MaxValue; ++i) {
+		L.Push(c.GetResourceAmountFromType(i, false));
+		L.SetTableRaw(-2, static_cast<int>(i));
 	}
 }
 

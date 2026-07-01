@@ -126,10 +126,18 @@ namespace shok {
 		bool HasResources(const CostInfo* has) const;
 		bool SubResources(const CostInfo& tosub); // returns hadRes, does not sub anything if one res type is missing
 
+		// 4a9759 multipy scalar
+
 		static inline shok::ResourceType(__cdecl* const ResourceTypeToRaw)(shok::ResourceType rt) = reinterpret_cast<shok::ResourceType(__cdecl*)(shok::ResourceType)>(0x4A9299);
 		static inline shok::ResourceType(__cdecl* const RawToResourceType)(shok::ResourceType rt) = reinterpret_cast<shok::ResourceType(__cdecl*)(shok::ResourceType)>(0x4A92D6);
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x85D668);
+
+		static void HookResTrigger();
+	private:
+		bool SubFromTypeOverride(shok::ResourceType ty, float tosub, float dispo);
+		void CleanupNegativeByRaw();
+		float* GetRes(shok::ResourceType t);
 	};
 	static_assert(sizeof(CostInfo) == 18 * 4);
 

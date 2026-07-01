@@ -1,8 +1,14 @@
 
 #include "s5_baseDefs.h"
 
+#include <shok/s5_scriptsystem.h>
+#include <shok/events/s5_events.h>
+#include <utility/savegame_extra.h>
+
 #include <algorithm>
 #include <cctype>
+#include <utility/ModPlayers.h>
+#include <utility/hooks.h>
 
 
 void shok::Position::FloorToBuildingPlacement()
@@ -199,6 +205,93 @@ bool shok::CostInfo::SubResources(const CostInfo& tosub)
 {
 	return costinfo_subci(this, &tosub);
 }
+
+
+void shok::CostInfo::HookResTrigger() {
+	static bool Hooked = false;
+	if (Hooked)
+		return;
+	Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{
+		0x10,
+		{reinterpret_cast<void*>(0x4a963d)}
+	};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4a963d), CppLogic::Hooks::MemberFuncPointerToVoid(&CostInfo::SubFromTypeOverride, 0), reinterpret_cast<void*>(0x4a9642));
+}
+bool shok::CostInfo::SubFromTypeOverride(shok::ResourceType ty, float tosub, float dispo) {
+	if (ty <= ResourceType::None || ty > ResourceType_MaxValue)
+		return false;
+	CleanupNegativeByRaw();
+	if (tosub == 0.0f)
+		return true;
+	auto* r = GetRes(ty);
+	auto am = *r;
+	auto raw = ResourceTypeToRaw(ty);
+	if (raw != ResourceType::None)
+		am += *GetRes(raw);
+	if (am - tosub < dispo)
+		return false;
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResourceTriggers) {
+		auto maxp = CppLogic::Mod::Player::ExtraPlayerManager::GlobalObj().GetMaxPlayer();
+		auto* pman = *GGL::CGLGameLogic::GlobalObj;
+		for (auto p = shok::PlayerId::P1; p <= maxp; ++p) {
+			if (&pman->GetPlayer(p)->CurrentResources == this) {
+				CppLogic::Events::PaydayEvent ev{shok::EventIDs::CppLogicEvent_OnResourceChanged, ty, ResourceType::None, 0.0f, p, tosub, 0.0f};
+				(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+			}
+		}
+	}
+	*r -= tosub;
+	CleanupNegativeByRaw();
+	return true;
+}
+void shok::CostInfo::CleanupNegativeByRaw() {
+	auto* f = reinterpret_cast<void(__thiscall*)(CostInfo*)>(0x4a95aa);
+	f(this);
+}
+float* shok::CostInfo::GetRes(shok::ResourceType t) {
+	switch (t) {
+		case ResourceType::None:
+			return nullptr;
+		case ResourceType::Gold:
+			return &Gold;
+		case ResourceType::GoldRaw:
+			return &GoldRaw;
+		case ResourceType::Silver:
+			return &Silver;
+		case ResourceType::SilverRaw:
+			return &SilverRaw;
+		case ResourceType::Stone:
+			return &Stone;
+		case ResourceType::StoneRaw:
+			return &StoneRaw;
+		case ResourceType::Iron:
+			return &Iron;
+		case ResourceType::IronRaw:
+			return &IronRaw;
+		case ResourceType::Sulfur:
+			return &Sulfur;
+		case ResourceType::SulfurRaw:
+			return &SulfurRaw;
+		case ResourceType::Clay:
+			return &Clay;
+		case ResourceType::ClayRaw:
+			return &ClayRaw;
+		case ResourceType::Wood:
+			return &Wood;
+		case ResourceType::WoodRaw:
+			return &WoodRaw;
+		case ResourceType::WeatherEnergy:
+			return &WeatherEnergy;
+		case ResourceType::Knowledge:
+			return &Knowledge;
+		case ResourceType::Faith:
+			return  &Faith;
+		default:
+			return nullptr;
+	}
+}
+
 
 inline void(__thiscall* const eventhandlerlist_addhandlers)(EGL::EventHandlerList* th, shok::EventIDs id, EGL::EventHandler* h) = reinterpret_cast<void(__thiscall*)(EGL::EventHandlerList*, shok::EventIDs, EGL::EventHandler*)>(0x49E6A1);
 void EGL::EventHandlerList::AddHandler(shok::EventIDs id, EGL::EventHandler* h)

@@ -185,7 +185,9 @@ namespace shok {
 		Knowledge = 16,
 		Faith = 17,
 	};
-	constexpr int ResourceType_MaxValue = 17;
+	constexpr auto ResourceType_MinValue = ResourceType::Gold;
+	constexpr auto ResourceType_MaxValue = ResourceType::Faith;
+	constexpr int ResourceType_MaxValueI = static_cast<int>(ResourceType_MaxValue);
 
 	enum class Goods : int {
 		XG_Gold = 2,
@@ -633,3 +635,5 @@ template<>
 class enum_is_iter<shok::PlayerId> : public std::true_type {};
 template<>
 class enum_is_iter<shok::ScoreType> : public std::true_type {};
+template<>
+class enum_is_iter<shok::ResourceType> : public std::true_type {};

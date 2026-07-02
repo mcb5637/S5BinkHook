@@ -1305,6 +1305,19 @@ namespace CppLogic::Logic {
 		ev->Progress = prog;
 	}
 
+	float GetWeatherSpeedFactor() {
+		auto state = (*GGL::CGLGameLogic::GlobalObj)->WeatherHandler->GetCurrentWeatherState();
+		auto* prop = *GGL::CLogicProperties::GlobalObj;
+		switch (state) {
+			case shok::WeatherState::Rain:
+				return prop->WeatherMoveSpeedRainFactor;
+			case shok::WeatherState::Winter:
+				return prop->WeatherMoveSpeedSnowFactor;
+			default:
+				return 1.0f;
+		}
+	}
+
 	RWE::RwOpCombineType LogicModel_CheckTO(luaext::State L, int idx) {
 		int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 		if (!(i >= 0 && i < 3))
@@ -1810,6 +1823,7 @@ namespace CppLogic::Logic {
 			luaext::FuncReference::GetRef<EnableConstructionTriggers>("EnableConstructionTriggers"),
 			luaext::FuncReference::GetRef<ConstructionTriggerGetProgress>("ConstructionTriggerGetProgress"),
 			luaext::FuncReference::GetRef<ConstructionTriggerSetProgress>("ConstructionTriggerSetProgress"),
+			luaext::FuncReference::GetRef<GetWeatherSpeedFactor>("GetWeatherSpeedFactor"),
 		};
 
 	constexpr std::array UICmd{

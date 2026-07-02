@@ -1053,6 +1053,10 @@ function CppLogic.Logic.ConstructionTriggerGetProgress() end
 --- @param prog number
 function CppLogic.Logic.ConstructionTriggerSetProgress(prog) end
 
+--- gets the speed factor of the current weather
+--- @return number
+function CppLogic.Logic.GetWeatherSpeedFactor() end
+
 --- dumps game logic
 --- dev only, slow!
 ---@return table
@@ -2191,6 +2195,11 @@ function CppLogic.Entity.Settler.GetDodgeChance(id)end
 --- @param id entity
 --- @return number
 function CppLogic.Entity.Settler.GetLeveledDodgeBonus(id)end
+
+--- level dependent speed bonus
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetLeveledSpeedBonus(id)end
 
 --- serf targeted extraction resource.
 --- @param id entity

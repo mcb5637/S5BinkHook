@@ -806,6 +806,17 @@ namespace CppLogic::Entity {
 		return lvl->DodgeChance;
 	}
 
+	std::optional<float> SettlerGetLeveledSpeedBonus(GGL::CSettler* s) {
+		if (s->ModifierProfile.EntityReference.ExperienceClass == shok::ExperienceClass::Invalid)
+			return std::nullopt;
+		if (s->ModifierProfile.ExperienceLevel.Value <= 0)
+			return 0.0f;
+		auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
+		if (lvl == nullptr)
+			return 0.0f;;
+		return lvl->Speed;
+	}
+
 	std::pair<std::optional<shok::EntityId>, std::optional<float>> SerfGetExtractionTarget(EGL::CGLEEntity* e) {
 		auto* sb = e->GetBehavior<GGL::CSerfBehavior>();
 		if (sb == nullptr)
@@ -2132,6 +2143,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SettlerGetRandomDamageBonus>("GetRandomDamageBonus"),
 			luaext::FuncReference::GetRef<SettlerGetDodgeChance>("GetDodgeChance"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledDodgeBonus>("GetLeveledDodgeBonus"),
+			luaext::FuncReference::GetRef<SettlerGetLeveledSpeedBonus>("GetLeveledSpeedBonus"),
 			luaext::FuncReference::GetRef<SerfGetExtractionTarget>("SerfGetExtractionTarget"),
 	};
 

@@ -286,7 +286,7 @@ float* shok::CostInfo::GetRes(shok::ResourceType t) {
 		case ResourceType::Knowledge:
 			return &Knowledge;
 		case ResourceType::Faith:
-			return  &Faith;
+			return &Faith;
 		default:
 			return nullptr;
 	}

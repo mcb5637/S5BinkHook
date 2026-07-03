@@ -817,6 +817,17 @@ namespace CppLogic::Entity {
 		return lvl->Speed;
 	}
 
+	std::optional<float> SettlerGetLeveledRangeBonus(GGL::CSettler* s) {
+		if (s->ModifierProfile.EntityReference.ExperienceClass == shok::ExperienceClass::Invalid)
+			return std::nullopt;
+		if (s->ModifierProfile.ExperienceLevel.Value <= 0)
+			return 0.0f;
+		auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
+		if (lvl == nullptr)
+			return 0.0f;;
+		return lvl->MaxRange;
+	}
+
 	std::pair<std::optional<shok::EntityId>, std::optional<float>> SerfGetExtractionTarget(EGL::CGLEEntity* e) {
 		auto* sb = e->GetBehavior<GGL::CSerfBehavior>();
 		if (sb == nullptr)
@@ -1632,6 +1643,15 @@ namespace CppLogic::Entity {
 			d->MaxRangeUseBoni = L.CheckBool(3);
 		return 0;
 	}
+	std::tuple<int, bool> GetAutoAttackMaxRangeBase(EGL::CGLEEntity* e) {
+		if (auto* bb = e->GetBehaviorDynamic<GGL::CBattleBehavior>()) {
+			return bb->GetMaxRangeBase();
+		}
+		if (auto* ac = e->GetBehavior<GGL::CAutoCannonBehavior>()) {
+			return {ac->GetMaxRangeBase(), false};
+		}
+		throw lua::LuaException{"no battle or autocannon"};
+	}
 	int SetDisplayName(luaext::State L) {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
@@ -1983,6 +2003,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<GetBaseArmor>("GetBaseArmor"),
 			luaext::FuncReference::GetRef<SetExploration>("SetExploration"),
 			luaext::FuncReference::GetRef<SetAutoAttackMaxRange>("SetAutoAttackMaxRange"),
+			luaext::FuncReference::GetRef<GetAutoAttackMaxRangeBase>("GetAutoAttackMaxRangeBase"),
 			luaext::FuncReference::GetRef<SetDisplayName>("SetDisplayName"),
 			luaext::FuncReference::GetRef<GetDisplayName>("GetDisplayName"),
 			luaext::FuncReference::GetRef<PerformHeal>("PerformHeal"),
@@ -2144,6 +2165,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SettlerGetDodgeChance>("GetDodgeChance"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledDodgeBonus>("GetLeveledDodgeBonus"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledSpeedBonus>("GetLeveledSpeedBonus"),
+			luaext::FuncReference::GetRef<SettlerGetLeveledRangeBonus>("SettlerGetLeveledRangeBonus"),
 			luaext::FuncReference::GetRef<SerfGetExtractionTarget>("SerfGetExtractionTarget"),
 	};
 

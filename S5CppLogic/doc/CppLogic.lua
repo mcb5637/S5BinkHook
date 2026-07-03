@@ -1315,6 +1315,14 @@ function CppLogic.API.GetMonitors() end
 ---updates the clip mouse state from GDB
 function CppLogic.API.UpdateClipMouse() end
 
+--- formats a number with specified precision.
+--- 0 precision gives the same result as rounding, <0 throws.
+--- @param number number
+--- @param precision number
+--- @param trim boolean? if true, remove trailing zeroes
+--- @return string
+function CppLogic.API.FormatNumber(number, precision, trim) end
+
 ---@class RNG
 local RNG = {}
 
@@ -1796,6 +1804,12 @@ function CppLogic.Entity.SetExploration(id, ex, useBoni) end
 --- @param ran number (<0 disable)
 function CppLogic.Entity.SetAutoAttackMaxRange(id, ran, useBoni) end
 
+--- gets settlers/autocannons max attack range.
+--- @param id entity
+--- @return number range
+--- @return boolean boni
+function CppLogic.Entity.GetAutoAttackMaxRangeBase(id) end
+
 --- overrides an entities display name.
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
@@ -2200,6 +2214,11 @@ function CppLogic.Entity.Settler.GetLeveledDodgeBonus(id)end
 --- @param id entity
 --- @return number
 function CppLogic.Entity.Settler.GetLeveledSpeedBonus(id)end
+
+--- level dependent max range bonus
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.SettlerGetLeveledRangeBonus(id)end
 
 --- serf targeted extraction resource.
 --- @param id entity

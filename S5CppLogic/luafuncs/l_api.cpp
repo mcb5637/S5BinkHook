@@ -673,6 +673,23 @@ namespace CppLogic::API {
 		return 0;
 	}
 
+	std::string FormatNumber(double num, int precision, std::optional<bool> trim) {
+		auto s = std::format("{:.{}f}", num, precision);
+		if (trim.value_or(false)) {
+			auto l = s.find('.');
+			if (l != std::string::npos) {
+				for (auto c = s.size()-1; c > l; --c) {
+					if (s[c] != '0') {
+						s.resize(c+1);
+						return s;
+					}
+				}
+				s.resize(l);
+			}
+		}
+		return s;
+	}
+
 	constexpr std::array API{
 			luaext::FuncReference::GetRef<Eval>("Eval"),
 			luaext::FuncReference::GetRef<Log>("Log"),
@@ -705,6 +722,7 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<GetMonitors>("GetMonitors"),
 			luaext::FuncReference::GetRef<GetTriggers>("GetTriggers"),
 			luaext::FuncReference::GetRef<UpdateClipMouse>("UpdateClipMouse"),
+			luaext::FuncReference::GetRef<FormatNumber>("FormatNumber"),
 #ifdef DEBUG_FUNCS
 			luaext::FuncReference::GetRef<WriteTriggers>("WriteTriggers"),
 			luaext::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),

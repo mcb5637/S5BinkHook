@@ -1815,24 +1815,6 @@ void EGL::CGLEEntity::HookExplorationMod()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4ab192), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CBuilding::GetExplorationOverride, 0), reinterpret_cast<void*>(0x4ab199));
 }
 
-int GGL::CSettler::LeaderGetRegenHealth()
-{
-	auto* d = GetAdditionalData(false);
-	int i;
-	if (d && d->RegenHPOverride >= 0)
-		i = d->RegenHPOverride;
-	else
-		i = GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>()->HealingPoints;
-	return static_cast<int>(ModifierProfile.GetModifiedValue(EGL::IProfileModifierSetObserver::ModifierType::HealingPoints, static_cast<float>(i)));
-}
-int GGL::CSettler::LeaderGetRegenHealthSeconds()
-{
-	auto* d = GetAdditionalData(false);
-	if (d && d->RegenSecondsOverride >= 0)
-		return d->RegenSecondsOverride;
-	else
-		return GetEntityType()->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>()->HealingSeconds;
-}
 static inline void(__thiscall* const settler_killbyenviro)(GGL::CSettler* th) = reinterpret_cast<void(__thiscall*)(GGL::CSettler*)>(0x4A5049);
 void GGL::CSettler::KillSettlerByEnvironment()
 {

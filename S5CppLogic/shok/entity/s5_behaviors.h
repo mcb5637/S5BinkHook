@@ -892,7 +892,7 @@ namespace GGL {
 	private:
 		void __thiscall EventOverrideGetDamage(EGL::CEventGetValue_Int* ev) const;
 		int __thiscall TaskOverrideFireProjectile(EGL::CGLETaskArgs* a) const;
-		float __thiscall GetMaxRangeOverride() const;
+		[[nodiscard]] float __thiscall GetMaxRangeOverride() const;
 	};
 
 	class CLeaderBehaviorProps;
@@ -943,6 +943,9 @@ namespace GGL {
 		[[nodiscard]] float GetAutoAttackRangeVsBuildings() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryBuildingAutoAttackRangeFactor otherwise
 		[[nodiscard]] float GetAutoAttackRangeVsCivillians() const; // config for attackmove, max for defend, GetAutoAttackRange * config->MilitaryCivilianAutoAttackRangeFactor otherwise
 		shok::EntityId SearchAutoAttackTarget();
+		[[nodiscard]] int GetRegenHealthBase() const;
+		[[nodiscard]] int GetRegenHealth() const;
+		[[nodiscard]] int GetRegenHealthSeconds() const;
 
 		void PerformRegeneration();
 

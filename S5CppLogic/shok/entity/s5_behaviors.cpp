@@ -746,6 +746,25 @@ shok::EntityId GGL::CLeaderBehavior::SearchAutoAttackTarget()
 {
 	return leaderbehsearchautoattacktar(this);
 }
+int GGL::CLeaderBehavior::GetRegenHealthBase() const {
+	auto* d = EGL::CGLEEntity::GetEntityByID(EntityId)->GetAdditionalData(false);
+	if (d && d->RegenHPOverride >= 0)
+		return d->RegenHPOverride;
+	else
+		return LeaderBehProps->HealingPoints;
+}
+int GGL::CLeaderBehavior::GetRegenHealth() const {
+	auto* ent = static_cast<GGL::CSettler*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	auto i = GetRegenHealthBase();
+	return static_cast<int>(ent->ModifierProfile.GetModifiedValue(EGL::IProfileModifierSetObserver::ModifierType::HealingPoints, static_cast<float>(i)));
+}
+int GGL::CLeaderBehavior::GetRegenHealthSeconds() const {
+	auto* d = EGL::CGLEEntity::GetEntityByID(EntityId)->GetAdditionalData(false);
+	if (d && d->RegenSecondsOverride >= 0)
+		return d->RegenSecondsOverride;
+	else
+		return LeaderBehProps->HealingSeconds;
+}
 
 void GGL::CLeaderBehavior::PerformRegeneration()
 {
@@ -754,14 +773,14 @@ void GGL::CLeaderBehavior::PerformRegeneration()
 	int hp = e->Health;
 	if (hp <= 0)
 		return;
-	int r = static_cast<CSettler*>(e)->LeaderGetRegenHealth(); // NOLINT(*-pro-type-static-cast-downcast)
+	int r = GetRegenHealth();
 	e->PerformHeal(r, CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderRegenRegenerateSoldiers);
 }
 
 void __thiscall GGL::CLeaderBehavior::CheckRegen()
 {
 	EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(EntityId);
-	int max = static_cast<GGL::CSettler*>(e)->LeaderGetRegenHealthSeconds(); // NOLINT(*-pro-type-static-cast-downcast)
+	int max = GetRegenHealthSeconds();
 	if (++SecondsSinceHPRefresh >= max)
 		PerformRegeneration();
 	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderFixIdleSoldierBattle) {

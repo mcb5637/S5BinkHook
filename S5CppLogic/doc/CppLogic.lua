@@ -2218,13 +2218,23 @@ function CppLogic.Entity.Settler.GetLeveledSpeedBonus(id)end
 --- level dependent max range bonus
 --- @param id entity
 --- @return number
-function CppLogic.Entity.Settler.SettlerGetLeveledRangeBonus(id)end
+function CppLogic.Entity.Settler.GetLeveledRangeBonus(id)end
 
 --- serf targeted extraction resource.
 --- @param id entity
 --- @return number targetId
 --- @return number slot
 function CppLogic.Entity.Settler.SerfGetExtractionTarget(id)end
+
+--- autoattack miss chance (only arrow type projectiles)
+---@param id entity
+---@return number chance
+function CppLogic.Entity.Settler.GetAutoAttackMissChance(id)end
+
+--- level dependent miss chance bonus
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetLeveledMissChanceBonus(id)end
 
 --- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
 --- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).
@@ -2270,6 +2280,7 @@ function CppLogic.Entity.Leader.SetSoldierLimit(id, limit) end
 --- @param id entity
 --- @return number hp hp regenerated
 --- @return number sec seconds between refreshes
+--- @return number baseHp unmodified hp regenerated
 function CppLogic.Entity.Leader.GetRegeneration(id) end
 --- a leaders regeneration.
 --- status of this gets saved into a savegame.
@@ -2278,6 +2289,11 @@ function CppLogic.Entity.Leader.GetRegeneration(id) end
 --- @param hp number regenerated
 --- @param seconds number between refreshes
 function CppLogic.Entity.Leader.SetRegeneration(id, hp, seconds) end
+
+--- the level dependent regeneration bonus (nil if it does not exist)
+---@param id entity
+---@return number? hp
+function CppLogic.Entity.Leader.GetLeveledRegenBonus(id)end
 
 --- the level dependent damage bonus (nil if it does not exist)
 ---@param id entity

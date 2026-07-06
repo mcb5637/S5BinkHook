@@ -462,7 +462,7 @@ namespace EGL {
 			Damage = 103, // gets called, also shuriken, circularattack, modified by tech and experience
 			DamageBonus = 104, // gets called, modified by tech and experience
 			MaxAttackRange = 105, // gets called, battle+autocannon?, modified by tech and experience
-			MinAttackRange = 106, // modified by tech
+			MinAttackRange = 106, // modified by tech, seems to be not called
 			Experience = 107, // no modifier, straight to event Leader_GetXP
 			ExperienceLevels = 108, // no modifier, straight calculation from Experience
 			// 109 unknown just passes through initial, called max soldiers?
@@ -584,8 +584,6 @@ namespace GGL {
 
 		bool IsIdle();
 
-		int LeaderGetRegenHealth();
-		int LeaderGetRegenHealthSeconds();
 		void KillSettlerByEnvironment();
 		int GetDodgeChance(); // used in melee combat, percent
 		std::pair<int, bool> __thiscall GetBaseArmor(); // armor, applyModifiers

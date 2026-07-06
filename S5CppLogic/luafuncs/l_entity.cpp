@@ -838,6 +838,22 @@ namespace CppLogic::Entity {
 		return {tid, sb->ResourceSlot};
 	}
 
+	float SettlerGetAutoAttackMissChance(GGL::CSettler* s) {
+		auto* b = s->GetBehaviorDynamic<GGL::CBattleBehavior>();
+		return b->GetMissChance();
+	}
+
+	std::optional<float> SettlerGetLeveledMissChanceBonus(GGL::CSettler* s) {
+		if (s->ModifierProfile.EntityReference.ExperienceClass == shok::ExperienceClass::Invalid)
+			return std::nullopt;
+		if (s->ModifierProfile.ExperienceLevel.Value <= 0)
+			return 0.0f;
+		auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
+		if (lvl == nullptr)
+			return 0.0f;;
+		return lvl->MissChance;
+	}
+
 	int BuildingMarketGetCurrentTradeData(luaext::State L) {
 		GGL::CBuilding* b = L.CheckBuilding(1);
 		auto* m = b->GetBehavior<GGL::CMarketBehavior>();
@@ -1676,11 +1692,24 @@ namespace CppLogic::Entity {
 		if (CppLogic::HasSCELoader())
 			throw lua::LuaException("use CEntity instead");
 		GGL::CSettler* b = L.CheckSettler(1);
-		if (!b->GetBehaviorDynamic<GGL::CLeaderBehavior>())
+		auto* lb = b->GetBehaviorDynamic<GGL::CLeaderBehavior>();
+		if (lb == nullptr)
 			throw lua::LuaException("no leader");
-		L.Push(b->LeaderGetRegenHealth());
-		L.Push(b->LeaderGetRegenHealthSeconds());
-		return 2;
+		L.Push(lb->GetRegenHealth());
+		L.Push(lb->GetRegenHealthSeconds());
+		L.Push(lb->GetRegenHealthBase());
+		return 3;
+	}
+
+	std::optional<float> LeaderGetLeveledRegenBonus(GGL::CSettler* s) {
+		if (s->ModifierProfile.EntityReference.ExperienceClass == shok::ExperienceClass::Invalid)
+			return std::nullopt;
+		if (s->ModifierProfile.ExperienceLevel.Value <= 0)
+			return 0.0f;
+		auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
+		if (lvl == nullptr)
+			return 0.0f;
+		return lvl->HealingPoints;
 	}
 
 	int EnableRangedEffectSoldierHeal(luaext::State L) {
@@ -2165,8 +2194,10 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SettlerGetDodgeChance>("GetDodgeChance"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledDodgeBonus>("GetLeveledDodgeBonus"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledSpeedBonus>("GetLeveledSpeedBonus"),
-			luaext::FuncReference::GetRef<SettlerGetLeveledRangeBonus>("SettlerGetLeveledRangeBonus"),
+			luaext::FuncReference::GetRef<SettlerGetLeveledRangeBonus>("GetLeveledRangeBonus"),
 			luaext::FuncReference::GetRef<SerfGetExtractionTarget>("SerfGetExtractionTarget"),
+			luaext::FuncReference::GetRef<SettlerGetAutoAttackMissChance>("GetAutoAttackMissChance"),
+			luaext::FuncReference::GetRef<SettlerGetLeveledMissChanceBonus>("GetLeveledMissChanceBonus"),
 	};
 
 	constexpr std::array Leader{
@@ -2178,6 +2209,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<LeaderSetSoldierLimit>("SetSoldierLimit"),
 			luaext::FuncReference::GetRef<LeaderSetRegeneration>("SetRegeneration"),
 			luaext::FuncReference::GetRef<LeaderGetRegeneration>("GetRegeneration"),
+			luaext::FuncReference::GetRef<LeaderGetLeveledRegenBonus>("GetLeveledRegenBonus"),
 			luaext::FuncReference::GetRef<LeaderGetLeveledDamageBonus>("GetLeveledDamageBonus"),
 	};
 

@@ -39,35 +39,52 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Render(EGUIX::CCustomWidget* wid
 	if (PartialWidget.Color.Alpha && ElementCount > WidgetCount) {
 		if (Widgets.empty())
 			return;
-		EGUIX::Rect texcoords = PartialWidget.TextureCoordinates;
-		float childsiz = Widgets[0]->PosAndSize.H + ScrollableSpacing();
+		EGUIX::Rect texCoords = PartialWidget.TextureCoordinates;
 		auto rend = shok::UIRenderer::GlobalObj();
-		EGUIX::Rect containerpos = WidgetContainer->CalcGlobalPosAndSize();
+
+		float childSizX = GetScrollDirection(Widgets[0]).Limit + ScrollableSpacing();
+		float childSizY = GetAntiScrollDirection(Widgets[0]).Limit + ScrollableSpacing();
+
+		EGUIX::Rect containerPos = WidgetContainer->CalcGlobalPosAndSize();
 		EGUIX::Rect r = Widgets[0]->PosAndSize;
-		r.X = containerpos.X + Widgets[0]->PosAndSize.X;
-		r.Y = containerpos.Y + ScrollableSpacing();
-		r.H = UIOffset() * childsiz - ScrollableSpacing();
-		float texoff = (Widgets[0]->PosAndSize.H - r.H) / Widgets[0]->PosAndSize.H * PartialWidget.TextureCoordinates.H;
-		PartialWidget.TextureCoordinates.Y += texoff;
-		PartialWidget.TextureCoordinates.H -= texoff;
-		if (r.H > 1.0f && PartialTop)
-			rend->RenderMaterial(&PartialWidget, true, &r);
-		PartialWidget.TextureCoordinates = texcoords;
-		r.Y += r.H + ScrollableSpacing();
-		r.H = containerpos.H - ScrollableSpacing() * 3 - r.H;
-		for (const auto w : Widgets) {
-			if (w->IsShown) {
-				r.Y += childsiz;
-				r.H -= childsiz;
-			}
-			else {
-				break;
+
+		GetAntiScrollDirection(r).Pos = GetAntiScrollDirection(containerPos).Pos + GetAntiScrollDirection(Widgets[0]).Pos;
+
+		GetScrollDirection(r).Pos = GetScrollDirection(containerPos).Pos + ScrollableSpacing();
+		GetScrollDirection(r).Limit = UIOffset() * childSizX - ScrollableSpacing();
+
+		float texOff = (GetScrollDirection(Widgets[0]).Limit - GetScrollDirection(r).Limit) /
+			GetScrollDirection(Widgets[0]).Limit * GetScrollDirection(PartialWidget.TextureCoordinates).Limit;
+
+		GetScrollDirection(PartialWidget.TextureCoordinates).Pos += texOff;
+		GetScrollDirection(PartialWidget.TextureCoordinates).Limit -= texOff;
+
+		if (GetScrollDirection(r).Limit > 1.0f && PartialTop) {
+			for (int i = 0; i < PerRowCount; ++i) {
+				rend->RenderMaterial(&PartialWidget, true, &r);
+				GetAntiScrollDirection(r).Pos += childSizY;
 			}
 		}
-		PartialWidget.TextureCoordinates.H *= r.H / Widgets[0]->PosAndSize.H;
-		if (r.H > 1.0f && r.H < Widgets[0]->PosAndSize.H && PartialBottom)
-			rend->RenderMaterial(&PartialWidget, true, &r);
-		PartialWidget.TextureCoordinates = texcoords;
+
+		PartialWidget.TextureCoordinates = texCoords;
+
+		GetAntiScrollDirection(r).Pos = GetAntiScrollDirection(containerPos).Pos + GetAntiScrollDirection(Widgets[0]).Pos;
+
+		GetScrollDirection(r).Pos += GetScrollDirection(r).Limit + ScrollableSpacing();
+		GetScrollDirection(r).Pos += childSizX * static_cast<float>(CurrentlyVisibleRows);
+		GetScrollDirection(r).Limit = GetScrollDirection(containerPos).Limit - ScrollableSpacing() * 3 - GetScrollDirection(r).Limit;
+		GetScrollDirection(r).Limit -= childSizX * static_cast<float>(CurrentlyVisibleRows);
+
+		GetScrollDirection(PartialWidget.TextureCoordinates).Limit *= GetScrollDirection(r).Limit / GetScrollDirection(Widgets[0]).Limit;
+
+		if (GetScrollDirection(r).Limit > 1.0f && PartialBottomNum > 0) {
+			for (int i = 0; i < std::min(PerRowCount, PartialBottomNum); ++i) {
+				rend->RenderMaterial(&PartialWidget, true, &r);
+				GetAntiScrollDirection(r).Pos += childSizY;
+			}
+		}
+
+		PartialWidget.TextureCoordinates = texCoords;
 	}
 }
 bool CppLogic::Mod::UI::AutoScrollCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain)
@@ -138,13 +155,28 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 			}
 		}
 	}
-	float childs = Widgets[0]->PosAndSize.H + ScrollableSpacing();
-	WidgetCount = static_cast<int>((WidgetContainer->PosAndSize.H - ScrollableSpacing()) / childs);
+	auto [childP, childL] = GetScrollDirection(Widgets[0]);
+	auto [containerP, containerL] = GetScrollDirection(WidgetContainer);
+	float childs = childL + ScrollableSpacing();
+	RowCount = static_cast<int>((containerL - ScrollableSpacing()) / childs);
+	if (Is2D())
+	{
+		auto [childPRow, childLRow] = GetAntiScrollDirection(Widgets[0]);
+		auto [containerPRow, containerLRow] = GetAntiScrollDirection(WidgetContainer);
+		float childsRow = childLRow + ScrollableSpacing();
+		PerRowCount = static_cast<int>((containerLRow - ScrollableSpacing()) / childsRow);
+	}
+	else {
+		PerRowCount = 1;
+	}
+	WidgetCount = RowCount * PerRowCount;
+	TotalRowsNeeded = ElementCount / PerRowCount;
+	if (ElementCount % PerRowCount != 0) // partial filled row
+		++TotalRowsNeeded;
 	for (size_t o = Widgets.size(); o < std::min(WidgetCount, ElementCount); ++o) {
 		Widgets.push_back(WidgetContainer->CloneAsChild(Widgets[0], [o](const char* n, EGUIX::CBaseWidget* w) {
 			return std::format("{}_{}", n, o);
-			},
-			Widgets.back()));
+		}, Widgets.back()));
 	}
 	Clamp();
 	Update();
@@ -152,31 +184,55 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::ReInit()
 
 void CppLogic::Mod::UI::AutoScrollCustomWidget::Update()
 {
-	float childsiz = Widgets[0]->PosAndSize.H + ScrollableSpacing();
-	float cpos = ScrollableSpacing() + UIOffset() * childsiz;
-	int curri = 0;
-	int lastwid = 0;
-	auto off = static_cast<int>(std::ceil(Offset));
+	const float childSizX = GetScrollDirection(Widgets[0]).Limit + ScrollableSpacing();
+	float cposX = ScrollableSpacing() + UIOffset() * childSizX;
+	float limitX = GetScrollDirection(WidgetContainer).Limit;
+
+	const float childSizY = GetAntiScrollDirection(Widgets[0]).Limit + ScrollableSpacing();
+	float cposY = ScrollableSpacing();
+	const float cPosYStart = cposY;
+	float limitY = GetAntiScrollDirection(WidgetContainer).Limit;
+
+	int elementNum = 0;
+	int lastWid = 0;
+	const auto off = static_cast<int>(std::ceil(Offset)) * PerRowCount;
 	PartialTop = Offset > 0.0f;
+	CurrentlyVisibleRows = Is2D() ? 1 : 0;
+
 	for (auto* w : Widgets) {
-		if (curri < std::min(WidgetCount, ElementCount) && cpos + childsiz <= WidgetContainer->PosAndSize.H) {
-			w->PosAndSize.Y = cpos;
-			w->UserVariable[0] = curri + off;
-			w->SetVisibility(true);
-			lastwid = curri;
+		bool rowBump = false;
+		if (Is2D() && cposY + childSizY > limitY) {
+			cposX += childSizX;
+			cposY = cPosYStart;
+			rowBump = true;
 		}
-		else {
+		if (elementNum >= WidgetCount ||
+			elementNum + off >= ElementCount ||
+			cposX + childSizX > limitX) {
 			w->SetVisibility(false);
+			continue;
 		}
-		++curri;
-		cpos += childsiz;
+		GetScrollDirection(w).Pos = cposX;
+		if (Is2D())
+			GetAntiScrollDirection(w).Pos = cposY;
+		else
+			rowBump = true;
+		w->UserVariable[0] = elementNum + off;
+		w->SetVisibility(true);
+		lastWid = elementNum;
+		if (Is2D())
+			cposY += childSizY;
+		else
+			cposX += childSizX;
+		++elementNum;
+		if (rowBump)
+			++CurrentlyVisibleRows;
 	}
-	PartialBottom = lastwid + off + 1 < ElementCount;
+	PartialBottomNum = ElementCount - (lastWid + off + 1);
 	if (Slider) {
-		if (ElementCount > WidgetCount) {
+		if (TotalRowsNeeded > RowCount) {
 			Slider->SetVisibility(true);
-			float barlen = SliderTravel->PosAndSize.H - Slider->PosAndSize.H;
-			Slider->PosAndSize.Y = Offset / static_cast<float>(ElementCount - WidgetCount) * barlen;
+			GetScrollDirection(Slider).Pos = Offset / static_cast<float>(TotalRowsNeeded - RowCount) * BarLength();
 		}
 		else {
 			Slider->SetVisibility(false);
@@ -186,24 +242,24 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Update()
 
 void CppLogic::Mod::UI::AutoScrollCustomWidget::Clamp()
 {
-	if (Offset + static_cast<float>(WidgetCount) > static_cast<float>(ElementCount))
-		Offset = static_cast<float>(ElementCount - WidgetCount);
+	if (Offset + static_cast<float>(RowCount) > static_cast<float>(TotalRowsNeeded))
+		Offset = static_cast<float>(TotalRowsNeeded - RowCount);
 	if (Offset < 0)
 		Offset = 0;
 }
 
 void CppLogic::Mod::UI::AutoScrollCustomWidget::UpdateBySlider(int x, int y)
 {
-	if (Slider && ElementCount > WidgetCount) {
-		float barlen = SliderTravel->PosAndSize.H - Slider->PosAndSize.H;
-		Offset = (static_cast<float>(y) - SliderTravel->PosAndSize.Y - Slider->PosAndSize.H / 2) / barlen * static_cast<float>(ElementCount - WidgetCount);
+	if (Slider && TotalRowsNeeded > RowCount) {
+		Offset = (GetScrollDirection(static_cast<float>(x), static_cast<float>(y)) - GetScrollDirection(SliderTravel).Pos - GetScrollDirection(Slider).Limit / 2) /
+			BarLength() * static_cast<float>(TotalRowsNeeded - RowCount);
 		Clamp();
 	}
 }
 
 bool CppLogic::Mod::UI::AutoScrollCustomWidget::ClickedOnSlider(int x, int y) const
 {
-	if (Slider && ElementCount > WidgetCount) {
+	if (Slider && TotalRowsNeeded > RowCount) {
 		auto fx = static_cast<float>(x);
 		auto fy = static_cast<float>(y);
 		float xl = SliderTravel->PosAndSize.X;
@@ -223,6 +279,9 @@ float CppLogic::Mod::UI::AutoScrollCustomWidget::UIOffset() const
 	if (m == 0.0f)
 		return 0.0f;
 	return 1.0f - m;
+}
+float CppLogic::Mod::UI::AutoScrollCustomWidget::BarLength() const {
+	return GetScrollDirection(SliderTravel).Limit - GetScrollDirection(Slider).Limit;
 }
 
 bool CppLogic::Mod::UI::InputFocusWidget::CheckFocusEvent(BB::CEvent* ev)

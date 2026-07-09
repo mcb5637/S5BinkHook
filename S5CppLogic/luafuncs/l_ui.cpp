@@ -1139,7 +1139,10 @@ namespace CppLogic::UI {
 		sc->ReInit();
 		L.Push(sc->ElementCount);
 		L.Push(sc->WidgetCount);
-		return 2;
+		L.Push(sc->RowCount);
+		L.Push(sc->PerRowCount);
+		L.Push(sc->TotalRowsNeeded);
+		return 5;
 	}
 	int GetAutoScrollCustomWidgetOffset(luaext::State L) {
 		auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));

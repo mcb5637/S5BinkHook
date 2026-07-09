@@ -12,6 +12,12 @@ namespace CppLogic::Mod::UI {
 
 	class AutoScrollCustomWidget : public BB::IObject, public EGUIX::ICustomWidget {
 	public:
+		enum class ScrollMode : int {
+			Vertical = 0,
+			Horizontal = 1,
+			Vertical2D = 2,
+		};
+
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 		virtual void* __stdcall CastToIdentifier(shok::ClassId id) override;
 
@@ -23,12 +29,16 @@ namespace CppLogic::Mod::UI {
 		float Offset = 0;
 		int ElementCount = 0;
 		int WidgetCount = 0;
+		int PerRowCount = 0;
+		int TotalRowsNeeded = 0;
+		int RowCount = 0;
+		int CurrentlyVisibleRows = 0;
 		std::vector<EGUIX::CBaseWidget*> Widgets;
 		EGUIX::CBaseWidget* Slider = nullptr, * SliderTravel = nullptr;
 		EGUIX::CContainerWidget* WidgetContainer = nullptr;
 		bool Dragging = false;
 		bool PartialTop = false;
-		bool PartialBottom = false;
+		int PartialBottomNum = 0;
 		EGUIX::CMaterial PartialWidget;
 
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100C);
@@ -50,10 +60,42 @@ namespace CppLogic::Mod::UI {
 		[[nodiscard]] inline float ScrollableSpacing() const {
 			return static_cast<float>(IntegerUserVariable0);
 		}
+		[[nodiscard]] inline ScrollMode GetScrollMode() const {
+			return static_cast<ScrollMode>(IntegerUserVariable1);
+		}
+		struct PosAndLimit {
+			float& Pos;
+			float& Limit;
+		};
+		[[nodiscard]] inline PosAndLimit GetScrollDirection(EGUIX::Rect& r) const {
+			if (GetScrollMode() == ScrollMode::Horizontal)
+				return {r.X, r.W};
+			return {r.Y, r.H};
+		}
+		[[nodiscard]] inline PosAndLimit GetScrollDirection(EGUIX::CBaseWidget* r) const {
+			return GetScrollDirection(r->PosAndSize);
+		}
+		[[nodiscard]] inline bool Is2D() const {
+			return GetScrollMode() == ScrollMode::Vertical2D;
+		}
+		[[nodiscard]] inline PosAndLimit GetAntiScrollDirection(EGUIX::Rect& r) const {
+			if (GetScrollMode() == ScrollMode::Horizontal)
+				return {r.Y, r.H};
+			return {r.X, r.W};
+		}
+		[[nodiscard]] inline PosAndLimit GetAntiScrollDirection(EGUIX::CBaseWidget* w) const {
+			return GetAntiScrollDirection(w->PosAndSize);
+		}
+		[[nodiscard]] inline float GetScrollDirection(float x, float y) const {
+			if (GetScrollMode() == ScrollMode::Horizontal)
+				return x;
+			return y;
+		}
 	private:
 		void UpdateBySlider(int x, int y);
 		[[nodiscard]] bool ClickedOnSlider(int x, int y) const;
 		[[nodiscard]] float UIOffset() const;
+		[[nodiscard]] float BarLength() const;
 	};
 
 	class InputFocusWidget {

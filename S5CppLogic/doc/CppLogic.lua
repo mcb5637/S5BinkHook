@@ -3608,8 +3608,11 @@ function CppLogic.UI.RemoveShortMessage(id) end
 ---(calculating max scrollables, cloning scrollables, initializing scrollables, initializing partial scroll element texture from scrollable, initialize slider)
 ---@param id number|string
 ---@param numToScroll number number of elements to scroll through
----@return number widCount number of elements to scroll over
----@return number widCount number of widgets active
+---@return number elementCount number of elements to scroll over
+---@return number widCount number of widgets active (visible at the same time)
+---@return number rowCount number of rows active
+---@return number perRowCount number of elements per row active/scroll over
+---@return number totalRowsNeeded number of rows to scroll over
 function CppLogic.UI.InitAutoScrollCustomWidget(id, numToScroll) end
 
 ---gets the offset, widget count and element count of a CppLogic::Mod::UI::AutoScrollCustomWidget.

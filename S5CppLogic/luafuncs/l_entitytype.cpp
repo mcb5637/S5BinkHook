@@ -955,6 +955,12 @@ namespace CppLogic::EntityType {
 		return {p->Damage, p->Delay, p->Radius};
 	}
 
+	int DumpEntityType(luaext::State L) {
+		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+		CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, t);
+		return 1;
+	}
+
 	constexpr std::array EntityType{
 			luaext::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
 			luaext::FuncReference::GetRef<SetLimitedLifespanDuration>("SetLimitedLifespanDuration"),
@@ -993,6 +999,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<IsSoldierType>("IsSoldierType"),
 			luaext::FuncReference::GetRef<IsWorkerType>("IsWorkerType"),
 			luaext::FuncReference::GetRef<GetBombData>("GetBombData"),
+			luaext::FuncReference::GetRef<DumpEntityType>("DumpEntityType"),
 		};
 
 	constexpr std::array Settler{

@@ -3974,6 +3974,18 @@ function CppLogic.ModLoader.GetEffectTypeMem(tid) end
 --- @return CppStructAccess
 function CppLogic.ModLoader.GetFeedbackEventMem(tid) end
 
+--- adds additional players. players [1,n] will be initialized on game start.
+--- @param n number
+function CppLogic.ModLoader.SetMaxPlayers(n) end
+
+--- gets the max active player.
+--- @return number
+function CppLogic.ModLoader.GetMaxPlayers() end
+
+--- after an entitytype has been modified with CppLogic.ModLoader.GetEntityTypeMem, refreshes its behavior lists and blocking info.
+--- @param ety number|string
+function CppLogic.ModLoader.EntityTypeRefreshPostModify(ety) end
+
 ---accesses the GGL::CLogicProperties (aka Config/Logic.xml)
 ---warning: has no semantic checks, it is easy to crash your game by modifying memory!
 ---automatically marks for reload on writing

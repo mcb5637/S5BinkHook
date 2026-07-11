@@ -64,6 +64,8 @@ namespace EGL {
 		static inline constexpr int TypeDesc = 0x810B0C;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x23962D3D);
 
+		// ctor 4a6321
+
 		void InitializeBlocking();
 
 		// checks identifier, only returns exact class, no subclasses
@@ -315,6 +317,8 @@ namespace ED {
 		static inline constexpr int vtp = 0x788840;
 		static inline constexpr int TypeDesc = 0x83C918;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x20E25C5D);
+
+		// ctor 5b8afa
 	};
 	static_assert(sizeof(ED::CDisplayEntityProps) == 16 * 4);
 	//constexpr int i = offsetof(CDisplayEntityProps, AnimList)/4;

@@ -165,6 +165,32 @@ void GGlue::CEntitiesPropsMgr::FreeEntityType(shok::EntityTypeId i)
 	DisplayProps.EntityTypesDisplayProps[id] = nullptr;
 }
 
+void GGlue::CEntitiesPropsMgr::RefreshTypePostModify(shok::EntityTypeId id) {
+	auto* ty = CppLogic::GetEntityType(id);
+	CGLEEntitiesProps.EntityTypesLogicProps[static_cast<int>(id)] = ty->LogicProps;
+	DisplayProps.EntityTypesDisplayProps[static_cast<int>(id)] = ty->DisplayProps;
+	{
+		auto l = ty->LogicProps->BehaviorProps.SaveVector();
+		l.Vector.clear();
+		auto d = ty->DisplayProps->DisplayBehaviorProps.SaveVector();
+		d.Vector.clear();
+		for (int i = 0; i < ty->BehaviorProps.size(); ++i) {
+			auto& b = ty->BehaviorProps[i];
+			if (b.Logic != nullptr) {
+				b.Logic->BehaviorIndex = i;
+				l.Vector.push_back(b.Logic);
+			}
+			if (b.Display != nullptr) {
+				b.Display->Index = i;
+				d.Vector.push_back(b.Display);
+			}
+		}
+	}
+	ty->LogicProps->NumberOfBehaviors = static_cast<int>(ty->BehaviorProps.size());
+	ty->LogicProps->InitializeBlocking();
+	RefreshDisplayFlags();
+}
+
 void GGlue::CEntitiesPropsMgr::RefreshDisplayFlags()
 {
 	delete (*ED::CGlobalsBaseEx::GlobalObj)->EntityTypeFlags;

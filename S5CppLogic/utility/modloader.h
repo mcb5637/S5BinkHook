@@ -397,6 +397,7 @@ namespace CppLogic::ModLoader {
 		static int GetFeedbackEventMem(luaext::State l);
 		static int SetMaxPlayers(luaext::State L);
 		static int GetMaxPlayers(luaext::State L);
+		static void EntityTypeRefreshPostModify(shok::EntityTypeId id);
 
 		static constexpr std::array LuaFuncs{
 				luaext::FuncReference::GetRef<SetEntityTypeToReload>("SetEntityTypeToReload"),
@@ -421,6 +422,7 @@ namespace CppLogic::ModLoader {
 				luaext::FuncReference::GetRef<GetFeedbackEventMem>("GetFeedbackEventMem"),
 				luaext::FuncReference::GetRef<SetMaxPlayers>("SetMaxPlayers"),
 				luaext::FuncReference::GetRef<GetMaxPlayers>("GetMaxPlayers"),
+				luaext::FuncReference::GetRef<EntityTypeRefreshPostModify>("EntityTypeRefreshPostModify"),
 		};
 
 		static constexpr std::array NoLoaderFuncs{
@@ -436,6 +438,7 @@ namespace CppLogic::ModLoader {
 				luaext::FuncReference::GetRef<LoadStringTableTextOverrides>("LoadStringTableTextOverrides"),
 				luaext::FuncReference::GetRef<MapGetModPacks>("MapGetModPacks"),
 				luaext::FuncReference::GetRef<GetMaxPlayers>("GetMaxPlayers"),
+				luaext::FuncReference::GetRef<EntityTypeRefreshPostModify>("EntityTypeRefreshPostModify"),
 		};
 
 		static constexpr std::array Mainmenu{

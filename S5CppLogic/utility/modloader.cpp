@@ -1542,6 +1542,11 @@ int CppLogic::ModLoader::ModLoader::GetMaxPlayers(luaext::State L) {
 	return 1;
 }
 
+void CppLogic::ModLoader::ModLoader::EntityTypeRefreshPostModify(shok::EntityTypeId id) {
+	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
+	mng->RefreshTypePostModify(id);
+}
+
 void CppLogic::ModLoader::ModLoader::Log(luaext::State L, const char* log)
 {
 	shok::LogString("ModLoader: %s\n", log);

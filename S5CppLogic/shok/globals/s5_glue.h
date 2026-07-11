@@ -93,6 +93,7 @@ namespace GGlue {
 		void PopEntityType(shok::EntityTypeId id);
 		// remember to also free in idmanager, free last id first
 		void FreeEntityType(shok::EntityTypeId id);
+		void RefreshTypePostModify(shok::EntityTypeId id);
 		static void RefreshDisplayFlags();
 	};
 	static_assert(offsetof(CEntitiesPropsMgr, CGLEEntitiesProps) == 16 * 4);

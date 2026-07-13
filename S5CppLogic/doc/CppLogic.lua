@@ -1851,6 +1851,10 @@ function CppLogic.Entity.GetAttackCommandTarget(id) end
 --- @param id entity
 --- @return CostInfo|nil produced
 --- @return CostInfo|nil used
+--- @return number? perTickProduced
+--- @return number? perTickUsed
+--- @return number? perWorktimeProduced
+--- @return number? perWorktimeUsed
 function CppLogic.Entity.GetTrackedResources(id) end
 
 --- returns the full entityname->id mapping
@@ -2498,6 +2502,11 @@ function CppLogic.Entity.Building.BuildingGetAttachedSerfs(id, approaching) end
 --- @param backward boolean?
 --- @param looped boolean?
 function CppLogic.Entity.Building.SetBuildingSubAnim(id, index, anim, backward, looped) end
+
+--- gets the resource produced by a refiner, or nil if id is no refiner.
+--- @param id number
+--- @return number?
+function CppLogic.Entity.Building.RefinerGetRefinedResource(id) end
 
 --- buys a leader in a barracks by entitytype.
 --- uses resources, asserts if not possible.

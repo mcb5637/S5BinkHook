@@ -2,6 +2,7 @@
 // ReSharper disable once CppUnusedIncludeDirective
 #include <cstdint>
 // ReSharper disable once CppUnusedIncludeDirective
+#include <chrono>
 #include <compare>
 #include <numbers>
 
@@ -24,6 +25,8 @@ namespace shok {
 	static inline int(__stdcall* const LoadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = reinterpret_cast<int(__stdcall*)(lua_State*, const char*, size_t, const char*)>(0x59BE57);
 
 	static inline float(__stdcall* const GetCurrentTimeFloat)() = reinterpret_cast<float(__stdcall*)()>(0x548B64);
+
+	using Tick = std::chrono::duration<int32_t, std::deci>;
 
 	// std::exp 0x5c5060
 	// std::atan 0x7250d0

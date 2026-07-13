@@ -94,6 +94,19 @@ void CppLogic::Mod::FormationSpacedBehavior::operator delete(void* p) {
 	shok::Free(p);
 }
 
+void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::Wrapup(float per) {
+	Last = Running / per;
+	Running = 0.0f;
+	AverageSum += Last;
+	++AverageSumN;
+}
+
+double CppLogic::Mod::ResourceTrackerBehavior::Efficiency::Average() const {
+	if (AverageSumN == 0)
+		return -1.0;
+	return AverageSum / AverageSumN;
+}
+
 shok::ClassId __stdcall CppLogic::Mod::ResourceTrackerBehavior::GetClassIdentifier() const
 {
 	return Identifier;
@@ -121,6 +134,7 @@ void __thiscall CppLogic::Mod::ResourceTrackerBehavior::AddHandlers(shok::Entity
 	e->CreateEventHandler<shok::EventIDs::CppLogicEvent_OnResourceMined>(this, &ResourceTrackerBehavior::EventMinedOrRefined);
 	e->CreateEventHandler<shok::EventIDs::CppLogicEvent_OnResourceRefined>(this, &ResourceTrackerBehavior::EventMinedOrRefined);
 	e->CreateEventHandler<shok::EventIDs::CppLogicEvent_OnRefinerSupplyTaken>(this, &ResourceTrackerBehavior::EventSupplied);
+	e->CreateEventHandler<shok::EventIDs::Behavior_Tick>(this, &ResourceTrackerBehavior::EventTick);
 }
 void __thiscall CppLogic::Mod::ResourceTrackerBehavior::OnEntityCreate(EGL::CGLEBehaviorProps* p)
 {
@@ -142,10 +156,47 @@ void __thiscall CppLogic::Mod::ResourceTrackerBehavior::OnEntityUpgrade(EGL::CGL
 void CppLogic::Mod::ResourceTrackerBehavior::EventMinedOrRefined(GGL::CEventGoodsTraded* ev)
 {
 	Produced.AddToType(ev->BuyType, ev->BuyAmount);
+	PerTickProduced.Running += ev->BuyAmount;
+	if (WorktimeWrapup(ev))
+		PerWorktimeProduced.Running += ev->BuyAmount;
 }
 void CppLogic::Mod::ResourceTrackerBehavior::EventSupplied(GGL::CEventGoodsTraded* ev)
 {
 	Used.AddToType(ev->SellType, ev->SellAmount);
+	PerTickUsed.Running += ev->SellAmount;
+	if (WorktimeWrapup(ev))
+		PerWorktimeUsed.Running += ev->SellAmount;
+}
+
+bool CppLogic::Mod::ResourceTrackerBehavior::WorktimeWrapup(GGL::CEventGoodsTraded* ev) {
+	if (ev->Entity != EntityId)
+		return false;
+	auto* work = EGL::CGLEEntity::GetEntityByID(ev->Entity);
+	auto wt = work->EventGetWorktime();
+	if (!StartWorktime.has_value() || !LastWorktime.has_value()) {
+		StartWorktime = wt;
+		LastWorktime = StartWorktime;
+		return true;
+	}
+	if (wt > *LastWorktime) {
+		auto p = static_cast<float>(*StartWorktime - *LastWorktime);
+		PerWorktimeProduced.Wrapup(p);
+		PerWorktimeUsed.Wrapup(p);
+		StartWorktime = wt;
+	}
+	LastWorktime = wt;
+	return true;
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::EventTick(BB::CEvent*) {
+	static constexpr auto dur = static_cast<int>(std::chrono::seconds{std::chrono::minutes{5}}.count());
+	using small_sec = std::chrono::duration<int32_t, std::chrono::seconds::period>;
+	auto t = std::chrono::duration_cast<small_sec>(shok::Tick{(*EGL::CGLEGameLogic::GlobalObj)->GetTick()}).count();
+	if (t % dur == 0) {
+		auto p = static_cast<float>(dur);
+		PerTickProduced.Wrapup(p);
+		PerTickUsed.Wrapup(p);
+	}
 }
 
 shok::ClassId __stdcall CppLogic::Mod::HawkCircleBehavior::GetClassIdentifier() const

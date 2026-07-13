@@ -43,14 +43,33 @@ namespace CppLogic::Mod {
 	class ResourceTrackerBehavior : public EGL::CGLEBehavior {
 	public:
 		shok::CostInfo Produced, Used;
+		std::optional<int> LastWorktime;
+		std::optional<int> StartWorktime;
+
+		struct Efficiency {
+			double AverageSum = 0.0f;
+			size_t AverageSumN = 0;
+			float Last = 0.0f;
+			float Running = 0.0f;
+
+			void Wrapup(float per);
+			[[nodiscard]] double Average() const;
+		};
+
+		Efficiency PerWorktimeProduced;
+		Efficiency PerTickProduced;
+		Efficiency PerWorktimeUsed;
+		Efficiency PerTickUsed;
+
 
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	protected:
 		virtual void __thiscall AddHandlers(shok::EntityId id) override;
 		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
 		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old) override;
 
-
+	public:
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x100B);
 		static const BB::SerializationData SerializationData[];
 
@@ -60,6 +79,8 @@ namespace CppLogic::Mod {
 	private:
 		void EventMinedOrRefined(GGL::CEventGoodsTraded* ev);
 		void EventSupplied(GGL::CEventGoodsTraded* ev);
+		bool WorktimeWrapup(GGL::CEventGoodsTraded* ev);
+		void EventTick(BB::CEvent*);
 	};
 
 

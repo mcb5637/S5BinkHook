@@ -612,7 +612,29 @@ namespace CppLogic::Entity {
 			return 0;
 		L.Push(b->Produced);
 		L.Push(b->Used);
-		return 2;
+		L.Push(b->PerTickProduced.Average());
+		L.Push(b->PerTickUsed.Average());
+		if (e->GetClassIdentifier() == GGL::CBuilding::Identifier) {
+			size_t n = 0;
+			double prod = 0.0;
+			double used = 0.0;
+			for (auto& [_, a] : e->ObserverEntities.ForKeys(shok::AttachmentType::WORKER_WORKPLACE)) {
+				auto* w = EGL::CGLEEntity::GetEntityByID(a.EntityId);
+				auto* wb = w->GetBehavior<CppLogic::Mod::ResourceTrackerBehavior>();
+				if (wb == nullptr)
+					continue;
+				++n;
+				prod += wb->PerWorktimeProduced.Average();
+				used += wb->PerWorktimeUsed.Average();
+			}
+			L.Push(prod / n);
+			L.Push(used / n);
+		}
+		else {
+			L.Push(b->PerWorktimeProduced.Average());
+			L.Push(b->PerWorktimeUsed.Average());
+		}
+		return 6;
 	}
 
 	int GetAllScriptNameMappings(luaext::State L) {
@@ -1996,6 +2018,13 @@ namespace CppLogic::Entity {
 		beh->SlotMultiSubAnims.SetSubAnim(&t);
 	}
 
+	std::optional<shok::ResourceType> BuildingGetRefinedResource(GGL::CBuilding* b) {
+		auto* r = b->GetBehavior<GGL::CResourceRefinerBehavior>();
+		if (r == nullptr)
+			return std::nullopt;
+		return r->GetResource();
+	}
+
 
 	void Cleanup(luaext::State L) {
 		DisableConversionHook(L);
@@ -2254,6 +2283,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<MarketGetSellResources>("MarketGetSellResources"),
 			luaext::FuncReference::GetRef<BuildingGetAttachedSerfs>("BuildingGetAttachedSerfs"),
 			luaext::FuncReference::GetRef<SetBuildingSubAnim>("SetBuildingSubAnim"),
+			luaext::FuncReference::GetRef<BuildingGetRefinedResource>("RefinerGetRefinedResource"),
 	};
 
 	void Init(luaext::State L)

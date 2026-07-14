@@ -94,17 +94,48 @@ void CppLogic::Mod::FormationSpacedBehavior::operator delete(void* p) {
 	shok::Free(p);
 }
 
-void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::Wrapup(float per) {
-	Last = Running / per;
-	Running = 0.0f;
-	AverageSum += Last;
-	++AverageSumN;
+void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::AddTick(double per, int t) {
+	if (Tick >= 0) {
+		int d;
+		if (t < Tick)
+			d = 0;
+		else
+			d = t - Tick;
+		N += d;
+	}
+	Tick = t;
+	Sum += per;
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::AddWorktime(double per, int t) {
+	if (Tick >= 0) {
+		int d;
+		if (t > Tick)
+			d = 0;
+		else
+			d = Tick - t;
+		N += d;
+	}
+	Tick = t;
+	Sum += per;
 }
 
 double CppLogic::Mod::ResourceTrackerBehavior::Efficiency::Average() const {
-	if (AverageSumN == 0)
+	if (N == 0.0)
 		return -1.0;
-	return AverageSum / AverageSumN;
+	return Sum / N;
+}
+
+double CppLogic::Mod::ResourceTrackerBehavior::Cycle::Average() const {
+	if (N == 0)
+		return -1.0;
+	return Sum / N;
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::Cycle::Ended() {
+	++N;
+	Sum += Curr;
+	Curr = 0;
 }
 
 shok::ClassId __stdcall CppLogic::Mod::ResourceTrackerBehavior::GetClassIdentifier() const
@@ -156,47 +187,47 @@ void __thiscall CppLogic::Mod::ResourceTrackerBehavior::OnEntityUpgrade(EGL::CGL
 void CppLogic::Mod::ResourceTrackerBehavior::EventMinedOrRefined(GGL::CEventGoodsTraded* ev)
 {
 	Produced.AddToType(ev->BuyType, ev->BuyAmount);
-	PerTickProduced.Running += ev->BuyAmount;
-	if (WorktimeWrapup(ev))
-		PerWorktimeProduced.Running += ev->BuyAmount;
+	PerTickProduced.AddTick(ev->BuyAmount, GetTick());
+	PerCycleProduced.Curr += ev->BuyAmount;
+	auto wt = GetWorktime(ev);
+	PerWorktimeProduced.AddWorktime(ev->BuyAmount, wt);
+	PerWorktimeUsed.AddWorktime(0.0, wt);
 }
+
 void CppLogic::Mod::ResourceTrackerBehavior::EventSupplied(GGL::CEventGoodsTraded* ev)
 {
 	Used.AddToType(ev->SellType, ev->SellAmount);
-	PerTickUsed.Running += ev->SellAmount;
-	if (WorktimeWrapup(ev))
-		PerWorktimeUsed.Running += ev->SellAmount;
-}
-
-bool CppLogic::Mod::ResourceTrackerBehavior::WorktimeWrapup(GGL::CEventGoodsTraded* ev) {
-	if (ev->Entity != EntityId)
-		return false;
-	auto* work = EGL::CGLEEntity::GetEntityByID(ev->Entity);
-	auto wt = work->EventGetWorktime();
-	if (!StartWorktime.has_value() || !LastWorktime.has_value()) {
-		StartWorktime = wt;
-		LastWorktime = StartWorktime;
-		return true;
-	}
-	if (wt > *LastWorktime) {
-		auto p = static_cast<float>(*StartWorktime - *LastWorktime);
-		PerWorktimeProduced.Wrapup(p);
-		PerWorktimeUsed.Wrapup(p);
-		StartWorktime = wt;
-	}
-	LastWorktime = wt;
-	return true;
+	PerTickUsed.AddTick(ev->SellAmount, GetTick());
+	PerWorktimeUsed.AddWorktime(ev->SellAmount, GetWorktime(ev));
 }
 
 void CppLogic::Mod::ResourceTrackerBehavior::EventTick(BB::CEvent*) {
-	static constexpr auto dur = static_cast<int>(std::chrono::seconds{std::chrono::minutes{5}}.count());
-	using small_sec = std::chrono::duration<int32_t, std::chrono::seconds::period>;
-	auto t = std::chrono::duration_cast<small_sec>(shok::Tick{(*EGL::CGLEGameLogic::GlobalObj)->GetTick()}).count();
-	if (t % dur == 0) {
-		auto p = static_cast<float>(dur);
-		PerTickProduced.Wrapup(p);
-		PerTickUsed.Wrapup(p);
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto* b = e->GetBehavior<GGL::CWorkerBehavior>();
+	if (b != nullptr) {
+		bool w = b->CycleIndex == GGL::CWorkerBehavior::Cycle::Work;
+		if (w != CycleWorking) {
+			CycleWorking = w;
+			if (!w) {
+				PerCycleProduced.Ended();
+			}
+			else {
+				PerWorktimeProduced.Tick = b->WorkTimeRemaining;
+				PerWorktimeUsed.Tick = b->WorkTimeRemaining;
+			}
+		}
 	}
+}
+
+int CppLogic::Mod::ResourceTrackerBehavior::GetTick() {
+	return (*EGL::CGLEGameLogic::GlobalObj)->GetTick();
+}
+
+int CppLogic::Mod::ResourceTrackerBehavior::GetWorktime(GGL::CEventGoodsTraded* ev) const {
+	if (ev->Entity != EntityId)
+		return 0;
+	auto* work = EGL::CGLEEntity::GetEntityByID(ev->Entity);
+	return work->EventGetWorktime();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::HawkCircleBehavior::GetClassIdentifier() const

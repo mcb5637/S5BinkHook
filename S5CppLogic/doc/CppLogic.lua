@@ -1855,6 +1855,7 @@ function CppLogic.Entity.GetAttackCommandTarget(id) end
 --- @return number? perTickUsed
 --- @return number? perWorktimeProduced
 --- @return number? perWorktimeUsed
+--- @return number? perCycleProduced
 function CppLogic.Entity.GetTrackedResources(id) end
 
 --- returns the full entityname->id mapping

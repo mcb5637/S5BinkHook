@@ -43,23 +43,31 @@ namespace CppLogic::Mod {
 	class ResourceTrackerBehavior : public EGL::CGLEBehavior {
 	public:
 		shok::CostInfo Produced, Used;
-		std::optional<int> LastWorktime;
-		std::optional<int> StartWorktime;
+		bool CycleWorking = false;
 
 		struct Efficiency {
-			double AverageSum = 0.0f;
-			size_t AverageSumN = 0;
-			float Last = 0.0f;
-			float Running = 0.0f;
+			double Sum = 0.0;
+			double N = 0.0;
+			int Tick = -1;
 
-			void Wrapup(float per);
+			void AddTick(double per, int t);
+			void AddWorktime(double per, int t);
 			[[nodiscard]] double Average() const;
+		};
+		struct Cycle {
+			double Sum = 0.0;
+			int N = 0;
+			double Curr = 0.0;
+
+			[[nodiscard]] double Average() const;
+			void Ended();
 		};
 
 		Efficiency PerWorktimeProduced;
 		Efficiency PerTickProduced;
 		Efficiency PerWorktimeUsed;
 		Efficiency PerTickUsed;
+		Cycle PerCycleProduced;
 
 
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
@@ -79,8 +87,9 @@ namespace CppLogic::Mod {
 	private:
 		void EventMinedOrRefined(GGL::CEventGoodsTraded* ev);
 		void EventSupplied(GGL::CEventGoodsTraded* ev);
-		bool WorktimeWrapup(GGL::CEventGoodsTraded* ev);
 		void EventTick(BB::CEvent*);
+		static int GetTick();
+		int GetWorktime(GGL::CEventGoodsTraded* ev) const;
 	};
 
 

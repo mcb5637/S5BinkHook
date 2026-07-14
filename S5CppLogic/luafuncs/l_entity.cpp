@@ -615,26 +615,43 @@ namespace CppLogic::Entity {
 		L.Push(b->PerTickProduced.Average());
 		L.Push(b->PerTickUsed.Average());
 		if (e->GetClassIdentifier() == GGL::CBuilding::Identifier) {
-			size_t n = 0;
-			double prod = 0.0;
-			double used = 0.0;
+			struct Avg {
+				double sum = 0.0;
+				size_t n = 0;
+			};
+			static constexpr auto add = [](Avg& a, double v) {
+				if (v < 0.0)
+					return;
+				a.sum += v;
+				++a.n;
+			};
+			Avg prod;
+			Avg used;
+			Avg cyc;
 			for (auto& [_, a] : e->ObserverEntities.ForKeys(shok::AttachmentType::WORKER_WORKPLACE)) {
 				auto* w = EGL::CGLEEntity::GetEntityByID(a.EntityId);
 				auto* wb = w->GetBehavior<CppLogic::Mod::ResourceTrackerBehavior>();
 				if (wb == nullptr)
 					continue;
-				++n;
-				prod += wb->PerWorktimeProduced.Average();
-				used += wb->PerWorktimeUsed.Average();
+				add(prod, wb->PerWorktimeProduced.Average());
+				add(used, wb->PerWorktimeUsed.Average());
+				add(cyc, wb->PerCycleProduced.Average());
 			}
-			L.Push(prod / n);
-			L.Push(used / n);
+			static constexpr auto get = [](const Avg &a) {
+				if (a.n == 0)
+					return -1.0;
+				return a.sum / a.n;
+			};
+			L.Push(get(prod));
+			L.Push(get(used));
+			L.Push(get(cyc));
 		}
 		else {
 			L.Push(b->PerWorktimeProduced.Average());
 			L.Push(b->PerWorktimeUsed.Average());
+			L.Push(b->PerCycleProduced.Average());
 		}
-		return 6;
+		return 7;
 	}
 
 	int GetAllScriptNameMappings(luaext::State L) {

@@ -1851,12 +1851,17 @@ function CppLogic.Entity.GetAttackCommandTarget(id) end
 --- @param id entity
 --- @return CostInfo|nil produced
 --- @return CostInfo|nil used
+function CppLogic.Entity.GetTrackedResources(id) end
+
+--- gets the production statistics of an entity. for buildings per worktime and per cycle are averages of their workers.
+--- requires the entity type having a CppLogic::Mod::ResourceTrackerBehavior behavior and activated CppLogic.Logic.EnableResourceTriggers.
+--- @param id entity
 --- @return number? perTickProduced
 --- @return number? perTickUsed
 --- @return number? perWorktimeProduced
 --- @return number? perWorktimeUsed
 --- @return number? perCycleProduced
-function CppLogic.Entity.GetTrackedResources(id) end
+function CppLogic.Entity.GetTrackedResourceStatistics(id) end
 
 --- returns the full entityname->id mapping
 --- @return table<string, number>
@@ -2970,6 +2975,16 @@ function CppLogic.EntityType.Settler.GetUpgradeCategory(ty) end
 ---@param et number|string
 ---@return table
 function CppLogic.EntityType.Settler.DumpBattleBehavior(et) end
+
+--- gets the worktime data of a worker type.
+---@param et number|string
+---@return number changeWork
+---@return number changeCamp
+---@return number changeFarm
+---@return number changeResi
+---@return number maxFarm
+---@return number maxResi
+function CppLogic.EntityType.Settler.WorkerGetWorktimeData(et) end
 
 --- number of settlers this building (villagecenter) supports.
 --- @param ty number entitytype

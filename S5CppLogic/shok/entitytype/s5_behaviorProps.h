@@ -291,7 +291,7 @@ namespace GGL {
 		shok::TaskListId IdleTaskList{};
 		shok::TaskListId LeaveTaskList{}; // 15
 		float AmountResearched = 1.0f;
-		float WorkTimeChangeWork = 0.0f;
+		int WorkTimeChangeWork = 0;
 		float WorkTimeChangeFarm = 0.1f, WorkTimeChangeResidence = 0.1f, WorkTimeChangeCamp = 0.1f; // la20
 		int WorkTimeMaxChangeFarm = 0, WorkTimeMaxChangeResidence = 0;
 		float ExhaustedWorkMotivationMalus = 0.0f;

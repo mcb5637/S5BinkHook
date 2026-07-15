@@ -53,6 +53,15 @@ namespace CppLogic::Mod {
 			void AddTick(double per, int t);
 			void AddWorktime(double per, int t);
 			[[nodiscard]] double Average() const;
+			template<class Dur>
+			[[nodiscard]] double Average() const {
+				if (N == 0.0)
+					return -1.0;
+				using tick = std::chrono::duration<double, shok::Tick::period>;
+				using D = std::chrono::duration<double, typename Dur::period>;
+				static constexpr double fact = std::chrono::duration_cast<D>(tick(1)).count();
+				return Average() / fact;
+			}
 		};
 		struct Cycle {
 			double Sum = 0.0;

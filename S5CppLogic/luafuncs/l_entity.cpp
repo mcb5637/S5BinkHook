@@ -612,8 +612,17 @@ namespace CppLogic::Entity {
 			return 0;
 		L.Push(b->Produced);
 		L.Push(b->Used);
-		L.Push(b->PerTickProduced.Average());
-		L.Push(b->PerTickUsed.Average());
+		return 2;
+	}
+
+	int GetTrackedResourceStatistics(luaext::State L) {
+		EGL::CGLEEntity* e = L.CheckEntity(1);
+		auto* b = e->GetBehavior<CppLogic::Mod::ResourceTrackerBehavior>();
+		if (!b)
+			return 0;
+		using min = std::chrono::minutes;
+		L.Push(b->PerTickProduced.Average<min>());
+		L.Push(b->PerTickUsed.Average<min>());
 		if (e->GetClassIdentifier() == GGL::CBuilding::Identifier) {
 			struct Avg {
 				double sum = 0.0;
@@ -651,7 +660,7 @@ namespace CppLogic::Entity {
 			L.Push(b->PerWorktimeUsed.Average());
 			L.Push(b->PerCycleProduced.Average());
 		}
-		return 7;
+		return 5;
 	}
 
 	int GetAllScriptNameMappings(luaext::State L) {
@@ -2094,6 +2103,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<GetAttackCommandTarget>("GetAttackCommandTarget"),
 			luaext::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
 			luaext::FuncReference::GetRef<GetTrackedResources>("GetTrackedResources"),
+			luaext::FuncReference::GetRef<GetTrackedResourceStatistics>("GetTrackedResourceStatistics"),
 			luaext::FuncReference::GetRef<GetAllScriptNameMappings>("GetAllScriptNameMappings"),
 			luaext::FuncReference::GetRef<GetLimitedAmmo>("GetLimitedAmmo"),
 			luaext::FuncReference::GetRef<SetLimitedAmmo>("SetLimitedAmmo"),

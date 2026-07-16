@@ -94,7 +94,22 @@ void CppLogic::Mod::FormationSpacedBehavior::operator delete(void* p) {
 	shok::Free(p);
 }
 
-void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::AddTick(double per, int t) {
+double CppLogic::Mod::ResourceTrackerBehavior::Last3::GetLast3() const {
+	double d = 0.0;
+	for (size_t i = 0; i < Last.size() - 1; ++i) {
+		d += Last[i];
+	}
+	return d / (Last.size() - 1);
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::Last3::TurnOver() {
+	for (size_t i = 0; i < Last.size() - 1; ++i) {
+		Last[i] = Last[i + 1];
+	}
+	Last[Last.size()-1] = 0.0;
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::TickEfficiency::AddTick(double per, int t) {
 	if (Tick >= 0) {
 		int d;
 		if (t < Tick)
@@ -105,9 +120,14 @@ void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::AddTick(double per, int
 	}
 	Tick = t;
 	Sum += per;
+	Last[Last.size()-1] += per;
 }
 
-void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::AddWorktime(double per, int t) {
+void CppLogic::Mod::ResourceTrackerBehavior::TickEfficiency::Minute() {
+	TurnOver();
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::WorktimeEfficiency::AddWorktime(double per, int t) {
 	if (Tick >= 0) {
 		int d;
 		if (t > Tick)
@@ -120,10 +140,15 @@ void CppLogic::Mod::ResourceTrackerBehavior::Efficiency::AddWorktime(double per,
 	Sum += per;
 }
 
-double CppLogic::Mod::ResourceTrackerBehavior::Efficiency::Average() const {
+double CppLogic::Mod::ResourceTrackerBehavior::WorktimeEfficiency::Average() const {
 	if (N == 0.0)
 		return -1.0;
 	return Sum / N;
+}
+
+void CppLogic::Mod::ResourceTrackerBehavior::Cycle::Add(double per) {
+	Sum += per;
+	Last[Last.size()-1] += per;
 }
 
 double CppLogic::Mod::ResourceTrackerBehavior::Cycle::Average() const {
@@ -136,6 +161,7 @@ void CppLogic::Mod::ResourceTrackerBehavior::Cycle::Ended() {
 	++N;
 	Sum += Curr;
 	Curr = 0;
+	TurnOver();
 }
 
 shok::ClassId __stdcall CppLogic::Mod::ResourceTrackerBehavior::GetClassIdentifier() const
@@ -188,7 +214,7 @@ void CppLogic::Mod::ResourceTrackerBehavior::EventMinedOrRefined(GGL::CEventGood
 {
 	Produced.AddToType(ev->BuyType, ev->BuyAmount);
 	PerTickProduced.AddTick(ev->BuyAmount, GetTick());
-	PerCycleProduced.Curr += ev->BuyAmount;
+	PerCycleProduced.Add(ev->BuyAmount);
 	auto wt = GetWorktime(ev);
 	PerWorktimeProduced.AddWorktime(ev->BuyAmount, wt);
 	PerWorktimeUsed.AddWorktime(0.0, wt);
@@ -216,6 +242,11 @@ void CppLogic::Mod::ResourceTrackerBehavior::EventTick(BB::CEvent*) {
 				PerWorktimeUsed.Tick = b->WorkTimeRemaining;
 			}
 		}
+	}
+	shok::Tick tick{GetTick()};
+	if (std::chrono::duration_cast<std::chrono::seconds>(tick).count() % std::chrono::seconds{std::chrono::minutes{1}}.count() == 0) {
+		PerTickProduced.Minute();
+		PerTickUsed.Minute();
 	}
 }
 

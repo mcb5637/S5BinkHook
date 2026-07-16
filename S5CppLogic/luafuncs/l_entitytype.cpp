@@ -908,6 +908,13 @@ namespace CppLogic::EntityType {
 						  p->WorkTimeChangeResidence, p->WorkTimeMaxChangeFarm, p->WorkTimeMaxChangeResidence};
 	}
 
+	auto WorkerGetRefinerData(GGlue::CGlueEntityProps* t) {
+		auto* p = t->GetBehaviorProps<GGL::CWorkerBehaviorProps>();
+		if (p == nullptr)
+			throw lua::LuaException("no worker behavior props");
+		return std::tuple{p->ResourceToRefine, p->TransportAmount};
+	}
+
 	int GetDeleteWhenBuildOn(luaext::State L) {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		L.Push(t->LogicProps->DeleteWhenBuiltOn);
@@ -1049,6 +1056,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<GetUpgradeCategory>("GetUpgradeCategory"),
 			luaext::FuncReference::GetRef<DumpBattleBehavior>("DumpBattleBehavior"),
 			luaext::FuncReference::GetRef<WorkerGetWorktimeData>("WorkerGetWorktimeData"),
+			luaext::FuncReference::GetRef<WorkerGetRefinerData>("WorkerGetRefinerData"),
 		};
 
 	constexpr std::array Building{

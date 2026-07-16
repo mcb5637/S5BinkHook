@@ -45,37 +45,52 @@ namespace CppLogic::Mod {
 		shok::CostInfo Produced, Used;
 		bool CycleWorking = false;
 
-		struct Efficiency {
+		struct Last3 {
+			std::array<double, 4> Last{};
+
+			[[nodiscard]] double GetLast3() const;
+		protected:
+			void TurnOver();
+		};
+		struct TickEfficiency : Last3 {
 			double Sum = 0.0;
 			double N = 0.0;
 			int Tick = -1;
 
 			void AddTick(double per, int t);
-			void AddWorktime(double per, int t);
-			[[nodiscard]] double Average() const;
 			template<class Dur>
 			[[nodiscard]] double Average() const {
 				if (N == 0.0)
 					return -1.0;
 				using tick = std::chrono::duration<double, shok::Tick::period>;
 				using D = std::chrono::duration<double, typename Dur::period>;
-				static constexpr double fact = std::chrono::duration_cast<D>(tick(1)).count();
-				return Average() / fact;
+				auto nDur = std::chrono::duration_cast<D>(tick(N));
+				return Sum / nDur.count();
 			}
+			void Minute();
 		};
-		struct Cycle {
+		struct WorktimeEfficiency {
+			double Sum = 0.0;
+			double N = 0.0;
+			int Tick = -1;
+
+			void AddWorktime(double per, int t);
+			[[nodiscard]] double Average() const;
+		};
+		struct Cycle : Last3 {
 			double Sum = 0.0;
 			int N = 0;
 			double Curr = 0.0;
 
+			void Add(double per);
 			[[nodiscard]] double Average() const;
 			void Ended();
 		};
 
-		Efficiency PerWorktimeProduced;
-		Efficiency PerTickProduced;
-		Efficiency PerWorktimeUsed;
-		Efficiency PerTickUsed;
+		WorktimeEfficiency PerWorktimeProduced;
+		TickEfficiency PerTickProduced;
+		WorktimeEfficiency PerWorktimeUsed;
+		TickEfficiency PerTickUsed;
 		Cycle PerCycleProduced;
 
 

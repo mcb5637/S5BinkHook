@@ -12,16 +12,17 @@
 #include <utility/ModBehavior.h>
 
 namespace CppLogic::EntityType {
-	int LeaderTypeGetSoldierType(luaext::State L) {
-		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
-		if (!t->IsSettlerType())
-			throw lua::LuaException("no settler type at 1");
-		auto* p = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
-		if (!p)
-			throw lua::LuaException("no leader type at 1");
-		L.Push(p->SoldierType);
-		return 1;
-	}
+	namespace {
+		int LeaderTypeGetSoldierType(luaext::State L) {
+			GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
+			if (!t->IsSettlerType())
+				throw lua::LuaException("no settler type at 1");
+			auto* p = t->GetBehaviorPropsDynamic<GGL::CLeaderBehaviorProps>();
+			if (!p)
+				throw lua::LuaException("no leader type at 1");
+			L.Push(p->SoldierType);
+			return 1;
+		}
 	int LeaderTypeSetSoldierType(luaext::State L) {
 		GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 		if (!t->IsSettlerType())
@@ -1071,6 +1072,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<AddHPTechMod>("AddHPTechMod"),
 			luaext::FuncReference::GetRef<GetBuildOnTypes>("GetBuildOnTypes"),
 		};
+	} // namespace
 
 	void Init(luaext::State L)
 	{

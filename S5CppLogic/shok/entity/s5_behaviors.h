@@ -40,6 +40,7 @@ namespace EGL {
 			// ReSharper disable once CppUninitializedNonStaticDataMember
 			CMovementBehavior* Beh;
 
+		public:
 			inline virtual void __stdcall FillSlot(EGL::SSlotArgsMovingEntity* data) override {
 				data->Pos = Beh->LastTurnPos;
 			}
@@ -245,10 +246,11 @@ namespace GGL {
 		GGL::CHeroAbilityProps* AbilityProps = nullptr;
 		int SecondsCharged = 0; // 5
 
-
+	protected:
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+	public:
 		virtual bool IsAbility(shok::AbilityId ability) = 0; // 8
 		virtual bool CanUseAbility();
 		virtual bool CheckAndResetCooldown();
@@ -403,9 +405,11 @@ namespace GGL {
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x876F08);
 
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
+	protected:
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+	public:
 		virtual bool IsAbility(shok::AbilityId ability) override;
 	protected:
 		int TaskGoToCannonPos(EGL::CGLETaskArgs* a);
@@ -457,10 +461,11 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x2BA19F1D);
 		static inline BB::SerializationData* const SerializationData = reinterpret_cast<BB::SerializationData*>(0x86D4B8);
 
-
+	protected:
 		virtual void AddHandlers(shok::EntityId id) override;
 		virtual void OnEntityCreate(EGL::CGLEBehaviorProps* p) override;
 		virtual void OnEntityLoad(EGL::CGLEBehaviorProps* p) override;
+	public:
 		virtual bool IsAbility(shok::AbilityId ability) override;
 
 	protected:

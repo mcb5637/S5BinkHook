@@ -1129,7 +1129,7 @@ int CppLogic::Mod::BombardmentAbility::TaskBombard(EGL::CGLETaskArgs* a)
 	cr.EffectType = pr->EffectType;
 	cr.PlayerID = en->PlayerId;
 	// ReSharper disable once CppPossiblyUnintendedObjectSlicing
-	cr.StartPos = cr.CurrentPos = en->Position;
+	cr.StartPos = cr.CurrentPos = static_cast<shok::Position&>(en->Position);
 	cr.TargetPos = Target;
 	cr.AttackerID = eid;
 	cr.Damage = static_cast<int>(en->ModifyDamage(pr->Damage) * en->GetTotalAffectedDamageModifier());
@@ -1269,7 +1269,7 @@ int CppLogic::Mod::LimitedAmmoBehavior::TaskCheckAmmo(EGL::CGLETaskArgs* a)
 	return 0;
 }
 
-shok::TaskStateExecutionResult CppLogic::Mod::LimitedAmmoBehavior::StateCheckAmmo(int time)
+shok::TaskStateExecutionResult CppLogic::Mod::LimitedAmmoBehavior::StateCheckAmmo(int time) // NOLINT(*-make-member-function-const)
 {
 	if (RemainingAmmo > 0)
 		return shok::TaskStateExecutionResult::Finished;
@@ -1321,6 +1321,7 @@ void CppLogic::Mod::ReloadableCannonBuilderAbility::operator delete(void* p)
 
 void CppLogic::Mod::ReloadableCannonBuilderAbility::AddHandlers(shok::EntityId id)
 {
+	// ReSharper disable once CppReferenceToOverriddenVirtualFunction
 	GGL::CHeroAbility::AddHandlers(id); // NOLINT(*-parent-virtual-call)
 	auto* e = EGL::CGLEEntity::GetEntityByID(id);
 	auto* cb = static_cast<GGL::CCannonBuilderBehavior*>(this);
@@ -1790,7 +1791,7 @@ void CppLogic::Mod::AdvancedMarketBehavior::EventCancel(BB::CEvent* ev)
 	SellResources = ResourceData{};
 }
 
-void CppLogic::Mod::AdvancedMarketBehavior::EventGetProgress(EGL::CEventGetValue_Float* ev)
+void CppLogic::Mod::AdvancedMarketBehavior::EventGetProgress(EGL::CEventGetValue_Float* ev) // NOLINT(*-convert-member-functions-to-static)
 {
 	ev->Data = 1.0f;
 }

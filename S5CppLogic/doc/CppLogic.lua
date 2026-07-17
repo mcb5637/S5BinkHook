@@ -2738,6 +2738,20 @@ function CppLogic.EntityType.IsWorkerType(ty) end
 --- @return number range
 function CppLogic.EntityType.GetBombData(ty) end
 
+--- entitytype torch data
+--- @param ty number entitytype
+--- @return number duration
+--- @return number range
+function CppLogic.EntityType.GetTorchData(ty)end
+
+--- entitytype keg data
+--- @param ty number entitytype
+--- @return number damage
+--- @return number damagePercent
+--- @return number delay
+--- @return number range
+function CppLogic.EntityType.GetKegData(ty)end
+
 --- the soldier type of a leader type
 --- @param ty number leader type
 --- @return number soldier type
@@ -2905,6 +2919,33 @@ function CppLogic.EntityType.Settler.GetAbilityDataHawk(ty)end
 --- @return number type
 --- @return number tasklist
 function CppLogic.EntityType.Settler.GetAbilityDataSummon(ty)end
+
+--- entitytype binocular data
+--- @param ty number entitytype
+--- @return number rangePerEntity
+--- @return number number
+--- @return number spacing
+function CppLogic.EntityType.Settler.GetAbilityDataBinocular(ty)end
+
+--- entitytype find resources data
+--- @param ty number entitytype
+--- @return number range
+--- @return number tl
+function CppLogic.EntityType.Settler.GetAbilityDataFindRes(ty)end
+
+--- entitytype torch placer data
+--- @param ty number entitytype
+--- @return number torchType
+function CppLogic.EntityType.Settler.GetAbilityDataTorch(ty)end
+
+--- entitytype keg placer data
+--- @param ty number entitytype
+--- @return number secondsToArm
+--- @return number secondsToDisarm
+--- @return number kegType
+--- @return number placeTL
+--- @return number disarmTL
+function CppLogic.EntityType.Settler.GetAbilityDataSabotage(ty)end
 
 --- entitytytpe resurrect ability data.
 --- @param ty number entitytype

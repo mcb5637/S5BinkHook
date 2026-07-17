@@ -592,6 +592,46 @@ namespace CppLogic::EntityType {
 			return std::tuple{p->NumberOfSummonedEntities, p->SummonedEntityType, p->SummonTaskList};
 		}
 
+		auto GetAbilityDataBinocular(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CAbilityScoutBinocularProps>();
+			if (p == nullptr)
+				throw lua::LuaException("no binocular entity at 1");
+			return std::tuple{p->ExplorationRangeOfExplorationEntities, p->NumberOfExplorationEntities, p->SpacingOfExplorationEntities};
+		}
+
+		auto GetAbilityDataFindRes(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CPointToResourceBehaviorProperties>();
+			if (p == nullptr)
+				throw lua::LuaException("no res finder entity at 1");
+			return std::tuple{p->SearchRadius, p->TaskList};
+		}
+
+		auto GetAbilityDataTorch(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CTorchPlacerBehaviorProperties>();
+			if (p == nullptr)
+				throw lua::LuaException("no torch placer entity at 1");
+			return p->TorchEntity;
+		}
+		auto GetTorchData(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CTorchBehaviorProperties>();
+			if (p == nullptr)
+				throw lua::LuaException("no torch entity at 1");
+			return std::tuple{p->Duration, t->LogicProps->Exploration};
+		}
+
+		auto GetAbilityDataSabotage(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CKegPlacerBehaviorProperties>();
+			if (p == nullptr)
+				throw lua::LuaException("no keg placer entity at 1");
+			return std::tuple{p->SecondsNeededToArm, p->SecondsNeededToDisarm, p->KegEntityType, p->PlaceKegTaskList, p->DisarmKegTaskList};
+		}
+		auto GetKegData(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CKegBehaviorProperties>();
+			if (p == nullptr)
+				throw lua::LuaException("no keg entity at 1");
+			return std::tuple{p->Damage, p->DamagePercent, p->Delay, p->Radius};
+		}
+
 		int GetAbilityLightningStrikeData(luaext::State L) {
 			GGlue::CGlueEntityProps* t = L.CheckEntityType(1);
 			auto* p = t->GetBehaviorProps<CppLogic::Mod::LightningStrikeAbilityProps>();
@@ -1039,6 +1079,8 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<IsWorkerType>("IsWorkerType"),
 			luaext::FuncReference::GetRef<GetBombData>("GetBombData"),
 			luaext::FuncReference::GetRef<DumpEntityType>("DumpEntityType"),
+			luaext::FuncReference::GetRef<GetTorchData>("GetTorchData"),
+			luaext::FuncReference::GetRef<GetKegData>("GetKegData"),
 		};
 
 		constexpr std::array Settler{
@@ -1070,6 +1112,10 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<GetAbilityDataMotivate>("GetAbilityDataMotivate"),
 			luaext::FuncReference::GetRef<GetAbilityDataHawk>("GetAbilityDataHawk"),
 			luaext::FuncReference::GetRef<GetAbilityDataSummon>("GetAbilityDataSummon"),
+			luaext::FuncReference::GetRef<GetAbilityDataBinocular>("GetAbilityDataBinocular"),
+			luaext::FuncReference::GetRef<GetAbilityDataFindRes>("GetAbilityDataFindRes"),
+			luaext::FuncReference::GetRef<GetAbilityDataTorch>("GetAbilityDataTorch"),
+			luaext::FuncReference::GetRef<GetAbilityDataSabotage>("GetAbilityDataSabotage"),
 			luaext::FuncReference::GetRef<GetFearless>("GetFearless"),
 			luaext::FuncReference::GetRef<SetFearless>("SetFearless"),
 			luaext::FuncReference::GetRef<SettlerGetCost>("GetCost"),

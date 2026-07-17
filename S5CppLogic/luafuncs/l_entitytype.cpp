@@ -559,17 +559,37 @@ namespace CppLogic::EntityType {
 
 		std::tuple<float, int, float> GetAbilityDataFear(GGlue::CGlueEntityProps* t) {
 			auto* p = t->GetBehaviorProps<GGL::CInflictFearAbilityProps>();
+			if (p == nullptr)
+				throw lua::LuaException("no fear entity at 1");
 			return {p->Range, p->FlightDuration, p->FlightRange};
 		}
 
 		std::tuple<float, float, float> GetAbilityDataConvertSettler(GGlue::CGlueEntityProps* t) {
 			auto* p = t->GetBehaviorProps<GGL::CConvertSettlerAbilityProps>();
+			if (p == nullptr)
+				throw lua::LuaException("no convert entity at 1");
 			return {p->ConversionStartRange, p->ConversionMaxRange, p->HPToMSFactor};
 		}
 
 		std::tuple<float, int> GetAbilityDataMotivate(GGlue::CGlueEntityProps* t) {
 			auto* p = t->GetBehaviorProps<GGL::CMotivateWorkersAbilityProps>();
+			if (p == nullptr)
+				throw lua::LuaException("no motivate entity at 1");
 			return {p->Range, p->WorkTimeBonus};
+		}
+
+		auto GetAbilityDataHawk(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CHeroHawkBehaviorProps>();
+			if (p == nullptr)
+				throw lua::LuaException("no hawk entity at 1");
+			return std::tuple{p->HawkMaxRange, p->HawkType};
+		}
+
+		auto GetAbilityDataSummon(GGlue::CGlueEntityProps* t) {
+			auto* p = t->GetBehaviorProps<GGL::CSummonBehaviorProps>();
+			if (p == nullptr)
+				throw lua::LuaException("no summon entity at 1");
+			return std::tuple{p->NumberOfSummonedEntities, p->SummonedEntityType, p->SummonTaskList};
 		}
 
 		int GetAbilityLightningStrikeData(luaext::State L) {
@@ -1048,6 +1068,8 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<GetAbilityDataFear>("GetAbilityDataFear"),
 			luaext::FuncReference::GetRef<GetAbilityDataConvertSettler>("GetAbilityDataConvertSettler"),
 			luaext::FuncReference::GetRef<GetAbilityDataMotivate>("GetAbilityDataMotivate"),
+			luaext::FuncReference::GetRef<GetAbilityDataHawk>("GetAbilityDataHawk"),
+			luaext::FuncReference::GetRef<GetAbilityDataSummon>("GetAbilityDataSummon"),
 			luaext::FuncReference::GetRef<GetFearless>("GetFearless"),
 			luaext::FuncReference::GetRef<SetFearless>("SetFearless"),
 			luaext::FuncReference::GetRef<SettlerGetCost>("GetCost"),

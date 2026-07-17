@@ -2893,6 +2893,19 @@ function CppLogic.EntityType.Settler.GetAbilityDataConvertSettler(ty)end
 --- @return number workTime
 function CppLogic.EntityType.Settler.GetAbilityDataMotivate(ty)end
 
+--- entitytype hawk owner ability data
+--- @param ty number entitytype
+--- @return number maxRange
+--- @return number hawkType
+function CppLogic.EntityType.Settler.GetAbilityDataHawk(ty)end
+
+--- entitytype summon ability data
+--- @param ty number entitytype
+--- @return number amount
+--- @return number type
+--- @return number tasklist
+function CppLogic.EntityType.Settler.GetAbilityDataSummon(ty)end
+
 --- entitytytpe resurrect ability data.
 --- @param ty number entitytype
 --- @return number range

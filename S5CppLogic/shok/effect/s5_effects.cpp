@@ -296,6 +296,8 @@ void GGL::CArrowEffect::HookDealDamage()
 
 void __declspec(naked) cannonballhit_damage() {
 	__asm {
+		push 1;
+
 		mov eax, [esi + 52 * 4];
 		shr eax, 24;
 		cmp eax, 0;

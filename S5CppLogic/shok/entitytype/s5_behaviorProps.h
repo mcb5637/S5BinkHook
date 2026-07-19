@@ -117,6 +117,7 @@ namespace GGL {
 		shok::DamageClassId DamageClass{};
 		int Damage = 0;
 		float Range = 0.0f;
+		shok::EffectTypeId Effect{};
 
 		static inline constexpr int vtp = 0x7774A0;
 		static inline constexpr int TypeDesc = 0x82305C;

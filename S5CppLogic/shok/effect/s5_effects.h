@@ -287,9 +287,7 @@ namespace EGL {
 	public:
 		shok::PlayerId PlayerID = shok::PlayerId::Invalid;
 		shok::Position StartPos = { 0,0 }, CurrentPos = { 0,0 }, TargetPos = { 0,0 };
-	private:
-		int Zero2 = 0; // height offset unused
-	public:
+		float HeightOffset = 0; // unused
 		shok::EntityId AttackerID = shok::EntityId::Invalid, TargetID = shok::EntityId::Invalid;
 		int Damage = 0; // 13
 		float DamageRadius = 0;

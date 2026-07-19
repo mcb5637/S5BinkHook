@@ -367,6 +367,9 @@ namespace GGL {
 
 		// defined states: Default
 
+		// 506867 get bomb props
+		// 506909 kill affected entities
+
 		static inline constexpr int vtp = 0x778468;
 		static inline constexpr int TypeDesc = 0x8258A8;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x76AE8807);
@@ -442,11 +445,20 @@ namespace GGL {
 		// defined events: CircularAttack_ActivateCommand
 		// defined tasks: TASK_SET_SPECIAL_ATTACK_ANIM, TASK_PERFORM_SPECIAL_ATTACK
 
+		// 4fe267 get armorclass of target
+		// 4fe2fb get ac factor of target
+		// 4fe563 calculate damage against target
+
 		static inline constexpr int vtp = 0x777464;
 		static inline constexpr int TypeDesc = 0x823038;
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x522330D);
 
+		[[nodiscard]] int GetDamage() const;
+
 		static void HookDealDamage();
+	private:
+		int TaskSpecialAttackOverride(EGL::CGLETaskArgs*);
+		int GetDamageAgainstTargetOld(EGL::CGLEEntity* t);
 	};
 
 	class CSummonBehavior : public GGL::CHeroAbility {
@@ -565,6 +577,12 @@ namespace GGL {
 		// calc dmg against 4dc535(ent)
 		// fire single 4dc656(ent)
 		// fill targets 4dc44c(targetId, vector<entity>)
+
+		[[nodiscard]] int GetDamage() const;
+	private:
+		void FireSingleOverride(EGL::CGLEEntity* t);
+		int CalculateDamageAgainstOld(EGL::CGLEEntity* t);
+		void GetProjectileStartPos(shok::Position* pos);
 	};
 
 	class CKegPlacerBehavior : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)

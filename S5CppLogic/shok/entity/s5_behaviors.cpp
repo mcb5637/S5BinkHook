@@ -12,6 +12,7 @@
 #include <shok/events/s5_netevents.h>
 #include <utility/hooks.h>
 #include <utility/EntityAddonData.h>
+#include <utility/entityiterator.h>
 #include <utility/savegame_extra.h>
 #include <utility/mod.h>
 
@@ -177,6 +178,7 @@ void GGL::CBombPlacerBehavior::HookFixBombAttachment()
 
 void __declspec(naked) bombexplode_damage() {
 	__asm {
+		push 1;
 		push 12;
 		push 1;
 		push 1;
@@ -294,28 +296,48 @@ void GGL::CRangedEffectAbility::HookHealAffected(bool active)
 		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4E3C78), reinterpret_cast<void*>(0x4E39B4));
 }
 
-void __declspec(naked) circularatt_damage() {
-	__asm {
-		push 11;
-		push 1;
-		push 1;
-		push 1;
-		push 0;
-		push eax;
-		push esi;
-		mov ecx, [ebp - 0x10];
-		call EGL::CGLEEntity::AdvancedHurtEntityByStatic;
-
-		push 0x4FE72F;
-		ret;
-	};
+int GGL::CCircularAttack::GetDamage() const {
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	return static_cast<int>(e->ModifyDamage(CAProps->Damage) * e->GetTotalAffectedDamageModifier());
 }
-void GGL::CCircularAttack::HookDealDamage()
-{
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
-		   reinterpret_cast<void*>(0x4FE722)
-	   } };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4FE722), &circularatt_damage, reinterpret_cast<void*>(0x4FE72F));
+
+void GGL::CCircularAttack::HookDealDamage() {
+	CppLogic::Hooks::SaveVirtualProtect vp{0x40, {reinterpret_cast<void*>(0x4fe681)}};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4fe681), CppLogic::Hooks::MemberFuncPointerToVoid(&CCircularAttack::TaskSpecialAttackOverride, 0),
+							   reinterpret_cast<void*>(0x4fe68b));
+}
+
+int GGL::CCircularAttack::TaskSpecialAttackOverride(EGL::CGLETaskArgs*) {
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AoEDamageFix) {
+		EGL::CGLEEntity::AdvancedDealAoEDamage(e, e->Position, CAProps->Range, GetDamage(), e->PlayerId, CAProps->DamageClass, true, true, true,
+											   shok::AdvancedDealDamageSource::AbilityCircularAttack, false);
+	}
+	else {
+		CppLogic::Iterator::EntityPredicateIsCombatRelevant irel{};
+		CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> icircl{e->Position, CAProps->Range * CAProps->Range};
+		CppLogic::Iterator::EntityPredicateIsAlive iali{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer ipl{};
+		CppLogic::Iterator::EntityPredicateOfAnyPlayer::FillHostilePlayers(ipl.players, e->PlayerId);
+		CppLogic::Iterator::PredicateStaticAnd<EGL::CGLEEntity, 4> p{&irel, &iali, &ipl, &icircl};
+		CppLogic::Iterator::MultiRegionEntityIterator it{e->Position, CAProps->Range,
+														 shok::AccessCategoryFlags::AccessCategoryBuilding | shok::AccessCategoryFlags::AccessCategorySettler, &p};
+		for (auto* ei : it) {
+			ei->AdvancedHurtEntityBy(e, GetDamageAgainstTargetOld(ei), e->PlayerId, true, true, true, shok::AdvancedDealDamageSource::AbilityCircularAttack);
+		}
+	}
+	if (CAProps->Effect != shok::EffectTypeId::Invalid) {
+		EGL::CGLEEffectCreator cr{};
+		cr.EffectType = CAProps->Effect;
+		cr.CurrentPos = static_cast<shok::Position&>(e->Position);
+		(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
+	}
+	return 0;
+}
+
+int GGL::CCircularAttack::GetDamageAgainstTargetOld(EGL::CGLEEntity* t) {
+	auto* f = reinterpret_cast<int(__thiscall*)(CCircularAttack*, EGL::CGLEEntity*)>(0x4fe563);
+	return f(this, t);
 }
 
 static inline void(__thiscall* const summonbeh_eventdie)(GGL::CSummonBehavior* th, BB::CEvent* ev) = reinterpret_cast<void(__thiscall*)(GGL::CSummonBehavior*, BB::CEvent*)>(0x4D6F25);
@@ -435,27 +457,46 @@ void GGL::CSniperAbility::OverrideSnipeTask()
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DB5B8), CppLogic::Hooks::MemberFuncPointerToVoid(&CSniperAbility::TaskOverrideSnipe, 0), reinterpret_cast<void*>(0x4DB5BD));
 }
 
-void __declspec(naked) shurikenthrow() {
-	__asm {
-		lea edx, [ebp - 0x5C];
-
-		mov byte ptr[edx + 17 * 4 + 3], 15;
-
-		mov[ebp - 0x20], eax;
-		mov eax, [ecx];
-		push edx;
-
-
-		push 0x4DC6E2;
-		ret;
-	};
-}
 void GGL::CShurikenAbility::HookDealDamage()
 {
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
-		   reinterpret_cast<void*>(0x4DC6D9)
+		   reinterpret_cast<void*>(0x4dc656)
 	   } };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4DC6D9), &shurikenthrow, reinterpret_cast<void*>(0x4DC6E2));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4dc656), CppLogic::Hooks::MemberFuncPointerToVoid(&CShurikenAbility::FireSingleOverride, 0), reinterpret_cast<void*>(0x4dc660));
+}
+
+int GGL::CShurikenAbility::GetDamage() const {
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	float r = e->ModifyDamage(ShurikenProps->DamageAmount, true);
+	return static_cast<int>(r * e->GetTotalAffectedDamageModifier());
+}
+
+void GGL::CShurikenAbility::FireSingleOverride(EGL::CGLEEntity* t) {
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	CProjectileEffectCreator cr{};
+	cr.EffectType = ShurikenProps->ProjectileType;
+	GetProjectileStartPos(&cr.CurrentPos);
+	cr.StartPos = cr.CurrentPos;
+	cr.HeightOffset = ShurikenProps->ProjectileOffsetHeight;
+	cr.TargetPos = static_cast<shok::Position&>(t->Position);
+	cr.AttackerID = e->EntityId;
+	cr.TargetID = t->EntityId;
+	cr.Damage = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AoEDamageFix ?
+		static_cast<int>(t->CalculateDamageAgainstMe(GetDamage(), ShurikenProps->DamageClass)) :
+		CalculateDamageAgainstOld(t);
+	cr.DamageClass = ShurikenProps->DamageClass;
+	cr.AdvancedDamageSourceOverride = shok::AdvancedDealDamageSource::AbilityShuriken;
+	(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
+}
+
+int GGL::CShurikenAbility::CalculateDamageAgainstOld(EGL::CGLEEntity* t) {
+	auto* f = reinterpret_cast<int(__thiscall*)(CShurikenAbility*, EGL::CGLEEntity*)>(0x4dc535);
+	return f(this, t);
+}
+
+void GGL::CShurikenAbility::GetProjectileStartPos(shok::Position* pos) {
+	auto* f = reinterpret_cast<void(__thiscall*)(CShurikenAbility*, shok::Position*)>(0x4dbb52);
+	return f(this, pos);
 }
 
 static inline float(__thiscall* const battleBehaviorGetMaxRange)(const GGL::CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(const GGL::CBattleBehavior*)>(0x50AB43);

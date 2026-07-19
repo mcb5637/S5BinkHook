@@ -1422,7 +1422,7 @@ void __thiscall EGL::CGLEEntity::AdvancedHurtEntityByStatic(EGL::CGLEEntity *th,
 	th->AdvancedHurtEntityBy(attacker, damage, attackerFallback, uiFeedback, xp, addStat, sourceInfo);
 }
 
-void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, shok::PlayerId player, shok::DamageClassId damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo)
+void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker, const shok::Position& center, float range, int damage, shok::PlayerId player, shok::DamageClassId damageclass, bool uiFeedback, bool xp, bool addStat, shok::AdvancedDealDamageSource sourceInfo, bool rangeAffectsDamage)
 {
 	if ((*GGL::CGLGameLogic::GlobalObj)->GlobalInvulnerability)
 		return;
@@ -1433,12 +1433,17 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 	CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity> icircl{ center, range * range };
 	CppLogic::Iterator::EntityPredicateIsAlive iali{};
 
-	auto lam = [range, damage, damageclass, attacker, pl, uiFeedback, xp, addStat, sourceInfo](EGL::CGLEEntity* curr, float cr) {
-		cr = std::sqrtf(cr) / range;
-		if (cr < 0 || cr > 1)
-			cr = 0;
-		else
-			cr = 1 - cr * cr;
+	auto lam = [&](EGL::CGLEEntity* curr, float cr) {
+		if (rangeAffectsDamage) {
+			cr = std::sqrtf(cr) / range;
+			if (cr < 0 || cr > 1)
+				cr = 0;
+			else
+				cr = 1 - cr * cr;
+		}
+		else {
+			cr = 1.0f;
+		}
 
 		if (cr != 0) {
 			float dmg = curr->CalculateDamageAgainstMe(damage, damageclass, cr);
@@ -1448,7 +1453,7 @@ void __stdcall EGL::CGLEEntity::AdvancedDealAoEDamage(EGL::CGLEEntity* attacker,
 
 			curr->AdvancedHurtEntityBy(attacker, static_cast<int>(dmg), pl, uiFeedback, xp, addStat, sourceInfo);
 		}
-		};
+	};
 
 	static constexpr auto acflags = shok::AccessCategoryFlags::AccessCategorySettler
 		| shok::AccessCategoryFlags::AccessCategoryAnimal | shok::AccessCategoryFlags::AccessCategoryBuilding

@@ -1374,7 +1374,7 @@ function CppLogic.Combat.DealAoEDamage(attackerId, x, y, r, dmg, player, dmgclas
 
 --- enables AoE projectile fix.
 --- when enabled, cannons and similar AoE projectiles use the entitytypes damageclass.
---- (also fixes autocannon rotation)
+--- (also fixes autocannon rotation & hero ability damage caching)
 --- status of this gets saved into a savegame.
 function CppLogic.Combat.EnableAoEProjectileFix() end
 --- disables AoE projectile fix.
@@ -2248,6 +2248,16 @@ function CppLogic.Entity.Settler.GetAutoAttackMissChance(id)end
 --- @param id entity
 --- @return number
 function CppLogic.Entity.Settler.GetLeveledMissChanceBonus(id)end
+
+--- current modified circular attack damage
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetCircularAttackDamage(id)end
+
+--- current modified shuriken damage (per projectile)
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetShurikenDamage(id)end
 
 --- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
 --- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).

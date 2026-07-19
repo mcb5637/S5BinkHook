@@ -914,6 +914,20 @@ namespace CppLogic::Entity {
 			return lvl->MissChance;
 		}
 
+		int SettlerGetCircularAttackDamage(GGL::CSettler* s) {
+			auto* b = s->GetBehavior<GGL::CCircularAttack>();
+			if (b == nullptr)
+				throw lua::LuaException{"no circularattack entity"};
+			return b->GetDamage();
+		}
+
+		int SettlerGetShurikenDamage(GGL::CSettler* s) {
+			auto* b = s->GetBehavior<GGL::CShurikenAbility>();
+			if (b == nullptr)
+				throw lua::LuaException{"no shuriken entity"};
+			return b->GetDamage();
+		}
+
 		int BuildingMarketGetCurrentTradeData(luaext::State L) {
 			GGL::CBuilding* b = L.CheckBuilding(1);
 			auto* m = b->GetBehavior<GGL::CMarketBehavior>();
@@ -2282,6 +2296,8 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SerfGetExtractionTarget>("SerfGetExtractionTarget"),
 			luaext::FuncReference::GetRef<SettlerGetAutoAttackMissChance>("GetAutoAttackMissChance"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledMissChanceBonus>("GetLeveledMissChanceBonus"),
+			luaext::FuncReference::GetRef<SettlerGetCircularAttackDamage>("GetCircularAttackDamage"),
+			luaext::FuncReference::GetRef<SettlerGetShurikenDamage>("GetShurikenDamage"),
 		};
 
 		constexpr std::array Leader{

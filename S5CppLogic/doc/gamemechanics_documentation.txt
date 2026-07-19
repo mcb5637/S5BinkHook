@@ -127,7 +127,8 @@ Combat:
 		- Bug: no Statistics for kills (fixed by CppLogic.Combat.EnableAoEProjectileFix)
 	GGL::CCircularAttack:
 		- calculate Damage as Attacker->CCircularAttackProps->Damage modified by Technologies, ExperienceLevels and RangedEffectsFactor
-		- deals AoEDamage on its position
+		- deals AoEDamage on its position, with no damage fallof due to range
+		- Bug: calculates damage against each target separately, including the Damageclass/Armorclass factor in the cached call to ModifyStat (fixed by CppLogic.Combat.EnableAoEProjectileFix)
 	GGL::CSniperAbility:
 		- calculate Damage as Target->MaxHealth * Attacker->HPFactor
 		- Bug: Damage is dealt immediately, not with a Arrow (fixed by CppLogic.Logic.FixSnipeDamage)

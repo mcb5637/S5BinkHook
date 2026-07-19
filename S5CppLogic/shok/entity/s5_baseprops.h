@@ -36,6 +36,7 @@ namespace EGL {
 
 		// get entity 585f56
 		// get moving entity 586773
+		// get diplo handler of player 4f2903
 	};
 }
 

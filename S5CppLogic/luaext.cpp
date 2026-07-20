@@ -5,7 +5,7 @@
 #include <shok/ui/s5_widget.h>
 #include <shok/effect/s5_effects.h>
 #include <shok/globals/s5_entityandeffectmanager.h>
-#include <utility/ModPlayers.h>
+#include <mod/ModPlayers.h>
 
 EGL::CGLEEntity* luaext::detail::OptEntity(State L, int i)
 {

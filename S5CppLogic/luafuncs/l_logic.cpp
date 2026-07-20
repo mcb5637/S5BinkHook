@@ -28,7 +28,7 @@
 #include <utility/savegame_extra.h>
 #include <utility/modloader.h>
 #include <luafuncs/l_ui.h>
-#include <utility/ModFilesystem.h>
+#include <mod/ModFilesystem.h>
 
 namespace CppLogic::Logic {
 	int GetDamageFactor(luaext::State L) {

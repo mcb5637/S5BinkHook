@@ -22,11 +22,11 @@
 #include <luaext.h>
 #include <utility/dump_guitextures.h>
 #include <utility/luaserializer.h>
-#include <utility/ModConfig.h>
+#include <mod/ModConfig.h>
 #include <utility/StringUtility.h>
 #include <utility/WinAPIUtil.h>
 #include <utility/savegame_extra.h>
-#include <utility/ModPlayers.h>
+#include <mod/ModPlayers.h>
 
 #ifdef DEBUG_FUNCS
 #define RESERIALIZE_NO_DIALOG

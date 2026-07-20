@@ -4,7 +4,7 @@
 #include <shok/ui/s5_widget.h>
 #include <utility/EnumIdManagerMagic.h>
 
-#include <utility/mod.h>
+#include <mod/mod.h>
 
 
 namespace CppLogic::Mod::UI {

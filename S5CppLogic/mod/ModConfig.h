@@ -4,7 +4,7 @@
 #include <shok/entity/s5_behaviors.h>
 #include <shok/globals/s5_config.h>
 
-#include <utility/mod.h>
+#include <mod/mod.h>
 
 namespace CppLogic::Mod::Config {
 	void RegisterClasses();

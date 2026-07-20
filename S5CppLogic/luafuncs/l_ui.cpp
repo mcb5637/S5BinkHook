@@ -17,10 +17,10 @@
 #include <shok/globals/s5_cutscene.h>
 #include <utility/hooks.h>
 #include <utility/luaserializer.h>
-#include <utility/ModUI.h>
+#include <mod/ModUI.h>
 #include <utility/LuaEventInterface.h>
 #include <utility/WinAPIUtil.h>
-#include <utility/ModBehavior.h>
+#include <mod/ModBehavior.h>
 #include <utility/savegame_extra.h>
 
 namespace CppLogic::UI {

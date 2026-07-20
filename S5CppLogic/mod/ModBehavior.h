@@ -4,7 +4,7 @@
 #include <shok/entity/s5_behaviors.h>
 #include <shok/entitytype/s5_behaviorProps.h>
 
-#include <utility/mod.h>
+#include <mod/mod.h>
 #include <shok/globals/s5_staticlist.h>
 #include <shok/events/s5_netevents.h>
 

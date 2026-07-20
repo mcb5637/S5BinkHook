@@ -1062,7 +1062,7 @@ namespace shok {
 		Worker_OnBuildingCatchFire = 0x1301D, //EGL::CEvent1Entity worker something entity
 		Worker_GetResourceToRefine = 0x1301E, //EGL::CEventGetValue<int, 1211121895>
 		WorkerFlee_IsFleeing = 0x1301F, //EGL::CEventGetValue<bool,1709081367>
-		Worker_IsEnteredBuldingRecentlyAttacked = 0x13020, //EGL::CEventGetValue<bool,1709081367>
+		Worker_IsEnteredBuildingRecentlyAttacked = 0x13020, //EGL::CEventGetValue<bool,1709081367>
 		Worker_IsLeaving = 0x13021, //EGL::CEventGetValue<bool,1709081367>
 		Worker_GetTransportModel = 0x13022, //EGL::CEventGetValue<int, 1211121895>
 		SettlerMerchant_MoveInCommand = 0x13023, //BB::CEvent
@@ -1070,7 +1070,7 @@ namespace shok {
 		Worker_OnApproachingBridgeDetach = 0x13025, //EGL::CEvent1Entity empty
 		NeutralBridge_IncreaseProgress = 0x13026, //GGL::CEventBridgeProgress (destroys if reaches 100)
 		NeutralBridge_GetNeutralBridgeBehavior = 0x13027, //EGL::CEventGetValue<GGL::CNeutralBridgeBehavior *,1150290935>
-		NeutralBrifge_GetProgress = 0x13028, //GGL::CEventBridgeProgress
+		NeutralBridge_GetProgress = 0x13028, //GGL::CEventBridgeProgress
 		Worker_SetWorkTimeRemaining = 0x13029, //EGL::CEventValue<int,-27574121>
 		SettlerMerchant_GetBuildingId = 0x1302A, //EGL::CEventGetValue<int, 1211121895>
 
@@ -1197,7 +1197,7 @@ namespace shok {
 		LimitedLifespan_GetTimeMax = 0x1602A, //EGL::CEventGetValue<int,1211121895>
 		HeroBehavior_GetSpawnTurn = 0x1602B, //EGL::CEventGetValue<int,1211121895>
 
-		MotivateVorkers_ActivateCommand = 0x1602C, //BB::CEvent
+		MotivateWorkers_ActivateCommand = 0x1602C, //BB::CEvent
 		Sniper_SnipeCommand = 0x1602D, //EGL::CEvent1Entity
 		Sniper_GetRange = 0x1602E, //EGL::CEventGetValue<float,1468983543>
 		Shuriken_ActivateCommand = 0x1602F, //EGL::CEvent1Entity
@@ -1212,7 +1212,7 @@ namespace shok {
 		Market_WorkStep = 0x17007, //BB::CEvent
 		University_ResearchStep = 0x17008, //BB::CEvent
 		Market_GetProgress = 0x17009, //EGL::CEventGetValue<float,1468983543>
-		Market_StartTrade = 0x1700A, //EGL::CEventGetValue<float,1468983543>
+		Market_StartTrade = 0x1700A, //GGL::CEventTransaction
 		Market_CancelTrade = 0x1700B, //BB::CEvent
 		University_GetTechResearchedProgress = 0x1700C, //EGL::CEventGetValue<float,1468983543> 0-100, seems to be unused
 		ConstructionSite_OnBuildingDetach = 0x1700D, //EGL::CEvent1Entity
@@ -1263,8 +1263,8 @@ namespace shok {
 		IsThief = 0x1800D, //EGL::CEventGetValue<bool, 1709081367>
 
 		LimitedAttachment_Attach = 0x1A002, //GGL::CEventEntityAttachment
-		LimitedAttachment_Dettach = 0x1A003, //GGL::CEventEntityAttachment
-		LimitedAttacgment_IsActiveAndNotFull = 0x1A004, //GGL::CEventAttachmentTypeGetBool, is unused
+		LimitedAttachment_Detach = 0x1A003, //GGL::CEventEntityAttachment
+		LimitedAttachment_IsActiveAndNotFull = 0x1A004, //GGL::CEventAttachmentTypeGetBool, is unused
 		LimitedAttachment_IsActive = 0x1A005, //GGL::CEventAttachmentTypeGetBool
 		LimitedAttachment_SetLimit = 0x1A006, //GGL::CEventAttachmentTypeInteger
 		LimitedAttachment_GetMax = 0x1A007, //GGL::CEventAttachmentTypeGetInteger
@@ -1303,7 +1303,7 @@ namespace shok {
 		AlphaBlending_Start = 0x1D003, // GGL::CEventStartAlphaBlending
 
 		Movement_TaskMoveToApproachPosOf = 0x20001, //EGL::CEvent1Entity
-		Movement_TaskMoveToPosRealtiveToEntity = 0x20002, //EGL::CEventPositionAndEntity
+		Movement_TaskMoveToPosRelativeToEntity = 0x20002, //EGL::CEventPositionAndEntity
 		Movement_TaskMoveToPos = 0x20003, //EGL::CEventPosition
 		MultiSubAnim_SetSubAnim = 0x20004, //EGL::CEventSubAnim
 		Behavior_Tick = 0x20005, //BB::CEvent ticks every second, also LogicEvent_Second

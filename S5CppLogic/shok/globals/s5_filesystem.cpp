@@ -1,6 +1,6 @@
 #include "s5_filesystem.h"
 #include <shok/s5_exception.h>
-#include <utility/ModFilesystem.h>
+#include <mod/ModFilesystem.h>
 
 #include <utility/hooks.h>
 

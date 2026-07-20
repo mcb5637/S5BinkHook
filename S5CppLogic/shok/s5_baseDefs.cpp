@@ -7,7 +7,7 @@
 
 #include <algorithm>
 #include <cctype>
-#include <utility/ModPlayers.h>
+#include <mod/ModPlayers.h>
 #include <utility/hooks.h>
 
 

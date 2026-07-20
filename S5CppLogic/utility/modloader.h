@@ -6,7 +6,7 @@
 #include <shok/globals/s5_mapdisplay.h>
 #include <shok/globals/s5_classfactory.h>
 #include <luaext.h>
-#include <utility/ModFilesystem.h>
+#include <mod/ModFilesystem.h>
 
 
 namespace CppLogic::ModLoader {

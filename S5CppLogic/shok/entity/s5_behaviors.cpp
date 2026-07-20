@@ -14,7 +14,7 @@
 #include <utility/EntityAddonData.h>
 #include <utility/entityiterator.h>
 #include <utility/savegame_extra.h>
-#include <utility/mod.h>
+#include <mod/mod.h>
 
 inline void(__thiscall* const path_waypoint_removelast)(EGL::CCoarsePath::WaypointData* th) = reinterpret_cast<void(__thiscall*)(EGL::CCoarsePath::WaypointData*)>(0x508988);
 void EGL::CCoarsePath::WaypointData::RemoveLastWaypoint()

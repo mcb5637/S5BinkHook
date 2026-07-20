@@ -48,13 +48,13 @@
 #include <utility/luaserializer.h>
 #include <utility/savegame_extra.h>
 #include <utility/EntityAddonData.h>
-#include <utility/ModBehavior.h>
-#include <utility/ModUI.h>
-#include <utility/ModConfig.h>
+#include <mod/ModBehavior.h>
+#include <mod/ModUI.h>
+#include <mod/ModConfig.h>
 #include <utility/EnumIdManagerMagic.h>
-#include <utility/ModFilesystem.h>
-#include <utility/ModEffect.h>
-#include <utility/ModPlayers.h>
+#include <mod/ModFilesystem.h>
+#include <mod/ModEffect.h>
+#include <mod/ModPlayers.h>
 
 struct CppLogicOptions {
 	bool DoNotLoad = false;

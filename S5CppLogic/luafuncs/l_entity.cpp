@@ -19,7 +19,7 @@
 #include <utility/modloader.h>
 #include <utility/savegame_extra.h>
 #include <utility/EntityAddonData.h>
-#include <utility/ModBehavior.h>
+#include <mod/ModBehavior.h>
 #include <utility/LuaEventInterface.h>
 #include <utility/luaserializer.h>
 
@@ -843,7 +843,6 @@ namespace CppLogic::Entity {
 			auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
 			if (lvl == nullptr)
 				return {0.0f, 0.0f};
-			;
 			return {lvl->DamageAmount, lvl->DamageBonus};
 		}
 
@@ -859,7 +858,6 @@ namespace CppLogic::Entity {
 			auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
 			if (lvl == nullptr)
 				return 0.0f;
-			;
 			return lvl->DodgeChance;
 		}
 
@@ -871,7 +869,6 @@ namespace CppLogic::Entity {
 			auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
 			if (lvl == nullptr)
 				return 0.0f;
-			;
 			return lvl->Speed;
 		}
 
@@ -883,8 +880,18 @@ namespace CppLogic::Entity {
 			auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
 			if (lvl == nullptr)
 				return 0.0f;
-			;
 			return lvl->MaxRange;
+		}
+
+		std::optional<float> SettlerGetLeveledExplorationBonus(GGL::CSettler* s) {
+			if (s->ModifierProfile.EntityReference.ExperienceClass == shok::ExperienceClass::Invalid)
+				return std::nullopt;
+			if (s->ModifierProfile.ExperienceLevel.Value <= 0)
+				return 0.0f;
+			auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
+			if (lvl == nullptr)
+				return 0.0f;
+			return lvl->Exploration;
 		}
 
 		std::pair<std::optional<shok::EntityId>, std::optional<float>> SerfGetExtractionTarget(EGL::CGLEEntity* e) {
@@ -910,7 +917,6 @@ namespace CppLogic::Entity {
 			auto* lvl = s->ModifierProfile.GetExperienceClassLevel();
 			if (lvl == nullptr)
 				return 0.0f;
-			;
 			return lvl->MissChance;
 		}
 
@@ -2216,7 +2222,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<
 				EGL::CEvent1Entity, shok::EventIDs::Shuriken_ActivateCommand, LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityShuriken>,
 				LuaEventInterface::CheckSettler, LuaEventInterface::CheckEntityDiploState<shok::DiploState::Hostile>, CheckShurikenEvent>>("CommandShuriken"),
-			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::MotivateVorkers_ActivateCommand,
+			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<BB::CEvent, shok::EventIDs::MotivateWorkers_ActivateCommand,
 																				LuaEventInterface::CheckEntityAbility<shok::AbilityId::AbilityMotivateWorkers>>>(
 				"CommandMotivateWorkers"),
 			luaext::FuncReference::GetRef<LuaEventInterface::EntityCommandEvent<EGL::CEvent1Entity, shok::EventIDs::KegPlacer_SabotageCommand,
@@ -2293,6 +2299,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SettlerGetLeveledDodgeBonus>("GetLeveledDodgeBonus"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledSpeedBonus>("GetLeveledSpeedBonus"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledRangeBonus>("GetLeveledRangeBonus"),
+			luaext::FuncReference::GetRef<SettlerGetLeveledExplorationBonus>("GetLeveledExplorationBonus"),
 			luaext::FuncReference::GetRef<SerfGetExtractionTarget>("SerfGetExtractionTarget"),
 			luaext::FuncReference::GetRef<SettlerGetAutoAttackMissChance>("GetAutoAttackMissChance"),
 			luaext::FuncReference::GetRef<SettlerGetLeveledMissChanceBonus>("GetLeveledMissChanceBonus"),

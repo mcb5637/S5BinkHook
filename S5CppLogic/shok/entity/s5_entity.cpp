@@ -788,7 +788,7 @@ void EGL::CMovingEntity::HeroAbilityShuriken(shok::EntityId tid)
 
 void EGL::CMovingEntity::HeroAbilityMotivateWorkers()
 {
-	BB::CEvent ev{ shok::EventIDs::MotivateVorkers_ActivateCommand };
+	BB::CEvent ev{ shok::EventIDs::MotivateWorkers_ActivateCommand };
 	FireEvent(&ev);
 }
 

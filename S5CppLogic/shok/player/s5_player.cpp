@@ -7,7 +7,7 @@
 #include <shok/events/s5_netevents.h>
 #include <shok/ui/s5_widget.h>
 #include <utility/hooks.h>
-#include <utility/ModPlayers.h>
+#include <mod/ModPlayers.h>
 #include <utility/savegame_extra.h>
 
 static inline int(__thiscall* const plattracthandlerGetAttLimit)(GGL::CPlayerAttractionHandler* th) = reinterpret_cast<int(__thiscall*)(GGL::CPlayerAttractionHandler*)>(0x4C216F);

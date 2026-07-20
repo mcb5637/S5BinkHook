@@ -4,7 +4,7 @@
 #include <shok/effect/s5_effects.h>
 #include <shok/entity/s5_tasklist.h>
 #include <utility/entityiterator.h>
-#include <utility/ModEffect.h>
+#include <mod/ModEffect.h>
 
 void CppLogic::Mod::RegisterClasses()
 {

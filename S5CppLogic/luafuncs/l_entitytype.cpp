@@ -9,7 +9,7 @@
 #include <luaext.h>
 #include <utility/hooks.h>
 #include <utility/luaserializer.h>
-#include <utility/ModBehavior.h>
+#include <mod/ModBehavior.h>
 
 namespace CppLogic::EntityType {
 	namespace {
@@ -193,6 +193,10 @@ namespace CppLogic::EntityType {
 				return 0;
 			}
 			throw lua::LuaException("no battle or autocannon entity type at 1");
+		}
+
+		auto GetExploration(GGlue::CGlueEntityProps* t) {
+			return t->LogicProps->Exploration;
 		}
 
 		int AddEntityCategory(luaext::State L) {
@@ -1051,6 +1055,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<SetSuspendedAnimation>("SetSuspendedAnimation"),
 			luaext::FuncReference::GetRef<GetAutoAttackDamage>("GetAutoAttackDamage"),
 			luaext::FuncReference::GetRef<SetAutoAttackDamage>("SetAutoAttackDamage"),
+			luaext::FuncReference::GetRef<GetExploration>("GetExploration"),
 			luaext::FuncReference::GetRef<AddEntityCategory>("AddEntityCategory"),
 			luaext::FuncReference::GetRef<RemoveEntityCategory>("RemoveEntityCategory"),
 			luaext::FuncReference::GetRef<GetAutoAttackMissChance>("GetAutoAttackMissChance"),

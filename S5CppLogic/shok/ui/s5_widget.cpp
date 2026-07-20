@@ -6,10 +6,10 @@
 #include <shok/globals/s5_mapdisplay.h>
 #include <shok/globals/s5_classfactory.h>
 #include <utility/hooks.h>
-#include <utility/mod.h>
+#include <mod/mod.h>
 #include <utility/EntityAddonData.h>
 #include <shok/engine/s5_RWE_2d.h>
-#include <utility/ModPlayers.h>
+#include <mod/ModPlayers.h>
 
 shok::Color EGUIX::Color::ToShokColor() const
 {

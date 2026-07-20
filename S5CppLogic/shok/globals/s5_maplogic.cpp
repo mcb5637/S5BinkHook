@@ -11,7 +11,7 @@
 #include <shok/globals/s5_framework.h>
 #include <utility/entityiterator.h>
 #include <utility/hooks.h>
-#include <utility/ModPlayers.h>
+#include <mod/ModPlayers.h>
 #include <utility/savegame_extra.h>
 
 void EGL::CTerrainVertexColors::ToTerrainCoord(shok::Position& p, int* out)

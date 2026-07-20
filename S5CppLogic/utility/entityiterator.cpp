@@ -4,7 +4,7 @@
 #include <shok/player/s5_player.h>
 #include <shok/entitytype/s5_entitytype.h>
 
-#include "ModPlayers.h"
+#include "mod/ModPlayers.h"
 
 CppLogic::Iterator::GlobalEntityIterator::GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* const p)
 	: GlobalManagedIterator<EGL::CGLEEntity>(*EGL::CGLEEntityManager::GlobalObj, p) {

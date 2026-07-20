@@ -3,7 +3,7 @@
 #include <shok/s5_defines.h>
 #include <shok/globals/s5_classfactory.h>
 #include <utility/hooks.h>
-#include <utility/ModConfig.h>
+#include <mod/ModConfig.h>
 
 EGL::CGLEAnimProps::CGLEAnimProps()
 {

@@ -2233,6 +2233,11 @@ function CppLogic.Entity.Settler.GetLeveledSpeedBonus(id)end
 --- @return number
 function CppLogic.Entity.Settler.GetLeveledRangeBonus(id)end
 
+--- level dependent exploration bonus
+--- @param id entity
+--- @return number
+function CppLogic.Entity.Settler.GetLeveledExplorationBonus(id)end
+
 --- serf targeted extraction resource.
 --- @param id entity
 --- @return number targetId
@@ -2600,6 +2605,11 @@ function CppLogic.EntityType.GetAutoAttackDamage(ty) end
 --- @param dmg number damage amount
 --- @param dc number damageclass
 function CppLogic.EntityType.SetAutoAttackDamage(ty, dmg, dc) end
+
+--- base exploration of an entity type.
+--- @param ty number entitytype
+--- @return number exploration
+function CppLogic.EntityType.GetExploration(ty) end
 
 --- adds an entity category to an entitytype.
 --- can be tested for with logic/predicate, does not need to be from predefined EntityCategories.

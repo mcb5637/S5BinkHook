@@ -7,7 +7,7 @@
 #include <shok/globals/s5_glue.h>
 #include <shok/engine/s5_RWE_anim.h>
 #include <utility/hooks.h>
-#include <utility/ModPlayers.h>
+#include <mod/ModPlayers.h>
 
 
 bool ED::CLandscape::GetTerrainPosAtScreenCoords(shok::PositionRot& outpos, int x, int y)

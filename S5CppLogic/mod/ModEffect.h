@@ -3,7 +3,7 @@
 #include <shok/s5_baseDefs.h>
 #include <shok/effect/s5_effects.h>
 
-#include <utility/mod.h>
+#include <mod/mod.h>
 #include <shok/globals/s5_staticlist.h>
 #include <shok/events/s5_netevents.h>
 

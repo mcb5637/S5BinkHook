@@ -480,5 +480,5 @@ function ExtraPlayers.InitUI()
 end
 
 CppLogic.API.EnableScriptTriggerEval(true)
-Trigger.RequestTrigger(Events.CPPLOGIC_EVENT_ON_MAP_STARTED, nil, "ExtraPlayers.Init", 1)
-Trigger.RequestTrigger(Events.CPPLOGIC_EVENT_ON_SAVEGAME_LOADED, nil, "ExtraPlayers.InitUI", 1)
+Trigger.RequestTriggerBackup(Events.CPPLOGIC_EVENT_ON_MAP_STARTED, nil, "ExtraPlayers.Init", 1)
+Trigger.RequestTriggerBackup(Events.CPPLOGIC_EVENT_ON_SAVEGAME_LOADED, nil, "ExtraPlayers.InitUI", 1)

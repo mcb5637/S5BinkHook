@@ -153,14 +153,14 @@ function CppLogic.Effect.EnableEffectTriggers(enable) end
 --- @param starty number start pos y
 --- @param tarx number target pos x
 --- @param tary number target pos y
---- @param dmg number damage done by projectile (optional, 0/nil if not used)
---- @param radius number damage radius for AOE projectiles (optional, -1/nil if not used)
---- @param tarid number target entity id (optional, 0/nil if not used)
---- @param attid number attacker entity id (optional, 0/nil if not used)
---- @param playerid number attacker player id (optional, 0/nil if not used)
---- @param dmgclass number damageclass (optional, 0/nil if not used)
---- @param callback fun(id:number) function that gets called on hit (optional, nil if not used)
---- @param source number what deals damage, used for triggers (default AdvancedDealDamageSource.Script) max size 8 bit instead of 32
+--- @param dmg number? damage done by projectile (optional, 0/nil if not used)
+--- @param radius number? damage radius for AOE projectiles (optional, -1/nil if not used)
+--- @param tarid number? target entity id (optional, 0/nil if not used)
+--- @param attid number? attacker entity id (optional, 0/nil if not used)
+--- @param playerid number? attacker player id (optional, 0/nil if not used)
+--- @param dmgclass number? damageclass (optional, 0/nil if not used)
+--- @param callback nil|fun(id:number) function that gets called on hit (optional, nil if not used)
+--- @param source number? what deals damage, used for triggers (default AdvancedDealDamageSource.Script) max size 8 bit instead of 32
 --- @return number effectId id
 function CppLogic.Effect.CreateProjectile(effecttype, startx, starty, tarx, tary, dmg, radius, tarid, attid, playerid, dmgclass, callback, source) end
 
@@ -733,7 +733,7 @@ function CppLogic.Logic.SetLeadersRegenerateTroopHealth(regen, idle) end
 --- does not work with SCELoader.
 --- if called from mainmenu, only affects mainmenu, not ingame.
 --- @param key string key to replace
---- @param text string replacement string or nil to restore default
+--- @param text string? replacement string or nil to restore default
 function CppLogic.Logic.SetStringTableText(key, text) end
 
 --- deprecated

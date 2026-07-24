@@ -77,6 +77,8 @@ namespace EScr {
 		bool Call(int nargs, int nres); // uses shok error handling, so you get a popup on errors
 		void SetState(luaext::State l); // removes from prev StateAddon and adds to new one (both with null check)
 
+		// call result bool32 5a178e
+
 		static inline constexpr int vtp = 0x786bd0;
 	};
 
@@ -93,6 +95,8 @@ namespace EScr {
 
 		static inline constexpr int vtp = 0x786BE0;
 		static inline constexpr int TypeDesc = 0x83B83C;
+
+		// ctor 5a195c
 	};
 	static_assert(sizeof(EScr::CLuaFuncRefCommand) == 12 * 4);
 
@@ -105,6 +109,8 @@ namespace EScr {
 		void SetCommandString(const char* c);
 
 		static inline constexpr int vtp = 0x786BD8;
+		
+		// ctor 5a1913
 
 		static inline const BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0xA068B0);
 
@@ -122,6 +128,7 @@ namespace EScr {
 			int Type; // 1 double, 2 string, 0 nothing
 
 			// read 59f7f0 stdcall(L, index) -> valid
+			// push 59ed52
 		};
 
 		shok::EventIDs EventType; // 1

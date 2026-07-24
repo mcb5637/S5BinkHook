@@ -46,7 +46,7 @@ void EScr::CScriptTriggerSystem::DisableTrigger(shok::TriggerId id)
 	t->Switch = false;
 }
 
-void ClearMarkedTriggersOfEvent(EScr::CScriptTriggerSystem* th, shok::EventIDs id) {
+static void ClearMarkedTriggersOfEvent(EScr::CScriptTriggerSystem* th, shok::EventIDs id) {
 	// struct vec_data {
 	// 	int _;
 	// 	EScr::CScriptTrigger** begin;
@@ -90,7 +90,7 @@ void ClearMarkedTriggersOfEvent(EScr::CScriptTriggerSystem* th, shok::EventIDs i
 	// }
 }
 
-void __stdcall ScriptTriggerSys_FireEventHooked(BB::IPostEvent* th, BB::CEvent* ev) {
+static void __stdcall ScriptTriggerSys_FireEventHooked(BB::IPostEvent* th, BB::CEvent* ev) {
 	static std::vector<shok::EventIDs> eventsToClear{};
 
 	auto* t = static_cast<EScr::CScriptTriggerSystem*>(th); // NOLINT(*-pro-type-static-cast-downcast)
@@ -147,7 +147,7 @@ void EScr::CScriptTriggerSystem::HookFireEvent()
 	*reinterpret_cast<void(__stdcall**)(BB::IPostEvent*, BB::CEvent*)>(0x786674) = &ScriptTriggerSys_FireEventHooked;;
 }
 
-void __stdcall overrideluafunc_empty(lua_State* L, const char* name, lua::CFunction f) {
+static void __stdcall overrideluafunc_empty(lua_State* L, const char* name, lua::CFunction f) {
 
 }
 bool HookRemoveFuncOverrides_Hooked = false;

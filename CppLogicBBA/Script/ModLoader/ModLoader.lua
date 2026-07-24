@@ -965,3 +965,5 @@ end
 function ModLoader.UnloadScriptLibs()
 	ModLoader.CleanupMods(ModLoader.ModList, true, true)
 end
+
+Trigger.RequestTriggerBackup = Trigger.RequestTrigger

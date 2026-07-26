@@ -1723,7 +1723,7 @@ namespace CppLogic::Entity {
 			auto* d = b->GetAdditionalData(true);
 			if (!L.IsNoneOrNil(2))
 				d->RegenHPOverride = L.CheckInt(2);
-			if (!L.IsNoneOrNil(2))
+			if (!L.IsNoneOrNil(3))
 				d->RegenSecondsOverride = L.CheckInt(3);
 			return 0;
 		}

@@ -2314,8 +2314,8 @@ function CppLogic.Entity.Leader.GetRegeneration(id) end
 --- status of this gets saved into a savegame.
 --- does not work with SCELoader.
 --- @param id entity
---- @param hp number regenerated
---- @param seconds number between refreshes
+--- @param hp number? regenerated
+--- @param seconds number? between refreshes
 function CppLogic.Entity.Leader.SetRegeneration(id, hp, seconds) end
 
 --- the level dependent regeneration bonus (nil if it does not exist)

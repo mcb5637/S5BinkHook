@@ -6,6 +6,7 @@
 #include <shok/s5_defines.h>
 #include <shok/player/s5_player.h>
 #include <shok/ui/s5_guistates.h>
+#include <utility/EnumIdManagerMagic.h>
 
 enum class win_mouseEvents : int {
 	KeyDown = 0x100,
@@ -27,6 +28,11 @@ enum class win_mouseEvents : int {
 	XButtonDown = 0x20B,
 	XButtonUp = 0x20C,
 	XButtonDBl = 0x20D,
+};
+template <>
+struct magic_enum::customize::enum_range<win_mouseEvents> {
+	static constexpr int min = 0x100;
+	static constexpr int max = 0x20D;
 };
 
 namespace BB {
@@ -962,3 +968,12 @@ namespace ED {
 	};
 	static_assert(sizeof(ED::CGUIScene) == 4 * 4);
 }
+
+
+namespace CppLogic {
+	template<>
+	inline auto GetIdManager<win_mouseEvents>() {
+		return CppLogic::MagicEnum::EnumIdManager<win_mouseEvents>{};
+	}
+}
+

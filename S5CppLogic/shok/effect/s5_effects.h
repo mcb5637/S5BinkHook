@@ -77,6 +77,7 @@ namespace EGL {
 		static void HookOnDestroy();
 
 		// set pos 588BB0 thiscall(pos*)
+		// 58916d weird ctor
 	};
 	static_assert(offsetof(CEffect, StartTurn) == 18 * 4);
 
@@ -243,6 +244,8 @@ namespace GGL {
 		static inline constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x284C6B9D);
 
 		// bug: no OnLoaded override to reset Props!
+
+		// 5173d0 weird hardcoded Logic.Lightning ctor
 	};
 	static_assert(sizeof(CEffectLightning) == 30 * 4);
 	static_assert(offsetof(CEffectLightning, HasSpawnedFire) == 28*4);

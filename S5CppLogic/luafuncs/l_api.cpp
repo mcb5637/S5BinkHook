@@ -324,6 +324,10 @@ namespace CppLogic::API {
 		CppLogic::GetIdManager<shok::AttachmentType>().PushToState(L);
 		L.SetGlobal();
 
+		L.Push("MouseEvents");
+		CppLogic::GetIdManager<win_mouseEvents>().PushToState(L);
+		L.SetGlobal();
+
 		return 0;
 	}
 

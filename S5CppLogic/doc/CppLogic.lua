@@ -1231,7 +1231,7 @@ function CppLogic.API.RuntimeStoreSet(name, value) end
 --- @return string|number|nil value data
 function CppLogic.API.RuntimeStoreGet(name) end
 
---- creates the global tables Animations, TerrainTypes, WaterTypes, ArmorClasses, ExperienceClasses.
+--- creates the global tables Animations, TerrainTypes, WaterTypes, ArmorClasses, ExperienceClasses, NetEvents, AdvancedDealDamageSource, AttachmentTypes, MouseEvents.
 --- data gets read directly from the game, so anything you can use is in there.
 function CppLogic.API.CreateExtraDataTables() end
 

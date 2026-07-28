@@ -92,7 +92,7 @@ bool BB::CFileSystemMgr::CloseHandle(int handle)
 	return file_closehandle(handle);
 }
 
-std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::OpenFileStreamWithSource(const char* path, BB::IStream::Flags f)
+std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::OpenFileStreamWithSource(const char* path, BB::IStream::Flags f, bool openArchive)
 {
 	if (Cache == nullptr && !PathIsAbsolute(path)) { // override seems unused by shok
 		BB::IStream::Flags fnoex = f | BB::IStream::Flags::NoThrow;
@@ -124,6 +124,23 @@ std::pair<std::string_view, std::unique_ptr<BB::IStream>> BB::CFileSystemMgr::Op
 				for (auto* fs : LoadOrder) {
 					if (fs->TryGetFSName() == arch) {
 						auto s = fs->OpenFileStreamUnique(file.c_str(), fnoex);
+						if (s != nullptr) {
+							return { arch, std::move(s) };
+						}
+					}
+				}
+				if (openArchive) {
+					if (arch.ends_with(".bba") || arch.ends_with(".s5x")) {
+						auto a = BB::CBBArchiveFile::CreateUnique();
+						a->OpenArchive(arch.data());
+						auto s = a->OpenFileStreamUnique(file.c_str(), fnoex);
+						if (s != nullptr) {
+							return { arch, std::move(s) };
+						}
+					}
+					else {
+						auto pa = (std::filesystem::path{arch} / file).generic_string();
+						auto s = BB::CFileStream::CreateOpenUnique(pa.c_str(), f);
 						if (s != nullptr) {
 							return { arch, std::move(s) };
 						}
@@ -239,6 +256,10 @@ static inline bool(__thiscall* const filestream_open)(BB::CFileStream* th, const
 bool BB::CFileStream::OpenFile(const char* name, Flags mode)
 {
 	return filestream_open(this, name, mode);
+}
+
+std::unique_ptr<BB::CFileStream> BB::CFileStream::CreateOpenUnique(const char* name, Flags mode) {
+	return std::unique_ptr<CFileStream>{CreateOpen(name, mode)};
 }
 
 BB::CMemoryStream::CMemoryStream()

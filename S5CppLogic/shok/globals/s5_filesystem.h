@@ -98,6 +98,10 @@ namespace BB {
 
 		CFileStream();
 		bool OpenFile(const char* name, Flags mode);
+
+		static inline auto* CreateOpen = reinterpret_cast<CFileStream*(__cdecl*)(const char*, Flags)>(0x550a4a);
+
+		static std::unique_ptr<CFileStream> CreateOpenUnique(const char* name, Flags mode);
 	};
 	class CMemoryStream : public IStream { // read from archives
 		void* Data = nullptr; // 1
@@ -271,7 +275,7 @@ namespace BB {
 		// remove data/ before usage, this func does not do that by itself.
 		bool OpenFileAsHandle(const char* path, int& handle, size_t& size);
 		static bool CloseHandle(int handle);
-		std::pair<std::string_view, std::unique_ptr<BB::IStream>> OpenFileStreamWithSource(const char* path, BB::IStream::Flags f);
+		std::pair<std::string_view, std::unique_ptr<BB::IStream>> OpenFileStreamWithSource(const char* path, BB::IStream::Flags f, bool openArchive = false);
 		std::string MakeAbsoluteWithArchive(const char* path, std::string_view before, std::string_view after);
 
 		static inline BB::CFileSystemMgr** const GlobalObj = reinterpret_cast<BB::CFileSystemMgr**>(0x88F088);
@@ -282,6 +286,8 @@ namespace BB {
 
 		static std::string ReadFileToString(const char* name);
 		static bool DoesFileExist(const char* name);
+
+		using OpenFileStreamWithSourceT = std::pair<std::string_view, std::unique_ptr<BB::IStream>> (BB::CFileSystemMgr::*)(const char* path, BB::IStream::Flags f, bool openArchive);
 
 		// init filesystem 5466E1(const char* lang, int extraNum, 0, bool noBba)
 		// static 545ea1 add archive to global (path, no_exception)

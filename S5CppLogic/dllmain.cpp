@@ -532,6 +532,11 @@ struct DebuggerOrig {
 			auto getsa = reinterpret_cast<bool(__stdcall*)()>(GetProcAddress(debugger, "?DebuggerSupportsSourceArchive@@YG_NXZ"));
 			if (getsa != nullptr) {
 				EScr::CScriptTriggerSystem::FileLoadAddArchive = getsa();
+
+				auto a = reinterpret_cast<void(__stdcall*)(BB::CFileSystemMgr::OpenFileStreamWithSourceT)>(GetProcAddress(debugger, "?SetGetSourceFromArchive@@YGXP8CFileSystemMgr@BB@@AE?AU?$pair@V?$basic_string_view@DU?$char_traits@D@std@@@std@@V?$unique_ptr@VIStream@BB@@U?$default_delete@VIStream@BB@@@std@@@2@@std@@PBDW4Flags@IStream@2@_N@Z@Z"));
+				if (a != nullptr) {
+					a(&BB::CFileSystemMgr::OpenFileStreamWithSource);
+				}
 			}
 		}
 	}

@@ -7,6 +7,10 @@
 #include <shok/globals/s5_filesystem.h>
 #include <utility/EnumIdManagerMagic.h>
 
+namespace Framework {
+	class CMain;
+}
+
 namespace ECore {
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IReplayStreamExtension {
@@ -78,6 +82,8 @@ namespace GS3DTools {
 
 		static inline constexpr int vtp = 0x761D34;
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E7D0);
+
+		// ctor 40305a
 	};
 	static_assert(offsetof(CMapData, MapGUID) == 16 * 4);
 
@@ -88,6 +94,7 @@ namespace GS3DTools {
 
 		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		class CPlayingReplay : public BB::IPostEvent {
+		public:
 			virtual void __stdcall PostEvent(BB::CEvent* ev) override;
 		};
 
@@ -97,7 +104,7 @@ namespace GS3DTools {
 		PADDINGI(2); // 28 double -1
 		PADDINGI(3); // last float 0.001
 		shok::String SomeString; // 33
-		PADDINGI(1);
+		Framework::CMain* Main;
 		PADDINGI(2);
 		CPlayingReplay PlayingReplay; // 43
 
@@ -242,6 +249,8 @@ namespace GDB {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x5070AAC3);
 
 		void RemoveKey(const std::string& k);
+
+		// ctor 40afea
 	};
 }
 
@@ -429,6 +438,7 @@ namespace Framework {
 			MainMenu = 1,
 			Singleplayer = 2,
 			Multiplayer = 3,
+			Error = 4,
 		};
 		enum class NextMode : int {
 			NoChange = 0,
@@ -442,26 +452,35 @@ namespace Framework {
 
 
 		Mode CurrentMode; // 1 mainmenu, 2 ingame (sp?)
-		GS3DTools::CMapData CurrentMap; // 4
+		struct DataT {
+			GS3DTools::CMapData CurrentMap; // 4  some subobject starts here, at least up to language
+			PADDINGI(1);
+			GS3DTools::CGUIReplaySystem ReplaySystem; // 28
+			CMain* Main;
+			PADDINGI(3);
+			shok::String ReplayToLoad; // 76 from commandline, not sure if it does anything
+			shok::String GUIReplay; // 83 from commandline, not sure it does anything
+			shok::String SavegameToLoad; // 90
+			shok::String SaveAfterXSeconds; // 97 from commandline, not sure it does anything
+			PADDINGI(2);
+			bool UseExeDir, MP, GrabScreenshots; // 106 from commandline, not sure if they do anything
+			PADDINGI(1);
+			double Tickrate; // 108
+			bool HideGUI, RecordGUI; // 110
+			shok::String Language; // 111
+			shok::String OldGameVersion; // 118 unused, SHOKPC1.05
+			shok::String UbiComGameName; // 125
+			shok::String SoundtrackLanguage; // 132
+			int ExtraCmdOnly; // 139
+			bool DebugScript;
+			PADDING(3);
+			PADDINGI(1);
+
+			// ctor 40976a
+		};
+
+		DataT Data;
 		PADDINGI(1);
-		GS3DTools::CGUIReplaySystem ReplaySystem; // 28
-		PADDINGI(4);
-		shok::String ReplayToLoad; // 76 from commandline, not sure if it does anything
-		shok::String GUIReplay; // 83 from commandline, not sure it does anything
-		shok::String SavegameToLoad; // 90
-		shok::String SaveAfterXSeconds; // 97 from commandline, not sure it does anything
-		PADDINGI(2);
-		bool UseExeDir, MP, GrabScreenshots; // 106 from commandline, not sure if they do anything
-		PADDINGI(1);
-		double Tickrate; // 108
-		bool HideGUI, RecordGUI; // 110
-		shok::String Language; // 111
-		shok::String OldGameVersion; // 118 unused, SHOKPC1.05
-		shok::String UbiComGameName; // 125
-		shok::String SoundtrackLanguage; // 132
-		int ExtraCmdOnly; // 139
-		bool DebugScript;
-		PADDINGI(2);
 		CLuaDebuggerPort* LuaDebuggerPort;
 		lua_State* MainmenuState; // 144
 		bool MainmenuInitialized; // just call to reinit instead of init, lua scripts are loaded from winmain
@@ -491,11 +510,16 @@ namespace Framework {
 				OverrideSizeWindowed(r.left, r.top, r.right - r.left, r.bottom - r.top, borderless);
 			}
 			void OverrideSizeBorderlessFullscreen(std::string_view screen);
+
+			// ctor 4073a0
 		} WindowData; // 160
 		AGameModeBase* GameModeBase; // 169
 		PADDINGI(1);
 		NextMode ToDo; // 171
-		PADDINGI(2);
+		PADDINGI(1);
+		PADDING(1);
+		bool UnknownBool;
+		PADDING(2);
 		struct CIH {
 			shok::Vector<ActualCampagnInfo> Campagns; // access with -1 + name
 			CampagnInfo Infos[4];
@@ -508,6 +532,8 @@ namespace Framework {
 			// load campagns 51A11A __thiscall(path, shok::Vector<int>* Keys)
 
 			// 51915a fill path to mapfolder (GS3DTools::CMapData*, shok::String*)
+
+			// ctor 40b792
 		} CampagnInfoHandler;
 		struct SUserPaths {
 			shok::String SaveGames, // 0
@@ -526,9 +552,22 @@ namespace Framework {
 		}*UserPaths;
 		GDB::CList GDB; // 227
 
+		struct UnknownDialog {
+			HWND Handle{};
+			PADDINGI(1);
+
+			// ctor 407219
+			// dialog func 4071bc
+		} Dialog;
+
+		PADDINGI(1);
+
 		static inline constexpr int vtp = 0x76293C;
 
 		// parse cmd args 0x4082F3 uknownObj->__thiscall(const char* str, void* CMainp4)
+		// fill current dir 54e936(char*, size)
+
+		// ctor 40b968
 
 		void SaveGDB();
 		ED::CGUICamera* GetCamera(); // gets mainmenu or ingame camera
@@ -552,11 +591,13 @@ namespace Framework {
 	static_assert(offsetof(Framework::CMain, GDB) == 227 * 4);
 	static_assert(offsetof(Framework::CMain, ToDo) == 171 * 4);
 	static_assert(offsetof(Framework::CMain, GameModeBase) == 169 * 4);
-	static_assert(offsetof(Framework::CMain, SavegameToLoad) == 90 * 4);
+	static_assert(offsetof(Framework::CMain, Data.SavegameToLoad) == 90 * 4);
 	static_assert(offsetof(Framework::CMain, GluePropsManager) == 150 * 4);
 	static_assert(offsetof(Framework::CMain, CampagnInfoHandler) == 174 * 4);
+	static_assert(offsetof(Framework::CMain, MainmenuState) == 144 * 4);
 	static_assert(sizeof(Framework::CMain::SWindowData) == 4 * 9);
 	static_assert(sizeof(Framework::CMain::SUserPaths) == 133 * 4);
+	static_assert(sizeof(Framework::CMain) == 0x3a8);
 	//constexpr int i = sizeof(Framework::CMain::SUserPaths) / 4;
 	//constexpr int i = offsetof(Framework::CMain, ReplayToLoad) / 4;
 
@@ -570,6 +611,8 @@ namespace Framework {
 
 		// 408855 ctor
 	};
+
+	// 54c2af get registry key (int)  0=>HKEY_LOCAL_MACHINE  1/2=>HKEY_CURRENT_USER, _=>0
 }
 
 namespace CppLogic {

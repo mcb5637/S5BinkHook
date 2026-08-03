@@ -57,6 +57,10 @@ shok::String& shok::String::append(String& toappend)
 {
 	return *str_append2(this, &toappend);
 }
+shok::String& shok::String::append(std::string_view toappend) {
+	auto* f = reinterpret_cast<String*(__thiscall*)(String*, const char*, size_t)>(0x405ad2);
+	return *f(this, toappend.data(), toappend.size());
+}
 inline void(__thiscall* const str_resize)(shok::String* th, size_t l, char c) = reinterpret_cast<void(__thiscall*)(shok::String*, size_t, char)>(0x5540BA);
 void shok::String::resize(size_t len, char c)
 {

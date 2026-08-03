@@ -493,6 +493,7 @@ void EGUIX::CContainerWidget::AddWidgetExistingName(EGUIX::CBaseWidget* toAdd, c
 
 EGUIX::CBaseWidget* EGUIX::CContainerWidget::CloneAsChild(EGUIX::CBaseWidget* toClone, const std::function<std::string(const char* n, EGUIX::CBaseWidget* oldWid)>& nameGen, EGUIX::CBaseWidget* before)
 {
+	EScr::CLuaFuncRefCommand::HookCopyAssignOperator();
     auto* mng = EGUIX::WidgetManager::GlobalObj();
     EGUIX::CBaseWidget* w;
     auto* cont = dynamic_cast<EGUIX::CContainerWidget*>(toClone);

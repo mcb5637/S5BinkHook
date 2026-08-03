@@ -22,7 +22,8 @@ namespace shok {
 
 	static inline void(_stdcall* const SetHighPrecFPU)() = reinterpret_cast<void(_stdcall*)()>(0x5C8451);
 
-	static inline int(__stdcall* const LoadBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = reinterpret_cast<int(__stdcall*)(lua_State*, const char*, size_t, const char*)>(0x59BE57);
+	static inline int(__stdcall* const DoBuffer)(lua_State* L, const char* buff, size_t bufflen, const char* name) = reinterpret_cast<int(__stdcall*)(lua_State*, const char*, size_t, const char*)>(0x59BE57);
+	// 59c100 same without len param
 
 	static inline float(__stdcall* const GetCurrentTimeFloat)() = reinterpret_cast<float(__stdcall*)()>(0x548B64);
 

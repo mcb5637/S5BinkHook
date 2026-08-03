@@ -211,7 +211,7 @@ ModLoader.ManifestType = {
 			if t.ObjectMerge then
 				---@type ManifestMergeOperation[]
 				local merges = into[t.ObjectMerge]
-				for _, id in from[t.Key] do
+				for _, id in pairs(from[t.Key]) do
 					for _, merge in ipairs(merges) do
 						if not merge.DoNotRemoveOnOverride then
 							for i=table.getn(merge.AppliesTo),1,-1 do

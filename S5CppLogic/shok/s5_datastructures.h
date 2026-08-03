@@ -645,6 +645,7 @@ namespace shok {
 		void assign(const char* s, size_t len);
 		String& append(String& toappend, size_t pos, size_t count = std::string::npos);
 		String& append(String& toappend);
+		String& append(std::string_view toappend);
 		void resize(size_t len, char c = '\0');
 		[[nodiscard]] const char* c_str() const;
 		[[nodiscard]] size_t size() const;
@@ -657,6 +658,9 @@ namespace shok {
 		String& operator=(const std::string_view& s);
 		String& operator=(const char* s);
 		operator std::string_view() const;
+
+		// tidy 40142d
+		// ctor empty 4015ed
 	};
 	static_assert(sizeof(String) == 7 * 4);
 	std::strong_ordering operator<=>(const String& a, std::string_view b);

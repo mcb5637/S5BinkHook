@@ -230,14 +230,39 @@ void EScr::CLuaFuncRef::SetState(luaext::State l)
 void EScr::CLuaFuncRefCommand::ReplaceFunc(luaext::State L, int idx)
 {
 	StateAddon::HookSetAllRecompile();
-	CheckRef();
-	Clear();
 	SetState(L);
+	if (Ref != luaext::State::NoRef.Value())
+		throw std::logic_error("replace func ref not empty?");
 	L.CheckType(idx, lua::LType::Function);
 	L.PushValue(idx);
 	Ref = L.Ref(luaext::State::RegistryIndex).Value();
 	NeedsCompile = false;
 	LuaCommand = std::string_view("");
+}
+
+void EScr::CLuaFuncRefCommand::HookCopyAssignOperator() {
+	static bool Hooked = false;
+	if (Hooked)
+		return;
+	Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp {reinterpret_cast<void*>(0x55e195), 0x10};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55e195), CppLogic::Hooks::MemberFuncPointerToVoid(&CLuaFuncRefCommand::CopyAssignOperatorOverride, 0), reinterpret_cast<void*>(0x55e19b));
+}
+
+EScr::CLuaFuncRefCommand* EScr::CLuaFuncRefCommand::CopyAssignOperatorOverride(CLuaFuncRefCommand* other) {
+	SetState(other->L);
+	if (other->Ref >= 0) {
+		NeedsCompile = false;
+		L.Push(luaext::Reference{other->Ref});
+		Ref = L.Ref(luaext::State::RegistryIndex).Value();
+	}
+	else {
+		Ref = luaext::State::NoRef.Value();
+		NeedsCompile = true;
+	}
+	Unknown = other->Unknown;
+	LuaCommand = other->LuaCommand;
+	return this;
 }
 
 int __stdcall EScr::CLuaFuncRefGlobal::GetRefToFunc()

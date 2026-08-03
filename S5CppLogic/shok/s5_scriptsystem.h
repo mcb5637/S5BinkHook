@@ -86,8 +86,10 @@ namespace EScr {
 	class CLuaFuncRefCommand : public CLuaFuncRef {
 	public:
 		shok::String LuaCommand; // 4 - 10
-		PADDINGI(1); // 11
+	private:
+		int Unknown = 0; // 11
 
+	public:
 		virtual int __stdcall GetRefToFunc() override;
 		void SetCommandString(const char* c);
 
@@ -97,6 +99,11 @@ namespace EScr {
 		static inline constexpr int TypeDesc = 0x83B83C;
 
 		// ctor 5a195c
+		// copy assign 55e195 buggy
+
+		static void HookCopyAssignOperator();
+	private:
+		CLuaFuncRefCommand* CopyAssignOperatorOverride(CLuaFuncRefCommand* other);
 	};
 	static_assert(sizeof(EScr::CLuaFuncRefCommand) == 12 * 4);
 
@@ -198,6 +205,7 @@ namespace EScr {
 		shok::List<CLuaFuncRef*> RegisteredRefs;
 
 		// ctor 0x5A282C, dtor 0x59D39F
+		// get RegisteredRefs 5a15c6
 
 		static inline StateAddon* (__stdcall* const Get)(lua_State* L) = reinterpret_cast<StateAddon* (__stdcall*)(lua_State*)>(0x59B1A3);
 		static inline void(__stdcall* const Set)(lua_State* L, StateAddon* a) = reinterpret_cast<void(__stdcall*)(lua_State*, StateAddon*)>(0x5A21FC);

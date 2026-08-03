@@ -1508,6 +1508,46 @@ namespace CppLogic::UI {
 		return {n, id};
 	}
 
+	static void Check(std::map<int, shok::WidgetId>& refs, EGUIX::CBaseWidget* w, luaext::State L) {
+		if (auto* cont = BB::IdentifierCast<EGUIX::CContainerWidget>(w)) {
+			for (auto* c : cont->WidgetListHandler.SubWidgets)
+				Check(refs, c, L);
+			return;
+		}
+		auto idm = CppLogic::GetIdManager<shok::WidgetId>();
+		auto ref = [&](int r, std::string_view v) {
+			if (r < 0)
+				return;
+			auto it = refs.find(r);
+			if (it != refs.end()) {
+				L.Push(idm.GetNameByID(w->WidgetID));
+				L.Push(v);
+				L.Concat(2);
+				L.Push(idm.GetNameByID(it->second));
+				L.SetTableRaw(-3);
+			}
+			else {
+				refs.emplace(r, w->WidgetID);
+			}
+		};
+		if (auto* up = w->GetUpdateFunc()) {
+			ref(up->FuncRefCommand.Ref, " update");
+		}
+		if (auto* tt = w->GetTooltipHelper()) {
+			ref(tt->UpdateFunction.FuncRefCommand.Ref, " tooltip");
+		}
+		if (auto* ac = w->GetButtonHelper()) {
+			ref(ac->ActionFunction.FuncRefCommand.Ref, " action");
+		}
+	}
+	int SearchMultiRefs(luaext::State L) {
+		auto* w = L.CheckWidget(1);
+		std::map<int, shok::WidgetId> refs{};
+		L.NewTable();
+		Check(refs, w, L);
+		return 1;
+	}
+
 	int CreateSelectionDecal(luaext::State L) {
 
 		auto t = L.CheckEnum<shok::SelectionTextureId>(1);
@@ -2034,6 +2074,9 @@ namespace CppLogic::UI {
 		luaext::FuncReference::GetRef<OverrideSelectablePlayers>("OverrideSelectablePlayers"),
 		luaext::FuncReference::GetRef<SetFeedbackEventCallback>("SetFeedbackEventCallback"),
 		luaext::FuncReference::GetRef<GetWidgetType>("GetWidgetType"),
+#ifdef DEBUG_FUNCS
+		luaext::FuncReference::GetRef<SearchMultiRefs>("SearchMultiRefs"),
+#endif
 	};
 
 	void CheckConstruct(EGL::CNetEvent2Entities& ev) {

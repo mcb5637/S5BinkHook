@@ -25,452 +25,454 @@
 #include <utility/savegame_extra.h>
 
 namespace CppLogic::API {
-	void CheckEvalEnabled(luaext::State L) {
-		if (CppLogic::HasSCELoader())
-			throw lua::LuaException{ "Loading lua code disabled for Kimichura" };
-	}
-
-	bool IsExternalmap(const char* s) {
-		std::string_view str{ s };
-		return str.rfind(R"(data\maps\externalmap\)", 0) != std::string_view::npos;
-	}
-
-	int Eval(luaext::State L) {
-		CheckEvalEnabled(L);
-		size_t strlen = 0;
-		const char* s = L.CheckString(1, &strlen);
-		lua::ErrorCode r = L.LoadBuffer(s, strlen, "Eval");
-		L.Push(r == lua::ErrorCode::Success);
-		return 2;
-	}
-
-	int Log(luaext::State L) {
-		const char* s = L.CheckString(1);
-		shok::LogString("%s\n", s);
-		return 0;
-	}
-
-	int StackTrace(luaext::State L) {
-		L.Push(L.GenerateStackTrace(L.OptInt(1, 0), L.OptInt(2, -1), L.OptBool(3, false), L.OptBool(4, false)));
-		return 1;
-	}
-
-	int GetFuncDebug(luaext::State L) {
-		if (!L.IsFunction(1))
-			throw lua::LuaException("no func");
-		L.PushValue(1);
-		lua::DebugInfo ar = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Source | lua::DebugInfoOptions::Name | lua::DebugInfoOptions::Line | lua::DebugInfoOptions::Upvalues);
-
-		L.NewTable();
-		L.Push("name");
-		L.Push(ar.Name);
-		L.SetTableRaw(-3);
-		L.Push("namewhat");
-		L.Push(ar.NameWhat);
-		L.SetTableRaw(-3);
-		L.Push("nups");
-		L.Push(ar.NumUpvalues);
-		L.SetTableRaw(-3);
-		L.Push("short_src");
-		L.Push(ar.ShortSrc);
-		L.SetTableRaw(-3);
-		L.Push("linedefined");
-		L.Push(ar.LineDefined);
-		L.SetTableRaw(-3);
-		L.Push("what");
-		L.Push(ar.What);
-		L.SetTableRaw(-3);
-		return 1;
-	}
-
-	int ReadFileAsString(luaext::State L) {
-		const char* s = L.CheckString(1);
-#ifndef DEBUG_FUNCS
-		if (!IsExternalmap(s))
-			throw lua::LuaException{ "not a map file" };
-#endif
-		auto data = BB::CFileSystemMgr::ReadFileToString(s);
-		L.Push(data);
-		return 1;
-	}
-
-	int GetFilesInDirectory(luaext::State L) {
-		shok::Set<shok::String> m{};
-		(*BB::CFileSystemMgr::GlobalObj)->FillFilesInDirectory(&m, L.CheckString(1), BB::IFileSystem::SearchOptions::SkipDirectories);
-		L.NewTable();
-		int i = 1;
-		for (const auto& f : m) {
-			L.Push(f);
-			L.SetTableRaw(-2, i);
-			++i;
-		}
-		return 1;
-	}
-
-	int LDoesFileExist(luaext::State L) {
-		const char* s = L.CheckString(1);
-		L.Push(BB::CFileSystemMgr::DoesFileExist(s));
-		return 1;
-	}
-
-	std::string MakeAbsoluteWithArchive(std::string_view path, std::optional<std::string_view> after, std::optional<std::string_view> before) {
-		return (*BB::CFileSystemMgr::GlobalObj)->MakeAbsoluteWithArchive(path.data(), before.value_or(""), after.value_or(""));
-	}
-
-	std::string_view GetDefaultLoadOrderTop() {
-		return BB::CFileSystemMgr::LoadorderTop->TryGetFSName();
-	}
-
-	int DoString(luaext::State L) {
-		CheckEvalEnabled(L);
-		size_t strlen = 0;
-		const char* s = L.CheckString(1, &strlen);
-		const char* na = L.CheckString(2);
-		L.Push(static_cast<int>(L.DoString(s, strlen, na)));
-		return L.GetTop() - 2;
-	}
-
-	int MapGetDataPath(luaext::State L) {
-		const char* n = L.CheckString(1);
-		auto ty = L.CheckEnum<shok::MapType>(2);
-		const char* cn = L.OptString(3, nullptr); // optional
-		bool nt = L.OptBool(4, false);
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
-		if (ci == nullptr) {
-			if (nt) {
-				L.Push("");
-				L.Push("");
-				L.NewTable();
-				L.Push("invalid map type/campagn");
-				return 4;
-			}
-			else {
-				throw lua::LuaException("invalid map type/campagn");
-			}
-		}
-		Framework::MapInfo* i = ci->GetMapInfoByName(n);
-		if (i == nullptr) {
-			if (nt) {
-				L.Push("");
-				L.Push("");
-				L.NewTable();
-				L.Push("invalid map");
-				return 4;
-			}
-			else {
-				throw lua::LuaException("invalid");
-			}
-		}
-		L.Push(i->MapFilePath.c_str());
-		L.Push(i->GUID.Data.c_str());
-		L.NewTable();
-		int j = 1;
-		for (int k : i->Keys.Keys) {
-			L.Push(k);
-			L.SetTableRaw(-2, j);
-			++j;
-		}
-		return 3;
-	}
-
-	int SaveGetMapInfo(luaext::State L) {
-		const char* save = L.CheckString(1);
-		bool nt = L.OptBool(2, false);
-		Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
-		if (!sdata->LoadSaveData(save)) {
-			if (nt) {
-				L.Push("");
-				L.Push(0);
-				L.Push("");
-				L.Push("");
-				L.Push(false);
-				return 5;
-			}
-			else {
-				throw lua::LuaException("save doesnt exist");
-			}
-		}
-		L.Push(sdata->CurrentSave->MapData.MapName.c_str());
-		L.Push(static_cast<int>(sdata->CurrentSave->MapData.MapType));
-		L.Push(sdata->CurrentSave->MapData.MapCampagnName.c_str());
-		L.Push(sdata->CurrentSave->MapData.MapGUID.c_str());
-		L.Push(true);
-		return 5;
-	}
-
-	void PushGDBList(luaext::State L, const GDB::CList& list) {
-		L.NewTable();
-		for (const auto& e : list.Entries) {
-			L.Push(e.first.c_str());
-			if (const auto* s = dynamic_cast<const GDB::CString*>(e.second))
-				L.Push(s->Data.c_str());
-			else if (const auto* v = dynamic_cast<const GDB::CValue*>(e.second))
-				L.Push(v->Data);
-			else if (const auto* l = dynamic_cast<const GDB::CList*>(e.second)) {
-				L.CheckStack(4, "stackoverflow");
-				PushGDBList(L, *l);
-			}
-			else
-				L.Push(true);
-			L.SetTableRaw(-3);
-		}
-	}
-
-	int GetGDB(luaext::State L) {
-		PushGDBList(L, (*Framework::CMain::GlobalObj)->GDB);
-		return 1;
-	}
-
-	int RemoveGDBKey(luaext::State L) {
-		std::string k = L.CheckStdString(1);
-		(*Framework::CMain::GlobalObj)->GDB.RemoveKey(k);
-		return 0;
-	}
-
-	void GetRuntimeStore() {
-		luaext::State mm{ shok::LuaStateMainmenu };
-		mm.PushLightUserdata(&GetRuntimeStore);
-		mm.GetTableRaw(mm.RegistryIndex);
-		if (mm.IsNil(-1)) {
-			mm.NewTable();
-			mm.PushLightUserdata(&GetRuntimeStore);
-			mm.PushValue(-2);
-			mm.SetTableRaw(mm.RegistryIndex);
-		}
-	}
-	int RuntimeStoreSet(luaext::State L) {
-		luaext::State mm{ shok::LuaStateMainmenu };
-		int t = mm.GetTop();
-		auto key = L.CheckStringView(1);
-
-		GetRuntimeStore();
-		mm.Push(key);
-
-		if (L.IsNoneOrNil(2)) {
-			mm.Push();
-		}
-		else {
-			BB::CMemoryStream st{};
-			Serializer::AdvLuaStateSerializer<true> seri{st, L.GetState()};
-			seri.SerializeVariable(2);
-
-			mm.Push(st.GetData());
+	namespace {
+		void CheckEvalEnabled(luaext::State L) {
+			if (CppLogic::HasSCELoader())
+				throw lua::LuaException{ "Loading lua code disabled for Kimichura" };
 		}
 
-		mm.SetTableRaw(-3);
+		bool IsExternalmap(const char* s) {
+			std::string_view str{ s };
+			return str.rfind(R"(data\maps\externalmap\)", 0) != std::string_view::npos;
+		}
 
-		if (mm.GetState() != L.GetState())
-			mm.SetTop(t);
-		return 0;
-	}
-	int RuntimeStoreGet(luaext::State L) {
-		luaext::State mm{ shok::LuaStateMainmenu };
-		int t = mm.GetTop();
+		int Eval(luaext::State L) {
+			CheckEvalEnabled(L);
+			size_t strlen = 0;
+			const char* s = L.CheckString(1, &strlen);
+			lua::ErrorCode r = L.LoadBuffer(s, strlen, "Eval");
+			L.Push(r == lua::ErrorCode::Success);
+			return 2;
+		}
 
-		auto s = L.CheckStringView(1);
-		GetRuntimeStore();
-		mm.Push(s);
-		mm.GetTableRaw(-2);
+		int Log(luaext::State L) {
+			const char* s = L.CheckString(1);
+			shok::LogString("%s\n", s);
+			return 0;
+		}
 
-		if (mm.IsNoneOrNil(-1)) {
-			if (mm.GetState() != L.GetState())
-				mm.SetTop(t);
-			L.Push();
+		int StackTrace(luaext::State L) {
+			L.Push(L.GenerateStackTrace(L.OptInt(1, 0), L.OptInt(2, -1), L.OptBool(3, false), L.OptBool(4, false)));
 			return 1;
 		}
 
-		IO::StringViewReadStream st {mm.CheckStringView(-1)};
-		Serializer::AdvLuaStateSerializer<true> seri{st, L.GetState()};
-		seri.DeserializeVariable();
+		int GetFuncDebug(luaext::State L) {
+			if (!L.IsFunction(1))
+				throw lua::LuaException("no func");
+			L.PushValue(1);
+			lua::DebugInfo ar = L.Debug_GetInfoForFunc(lua::DebugInfoOptions::Source | lua::DebugInfoOptions::Name | lua::DebugInfoOptions::Line | lua::DebugInfoOptions::Upvalues);
 
-		if (mm.GetState() != L.GetState())
-			mm.SetTop(t);
-		return 1;
-	}
-
-	int CreateExtraDataTables(luaext::State L) {
-		(*BB::CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L.GetState(), "Animations");
-		(*BB::CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "TerrainTypes");
-		(*BB::CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "WaterTypes");
-		(*BB::CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L.GetState(), "ArmorClasses");
-
-		{
-			L.Push("ExperienceClasses");
 			L.NewTable();
-
-			L.Push("Invalid");
-			L.Push(static_cast<int>(shok::ExperienceClass::Invalid));
+			L.Push("name");
+			L.Push(ar.Name);
 			L.SetTableRaw(-3);
+			L.Push("namewhat");
+			L.Push(ar.NameWhat);
+			L.SetTableRaw(-3);
+			L.Push("nups");
+			L.Push(ar.NumUpvalues);
+			L.SetTableRaw(-3);
+			L.Push("short_src");
+			L.Push(ar.ShortSrc);
+			L.SetTableRaw(-3);
+			L.Push("linedefined");
+			L.Push(ar.LineDefined);
+			L.SetTableRaw(-3);
+			L.Push("what");
+			L.Push(ar.What);
+			L.SetTableRaw(-3);
+			return 1;
+		}
 
-			auto* mng = GGL::ExperienceClassHolder::GlobalObj();
-			for (int i = 0; i < static_cast<int>(mng->Classes.size()); ++i) {
-				L.Push(mng->Classes[i]->Table.c_str());
-				L.Push(i);
+		int ReadFileAsString(luaext::State L) {
+			const char* s = L.CheckString(1);
+#ifndef DEBUG_FUNCS
+			if (!IsExternalmap(s))
+				throw lua::LuaException{ "not a map file" };
+#endif
+			auto data = BB::CFileSystemMgr::ReadFileToString(s);
+			L.Push(data);
+			return 1;
+		}
+
+		int GetFilesInDirectory(luaext::State L) {
+			shok::Set<shok::String> m{};
+			(*BB::CFileSystemMgr::GlobalObj)->FillFilesInDirectory(&m, L.CheckString(1), BB::IFileSystem::SearchOptions::SkipDirectories);
+			L.NewTable();
+			int i = 1;
+			for (const auto& f : m) {
+				L.Push(f);
+				L.SetTableRaw(-2, i);
+				++i;
+			}
+			return 1;
+		}
+
+		int LDoesFileExist(luaext::State L) {
+			const char* s = L.CheckString(1);
+			L.Push(BB::CFileSystemMgr::DoesFileExist(s));
+			return 1;
+		}
+
+		std::string MakeAbsoluteWithArchive(std::string_view path, std::optional<std::string_view> after, std::optional<std::string_view> before) {
+			return (*BB::CFileSystemMgr::GlobalObj)->MakeAbsoluteWithArchive(path.data(), before.value_or(""), after.value_or(""));
+		}
+
+		std::string_view GetDefaultLoadOrderTop() {
+			return BB::CFileSystemMgr::LoadorderTop->TryGetFSName();
+		}
+
+		int DoString(luaext::State L) {
+			CheckEvalEnabled(L);
+			size_t strlen = 0;
+			const char* s = L.CheckString(1, &strlen);
+			const char* na = L.CheckString(2);
+			L.Push(static_cast<int>(L.DoString(s, strlen, na)));
+			return L.GetTop() - 2;
+		}
+
+		int MapGetDataPath(luaext::State L) {
+			const char* n = L.CheckString(1);
+			auto ty = L.CheckEnum<shok::MapType>(2);
+			const char* cn = L.OptString(3, nullptr); // optional
+			bool nt = L.OptBool(4, false);
+			Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
+			if (ci == nullptr) {
+				if (nt) {
+					L.Push("");
+					L.Push("");
+					L.NewTable();
+					L.Push("invalid map type/campagn");
+					return 4;
+				}
+				else {
+					throw lua::LuaException("invalid map type/campagn");
+				}
+			}
+			Framework::MapInfo* i = ci->GetMapInfoByName(n);
+			if (i == nullptr) {
+				if (nt) {
+					L.Push("");
+					L.Push("");
+					L.NewTable();
+					L.Push("invalid map");
+					return 4;
+				}
+				else {
+					throw lua::LuaException("invalid");
+				}
+			}
+			L.Push(i->MapFilePath.c_str());
+			L.Push(i->GUID.Data.c_str());
+			L.NewTable();
+			int j = 1;
+			for (int k : i->Keys.Keys) {
+				L.Push(k);
+				L.SetTableRaw(-2, j);
+				++j;
+			}
+			return 3;
+		}
+
+		int SaveGetMapInfo(luaext::State L) {
+			const char* save = L.CheckString(1);
+			bool nt = L.OptBool(2, false);
+			Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
+			if (!sdata->LoadSaveData(save)) {
+				if (nt) {
+					L.Push("");
+					L.Push(0);
+					L.Push("");
+					L.Push("");
+					L.Push(false);
+					return 5;
+				}
+				else {
+					throw lua::LuaException("save doesnt exist");
+				}
+			}
+			L.Push(sdata->CurrentSave->MapData.MapName.c_str());
+			L.Push(static_cast<int>(sdata->CurrentSave->MapData.MapType));
+			L.Push(sdata->CurrentSave->MapData.MapCampagnName.c_str());
+			L.Push(sdata->CurrentSave->MapData.MapGUID.c_str());
+			L.Push(true);
+			return 5;
+		}
+
+		void PushGDBList(luaext::State L, const GDB::CList& list) {
+			L.NewTable();
+			for (const auto& e : list.Entries) {
+				L.Push(e.first.c_str());
+				if (const auto* s = dynamic_cast<const GDB::CString*>(e.second))
+					L.Push(s->Data.c_str());
+				else if (const auto* v = dynamic_cast<const GDB::CValue*>(e.second))
+					L.Push(v->Data);
+				else if (const auto* l = dynamic_cast<const GDB::CList*>(e.second)) {
+					L.CheckStack(4, "stackoverflow");
+					PushGDBList(L, *l);
+				}
+				else
+					L.Push(true);
 				L.SetTableRaw(-3);
 			}
-
-			L.SetGlobal();
 		}
 
-		L.Push("NetEvents");
-		CppLogic::GetIdManager<shok::NetEventIds>().PushToState(L);
-		L.SetGlobal();
-
-		L.Push("AdvancedDealDamageSource");
-		CppLogic::GetIdManager<shok::AdvancedDealDamageSource>().PushToState(L);
-		L.SetGlobal();
-
-		L.Push("AttachmentTypes");
-		CppLogic::GetIdManager<shok::AttachmentType>().PushToState(L);
-		L.SetGlobal();
-
-		L.Push("MouseEvents");
-		CppLogic::GetIdManager<win_mouseEvents>().PushToState(L);
-		L.SetGlobal();
-
-		return 0;
-	}
-
-	std::filesystem::path GetPersistentMapFilesDir() {
-		std::filesystem::path p{ Framework::SavegameSystem::GlobalObj()->SaveDir };
-		p.replace_filename("PersistentMapFiles");
-		return p;
-	}
-	void AppendPersistendMapFileName(luaext::State L, std::filesystem::path& p, int indexoff) {
-		const char* n = L.CheckString(1 + indexoff);
-		auto ty = L.CheckEnum<shok::MapType>(2 + indexoff);
-		const char* cn = L.OptString(3 + indexoff, nullptr); // optional
-		Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
-		if (!ci)
-			throw lua::LuaException("invalid map type/campagn");
-		Framework::MapInfo* i = ci->GetMapInfoByName(n);
-		if (!i)
-			throw lua::LuaException("invalid map");
-		p.append(i->GUID.Data.c_str()).replace_extension("bin");
-	}
-
-	int SavePersistentMapFile(luaext::State L) {
-		std::filesystem::path p = GetPersistentMapFilesDir();
-		AppendPersistendMapFileName(L, p, 1);
-		auto path = p.string();
-
-		try {
-			BB::CFileStreamEx fs{};
-			if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultWrite))
-				throw lua::LuaException{ "cannot open file" };
-			CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ fs, L.GetState() };
-			seri.SerializeVariable(1);
-			fs.Close();
-		}
-		catch (const BB::CFileException& ex) {
-			char buff[255]{};
-			ex.CopyMessage(buff, 254);
-			throw lua::LuaException{ buff };
+		int GetGDB(luaext::State L) {
+			PushGDBList(L, (*Framework::CMain::GlobalObj)->GDB);
+			return 1;
 		}
 
-		L.Push(path);
-		return 1;
-	}
-	int LoadPersistentMapFile(luaext::State L) {
-		std::filesystem::path p = GetPersistentMapFilesDir();
-		AppendPersistendMapFileName(L, p, 0);
-		auto path = p.string();
-
-		try {
-			BB::CFileStreamEx fs{};
-			if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultRead))
-				throw lua::LuaException{ "cannot open file" };
-			CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ fs, L.GetState() };
-			seri.DeserializeVariable();
-			fs.Close();
-		}
-		catch (const BB::CFileException& ex) {
-			char buff[255]{};
-			ex.CopyMessage(buff, 254);
-			throw lua::LuaException{ buff };
+		int RemoveGDBKey(luaext::State L) {
+			std::string k = L.CheckStdString(1);
+			(*Framework::CMain::GlobalObj)->GDB.RemoveKey(k);
+			return 0;
 		}
 
-		return 1;
-	}
-	int HasPersistentMapFile(luaext::State L) {
-		std::filesystem::path p = GetPersistentMapFilesDir();
-		AppendPersistendMapFileName(L, p, 0);
-
-		bool direxists = std::filesystem::exists(p) && std::filesystem::is_directory(p);
-
-		L.Push(std::filesystem::exists(p) && std::filesystem::is_regular_file(p));
-		L.Push(direxists);
-		return 2;
-	}
-
-	DWORD MainThreadID = 0;
-	int GetMainThreadID(luaext::State L) {
-		L.Push(MainThreadID);
-		return 1;
-	}
-	int GetCurrentThreadID(luaext::State L) {
-		L.Push(static_cast<int>(GetCurrentThreadId()));
-		return 1;
-	}
-
-	int LGetCurrentTime(luaext::State L) {
-		L.Push(static_cast<double>(std::time(nullptr)));
-		return 1;
-	}
-
-	int GetCurrentCutscene(luaext::State L) {
-		L.Push((**ECS::CManager::GlobalObj)->ActiveCutscene.c_str());
-		return 1;
-	}
-
-	int EnableScriptTriggerEval(luaext::State L) {
-		bool a = L.CheckBool(1);
-		EScr::CLuaFuncRefGlobal::HookFuncAccess(a);
-		CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ScriptTriggerEval = a;
-		return 0;
-	}
-
-	int ReloadExternalmaps(luaext::State L) {
-		auto* m = *Framework::CMain::GlobalObj;
-		if (m->CurrentMode != Framework::CMain::Mode::MainMenu)
-			throw lua::LuaException{"not in mainmenu"};
-		m->CampagnInfoHandler.Infos[3].LoadOverride("maps\\user", &m->CampagnInfoHandler.Keys);
-		return 0;
-	}
-
-	int GetMonitors(luaext::State L) {
-		L.NewTable();
-		struct D {
-			luaext::State L;
-			int i = 1;
-		};
-		D d{ L };
-
-		EnumDisplayMonitors(nullptr, nullptr, [](HMONITOR m, HDC, LPRECT r, LPARAM vd) -> BOOL {
-			D* d = reinterpret_cast<D*>(vd);
-			MONITORINFOEX mi{};
-			mi.cbSize = sizeof(MONITORINFOEX);
-			if (GetMonitorInfo(m, &mi)) {
-				d->L.NewTable();
-
-				d->L.Push("Name");
-				d->L.Push(mi.szDevice);
-				d->L.SetTableRaw(-3);
-				d->L.Push("H");
-				d->L.Push(static_cast<int>(r->bottom - r->top));
-				d->L.SetTableRaw(-3);
-				d->L.Push("W");
-				d->L.Push(static_cast<int>(r->right - r->left));
-				d->L.SetTableRaw(-3);
-
-
-				d->L.SetTableRaw(-2, d->i);
-				++d->i;
+		void GetRuntimeStore() {
+			luaext::State mm{ shok::LuaStateMainmenu };
+			mm.PushLightUserdata(&GetRuntimeStore);
+			mm.GetTableRaw(mm.RegistryIndex);
+			if (mm.IsNil(-1)) {
+				mm.NewTable();
+				mm.PushLightUserdata(&GetRuntimeStore);
+				mm.PushValue(-2);
+				mm.SetTableRaw(mm.RegistryIndex);
 			}
-			return true;
-		}, reinterpret_cast<LPARAM>(&d));
+		}
+		int RuntimeStoreSet(luaext::State L) {
+			luaext::State mm{ shok::LuaStateMainmenu };
+			int t = mm.GetTop();
+			auto key = L.CheckStringView(1);
 
-		return 1;
+			GetRuntimeStore();
+			mm.Push(key);
+
+			if (L.IsNoneOrNil(2)) {
+				mm.Push();
+			}
+			else {
+				BB::CMemoryStream st{};
+				Serializer::AdvLuaStateSerializer<true> seri{st, L.GetState()};
+				seri.SerializeVariable(2);
+
+				mm.Push(st.GetData());
+			}
+
+			mm.SetTableRaw(-3);
+
+			if (mm.GetState() != L.GetState())
+				mm.SetTop(t);
+			return 0;
+		}
+		int RuntimeStoreGet(luaext::State L) {
+			luaext::State mm{ shok::LuaStateMainmenu };
+			int t = mm.GetTop();
+
+			auto s = L.CheckStringView(1);
+			GetRuntimeStore();
+			mm.Push(s);
+			mm.GetTableRaw(-2);
+
+			if (mm.IsNoneOrNil(-1)) {
+				if (mm.GetState() != L.GetState())
+					mm.SetTop(t);
+				L.Push();
+				return 1;
+			}
+
+			IO::StringViewReadStream st {mm.CheckStringView(-1)};
+			Serializer::AdvLuaStateSerializer<true> seri{st, L.GetState()};
+			seri.DeserializeVariable();
+
+			if (mm.GetState() != L.GetState())
+				mm.SetTop(t);
+			return 1;
+		}
+
+		int CreateExtraDataTables(luaext::State L) {
+			(*BB::CIDManagerEx::AnimManager)->DumpManagerToLuaGlobal(L.GetState(), "Animations");
+			(*BB::CIDManagerEx::TerrainTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "TerrainTypes");
+			(*BB::CIDManagerEx::WaterTypeManager)->DumpManagerToLuaGlobal(L.GetState(), "WaterTypes");
+			(*BB::CIDManagerEx::ArmorClassManager)->DumpManagerToLuaGlobal(L.GetState(), "ArmorClasses");
+
+			{
+				L.Push("ExperienceClasses");
+				L.NewTable();
+
+				L.Push("Invalid");
+				L.Push(static_cast<int>(shok::ExperienceClass::Invalid));
+				L.SetTableRaw(-3);
+
+				auto* mng = GGL::ExperienceClassHolder::GlobalObj();
+				for (int i = 0; i < static_cast<int>(mng->Classes.size()); ++i) {
+					L.Push(mng->Classes[i]->Table.c_str());
+					L.Push(i);
+					L.SetTableRaw(-3);
+				}
+
+				L.SetGlobal();
+			}
+
+			L.Push("NetEvents");
+			CppLogic::GetIdManager<shok::NetEventIds>().PushToState(L);
+			L.SetGlobal();
+
+			L.Push("AdvancedDealDamageSource");
+			CppLogic::GetIdManager<shok::AdvancedDealDamageSource>().PushToState(L);
+			L.SetGlobal();
+
+			L.Push("AttachmentTypes");
+			CppLogic::GetIdManager<shok::AttachmentType>().PushToState(L);
+			L.SetGlobal();
+
+			L.Push("MouseEvents");
+			CppLogic::GetIdManager<win_mouseEvents>().PushToState(L);
+			L.SetGlobal();
+
+			return 0;
+		}
+
+		std::filesystem::path GetPersistentMapFilesDir() {
+			std::filesystem::path p{ Framework::SavegameSystem::GlobalObj()->SaveDir };
+			p.replace_filename("PersistentMapFiles");
+			return p;
+		}
+		void AppendPersistendMapFileName(luaext::State L, std::filesystem::path& p, int indexoff) {
+			const char* n = L.CheckString(1 + indexoff);
+			auto ty = L.CheckEnum<shok::MapType>(2 + indexoff);
+			const char* cn = L.OptString(3 + indexoff, nullptr); // optional
+			Framework::CampagnInfo* ci = (*Framework::CMain::GlobalObj)->CampagnInfoHandler.GetCampagnInfo(ty, cn);
+			if (!ci)
+				throw lua::LuaException("invalid map type/campagn");
+			Framework::MapInfo* i = ci->GetMapInfoByName(n);
+			if (!i)
+				throw lua::LuaException("invalid map");
+			p.append(i->GUID.Data.c_str()).replace_extension("bin");
+		}
+
+		int SavePersistentMapFile(luaext::State L) {
+			std::filesystem::path p = GetPersistentMapFilesDir();
+			AppendPersistendMapFileName(L, p, 1);
+			auto path = p.string();
+
+			try {
+				BB::CFileStreamEx fs{};
+				if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultWrite))
+					throw lua::LuaException{ "cannot open file" };
+				CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ fs, L.GetState() };
+				seri.SerializeVariable(1);
+				fs.Close();
+			}
+			catch (const BB::CFileException& ex) {
+				char buff[255]{};
+				ex.CopyMessage(buff, 254);
+				throw lua::LuaException{ buff };
+			}
+
+			L.Push(path);
+			return 1;
+		}
+		int LoadPersistentMapFile(luaext::State L) {
+			std::filesystem::path p = GetPersistentMapFilesDir();
+			AppendPersistendMapFileName(L, p, 0);
+			auto path = p.string();
+
+			try {
+				BB::CFileStreamEx fs{};
+				if (!fs.OpenFile(path.c_str(), BB::IStream::Flags::DefaultRead))
+					throw lua::LuaException{ "cannot open file" };
+				CppLogic::Serializer::AdvLuaStateSerializer<false> seri{ fs, L.GetState() };
+				seri.DeserializeVariable();
+				fs.Close();
+			}
+			catch (const BB::CFileException& ex) {
+				char buff[255]{};
+				ex.CopyMessage(buff, 254);
+				throw lua::LuaException{ buff };
+			}
+
+			return 1;
+		}
+		int HasPersistentMapFile(luaext::State L) {
+			std::filesystem::path p = GetPersistentMapFilesDir();
+			AppendPersistendMapFileName(L, p, 0);
+
+			bool direxists = std::filesystem::exists(p) && std::filesystem::is_directory(p);
+
+			L.Push(std::filesystem::exists(p) && std::filesystem::is_regular_file(p));
+			L.Push(direxists);
+			return 2;
+		}
+
+		DWORD MainThreadID = 0;
+		int GetMainThreadID(luaext::State L) {
+			L.Push(MainThreadID);
+			return 1;
+		}
+		int GetCurrentThreadID(luaext::State L) {
+			L.Push(static_cast<int>(GetCurrentThreadId()));
+			return 1;
+		}
+
+		int LGetCurrentTime(luaext::State L) {
+			L.Push(static_cast<double>(std::time(nullptr)));
+			return 1;
+		}
+
+		int GetCurrentCutscene(luaext::State L) {
+			L.Push((**ECS::CManager::GlobalObj)->ActiveCutscene.c_str());
+			return 1;
+		}
+
+		int EnableScriptTriggerEval(luaext::State L) {
+			bool a = L.CheckBool(1);
+			EScr::CLuaFuncRefGlobal::HookFuncAccess(a);
+			CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ScriptTriggerEval = a;
+			return 0;
+		}
+
+		int ReloadExternalmaps(luaext::State L) {
+			auto* m = *Framework::CMain::GlobalObj;
+			if (m->CurrentMode != Framework::CMain::Mode::MainMenu)
+				throw lua::LuaException{"not in mainmenu"};
+			m->CampagnInfoHandler.Infos[3].LoadOverride("maps\\user", &m->CampagnInfoHandler.Keys);
+			return 0;
+		}
+
+		int GetMonitors(luaext::State L) {
+			L.NewTable();
+			struct D {
+				luaext::State L;
+				int i = 1;
+			};
+			D d{ L };
+
+			EnumDisplayMonitors(nullptr, nullptr, [](HMONITOR m, HDC, LPRECT r, LPARAM vd) -> BOOL {
+				D* d = reinterpret_cast<D*>(vd);
+				MONITORINFOEX mi{};
+				mi.cbSize = sizeof(MONITORINFOEX);
+				if (GetMonitorInfo(m, &mi)) {
+					d->L.NewTable();
+
+					d->L.Push("Name");
+					d->L.Push(mi.szDevice);
+					d->L.SetTableRaw(-3);
+					d->L.Push("H");
+					d->L.Push(static_cast<int>(r->bottom - r->top));
+					d->L.SetTableRaw(-3);
+					d->L.Push("W");
+					d->L.Push(static_cast<int>(r->right - r->left));
+					d->L.SetTableRaw(-3);
+
+
+					d->L.SetTableRaw(-2, d->i);
+					++d->i;
+				}
+				return true;
+			}, reinterpret_cast<LPARAM>(&d));
+
+			return 1;
+		}
 	}
 
 	int RNG::Int(luaext::State L)
@@ -544,154 +546,192 @@ namespace CppLogic::API {
 		CppLogic::Serializer::UserdataDeserializer[std::string{ typename_details::type_name<RNG>() }] = &luaext::State::CppToCFunction<RNG::Deserialize>;
 	}
 
-	int CreateRNG(luaext::State L) {
-		if (L.IsNoneOrNil(1))
-			L.NewUserClass<RNG>();
-		else
-			L.NewUserClass<RNG>(L.CheckInt(1));
-		return 1;
-	}
+	namespace {
+		int CreateRNG(luaext::State L) {
+			if (L.IsNoneOrNil(1))
+				L.NewUserClass<RNG>();
+			else
+				L.NewUserClass<RNG>(L.CheckInt(1));
+			return 1;
+		}
 
 #ifdef DEBUG_FUNCS
-	int GenerateClassSchemas(luaext::State L) {
-		BB::CFileStreamEx f{};
-		f.OpenFile(L.CheckString(1), BB::IStream::Flags::DefaultWrite);
-		CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(f);
-		f.Close();
-		return 0;
-	}
-	int DumpUnknownFieldSerializers(luaext::State L) {
-		CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(L);
-		return 1;
-	}
-	int DumpUnknownListOptions(luaext::State L) {
-		CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(L);
-		return 1;
-	}
+		int GenerateClassSchemas(luaext::State L) {
+			BB::CFileStreamEx f{};
+			f.OpenFile(L.CheckString(1), BB::IStream::Flags::DefaultWrite);
+			CppLogic::Serializer::SchemaGenerator::WriteAllClassesSchema(f);
+			f.Close();
+			return 0;
+		}
+		int DumpUnknownFieldSerializers(luaext::State L) {
+			CppLogic::Serializer::SchemaGenerator::PushUnknownFieldSerializers(L);
+			return 1;
+		}
+		int DumpUnknownListOptions(luaext::State L) {
+			CppLogic::Serializer::SchemaGenerator::PushUnknownListOptions(L);
+			return 1;
+		}
+
+		int BuildReferenceMap(luaext::State L) {
+			static constexpr int RESERVED_REFS=2;
+			static constexpr int FREELIST_REF=1;
+			static constexpr int ARRAYSIZE_REF=2;
+			int idx = 1;
+			if (L.IsNoneOrNil(1)) {
+				idx = luaext::State::RegistryIndex;
+			}
+
+			L.SetTop(1);
+			L.NewTable();
+			L.NewTable();
+			std::set<int> free{};
+
+			int n = FREELIST_REF;
+			// while (true) {
+			// 	L.GetTableRaw(idx, n);
+			// 	if (L.IsNil(-1)) {
+			// 		L.Pop(1);
+			// 		break;
+			// 	}
+			// 	n = L.Check<int>(-1);
+			// 	free.insert(n);
+			// 	L.Push(true);
+			// 	L.SetTableRaw(2);
+			// }
+
+			for (n = RESERVED_REFS + 1; n <= L.RawLength(idx); ++n) {
+				L.Push(n);
+				L.GetTableRaw(idx, n);
+				L.SetTableRaw(3);
+			}
+
+			return 2;
+		}
 #endif
 
-	void UpdateClipMouse() {
-		static constexpr const char* key = "CppLogic\\ClipMouse";
-		Framework::CMain* f = *Framework::CMain::GlobalObj;
-		if (f->GDB.IsKeyValid(key)) {
-			auto b = f->GDB.GetValue(key) != 0.0f;
-			EGUIX::UIInput_ClipMouse = b;
-			if (b)
-				EGUIX::HookUIInput();
+		void UpdateClipMouse() {
+			static constexpr const char* key = "CppLogic\\ClipMouse";
+			Framework::CMain* f = *Framework::CMain::GlobalObj;
+			if (f->GDB.IsKeyValid(key)) {
+				auto b = f->GDB.GetValue(key) != 0.0f;
+				EGUIX::UIInput_ClipMouse = b;
+				if (b)
+					EGUIX::HookUIInput();
+			}
 		}
-	}
 
-	void ResizeWindow(Framework::CMain::SWindowData* wd) {
-		Framework::CMain* f = *Framework::CMain::GlobalObj;
-		static constexpr const char* key = "CppLogic\\BorderlessFullscreenOn";
-		static constexpr const char* keyX = "CppLogic\\WindowedX";
-		static constexpr const char* keyY = "CppLogic\\WindowedY";
-		if (f->GDB.IsKeyValid(keyX) && f->GDB.IsKeyValid(keyY)) {
-			auto x = f->GDB.GetValue(keyX);
-			auto y = f->GDB.GetValue(keyY);
-			wd->OverrideSizeWindowed(0, 0, static_cast<int>(x), static_cast<int>(y), false);
+		void ResizeWindow(Framework::CMain::SWindowData* wd) {
+			Framework::CMain* f = *Framework::CMain::GlobalObj;
+			static constexpr const char* key = "CppLogic\\BorderlessFullscreenOn";
+			static constexpr const char* keyX = "CppLogic\\WindowedX";
+			static constexpr const char* keyY = "CppLogic\\WindowedY";
+			if (f->GDB.IsKeyValid(keyX) && f->GDB.IsKeyValid(keyY)) {
+				auto x = f->GDB.GetValue(keyX);
+				auto y = f->GDB.GetValue(keyY);
+				wd->OverrideSizeWindowed(0, 0, static_cast<int>(x), static_cast<int>(y), false);
+				UpdateClipMouse();
+				return;
+			}
+			if (!f->GDB.IsKeyValid(key))
+				return;
+			std::string_view n{ f->GDB.GetString(key) };
+			if (n.empty())
+				return;
+
 			UpdateClipMouse();
-			return;
+			wd->OverrideSizeBorderlessFullscreen(n);
 		}
-		if (!f->GDB.IsKeyValid(key))
-			return;
-		std::string_view n{ f->GDB.GetString(key) };
-		if (n.empty())
-			return;
 
-		UpdateClipMouse();
-		wd->OverrideSizeBorderlessFullscreen(n);
-	}
-
-	int WriteGhidraImport(luaext::State L) {
-		std::ofstream st{"/home/mcb/ghidra_scripts/s5_luafuncs.txt", std::ofstream::out | std::ofstream::trunc};
-		auto w = [&](EScr::StaticFuncList* l, const char* t) {
-			for (auto* e = l->First; e != nullptr; e = e->Next) {
-				const char* ta = t;
-				if (ta == nullptr)
-					ta = e->Table;
-				if (ta == nullptr)
-					continue;
-				if (e->Table != nullptr && t != nullptr && std::string_view(t) != ta)
-					continue;
-				st << reinterpret_cast<int>(e) << "|type|EScr::StaticFuncListEntry\n";
-				st << reinterpret_cast<int>(e->Func) << "|func|lua::" << ta << "::" << e->Name << "\n";
-			}
-		};
-		w(EScr::StaticFuncList::FrameworkList(), "Framework");
-		w(EScr::StaticFuncList::ScriptList(), "Script");
-		w(EScr::StaticFuncList::LuaDebuggerList(), "LuaDebugger");
-		w(EScr::StaticFuncList::MouseList(), "Mouse");
-		w(EScr::StaticFuncList::GameList(), "Game");
-		w(EScr::StaticFuncList::GDBList(), "GDB");
-		w(EScr::StaticFuncList::DisplayOptionsList(), "DisplayOptions");
-		w(EScr::StaticFuncList::SoundOptionsList(), "SoundOptions");
-		w(EScr::StaticFuncList::AIList(), "AI");
-		w(EScr::StaticFuncList::XNetworkList(), "XNetwork");
-		w(EScr::StaticFuncList::DisplayList(), "Display");
-		w(EScr::StaticFuncList::Logic1List(), "Logic");
-		w(EScr::StaticFuncList::Logic2List(), "Logic");
-		w(EScr::StaticFuncList::Logic3List(), "Logic");
-		w(EScr::StaticFuncList::Logic4List(), "Logic");
-		w(EScr::StaticFuncList::CameraList(), "Camera");
-		w(EScr::StaticFuncList::GUIList(), "GUI");
-		w(EScr::StaticFuncList::GUIList2(), "GUI");
-		w(EScr::StaticFuncList::XGUIEngList(), "XGUIEng");
-		w(EScr::StaticFuncList::SoundList(), nullptr);
-		w(EScr::StaticFuncList::MusicList(), "Music");
-		w(EScr::StaticFuncList::CutsceneList(), "Cutscene");
-		w(EScr::StaticFuncList::InputList(), "Input");
-		w(EScr::StaticFuncList::XNetworkUbiComList(), "XNetworkUbiCom");
-		return 0;
-	}
-
-	int GetTriggers(luaext::State L) {
-		EScr::CScriptTriggerSystem* ts = *EScr::CScriptTriggerSystem::GlobalObj;
-		L.NewTable();
-		for (auto& t : ts->Trigger) {
-			L.Push(t.first);
-			if (t.second == nullptr) {
-				L.Push("nullptr");
-			} else {
-				CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, t.second);
-			}
-			L.SetTableRaw(-3);
-		}
-		return 1;
-	}
-
-	int WriteTriggers(luaext::State L) {
-		EScr::CScriptTriggerSystem* ts = *EScr::CScriptTriggerSystem::GlobalObj;
-		BB::CFileStreamEx f{};
-		f.OpenFile(L.CheckString(1), BB::IStream::Flags::DefaultWrite);
-		auto s = BB::CXmlSerializer::CreateUnique();
-		for (auto& t : ts->Trigger) {
-			if (t.second == nullptr) {
-				auto str = std::format("{} is nullptr!\n", static_cast<int>(t.first));
-				f.Write(str.c_str(), str.size());
-			} else {
-				f.Write("\r\n", 2);
-				s->Serialize(&f, t.second);
-			}
-		}
-		return 0;
-	}
-
-	std::string FormatNumber(double num, int precision, std::optional<bool> trim) {
-		auto s = std::format("{:.{}f}", num, precision);
-		if (trim.value_or(false)) {
-			auto l = s.find('.');
-			if (l != std::string::npos) {
-				for (auto c = s.size()-1; c > l; --c) {
-					if (s[c] != '0') {
-						s.resize(c+1);
-						return s;
-					}
+		int WriteGhidraImport(luaext::State L) {
+			std::ofstream st{"/home/mcb/ghidra_scripts/s5_luafuncs.txt", std::ofstream::out | std::ofstream::trunc};
+			auto w = [&](EScr::StaticFuncList* l, const char* t) {
+				for (auto* e = l->First; e != nullptr; e = e->Next) {
+					const char* ta = t;
+					if (ta == nullptr)
+						ta = e->Table;
+					if (ta == nullptr)
+						continue;
+					if (e->Table != nullptr && t != nullptr && std::string_view(t) != ta)
+						continue;
+					st << reinterpret_cast<int>(e) << "|type|EScr::StaticFuncListEntry\n";
+					st << reinterpret_cast<int>(e->Func) << "|func|lua::" << ta << "::" << e->Name << "\n";
 				}
-				s.resize(l);
-			}
+			};
+			w(EScr::StaticFuncList::FrameworkList(), "Framework");
+			w(EScr::StaticFuncList::ScriptList(), "Script");
+			w(EScr::StaticFuncList::LuaDebuggerList(), "LuaDebugger");
+			w(EScr::StaticFuncList::MouseList(), "Mouse");
+			w(EScr::StaticFuncList::GameList(), "Game");
+			w(EScr::StaticFuncList::GDBList(), "GDB");
+			w(EScr::StaticFuncList::DisplayOptionsList(), "DisplayOptions");
+			w(EScr::StaticFuncList::SoundOptionsList(), "SoundOptions");
+			w(EScr::StaticFuncList::AIList(), "AI");
+			w(EScr::StaticFuncList::XNetworkList(), "XNetwork");
+			w(EScr::StaticFuncList::DisplayList(), "Display");
+			w(EScr::StaticFuncList::Logic1List(), "Logic");
+			w(EScr::StaticFuncList::Logic2List(), "Logic");
+			w(EScr::StaticFuncList::Logic3List(), "Logic");
+			w(EScr::StaticFuncList::Logic4List(), "Logic");
+			w(EScr::StaticFuncList::CameraList(), "Camera");
+			w(EScr::StaticFuncList::GUIList(), "GUI");
+			w(EScr::StaticFuncList::GUIList2(), "GUI");
+			w(EScr::StaticFuncList::XGUIEngList(), "XGUIEng");
+			w(EScr::StaticFuncList::SoundList(), nullptr);
+			w(EScr::StaticFuncList::MusicList(), "Music");
+			w(EScr::StaticFuncList::CutsceneList(), "Cutscene");
+			w(EScr::StaticFuncList::InputList(), "Input");
+			w(EScr::StaticFuncList::XNetworkUbiComList(), "XNetworkUbiCom");
+			return 0;
 		}
-		return s;
+
+		int GetTriggers(luaext::State L) {
+			EScr::CScriptTriggerSystem* ts = *EScr::CScriptTriggerSystem::GlobalObj;
+			L.NewTable();
+			for (auto& t : ts->Trigger) {
+				L.Push(t.first);
+				if (t.second == nullptr) {
+					L.Push("nullptr");
+				} else {
+					CppLogic::Serializer::ObjectToLuaSerializer::Serialize(L, t.second);
+				}
+				L.SetTableRaw(-3);
+			}
+			return 1;
+		}
+
+		int WriteTriggers(luaext::State L) {
+			EScr::CScriptTriggerSystem* ts = *EScr::CScriptTriggerSystem::GlobalObj;
+			BB::CFileStreamEx f{};
+			f.OpenFile(L.CheckString(1), BB::IStream::Flags::DefaultWrite);
+			auto s = BB::CXmlSerializer::CreateUnique();
+			for (auto& t : ts->Trigger) {
+				if (t.second == nullptr) {
+					auto str = std::format("{} is nullptr!\n", static_cast<int>(t.first));
+					f.Write(str.c_str(), str.size());
+				} else {
+					f.Write("\r\n", 2);
+					s->Serialize(&f, t.second);
+				}
+			}
+			return 0;
+		}
+
+		std::string FormatNumber(double num, int precision, std::optional<bool> trim) {
+			auto s = std::format("{:.{}f}", num, precision);
+			if (trim.value_or(false)) {
+				auto l = s.find('.');
+				if (l != std::string::npos) {
+					for (auto c = s.size()-1; c > l; --c) {
+						if (s[c] != '0') {
+							s.resize(c+1);
+							return s;
+						}
+					}
+					s.resize(l);
+				}
+			}
+			return s;
+		}
 	}
 
 	constexpr std::array API{
@@ -733,6 +773,7 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<DumpUnknownFieldSerializers>("DumpUnknownFieldSerializers"),
 			luaext::FuncReference::GetRef<DumpUnknownListOptions>("DumpUnknownListOptions"),
 			luaext::FuncReference::GetRef<WriteGhidraImport>("WriteGhidraImport"),
+			luaext::FuncReference::GetRef<BuildReferenceMap>("BuildReferenceMap"),
 #endif
 	};
 

@@ -97,7 +97,7 @@ void CppLogic::ModLoader::ModLoader::PreMapStart(lua_State* ingame, const char* 
 	luaext::State L{ ingame };
 	auto mappath = std::format("{}\\{}\\ModLoader.lua", externalmap ? "Maps" : path, externalmap ? "ExternalMap" : name);
 	Init(L, mappath.c_str(), "MapStart", [](luaext::State l) {
-		const GS3DTools::CMapData& m = (*Framework::CMain::GlobalObj)->CurrentMap;
+		const GS3DTools::CMapData& m = (*Framework::CMain::GlobalObj)->Data.CurrentMap;
 		l.NewTable();
 		l.Push("MapName");
 		l.Push(m.MapName);

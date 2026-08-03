@@ -115,6 +115,7 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0xCBC5B326);
 
 		// 55a3e9 set command
+		// 55e1cc copy assign
 
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
 
@@ -150,7 +151,14 @@ namespace EGUIX {
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IWidgetRegistrationCallback {
 	public:
-		virtual void OnRegistrationChanged(shok::WidgetId id, int mode) = 0; // mode ==2 sem to be unregister
+		enum class Mode : int {
+			Register = 1,
+			Unregister = 2,
+			Show = 3,
+			Hide = 4,
+		};
+
+		virtual void OnRegistrationChanged(shok::WidgetId id, Mode mode) = 0; // mode ==2 sem to be unregister
 	};
 
 	class CToolTipHelper : public BB::IObject, public IWidgetRegistrationCallback { // size 41
@@ -170,7 +178,7 @@ namespace EGUIX {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x102E66C6);
 
 		[[nodiscard]] virtual shok::ClassId __stdcall GetClassIdentifier() const override;
-		virtual void OnRegistrationChanged(shok::WidgetId id, int mode) override;
+		virtual void OnRegistrationChanged(shok::WidgetId id, Mode mode) override;
 	};
 	static_assert(sizeof(EGUIX::CToolTipHelper) == 41 * 4);
 
@@ -348,6 +356,7 @@ namespace EGUIX {
 		static void HookFixTextRender();
 
 		// copy ctor 55f5db
+		// 55f596 copy assign
 
 	private:
 		static void __thiscall CenterRenderArea(const CTextButtonWidget* th, Rect* render);
@@ -1321,14 +1330,21 @@ namespace EGUIX {
 
 	class WidgetManager { // this thing has no vtable...
 	public:
-		BB::CIDManagerEx* WidgetNameManager = nullptr;
+		BB::CIDManager* WidgetNameManager = nullptr;
 		shok::Vector<EGUIX::CBaseWidget*> Widgets;
+		shok::List<IWidgetRegistrationCallback*> RegistrationCallbacks;
 
 		shok::WidgetId GetIdByName(const char* name);
 		EGUIX::CBaseWidget* GetWidgetByID(shok::WidgetId id);
 		void RemoveWidget(EGUIX::CBaseWidget* w); // does not delete
 
 		static inline EGUIX::WidgetManager* (* const GlobalObj)() = reinterpret_cast<EGUIX::WidgetManager * (*)()>(0x558473);
+
+		// 558479 is valid id
+		// 5589f2 ctor
+		// 558b03 add reg callback
+		// 5584f4 remove reg callback
+		// 55849b call cbs (this, id, mode)
 
 	private:
 		friend class EGUIX::CContainerWidget;
@@ -1399,6 +1415,7 @@ namespace EGUIX {
 		// render all 0x556409 __thiscall()
 		// clear widget 0x5563f1 thiscall()
 		// load project widget 0x55b15e cdecl(const char*)
+		// load ingame gui 40e6cb static cdecl()
 
 		static inline void(__cdecl* const KeyStrokeLuaCallback)() = reinterpret_cast<void(__cdecl*)()>(0x55C445);
 	};
@@ -1425,6 +1442,9 @@ namespace EGUIX {
 
 		static inline WidgetFuncManager* (__cdecl* const GlobalObj)() = reinterpret_cast<WidgetFuncManager* (__cdecl*)()>(0x55ADE0);
 		// ctor 55AE9D
+
+		// set active state 55ae8f
+		// set active state static 5563d2
 	};
 }
 

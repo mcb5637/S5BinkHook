@@ -62,6 +62,7 @@ ModLoader = ModLoader or {}
 ---@field package Deprecated string?
 ---@field package ObjectMerge string?
 ---@field package ObjectMergeFunc nil|fun(is:string|number):CppStructAccess
+---@field package ObjectPostMerge nil|fun(is:string|number):nil
 
 ---@class CManifestType
 ---@field Preload fun(e:CManifestEntry, m:Manifest)
@@ -142,7 +143,7 @@ function ModLoader.ManifestTypes()
 		{Key="Models", Preload=nil, Table=Models, Load=CppLogic.ModLoader.AddModel},
 		{Key="EffectTypes", Preload=CppLogic.ModLoader.PreLoadEffectType, Table=GGL_Effects, Load=CppLogic.ModLoader.AddEffectType, ObjectMerge="EffectTypeMerges", ObjectMergeFunc=CppLogic.ModLoader.GetEffectTypeMem},
 		{Key="TaskLists", Preload=CppLogic.ModLoader.PreLoadTaskList, Table=TaskLists, Load=CppLogic.ModLoader.AddTaskList, ObjectMerge="TaskListMerges", ObjectMergeFunc=CppLogic.ModLoader.GetTaskListMem},
-		{Key="EntityTypes", Preload=CppLogic.ModLoader.PreLoadEntityType, Table=Entities, Load=CppLogic.ModLoader.AddEntityType, ObjectMerge="EntityTypeMerges", ObjectMergeFunc=CppLogic.ModLoader.GetEntityTypeMem},
+		{Key="EntityTypes", Preload=CppLogic.ModLoader.PreLoadEntityType, Table=Entities, Load=CppLogic.ModLoader.AddEntityType, ObjectMerge="EntityTypeMerges", ObjectMergeFunc=CppLogic.ModLoader.GetEntityTypeMem, ObjectPostMerge=CppLogic.ModLoader.EntityTypeRefreshPostModify},
 		{Key="Technologies", Preload=CppLogic.ModLoader.PreLoadTechnology, Table=Technologies, Load=CppLogic.ModLoader.AddTechnology, ObjectMerge="TechnologyMerges", ObjectMergeFunc=CppLogic.ModLoader.GetTechnologyMem},
 		{Key="GUITextures", Preload=nil, Table=nil, Load=CppLogic.ModLoader.AddGUITexture},
 		{Key="GUITextures_Add", Preload=nil, Table=nil, Load=nil, Deprecated="GUITextures"},
@@ -276,6 +277,9 @@ ModLoader.ManifestType = {
 					xpcall(function()
 						merge.MergeFunc(t.ObjectMergeFunc(id), id)
 					end, LuaDebugger.Log)
+					if t.ObjectPostMerge then
+						t.ObjectPostMerge(id)
+					end
 				end
 			end
 		end

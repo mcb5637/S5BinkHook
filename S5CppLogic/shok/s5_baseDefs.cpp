@@ -28,6 +28,9 @@ float shok::Position::GetDistanceSquaredTo(const shok::Position& p) const
 	float dy = Y - p.Y;
 	return (dx * dx + dy * dy);
 }
+float shok::Position::GetDistanceTo(const Position& p) const {
+	return std::sqrt(GetDistanceSquaredTo(p));
+}
 
 bool shok::Position::IsInRange(const shok::Position& p, float range) const
 {

@@ -1878,11 +1878,26 @@ namespace CppLogic::Logic {
 			L.Push("CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_ResearchProgress));
 			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_RESEARCH_CANCELED");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_CancelResearch));
+			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_CONSTRUCTION_PROGRESS");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_ConstructionProgress));
 			L.SetTableRaw(-3);
 			L.Push("CPPLOGIC_EVENT_ON_RESOURCE_CHANGED");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_OnResourceChanged));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_UPGRADE_STARTED");
+			L.Push(static_cast<int>(shok::EventIDs::Building_OnUpgradeStart));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_UPGRADE_CANCELED");
+			L.Push(static_cast<int>(shok::EventIDs::Building_OnUpgradeCancel));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_TRAINING_START");
+			L.Push(static_cast<int>(shok::EventIDs::Barracks_BuyLeader));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_TRAINING_COMPLETE");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_TrainingComplete));
 			L.SetTableRaw(-3);
 			L.Pop(1);
 		}

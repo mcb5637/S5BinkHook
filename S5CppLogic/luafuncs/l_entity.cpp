@@ -934,6 +934,30 @@ namespace CppLogic::Entity {
 			return b->GetDamage();
 		}
 
+		auto SettlerGetTrainingProgress(GGL::CSettler* s) {
+			auto* rax = BB::IdentifierCast<GGL::CBuilding>(EGL::CGLEEntity::GetEntityByID(s->GetFirstAttachedEntity(shok::AttachmentType::FIGHTER_BARRACKS)));
+			if (rax != nullptr) {
+				auto* lb = s->GetBehavior<GGL::CLeaderBehavior>();
+				if (lb == nullptr)
+					throw lua::LuaException{"not a leader"};
+				return std::tuple{
+					static_cast<float>((*EGL::CGLEGameLogic::GlobalObj)->GetTick() - lb->TrainingStartTurn) * 0.1f,
+					lb->GetTrainingTime(),
+				};
+			}
+			auto* leaveBuild = BB::IdentifierCast<GGL::CBuilding>(EGL::CGLEEntity::GetEntityByID(s->GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE)));
+			if (leaveBuild != nullptr) {
+				shok::Position doorPos{};
+				leaveBuild->GetDoorPosAbs(&doorPos);
+
+				return std::tuple{
+					s->Position.GetDistanceTo(leaveBuild->LeavePosition),
+					doorPos.GetDistanceTo(leaveBuild->LeavePosition),
+				};
+			}
+			return std::tuple{0.0f, -1.0f};
+		}
+
 		int BuildingMarketGetCurrentTradeData(luaext::State L) {
 			GGL::CBuilding* b = L.CheckBuilding(1);
 			auto* m = b->GetBehavior<GGL::CMarketBehavior>();
@@ -1839,6 +1863,13 @@ namespace CppLogic::Entity {
 			return 1;
 		}
 
+		shok::EntityId BuildingGetUpgradeSite(GGL::CBuilding* b) {
+			return b->GetFirstAttachedEntity(shok::AttachmentType::BUILDING_UPGRADE_SITE);
+		}
+		shok::EntityId UpgradeSiteGetBuilding(EGL::CGLEEntity* b) {
+			return b->GetFirstAttachedToMe(shok::AttachmentType::BUILDING_UPGRADE_SITE);
+		}
+
 		int BarracksBuyLeaderByType(luaext::State L) {
 			GGL::CBuilding* e = L.CheckBuilding(1);
 			auto rax = e->GetBehavior<GGL::CBarrackBehavior>();
@@ -2305,6 +2336,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<SettlerGetLeveledMissChanceBonus>("GetLeveledMissChanceBonus"),
 			luaext::FuncReference::GetRef<SettlerGetCircularAttackDamage>("GetCircularAttackDamage"),
 			luaext::FuncReference::GetRef<SettlerGetShurikenDamage>("GetShurikenDamage"),
+			luaext::FuncReference::GetRef<SettlerGetTrainingProgress>("GetTrainingProgress"),
 		};
 
 		constexpr std::array Leader{
@@ -2354,6 +2386,8 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<BuildingGetConstructionSite>("GetConstructionSite"),
 			luaext::FuncReference::GetRef<IsConstructionSite>("IsConstructionSite"),
 			luaext::FuncReference::GetRef<ConstructionSiteGetBuilding>("ConstructionSiteGetBuilding"),
+			luaext::FuncReference::GetRef<BuildingGetUpgradeSite>("GetUpgradeSite"),
+			luaext::FuncReference::GetRef<UpgradeSiteGetBuilding>("UpgradeSiteGetBuilding"),
 			luaext::FuncReference::GetRef<BarracksBuyLeaderByType>("BarracksBuyLeaderByType"),
 			luaext::FuncReference::GetRef<BuildingGetRelativePositions>("GetRelativePositions"),
 			luaext::FuncReference::GetRef<BuildingSpawnWorkerFor>("SpawnWorkerFor"),

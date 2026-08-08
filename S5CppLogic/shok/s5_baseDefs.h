@@ -40,6 +40,7 @@ namespace shok {
 		void FloorToBuildingPlacement();
 		void RoundToBuildingPlacement();
 		[[nodiscard]] float GetDistanceSquaredTo(const Position& p) const;
+		[[nodiscard]] float GetDistanceTo(const Position& p) const;
 		[[nodiscard]] bool IsInRange(const Position& p, float range) const;
 		// returns rad
 		[[nodiscard]] float GetAngle() const;

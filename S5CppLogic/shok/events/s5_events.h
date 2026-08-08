@@ -1227,9 +1227,9 @@ namespace shok {
 		Foundry_GetCannonType = 0x17017, //EGL::CEventGetValue<int,1211121895>
 		Foundry_WorkStep = 0x17018, //BB::CEvent
 		Unused_Init = 0x17019, //BB::CEvent deprecated, never called
-		Building_OnUpgradeStart = 0x1701A, //BB::CEvent
+		Building_OnUpgradeStart = 0x1701A, //BB::CEvent, EGL::CEvent1Entity when used as Logic event
 		Building_OnBuildOnDetached = 0x1701B, //BB::CEvent used by mine
-		Building_OnUpgradeCancel = 0x1701C, //BB::CEvent
+		Building_OnUpgradeCancel = 0x1701C, //BB::CEvent, EGL::CEvent1Entity when used as Logic event
 		IsConvertible = 0x1701D, //EGL::CEventGetValue<bool,1709081367>
 
 		Barracks_ActivateAutoFill = 0x1701E, //BB::CEvent
@@ -1374,6 +1374,8 @@ namespace shok {
 		CppLogicEvent_ResearchProgress, // CppLogic::Events::TechProgressEvent
 		CppLogicEvent_ConstructionProgress, // CppLogic::Events::ConstructionProgressEvent
 		CppLogicEvent_OnResourceChanged, // CppLogic::Events::PaydayEvent
+		CppLogicEvent_CancelResearch, // CppLogic::Events::EntityAndTechEvent
+		CppLogicEvent_TrainingComplete, // EGL::CEvent2Entities
 	};
 
 	enum class InputEventIds : int {

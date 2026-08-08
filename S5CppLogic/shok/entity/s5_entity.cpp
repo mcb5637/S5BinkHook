@@ -1046,8 +1046,22 @@ void GGL::CBuilding::HookResearchTriggers() {
 	if (HookResearchTriggers_Hooked)
 		return;
 	HookResearchTriggers_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4aacb7), 0x20 };
-	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4aacb7), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::PlayerTechManager::StartResearchWithTrigger, 0));
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+			reinterpret_cast<void*>(0x4aacb7),
+			reinterpret_cast<void*>(0x4aad00),
+		} };
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4aacb7), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::PlayerTechManager::StartResearchWithTrigger, 0));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4aad00), &CancelResearchTriggerASM, reinterpret_cast<void*>(0x4aad07));
+	}
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 0x20, {
+			reinterpret_cast<void*>(0x4af206),
+			reinterpret_cast<void*>(0x4af24b),
+		}};
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4af206), &FireStartUpgradeEventOverrideASM, reinterpret_cast<void*>(0x4af20d));
+		CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4af24b), CppLogic::Hooks::MemberFuncPointerToVoid(&CBuilding::DestroyUpgradeSiteOverride, 0));
+	}
 }
 
 void GGL::CBuilding::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
@@ -1068,6 +1082,55 @@ float __thiscall GGL::CBuilding::GetExplorationOverride() {
 		ex *= (*GGL::CLogicProperties::GlobalObj)->BuildingUnderConstructionExplorationFactor;
 	}
 	return ex;
+}
+
+void __fastcall GGL::CBuilding::FireStartUpgradeEventOverride(CBuilding* th) {
+	if (!CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers)
+		return;
+	EGL::CEvent1Entity e2{shok::EventIDs::Building_OnUpgradeStart, th->EntityId};
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&e2);
+}
+
+void NAKED_DEF GGL::CBuilding::FireStartUpgradeEventOverrideASM() {
+	__asm {
+		call [eax+0x40];
+
+		mov ecx, esi;
+		call GGL::CBuilding::FireStartUpgradeEventOverride;
+
+
+		or dword ptr [ebp-0x4], 0xffffffff;
+		push 0x4af20d;
+		ret;
+	};
+}
+
+void __thiscall GGL::CBuilding::DestroyUpgradeSiteOverride() {
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers) {
+		EGL::CEvent1Entity ev{shok::EventIDs::Building_OnUpgradeCancel, EntityId};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+	}
+
+	auto* f = reinterpret_cast<void(__thiscall*)(CBuilding*)>(0x4abe3f);
+	f(this);
+}
+
+void NAKED_DEF GGL::CBuilding::CancelResearchTriggerASM() {
+	__asm {
+		mov ecx, esi;
+		call GGL::CBuilding::CancelResearchTrigger;
+
+		and dword ptr [esi + 0x124],0x0
+		pop esi;
+		ret;
+	};
+}
+
+void __fastcall GGL::CBuilding::CancelResearchTrigger(CBuilding* th) {
+	if (!CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResearchTriggers)
+		return;
+	CppLogic::Events::EntityAndTechEvent ev{shok::EventIDs::CppLogicEvent_CancelResearch, th->EntityId, th->CurrentTechnology, th->PlayerId};
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 }
 
 void __thiscall GGL::CBridgeEntity::ApplyHeightOverride() const {

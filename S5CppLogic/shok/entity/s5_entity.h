@@ -729,6 +729,11 @@ namespace GGL {
 	private:
 		void EventGetArmorOverride(EGL::CEventGetValue_Int* ev);
 		float __thiscall GetExplorationOverride();
+		static void __fastcall FireStartUpgradeEventOverride(CBuilding* th);
+		static void NAKED_DECL FireStartUpgradeEventOverrideASM();
+		void __thiscall DestroyUpgradeSiteOverride();
+		static void NAKED_DECL CancelResearchTriggerASM();
+		static __fastcall void CancelResearchTrigger(CBuilding* th);
 
 		friend class EGL::CGLEEntity;
 	};

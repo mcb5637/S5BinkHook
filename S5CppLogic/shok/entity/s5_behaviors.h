@@ -969,14 +969,18 @@ namespace GGL {
 		[[nodiscard]] int GetRegenHealthBase() const;
 		[[nodiscard]] int GetRegenHealth() const;
 		[[nodiscard]] int GetRegenHealthSeconds() const;
+		[[nodiscard]] float GetTrainingTime() const;
 
 		void PerformRegeneration();
 
 		static void HookLeaderRegen();
+		static void HookBuyTriggers();
 	private:
 		void __thiscall CheckRegen();
 		static void __thiscall CheckRegenStatic(CLeaderBehavior* th);
 		static void NAKED_DECL CheckRegenASM();
+		EGL::CGLEEntity* TaskLeaveRaxAdd();
+		EGL::CGLEEntity* EventRaxDetachAdd();
 	};
 
 	class CSoldierBehavior : public GGL::CBattleBehavior {

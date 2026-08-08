@@ -795,7 +795,7 @@ int GGL::CLeaderBehavior::GetRegenHealthBase() const {
 		return LeaderBehProps->HealingPoints;
 }
 int GGL::CLeaderBehavior::GetRegenHealth() const {
-	auto* ent = static_cast<GGL::CSettler*>(EGL::CGLEEntity::GetEntityByID(EntityId));
+	auto* ent = static_cast<GGL::CSettler*>(EGL::CGLEEntity::GetEntityByID(EntityId)); // NOLINT(*-pro-type-static-cast-downcast)
 	auto i = GetRegenHealthBase();
 	return static_cast<int>(ent->ModifierProfile.GetModifiedValue(EGL::IProfileModifierSetObserver::ModifierType::HealingPoints, static_cast<float>(i)));
 }
@@ -805,6 +805,11 @@ int GGL::CLeaderBehavior::GetRegenHealthSeconds() const {
 		return d->RegenSecondsOverride;
 	else
 		return LeaderBehProps->HealingSeconds;
+}
+
+float GGL::CLeaderBehavior::GetTrainingTime() const {
+	auto* f = reinterpret_cast<float(__thiscall*)(const CLeaderBehavior*)>(0x4eceb1);
+	return f(this);
 }
 
 void GGL::CLeaderBehavior::PerformRegeneration()
@@ -853,6 +858,22 @@ void NAKED_DEF GGL::CLeaderBehavior::CheckRegenASM() {
 		ret;
 	}
 }
+
+EGL::CGLEEntity* GGL::CLeaderBehavior::TaskLeaveRaxAdd() {
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	auto rax = e->GetFirstAttachedEntity(shok::AttachmentType::FIGHTER_BARRACKS);
+	EGL::CEvent2Entities ev{shok::EventIDs::CppLogicEvent_TrainingComplete, EntityId, rax};
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+	return e;
+}
+
+EGL::CGLEEntity* GGL::CLeaderBehavior::EventRaxDetachAdd() {
+	auto* e = EGL::CGLEEntity::GetEntityByID(EntityId);
+	EGL::CEvent2Entities ev{shok::EventIDs::CppLogicEvent_TrainingComplete, EntityId, shok::EntityId::Invalid};
+	(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+	return e;
+}
+
 bool HookLeaderRegen_Hooked = false;
 void GGL::CLeaderBehavior::HookLeaderRegen()
 {
@@ -863,6 +884,19 @@ void GGL::CLeaderBehavior::HookLeaderRegen()
 		reinterpret_cast<void*>(0x4EFC29)
 	} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4EFC29), &CheckRegenASM, reinterpret_cast<void*>(0x4EFC42));
+}
+
+void GGL::CLeaderBehavior::HookBuyTriggers() {
+	static bool Hooked = false;
+	if (Hooked)
+		return;
+	Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{0x20, {
+		reinterpret_cast<void*>(0x4ec1c1),
+		reinterpret_cast<void*>(0x4eb44e),
+	}};
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4ec1c1), CppLogic::Hooks::MemberFuncPointerToVoid(&CLeaderBehavior::TaskLeaveRaxAdd, 0));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4eb44e), CppLogic::Hooks::MemberFuncPointerToVoid(&CLeaderBehavior::EventRaxDetachAdd, 0));
 }
 
 void GGL::CKegBehavior::AdvancedDealDamage() const {
@@ -1654,6 +1688,8 @@ shok::EntityId GGL::CBarrackBehavior::BuyLeaderByType(shok::EntityTypeId ety)
 	if (id != shok::EntityId::Invalid) {
 		EGL::CEventValue_Int ev = { shok::EventIDs::Leader_SetTrainingTL, raxbeh_gettrainingtl(this) };
 		EGL::CGLEEntity::GetEntityByID(id)->FireEvent(&ev);
+		EGL::CEvent2Entities e2{shok::EventIDs::Barracks_BuyLeader, EntityId, id};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&e2);
 	}
 	return id;
 }
@@ -1664,9 +1700,12 @@ void GGL::CBarrackBehavior::HookBuyTriggers()
 	if (HookBuyTriggers_Hooked)
 		return;
 	HookBuyTriggers_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x50F020 - 0x50F016, { reinterpret_cast<void*>(0x50F016), reinterpret_cast<void*>(0x50EE4D) } };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F016), CppLogic::Hooks::MemberFuncPointerToVoid(&CBarrackBehavior::EventBuyLeaderOverride, 0), reinterpret_cast<void*>(0x50F020));
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50EE4D), CppLogic::Hooks::MemberFuncPointerToVoid(&CBarrackBehavior::EventBuySoldierOverride, 0), reinterpret_cast<void*>(0x50EE57));
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 0x50F020 - 0x50F016, { reinterpret_cast<void*>(0x50F016), reinterpret_cast<void*>(0x50EE4D) } };
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50F016), CppLogic::Hooks::MemberFuncPointerToVoid(&CBarrackBehavior::EventBuyLeaderOverride, 0), reinterpret_cast<void*>(0x50F020));
+		CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x50EE4D), CppLogic::Hooks::MemberFuncPointerToVoid(&CBarrackBehavior::EventBuySoldierOverride, 0), reinterpret_cast<void*>(0x50EE57));
+	}
+	CLeaderBehavior::HookBuyTriggers();
 }
 void GGL::CBarrackBehavior::EventBuyLeaderOverride(EGL::CEventValue_Int* ev)
 {

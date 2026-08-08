@@ -881,7 +881,7 @@ function CppLogic.Logic.EnableResourceTriggers(enabled, refinerFix) end
 ---@param sellAmount number?
 function CppLogic.Logic.SetResourceTriggerAmount(buyAmount, sellAmount) end
 
---- enables/disables research triggers (Events.CPPLOGIC_EVENT_ON_RESEARCH_STARTED, Events.CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS, Events.LOGIC_EVENT_RESEARCH_DONE).
+--- enables/disables research triggers (Events.CPPLOGIC_EVENT_ON_RESEARCH_STARTED, Events.CPPLOGIC_EVENT_ON_RESEARCH_PROGRESS, Events.LOGIC_EVENT_RESEARCH_DONE, Events.CPPLOGIC_EVENT_ON_RESEARCH_CANCELED, Events.CPPLOGIC_EVENT_ON_UPGRADE_STARTED, Events.CPPLOGIC_EVENT_ON_UPGRADE_CANCELED).
 --- status of this gets saved into a savegame.
 --- @param enabled boolean
 function CppLogic.Logic.EnableResearchTriggers(enabled) end
@@ -2264,6 +2264,12 @@ function CppLogic.Entity.Settler.GetCircularAttackDamage(id)end
 --- @return number
 function CppLogic.Entity.Settler.GetShurikenDamage(id)end
 
+--- current training progress of a leader, or progress leaving a building
+--- @param id entity
+--- @return number curr
+--- @return number max -1 if none of the conditions are met
+function CppLogic.Entity.Settler.GetTrainingProgress(id)end
+
 --- sets a special task list (TL_SCRIPT_ANIMATION) to play an animation on this entity.
 --- after the animation is done, executes TASK_BATTLE_WAIT_UNTIL to reset animation. (this may block returning to your normal tl for a few seconds).
 --- the tasklist TL_SCRIPT_ANIMATION gets created at first use, it may not be there before you call this func.
@@ -2510,6 +2516,15 @@ function CppLogic.Entity.Building.ConstructionSiteGetBuilding(id) end
 --- @param id entity
 --- @return boolean
 function CppLogic.Entity.Building.IsConstructionSite(id) end
+
+--- gets the upgradesite of a building.
+--- @param id entity
+--- @return number id id or 0
+function CppLogic.Entity.Building.GetUpgradeSite(id) end
+--- gets building of a upgradesite.
+--- @param id entity
+--- @return number id id or 0
+function CppLogic.Entity.Building.UpgradeSiteGetBuilding(id) end
 
 --- resturns all serfs currently constructing/building the specified building.
 --- (if applied to a building under construction, automatically checks the constructionsite instead)

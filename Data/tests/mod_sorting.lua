@@ -1,0 +1,115 @@
+---@type ModList
+local test = {
+    Incompatible = {},
+    Failed = {},
+    Mods = {
+        {
+            Name = "x1",
+            BBAPath = "",
+            DataMod = false,
+            Description = "",
+            Incompatible = {},
+            KeepArchive = false,
+            LoaderPath = "",
+            MainmenuMod = false,
+            MainmenuPath = "",
+            Override = {},
+            Required = {},
+            ScriptLib = false,
+            ScriptMod = false,
+            ScriptPath = "",
+            Settings = {},
+            UserRequestable = false,
+            Version = "",
+        },
+        {
+            Name = "a",
+            BBAPath = "",
+            DataMod = false,
+            Description = "",
+            Incompatible = {},
+            KeepArchive = false,
+            LoaderPath = "",
+            MainmenuMod = false,
+            MainmenuPath = "",
+            Override = {},
+            Required = {},
+            ScriptLib = false,
+            ScriptMod = false,
+            ScriptPath = "",
+            Settings = {},
+            UserRequestable = false,
+            Version = "",
+        },
+        {
+            Name = "b",
+            BBAPath = "",
+            DataMod = false,
+            Description = "",
+            Incompatible = {},
+            KeepArchive = false,
+            LoaderPath = "",
+            MainmenuMod = false,
+            MainmenuPath = "",
+            Override = {"c"},
+            Required = {},
+            ScriptLib = false,
+            ScriptMod = false,
+            ScriptPath = "",
+            Settings = {},
+            UserRequestable = false,
+            Version = "",
+        },
+        {
+            Name = "c",
+            BBAPath = "",
+            DataMod = false,
+            Description = "",
+            Incompatible = {},
+            KeepArchive = false,
+            LoaderPath = "",
+            MainmenuMod = false,
+            MainmenuPath = "",
+            Override = {"x5", "x7"},
+            Required = {},
+            ScriptLib = false,
+            ScriptMod = false,
+            ScriptPath = "",
+            Settings = {},
+            UserRequestable = false,
+            Version = "",
+        },
+        {
+            Name = "x5",
+            BBAPath = "",
+            DataMod = false,
+            Description = "",
+            Incompatible = {},
+            KeepArchive = false,
+            LoaderPath = "",
+            MainmenuMod = false,
+            MainmenuPath = "",
+            Override = {},
+            Required = {},
+            ScriptLib = false,
+            ScriptMod = false,
+            ScriptPath = "",
+            Settings = {},
+            UserRequestable = false,
+            Version = "",
+        },
+    },
+}
+
+ModLoader.SortMods(test)
+
+assert(test.Mods[1].Name == "a")
+assert(test.Mods[2].Name == "x1")
+assert(test.Mods[3].Name == "x5")
+assert(test.Mods[4].Name == "c")
+assert(test.Mods[5].Name == "b")
+
+LuaDebugger.Log("result")
+for _,e in ipairs(test.Mods) do
+    LuaDebugger.Log(e.Name)
+end

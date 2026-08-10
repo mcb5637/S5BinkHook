@@ -556,18 +556,44 @@ function ModLoader.SortMods(modlist, failuresToList)
 			checkfail(false, "incompatibility found: "..m.Name.." with "..with)
 		end
 	end
-	table.sort(modlist.Mods, function(a, b)
-		local ab = contains(a.Override, b.Name)
-		local ba = contains(b.Override, a.Name)
-		if ab and ba then
-			checkfail(false, "circular override: "..a.Name.." with "..b.Name)
-			return false
-		end
-		if ba then
-			return true
-		end
-		return false
+
+	local old = modlist.Mods
+	---@type ModpackDesc[]
+	local new = {}
+	table.sort(old, function(a, b)
+		return a.Name < b.Name
 	end)
+
+	---@param m ModpackDesc
+	---@return boolean
+	local function hasReqirements(m)
+		for _,e in ipairs(old) do
+			if contains(m.Override, e.Name) then
+				return false
+			end
+		end
+		return true
+	end
+
+	while old[1] do
+		local i = 1
+		local added = 0
+		while old[i] do
+			local m = old[i]
+			if hasReqirements(m) then
+				added = added + 1
+				table.insert(new, m)
+				table.remove(old, i)
+			else
+				i = i + 1
+			end
+		end
+		if added == 0 then
+			checkfail(false, "circular override")
+		end
+	end
+
+	modlist.Mods = new
 end
 
 --- loads a ModPack bba, if present
@@ -857,7 +883,7 @@ end
 function ModLoader.IsUserRequestedModWhitelisted(modname)
 	if modname == "test" or modname == "WideScreenMode" or modname == "BugFixes" or modname == "MPW_Core" or
 	modname == "MPW_CombatPlus" or modname == "MPW_AOE" or modname == "MPW_Territory" or modname == "QoL" or modname == "AdvancedUI" or
-	modname == "ExtraUI" then
+	modname == "ExtraUI" or modname == "HookAdaptor" then
 		return true
 	end
 	if not ModLoader.UserRequestedModWhitelisted then

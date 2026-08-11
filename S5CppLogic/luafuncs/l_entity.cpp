@@ -49,7 +49,7 @@ namespace CppLogic::Entity {
 			int num = L.GetTop();
 			auto* p = L.NewUserClass<CppLogic::Iterator::EntityPredicateOfAnyPlayer>();
 			p->players.reserve(num);
-			for (int i = 0; i < num; ++i)
+			for (int i = 1; i < num; ++i)
 				p->players.emplace_back(L.CheckPlayerId(i));
 			return 1;
 		}

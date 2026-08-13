@@ -4400,6 +4400,7 @@ function RedirectLayerPopHelper:Set(n, r) end
 ---@field Tooltip string
 ---@field Options string[]
 ---@field Set string?
+---@field UI boolean
 
 ---@class ModpackDesc
 ---@field Name string

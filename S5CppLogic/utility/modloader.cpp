@@ -1582,6 +1582,7 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 	}
 	m->AddArchive("ModPacks\\CppLogic.bba");
 	Initialized = true;
+	EScr::LuaStateSerializer::AddGlobalToNotSerialize("ModLoader");
 }
 
 void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
@@ -1679,6 +1680,7 @@ const BB::SerializationData CppLogic::ModLoader::ModpackDesc::Setting::Serializa
 	AutoMemberSerialization(ModpackDesc::Setting, Name),
 	AutoMemberSerialization(ModpackDesc::Setting, Tooltip),
 	AutoMemberSerialization(ModpackDesc::Setting, Options),
+	AutoMemberSerialization(ModpackDesc::Setting, UI),
 	BB::SerializationData::GuardData(),
 };
 

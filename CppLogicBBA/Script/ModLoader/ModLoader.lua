@@ -75,6 +75,7 @@ ModLoader = ModLoader or {}
 ---@field Mods ModpackDesc[]
 ---@field Incompatible string[]
 ---@field Failed string[]
+---@field package UISettings table<string, table<string,string>>
 
 ---@class ModPack
 ---@field Manifest Manifest
@@ -447,7 +448,7 @@ end
 --- @param failuresToList boolean?
 --- @return ModList
 function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresToList)
-	modlist = modlist or {Mods = {}, Incompatible = {}, Failed = {}}
+	modlist = modlist or {Mods = {}, Incompatible = {}, Failed = {}, UISettings = ModLoader.LoadUISettings()}
 	local function checkfail(cond, msg)
 		if failuresToList then
 			if not cond then
@@ -491,7 +492,9 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresTo
 				if good then
 					for _,s in ipairs(m.Settings) do
 						if sett[s.Key] then
-							s.Set = sett[s.Key] or s.Options[1]
+							s.Set = sett[s.Key]
+						elseif s.UI and modlist.UISettings[name] and modlist.UISettings[name][s.Key] then
+							s.Set = modlist.UISettings[name][s.Key]
 						end
 					end
 					table.insert(modlist.Mods, m)
@@ -680,7 +683,7 @@ end
 function ModLoader.RequireModList()
 	xpcall(function()
 		---@type ModList
-		ModLoader.ModList = {Mods = {}, Incompatible = {}, Failed = {}}
+		ModLoader.ModList = {Mods = {}, Incompatible = {}, Failed = {}, UISettings = ModLoader.LoadUISettings()}
 		if ModLoader.MapInfo.IsSavegame then
 			local _, ml = ModLoader.ParseSaveGUID(ModLoader.MapInfo.MapGUID, ModLoader.MapInfo.MapName,
 				ModLoader.MapInfo.MapType, ModLoader.MapInfo.MapCampagnName
@@ -716,8 +719,9 @@ end
 ---@param noVers boolean
 ---@param select nil|fun(mp:ModpackDesc):boolean
 ---@param defaultSetting boolean?
+---@param writeUI boolean?
 ---@return string
-function ModLoader.SerializeModList(ml, noVers, select, defaultSetting)
+function ModLoader.SerializeModList(ml, noVers, select, defaultSetting, writeUI)
 	if not select then
 		select = function() return true end
 	end
@@ -729,8 +733,14 @@ function ModLoader.SerializeModList(ml, noVers, select, defaultSetting)
 				s = s.."@"..m.Version
 			end
 			for _,se in ipairs(m.Settings) do
-				if (se.Set or defaultSetting) and se.Key ~= "" then
-					s = s.."?"..se.Key.."="..(se.Set or se.Options[1])
+				if not se.UI or writeUI then
+					local to = se.Set
+					if not s and defaultSetting then
+						s = se.Options[1]
+					end
+					if to and se.Key ~= "" then
+						s = s.."?"..se.Key.."="..to
+					end
 				end
 			end
 		end
@@ -917,6 +927,28 @@ function ModLoader.DiscoverUserRequested(modlist, requested, failuresToList)
 		return
 	end
 	ModLoader.DiscoverRequired(l, modlist, true, failuresToList)
+end
+
+--- loads user settings of all mods
+--- @param requested string|string[]|nil
+--- @return table<string,table<string,string>>
+function ModLoader.LoadUISettings(requested)
+	if not requested then
+		requested = GDB.GetString("CppLogic\\UserRequestedMods")
+	end
+	---@type string[]
+	local l
+	if type(requested)=="string" then
+		l = ModLoader.LoadModList(requested)
+	else
+		l = requested
+	end
+	local t = {}
+	for _,m in ipairs(l) do
+		local n, _, s = ModLoader.ParseModString(m)
+		t[n] = s
+	end
+	return t
 end
 
 --- adds empty tables, for compatibility with old modloaders

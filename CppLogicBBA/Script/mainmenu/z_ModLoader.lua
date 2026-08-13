@@ -101,6 +101,7 @@ function ModLoaderMainmenu.LoadModpacks()
 				Tooltip = XGUIEng.GetStringTableText("CppLogic_Mainmenu/OnTT"),
 				Type = ModLoaderMainmenu.ModSettingType.Active,
 				Options = {},
+				UI = false,
 			}
 			table.insert(i.Settings, 1, o)
 			o = {
@@ -109,6 +110,7 @@ function ModLoaderMainmenu.LoadModpacks()
 				Tooltip = XGUIEng.GetStringTableText("CppLogic_Mainmenu/IngameTT"),
 				Type = ModLoaderMainmenu.ModSettingType.Ingame,
 				Options = {},
+				UI = false,
 			}
 			table.insert(i.Settings, 2, o)
 			o = {
@@ -117,6 +119,7 @@ function ModLoaderMainmenu.LoadModpacks()
 				Tooltip = XGUIEng.GetStringTableText("CppLogic_Mainmenu/MainmenuTT"),
 				Type = ModLoaderMainmenu.ModSettingType.MainMenu,
 				Options = {},
+				UI = false,
 			}
 			table.insert(i.Settings, 3, o)
 			table.insert(ModLoaderMainmenu.ModPacks, i)
@@ -145,7 +148,7 @@ function ModLoaderMainmenu.StoreUserRequestedModpacks()
 	local s = ModLoader.SerializeModList(ModLoaderMainmenu.ModPacks, true, function(mp)
 		---@cast mp CPPLMMMod
 		return (mp.MainmenuMod or mp.UserRequestable) and mp.Active
-	end)
+	end, nil, true)
 	GDB.SetString("CppLogic\\UserRequestedMods", s)
 end
 
@@ -308,7 +311,7 @@ function ModLoaderMainmenu.PredictMapModPacks(map, type, cname, userRequested, s
 	---@diagnostic disable-next-line: inject-field
 	ModLoader.UserRequestedModWhitelisted = ur
 	---@type ModList
-	local modlist = {Mods = {}, Incompatible = i, Failed = {}}
+	local modlist = {Mods = {}, Incompatible = i, Failed = {}, UISettings = ModLoader.LoadUISettings()}
 	ModLoader.DiscoverRequired(r, modlist, nil, true)
 	if not saveMl then
 		ModLoader.DiscoverUserRequested(modlist, userRequested, true)

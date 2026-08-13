@@ -467,6 +467,7 @@ namespace CppLogic::ModLoader {
 			std::string Name;
 			std::string Tooltip;
 			std::vector<std::string> Options;
+			bool UI = false;
 
 			static const BB::SerializationData SerializationData[];
 		};

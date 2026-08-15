@@ -1167,7 +1167,7 @@ namespace CppLogic::UA {
 		return 0;
 	}
 
-	int New(luaext::State L) {
+	static int New(luaext::State L) {
 		auto pl = L.CheckPlayerId(1);
 		L.CheckType(2, lua::LType::Function);
 		L.CheckType(3, lua::LType::Function);
@@ -1184,7 +1184,7 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int GetNearestEnemyInArea(luaext::State L) {
+	static int GetNearestEnemyInArea(luaext::State L) {
 		auto pl = L.CheckPlayerId(1);
 		shok::Position p = L.CheckPos(2);
 		float r = L.CheckFloat(3);
@@ -1196,7 +1196,7 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int CountTargetEntitiesInArea(luaext::State L) {
+	static int CountTargetEntitiesInArea(luaext::State L) {
 		auto pl = L.CheckPlayerId(1);
 		shok::Position p = L.CheckPos(2);
 		float r = L.CheckFloat(3);
@@ -1204,7 +1204,7 @@ namespace CppLogic::UA {
 		return 1;
 	}
 
-	int AddCannonBuilderData(luaext::State L) {
+	static int AddCannonBuilderData(luaext::State L) {
 		UACannonBuilderAbilityData d = { L.CheckEnum<shok::EntityTypeId>(1), L.CheckEnum<shok::EntityTypeId>(2), L.CheckEnum<shok::EntityTypeId>(3) };
 		UnlimitedArmy::CannonBuilderAbilityData.emplace_back(d);
 		return 0;
@@ -1216,7 +1216,7 @@ namespace CppLogic::UA {
 		CppLogic::Serializer::UserdataDeserializer[std::string{ typename_details::type_name<UnlimitedArmy>() }] = &luaext::State::CppToCFunction<ReadTable>;
 	}
 
-	constexpr std::array UA{
+	static constexpr std::array UA{
 			luaext::FuncReference::GetRef<New>("New"),
 			luaext::FuncReference::GetRef<GetNearestEnemyInArea>("GetNearestEnemyInArea"),
 			luaext::FuncReference::GetRef<CountTargetEntitiesInArea>("CountTargetEntitiesInArea"),

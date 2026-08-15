@@ -14,68 +14,69 @@
 #include <array>
 
 namespace CppLogic::Mem {
-	int SetFPU(luaext::State L) {
-		shok::SetHighPrecFPU();
-		return 0;
-	}
+	namespace {
+		int SetFPU(luaext::State L) {
+			shok::SetHighPrecFPU();
+			return 0;
+		}
 
-	int EntityType(luaext::State L) {
-		CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.EntityType", static_cast<BB::IObject*>(L.CheckEntityType(1)));
-		return 1;
-	}
+		int EntityType(luaext::State L) {
+			CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.EntityType", static_cast<BB::IObject*>(L.CheckEntityType(1)));
+			return 1;
+		}
 
-	int Entity(luaext::State L) {
-		CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.Entity", static_cast<BB::IObject*>(L.CheckEntity(1)));
-		return 1;
-	}
+		int Entity(luaext::State L) {
+			CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.Entity", static_cast<BB::IObject*>(L.CheckEntity(1)));
+			return 1;
+		}
 
-	int EffectType(luaext::State L) {
-		auto id = L.CheckEnum<shok::EffectTypeId>(1);
-		CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.EffectType", GetEffectType(id), EGL::EffectType::SerializationData);
-		return 1;
-	}
+		int EffectType(luaext::State L) {
+			auto id = L.CheckEnum<shok::EffectTypeId>(1);
+			CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.EffectType", GetEffectType(id), EGL::EffectType::SerializationData);
+			return 1;
+		}
 
-	int Effect(luaext::State L) {
-		CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.Effect", static_cast<BB::IObject*>(L.CheckEffect(1)));
-		return 1;
-	}
+		int Effect(luaext::State L) {
+			CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.Effect", static_cast<BB::IObject*>(L.CheckEffect(1)));
+			return 1;
+		}
 
-	int Player(luaext::State L) {
-		auto p = L.CheckPlayerId(1, false);
-		CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.Player", (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p));
-		return 1;
-	}
+		int Player(luaext::State L) {
+			auto p = L.CheckPlayerId(1, false);
+			CppLogic::Serializer::ObjectAccess::PushObject(L, "Mem.Player", (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(p));
+			return 1;
+		}
 
-	int Technology(luaext::State L) {
-		auto id = L.CheckEnum<shok::TechnologyId>(1);
-		Serializer::ObjectAccess::PushObject(L, "Mem.GetTechnology", GetTechnology(id), shok::Technology::SerializationData);
-		return 1;
-	}
+		int Technology(luaext::State L) {
+			auto id = L.CheckEnum<shok::TechnologyId>(1);
+			Serializer::ObjectAccess::PushObject(L, "Mem.GetTechnology", GetTechnology(id), shok::Technology::SerializationData);
+			return 1;
+		}
 
-	int LogicProperties(luaext::State L) {
-		Serializer::ObjectAccess::PushObject(L, "Mem.LogicProperties", *GGL::CLogicProperties::GlobalObj);
-		return 1;
-	}
+		int LogicProperties(luaext::State L) {
+			Serializer::ObjectAccess::PushObject(L, "Mem.LogicProperties", *GGL::CLogicProperties::GlobalObj);
+			return 1;
+		}
 
-	int PlayerAttractionProps(luaext::State L) {
-		Serializer::ObjectAccess::PushObject(L, "Mem.PlayerAttractionProps", *GGL::CPlayerAttractionProps::GlobalObj);
-		return 1;
-	}
+		int PlayerAttractionProps(luaext::State L) {
+			Serializer::ObjectAccess::PushObject(L, "Mem.PlayerAttractionProps", *GGL::CPlayerAttractionProps::GlobalObj);
+			return 1;
+		}
 
-	constexpr std::array Mem = {
-		luaext::FuncReference::GetRef<SetFPU>("SetFPU"),
-		luaext::FuncReference::GetRef<EntityType>("EntityType"),
-		luaext::FuncReference::GetRef<Entity>("Entity"),
-		luaext::FuncReference::GetRef<EffectType>("EffectType"),
-		luaext::FuncReference::GetRef<Effect>("Effect"),
-		luaext::FuncReference::GetRef<Player>("Player"),
-		luaext::FuncReference::GetRef<Technology>("Technology"),
-		luaext::FuncReference::GetRef<LogicProperties>("LogicProperties"),
-		luaext::FuncReference::GetRef<PlayerAttractionProps>("PlayerAttractionProps"),
-	};
+		constexpr std::array Mem = {
+			luaext::FuncReference::GetRef<SetFPU>("SetFPU"),
+			luaext::FuncReference::GetRef<EntityType>("EntityType"),
+			luaext::FuncReference::GetRef<Entity>("Entity"),
+			luaext::FuncReference::GetRef<EffectType>("EffectType"),
+			luaext::FuncReference::GetRef<Effect>("Effect"),
+			luaext::FuncReference::GetRef<Player>("Player"),
+			luaext::FuncReference::GetRef<Technology>("Technology"),
+			luaext::FuncReference::GetRef<LogicProperties>("LogicProperties"),
+			luaext::FuncReference::GetRef<PlayerAttractionProps>("PlayerAttractionProps"),
+		};
+	} // namespace
 
-	void Init(luaext::State L)
-	{
+	void Init(luaext::State L) {
 		L.RegisterFuncs(Mem, -3);
 
 		L.Push("ObjectAccessType");
@@ -85,4 +86,4 @@ namespace CppLogic::Mem {
 		CppLogic::GetIdManager<BB::SerializationListOptions::ExtendedInfo::Ty>().PushToState(L);
 		L.SetTableRaw(-3);
 	}
-}
+} // namespace CppLogic::Mem

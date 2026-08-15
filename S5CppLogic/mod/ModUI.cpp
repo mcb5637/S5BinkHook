@@ -598,10 +598,10 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcnam
 		return true;
 	lua::State L{ *EScr::GetCurrentLuaState() };
 	int t = L.GetTop();
-	std::string s = std::format("return {}", funcname);
+	std::string s = std::format("#return {}", funcname);
 	bool r = false;
 	try {
-		L.DoStringT(s, "TextInputCustomWidget::CallFunc");
+		L.DoStringT(std::string_view(s).substr(1), s.c_str());
 		if (L.IsFunction(-1)) {
 			const auto& [str, _] = ClearTextOutput();
 			L.Push(str);
@@ -1051,10 +1051,10 @@ bool CppLogic::Mod::UI::MiniMapOverlayWithCallbackCustomWidget::HandleEvent(EGUI
 			{
 				luaext::State L{ *EScr::GetCurrentLuaState() };
 				int t = L.GetTop();
-				std::string s = std::format("return {}", static_cast<std::string_view>(FuncName()));
+				std::string s = std::format("#return {}", static_cast<std::string_view>(FuncName()));
 				bool r = false;
 				try {
-					L.DoStringT(s, "MiniMapOverlayWithCallbackCustomWidget::HandleEvent");
+					L.DoStringT(std::string_view(s).substr(1), s.c_str());
 					if (L.IsFunction(-1)) {
 						L.Push(widget->WidgetID);
 						L.Push(*pos);

@@ -102,8 +102,10 @@ namespace EScr {
 		// copy assign 55e195 buggy
 
 		static void HookCopyAssignOperator();
+		static void HookGetRef();
 	private:
 		CLuaFuncRefCommand* CopyAssignOperatorOverride(CLuaFuncRefCommand* other);
+		int __stdcall GetRefToFuncOverride();
 	};
 	static_assert(sizeof(EScr::CLuaFuncRefCommand) == 12 * 4);
 

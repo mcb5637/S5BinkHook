@@ -248,6 +248,14 @@ void EScr::CLuaFuncRefCommand::HookCopyAssignOperator() {
 	CppLogic::Hooks::SaveVirtualProtect vp {reinterpret_cast<void*>(0x55e195), 0x10};
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x55e195), CppLogic::Hooks::MemberFuncPointerToVoid(&CLuaFuncRefCommand::CopyAssignOperatorOverride, 0), reinterpret_cast<void*>(0x55e19b));
 }
+void EScr::CLuaFuncRefCommand::HookGetRef() {
+	static bool Hooked = false;
+	if (Hooked)
+		return;
+	Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp {reinterpret_cast<void*>(0x5a1884), 0x10};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x5a1884), CppLogic::Hooks::MemberFuncPointerToVoid(&CLuaFuncRefCommand::GetRefToFuncOverride, 0), reinterpret_cast<void*>(0x5a188b));
+}
 
 EScr::CLuaFuncRefCommand* EScr::CLuaFuncRefCommand::CopyAssignOperatorOverride(CLuaFuncRefCommand* other) {
 	SetState(other->L);
@@ -263,6 +271,18 @@ EScr::CLuaFuncRefCommand* EScr::CLuaFuncRefCommand::CopyAssignOperatorOverride(C
 	Unknown = other->Unknown;
 	LuaCommand = other->LuaCommand;
 	return this;
+}
+
+int __stdcall EScr::CLuaFuncRefCommand::GetRefToFuncOverride() {
+	if (L.GetState() == nullptr || LuaCommand.size() == 0)
+		return luaext::State::NoRef.Value();
+	auto t = L.AutoCleanStack();
+	auto f = std::format("#{}", std::string_view(LuaCommand));
+	auto cmd = std::string_view(f).substr(1);
+	if (L.LoadBuffer(cmd.data(), cmd.size(), f.c_str()) == lua::ErrorCode::Success) {
+		return L.Ref(luaext::State::RegistryIndex).Value();
+	}
+	return luaext::State::NoRef.Value();
 }
 
 int __stdcall EScr::CLuaFuncRefGlobal::GetRefToFunc()
@@ -295,7 +315,8 @@ int __stdcall EScr::CLuaFuncRefGlobal::GetRefOverride()
 	}
 	else {
 		try {
-			L.DoStringT(std::format("return {};", static_cast<std::string_view>(FuncName)), "EScr::CLuaFuncRefGlobal::GetRefOverride");
+			auto data = std::format("#return {}", static_cast<std::string_view>(FuncName));
+			L.DoStringT(std::string_view(data).substr(1), data.c_str());
 			if (L.IsFunction(-1)) {
 				r = L.Ref(luaext::State::RegistryIndex);
 			}

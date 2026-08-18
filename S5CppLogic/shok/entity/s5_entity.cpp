@@ -1375,12 +1375,16 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(CGLEEntity* attacker, int damage, sho
 				currentSol++;
 			}
 			while (troopHp > 0 && damage > 0) {
+				if (firstToDie->InvulnerabilityFlag) {
+					damage = 0;
+					break;
+				}
 				int thisSolHp = troopHp - ((currentSol - 1) * hpPerSol);
 				if (damage >= thisSolHp) {
 					damage -= thisSolHp;
 					troopHp -= thisSolHp;
 					damageDone += thisSolHp;
-					attackedLeader->DetachObservedEntity(shok::AttachmentType::LEADER_SOLDIER, firstToDie->EntityId, false);
+
 					currentSol--;
 					idsKilled.push_back(firstToDie->EntityId);
 					xpToAdd += firstToDie->GetEntityType()->LogicProps->ExperiencePoints;
@@ -1389,6 +1393,8 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(CGLEEntity* attacker, int damage, sho
 					CppLogic::Events::AdvHurtEvent ev{ shok::EventIDs::CppLogicEvent_OnEntityKilled, attacker ? attacker->EntityId : static_cast<shok::EntityId>(0), firstToDie->EntityId, damage, sourceInfo, attackerPlayer };
 					(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 
+					attackedLeader->DetachObservedEntity(shok::AttachmentType::LEADER_SOLDIER, firstToDie->EntityId, false);
+					firstToDie->InvulnerabilityFlag = false;
 					firstToDie->Hurt(firstToDie->Health);
 
 					shok::EntityId id = attackedLeader->GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER);
@@ -1408,7 +1414,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(CGLEEntity* attacker, int damage, sho
 			firstToDie = attackedLeader;
 		}
 	}
-	if (damage > 0) {
+	if (damage > 0 && !firstToDie->InvulnerabilityFlag) {
 		if (damage >= firstToDie->Health) {
 			damageDone += firstToDie->Health;
 			idsKilled.push_back(firstToDie->EntityId);
@@ -1417,6 +1423,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(CGLEEntity* attacker, int damage, sho
 			firstToDie->FireEvent(&kev);
 			CppLogic::Events::AdvHurtEvent ev{ shok::EventIDs::CppLogicEvent_OnEntityKilled, attacker ? attacker->EntityId : static_cast<shok::EntityId>(0), firstToDie->EntityId, damage, sourceInfo, attackerPlayer };
 			(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+			firstToDie->InvulnerabilityFlag = false;
 			firstToDie->Hurt(firstToDie->Health);
 		}
 		else {
@@ -1442,7 +1449,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(CGLEEntity* attacker, int damage, sho
 	if (idsKilled.empty())
 		return;
 
-	const char* callback;
+	std::string_view callback;
 	if (dynamic_cast<GGL::CBuilding*>(this)) {
 		if (addStat) {
 			if (attackerPlayer != static_cast<shok::PlayerId>(0))
@@ -1936,7 +1943,7 @@ void GGL::CSettler::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
 	if (EventIsSoldier()) {
 		auto* l = GetEntityByID(GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER));
 		if (l == nullptr) {
-			Destroy();
+			Hurt(Health);
 			return;
 		}
 		l->FireEvent(ev);

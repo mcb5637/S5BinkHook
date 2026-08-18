@@ -908,6 +908,7 @@ namespace GGL {
 		// is valid attack target 50b979
 		// set battle tasklist 50b81f
 		// get dmg against 50c1cd (entity*)
+		// 50b597 get armor class of (entity*)
 
 		static void HookDamageOverride();
 		static void HookRangeOverride();

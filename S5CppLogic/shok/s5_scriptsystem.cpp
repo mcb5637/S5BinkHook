@@ -131,7 +131,7 @@ static void __stdcall ScriptTriggerSys_FireEventHooked(BB::IPostEvent* th, BB::C
 		if (!tr->ConditionFunc.CheckRef() || tr->CallCondition()) {
 			*EScr::CScriptTriggerSystem::CurrentRunningEventGet = ev;
 			*EScr::CScriptTriggerSystem::CurrentRunningEventSet = ev;
-			tr->MarkedForUnrequest = tr->CallAction();
+			tr->MarkedForUnrequest |= tr->CallAction();
 		}
 	}
 

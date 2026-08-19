@@ -987,6 +987,7 @@ namespace CppLogic::UI {
 			vh->StateIdManager->GetIDByNameOrCreate(GUIState_PlaceBuildingEx::Name, GUIState_PlaceBuildingEx::Id); // make sure the state id exists
 			GGUI::SPlaceBuildingStateParameters p{L.CheckEnum<shok::UpgradeCategoryId>(1)};
 			vh->SetGUIState<CppLogic::UI::GUIState_PlaceBuildingEx>(&p);
+			BB::IdentifierCast<GUIState_PlaceBuildingEx>(vh->CurrentState)->ScrollRotate = L.OptBool(2, true);
 			return 0;
 		}
 
@@ -1677,7 +1678,7 @@ namespace CppLogic::UI {
 	bool CppLogic::UI::GUIState_PlaceBuildingEx::OnMouseEvent(BB::CEvent* ev) {
 		if (auto* e = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 			if (e->IsEvent(shok::InputEventIds::MouseWheel)) {
-				if (e->IsModifier(shok::Keys::ModifierControl)) {
+				if (!ScrollRotate ||  e->IsModifier(shok::Keys::ModifierControl)) {
 					(*ERwTools::CRwCameraHandler::GlobalObj)->ScrollWheelZoom(e->Delta);
 					e->EventHandled = true;
 					return true;

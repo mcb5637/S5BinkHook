@@ -313,9 +313,7 @@ ModLoader.ManifestType = {
 		Merge = function(t, into, from)
 			local at = into[t.Key]
 			for u, v in pairs(from[t.Key]) do
-				if not at[u] then
-					at[u] = v
-				end
+				at[u] = v
 			end
 		end,
 		Fix = function(t, manifest)
@@ -363,9 +361,10 @@ ModLoader.ManifestType = {
 			local at = into[t.Key]
 			for _, sg in ipairs(from[t.Key]) do
 				local c = false
-				for _, s in ipairs(at) do
+				for i, s in ipairs(at) do
 					if sg[1] == s[1] then
 						c = true
+						at[i] = sg
 					end
 				end
 				if not c then
@@ -653,10 +652,13 @@ end
 function ModLoader.LoadMods(modlist)
 	-- [n] ... [2] overrides [1]
 	ModLoader.LoadArchives(modlist)
-	-- merge ignores items already present -> {s5x, n, ..., 2, 1}
-	for i=table.getn(modlist.Mods),1,-1 do
-		ModLoader.InitMod(modlist.Mods[i])
+	local mapManifest = ModLoader.Manifest
+	ModLoader.Manifest = {}
+	-- s5x [n] ... [2] overrides [1]
+	for _,m in ipairs(modlist.Mods) do
+		ModLoader.InitMod(m)
 	end
+	ModLoader.MergeManifest(ModLoader.Manifest, mapManifest)
 end
 
 --- removes no longer needed ModPack bbas

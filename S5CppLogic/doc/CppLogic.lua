@@ -3613,7 +3613,8 @@ function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
 --- sets a GUI State to place a construction site and choose its rotation.
 --- status of this gets saved into savegames.
 --- @param ucat number building upgrade category
-function CppLogic.UI.SetGUIStatePlaceBuildingEx(ucat) end
+--- @param rotate boolean?
+function CppLogic.UI.SetGUIStatePlaceBuildingEx(ucat, rotate) end
 --- changes the rotation of a PlaceBuildingEx state.
 --- @param deg number
 function CppLogic.UI.SetPlaceBuildingRotation(deg) end

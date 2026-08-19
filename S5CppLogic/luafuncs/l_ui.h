@@ -43,6 +43,7 @@ namespace CppLogic::UI {
 	public:
 		int CurrentStep = 0;
 		bool Chain = false;
+		bool ScrollRotate = true;
 
 		static constexpr int NumSteps = 4;
 		static constexpr float StepToDegrees = 360.0f / NumSteps;

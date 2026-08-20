@@ -302,7 +302,7 @@ namespace ED {
 
 		static void HookExtraPlayers();
 	private:
-		void RefreshPlayerColorsExtra() const;
+		void RefreshPlayerColorsExtra();
 		void SetPlayerColorMappingExtra(shok::PlayerId pid, int col);
 	};
 	static_assert(offsetof(CPlayerColors, CurrentPlayerUIColors) == 1 * 4);

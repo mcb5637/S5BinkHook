@@ -214,7 +214,7 @@ void ED::CPlayerColors::HookExtraPlayers() {
 
 shok::Color* ED::CPlayerColors::GlobalPlayerMinimapColor = nullptr;
 // ReSharper disable once CppDFAUnreachableFunctionCall
-void ED::CPlayerColors::RefreshPlayerColorsExtra() const {
+void ED::CPlayerColors::RefreshPlayerColorsExtra() {
 	static std::vector<RWE::RwRGBAReal> ModelColors{};
 	static std::vector<PlayerUIColor> UIColors{};
 	static std::vector<shok::Color> MinimapColor{};
@@ -232,6 +232,11 @@ void ED::CPlayerColors::RefreshPlayerColorsExtra() const {
 		UIColors[i] = {.B = uic.B, .G = uic.G, .R = uic.R, .A = uic.A};
 		ModelColors[i].FromShokColor(uic);
 		MinimapColor[i] = dp->MiniMapColor.at(mapping);
+	}
+	for (int i = 0; i <= 8; ++i) {
+		CurrentPlayerUIColors[i] = UIColors[i];
+		CurrentPlayerMiniMapColors[i] = MinimapColor[i];
+		CurrentPlayerModelColors[i] = ModelColors[i];
 	}
 
 	*GlobalPlayerModelColors = ModelColors.data();

@@ -94,7 +94,7 @@ static void __stdcall ScriptTriggerSys_FireEventHooked(BB::IPostEvent* th, BB::C
 	static std::vector<shok::EventIDs> eventsToClear{};
 
 	auto* t = static_cast<EScr::CScriptTriggerSystem*>(th); // NOLINT(*-pro-type-static-cast-downcast)
-	if (t->TriggerSystemDisabled)
+	if (t->TriggerSystemDisabled && !ev->IsEvent(shok::EventIDs::CppLogicEvent_OnMapStarted) && !ev->IsEvent(shok::EventIDs::CppLogicEvent_OnSavegameLoaded))
 		return;
 
 	BB::CEvent* oldget = *EScr::CScriptTriggerSystem::CurrentRunningEventGet;

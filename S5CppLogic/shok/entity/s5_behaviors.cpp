@@ -460,9 +460,16 @@ void GGL::CSniperAbility::OverrideSnipeTask()
 void GGL::CShurikenAbility::HookDealDamage()
 {
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
-		   reinterpret_cast<void*>(0x4dc656)
+		   reinterpret_cast<void*>(0x4dc656),
+		   reinterpret_cast<void*>(0x4dc4e4),
 	   } };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4dc656), CppLogic::Hooks::MemberFuncPointerToVoid(&CShurikenAbility::FireSingleOverride, 0), reinterpret_cast<void*>(0x4dc660));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4dc4e4), CppLogic::Hooks::MemberFuncPointerToVoid(&CShurikenAbility::IsValidTargetExtra, 0));
+}
+
+bool GGL::CShurikenAbility::IsValidTarget(EGL::CGLEEntity* target) const {
+	auto* f = reinterpret_cast<bool(__thiscall*)(const CShurikenAbility*, EGL::CGLEEntity*)>(0x4dbc48);
+	return f(this, target);
 }
 
 int GGL::CShurikenAbility::GetDamage() const {
@@ -497,6 +504,12 @@ int GGL::CShurikenAbility::CalculateDamageAgainstOld(EGL::CGLEEntity* t) {
 void GGL::CShurikenAbility::GetProjectileStartPos(shok::Position* pos) {
 	auto* f = reinterpret_cast<void(__thiscall*)(CShurikenAbility*, shok::Position*)>(0x4dbb52);
 	return f(this, pos);
+}
+
+bool GGL::CShurikenAbility::IsValidTargetExtra(EGL::CGLEEntity* target) const {
+	if (target->GetClassIdentifier() != GGL::CSettler::Identifier)
+		return false;
+	return IsValidTarget(target);
 }
 
 static inline float(__thiscall* const battleBehaviorGetMaxRange)(const GGL::CBattleBehavior*) = reinterpret_cast<float(__thiscall*)(const GGL::CBattleBehavior*)>(0x50AB43);

@@ -230,6 +230,8 @@ namespace EGL {
 		int EventGetWorktime();
 		float EventGetMotivation();
 
+		// 4dbf4f get armorclass stdcall (maybe this shurikenbeh?, not used)
+
 		void SetHealth(int h);
 		// nullptr to remove
 		// overrides name->id mapping, if already exists

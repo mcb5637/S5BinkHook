@@ -1252,11 +1252,17 @@ float EGL::CGLEEntity::CalculateDamageAgainstMe(int damage, shok::DamageClassId 
 	float dmg = static_cast<float>(damage) * aoeFactor;
 	EGL::CEventGetValue_Int getac{ shok::EventIDs::GetArmorClass };
 	FireEvent(&getac);
+	auto ac = static_cast<shok::ArmorClassId>(getac.Data);
 	EGL::CEventGetValue_Int geta{ shok::EventIDs::GetArmor };
 	FireEvent(&geta);
 
-	if (auto dco = CppLogic::GetDamageClass(damageclass))
-		dmg *= dco->GetBonusVsArmorClass(static_cast<shok::ArmorClassId>(getac.Data));
+	if (ac != shok::ArmorClassId::Invalid) {
+		if (auto dco = CppLogic::GetDamageClass(damageclass))
+			dmg *= dco->GetBonusVsArmorClass(ac);
+	}
+	else {
+		shok::LogString("ac 0 on type %i\n", getac.Data);
+	}
 	dmg -= static_cast<float>(geta.Data);
 	return dmg;
 }

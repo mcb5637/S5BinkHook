@@ -51,9 +51,11 @@ float& GGL::CDamageClassProps::GetBonusVsArmorClass(shok::ArmorClassId ac)
         }
     }
     --i;
-    if (i < 0 || i > 6)
-        throw std::out_of_range{ "invalid armorclass" };
-    return (&ArmorClassNoneFactor)[i];
+    if (i < 0 || i > 6) {
+    	shok::LogString("invalid ac %i\n", ac);
+		throw std::out_of_range{"invalid armorclass"};
+	}
+	return (&ArmorClassNoneFactor)[i];
 }
 
 GGL::CDamageClassProps* GGL::DamageClassesHolder::Get(shok::DamageClassId id)

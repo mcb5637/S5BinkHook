@@ -570,19 +570,22 @@ namespace GGL {
 
 		static void HookDealDamage();
 
-		// is valid target 4dbc48(entity*), 4dbe39(id)
+		// is valid target 4dbe39(id)
 		// is hostile 4dbaac
 		// is in target cone 4dbaef (angleToMaintarget, entity)
 		// search better target 4dbe57 (probably noop, since target has angle 0 -> will be found again)
 		// calc dmg against 4dc535(ent)
 		// fire single 4dc656(ent)
 		// fill targets 4dc44c(targetId, vector<entity>)
+		// get damageclass factor 4dc090(targetent)
 
+		[[nodiscard]] bool IsValidTarget(EGL::CGLEEntity* target) const;
 		[[nodiscard]] int GetDamage() const;
 	private:
 		void FireSingleOverride(EGL::CGLEEntity* t);
 		int CalculateDamageAgainstOld(EGL::CGLEEntity* t);
 		void GetProjectileStartPos(shok::Position* pos);
+		[[nodiscard]] bool IsValidTargetExtra(EGL::CGLEEntity* target) const;
 	};
 
 	class CKegPlacerBehavior : public GGL::CHeroAbility { // NOLINT(*-pro-type-member-init)

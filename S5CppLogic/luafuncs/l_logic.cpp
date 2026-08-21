@@ -1325,362 +1325,366 @@ namespace CppLogic::Logic {
 				throw lua::LuaException("invalid transform operation");
 			return static_cast<RWE::RwOpCombineType>(i);
 		}
-		struct LogicModel {
-			shok::ModelId ModelId = {};
-			shok::AnimationId AnimId = {};
-			RWE::RpClump* Model = nullptr;
-			RWE::Anim::RpHAnimHierarchy* AnimHandler = nullptr;
-			float StartTime = 0;
-			float CurrentTime = 0;
-			int PlayerColor = -1;
-			bool NoShadow = false, NoParticleEffects = false, NoTerrainDecal = false;
-			shok::Color Modulate = shok::Color{255, 255, 255, 255};
+	} // namespace
 
-			static int Clear(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (m->Model) {
-					m->Model->Destroy();
-					m->Model = nullptr;
-					m->AnimHandler = nullptr;
-				}
-				m->ModelId = shok::ModelId::Invalid;
-				m->AnimId = shok::AnimationId::Invalid;
-				m->PlayerColor = -1;
-				m->NoShadow = false;
-				m->NoParticleEffects = false;
-				m->NoTerrainDecal = false;
-				m->Modulate = shok::Color{255, 255, 255, 255};
-				return 0;
+	struct LogicModel {
+		shok::ModelId ModelId = {};
+		shok::AnimationId AnimId = {};
+		RWE::RpClump* Model = nullptr;
+		RWE::Anim::RpHAnimHierarchy* AnimHandler = nullptr;
+		float StartTime = 0;
+		float CurrentTime = 0;
+		int PlayerColor = -1;
+		bool NoShadow = false, NoParticleEffects = false, NoTerrainDecal = false;
+		shok::Color Modulate = shok::Color{255, 255, 255, 255};
+
+		static int Clear(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (m->Model) {
+				m->Model->Destroy();
+				m->Model = nullptr;
+				m->AnimHandler = nullptr;
 			}
-			static int SetModel(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				auto mid = L.CheckEnum<shok::ModelId>(2);
-				if (m->Model) {
-					m->Model->Destroy();
-					m->Model = nullptr;
-					m->AnimHandler = nullptr;
+			m->ModelId = shok::ModelId::Invalid;
+			m->AnimId = shok::AnimationId::Invalid;
+			m->PlayerColor = -1;
+			m->NoShadow = false;
+			m->NoParticleEffects = false;
+			m->NoTerrainDecal = false;
+			m->Modulate = shok::Color{255, 255, 255, 255};
+			return 0;
+		}
+		static int SetModel(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			auto mid = L.CheckEnum<shok::ModelId>(2);
+			if (m->Model) {
+				m->Model->Destroy();
+				m->Model = nullptr;
+				m->AnimHandler = nullptr;
+			}
+			auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid);
+			m->Model = mdata->Instanciate();
+			m->Model->AddToDefaultWorld();
+			m->ModelId = mid;
+			m->AnimId = shok::AnimationId::Invalid;
+			m->PlayerColor = -1;
+			m->NoShadow = false;
+			m->NoParticleEffects = false;
+			m->NoTerrainDecal = false;
+			m->Modulate = shok::Color{255, 255, 255, 255};
+			return 0;
+		}
+		static int SetAnim(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			auto anim = L.CheckEnum<shok::AnimationId>(2);
+			m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
+			if (!m->AnimHandler)
+				throw lua::LuaException{"no animhandler?"};
+			auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(anim);
+			m->AnimHandler->SetupForModel(m->Model);
+			m->AnimHandler->currentAnim->SetAnimation(adata);
+			m->AnimHandler->currentAnim->SetCurrentTime(0.0f);
+			m->AnimHandler->UpdateMatrices();
+			m->StartTime = (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds();
+			m->AnimId = anim;
+			m->CurrentTime = m->StartTime;
+			return 0;
+		}
+		static int SetTimeOfAnim(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			if (!m->AnimHandler)
+				throw lua::LuaException{"set an anim first"};
+			float t = L.OptFloat(2, (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds());
+			if (L.OptBool(3, true))
+				t -= m->StartTime;
+			m->CurrentTime = t;
+			m->AnimHandler->currentAnim->SetCurrentTime(t);
+			m->AnimHandler->UpdateMatrices();
+			return 0;
+		}
+		static int Translate(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			shok::Position p = L.CheckPos(2);
+			float h = L.OptFloat(3, 0);
+			if (L.OptBool(5, true)) {
+				float t = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
+				if (L.OptBool(6, false)) {
+					float w = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
+					h += std::max(t, w);
 				}
-				auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(mid);
+				else {
+					h += t;
+				}
+			}
+			RWE::RwV3d tr{p.X, p.Y, h};
+			m->Model->GetFrame()->Translate(&tr, LogicModel_CheckTO(L, 4));
+			return 0;
+		}
+		static int Rotate(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			float r = L.CheckFloat(2);
+			m->Model->GetFrame()->Rotate(r, LogicModel_CheckTO(L, 3));
+			return 0;
+		}
+		static int Scale(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			float s = L.CheckFloat(2);
+			m->Model->GetFrame()->Scale(s, LogicModel_CheckTO(L, 3));
+			return 0;
+		}
+		static int ResetTransform(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			m->Model->GetFrame()->Rotate(0, RWE::RwOpCombineType::Replace);
+			return 0;
+		}
+		static int SetColorByPlayer(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			int p = L.CheckInt(2);
+			if (!(p >= 0 && p <= 9))
+				throw lua::LuaException("invalid player");
+			m->Model->SetPlayerColor(p);
+			m->PlayerColor = p;
+			return 0;
+		}
+		static int DisableShadow(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			m->Model->DisableShadow();
+			m->NoShadow = true;
+			return 0;
+		}
+		static int DisableParticleEffects(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			m->Model->DisableParticleEffects();
+			m->NoParticleEffects = true;
+			return 0;
+		}
+		static int DisableTerrainDecal(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			m->Model->DisableTerrainDecal();
+			m->NoTerrainDecal = true;
+			return 0;
+		}
+		static int SetColorModulate(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			if (!m->Model)
+				throw lua::LuaException("set a model first");
+			int r = L.CheckInt(2);
+			int g = L.CheckInt(3);
+			int b = L.CheckInt(4);
+			int a = L.OptInt(5, 255);
+			m->Modulate = shok::Color{r, g, b, a};
+			m->Model->SetColorModulate(m->Modulate);
+			return 0;
+		}
+		static int Serialize(luaext::State L) {
+			auto* m = L.CheckUserClass<LogicModel>(1);
+			L.Push(typename_details::type_name<LogicModel>());
+			L.NewTable();
+
+			L.Push("Model");
+			L.Push(m->ModelId);
+			L.SetTableRaw(-3);
+
+			L.Push("Anim");
+			L.Push(m->AnimId);
+			L.SetTableRaw(-3);
+
+			L.Push("StartTime");
+			L.Push(m->StartTime);
+			L.SetTableRaw(-3);
+
+			L.Push("CurrentTime");
+			L.Push(m->CurrentTime);
+			L.SetTableRaw(-3);
+
+			if (m->Model) {
+				auto* f = m->Model->GetFrame();
+				auto* mat = reinterpret_cast<float*>(f->GetLTM());
+				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
+					L.Push(mat[i]);
+					L.SetTableRaw(-2, i + 1);
+				}
+			}
+			L.Push("PlayerColor");
+			L.Push(m->PlayerColor);
+			L.SetTableRaw(-3);
+
+			L.Push("NoShadow");
+			L.Push(m->NoShadow);
+			L.SetTableRaw(-3);
+
+			L.Push("NoParticleEffects");
+			L.Push(m->NoParticleEffects);
+			L.SetTableRaw(-3);
+
+			L.Push("NoTerrainDecal");
+			L.Push(m->NoTerrainDecal);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateR");
+			L.Push(m->Modulate.R);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateG");
+			L.Push(m->Modulate.G);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateB");
+			L.Push(m->Modulate.B);
+			L.SetTableRaw(-3);
+
+			L.Push("ModulateA");
+			L.Push(m->Modulate.A);
+			L.SetTableRaw(-3);
+
+			return 2;
+		}
+		static int Deserialize(luaext::State L) {
+			auto* m = L.NewUserClass<LogicModel>();
+			L.Push("Model");
+			L.GetTableRaw(1);
+			m->ModelId = L.CheckEnum<shok::ModelId>(-1);
+			L.Pop(1);
+
+			L.Push("Anim");
+			L.GetTableRaw(1);
+			m->AnimId = L.CheckEnum<shok::AnimationId>(-1);
+			L.Pop(1);
+
+			L.Push("StartTime");
+			L.GetTableRaw(1);
+			m->StartTime = L.CheckFloat(-1);
+			L.Pop(1);
+
+			L.Push("CurrentTime");
+			L.GetTableRaw(1);
+			m->CurrentTime = L.CheckFloat(-1);
+			L.Pop(1);
+
+			L.Push("PlayerColor");
+			L.GetTableRaw(1);
+			m->PlayerColor = L.CheckInt(-1);
+			L.Pop(1);
+
+			L.Push("NoShadow");
+			L.GetTableRaw(1);
+			m->NoShadow = L.CheckBool(-1);
+			L.Pop(1);
+
+			L.Push("NoParticleEffects");
+			L.GetTableRaw(1);
+			m->NoParticleEffects = L.CheckBool(-1);
+			L.Pop(1);
+
+			L.Push("NoTerrainDecal");
+			L.GetTableRaw(1);
+			m->NoTerrainDecal = L.CheckBool(-1);
+			L.Pop(1);
+
+			L.Push("ModulateR");
+			L.GetTableRaw(1);
+			m->Modulate.R = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			L.Push("ModulateG");
+			L.GetTableRaw(1);
+			m->Modulate.G = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			L.Push("ModulateB");
+			L.GetTableRaw(1);
+			m->Modulate.B = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			L.Push("ModulateA");
+			L.GetTableRaw(1);
+			m->Modulate.A = static_cast<byte>(L.CheckInt(-1));
+			L.Pop(1);
+
+			if (m->ModelId != shok::ModelId::Invalid) {
+				auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(m->ModelId);
 				m->Model = mdata->Instanciate();
 				m->Model->AddToDefaultWorld();
-				m->ModelId = mid;
-				m->AnimId = shok::AnimationId::Invalid;
-				m->PlayerColor = -1;
-				m->NoShadow = false;
-				m->NoParticleEffects = false;
-				m->NoTerrainDecal = false;
-				m->Modulate = shok::Color{255, 255, 255, 255};
-				return 0;
-			}
-			static int SetAnim(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				auto anim = L.CheckEnum<shok::AnimationId>(2);
-				m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
-				if (!m->AnimHandler)
-					throw lua::LuaException{"no animhandler?"};
-				auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(anim);
-				m->AnimHandler->SetupForModel(m->Model);
-				m->AnimHandler->currentAnim->SetAnimation(adata);
-				m->AnimHandler->currentAnim->SetCurrentTime(0.0f);
-				m->AnimHandler->UpdateMatrices();
-				m->StartTime = (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds();
-				m->AnimId = anim;
-				m->CurrentTime = m->StartTime;
-				return 0;
-			}
-			static int SetTimeOfAnim(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				if (!m->AnimHandler)
-					throw lua::LuaException{"set an anim first"};
-				float t = L.OptFloat(2, (*EGL::CGLEGameLogic::GlobalObj)->GetTimeSeconds());
-				if (L.OptBool(3, true))
-					t -= m->StartTime;
-				m->CurrentTime = t;
-				m->AnimHandler->currentAnim->SetCurrentTime(t);
-				m->AnimHandler->UpdateMatrices();
-				return 0;
-			}
-			static int Translate(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				shok::Position p = L.CheckPos(2);
-				float h = L.OptFloat(3, 0);
-				if (L.OptBool(5, true)) {
-					float t = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetTerrainHeightAtPos(p);
-					if (L.OptBool(6, false)) {
-						float w = (*ED::CGlobalsLogicEx::GlobalObj)->Landscape->GetWaterHeightAtPos(p);
-						h += std::max(t, w);
-					}
-					else {
-						h += t;
-					}
+				if (m->AnimId != shok::AnimationId::Invalid) {
+					m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
+					if (!m->AnimHandler)
+						throw lua::LuaException{"no animhandler?"};
+					auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(m->AnimId);
+					m->AnimHandler->SetupForModel(m->Model);
+					m->AnimHandler->currentAnim->SetAnimation(adata);
+					m->AnimHandler->currentAnim->SetCurrentTime(m->CurrentTime);
+					m->AnimHandler->UpdateMatrices();
 				}
-				RWE::RwV3d tr{p.X, p.Y, h};
-				m->Model->GetFrame()->Translate(&tr, LogicModel_CheckTO(L, 4));
-				return 0;
-			}
-			static int Rotate(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				float r = L.CheckFloat(2);
-				m->Model->GetFrame()->Rotate(r, LogicModel_CheckTO(L, 3));
-				return 0;
-			}
-			static int Scale(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				float s = L.CheckFloat(2);
-				m->Model->GetFrame()->Scale(s, LogicModel_CheckTO(L, 3));
-				return 0;
-			}
-			static int ResetTransform(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				m->Model->GetFrame()->Rotate(0, RWE::RwOpCombineType::Replace);
-				return 0;
-			}
-			static int SetColorByPlayer(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				int p = L.CheckInt(2);
-				if (!(p >= 0 && p <= 9))
-					throw lua::LuaException("invalid player");
-				m->Model->SetPlayerColor(p);
-				m->PlayerColor = p;
-				return 0;
-			}
-			static int DisableShadow(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				m->Model->DisableShadow();
-				m->NoShadow = true;
-				return 0;
-			}
-			static int DisableParticleEffects(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				m->Model->DisableParticleEffects();
-				m->NoParticleEffects = true;
-				return 0;
-			}
-			static int DisableTerrainDecal(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				m->Model->DisableTerrainDecal();
-				m->NoTerrainDecal = true;
-				return 0;
-			}
-			static int SetColorModulate(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				if (!m->Model)
-					throw lua::LuaException("set a model first");
-				int r = L.CheckInt(2);
-				int g = L.CheckInt(3);
-				int b = L.CheckInt(4);
-				int a = L.OptInt(5, 255);
-				m->Modulate = shok::Color{r, g, b, a};
+				auto* f = m->Model->GetFrame();
+				auto* mat = reinterpret_cast<float*>(f->GetLTM());
+				for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
+					L.GetTableRaw(1, i + 1);
+					if (L.IsNumber(-1))
+						mat[i] = L.CheckFloat(-1);
+					L.Pop(1);
+				}
+				f->UpdateObjects();
+				if (m->PlayerColor >= 0)
+					m->Model->SetPlayerColor(m->PlayerColor);
+				if (m->NoParticleEffects)
+					m->Model->DisableParticleEffects();
+				if (m->NoShadow)
+					m->Model->DisableShadow();
+				if (m->NoTerrainDecal)
+					m->Model->DisableTerrainDecal();
 				m->Model->SetColorModulate(m->Modulate);
-				return 0;
 			}
-			static int Serialize(luaext::State L) {
-				auto* m = L.CheckUserClass<LogicModel>(1);
-				L.Push(typename_details::type_name<LogicModel>());
-				L.NewTable();
+			return 1;
+		}
 
-				L.Push("Model");
-				L.Push(m->ModelId);
-				L.SetTableRaw(-3);
-
-				L.Push("Anim");
-				L.Push(m->AnimId);
-				L.SetTableRaw(-3);
-
-				L.Push("StartTime");
-				L.Push(m->StartTime);
-				L.SetTableRaw(-3);
-
-				L.Push("CurrentTime");
-				L.Push(m->CurrentTime);
-				L.SetTableRaw(-3);
-
-				if (m->Model) {
-					auto* f = m->Model->GetFrame();
-					auto* mat = reinterpret_cast<float*>(f->GetLTM());
-					for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
-						L.Push(mat[i]);
-						L.SetTableRaw(-2, i + 1);
-					}
-				}
-				L.Push("PlayerColor");
-				L.Push(m->PlayerColor);
-				L.SetTableRaw(-3);
-
-				L.Push("NoShadow");
-				L.Push(m->NoShadow);
-				L.SetTableRaw(-3);
-
-				L.Push("NoParticleEffects");
-				L.Push(m->NoParticleEffects);
-				L.SetTableRaw(-3);
-
-				L.Push("NoTerrainDecal");
-				L.Push(m->NoTerrainDecal);
-				L.SetTableRaw(-3);
-
-				L.Push("ModulateR");
-				L.Push(m->Modulate.R);
-				L.SetTableRaw(-3);
-
-				L.Push("ModulateG");
-				L.Push(m->Modulate.G);
-				L.SetTableRaw(-3);
-
-				L.Push("ModulateB");
-				L.Push(m->Modulate.B);
-				L.SetTableRaw(-3);
-
-				L.Push("ModulateA");
-				L.Push(m->Modulate.A);
-				L.SetTableRaw(-3);
-
-				return 2;
-			}
-			static int Deserialize(luaext::State L) {
-				auto* m = L.NewUserClass<LogicModel>();
-				L.Push("Model");
-				L.GetTableRaw(1);
-				m->ModelId = L.CheckEnum<shok::ModelId>(-1);
-				L.Pop(1);
-
-				L.Push("Anim");
-				L.GetTableRaw(1);
-				m->AnimId = L.CheckEnum<shok::AnimationId>(-1);
-				L.Pop(1);
-
-				L.Push("StartTime");
-				L.GetTableRaw(1);
-				m->StartTime = L.CheckFloat(-1);
-				L.Pop(1);
-
-				L.Push("CurrentTime");
-				L.GetTableRaw(1);
-				m->CurrentTime = L.CheckFloat(-1);
-				L.Pop(1);
-
-				L.Push("PlayerColor");
-				L.GetTableRaw(1);
-				m->PlayerColor = L.CheckInt(-1);
-				L.Pop(1);
-
-				L.Push("NoShadow");
-				L.GetTableRaw(1);
-				m->NoShadow = L.CheckBool(-1);
-				L.Pop(1);
-
-				L.Push("NoParticleEffects");
-				L.GetTableRaw(1);
-				m->NoParticleEffects = L.CheckBool(-1);
-				L.Pop(1);
-
-				L.Push("NoTerrainDecal");
-				L.GetTableRaw(1);
-				m->NoTerrainDecal = L.CheckBool(-1);
-				L.Pop(1);
-
-				L.Push("ModulateR");
-				L.GetTableRaw(1);
-				m->Modulate.R = static_cast<byte>(L.CheckInt(-1));
-				L.Pop(1);
-
-				L.Push("ModulateG");
-				L.GetTableRaw(1);
-				m->Modulate.G = static_cast<byte>(L.CheckInt(-1));
-				L.Pop(1);
-
-				L.Push("ModulateB");
-				L.GetTableRaw(1);
-				m->Modulate.B = static_cast<byte>(L.CheckInt(-1));
-				L.Pop(1);
-
-				L.Push("ModulateA");
-				L.GetTableRaw(1);
-				m->Modulate.A = static_cast<byte>(L.CheckInt(-1));
-				L.Pop(1);
-
-				if (m->ModelId != shok::ModelId::Invalid) {
-					auto* mdata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetModelData(m->ModelId);
-					m->Model = mdata->Instanciate();
-					m->Model->AddToDefaultWorld();
-					if (m->AnimId != shok::AnimationId::Invalid) {
-						m->AnimHandler = m->Model->GetFrame()->GetAnimFrameHandler();
-						if (!m->AnimHandler)
-							throw lua::LuaException{"no animhandler?"};
-						auto* adata = (*ED::CGlobalsBaseEx::GlobalObj)->ResManager->GetAnimData(m->AnimId);
-						m->AnimHandler->SetupForModel(m->Model);
-						m->AnimHandler->currentAnim->SetAnimation(adata);
-						m->AnimHandler->currentAnim->SetCurrentTime(m->CurrentTime);
-						m->AnimHandler->UpdateMatrices();
-					}
-					auto* f = m->Model->GetFrame();
-					auto* mat = reinterpret_cast<float*>(f->GetLTM());
-					for (int i = 0; i < (sizeof(RWE::RwMatrix) / sizeof(float)); ++i) {
-						L.GetTableRaw(1, i + 1);
-						if (L.IsNumber(-1))
-							mat[i] = L.CheckFloat(-1);
-						L.Pop(1);
-					}
-					f->UpdateObjects();
-					if (m->PlayerColor >= 0)
-						m->Model->SetPlayerColor(m->PlayerColor);
-					if (m->NoParticleEffects)
-						m->Model->DisableParticleEffects();
-					if (m->NoShadow)
-						m->Model->DisableShadow();
-					if (m->NoTerrainDecal)
-						m->Model->DisableTerrainDecal();
-					m->Model->SetColorModulate(m->Modulate);
-				}
-				return 1;
-			}
-
-			static constexpr const std::array LuaMethods = {
-				luaext::FuncReference::GetRef<Clear>("Clear"),
-				luaext::FuncReference::GetRef<SetModel>("SetModel"),
-				luaext::FuncReference::GetRef<Translate>("Translate"),
-				luaext::FuncReference::GetRef<Rotate>("Rotate"),
-				luaext::FuncReference::GetRef<Scale>("Scale"),
-				luaext::FuncReference::GetRef<ResetTransform>("ResetTransform"),
-				luaext::FuncReference::GetRef<SetColorByPlayer>("SetColorByPlayer"),
-				luaext::FuncReference::GetRef<DisableShadow>("DisableShadow"),
-				luaext::FuncReference::GetRef<DisableParticleEffects>("DisableParticleEffects"),
-				luaext::FuncReference::GetRef<DisableTerrainDecal>("DisableTerrainDecal"),
-				luaext::FuncReference::GetRef<SetColorModulate>("SetColorModulate"),
-				luaext::FuncReference::GetRef<SetAnim>("SetAnim"),
-				luaext::FuncReference::GetRef<SetTimeOfAnim>("SetTimeOfAnim"),
-			};
-			static constexpr const std::array LuaMetaMethods{
-				luaext::FuncReference::GetRef<Serialize>(lua::MetaEvent::Serialize),
-			};
-
-			~LogicModel() {
-				if (Model) {
-					Model->Destroy();
-					Model = nullptr;
-				}
-			};
+		static constexpr const std::array LuaMethods = {
+			luaext::FuncReference::GetRef<Clear>("Clear"),
+			luaext::FuncReference::GetRef<SetModel>("SetModel"),
+			luaext::FuncReference::GetRef<Translate>("Translate"),
+			luaext::FuncReference::GetRef<Rotate>("Rotate"),
+			luaext::FuncReference::GetRef<Scale>("Scale"),
+			luaext::FuncReference::GetRef<ResetTransform>("ResetTransform"),
+			luaext::FuncReference::GetRef<SetColorByPlayer>("SetColorByPlayer"),
+			luaext::FuncReference::GetRef<DisableShadow>("DisableShadow"),
+			luaext::FuncReference::GetRef<DisableParticleEffects>("DisableParticleEffects"),
+			luaext::FuncReference::GetRef<DisableTerrainDecal>("DisableTerrainDecal"),
+			luaext::FuncReference::GetRef<SetColorModulate>("SetColorModulate"),
+			luaext::FuncReference::GetRef<SetAnim>("SetAnim"),
+			luaext::FuncReference::GetRef<SetTimeOfAnim>("SetTimeOfAnim"),
 		};
+		static constexpr const std::array LuaMetaMethods{
+			luaext::FuncReference::GetRef<Serialize>(lua::MetaEvent::Serialize),
+		};
+
+		~LogicModel() {
+			if (Model) {
+				Model->Destroy();
+				Model = nullptr;
+			}
+		};
+	};
+
+	namespace {
 		int CreateFreeModel(luaext::State L) {
 			L.NewUserClass<LogicModel>();
 			return 1;

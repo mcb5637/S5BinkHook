@@ -407,14 +407,22 @@ namespace ED {
 	template<class T>
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CDEResourceList {
+		struct VtableAccess {
+			struct {
+				void (__thiscall* Load)(CDEResourceList*, int, shok::String*);
+				T* (__thiscall* Get)(CDEResourceList*, int);
+			} *vtp;
+		};
 	public:
 		shok::Map<int, T*> Map;
 		//check params
-		virtual void Load(int id, shok::String* name) {
-			throw std::logic_error("not implemented");
+		virtual void __thiscall Load(int id, shok::String* name) {
+			auto* th = reinterpret_cast<VtableAccess*>(this);
+			th->vtp->Load(this, id, name);
 		}
-		virtual T* Get(int id) {
-			throw std::logic_error("not implemented");
+		virtual T* __thiscall Get(int id) {
+			auto* th = reinterpret_cast<VtableAccess*>(this);
+			return th->vtp->Get(this, id);
 		}
 	};
 

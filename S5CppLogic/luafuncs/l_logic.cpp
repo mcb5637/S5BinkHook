@@ -311,11 +311,7 @@ namespace CppLogic::Logic {
 			if (CppLogic::HasSCELoader())
 				throw lua::LuaException("use CEntity instead");
 			EGL::CGLEEntity::HookHurtEntity();
-			if (L.IsBoolean(1))
-				EGL::CGLEEntity::HurtEntityCallWithNoAttacker = L.ToBoolean(1);
-			else
-				EGL::CGLEEntity::HurtEntityCallWithNoAttacker = true;
-			CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker = EGL::CGLEEntity::HurtEntityCallWithNoAttacker;
+			CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker = L.OptBool(1, true);
 			return 0;
 		}
 
@@ -1713,7 +1709,6 @@ namespace CppLogic::Logic {
 		GGL::CSniperAbility::SnipeDamageOverride = nullptr;
 		EGL::CGLEEntity::LuaTaskListCallback = nullptr;
 		EGL::CGLEEntity::BuildOnSetPosFixMovement = false;
-		EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
 		EGL::CGLEEntity::HookSetTaskListNonCancelable(false);
 		GGL::CEntityProfile::HookExperience(false);
 		GGL::CWorkerBehavior::ResourceTriggers = false;
@@ -1745,6 +1740,7 @@ namespace CppLogic::Logic {
 		luaext::FuncReference::GetRef<LandscapeGetSector>("LandscapeGetSector"),
 		luaext::FuncReference::GetRef<LandscapeGetNearestUnblockedPosInSector>("LandscapeGetNearestUnblockedPosInSector"),
 		luaext::FuncReference::GetRef<EnableAllHurtEntityTrigger>("EnableAllHurtEntityTrigger"),
+		luaext::FuncReference::GetRef<EGL::CGLEEntity::HookHurtEntity>("EnableHurtFixes"),
 		luaext::FuncReference::GetRef<HurtEntityGetDamage>("HurtEntityGetDamage"),
 		luaext::FuncReference::GetRef<HurtEntitySetDamage>("HurtEntitySetDamage"),
 		luaext::FuncReference::GetRef<EventGetClickOnMouseData>("EventGetClickOnMouseData"),
@@ -1909,8 +1905,7 @@ namespace CppLogic::Logic {
 	void OnSaveLoaded(luaext::State L) {
 		L.PushSerializedRegistry();
 		if (!CppLogic::HasSCELoader()) {
-			EGL::CGLEEntity::HurtEntityCallWithNoAttacker = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker;
-			if (EGL::CGLEEntity::HurtEntityCallWithNoAttacker)
+			if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker)
 				EGL::CGLEEntity::HookHurtEntity();
 
 			EGL::CGLEEntity::UseMaxHPTechBoni = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.UseMaxHPTechBoni;

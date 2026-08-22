@@ -1211,8 +1211,6 @@ void EGL::CGLEEntity::ActivateEntityChangePlayerFix()
 }
 
 
-bool EGL::CGLEEntity::HurtEntityCallWithNoAttacker = false;
-bool HookHurtEntity_Hooked = false;
 void __cdecl EGL::CGLEEntity::FixedHurtEntity(EGL::CGLEEntity* att, EGL::CGLEEntity* tar, int dmg)
 {
 	tar->AdvancedHurtEntityBy(att, dmg, static_cast<shok::PlayerId>(0), true, true, true, shok::AdvancedDealDamageSource::Unknown);
@@ -1223,17 +1221,20 @@ void __cdecl EGL::CGLEEntity::FixedHurtEntityAoE(EGL::CGLEEntity* att, shok::Pos
 }
 void EGL::CGLEEntity::HookHurtEntity()
 {
+	static bool HookHurtEntity_Hooked = false;
 	if (HookHurtEntity_Hooked)
 		return;
 	if (CppLogic::HasSCELoader())
 		throw std::logic_error("hook hurt entity does not work with SCELoader");
 	HookHurtEntity_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
-		EGL::CGLEEntity::EntityHurtEntity,
-		EGL::CGLEEntity::EntityDealAoEDamage,
-	} };
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityHurtEntity, &EGL::CGLEEntity::FixedHurtEntity, reinterpret_cast<void*>(0x49F35D));
-	CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityDealAoEDamage, &EGL::CGLEEntity::FixedHurtEntityAoE, reinterpret_cast<void*>(0x49F82F));
+	{
+		CppLogic::Hooks::SaveVirtualProtect vp{ 0x40, {
+			EGL::CGLEEntity::EntityHurtEntity,
+			EGL::CGLEEntity::EntityDealAoEDamage,
+		} };
+		CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityHurtEntity, &EGL::CGLEEntity::FixedHurtEntity, reinterpret_cast<void*>(0x49F35D));
+		CppLogic::Hooks::WriteJump(EGL::CGLEEntity::EntityDealAoEDamage, &EGL::CGLEEntity::FixedHurtEntityAoE, reinterpret_cast<void*>(0x49F82F));
+	}
 	GGL::CArrowEffect::HookDealDamage();
 	GGL::CBattleBehavior::HookDealDamage();
 	GGL::CCircularAttack::HookDealDamage();
@@ -1314,7 +1315,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(CGLEEntity* attacker, int damage, sho
 	if (GetFirstAttachedEntity(shok::AttachmentType::SETTLER_ENTERED_BUILDING) != static_cast<shok::EntityId>(0) || GetFirstAttachedEntity(shok::AttachmentType::SETTLER_BUILDING_TO_LEAVE) != static_cast<shok::EntityId>(0))
 		return;
 	shok::PlayerId attackerPlayer = attacker ? attacker->PlayerId : attackerFallback;
-	if (attacker || HurtEntityCallWithNoAttacker) {
+	if (attacker || CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker) {
 		CppLogic::Events::AdvHurtEvent ev{ shok::EventIDs::LogicEvent_HurtEntity, attacker ? attacker->EntityId : static_cast<shok::EntityId>(0), EntityId, damage, sourceInfo, attackerPlayer };
 		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
 		damage = ev.Damage;
@@ -1474,7 +1475,7 @@ void EGL::CGLEEntity::AdvancedHurtEntityBy(CGLEEntity* attacker, int damage, sho
 		}
 		callback = "GameCallback_SettlerKilled";
 	}
-	if (attackerPlayer != static_cast<shok::PlayerId>(0) || HurtEntityCallWithNoAttacker) {
+	if (attackerPlayer != static_cast<shok::PlayerId>(0) || CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.HurtEntityCallWithNoAttacker) {
 
 		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
 		int t = L.GetTop();

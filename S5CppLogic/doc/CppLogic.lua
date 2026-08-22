@@ -625,6 +625,10 @@ function CppLogic.Logic.Navigate(from, to) end
 --- @param b boolean enable (optional, default true)
 function CppLogic.Logic.EnableAllHurtEntityTrigger(b) end
 
+--- enables all fixes of CppLogic.Logic.EnableAllHurtEntityTrigger without changing the flag behind it.
+--- not saved into savegames!
+function CppLogic.Logic.EnableHurtFixes()end
+
 --- enables entity max hp to be modified by techs.
 --- does not work with SCELoader.
 --- status of this gets saved into a savegame.

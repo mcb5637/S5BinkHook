@@ -339,7 +339,6 @@ namespace EGL {
 		static void __cdecl FixedHurtEntityAoE(EGL::CGLEEntity* att, shok::Position* p, float r, int dmg, shok::PlayerId pl, shok::DamageClassId dmgcl);
 	public:
 		static void HookHurtEntity();
-		static bool HurtEntityCallWithNoAttacker;
 		static CppLogic::EntityAddon::EntityAddonData LastRemovedEntityAddonData;
 
 		static inline EGL::CGLEEntity* (__stdcall* const GetEntityByID)(shok::EntityId id) = reinterpret_cast<EGL::CGLEEntity * (__stdcall*)(shok::EntityId)>(0x5825B4);

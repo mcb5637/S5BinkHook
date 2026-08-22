@@ -848,7 +848,7 @@ void __thiscall GGL::CLeaderBehavior::CheckRegen()
 			auto tar = e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_COMMAND_TARGET);
 			if (tar != shok::EntityId::Invalid) {
 				if (EGL::CGLEEntity::GetEntityByID(sol.begin()->second.EntityId)->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_TARGET) == shok::EntityId::Invalid) {
-					for (const auto &a: sol | std::views::values) {
+					for (const auto &[_, a]: sol) {
 						auto* s = EGL::CGLEEntity::GetEntityByID(a.EntityId);
 						auto* f = reinterpret_cast<void(__thiscall*)(CLeaderBehavior*, EGL::CGLEEntity*, shok::EntityId)>(0x4ecf86);
 						f(this, s, tar);

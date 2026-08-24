@@ -1898,6 +1898,12 @@ namespace CppLogic::Logic {
 			L.Push("CPPLOGIC_EVENT_ON_TRAINING_COMPLETE");
 			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_TrainingComplete));
 			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_CANNON_CONSTRUCTION_STARTED");
+			L.Push(static_cast<int>(shok::EventIDs::Foundry_BuildCannonCommand));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_ON_SERF_BOUGHT");
+			L.Push(static_cast<int>(shok::EventIDs::Keep_BuySerfCommand));
+			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
 	}

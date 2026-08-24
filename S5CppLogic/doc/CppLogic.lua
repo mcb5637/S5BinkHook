@@ -904,6 +904,12 @@ function CppLogic.Logic.SetResearchTriggerProgress(progress) end
 --- - Logic.BarracksBuyLeader
 --- - GUI.BuySoldier (net event handler)
 --- - GUI.BuySerf (net event handler)
+--- - GUI.BuyCannon (net event handler)
+--- also fires the following triggers:
+--- - Events.CPPLOGIC_EVENT_ON_TRAINING_START
+--- - Events.CPPLOGIC_EVENT_ON_TRAINING_COMPLETE
+--- - Events.CPPLOGIC_EVENT_ON_CANNON_CONSTRUCTION_STARTED
+--- - Events.CPPLOGIC_EVENT_ON_SERF_BOUGHT
 function CppLogic.Logic.EnableSettlerBuyTriggers() end
 
 --- gets data of a Events.CPPLOGIC_EVENT_CAN_BUY_SETTLER

@@ -949,10 +949,12 @@ namespace CppLogic::Entity {
 			if (leaveBuild != nullptr) {
 				shok::Position doorPos{};
 				leaveBuild->GetDoorPosAbs(&doorPos);
+				shok::Position leavePos{static_cast<const shok::Position&>(leaveBuild->Position)};
+				leavePos += leaveBuild->LeavePosition.Rotate(leaveBuild->Position.r);
 
 				return std::tuple{
-					s->Position.GetDistanceTo(leaveBuild->LeavePosition),
-					doorPos.GetDistanceTo(leaveBuild->LeavePosition),
+					s->Position.GetDistanceTo(doorPos),
+					doorPos.GetDistanceTo(leavePos),
 				};
 			}
 			return std::tuple{0.0f, -1.0f};

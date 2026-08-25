@@ -3,7 +3,7 @@ project(S5CppLogic)
 
 enable_language(CXX ASM)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 find_package(magic_enum REQUIRED)
 

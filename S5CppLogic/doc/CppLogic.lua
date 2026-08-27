@@ -3233,6 +3233,15 @@ function CppLogic.UI.WidgetGetPositionAndSize(wid) end
 --- @param h number|nil (optional, default current)
 function CppLogic.UI.WidgetSetPositionAndSize(wid, x, y, w, h) end
 
+--- gets a widgets position and size relative to a target widget.
+--- @param wid widget
+--- @param target widget
+--- @return number x
+--- @return number y
+--- @return number w
+--- @return number h
+function CppLogic.UI.WidgetGetPositionAndSizeRelativeTo(wid, target) end
+
 --- gets a widgets updatemanual flag.
 --- @param wid widget
 --- @return boolean

@@ -1118,6 +1118,211 @@
     </BackgroundMaterial>
   </WidgetList>
   <WidgetList classname="EGUIX::CContainerWidget" classid="0x55f9d1f6">
+    <Name>OptionsMenuCppLogic_SettingsDrop</Name>
+    <Rectangle>
+      <X>500</X>
+      <Y>150</Y>
+      <W>177</W>
+      <H>100</H>
+    </Rectangle>
+    <IsShown>False</IsShown>
+    <ZPriority>0</ZPriority>
+    <MotherID>OptionsMenuCppLogic</MotherID>
+    <Group></Group>
+    <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+    <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+    <SubWidgets>
+      <WidgetList classname="EGUIX::CTextButtonWidget" classid="0x5dd085a6">
+        <Name>OptionsMenuCppLogic_SettingsDrop_Scrollable</Name>
+        <Rectangle>
+          <X>0</X>
+          <Y>0</Y>
+          <W>150</W>
+          <H>47</H>
+        </Rectangle>
+        <IsShown>True</IsShown>
+        <ZPriority>0</ZPriority>
+        <MotherID>OptionsMenuCppLogic_SettingsDrop</MotherID>
+        <Group></Group>
+        <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+        <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+        <ButtonHelper>
+          <DisabledFlag>false</DisabledFlag>
+          <HighLightedFlag>false</HighLightedFlag>
+          <ActionFunction>
+            <LuaCommand>ModLoaderMainmenu.ActionSettingDropdown()</LuaCommand>
+          </ActionFunction>
+          <ShortCutString>
+            <StringTableKey></StringTableKey>
+            <RawString></RawString>
+          </ShortCutString>
+        </ButtonHelper>
+        <Materials>
+          <Texture>data\graphics\textures\gui\mainmenu\sub.png</Texture>
+          <TextureCoordinates>
+            <X>0</X>
+            <Y>0</Y>
+            <W>1</W>
+            <H>1</H>
+          </TextureCoordinates>
+          <Color>
+            <Red>255</Red>
+            <Green>255</Green>
+            <Blue>255</Blue>
+            <Alpha>255</Alpha>
+          </Color>
+        </Materials>
+        <Materials>
+          <Texture>data\graphics\textures\gui\mainmenu\sub_hi.png</Texture>
+          <TextureCoordinates>
+            <X>0</X>
+            <Y>0</Y>
+            <W>1</W>
+            <H>1</H>
+          </TextureCoordinates>
+          <Color>
+            <Red>255</Red>
+            <Green>255</Green>
+            <Blue>255</Blue>
+            <Alpha>255</Alpha>
+          </Color>
+        </Materials>
+        <Materials>
+          <Texture>data\graphics\textures\gui\mainmenu\sub_sel.png</Texture>
+          <TextureCoordinates>
+            <X>0</X>
+            <Y>0</Y>
+            <W>1</W>
+            <H>1</H>
+          </TextureCoordinates>
+          <Color>
+            <Red>255</Red>
+            <Green>255</Green>
+            <Blue>255</Blue>
+            <Alpha>255</Alpha>
+          </Color>
+        </Materials>
+        <Materials>
+          <Texture>data\graphics\textures\gui\mainmenu\sub_in.png</Texture>
+          <TextureCoordinates>
+            <X>0</X>
+            <Y>0</Y>
+            <W>1</W>
+            <H>1</H>
+          </TextureCoordinates>
+          <Color>
+            <Red>255</Red>
+            <Green>255</Green>
+            <Blue>255</Blue>
+            <Alpha>255</Alpha>
+          </Color>
+        </Materials>
+        <Materials>
+          <Texture>data\graphics\textures\gui\mainmenu\sub_akt.png</Texture>
+          <TextureCoordinates>
+            <X>0</X>
+            <Y>0</Y>
+            <W>1</W>
+            <H>1</H>
+          </TextureCoordinates>
+          <Color>
+            <Red>255</Red>
+            <Green>255</Green>
+            <Blue>255</Blue>
+            <Alpha>255</Alpha>
+          </Color>
+        </Materials>
+        <ToolTipHelper>
+          <ToolTipEnabledFlag>False</ToolTipEnabledFlag>
+          <ToolTipString>
+            <StringTableKey></StringTableKey>
+            <RawString></RawString>
+          </ToolTipString>
+          <TargetWidget></TargetWidget>
+          <ControlTargetWidgetDisplayState>False</ControlTargetWidgetDisplayState>
+          <UpdateFunction>
+            <LuaCommand></LuaCommand>
+          </UpdateFunction>
+        </ToolTipHelper>
+        <StringHelper>
+          <Font>
+            <FontName>data\menu\fonts\mainmenularge.met</FontName>
+          </Font>
+          <String>
+            <StringTableKey></StringTableKey>
+            <RawString></RawString>
+          </String>
+          <StringFrameDistance>3</StringFrameDistance>
+          <Color>
+            <Red>255</Red>
+            <Green>255</Green>
+            <Blue>255</Blue>
+            <Alpha>255</Alpha>
+          </Color>
+        </StringHelper>
+        <CenterText>true</CenterText>
+        <UpdateFunction>
+          <LuaCommand>ModLoaderMainmenu.UpdateSettingDropdown()</LuaCommand>
+        </UpdateFunction>
+        <UpdateManualFlag>false</UpdateManualFlag>
+      </WidgetList>
+      <WidgetList classname="EGUIX::CCustomWidget" classid="0x7656db56">
+        <Name>OptionsMenuCppLogic_SettingsDropScroll</Name>
+        <Rectangle>
+          <X>0</X>
+          <Y>0</Y>
+          <W>177</W>
+          <H>100</H>
+        </Rectangle>
+        <IsShown>True</IsShown>
+        <ZPriority>0</ZPriority>
+        <MotherID>OptionsMenuCppLogic_SettingsDrop</MotherID>
+        <Group></Group>
+        <ForceToHandleMouseEventsFlag>False</ForceToHandleMouseEventsFlag>
+        <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+        <CustomClassName>CppLogic::Mod::UI::AutoScrollCustomWidget</CustomClassName>
+        <IntegerUserVariable0DefaultValue>1</IntegerUserVariable0DefaultValue>
+        <IntegerUserVariable1DefaultValue>0</IntegerUserVariable1DefaultValue>
+        <IntegerUserVariable2DefaultValue>0</IntegerUserVariable2DefaultValue>
+        <IntegerUserVariable3DefaultValue>0</IntegerUserVariable3DefaultValue>
+        <IntegerUserVariable4DefaultValue>0</IntegerUserVariable4DefaultValue>
+        <IntegerUserVariable5DefaultValue>0</IntegerUserVariable5DefaultValue>
+        <StringUserVariable0DefaultValue></StringUserVariable0DefaultValue>
+        <StringUserVariable1DefaultValue>OptionsMenuCppLogic_SettingsDrop_Scrollable</StringUserVariable1DefaultValue>
+      </WidgetList>
+      <WidgetList classname="EGUIX::CStaticWidget" classid="0x213a8776">
+        <Name>OptionsMenuCppLogic_SettingsDropBG</Name>
+        <Rectangle>
+          <X>0</X>
+          <Y>0</Y>
+          <W>177</W>
+          <H>100</H>
+        </Rectangle>
+        <IsShown>True</IsShown>
+        <ZPriority>0</ZPriority>
+        <MotherID>OptionsMenuCppLogic_SettingsDrop</MotherID>
+        <Group></Group>
+        <ForceToHandleMouseEventsFlag>True</ForceToHandleMouseEventsFlag>
+        <ForceToNeverBeFoundFlag>False</ForceToNeverBeFoundFlag>
+        <BackgroundMaterial>
+          <Texture></Texture>
+          <TextureCoordinates>
+            <X>0</X>
+            <Y>0</Y>
+            <W>1</W>
+            <H>1</H>
+          </TextureCoordinates>
+          <Color>
+            <Red>0</Red>
+            <Green>0</Green>
+            <Blue>0</Blue>
+            <Alpha>255</Alpha>
+          </Color>
+        </BackgroundMaterial>
+      </WidgetList>
+    </SubWidgets>
+  </WidgetList>
+  <WidgetList classname="EGUIX::CContainerWidget" classid="0x55f9d1f6">
     <Name>OptionsMenuCppLogic_MainContainer</Name>
     <Rectangle>
       <X>0</X>
@@ -1433,9 +1638,9 @@
       <WidgetList classname="EGUIX::CContainerWidget" classid="0x55f9d1f6">
         <Name>OptionsMenuCppLogic_Settings</Name>
         <Rectangle>
-          <X>277</X>
+          <X>230</X>
           <Y>65</Y>
-          <W>400</W>
+          <W>450</W>
           <H>400</H>
         </Rectangle>
         <IsShown>True</IsShown>
@@ -1450,7 +1655,7 @@
             <Rectangle>
               <X>273</X>
               <Y>13</Y>
-              <W>100</W>
+              <W>177</W>
               <H>47</H>
             </Rectangle>
             <IsShown>True</IsShown>
@@ -1637,7 +1842,7 @@
             <Rectangle>
               <X>250</X>
               <Y>0</Y>
-              <W>150</W>
+              <W>200</W>
               <H>400</H>
             </Rectangle>
             <IsShown>True</IsShown>

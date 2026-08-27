@@ -9,6 +9,7 @@
 ---@field private SliderBackground string?
 ---@field OnSelectedChanged fun(old:T?, new:T?)?
 ---@field StringExtract nil|fun(t:T):string
+---@field DropdownParent widget?
 AutoScroll = {}
 
 ---@generic T
@@ -200,4 +201,25 @@ function AutoScroll:Setup()
 		CppLogic.UI.ButtonOverrideActionFunc(self.DownButton, function() self:GUIAction_ModScroll(1) end)
 		CppLogic.UI.WidgetOverrideUpdateFunc(self.DownButton, function() self:GUIUpdate_ScrollDown() end)
 	end
+end
+
+---@generic T
+---@param self CPPLAutoScroll<T>
+---@param over T[]
+---@param parent widget
+---@param container widget
+---@param bg widget?
+function AutoScroll:ShowAsDropdown(over, parent, container, bg)
+	local commonParent = XGUIEng.GetWidgetsMotherID(container)
+	local x,y,w,h = CppLogic.UI.WidgetGetPositionAndSizeRelativeTo(parent, commonParent)
+	local _,_,_,ph = CppLogic.UI.WidgetGetPositionAndSize(commonParent)
+	local _,_,cx,cy = CppLogic.UI.WidgetGetPositionAndSize(container)
+	self.DropdownParent = parent
+	XGUIEng.SetWidgetPositionAndSize(container, x, y + h, cx, ph - y - h)
+	XGUIEng.SetWidgetSize(self.CustomWidget, cx, ph - y - h)
+	if bg then
+		XGUIEng.SetWidgetSize(bg, cx, ph - y - h)
+	end
+	XGUIEng.ShowWidget(container, 1)
+	self:SetDataToScrollOver(over)
 end

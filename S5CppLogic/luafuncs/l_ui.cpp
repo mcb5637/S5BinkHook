@@ -62,6 +62,18 @@ namespace CppLogic::UI {
 			return 4;
 		}
 
+		auto WidgetGetPositionAndSizeRelativeTo(EGUIX::CBaseWidget* w, EGUIX::CBaseWidget* to) {
+			EGUIX::Rect r = w->PosAndSize;
+			while (w != to) {
+				w = EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(w->MotherWidgetID);
+				if (w == nullptr)
+					break;
+				r.X += w->PosAndSize.X;
+				r.Y += w->PosAndSize.Y;
+			}
+			return std::tuple{r.X, r.Y, r.W, r.H};
+		}
+
 		int WidgetSetPositionAndSize(luaext::State L) {
 			EGUIX::CBaseWidget* wid = L.CheckWidget(1);
 			float x, y, w, h;
@@ -1509,7 +1521,7 @@ namespace CppLogic::UI {
 			return {n, id};
 		}
 
-		static void Check(std::map<int, shok::WidgetId>& refs, EGUIX::CBaseWidget* w, luaext::State L) {
+		void Check(std::map<int, shok::WidgetId>& refs, EGUIX::CBaseWidget* w, luaext::State L) {
 			if (auto* cont = BB::IdentifierCast<EGUIX::CContainerWidget>(w)) {
 				for (auto* c : cont->WidgetListHandler.SubWidgets)
 					Check(refs, c, L);
@@ -1948,6 +1960,7 @@ namespace CppLogic::UI {
 		constexpr std::array UI{
 			luaext::FuncReference::GetRef<WidgetGetPositionAndSize>("WidgetGetPositionAndSize"),
 			luaext::FuncReference::GetRef<WidgetSetPositionAndSize>("WidgetSetPositionAndSize"),
+			luaext::FuncReference::GetRef<WidgetGetPositionAndSizeRelativeTo>("WidgetGetPositionAndSizeRelativeTo"),
 			luaext::FuncReference::GetRef<WidgetGetUpdateManualFlag>("WidgetGetUpdateManualFlag"),
 			luaext::FuncReference::GetRef<WidgetSetUpdateManualFlag>("WidgetSetUpdateManualFlag"),
 			luaext::FuncReference::GetRef<WidgetGetUpdateFunc>("WidgetGetUpdateFunc"),

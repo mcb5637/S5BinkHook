@@ -3633,7 +3633,8 @@ function CppLogic.UI.SetGUIStateLuaSelection(onclick, oncancel) end
 --- status of this gets saved into savegames.
 --- @param ucat number building upgrade category
 --- @param rotate boolean?
-function CppLogic.UI.SetGUIStatePlaceBuildingEx(ucat, rotate) end
+--- @param modifier number? rotate if this modifier is pressed, if None -> rotate if Control is not pressed
+function CppLogic.UI.SetGUIStatePlaceBuildingEx(ucat, rotate, modifier) end
 --- changes the rotation of a PlaceBuildingEx state.
 --- @param deg number
 function CppLogic.UI.SetPlaceBuildingRotation(deg) end
@@ -3790,6 +3791,14 @@ function CppLogic.UI.AutoScrollCustomWidgetSetOffset(id, off) end
 ---@param b number
 ---@param a number
 function CppLogic.UI.AutoScrollCustomWidgetSetMaterial(id, texture, x, y, w, h, r, g, b, a) end
+
+---gets the max x,y pos of all visible scroll widgets of a CppLogic::Mod::UI::AutoScrollCustomWidget.
+---@param id number|string
+---@return number x
+---@return number y
+---@return number width
+---@return number height
+function CppLogic.UI.AutoScrollCustomWidgetGetMaxScrollPos(id) end
 
 ---gets the text of a CppLogic::Mod::UI::TextInputCustomWidget.
 ---@param id number|string

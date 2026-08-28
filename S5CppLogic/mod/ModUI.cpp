@@ -248,6 +248,17 @@ void CppLogic::Mod::UI::AutoScrollCustomWidget::Clamp()
 		Offset = 0;
 }
 
+std::pair<float, float> CppLogic::Mod::UI::AutoScrollCustomWidget::GetMaxSize() const {
+	std::pair r{0.0f, 0.0f};
+	for (auto* w : Widgets) {
+		if (!w->IsShown)
+			continue;
+		r.first = std::max(r.first, w->PosAndSize.X);
+		r.second = std::max(r.second, w->PosAndSize.Y);
+	}
+	return r;
+}
+
 void CppLogic::Mod::UI::AutoScrollCustomWidget::UpdateBySlider(int x, int y)
 {
 	if (Slider && TotalRowsNeeded > RowCount) {

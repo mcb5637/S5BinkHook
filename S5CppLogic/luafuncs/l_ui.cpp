@@ -999,7 +999,9 @@ namespace CppLogic::UI {
 			vh->StateIdManager->GetIDByNameOrCreate(GUIState_PlaceBuildingEx::Name, GUIState_PlaceBuildingEx::Id); // make sure the state id exists
 			GGUI::SPlaceBuildingStateParameters p{L.CheckEnum<shok::UpgradeCategoryId>(1)};
 			vh->SetGUIState<CppLogic::UI::GUIState_PlaceBuildingEx>(&p);
-			BB::IdentifierCast<GUIState_PlaceBuildingEx>(vh->CurrentState)->ScrollRotate = L.OptBool(2, true);
+			auto* state = BB::IdentifierCast<GUIState_PlaceBuildingEx>(vh->CurrentState);
+			state->ScrollRotate = L.OptBool(2, true);
+			state->ScrollModifiers = static_cast<shok::Keys>(L.OptInt(3, 0));
 			return 0;
 		}
 
@@ -1210,6 +1212,16 @@ namespace CppLogic::UI {
 			sc->PartialWidget.Color.Blue = L.CheckInt(9);
 			sc->PartialWidget.Color.Alpha = L.CheckInt(10);
 			return 0;
+		}
+		auto AutoScrollCustomWidgetGetMaxScrollPos(EGUIX::CBaseWidget *bw) {
+			auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(bw);
+			if (w == nullptr)
+				throw lua::LuaException{"not a customwidget"};
+			auto* sc = dynamic_cast<CppLogic::Mod::UI::AutoScrollCustomWidget*>(w->CustomWidget);
+			if (sc == nullptr)
+				throw lua::LuaException{"not a AutoScrollCustomWidget"};
+			auto [x,y] = sc->GetMaxSize();
+			return std::tuple{x, y, sc->Widgets[0]->PosAndSize.W, sc->Widgets[0]->PosAndSize.H};
 		}
 		int TextInputCustomWidgetGetText(luaext::State L) {
 			auto* w = BB::IdentifierCast<EGUIX::CCustomWidget>(L.CheckWidget(1));
@@ -1690,7 +1702,16 @@ namespace CppLogic::UI {
 	bool CppLogic::UI::GUIState_PlaceBuildingEx::OnMouseEvent(BB::CEvent* ev) {
 		if (auto* e = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 			if (e->IsEvent(shok::InputEventIds::MouseWheel)) {
-				if (!ScrollRotate ||  e->IsModifier(shok::Keys::ModifierControl)) {
+				bool rotate = false;
+				if (ScrollRotate) {
+					if (ScrollModifiers == shok::Keys::None) {
+						rotate = !e->IsModifier(shok::Keys::ModifierControl);
+					}
+					else {
+						rotate = e->IsModifier(ScrollModifiers);
+					}
+				}
+				if (!rotate) {
 					(*ERwTools::CRwCameraHandler::GlobalObj)->ScrollWheelZoom(e->Delta);
 					e->EventHandled = true;
 					return true;
@@ -2039,6 +2060,7 @@ namespace CppLogic::UI {
 			luaext::FuncReference::GetRef<AutoScrollCustomWidgetModOffset>("AutoScrollCustomWidgetModOffset"),
 			luaext::FuncReference::GetRef<AutoScrollCustomWidgetSetOffset>("AutoScrollCustomWidgetSetOffset"),
 			luaext::FuncReference::GetRef<AutoScrollCustomWidgetSetMaterial>("AutoScrollCustomWidgetSetMaterial"),
+			luaext::FuncReference::GetRef<AutoScrollCustomWidgetGetMaxScrollPos>("AutoScrollCustomWidgetGetMaxScrollPos"),
 			luaext::FuncReference::GetRef<TextInputCustomWidgetGetText>("TextInputCustomWidgetGetText"),
 			luaext::FuncReference::GetRef<TextInputCustomWidgetSetText>("TextInputCustomWidgetSetText"),
 			luaext::FuncReference::GetRef<TextInputCustomWidgetSetIgnoreNextChar>("TextInputCustomWidgetSetIgnoreNextChar"),

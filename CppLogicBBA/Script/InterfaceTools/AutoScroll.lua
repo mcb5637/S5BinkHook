@@ -222,4 +222,11 @@ function AutoScroll:ShowAsDropdown(over, parent, container, bg)
 	end
 	XGUIEng.ShowWidget(container, 1)
 	self:SetDataToScrollOver(over)
+	if bg then
+		local _,widc,elemc = CppLogic.UI.GetAutoScrollCustomWidgetOffset(self.CustomWidget)
+		if widc > elemc then
+			local maxcx, maxcy, mw, mh = CppLogic.UI.AutoScrollCustomWidgetGetMaxScrollPos(self.CustomWidget)
+			XGUIEng.SetWidgetSize(bg, maxcx + mw, maxcy + mh)
+		end
+	end
 end

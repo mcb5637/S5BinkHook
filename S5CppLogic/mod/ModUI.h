@@ -50,6 +50,7 @@ namespace CppLogic::Mod::UI {
 		void ReInit();
 		void Update();
 		void Clamp();
+		[[nodiscard]] std::pair<float, float> GetMaxSize() const;
 
 		[[nodiscard]] inline const shok::String& SliderName() const {
 			return StringUserVariable[0];

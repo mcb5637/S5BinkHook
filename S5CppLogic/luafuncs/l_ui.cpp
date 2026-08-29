@@ -66,7 +66,7 @@ namespace CppLogic::UI {
 			EGUIX::Rect r = w->PosAndSize;
 			while (w != to) {
 				w = EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(w->MotherWidgetID);
-				if (w == nullptr)
+				if (w == nullptr || w == to)
 					break;
 				r.X += w->PosAndSize.X;
 				r.Y += w->PosAndSize.Y;

@@ -22,6 +22,7 @@ ModLoaderMainmenu = {
 				ModLoaderMainmenu.SettingsScroll:Setup()
 				ModLoaderMainmenu.SettingsScroll:SetDataToScrollOver({})
 				ModLoaderMainmenu.SettingsScrollDropdown:Setup()
+				ModLoaderMainmenu.SettingsScrollDropdown:SetupDropdownWidgets("OptionsMenuCppLogic_SettingsDrop", "OptionsMenuCppLogic_SettingsDropBG")
 			end
 		end,
 	},
@@ -190,8 +191,9 @@ end
 ---@param s CPPLMMOption
 ---@param mp CPPLMMMod
 ---@param w widget
+---@param drop CPPLAutoScroll<string>
 ---@return boolean
-function ModLoaderMainmenu.SettingToggle(s, mp, w)
+function ModLoaderMainmenu.SettingToggle(s, mp, w, drop)
 	if s.Type == ModLoaderMainmenu.ModSettingType.Active then
 		mp.Active = not mp.Active
 		return true
@@ -199,10 +201,10 @@ function ModLoaderMainmenu.SettingToggle(s, mp, w)
 		s.Set = (s.Set or s.Options[1]) == "true" and "false" or "true"
 		return true
 	elseif s.Type == ModLoaderMainmenu.ModSettingType.Dropdown then
-		if XGUIEng.IsWidgetShown("OptionsMenuCppLogic_SettingsDrop") == 1 and ModLoaderMainmenu.SettingsScrollDropdown.DropdownParent == w then
-			XGUIEng.ShowWidget("OptionsMenuCppLogic_SettingsDrop", 0)
+		if drop:IsDropdownAttachedTo(w) then
+			drop:HideDropdown()
 		else
-			ModLoaderMainmenu.SettingsScrollDropdown:ShowAsDropdown(s.Options, w, "OptionsMenuCppLogic_SettingsDrop", "OptionsMenuCppLogic_SettingsDropBG")
+			drop:ShowAsDropdown(s.Options, w)
 		end
 		return false
 	end
@@ -221,7 +223,7 @@ function ModLoaderMainmenu.ActionSetting()
 	if not mp then
 		return
 	end
-	if ModLoaderMainmenu.SettingToggle(s, mp, w) then
+	if ModLoaderMainmenu.SettingToggle(s, mp, w, ModLoaderMainmenu.SettingsScrollDropdown) then
 		ModLoaderMainmenu.StoreUserRequestedModpacks()
 	end
 end
@@ -229,7 +231,8 @@ end
 ---@param w number
 ---@param s CPPLMMOption
 ---@param mp CPPLMMMod
-function ModLoaderMainmenu.SettingButtonUpdate(w, s, mp)
+---@param drop CPPLAutoScroll<string>
+function ModLoaderMainmenu.SettingButtonUpdate(w, s, mp, drop)
 	XGUIEng.SetText(w, s.Name)
 	CppLogic.UI.WidgetSetTooltipString(w, s.Tooltip, false)
 	local high = false
@@ -250,7 +253,7 @@ function ModLoaderMainmenu.SettingButtonUpdate(w, s, mp)
 	end
 	XGUIEng.HighLightButton(w, high and 1 or 0)
 	if s.Type == ModLoaderMainmenu.ModSettingType.Dropdown then
-		if XGUIEng.IsWidgetShown("OptionsMenuCppLogic_SettingsDrop") == 1 and ModLoaderMainmenu.SettingsScrollDropdown.DropdownParent == w then
+		if drop:IsDropdownAttachedTo(w) then
 			XGUIEng.SetMaterialTexture(w, 0, "data\\graphics\\textures\\gui\\dropdown\\small_dropmenu_down.png")
 			XGUIEng.SetMaterialTexture(w, 1, "data\\graphics\\textures\\gui\\dropdown\\small_dropmenu_down_hi.png")
 			XGUIEng.SetMaterialTexture(w, 2, "data\\graphics\\textures\\gui\\dropdown\\small_dropmenu_down_sel.png")
@@ -284,7 +287,15 @@ function ModLoaderMainmenu.UpdateSetting()
 	if not mp then
 		return
 	end
-	ModLoaderMainmenu.SettingButtonUpdate(w, s, mp)
+	ModLoaderMainmenu.SettingButtonUpdate(w, s, mp, ModLoaderMainmenu.SettingsScrollDropdown)
+end
+
+---@param w widget
+---@param o string
+---@param s CPPLMMOption
+function ModLoaderMainmenu.SettingDropdownUpdate(w, o, s)
+	XGUIEng.SetText(w, "@center|"..o)
+	XGUIEng.HighLightButton(w, s.Set == o and 1 or 0)
 end
 
 function ModLoaderMainmenu.UpdateSettingDropdown()
@@ -299,8 +310,15 @@ function ModLoaderMainmenu.UpdateSettingDropdown()
 	if not s then
 		return
 	end
-	XGUIEng.SetText(w, "@center|"..o)
-	XGUIEng.HighLightButton(w, s.Set == o and 1 or 0)
+	ModLoaderMainmenu.SettingDropdownUpdate(w, o, s)
+end
+
+---@param w widget
+---@param o string
+---@param s CPPLMMOption
+function ModLoaderMainmenu.SettingDropdownAction(w, o, s)
+	s.Set = o
+	XGUIEng.ShowWidget(w, 0)
 end
 
 function ModLoaderMainmenu.ActionSettingDropdown()
@@ -315,9 +333,8 @@ function ModLoaderMainmenu.ActionSettingDropdown()
 	if not s then
 		return
 	end
-	s.Set = o
+	ModLoaderMainmenu.SettingDropdownAction("OptionsMenuCppLogic_SettingsDrop", o, s)
 	ModLoaderMainmenu.StoreUserRequestedModpacks()
-	XGUIEng.ShowWidget("OptionsMenuCppLogic_SettingsDrop", 0)
 end
 
 function ModLoaderMainmenu.IsSavegameValid(save)

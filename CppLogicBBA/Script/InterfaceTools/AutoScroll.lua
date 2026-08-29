@@ -10,6 +10,8 @@
 ---@field OnSelectedChanged fun(old:T?, new:T?)?
 ---@field StringExtract nil|fun(t:T):string
 ---@field DropdownParent widget?
+---@field DropdownContainer widget?
+---@field DropdownBG widget?
 AutoScroll = {}
 
 ---@generic T
@@ -205,28 +207,52 @@ end
 
 ---@generic T
 ---@param self CPPLAutoScroll<T>
----@param over T[]
----@param parent widget
 ---@param container widget
 ---@param bg widget?
-function AutoScroll:ShowAsDropdown(over, parent, container, bg)
-	local commonParent = XGUIEng.GetWidgetsMotherID(container)
+function AutoScroll:SetupDropdownWidgets(container, bg)
+	self.DropdownContainer = container
+	self.DropdownBG = bg
+end
+
+---@generic T
+---@param self CPPLAutoScroll<T>
+---@param over T[]
+---@param parent widget
+function AutoScroll:ShowAsDropdown(over, parent)
+	assert(self.DropdownContainer)
+	local commonParent = XGUIEng.GetWidgetsMotherID(self.DropdownContainer)
 	local x,y,w,h = CppLogic.UI.WidgetGetPositionAndSizeRelativeTo(parent, commonParent)
 	local _,_,_,ph = CppLogic.UI.WidgetGetPositionAndSize(commonParent)
-	local _,_,cx,cy = CppLogic.UI.WidgetGetPositionAndSize(container)
+	local _,_,cx,cy = CppLogic.UI.WidgetGetPositionAndSize(self.DropdownContainer)
 	self.DropdownParent = parent
-	XGUIEng.SetWidgetPositionAndSize(container, x, y + h, cx, ph - y - h)
+	XGUIEng.SetWidgetPositionAndSize(self.DropdownContainer, x, y + h, cx, ph - y - h)
 	XGUIEng.SetWidgetSize(self.CustomWidget, cx, ph - y - h)
-	if bg then
-		XGUIEng.SetWidgetSize(bg, cx, ph - y - h)
+	if self.DropdownBG then
+		XGUIEng.SetWidgetSize(self.DropdownBG, cx, ph - y - h)
 	end
-	XGUIEng.ShowWidget(container, 1)
+	XGUIEng.ShowWidget(self.DropdownContainer, 1)
 	self:SetDataToScrollOver(over)
-	if bg then
+	if self.DropdownBG then
 		local _,widc,elemc = CppLogic.UI.GetAutoScrollCustomWidgetOffset(self.CustomWidget)
 		if widc > elemc then
 			local maxcx, maxcy, mw, mh = CppLogic.UI.AutoScrollCustomWidgetGetMaxScrollPos(self.CustomWidget)
-			XGUIEng.SetWidgetSize(bg, maxcx + mw, maxcy + mh)
+			XGUIEng.SetWidgetSize(self.DropdownBG, maxcx + mw, maxcy + mh)
 		end
 	end
+end
+
+---@generic T
+---@param self CPPLAutoScroll<T>
+---@param parent widget
+function AutoScroll:IsDropdownAttachedTo(parent)
+	assert(self.DropdownContainer)
+	return XGUIEng.IsWidgetShown(self.DropdownContainer) == 1 and self.DropdownParent == parent
+end
+
+---@generic T
+---@param self CPPLAutoScroll<T>
+function AutoScroll:HideDropdown()
+	assert(self.DropdownContainer)
+	XGUIEng.ShowWidget(self.DropdownContainer, 0)
+	self.DropdownParent = nil
 end

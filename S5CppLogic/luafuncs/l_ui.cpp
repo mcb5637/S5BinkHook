@@ -648,6 +648,22 @@ namespace CppLogic::UI {
 			return 0;
 		}
 
+		void ReparentWidget(EGUIX::CBaseWidget* move, EGUIX::CBaseWidget* parent, std::optional<EGUIX::CBaseWidget*> before) {
+			auto* mother = dynamic_cast<EGUIX::CContainerWidget*>(EGUIX::WidgetManager::GlobalObj()->GetWidgetByID(move->MotherWidgetID));
+			if (mother == nullptr)
+				throw lua::LuaException{"no mother widget???"};
+			auto* parentCont = dynamic_cast<EGUIX::CContainerWidget*>(parent);
+			if (parentCont == nullptr)
+				throw lua::LuaException{"new parent not a container widget"};
+			if (before.has_value() && parentCont->WidgetID != (*before)->MotherWidgetID)
+				throw lua::LuaException{"before is not in parent"};
+			auto motherSL = mother->WidgetListHandler.SubWidgets.SaveList();
+			auto parentSL = parentCont->WidgetListHandler.SubWidgets.SaveList();
+			auto m = std::find(motherSL.List.begin(), motherSL.List.end(), move);
+			auto b = std::find(parentSL.List.begin(), parentSL.List.end(), before);
+			parentSL.List.splice(b, motherSL.List, m);
+		}
+
 		int ReloadGUI(luaext::State L) {
 			const char* str = L.OptString(1, R"(Data\Menu\Projects\Ingame.xml)");
 			if (!BB::CFileSystemMgr::DoesFileExist(str))
@@ -2079,6 +2095,7 @@ namespace CppLogic::UI {
 			luaext::FuncReference::GetRef<InitNetHandlers>("InitNetHandlers"),
 			luaext::FuncReference::GetRef<RemoveWidget>("RemoveWidget"),
 			luaext::FuncReference::GetRef<ReorderWidgets>("ReorderWidgets"),
+			luaext::FuncReference::GetRef<ReparentWidget>("ReparentWidget"),
 			luaext::FuncReference::GetRef<MiniMapOverlaySetCallbackFuncName>("MiniMapOverlaySetCallbackFuncName"),
 			luaext::FuncReference::GetRef<StatisticsWidgetOverridePlayersToShowGraphs>("StatisticsWidgetOverridePlayersToShowGraphs"),
 			luaext::FuncReference::GetRef<OverrideSelectablePlayers>("OverrideSelectablePlayers"),

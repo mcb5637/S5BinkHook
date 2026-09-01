@@ -3445,6 +3445,12 @@ function CppLogic.UI.RemoveWidget(wid) end
 --- @param target widget?
 function CppLogic.UI.ReorderWidgets(tomove, target) end
 
+--- moves a widget between parents, tomove is placed directly before target (at the end, if target is nil).
+--- @param tomove widget
+--- @param newParent widget
+--- @param target widget?
+function CppLogic.UI.ReparentWidget(tomove, newParent, target) end
+
 --- gets a widgets name.
 --- @param wid widget
 --- @return string name

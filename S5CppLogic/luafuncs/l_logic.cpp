@@ -27,8 +27,8 @@
 #include <utility/luaserializer.h>
 #include <utility/savegame_extra.h>
 #include <utility/modloader.h>
-#include <luafuncs/l_ui.h>
 #include <mod/ModFilesystem.h>
+#include <mod/ModGUIState.h>
 
 namespace CppLogic::Logic {
 	namespace {
@@ -674,7 +674,7 @@ namespace CppLogic::Logic {
 			if (CppLogic::HasSCELoader())
 				throw lua::LuaException("not supported with SCELoader");
 			// GGUI::CPlaceBuildingState::HookPlacementRotation();
-			auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
+			auto* s = dynamic_cast<Mod::GUIState::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
 			if (s)
 				s->SetRotation(L.CheckFloat(1));
 			return 0;
@@ -682,7 +682,7 @@ namespace CppLogic::Logic {
 		int GetPlaceBuildingRotation(luaext::State L) {
 			if (CppLogic::HasSCELoader())
 				throw lua::LuaException("not supported with SCELoader");
-			auto* s = dynamic_cast<CppLogic::UI::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
+			auto* s = dynamic_cast<Mod::GUIState::GUIState_PlaceBuildingEx*>(GGUI::CManager::GlobalObj()->C3DViewHandler->CurrentState);
 			if (!s)
 				return 0;
 			L.Push(s->GetRotation());

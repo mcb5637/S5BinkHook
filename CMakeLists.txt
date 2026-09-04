@@ -127,8 +127,9 @@ add_library(LuaDebugger SHARED
         S5CppLogic/mod/ModEffect.cpp
         S5CppLogic/mod/ModFilesystem.cpp
         S5CppLogic/mod/ModPlayers.cpp
-        S5CppLogic/utility/modloader.cpp
         S5CppLogic/mod/ModUI.cpp
+        S5CppLogic/mod/ModGUIState.cpp
+        S5CppLogic/utility/modloader.cpp
         S5CppLogic/utility/savegame_extra.cpp
         S5CppLogic/utility/SchemaGenerator.cpp
         S5CppLogic/utility/StringUtil.cpp

@@ -663,6 +663,7 @@ namespace CppLogic::UI {
 			auto m = std::find(motherSL.List.begin(), motherSL.List.end(), move);
 			auto b = std::find(parentSL.List.begin(), parentSL.List.end(), before);
 			parentSL.List.splice(b, motherSL.List, m);
+			move->MotherWidgetID = parent->WidgetID;
 		}
 
 		int ReloadGUI(luaext::State L) {

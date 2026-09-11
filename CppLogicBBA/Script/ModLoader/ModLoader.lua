@@ -52,13 +52,14 @@ ModLoader = ModLoader or {}
 ---@field EffectTypeMerges ManifestMergeOperation[]|nil
 ---@field FeedbackEventSoundDataMerges ManifestMergeOperation[]|nil
 ---@field ConfigFileMerges ManifestMergeOperation[]|nil
+---@field Players table<string,number>|nil
 
 ---@class CManifestEntry
 ---@field package Key string
 ---@field package Preload nil|fun(s:string):number
 ---@field package Load nil|fun(s:string|number):number
 ---@field package Table table<string,number>?
----@field package Type nil|"kv"|"sound"|"config"
+---@field package Type nil|"kv"|"sound"|"config"|"player"
 ---@field package Deprecated string?
 ---@field package ObjectMerge string?
 ---@field package ObjectMergeFunc nil|fun(is:string|number):CppStructAccess
@@ -166,6 +167,7 @@ function ModLoader.ManifestTypes()
 				---@diagnostic disable-next-line: missing-return
 			end
 		end},
+		{Key="Players", Type="player"},
 	}
 	return r
 end
@@ -425,6 +427,36 @@ ModLoader.ManifestType = {
 				end
 			end
 		end
+	},
+	player = {
+		Preload = function(t, manifest)
+		end,
+		Load = function(t, manifest)
+			local pid = ModLoader.PlayerIdDynamicStart or 9
+			local pd = manifest.Players or {}
+			for k,v in pairs(pd) do
+				pd[k] = pid
+				pid = pid + 1
+			end
+			CppLogic.ModLoader.SetMaxPlayers(pid - 1)
+		end,
+		Merge = function(t, into, from)
+			local i = into.Players
+			if not i then
+				i = {}
+				into.Players = i
+			end
+			local f = from.Players
+			if not f then
+				return
+			end
+			for k,v in pairs(f) do
+				assert(i[k] == nil, "player name already in use")
+				i[k] = v
+			end
+		end,
+		Fix = function(t, manifest)
+		end,
 	},
 }
 

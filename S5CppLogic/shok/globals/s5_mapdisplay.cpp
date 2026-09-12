@@ -228,10 +228,10 @@ void ED::CPlayerColors::RefreshPlayerColorsExtra() {
 
 	for (int i = 0; i <= maxPl; ++i) {
 		int mapping = i < 9 ? PlayerColorMapping[i] : ep.ColorMapping(static_cast<shok::PlayerId>(i));
-		const auto& uic = dp->PlayerColor.at(mapping);
+		MinimapColor[i] = dp->MiniMapColor.at(mapping);
+		const auto& uic = ConfigColors[mapping];
 		UIColors[i] = {.B = uic.B, .G = uic.G, .R = uic.R, .A = uic.A};
 		ModelColors[i].FromShokColor(uic);
-		MinimapColor[i] = dp->MiniMapColor.at(mapping);
 	}
 	for (int i = 0; i <= 8; ++i) {
 		CurrentPlayerUIColors[i] = UIColors[i];

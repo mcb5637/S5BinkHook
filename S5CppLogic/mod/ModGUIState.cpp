@@ -160,17 +160,9 @@ namespace CppLogic::Mod::GUIState {
 		for (const auto& e : m->SelectedEntities) {
 			if (i->IsSerf(e.Id)) {
 				auto serf_sect = i->GetSectorOfEntity(e.Id);
-				if (d->TargetID != shok::EntityId::Invalid) {
-					if (i->IsEntityInSector(d->TargetID, serf_sect)) {
-						hasSector = true;
-						break;
-					}
-				}
-				else {
-					if (sector == serf_sect) {
-						hasSector = true;
-						break;
-					}
+				if (sector == serf_sect || (d->TargetID != shok::EntityId::Invalid && i->IsEntityInSector(d->TargetID, serf_sect))) {
+					hasSector = true;
+					break;
 				}
 			}
 		}
@@ -236,13 +228,15 @@ namespace CppLogic::Mod::GUIState {
 		}
 		d->TargetPos.FloorToBuildingPlacement();
 		if (UpgradeCategory != shok::UpgradeCategoryId::Invalid) {
-			auto ety = m->GUIInterface->GetBuildingTypeByUCat(m->ControlledPlayer, UpgradeCategory);
-			if (static_cast<int>(d->TargetPos.X) == static_cast<int>(PosToBuild.X) && static_cast<int>(d->TargetPos.Y) == static_cast<int>(PosToBuild.X)) {
+			if (d->TargetPos == CacheSourcePos) {
 				d->TargetPos = PosToBuild;
+				d->TargetID = CacheTargetID;
 			}
 			else {
+				auto ety = m->GUIInterface->GetBuildingTypeByUCat(m->ControlledPlayer, UpgradeCategory);
 				auto* lp = *GGL::CLogicProperties::GlobalObj;
 				float snap = lp->BuildingPlacementSnapDistance;
+				CacheSourcePos = d->TargetPos;
 				auto [p, id] = GetNearestPlacementPos(ety, shok::PositionRot{d->TargetPos.X, d->TargetPos.Y, CppLogic::DegreesToRadians(GetRotation())}, snap);
 				if (p.X >= 0) {
 					d->TargetPos.X = p.X;
@@ -251,6 +245,7 @@ namespace CppLogic::Mod::GUIState {
 					if (id != shok::EntityId::Invalid)
 						d->TargetID = id;
 				}
+				CacheTargetID = d->TargetID;
 				PosToBuild = d->TargetPos;
 			}
 		}
@@ -290,6 +285,8 @@ namespace CppLogic::Mod::GUIState {
 
 	void GUIState_PlaceBuildingEx::OnRotationChanged() {
 		PosToBuild = {};
+		CacheSourcePos = {};
+		CacheTargetID = shok::EntityId::Invalid;
 		UpdateModel(MouseX, MouseY);
 	}
 } // namespace CppLogic::Mod::GUIState

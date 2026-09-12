@@ -735,6 +735,8 @@ namespace GGUI {
 		// on minimap MouseL clicked 525A9A(x, y)
 		// scroll to pos (minimap click) cdecl 523D2D(shok::position*)
 
+		// 524e85 execute command state thiscall(targetdata, basicstate*)
+
 		void HackPostEvent();
 		static void DisableSelectionLimit(bool disable);
 

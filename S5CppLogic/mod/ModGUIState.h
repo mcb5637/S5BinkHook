@@ -36,6 +36,8 @@ namespace CppLogic::Mod::GUIState {
 		shok::Keys ScrollModifiers = shok::Keys::None;
 		bool Chain = false;
 		bool ScrollRotate = true;
+		shok::Position CacheSourcePos{};
+		shok::EntityId CacheTargetID{};
 
 		static constexpr int NumSteps = 4;
 		static constexpr float StepToDegrees = 360.0f / NumSteps;

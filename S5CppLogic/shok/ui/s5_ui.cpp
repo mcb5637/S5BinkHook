@@ -558,3 +558,11 @@ void GGUI::SoundFeedback::SoundDatas::ReloadData(shok::FeedbackEventShortenedId 
 	auto seri = BB::CXmlSerializer::CreateUnique();
 	seri->Deserialize(file.c_str(), data, FeedbackEventSoundData::SerializationData);
 }
+
+GGUI::SoundFeedback* GGUI::SoundFeedback::GlobalObj() {
+	auto* create = reinterpret_cast<void (*)()>(0x52799B);
+	auto* obj = reinterpret_cast<SoundFeedback**>(0x880ba4);
+	if (*obj == nullptr)
+		create();
+	return *obj;
+}

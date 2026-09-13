@@ -538,6 +538,18 @@ namespace CppLogic::Logic {
 			L.Push(static_cast<int>((*ED::CGlobalsLogicEx::GlobalObj)->GetBlocking(p)));
 			return 1;
 		}
+		auto LandscapeGetBlockingFlags(shok::Position p) {
+			auto bl = (*ED::CGlobalsLogicEx::GlobalObj)->GetBlocking(p);
+			auto check = [&](EGL::CGLELandscape::BlockingMode m) {
+				return (bl & m) == m;
+			};
+			return std::tuple{
+				check(EGL::CGLELandscape::BlockingMode::Blocked),
+				check(EGL::CGLELandscape::BlockingMode::BridgeArea),
+				check(EGL::CGLELandscape::BlockingMode::BuildBlock),
+				check(EGL::CGLELandscape::BlockingMode::TerrainSlope),
+			};
+		}
 		int LandscapeGetBridgeHeight(luaext::State L) {
 			shok::Position p = L.CheckPos(1);
 			L.Push((*EGL::CGLEGameLogic::GlobalObj)->Landscape->LowRes->GetBridgeHeight(p));
@@ -1756,6 +1768,7 @@ namespace CppLogic::Logic {
 		luaext::FuncReference::GetRef<LandscapeGetTerrainHeight>("LandscapeGetTerrainHeight"),
 		luaext::FuncReference::GetRef<LandscapeGetTerrainVertexColor>("LandscapeGetTerrainVertexColor"),
 		luaext::FuncReference::GetRef<LandscapeGetBlocking>("LandscapeGetBlocking"),
+		luaext::FuncReference::GetRef<LandscapeGetBlockingFlags>("LandscapeGetBlockingFlags"),
 		luaext::FuncReference::GetRef<LandscapeGetBridgeHeight>("LandscapeGetBridgeHeight"),
 		luaext::FuncReference::GetRef<GetColorByColorIndex>("GetColorByColorIndex"),
 		luaext::FuncReference::GetRef<SetColorByColorIndex>("SetColorByColorIndex"),

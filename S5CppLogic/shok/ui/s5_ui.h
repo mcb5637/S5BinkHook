@@ -935,7 +935,7 @@ namespace GGUI {
 
 
 
-		static inline GGUI::SoundFeedback* (* const GlobalObj)() = reinterpret_cast<GGUI::SoundFeedback * (*)()>(0x52799B);
+		static GGUI::SoundFeedback* GlobalObj();
 
 		struct FeedbackEventIdShortener {
 			shok::Map<shok::FeedbackEventIds, shok::FeedbackEventShortenedId> Mapping; // not completely sure

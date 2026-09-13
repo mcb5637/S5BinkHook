@@ -598,6 +598,14 @@ function CppLogic.Logic.LandscapeGetTerrainVertexColor(p) end
 --- @param p Position
 --- @return number blockingInfo bitfield (Blocking -> 1, BridgeArea -> 2, BuildBlock -> 4, TerrainSlope -> 8)
 function CppLogic.Logic.LandscapeGetBlocking(p) end
+--- gets the blocking of a position.
+--- height resolution (pos/100), input full pos.
+--- @param p Position
+--- @return boolean blocked
+--- @return boolean bridgetArea
+--- @return boolean buildBlock
+--- @return boolean terrainSlope
+function CppLogic.Logic.LandscapeGetBlockingFlags(p) end
 --- gets the bridge height of a position.
 --- quads resolution (pos/100/4), input full pos.
 --- is 0 if not set by a bridge that was there at some point.
@@ -1332,6 +1340,41 @@ function CppLogic.API.UpdateClipMouse() end
 --- @param trim boolean? if true, remove trailing zeroes
 --- @return string
 function CppLogic.API.FormatNumber(number, precision, trim) end
+
+--- binary or (uint32)
+---@param a number
+---@param b number
+---@return number
+function CppLogic.API.BitOr(a, b) end
+
+--- binary and (uint32)
+---@param a number
+---@param b number
+---@return number
+function CppLogic.API.BitAnd(a, b) end
+
+--- binary xor (uint32)
+---@param a number
+---@param b number
+---@return number
+function CppLogic.API.BitXOr(a, b) end
+
+--- binary not (uint32)
+---@param a number
+---@return number
+function CppLogic.API.BitNot(a) end
+
+--- binary left shift (uint32)
+---@param a number
+---@param b number
+---@return number
+function CppLogic.API.BitShiftLeft(a, b) end
+
+--- binary right shift (uint32)
+---@param a number
+---@param b number
+---@return number
+function CppLogic.API.BitShiftRight(a, b) end
 
 ---@class RNG
 local RNG = {}

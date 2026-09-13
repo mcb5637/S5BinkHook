@@ -732,6 +732,25 @@ namespace CppLogic::API {
 			}
 			return s;
 		}
+
+		auto BitOr(uint32_t a, uint32_t b) {
+			return a | b;
+		}
+		auto BitAnd(uint32_t a, uint32_t b) {
+			return a & b;
+		}
+		auto BitXOr(uint32_t a, uint32_t b) {
+			return a ^ b;
+		}
+		auto BitNot(uint32_t a) {
+			return ~a;
+		}
+		auto BitSL(uint32_t a, uint32_t b) {
+			return a << b;
+		}
+		auto BitSR(uint32_t a, uint32_t b) {
+			return a >> b;
+		}
 	}
 
 	constexpr std::array API{
@@ -767,6 +786,12 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<GetTriggers>("GetTriggers"),
 			luaext::FuncReference::GetRef<UpdateClipMouse>("UpdateClipMouse"),
 			luaext::FuncReference::GetRef<FormatNumber>("FormatNumber"),
+			luaext::FuncReference::GetRef<BitOr>("BitOr"),
+			luaext::FuncReference::GetRef<BitAnd>("BitAnd"),
+			luaext::FuncReference::GetRef<BitXOr>("BitXOr"),
+			luaext::FuncReference::GetRef<BitNot>("BitNot"),
+			luaext::FuncReference::GetRef<BitSL>("BitShiftLeft"),
+			luaext::FuncReference::GetRef<BitSR>("BitShiftRight"),
 #ifdef DEBUG_FUNCS
 			luaext::FuncReference::GetRef<WriteTriggers>("WriteTriggers"),
 			luaext::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),

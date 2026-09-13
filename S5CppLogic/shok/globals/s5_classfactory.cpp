@@ -109,6 +109,17 @@ void CheckEnum(luaext::State L, void* data, int idx, const BB::FieldSerializer* 
 	*static_cast<En*>(data) = luaext::State{ L }.CheckEnum<En>(idx, true);
 }
 
+void CheckAccessCategory(luaext::State L, void* data, int idx, const BB::FieldSerializer* fs) {
+	shok::AccessCategory cat{-1};
+	if (L.IsNumber(idx))
+		cat = static_cast<shok::AccessCategory>(L.CheckInt(idx));
+	else
+		fs->DeserializeFromString(&cat, L.CheckString(idx));
+	if (cat < shok::AccessCategory::AccessCategoryNone || cat > shok::AccessCategory::AccessCategoryOrnamental)
+		throw lua::LuaException{"invalid access category"};
+	*static_cast<shok::AccessCategory*>(data) = cat;
+}
+
 BB::FieldSerializer::ExtendedInfo InfoTasklist{ "shok::TaskListId", &PushInt, &CheckEnum<shok::TaskListId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoTask{ "shok::Task", &PushInt, &CheckEnum<shok::Task>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoEntityType{ "shok::EntityTypeId", &PushInt, &CheckEnum<shok::EntityTypeId>, "xs:string" };
@@ -124,7 +135,7 @@ BB::FieldSerializer::ExtendedInfo InfoAmbientSoundID{ "shok::AmbientSoundId", &P
 BB::FieldSerializer::ExtendedInfo InfoWeatherEffectTextureID{ "shok::WeatherEffectTextureId", &PushInt, &CheckEnum<shok::WeatherEffectTextureId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoTerrainTextureTextureID{ "shok::TerrainTextureId", &PushInt, &CheckEnum<shok::TerrainTextureId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoEntityCategory{ "shok::EntityCategory", &PushInt, &CheckEnum<shok::EntityCategory>, "xs:string" };
-BB::FieldSerializer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &PushInt, &CheckInt, "xs:string" };
+BB::FieldSerializer::ExtendedInfo InfoAccessCategory{ "shok::AccessCategory", &PushInt, &CheckAccessCategory, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoAnimCategory{ "shok::AnimationCategoryId", &PushInt, &CheckEnum<shok::AnimationCategoryId>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoGoods{ "shok::Goods", &PushInt, &CheckEnum<shok::Goods>, "xs:string" };
 BB::FieldSerializer::ExtendedInfo InfoWidgetID{ "shok::WidgetId", &PushInt, &CheckEnum<shok::WidgetId>, "xs:string" };

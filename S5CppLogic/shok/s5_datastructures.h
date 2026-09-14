@@ -661,6 +661,8 @@ namespace shok {
 
 		// tidy 40142d
 		// ctor empty 4015ed
+		// operator+ 45a010 cdecl(char*)
+		// operator+ 534694 cdecl(shok::String*)
 	};
 	static_assert(sizeof(String) == 7 * 4);
 	std::strong_ordering operator<=>(const String& a, std::string_view b);

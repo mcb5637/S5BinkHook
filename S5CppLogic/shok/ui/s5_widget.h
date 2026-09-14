@@ -659,7 +659,7 @@ namespace GGUI {
 	class OnScreenInfoRenderer {
 		friend class C3DOnScreenInformationCustomWidget;
 	public:
-		struct {
+		struct TextureDataS {
 			EGUIX::CMaterial Texture_DeadHero; // 46
 			EGUIX::CMaterial Texture_NPCMarker;
 			EGUIX::CMaterial Texture_NoWorker; // 66
@@ -712,7 +712,16 @@ namespace GGUI {
 			EGUIX::CMaterial Texture_MOEmpty;
 			shok::FontId FontID_OnscreenNumbersSmall; // 500 in struct
 			shok::FontId FontID_Onscreen10;
-			PADDINGI(3); // map? of entitytype -> texture gui/MO_NAME
+			struct WorkerIconsS {
+				shok::Map<shok::String, EGUIX::CMaterial*> Data; // map? of entitytype -> texture gui/MO_NAME
+
+				// 5426ac get worker icon (shok::String*) -> EGUIX::CMaterial**
+			} WorkerIcons;
+
+			// ctor 54289b
+			// load workers 542736
+			void LoadWorkerIcons();
+			void ReloadWorkerIcons();
 		} TextureData;
 		COnScreenElementMotivation OSEMotivation; // 551
 		COnScreenElementBuilding OSEBuilding; // 617
@@ -753,6 +762,9 @@ namespace GGUI {
 		EGUIX::CMaterial* GetResourceIcon(shok::ResourceType rt); // does not return wood icon without patching
 		EGUIX::CMaterial* GetRefinerResourceIcon(shok::ResourceType rt);
 
+		// 542722 get worker icon (shok::String* typename)
+		// ctor 541827
+
 	private:
 		EGUIX::CMaterial* __thiscall GetResourceIconOverride(shok::ResourceType rt);
 		void __thiscall RenderFloatiesHooked();
@@ -767,6 +779,8 @@ namespace GGUI {
 
 		static inline constexpr int vtp = 0x77D490;
 		static inline constexpr int TypeDesc = 0x82E1E8;
+
+		// ctor 536a35
 
 		void ShowResourceFloatieOnEntity(shok::EntityId eid, int amount);
 

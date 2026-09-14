@@ -683,6 +683,20 @@ bool EGUIX::CStringInputCustomWidget::HandleInput(CCustomWidget* wid, shok::Keys
     return stringinputcw_input(this, wid, keyCode, keyChar);
 }
 
+void GGUI::OnScreenInfoRenderer::TextureDataS::LoadWorkerIcons() {
+	auto* f = reinterpret_cast<void(__thiscall*)(TextureDataS*)>(0x542736);
+	f(this);
+}
+
+void GGUI::OnScreenInfoRenderer::TextureDataS::ReloadWorkerIcons() {
+	for (auto& e : WorkerIcons.Data) {
+		delete e.second;
+		e.second = nullptr;
+	}
+	WorkerIcons.Data.clear();
+	LoadWorkerIcons();
+}
+
 static inline void(__thiscall* const onscreenmoti_render)(GGUI::COnScreenElementMotivation* th, const shok::Position* ScreenPos, const GGL::IGLGUIInterface::UIData* data) = reinterpret_cast<void(__thiscall*)(GGUI::COnScreenElementMotivation*, const shok::Position*, const GGL::IGLGUIInterface::UIData*)>(0x53E93C);
 void GGUI::COnScreenElementMotivation::Render(const shok::Position* screenPos, const GGL::IGLGUIInterface::UIData* data)
 {

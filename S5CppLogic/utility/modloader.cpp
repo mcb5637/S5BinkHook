@@ -1545,6 +1545,9 @@ int CppLogic::ModLoader::ModLoader::GetMaxPlayers(luaext::State L) {
 void CppLogic::ModLoader::ModLoader::EntityTypeRefreshPostModify(shok::EntityTypeId id) {
 	auto* mng = (*Framework::CMain::GlobalObj)->GluePropsManager->EntitiesPropsManager;
 	mng->RefreshTypePostModify(id);
+	auto* cw = *GGUI::C3DOnScreenInformationCustomWidget::GlobalObj;
+	if (cw != nullptr)
+		cw->Renderer.TextureData.ReloadWorkerIcons();
 }
 
 void CppLogic::ModLoader::ModLoader::Log(luaext::State L, const char* log)

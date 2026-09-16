@@ -47,6 +47,8 @@ RWE::RwTexture* EGUIX::TextureManager::ReloadTexture(shok::GUITextureId id)
 void EGUIX::TextureManager::FreeTexture(shok::GUITextureId i)
 {
     int id = static_cast<int>(i);
+	if (Textures[id] == nullptr)
+		return;
     Textures[id]->Destroy();
     Textures[id] = nullptr;
 }

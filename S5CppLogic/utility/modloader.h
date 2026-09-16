@@ -57,6 +57,24 @@ namespace CppLogic::ModLoader {
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
 			}
 
+			En GetId(luaext::State L, const char* s) {
+				auto mng = IdManager();
+				En id = mng.GetIdByName(s);
+				if (id == static_cast<En>(0)) {
+					id = mng.GetIDByNameOrCreate(s);
+					OnIdAllocated(id);
+					// ReSharper disable once CppDFAConstantConditions
+					if (TableName()) {
+						L.Push(TableName());
+						L.GetGlobal();
+						L.PushValue(1);
+						L.Push(id);
+						L.SetTableRaw(-3);
+						L.Pop(1);
+					}
+				}
+				return id;
+			}
 			En GetId(luaext::State L, int idx) {
 				auto mng = IdManager();
 				auto t = L.Type(idx);
@@ -69,21 +87,7 @@ namespace CppLogic::ModLoader {
 				}
 				else if (t == lua::LType::String) {
 					const char* s = L.ToString(idx);
-					En id = mng.GetIdByName(s);
-					if (id == static_cast<En>(0)) {
-						id = mng.GetIDByNameOrCreate(s);
-						OnIdAllocated(id);
-						// ReSharper disable once CppDFAConstantConditions
-						if (TableName()) {
-							L.Push(TableName());
-							L.GetGlobal();
-							L.PushValue(1);
-							L.Push(id);
-							L.SetTableRaw(-3);
-							L.Pop(1);
-						}
-					}
-					return id;
+					return GetId(L, s);
 				}
 				else {
 					throw lua::LuaException{std::format("invalid {} at {}: invalid type", typename_details::type_name<En>(), idx)};
@@ -107,6 +111,9 @@ namespace CppLogic::ModLoader {
 			std::vector<En> ToRemove, ToReload;
 
 		public:
+			// ReSharper disable once CppMemberFunctionMayBeStatic
+			void OnIdAllocatedExtra(En) {}
+
 			virtual void Reset() override {
 				while (!ToRemove.empty()) {
 					En id = ToRemove.back();
@@ -122,8 +129,10 @@ namespace CppLogic::ModLoader {
 				static_assert(sizeof(DataTypeLoaderCommon<En>) != sizeof(DataTypeLoaderCommon<En>));
 			}
 			virtual void OnIdAllocated(En id) override {
-				if (std::find(ToRemove.begin(), ToRemove.end(), id) == ToRemove.end())
+				if (std::find(ToRemove.begin(), ToRemove.end(), id) == ToRemove.end()) {
 					ToRemove.push_back(id);
+					OnIdAllocatedExtra(id);
+				}
 			}
 			virtual void OnIdLoaded(En id) override {
 				if (std::find(ToRemove.begin(), ToRemove.end(), id) != ToRemove.end())

@@ -67,6 +67,9 @@ example: as originals
 Note: GUI textures are used only for widgets. referenced by the gui xml and loaded from there without specifically loading them via modloader, but in that case, they will not get cleaned up properly.
 Note2: The full path to the texture is used as id, and having data in front can make the difference between overriding an existing texture and loading a new one. have a look at data/menu/projects/ingame.xml to see what path is used.
 Note3: a few GUI textures are only getting added via lua later on, namely worker icons, motivation icons and the payday clock. these can be changed by Replace as well.
+Note4: for new EntityTypes a texture id data\graphics\textures\gui\MO_typename (without .png, replacing typename) is automatically reserved.
+        this id will be used by onscreen worker icons (workplace/farm/residence).
+        if you need an actual texture for your worker, you need to additionally load it via ModLoader.
 
 Animation:
 path: data/graphics/animations/aname.anm

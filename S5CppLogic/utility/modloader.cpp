@@ -268,6 +268,8 @@ void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>:
 	(*EGL::CGLEEntitiesProps::GlobalObj)->EntityTypeManager->RemoveID(static_cast<int>(id));
 }
 template<>
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::OnIdAllocatedExtra(shok::EntityTypeId id);
+template<>
 CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId> CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj{};
 
 template<>
@@ -1124,6 +1126,16 @@ void CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProp
 template<>
 CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps> CppLogic::ModLoader::ModLoader::ConfigFileLoader<GGL::CPlayerAttractionProps>::Obj{};
 
+
+
+
+
+template<>
+void CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::OnIdAllocatedExtra(shok::EntityTypeId id) {
+	auto n = CppLogic::GetIdManager<shok::EntityTypeId>().GetNameByID(id);
+	auto tex = std::format(R"(data\graphics\textures\gui\MO_{})", n);
+	DataTypeLoaderTracking<shok::GUITextureId>::Obj.GetId(luaext::State{nullptr}, tex.c_str());
+}
 
 std::array<CppLogic::ModLoader::ModLoader::DataTypeLoader*, 23> CppLogic::ModLoader::ModLoader::Loaders{{
 	&CppLogic::ModLoader::ModLoader::DataTypeLoaderTracking<shok::EntityTypeId>::Obj,

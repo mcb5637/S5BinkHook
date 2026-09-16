@@ -101,3 +101,18 @@ how attacking works:
         - Soldier_SetAttackTarget sets ATTACKER_TARGET
 
 autoattack fires attack command event, then resets current command
+
+commandline arguments: (X is arbitrary string, I is string parsed as int, D is string parsed as double
+- "-MP"
+- "-MAP:X"
+- "-REPLAY:X"
+- "-SAVEGAME:X"
+- "-SAVEAFTERXSECONDS:I"
+- "-AUTOSHUTDOWN:I"
+- "-GRABSCREENSHOTS"
+- "-TICKRATE:D"
+- "-HIDEGUI"
+- "-RECORDGUI"
+- "-LANG:X"
+- "-EXTRA:I" has some precondition
+- "-DEBUGSCRIPT"

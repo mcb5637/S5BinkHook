@@ -568,6 +568,7 @@ namespace Framework {
 		// fill current dir 54e936(char*, size)
 
 		// ctor 40b968
+		// parse cmd args 4082f3(char*, DataT*) static stdcall
 
 		void SaveGDB();
 		ED::CGUICamera* GetCamera(); // gets mainmenu or ingame camera

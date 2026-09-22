@@ -1249,7 +1249,7 @@ namespace CppLogic::UI {
 			auto* t = dynamic_cast<CppLogic::Mod::UI::TextInputCustomWidget*>(w->CustomWidget);
 			if (t == nullptr)
 				throw lua::LuaException{"not a TextInputCustomWidget"};
-			const auto& [str, _] = t->ClearTextOutput();
+			const auto str = t->ClearTextOutput();
 			L.Push(str);
 			return 1;
 		}
@@ -2084,7 +2084,7 @@ namespace CppLogic::UI {
 		L.SetTableRaw(-3);
 
 		L.Push("TextInputCustomWidgetEvent");
-		GetIdManager<Mod::UI::TextInputCustomWidget::Event>().PushToState(L);
+		GetIdManager<Mod::UI::TextInputCustomWidget::Flag>().PushToState(L);
 		L.SetTableRaw(-3);
 
 		if (L.GetState() == shok::LuaStateMainmenu) {

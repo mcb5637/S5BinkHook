@@ -94,11 +94,16 @@ namespace BB {
 }
 
 namespace shok {
+	class UIRenderCustomColorContext;
 	static inline HWND* MainWindowHandle = reinterpret_cast<HWND*>(0x84ECC4);
 
 
 	class UIRenderer {
 	public:
+		enum class TextAlignment : int {
+			Left, Center, Right,
+		};
+
 		RWE::RwCamera* Camera = nullptr;
 		bool ShouldRenderText = false;
 		PADDING(3);
@@ -116,6 +121,8 @@ namespace shok {
 		void RenderLine(const EGUIX::Color* c, bool scale, float x1, float y1, float x2, float y2);
 		float GetTextWidth(const char* text, shok::FontId font);
 		static float GetTextHeight(shok::FontId font);
+		int RenderTextExt(const char* txt, shok::FontId fontid, bool scale, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor,
+				UIRenderCustomColorContext* customColorCtx, const EGUIX::Color* cursorColor, TextAlignment align = TextAlignment::Left);
 
 		static constexpr shok::Position ScaledScreenSize{ 1024.0f, 768.0f };
 

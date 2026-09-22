@@ -112,11 +112,18 @@ namespace CppLogic::Mod::UI {
 	};
 
 	class TextInputCustomWidget : public BB::IObject, public EGUIX::ICustomWidget, public InputFocusWidget {
+		static constexpr std::string_view CursorCmd = "@cursor|";
+
 	public:
 		enum class Event : int {
 			Confirm = 0,
 			Cancel = 1,
 			Validate = 2,
+		};
+		enum class Flag : int {
+			Cancel = 1,
+			Validate = 2,
+			Centered = 4,
 		};
 		enum class Modes : int {
 			Normal = 0,
@@ -144,10 +151,9 @@ namespace CppLogic::Mod::UI {
 		std::string CurrentTextDisplay;
 		EGUIX::CFontIDHandler Font;
 		size_t CurrentPos = 0;
-		size_t CurrentPosInDisplay = 0;
 		bool IgnoreNextChar = false;
 
-		[[nodiscard]] std::pair<std::string, size_t> ClearTextOutput() const;
+		[[nodiscard]] std::string ClearTextOutput(bool cursor = false) const;
 		void RefreshDisplayText();
 
 		inline shok::String& EventFunc() {
@@ -159,10 +165,10 @@ namespace CppLogic::Mod::UI {
 		[[nodiscard]] inline Modes Mode() const {
 			return static_cast<Modes>(IntegerUserVariable0);
 		}
-		[[nodiscard]] inline Event Flags() const {
-			return static_cast<Event>(IntegerUserVariable1);
+		[[nodiscard]] inline Flag Flags() const {
+			return static_cast<Flag>(IntegerUserVariable1);
 		}
-		[[nodiscard]] inline bool HasFlag(Event f) const {
+		[[nodiscard]] inline bool HasFlag(Flag f) const {
 			return static_cast<int>(Flags()) & static_cast<int>(f);
 		}
 		[[nodiscard]] inline shok::Color TextColor() const {
@@ -255,4 +261,11 @@ class enum_is_flags<CppLogic::Mod::UI::TextInputCustomWidget::Event> : public st
 template<>
 inline auto CppLogic::GetIdManager<CppLogic::Mod::UI::TextInputCustomWidget::Event>() {
 	return CppLogic::MagicEnum::EnumIdManager<CppLogic::Mod::UI::TextInputCustomWidget::Event>();
+}
+
+template<>
+class enum_is_flags<CppLogic::Mod::UI::TextInputCustomWidget::Flag> : public std::true_type {};
+template<>
+inline auto CppLogic::GetIdManager<CppLogic::Mod::UI::TextInputCustomWidget::Flag>() {
+	return CppLogic::MagicEnum::EnumIdManager<CppLogic::Mod::UI::TextInputCustomWidget::Flag>();
 }

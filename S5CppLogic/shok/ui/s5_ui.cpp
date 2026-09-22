@@ -91,6 +91,72 @@ float shok::UIRenderer::GetTextHeight(shok::FontId font)
 	return EGUIX::FontManager::GlobalObj()->GetFontObj(font)->GetHeight();
 }
 
+int shok::UIRenderer::RenderTextExt(const char* txt, shok::FontId fontid, bool scale, float x, float y, float xend, const EGUIX::Color* color, float linedistancefactor,
+									 UIRenderCustomColorContext* customColorCtx, const EGUIX::Color* cursorColor, TextAlignment align) {
+	if (!ShouldRenderText)
+		return 0;
+	if (!txt || *txt == 0)
+		return 1;
+	auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(fontid);
+	if (!f)
+		return 0;
+	// no idea what these funcs do
+	RWE::P2D::CTM::Push();
+	RWE::P2D::CTM::SetIdentity();
+	Brush->SetTexture(nullptr);
+
+	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
+	SetTextRenderColor(c);
+	RWE::RwV2d anchor = { x,y };
+	RWE::RwV2d posTransform = { 1.0f, 1.0f };
+	float end = xend;
+	if (!scale) {
+		anchor.x = anchor.x * shok::UIRenderer::ScaledScreenSize.X / RenderSizeX;
+		anchor.y = anchor.y * shok::UIRenderer::ScaledScreenSize.Y / RenderSizeY;
+		end = end * shok::UIRenderer::ScaledScreenSize.X / RenderSizeX;
+	}
+
+	const float fontsize = f->GetHeight(); //0.036
+	//const float linedistance = fontsize * (ldf == 0.0f ? 1.0f : ldf);
+
+	RWE::RwV2d stepx;
+	RWE::RwV2d stepy;
+	RWE::RwV2d stepori;
+	RWE::P2D::Device::GetStep(&stepx, &stepy, &stepori);
+	anchor.x = anchor.x * stepx.x * RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	posTransform.x = posTransform.x * stepx.x * RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	end = end * stepx.x * RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
+	if (!SomeTextBool) {
+		RWE::P2D::CTM::Scale(shok::UIRenderer::ScaledScreenSize.X / RenderSizeX, shok::UIRenderer::ScaledScreenSize.Y / RenderSizeY);
+		anchor.y = RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
+		posTransform.y = posTransform.y * RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
+	}
+	else {
+		anchor.y = 1.0f - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
+		posTransform.y = posTransform.y * RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
+	}
+
+	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureRaster(nullptr);
+	// ReSharper disable once CppExpressionWithoutSideEffects
+	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureFilterMode(RWE::RwTextureFilterMode::rwFILTERLINEAR);
+
+	// i dont think this was a template when BB did this, but this is way nicer as one
+	if (f->IsWchar()) {
+		static wchar_t buff[5001]{}; // same size that is used in the original func
+		shok::UIRenderer::MultibyteToWString(txt, buff, 5000);
+		CppLogic::TextRenderer<wchar_t> rend{ this, buff, f, anchor, end, linedistancefactor, posTransform, customColorCtx, c, cursorColor, align };
+		rend.MainRender();
+	}
+	else {
+		CppLogic::TextRenderer<char> rend{ this, txt, f, anchor, end, linedistancefactor, posTransform, customColorCtx, c, cursorColor, align };
+		rend.MainRender();
+	}
+
+	RWE::P2D::CTM::Pop();
+
+	return 1;
+}
+
 static inline const EGUIX::Color* (__thiscall* const uircustomcolorcont_getcol)(shok::UIRenderCustomColorContext* th, int i) = reinterpret_cast<const EGUIX::Color * (__thiscall*)(shok::UIRenderCustomColorContext*, int)>(0x5577B6);
 const EGUIX::Color* shok::UIRenderCustomColorContext::GetColorByInt(int i)
 {
@@ -162,69 +228,8 @@ float __cdecl printstr_getlength_override(RWE::P2D::Rt2dFont* f, const char* str
 	return len * multiply;
 }
 
-int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, shok::FontId font, bool uk, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* customcolordata, float ldf) {
-	if (!r->ShouldRenderText)
-		return 0;
-	if (!txt || *txt == 0)
-		return 1;
-	auto* f = EGUIX::FontManager::GlobalObj()->GetFontObj(font);
-	if (!f)
-		return 0;
-	// no idea what these funcs do
-	RWE::P2D::CTM::Push();
-	RWE::P2D::CTM::SetIdentity();
-	r->Brush->SetTexture(nullptr);
-
-	const shok::Color c = color ? color->ToShokColor() : shok::Color{};
-	r->SetTextRenderColor(c);
-	RWE::RwV2d anchor = { x,y };
-	RWE::RwV2d posTransform = { 1.0f, 1.0f };
-	float end = xend;
-	if (!uk) {
-		anchor.x = anchor.x * shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX;
-		anchor.y = anchor.y * shok::UIRenderer::ScaledScreenSize.Y / r->RenderSizeY;
-		end = end * shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX;
-	}
-
-	const float fontsize = f->GetHeight(); //0.036
-	//const float linedistance = fontsize * (ldf == 0.0f ? 1.0f : ldf);
-
-	RWE::RwV2d stepx;
-	RWE::RwV2d stepy;
-	RWE::RwV2d stepori;
-	RWE::P2D::Device::GetStep(&stepx, &stepy, &stepori);
-	anchor.x = anchor.x * stepx.x * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
-	posTransform.x = posTransform.x * stepx.x * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
-	end = end * stepx.x * r->RenderSizeX / shok::UIRenderer::ScaledScreenSize.X;
-	if (!r->SomeTextBool) {
-		RWE::P2D::CTM::Scale(shok::UIRenderer::ScaledScreenSize.X / r->RenderSizeX, shok::UIRenderer::ScaledScreenSize.Y / r->RenderSizeY);
-		anchor.y = r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
-		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
-	}
-	else {
-		anchor.y = 1.0f - (fontsize * shok::UIRenderer::ScaledScreenSize.Y + anchor.y) / shok::UIRenderer::ScaledScreenSize.Y;
-		posTransform.y = posTransform.y * r->RenderSizeY / shok::UIRenderer::ScaledScreenSize.Y / shok::UIRenderer::ScaledScreenSize.Y;
-	}
-
-	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureRaster(nullptr);
-	// ReSharper disable once CppExpressionWithoutSideEffects
-	(*RWE::RwGlobals::GlobalObj)->dOpenDevice.SetTextureFilterMode(RWE::RwTextureFilterMode::rwFILTERLINEAR);
-
-	// i dont think this was a template when BB did this, but this is way nicer as one
-	if (f->IsWchar()) {
-		static wchar_t buff[5001]{}; // same size that is used in the original func
-		shok::UIRenderer::MultibyteToWString(txt, buff, 5000);
-		CppLogic::TextRenderer<wchar_t> rend{ r, buff, f, anchor, end, ldf, posTransform, customcolordata, c };
-		rend.MainRender();
-	}
-	else {
-		CppLogic::TextRenderer<char> rend{ r, txt, f, anchor, end, ldf, posTransform, customcolordata, c };
-		rend.MainRender();
-	}
-
-	RWE::P2D::CTM::Pop();
-
-	return 1;
+int __fastcall printstr_override(shok::UIRenderer* r, int _, const char* txt, shok::FontId font, bool scale, float x, float y, float xend, const EGUIX::Color* color, shok::UIRenderCustomColorContext* customcolordata, float ldf) {
+	return r->RenderTextExt(txt, font, scale, x, y, xend, color, ldf, customcolordata, nullptr);
 }
 bool HookTextPrinting_Hooked = false; // 1103
 void shok::HookTextPrinting()

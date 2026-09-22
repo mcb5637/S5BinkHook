@@ -7,9 +7,7 @@
 namespace CppLogic {
     template<class T>
     class TextRenderer {
-        enum class TextAlignment : int {
-            Left, Center, Right,
-        };
+        using TextAlignment = shok::UIRenderer::TextAlignment;
 
         shok::UIRenderer *Renderer;
         const T *Buff;
@@ -21,23 +19,25 @@ namespace CppLogic {
         const float FontSize;
         const float LineDistance;
         bool ContainsAt = false;
-        TextAlignment Alignment = TextAlignment::Left;
+        TextAlignment Alignment;
         const T *StrPos;
         T *LinePos;
         shok::UIRenderCustomColorContext *CustomColorData;
         const shok::Color DefaultColor;
         bool SkipWhitespaceActive = true;
         float ActiveTabSplit = -1.0f;
+    	const EGUIX::Color* CursorColor;
+    	std::optional<std::tuple<float, float, float>> CursorRenderPos = std::nullopt;
 
         static inline T Line[5001]{};
 
     public:
         TextRenderer(shok::UIRenderer *r, const T *txt, RWE::P2D::Rt2dFont *f, const RWE::RwV2d &anchor, float end,
                      float ldf, const RWE::RwV2d &posTransform, shok::UIRenderCustomColorContext *customcolordata,
-                     shok::Color defaultcolor)
+                     shok::Color defaultcolor, const EGUIX::Color* cursorCol, TextAlignment align)
             : Renderer(r), Buff(txt), Font(f), Anchor(anchor), PosTransform(posTransform), End(end), StartX(anchor.x),
-        FontSize(f->GetHeight()), LineDistance(FontSize * (ldf == 0.0f ? 1.0f : ldf)), StrPos(Buff), LinePos(Line),
-        CustomColorData(customcolordata), DefaultColor(defaultcolor) {}
+        FontSize(f->GetHeight()), LineDistance(FontSize * (ldf == 0.0f ? 1.0f : ldf)), Alignment(align), StrPos(Buff), LinePos(Line),
+        CustomColorData(customcolordata), DefaultColor(defaultcolor), CursorColor(cursorCol) {}
 
     private:
         static constexpr const T *txt_cr() {
@@ -122,6 +122,13 @@ namespace CppLogic {
                 return L"tab:";
             else
                 return "tab:";
+        }
+
+    	static constexpr const T *txt_cursor() {
+        	if constexpr (std::same_as<T, wchar_t>)
+        		return L"cursor";
+        	else
+        		return "cursor";
         }
 
         static bool CharsMatch(const T *txt, const T *sear, bool checkend) {
@@ -369,6 +376,14 @@ namespace CppLogic {
             }
         }
 
+    	void ClearCursor() {
+        	if (CursorColor && CursorColor->Alpha > 0 && CursorRenderPos.has_value()) {
+        		auto [x,y,h] = *CursorRenderPos;
+        		Renderer->RenderLine(CursorColor, true, x, y, x, y - h);
+        	}
+        	CursorRenderPos = std::nullopt;
+        }
+
         void RenderAtLine() {
             static T partialline[5001]{};
             T const *plinepos = Line;
@@ -535,6 +550,22 @@ namespace CppLogic {
                             }
                             SkipToEndOfAt(plinepos);
                             continue;
+                        } else if (CharsMatch(&plinepos[1], txt_cursor(), true)) {
+                        	plinepos += 7;
+                        	if (*plinepos == '|')
+                        		++plinepos;
+                        	*partlinepos = '\0';
+                        	Font->RenderText(partialline, FontSize, &Anchor, Renderer->Brush);
+                        	partlinepos = partialline;
+                        	if (CursorColor && CursorColor->Alpha > 0) {
+                        		float sf = FontSize;
+                        		float h = sf * shok::UIRenderer::ScaledScreenSize.Y;
+                        		float x = Anchor.x / PosTransform.x;
+                        		float y = (Anchor.y - 1.0f) * -shok::UIRenderer::ScaledScreenSize.Y + 1.0f;
+                        		ClearCursor();
+                        		CursorRenderPos = {x, y, h};
+                        	}
+                        	continue;
                         } else {
                             SkipToEndOfAt(plinepos);
                             continue;
@@ -570,6 +601,7 @@ namespace CppLogic {
                     RenderAtLine();
                 else
                     Font->RenderText(Line, FontSize, &Anchor, Renderer->Brush);
+            	ClearCursor();
 
                 if (tabSplit >= 0.0f) {
                     ActiveTabSplit = -1.0f;

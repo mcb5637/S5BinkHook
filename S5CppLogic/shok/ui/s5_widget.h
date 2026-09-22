@@ -1280,6 +1280,8 @@ namespace GGUI {
 	public:
 		static inline constexpr int vtp = 0x77D27C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7E0B4136);
+
+		// ctor 5357fc
 	};
 
 	// updates TradeWindowOffer (hardcoded) widgets

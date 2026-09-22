@@ -337,6 +337,7 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Initialize()
 	if (FontName().size() > 0)
 		f = FontName().c_str();
 	Font.LoadFont(f);
+	RefreshDisplayText();
 }
 
 void CppLogic::Mod::UI::TextInputCustomWidget::Destroy()
@@ -357,36 +358,29 @@ void CppLogic::Mod::UI::TextInputCustomWidget::Render(EGUIX::CCustomWidget* widg
 	if (col.Alpha == 0) {
 		col = EGUIX::Color{};
 	}
+	EGUIX::Color cursor;
+	if (!HasFocus()) {
+		cursor = {0,0,0,0};
+	}
+	else if (!(static_cast<int>(shok::GetCurrentTimeFloat() * 3.0f) & 1)) {
+		cursor = EGUIX::Color{ BlinkColor() };
+		if (cursor.Alpha == 0) {
+			cursor.Red = 100;
+			cursor.Green = 100;
+			cursor.Blue = 100;
+			cursor.Alpha = 255;
+		}
+	}
+	else {
+		cursor = col;
+	}
 	{
 		float x = screenCoords->X;
 		float y = screenCoords->Y;
 		float end = screenCoords->X + screenCoords->W;
-		rend->RenderText(CurrentTextDisplay.c_str(), Font.FontID, true, x, y, end, &col, 1);
+		rend->RenderTextExt(CurrentTextDisplay.c_str(), Font.FontID, true, x, y, end, &col, 1, nullptr,
+			&cursor, HasFlag(Flag::Centered) ? shok::UIRenderer::TextAlignment::Center : shok::UIRenderer::TextAlignment::Left);
 	}
-	if (!HasFocus())
-		return;
-	if (!(static_cast<int>(shok::GetCurrentTimeFloat() * 3.0f) & 1)) {
-		col = EGUIX::Color{ BlinkColor() };
-		if (col.Alpha == 0) {
-			col.Red = 100;
-			col.Green = 100;
-			col.Blue = 100;
-			col.Alpha = 255;
-		}
-	}
-	char back = CurrentTextDisplay[CurrentPosInDisplay];
-	CurrentTextDisplay[CurrentPosInDisplay] = '\0';
-	float textw = rend->GetTextWidth(CurrentTextDisplay.c_str(), Font.FontID);
-	CurrentTextDisplay[CurrentPosInDisplay] = back;
-	float x = screenCoords->X;
-	float y = screenCoords->Y;
-	if (rend->SomeTextBool) {
-		x = x / shok::UIRenderer::ScaledScreenSize.X * rend->RenderSizeX;
-		y = y / shok::UIRenderer::ScaledScreenSize.Y * rend->RenderSizeY;
-	}
-	x += textw * rend->RenderSizeY + 1.0f;
-	float h = shok::UIRenderer::GetTextHeight(Font.FontID) * rend->RenderSizeY;
-	rend->RenderLine(&col, false, x, y, x, y + h);
 }
 
 bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget* widget, BB::CEvent* ev, BB::CEvent* evAgain)
@@ -430,7 +424,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 				changed = true;
 			}
 			if (changed) {
-				if (HasFlag(Event::Validate)) {
+				if (HasFlag(Flag::Validate)) {
 					if (!CallFunc(EventFunc(), Event::Validate)) {
 						return true;
 					}
@@ -463,7 +457,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::HandleEvent(EGUIX::CCustomWidget*
 			else if (me->IsKey(shok::Keys::Escape)) {
 				ClearFocus();
 				EGUIX::WidgetLoader::KeyStrokeLuaCallback();
-				if (HasFlag(Event::Cancel))
+				if (HasFlag(Flag::Cancel))
 					CallFunc(EventFunc(), Event::Cancel);
 			}
 			else if (me->IsKey(shok::Keys::Left)) {
@@ -574,18 +568,23 @@ void CppLogic::Mod::UI::TextInputCustomWidget::RefreshDisplayText()
 	CurrentTextDisplay.clear();
 	if (Mode() == Modes::Password) {
 		CurrentTextDisplay.append(CurrentTextRaw.length(), '*');
-		CurrentPosInDisplay = CurrentPos;
+		CurrentTextDisplay.insert(CurrentPos, CursorCmd);
 		return;
 	}
-	std::tie(CurrentTextDisplay, CurrentPosInDisplay) = ClearTextOutput();
+	CurrentTextDisplay= ClearTextOutput(true);
 }
 
-std::pair<std::string, size_t> CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput() const
+std::string CppLogic::Mod::UI::TextInputCustomWidget::ClearTextOutput(bool cursor) const
 {
 	std::string r{};
 	size_t i = 0, j = 0;
 	std::optional<size_t> pos = std::nullopt;
 	for (char cr : CurrentTextRaw) {
+		if (i == CurrentPos) {
+			pos = j;
+			if (cursor)
+				r.append(CursorCmd);
+		}
 		auto c = static_cast<unsigned char>(cr);
 		if (c > 0x7F) {
 			r.append(1, static_cast<char>((c >> 6) | 0xC0));
@@ -595,12 +594,12 @@ std::pair<std::string, size_t> CppLogic::Mod::UI::TextInputCustomWidget::ClearTe
 		r.append(1, static_cast<char>(c));
 		++i;
 		++j;
-		if (i == CurrentPos)
-			pos = j;
 	}
-	if (!pos.has_value())
-		pos = i;
-	return { r, *pos };
+	if (!pos.has_value()) {
+		if (cursor)
+			r.append(CursorCmd);
+	}
+	return r;
 }
 
 bool CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcname, Event ev)
@@ -614,7 +613,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::CallFunc(std::string_view funcnam
 	try {
 		L.DoStringT(std::string_view(s).substr(1), s.c_str());
 		if (L.IsFunction(-1)) {
-			const auto& [str, _] = ClearTextOutput();
+			const auto str = ClearTextOutput();
 			L.Push(str);
 			L.Push(static_cast<int>(WidgetId));
 			L.Push(static_cast<int>(ev));
@@ -690,7 +689,7 @@ bool CppLogic::Mod::UI::TextInputCustomWidget::Validate()
 		if (Mode() == Modes::UDouble && out < 0.0)
 			return false;
 	}
-	if (HasFlag(Event::Validate)) {
+	if (HasFlag(Flag::Validate)) {
 		if (!CallFunc(EventFunc(), Event::Validate)) {
 			return false;
 		}

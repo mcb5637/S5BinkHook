@@ -13,12 +13,16 @@ namespace ESnd {
 	public:
 		virtual void StartMusic(const char* path, int vol, bool loop);
 		virtual void StopMusic();
-		// 2 more vfuncs
+		[[nodiscard]] virtual const char* GetCurrentlyPlaying() const;
+		[[nodiscard]] virtual int GetVolume() const;
 	};
 
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CSoEMusic : public ISoEMusic {
-		PADDINGI(18);
+		PADDINGI(10);
+		// next 2 only set when looped
+		shok::String CurrentlyPlaying;
+		int Volume;
 		float VolumeAdjustment = false; // 19
 		PADDINGI(1); // a bool?
 
@@ -32,6 +36,15 @@ namespace ESnd {
 		static inline ESnd::CSoEMusic** const GlobalObj = reinterpret_cast<ESnd::CSoEMusic**>(0x859FD4);
 
 		static void HookStartMusicFilesystem();
+
+		// ctor 49654b
+
+		struct SavegameData {
+			shok::String Music;
+			int Volume;
+
+			static inline auto* const SerializationData = reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x40276e);
+		};
 	};
 	//constexpr int i = offsetof(ESnd::CSoEMusic, VolumeAdjustment)/4;
 	static_assert(sizeof(CSoEMusic) == 21 * 4);
@@ -62,12 +75,27 @@ namespace ESnd {
 	class ISoESoundPlayBack {
 	public:
 		virtual BB::CIDManagerEx* __stdcall GetSoundManager() = 0;
-		// 3 more, then dtor
+		// no idea what 1st param is, int* success or some id?, returns it
+		virtual void* __stdcall Start3DSound(void*, shok::SoundId sound, float x, float y, float z, int volume, bool looped) = 0;
+		// 2 more, then dtor
 
 		static inline constexpr int vtp = 0x76D2CC;
 	};
 	class ISoESound : public BB::IPostEvent {
 	public:
+		enum class VolumeAdjustType : int {
+			Main = 0,
+			SoundEffect = 1,
+			Music = 2,
+			Voice = 3,
+			Feedback = 4,
+		};
+		enum class LuaAPIVolumeAdjustType : int {
+			Main = 0,
+			Ambient = 5,
+			Voice = 4,
+		};
+
 		virtual ISoESoundPlayBack* __stdcall GetPlayback() = 0;
 		virtual CSoEMusic* __stdcall GetMusic() = 0;
 	private:
@@ -80,7 +108,7 @@ namespace ESnd {
 		virtual void __stdcall uk2(int) = 0;
 		virtual int __stdcall uk3() = 0;
 	public:
-		virtual void __stdcall SetVolumeAdjustment(int t, float v) = 0;
+		virtual void __stdcall SetVolumeAdjustment(VolumeAdjustType t, float v) = 0;
 		virtual ~ISoESound() = default; // 10
 
 
@@ -95,12 +123,13 @@ namespace ESnd {
 		virtual void __stdcall LoadAmbientSounds() = 0;
 		virtual void __stdcall InitLuaState(lua_State L) = 0;
 	};
-	class CSoESound : public ISoESoundEx,  public ISoESoundPlayBack { // 15 v funcs
+	class CSoESound : public ISoESoundEx, public ISoESoundPlayBack { // 15 v funcs
 	public:
 		// 12 load ids
 		static inline constexpr int vtp = 0x76D334;
 
 		static inline CSoESound** const GlobalObj = reinterpret_cast<CSoESound**>(0x859F10);
+		// get globalobj 493322
 
 		struct IdRandomData {
 			void* Str; // points to stack, not useable
@@ -114,8 +143,20 @@ namespace ESnd {
 		PADDINGI(4); // another vector?
 		int RandomSeed = 0; // 46
 		CSoEMusic Music; // 47
-		PADDINGI(7);
+		float MainVolumeAdjustment = 0.0f;
+		float UnknownEffectVolumeAdjustment = 0.0f;
+		float FeedbackVolumeAdjustment = 0.0f;
+		float EffectVolumeAdjustment = 0.0f;
+		float Voice1VolumeAdjustment = 0.0f;
+		PADDINGI(1);
+		float Voice2VolumeAdjustment = 0.0f;
 		AmbientSoundManager AmbientSound; // 75
+		PADDINGI(8);
+		float AmbientVolumeAdjustment = 0.0f;
+		PADDING(40);
+		bool PausedAll = false;
+		bool Paused3D = false;
+		PADDING(2);
 
 		int Play2DSound(shok::SoundId sound, int vol, bool looped);
 		void PauseAll(bool pause);
@@ -124,6 +165,8 @@ namespace ESnd {
 		shok::SoundId AddSoundToNewGroup(const char* name);
 		shok::SoundId AddSoundToLastGroup(const char* name);
 		void PopSoundGroup(shok::SoundId firstsound);
+
+		// ctor 49535c
 	};
 	static_assert(offsetof(CSoESound, UnknownVector) == 34 * 4);
 	static_assert(offsetof(CSoESound, AmbientSound) == 75 * 4);

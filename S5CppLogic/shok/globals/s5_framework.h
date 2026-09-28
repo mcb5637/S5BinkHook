@@ -570,6 +570,22 @@ namespace Framework {
 		// ctor 40b968
 		// parse cmd args 4082f3(char*, DataT*) static stdcall
 
+		// 40b528 init sound default values
+		struct SoundConfig {
+			bool uk = true;
+			bool Hardware3dSoundEnabled = true;
+			bool EAXEnabled = false;
+			bool LowQualityEnabled = false;
+			float MainVolume = 1.0f;
+			float SoundEffectVolume = 1.0f;
+			float MusicVolume = 0.5f;
+			float VoiceVolume = 1.0f;
+			float FeedbackVolume = 1.0f;
+
+
+			// ctor 40882d
+		};
+
 		void SaveGDB();
 		ED::CGUICamera* GetCamera(); // gets mainmenu or ingame camera
 

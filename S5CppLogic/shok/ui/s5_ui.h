@@ -205,7 +205,7 @@ namespace ERwTools {
 	class ICameraHandle {
 	public:
 		virtual void SetDirty() = 0;
-		virtual int GetUpdateZMode_() = 0;
+		virtual bool GetDirty() = 0;
 		virtual CameraInfo* GetCameraInfo() = 0;
 		virtual float GetZoomFactor() = 0;
 	private:
@@ -221,10 +221,10 @@ namespace ERwTools {
 		virtual void SetScrollDown(int flag) = 0;
 		virtual void SetScrollBorderFlag(int flag) = 0;
 		virtual void SetScrollMouseMode(int flag) = 0;
-		virtual void GetScrollMouseMode() = 0;
-		virtual void GetScrollBorderFlag() = 0;
+		virtual int GetScrollMouseMode() = 0;
+		virtual bool GetScrollBorderFlag() = 0;
 		virtual void SetUpdateZMode(int mode) = 0; // >= 0 && < 4
-		virtual void GetUpdateZMode() = 0;
+		virtual int GetUpdateZMode() = 0;
 		virtual void SetLookAtZ(float z) = 0;
 		virtual void SetScrollSpeedZ(float a) = 0; // 20
 		virtual void SetScrollZUp(int flag) = 0;
@@ -244,7 +244,7 @@ namespace ERwTools {
 		virtual void ZoomSetAngleGameTimeSynced(int currentTurn, float z) = 0;
 		virtual void ZoomSetDistanceGameTimeSynced(int currentTurn, float d) = 0;
 		virtual float GetVerticalAngle() = 0;
-		virtual float GetLookAtZ() = 0;
+		virtual float GetCameraDistance() = 0;
 		virtual void ZoomSetAngleFlight(int currentTurn, float angle, float time) = 0;
 		virtual void ZoomSetDistanceFlight(int currentTurn, float distance, float time) = 0; // 40
 		virtual void SetRotationSpeed(float speed) = 0;
@@ -272,7 +272,8 @@ namespace ERwTools {
 	public:
 		virtual void InitCameraFlight() = 0;
 		virtual void StopCameraFlight() = 0;
-		// 2 file funcs
+		virtual void Serialize(const char* dir) const = 0;
+		virtual void Deserialize(const char* dir) = 0;
 
 
 
@@ -386,6 +387,8 @@ namespace ERwTools {
 		static inline CRwCameraHandler** const GlobalObj = reinterpret_cast<CRwCameraHandler**>(0x87eeec);
 		static inline float* const CutsceneFarClipPlaneMax = reinterpret_cast<float*>(0x77A7E8);
 		static inline float* const CutsceneFarClipPlaneMin = reinterpret_cast<float*>(0x77A7F0);
+
+		static inline auto* const SerializationData = reinterpret_cast<const BB::SerializationData*(*)()>(0x51faa1);
 
 		// tick 51eef8
 	};
@@ -744,6 +747,8 @@ namespace GGUI {
 
 		// 524e85 execute command state thiscall(targetdata, basicstate*)
 
+		// 5268e1 deserialize (char*)
+
 		void HackPostEvent();
 		static void DisableSelectionLimit(bool disable);
 
@@ -917,11 +922,34 @@ namespace GGUI {
 			static inline const BB::SerializationData* SerializationData = reinterpret_cast<const BB::SerializationData*>(0x883720);
 		};
 
-		PADDINGI(6); // 2 maps, queued, cooldown????
-		PADDINGI(1); // 0
-		EGL::CPlayerEntityIterator* Iterator = nullptr;
-		PADDINGI(2); // 2 floats, counters?
-		PADDINGI(3); // 10 map
+		struct MemoryData {
+			struct EventData {
+				shok::FeedbackEventShortenedId EventType{};
+				int Parameter1 = 0, Parameter2 = 0, Parameter3 = 0;
+				PADDINGI(1);
+			};
+			struct Element {
+				EventData Event;
+				float AppearanceTime = 0.0f;
+				float LifeTime = 0.0f;
+				int Priority = 0;
+			};
+
+			shok::List<Element> ToBePlayedData;
+			shok::List<Element> PlayedData;
+			float MaximumLifeTimeOfPlayedSounds = 0; // 0
+			EGL::CPlayerEntityIterator* Iterator = nullptr;
+		};
+
+		struct StateElement {
+			float AppearanceTimeStamp;
+			shok::FeedbackStateId StateType;
+		};
+
+		MemoryData Memory;
+		float CurrentTime = 0.0f;
+		PADDINGI(1); // 1 floats, counter?
+		shok::List<StateElement> State; // 10
 		struct FeedbackStates {
 			shok::Vector<FeedbackState*> States;
 
@@ -934,7 +962,18 @@ namespace GGUI {
 
 			void ReloadData(shok::FeedbackEventShortenedId id);
 		} SD; // 17
-		PADDINGI(3); // map?
+		struct IgnoreMemoryData {
+			struct EventWithTime {
+				MemoryData::EventData Event;
+				float Time = 0.0f;
+			};
+			struct IgnoreDataElement {
+				EventWithTime Event;
+				float AppearanceTime = 0.0f;
+			};
+			
+			shok::List<IgnoreDataElement> IgnoreData;
+		} IgnoreMemory;
 		bool PlaySounds = false; // 23
 
 		// ctor 5278ED
@@ -952,6 +991,9 @@ namespace GGUI {
 			static inline FeedbackEventIdShortener*(*const GlobalObj)() = reinterpret_cast<FeedbackEventIdShortener*(*)()>(0x527530);
 			static inline shok::FeedbackEventShortenedId (__cdecl* const ShortenID)(shok::FeedbackEventIds id) = reinterpret_cast<shok::FeedbackEventShortenedId (__cdecl*)(shok::FeedbackEventIds)>(0x52757c);
 		};
+
+		// 52633d deserialize cdecl (char* path, char* file, this)
+		// get seridata 525f9b()
 	};
 	static_assert(sizeof(SoundFeedback) == 24 * 4);
 	static_assert(offsetof(SoundFeedback, FS) == 13 * 4);

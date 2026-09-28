@@ -14,6 +14,16 @@ void ESnd::ISoEMusic::StopMusic()
 	f(this);
 }
 
+const char* ESnd::ISoEMusic::GetCurrentlyPlaying() const {
+	auto* f = reinterpret_cast<const char*(__fastcall*)(const ISoEMusic*)>(0x49657b);
+	return f(this);
+}
+
+int ESnd::ISoEMusic::GetVolume() const {
+	auto* f = reinterpret_cast<int(__fastcall*)(const ISoEMusic*)>(0x496577);
+	return f(this);
+}
+
 static inline void(__thiscall* const music_pause)(ESnd::CSoEMusic* th, bool p) = reinterpret_cast<void(__thiscall*)(ESnd::CSoEMusic*, bool)>(0x4964DF);
 void ESnd::CSoEMusic::PauseMusic(bool p)
 {

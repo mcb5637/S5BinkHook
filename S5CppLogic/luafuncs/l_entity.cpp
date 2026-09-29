@@ -670,6 +670,10 @@ namespace CppLogic::Entity {
 			return 8;
 		}
 
+		auto HasTrackedResources(EGL::CGLEEntity* e) {
+			return e->GetBehavior<CppLogic::Mod::ResourceTrackerBehavior>() != nullptr;
+		}
+
 		int GetAllScriptNameMappings(luaext::State L) {
 			auto& m = (*EGL::CGLEEntityManager::GlobalObj)->ScriptName;
 			L.NewTable();
@@ -2162,6 +2166,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<Debug_GetTaskInfo>("Debug_GetTaskInfo"),
 			luaext::FuncReference::GetRef<GetTrackedResources>("GetTrackedResources"),
 			luaext::FuncReference::GetRef<GetTrackedResourceStatistics>("GetTrackedResourceStatistics"),
+			luaext::FuncReference::GetRef<HasTrackedResources>("HasTrackedResources"),
 			luaext::FuncReference::GetRef<GetAllScriptNameMappings>("GetAllScriptNameMappings"),
 			luaext::FuncReference::GetRef<GetLimitedAmmo>("GetLimitedAmmo"),
 			luaext::FuncReference::GetRef<SetLimitedAmmo>("SetLimitedAmmo"),

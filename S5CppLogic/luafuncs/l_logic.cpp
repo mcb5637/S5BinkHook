@@ -1327,6 +1327,10 @@ namespace CppLogic::Logic {
 			}
 		}
 
+		shok::ResourceType GetResourceFromRaw(shok::ResourceType ty) {
+			return shok::CostInfo::RawToResourceType(ty);
+		}
+
 		RWE::RwOpCombineType LogicModel_CheckTO(luaext::State L, int idx) {
 			int i = L.OptInt(idx, static_cast<int>(RWE::RwOpCombineType::Preconcat));
 			if (!(i >= 0 && i < 3))
@@ -1837,6 +1841,7 @@ namespace CppLogic::Logic {
 		luaext::FuncReference::GetRef<ConstructionTriggerGetProgress>("ConstructionTriggerGetProgress"),
 		luaext::FuncReference::GetRef<ConstructionTriggerSetProgress>("ConstructionTriggerSetProgress"),
 		luaext::FuncReference::GetRef<GetWeatherSpeedFactor>("GetWeatherSpeedFactor"),
+		luaext::FuncReference::GetRef<GetResourceFromRaw>("GetResourceFromRaw"),
 	};
 
 	constexpr std::array UICmd{

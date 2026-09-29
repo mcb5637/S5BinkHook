@@ -1080,6 +1080,11 @@ function CppLogic.Logic.GetWeatherSpeedFactor() end
 ---@return table
 function CppLogic.Logic.DumpGameLogic() end
 
+--- gets the resource type by raw resource (reverse of Logic.GetRawResourceType)
+--- @param rt number
+--- @return number
+function CppLogic.Logic.GetResourceFromRaw(rt) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.
@@ -1918,6 +1923,11 @@ function CppLogic.Entity.GetTrackedResources(id) end
 --- @return number? perMinuteProducedLast3
 --- @return number? perMinuteUsedLast3
 function CppLogic.Entity.GetTrackedResourceStatistics(id) end
+
+--- checks if the entity has a CppLogic::Mod::ResourceTrackerBehavior behavior.
+--- @param id entity
+--- @return boolean
+function CppLogic.Entity.HasTrackedResources(id) end
 
 --- returns the full entityname->id mapping
 --- @return table<string, number>

@@ -2084,7 +2084,7 @@ namespace CppLogic::UI {
 		L.SetTableRaw(-3);
 
 		L.Push("TextInputCustomWidgetEvent");
-		GetIdManager<Mod::UI::TextInputCustomWidget::Flag>().PushToState(L);
+		GetIdManager<Mod::UI::TextInputCustomWidget::Event>().PushToState(L);
 		L.SetTableRaw(-3);
 
 		if (L.GetState() == shok::LuaStateMainmenu) {

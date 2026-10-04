@@ -77,6 +77,7 @@ ModLoader = ModLoader or {}
 ---@field Incompatible string[]
 ---@field Failed string[]
 ---@field package UISettings table<string, table<string,string>>
+---@field UserRequestedLog string?
 
 ---@class ModPack
 ---@field Manifest Manifest
@@ -480,6 +481,7 @@ end
 --- @return ModList
 function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresToList)
 	modlist = modlist or {Mods = {}, Incompatible = {}, Failed = {}, UISettings = ModLoader.LoadUISettings()}
+	local userreq, userfail = {}, {}
 	local function checkfail(cond, msg)
 		if failuresToList then
 			if not cond then
@@ -519,6 +521,7 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresTo
 							good = false
 						end
 					end
+					table.insert(good and userreq or userfail, m.Name)
 				end
 				if good then
 					for _,s in ipairs(m.Settings) do
@@ -547,6 +550,22 @@ function ModLoader.DiscoverRequired(req, modlist, checkUserRequested, failuresTo
 				checkfail(false, "missing mod: "..name)
 			end
 		end
+	end
+	if checkUserRequested then
+		local s = modlist.UserRequestedLog or ""
+		if userreq[1] then
+			if s ~= "" then
+				s = s.."\n"
+			end
+			s = s.."ModLoader: loading user-requested modpacks: "..table.concat(userreq, ", ")
+		end
+		if userfail[1] then
+			if s ~= "" then
+				s = s.."\n"
+			end
+			s = s.."ModLoader: user-requested modpacks denied: "..table.concat(userfail, ", ")
+		end
+		modlist.UserRequestedLog = s
 	end
 	return modlist
 end
@@ -739,6 +758,10 @@ function ModLoader.RequireModList()
 		ModLoader.DiscoverRequired(ModLoader.RequiredMods, ModLoader.ModList)
 		if not ModLoader.MapInfo.IsSavegame then
 			ModLoader.DiscoverUserRequested(ModLoader.ModList)
+			local log = ModLoader.ModList.UserRequestedLog
+			if LuaDebugger.Log and log and log ~= "" and log ~= " " then
+				LuaDebugger.Log(log)
+			end
 		end
 		ModLoader.SortMods(ModLoader.ModList)
 		ModLoader.LoadMods(ModLoader.ModList)

@@ -96,9 +96,13 @@ bool CppLogic::Mod::UI::AutoScrollCustomWidget::HandleEvent(EGUIX::CCustomWidget
 	}
 	else if (auto* me = BB::IdentifierCast<BB::CMouseEvent>(ev)) {
 		if (me->IsEvent(shok::InputEventIds::MouseWheel)) {
-			Offset += -static_cast<float>(me->Delta) / 200.0f;
-			Clamp();
-			Update();
+			if (TotalRowsNeeded > RowCount) {
+				Offset += -static_cast<float>(me->Delta) / 200.0f;
+				Clamp();
+				Update();
+				return true;
+			}
+			return false;
 		}
 		else if (me->IsEvent(shok::InputEventIds::MouseButtonDown) && me->IsKey(shok::Keys::MouseLButton)) {
 			if (ClickedOnSlider(me->X, me->Y)) {

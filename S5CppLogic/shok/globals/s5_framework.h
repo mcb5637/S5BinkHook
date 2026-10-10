@@ -7,6 +7,10 @@
 #include <shok/globals/s5_filesystem.h>
 #include <utility/EnumIdManagerMagic.h>
 
+namespace GS3DTools {
+	class CGUIReplaySystem;
+	class CMapData;
+}
 namespace Framework {
 	class CMain;
 }
@@ -14,44 +18,68 @@ namespace Framework {
 namespace ECore {
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IReplayStreamExtension {
-		virtual void unknown0();
+	public:
+		virtual void __stdcall WriteToStream(BB::IStream* stream, BB::CBinarySerializer* seri) = 0;
+		virtual void __stdcall LoadFromStream(BB::IStream* stream, BB::CBinarySerializer* seri) = 0;
 	};
 
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CReplayHandler : public BB::IPostEvent {
 	public:
 		struct Storage {
-			BB::CMemoryStream* Stream = nullptr;
+			BB::IStream* Stream = nullptr;
 			BB::CBinarySerializer* Serializer = nullptr;
-			int Data = 0; // latest ECore::CECoreEventInteger data
-			PADDINGI(1);
+			int CurrentTick = 0; // latest ECore::CECoreEventInteger data
+			int LastTickWritten = 0;
+
+			// read next event up to tick 547936 (int tick)
+			// read next event 5478c6 ()
+			// write event 547825 (BB::CEvent*)
+			// is eof 5478bc
 		};
 
-		PADDINGI(1); //0
-		Storage* Store1 = nullptr;
-		Storage* Store2 = nullptr;
+		Storage* PlaybackStore = nullptr; // used for playing replay, also loading from save? (memory stream)
+		Storage* SavegameStore = nullptr; // stored to replay file in savegame (memory stream)
+		Storage* FileOutputStore = nullptr; // to write out replay file (file stream)
 		BB::IPostEvent* CheckSumCalc = nullptr; //4 Framework::CCheckSumCalculator
 		BB::CMemoryStream* MemoryStream = nullptr;
 		BB::CFileStream* FileStream = nullptr;
 		BB::CBinarySerializer* Serializer = nullptr; //7 of CReplayMgr
-		PADDINGI(3);
+		bool IsPlaybackActive = false;
+		PADDINGI(2);
 		
 
 		static inline constexpr int vtp = 0x77F2C8;
 		// 5472A7 ctor
+		// 5474f9 setup output file (const char* filepath)
+		// 547438 setup store 1 (GS3DTools::CGUIReplaySystem*)
+		// 54730b write event (BB::CEvent*)
+		// 5475b0 load savegame events (tick)
+		// 54732a update
+		// 547629 is playback running (active & !eof)
 	};
 	static_assert(offsetof(CReplayHandler, Serializer) == 7 * 4);
 	static_assert(sizeof(CReplayHandler) == 11 * 4);
 
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IReplayMgr {
-		virtual void unknown0() = 0;
+	public:
+		virtual bool __stdcall Read(const char* file, GS3DTools::CMapData* mapdata) = 0;
+	private:
+		virtual void uk()=0;
+	public:
+		virtual void __stdcall WriteSavegame(const char* file) = 0;
+		virtual void __stdcall InitMapOrSavegame(Framework::CMain* main, GS3DTools::CGUIReplaySystem* replaySys, const char* filePath, int tick) = 0;
+		virtual void __stdcall Update() = 0;
+		virtual CReplayHandler* __stdcall GetReplayHandler() = 0;
+		virtual bool __stdcall IsPlaybackRunning() = 0;
 	};
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CReplayMgr : public IReplayMgr {
 	public:
 		CReplayHandler* ReplayHandler = nullptr; // probably unique ptr
-		PADDINGI(2);
+		PADDINGI(1);
+		BB::CMemoryStream* MemoryStream = nullptr; // probably unique ptr
 		BB::CBinarySerializer* Serializer = nullptr;
 
 		static inline constexpr int vtp = 0x77F2D0;
@@ -59,13 +87,24 @@ namespace ECore {
 	};
 	static_assert(sizeof(CReplayMgr) == 5 * 4);
 
-	class IReplaySystem {};
+	class IReplaySystem {}; // no known vtable
 
-	class CReplaySystem : public IReplaySystem {
+	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
+	class CReplaySystem : public IReplaySystem { // size 4
+		virtual void Create(int, int) = 0;
+		virtual void uk() = 0;
+		virtual void uk2() = 0;
 	public:
+		virtual CReplayMgr* Get(int) = 0;
+
 		static inline CReplaySystem** const GlobalObj = reinterpret_cast<CReplaySystem**>(0x886ba4);
 
 		static inline constexpr int vtp = 0x77EEF0;
+
+		shok::Map<int, CReplayMgr*> ReplayManagers;
+
+		// ctor 545d28
+		// init 518a52, allocates then calls vtp[0] 2 times
 	};
 }
 
@@ -73,6 +112,9 @@ namespace GS3DTools {
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CMapData : public ECore::IReplayStreamExtension {
 	public:
+		virtual void __stdcall WriteToStream(BB::IStream* stream, BB::CBinarySerializer* seri) override;
+		virtual void __stdcall LoadFromStream(BB::IStream* stream, BB::CBinarySerializer* seri) override;
+
 		shok::String MapName;
 		shok::MapType MapType{};
 		shok::String MapCampagnName;
@@ -90,6 +132,9 @@ namespace GS3DTools {
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class CGUIReplaySystem : public ECore::IReplayStreamExtension, public BB::IPostEvent {
 	public:
+		virtual void __stdcall WriteToStream(BB::IStream* stream, BB::CBinarySerializer* seri) override;
+		virtual void __stdcall LoadFromStream(BB::IStream* stream, BB::CBinarySerializer* seri) override;
+
 		virtual void __stdcall PostEvent(BB::CEvent* ev) override;
 
 		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
@@ -99,21 +144,24 @@ namespace GS3DTools {
 		};
 
 		CMapData MapData;
-		int DisplaySizeX, DisplaySizeY; // 25
+		int GameResX, GameResY; // 25
 		PADDINGI(1);
 		PADDINGI(2); // 28 double -1
-		PADDINGI(3); // last float 0.001
-		shok::String SomeString; // 33
+		PADDINGI(2);
+		float RecordingRate; // 0.001
+		shok::String SaveGameName; // 33
 		Framework::CMain* Main;
 		PADDINGI(2);
 		CPlayingReplay PlayingReplay; // 43
 
 		static inline constexpr int vtp = 0x779F80;
 
+		static inline auto* const SerializationData = reinterpret_cast<const BB::SerializationData*(__stdcall*)()>(0x518d11);
+
 		// ctor 518EBB
 		// set displ size 518BA1
 	};
-	static_assert(offsetof(CGUIReplaySystem, SomeString) == 33 * 4);
+	static_assert(offsetof(CGUIReplaySystem, SaveGameName) == 33 * 4);
 	static_assert(offsetof(CGUIReplaySystem, PlayingReplay) == 43 * 4);
 	//constexpr int i = offsetof(CGUIReplaySystem, PlayingReplay) / 4;
 }
@@ -390,16 +438,18 @@ namespace Framework {
 	public:
 		// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 		class CNetworkEvent : public BB::IPostEvent {
+		public:
 			CEventTimeManager* TimeManager1 = nullptr;
 			CEventTimeManager* TimeManager2 = nullptr; // same pointer
 			BB::CBinarySerializer* BinarySerializer = nullptr;
-			BB::CMemoryStream MemoryStream; // stores GUI events between recieving and executing, then goes to TimeManager2
+			BB::CMemoryStream MemoryStream; // stores GUI events between receiving and executing, then goes to TimeManager2
 
 			static inline constexpr int vtp = 0x7632C0;
 
 			virtual void __stdcall PostEvent(BB::CEvent* ev) override; // speed event to TimeManager1, otherwise stored to MemoryStream
 
 			// update 40F9B5 __thiscall()
+			// ctor 40f610
 		};
 		CNetworkEvent NetworkEvent; //1428
 
@@ -448,6 +498,9 @@ namespace Framework {
 			StartMapMP = 4,
 			RestartMapSP = 5,
 			LeaveGame = 6,
+
+			// CppLogic only
+			LoadReplay = 100,
 		};
 
 
@@ -477,6 +530,9 @@ namespace Framework {
 			PADDINGI(1);
 
 			// ctor 40976a
+			// get replay 409218 () -> char*
+			// get gui replay 40922c() -> char*
+			// get savegame 409240() -> char*
 		};
 
 		DataT Data;
@@ -549,6 +605,9 @@ namespace Framework {
 				Temp_Logs_Game, // 70
 				Temp_MiniDump; // 77
 			shok::String Empties[7];
+
+			// format replay path 518b16 static cdecl(const char*, SUserPaths*)->const char*
+			// make replay file path 518a8d static (const char* unused_mapname, SUserPaths*, 1 int)->const char*
 		}*UserPaths;
 		GDB::CList GDB; // 227
 
@@ -569,6 +628,11 @@ namespace Framework {
 
 		// ctor 40b968
 		// parse cmd args 4082f3(char*, DataT*) static stdcall
+
+		// WinMain 40780e
+		// make window 4072b5(HINSTANCE) (default size)
+
+		// 40adfd read GDB
 
 		// 40b528 init sound default values
 		struct SoundConfig {
@@ -619,7 +683,7 @@ namespace Framework {
 	//constexpr int i = offsetof(Framework::CMain, ReplayToLoad) / 4;
 
 	struct GameModeStartMapData {
-		int zero; // something replay related?
+		char* ReplayFilename;
 		CLuaDebuggerPort* LuaDebuggerPort;
 		int* ptoone;
 		GS3DTools::CMapData* MapToLoad;

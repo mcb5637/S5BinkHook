@@ -1343,8 +1343,11 @@ namespace shok {
 		Sound_Start = 0x22001, // EGL::CEventSoundPositionAndID
 		Sound_Stop = 0x22002, // EGL::CEventSoundPositionAndID
 
+		ReplayTick = 0x30001, // ECore::CECoreEventInteger marks end of tick in replay streams
+		ReplayNotifyCurrentTick = 0x50002, //EGL::CEventValue<int,-27574121> sent to replay handler on tick
+
 		// entity events
-		CppL_OnEntityDestroy = 0x51000, // BB::CEvent deprectated
+		CppL_OnEntityDestroy = 0x51000, // BB::CEvent deprecated
 		CppL_OnEntityKilled, // GGL::CEventEntityIndex index is attacker player
 		CppL_OnDamageDealt, // GGL::CEventEntityIndex entity is damaged, index is damage
 		CppL_AffectedExperienceGained, // GGL::CEventEntityIndex, index id xp, can be modified, id is attacker

@@ -668,9 +668,13 @@ namespace GGUI {
 }
 
 // ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
-class CMouseCursorManager : public GGUI::IMouseCursorAppearance {
+class CMouseCursorManager : public GGUI::IMouseCursorAppearance { // size 9
 public:
 	static inline constexpr int vtp = 0x761BBC;
+
+	// ctor 401f5e (HINSTANCE)
+
+	// globalobj 84e53c
 };
 
 namespace GGUI {

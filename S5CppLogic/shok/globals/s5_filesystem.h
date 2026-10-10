@@ -71,6 +71,8 @@ namespace BB {
 				Write(&c, 1);
 			}
 		}
+
+		// 5478a4 is eof (this esi) -> bool
 	};
 
 	class CFileStream : public IStream { // used to read files directly
@@ -135,6 +137,8 @@ namespace BB {
 		inline std::string_view GetData() {
 			return std::string_view{ static_cast<char*>(Data), static_cast<size_t>(Size) };
 		}
+
+		// ctor 54ed24
 	};
 	static_assert(sizeof(CMemoryStream) == 0x18);
 

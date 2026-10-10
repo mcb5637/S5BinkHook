@@ -751,6 +751,23 @@ namespace CppLogic::API {
 		auto BitSR(uint32_t a, uint32_t b) {
 			return a >> b;
 		}
+
+		int ListReplays(luaext::State L) {
+			L.NewTable();
+			auto* m = *Framework::CMain::GlobalObj;
+			int i = 1;
+			for (auto f : std::filesystem::directory_iterator{m->UserPaths->Temp_Replays.c_str()}) {
+				L.Push(f.path().filename().string());
+				L.SetTableRaw(-2, i++);
+			}
+			return 1;
+		}
+
+		void StartReplay(std::string_view name) {
+			auto* m = *Framework::CMain::GlobalObj;
+			m->Data.ReplayToLoad = name;
+			m->ToDo = Framework::CMain::NextMode::LoadReplay;
+		}
 	}
 
 	constexpr std::array API{
@@ -792,6 +809,8 @@ namespace CppLogic::API {
 			luaext::FuncReference::GetRef<BitNot>("BitNot"),
 			luaext::FuncReference::GetRef<BitSL>("BitShiftLeft"),
 			luaext::FuncReference::GetRef<BitSR>("BitShiftRight"),
+			luaext::FuncReference::GetRef<ListReplays>("ListReplays"),
+			luaext::FuncReference::GetRef<StartReplay>("StartReplay"),
 #ifdef DEBUG_FUNCS
 			luaext::FuncReference::GetRef<WriteTriggers>("WriteTriggers"),
 			luaext::FuncReference::GetRef<GenerateClassSchemas>("GenerateClassSchemas"),

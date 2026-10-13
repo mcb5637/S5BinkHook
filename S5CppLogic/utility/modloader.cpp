@@ -156,6 +156,8 @@ void CppLogic::ModLoader::ModLoader::PreSaveLoad(lua_State* ingame, Framework::G
 	Framework::SavegameSystem* sdata = Framework::SavegameSystem::GlobalObj();
 	if (!sdata->LoadSaveData(data->Folder))
 		throw std::logic_error("no save???");
+	// update CMain early, so ModLoader has access to Framework.GetCurrentMapName(), ...
+	(*Framework::CMain::GlobalObj)->Data.CurrentMap = sdata->CurrentSave->MapData;
 	luaext::State L{ ingame };
 	auto mappath = std::format("{}\\ModLoader.lua", externalmap ? "Maps\\ExternalMap" : internalmap_getpath(&sdata->CurrentSave->MapData));
 	Init(L, mappath.c_str(), "LoadSave", [&](luaext::State l) {

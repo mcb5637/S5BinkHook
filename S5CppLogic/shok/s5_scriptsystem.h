@@ -257,6 +257,8 @@ namespace EScr {
 		static inline auto* InputList = reinterpret_cast<StaticFuncList*(*)()>(0x59dc0a);
 		static inline auto* XNetworkUbiComList = reinterpret_cast<StaticFuncList*(*)()>(0x5a56f0);
 	};
+
+	// create state 59bf0c (EScr::ILuaDebugger*, bool debug)
 }
 
 // ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor

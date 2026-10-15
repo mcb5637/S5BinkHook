@@ -65,9 +65,7 @@ namespace ECore {
 	class IReplayMgr {
 	public:
 		virtual bool __stdcall Read(const char* file, GS3DTools::CMapData* mapdata) = 0;
-	private:
-		virtual void uk()=0;
-	public:
+		virtual void __stdcall SetIsPlaybackActive() = 0;
 		virtual void __stdcall WriteSavegame(const char* file) = 0;
 		virtual void __stdcall InitMapOrSavegame(Framework::CMain* main, GS3DTools::CGUIReplaySystem* replaySys, const char* filePath, int tick) = 0;
 		virtual void __stdcall Update() = 0;
@@ -126,6 +124,7 @@ namespace GS3DTools {
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E7D0);
 
 		// ctor 40305a
+		// operator== 4093d1
 	};
 	static_assert(offsetof(CMapData, MapGUID) == 16 * 4);
 
@@ -235,6 +234,7 @@ namespace Framework {
 
 		static inline BB::SerializationData* SerializationData = reinterpret_cast<BB::SerializationData*>(0x84E920);
 		// ctor 403180, dtor 403083
+		// get replay file 4024dc (savepath + replay.rpl)
 
 	private:
 		void __thiscall SaveGameOverride(const char* path, GGL::CGLGameLogic* gl, GS3DTools::CMapData* mapdata, const char* name);
@@ -322,7 +322,14 @@ public:
 namespace Framework {
 	// ReSharper disable once CppPolymorphicClassWithNonVirtualPublicDestructor
 	class IGameCallBacks {
-		virtual void unknown0() = 0;
+	public:
+		virtual void __stdcall RegisterLuaLibs(lua_State*, lua_State* ingame) = 0; // 1st param mainmenu? both may be nullptr
+	private:
+		virtual void __stdcall uk1() = 0;
+		virtual void __stdcall uk2() = 0;
+	public:
+		virtual const char* __stdcall MakeReplayPath(const char* ignored) = 0;
+		virtual void __stdcall LoadSaveReplayData(GS3DTools::CMapData* mapdata, const char* replayFile) = 0;
 	};
 	class CEventTimeManager_UnknownInt {
 		PADDINGI(1);
@@ -406,6 +413,7 @@ namespace Framework {
 
 		// 40e9d8 update
 		// 40e81f ctor
+		// 40e49f open lua state (EScr::ILuaDebugger*)
 
 		bool AddArchiveIfExternalmap(GameModeStartMapData* data, GS3DTools::CMapData* map, const char* path);
 		void RemoveArchiveIfExternalmap();
@@ -456,6 +464,7 @@ namespace Framework {
 		static inline constexpr int vtp = 0x7632C8;
 
 		// ctor 40f6b5
+		// load save 40fa48
 
 		static void (*PreUpdate)();
 		static void HookUpdate();

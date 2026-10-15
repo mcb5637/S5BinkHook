@@ -756,7 +756,7 @@ namespace CppLogic::API {
 			L.NewTable();
 			auto* m = *Framework::CMain::GlobalObj;
 			int i = 1;
-			for (auto f : std::filesystem::directory_iterator{m->UserPaths->Temp_Replays.c_str()}) {
+			for (const auto& f : std::filesystem::directory_iterator{m->UserPaths->Temp_Replays.c_str()}) {
 				L.Push(f.path().filename().string());
 				L.SetTableRaw(-2, i++);
 			}

@@ -132,6 +132,8 @@ namespace CppLogic::Mod::GUIState {
 							CurrentStep += NumSteps;
 					}
 					PosToBuild = {};
+					CacheSourcePos = {};
+					CacheTargetID = shok::EntityId::Invalid;
 					UpdateModel(e->X, e->Y);
 					e->EventHandled = true;
 					return true;

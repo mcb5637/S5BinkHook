@@ -175,6 +175,10 @@ void* __stdcall BB::IObject::CastToIdentifier(shok::ClassId id)
 	return nullptr;
 }
 
+const void* __stdcall BB::IObject::CastToIdentifier(shok::ClassId id) const {
+	return const_cast<IObject*>(this)->CastToIdentifier(id);
+}
+
 bool __stdcall ECore::ICheckData::Check()
 {
 	return true;

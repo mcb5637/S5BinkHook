@@ -190,6 +190,7 @@ namespace BB {
 		To* CastToIdentifier() {
 			return static_cast<To*>(CastToIdentifier(To::Identifier));
 		}
+		[[nodiscard]] const void* __stdcall CastToIdentifier(shok::ClassId id) const;
 	};
 
 	template<HasValidIdentifier CastTo, class CastFrom, HasValidIdentifier... AdditionalSubClasses>

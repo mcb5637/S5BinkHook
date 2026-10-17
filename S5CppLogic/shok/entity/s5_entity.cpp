@@ -460,7 +460,7 @@ shok::EntityId GGL::CBuilding::GetConstructionSite() const
 	return GetFirstAttachedToMe(shok::AttachmentType::CONSTRUCTION_SITE_BUILDING);
 }
 
-static inline int(__thiscall* const shok_build_getnearestfreeslot)(EGL::CGLEEntity* th, shok::Position* p) = reinterpret_cast<int(__thiscall*) (EGL::CGLEEntity*, shok::Position*)>(0x4AB02D);
+static inline int(__thiscall* const shok_build_getnearestfreeslot)(const EGL::CGLEEntity* th, shok::Position* p) = reinterpret_cast<int(__thiscall*) (const EGL::CGLEEntity*, shok::Position*)>(0x4AB02D);
 int GGL::CBuilding::GetNearestFreeConstructionSlotFor(shok::Position* p) const
 {
 	shok::EntityId cid = GetConstructionSite();
@@ -472,7 +472,7 @@ int GGL::CBuilding::GetNearestFreeConstructionSlotFor(shok::Position* p) const
 	return shok_build_getnearestfreeslot(consi, p);
 }
 
-int GGL::CBuilding::GetNearestFreeRepairSlotFor(shok::Position* p)
+int GGL::CBuilding::GetNearestFreeRepairSlotFor(shok::Position* p) const
 {
 	return shok_build_getnearestfreeslot(this, p);
 }

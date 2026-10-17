@@ -1533,6 +1533,21 @@ function CppLogic.Entity.EntityIteratorCount(...) end
 --- @return number range
 function CppLogic.Entity.EntityIteratorGetNearest(...) end
 
+---@class CppLogicIteratorSortedTableEntry
+---@field Id number
+---@field RangeSquared number
+---@field Priority number
+
+--- turns an iterator to a sorted table. sorted by Priority first descending, RangeSquared second ascending.
+--- @param iter fun():number,number,number
+--- @return CppLogicIteratorSortedTableEntry[]
+function CppLogic.Entity.EntityIteratorToSortedTable(iter) end
+
+--- turns an iterator to a sorted table. sorted by Priority first descending, RangeSquared second ascending.
+--- @param iter fun():number,number,number
+--- @return number[]
+function CppLogic.Entity.EntityIteratorToSortedTableIdOnly(iter) end
+
 --- checks an entity agains a predicate.
 --- @param id number entity
 --- @param pred Predicate
@@ -1659,7 +1674,7 @@ function CppLogic.Entity.Predicates.IsAlive() end
 --- @return Predicate
 function CppLogic.Entity.Predicates.IsNotInBuilding() end
 
---- creates a predicate that checks for buildings under construction
+--- creates a predicate that checks for buildings under construction. (not of class GGL::CConstructionSite)
 --- @return Predicate
 function CppLogic.Entity.Predicates.IsConstructionSite() end
 
@@ -1667,6 +1682,11 @@ function CppLogic.Entity.Predicates.IsConstructionSite() end
 --- @param sec number
 --- @return Predicate
 function CppLogic.Entity.Predicates.IsInSector(sec) end
+
+--- creates a predicate that checks for free construction/repair slots, reachable from pos.
+--- @param pos Position
+--- @return Predicate
+function CppLogic.Entity.Predicates.HasFreeSerfSlot(pos) end
 
 ---@alias entity number|string
 

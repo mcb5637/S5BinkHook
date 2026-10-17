@@ -209,6 +209,11 @@ namespace CppLogic::Entity {
 			return 1;
 		}
 
+		int PredicateHasFreeSerfSlot(luaext::State L) {
+			L.NewUserClass<CppLogic::Iterator::EntityIteratorHasFreeSerfSlot>(L.CheckPos(1));
+			return 1;
+		}
+
 		int EntityIteratorTableize(luaext::State L) {
 			if (L.GetTop() > 1) { // auto create an and predicate
 				PredicateAndAutoCreate(L);
@@ -341,6 +346,36 @@ namespace CppLogic::Entity {
 			L.Push(); // state
 			L.Push(); // initial value
 			return 3;
+		}
+
+		template<bool idOnly>
+		int EntityIteratorToSortedTable(luaext::State L) {
+			L.CheckType(1, lua::LType::Function);
+			if (L.Debug_GetUpvalue(1, 1) == nullptr)
+				throw lua::LuaException{"no upvalue"};
+			auto* iter = L.CheckUserClass<Iterator::ManagedIterator<EGL::CGLEEntity>>(-1);
+			auto d = iter->GetSorted();
+			L.NewTable();
+			int i = 1;
+			for (const auto& e : d) {
+				if constexpr (!idOnly) {
+					L.NewTable();
+					L.Push("Id");
+					L.Push(e.Object->EntityId);
+					L.SetTableRaw(-3);
+					L.Push("RangeSquared");
+					L.Push(e.Range);
+					L.SetTableRaw(-3);
+					L.Push("Priority");
+					L.Push(e.Priority);
+					L.SetTableRaw(-3);
+				}
+				else {
+					L.Push(e.Object->EntityId);
+				}
+				L.SetTableRaw(-2, i++);
+			}
+			return 1;
 		}
 
 		int CheckPredicate(luaext::State L) {
@@ -2158,6 +2193,8 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<PlayerEntityIterator>("PlayerEntityIterator"),
 			luaext::FuncReference::GetRef<RegionEntityIteratorRect>("RegionEntityIteratorRect"),
 			luaext::FuncReference::GetRef<RegionEntityIteratorCircle>("RegionEntityIteratorCircle"),
+			luaext::FuncReference::GetRef<EntityIteratorToSortedTable<false>>("EntityIteratorToSortedTable"),
+			luaext::FuncReference::GetRef<EntityIteratorToSortedTable<true>>("EntityIteratorToSortedTableIdOnly"),
 			luaext::FuncReference::GetRef<EntityIteratorGetNearest>("EntityIteratorGetNearest"),
 			luaext::FuncReference::GetRef<EntityIteratorCount>("EntityIteratorCount"),
 			luaext::FuncReference::GetRef<CheckPredicate>("CheckPredicate"),
@@ -2203,6 +2240,7 @@ namespace CppLogic::Entity {
 			luaext::FuncReference::GetRef<PredicateOfUpgradeCategory>("OfUpgradeCategory"),
 			luaext::FuncReference::GetRef<PredicateIsAlive>("IsAlive"),
 			luaext::FuncReference::GetRef<PredicateIsNotInBuilding>("IsNotInBuilding"),
+			luaext::FuncReference::GetRef<PredicateHasFreeSerfSlot>("HasFreeSerfSlot"),
 			luaext::FuncReference::GetRef<PredicateIsBuildingOrConstructionSite>("IsBuildingOrConstructionSite"),
 			luaext::FuncReference::GetRef<PredicateIsConstructionSite>("IsConstructionSite"),
 			luaext::FuncReference::GetRef<PredicateIsInSector>("IsInSector"),

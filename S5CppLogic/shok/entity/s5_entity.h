@@ -688,7 +688,7 @@ namespace GGL {
 
 		[[nodiscard]] shok::EntityId GetConstructionSite() const;
 		int GetNearestFreeConstructionSlotFor(shok::Position* p) const;
-		int GetNearestFreeRepairSlotFor(shok::Position* p);
+		int GetNearestFreeRepairSlotFor(shok::Position* p) const;
 		[[nodiscard]] bool IsConstructionFinished() const;
 		bool IsIdle(bool forRecruitemnt = false, bool ignoreAlarm = false);
 		shok::TechnologyId GetTechnologyInResearch();

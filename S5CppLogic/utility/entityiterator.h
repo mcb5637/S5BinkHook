@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <concepts>
+#include <algorithm>
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/s5_defines.h>
@@ -189,6 +190,18 @@ namespace CppLogic::Iterator {
 			}
 			return i;
 		}
+
+		std::vector<ExtendedData> GetSorted() {
+			std::vector<ExtendedData> r{};
+			for (ExtendedData& e : ExtendedIterate())
+				r.emplace_back(e);
+			std::ranges::sort(r, [](const ExtendedData& a, const ExtendedData& b) {
+				if (a.Priority != b.Priority)
+					return std::greater<>{}(a.Priority, b.Priority);
+				return std::less<>{}(a.Range, b.Range);
+			});
+			return r;
+		}
 	};
 
 	template<class T>
@@ -219,12 +232,16 @@ namespace CppLogic::Iterator {
 	class GlobalEntityIterator : public GlobalManagedIterator<EGL::CGLEEntity> {
 	public:
 		explicit GlobalEntityIterator(const Predicate<EGL::CGLEEntity>* p);
+
+		using InheritsFrom = std::tuple<ManagedIterator<EGL::CGLEEntity>>;
 	};
 
 	// you may create/destroy effects while iterating, even the current one (just dont try to get the current one from the iterator after destroying)
 	class GlobalEffectIterator : public GlobalManagedIterator<EGL::CEffect> {
 	public:
 		explicit GlobalEffectIterator(const Predicate<EGL::CEffect>* p);
+
+		using InheritsFrom = std::tuple<ManagedIterator<EGL::CEffect>>;
 	};
 
 	// you may not create/destroy entities while iterating
@@ -235,6 +252,8 @@ namespace CppLogic::Iterator {
 		[[nodiscard]] virtual EGL::CGLEEntity* GetCurrentBase(const EntityIteratorStatus& c) const override;
 	public:
 		PlayerEntityIterator(shok::PlayerId player, const Predicate<EGL::CGLEEntity>* p);
+
+		using InheritsFrom = std::tuple<ManagedIterator<EGL::CGLEEntity>>;
 	};
 	// you may not create/destroy entities while iterating
 	class MultiPlayerEntityIterator : public ManagedIterator<EGL::CGLEEntity> {
@@ -246,6 +265,8 @@ namespace CppLogic::Iterator {
 	public:
 		explicit MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* p);
 		MultiPlayerEntityIterator(const Predicate<EGL::CGLEEntity>* p, std::initializer_list<shok::PlayerId> pls);
+
+		using InheritsFrom = std::tuple<ManagedIterator<EGL::CGLEEntity>>;
 	};
 	// you may not create/destroy entities while iterating
 	// area defines only the regions to search, you need a predicate for an exact area check
@@ -264,6 +285,8 @@ namespace CppLogic::Iterator {
 		MultiRegionEntityIterator(float x1, float y1, float x2, float y2, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* p);
 		MultiRegionEntityIterator(const shok::AARect& area, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* p);
 		MultiRegionEntityIterator(const shok::Position& center, float range, shok::AccessCategoryFlags accessCategories, const Predicate<EGL::CGLEEntity>* p);
+
+		using InheritsFrom = std::tuple<ManagedIterator<EGL::CGLEEntity>>;
 	};
 
 	template<class T, size_t s>
@@ -658,5 +681,15 @@ namespace CppLogic::Iterator {
 		virtual bool Matches(const EGL::CEffect* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CEffect>>;
+	};
+
+	class EntityIteratorHasFreeSerfSlot : public Predicate<EGL::CGLEEntity> {
+		shok::Position Pos;
+	public:
+		explicit EntityIteratorHasFreeSerfSlot(const shok::Position& pos);
+
+		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
+
+		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
 	};
 }

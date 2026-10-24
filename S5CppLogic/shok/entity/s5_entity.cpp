@@ -580,6 +580,11 @@ void EGL::CGLEEntity::Hurt(int dmg)
 	entityhurt(this, dmg);
 }
 
+bool EGL::CGLEEntity::Heal(int heal) {
+	auto* f = reinterpret_cast<bool(__thiscall* const)(EGL::CGLEEntity*, int)>(0x57b7ad);
+	return f(this, heal);
+}
+
 static inline void(__thiscall* const shok_entity_settasklistbyid)(EGL::CGLEEntity* th, shok::TaskListId tl, int t) = reinterpret_cast<void(__thiscall* const)(EGL::CGLEEntity*, shok::TaskListId, int)>(0x57B3B6);
 void EGL::CGLEEntity::SetTaskList(shok::TaskListId tl)
 {
@@ -1627,6 +1632,12 @@ void NAKED_DEF EGL::CGLEEntity::OnCreateFixHPASM() {
 		ret;
 	}
 }
+
+bool __thiscall EGL::CGLEEntity::HealOverride(int heal) {
+	PerformHeal(heal, false);
+	return true; // gets ignored anyway
+}
+
 bool HookMaxHP_Hooked = false;
 void EGL::CGLEEntity::HookMaxHP()
 {
@@ -1637,10 +1648,12 @@ void EGL::CGLEEntity::HookMaxHP()
 	HookMaxHP_Hooked = true;
 	CppLogic::Hooks::SaveVirtualProtect vp{ 0x16, {
 		reinterpret_cast<void*>(0x57B798),
-		reinterpret_cast<void*>(0x571B93)
+		reinterpret_cast<void*>(0x571B93),
+		reinterpret_cast<void*>(0x592efd),
 	} };
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x57B798), CppLogic::Hooks::MemberFuncPointerToVoid(&CGLEEntity::GetMaxHPOverride, 0), reinterpret_cast<void*>(0x57B7AD));
 	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x571B93), &OnCreateFixHPASM, reinterpret_cast<void*>(0x571B98));
+	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x592efd), CppLogic::Hooks::MemberFuncPointerToVoid(&CGLEEntity::HealOverride, 0));
 	GGL::CGLGUIInterface::HookFillDataHealth();
 }
 

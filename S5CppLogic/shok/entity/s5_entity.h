@@ -238,6 +238,7 @@ namespace EGL {
 		// but does not remove id->name mapping
 		void SetScriptName(const char* n);
 		void Hurt(int dmg);
+		bool Heal(int heal);
 		void SetTaskList(shok::TaskListId tl);
 		void SetTaskList(EGL::CGLETaskList* tl);
 		EGL::CGLETaskList* GetCurrentTaskList();
@@ -322,6 +323,7 @@ namespace EGL {
 		friend class GGL::CGLGUIInterface;
 		static void __thiscall OnCreateFixHP(CGLEEntity* th, const EGL::CGLEEntityCreator* c);
 		static void NAKED_DECL OnCreateFixHPASM();
+		bool __thiscall HealOverride(int heal);
 
 	public:
 		static shok::TaskExecutionResult(*LuaTaskListCallback)(EGL::CGLEEntity* e, int val); // 0 next task, 1 state changed, 2 tasklist changed, 3 lua task repeat

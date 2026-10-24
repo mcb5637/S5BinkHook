@@ -23,7 +23,11 @@ namespace CppLogic::Tech {
 		}
 
 		float GetCurrentResearchProgress(shok::PlayerId pid, shok::TechnologyId techId) {
+			if (pid == shok::PlayerId::P0)
+				throw lua::LuaException{"player 0 has no techs"};
 			auto* pl = (*GGL::CGLGameLogic::GlobalObj)->GetPlayer(pid);
+			if (pl == nullptr)
+				throw lua::LuaException{"player status nullptr??"};
 			auto& t = pl->TechnologyStates.TechnologyState.at(static_cast<int>(techId));
 			return static_cast<float>(t.ResearchProgress) / GGL::PlayerTechManager::Tech::ProgressFactor;
 		}

@@ -3220,7 +3220,7 @@ function CppLogic.Technology.GetResearchInfo(tid) end
 --- @param cost CostInfo cost info (optional)
 function CppLogic.Technology.SetResearchInfo(tid, time, cost) end
 
---- current researc progress.
+--- current research progress.
 --- @param player number
 --- @param tid number|string
 --- @return number

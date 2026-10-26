@@ -7,9 +7,9 @@
 namespace CppLogic::Serializer {
 	class SchemaGenerator {
 		static void PushUnknownFieldSerializers(luaext::State L, const BB::SerializationData* d);
-		static void PushUnknownFieldSerializersSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, luaext::State L);
+		static void PushUnknownFieldSerializersSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, bool baseSkipClassname, luaext::State L);
 		static void PushUnknownListOptions(luaext::State L, const BB::SerializationData* d);
-		static void PushUnknownListOptionsSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, luaext::State L);
+		static void PushUnknownListOptionsSpecific(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, bool baseSkipClassname, luaext::State L);
 
 	public:
 		static void PushUnknownFieldSerializers(luaext::State L);
@@ -27,13 +27,16 @@ namespace CppLogic::Serializer {
 		static void WriteRegisteredClassesSchema(BB::IStream& f);
 		static void WriteChosenClassesSchema(BB::IStream& f);
 		static void WriteNewClassSchema(BB::IStream& f, std::string_view name, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id = shok::ClassId::Invalid);
-		static void WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname, shok::ClassId id = shok::ClassId::Invalid);
+		static void WriteSubclassSchema(BB::IStream& f, std::string_view name, std::string_view basename, const BB::SerializationData* seridata, bool skipClassname,
+										shok::ClassId id = shok::ClassId::Invalid, bool baseSkipClassname = false);
 		static void WriteClassnameClassSchema(BB::IStream& f, std::string_view name, shok::ClassId id);
-		static void WriteChosenClassSchema(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, BB::IStream& f);
+		static void WriteChosenClassSchema(std::string_view name, const BB::SerializationData* cl, std::string_view parent_name, bool hasParentSeridata, bool skipClassname, bool baseSkipClassname, BB::IStream& f);
 		static void PreRegisterExtraClasses();
 		template<auto F, class... Arg>
-		static void ForAllChoosesClasses(Arg&... arg);
+		static void ForAllChosenClasses(Arg&... arg);
 		template<auto F, class C, class... Arg>
-		static void ForSimpleChoosenClass(Arg&... arg);
+		static void ForSimpleChosenClass(Arg&... arg);
+		template<auto F, class C, class P, class ...Arg>
+		static void ForParentChosenClass(Arg& ...arg);
 	};
 }

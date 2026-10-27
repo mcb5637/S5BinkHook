@@ -115,7 +115,7 @@ ModLoader = {
 	--- note that this mechanism bakes the exact version of each modpack into the savegame.
 	--- @type string[]
 	RequiredMods = {},
-	--- if set, allocates this many extra players for the mapscript.
+	--- if set, allocates this many extra players for the mapscript. (the number set here will be the last valid Id)
 	--- additional players can be requested via the Manifest and will get Ids > than this.
 	--- @type number?
 	ReservedPlayerIds = nil,

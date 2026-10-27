@@ -433,7 +433,7 @@ ModLoader.ManifestType = {
 		Preload = function(t, manifest)
 		end,
 		Load = function(t, manifest)
-			local pid = ModLoader.PlayerIdDynamicStart or 9
+			local pid = (ModLoader.ReservedPlayerIds or 8) + 1
 			local pd = manifest.Players or {}
 			for k,v in pairs(pd) do
 				pd[k] = pid
@@ -1083,6 +1083,19 @@ end
 ---	unloads all script lib bbas
 function ModLoader.UnloadScriptLibs()
 	ModLoader.CleanupMods(ModLoader.ModList, true, true)
+end
+
+function ModLoader.FixExtraPlayers()
+	local max = CppLogic.ModLoader.GetMaxPlayers()
+	for i = 9, max do
+		Score.Player[i] = {}
+		Score.Player[i]["all"] = 0
+		Score.Player[i]["resources"] = 0
+		Score.Player[i]["buildings"] = 0
+		Score.Player[i]["technology"] = 0
+		Score.Player[i]["settlers"] = 0
+		Score.Player[i]["battle"] = 0
+	end
 end
 
 Trigger.RequestTriggerBackup = Trigger.RequestTrigger

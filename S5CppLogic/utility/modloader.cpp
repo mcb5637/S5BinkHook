@@ -86,6 +86,18 @@ void CppLogic::ModLoader::ModLoader::Init(luaext::State L, const char* mappath, 
 			L.Pop(1);
 		}
 	}
+	L.Push("FixExtraPlayers");
+	L.GetTableRaw(-2);
+	if (L.IsFunction(-1)) {
+		if (L.PCall(0, 0) != lua::ErrorCode::Success) {
+			auto s = std::format("Initialize error: {}", L.ToDebugString(-1));
+			Log(L, s.c_str());
+			L.Pop(1);
+		}
+	}
+	else {
+		L.Pop(1);
+	}
 	Framework::AGameModeBase::DoNotRemoveNextArchive = keeparchive;
 	RemoveLib(L);
 	L.SetTop(t);

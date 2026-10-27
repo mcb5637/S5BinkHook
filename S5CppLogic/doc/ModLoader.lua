@@ -104,13 +104,21 @@ ModLoader = {
 		Fonts = {
 			
 		},
+		--- dynamic Player Ids. [randomName] = 0 (0 gets replaced by the assigned Id)
+		Players = {
+
+        },
 	},
-	--- the names of all ModPacks requied by this map. a call to ModLoader.RequireModList() in Initialize will then try to load them.
+	--- the names of all ModPacks requried by this map. a call to ModLoader.RequireModList() in Initialize will then try to load them.
 	--- after adding user requested modpacks and dependencies, this will get saved into the savegame.
 	--- when loading a savegame, overrides this variable with info stored in the savegame.
 	--- note that this mechanism bakes the exact version of each modpack into the savegame.
 	--- @type string[]
 	RequiredMods = {},
+	--- if set, allocates this many extra players for the mapscript.
+	--- additional players can be requested via the Manifest and will get Ids > than this.
+	--- @type number?
+	ReservedPlayerIds = nil,
 }
 
 --- this function gets called after ModLoader loads this file.

@@ -78,6 +78,13 @@ namespace CppLogic::Entity {
 			return 1;
 		}
 		void PredicateAndAutoCreate(luaext::State L) { // clear stack after creating and predicate
+			if (L.GetTop() == 0 || L.IsNoneOrNil(1)) {
+				L.SetTop(0);
+				L.NewUserClass<Iterator::PredicateAll<EGL::CGLEEntity>>();
+				return;
+			}
+			if (L.GetTop() == 1)
+				return;
 			PredicateAnd(L);
 			L.Insert(1);
 			L.SetTop(1);
@@ -210,14 +217,12 @@ namespace CppLogic::Entity {
 		}
 
 		int PredicateHasFreeSerfSlot(luaext::State L) {
-			L.NewUserClass<CppLogic::Iterator::EntityIteratorHasFreeSerfSlot>(L.CheckPos(1));
+			L.NewUserClass<CppLogic::Iterator::EntityPredicateHasFreeSerfSlot>(L.CheckPos(1));
 			return 1;
 		}
 
 		int EntityIteratorTableize(luaext::State L) {
-			if (L.GetTop() > 1) { // auto create an and predicate
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 			int index = 1;
 			L.NewTable();
@@ -231,9 +236,7 @@ namespace CppLogic::Entity {
 		}
 
 		int EntityIteratorCount(luaext::State L) {
-			if (L.GetTop() > 1) { // auto create an and predicate
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 			CppLogic::Iterator::GlobalEntityIterator it{pred};
 			L.Push(it.Count());
@@ -241,9 +244,7 @@ namespace CppLogic::Entity {
 		}
 
 		int EntityIteratorGetNearest(luaext::State L) {
-			if (L.GetTop() > 1) { // auto create an and predicate
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 			CppLogic::Iterator::GlobalEntityIterator it{pred};
 			float maxR = -1;
@@ -275,9 +276,7 @@ namespace CppLogic::Entity {
 			return 3;
 		}
 		int LEntityIterator(luaext::State L) {
-			if (L.GetTop() > 1) { // auto create an and predicate
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 
 			L.NewUserClass<CppLogic::Iterator::GlobalEntityIterator>(pred); // upvalue of func
@@ -313,11 +312,9 @@ namespace CppLogic::Entity {
 			auto acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
 			L.Remove(3);
 			L.Remove(2);
+			L.Remove(1);
 			L.NewUserClass<CppLogic::Iterator::PredicateInRect<EGL::CGLEEntity>>(area);
-			if (L.GetTop() > 1) { // auto create an and predicate
-				L.Replace(1);
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 
@@ -333,11 +330,9 @@ namespace CppLogic::Entity {
 			auto acf = static_cast<shok::AccessCategoryFlags>(L.CheckInt(3));
 			L.Remove(3);
 			L.Remove(2);
+			L.Remove(1);
 			L.NewUserClass<CppLogic::Iterator::PredicateInCircle<EGL::CGLEEntity>>(p, r * r);
-			if (L.GetTop() > 1) { // auto create an and predicate
-				L.Replace(1);
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CGLEEntity>>(1);
 

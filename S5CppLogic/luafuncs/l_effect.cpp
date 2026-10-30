@@ -253,6 +253,13 @@ namespace CppLogic::Effect {
 			return 1;
 		}
 		void PredicateAndAutoCreate(luaext::State L) { // clear stack after creating and predicate
+			if (L.GetTop() == 0 || L.IsNoneOrNil(1)) {
+				L.SetTop(0);
+				L.NewUserClass<Iterator::PredicateAll<EGL::CEffect>>();
+				return;
+			}
+			if (L.GetTop() == 1)
+				return;
 			PredicateAnd(L);
 			L.Insert(1);
 			L.SetTop(1);
@@ -315,9 +322,7 @@ namespace CppLogic::Effect {
 			return 3;
 		}
 		int EffectIterator(luaext::State L) {
-			if (L.GetTop() > 1) { // auto create an and predicate
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
 			L.NewUserClass<CppLogic::Iterator::GlobalEffectIterator>(pred); // upvalue of func
 			L.Push<IteratorNext>(1); // func
@@ -327,9 +332,7 @@ namespace CppLogic::Effect {
 		}
 
 		int EffectIteratorTableize(luaext::State L) {
-			if (L.GetTop() > 1) { // auto create an and predicate
-				PredicateAndAutoCreate(L);
-			}
+			PredicateAndAutoCreate(L);
 			auto* pred = L.CheckUserClass<CppLogic::Iterator::Predicate<EGL::CEffect>>(1);
 			int index = 1;
 			L.NewTable();

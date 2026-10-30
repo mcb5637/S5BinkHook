@@ -403,10 +403,10 @@ bool CppLogic::Iterator::EffectPredicateIsArrowOrCannonBall::Matches(const EGL::
 	return id == GGL::CArrowEffect::Identifier || id == GGL::CCannonBallEffect::Identifier;
 }
 
-CppLogic::Iterator::EntityIteratorHasFreeSerfSlot::EntityIteratorHasFreeSerfSlot(const shok::Position& pos) : Pos(pos) {
+CppLogic::Iterator::EntityPredicateHasFreeSerfSlot::EntityPredicateHasFreeSerfSlot(const shok::Position& pos) : Pos(pos) {
 }
 
-bool CppLogic::Iterator::EntityIteratorHasFreeSerfSlot::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const {
+bool CppLogic::Iterator::EntityPredicateHasFreeSerfSlot::Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const {
 	const auto* build = BB::IdentifierCast<const GGL::CBuilding, const EGL::CGLEEntity, const GGL::CConstructionSite, const GGL::CBridgeEntity>(e);
 	if (build == nullptr)
 		return false;

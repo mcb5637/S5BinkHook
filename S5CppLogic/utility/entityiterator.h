@@ -683,13 +683,23 @@ namespace CppLogic::Iterator {
 		using InheritsFrom = std::tuple<Predicate<EGL::CEffect>>;
 	};
 
-	class EntityIteratorHasFreeSerfSlot : public Predicate<EGL::CGLEEntity> {
+	class EntityPredicateHasFreeSerfSlot : public Predicate<EGL::CGLEEntity> {
 		shok::Position Pos;
 	public:
-		explicit EntityIteratorHasFreeSerfSlot(const shok::Position& pos);
+		explicit EntityPredicateHasFreeSerfSlot(const shok::Position& pos);
 
 		virtual bool Matches(const EGL::CGLEEntity* e, float* rangeOut, int* prio) const override;
 
 		using InheritsFrom = std::tuple<Predicate<EGL::CGLEEntity>>;
+	};
+
+	template<class T>
+	class PredicateAll : public Predicate<T> {
+	public:
+		virtual bool Matches(const T* e, float* rangeOut, int* prio) const override {
+			return true;
+		}
+
+		using InheritsFrom = std::tuple<Predicate<T>>;
 	};
 }

@@ -1,4 +1,5 @@
 #pragma once
-#define DIRECT3D_VERSION 0x0900
+#define NOMINMAX 1
+#include <d3d9helper.h>
 
 // D3DXCreateEffect 0x62A355

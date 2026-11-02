@@ -1,5 +1,8 @@
 #include "s5_RWEngine.h"
+
+#include <shok/globals/s5_framework.h>
 #include <shok/globals/s5_mapdisplay.h>
+#include <utility/hooks.h>
 
 inline void(__cdecl* const vec3d_transform)(RWE::RwV3d* ou, const RWE::RwV3d* i, const RWE::RwMatrix* m) = reinterpret_cast<void(__cdecl*)(RWE::RwV3d*, const RWE::RwV3d*, const RWE::RwMatrix*)>(0x41C770);
 
@@ -508,4 +511,39 @@ static inline int(__cdecl* const texture_destroy)(RwTexture* t) = reinterpret_ca
 void RwTexture::Destroy()
 {
     texture_destroy(this);
+}
+
+static void SetPresentParameters() {
+	auto& i = *RWE::Present;
+	auto* m = *Framework::CMain::GlobalObj;
+	bool vsync = true;
+	const char* key = "CppLogic\\VSync";
+	if (m->GDB.IsKeyValid(key))
+		vsync = m->GDB.GetValue(key) != 0;
+	if (vsync)
+		i.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+}
+static void NAKED SetPresentParametersASM() {
+	__asm {
+		mov esi, 0x410e30;
+		call esi;
+		call SetPresentParameters;
+
+		push 0x4112d1;
+		ret;
+	};
+}
+void RWE::HookFixEngine() {
+	static bool Hooked = false;
+	if (Hooked)
+		return;
+	Hooked = true;
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x41137f-0x41134e,
+		{
+			reinterpret_cast<void*>(0x4112cc),
+			reinterpret_cast<void*>(0x41134e),
+		}
+	};
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4112cc), &SetPresentParametersASM, reinterpret_cast<void*>(0x4112d1));
+	CppLogic::Hooks::WriteNops(reinterpret_cast<void*>(0x41134e), 0x41137f-0x41134e);
 }

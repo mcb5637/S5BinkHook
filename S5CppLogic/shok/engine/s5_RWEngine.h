@@ -3,6 +3,7 @@
 #include <shok/s5_forwardDecls.h>
 #include <shok/s5_baseDefs.h>
 #include <shok/engine/s5_RWE_enums.h>
+#include <shok/engine/directx.h>
 #include <span>
 #include <optional>
 #include <Win.h>
@@ -1183,6 +1184,25 @@ namespace RWE {
 			// 5E3A20 RtDictSchemaInit
 		};
 	}
+
+	struct RwEngineOpenParams
+	{
+		void    *displayID;     /**< Display Identifier */
+	};
+	struct _rwD3D9AdapterInformation
+	{
+		char          name[MAX_DEVICE_IDENTIFIER_STRING];
+		int         modeCount;
+		D3DDISPLAYMODE  mode;
+		int         displayDepth;
+		int         flags;
+	};
+
+
+	inline IDirect3D9** RwDirect3DObject = reinterpret_cast<IDirect3D9**>(0x850228);
+	inline auto* Present = reinterpret_cast<D3DPRESENT_PARAMETERS* const>(0xa1afc0);
+
+	void HookFixEngine();
 }
 
 struct RwTexture {
@@ -1261,3 +1281,13 @@ class enum_is_flags<RWE::RpAtomic::Flags> : public std::true_type {};
 // 0x41E090 _rwD3D9Im2DRenderOpen
 // 0x410A40 D3D9RestoreCacheLights
 // 0x41FF70 _rwD3D9RenderStateReset
+// 0x410d20 D3D9DeviceSystemClose
+// 0x410e30 D3D9SetPresentParameters (optimized calling convention)
+// 850224 WindowHandle HWND
+// a1afc0 Present
+// 411290 D3D9DeviceSystemStart
+// 4138f0 D3D9System
+// 85025c EnableFullScreenDialogBoxMode
+// a1b040 _RwD3D9ZBufferDepth
+// 850244 _RwHasStencilBuffer
+// a1b280 _RwD3D9DeviceCaps

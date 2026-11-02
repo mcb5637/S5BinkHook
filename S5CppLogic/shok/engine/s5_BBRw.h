@@ -175,6 +175,7 @@ namespace BBRw {
 		CRwTextures* SelectionTextures; // also shorewave
 
 		// init 0x48C77B
+		// ctor 48be67
 
 		static inline CEngine** const GlobalObj = reinterpret_cast<CEngine**>(0x8595E8); // technically IEngine, but CEngine is the only thing that ever ends up here
 	};

@@ -383,6 +383,7 @@ void InitGame() {
 	GGL::CGLEffectFireProps::HookFixCtor();
 	GGUI::CManager::DisableSelectionLimit(true);
 	GGL::ExperienceClass::HookFixSeriData();
+	RWE::HookFixEngine();
 }
 
 double Version = 0.0;

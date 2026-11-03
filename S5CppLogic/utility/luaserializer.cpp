@@ -502,6 +502,8 @@ void CppLogic::Serializer::FastBinarySerializer::Deserialize(BB::IStream& s, BB:
 	Deserialize(s, o, (*BB::CClassFactory::GlobalObj)->GetSerializationDataForClass(id), id);
 }
 
+std::map<std::string, lua::CFunction, std::less<>> CppLogic::Serializer::UserdataDeserializer{};
+
 CppLogic::Serializer::ObjectAccess::ObjectAccess(std::string_view name, void* obj, const BB::SerializationData* sd, int id, void(*onWrite)(int id))
 	: SDName(name), Object(obj), SeriData(sd), Id(id), OnWrite(onWrite == nullptr ? [](int) {} : onWrite)
 {

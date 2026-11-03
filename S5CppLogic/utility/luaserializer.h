@@ -69,7 +69,7 @@ namespace CppLogic::Serializer {
 	};
 
 
-	static std::map<std::string, lua::CFunction, std::less<>> UserdataDeserializer;
+	extern std::map<std::string, lua::CFunction, std::less<>> UserdataDeserializer;
 	/// <summary>
 	/// better serialization of lua states.
 	/// serialize writes the type (so it can write a reference instead).

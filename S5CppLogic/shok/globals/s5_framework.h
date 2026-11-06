@@ -570,6 +570,9 @@ namespace Framework {
 		// ctor 40b968
 		// parse cmd args 4082f3(char*, DataT*) static stdcall
 
+		// 407441 WNDPROC
+		// 7ffca4 bool window is active
+
 		// 40b528 init sound default values
 		struct SoundConfig {
 			bool uk = true;

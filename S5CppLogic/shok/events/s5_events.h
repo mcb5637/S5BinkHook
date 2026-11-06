@@ -785,6 +785,8 @@ namespace BB {
 		static inline constexpr int TypeDesc = 0x7FFE98;
 		static inline constexpr int vtp = 0x762154;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x7B2E4D60);
+
+		// ctor 4073f1
 	};
 
 	class CKeyEvent : public BB::CInputEvent {

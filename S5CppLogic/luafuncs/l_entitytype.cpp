@@ -6,6 +6,7 @@
 #include <shok/entity/s5_entity.h>
 #include <shok/globals/s5_maplogic.h>
 #include <shok/player/s5_player.h>
+#include <shok/entity/s5_animset.h>
 #include <luaext.h>
 #include <utility/hooks.h>
 #include <utility/luaserializer.h>
@@ -1044,6 +1045,38 @@ namespace CppLogic::EntityType {
 			return 1;
 		}
 
+		int SearchMissingDieAnims(luaext::State L) {
+			L.NewTable();
+			auto etymng = CppLogic::GetIdManager<shok::EntityTypeId>();
+			auto die = CppLogic::GetIdManager<shok::AnimationCategoryId>().GetIdByName("Die");
+			for (auto e : etymng) {
+				auto* ety = CppLogic::GetEntityType(e);
+				if (auto* animbeh = ety->GetBehaviorProps<GGL::CGLAnimationBehaviorExProps>()) {
+					if (animbeh->AnimSet == shok::AnimSetId::Invalid) {
+						L.Push(etymng.GetNameByID(e));
+						L.Push("AnimSet 0");
+						L.SetTableRaw(-3);
+					}
+					else {
+						auto* aset = CppLogic::GetAnimSet(animbeh->AnimSet);
+						bool found = false;
+						for (auto* a : aset->Anims) {
+							if (a->Name == die) {
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
+							L.Push(etymng.GetNameByID(e));
+							L.Push("has no Die");
+							L.SetTableRaw(-3);
+						}
+					}
+				}
+			}
+			return 1;
+		}
+
 		constexpr std::array EntityType{
 			luaext::FuncReference::GetRef<GetLimitedLifespanDuration>("GetLimitedLifespanDuration"),
 			luaext::FuncReference::GetRef<SetLimitedLifespanDuration>("SetLimitedLifespanDuration"),
@@ -1134,6 +1167,7 @@ namespace CppLogic::EntityType {
 			luaext::FuncReference::GetRef<DumpBattleBehavior>("DumpBattleBehavior"),
 			luaext::FuncReference::GetRef<WorkerGetWorktimeData>("WorkerGetWorktimeData"),
 			luaext::FuncReference::GetRef<WorkerGetRefinerData>("WorkerGetRefinerData"),
+			luaext::FuncReference::GetRef<SearchMissingDieAnims>("SearchMissingDieAnims"),
 		};
 
 		constexpr std::array Building{

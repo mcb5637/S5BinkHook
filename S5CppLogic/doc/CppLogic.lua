@@ -3167,6 +3167,10 @@ function CppLogic.EntityType.Settler.WorkerGetWorktimeData(et) end
 ---@return number amount
 function CppLogic.EntityType.Settler.WorkerGetRefinerData(et) end
 
+--- searches all settler types for missing die animations
+--- @return table<string,string>
+function CppLogic.EntityType.Settler.SearchMissingDieAnims() end
+
 --- number of settlers this building (villagecenter) supports.
 --- @param ty number entitytype
 --- @return number slots

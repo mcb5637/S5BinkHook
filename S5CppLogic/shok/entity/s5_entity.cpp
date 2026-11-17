@@ -1961,7 +1961,7 @@ void GGL::CSettler::Appear()
 
 void GGL::CSettler::EventGetArmorOverride(EGL::CEventGetValue_Int* ev) {
 	if (EventIsSoldier()) {
-		auto* l = GetEntityByID(GetFirstAttachedEntity(shok::AttachmentType::LEADER_SOLDIER));
+		auto* l = GetEntityByID(GetFirstAttachedToMe(shok::AttachmentType::LEADER_SOLDIER));
 		if (l == nullptr) {
 			Hurt(Health);
 			return;

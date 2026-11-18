@@ -440,11 +440,33 @@ function ModLoaderMainmenu.ActionMonitor()
 		return
 	end
 	GDB.SetString("CppLogic\\BorderlessFullscreenOn", m.Name)
+	if m.Name ~= "" then
+		CppLogic.API.RemoveGDBKey("CppLogic\\WindowedX")
+		CppLogic.API.RemoveGDBKey("CppLogic\\WindowedY")
+	end
 end
 
 function ModLoaderMainmenu.UpdateMonitorSelect()
+	local on = GDB.GetString("CppLogic\\BorderlessFullscreenOn") ~= ""
+
+	local get = function(k)
+		if GDB.IsKeyValid(k) then
+			return GDB.GetValue(k)
+		end
+	end
+
+	local x, y = get("CppLogic\\WindowedX"), get("CppLogic\\WindowedY")
+	if x and y then
+		on = true
+	end
+
+	if x and y then
+		XGUIEng.SetText(XGUIEng.GetCurrentWidgetID(), "@center "..x.."x"..y)
+	else
+		XGUIEng.SetTextKeyName(XGUIEng.GetCurrentWidgetID(), on and "CppLogic_Mainmenu/Borderless" or "CppLogic_Mainmenu/Fullscreen")
+	end
+
 	if not ModLoaderMainmenu.MonitorScroll.Over[1] then
-		local on = GDB.GetString("CppLogic\\BorderlessFullscreenOn") ~= ""
 		XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), on and 1 or 0)
 		XGUIEng.ShowWidget("OptionsMenu30_ResExtraList", on and 1 or 0)
 		XGUIEng.ShowWidget("OptionsMenu30_ResolutionList", on and 0 or 1)
@@ -482,6 +504,40 @@ function ModLoaderMainmenu.ActionClamp()
 	f = 1 - f
 	GDB.SetValue("CppLogic\\ClipMouse", f)
 	CppLogic.API.UpdateClipMouse()
+end
+
+function ModLoaderMainmenu.UpdateVSync()
+	local f = 1
+	if GDB.IsKeyValid("CppLogic\\VSync") then
+		f = GDB.GetValue("CppLogic\\VSync")
+	end
+	XGUIEng.HighLightButton(XGUIEng.GetCurrentWidgetID(), f)
+end
+
+function ModLoaderMainmenu.ActionVSync()
+	local f = 1
+	if GDB.IsKeyValid("CppLogic\\VSync") then
+		f = GDB.GetValue("CppLogic\\VSync")
+	end
+	f = 1 - f
+	GDB.SetValue("CppLogic\\VSync", f)
+end
+
+---@param txt string
+---@param wid number
+---@param event CPLTextInputCustomWidgetEvent
+function ModLoaderMainmenu.EventCustomWindow(txt, wid, event)
+	if event == CppLogic.UI.TextInputCustomWidgetEvent.Confirm then
+		local _, _, x, y = string.find(txt, "(%d+) *x *(%d+)")
+		if x and y then
+			GDB.SetValue("CppLogic\\WindowedX", x)
+			GDB.SetValue("CppLogic\\WindowedY", y)
+			GDB.SetString("CppLogic\\BorderlessFullscreenOn", "")
+		elseif txt == "" then
+			CppLogic.API.RemoveGDBKey("CppLogic\\WindowedX")
+			CppLogic.API.RemoveGDBKey("CppLogic\\WindowedY")
+		end
+	end
 end
 
 function ModLoaderMainmenu.InitUI()
@@ -1156,6 +1212,9 @@ function ModLoaderMainmenu.InitUI()
 	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtra_BG") == 0, "OptionsMenu30_ResExtra_BG already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResExtraToggle") == 0, "OptionsMenu30_ResExtraToggle already exists")
 	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResClamp") == 0, "OptionsMenu30_ResClamp already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_ResVSync") == 0, "OptionsMenu30_ResVSync already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_CustomResTT") == 0, "OptionsMenu30_CustomResTT already exists")
+	assert(XGUIEng.GetWidgetID("OptionsMenu30_CustomRes") == 0, "OptionsMenu30_CustomRes already exists")
 	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenu30_Resolution", "OptionsMenu30_ResExtra", "OptionsMenu30_Resolution_Headline")
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtra", 0, 0, 710, 247)
 	XGUIEng.ShowWidget("OptionsMenu30_ResExtra", 1)
@@ -1251,7 +1310,7 @@ function ModLoaderMainmenu.InitUI()
 		0, "OptionsMenu30_ResExtraSliderGfx", "OptionsMenu30_ResExtraScrollable")
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraScroll", 0, 0, 502, 207)
 	XGUIEng.ShowWidget("OptionsMenu30_ResExtraScroll", 1)
-	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraScroll", 0, false, false)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraScroll", 0, false, true)
 	CppLogic.UI.ContainerWidgetCreateContainerWidgetChild("OptionsMenu30_ResExtraList", "OptionsMenu30_ResExtraScrollBar", nil)
 	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraScrollBar", 464, 84, 38, 44)
 	XGUIEng.ShowWidget("OptionsMenu30_ResExtraScrollBar", 1)
@@ -1270,7 +1329,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResExtra_BG", 0, 0, 0, 1, 1)
 	XGUIEng.SetMaterialColor("OptionsMenu30_ResExtra_BG", 0, 0, 7, 12, 96)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenu30_ResExtra", "OptionsMenu30_ResExtraToggle", nil)
-	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraToggle", 540, 64, 130, 47)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResExtraToggle", 540, 50, 130, 47)
 	XGUIEng.ShowWidget("OptionsMenu30_ResExtraToggle", 1)
 	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResExtraToggle", 0, false, false)
 	XGUIEng.DisableButton("OptionsMenu30_ResExtraToggle", 0)
@@ -1300,7 +1359,7 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResExtraToggle", false)
 	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenu30_ResExtraToggle", function() ModLoaderMainmenu.UpdateMonitorSelect() end)
 	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenu30_ResExtra", "OptionsMenu30_ResClamp", nil)
-	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResClamp", 540, 121, 130, 47)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResClamp", 540, 100, 130, 47)
 	XGUIEng.ShowWidget("OptionsMenu30_ResClamp", 1)
 	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResClamp", 0, false, false)
 	XGUIEng.DisableButton("OptionsMenu30_ResClamp", 0)
@@ -1329,9 +1388,51 @@ function ModLoaderMainmenu.InitUI()
 	CppLogic.UI.TextButtonSetCenterText("OptionsMenu30_ResClamp", true)
 	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResClamp", false)
 	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenu30_ResClamp", function() ModLoaderMainmenu.UpdateClamp() end)
+	CppLogic.UI.ContainerWidgetCreateTextButtonWidgetChild("OptionsMenu30_ResExtra", "OptionsMenu30_ResVSync", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_ResVSync", 540, 150, 130, 47)
+	XGUIEng.ShowWidget("OptionsMenu30_ResVSync", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_ResVSync", 0, false, false)
+	XGUIEng.DisableButton("OptionsMenu30_ResVSync", 0)
+	XGUIEng.HighLightButton("OptionsMenu30_ResVSync", 0)
+	CppLogic.UI.ButtonOverrideActionFunc("OptionsMenu30_ResVSync", function() ModLoaderMainmenu.ActionVSync() end)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResVSync", 0, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResVSync", 0, "data\\graphics\\textures\\gui\\mainmenu\\sub.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResVSync", 0, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResVSync", 1, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResVSync", 1, "data\\graphics\\textures\\gui\\mainmenu\\sub_hi.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResVSync", 1, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResVSync", 2, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResVSync", 2, "data\\graphics\\textures\\gui\\mainmenu\\sub_sel.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResVSync", 2, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResVSync", 3, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResVSync", 3, "data\\graphics\\textures\\gui\\mainmenu\\sub_in.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResVSync", 3, 255, 255, 255, 255)
+	CppLogic.UI.WidgetMaterialSetTextureCoordinates("OptionsMenu30_ResVSync", 4, 0, 0, 1, 1)
+	XGUIEng.SetMaterialTexture("OptionsMenu30_ResVSync", 4, "data\\graphics\\textures\\gui\\mainmenu\\sub_akt.png")
+	XGUIEng.SetMaterialColor("OptionsMenu30_ResVSync", 4, 255, 255, 255, 255)
+	CppLogic.UI.WidgetSetTooltipString("OptionsMenu30_ResVSync", "CppLogic_Mainmenu/VSyncTT", true)
+	CppLogic.UI.WidgetSetFont("OptionsMenu30_ResVSync", "data\\menu\\fonts\\mainmenularge.met")
+	CppLogic.UI.WidgetSetStringFrameDistance("OptionsMenu30_ResVSync", 3)
+	XGUIEng.SetTextKeyName("OptionsMenu30_ResVSync", "CppLogic_Mainmenu/VSync")
+	XGUIEng.SetTextColor("OptionsMenu30_ResVSync", 255, 255, 255, 255)
+	CppLogic.UI.TextButtonSetCenterText("OptionsMenu30_ResVSync", true)
+	CppLogic.UI.WidgetSetUpdateManualFlag("OptionsMenu30_ResVSync", false)
+	CppLogic.UI.WidgetOverrideUpdateFunc("OptionsMenu30_ResVSync", function() ModLoaderMainmenu.UpdateVSync() end)
+	CppLogic.UI.ContainerWidgetCreatePureTooltipWidgetChild("OptionsMenu30_ResExtra", "OptionsMenu30_CustomResTT", nil)
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_CustomResTT", 15, 210, 500, 20)
+	XGUIEng.ShowWidget("OptionsMenu30_CustomResTT", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_CustomResTT", 0, false, false)
+	CppLogic.UI.WidgetSetTooltipString("OptionsMenu30_CustomResTT", "CppLogic_Mainmenu/CustomResTT", true)
+	CppLogic.UI.ContainerWidgetCreateCustomWidgetChild("OptionsMenu30_ResExtra", "OptionsMenu30_CustomRes", "CppLogic::Mod::UI::TextInputCustomWidget", nil, 0, 0, 0, 0, 1611400960,
+		0, "ModLoaderMainmenu.EventCustomWindow", "")
+	CppLogic.UI.WidgetSetPositionAndSize("OptionsMenu30_CustomRes", 15, 210, 500, 20)
+	XGUIEng.ShowWidget("OptionsMenu30_CustomRes", 1)
+	CppLogic.UI.WidgetSetBaseData("OptionsMenu30_CustomRes", 0, false, false)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraScrollable", nil, false, false)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraUp", nil, false, true)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraDown", nil, false, true)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResExtraToggle", "StartMenu_TooltipText", true, true)
 	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResClamp", "StartMenu_TooltipText", true, true)
+	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_ResVSync", "StartMenu_TooltipText", true, true)
+	CppLogic.UI.WidgetSetTooltipData("OptionsMenu30_CustomResTT", "StartMenu_TooltipText", true, true)
 end

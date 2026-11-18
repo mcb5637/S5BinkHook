@@ -312,6 +312,7 @@ namespace GGL {
 		bool RemoveQuest(int questId, bool info);
 
 		// dtor 4b6279
+		// get quest by id 4c8095
 	};
 	static_assert(sizeof(PlayerQuestManager::Quest) == 24 * 4);
 	//constexpr int i = offsetof(PlayerQuestManager::Quest, SubQuestDoneFlagArray) / 4;

@@ -725,6 +725,7 @@ namespace GGL {
 		// defined events: IsConvertible, GetArmorClass, GetArmor, OnAttackedBy, WorkerAlarmMode_Enable, WorkerAlarmMode_Disable
 
 		// 4a9db6 add construction progress(float)
+		// 4ab0d4 get logic props
 
 		static std::vector<shok::AdditionalTechModifier> ConstructionSpeedModifiers;
 		static void EnableConstructionSpeedTechs();

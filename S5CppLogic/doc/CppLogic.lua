@@ -1085,6 +1085,19 @@ function CppLogic.Logic.DumpGameLogic() end
 --- @return number
 function CppLogic.Logic.GetResourceFromRaw(rt) end
 
+--- enables triggers for attraction limit calculation (Events.CPPLOGIC_EVENT_CALCULATE_ATTRACTION_USAGE and Events.CPPLOGIC_EVENT_CALCULATE_ATTRACTION_LIMIT)
+--- @param enabled boolean
+function CppLogic.Logic.EnableAttractionTriggers(enabled) end
+
+--- gets attraction trigger data (Events.CPPLOGIC_EVENT_CALCULATE_ATTRACTION_USAGE and Events.CPPLOGIC_EVENT_CALCULATE_ATTRACTION_LIMIT)
+--- @return number amount
+--- @return number player
+function CppLogic.Logic.AttractionTriggerGetData() end
+
+--- sets attraction trigger amount (Events.CPPLOGIC_EVENT_CALCULATE_ATTRACTION_USAGE and Events.CPPLOGIC_EVENT_CALCULATE_ATTRACTION_LIMIT)
+--- @param amount number
+function CppLogic.Logic.AttractionTriggerSetData(amount) end
+
 --- ui command callback.
 --- func parameters are (eventId, eventData, writeback).
 --- function can return true to skip further event execution.

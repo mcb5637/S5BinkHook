@@ -65,6 +65,7 @@ namespace GGL {
 		int GetNumberOfMilitaryUnits();
 		// in 1/100 ticks
 		[[nodiscard]] int GetTimeToNextPayday() const;
+		static int GetAttractionUsageOfVect(const shok::Vector<shok::EntityId>& v);
 
 		int GetSleepPlaceLimit();
 		int GetFreeSleepPlaces();
@@ -87,7 +88,6 @@ namespace GGL {
 		static void (*OnCheckPayDayCallback)(GGL::CPlayerAttractionHandler* th);
 
 		static void HookWorkerSpawn();
-		static bool AttractionCannonInProgress;
 		static void HookAttractionCannonInProgress();
 
 		// on entity created 0x4C38FE __thiscall(id)
@@ -102,11 +102,12 @@ namespace GGL {
 
 	private:
 		void __thiscall CheckWorkerSpawnHook();
-		static int __thiscall CannonsInProgressAttraction(const CPlayerAttractionHandler* th);
-		static void NAKED_DECL CannonsInProgressAttractionASM();
+		[[nodiscard]] int __thiscall CannonsInProgressAttraction() const;
 		void CheckPaydayOverride();
 		[[nodiscard]] int GetTimeToNextPaydayOverride() const;
 		[[nodiscard]] int GetPaydayFrequency100Override() const;
+		[[nodiscard]] int GetAttractionUsageOverride() const;
+		[[nodiscard]] int GetAttractionLimitOverride() const;
 	};
 	//constexpr int i = offsetof(CPlayerAttractionHandler, EntityTypeCountMap) / 4;
 

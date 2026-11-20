@@ -1221,8 +1221,7 @@ namespace CppLogic::Logic {
 		}
 
 		int EnableCannonInProgressAttraction(luaext::State L) {
-			GGL::CPlayerAttractionHandler::AttractionCannonInProgress = L.CheckBool(1);
-			CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction = GGL::CPlayerAttractionHandler::AttractionCannonInProgress;
+			CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction = L.CheckBool(1);
 			GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();
 			return 0;
 		}
@@ -1336,6 +1335,26 @@ namespace CppLogic::Logic {
 			if (!(i >= 0 && i < 3))
 				throw lua::LuaException("invalid transform operation");
 			return static_cast<RWE::RwOpCombineType>(i);
+		}
+
+		void EnableAttractionTriggers(bool en) {
+			bool& f = CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AttractionTriggers;
+			f = en;
+			if (f)
+				GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();
+		}
+
+		auto AttractionTriggerGetData() {
+			auto* ev = BB::IdentifierCast<GGL::CEventPlayerIDInteger>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+			if (!ev)
+				throw lua::LuaException("not in trigger");
+			return std::tuple{ev->Data, ev->PlayerID};
+		}
+		void AttractionTriggerSetData(int amount) {
+			auto* ev = BB::IdentifierCast<GGL::CEventPlayerIDInteger>(*EScr::CScriptTriggerSystem::CurrentRunningEventGet);
+			if (!ev)
+				throw lua::LuaException("not in trigger");
+			ev->Data = amount;
 		}
 	} // namespace
 
@@ -1729,7 +1748,6 @@ namespace CppLogic::Logic {
 		GGL::CEntityProfile::HookExperience(false);
 		GGL::CWorkerBehavior::ResourceTriggers = false;
 		GGL::CWorkerBehavior::RefinerFix = false;
-		GGL::CPlayerAttractionHandler::AttractionCannonInProgress = false;
 		std::erase(EGL::CGLEEntity::AdditionalCancelableStates, shok::TaskState::BattleWait);
 	}
 
@@ -1842,6 +1860,9 @@ namespace CppLogic::Logic {
 		luaext::FuncReference::GetRef<ConstructionTriggerSetProgress>("ConstructionTriggerSetProgress"),
 		luaext::FuncReference::GetRef<GetWeatherSpeedFactor>("GetWeatherSpeedFactor"),
 		luaext::FuncReference::GetRef<GetResourceFromRaw>("GetResourceFromRaw"),
+		luaext::FuncReference::GetRef<EnableAttractionTriggers>("EnableAttractionTriggers"),
+		luaext::FuncReference::GetRef<AttractionTriggerGetData>("AttractionTriggerGetData"),
+		luaext::FuncReference::GetRef<AttractionTriggerSetData>("AttractionTriggerSetData"),
 	};
 
 	constexpr std::array UICmd{
@@ -1922,6 +1943,12 @@ namespace CppLogic::Logic {
 			L.Push("CPPLOGIC_EVENT_ON_SERF_BOUGHT");
 			L.Push(static_cast<int>(shok::EventIDs::Keep_BuySerfCommand));
 			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_CALCULATE_ATTRACTION_USAGE");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_CalculateAttractionUsage));
+			L.SetTableRaw(-3);
+			L.Push("CPPLOGIC_EVENT_CALCULATE_ATTRACTION_LIMIT");
+			L.Push(static_cast<int>(shok::EventIDs::CppLogicEvent_CalculateAttractionLimit));
+			L.SetTableRaw(-3);
 			L.Pop(1);
 		}
 	}
@@ -1998,10 +2025,8 @@ namespace CppLogic::Logic {
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.SettlerBuyTriggers)
 			EnableSettlerBuyTriggers(luaext::State{nullptr});
 
-		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction) {
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction)
 			GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress();
-			GGL::CPlayerAttractionHandler::AttractionCannonInProgress = true;
-		}
 
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ResDoodad_RefillableCategory != shok::EntityCategory::Invalid) {
 			GGL::CResourceDoodad::HookAutoDestroyIfEmpty();
@@ -2016,6 +2041,9 @@ namespace CppLogic::Logic {
 
 		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.ConstructionTriggers)
 			EnableConstructionTriggers(true);
+
+		if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AttractionTriggers)
+			EnableAttractionTriggers(true);
 
 		L.Pop(1);
 	}

@@ -1378,6 +1378,8 @@ namespace shok {
 		CppLogicEvent_OnResourceChanged, // CppLogic::Events::PaydayEvent
 		CppLogicEvent_CancelResearch, // CppLogic::Events::EntityAndTechEvent
 		CppLogicEvent_TrainingComplete, // EGL::CEvent2Entities
+		CppLogicEvent_CalculateAttractionUsage, // GGL::CEventPlayerIDInteger
+		CppLogicEvent_CalculateAttractionLimit, // GGL::CEventPlayerIDInteger
 	};
 
 	enum class InputEventIds : int {

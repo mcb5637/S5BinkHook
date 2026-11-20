@@ -46,6 +46,7 @@ namespace CppLogic::SavegameExtra {
 		bool BattleWaitCancelable = false;
 		bool ResearchTriggers = false;
 		bool ConstructionTriggers = false;
+		bool AttractionTriggers = false;
 		shok::EntityCategory ResDoodad_RefillableCategory = {};
 		std::vector<ExtraPlayerData> ExtraPlayers;
 

@@ -117,6 +117,11 @@ int GGL::CPlayerAttractionHandler::GetTimeToNextPayday() const
 	return f(this);
 }
 
+int GGL::CPlayerAttractionHandler::GetAttractionUsageOfVect(const shok::Vector<shok::EntityId>& v) {
+	auto* f = reinterpret_cast<int(__stdcall*)(const shok::Vector<shok::EntityId>*)>(0x4c2335);
+	return f(&v);
+}
+
 static inline int(__thiscall* const shok_playerattractionhandler_attachworkers)(GGL::CPlayerAttractionHandler* th, bool force) = reinterpret_cast<int(__thiscall* const)(GGL::CPlayerAttractionHandler*, bool)>(0x4C4302);
 void GGL::CPlayerAttractionHandler::CheckWorkerAttachment(bool forceReAttach)
 {
@@ -227,12 +232,12 @@ void GGL::CPlayerAttractionHandler::HookWorkerSpawn()
 	CppLogic::Hooks::RedirectCall(reinterpret_cast<void*>(0x4C4AB7), CppLogic::Hooks::MemberFuncPointerToVoid(&GGL::CPlayerAttractionHandler::CheckWorkerSpawnHook, 0));
 }
 
-int __thiscall GGL::CPlayerAttractionHandler::CannonsInProgressAttraction(const CPlayerAttractionHandler* th)
+int __thiscall GGL::CPlayerAttractionHandler::CannonsInProgressAttraction() const
 {
-	if (!AttractionCannonInProgress)
+	if (!CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.CannonInProgressAttraction)
 		return 0;
 	int i = 0;
-	for (shok::EntityId id : th->WorkBuildingsArray) {
+	for (shok::EntityId id : WorkBuildingsArray) {
 		const EGL::CGLEEntity* e = EGL::CGLEEntity::GetEntityByID(id);
 		auto* f = e->GetBehavior<GGL::CFoundryBehavior>();
 		if (f != nullptr && f->CannonType != shok::EntityTypeId::Invalid) {
@@ -243,20 +248,6 @@ int __thiscall GGL::CPlayerAttractionHandler::CannonsInProgressAttraction(const 
 		}
 	}
 	return i;
-}
-
-void NAKED_DEF GGL::CPlayerAttractionHandler::CannonsInProgressAttractionASM() {
-	__asm {
-		mov eax, 0x4C2335;
-		call eax;
-		add edi, eax;
-		mov ecx, esi;
-		call GGL::CPlayerAttractionHandler::CannonsInProgressAttraction;
-		add eax, edi;
-
-		push 0x4C27DD;
-		ret;
-	};
 }
 
 void GGL::CPlayerAttractionHandler::CheckPaydayOverride() {
@@ -303,15 +294,50 @@ int GGL::CPlayerAttractionHandler::GetPaydayFrequency100Override() const {
 	return GetPaydayFrequency() * 1000;
 }
 
-bool GGL::CPlayerAttractionHandler::AttractionCannonInProgress = true;
-bool AttractionCannonInProgress_Hooked = false;
+int GGL::CPlayerAttractionHandler::GetAttractionUsageOverride() const {
+	int r = GetAttractionUsageOfVect(FreeWorkerArray);
+	r += GetAttractionUsageOfVect(EmployedWorkerArray);
+	r += GetAttractionUsageOfVect(SoldierArray);
+	r += GetAttractionUsageOfVect(LeaderArray);
+	r += GetAttractionUsageOfVect(SerfArray);
+	r += CannonsInProgressAttraction();
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AttractionTriggers) {
+		GGL::CEventPlayerIDInteger ev{shok::EventIDs::CppLogicEvent_CalculateAttractionUsage, PlayerID, r};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		r = ev.Data;
+	}
+	return r;
+}
+
+int GGL::CPlayerAttractionHandler::GetAttractionLimitOverride() const {
+	int r = 0;
+	for (auto id : VillageCenterArray) {
+		auto* e = EGL::CGLEEntity::GetEntityByID(id);
+		auto* bp = BB::IdentifierCast<GGL::CGLBuildingProps>(e->GetEntityType()->LogicProps);
+		if (bp != nullptr) {
+			r += bp->NumberOfAttractableSettlers;
+		}
+	}
+	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.AttractionTriggers) {
+		GGL::CEventPlayerIDInteger ev{shok::EventIDs::CppLogicEvent_CalculateAttractionLimit, PlayerID, r};
+		(*EScr::CScriptTriggerSystem::GlobalObj)->RunTrigger(&ev);
+		r = ev.Data;
+	}
+	return r;
+}
+
 void GGL::CPlayerAttractionHandler::HookAttractionCannonInProgress()
 {
+	static bool AttractionCannonInProgress_Hooked = false;
 	if (AttractionCannonInProgress_Hooked)
 		return;
 	AttractionCannonInProgress_Hooked = true;
-	CppLogic::Hooks::SaveVirtualProtect vp{ reinterpret_cast<void*>(0x4C27D6), 10 };
-	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4C27D6), &CannonsInProgressAttractionASM, reinterpret_cast<void*>(0x4C27DD));
+	CppLogic::Hooks::SaveVirtualProtect vp{ 0x10, {
+		reinterpret_cast<void*>(0x4c278b),
+		reinterpret_cast<void*>(0x4c216f),
+	} };
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4c278b), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerAttractionHandler::GetAttractionUsageOverride, 0), reinterpret_cast<void*>(0x4c2795));
+	CppLogic::Hooks::WriteJump(reinterpret_cast<void*>(0x4c216f), CppLogic::Hooks::MemberFuncPointerToVoid(&CPlayerAttractionHandler::GetAttractionLimitOverride, 0), reinterpret_cast<void*>(0x4c2176));
 }
 
 static inline shok::UpgradeCategoryId(__thiscall* const upgrademanager_getucatbybuilding)(GGL::CUpgradeManager* th, shok::EntityTypeId id) = reinterpret_cast<shok::UpgradeCategoryId(__thiscall*)(GGL::CUpgradeManager*, shok::EntityTypeId)>(0x4B3CA6);

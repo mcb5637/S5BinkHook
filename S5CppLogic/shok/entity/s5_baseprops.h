@@ -27,7 +27,7 @@ namespace EGL {
 		virtual void __thiscall OnEntityCreate(EGL::CGLEBehaviorProps* p) = 0;
 		virtual void __thiscall OnEntityLoad(EGL::CGLEBehaviorProps* p) = 0;
 		virtual void __thiscall OnEntityUpgrade(EGL::CGLEEntity* old); // on movement seems to copy a lot of data, maybe change behavior?
-		virtual void __thiscall OnEntityDestroy(bool ev); // 7 usually empty, ev is false when destroyed normally, entity is still valid when called (not the case in dtor)
+		virtual void __thiscall OnEntityDestroy(bool mapExit); // 7 usually empty, mapExit is false when destroyed normally, entity is still valid when called (not the case in dtor)
 
 	public:
 		static inline constexpr int TypeDesc = 0x813778;

@@ -616,11 +616,6 @@ void EGL::CGLEEntity::AddDelayedEvent(BB::CEvent* ev)
 	entity_adddelayedevent(this, ev, 0);
 }
 
-void EGL::CGLEEntity::Destroy()
-{
-	DestroyVT(0);
-}
-
 static inline bool(__stdcall* const entity_checkdodge)(EGL::CGLEEntity* th) = reinterpret_cast<bool(__stdcall*)(EGL::CGLEEntity*)>(0x50ABB9);
 bool EGL::CGLEEntity::CheckDodge()
 {

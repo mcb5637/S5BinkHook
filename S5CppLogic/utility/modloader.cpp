@@ -1616,8 +1616,9 @@ void CppLogic::ModLoader::ModLoader::Initialize()
 
 void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 {
-	if (((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu)) {
+	if ((*Framework::CMain::GlobalObj)->CurrentMode != Framework::CMain::Mode::MainMenu) {
 		luaext::State L{ *EScr::CScriptTriggerSystem::GameState };
+		(*EScr::CScriptTriggerSystem::GlobalObj)->TriggerSystemDisabled = true;
 		ModPackList = "";
 
 		Log(L, "Cleanup");
@@ -1657,7 +1658,7 @@ void CppLogic::ModLoader::ModLoader::Cleanup(Framework::CMain::NextMode n)
 			for (EGL::CGLEEntity* a : it) {
 				if (man->GetDisplayForEntity(a->EntityId))
 					man->DestroyDisplayForEntity(a->EntityId);
-				a->Destroy();
+				a->Destroy(true);
 			}
 			(*EGL::CGLEGameLogic::GlobalObj)->ClearToDestroy();
 		}

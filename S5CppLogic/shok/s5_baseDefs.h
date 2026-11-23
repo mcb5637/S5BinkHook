@@ -361,6 +361,7 @@ namespace EGL {
 
 		// 44b46d fill ids of attachment thiscall(multimap, attachmenttype, vector<entityid>)
 		// 44b13d get number of attachment types thiscall(multimap, atype)
+		// 4acb00 on destroy call detach
 	};
 	class CEntityAttachmentProxy {
 	};

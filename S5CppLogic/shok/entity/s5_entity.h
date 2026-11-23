@@ -114,8 +114,10 @@ namespace EGL {
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x3F2913E0);
 
 	private:
-		virtual void OnDestroy(int i) = 0;
-		virtual void DestroyVT(int i) = 0;
+		virtual void OnDestroy(bool mapExit) = 0;
+	public:
+		virtual void Destroy(bool mapExit = false) = 0;
+	private:
 		virtual void InitializeFromCreator(const EGL::CGLEEntityCreator* cr) = 0; // 5
 		virtual void CopyToCreator(EGL::CGLEEntityCreator* cr) const = 0;
 		virtual void OnCreated() = 0;
@@ -254,8 +256,6 @@ namespace EGL {
 		[[nodiscard]] shok::AccessCategory GetAccessCategory() const;
 		std::tuple<float, bool> __thiscall GetBaseExploration();
 
-		void Destroy();
-
 		[[nodiscard]] shok::EntityId GetFirstAttachedToMe(shok::AttachmentType attachmentId) const; // other -> this
 		[[nodiscard]] shok::EntityId GetFirstAttachedEntity(shok::AttachmentType attachmentId) const; // this -> other
 		/**
@@ -360,6 +360,8 @@ namespace EGL {
 		// defined states: SetNextTaskList
 
 		// add to idmanager 57B1E6()
+		// remove from region & player 57a91a
+		// remove blocking & script trigger destroy 57c065
 	};
 #ifdef __INTELLISENSE__
 #pragma diag_suppress 2784

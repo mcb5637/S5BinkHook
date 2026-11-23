@@ -319,6 +319,8 @@ namespace EGL {
 
 		static inline constexpr int vtp = 0x783B4C;
 		static constexpr shok::ClassId Identifier = static_cast<shok::ClassId>(0x1A5477F7);
+
+		// remove entity 58d859
 	};
 
 	class CPlayerFeedbackHandler : public BB::IObject {
@@ -435,6 +437,8 @@ namespace EGL {
 			PADDINGI(2);
 
 			shok::Vector<EGL::CGLEEntity*>& GetByAccessCategory(shok::AccessCategory ac);
+
+			// remove entity 587A1C
 		};
 		shok::Vector<Entry> Data;
 
@@ -446,8 +450,8 @@ namespace EGL {
 		size_t GetEntryIdByComponents(int x, int y);
 		size_t GetEntryId(const shok::Position& p);
 		// add entity 587AF1
-		// remove entity 587A1C
 		// on entity move 587B4D __thiscall(this, entity, lastpos)
+		// on entity destroyed 587a4c
 	};
 	static_assert(sizeof(RegionDataEntity::Entry) == 120);
 

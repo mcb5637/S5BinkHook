@@ -329,7 +329,7 @@ int GGL::CCircularAttack::TaskSpecialAttackOverride(EGL::CGLETaskArgs*) {
 	if (CAProps->Effect != shok::EffectTypeId::Invalid) {
 		EGL::CGLEEffectCreator cr{};
 		cr.EffectType = CAProps->Effect;
-		cr.CurrentPos = static_cast<shok::Position&>(e->Position);
+		cr.StartPos = static_cast<shok::Position&>(e->Position);
 		(*EGL::CGLEGameLogic::GlobalObj)->CreateEffect(&cr);
 	}
 	return 0;

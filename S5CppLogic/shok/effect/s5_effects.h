@@ -288,14 +288,14 @@ namespace EGL {
 	private:
 		int Zero1 = 0;
 	public:
-		shok::PlayerId PlayerID = shok::PlayerId::Invalid;
+		shok::PlayerId PlayerID = shok::PlayerId::P0;
 		shok::Position StartPos = { 0,0 }, CurrentPos = { 0,0 }, TargetPos = { 0,0 };
 		float HeightOffset = 0; // unused
 		shok::EntityId AttackerID = shok::EntityId::Invalid, TargetID = shok::EntityId::Invalid;
 		int Damage = 0; // 13
 		float DamageRadius = 0;
 		shok::DamageClassId DamageClass = shok::DamageClassId::Invalid; // unused
-		shok::PlayerId SourcePlayer = shok::PlayerId::Invalid; // 16
+		shok::PlayerId SourcePlayer = shok::PlayerId::P0; // 16
 		bool Misses = false; // 17
 	private:
 		bool Zero5[2] = { false, false };

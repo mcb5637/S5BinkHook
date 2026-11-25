@@ -1265,7 +1265,7 @@ float EGL::CGLEEntity::CalculateDamageAgainstMe(int damage, shok::DamageClassId 
 		shok::LogString("ac 0 on type %i\n", getac.Data);
 	}
 	dmg -= static_cast<float>(geta.Data);
-	return dmg;
+	return std::max(dmg, 1.0f);
 }
 
 float EGL::CGLEEntity::ModifyDamage(int baseDamage, bool noCache) const

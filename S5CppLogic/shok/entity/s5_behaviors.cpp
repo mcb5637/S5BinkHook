@@ -844,7 +844,7 @@ void __thiscall GGL::CLeaderBehavior::CheckRegen()
 		PerformRegeneration();
 	if (CppLogic::SavegameExtra::SerializedMapdata::GlobalObj.LeaderFixIdleSoldierBattle) {
 		auto sol = e->ObservedEntities.ForKeys(shok::AttachmentType::LEADER_SOLDIER);
-		if (sol.begin() != sol.end()) {
+		if (sol.begin() != sol.end() && e->CurrentTaskListID == LeaderBehProps->BattleTaskList) {
 			auto tar = e->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_COMMAND_TARGET);
 			if (tar != shok::EntityId::Invalid) {
 				if (EGL::CGLEEntity::GetEntityByID(sol.begin()->second.EntityId)->GetFirstAttachedEntity(shok::AttachmentType::ATTACKER_TARGET) == shok::EntityId::Invalid) {

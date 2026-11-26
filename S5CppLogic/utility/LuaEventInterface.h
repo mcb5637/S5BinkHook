@@ -44,6 +44,10 @@ namespace CppLogic::LuaEventInterface {
 		return BB::CEvent{ id };
 	}
 	template<>
+	inline BB::CEvent CheckEvent<BB::CEvent>(luaext::State L, shok::NetEventIds id, int off) {
+		return BB::CEvent{ id };
+	}
+	template<>
 	inline GGL::CEventPositionAnd2EntityTypes CheckEvent<GGL::CEventPositionAnd2EntityTypes>(luaext::State L, shok::EventIDs id, int off) {
 		return { id, L.CheckPos(off + 1), L.CheckEnum<shok::EntityTypeId>(off + 2), L.CheckEnum<shok::EntityTypeId>(off + 3) };
 	}

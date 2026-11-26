@@ -4163,6 +4163,9 @@ function CppLogic.UI.Commands.BombCannonCombo_Activate(id, p) end
 ---@param am number
 function CppLogic.UI.Commands.Player_DonateResources(target_player, resType, am) end
 
+---sends escape event
+function CppLogic.UI.Commands.Game_Escape() end
+
 --- loads an entitytype from a xml file (data/config/entities/typename.xml).
 --- the entitytype gets automatically removed/reloaded on leaving the map.
 --- load any additional models you want to use first.

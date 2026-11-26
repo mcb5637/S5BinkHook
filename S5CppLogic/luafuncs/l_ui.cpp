@@ -2070,6 +2070,7 @@ namespace CppLogic::UI {
 			luaext::FuncReference::GetRef<CommandMove>("Entity_Move"),
 			luaext::FuncReference::GetRef<CommandPatrol>("Entity_Patrol"),
 			luaext::FuncReference::GetRef<CommandDonateResources>("Player_DonateResources"),
+			luaext::FuncReference::GetRef<LuaEventInterface::NetEvent<BB::CEvent, shok::NetEventIds::Escape>>("Game_Escape"),
 		};
 	} // namespace
 
